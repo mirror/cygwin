@@ -149,6 +149,8 @@ namespace cgen {
 // XXX: fill out families of functions
 #define RORQI(x, y) (SRLQI((x), (y)) | SLLQI((x), 8-(y)))
 #define ROLQI(x, y) (SLLQI((x), (y)) | SRLQI((x), 8-(y)))
+#define RORHI(x, y) (SRLHI((x), (y)) | SLLHI((x), 16-(y)))
+#define ROLHI(x, y) (SLLHI((x), (y)) | SRLHI((x), 16-(y)))
 #define RORSI(x, y) (SRLSI((x), (y)) | SLLSI((x), 32-(y)))
 #define ROLSI(x, y) (SLLSI((x), (y)) | SRLSI((x), 32-(y)))
 #define JOINSIDI(x, y)  (MAKEDI(x, y))

@@ -5,7 +5,7 @@ AC_CONFIG_AUX_DIR(config)
 dnl set $CC early on
 AC_PROG_CC
 
-AM_INIT_AUTOMAKE(sid, 0.1)
+AM_INIT_AUTOMAKE(sid, 0.1-net)
 
 dnl automake support
 AM_MAINTAINER_MODE

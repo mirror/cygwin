@@ -1,3 +1,8 @@
+2001-10-10  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in: Designate this as a "-net" version.
+	* configure: Regenerated.
+
 2001-10-05  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am (all-local): Create version.h file with $(VERSION) in it.

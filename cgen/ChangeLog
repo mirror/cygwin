@@ -1,3 +1,17 @@
+2002-01-07  Ben Elliston  <bje@redhat.com>
+
+	* utils.scm (copyright-fsf): Add 2002.
+	(copyright-cygnus): Rename to copyright-red-hat.
+	(copyright-red-hat): Add 2002.
+	(CURRENT-COPYRIGHT): Update comment.
+	* opcodes.scm (option-set!): Update callers.
+	* sid-model.scm (cgen-model.cxx): Likewise.
+	* sid-cpu.scm: Likewise.
+	* sid-decode.scm: Likewise.
+	* sid.scm (option-set!): Handle "redhat" as an option for
+	"copyright"; use copyright-red-hat.
+	* sim.scm (option-set!): Likewise.
+
 2002-01-03  Dave Brolley  <brolley@redhat.com>
 
 	* decode.scm (-distinguishing-bit-population): Compute num-insns, the

@@ -1,5 +1,5 @@
 ; Simulator model support, plus misc. things associated with a cpu family.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2002 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Return C code to define cpu implementation properties.
@@ -337,7 +337,7 @@ const MACH " (gen-sym mach) "_mach =
 
   (string-write
    (gen-copyright "Simulator model support for @prefix@."
-		  copyright-cygnus package-cygnus-simulators)
+		  copyright-red-hat package-cygnus-simulators)
    "\
 
 #include \"@arch@-main.h\"

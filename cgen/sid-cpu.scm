@@ -1,5 +1,5 @@
 ; CPU family related simulator generator, excluding decoding and model support.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2002 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; ***********
@@ -75,7 +75,7 @@
 
   (string-write
    (gen-copyright "Misc. entries in the @arch@ description file."
-		  copyright-cygnus package-cygnus-simulators)
+		  copyright-red-hat package-cygnus-simulators)
    "\
 #ifndef DESC_@ARCH@_H
 #define DESC_@ARCH@_H
@@ -242,7 +242,7 @@ namespace @arch@ {
 
   (string-write
    (gen-copyright "CPU class elements for @cpu@."
-		  copyright-cygnus package-cygnus-simulators)
+		  copyright-red-hat package-cygnus-simulators)
    "\
 // This file is included in the middle of the cpu class struct.
 
@@ -416,7 +416,7 @@ typedef struct @prefix@_trace_record {
 
   (string-write
    (gen-copyright "CPU family header for @cpu@ / @prefix@."
-		  copyright-cygnus package-cygnus-simulators)
+		  copyright-red-hat package-cygnus-simulators)
    "\
 #ifndef DEFS_@PREFIX@_H
 #define DEFS_@PREFIX@_H
@@ -503,7 +503,7 @@ namespace @cpu@ {
   (string-write
    (gen-copyright (string-append "Simulator instruction operand writer for "
 				(current-arch-name) ".")
-		 copyright-cygnus package-cygnus-simulators)
+		 copyright-red-hat package-cygnus-simulators)
    "\
 
 #include \"@cpu@.h\"
@@ -621,7 +621,7 @@ using namespace @cpu@;
 
   (string-write
    (gen-copyright "Simulator instruction semantics for @prefix@."
-		  copyright-cygnus package-cygnus-simulators)
+		  copyright-red-hat package-cygnus-simulators)
    "\
 
 #include \"@cpu@.h\"
@@ -1253,7 +1253,7 @@ restart:
 
   (string-write
    (gen-copyright "Simulator instruction semantics for @prefix@."
-		  copyright-cygnus package-cygnus-simulators)
+		  copyright-red-hat package-cygnus-simulators)
    "\
 
 #include \"@cpu@.h\"

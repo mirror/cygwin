@@ -1,5 +1,5 @@
 ; General cpu info generator support.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2002 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Global state variables.
@@ -36,8 +36,8 @@
     ((opinst) (set! -opcodes-build-operand-instance-table? #t))
     ((copyright) (cond ((equal?  value '("fsf"))
 			(set! CURRENT-COPYRIGHT copyright-fsf))
-		       ((equal? value '("cygnus"))
-			(set! CURRENT-COPYRIGHT copyright-cygnus))
+		       ((equal? value '("redhat"))
+			(set! CURRENT-COPYRIGHT copyright-red-hat))
 		       (else (error "invalid copyright value" value))))
     ((package) (cond ((equal?  value '("binutils"))
 		      (set! CURRENT-PACKAGE package-gnu-binutils-gdb))

@@ -226,6 +226,7 @@ clean:
 
 distclean: clean
 	rm -f Makefile config.status config.cache config.log
+	rm -f iwidgets.tcl pkgIndex.tcl
 
 depend:
 	makedepend -- $(CC_SWITCHES) -- $(SRCS)

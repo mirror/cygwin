@@ -407,7 +407,7 @@ distclean: clean
 	-rm -f *.tab.c
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
-	-rm -f config.status
+	-rm -f config.status itclConfig.sh pkgIndex.tcl
 
 #========================================================================
 # Install binary object libraries.  On Windows this includes both .dll and

@@ -1,3 +1,14 @@
+2001-03-06  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configrun-sid.in: Remove unused configuration variables.
+	Find sid executable relative to this script in install tree.
+	Roll back $gloss_specified change.
+
+2001-02-23  John Healy  <jhealy@redhat.com>
+
+	* configrun-sid.in: Added $gloss_specified variable.
+	Added error reporting for sim run.
+
 2001-01-23  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configrun-sid.in: Use system perlfunc, not fork/exec, to spawn

@@ -8,6 +8,7 @@ $running_under_some_shell = 0;
 
 #use strict;
 use Getopt::Long;
+use File::Basename;
 require 5.004;
 
 %cpu_comptype = (
@@ -42,6 +43,7 @@ require 5.004;
 
 $opt_cpu="";
 $opt_help=0;
+$opt_version=0;
 $opt_verbose=0;
 $opt_save_temps=0;
 $opt_no_run=0;
@@ -69,14 +71,25 @@ $opt_sidcodec="";
 
 $any_tcl = 0;
 
+# sid executable
+if ($ENV{'SID'}) {
+  $sid=$ENV{'SID'};
+} else {
+  $sid = dirname($0);
+  $sid .= "/sid";
+}
+
+$version=q$Id: configrun-sid.in,v 1.25 2001/10/26 18:03:30 fche Exp $;
+
 # by default the loader data mapper connects to the cpu-mapper access-port
 $load_mapper_data = "cpu-mapper access-port";
 
 # (see perldoc Getopt::Long)
 %options = (
 	    "help!" => ["help", "Print this help message."],
+	    "version!" => ["version", "Print wrapper / sid versions."],
 	    "cpu=s" => ["cpu=CPU   (REQUIRED)", "Select target processor.", "none"],
-	    "verbose!" => ["verbose", "Turn on various run-time verbosity settings.", "no"],
+	    "v|verbose!" => ["v|verbose", "Turn on various run-time verbosity settings.", "no"],
 	    "save-temps!" => ["save-temps", "Keep generated sid configuration file.", "no"],
 	    "trace-extract!" => ["trace-extract", "Turn on CPU insn decode tracing.", "no"],
 	    "trace-semantics!" => ["trace-semantics", "Turn on CPU insn execute tracing.", "no"],
@@ -87,6 +100,7 @@ $load_mapper_data = "cpu-mapper access-port";
 	    "enable-warnings!" => ["enable-warnings", "Enable CPU execution warnings.", "no"],
 	    "memory-region=s@" => ["memory-region=BASE,SIZE", "Add RAM region from BASE to BASE+SIZE-1.", "no",
 				   "other options:",
+				   "   bus=MAPPER     Attach memory to bus MAPPER, not data",
 				   "   read-only      Make memory read-only",
 				   "   alias=BASE2    Add an alias at BASE2",
 				   "   file=FILENAME  Load/save memory image from file",
@@ -232,7 +246,12 @@ my @ARGV_COPY = @ARGV;
 # handle args
 &GetOptions(@options);
 
-# handle help
+# handle version/help
+if ($opt_version) {
+  print STDERR "$version\n";
+  system ("$sid", "-v");
+  exit (0);
+}
 if ($opt_help || $opt_cpu eq "") {
   &usage;
 }
@@ -326,24 +345,25 @@ if ($opt_gdb)
 # ----------------------------------------------------------------------------
 # Configuration file construction
 
-# sid executable
-if ($ENV{'SID'}) {
-  $sid=$ENV{'SID'};
+# Don't bother compute accurate values if config file is temporary
+# anyway.
+if ($opt_norun || $opt_save_temps) {
+  $whoami=qx{whoami}; chop ($whoami);
+  $hostname=qx{hostname}; chop ($hostname);
+  $date=qx{date}; chop ($date);
+  $uname=qx{uname}; chop ($uname);
 } else {
-  $sid = qx{dirname $0};
-  chomp $sid;
-  $sid .= "/sid";
+  $whoami="";
+  $hostname="";
+  $date="";
+  $uname="";
 }
-
-$whoami=qx{whoami}; chop ($whoami);
-$hostname=qx{hostname}; chop ($hostname);
-$date=qx{date}; chop ($date);
-$uname=qx{uname}; chop ($uname);
-$version=q$Id: configrun-sid.in,v 1.24 2001/10/17 17:47:55 brolley Exp $;
 $zeroth_section = "# sid configuration file
 # created by $version
 # run by $whoami @ $hostname ($uname) at $date
 # args: @ARGV_COPY\n";
+
+if ($opt_verbose) { $zeroth_section .= "set main verbose? true\n"; }
 
 $cpu_component_type = $cpu_comptype{$opt_cpu} || die "Unknown cpu $opt_cpu for cpu component type\n";
 $first_section = "# first section\n" .
@@ -353,6 +373,7 @@ $first_section = "# first section\n" .
   &sidconf_new("hw-glue-sequence-1", "hw-reset-net") . "\n" .
   &sidconf_new("hw-glue-sequence-8", "deinit-sequence") . "\n" .
   &sidconf_new("hw-glue-sequence-1", "yield-net") . "\n" .
+  &sidconf_new("hw-glue-sequence-2", "cache-flush-net") . "\n" .
   &sidconf_new("sid-sched-host-accurate", "host-sched") . "\n" .
   &sidconf_new("sid-sched-sim", "target-sched") . "\n" .
   "";
@@ -413,7 +434,9 @@ if ($opt_icache) {
 connect-bus icache downstream $bus_upstream
 set icache report-heading \"icache profile report\"
 connect-pin init-sequence output-1 -> icache invalidate-all
-connect-pin deinit-sequence output-6 -> icache report!\n";
+connect-pin deinit-sequence output-6 -> icache report!
+connect-pin cache-flush-net output-1 -> icache flush-all
+connect-pin cache-flush-net output-2 -> icache invalidate-all\n";
   # $bus_upstream = "icache upstream";
 } else {
   $second_section .= "connect-bus cpu insn-memory $bus_upstream\n";
@@ -425,7 +448,9 @@ if ($opt_dcache) {
 connect-bus dcache downstream $bus_upstream
 set dcache report-heading \"dcache profile report\"
 connect-pin init-sequence output-1 -> dcache invalidate-all
-connect-pin deinit-sequence output-6 -> dcache report!\n";
+connect-pin deinit-sequence output-6 -> dcache report!
+connect-pin cache-flush-net output-1 -> dcache flush-all
+connect-pin cache-flush-net output-2 -> dcache invalidate-all\n";
   $bus_upstream = "dcache upstream";
 } else {
   $second_section .= "connect-bus cpu data-memory $bus_upstream\n";
@@ -865,7 +890,8 @@ connect-pin ${processor}-gdb process-signal -> main stop!
 connect-pin init-sequence output-3 -> ${processor}-gdb init
 connect-pin deinit-sequence output-5 -> ${processor}-gdb deinit
 connect-pin ${processor}-gdb yield -> yield-net input
-connect-pin ${processor}-gdb flush-icache -> $processor flush-icache
+connect-pin ${processor}-gdb flush-icache -> cache-flush-net input
+connect-pin cache-flush-net output-1 -> $processor flush-icache
 connect-pin ${processor}-gdb restart -> hw-reset-net input
 set ${processor}-gdb exit-on-detach? 1\n" .
 ($opt_verbose ? "set ${processor}-gdb trace-gdbsid? $opt_verbose\n" : "") .
@@ -1007,6 +1033,7 @@ while ($#opt_memory_region >= 0)
     $spec = shift @opt_memory_region;
     $mems ++;
     # Format: BASE,SIZE
+    #         [,bus=MAPPER]
     #         [,read-only]
     #         [,alias=BASE2]
     #         [,file=NAME]
@@ -1027,6 +1054,7 @@ while ($#opt_memory_region >= 0)
     $last = $base + $size - 1;
     $membus = "read-write-port"; # default read-write
     $memfile = ""; # default no file
+    $memmapper = "cpu-mapper";
     $mmap = 0; # default no mmap
     $latr = 0; $latw = 0; # default no latencies
     @aliases = ();
@@ -1043,6 +1071,7 @@ while ($#opt_memory_region >= 0)
 	$opt = shift @spec;
 	if ($opt eq "read-only") { $membus = "read-only-port"; }
 	elsif ($opt eq "mmap") { $mmap = 1; }
+	elsif ($opt =~ /bus=(.+)/) { $memmapper = $1; }
 	elsif ($opt =~ /file=(.+)/) { $memfile = $1; }
 	elsif ($opt =~ /alias=(.+)/) { push @aliases, $1 }
 	elsif ($opt =~ /relate=(.+)/) { push @relates, $1 }
@@ -1052,13 +1081,13 @@ while ($#opt_memory_region >= 0)
       }
 
     # process memory maps
-    $third_section .= "connect-bus cpu-mapper mem$mems:[$base,$last] mem$mems $membus\n";
+    $third_section .= "connect-bus $memmapper mem$mems:[$base,$last] mem$mems $membus\n";
 
     foreach $alias (@aliases)
       {
 	$alias = oct($alias) if ($alias =~ /^0/);
 	$aliasend = $alias + $size - 1;
-	$third_section .= "connect-bus cpu-mapper mem$mems:[$alias,$aliasend] mem$mems $membus\n";
+	$third_section .= "connect-bus $memmapper mem$mems:[$alias,$aliasend] mem$mems $membus\n";
       }
 
     foreach $relate (@relates) {
@@ -1165,7 +1194,6 @@ foreach $lib (sort keys %component_libs)
 
 
 # ----------------------------------------------------------------------------
-if ($opt_verbose) { $zeroth_section .= "set main verbose? true\n"; }
 if ($opt_persistent) { $zeroth_section .= "set main persistent? true\n"; }
 
 # Build config file

@@ -113,6 +113,9 @@ dnl can recursively descend there - see "Makefile.am".
 make_subdirs="cache consoles gdb gloss glue ide interrupt lcd loader mapper memory mmu parport profiling rtc sched uart testsuite"
 AC_SUBST(make_subdirs)
 
+dnl Install without the --program-prefix
+program_transform_name=s,x,x,
+
 dnl List all component subdirectory files not covered by AC_CONFIG_SUBDIRS
 dnl that need autoconf @substitution@.
 AC_OUTPUT([Makefile testsuite/Makefile tconfig.h:tconfig.in siddoc	

@@ -13,5 +13,8 @@ AC_SUBST(INSTALL)
 dnl Perform --target/--enable-targets processing.
 CY_SIDTARGET_CHECK
 
+dnl Install without the --program-prefix
+program_transform_name=s,x,x,
+
 AC_OUTPUT_COMMANDS([chmod a+x configrun-sid pregen/pregen-configs])
 AC_OUTPUT([Makefile pregen/Makefile configrun-sid pregen/pregen-configs])

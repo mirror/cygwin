@@ -1142,6 +1142,8 @@ echo "$ac_t""$sidtarget_xstormy16" 1>&6
 
 
 
+program_transform_name=s,x,x,
+
 
 trap '' 1 2 15
 cat > confcache <<\EOF

@@ -24,5 +24,8 @@ CY_SIDTARGET_CHECK
 dnl Pass SID_STATIC flag to Makefile.am to indicate a static build.
 AM_CONDITIONAL(SID_STATIC, test x$enable_shared != xyes)
 
+dnl Install without the --program-prefix
+program_transform_name=s,x,x,
+
 dnl Outputs
 AC_OUTPUT(Makefile)

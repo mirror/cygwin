@@ -1,6 +1,6 @@
 // sidcpuutil.h - Elements common to CPU models.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2003 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -283,7 +283,7 @@ namespace sidutil
     virtual void print_insn_summary (sid::host_int_4)
       {
 	std::cerr << "instruction count: " << this->total_insn_count << "  "
-		  << "simulated cycles: " << this->total_latency << std::endl;
+		  << "simulated cycles: " << this->total_latency + this->total_insn_count << std::endl;
       }
     virtual void stepped (sid::host_int_4 n)
       {

@@ -1,3 +1,8 @@
+2003-01-15  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (sidutil): Add total_insn_count when computing
+	simulated cycles.
+
 2002-11-29  Ben Elliston  <bje@redhat.com>
 
 	* sidcpuutil.h (basic_cpu::print_insn_summary_pin): New pin.

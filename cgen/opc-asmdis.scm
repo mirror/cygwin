@@ -85,7 +85,7 @@ void
   (string-write
    ; No need for copyright, appended to file with one.
    "\n"
-   (lambda () (gen-extra-asm.c srcdir (current-arch-name))) ; from <arch>.opc
+   (lambda () (gen-extra-asm.c (opc-file-path) (current-arch-name)))
    "\n"
    -gen-parse-switch
    (lambda () (gen-handler-table "parse" opc-parse-handlers))
@@ -178,7 +178,7 @@ void
   (string-write
    ; No need for copyright, appended to file with one.
    "\n"
-   (lambda () (gen-extra-dis.c srcdir (current-arch-name))) ; from <arch>.opc
+   (lambda () (gen-extra-dis.c (opc-file-path) (current-arch-name)))
    "\n"
    -gen-print-switch
    (lambda () (gen-handler-table "print" opc-print-handlers))

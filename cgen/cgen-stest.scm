@@ -24,9 +24,11 @@
 
 (define stest-arguments
   (list
-   (list '-B "file" "generate build.sh"
+   (list "-B" "file" "generate build.sh"
+	 #f
 	 (lambda (arg) (file-write arg cgen-build.sh)))
-   (list '-E "file" "generate the testsuite .exp"
+   (list "-E" "file" "generate the testsuite .exp"
+	 #f
 	 (lambda (arg) (file-write arg cgen-allinsn.exp)))
    )
 )

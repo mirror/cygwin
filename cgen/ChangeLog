@@ -1,3 +1,26 @@
+2003-09-08  Dave Brolley  <brolley@redhat.com>
+
+	On behalf of Doug Evans <dje@sebabeach.org>
+	Pass in paths to input files, instead of assuming they live in
+	$srcdir/cpu.  Plus misc. option processing cleanup.
+	* cgen-doc.scm (doc-arguments): Make options strings not symbols.
+	Add pre-process pass to all options.
+	* cgen-gas.scm (gas-arguments): Ditto.
+	* cgen-sid.scm (sim-arguments): Ditto.
+	* cgen-sim.scm (sim-arguments): Ditto.
+	* cgen-stest.scm (stest-arguments): Ditto.
+	* cgen-opc.scm (opc-arguments): Ditto.  New argument -OPC.
+	(-opc-file-path): New global.
+	(opc-file-path): New fn.
+	* opcodes.scm (read-cpu.opc): Replace srcdir,cpu args with opc-file.
+	All callers updated.
+	(gen-extra-cpu.h,gen-extra-cpu.c,gen-extra-opc.h,gen-extra-opc.c,
+	gen-extra-asm.c,gen-extra-dis.c,gen-extra-ibld.h,gen-extra-ibld.c):
+	Replace srcdir arg with opc-file.  All callers updated.
+	* read.scm (-opt-spec-update): Delete.
+	(opt-get-first-pass,opt-get-second-pass): New fns.
+	(-cgen): Process application-specific arguments in two passes.
+
 2003-08-29  Dave Brolley  <brolley@redhat.com>
 
 	* cpu/frv.cpu: Removed.

@@ -20,12 +20,14 @@
 
 (define doc-arguments
   (list
-   (list '-H "file" "generate $arch.html in <file>"
+   (list "-H" "file" "generate $arch.html in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen.html)))
-   ; can't use '-I because that gets interpreted as a complex number
-   (list (string->symbol "-I") "file" "generate $arch-insn.html in <file>"
+   (list "-I" "file" "generate $arch-insn.html in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-insn.html)))
-   (list '-N "file" "specify name of insn.html file"
+   (list "-N" "file" "specify name of insn.html file"
+	 #f
 	 (lambda (arg) (set! *insn-html-file-name* arg)))
    )
 )

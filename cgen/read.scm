@@ -913,17 +913,6 @@ Define a preprocessor-style macro.
 	       (cons (cons opt #f) (cdr argv))))))
 )
 
-; Convert old style option spec to new style.
-; This involves converting a symbol option name to a string.
-
-(define (-opt-spec-update spec-list)
-  (map (lambda (spec)
-	 (if (symbol? (car spec))
-	     (cons (symbol->string (car spec)) (cdr spec))
-	     spec))
-       spec-list)
-)
-
 ; Used to ensure backtraces are printed if an error occurs.
 
 (define (catch-with-backtrace thunk)
@@ -1009,7 +998,7 @@ Define a preprocessor-style macro.
 ; arguments specified up til now, then continue with next batch of args".
 
 (define common-arguments
-  '(("-a" "arch"      "set arch, specifies name of .cpu file to load")
+  '(("-a" "arch-file" "specify path of .cpu file to load")
     ("-b" #f          "use debugging evaluator, for backtraces")
     ("-d" #f          "start interactive debugging session")
     ("-f" "flags"     "specify a set of flags to control code generation")
@@ -1022,6 +1011,12 @@ Define a preprocessor-style macro.
     ("--version" #f   "print version info")
     )
 )
+
+; Accessors for application option specs
+(define (opt-get-first-pass opt)
+  (or (list-ref opt 3) (lambda args #f)))
+(define (opt-get-second-pass opt)
+  (or (list-ref opt 4) (lambda args #f)))
 
 ; Parse options and call generators.
 ; ARGS is a #:keyword delimited list of arguments.
@@ -1071,10 +1066,10 @@ Define a preprocessor-style macro.
       ; ARGS has been processed, now we can process ARGV.
 
       (let (
-	    (opt-spec (append common-arguments (-opt-spec-update opt-spec)))
+	    (opt-spec (append common-arguments opt-spec))
 	    (app-args nil)    ; application's args are queued here
 	    (repl? #f)
-	    (arch #f)
+	    (arch-file #f)
 	    (keep-mach "all") ; default is all machs
 	    (keep-isa "all")  ; default is all isas
 	    (flags "")
@@ -1093,7 +1088,7 @@ Define a preprocessor-style macro.
 	      ((missing) (cgen-usage 'missing arg opt-spec))
 	      (else
 	       (cond ((str=? "-a" (car opt))
-		      (set! arch arg)
+		      (set! arch-file arg)
 		      )
 		     ((str=? "-b" (car opt))
 		      (if (memq 'debug-extensions *features*)
@@ -1158,12 +1153,12 @@ Define a preprocessor-style macro.
 
 	; All arguments have been parsed.
 
-	(if (not arch)
+	(if (not arch-file)
 	    (error "-a option missing, no architecture specified"))
 
 	(if repl?
 	    (debug-repl nil))
-	(cpu-load (string-append srcdir "/cpu/" arch ".cpu")
+	(cpu-load arch-file
 		  keep-mach keep-isa flags
 		  app-init! app-finish! app-analyze!)
 	; Start another repl loop if -d.
@@ -1171,15 +1166,26 @@ Define a preprocessor-style macro.
 	(if repl?
 	    (debug-repl nil))
 
-	; Done with processing the arguments.  Call the application's
-	; file generators.
+	; Done with processing the arguments.
+	; Application arguments are processed in two passes.
+	; This is because the app may have arguments that specify things
+	; that affect file generation (e.g. to specify another input file)
+	; and we don't want to require an ordering of the options.
 
 	(for-each (lambda (opt-arg)
 		    (let ((opt (car opt-arg))
 			  (arg (cdr opt-arg)))
 		      (if (cadr opt)
-			  ((cadddr opt) arg)
-			  ((cadddr opt)))))
+			  ((opt-get-first-pass opt) arg)
+			  ((opt-get-first-pass opt)))))
+		  (reverse app-args))
+
+	(for-each (lambda (opt-arg)
+		    (let ((opt (car opt-arg))
+			  (arg (cdr opt-arg)))
+		      (if (cadr opt)
+			  ((opt-get-second-pass opt) arg)
+			  ((opt-get-second-pass opt)))))
 		  (reverse app-args))
 	)
       )

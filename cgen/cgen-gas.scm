@@ -24,9 +24,11 @@
 
 (define gas-arguments
   (list
-   (list '-B "file" "generate build script in <file>"
+   (list "-B" "file" "generate build script in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-build.sh)))
-   (list '-E "file" "generate allinsn.exp in <file>"
+   (list "-E" "file" "generate allinsn.exp in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-allinsn.exp)))
    )
 )

@@ -23,25 +23,35 @@
 
 (define sim-arguments
   (list
-   (list '-H "file" "generate desc.h in <file>"
+   (list "-H" "file" "generate desc.h in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-desc.h)))
-   (list '-C "file" "generate cpu.h in <file>"
+   (list "-C" "file" "generate cpu.h in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-cpu.h)))
-   (list '-E "file" "generate defs.h in <file>"
+   (list "-E" "file" "generate defs.h in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-defs.h)))
-   (list '-T "file" "generate decode.h in <file>"
+   (list "-T" "file" "generate decode.h in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-decode.h)))
-   (list '-D "file" "generate decode.cxx in <file>"
+   (list "-D" "file" "generate decode.cxx in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-decode.cxx)))
-   (list '-W "file" "generate write.cxx in <file>"
+   (list "-W" "file" "generate write.cxx in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-write.cxx)))
-   (list '-S "file" "generate semantics.cxx in <file>"
+   (list "-S" "file" "generate semantics.cxx in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-semantics.cxx)))
-   (list '-X "file" "generate sem-switch.cxx in <file>"
+   (list "-X" "file" "generate sem-switch.cxx in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-sem-switch.cxx)))
-   (list '-M "file" "generate model.cxx in <file>"
+   (list "-M" "file" "generate model.cxx in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-model.cxx)))
-   (list '-N "file" "generate model.h in <file>"
+   (list "-N" "file" "generate model.h in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-model.h)))
    )
 )

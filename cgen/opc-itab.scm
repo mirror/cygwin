@@ -698,7 +698,7 @@ void
 #define @ARCH@_OPC_H
 
 "
-   (lambda () (gen-extra-opc.h srcdir (current-arch-name))) ; from <arch>.opc
+   (lambda () (gen-extra-opc.h (opc-file-path) (current-arch-name)))
    -gen-insn-enum
    -gen-ifield-decls
    -gen-init-macros
@@ -725,7 +725,7 @@ void
 #include \"@prefix@-opc.h\"
 #include \"libiberty.h\"
 \n"
-   (lambda () (gen-extra-opc.c srcdir (current-arch-name))) ; from <arch>.opc
+   (lambda () (gen-extra-opc.c (opc-file-path) (current-arch-name)))
    -gen-hash-decls
    -gen-ifmt-table
    -gen-insn-opcode-table

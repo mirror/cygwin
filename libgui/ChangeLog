@@ -1,3 +1,9 @@
+2001-08-24  Keith Seitz  <keiths@redhat.com>
+
+	* src/tkTable.tcl: Use "string compare" instead of "string
+	equal". The latter is only available in newer versions of
+	tcl.
+
 2001-08-12  Mo DeJong  <mdejong@redhat.com>
 
 	* src/tkCanvEdge.c: Work around Windows gcc problem

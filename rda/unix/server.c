@@ -374,6 +374,17 @@ main (int argc, char **argv)
 
   signal (SIGCHLD, chld_handler);
 
+  {
+    int sig;
+    /* Ignore realtime signals.  We do this so as to not terminate
+       RDA if we inadvertently receive one of these signals.  The
+       realtime signals are used for thread support, and, for some
+       reason, some environments send these signals to RDA as well
+       as the application.  (And some don't.)  */
+    for (sig = SIGRTMIN; sig <= SIGRTMAX; sig++)
+      signal (sig, SIG_IGN);
+  }
+
   if (portno != 0)
     {
       gdbsocket_startup (portno, gdbserver.attach, process);

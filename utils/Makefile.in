@@ -191,18 +191,18 @@ maintainer-clean-wince: configure-wince
 configure-spu: spu/Makefile
 spu/Makefile: config.status
 	test -d spu || mkdir spu ; \
-	cd spu && $(abs_srcdir)/spu/configure $(subconfigure_args)
+	cd spu && $(abs_srcdir)/spu/configure $(subconfigure_args)/spu
 .PHONY: configure-spu
 
 configure-sparclite: sparclite/Makefile
 sparclite/Makefile: config.status
 	test -d sparclite || mkdir sparclite ; \
-	cd sparclite && $(abs_srcdir)/sparclite/configure $(subconfigure_args)
+	cd sparclite && $(abs_srcdir)/sparclite/configure $(subconfigure_args)/sparclite
 .PHONY: configure-sparclite
 
 configure-wince: wince/Makefile
 wince/Makefile: config.status
 	test -d wince || mkdir wince ; \
-	cd wince && $(abs_srcdir)/wince/configure $(subconfigure_args)
+	cd wince && $(abs_srcdir)/wince/configure $(subconfigure_args)/wince
 .PHONY: configure-wince
 

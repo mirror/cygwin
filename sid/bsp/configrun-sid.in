@@ -113,6 +113,8 @@ Options:
                                alias=BASE2    Add an alias at BASE2
                                file=FILENAME  Load/save memory image from file
                                mmap           Memory map given file
+                               latency=R:W    Set read, write latencies  [0:0]
+                               latency=RW     Set both latencies           [0]
  --gdb=PORT                 Add a gdb/debugger interface on TCP port.   [none]
  --board=BOARD              Model given board or system.               [gloss]
  --engine=scache|pbb        Set given cgen CPU engine.                   [pbb]
@@ -898,6 +900,7 @@ while ($#opt_memory_region >= 0)
     #         [,alias=BASE2]
     #         [,file=NAME]
     #         [,mmap]
+    #         [,latency=R[:W]]
     #         [,relate=COMPONENT/RELATION]  (deprecated)
     @spec = split /,/, $spec;
 
@@ -914,6 +917,7 @@ while ($#opt_memory_region >= 0)
     $membus = "read-write-port"; # default read-write
     $memfile = ""; # default no file
     $mmap = 0; # default no mmap
+    $latr = 0; $latw = 0; # default no latencies
     @aliases = ();
     @relates = ();
 
@@ -928,9 +932,11 @@ while ($#opt_memory_region >= 0)
 	$opt = shift @spec;
 	if ($opt eq "read-only") { $membus = "read-only-port"; }
 	elsif ($opt eq "mmap") { $mmap = 1; }
-	elsif ($opt =~ /file=(.*)/) { $memfile = $1; }
-	elsif ($opt =~ /alias=(.*)/) { push @aliases, $1 }
-	elsif ($opt =~ /relate=(.*)/) { push @relates, $1 }
+	elsif ($opt =~ /file=(.+)/) { $memfile = $1; }
+	elsif ($opt =~ /alias=(.+)/) { push @aliases, $1 }
+	elsif ($opt =~ /relate=(.+)/) { push @relates, $1 }
+	elsif ($opt =~ /latency=(\d+):(\d+)/) { $latr = $1; $latw = $2 }
+	elsif ($opt =~ /latency=(\d+)/) { $latr = $1; $latw = $1 }
 	else { die "Cannot parse memory region option `$opt'.\n"; }
       }
 
@@ -965,6 +971,10 @@ while ($#opt_memory_region >= 0)
 	  $third_section .= "connect-pin deinit-sequence output-6 -> mem$mems image-store\n";
 	}
       }
+
+    # process latencies
+    if ($latr != 0) { $third_section .= "set mem$mems read-latency $latr\n" }
+    if ($latw != 0) { $third_section .= "set mem$mems write-latency $latw\n" }
   }
 
 

@@ -1,3 +1,12 @@
+2003-04-10  Kevin Buettner  <kevinb@redhat.com>
+
+	* linux-target.c (NUM_REGS) [MIPS_LINUX_TARGET, MIPS64_LINUX_TARGET]:
+	Bump to 72.
+	(struct peekuser_pokeuser_reginfo) [MIPS_LINUX_TARGET]: Use
+	PROTO_SIZE for ``bad'' and ``cause''.
+	(struct peekuser_pokeuser_reginfo) [MIPS_LINUX_TARGET]
+	[MIPS64_LINUX_TARGET]: Add ``fir'' register.
+
 2003-02-07  Kevin Buettner  <kevinb@redhat.com>
 
 	* gdbserv-thread-db.h (singlestep_lwp): Add ``struct gdbserv *''

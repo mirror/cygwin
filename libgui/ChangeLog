@@ -1,3 +1,10 @@
+2001-10-10  Ian Roxborough  <irox@redhat.com>
+
+       * library/looknfeel.tcl (standard_look_and_feel):
+       Font changes to improve default look and feel.
+       Increase default font size, use helvetica for
+       menus, status bar and balloon help.
+	
 2001-09-08  Ian Roxborough <irox@redhat.com>
 
 	* all: Tcl/Tk8.3 upgrade merge.

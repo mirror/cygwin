@@ -34,12 +34,13 @@ proc standard_look_and_feel {} {
     eval define_font global/italic [array get actual]
     define_font global/menu -family windows-menu
   } else {
-    define_font global/default -family courier -size 9
-    define_font global/bold -family courier -size 9 -weight bold
-    define_font global/fixed -family courier -size 9
-    define_font global/status -family courier -size 9
-    define_font global/italic -family courier -size 9 -slant italic
-    define_font global/menu -family courier -size 9
+    set size 12
+    define_font global/default -family courier -size $size 
+    define_font global/bold -family courier -size $size -weight bold
+    define_font global/fixed -family courier -size $size
+    define_font global/status -family helvetica -size [expr $size - 1]
+    define_font global/italic -family courier -size $size -slant italic
+    define_font global/menu -family helvetica -size $size
   }
 
   # Make sure this font is actually used by default.

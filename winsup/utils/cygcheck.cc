@@ -35,7 +35,7 @@ typedef __int64 longlong;
 
 void dump_setup (int, char **, bool);
 
-static const char version[] = "$Revision: 1.33 $";
+static const char version[] = "$Revision: 1.34 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1314,7 +1314,9 @@ static void
 usage (FILE * stream, int status)
 {
   fprintf (stream, "\
-Usage: cygcheck [OPTIONS] [program ...]\n\
+Usage: cygcheck [OPTIONS] [PROGRAM...]\n\
+Check system information or PROGRAM library dependencies\n\
+\n\
  -c, --check-setup  check packages installed via setup.exe\n\
  -s, --sysinfo      system information (not with -k)\n\
  -v, --verbose      verbose output (indented) (for -s or programs)\n\

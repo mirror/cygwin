@@ -22,7 +22,7 @@
 #include <windows.h>
 #include <getopt.h>
 
-static const char version[] = "$Revision: 1.6 $";
+static const char version[] = "$Revision: 1.7 $";
 static char *prog_name;
 
 static struct option longopts[] =
@@ -648,6 +648,8 @@ usage (FILE * stream)
 {
   fprintf (stream , ""
   "Usage: %s [options] low_pc high_pc command...\n"
+  "Single-step profile COMMAND\n"
+  "\n"
   " -c, --console-trace  trace every EIP value to the console. *Lots* slower.\n"
   " -d, --disable        disable single-stepping by default; use\n"
   "                      OutputDebugString (\"ssp on\") to enable stepping\n"

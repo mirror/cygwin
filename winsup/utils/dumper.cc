@@ -36,7 +36,7 @@ __attribute__ ((packed))
 #endif
   note_header;
 
-static const char version[] = "$Revision: 1.9 $";
+static const char version[] = "$Revision: 1.10 $";
 
 BOOL verbose = FALSE;
 
@@ -777,6 +777,7 @@ usage (FILE *stream, int status)
   fprintf (stream, "\
 Usage: dumper [OPTION] FILENAME WIN32PID\n\
 Dump core from WIN32PID to FILENAME.core\n\
+\n\
  -d, --verbose  be verbose while dumping\n\
  -h, --help     output help information and exit\n\
  -q, --quiet    be quiet while dumping (default)\n\

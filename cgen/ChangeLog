@@ -1,3 +1,12 @@
+2002-11-30  Hans-Peter Nilsson  <hp@axis.com>
+
+	* doc/rtl.texi (Model variants): Mention current limitations for
+	unit inputs and outputs.
+	(Hardware elements) <attribute PROFILE>: Be slightly more
+	verbose.
+	(Instructions) <timing>: input/output overrides have a direction
+	operand.
+
 2002-11-25  DJ Delorie  <dj@redhat.com>
 
 	* xstormy16.cpu (sdiv, divlh, sdivlh): Fix sdivlh/divlh encodings.

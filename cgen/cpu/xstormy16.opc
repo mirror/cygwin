@@ -1,5 +1,5 @@
 /* XSTORMY16 opcode support.  -*- C -*-
-   Copyright (C) 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2001, 2002, 2005 Red Hat, Inc.
    This file is part of CGEN.  */
 
 /* This file is an addendum to xstormy16.cpu.  Heavy use of C code isn't
@@ -65,7 +65,7 @@ parse_mem8 (cd, strp, opindex, valuep)
 	return _("Bad register name");
     }
   else if (cgen_parse_keyword (cd, strp, & xstormy16_cgen_opval_gr_names, 
-			       valuep) == NULL)
+			       (long *) valuep) == NULL)
     return _("Label conflicts with register name");
   else if (strncasecmp (*strp, "rx,", 3) == 0
 	   || strncasecmp (*strp, "rxl,", 3) == 0

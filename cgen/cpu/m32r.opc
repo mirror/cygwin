@@ -1,5 +1,5 @@
 /* M32R opcode support.  -*- C -*-
-   Copyright (C) 2000, 2001, 2004 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2004, 2005 Red Hat, Inc.
    This file is part of CGEN.  */
 
 /* This file is an addendum to m32r.cpu.  Heavy use of C code isn't
@@ -65,7 +65,7 @@ m32r_cgen_dis_hash (buf, value)
 
 /* -- asm.c */
 static const char * parse_hash
-  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
+  PARAMS ((CGEN_CPU_DESC, const char **, int, long *));
 static const char * parse_hi16
   PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
 static const char * parse_slo16
@@ -80,7 +80,7 @@ parse_hash (cd, strp, opindex, valuep)
      CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
      const char **strp;
      int opindex ATTRIBUTE_UNUSED;
-     unsigned long *valuep ATTRIBUTE_UNUSED;
+     long *valuep ATTRIBUTE_UNUSED;
 {
   if (**strp == '#')
     ++*strp;
@@ -266,12 +266,12 @@ my_print_insn (cd, pc, info)
      bfd_vma pc;
      disassemble_info *info;
 {
-  char buffer[CGEN_MAX_INSN_SIZE];
-  char *buf = buffer;
+  bfd_byte buffer[CGEN_MAX_INSN_SIZE];
+  bfd_byte *buf = buffer;
   int status;
   int buflen = (pc & 3) == 0 ? 4 : 2;
   int big_p = CGEN_CPU_INSN_ENDIAN (cd) == CGEN_ENDIAN_BIG;
-  char *x;
+  bfd_byte *x;
 
   /* Read the base part of the insn.  */
 

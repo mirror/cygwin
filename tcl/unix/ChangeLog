@@ -1,3 +1,13 @@
+2002-07-30  Keith Seitz  <keiths@redhat.com>
+
+	From Mo DeJong  <supermo@bayarea.net>
+	* unix/configure: Regenerate.
+	* unix/configure.in: Don't subst TCL_BIN_DIR into tclConfig.sh.
+	* unix/tclConfig.sh.in: Remove TCL_BIN_DIR variable since it
+	should not exist in the tclConfig.sh file. This variable
+	should be set by the SC_PATH_TCLCONFIG macro when the
+	extension's configure script is run.
+
 2002-01-10  Keith Seitz  <keiths@redhat.com>
 
 	* unix/Makefile.in (TCL_RANLIB): Renamed from just "RANLIB".

@@ -1,5 +1,5 @@
 /* Disassemble AVR instructions.
-   Copyright 1999, 2000 Free Software Foundation, Inc.
+   Copyright 1999, 2000, 2002, 2004 Free Software Foundation, Inc.
 
    Contributed by Denis Chertykov <denisc@overta.ru>
 
@@ -367,13 +367,13 @@ print_insn_avr(addr, info)
     (*prin) (stream, "\t; %s", comment1);
 
   if (sym_op1)
-    info->print_address_func(sym_addr1, info);
+    info->print_address_func (sym_addr1, info);
 
   if (*comment2)
     (*prin) (stream, " %s", comment2);
 
   if (sym_op2)
-    info->print_address_func(sym_addr2, info);
+    info->print_address_func (sym_addr2, info);
 
   return cmd_len;
 }

@@ -1,3 +1,9 @@
+2004-06-28  Dave Brolley  <brolley@redhat.com>
+
+	* gdb.cxx (process_get_mem): Use byte-at-a-time access for unaligned
+	requests.
+	(process_set_mem): Ditto.
+
 2004-03-22  Dave Brolley  <brolley@redhat.com>
 
 	* gdb.cxx (deinit_handler): Call target_power and

@@ -68,7 +68,7 @@ unknown.badconf:63: unknown command host-sched
 unknown.badconf:63: unknown command advance
 unknown.badconf:66: unknown command bus
 unknown.badconf:66: unknown command loader
-unknown.badconf:66: unknown command load-accessor
+unknown.badconf:66: unknown command load-accessor-data
 unknown.badconf:66: unknown command bus
 unknown.badconf:66: unknown command access-port
 Configuration error.  Aborting.

@@ -1,6 +1,6 @@
 CBinvaComp.badconf:61: unknown command connect-BUS
 CBinvaComp.badconf:61: unknown command loader
-CBinvaComp.badconf:61: unknown command load-accessor
+CBinvaComp.badconf:61: unknown command load-accessor-data
 CBinvaComp.badconf:61: unknown command bus
 CBinvaComp.badconf:61: unknown command access-port
 CBinvaComp.badconf:85: component hw-remap/pause-arm/ref not found

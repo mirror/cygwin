@@ -16,7 +16,7 @@ relate angel cpu cpu
 connect-pin main starting -> loader load!
 connect-pin main perform-activity -> cpu step!
 
-connect-bus loader load-accessor bus access-port
+connect-bus loader load-accessor-data bus access-port
 
 connect-pin cpu trap - angel trap               # ERROR: invalid direction
 # new hw-cpu-arm7t main

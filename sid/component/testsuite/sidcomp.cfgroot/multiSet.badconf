@@ -75,7 +75,7 @@ connect-pin main perform-activity -> cpu step!
 # ELF loader
 connect-pin loader start-pc-set -> cpu start-pc-set!
 connect-pin loader endian-set -> cpu endian-set!
-connect-bus loader load-accessor bus access-port
+connect-bus loader load-accessor-data bus access-port
 
 # Gloss support
 connect-pin cpu trap <-> angel trap

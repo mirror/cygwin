@@ -1,5 +1,5 @@
-multiCB.badconf:63: could not set component loader accessor load-accessor
-multiCB.badconf:64: component loader has no bus load-accessor
+multiCB.badconf:63: could not set component loader accessor load-accessor-data
+multiCB.badconf:64: component loader has no bus load-accessor-data
 multiCB.badconf:89: component remapper has no bus all
 multiCB.badconf:94: could not set component bus accessor \[0,0x7fffff\]
 Configuration error.  Aborting.

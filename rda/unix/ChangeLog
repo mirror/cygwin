@@ -1,5 +1,11 @@
 2005-03-10  Jim Blandy  <jimb@redhat.com>
 
+	Make config.in generated automatically again.
+	* configure.in: Provide descriptions for all the preprocessor
+	symbols we define.
+	* configure: Regenerated.
+	* config.in: Regenerated using autoheader.
+
 	* linux-target.c (frv_fdpic_loadmap_addresses): Use '%lx' for
 	unsigned long argument.
 

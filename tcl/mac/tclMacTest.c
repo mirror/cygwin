@@ -211,32 +211,3 @@ WriteTextResource(
 	    (char *) NULL);
     return TCL_ERROR;
 }
-
-int
-TclMacChmod(
-    char *path, 
-    int mode)
-{
-    HParamBlockRec hpb;
-    OSErr err;
-    
-    c2pstr(path);
-    hpb.fileParam.ioNamePtr = (unsigned char *) path;
-    hpb.fileParam.ioVRefNum = 0;
-    hpb.fileParam.ioDirID = 0;
-    
-    if (mode & 0200) {
-        err = PBHRstFLockSync(&hpb);
-    } else {
-        err = PBHSetFLockSync(&hpb);
-    }
-    p2cstr((unsigned char *) path);
-    
-    if (err != noErr) {
-        errno = TclMacOSErrorToPosixError(err);
-        return -1;
-    }
-    
-    return 0;
-}
-

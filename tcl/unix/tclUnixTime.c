@@ -14,6 +14,8 @@
 
 #include "tclInt.h"
 #include "tclPort.h"
+#define TM_YEAR_BASE 1900
+#define IsLeapYear(x)   ((x % 4 == 0) && (x % 100 != 0 || x % 400 == 0))
 
 /*
  *-----------------------------------------------------------------------------
@@ -165,12 +167,17 @@ TclpGetTimeZone (currentTime)
 #if defined(HAVE_TIMEZONE_VAR) && !defined (TCL_GOT_TIMEZONE)
 #   define TCL_GOT_TIMEZONE
     static int setTZ = 0;
+#ifdef TCL_THREADS
+    static Tcl_Mutex tzMutex;
+#endif
     int        timeZone;
 
+    Tcl_MutexLock(&tzMutex);
     if (!setTZ) {
         tzset();
         setTZ = 1;
     }
+    Tcl_MutexUnlock(&tzMutex);
 
     /*
      * Note: this is not a typo in "timezone" below!  See tzset
@@ -233,4 +240,71 @@ TclpGetTime(timePtr)
     (void) gettimeofday(&tv, &tz);
     timePtr->sec = tv.tv_sec;
     timePtr->usec = tv.tv_usec;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TclpGetDate --
+ *
+ *	This function converts between seconds and struct tm.  If
+ *	useGMT is true, then the returned date will be in Greenwich
+ *	Mean Time (GMT).  Otherwise, it will be in the local time zone.
+ *
+ * Results:
+ *	Returns a static tm structure.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+struct tm *
+TclpGetDate(time, useGMT)
+    TclpTime_t time;
+    int useGMT;
+{
+    CONST time_t *tp = (CONST time_t *)time;
+
+    if (useGMT) {
+	return gmtime(tp);
+    } else {
+	return localtime(tp);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TclpStrftime --
+ *
+ *	On Unix, we can safely call the native strftime implementation.
+ *
+ * Results:
+ *	The normal strftime result.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+size_t
+TclpStrftime(s, maxsize, format, t)
+    char *s;
+    size_t maxsize;
+    CONST char *format;
+    CONST struct tm *t;
+{
+    if (format[0] == '%' && format[1] == 'Q') {
+	/* Format as a stardate */
+	sprintf(s, "Stardate %2d%03d.%01d",
+		(((t->tm_year + TM_YEAR_BASE) + 377) - 2323),
+		(((t->tm_yday + 1) * 1000) /
+			(365 + IsLeapYear((t->tm_year + TM_YEAR_BASE)))),
+		(((t->tm_hour * 60) + t->tm_min)/144));
+	return(strlen(s));
+    }
+    return strftime(s, maxsize, format, t);
 }

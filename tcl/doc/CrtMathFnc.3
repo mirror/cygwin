@@ -87,7 +87,7 @@ It should set also \fIresultPtr->type\fR to either TCL_INT or TCL_DOUBLE
 to indicate which value was set.
 Under normal circumstances \fIproc\fR should return TCL_OK.
 If an error occurs while executing the function, \fIproc\fR should
-return TCL_ERROR and leave an error message in \fIinterp->result\fR.
+return TCL_ERROR and leave an error message in the interpreter's result.
 
 .SH KEYWORDS
 expression, mathematical function

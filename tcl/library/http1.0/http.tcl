@@ -181,7 +181,7 @@ proc http_get { url args } {
 	puts $s "Content-Type: application/x-www-form-urlencoded"
 	puts $s ""
 	fconfigure $s -translation {auto binary}
-	puts $s $state(-query)
+	puts -nonewline $s $state(-query)
     } else {
 	puts $s ""
     }

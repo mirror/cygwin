@@ -36,6 +36,8 @@ char *
 .sp
 \fBTcl_DStringSetLength\fR(\fIdsPtr, newLength\fR)
 .sp
+\fBTcl_DStringTrunc\fR(\fIdsPtr, newLength\fR)
+.sp
 \fBTcl_DStringFree\fR(\fIdsPtr\fR)
 .sp
 \fBTcl_DStringResult\fR(\fIinterp, dsPtr\fR)
@@ -124,13 +126,17 @@ caller to fill in the new space.
 even if the string is truncated to zero length, so \fBTcl_DStringFree\fR
 will still need to be called.
 .PP
+\fBTcl_DStringTrunc\fR changes the length of a dynamic string.
+This procedure is now deprecated.  \fBTcl_DStringSetLength\fR  should
+be used instead.
+.PP
 \fBTcl_DStringFree\fR should be called when you're finished using
 the string.  It frees up any memory that was allocated for the string
 and reinitializes the string's value to an empty string.
 .PP
 \fBTcl_DStringResult\fR sets the result of \fIinterp\fR to the value of
 the dynamic string given by \fIdsPtr\fR.  It does this by moving
-a pointer from \fIdsPtr\fR to \fIinterp->result\fR.
+a pointer from \fIdsPtr\fR to the interpreter's result.
 This saves the cost of allocating new memory and copying the string.
 \fBTcl_DStringResult\fR also reinitializes the dynamic string to
 an empty string.

@@ -8,7 +8,7 @@
 '\" RCS: @(#) $Id$
 '\" 
 .so man.macros
-.TH lindex n 7.4 Tcl "Tcl Built-In Commands"
+.TH lindex n 8.2 Tcl "Tcl Built-In Commands"
 .BS
 '\" Note:  do not modify the .SH NAME line immediately below!
 .SH NAME
@@ -29,7 +29,9 @@ If \fIindex\fR is negative or greater than or equal to the number
 of elements in \fIvalue\fR, then an empty
 string is returned.
 If \fIindex\fR has the value \fBend\fR, it refers to the last element
-in the list.
+in the list, and \fBend\-\fIinteger\fR refers to the last element in
+the list minus the specified integer offset.
+
 
 .SH KEYWORDS
 element, index, list

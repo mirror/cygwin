@@ -17,8 +17,8 @@
  * RCS: @(#) $Id$
  */
 
-#include "tclMacInt.h"
 #include "tclInt.h"
+#include "tclMacInt.h"
 #include <Memory.h>
 #include <stdlib.h>
 #include <string.h>

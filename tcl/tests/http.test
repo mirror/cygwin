@@ -6,6 +6,7 @@
 #
 # Copyright (c) 1991-1993 The Regents of the University of California.
 # Copyright (c) 1994-1996 Sun Microsystems, Inc.
+# Copyright (c) 1998-2000 by Ajuba Solutions.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -13,14 +14,19 @@
 #
 # RCS: @(#) $Id$
 
-if {[string compare test [info procs test]] == 1} then {source defs}
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
+set tcltest::testConstraints(notLinux) \
+	[expr ![string equal Linux $tcl_platform(os)]]
 
-if {[catch {package require http 2.0}]} {
+if {[catch {package require http 2} version]} {
     if {[info exist http2]} {
-	catch {puts stderr "Cannot load http 2.0 package"}
+	catch {puts "Cannot load http 2.* package"}
 	return
     } else {
-	catch {puts stderr "Running http 2.0 tests in slave interp"}
+	catch {puts "Running http 2.* tests in slave interp"}
 	set interp [interp create http2]
 	$interp eval [list set http2 "running"]
 	$interp eval [list source [info script]]
@@ -29,164 +35,54 @@ if {[catch {package require http 2.0}]} {
     }
 }
 
-############### The httpd_ procedures implement a stub http server. ########
-proc httpd_init {{port 8015}} {
-    socket -server httpdAccept $port
+proc bgerror {args} {
+    global errorInfo
+    puts stderr "http.test bgerror"
+    puts stderr [join $args]
+    puts stderr $errorInfo
 }
-proc httpd_log {args} {
-    global httpLog
-    if {[info exists httpLog] && $httpLog} {
-	puts stderr "httpd: [join $args { }]"
-    }
-}
-array set httpdErrors {
-    204 {No Content}
-    400 {Bad Request}
-    404 {Not Found}
-    503 {Service Unavailable}
-    504 {Service Temporarily Unavailable}
-    }
-
-proc httpdError {sock code args} {
-    global httpdErrors
-    puts $sock "$code $httpdErrors($code)"
-    httpd_log "error: [join $args { }]"
-}
-proc httpdAccept {newsock ipaddr port} {
-    global httpd
-    upvar #0 httpd$newsock data
-
-    fconfigure $newsock -blocking 0 -translation {auto crlf}
-    httpd_log $newsock Connect $ipaddr $port
-    set data(ipaddr) $ipaddr
-    fileevent $newsock readable [list httpdRead $newsock]
-}
-
-# read data from a client request
-
-proc httpdRead { sock } {
-    upvar #0 httpd$sock data
-
-    set readCount [gets $sock line]
-    if {![info exists data(state)]} {
-	if [regexp {(POST|GET|HEAD) ([^?]+)\??([^ ]*) HTTP/1.0} \
-		$line x data(proto) data(url) data(query)] {
-	    set data(state) mime
-	    httpd_log $sock Query $line
-	} else {
-	    httpdError $sock 400
-	    httpd_log $sock Error "bad first line:$line"
-	    httpdSockDone $sock
-	}
-	return
-    }
-
-    # string compare $readCount 0 maps -1 to -1, 0 to 0, and > 0 to 1
-
-    set state [string compare $readCount 0],$data(state),$data(proto)
-    httpd_log $sock $state
-    switch -- $state {
-	-1,mime,HEAD	-
-	-1,mime,GET	-
-	-1,mime,POST	{
-	    # gets would block
-	    return
-	}
-	0,mime,HEAD	-
-	0,mime,GET	-
-	0,query,POST	{ httpdRespond $sock }
-	0,mime,POST	{ set data(state) query }
-	1,mime,HEAD	-
-	1,mime,POST	-
-	1,mime,GET	{
-	    if [regexp {([^:]+):[ 	]*(.*)}  $line dummy key value] {
-		set data(mime,[string tolower $key]) $value
-	    }
-	}
-	1,query,POST	{
-	    append data(query) $line
-	    httpdRespond $sock
-	}
-	default {
-	    if [eof $sock] {
-		httpd_log $sock Error "unexpected eof on <$data(url)> request"
-	    } else {
-		httpd_log $sock Error "unhandled state <$state> fetching <$data(url)>"
-	    }
-	    httpdError $sock 404
-	    httpdSockDone $sock
-	}
-    }
-}
-proc httpdSockDone { sock } {
-upvar #0 httpd$sock data
-    unset data
-    close $sock
-}
-
-# Respond to the query.
-
-set bindata "This is binary data\x0d\x0amore\x0dmore\x0amore\x00null"
-proc httpdRespond { sock } {
-    global httpd bindata port
-    upvar #0 httpd$sock data
-
-    if {[string match *binary* $data(url)]} {
-	set html "$bindata[info hostname]:$port$data(url)"
-	set type application/octet-stream
-    } else {
-	set type text/html
-
-	set html "<html><head><title>HTTP/1.0 TEST</title></head><body>
-<h1>Hello, World!</h1>
-<h2>$data(proto) $data(url)</h2>
-"
-	if {[info exists data(query)] && [string length $data(query)]} {
-	    append html "<h2>Query</h2>\n<dl>\n"
-	    foreach {key value} [split $data(query) &=] {
-		append html "<dt>$key<dd>$value\n"
-		if {[string compare $key timeout] == 0} {
-		    # Simulate a timeout by not responding,
-		    # but clean up our socket later.
-
-		    after 50 [list httpdSockDone $sock]
-		    httpd_log $sock Noresponse ""
-		    return
-		}
-	    }
-	    append html </dl>\n
-	}
-	append html </body></html>
-    }
-
-    if {$data(proto) == "HEAD"} {
-	puts $sock "HTTP/1.0 200 OK"
-    } else {
-	puts $sock "HTTP/1.0 200 Data follows"
-    }
-    puts $sock "Date: [clock format [clock clicks]]"
-    puts $sock "Content-Type: $type"
-    puts $sock "Content-Length: [string length $html]"
-    puts $sock ""
-    if {$data(proto) != "HEAD"} {
-	fconfigure $sock -translation binary
-	puts -nonewline $sock $html
-    }
-    httpd_log $sock Done ""
-    httpdSockDone $sock
-}
-##################### end server ###########################
 
 set port 8010
-if [catch {httpd_init $port} listen] {
-    puts stderr "Cannot start http server, http test skipped"
-    unset port
-    return
+set bindata "This is binary data\x0d\x0amore\x0dmore\x0amore\x00null"
+catch {unset data}
+
+# Ensure httpd file exists
+
+set origFile [file join $::tcltest::testsDirectory httpd]
+set newFile [file join $::tcltest::workingDirectory httpd]
+if {![file exists $newFile]} {
+    file copy $origFile $newFile
+    set removeHttpd 1
 }
+set httpdFile [file join $::tcltest::workingDirectory httpd]
+
+if {[info commands testthread] == "testthread" && [file exists $httpdFile]} {
+    set httpthread [testthread create "
+	source $httpdFile
+	testthread wait
+    "]
+    testthread send $httpthread [list set port $port]
+    testthread send $httpthread [list set bindata $bindata]
+    testthread send $httpthread {httpd_init $port}
+    puts "Running httpd in thread $httpthread"
+} else {
+    if ![file exists $httpdFile] {
+	puts "Cannot read $httpdFile script, http test skipped"
+	unset port
+	return
+    }
+    source $httpdFile
+    if [catch {httpd_init $port} listen] {
+	puts "Cannot start http server, http test skipped"
+	unset port
+	return
+    }
+}
+
 
 test http-1.1 {http::config} {
     http::config
-} {-accept */* -proxyfilter http::ProxyRequired -proxyhost {} -proxyport {} -useragent {Tcl http client package 2.0}}
+} [list -accept */* -proxyfilter http::ProxyRequired -proxyhost {} -proxyport {} -useragent "Tcl http client package $version"]
 
 test http-1.2 {http::config} {
     http::config -proxyfilter
@@ -221,6 +117,7 @@ test http-3.2 {http::geturl} {
 } {Unsupported URL: http:junk}
 
 set url [info hostname]:$port
+set badurl www.scriptics.com:6666
 test http-3.3 {http::geturl} {
     set token [http::geturl $url]
     http::data $token
@@ -232,6 +129,8 @@ test http-3.3 {http::geturl} {
 set tail /a/b/c
 set url [info hostname]:$port/a/b/c
 set binurl [info hostname]:$port/binary
+set posturl [info hostname]:$port/post
+set badposturl [info hostname]:$port/droppost
 
 test http-3.4 {http::geturl} {
     set token [http::geturl $url]
@@ -274,7 +173,7 @@ test http-3.7 {http::geturl} {
 </body></html>"
 
 test http-3.8 {http::geturl} {
-    set token [http::geturl $url -query Name=Value&Foo=Bar]
+    set token [http::geturl $url -query Name=Value&Foo=Bar -timeout 2000]
     http::data $token
 } "<html><head><title>HTTP/1.0 TEST</title></head><body>
 <h1>Hello, World!</h1>
@@ -291,6 +190,115 @@ test http-3.9 {http::geturl} {
     http::code $token
 } "HTTP/1.0 200 OK"
 
+test http-3.10 {http::geturl queryprogress} {
+    set query foo=bar
+    set sep ""
+    set i 0
+    # Create about 120K of query data
+    while {$i < 14} {
+	incr i
+	append query $sep$query
+	set sep &
+    }
+
+    proc postProgress {token x y} {
+	global postProgress
+	lappend postProgress $y
+    }
+    set postProgress {}
+    set t [http::geturl $posturl -query $query \
+	    -queryprogress postProgress -queryblocksize 16384]
+    http::wait $t
+    list [http::status $t] [string length $query] $postProgress [http::data $t]
+} {ok 122879 {16384 32768 49152 65536 81920 98304 114688 122879} {Got 122879 bytes}}
+
+test http-3.11 {http::geturl querychannel with -command} {
+    set query foo=bar
+    set sep ""
+    set i 0
+    # Create about 120K of query data
+    while {$i < 14} {
+	incr i
+	append query $sep$query
+	set sep &
+    }
+    ::tcltest::makeFile $query outdata
+    set fp [open outdata]
+
+    proc asyncCB {token} {
+	global postResult
+	lappend postResult [http::data $token]
+    }
+    set postResult [list ]
+    set t [http::geturl $posturl -querychannel $fp]
+    http::wait $t
+    set testRes [list [http::status $t] [string length $query] [http::data $t]]
+
+    # Now do async
+    http::cleanup $t
+    close $fp
+    set fp [open outdata]
+    set t [http::geturl $posturl -querychannel $fp -command asyncCB]
+    set postResult [list PostStart]
+    http::wait $t
+
+    lappend testRes [http::status $t] $postResult
+    set testRes
+} {ok 122879 {Got 122880 bytes} ok {PostStart {Got 122880 bytes}}}
+
+# On Linux platforms when the client and server are on the same
+# host, the client is unable to read the server's response one
+# it hits the write error.  The status is "eof"
+
+# On Windows, the http::wait procedure gets a
+# "connection reset by peer" error while reading the reply
+
+test http-3.12 {http::geturl querychannel with aborted request} {nonPortable} {
+    set query foo=bar
+    set sep ""
+    set i 0
+    # Create about 120K of query data
+    while {$i < 14} {
+	incr i
+	append query $sep$query
+	set sep &
+    }
+    ::tcltest::makeFile $query outdata
+    set fp [open outdata]
+
+    proc asyncCB {token} {
+	global postResult
+	lappend postResult [http::data $token]
+    }
+    proc postProgress {token x y} {
+	global postProgress
+	lappend postProgress $y
+    }
+    set postProgress {}
+    # Now do async
+    set postResult [list PostStart]
+    if {[catch {
+	set t [http::geturl $badposturl -querychannel $fp -command asyncCB \
+		-queryprogress postProgress]
+	http::wait $t
+	upvar #0 $t state
+    } err]} {
+	puts $errorInfo
+	error $err
+    }
+
+    list [http::status $t] [http::code $t]
+} {ok {HTTP/1.0 200 Data follows}}
+
+test http-3.13 {http::geturl socket leak test} {
+    set chanCount [llength [file channels]]
+    for {set i 0} {$i < 3} {incr i} {
+	catch {http::geturl $badurl -timeout 5000}
+    }
+
+    # No extra channels should be taken
+    expr {[llength [file channels]] == $chanCount}
+} 1
 
 test http-4.1 {http::Event} {
     set token [http::geturl $url]
@@ -377,16 +385,62 @@ test http-4.10 {http::Event} {
     set token [http::geturl $url -progress myProgress]
     http::size $token
 } {111}
+
+# Timeout cases
+
+#	Short timeout to working server  (the test server)
+#	This lets us try a reset during the connection
+
 test http-4.11 {http::Event} {
     set token [http::geturl $url -timeout 1 -command {#}]
     http::reset $token
     http::status $token
 } {reset}
+
+#	Longer timeout with reset
+
 test http-4.12 {http::Event} {
-    set token [http::geturl $url?timeout=10 -timeout 1 -command {#}]
+    set token [http::geturl $url/?timeout=10 -command {#}]
+    http::reset $token
+    http::status $token
+} {reset}
+
+#	Medium timeout to working server that waits even longer
+#	The timeout hits while waiting for a reply
+
+test http-4.13 {http::Event} {
+    set token [http::geturl $url?timeout=30 -timeout 10 -command {#}]
     http::wait $token
     http::status $token
 } {timeout}
+
+#	Longer timeout to good host, bad port, gets an error
+#	after the connection "completes" but the socket is bad
+
+test http-4.14 {http::Event} {
+    set code [catch {
+	set token [http::geturl $badurl/?timeout=10 -timeout 10000 -command {#}]
+	if {[string length $token] == 0} {
+	    error "bogus return from http::geturl"
+	}
+	http::wait $token
+	http::status $token
+    } err]
+    # error code varies among platforms.
+    list $code [string match "connect failed*" $err]
+} {1 1}
+
+# Bogus host
+
+test http-4.15 {http::Event} {
+    set code [catch {
+	set token [http::geturl not_a_host.scriptics.com -timeout 1000 -command {#}]
+	http::wait $token
+	http::status $token
+    } err]
+    # error code varies among platforms.
+    list $code [string match "couldn't open socket*" $err]
+} {1 1}
 
 test http-5.1 {http::formatQuery} {
     http::formatQuery name1 value1 name2 "value two"
@@ -412,6 +466,22 @@ test http-6.1 {http::ProxyRequired} {
 <h2>GET http://$url</h2>
 </body></html>"
 
-unset url
-unset port
-close $listen
+# cleanup
+catch {unset url}
+catch {unset badurl}
+catch {unset port}
+catch {unset data}
+if {[info exists httpthread]} {
+    testthread send -async $httpthread {
+	testthread exit
+    }
+} else {
+    close $listen
+}
+
+if {[info exist removeHttpd]} {
+    removeFile $httpdFile
+}
+
+::tcltest::cleanupTests
+

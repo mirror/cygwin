@@ -6,13 +6,17 @@
 #
 # Copyright (c) 1991-1993 The Regents of the University of California.
 # Copyright (c) 1994 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # RCS: @(#) $Id$
 
-if {[string compare test [info procs test]] == 1} then {source defs}
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
 
 set x {abcd bbcd 123 234 345}
 test lsearch-1.1 {lsearch command} {
@@ -45,7 +49,7 @@ test lsearch-2.5 {search modes} {
 } 1
 test lsearch-2.6 {search modes} {
     list [catch {lsearch -regexp {xyz bbcc *bc*} *bc*} msg] $msg
-} {1 {couldn't compile regular expression pattern: ?+* follows nothing}}
+} {1 {couldn't compile regular expression pattern: quantifier operand invalid}}
 test lsearch-2.7 {search modes} {
     lsearch -regexp {b.x ^bc xy bcx} ^bc
 } 3
@@ -57,7 +61,7 @@ test lsearch-2.9 {search modes} {
 } 1
 test lsearch-2.10 {search modes} {
     list [catch {lsearch -glib {b.x bx xy bcx} b.x} msg] $msg
-} {1 {bad search mode "-glib": must be -exact, -glob, -regexp, -dictionary, or -nocase}}
+} {1 {bad search mode "-glib": must be -exact, -glob, or -regexp}}
 
 test lsearch-3.1 {lsearch errors} {
     list [catch lsearch msg] $msg
@@ -67,7 +71,7 @@ test lsearch-3.2 {lsearch errors} {
 } {1 {wrong # args: should be "lsearch ?mode? list pattern"}}
 test lsearch-3.3 {lsearch errors} {
     list [catch {lsearch a b c} msg] $msg
-} {1 {bad search mode "a": must be -exact, -glob, -regexp, -dictionary, or -nocase}}
+} {1 {bad search mode "a": must be -exact, -glob, or -regexp}}
 test lsearch-3.4 {lsearch errors} {
     list [catch {lsearch a b c d} msg] $msg
 } {1 {wrong # args: should be "lsearch ?mode? list pattern"}}
@@ -84,3 +88,20 @@ test lsearch-4.2 {binary data} {
     append x two
     lsearch -exact [list foo one\000two bar] $x
 } 1
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+

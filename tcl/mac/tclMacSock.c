@@ -82,6 +82,9 @@ typedef struct TcpState {
     rdsEntry rdsarray[5+1];	   /* Array used when cleaning out recieve 
 				    * buffers on a closing socket. */
     Tcl_Channel channel;	   /* Channel associated with this socket. */
+    int writeBufferSize;           /* Size of buffer to hold data for
+                                    *  asynchronous writes. */
+    void *writeBuffer;             /* Buffer for async write data. */
     struct TcpState *nextPtr;	   /* The next socket on the global socket
 				    * list. */
 } TcpState;
@@ -179,6 +182,13 @@ static void		TcpWatch _ANSI_ARGS_((ClientData instanceData,
 static int		WaitForSocketEvent _ANSI_ARGS_((TcpState *infoPtr,
 		            int mask, int *errorCodePtr));
 
+pascal void NotifyRoutine (
+    StreamPtr tcpStream,
+    unsigned short eventCode,
+    Ptr userDataPtr,
+    unsigned short terminReason,
+    struct ICMPReport *icmpMsg);
+    
 /*
  * This structure describes the channel type structure for TCP socket
  * based IO:
@@ -206,6 +216,7 @@ static Tcl_ChannelType tcpChannelType = {
 ResultUPP resultUPP = NULL;
 TCPIOCompletionUPP completeUPP = NULL;
 TCPIOCompletionUPP closeUPP = NULL;
+TCPNotifyUPP notifyUPP = NULL;
 
 /*
  * Built-in commands, and the procedures associated with them:
@@ -240,11 +251,15 @@ static PortInfo portServices[] = {
     {NULL,		0},
 };
 
-/*
- * Every open socket has an entry on the following list.
- */
+typedef struct ThreadSpecificData {
+    /*
+     * Every open socket has an entry on the following list.
+     */
+    
+    TcpState *socketList;
+} ThreadSpecificData;
 
-static TcpState *socketList = NULL;
+static Tcl_ThreadDataKey dataKey;
 
 /*
  * Globals for holding information about OS support for sockets.
@@ -284,64 +299,78 @@ InitSockets()
     ParamBlockRec pb; 
     OSErr err;
     long response;
-
-    initialized = 1;
-    Tcl_CreateExitHandler(SocketExitHandler, (ClientData) NULL);
-	
-    if (Gestalt(gestaltMacTCPVersion, &response) == noErr) {
-	hasSockets = true;
-    } else {
-	hasSockets = false;
-    }
-
-    if (!hasSockets) {
-	return;
-    }
-
-    /*
-     * Load MacTcp driver and name server resolver.
-     */
-	
-		
-    pb.ioParam.ioCompletion = 0L; 
-    pb.ioParam.ioNamePtr = "\p.IPP"; 
-    pb.ioParam.ioPermssn = fsCurPerm; 
-    err = PBOpenSync(&pb); 
-    if (err != noErr) {
-	hasSockets = 0;
-	return;
-    }
-    driverRefNum = pb.ioParam.ioRefNum; 
-	
-    socketBufferSize = GetBufferSize();
-    err = OpenResolver(NULL);
-    if (err != noErr) {
-	hasSockets = 0;
-	return;
-    }
-
-    GetCurrentProcess(&applicationPSN);
-    /*
-     * Create UPP's for various callback routines.
-     */
-
-    resultUPP = NewResultProc(DNRCompletionRoutine);
-    completeUPP = NewTCPIOCompletionProc(IOCompletionRoutine);
-    closeUPP = NewTCPIOCompletionProc(CloseCompletionRoutine);
-
-    /*
-     * Install an ExitToShell patch.  We use this patch instead
-     * of the Tcl exit mechanism because we need to ensure that
-     * these routines are cleaned up even if we crash or are forced
-     * to quit.  There are some circumstances when the Tcl exit
-     * handlers may not fire.
-     */
-
-    TclMacInstallExitToShellPatch(CleanUpExitProc);
+    ThreadSpecificData *tsdPtr;
     
-    Tcl_CreateEventSource(SocketSetupProc, SocketCheckProc, NULL);
+    if (! initialized) {
+	/*
+	 * Do process wide initialization.
+	 */
 
-    initialized = 1;
+	initialized = 1;
+	    
+	if (Gestalt(gestaltMacTCPVersion, &response) == noErr) {
+	    hasSockets = true;
+	} else {
+	    hasSockets = false;
+	}
+    
+	if (!hasSockets) {
+	    return;
+	}
+    
+	/*
+	 * Load MacTcp driver and name server resolver.
+	 */
+	    
+		    
+	pb.ioParam.ioCompletion = 0L; 
+	pb.ioParam.ioNamePtr = "\p.IPP"; 
+	pb.ioParam.ioPermssn = fsCurPerm; 
+	err = PBOpenSync(&pb); 
+	if (err != noErr) {
+	    hasSockets = 0;
+	    return;
+	}
+	driverRefNum = pb.ioParam.ioRefNum; 
+	    
+	socketBufferSize = GetBufferSize();
+	err = OpenResolver(NULL);
+	if (err != noErr) {
+	    hasSockets = 0;
+	    return;
+	}
+    
+	GetCurrentProcess(&applicationPSN);
+	/*
+	 * Create UPP's for various callback routines.
+	 */
+    
+	resultUPP = NewResultProc(DNRCompletionRoutine);
+	completeUPP = NewTCPIOCompletionProc(IOCompletionRoutine);
+	closeUPP = NewTCPIOCompletionProc(CloseCompletionRoutine);
+	notifyUPP = NewTCPNotifyProc(NotifyRoutine);
+    
+	/*
+	 * Install an ExitToShell patch.  We use this patch instead
+	 * of the Tcl exit mechanism because we need to ensure that
+	 * these routines are cleaned up even if we crash or are forced
+	 * to quit.  There are some circumstances when the Tcl exit
+	 * handlers may not fire.
+	 */
+    
+	TclMacInstallExitToShellPatch(CleanUpExitProc);
+    }
+
+    /*
+     * Do per-thread initialization.
+     */
+
+    tsdPtr = (ThreadSpecificData *)TclThreadDataKeyGet(&dataKey);
+    if (tsdPtr == NULL) {
+	tsdPtr->socketList = NULL;
+	Tcl_CreateEventSource(SocketSetupProc, SocketCheckProc, NULL);
+	Tcl_CreateThreadExitHandler(SocketExitHandler, (ClientData) NULL);
+    }
 }
 
 /*
@@ -370,13 +399,12 @@ SocketExitHandler(
 	/* CleanUpExitProc();
 	TclMacDeleteExitToShellPatch(CleanUpExitProc); */
     }
-    initialized = 0;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * TclHasSockets --
+ * TclpHasSockets --
  *
  *	This function determines whether sockets are available on the
  *	current system and returns an error in interp if they are not.
@@ -393,12 +421,10 @@ SocketExitHandler(
  */
 
 int
-TclHasSockets(
+TclpHasSockets(
     Tcl_Interp *interp)		/* Interp for error messages. */
 {
-    if (!initialized) {
-	InitSockets();
-    }
+    InitSockets();
 
     if (hasSockets) {
 	return TCL_OK;
@@ -434,6 +460,7 @@ SocketSetupProc(
 {
     TcpState *statePtr;
     Tcl_Time blockTime = { 0, 0 };
+    ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
 
     if (!(flags & TCL_FILE_EVENTS)) {
 	return;
@@ -443,7 +470,7 @@ SocketSetupProc(
      * Check to see if there is a ready socket.  If so, poll.
      */
 
-    for (statePtr = socketList; statePtr != NULL;
+    for (statePtr = tsdPtr->socketList; statePtr != NULL;
 	    statePtr = statePtr->nextPtr) {
 	if (statePtr->flags & TCP_RELEASE) {
 	    continue;
@@ -480,6 +507,7 @@ SocketCheckProc(
     TcpState *statePtr;
     SocketEvent *evPtr;
     TcpState dummyState;
+    ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
 
     if (!(flags & TCL_FILE_EVENTS)) {
 	return;
@@ -491,7 +519,7 @@ SocketCheckProc(
      * events).
      */
 
-    for (statePtr = socketList; statePtr != NULL;
+    for (statePtr = tsdPtr->socketList; statePtr != NULL;
 	    statePtr = statePtr->nextPtr) {
 	/*
 	 * Check to see if this socket is dead and needs to be cleaned
@@ -702,10 +730,14 @@ TcpClose(
 	InitMacTCPParamBlock(&closePB, TCPClose);
     	closePB.tcpStream = tcpStream;
     	closePB.ioCompletion = NULL; 
+	closePB.csParam.close.ulpTimeoutValue = 60 /* seconds */;
+	closePB.csParam.close.ulpTimeoutAction = 1 /* 1:abort 0:report */;
+	closePB.csParam.close.validityFlags = timeoutValue | timeoutAction;
     	err = PBControlSync((ParmBlkPtr) &closePB);
     	if (err != noErr) {
     	    Debugger();
-            panic("error closing server socket");
+    	    goto afterRelease;
+            /* panic("error closing server socket"); */
     	}
 	statePtr->flags |= TCP_RELEASE;
 
@@ -725,8 +757,17 @@ TcpClose(
 	 * Free the buffer space used by the socket and the 
 	 * actual socket state data structure.
 	 */
-
-	ckfree((char *) statePtr->pb.csParam.create.rcvBuff);
+      afterRelease:
+        
+        /*
+         * Have to check whether the pointer is NULL, since we could get here
+         * on a failed socket open, and then the rcvBuff would never have been
+         * allocated.
+         */
+         
+        if (err == noErr) {
+	    ckfree((char *) statePtr->pb.csParam.create.rcvBuff);
+	}
 	FreeSocketInfo(statePtr);
 	return 0;
     }
@@ -741,26 +782,32 @@ TcpClose(
     	closePB.tcpStream = tcpStream;
     	closePB.ioCompletion = NULL; 
     	err = PBControlSync((ParmBlkPtr) &closePB);
-    	if (err != noErr) {
-            panic("error closing async connect socket");
-    	}
-	statePtr->flags |= TCP_RELEASE;
+    	if (err == noErr) {
+	    statePtr->flags |= TCP_RELEASE;
 
-	InitMacTCPParamBlock(&statePtr->pb, TCPRelease);
-	statePtr->pb.tcpStream = statePtr->tcpStream;
-	err = PBControlSync((ParmBlkPtr) &statePtr->pb);
-	if (err != noErr) {
-            panic("error releasing async connect socket");
+	    InitMacTCPParamBlock(&closePB, TCPRelease);
+    	    closePB.tcpStream = tcpStream;
+    	    closePB.ioCompletion = NULL; 
+
+	    err = PBControlSync((ParmBlkPtr) &closePB);
 	}
 
 	/*
 	 * Free the buffer space used by the socket and the 
-	 * actual socket state data structure.
+	 * actual socket state data structure.  However, if the
+	 * RELEASE returns an error, then the rcvBuff is usually
+	 * bad, so we can't release it.  I think this means we will
+	 * leak the buffer, so in the future, we may want to track the
+	 * buffers separately, and nuke them on our own (or just not
+	 * use MacTCP!).
 	 */
 
-	ckfree((char *) statePtr->pb.csParam.create.rcvBuff);
+        if (err == noErr) {
+	    ckfree((char *) closePB.csParam.create.rcvBuff);
+	}
+	
 	FreeSocketInfo(statePtr);
-	return 0;
+	return err;
     }
 
     /*
@@ -1109,7 +1156,7 @@ TcpInput(
  *
  * TcpGetHandle --
  *
- *	Called from Tcl_GetChannelFile to retrieve handles from inside
+ *	Called from Tcl_GetChannelHandle to retrieve handles from inside
  *	a file based channel.
  *
  * Results:
@@ -1210,8 +1257,26 @@ TcpOutput(
 	    if (toWrite < amount) {
 		amount = toWrite;
 	    }
+
+            /* We need to copy the data, otherwise the caller may overwrite
+             * the buffer in the middle of our asynchronous call
+             */
+             
+            if (amount > statePtr->writeBufferSize) {
+                /* 
+                 * need to grow write buffer 
+                 */
+                 
+                if (statePtr->writeBuffer != (void *) NULL) {
+                    ckfree(statePtr->writeBuffer);
+                }
+                statePtr->writeBuffer = (void *) ckalloc(amount);
+                statePtr->writeBufferSize = amount;
+            }
+            memcpy(statePtr->writeBuffer, buf, amount);
+            statePtr->dataSegment[0].ptr = statePtr->writeBuffer;
+
 	    statePtr->dataSegment[0].length = amount;
-	    statePtr->dataSegment[0].ptr = buf;
 	    statePtr->dataSegment[1].length = 0;
 	    InitMacTCPParamBlock(&statePtr->pb, TCPSend);
 	    statePtr->pb.ioCompletion = completeUPP;
@@ -1470,6 +1535,7 @@ NewSocketInfo(
     StreamPtr tcpStream)
 {
     TcpState *statePtr;
+    ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
 
     statePtr = (TcpState *) ckalloc((unsigned) sizeof(TcpState));
     statePtr->tcpStream = tcpStream;
@@ -1479,8 +1545,10 @@ NewSocketInfo(
     statePtr->watchMask = 0;
     statePtr->acceptProc = (Tcl_TcpAcceptProc *) NULL;
     statePtr->acceptProcData = (ClientData) NULL;
-    statePtr->nextPtr = socketList;
-    socketList = statePtr;
+    statePtr->writeBuffer = (void *) NULL;
+    statePtr->writeBufferSize = 0;
+    statePtr->nextPtr = tsdPtr->socketList;
+    tsdPtr->socketList = statePtr;
     return statePtr;
 }
 
@@ -1505,17 +1573,24 @@ static void
 FreeSocketInfo(
     TcpState *statePtr)		/* The state pointer to free. */
 {
-    if (statePtr == socketList) {
-	socketList = statePtr->nextPtr;
+    ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
+
+    if (statePtr == tsdPtr->socketList) {
+	tsdPtr->socketList = statePtr->nextPtr;
     } else {
 	TcpState *p;
-	for (p = socketList; p != NULL; p = p->nextPtr) {
+	for (p = tsdPtr->socketList; p != NULL; p = p->nextPtr) {
 	    if (p->nextPtr == statePtr) {
 		p->nextPtr = statePtr->nextPtr;
 		break;
 	    }
 	}
     }
+    
+    if (statePtr->writeBuffer != (void *) NULL) {
+        ckfree(statePtr->writeBuffer);
+    }
+    
     ckfree((char *) statePtr);
 }
 
@@ -1542,7 +1617,7 @@ Tcl_MakeTcpClientChannel(
     TcpState *statePtr;
     char channelName[20];
 
-    if (TclHasSockets(NULL) != TCL_OK) {
+    if (TclpHasSockets(NULL) != TCL_OK) {
 	return NULL;
     }
 	
@@ -1621,6 +1696,7 @@ CreateSocket(
     InitMacTCPParamBlock(&pb, TCPCreate);
     pb.csParam.create.rcvBuff = buffer;
     pb.csParam.create.rcvBuffLen = socketBufferSize;
+    pb.csParam.create.notifyProc = nil /* notifyUPP */;
     err = PBControlSync((ParmBlkPtr) &pb);
     if (err != noErr) {
         Tcl_SetErrno(0); /* TODO: set to ENOSR - maybe?*/
@@ -1645,6 +1721,10 @@ CreateSocket(
 	statePtr->pb.csParam.open.localPort = statePtr->port;
 	statePtr->pb.ioCompletion = completeUPP; 
 	statePtr->pb.csParam.open.userDataPtr = (Ptr) statePtr;
+	statePtr->pb.csParam.open.ulpTimeoutValue = 100;
+	statePtr->pb.csParam.open.ulpTimeoutAction 	= 1 /* 1:abort 0:report */;
+	statePtr->pb.csParam.open.commandTimeoutValue	= 0 /* infinity */;
+
 	statePtr->flags |= TCP_LISTENING;
 	err = PBControlAsync((ParmBlkPtr) &(statePtr->pb));
 
@@ -1674,12 +1754,18 @@ CreateSocket(
 	 */
 
 	InitMacTCPParamBlock(&statePtr->pb, TCPActiveOpen);
+	
 	statePtr->pb.tcpStream = tcpStream;
 	statePtr->pb.csParam.open.remoteHost = macAddr;
 	statePtr->pb.csParam.open.remotePort = port;
 	statePtr->pb.csParam.open.localHost = 0;
 	statePtr->pb.csParam.open.localPort = myport;
-	statePtr->pb.csParam.open.userDataPtr = (Ptr) statePtr;
+	statePtr->pb.csParam.open.userDataPtr = (Ptr) statePtr;	
+	statePtr->pb.csParam.open.validityFlags 	= timeoutValue | timeoutAction;
+	statePtr->pb.csParam.open.ulpTimeoutValue 	= 60 /* seconds */;
+	statePtr->pb.csParam.open.ulpTimeoutAction 	= 1 /* 1:abort 0:report */;
+	statePtr->pb.csParam.open.commandTimeoutValue   = 0;
+
 	statePtr->pb.ioCompletion = completeUPP;
 	if (async) {
 	    statePtr->flags |= TCP_ASYNC_CONNECT;
@@ -1769,7 +1855,7 @@ Tcl_OpenTcpClient(
     TcpState *statePtr;
     char channelName[20];
 
-    if (TclHasSockets(interp) != TCL_OK) {
+    if (TclpHasSockets(interp) != TCL_OK) {
 	return NULL;
     }
 	
@@ -1820,7 +1906,7 @@ Tcl_OpenTcpServer(
     TcpState *statePtr;
     char channelName[20];
 
-    if (TclHasSockets(interp) != TCL_OK) {
+    if (TclpHasSockets(interp) != TCL_OK) {
 	return NULL;
     }
 
@@ -1875,6 +1961,7 @@ SocketEventProc(
     TcpState *statePtr;
     SocketEvent *eventPtr = (SocketEvent *) evPtr;
     int mask = 0;
+    ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
 
     if (!(flags & TCL_FILE_EVENTS)) {
 	return 0;
@@ -1884,7 +1971,7 @@ SocketEventProc(
      * Find the specified socket on the socket list.
      */
 
-    for (statePtr = socketList; statePtr != NULL;
+    for (statePtr = tsdPtr->socketList; statePtr != NULL;
 	    statePtr = statePtr->nextPtr) {
 	if ((statePtr == eventPtr->statePtr) && 
 		(statePtr->tcpStream == eventPtr->tcpStream)) {
@@ -1966,23 +2053,48 @@ WaitForSocketEvent(
 	statusPB.csCode = TCPStatus;
 	err = PBControlSync((ParmBlkPtr) &statusPB);
 	if (err != noErr) {
-	    statePtr->checkMask |= (TCL_READABLE | TCL_WRITABLE);
-	    return 1;
+            /*
+             * I am not sure why it is right to return 1 - indicating success
+             * for synchronous sockets when an attempt to get status on the
+             * driver yeilds an error.   But it is CERTAINLY wrong for async
+             * sockect which have not yet connected.
+             */
+             
+	    if (statePtr->flags & TCP_ASYNC_CONNECT) {
+	        *errorCodePtr = EWOULDBLOCK;
+	        return 0;
+	    } else {
+	        statePtr->checkMask |= (TCL_READABLE | TCL_WRITABLE);
+	        return 1;
+	    }
 	}
 	statePtr->checkMask = 0;
-	if (statusPB.csParam.status.amtUnreadData > 0) {
-	    statePtr->checkMask |= TCL_READABLE;
-	}
-	if (!(statePtr->flags & TCP_WRITING)
-		&& (statusPB.csParam.status.sendWindow - 
-			statusPB.csParam.status.amtUnackedData) > 0) {
-	    statePtr->flags &= ~(TCP_ASYNC_CONNECT);
-	    statePtr->checkMask |= TCL_WRITABLE;
-	}
-	if (mask & statePtr->checkMask) {
-	    return 1;
-	}
-
+	
+	/*
+	 * The "6" below is the "connection being established" flag.  I couldn't
+	 * find a define for this in MacTCP.h, but that's what the programmer's
+	 * guide says.
+	 */
+	 
+	if ((statusPB.csParam.status.connectionState != 0)
+	        && (statusPB.csParam.status.connectionState != 4)
+	        && (statusPB.csParam.status.connectionState != 6)) {
+	    if (statusPB.csParam.status.amtUnreadData > 0) {
+	        statePtr->checkMask |= TCL_READABLE;
+	    }
+	    if (!(statePtr->flags & TCP_WRITING)
+		    && (statusPB.csParam.status.sendWindow - 
+			    statusPB.csParam.status.amtUnackedData) > 0) {
+	        statePtr->flags &= ~(TCP_ASYNC_CONNECT);
+	        statePtr->checkMask |= TCL_WRITABLE;
+	    }
+	    if (mask & statePtr->checkMask) {
+	        return 1;
+	    }
+        } else {
+            break;
+        }
+        
 	/*
 	 * Call the system to let other applications run while we
 	 * are waiting for this event to occur.
@@ -2126,7 +2238,7 @@ Tcl_GetHostName()
         return hostname;
     }
     
-    if (TclHasSockets(NULL) == TCL_OK) {
+    if (TclpHasSockets(NULL) == TCL_OK) {
 	err = GetLocalAddress(&ourAddress);
 	if (err == noErr) {
 	    /*
@@ -2266,10 +2378,11 @@ CleanUpExitProc()
 {
     TCPiopb exitPB;
     TcpState *statePtr;
+    ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
 
-    while (socketList != NULL) {
-	statePtr = socketList;
-	socketList = statePtr->nextPtr;
+    while (tsdPtr->socketList != NULL) {
+	statePtr = tsdPtr->socketList;
+	tsdPtr->socketList = statePtr->nextPtr;
 
 	/*
 	 * Close and Release the connection.
@@ -2321,7 +2434,7 @@ GetHostFromString(
     EventRecord dummy;
     DNRState dnrState;
 	
-    if (TclHasSockets(NULL) != TCL_OK) {
+    if (TclpHasSockets(NULL) != TCL_OK) {
 	return 0;
     }
 
@@ -2536,7 +2649,7 @@ GetBufferSize()
  * Results:
  *	A standard Tcl result.  On success, the port number is
  *	returned in portPtr. On failure, an error message is left in
- *	interp->result.
+ *	the interp's result.
  *
  * Side effects:
  *	None.
@@ -2604,12 +2717,50 @@ static void
 ClearZombieSockets()
 {
     TcpState *statePtr;
+    ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
 
-    for (statePtr = socketList; statePtr != NULL;
+    for (statePtr = tsdPtr->socketList; statePtr != NULL;
 	    statePtr = statePtr->nextPtr) {
 	if (statePtr->flags & TCP_RELEASE) {
 	    SocketFreeProc(statePtr);
 	    return;
 	}
     }
+}
+
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * NotifyRoutine --
+ *
+ *	This routine does nothing currently, and is not being used.  But
+ *      it is useful if you want to experiment with what MacTCP thinks that
+ *      it is doing...
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+pascal void NotifyRoutine (
+    StreamPtr tcpStream,
+    unsigned short eventCode,
+    Ptr userDataPtr,
+    unsigned short terminReason,
+    struct ICMPReport *icmpMsg)
+{
+    StreamPtr localTcpStream;
+    unsigned short localEventCode;
+    unsigned short localTerminReason;
+    struct ICMPReport localIcmpMsg;
+
+    localTcpStream = tcpStream;
+    localEventCode = eventCode;
+    localTerminReason = terminReason;
+    localIcmpMsg = *icmpMsg;
+        
 }

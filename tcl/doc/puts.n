@@ -34,8 +34,8 @@ value of the \fB\-translation\fR option for the channel (for example,
 on PCs newlines are normally replaced with carriage-return-linefeed
 sequences;  on Macintoshes newlines are normally replaced with
 carriage-returns).
-See the \fBfconfigure\fR manual entry for a discussion of end-of-line
-translations.
+See the \fBfconfigure\fR manual entry for a discussion on ways in
+which \fBfconfigure\fR will alter output.
 .PP
 Tcl buffers output internally, so characters written with \fBputs\fR
 may not appear immediately on the output file or device;  Tcl will

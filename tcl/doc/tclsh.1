@@ -26,7 +26,8 @@ Tcl commands from standard input and printing command results and
 error messages to standard output.
 It runs until the \fBexit\fR command is invoked or until it
 reaches end-of-file on its standard input.
-If there exists a file \fB.tclshrc\fR in the home directory of
+If there exists a file \fB.tclshrc\fR (or \fBtclshrc.tcl\fR on
+the Windows platforms) in the home directory of
 the user, \fBtclsh\fR evaluates the file as a Tcl script
 just before reading the first command from standard input.
 

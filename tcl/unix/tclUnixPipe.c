@@ -128,12 +128,16 @@ TclpMakeFile(channel, direction)
 
 TclFile
 TclpOpenFile(fname, mode)
-    char *fname;			/* The name of the file to open. */
-    int mode;				/* In what mode to open the file? */
+    CONST char *fname;		/* The name of the file to open. */
+    int mode;			/* In what mode to open the file? */
 {
     int fd;
+    char *native;
+    Tcl_DString ds;
 
-    fd = open(fname, mode, 0666);
+    native = Tcl_UtfToExternalDString(NULL, fname, -1, &ds);
+    fd = open(native, mode, 0666);			/* INTL: Native. */
+    Tcl_DStringFree(&ds);
     if (fd != -1) {
         fcntl(fd, F_SETFD, FD_CLOEXEC);
 
@@ -143,7 +147,7 @@ TclpOpenFile(fname, mode)
 	 */
 
 	if (mode & O_WRONLY) {
-	    lseek(fd, 0, SEEK_END);
+	    lseek(fd, (off_t) 0, SEEK_END);
 	}
 
 	/*
@@ -175,36 +179,34 @@ TclpOpenFile(fname, mode)
  */
 
 TclFile
-TclpCreateTempFile(contents, namePtr)
-    char *contents;		/* String to write into temp file, or NULL. */
-    Tcl_DString *namePtr;	/* If non-NULL, pointer to initialized 
-				 * DString that is filled with the name of 
-				 * the temp file that was created. */
+TclpCreateTempFile(contents)
+    CONST char *contents;	/* String to write into temp file, or NULL. */
 {
-    char fileName[L_tmpnam];
-    TclFile file;
-    size_t length = (contents == NULL) ? 0 : strlen(contents);
+    char fileName[L_tmpnam], *native;
+    Tcl_DString dstring;
+    int fd;
 
-    tmpnam(fileName);
-    file = TclpOpenFile(fileName, O_RDWR|O_CREAT|O_TRUNC);
-    unlink(fileName);
+    if (tmpnam(fileName) == NULL) {			/* INTL: Native. */
+	return NULL;
+    }
+    fd = open(fileName, O_RDWR|O_CREAT|O_TRUNC, 0666);	/* INTL: Native. */
+    if (fd == -1) {
+	return NULL;
+    }
+    fcntl(fd, F_SETFD, FD_CLOEXEC);
+    unlink(fileName);					/* INTL: Native. */
 
-    if ((file != NULL) && (length > 0)) {
-	int fd = GetFd(file);
-	while (1) {
-	    if (write(fd, contents, length) != -1) {
-		break;
-	    } else if (errno != EINTR) {
-		close(fd);
-		return NULL;
-	    }
+    if (contents != NULL) {
+	native = Tcl_UtfToExternalDString(NULL, contents, -1, &dstring);
+	if (write(fd, native, strlen(native)) == -1) {
+	    close(fd);
+	    Tcl_DStringFree(&dstring);
+	    return NULL;
 	}
-	lseek(fd, 0, SEEK_SET);
+	Tcl_DStringFree(&dstring);
+	lseek(fd, (off_t) 0, SEEK_SET);
     }
-    if (namePtr != NULL) {
-	Tcl_DStringAppend(namePtr, fileName, -1);
-    }
-    return file;
+    return MakeFile(fd);
 }
 
 /*
@@ -279,7 +281,7 @@ TclpCloseFile(file)
 }
 
 /*
- *----------------------------------------------------------------------
+ *---------------------------------------------------------------------------
  *
  * TclpCreateProcess --
  *
@@ -292,14 +294,14 @@ TclpCloseFile(file)
  *
  * Results:
  *	The return value is TCL_ERROR and an error message is left in
- *	interp->result if there was a problem creating the child 
+ *	the interp's result if there was a problem creating the child 
  *	process.  Otherwise, the return value is TCL_OK and *pidPtr is
  *	filled with the process id of the child process.
  * 
  * Side effects:
  *	A process is created.
  *	
- *----------------------------------------------------------------------
+ *---------------------------------------------------------------------------
  */
 
     /* ARGSUSED */
@@ -311,11 +313,11 @@ TclpCreateProcess(interp, argc, argv, inputFile, outputFile, errorFile,
 				 * Error messages from the child process
 				 * itself are sent to errorFile. */
     int argc;			/* Number of arguments in following array. */
-    char **argv;		/* Array of argument strings.  argv[0]
-				 * contains the name of the executable
-				 * converted to native format (using the
-				 * Tcl_TranslateFileName call).  Additional
-				 * arguments have not been converted. */
+    char **argv;		/* Array of argument strings in UTF-8.
+				 * argv[0] contains the name of the executable
+				 * translated using Tcl_TranslateFileName
+				 * call).  Additional arguments have not been
+				 * converted. */
     TclFile inputFile;		/* If non-NULL, gives the file to use as
 				 * input for the child process.  If inputFile
 				 * file is not readable or is NULL, the child
@@ -336,8 +338,10 @@ TclpCreateProcess(interp, argc, argv, inputFile, outputFile, errorFile,
 {
     TclFile errPipeIn, errPipeOut;
     int joinThisError, count, status, fd;
-    char errSpace[200];
-    int pid;
+    char errSpace[200 + TCL_INTEGER_SPACE];
+    Tcl_DString *dsArray;
+    char **newArgv;
+    int pid, i;
     
     errPipeIn = NULL;
     errPipeOut = NULL;
@@ -354,8 +358,19 @@ TclpCreateProcess(interp, argc, argv, inputFile, outputFile, errorFile,
 	goto error;
     }
 
+    /*
+     * We need to allocate and convert this before the fork
+     * so it is properly deallocated later
+     */
+    dsArray = (Tcl_DString *) ckalloc(argc * sizeof(Tcl_DString));
+    newArgv = (char **) ckalloc((argc+1) * sizeof(char *));
+    newArgv[argc] = NULL;
+    for (i = 0; i < argc; i++) {
+	newArgv[i] = Tcl_UtfToExternalDString(NULL, argv[i], -1, &dsArray[i]);
+    }
+
     joinThisError = (errorFile == outputFile);
-    pid = vfork();
+    pid = fork();
     if (pid == 0) {
 	fd = GetFd(errPipeOut);
 
@@ -370,8 +385,7 @@ TclpCreateProcess(interp, argc, argv, inputFile, outputFile, errorFile,
 			((dup2(1,2) == -1) ||
 			 (fcntl(2, F_SETFD, 0) != 0)))) {
 	    sprintf(errSpace,
-		    "%dforked process couldn't set up input/output: ",
-		    errno);
+		    "%dforked process couldn't set up input/output: ", errno);
 	    write(fd, errSpace, (size_t) strlen(errSpace));
 	    _exit(1);
 	}
@@ -381,12 +395,21 @@ TclpCreateProcess(interp, argc, argv, inputFile, outputFile, errorFile,
 	 */
 
 	RestoreSignals();
-	execvp(argv[0], &argv[0]);
-	sprintf(errSpace, "%dcouldn't execute \"%.150s\": ", errno,
-		argv[0]);
+	execvp(newArgv[0], newArgv);			/* INTL: Native. */
+	sprintf(errSpace, "%dcouldn't execute \"%.150s\": ", errno, argv[0]);
 	write(fd, errSpace, (size_t) strlen(errSpace));
 	_exit(1);
     }
+    
+    /*
+     * Free the mem we used for the fork
+     */
+    for (i = 0; i < argc; i++) {
+	Tcl_DStringFree(&dsArray[i]);
+    }
+    ckfree((char *) dsArray);
+    ckfree((char *) newArgv);
+
     if (pid == -1) {
 	Tcl_AppendResult(interp, "couldn't fork child process: ",
 		Tcl_PosixError(interp), (char *) NULL);
@@ -621,7 +644,7 @@ TclpCreateCommandChannel(readFile, writeFile, errorFile, numPids, pidPtr)
                                  * the channel is closed or the processes
                                  * are detached (in a background exec). */
 {
-    char channelName[20];
+    char channelName[16 + TCL_INTEGER_SPACE];
     int channelId;
     PipeState *statePtr = (PipeState *) ckalloc((unsigned) sizeof(PipeState));
     int mode;
@@ -676,13 +699,13 @@ TclpCreateCommandChannel(readFile, writeFile, errorFile, numPids, pidPtr)
  *	This procedure is invoked in the generic implementation of a
  *	background "exec" (An exec when invoked with a terminating "&")
  *	to store a list of the PIDs for processes in a command pipeline
- *	in interp->result and to detach the processes.
+ *	in the interp's result and to detach the processes.
  *
  * Results:
  *	None.
  *
  * Side effects:
- *	Modifies interp->result. Detaches processes.
+ *	Modifies the interp's result. Detaches processes.
  *
  *----------------------------------------------------------------------
  */
@@ -695,7 +718,7 @@ TclGetAndDetachPids(interp, chan)
     PipeState *pipePtr;
     Tcl_ChannelType *chanTypePtr;
     int i;
-    char buf[20];
+    char buf[TCL_INTEGER_SPACE];
 
     /*
      * Punt if the channel is not a command channel.
@@ -708,7 +731,7 @@ TclGetAndDetachPids(interp, chan)
 
     pipePtr = (PipeState *) Tcl_GetChannelInstanceData(chan);
     for (i = 0; i < pipePtr->numPids; i++) {
-        sprintf(buf, "%ld", TclpGetPid(pipePtr->pidPtr[i]));
+        TclFormatInt(buf, (long) TclpGetPid(pipePtr->pidPtr[i]));
         Tcl_AppendElement(interp, buf);
         Tcl_DetachPids(1, &(pipePtr->pidPtr[i]));
     }
@@ -759,7 +782,6 @@ PipeBlockModeProc(instanceData, mode)
         if (fcntl(fd, F_SETFL, curStatus) < 0) {
             return errno;
         }
-        curStatus = fcntl(fd, F_GETFL);
     }
     if (psPtr->outFile) {
         fd = GetFd(psPtr->outFile);
@@ -799,7 +821,9 @@ PipeBlockModeProc(instanceData, mode)
         }
     }
 #endif	/* USE_FIONBIO */
-    
+
+    psPtr->isNonBlocking = (mode == TCL_MODE_NONBLOCKING);
+
     return 0;
 }
 
@@ -1129,8 +1153,7 @@ Tcl_PidObjCmd(dummy, interp, objc, objv)
     if (objc == 1) {
 	Tcl_SetLongObj(Tcl_GetObjResult(interp), (long) getpid());
     } else {
-        chan = Tcl_GetChannel(interp, Tcl_GetStringFromObj(objv[1], NULL),
-		NULL);
+        chan = Tcl_GetChannel(interp, Tcl_GetString(objv[1]), NULL);
         if (chan == (Tcl_Channel) NULL) {
 	    return TCL_ERROR;
 	}
@@ -1147,3 +1170,5 @@ Tcl_PidObjCmd(dummy, interp, objc, objv)
     }
     return TCL_OK;
 }
+
+

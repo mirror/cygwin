@@ -47,7 +47,7 @@ When matching \fIstring\fR to the patterns, use glob-style matching
 \fB\-regexp\fR
 When matching \fIstring\fR to the patterns, use regular
 expression matching
-(i.e. the same as implemented by the \fBregexp\fR command).
+(as described in the \fBre_syntax\fR reference page).
 .TP 10
 \fB\-\|\-\fR
 Marks the end of options.  The argument following this one will
@@ -75,6 +75,10 @@ then the body after that is used, and so on).
 This feature makes it possible to share a single \fIbody\fR among
 several patterns.
 .PP
+Beware of how you place comments in \fBswitch\fR commands.  Comments
+should only be placed \fBinside\fR the execution body of one of the
+patterns, and not intermingled with the patterns.
+.PP
 Below are some examples of \fBswitch\fR commands:
 .CS
 \fBswitch\0abc\0a\0\-\0b\0{format 1}\0abc\0{format 2}\0default\0{format 3}\fR
@@ -94,7 +98,10 @@ will return \fB1\fR, and
 	a
 		\-
 	b
-		{format 1}
+		{
+		# Correct Comment Placement
+		format 1
+	}
 	a*
 		{format 2}
 	default

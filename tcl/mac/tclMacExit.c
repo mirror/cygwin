@@ -104,7 +104,7 @@ static ExitToShellDataPtr gExitToShellData = (ExitToShellDataPtr) NULL;
  */
 
 void
-TclPlatformExit(
+TclpExit(
     int status)		/* Ignored. */
 {
     TclMacExitHandler();

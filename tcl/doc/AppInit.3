@@ -51,7 +51,7 @@ Invoke a startup script to initialize the application.
 .LP
 \fBTcl_AppInit\fR returns TCL_OK or TCL_ERROR.
 If it returns TCL_ERROR then it must leave an error message in
-\fIinterp->result\fR;  otherwise the result is ignored.
+for the interpreter's result;  otherwise the result is ignored.
 .PP
 In addition to \fBTcl_AppInit\fR, your application should also contain
 a procedure \fBmain\fR that calls \fBTcl_Main\fR as follows:

@@ -6,13 +6,17 @@
 # errors. No output means no errors were found.
 #
 # Copyright (c) 1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # RCS: @(#) $Id$
 
-if {[string compare test [info procs test]] == 1} then {source defs}
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
 
 # Clear out any namespaces called test_ns_*
 catch {eval namespace delete [namespace children :: test_ns_*]}
@@ -77,14 +81,14 @@ test namespace-5.2 {Tcl_PopCallFrame, local vars must be deleted} {
 test namespace-6.1 {Tcl_CreateNamespace} {
     catch {eval namespace delete [namespace children :: test_ns_*]}
     list [lsort [namespace children :: test_ns_*]] \
-	 [namespace eval test_ns_1 {namespace current}] \
-	 [namespace eval test_ns_2 {namespace current}] \
-	 [namespace eval ::test_ns_3 {namespace current}] \
-	 [namespace eval ::test_ns_4 \
-             {namespace eval foo {namespace current}}] \
-	 [namespace eval ::test_ns_5 \
-             {namespace eval ::test_ns_6 {namespace current}}] \
-         [lsort [namespace children :: test_ns_*]]
+        [namespace eval test_ns_1 {namespace current}] \
+	[namespace eval test_ns_2 {namespace current}] \
+	[namespace eval ::test_ns_3 {namespace current}] \
+	[namespace eval ::test_ns_4 \
+            {namespace eval foo {namespace current}}] \
+	[namespace eval ::test_ns_5 \
+            {namespace eval ::test_ns_6 {namespace current}}] \
+        [lsort [namespace children :: test_ns_*]]
 } {{} ::test_ns_1 ::test_ns_2 ::test_ns_3 ::test_ns_4::foo ::test_ns_6 {::test_ns_1 ::test_ns_2 ::test_ns_3 ::test_ns_4 ::test_ns_5 ::test_ns_6}}
 test namespace-6.2 {Tcl_CreateNamespace, odd number of :'s in name is okay} {
     list [namespace eval :::test_ns_1::::foo {namespace current}] \
@@ -99,8 +103,8 @@ test namespace-6.4 {Tcl_CreateNamespace, trailing ::s in ns name are ignored} {
         namespace eval test_ns_2:: {}
         namespace eval test_ns_3:: {}
     }
-    namespace children ::test_ns_1
-} {::test_ns_1::test_ns_2 ::test_ns_1::test_ns_3}
+    lsort [namespace children ::test_ns_1]
+} [lsort {::test_ns_1::test_ns_2 ::test_ns_1::test_ns_3}]
 test namespace-6.5 {Tcl_CreateNamespace, relative ns names now only looked up in current ns} {
     set trigger {
         namespace eval test_ns_2 {namespace current}
@@ -185,10 +189,10 @@ test namespace-8.4 {TclTeardownNamespace, cmds imported from deleted ns go away}
         namespace import ::test_ns_export::*
         proc p {} {return foo}
     }
-    list [info commands test_ns_import::*] \
+    list [lsort [info commands test_ns_import::*]] \
          [namespace delete test_ns_export] \
          [info commands test_ns_import::*]
-} {{::test_ns_import::p ::test_ns_import::cmd1 ::test_ns_import::cmd2} {} ::test_ns_import::p}
+} [list [lsort {::test_ns_import::p ::test_ns_import::cmd1 ::test_ns_import::cmd2}] {} ::test_ns_import::p]
 
 test namespace-9.1 {Tcl_Import, empty import pattern} {
     catch {eval namespace delete [namespace children :: test_ns_*]}
@@ -259,12 +263,12 @@ test namespace-10.3 {Tcl_ForgetImport, deletes matching imported cmds} {
         namespace import ::test_ns_export::*
         proc p {} {return [cmd1 123]}
         set l {}
-        lappend l [info commands ::test_ns_import::*]
+        lappend l [lsort [info commands ::test_ns_import::*]]
         namespace forget ::test_ns_export::cmd1
         lappend l [info commands ::test_ns_import::*]
         lappend l [catch {cmd1 777} msg] $msg
     }
-} {{::test_ns_import::p ::test_ns_import::cmd1} ::test_ns_import::p 1 {invalid command name "cmd1"}}
+} [list [lsort {::test_ns_import::p ::test_ns_import::cmd1}] ::test_ns_import::p 1 {invalid command name "cmd1"}]
 
 test namespace-11.1 {TclGetOriginalCommand, check if not imported cmd} {
     catch {eval namespace delete [namespace children :: test_ns_*]}
@@ -322,9 +326,9 @@ test namespace-14.1 {TclGetNamespaceForQualName, absolute names} {
     }
     namespace eval test_ns_1 {
         list $::v $::test_ns_2::v $::test_ns_1::test_ns_2::v \
-             [namespace children :: test_ns_*]
+		[lsort [namespace children :: test_ns_*]]
     }
-} {10 30 20 {::test_ns_1 ::test_ns_2}}
+} [list 10 30 20 [lsort {::test_ns_1 ::test_ns_2}]]
 test namespace-14.2 {TclGetNamespaceForQualName, invalid absolute names} {
     namespace eval test_ns_1 {
         list [catch {set ::test_ns_777::v} msg] $msg \
@@ -671,8 +675,8 @@ test namespace-21.6 {NamespaceChildrenCmd, glob-style pattern given} {
 } {::test_ns_1::test_ns_foo}
 test namespace-21.7 {NamespaceChildrenCmd, glob-style pattern given} {
     namespace eval test_ns_1::test_ns_foo {}
-    namespace children test_ns_1 test*
-} {::test_ns_1::test_ns_2 ::test_ns_1::test_ns_foo}
+    lsort [namespace children test_ns_1 test*]
+} [lsort {::test_ns_1::test_ns_2 ::test_ns_1::test_ns_foo}]
 
 test namespace-22.1 {NamespaceCodeCmd, bad args} {
     catch {eval namespace delete [namespace children :: test_ns_*]}
@@ -797,13 +801,13 @@ test namespace-26.5 {NamespaceExportCmd, sequence of patterns, patterns accumula
     namespace eval test_ns_2 {
         namespace import -force ::test_ns_1::*
     }
-    list [info commands test_ns_2::*] [test_ns_2::cmd3 hello]
-} {{::test_ns_2::cmd1 ::test_ns_2::cmd3} {cmd3: hello}}
-test namespace-26.6 {NamespaceExportCmd, no patterns means return export list} {
+    list [lsort [info commands test_ns_2::*]] [test_ns_2::cmd3 hello]
+} [list [lsort {::test_ns_2::cmd1 ::test_ns_2::cmd3}] {cmd3: hello}]
+test namespace-26.6 {NamespaceExportCmd, no patterns means return uniq'ed export list} {
     namespace eval test_ns_1 {
         namespace export
     }
-} {cmd1 cmd1 cmd3}
+} {cmd1 cmd3}
 test namespace-26.7 {NamespaceExportCmd, -clear resets export list} {
     namespace eval test_ns_1 {
         namespace export -clear cmd4
@@ -811,8 +815,8 @@ test namespace-26.7 {NamespaceExportCmd, -clear resets export list} {
     namespace eval test_ns_2 {
         namespace import ::test_ns_1::*
     }
-    list [info commands test_ns_2::*] [test_ns_2::cmd4 hello]
-} {{::test_ns_2::cmd4 ::test_ns_2::cmd1 ::test_ns_2::cmd3} {cmd4: hello}}
+    list [lsort [info commands test_ns_2::*]] [test_ns_2::cmd4 hello]
+} [list [lsort {::test_ns_2::cmd4 ::test_ns_2::cmd1 ::test_ns_2::cmd3}] {cmd4: hello}]
 
 test namespace-27.1 {NamespaceForgetCmd, no args} {
     catch {eval namespace delete [namespace children :: test_ns_*]}
@@ -1090,8 +1094,24 @@ test namespace-38.1 {UpdateStringOfNsName} {
          [namespace eval {} {namespace current}]
 } {:: ::}
 
+# cleanup
 catch {rename cmd1 {}}
 catch {unset l}
 catch {unset msg}
 catch {unset trigger}
 eval namespace delete [namespace children :: test_ns_*]
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+

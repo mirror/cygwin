@@ -42,6 +42,8 @@
 #include "tcl.h"
 #include "tclMac.h"
 #include "tclInt.h"
+#include "MoreFiles.h"
+#include "MoreFilesExtras.h"
 
 #pragma export reset
 

@@ -36,7 +36,7 @@ a token for it.  The token is required in calls to most other Tcl
 procedures, such as \fBTcl_CreateCommand\fR, \fBTcl_Eval\fR, and
 \fBTcl_DeleteInterp\fR.
 Clients are only allowed to access a few of the fields of
-Tcl_Interp structures;  see the Tcl_Interp
+Tcl_Interp structures;  see the \fBTcl_Interp\fR
 and \fBTcl_CreateCommand\fR man pages for details.
 The new interpreter is initialized with no defined variables and only
 the built-in Tcl commands.  To bind in additional commands, call
@@ -49,10 +49,10 @@ resources associated with it, including variables, procedures, and
 application-specific command bindings, will be deleted.  After
 \fBTcl_DeleteInterp\fR returns any attempt to use \fBTcl_Eval\fR on the
 interpreter will fail and return \fBTCL_ERROR\fR. After the call to
-\fBTcl_DeleteInterp\fR it is safe to examine \fIinterp->result\fR, query or
-set the values of variables, define, undefine or retrieve procedures, and
-examine the runtime evaluation stack. See below, in the section
-\fBINTERPRETERS AND MEMORY MANAGEMENT\fR for details.
+\fBTcl_DeleteInterp\fR it is safe to examine the interpreter's result,
+query or set the values of variables, define, undefine or retrieve
+procedures, and examine the runtime evaluation stack. See below, in the
+section \fBINTERPRETERS AND MEMORY MANAGEMENT\fR for details.
 .PP
 \fBTcl_InterpDeleted\fR returns nonzero if \fBTcl_DeleteInterp\fR was
 called with \fIinterp\fR as its argument; this indicates that the
@@ -124,8 +124,8 @@ All uses of interpreters in Tcl and Tk have already been protected.
 Extension writers should ensure that their code also properly protects any
 additional interpreters used, as described above.
 
-.SH KEYWORDS
-command, create, delete, interpreter
-
 .SH "SEE ALSO"
 Tcl_Preserve(3), Tcl_Release(3)
+
+.SH KEYWORDS
+command, create, delete, interpreter

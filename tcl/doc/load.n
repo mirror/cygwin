@@ -64,7 +64,7 @@ typedef int Tcl_PackageInitProc(Tcl_Interp *\fIinterp\fR);
 The \fIinterp\fR argument identifies the interpreter in which the
 package is to be loaded.  The initialization procedure must return
 \fBTCL_OK\fR or \fBTCL_ERROR\fR to indicate whether or not it completed
-successfully;  in the event of an error it should set \fIinterp->result\fR
+successfully;  in the event of an error it should set the interpreter's result
 to point to an error message.  The result of the \fBload\fR command
 will be the result returned by the initialization procedure.
 .PP
@@ -106,6 +106,21 @@ different files have been \fBload\fRed with different versions of
 the package, Tcl picks the file that was loaded first.
 .VE
 
+.SH "PORTABILITY ISSUES"
+.TP
+\fBWindows\fR\0\0\0\0\0
+.
+When a load fails with "library not found" error, it is also possible
+that a dependent library was not found.  To see the dependent libraries,
+type ``dumpbin -imports <dllname>'' in a DOS console to see what the
+library must import.
+When loading a DLL in the current directory, Windows will ignore ``./'' as
+a path specifier and use a search heuristic to find the DLL instead.
+To avoid this, load the DLL with
+.CS
+    load [file join [pwd] mylib.DLL]
+.CE
+
 .SH BUGS
 .PP
 If the same file is \fBload\fRed by different \fIfileName\fRs, it will
@@ -118,3 +133,4 @@ detect the redundant loads, others may not).
 
 .SH KEYWORDS
 binary code, loading, safe interpreter, shared library
+

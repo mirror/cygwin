@@ -16,10 +16,9 @@
 #ifndef _TCLPORT
 #define _TCLPORT
 
-#if defined(__CYGWIN__) && defined(__TCL_UNIX_VARIANT)
-#	include "../unix/tclUnixPort.h"
-#else
-#if defined(__WIN32__) || defined(_WIN32)
+#include "tcl.h"
+
+#if defined(__WIN32__)
 #   include "../win/tclWinPort.h"
 #else
 #   if defined(MAC_TCL)
@@ -27,7 +26,6 @@
 #    else
 #	include "../unix/tclUnixPort.h"
 #    endif
-#endif
 #endif
 
 #endif /* _TCLPORT */

@@ -107,7 +107,8 @@ returning an error) will generally assume that the result
 has been initialized when the procedure is called.
 If such a procedure is to be called after the result has been
 changed, then \fBTcl_ResetResult\fR should be called first to
-reset the result to its initialized state.
+reset the result to its initialized state.  The direct use of
+\fIinterp->result\fR is strongly deprecated (see \fBTcl_SetResult\fR).
 .PP
 The \fIerrorLine\fR
 field is valid only after \fBTcl_Eval\fR returns
@@ -123,3 +124,4 @@ occurred.
 
 .SH KEYWORDS
 free, initialized, interpreter, malloc, result
+

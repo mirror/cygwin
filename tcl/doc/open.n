@@ -55,8 +55,9 @@ Open the file for reading and writing.  Truncate it if it exists.
 If it doesn't exist, create a new file.
 .TP 15
 \fBa\fR
-Open the file for writing only.  The file must already exist, and the file
-is positioned so that new data is appended to the file.
+Open the file for writing only.  If the file doesn't exist,
+create a new empty file.
+Set the initial access position  to the end of the file.
 .TP 15
 \fBa+\fR
 Open the file for reading and writing.  If the file doesn't exist,
@@ -144,6 +145,23 @@ number of data bits, and number of stop bits for this serial port.  The
 ``odd'', ``even'', ``mark'', or ``space''.  \fIData\fR is the number of
 data bits and should be an integer from 5 to 8, while \fIstop\fR is the
 number of stop bits and should be the integer 1 or 2.
+.TP
+\fB\-pollinterval \fImsec\fR
+.
+This option, available only on Windows for serial ports, is used to
+set the maximum time between polling for fileevents.  This affects the
+time interval between checking for events throughout the Tcl
+interpreter (the smallest value always wins).  Use this option only if
+you want to poll the serial port more often than 10 msec (the default).
+.TP
+\fB\-lasterror\fR
+.
+This option is available only on Windows for serial ports, and is
+query only (will only be reported when directly requested).
+In case of a serial communication error, \fBread\fR or \fBputs\fR
+returns a general Tcl file I/O error.
+\fBfconfigure -lasterror\fR can be called to get a list 
+of error details (e.g. FRAME RXOVER).
 .VE
 
 .VS
@@ -153,8 +171,13 @@ number of stop bits and should be the integer 1 or 2.
 \fBWindows \fR(all versions)
 .
 Valid values for \fIfileName\fR to open a serial port are of the form
-\fBcom\fIX\fB:\fR, where \fIX\fR is a number, generally from 1 to 4.  An
-attempt to open a serial port that does not exist will fail.
+\fBcom\fIX\fB:\fR, where \fIX\fR is a number, generally from 1 to 4.
+This notation only works for serial ports from 1 to 9, if the system
+happens to have more than four.  An attempt to open a serial port that
+does not exist or has a number greater than 9 will fail.  An alternate
+form of opening serial ports is to use the filename \fB\e\e.\ecomX\fR,
+where X is any number that corresponds to a serial port; please note
+that this method is considerably slower on Windows 95 and Windows 98.
 .TP
 \fBWindows NT\fR
 .
@@ -201,19 +224,6 @@ standard output.  If a command pipeline is opened for writing to a 16-bit DOS
 application, no data will be sent to the command pipeline's standard output
 until the pipe is actually closed.  This problem occurs because 16-bit DOS
 applications are run synchronously, as described above.  
-.TP
-\fBWindows 3.X\fR 
-.
-A command pipeline can execute 16-bit or 32-bit DOS or Windows
-applications, but the call to \fBopen\fR will not return until the last
-program in the pipeline has finished executing; command pipelines run
-synchronously.  If the pipeline is opened with write access (either just
-writing or both reading and writing) the first application in the
-pipeline will instead see an immediate end-of-file; any data the caller
-writes to the open pipe will instead be discarded.
-.sp
-Since Tcl cannot be run with a real console under Windows 3.X, there are
-no interactions between command pipelines and the console.
 .TP
 \fBMacintosh\fR
 .

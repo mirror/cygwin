@@ -36,7 +36,7 @@ the command at global level instead of the current stack level.
 on the history list and then execute it using \fBTcl_Eval\fR
 (or \fBTcl_GlobalEval\fR if the TCL_EVAL_GLOBAL bit is set in \fIflags\fR).
 It returns a completion code such as TCL_OK just like \fBTcl_Eval\fR
-and it leaves information in \fIinterp->result\fR.
+and it leaves information in the interpreter's result.
 If you don't want the command recorded on the history list then
 you should invoke \fBTcl_Eval\fR instead of \fBTcl_RecordAndEval\fR.
 Normally \fBTcl_RecordAndEval\fR is only called with top-level
@@ -55,3 +55,4 @@ Tcl_RecordAndEvalObj
 
 .SH KEYWORDS
 command, event, execute, history, interpreter, record
+

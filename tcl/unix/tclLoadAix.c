@@ -213,7 +213,7 @@ static void caterr(char *s)
 
 	while (*p >= '0' && *p <= '9')
 		p++;
-	switch(atoi(s)) {
+	switch(atoi(s)) {		/* INTL: "C", UTF safe. */
 	case L_ERROR_TOOMANY:
 		strcat(errbuf, "to many errors");
 		break;
@@ -234,7 +234,7 @@ static void caterr(char *s)
 		strcat(errbuf, p);
 		break;
 	case L_ERROR_ERRNO:
-		strcat(errbuf, strerror(atoi(++p)));
+		strcat(errbuf, strerror(atoi(++p)));	/* INTL: "C", UTF safe. */
 		break;
 	default:
 		strcat(errbuf, s);
@@ -546,4 +546,5 @@ static void * findMain(void)
 	free(buf);
 	return ret;
 }
+
 

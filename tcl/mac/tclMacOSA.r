@@ -39,14 +39,14 @@ resource 'vers' (1) {
 	SCRIPT_MAJOR_VERSION, MINOR_VERSION,
 	RELEASE_LEVEL, 0x00, verUS,
 	SCRIPT_PATCH_LEVEL,
-	SCRIPT_PATCH_LEVEL ", by Jim Ingham & Ray Johnson © Sun Microsystems"
+	SCRIPT_PATCH_LEVEL ", by Jim Ingham © Cygnus Solutions"
 };
 
 resource 'vers' (2) {
 	SCRIPT_MAJOR_VERSION, MINOR_VERSION,
 	RELEASE_LEVEL, 0x00, verUS,
 	SCRIPT_PATCH_LEVEL,
-	"Tclapplescript " SCRIPT_PATCH_LEVEL " © 1996-1997"
+	"Tclapplescript " SCRIPT_PATCH_LEVEL " © 1996-1999"
 };
 
 /*

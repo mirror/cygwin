@@ -1,6 +1,7 @@
 '\"
 '\" Copyright (c) 1992-1995 Karl Lehenbauer and Mark Diekhans.
 '\" Copyright (c) 1995-1997 Sun Microsystems, Inc.
+'\" Copyright (c) 1998-1999 Scriptics Corporation
 '\"
 '\" This documentation is derived from the time and date facilities of
 '\" TclX, by Mark Diekhans and Karl Lehenbauer.
@@ -11,7 +12,7 @@
 '\" RCS: @(#) $Id$
 '\" 
 .so man.macros
-.TH clock n 7.4 Tcl "Tcl Built-In Commands"
+.TH clock n 8.3 Tcl "Tcl Built-In Commands"
 .BS
 '\" Note:  do not modify the .SH NAME line immediately below!
 .SH NAME
@@ -28,12 +29,16 @@ time.  The \fIoption\fR argument determines what action is carried
 out by the command.  The legal \fIoptions\fR (which may be
 abbreviated) are:
 .TP
-\fBclock clicks\fR
+.VS 8.3
+\fBclock clicks\fR ?\fB\-milliseconds\fR?
 Return a high-resolution time value as a system-dependent integer
 value.  The unit of the value is system-dependent but should be the
 highest resolution clock available on the system such as a CPU cycle
-counter. This value should only be used for the relative measurement
+counter. If \fB\-milliseconds\fR is specified, then the value is
+guaranteed to be of millisecond granularity.
+This value should only be used for the relative measurement
 of elapsed time.
+.VE 8.3
 .TP
 \fBclock format \fIclockValue\fR ?\fB\-format \fIstring\fR? ?\fB\-gmt \fIboolean\fR?
 Converts an integer time value, typically returned by
@@ -74,11 +79,11 @@ AM/PM indicator.
 .IP \fB%S\fR
 Seconds (00 - 59).
 .IP \fB%U\fR
-Week of year (01 - 52), Sunday is the first day of the week.
+Week of year (00 - 52), Sunday is the first day of the week.
 .IP \fB%w\fR
 Weekday number (Sunday = 0).
 .IP \fB%W\fR
-Week of year (01 - 52), Monday is the first day of the week.
+Week of year (00 - 52), Monday is the first day of the week.
 .IP \fB%x\fR
 Locale specific date format.
 .IP \fB%X\fR
@@ -129,6 +134,8 @@ specified, the current date is assumed.  If the string does not contain a
 time zone mnemonic, the local time zone is assumed, unless the \fB\-gmt\fR 
 argument is true, in which case the clock value is calculated assuming
 that the specified time is relative to Greenwich Mean Time.
+\fB-gmt\fR, if specified, affects only the computed time value; it does not
+impact the interpretation of \fB-base\fR.
 .sp
 If the \fB\-base\fR flag is specified, the next argument should contain
 an integer clock value.  Only the date in this value is used, not the
@@ -148,13 +155,19 @@ a 24-hour clock.
 \fIdate\fR
 A specific month and day with optional year.  The
 acceptable formats are \fImm/dd\fR?\fI/yy\fR?, \fImonthname dd\fR
-?, \fIyy\fR?, \fIdd monthname \fR?\fIyy\fR? and \fIday, dd monthname
-yy\fR.  The default year is the current year.  If the year is less
+?, \fIyy\fR?, \fIdd monthname \fR?\fIyy\fR?, \fIday, dd monthname
+yy\fR, \fI?CC?yymmdd\fR, \fI?CC?yy-mm-dd\fR, \fIdd-monthname-?CC?yy\fR.
+The default year is the current year.  If the year is less
 .VS
 than 100, we treat the years 00-68 as 2000-2068 and the years 69-99
 as 1969-1999.  Not all platforms can represent the years 38-70, so
 an error may result if these years are used.
 .VE
+.TP
+\fIISO 8601 point-in-time\fR
+An ISO 8601 point-in-time specification, such as \fICCyymmddThhmmss\fR, where
+T is the literal T, \fICCyymmdd hhmmss\fR, or 
+\fICCyymmddThh:mm:ss\fR.
 .TP
 \fIrelative time\fR
 A specification relative to the current time.  The format is \fInumber
@@ -176,6 +189,19 @@ used.  Finally, a correction is applied so that the correct hour of
 the day is produced after allowing for daylight savings time
 differences and the correct date is given when going from the end
 of a long month to a short month.
+.sp
+Daylight savings time correction is applied only when the relative time
+is specified in units of days or more, ie, days, weeks, fortnights, months or
+years.  This means that when crossing the daylight savings time boundary,
+different results will be given for \fBclock scan "1 day"\fR and
+\fBclock scan "24 hours"\fR:
+.CS
+.ta 6c
+\fB% clock scan "1 day" -base [clock scan 1999-10-31]
+941443200
+% clock scan "24 hours" -base [clock scan 1999-10-31]
+941439600\fR
+.CE
 .RE
 .TP
 \fBclock seconds\fR
@@ -186,3 +212,4 @@ an ``epoch''.  You shouldn't assume the value of the epoch.
 
 .SH KEYWORDS
 clock, date, time
+

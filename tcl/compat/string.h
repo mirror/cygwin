@@ -32,8 +32,12 @@ extern char *		memchr _ANSI_ARGS_((CONST VOID *s, int c, size_t n));
 extern int		memcmp _ANSI_ARGS_((CONST VOID *s1, CONST VOID *s2,
 			    size_t n));
 extern char *		memcpy _ANSI_ARGS_((VOID *t, CONST VOID *f, size_t n));
+#ifdef NO_MEMMOVE
+#define memmove(d, s, n) bcopy ((s), (d), (n))
+#else
 extern char *		memmove _ANSI_ARGS_((VOID *t, CONST VOID *f,
 			    size_t n));
+#endif
 extern char *		memset _ANSI_ARGS_((VOID *s, int c, size_t n));
 
 extern int		strcasecmp _ANSI_ARGS_((CONST char *s1,

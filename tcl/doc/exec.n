@@ -202,10 +202,11 @@ instead of ``applbakery.default'').
 Two or more forward or backward slashes in a row in a path refer to a
 network path.  For example, a simple concatenation of the root directory
 \fBc:/\fR with a subdirectory \fB/windows/system\fR will yield
-\fBc://windows/system\fR (two slashes together), which refers to the
-directory \fB/system\fR on the machine \fBwindows\fR (and the \fBc:/\fR is
-ignored), and is not equivalent to \fBc:/windows/system\fR, which describes
-a directory on the current computer.
+\fBc://windows/system\fR (two slashes together), which refers to the mount
+point called \fBsystem\fR on the machine called \fBwindows\fR (and the
+\fBc:/\fR is ignored), and is not equivalent to \fBc:/windows/system\fR,
+which describes a directory on the current computer.  The \fBfile join\fR
+command should be used to concatenate path components.
 .TP
 \fBWindows NT\fR
 .
@@ -264,7 +265,7 @@ the caller must prepend ``\fBcommand.com /c\0\fR'' to the desired command.
 Once a 16-bit DOS application has read standard input from a console and 
 then quit, all subsequently run 16-bit DOS applications will see the 
 standard input as already closed.  32-bit applications do not have this
-problem and will run correctly even after a 16-bit DOS application thinks 
+problem and will run correctly, even after a 16-bit DOS application thinks 
 that standard input is closed.  There is no known workaround for this bug
 at this time.
 .sp
@@ -282,8 +283,8 @@ other end of the pipe must be closed before the 16-bit DOS application
 begins executing.  All standard output or error from a 16-bit DOS
 application to a pipe is collected into temporary files; the application
 must terminate before the temporary files are redirected to the next stage
-of the pipeline.  This is due to a workaround for a Windows 95 bug in the 
-implementation of pipes, and is how the Windows 95 command line interpreter
+of the pipeline.  This is due to a workaround for a Windows 95 bug in the
+implementation of pipes, and is how the standard Windows 95 DOS shell
 handles pipes itself.
 .sp
 Certain applications, such as \fBcommand.com\fR, should not be executed
@@ -291,55 +292,6 @@ interactively.  Applications which directly access the console window,
 rather than reading from their standard input and writing to their standard
 output may fail, hang Tcl, or even hang the system if their own private
 console window is not available to them.
-.RE
-.TP
-\fBWindows 3.X\fR
-.
-When attempting to execute an application, \fBexec\fR first searches for the
-name as it was specified.  Then, in order, \fB.com\fR, \fB.exe\fR, and \fB.bat\fR
-are appended to the end of the specified name and it searches for
-the longer name.  If a directory name was not specified as part of the
-application name, the following directories are automatically searched in
-order when attempting to locate the application:
-.sp
-.RS
-.RS
-The directory from which the Tcl executable was loaded.
-.br
-The current directory.
-.br
-The Windows 3.X system directory.
-.br
-The Windows 3.X home directory.
-.br
-The directories listed in the path.
-.RE
-.sp
-In order to execute the shell builtin commands like \fBdir\fR and \fBcopy\fR,
-the caller must prepend ``\fBcommand.com /c\0\fR'' to the desired command.
-.sp
-16-bit and 32-bit DOS and Windows applications may be executed.  However,
-redirection and piping of standard IO only works with 16-bit DOS
-applications.  32-bit applications always see standard input as already
-closed, and any standard output or error is discarded, no matter where in the
-pipeline the application occurs or what redirection symbols are used by the
-caller.  Additionally, for 16-bit applications, standard error is always
-sent to the same place as standard output; it cannot be redirected to a
-separate location.  In order to achieve pseudo-redirection for 32-bit
-applications, the 32-bit application must instead be written to take command
-line arguments that specify the files that it should read from and write to
-and open those files itself.  
-.sp
-All applications, both 16-bit and 32-bit, run synchronously; each application
-runs to completion before the next one in the pipeline starts.  Temporary files
-are used to simulate piping between applications.  The \fBexec\fR
-command cannot be used to start an application in the background.
-.sp
-When standard input is redirected from an open file using the
-``\fB@\0\fIfileId\fR'' notation, the open file is completely read up to its
-end.  This is slightly different than under Windows 95 or NT, where the child
-application consumes from the open file only as much as it wants.
-Redirecting to an open file is supported as normal.
 .RE
 .TP
 \fBMacintosh\fR

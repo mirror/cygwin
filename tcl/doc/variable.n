@@ -36,7 +36,9 @@ Normally, \fIname\fR is unqualified
 (does not include the names of any containing namespaces),
 and the variable is created in the current namespace.
 If \fIname\fR includes any namespace qualifiers,
-the variable is created in the specified namespace.
+the variable is created in the specified namespace.  If the variable
+is not defined, it will be visible to the \fBnamespace which\fR
+command, but not to the \fBinfo exists\fR command.
 .PP
 If the \fBvariable\fR command is executed inside a Tcl procedure,
 it creates local variables

@@ -28,7 +28,7 @@ Tcl_Channel
 .AS Tcl_ChannelType newClientProcPtr in
 .AP Tcl_Interp *interp in
 Tcl interpreter to use for error reporting.  If non-NULL and an
-error occurs, an error message is left in \fIinterp->result\fR.
+error occurs, an error message is left in the interpreter's result.
 .AP int port in
 A port number to connect to as a client or to listen on as a server.
 .AP char *host in
@@ -91,7 +91,7 @@ If an error occurs in opening the socket, \fBTcl_OpenTcpClient\fR returns
 NULL and records a POSIX error code that can be retrieved
 with \fBTcl_GetErrno\fR.
 In addition, if \fIinterp\fR is non-NULL, an error message
-is left in \fIinterp->result\fR.
+is left in the interpreter's result.
 .PP
 The newly created channel is not registered in the supplied interpreter; to
 register it, use \fBTcl_RegisterChannel\fR.
@@ -143,8 +143,8 @@ connection it can close \fIchannel\fR.
 representing the server socket.
 If an error occurs, \fBTcl_OpenTcpServer\fR returns NULL and
 records a POSIX error code that can be retrieved with \fBTcl_GetErrno\fR.
-In addition, if \fIinterp->result\fR is non-NULL, an error message
-is left in \fIinterp->result\fR.
+In addition, if the interpreter is non-NULL, an error message
+is left in the interpreter's result.
 .PP
 The channel returned by \fBTcl_OpenTcpServer\fR cannot be used for
 either input or output.
@@ -177,3 +177,4 @@ Tcl_OpenFileChannel(3), Tcl_RegisterChannel(3), vwait(n)
 
 .SH KEYWORDS
 client, server, TCP
+

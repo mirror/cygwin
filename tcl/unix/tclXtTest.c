@@ -16,6 +16,8 @@
 
 static int	TesteventloopCmd _ANSI_ARGS_((ClientData clientData,
 		    Tcl_Interp *interp, int argc, char **argv));
+extern void	InitNotifier _ANSI_ARGS_((void));
+
 
 /*
  *----------------------------------------------------------------------
@@ -28,7 +30,7 @@ static int	TesteventloopCmd _ANSI_ARGS_((ClientData clientData,
  *
  * Results:
  *	Returns a standard Tcl completion code, and leaves an error
- *	message in interp->result if an error occurs.
+ *	message in the interp's result if an error occurs.
  *
  * Side effects:
  *	Depends on the startup script.
@@ -40,6 +42,11 @@ int
 Tclxttest_Init(interp)
     Tcl_Interp *interp;		/* Interpreter for application. */
 {
+    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) {
+	return TCL_ERROR;
+    }
+    XtToolkitInitialize();
+    InitNotifier();
     Tcl_CreateCommand(interp, "testeventloop", TesteventloopCmd,
             (ClientData) 0, (Tcl_CmdDeleteProc *) NULL);
     return TCL_OK;
@@ -111,3 +118,4 @@ TesteventloopCmd(clientData, interp, argc, argv)
     }
     return TCL_OK;
 }
+

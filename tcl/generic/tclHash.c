@@ -83,6 +83,11 @@ Tcl_InitHashTable(tablePtr, keyType)
 					 * TCL_STRING_KEYS, TCL_ONE_WORD_KEYS,
 					 * or an integer >= 2. */
 {
+#if (TCL_SMALL_HASH_TABLE != 4) 
+    panic("Tcl_InitHashTable: TCL_SMALL_HASH_TABLE is %d, not 4\n",
+	    TCL_SMALL_HASH_TABLE);
+#endif
+    
     tablePtr->buckets = tablePtr->staticBuckets;
     tablePtr->staticBuckets[0] = tablePtr->staticBuckets[1] = 0;
     tablePtr->staticBuckets[2] = tablePtr->staticBuckets[3] = 0;

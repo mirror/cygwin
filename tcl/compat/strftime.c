@@ -55,6 +55,7 @@ static char *rcsid = "$Id$";
 #include "tclPort.h"
 
 #define TM_YEAR_BASE   1900
+#define IsLeapYear(x)   ((x % 4 == 0) && (x % 100 != 0 || x % 400 == 0))
 
 typedef struct {
     const char *abday[7];
@@ -105,12 +106,22 @@ static size_t		_fmt _ANSI_ARGS_((const char *format,
 			    const struct tm *t));
 
 size_t
-TclStrftime(s, maxsize, format, t)
+TclpStrftime(s, maxsize, format, t)
     char *s;
     size_t maxsize;
     const char *format;
     const struct tm *t;
 {
+    if (format[0] == '%' && format[1] == 'Q') {
+	/* Format as a stardate */
+	sprintf(s, "Stardate %2d%03d.%01d",
+		(((t->tm_year + TM_YEAR_BASE) + 377) - 2323),
+		(((t->tm_yday + 1) * 1000) /
+			(365 + IsLeapYear((t->tm_year + TM_YEAR_BASE)))),
+		(((t->tm_hour * 60) + t->tm_min)/144));
+	return(strlen(s));
+    }
+
     tzset();
 
     pt = s;
@@ -315,7 +326,7 @@ _fmt(format, t)
 		    continue;
 #ifndef MAC_TCL
 		case 'Z': {
-		    char *name = TclpGetTZName();
+		    char *name = TclpGetTZName(t->tm_isdst);
 		    if (name && !_add(name)) {
 			return 0;
 		    }

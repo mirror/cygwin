@@ -14,9 +14,10 @@
 package \- Facilities for package loading and version control
 .SH SYNOPSIS
 .nf
-\fBpackage forget \fIpackage\fR
+\fBpackage forget ?\fIpackage package ...\fR?
 \fBpackage ifneeded \fIpackage version\fR ?\fIscript\fR?
 \fBpackage names\fR
+\fBpackage present \fR?\fB\-exact\fR? \fIpackage \fR?\fIversion\fR?
 \fBpackage provide \fIpackage \fR?\fIversion\fR?
 \fBpackage require \fR?\fB\-exact\fR? \fIpackage \fR?\fIversion\fR?
 \fBpackage unknown \fR?\fIcommand\fR?
@@ -42,8 +43,8 @@ primarily by system scripts that maintain the package database.
 The behavior of the \fBpackage\fR command is determined by its first argument.
 The following forms are permitted:
 .TP
-\fBpackage forget \fIpackage\fR
-Removes all information about \fIpackage\fR from this interpreter,
+\fBpackage forget ?\fIpackage package ...\fR?
+Removes all information about each specified package from this interpreter,
 including information provided by both \fBpackage ifneeded\fR and
 \fBpackage provide\fR.
 .TP
@@ -74,6 +75,10 @@ interpreter for which a version has been provided (via
 \fBpackage provide\fR) or for which a \fBpackage ifneeded\fR
 script is available.
 The order of elements in the list is arbitrary.
+.TP
+\fBpackage present \fR?\fB\-exact\fR? \fIpackage \fR?\fIversion\fR?
+This command is equivalent to \fBpackage require\fR except that it
+does not try and load the package if it is not already loaded.
 .TP
 \fBpackage provide \fIpackage \fR?\fIversion\fR?
 This command is invoked to indicate that version \fIversion\fR
@@ -186,3 +191,4 @@ See the documentation for \fBpkg_mkIndex\fR for details.
 
 .SH KEYWORDS
 package, version
+

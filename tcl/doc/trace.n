@@ -30,7 +30,9 @@ refer to a normal variable, an element of an array, or to an array
 as a whole (i.e. \fIname\fR may be just the name of an array, with no
 parenthesized index).  If \fIname\fR refers to a whole array, then
 \fIcommand\fR is invoked whenever any element of the array is
-manipulated.
+manipulated.  If the variable does not exist, it will be created but
+will not be given a value, so it will be visible to \fBnamespace which\fR
+queries, but not to \fBinfo exists\fR queries.
 .RS
 .PP
 \fIOps\fR indicates which operations are of interest, and consists of

@@ -2,19 +2,23 @@
 #
 # This file contains the original set of tests for Tcl's expr command.
 # Since the expr command is now compiled, a new set of tests covering
-# the new implementation is in the file "expr.test". Sourcing this file
-# into Tcl runs the tests and generates output for errors.
-# No output means no errors were found.
+# the new implementation are in the files "parseExpr.test and
+# "compExpr.test". Sourcing this file into Tcl runs the tests and generates
+# output for errors. No output means no errors were found.
 #
 # Copyright (c) 1991-1994 The Regents of the University of California.
 # Copyright (c) 1994-1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # RCS: @(#) $Id$
 
-if {[string compare test [info procs test]] == 1} then {source defs}
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
 
 if {([catch {expr T1()} msg] == 1) && ($msg == {unknown math function "T1"})} {
     set gotT1 0
@@ -456,13 +460,13 @@ test expr-old-26.15 {error conditions} {
 } {1 {syntax error in expression "a@b"}}
 test expr-old-26.16 {error conditions} {
     list [catch {expr a[b} msg] $msg
-} {1 {missing close-bracket or close-brace}}
+} {1 {missing close-bracket}}
 test expr-old-26.17 {error conditions} {
     list [catch {expr a`b} msg] $msg
 } {1 {syntax error in expression "a`b"}}
 test expr-old-26.18 {error conditions} {
     list [catch {expr \"a\"\{b} msg] $msg
-} {1 {missing close-brace}}
+} {1 syntax\ error\ in\ expression\ \"\"a\"\{b\"}
 test expr-old-26.19 {error conditions} {
     list [catch {expr a} msg] $msg
 } {1 {syntax error in expression "a"}}
@@ -777,16 +781,16 @@ test expr-old-32.45 {math functions in expressions} {
 } {1}
 test expr-old-32.46 {math functions in expressions} {
     list [catch {expr rand(24)} msg] $msg
-} {1 {syntax error in expression "rand(24)"}}
+} {1 {too many arguments for math function}}
 test expr-old-32.47 {math functions in expressions} {
     list [catch {expr srand()} msg] $msg
-} {1 {syntax error in expression "srand()"}}
+} {1 {too few arguments for math function}}
 test expr-old-32.48 {math functions in expressions} {
     list [catch {expr srand(3.79)} msg] $msg
 } {1 {can't use floating-point value as argument to srand}}
 test expr-old-32.49 {math functions in expressions} {
     list [catch {expr srand("")} msg] $msg
-} {1 {can't use non-numeric string as argument to srand}}
+} {1 {argument to math function didn't have numeric value}}
 test expr-old-32.50 {math functions in expressions} {
     set result [expr round(srand(12345) * 1000)]
     for {set i 0} {$i < 10} {incr i} {
@@ -796,7 +800,7 @@ test expr-old-32.50 {math functions in expressions} {
 } {97 834 948 36 12 51 766 585 914 784 333}
 test expr-old-32.51 {math functions in expressions} {
     list [catch {expr {srand([lindex "6ty" 0])}} msg] $msg
-} {1 {can't use non-numeric string as argument to srand}}
+} {1 {argument to math function didn't have numeric value}}
 
 test expr-old-33.1 {conversions and fancy args to math functions} {
     expr hypot ( 3 , 4 )
@@ -862,16 +866,16 @@ test expr-old-34.16 {errors in math functions} {
 if $gotT1 {
     test expr-old-34.17 {errors in math functions} {
 	list [catch {expr T1(4)} msg] $msg
-    } {1 {syntax error in expression "T1(4)"}}
+    } {1 {too many arguments for math function}}
 }
 
 test expr-old-36.1 {ExprLooksLikeInt procedure} {
     list [catch {expr 0289} msg] $msg
-} {1 {syntax error in expression "0289"}}
+} {1 {"0289" is an invalid octal number}}
 test expr-old-36.2 {ExprLooksLikeInt procedure} {
     set x 0289
     list [catch {expr {$x+1}} msg] $msg
-} {1 {can't use non-numeric string as operand of "+"}}
+} {1 {can't use invalid octal number as operand of "+"}}
 test expr-old-36.3 {ExprLooksLikeInt procedure} {
     list [catch {expr 0289.1} msg] $msg
 } {0 289.1}
@@ -927,3 +931,20 @@ if {(4195835.0 - (4195835.0/3145727.0)*3145727.0) == 256.0} {
     puts "call Intel customer service immediately at 1-800-628-8686"
     puts "to request a replacement processor."
 }
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -37,7 +37,8 @@ element using the same rules as the \fBstring match\fR command.
 .TP
 \fB\-regexp\fR
 \fIPattern\fR is treated as a regular expression and matched against
-each list element using the same rules as the \fBregexp\fR command.
+each list element using the rules described in the \fBre_syntax\fR
+reference page.
 .PP
 If \fImode\fR is omitted then it defaults to \fB\-glob\fR.
 

@@ -42,21 +42,21 @@ resource 'vers' (1) {
 	TCL_MAJOR_VERSION, MINOR_VERSION,
 	RELEASE_LEVEL, 0x00, verUS,
 	TCL_PATCH_LEVEL,
-	TCL_PATCH_LEVEL ", by Ray Johnson © Sun Microsystems"
+	TCL_PATCH_LEVEL ", by Ray Johnson & Jim Ingham © Scriptics Inc"
 };
 
 resource 'vers' (2) {
 	TCL_MAJOR_VERSION, MINOR_VERSION,
 	RELEASE_LEVEL, 0x00, verUS,
 	TCL_PATCH_LEVEL,
-	"Tcl Shell " TCL_PATCH_LEVEL " © 1996"
+	"Tcl Shell " TCL_PATCH_LEVEL " © 1996-1997 Sun Microsystems, 1998-1999 Scriptics Inc"
 };
 
 #define TCL_APP_CREATOR 'Tcl '
 
 type TCL_APP_CREATOR as 'STR ';
 resource TCL_APP_CREATOR (0, purgeable) {
-	"Tcl Shell " TCL_PATCH_LEVEL " © 1996"
+	"Tcl Shell " TCL_PATCH_LEVEL " © 1996-1999"
 };
 
 /*

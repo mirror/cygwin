@@ -49,7 +49,7 @@ the converted value at the location indicated by the procedure's
 third argument.  If all goes well, each of the procedures returns
 TCL_OK.  If \fIstring\fR doesn't have the proper syntax for the
 desired type then TCL_ERROR is returned, an error message is left
-in \fIinterp->result\fR, and nothing is stored at *\fIintPtr\fR
+in the interpreter's result, and nothing is stored at *\fIintPtr\fR
 or *\fIdoublePtr\fR or *\fIboolPtr\fR.
 .PP
 \fBTcl_GetInt\fR expects \fIstring\fR to consist of a collection
@@ -79,3 +79,4 @@ are also acceptable.
 
 .SH KEYWORDS
 boolean, conversion, double, floating-point, integer
+

@@ -64,8 +64,7 @@ The destination variable name is specified in a single string;  it
 may not be an array element.
 .PP
 Both procedures return either TCL_OK or TCL_ERROR, and they
-leave an error message in \fIinterp->result\fR if an error
-occurs.
+leave an error message in the interpreter's result if an error occurs.
 .PP
 As with the \fBupvar\fR command, the source variable need not exist;
 if it does exist, unsetting it later does not destroy the link.  The
@@ -74,3 +73,4 @@ it must exist as a linked variable.
 
 .SH KEYWORDS
 linked variable, upvar, variable
+

@@ -29,15 +29,6 @@ extern int errno;			/* Use errno from tclExecute.c. */
 #endif
 
 /*
- * The following variable is secretly shared with Tcl so we can
- * tell if expression evaluation is in progress.  If not, matherr
- * just emulates the default behavior, which includes printing
- * a message.
- */
-
-extern int tcl_MathInProgress;
-
-/*
  * The following definitions allow matherr to compile on systems
  * that don't really support it.  The compiled procedure is bogus,
  * but it will never be executed on these systems anyway.
@@ -74,7 +65,7 @@ int
 matherr(xPtr)
     struct exception *xPtr;	/* Describes error that occurred. */
 {
-    if (!tcl_MathInProgress) {
+    if (TclMathInProgress()) {
 	return 0;
     }
     if ((xPtr->type == DOMAIN) || (xPtr->type == SING)) {
@@ -84,3 +75,4 @@ matherr(xPtr)
     }
     return 1;
 }
+

@@ -8,7 +8,7 @@
 '\" RCS: @(#) $Id$
 '\" 
 .so man.macros
-.TH format n "" Tcl "Tcl Built-In Commands"
+.TH format n 8.1 Tcl "Tcl Built-In Commands"
 .BS
 '\" Note:  do not modify the .SH NAME line immediately below!
 .SH NAME
@@ -154,9 +154,11 @@ Convert integer to unsigned octal string.
 \fBx\fR or \fBX\fR
 Convert integer to unsigned hexadecimal string, using digits
 ``0123456789abcdef'' for \fBx\fR and ``0123456789ABCDEF'' for \fBX\fR).
+.VS
 .TP 10
 \fBc\fR
-Convert integer to the 8-bit character it represents.
+Convert integer to the Unicode character it represents.
+.VE
 .TP 10
 \fBs\fR
 No conversion; just insert string.

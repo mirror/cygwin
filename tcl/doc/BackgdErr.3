@@ -33,7 +33,7 @@ obvious way for that code to report the error to the user.
 In these cases the code calls \fBTcl_BackgroundError\fR with an
 \fIinterp\fR argument identifying the interpreter in which the
 error occurred.  At the time \fBTcl_BackgroundError\fR is invoked,
-\fIinterp->result\fR is expected to contain an error message.
+the interpreter's result is expected to contain an error message.
 \fBTcl_BackgroundError\fR will invoke the \fBbgerror\fR
 Tcl command to report the error in an application-specific fashion.
 If no \fBbgerror\fR command exists, or if it returns with an error condition,

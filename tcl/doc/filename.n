@@ -26,7 +26,7 @@ Instead, portable scripts must use the \fBfile split\fR and \fBfile
 join\fR commands to manipulate file names (see the \fBfile\fR manual
 entry for more details).
 
-.SH PATH TYPES
+.SH "PATH TYPES"
 .PP
 File names are grouped into three general types based on the starting point
 for the path used to specify the file: absolute, relative, and
@@ -39,7 +39,7 @@ current volume, or relative to the current directory of the specified
 volume.  The \fBfile pathtype\fR command can be used to determine the
 type of a given path.
 
-.SH PATH SYNTAX
+.SH "PATH SYNTAX"
 .PP
 The rules for native names depend on the value reported in the Tcl
 array element \fBtcl_platform(platform)\fR:
@@ -163,7 +163,7 @@ Volume-relative path to a file \fBfoo\fR in the root directory of the current
 volume.
 .RE
 
-.SH TILDE SUBSTITUTION
+.SH "TILDE SUBSTITUTION"
 .PP
 In addition to the file name rules described above, Tcl also supports
 \fIcsh\fR-style tilde substitution.  If a file name starts with a
@@ -181,7 +181,7 @@ use a tilde followed by a user name will generate an error.  File
 names that have a tilde without a user name will be substituted using
 the \fB$HOME\fR environment variable, just like for Unix.
 
-.SH PORTABILITY ISSUES
+.SH "PORTABILITY ISSUES"
 .PP
 Not all file systems are case sensitive, so scripts should avoid code
 that depends on the case of characters in a file name.  In addition,

@@ -206,6 +206,14 @@ Tclapplescript_Init(
     long appleScriptFlags;
 	
     /* 
+     * Perform the required stubs magic...
+     */
+     	
+    if (!Tcl_InitStubs(interp, "8.2", 0)) {
+	return TCL_ERROR;
+    }
+
+    /* 
      * Here We Will Get The Available Osa Languages, Since They Can Only Be 
      * Registered At Startup...  If You Dynamically Load Components, This
      * Will Fail, But This Is Not A Common Thing To Do.
@@ -1926,7 +1934,7 @@ tclOSAAddContext(
     int newPtr;
 
     if (contextName == NULL) {
-	contextName = ckalloc(24 * sizeof(char));
+	contextName = ckalloc(16 + TCL_INTEGER_SPACE);
 	sprintf(contextName, "OSAContext%d", contextIndex++);
     } else if (*contextName == '\0') {
 	sprintf(contextName, "OSAContext%d", contextIndex++);
@@ -2057,7 +2065,7 @@ tclOSAStore(
     Str255 rezName;
     int result = TCL_OK;
     short saveRef, fileRef = -1;
-    char idStr[64];
+    char idStr[16 + TCL_INTEGER_SPACE];
     FSSpec fileSpec;
     Tcl_DString buffer;
     char *nativeName;
@@ -2276,7 +2284,7 @@ tclOSALoad(
     Str255 rezName;
     int result = TCL_OK;
     short saveRef, fileRef = -1;
-    char idStr[64];
+    char idStr[16 + TCL_INTEGER_SPACE];
     FSSpec fileSpec;
     Tcl_DString buffer;
     char *nativeName;
@@ -2687,9 +2695,10 @@ prepareScriptData(
     int i;
     char buffer[7];
     OSErr sysErr = noErr;
-		
+    Tcl_DString encodedText;
+
     Tcl_DStringInit(scrptData);
-	
+
     for (i = 0; i < argc; i++) {
 	Tcl_DStringAppend(scrptData, argv[i], -1);
 	Tcl_DStringAppend(scrptData, " ", 1);
@@ -2699,7 +2708,7 @@ prepareScriptData(
      * First replace the \n's with \r's in the script argument
      * Also replace "\\n" with "  ".
      */
-	 
+
     for (ptr = scrptData->string; *ptr != '\0'; ptr++) {
 	if (*ptr == '\n') {
 	    *ptr = '\r';
@@ -2710,10 +2719,13 @@ prepareScriptData(
 	    }
 	}
     }
- 	
-    sysErr = AECreateDesc(typeChar, Tcl_DStringValue(scrptData),
-	    Tcl_DStringLength(scrptData), scrptDesc);
-						
+
+    Tcl_UtfToExternalDString(NULL, Tcl_DStringValue(scrptData),
+	    Tcl_DStringLength(scrptData), &encodedText);
+    sysErr = AECreateDesc(typeChar, Tcl_DStringValue(&encodedText),
+	    Tcl_DStringLength(&encodedText), scrptDesc);
+    Tcl_DStringFree(&encodedText);
+
     if (sysErr != noErr) {
 	sprintf(buffer, "%6d", sysErr);
 	Tcl_DStringFree(scrptData);
@@ -2722,7 +2734,7 @@ prepareScriptData(
 	Tcl_DStringAppend(scrptData, " creating Script Data Descriptor.", 33);
 	return TCL_ERROR;					
     }
-	
+
     return TCL_OK;
 }
 

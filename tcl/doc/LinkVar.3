@@ -48,7 +48,7 @@ be returned, and whenever the Tcl variable is written the C
 variable will be updated to have the same value.
 \fBTcl_LinkVar\fR normally returns TCL_OK;  if an error occurs
 while setting up the link (e.g. because \fIvarName\fR is the
-name of array) then TCL_ERROR is returned and \fIinterp->result\fR
+name of array) then TCL_ERROR is returned and the interpreter's result
 contains an error message.
 .PP
 The \fItype\fR argument specifies the type of the C variable,
@@ -113,3 +113,4 @@ variable are invoked.
 
 .SH KEYWORDS
 boolean, integer, link, read-only, real, string, traces, variable
+

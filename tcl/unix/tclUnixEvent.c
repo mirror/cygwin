@@ -34,7 +34,7 @@ void
 Tcl_Sleep(ms)
     int ms;			/* Number of milliseconds to sleep. */
 {
-    static struct timeval delay;
+    struct timeval delay;
     Tcl_Time before, after;
 
     /*
@@ -74,3 +74,4 @@ Tcl_Sleep(ms)
 	TclpGetTime(&before);
     }
 }
+

@@ -41,7 +41,7 @@ allowable nesting depth for an interpreter.
 The \fIdepth\fR argument specifies a new limit for \fIinterp\fR,
 and \fBTcl_SetRecursionLimit\fR returns the old limit.
 To read out the old limit without modifying it, invoke
-\fBTcl_SetRecursionDepth\fR with \fIdepth\fR equal to 0.
+\fBTcl_SetRecursionLimit\fR with \fIdepth\fR equal to 0.
 .PP
 The \fBTcl_SetRecursionLimit\fR only sets the size of the Tcl
 call stack:  it cannot by itself prevent stack overflows on the

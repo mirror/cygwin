@@ -49,7 +49,7 @@ and writing.
 If an error occurs in \fBTcl_GetOpenFile\fR (e.g. \fIstring\fR didn't
 make any sense or \fIcheckUsage\fR was set and the file wasn't opened
 for the access specified by \fIwrite\fR) then TCL_ERROR is returned
-and \fIinterp->result\fR will contain an error message.
+and the interpreter's result will contain an error message.
 In the current implementation \fIcheckUsage\fR is ignored and consistency
 checks are always performed.
 .VS
@@ -59,3 +59,4 @@ Note that this interface is only supported on the Unix platform.
 
 .SH KEYWORDS
 channel, file handle, permissions, pipeline, read, write
+

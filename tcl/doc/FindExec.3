@@ -7,7 +7,7 @@
 '\" RCS: @(#) $Id$
 '\" 
 .so man.macros
-.TH Tcl_FindExecutable 3 7.5 Tcl "Tcl Library Procedures"
+.TH Tcl_FindExecutable 3 8.1 Tcl "Tcl Library Procedures"
 .BS
 .SH NAME
 Tcl_FindExecutable, Tcl_GetNameOfExecutable \- identify or return the name of the binary file containing the application
@@ -15,7 +15,7 @@ Tcl_FindExecutable, Tcl_GetNameOfExecutable \- identify or return the name of th
 .nf
 \fB#include <tcl.h>\fR
 .sp
-char *
+void
 \fBTcl_FindExecutable\fR(\fIargv0\fR)
 .sp
 CONST char *
@@ -54,3 +54,4 @@ computed or unknown.
 
 .SH KEYWORDS
 binary, executable file
+

@@ -1,8 +1,365 @@
+2000-02-08  Nick Clifton  <nickc@cygnus.com>
+
+	* callback.c: Fix compile time warning messages.
+	* run.c: Fix compile time warning messages.
+     
+1999-12-17  Dave Brolley  <brolley@cygnus.com>
+
+	* sim-profile.h: (set_profile_option_mask): Add prototype.
+	* sim-profile.c (set_profile_option_mask): No longer static.
+
+Wed Dec  8 21:47:13 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* sim-arange.c: Include <string.h>
+
+1999-12-07  Dave Brolley  <brolley@cygnus.com>
+
+	* sim-options.c (print_help): '=' required before optional argument.
+	* cgen-par.h (CGEN_FN_MEM_QI_WRITE): New enumerator.
+	(CGEN_FN_MEM_HI_WRITE): New enumerator.
+	(CGEN_FN_MEM_SI_WRITE): New enumerator.
+	(CGEN_FN_MEM_DI_WRITE): New enumerator.
+	(CGEN_FN_MEM_DF_WRITE): New enumerator.
+	(CGEN_FN_MEM_XI_WRITE): New enumerator.
+	(fn_mem_qi_write): New union members.
+	(fn_mem_hi_write): New union members.
+	(fn_mem_si_write): New union members.
+	(fn_mem_di_write): New union members.
+	(fn_mem_df_write): New union members.
+	(fn_mem_xi_write): New union members.
+	(sim_queue_fn_mem_qi_write): New function.
+	(sim_queue_fn_mem_hi_write): New function.
+	(sim_queue_fn_mem_si_write): New function.
+	(sim_queue_fn_mem_di_write): New function.
+	(sim_queue_fn_mem_df_write): New function.
+	(sim_queue_fn_mem_xi_write): New function.
+	* cgen-par.c (sim_queue_fn_mem_qi_write): New function.
+	(sim_queue_fn_mem_hi_write): New function.
+	(sim_queue_fn_mem_si_write): New function.
+	(sim_queue_fn_mem_di_write): New function.
+	(sim_queue_fn_mem_df_write): New function.
+	(sim_queue_fn_mem_xi_write): New function.
+	(cgen_write_queue_element_execute): Handle CGEN_FN_MEM_QI_WRITE,
+	CGEN_FN_MEM_HI_WRITE, CGEN_FN_MEM_SI_WRITE, CGEN_FN_MEM_DI_WRITE,
+	CGEN_FN_MEM_DF_WRITE, CGEN_FN_MEM_XI_WRITE.
+
+1999-12-01  Dave Brolley  <brolley@cygnus.com>
+
+	* cgen-accfp.c (subsf): Check status code.
+	(mulsf): Ditto.
+	(negsf): Ditto.
+	(abssf): Ditto.
+	(sqrtsf): Ditto.
+	(invsf): Ditto.
+	(minsf): Ditto.
+	(maxsf): Ditto.
+	(subdf): Ditto.
+	(muldf): Ditto.
+	(divdf): Ditto.
+	(negdf): Ditto.
+	(absdf): Ditto.
+	(sqrtdf): Ditto.
+	(invdf): Ditto.
+	(mindf): Ditto.
+	(maxdf): Ditto.
+
+1999-11-26  Dave Brolley  <brolley@cygnus.com>
+
+	* cgen-par.h (fn_df_write): Mode of data is DF.
+	(sim_queue_fn_df_write): Mode of data is DF.
+	* cgen-par.c (sim_queue_fn_df_write): Mode of data is DF.
+
+1999-11-22  Dave Brolley  <brolley@cygnus.com>
+
+	* cgen-trace.c (SIZE_TRACE_BUF): Inxrease size of trace buffer.
+	* cgen-par.h (CGEN_WRITE_QUEUE_SIZE): Increase size of queue.
+
+1999-11-04  Dave Brolley  <brolley@cygnus.com>
+
+	* cgen-par.h (cgen_write_queue_kind): Add CGEN_FN_XI_WRITE and
+	CGEN_MEM_XI_WRITE members.
+	(CGEN_WRITE_QUEUE_ELEMENT): Add fn_xi_write and mem_xi_write members.
+	(sim_queue_fn_xi_write): New function.
+	(sim_queue_mem_xi_write): New function.
+
+	* cgen-par.c (sim_queue_fn_xi_write): New function.
+	(sim_queue_mem_xi_write): New function.
+	(cgen_write_queue_element_execute): Handle CGEN_FN_XI_WRITE and
+	CGEN_MEM_XI_WRITE.
+
+1999-10-22  Dave Brolley  <brolley@cygnus.com>
+
+	* cgen-par.h (insn_address): New field in CGEN_WRITE_QUEUE_ELEMENT.
+	(CGEN_WRITE_QUEUE_ELEMENT_IADDR): New macro.
+	* cgen-par.c: Set insn_address for each queued write. Get pc from
+	cpu when executing queued writes.
+
+1999-10-19  Dave Brolley  <brolley@cygnus.com>
+
+	* cgen-par.h (sim_queue_fn_pc_write): New function.
+	(CGEN_FN_PC_WRITE): New enumerator.
+	(fn_pc_write): New union member.
+	* cgen-par.c (sim_queue_fn_pc_write): New function.
+	(cgen_write_queue_element_execute): Handle CGEN_FN_PC_WRITE.
+
+1999-10-18  Dave Brolley  <brolley@cygnus.com>
+
+	* cgen-par.h (CGEN_MEM_DI_WRITE): New enumerator.
+	(CGEN_MEM_DF_WRITE): New enumerator.
+	(mem_di_write): New union member.
+	(mem_df_write): New union member.
+	* cgen-par.c (sim_queue_mem_di_write): New function.
+	(sim_queue_mem_df_write): New function.
+	(cgen_write_queue_element_execute): Handle CGEN_MEM_DI_WRITE and
+	CGEN_MEM_DF_WRITE.
+	* cgen-accfp.c (divsf): Check for division errors.
+
+1999-10-14  Doug Evans  <devans@casey.cygnus.com>
+
+	* cgen-engine.h (EXTRACT_INT,EXTRACT_UINT): Delete.
+
+1999-10-07  Dave Brolley  <brolley@cygnus.com>
+
+	* cgen-par.h (CGEN_FN_HI_WRITE): New enumerator. 
+	(fn_hi_write): New union member.
+	(sim_queue_fn_hi_write): New function.
+	* cgen-par.c (sim_queue_fn_hi_write): New function.
+	(cgen_write_queue_element_execute): Handle CGEN_FN_HI_WRITE.
+
+1999-09-29  Doug Evans  <devans@casey.cygnus.com>
+
+	* cgen-defs.h (sim_engine_invalid_insn): New arg `vpc'.
+	Change type of result to SEM_PC.
+
+Wed Sep 29 14:43:57 1999  Dave Brolley  <brolley@cygnus.com>
+
+	* cgen-defs.h (sim_engine_invalid_insn): Now returns PC.
+
+1999-09-25  Doug Evans  <devans@casey.cygnus.com>
+
+	* cgen-ops.h (SUBWORD*): Delete cpu arg.
+	(JOIN*): Delete cpu arg.
+
+Tue Sep 21 17:14:16 1999  Dave Brolley  <brolley@cygnus.com>
+
+	* genmloop.sh (@cpu@_scache_lookup): No longer takes last_insn_p
+	parameter.
+	(SET_LAST_INSN_P): Set last_insn_p flag in the scache element.
+
+Mon Sep 20 21:44:06 1999  Geoffrey Keating  <geoffk@cygnus.com>
+
+        * sim-fpu.c (i2fpu): Keep the guard bits sticky when converting
+        large values.
+
+Wed Sep 15 14:12:37 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* hw-tree.c, hw-properties.c, hw-instances.c: Include "sim-io.h".
+
+Tue Sep 14 14:15:47 1999  Dave Brolley  <brolley@cygnus.com>
+
+	* cgen-par.h (CGEN_BI_WRITE): New enumerator.
+	(bi_write): New union element.
+	(sim_queue_bi_write): New function.
+	* cgen-par.c (sim_queue_bi_write): New function.
+	(cgen_write_queue_element_execute): Handle CGEN_BI_WRITE.
+
+Thu Sep  2 18:15:53 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+	* aclocal.m4 (WERROR_CFLAGS, WARN_CFLAGS): Merge from
+ 	../gdb/configure.in.
+	* Make-common.in (WERROR_CFLAGS, WARN_CFLAGS): Define.
+	(SIM_WERROR_CFLAGS, SIM_WARN_CFLAGS): Define.
+	(SIM_WARNINGS): Delete
+	(CONFIG_CFLAGS): Update.
+
+Tue Aug 31 16:01:42 1999  Dave Brolley  <brolley@cygnus.com>
+
+	* cgen-par.c: New file.
+	* cgen-par.h: New file.
+	* cgen-sim.h (cgen-par.h): #include it.
+	* cgen-cpu.h (write_queue): New field.
+	(CPU_WRITE_QUEUE): New access macro.
+	* Make-common.in (CGEN_MAIN_CPU_DEPS): Add cgen-par.h.
+	(cgen-par.o): New target.
+
+1999-08-28  Doug Evans  <devans@casey.cygnus.com>
+
+	* cgen-types.h (mode_type,MODE_VOID): Renamed from MODE_VM.
+	* cgen-utils.c (mode_names): Update.
+
+1999-08-20  Doug Evans  <devans@casey.cygnus.com>
+
+	* genmloop.sh: New args -parallel-generic-write, -parallel-only.
+	* cgen-engine.h (SEMANTIC_FN): Don't use version with PAREXEC
+	buffer arg if WITH_PARALLEL_GENWRITE.
+	(struct insn_sem): Handle WITH_PARALLEL_GENWRITE.
+	(struct idesc): Ditto.
+
+Wed Aug 18 18:17:28 1999  Doug Evans  <devans@canuck.cygnus.com>
+
+	* sim-model.c (model_option_handler): Add \n to error message.
+
+1999-08-08  Doug Evans  <devans@casey.cygnus.com>
+
+	* cgen-engine.h (SEM_FN_NAME,SEMF_FN_NAME): Delete.
+	(insn_sem): Rewrite.
+	(sem_fn_desc): New struct.
+	(idesc): Rewrite.
+	* genmloop.sh (scache case,@cpu@_scache_lookup): Profile scache hit,
+	misses if ! FAST_P.
+	(scache case): Split into non-parallel/parallel versions.
+	(@cpu@_engine_run_{full,fast}): Call @cpu@_{sem,semf}_init_idesc_table
+	if not use semantic switch version.
+
+1999-08-04  Doug Evans  <devans@casey.cygnus.com>
+
+	* cgen-defs.h (SEM_BRANCH_TYPE): New enum.
+	* cgen-engine.h (SEM_BRANCH_UNTAKEN,SEM_BRANCH_UNCACHEABLE): Delete.
+	(SEM_BRANCH_INIT_EXTRACT): Delete.
+	(SEM_BRANCH_INIT): Replace npc_ptr with br_type.
+	(SEM_BRANCH_FINI): Ditto.
+	(SEM_BRANCH_VIA_ADDR): Ditto.
+	(SEM_BRANCH_VIA_CACHE): Ditto.  Delete cachvarptr arg.
+	(SEM_BRANCH_ADDR_CACHE): Delete.
+	(SEM_SKIP_COMPILE,SEM_SKIP_INSN): New macros.
+	* cgen-scache.h (cpu_scache): Replace member pbb_pr_npc_ptr with
+	pbb_br_type.
+	* genmloop.sh (eng.hin): Update prototype of ${cpu}_pbb_cti_chain.
+	(@cpu@_pbb_begin): Initialize branch_target.
+	(@cpu@_pbb_cti_chain): Replace arg new_vpc_ptr with br_type.
+	(@cpu@_engine_run_full): Replace local pbb_br_npc_ptr with
+	pbb_br_type.
+	(@cpu@_engine_run_fast): Ditto.
+
+Fri Jul 16 14:47:53 1999  Dave Brolley  <brolley@cygnus.com>
+
+	* cgen-utils.c (RORSI): New function.
+	(ROLSI): New function.
+
+1999-07-14  Doug Evans  <devans@casey.cygnus.com>
+
+	* Makefile.in (TAGS): Tweak TAGS regex.
+	* cgen-mem.h (*): Add TAGS markers.
+
+Sun Jul 11 23:47:20 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* sim-resume.c (sim_resume): Ensure that the siggnal [sic] is only
+ 	passed in when sim_resume is first entered - don't re-pass it
+ 	after a restart.
+	
+Sun Jul 11 23:34:44 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* sim-options.c (standard_option_handler): Add OPTION_LOAD_VMA and
+ 	OPTION_LOAD_LMA but only when is defined.
+	(standard_options): When SIM_HANDLES_LMA is defined include
+ 	options --load-lma and --load-vma.
+	(standard_install): Initialize STATE_LOAD_AT_LMA_P.
+
+	* sim-base.h (STATE_LOAD_AT_LMA_P): Define.
+	(struct sim_state_base): Add load_at_lma_p.
+	* sim-hload.c (sim_load): Replace SIM_HANDLES_LMA with
+ 	STATE_LOAD_AT_LMA_P.
+
+Sun Jul 11 12:03:36 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* nrun.c (main): Re-format loop gnu style.
+
+Wed Jul  7 19:56:03 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* dv-sockser.c (connected_p): Initialize addrlen.
+
+1999-07-06  Dave Brolley  <brolley@cygnus.com>
+
+	* cgen-accfp.c (floatsidf): New function.
+	(fixdfsi): New function.
+
+1999-07-06  Doug Evans  <devans@casey.cygnus.com>
+
+	* sim-model.c (sim_model_init): Issue error if machine is unsupported.
+
+1999-07-05  Doug Evans  <devans@casey.cygnus.com>
+
+	* Make-common.in (CGEN_MAIN_CPU_DEPS): Add cgen-fpu.h.
+	(cgen-fpu.o,cgen-accfp.o): Add rules for.
+	* cgen-fpu.c: New file.
+	* cgen-fpu.h: New file.
+	* cgen-accfp.c: New file.
+	* cgen-cpu.h (CGEN_CPU): New member fpu.
+	* cgen-mem.h: Redo fp support.
+	* cgen-ops.h: Delete k&r support.  Redo fp support.
+	* cgen-sim.h: Include cgen-fpu.h.
+	* cgen-types.h (SF,DF,XF,TF): Moved to cgen-fpu.h.
+
+1999-06-23  Doug Evans  <devans@casey.cygnus.com>
+
+	* cgen-engine.h (TARGET_SEM_BRANCH_FINI): Remove cruft at end of
+	ifndef.
+	* genmloop.sh (@cpu@_scache_lookup): Delete unused local var.
+	(@cpu@_pbb_cti_chain): Minor clean up.
+
+1999-05-08  Felix Lee  <flee@cygnus.com>
+
+        * aclocal.m4: Use AC_EXEEXT instead of AM_EXEEXT.  Delete defn of
+        AM_CYGWIN32 and AM_EXEEXT.
+	* configure: Regenerate.
+	
+Fri Apr 16 16:43:22 1999  Doug Evans  <devans@charmed.cygnus.com>
+
+	* sim-core.c (device_error,device_io_read_buffer,
+	device_io_write_buffer): Delete decls.
+	* sim-core.h: Put them here.
+
+	* sim-core.c (sim_core_read_buffer): Pass sd to device_io_read_buffer.
+	(sim_core_write_buffer): Pass sd to device_io_write_buffer.
+	* sim-n-core.h (sim_core_read_aligned_N): Ditto.
+	(sim_core_write_aligned_N): Ditto.
+
+1999-04-14  Stephane Carrez  <stcarrez@worldnet.fr>
+
+	* sim-memopt.c (sim_memory_uninstall): Don't look into
+	free()d memory.
+
+1999-04-14  Doug Evans  <devans@casey.cygnus.com>
+
+	* cgen-utils.scm (virtual_insn_entries): Update attribute definition.
+
+1999-04-13  Doug Evans  <devans@casey.cygnus.com>
+
+	* sim-core.c (sim_core_read_buffer): Handle NULL cpu when WITH_DEVICES.
+	(sim_core_write_buffer): Ditto.
+
+1999-04-02  Keith Seitz  <keiths@cygnus.com>
+
+	* sim-io.c (sim_io_poll_quit): Only call the poll_quit callback
+	after the interval counter has expired.
+	(POLL_QUIT_INTERVAL): Define. Used to tweak the frequency of
+	poll_quit callbacks. May be overridden by Makefile.
+	(poll_quit_counter): New global.
+	* sim-events.c: Remove all mentions of ui_loop_hook. The
+	host callback "poll_quit" will serve the purpose.
+	* run.c: Add definition of ui_loop_hook when NEED_UI_LOOP_HOOK
+	is defined.
+	* nrun.c: Remove declaration of ui_loop_hook.
+
+Wed Mar 31 18:55:41 1999  Doug Evans  <devans@canuck.cygnus.com>
+
+	* cgen-run.c (sim_resume): Don't tell main loop to run "forever"
+	if being used by gdb.
+
+1999-03-22  Doug Evans  <devans@casey.cygnus.com>
+
+	* cgen-types.h (XF,TF): Tweak.
+	* cgen-ops.h: Redo inline support.  Delete DI_FN_SUPPORT,
+	in cgen-types.h.
+	(SUBWORD*,JOIN*): Define.
+	* cgen-trace.c (sim_cgen_disassemble_insn): Update, base_insn_bitsize
+	moved into cpu descriptor.
+	* sim-model.h (MACH): New member `num'.
+
 1999-02-09  Doug Evans  <devans@casey.cygnus.com>
 
-	* Make-common.in (CGEN_READ_SCM): Renamed from CGEN_MAIN_SCM.
-	(CGEN_DESC_SCM): New variable.
-	(cgen-desc): New rule.
 	* cgen-cpu.h (CGEN_DISASSEMBLER): New type.
 	(CGEN_CPU): Member opcode renamed to cpu_desc.
 	New members get_idata,disassembler.
@@ -109,8 +466,6 @@ Wed Jan 27 17:19:09 1999  Doug Evans  <devans@canuck.cygnus.com>
 1999-01-05  Doug Evans  <devans@casey.cygnus.com>
 
 	* Make-common.in (CGEN_INCLUDE_DEPS): Add cgen-defs.h, cgen-engine.h.
-	(CGEN_MAIN_SCM): Add rtx-funcs.scm.
-	(cgen-arch): Pass $(mach) to cgen.sh.
 	* cgen-engine.h (SEM_BRANCH_FINI): New arg pcvar, all uses updated.
 	(SEM_BRANCH_INIT_EXTRACT): New macro.
 	(SEM_BRANCH_INIT): Add taken_p.
@@ -280,7 +635,6 @@ Mon Nov 23 13:28:38 1998  Andrew Cagney  <cagney@b1.cygnus.com>
 1998-11-18  Doug Evans  <devans@casey.cygnus.com>
 
 	* Make-common.in (cgen-utils.o): Depend on cgen-engine.h.
-	(CGEN_ARCH_SCM): New variable.
 	* cgen-engine.h (EXTRACT_[ML]SB0_{INT,UINT}): New macros.
 	(EXTRACT_INT,EXTRACT_UINT): New macros.
 	(SEM_SEM_ARG): New macro.
@@ -289,7 +643,7 @@ Mon Nov 23 13:28:38 1998  Andrew Cagney  <cagney@b1.cygnus.com>
 	(sim_disassemble_insn): Update prototype.
 	* cgen-trace.c (current_insn,insn_fields): New static locals.
 	(trace_insn): Set them.
-	* cgen-utils.scm: #include cgen-engine.h.
+	* cgen-utils.c: #include cgen-engine.h.
 	(sim_disassemble_insn): New arg insn_fields.
 	Handle variable length insns.
 	* genmloop.sh: Only emit pbb decls if -pbb.
@@ -484,15 +838,6 @@ Thu Jul  2 17:13:25 1998  Doug Evans  <devans@seba.cygnus.com>
 	computation out of main loop.
 
 Wed Jul  1 16:44:12 1998  Doug Evans  <devans@seba.cygnus.com>
-
-	* Make-common.in (SCHEME,SCHEMEFLAGS): Delete.
-	(CGENDIR,CGEN): New variables.
-	(CGEN_VERBOSE): Renamed to CGENFLAGS.
-	(cgen-arch,cgen-cpu,cgen-decode): Update.
-	(CGEN_CPU_WRITE): New variable.
-	(CGEN_CPU_SEMSW): -W -> -X.
-	(CGEN_FLAGS_TO_PASS): Delete SCHEME.  Add CGEN,CGENFLAGS.
-	* cgen.sh: Delete args scheme,schemeflags.  New arg cgen.
 
 	* cgen-sim.h (RECORD_IADDR): Delete.
 	* cgen-types.h (HOSTINT,HOSTUINT,HOSTPTR): New types.
@@ -739,8 +1084,6 @@ Wed May  6 16:04:18 1998  Doug Evans  <devans@seba.cygnus.com>
 	(CGEN_CPU): Always define scache member.  New members idesc,opcode.
 	(cgen_cpu_max_extra_bytes): Declare.
 	* cgen-utils.c (cgen_cpu_max_extra_bytes): New function.
-
-	* cgen.sh: s/@arch@/${arch}/ for cpu files.
 
 	* sim-cpu.h: New file.  sim_cpu_base moved here.
 	Move sim_cpu_lookup decl here.
@@ -1498,14 +1841,12 @@ Tue Feb 17 16:27:46 1998  Andrew Cagney  <cagney@b1.cygnus.com>
 	
 Tue Feb 17 17:27:30 1998  Doug Evans  <devans@seba.cygnus.com>
 
-	* Make-common.in (CGEN_MAIN_SCM): Update.
 	* aclocal.m4 (USE_MAINTAINER_MODE): New variable.
 
 	* cgen-sim.h (SEMANTIC_CACHE_FN): Delete.
 	(SEMANTIC_FN): Rewrite declaration.
 	(DECODE): Update type of semantic_fast member.
 	({EX,SEM}_FN_NAME): Have only one version.
-	* cgen.sh: Support building cpu.c.
 	* sim-base.h (sim_state_base): Delete conditionals surrounding
 	member scache_size.
 
@@ -1525,7 +1866,6 @@ Mon Feb  9 14:48:37 1998  Doug Evans  <devans@canuck.cygnus.com>
 	* cgen-sim.h (DECODE): Always use switch for `read' for now.
 	(PAREXEC): Renamed from PARALLEL_EXEC.  All uses updated.
 	(SEMANTIC{,_CACHE}_FN): Fix return type.
-	* cgen.sh (decode): Add s/@arch@/$arch/.
 	* genmloop.sh (@cpu@_engine_run): Delete `current_state'.
 	(engine_resume): Likewise.  Make `engine' volatile.  Save copy
 	of cpu pointer in volatile object.  Initialize read switch if
@@ -1595,10 +1935,6 @@ Fri Jan 30 09:36:33 1998  Andrew Cagney  <cagney@b1.cygnus.com>
  	MAX_NR_PROCESSORS.
 	(sim_engine_nr_cpus) sim-engine.c, sim-engine.h: New function
 	
-Thu Jan 29 12:13:01 1998  Doug Evans  <devans@canuck.cygnus.com>
-
-	* cgen.sh: Portably read parms past $9.
-
 Fri Jan 23 14:20:54 1998  Doug Evans  <devans@seba.cygnus.com>
 
 	* Make-common.in (stamp-tvals): New rule.
@@ -1619,7 +1955,6 @@ Mon Jan 19 12:45:45 1998  Doug Evans  <devans@seba.cygnus.com>
 
 	* cgen-scache.h: Deleted.
 	* Make-common.in (cgen-run.o,cgen-scache.o): Delete cgen-scache.h dep.
-	(CGEN_CPU_SCM): Add sim-model.scm.
 	* cgen-scache.c: Only compile contents if WITH_SCACHE.
 	(scache_init): Use runtime computed size of SCACHE.
 	(scache_flush): Likewise.

@@ -1,3 +1,7 @@
+2001-10-29  Frank Ch. Eigler  <fche@redhat.com>
+
+	* (*.conf): Regenerated with memory component tweaks.
+
 2001-10-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* (*.conf): Regenerated with reset-net etc. tweaks.

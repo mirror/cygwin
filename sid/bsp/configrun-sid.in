@@ -1061,9 +1061,10 @@ while ($#opt_memory_region >= 0)
     @relates = ();
 
     # common stuff
-    $third_section .= "# memory region $mems ($spec)\n" .
-      &sidconf_new("hw-memory-ram/rom-basic", "mem$mems") . "\n" .
-	"set mem$mems size $size\n";
+    $first_section .= "# memory region $mems ($spec)\n" .
+      &sidconf_new("hw-memory-ram/rom-basic", "mem$mems") . "\n";
+    $third_section .= "# memory region $mems ($spec) configuration\n" .
+      "set mem$mems size $size\n";
 
     # consume other options
     while ($#spec >= 0)

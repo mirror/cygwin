@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: fork04.c,v 1.4 2003/02/20 11:22:17 corinna Exp $ */
+/* $Id: fork04.c,v 1.5 2005/01/10 04:13:39 cgf Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -165,7 +165,7 @@ setup()
   tst_tmpdir();
 
   /* add a variable to the environment */
-  putenv("TESTPROG=FRKTCS04");
+  putenv(strdup("TESTPROG=FRKTCS04"));
 
   /* Pause if that option was specified */
   TEST_PAUSE;

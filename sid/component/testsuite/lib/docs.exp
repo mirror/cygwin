@@ -18,7 +18,7 @@ proc doc_test {subdirectory compname} {
     regsub -all -- / $compname _ docname
 
     # Each sub-test, one by one.
-    doc_exists
+    doc_exists $compname
     doc_includes_component $compname
     doc_trailing_whitespace
 
@@ -43,7 +43,7 @@ proc doc_load {} {
 # Test if a doc file exists in the source tree.
 # Passes or fails the test.
 
-proc doc_exists {} {
+proc doc_exists {compname} {
     global srcdir subdir docname
 
     # search for related file names first
@@ -55,12 +55,12 @@ proc doc_exists {} {
 	set candidates [glob -nocomplain -- $pattern]
 	verbose "Candidates: $pattern -> $candidates"
 	if {[llength $candidates] == 1} then {
-	    pass "Documentation file exists (${docname}.txt)"
+	    pass "Documentation file for ${compname} exists"
 	    set docname [lindex $candidates 0]
 	    return
 	}
     }
-    fail "Documentation file ($docname) is missing"
+    fail "Documentation file for ${compname} is missing"
 }
 
 

@@ -1,0 +1,1939 @@
+<!DOCTYPE BOOK PUBLIC "-//Davenport//DTD DocBook V3.0//EN">
+<BOOK><!-- Copyright 2001 by Red Hat, Inc. --><!-- Process this file through "make normalize" before CVS operations (diff/commit). -->
+<BOOKINFO>
+<TITLE>SID Simulator User's Guide</TITLE>
+<DATE>$Date$</DATE>
+<PUBLISHER>
+<PUBLISHERNAME>Red Hat, Inc.</PUBLISHERNAME>
+<ADDRESS><EMAIL>sid@sources.redhat.com</EMAIL></ADDRESS>
+</PUBLISHER>
+<COPYRIGHT>
+<YEAR>2001</YEAR>
+<HOLDER>Red Hat, Inc.</HOLDER>
+</COPYRIGHT>
+<DATE>$Date$</DATE>
+<LEGALNOTICE>
+<PARA>This material may be distributed only
+    subject to the terms and conditions set forth in the Open Publication
+    License, V1.0 or later (the latest version is presently available at <ULINK URL="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</ULINK>).
+   </PARA>
+<PARA>    Distribution of substantively modified versions of this document is
+    prohibited without the explicit permission of the copyright holder.
+   </PARA>
+<PARA>    Distribution of the work or derivative of the work in any standard (paper)
+    book form for commercial purposes is prohibited unless prior permission is
+    obtained from the copyright holder.
+   </PARA>
+</LEGALNOTICE>
+</BOOKINFO>
+<TOC>
+<TITLE>Table of Contents</TITLE>
+</TOC>
+<CHAPTER>
+<TITLE>Introduction</TITLE>
+<PARA>The SID simulator consists of an engine that loads  and connects simulated
+   components, based on a  configuration file, and runs simulation sessions.
+   The SID Simulation Toolkit provides a set of ready-made  components that
+   you can configure to create your own  simulation environment.</PARA>
+<SECT1>
+<TITLE>Benefits of Using the SID Simulator</TITLE>
+<PARA>In recent years, there has been notable growth in the  use and the application
+    of embedded systems. However, the  improvements to the design and testing
+    tools have not kept  pace with the rapid development of customized hardware
+    parts.  This simulation tool has been designed to help close this gap and
+    meet the needs of embedded software developers. The simulation of the target
+    environment enables embedded  software developers to analyze and test their
+    software, even in the absence of the physical hardware. </PARA>
+<PARA>In many respects, the virtual target simulation enables a  better development
+    environment, since you can analyze a  system design's functionality and performance
+    in ways that  are not possible on the physical hardware.</PARA>
+<PARA>There are three key benefits that can be gained from using  this tool:
+   </PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>With a simulated target, the debugger can see different  states
+      of the software that cannot be viewed on the hardware.  Consequently, testing
+      on the simulator tool is often faster  and more flexible that performing similar
+      software testing  on the physical hardware.</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>Using the SID simulation environment, you can gain more  insight
+      into the functional behavior of the software on  your system. This results
+      in a shortened time-to-market.</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>Testing on a simulated target allows you to use system building
+      blocks to explore alternative solutions before the hardware  components are
+      created. This can reduce the overall cost of  the system implementation.</PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+<PARA>However, in order to get the full value of the simulation tool.  You
+    do need to understanding the differences between the actual  hardware and
+    virtual target simulation environments.</PARA>
+</SECT1>
+<SECT1>
+<TITLE>The Simulator Toolkit</TITLE>
+<PARA>Designing an embedded system is the process of implementing a
+   desired functionality by using a set of physical components.  Using
+   a similar process, the SID Simulation Toolkit enables you to create
+   a virtual simulation environment using simulated components, even
+   when physical components are unavailable.
+   </PARA>
+<PARA>Whether you are working with physical components or on a
+   virtual simulation environment, your system can be viewed as a
+   collection of simpler subsystems.  In other words, the system is
+   made up of components, with a list of methods or rules that tie all
+   the pieces together in order to create the desired
+   functionality. </PARA>
+<PARA>The virtual simulation model that you use to test your
+   embedded system software needs to be a natural one in order to help
+   you debug your design.  The virtual simulation model must be
+   flexible so that you can choose different models in the different
+   phases of the development process. The simulation of the model
+   should also accommodate different levels of accuracy, such as
+   functional and cycle-accurate.  With a functionally accurate
+   simulator, you can compile and execute the design model directly on
+   a host machine without paying much attention to the simulation
+   time. With a cycle-accurate simulation, you can execute the design
+   model in a timed fashion. </PARA>
+</SECT1>
+<SECT1>
+<TITLE>About this Manual</TITLE>
+<PARA>This manual is a guide to the SID Simulator. It is a
+   reference guide for users who want to use and configure the
+   simulation components provided by Red Hat.</PARA>
+<PARA>The manual is organized according to how an user would first
+   approach using the SID tool by providing information about the
+   overall SID architecture; how to run, use and customize the SID
+   tool for your specific requirements, and how to gather information
+   from the running system.</PARA>
+<SECT2>
+<TITLE>SID Architecture</TITLE>
+<PARA>This release contains the tools and capabilities to
+    customize the configuration of the virtual simulation model by
+    providing a library of existing components; a documented interface
+    to enable the designer to add other components. All SID components
+    have been designed to enable pluggability into the SID framework.
+    Each component exports a set of pines and bus connectors and
+    therefore has no knowledge of the other components that are
+    connected to it. </PARA>
+</SECT2>
+<SECT2>
+<TITLE>SID Configuration File</TITLE>
+<PARA>The SID configuration file is an editable file that
+    configures a SID simulation run. The configuration file defines
+    the simulation contents, topology, and initial state. We supply
+    several configuration files that simulate selected target
+    boards.</PARA>
+<PARA>For information on how to create or modify a
+    SID configuration file, refer to <XREF LINKEND="WORKINGWITHCONFIGFILE">&#62;.</PARA>
+</SECT2>
+<SECT2>
+<TITLE>SID Component Library</TITLE>
+<PARA>SID comes with a number of components, each of which can be
+    modified, configured, or connected to any other
+    independently. They are self-contained, and individually
+    documented. Existing components include:
+    </PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>CPUs, such as <FILENAME>hw-cpu-arm7</FILENAME> or <FILENAME>hw-cpu-m32r/d</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>disks, such as <FILENAME>hw-disk-ide</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>rom-monitors or low-level operating systems, such as <FILENAME>sw-gloss-arm_angel</FILENAME>l</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>glue, such as <FILENAME>hw-glue-bus-mux</FILENAME> or <FILENAME>hw-glue-probe-bus</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>interrupts, such as <FILENAME>hw-interrupt-arm_ref</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>LCDs, such as <FILENAME>hw-visual-lcd</FILENAME> or <FILENAME>hw-lcd-char-display</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>binary loaders, such as <FILENAME>sw-load-elf</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>mappers, such as <FILENAME>hw-mapper-basic</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>memory, such as <FILENAME>hw-memory-ram_rom-basic</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>MMUs, such as <FILENAME>hw-remap_pause-arm_ref</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>UARTs, such as <FILENAME>hw-uart-ns16550</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>parallel ports, such as <FILENAME>hw-parport-ps_2</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>RTCs, such as <FILENAME>hw-rtc-ds1x4</FILENAME>2</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>timers, such as <FILENAME>hw-timer-arm_ref</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>audio codecs, such as <FILENAME>hw-audio-sid</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>console IO facilities, such as <FILENAME>sid-io-stdio</FILENAME> or <FILENAME>sid-io-socket</FILENAME></PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+<PARA>For information on how to understand the SID component
+    documentation, refer to <XREF LINKEND="HOWTOREADCOMPREF">&#62;.</PARA>
+<PARA>Adding new components is straightforward and does not
+    require any modifications to SID. For more information on the SID
+    Component Library, refer to the SID Component Developers Kit
+    Reference Guide.</PARA>
+</SECT2>
+<SECT2>
+<TITLE>Using SID</TITLE>
+<PARA>SID is packaged as a standalone command-line program that
+    reads and executes a configuration file (see <XREF LINKEND="WORKINGWITHCONFIGFILE">&#62;). A typical session with SID
+    begins with compiling or assembling code for the simulated system
+    to run, using standard a cross-development toolchain, and proceeds
+    through loading the target binary into the simulation environment,
+    stepping the simulator through a supervised execution, shutting
+    the simulation down and analyzing the results. While running a
+    simulation, SID can interface with POSIX standard I/O, a TK-based
+    visual simulation monitor, the <FILENAME>gdb</FILENAME> debugger,
+    and the <FILENAME>gprof</FILENAME> profiler.
+    </PARA>
+<PARA>For information on invoking, customizing, and interfacing
+     with SID, refer to <XREF LINKEND="USINGSID">&#62;.
+    </PARA>
+</SECT2>
+</SECT1>
+</CHAPTER>
+<CHAPTER>
+<TITLE>The <PRODUCTNAME>SID</PRODUCTNAME> Architecture</TITLE>
+<PARA>A simulated environment provides embedded software developers
+  with a number of advantages over a typical hardware model. Working
+  in a simulated environment provides a rapid way to examine the
+  complex interactions of the embedded software on the simulated
+  hardware system.</PARA>
+<PARA> <PRODUCTNAME>SID</PRODUCTNAME> is a simulation framework for
+  supporting embedded systems software development. It features a
+  modular architecture of loosely-coupled software components that
+  interact with each other to simulate the behavior of physical
+  hardware parts. This modularity allows users or programs to monitor
+  or interact with a running simulation. </PARA>
+<PARA><PRODUCTNAME>SID</PRODUCTNAME> insists on a decomposition of a
+  simulation into independent components that share a fixed low-level
+  API, which defines all possible inter-component communication
+  mechanisms. The API is small and general, on which application- or
+  device-specific behaviors are layered.</PARA>
+<PARA><PRODUCTNAME>SID</PRODUCTNAME> typically reads configuration
+  files to create and manage the web of low-level connections between
+  all needed components.  A configuration file may spell out the model
+  of an entire hardware development board, or may add instrumentation
+  to an existing model.</PARA>
+<SECT1>
+<TITLE>Component Types</TITLE>
+<INDEXTERM>
+<PRIMARY>components</PRIMARY>
+<SECONDARY>types of</SECONDARY>
+</INDEXTERM>
+<PARA>The SID package includes many types of components. The
+   component types fall into the following categories: </PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>hardware model</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>software model</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>bridge</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>special function</PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+<SECT2>
+<TITLE>Hardware Model Components</TITLE>
+<INDEXTERM>
+<PRIMARY>components</PRIMARY>
+<SECONDARY>hardware model type</SECONDARY>
+</INDEXTERM>
+<PARA>A hardware model type component simulates some sort of
+    target hardware device, so it tends to connect to other components
+    through hardware-oriented connections. </PARA>
+<PARA>Examples include:</PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>a CPU, <FILENAME>hw-cpu-arm7t</FILENAME> </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>a hard drive interface, <FILENAME>hw-disk-ide</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA> an address space decoder/mapper, <FILENAME>hw-mapper-basic
+       </FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>memory, <FILENAME>hw-memory-ram/rom-basic</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>a teletype, <FILENAME>hw-visual-tty</FILENAME> </PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+<PARA>These tend to be the busiest components in a running
+    simulation.</PARA>
+</SECT2>
+<SECT2>
+<TITLE>Software Model Components</TITLE>
+<INDEXTERM>
+<PRIMARY>components</PRIMARY>
+<SECONDARY>software model type</SECONDARY>
+</INDEXTERM>
+<PARA>A software model type component crosses the
+    hardware-software abstraction boundary by emulating the operation
+    of target software.</PARA>
+<PARA>Examples include:</PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>a ROM monitor, <FILENAME>sw-gloss-arm/angel</FILENAME> </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>a debugging stub,  <FILENAME>sw-debug-gdb</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>profiling instrumentation,  <FILENAME>sw-profile-gprof</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>an executable loader,  <FILENAME>sw-load-elf </FILENAME> 
+      </PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+</SECT2>
+<SECT2>
+<TITLE>Bridge Components</TITLE>
+<INDEXTERM>
+<PRIMARY>components</PRIMARY>
+<SECONDARY>bridge type</SECONDARY>
+</INDEXTERM>
+<PARA>A bridge type component crosses simulation implementation
+    language boundaries by mapping between a different API and the SID
+    low-level API. It allows a foreign simulation system to
+    impersonate a SID component, and sometimes vice versa.</PARA>
+<PARA>Examples include:</PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>a Tcl/Tk bridge,
+     <FILENAME>bridge-tcl</FILENAME></PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+</SECT2>
+<SECT2>
+<TITLE>Special Function Components</TITLE>
+<INDEXTERM>
+<PRIMARY>components</PRIMARY>
+<SECONDARY>special function type</SECONDARY>
+</INDEXTERM>
+<PARA>A special function type component carries out tasks related
+    to the infrastructure of the simulation, or crossing the
+    target/host abstraction boundary. </PARA>
+<PARA>Examples include: </PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>an event scheduler, <FILENAME>sid-sched-sim</FILENAME> </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>a configuration manager,  <FILENAME>sid-control-cfgroot</FILENAME></PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>a host network interface, <FILENAME>sid-io-socket</FILENAME></PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+</SECT2>
+</SECT1>
+<SECT1>
+<TITLE>Communication Between Components</TITLE>
+<INDEXTERM>
+<PRIMARY>components</PRIMARY>
+<SECONDARY>communication between
+    </SECONDARY>
+</INDEXTERM>
+<PARA>The SID API provides only a few ways for components to
+   communicate with each other. Hardware type components tend to use
+   only the <EMPHASIS>pin</EMPHASIS> and <EMPHASIS>bus</EMPHASIS>
+   mechanisms, and other types also use the <EMPHASIS>   attribute</EMPHASIS> and <EMPHASIS>relation</EMPHASIS>
+   mechanisms. All of these communication mechanisms may be set up in
+   a SID configuration file.
+   </PARA>
+<PARA>The SID <EMPHASIS>pin</EMPHASIS> mechanism allows a component
+   to send or receive broadcast events to or from connected
+   components. Each event carries a small integer value as a
+   parameter; how this value is interpreted is up to the involved
+   components. This is an abstraction of individual electrical signal
+   lines that connect hardware parts, modelling a level transition by
+   a function call. A component may maintain several different pin
+   connection networks. Typically, clocking and initialization or
+   shutdown signals are distributed through dedicated pin
+   connections. </PARA>
+<PARA>The SID <EMPHASIS>bus</EMPHASIS> mechanism allows a component
+   to read or write addressable memory or registers of another
+   component. This is an abstraction of the address, data, and control
+   buses that connect hardware parts together, modelling protocols and
+   signals by a function call from a component (a bus master) to
+   another (a bus slave). A bus mastering component may have several
+   named accessors. Each may point to a bus slave component's named
+   bus.</PARA>
+<PARA>The SID <EMPHASIS>attribute</EMPHASIS> mechanism allows a
+   component to read or write named internal states of another
+   component. These states are considered to be opaque strings and may
+   represent anything from hexadecimal values of registers through
+   configuration variables to a binary dump of the entire state of the
+   component. Attributes may be categorized, so that standard
+   formatting and interpretation may be applied to groups of
+   attributes.</PARA>
+<PARA> The SID <EMPHASIS>relation</EMPHASIS> mechanism allows a
+   component to make any SID API call to another component. A
+   component that supervises others has a specific named relationship
+   to them. A supervisor's relation stores pointers to the supervised
+   components. </PARA>
+</SECT1>
+<SECT1>
+<TITLE>System Organization</TITLE>
+<INDEXTERM>
+<PRIMARY>system organization</PRIMARY>
+</INDEXTERM>
+<PARA>One may consider the fixed low-level SID API as a socket, or
+   a standardized connector between simulated components. Think of SID
+   components as integrated circuits that plug into these sockets and
+   configuration files as the circuit wiring that connects the sockets
+   to each other. To simulate an entire board, many different
+   components will be needed, and their connections need to be set up
+   just right for SID to work.  </PARA>
+<PARA>While the configuration process is described in detail in a
+   later section(see <XREF LINKEND="WORKINGWITHCONFIGFILE">&#62;),
+   there are common patterns of configuration in typical SID
+   simulation runs. These sketches outline some of these patterns.
+   </PARA>
+<SECT2>
+<TITLE>Main Loop, Schedulers</TITLE>
+<INDEXTERM>
+<PRIMARY>main loop</PRIMARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>schedulers
+     </PRIMARY>
+</INDEXTERM>
+<PARA>In a running SID simulation, activity occurs in a single
+    thread. It passes from a central top-level loop down through
+    components and back, by calling SID API functions. More
+    specifically, the top level loop signals each iteration on a
+    designated pin. Each component that connects a pin to it will be
+    invoked to do some work. This work may include internal
+    calculations, changing attributes, or could involve making pin- or
+    bus-related function calls to other components. Then those
+    components do some work, and so on. When these work units are
+    complete, control returns to the top level loop, which then goes
+    around for another iteration.  </PARA>
+<PARA>There also exist control pins that cause and indicate the
+    initialization and shutdown of a simulation run. This allows
+    components to monitor or effect changes to the top-level
+    looping. For example, simulated CPU executes the target program's
+    <FUNCTION>exit()</FUNCTION> system call, the component that
+    interprets system calls will signal this event on a pin. If that
+    pin is connected to the main loop's shutdown control pin, the
+    simulation will shortly end.
+    </PARA>
+<PARA>Many components may wish to regulate the rate at which
+    control is passed to them. They may have nothing to do at times
+    (like an idle DMA controller).  Some may wish to act at
+    independent frequencies (like a CPU and a timer).  Several special
+    function components exist to keep simulation time and dispatch
+    events to other components only at intervals of interest: these
+    are the scheduler (<FILENAME>sid-sched</FILENAME>)
+    components. </PARA>
+<PARA>There is usually one host-time scheduler and one target-time
+    scheduler in a simulation run. Both are connected to the top level
+    activity pin. Components that interface between the host and the
+    simulated target often use the host-time scheduler
+    (<FILENAME>sid-sched-host</FILENAME>), so they get activity
+    signals at rates related to passing wall-clock time. Components
+    that model the hardware of the target system are generally
+    connected to the target-time scheduler
+    (<FILENAME>sid-sched-sim</FILENAME>), so target activity may be
+    suspended/resumed en masse by a debugger. </PARA>
+</SECT2>
+<SECT2>
+<TITLE>Peripherals, Memory Mapping </TITLE>
+<INDEXTERM>
+<PRIMARY>peripherals</PRIMARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>      memory mapping</PRIMARY>
+</INDEXTERM>
+<PARA>A typical SID configuration one or more CPU models, some
+    banks of memory, and several peripherals. When the CPU executes a
+    load or store instruction, the correct SID component must be
+    addressed to carry out the memory access.  This decoding operation
+    is performed by an intermediary: a mapper component that is
+    configured with the target board's memory map. </PARA>
+<PARA>The CPU component is usually connected to the slave side of
+    the mapper, and the master side of the mapper is connected to
+    multiple slave peripheral components. Other bus master components
+    may also connect to the mapper similarly.  When a bus master makes
+    a read or write call, the interposed mapper component decodes the
+    address, and passes the read or write call to the specific
+    component being addressed. </PARA>
+<PARA>In effect, the mapper transforms the CPU's view of the
+    address space to peripheral-centric views. This way, neither the
+    CPU nor the peripheral is aware of the target board's memory map:
+    this knowledge is encapsulated in a mapper. </PARA>
+<PARA>There may be several mapper components in a simulation
+    run. This is appropriate if there are separate instruction and
+    data address spaces for a Harvard architecture CPU, or if address
+    spaces are nested, or partly shared between multiple
+    masters.</PARA>
+</SECT2>
+<SECT2>
+<TITLE>CPU, Monitor Emulation, Debugger Interface</TITLE>
+<PARA></PARA>
+</SECT2>
+</SECT1>
+</CHAPTER>
+<CHAPTER ID="WORKINGWITHCONFIGFILE">
+<TITLE>Working with the <PRODUCTNAME>SID</PRODUCTNAME> Configuration File
+  </TITLE>
+<INDEXTERM>
+<PRIMARY>configuration file</PRIMARY>
+<SECONDARY>working with</SECONDARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>modifying the configuration file</PRIMARY>
+</INDEXTERM>
+<PARA>To create a simulated system, you need to select the
+  components you want to use, describe their properties, and specify
+  how they should connect together. All of this information is
+  specified in the simulator configuration file. </PARA>
+<PARA>The simulator configuration file consists of a series of
+  commands. The instructions are interpreted by a special
+  <PRODUCTNAME>SID</PRODUCTNAME> component with type
+  <FILENAME>sid-control-cfgroot</FILENAME>. This component is always
+  present in the SID main-line program <COMMAND>sid</COMMAND> or
+  <COMMAND>sid.exe </COMMAND>. </PARA>
+<SECT1>
+<TITLE>The Configuration File Contents</TITLE>
+<INDEXTERM>
+<PRIMARY>configuration file</PRIMARY>
+<SECONDARY>contents of</SECONDARY>
+</INDEXTERM>
+<PARA>The configuration file consists of three major sections: </PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>A listing of component libraries, which are to be dynamically
+      loaded libraries</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>A set of commands to instantiate any required <PRODUCTNAME>       SID</PRODUCTNAME> components</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>A set of commands that connect and configure the components. 
+     </PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+<PARA>The configuration process consists of reading each command
+   from a configuration file, from top to bottom. If any lines are not
+   recognized as syntactically valid commands, or if any commands fail
+   (see below), the configuration process continues, but the
+   simulation will abort before entering the main loop. Error messages
+   are produced in these cases.</PARA>
+<SECT2>
+<TITLE>Technical Notes</TITLE>
+<PARA> In a way, the simulator configuration language corresponds
+    to the common low-level API of <PRODUCTNAME>SID</PRODUCTNAME>
+    components. This API is described in the Component Developers Kit
+    Reference manual. Each configuration command maps to a small
+    number of low-level <PRODUCTNAME>SID</PRODUCTNAME> API calls.  Any
+    <PRODUCTNAME>SID</PRODUCTNAME> component could make the same calls
+    at any time during a run. This means that configuration is not
+    really a special stage of <PRODUCTNAME>SID</PRODUCTNAME>
+    processing, but potentially an ongoing activity to continually
+    change the running system. This also means that any particular
+    <PRODUCTNAME>SID</PRODUCTNAME> configuration file could be
+    supplanted by <PRODUCTNAME>SID</PRODUCTNAME> components that
+    perform the work by making the equivalent
+    <PRODUCTNAME>SID</PRODUCTNAME> API calls.</PARA>
+</SECT2>
+</SECT1>
+<SECT1>
+<TITLE>Creating a New Configuration File</TITLE>
+<INDEXTERM>
+<PRIMARY>configuration file</PRIMARY>
+<SECONDARY>creating new</SECONDARY>
+</INDEXTERM>
+<PARA>The configuration file can have eight types of commands,
+   interspersed with blanks and comments. Commands take a number of
+   whitespace-separated arguments.  Each parameter is a string,
+   optionally enclosed in double-quotes. Comments start with "#" and
+   extend until the end of line.</PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>The <COMMAND>load</COMMAND> command registers
+    component libraries.  These are dynamically-loaded libraries that
+    contain a collection of related <PRODUCTNAME> SID</PRODUCTNAME>
+    component types. Each component type has a unique structured name
+    that describes its type of functionality. Names are typically
+    structured to describe the component's role. For example: <GRAPHIC FILEREF="images/name-structure.jpg" SCALE="75"></GRAPHIC>
+    </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>The <COMMAND>new</COMMAND> command instantiates
+    components of a given type and assigns unique reference names for
+    the new instances.  Other commands use these names to reference
+    the component instances.</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>The <COMMAND>set</COMMAND>,
+    <COMMAND>connect-pin</COMMAND>, ,
+    <COMMAND>disconnect-pin</COMMAND>, <COMMAND>connect-bus</COMMAND>,
+    <COMMAND> disconnect-bus</COMMAND>, and <COMMAND>relate</COMMAND>
+    commands configure and manage connections between component
+    instances. </PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+</SECT1>
+<SECT1>
+<TITLE>Command Syntax</TITLE>
+<INDEXTERM>
+<PRIMARY>syntax</PRIMARY>
+<SECONDARY>of configuration
+   file commands
+   </SECONDARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>configuration
+   file</PRIMARY>
+<SECONDARY> command syntax</SECONDARY>
+</INDEXTERM>
+<PARA>The syntax for each command type follows.</PARA>
+<SECT2>
+<TITLE>The <COMMAND>load</COMMAND> Command</TITLE>
+<INDEXTERM>
+<PRIMARY><COMMAND>load</COMMAND> command</PRIMARY>
+</INDEXTERM>
+<SECT3>
+<TITLE>Syntax</TITLE>
+<PARA>The syntax is: <PARAMETER>LIBRARYFILE</PARAMETER>
+     <PARAMETER>LIBRARYSYMBOL</PARAMETER></PARA>
+<PARA>where: </PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA> The <PARAMETER>LIBRARYFILE</PARAMETER> parameter is a file
+	name.  </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>The <PARAMETER>LIBRARYSYMBOL</PARAMETER> parameter is a symbol
+	name.</PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+<PARA>For a list of appropriate <PARAMETER>LIBRARYFILE</PARAMETER> and <PARAMETER>LIBRARYSYMBOL</PARAMETER> names, refer to the component reference information
+      on each component.</PARA>
+<EXAMPLE>
+<TITLE><COMMAND>load</COMMAND></TITLE>
+<PROGRAMLISTING> load
+      libcache.la cache_component_library</PROGRAMLISTING>
+<PROGRAMLISTING> load libmemory.la memory_component_library
+      </PROGRAMLISTING>
+</EXAMPLE>
+</SECT3>
+<SECT3>
+<TITLE>Function</TITLE>
+<PARA>Registers a component library. Loads the shared library
+     from the file named by the first string. Enumerates the available
+     component types by searching the library for the
+     <FUNCTION>sid::component_library</FUNCTION> symbol named by the
+     second string. Add all its component type names to the catalog of
+     known types for subsequent new commands.  Nearly all SID
+     components are packaged in shared libraries.</PARA>
+</SECT3>
+<SECT3>
+<TITLE>Technical Notes</TITLE>
+<PARA>The <PARAMETER>LIBRARYFILE</PARAMETER> parameter is
+     interpreted as a filename. It may be the name of a Windows DLL or
+     the name UNIX shared object (<FILENAME>.so</FILENAME>) file,
+     although libtool archives ending with the extension
+     <FILENAME>.la</FILENAME> are preferred. The file must exist and
+     be loadable on the host platform using normal library loading
+     routines like <FUNCTION> dlopen()</FUNCTION>. If the filename is
+     not absolute, several paths are searched.  Among these are a
+     colon-separated UNIX-style directory list given in the <ENVAR>     SID_LIBRARY_PATH</ENVAR> environment variable, the
+     <ENVAR>PATH</ENVAR> environment variable in standard platform
+     notation, and the installation root directory for SID given by
+     the <ENVAR>SID_EXEC_PREFIX</ENVAR> environment variable.
+     </PARA>
+<PARA>The <PARAMETER>LIBRARYSYMBOL</PARAMETER> parameter is the
+     name of an exported data symbol in the shared library. It must be
+     resolvable using a standard function like
+     <FUNCTION>dlsym()</FUNCTION> and refer to an initialized instance
+     of the <CLASSNAME>sid::component_library</CLASSNAME> structure
+     that lists the low-level entry points to the component factory
+     functions.  </PARA>
+<PARA>The <COMMAND>load</COMMAND> command
+     checks the magic version number in the structure against the
+     number compiled into the sid main-line program.  If the shared
+     library is deemed compatible, the list of component types that it
+     contains are obtained, using the
+     <FUNCTION>sid::component_library::list_component_types()
+     </FUNCTION> call, and registered internally. From this point, any
+     further request to instantiate a component type whose name is on
+     that list will be directed to this shared library.  The special
+     string <PARAMETER>-static-</PARAMETER> is also understood as a
+     <PARAMETER>LIBRARYFILE</PARAMETER> parameter. It is used in cases
+     where sid::component_library structures are specially linked
+     directly into the SID main-line program. This is an advanced
+     technique and is not discussed further. Referring to an invalid
+     <PARAMETER>LIBRARYFILE</PARAMETER> or
+     <PARAMETER>LIBRARYSYMBOL</PARAMETER> will cause an error. </PARA>
+</SECT3>
+</SECT2>
+<SECT2>
+<TITLE>The <COMMAND>new</COMMAND> Command</TITLE>
+<INDEXTERM>
+<PRIMARY><COMMAND>new</COMMAND> command</PRIMARY>
+</INDEXTERM>
+<SECT3>
+<TITLE>Syntax</TITLE>
+<PARA>The syntax is:<PROGRAMLISTING>new
+     <PARAMETER>TYPENAME</PARAMETER> <PARAMETER>     REFERENCE</PARAMETER></PROGRAMLISTING>where: </PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>The <PARAMETER>TYPENAME</PARAMETER> parameter is the component
+	type.</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>The <PARAMETER>REFERENCE</PARAMETER> parameter is the reference
+	name of the new component instance.</PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+<EXAMPLE>
+<TITLE><COMMAND>new</COMMAND></TITLE>
+<PROGRAMLISTING>new
+      hw-glue-sequence-8 init-sequence </PROGRAMLISTING>
+<PROGRAMLISTING>new sw-debug-gdb gdb-interface </PROGRAMLISTING>
+</EXAMPLE>
+</SECT3>
+<SECT3>
+<TITLE>Function</TITLE>
+<PARA>Instantiates a new component. The first string is the
+     component type--one of those made available by a prior load
+     command. The second string is the freely chosen reference name
+     for the new component instance. That name must be unique in a SID
+     run.  It is possible to instantiate the same type of component
+     multiple times, but each instance must have a unique reference
+     name. A <FILENAME> sid-control-cfgroot</FILENAME> type component
+     is automatically instantiated and given the reference name main,
+     so that name is reserved.  Do not use an unknown
+     <PARAMETER>TYPENAME</PARAMETER>, or a duplicate
+     <PARAMETER>REFERENCE </PARAMETER>; this will cause an error.
+     </PARA>
+</SECT3>
+<SECT3>
+<TITLE>Technical Notes</TITLE>
+<PARA>If this command is successful, it will cause the
+     <FUNCTION>sid::component_library::create_component() </FUNCTION>
+     hook to be called on the component library that has last
+     registered TYPENAME.</PARA>
+</SECT3>
+</SECT2>
+<SECT2>
+<TITLE>The <COMMAND>connect-pin</COMMAND> and <COMMAND>disconnect-pin</COMMAND>
+     Commands</TITLE>
+<INDEXTERM>
+<PRIMARY><COMMAND>connect</COMMAND> command</PRIMARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY><COMMAND>disconnect</COMMAND> command</PRIMARY>
+</INDEXTERM>
+<SECT3>
+<TITLE>Syntax</TITLE>
+<PARA>The syntax is: <PROGRAMLISTING>connect-pin
+     <PARAMETER>COMPONENT1 </PARAMETER> <PARAMETER>PIN1</PARAMETER>
+     <PARAMETER>DIRECTION</PARAMETER> <PARAMETER>     COMPONENT2</PARAMETER>
+     <PARAMETER>PIN2</PARAMETER></PROGRAMLISTING><PROGRAMLISTING>     disconnect-pin <PARAMETER>COMPONENT1</PARAMETER>
+     <PARAMETER>PIN1</PARAMETER> <PARAMETER> DIRECTION</PARAMETER>
+     <PARAMETER>COMPONENT2</PARAMETER>
+     <PARAMETER>PIN2</PARAMETER></PROGRAMLISTING>where:
+     </PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>The <PARAMETER>COMPONENT1</PARAMETER> and <PARAMETER>COMPONENT2
+	</PARAMETER> parameters are reference names of existing component instances.
+       </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>The <PARAMETER>PIN1</PARAMETER> and <PARAMETER>PIN2</PARAMETER>
+	parameters are pin names belonging to <PARAMETER>COMPONENT1</PARAMETER> and <PARAMETER>	 COMPONENT2</PARAMETER>, respectively.</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>The <PARAMETER>DIRECTION</PARAMETER> parameter
+      is either "<LITERAL> -&#62;</LITERAL>", "<LITERAL>&lt;-</LITERAL>",
+      or "<LITERAL>&lt;-&#62;</LITERAL>", indicating the directionality of
+      the pin connection. The first two establish or destroy a single
+      pin connection in opposite directions, and the last establishes
+      or destroys two independent connections in the opposite
+      directions. The arrow shape suggests the direction of
+      signalling: output to input. </PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+<EXAMPLE>
+<TITLE><COMMAND>connect-pin</COMMAND> and <COMMAND>disconnect-pin</COMMAND></TITLE>
+<PROGRAMLISTING>connect-pin main perform-activity -&#62; host-sched advance</PROGRAMLISTING>
+<PROGRAMLISTING>connect-pin cpu trap &lt;-&#62; gdb-interface trap</PROGRAMLISTING>
+<PROGRAMLISTING>disconnect-pin host-sched advance &lt;- main perform-activity
+      </PROGRAMLISTING>
+</EXAMPLE>
+</SECT3>
+<SECT3>
+<TITLE>Function</TITLE>
+<PARA>Adds or removes a pin connection between a pair of
+     component instances.  Each SID component generally defines its
+     own set of pins. These may be input and/or output. See the
+     reference documentation for the list for any particular component
+     type.  It is possible to connect many input pins to a given
+     output pin, and it is also possible to connect many output pins
+     to a given input pin. It is an error to make the same pin-to-pin
+     connection twice, or to connect an input-only and an output-only
+     pin in the wrong direction. Similarly, it is an error to try to
+     remove a nonexistent connection. </PARA>
+</SECT3>
+<SECT3>
+<TITLE>Technical Notes</TITLE>
+<PARA> The <COMMAND>connect-pin</COMMAND> command causes a
+     <FUNCTION>sid::component::find_pin() </FUNCTION> call on the
+     component and pin on the input side of the arrow, and passes the
+     result to a <FUNCTION>sid::component::connect_pin()</FUNCTION>
+     call on the output side of the arrow. (The bidirectional
+     <LITERAL>&lt;-&#62;</LITERAL> case simply repeats this with the two
+     sides exchanged.)  The <COMMAND>disconnect-pin </COMMAND> command
+     does the same, except it uses
+     <FUNCTION>sid::component::disconnect_pin() </FUNCTION> instead.
+     With a pin connection, the component on the output side of the
+     arrow can make <FUNCTION>sid::pin::driven</FUNCTION> calls to the
+     given input pin. </PARA>
+</SECT3>
+</SECT2>
+<SECT2>
+<TITLE>The <COMMAND>connect-bus</COMMAND> and <COMMAND>disconnect-bus</COMMAND>
+     Commands</TITLE>
+<INDEXTERM>
+<PRIMARY><COMMAND>connect-bus</COMMAND> command</PRIMARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY><COMMAND>disconnect-bus</COMMAND> command</PRIMARY>
+</INDEXTERM>
+<SECT3>
+<TITLE>Syntax</TITLE>
+<PARA>The syntax is:<PROGRAMLISTING>connect-bus
+     <PARAMETER>MASTER</PARAMETER> <PARAMETER> ACCESSOR</PARAMETER>
+     <PARAMETER>SLAVE</PARAMETER>
+     <PARAMETER>BUS</PARAMETER></PROGRAMLISTING><PROGRAMLISTING>     disconnect-bus MASTER ACCESSOR SLAVE BUS</PROGRAMLISTING>where:
+    </PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>The <PARAMETER>MASTER</PARAMETER> and <PARAMETER>SLAVE</PARAMETER>
+	parameters are reference names of existing component instances.</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>The <PARAMETER>ACCESSOR</PARAMETER> parameter is the name
+	of an accessor of the <PARAMETER>MASTER</PARAMETER> component. </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>The <PARAMETER>BUS</PARAMETER> parameter is the name of a
+	bus of the <PARAMETER>SLAVE</PARAMETER> component. </PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+<EXAMPLE>
+<TITLE><COMMAND>connect-bus</COMMAND> and
+      <COMMAND>disconnect-bus</COMMAND></TITLE>
+<PROGRAMLISTING>connect-bus angel target-memory bus access-port
+      </PROGRAMLISTING>
+<PROGRAMLISTING>disconnect-bus cpu insn-memory
+      bus access-port </PROGRAMLISTING>
+</EXAMPLE>
+</SECT3>
+<SECT3>
+<TITLE>Function</TITLE>
+<PARA>Adds or removes an accessor-to-bus connection between two
+     components.  Each <PRODUCTNAME>SID</PRODUCTNAME> component
+     defines its own set of buses and accessors. See the component
+     reference sections for the list for any particular component
+     type. </PARA>
+</SECT3>
+<SECT3>
+<TITLE>Technical Notes</TITLE>
+<PARA> The <COMMAND>connect-bus</COMMAND> command causes a
+     <FUNCTION>sid::component::find_bus() </FUNCTION> call on the
+     <PARAMETER>SLAVE</PARAMETER> component for the <PARAMETER>     BUS</PARAMETER> name, and will pass the result to a
+     <FUNCTION>sid::component::connect_accessor() </FUNCTION> call on
+     the <PARAMETER>MASTER</PARAMETER> component for the <PARAMETER>     ACCESSOR</PARAMETER> name.  The <COMMAND>disconnect-bus</COMMAND>
+     command does the same, except it uses
+     <FUNCTION>sid::component::disconnect_accessor() </FUNCTION>
+     instead.  With a bus connection, the
+     <PARAMETER>MASTER</PARAMETER> component can make
+     <CLASSNAME>sid::bus</CLASSNAME> read or write calls via the given
+     accessor to the given bus of the <PARAMETER>SLAVE</PARAMETER>
+     component.
+     </PARA>
+</SECT3>
+</SECT2>
+<SECT2>
+<TITLE>The <COMMAND>set</COMMAND> Command</TITLE>
+<INDEXTERM>
+<PRIMARY><COMMAND>set</COMMAND> command</PRIMARY>
+</INDEXTERM>
+<SECT3>
+<TITLE>Syntax</TITLE>
+<PARA>The syntax is:<PROGRAMLISTING>set
+     <PARAMETER>COMPONENT</PARAMETER> <PARAMETER> ATTRNAME</PARAMETER>
+     <PARAMETER>ATTRVALUE</PARAMETER></PROGRAMLISTING>where:
+     </PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>The <PARAMETER>COMPONENT</PARAMETER> parameter is a reference
+	name of an existing SID component instance.</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>The <PARAMETER>ATTRNAME</PARAMETER> parameter is the name
+	of an attribute defined by that component.</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>The <PARAMETER>ATTRVALUE</PARAMETER> parameter is the value
+	string.</PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+<EXAMPLE>
+<TITLE><COMMAND>set</COMMAND></TITLE>
+<PROGRAMLISTING>set cpu r0 0x1ea90e42</PROGRAMLISTING>
+<PROGRAMLISTING>set angel command-line "sid hello world"</PROGRAMLISTING>
+</EXAMPLE>
+</SECT3>
+<SECT3>
+<TITLE>Function</TITLE>
+<PARA>Sets an attribute value.  Each
+     <PRODUCTNAME>SID</PRODUCTNAME> component generally defines its
+     own set of attributes and rules for interpreting their
+     values. See the component reference sections for the list for any
+     particular component type.  </PARA>
+</SECT3>
+<SECT3>
+<TITLE>Technical Notes</TITLE>
+<PARA>The component instance will receive a
+     <FUNCTION>sid::component::set_attribute_value() </FUNCTION> call
+     with verbatim copies of these two parameters.  If the <FUNCTION>     sid::component::set_attribute_value()</FUNCTION> call fails
+     (returns something other than
+     <RETURNVALUE>sid::component::ok</RETURNVALUE> ), the
+     configuration process will fail. </PARA>
+</SECT3>
+</SECT2>
+<SECT2>
+<TITLE>The <COMMAND>relate</COMMAND> and <COMMAND>unrelate</COMMAND> Commands
+    </TITLE>
+<INDEXTERM>
+<PRIMARY><COMMAND>relate</COMMAND>
+    command</PRIMARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY><COMMAND>unrelate</COMMAND>
+    command</PRIMARY>
+</INDEXTERM>
+<SECT3>
+<TITLE>Syntax</TITLE>
+<PARA>The syntax is: <PROGRAMLISTING>relate
+     <PARAMETER>COMPONENT1</PARAMETER> <PARAMETER>     RELATIONSHIP</PARAMETER>
+     <PARAMETER>COMPONENT2</PARAMETER></PROGRAMLISTING><PROGRAMLISTING>     unrelate <PARAMETER>COMPONENT1</PARAMETER>
+     <PARAMETER>RELATIONSHIP</PARAMETER> <PARAMETER>     COMPONENT2</PARAMETER></PROGRAMLISTING>where </PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA>The <PARAMETER>COMPONENT1</PARAMETER> and <PARAMETER>COMPONENT2
+	</PARAMETER> parameters are reference names of existing component instances. 
+       </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA> The <PARAMETER>RELATIONSHIP</PARAMETER> parameter is the
+	name of a component relationship supported by <PARAMETER>COMPONENT1</PARAMETER>.
+       </PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+<EXAMPLE>
+<TITLE><COMMAND>relate</COMMAND> and
+      <COMMAND>unrelate</COMMAND></TITLE>
+<PROGRAMLISTING>relate
+      gdb-interface target cpu</PROGRAMLISTING>
+<PROGRAMLISTING>unrelate cpu coprocessor cop </PROGRAMLISTING>
+</EXAMPLE>
+</SECT3>
+<SECT3>
+<TITLE>Function</TITLE>
+<PARA>Adds or removes a supervisory relationship between the
+     named components.  Each SID component may define its own set of
+     component relationships. See the component reference
+     sections for the list of relationships it supports.  It is
+     an error to create duplicate relationships, for example by
+     repeating the same command. </PARA>
+</SECT3>
+<SECT3>
+<TITLE>Technical Notes</TITLE>
+<PARA>This command causes a SID component API call to be placed
+     on <PARAMETER> COMPONENT1</PARAMETER>, supplying
+     <PARAMETER>RELATIONSHIP</PARAMETER> and <PARAMETER>     COMPONENT2</PARAMETER>. For more information on the SID component
+     API, refer to the Component Developer's Kit Reference manual.
+     With a component relationship, <PARAMETER> COMPONENT1</PARAMETER>
+     is able to make any low-level SID API call on <PARAMETER>     COMPONENT2</PARAMETER>. </PARA>
+</SECT3>
+</SECT2>
+<SECT2>
+<TITLE>Lexer Issues</TITLE>
+<INDEXTERM>
+<PRIMARY>configuration
+    file</PRIMARY>
+<SECONDARY>lexer</SECONDARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>configuration
+    file</PRIMARY>
+<SECONDARY>comments in</SECONDARY>
+</INDEXTERM>
+<PARA>The configuration file may contain blank lines. Comments
+    begin with the <LITERAL>#</LITERAL> character and terminate at
+    end-of-line. Blank lines and comments are ignored during parsing.
+    All commands take some arguments.  All arguments are strings. A
+    string is a white-space-separated sequence of printable
+    (<LITERAL>isprint()</LITERAL>) characters.  Strings may be
+    enclosed in double quotes. If started with double-quotes, all
+    characters between opening and closing quotes are included in the
+    string. Backslash characters ( "\" ) escape double-quotes and
+    backslash characters, in the usual C convention.  The string
+    <LITERAL>\n</LITERAL> is interpreted as a C <LITERAL>\n</LITERAL>.
+    Without double-quotes, strings are taken to be
+    whitespace-separated words.  A <LITERAL>#</LITERAL> character
+    found where a string is expected is interpreted as a comment to
+    end-of-line, and the search for the next string found is returned
+    instead.</PARA>
+</SECT2>
+</SECT1>
+</CHAPTER>
+<CHAPTER ID="HOWTOREADCOMPREF">
+<TITLE>How to Understand Component Reference Information</TITLE>
+<INDEXTERM>
+<PRIMARY>component reference
+  information</PRIMARY>
+<SECONDARY>how to read</SECONDARY>
+</INDEXTERM>
+<PARA> Every SID component has an associate text file that documents
+  the component according to a standard template. The template is
+  meant to include enough information for you to use the component in
+  a simulation run. It includes a basic functional description and
+  detailed low-level configuration information.
+  </PARA>
+<PARA> The component documentation does not attempt to describe an
+  application programmer's view of a hardware-oriented component, so
+  it is not a programming manual. You should refer to the hardware
+  manufacturer's data books for this kind of information. </PARA>
+<SECT1>
+<TITLE>Finding Component Reference Information</TITLE>
+<INDEXTERM>
+<PRIMARY>component reference
+   information</PRIMARY>
+<SECONDARY>searching
+   for</SECONDARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>documentation</PRIMARY>
+<SECONDARY>for
+   individual components</SECONDARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>siddoc</PRIMARY>
+<SECONDARY>searching for
+   documentation</SECONDARY>
+</INDEXTERM>
+<PARA>To search for and display installed component documentation
+   files that match a given substring, use the
+   <COMMAND>siddoc</COMMAND> command. </PARA>
+<PARA>Usage: </PARA>
+<PROGRAMLISTING>siddoc [-l] name
+   ... </PROGRAMLISTING>
+<PARA>where</PARA>
+<VARIABLELIST>
+<VARLISTENTRY>
+<TERM><PARAMETER>name</PARAMETER></TERM>
+<LISTITEM>
+<PARA>is a substring of the desired component type name</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM><PARAMETER>-l</PARAMETER></TERM>
+<LISTITEM>
+<PARA>specifies that you only want matching component types to
+      be listed, instead of the actual documentation. Without
+      <PARAMETER>-l</PARAMETER>, each matching documentation file will
+      be displayed on the screen by running the <COMMAND>      more</COMMAND> program.The default <COMMAND>more</COMMAND> may
+      be overridden by setting the <ENVAR>PAGER</ENVAR> environment
+      variable. </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+</VARIABLELIST>
+<PARA>Examples: </PARA>
+<VARIABLELIST>
+<VARLISTENTRY>
+<TERM><USERINPUT>siddoc -l hw-cpu</USERINPUT></TERM>
+<LISTITEM>
+<PARA>will show <FILENAME>hw-cpu-arm7t hw-cpu-m32r/d</FILENAME>
+      and any other CPU-type components that have documentation
+      files.</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM><USERINPUT>siddoc memory-flash uart</USERINPUT></TERM>
+<LISTITEM>
+<PARA>will display the documentation files of both
+      <FILENAME>hw-memory-flash-* </FILENAME> components, then the
+      <FILENAME>hw-uart-*</FILENAME> components.
+      </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+</VARIABLELIST>
+</SECT1>
+<SECT1>
+<TITLE>Parts of the Component Documentation Template</TITLE>
+<INDEXTERM>
+<PRIMARY>component documentation
+   template</PRIMARY>
+<SECONDARY> parts of</SECONDARY>
+</INDEXTERM>
+<PARA>The simulation component documentation template is broken
+   into the following sections.  </PARA>
+<SECT2>
+<TITLE>Name</TITLE>
+<INDEXTERM>
+<PRIMARY>component name</PRIMARY>
+</INDEXTERM>
+<PARA>This item provides the SID component-type name. In cases
+    where a family of components may be described together, this item
+    may list several names.
+    </PARA>
+<PARA>SID component-type names are structured so that the first
+    part of the component-type name indicates the category of thing
+    that is simulated: </PARA>
+<ITEMIZEDLIST>
+<LISTITEM>
+<PARA><FILENAME>hw</FILENAME> usually indicates that
+     the simulated component represents hardware. </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA><FILENAME>sw</FILENAME> indicates that the
+     simulated component represents software.</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA><FILENAME>sid</FILENAME> indicates that the simulated component
+       performs special simulation management tasks.</PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+</SECT2>
+<SECT2>
+<TITLE>Synopsis</TITLE>
+<INDEXTERM>
+<PRIMARY>synopsis</PRIMARY>
+</INDEXTERM>
+<PARA>The Synopsis summarizes the component's purpose and lists
+    its external interfaces in a condensed form. The summary includes
+    a complete list of the names of the component's pins, buses,
+    accessors, attributes, and relationships.  These names may be
+    referenced in SID configuration files, or by other supervisory
+    components.  The last items in this section list the component
+    library file and symbol names in which this component-type is
+    found. Supply these two names to a load configuration file
+    command. </PARA>
+</SECT2>
+<SECT2>
+<TITLE>Functionality</TITLE>
+<INDEXTERM>
+<PRIMARY>functionality</PRIMARY>
+</INDEXTERM>
+<PARA> This section gives detailed information about how this
+    component operates.  It has several subsections. </PARA>
+<SECT3>
+<TITLE>Modelling</TITLE>
+<INDEXTERM>
+<PRIMARY>modelling</PRIMARY>
+</INDEXTERM>
+<PARA>The modelling subsection discusses the relationship of this
+     SID component to the real thing (maybe hardware) being
+     modelled. The scope of simulation focuses on whatever important
+     differences exist between a simulated program's view of the SID
+     model versus reality.</PARA>
+</SECT3>
+<SECT3>
+<TITLE>Behaviors</TITLE>
+<INDEXTERM>
+<PRIMARY>behaviors</PRIMARY>
+</INDEXTERM>
+<PARA>The behaviors subsection describes in detail how the SID component operates.
+      Each separate behavior (stage of life, or independent processing activity)
+      is described separately. Each behavior section describes what triggers the
+      behavior (usually a pin, bus, or attribute call), what the component does
+      internally in response, and what external results may be visible. These sections
+      reference the low-level pin, bus, etc. names. </PARA>
+</SECT3>
+<SECT3>
+<TITLE>SID Conventions</TITLE>
+<INDEXTERM>
+<PRIMARY>conventions</PRIMARY>
+</INDEXTERM>
+<PARA>The conventions subsection describes which SID behaviors the component
+      supports. These are called conventions, since they are high-level behaviors
+      expressed exclusively in terms of lower-level constructs (pins, attributes,
+      and so on).  The following is a list of SID conventions. </PARA>
+</SECT3>
+<SECT3>
+<TITLE>Supervisory versus Functional</TITLE>
+<INDEXTERM>
+<PRIMARY>supervisory components</PRIMARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>functional components</PRIMARY>
+</INDEXTERM>
+<PARA>A supervisory component may manipulate other components using the full
+      SID API. A functional component uses only the pin and bus APIs to communicate
+      with its neighbors. Most hardware modelling components are functional; most
+      simulator control components are supervisory.</PARA>
+</SECT3>
+<SECT3>
+<TITLE>Target View Support</TITLE>
+<INDEXTERM>
+<PRIMARY>target view support</PRIMARY>
+</INDEXTERM>
+<PARA>A SID component that supports the target view specially
+      exports some attributes. The component classifies these selected attributes
+      with one of the category names pin, register, or setting. The component internally
+      associates these attributes with operations on actual SID pins or other state.
+     </PARA>
+<PARA>The target view will allow attributes of these three categories to be
+      interacted with ( display = read, update = write ). The write routines associated
+      with these attributes should be generous to permit the user a wide range of
+      valid input formats.  </PARA>
+<PARA>A SID component that does not support the target view may still be a
+      first class member of a SID configuration. It will be harder for a user to
+      interact with the component, that's all. </PARA>
+</SECT3>
+<SECT3>
+<TITLE>State Save/Restore Support</TITLE>
+<INDEXTERM>
+<PRIMARY>state save/restore support</PRIMARY>
+</INDEXTERM>
+<PARA>A SID component that supports standard state save/restore function does
+      so by exporting an attribute named state-snapshot. When read, the attribute
+      value represents a subset of the internal state of the component; this is
+      the state save operation. When written to with the string from a previous
+      read, the internal state of the component will be reset according to the supplied
+      string; this is the restore operation.  </PARA>
+<PARA>Normally, components endavour to save and restore the subset state that
+      may be visible to an executing simulated application. Some components may
+      save/restore additional state like configuration preferences, or transitory
+      attributes.  </PARA>
+<PARA>A SID component that does not support state save/restore may not be
+      safe to interoperate with other components after a restore operation.</PARA>
+</SECT3>
+<SECT3>
+<TITLE>Triggerpoint Support</TITLE>
+<INDEXTERM>
+<PRIMARY>triggerpoint support</PRIMARY>
+</INDEXTERM>
+<PARA>A SID component that supports triggerpoints allows some internal state
+      to be watched or monitored for certain conditions. Watch criteria include
+      any change, matching a given value, or matching a given value with a given
+      boolean mask. Whenever a component detects that an active watching criterion
+      succeeds, it drive a special output pin.  </PARA>
+<PARA>The watchable internal state values are advertised as attributes with
+      the additional category watchable. Watching such a state value involves, at
+      the low level, connecting to a virtual output pins that has a special name.
+      The name encodes the watchable item and a specification of the watch criterion.
+     </PARA>
+<PARA>A SID component that does not support triggerpoints may still be a first
+      class member of a SID configuration. Monitoring the component's internal state
+      may simply be slow and cumbersome.</PARA>
+</SECT3>
+<SECT3>
+<TITLE>Reentrancy</TITLE>
+<INDEXTERM>
+<PRIMARY>reentrancy</PRIMARY>
+</INDEXTERM>
+<PARA>Some SID components defend themselves against reentrancy. Since SID
+      components tend to perform activity by calling other SID components, it is
+      conceivable that the called component may in turn call back to the original
+      component. It is a possible problem because some components may have internal
+      data structures that are not in a consistent state at the moment of a reentrant
+      call. It is also possible that infinite recursion could result.  </PARA>
+<PARA>A SID component that defends itself against reentrancy does this by
+      run-time checks around certain incoming calls, like specific pin or bus signals,
+      or attribute accesses. When it detects that more than some number of calls
+      are in progress, it signals an error message and may even shut SID down.</PARA>
+<PARA>A SID component that does not defend itself against reentrancy may nevertheless
+      be vulnerable to the problem. It may be unable to detect the situation before
+      it becomes a failure.</PARA>
+<PARA>In order to avoid triggering these detection measures, it is important
+      that a SID configuration avoid the possibility of violation of the reentrancy
+      restrictions of a component. For example, avoid creating pin or bus connections
+      that cause gratuitous loops, and abusing supervisory components.</PARA>
+</SECT3>
+</SECT2>
+<SECT2>
+<TITLE>Environment</TITLE>
+<INDEXTERM>
+<PRIMARY>environment</PRIMARY>
+<SECONDARY>component interaction
+      with</SECONDARY>
+</INDEXTERM>
+<PARA> This section talks about how instances of this component interact with
+     their environment. </PARA>
+<SECT3>
+<TITLE>Related Components</TITLE>
+<INDEXTERM>
+<PRIMARY>relationships between components</PRIMARY>
+</INDEXTERM>
+<PARA>SID components are meant to connect to each other. This section discusses
+      what other components work well together with this one. It may include configuration
+      file fragments to demonstrate minimal interconnection instructions.  </PARA>
+</SECT3>
+<SECT3>
+<TITLE>Host System</TITLE>
+<INDEXTERM>
+<PRIMARY>host system</PRIMARY>
+</INDEXTERM>
+<PARA>Since SID components are software modules that run on the host, they
+      naturally interact with the host system. In some cases, there may be significant
+      resource consumption issues that a user needs to be aware of. This section
+      talks about what kind of impact this component may have on the host, including
+      host I/O, security concerns, memory consumption, performance, and error handling
+      conventions.  </PARA>
+</SECT3>
+</SECT2>
+<SECT2>
+<TITLE>SID Interface Reference</TITLE>
+<INDEXTERM>
+<PRIMARY>SID interface reference</PRIMARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>reference</PRIMARY>
+<SECONDARY>SID interface</SECONDARY>
+</INDEXTERM>
+<PARA>This section discusses the interfaces of this SID component in a tabular
+     reference format. There are several formats, one per low level interface.
+     In all cases, the table rows cross-reference to the Behaviors section, where
+     fuller details about the use of that item may be found (see Behaviors for
+     more details).  </PARA>
+<SECT3>
+<TITLE>Pins</TITLE>
+<INDEXTERM>
+<PRIMARY>pin reference information</PRIMARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>reference information</PRIMARY>
+<SECONDARY>pins</SECONDARY>
+</INDEXTERM>
+<VARIABLELIST>
+<VARLISTENTRY>
+<TERM>Column 1: Name</TERM>
+<LISTITEM>
+<PARA>Gives the string that the connect-pin configuration command may use
+	 to reference this pin. </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Column 2: Directionality</TERM>
+<LISTITEM>
+<PARA> Identifies this pin as a possible input, output, or both.</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Column 3: Legal Values</TERM>
+<LISTITEM>
+<PARA>Lists the range of values that may be driven into this pin (if an input),
+	 or what values may be driven outward (if output). The values may be limited
+	 to a subrange of the host_int_4 type.</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Column 4: Behavior </TERM>
+<LISTITEM>
+<PARA>References the behaviors associated with this pin</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+</VARIABLELIST>
+</SECT3>
+<SECT3>
+<TITLE>Buses</TITLE>
+<INDEXTERM>
+<PRIMARY>bus reference information</PRIMARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>reference information</PRIMARY>
+<SECONDARY>buses</SECONDARY>
+</INDEXTERM>
+<VARIABLELIST>
+<VARLISTENTRY>
+<TERM>Column 1: Name </TERM>
+<LISTITEM>
+<PARA>Gives the string with which the connect-bus configuration command may
+	 reference this bus. </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Column 2: Address Range</TERM>
+<LISTITEM>
+<PARA> Identifies the supported range of addresses for accesses on this bus. 
+	</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Column 3: Access Types </TERM>
+<LISTITEM>
+<PARA>Lists what subset of size, endianness, and read/write accesses are supported.
+	</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Column 4: Behavior </TERM>
+<LISTITEM>
+<PARA>References the behaviors associated with this bus. </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+</VARIABLELIST>
+</SECT3>
+<SECT3>
+<TITLE>Accessors</TITLE>
+<INDEXTERM>
+<PRIMARY>accessor reference information</PRIMARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>reference information</PRIMARY>
+<SECONDARY>accessors</SECONDARY>
+</INDEXTERM>
+<VARIABLELIST>
+<VARLISTENTRY>
+<TERM>Column 1: Name  </TERM>
+<LISTITEM>
+<PARA>Gives the string with which the <COMMAND>connect-bus</COMMAND> configuration
+	 command may reference this accessor.</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Column 2: Access Types </TERM>
+<LISTITEM>
+<PARA>Lists what subset of size, endianness, and read/write accesses may be
+	 made by this component using this accessor. </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Column 3: Behavior </TERM>
+<LISTITEM>
+<PARA>References the behaviors associated with this accessor. </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+</VARIABLELIST>
+</SECT3>
+<SECT3>
+<TITLE>Attributes</TITLE>
+<INDEXTERM>
+<PRIMARY>attribute reference information</PRIMARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>reference information</PRIMARY>
+<SECONDARY>attributes</SECONDARY>
+</INDEXTERM>
+<VARIABLELIST>
+<VARLISTENTRY>
+<TERM>Column 1: Name  </TERM>
+<LISTITEM>
+<PARA> Gives the string with which the <COMMAND>set</COMMAND> configuration
+	 command may reference this attribute.</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Column 2: Categories </TERM>
+<LISTITEM>
+<PARA>Lists the category names under which this attribute is classified. 
+	</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Column 3: Legal Values / Default Values </TERM>
+<LISTITEM>
+<PARA>Describes legal values of this attribute, for both reading and writing,
+	 and may include the default value.  There are several common attribute value
+	 formats:  <ITEMIZEDLIST>
+<LISTITEM>
+<PARA><EMPHASIS>numeric</EMPHASIS> strings are C-style integral
+	    numeric literals like <LITERAL>0</LITERAL>, <LITERAL>0xEEEF</LITERAL>, <LITERAL>	     0377</LITERAL>, <LITERAL>0b1101101</LITERAL>, and <LITERAL>-75</LITERAL>.
+	   </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA><EMPHASIS>boolean</EMPHASIS> strings are values such as true,
+	    false, n, yes, 0, and 1.</PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA><EMPHASIS>general</EMPHASIS> strings containing a sequence
+	    of unrestricted binary bytes.</PARA>
+</LISTITEM>
+</ITEMIZEDLIST></PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Column 4: Behavior </TERM>
+<LISTITEM>
+<PARA>References the behaviors associated with this attribute. </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+</VARIABLELIST>
+</SECT3>
+<SECT3>
+<TITLE>Relationships</TITLE>
+<INDEXTERM>
+<PRIMARY>relationship reference information</PRIMARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>reference information</PRIMARY>
+<SECONDARY>relationships
+      </SECONDARY>
+</INDEXTERM>
+<VARIABLELIST>
+<VARLISTENTRY>
+<TERM>Column 1: Name </TERM>
+<LISTITEM>
+<PARA>Gives the string with which the relate configuration command may reference
+	 this relationship.</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Column 2: Behavior </TERM>
+<LISTITEM>
+<PARA>References the behaviors associated with this relationship. </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+</VARIABLELIST>
+</SECT3>
+</SECT2>
+<SECT2>
+<TITLE>References</TITLE>
+<PARA>This section may refer the reader to further material describing the
+     component, or its real-world image.</PARA>
+</SECT2>
+</SECT1>
+</CHAPTER>
+<CHAPTER ID="USINGSID">
+<TITLE>Using SID</TITLE>
+<SECT1>
+<TITLE>Running SID</TITLE>
+<PARA>SID is essentially a batch process. It reads a configuration
+    file (see <XREF LINKEND="WORKINGWITHCONFIGFILE">&#62;) and executes its
+    contents. Thus the basic invocation interface is simple; the hard
+    part is writing a complete, useful configuration file. There are
+    two ways, commonly, of using SID: direct invocation on a
+    task-specific configuration file, and through a wrapper that sets
+    up a more generic simulation environment.</PARA>
+<SECT2>
+<TITLE>Direct invocation</TITLE>
+<PARA>The most direct (and flexible) way of running SID is
+     with the command-line:</PARA>
+<CMDSYNOPSIS>
+<COMMAND>sid</COMMAND>
+<ARG>-h</ARG>
+<ARG>-n</ARG>
+<ARG>-f <REPLACEABLE>FILE</REPLACEABLE></ARG>
+<ARG>-e <REPLACEABLE>LINE</REPLACEABLE></ARG>
+<ARG REP="REPEAT"><REPLACEABLE>CONFIG_FILE</REPLACEABLE></ARG>
+</CMDSYNOPSIS>
+<TABLE>
+<TITLE>SID Options</TITLE>
+<TGROUP COLS="2">
+<THEAD>
+<ROW>
+<ENTRY>Option</ENTRY>
+<ENTRY>Meaning</ENTRY>
+</ROW>
+</THEAD>
+<TBODY>
+<ROW>
+<ENTRY>-h</ENTRY>
+<ENTRY>print this help</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>-n</ENTRY>
+<ENTRY>load/check configuration but do not run simulation</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>-f <REPLACEABLE>FILE</REPLACEABLE></ENTRY>
+<ENTRY>also read configuration <REPLACEABLE>FILE</REPLACEABLE></ENTRY>
+</ROW>
+<ROW>
+<ENTRY>-e <REPLACEABLE>LINE</REPLACEABLE></ENTRY>
+<ENTRY>also do configuration <REPLACEABLE>LINE</REPLACEABLE></ENTRY>
+</ROW>
+</TBODY>
+</TGROUP>
+</TABLE>
+<PARA>All <OPTION>-f</OPTION>/<OPTION>-e</OPTION> options are
+     performed first, in sequence. Any
+     <REPLACEABLE>CONFIG_FILE</REPLACEABLE> names supplied without
+     <OPTION>-f</OPTION> are done last, in sequence.</PARA>
+<EXAMPLE>
+<TITLE>SID invocations</TITLE>
+<VARIABLELIST>
+<VARLISTENTRY>
+<TERM><USERINPUT>sid arm7t-config</USERINPUT></TERM>
+<LISTITEM>
+<PARA>runs the simulation environment described in <FILENAME>arm7t-config</FILENAME></PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM><USERINPUT>sid -e 'set angel command-line "simulated banana"' arm7t-config</USERINPUT></TERM>
+<LISTITEM>
+<PARA>executes the supplied configuration line
+	 (setting the command line to "simulated banana") and
+	 then runs the simulation environment described in
+	 <FILENAME>arm7t-config</FILENAME></PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM><USERINPUT>sid -f special-settings arm7t-config</USERINPUT></TERM>
+<LISTITEM>
+<PARA>executes any directives in the file
+	 <FILENAME>special-settings</FILENAME>, then runs
+	 the simulation environment described in
+	 <FILENAME>arm7t-config</FILENAME></PARA>
+</LISTITEM>
+</VARLISTENTRY>
+</VARIABLELIST>
+</EXAMPLE>
+<PARA>Invoking SID this way is simple, but requires a detailed
+     configuration file <OPTION>CONFIG_FILE</OPTION> in order to
+     perform any interesting simulation tasks. Since many components and
+     connections will vary only slightly between simulation runs, it
+     is often beneficial to introduce a "wrapper" program which
+     automatically constructs configuration files from common
+     idioms.</PARA>
+</SECT2>
+<SECT2>
+<TITLE>Invocation through a wrapper</TITLE>
+<PARA>A common wrapper around the
+     <FILENAME>sid</FILENAME> binary is the perl script
+     <FILENAME>configrun-sid</FILENAME>, which accepts more
+     customization options and writes a temporary configuration file
+     containing a relatively common arrangement of CPU, memory,
+     gloss, scheduler, mapper, I/O and debugger components,
+     representative of an embedded system "target board". 
+     It is
+     invoked with the command-line </PARA>
+<CMDSYNOPSIS>
+<COMMAND>configrun-sid</COMMAND>
+<ARG>--help</ARG>
+<ARG CHOICE="REQ">--cpu=<REPLACEABLE>CPU</REPLACEABLE></ARG>
+<ARG>--verbose</ARG>
+<ARG>--save-temps</ARG>
+<SBR>
+<ARG>--trace-extract</ARG>
+<ARG>--trace-semantics</ARG>
+<ARG>--trace-core</ARG>
+<SBR>
+<ARG>--memory-region=<REPLACEABLE>BASE</REPLACEABLE>,<REPLACEABLE>SIZE</REPLACEABLE>
+      <GROUP CHOICE="OPTMULT">
+<ARG>,read-only</ARG>
+<ARG>,alias=<REPLACEABLE>BASE2</REPLACEABLE></ARG>
+<ARG>,file=<REPLACEABLE>FILENAME</REPLACEABLE></ARG>
+<ARG>,mmap</ARG>
+</GROUP></ARG>
+<SBR>
+<ARG>--gdb=<REPLACEABLE>PORT</REPLACEABLE></ARG>
+<ARG>--board=<REPLACEABLE>BOARD</REPLACEABLE></ARG>
+<ARG>--engine=<GROUP>
+<ARG>scache</ARG>
+<ARG>pbb</ARG>
+</GROUP></ARG>
+<GROUP>
+<ARG>-EB</ARG>
+<ARG>-EL</ARG>
+</GROUP>
+<SBR>
+<ARG>--tksm</ARG>
+<ARG>--persistent</ARG>
+<ARG>--no-run</ARG>
+<ARG>--insn-count=<REPLACEABLE>N</REPLACEABLE></ARG>
+<ARG>--gprof</ARG>
+<ARG>--wrap=<REPLACEABLE>COMPONENT</REPLACEABLE></ARG>
+</CMDSYNOPSIS>
+<TABLE>
+<TITLE>configrun-sid Options</TITLE>
+<TGROUP COLS="3">
+<THEAD>
+<ROW>
+<ENTRY>Option</ENTRY>
+<ENTRY>Meaning</ENTRY>
+<ENTRY>Default</ENTRY>
+</ROW>
+</THEAD>
+<TBODY>
+<ROW>
+<ENTRY>--help</ENTRY>
+<ENTRY>Print this help message.</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--cpu=CPU</ENTRY>
+<ENTRY>Select target processor</ENTRY>
+<ENTRY>none</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--verbose</ENTRY>
+<ENTRY>Turn on various run-time verbosity settings.</ENTRY>
+<ENTRY>no</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--save-temps</ENTRY>
+<ENTRY>Keep generated sid configuration file.</ENTRY>
+<ENTRY>no</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--trace-extract</ENTRY>
+<ENTRY>Turn on CPU insn decode tracing.</ENTRY>
+<ENTRY>no</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--trace-semantics</ENTRY>
+<ENTRY>Turn on CPU insn execute tracing.</ENTRY>
+<ENTRY>no</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--trace-core</ENTRY>
+<ENTRY>Turn on bus access tracing.</ENTRY>
+<ENTRY>no</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--memory-region=BASE,SIZE</ENTRY>
+<ENTRY>Add RAM region from BASE to
+	 BASE+SIZE-1. Additional options may be appended,
+	 separated by commas: <OPTION>read-only</OPTION> flags
+	 this region as read-only,
+	 <OPTION>alias=<REPLACEABLE>BASE2</REPLACEABLE></OPTION>
+	 adds an alias to this region at
+	 <REPLACEABLE>BASE2</REPLACEABLE>,
+	 <OPTION>file=<REPLACEABLE>FILENAME</REPLACEABLE></OPTION>
+	 loads and saves this memory region from a file, and
+	 <OPTION>mmap</OPTION> memory-maps such a file rather
+	 than loading it.</ENTRY>
+<ENTRY>no</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--gdb=<REPLACEABLE>PORT</REPLACEABLE></ENTRY>
+<ENTRY>Add a gdb/debugger interface on TCP port.</ENTRY>
+<ENTRY>none</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--board=<REPLACEABLE>BOARD</REPLACEABLE></ENTRY>
+<ENTRY>Model given board or system.</ENTRY>
+<ENTRY>gloss</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--engine=scache|pbb</ENTRY>
+<ENTRY>Set given cgen CPU engine.</ENTRY>
+<ENTRY>pbb</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>-EB | -EL</ENTRY>
+<ENTRY>Set powerup CPU mode to big/little endian.</ENTRY>
+<ENTRY>auto</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--tksm</ENTRY>
+<ENTRY>Add an experimental Tk system monitor.</ENTRY>
+<ENTRY>no</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--persistent</ENTRY>
+<ENTRY>Rerun top-level loop indefinitely.</ENTRY>
+<ENTRY>no</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--no-run</ENTRY>
+<ENTRY>Make config file (--save-temps) and exit.</ENTRY>
+<ENTRY>no</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--insn-count=<REPLACEABLE>N</REPLACEABLE></ENTRY>
+<ENTRY>Block of uninterrupted ticks for insns.</ENTRY>
+<ENTRY>10000</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--gprof</ENTRY>
+<ENTRY>GPROF-profile, collect every N ticks.</ENTRY>
+<ENTRY>no</ENTRY>
+</ROW>
+<ROW>
+<ENTRY>--wrap=<REPLACEABLE>COMPONENT</REPLACEABLE></ENTRY>
+<ENTRY>Turn on SID API tracing for named component.</ENTRY>
+<ENTRY>none</ENTRY>
+</ROW>
+</TBODY>
+</TGROUP>
+</TABLE>
+<PARA>     Typically, if SID is built along with a GNU toolchain, the
+     build process also produces a wrapper shell script around
+     <FILENAME>configrun-sid</FILENAME>, such as
+     <FILENAME>arm-elf-sid</FILENAME>, which in turn executes
+     <FILENAME>configrun-sid ---cpu arm</FILENAME>. This is simply
+     for uniform naming with the other target-specific portions of
+     the toolchain, such as <FILENAME>arm-elf-gcc</FILENAME> or
+     <FILENAME>arm-elf-ld</FILENAME>.
+    </PARA>
+</SECT2>
+</SECT1>
+<SECT1>
+<TITLE>SID Startup</TITLE>
+<PARA>SID is started up when the <LITERAL>run!</LITERAL> pin is
+    down, which results in the simulation top level loop beginning. The
+    first action is that all the components reported in the SID
+    configuration file are configured together in the specified manner in
+    the configuration file. After the relationships are established, the
+    main loop regains control to complete any further steps and after the
+    main loop is completed, the control is returned to the function that
+    sent the <COMMAND>run!</COMMAND> command.</PARA>
+</SECT1>
+<SECT1>
+<TITLE>Creating an Application to Run on SID</TITLE>
+<PARA>The target code is developed in a similar manner as you
+    would for developing code to run on the target hardware. The source
+    code is either written in C or C++ and is then compiled, assembled and
+    linked for arm-elf format. The user then has the ability to download
+    to the target hardware or on SID. The simulator supports the ARM
+    architectures for this release in both big-endian and little-endian
+    and in elf file format. The default is big-endian. Once the code is
+    loaded on SID, the execution and debugging proceed in the usual
+    manner.</PARA>
+<GRAPHIC FILEREF="images/sid-diagram.jpg" SCALE="55"></GRAPHIC>
+<PARA></PARA>
+</SECT1>
+<SECT1>
+<TITLE>Debugging Using SID</TITLE>
+<PARA>Aside from providing
+    interactive monitoring of a simulation through a console or TK
+    visual interface, SID provides mechanisms to debug and profile the
+    simulation environment with conventional GNU development tools
+    such as <FILENAME>gdb</FILENAME> and <FILENAME>gprof</FILENAME>. The
+    following sections assume familiarity with these GNU tools, and
+    focus on describing their interfaces with SID. The debugging and
+    profiling components provided with SID are normal components, and
+    certainly other such debugging and profiling components could be
+    made. They do not have nor need special access to anything outside
+    the normal SID component API; they merely serve as bridges between
+    SID and other existing tools.
+   </PARA>
+<SECT2>
+<TITLE>Using GDB</TITLE>
+<PARA>The debugging interface is designed resemble working with
+     a remote "target board", using the GDB remote protocol. The SID
+     simulation is run with a configuration that instantiates a
+     <FILENAME>sw-debug-gdb</FILENAME> GDB stub component connected
+     to a <FILENAME>sid-io-socket-server</FILENAME> socket component,
+     which serves a connection between the GDB stub component and a
+     remote debugger. The GDB stub component is configured to monitor
+     and control other components within the simulation environment,
+     such as CPU and system scheduler, in response to commands it
+     receives from the socket component. A simulation user wishing
+     to debug the simulation runs <FILENAME>gdb</FILENAME> as usual, on
+     any machine capable of connecting to the host running the
+     simulation, but directs it to the TCP socket configured into the
+     socket component in the simulation. The user can then proceed to
+     debug the simulation exactly as if it were a "real" target
+     environment.
+    </PARA>
+<PARA>Configuring the GDB stub and socket components is somewhat
+     lengthy and verbose, but is performed automatically by the
+     <FILENAME>configrun-sid</FILENAME> command when
+     invoked with the
+     <FILENAME>---gdb=<REPLACEABLE>PORT</REPLACEABLE></FILENAME>
+     option.  For complete details of the connection process, see
+     <FILENAME>siddoc sw-debug-gdb</FILENAME>.
+    </PARA>
+</SECT2>
+<SECT2>
+<TITLE>Profiling</TITLE>
+<PARA>The profiling facility consists of the standard GNU
+     profile-analysis tool <FILENAME>gprof</FILENAME>, along with a
+     SID component <FILENAME>sw-profile-gprof</FILENAME>. The
+     component is loaded into a SID session and configured to sample
+     any other component's numeric attribute, and record a
+     histogram. The histogram is then output to a file, and
+     <FILENAME>gprof</FILENAME> interprets the file as a "flat
+     profile". The profiling component has no call-graph collection
+     facility.
+    </PARA>
+<PARA>When the profiling component's <FUNCTION>sample</FUNCTION> pin
+     is driven, it uses its <FUNCTION>value-attribute</FUNCTION>
+     attribute as the <EMPHASIS>name</EMPHASIS> of an attribute to
+     sample on the component in its <FUNCTION>target-component</FUNCTION>
+     relation. The sample is taken immediately, interpreted as a
+     numeric string, and stored in a histogram bucket. The histogram
+     bucket's width, in bytes, is specified by the profiling
+     component's <FUNCTION>bucket-size</FUNCTION> attribute.
+    </PARA>
+<PARA>When the profiling component's <FUNCTION>store</FUNCTION> pin
+     is driven, the histogram is dumped to the file named in the
+     profiling component's <FUNCTION>output-file</FUNCTION> attribute,
+     which has a default value of <FILENAME>gmon.out</FILENAME>.  The
+     histogram is not cleared by this action, however. To clear the
+     histogram, the profiling component's <FUNCTION>reset</FUNCTION> must
+     be driven. Since dumping and resetting are separate operations,
+     one can collect multiple cumulative profiles of a value across a
+     single simulation run.
+    </PARA>
+<PARA>A simple configuration example is given below, showing a
+     connection between the profiling component and a cpu (assumed to
+     already be instantiated). For complete reference on the profiling
+     component, see <FILENAME>siddoc sw-profile-gprof</FILENAME>.
+    </PARA>
+<EXAMPLE>
+<TITLE>Profiling a CPU component's program counter</TITLE>
+<PROGRAMLISTING>      load libprof.la prof_component_library
+      new sw-profile-gprof gprof
+
+      relate gprof target-component cpu
+
+      set gprof value-attribute pc
+      set gprof bucket-size 4
+
+      connect-pin main perform-activity -&#62; gprof sample
+      connect-pin main stopping -&#62; gprof store
+     </PROGRAMLISTING>
+</EXAMPLE>
+<PARA></PARA>
+<PARA></PARA>
+</SECT2>
+</SECT1>
+</CHAPTER><!-- Index -->
+</BOOK><!-- Keep this comment at the end of the file
+Local variables:
+mode:sgml
+sgml-omittag:nil
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:1
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-default-dtd-file:"book-sid.ced"
+sgml-exposed-tags:nil
+sgml-local-catalogs:("/usr/share/sgml/docbook/sgml-dtd-3.0/catalog" "/usr/lib/sgml/CATALOG")
+sgml-local-ecat-files:nil
+sgml-namecase-general:t
+sgml-general-insert-case:lower
+End:
+-->

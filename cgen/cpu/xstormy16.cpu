@@ -424,16 +424,18 @@
 
 ; The all-purpose addition operation.
 (define-pmacro (set-psw-add Rd index a b c)
-  (sequence ((HI value))
+  (sequence ((HI value) (HI newpsw))
     (set value (addc a b c))
+    (set newpsw (or (or (and psw #x0F80)
+			(basic-psw value))
+		    (or (or (sll HI (add-oflag HI a b c) 4)
+			    (sll HI (add-cflag HI a b c) 2))
+			(or (and (srl HI (addc HI (and a #xF) (and b #xF) c) 
+				      1) #x8)
+			    (sll index 12)))))
     (set (reg HI h-gr index) value)
-    (set psw (or (or (and psw #x0F80)
-		     (basic-psw value))
-		 (or (or (sll HI (add-oflag HI a b c) 4)
-			 (sll HI (add-cflag HI a b c) 2))
-		     (or (and (srl HI (addc HI (and a #xF) (and b #xF) c) 
-				   1) #x8)
-			 (sll index 12)))))))
+    (set psw newpsw)
+    ))
 
 ; Set the PSW for a subtraction of a-b into Rd, but don't actually
 ; do the subtract.
@@ -452,16 +454,18 @@
 ; (this chip has a borrow for subtraction, rather than
 ; just using a carry for both).
 (define-pmacro (set-psw-sub Rd index a b c)
-  (sequence ((HI value))
+  (sequence ((HI value) (HI newpsw))
     (set value (subc a b c))
-    (set (reg HI h-gr index) value)
-    (set psw (or (or (and psw #x0F80)
+    (set newpsw (or (or (and psw #x0F80)
 		     (basic-psw value))
 		 (or (or (sll HI (sub-oflag HI a b c) 4)
 			 (sll HI (sub-cflag HI a b c) 2))
 		     (or (and (srl HI (subc HI (and a #xF) (and b #xF) c)
 				   1) #x8)
-			 (sll index 12)))))))
+			 (sll index 12)))))
+    (set (reg HI h-gr index) value)
+    (set psw newpsw)
+    ))
 
 ; A 17-bit rotate-left operation
 (define-pmacro (set-psw-rotate17 Rd index src c rot)

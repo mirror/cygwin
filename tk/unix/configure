@@ -2261,7 +2261,7 @@ esac
 # gdb linked statically w/ Solaris iff GCC and GNU ld are used,
 # otherwise dynamic
 #
-        sparc-sun-solaris2*)
+        *-*-solaris2*)
 	    sol_xlibsw=
             if test "x$GCC" = "xyes" ; then
 	       # This is probably the simplest way to test for GNU ld.

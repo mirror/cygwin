@@ -1,5 +1,10 @@
 2005-02-07  Jim Blandy  <jimb@redhat.com>
 
+	* guile.scm: New file, containing Guile-specific definitions and
+	adaptations.  This is loaded by the app-specific shell scripts.
+	Initially identical to fixup.scm.
+	* cgen-sid.scm: Don't load fixup.scm here.
+
 	* cos.scm: Profile elm-xset! when requested, not elm-set!; the
 	latter is a macro.
 

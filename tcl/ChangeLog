@@ -1,3 +1,14 @@
+2003-02-11  Martin M. Hunt  <hunt@redhat.com>
+	From Mumit Khan  <khan@nanotech.wisc.edu>
+
+	* generic/tclIOUtil.c (SetFsPathFromAny): Add Cygwin specific
+	code to convert POSIX filename to native format.
+	* generic/tclFileName.c (Tcl_TranslateFileName): And remove
+	from here.
+	(TclDoGlob): Adjust.
+	* win/tclWinFile.c (TclpObjChdir): Use chdir on Cygwin.
+
+
 2003-02-06  Martin M. Hunt  <hunt@redhat.com>
 
 	* win/tcl.m4 (SC_CONFIG_CFLAGS): Don't default to -O.

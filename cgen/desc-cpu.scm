@@ -365,7 +365,8 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
 			       '((max)))
 		       car))
    "/* Number of operands types.  */\n"
-   "#define MAX_OPERANDS ((int) @ARCH@_OPERAND_MAX)\n\n"
+   "#define MAX_OPERANDS " (number->string (length (gen-obj-list-enums (current-op-list)))) "\n\n"
+   ; was: "#define MAX_OPERANDS ((int) @ARCH@_OPERAND_MAX)\n\n"
    "/* Maximum number of operands referenced by any insn.  */\n"
    "#define MAX_OPERAND_INSTANCES "
    (number->string (max-operand-instances))

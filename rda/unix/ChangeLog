@@ -1,3 +1,9 @@
+2003-01-10  Kevin Buettner  <kevinb@redhat.com>
+
+	* Makefile.in: Regenerate using "automake --cygnus --ignore-deps".
+	Someday, when ``depcomp'' is added to the top level, the
+	--ignore-deps flag can be discarded.
+
 2002-12-18  Kevin Buettner  <kevinb@redhat.com>
 
 	* ptrace-target.h, ptrace-target.c (ptrace_write_user)

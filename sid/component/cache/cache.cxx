@@ -48,7 +48,11 @@ cache_component::cache_component (unsigned assocy,
 				  unsigned cache_sz, 
 				  unsigned line_sz,
 				  cache_replacement_algorithm& replacer)
-  :report_pin (this, &cache_component::emit_report),
+  :acache (cache_sz, line_sz, assocy, replacer),
+   upstream (*this),
+   downstream (0),
+   report_pin (this, &cache_component::emit_report),
+   flush_all_pin (this, &cache_component::flush_all_lines),
    flush_pin (this, &cache_component::flush_line),
    invalidate_all_pin (this, &cache_component::invalidate_all_lines),
    invalidate_pin (this, &cache_component::invalidate_line),
@@ -57,14 +61,13 @@ cache_component::cache_component (unsigned assocy,
    unlock_pin (this, &cache_component::unlock_line),
    write_allocate_p (false),
    write_through_p (false),
-   downstream (0),
-   upstream (*this),
    collect_p (true),
+   report_heading ("cache profile report"),
    line_size (line_sz),
    cache_size (cache_sz),
    assoc (assocy),
-   report_heading ("cache profile report"),
-   acache (cache_sz, line_sz, assocy, replacer)
+   hit_latency (0),
+   miss_latency (0)
 {
   memset (&stats, 0, sizeof (stats));
 
@@ -72,6 +75,7 @@ cache_component::cache_component (unsigned assocy,
   add_accessor ("downstream", &downstream);
   
   add_pin ("report!", &report_pin);
+  add_pin ("flush-all", &flush_all_pin);
   add_pin ("flush", &flush_pin);
   add_pin ("invalidate-all", &invalidate_all_pin);
   add_pin ("invalidate", &invalidate_pin);
@@ -347,12 +351,23 @@ cache_component::write_line (cache_line& line)
 }
 
 void
+cache_component::flush_all_lines (host_int_4)
+{
+  while (true)
+    {
+      cache_line* line = acache.find_any_dirty ();
+      if (line == 0) break;
+      (void) write_line (*line);
+    }
+}
+
+void
 cache_component::flush_line (host_int_4 addr)
 {
   bool hit;
   cache_line& line = acache.find (acache.addr_to_tag (addr), hit);
   if (hit && line.dirty_p ())
-    bus::status st = write_line (line);
+    (void) write_line (line);
 }
 
 void
@@ -374,7 +389,7 @@ void
 cache_component::prefetch_line (host_int_4 addr)
 {
   sid::big_int_1 dummy;
-  bus::status st = read_any (addr, dummy);
+  (void) read_any (addr, dummy);
 }
 
 void
@@ -535,11 +550,11 @@ cache_replacement_fifo::replace (cache_set& cset, cache_line& old_line, cache_li
 void
 cache_replacement_lru::replace (cache_set& cset, cache_line& old_line, cache_line new_line)
 {
-  int oldest;
+  unsigned oldest = 0;
   int index = -1;
   lru.resize (cset.num_lines ());
 
-  for (unsigned i = 0, oldest = 0; i < cset.num_lines (); i++)
+  for (unsigned i = 0; i < cset.num_lines (); i++)
     {
       cache_line& line = cset.get_line (i);
       if (!line.valid_p ())
@@ -640,9 +655,9 @@ CacheListTypes ()
 
   types.push_back ("hw-cache-basic");
 
-  for (int i = 0; i < (sizeof (assocs) / sizeof (string)); i++)
-    for (int j = 0; j < (sizeof (cache_sizes) / sizeof (string)); j++)
-      for (int k = 0; k < (sizeof (line_sizes) / sizeof (string)); k++)
+  for (unsigned i = 0; i < (sizeof (assocs) / sizeof (string)); i++)
+    for (unsigned j = 0; j < (sizeof (cache_sizes) / sizeof (string)); j++)
+      for (unsigned k = 0; k < (sizeof (line_sizes) / sizeof (string)); k++)
 	{
 	  if (assocs[i] == "direct")
 	    {
@@ -652,7 +667,7 @@ CacheListTypes ()
 	      types.push_back (type);
 	    }
 	  else
-	    for (int m = 0;
+	    for (unsigned m = 0;
 		 m < (sizeof (replacement_algorithms) / sizeof (string)); m++)
 	      {
 		type = string ("hw-cache-");
@@ -669,7 +684,7 @@ CacheListTypes ()
 static component*
 CacheCreate (const string& typeName)
 {
-  int i;
+  unsigned i;
   bool match;
 
   if (typeName == "hw-cache-basic")

@@ -116,7 +116,9 @@ Functionality:
    |                 | on a line that is present and |
    |                 | dirty, it will be flushed to  |
    |                 | memory and marked as not      |
-   |                 | dirty.                        |
+   |                 | dirty. The entire cache can   |
+   |                 | be flushed by driving         |
+   |                 | flush-all.                    |
    |-----------------+-------------------------------|
    |    invalidating | Lines in the cache that       |
    |                 | contain accurate contents are |
@@ -233,6 +235,8 @@ Component Reference:
    |--------------+---------+-----------+------------|
    |flush         |in       |32-bit     |flushing    |
    |              |         |address    |            |
+   |--------------+---------+-----------+------------|
+   |flush-all     |in       |any        |flushing    |
    |--------------+---------+-----------+------------|
    |invalidate    |in       |32-bit     |invalidating|
    |              |         |address    |            |

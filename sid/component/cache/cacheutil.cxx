@@ -209,6 +209,19 @@ cache_set::find (const cache_tag& tag, bool& hit)
   return dummy;
 }
 
+
+cache_line*
+cache_set::find_any_dirty ()
+{
+  for (iterator_t it = lines.begin (); it != lines.end (); it++)
+    {
+      cache_line* i = * it;
+      if (i->dirty_p ()) return i;
+    }
+
+  return 0;
+}
+
 void
 cache_set::invalidate ()
 {
@@ -306,7 +319,19 @@ cache::find (cache_tag tag, bool& hit)
   return sets[index]->find (tag, hit);
 }
 
-int
+cache_line*
+cache::find_any_dirty ()
+{
+  for (unsigned i = 0; i < this->num_sets(); i++)
+    {
+      cache_line* foo = sets[i]->find_any_dirty ();
+      if (foo) return foo;
+    }
+  return 0;
+}
+
+
+unsigned
 cache::num_sets ()
 {
   return sets.size ();

@@ -13,6 +13,7 @@
     <!-- pins -->
     <defpin name="report!" direction="in" behaviors="statistics reporting" />
     <defpin name="flush" direction="in" legalvalues="32-bit address" behaviors="flushing" />
+    <defpin name="flush-all" direction="in" legalvalues="any" behaviors="flushing" />
     <defpin name="invalidate" direction="in" legalvalues="32-bit address" behaviors="invalidating" />
     <defpin name="invalidate-all" direction="in" legalvalues="any" behaviors="invalidating" />
     <defpin name="prefetch" direction="in" legalvalues="32-bit address" behaviors="prefetching" />
@@ -146,7 +147,8 @@
 	a line to memory.  For this purpose, the component provides
 	<pin>flush</pin> which can be driven with an address.  If the
 	address falls on a line that is present and dirty, it will be
-	flushed to memory and marked as not dirty.</p>
+	flushed to memory and marked as not dirty.  The entire cache
+        can be flushed by driving <pin>flush-all</pin>.</p>
     </behavior>
 
     <behavior name="invalidating">

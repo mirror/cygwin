@@ -1,21 +1,22 @@
 /* Macro definitions for running gdb on a Sun 4 running Solaris 2.
    Copyright 1989, 1992 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* Most of what we know is generic to SPARC hosts.  */
 
@@ -24,13 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Pick up more stuff from the generic SVR4 host include file. */
 
 #include "xm-sysv4.h"
-
-/* gdb wants to use the prgregset_t interface rather than
-   the gregset_t interface, partly because that's what's
-   used in core-sol2.c */
-
-#define GDB_GREGSET_TYPE prgregset_t
-#define GDB_FPREGSET_TYPE prfpregset_t
 
 /* These are not currently used in SVR4 (but should be, FIXME!).  */
 #undef	DO_DEFERRED_STORES

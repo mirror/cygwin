@@ -1,17 +1,55 @@
 2001-07-25  Frank Ch. Eigler  <fche@redhat.com>
 
 	From Corinna Vinschen <vinschen@redhat.com>
-	* configure.in (lcd_libs): Look for -lncurses too, if -lcurses
+	* configure.in (lcd_libs): Look for -lncurses too, if -lcurses 
 	is not found.
 
 2001-07-23  Frank Ch. Eigler  <fche@redhat.com>
 
 	* siddoc.in (listfiles): Adapt to new XML-origin .txt files.
 
+2001-07-23  Ben Elliston  <bje@redhat.com>
+
+	* families/Makefile.am (SUBDIRS): Set to @family_subdirs@.
+	* families/configure.in: New file.
+	* families/configure: Likewise.
+	* families/aclocal.m4: Likewise.
+
+	* configure.in (AC_CONFIG_SUBDIRS): Add "families".
+	(make_subdirs): Remove "families".
+	(AC_OUTPUT): Remove "families/Makefile".
+
+2001-07-17  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add support for families/*.
+
 2001-07-16  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (check-recursive): New rule.
 
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* component.dtd: Move here, though XML files refer to copy at
+	`http://sources.redhat.com/sid/component.dtd'.
+
+2001-07-10  Frank Ch. Eigler  <fche@redhat.com>
+
+	* component_html.xsl: Tweak to allow libxml2/libxslt to process.
+
+2001-07-10  matthew green  <mrg@redhat.com>
+
+	* Makefile.in: Regenerate.
+	* aclocal.m4: Regenerate.
+	* configure: Regenerate.
+
+2001-07-04  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add maintainer-mode doc building configury.
+	* configure: Regenerate.
+	* Makefile.am: Add maintainer-mode doc building.
+	* Makefile.in: Regenerate.
+	* component_html.xsl: Add.
+	
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am (ACLOCAL_AMFLAGS): Refer to $srcdir.
@@ -28,10 +66,15 @@
 
 	* CATALOG: Add hw-visual-probe-bus, hw-visual-probe-pin.
 
+2001-03-22  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.in: Regenerate.
+	* configure: Likewise.
+	* aclocal.m4: Likewise.
+
 2001-03-21  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.in: Regenerate.
-	* configure: Regenerate.
 
 2001-01-12  Jeff Johnston  <jjohnstn@redhat.com>
 

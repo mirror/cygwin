@@ -1,3 +1,14 @@
+2003-11-14  Kevin Buettner  <kevinb@redhat.com>
+
+	* config.in (FRV_LINUX_TARGET): Add.
+	* configure.in (sys/user.h): Don't check for this header; it's
+	not used.
+	(frv*linux*): Add rudimentary support for FR-V Linux.
+	* linux-target.c (PEEKUSER_POKEUSER_REGINFO, NUM_REGS, PC_REGNUM)
+	(sign_extend, greg_offset_and_size, fpreg_offset_and_size)
+	(noreg_offset_and_size, reginfo) [FRV_LINUX_TARGET]: Define.
+	* configure, Makefile.in: Regenerate.
+
 2003-09-10  Kevin Buettner  <kevinb@redhat.com>
 
 	From Jimi Xenidis  <jimix@watson.ibm.com>:

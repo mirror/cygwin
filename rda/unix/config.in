@@ -107,6 +107,9 @@
 /* Define if target uses MIPS o32 ABI */
 #undef MIPS_ABI_O32
 
+/* Define if target is FR-V Linux r FR-V uClinux */
+#undef FRV_LINUX_TARGET
+
 /* Define if target is any Linux */
 #undef LINUX_TARGET
 

@@ -859,6 +859,193 @@ is_extended_reg (int regnum)
 }
 
 /* End of ALPHA_LINUX_TARGET */
+#elif defined(FRV_LINUX_TARGET)
+
+#define PEEKUSER_POKEUSER_REGINFO 1
+
+enum
+{
+  NUM_REGS = 149,
+  PC_REGNUM = 128,
+  sign_extend = 0
+};
+
+#define greg_offset_and_size(FIELD) GREGS, offsetof (struct user_int_regs, FIELD), fieldsize (struct user_int_regs, FIELD)
+#define fpreg_offset_and_size(FIELD) FPREGS, offsetof (struct user_fpmedia_regs, FIELD), fieldsize (struct user_fpmedia_regs, FIELD)
+#define noreg_offset_and_size(FIELD) NOREGS, 0, 0
+
+static struct peekuser_pokeuser_reginfo reginfo[] =
+{
+  { PT_GR(0) * 4,   4, greg_offset_and_size (gr[0]),   4 },
+  { PT_GR(1) * 4,   4, greg_offset_and_size (gr[1]),   4 },
+  { PT_GR(2) * 4,   4, greg_offset_and_size (gr[2]),   4 },
+  { PT_GR(3) * 4,   4, greg_offset_and_size (gr[3]),   4 },
+  { PT_GR(4) * 4,   4, greg_offset_and_size (gr[4]),   4 },
+  { PT_GR(5) * 4,   4, greg_offset_and_size (gr[5]),   4 },
+  { PT_GR(6) * 4,   4, greg_offset_and_size (gr[6]),   4 },
+  { PT_GR(7) * 4,   4, greg_offset_and_size (gr[7]),   4 },
+  { PT_GR(8) * 4,   4, greg_offset_and_size (gr[8]),   4 },
+  { PT_GR(9) * 4,   4, greg_offset_and_size (gr[9]),   4 },
+  { PT_GR(10) * 4,  4, greg_offset_and_size (gr[10]),  4 },
+  { PT_GR(11) * 4,  4, greg_offset_and_size (gr[11]),  4 },
+  { PT_GR(12) * 4,  4, greg_offset_and_size (gr[12]),  4 },
+  { PT_GR(13) * 4,  4, greg_offset_and_size (gr[13]),  4 },
+  { PT_GR(14) * 4,  4, greg_offset_and_size (gr[14]),  4 },
+  { PT_GR(15) * 4,  4, greg_offset_and_size (gr[15]),  4 },
+  { PT_GR(16) * 4,  4, greg_offset_and_size (gr[16]),  4 },
+  { PT_GR(17) * 4,  4, greg_offset_and_size (gr[17]),  4 },
+  { PT_GR(18) * 4,  4, greg_offset_and_size (gr[18]),  4 },
+  { PT_GR(19) * 4,  4, greg_offset_and_size (gr[19]),  4 },
+  { PT_GR(20) * 4,  4, greg_offset_and_size (gr[20]),  4 },
+  { PT_GR(21) * 4,  4, greg_offset_and_size (gr[21]),  4 },
+  { PT_GR(22) * 4,  4, greg_offset_and_size (gr[22]),  4 },
+  { PT_GR(23) * 4,  4, greg_offset_and_size (gr[23]),  4 },
+  { PT_GR(24) * 4,  4, greg_offset_and_size (gr[24]),  4 },
+  { PT_GR(25) * 4,  4, greg_offset_and_size (gr[25]),  4 },
+  { PT_GR(26) * 4,  4, greg_offset_and_size (gr[26]),  4 },
+  { PT_GR(27) * 4,  4, greg_offset_and_size (gr[27]),  4 },
+  { PT_GR(28) * 4,  4, greg_offset_and_size (gr[28]),  4 },
+  { PT_GR(29) * 4,  4, greg_offset_and_size (gr[29]),  4 },
+  { PT_GR(30) * 4,  4, greg_offset_and_size (gr[30]),  4 },
+  { PT_GR(31) * 4,  4, greg_offset_and_size (gr[31]),  4 },
+  { PT_GR(32) * 4,  4, greg_offset_and_size (gr[32]),  4 },
+  { PT_GR(33) * 4,  4, greg_offset_and_size (gr[33]),  4 },
+  { PT_GR(34) * 4,  4, greg_offset_and_size (gr[34]),  4 },
+  { PT_GR(35) * 4,  4, greg_offset_and_size (gr[35]),  4 },
+  { PT_GR(36) * 4,  4, greg_offset_and_size (gr[36]),  4 },
+  { PT_GR(37) * 4,  4, greg_offset_and_size (gr[37]),  4 },
+  { PT_GR(38) * 4,  4, greg_offset_and_size (gr[38]),  4 },
+  { PT_GR(39) * 4,  4, greg_offset_and_size (gr[39]),  4 },
+  { PT_GR(40) * 4,  4, greg_offset_and_size (gr[40]),  4 },
+  { PT_GR(41) * 4,  4, greg_offset_and_size (gr[41]),  4 },
+  { PT_GR(42) * 4,  4, greg_offset_and_size (gr[42]),  4 },
+  { PT_GR(43) * 4,  4, greg_offset_and_size (gr[43]),  4 },
+  { PT_GR(44) * 4,  4, greg_offset_and_size (gr[44]),  4 },
+  { PT_GR(45) * 4,  4, greg_offset_and_size (gr[45]),  4 },
+  { PT_GR(46) * 4,  4, greg_offset_and_size (gr[46]),  4 },
+  { PT_GR(47) * 4,  4, greg_offset_and_size (gr[47]),  4 },
+  { PT_GR(48) * 4,  4, greg_offset_and_size (gr[48]),  4 },
+  { PT_GR(49) * 4,  4, greg_offset_and_size (gr[49]),  4 },
+  { PT_GR(50) * 4,  4, greg_offset_and_size (gr[50]),  4 },
+  { PT_GR(51) * 4,  4, greg_offset_and_size (gr[51]),  4 },
+  { PT_GR(52) * 4,  4, greg_offset_and_size (gr[52]),  4 },
+  { PT_GR(53) * 4,  4, greg_offset_and_size (gr[53]),  4 },
+  { PT_GR(54) * 4,  4, greg_offset_and_size (gr[54]),  4 },
+  { PT_GR(55) * 4,  4, greg_offset_and_size (gr[55]),  4 },
+  { PT_GR(56) * 4,  4, greg_offset_and_size (gr[56]),  4 },
+  { PT_GR(57) * 4,  4, greg_offset_and_size (gr[57]),  4 },
+  { PT_GR(58) * 4,  4, greg_offset_and_size (gr[58]),  4 },
+  { PT_GR(59) * 4,  4, greg_offset_and_size (gr[59]),  4 },
+  { PT_GR(60) * 4,  4, greg_offset_and_size (gr[60]),  4 },
+  { PT_GR(61) * 4,  4, greg_offset_and_size (gr[61]),  4 },
+  { PT_GR(62) * 4,  4, greg_offset_and_size (gr[62]),  4 },
+  { PT_GR(63) * 4,  4, greg_offset_and_size (gr[63]),  4 },
+
+
+  { PT_FR(0) * 4,   4, fpreg_offset_and_size (fr[0]), 4 },
+  { PT_FR(1) * 4,   4, fpreg_offset_and_size (fr[1]),  4 },
+  { PT_FR(2) * 4,   4, fpreg_offset_and_size (fr[2]),  4 },
+  { PT_FR(3) * 4,   4, fpreg_offset_and_size (fr[3]),  4 },
+  { PT_FR(4) * 4,   4, fpreg_offset_and_size (fr[4]),  4 },
+  { PT_FR(5) * 4,   4, fpreg_offset_and_size (fr[5]),  4 },
+  { PT_FR(6) * 4,   4, fpreg_offset_and_size (fr[6]),  4 },
+  { PT_FR(7) * 4,   4, fpreg_offset_and_size (fr[7]),  4 },
+  { PT_FR(8) * 4,   4, fpreg_offset_and_size (fr[8]),  4 },
+  { PT_FR(9) * 4,   4, fpreg_offset_and_size (fr[9]),  4 },
+  { PT_FR(10) * 4,  4, fpreg_offset_and_size (fr[10]), 4 },
+  { PT_FR(11) * 4,  4, fpreg_offset_and_size (fr[11]), 4 },
+  { PT_FR(12) * 4,  4, fpreg_offset_and_size (fr[12]), 4 },
+  { PT_FR(13) * 4,  4, fpreg_offset_and_size (fr[13]), 4 },
+  { PT_FR(14) * 4,  4, fpreg_offset_and_size (fr[14]), 4 },
+  { PT_FR(15) * 4,  4, fpreg_offset_and_size (fr[15]), 4 },
+  { PT_FR(16) * 4,  4, fpreg_offset_and_size (fr[16]), 4 },
+  { PT_FR(17) * 4,  4, fpreg_offset_and_size (fr[17]), 4 },
+  { PT_FR(18) * 4,  4, fpreg_offset_and_size (fr[18]), 4 },
+  { PT_FR(19) * 4,  4, fpreg_offset_and_size (fr[19]), 4 },
+  { PT_FR(20) * 4,  4, fpreg_offset_and_size (fr[20]), 4 },
+  { PT_FR(21) * 4,  4, fpreg_offset_and_size (fr[21]), 4 },
+  { PT_FR(22) * 4,  4, fpreg_offset_and_size (fr[22]), 4 },
+  { PT_FR(23) * 4,  4, fpreg_offset_and_size (fr[23]), 4 },
+  { PT_FR(24) * 4,  4, fpreg_offset_and_size (fr[24]), 4 },
+  { PT_FR(25) * 4,  4, fpreg_offset_and_size (fr[25]), 4 },
+  { PT_FR(26) * 4,  4, fpreg_offset_and_size (fr[26]), 4 },
+  { PT_FR(27) * 4,  4, fpreg_offset_and_size (fr[27]), 4 },
+  { PT_FR(28) * 4,  4, fpreg_offset_and_size (fr[28]), 4 },
+  { PT_FR(29) * 4,  4, fpreg_offset_and_size (fr[29]), 4 },
+  { PT_FR(30) * 4,  4, fpreg_offset_and_size (fr[30]), 4 },
+  { PT_FR(31) * 4,  4, fpreg_offset_and_size (fr[31]), 4 },
+  { PT_FR(32) * 4,  4, fpreg_offset_and_size (fr[32]), 4 },
+  { PT_FR(33) * 4,  4, fpreg_offset_and_size (fr[33]), 4 },
+  { PT_FR(34) * 4,  4, fpreg_offset_and_size (fr[34]), 4 },
+  { PT_FR(35) * 4,  4, fpreg_offset_and_size (fr[35]), 4 },
+  { PT_FR(36) * 4,  4, fpreg_offset_and_size (fr[36]), 4 },
+  { PT_FR(37) * 4,  4, fpreg_offset_and_size (fr[37]), 4 },
+  { PT_FR(38) * 4,  4, fpreg_offset_and_size (fr[38]), 4 },
+  { PT_FR(39) * 4,  4, fpreg_offset_and_size (fr[39]), 4 },
+  { PT_FR(40) * 4,  4, fpreg_offset_and_size (fr[40]), 4 },
+  { PT_FR(41) * 4,  4, fpreg_offset_and_size (fr[41]), 4 },
+  { PT_FR(42) * 4,  4, fpreg_offset_and_size (fr[42]), 4 },
+  { PT_FR(43) * 4,  4, fpreg_offset_and_size (fr[43]), 4 },
+  { PT_FR(44) * 4,  4, fpreg_offset_and_size (fr[44]), 4 },
+  { PT_FR(45) * 4,  4, fpreg_offset_and_size (fr[45]), 4 },
+  { PT_FR(46) * 4,  4, fpreg_offset_and_size (fr[46]), 4 },
+  { PT_FR(47) * 4,  4, fpreg_offset_and_size (fr[47]), 4 },
+  { PT_FR(48) * 4,  4, fpreg_offset_and_size (fr[48]), 4 },
+  { PT_FR(49) * 4,  4, fpreg_offset_and_size (fr[49]), 4 },
+  { PT_FR(50) * 4,  4, fpreg_offset_and_size (fr[50]), 4 },
+  { PT_FR(51) * 4,  4, fpreg_offset_and_size (fr[51]), 4 },
+  { PT_FR(52) * 4,  4, fpreg_offset_and_size (fr[52]), 4 },
+  { PT_FR(53) * 4,  4, fpreg_offset_and_size (fr[53]), 4 },
+  { PT_FR(54) * 4,  4, fpreg_offset_and_size (fr[54]), 4 },
+  { PT_FR(55) * 4,  4, fpreg_offset_and_size (fr[55]), 4 },
+  { PT_FR(56) * 4,  4, fpreg_offset_and_size (fr[56]), 4 },
+  { PT_FR(57) * 4,  4, fpreg_offset_and_size (fr[57]), 4 },
+  { PT_FR(58) * 4,  4, fpreg_offset_and_size (fr[58]), 4 },
+  { PT_FR(59) * 4,  4, fpreg_offset_and_size (fr[59]), 4 },
+  { PT_FR(60) * 4,  4, fpreg_offset_and_size (fr[60]), 4 },
+  { PT_FR(61) * 4,  4, fpreg_offset_and_size (fr[61]), 4 },
+  { PT_FR(62) * 4,  4, fpreg_offset_and_size (fr[62]), 4 },
+  { PT_FR(63) * 4,  4, fpreg_offset_and_size (fr[63]), 4 },
+
+  { PT_PC * 4,      4, greg_offset_and_size (pc),      4 },
+  { PT_PSR * 4,     4, greg_offset_and_size (psr),     4 },
+  { PT_CCR * 4,     4, greg_offset_and_size (ccr),     4 },
+  { PT_CCCR * 4,    4, greg_offset_and_size (cccr),    4 },
+
+  /* 132 - 134 are unspecified.  */
+  { 0,              0, noreg_offset_and_size (132),    4 },
+  { 0,              0, noreg_offset_and_size (133),    4 },
+  { 0,              0, noreg_offset_and_size (134),    4 },
+
+  /* tbr */
+  { 0,              0, noreg_offset_and_size (135),    4 },
+
+  /* brr */
+  { 0,              0, noreg_offset_and_size (136),    4 },
+
+  /* dbar0 - dbar3 */
+  { 0,              0, noreg_offset_and_size (137),    4 },
+  { 0,              0, noreg_offset_and_size (138),    4 },
+  { 0,              0, noreg_offset_and_size (139),    4 },
+  { 0,              0, noreg_offset_and_size (140),    4 },
+
+  /* 141 - 144 are unspecified.  */
+  { 0,              0, noreg_offset_and_size (141),    4 },
+  { 0,              0, noreg_offset_and_size (142),    4 },
+  { 0,              0, noreg_offset_and_size (143),    4 },
+  { 0,              0, noreg_offset_and_size (144),    4 },
+
+  { PT_LR * 4,      4, greg_offset_and_size (lr),      4 },
+  { PT_LCR * 4,     4, greg_offset_and_size (lcr),     4 },
+
+  /* Can't use greg_offset_and_size for iacc0h and iacc0l because the iacc
+     field is 64-bits wide.  We need to provide access to the individual
+     32-bit halves. */
+  { PT_IACC0H * 4,  4, GREGS, offsetof (struct user_int_regs, iacc[0]), 4, 4 },
+  { PT_IACC0L * 4,  4, GREGS, offsetof (struct user_int_regs, iacc[0]) + 4, 4, 4 }
+};
+
+/* End of FRV_LINUX_TARGET */
 #else
 #error Need a _LINUX_TARGET define for your architecture
 #endif

@@ -642,7 +642,7 @@ proc default_target_compile {source destfile type options} {
 proc reboot_target { } {
     set result [remote_reboot target]
     puts "REBOOT_TARGET: \"$result\""
-    return [remote_reboot target];
+    return ${result};
 }
 
 #

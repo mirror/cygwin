@@ -1,0 +1,15 @@
+Support for the Fujitsu FRV architecture added by Red Hat. Models for FR400 and
+FR500 included.
+
+Major features in release 1.0:
+
+This is the first release of CGEN. It includes the most important
+applications, including the assembler, disassembler and simulator
+generators. A handful of CPU descriptions are also included:
+
+	* ARM7T
+	* Intel i960
+	* Intel IA-32 and IA-64
+	* Fujitsu FR-30
+	* Mitsubishi M32R/D
+	* SPARC

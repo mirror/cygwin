@@ -19,6 +19,18 @@ enum sem_status
   SEM_STATUS_STALLED
 };
 
+
+// Virtual insn support.
+
+// Canonical ids of virtual insns.
+enum virtual_insn_type {
+  VIRTUAL_INSN_INVALID,
+  VIRTUAL_INSN_BEGIN,
+  VIRTUAL_INSN_COND,
+  VIRTUAL_INSN_CHAIN, VIRTUAL_INSN_CTI_CHAIN,
+  VIRTUAL_INSN_BEFORE, VIRTUAL_INSN_AFTER,
+};
+
 // Exceptions used to exit the cpu's "main loop".
 
 class cgen_trap
@@ -233,12 +245,12 @@ public:
 	{
 	  // Look up virtual insns indices so we only do the lookup once.
 	  // ??? Initialized here until pbb support finished.
-	  begin_index = begin_insn.idesc->lookup_virtual (cgen::VIRTUAL_INSN_BEGIN);
-	  cond_index = begin_insn.idesc->lookup_virtual (cgen::VIRTUAL_INSN_COND);
-	  chain_index = begin_insn.idesc->lookup_virtual (cgen::VIRTUAL_INSN_CHAIN);
-	  cti_chain_index = begin_insn.idesc->lookup_virtual (cgen::VIRTUAL_INSN_CTI_CHAIN);
-	  before_index = begin_insn.idesc->lookup_virtual (cgen::VIRTUAL_INSN_BEFORE);
-	  after_index = begin_insn.idesc->lookup_virtual (cgen::VIRTUAL_INSN_AFTER);
+	  begin_index = begin_insn.idesc->lookup_virtual (VIRTUAL_INSN_BEGIN);
+	  cond_index = begin_insn.idesc->lookup_virtual (VIRTUAL_INSN_COND);
+	  chain_index = begin_insn.idesc->lookup_virtual (VIRTUAL_INSN_CHAIN);
+	  cti_chain_index = begin_insn.idesc->lookup_virtual (VIRTUAL_INSN_CTI_CHAIN);
+	  before_index = begin_insn.idesc->lookup_virtual (VIRTUAL_INSN_BEFORE);
+	  after_index = begin_insn.idesc->lookup_virtual (VIRTUAL_INSN_AFTER);
 	  index_init_p = true;
 	}
       pbb_p = true;

@@ -278,18 +278,6 @@ public:
 
 };
 
-
-// Virtual insn support.
-
-// Canonical ids of virtual insns.
-enum virtual_insn_type {
-  VIRTUAL_INSN_INVALID,
-  VIRTUAL_INSN_BEGIN,
-  VIRTUAL_INSN_COND,
-  VIRTUAL_INSN_CHAIN, VIRTUAL_INSN_CTI_CHAIN,
-  VIRTUAL_INSN_BEFORE, VIRTUAL_INSN_AFTER,
-};
-
 } // namespace cgen
 
 #endif /* CGEN_CPU_H */

@@ -110,7 +110,7 @@ MAKEOVERRIDES =
 
 LIBIBERTY = -L../../../libiberty -liberty
 
-libcgencpu_la_SOURCES = compCGEN.cxx fp.h fp.cxx tracedis.cxx
+libcgencpu_la_SOURCES = compCGEN.cxx tracedis.cxx
 libcgencpu_la_LDFLAGS = -module -no-undefined
 libcgencpu_la_LIBADD = @cpu_libs@ $(INTLLIBS) $(LIBIBERTY) cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo dis-init.lo
 libcgencpu_la_DEPENDENCIES = @cpu_libs@ cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo dis-init.lo
@@ -138,16 +138,11 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I.
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libcgencpu_la_OBJECTS =  compCGEN.lo fp.lo tracedis.lo
+libcgencpu_la_OBJECTS =  compCGEN.lo tracedis.lo
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@
-CFLAGS = @CFLAGS@
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 DIST_COMMON =  ./stamp-h.in CGEN.sh.in ChangeLog Makefile.am Makefile.in \
 acinclude.m4 aclocal.m4 config.in configure configure.in
 
@@ -156,7 +151,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/compCGEN.P .deps/fp.P .deps/tracedis.P
+DEP_FILES =  .deps/compCGEN.P .deps/tracedis.P
 SOURCES = $(libcgencpu_la_SOURCES)
 OBJECTS = $(libcgencpu_la_OBJECTS)
 
@@ -284,7 +279,7 @@ libcgencpu.la: $(libcgencpu_la_OBJECTS) $(libcgencpu_la_DEPENDENCIES)
 all-recursive install-data-recursive install-exec-recursive \
 installdirs-recursive install-recursive uninstall-recursive  \
 check-recursive installcheck-recursive info-recursive dvi-recursive:
-	@set fnord $(MAKEFLAGS); amf=$$2; \
+	@set fnord $$MAKEFLAGS; amf=$$2; \
 	dot_seen=no; \
 	target=`echo $@ | sed s/-recursive//`; \
 	list='$(SUBDIRS)'; for subdir in $$list; do \
@@ -304,7 +299,7 @@ check-recursive installcheck-recursive info-recursive dvi-recursive:
 
 mostlyclean-recursive clean-recursive distclean-recursive \
 maintainer-clean-recursive:
-	@set fnord $(MAKEFLAGS); amf=$$2; \
+	@set fnord $$MAKEFLAGS; amf=$$2; \
 	dot_seen=no; \
 	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
 	  rev="$$subdir $$rev"; \

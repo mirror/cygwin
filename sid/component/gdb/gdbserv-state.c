@@ -101,6 +101,7 @@ gdbserv_fromclient_break (struct gdbserv *gdbserv)
          same time as it stops itself */
       break;
     default:
+      ;
     }
 }
 

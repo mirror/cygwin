@@ -20,7 +20,7 @@ MAKEOVERRIDES=
 
 LIBIBERTY = -L../../../libiberty -liberty
 
-libcgencpu_la_SOURCES = compCGEN.cxx fp.h fp.cxx tracedis.cxx
+libcgencpu_la_SOURCES = compCGEN.cxx tracedis.cxx
 libcgencpu_la_LDFLAGS = -module -no-undefined
 libcgencpu_la_LIBADD = @cpu_libs@ $(INTLLIBS) $(LIBIBERTY) cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo dis-init.lo
 libcgencpu_la_DEPENDENCIES = @cpu_libs@ cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo dis-init.lo

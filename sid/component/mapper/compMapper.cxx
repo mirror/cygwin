@@ -175,73 +175,18 @@ public:
   // The address lookup function - body below
   inline mapping_record* locate (host_int_4 address) const;
 
-
-  // Specialized write() for stride/offset slaves
   template <class DataMaster, class DataSlave>
   inline bus::status
   write_strideoffset_any (host_int_4 address, const mapping_record* r,
-			  DataMaster data, DataSlave) throw ()
-    {
-      const host_int_4 master_offset = address & r->stride_mask;
-      const host_int_4 master_size = sizeof (typename DataMaster::value_type);
-      const host_int_4 slave_size = sizeof (typename DataSlave::value_type);
-      const host_int_4 slave_offset = r->offset;
-
-      // Signal error if master access does not include all of slave bus
-      if (UNLIKELY((master_offset > slave_offset) || 
-	 	   (master_offset+master_size < slave_offset+slave_size)))
-	return bus::misaligned;
-
-      // Signal error if master access spans stride boundary.
-      if (UNLIKELY(master_size+master_offset > r->stride))
-	return bus::misaligned;
-
-      // Copy data bytes for slave
-      DataSlave ds;
-      for (unsigned i=0; i<slave_size; i++)
-	ds.write_byte (i, data.read_byte (i + slave_offset - master_offset));
-
-      host_int_4 mapped_address = (address - (r->low - r->mapped_base)) >> (r->stride_shift - r->width_shift);
-      
-      bus::status st = r->accessor->write (mapped_address, ds);
-      st.latency += target->latency;
-      return st;
-    }
-
+			  DataMaster data, DataSlave)
+    throw ();
 
   // Specialized read() for stride/offset slaves
   template <class DataMaster, class DataSlave>
   inline bus::status
   read_strideoffset_any (host_int_4 address, const mapping_record* r,
-			  DataMaster& data, DataSlave) throw ()
-    {
-      const host_int_4 master_offset = address & r->stride_mask;
-      const host_int_4 master_size = sizeof (typename DataMaster::value_type);
-      const host_int_4 slave_size = sizeof (typename DataSlave::value_type);
-      const host_int_4 slave_offset = r->offset;
-
-      // Signal error if master access does not include all of slave bus
-      if (UNLIKELY((master_offset > slave_offset) || 
-		   (master_offset+master_size < slave_offset+slave_size)))
-	return bus::misaligned;
-
-      // Signal error if master access spans stride boundary.
-      if (UNLIKELY(master_size+master_offset > r->stride))
-	return bus::misaligned;
-
-      DataSlave ds;
-      host_int_4 mapped_address = (address - (r->low - r->mapped_base)) >> (r->stride_shift - r->width_shift);
-      bus::status s = r->accessor->read (mapped_address, ds);
-
-      // Copy data bytes for master
-      for (unsigned i=0; i<slave_size; i++)
-	data.write_byte (i, ds.read_byte (i + slave_offset - master_offset));
-
-      // Add on latency
-      s.latency += target->latency;
-      return s;
-    }
-
+			 DataMaster& data, DataSlave) 
+    throw ();
 
   // Generic write() & read()
   template <class Data>
@@ -493,93 +438,7 @@ generic_mapper::connected_bus (const string& name) throw()
      return 0;
   }
 
-template <class Data>
-inline bus::status
-generic_mapper_bus::write_any (host_int_4 address, Data data) throw ()
-  {
-    const mapping_record* r = this->locate (address);
-    if (LIKELY (r))
-      {
-	// bypass stride/offset calculations?
-	if (LIKELY(! r->use_strideoffset_p))
-	  {
-	    host_int_4 mapped_address = address - (r->low - r->mapped_base);
-	    bus::status st = r->accessor->write (mapped_address, data);
-	    st.latency += target->latency;
-	    return st;
-	  }
 
-	// Order these alternatives by guess of frequency of use
-	if (r->width == 1)
-	  {
-	    typename Data::size_1_type s1data;
-	    return write_strideoffset_any (address, r, data, s1data);
-	  }
-	else if (r->width == 4)
-	  {
-	    typename Data::size_4_type s4data;
-	    return write_strideoffset_any (address, r, data, s4data);
-	  }
-	else if (r->width == 2)
-	  {
-	    typename Data::size_2_type s2data;
-	    return write_strideoffset_any (address, r, data, s2data);
-	  }
-	else if (r->width == 8)
-	  {
-	    typename Data::size_8_type s8data;
-	    return write_strideoffset_any (address, r, data, s8data);
-	  }
-	else
-	  assert (0);
-      }
-    else
-      return bus::unmapped;
-  }
-
-template <class Data>
-inline bus::status
-generic_mapper_bus::read_any (host_int_4 address, Data& data) throw ()
-  {
-    const mapping_record* r = this->locate (address);
-    if (LIKELY (r))
-      {
-	// bypass stride/offset calculations?
-	if (LIKELY(! r->use_strideoffset_p))
-	  {
-	    host_int_4 mapped_address = address - (r->low - r->mapped_base);
-	    bus::status st = r->accessor->read (mapped_address, data);
-	    st.latency += target->latency;
-	    return st;
-	  }
-
-	// Order these alternatives by guess of frequency of use
-	if (r->width == 1)
-	  {
-	    typename Data::size_1_type s1data;
-	    return read_strideoffset_any (address, r, data, s1data);
-	  }
-	else if (r->width == 4)
-	  {
-	    typename Data::size_4_type s4data;
-	    return read_strideoffset_any (address, r, data, s4data);
-	  }
-	else if (r->width == 2)
-	  {
-	    typename Data::size_2_type s2data;
-	    return read_strideoffset_any (address, r, data, s2data);
-	  }
-	else if (r->width == 8)
-	  {
-	    typename Data::size_8_type s8data;
-	    return read_strideoffset_any (address, r, data, s8data);
-	  }
-	else
-	  assert (0);
-      }
-    else
-      return bus::unmapped;
-  }
 
 
 // Parse a mapping specification and produce a mapping_record from it.
@@ -954,6 +813,166 @@ generic_mapper::restore_state (const string& state)
     return component::bad_value;
 } 
 
+
+template <class Data>
+inline bus::status
+generic_mapper_bus::write_any (host_int_4 address, Data data) throw ()
+  {
+    const mapping_record* r = this->locate (address);
+    if (LIKELY (r))
+      {
+	// bypass stride/offset calculations?
+	if (LIKELY(! r->use_strideoffset_p))
+	  {
+	    host_int_4 mapped_address = address - (r->low - r->mapped_base);
+	    bus::status st = r->accessor->write (mapped_address, data);
+	    st.latency += this->target->latency;
+	    return st;
+	  }
+
+	// Order these alternatives by guess of frequency of use
+	if (r->width == 1)
+	  {
+	    typename Data::size_1_type s1data;
+	    return write_strideoffset_any (address, r, data, s1data);
+	  }
+	else if (r->width == 4)
+	  {
+	    typename Data::size_4_type s4data;
+	    return write_strideoffset_any (address, r, data, s4data);
+	  }
+	else if (r->width == 2)
+	  {
+	    typename Data::size_2_type s2data;
+	    return write_strideoffset_any (address, r, data, s2data);
+	  }
+	else if (r->width == 8)
+	  {
+	    typename Data::size_8_type s8data;
+	    return write_strideoffset_any (address, r, data, s8data);
+	  }
+	else
+	  assert (0);
+      }
+    else
+      return bus::unmapped;
+  }
+
+
+template <class Data>
+inline bus::status
+generic_mapper_bus::read_any (host_int_4 address, Data& data) throw ()
+  {
+    const mapping_record* r = this->locate (address);
+    if (LIKELY (r))
+      {
+	// bypass stride/offset calculations?
+	if (LIKELY(! r->use_strideoffset_p))
+	  {
+	    host_int_4 mapped_address = address - (r->low - r->mapped_base);
+	    bus::status st = r->accessor->read (mapped_address, data);
+	    st.latency += this->target->latency;
+	    return st;
+	  }
+
+	// Order these alternatives by guess of frequency of use
+	if (r->width == 1)
+	  {
+	    typename Data::size_1_type s1data;
+	    return read_strideoffset_any (address, r, data, s1data);
+	  }
+	else if (r->width == 4)
+	  {
+	    typename Data::size_4_type s4data;
+	    return read_strideoffset_any (address, r, data, s4data);
+	  }
+	else if (r->width == 2)
+	  {
+	    typename Data::size_2_type s2data;
+	    return read_strideoffset_any (address, r, data, s2data);
+	  }
+	else if (r->width == 8)
+	  {
+	    typename Data::size_8_type s8data;
+	    return read_strideoffset_any (address, r, data, s8data);
+	  }
+	else
+	  assert (0);
+      }
+    else
+      return bus::unmapped;
+  }
+
+
+  // Specialized write() for stride/offset slaves
+template <class DataMaster, class DataSlave>
+inline bus::status
+generic_mapper_bus::write_strideoffset_any (host_int_4 address,
+					    const mapping_record* r,
+					    DataMaster data, DataSlave)
+  throw ()
+    {
+      const host_int_4 master_offset = address & r->stride_mask;
+      const host_int_4 master_size = sizeof (typename DataMaster::value_type);
+      const host_int_4 slave_size = sizeof (typename DataSlave::value_type);
+      const host_int_4 slave_offset = r->offset;
+
+      // Signal error if master access does not include all of slave bus
+      if (UNLIKELY((master_offset > slave_offset) || 
+	 	   (master_offset+master_size < slave_offset+slave_size)))
+	return bus::misaligned;
+
+      // Signal error if master access spans stride boundary.
+      if (UNLIKELY(master_size+master_offset > r->stride))
+	return bus::misaligned;
+
+      // Copy data bytes for slave
+      DataSlave ds;
+      for (unsigned i=0; i<slave_size; i++)
+	ds.write_byte (i, data.read_byte (i + slave_offset - master_offset));
+
+      host_int_4 mapped_address = (address - (r->low - r->mapped_base)) >> (r->stride_shift - r->width_shift);
+      
+      bus::status st = r->accessor->write (mapped_address, ds);
+      st.latency += this->target->latency;
+      return st;
+    }
+
+
+// Specialized read() for stride/offset slaves
+template <class DataMaster, class DataSlave>
+inline bus::status
+generic_mapper_bus::read_strideoffset_any (host_int_4 address,
+					   const mapping_record* r,
+					   DataMaster& data,
+					   DataSlave) throw ()
+{
+  const host_int_4 master_offset = address & r->stride_mask;
+  const host_int_4 master_size = sizeof (typename DataMaster::value_type);
+  const host_int_4 slave_size = sizeof (typename DataSlave::value_type);
+  const host_int_4 slave_offset = r->offset;
+  
+  // Signal error if master access does not include all of slave bus
+  if (UNLIKELY((master_offset > slave_offset) || 
+	       (master_offset+master_size < slave_offset+slave_size)))
+    return bus::misaligned;
+  
+  // Signal error if master access spans stride boundary.
+  if (UNLIKELY(master_size+master_offset > r->stride))
+    return bus::misaligned;
+  
+  DataSlave ds;
+  host_int_4 mapped_address = (address - (r->low - r->mapped_base)) >> (r->stride_shift - r->width_shift);
+  bus::status s = r->accessor->read (mapped_address, ds);
+  
+  // Copy data bytes for master
+  for (unsigned i=0; i<slave_size; i++)
+    data.write_byte (i, ds.read_byte (i + slave_offset - master_offset));
+  
+  // Add on latency
+  s.latency += this->target->latency;
+  return s;
+}
 
 
 // ----------------------------------------------------------------------------

@@ -399,6 +399,23 @@
        (list "unsigned short" 16)))
 )
 
+; Utility to return name of variable/structure-member to use to record
+; profiling data for SYM.
+
+(define (gen-profile-sym sym out?)
+  (string-append (if out? "out_" "in_")
+		 (if (symbol? sym) (symbol->string sym) sym))
+)
+
+; Return name of variable/structure-member to use to record data needed for
+; profiling operand SELF.
+
+(method-make!
+ <operand> 'sbuf-profile-sym
+ (lambda (self out?)
+   (gen-profile-sym (gen-sym self) out?))
+)
+
 ; sbuf-profile-elm method.
 ; Return the ARGBUF member needed for profiling SELF in <sformat> SFMT.
 ; The result is (var-name "C-type" approx-bitsize) or #f if unneeded.
@@ -408,8 +425,7 @@
  (lambda (self sfmt out?)
    (if (hw-scalar? (op:type self))
        #f
-       (cons (string-append (if out? "out_" "in_")
-			    (gen-sym self))
+       (cons (send self 'sbuf-profile-sym out?)
 	     (send (op:type self) 'sbuf-profile-data))))
 )
 

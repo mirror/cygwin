@@ -31,7 +31,8 @@ arm_angel::arm_angel():
   register_attribute_names[1] = "r1";
 
   // ??? The extra space is for compatibility with existing ARM tools, right?
-  command_line = "sid ";
+  command_line.clear ();
+  command_line.push_back ("sid ");
 }
 
 // Angel only has file descriptors 0 and 1 opened initially.
@@ -264,7 +265,7 @@ arm_angel::do_get_cmdline()
       set_error_result(newlib::eFault);
     }
 
-  set_string(str_ptr, command_line + '\0');
+  set_string(str_ptr, get_command_line() + '\0');
 }
 
 void

@@ -251,6 +251,7 @@ namespace cgen {
 #define ZEXTSIDI(x) ((DI) (USI) (x))
 #define ZEXTDIDI(x) ((UDI) (x))
 
+#define TRUNCBIBI(x) ((BI) (x))
 #define TRUNCQIBI(x) ((BI) (QI) (x))
 #define TRUNCQIQI(x) ((QI) (x))
 #define TRUNCHIBI(x) ((BI) (HI) (x))
@@ -407,6 +408,15 @@ ADDCFDI (DI a, DI b, BI c)
 }
 
 inline BI
+ADDOFQI (QI a, QI b, BI c)
+{
+  QI tmp = ADDQI (a, ADDQI (b, c));
+  BI res = (((a < 0) == (b < 0))
+	    && ((a < 0) != (tmp < 0)));
+  return res;
+}
+
+inline BI
 ADDOFHI (HI a, HI b, BI c)
 {
   HI tmp = ADDHI (a, ADDHI (b, c));
@@ -473,6 +483,15 @@ inline BI
 SUBCFSI (SI a, SI b, BI c)
 {
   BI res = ((USI) a < (USI) b) || (c && a == b);
+  return res;
+}
+
+inline BI
+SUBOFQI (QI a, QI b, BI c)
+{
+  QI tmp = SUBQI (a, ADDQI (b, c));
+  BI res = (((a < 0) != (b < 0))
+	    && ((a < 0) != (tmp < 0)));
   return res;
 }
 

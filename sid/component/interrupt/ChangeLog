@@ -2,6 +2,10 @@
 
 	* Makefile.am (check-local): Rename target from "checkme".
 
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* *.xml: Add <?xml ... ?> prefix.
+
 2001-07-11  Ben Elliston  <bje@redhat.com>
 
 	* components.cxx (operator<<): Move this function template ..
@@ -14,11 +18,44 @@
 	* components.h (IntController fiq_read_word): Provide dummy body.
 	(fiq_write_word): Ditto.
 
+2001-07-04  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add maintainer-mode doc building configury.
+	* configure: Regenerate.
+	* Makefile.am: Add maintainer-mode doc building.
+	* Makefile.in: Regenerate.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (DOCS): Define.
+	(pkgdata_DATA): Use it.
+	* Makefile.in: Regenerate.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* hw-interrupt-arm_ref.txt: Generate.
+	* hw-interrupt-cogent_cma222.txt: Likewise.
+
+2001-06-29  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (libinterrupt_la_SOURCES): Add $(EXTRASRC).
+	(DEJAGNUTESTS): Add $(EXTRATESTS).
+	* Makefile.in: Regenerate.
+
 2001-06-28  Ben Elliston  <bje@redhat.com>
 
 	* arm.h: Formatting cleanups.
 	* arm.cxx: Likewise.
 	* components.h: Likewise.
+
+2001-06-27  graydon hoare  <graydon@redhat.com>
+
+	* hw-interrupt-cogent_cma222.xml: Add.
+	* hw-interrupt-arm_ref.xml: Add.
+
+2001-03-23  John Healy  <jhealy@redhat.com>
+
+	* Makefile.in: Regenerated.
 
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 

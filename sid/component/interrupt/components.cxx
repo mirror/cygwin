@@ -15,16 +15,14 @@ compInterruptListTypes()
 {
   vector<string> types;
 #if SIDTARGET_ARM
-  types.push_back(string("hw-interrupt-arm/ref"));
-  types.push_back(string("hw-interrupt-cogent/cma222"));
-//  types.push_back(string("hw-interrupt-sa"));
+  types.push_back ("hw-interrupt-arm/ref");
+  types.push_back ("hw-interrupt-cogent/cma222");
 #endif
   return types;
 }
 
 #include "arm.h"
 #include "cma222.h"
-//#include "sa.h"
 
 static component*
 compInterruptCreate(const string& typeName)
@@ -34,8 +32,6 @@ compInterruptCreate(const string& typeName)
     return new armIntController();
   if (typeName == "hw-interrupt-cogent/cma222")
     return new cma222IntController();
-//  if (typeName == "hw-interrupt-sa")
-//    return new saIntController();
 #endif
   return 0;
 }
@@ -46,7 +42,6 @@ compInterruptDelete(component* c)
 #if SIDTARGET_ARM
   delete dynamic_cast<armIntController*>(c);
   delete dynamic_cast<cma222IntController*>(c);
-//  delete dynamic_cast<saIntController*>(c);
 #endif
 }
 

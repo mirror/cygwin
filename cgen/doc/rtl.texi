@@ -205,7 +205,7 @@ To be consistent with Scheme, "-" is preferred over "_".
 Boolean attributes are defined with:
 
 @example
-(define-attribute
+(define-attr
   (type boolean)
   (for user-list)
   (name attribute-name)
@@ -234,7 +234,7 @@ considered users of the attribute.
 Integer attributes are defined with:
 
 @example
-(define-attribute
+(define-attr
   (type integer)
   (for user-list)
   (name attribute-name)
@@ -259,7 +259,7 @@ range of possible values is restricted and each value has a name.
 Enumerated attributes are defined with
 
 @example
-(define-attribute
+(define-attr
   (type enum)
   (for user-list)
   (name attribute-name)
@@ -291,7 +291,7 @@ currently no rush.)
 Bitset attributes are defined with:
 
 @example
-(define-attribute
+(define-attr
   (type bitset)
   (for user-list)
   (name attribute-name)
@@ -1427,7 +1427,8 @@ Rather than specifying the prefix in each entry, it is specified once, here.
 Convention requires @samp{prefix} not contain any lowercase characters.
 
 @subsection ifield
-The name of the instruction field that the enum is intended for.
+The name of the instruction field that the enum is intended for.  This
+must be a simple ifield, not a multi-ifield.
 
 @subsection values
 A list of possible values.  Each element has one of the following forms:
@@ -1539,7 +1540,7 @@ hardware element.
 The index of the hardware element. This is used to mate the hardware
 element with the instruction field that selects it, and must be the name
 of an ifield entry. (*note: The index may be other things besides
-ifields in the future.)
+ifields in the future.)  It must not be a multi-ifield, currently.
 
 @subsection asm
 Sometimes it's necessary to escape to C to parse assembler, or print
@@ -2143,8 +2144,7 @@ mode of the result, which is defined to be that of the last expression.
 Execute @samp{expr1}, @samp{expr2}, etc. in parallel. All inputs are
 read before any output is written.  @samp{empty} must be @samp{()} and
 is present for consistency with @samp{sequence}. @samp{mode} must be
-@samp{VOID} (void mode). @samp{((mode1 local1) ...)} is a set of local
-variables.
+@samp{VOID} (void mode).
 
 @item (unop mode operand)
 Perform a unary arithmetic operation. @samp{unop} is one of @code{neg},
@@ -2197,6 +2197,7 @@ Otherwise, the @samp{else} part is executed (if present).
 
 @samp{mode} is the mode of the result, not of @samp{condition}.
 If @samp{mode} is not @code{VOID} (void mode), @samp{else} must be present.
+When the result is used, @samp{mode} must specified, and not be @code{VOID}.
 
 @item (cond mode (condition1 expr1a ...) (...) [(else exprNa...)])
 From Scheme: keep testing conditions until one succeeds, and then

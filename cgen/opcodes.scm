@@ -708,7 +708,7 @@
 ; it up into manageable chunks.
 
 (define (read-cpu.opc srcdir cpu delim)
-  (let ((file (string-append srcdir "/" (current-arch-name) ".opc"))
+  (let ((file (string-append srcdir "/cpu/" (current-arch-name) ".opc"))
 	(start-delim (string-append "/* -- " delim))
 	(end-delim "/* -- "))
     (if (file-exists? file)

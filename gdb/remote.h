@@ -1,5 +1,5 @@
 /* Remote target communications for serial-line targets in custom GDB protocol
-   Copyright 1999, Free Software Foundation, Inc.
+   Copyright 1999 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -28,7 +28,7 @@
    FOREVER, wait forever rather than timing out; this is used while
    the target is executing user code.  */
 
-extern void getpkt (char *buf, int forever);
+extern void getpkt (char *buf, long sizeof_buf, int forever);
 
 /* Send a packet to the remote machine, with error checking.  The data
    of the packet is in BUF.  The string in BUF can be at most PBUFSIZ
@@ -40,13 +40,8 @@ extern int putpkt (char *buf);
 
 /* Send HEX encoded string to the target console. (gdb_stdtarg) */
 
-extern void remote_console_output PARAMS ((char *));
+extern void remote_console_output (char *);
 
-
-/* FIXME: cagney/1999-09-20: This function is going to be replaced
-   with a more generic (non remote specific) mechanism. */
-
-extern void cleanup_sigint_signal_handler (void);
 
 /* FIXME: cagney/1999-09-20: The remote cisco stuff in remote.c needs
    to be broken out into a separate file (remote-cisco.[hc]?).  Before
@@ -56,5 +51,7 @@ extern void cleanup_sigint_signal_handler (void);
 extern void remote_cisco_objfile_relocate (bfd_signed_vma text_off,
 					   bfd_signed_vma data_off,
 					   bfd_signed_vma bss_off);
+
+extern void async_remote_interrupt_twice (void *arg);
 
 #endif

@@ -1,6 +1,6 @@
 /* Common declarations for the GNU Hurd
 
-   Copyright (C) 1995, 1998 Free Software Foundation, Inc.
+   Copyright 1995, 1996, 1998, 1999 Free Software Foundation, Inc.
 
    Written by Miles Bader <miles@gnu.ai.mit.edu>
 
@@ -16,7 +16,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA. */
 
 #ifndef __NM_GNU_H__
 #define __NM_GNU_H__
@@ -25,8 +26,6 @@
 #include <mach.h>
 #include <mach/exception.h>
 
-#undef target_pid_to_str
-#define target_pid_to_str(pid) gnu_target_pid_to_str(pid)
 extern char *gnu_target_pid_to_str (int pid);
 
 /* Before storing, we need to read all the registers.  */
@@ -39,7 +38,5 @@ extern char *gnu_target_pid_to_str (int pid);
 #define SVR4_SHARED_LIBS
 #include "solib.h"
 #define NO_CORE_OPS
-
-#define MAINTENANCE_CMDS 1
 
 #endif /* __NM_GNU_H__ */

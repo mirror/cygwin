@@ -1,4 +1,4 @@
-# Copyright (C) 1998 Free Software Foundation, Inc.
+# Copyright 1998, 1999 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ if $tracelevel then {
         strace $tracelevel
         }
 
+if { [skip_cplus_tests] } { continue }
+
 #
 # test running programs
 #
@@ -41,6 +43,20 @@ set bug_id 0
 set testfile "member-ptr"
 set srcfile ${testfile}.cc
 set binfile ${objdir}/${subdir}/${testfile}
+
+# Create and source the file that provides information about the compiler
+# used to compile the test case.
+
+if [get_compiler_info ${binfile} "c++"] {
+    return -1
+}
+
+# Nearly all of these tests fail when compiled with G++, so just give up
+# until GDB gets enhanced. -sts 1999-06-22
+
+if {$gcc_compiled} {
+    continue 
+}
 
 if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {debug c++}] != "" } {
      gdb_suppress_entire_file "Testcase compile failed, so all tests in this file will automatically fail."
@@ -89,6 +105,7 @@ gdb_expect {
 
 # print pointer to data member
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print pmi\n"
 gdb_expect {
    -re "\\$\[0-9\]* = \\(int \\( A::\\*\\)\\) &A::j\r\n$gdb_prompt $" {
@@ -101,6 +118,7 @@ gdb_expect {
 
 # print dereferenced pointer to data member
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print a.*pmi\n"
 gdb_expect {
    -re "\\$\[0-9\]* = 121\r\n$gdb_prompt $" {
@@ -113,6 +131,7 @@ gdb_expect {
 # print dereferenced pointer to data member
 # this time, dereferenced through a pointer
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print a_p->*pmi\n"
 gdb_expect {
    -re "\\$\[0-9\]* = 121\r\n$gdb_prompt $" {
@@ -198,6 +217,7 @@ gdb_expect {
 }
 
 # Double-check by printing a.
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print a\n"
 gdb_expect {
    -re "\\$\[0-9\]* = \{c = 120 'x', j = 33, jj = 1331, static s = 10, Virtual table at $hex\}\r\n$gdb_prompt $" {
@@ -230,6 +250,7 @@ gdb_expect {
 }
 
 # Double-check by printing a.
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print a\n"
 gdb_expect {
    -re "\\$\[0-9\]* = \{c = 120 'x', j = 44, jj = 1331, static s = 10, Virtual table at $hex\}\r\n$gdb_prompt $" {
@@ -276,6 +297,7 @@ gdb_expect {
 
 # Ptype a pointer to a method.
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "ptype pmf\n"
 gdb_expect {
    -re "type = int \\( A::\\*\\)\\(\\.\\.\\.\\)\r\n$gdb_prompt $" {
@@ -287,6 +309,7 @@ gdb_expect {
 
 # print a pointer to a method
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print pmf\n"
 gdb_expect {
    -re "\\$\[0-9\]* = \\(int \\( A::\\*\\)\\(\\.\\.\\.\\)\\) \\?\\? <not supported with HP aCC>\r\n$gdb_prompt $" {
@@ -299,6 +322,7 @@ gdb_expect {
 
 # Ptype a pointer to a pointer to a method
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "ptype pmf_p\n"
 gdb_expect {
    -re "type = int \\( A::\\*\\*\\)\\(\\.\\.\\.\\)\r\n$gdb_prompt $" {
@@ -310,6 +334,7 @@ gdb_expect {
 
 # print a pointer to a pointer to a method
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print pmf_p\n"
 gdb_expect {
    -re "\\$\[0-9\]* = \\(int \\( A::\\*\\*\\)\\(\\.\\.\\.\\)\\) $hex\r\n$gdb_prompt $" {
@@ -321,39 +346,43 @@ gdb_expect {
 
 # print dereferenced pointer to method
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print a.*pmf\n"
 gdb_expect {
    -re "Pointers to methods not supported with HP aCC\r\n$gdb_prompt $" {
       pass "print a.*pmf (known aCC limitation)"
     }
-    -re ".*$gdb_prompt $" { fail "print a.*pmf -- ??" }
+    -re ".*$gdb_prompt $" { fail "print a.*pmf" }
     timeout { fail "(timeout) print a.*pmf" }
 }
 
 # print dereferenced pointer to method, using ->*
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print a_p->*pmf\n"
 gdb_expect {
    -re "Pointers to methods not supported with HP aCC\r\n$gdb_prompt $" {
       pass "print a_p->*pmf (known aCC limitation)"
     }
-    -re ".*$gdb_prompt $" { fail "print a_p->*pmf -- ??" }
+    -re ".*$gdb_prompt $" { fail "print a_p->*pmf" }
     timeout { fail "(timeout) print a_p->*pmf" }
 }
 
 # set the pointer to data member
 
+setup_xfail "hppa*-*-*"
 send_gdb "set var pmf = &A::foo\n"
 gdb_expect {
    -re "Assignment to pointers to methods not implemented with HP aCC\r\n$gdb_prompt $" {
       pass "set var pmf (known aCC limitation)"
     }
-    -re ".*$gdb_prompt $" { fail "set var pmf -- ??" }
+    -re ".*$gdb_prompt $" { fail "set var pmf" }
     timeout { fail "(timeout) set var pmf" }
 }
 
 # Try to dereference the pointer to method without any object
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print *pmf\n"
 gdb_expect {
    -re "Attempt to dereference pointer to member without an object\r\n$gdb_prompt $" {
@@ -375,6 +404,7 @@ gdb_expect {
 }
 
 # Check cast of pointer to member to integer
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print (int) pmi\n"
 gdb_expect {
    -re "\\$\[0-9\]* = 8\r\n$gdb_prompt $" {
@@ -385,37 +415,41 @@ gdb_expect {
 }
 
 # Check cast of pointer to method to integer
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print (int) pmf\n"
 gdb_expect {
    -re "Pointers to methods not supported with HP aCC\r\n$gdb_prompt $" {
       pass "casting pmf to int (known aCC limitation)"
     }
-    -re ".*$gdb_prompt $" { fail "casting pmf to int -- ??" }
+    -re ".*$gdb_prompt $" { fail "casting pmf to int" }
     timeout { fail "(timeout) casting pmf to int" }
 }
 
 # Try to invoke a function through a pointer to data member
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print (a.*pmi)(3)\n"
 gdb_expect {
    -re "Not implemented: function invocation through pointer to method with HP aCC\r\n$gdb_prompt $" {
       pass "print (a.*pmi)(3) -- error message should be different"
     }
-    -re ".*$gdb_prompt $" { fail "print (a.*pmi)(3) -- ???" }
+    -re ".*$gdb_prompt $" { fail "print (a.*pmi)(3)" }
     timeout { fail "(timeout) print (a.*pmi)(3)" }
 }
 
 # Try to invoke a function through a pointer to a method
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print (a.*pmf)(3)\n"
 gdb_expect {
    -re "Not implemented: function invocation through pointer to method with HP aCC\r\n$gdb_prompt $" {
       pass "print (a.*pmi)(3) -- known aCC limitation"
     }
-    -re ".*$gdb_prompt $" { fail "print (a.*pmf)(3) -- ???" }
+    -re ".*$gdb_prompt $" { fail "print (a.*pmf)(3)" }
     timeout { fail "(timeout) print (a.*pmf)(3)" }
 }
 
 
 # Go past assignment of NULL to pmi
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "next\n"
 gdb_expect {
    -re "\r\n85\[ \t\]*k = \\(a.\\*pmf\\)\\(3\\);\r\n$gdb_prompt $" {
@@ -435,6 +469,7 @@ gdb_expect {
 #}
 
 # Dereference the null pointer to member
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print a.*pmi\n"
 gdb_expect {
    -re "Attempted dereference of null pointer-to-member\r\n$gdb_prompt $" {
@@ -455,6 +490,7 @@ gdb_expect {
     timeout { fail "(timeout) set break at 91" }
 }
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "continue\n"
 gdb_expect {
    -re "Continuing\\.\r\n\r\nBreakpoint.*at.*member-ptr\\.cc:91\r\n91\[ \t]*k = \\(a.\\*pmf\\)\\(4\\);\r\n$gdb_prompt $" {
@@ -468,6 +504,7 @@ gdb_expect {
 # Now check again that pmi works even when not set to
 # something that's at the beginning of the object
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print pmi\n"
 gdb_expect {
    -re "\\$\[0-9\]* = \\(int \\( A::\\*\\)\\) &A::jj\r\n$gdb_prompt $" {
@@ -480,6 +517,7 @@ gdb_expect {
 
 # print dereferenced pointer to data member
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print a.*pmi\n"
 gdb_expect {
    -re "\\$\[0-9\]* = 1331\r\n$gdb_prompt $" {
@@ -492,6 +530,7 @@ gdb_expect {
 # print dereferenced pointer to data member
 # this time, dereferenced through a pointer
 
+setup_xfail "hppa*-*-*" CLLbs16901
 send_gdb "print a_p->*pmi\n"
 gdb_expect {
    -re "\\$\[0-9\]* = 1331\r\n$gdb_prompt $" {

@@ -1,21 +1,23 @@
 /* Target machine description for SGI Iris under Irix, for GDB.
-   Copyright 1990, 1991, 1992, 1993, 1995 Free Software Foundation, Inc.
+   Copyright 1990, 1991, 1992, 1993, 1995, 1999
+   Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #include "mips/tm-bigmips.h"
 
@@ -27,10 +29,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Redefine register numbers for SGI. */
 
 #undef NUM_REGS
-#undef REGISTER_NAMES
+#undef MIPS_REGISTER_NAMES
 #undef FP0_REGNUM
 #undef PC_REGNUM
-#undef PS_REGNUM
 #undef HI_REGNUM
 #undef LO_REGNUM
 #undef CAUSE_REGNUM
@@ -45,7 +46,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Initializer for an array of names of registers.
    There should be NUM_REGS strings in this initializer.  */
 
-#define REGISTER_NAMES 	\
+#define MIPS_REGISTER_NAMES 	\
     {	"zero",	"at",	"v0",	"v1",	"a0",	"a1",	"a2",	"a3", \
 	"t0",	"t1",	"t2",	"t3",	"t4",	"t5",	"t6",	"t7", \
 	"s0",	"s1",	"s2",	"s3",	"s4",	"s5",	"s6",	"s7", \
@@ -75,7 +76,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* Offsets for register values in _sigtramp frame.
    sigcontext is immediately above the _sigtramp frame on Irix.  */
-#define SIGFRAME_BASE		0x0 
+#define SIGFRAME_BASE		0x0
 #define SIGFRAME_PC_OFF		(SIGFRAME_BASE + 2 * 4)
 #define SIGFRAME_REGSAVE_OFF	(SIGFRAME_BASE + 3 * 4)
 #define SIGFRAME_FPREGSAVE_OFF	(SIGFRAME_BASE + 3 * 4 + 32 * 4 + 4)

@@ -1,5 +1,8 @@
 2001-06-18  Ben Elliston  <bje@redhat.com>
 
+	* sidcomp.cfgroot/badconf.exp: Improve messages.
+	(sid_check_err): Make detailed fault analysis a verbose message.
+
 	* sidcomp.cache/types.exp: Remove rogue test case.
 
 2001-06-15  Ben Elliston  <bje@redhat.com>

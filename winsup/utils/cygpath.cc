@@ -21,7 +21,7 @@ details. */
 #include <sys/cygwin.h>
 #include <ctype.h>
 
-static const char version[] = "$Revision: 1.22 $";
+static const char version[] = "$Revision: 1.23 $";
 
 static char *prog_name;
 static char *file_arg;
@@ -56,6 +56,8 @@ static struct option long_options[] = {
   {(char *) "windir", no_argument, NULL, 'W'},
   {0, no_argument, 0, 0}
 };
+
+static char options[] = "ac:df:hilmopst:uvwADHPSW";
 
 static void
 usage (FILE * stream, int status)
@@ -534,7 +536,8 @@ print_version ()
 cygpath (cygwin) %.*s\n\
 Path Conversion Utility\n\
 Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
-Compiled on %s", len, v, __DATE__);
+Compiled on %s\n\
+", len, v, __DATE__);
 }
 
 int
@@ -562,7 +565,7 @@ main (int argc, char **argv)
   options_from_file_flag = 0;
   allusers_flag = 0;
   output_flag = 0;
-  while ((c = getopt_long (argc, argv, (char *) "ac:df:hilmopst:uvwADHPSW",
+  while ((c = getopt_long (argc, argv, options,
 			   long_options, (int *) NULL)) != EOF)
     {
       switch (c)

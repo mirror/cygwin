@@ -8,7 +8,7 @@
 This chapter describes the internals of the assembler.  It is incomplete, but
 it may help a bit.
 
-This chapter was last modified on $Date: 2000/02/28 04:08:32 $.  It is not updated regularly, and it
+This chapter was last modified on $Date: 2000/03/13 20:46:07 $.  It is not updated regularly, and it
 may be out of date.
 
 @menu
@@ -1058,6 +1058,16 @@ upon the number of bytes that the alignment will skip.
 @cindex HANDLE_ALIGN
 You may define this macro to do special handling for an alignment directive.
 GAS will call it at the end of the assembly.
+
+@item TC_IMPLICIT_LCOMM_ALIGNMENT (@var{size}, @var{p2var})
+@cindex TC_IMPLICIT_LCOMM_ALIGNMENT
+An @code{.lcomm} directive with no explicit alignment parameter will use this
+macro to set @var{p2var} to the alignment that a request for @var{size} bytes
+will have.  The alignment is expressed as a power of two.  If no alignment
+should take place, the macro definition should do nothing.  Some targets define
+a @code{.bss} directive that is also affected by this macro.  The default
+definition will set @var{p2var} to the truncated power of two of sizes up to
+eight bytes.
 
 @item md_flush_pending_output
 @cindex md_flush_pending_output

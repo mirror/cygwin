@@ -329,6 +329,28 @@
   (let ((estate (estate-make-for-normal-rtl-c extra-vars-alist overrides)))
     (rtl-c-with-estate estate mode (rtx-compile #f x extra-vars-alist)))
 )
+
+; Same as rtl-c-with-estate except return a <c-expr> object.
+
+(define (rtl-c-expr-with-estate estate mode expr)
+  (rtl-c-get estate mode (rtx-eval-with-estate expr mode estate))
+)
+
+; Same as rtl-c-parsed except return a <c-expr> object.
+
+(define (rtl-c-expr-parsed mode x extra-vars-alist . overrides)
+  (let ((estate (estate-make-for-normal-rtl-c extra-vars-alist overrides)))
+    (rtl-c-expr-with-estate estate mode x))
+)
+
+; Same as rtl-c-expr-parsed but X is unparsed.
+
+(define (rtl-c-expr mode x extra-vars-alist . overrides)
+  ; ??? rtx-compile could return a closure, then we wouldn't have to
+  ; pass EXTRA-VARS-ALIST to two routines here.
+  (let ((estate (estate-make-for-normal-rtl-c extra-vars-alist overrides)))
+    (rtl-c-expr-with-estate estate mode (rtx-compile #f x extra-vars-alist)))
+)
 
 ; C++ versions of rtl-c routines.
 
@@ -389,9 +411,7 @@
 ;
 ; ??? mode compatibility checks are wip
 
-(define (rtl-c-get estate mode src)
-  (logit 4 "(rtl-c-get " (mode-real-name mode) " " (rtx-strdump src) ")\n")
-
+(define (-rtl-c-get estate mode src)
   (let ((mode (mode:lookup mode)))
 
     (cond ((c-expr? src)
@@ -408,13 +428,13 @@
 					": ")
 			 (obj:name mode)))))
 
-	  ; The recursive call to rtl-c-get is in case the result of rtx-eval
+	  ; The recursive call to -rtl-c-get is in case the result of rtx-eval
 	  ; is a hardware object, rtx-func object, or another rtl expression.
 	  ((rtx? src)
 	   (let ((evald-src (rtx-eval-with-estate src mode estate)))
 	     ; There must have been some change, otherwise we'll loop forever.
 	     (assert (not (eq? src evald-src)))
-	     (rtl-c-get estate mode evald-src)))
+	     (-rtl-c-get estate mode evald-src)))
 
 	  ((or (and (symbol? src) (current-op-lookup src))
 	       (operand? src))
@@ -459,7 +479,17 @@
 	       (cx:make INT src)
 	       (cx:make mode src)))
 
-	  (else (error "rtl-c-get: invalid argument:" src))))
+	  (else (error "-rtl-c-get: invalid argument:" src))))
+)
+
+(define (rtl-c-get estate mode src)
+  (logit 4 (spaces (estate-depth estate))
+	 "(rtl-c-get " (mode-real-name mode) " " (rtx-strdump src) ")\n")
+  (let ((result (-rtl-c-get estate mode src)))
+    (logit 4 (spaces (estate-depth estate))
+	   "(rtl-c-get " (mode-real-name mode) " " (rtx-strdump src) ") => "
+	   (cx:c result) "\n")
+    result)
 )
 
 ; Return a <c-expr> object to set the value of DEST to SRC.

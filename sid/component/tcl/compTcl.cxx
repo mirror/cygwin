@@ -1,6 +1,6 @@
 // compTcl.cxx - Tcl bridge component.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999-2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -94,6 +94,7 @@ namespace tcl_api_component
   using sidutil::bijection;
   using sidutil::std_error_string;
   using sidutil::tokenize;
+  using sidutil::sid_file_search_path;
 
 
 #ifndef DISABLE_THIS_COMPONENT
@@ -2059,35 +2060,7 @@ scan_files (const string& dotless_extension)
   file_map_t files;
   string extension = string(".") + dotless_extension;
 
-  vector<string> search_directories;
-
-  char* slp = getenv ("SID_LIBRARY_PATH"); // run-time configuration
-  if (slp)
-    {
-      search_directories = tokenize (slp, ":");
-    }
-
-  char* sep = getenv ("SID_EXEC_PREFIX"); // install-time configuration
-#ifdef HAVE_CYGWIN_CONV_TO_FULL_POSIX_PATH
-	char conv_fn[PATH_MAX*2];
-	if (sep)
-	  {
-	    int rc = cygwin_conv_to_full_posix_path (sep, conv_fn);
-	    if (rc != 0)
-	      cerr << "tcl-bridge: cygwin_conv_to_full_posix_path failed: " 
-		   << std_error_string () << endl;
-	    else
-	      sep = conv_fn;
-	  }
-#endif
-  if (!sep) sep = SID_EXEC_PREFIX; // build-time configuration
-  // We really just want to get to pkgdatadir, which is $prefix/share/sidcomp.
-  // Guess exec-prefix == prefix
-  string pkglibdir1 = string(sep) + string("/share/sidcomp");
-  search_directories.push_back (pkglibdir1);
-  // Guess exec-prefix == prefix/H-HOST
-  string pkglibdir2 = string(sep) + string("/../share/sidcomp");
-  search_directories.push_back (pkglibdir2);
+  vector<string> search_directories = sid_file_search_path ();
 
 #ifndef HAVE_OPENDIR
 #error "Need opendir!"
@@ -2095,7 +2068,8 @@ scan_files (const string& dotless_extension)
 
   for (unsigned i=0; i<search_directories.size(); i++)
     {
-      const char* dname = search_directories[i].c_str();
+      string search_dir = search_directories[i] + "/sidcomp";
+      const char* dname = search_dir.c_str();
       // cout << "Searching directory `" << dname << "'" << endl;
 
       DIR* d = opendir (dname);

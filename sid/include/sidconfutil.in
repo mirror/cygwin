@@ -33,3 +33,6 @@
 /* Define if compiler supports __builtin_expect */
 #undef HAVE_BUILTIN_EXPECT
 
+/* Define to build-time exec-prefix */
+#undef SID_EXEC_PREFIX
+

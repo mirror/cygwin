@@ -1,7 +1,7 @@
 // compConfig.cxx - The cfgroot component: configuration parsing, root
 // of component creation and management.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999-2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -74,6 +74,7 @@ using sidutil::parse_attribute;
 using sidutil::std_error_string;
 using sidutil::recursion_limited;
 using sidutil::recursion_record;
+using sidutil::find_sid_data_file;
 
 
 // This component reads a flat config file, and acts as a root
@@ -483,7 +484,7 @@ cfgroot_component::configure(const std::string& name)
   unsigned last_line_num = this->line_num;
   this->line_num = 1;
 
-  ifstream cfile(this->config_file.c_str());
+  ifstream cfile(find_sid_data_file(this->config_file).c_str());
   if(! cfile.good())
     {
       cerr << config_file << ": " << std_error_string() << endl;

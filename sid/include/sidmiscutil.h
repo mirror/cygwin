@@ -1,6 +1,6 @@
 // sidmiscutil.h - Useful utility classes.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999-2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -10,6 +10,7 @@
 #include <sidconfig.h>
 
 #include <string>
+#include <fstream>
 #include <vector>
 #include <map>
 #include <cassert>
@@ -304,6 +305,75 @@ namespace sidutil
 #endif
       return std::string(error_message);
     }
+
+
+  // Return a vector of directory names, where the SID_LIBRARY_PATH
+  // and SID_EXEC_PREFIX environment variables are pointing.  Convert
+  // all paths to POSIX form on Cygwin.
+  inline std::vector<std::string>
+  sid_file_search_path ()
+  {
+    vector<string> search_directories;
+
+    char* slp = getenv ("SID_LIBRARY_PATH"); // run-time configuration
+    if (slp)
+      {
+	search_directories = tokenize (slp, ":");
+      }
+    
+    char* sep = getenv ("SID_EXEC_PREFIX"); // install-time configuration
+#ifdef __CYGWIN__
+    char conv_fn[PATH_MAX*2];
+    if (sep)
+      {
+	int rc = cygwin_conv_to_full_posix_path (sep, conv_fn);
+	if (rc != 0)
+	  cerr << "sid_file_search_path: cygwin_conv_to_full_posix_path failed: " 
+	       << std_error_string () << endl;
+	else
+	  sep = conv_fn;
+      }
+#endif
+    if (!sep) sep = SID_EXEC_PREFIX; // build-time configuration
+    // We really just want to get to pkgdatadir, which is $prefix/share
+    // Guess exec-prefix == prefix
+    string pkglibdir1 = string(sep) + string("/share");
+    search_directories.push_back (pkglibdir1);
+    // Guess exec-prefix == prefix/H-HOST
+    string pkglibdir2 = string(sep) + string("/../share");
+    search_directories.push_back (pkglibdir2);
+
+    return search_directories;
+  }
+
+
+  // Look around cwd, the standard search dirs (.../sid)
+  // At worst, return the given name.
+  inline std::string
+  find_sid_data_file (const std::string& file)
+  {
+    std::vector<std::string> file_path = sid_file_search_path ();
+    std::vector<std::string> path;
+
+    path.push_back (string("")); // no prefix
+    for (unsigned i=0; i<file_path.size(); i++)
+      path.push_back (file_path[i] + string("/sid/"));
+
+    for (unsigned i=0; i<path.size(); i++)
+      {
+	const std::string& dir = path[i];
+	std::string full_path = dir + file;
+	
+	// Try to open it.
+	std::ifstream f (full_path.c_str());
+	if (f.good())
+	  return full_path;
+      }
+
+    return file;
+  }
+
+
 }
 
 #endif // SIDMISCUTIL_H

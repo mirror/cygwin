@@ -59,5 +59,12 @@ fi
 AC_MSG_RESULT([$sid_cv_builtin_expect])
 		
 
+if test "${exec_prefix}" = "NONE"; then
+	sid_exec_prefix=${prefix}
+else
+	sid_exec_prefix=${exec_prefix}
+fi
+AC_DEFINE_UNQUOTED(SID_EXEC_PREFIX,"$sid_exec_prefix",[Define to build-time exec-prefix])
+
 dnl Outputs
 AC_OUTPUT(Makefile)

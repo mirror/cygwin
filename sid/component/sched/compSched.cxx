@@ -1139,7 +1139,9 @@ ostream&
 operator << (ostream& o, const scheduler_component<Scheduler>& it)
 {
   o << "scheduler-state "
+    << it.enable_threshold << " "
     << it.enable_p << " "
+    << it.yield_host_time_threshold << " "
     << it.yield_host_time_p << " "
     << it.sched.step_cycle_limit << " "   // this is a component attribute
     << it.advance_count << " "
@@ -1182,7 +1184,9 @@ operator >> (istream& i, scheduler_component<Scheduler>& it)
   i >> key;
   if (key == "scheduler-state")
     {
-      i >> it.enable_p
+      i >> it.enable_threshold
+        >> it.enable_p
+	>> it.yield_host_time_threshold
 	>> it.yield_host_time_p
 	>> it.sched.step_cycle_limit
 	>> it.advance_count
@@ -1251,8 +1255,10 @@ class scheduler_component: public scheduler_component_base
 
   vector<client_t*> clients;  
   host_int_1 num_clients;
-  bool enable_p;
-  bool yield_host_time_p;
+  int enable_threshold;
+  int enable_p;
+  int yield_host_time_threshold;
+  int yield_host_time_p;
   host_int_8 advance_count;
   callback_pin<this_t> advance_pin;
   callback_pin<this_t> time_query_pin;
@@ -1298,11 +1304,21 @@ protected:
       recursion_record limit (this);
       if (UNLIKELY(!limit.ok()))
 	return;
-
-      if (LIKELY(this->enable_p))
+#if 0
+      cerr << "Scheduler:" << endl;
+      cerr << "  enable_p==" << this->enable_p
+	   << " enable_threshold==" << this->enable_threshold << endl;
+#endif
+      if (LIKELY(this->enable_p >= this->enable_threshold))
         {
+#if 0
+	  cerr << "  yield_host_time_p=="
+	       << this->yield_host_time_p
+	       << " yield_host_time_threshold=="
+	       << this->yield_host_time_threshold << endl;
+#endif
           this->advance_count ++;
-  	  this->sched.advance (this->yield_host_time_p);
+  	  this->sched.advance (this->yield_host_time_p >= this->yield_host_time_threshold);
         }
     }
 
@@ -1395,11 +1411,14 @@ public:
     sched(),
     clients(0),
     num_clients(0),
-    enable_p(true), yield_host_time_p(false), 
+    enable_threshold(1),
+    yield_host_time_threshold(1), 
+    yield_host_time_p(0), 
     advance_pin(this, & scheduler_component::advance),
     time_query_pin(this, & scheduler_component::time_query),
     yield_pin(this, & scheduler_component::yield_step_loop)
     {
+      enable_p = enable_threshold;
       scheduler_component_ctor_1();
       scheduler_component_ctor_2();
       scheduler_component_ctor_3();
@@ -1419,7 +1438,9 @@ scheduler_component<Scheduler>::scheduler_component_ctor_1()
   add_pin ("time-low", & this->time_low_pin);
   add_pin ("yield", & this->yield_pin);
   add_attribute ("yield", & this->yield_pin, "pin");
+  add_attribute ("enable-threshold", & this->enable_threshold, "setting");
   add_attribute ("enabled?", & this->enable_p, "setting");
+  add_attribute ("yield-host-time-threshold", & this->yield_host_time_threshold, "setting");
   add_attribute ("yield-host-time?", & this->yield_host_time_p, "setting");
   add_attribute_ro_value ("scheduler-control-gui", string("sid-visual-sched"), "gui");
 }

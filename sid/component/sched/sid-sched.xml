@@ -25,8 +25,10 @@
     <defattribute name="N-control" category="pin" behaviors="subscription" />
     <defattribute name="advance" category="pin" behaviors="advancing" />
     <defattribute name="yield" category="pin" behaviors="advancing" />
-    <defattribute name="enabled?" category="setting" legalvalues="boolean" defaultvalue="'1'" behaviors="advancing" />
-    <defattribute name="yield-host-time?" category="setting" legalvalues="boolean" defaultvalue="'0'" behaviors="timing" />
+    <defattribute name="enable-theshold" category="setting" legalvalues="numeric" defaultvalue="'1'" behaviors="advancing" />
+    <defattribute name="enabled?" category="setting" legalvalues="numeric" defaultvalue="enable-threshold" behaviors="advancing" />
+    <defattribute name="yield-host-time-threshold" category="setting" legalvalues="numeric" defaultvalue="'1'" behaviors="timing" />
+    <defattribute name="yield-host-time?" category="setting" legalvalues="numeric" defaultvalue="'0'" behaviors="timing" />
     <defattribute name="step-cycle-limit" category="setting" legalvalues="numeric" defaultvalue="advancing" />
     <defattribute name="time" category="register" legalvalues="numeric" defaultvalue="timing" />
     <defattribute name="advance-count" category="register" legalvalues="numeric" defaultvalue="advancing" />
@@ -81,7 +83,8 @@
       operating system.  Its <attribute>time</attribute> is simply that of the operating
       system.  When advancing, there may be no scheduled events due,
       even though there may be scheduled events.  In such a case, if
-      the <attribute>yield-host-time?</attribute>  attribute is set to <tt>1</tt>, a host-time
+      the <attribute>yield-host-time?</attribute>  attribute is set to <tt>a value greater than or
+      equalt to yield-host-time-threshold</tt>, a host-time
       scheduler will yield some amount of time to the host operating
       system using a function like usleep().
       </p>
@@ -129,8 +132,8 @@
 
     <behavior name="advancing">
       <p> When you have disabled the scheduler by setting the
-      <attribute>enabled?</attribute>  attribute to 0, advancing as described below, does
-      not occur.
+      <attribute>enabled?</attribute>  attribute to a value less than enable-threshold,
+      advancing as described below, does not occur.
       </p>
 
       <p> Whenever the <pin>advance</pin> input pin is driven, the scheduler

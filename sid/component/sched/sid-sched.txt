@@ -59,10 +59,13 @@ Functionality:
    |               | though there may be scheduled   |
    |               | events. In such a case, if the  |
    |               | yield-host-time? attribute is   |
-   |               | set to 1, a host-time scheduler |
-   |               | will yield some amount of time  |
-   |               | to the host operating system    |
-   |               | using a function like usleep(). |
+   |               | set to a value greater than or  |
+   |               | equalt to                       |
+   |               | yield-host-time-threshold, a    |
+   |               | host-time scheduler will yield  |
+   |               | some amount of time to the host |
+   |               | operating system using a        |
+   |               | function like usleep().         |
    |               |                                 |
    |               | The time-query pin, when        |
    |               | driven, causes a scheduler to   |
@@ -129,7 +132,8 @@ Functionality:
    |---------------+---------------------------------|
    |     advancing | When you have disabled the      |
    |               | scheduler by setting the        |
-   |               | enabled? attribute to 0,        |
+   |               | enabled? attribute to a value   |
+   |               | less than enable-threshold,     |
    |               | advancing as described below,   |
    |               | does not occur.                 |
    |               |                                 |
@@ -251,42 +255,46 @@ Component Reference:
    |          |         |value          |            |
    +-------------------------------------------------+
 
-   +-----------------------------------------------------------+
-   |                        attributes                         |
-   |-----------------------------------------------------------|
-   |      name      |category| legal  | default |  behaviors  ||
-   |                |        | values |  value  |             ||
-   |----------------+--------+--------+---------+-------------||
-   |state-snapshot  |no      |opaque  |-        |state        ||
-   |                |category|string  |         |save/restore ||
-   |----------------+--------+--------+---------+-------------||
-   |num-clients     |setting |numeric |'0'      |configuration||
-   |----------------+--------+--------+---------+-------------||
-   |N-regular?      |setting |boolean |'0'      |subscription ||
-   |----------------+--------+--------+---------+-------------||
-   |N-time          |setting |numeric |'0'      |subscription ||
-   |----------------+--------+--------+---------+-------------||
-   |N-scale         |setting |numeric |'1'      |subscription ||
-   |                |        |fraction|         |             ||
-   |----------------+--------+--------+---------+-------------||
-   |N-event         |pin     |-       |-        |advancing    ||
-   |----------------+--------+--------+---------+-------------||
-   |N-control       |pin     |-       |-        |subscription ||
-   |----------------+--------+--------+---------+-------------||
-   |advance         |pin     |-       |-        |advancing    ||
-   |----------------+--------+--------+---------+-------------||
-   |yield           |pin     |-       |-        |advancing    ||
-   |----------------+--------+--------+---------+-------------||
-   |enabled?        |setting |boolean |'1'      |advancing    ||
-   |----------------+--------+--------+---------+-------------||
-   |yield-host-time?|setting |boolean |'0'      |timing       ||
-   |----------------+--------+--------+---------+-------------||
-   |step-cycle-limit|setting |numeric |advancing|             ||
-   |----------------+--------+--------+---------+-------------||
-   |time            |register|numeric |timing   |             ||
-   |----------------+--------+--------+---------+-------------||
-   |advance-count   |register|numeric |advancing|             ||
-   +-----------------------------------------------------------+
+   +---------------------------------------------------------------------------+
+   |                                attributes                                 |
+   |---------------------------------------------------------------------------|
+   |          name           |category| legal  | default value  |  behaviors  ||
+   |                         |        | values |                |             ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |state-snapshot           |no      |opaque  |-               |state        ||
+   |                         |category|string  |                |save/restore ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |num-clients              |setting |numeric |'0'             |configuration||
+   |-------------------------+--------+--------+----------------+-------------||
+   |N-regular?               |setting |boolean |'0'             |subscription ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |N-time                   |setting |numeric |'0'             |subscription ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |N-scale                  |setting |numeric |'1'             |subscription ||
+   |                         |        |fraction|                |             ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |N-event                  |pin     |-       |-               |advancing    ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |N-control                |pin     |-       |-               |subscription ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |advance                  |pin     |-       |-               |advancing    ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |yield                    |pin     |-       |-               |advancing    ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |enable-theshold          |setting |numeric |'1'             |advancing    ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |enabled?                 |setting |numeric |enable-threshold|advancing    ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |yield-host-time-threshold|setting |numeric |'1'             |timing       ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |yield-host-time?         |setting |numeric |'0'             |timing       ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |step-cycle-limit         |setting |numeric |advancing       |             ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |time                     |register|numeric |timing          |             ||
+   |-------------------------+--------+--------+----------------+-------------||
+   |advance-count            |register|numeric |advancing       |             ||
+   +---------------------------------------------------------------------------+
 
   Variant: sid-sched-sim
 

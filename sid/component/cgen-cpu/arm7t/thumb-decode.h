@@ -181,10 +181,7 @@ struct thumb_scache {
   // argument buffer
   thumb_sem_fields fields;
 
-  // writeback flags
-  // Only used if profiling or parallel execution support enabled during
-  // file generation.
-  unsigned written;
+
 
   // decode given instruction
   void decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn);

@@ -54,7 +54,7 @@ m32rbf_sem_add (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = ADDSI (* FLD (i_dr), * FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -77,7 +77,7 @@ m32rbf_sem_add3 (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = ADDSI (* FLD (i_sr), FLD (f_simm16));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -100,7 +100,7 @@ m32rbf_sem_and (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = ANDSI (* FLD (i_dr), * FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -123,7 +123,7 @@ m32rbf_sem_and3 (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = ANDSI (* FLD (i_sr), FLD (f_uimm16));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -146,7 +146,7 @@ m32rbf_sem_or (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = ORSI (* FLD (i_dr), * FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -169,7 +169,7 @@ m32rbf_sem_or3 (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = ORSI (* FLD (i_sr), FLD (f_uimm16));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -192,7 +192,7 @@ m32rbf_sem_xor (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = XORSI (* FLD (i_dr), * FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -215,7 +215,7 @@ m32rbf_sem_xor3 (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = XORSI (* FLD (i_sr), FLD (f_uimm16));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -238,7 +238,7 @@ m32rbf_sem_addi (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = ADDSI (* FLD (i_dr), FLD (f_simm8));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -265,13 +265,13 @@ m32rbf_sem_addv (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = temp0;
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = temp1;
     current_cpu->hardware.h_cond = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "condbit" << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "cond" << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -299,13 +299,13 @@ m32rbf_sem_addv3 (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = temp0;
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = temp1;
     current_cpu->hardware.h_cond = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "condbit" << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "cond" << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -333,13 +333,13 @@ m32rbf_sem_addx (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = temp0;
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = temp1;
     current_cpu->hardware.h_cond = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "condbit" << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "cond" << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -771,7 +771,7 @@ m32rbf_sem_cmp (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     BI opval = LTSI (* FLD (i_src1), * FLD (i_src2));
     current_cpu->hardware.h_cond = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "condbit" << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "cond" << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -794,7 +794,7 @@ m32rbf_sem_cmpi (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     BI opval = LTSI (* FLD (i_src2), FLD (f_simm16));
     current_cpu->hardware.h_cond = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "condbit" << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "cond" << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -817,7 +817,7 @@ m32rbf_sem_cmpu (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     BI opval = LTUSI (* FLD (i_src1), * FLD (i_src2));
     current_cpu->hardware.h_cond = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "condbit" << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "cond" << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -840,7 +840,7 @@ m32rbf_sem_cmpui (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     BI opval = LTUSI (* FLD (i_src2), FLD (f_simm16));
     current_cpu->hardware.h_cond = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "condbit" << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "cond" << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -864,7 +864,7 @@ if (NESI (* FLD (i_sr), 0)) {
     SI opval = DIVSI (* FLD (i_dr), * FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -889,7 +889,7 @@ if (NESI (* FLD (i_sr), 0)) {
     SI opval = UDIVSI (* FLD (i_dr), * FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -914,7 +914,7 @@ if (NESI (* FLD (i_sr), 0)) {
     SI opval = MODSI (* FLD (i_dr), * FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -939,7 +939,7 @@ if (NESI (* FLD (i_sr), 0)) {
     SI opval = UMODSI (* FLD (i_dr), * FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1020,7 +1020,7 @@ m32rbf_sem_ld (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = current_cpu->GETMEMSI (pc, * FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1043,7 +1043,7 @@ m32rbf_sem_ld_d (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = current_cpu->GETMEMSI (pc, ADDSI (* FLD (i_sr), FLD (f_simm16)));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1066,7 +1066,7 @@ m32rbf_sem_ldb (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, * FLD (i_sr)));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1089,7 +1089,7 @@ m32rbf_sem_ldb_d (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, ADDSI (* FLD (i_sr), FLD (f_simm16))));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1112,7 +1112,7 @@ m32rbf_sem_ldh (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, * FLD (i_sr)));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1135,7 +1135,7 @@ m32rbf_sem_ldh_d (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, ADDSI (* FLD (i_sr), FLD (f_simm16))));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1158,7 +1158,7 @@ m32rbf_sem_ldub (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, * FLD (i_sr)));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1181,7 +1181,7 @@ m32rbf_sem_ldub_d (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, ADDSI (* FLD (i_sr), FLD (f_simm16))));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1204,7 +1204,7 @@ m32rbf_sem_lduh (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, * FLD (i_sr)));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1227,7 +1227,7 @@ m32rbf_sem_lduh_d (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, ADDSI (* FLD (i_sr), FLD (f_simm16))));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1254,13 +1254,13 @@ m32rbf_sem_ld_plus (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = temp0;
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = temp1;
     * FLD (i_sr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "sr" << '[' << FLD (f_r2) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1284,7 +1284,7 @@ m32rbf_sem_ld24 (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = FLD (i_uimm24);
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1307,7 +1307,7 @@ m32rbf_sem_ldi8 (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = FLD (f_simm8);
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1330,7 +1330,7 @@ m32rbf_sem_ldi16 (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = FLD (f_simm16);
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1360,7 +1360,7 @@ m32rbf_sem_lock (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = current_cpu->GETMEMSI (pc, * FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1476,7 +1476,7 @@ m32rbf_sem_mul (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = MULSI (* FLD (i_dr), * FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1591,7 +1591,7 @@ m32rbf_sem_mv (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = * FLD (i_sr);
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1614,7 +1614,7 @@ m32rbf_sem_mvfachi (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = TRUNCDISI (SRADI (current_cpu->h_accum_get (), 32));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1637,7 +1637,7 @@ m32rbf_sem_mvfaclo (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = TRUNCDISI (current_cpu->h_accum_get ());
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1660,7 +1660,7 @@ m32rbf_sem_mvfacmi (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = TRUNCDISI (SRADI (current_cpu->h_accum_get (), 16));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1683,7 +1683,7 @@ m32rbf_sem_mvfc (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = current_cpu->h_cr_get (FLD (f_r2));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1752,7 +1752,7 @@ m32rbf_sem_mvtc (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     USI opval = * FLD (i_sr);
     current_cpu->h_cr_set (FLD (f_r1), opval);
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dcr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "cr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1775,7 +1775,7 @@ m32rbf_sem_neg (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = NEGSI (* FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1816,7 +1816,7 @@ m32rbf_sem_not (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = INVSI (* FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1947,7 +1947,7 @@ m32rbf_sem_seth (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = SLLSI (FLD (f_hi16), 16);
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1970,7 +1970,7 @@ m32rbf_sem_sll (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = SLLSI (* FLD (i_dr), ANDSI (* FLD (i_sr), 31));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -1993,7 +1993,7 @@ m32rbf_sem_sll3 (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = SLLSI (* FLD (i_sr), ANDSI (FLD (f_simm16), 31));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -2016,7 +2016,7 @@ m32rbf_sem_slli (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = SLLSI (* FLD (i_dr), FLD (f_uimm5));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -2039,7 +2039,7 @@ m32rbf_sem_sra (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = SRASI (* FLD (i_dr), ANDSI (* FLD (i_sr), 31));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -2062,7 +2062,7 @@ m32rbf_sem_sra3 (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = SRASI (* FLD (i_sr), ANDSI (FLD (f_simm16), 31));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -2085,7 +2085,7 @@ m32rbf_sem_srai (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = SRASI (* FLD (i_dr), FLD (f_uimm5));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -2108,7 +2108,7 @@ m32rbf_sem_srl (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = SRLSI (* FLD (i_dr), ANDSI (* FLD (i_sr), 31));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -2131,7 +2131,7 @@ m32rbf_sem_srl3 (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = SRLSI (* FLD (i_sr), ANDSI (FLD (f_simm16), 31));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -2154,7 +2154,7 @@ m32rbf_sem_srli (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = SRLSI (* FLD (i_dr), FLD (f_uimm5));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -2324,7 +2324,7 @@ m32rbf_sem_st_plus (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = tmp_new_src2;
     * FLD (i_src2) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "src2" << '[' << FLD (f_r2) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2357,7 +2357,7 @@ m32rbf_sem_st_minus (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = tmp_new_src2;
     * FLD (i_src2) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "src2" << '[' << FLD (f_r2) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2381,7 +2381,7 @@ m32rbf_sem_sub (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = SUBSI (* FLD (i_dr), * FLD (i_sr));
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -2408,13 +2408,13 @@ m32rbf_sem_subv (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = temp0;
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = temp1;
     current_cpu->hardware.h_cond = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "condbit" << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "cond" << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2442,13 +2442,13 @@ m32rbf_sem_subx (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = temp0;
     * FLD (i_dr) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "dr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_r1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = temp1;
     current_cpu->hardware.h_cond = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "condbit" << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "cond" << ":=0x" << hex << opval << dec << "  ";
   }
 }
 

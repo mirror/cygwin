@@ -10,7 +10,7 @@
 ; [It still does but that's to be fixed.]
 
 ; Specify which application.
-(set! APPLICATION 'SIMULATOR)
+(set! APPLICATION 'SID-SIMULATOR)
 
 ; Misc. state info.
 

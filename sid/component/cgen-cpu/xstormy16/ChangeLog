@@ -1,3 +1,7 @@
+2003-03-12  Frank Ch. Eigler  <fche@redhat.com>
+
+        * xstormy16-decode.cxx: Regenerate with fixed cgen SID-SIMULATOR.
+
 2002-03-05  DJ Delorie  <dj@redhat.com>
 
 	* xstormy16-sem.cxx: Regenerate.

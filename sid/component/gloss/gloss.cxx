@@ -680,6 +680,9 @@ gloss32::syscall_trap()
     case libgloss::SYS_times:
       do_sys_times();
       break;
+    case libgloss::SYS_unlink:
+      do_sys_unlink();
+      break;
     default:
       do_nonstandard_target_syscalls (syscall);
       break;
@@ -765,6 +768,25 @@ gloss32::do_sys_times()
 }
 
 void
+gloss32::do_sys_unlink()
+{
+  string filename;
+  int32 str_ptr;
+  int errcode;
+
+  get_int_argument(1, str_ptr);
+  get_string(str_ptr, filename, 100);
+
+  if (! this->remove (filename, errcode))
+    {
+      set_host_error_result (errcode);
+      set_int_result (-1);
+    }
+  else
+    set_int_result (0);
+}
+
+void
 gloss32::do_sys_exit()
 {
   int32 value;
@@ -792,11 +814,14 @@ gloss32::do_sys_lseek()
     {
     case 1:
       whence = hostops::seek_cur;
+      break;
     case 2:
       whence = hostops::seek_end;
+      break;
     default:
     case 0:
       whence = hostops::seek_set;
+      break;
     }
 
   size32 new_pos;
@@ -805,10 +830,10 @@ gloss32::do_sys_lseek()
   if (! this->lseek(handle, offset, whence, new_pos, errcode))
     {
       set_host_error_result(errcode);
-      set_int_result(1);
+      set_int_result(-1);
       return;
     }
-  set_int_result(0);
+  set_int_result(new_pos);
 }
 
 void

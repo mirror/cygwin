@@ -1,3 +1,9 @@
+2000-06-15  Jonathan Larmour  <jlarmour@redhat.co.uk>
+
+	* iwidgets3.0.0/unix/configure.in: Use config scripts from build
+	tree before exec_prefix
+	* iwidgets3.0.0/unix/configure: regenerate
+
 2000-05-03  Syd Polk  <spolk@redhat.com>
 
 	* Makefile.in (check test): Call "make test" explicitly when

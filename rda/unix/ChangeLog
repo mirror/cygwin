@@ -9,9 +9,6 @@
 	* configure.in: Use stock-breakpoints.o on FRV Linux, too.
 	* configure: Regenerated.
 
-	* linux-target.c (frv_fdpic_loadmap_addresses): Use '%lx' for
-	unsigned long argument.
-
 2004-12-03  Jim Blandy  <jimb@redhat.com>
 
 	Disable debugging messages by default.

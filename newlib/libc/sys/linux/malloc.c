@@ -19,7 +19,7 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-/* $Id: malloc.c,v 1.1 2002/07/15 20:16:30 jjohnstn Exp $
+/* $Id: malloc.c,v 1.2 2003/06/20 23:57:47 jjohnstn Exp $
 
   This work is mainly derived from malloc-2.6.4 by Doug Lea
   <dl@cs.oswego.edu>, which is available from:
@@ -301,6 +301,11 @@
 #define Void_t      char
 #endif
 #endif /*Void_t*/
+
+#define _GNU_SOURCE
+#include <features.h>
+#define _LIBC 1
+#define NOT_IN_libc 1
 
 #if __STD_C
 # include <stddef.h>   /* for size_t */

@@ -36,7 +36,7 @@ public:
   void  operator ||     (foo&);
   void  operator ~      (void);
   void  operator --     (int);
-  void  operator ->     (void);
+  foo*  operator ->     (void);
   void  operator -=     (foo&);
   void  operator /=     (foo&);
   void  operator <<=    (foo&);
@@ -45,7 +45,7 @@ public:
   void  operator ->*    (foo&);
   void  operator []     (foo&);
   void  operator ()     (foo&);
-  void* operator new    (size_t);
+  void* operator new    (size_t) throw ();
   void  operator delete (void *);
   /**/  operator int    ();
   /**/  operator char*  ();
@@ -63,7 +63,7 @@ extern "C" {
 };
 #endif
 
-main () {
+int main () {
 #ifdef usestubs
    set_debug_traps();
    breakpoint();
@@ -105,7 +105,7 @@ void  foo::operator ^      (foo& afoo) { afoo.ifoo = 0; }
 void  foo::operator ||     (foo& afoo) { afoo.ifoo = 0; }
 void  foo::operator ~      (void) {}
 void  foo::operator --     (int ival) { ival = 0; }
-void  foo::operator ->     (void) {}
+foo*  foo::operator ->     (void) {return this;}
 void  foo::operator -=     (foo& afoo) { afoo.ifoo = 0; }
 void  foo::operator /=     (foo& afoo) { afoo.ifoo = 0; }
 void  foo::operator <<=    (foo& afoo) { afoo.ifoo = 0; }
@@ -114,7 +114,7 @@ void  foo::operator ^=     (foo& afoo) { afoo.ifoo = 0; }
 void  foo::operator ->*    (foo& afoo) { afoo.ifoo = 0; }
 void  foo::operator []     (foo& afoo) { afoo.ifoo = 0; }
 void  foo::operator ()     (foo& afoo) { afoo.ifoo = 0; }
-void* foo::operator new    (size_t ival) { ival = 0; return 0; }
+void* foo::operator new    (size_t ival) throw () { ival = 0; return 0; }
 void  foo::operator delete (void *ptr) { ptr = 0; }
 /**/  foo::operator int    () { return 0; }
 /**/  foo::operator char*  () { return 0; }
@@ -183,3 +183,14 @@ int	  hairyfunc4 (PFPFPc_s_i arg)		{ arg = 0; return 0; }
 int	  hairyfunc5 (PFPc_PFl_i arg)		{ arg = 0; return 0; }
 int	  hairyfunc6 (PFPi_PFl_i arg)		{ arg = 0; return 0; }
 int	  hairyfunc7 (PFPFPc_i_PFl_i arg)	{ arg = 0; return 0; }
+
+/* gdb has two demanglers (one for g++ 2.95, one for g++ 3).
+   These marker functions help me figure out which demangler is in use. */
+
+int	dm_type_char_star (char * p)		{ return (int) p; }
+int	dm_type_foo_ref (foo & foo)		{ return foo.ifoo; }
+int	dm_type_int_star (int * p)		{ return (int) p; }
+int	dm_type_long_star (long * p)		{ return (int) p; }
+int	dm_type_unsigned_int (unsigned int i)	{ return i; }
+int	dm_type_void (void)			{ return 0; }
+int	dm_type_void_star (void * p)		{ return (int) p; }

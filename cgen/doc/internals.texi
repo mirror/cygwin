@@ -83,6 +83,7 @@ This manual documents the internals of CGEN, version @value{VERSION}.
 * Source file overview::
 * Option processing::
 * Parsing::
+* Debuging::			Debugging applications
 * Version numbering::
 * Glossary::                    Glossary
 * Index::                       Index
@@ -367,6 +368,21 @@ There are two version numbers: the version number of cgen itself and a
 version number for the description language it accepts.  These are kept
 in the symbols @code{-CGEN-VERSION} and @code{-CGEN-LANG-VERSION} in
 @file{read.scm}.
+
+@node Debugging
+@chapter Debugging
+
+Debugging can be difficult in Guile.  Guile 1.4 (configured with the
+--enable-guile-debug option) seems unable to produce a stack backtrace
+when errors are triggered in Scheme code.  You should use Guile 1.3 in
+the meantime.  So far, the best way to debug your application is to
+insert (error) function applications at select places to cause the
+interpreter to output a stack backtrace.  This can be useful for
+answering the ``How did I get here?''  question.
+
+CGEN includes a (logit) function which logs error messages at different
+diagnostic levels.  If you want to produce debugging output, use
+(logit).
 
 @node Index
 @unnumbered Index

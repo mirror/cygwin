@@ -1,0 +1,474 @@
+2000-02-04  Nick Clifton  <nickc@cygnus.com>
+
+	* config/arm/tm-arm.h (LOWEST_PC): Define.
+
+2000-02-04  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
+
+	* infrun.c (resume): Make just one call to target_resume(), instead
+ 	of four: set up correct parameters in all the cases ahead of time,
+ 	and do call at the end.
+
+2000-02-04  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
+
+	* config/powerpc/tm-ppc-eabi.h: Define
+ 	SOFUN_ADDRESS_MAYBE_MISSING.
+
+2000-02-04  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* arm-tdep.c (arm_pc_is_thumb_dummy): Account for large dummy
+	frames (revisited).
+
+Fri Feb  4 22:42:36 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* Makefile.in (INIT_FILES): Append CONFIG_INITS
+	* configure.in (CONFIG_INIT): Initialize.
+	(links): Link srcdir/gdbtk/library to gdbtcl2.
+	* gdbtcl2: Moved to gdbtk/library.
+	ChangeLog-gdbtk, gdbtk-cmds.c, gdbtk-hooks.c, gdbtk-variable.c,
+ 	gdbtk-varobj.c, gdbtk-wrapper.c, gdbtk-wrapper.h, gdbtk.c,
+ 	gdbtk.h: Moved to gdbtk/generic.
+
+2000-02-03  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
+
+	* printcmd.c (build_address_symbolic): New function. Returns all
+ 	the parts that are necessary to print an address in a symbolic
+ 	form.
+	(print_address_symbolic): Split into a printing part and an
+ 	information building part, build_address_symbolic().
+
+	* defs.h (build_address_symbolic): Export.
+
+2000-02-03  Jim Blandy  <jimb@redhat.com>
+
+	* dwarf2read.c (decode_locdesc): Add support for the DW_OP_bregx
+	opcode.
+
+2000-02-02  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* arm-tdep.c (arm_push_arguments): Fix passing of floating point
+	arguments on dummy frames.
+
+2000-02-02  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* arm-tdep.c (arm_pc_is_thumb_dummy): Account for large dummy frames.
+	(arm_pop_frame): Account fr dummy frames (as opposed to real ones).
+
+2000-02-01  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
+
+	* remote.c (getpkt_sane): New function. It is the old getpkt(),
+ 	which now returns a timeout indication.
+	(getpkt): New function. Wrapper for getpkt_sane(), so that return
+ 	value can still be ignored.
+
+Tue Feb  1 18:47:31 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* top.c (print_gdb_version): Print ``UI_OUT'' when configured with
+ 	UI_OUT.
+
+Tue Feb  1 00:17:12 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* ui-file.c, ui-file.h: Rename gdb-file.h, gdb-file.c.  Rename
+ 	``struct gdb_file'' to ``struct ui_file''.  Delete typedef
+ 	GDB_FILE.
+	
+	* Makefile.in: Update.
+
+	* ax-gdb.c, ax-general.c, ax.h, buildsym.c, c-lang.c, c-lang.h,
+ 	c-typeprint.c, c-valprint.c, ch-lang.c, ch-lang.h, ch-typeprint.c,
+ 	ch-valprint.c, command.c, command.h, convex-tdep.c, corefile.c,
+ 	cp-valprint.c, d10v-tdep.c, d30v-tdep.c, defs.h, expprint.c,
+ 	expression.h, f-lang.c, f-lang.h, f-typeprint.c, f-valprint.c,
+ 	frame.h, gdb-events.sh, gdb-file.c, gdb-file.h, gdbcmd.h,
+ 	gdbtypes.h, hppa-tdep.c, jv-lang.c, jv-lang.h, jv-typeprint.c,
+ 	jv-valprint.c, language.c, language.h, m2-lang.c, m2-lang.h,
+ 	m2-typeprint.c, m2-valprint.c, m3-nat.c, main.c, monitor.c,
+ 	printcmd.c, pyr-tdep.c, remote-mips.c, remote-sim.c, remote-udi.c,
+ 	remote.c, scm-lang.c, scm-lang.h, scm-valprint.c, ser-e7kpc.c,
+ 	ser-go32.c, ser-mac.c, ser-ocd.c, ser-unix.c, ser-unix.h,
+ 	serial.c, serial.h, stack.c, symfile.c, symmisc.c, tahoe-tdep.c,
+ 	target.c, target.h, top.c, top.h, typeprint.c, typeprint.h,
+ 	utils.c, v850ice.c, valprint.c, valprint.h, value.h,
+ 	config/pa/tm-hppa.h: Update.
+	* cli-out.c, cli-out.h, ui-out.c, ui-out.h, varobj.c: Update.
+
+2000-01-31  Jason Molenda  (jsm@bugshack.cygnus.com)
+
+	* config/alpha/alpha-osf2.mh, config/alpha/alpha-osf3.mh,
+	config/i386/i386dgux.mh, config/i386/i386sol2.mh,
+	config/i386/i386v4.mh, config/i386/i386v42mp.mh,
+	config/i386/ncr3000.mh, config/m68k/m68kv4.mh,
+	config/m88k/delta88v4.mh, config/mips/irix4.mh,
+	config/mips/irix5.mh, config/mips/mipsv4.mh,
+	config/powerpc/solaris.mh (NATDEPFILES): Change references to
+	proc_api.o, proc_events.o, proc_flags.o, and proc_why.o to
+	proc-api.o, proc-events.o, proc-flags.o, and proc-why.o.
+
+Mon Jan 31 17:14:52 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* top.c (fputs_unfiltered_hook): Moved to tui/tui-file.c.
+
+	* main.c (captured_main): Only use the legacy tui_file code when
+ 	linking in older code such as the TUI.
+
+	* gdb-file.h, gdb-file.c: New files.
+	* utils.c, defs.h (struct gdb_file, gdb_file_new, gdb_file_delete,
+ 	null_file_isatty, null_file_rewind, null_file_put,
+ 	null_file_flush, null_file_write, null_file_fputs,
+ 	null_file_delete, gdb_file_data, gdb_flush, gdb_file_isatty,
+ 	gdb_file_rewind, gdb_file_put, gdb_file_write, fputs_unfiltered,
+ 	set_gdb_file_flush, set_gdb_file_isatty, set_gdb_file_rewind,
+ 	set_gdb_file_put, set_gdb_file_write, set_gdb_file_fputs,
+ 	set_gdb_file_data, struct accumulated_gdb_file,
+ 	do_gdb_file_xstrdup, gdb_file_xstrdup, struct mem_file):
+ 	mem_file_new, mem_file_delete, mem_fileopen, mem_file_rewind,
+ 	mem_file_put, mem_file_write, struct stdio_file): stdio_file_new,
+ 	stdio_file_delete, stdio_file_flush, stdio_file_write,
+ 	stdio_file_fputs, stdio_file_isatty, stdio_fileopen, gdb_fopen):
+ 	Moved to gdb-file.h and gdb-file.c.
+	* utils.c (enum streamtype, struct tui_stream, tui_file_new,
+ 	tui_file_delete, tui_fileopen, tui_sfileopen, tui_file_isatty,
+ 	tui_file_rewind, tui_file_put, tui_file_fputs,
+ 	tui_file_get_strbuf, tui_file_adjust_strbuf, tui_file_flush,
+	fputs_unfiltered_hook):
+ 	Moved to tui/tui-file.c and tui/tui-file.h.
+	
+	* Makefile.in (COMMON_OBS): Add gdb-file.o, tui-file.o.
+	(tui-file.o, gdb-file.o): Add dependencies.
+	(corefile.o, main.o, utils.o, simmisc.o): Update dependencies.
+	* main.c: #include tui/tui-file.h.
+
+2000-01-28  Fred Fish  <fnf@cygnus.com>
+
+	* findvar.c (value_from_register): Special case handling of D10V
+	pointer values fetched from registers.
+
+2000-01-28  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* arm-tdep.c (thumb_skip_prologue, thumb_scan_prologue): Add
+	support for new style thumb prologues.
+
+2000-01-28  Nick Clifton  <nickc@redhat.com>
+
+	* arm-tdep.c: Remove extraneous dash at start of strings
+	introduced in previous delta.
+
+2000-01-27  Nick Clifton  <nickc@redhat.com>
+
+	* arm-tdep.c: Replace uses of arm_toggle_renames() with
+	parse_arm_disassembler_option().
+
+2000-01-27  Jim Blandy  <jimb@cygnus.com>
+
+	* symtab.c (decode_line_1): Don't let commas that are within
+ 	quotes or parenthesis terminate the line spec.  Don't use pp when
+ 	removing the final double quote of a double-quoted string.  Don't
+ 	forget to skip the opening double quote.  I have no clue whether
+ 	this change is correct; probably we've just moved this function
+ 	from one buggy place to another buggy place, and never came within
+ 	an outhouse whiff of correctness.
+	(find_toplevel_char): New function.
+
+2000-01-27  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* arm-tdep.c (arm_push_arguments): Set the thumb mode bit when
+        passing the pointer to a thumb function as an argument.
+
+2000-01-27  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* remote-rdi.c (arm_rdi_mourn_inferior): Make sure breakpoints
+	are reinserted for another run.
+
+2000-01-27  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* cli-out.c (cli_filed_string): Test for NULL string.
+
+2000-01-27  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* infcmd.c (run_stack_dummy): Account for a random signal stopping
+	the inferior as well as breakpoints being hit while performing an
+	inferior function call.
+	* valops.c (hand_function_call): Ditto.
+
+2000-01-27  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
+
+	From  Mark Kettenis  <kettenis@gnu.org>
+
+	* config/i386/tm-i386gnu.h (THREAD_STATE_FLAVOR): Define to
+	i386_REGS_SEGS_STATE.
+	(HAVE_I387_REGS): Define.
+	(FLOAT_INFO): Remove.
+	* i386gnu-nat.c: Almost completely rewritten to use new i386
+	register layout and `float info' implementation.
+	* gnu-nat.c (inf_update_procs, proc_get_state, proc_string):
+	Move prototypes from here.
+	* gnu-nat.h: To here.
+
+2000-01-24  Kevin Buettner  <kevinb@redhat.com>
+
+	* utils.c (get_field, put_field): Fix buffer underruns and
+	overruns.  Also, handle case where total_len is not evenly
+	divisible by 8.
+	(getfield): Make sure zeroing of unwanted bits occurs even
+	when bit field to extract does not straddle two or more
+	bytes.
+
+2000-01-23   Christopher Faylor  <cgf@cygnus.com>
+
+	* defs.h: Add gdb_thread_select declaration.
+
+2000-01-23  Kevin Buettner  <kevinb@redhat.com>
+
+	* linux-thread.c (_initialize_linuxthreads): Make sure that
+	linuxthreads_block_mask does not block SIGCHLD.
+
+2000-01-20  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* rdi-share/devsw.c (openLogFile): On cygwin, set the log mode to
+	text so that new lines work properly.
+
+2000-01-18  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
+
+	* proc-utils.h: New file. Export functions from proc-*.c.
+
+	* proc_api.c: Rename to:
+	* proc-api.c: New file. Add include of proc-utils.h.
+
+	* proc_events.c: Rename to:
+	* proc-events.c: New file.
+
+	* proc_flags.c: Rename to:
+	* proc-flags.c: New file.
+
+	* proc_why.c: Rename to:
+	* proc-why.c: New file. Add include of proc-utils.h.
+
+	* procfs.c: Add includes of gdbthread.h, sys/wait.h, signal.h,
+ 	ctype.h, proc-utils.h.
+	(find_procinfo_or_die): Add braces to avoid ambiguous else clause.
+	(open_procinfo_files): Conditionalize local variable tmp, to avoid
+ 	compiler warnings.
+	(proc_iterate_over_mappings): Conditionalize local vars mapfd and
+ 	pathname.
+	(procfs_wait): Adjust format in some printf_filetered calls to
+ 	avoid compiler warnings.
+	(make_signal_thread_runnable): Ifdef 0. The calls to this function
+ 	are also ifdef'd 0 .
+	(procfs_resume): Add parentheses around '&&' operation.
+	(procfs_set_exec_trap): Remove unused variable.
+	(info_proc_cmd): Add braces to avoid ambiguous else clause.
+
+	* Makefile.in (procfs.o, proc-api.o, proc-events.o, proc-flags.o,
+ 	proc-why.o): Update dependencies.
+
+	* config/sparc/sun4sol2.mh (NATDEPFILES): Change proc_*.o files to
+	proc-*.o.
+
+2000-01-17  Jason Molenda  (jsm@bugshack.cygnus.com)
+
+	* configure.in (NEW_PROC_API): Fix Unixware-matching regexp.
+	Fix from Robert Lipe <robertl@sco.com>.
+	* configure: Regenerated.
+
+2000-01-17  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
+
+	* stack.c (print_frame_info_base): Break up into the frame info
+ 	(location) printing part and the rest (source line printing).
+	(print_frame): New function. Take care of printing the location
+ 	information.
+	Update copyright.
+
+	* infrun.c (normal_stop): Use enum values rather than integers for the
+	source_flag to be passed to show_and_print_stack_frame().
+        Update copyright.
+	
+	* frame.h (print_what): New enum for 'source' argument to
+ 	print_frame_info_base(). Use this instead of obscure numbers.
+	Update copyright.
+	
+Sun Jan 16 17:58:00 2000  David Taylor  <taylor@texas.cygnus.com>
+
+	* event-top.c (stdin_event_handler): call quit_command rather than
+ 	exit -- run cleanups, give target code a chance to say goodbye to
+ 	the target.  Fixes bug where the inferior processes were left
+ 	around on Solaris (and probably elsewhere) by the testsuite.
+
+2000-01-14  Mark Salter  <msalter@cygnus.com>
+
+	* v850-tdep.c (v850_target_architecture_hook): Setup correct
+ 	machine id for disassembly.
+
+2000-01-13  Jim Blandy  <jimb@cygnus.com>
+
+	* i386-linux-nat.c (fill_gregset): Pass the correct arguments to
+	convert_to_regset, when regno indicates a specific register.
+
+Thu Jan 13 23:34:17 EST 2000  Nicholas Duffek <nsd@cygnus.com>
+
+	* uw-thread.c: Document libthread.so debugging interface.  Minor
+	comment and formatting tweaks.
+	(DEBUG): #define as 0 instead of 1.
+	(CALL_BASE): Include function name in error msg.
+	(libthread_stub): Adjust inferior_pid after thread exit.
+	(uw_thread_create_inferior): Deactivate uw_thread_ops before
+	asking procfs_ops to create inferior.
+	(libthread_init): Don't return nonlocally on error.
+
+2000-01-12  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* rdi-share/ardi.c (negotiate_params): Fix initialization of static
+	variable.
+
+2000-01-12  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* remote-rdi.c (arm_rdi_open): Call arm-rdi-close() to make sure
+	both sides are on the same state.
+
+2000-01-12  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* rdi-share/serdrv.c (find_baud_rate): Fix entries for 57600 and
+	115200 (minor syntax mistake).
+
+2000-01-12  Jim Blandy  <jimb@cygnus.com>
+
+	* config/sparc/tm-sun4sol2.h (MERGEPID): Provide a definition for
+	this here, to go along with the definitions of PIDGET and TIDGET.
+
+2000-01-12  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
+
+	* thread.c (do_captured_thread_select): New function. Switch
+ 	current thread, safely from within catch_errors().
+	(gdb_thread_select): New function. Switch threads safely.
+	(thread_command): Use gdb_thread_select().
+	Include ui-out.h.
+	(do_captured_list_thread_ids): New function.
+	(gdb_list_thread_ids): New function.
+
+	* defs.h (gdb_thread_select, gdb_list_thread_ids): Export.
+
+2000-01-11  Christopher Faylor <cgf@cygnus.com>
+
+	* configure.in: Avoid linking -limagehlp unless it's a native build.
+	* configure: Regenerate.
+	* thread.cc (add_thread): Clear private data pointer here or suffer
+	strange behavior when it is checked for NULL later.
+
+2000-01-09  Christopher Faylor  <cgf@cygnus.com>
+
+	* win32nat.c (handle_exceptions): Handle various arithmetic exceptions.
+	* configure.in: Add an additional library to cygwin link.
+	* configure: Regenerate.
+
+	Patch from Egor Duda <deo@logos-m.ru>:
+	* coffread.c (coff_symfile_read): Reinstate ability to recognize "pe"
+	type.
+
+2000-01-07  Michael Snyder  <msnyder@cleaver.cygnus.com>
+
+	* uw-thread.c: New file to support UnixWare user-mode threads:
+	contributed by Nickolas Duffek  <nsd@cygnus.com>. 
+	* target.h (struct target_ops): New vector, to_extra_thread_info,
+	allows back-ends to give extra details in info thread display.
+	(target_extra_thread_info): define new macro.
+	(target_find_new_threads): simplify macro.  Cleanup comments.
+	* target.c (to_extra_thread_info): default and inherit new vector.
+	(cleanup_target): eliminate PARAMS, break up long lines,
+	provide default definition for to_extra_thread_info, and
+	to_find_new_threads.  Default to_thread_alive and to_query
+	to return_zero, not target_ignore (they each return int not void).
+	(debug_to_find_new_threads): new debug entry.
+	(setup_target_debug): add debug_to_find_new_threads.
+	* gdbthread.h: export struct thread_info, find_thread_pid, and
+	iterate_over_threads.  Add comments.  Eliminate PARAMS.  Update
+	copyright.  Add new private data pointer for use by target back-ends.
+	* thread.c (struct thread_info): move definition to gdbthread.h.
+	(find_thread_pid): new exported function for thread lookup.
+	(iterate_over_threads): new exported function for applying 
+	arbitrary operations to threads.  Update copyright to 2000.
+	(info_threads_command): use new target_extra_thread_info vector
+	to display extra information about each thread (if implemented).
+	* config/i386/tm-i386v42mp.h: remove obsolete #defines for procfs.
+	Add defines for PIDGET, etc.
+	* config/i386/tm-i386sol2.h: ditto.
+	* config/sparc/tm-sun4sol2.h: ditto.
+	* config/i386/i386v42mp.mh: add uw-thread.o to NATDEPFILES.
+	* testsuite/gdb.threads/pthreads.exp: Try to link with -lthread
+	if -lpthread and -lpthreads fail.
+
+	* procfs.c: (PIDGET, TIDGET, MERGEPID): change default to no-op.
+	(proc_flags): combine flags that UnixWare splits into two locations.
+	(proc_modify_flag): add support for PR_KLC (kill on last close).
+	(proc_[un]set_kill_on_last_close): new functions.
+	
+2000-01-07  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
+
+	* infrun.c (normal_stop): Print out thread id when we stop.
+
+2000-01-06  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* remote.c (remote_open_1): Fix message so it does not imply a
+	specific syntax for serial ports, as it is OS dependent. 
+	(remote_async_open_1): Ibid.
+	(init_remote_ops): Ibid.
+
+2000-01-06  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* rdi-share/serdrv.c (SerialOpen): Use speed from "-b" argument or
+	"set remotebaud" command (if set) when no speed is specified on
+	the "target rdi" command.
+
+2000-01-06  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* rdi-share/serdrv.c (find_baud_rate): Add entries for 57600 and
+	115200.
+	(baud_options[]): Ibid.
+
+2000-01-06  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* rdi-share/unixcomm.c: Fix SERIAL_PREFIX so it matches the prefix
+	used by each operating system.
+
+2000-01-06  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
+
+	* breakpoint.c (until_break_command): Add an argument for the
+ 	continuation, the beginning of the cleanups set up by this
+ 	command.
+	(until_break_command_continuation): Do cleanups until the one
+ 	passed in as argument instead of doing all of them.
+
+	* infcmd.c (finish_command_continuation): Expect a new argument,
+ 	which indicates up to where to do cleanups. Update calls to
+ 	do_exec_cleanups to use this marker, instead of ALL_CLEANUPS.
+	(finish_command): Add another argument for the continuation: the
+	starting cleanup for this command.
+
+2000-01-05  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	From Grant Edwards <grante@visi.com> (original patch from Thomas
+	Zenker ):
+	* rdi-share/ardi.c: Allow interruption of interruptible
+	targets with a <CNTL-C>.
+
+2000-01-04  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* rdi-share/etherdrv.c (fetch_ports): Send extra words on request
+	to control port to accommodate some versions of Angel.
+
+2000-01-04  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* rdi-share/devsw.c (dumpPacket): Fix source of channel information.
+	Add interpretation for C Support Library packets.
+
+2000-01-04  Fernando Nasser  <fnasser@totem.to.cygnus.com>
+
+	* rdi-share/devsw.c (DevSW_Close): Remove const from argument that
+	is now being modified.
+	* rdi-share/devsw.h: Adjust declaration of the above funtion.
+
+For older changes see ChangeLog-99
+
+Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
+version-control: never
+End:

@@ -1,17 +1,47 @@
+/* sys/termios.h
+
+   Copyright 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+
+This file is part of Cygwin.
+
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
+
 /* sys/termios.h */
 
 #ifndef	_SYS_TERMIOS_H
 #define _SYS_TERMIOS_H
+
+#define	TIOCMGET	0x5415
+#define	TIOCMSET	0x5418
+#define	TIOCINQ		0x541B	
+
+/* TIOCINQ is utilized instead of FIONREAD which has been
+accupied for other purposes under CYGWIN.
+Other UNIX ioctl requests has been omited because
+effects of their work one can achive by standard
+POSIX commands */
+
+
+#define	TIOCM_DTR	0x002
+#define	TIOCM_RTS	0x004
+#define	TIOCM_CTS	0x020
+#define	TIOCM_CAR	0x040
+#define	TIOCM_RNG	0x080
+#define	TIOCM_DSR	0x100
+#define	TIOCM_CD	TIOCM_CAR
+#define	TIOCM_RI	TIOCM_RNG
 
 #define TCOOFF		0
 #define TCOON		1
 #define TCIOFF		2
 #define TCION		3
 
-#define TCGETA   	5
-#define TCSETA   	6
-#define TCSETAW	 	7
-#define TCSETAF	 	8
+#define TCGETA	5
+#define TCSETA	6
+#define TCSETAW		7
+#define TCSETAF		8
 
 #define TCIFLUSH	0
 #define TCOFLUSH	1
@@ -147,7 +177,8 @@
 #define B57600	 0x01001
 #define B115200	 0x01002
 #define B128000	 0x01003
-#define B256000	 0x01003
+#define B230400  0x01004
+#define B256000	 0x01005
 #define CRTSXOFF 0x04000
 #define CRTSCTS	 0x08000
 
@@ -167,23 +198,31 @@
 
 #define VDISCARD	1
 #define VEOL		2
-#define VEOL2   	3
+#define VEOL2		3
 #define VEOF		4
 #define VERASE		5
 #define VINTR		6
 #define VKILL		7
-#define VLNEXT 		8
+#define VLNEXT		8
 #define VMIN		9
 #define VQUIT		10
-#define VREPRINT 	11
+#define VREPRINT	11
 #define VSTART		12
 #define VSTOP		13
 #define VSUSP		14
-#define VSWTC 		15
+#define VSWTC		15
 #define VTIME		16
-#define VWERASE 	17
+#define VWERASE	17
 
-#define NCCS 		18
+#define NCCS		18
+
+/* `c_cc' member of 'struct termios' structure can be disabled by
+   using the value _POSIX_VDISABLE.  */
+#define	_POSIX_VDISABLE	'\0'
+
+/* Compare a character C to a value VAL from the `c_cc' array in a
+   `struct termios'.  If VAL is _POSIX_VDISABLE, no character can match it.  */
+#define CCEQ(val, c)	((c) == (val) && (val) != _POSIX_VDISABLE)
 
 typedef unsigned char cc_t;
 typedef unsigned int  tcflag_t;

@@ -37,7 +37,6 @@ targets = { target = "maintainer-clean";
             makeline_flag = "-"; };
 
 subdirs = { subdir = "spu"; };
-subdirs = { subdir = "sparclite"; };
 subdirs = { subdir = "wince"; };
 
 

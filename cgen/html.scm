@@ -754,6 +754,7 @@ See the input .cpu file(s) for copyright information.
 
 (define (doc-init!)
   (desc-init!)
+  (mode-set-biggest-word-bitsizes!)
   *UNSPECIFIED*
 )
 

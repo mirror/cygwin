@@ -30,6 +30,7 @@
   (endian little)
   (insn-endian little)
   (insn-chunk-bitsize 16)
+  (word-bitsize 32)
 )
 
 (define-mach

@@ -46,8 +46,8 @@
 		; easy to define since the object doesn't exist before it's
 		; defined.
 		; ??? May wish to later remove SEM-MODE (e.g. mips signed add
-		; is different than mips unsigned add) however for now it keeps
-		; things simpler (and prevents being wildly dissimilar from
+		; is different than mips unsigned add).  However for now it keeps
+		; things simpler, and prevents being wildly dissimilar from
 		; GCC-RTL.  And the mips case needn't be handled with different
 		; adds anyway.
 		sem-mode
@@ -203,7 +203,7 @@
 ; Add MODE named NAME to the list of recognized modes.
 ; If NAME is already present, replace it with MODE.
 ; MODE is a mode object.
-; NAME exists to allow aliases of modes [e.g. WI, UWI, AI].
+; NAME exists to allow aliases of modes [e.g. WI, UWI, AI, IAI].
 ;
 ; No attempt to preserve any particular order of entries is done here.
 ; That is up to the caller.
@@ -310,9 +310,12 @@
 )
 
 ; Return a mode in mode class CLASS wide enough to hold BITS.
+; This ignores "host" modes (e.g. INT,UINT).
 
 (define (mode-find bits class)
-  (let ((modes (find (lambda (mode) (eq? (mode:class (cdr mode)) class))
+  (let ((modes (find (lambda (mode)
+		       (and (eq? (mode:class (cdr mode)) class)
+			    (not (mode:host? (cdr mode)))))
 		     mode-list)))
     (if (null? modes)
 	(error "invalid mode class" class))
@@ -332,7 +335,7 @@
 )
 
 ; Make a new INT/UINT mode.
-; These have a variable number of bits (1-32).
+; These have a variable number of bits (1-64).
 
 (define (mode-make-int bits)
   (if (or (<= bits 0) (> bits 64))
@@ -352,6 +355,99 @@
     result)
 )
 
+; WI/UWI/AI/IAI modes
+; These are aliases for other modes, e.g. SI,DI.
+; Final values are defered until all cpu family definitions have been
+; read in so that we know the word size, etc.
+;
+; NOTE: We currently assume WI/AI/IAI all have the same size: cpu:word-bitsize.
+; If we ever add an architecture that needs different modes for WI/AI/IAI,
+; we can add the support then.
+
+; This is defined by the target in define-cpu:word-bitsize.
+(define WI #f)
+(define UWI #f)
+
+; An "address int".  This is recorded in addition to a "word int" because it
+; is believed that some target will need it.  It also stays consistent with
+; what BFD does.  It also allows one to write rtl without having to care
+; what the real mode actually is.
+; ??? These are currently set from define-cpu:word-bitsize but that's just
+; laziness.  If an architecture comes along that has different values,
+; add the support then.
+(define AI #f)
+(define IAI #f)
+
+; Kind of word size handling wanted.
+; BIGGEST: pick the largest word size
+; IDENTICAL: all word sizes must be identical
+(define -mode-word-sizes-kind #f)
+
+; Called when a cpu-family is read in to set the word sizes.
+
+(define (mode-set-word-modes! bitsize)
+  (let ((current-word-bitsize (mode:bits WI))
+	(word-mode (mode-find bitsize 'INT))
+	(uword-mode (mode-find bitsize 'UINT))
+	(ignore? #f))
+
+    ; Ensure we found a precise match.
+    (if (!= bitsize (mode:bits word-mode))
+	(error "unable to find precise mode to match cpu word-bitsize" bitsize))
+
+    ; Enforce word size kind.
+    (if (!= current-word-bitsize 0)
+	; word size already set
+	(case -mode-word-sizes-kind
+	  ((IDENTICAL)
+	   (if (!= current-word-bitsize (mode:bits word-mode))
+	       (error "app requires all selected cpu families to have same word size"))
+	   (set! ignore? #t))
+	  ((BIGGEST)
+	   (if (>= current-word-bitsize (mode:bits word-mode))
+	       (set! ignore? #t)))
+	  ))
+
+    (if (not ignore?)
+	(begin
+	  (set! WI word-mode)
+	  (set! UWI uword-mode)
+	  (set! AI uword-mode)
+	  (set! IAI uword-mode)
+	  (assq-set! mode-list 'WI word-mode)
+	  (assq-set! mode-list 'UWI uword-mode)
+	  (assq-set! mode-list 'AI uword-mode)
+	  (assq-set! mode-list 'IAI uword-mode)
+	  ))
+    )
+)
+
+; Called by apps to indicate cpu:word-bitsize always has one value.
+; It is an error to call this if the selected cpu families have
+; different word sizes.
+; Must be called before loading .cpu files.
+
+(define (mode-set-identical-word-bitsizes!)
+  (set! -mode-word-sizes-kind 'IDENTICAL)
+)
+
+; Called by apps to indicate using the biggest cpu:word-bitsize of all
+; selected cpu families.
+; Must be called before loading .cpu files.
+
+(define (mode-set-biggest-word-bitsizes!)
+  (set! -mode-word-sizes-kind 'BIGGEST)
+)
+
+; Ensure word sizes have been defined.
+; This must be called after all cpu families have been defined
+; and before any ifields, hardware, operand or insns have been read.
+
+(define (mode-ensure-word-sizes-defined)
+  (if (eq? (mode-real-name WI) 'VOID)
+      (error "word sizes must be defined"))
+)
+
 ; Initialization.
 
 ; Some modes are refered to by the Scheme code.
@@ -362,23 +458,12 @@
 (define VOID #f)
 (define DFLT #f)
 
-; This is defined by the target.  We provide a default def'n.
-(define WI #f)
-(define UWI #f)
-
-; An "address int".  This is recorded in addition to a "word int" because it
-; is believed that some target will need it.  It also stays consistent with
-; what BFD does.
-; This can also be defined by the target.  We provide a default.
-(define AI #f)
-(define IAI #f)
-
 ; Variable sized portable ints.
 (define INT #f)
 (define UINT #f)
 
 (define (mode-init!)
-  (set! mode-list nil)
+  (set! -mode-word-sizes-kind 'IDENTICAL)
 
   (reader-add-command! 'define-full-mode
 		       "\
@@ -397,6 +482,8 @@ Define a mode, all arguments specified.
   ; FN-SUPPORT: In sem-ops.h file, include prototypes as well as macros.
   ;             Elsewhere, functions are defined to perform the operation.
   (define-attr '(for mode) '(type boolean) '(name FN-SUPPORT))
+
+  (set! mode-list nil)
 
   (let ((dfm define-full-mode))
     ; This list must be defined in order of increasing size among each type.
@@ -456,32 +543,19 @@ Define a mode, all arguments specified.
   (set! INT (mode:lookup 'INT))
   (set! UINT (mode:lookup 'UINT))
 
-  ; To redefine these, use mode:add! again.
-  (set! WI (mode:add! 'WI (mode:lookup 'SI)))
-  (set! UWI (mode:add! 'UWI (mode:lookup 'USI)))
-  (set! AI (mode:add! 'AI (mode:lookup 'USI)))
-  (set! IAI (mode:add! 'IAI (mode:lookup 'USI)))
+  ; While setting the real values of WI/UWI/AI/IAI is defered to
+  ; mode-set-word-modes!, create entries in the list.
+  (set! WI (mode:add! 'WI (mode:lookup 'VOID)))
+  (set! UWI (mode:add! 'UWI (mode:lookup 'VOID)))
+  (set! AI (mode:add! 'AI (mode:lookup 'VOID)))
+  (set! IAI (mode:add! 'IAI (mode:lookup 'VOID)))
+
+  ; Keep the fields sorted for mode-find.
+  (set! mode-list (reverse mode-list))
 
   *UNSPECIFIED*
 )
 
 (define (mode-finish!)
-  ; Keep the fields sorted for mode-find.
-  (set! mode-list (reverse mode-list))
-
-  (if #f
-  ; ???: Something like this would be nice if it was timed appropriately
-  ; redefine WI/UWI/AI/IAI for this target
-      (case (cpu-word-bitsize (current-cpu))
-	((32) (begin
-		(display "Recognized 32-bit cpu.\n")))
-	((64) (begin
-		(display "Recognized 64-bit cpu.\n")
-		(set! WI (mode:add! 'WI (mode:lookup 'DI)))
-		(set! UWI (mode:add! 'UWI (mode:lookup 'UDI)))
-		(set! AI (mode:add! 'AI (mode:lookup 'UDI)))
-		(set! IAI (mode:add! 'IAI (mode:lookup 'UDI)))))
-	(else (error "Unknown word-bitsize for WI/UWI/AI/IAI mode!"))))
-
   *UNSPECIFIED*
 )

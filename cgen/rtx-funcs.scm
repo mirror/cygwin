@@ -317,7 +317,7 @@
 (drmn (annul yes?)
       ; The pc reference here is hidden in c-code to not generate a spurious
       ; pc input operand.
-      (list 'c-call 'VOID "SEM_ANNUL_INSN" (list 'c-code 'AI "pc") yes?)
+      (list 'c-call 'VOID "SEM_ANNUL_INSN" (list 'c-code 'IAI "pc") yes?)
 )
 
 ; Skip the following insn if YES? is non-zero.

@@ -662,6 +662,7 @@
 
 (define (opcodes-init!)
   (desc-init!)
+  (mode-set-biggest-word-bitsizes!)
   *UNSPECIFIED*
 )
 

@@ -1019,13 +1019,12 @@
 			(memq new-mode-class '(INT UINT))))))))
 )
 
-
 ; These are scalars.
+
 (method-make!
  <hw-immediate> 'get-index-mode
  (lambda (self) #f)
 )
-
 
 ; Addresses.
 ; These are usually symbols.
@@ -1079,6 +1078,27 @@
 
 (method-make! <hw-iaddress> 'iaddress? (lambda (self) #t))
 
+; Misc. random hardware support.
+
+; Map a mode to a hardware object that can contain immediate values of that
+; mode.
+
+(define (hardware-for-mode mode)
+  (cond ((mode:eq? mode 'AI) h-addr)
+	((mode:eq? mode 'IAI) h-iaddr)
+	((mode-signed? mode) h-sint)
+	((mode-unsigned? mode) h-uint)
+	(else (error "Don't know h-object for mode " mode)))
+)
+
+; Called when a cpu-family is read in to set the word sizes.
+; Must be called after mode-set-word-modes! has been called.
+
+(define (hw-update-word-modes!)
+  (elm-xset! h-addr 'type (make <scalar> (mode:lookup 'AI)))
+  (elm-xset! h-iaddr 'type (make <scalar> (mode:lookup 'IAI)))
+)
+
 ; Builtins, attributes, init/fini support.
 
 (define h-memory #f)
@@ -1086,17 +1106,6 @@
 (define h-uint #f)
 (define h-addr #f)
 (define h-iaddr #f)
-
-
-; Map a mode to a hardware object that can contain immediate values of that mode
-(define (hardware-for-mode mode)
-  (cond ((mode:eq? mode 'AI) h-addr)
-	((mode:eq? mode 'IAI) h-addr)
-	((mode-signed? mode) h-sint)
-	((mode-unsigned? mode) h-uint)
-	(else (error "Don't know h-object for mode " mode)))
-)
-
 
 ; Called before reading a .cpu file in.
 

@@ -40,21 +40,6 @@
   (data-endian either)
   (word-bitsize 64)
 )
-
-(eval
- (begin
-   ;; We need 64-bit host support.
-   (set! INT (mode:add! 'INT (mode:lookup 'DI)))
-   (set! UINT (mode:add! 'UINT (mode:lookup 'UDI)))
-
-   ;; ??? This shouldn't be necessary, IMO.
-   (set! WI (mode:add! 'WI (mode:lookup 'DI)))
-   (set! UWI (mode:add! 'UWI (mode:lookup 'UDI)))
-   (set! AI (mode:add! 'AI (mode:lookup 'UDI)))
-   (set! IAI (mode:add! 'IAI (mode:lookup 'UDI)))
-   )
-)
-
 
 (define-mach
   (name ia64)

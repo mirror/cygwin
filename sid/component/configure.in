@@ -74,6 +74,8 @@ fi
 
 AC_SUBST(CYGWIN)
 
+dnl building docs
+RH_DOCBUILD_CHECK
 
 dnl Perform --target/--enable-targets processing.
 CY_SIDTARGET_CHECK
@@ -85,7 +87,7 @@ dnl cfgroot is here because it's statically linked, and libltdl is its baby.
 dnl tcl is here because it looks for tcl/tk in a too complex way for this file.
 dnl audio is here because it has more host-dependent configuration
 dnl cgen-cpu is here because it has target-dependent configuration
-AC_CONFIG_SUBDIRS([cfgroot tcl audio cgen-cpu timers])
+AC_CONFIG_SUBDIRS([cfgroot tcl audio cgen-cpu families timers])
 
 
 

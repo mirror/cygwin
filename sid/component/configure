@@ -3077,6 +3077,129 @@ fi
 
 
 
+# Extract the first word of "links", so it can be a program name with args.
+set dummy links; ac_word=$2
+echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
+echo "configure:3084: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_prog_LINKS'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  if test -n "$LINKS"; then
+  ac_cv_prog_LINKS="$LINKS" # Let the user override the test.
+else
+  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS=":"
+  ac_dummy="$PATH"
+  for ac_dir in $ac_dummy; do
+    test -z "$ac_dir" && ac_dir=.
+    if test -f $ac_dir/$ac_word; then
+      ac_cv_prog_LINKS="true"
+      break
+    fi
+  done
+  IFS="$ac_save_ifs"
+  test -z "$ac_cv_prog_LINKS" && ac_cv_prog_LINKS="false"
+fi
+fi
+LINKS="$ac_cv_prog_LINKS"
+if test -n "$LINKS"; then
+  echo "$ac_t""$LINKS" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+
+
+if test x$LINKS = xtrue; then
+  HAVE_LINKS_TRUE=
+  HAVE_LINKS_FALSE='#'
+else
+  HAVE_LINKS_TRUE='#'
+  HAVE_LINKS_FALSE=
+fi
+
+# Extract the first word of "xsltproc", so it can be a program name with args.
+set dummy xsltproc; ac_word=$2
+echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
+echo "configure:3124: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_prog_XSLTPROC'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  if test -n "$XSLTPROC"; then
+  ac_cv_prog_XSLTPROC="$XSLTPROC" # Let the user override the test.
+else
+  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS=":"
+  ac_dummy="$PATH"
+  for ac_dir in $ac_dummy; do
+    test -z "$ac_dir" && ac_dir=.
+    if test -f $ac_dir/$ac_word; then
+      ac_cv_prog_XSLTPROC="true"
+      break
+    fi
+  done
+  IFS="$ac_save_ifs"
+  test -z "$ac_cv_prog_XSLTPROC" && ac_cv_prog_XSLTPROC="false"
+fi
+fi
+XSLTPROC="$ac_cv_prog_XSLTPROC"
+if test -n "$XSLTPROC"; then
+  echo "$ac_t""$XSLTPROC" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+
+
+if test x$XSLTPROC = xtrue; then
+  HAVE_XSLTPROC_TRUE=
+  HAVE_XSLTPROC_FALSE='#'
+else
+  HAVE_XSLTPROC_TRUE='#'
+  HAVE_XSLTPROC_FALSE=
+fi
+
+# Extract the first word of "sabcmd", so it can be a program name with args.
+set dummy sabcmd; ac_word=$2
+echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
+echo "configure:3164: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_prog_SABLOTRON'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  if test -n "$SABLOTRON"; then
+  ac_cv_prog_SABLOTRON="$SABLOTRON" # Let the user override the test.
+else
+  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS=":"
+  ac_dummy="$PATH"
+  for ac_dir in $ac_dummy; do
+    test -z "$ac_dir" && ac_dir=.
+    if test -f $ac_dir/$ac_word; then
+      ac_cv_prog_SABLOTRON="true"
+      break
+    fi
+  done
+  IFS="$ac_save_ifs"
+  test -z "$ac_cv_prog_SABLOTRON" && ac_cv_prog_SABLOTRON="false"
+fi
+fi
+SABLOTRON="$ac_cv_prog_SABLOTRON"
+if test -n "$SABLOTRON"; then
+  echo "$ac_t""$SABLOTRON" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+
+
+if test x$SABLOTRON = xtrue; then
+  HAVE_SABLOTRON_TRUE=
+  HAVE_SABLOTRON_FALSE='#'
+else
+  HAVE_SABLOTRON_TRUE='#'
+  HAVE_SABLOTRON_FALSE=
+fi
+
+
+
+
 
 
 sid_host=`${CONFIG_SHELL-/bin/sh} $ac_config_sub $host`
@@ -3112,8 +3235,6 @@ sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
 sidtarget_ppc=$sidtarget_default
 
-
-
 for targ in $all_targets
 do
    case "$targ" in
@@ -3140,7 +3261,7 @@ esac
 
 
 echo $ac_n "checking ARM family support""... $ac_c" 1>&6
-echo "configure:3144: checking ARM family support" >&5
+echo "configure:3265: checking ARM family support" >&5
 
 
 
@@ -3153,9 +3274,8 @@ else
 fi
 echo "$ac_t""$sidtarget_arm" 1>&6
 
-
 echo $ac_n "checking MIPS family support""... $ac_c" 1>&6
-echo "configure:3159: checking MIPS family support" >&5
+echo "configure:3279: checking MIPS family support" >&5
 
 
 
@@ -3169,7 +3289,7 @@ fi
 echo "$ac_t""$sidtarget_mips" 1>&6
 
 echo $ac_n "checking M32R family support""... $ac_c" 1>&6
-echo "configure:3173: checking M32R family support" >&5
+echo "configure:3293: checking M32R family support" >&5
 
 
 
@@ -3183,7 +3303,7 @@ fi
 echo "$ac_t""$sidtarget_m32r" 1>&6
 
 echo $ac_n "checking M68K family support""... $ac_c" 1>&6
-echo "configure:3187: checking M68K family support" >&5
+echo "configure:3307: checking M68K family support" >&5
 
 
 
@@ -3197,7 +3317,7 @@ fi
 echo "$ac_t""$sidtarget_m68k" 1>&6
 
 echo $ac_n "checking PPC family support""... $ac_c" 1>&6
-echo "configure:3201: checking PPC family support" >&5
+echo "configure:3321: checking PPC family support" >&5
 
 
 
@@ -3213,8 +3333,7 @@ echo "$ac_t""$sidtarget_ppc" 1>&6
 
 
 
-
-subdirs="cfgroot tcl audio cgen-cpu timers"
+subdirs="cfgroot tcl audio cgen-cpu families timers"
 
 
 
@@ -3412,6 +3531,15 @@ s%@CXXCPP@%$CXXCPP%g
 s%@lcd_libs@%$lcd_libs%g
 s%@socket_libs@%$socket_libs%g
 s%@CYGWIN@%$CYGWIN%g
+s%@LINKS@%$LINKS%g
+s%@HAVE_LINKS_TRUE@%$HAVE_LINKS_TRUE%g
+s%@HAVE_LINKS_FALSE@%$HAVE_LINKS_FALSE%g
+s%@XSLTPROC@%$XSLTPROC%g
+s%@HAVE_XSLTPROC_TRUE@%$HAVE_XSLTPROC_TRUE%g
+s%@HAVE_XSLTPROC_FALSE@%$HAVE_XSLTPROC_FALSE%g
+s%@SABLOTRON@%$SABLOTRON%g
+s%@HAVE_SABLOTRON_TRUE@%$HAVE_SABLOTRON_TRUE%g
+s%@HAVE_SABLOTRON_FALSE@%$HAVE_SABLOTRON_FALSE%g
 s%@sidtarget_arm@%$sidtarget_arm%g
 s%@SIDTARGET_ARM_TRUE@%$SIDTARGET_ARM_TRUE%g
 s%@SIDTARGET_ARM_FALSE@%$SIDTARGET_ARM_FALSE%g
@@ -3692,7 +3820,7 @@ if test "$no_recursion" != yes; then
     esac
   done
 
-  for ac_config_dir in cfgroot tcl audio cgen-cpu timers; do
+  for ac_config_dir in cfgroot tcl audio cgen-cpu families timers; do
 
     # Do not complain, so a configure script can configure whichever
     # parts of a large source tree are present.

@@ -1,3 +1,9 @@
+2005-01-13  Keith Seitz  <keiths@redhat.com>
+
+	* configure.in: Rename to ...
+	* configure.ac: ... this.
+	* configure: Regenerate with autoconf 2.59.
+
 2004-03-31  Martin Hunt  <hunt@redhat.com>
 
 	* library/combobox.tcl (::combobox::Configure): Remove

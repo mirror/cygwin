@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  */
 
-/* $Id: parse_opts.c,v 1.3 2003/01/24 01:09:39 cgf Exp $ */
+/* $Id: parse_opts.c,v 1.4 2003/02/08 02:56:48 cgf Exp $ */
 
 /**********************************************************
  * 
@@ -99,6 +99,24 @@
 #ifndef DEBUG
 #define DEBUG	0
 #endif
+
+/*
+ * Code from usctest.h that not part of this file since we are the library.
+ */
+
+struct usc_errno_t TEST_VALID_ENO[USC_MAX_ERRNO];
+
+  /***********************************************************************
+   * Globals for returning the return code and errno from the system call
+   * test macros.
+   ***********************************************************************/
+int TEST_RETURN;
+int TEST_ERRNO;
+
+  /***********************************************************************
+   * temporary variables for determining max and min times in TEST macro
+   ***********************************************************************/
+long btime, etime, tmptime;
 
 /* The timing information block. */
 struct tblock tblock={0,((long) -1)>>1,0,0};
@@ -807,24 +825,6 @@ struct usc_bigstack_t bstack;
 int Help = 0;
 int Help2 = 0;
 char *ptr;
-
-/*
- * Code from usctest.h that not part of this file since we are the library.
- */
-
-struct usc_errno_t TEST_VALID_ENO[USC_MAX_ERRNO];
-
-  /***********************************************************************
-   * Globals for returning the return code and errno from the system call
-   * test macros.
-   ***********************************************************************/
-int TEST_RETURN;
-int TEST_ERRNO;
-
-  /***********************************************************************
-   * temporary variables for determining max and min times in TEST macro
-   ***********************************************************************/
-long btime, etime, tmptime;
 
 
 

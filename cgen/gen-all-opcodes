@@ -16,13 +16,13 @@ then
     exit 1
 fi
 
+builddir=tmp-opc
+
+rm -rf $builddir
+mkdir $builddir
+
 export cgendir=`pwd`
 
-rm -rf /tmp/tmp-opcodes
-mkdir /tmp/tmp-opcodes
-
-cd /tmp/tmp-opcodes
+cd $builddir
 $cgendir/../opcodes/configure --prefix /tmp/junk --target m32r-elf --enable-targets=all
 make run-cgen-all
-
-rm -rf /tmp/tmp-opcodes

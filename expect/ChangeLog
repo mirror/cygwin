@@ -1,3 +1,11 @@
+2002-11-19  Andrew Cagney  <ac131313@redhat.com>
+
+	* exp_clib.c (ecases;): Cast value returned by TclRegComp to a
+ 	void pointer.
+	* exp_command.c (Exp_SpawnCmd): Cast `wfd' to an int before
+	passing to `dup'.  Pass `rfd' and `wfd' to an int before assigning
+	to `master'.
+
 2002-07-30  Keith Seitz  <keiths@redhat.com>
 
 	From Mo DeJong  <supermo@bayarea.net>

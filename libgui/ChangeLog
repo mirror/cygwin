@@ -1,3 +1,14 @@
+2001-09-02  Martin M. Hunt  <hunt@redhat.com>
+
+	* library/panedwindow.tcl (fraction): Remove method.
+	(_resizeArray): Correct calculations of _max
+	and _min for each pane.
+	(_moveSash): Take a third parameter, direction.
+	(_caclPos): Rename to _calcPos. Take an optional
+	third parameter, direction. This is so recursive calls
+	to _calcPos continue adjusting panes upward or downward
+	ans does not loop infinitely.
+	
 2001-08-24  Keith Seitz  <keiths@redhat.com>
 
 	* src/tkTable.tcl: Use "string compare" instead of "string

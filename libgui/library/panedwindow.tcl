@@ -31,7 +31,6 @@ class cyg::PanedWindow {
   public {
     method index {index}
     method childsite {args}
-    method fraction {percentage1 percentage2 args}
     method add {tag args}
     method insert {index tag args}
     method delete {index}
@@ -48,11 +47,11 @@ class cyg::PanedWindow {
     method _endDrag {where num}
     method _configDrag {where num}
     method _handleDrag {where num}
-    method _moveSash {where num}
+    method _moveSash {where num {dir ""}}
 
     method _resizeArray {}
     method _setActivePanes {}
-    method _caclPos {where num}
+    method _calcPos {where num {dir ""}}
     method _makeSashes {}
     method _placeSash {i}
     method _placePanes {{start 0} {end end} {forget 0}}
@@ -542,8 +541,11 @@ body cyg::PanedWindow::_resizeArray {} {
   set _ploc(0) 0
   set _max(0) 0
   set _min(0) 0
+
   # calculate the percentage of resizable space
   set resizePerc [expr 1.0 - ($_rPixels.0 / $_dimension)]
+
+  # now set the pane positions
   for {set i 1; set n 0} {$i < $totalpanes} {incr i; incr n} {
     if {$_resizable($n)} {
       set _where($i) [expr $_where($n) + ($_frac($n) * $resizePerc)]
@@ -551,19 +553,36 @@ body cyg::PanedWindow::_resizeArray {} {
       set _where($i) [expr $_where($n) + [expr $_pixels($n).0 / $_dimension]]
     }
     set _ploc($i) [expr $_ploc($n) + $_pixels($n)]
-    if {$_pmax($n)} {
-      set _max($i) [expr $_max($n) + $_pmax($n)]
-    } else {
+    set _max($i) [expr $_max($n) + $_pmax($n)]
+    if {($_max($n) == 0 || $_pmax($n) == 0) && $n != 0} {
       set _max($i) 0
     }
     set _min($i) [expr $_min($n) + $_pmin($n)]
     #puts "where($i)=$_where($i)"
     #puts "ploc($i)=$_ploc($i)"
-    #puts "max($i)=$_max($i)"
     #puts "min($i)=$_min($i)"
+    #puts "pmin($i)=$_pmin($i)"
+    #puts "pmax($i)=$_pmax($i)"
+    #puts "pixels($i)=$_pixels($i)"
   }
   set _ploc($i) $_dimension
   set _where($i) 1.0
+
+  # finally, starting at the bottom,
+  # check the _max and _min arrays
+  set _max($totalpanes) $_dimension
+  set _min($totalpanes) $_dimension
+  #puts "_max($totalpanes) = $_max($totalpanes)"
+  for {set i [expr $totalpanes - 1]} {$i > 0} {incr i -1} {
+    set n [expr $i + 1]
+    set m [expr $_max($n) - $_pmin($i)]
+    if {$_max($i) > $m || !$_max($i)} { set _max($i) $m }
+    if {$_pmax($i)} {
+      set m [expr $_min($n) - $_pmax($i)]
+      if {$_min($i) < $m} {set _min($i) $m }
+    }
+    #puts "$i $_max($i) $_min($i)"
+  }
 }
 
 # ------------------------------------------------------------------
@@ -626,25 +645,25 @@ body cyg::PanedWindow::_handleDrag {where num} {
 #
 # Move the sash to the absolute pixel location
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_moveSash {where num} {
+body cyg::PanedWindow::_moveSash {where num {dir ""}} {
   #puts "moveSash $where $num"
   set _minsashmoved [expr ($_minsashmoved<$num)?$_minsashmoved:$num]
   set _maxsashmoved [expr ($_maxsashmoved>$num)?$_maxsashmoved:$num]
-  _caclPos $where $num
+  _calcPos $where $num $dir
 }
 
 
 # ------------------------------------------------------------------
-# PRIVATE METHOD: _caclPos where num
+# PRIVATE METHOD: _calcPos where num
 #
-# Determines the new position for the sash.  Make sure theposition does
+# Determines the new position for the sash.  Make sure the position does
 # not go past the minimum for the pane on each side of the sash.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_caclPos {where num} {
-  #puts "calcPos $num $where"
+body cyg::PanedWindow::_calcPos {where num {direction ""}} {
   set dir [expr $where - $_ploc($num)]
+  #puts "calcPos $where $num $dir $direction"
   if {$dir == 0} { return }
-
+  
   # simplify expressions by computing these now
   set m [expr $num-1]
   set p [expr $num+1]
@@ -662,6 +681,7 @@ body cyg::PanedWindow::_caclPos {where num} {
     # we have stretched the pane above us to the limit
     set upper1 [expr $_ploc($m) + $_pmax($m)]
   }
+
   # we have squeezed the pane below us to the limit
   set upper2 [expr $_ploc($p) - $_pmin($num)]
 
@@ -670,40 +690,40 @@ body cyg::PanedWindow::_caclPos {where num} {
   #puts "lower1=$lower1 lower2=$lower2 _min($num)=$_min($num)"
   #puts "upper1=$upper1 upper2=$upper2 _max($num)=$_max($num)"
   if {$dir < 0 && $where > $_min($num)} {
-    if {$where < $lower2} {
+    if {$where < $lower2 && $direction != "down"} {
       set done 1
       if {$p == [llength $_activePanes]} {
 	set _ploc($num) $upper2
       } else {
-	_moveSash [expr $where + $_pmax($num)] $p
+	_moveSash [expr $where + $_pmax($num)] $p up
 	set _ploc($num) [expr $_ploc($p) - $_pmax($num)]
       }
     }
-    if {$where < $lower1} {
+    if {$where < $lower1 && $direction != "up"} {
       set done 1
       if {$num == 1} {
 	set _ploc($num) $lower1
       } else {
-	_moveSash [expr $where - $_pmin($m)] $m
+	_moveSash [expr $where - $_pmin($m)] $m down
 	set _ploc($num) [expr $_ploc($m) + $_pmin($m)]
       }
     }
   } elseif {$dir > 0 && ($_max($num) == 0 || $where < $_max($num))} {
-    if {$where > $upper1} {
+    if {$where > $upper1 && $direction != "up"} {
       set done 1
       if {$num == 1} {
 	set _ploc($num) $upper1
       } else {
-	_moveSash [expr $where - $_pmax($m)] $m
+	_moveSash [expr $where - $_pmax($m)] $m down
 	set _ploc($num) [expr $_ploc($m) + $_pmax($m)]
       }
     }
-    if {$where > $upper2} {
+    if {$where > $upper2 && $direction != "down"} {
       set done 1
       if {$p == [llength $_activePanes]} {
 	set _ploc($num) $upper2
       } else {
-	_moveSash [expr $where + $_pmin($num)] $p
+	_moveSash [expr $where + $_pmin($num)] $p up
 	set _ploc($num) [expr $_ploc($p) - $_pmin($num)]
       }
     }
@@ -711,7 +731,6 @@ body cyg::PanedWindow::_caclPos {where num} {
 
   if {!$done} {
     if {!($_max($num) > 0 && $where > $_max($num)) && $where >= $_min($num)} {
-      #puts "ploc($num)=$where"
       set _ploc($num) $where
     }
   }

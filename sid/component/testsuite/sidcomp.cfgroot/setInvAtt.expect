@@ -1,14 +1,10 @@
-setInvAtt.badconf:35: component target-sched attribute enabled not found
-setInvAtt.badconf:36: component target-sched attribute number-of-clients not found
-setInvAtt.badconf:38: component host-sched attribute disabled? not found
-setInvAtt.badconf:39: component host-sched attribute num-clientss not found
-setInvAtt.badconf:40: component host-sched attribute sim? not found
-setInvAtt.badconf:41: component host-sched attribute host-sched not found
-setInvAtt.badconf:44: component mem attribute ramsize not found
-setInvAtt.badconf:45: component cpu attribute size not found
-setInvAtt.badconf:46: component loader attribute size not found
-setInvAtt.badconf:50: component loader attribute ver not found
-setInvAtt.badconf:51: component angel attribute timer1 not found
-setInvAtt.badconf:52: component cpu attribute _engine-type_ not found
-setInvAtt.badconf:53: component cpu attribute step-count not found
+setInvAtt.badconf:24: component target-sched attribute enabled not found
+setInvAtt.badconf:25: component target-sched attribute number-of-clients not found
+setInvAtt.badconf:27: component host-sched attribute disabled? not found
+setInvAtt.badconf:28: component host-sched attribute num-clientss not found
+setInvAtt.badconf:29: component host-sched attribute sim? not found
+setInvAtt.badconf:30: component host-sched attribute host-sched not found
+setInvAtt.badconf:33: component mem attribute ramsize not found
+setInvAtt.badconf:34: component loader attribute size not found
+setInvAtt.badconf:38: component loader attribute ver not found
 Configuration error.  Aborting.

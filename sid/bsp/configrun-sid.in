@@ -10,8 +10,6 @@ $running_under_some_shell = 0;
 use Getopt::Long;
 require 5.004;
 
-
-
 %cpu_comptype = (
 		 "arm" => "hw-cpu-arm7t",
 		 "thumb" => "hw-cpu-arm7t",
@@ -75,82 +73,88 @@ $any_tcl = 0;
 $load_mapper_data = "cpu-mapper access-port";
 
 # (see perldoc Getopt::Long)
-@options = (
-	    "cpu=s",
-	    "help!",
-	    "verbose!",
-	    "save-temps!",
-	    "trace-extract!",
-	    "trace-semantics!",
-	    "trace-disassemble!",
-	    "trace-counter!",
-	    "trace-core!",
-	    "trace-core-visual!",
-	    "enable-warnings!",
-	    "memory-region=s@",
-	    "gdb=i",
-	    "gdbport=i%",
-	    "tv=i",
-	    "tksm!",
-	    "board=s",
-	    "engine=s",
-	    "EB!",
-	    "EL!",
-	    "persistent!",
-	    "no-run!",
-	    "insn-count=i",
-	    "gprof!",
-	    "sidrtc=s",
-	    "sidcodec=s",
-	    "wrap=s@",
-	    "load=s%",
-);
+%options = (
+	    "help!" => ["help", "Print this help message."],
+	    "cpu=s" => ["cpu=CPU   (REQUIRED)", "Select target processor.", "none"],
+	    "verbose!" => ["verbose", "Turn on various run-time verbosity settings.", "no"],
+	    "save-temps!" => ["save-temps", "Keep generated sid configuration file.", "no"],
+	    "trace-extract!" => ["trace-extract", "Turn on CPU insn decode tracing.", "no"],
+	    "trace-semantics!" => ["trace-semantics", "Turn on CPU insn execute tracing.", "no"],
+	    "trace-disassemble!" => ["trace-disassemble", "Turn on CPU insn execute disassembly.", "no"],
+	    "trace-counter!" => ["trace-counter", "Turn on CPU insn counter.", "no"],
+	    "trace-core!" => ["trace-core", "Turn on bus access tracing.", "no"],
+	    # "trace-core-visual!" => ["trace-core-visual", "Turn on visual bus access tracing.", "no"],
+	    "enable-warnings!" => ["enable-warnings", "Enable CPU execution warnings.", "no"],
+	    "memory-region=s@" => ["memory-region=BASE,SIZE", "Add RAM region from BASE to BASE+SIZE-1.", "no",
+				   "other options:",
+				   "   read-only      Make memory read-only",
+				   "   alias=BASE2    Add an alias at BASE2",
+				   "   file=FILENAME  Load/save memory image from file",
+				   "   mmap           Memory map given file",
+				   "   latency=R:W    Set read, write latencies  [0:0]",
+				   "   latency=RW     Set both latencies           [0]"],
+	    "gdb=i" => ["gdb=PORT", "Add a gdb/debugger interface on TCP port.", "",
+			"Equivalent to --gdbport cpu=PORT.           [none]"],
+	    "gdbport=i%" => ["gdbport PROCESSOR=PORT", "Add a gdb/debugger interface on TCP port", "",
+			     "for the given processor. May be specified",
+			     "more than once to debug multiple CPUs.      [none]"],
+	    "tksm!" => ["tksm", "Add an experimental Tk system monitor.", "no"],
+	    "board=s" => ["board=BOARD", "Model given board or system.", "gloss"],
+	    "engine=s" => ["engine=scache|pbb", "Set given cgen CPU engine.", "pbb"],
+	    "EB!" => ["-EB | -EL", "Set powerup CPU mode to big/little endian.", "auto"],
+	    "EL!" => [],
+	    "persistent!" => ["persistent", "Rerun top-level loop indefinitely.", "no"],
+	    "no-run!" => ["no-run", "Make config file (--save-temps) and exit.", "no"],
+	    "insn-count=i" => ["insn-count=N", "Block of uninterrupted ticks for insns", "10000"],
+	    "gprof!" => ["gprof", "GPROF-profile, collect every N ticks", "no"],
+	    "sidrtc=s" => [],
+	    "sidcodec=s" => [],
+	    "wrap=s@" => ["wrap=COMPONENT", "Turn on SID API tracing for named component", "none"],
+	    "load=s%" => ["load PROCESSOR=NAME", "Specify an executable to be loaded into", "",
+	                  "a specific processor. May be specified more",
+                          "than once to load multiple processors.  [cpu=exec]"]
+	   );
+
+@options = keys (%options);
 
 sub usage {
-  print STDERR "
-Usage: $0 --cpu=CPU [option ..] [--] [exec args ..]
-Options:
- --help                     Print this help message.
- --cpu=CPU   (REQUIRED)     Select target processor                     [none]
- --verbose                  Turn on various run-time verbosity settings.  [no]
- --save-temps               Keep generated sid configuration file.        [no]
- --trace-extract            Turn on CPU insn decode tracing.              [no]
- --trace-semantics          Turn on CPU insn execute tracing.             [no]
- --trace-disassemble        Turn on CPU insn execute disassembly.         [no]
- --trace-counter            Turn on CPU insn counter.                     [no]
- --trace-core               Turn on bus access tracing.                   [no]
- --enable-warnings          Enable CPU execution warnings.                [no]
- --memory-region=BASE,SIZE  Add RAM region from BASE to BASE+SIZE-1.      [no]
-                            other options:
-                               read-only      Make memory read-only
-                               alias=BASE2    Add an alias at BASE2
-                               file=FILENAME  Load/save memory image from file
-                               mmap           Memory map given file
-                               latency=R:W    Set read, write latencies  [0:0]
-                               latency=RW     Set both latencies           [0]
- --gdb=PORT                 Add a gdb/debugger interface on TCP port.
-                            Equivalent to --gdbport cpu=PORT.           [none]
- --gdbport PROCESSOR=PORT   Add a gdb/debugger interface on TCP port
-                            for the given processor. May be specified
-                            more than once to debug multiple
-                            processors.                                 [none]
- --board=BOARD              Model given board or system.               [gloss]
- --engine=scache|pbb        Set given cgen CPU engine.                   [pbb]
- -EB | -EL                  Set powerup CPU mode to big/little endian   [auto]
- --tksm                     Add an experimental Tk system monitor         [no]
- --persistent               Rerun top-level loop indefinitely             [no]
- --no-run                   Make config file (--save-temps) and exit.     [no]
- --insn-count=N             Block of uninterrupted ticks for insns     [10000]
- --gprof                    GPROF-profile, collect every N ticks          [no]
- --wrap=COMPONENT           Turn on SID API tracing for named component [none]
- --load PROCESSOR=NAME      Specify an executable to be loaded into
-                            a specific processor. May be specified more
-                            than once to load multiple processors.  [cpu=exec]
-";
+  print STDERR "\nUsage: $0 --cpu=CPU [option ..] [--] [exec args ..]\n";
+  print STDERR "Options:\n";
+  
+  foreach $usage_msgs (sort (values %options))
+    {
+      my $num_entries = scalar (@{$usage_msgs});
+      next if ($num_entries < 2);
+      
+      my $option = @{$usage_msgs}[0];
+      my $synopsis = @{$usage_msgs}[1];
+      my $default = @{$usage_msgs}[2];
 
-# temporarily disabled, until BLT build problems are fixed:
-# --trace-core-visual        Turn on visual bus access tracing.            [no]
+      # Special handling for single dash options (eg. -EL).
+      if ($option =~ /^-/)
+	{
+	  printf STDERR " %-26s ", $option;
+	} else {
+	  printf STDERR " --%-24s ", $option;
+	}
 
+      # If a default value has been given, display it within [ ].
+      if ($default ne "")
+	{
+	  my $width = 48 - length ($default);
+	  printf STDERR "%-${width}s%s\n", $synopsis, "[" . $default . "]";
+	}
+      else
+	{
+	  printf STDERR "%s\n", $synopsis;
+	}
+
+      # Print any supplementary lines of help.
+      for ($i = 3; $i < $num_entries; $i++)
+	{
+	  printf STDERR "%28s%s\n", " ", @{$usage_msgs}[$i];
+	}
+    }
   exit (0);
 }
 

@@ -1,6 +1,6 @@
 // compTcl.cxx - Tcl bridge component.  -*- C++ -*-
 
-// Copyright (C) 1999-2001 Red Hat.
+// Copyright (C) 1999, 2000, 2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -577,18 +577,39 @@ tcl_component::encode_bus_status (bus::status p) const
   string id;
   bool found = this->bus_status_lut.find (p, id);
   if (found)
-    return id;
+    {
+      id += " " + make_attribute (p.latency);
+      return id;
+    }
   else
-    return "?";
+    return "? 0";
 }
 
 bus::status 
 tcl_component::decode_bus_status (const string& str) const
 { 
+  vector<string> status_pair = sidutil::tokenize (str, " ");
+  if (status_pair.size () != 2)
+    {
+      cerr << "TCL ERROR: syntax error in bus status (" << str << ")" << endl;
+      return bus::unpermitted;
+    }
+
   bus::status id;
-  bool found = this->bus_status_lut.find (str, id);
+  bool found = this->bus_status_lut.find (status_pair[0], id);
   if (found)
-    return id;
+    {
+      host_int_2 lat;
+      if (parse_attribute (status_pair[1], lat) != component::ok)
+	{
+	  cerr << "TCL ERROR: unable to parse bus latency" << endl;
+	  id.latency = 0;
+	}
+      else
+	id.latency = lat;
+
+      return id;
+    }
   else
     return bus::unpermitted; // misc error
 }
@@ -1752,7 +1773,7 @@ sid_bus_read_any (ClientData cdata, Tcl_Interp* interp,
   bus::status stat = b->read (addr, data);
   string code = comp->encode_bus_status (stat);
   string data_string = make_attribute (data);
-  string result = code + " " + data_string;
+  string result = "{" + code + "} " + data_string;
 
   Tcl_Obj* hobj = make_object (result);
   Tcl_SetObjResult (interp, hobj);

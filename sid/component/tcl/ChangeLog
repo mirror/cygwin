@@ -1,3 +1,11 @@
+2001-06-21  Ben Elliston  <bje@redhat.com>
+
+	* compTcl.cxx (encode_bus_status): Append bus latency when
+	constructing the bus status string.
+	(decode_bus_status): Decode status code and latency.
+	(sid_bus_read_any): Place status string in a sub-list of result.
+	* bridge-tcl.txt: Update Tcl type table.
+
 2001-04-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* compTcl.cxx (scan_files): Make ".../sidcomp" an optional part of

@@ -1387,7 +1387,7 @@
 )
 
 (dnmi pop "pop"
-      ((IDOC MEM))
+      ((PIPE O) (IDOC MEM))
       "pop $dr"
       (emit ld-plus dr (sr 15)) ; "ld %0,@sp+"
 )

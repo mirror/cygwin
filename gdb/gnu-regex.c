@@ -1,3 +1,4 @@
+/* *INDENT-OFF* */ /* keep in sync with glibc */
 /* Extended regular expression matching and search library,
    version 0.12.
    (Implements POSIX draft P1003.2/D11.2, except for some of the
@@ -5,7 +6,7 @@
    Copyright (C) 1993, 94, 95, 96, 97, 98 Free Software Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the 
-   GNU C Library.  Bugs can be reported to bug-glibc@prep.ai.mit.edu.
+   GNU C Library.  Bugs can be reported to bug-glibc@gnu.org.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -19,7 +20,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation, 
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* AIX requires this to be the first thing in the file. */
 #if defined _AIX && !defined REGEX_MALLOC
@@ -1700,7 +1702,11 @@ typedef struct
        } 								\
     }
 
-#if defined _LIBC || (defined HAVE_WCTYPE_H && defined HAVE_WCHAR_H)
+/* Use this only if they have btowc(), since wctype() is used below
+   together with btowc().  btowc() is defined in the 1994 Amendment 1
+   to ISO C and may not be present on systems where we have wchar.h
+   and wctype.h.  */
+#if defined _LIBC || (defined HAVE_WCTYPE_H && defined HAVE_WCHAR_H && defined HAVE_BTOWC)
 /* The GNU C library provides support for user-defined character classes
    and the functions from ISO C amendement 1.  */
 # ifdef CHARCLASS_NAME_MAX
@@ -5724,7 +5730,7 @@ weak_alias (__regexec, regexec)
    from either regcomp or regexec.   We don't use PREG here.  */
 
 size_t
-__regerror (errcode, preg, errbuf, errbuf_size)
+regerror (errcode, preg, errbuf, errbuf_size)
     int errcode;
     const regex_t *preg;
     char *errbuf;

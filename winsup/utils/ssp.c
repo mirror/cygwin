@@ -22,7 +22,7 @@
 #include <windows.h>
 #include <getopt.h>
 
-static const char version[] = "$Revision: 1.7 $";
+static const char version[] = "$Revision: 1.8 $";
 static char *prog_name;
 
 static struct option longopts[] =
@@ -39,7 +39,7 @@ static struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "cdehlstvV";
+static char opts[] = "+cdehlstvV";
 
 #define KERNEL_ADDR 0x77000000
 

@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  */
 
-/* $Id: test.h,v 1.4 2003/01/24 01:09:39 cgf Exp $ */
+/* $Id: test.h,v 1.5 2003/05/09 20:53:22 corinna Exp $ */
 
 #ifndef __TEST_H__
 #define __TEST_H__
@@ -54,7 +54,6 @@ int execvp(const char *, const char * const []);
 /* CGF: Avoid compilation warnings for undefined functions */
 extern int setregid (gid_t, gid_t);
 int setreuid (uid_t, uid_t);
-int gethostid (void);
 
 #define TPASS    0    /* Test passed flag */
 #define TFAIL    1    /* Test failed flag */

@@ -1,3 +1,8 @@
+2002-02-18  Frank Ch. Eigler  <fche@redhat.com>
+
+	* gprof.cxx (store): Emit high_pc for histogram as gprof expects it
+	(exclusive upper limit), not actual (maximum value).
+
 2001-12-01  Frank Ch. Eigler  <fche@redhat.com>
 
 	* gprof.cxx (make_pair): Import from std::.

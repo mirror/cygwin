@@ -1,3 +1,9 @@
+2000-08-14  Jimmy Guo  <guo@cup.hp.com>
+
+	* runtest.exp: Reapply part of the backed out change to
+	runtest.exp -- handle multiple directories in TCL variables
+	dir_to_run and cmdline_dir_to_run.
+
 2000-08-04  Geoff Keating  <geoffk@cygnus.com>
 
 	Back out this change:

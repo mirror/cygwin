@@ -1,6 +1,6 @@
 // lcd-char-display.cxx - description.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -131,7 +131,8 @@ lcd_char_display :: init( host_int_4 ) {
 }
 
 void
-lcd_char_display :: set_pixel( host_int_4 val ) {
+lcd_char_display::set_pixel (host_int_4 val)
+{
   int i = val;
 
   int row = i >> 16;
@@ -140,6 +141,8 @@ lcd_char_display :: set_pixel( host_int_4 val ) {
 #ifndef HAVE_CURSES_H
   cout << '[' << row << ',' << col << ']';
 #else
+  if (!w)
+    return;
   mvwaddch( w, row, col, '*' );
 #endif // HAVE_CURSES_H
 
@@ -147,12 +150,16 @@ lcd_char_display :: set_pixel( host_int_4 val ) {
 }
 
 void
-lcd_char_display :: new_frame( host_int_4 val ) {
+lcd_char_display::new_frame (host_int_4 val)
+{
 #ifdef HAVE_CURSES_H
-  if( val == 1 )
-    werase( w );
+  if (!w)
+    return;
+
+  if (val == 1)
+    werase (w);
   else
-    wrefresh( w );
+    wrefresh (w);
 #else
   cout << endl;
 #endif

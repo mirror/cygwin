@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacFont.c,v 1.7.6.1 2000/05/04 21:26:26 spolk Exp $
+ * RCS: @(#) $Id: tkMacFont.c,v 1.8 2002/10/09 11:56:43 das Exp $
  */
  
 #include <Windows.h>
@@ -241,7 +241,7 @@ static FontFamily *	AllocFontFamily(CONST MacFont *fontPtr, int family);
 static SubFont *	CanUseFallback(MacFont *fontPtr,
 			    CONST char *fallbackName, int ch);
 static SubFont *	CanUseFallbackWithAliases(MacFont *fontPtr, 
-			    char *faceName, int ch, Tcl_DString *nameTriedPtr);
+			    CONST char *faceName, int ch, Tcl_DString *nameTriedPtr);
 static SubFont *	FindSubFontForChar(MacFont *fontPtr, int ch);
 static void		FontMapInsert(SubFont *subFontPtr, int ch);
 static void		FontMapLoadPage(SubFont *subFontPtr, int row);
@@ -257,7 +257,7 @@ static void		ReleaseFont(MacFont *fontPtr);
 static void		ReleaseSubFont(SubFont *subFontPtr);
 static int		SeenName(CONST char *name, Tcl_DString *dsPtr);
 
-static char *      	BreakLine(FontFamily *familyPtr, int flags, 
+static CONST char *    	BreakLine(FontFamily *familyPtr, int flags, 
 			    CONST char *source, int numBytes, int *widthPtr);
 static int		GetFamilyNum(CONST char *faceName, short *familyPtr);
 static int		GetFamilyOrAliasNum(CONST char *faceName, 
@@ -326,7 +326,7 @@ TkpFontPkgInit(mainPtr)
 	 */
 	
 	fontMenu = NewMenu('FT', "\px");
-	AddResMenu(fontMenu, 'FONT');
+	AppendResMenu(fontMenu, 'FONT');
 	
 	numFonts = CountMItems(fontMenu);
 	tmpFontNameMap = (FontNameMap *) ckalloc(sizeof(FontNameMap) * numFonts);
@@ -484,7 +484,8 @@ TkpGetFontFromAttributes(
 {
     short faceNum, style;
     int i, j;
-    char *faceName, *fallback;
+    CONST char *faceName;
+    char *fallback;
     char ***fallbacks;
     MacFont *fontPtr;
         
@@ -761,7 +762,7 @@ Tk_MeasureChars(
         int widthLeft;
         FontFamily *thisFamilyPtr;
         Tcl_UniChar ch;
-        char *rest;
+        CONST char *rest;
         
 	/*
 	 * How many chars will fit in the space allotted? 
@@ -835,7 +836,7 @@ Tk_MeasureChars(
  *---------------------------------------------------------------------------
  */
  
-static char *      	
+static CONST char *      	
 BreakLine(
     FontFamily *familyPtr,	/* FontFamily that describes the font values
     				 * that are already selected into the graphics
@@ -1498,7 +1499,7 @@ FindSubFontForChar(
     int ch)			/* The Unicode character to be displayed. */
 {
     int i, j, k;
-    char *fallbackName;
+    CONST char *fallbackName;
     char **aliases;
     SubFont *subFontPtr;
     FontNameMap *mapPtr;
@@ -1831,7 +1832,7 @@ static SubFont *
 CanUseFallbackWithAliases(
     MacFont *fontPtr,		/* The font object that will own the new
 				 * screen font. */
-    char *faceName,		/* Desired face name for new screen font. */
+    CONST char *faceName,		/* Desired face name for new screen font. */
     int ch,			/* The Unicode character that the new
 				 * screen font must be able to display. */
     Tcl_DString *nameTriedPtr)	/* Records face names that have already
@@ -2149,4 +2150,3 @@ GetFontEncoding(
     }
     return Tcl_GetEncoding(NULL, name);
 }
-

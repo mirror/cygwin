@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkUnixColor.c,v 1.7.6.1 2000/05/04 21:26:30 spolk Exp $
+ * RCS: @(#) $Id: tkUnixColor.c,v 1.2 1998/09/14 18:23:55 stanton Exp $
  */
 
 #include <tkColor.h>
@@ -422,4 +422,3 @@ TkpCmapStressed(tkwin, colormap)
     }
     return 0;
 }
-

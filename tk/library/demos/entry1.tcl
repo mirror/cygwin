@@ -3,7 +3,7 @@
 # This demonstration script creates several entry widgets without
 # scrollbars.
 #
-# RCS: @(#) $Id: entry1.tcl,v 1.7.6.1 2000/05/04 21:26:25 spolk Exp $
+# RCS: @(#) $Id: entry1.tcl,v 1.2 1998/09/14 18:23:28 stanton Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -34,4 +34,3 @@ $w.e1 insert 0 "Initial value"
 $w.e2 insert end "This entry contains a long value, much too long "
 $w.e2 insert end "to fit in the window at one time, so long in fact "
 $w.e2 insert end "that you'll have to scan or scroll to see the end."
-

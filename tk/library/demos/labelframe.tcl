@@ -3,7 +3,7 @@
 # This demonstration script creates a toplevel window containing
 # several labelframe widgets.
 #
-# RCS: @(#) $Id: labelframe.tcl,v 1.2 2003/01/21 19:53:14 hunt Exp $
+# RCS: @(#) $Id: labelframe.tcl,v 1.3 2003/01/21 20:24:47 hunt Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."

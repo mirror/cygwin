@@ -4,7 +4,7 @@
 # "autoconf" program (constructs like "@foo@" will get replaced in the
 # actual Makefile.
 #
-# RCS: @(#) $Id: Makefile.in,v 1.9.6.13 2001/08/07 02:18:47 mdejong Exp $
+# RCS: @(#) $Id: Makefile.in,v 1.58 2002/09/04 17:44:55 andreas_kupries Exp $
 
 TCLVERSION		= @TCL_VERSION@
 VERSION			= @TK_VERSION@
@@ -39,7 +39,11 @@ INSTALL_ROOT		=
 # Directory from which applications will reference the library of Tk
 # scripts (note: you can set the TK_LIBRARY environment variable at
 # run-time to override this value):
+
+# REDHAT LOCAL
+#TK_LIBRARY		= $(prefix)/lib/tk$(VERSION)
 TK_LIBRARY		= @datadir@/tk$(VERSION)
+# END REDHAT LOCAL
 
 # Path to use at runtime to refer to LIB_INSTALL_DIR:
 LIB_RUNTIME_DIR		= $(libdir)
@@ -73,6 +77,12 @@ MANN_INSTALL_DIR	= $(MAN_INSTALL_DIR)/mann
 # Libraries built with optimization switches have this additional extension
 TK_DBGX			= @TK_DBGX@
 
+# Directory in which to install the pkgIndex.tcl file for loadable Tk
+PKG_INSTALL_DIR		= $(LIB_INSTALL_DIR)/tk$(VERSION)$(TK_DBGX)
+
+# Package index file for loadable Tk
+PKG_INDEX		= $(PKG_INSTALL_DIR)/pkgIndex.tcl
+
 # The directory containing the Tcl source and header files.
 TCL_SRC_DIR		= @TCL_SRC_DIR@
 
@@ -84,13 +94,14 @@ TCL_BIN_DIR		= @TCL_BIN_DIR@
 # for this version of Tk ("srcdir" will be replaced or has already
 # been replaced by the configure script):
 TCL_GENERIC_DIR	= @TCL_SRC_DIR@/generic
+TCL_TOOL_DIR = @TCL_SRC_DIR@/tools
 
-# This program converts from POSIX to Windows native paths.
+# Converts a POSIX path to a Windows native path.
 CYGPATH			= @CYGPATH@
 
 # The name of the Tcl library.
-TCL_LIB_SPEC	  = @TCL_BUILD_LIB_SPEC@
-TCL_STUB_LIB_SPEC = @TCL_BUILD_STUB_LIB_SPEC@
+TCL_LIB_FILE	  = "$(shell $(CYGPATH) '@TCL_BIN_DIR@/@TCL_LIB_FILE@')"
+TCL_STUB_LIB_FILE = "$(shell $(CYGPATH) '@TCL_BIN_DIR@/@TCL_STUB_LIB_FILE@')"
 
 SRC_DIR			= @srcdir@
 ROOT_DIR		= $(SRC_DIR)/..
@@ -108,7 +119,6 @@ BITMAP_DIR_NATIVE	= $(shell $(CYGPATH) '$(ROOT_DIR)/bitmaps')
 XLIB_DIR_NATIVE		= $(shell $(CYGPATH) '$(ROOT_DIR)/xlib')
 TCL_GENERIC_NATIVE	= $(shell $(CYGPATH) '$(TCL_GENERIC_DIR)')
 TCL_SRC_DIR_NATIVE      = $(shell $(CYGPATH) '$(TCL_SRC_DIR)')
-TCL_BIN_DIR_NATIVE      = $(shell $(CYGPATH) '$(TCL_BIN_DIR)')
 RC_DIR_NATIVE      	= $(shell $(CYGPATH) '$(RC_DIR)')
 
 DLLSUFFIX		= @DLLSUFFIX@
@@ -118,13 +128,9 @@ EXESUFFIX		= @EXESUFFIX@
 TK_STUB_LIB_FILE	= @TK_STUB_LIB_FILE@
 TK_LIB_FILE		= @TK_LIB_FILE@
 TK_DLL_FILE		= @TK_DLL_FILE@
-TK_DLL_BASE		= @TK_DLL_BASE@
 
 SHARED_LIBRARIES 	= $(TK_DLL_FILE) $(TK_STUB_LIB_FILE)
 STATIC_LIBRARIES	= $(TK_LIB_FILE)
-
-WISH_RES		= @WISH_RES@
-TK_RES			= @TK_RES@
 
 WISH			= wish$(VER)${EXESUFFIX}
 TKTEST			= tktest${EXEEXT}
@@ -165,6 +171,7 @@ RANLIB		= @RANLIB@
 CC		= @CC@
 RC		= @RC@
 RES		= @RES@
+TK_RES		= @TK_RES@
 AC_FLAGS	= @EXTRA_CFLAGS@ @DEFS@
 CPPFLAGS	= @CPPFLAGS@
 LDFLAGS		= @LDFLAGS@ @LDFLAGS_DEFAULT@
@@ -172,24 +179,28 @@ LDFLAGS_CONSOLE	= @LDFLAGS_CONSOLE@
 LDFLAGS_WINDOW	= @LDFLAGS_WINDOW@
 EXEEXT		= @EXEEXT@
 OBJEXT		= @OBJEXT@
-LIBS_GUI	= @LIBS_GUI@
 STLIB_LD	= @STLIB_LD@
 SHLIB_LD	= @SHLIB_LD@
+SHLIB_LD_LIBS	= @SHLIB_LD_LIBS@ $(TCL_STUB_LIB_FILE) $(LIBS)
 SHLIB_CFLAGS	= @SHLIB_CFLAGS@
-SHLIB_LD_LIBS	= @SHLIB_LD_LIBS@ $(TCL_STUB_LIB_SPEC) $(LIBS_GUI)
 SHLIB_SUFFIX	= @SHLIB_SUFFIX@
 VER		= @TK_MAJOR_VERSION@@TK_MINOR_VERSION@
 DOTVER		= @TK_MAJOR_VERSION@.@TK_MINOR_VERSION@
-LIBS		= @LIBS@ $(LIBS_GUI)
+LIBS		= @LIBS@ @LIBS_GUI@
 RMDIR		= rm -rf
 MKDIR		= mkdir -p
 SHELL		= @SHELL@
 RM		= rm -f
 COPY		= cp
 
-# FIXME: Add a "make shell SCRIPT=foo.tcl" argument
-# so that a shell can easily be run from the build dir.
-TCLSH_PROG	= $(TCL_BIN_DIR)/tclsh$(VER)
+TCLSH_PROG	= @TCLSH_PROG@
+
+# TCL_EXE is the name of a tclsh executable that is available *BEFORE*
+# running make for the first time. Certain build targets (make genstubs)
+# need it to be available on the PATH. This executable should *NOT* be
+# required just to do a normal build although it can be required to run
+# make dist.
+TCL_EXE			= tclsh
 
 CC_SWITCHES = ${CFLAGS} ${CFLAGS_WARNING} ${SHLIB_CFLAGS} \
 -I"${GENERIC_DIR_NATIVE}" -I"${WIN_DIR_NATIVE}" \
@@ -214,21 +225,7 @@ INSTALL_DATA	= ${INSTALL}
 WISH_OBJS = \
 	winMain.$(OBJEXT)
 
-TCLTEST_OBJS = \
-	${TCL_BIN_DIR}/tclThreadTest.$(OBJEXT)
-
-TCLTEST_OBJS_NATIVE = \
-	"${TCL_BIN_DIR_NATIVE}/tclThreadTest.$(OBJEXT)"
-
 TKTEST_OBJS = \
-	$(TCLTEST_OBJS) \
-	testMain.$(OBJEXT) \
-	tkSquare.$(OBJEXT) \
-	tkTest.$(OBJEXT) \
-	tkWinTest.$(OBJEXT)
-
-TKTEST_OBJS_NATIVE = \
-	$(TCLTEST_OBJS_NATIVE) \
 	testMain.$(OBJEXT) \
 	tkSquare.$(OBJEXT) \
 	tkTest.$(OBJEXT) \
@@ -316,6 +313,7 @@ TK_OBJS = \
 	tkMenubutton.$(OBJEXT) \
 	tkMenuDraw.$(OBJEXT) \
 	tkMessage.$(OBJEXT) \
+	tkPanedWindow.$(OBJEXT) \
 	tkObj.$(OBJEXT) \
 	tkOldConfig.$(OBJEXT) \
 	tkOption.$(OBJEXT) \
@@ -326,6 +324,7 @@ TK_OBJS = \
 	tkScale.$(OBJEXT) \
 	tkScrollbar.$(OBJEXT) \
 	tkSelect.$(OBJEXT) \
+	tkStyle.$(OBJEXT) \
 	tkText.$(OBJEXT) \
 	tkTextBTree.$(OBJEXT) \
 	tkTextDisp.$(OBJEXT) \
@@ -335,6 +334,7 @@ TK_OBJS = \
 	tkTextTag.$(OBJEXT) \
 	tkTextWind.$(OBJEXT) \
 	tkTrig.$(OBJEXT) \
+	tkUndo.$(OBJEXT) \
 	tkUtil.$(OBJEXT) \
 	tkVisual.$(OBJEXT) \
 	tkStubInit.$(OBJEXT) \
@@ -361,7 +361,7 @@ binaries: @LIBRARIES@ $(WISH)
 libraries:
 
 $(ROOT_DIR)/doc/man.macros:
-	$(INSTALL_DATA) @TCL_SRC_DIR@/doc/man.macros $(ROOT_DIR)/doc/man.macros
+	$(INSTALL_DATA) "$(TCL_SRC_DIR)/doc/man.macros" "$(ROOT_DIR)/doc/man.macros"
 
 doc: $(ROOT_DIR)/doc/man.macros
 
@@ -369,13 +369,17 @@ winhelp: $(TCL_SRC_DIR_NATIVE)/tools/man2help.tcl $(MAN2TCL)
 	TCL_LIBRARY="$(TCL_SRC_DIR_NATIVE)/library"; export TCL_LIBRARY; \
 	TK_LIBRARY="$(ROOT_DIR_NATIVE)/library"; export TK_LIBRARY; \
 	PATH="$(PATH):$(TCL_BIN_DIR)"; export PATH; \
-	$(TCLSH_PROG) "$(TCL_SRC_DIR_NATIVE)"/tools/man2help.tcl tcl "$(VER)" $(CORE_DOCS)
+	$(TCLSH_PROG) "$(TCL_SRC_DIR_NATIVE)/tools/man2help.tcl" tcl "$(VER)" $(CORE_DOCS)
 	$(COPY) "$(TCL_BIN_DIR)"/tcl.hpj ./
 	hcw /c /e tcl.hpj
 	$(COPY) ./tcl$(VER).cnt ./TCL$(VER).HLP "$(TCL_SRC_DIR_NATIVE)"/tools/
 
 $(MAN2TCL): $(TCL_SRC_DIR_NATIVE)/tools/man2tcl.c
 	$(CC) $(CFLAGS_OPTIMIZE) $(MAN2TCLFLAGS) -o $(MAN2TCL) "$(TCL_SRC_DIR_NATIVE)"/tools/man2tcl.c
+
+# Specifying TESTFLAGS on the command line is the standard way to pass
+# args to tcltest, ie:
+#	% make test TESTFLAGS="-verbose bps -file fileName.test"
 
 test: binaries $(TKTEST)
 	@TCL_LIBRARY="$(TCL_SRC_DIR_NATIVE)/library"; export TCL_LIBRARY; \
@@ -384,16 +388,32 @@ test: binaries $(TKTEST)
 	./$(TKTEST) "$(ROOT_DIR_NATIVE)/tests/all.tcl" $(TESTFLAGS) \
 	| ./$(CAT32)
 
-runtest: tktest
+runtest: binaries $(TKTEST)
 	@TCL_LIBRARY="$(TCL_SRC_DIR_NATIVE)/library"; export TCL_LIBRARY; \
 	TK_LIBRARY="$(ROOT_DIR_NATIVE)/library"; export TK_LIBRARY; \
 	PATH="$(PATH):$(TCL_BIN_DIR)"; export PATH; \
-	./$(TKTEST) 
+	./$(TKTEST) $(TESTFLAGS) $(SCRIPT)
+
+# This target can be used to run wish from the build directory
+# via `make shell` or `make shell SCRIPT=foo.tcl`
+shell: binaries
+	@TCL_LIBRARY="$(TCL_SRC_DIR_NATIVE)/library"; export TCL_LIBRARY; \
+	TK_LIBRARY="$(ROOT_DIR_NATIVE)/library"; export TK_LIBRARY; \
+	PATH="$(PATH):$(TCL_BIN_DIR)"; export PATH; \
+	./$(WISH) $(SCRIPT)
+
+# This target can be used to run wish inside either gdb or insight
+gdb: binaries
+	@echo "set env TCL_LIBRARY=$(TCL_SRC_DIR_NATIVE)/library" > gdb.run
+	@echo "set env TK_LIBRARY=$(ROOT_DIR_NATIVE)/library" >> gdb.run
+	PATH="$(PATH):$(TCL_BIN_DIR)"; export PATH; \
+	gdb ./$(WISH) --command=gdb.run
+	@$(RM) gdb.run
 
 install: all install-binaries install-libraries install-doc install-demos
 
-install-binaries:
-	@for i in $(LIB_INSTALL_DIR) $(BIN_INSTALL_DIR) ; \
+install-binaries: binaries
+	@for i in $(LIB_INSTALL_DIR) $(BIN_INSTALL_DIR) $(PKG_INSTALL_DIR); \
 	    do \
 	    if [ ! -d $$i ] ; then \
 		echo "Making directory $$i"; \
@@ -402,29 +422,34 @@ install-binaries:
 		else true; \
 		fi; \
 	    done;
-	@echo "Installing $(TK_LIB_FILE) to $(LIB_INSTALL_DIR)/"
-	@$(INSTALL_DATA) $(TK_LIB_FILE) $(LIB_INSTALL_DIR)/$(TK_LIB_FILE)
-	@echo "Installing $(WISH) as $(BIN_INSTALL_DIR)/wish$(VERSION)"
-	@$(INSTALL_PROGRAM) $(WISH) $(BIN_INSTALL_DIR)/$(WISH)
-	@echo "Installing tkConfig.sh to $(LIB_INSTALL_DIR)/"
-	@$(INSTALL_DATA) tkConfig.sh $(LIB_INSTALL_DIR)/tkConfig.sh
-	@if test "$(DLLSUFFIX)" != "" ; then \
-	    echo "Installing $(TK_DLL_FILE) to $(LIB_INSTALL_DIR)/" ; \
-	    $(INSTALL_PROGRAM) $(TK_DLL_FILE) \
-		$(BIN_INSTALL_DIR)/$(TK_DLL_FILE) ; \
-	fi
-	@if test "$(TK_STUB_LIB_FILE)" != "" ; then \
-	    if [ -f $(TK_STUB_LIB_FILE) ]; then \
-	        echo "Installing $(TK_STUB_LIB_FILE) to $(LIB_INSTALL_DIR)/"; \
-	        $(INSTALL_DATA) $(TK_STUB_LIB_FILE) \
-			 $(LIB_INSTALL_DIR)/$(TK_STUB_LIB_FILE); \
+	@for i in $(TK_DLL_FILE) $(WISH); \
+	    do \
+	    if [ -f $$i ]; then \
+		echo "Installing $$i to $(BIN_INSTALL_DIR)/"; \
+		$(COPY) $$i "$(BIN_INSTALL_DIR)"; \
 	    fi; \
-        fi
+	    done
+	@echo "Creating package index $(PKG_INDEX)"; 
+	@$(RM) $(PKG_INDEX);
+	@(\
+	echo "if {[package vcompare [package provide Tcl]\
+		$(TCLVERSION)] != 0} { return }";\
+	echo "package ifneeded Tk $(VERSION)\
+		[list load [file join \$$dir .. .. bin $(TK_DLL_FILE)] Tk]";\
+	) > $(PKG_INDEX);
+	@for i in tkConfig.sh $(TK_LIB_FILE) $(TK_STUB_LIB_FILE); \
+	    do \
+	    if [ -f $$i ]; then \
+		echo "Installing $$i to $(LIB_INSTALL_DIR)/"; \
+		$(COPY) $$i "$(LIB_INSTALL_DIR)"; \
+	    fi; \
+	    done
 
-install-libraries:
+install-libraries: libraries
 	@for i in $(INSTALL_ROOT)$(prefix)/lib \
 		$(INCLUDE_INSTALL_DIR) $(INCLUDE_INSTALL_DIR)/X11 \
-		$(SCRIPT_INSTALL_DIR) $(SCRIPT_INSTALL_DIR)/images; \
+		$(SCRIPT_INSTALL_DIR) $(SCRIPT_INSTALL_DIR)/images \
+		$(SCRIPT_INSTALL_DIR)/msgs; \
 	    do \
 	    if [ ! -d $$i ] ; then \
 		echo "Making directory $$i"; \
@@ -433,9 +458,9 @@ install-libraries:
 		else true; \
 		fi; \
 	    done;
-	@echo "Installing header files";
-	@for i in $(GENERIC_DIR)/tk.h $(GENERIC_DIR)/tkDecls.h \
-		$(GENERIC_DIR)/tkIntXlibDecls.h ; \
+	@echo "Installing header files to $(INCLUDE_INSTALL_DIR)/";
+	@for i in $(GENERIC_DIR)/tk.h $(GENERIC_DIR)/tkPlatDecls.h \
+		$(GENERIC_DIR)/tkIntXlibDecls.h $(GENERIC_DIR)/tkDecls.h ; \
 	    do \
 	    $(INSTALL_DATA) $$i $(INCLUDE_INSTALL_DIR); \
 	    done;
@@ -454,6 +479,13 @@ install-libraries:
 	    do \
 	    if [ -f $$i ] ; then \
 		$(INSTALL_DATA) $$i $(SCRIPT_INSTALL_DIR)/images; \
+	    fi; \
+	    done;
+	@echo "Installing translation directory";
+	@for i in $(ROOT_DIR)/library/msgs/*.msg; \
+	    do \
+	    if [ -f $$i ] ; then \
+		$(INSTALL_DATA) $$i $(SCRIPT_INSTALL_DIR)/msgs; \
 	    fi; \
 	    done;
 
@@ -489,40 +521,25 @@ install-demos:
 		fi; \
 	    done;
 
-install-doc:
+install-doc: doc
 
 
-$(WISH): $(TK_LIB_FILE) $(WISH_OBJS) $(WISH_RES)
-	$(CC) $(CFLAGS) $(WISH_OBJS) $(TCL_LIB_SPEC) $(TK_LIB_FILE) $(LIBS) \
-	$(WISH_RES) $(CC_EXENAME) $(LDFLAGS_WINDOW)
+$(WISH): $(TK_LIB_FILE) $(TK_STUB_LIB_FILE) $(WISH_OBJS) wish.$(RES)
+	$(CC) $(CFLAGS) $(WISH_OBJS) $(TCL_LIB_FILE) $(TK_LIB_FILE) $(LIBS) \
+	wish.$(RES) $(CC_EXENAME) $(LDFLAGS_WINDOW)
 
 tktest : $(TKTEST)
 
-$(TKTEST): $(TK_LIB_FILE) $(TKTEST_OBJS) $(WISH_RES) $(CAT32)
-	$(CC) $(CFLAGS) $(TKTEST_OBJS_NATIVE) $(TCL_LIB_SPEC) \
+$(TKTEST): $(TK_LIB_FILE) $(TKTEST_OBJS) wish.$(RES) $(CAT32)
+	$(CC) $(CFLAGS) $(TKTEST_OBJS) $(TCL_LIB_FILE) \
 	$(TK_LIB_FILE) $(LIBS) \
-	$(WISH_RES) $(CC_EXENAME) $(LDFLAGS_WINDOW)
+	wish.$(RES) $(CC_EXENAME) $(LDFLAGS_WINDOW)
 
 cat32.${OBJEXT}: $(TCL_SRC_DIR)/win/cat.c
 	$(CC) -c $(CC_SWITCHES) @DEPARG@ $(CC_OBJNAME)
 
 $(CAT32): cat32.${OBJEXT}
 	$(CC) $(CFLAGS) cat32.$(OBJEXT) $(CC_EXENAME) $(LDFLAGS_CONSOLE)
-
-# WISH_RES 
-$(RC_DIR)/wish_static.rc : $(RC_DIR)/wish.rc $(RC_DIR)/tk_base.rc
-	cat $(RC_DIR)/wish.rc $(RC_DIR)/tk_base.rc > $(RC_DIR)/wish_static.rc
-
-wish_static.$(RES) : $(RC_DIR)/wish_static.rc
-	$(RC) @RC_OUT@ $@ @RC_TYPE@ @RC_INCLUDE@ "$(GENERIC_DIR_NATIVE)" @RC_INCLUDE@ "$(TCL_GENERIC_NATIVE)" @RC_INCLUDE@ "$(RC_DIR_NATIVE)" @DEPARG@
-
-
-# TK_RES
-$(RC_DIR)/tk_dll.rc : $(RC_DIR)/tk.rc $(RC_DIR)/tk_base.rc
-	cat $(RC_DIR)/tk.rc $(RC_DIR)/tk_base.rc > $(RC_DIR)/tk_dll.rc
-
-tk_dll.$(RES) : $(RC_DIR)/tk_dll.rc
-	$(RC) @RC_OUT@ $@ @RC_TYPE@ @RC_INCLUDE@ "$(GENERIC_DIR_NATIVE)" @RC_INCLUDE@ "$(TCL_GENERIC_NATIVE)" @RC_INCLUDE@ "$(RC_DIR_NATIVE)" @DEPARG@
 
 # The following targets are configured by autoconf to generate either
 # a shared library or static library
@@ -534,11 +551,9 @@ ${TK_STUB_LIB_FILE}: ${STUB_OBJS}
 
 ${TK_DLL_FILE}: ${TK_OBJS} $(TK_RES)
 	@$(RM) ${TK_DLL_FILE}
-	@MAKE_DLL@ ${TK_OBJS} $(TK_RES) $(SHLIB_LD_LIBS) $(TK_DLL_BASE)
+	@MAKE_DLL@ ${TK_OBJS} $(TK_RES) $(SHLIB_LD_LIBS)
 
-${GNU_TK_LIB_FILE}: ${TK_DLL_FILE}
-
-${MSVC_TK_LIB_FILE}: ${TK_OBJS}
+${TK_LIB_FILE}: ${TK_OBJS}
 	@$(RM) ${TK_LIB_FILE}
 	@MAKE_LIB@ ${TK_OBJS}
 	@POST_MAKE_LIB@
@@ -560,8 +575,6 @@ tkWinTest.$(OBJEXT): tkWinTest.c
 tkSquare.$(OBJEXT): tkSquare.c
 	$(CC) -c $(CC_SWITCHES) @DEPARG@ $(CC_OBJNAME)
 
-tclThreadTest.$(OBJEXT): $(TCL_BIN_DIR)/tclThreadTest.$(OBJEXT)
-
 # Add the object extension to the implicit rules.  By default .obj is not
 # automatically added.
 
@@ -575,7 +588,7 @@ tclThreadTest.$(OBJEXT): $(TCL_BIN_DIR)/tclThreadTest.$(OBJEXT)
 	$(CC) -c $(STUB_CC_SWITCHES) -DBUILD_tk @DEPARG@ $(CC_OBJNAME)
 
 .rc.$(RES):
-	$(RC) @RC_OUT@ $@ @RC_TYPE@ @RC_INCLUDE@ "$(GENERIC_DIR_NATIVE)" @RC_INCLUDE@ "$(TCL_GENERIC_NATIVE)" @RC_INCLUDE@ "$(RC_DIR_NATIVE)" @DEPARG@
+	$(RC) @RC_OUT@ $@ @RC_TYPE@ @RC_DEFINES@ @RC_INCLUDE@ "$(GENERIC_DIR_NATIVE)" @RC_INCLUDE@ "$(TCL_GENERIC_NATIVE)" @RC_INCLUDE@ "$(RC_DIR_NATIVE)" @DEPARG@
 
 depend:
 
@@ -583,7 +596,7 @@ cleanhelp:
 	$(RM) *.hlp *.cnt *.hpj *.GID *.rtf man2tcl${EXEEXT}
 
 clean: cleanhelp
-	$(RM) *.lib *.a *.exp *.dll *.$(RES) *.${OBJEXT} *~ \#* TAGS a.out
+	$(RM) *.lib *.a *.exp *.dll *.res *.${OBJEXT} *~ \#* TAGS a.out
 	$(RM) $(WISH) $(TKTEST) $(CAT32)
 	$(RM) *.pch *.ilk *.pdb
 
@@ -592,3 +605,19 @@ distclean: clean
 
 Makefile: $(SRC_DIR)/Makefile.in
 	./config.status
+
+#
+# Regenerate the stubs files.
+#
+
+$(GENERIC_DIR)/tkStubInit.c: $(GENERIC_DIR)/tk.decls \
+		$(GENERIC_DIR)/tkInt.decls
+	@echo "Warning: tkStubInit.c may be out of date."
+	@echo "Developers may want to run \"make genstubs\" to regenerate."
+	@echo "This warning can be safely ignored, do not report as a bug!"
+
+genstubs:
+	$(TCL_EXE) "$(TCL_TOOL_DIR}\genStubs.tcl" \
+	    "$(GENERIC_DIR_NATIVE)" \
+	    "$(GENERIC_DIR_NATIVE)\tk.decls" \
+            "$(GENERIC_DIR_NATIVE)\tkInt.decls"

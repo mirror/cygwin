@@ -11,7 +11,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacXStubs.c,v 1.7.6.1 2000/05/04 21:26:27 spolk Exp $
+ * RCS: @(#) $Id: tkMacXStubs.c,v 1.16 2002/10/09 11:57:05 das Exp $
  */
 
 #include "tkInt.h"
@@ -90,7 +90,7 @@ int _XInitImageFuncPtrs _ANSI_ARGS_((XImage *image));
 
 TkDisplay *
 TkpOpenDisplay(
-    char *display_name)
+    CONST char *display_name)
 {
     Display *display;
     Screen *screen;
@@ -106,6 +106,7 @@ TkpOpenDisplay(
 
     graphicsDevice = GetMainDevice();
     display = (Display *) ckalloc(sizeof(Display));
+    memset(display, 0, sizeof(Display));
     display->resource_alloc = MacXIdAlloc;
     screen = (Screen *) ckalloc(sizeof(Screen) * 2);
     display->default_screen = 0;
@@ -138,6 +139,7 @@ TkpOpenDisplay(
     screen->root_visual->map_entries = 2 ^ 8;
 
     gMacDisplay = (TkDisplay *) ckalloc(sizeof(TkDisplay));
+    memset(gMacDisplay, 0, sizeof(TkDisplay));
     gMacDisplay->display = display;
     return gMacDisplay;
 }
@@ -182,7 +184,6 @@ TkpCloseDisplay(
         ckfree((char *) display->screens);
     }
     ckfree((char *) display);
-    ckfree((char *) displayPtr);
 }
 
 /*
@@ -524,6 +525,19 @@ XQueryColors(
 {
 }
 
+int   
+XQueryTree(display, w, root_return, parent_return, children_return,
+        nchildren_return)
+    Display* display;
+    Window w;
+    Window* root_return;
+    Window* parent_return;
+    Window** children_return;
+    unsigned int* nchildren_return;
+{
+    return 0;
+}
+
 int
 XGetWindowProperty(
     Display *display,
@@ -793,14 +807,35 @@ XCreateIC(
  *----------------------------------------------------------------------
  */
 
-char *
+CONST char *
 TkGetDefaultScreenName(
     Tcl_Interp *interp,		/* Not used. */
-    char *screenName)		/* If NULL, use default string. */
+    CONST char *screenName)	/* If NULL, use default string. */
 {
     if ((screenName == NULL) || (screenName[0] == '\0')) {
 	screenName = macScreenName;
     }
     return screenName;
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tk_SetCaretPos --
+ *
+ *	This indicates the cursor position to Tk.
+ *	This is currently a noop stub for MacX.
+ *
+ *----------------------------------------------------------------------
+ */
 
+void
+Tk_SetCaretPos(Tk_Window tkwin, int x, int y, int height)
+{
+    TkCaret *caretPtr = &(((TkWindow *) tkwin)->dispPtr->caret);
+
+    caretPtr->winPtr = ((TkWindow *) tkwin);
+    caretPtr->x = x;
+    caretPtr->y = y;
+    caretPtr->height = height;
+}

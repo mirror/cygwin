@@ -43,5 +43,4 @@ browse -	A simple directory browser.  Invoke it with and argument
 		Double-click on files or subdirectories to browse them.
 		Control-c and control-q cause the program to exit.
 
-RCS: @(#) $Id: README,v 1.7.6.1 2000/05/04 21:26:25 spolk Exp $
-
+RCS: @(#) $Id: README,v 1.2 1998/09/14 18:23:25 stanton Exp $

@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacClipboard.c,v 1.7.6.1 2000/05/04 21:26:26 spolk Exp $
+ * RCS: @(#) $Id: tkMacClipboard.c,v 1.6 2000/02/10 08:53:11 jingham Exp $
  */
 
 #include "tkInt.h"
@@ -301,4 +301,3 @@ TkSuspendClipboard()
 
     return;
 }
-

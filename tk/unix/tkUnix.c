@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkUnix.c,v 1.7.6.1 2000/05/04 21:26:30 spolk Exp $
+ * RCS: @(#) $Id: tkUnix.c,v 1.5 2002/01/25 21:09:37 dgp Exp $
  */
 
 #include <tkInt.h>
@@ -68,10 +68,10 @@ TkGetServerInfo(interp, tkwin)
  *----------------------------------------------------------------------
  */
 
-char *
+CONST char *
 TkGetDefaultScreenName(interp, screenName)
     Tcl_Interp *interp;		/* Interp used to find environment variables. */
-    char *screenName;		/* Screen name from command line, or NULL. */
+    CONST char *screenName;	/* Screen name from command line, or NULL. */
 {
     if ((screenName == NULL) || (screenName[0] == '\0')) {
 	screenName = Tcl_GetVar2(interp, "env", "DISPLAY", TCL_GLOBAL_ONLY);
@@ -106,4 +106,3 @@ Tk_UpdatePointer(tkwin, x, y, state)
    * This function intentionally left blank
    */
 }
-

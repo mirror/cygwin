@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacCursors.r,v 1.7.6.1 2000/05/04 21:26:26 spolk Exp $
+ * RCS: @(#) $Id: tkMacCursors.r,v 1.2 1998/09/14 18:23:34 stanton Exp $
  */
 
 /*
@@ -127,5 +127,4 @@ data 'crsr' (1001, "fist") {
 	$"FFFF 0001 FFFF CCCC 9999 0003 0000 0000"
 	$"0000"                                   
 };
-
 

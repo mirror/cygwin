@@ -2,7 +2,7 @@
 '\" Copyright (c) 1998-2000 by Scriptics Corporation.
 '\" All rights reserved.
 '\" 
-'\" RCS: @(#) $Id: chooseDirectory.n,v 1.1.2.2 2000/09/26 16:07:34 spolk Exp $
+'\" RCS: @(#) $Id: chooseDirectory.n,v 1.1 2000/01/27 00:23:10 ericm Exp $
 '\" 
 .so man.macros
 .TH tk_chooseDirectory n 8.3 Tk "Tk Built-In Commands"
@@ -50,4 +50,3 @@ tk_getOpenFile, tk_getSaveFile
 
 .SH KEYWORDS
 directory selection dialog
-

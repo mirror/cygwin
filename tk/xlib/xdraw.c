@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: xdraw.c,v 1.7.6.1 2000/05/04 21:26:31 spolk Exp $
+ * RCS: @(#) $Id: xdraw.c,v 1.4 1999/04/16 01:51:55 stanton Exp $
  */
 
 #include "tk.h"
@@ -80,4 +80,3 @@ XFillRectangle(display, d, gc, x, y, width, height)
     rectangle.height = height;
     XFillRectangles(display, d, gc, &rectangle, 1);
 }
-

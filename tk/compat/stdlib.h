@@ -14,7 +14,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: stdlib.h,v 1.7.6.1 2000/05/04 21:26:20 spolk Exp $
+ * RCS: @(#) $Id: stdlib.h,v 1.3 1999/04/16 00:46:30 stanton Exp $
  */
 
 #ifndef _STDLIB
@@ -43,4 +43,3 @@ extern unsigned long	strtoul _ANSI_ARGS_((CONST char *string,
 			    char **endPtr, int base));
 
 #endif /* _STDLIB */
-

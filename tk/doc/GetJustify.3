@@ -5,7 +5,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" RCS: @(#) $Id: GetJustify.3,v 1.7.6.1 2000/05/04 21:26:21 spolk Exp $
+'\" RCS: @(#) $Id: GetJustify.3,v 1.4 2002/08/05 04:30:38 dgp Exp $
 '\" 
 .so man.macros
 .TH Tk_GetJustifyFromObj 3 8.1 Tk "Tk Library Procedures"
@@ -23,7 +23,7 @@ int
 int
 \fBTk_GetJustify(\fIinterp, string, justifyPtr\fB)\fR
 .sp
-char *
+CONST char *
 \fBTk_NameOfJustify(\fIjustify\fB)\fR
 .SH ARGUMENTS
 .AS "Tk_Justify" *justifyPtr
@@ -34,7 +34,7 @@ Interpreter to use for error reporting, or NULL.
 String value contains name of justification style (\fBleft\fR, \fBright\fR, or
 \fBcenter\fR).  The
 internal rep will be modified to cache corresponding justify value.
-.AP char *string in
+.AP "CONST char" *string in
 Same as \fIobjPtr\fR except description of justification style is passed as
 a string.
 .VE
@@ -91,4 +91,3 @@ If \fIjustify\fR isn't a legal justify value, then
 
 .SH KEYWORDS
 center, fill, justification, string
-

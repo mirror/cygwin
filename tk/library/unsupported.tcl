@@ -3,7 +3,7 @@
 # Commands provided by Tk without official support.  Use them at your
 # own risk.  They may change or go away without notice.
 #
-# RCS: @(#) $Id: unsupported.tcl,v 1.2 2003/01/21 19:53:14 hunt Exp $
+# RCS: @(#) $Id: unsupported.tcl,v 1.3 2003/01/21 20:24:46 hunt Exp $
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.

@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkWinPixmap.c,v 1.7.6.1 2000/05/04 21:26:31 spolk Exp $
+ * RCS: @(#) $Id: tkWinPixmap.c,v 1.3 2000/02/01 11:41:44 hobbs Exp $
  */
 
 #include "tkWinInt.h"
@@ -196,4 +196,3 @@ XGetGeometry(display, d, root_return, x_return, y_return, width_return,
     }
     return 1;
 }
-

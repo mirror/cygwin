@@ -3,7 +3,7 @@
 # This demonstration script creates a canvas widet that displays the
 # floorplan for DEC's Western Research Laboratory.
 #
-# RCS: @(#) $Id: floor.tcl,v 1.7.6.1 2000/05/04 21:26:25 spolk Exp $
+# RCS: @(#) $Id: floor.tcl,v 1.3 2001/06/14 10:56:58 dkf Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -94,7 +94,7 @@ proc newRoom w {
 proc roomChanged {w args} {
     global currentRoom floorItems colors
     $w delete highlight
-    if [catch {set item $floorItems($currentRoom)}] {
+    if {[catch {set item $floorItems($currentRoom)}]} {
 	return
     }
     set new [eval \
@@ -1368,4 +1368,3 @@ bind $c <B2-Motion> "$c scan dragto %x %y"
 bind $c <Destroy> "unset currentRoom"
 set currentRoom ""
 trace variable currentRoom w "roomChanged $c"
-

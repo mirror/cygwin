@@ -3,7 +3,7 @@
 # This demonstration script creates a toplevel window containing
 # several label widgets.
 #
-# RCS: @(#) $Id: label.tcl,v 1.7.6.1 2000/05/04 21:26:25 spolk Exp $
+# RCS: @(#) $Id: label.tcl,v 1.2 1998/09/14 18:23:29 stanton Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -38,4 +38,3 @@ label $w.right.bitmap -borderwidth 2 -relief sunken \
 	-bitmap @[file join $tk_library demos images face.bmp]
 label $w.right.caption -text "Tcl/Tk Proprietor"
 pack $w.right.bitmap $w.right.caption -side top
-

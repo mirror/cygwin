@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacDraw.c,v 1.7.6.1 2000/05/04 21:26:26 spolk Exp $
+ * RCS: @(#) $Id: tkMacDraw.c,v 1.9 2002/04/08 09:04:43 das Exp $
  */
 
 #include "tkInt.h"
@@ -370,6 +370,9 @@ TkPutImage(
 	pixmap.pmTable = NULL;
 	pixmap.pmReserved = 0;
 	pixmap.baseAddr = image->data;
+    if (image->bytes_per_line >= 0x4000) {
+    	panic("TkImage too wide!");
+    }
 	pixmap.rowBytes = image->bytes_per_line | 0x8000;
 	
 	CopyBits((BitMap *) &pixmap, &((GrafPtr) destPort)->portBits, 
@@ -1191,4 +1194,3 @@ TkpDrawHighlightBorder (
         }
     }
 }
-

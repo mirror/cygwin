@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacOSXMenu.c,v 1.2 2003/01/21 19:53:15 hunt Exp $
+ * RCS: @(#) $Id: tkMacOSXMenu.c,v 1.3 2003/01/21 20:24:49 hunt Exp $
  */
 #include "tkMacOSXInt.h"
 #include "tkMenuButton.h"
@@ -1232,10 +1232,8 @@ ReconfigureIndividualMenu(
                     }
 		    if (glyph != 0x0) {
 			SetMenuItemKeyGlyph(macMenuHdl, base + index, glyph);
-			if (modifiers == 0) {
-			    if (!hasCmd) {
-				modifiers |= kMenuNoCommandModifier;
-			    }
+			if (!hasCmd) {
+			    modifiers |= kMenuNoCommandModifier;
 			}
 		    }
                 }

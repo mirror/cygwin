@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkWinDraw.c,v 1.7.6.2 2000/09/26 16:09:57 spolk Exp $
+ * RCS: @(#) $Id: tkWinDraw.c,v 1.11 2001/12/07 05:20:52 chengyemao Exp $
  */
 
 #include "tkWinInt.h"
@@ -589,6 +589,12 @@ TkPutImage(colors, ncolors, display, d, gc, image, src_x, src_y, dest_x,
 		image->data, infoPtr, DIB_RGB_COLORS);
 	ckfree((char *) infoPtr);
     }
+    if(!bitmap) {
+	panic("Fail to allocate bitmap\n");
+	DeleteDC(dcMem);
+    	TkWinReleaseDrawableDC(d, dc, &state);
+	return;
+    }
     bitmap = SelectObject(dcMem, bitmap);
     BitBlt(dc, dest_x, dest_y, width, height, dcMem, src_x, src_y, SRCCOPY);
     DeleteObject(SelectObject(dcMem, bitmap));
@@ -745,15 +751,13 @@ RenderObject(dc, gc, points, npoints, mode, pen, func)
 	}
 
 	/*
-	 * Grow the bounding box enough to account for wide lines.
+	 * Grow the bounding box enough to account for line width.
 	 */
 
-	if (gc->line_width > 1) {
-	    rect.left -= gc->line_width;
-	    rect.top -= gc->line_width;
-	    rect.right += gc->line_width;
-	    rect.bottom += gc->line_width;
-	}
+	rect.left -= gc->line_width;
+	rect.top -= gc->line_width;
+	rect.right += gc->line_width;
+	rect.bottom += gc->line_width;
 
 	width = rect.right - rect.left;
 	height = rect.bottom - rect.top;
@@ -1333,5 +1337,3 @@ TkpDrawHighlightBorder(tkwin, fgGC, bgGC, highlightWidth, drawable)
 {
     TkDrawInsetFocusHighlight(tkwin, fgGC, highlightWidth, drawable, 0);
 }
-
-

@@ -11,7 +11,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkPointer.c,v 1.7.6.1 2000/05/04 21:26:24 spolk Exp $
+ * RCS: @(#) $Id: tkPointer.c,v 1.7 2002/08/31 06:12:25 das Exp $
  */
 
 #include "tkInt.h"
@@ -20,7 +20,13 @@
 #include "tkWinInt.h"
 #endif
 
-#ifdef MAC_TCL
+#if defined(MAC_TCL)
+#include "tkMacInt.h"
+#define Cursor XCursor
+#endif
+
+#if defined(MAC_OSX_TK)
+#include "tkMacOSXInt.h"
 #define Cursor XCursor
 #endif
 
@@ -561,7 +567,7 @@ UpdateCursor(winPtr)
 	if (winPtr->atts.cursor != None) {
 	    cursor = winPtr->atts.cursor;
 	    break;
-	} else if (winPtr->flags & TK_TOP_LEVEL) {
+	} else if (winPtr->flags & TK_TOP_HIERARCHY) {
 	    break;
 	}
 	winPtr = winPtr->parentPtr;
@@ -645,4 +651,3 @@ TkGenerateActivateEvents(winPtr, active)
     TkQueueEventForAllChildren(winPtr, &event);
     
 }
-

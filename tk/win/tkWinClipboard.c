@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkWinClipboard.c,v 1.8.6.2 2000/09/26 16:09:54 spolk Exp $
+ * RCS: @(#) $Id: tkWinClipboard.c,v 1.7 2000/04/12 18:51:11 hobbs Exp $
  */
 
 #include "tkWinInt.h"
@@ -452,5 +452,3 @@ TkSelPropProc(eventPtr)
     register XEvent *eventPtr;		/* X PropertyChange event. */
 {
 }
-
-

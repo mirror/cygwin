@@ -11,7 +11,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkCanvas.h,v 1.7.6.1 2000/05/04 21:26:23 spolk Exp $
+ * RCS: @(#) $Id: tkCanvas.h,v 1.6 2002/10/10 07:25:24 hobbs Exp $
  */
 
 #ifndef _TKCANVAS
@@ -293,21 +293,6 @@ typedef struct TkCanvas {
  */
 
 extern int		TkCanvPostscriptCmd _ANSI_ARGS_((TkCanvas *canvasPtr,
-			    Tcl_Interp *interp, int argc, char **argv));
-
-/*
- * The following definition is shared between tkCanvPs.c and tkCanvImg.c, 
- * and is used in generating postscript for images and windows.
- */
-
-typedef struct TkColormapData {	/* Hold color information for a window */
-    int separated;		/* Whether to use separate color bands */
-    int color;			/* Whether window is color or black/white */
-    int ncolors;		/* Number of color values stored */
-    XColor *colors;		/* Pixel value -> RGB mappings */
-    int red_mask, green_mask, blue_mask;	/* Masks and shifts for each */
-    int red_shift, green_shift, blue_shift;	/* color band */
-} TkColormapData;
+			    Tcl_Interp *interp, int argc, CONST char **argv));
 
 #endif /* _TKCANVAS */
-

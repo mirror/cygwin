@@ -2,11 +2,12 @@
  * tkImgPhoto.c --
  *
  *	Implements images of type "photo" for Tk.  Photo images are
- *	stored in full color (32 bits per pixel) and displayed using
- *	dithering if necessary.
+ *	stored in full color (32 bits per pixel including alpha channel)
+ *	and displayed using dithering if necessary.
  *
  * Copyright (c) 1994 The Australian National University.
  * Copyright (c) 1994-1997 Sun Microsystems, Inc.
+ * Copyright (c) 2002 Donal K. Fellows
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -15,7 +16,7 @@
  *	   Department of Computer Science,
  *	   Australian National University.
  *
- * RCS: @(#) $Id: tkImgPhoto.c,v 1.7.6.3 2000/09/26 16:08:05 spolk Exp $
+ * RCS: @(#) $Id: tkImgPhoto.c,v 1.36 2002/10/18 00:48:22 hobbs Exp $
  */
 
 #include "tkInt.h"
@@ -161,7 +162,7 @@ typedef struct PhotoMaster {
     Tcl_Obj *dataString;	/* Object to use as contents of image. */
     Tcl_Obj *format;		/* User-specified format of data in image
 				 * file or string value. */
-    unsigned char *pix24;	/* Local storage for 24-bit image. */
+    unsigned char *pix32;	/* Local storage for 32-bit image. */
     int ditherX, ditherY;	/* Location of first incorrectly
 				 * dithered pixel in image. */
     TkRegion validRegion;	/* Tk region indicating which parts of
@@ -231,6 +232,7 @@ struct SubcommandOptions {
     int subsampleX, subsampleY;	/* Values specified for -subsample option. */
     Tcl_Obj *format;		/* Value specified for -format option. */
     XColor *background;		/* Value specified for -background option. */
+    int compositingRule;	/* Value specified for -compositingrule opt */
 };
 
 /*
@@ -241,6 +243,7 @@ struct SubcommandOptions {
  * field of the SubcommandOptions structure if that option was specified.
  *
  * OPT_BACKGROUND:		Set if -format option allowed/specified.
+ * OPT_COMPOSITE:		Set if -compositingrule option allowed/spec'd.
  * OPT_FORMAT:			Set if -format option allowed/specified.
  * OPT_FROM:			Set if -from option allowed/specified.
  * OPT_GRAYSCALE:		Set if -grayscale option allowed/specified.
@@ -251,13 +254,14 @@ struct SubcommandOptions {
  */
 
 #define OPT_BACKGROUND	1
-#define OPT_FORMAT	2
-#define OPT_FROM	4
-#define OPT_GRAYSCALE	8
-#define OPT_SHRINK	0x10
-#define OPT_SUBSAMPLE	0x20
-#define OPT_TO		0x40
-#define OPT_ZOOM	0x80
+#define OPT_COMPOSITE	2
+#define OPT_FORMAT	4
+#define OPT_FROM	8
+#define OPT_GRAYSCALE	0x10
+#define OPT_SHRINK	0x20
+#define OPT_SUBSAMPLE	0x40
+#define OPT_TO		0x80
+#define OPT_ZOOM	0x100
 
 /*
  * List of option names.  The order here must match the order of
@@ -266,6 +270,7 @@ struct SubcommandOptions {
 
 static char *optionNames[] = {
     "-background",
+    "-compositingrule",
     "-format",
     "-from",
     "-grayscale",
@@ -277,7 +282,14 @@ static char *optionNames[] = {
 };
 
 /*
- * The type record for photo images:
+ * Message to generate when an attempt to resize an image fails due
+ * to memory problems.
+ */
+#define TK_PHOTO_ALLOC_FAILURE_MESSAGE \
+	"not enough free memory for image buffer"
+
+/*
+ * Functions used in the type record for photo images.
  */
 
 static int		ImgPhotoCreate _ANSI_ARGS_((Tcl_Interp *interp,
@@ -298,6 +310,10 @@ static int		ImgPhotoPostscript _ANSI_ARGS_((ClientData clientData,
 			    Tk_PostscriptInfo psInfo, int x, int y, int width,
 			    int height, int prepass));
 
+/*
+ * The type record itself for photo images:
+ */
+
 Tk_ImageType tkPhotoImageType = {
     "photo",			/* name */
     ImgPhotoCreate,		/* createProc */
@@ -314,6 +330,7 @@ typedef struct ThreadSpecificData {
 				       * list of known photo image formats.*/
     Tk_PhotoImageFormat *oldFormatList;  /* Pointer to the first in the 
 				       * list of known photo image formats.*/
+    int initialized;	/* set to 1 if we've initialized the strucuture */
 } ThreadSpecificData;
 static Tcl_ThreadDataKey dataKey;
 
@@ -357,6 +374,8 @@ static int imgPhotoColorHashInitialized;
  * Forward declarations
  */
 
+static void		PhotoFormatThreadExitProc _ANSI_ARGS_((
+			    ClientData clientData));
 static int		ImgPhotoCmd _ANSI_ARGS_((ClientData clientData,
 			    Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
 static int		ParseSubcommandOptions _ANSI_ARGS_((
@@ -370,7 +389,7 @@ static int		ImgPhotoConfigureMaster _ANSI_ARGS_((
 			    int objc, Tcl_Obj *CONST objv[], int flags));
 static void		ImgPhotoConfigureInstance _ANSI_ARGS_((
 			    PhotoInstance *instancePtr));
-static void		ImgPhotoSetSize _ANSI_ARGS_((PhotoMaster *masterPtr,
+static int		ImgPhotoSetSize _ANSI_ARGS_((PhotoMaster *masterPtr,
 			    int width, int height));
 static void		ImgPhotoInstanceSetSize _ANSI_ARGS_((
 			    PhotoInstance *instancePtr));
@@ -381,7 +400,7 @@ static char *		ImgGetPhoto _ANSI_ARGS_((PhotoMaster *masterPtr,
 			    Tk_PhotoImageBlock *blockPtr,
 			    struct SubcommandOptions *optPtr));
 static int		IsValidPalette _ANSI_ARGS_((PhotoInstance *instancePtr,
-			    char *palette));
+			    CONST char *palette));
 static int		CountBits _ANSI_ARGS_((pixel mask));
 static void		GetColorTable _ANSI_ARGS_((PhotoInstance *instancePtr));
 static void		FreeColorTable _ANSI_ARGS_((ColorTable *colorPtr,
@@ -430,6 +449,48 @@ static void		PhotoOptionCleanupProc _ANSI_ARGS_((
  *
  *----------------------------------------------------------------------
  */
+
+static void
+PhotoFormatThreadExitProc(clientData)
+    ClientData clientData;	/* not used */
+{
+    Tk_PhotoImageFormat *freePtr;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+
+    while (tsdPtr->oldFormatList != NULL) {
+	freePtr = tsdPtr->oldFormatList;
+	tsdPtr->oldFormatList = tsdPtr->oldFormatList->nextPtr;
+	ckfree((char *) freePtr->name);
+	ckfree((char *) freePtr);
+    }
+    while (tsdPtr->formatList != NULL) {
+	freePtr = tsdPtr->formatList;
+	tsdPtr->formatList = tsdPtr->formatList->nextPtr;
+	ckfree((char *) freePtr->name);
+	ckfree((char *) freePtr);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tk_CreateOldPhotoImageFormat, Tk_CreatePhotoImageFormat --
+ *
+ *	This procedure is invoked by an image file handler to register
+ *	a new photo image format and the procedures that handle the
+ *	new format.  The procedure is typically invoked during
+ *	Tcl_AppInit.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	The new image file format is entered into a table used in the
+ *	photo image "read" and "write" subcommands.
+ *
+ *----------------------------------------------------------------------
+ */
 void
 Tk_CreateOldPhotoImageFormat(formatPtr)
     Tk_PhotoImageFormat *formatPtr;
@@ -442,6 +503,10 @@ Tk_CreateOldPhotoImageFormat(formatPtr)
     ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
             Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
+    if (!tsdPtr->initialized) {
+	tsdPtr->initialized = 1;
+	Tcl_CreateThreadExitHandler(PhotoFormatThreadExitProc, NULL);
+    }
     copyPtr = (Tk_PhotoImageFormat *) ckalloc(sizeof(Tk_PhotoImageFormat));
     *copyPtr = *formatPtr;
     copyPtr->name = (char *) ckalloc((unsigned) (strlen(formatPtr->name) + 1));
@@ -462,6 +527,10 @@ Tk_CreatePhotoImageFormat(formatPtr)
     ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
             Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
+    if (!tsdPtr->initialized) {
+	tsdPtr->initialized = 1;
+	Tcl_CreateThreadExitHandler(PhotoFormatThreadExitProc, NULL);
+    }
     copyPtr = (Tk_PhotoImageFormat *) ckalloc(sizeof(Tk_PhotoImageFormat));
     *copyPtr = *formatPtr;
     copyPtr->name = (char *) ckalloc((unsigned) (strlen(formatPtr->name) + 1));
@@ -520,7 +589,7 @@ ImgPhotoCreate(interp, name, objc, objv, typePtr, master, clientDataPtr)
     masterPtr->imageCmd = Tcl_CreateObjCommand(interp, name, ImgPhotoCmd,
 	    (ClientData) masterPtr, ImgPhotoCmdDeletedProc);
     masterPtr->palette = NULL;
-    masterPtr->pix24 = NULL;
+    masterPtr->pix32 = NULL;
     masterPtr->instancePtr = NULL;
     masterPtr->validRegion = TkCreateRegion();
 
@@ -563,13 +632,14 @@ ImgPhotoCmd(clientData, interp, objc, objv)
     Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
     int oldformat = 0;
-    static char *photoOptions[] = {
+    static CONST char *photoOptions[] = {
 	"blank", "cget", "configure", "copy", "data", "get", "put",
-	"read", "redither", "write", (char *) NULL
+	"read", "redither", "transparency", "write", (char *) NULL
     };
     enum options {
 	PHOTO_BLANK, PHOTO_CGET, PHOTO_CONFIGURE, PHOTO_COPY, PHOTO_DATA,
-	PHOTO_GET, PHOTO_PUT, PHOTO_READ, PHOTO_REDITHER, PHOTO_WRITE
+	PHOTO_GET, PHOTO_PUT, PHOTO_READ, PHOTO_REDITHER, PHOTO_TRANS,
+	PHOTO_WRITE
     };
 
     PhotoMaster *masterPtr = (PhotoMaster *) clientData;
@@ -578,8 +648,8 @@ ImgPhotoCmd(clientData, interp, objc, objv)
     int dataWidth, dataHeight;
     struct SubcommandOptions options;
     int listArgc;
-    char **listArgv;
-    char **srcArgv;
+    CONST char **listArgv;
+    CONST char **srcArgv;
     unsigned char *pixelPtr;
     Tk_PhotoImageBlock block;
     Tk_Window tkwin;
@@ -607,8 +677,9 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	}
 	return proc(clientData, interp, objc, objv);
     }
+
     switch ((enum options) index) {
-      case PHOTO_BLANK: {
+    case PHOTO_BLANK:
 	/*
 	 * photo blank command - just call Tk_PhotoBlank.
 	 */
@@ -620,9 +691,10 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	    return TCL_ERROR;
 	}
 	break;
-      }
-      case PHOTO_CGET: {
+
+    case PHOTO_CGET: {
 	char *arg;
+
 	if (objc != 3) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "option");
 	    return TCL_ERROR;
@@ -643,12 +715,12 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	Tk_ConfigureValue(interp, Tk_MainWindow(interp), configSpecs,
 		(char *) masterPtr, Tcl_GetString(objv[2]), 0);
 	break;
-      }
-      case PHOTO_CONFIGURE: {
+    }
+
+    case PHOTO_CONFIGURE:
 	/*
 	 * photo configure command - handle this in the standard way.
 	 */
-	char *opt, *arg;
 
 	if (objc == 2) {
 	    Tcl_Obj *obj, *subobj;
@@ -677,39 +749,38 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	    return TCL_OK;
 	}
 	if (objc == 3) {
-	  char *arg = Tcl_GetStringFromObj(objv[2], (int *) &length);
-	  if (!strncmp(arg, "-data", length)) {
-	    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
-		"-data {} {} {}", (char *) NULL);
-	    if (masterPtr->dataString) {
-		Tcl_ListObjAppendElement(interp, Tcl_GetObjResult(interp),
-			masterPtr->dataString);
-	    } else {
+	    char *arg = Tcl_GetStringFromObj(objv[2], (int *) &length);
+	    if (!strncmp(arg, "-data", length)) {
 		Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
-		" {}", (char *) NULL);
-	    }
-	    return TCL_OK;
-	  } else if (!strncmp(arg, "-format", length)) {
-	    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
-		"-format {} {} {}", (char *) NULL);
-	    if (masterPtr->format) {
-		Tcl_ListObjAppendElement(interp, Tcl_GetObjResult(interp),
-			masterPtr->format);
-	    } else {
+			"-data {} {} {}", (char *) NULL);
+		if (masterPtr->dataString) {
+		    Tcl_ListObjAppendElement(interp, Tcl_GetObjResult(interp),
+			    masterPtr->dataString);
+		} else {
+		    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+			    " {}", (char *) NULL);
+		}
+		return TCL_OK;
+	    } else if (!strncmp(arg, "-format", length)) {
 		Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
-		" {}", (char *) NULL);
+			"-format {} {} {}", (char *) NULL);
+		if (masterPtr->format) {
+		    Tcl_ListObjAppendElement(interp, Tcl_GetObjResult(interp),
+			    masterPtr->format);
+		} else {
+		    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+			    " {}", (char *) NULL);
+		}
+		return TCL_OK;
+	    } else {
+		return Tk_ConfigureInfo(interp, Tk_MainWindow(interp),
+			configSpecs, (char *) masterPtr, arg, 0);
 	    }
-	    return TCL_OK;
-	  } else {
-	    return Tk_ConfigureInfo(interp, Tk_MainWindow(interp),
-		    configSpecs, (char *) masterPtr, arg, 0);
-	  }
 	}
 	return ImgPhotoConfigureMaster(interp, masterPtr, objc-2, objv+2,
 		TK_CONFIG_ARGV_ONLY);
-	break;
-      }
-      case PHOTO_COPY: {
+
+    case PHOTO_COPY:
 	/*
 	 * photo copy command - first parse options.
 	 */
@@ -719,14 +790,15 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	options.zoomX = options.zoomY = 1;
 	options.subsampleX = options.subsampleY = 1;
 	options.name = NULL;
+	options.compositingRule = TK_PHOTO_COMPOSITE_OVERLAY;
 	if (ParseSubcommandOptions(&options, interp,
-		OPT_FROM | OPT_TO | OPT_ZOOM | OPT_SUBSAMPLE | OPT_SHRINK,
-		&index, objc, objv) != TCL_OK) {
+		OPT_FROM | OPT_TO | OPT_ZOOM | OPT_SUBSAMPLE | OPT_SHRINK |
+		OPT_COMPOSITE, &index, objc, objv) != TCL_OK) {
 	    return TCL_ERROR;
 	}
 	if (options.name == NULL || index < objc) {
 	    Tcl_WrongNumArgs(interp, 2, objv,
-		    "source-image ?-from x1 y1 x2 y2? ?-to x1 y1 x2 y2? ?-zoom x y? ?-subsample x y?");
+		    "source-image ?-compositingrule rule? ?-from x1 y1 x2 y2? ?-to x1 y1 x2 y2? ?-zoom x y? ?-subsample x y?");
 	    return TCL_ERROR;
 	}
 
@@ -735,7 +807,8 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	 * Check the values given for the -from option.
 	 */
 
-	if ((srcHandle = Tk_FindPhoto(interp, Tcl_GetString(options.name))) == NULL) {
+	srcHandle = Tk_FindPhoto(interp, Tcl_GetString(options.name));
+	if (srcHandle == NULL) {
 	    Tcl_AppendResult(interp, "image \"",
 		    Tcl_GetString(options.name), "\" doesn't",
 		    " exist or is not a photo image", (char *) NULL);
@@ -754,11 +827,11 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	 * Fill in default values for unspecified parameters.
 	 */
 
-	if (((options.options & OPT_FROM) == 0) || (options.fromX2 < 0)) {
+	if (!(options.options & OPT_FROM) || (options.fromX2 < 0)) {
 	    options.fromX2 = block.width;
 	    options.fromY2 = block.height;
 	}
-	if (((options.options & OPT_TO) == 0) || (options.toX2 < 0)) {
+	if (!(options.options & OPT_TO) || (options.toX2 < 0)) {
 	    width = options.fromX2 - options.fromX;
 	    if (options.subsampleX > 0) {
 		width = (width + options.subsampleX - 1) / options.subsampleX;
@@ -787,7 +860,13 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	 */
 
 	if (options.options & OPT_SHRINK) {
-	    ImgPhotoSetSize(masterPtr, options.toX2, options.toY2);
+	    if (ImgPhotoSetSize(masterPtr, options.toX2,
+		    options.toY2) != TCL_OK) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+			TK_PHOTO_ALLOC_FAILURE_MESSAGE, (char *) NULL);
+		return TCL_ERROR;
+	    }
 	}
 
 	/*
@@ -795,17 +874,18 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	 */
 
 	block.pixelPtr += options.fromX * block.pixelSize
-	    + options.fromY * block.pitch;
+		+ options.fromY * block.pitch;
 	block.width = options.fromX2 - options.fromX;
 	block.height = options.fromY2 - options.fromY;
 	Tk_PhotoPutZoomedBlock((Tk_PhotoHandle) masterPtr, &block,
 		options.toX, options.toY, options.toX2 - options.toX,
 		options.toY2 - options.toY, options.zoomX, options.zoomY,
-		options.subsampleX, options.subsampleY);
+		options.subsampleX, options.subsampleY,
+		options.compositingRule);
 
 	break;
-      }
-      case PHOTO_DATA: {
+
+    case PHOTO_DATA: {
 	char *data;
 
 	/*
@@ -878,7 +958,7 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 
 	data = ImgGetPhoto(masterPtr, &block, &options);
 
-	result =  ((int	(*) _ANSI_ARGS_((Tcl_Interp *interp, Tcl_Obj *formatString,
+	result = ((int (*) _ANSI_ARGS_((Tcl_Interp *interp, Tcl_Obj *formatString,
 		Tk_PhotoImageBlock *blockPtr, VOID *dummy))) stringWriteProc)
 		(interp, options.format, &block, (VOID *) NULL);
 	if (options.background) {
@@ -889,8 +969,9 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	}
 	return result;
 	break;
-      }
-      case PHOTO_GET: {
+    }
+
+    case PHOTO_GET: {
 	/*
 	 * photo get command - first parse and check parameters.
 	 */
@@ -916,13 +997,14 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	 * Extract the value of the desired pixel and format it as a string.
 	 */
 
-	pixelPtr = masterPtr->pix24 + (y * masterPtr->width + x) * 4;
+	pixelPtr = masterPtr->pix32 + (y * masterPtr->width + x) * 4;
 	sprintf(string, "%d %d %d", pixelPtr[0], pixelPtr[1],
 		pixelPtr[2]);
 	Tcl_AppendResult(interp, string, (char *) NULL);
 	break;
-      }
-      case PHOTO_PUT: {
+    }
+
+    case PHOTO_PUT:
 	/*
 	 * photo put command - first parse the options and colors specified.
 	 */
@@ -931,7 +1013,7 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	memset((VOID *) &options, 0, sizeof(options));
 	options.name = NULL;
 	if (ParseSubcommandOptions(&options, interp, OPT_TO|OPT_FORMAT,
-	       &index, objc, objv) != TCL_OK) {
+		&index, objc, objv) != TCL_OK) {
 	    return TCL_ERROR;
 	}
 	if ((options.name == NULL) || (index < objc)) {
@@ -942,8 +1024,8 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	if (MatchStringFormat(interp, options.name ? objv[2]:NULL, 
 		options.format, &imageFormat, &imageWidth,
 		&imageHeight, &oldformat) == TCL_OK) {
-	    Tcl_Obj *format;
-	    Tcl_Obj *data;
+	    Tcl_Obj *format, *data;
+
 	    if (((options.options & OPT_TO) == 0) || (options.toX2 < 0)) {
 		options.toX2 = options.toX + imageWidth;
 		options.toY2 = options.toY + imageHeight;
@@ -964,8 +1046,8 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	    }
 	    if ((*imageFormat->stringReadProc)(interp, data,
 		    format, (Tk_PhotoHandle) masterPtr,
-		    0, 0, imageWidth, imageHeight, options.toX, options.toY)
-		    != TCL_OK) {
+		    options.toX, options.toY, imageWidth, imageHeight,
+		    0, 0) != TCL_OK) {
 		return TCL_ERROR;
 	    }
 	    masterPtr->flags |= IMAGE_CHANGED;
@@ -976,8 +1058,7 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	}
 	Tcl_ResetResult(interp);
 	if (Tcl_SplitList(interp, Tcl_GetString(options.name),
-		&dataHeight, &srcArgv)
-		!= TCL_OK) {
+		&dataHeight, &srcArgv) != TCL_OK) {
 	    return TCL_ERROR;
 	}
 	tkwin = Tk_MainWindow(interp);
@@ -991,17 +1072,14 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	    }
 	    if (y == 0) {
 		dataWidth = listArgc;
-		pixelPtr = (unsigned char *) ckalloc((unsigned)
-			dataWidth * dataHeight * 3);
+		pixelPtr = (unsigned char *)
+			ckalloc((unsigned) dataWidth * dataHeight * 3);
 		block.pixelPtr = pixelPtr;
-	    } else {
-		if (listArgc != dataWidth) {
-		    Tcl_AppendResult(interp, "all elements of color list must",
-			     " have the same number of elements",
-			    (char *) NULL);
-		    ckfree((char *) listArgv);
-		    break;
-		}
+	    } else if (listArgc != dataWidth) {
+		Tcl_AppendResult(interp, "all elements of color list must",
+			" have the same number of elements", (char *) NULL);
+		ckfree((char *) listArgv);
+		break;
 	    }
 	    for (x = 0; x < dataWidth; ++x) {
 		if (!XParseColor(Tk_Display(tkwin), Tk_Colormap(tkwin),
@@ -1015,8 +1093,9 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 		*pixelPtr++ = color.blue >> 8;
 	    }
 	    ckfree((char *) listArgv);
-	    if (x < dataWidth)
+	    if (x < dataWidth) {
 		break;
+	    }
 	}
 	ckfree((char *) srcArgv);
 	if (y < dataHeight || dataHeight == 0 || dataWidth == 0) {
@@ -1034,7 +1113,7 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	 * copy the block in using Tk_PhotoPutBlock.
 	 */
 
-	if (((options.options & OPT_TO) == 0) || (options.toX2 < 0)) {
+	if (!(options.options & OPT_TO) || (options.toX2 < 0)) {
 	    options.toX2 = options.toX + dataWidth;
 	    options.toY2 = options.toY + dataHeight;
 	}
@@ -1048,16 +1127,17 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	block.offset[3] = 0;
 	Tk_PhotoPutBlock((ClientData)masterPtr, &block,
 		options.toX, options.toY, options.toX2 - options.toX,
-		options.toY2 - options.toY);
+		options.toY2 - options.toY, TK_PHOTO_COMPOSITE_SET);
 	ckfree((char *) block.pixelPtr);
 	break;
-      }
-      case PHOTO_READ: {
+
+    case PHOTO_READ: {
+	Tcl_Obj *format;
+
 	/*
 	 * photo read command - first parse the options specified.
 	 */
 
-	Tcl_Obj *format;
 	index = 2;
 	memset((VOID *) &options, 0, sizeof(options));
 	options.name = NULL;
@@ -1068,8 +1148,7 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	    return TCL_ERROR;
 	}
 	if ((options.name == NULL) || (index < objc)) {
-	    Tcl_WrongNumArgs(interp, 2, objv,
-		    "fileName ?options?");
+	    Tcl_WrongNumArgs(interp, 2, objv, "fileName ?options?");
 	    return TCL_ERROR;
 	}
 
@@ -1079,7 +1158,7 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 
         if (Tcl_IsSafe(interp)) {
             Tcl_AppendResult(interp, "can't get image from a file in a",
-                    " safe interpreter", (char *) NULL);
+		    " safe interpreter", (char *) NULL);
             return TCL_ERROR;
         }
         
@@ -1094,16 +1173,18 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	}
         if (Tcl_SetChannelOption(interp, chan, "-translation", "binary")
 		!= TCL_OK) {
+	    Tcl_Close(NULL, chan);
             return TCL_ERROR;
         }
         if (Tcl_SetChannelOption(interp, chan, "-encoding", "binary")
 		!= TCL_OK) {
+	    Tcl_Close(NULL, chan);
             return TCL_ERROR;
         }
     
 	if (MatchFileFormat(interp, chan,
-		Tcl_GetString(options.name), options.format,
-		&imageFormat, &imageWidth, &imageHeight, &oldformat) != TCL_OK) {
+		Tcl_GetString(options.name), options.format, &imageFormat,
+		&imageWidth, &imageHeight, &oldformat) != TCL_OK) {
 	    Tcl_Close(NULL, chan);
 	    return TCL_ERROR;
 	}
@@ -1133,8 +1214,13 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	 */
 
 	if (options.options & OPT_SHRINK) {
-	    ImgPhotoSetSize(masterPtr, options.toX + width,
-		    options.toY + height);
+	    if (ImgPhotoSetSize(masterPtr, options.toX + width,
+		    options.toY + height) != TCL_OK) {
+		Tcl_ResetResult(interp);
+		Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+			TK_PHOTO_ALLOC_FAILURE_MESSAGE, (char *) NULL);
+		return TCL_ERROR;
+	    }
 	}
 
 	/*
@@ -1155,42 +1241,163 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	}
 	return result;
 	break;
-      }
-      case PHOTO_REDITHER: {
-	if (objc == 2) {
-	    /*
-	     * Call Dither if any part of the image is not correctly
-	     * dithered at present.
-	     */
+    }
 
-	    x = masterPtr->ditherX;
-	    y = masterPtr->ditherY;
-	    if (masterPtr->ditherX != 0) {
-		Tk_DitherPhoto((Tk_PhotoHandle) masterPtr, x, y, masterPtr->width - x, 1);
-	    }
-	    if (masterPtr->ditherY < masterPtr->height) {
-		x = 0;
-		Tk_DitherPhoto((Tk_PhotoHandle)masterPtr, 0, masterPtr->ditherY, masterPtr->width,
-			masterPtr->height - masterPtr->ditherY);
-	    }
-
-	    if (y < masterPtr->height) {
-		/*
-		 * Tell the core image code that part of the image has changed.
-		 */
-
-		Tk_ImageChanged(masterPtr->tkMaster, x, y,
-			(masterPtr->width - x), (masterPtr->height - y),
-			masterPtr->width, masterPtr->height);
-	    }
-
-	} else {
+    case PHOTO_REDITHER:
+	if (objc != 2) {
 	    Tcl_WrongNumArgs(interp, 2, objv, (char *) NULL);
 	    return TCL_ERROR;
 	}
+
+	/*
+	 * Call Dither if any part of the image is not correctly
+	 * dithered at present.
+	 */
+
+	x = masterPtr->ditherX;
+	y = masterPtr->ditherY;
+	if (masterPtr->ditherX != 0) {
+	    Tk_DitherPhoto((Tk_PhotoHandle) masterPtr, x, y,
+		    masterPtr->width - x, 1);
+	}
+	if (masterPtr->ditherY < masterPtr->height) {
+	    x = 0;
+	    Tk_DitherPhoto((Tk_PhotoHandle)masterPtr, 0,
+		    masterPtr->ditherY, masterPtr->width,
+		    masterPtr->height - masterPtr->ditherY);
+	}
+
+	if (y < masterPtr->height) {
+	    /*
+	     * Tell the core image code that part of the image has changed.
+	     */
+
+	    Tk_ImageChanged(masterPtr->tkMaster, x, y,
+		    (masterPtr->width - x), (masterPtr->height - y),
+		    masterPtr->width, masterPtr->height);
+	}
 	break;
-      }
-      case PHOTO_WRITE: {
+
+    case PHOTO_TRANS: {
+	static CONST char *photoTransOptions[] = {
+	    "get", "set", (char *) NULL
+	};
+	enum transOptions {
+	    PHOTO_TRANS_GET, PHOTO_TRANS_SET
+	};
+
+	if (objc < 3) {
+	    Tcl_WrongNumArgs(interp, 2, objv, "option ?arg arg ...?");
+	    return TCL_ERROR;
+	}
+	if (Tcl_GetIndexFromObj(interp, objv[2], photoTransOptions, "option",
+		0, &index) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+
+	switch ((enum transOptions) index) {
+	case PHOTO_TRANS_GET: {
+	    XRectangle testBox;
+	    TkRegion testRegion;
+
+	    if (objc != 5) {
+		Tcl_WrongNumArgs(interp, 3, objv, "x y");
+		return TCL_ERROR;
+	    }
+	    if ((Tcl_GetIntFromObj(interp, objv[3], &x) != TCL_OK)
+		    || (Tcl_GetIntFromObj(interp, objv[4], &y) != TCL_OK)) {
+		return TCL_ERROR;
+	    }
+	    if ((x < 0) || (x >= masterPtr->width)
+		|| (y < 0) || (y >= masterPtr->height)) {
+		Tcl_AppendResult(interp, Tcl_GetString(objv[0]),
+			" transparency get: coordinates out of range",
+			(char *) NULL);
+		return TCL_ERROR;
+	    }
+
+	    testBox.x = x;
+	    testBox.y = y;
+	    testBox.width = 1;
+	    testBox.height = 1;
+	    /* What a way to do a test! */
+	    testRegion = TkCreateRegion();
+	    TkUnionRectWithRegion(&testBox, testRegion, testRegion);
+	    TkIntersectRegion(testRegion, masterPtr->validRegion, testRegion);
+	    TkClipBox(testRegion, &testBox);
+	    TkDestroyRegion(testRegion);
+
+	    Tcl_SetBooleanObj(Tcl_GetObjResult(interp),
+		    (testBox.width==0 && testBox.height==0));
+	    return TCL_OK;
+	}
+
+	case PHOTO_TRANS_SET: {
+	    int transFlag;
+	    XRectangle setBox;
+
+	    if (objc != 6) {
+		Tcl_WrongNumArgs(interp, 3, objv, "x y boolean");
+		return TCL_ERROR;
+	    }
+	    if ((Tcl_GetIntFromObj(interp, objv[3], &x) != TCL_OK)
+		    || (Tcl_GetIntFromObj(interp, objv[4], &y) != TCL_OK)
+		    || (Tcl_GetBooleanFromObj(interp, objv[5],
+		    &transFlag) != TCL_OK)) {
+		return TCL_ERROR;
+	    }
+	    if ((x < 0) || (x >= masterPtr->width)
+		|| (y < 0) || (y >= masterPtr->height)) {
+		Tcl_AppendResult(interp, Tcl_GetString(objv[0]),
+			" transparency set: coordinates out of range",
+			(char *) NULL);
+		return TCL_ERROR;
+	    }
+
+	    setBox.x = x;
+	    setBox.y = y;
+	    setBox.width = 1;
+	    setBox.height = 1;
+	    pixelPtr = masterPtr->pix32 + (y * masterPtr->width + x) * 4;
+
+	    if (transFlag) {
+		/*
+		 * Make pixel transparent.
+		 */
+		TkRegion clearRegion = TkCreateRegion();
+
+		TkUnionRectWithRegion(&setBox, clearRegion, clearRegion);
+		TkSubtractRegion(masterPtr->validRegion, clearRegion,
+			masterPtr->validRegion);
+		TkDestroyRegion(clearRegion);
+		/*
+		 * Set the alpha value correctly.
+		 */
+		pixelPtr[3] = 0;
+	    } else {
+		/*
+		 * Make pixel opaque.
+		 */
+		TkUnionRectWithRegion(&setBox, masterPtr->validRegion,
+			masterPtr->validRegion);
+		pixelPtr[3] = 255;
+	    }
+
+	    /*
+	     * Inform the generic image code that the image
+	     * has (potentially) changed.
+	     */
+
+	    Tk_ImageChanged(masterPtr->tkMaster, x, y, 1, 1,
+		    masterPtr->width, masterPtr->height);
+	    masterPtr->flags &= ~IMAGE_CHANGED;
+	}
+
+	}
+	return TCL_OK;
+    }
+
+    case PHOTO_WRITE: {
 	char *data;
 	Tcl_Obj *format;
 
@@ -1200,7 +1407,7 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 
         if (Tcl_IsSafe(interp)) {
             Tcl_AppendResult(interp, "can't write image to a file in a",
-                    " safe interpreter", (char *) NULL);
+		    " safe interpreter", (char *) NULL);
             return TCL_ERROR;
         }
         
@@ -1234,7 +1441,7 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	 * Fill in default values for unspecified parameters.
 	 */
 
-	if (((options.options & OPT_FROM) == 0) || (options.fromX2 < 0)) {
+	if (!(options.options & OPT_FROM) || (options.fromX2 < 0)) {
 	    options.fromX2 = masterPtr->width;
 	    options.fromY2 = masterPtr->height;
 	}
@@ -1246,7 +1453,7 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 
 	matched = 0;
 	for (imageFormat = tsdPtr->formatList; imageFormat != NULL;
-	     imageFormat = imageFormat->nextPtr) {
+		imageFormat = imageFormat->nextPtr) {
 	    if ((options.format == NULL)
 		    || (strncasecmp(Tcl_GetString(options.format),
 		    imageFormat->name, strlen(imageFormat->name)) == 0)) {
@@ -1257,18 +1464,18 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	    }
 	}
 	if (imageFormat == NULL) {
-	  oldformat = 1;
-	  for (imageFormat = tsdPtr->oldFormatList; imageFormat != NULL;
-	     imageFormat = imageFormat->nextPtr) {
-	    if ((options.format == NULL)
-		    || (strncasecmp(Tcl_GetString(options.format),
-		    imageFormat->name, strlen(imageFormat->name)) == 0)) {
-		matched = 1;
-		if (imageFormat->fileWriteProc != NULL) {
-		    break;
+	    oldformat = 1;
+	    for (imageFormat = tsdPtr->oldFormatList; imageFormat != NULL;
+		    imageFormat = imageFormat->nextPtr) {
+		if ((options.format == NULL)
+			|| (strncasecmp(Tcl_GetString(options.format),
+			imageFormat->name, strlen(imageFormat->name)) == 0)) {
+		    matched = 1;
+		    if (imageFormat->fileWriteProc != NULL) {
+			break;
+		    }
 		}
 	    }
-	  }
 	}
 	if (imageFormat == NULL) {
 	    if (options.format == NULL) {
@@ -1298,8 +1505,7 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	    format = (Tcl_Obj *) Tcl_GetString(options.format);
 	}
 	result = (*imageFormat->fileWriteProc)(interp,
-		Tcl_GetString(options.name),
-		format, &block);
+		Tcl_GetString(options.name), format, &block);
 	if (options.background) {
 	    Tk_FreeColor(options.background);
 	}
@@ -1307,10 +1513,9 @@ ImgPhotoCmd(clientData, interp, objc, objv)
 	    ckfree(data);
 	}
 	return result;
-	break;
-      }
     }
 
+    }
     return TCL_OK;
 }
 
@@ -1321,7 +1526,8 @@ ImgPhotoCmd(clientData, interp, objc, objv)
  *
  *	This procedure is invoked to process one of the options
  *	which may be specified for the photo image subcommands,
- *	namely, -from, -to, -zoom, -subsample, -format, and -shrink.
+ *	namely, -from, -to, -zoom, -subsample, -format, -shrink,
+ *	and -compositingrule.
  *
  * Results:
  *	A standard Tcl result.
@@ -1436,7 +1642,9 @@ ParseSubcommandOptions(optPtr, interp, allowedOptions, optIndexPtr, objc, objv)
 	    }
 	} else if (bit == OPT_FORMAT) {
 	    /*
-	     * The -format option takes a single string value.
+	     * The -format option takes a single string value.  Note
+	     * that parsing this is outside the scope of this
+	     * function.
 	     */
 
 	    if (index + 1 < objc) {
@@ -1444,6 +1652,34 @@ ParseSubcommandOptions(optPtr, interp, allowedOptions, optIndexPtr, objc, objv)
 		optPtr->format = objv[index];
 	    } else {
 		Tcl_AppendResult(interp, "the \"-format\" option ",
+			"requires a value", (char *) NULL);
+		return TCL_ERROR;
+	    }
+	} else if (bit == OPT_COMPOSITE) {
+	    /*
+	     * The -compositingrule option takes a single value from
+	     * a well-known set.
+	     */
+
+	    if (index + 1 < objc) {
+		/*
+		 * Note that these must match the TK_PHOTO_COMPOSITE_*
+		 * constants.
+		 */
+		static CONST char *compositingRules[] = {
+		    "overlay", "set",
+		    NULL
+		};
+
+		index++;
+		if (Tcl_GetIndexFromObj(interp, objv[index], compositingRules,
+			"compositing rule", 0, &optPtr->compositingRule)
+			!= TCL_OK) {
+		    return TCL_ERROR;
+		}
+		*optIndexPtr = index;
+	    } else {
+		Tcl_AppendResult(interp, "the \"-compositingrule\" option ",
 			"requires a value", (char *) NULL);
 		return TCL_ERROR;
 	    }
@@ -1588,7 +1824,7 @@ ImgPhotoConfigureMaster(interp, masterPtr, objc, objv, flags)
 				 * such as TK_CONFIG_ARGV_ONLY. */
 {
     PhotoInstance *instancePtr;
-    char *oldFileString, *oldPaletteString;
+    CONST char *oldFileString, *oldPaletteString;
     Tcl_Obj *oldData, *data = NULL, *oldFormat, *format = NULL;
     int length, i, j;
     double oldGamma;
@@ -1596,25 +1832,33 @@ ImgPhotoConfigureMaster(interp, masterPtr, objc, objv, flags)
     Tcl_Channel chan;
     Tk_PhotoImageFormat *imageFormat;
     int imageWidth, imageHeight;
-    char **args;
+    CONST char **args;
     int oldformat;
     Tcl_Obj *tempdata, *tempformat;
 
-    args = (char **) ckalloc((objc + 1) * sizeof(char *));
+    args = (CONST char **) ckalloc((objc + 1) * sizeof(char *));
     for (i = 0, j = 0; i < objc; i++,j++) {
 	args[j] = Tcl_GetStringFromObj(objv[i], &length);
 	if ((length > 1) && (args[j][0] == '-')) {
 	    if ((args[j][1] == 'd') &&
-		    !strncmp(args[j],"-data", (size_t) length)) {
-		if (i < objc) {
-		    data = objv[++i];
+		    !strncmp(args[j], "-data", (size_t) length)) {
+		if (++i < objc) {
+		    data = objv[i];
 		    j--;
+		} else {
+		    Tcl_AppendResult(interp,
+			    "value for \"-data\" missing", (char *) NULL);
+		    return TCL_ERROR;
 		}
 	    } else if ((args[j][1] == 'f') &&
-		    !strncmp(args[j],"-format", (size_t) length)) {
-		if (i < objc) {
-		    format = objv[++i];
+		    !strncmp(args[j], "-format", (size_t) length)) {
+		if (++i < objc) {
+		    format = objv[i];
 		    j--;
+		} else {
+		    Tcl_AppendResult(interp,
+			    "value for \"-format\" missing", (char *) NULL);
+		    return TCL_ERROR;
 		}
 	    }
 	}
@@ -1630,8 +1874,18 @@ ImgPhotoConfigureMaster(interp, masterPtr, objc, objv, flags)
      */
 
     oldFileString = masterPtr->fileString;
-    oldData = (oldFileString == NULL) ? masterPtr->dataString: NULL;
+    if (oldFileString == NULL) {
+	oldData = masterPtr->dataString;
+	if (oldData != NULL) {
+	    Tcl_IncrRefCount(oldData);
+	}
+    } else {
+	oldData = NULL;
+    }
     oldFormat = masterPtr->format;
+    if (oldFormat != NULL) {
+	Tcl_IncrRefCount(oldFormat);
+    }
     oldPaletteString = masterPtr->palette;
     oldGamma = masterPtr->gamma;
 
@@ -1642,7 +1896,7 @@ ImgPhotoConfigureMaster(interp, masterPtr, objc, objv, flags)
     if (Tk_ConfigureWidget(interp, Tk_MainWindow(interp), configSpecs,
 	    j, args, (char *) masterPtr, flags) != TCL_OK) {
 	ckfree((char *) args);
-	return TCL_ERROR;
+	goto errorExit;
     }
     ckfree((char *) args);
 
@@ -1684,7 +1938,13 @@ ImgPhotoConfigureMaster(interp, masterPtr, objc, objv, flags)
      * and make sure storage is correctly allocated for this image.
      */
 
-    ImgPhotoSetSize(masterPtr, masterPtr->width, masterPtr->height);
+    if (ImgPhotoSetSize(masterPtr, masterPtr->width,
+	    masterPtr->height) != TCL_OK) {
+	Tcl_ResetResult(interp);
+	Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+		TK_PHOTO_ALLOC_FAILURE_MESSAGE, (char *) NULL);
+	goto errorExit;
+    }
 
     /*
      * Read in the image from the file or string if the user has
@@ -1700,30 +1960,36 @@ ImgPhotoConfigureMaster(interp, masterPtr, objc, objv, flags)
          */
 
         if (Tcl_IsSafe(interp)) {
-            Tcl_AppendResult(interp, "can't get image from a file in a",
-                    " safe interpreter", (char *) NULL);
-            return TCL_ERROR;
+	    Tcl_ResetResult(interp);
+            Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+		    "can't get image from a file in a safe interpreter",
+		    (char *) NULL);
+	    goto errorExit;
         }
         
 	chan = Tcl_OpenFileChannel(interp, masterPtr->fileString, "r", 0);
 	if (chan == NULL) {
-	    return TCL_ERROR;
+	    goto errorExit;
 	}
-        if (Tcl_SetChannelOption(interp, chan, "-translation", "binary")
-		!= TCL_OK) {
-            return TCL_ERROR;
-        }
-        if (Tcl_SetChannelOption(interp, chan, "-encoding", "binary")
-		!= TCL_OK) {
-            return TCL_ERROR;
-        }
-	if (MatchFileFormat(interp, chan, masterPtr->fileString,
-		masterPtr->format, &imageFormat, &imageWidth,
-		&imageHeight, &oldformat) != TCL_OK) {
+	/*
+	 * -translation binary also sets -encoding binary
+	 */
+        if ((Tcl_SetChannelOption(interp, chan,
+		"-translation", "binary") != TCL_OK) ||
+		(MatchFileFormat(interp, chan, masterPtr->fileString,
+			masterPtr->format, &imageFormat, &imageWidth,
+			&imageHeight, &oldformat) != TCL_OK)) {
 	    Tcl_Close(NULL, chan);
-	    return TCL_ERROR;
+	    goto errorExit;
 	}
-	ImgPhotoSetSize(masterPtr, imageWidth, imageHeight);
+	result = ImgPhotoSetSize(masterPtr, imageWidth, imageHeight);
+	if (result != TCL_OK) {
+	    Tcl_Close(NULL, chan);
+	    Tcl_ResetResult(interp);
+	    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+		    TK_PHOTO_ALLOC_FAILURE_MESSAGE, (char *) NULL);
+	    goto errorExit;
+	}
 	tempformat = masterPtr->format;
 	if (oldformat && tempformat) {
 	    tempformat = (Tcl_Obj *) Tcl_GetString(tempformat);
@@ -1734,7 +2000,7 @@ ImgPhotoConfigureMaster(interp, masterPtr, objc, objv, flags)
 		imageWidth, imageHeight, 0, 0);
 	Tcl_Close(NULL, chan);
 	if (result != TCL_OK) {
-	    return TCL_ERROR;
+	    goto errorExit;
 	}
 
 	Tcl_ResetResult(interp);
@@ -1743,14 +2009,19 @@ ImgPhotoConfigureMaster(interp, masterPtr, objc, objv, flags)
 
     if ((masterPtr->fileString == NULL) && (masterPtr->dataString != NULL)
 	    && ((masterPtr->dataString != oldData)
-	    || (masterPtr->format != oldFormat))) {
+		    || (masterPtr->format != oldFormat))) {
 
-	if (MatchStringFormat(interp, masterPtr->dataString, 
+	if (MatchStringFormat(interp, masterPtr->dataString,
 		masterPtr->format, &imageFormat, &imageWidth,
 		&imageHeight, &oldformat) != TCL_OK) {
-	    return TCL_ERROR;
+	    goto errorExit;
 	}
-	ImgPhotoSetSize(masterPtr, imageWidth, imageHeight);
+	if (ImgPhotoSetSize(masterPtr, imageWidth, imageHeight) != TCL_OK) {
+	    Tcl_ResetResult(interp);
+	    Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
+		    TK_PHOTO_ALLOC_FAILURE_MESSAGE, (char *) NULL);
+	    goto errorExit;
+	}
 	tempformat = masterPtr->format;
 	tempdata = masterPtr->dataString;
 	if (oldformat) {
@@ -1762,7 +2033,7 @@ ImgPhotoConfigureMaster(interp, masterPtr, objc, objv, flags)
 	if ((*imageFormat->stringReadProc)(interp, tempdata,
 		tempformat, (Tk_PhotoHandle) masterPtr,
 		0, 0, imageWidth, imageHeight, 0, 0) != TCL_OK) {
-	    return TCL_ERROR;
+	    goto errorExit;
 	}
 
 	Tcl_ResetResult(interp);
@@ -1802,7 +2073,22 @@ ImgPhotoConfigureMaster(interp, masterPtr, objc, objv, flags)
 	    masterPtr->height, masterPtr->width, masterPtr->height);
     masterPtr->flags &= ~IMAGE_CHANGED;
 
+    if (oldData != NULL) {
+	Tcl_DecrRefCount(oldData);
+    }
+    if (oldFormat != NULL) {
+	Tcl_DecrRefCount(oldFormat);
+    }
     return TCL_OK;
+
+  errorExit:
+    if (oldData != NULL) {
+	Tcl_DecrRefCount(oldData);
+    }
+    if (oldFormat != NULL) {
+	Tcl_DecrRefCount(oldFormat);
+    }
+    return TCL_ERROR;
 }
 
 /*
@@ -1900,6 +2186,8 @@ ImgPhotoConfigureInstance(instancePtr)
 	     * to byte-swap any 16 or 32 bit values that we store in the
 	     * image in those situations where the server's endianness
 	     * is different from ours.
+	     *
+	     * FIXME: use autoconf to figure this out.
 	     */
 
 	    if (imagePtr != NULL) {
@@ -1977,7 +2265,6 @@ ImgPhotoGet(tkwin, masterData)
     Colormap colormap;
     int mono, nRed, nGreen, nBlue;
     XVisualInfo visualInfo, *visInfoPtr;
-    XRectangle validBox;
     char buf[TCL_INTEGER_SPACE * 3];
     int numVisuals;
     XColor *white, *black;
@@ -2121,8 +2408,10 @@ ImgPhotoGet(tkwin, masterData)
     gcValues.graphics_exposures = False;
     instancePtr->gc = Tk_GetGC(tkwin,
 	    GCForeground|GCBackground|GCGraphicsExposures, &gcValues);
+
     /*
      * Set configuration options and finish the initialization of the instance.
+     * This will also dither the image if necessary.
      */
 
     ImgPhotoConfigureInstance(instancePtr);
@@ -2134,16 +2423,6 @@ ImgPhotoGet(tkwin, masterData)
     if (instancePtr->nextPtr == NULL) {
 	Tk_ImageChanged(masterPtr->tkMaster, 0, 0, 0, 0,
 		masterPtr->width, masterPtr->height);
-    }
-
-    /*
-     * Dither the image to fill in this instance's pixmap.
-     */
-
-    TkClipBox(masterPtr->validRegion, &validBox);
-    if ((validBox.width > 0) && (validBox.height > 0)) {
-	DitherInstance(instancePtr, validBox.x, validBox.y, validBox.width,
-		validBox.height);
     }
 
     return (ClientData) instancePtr;
@@ -2290,8 +2569,8 @@ ImgPhotoDelete(masterData)
     if (masterPtr->imageCmd != NULL) {
 	Tcl_DeleteCommandFromToken(masterPtr->interp, masterPtr->imageCmd);
     }
-    if (masterPtr->pix24 != NULL) {
-	ckfree((char *) masterPtr->pix24);
+    if (masterPtr->pix32 != NULL) {
+	ckfree((char *) masterPtr->pix32);
     }
     if (masterPtr->validRegion != NULL) {
 	TkDestroyRegion(masterPtr->validRegion);
@@ -2346,7 +2625,8 @@ ImgPhotoCmdDeletedProc(clientData)
  *	image's size to `width' x `height' pixels.
  *
  * Results:
- *	None.
+ *	TCL_OK if successful, TCL_ERROR if failure occurred (currently
+ *	just with memory allocation.)
  *
  * Side effects:
  *	Storage gets reallocated, for the master and all its instances.
@@ -2354,12 +2634,12 @@ ImgPhotoCmdDeletedProc(clientData)
  *----------------------------------------------------------------------
  */
 
-static void
+static int
 ImgPhotoSetSize(masterPtr, width, height)
     PhotoMaster *masterPtr;
     int width, height;
 {
-    unsigned char *newPix24;
+    unsigned char *newPix32 = NULL;
     int h, offset, pitch;
     unsigned char *srcPtr, *destPtr;
     XRectangle validBox, clipBox;
@@ -2371,6 +2651,29 @@ ImgPhotoSetSize(masterPtr, width, height)
     }
     if (masterPtr->userHeight > 0) {
 	height = masterPtr->userHeight;
+    }
+
+    pitch = width * 4;
+
+    /*
+     * Test if we're going to (re)allocate the main buffer now, so
+     * that any failures will leave the photo unchanged.
+     */
+    if ((width != masterPtr->width) || (height != masterPtr->height)
+	    || (masterPtr->pix32 == NULL)) {
+	/*
+	 * Not a u-long, but should be one.
+	 */
+	unsigned /*long*/ newPixSize = (unsigned /*long*/) (height * pitch);
+
+	newPix32 = (unsigned char *) attemptckalloc(newPixSize);
+	/*
+	 * The result could validly be NULL if the number of bytes
+	 * requested was 0. [Bug 619544]
+	 */
+	if (newPix32 == NULL && newPixSize != 0) {
+	    return TCL_ERROR;
+	}
     }
 
     /*
@@ -2393,38 +2696,33 @@ ImgPhotoSetSize(masterPtr, width, height)
 	TkClipBox(masterPtr->validRegion, &validBox);
     }
 
-    if ((width != masterPtr->width) || (height != masterPtr->height)
-	    || (masterPtr->pix24 == NULL)) {
-
-	/*
-	 * Reallocate storage for the 24-bit image and copy
-	 * over valid regions.
-	 */
-
-	pitch = width * 4;
-	newPix24 = (unsigned char *) ckalloc((unsigned) (height * pitch));
-
+    /*
+     * Use the reallocated storage (allocation above) for the 32-bit
+     * image and copy over valid regions.  Note that this test is true
+     * precisely when the allocation has already been done.
+     */
+    if (newPix32 != NULL) {
 	/*
 	 * Zero the new array.  The dithering code shouldn't read the
 	 * areas outside validBox, but they might be copied to another
 	 * photo image or written to a file.
 	 */
 
-	if ((masterPtr->pix24 != NULL)
+	if ((masterPtr->pix32 != NULL)
 	    && ((width == masterPtr->width) || (width == validBox.width))) {
 	    if (validBox.y > 0) {
-		memset((VOID *) newPix24, 0, (size_t) (validBox.y * pitch));
+		memset((VOID *) newPix32, 0, (size_t) (validBox.y * pitch));
 	    }
 	    h = validBox.y + validBox.height;
 	    if (h < height) {
-		memset((VOID *) (newPix24 + h * pitch), 0,
+		memset((VOID *) (newPix32 + h * pitch), 0,
 			(size_t) ((height - h) * pitch));
 	    }
 	} else {
-	    memset((VOID *) newPix24, 0, (size_t) (height * pitch));
+	    memset((VOID *) newPix32, 0, (size_t) (height * pitch));
 	}
 
-	if (masterPtr->pix24 != NULL) {
+	if (masterPtr->pix32 != NULL) {
 
 	    /*
 	     * Copy the common area over to the new array array and
@@ -2438,8 +2736,8 @@ ImgPhotoSetSize(masterPtr, width, height)
 		 */
 
 		offset = validBox.y * pitch;
-		memcpy((VOID *) (newPix24 + offset),
-			(VOID *) (masterPtr->pix24 + offset),
+		memcpy((VOID *) (newPix32 + offset),
+			(VOID *) (masterPtr->pix32 + offset),
 			(size_t) (validBox.height * pitch));
 
 	    } else if ((validBox.width > 0) && (validBox.height > 0)) {
@@ -2448,8 +2746,8 @@ ImgPhotoSetSize(masterPtr, width, height)
 		 * Area to be copied is not contiguous - copy line by line.
 		 */
 
-		destPtr = newPix24 + (validBox.y * width + validBox.x) * 4;
-		srcPtr = masterPtr->pix24 + (validBox.y * masterPtr->width
+		destPtr = newPix32 + (validBox.y * width + validBox.x) * 4;
+		srcPtr = masterPtr->pix32 + (validBox.y * masterPtr->width
 			+ validBox.x) * 4;
 		for (h = validBox.height; h > 0; h--) {
 		    memcpy((VOID *) destPtr, (VOID *) srcPtr,
@@ -2459,10 +2757,10 @@ ImgPhotoSetSize(masterPtr, width, height)
 		}
 	    }
 
-	    ckfree((char *) masterPtr->pix24);
+	    ckfree((char *) masterPtr->pix32);
 	}
 
-	masterPtr->pix24 = newPix24;
+	masterPtr->pix32 = newPix32;
 	masterPtr->width = width;
 	masterPtr->height = height;
 
@@ -2479,12 +2777,10 @@ ImgPhotoSetSize(masterPtr, width, height)
 		masterPtr->ditherX = 0;
 		masterPtr->ditherY = validBox.height;
 	    }
-	} else {
-	    if ((masterPtr->ditherY > 0)
-		    || ((int) validBox.width < masterPtr->ditherX)) {
-		masterPtr->ditherX = validBox.width;
-		masterPtr->ditherY = 0;
-	    }
+	} else if ((masterPtr->ditherY > 0)
+		|| ((int) validBox.width < masterPtr->ditherX)) {
+	    masterPtr->ditherX = validBox.width;
+	    masterPtr->ditherY = 0;
 	}
     }
 
@@ -2496,6 +2792,8 @@ ImgPhotoSetSize(masterPtr, width, height)
 	    instancePtr = instancePtr->nextPtr) {
 	ImgPhotoInstanceSetSize(instancePtr);
     }
+
+    return TCL_OK;
 }
 
 /*
@@ -2540,6 +2838,10 @@ ImgPhotoInstanceSetSize(instancePtr)
 		(masterPtr->width > 0) ? masterPtr->width: 1,
 		(masterPtr->height > 0) ? masterPtr->height: 1,
 		instancePtr->visualInfo.depth);
+        if (!newPixmap) {
+            panic("Fail to create pixmap with Tk_GetPixmap in ImgPhotoInstanceSetSize.\n");
+            return;
+        }
 
 	/*
 	 * The following is a gross hack needed to properly support colormaps
@@ -2654,7 +2956,7 @@ static int
 IsValidPalette(instancePtr, palette)
     PhotoInstance *instancePtr;		/* Instance to which the palette
 					 * specification is to be applied. */
-    char *palette;			/* Palette specification string. */
+    CONST char *palette;		/* Palette specification string. */
 {
     int nRed, nGreen, nBlue, mono, numColors;
     char *endp;
@@ -2932,7 +3234,6 @@ AllocateColors(colorPtr)
      * shades of each primary.
      */
 
-    nRed = nGreen = nBlue = 0;
     mono = sscanf(colorPtr->id.palette, "%d/%d/%d", &nRed, &nGreen, &nBlue)
 	    <= 1;
     igam = 1.0 / colorPtr->id.gamma;
@@ -3436,7 +3737,7 @@ MatchFileFormat(interp, chan, fileName, formatObj, imageFormatPtr,
 	    }
 	}
 	if (formatPtr->fileMatchProc != NULL) {
-	    (void) Tcl_Seek(chan, 0L, SEEK_SET);
+	    (void) Tcl_Seek(chan, Tcl_LongAsWide(0L), SEEK_SET);
 	    
 	    if ((*formatPtr->fileMatchProc)(chan, fileName, formatObj,
 		    widthPtr, heightPtr, interp)) {
@@ -3451,35 +3752,35 @@ MatchFileFormat(interp, chan, fileName, formatObj, imageFormatPtr,
 	}
     }
     if (formatPtr == NULL) {
-      useoldformat = 1;
-      for (formatPtr = tsdPtr->oldFormatList; formatPtr != NULL;
-	 formatPtr = formatPtr->nextPtr) {
-	if (formatString != NULL) {
-	    if (strncasecmp(formatString,
-		    formatPtr->name, strlen(formatPtr->name)) != 0) {
-		continue;
+	useoldformat = 1;
+	for (formatPtr = tsdPtr->oldFormatList; formatPtr != NULL;
+		formatPtr = formatPtr->nextPtr) {
+	    if (formatString != NULL) {
+		if (strncasecmp(formatString,
+			formatPtr->name, strlen(formatPtr->name)) != 0) {
+		    continue;
+		}
+		matched = 1;
+		if (formatPtr->fileMatchProc == NULL) {
+		    Tcl_AppendResult(interp, "-file option isn't supported",
+			    " for ", formatString, " images", (char *) NULL);
+		    return TCL_ERROR;
+		}
 	    }
-	    matched = 1;
-	    if (formatPtr->fileMatchProc == NULL) {
-		Tcl_AppendResult(interp, "-file option isn't supported for ",
-			formatString, " images", (char *) NULL);
-		return TCL_ERROR;
+	    if (formatPtr->fileMatchProc != NULL) {
+		(void) Tcl_Seek(chan, Tcl_LongAsWide(0L), SEEK_SET);
+		if ((*formatPtr->fileMatchProc)(chan, fileName, (Tcl_Obj *)
+			formatString, widthPtr, heightPtr, interp)) {
+		    if (*widthPtr < 1) {
+			*widthPtr = 1;
+		    }
+		    if (*heightPtr < 1) {
+			*heightPtr = 1;
+		    }
+		    break;
+		}
 	    }
 	}
-	if (formatPtr->fileMatchProc != NULL) {
-	    (void) Tcl_Seek(chan, 0L, SEEK_SET);
-	    if ((*formatPtr->fileMatchProc)(chan, fileName, (Tcl_Obj *) formatString,
-		    widthPtr, heightPtr, interp)) {
-		if (*widthPtr < 1) {
-		    *widthPtr = 1;
-		}
-		if (*heightPtr < 1) {
-		    *heightPtr = 1;
-		}
-		break;
-	    }
-	}
-      }
     }
 
     if (formatPtr == NULL) {
@@ -3497,7 +3798,7 @@ MatchFileFormat(interp, chan, fileName, formatObj, imageFormatPtr,
 
     *imageFormatPtr = formatPtr;
     *oldformat = useoldformat;
-    (void) Tcl_Seek(chan, 0L, SEEK_SET);
+    (void) Tcl_Seek(chan, Tcl_LongAsWide(0L), SEEK_SET);
     return TCL_OK;
 }
 
@@ -3576,34 +3877,34 @@ MatchStringFormat(interp, data, formatObj, imageFormatPtr,
     }
 
     if (formatPtr == NULL) {
-      useoldformat = 1;
-      for (formatPtr = tsdPtr->oldFormatList; formatPtr != NULL;
-	    formatPtr = formatPtr->nextPtr) {
-	if (formatObj != NULL) {
-	    if (strncasecmp(formatString,
-		    formatPtr->name, strlen(formatPtr->name)) != 0) {
-		continue;
+	useoldformat = 1;
+	for (formatPtr = tsdPtr->oldFormatList; formatPtr != NULL;
+		formatPtr = formatPtr->nextPtr) {
+	    if (formatObj != NULL) {
+		if (strncasecmp(formatString,
+			formatPtr->name, strlen(formatPtr->name)) != 0) {
+		    continue;
+		}
+		matched = 1;
+		if (formatPtr->stringMatchProc == NULL) {
+		    Tcl_AppendResult(interp, "-data option isn't supported",
+			    " for ", formatString, " images", (char *) NULL);
+		    return TCL_ERROR;
+		}
 	    }
-	    matched = 1;
-	    if (formatPtr->stringMatchProc == NULL) {
-		Tcl_AppendResult(interp, "-data option isn't supported for ",
-			formatString, " images", (char *) NULL);
-		return TCL_ERROR;
+	    if ((formatPtr->stringMatchProc != NULL)
+		    && (formatPtr->stringReadProc != NULL)
+		    && (*formatPtr->stringMatchProc)(
+			    (Tcl_Obj *) Tcl_GetString(data),
+			    (Tcl_Obj *) formatString,
+			    widthPtr, heightPtr, interp)) {
+		break;
 	    }
 	}
-	if ((formatPtr->stringMatchProc != NULL)
-		&& (formatPtr->stringReadProc != NULL)
-		&& (*formatPtr->stringMatchProc)((Tcl_Obj *) Tcl_GetString(data),
-			(Tcl_Obj *) formatString,
-		widthPtr, heightPtr, interp)) {
-	    break;
-	}
-      }	
     }
     if (formatPtr == NULL) {
 	if ((formatObj != NULL) && !matched) {
-	    Tcl_AppendResult(interp, "image format \"",
-		    formatString,
+	    Tcl_AppendResult(interp, "image format \"", formatString,
 		    "\" is not supported", (char *) NULL);
 	} else {
 	    Tcl_AppendResult(interp, "couldn't recognize image data",
@@ -3641,7 +3942,7 @@ Tk_PhotoHandle
 Tk_FindPhoto(interp, imageName)
     Tcl_Interp *interp;		/* Interpreter (application) in which image
 				 * exists. */
-    char *imageName;		/* Name of the desired photo image. */
+    CONST char *imageName;	/* Name of the desired photo image. */
 {
     ClientData clientData;
     Tk_ImageType *typePtr;
@@ -3670,7 +3971,7 @@ Tk_FindPhoto(interp, imageName)
  *---------------------------------------------------------------------- */
 
 void
-Tk_PhotoPutBlock(handle, blockPtr, x, y, width, height)
+Tk_PhotoPutBlock(handle, blockPtr, x, y, width, height, compRule)
     Tk_PhotoHandle handle;	/* Opaque handle for the photo image
 				 * to be updated. */
     register Tk_PhotoImageBlock *blockPtr;
@@ -3680,6 +3981,8 @@ Tk_PhotoPutBlock(handle, blockPtr, x, y, width, height)
 				 * be updated in the image. */
     int width, height;		/* Dimensions of the area of the image
 				 * to be updated. */
+    int compRule;		/* Compositing rule to use when processing
+				 * transparent pixels. */
 {
     register PhotoMaster *masterPtr;
     int xEnd, yEnd;
@@ -3700,14 +4003,17 @@ Tk_PhotoPutBlock(handle, blockPtr, x, y, width, height)
 	    && ((y + height) > masterPtr->userHeight)) {
 	height = masterPtr->userHeight - y;
     }
-    if ((width <= 0) || (height <= 0))
+    if ((width <= 0) || (height <= 0)) {
 	return;
+    }
 
     xEnd = x + width;
     yEnd = y + height;
     if ((xEnd > masterPtr->width) || (yEnd > masterPtr->height)) {
-	ImgPhotoSetSize(masterPtr, MAX(xEnd, masterPtr->width),
-		MAX(yEnd, masterPtr->height));
+	if (ImgPhotoSetSize(masterPtr, MAX(xEnd, masterPtr->width),
+		MAX(yEnd, masterPtr->height)) == TCL_ERROR) {
+	    panic(TK_PHOTO_ALLOC_FAILURE_MESSAGE);
+	}
     }
 
     if ((y < masterPtr->ditherY) || ((y == masterPtr->ditherY)
@@ -3737,11 +4043,11 @@ Tk_PhotoPutBlock(handle, blockPtr, x, y, width, height)
     }
 
     /*
-     * Copy the data into our local 24-bit/pixel array.
+     * Copy the data into our local 32-bit/pixel array.
      * If we can do it with a single memcpy, we do.
      */
 
-    destLinePtr = masterPtr->pix24 + (y * masterPtr->width + x) * 4;
+    destLinePtr = masterPtr->pix32 + (y * masterPtr->width + x) * 4;
     pitch = masterPtr->width * 4;
 
     /*
@@ -3753,40 +4059,82 @@ Tk_PhotoPutBlock(handle, blockPtr, x, y, width, height)
 	    && (greenOffset == 1) && (blueOffset == 2) && (alphaOffset == 3)
 	    && (width <= blockPtr->width) && (height <= blockPtr->height)
 	    && ((height == 1) || ((x == 0) && (width == masterPtr->width)
-		&& (blockPtr->pitch == pitch)))) {
+		&& (blockPtr->pitch == pitch)))
+	    && (compRule == TK_PHOTO_COMPOSITE_SET)) {
 	memcpy((VOID *) destLinePtr,
 		(VOID *) (blockPtr->pixelPtr + blockPtr->offset[0]),
 		(size_t) (height * width * 4));
     } else {
+	int alpha;
 	for (hLeft = height; hLeft > 0;) {
 	    srcLinePtr = blockPtr->pixelPtr + blockPtr->offset[0];
 	    hCopy = MIN(hLeft, blockPtr->height);
 	    hLeft -= hCopy;
 	    for (; hCopy > 0; --hCopy) {
-		destPtr = destLinePtr;
-		for (wLeft = width; wLeft > 0;) {
-		    wCopy = MIN(wLeft, blockPtr->width);
-		    wLeft -= wCopy;
-		    srcPtr = srcLinePtr;
-		    for (; wCopy > 0; --wCopy) {
-		      if (!destPtr[3]) {
-			destPtr[0] = destPtr[1] = destPtr[2] = 0xd9;
-		      }
-		      if (!alphaOffset || (srcPtr[alphaOffset] == 255)) {
-			*destPtr++ = srcPtr[0];
-			*destPtr++ = srcPtr[greenOffset];
-			*destPtr++ = srcPtr[blueOffset];
-			*destPtr++ = 255;
-		      } else {
-			if (srcPtr[alphaOffset]) {
-			    destPtr[0] += (srcPtr[0] - destPtr[0]) * srcPtr[alphaOffset] / 255;
-			    destPtr[1] += (srcPtr[greenOffset] - destPtr[1]) * srcPtr[alphaOffset] / 255;
-			    destPtr[2] += (srcPtr[blueOffset] - destPtr[2]) * srcPtr[alphaOffset] / 255;
-			    destPtr[3] += (255 - destPtr[3]) * srcPtr[alphaOffset] / 255;
-		  	}
-			destPtr+=4;
-		      }
-		      srcPtr += blockPtr->pixelSize;
+		if ((blockPtr->pixelSize == 4) && (greenOffset == 1)
+		    && (blueOffset == 2) && (alphaOffset == 3)
+		    && (width <= blockPtr->width)
+		    && (compRule == TK_PHOTO_COMPOSITE_SET)) {
+		    memcpy((VOID *) destLinePtr, (VOID *) srcLinePtr,
+			   (size_t) (width * 4));
+		} else {
+		    destPtr = destLinePtr;
+		    for (wLeft = width; wLeft > 0;) {
+			wCopy = MIN(wLeft, blockPtr->width);
+			wLeft -= wCopy;
+			srcPtr = srcLinePtr;
+			for (; wCopy > 0; --wCopy) {
+			    alpha = srcPtr[alphaOffset];
+			    /*
+			     * In the easy case, we can just copy.
+			     */
+			    if (!alphaOffset || (alpha == 255)) {
+				/* new solid part of the image */
+				*destPtr++ = srcPtr[0];
+				*destPtr++ = srcPtr[greenOffset];
+				*destPtr++ = srcPtr[blueOffset];
+				*destPtr++ = 255;
+				srcPtr += blockPtr->pixelSize;
+				continue;
+			    }
+
+			    /*
+			     * Combine according to the compositing rule.
+			     */
+			    switch (compRule) {
+			    case TK_PHOTO_COMPOSITE_SET:
+				*destPtr++ = srcPtr[0];
+				*destPtr++ = srcPtr[greenOffset];
+				*destPtr++ = srcPtr[blueOffset];
+				*destPtr++ = alpha;
+				break;
+
+			    case TK_PHOTO_COMPOSITE_OVERLAY:
+				if (!destPtr[3]) {
+				    /*
+				     * There must be a better way to select a
+				     * background colour!
+				     */
+				    destPtr[0] = destPtr[1] = destPtr[2] = 0xd9;
+				}
+
+				if (alpha) {
+				    destPtr[0] += (srcPtr[0] - destPtr[0]) * alpha / 255;
+				    destPtr[1] += (srcPtr[greenOffset] - destPtr[1]) * alpha / 255;
+				    destPtr[2] += (srcPtr[blueOffset] - destPtr[2]) * alpha / 255;
+				    destPtr[3] += (255 - destPtr[3]) * alpha / 255;
+				}
+				/*
+				 * else should be empty space
+				 */
+				destPtr += 4;
+				break;
+
+			    default:
+				panic("unknown compositing rule: %d", compRule);
+			    }
+			    srcPtr += blockPtr->pixelSize;
+			}
 		    }
 		}
 		srcLinePtr += blockPtr->pitch;
@@ -3799,61 +4147,81 @@ Tk_PhotoPutBlock(handle, blockPtr, x, y, width, height)
      * Add this new block to the region which specifies which data is valid.
      */
 
-  if (alphaOffset) {
-    int x1, y1, end;
-    
-    /*
-     * This block is grossly inefficient.  For each row in the image, it
-     * finds each continguous string of transparent pixels, then marks those
-     * areas as invalid in the validRegion mask.  This makes drawing very
-     * efficient, because of the way we use X:  we just say, here's your
-     * mask, and here's your data.  We need not worry about the current
-     * background color, etc.  But this costs us a lot on the image setup.
-     * Still, image setup only happens once, whereas the drawing happens
-     * many times, so this might be the best way to go.
-     *
-     * An alternative might be to not set up this mask, and instead, at
-     * drawing time, for each transparent pixel, set its color to the
-     * color of the background behind that pixel.  This is what I suspect
-     * most of programs do.  However, they don't have to deal with the canvas,
-     * which could have many different background colors.  Determining the
-     * correct bg color for a given pixel might be expensive.
-     */
-     
-    destLinePtr = masterPtr->pix24 + (y * masterPtr->width + x) * 4 + 3;
-    for (y1 = 0; y1 < height; y1++) {
-	x1 = 0;
-	destPtr = destLinePtr;
-	while (x1 < width) {
-	    /* search for first non-transparent pixel */
-	    while ((x1 < width) && !*destPtr) {
-		    x1++; destPtr += 4;
-	    }
-	    end = x1;
-	    /* search for first transparent pixel */
-	    while ((end < width) && *destPtr) {
-	        end++; destPtr += 4;
-	    }
-	    if (end > x1) {
-		rect.x = x + x1;
-		rect.y = y + y1;
-		rect.width = end - x1;
-		rect.height = 1;
-		TkUnionRectWithRegion(&rect, masterPtr->validRegion,
-			masterPtr->validRegion);
-	    }
-	    x1 = end;
+    if (alphaOffset) {
+	int x1, y1, end;
+
+	/*
+	 * This block is grossly inefficient.  For each row in the image, it
+	 * finds each continguous string of nontransparent pixels, then marks
+	 * those areas as valid in the validRegion mask.  This makes drawing
+	 * very efficient, because of the way we use X: we just say, here's
+	 * your mask, and here's your data.  We need not worry about the
+	 * current background color, etc.  But this costs us a lot on the
+	 * image setup.  Still, image setup only happens once, whereas the
+	 * drawing happens many times, so this might be the best way to go.
+	 *
+	 * An alternative might be to not set up this mask, and instead, at
+	 * drawing time, for each transparent pixel, set its color to the
+	 * color of the background behind that pixel.  This is what I suspect
+	 * most of programs do.  However, they don't have to deal with the
+	 * canvas, which could have many different background colors.
+	 * Determining the correct bg color for a given pixel might be
+	 * expensive.
+	 */
+
+	if (compRule != TK_PHOTO_COMPOSITE_OVERLAY) {
+	    /*
+	     * Don't need this when using the OVERLAY compositing rule,
+	     * which always strictly increases the valid region.
+	     */
+	    TkRegion workRgn = TkCreateRegion();
+
+	    rect.x = x;
+	    rect.y = y;
+	    rect.width = width;
+	    rect.height = height;
+	    TkUnionRectWithRegion(&rect, workRgn, workRgn);
+	    TkSubtractRegion(masterPtr->validRegion, workRgn,
+		    masterPtr->validRegion);
+	    TkDestroyRegion(workRgn);
 	}
-	destLinePtr += masterPtr->width * 4;
+
+	destLinePtr = masterPtr->pix32 + (y * masterPtr->width + x) * 4 + 3;
+	for (y1 = 0; y1 < height; y1++) {
+	    x1 = 0;
+	    destPtr = destLinePtr;
+	    while (x1 < width) {
+		/* search for first non-transparent pixel */
+		while ((x1 < width) && !*destPtr) {
+		    x1++;
+		    destPtr += 4;
+		}
+		end = x1;
+		/* search for first transparent pixel */
+		while ((end < width) && *destPtr) {
+		    end++;
+		    destPtr += 4;
+		}
+		if (end > x1) {
+		    rect.x = x + x1;
+		    rect.y = y + y1;
+		    rect.width = end - x1;
+		    rect.height = 1;
+		    TkUnionRectWithRegion(&rect, masterPtr->validRegion,
+			    masterPtr->validRegion);
+		}
+		x1 = end;
+	    }
+	    destLinePtr += masterPtr->width * 4;
+	}
+    } else {
+	rect.x = x;
+	rect.y = y;
+	rect.width = width;
+	rect.height = height;
+	TkUnionRectWithRegion(&rect, masterPtr->validRegion,
+		masterPtr->validRegion);
     }
-  } else {
-    rect.x = x;
-    rect.y = y;
-    rect.width = width;
-    rect.height = height;
-    TkUnionRectWithRegion(&rect, masterPtr->validRegion,
-	    masterPtr->validRegion);
-  }
 
     /*
      * Update each instance.
@@ -3889,7 +4257,7 @@ Tk_PhotoPutBlock(handle, blockPtr, x, y, width, height)
 
 void
 Tk_PhotoPutZoomedBlock(handle, blockPtr, x, y, width, height, zoomX, zoomY,
-	subsampleX, subsampleY)
+	subsampleX, subsampleY, compRule)
     Tk_PhotoHandle handle;	/* Opaque handle for the photo image
 				 * to be updated. */
     register Tk_PhotoImageBlock *blockPtr;
@@ -3901,6 +4269,8 @@ Tk_PhotoPutZoomedBlock(handle, blockPtr, x, y, width, height, zoomX, zoomY,
 				 * to be updated. */
     int zoomX, zoomY;		/* Zoom factors for the X and Y axes. */
     int subsampleX, subsampleY;	/* Subsampling factors for the X and Y axes. */
+    int compRule;		/* Compositing rule to use when processing
+				 * transparent pixels. */
 {
     register PhotoMaster *masterPtr;
     int xEnd, yEnd;
@@ -3915,16 +4285,16 @@ Tk_PhotoPutZoomedBlock(handle, blockPtr, x, y, width, height, zoomX, zoomY,
     int blockXSkip, blockYSkip;
     XRectangle rect;
 
-    if ((zoomX == 1) && (zoomY == 1) && (subsampleX == 1)
-	    && (subsampleY == 1)) {
-	Tk_PhotoPutBlock(handle, blockPtr, x, y, width, height);
+    if (zoomX==1 && zoomY==1 && subsampleX==1 && subsampleY==1) {
+	Tk_PhotoPutBlock(handle, blockPtr, x, y, width, height, compRule);
 	return;
     }
 
     masterPtr = (PhotoMaster *) handle;
 
-    if ((zoomX <= 0) || (zoomY <= 0))
+    if (zoomX <= 0 || zoomY <= 0) {
 	return;
+    }
     if ((masterPtr->userWidth != 0) && ((x + width) > masterPtr->userWidth)) {
 	width = masterPtr->userWidth - x;
     }
@@ -3932,17 +4302,20 @@ Tk_PhotoPutZoomedBlock(handle, blockPtr, x, y, width, height, zoomX, zoomY,
 	    && ((y + height) > masterPtr->userHeight)) {
 	height = masterPtr->userHeight - y;
     }
-    if ((width <= 0) || (height <= 0))
+    if (width <= 0 || height <= 0) {
 	return;
+    }
 
     xEnd = x + width;
     yEnd = y + height;
     if ((xEnd > masterPtr->width) || (yEnd > masterPtr->height)) {
-	int sameSrc = (blockPtr->pixelPtr == masterPtr->pix24);
-	ImgPhotoSetSize(masterPtr, MAX(xEnd, masterPtr->width),
-		MAX(yEnd, masterPtr->height));
+	int sameSrc = (blockPtr->pixelPtr == masterPtr->pix32);
+	if (ImgPhotoSetSize(masterPtr, MAX(xEnd, masterPtr->width),
+		MAX(yEnd, masterPtr->height)) == TCL_ERROR) {
+	    panic(TK_PHOTO_ALLOC_FAILURE_MESSAGE);
+	}
 	if (sameSrc) {
-	    blockPtr->pixelPtr = masterPtr->pix24;
+	    blockPtr->pixelPtr = masterPtr->pix32;
 	}
     }
 
@@ -3980,24 +4353,26 @@ Tk_PhotoPutZoomedBlock(handle, blockPtr, x, y, width, height, zoomX, zoomY,
 
     blockXSkip = subsampleX * blockPtr->pixelSize;
     blockYSkip = subsampleY * blockPtr->pitch;
-    if (subsampleX > 0)
+    if (subsampleX > 0) {
 	blockWid = ((blockPtr->width + subsampleX - 1) / subsampleX) * zoomX;
-    else if (subsampleX == 0)
+    } else if (subsampleX == 0) {
 	blockWid = width;
-    else
+    } else {
 	blockWid = ((blockPtr->width - subsampleX - 1) / -subsampleX) * zoomX;
-    if (subsampleY > 0)
+    }
+    if (subsampleY > 0) {
 	blockHt = ((blockPtr->height + subsampleY - 1) / subsampleY) * zoomY;
-    else if (subsampleY == 0)
+    } else if (subsampleY == 0) {
 	blockHt = height;
-    else
+    } else {
 	blockHt = ((blockPtr->height - subsampleY - 1) / -subsampleY) * zoomY;
+    }
 
     /*
-     * Copy the data into our local 24-bit/pixel array.
+     * Copy the data into our local 32-bit/pixel array.
      */
 
-    destLinePtr = masterPtr->pix24 + (y * masterPtr->width + x) * 4;
+    destLinePtr = masterPtr->pix32 + (y * masterPtr->width + x) * 4;
     srcOrigPtr = blockPtr->pixelPtr + blockPtr->offset[0];
     if (subsampleX < 0) {
 	srcOrigPtr += (blockPtr->width - 1) * blockPtr->pixelSize;
@@ -4020,23 +4395,43 @@ Tk_PhotoPutZoomedBlock(handle, blockPtr, x, y, width, height, zoomX, zoomY,
 		srcPtr = srcLinePtr;
 		for (; wCopy > 0; wCopy -= zoomX) {
 		    for (xRepeat = MIN(wCopy, zoomX); xRepeat > 0; xRepeat--) {
-		      if (!destPtr[3]) {
-			destPtr[0] = destPtr[1] = destPtr[2] = 0xd9;
-		      }
-		      if (!alphaOffset || (srcPtr[alphaOffset] == 255)) {
-			*destPtr++ = srcPtr[0];
-			*destPtr++ = srcPtr[greenOffset];
-			*destPtr++ = srcPtr[blueOffset];
-			*destPtr++ = 255;
-		      } else {
-			if (srcPtr[alphaOffset]) {
-			    destPtr[0] += (srcPtr[0] - destPtr[0]) * srcPtr[alphaOffset] / 255;
-			    destPtr[1] += (srcPtr[greenOffset] - destPtr[1]) * srcPtr[alphaOffset] / 255;
-			    destPtr[2] += (srcPtr[blueOffset] - destPtr[2]) * srcPtr[alphaOffset] / 255;
-			    destPtr[3] += (255 - destPtr[3]) * srcPtr[alphaOffset] / 255;
-		  	}
-			destPtr+=4;
-		      }
+			/*
+			 * Common case (solid pixels) first
+			 */
+			if (!alphaOffset || (srcPtr[alphaOffset] == 255)) {
+			    *destPtr++ = srcPtr[0];
+			    *destPtr++ = srcPtr[greenOffset];
+			    *destPtr++ = srcPtr[blueOffset];
+			    *destPtr++ = 255;
+			    continue;
+ 			}
+
+			switch (compRule) {
+			case TK_PHOTO_COMPOSITE_SET:
+			    *destPtr++ = srcPtr[0];
+			    *destPtr++ = srcPtr[greenOffset];
+			    *destPtr++ = srcPtr[blueOffset];
+			    *destPtr++ = srcPtr[alphaOffset];
+			    break;
+			case TK_PHOTO_COMPOSITE_OVERLAY:
+			    if (!destPtr[3]) {
+				/*
+				 * There must be a better way to select a
+				 * background colour!
+				 */
+				destPtr[0] = destPtr[1] = destPtr[2] = 0xd9;
+			    }
+			    if (srcPtr[alphaOffset]) {
+				destPtr[0] += (srcPtr[0] - destPtr[0]) * srcPtr[alphaOffset] / 255;
+				destPtr[1] += (srcPtr[greenOffset] - destPtr[1]) * srcPtr[alphaOffset] / 255;
+				destPtr[2] += (srcPtr[blueOffset] - destPtr[2]) * srcPtr[alphaOffset] / 255;
+				destPtr[3] += (255 - destPtr[3]) * srcPtr[alphaOffset] / 255;
+			    }
+			    destPtr += 4;
+			    break;
+			default:
+			    panic("unknown compositing rule: %d", compRule);
+			}
 		    }
 		    srcPtr += blockXSkip;
 		}
@@ -4051,46 +4446,65 @@ Tk_PhotoPutZoomedBlock(handle, blockPtr, x, y, width, height, zoomX, zoomY,
     }
 
     /*
-     * Add this new block to the region that specifies which data is valid.
+     * Recompute the region of data for which we have valid pixels to plot.
      */
 
-  if (alphaOffset) {
-    int x1, y1, end;
+    if (alphaOffset) {
+	int x1, y1, end;
 
-    destLinePtr = masterPtr->pix24 + (y * masterPtr->width + x) * 4 + 3;
-    for (y1 = 0; y1 < height; y1++) {
-	x1 = 0;
-	destPtr = destLinePtr;
-	while (x1 < width) {
-	    /* search for first non-transparent pixel */
-	    while ((x1 < width) && !*destPtr) {
-		    x1++; destPtr += 4;
-	    }
-	    end = x1;
-	    /* search for first transparent pixel */
-	    while ((end < width) && *destPtr) {
-	        end++; destPtr += 4;
-	    }
-	    if (end > x1) {
-		rect.x = x + x1;
-		rect.y = y + y1;
-		rect.width = end - x1;
-		rect.height = 1;
-		TkUnionRectWithRegion(&rect, masterPtr->validRegion,
-			masterPtr->validRegion);
-	    }
-	    x1 = end;
+	if (compRule != TK_PHOTO_COMPOSITE_OVERLAY) {
+	    /*
+	     * Don't need this when using the OVERLAY compositing rule, which
+	     * always strictly increases the valid region.
+	     */
+	    TkRegion workRgn = TkCreateRegion();
+
+	    rect.x = x;
+	    rect.y = y;
+	    rect.width = width;
+	    rect.height = 1;
+	    TkUnionRectWithRegion(&rect, workRgn, workRgn);
+	    TkSubtractRegion(masterPtr->validRegion, workRgn,
+		    masterPtr->validRegion);
+	    TkDestroyRegion(workRgn);
 	}
-	destLinePtr += masterPtr->width * 4;
+
+	destLinePtr = masterPtr->pix32 + (y * masterPtr->width + x) * 4 + 3;
+	for (y1 = 0; y1 < height; y1++) {
+	    x1 = 0;
+	    destPtr = destLinePtr;
+	    while (x1 < width) {
+		/* search for first non-transparent pixel */
+		while ((x1 < width) && !*destPtr) {
+		    x1++;
+		    destPtr += 4;
+		}
+		end = x1;
+		/* search for first transparent pixel */
+		while ((end < width) && *destPtr) {
+		    end++;
+		    destPtr += 4;
+		}
+		if (end > x1) {
+		    rect.x = x + x1;
+		    rect.y = y + y1;
+		    rect.width = end - x1;
+		    rect.height = 1;
+		    TkUnionRectWithRegion(&rect, masterPtr->validRegion,
+			    masterPtr->validRegion);
+		}
+		x1 = end;
+	    }
+	    destLinePtr += masterPtr->width * 4;
+	}
+    } else {
+	rect.x = x;
+	rect.y = y;
+	rect.width = width;
+	rect.height = height;
+	TkUnionRectWithRegion(&rect, masterPtr->validRegion,
+		masterPtr->validRegion);
     }
-  } else {
-    rect.x = x;
-    rect.y = y;
-    rect.width = width;
-    rect.height = height;
-    TkUnionRectWithRegion(&rect, masterPtr->validRegion,
-	    masterPtr->validRegion);
-  }
 
     /*
      * Update each instance.
@@ -4274,7 +4688,7 @@ DitherInstance(instancePtr, xStart, yStart, width, height)
     firstBit = bigEndian? (1 << (imagePtr->bitmap_unit - 1)): 1;
 
     lineLength = masterPtr->width * 3;
-    srcLinePtr = masterPtr->pix24 + (yStart * masterPtr->width + xStart) * 4;
+    srcLinePtr = masterPtr->pix32 + (yStart * masterPtr->width + xStart) * 4;
     errLinePtr = instancePtr->error + yStart * lineLength + xStart * 3;
     xEnd = xStart + width;
 
@@ -4566,11 +4980,11 @@ Tk_PhotoBlank(handle)
     masterPtr->validRegion = TkCreateRegion();
 
     /*
-     * Clear out the 24-bit pixel storage array.
+     * Clear out the 32-bit pixel storage array.
      * Clear out the dithering error arrays for each instance.
      */
 
-    memset((VOID *) masterPtr->pix24, 0,
+    memset((VOID *) masterPtr->pix32, 0,
 	    (size_t) (masterPtr->width * masterPtr->height * 4));
     for (instancePtr = masterPtr->instancePtr; instancePtr != NULL;
 	    instancePtr = instancePtr->nextPtr) {
@@ -4626,8 +5040,10 @@ Tk_PhotoExpand(handle, width, height)
 	height = masterPtr->height;
     }
     if ((width != masterPtr->width) || (height != masterPtr->height)) {
-	ImgPhotoSetSize(masterPtr, MAX(width, masterPtr->width),
-		MAX(height, masterPtr->height));
+	if (ImgPhotoSetSize(masterPtr, MAX(width, masterPtr->width),
+		MAX(height, masterPtr->height)) == TCL_ERROR) {
+	    panic(TK_PHOTO_ALLOC_FAILURE_MESSAGE);
+	}
 	Tk_ImageChanged(masterPtr->tkMaster, 0, 0, 0, 0, masterPtr->width,
 		masterPtr->height);
     }
@@ -4696,10 +5112,43 @@ Tk_PhotoSetSize(handle, width, height)
 
     masterPtr->userWidth = width;
     masterPtr->userHeight = height;
-    ImgPhotoSetSize(masterPtr, ((width > 0) ? width: masterPtr->width),
-	    ((height > 0) ? height: masterPtr->height));
+    if (ImgPhotoSetSize(masterPtr, ((width > 0) ? width: masterPtr->width),
+	    ((height > 0) ? height: masterPtr->height)) == TCL_ERROR) {
+	panic(TK_PHOTO_ALLOC_FAILURE_MESSAGE);
+    }
     Tk_ImageChanged(masterPtr->tkMaster, 0, 0, 0, 0,
 	    masterPtr->width, masterPtr->height);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkGetPhotoValidRegion --
+ *
+ *	This procedure is called to get the part of the photo where
+ *	there is valid data.  Or, conversely, the part of the photo
+ *	which is transparent.
+ *
+ * Results:
+ *	A TkRegion value that indicates the current area of the photo
+ *	that is valid.  This value should not be used after any
+ *	modification to the photo image.
+ *
+ * Side Effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+TkRegion
+TkPhotoGetValidRegion(handle)
+    Tk_PhotoHandle handle; /* Handle for the image whose valid region
+			    * is to obtained. */
+{
+    PhotoMaster *masterPtr;
+
+    masterPtr = (PhotoMaster *) handle;
+    return masterPtr->validRegion;
 }
 
 /*
@@ -4754,11 +5203,14 @@ ImgGetPhoto(masterPtr, blockPtr, optPtr)
 		+ blockPtr->pixelSize - 1;
 	for (x = 0; x < blockPtr->width; x++) {
 	    if (*pixelPtr != 255) {
-		alphaOffset = 3; break;
+		alphaOffset = 3;
+		break;
 	    }
 	    pixelPtr += blockPtr->pixelSize;
 	}
-	if (alphaOffset) break;
+	if (alphaOffset) {
+	    break;
+	}
     }
     if (!alphaOffset) {
 	blockPtr->pixelPtr--;
@@ -4960,7 +5412,7 @@ Tk_PhotoGetImage(handle, blockPtr)
     PhotoMaster *masterPtr;
 
     masterPtr = (PhotoMaster *) handle;
-    blockPtr->pixelPtr = masterPtr->pix24;
+    blockPtr->pixelPtr = masterPtr->pix32;
     blockPtr->width = masterPtr->width;
     blockPtr->height = masterPtr->height;
     blockPtr->pitch = masterPtr->width * 4;
@@ -5138,13 +5590,13 @@ Tk_CreatePhotoOption(interp, name, proc)
 static int
 ImgPhotoPostscript(clientData, interp, tkwin, psInfo,
         x, y, width, height, prepass)
-    ClientData clientData;
-    Tcl_Interp *interp;
-    Tk_Window tkwin;
-    Tk_PostscriptInfo psInfo; /* postscript info */
-    int x, y;   /* First pixel to output */
-    int width, height;  /* Width and height of area */
-    int prepass;
+     ClientData clientData;	/* Handle for the photo image */
+    Tcl_Interp *interp;		/* Interpreter */
+    Tk_Window tkwin;		/* (unused) */
+    Tk_PostscriptInfo psInfo;	/* postscript info */
+    int x, y;			/* First pixel to output */
+    int width, height;		/* Width and height of area */
+    int prepass;		/* (unused) */
 {
     Tk_PhotoImageBlock block;
 
@@ -5153,4 +5605,35 @@ ImgPhotoPostscript(clientData, interp, tkwin, psInfo,
 
     return Tk_PostscriptPhoto(interp, &block, psInfo, width, height);
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tk_PhotoPutBlock_NoComposite, Tk_PhotoPutZoomedBlock_NoComposite --
+ *
+ * These backward-compatability functions just exist to fill slots in
+ * stubs table.  For the behaviour of *_NoComposite, refer to the
+ * corresponding function without the extra suffix.
+ *
+ *----------------------------------------------------------------------
+ */
+void
+Tk_PhotoPutBlock_NoComposite(handle, blockPtr, x, y, width, height)
+     Tk_PhotoHandle handle;
+     Tk_PhotoImageBlock *blockPtr;
+     int x, y, width, height;
+{
+    Tk_PhotoPutBlock(handle, blockPtr, x, y, width, height,
+	    TK_PHOTO_COMPOSITE_OVERLAY);
+}
 
+void
+Tk_PhotoPutZoomedBlock_NoComposite(handle, blockPtr, x, y, width, height,
+				   zoomX, zoomY, subsampleX, subsampleY)
+     Tk_PhotoHandle handle;
+     Tk_PhotoImageBlock *blockPtr;
+     int x, y, width, height, zoomX, zoomY, subsampleX, subsampleY;
+{
+    Tk_PhotoPutZoomedBlock(handle, blockPtr, x, y, width, height,
+	    zoomX, zoomY, subsampleX, subsampleY, TK_PHOTO_COMPOSITE_OVERLAY);
+}

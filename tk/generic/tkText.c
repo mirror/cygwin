@@ -14,14 +14,15 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkText.c,v 1.8.6.2 2000/09/26 16:08:28 spolk Exp $
+ * RCS: @(#) $Id: tkText.c,v 1.32 2002/10/02 21:23:10 hobbs Exp $
  */
 
 #include "default.h"
 #include "tkPort.h"
 #include "tkInt.h"
+#include "tkUndo.h"
 
-#ifdef MAC_TCL
+#if defined(MAC_TCL) || defined(MAC_OSX_TK)
 #define Style TkStyle
 #define DInfo TkDInfo
 #endif
@@ -42,6 +43,9 @@ static Tk_CustomOption stateOption = {
  */
 
 static Tk_ConfigSpec configSpecs[] = {
+    {TK_CONFIG_BOOLEAN, "-autoseparators", "autoSeparators",
+        "AutoSeparators", DEF_TEXT_AUTO_SEPARATORS,
+        Tk_Offset(TkText, autoSeparators), 0},
     {TK_CONFIG_BORDER, "-background", "background", "Background",
 	DEF_TEXT_BG_COLOR, Tk_Offset(TkText, border), TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_BORDER, "-background", "background", "Background",
@@ -87,6 +91,8 @@ static Tk_ConfigSpec configSpecs[] = {
 	DEF_TEXT_INSERT_ON_TIME, Tk_Offset(TkText, insertOnTime), 0},
     {TK_CONFIG_PIXELS, "-insertwidth", "insertWidth", "InsertWidth",
 	DEF_TEXT_INSERT_WIDTH, Tk_Offset(TkText, insertWidth), 0},
+    {TK_CONFIG_INT, "-maxundo", "maxUndo", "MaxUndo",
+	DEF_TEXT_MAX_UNDO, Tk_Offset(TkText, maxUndo), 0},
     {TK_CONFIG_PIXELS, "-padx", "padX", "Pad",
 	DEF_TEXT_PADX, Tk_Offset(TkText, padX), 0},
     {TK_CONFIG_PIXELS, "-pady", "padY", "Pad",
@@ -129,6 +135,8 @@ static Tk_ConfigSpec configSpecs[] = {
     {TK_CONFIG_STRING, "-takefocus", "takeFocus", "TakeFocus",
 	DEF_TEXT_TAKE_FOCUS, Tk_Offset(TkText, takeFocus),
 	TK_CONFIG_NULL_OK},
+    {TK_CONFIG_BOOLEAN, "-undo", "undo", "Undo",
+        DEF_TEXT_UNDO, Tk_Offset(TkText, undo), 0},
     {TK_CONFIG_INT, "-width", "width", "Width",
 	DEF_TEXT_WIDTH, Tk_Offset(TkText, width), 0},
     {TK_CONFIG_CUSTOM, "-wrap", "wrap", "Wrap",
@@ -139,10 +147,6 @@ static Tk_ConfigSpec configSpecs[] = {
     {TK_CONFIG_STRING, "-yscrollcommand", "yScrollCommand", "ScrollCommand",
 	DEF_TEXT_YSCROLL_COMMAND, Tk_Offset(TkText, yScrollCmd),
 	TK_CONFIG_NULL_OK},
-    /* Red Hat Local */
-    {TK_CONFIG_INT, "-tabsize", "tabSize", "TabSize",
-	DEF_TEXT_TAB_SIZE, Tk_Offset(TkText, tabsize), 0},
-    /* End Red Hat Local */
     {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
 	(char *) NULL, 0, 0}
 };
@@ -159,8 +163,8 @@ int tkTextDebug = 0;
  */
 
 static int		WrapModeParseProc _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, Tk_Window tkwin, char *value,
-			    char *widgRec, int offset));
+			    Tcl_Interp *interp, Tk_Window tkwin,
+			    CONST char *value, char *widgRec, int offset));
 static char *		WrapModePrintProc _ANSI_ARGS_((ClientData clientData,
 			    Tk_Window tkwin, char *widgRec, int offset,
 			    Tcl_FreeProc **freeProcPtr));
@@ -194,7 +198,7 @@ WrapModeParseProc(clientData, interp, tkwin, value, widgRec, offset)
     ClientData clientData;		/* some flags.*/
     Tcl_Interp *interp;			/* Used for reporting errors. */
     Tk_Window tkwin;			/* Window containing canvas widget. */
-    char *value;			/* Value of option (list of tag
+    CONST char *value;			/* Value of option (list of tag
 					 * names). */
     char *widgRec;			/* Pointer to record for item. */
     int offset;				/* Offset into item. */
@@ -281,12 +285,14 @@ WrapModePrintProc(clientData, tkwin, widgRec, offset, freeProcPtr)
  */
 
 static int		ConfigureText _ANSI_ARGS_((Tcl_Interp *interp,
-			    TkText *textPtr, int argc, char **argv, int flags));
+			    TkText *textPtr, int argc, CONST char **argv,
+			    int flags));
 static int		DeleteChars _ANSI_ARGS_((TkText *textPtr,
-			    char *index1String, char *index2String));
+			    CONST char *index1String, CONST char *index2String,
+			    TkTextIndex *indexPtr1, TkTextIndex *indexPtr2));
 static void		DestroyText _ANSI_ARGS_((char *memPtr));
 static void		InsertChars _ANSI_ARGS_((TkText *textPtr,
-			    TkTextIndex *indexPtr, char *string));
+			    TkTextIndex *indexPtr, CONST char *string));
 static void		TextBlinkProc _ANSI_ARGS_((ClientData clientData));
 static void		TextCmdDeletedProc _ANSI_ARGS_((
 			    ClientData clientData));
@@ -294,30 +300,39 @@ static void		TextEventProc _ANSI_ARGS_((ClientData clientData,
 			    XEvent *eventPtr));
 static int		TextFetchSelection _ANSI_ARGS_((ClientData clientData,
 			    int offset, char *buffer, int maxBytes));
+static int		TextIndexSortProc _ANSI_ARGS_((CONST VOID *first,
+			    CONST VOID *second));
 static int		TextSearchCmd _ANSI_ARGS_((TkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv));
+			    Tcl_Interp *interp, int argc, CONST char **argv));
+static int		TextEditCmd _ANSI_ARGS_((TkText *textPtr,
+			    Tcl_Interp *interp, int argc, CONST char **argv));
 static int		TextWidgetCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, int argc, char **argv));
+			    Tcl_Interp *interp, int argc, CONST char **argv));
 static void		TextWorldChanged _ANSI_ARGS_((
 			    ClientData instanceData));
 static int		TextDumpCmd _ANSI_ARGS_((TkText *textPtr,
-			    Tcl_Interp *interp, int argc, char **argv));
+			    Tcl_Interp *interp, int argc, CONST char **argv));
 static void		DumpLine _ANSI_ARGS_((Tcl_Interp *interp, 
 			    TkText *textPtr, int what, TkTextLine *linePtr,
-			    int start, int end, int lineno, char *command));
+			    int start, int end, int lineno,
+			    CONST char *command));
 static int		DumpSegment _ANSI_ARGS_((Tcl_Interp *interp, char *key,
-			    char *value, char * command, TkTextIndex *index,
-			    int what));
+			    char *value, CONST char * command,
+			    TkTextIndex *index, int what));
+static int		TextEditUndo _ANSI_ARGS_((TkText *textPtr));
+static int		TextEditRedo _ANSI_ARGS_((TkText *textPtr));
+static void		TextGetText _ANSI_ARGS_((TkTextIndex * index1,
+			    TkTextIndex * index2, Tcl_DString *dsPtr));
+static void		updateDirtyFlag _ANSI_ARGS_((TkText *textPtr));
 
 /*
  * The structure below defines text class behavior by means of procedures
  * that can be invoked from generic window code.
  */
 
-static TkClassProcs textClass = {
-    NULL,			/* createProc. */
-    TextWorldChanged,		/* geometryProc. */
-    NULL			/* modalProc. */
+static Tk_ClassProcs textClass = {
+    sizeof(Tk_ClassProcs),	/* size */
+    TextWorldChanged,		/* worldChangedProc */
 };
 
 
@@ -344,7 +359,7 @@ Tk_TextCmd(clientData, interp, argc, argv)
 				 * interpreter. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    CONST char **argv;		/* Argument strings. */
 {
     Tk_Window tkwin = (Tk_Window) clientData;
     Tk_Window new;
@@ -366,7 +381,14 @@ Tk_TextCmd(clientData, interp, argc, argv)
 	return TCL_ERROR;
     }
 
+    /*
+     * Create the text widget and initialize everything to zero,
+     * then set the necessary initial (non-NULL) values.
+     */
+
     textPtr = (TkText *) ckalloc(sizeof(TkText));
+    memset((VOID *) textPtr, 0, sizeof(TkText));
+
     textPtr->tkwin = new;
     textPtr->display = Tk_Display(new);
     textPtr->interp = interp;
@@ -375,65 +397,26 @@ Tk_TextCmd(clientData, interp, argc, argv)
 	    (ClientData) textPtr, TextCmdDeletedProc);
     textPtr->tree = TkBTreeCreate(textPtr);
     Tcl_InitHashTable(&textPtr->tagTable, TCL_STRING_KEYS);
-    textPtr->numTags = 0;
     Tcl_InitHashTable(&textPtr->markTable, TCL_STRING_KEYS);
     Tcl_InitHashTable(&textPtr->windowTable, TCL_STRING_KEYS);
     Tcl_InitHashTable(&textPtr->imageTable, TCL_STRING_KEYS);
     textPtr->state = TK_STATE_NORMAL;
-    textPtr->border = NULL;
-    textPtr->borderWidth = 0;
-    textPtr->padX = 0;
-    textPtr->padY = 0;
     textPtr->relief = TK_RELIEF_FLAT;
-    textPtr->highlightWidth = 0;
-    textPtr->highlightBgColorPtr = NULL;
-    textPtr->highlightColorPtr = NULL;
     textPtr->cursor = None;
-    textPtr->fgColor = NULL;
-    textPtr->tkfont = NULL;
     textPtr->charWidth = 1;
-    textPtr->spacing1 = 0;
-    textPtr->spacing2 = 0;
-    textPtr->spacing3 = 0;
-    textPtr->tabOptionString = NULL;
-    textPtr->tabsize = 8;
-    textPtr->tabArrayPtr = NULL;
     textPtr->wrapMode = TEXT_WRAPMODE_CHAR;
-    textPtr->width = 0;
-    textPtr->height = 0;
-    textPtr->setGrid = 0;
     textPtr->prevWidth = Tk_Width(new);
     textPtr->prevHeight = Tk_Height(new);
     TkTextCreateDInfo(textPtr);
     TkTextMakeByteIndex(textPtr->tree, 0, 0, &startIndex);
     TkTextSetYView(textPtr, &startIndex, 0);
-    textPtr->selTagPtr = NULL;
-    textPtr->selBorder = NULL;
-    textPtr->selBdString = NULL;
-    textPtr->selFgColorPtr = NULL;
     textPtr->exportSelection = 1;
-    textPtr->abortSelections = 0;
-    textPtr->insertMarkPtr = NULL;
-    textPtr->insertBorder = NULL;
-    textPtr->insertWidth = 0;
-    textPtr->insertBorderWidth = 0;
-    textPtr->insertOnTime = 0;
-    textPtr->insertOffTime = 0;
-    textPtr->insertBlinkHandler = (Tcl_TimerToken) NULL;
-    textPtr->bindingTable = NULL;
-    textPtr->currentMarkPtr = NULL;
     textPtr->pickEvent.type = LeaveNotify;
-    textPtr->pickEvent.xcrossing.x = 0;
-    textPtr->pickEvent.xcrossing.y = 0;
-    textPtr->numCurTags = 0;
-    textPtr->curTagArrayPtr = NULL;
-    textPtr->takeFocus = NULL;
-    textPtr->xScrollCmd = NULL;
-    textPtr->yScrollCmd = NULL;
-    
-    /*
-     * KHAMIS */
-    textPtr->flags = 0;
+    textPtr->undoStack = TkUndoInitStack(interp,0);
+    textPtr->undo = 1;
+    textPtr->isDirtyIncrement = 1;
+    textPtr->autoSeparators = 1;
+    textPtr->lastEditMode = TK_TEXT_EDIT_OTHER;
 
     /*
      * Create the "sel" tag and the "current" and "insert" marks.
@@ -448,7 +431,7 @@ Tk_TextCmd(clientData, interp, argc, argv)
     textPtr->insertMarkPtr = TkTextSetMark(textPtr, "insert", &startIndex);
 
     Tk_SetClass(textPtr->tkwin, "Text");
-    TkSetClassProcs(textPtr->tkwin, &textClass, (ClientData) textPtr);
+    Tk_SetClassProcs(textPtr->tkwin, &textClass, (ClientData) textPtr);
     Tk_CreateEventHandler(textPtr->tkwin,
 	    ExposureMask|StructureNotifyMask|FocusChangeMask,
 	    TextEventProc, (ClientData) textPtr);
@@ -466,47 +449,35 @@ Tk_TextCmd(clientData, interp, argc, argv)
 
     return TCL_OK;
 }
-
-static void
-ViewArgs (reason, argc, argv, mode)
-     char *reason;
-     int argc;
-     char *argv[];
-     int mode;
-{
-    int i;
-    if (reason)
-    {
-	fprintf (stderr, "%s\nused arguments:\n", reason);
-    }
-    for (i=0; i<argc; i++)
-    {
-	if (mode)
-	{
-	    fprintf (stderr, "%s ", argv[i]);
-	}
-	else
-	{
-	    fprintf (stderr, "argv[%i] = [%s]\n", i, argv[i]);
-	}
-    }
-    if (mode && mode != 2)
-    {
-	fprintf (stderr, "\n");
-    }
-}
+
+/*
+ *--------------------------------------------------------------
+ *
+ * TextWidgetCmd --
+ *
+ *	This procedure is invoked to process the Tcl command
+ *	that corresponds to a text widget.  See the user
+ *	documentation for details on what it does.
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side effects:
+ *	See the user documentation.
+ *
+ *--------------------------------------------------------------
+ */
 
 static int
 TextWidgetCmd(clientData, interp, argc, argv)
     ClientData clientData;	/* Information about text widget. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    CONST char **argv;		/* Argument strings. */
 {
     register TkText *textPtr = (TkText *) clientData;
-    int result = TCL_OK;
+    int c, result = TCL_OK;
     size_t length;
-    int c;
     TkTextIndex index1, index2;
 
     if (argc < 2) {
@@ -550,7 +521,7 @@ TextWidgetCmd(clientData, interp, argc, argv)
     } else if ((c == 'c') && (strncmp(argv[1], "compare", length) == 0)
 	    && (length >= 3)) {
 	int relation, value;
-	char *p;
+	CONST char *p;
 
 	if (argc != 5) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -624,18 +595,114 @@ TextWidgetCmd(clientData, interp, argc, argv)
 	}
     } else if ((c == 'd') && (strncmp(argv[1], "delete", length) == 0)
 	    && (length >= 3)) {
-	    
-/*ViewArgs ("editor", argc, argv, 0);*/
-	    
-	if ((argc != 3) && (argc != 4)) {
+	int i;
+
+	if (argc < 3) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"",
-		    argv[0], " delete index1 ?index2?\"", (char *) NULL);
+		    argv[0], " delete index1 ?index2 ...?\"", (char *) NULL);
 	    result = TCL_ERROR;
 	    goto done;
 	}
 	if (textPtr->state == TK_STATE_NORMAL) {
-	    result = DeleteChars(textPtr, argv[2],
-		    (argc == 4) ? argv[3] : (char *) NULL);
+	    if (argc < 5) {
+		/*
+		 * Simple case requires no predetermination of indices.
+		 */
+		result = DeleteChars(textPtr, argv[2],
+			(argc == 4) ? argv[3] : NULL, NULL, NULL);
+	    } else {
+		/*
+		 * Multi-index pair case requires that we prevalidate the
+		 * indices and sort from last to first so that deletes
+		 * occur in the exact (unshifted) text.  It also needs to
+		 * handle partial and fully overlapping ranges.  We have to
+		 * do this with multiple passes.
+		 */
+		TkTextIndex *indices, *ixStart, *ixEnd, *lastStart, *lastEnd;
+		char *useIdx;
+
+		argc -= 2;
+		argv += 2;
+		indices = (TkTextIndex *)
+		    ckalloc((argc + 1) * sizeof(TkTextIndex));
+
+		/*
+		 * First pass verifies that all indices are valid.
+		 */
+		for (i = 0; i < argc; i++) {
+		    if (TkTextGetIndex(interp, textPtr, argv[i],
+			    &indices[i]) != TCL_OK) {
+			result = TCL_ERROR;
+			ckfree((char *) indices);
+			goto done;
+		    }
+		}
+		/*
+		 * Pad out the pairs evenly to make later code easier.
+		 */
+		if (argc & 1) {
+		    indices[i] = indices[i-1];
+		    TkTextIndexForwChars(&indices[i], 1, &indices[i]);
+		    argc++;
+		}
+		useIdx = (char *) ckalloc((unsigned) argc);
+		memset(useIdx, 0, (unsigned) argc);
+		/*
+		 * Do a decreasing order sort so that we delete the end
+		 * ranges first to maintain index consistency.
+		 */
+		qsort((VOID *) indices, (unsigned) (argc / 2),
+			2 * sizeof(TkTextIndex), TextIndexSortProc);
+		lastStart = lastEnd = NULL;
+		/*
+		 * Second pass will handle bogus ranges (end < start) and
+		 * overlapping ranges.
+		 */
+		for (i = 0; i < argc; i += 2) {
+		    ixStart = &indices[i];
+		    ixEnd   = &indices[i+1];
+		    if (TkTextIndexCmp(ixEnd, ixStart) <= 0) {
+			continue;
+		    }
+		    if (lastStart) {
+			if (TkTextIndexCmp(ixStart, lastStart) == 0) {
+			    /*
+			     * Start indices were equal, and the sort placed
+			     * the longest range first, so skip this one.
+			     */
+			    continue;
+			} else if (TkTextIndexCmp(lastStart, ixEnd) < 0) {
+			    /*
+			     * The next pair has a start range before the end
+			     * point of the last range.  Constrain the delete
+			     * range, but use the pointer values.
+			     */
+			    *ixEnd = *lastStart;
+			    if (TkTextIndexCmp(ixEnd, ixStart) <= 0) {
+				continue;
+			    }
+			}
+		    }
+		    lastStart = ixStart;
+		    lastEnd   = ixEnd;
+		    useIdx[i]   = 1;
+		}
+		/*
+		 * Final pass take the input from the previous and deletes
+		 * the ranges which are flagged to be deleted.
+		 */
+		for (i = 0; i < argc; i += 2) {
+		    if (useIdx[i]) {
+			/*
+			 * We don't need to check the return value because all
+			 * indices are preparsed above.
+			 */
+			DeleteChars(textPtr, NULL, NULL,
+				&indices[i], &indices[i+1]);
+		    }
+		}
+		ckfree((char *) indices);
+	    }
 	}
     } else if ((c == 'd') && (strncmp(argv[1], "dlineinfo", length) == 0)
 	    && (length >= 2)) {
@@ -658,53 +725,64 @@ TextWidgetCmd(clientData, interp, argc, argv)
 	    sprintf(buf, "%d %d %d %d %d", x, y, width, height, base);
 	    Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	}
+    } else if ((c == 'e') && (strncmp(argv[1], "edit", length) == 0)) {
+        result = TextEditCmd(textPtr, interp, argc, argv);
     } else if ((c == 'g') && (strncmp(argv[1], "get", length) == 0)) {
-	if ((argc != 3) && (argc != 4)) {
+	Tcl_Obj *objPtr = NULL;
+	Tcl_DString ds;
+	int i, found = 0;
+
+	if (argc < 3) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"",
-		    argv[0], " get index1 ?index2?\"", (char *) NULL);
+		    argv[0], " get index1 ?index2 ...?\"", (char *) NULL);
 	    result = TCL_ERROR;
 	    goto done;
 	}
-	if (TkTextGetIndex(interp, textPtr, argv[2], &index1) != TCL_OK) {
-	    result = TCL_ERROR;
-	    goto done;
-	}
-	if (argc == 3) {
-	    index2 = index1;
-	    TkTextIndexForwChars(&index2, 1, &index2);
-	} else if (TkTextGetIndex(interp, textPtr, argv[3], &index2)
-		!= TCL_OK) {
-	    result = TCL_ERROR;
-	    goto done;
-	}
-	if (TkTextIndexCmp(&index1, &index2) >= 0) {
-	    goto done;
-	}
-	while (1) {
-	    int offset, last, savedChar;
-	    TkTextSegment *segPtr;
-
-	    segPtr = TkTextIndexToSeg(&index1, &offset);
-	    last = segPtr->size;
-	    if (index1.linePtr == index2.linePtr) {
-		int last2;
-
-		if (index2.byteIndex == index1.byteIndex) {
-		    break;
-		}
-		last2 = index2.byteIndex - index1.byteIndex + offset;
-		if (last2 < last) {
-		    last = last2;
-		}
+	for (i = 2; i < argc; i += 2) {
+	    if (TkTextGetIndex(interp, textPtr, argv[i], &index1) != TCL_OK) {
+		result = TCL_ERROR;
+		goto done;
 	    }
-	    if (segPtr->typePtr == &tkTextCharType) {
-		savedChar = segPtr->body.chars[last];
-		segPtr->body.chars[last] = 0;
-		Tcl_AppendResult(interp, segPtr->body.chars + offset,
-			(char *) NULL);
-		segPtr->body.chars[last] = savedChar;
+	    if (i+1 == argc) {
+		index2 = index1;
+		TkTextIndexForwChars(&index2, 1, &index2);
+	    } else if (TkTextGetIndex(interp, textPtr, argv[i+1], &index2)
+		    != TCL_OK) {
+		if (objPtr) {
+		    Tcl_DecrRefCount(objPtr);
+		}
+		result = TCL_ERROR;
+		goto done;
 	    }
-	    TkTextIndexForwBytes(&index1, last-offset, &index1);
+	    if (TkTextIndexCmp(&index1, &index2) < 0) {
+		/* 
+		 * Place the text in a DString and move it to the result.
+		 * Since this could in principle be a megabyte or more, we
+		 * want to do it efficiently!
+		 */
+		TextGetText(&index1, &index2, &ds);
+		found++;
+		if (found == 1) {
+		    Tcl_DStringResult(interp, &ds);
+		} else {
+		    if (found == 2) {
+			/*
+			 * Move the first item we put into the result into
+			 * the first element of the list object.
+			 */
+			objPtr = Tcl_NewObj();
+			Tcl_ListObjAppendElement(NULL, objPtr,
+				Tcl_GetObjResult(interp));
+		    }
+		    Tcl_ListObjAppendElement(NULL, objPtr,
+			    Tcl_NewStringObj(Tcl_DStringValue(&ds),
+				    Tcl_DStringLength(&ds)));
+		}
+		Tcl_DStringFree(&ds);
+	    }
+	}
+	if (found > 1) {
+	    Tcl_SetObjResult(interp, objPtr);
 	}
     } else if ((c == 'i') && (strncmp(argv[1], "index", length) == 0)
 	    && (length >= 3)) {
@@ -726,10 +804,8 @@ TextWidgetCmd(clientData, interp, argc, argv)
     } else if ((c == 'i') && (strncmp(argv[1], "insert", length) == 0)
 	    && (length >= 3)) {
 	int i, j, numTags;
-	char **tagNames;
+	CONST char **tagNames;
 	TkTextTag **oldTagArrayPtr;
-
-/*ViewArgs ("editor", argc, argv, 0);*/
 
 	if (argc < 4) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -795,8 +871,8 @@ TextWidgetCmd(clientData, interp, argc, argv)
     } else {
 	Tcl_AppendResult(interp, "bad option \"", argv[1],
 		"\": must be bbox, cget, compare, configure, debug, delete, ",
-		"dlineinfo, dump, get, image, index, insert, mark, scan, ",
-		"search, see, tag, window, xview, or yview",
+                "dlineinfo, dump, edit, get, image, index, insert, mark, ",
+                "scan, search, see, tag, window, xview, or yview",
 		(char *) NULL);
 	result = TCL_ERROR;
     }
@@ -804,6 +880,49 @@ TextWidgetCmd(clientData, interp, argc, argv)
     done:
     Tcl_Release((ClientData) textPtr);
     return result;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TextIndexSortProc --
+ *
+ *	This procedure is called by qsort when sorting an array of
+ *	indices in *decreasing* order (last to first).
+ *
+ * Results:
+ *	The return value is -1 if the first argument should be before
+ *	the second element, 0 if it's equivalent, and 1 if it should be
+ *	after the second element.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+TextIndexSortProc(first, second)
+    CONST VOID *first, *second;		/* Elements to be compared. */
+{
+    TkTextIndex *pair1 = (TkTextIndex *) first;
+    TkTextIndex *pair2 = (TkTextIndex *) second;
+    int cmp = TkTextIndexCmp(&pair1[1], &pair2[1]);
+
+    if (cmp == 0) {
+	/*
+	 * If the first indices were equal, we want the second index of the
+	 * pair also to be the greater.  Use pointer magic to access the
+	 * second index pair.
+	 */
+	cmp = TkTextIndexCmp(&pair1[0], &pair2[0]);
+    }
+    if (cmp > 0) {
+	return -1;
+    } else if (cmp < 0) {
+	return 1;
+    }
+    return 0;
 }
 
 /*
@@ -863,6 +982,7 @@ DestroyText(memPtr)
     if (textPtr->bindingTable != NULL) {
 	Tk_DeleteBindingTable(textPtr->bindingTable);
     }
+    TkUndoFreeStack(textPtr->undoStack);
 
     /*
      * NOTE: do NOT free up selBorder, selBdString, or selFgColorPtr:
@@ -904,7 +1024,7 @@ ConfigureText(interp, textPtr, argc, argv, flags)
     register TkText *textPtr;	/* Information about widget;  may or may
 				 * not already have values for some fields. */
     int argc;			/* Number of valid entries in argv. */
-    char **argv;		/* Arguments. */
+    CONST char **argv;		/* Arguments. */
     int flags;			/* Flags to pass to Tk_ConfigureWidget. */
 {
     int oldExport = textPtr->exportSelection;
@@ -913,6 +1033,8 @@ ConfigureText(interp, textPtr, argc, argv, flags)
 	    argc, argv, (char *) textPtr, flags) != TCL_OK) {
 	return TCL_ERROR;
     }
+
+    TkUndoSetDepth(textPtr->undoStack, textPtr->maxUndo);
 
     /*
      * A few other options also need special processing, such as parsing
@@ -1019,6 +1141,16 @@ ConfigureText(interp, textPtr, argc, argv, flags)
 		    (ClientData) textPtr);
 	    textPtr->flags |= GOT_SELECTION;
 	}
+    }
+
+    /*
+     * Account for state changes that would reenable blinking cursor state.
+     */
+
+    if (textPtr->flags & GOT_FOCUS) {
+	Tcl_DeleteTimerHandler(textPtr->insertBlinkHandler);
+	textPtr->insertBlinkHandler = (Tcl_TimerToken) NULL;
+	TextBlinkProc((ClientData) textPtr);
     }
 
     /*
@@ -1228,11 +1360,12 @@ InsertChars(textPtr, indexPtr, string)
     TkText *textPtr;		/* Overall information about text widget. */
     TkTextIndex *indexPtr;	/* Where to insert new characters.  May be
 				 * modified and/or invalidated. */
-    char *string;		/* Null-terminated string containing new
+    CONST char *string;		/* Null-terminated string containing new
 				 * information to add to text. */
 {
     int lineIndex, resetView, offset;
     TkTextIndex newTop;
+    char indexBuffer[TK_POS_CHARS];
 
     /*
      * Don't allow insertions on the last (dummy) line of the text.
@@ -1261,6 +1394,68 @@ InsertChars(textPtr, indexPtr, string)
     }
     TkTextChanged(textPtr, indexPtr, indexPtr);
     TkBTreeInsertChars(indexPtr, string);
+
+    /*
+     * Push the insertion on the undo stack
+     */
+
+    if ( textPtr->undo ) {
+        TkTextIndex     toIndex;
+
+        Tcl_DString actionCommand;
+        Tcl_DString revertCommand;
+        
+        if (textPtr->autoSeparators &&
+            textPtr->lastEditMode != TK_TEXT_EDIT_INSERT) {
+            TkUndoInsertUndoSeparator(textPtr->undoStack);
+        }
+        
+        textPtr->lastEditMode = TK_TEXT_EDIT_INSERT;
+        
+        Tcl_DStringInit(&actionCommand);
+        Tcl_DStringInit(&revertCommand);
+        
+        Tcl_DStringAppend(&actionCommand,Tcl_GetCommandName(textPtr->interp,textPtr->widgetCmd),-1);
+        Tcl_DStringAppend(&actionCommand," insert ",-1);
+        TkTextPrintIndex(indexPtr,indexBuffer);
+        Tcl_DStringAppend(&actionCommand,indexBuffer,-1);
+        Tcl_DStringAppend(&actionCommand," ",-1);
+        Tcl_DStringAppendElement(&actionCommand,string);
+        Tcl_DStringAppend(&actionCommand,";",-1);
+        Tcl_DStringAppend(&actionCommand,Tcl_GetCommandName(textPtr->interp,textPtr->widgetCmd),-1);
+        Tcl_DStringAppend(&actionCommand," mark set insert ",-1);
+        TkTextIndexForwBytes(indexPtr, (int) strlen(string),
+			&toIndex);
+        TkTextPrintIndex(&toIndex, indexBuffer);
+        Tcl_DStringAppend(&actionCommand,indexBuffer,-1);
+        Tcl_DStringAppend(&actionCommand,"; ",-1);
+        Tcl_DStringAppend(&actionCommand,Tcl_GetCommandName(textPtr->interp,textPtr->widgetCmd),-1);
+        Tcl_DStringAppend(&actionCommand," see insert",-1);
+        
+        Tcl_DStringAppend(&revertCommand,Tcl_GetCommandName(textPtr->interp,textPtr->widgetCmd),-1);
+        Tcl_DStringAppend(&revertCommand," delete ",-1);
+        TkTextPrintIndex(indexPtr,indexBuffer);
+        Tcl_DStringAppend(&revertCommand,indexBuffer,-1);
+        Tcl_DStringAppend(&revertCommand," ",-1);
+        TkTextPrintIndex(&toIndex, indexBuffer);
+        Tcl_DStringAppend(&revertCommand,indexBuffer,-1);
+        Tcl_DStringAppend(&revertCommand," ;",-1);
+        Tcl_DStringAppend(&revertCommand,Tcl_GetCommandName(textPtr->interp,textPtr->widgetCmd),-1);
+        Tcl_DStringAppend(&revertCommand," mark set insert ",-1);
+        TkTextPrintIndex(indexPtr,indexBuffer);
+        Tcl_DStringAppend(&revertCommand,indexBuffer,-1);
+        Tcl_DStringAppend(&revertCommand,"; ",-1);
+        Tcl_DStringAppend(&revertCommand,Tcl_GetCommandName(textPtr->interp,textPtr->widgetCmd),-1);
+        Tcl_DStringAppend(&revertCommand," see insert",-1);
+        
+        TkUndoPushAction(textPtr->undoStack,&actionCommand, &revertCommand);
+
+     	Tcl_DStringFree(&actionCommand);
+     	Tcl_DStringFree(&revertCommand);
+
+    }
+    updateDirtyFlag(textPtr);
+
     if (resetView) {
 	TkTextMakeByteIndex(textPtr->tree, lineIndex, 0, &newTop);
 	TkTextIndexForwBytes(&newTop, offset, &newTop);
@@ -1293,34 +1488,51 @@ InsertChars(textPtr, indexPtr, string)
  */
 
 static int
-DeleteChars(textPtr, index1String, index2String)
+DeleteChars(textPtr, index1String, index2String, indexPtr1, indexPtr2)
     TkText *textPtr;		/* Overall information about text widget. */
-    char *index1String;		/* String describing location of first
+    CONST char *index1String;	/* String describing location of first
 				 * character to delete. */
-    char *index2String;		/* String describing location of last
+    CONST char *index2String;	/* String describing location of last
 				 * character to delete.  NULL means just
 				 * delete the one character given by
 				 * index1String. */
+    TkTextIndex *indexPtr1;	/* index describing location of first
+				 * character to delete. */
+    TkTextIndex *indexPtr2;	/* index describing location of last
+				 * character to delete.  NULL means just
+				 * delete the one character given by
+				 * indexPtr1. */
 {
     int line1, line2, line, byteIndex, resetView;
     TkTextIndex index1, index2;
+    char indexBuffer[TK_POS_CHARS];
 
     /*
      * Parse the starting and stopping indices.
      */
 
-    if (TkTextGetIndex(textPtr->interp, textPtr, index1String, &index1)
-	    != TCL_OK) {
-	return TCL_ERROR;
-    }
-    if (index2String != NULL) {
-	if (TkTextGetIndex(textPtr->interp, textPtr, index2String, &index2)
+    if (index1String != NULL) {
+	if (TkTextGetIndex(textPtr->interp, textPtr, index1String, &index1)
 		!= TCL_OK) {
 	    return TCL_ERROR;
 	}
+	if (index2String != NULL) {
+	    if (TkTextGetIndex(textPtr->interp, textPtr, index2String, &index2)
+		    != TCL_OK) {
+		return TCL_ERROR;
+	    }
+	} else {
+	    index2 = index1;
+	    TkTextIndexForwChars(&index2, 1, &index2);
+	}
     } else {
-	index2 = index1;
-	TkTextIndexForwChars(&index2, 1, &index2);
+	index1 = *indexPtr1;
+	if (indexPtr2 != NULL) {
+	    index2 = *indexPtr2;
+	} else {
+	    index2 = index1;
+	    TkTextIndexForwChars(&index2, 1, &index2);
+	}
     }
 
     /*
@@ -1415,6 +1627,68 @@ DeleteChars(textPtr, index1String, index2String)
 	    byteIndex -= (index2.byteIndex - index1.byteIndex);
 	}
     }
+
+    /*
+     * Push the deletion on the undo stack
+     */
+
+    if (textPtr->undo) {
+	Tcl_DString ds;
+        Tcl_DString actionCommand;
+        Tcl_DString revertCommand;
+    
+	if (textPtr->autoSeparators
+		&& (textPtr->lastEditMode != TK_TEXT_EDIT_DELETE)) {
+	   TkUndoInsertUndoSeparator(textPtr->undoStack);
+	}
+
+	textPtr->lastEditMode = TK_TEXT_EDIT_DELETE;
+
+        Tcl_DStringInit(&actionCommand);
+        Tcl_DStringInit(&revertCommand);
+
+        Tcl_DStringAppend(&actionCommand,Tcl_GetCommandName(textPtr->interp,textPtr->widgetCmd),-1);
+        Tcl_DStringAppend(&actionCommand," delete ",-1);
+        TkTextPrintIndex(&index1,indexBuffer);
+        Tcl_DStringAppend(&actionCommand,indexBuffer,-1);
+        Tcl_DStringAppend(&actionCommand," ",-1);
+        TkTextPrintIndex(&index2, indexBuffer);
+        Tcl_DStringAppend(&actionCommand,indexBuffer,-1);
+        Tcl_DStringAppend(&actionCommand,"; ",-1);
+        Tcl_DStringAppend(&actionCommand,Tcl_GetCommandName(textPtr->interp,textPtr->widgetCmd),-1);
+        Tcl_DStringAppend(&actionCommand," mark set insert ",-1);
+        TkTextPrintIndex(&index1,indexBuffer);
+        Tcl_DStringAppend(&actionCommand,indexBuffer,-1);
+
+        Tcl_DStringAppend(&actionCommand,"; ",-1);
+        Tcl_DStringAppend(&actionCommand,Tcl_GetCommandName(textPtr->interp,textPtr->widgetCmd),-1);
+        Tcl_DStringAppend(&actionCommand," see insert",-1);
+
+	TextGetText(&index1, &index2, &ds);
+
+        Tcl_DStringAppend(&revertCommand,Tcl_GetCommandName(textPtr->interp,textPtr->widgetCmd),-1);
+        Tcl_DStringAppend(&revertCommand," insert ",-1);
+        TkTextPrintIndex(&index1,indexBuffer);
+        Tcl_DStringAppend(&revertCommand,indexBuffer,-1);
+        Tcl_DStringAppend(&revertCommand," ",-1);
+        Tcl_DStringAppendElement(&revertCommand,Tcl_DStringValue(&ds));
+        Tcl_DStringAppend(&revertCommand,"; ",-1);
+        Tcl_DStringAppend(&revertCommand,Tcl_GetCommandName(textPtr->interp,textPtr->widgetCmd),-1);
+        Tcl_DStringAppend(&revertCommand," mark set insert ",-1);
+        TkTextPrintIndex(&index2, indexBuffer);
+        Tcl_DStringAppend(&revertCommand,indexBuffer,-1);
+        Tcl_DStringAppend(&revertCommand,"; ",-1);
+        Tcl_DStringAppend(&revertCommand,Tcl_GetCommandName(textPtr->interp,textPtr->widgetCmd),-1);
+        Tcl_DStringAppend(&revertCommand," see insert",-1);
+
+        TkUndoPushAction(textPtr->undoStack,&actionCommand, &revertCommand);
+
+        Tcl_DStringFree(&actionCommand);
+        Tcl_DStringFree(&revertCommand);
+
+    }
+    updateDirtyFlag(textPtr);
+
     TkBTreeDeleteChars(&index1, &index2);
     if (resetView) {
 	TkTextMakeByteIndex(textPtr->tree, line, byteIndex, &index1);
@@ -1594,6 +1868,7 @@ TkTextLostSelection(clientData)
     ClientData clientData;		/* Information about text widget. */
 {
     register TkText *textPtr = (TkText *) clientData;
+    XEvent event;
 #ifdef ALWAYS_SHOW_SELECTION
     TkTextIndex start, end;
 
@@ -1612,6 +1887,21 @@ TkTextLostSelection(clientData)
     TkTextRedrawTag(textPtr, &start, &end, textPtr->selTagPtr, 1);
     TkBTreeTag(&start, &end, textPtr->selTagPtr, 0);
 #endif
+
+    /*
+     * Send an event that the selection changed.  This is equivalent to
+     * "event generate $textWidget <<Selection>>"
+     */
+
+    memset((VOID *) &event, 0, sizeof(event));
+    event.xany.type = VirtualEvent;
+    event.xany.serial = NextRequest(Tk_Display(textPtr->tkwin));
+    event.xany.send_event = False;
+    event.xany.window = Tk_WindowId(textPtr->tkwin);
+    event.xany.display = Tk_Display(textPtr->tkwin);
+    ((XVirtualEvent *) &event)->name = Tk_GetUid("Selection");
+    Tk_HandleEvent(&event);
+
     textPtr->flags &= ~GOT_SELECTION;
 }
 
@@ -1655,9 +1945,10 @@ TextBlinkProc(clientData)
 		textPtr->insertOnTime, TextBlinkProc, (ClientData) textPtr);
     }
     TkTextMarkSegToIndex(textPtr, textPtr->insertMarkPtr, &index);
-    TkTextCharBbox(textPtr, &index, &x, &y, &w, &h);
-    TkTextRedrawRegion(textPtr, x - textPtr->insertWidth / 2, y,
-	    textPtr->insertWidth, h);
+    if (TkTextCharBbox(textPtr, &index, &x, &y, &w, &h) == 0) {
+	TkTextRedrawRegion(textPtr, x - textPtr->insertWidth / 2, y,
+		textPtr->insertWidth, h);
+    }
 }
 
 /*
@@ -1683,14 +1974,14 @@ TextSearchCmd(textPtr, interp, argc, argv)
     TkText *textPtr;		/* Information about text widget. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    CONST char **argv;		/* Argument strings. */
 {
     int backwards, exact, searchElide, c, i, argsLeft, noCase, leftToScan;
     size_t length;
     int numLines, startingLine, startingByte, lineNum, firstByte, lastByte;
     int code, matchLength, matchByte, passes, stopLine, searchWholeText;
     int patLength;
-    char *arg, *pattern, *varName, *p, *startOfLine;
+    CONST char *arg, *pattern, *varName, *p, *startOfLine;
     char buffer[20];
     TkTextIndex index, stopIndex;
     Tcl_DString line, patDString;
@@ -1776,8 +2067,8 @@ TextSearchCmd(textPtr, interp, argc, argv)
     if (noCase && exact) {
 	Tcl_DStringInit(&patDString);
 	Tcl_DStringAppend(&patDString, pattern, -1);
+	Tcl_UtfToLower(Tcl_DStringValue(&patDString));
 	pattern = Tcl_DStringValue(&patDString);
-	Tcl_UtfToLower(pattern);
     }
 
     Tcl_DStringInit(&line);
@@ -1937,7 +2228,7 @@ TextSearchCmd(textPtr, interp, argc, argv)
 		i = p - startOfLine;
 		thisLength = patLength;
 	    } else {
-		char *start, *end;
+		CONST char *start, *end;
 		int match;
 
 		match = Tcl_RegExpExec(interp, regexp,
@@ -2098,7 +2389,7 @@ TkTextGetTabs(interp, tkwin, string)
 					 * the text manual entry for details. */
 {
     int argc, i, count, c;
-    char **argv;
+    CONST char **argv;
     TkTextTabArray *tabArrayPtr;
     TkTextTab *tabPtr;
     Tcl_UniChar ch;
@@ -2202,7 +2493,7 @@ TextDumpCmd(textPtr, interp, argc, argv)
     register TkText *textPtr;	/* Information about text widget. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings.  Someone else has already
+    CONST char **argv;		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "dump". */
 {
@@ -2212,7 +2503,7 @@ TextDumpCmd(textPtr, interp, argc, argv)
     int what = 0;		/* bitfield to select segment types */
     int atEnd;			/* True if dumping up to logical end */
     TkTextLine *linePtr;
-    char *command = NULL;	/* Script callback to apply to segments */
+    CONST char *command = NULL;	/* Script callback to apply to segments */
 #define TK_DUMP_TEXT	0x1
 #define TK_DUMP_MARK	0x2
 #define TK_DUMP_TAG	0x4
@@ -2325,7 +2616,7 @@ DumpLine(interp, textPtr, what, linePtr, startByte, endByte, lineno, command)
     TkTextLine *linePtr;	/* The current line */
     int startByte, endByte;	/* Byte range to dump */
     int lineno;			/* Line number for indices dump */
-    char *command;		/* Script to apply to the segment */
+    CONST char *command;	/* Script to apply to the segment */
 {
     int offset;
     TkTextSegment *segPtr;
@@ -2344,9 +2635,9 @@ DumpLine(interp, textPtr, what, linePtr, startByte, endByte, lineno, command)
 	    offset += segPtr->size, segPtr = segPtr->nextPtr) {
 	if ((what & TK_DUMP_TEXT) && (segPtr->typePtr == &tkTextCharType) &&
 		(offset + segPtr->size > startByte)) {
-	    char savedChar;			/* Last char used in the seg */
-	    int last = segPtr->size;		/* Index of savedChar */
-	    int first = 0;			/* Index of first char in seg */
+	    char savedChar;		/* Last char used in the seg */
+	    int last = segPtr->size;	/* Index of savedChar */
+	    int first = 0;		/* Index of first char in seg */
 	    if (offset + segPtr->size > endByte) {
 		last = endByte - offset;
 	    }
@@ -2419,31 +2710,305 @@ DumpSegment(interp, key, value, command, index, what)
     Tcl_Interp *interp;
     char *key;			/* Segment type key */
     char *value;		/* Segment value */
-    char *command;		/* Script callback */
+    CONST char *command;	/* Script callback */
     TkTextIndex *index;         /* index with line/byte position info */
     int what;			/* Look for TK_DUMP_INDEX bit */
 {
     char buffer[TCL_INTEGER_SPACE*2];
     TkTextPrintIndex(index, buffer);
-    if (command == (char *) NULL) {
+    if (command == NULL) {
 	Tcl_AppendElement(interp, key);
 	Tcl_AppendElement(interp, value);
 	Tcl_AppendElement(interp, buffer);
 	return TCL_OK;
     } else {
-	char *argv[4];
+	CONST char *argv[4];
 	char *list;
 	int result;
 	argv[0] = key;
 	argv[1] = value;
 	argv[2] = buffer;
-	argv[3] = (char *) NULL;
+	argv[3] = NULL;
 	list = Tcl_Merge(3, argv);
 	result = Tcl_VarEval(interp, command, " ", list, (char *) NULL);
 	ckfree(list);
 	return result;
     }
 }
+
+/*
+ * TextEditUndo --
+ *    undo the last change.
+ *
+ * Results:
+ *    None
+ *
+ * Side effects:
+ *    None.
+ */
 
+static int
+TextEditUndo(textPtr)
+    TkText     * textPtr;          /* Overall information about text widget. */
+{
+    int status;
 
+    if (!textPtr->undo) {
+       return TCL_OK;
+    }
 
+    /* Turn off the undo feature */
+    textPtr->undo = 0;
+
+    /* The dirty counter should count downwards as we are undoing things */
+    textPtr->isDirtyIncrement = -1;
+
+    /* revert one compound action */
+    status = TkUndoRevert(textPtr->undoStack);
+
+    /* Restore the isdirty increment */
+    textPtr->isDirtyIncrement = 1;
+
+    /* Turn back on the undo feature */
+    textPtr->undo = 1;
+
+    return status;
+}
+
+/*
+ * TextEditRedo --
+ *    redo the last undone change.
+ *
+ * Results:
+ *    None
+ *
+ * Side effects:
+ *    None.
+ */
+
+static int
+TextEditRedo(textPtr)
+    TkText     * textPtr;       /* Overall information about text widget. */
+{
+    int status;
+
+    if (!textPtr->undo) {
+       return TCL_OK;
+    }
+
+    /* Turn off the undo feature temporarily */
+    textPtr->undo = 0;
+
+    /* reapply one compound action */
+    status = TkUndoApply(textPtr->undoStack);
+
+    /* Turn back on the undo feature */
+    textPtr->undo = 1;
+
+    return status;
+}
+
+/*
+ * TextEditCmd --
+ *
+ *    Handle the subcommands to "$text edit ...".
+ *    See documentation for details.
+ *
+ * Results:
+ *    None
+ *
+ * Side effects:
+ *    None.
+ */
+
+static int
+TextEditCmd(textPtr, interp, argc, argv)
+    TkText *textPtr;          /* Information about text widget. */
+    Tcl_Interp *interp;       /* Current interpreter. */
+    int argc;                 /* Number of arguments. */
+    CONST char **argv;        /* Argument strings. */
+{
+    int      c, setModified;
+    size_t   length;
+
+    if (argc < 3) {
+	Tcl_AppendResult(interp, "wrong # args: should be \"",
+		argv[0], " edit option ?arg arg ...?\"", (char *) NULL);
+	return TCL_ERROR;
+    }
+    c = argv[2][0];
+    length = strlen(argv[2]);
+    if ((c == 'm') && (strncmp(argv[2], "modified", length) == 0)) {
+	if (argc == 3) {
+	    Tcl_SetObjResult(interp, Tcl_NewBooleanObj(textPtr->isDirty));
+	} else if (argc != 4) {
+	    Tcl_AppendResult(interp, "wrong # args: should be \"",
+		    argv[0], " edit modified ?boolean?\"", (char *) NULL);
+	    return TCL_ERROR;
+	} else {
+	    XEvent event;
+	    if (Tcl_GetBoolean(interp, argv[3], &setModified) != TCL_OK) {
+		return TCL_ERROR;
+            }
+	    /*
+	     * Set or reset the dirty info and trigger a Modified event.
+	     */
+
+	    if (setModified) {
+		textPtr->isDirty     = 1;
+		textPtr->modifiedSet = 1;
+	    } else {
+		textPtr->isDirty     = 0;
+		textPtr->modifiedSet = 0;
+	    }
+
+	    /*
+	     * Send an event that the text was modified.  This is equivalent to
+	     * "event generate $textWidget <<Modified>>"
+	     */
+
+	    memset((VOID *) &event, 0, sizeof(event));
+	    event.xany.type = VirtualEvent;
+	    event.xany.serial = NextRequest(Tk_Display(textPtr->tkwin));
+	    event.xany.send_event = False;
+	    event.xany.window = Tk_WindowId(textPtr->tkwin);
+	    event.xany.display = Tk_Display(textPtr->tkwin);
+	    ((XVirtualEvent *) &event)->name = Tk_GetUid("Modified");
+	    Tk_HandleEvent(&event);
+        }
+    } else if ((c == 'r') && (strncmp(argv[2], "redo", length) == 0)
+	    && (length >= 3)) {
+	if (argc != 3) {
+	    Tcl_AppendResult(interp, "wrong # args: should be \"",
+		    argv[0], " edit redo\"", (char *) NULL);
+	    return TCL_ERROR;
+	}
+        if ( TextEditRedo(textPtr) ) {
+            Tcl_AppendResult(interp, "nothing to redo", (char *) NULL);
+	    return TCL_ERROR;
+        }
+    } else if ((c == 'r') && (strncmp(argv[2], "reset", length) == 0)
+	    && (length >= 3)) {
+	if (argc != 3) {
+	    Tcl_AppendResult(interp, "wrong # args: should be \"",
+		    argv[0], " edit reset\"", (char *) NULL);
+	    return TCL_ERROR;
+	}
+        TkUndoClearStacks(textPtr->undoStack);
+    } else if ((c == 's') && (strncmp(argv[2], "separator", length) == 0)) {
+	if (argc != 3) {
+	    Tcl_AppendResult(interp, "wrong # args: should be \"",
+		    argv[0], " edit separator\"", (char *) NULL);
+	    return TCL_ERROR;
+	}
+        TkUndoInsertUndoSeparator(textPtr->undoStack);
+    } else if ((c == 'u') && (strncmp(argv[2], "undo", length) == 0)) {
+	if (argc != 3) {
+	    Tcl_AppendResult(interp, "wrong # args: should be \"",
+		    argv[0], " edit undo\"", (char *) NULL);
+	    return TCL_ERROR;
+	}
+        if ( TextEditUndo(textPtr) ) {
+            Tcl_AppendResult(interp, "nothing to undo",
+		    (char *) NULL);
+	    return TCL_ERROR;
+        }
+    } else {
+	Tcl_AppendResult(interp, "bad edit option \"", argv[2],
+		"\": must be modified, redo, reset, separator or undo",
+		(char *) NULL);
+	return TCL_ERROR;
+    }
+    
+    return TCL_OK;
+}
+
+/*
+ * TextGetText --
+ *    Returns the text from indexPtr1 to indexPtr2, placing that text
+ *    in the Tcl_DString given.  That DString should be free or uninitialized.
+ *
+ * Results:
+ *    None.
+ *
+ * Side effects:
+ *    Memory will be allocated for the DString.  Remember to free it.
+ */
+
+static void 
+TextGetText(indexPtr1,indexPtr2, dsPtr)
+    TkTextIndex *indexPtr1;
+    TkTextIndex *indexPtr2;
+    Tcl_DString *dsPtr;
+{
+    TkTextIndex tmpIndex;
+    Tcl_DStringInit(dsPtr);
+    
+    TkTextMakeByteIndex(indexPtr1->tree, TkBTreeLineIndex(indexPtr1->linePtr),
+	    indexPtr1->byteIndex, &tmpIndex);
+
+    if (TkTextIndexCmp(indexPtr1, indexPtr2) < 0) {
+	while (1) {
+	    int offset, last;
+	    TkTextSegment *segPtr;
+
+	    segPtr = TkTextIndexToSeg(&tmpIndex, &offset);
+	    last = segPtr->size;
+	    if (tmpIndex.linePtr == indexPtr2->linePtr) {
+		int last2;
+
+		if (indexPtr2->byteIndex == tmpIndex.byteIndex) {
+		    break;
+		}
+		last2 = indexPtr2->byteIndex - tmpIndex.byteIndex + offset;
+		if (last2 < last) {
+		    last = last2;
+		}
+	    }
+	    if (segPtr->typePtr == &tkTextCharType) {
+		Tcl_DStringAppend(dsPtr, segPtr->body.chars + offset,
+			last - offset);
+	    }
+	    TkTextIndexForwBytes(&tmpIndex, last-offset, &tmpIndex);
+	}
+    }
+}
+
+/*
+ * updateDirtyFlag --
+ *    increases the dirtyness of the text widget
+ *
+ * Results:
+ *    None
+ *
+ * Side effects:
+ *    None.
+ */
+
+static void updateDirtyFlag (textPtr)
+    TkText *textPtr;          /* Information about text widget. */
+{
+    int oldDirtyFlag;
+
+    if (textPtr->modifiedSet) {
+        return;
+    }
+    oldDirtyFlag = textPtr->isDirty;
+    textPtr->isDirty += textPtr->isDirtyIncrement;
+    if (textPtr->isDirty == 0 || oldDirtyFlag == 0) {
+	XEvent event;
+	/*
+	 * Send an event that the text was modified.  This is equivalent to
+	 * "event generate $textWidget <<Modified>>"
+	 */
+
+	memset((VOID *) &event, 0, sizeof(event));
+	event.xany.type = VirtualEvent;
+	event.xany.serial = NextRequest(Tk_Display(textPtr->tkwin));
+	event.xany.send_event = False;
+	event.xany.window = Tk_WindowId(textPtr->tkwin);
+	event.xany.display = Tk_Display(textPtr->tkwin);
+	((XVirtualEvent *) &event)->name = Tk_GetUid("Modified");
+	Tk_HandleEvent(&event);
+    }
+}

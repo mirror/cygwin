@@ -1,3 +1,9 @@
+2004-08-05  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Remove sparclite subdirectory -- it is obsolete.
+	* configure.in, Makefile.def: Remove references thereto.
+	* configure, Makefile.in: Regenerate.
+
 2003-12-12  Michael Chastain  <mec.gnu@mindspring.com>
 
 	Fix for PR gdb/1480.

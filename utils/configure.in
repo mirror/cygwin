@@ -8,11 +8,6 @@ if test -d ${srcdir}/spu ; then
 fi
 
 case "${target}" in
-  sparclite-*-*)
-    if test -d ${srcdir}/sparclite ; then
-      configdirs="$configdirs sparclite"
-    fi
-    ;;
   *mips*-*-pe* | *sh*-*-pe* | *arm*-*-wince | *arm*-wince-pe* )
     if test -d ${srcdir}/wince ; then
       configdirs="$configdirs wince"

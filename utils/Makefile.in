@@ -59,8 +59,8 @@ mostlyclean: @mostlyclean_subdirs@
 clean: @clean_subdirs@
 
 # These should always clean all sudirectories...
-distclean: distclean-spu distclean-sparclite distclean-wince 
-maintainer-clean: maintainer-clean-spu maintainer-clean-sparclite maintainer-clean-wince 
+distclean: distclean-spu distclean-wince 
+maintainer-clean: maintainer-clean-spu maintainer-clean-wince 
 clean mostlyclean:
 	-rm -f *~ core *.o a.out 
 maintainer-clean distclean:
@@ -108,10 +108,6 @@ all-spu: configure-spu
 	cd spu && $(MAKE) $(FLAGS_TO_PASS) all
 .PHONY: all-spu
 
-all-sparclite: configure-sparclite
-	cd sparclite && $(MAKE) $(FLAGS_TO_PASS) all
-.PHONY: all-sparclite
-
 all-wince: configure-wince
 	cd wince && $(MAKE) $(FLAGS_TO_PASS) all
 .PHONY: all-wince
@@ -121,10 +117,6 @@ all-wince: configure-wince
 install-spu: configure-spu
 	cd spu && $(MAKE)  install
 .PHONY: install-spu
-
-install-sparclite: configure-sparclite
-	cd sparclite && $(MAKE)  install
-.PHONY: install-sparclite
 
 install-wince: configure-wince
 	cd wince && $(MAKE)  install
@@ -136,10 +128,6 @@ mostlyclean-spu: configure-spu
 	cd spu && $(MAKE)  mostlyclean
 .PHONY: mostlyclean-spu
 
-mostlyclean-sparclite: configure-sparclite
-	cd sparclite && $(MAKE)  mostlyclean
-.PHONY: mostlyclean-sparclite
-
 mostlyclean-wince: configure-wince
 	cd wince && $(MAKE)  mostlyclean
 .PHONY: mostlyclean-wince
@@ -149,10 +137,6 @@ mostlyclean-wince: configure-wince
 clean-spu: configure-spu
 	cd spu && $(MAKE)  clean
 .PHONY: clean-spu
-
-clean-sparclite: configure-sparclite
-	cd sparclite && $(MAKE)  clean
-.PHONY: clean-sparclite
 
 clean-wince: configure-wince
 	cd wince && $(MAKE)  clean
@@ -164,10 +148,6 @@ distclean-spu: configure-spu
 	-cd spu && $(MAKE)  distclean
 .PHONY: distclean-spu
 
-distclean-sparclite: configure-sparclite
-	-cd sparclite && $(MAKE)  distclean
-.PHONY: distclean-sparclite
-
 distclean-wince: configure-wince
 	-cd wince && $(MAKE)  distclean
 .PHONY: distclean-wince
@@ -177,10 +157,6 @@ distclean-wince: configure-wince
 maintainer-clean-spu: configure-spu
 	-cd spu && $(MAKE)  maintainer-clean
 .PHONY: maintainer-clean-spu
-
-maintainer-clean-sparclite: configure-sparclite
-	-cd sparclite && $(MAKE)  maintainer-clean
-.PHONY: maintainer-clean-sparclite
 
 maintainer-clean-wince: configure-wince
 	-cd wince && $(MAKE)  maintainer-clean
@@ -193,12 +169,6 @@ spu/Makefile: config.status
 	test -d spu || mkdir spu ; \
 	cd spu && $(abs_srcdir)/spu/configure $(subconfigure_args)/spu
 .PHONY: configure-spu
-
-configure-sparclite: sparclite/Makefile
-sparclite/Makefile: config.status
-	test -d sparclite || mkdir sparclite ; \
-	cd sparclite && $(abs_srcdir)/sparclite/configure $(subconfigure_args)/sparclite
-.PHONY: configure-sparclite
 
 configure-wince: wince/Makefile
 wince/Makefile: config.status

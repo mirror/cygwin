@@ -1,0 +1,377 @@
+\input texinfo       @c                    -*- Texinfo -*-
+
+@c This file is work in progress.
+@c Don't expect it to go through texinfo just yet. --bje
+
+@include version.texi
+
+@ifinfo
+Copyright @copyright{} 2000 Red Hat, Inc.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+@ignore
+Permission is granted to process this file through TeX and print the
+results, provided the printed document carries a copying permission
+notice identical to this one except for the removal of this paragraph
+(this paragraph not being relevant to the printed manual).
+
+@end ignore
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that
+the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions.
+@end ifinfo
+
+@synindex ky cp
+@c
+@c This file documents the internals of the Cpu tools GENerator, CGEN.
+@c
+@c Copyright (C) 2000 Red Hat, Inc.
+@c
+
+@setchapternewpage odd
+@settitle CGEN
+@titlepage
+@finalout
+@title The Cpu tools GENerator, CGEN.
+@subtitle Version @value{VERSION}
+@sp 1
+@subtitle @value{UPDATED}
+@author Ben Elliston
+@author Red Hat, Inc.
+@page
+
+@tex
+{\parskip=0pt \hfill Red Hat, Inc.\par \hfill
+\TeX{}info \texinfoversion\par }
+@end tex
+
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2000 Red Hat, Inc.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that
+the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions.
+@end titlepage
+
+@node Top
+@top Introduction
+
+@cindex version
+This manual documents the internals of CGEN, version @value{VERSION}.
+
+@menu
+* Introduction::                Introduction
+* Guile::
+* Conventions::                 Coding conventions
+* Applications::
+* Source file overview::
+* Option processing::
+* Parsing::
+* Version numbering::
+* Glossary::                    Glossary
+* Index::                       Index
+@end menu
+
+@node Introduction
+@chapter Introduction
+
+This document details the implementation and internals of CGEN, the
+``Cpu tools GENerator''.  It focuses on theory of operation and concepts
+rather than extensive details of the implementation--these details
+date too quickly.
+
+@node Conventions
+@chapter Conventions
+
+There are a number of conventions used in the cgen source code.  If you
+take the time to absorb these now, the code will be much easier to
+understand.
+
+@itemize @bullet
+@item Procedures and variables local to a file are named @code{-foo}.
+@item Only routines that emit application code begin with @code{gen-}.
+@item Symbols beginning with @code{c-} are either variables containing C code
+      or procedures that generate C code, similarily for C++ and @code{c++-}.
+@item Variables containing C code begin with @code{c-}.
+@item Only routines that emit an entire file begin with @code{cgen-}.
+@item All @file{.cpu} file elements shall have @code{-foo-parse} and
+      @code{-foo-read} procedures.
+@item Global variables containing class definitions shall be named
+      @code{<class-name>}.
+@item Procedures related to a particular class shall be named
+      @code{class-name-proc-name}, where @code{class-name} may be abbreviated.
+@item Procedures that test whether something is an object of a
+      particular class shall be named @code{class-name?}.
+@item In keeping with Scheme conventions, predicates shall have a
+      @code{?} suffix.
+@item In keeping with Scheme conventions, methods and procedures that
+      modify an argument or have other side effects shall have a
+      @code{!} suffix, usually these procs return @code{*UNSPECIFIED*}.
+@item All @code{-foo-parse}, @code{parse-foo} procs shall have @code{context}
+      as the first argument. [FIXME: not all such procs have been
+      converted]
+@end itemize
+
+@node Applications
+@chapter Applications
+
+One of the most importance concepts to grasp with CGEN is that it is not
+a simulator generator.  It's a generic tool generator--it can be used to
+generate a simulator, an assembler, a disassembler and so on.  These
+``applications'' can then produce different outputs from the same CPU
+description.
+
+When you want to run the cgen framework, an application-specific source
+file is loaded into the Guile interpreter to get cgen running.  This
+source file loads in any other source files it needs and then, for
+example, calls:
+
+@example
+    (cgen #:argv argv
+	  #:app-name "sim"
+	  #:arg-spec sim-arguments
+	  #:init sim-init!
+	  #:finish sim-finish!
+	  #:analyze sim-analyze!)
+    )
+@end example
+
+This gets the whole framework started, in an application-specific way.
+
+node Source file overview
+@chapter Source file overview
+
+@table @file
+
+@item *.cpu, *.opc, *.sim
+Files belonging to each CPU description.  .sim files are automatically
+included if they are defined for the given architecture.
+
+@item doc/*.texi
+Texinfo documentation for cgen.
+
+@item slib/*.scm
+Third-party libraries written in Scheme.  For example, sort.scm is a
+collection of procedures to sort lists.
+
+@item Makefile.am
+automake Makefile for cgen.
+
+@item NEWS
+News about cgen.
+
+@item README
+Notes to read abot cgen.
+
+@item attr.scm
+Handling of cgen attributes.
+
+@item cgen-gas.scm
+Top-level for GAS testsuite generation.
+
+@item cgen-opc.scm
+Top-level for opcodes generation.
+
+@item cgen-sid.scm
+Top-level for SID simulator generation.
+ 
+@item cgen-sim.scm
+Top-level for older simulator generation.
+
+@item cgen-stest.scm
+Top-level for simulator testsuite generation.
+
+@item configure.in
+Template for `configure'--process with autoconf.
+
+@item cos.scm
+cgen object system.  Adds object oriented features to the Scheme
+language.  See the top of @file{cos.scm} for the user-visible
+procedures.
+
+@item decode.scm
+Generic decoder routines.
+
+@item desc-cpu.scm
+???
+
+@item desc.scm
+???
+
+@item dev.scm
+Debugging support.
+
+@item enum.scm
+Enumerations.
+
+@item fixup.scm
+Some procedure definitions to patch up possible differences between
+older and newer versions of Guile:
+
+  * define a (load..) procedure that uses
+    primitive-load-path if load-from-path is not known.
+
+  * define =? and >=? if they aren't already known.
+
+  * define %stat, reverse! and debug-enable in terms of
+    older equivalent procedures, if they aren't already
+    known.
+
+@item gas-test.scm
+GAS testsuite generator.
+
+@item hardware.scm
+Hardware description routines.
+
+@item ifield.scm
+Instruction fields.
+
+@item insn.scm
+Instruction defintions.
+
+@item mach.scm
+Architecture description routines.
+
+@item minsn.scm
+Macro instructions.
+
+@item mode.scm
+Modes.
+
+@item model.scm
+Model specification.
+
+@item opc-asmdis.scm
+For the opcodes applications.
+
+@item opc-ibld.scm
+Ditto.
+
+@item opc-itab.scm
+Ditto.
+
+@item opc-opinst.scm
+Ditto.
+
+@item opcodes.scm
+Ditto.
+
+@item operand.scm
+Operands.
+
+@item pgmr-tools.scm
+Programmer tools--debugging tools, mainly.
+
+@item pmacros.scm
+Preprocessor macros.
+
+@item profile.scm
+Unused?
+
+@item read.scm
+Read and parse .cpu files.  @code{maybe_load} is used to load in files
+for required symbols if they are not already present in the environment
+(say, because it was compiled).
+
+@item rtl-c.scm
+RTL to C translation.
+
+@item rtl.scm
+RTL support.
+
+@item rtx-funcs.scm
+RTXs.
+
+@item sem-frags.scm
+Semantic fragments.
+
+@item semantics.scm
+Semantic analysis for the CPU descriptions.
+
+@item sid-cpu.scm
+For the SID application.
+
+@item sid-decode.scm
+Ditto.
+
+@item sid-model.scm
+Ditto.
+
+@item sid.scm
+Ditto.
+
+@item sim-arch.scm
+For the simulator application.
+
+@item sim-cpu.scm
+Ditto.
+
+@item sim-decode.scm
+Ditto.
+
+@item sim-model.scm
+Ditto.
+
+@item sim-test.scm
+For the simulator testsuite application.
+
+@item sim.scm
+For the simulator application.
+
+@item simplify.inc
+Preprocessor macros to simplify CPU description files.  This file is not
+loaded by the Scheme interpreter, but is instead included by the .cpu
+file.
+
+@item types.scm
+Low-level types.
+
+@item utils-cgen.scm
+cgen-specific utilities.
+
+@item utils-gen.scm
+Code generation specific utilities.
+
+@item utils-sim.scm
+Simulator specific utilities.
+
+@item utils.scm
+Miscellaneous utilities.
+
+@end table
+
+@code{cgen} is the main entry point called by application file
+generators. It just calls @code{-cgen}, but it does so wrapped inside a
+@code{catch-with-backtrace} procedure to make debugging easier.
+
+@node Version numbering
+@chapter Version numbering
+
+There are two version numbers: the version number of cgen itself and a
+version number for the description language it accepts.  These are kept
+in the symbols @code{-CGEN-VERSION} and @code{-CGEN-LANG-VERSION} in
+@file{read.scm}.
+
+@node Index
+@unnumbered Index
+
+@printindex cp
+
+@contents
+@bye

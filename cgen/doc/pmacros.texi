@@ -1,0 +1,457 @@
+@c Copyright (C) 2000 Red Hat, Inc.
+@c This file is part of the CGEN manual.
+@c For copying conditions, see the file cgen.texi.
+
+@node Preprocessor macros
+@chapter Preprocessor macros
+@cindex Preprocessor macros
+@cindex pmacros
+
+Preprocessor macros provide a way of simplifying the writing of
+@file{.cpu} files and serve the same purpose that macros do in C.
+
+@menu
+* Defining a preprocessor macro:: @code{define-pmacro}
+* Using preprocessor macros::
+* Macro expansion::               The @code{pmacro-expand} procedure
+* Default argument values::       Specifying default values of arguments
+* Multiple output expressions::   Using @code{begin}
+* Symbol concatenation::          The @code{.sym} builtin
+* String concatenation::          The @code{.str} builtin
+* Convert a number to a hex::     The @code{.hex} builtin
+* Convert a string to uppercase:: The @code{.upcase} builtin
+* Convert a string to lowercase:: The @code{.downcase} builtin
+* Getting part of a string::      The @code{.substr} builtin
+* List splicing::                 The @code{.splice} builtin
+* Number generation::             The @code{.iota} builtin
+* Mapping a macro over a list::   The @code{.map} builtin
+* Applying a macro to a list::    The @code{.apply} builtin
+* Defining a macro inline::       The @code{.pmacro} builtin
+* Passing macros as arguments::   Passing a macro to another macro
+@end menu
+
+@node Defining a preprocessor macro
+@section Defining a preprocessor macro
+@cindex define-pmacro
+
+Preprocessor macros are defined with:
+
+@smallexample
+(define-pmacro (name parm1 parm2 ... parmN)
+  expansion
+)
+@end smallexample
+
+The result is @samp{expansion} with parameters replaced with the actual
+arguments of the macro invocation.  Free variables are left unchanged.
+[A "free variable", as defined here, is one that doesn't appear in the
+parameter list.]
+
+@c ??? This used to be true, but currently isn't.
+@c If the result is another macro invocation, it is expanded in turn.  
+
+@samp{expansion} must be exactly one expression.
+
+@node Using preprocessor macros
+@section Using preprocessor macros
+
+Preprocessor macros are invoked in either of two ways: positional arguments
+and arguments by name.
+@c Rather lame wording.
+
+@smallexample
+(define-pmacro (foo arg1 arg2) (bar arg1 arg2))
+
+; Invoke by positional arguments.
+
+(foo abc def) ==> (bar abc def)
+
+; Invoke by naming arguments.
+
+(foo #:arg1 ghi #:arg2 jkl) ==> (bar ghi jkl)
+@end smallexample
+
+@c If you think more should be said here, I agree.
+@c Please think of something.
+
+@node Macro expansion
+@section Macro expansion
+
+At the implementation level, pmacros are expand with the
+@code{pmacro-expand} Scheme procedure.
+
+The following is executed from a Guile shell, as opposed to 
+appearing in a cpu description file, hence the extra quoting.
+
+@smallexample
+guile> (define-pmacro '(foo a b) '(+ a b))
+guile> (pmacro-expand '(foo 3 4))
+(+ 3 4)
+@end smallexample
+
+@node Default argument values
+@section Default argument values
+
+Invoking pmacros by specifying argument names allows some, or all,
+arguments to be elided and thus allows for arguments to have default values.
+
+Specify default values with the following syntax.
+
+@smallexample
+(define-pmacro (macro-name (arg1 . default-value)
+                           (arg2 . default value) ...)
+  ...
+)
+@end smallexample
+
+Example:
+
+@smallexample
+(define-pmacro (foo (arg1 . 1) (arg2 . 2))
+  (bar arg1 arg2)
+)
+
+(foo #:arg2 33) ==> (bar 1 33)
+@end smallexample
+
+@node Multiple output expressions
+@section Multiple output expressions
+@cindex begin
+
+The result of a preprocessor macro is exactly one expression.
+It is often useful, however, to return multiple expressions, say for
+example when you want one macro to define several instructions.
+
+The way to do this is to enclose all the expressions with @code{begin}.
+@code{begin} is only valid at the top [definition] level.
+
+??? It's moderately clumsy to restrict @code{begin} like this.
+Using @code{sequence} for this purpose might be cleaner except that
+sequence locals don't make sense in this context (though perhaps that's
+a lesser evil).  In the end, @code{begin} can be shorthand for a void-mode
+sequence with no locals so I haven't been in a rush to resolve this.
+
+@node Symbol concatenation
+@section Symbol concatenation
+@cindex .sym
+
+Symbol and string concatenation are supported. Symbol concatenation is
+done with:
+
+@code{(.sym arg1 arg2 ...)}
+
+Acceptable arguments are symbols, strings, and numbers.
+The result is a symbol with the arguments concatenated together.
+Numbers are converted to a string, base 10, and then to a symbol.
+The result must be a valid Scheme symbol with the additional restriction
+that the first character must be a letter.
+
+@node String concatenation
+@section String concatenation
+@cindex .str
+
+String concatenation is done with
+
+@code{(.str arg1 arg2 ...)}
+
+Acceptable arguments are symbols, strings, and numbers.  The result is a
+string with the arguments concatenated together.
+Numbers are converted base 10.
+
+Example:
+
+@smallexample
+(define-pmacro (bin-op mnemonic op2-op sem-op)
+  (dni mnemonic
+       (.str mnemonic " reg/reg")
+       ()
+       (.str mnemonic " $dr,$sr")
+       (+ OP1_0 op2-op dr sr)
+       (set dr (sem-op dr sr))
+       ())
+)
+(bin-op and OP2_12 and)
+(bin-op or OP2_14 or)
+(bin-op xor OP2_13 xor)
+@end smallexample
+
+@node Convert a number to a hex
+@section Convert a number to a hex
+
+Convert a number to a lowercase hex string with @code{.hex}.  If
+@code{width} is present, the result is that many characters beginning
+with the least significant digit.  Zeros are prepended as necessary.
+
+Syntax: @code{(.hex number [width])}
+
+Examples:
+
+@smallexample
+(.hex 42)   --> "2a"
+(.hex 42 1) --> "a"
+(.hex 42 4) --> "002a"
+@end smallexample
+
+@node Convert a string to uppercase
+@section Convert a string to uppercase
+
+Convert a string to uppercase with @code{.upcase}.
+
+Syntax: @code{(.upcase string)}
+
+Example:
+
+@smallexample
+(.upcase "foo!") --> "FOO!"
+@end smallexample
+
+@node Convert a string to lowercase
+@section Convert a string to lowercase
+
+Convert a string to lowercase with @code{.downcase}.
+
+Syntax: @code{(.downcase string)}
+
+Example:
+
+@smallexample
+(.downcase "BAR?") --> "bar?"
+@end smallexample
+
+@node Getting part of a string
+@section Getting part of a string
+
+Extract a part of a string with @code{.substr}.
+
+Syntax: @code{(.substr string start end)}
+
+where @samp{start} is the starting character, and @samp{end} is one past
+the ending character.  Character numbering begins at position 0.
+If @samp{start} and @samp{end} are the same, and both valid, the empty
+string is returned.
+
+Example:
+
+@smallexample
+(.substr "howzitgoineh?" 2 6) --> "wzit"
+@end smallexample
+
+@node List splicing
+@section List splicing
+@cindex .splice
+
+It is often useful to splice a list into a "parent" list.
+This is best explained with an example.
+
+@smallexample
+(define-pmacro (splice-test a b c)
+               (.splice a (.unsplice b) c))
+(pmacro-expand (splice-test (1 (2) 3)))
+
+--> (1 2 3)
+@end smallexample
+
+Note that a level of parentheses around @code{2} has been removed.
+
+This is useful, for example, when one wants to pass a list of fields to
+a macro that defines an instruction.  For example:
+
+@smallexample
+(define-pmacro (cond-move-1 name comment mnemonic cc-prefix cc-name cc-opcode
+			    src-name src-opcode cond test)
+  (dni name
+       (.str "move %" cc-name " " comment ", v9 page 191")
+       ((MACH64))
+       (.str mnemonic " " cc-prefix cc-name ",$" src-name ",$rd")
+       (.splice + OP_2 rd OP3_MOVCC cond
+		(.unsplice cc-opcode) (.unsplice src-opcode))
+       (if (test cc-name)
+	   (set rd src-name))
+       ())
+)
+@end smallexample
+
+This macro, taken from @file{sparc64.cpu}, defines a conditional move
+instruction. Arguments @code{cc-opcode} and @code{src-opcode} are lists
+of fields. The macro is invoked with (simplified from @file{sparc64.cpu}):
+
+@smallexample
+(cond-move-1 mova-icc "blah ..." mova
+             "%" icc ((f-fmt4-cc2 1) (f-fmt4-cc1-0 0))
+             rs2 ((f-i 0) (f-fmt4-res10-6 0) rs2)
+             CC_A test-always)
+(cond-move-1 mova-imm-icc "blah ..." mova
+             "%" icc ((f-fmt4-cc2 1) (f-fmt4-cc1-0 0))
+             simm11 ((f-i 1) simm11)
+             CC_A test-always)
+@end smallexample
+
+Macro @code{cond-move-1} is being used here to define both the register
+and the immediate value case.  Each case has a slightly different list
+of opcode fields.  Without the use of @code{.splice}/@code{.unsplice},
+the resulting formats would be:
+
+@smallexample
+(+ OP_2 rd OP3_MOVCC CC_A ((f-fmt4-cc2-1) (f-fmt4-cc1-0 0))
+   ((f-i 0) (f-fmt4-res10-6 0) rs2))
+
+and
+
+(+ OP_2 rd OP3_MOVCC CC_A ((f-fmt4-cc2-1) (f-fmt4-cc1-0 0))
+   ((f-i 1) simm11))
+@end smallexample
+
+respectively.  This is not what is wanted.  What is wanted is
+
+@smallexample
+(+ OP_2 rd OP3_MOVCC CC_A (f-fmt4-cc2-1) (f-fmt4-cc1-0 0)
+   (f-i 0) (f-fmt4-res10-6 0) rs2)
+
+and
+
+(+ OP_2 rd OP3_MOVCC CC_A (f-fmt4-cc2-1) (f-fmt4-cc1-0 0)
+   (f-i 1) simm11)
+@end smallexample
+
+respectively, which is what @code{.splice} achieves.
+
+@code{.unsplice} is a special reserved symbol that is only recognized inside
+@code{.splice}.
+
+@node Number generation
+@section Number generation
+@cindex .iota
+@cindex Number generation
+
+Machine descriptions often require a list of sequential numbers.
+Generate a list of numbers with the @code{.iota} builtin macro.
+
+The syntax is @samp{(.iota count [start [incr]])}.
+
+Examples:
+
+@smallexample
+(.iota 5)      --> 0 1 2 3 4
+(.iota 5 4)    --> 4 5 6 7 8
+(.iota 5 5 -1) --> 5 4 3 2 1
+@end smallexample
+
+@node Mapping a macro over a list
+@section Mapping a macro over a list
+@cindex .map
+
+Apply a macro to each element of a list, or set of lists, with @code{.map}.
+
+The syntax is @samp{(.map macro-name list1 [list2 ...])}.
+
+The result is a list with @samp{macro-name} applied to each element of
+@samp{listN}.  @samp{macro-name} should take as many arguments as there
+are lists.  This is often useful in constructing enum and register name lists.
+
+Example:
+
+@smallexample
+(define-pmacro (foo name number) ((.sym X name) number))
+(.map foo (A B C D E) (.iota 5))
+
+-->
+
+((XA 0) (XB 1) (XC 2) (XD 3) (XE 4))
+@end smallexample
+
+@node Applying a macro to a list
+@section Applying a macro to a list
+
+Invoke a macro with each argument coming from an element of a list,
+with @code{.apply}.
+
+The syntax is @samp{(.apply macro-name list)}.
+
+The result is the result of invoking macro @samp{macro-name}.
+@samp{macro-name} should take as many arguments as there elements in
+@samp{list}.  If @samp{macro-name} takes a variable number of trailing
+arguments, there must be at least as many list elements as there are
+fixed arguments.
+@c clumsily worded or what
+
+Example:
+@c need a more useful example
+
+@smallexample
+(.apply .str (.iota 5))
+
+-->
+
+"01234"
+@end smallexample
+
+Note that @code{(.str (.iota 5))} is an error.  Here the list
+@samp{(0 1 2 3 4)} is passed as the first argument of @code{.str},
+which is wrong.
+
+@node Defining a macro inline
+@section Defining a macro inline
+
+Define a macro inline with @code{.pmacro}.
+This is only supported when passing macros as arguments to other macros.
+
+@smallexample
+(define-pmacro (load-op suffix op2-op mode ext-op)
+  (begin
+    (dni (.sym ld suffix) (.str "ld" suffix)
+	 ()
+	 (.str "ld" suffix " $dr,@@$sr")
+	 (+ OP1_2 op2-op dr sr)
+	 (set dr (ext-op WI (mem: mode sr)))
+	 ())
+  )
+)
+
+(load-op "" OP2_12 WI (.pmacro (mode expr) expr))
+(load-op b OP2_8 QI (.pmacro (mode expr) (ext: mode expr)))
+(load-op h OP2_10 HI (.pmacro (mode expr) (ext: mode expr)))
+(load-op ub OP2_9 QI (.pmacro (mode expr) (zext: mode expr)))
+(load-op uh OP2_11 HI (.pmacro (mode expr) (zext: mode expr)))
+@end smallexample
+
+Currently, .pmacro's don't bind the way Scheme lambda expressions do.
+For example, arg2 in the second pmacro is not bound to the arg2 argument
+of the first pmacro.
+
+@smallexample
+(define-pmacro (foo arg1 arg2) ((.pmacro (bar) (+ arg2 bar)) arg1))
+(foo 3 4) ==> (+ arg2 3)
+@end smallexample
+
+One can make an argument either way.  I'm not sure what the right thing
+to do here is (leave things as is, or have lexical binding like Scheme).
+
+@node Passing macros as arguments
+@section Passing macros as arguments
+
+Macros may be passed to other macros.
+
+Example:
+
+@smallexample
+(define-pmacro (no-ext-expr mode expr) expr)
+(define-pmacro (ext-expr mode expr) (ext: mode expr))
+(define-pmacro (zext-expr mode expr) (zext: mode expr))
+
+(define-pmacro (load-op suffix op2-op mode ext-op)
+  (begin
+    (dni (.sym ld suffix) (.str "ld" suffix)
+	 ()
+	 (.str "ld" suffix " $dr,@@$sr")
+	 (+ OP1_2 op2-op dr sr)
+	 (set dr (ext-op WI (mem: mode sr)))
+	 ())
+  )
+)
+
+(load-op "" OP2_12 WI no-ext-expr)
+(load-op b OP2_8 QI ext-expr)
+(load-op h OP2_10 HI ext-expr)
+(load-op ub OP2_9 QI zext-expr)
+(load-op uh OP2_11 HI zext-expr)
+@end smallexample

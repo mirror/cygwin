@@ -550,7 +550,11 @@
 			 pos (+ 1 count)
 			 (cdr bitnums)))))))
     (string-append
-     "("
+     ; While we could just always emit "(0" to handle the case of an empty set,
+     ; keeping the code more readable for the normal case is important.
+     (if (< (length groups) 1)
+	 "(0"
+	 "(")
      (string-drop 3
 		  (string-map
 		   (lambda (group)
@@ -938,11 +942,9 @@
 			";\n"
 			indent "  val = "))
        (string-append indent "  unsigned int val = "))
-   (if (< (length (dtable-guts-bitnums table-guts)) 1)
-       "0"
-       (-gen-decode-bits (dtable-guts-bitnums table-guts)
-			 (dtable-guts-startbit table-guts)
-			 (dtable-guts-bitsize table-guts) "insn" lsb0?))
+   (-gen-decode-bits (dtable-guts-bitnums table-guts)
+		     (dtable-guts-startbit table-guts)
+		     (dtable-guts-bitsize table-guts) "insn" lsb0?)
    ";\n"
    indent "  switch (val)\n"
    indent "  {\n"

@@ -1,3 +1,7 @@
+2001-01-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* CATALOG: Add hw-glue-bus-mux.
+
 2001-01-03  matthew green  <mrg@redhat.com>
 
 	* configure.in (AC_HAVE_FUNCS): Also check for times(2).

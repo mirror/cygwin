@@ -253,7 +253,7 @@ if ($opt_load{"cpu"})
     }
     $exec = $opt_load{"cpu"};
 }
-else
+elsif ($exec)
   {
       $opt_load{"cpu"} = "$exec";
   }
@@ -344,6 +344,7 @@ if ($opt_persistent) { $zeroth_section .= "set main persistent? true\n"; }
 $cpu_component_type = $cpu_comptype{$opt_cpu} || die "Unknown cpu $opt_cpu for cpu component type\n";
 $first_section = "# first section\n" .
   &sidconf_new("$cpu_component_type", "cpu") . "\n" .
+  &sidconf_new("hw-mapper-basic", "cpu-mapper") . "\n" .
   &sidconf_new("hw-glue-sequence-8", "init-sequence") . "\n" .
   &sidconf_new("hw-glue-sequence-1", "hw-reset-net") . "\n" .
   &sidconf_new("hw-glue-sequence-8", "deinit-sequence") . "\n" .
@@ -878,11 +879,10 @@ connect-pin cpu trap-code -> cpu-gdb trap-code
       }
   }
 
-# Generate a loader and mapper for each processor
+# Generate a loader for each processor
 foreach $processor (keys %opt_load)
   {
     $first_section .= "# ${processor} loader\n" .
-	&sidconf_new("hw-mapper-basic", "${processor}-mapper") . "\n" .
 	&sidconf_new("sw-load-elf", "${processor}-loader") . "\n";
     $second_section .= "# ${processor} loader
 set ${processor}-loader file \"$opt_load{$processor}\"

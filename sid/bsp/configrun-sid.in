@@ -318,6 +318,7 @@ if ($opt_gprof)
       &sidconf_new("sw-profile-gprof", "gprof") . "\n";
   }
 
+$enable_z_packet = "false";
 $second_section = "# second section
 # settings
 set cpu step-insn-count $cpu_insn_count
@@ -798,7 +799,7 @@ connect-pin gloss trap-code-chain -> gdb trap-code
 connect-pin gloss process-signal -> gdb gloss-process-signal
 connect-pin gloss debug-tx -> gdb target-tx
 relate gdb gloss gloss
-set gdb enable-Z-packet? false
+set gdb enable-Z-packet? $enable_z_packet
 set gdb operating-mode? false
 ";
       }

@@ -1,3 +1,8 @@
+2001-07-06  Frank Ch. Eigler  <fche@redhat.com>
+
+	* components.h (IntController fiq_read_word): Provide dummy body.
+	(fiq_write_word): Ditto.
+
 2001-06-28  Ben Elliston  <bje@redhat.com>
 
 	* arm.h: Formatting cleanups.

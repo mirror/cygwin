@@ -1,4 +1,8 @@
 2001-10-29  Frank Ch. Eigler  <fche@redhat.com>
+	
+	* configrun-sid.in (memory-region): Create component in first section.
+
+2001-10-29  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configrun-sid.in (gdb): Support no-gloss case generally.
 

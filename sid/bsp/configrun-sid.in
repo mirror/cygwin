@@ -79,7 +79,7 @@ if ($ENV{'SID'}) {
   $sid .= "/sid";
 }
 
-$version=q$Id: configrun-sid.in,v 1.28 2001/10/29 17:44:36 fche Exp $;
+$version=q$Id: configrun-sid.in,v 1.29 2001/10/29 18:14:53 fche Exp $;
 
 # by default the loader data mapper connects to the cpu-mapper access-port
 $load_mapper_data = "cpu-mapper access-port";
@@ -1061,9 +1061,10 @@ while ($#opt_memory_region >= 0)
     @relates = ();
 
     # common stuff
-    $third_section .= "# memory region $mems ($spec)\n" .
-      &sidconf_new("hw-memory-ram/rom-basic", "mem$mems") . "\n" .
-	"set mem$mems size $size\n";
+    $first_section .= "# memory region $mems ($spec)\n" .
+      &sidconf_new("hw-memory-ram/rom-basic", "mem$mems") . "\n";
+    $third_section .= "# memory region $mems ($spec) configuration\n" .
+      "set mem$mems size $size\n";
 
     # consume other options
     while ($#spec >= 0)

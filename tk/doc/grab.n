@@ -120,4 +120,3 @@ processes, this restriction doesn't exist.
 
 .SH KEYWORDS
 grab, keyboard events, pointer events, window
-

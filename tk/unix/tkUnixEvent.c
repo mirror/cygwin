@@ -26,6 +26,17 @@ typedef struct ThreadSpecificData {
 } ThreadSpecificData;
 static Tcl_ThreadDataKey dataKey;
 
+#if defined(TK_USE_INPUT_METHODS) && defined(PEEK_XCLOSEIM)
+/*
+ * Structure used to peek into internal XIM data structure.
+ * Enabled only on systems where we are sure it works.
+ */
+struct XIMPeek {
+    void *junk1, *junk2;
+    XIC  ic_chain;
+};
+#endif
+
 /*
  * Prototypes for procedures that are referenced only in this file:
  */
@@ -39,6 +50,9 @@ static void		DisplayFileProc _ANSI_ARGS_((ClientData clientData,
 static void		DisplaySetupProc _ANSI_ARGS_((ClientData clientData,
 			    int flags));
 static void		TransferXEventsToTcl _ANSI_ARGS_((Display *display));
+#ifdef TK_USE_INPUT_METHODS
+static void		OpenIM _ANSI_ARGS_((TkDisplay *dispPtr));
+#endif
 
 
 /*
@@ -118,7 +132,7 @@ DisplayExitHandler(clientData)
 
 TkDisplay *
 TkpOpenDisplay(display_name)
-    char *display_name;
+    CONST char *display_name;
 {
     TkDisplay *dispPtr;
     Display *display = XOpenDisplay(display_name);
@@ -127,7 +141,11 @@ TkpOpenDisplay(display_name)
 	return NULL;
     }
     dispPtr = (TkDisplay *) ckalloc(sizeof(TkDisplay));
+    memset(dispPtr, 0, sizeof(TkDisplay));
     dispPtr->display = display;
+#ifdef TK_USE_INPUT_METHODS
+    OpenIM(dispPtr);
+#endif
     Tcl_CreateFileHandler(ConnectionNumber(display), TCL_READABLE,
 	    DisplayFileProc, (ClientData) dispPtr);
     return dispPtr;
@@ -144,25 +162,50 @@ TkpOpenDisplay(display_name)
  *	None.
  *
  * Side effects:
- *	Deallocates the displayPtr.
+ *	Deallocates the displayPtr and unix-specific resources.
  *
  *----------------------------------------------------------------------
  */
 
 void
-TkpCloseDisplay(displayPtr)
-    TkDisplay *displayPtr;
+TkpCloseDisplay(dispPtr)
+    TkDisplay *dispPtr;
 {
-    TkDisplay *dispPtr = (TkDisplay *) displayPtr;
+    TkSendCleanup(dispPtr);
+
+    TkFreeXId(dispPtr);
+
+    TkWmCleanup(dispPtr);
+
+#ifdef TK_USE_INPUT_METHODS
+#if TK_XIM_SPOT
+    if (dispPtr->inputXfs) {
+	XFreeFontSet(dispPtr->display, dispPtr->inputXfs);
+    }
+#endif
+    if (dispPtr->inputMethod) {
+	/*
+	 * This caused core dumps on some systems (Solaris 2.3 1/6/95).
+	 * The most likely cause of this is a bug in X that accesses
+	 * memory that was already deallocated inside XCloseIM().
+	 * One can work around this issue by making sure a XDestroyIC()
+	 * gets invoked for each XCreateIC().
+	 */
+
+#if defined(TK_USE_INPUT_METHODS) && defined(PEEK_XCLOSEIM)
+	struct XIMPeek *peek = (struct XIMPeek *) dispPtr->inputMethod;
+	if (peek->ic_chain != NULL)
+	    panic("input contexts not freed before XCloseIM");
+#endif
+	XCloseIM(dispPtr->inputMethod);
+    }
+#endif
 
     if (dispPtr->display != 0) {
-        Tcl_DeleteFileHandler(ConnectionNumber(dispPtr->display));
-	
-        (void) XSync(dispPtr->display, False);
-        (void) XCloseDisplay(dispPtr->display);
+	Tcl_DeleteFileHandler(ConnectionNumber(dispPtr->display));
+	(void) XSync(dispPtr->display, False);
+	(void) XCloseDisplay(dispPtr->display);
     }
-    
-    ckfree((char *) dispPtr);
 }
 
 /*
@@ -230,7 +273,6 @@ DisplaySetupProc(clientData, flags)
  *----------------------------------------------------------------------
  */
 
-
 static void
 TransferXEventsToTcl(display)
     Display *display;
@@ -285,8 +327,6 @@ DisplayCheckProc(clientData, flags)
 	TransferXEventsToTcl(dispPtr->display);
     }
 }
-
-
 
 /*
  *----------------------------------------------------------------------
@@ -516,6 +556,81 @@ TkpSync(display)
      * Transfer events from the X event queue to the Tk event queue.
      */
     TransferXEventsToTcl(display);
-
 }
+#ifdef TK_USE_INPUT_METHODS
+
+/* 
+ *--------------------------------------------------------------
+ *
+ * OpenIM --
+ *
+ *	Tries to open an X input method, associated with the
+ *	given display.  Right now we can only deal with a bare-bones
+ *	input style:  no preedit, and no status.
+ *
+ * Results:
+ *	Stores the input method in dispPtr->inputMethod;  if there isn't
+ *	a suitable input method, then NULL is stored in dispPtr->inputMethod.
+ *
+ * Side effects:
+ *	An input method gets opened.
+ *
+ *--------------------------------------------------------------
+ */
 
+static void
+OpenIM(dispPtr)
+    TkDisplay *dispPtr;		/* Tk's structure for the display. */
+{
+    unsigned short i;
+    XIMStyles *stylePtr;
+    char *modifier_list;
+
+    if ((modifier_list = XSetLocaleModifiers("")) == NULL) {
+	goto error;
+    }
+
+    dispPtr->inputMethod = XOpenIM(dispPtr->display, NULL, NULL, NULL);
+    if (dispPtr->inputMethod == NULL) {
+	return;
+    }
+
+    if ((XGetIMValues(dispPtr->inputMethod, XNQueryInputStyle, &stylePtr,
+	    NULL) != NULL) || (stylePtr == NULL)) {
+	goto error;
+    }
+#if TK_XIM_SPOT
+    /*
+     * If we want to do over-the-spot XIM, we have to check that this
+     * mode is supported.  If not we will fall-through to the check below.
+     */
+    for (i = 0; i < stylePtr->count_styles; i++) {
+	if (stylePtr->supported_styles[i]
+		== (XIMPreeditPosition | XIMStatusNothing)) {
+	    dispPtr->flags |= TK_DISPLAY_XIM_SPOT;
+	    XFree(stylePtr);
+	    return;
+	}
+    }
+#endif
+    for (i = 0; i < stylePtr->count_styles; i++) {
+	if (stylePtr->supported_styles[i]
+		== (XIMPreeditNothing | XIMStatusNothing)) {
+	    XFree(stylePtr);
+	    return;
+	}
+    }
+    XFree(stylePtr);
+
+    error:
+
+    if (dispPtr->inputMethod) {
+	/*
+	 * This call should not suffer from any core dumping problems
+	 * since we have not allocated any input contexts.
+	 */
+	XCloseIM(dispPtr->inputMethod);
+	dispPtr->inputMethod = NULL;
+    }
+}
+#endif /* TK_USE_INPUT_METHODS */

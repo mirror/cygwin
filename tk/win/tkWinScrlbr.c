@@ -87,9 +87,10 @@ static void		UpdateScrollbarMetrics _ANSI_ARGS_((void));
  * The class procedure table for the scrollbar widget.
  */
 
-TkClassProcs tkpScrollbarProcs = {
+Tk_ClassProcs tkpScrollbarProcs = {
+    sizeof(Tk_ClassProcs),	/* size */
+    NULL,			/* worldChangedProc */
     CreateProc,			/* createProc */
-    NULL,			/* geometryProc */
     ModalLoopProc,		/* modalProc */
 };
 
@@ -241,7 +242,7 @@ CreateProc(tkwin, parentWin, instanceData)
 
     for (winPtr = ((TkWindow*)tkwin)->nextPtr; winPtr != NULL;
 	 winPtr = winPtr->nextPtr) {
-	if ((winPtr->window != None) && !(winPtr->flags & TK_TOP_LEVEL)) {
+	if ((winPtr->window != None) && !(winPtr->flags & TK_TOP_HIERARCHY)) {
 	    TkWinSetWindowPos(scrollPtr->hwnd, Tk_GetHWND(winPtr->window),
 		    Below);
 	    break;
@@ -249,8 +250,13 @@ CreateProc(tkwin, parentWin, instanceData)
     }
 
     scrollPtr->lastVertical = scrollPtr->info.vertical;
+#ifdef _WIN64
+    scrollPtr->oldProc = (WNDPROC)SetWindowLongPtr(scrollPtr->hwnd,
+	    GWLP_WNDPROC, (LONG_PTR) ScrollbarProc);
+#else
     scrollPtr->oldProc = (WNDPROC)SetWindowLong(scrollPtr->hwnd, GWL_WNDPROC,
 	    (DWORD) ScrollbarProc);
+#endif
     window = Tk_AttachHWND(tkwin, scrollPtr->hwnd);
 
     UpdateScrollbar(scrollPtr);
@@ -295,7 +301,11 @@ TkpDisplayScrollbar(clientData)
     if (scrollPtr->lastVertical != scrollPtr->info.vertical) {
 	HWND hwnd = Tk_GetHWND(Tk_WindowId(tkwin));
 
+#ifdef _WIN64
+	SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR) scrollPtr->oldProc);
+#else
 	SetWindowLong(hwnd, GWL_WNDPROC, (DWORD) scrollPtr->oldProc);
+#endif
 	DestroyWindow(hwnd);
 
 	CreateProc(tkwin, Tk_WindowId(Tk_Parent(tkwin)),
@@ -328,7 +338,11 @@ TkpDestroyScrollbar(scrollPtr)
     WinScrollbar *winScrollPtr = (WinScrollbar *)scrollPtr;
     HWND hwnd = winScrollPtr->hwnd;
     if (hwnd) {
+#ifdef _WIN64
+	SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR) winScrollPtr->oldProc);
+#else
 	SetWindowLong(hwnd, GWL_WNDPROC, (DWORD) winScrollPtr->oldProc);
+#endif
 	if (winScrollPtr->winFlags & IN_MODAL_LOOP) {
 	    ((TkWindow *)scrollPtr->tkwin)->flags |= TK_DONT_DESTROY_WINDOW;
 	    SetParent(hwnd, NULL);
@@ -745,5 +759,3 @@ TkpScrollbarPosition(scrollPtr, x, y)
     }
     return BOTTOM_GAP;
 }
-
-

@@ -21,7 +21,7 @@
 
 int			TkplatformtestInit _ANSI_ARGS_((Tcl_Interp *interp));
 static int		DebuggerCmd _ANSI_ARGS_((ClientData dummy,
-			    Tcl_Interp *interp, int argc, char **argv));
+			    Tcl_Interp *interp, int argc, CONST char **argv));
 
 /*
  *----------------------------------------------------------------------
@@ -75,9 +75,8 @@ DebuggerCmd(
     ClientData clientData,		/* Not used. */
     Tcl_Interp *interp,			/* Not used. */
     int argc,				/* Not used. */
-    char **argv)			/* Not used. */
+    CONST char **argv)			/* Not used. */
 {
     Debugger();
     return TCL_OK;
 }
-

@@ -141,4 +141,3 @@ TkPreprocessMenu(menuPtr)
     menuPtr->postCommandGeneration = tsdPtr->postCommandGeneration;
     return PreprocessMenu(menuPtr);
 }
-

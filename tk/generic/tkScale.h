@@ -254,5 +254,3 @@ EXTERN int		TkScaleValueToPixel _ANSI_ARGS_((TkScale *scalePtr,
 # define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif /* _TKSCALE */
-
-

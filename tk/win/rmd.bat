@@ -1,26 +1,22 @@
 @echo off
 rem RCS: @(#) $Id$
 
-if not exist %1\tag.txt goto end
+if not exist %1\nul goto end
 
 echo Removing directory %1
 
 if "%OS%" == "Windows_NT" goto winnt
 
-cd %1
-if errorlevel 1 goto end
-del *.*
-cd ..
-rmdir %1
+deltree /y %1
 if errorlevel 1 goto end
 goto success
 
 :winnt
-rmdir %1 /s /q
+rmdir /s /q %1
 if errorlevel 1 goto end
 
 :success
-echo deleted directory %1
+echo Deleted directory %1
 
 :end
 

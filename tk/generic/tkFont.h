@@ -220,13 +220,7 @@ EXTERN void		TkpGetFontFamilies _ANSI_ARGS_((Tcl_Interp *interp,
 EXTERN TkFont *		TkpGetNativeFont _ANSI_ARGS_((Tk_Window tkwin,
 			    CONST char *name));
 
-/* CYGNUS LOCAL */
-EXTERN void		TkUpdateFonts _ANSI_ARGS_((Tk_Window tkwin,
-			    int (*changed) (TkFontAttributes *faPtr)));
-
 # undef TCL_STORAGE_CLASS
 # define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif	/* _TKFONT */
-
-

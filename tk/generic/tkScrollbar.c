@@ -102,12 +102,12 @@ Tk_ConfigSpec tkpScrollbarConfigSpecs[] = {
  */
 
 static int		ConfigureScrollbar _ANSI_ARGS_((Tcl_Interp *interp,
-			    TkScrollbar *scrollPtr, int argc, char **argv,
+			    TkScrollbar *scrollPtr, int argc, CONST char **argv,
 			    int flags));
 static void		ScrollbarCmdDeletedProc _ANSI_ARGS_((
 			    ClientData clientData));
 static int		ScrollbarWidgetCmd _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *, int argc, char **argv));
+			    Tcl_Interp *, int argc, CONST char **argv));
 
 /*
  *--------------------------------------------------------------
@@ -133,7 +133,7 @@ Tk_ScrollbarCmd(clientData, interp, argc, argv)
 				 * interpreter. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
+    CONST char **argv;		/* Argument strings. */
 {
     Tk_Window tkwin = (Tk_Window) clientData;
     register TkScrollbar *scrollPtr;
@@ -153,7 +153,7 @@ Tk_ScrollbarCmd(clientData, interp, argc, argv)
     Tk_SetClass(new, "Scrollbar");
     scrollPtr = TkpCreateScrollbar(new);
 
-    TkSetClassProcs(new, &tkpScrollbarProcs, (ClientData) scrollPtr);
+    Tk_SetClassProcs(new, &tkpScrollbarProcs, (ClientData) scrollPtr);
 
     /*
      * Initialize fields that won't be initialized by ConfigureScrollbar,
@@ -231,7 +231,7 @@ ScrollbarWidgetCmd(clientData, interp, argc, argv)
 					 * widget. */
     Tcl_Interp *interp;			/* Current interpreter. */
     int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+    CONST char **argv;			/* Argument strings. */
 {
     register TkScrollbar *scrollPtr = (TkScrollbar *) clientData;
     int result = TCL_OK;
@@ -538,7 +538,7 @@ ConfigureScrollbar(interp, scrollPtr, argc, argv, flags)
 					 * may not already have values for
 					 * some fields. */
     int argc;				/* Number of valid entries in argv. */
-    char **argv;			/* Arguments. */
+    CONST char **argv;			/* Arguments. */
     int flags;				/* Flags to pass to
 					 * Tk_ConfigureWidget. */
 {
@@ -709,4 +709,3 @@ TkScrollbarEventuallyRedraw(scrollPtr)
 	scrollPtr->flags |= REDRAW_PENDING;
     }
 }
-

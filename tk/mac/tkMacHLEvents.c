@@ -202,7 +202,7 @@ OdocHandler(
      */
 
     if ((interp == NULL) || 
-    	(Tcl_GetCommandInfo(interp, "tkOpenDocument", &dummy)) == 0) {
+    	(Tcl_GetCommandInfo(interp, "::tk::mac::OpenDocument", &dummy)) == 0) {
     	return noErr;
     }
     
@@ -228,7 +228,7 @@ OdocHandler(
     }
 
     Tcl_DStringInit(&command);
-    Tcl_DStringAppend(&command, "tkOpenDocument", -1);
+    Tcl_DStringAppend(&command, "::tk::mac::OpenDocument", -1);
     for (index = 1; index <= count; index++) {
 	int length;
 	Handle fullPath;
@@ -439,4 +439,3 @@ MissedAnyParameters(
    
    return (err != errAEDescNotFound);
 }
-

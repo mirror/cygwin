@@ -437,5 +437,3 @@ ScaleActionProc(ControlRef theControl, ControlPartCode partCode)
     Tcl_Release((ClientData) scalePtr);
 }
 
-
-

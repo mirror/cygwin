@@ -32,14 +32,19 @@ typedef struct ThreadSpecificData {
 } ThreadSpecificData;
 static Tcl_ThreadDataKey dataKey;
 
+static void	FreeUidThreadExitProc _ANSI_ARGS_((ClientData clientData));
+
 /*
  * The following tables defines the string values for reliefs, which are
  * used by Tk_GetAnchorFromObj and Tk_GetJustifyFromObj.
  */
 
-static char *anchorStrings[] = {"n", "ne", "e", "se", "s", "sw", "w", "nw",
-	"center", (char *) NULL};
-static char *justifyStrings[] = {"left", "right", "center", (char *) NULL};
+static CONST char *anchorStrings[] = {
+    "n", "ne", "e", "se", "s", "sw", "w", "nw", "center", (char *) NULL
+};
+static CONST char *justifyStrings[] = {
+    "left", "right", "center", (char *) NULL
+};
 
 
 /*
@@ -102,7 +107,7 @@ Tk_GetAnchorFromObj(interp, objPtr, anchorPtr)
 int
 Tk_GetAnchor(interp, string, anchorPtr)
     Tcl_Interp *interp;		/* Use this for error reporting. */
-    char *string;		/* String describing a direction. */
+    CONST char *string;		/* String describing a direction. */
     Tk_Anchor *anchorPtr;	/* Where to store Tk_Anchor corresponding
 				 * to string. */
 {
@@ -176,7 +181,7 @@ Tk_GetAnchor(interp, string, anchorPtr)
  *--------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tk_NameOfAnchor(anchor)
     Tk_Anchor anchor;		/* Anchor for which identifying string
 				 * is desired. */
@@ -218,7 +223,7 @@ Tk_NameOfAnchor(anchor)
 int
 Tk_GetJoinStyle(interp, string, joinPtr)
     Tcl_Interp *interp;		/* Use this for error reporting. */
-    char *string;		/* String describing a justification style. */
+    CONST char *string;		/* String describing a justification style. */
     int *joinPtr;		/* Where to store join style corresponding
 				 * to string. */
 {
@@ -264,7 +269,7 @@ Tk_GetJoinStyle(interp, string, joinPtr)
  *--------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tk_NameOfJoinStyle(join)
     int join;			/* Join style for which identifying string
 				 * is desired. */
@@ -300,7 +305,7 @@ Tk_NameOfJoinStyle(join)
 int
 Tk_GetCapStyle(interp, string, capPtr)
     Tcl_Interp *interp;		/* Use this for error reporting. */
-    char *string;		/* String describing a justification style. */
+    CONST char *string;		/* String describing a justification style. */
     int *capPtr;		/* Where to store cap style corresponding
 				 * to string. */
 {
@@ -346,7 +351,7 @@ Tk_GetCapStyle(interp, string, capPtr)
  *--------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tk_NameOfCapStyle(cap)
     int cap;			/* Cap style for which identifying string
 				 * is desired. */
@@ -419,7 +424,7 @@ Tk_GetJustifyFromObj(interp, objPtr, justifyPtr)
 int
 Tk_GetJustify(interp, string, justifyPtr)
     Tcl_Interp *interp;		/* Use this for error reporting. */
-    char *string;		/* String describing a justification style. */
+    CONST char *string;		/* String describing a justification style. */
     Tk_Justify *justifyPtr;	/* Where to store Tk_Justify corresponding
 				 * to string. */
 {
@@ -465,7 +470,7 @@ Tk_GetJustify(interp, string, justifyPtr)
  *--------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tk_NameOfJustify(justify)
     Tk_Justify justify;		/* Justification style for which
 				 * identifying string is desired. */
@@ -476,6 +481,32 @@ Tk_NameOfJustify(justify)
 	case TK_JUSTIFY_CENTER: return "center";
     }
     return "unknown justification style";
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * FreeUidThreadExitProc --
+ *
+ *	Cleans up memory used for Tk_Uids in the thread.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	All information in the identifier table is deleted.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+FreeUidThreadExitProc(clientData)
+    ClientData clientData;		/* Not used. */
+{
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+    Tcl_DeleteHashTable(&tsdPtr->uidTable);
+    tsdPtr->initialized = 0;
 }
 
 /*
@@ -512,6 +543,7 @@ Tk_GetUid(string)
 
     if (!tsdPtr->initialized) {
 	Tcl_InitHashTable(tablePtr, TCL_STRING_KEYS);
+	Tcl_CreateThreadExitHandler(FreeUidThreadExitProc, NULL);
 	tsdPtr->initialized = 1;
     }
     return (Tk_Uid) Tcl_GetHashKey(tablePtr,
@@ -545,7 +577,7 @@ Tk_GetScreenMM(interp, tkwin, string, doublePtr)
     Tk_Window tkwin;		/* Window whose screen determines conversion
 				 * from centimeters and other absolute
 				 * units. */
-    char *string;		/* String describing a screen distance. */
+    CONST char *string;		/* String describing a screen distance. */
     double *doublePtr;		/* Place to store converted result. */
 {
     char *end;
@@ -621,7 +653,7 @@ Tk_GetPixels(interp, tkwin, string, intPtr)
     Tk_Window tkwin;		/* Window whose screen determines conversion
 				 * from centimeters and other absolute
 				 * units. */
-    char *string;		/* String describing a number of pixels. */
+    CONST char *string;		/* String describing a number of pixels. */
     int *intPtr;		/* Place to store converted result. */
 {
     double d;
@@ -715,6 +747,5 @@ TkGetDoublePixels(interp, tkwin, string, doublePtr)
     *doublePtr = d;
     return TCL_OK;
 }
-
 
 

@@ -370,6 +370,9 @@ TkPutImage(
 	pixmap.pmTable = NULL;
 	pixmap.pmReserved = 0;
 	pixmap.baseAddr = image->data;
+    if (image->bytes_per_line >= 0x4000) {
+    	panic("TkImage too wide!");
+    }
 	pixmap.rowBytes = image->bytes_per_line | 0x8000;
 	
 	CopyBits((BitMap *) &pixmap, &((GrafPtr) destPort)->portBits, 
@@ -1191,4 +1194,3 @@ TkpDrawHighlightBorder (
         }
     }
 }
-

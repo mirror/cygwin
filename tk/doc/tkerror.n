@@ -36,4 +36,3 @@ documentation.
 
 .SH KEYWORDS
 background error, reporting
-

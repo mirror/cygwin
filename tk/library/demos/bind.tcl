@@ -77,4 +77,3 @@ $w.text tag bind d6 <1> {source [file join $tk_library demos cscroll.tcl]}
 
 $w.text mark set insert 0.0
 $w.text configure -state disabled
-

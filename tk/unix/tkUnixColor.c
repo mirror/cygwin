@@ -422,4 +422,3 @@ TkpCmapStressed(tkwin, colormap)
     }
     return 0;
 }
-

@@ -101,12 +101,14 @@ leave on each side of the slave(s).
 .TP
 \fB\-padx \fIamount\fR
 \fIAmount\fR specifies how much horizontal external padding to
-leave on each side of the slave(s).
+leave on each side of the slave(s).  \fIAmount\fR may be a list
+of two values to specify padding for left and right separately.
 \fIAmount\fR defaults to 0.
 .TP
 \fB\-pady \fIamount\fR
 \fIAmount\fR specifies how much vertical external padding to
-leave on each side of the slave(s).
+leave on each side of the slave(s).  \fIAmount\fR may be a list
+of two values to specify padding for top and bottom separtely.
 \fIAmount\fR defaults to 0.
 .TP
 \fB\-side \fIside\fR
@@ -264,4 +266,3 @@ the stacking order of either the master or the slave.
 
 .SH KEYWORDS
 geometry manager, location, packer, parcel, propagation, size
-

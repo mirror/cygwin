@@ -1232,10 +1232,8 @@ ReconfigureIndividualMenu(
                     }
 		    if (glyph != 0x0) {
 			SetMenuItemKeyGlyph(macMenuHdl, base + index, glyph);
-			if (modifiers == 0) {
-			    if (!hasCmd) {
-				modifiers |= kMenuNoCommandModifier;
-			    }
+			if (!hasCmd) {
+			    modifiers |= kMenuNoCommandModifier;
 			}
 		    }
                 }

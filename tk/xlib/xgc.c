@@ -14,13 +14,20 @@
 
 #include <tkInt.h>
 
+#if !defined(MAC_TCL) && !defined(MAC_OSX_TK)
+#	include <X11/Xlib.h>
+#endif
 #ifdef MAC_TCL
 #	include <Xlib.h>
 #	include <X.h>
 #	define Cursor XCursor
 #	define Region XRegion
-#else
+#endif
+#ifdef MAC_OSX_TK
 #	include <X11/Xlib.h>
+#	include <X11/X.h>
+#	define Cursor XCursor
+#	define Region XRegion
 #endif
 
 
@@ -438,7 +445,7 @@ XDrawPoints(display, d, gc, points, npoints, mode)
     }
 }
 
-#ifndef MAC_TCL
+#if !defined(MAC_TCL) && !defined(MAC_OSX_TK)
 void
 XDrawSegments(display, d, gc, segments, nsegments)
     Display* display;
@@ -542,4 +549,3 @@ XUndefineCursor(display, w)
     Window w;
 {
 }
-

@@ -95,4 +95,3 @@ functionality is provided by the \fBdde\fR command instead.
 .VS
 application, dde, name, remote execution, security, send
 .VE
-

@@ -39,6 +39,15 @@ typedef struct TkMenuPlatformData_ *TkMenuPlatformData;
 typedef struct TkMenuPlatformEntryData_ *TkMenuPlatformEntryData;
 
 /*
+ * Legal values for the "compound" field of TkMenuEntry and TkMenuButton records.
+ */
+
+enum compound {
+    COMPOUND_BOTTOM, COMPOUND_CENTER, COMPOUND_LEFT, COMPOUND_NONE,
+	COMPOUND_RIGHT, COMPOUND_TOP
+};
+
+/*
  * One of the following data structures is kept for each entry of each
  * menu managed by this file:
  */
@@ -115,6 +124,9 @@ typedef struct TkMenuEntry {
 				 * entry. */
     int labelWidth;		/* Number of pixels to allow for displaying
 				 * labels in menu entries. */
+    int compound;		/* Value of -compound option; specifies whether
+				 * the entry should show both an image and
+				 * text, and, if so, how. */
 
     /*
      * Information used to implement this entry's action:
@@ -569,5 +581,4 @@ EXTERN void		TkpSetWindowMenuBar _ANSI_ARGS_((Tk_Window tkwin,
 # define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif /* _TKMENU */
-
 

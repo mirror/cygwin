@@ -189,7 +189,7 @@ int
 Tk_CanvasGetCoord(interp, canvas, string, doublePtr)
     Tcl_Interp *interp;		/* Interpreter for error reporting. */
     Tk_Canvas canvas;		/* Canvas to which coordinate applies. */
-    char *string;		/* Describes coordinate (any screen
+    CONST char *string;		/* Describes coordinate (any screen
 				 * coordinate form may be used here). */
     double *doublePtr;		/* Place to store converted coordinate. */
 {
@@ -369,14 +369,14 @@ Tk_CanvasTagsParseProc(clientData, interp, tkwin, value, widgRec, offset)
     ClientData clientData;		/* Not used.*/
     Tcl_Interp *interp;			/* Used for reporting errors. */
     Tk_Window tkwin;			/* Window containing canvas widget. */
-    char *value;			/* Value of option (list of tag
+    CONST char *value;			/* Value of option (list of tag
 					 * names). */
     char *widgRec;			/* Pointer to record for item. */
     int offset;				/* Offset into item (ignored). */
 {
     register Tk_Item *itemPtr = (Tk_Item *) widgRec;
     int argc, i;
-    char **argv;
+    CONST char **argv;
     Tk_Uid *newPtr;
 
     /*
@@ -454,7 +454,7 @@ Tk_CanvasTagsPrintProc(clientData, tkwin, widgRec, offset, freeProcPtr)
 	return (char *) itemPtr->tagPtr[0];
     }
     *freeProcPtr = TCL_DYNAMIC;
-    return Tcl_Merge(itemPtr->numTags, (char **) itemPtr->tagPtr);
+    return Tcl_Merge(itemPtr->numTags, (CONST char **) itemPtr->tagPtr);
 }
 
 
@@ -706,7 +706,14 @@ TkSmoothParseProc(clientData, interp, tkwin, value, widgRec, offset)
     if (smooth) {
 	*smoothPtr = smooth;
 	return TCL_OK;
+    } else if (strncmp(value, tkBezierSmoothMethod.name, length) == 0) {
+	/*
+	 * We need to do handle the built-in bezier method.
+	 */
+	*smoothPtr = &tkBezierSmoothMethod;
+	return TCL_OK;
     }
+
 
     if (Tcl_GetBoolean(interp, (char *) value, &b) != TCL_OK) {
 	return TCL_ERROR;
@@ -777,7 +784,7 @@ Tk_GetDash(interp, value, dash)
 				 * store dash information. */
 {
     int argc, i;
-    char **largv, **argv = NULL;
+    CONST char **largv, **argv = NULL;
     char *pt;
 
     if ((value==(char *) NULL) || (*value==0) ) {
@@ -1472,4 +1479,3 @@ DashConvert (l, p, n, width)
     }
     return result;
 }
-

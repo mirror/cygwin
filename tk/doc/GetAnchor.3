@@ -24,7 +24,7 @@ int
 int
 \fBTk_GetAnchor(\fIinterp, string, anchorPtr\fB)\fR
 .sp
-char *
+CONST char *
 \fBTk_NameOfAnchor(\fIanchor\fB)\fR
 .SH ARGUMENTS
 .AS "Tk_Anchor" *anchorPtr
@@ -35,7 +35,7 @@ Interpreter to use for error reporting, or NULL.
 String value contains name of anchor point: \fBn\fR, \fBne\fR,
 \fBe\fR, \fBse\fR, \fBs\fR, \fBsw\fR, \fBw\fR, \fBnw\fR, or \fBcenter\fR;
 internal rep will be modified to cache corresponding Tk_Anchor.
-.AP char *string in
+.AP "CONST char" *string in
 Same as \fIobjPtr\fR except description of anchor point is passed as
 a string.
 .VE
@@ -84,4 +84,3 @@ If \fIanchor\fR isn't a legal anchor value, then
 
 .SH KEYWORDS
 anchor position
-

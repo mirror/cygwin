@@ -19,6 +19,10 @@
 #include "tkInt.h"
 #endif
 
+#ifndef _TKMENU
+#include "tkMenu.h"
+#endif
+
 #ifdef BUILD_tk
 # undef TCL_STORAGE_CLASS
 # define TCL_STORAGE_CLASS DLLEXPORT
@@ -162,6 +166,10 @@ typedef struct {
      * Miscellaneous information:
      */
 
+    int compound;               /* Value of -compound option; specifies whether
+                                 * the menubutton should show both an image and
+                                 * text, and, if so, how. */
+
     enum direction direction;	/* Direction for where to pop the menu.
     				 * Valid directions are "above", "below",
     				 * "left", "right", and "flush". "flush"
@@ -211,7 +219,7 @@ typedef struct {
  * Declaration of variables shared between the files in the button module.
  */
 
-extern TkClassProcs tkpMenubuttonClass;
+extern Tk_ClassProcs tkpMenubuttonClass;
 
 /*
  * Declaration of procedures used in the implementation of the button
@@ -232,4 +240,3 @@ EXTERN void		TkMenuButtonWorldChanged _ANSI_ARGS_((
 # define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif /* _TKMENUBUTTON */
-

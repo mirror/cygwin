@@ -16,12 +16,14 @@ radiobutton \- Create and manipulate radiobutton widgets
 .SH SYNOPSIS
 \fBradiobutton\fR \fIpathName \fR?\fIoptions\fR?
 .SO
-\-activebackground	\-cursor	\-highlightthickness	\-takefocus
-\-activeforeground	\-disabledforeground	\-image	\-text
-\-anchor	\-font	\-justify	\-textvariable
-\-background	\-foreground	\-padx	\-underline
-\-bitmap	\-highlightbackground	\-pady	\-wraplength
-\-borderwidth	\-highlightcolor	\-relief
+\-activebackground	\-font	\-pady
+\-activeforeground	\-foreground	\-relief
+\-anchor	\-highlightbackground	\-takefocus
+\-background	\-highlightcolor	\-text
+\-bitmap	\-highlightthickness	\-textvariable
+\-borderwidth	\-image	\-underline
+\-cursor	\-justify	\-wraplength
+\-disabledforeground	\-padx
 .SE
 .SH "WIDGET-SPECIFIC OPTIONS"
 .OP \-command command Command
@@ -51,6 +53,27 @@ for the entire widget, in place of \fBbackground\fR or \fBactiveBackground\fR,
 whenever the widget is selected.
 If specified as an empty string then no special color is used for
 displaying when the widget is selected.
+.VS 8.4
+.OP \-offrelief offRelief OffRelief
+Specifies the relief for the checkbutton when the indicator is not drawn and
+the checkbutton is off.  The default value is "raised".  By setting this option
+to "flat" and setting -indicatoron to false and -overrelief to raised,
+the effect is achieved 
+of having a flat button that raises on mouse-over and which is
+depressed when activated.  This is the behavior typically exhibited by
+the Align-Left, Align-Right, and Center radiobuttons on the toolbar of a 
+word-processor, for example.
+
+.VE 8.4
+.VS 8.4
+.OP \-overrelief overRelief OverRelief
+Specifies an alternative relief for the radiobutton, to be used when the
+mouse cursor is over the widget.  This option can be used to make
+toolbar buttons, by configuring \fB\-relief flat \-overrelief
+raised\fR.  If the value of this option is the empty string, then no
+alternative relief is used when the mouse cursor is over the radiobutton.
+The empty string is the default value.
+.VE 8.4
 .OP \-selectimage selectImage SelectImage
 Specifies an image to display (in place of the \fBimage\fR option)
 when the radiobutton is selected.
@@ -231,4 +254,3 @@ individual widgets or by redefining the class bindings.
 
 .SH KEYWORDS
 radiobutton, widget
-

@@ -44,4 +44,3 @@ browse -	A simple directory browser.  Invoke it with and argument
 		Control-c and control-q cause the program to exit.
 
 RCS: @(#) $Id$
-

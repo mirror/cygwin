@@ -921,5 +921,3 @@
 { "hebrew_shin", 0xcf9 },
 { "hebrew_taf", 0xcfa },
 { "Hebrew_switch", 0xFF7E },
-
-

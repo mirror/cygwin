@@ -13,17 +13,18 @@ namespace eval ::tk::dialog::file {}
 
 # Make the chooseDir namespace inside the dialog namespace
 namespace eval ::tk::dialog::file::chooseDir {
+    namespace import ::tk::msgcat::*
 }
 
-# ::tk::dialog::file::tkChooseDirectory --
+# ::tk::dialog::file::chooseDir:: --
 #
 #	Implements the TK directory selection dialog.
 #
 # Arguments:
 #	args		Options parsed by the procedure.
 #
-proc ::tk::dialog::file::chooseDir::tkChooseDirectory {args} {
-    global tkPriv
+proc ::tk::dialog::file::chooseDir:: {args} {
+    variable ::tk::Priv
     set dataName __tk_choosedir
     upvar ::tk::dialog::file::$dataName data
     ::tk::dialog::file::chooseDir::Config $dataName $args
@@ -50,7 +51,17 @@ proc ::tk::dialog::file::chooseDir::tkChooseDirectory {args} {
 	set data(okBtn) $w.f2.ok
 	set data(cancelBtn) $w.f3.cancel
     }
-    wm transient $w $data(-parent)
+
+    # Dialog boxes should be transient with respect to their parent,
+    # so that they will always stay on top of their parent window.  However,
+    # some window managers will create the window as withdrawn if the parent
+    # window is withdrawn or iconified.  Combined with the grab we put on the
+    # window, this can hang the entire application.  Therefore we only make
+    # the dialog transient if the parent is viewable.
+
+    if {[winfo viewable [winfo toplevel $data(-parent)]] } {
+	wm transient $w $data(-parent)
+    }
 
     trace variable data(selectPath) w [list ::tk::dialog::file::SetPath $w]
     $data(dirMenuBtn) configure \
@@ -81,7 +92,7 @@ proc ::tk::dialog::file::chooseDir::tkChooseDirectory {args} {
     # may take the focus away so we can't redirect it.  Finally,
     # restore any grab that was in effect.
 
-    tkwait variable tkPriv(selectFilePath)
+    vwait ::tk::Priv(selectFilePath)
 
     ::tk::RestoreFocusGrab $w $data(ent) withdraw
 
@@ -96,7 +107,7 @@ proc ::tk::dialog::file::chooseDir::tkChooseDirectory {args} {
     # Return value to user
     #
     
-    return $tkPriv(selectFilePath)
+    return $Priv(selectFilePath)
 }
 
 # ::tk::dialog::file::chooseDir::Config --
@@ -135,8 +146,13 @@ proc ::tk::dialog::file::chooseDir::Config {dataName argList} {
     tclParseConfigSpec ::tk::dialog::file::$dataName $specs "" $argList
 
     if {$data(-title) == ""} {
-	set data(-title) "Choose Directory"
+	set data(-title) "[mc "Choose Directory"]"
     }
+    
+    # Stub out the -multiple value for the dialog; it doesn't make sense for
+    # choose directory dialogs, but we have to have something there because we
+    # share so much code with the file dialogs.
+    set data(-multiple) 0
 
     # 4: set the default directory and selection according to the -initial
     #    settings
@@ -177,8 +193,9 @@ proc ::tk::dialog::file::chooseDir::OkCmd {w} {
     # 4b.   If the value is different from the current directory, change to
     #       that directory.
 
-    set iconText [tkIconList_Get $data(icons)]
-    if { ![string equal $iconText ""] } {
+    set selection [tk::IconList_Curselection $data(icons)]
+    if { [llength $selection] != 0 } {
+	set iconText [tk::IconList_Get $data(icons) [lindex $selection 0]]
 	set iconText [file join $data(selectPath) $iconText]
 	::tk::dialog::file::chooseDir::Done $w $iconText
     } else {
@@ -214,11 +231,13 @@ proc ::tk::dialog::file::chooseDir::OkCmd {w} {
 
 proc ::tk::dialog::file::chooseDir::DblClick {w} {
     upvar ::tk::dialog::file::[winfo name $w] data
-    set text [tkIconList_Get $data(icons)]
-    if {[string compare $text ""]} {
+    set selection [tk::IconList_Curselection $data(icons)]
+    if { [llength $selection] != 0 } {
+	set filenameFragment \
+		[tk::IconList_Get $data(icons) [lindex $selection 0]]
 	set file $data(selectPath)
 	if {[file isdirectory $file]} {
-	    ::tk::dialog::file::ListInvoke $w $text
+	    ::tk::dialog::file::ListInvoke $w [list $filenameFragment]
 	    return
 	}
     }
@@ -243,13 +262,13 @@ proc ::tk::dialog::file::chooseDir::ListBrowse {w text} {
 #
 #	Gets called when user has input a valid filename.  Pops up a
 #	dialog box to confirm selection when necessary. Sets the
-#	tkPriv(selectFilePath) variable, which will break the "tkwait"
+#	Priv(selectFilePath) variable, which will break the "vwait"
 #	loop in tk_chooseDirectory and return the selected filename to the
 #	script that calls tk_getOpenFile or tk_getSaveFile
 #
 proc ::tk::dialog::file::chooseDir::Done {w {selectFilePath ""}} {
     upvar ::tk::dialog::file::[winfo name $w] data
-    global tkPriv
+    variable ::tk::Priv
 
     if {[string equal $selectFilePath ""]} {
 	set selectFilePath $data(selectPath)
@@ -260,5 +279,5 @@ proc ::tk::dialog::file::chooseDir::Done {w {selectFilePath ""}} {
 	    return
 	}
     }
-    set tkPriv(selectFilePath) $selectFilePath
+    set Priv(selectFilePath) $selectFilePath
 }

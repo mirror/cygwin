@@ -51,6 +51,7 @@
 #define DEF_BUTTON_BITMAP		""
 #define DEF_BUTTON_BORDER_WIDTH		"2"
 #define DEF_BUTTON_CURSOR		""
+#define DEF_BUTTON_COMPOUND		"none"
 #define DEF_BUTTON_COMMAND		""
 #define DEF_BUTTON_DEFAULT		"disabled"
 #define DEF_BUTTON_DISABLED_FG_COLOR	DISABLED
@@ -69,12 +70,15 @@
 #define DEF_BUTTON_JUSTIFY		"center"
 #define DEF_BUTTON_OFF_VALUE		"0"
 #define DEF_BUTTON_ON_VALUE		"1"
+#define DEF_BUTTON_OVER_RELIEF		""
 #define DEF_BUTTON_PADX			"3m"
 #define DEF_LABCHKRAD_PADX		"1"
 #define DEF_BUTTON_PADY			"1m"
 #define DEF_LABCHKRAD_PADY		"1"
 #define DEF_BUTTON_RELIEF		"raised"
 #define DEF_LABCHKRAD_RELIEF		"flat"
+#define DEF_BUTTON_REPEAT_DELAY		"0"
+#define DEF_BUTTON_REPEAT_INTERVAL	"0"
 #define DEF_BUTTON_SELECT_COLOR		INDICATOR
 #define DEF_BUTTON_SELECT_MONO		BLACK
 #define DEF_BUTTON_SELECT_IMAGE		(char *) NULL
@@ -133,6 +137,9 @@
 #define DEF_ENTRY_BG_MONO		WHITE
 #define DEF_ENTRY_BORDER_WIDTH		"2"
 #define DEF_ENTRY_CURSOR		"xterm"
+#define DEF_ENTRY_DISABLED_BG_COLOR	NORMAL_BG
+#define DEF_ENTRY_DISABLED_BG_MONO	WHITE
+#define DEF_ENTRY_DISABLED_FG		DISABLED
 #define DEF_ENTRY_EXPORT_SELECTION	"1"
 #define DEF_ENTRY_FONT			"Helvetica -12"
 #define DEF_ENTRY_FG			BLACK
@@ -146,6 +153,8 @@
 #define DEF_ENTRY_INSERT_ON_TIME	"600"
 #define DEF_ENTRY_INSERT_WIDTH		"2"
 #define DEF_ENTRY_JUSTIFY		"left"
+#define DEF_ENTRY_READONLY_BG_COLOR	NORMAL_BG
+#define DEF_ENTRY_READONLY_BG_MONO	WHITE
 #define DEF_ENTRY_RELIEF		"sunken"
 #define DEF_ENTRY_SCROLL_COMMAND	""
 #define DEF_ENTRY_SELECT_COLOR		SELECT_BG
@@ -175,20 +184,36 @@
 #define DEF_FRAME_HIGHLIGHT_BG		NORMAL_BG
 #define DEF_FRAME_HIGHLIGHT		BLACK
 #define DEF_FRAME_HIGHLIGHT_WIDTH	"0"
+#define DEF_FRAME_LABEL			""
+#define DEF_FRAME_PADX			"0"
+#define DEF_FRAME_PADY			"0"
 #define DEF_FRAME_RELIEF		"flat"
 #define DEF_FRAME_TAKE_FOCUS		"0"
-#define DEF_FRAME_USE			""
 #define DEF_FRAME_VISUAL		""
 #define DEF_FRAME_WIDTH			"0"
+
+/*
+ * Defaults for labelframes:
+ */
+
+#define DEF_LABELFRAME_BORDER_WIDTH	"2"
+#define DEF_LABELFRAME_CLASS		"Labelframe"
+#define DEF_LABELFRAME_RELIEF		"groove"
+#define DEF_LABELFRAME_FG		BLACK
+#define DEF_LABELFRAME_FONT		"Helvetica -12 bold"
+#define DEF_LABELFRAME_TEXT		""
+#define DEF_LABELFRAME_LABELANCHOR	"nw"
 
 /*
  * Defaults for listboxes:
  */
 
+#define DEF_LISTBOX_ACTIVE_STYLE	"underline"
 #define DEF_LISTBOX_BG_COLOR		NORMAL_BG
 #define DEF_LISTBOX_BG_MONO		WHITE
 #define DEF_LISTBOX_BORDER_WIDTH	"2"
 #define DEF_LISTBOX_CURSOR		""
+#define DEF_LISTBOX_DISABLED_FG		DISABLED
 #define DEF_LISTBOX_EXPORT_SELECTION	"1"
 #define DEF_LISTBOX_FONT		"Helvetica -12 bold"
 #define DEF_LISTBOX_FG			BLACK
@@ -206,6 +231,7 @@
 #define DEF_LISTBOX_SELECT_FG_MONO	WHITE
 #define DEF_LISTBOX_SELECT_MODE		"browse"
 #define DEF_LISTBOX_SET_GRID		"0"
+#define DEF_LISTBOX_STATE		"normal"
 #define DEF_LISTBOX_TAKE_FOCUS		(char *) NULL
 #define DEF_LISTBOX_WIDTH		"20"
 
@@ -220,6 +246,7 @@
 #define DEF_MENU_ENTRY_BITMAP		None
 #define DEF_MENU_ENTRY_COLUMN_BREAK	"0"
 #define DEF_MENU_ENTRY_COMMAND		(char *) NULL
+#define DEF_MENU_ENTRY_COMPOUND 	"none"
 #define DEF_MENU_ENTRY_FG		(char *) NULL
 #define DEF_MENU_ENTRY_FONT		(char *) NULL
 #define DEF_MENU_ENTRY_HIDE_MARGIN	"0"
@@ -328,6 +355,40 @@
 #define DEF_MESSAGE_WIDTH		"0"
 
 /*
+ * Defaults for panedwindows
+ */
+
+#define DEF_PANEDWINDOW_BG_COLOR	NORMAL_BG
+#define DEF_PANEDWINDOW_BG_MONO		WHITE
+#define DEF_PANEDWINDOW_BORDERWIDTH	"2"
+#define DEF_PANEDWINDOW_CURSOR		""
+#define DEF_PANEDWINDOW_HANDLEPAD	"8"
+#define DEF_PANEDWINDOW_HANDLESIZE	"8"
+#define DEF_PANEDWINDOW_HEIGHT		""
+#define DEF_PANEDWINDOW_OPAQUERESIZE	"0"
+#define DEF_PANEDWINDOW_ORIENT		"horizontal"
+#define DEF_PANEDWINDOW_RELIEF		"flat"
+#define DEF_PANEDWINDOW_SASHCURSOR	""
+#define DEF_PANEDWINDOW_SASHPAD		"2"
+#define DEF_PANEDWINDOW_SASHRELIEF	"raised"
+#define DEF_PANEDWINDOW_SASHWIDTH	"2"
+#define DEF_PANEDWINDOW_SHOWHANDLE	"1"
+#define DEF_PANEDWINDOW_WIDTH		""
+
+/*
+ * Defaults for panedwindow panes
+ */
+
+#define DEF_PANEDWINDOW_PANE_AFTER	""
+#define DEF_PANEDWINDOW_PANE_BEFORE	""
+#define DEF_PANEDWINDOW_PANE_HEIGHT	""
+#define DEF_PANEDWINDOW_PANE_MINSIZE	"0"
+#define DEF_PANEDWINDOW_PANE_PADX	"0"
+#define DEF_PANEDWINDOW_PANE_PADY	"0"
+#define DEF_PANEDWINDOW_PANE_STICKY	"nsew"
+#define DEF_PANEDWINDOW_PANE_WIDTH	""
+
+/*
  * Defaults for scales:
  */
 
@@ -397,6 +458,7 @@
  * Defaults for texts:
  */
 
+#define DEF_TEXT_AUTO_SEPARATORS	"1"
 #define DEF_TEXT_BG_COLOR		NORMAL_BG
 #define DEF_TEXT_BG_MONO		WHITE
 #define DEF_TEXT_BORDER_WIDTH		"2"
@@ -414,6 +476,7 @@
 #define DEF_TEXT_INSERT_OFF_TIME	"300"
 #define DEF_TEXT_INSERT_ON_TIME		"600"
 #define DEF_TEXT_INSERT_WIDTH		"2"
+#define DEF_TEXT_MAX_UNDO    	"0"
 #define DEF_TEXT_PADX			"1"
 #define DEF_TEXT_PADY			"1"
 #define DEF_TEXT_RELIEF			"sunken"
@@ -431,11 +494,11 @@
 #define DEF_TEXT_STATE			"normal"
 #define DEF_TEXT_TABS			""
 #define DEF_TEXT_TAKE_FOCUS		(char *) NULL
+#define DEF_TEXT_UNDO    		"0"
 #define DEF_TEXT_WIDTH			"80"
 #define DEF_TEXT_WRAP			"char"
 #define DEF_TEXT_XSCROLL_COMMAND	""
 #define DEF_TEXT_YSCROLL_COMMAND	""
-#define DEF_TEXT_TAB_SIZE		"8"
 
 /*
  * Defaults for canvas text:
@@ -451,6 +514,6 @@
 #define DEF_TOPLEVEL_CLASS		"Toplevel"
 #define DEF_TOPLEVEL_MENU		""
 #define DEF_TOPLEVEL_SCREEN		""
+#define DEF_TOPLEVEL_USE		""
 
 #endif /* _TKUNIXDEFAULT */
-

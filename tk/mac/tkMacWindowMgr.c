@@ -273,13 +273,13 @@ TkAboutDlg()
     while (itemHit != 1) {
 	ModalDialog( NULL, &itemHit);
     }
-    DisposDialog(aboutDlog);
+    DisposeDialog(aboutDlog);
     aboutDlog = NULL;
 	
     if (TkMacHaveAppearance() >= 0x110) {
-    SelectWindow(FrontWindow());
-    } else {
         SelectWindow(FrontNonFloatingWindow());
+    } else {
+    SelectWindow(FrontWindow());
     }
 
     return;
@@ -426,7 +426,7 @@ GenerateUpdates(
      
     for (childPtr = winPtr->childList; childPtr != NULL;
 				       childPtr = childPtr->nextPtr) {
-	if (!Tk_IsMapped(childPtr) || Tk_IsTopLevel(childPtr)) {
+	if (!Tk_IsMapped(childPtr) || Tk_TopWinHierarchy(childPtr)) {
 	    continue;
 	}
 
@@ -1234,7 +1234,11 @@ TkMacConvertEvent(
 	    /* fall through */
 	    
 	case keyUp:
+	    if (TkMacHaveAppearance() >= 0x110) {
 	    whichWindow = FrontNonFloatingWindow();
+	    } else {
+	        whichWindow = FrontWindow();
+	    }
 	    if (whichWindow == NULL) {
 	        /*
 	         * This happens if we get a key event before Tk has had a
@@ -1542,7 +1546,7 @@ void
 TkpSetCapture(
     TkWindow *winPtr)			/* Capture window, or NULL. */
 {
-    while ((winPtr != NULL) && !Tk_IsTopLevel(winPtr)) {
+    while ((winPtr != NULL) && !Tk_TopWinHierarchy(winPtr)) {
 	winPtr = winPtr->parentPtr;
     }
     gGrabWinPtr = (Tk_Window) winPtr;
@@ -1715,7 +1719,7 @@ BringWindowForward(
     WindowRef wRef)
 {
     if (!TkpIsWindowFloating(wRef)) {
-        if (IsValidWindowPtr(wRef))
+        if ((TkMacHaveAppearance() < 0x110) || IsValidWindowPtr(wRef))
         SelectWindow(wRef);
     }
 }
@@ -1785,5 +1789,3 @@ TkpIsWindowFloating(WindowRef wRef)
     return (class == kFloatingWindowClass);
         
 }
-
-

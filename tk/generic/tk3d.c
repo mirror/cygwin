@@ -20,8 +20,9 @@
  * used by Tk_GetReliefFromObj.
  */
 
-static char *reliefStrings[] = {"flat", "groove", "raised", "ridge", "solid",
-	"sunken", (char *) NULL};
+static CONST char *reliefStrings[] = {"flat", "groove", "raised",
+				    "ridge", "solid", "sunken", 
+				    (char *) NULL};
 
 /*
  * Forward declarations for procedures defined in this file:
@@ -45,7 +46,7 @@ static void		ShiftLine _ANSI_ARGS_((XPoint *p1Ptr, XPoint *p2Ptr,
  * is set.
  */
 
-static Tcl_ObjType borderObjType = {
+Tcl_ObjType tkBorderObjType = {
     "border",			/* name */
     FreeBorderObjProc,		/* freeIntRepProc */
     DupBorderObjProc,		/* dupIntRepProc */
@@ -86,7 +87,7 @@ Tk_Alloc3DBorderFromObj(interp, tkwin, objPtr)
 {
     TkBorder *borderPtr;
 
-    if (objPtr->typePtr != &borderObjType) {
+    if (objPtr->typePtr != &tkBorderObjType) {
 	InitBorderObj(objPtr);
     }
     borderPtr = (TkBorder *) objPtr->internalRep.twoPtrValue.ptr1;
@@ -185,7 +186,7 @@ Tk_Get3DBorder(interp, tkwin, colorName)
     Tcl_Interp *interp;		/* Place to store an error message. */
     Tk_Window tkwin;		/* Token for window in which border will
 				 * be drawn. */
-    char *colorName;		/* String giving name of color
+    Tk_Uid colorName;		/* String giving name of color
 				 * for window background. */
 {
     Tcl_HashEntry *hashPtr;
@@ -323,7 +324,7 @@ Tk_Draw3DRectangle(tkwin, drawable, border, x, y, width, height,
  *--------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tk_NameOf3DBorder(border)
     Tk_3DBorder border;		/* Token for border. */
 {
@@ -651,7 +652,7 @@ Tk_GetReliefFromObj(interp, objPtr, resultPtr)
 int
 Tk_GetRelief(interp, name, reliefPtr)
     Tcl_Interp *interp;		/* For error messages. */
-    char *name;			/* Name of a relief type. */
+    CONST char *name;		/* Name of a relief type. */
     int *reliefPtr;		/* Where to store converted relief. */
 {
     char c;
@@ -702,7 +703,7 @@ Tk_GetRelief(interp, name, reliefPtr)
  *--------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tk_NameOfRelief(relief)
     int relief;		/* One of TK_RELIEF_FLAT, TK_RELIEF_RAISED,
 			 * or TK_RELIEF_SUNKEN. */
@@ -719,6 +720,8 @@ Tk_NameOfRelief(relief)
 	return "ridge";
     } else if (relief == TK_RELIEF_SOLID) {
 	return "solid";
+    } else if (relief == TK_RELIEF_NULL) {
+	return "";
     } else {
 	return "unknown relief";
     }
@@ -1260,7 +1263,7 @@ Tk_Get3DBorderFromObj(tkwin, objPtr)
     Tcl_HashEntry *hashPtr;
     TkDisplay *dispPtr = ((TkWindow *) tkwin)->dispPtr;
 
-    if (objPtr->typePtr != &borderObjType) {
+    if (objPtr->typePtr != &tkBorderObjType) {
 	InitBorderObj(objPtr);
     }
 
@@ -1353,7 +1356,7 @@ InitBorderObj(objPtr)
     if ((typePtr != NULL) && (typePtr->freeIntRepProc != NULL)) {
 	(*typePtr->freeIntRepProc)(objPtr);
     }
-    objPtr->typePtr = &borderObjType;
+    objPtr->typePtr = &tkBorderObjType;
     objPtr->internalRep.twoPtrValue.ptr1 = (VOID *) NULL;
 }
 
@@ -1405,5 +1408,3 @@ TkDebugBorder(tkwin, name)
     }
     return resultPtr;
 }
-
-

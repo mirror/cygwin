@@ -57,6 +57,7 @@ typedef struct TkBitmap {
 				 * and it isn't currently in use. */
     int width, height;		/* Dimensions of bitmap. */
     Display *display;		/* Display for which bitmap is valid. */
+    int screenNum;		/* Screen on which bitmap is valid */
     int resourceRefCount;	/* Number of active uses of this bitmap (each
 				 * active use corresponds to a call to
 				 * Tk_AllocBitmapFromObj or Tk_GetBitmap).
@@ -75,9 +76,9 @@ typedef struct TkBitmap {
 				 * (needed when deleting). */
     struct TkBitmap *nextPtr;	/* Points to the next TkBitmap structure with
 				 * the same name.  All bitmaps with the
-				 * same name (but different displays) are
-				 * chained together off a single entry in
-				 * nameTable. */
+				 * same name (but different displays or
+				 * screens) are chained together off a 
+				 * single entry in nameTable. */
 } TkBitmap;
 
 /* 
@@ -86,7 +87,7 @@ typedef struct TkBitmap {
  */
 
 typedef struct {
-    char *source;		/* Bitmap bits. */
+    CONST char *source;		/* Bitmap bits. */
     int width, height;		/* Dimensions of bitmap. */
 } DataKey;
 
@@ -124,7 +125,7 @@ static void		InitBitmapObj _ANSI_ARGS_((Tcl_Obj *objPtr));
  * ptr1 field of the Tcl_Obj points to a TkBitmap object.
  */
 
-static Tcl_ObjType bitmapObjType = {
+Tcl_ObjType tkBitmapObjType = {
     "bitmap",			/* name */
     FreeBitmapObjProc,		/* freeIntRepProc */
     DupBitmapObjProc,		/* dupIntRepProc */
@@ -167,7 +168,7 @@ Tk_AllocBitmapFromObj(interp, tkwin, objPtr)
 {
     TkBitmap *bitmapPtr;
 
-    if (objPtr->typePtr != &bitmapObjType) {
+    if (objPtr->typePtr != &tkBitmapObjType) {
 	InitBitmapObj(objPtr);
     }
     bitmapPtr = (TkBitmap *) objPtr->internalRep.twoPtrValue.ptr1;
@@ -186,7 +187,8 @@ Tk_AllocBitmapFromObj(interp, tkwin, objPtr)
 
 	    FreeBitmapObjProc(objPtr);
 	    bitmapPtr = NULL;
-	} else if (Tk_Display(tkwin) == bitmapPtr->display) {
+	} else if ( (Tk_Display(tkwin) == bitmapPtr->display)
+		&& (Tk_ScreenNumber(tkwin) == bitmapPtr->screenNum) ) {
 	    bitmapPtr->resourceRefCount++;
 	    return bitmapPtr->bitmap;
 	}
@@ -204,7 +206,8 @@ Tk_AllocBitmapFromObj(interp, tkwin, objPtr)
 	FreeBitmapObjProc(objPtr);
 	for (bitmapPtr = firstBitmapPtr; bitmapPtr != NULL;
 		bitmapPtr = bitmapPtr->nextPtr) {
-	    if (Tk_Display(tkwin) == bitmapPtr->display) {
+	    if ( (Tk_Display(tkwin) == bitmapPtr->display) &&
+		    (Tk_ScreenNumber(tkwin) == bitmapPtr->screenNum) ) {
 		bitmapPtr->resourceRefCount++;
 		bitmapPtr->objRefCount++;
 		objPtr->internalRep.twoPtrValue.ptr1 = (VOID *) bitmapPtr;
@@ -321,7 +324,8 @@ GetBitmap(interp, tkwin, string)
 	existingBitmapPtr = (TkBitmap *) Tcl_GetHashValue(nameHashPtr);
 	for (bitmapPtr = existingBitmapPtr; bitmapPtr != NULL;
 		bitmapPtr = bitmapPtr->nextPtr) {
-	    if (Tk_Display(tkwin) == bitmapPtr->display) {
+	    if ( (Tk_Display(tkwin) == bitmapPtr->display) &&
+		    (Tk_ScreenNumber(tkwin) == bitmapPtr->screenNum) ) {
 		bitmapPtr->resourceRefCount++;
 		return bitmapPtr;
 	    }
@@ -418,6 +422,7 @@ GetBitmap(interp, tkwin, string)
     bitmapPtr->width = width;
     bitmapPtr->height = height;
     bitmapPtr->display = Tk_Display(tkwin);
+    bitmapPtr->screenNum = Tk_ScreenNumber(tkwin);
     bitmapPtr->resourceRefCount = 1;
     bitmapPtr->objRefCount = 0;
     bitmapPtr->nameHashPtr = nameHashPtr;
@@ -463,7 +468,7 @@ Tk_DefineBitmap(interp, name, source, width, height)
     Tcl_Interp *interp;		/* Interpreter to use for error reporting. */
     CONST char *name;		/* Name to use for bitmap.  Must not already
 				 * be defined as a bitmap. */
-    char *source;		/* Address of bits for bitmap. */
+    CONST char *source;		/* Address of bits for bitmap. */
     int width;			/* Width of bitmap. */
     int height;			/* Height of bitmap. */
 {
@@ -518,7 +523,7 @@ Tk_DefineBitmap(interp, name, source, width, height)
  *--------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tk_NameOfBitmap(display, bitmap)
     Display *display;			/* Display for which bitmap was
 					 * allocated. */
@@ -804,7 +809,7 @@ Pixmap
 Tk_GetBitmapFromData(interp, tkwin, source, width, height)
     Tcl_Interp *interp;		/* Interpreter to use for error reporting. */
     Tk_Window tkwin;		/* Window in which bitmap will be used. */
-    char *source;		/* Bitmap data for bitmap shape. */
+    CONST char *source;		/* Bitmap data for bitmap shape. */
     int width, height;		/* Dimensions of bitmap. */
 {
     DataKey nameKey;
@@ -895,7 +900,7 @@ GetBitmapFromObj(tkwin, objPtr)
     Tcl_HashEntry *hashPtr;
     TkDisplay *dispPtr = ((TkWindow *) tkwin)->dispPtr;
 
-    if (objPtr->typePtr != &bitmapObjType) {
+    if (objPtr->typePtr != &tkBitmapObjType) {
 	InitBitmapObj(objPtr);
     }
 
@@ -970,7 +975,7 @@ InitBitmapObj(objPtr)
     if ((typePtr != NULL) && (typePtr->freeIntRepProc != NULL)) {
 	(*typePtr->freeIntRepProc)(objPtr);
     }
-    objPtr->typePtr = &bitmapObjType;
+    objPtr->typePtr = &tkBitmapObjType;
     objPtr->internalRep.twoPtrValue.ptr1 = (VOID *) NULL;
 }
 
@@ -1183,4 +1188,3 @@ TkGetBitmapPredefTable()
 
     return &tsdPtr->predefBitmapTable;
 }
-

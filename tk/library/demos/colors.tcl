@@ -99,4 +99,3 @@ $w.frame.list insert 0 gray60 gray70 gray80 gray85 gray90 gray95 \
     purple2 purple3 purple4 MediumPurple1 MediumPurple2 \
     MediumPurple3 MediumPurple4 thistle1 thistle2 thistle3 \
     thistle4
-

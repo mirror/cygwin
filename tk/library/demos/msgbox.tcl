@@ -63,4 +63,3 @@ proc showMessageBox {w} {
     tk_messageBox -icon info -message "You have selected \"$button\"" -type ok\
 	-parent $w
 }
-

@@ -17,20 +17,35 @@ entry \- Create and manipulate entry widgets
 .SH SYNOPSIS
 \fBentry\fR \fIpathName \fR?\fIoptions\fR?
 .SO
-\-background	\-highlightbackground	\-insertontime	\-selectforeground
-\-borderwidth	\-highlightcolor	\-insertwidth	\-takefocus
-\-cursor	\-highlightthickness	\-justify	\-textvariable
-\-exportselection	\-insertbackground	\-relief	\-xscrollcommand
-\-font	\-insertborderwidth	\-selectbackground
-\-foreground	\-insertofftime	\-selectborderwidth
+\-background	\-highlightthickness	\-selectbackground
+\-borderwidth	\-insertbackground	\-selectborderwidth
+\-cursor	\-insertborderwidth	\-selectforeground
+\-exportselection	\-insertofftime	\-takefocus
+\-font	\-insertontime	\-textvariable
+\-foreground	\-insertwidth	\-xscrollcommand
+\-highlightbackground	\-justify
+\-highlightcolor	\-relief
 .SE
 .SH "WIDGET-SPECIFIC OPTIONS"
+.VS 8.4
+.OP \-disabledbackground disabledBackground DisabledBackground
+Specifies the background color to use when the entry is disabled.  If
+this option is the empty string, the normal background color is used.
+.OP \-disabledforeground disabledForeground DisabledForeground
+Specifies the foreground color to use when the entry is disabled.  If
+this option is the empty string, the normal foreground color is used.
+.VE 8.4
 .VS 8.3
 .OP "\-invalidcommand or \-invcmd" invalidCommand InvalidCommand
 Specifies a script to eval when \fBvalidateCommand\fR returns 0.
 Setting it to {} disables this feature (the default).  The best use
 of this option is to set it to \fIbell\fR.  See \fBValidation\fR
 below for more information.
+.VE
+.VS 8.4
+.OP \-readonlybackground readonlyBackground ReadonlyBackground
+Specifies the background color to use when the entry is readonly.  If
+this option is the empty string, the normal background color is used.
 .VE
 .OP \-show show Show
 If this option is specified, then the true contents of the entry
@@ -42,11 +57,18 @@ a password.
 If characters in the entry are selected and copied elsewhere, the
 information copied will be what is displayed, not the true contents
 of the entry.
+.VS 8.4
 .OP \-state state State
-Specifies one of two states for the entry:  \fBnormal\fR or \fBdisabled\fR.
-If the entry is disabled then the value may not be changed using widget
-commands and no insertion cursor will be displayed, even if the input focus is
-in the widget.
+Specifies one of three states for the entry:  \fBnormal\fR,
+\fBdisabled\fR, or \fBreadonly\fR.  If the entry is readonly, then the
+value may not be changed using widget commands and no insertion cursor
+will be displayed, even if the input focus is in the widget; the
+contents of the widget may still be selected.  If the entry is
+disabled, the value may not be changed, no insertion cursor will be
+displayed, the contents will not be selectable, and the entry may
+be displayed in a different color, depending on the values of the
+\fB-disabledforeground\fR and \fB-disabledbackground\fR options.
+.VE 8.4
 .VS 8.3
 .OP \-validate validate Validate
 Specifies the mode in which validation should operate: \fBnone\fR,
@@ -123,7 +145,7 @@ loses focus.
 .IP \fBall\fR 10
 \fBvalidateCommand\fR will be called for all above conditions.
 .PP
-It is posible to perform percent substitutions on the \fBvalidateCommand\fR
+It is possible to perform percent substitutions on the \fBvalidateCommand\fR
 and \fBinvalidCommand\fR,
 just as you would in a \fBbind\fR script.  The following substitutions
 are recognized:
@@ -513,12 +535,15 @@ the insertion cursor.
 If the entry is disabled using the \fB\-state\fR option, then the entry's
 view can still be adjusted and text in the entry can still be selected,
 but no insertion cursor will be displayed and no text modifications will
-take place.
+take place
+.VS
+except if the entry is linked to a variable using the \fB\-textvariable\fR
+option, in which case any changes to the variable are reflected by the
+entry whatever the value of its \fB\-state\fR option.
+.VE
 .PP
 The behavior of entries can be changed by defining new bindings for
 individual widgets or by redefining the class bindings.
 
 .SH KEYWORDS
 entry, widget
-
-

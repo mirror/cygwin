@@ -29,20 +29,20 @@ The \fB::safe::loadTk\fR command initializes the required data structures
 in the named safe interpreter and then loads Tk into it.
 The command returns the name of the safe interpreter.
 If \fB\-use\fR is specified, the window identified by the specified system
-dependent identifier \fIwindowId\fR is used to contain the \fB``.''\fR
+dependent identifier \fIwindowId\fR is used to contain the ``.''
 window of the safe interpreter; it can be any valid id, eventually 
 referencing a window belonging to another application. As a convenience,
 if the window you plan to use is a Tk Window of the application you
 can use the window name (eg: \fB.x.y\fR) instead of its window Id 
 (\fB[winfo id .x.y]\fR).
 When \fB\-use\fR is not specified,
-a new toplevel window is created for the \fB``.''\fR window of
+a new toplevel window is created for the ``.'' window of
 the safe interpreter. On X11 if you want the embedded window
 to use another display than the default one, specify it with
 \fB\-display\fR.
 See the \fBSECURITY ISSUES\fR section below for implementation details.
 
-.SH SECURITY ISSUES
+.SH "SECURITY ISSUES"
 .PP
 Please read the \fBsafe\fR manual page for Tcl to learn about the basic
 security considerations for Safe Tcl.
@@ -74,4 +74,3 @@ safe(n), interp(n), library(n), load(n), package(n), source(n), unknown(n)
 .SH KEYWORDS
 alias, auto\-loading, auto_mkindex, load, master interpreter, safe
 interpreter, slave interpreter, source
-

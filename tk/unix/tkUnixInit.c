@@ -71,7 +71,7 @@ TkpGetAppName(interp, namePtr)
     Tcl_Interp *interp;
     Tcl_DString *namePtr;	/* A previously initialized Tcl_DString. */
 {
-    char *p, *name;
+    CONST char *p, *name;
 
     name = Tcl_GetVar(interp, "argv0", TCL_GLOBAL_ONLY);
     if ((name == NULL) || (*name == 0)) {
@@ -104,8 +104,8 @@ TkpGetAppName(interp, namePtr)
 
 void
 TkpDisplayWarning(msg, title)
-    char *msg;			/* Message to be displayed. */
-    char *title;		/* Title of warning. */
+    CONST char *msg;		/* Message to be displayed. */
+    CONST char *title;		/* Title of warning. */
 {
     Tcl_Channel errChannel = Tcl_GetStdChannel(TCL_STDERR);
     if (errChannel) {
@@ -115,4 +115,3 @@ TkpDisplayWarning(msg, title)
 	Tcl_WriteChars(errChannel, "\n", 1);
     }
 }
-

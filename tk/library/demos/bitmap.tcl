@@ -53,4 +53,3 @@ frame $w.frame
 bitmapRow $w.frame.0 error gray12 gray25 gray50 gray75
 bitmapRow $w.frame.1 hourglass info question questhead warning
 pack $w.frame -side top -expand yes -fill both
-

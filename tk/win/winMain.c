@@ -32,16 +32,11 @@
  */
 
 static void		setargv _ANSI_ARGS_((int *argcPtr, char ***argvPtr));
-static void		WishPanic _ANSI_ARGS_(TCL_VARARGS(char *,format));
+static void		WishPanic _ANSI_ARGS_(TCL_VARARGS(CONST char *,format));
 
 #ifdef TK_TEST
 extern int		Tktest_Init(Tcl_Interp *interp);
 #endif /* TK_TEST */
-
-#ifdef TCL_TEST
-extern int		TclObjTest_Init _ANSI_ARGS_((Tcl_Interp *interp));
-extern int		Tcltest_Init _ANSI_ARGS_((Tcl_Interp *interp));
-#endif /* TCL_TEST */
 
 static BOOL consoleRequired = TRUE;
 
@@ -98,16 +93,6 @@ WinMain(hInstance, hPrevInstance, lpszCmdLine, nCmdShow)
     char *p;
 
     Tcl_SetPanicProc(WishPanic);
-
-    /*
-     * Increase the application queue size from default value of 8.
-     * At the default value, cross application SendMessage of WM_KILLFOCUS
-     * will fail because the handler will not be able to do a PostMessage!
-     * This is only needed for Windows 3.x, since NT dynamically expands
-     * the queue.
-     */
-
-    SetMessageQueue(64);
 
     /*
      * Create the console channels and install them as the standard
@@ -189,17 +174,6 @@ Tcl_AppInit(interp)
 	}
     }
 
-#ifdef TCL_TEST
-    if (Tcltest_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
-    }
-    Tcl_StaticPackage(interp, "Tcltest", Tcltest_Init,
-            (Tcl_PackageInitProc *) NULL);
-    if (TclObjTest_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
-    }
-#endif /* TCL_TEST */
-
 #ifdef TK_TEST
     if (Tktest_Init(interp) == TCL_ERROR) {
 	goto error;
@@ -237,13 +211,13 @@ error:
  */
 
 void
-WishPanic TCL_VARARGS_DEF(char *,arg1)
+WishPanic TCL_VARARGS_DEF(CONST char *,arg1)
 {
     va_list argList;
     char buf[1024];
-    char *format;
+    CONST char *format;
     
-    format = TCL_VARARGS_START(char *,arg1,argList);
+    format = TCL_VARARGS_START(CONST char *,arg1,argList);
     vsprintf(buf, format, argList);
 
     MessageBeep(MB_ICONEXCLAMATION);
@@ -370,9 +344,8 @@ setargv(argcPtr, argvPtr)
     *argcPtr = argc;
     *argvPtr = argv;
 }
-
 
-#ifndef __CYGWIN__
+#if !defined(__GNUC__) || defined(TK_TEST)
 /*
  *----------------------------------------------------------------------
  *
@@ -400,15 +373,6 @@ int main(int argc, char **argv)
      */
 
     setlocale(LC_ALL, "C");
-    /*
-     * Increase the application queue size from default value of 8.
-     * At the default value, cross application SendMessage of WM_KILLFOCUS
-     * will fail because the handler will not be able to do a PostMessage!
-     * This is only needed for Windows 3.x, since NT dynamically expands
-     * the queue.
-     */
-
-    SetMessageQueue(64);
 
     /*
      * Create the console channels and install them as the standard
@@ -421,4 +385,4 @@ int main(int argc, char **argv)
     Tk_Main(argc, argv, Tcl_AppInit);
     return 0;
 }
-#endif /* !__CYGWIN__ */
+#endif /* !__GNUC__ || TK_TEST */

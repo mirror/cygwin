@@ -22,23 +22,6 @@
 # define TCL_STORAGE_CLASS DLLEXPORT
 #endif
 
-/* CYGNUS LOCAL.  */
-
-/* A linked list of GC structures.  */
-
-typedef struct TkGCList {
-    /* Next item on list.  */
-    struct TkGCList *next;
-    /* The display for the GC.  */
-    Display *display;
-    /* The GC.  */
-    GC gc;
-    /* GCForeground or GCBackground.  */
-    unsigned long mask;
-} TkGCList;
-
-/* END CYGNUS LOCAL */
-
 /*
  * One of the following data structures is used to keep track of
  * each color that is being used by the application; typically there
@@ -86,8 +69,6 @@ typedef struct TkColor {
 				 * valueTable (those allocated by
 				 * Tk_GetColorByValue) this field is always
 				 * NULL. */
-    /* CYGNUS LOCAL */
-    TkGCList *gcList;		/* List of GCs which use this color.  */
 } TkColor;
 
 /*
@@ -102,12 +83,7 @@ EXTERN TkColor *	TkpGetColor _ANSI_ARGS_((Tk_Window tkwin,
 EXTERN TkColor *	TkpGetColorByValue _ANSI_ARGS_((Tk_Window tkwin,
 			    XColor *colorPtr));	
 
-/* CYGNUS LOCAL.  */
-EXTERN void		TkMapOverColors _ANSI_ARGS_((void (*) (TkColor *)));
-EXTERN void		TkColorChanged _ANSI_ARGS_((TkColor *)); 
-
 # undef TCL_STORAGE_CLASS
 # define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif /* _TKCOLOR */
-

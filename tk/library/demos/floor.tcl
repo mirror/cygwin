@@ -94,7 +94,7 @@ proc newRoom w {
 proc roomChanged {w args} {
     global currentRoom floorItems colors
     $w delete highlight
-    if [catch {set item $floorItems($currentRoom)}] {
+    if {[catch {set item $floorItems($currentRoom)}]} {
 	return
     }
     set new [eval \
@@ -1368,4 +1368,3 @@ bind $c <B2-Motion> "$c scan dragto %x %y"
 bind $c <Destroy> "unset currentRoom"
 set currentRoom ""
 trace variable currentRoom w "roomChanged $c"
-

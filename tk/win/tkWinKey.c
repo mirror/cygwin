@@ -90,7 +90,29 @@ TkpGetString(winPtr, eventPtr, dsPtr)
     XKeyEvent* keyEv = &eventPtr->xkey;
 
     Tcl_DStringInit(dsPtr);
-    if (eventPtr->xkey.send_event != -1) {
+    if (eventPtr->xkey.send_event == -1) {
+        if (eventPtr->xkey.nbytes > 0) {
+	    Tcl_ExternalToUtfDString(TkWinGetKeyInputEncoding(),
+                    eventPtr->xkey.trans_chars, eventPtr->xkey.nbytes, dsPtr);
+        }
+    } else if (eventPtr->xkey.send_event == -2) {
+        /*
+         * Special case for win2000 multi-lingal IME input. 
+         * xkey.trans_chars[] already contains a UNICODE char.
+         */
+
+        int unichar;
+        char buf[TCL_UTF_MAX];
+        int len;
+
+        unichar = (eventPtr->xkey.trans_chars[1] & 0xff);
+        unichar <<= 8;
+        unichar |= (eventPtr->xkey.trans_chars[0] & 0xff);
+
+        len = Tcl_UniCharToUtf((Tcl_UniChar) unichar, buf);
+
+        Tcl_DStringAppend(dsPtr, buf, len);
+    } else  {
 	/*
 	 * This is an event generated from generic code.  It has no
 	 * nchars or trans_chars members. 
@@ -105,9 +127,6 @@ TkpGetString(winPtr, eventPtr, dsPtr)
 	    int len = Tcl_UniCharToUtf((Tcl_UniChar) (keysym & 255), buf);
 	    Tcl_DStringAppend(dsPtr, buf, len);
 	}
-    } else if (eventPtr->xkey.nbytes > 0) {
-	Tcl_ExternalToUtfDString(NULL, eventPtr->xkey.trans_chars,
-		eventPtr->xkey.nbytes, dsPtr);
     }
     return Tcl_DStringValue(dsPtr);
 }
@@ -565,14 +584,6 @@ TkpSetKeycodeAndState(tkwin, keySym, eventPtr)
             eventPtr->xkey.keycode = (KeyCode) (result & 0xff);
 	}
     }
-    {
-        /* Debug log */
-        FILE *fp = fopen("c:\\temp\\tklog.txt", "a");
-        if (fp != NULL) {
-            fprintf(fp, "TkpSetKeycode. Keycode %d State %d Keysym %d\n", eventPtr->xkey.keycode, eventPtr->xkey.state, keySym);
-            fclose(fp);
-        }
-    }
 }
 
 /*
@@ -729,5 +740,3 @@ XKeysymToString(keysym)
 {
     return NULL;
 }
-
-

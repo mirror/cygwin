@@ -17,3 +17,6 @@ button .hello -text "Hello, world" -command {
 }
 pack .hello
 
+# Local Variables:
+# mode: tcl
+# End:

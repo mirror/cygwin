@@ -61,6 +61,8 @@ Tk_InitImageArgs(interp, argc, argvPtr)
 	}
 	if (cmdInfo.isNativeObjectProc == 1) {
 	    useNewImage = 1; /* Tk uses the new image interface */
+	} else {
+	    useNewImage = 0; /* Tk uses old image interface */
 	}
     }
     if (useNewImage && (argc > 0)) {
@@ -72,4 +74,3 @@ Tk_InitImageArgs(interp, argc, argvPtr)
 	*argvPtr = (char **) argv;
     }
 }
-

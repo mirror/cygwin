@@ -80,8 +80,6 @@ static Tcl_ThreadDataKey dataKey;
 
 static int	FindSystemColor _ANSI_ARGS_((const char *name,
 		    XColor *colorPtr, int *indexPtr));
-static int	GetColorByName _ANSI_ARGS_((char *name, XColor *color));
-static int	GetColorByValue _ANSI_ARGS_((char *value, XColor *color));
 
 /*
  *----------------------------------------------------------------------

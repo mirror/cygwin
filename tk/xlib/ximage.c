@@ -47,7 +47,7 @@ XCreateBitmapFromData(display, d, data, width, height)
     GC gc;
     Pixmap pix;
 
-    pix = Tk_GetPixmap(display, d, width, height, 1);
+    pix = Tk_GetPixmap(display, d, (int) width, (int) height, 1);
     gc = XCreateGC(display, pix, 0, NULL);
     if (gc == NULL) {
 	return None;
@@ -69,4 +69,3 @@ XCreateBitmapFromData(display, d, data, width, height)
     XFreeGC(display, gc);
     return pix;
 }
-

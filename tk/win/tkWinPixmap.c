@@ -196,4 +196,3 @@ XGetGeometry(display, d, root_return, x_return, y_return, width_return,
     }
     return 1;
 }
-

@@ -31,14 +31,14 @@ Must be static: a
 pointer to this structure is retained by the image code.
 .AP Tcl_Interp *interp in
 Interpreter in which image was created.
-.AP char *name in
+.AP "CONST char" *name in
 Name of existing image.
 .AP Tk_ImageType **typePtrPtr out
 Points to word in which to store a pointer to type information for
 the given image, if it exists.
-.AP int argc
+.AP int argc in
 Number of arguments
-.AP char ***argvPtr
+.AP char ***argvPtr in/out
 Pointer to argument list
 .VE
 .BE
@@ -281,4 +281,3 @@ Tk_ImageChanged, Tk_GetImage, Tk_FreeImage, Tk_RedrawImage, Tk_SizeOfImage
 
 .SH KEYWORDS
 image manager, image type, instance, master
-

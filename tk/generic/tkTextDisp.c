@@ -96,6 +96,16 @@ typedef struct TextStyle {
         && ((s1)->sValuePtr->bgStipple == (s2)->sValuePtr->bgStipple))
 
 /*
+ * The following macro is used to compare two floating-point numbers
+ * to within a certain degree of scale.  Direct comparison fails on
+ * processors where the processor and memory representations of FP
+ * numbers of a particular precision is different (e.g. Intel)
+ */
+
+#define FP_EQUAL_SCALE(double1, double2, scaleFactor) \
+    (fabs((double1)-(double2))*((scaleFactor)+1.0) < 0.3)
+
+/*
  * The following structure describes one line of the display, which may
  * be either part or all of one line of the text.
  */
@@ -359,7 +369,7 @@ static int		MeasureChars _ANSI_ARGS_((Tk_Font tkfont,
 static void		MeasureUp _ANSI_ARGS_((TkText *textPtr,
 			    TkTextIndex *srcPtr, int distance,
 			    TkTextIndex *dstPtr));
-static int		NextTabStop _ANSI_ARGS_((TkText *textPtr, Tk_Font tkfont, int x,
+static int		NextTabStop _ANSI_ARGS_((Tk_Font tkfont, int x,
 			    int tabOrigin));
 static void		UpdateDisplayInfo _ANSI_ARGS_((TkText *textPtr));
 static void		ScrollByLines _ANSI_ARGS_((TkText *textPtr,
@@ -1880,6 +1890,25 @@ DisplayLineBackground(textPtr, dlPtr, prevPtr, pixmap)
 	    rightX = maxX;
 	}
 	if (chunkPtr->stylePtr->bgGC != None) {
+	    /* Not visible - bail out now */
+	    if (rightX + xOffset <= 0) {
+	        leftX = rightX;
+		continue;
+	    }
+
+	    /*
+	     * Trim the start position for drawing to be no further away than
+	     * -borderWidth. The reason is that on many X servers drawing from
+	     * -32768 (or less) to +something simply does not display
+	     * correctly. [Patch #541999]
+	     */
+	    if ((leftX + xOffset) < -(sValuePtr->borderWidth)) {
+	        leftX = -sValuePtr->borderWidth - xOffset;
+	    }
+	    if ((rightX - leftX) > 32767) {
+	        rightX = leftX + 32767;
+	    }
+
 	    XFillRectangle(display, pixmap, chunkPtr->stylePtr->bgGC,
 		    leftX + xOffset, 0, (unsigned int) (rightX - leftX),
 		    (unsigned int) dlPtr->height);
@@ -3270,7 +3299,7 @@ TkTextSeeCmd(textPtr, interp, argc, argv)
     TkText *textPtr;		/* Information about text widget. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings.  Someone else has already
+    CONST char **argv;		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "see". */
 {
@@ -3392,7 +3421,7 @@ TkTextXviewCmd(textPtr, interp, argc, argv)
     TkText *textPtr;		/* Information about text widget. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings.  Someone else has already
+    CONST char **argv;		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "xview". */
 {
@@ -3580,7 +3609,7 @@ TkTextYviewCmd(textPtr, interp, argc, argv)
     TkText *textPtr;		/* Information about text widget. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings.  Someone else has already
+    CONST char **argv;		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "yview". */
 {
@@ -3746,7 +3775,7 @@ TkTextScanCmd(textPtr, interp, argc, argv)
     register TkText *textPtr;	/* Information about text widget. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings.  Someone else has already
+    CONST char **argv;		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "scan". */
 {
@@ -3865,7 +3894,7 @@ GetXView(interp, textPtr, report)
 					 * scrollbar if it has changed. */
 {
     TextDInfo *dInfoPtr = textPtr->dInfoPtr;
-    char buffer[TCL_DOUBLE_SPACE * 2];
+    char buffer[TCL_DOUBLE_SPACE * 2 + 1];
     double first, last;
     int code;
 
@@ -3886,7 +3915,8 @@ GetXView(interp, textPtr, report)
 	Tcl_SetResult(interp, buffer, TCL_VOLATILE);
 	return;
     }
-    if ((first == dInfoPtr->xScrollFirst) && (last == dInfoPtr->xScrollLast)) {
+    if (FP_EQUAL_SCALE(first, dInfoPtr->xScrollFirst, dInfoPtr->maxLength) &&
+	FP_EQUAL_SCALE(last,  dInfoPtr->xScrollLast,  dInfoPtr->maxLength)) {
 	return;
     }
     dInfoPtr->xScrollFirst = first;
@@ -3936,7 +3966,7 @@ GetYView(interp, textPtr, report)
 					 * scrollbar if it has changed. */
 {
     TextDInfo *dInfoPtr = textPtr->dInfoPtr;
-    char buffer[TCL_DOUBLE_SPACE * 2];
+    char buffer[TCL_DOUBLE_SPACE * 2 + 1];
     double first, last;
     DLine *dlPtr;
     int totalLines, code, count;
@@ -3971,7 +4001,8 @@ GetYView(interp, textPtr, report)
 	Tcl_SetResult(interp, buffer, TCL_VOLATILE);
 	return;
     }
-    if ((first == dInfoPtr->yScrollFirst) && (last == dInfoPtr->yScrollLast)) {
+    if (FP_EQUAL_SCALE(first, dInfoPtr->yScrollFirst, totalLines) &&
+	FP_EQUAL_SCALE(last,  dInfoPtr->yScrollLast,  totalLines)) {
 	return;
     }
     dInfoPtr->yScrollFirst = first;
@@ -4380,7 +4411,7 @@ ElideMeasureProc(chunkPtr, x)
  *
  *	This procedure is the "layoutProc" for character segments.
  *
-n * Results:
+ * Results:
  *	If there is something to display for the chunk then a
  *	non-zero value is returned and the fields of chunkPtr
  *	will be filled in (see the declaration of TkTextDispChunk
@@ -4830,7 +4861,7 @@ AdjustForTab(textPtr, tabArrayPtr, index, chunkPtr)
 	 * interpretation of tabs.
 	 */
 
-	desired = NextTabStop(textPtr, textPtr->tkfont, x, 0);
+	desired = NextTabStop(textPtr->tkfont, x, 0);
 	goto update;
     }
 
@@ -4988,7 +5019,7 @@ SizeOfTab(textPtr, tabArrayPtr, index, x, maxX)
     TkTextTabAlign alignment;
 
     if ((tabArrayPtr == NULL) || (tabArrayPtr->numTabs == 0)) {
-	tabX = NextTabStop(textPtr, textPtr->tkfont, x, 0);
+	tabX = NextTabStop(textPtr->tkfont, x, 0);
 	return tabX - x;
     }
     if (index < tabArrayPtr->numTabs) {
@@ -5070,8 +5101,7 @@ SizeOfTab(textPtr, tabArrayPtr, index, x, maxX)
  */
 
 static int
-NextTabStop(textPtr, tkfont, x, tabOrigin)
-    TkText *textPtr;
+NextTabStop(tkfont, x, tabOrigin)
     Tk_Font tkfont;		/* Font in which chunk that contains tab
 				 * stop will be drawn. */
     int x;			/* X-position in pixels where last
@@ -5082,11 +5112,7 @@ NextTabStop(textPtr, tkfont, x, tabOrigin)
 {
     int tabWidth, rem;
     
-#if 1
-    tabWidth = Tk_TextWidth(tkfont, "0", 1) * textPtr->tabsize;
-#else
     tabWidth = Tk_TextWidth(tkfont, "0", 1) * 8;
-#endif
     if (tabWidth == 0) {
 	tabWidth = 1;
     }
@@ -5197,4 +5223,3 @@ MeasureChars(tkfont, source, maxBytes, startX, maxX, tabOrigin, nextXPtr)
     *nextXPtr = curX;
     return start - source;
 }
-

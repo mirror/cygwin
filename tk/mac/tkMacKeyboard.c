@@ -646,5 +646,3 @@ TkpInitKeymapInfo(dispPtr)
     }
     XFreeModifiermap(modMapPtr);
 }
-
-

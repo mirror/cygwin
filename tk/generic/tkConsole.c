@@ -47,21 +47,18 @@ TCL_DECLARE_MUTEX(consoleMutex)
  * The first three will be used in the tk app shells...
  */
  
-void	TkConsolePrint _ANSI_ARGS_((Tcl_Interp *interp,
-			    int devId, char *buffer, long size));
-
 static int	ConsoleCmd _ANSI_ARGS_((ClientData clientData,
-		    Tcl_Interp *interp, int argc, char **argv));
+		    Tcl_Interp *interp, int argc, CONST char **argv));
 static void	ConsoleDeleteProc _ANSI_ARGS_((ClientData clientData));
 static void	ConsoleEventProc _ANSI_ARGS_((ClientData clientData,
 		    XEvent *eventPtr));
 static int	InterpreterCmd _ANSI_ARGS_((ClientData clientData,
-		    Tcl_Interp *interp, int argc, char **argv));
+		    Tcl_Interp *interp, int argc, CONST char **argv));
 
 static int	ConsoleInput _ANSI_ARGS_((ClientData instanceData,
 		    char *buf, int toRead, int *errorCode));
 static int	ConsoleOutput _ANSI_ARGS_((ClientData instanceData,
-		    char *buf, int toWrite, int *errorCode));
+		    CONST char *buf, int toWrite, int *errorCode));
 static int	ConsoleClose _ANSI_ARGS_((ClientData instanceData,
 		    Tcl_Interp *interp));
 static void	ConsoleWatch _ANSI_ARGS_((ClientData instanceData,
@@ -151,6 +148,23 @@ static int ShouldUseConsoleChannel(type)
     if ((handle == INVALID_HANDLE_VALUE) || (handle == 0)) {
 	return 1;
     }
+
+    /*
+     * Win2K BUG: GetStdHandle(STD_OUTPUT_HANDLE) can return what appears
+     * to be a valid handle.  See TclpGetDefaultStdChannel() for this change
+     * implemented.  We didn't change it here because GetFileType() [below]
+     * will catch this with FILE_TYPE_UNKNOWN and appropriately return a
+     * value of 1, anyways.
+     *
+     *    char dummyBuff[1];
+     *    DWORD dummyWritten;
+     *
+     *    if ((type == TCL_STDOUT)
+     *	    && !WriteFile(handle, dummyBuff, 0, &dummyWritten, NULL)) {
+     *	return 1;
+     *    }
+     */
+
     fileType = GetFileType(handle);
 
     /*
@@ -319,7 +333,7 @@ Tk_CreateConsoleWindow(interp)
     ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
             Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 #ifdef MAC_TCL
-    static char initCmd[] = "source -rsrc {Console}";
+    static char initCmd[] = "if {[catch {source $tk_library:console.tcl}]} {source -rsrc console}";
 #else
     static char initCmd[] = "source $tk_library/console.tcl";
 #endif
@@ -391,7 +405,7 @@ Tk_CreateConsoleWindow(interp)
 static int
 ConsoleOutput(instanceData, buf, toWrite, errorCode)
     ClientData instanceData;		/* Indicates which device to use. */
-    char *buf;				/* The data buffer. */
+    CONST char *buf;			/* The data buffer. */
     int toWrite;			/* How many bytes to write? */
     int *errorCode;			/* Where to store error code. */
 {
@@ -459,6 +473,9 @@ ConsoleClose(instanceData, interp)
     ClientData instanceData;	/* Unused. */
     Tcl_Interp *interp;		/* Unused. */
 {
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+    tsdPtr->gStdoutInterp = NULL;
     return 0;
 }
 
@@ -543,7 +560,7 @@ ConsoleCmd(clientData, interp, argc, argv)
     ClientData clientData;		/* Not used. */
     Tcl_Interp *interp;			/* Current interpreter. */
     int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+    CONST char **argv;			/* Argument strings. */
 {
     ConsoleInfo *info = (ConsoleInfo *) clientData;
     char c;
@@ -585,7 +602,7 @@ ConsoleCmd(clientData, interp, argc, argv)
 	} else {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
 		    " eval command\"", (char *) NULL);
-	    return TCL_ERROR;
+	    result = TCL_ERROR;
 	}
     } else {
 	Tcl_AppendResult(interp, "bad option \"", argv[1],
@@ -620,7 +637,7 @@ InterpreterCmd(clientData, interp, argc, argv)
     ClientData clientData;		/* Not used. */
     Tcl_Interp *interp;			/* Current interpreter. */
     int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+    CONST char **argv;			/* Argument strings. */
 {
     ConsoleInfo *info = (ConsoleInfo *) clientData;
     char c;
@@ -691,13 +708,13 @@ ConsoleDeleteProc(clientData)
  *	This event procedure is registered on the main window of the
  *	slave interpreter.  If the user or a running script causes the
  *	main window to be destroyed, then we need to inform the console
- *	interpreter by invoking "tkConsoleExit".
+ *	interpreter by invoking "::tk::ConsoleExit".
  *
  * Results:
  *	None.
  *
  * Side effects:
- *	Invokes the "tkConsoleExit" procedure in the console interp.
+ *	Invokes the "::tk::ConsoleExit" procedure in the console interp.
  *
  *----------------------------------------------------------------------
  */
@@ -728,7 +745,7 @@ ConsoleEventProc(clientData, eventPtr)
             return;
         }
         Tcl_Preserve((ClientData) consoleInterp);
-	Tcl_DStringAppend(&dString, "tkConsoleExit", -1);
+	Tcl_DStringAppend(&dString, "::tk::ConsoleExit", -1);
 	Tcl_Eval(consoleInterp, Tcl_DStringValue(&dString));
 	Tcl_DStringFree(&dString);
         Tcl_Release((ClientData) consoleInterp);
@@ -758,7 +775,7 @@ TkConsolePrint(interp, devId, buffer, size)
     Tcl_Interp *interp;		/* Main interpreter. */
     int devId;			/* TCL_STDOUT for stdout, TCL_STDERR for
                                  * stderr. */
-    char *buffer;		/* Text buffer. */
+    CONST char *buffer;		/* Text buffer. */
     long size;			/* Size of text buffer. */
 {
     Tcl_DString command, output;
@@ -773,9 +790,9 @@ TkConsolePrint(interp, devId, buffer, size)
     }
     
     if (devId == TCL_STDERR) {
-	cmd = "tkConsoleOutput stderr ";
+	cmd = "::tk::ConsoleOutput stderr ";
     } else {
-	cmd = "tkConsoleOutput stdout ";
+	cmd = "::tk::ConsoleOutput stdout ";
     }
     
     result = Tcl_GetCommandInfo(interp, "console", &cmdInfo);
@@ -799,4 +816,3 @@ TkConsolePrint(interp, devId, buffer, size)
     Tcl_DStringFree(&command);
     Tcl_DStringFree(&output);
 }
-

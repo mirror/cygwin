@@ -16,14 +16,14 @@ Tk_SetAppName \- Set the name of an application for ``send'' commands
 .nf
 \fB#include <tk.h>\fR
 .sp
-char *
+CONST char *
 \fBTk_SetAppName\fR(\fItkwin, name\fR)
 .SH ARGUMENTS
 .AS Tk_Window parent
 .AP Tk_Window tkwin in
 Token for window in application.  Used only to select a particular
 application.
-.AP char *name in
+.AP "CONST char" *name in
 Name under which to register the application.
 .BE
 
@@ -63,4 +63,3 @@ functionality of \fBTk_SetAppName\fR.
 
 .SH KEYWORDS
 application, name, register, send command
-

@@ -28,7 +28,7 @@
  * the version string for Tcl.
  */
 
-#define RESOURCE_INCLUDED
+#define RC_INVOKED
 #include <Carbon.r>
 #include <tcl.h>
 #include "tk.h"

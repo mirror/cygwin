@@ -50,4 +50,3 @@ radiobutton $w.frame.left.b4 \
 	-bitmap @[file join $tk_library demos images noletter.bmp] \
 	-variable letters -value empty
 pack $w.frame.left.b3 $w.frame.left.b4 -side top -expand yes
-

@@ -301,4 +301,3 @@ TkSuspendClipboard()
 
     return;
 }
-

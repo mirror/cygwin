@@ -30,7 +30,7 @@ Tk_Cursor
 Tk_Cursor
 \fBTk_GetCursorFromData(\fIinterp, tkwin, source, mask, width, height, xHot, yHot, fg, bg\fB)\fR
 .sp
-char *
+CONST char *
 \fBTk_NameOfCursor(\fIdisplay, cursor\fB)\fR
 .sp
 .VS 8.1
@@ -52,9 +52,9 @@ modified to cache pointer to corresponding Tk_Cursor.
 Same as \fIobjPtr\fR except description of cursor is passed as a string and
 resulting Tk_Cursor isn't cached.
 .VE
-.AP char *source in
+.AP "CONST char" *source in
 Data for cursor cursor, in standard cursor format.
-.AP char *mask in
+.AP "CONST char" *mask in
 Data for mask cursor, in standard cursor format.
 .AP "int" width in
 Width of \fIsource\fR and \fImask\fR.
@@ -244,4 +244,3 @@ see if the actual data values have changed.
 
 .SH KEYWORDS
 cursor
-

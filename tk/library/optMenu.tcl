@@ -12,7 +12,7 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 
-# tk_optionMenu --
+# ::tk_optionMenu --
 # This procedure creates an option button named $w and an associated
 # menu.  Together they provide the functionality of Motif option menus:
 # they can be used to select one of many values, and the current value
@@ -27,7 +27,7 @@
 # firstValue -		First of legal values for option (must be >= 1).
 # args -		Any number of additional values.
 
-proc tk_optionMenu {w varName firstValue args} {
+proc ::tk_optionMenu {w varName firstValue args} {
     upvar #0 $varName var
 
     if {![info exists var]} {
@@ -43,4 +43,3 @@ proc tk_optionMenu {w varName firstValue args} {
     }
     return $w.menu
 }
-

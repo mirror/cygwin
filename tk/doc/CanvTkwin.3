@@ -38,7 +38,7 @@ Tk_OptionPrintProc *\fBTk_CanvasTagsPrintProc\fR;
 A token that identifies a canvas widget.
 .AP Tcl_Interp *interp in/out
 Interpreter to use for error reporting.
-.AP char *string in
+.AP "CONST char" *string in
 Textual description of a canvas coordinate.
 .AP double *doublePtr out
 Points to place to store a converted coordinate.
@@ -159,4 +159,3 @@ static Tk_ConfigSpec configSpecs[] = {
 
 .SH KEYWORDS
 canvas, focus, item type, redisplay, selection, type manager
-

@@ -42,9 +42,10 @@
 #endif
 
 #include <time.h>
-
-#ifdef _MSC_VER
-#include <tchar.h>
+#ifdef __CYGWIN__
+#    define _T(x) L##x
+#else
+#    include <tchar.h>
 #endif
 
 #ifdef _MSC_VER
@@ -58,7 +59,9 @@
 
 #define NBBY 8
 
+#ifndef OPEN_MAX
 #define OPEN_MAX 32
+#endif
 
 /*
  * The following define causes Tk to use its internal keysym hash table
@@ -71,11 +74,11 @@
  * input data available for a stdio FILE.
  */
 
-#if defined (_MSC_VER) || defined (__MINGW32__)
+#ifdef _MSC_VER
 #    define TK_READ_DATA_PENDING(f) ((f)->_cnt > 0)
-#else /* _MSC_VER || __MINGW32__ */
+#else /* _MSC_VER */
 #    define TK_READ_DATA_PENDING(f) ((f)->level > 0)
-#endif /* _MSC_VER || __MINGW32__ */
+#endif /* _MSC_VER */
 
 /*
  * The following stubs implement various calls that don't do anything
@@ -117,13 +120,6 @@
 #define TkpGetNativeAppBitmap(display, name, w, h) None
 
 /*
- * timezone et al are already defined in Windows32api headers used by
- * GNU mingw32 port.
- */
-
-#ifndef __MINGW32__
-
-/*
  * Define timezone for gettimeofday.
  */
 
@@ -132,11 +128,8 @@ struct timezone {
     int tz_dsttime;
 };
 
-#endif
-
 #ifndef _TCLINT
 #include <tclInt.h>
 #endif
 
 #endif /* _WINPORT */
-

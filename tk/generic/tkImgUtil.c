@@ -76,4 +76,3 @@ TkAlignImageData(image, alignment, bitOrder)
     }
     return data;
 }
-

@@ -79,4 +79,3 @@ bind
 
 .SH KEYWORDS
 binding, event, tag
-

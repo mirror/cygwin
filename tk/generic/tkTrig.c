@@ -1473,4 +1473,3 @@ TkGetButtPoints(p1, p2, width, project, m1, m2)
 	}
     }
 }
-

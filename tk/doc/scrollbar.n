@@ -16,10 +16,11 @@ scrollbar \- Create and manipulate scrollbar widgets
 .SH SYNOPSIS
 \fBscrollbar\fR \fIpathName \fR?\fIoptions\fR?
 .SO
-\-activebackground	\-highlightbackground	\-orient	\-takefocus
-\-background	\-highlightcolor	\-relief	\-troughcolor
-\-borderwidth	\-highlightthickness	\-repeatdelay
-\-cursor	\-jump	\-repeatinterval
+\-activebackground	\-highlightcolor	\-repeatdelay
+\-background	\-highlightthickness	\-repeatinterval
+\-borderwidth	\-jump	\-takefocus
+\-cursor	\-orient	\-troughcolor
+\-highlightbackground	\-relief
 .SE
 .SH "WIDGET-SPECIFIC OPTIONS"
 .OP \-activerelief activeRelief ActiveRelief
@@ -338,4 +339,3 @@ The End key adjusts the view to the bottom (right edge) of the document.
 
 .SH KEYWORDS
 scrollbar, widget
-

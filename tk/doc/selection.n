@@ -23,6 +23,9 @@ This command provides a Tcl interface to the X selection mechanism and
 implements the full selection functionality described in the
 X Inter-Client Communication Conventions Manual (ICCCM).
 .PP
+Note that for management of the CLIPBOARD selection (see below), the
+\fBclipboard\fR command may also be used.
+.PP
 The first argument to \fBselection\fR determines the format of the
 rest of the arguments and the behavior of the command.  The following
 forms are currently supported:
@@ -126,6 +129,8 @@ If \fIcommand\fR is specified, it is a Tcl script to execute when
 some other window claims ownership of the selection away from
 \fIwindow\fR.  \fISelection\fR defaults to PRIMARY.
 
+.SH "SEE ALSO"
+clipboard
+
 .SH KEYWORDS
 clear, format, handler, ICCCM, own, selection, target, type
-

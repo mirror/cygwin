@@ -502,4 +502,3 @@ GetMenuPartColor(
     return false;
 }
 }
-

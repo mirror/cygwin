@@ -22,7 +22,7 @@
  * Tcl object, used for quickly finding a mapping in a TkStateMap.
  */
 
-static Tcl_ObjType stateKeyType = {
+Tcl_ObjType tkStateKeyObjType = {
     "statekey",				/* name */
     (Tcl_FreeInternalRepProc *) NULL,	/* freeIntRepProc */
     (Tcl_DupInternalRepProc *) NULL,	/* dupIntRepProc */
@@ -630,7 +630,7 @@ int
 Tk_GetScrollInfo(interp, argc, argv, dblPtr, intPtr)
     Tcl_Interp *interp;			/* Used for error reporting. */
     int argc;				/* # arguments for command. */
-    char **argv;			/* Arguments for command. */
+    CONST char **argv;			/* Arguments for command. */
     double *dblPtr;			/* Filled in with argument "moveto"
 					 * option, if any. */
     int *intPtr;			/* Filled in with number of pages
@@ -794,7 +794,7 @@ TkComputeAnchor(anchor, tkwin, padX, padY, innerWidth, innerHeight, xPtr, yPtr)
 	case TK_ANCHOR_NW:
 	case TK_ANCHOR_W:
 	case TK_ANCHOR_SW:
-	    *xPtr = Tk_InternalBorderWidth(tkwin) + padX;
+	    *xPtr = Tk_InternalBorderLeft(tkwin) + padX;
 	    break;
 
 	case TK_ANCHOR_N:
@@ -804,7 +804,7 @@ TkComputeAnchor(anchor, tkwin, padX, padY, innerWidth, innerHeight, xPtr, yPtr)
 	    break;
 
 	default:
-	    *xPtr = Tk_Width(tkwin) - (Tk_InternalBorderWidth(tkwin) + padX)
+	    *xPtr = Tk_Width(tkwin) - (Tk_InternalBorderRight(tkwin) + padX)
 		    - innerWidth;
 	    break;
     }
@@ -813,7 +813,7 @@ TkComputeAnchor(anchor, tkwin, padX, padY, innerWidth, innerHeight, xPtr, yPtr)
 	case TK_ANCHOR_NW:
 	case TK_ANCHOR_N:
 	case TK_ANCHOR_NE:
-	    *yPtr = Tk_InternalBorderWidth(tkwin) + padY;
+	    *yPtr = Tk_InternalBorderTop(tkwin) + padY;
 	    break;
 
 	case TK_ANCHOR_W:
@@ -823,7 +823,7 @@ TkComputeAnchor(anchor, tkwin, padX, padY, innerWidth, innerHeight, xPtr, yPtr)
 	    break;
 
 	default:
-	    *yPtr = Tk_Height(tkwin) - Tk_InternalBorderWidth(tkwin) - padY
+	    *yPtr = Tk_Height(tkwin) - Tk_InternalBorderBottom(tkwin) - padY
 		    - innerHeight;
 	    break;
     }
@@ -920,7 +920,7 @@ TkFindStateNumObj(interp, optionPtr, mapPtr, keyPtr)
     CONST char *key;
     CONST Tcl_ObjType *typePtr;
 
-    if ((keyPtr->typePtr == &stateKeyType)
+    if ((keyPtr->typePtr == &tkStateKeyObjType)
 	    && (keyPtr->internalRep.twoPtrValue.ptr1 == (VOID *) mapPtr)) {
 	return (int) keyPtr->internalRep.twoPtrValue.ptr2;
     }
@@ -934,7 +934,7 @@ TkFindStateNumObj(interp, optionPtr, mapPtr, keyPtr)
 	    }
 	    keyPtr->internalRep.twoPtrValue.ptr1 = (VOID *) mapPtr;
 	    keyPtr->internalRep.twoPtrValue.ptr2 = (VOID *) mPtr->numKey;
-	    keyPtr->typePtr = &stateKeyType;	    
+	    keyPtr->typePtr = &tkStateKeyObjType;	    
 	    return mPtr->numKey;
 	}
     }
@@ -951,5 +951,3 @@ TkFindStateNumObj(interp, optionPtr, mapPtr, keyPtr)
     }
     return mPtr->numKey;
 }
-
-

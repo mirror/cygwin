@@ -13,4 +13,3 @@ switch $i {
     1 {puts "You pressed Cancel"}
     2 {showCode .dialog1}
 }
-

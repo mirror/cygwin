@@ -69,7 +69,7 @@ foreach l { monochrome gray color } {
     pack .t.$l -in .t.top.r -anchor w
 }
 
-set BitmapImage [image create bitmap -file $tk_library/demos/images/face \
+set BitmapImage [image create bitmap -file $tk_library/demos/images/face.bmp \
 	-background white -foreground black]
 set PhotoImage [image create photo -file $tk_library/demos/images/teapot.ppm]
 
@@ -82,4 +82,3 @@ button .t.file -text "Print to File" -command { FilePostscript .t.f.c }
 button .t.print -text "Print" -command { PrintPostscript .t.f.c }
 button .t.quit -text "Quit" -command { destroy .t }
 pack .t.file .t.print .t.quit -in .t.bot -side left -fill x -expand 1
-

@@ -311,8 +311,8 @@ The \fIflags\fR field consists of one or more bits ORed together.  At
 present only a single flag is supported: TK_OPTION_NULL_OK.  If
 this bit is set for an option then an empty string will be accepted as
 the value for the option and the resulting internal form will be a
-NULL pointer or \fBNone\fR, depending on the type of the option.
-If the flag is not set then empty strings will result
+NULL pointer, a zero value, or \fBNone\fR, depending on the type of
+the option.  If the flag is not set then empty strings will result
 in errors.
 TK_OPTION_NULL_OK is typically used to allow a
 feature to be turned off entirely, e.g. set a cursor value to
@@ -368,10 +368,16 @@ such as \fBTk_SetOptions\fR, and when the option is set the cursor
 for the window is changed by calling \fBXDefineCursor\fR.  This
 option type also supports the TK_OPTION_NULL_OK flag.
 .TP
+\fBTK_OPTION_CUSTOM\fR
+This option allows applications to define new option types.  The
+clientData field of the entry points to a structure defining the new
+option type.  See the section CUSTOM OPTION TYPES below for details.
+.TP
 \fBTK_OPTION_DOUBLE\fR
 The string value must be a floating-point number in
 the format accepted by \fBstrtol\fR.  The internal form is a C
-\fBdouble\fR value.
+\fBdouble\fR value.  This option type supports the TK_OPTION_NULL_OK
+flag; if a NULL value is set, the internal representation is set to zero.
 .TP
 \fBTK_OPTION_END\fR
 Marks the end of the template.  There must be a Tk_OptionSpec structure
@@ -406,12 +412,16 @@ The internal form is an integer value giving a
 distance in pixels, like the values returned by
 \fBTk_GetPixelsFromObj\fR.  Note: if the \fIobjOffset\fR field isn't
 used then information about the original value of this option will be lost.
-See \fBOBJOFFSET VS. INTERNALOFFSET\fR below for details.
+See \fBOBJOFFSET VS. INTERNALOFFSET\fR below for details.  This option
+type supports the TK_OPTION_NULL_OK flag; if a NULL value is set, the
+internal representation is set to zero.
 .TP
 \fBTK_OPTION_RELIEF\fR
 The value must be standard relief such as \fBraised\fR.
 The internal form is an integer relief value such as
-TK_RELIEF_RAISED.
+TK_RELIEF_RAISED.  This option type supports the TK_OPTION_NULL_OK
+flag; if the empty string is specified as the value for the option,
+the integer relief value is set to TK_RELIEF_NULL.
 .TP
 \fBTK_OPTION_STRING\fR
 The value may be any string.  The internal form is a (char *) pointer
@@ -447,7 +457,7 @@ If a field of a widget record has its offset stored in the \fIobjOffset\fR
 or \fIinternalOffset\fR field of a Tk_OptionSpec structure then the
 procedures described here will handle all of the storage allocation and
 resource management issues associated with the field.  When the value
-of an option is changed, \fBTk_SetOptions\fR (or \fBTk_FreeSavedOptions\fR
+of an option is changed, \fBTk_SetOptions\fR (or \fBTk_FreeSavedOptions\fR)
 will automatically free any resources associated with the old value, such as
 Tk_Fonts for TK_OPTION_FONT options or dynamically allocated memory for
 TK_OPTION_STRING options.  For an option stored as an object using the
@@ -491,13 +501,153 @@ on retrievals exists only for TK_OPTION_PIXELS options.
 .PP
 The second reason to use the \fIobjOffset\fR field is in order to
 implement new types of options not supported by these procedures.
-To implement a new type of option, use TK_OPTION_STRING as
+To implement a new type of option, you can use TK_OPTION_STRING as
 the type in the Tk_OptionSpec structure and set the \fIobjOffset\fR field
 but not the \fIinternalOffset\fR field.  Then, after calling
 \fBTk_SetOptions\fR, convert the object to internal form yourself.
+
+.SH "CUSTOM OPTION TYPES"
+.PP
+Applications can extend the built-in configuration types with
+additional configuration types by writing procedures to parse, print,
+free, and restore saved copies of the type and creating a structure
+pointing to those procedures:
+.CS
+typedef struct Tk_ObjCustomOption {
+	char *name;
+	Tk_CustomOptionSetProc *\fIsetProc\fR;
+	Tk_CustomOptionGetProc *\fIgetProc\fR;
+	Tk_CustomOptionRestoreProc *\fIrestoreProc\fR;
+	Tk_CustomOptionFreeProc *\fIfreeProc\fR;
+	ClientData \fIclientData\fR;
+} Tk_ObjCustomOption;
+
+typedef int Tk_CustomOptionSetProc(
+	ClientData \fIclientData\fR,
+	Tcl_Interp *\fIinterp\fR, 
+	Tk_Window \fItkwin\fR, 
+	Tcl_Obj **\fIvaluePtr\fR,
+	char *\fIrecordPtr\fR,
+	int \fIinternalOffset\fR,
+	char *\fIsaveInternalPtr\fR, 
+	int \fIflags\fR);
+
+typedef Tcl_Obj *Tk_CustomOptionGetProc(
+	ClientData \fIclientData\fR,
+	Tk_Window \fItkwin\fR, 
+	char *\fIrecordPtr\fR,
+	int \fIinternalOffset\fR);
+
+typedef void Tk_CustomOptionRestoreProc(
+	ClientData \fIclientData\fR,
+	Tk_Window \fItkwin\fR, 
+	char *\fIinternalPtr\fR, 
+	char *\fIsaveInternalPtr\fR);
+
+typedef void Tk_CustomOptionFreeProc(
+	ClientData \fIclientData\fR,
+	Tk_Window \fItkwin\fR, 
+	char *\fIinternalPtr\fR);
+.CE
+.PP
+The Tk_ObjCustomOption structure contains six fields: a name
+for the custom option type; pointers to the four procedures; and a
+\fIclientData\fR value to be passed to those procedures when they are
+invoked.  The \fIclientData\fR value typically points to a structure
+containing information that is needed by the procedures when they are
+parsing and printing options.  \fIRestoreProc\fR and \fIfreeProc\fR
+may be NULL, indicating that no function should be called for those
+operations.
+.PP
+The \fIsetProc\fR procedure is invoked by \fBTk_SetOptions\fR to
+convert a Tcl_Obj into an internal representation and store the
+resulting value in the widget record.  The arguments are:
+.RS
+.TP
+\fIclientData\fR
+A copy of the \fIclientData\fR field in the Tk_ObjCustomOption
+structure.
+.TP
+\fIinterp\fR
+A pointer to a Tcl interpreter, used for error reporting.
+.TP
+\fITkwin\fR
+A copy of the \fItkwin\fR argument to \fBTk_SetOptions\fR
+.TP
+\fIvaluePtr\fR
+A pointer to a reference to a Tcl_Obj describing the new value for the
+option; it could have been specified explicitly in the call to
+\fBTk_SetOptions\fR or it could come from the option database or a
+default.  If the objOffset for the option is non-negative (the option
+value is stored as a (Tcl_Obj *) in the widget record), the Tcl_Obj
+pointer referenced by \fIvaluePtr\fR is the pointer that will be
+stored at the objOffset for the option.  \fISetProc\fR may modify the
+value if necessary; for example, \fIsetProc\fR may change the value to
+NULL to support the TK_OPTION_NULL_OK flag.
+.TP
+\fIrecordPtr\fR
+A pointer to the start of the widget record to modify.
+.TP
+\fIinternalOffset\fR
+Offset in bytes from the start of the widget record to the location
+where the internal representation of the option value is to be placed.
+.TP
+\fIsaveInternalPtr\fR
+A pointer to storage allocated in a Tk_SavedOptions structure for the
+internal representation of the original option value.  Before setting
+the option to its new value, \fIsetProc\fR should set the value
+referenced by \fIsaveInternalPtr\fR to the original value of the
+option in order to support \fBTk_RestoreSavedOptions\fR.
+.TP
+\fIflags\fR
+A copy of the \fIflags\fR field in the Tk_OptionSpec structure for the
+option
+.RE
+.PP
+\fISetProc\fR returns a standard Tcl result:  TCL_OK to indicate successful
+processing, or TCL_ERROR to indicate a failure of any kind.  An error
+message may be left in the Tcl interpreter given by \fIinterp\fR in
+the case of an error.
+.PP
+The \fIgetProc\fR procedure is invoked by \fBTk_GetOptionValue\fR and
+\fBTk_GetOptionInfo\fR to retrieve a Tcl_Obj representation of the
+internal representation of an option.  The \fIclientData\fR argument
+is a copy of the \fIclientData\fR field in the Tk_ObjCustomOption
+structure.  \fITkwin\fR is a copy of the \fItkwin\fR argument to
+\fBTk_GetOptionValue\fR or \fBTk_GetOptionInfo\fR.  \fIRecordPtr\fR
+is a pointer to the beginning of the widget record to query.
+\fIInternalOffset\fR is the offset in bytes from the beginning of the
+widget record to the location where the internal representation of the
+option value is stored.  \fIGetProc\fR must return a pointer to a
+Tcl_Obj representing the value of the option.
+.PP
+The \fIrestoreProc\fR procedure is invoked by
+\fBTk_RestoreSavedOptions\fR to restore a previously saved internal
+representation of a custom option value.  The \fIclientData\fR argument
+is a copy of the \fIclientData\fR field in the Tk_ObjCustomOption
+structure.  \fITkwin\fR is a copy of the \fItkwin\fR argument to
+\fBTk_GetOptionValue\fR or \fBTk_GetOptionInfo\fR.  \fIInternalPtr\fR
+is a pointer to the location where internal representation of the
+option value is stored.
+\fISaveInternalPtr\fR is a pointer to the saved value.
+\fIRestoreProc\fR must copy the value from \fIsaveInternalPtr\fR to
+\fIinternalPtr\fR to restore the value.  \fIRestoreProc\fR need not
+free any memory associated with either \fIinternalPtr\fR or
+\fIsaveInternalPtr\fR; \fIfreeProc\fR will be invoked to free that
+memory if necessary.  \fIRestoreProc\fR has no return value.
+.PP
+The \fIfreeProc\fR procedure is invoked by \fBTk_SetOptions\fR and
+\fBTk_FreeSavedOptions\fR to free any storage allocated for the
+internal representation of a custom option.  The \fIclientData\fR argument
+is a copy of the \fIclientData\fR field in the Tk_ObjCustomOption
+structure.  \fITkwin\fR is a copy of the \fItkwin\fR argument to
+\fBTk_GetOptionValue\fR or \fBTk_GetOptionInfo\fR.  \fIInternalPtr\fR
+is a pointer to the location where the internal representation of the
+option value is stored.  The \fIfreeProc\fR must free any storage
+associated with the option.  \fIFreeProc\fR has no return value.
+
 
 .SH KEYWORDS
 anchor, bitmap, boolean, border, color, configuration option,
 cursor, double, font, integer, justify,
 pixels, relief, screen distance, synonym
-

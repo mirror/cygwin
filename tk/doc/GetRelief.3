@@ -24,7 +24,7 @@ int
 int
 \fBTk_GetRelief(\fIinterp, name, reliefPtr\fB)\fR
 .sp
-char *
+CONST char *
 \fBTk_NameOfRelief(\fIrelief\fB)\fR
 .SH ARGUMENTS
 .AS "Tcl_Interp" *reliefPtr
@@ -42,6 +42,8 @@ a string.
 .AP int *reliefPtr out
 Pointer to location in which to store relief value corresponding to
 \fIobjPtr\fR or \fIname\fR.
+.AP "CONST char" *name
+Name of the relief.
 .AP int relief in
 Relief value (one of TK_RELIEF_FLAT, TK_RELIEF_RAISED, TK_RELIEF_SUNKEN,
 TK_RELIEF_GROOVE, TK_RELIEF_SOLID, or TK_RELIEF_RIDGE).
@@ -79,4 +81,3 @@ is returned.
 
 .SH KEYWORDS
 name, relief, string
-

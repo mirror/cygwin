@@ -101,10 +101,11 @@ TkpUseWindow(interp, tkwin, string)
 				 * if string is bogus. */
     Tk_Window tkwin;		/* Tk window that does not yet have an
 				 * associated X window. */
-    char *string;		/* String identifying an X window to use
+    CONST char *string;		/* String identifying an X window to use
 				 * for tkwin;  must be an integer value. */
 {
     TkWindow *winPtr = (TkWindow *) tkwin;
+    TkWindow *usePtr;
     int id, anyError;
     Window parent;
     Tk_ErrorHandler handler;
@@ -120,6 +121,15 @@ TkpUseWindow(interp, tkwin, string)
 	return TCL_ERROR;
     }
     parent = (Window) id;
+
+    usePtr = (TkWindow *) Tk_IdToWindow(winPtr->display, parent);
+    if (usePtr != NULL) {
+	if (!(usePtr->flags & TK_CONTAINER)) {
+	    Tcl_AppendResult(interp, "window \"", usePtr->pathName,
+                    "\" doesn't have -container option set", (char *) NULL);
+	    return TCL_ERROR;
+	}
+    }
 
     /*
      * Tk sets the window colormap to the screen default colormap in
@@ -770,7 +780,7 @@ TkpRedirectKeyEvent(winPtr, eventPtr)
 
 	    return;
 	}
-	if (winPtr->flags & TK_TOP_LEVEL) {
+	if (winPtr->flags & TK_TOP_HIERARCHY) {
 	    break;
 	}
 	winPtr = winPtr->parentPtr;
@@ -872,7 +882,7 @@ TkpTestembedCmd(clientData, interp, argc, argv)
     ClientData clientData;		/* Main window for application. */
     Tcl_Interp *interp;			/* Current interpreter. */
     int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+    CONST char **argv;			/* Argument strings. */
 {
     int all;
     Container *containerPtr;
@@ -1022,4 +1032,3 @@ TkUnixContainerId(winPtr)
     panic("TkUnixContainerId couldn't find window");
     return None;
 }
-

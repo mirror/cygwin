@@ -16,18 +16,31 @@ button \- Create and manipulate button widgets
 .SH SYNOPSIS
 \fBbutton\fR \fIpathName \fR?\fIoptions\fR?
 .SO
-\-activebackground	\-cursor	\-highlightthickness	\-takefocus
-\-activeforeground	\-disabledforeground	\-image	\-text
-\-anchor	\-font	\-justify	\-textvariable
-\-background	\-foreground	\-padx	\-underline
-\-bitmap	\-highlightbackground	\-pady	\-wraplength
-\-borderwidth	\-highlightcolor	\-relief
+\-activebackground	\-foreground	\-repeatdelay
+\-activeforeground	\-highlightbackground	\-repeatinterval
+\-anchor	\-highlightcolor	\-takefocus
+\-background	\-highlightthickness	\-text
+\-bitmap	\-image	\-textvariable
+\-borderwidth	\-justify	\-underline
+\-cursor	\-padx	\-wraplength
+\-disabledforeground	\-pady
+\-font	\-relief
 .SE
 .SH "WIDGET-SPECIFIC OPTIONS"
 .OP \-command command Command
 Specifies a Tcl command to associate with the button.  This command
 is typically invoked when mouse button 1 is released over the button
 window.
+.VS 8.4
+.OP \-compound compound Compound
+Specifies whether the button should display both an image and text,
+and if so, where the image should be placed relative to the text.
+Valid values for this option are \fBbottom\fR, \fBcenter\fR,
+\fBleft\fR, \fBnone\fR, \fBright\fR and \fBtop\fR.  The default value
+is \fBnone\fR, meaning that the button will display either an image or
+text, depending on the values of the \fB\-image\fR and \fB\-bitmap\fR
+options.
+.VE
 .OP \-default default Default
 .VS
 Specifies one of three states for the default ring: \fBnormal\fR,
@@ -49,6 +62,15 @@ screen units (i.e. any of the forms acceptable to \fBTk_GetPixels\fR);
 for text it is in lines of text.
 If this option isn't specified, the button's desired height is computed
 from the size of the image or bitmap or text being displayed in it.
+.VS 8.4
+.OP \-overrelief overRelief OverRelief
+Specifies an alternative relief for the button, to be used when the
+mouse cursor is over the widget.  This option can be used to make
+toolbar buttons, by configuring \fB\-relief flat \-overrelief
+raised\fR.  If the value of this option is the empty string, then no
+alternative relief is used when the mouse cursor is over the button.
+The empty string is the default value.
+.VE 8.4
 .OP \-state state State
 Specifies one of three states for the button:  \fBnormal\fR, \fBactive\fR,
 or \fBdisabled\fR.  In normal state the button is displayed using the
@@ -174,4 +196,3 @@ individual widgets or by redefining the class bindings.
 
 .SH KEYWORDS
 button, widget
-

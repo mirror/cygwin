@@ -42,9 +42,9 @@ static int		MarkLayoutProc _ANSI_ARGS_((TkText *textPtr,
 			    int noCharsYet, TkWrapMode wrapMode,
 			    TkTextDispChunk *chunkPtr));
 static int		MarkFindNext _ANSI_ARGS_((Tcl_Interp *interp,
-			    TkText *textPtr, char *markName));
+			    TkText *textPtr, CONST char *markName));
 static int		MarkFindPrev _ANSI_ARGS_((Tcl_Interp *interp,
-			    TkText *textPtr, char *markName));
+			    TkText *textPtr, CONST char *markName));
 
 
 /*
@@ -99,7 +99,7 @@ TkTextMarkCmd(textPtr, interp, argc, argv)
     register TkText *textPtr;	/* Information about text widget. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings.  Someone else has already
+    CONST char **argv;		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "mark". */
 {
@@ -235,7 +235,7 @@ TkTextMarkCmd(textPtr, interp, argc, argv)
 TkTextSegment *
 TkTextSetMark(textPtr, name, indexPtr)
     TkText *textPtr;		/* Text widget in which to create mark. */
-    char *name;			/* Name of mark to set. */
+    CONST char *name;			/* Name of mark to set. */
     TkTextIndex *indexPtr;	/* Where to set mark. */
 {
     Tcl_HashEntry *hPtr;
@@ -350,7 +350,7 @@ TkTextMarkSegToIndex(textPtr, markPtr, indexPtr)
 int
 TkTextMarkNameToIndex(textPtr, name, indexPtr)
     TkText *textPtr;		/* Text widget containing mark. */
-    char *name;			/* Name of mark. */
+    CONST char *name;		/* Name of mark. */
     TkTextIndex *indexPtr;	/* Index information gets stored here. */
 {
     Tcl_HashEntry *hPtr;
@@ -526,11 +526,15 @@ TkTextInsertDisplayProc(chunkPtr, x, y, height, baseline, display, dst, screenY)
 
     if ((x + halfWidth) < 0) {
 	/*
-	 * The insertion cursor is off-screen.  Just return.
+	 * The insertion cursor is off-screen.
+	 * Indicate caret at 0,0 and return.
 	 */
 
+	Tk_SetCaretPos(textPtr->tkwin, 0, 0, height);
 	return;
     }
+
+    Tk_SetCaretPos(textPtr->tkwin, x - halfWidth, screenY, height);
 
     /*
      * As a special hack to keep the cursor visible on mono displays
@@ -542,12 +546,12 @@ TkTextInsertDisplayProc(chunkPtr, x, y, height, baseline, display, dst, screenY)
 
     if (textPtr->flags & INSERT_ON) {
 	Tk_Fill3DRectangle(textPtr->tkwin, dst, textPtr->insertBorder,
-		x - textPtr->insertWidth/2, y, textPtr->insertWidth,
-		height, textPtr->insertBorderWidth, TK_RELIEF_RAISED);
+		x - halfWidth, y, textPtr->insertWidth, height,
+		textPtr->insertBorderWidth, TK_RELIEF_RAISED);
     } else if (textPtr->selBorder == textPtr->insertBorder) {
 	Tk_Fill3DRectangle(textPtr->tkwin, dst, textPtr->border,
-		x - textPtr->insertWidth/2, y, textPtr->insertWidth,
-		height, 0, TK_RELIEF_FLAT);
+		x - halfWidth, y, textPtr->insertWidth, height,
+		0, TK_RELIEF_FLAT);
     }
 }
 
@@ -643,7 +647,7 @@ static int
 MarkFindNext(interp, textPtr, string)
     Tcl_Interp *interp;			/* For error reporting */
     TkText *textPtr;			/* The widget */
-    char *string;			/* The starting index or mark name */
+    CONST char *string;			/* The starting index or mark name */
 {
     TkTextIndex index;
     Tcl_HashEntry *hPtr;
@@ -717,7 +721,7 @@ static int
 MarkFindPrev(interp, textPtr, string)
     Tcl_Interp *interp;			/* For error reporting */
     TkText *textPtr;			/* The widget */
-    char *string;			/* The starting index or mark name */
+    CONST char *string;			/* The starting index or mark name */
 {
     TkTextIndex index;
     Tcl_HashEntry *hPtr;
@@ -773,4 +777,3 @@ MarkFindPrev(interp, textPtr, string)
 	segPtr = NULL;
     }
 }
-

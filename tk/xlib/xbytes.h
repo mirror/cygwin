@@ -56,4 +56,3 @@ static unsigned char xBitReverseTable[256] = {
 };
 
 #endif /* _XBYTES */
-

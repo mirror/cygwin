@@ -68,10 +68,10 @@ TkGetServerInfo(interp, tkwin)
  *----------------------------------------------------------------------
  */
 
-char *
+CONST char *
 TkGetDefaultScreenName(interp, screenName)
     Tcl_Interp *interp;		/* Interp used to find environment variables. */
-    char *screenName;		/* Screen name from command line, or NULL. */
+    CONST char *screenName;	/* Screen name from command line, or NULL. */
 {
     if ((screenName == NULL) || (screenName[0] == '\0')) {
 	screenName = Tcl_GetVar2(interp, "env", "DISPLAY", TCL_GLOBAL_ONLY);
@@ -106,4 +106,3 @@ Tk_UpdatePointer(tkwin, x, y, state)
    * This function intentionally left blank
    */
 }
-

@@ -11,7 +11,7 @@
 .TH Tk_AllocBitmapFromObj 3 8.1 Tk "Tk Library Procedures"
 .BS
 .SH NAME
-Tk_AllocBitmapFromObj, Tk_GetBitmap, Tk_GetBitmapFromObj, Tk_DefineBitmap, Tk_NameOfBitmap, Tk_SizeOfBitmap, Tk_FreeBitmapFromObj, Tk_FreeBitmap, Tk_GetBitmapFromData \- maintain database of single-plane pixmaps
+Tk_AllocBitmapFromObj, Tk_GetBitmap, Tk_GetBitmapFromObj, Tk_DefineBitmap, Tk_NameOfBitmap, Tk_SizeOfBitmap, Tk_FreeBitmapFromObj, Tk_FreeBitmap \- maintain database of single-plane pixmaps
 .SH SYNOPSIS
 .nf
 \fB#include <tk.h>\fR
@@ -30,7 +30,7 @@ Pixmap
 int
 \fBTk_DefineBitmap(\fIinterp, name, source, width, height\fB)\fR
 .sp
-char *
+CONST char *
 \fBTk_NameOfBitmap(\fIdisplay, bitmap\fB)\fR
 .sp
 \fBTk_SizeOfBitmap(\fIdisplay, bitmap, widthPtr, heightPtr\fB)\fR
@@ -57,7 +57,7 @@ resulting Pixmap isn't cached.
 .VE
 .AP "CONST char" *name in
 Name for new bitmap to be defined.
-.AP char *source in
+.AP "CONST char" *source in
 Data for bitmap, in standard bitmap format.
 Must be stored in static memory whose value will never change.
 .AP "int" width in
@@ -316,4 +316,3 @@ a different file.
 
 .SH KEYWORDS
 bitmap, pixmap
-

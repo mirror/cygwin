@@ -35,7 +35,7 @@ foreach i {open save} {
     pack $f -fill x -padx 1c -pady 3
 }
 
-if ![string compare $tcl_platform(platform) unix] {
+if {![string compare $tcl_platform(platform) unix]} {
     checkbutton $w.strict -text "Use Motif Style Dialog" \
 	-variable tk_strictMotif -onvalue 1 -offvalue 0
     pack $w.strict -anchor c
@@ -62,10 +62,9 @@ proc fileDialog {w ent operation} {
 	set file [tk_getSaveFile -filetypes $types -parent $w \
 	    -initialfile Untitled -defaultextension .txt]
     }
-    if [string compare $file ""] {
+    if {[string compare $file ""]} {
 	$ent delete 0 end
 	$ent insert 0 $file
 	$ent xview end
     }
 }
-

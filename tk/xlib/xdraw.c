@@ -80,4 +80,3 @@ XFillRectangle(display, d, gc, x, y, width, height)
     rectangle.height = height;
     XFillRectangles(display, d, gc, &rectangle, 1);
 }
-

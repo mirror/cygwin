@@ -16,10 +16,12 @@ message \- Create and manipulate message widgets
 .SH SYNOPSIS
 \fBmessage\fR \fIpathName \fR?\fIoptions\fR?
 .SO
-\-anchor	\-font	\-highlightthickness	\-takefocus
-\-background	\-foreground	\-padx	\-text
-\-borderwidth	\-highlightbackground	\-pady	\-textvariable
-\-cursor	\-highlightcolor	\-relief	\-width
+\-anchor	\-highlightbackground	\-takefocus
+\-background	\-highlightcolor	\-text
+\-borderwidth	\-highlightthickness	\-textvariable
+\-cursor	\-padx	\-width
+\-font	\-pady
+\-foreground	\-relief
 .SE
 .SH "WIDGET-SPECIFIC OPTIONS"
 .OP \-aspect aspect Aspect
@@ -145,4 +147,3 @@ The most common result is that the line is justified wrong.
 
 .SH KEYWORDS
 message, widget
-

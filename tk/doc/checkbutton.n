@@ -16,12 +16,14 @@ checkbutton \- Create and manipulate checkbutton widgets
 .SH SYNOPSIS
 \fBcheckbutton\fI pathName \fR?\fIoptions\fR?
 .SO
-\-activebackground	\-cursor	\-highlightthickness	\-takefocus
-\-activeforeground	\-disabledforeground	\-image	\-text
-\-anchor	\-font	\-justify	\-textvariable
-\-background	\-foreground	\-padx	\-underline
-\-bitmap	\-highlightbackground	\-pady	\-wraplength
-\-borderwidth	\-highlightcolor	\-relief
+\-activebackground	\-font	\-pady
+\-activeforeground	\-foreground	\-relief
+\-anchor	\-highlightbackground	\-takefocus
+\-background	\-highlightcolor	\-text
+\-bitmap	\-highlightthickness	\-textvariable
+\-borderwidth	\-image	\-underline
+\-cursor	\-justify	\-wraplength
+\-disabledforeground	\-padx
 .SE
 .SH "WIDGET-SPECIFIC OPTIONS"
 .OP \-command command Command
@@ -41,12 +43,32 @@ Specifies whether or not the indicator should be drawn.  Must be a
 proper boolean value.  If false, the \fBrelief\fR option is
 ignored and the widget's relief is always sunken if the widget is
 selected and raised otherwise.
+.VS 8.4
+.OP \-offrelief offRelief OffRelief
+Specifies the relief for the checkbutton when the indicator is not drawn and
+the checkbutton is off.  The default value is "raised".  By setting this option
+to "flat" and setting -indicatoron to false and -overrelief to raised,
+the effect is achieved 
+of having a flat button that raises on mouse-over and which is
+depressed when activated.  This is the behavior typically exhibited by
+the Bold, Italic, and Underline checkbuttons on the toolbar of a 
+word-processor, for example.
+.VE 8.4
 .OP \-offvalue offValue Value
 Specifies value to store in the button's associated variable whenever
 this button is deselected.  Defaults to ``0''.
 .OP \-onvalue onValue Value
 Specifies value to store in the button's associated variable whenever
 this button is selected.  Defaults to ``1''.
+.VS 8.4
+.OP \-overrelief overRelief OverRelief
+Specifies an alternative relief for the checkbutton, to be used when the
+mouse cursor is over the widget.  This option can be used to make
+toolbar buttons, by configuring \fB\-relief flat \-overrelief
+raised\fR.  If the value of this option is the empty string, then no
+alternative relief is used when the mouse cursor is over the checkbutton.
+The empty string is the default value.
+.VE 8.4
 .OP \-selectcolor selectColor Background
 Specifies a background color to use when the button is selected.
 If \fBindicatorOn\fR is true then the color applies to the indicator.
@@ -236,4 +258,3 @@ individual widgets or by redefining the class bindings.
 
 .SH KEYWORDS
 checkbutton, widget
-

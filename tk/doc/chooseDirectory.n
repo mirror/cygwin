@@ -50,4 +50,3 @@ tk_getOpenFile, tk_getSaveFile
 
 .SH KEYWORDS
 directory selection dialog
-

@@ -31,4 +31,3 @@ checkbutton $w.b1 -text "Wipers OK" -variable wipers -relief flat
 checkbutton $w.b2 -text "Brakes OK" -variable brakes -relief flat
 checkbutton $w.b3 -text "Driver Sober" -variable sober -relief flat
 pack $w.b1 $w.b2 $w.b3 -side top -pady 2 -anchor w
-

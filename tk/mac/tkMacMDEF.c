@@ -114,4 +114,3 @@ main(
       	SELECTRECT = globals.itemRect;
     }
 }
-

@@ -319,8 +319,8 @@ ConfigureImage(interp, canvas, itemPtr, argc, argv, flags)
     Tk_Image image;
 
     tkwin = Tk_CanvasTkwin(canvas);
-    if (Tk_ConfigureWidget(interp, tkwin, configSpecs, argc, (char **) argv,
-	    (char *) imgPtr, flags|TK_CONFIG_OBJS) != TCL_OK) {
+    if (TCL_OK != Tk_ConfigureWidget(interp, tkwin, configSpecs, argc,
+	    (CONST char **) argv, (char *) imgPtr, flags|TK_CONFIG_OBJS)) {
 	return TCL_ERROR;
     }
 
@@ -897,4 +897,3 @@ ImageChangedProc(clientData, x, y, width, height, imgWidth, imgHeight)
 	    imgPtr->header.y1 + y, (int) (imgPtr->header.x1 + x + width),
 	    (int) (imgPtr->header.y1 + y + height));
 }
-

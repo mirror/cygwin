@@ -17,6 +17,11 @@
 #include "tkButton.h"
 #include "default.h"
 
+typedef struct ThreadSpecificData { 
+    int defaultsInitialized;
+} ThreadSpecificData;
+static Tcl_ThreadDataKey dataKey;
+
 /*
  * Class names for buttons, indexed by one of the type values defined
  * in tkButton.h.
@@ -40,6 +45,15 @@ static char *defaultStrings[] = {
 
 static char *stateStrings[] = {
     "active", "disabled", "normal", (char *) NULL
+};
+
+/*
+ * The following table defines the legal values for the -compound option.
+ * It is used with the "enum compound" declaration in tkButton.h
+ */
+
+static char *compoundStrings[] = {
+    "bottom", "center", "left", "none", "right", "top", (char *) NULL
 };
 
 /*
@@ -69,6 +83,9 @@ static Tk_OptionSpec labelOptionSpecs[] = {
     {TK_OPTION_PIXELS, "-borderwidth", "borderWidth", "BorderWidth",
 	DEF_BUTTON_BORDER_WIDTH, Tk_Offset(TkButton, borderWidthPtr),
 	Tk_Offset(TkButton, borderWidth), 0, 0, 0},
+    {TK_OPTION_STRING_TABLE, "-compound", "compound", "Compound",
+	 DEF_BUTTON_COMPOUND, -1, Tk_Offset(TkButton, compound), 0,
+	 (ClientData) compoundStrings, 0},
     {TK_OPTION_CURSOR, "-cursor", "cursor", "Cursor",
 	DEF_BUTTON_CURSOR, -1, Tk_Offset(TkButton, cursor),
 	TK_OPTION_NULL_OK, 0, 0},
@@ -155,6 +172,9 @@ static Tk_OptionSpec buttonOptionSpecs[] = {
     {TK_OPTION_STRING, "-command", "command", "Command",
 	DEF_BUTTON_COMMAND, Tk_Offset(TkButton, commandPtr), -1,
 	TK_OPTION_NULL_OK, 0, 0},
+    {TK_OPTION_STRING_TABLE, "-compound", "compound", "Compound",
+	 DEF_BUTTON_COMPOUND, -1, Tk_Offset(TkButton, compound), 0,
+	 (ClientData) compoundStrings, 0},
     {TK_OPTION_CURSOR, "-cursor", "cursor", "Cursor",
 	DEF_BUTTON_CURSOR, -1, Tk_Offset(TkButton, cursor),
 	TK_OPTION_NULL_OK, 0, 0},
@@ -189,6 +209,9 @@ static Tk_OptionSpec buttonOptionSpecs[] = {
 	TK_OPTION_NULL_OK, 0, 0},
     {TK_OPTION_JUSTIFY, "-justify", "justify", "Justify",
 	DEF_BUTTON_JUSTIFY, -1, Tk_Offset(TkButton, justify), 0, 0, 0},
+    {TK_OPTION_RELIEF, "-overrelief", "overRelief", "OverRelief",
+	 DEF_BUTTON_OVER_RELIEF, -1, Tk_Offset(TkButton, overRelief),
+	 TK_OPTION_NULL_OK, 0, 0},
     {TK_OPTION_PIXELS, "-padx", "padX", "Pad",
 	DEF_BUTTON_PADX, Tk_Offset(TkButton, padXPtr),
 	Tk_Offset(TkButton, padX), 0, 0, 0},
@@ -196,7 +219,14 @@ static Tk_OptionSpec buttonOptionSpecs[] = {
 	DEF_BUTTON_PADY, Tk_Offset(TkButton, padYPtr),
 	Tk_Offset(TkButton, padY), 0, 0, 0},
     {TK_OPTION_RELIEF, "-relief", "relief", "Relief",
-	DEF_BUTTON_RELIEF, -1, Tk_Offset(TkButton, relief), 0, 0, 0},
+	DEF_BUTTON_RELIEF, -1, Tk_Offset(TkButton, relief),
+	 0, 0, 0},
+    {TK_OPTION_INT, "-repeatdelay", "repeatDelay", "RepeatDelay",
+	 DEF_BUTTON_REPEAT_DELAY, -1, Tk_Offset(TkButton, repeatDelay),
+	 0, 0, 0},
+    {TK_OPTION_INT, "-repeatinterval", "repeatInterval", "RepeatInterval",
+	 DEF_BUTTON_REPEAT_INTERVAL, -1, Tk_Offset(TkButton, repeatInterval),
+	 0, 0, 0},
     {TK_OPTION_STRING_TABLE, "-state", "state", "State",
 	DEF_BUTTON_STATE, -1, Tk_Offset(TkButton, state),
 	0, (ClientData) stateStrings, 0},
@@ -244,6 +274,9 @@ static Tk_OptionSpec checkbuttonOptionSpecs[] = {
     {TK_OPTION_STRING, "-command", "command", "Command",
 	DEF_BUTTON_COMMAND, Tk_Offset(TkButton, commandPtr), -1,
 	TK_OPTION_NULL_OK, 0, 0},
+    {TK_OPTION_STRING_TABLE, "-compound", "compound", "Compound",
+	 DEF_BUTTON_COMPOUND, -1, Tk_Offset(TkButton, compound), 0,
+	 (ClientData) compoundStrings, 0},
     {TK_OPTION_CURSOR, "-cursor", "cursor", "Cursor",
 	DEF_BUTTON_CURSOR, -1, Tk_Offset(TkButton, cursor),
 	TK_OPTION_NULL_OK, 0, 0},
@@ -277,10 +310,15 @@ static Tk_OptionSpec checkbuttonOptionSpecs[] = {
 	DEF_BUTTON_INDICATOR, -1, Tk_Offset(TkButton, indicatorOn), 0, 0, 0},
     {TK_OPTION_JUSTIFY, "-justify", "justify", "Justify",
 	DEF_BUTTON_JUSTIFY, -1, Tk_Offset(TkButton, justify), 0, 0, 0},
+    {TK_OPTION_RELIEF, "-offrelief", "offRelief", "OffRelief",
+	 DEF_BUTTON_RELIEF, -1, Tk_Offset(TkButton, offRelief), 0, 0, 0},
     {TK_OPTION_STRING, "-offvalue", "offValue", "Value",
 	DEF_BUTTON_OFF_VALUE, Tk_Offset(TkButton, offValuePtr), -1, 0, 0, 0},
     {TK_OPTION_STRING, "-onvalue", "onValue", "Value",
 	DEF_BUTTON_ON_VALUE, Tk_Offset(TkButton, onValuePtr), -1, 0, 0, 0},
+    {TK_OPTION_RELIEF, "-overrelief", "overRelief", "OverRelief",
+	 DEF_BUTTON_OVER_RELIEF, -1, Tk_Offset(TkButton, overRelief),
+	 TK_OPTION_NULL_OK, 0, 0},
     {TK_OPTION_PIXELS, "-padx", "padX", "Pad",
 	DEF_LABCHKRAD_PADX, Tk_Offset(TkButton, padXPtr),
 	Tk_Offset(TkButton, padX), 0, 0, 0},
@@ -345,6 +383,9 @@ static Tk_OptionSpec radiobuttonOptionSpecs[] = {
     {TK_OPTION_STRING, "-command", "command", "Command",
 	DEF_BUTTON_COMMAND, Tk_Offset(TkButton, commandPtr), -1,
 	TK_OPTION_NULL_OK, 0, 0},
+    {TK_OPTION_STRING_TABLE, "-compound", "compound", "Compound",
+	 DEF_BUTTON_COMPOUND, -1, Tk_Offset(TkButton, compound), 0,
+	 (ClientData) compoundStrings, 0},
     {TK_OPTION_CURSOR, "-cursor", "cursor", "Cursor",
 	DEF_BUTTON_CURSOR, -1, Tk_Offset(TkButton, cursor),
 	TK_OPTION_NULL_OK, 0, 0},
@@ -379,6 +420,11 @@ static Tk_OptionSpec radiobuttonOptionSpecs[] = {
 	0, 0, 0},
     {TK_OPTION_JUSTIFY, "-justify", "justify", "Justify",
 	DEF_BUTTON_JUSTIFY, -1, Tk_Offset(TkButton, justify), 0, 0, 0},
+    {TK_OPTION_RELIEF, "-offrelief", "offRelief", "OffRelief",
+	 DEF_BUTTON_RELIEF, -1, Tk_Offset(TkButton, offRelief), 0, 0, 0},
+    {TK_OPTION_RELIEF, "-overrelief", "overRelief", "OverRelief",
+	 DEF_BUTTON_OVER_RELIEF, -1, Tk_Offset(TkButton, overRelief),
+	 TK_OPTION_NULL_OK, 0, 0},
     {TK_OPTION_PIXELS, "-padx", "padX", "Pad",
 	DEF_LABCHKRAD_PADX, Tk_Offset(TkButton, padXPtr),
 	Tk_Offset(TkButton, padX), 0, 0, 0},
@@ -439,7 +485,7 @@ static Tk_OptionSpec *optionSpecs[] = {
  * into a single enumerated type used to dispatch the widget command.
  */
 
-static char *commandNames[][8] = {
+static CONST char *commandNames[][8] = {
     {"cget", "configure", (char *) NULL},
     {"cget", "configure", "flash", "invoke", (char *) NULL},
     {"cget", "configure", "deselect", "flash", "invoke", "select",
@@ -478,11 +524,11 @@ static void		ButtonSelectImageProc _ANSI_ARGS_((
 			    ClientData clientData, int x, int y, int width,
 			    int height, int imgWidth, int imgHeight));
 static char *		ButtonTextVarProc _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, char *name1, char *name2,
-			    int flags));
+			    Tcl_Interp *interp, CONST char *name1,
+			    CONST char *name2, int flags));
 static char *		ButtonVarProc _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, char *name1, char *name2,
-			    int flags));
+			    Tcl_Interp *interp, CONST char *name1,
+			    CONST char *name2, int flags));
 static int		ButtonWidgetObjCmd _ANSI_ARGS_((ClientData clientData,
 			    Tcl_Interp *interp, int objc,
 			    Tcl_Obj *CONST objv[]));
@@ -570,8 +616,7 @@ Tk_RadiobuttonObjCmd(clientData, interp, objc, objv)
 
 static int
 ButtonCreate(clientData, interp, objc, objv, type)
-    ClientData clientData;	/* Option table for this widget class, or
-				 * NULL if not created yet. */
+    ClientData clientData;	/* NULL. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int objc;			/* Number of arguments. */
     Tcl_Obj *CONST objv[];	/* Argument values. */
@@ -582,25 +627,12 @@ ButtonCreate(clientData, interp, objc, objv, type)
     TkButton *butPtr;
     Tk_OptionTable optionTable;
     Tk_Window tkwin;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+	Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
-    optionTable = (Tk_OptionTable) clientData;
-    if (optionTable == NULL) {
-	Tcl_CmdInfo info;
-	char *name;
-
-	/*
-	 * We haven't created the option table for this widget class
-	 * yet.  Do it now and save the table as the clientData for
-	 * the command, so we'll have access to it in future
-	 * invocations of the command.
-	 */
-
+    if (!tsdPtr->defaultsInitialized) {
 	TkpButtonSetDefaults(optionSpecs[type]);
-	optionTable = Tk_CreateOptionTable(interp, optionSpecs[type]);
-	name = Tcl_GetString(objv[0]);
-	Tcl_GetCommandInfo(interp, name, &info);
-	info.objClientData = (ClientData) optionTable;
-	Tcl_SetCommandInfo(interp, name, &info);
+	tsdPtr->defaultsInitialized = 1;
     }
 
     if (objc < 2) {
@@ -618,10 +650,17 @@ ButtonCreate(clientData, interp, objc, objv, type)
 	return TCL_ERROR;
     }
 
+    /*
+     * Create the option table for this widget class.  If it has already
+     * been created, the cached pointer will be returned.
+     */
+
+    optionTable = Tk_CreateOptionTable(interp, optionSpecs[type]);
+
     Tk_SetClass(tkwin, classNames[type]);
     butPtr = TkpCreateButton(tkwin);
 
-    TkSetClassProcs(tkwin, &tkpButtonProcs, (ClientData) butPtr);
+    Tk_SetClassProcs(tkwin, &tkpButtonProcs, (ClientData) butPtr);
 
     /*
      * Initialize the data structure for the button.
@@ -907,9 +946,9 @@ static void
 DestroyButton(butPtr)
     TkButton *butPtr;		/* Info about button widget. */
 {
+    butPtr->flags |= BUTTON_DELETED;
     TkpDestroyButton(butPtr);
 
-    butPtr->flags |= BUTTON_DELETED;
     if (butPtr->flags & REDRAW_PENDING) {
 	Tcl_CancelIdleCall(TkpDisplayButton, (ClientData) butPtr);
     }
@@ -991,7 +1030,7 @@ ConfigureButton(interp, butPtr, objc, objv)
 {
     Tk_SavedOptions savedOptions;
     Tcl_Obj *errorResult = NULL;
-    int error;
+    int error, haveImage;
     Tk_Image image;
 
     /*
@@ -1094,6 +1133,16 @@ ConfigureButton(interp, butPtr, objc, objv)
 			== NULL) {
 		    continue;
 		}
+
+		/*
+		 * If a radiobutton has the empty string as value
+		 * it should be selected.
+		 */
+
+ 		if ((butPtr->type == TYPE_RADIO_BUTTON) &&
+			(*Tcl_GetString(butPtr->onValuePtr) == 0)) {
+		    butPtr->flags |= SELECTED;
+		}
 	    }
 	}
 
@@ -1132,7 +1181,11 @@ ConfigureButton(interp, butPtr, objc, objv)
 	}
 	butPtr->selectImage = image;
 
-	if ((butPtr->imagePtr == NULL) && (butPtr->bitmap == None)
+	haveImage = 0;
+	if (butPtr->imagePtr != NULL || butPtr->bitmap != None) {
+	    haveImage = 1;
+	}
+	if ((!haveImage || butPtr->compound != COMPOUND_NONE)
 		&& (butPtr->textVarNamePtr != NULL)) {
 	    /*
 	     * The button must display the value of a variable: set up a trace
@@ -1295,6 +1348,9 @@ TkButtonWorldChanged(instanceData)
     } else {
 	gcValues.foreground = gcValues.background;
 	mask = GCForeground;
+	if (butPtr->compound != COMPOUND_NONE) {
+	    mask |= GCFont;
+	}
 	if (butPtr->gray == None) {
 	    butPtr->gray = Tk_GetBitmap(NULL, butPtr->tkwin, "gray50");
 	}
@@ -1499,8 +1555,8 @@ static char *
 ButtonVarProc(clientData, interp, name1, name2, flags)
     ClientData clientData;	/* Information about button. */
     Tcl_Interp *interp;		/* Interpreter containing variable. */
-    char *name1;		/* Name of variable. */
-    char *name2;		/* Second part of variable name. */
+    CONST char *name1;		/* Name of variable. */
+    CONST char *name2;		/* Second part of variable name. */
     int flags;			/* Information about what happened. */
 {
     register TkButton *butPtr = (TkButton *) clientData;
@@ -1578,13 +1634,17 @@ static char *
 ButtonTextVarProc(clientData, interp, name1, name2, flags)
     ClientData clientData;	/* Information about button. */
     Tcl_Interp *interp;		/* Interpreter containing variable. */
-    char *name1;		/* Not used. */
-    char *name2;		/* Not used. */
+    CONST char *name1;		/* Not used. */
+    CONST char *name2;		/* Not used. */
     int flags;			/* Information about what happened. */
 {
     TkButton *butPtr = (TkButton *) clientData;
     char *name;
     Tcl_Obj *valuePtr;
+
+    if (butPtr->flags & BUTTON_DELETED) {
+	return (char *) NULL;
+    }
 
     name = Tcl_GetString(butPtr->textVarNamePtr);
 

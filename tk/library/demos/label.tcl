@@ -38,4 +38,3 @@ label $w.right.bitmap -borderwidth 2 -relief sunken \
 	-bitmap @[file join $tk_library demos images face.bmp]
 label $w.right.caption -text "Tcl/Tk Proprietor"
 pack $w.right.bitmap $w.right.caption -side top
-

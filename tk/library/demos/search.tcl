@@ -139,4 +139,3 @@ $w.text mark set insert 0.0
 
 set fileName ""
 set searchString ""
-

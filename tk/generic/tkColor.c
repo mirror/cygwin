@@ -54,7 +54,7 @@ static void		InitColorObj _ANSI_ARGS_((Tcl_Obj *objPtr));
  * ptr1 field of the Tcl_Obj points to a TkColor object.
  */
 
-static Tcl_ObjType colorObjType = {
+Tcl_ObjType tkColorObjType = {
     "color",			/* name */
     FreeColorObjProc,		/* freeIntRepProc */
     DupColorObjProc,		/* dupIntRepProc */
@@ -98,7 +98,7 @@ Tk_AllocColorFromObj(interp, tkwin, objPtr)
 {
     TkColor *tkColPtr;
 
-    if (objPtr->typePtr != &colorObjType) {
+    if (objPtr->typePtr != &tkColorObjType) {
 	InitColorObj(objPtr);
     }
     tkColPtr = (TkColor *) objPtr->internalRep.twoPtrValue.ptr1;
@@ -187,7 +187,7 @@ Tk_GetColor(interp, tkwin, name)
     Tcl_Interp *interp;		/* Place to leave error message if
 				 * color can't be found. */
     Tk_Window tkwin;		/* Window in which color will be used. */
-    char *name;			/* Name of color to be allocated (in form
+    Tk_Uid name;		/* Name of color to be allocated (in form
 				 * suitable for passing to XParseColor). */
 {
     Tcl_HashEntry *nameHashPtr;
@@ -257,7 +257,6 @@ Tk_GetColor(interp, tkwin, name)
     tkColPtr->type = TK_COLOR_BY_NAME;
     tkColPtr->hashPtr = nameHashPtr;
     tkColPtr->nextPtr = existingColPtr;
-    tkColPtr->gcList = NULL;
     Tcl_SetHashValue(nameHashPtr, tkColPtr);
 
     return &tkColPtr->color;
@@ -338,7 +337,6 @@ Tk_GetColorByValue(tkwin, colorPtr)
     tkColPtr->type = TK_COLOR_BY_VALUE;
     tkColPtr->hashPtr = valueHashPtr;
     tkColPtr->nextPtr = NULL;
-    tkColPtr->gcList = NULL;
     Tcl_SetHashValue(valueHashPtr, tkColPtr);
     return &tkColPtr->color;
 }
@@ -365,7 +363,7 @@ Tk_GetColorByValue(tkwin, colorPtr)
  *--------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tk_NameOfColor(colorPtr)
     XColor *colorPtr;		/* Color whose name is desired. */
 {
@@ -645,7 +643,7 @@ Tk_GetColorFromObj(tkwin, objPtr)
     Tcl_HashEntry *hashPtr;
     TkDisplay *dispPtr = ((TkWindow *) tkwin)->dispPtr;
 
-    if (objPtr->typePtr != &colorObjType) {
+    if (objPtr->typePtr != &tkColorObjType) {
 	InitColorObj(objPtr);
     }
   
@@ -733,7 +731,7 @@ InitColorObj(objPtr)
     if ((typePtr != NULL) && (typePtr->freeIntRepProc != NULL)) {
 	(*typePtr->freeIntRepProc)(objPtr);
     }
-    objPtr->typePtr = &colorObjType;
+    objPtr->typePtr = &tkColorObjType;
     objPtr->internalRep.twoPtrValue.ptr1 = (VOID *) NULL;
 }
 
@@ -813,4 +811,3 @@ TkDebugColor(tkwin, name)
     }
     return resultPtr;
 }
-

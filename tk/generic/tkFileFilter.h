@@ -90,4 +90,3 @@ EXTERN int		TkGetFileFilters _ANSI_ARGS_ ((Tcl_Interp *interp,
 # define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif
-

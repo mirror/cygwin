@@ -42,7 +42,7 @@ units and pixels.
 .AP Tcl_Obj *objPtr in/out
 String value specifies a distance on the screen;
 internal rep will be modified to cache converted distance.
-.AP char *string in
+.AP "CONST char" *string in
 Same as \fIobjPtr\fR except specification of distance is passed as
 a string.
 .VE
@@ -109,4 +109,3 @@ store a double-precision floating-point result at \fI*doublePtr\fR.
 
 .SH KEYWORDS
 centimeters, convert, inches, millimeters, pixels, points, screen units
-

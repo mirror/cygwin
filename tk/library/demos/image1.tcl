@@ -34,4 +34,3 @@ image create photo image1b \
 label $w.l2 -image image1b -bd 1 -relief sunken
 
 pack $w.l1 $w.l2 -side top -padx .5m -pady .5m
-

@@ -80,7 +80,7 @@ static int gTkOwnsCursor = true;             /* A boolean indicating whether
  */
 
 static  void FindCursorByName _ANSI_ARGS_ ((TkMacCursor *macCursorPtr,
-	             char *string));
+	             CONST char *string));
 
 /*
  *----------------------------------------------------------------------
@@ -105,7 +105,7 @@ static  void FindCursorByName _ANSI_ARGS_ ((TkMacCursor *macCursorPtr,
 void 
 FindCursorByName(
     TkMacCursor *macCursorPtr,
-    char *string)
+    CONST char *string)
 {
     Handle resource;
     Str255 curName;
@@ -200,7 +200,7 @@ TkGetCursorByName(
         FindCursorByName(macCursorPtr, string);
 
 	if (macCursorPtr->macCursor == NULL) {
-	    char **argv;
+	    CONST char **argv;
 	    int argc, err;
 	    
 	    /*
@@ -249,8 +249,8 @@ TkGetCursorByName(
 TkCursor *
 TkCreateCursorFromData(
     Tk_Window tkwin,		/* Window in which cursor will be used. */
-    char *source,		/* Bitmap data for cursor shape. */
-    char *mask,			/* Bitmap data for cursor mask. */
+    CONST char *source,		/* Bitmap data for cursor shape. */
+    CONST char *mask,		/* Bitmap data for cursor mask. */
     int width, int height,	/* Dimensions of cursor. */
     int xHot, int yHot,		/* Location of hot-spot in cursor. */
     XColor fgColor,		/* Foreground color for cursor. */
@@ -399,4 +399,3 @@ Tk_MacTkOwnsCursor(
 {
     gTkOwnsCursor = tkOwnsIt;
 }
-

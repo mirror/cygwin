@@ -393,7 +393,7 @@ TkBTreeInsertChars(indexPtr, string)
 					 * index is no longer valid because
 					 * of changes to the segment
 					 * structure. */
-    char *string;			/* Pointer to bytes to insert (may
+    CONST char *string;			/* Pointer to bytes to insert (may
 					 * contain newlines, must be null-
 					 * terminated). */
 {
@@ -410,7 +410,7 @@ TkBTreeInsertChars(indexPtr, string)
     register TkTextSegment *segPtr;
     TkTextLine *newLinePtr;
     int chunkSize;			/* # characters in current chunk. */
-    register char *eol;			/* Pointer to character just after last
+    register CONST char *eol;		/* Pointer to character just after last
 					 * one in current chunk. */
     int changeToLineCount;		/* Counts change to total number of
 					 * lines in file. */
@@ -3753,4 +3753,3 @@ TkBTreeBytesInLine(linePtr)
     }
     return count;
 }
-

@@ -305,4 +305,3 @@ ErrorProc(display, errEventPtr)
     couldntHandle:
     return (*defaultHandler)(display, errEventPtr);
 }
-

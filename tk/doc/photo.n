@@ -31,7 +31,11 @@ can be supplied from
 C code through a procedural interface.  At present, only GIF and PPM/PGM
 formats are supported, but an interface exists to allow additional
 image file formats to be added easily.  A photo image is transparent
-in regions where no image data has been supplied.
+in regions where no image data has been supplied
+.VS 8.4
+or where it has been set transparent by the \fBtransparency set\fR
+subcommand.
+.VE 8.4
 
 .SH "CREATING PHOTOS"
 .PP
@@ -185,6 +189,18 @@ only every \fIx\fRth pixel in the X direction and \fIy\fRth pixel in
 the Y direction.  Negative values will cause the image to be flipped
 about the Y or X axes, respectively.  If \fIy\fR is not given, the
 default value is the same as \fIx\fR.
+.TP
+\fB\-compositingrule \fIrule\fR
+.VS 8.4
+Specifies how transparent pixels in the source image are combined with
+the destination image.  When a compositing rule of \fIoverlay\fR is
+set, the old contents of the destination image are visible, as if the
+source image were printed on a piece of transparent film and placed
+over the top of the destination.  When a compositing rule of \fIset\fR
+is set, the old contents of the destination image are discarded and
+the source image is used as-is.  The default compositing rule is
+\fIoverlay\fR.
+.VE 8.4
 .RE
 .TP
 \fIimageName \fBdata ?\fIoption value(s) ...\fR?
@@ -198,20 +214,21 @@ information. In all transparent pixels the color will be replaced by
 the specified color.
 .TP
 \fB\-format\fI format-name\fR
-Specifies the name of the image file format handler to be used to
-write the data to the file.  Specifically, this subcommand searches
+Specifies the name of the image file format handler to be used.
+Specifically, this subcommand searches
 for the first handler whose name matches a initial substring of
-\fIformat-name\fR and which has the capability to write an image
-file.  If this option is not given, this subcommand uses the first
-handler that has the capability to write an image file.
+\fIformat-name\fR and which has the capability to read this image data.
+If this option is not given, this subcommand uses the first
+handler that has the capability to read the image data.
 .TP
 \fB\-from \fIx1 y1 x2 y2\fR
-Specifies a rectangular region of \fIimageName\fR to be written to the
-image file.  If only \fIx1\fR and \fIy1\fR are specified, the region
+Specifies a rectangular region of \fIimageName\fR to be returned.
+If only \fIx1\fR and \fIy1\fR are specified, the region
 extends from \fI(x1,y1)\fR to the bottom-right corner of
 \fIimageName\fR.  If all four coordinates are given, they specify
-diagonally opposite corners of the rectangular region.  The default,
-if this option is not given, is the whole image.
+diagonally opposite corners of the rectangular region, including x1,y1
+and excluding x2,y2.  The default, if this option is not given, is the
+whole image.
 .TP
 \fB\-grayscale\fR
 If this options is specified, the data will not contain color
@@ -307,6 +324,21 @@ not noticeable, but if it is a problem, this command can be used to
 recalculate the dithered image in each window where the image is
 displayed.
 .TP
+\fIimageName \fBtransparency \fIsubcommand ?arg arg ...?\fR
+.VS 8.4
+Allows examination and manipulation of the transparency information in
+the photo image.  Several subcommands are available:
+.RS
+.TP
+\fIimageName \fBtransparency get \fIx y\fR
+Returns a boolean indicating if the pixel at (\fIx\fR,\fIy\fR) is
+transparent.
+\fIimageName \fBtransparency set \fIx y boolean\fR
+Makes the pixel at (\fIx\fR,\fIy\fR) transparent if \fIboolean\fR is
+true, and makes that pixel opaque otherwise.
+.RE
+.VE 8.4
+.TP
 \fIimageName \fBwrite \fIfilename\fR ?\fIoption value(s) ...\fR?
 Writes image data from \fIimageName\fR to a file named \fIfilename\fR.
 The following options may be specified:
@@ -337,7 +369,6 @@ if this option is not given, is the whole image.
 If this options is specified, the data will not contain color
 information. All pixel data will be transformed into grayscale.
 .RE
-.TP
 .SH "IMAGE FORMATS"
 .PP
 The photo image code is structured to allow handlers for additional
@@ -367,6 +398,10 @@ for the \fB\-format\fR option must begin with the complete name of the
 requested handler, and may contain additional information following
 that, which the handler can use, for example, to specify which variant
 to use of the formats supported by the handler.
+.VS 8.4
+Note that not all image handlers may support writing transparency data
+to a file, even where the target image format does.
+.VE 8.4
 
 .SH "COLOR ALLOCATION"
 .PP
@@ -406,4 +441,3 @@ John Ousterhout.
 
 .SH KEYWORDS
 photo, image, color
-

@@ -27,4 +27,3 @@
 #include "tkIntPlatDecls.h"
 
 #endif /* _TKUNIXINT */
-

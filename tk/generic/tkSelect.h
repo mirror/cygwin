@@ -183,4 +183,3 @@ extern void		TkSelUpdateClipboard _ANSI_ARGS_((TkWindow *winPtr,
 #endif
 
 #endif /* _TKSELECT */
-

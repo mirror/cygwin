@@ -26,6 +26,35 @@
  * structures exists for each node or leaf in the option tree.  It is
  * actually stored as part of the parent node, and describes a particular
  * child of the parent.
+ *
+ * The structure of the option db tree is a little confusing.  There are
+ * four different kinds of nodes in the tree:
+ *	interior class nodes
+ *	interior name nodes
+ *	leaf class nodes
+ *	leaf name nodes
+ *
+ * All interior nodes refer to _window_ classes and names; all leaf nodes
+ * refer to _option_ classes and names.  When looking for a particular option,
+ * therefore, you must compare interior node values to corresponding window
+ * values, and compare leaf node values to corresponding option values.
+ *
+ * The tree is actually stored in a collection of arrays; there is one each
+ * combination of WILDCARD/EXACT and CLASS/NAME and NODE/LEAF.  The NODE arrays
+ * contain the interior nodes of the tree; each element has a pointer to an
+ * array of elements which are the leaves of the tree.  The LEAF arrays, rather
+ * than holding the leaves of the tree, hold a cached subset of the option
+ * database, consisting of the values of all defined options for a single
+ * window, and some additional information about each ancestor of the window
+ * (since some options may be inherited from a parent), all the way back to the
+ * root window.
+ *
+ * Each time a call is made to Tk_GetOption, Tk will attempt to use the cached
+ * information to satisfy the lookup.  If the call is for a window other than
+ * that for which options are currently cached, the portion of the cache that
+ * contains information for common ancestors of the two windows is retained and
+ * the remainder is discarded and rebuilt with new information for the new
+ * window.
  */
 
 typedef struct Element {
@@ -206,6 +235,8 @@ static void		ExtendStacks _ANSI_ARGS_((ElArray *arrayPtr,
 static int		GetDefaultOptions _ANSI_ARGS_((Tcl_Interp *interp,
 			    TkWindow *winPtr));	
 static ElArray *	NewArray _ANSI_ARGS_((int numEls));	
+static void		OptionThreadExitProc _ANSI_ARGS_((
+			    ClientData clientData));
 static void		OptionInit _ANSI_ARGS_((TkMainInfo *mainPtr));
 static int		ParsePriority _ANSI_ARGS_((Tcl_Interp *interp,
 			    char *string));
@@ -233,8 +264,8 @@ void
 Tk_AddOption(tkwin, name, value, priority)
     Tk_Window tkwin;		/* Window token;  option will be associated
 				 * with main window for this window. */
-    char *name;			/* Multi-element name of option. */
-    char *value;		/* String value for option. */
+    CONST char *name;		/* Multi-element name of option. */
+    CONST char *value;		/* String value for option. */
     int priority;		/* Overall priority level to use for
 				 * this option, such as TK_USER_DEFAULT_PRIO
 				 * or TK_INTERACTIVE_PRIO.  Must be between
@@ -244,8 +275,8 @@ Tk_AddOption(tkwin, name, value, priority)
     register ElArray **arrayPtrPtr;
     register Element *elPtr;
     Element newEl;
-    register char *p;
-    char *field;
+    register CONST char *p;
+    CONST char *field;
     int count, firstField, length;
 #define TMP_SIZE 100
     char tmp[TMP_SIZE+1];
@@ -391,14 +422,17 @@ Tk_Uid
 Tk_GetOption(tkwin, name, className)
     Tk_Window tkwin;		/* Token for window that option is
 				 * associated with. */
-    char *name;			/* Name of option. */
-    char *className;		/* Class of option.  NULL means there
+    CONST char *name;		/* Name of option. */
+    CONST char *className;	/* Class of option.  NULL means there
 				 * is no class for this option:  just
 				 * check for name. */
 {
-    Tk_Uid nameId, classId;
+    Tk_Uid nameId, classId = NULL;
+    char *masqName;
     register Element *elPtr, *bestPtr;
     register int count;
+    StackLevel *levelPtr;
+    int stackDepth[NUM_STACKS];
     ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
             Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
@@ -411,43 +445,169 @@ Tk_GetOption(tkwin, name, className)
 	SetupStacks((TkWindow *) tkwin, 1);
     }
 
-    nameId = Tk_GetUid(name);
+    /*
+     * Get a default "best" match.
+     */
+    
     bestPtr = &tsdPtr->defaultMatch;
+
+    /*
+     * For megawidget support, we want to have some widget options masquerade
+     * as options for other widgets.  For example, a combobox has a button in
+     * it; this button ought to pick up the *Button.background, etc., options.
+     * But because the class of the widget is Combobox, our normal search
+     * won't get that option.
+     *
+     * To work around this, the option name field syntax was extended to allow
+     * for a "." in the name; if this character occurs in the name, then it
+     * indicates that this name contains a new window class and an option name,
+     * ie, "Button.foreground".  If we see this form in the name field, we 
+     * query the option database directly (since the option stacks will not
+     * have the information we need).
+     */
+
+    masqName = strchr(name, (int)'.');
+    if (masqName != NULL) {
+	/*
+	 * This option is masquerading with a different window class.
+	 * Search the stack to the depth it was before the current window's
+	 * information was pushed (the value for which is stored in the bases
+	 * field).
+	 */
+	levelPtr = &tsdPtr->levels[tsdPtr->curLevel];
+	nameId = Tk_GetUid(masqName+1);
+	for (count = 0; count < NUM_STACKS; count++) {
+	    stackDepth[count] = levelPtr->bases[count];
+	}
+    } else {
+	/*
+	 * No option masquerading here.  Just use the current level to get the
+	 * stack depths.
+	 */
+	nameId = Tk_GetUid(name);
+	for (count = 0; count < NUM_STACKS; count++) {
+	    stackDepth[count] = tsdPtr->stacks[count]->numUsed;
+	}
+    }
+
+    /*
+     * Probe the stacks for matches.
+     */
+
     for (elPtr = tsdPtr->stacks[EXACT_LEAF_NAME]->els,
-	    count = tsdPtr->stacks[EXACT_LEAF_NAME]->numUsed; count > 0;
-	    elPtr++, count--) {
+	     count = stackDepth[EXACT_LEAF_NAME]; count > 0;
+	 elPtr++, count--) {
 	if ((elPtr->nameUid == nameId)
 		&& (elPtr->priority > bestPtr->priority)) {
 	    bestPtr = elPtr;
 	}
     }
     for (elPtr = tsdPtr->stacks[WILDCARD_LEAF_NAME]->els,
-	    count = tsdPtr->stacks[WILDCARD_LEAF_NAME]->numUsed; count > 0;
-	    elPtr++, count--) {
+	     count = stackDepth[WILDCARD_LEAF_NAME]; count > 0;
+	 elPtr++, count--) {
 	if ((elPtr->nameUid == nameId)
 		&& (elPtr->priority > bestPtr->priority)) {
 	    bestPtr = elPtr;
 	}
     }
+
     if (className != NULL) {
 	classId = Tk_GetUid(className);
 	for (elPtr = tsdPtr->stacks[EXACT_LEAF_CLASS]->els,
-		count = tsdPtr->stacks[EXACT_LEAF_CLASS]->numUsed; count > 0;
-		elPtr++, count--) {
+		 count = stackDepth[EXACT_LEAF_CLASS]; count > 0;
+	     elPtr++, count--) {
 	    if ((elPtr->nameUid == classId)
 		    && (elPtr->priority > bestPtr->priority)) {
 		bestPtr = elPtr;
 	    }
 	}
 	for (elPtr = tsdPtr->stacks[WILDCARD_LEAF_CLASS]->els,
-		count = tsdPtr->stacks[WILDCARD_LEAF_CLASS]->numUsed; 
-                count > 0; elPtr++, count--) {
+		 count = stackDepth[WILDCARD_LEAF_CLASS]; count > 0;
+	     elPtr++, count--) {
 	    if ((elPtr->nameUid == classId)
 		    && (elPtr->priority > bestPtr->priority)) {
 		bestPtr = elPtr;
 	    }
 	}
     }
+    
+    /*
+     * If this option was masquerading with a different window class,
+     * probe the option database now.  Note that this will be inefficient
+     * if the option database is densely populated, or if the widget has many
+     * masquerading options.
+     */
+
+    if (masqName != NULL) {
+	char *masqClass;
+	Tk_Uid nodeId, winClassId, winNameId;
+	unsigned int classNameLength;
+	register Element *nodePtr, *leafPtr;
+	static int searchOrder[] = { EXACT_NODE_NAME,
+					 WILDCARD_NODE_NAME,
+					 EXACT_NODE_CLASS,
+					 WILDCARD_NODE_CLASS,
+					 -1 };
+	int *currentPtr, currentStack, leafCount;
+	
+	/*
+	 * Extract the masquerade class name from the name field.
+	 */
+	
+	classNameLength	= (unsigned int)(masqName - name);
+	masqClass	= (char *)ckalloc(classNameLength + 1);
+	strncpy(masqClass, name, classNameLength);
+	masqClass[classNameLength] = '\0';
+	
+	winClassId	= Tk_GetUid(masqClass);
+	ckfree(masqClass);
+	winNameId	= ((TkWindow *)tkwin)->nameUid;
+
+	levelPtr = &tsdPtr->levels[tsdPtr->curLevel];
+
+	for (currentPtr = searchOrder; *currentPtr != -1; currentPtr++) {
+	    currentStack = *currentPtr;
+	    nodePtr	= tsdPtr->stacks[currentStack]->els;
+	    count	= levelPtr->bases[currentStack];
+
+	    /*
+	     * For wildcard stacks, check all entries;  for non-wildcard
+	     * stacks, only check things that matched in the parent.
+	     */
+	    
+	    if (!(currentStack & WILDCARD)) {
+		nodePtr += levelPtr[-1].bases[currentStack];
+		count	-= levelPtr[-1].bases[currentStack];
+	    }
+	    
+	    if (currentStack && CLASS) {
+		nodeId = winClassId;
+	    } else {
+		nodeId = winNameId;
+	    }
+
+	    for ( ; count > 0; nodePtr++, count--) {
+		if (nodePtr->nameUid == nodeId) {
+		    leafPtr	= nodePtr->child.arrayPtr->els;
+		    leafCount	= nodePtr->child.arrayPtr->numUsed;
+		    for ( ; leafCount > 0; leafPtr++, leafCount--) {
+			if (leafPtr->flags & CLASS && className != NULL) {
+			    if (leafPtr->nameUid == classId &&
+				    leafPtr->priority > bestPtr->priority) {
+				bestPtr = leafPtr;
+			    }
+			} else {
+			    if (leafPtr->nameUid == nameId &&
+				    leafPtr->priority > bestPtr->priority) {
+				bestPtr = leafPtr;
+			    }
+			}
+		    }
+		}
+	    }
+	}
+    }
+    
     return bestPtr->child.valueUid;
 }
 
@@ -481,7 +641,7 @@ Tk_OptionObjCmd(clientData, interp, objc, objv)
     ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
             Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
-    static char *optionCmds[] = {
+    static CONST char *optionCmds[] = {
 	"add", "clear", "get", "readfile", NULL
     };
 
@@ -553,7 +713,7 @@ Tk_OptionObjCmd(clientData, interp, objc, objv)
 	    value = Tk_GetOption(window, Tcl_GetString(objv[3]),
 		    Tcl_GetString(objv[4]));
 	    if (value != NULL) {
-		Tcl_SetResult(interp, value, TCL_STATIC);
+		Tcl_SetResult(interp, (char *)value, TCL_STATIC);
 	    }
 	    break;
 	}
@@ -627,7 +787,7 @@ TkOptionDeadWindow(winPtr)
      * database.
      */
 
-    if ((winPtr->mainPtr->winPtr == winPtr)
+    if ((winPtr->mainPtr != NULL) && (winPtr->mainPtr->winPtr == winPtr)
 	    && (winPtr->mainPtr->optionRootPtr != NULL)) {
 	ClearOptionTree(winPtr->mainPtr->optionRootPtr);
 	winPtr->mainPtr->optionRootPtr = NULL;
@@ -934,7 +1094,8 @@ ReadOptionFile(interp, tkwin, fileName, priority)
 				 * or TK_INTERACTIVE_PRIO.  Must be between
 				 * 0 and TK_MAX_PRIO. */
 {
-    char *realName, *buffer;
+    CONST char *realName;
+    char *buffer;
     int result, bufferSize;
     Tcl_Channel chan;
     Tcl_DString newName;
@@ -967,8 +1128,8 @@ ReadOptionFile(interp, tkwin, fileName, priority)
      * overallocate if we are performing CRLF translation.
      */
     
-    bufferSize = Tcl_Seek(chan, 0L, SEEK_END);
-    (void) Tcl_Seek(chan, 0L, SEEK_SET);
+    bufferSize = (int) Tcl_Seek(chan, (Tcl_WideInt) 0, SEEK_END);
+    (void) Tcl_Seek(chan, (Tcl_WideInt) 0, SEEK_SET);
 
     if (bufferSize < 0) {
 	Tcl_AppendResult(interp, "error seeking to end of file \"",
@@ -1195,24 +1356,9 @@ SetupStacks(winPtr, leaf)
     arrayPtr = tsdPtr->stacks[EXACT_LEAF_CLASS];
     arrayPtr->numUsed = 0;
     arrayPtr->nextToUse = arrayPtr->els;
-    levelPtr->bases[EXACT_LEAF_NAME] = tsdPtr->stacks[EXACT_LEAF_NAME]
-            ->numUsed;
-    levelPtr->bases[EXACT_LEAF_CLASS] = tsdPtr->stacks[EXACT_LEAF_CLASS]
-            ->numUsed;
-    levelPtr->bases[EXACT_NODE_NAME] = tsdPtr->stacks[EXACT_NODE_NAME]
-            ->numUsed;
-    levelPtr->bases[EXACT_NODE_CLASS] = tsdPtr->stacks[EXACT_NODE_CLASS]
-            ->numUsed;
-    levelPtr->bases[WILDCARD_LEAF_NAME] = tsdPtr->stacks[WILDCARD_LEAF_NAME]
-            ->numUsed;
-    levelPtr->bases[WILDCARD_LEAF_CLASS] = tsdPtr->stacks[WILDCARD_LEAF_CLASS]
-            ->numUsed;
-    levelPtr->bases[WILDCARD_NODE_NAME] = tsdPtr->stacks[WILDCARD_NODE_NAME]
-            ->numUsed;
-    levelPtr->bases[WILDCARD_NODE_CLASS] = tsdPtr->stacks[WILDCARD_NODE_CLASS]
-            ->numUsed;
-
-
+    for (i = 0; i < NUM_STACKS; i++) {
+	levelPtr->bases[i] = tsdPtr->stacks[i]->numUsed;
+    }
     /*
      * Step 5: scan the current stack level looking for matches to this
      * window's name or class;  where found, add new information to the
@@ -1294,6 +1440,39 @@ ExtendStacks(arrayPtr, leaf)
 /*
  *--------------------------------------------------------------
  *
+ * OptionThreadExitProc --
+ *
+ *	Free data structures for option handling.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Option-related data structures get freed.
+ *
+ *--------------------------------------------------------------
+ */
+
+static void
+OptionThreadExitProc(clientData)
+    ClientData clientData;	/* not used */
+{
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+
+    if (tsdPtr->initialized) {
+	int i;
+	for (i = 0; i < NUM_STACKS; i++) {
+	    ckfree((char *) tsdPtr->stacks[i]);
+	}
+	ckfree((char *) tsdPtr->levels);
+	tsdPtr->initialized = 0;
+    }
+}
+
+/*
+ *--------------------------------------------------------------
+ *
  * OptionInit --
  *
  *	Initialize data structures for option handling.
@@ -1341,6 +1520,7 @@ OptionInit(mainPtr)
 	defaultMatchPtr->child.valueUid = NULL;
 	defaultMatchPtr->priority = -1;
 	defaultMatchPtr->flags = 0;
+	Tcl_CreateThreadExitHandler(OptionThreadExitProc, NULL);
     }
 
     /*

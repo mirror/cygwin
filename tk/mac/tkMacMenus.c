@@ -106,7 +106,7 @@ TkMacHandleMenuSelect(
 			break;
 		    }
 		default:
-		    GetItem(tkAppleMenu, theItem, name);
+		    GetMenuItemText(tkAppleMenu, theItem, name);
 		    HiliteMenu(0);
 		    OpenDeskAcc(name);
 		    return;
@@ -193,9 +193,9 @@ TkMacInitMenus(
 	panic("memory - menus");
     }
     InsertMenu(tkAppleMenu, 0);
-    AppendMenu(tkAppleMenu, "\pAbout Tcl & Tk…");
+    AppendMenu(tkAppleMenu, "\pAbout Tcl & Tkä");
     AppendMenu(tkAppleMenu, "\p(-");
-    AddResMenu(tkAppleMenu, 'DRVR');
+    AppendResMenu(tkAppleMenu, 'DRVR');
 
     if (TkMacUseMenuID(kFileMenu) != TCL_OK) {
     	panic("Menu ID %d is already in use!", kFileMenu);
@@ -205,7 +205,7 @@ TkMacInitMenus(
 	panic("memory - menus");
     }
     InsertMenu(tkFileMenu, 0);
-    AppendMenu(tkFileMenu, "\pSource…");
+    AppendMenu(tkFileMenu, "\pSourceä");
     AppendMenu(tkFileMenu, "\pClose/W");
     AppendMenu(tkFileMenu, "\p(-");
     AppendMenu(tkFileMenu, "\pQuit/Q");
@@ -330,7 +330,7 @@ static void
 SourceDialog()
 {
     int result;
-    char *path;
+    CONST char *path;
     char openCmd[] = "tk_getOpenFile -filetypes {\
             {{TCL Scripts} {.tcl} TEXT} {{Text Files} {} TEXT}}";
     
@@ -353,5 +353,3 @@ SourceDialog()
 	Tcl_BackgroundError(gInterp);
     }	   
 }
-
-

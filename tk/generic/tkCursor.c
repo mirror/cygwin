@@ -26,8 +26,8 @@
  */
 
 typedef struct {
-    char *source;		/* Cursor bits. */
-    char *mask;			/* Mask bits. */
+    CONST char *source;		/* Cursor bits. */
+    CONST char *mask;		/* Mask bits. */
     int width, height;		/* Dimensions of cursor (and data
 				 * and mask). */
     int xHot, yHot;		/* Location of cursor hot-spot. */
@@ -45,7 +45,7 @@ static void		DupCursorObjProc _ANSI_ARGS_((Tcl_Obj *srcObjPtr,
 static void		FreeCursor _ANSI_ARGS_((TkCursor *cursorPtr));
 static void		FreeCursorObjProc _ANSI_ARGS_((Tcl_Obj *objPtr));
 static TkCursor *	GetCursor _ANSI_ARGS_((Tcl_Interp *interp,
-			    Tk_Window tkwin, char *name));
+			    Tk_Window tkwin, CONST char *name));
 static TkCursor *	GetCursorFromObj _ANSI_ARGS_((Tk_Window tkwin,
 			    Tcl_Obj *objPtr));
 static void		InitCursorObj _ANSI_ARGS_((Tcl_Obj *objPtr));
@@ -58,7 +58,7 @@ static void		InitCursorObj _ANSI_ARGS_((Tcl_Obj *objPtr));
  * option is set.
  */
 
-static Tcl_ObjType cursorObjType = {
+Tcl_ObjType tkCursorObjType = {
     "cursor",			/* name */
     FreeCursorObjProc,		/* freeIntRepProc */
     DupCursorObjProc,		/* dupIntRepProc */
@@ -101,7 +101,7 @@ Tk_AllocCursorFromObj(interp, tkwin, objPtr)
 {
     TkCursor *cursorPtr;
 
-    if (objPtr->typePtr != &cursorObjType) {
+    if (objPtr->typePtr != &tkCursorObjType) {
 	InitCursorObj(objPtr);
     }
     cursorPtr = (TkCursor *) objPtr->internalRep.twoPtrValue.ptr1;
@@ -189,7 +189,7 @@ Tk_Cursor
 Tk_GetCursor(interp, tkwin, string)
     Tcl_Interp *interp;		/* Interpreter to use for error reporting. */
     Tk_Window tkwin;		/* Window in which cursor will be used. */
-    char *string;		/* Description of cursor.  See manual entry
+    Tk_Uid string;		/* Description of cursor.  See manual entry
 				 * for details on legal syntax. */
 {
     TkCursor *cursorPtr = GetCursor(interp, tkwin, string);
@@ -230,7 +230,7 @@ static TkCursor *
 GetCursor(interp, tkwin, string)
     Tcl_Interp *interp;		/* Interpreter to use for error reporting. */
     Tk_Window tkwin;		/* Window in which cursor will be used. */
-    char *string;		/* Description of cursor.  See manual entry
+    CONST char *string;		/* Description of cursor.  See manual entry
 				 * for details on legal syntax. */
 {
     Tcl_HashEntry *nameHashPtr;
@@ -276,13 +276,12 @@ GetCursor(interp, tkwin, string)
     cursorPtr->objRefCount = 0;
     cursorPtr->otherTable = &dispPtr->cursorNameTable;
     cursorPtr->hashPtr = nameHashPtr;
-	cursorPtr->nextPtr = NULL;
+    cursorPtr->nextPtr = existingCursorPtr;
     cursorPtr->idHashPtr = Tcl_CreateHashEntry(&dispPtr->cursorIdTable, 
             (char *) cursorPtr->cursor, &new);
     if (!new) {
 	panic("cursor already registered in Tk_GetCursor");
     }
-    cursorPtr->nextPtr = existingCursorPtr;
     Tcl_SetHashValue(nameHashPtr, cursorPtr);
     Tcl_SetHashValue(cursorPtr->idHashPtr, cursorPtr);
 
@@ -319,8 +318,8 @@ Tk_GetCursorFromData(interp, tkwin, source, mask, width, height,
 	xHot, yHot, fg, bg)
     Tcl_Interp *interp;		/* Interpreter to use for error reporting. */
     Tk_Window tkwin;		/* Window in which cursor will be used. */
-    char *source;		/* Bitmap data for cursor shape. */
-    char *mask;			/* Bitmap data for cursor mask. */
+    CONST char *source;		/* Bitmap data for cursor shape. */
+    CONST char *mask;		/* Bitmap data for cursor mask. */
     int width, height;		/* Dimensions of cursor. */
     int xHot, yHot;		/* Location of hot-spot in cursor. */
     Tk_Uid fg;			/* Foreground color for cursor. */
@@ -384,6 +383,7 @@ Tk_GetCursorFromData(interp, tkwin, source, mask, width, height,
     cursorPtr->objRefCount = 0;
     cursorPtr->idHashPtr = Tcl_CreateHashEntry(&dispPtr->cursorIdTable, 
             (char *) cursorPtr->cursor, &new);
+    cursorPtr->nextPtr = NULL;
 
     if (!new) {
 	panic("cursor already registered in Tk_GetCursorFromData");
@@ -418,7 +418,7 @@ Tk_GetCursorFromData(interp, tkwin, source, mask, width, height,
  *--------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tk_NameOfCursor(display, cursor)
     Display *display;		/* Display for which cursor was allocated. */
     Tk_Cursor cursor;		/* Identifier for cursor whose name is
@@ -694,7 +694,7 @@ GetCursorFromObj(tkwin, objPtr)
     Tcl_HashEntry *hashPtr;
     TkDisplay *dispPtr = ((TkWindow *) tkwin)->dispPtr;
 
-    if (objPtr->typePtr != &cursorObjType) {
+    if (objPtr->typePtr != &tkCursorObjType) {
 	InitCursorObj(objPtr);
     }
 
@@ -770,7 +770,7 @@ InitCursorObj(objPtr)
     if ((typePtr != NULL) && (typePtr->freeIntRepProc != NULL)) {
 	(*typePtr->freeIntRepProc)(objPtr);
     }
-    objPtr->typePtr = &cursorObjType;
+    objPtr->typePtr = &tkCursorObjType;
     objPtr->internalRep.twoPtrValue.ptr1 = (VOID *) NULL;
 }
 
@@ -866,5 +866,3 @@ TkDebugCursor(tkwin, name)
     }
     return resultPtr;
 }
-
-

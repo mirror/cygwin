@@ -46,9 +46,11 @@ color map for \fIwindow\fR.
 .TP
 \fBwinfo children \fIwindow\fR
 Returns a list containing the path names of all the children
-of \fIwindow\fR.  The list is in stacking order, with the lowest
-window first.  Top-level windows are returned as children
-of their logical parents.
+of \fIwindow\fR. Top-level windows are returned as children
+of their logical parents. The list is in stacking order, with
+the lowest window first, except for Top-level windows which
+are not returned in stacking order. Use the \fBwm stackorder\fR
+command to query the stacking order of Top-level windows.
 .TP
 \fBwinfo class \fIwindow\fR
 Returns the class name for \fIwindow\fR.
@@ -328,4 +330,3 @@ has no border).
 .SH KEYWORDS
 atom, children, class, geometry, height, identifier, information, interpreters,
 mapped, parent, path name, screen, virtual root, width, window
-

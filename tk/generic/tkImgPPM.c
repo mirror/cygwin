@@ -192,7 +192,7 @@ FileReadPPM(interp, chan, fileName, formatString, imageHandle, destX, destY,
     Tk_PhotoExpand(imageHandle, destX + width, destY + height);
 
     if (srcY > 0) {
-	Tcl_Seek(chan, (srcY * block.pitch), SEEK_CUR);
+	Tcl_Seek(chan, (Tcl_WideInt)(srcY * block.pitch), SEEK_CUR);
     }
 
     nLines = (MAX_MEMORY + block.pitch - 1) / block.pitch;
@@ -228,7 +228,8 @@ FileReadPPM(interp, chan, fileName, formatString, imageHandle, destX, destY,
 	    }
 	}
 	block.height = nLines;
-	Tk_PhotoPutBlock(imageHandle, &block, destX, destY, width, nLines);
+	Tk_PhotoPutBlock(imageHandle, &block, destX, destY, width, nLines,
+		TK_PHOTO_COMPOSITE_SET);
 	destY += nLines;
     }
 
@@ -274,10 +275,12 @@ FileWritePPM(interp, fileName, formatString, blockPtr)
 
     if (Tcl_SetChannelOption(interp, chan, "-translation", "binary")
 	    != TCL_OK) {
+	Tcl_Close(NULL, chan);
 	return TCL_ERROR;
     }
     if (Tcl_SetChannelOption(interp, chan, "-encoding", "binary")
 	    != TCL_OK) {
+	Tcl_Close(NULL, chan);
 	return TCL_ERROR;
     }
     
@@ -427,4 +430,3 @@ ReadPPMFileHeader(chan, widthPtr, heightPtr, maxIntensityPtr)
     }
     return type;
 }
-

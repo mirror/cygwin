@@ -191,7 +191,6 @@ TkMenuConfigureDrawOptions(menuPtr)
     Tk_3DBorder border, activeBorder;
     Tk_Font tkfont;
     XColor *fg, *activeFg, *indicatorFg;
-    XColor *foreground, *background;
  
     /*
      * A few options need special processing, such as setting the
@@ -215,19 +214,15 @@ TkMenuConfigureDrawOptions(menuPtr)
     menuPtr->textGC = newGC;
 
     gcValues.font = Tk_FontId(tkfont);
-    background = Tk_3DBorderColor(border);
-    gcValues.background = background->pixel;
+    gcValues.background = Tk_3DBorderColor(border)->pixel;
     if (menuPtr->disabledFgPtr != NULL) {
 	XColor *disabledFg;
 
 	disabledFg = Tk_GetColorFromObj(menuPtr->tkwin, 
 		menuPtr->disabledFgPtr);
-	foreground = disabledFg;
-	gcValues.foreground = foreground->pixel;
+	gcValues.foreground = disabledFg->pixel;
 	mask = GCForeground|GCBackground|GCFont;
     } else {
-        foreground = background;
-	background = NULL;
 	gcValues.foreground = gcValues.background;
 	mask = GCForeground;
 	if (menuPtr->gray == None) {
@@ -335,18 +330,16 @@ TkMenuConfigureEntryDrawOptions(mePtr, index)
 	    || (mePtr->activeBorderPtr != NULL)
 	    || (mePtr->activeFgPtr != NULL)
 	    || (mePtr->indicatorFgPtr != NULL)) {
-	XColor *fg, *bg, *indicatorFg, *activeFg;
+	XColor *fg, *indicatorFg, *activeFg;
 	Tk_3DBorder border, activeBorder;
     
 	fg = Tk_GetColorFromObj(menuPtr->tkwin, (mePtr->fgPtr != NULL)
 		? mePtr->fgPtr : menuPtr->fgPtr);
-
 	gcValues.foreground = fg->pixel;
 	border = Tk_Get3DBorderFromObj(menuPtr->tkwin, 
 		(mePtr->borderPtr != NULL) ? mePtr->borderPtr 
 		: menuPtr->borderPtr);
-	bg = Tk_3DBorderColor(border);
-	gcValues.background = bg->pixel;
+	gcValues.background = Tk_3DBorderColor(border)->pixel;
 
 	gcValues.font = Tk_FontId(tkfont);
 
@@ -360,6 +353,7 @@ TkMenuConfigureEntryDrawOptions(mePtr, index)
 	newGC = Tk_GetGC(menuPtr->tkwin,
 		GCForeground|GCBackground|GCFont|GCGraphicsExposures,
 		&gcValues);
+
 	indicatorFg = Tk_GetColorFromObj(menuPtr->tkwin, 
 		(mePtr->indicatorFgPtr != NULL) ? mePtr->indicatorFgPtr
 		: menuPtr->indicatorFgPtr);
@@ -367,13 +361,15 @@ TkMenuConfigureEntryDrawOptions(mePtr, index)
 	newIndicatorGC = Tk_GetGC(menuPtr->tkwin,
 		GCForeground|GCBackground|GCGraphicsExposures,
 		&gcValues);
+
 	if ((menuPtr->disabledFgPtr != NULL) || (mePtr->image != NULL)) {
-	    fg = Tk_GetColorFromObj(menuPtr->tkwin, 
+	    XColor *disabledFg;
+
+	    disabledFg = Tk_GetColorFromObj(menuPtr->tkwin, 
 		    menuPtr->disabledFgPtr);
-	    gcValues.foreground = fg->pixel;
+	    gcValues.foreground = disabledFg->pixel;
 	    mask = GCForeground|GCBackground|GCFont|GCGraphicsExposures;
 	} else {
-	    fg = bg;
 	    gcValues.foreground = gcValues.background;
 	    gcValues.fill_style = FillStippled;
 	    gcValues.stipple = menuPtr->gray;
@@ -389,8 +385,7 @@ TkMenuConfigureEntryDrawOptions(mePtr, index)
 		: menuPtr->activeBorderPtr);
 		
 	gcValues.foreground = activeFg->pixel;
-	bg = Tk_3DBorderColor(activeBorder);
-	gcValues.background = bg->pixel;
+	gcValues.background = Tk_3DBorderColor(activeBorder)->pixel;
 	newActiveGC = Tk_GetGC(menuPtr->tkwin,
 		GCForeground|GCBackground|GCFont|GCGraphicsExposures,
 		&gcValues);
@@ -1054,4 +1049,3 @@ AdjustMenuCoords(menuPtr, mePtr, xPtr, yPtr, string)
     }
     sprintf(string, "%d %d", *xPtr, *yPtr);
 }
-

@@ -45,4 +45,3 @@ resource 'SICN' (128, preload, locked) {
 		$"0FE0 1FF0 3FF8"
 	}
 };
-

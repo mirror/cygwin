@@ -146,4 +146,3 @@ TkpChangeFocus(winPtr, force)
     XFlush(dispPtr->display);
     return serial;
 }
-

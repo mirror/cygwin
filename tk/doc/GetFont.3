@@ -27,7 +27,7 @@ Tk_Font
 \fBTk_GetFontFromObj(\fItkwin, objPtr\fB)\fR
 .VE
 .sp
-char *
+CONST char *
 \fBTk_NameOfFont(\fItkfont\fB)\fR
 .sp
 .VS 8.1
@@ -62,7 +62,7 @@ Opaque font token.
 .VS 8.1
 \fBTk_AllocFontFromObj\fR finds the font indicated by \fIobjPtr\fR and
 returns a token that represents the font.  The return value can be used
-in subsequent calls to procedures such as \fBTk_FontMetrics\fR,
+in subsequent calls to procedures such as \fBTk_GetFontMetrics\fR,
 \fBTk_MeasureChars\fR, and \fBTk_FreeFont\fR.  The Tk_Font token
 will remain valid until
 \fBTk_FreeFontFromObj\fR or \fBTk_FreeFont\fR is called to release it. 
@@ -118,6 +118,8 @@ exactly one call to \fBTk_FreeFontFromObj\fR or \fBTk_FreeFont\fR
 for each call to \fBTk_AllocFontFromObj\fR or \fBTk_GetFont\fR.
 .VE
 
+.SH "SEE ALSO"
+Tk_FontId(3)
+
 .SH KEYWORDS
 font
-

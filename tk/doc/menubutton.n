@@ -16,14 +16,24 @@ menubutton \- Create and manipulate menubutton widgets
 .SH SYNOPSIS
 \fBmenubutton\fR \fIpathName \fR?\fIoptions\fR?
 .SO
-\-activebackground	\-cursor	\-highlightthickness	\-takefocus
-\-activeforeground	\-disabledforeground	\-image	\-text
-\-anchor	\-font	\-justify	\-textvariable
-\-background	\-foreground	\-padx	\-underline
-\-bitmap	\-highlightbackground	\-pady	\-wraplength
-\-borderwidth	\-highlightcolor	\-relief
+\-activebackground	\-font	\-pady
+\-activeforeground	\-foreground	\-relief
+\-anchor	\-highlightbackground	\-takefocus
+\-background	\-highlightcolor	\-text
+\-bitmap	\-highlightthickness	\-textvariable
+\-borderwidth	\-image	\-underline
+\-cursor	\-justify	\-wraplength
+\-disabledforeground	\-padx
 .SE
 .SH "WIDGET-SPECIFIC OPTIONS"
+.OP \-compound compound Compound
+Specifies whether the menubutton should display both an image and text,
+and if so, where the image should be placed relative to the text.
+Valid values for this option are \fBbottom\fR, \fBcenter\fR,
+\fBleft\fR, \fBnone\fR, \fBright\fR and \fBtop\fR.  The default value
+is \fBnone\fR, meaning that the menubutton will display either an image or
+text, depending on the values of the \fB\-image\fR and \fB\-bitmap\fR
+options.
 .VS
 .OP \-direction direction Height
 Specifies where the menu is going to be popup up. \fBabove\fR tries to
@@ -191,4 +201,3 @@ individual widgets or by redefining the class bindings.
 
 .SH KEYWORDS
 menubutton, widget
-

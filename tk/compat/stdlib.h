@@ -43,4 +43,3 @@ extern unsigned long	strtoul _ANSI_ARGS_((CONST char *string,
 			    char **endPtr, int base));
 
 #endif /* _STDLIB */
-

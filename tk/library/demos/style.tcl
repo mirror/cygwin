@@ -150,4 +150,3 @@ $w.text insert end "in this example.\n" spacing
 $w.text insert end "To see where the space is, select ranges of " spacing
 $w.text insert end "text within these paragraphs.  The selection " spacing
 $w.text insert end "highlight will cover the extra space." spacing
-

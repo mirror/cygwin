@@ -171,7 +171,7 @@ typedef struct TkScrollbar {
  * Declaration of scrollbar class procedures structure.
  */
 
-extern TkClassProcs tkpScrollbarProcs;
+extern Tk_ClassProcs tkpScrollbarProcs;
 
 /*
  * Declaration of scrollbar configuration options.
@@ -204,4 +204,3 @@ EXTERN int		TkpScrollbarPosition _ANSI_ARGS_((
 # define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif /* _TKSCROLLBAR */
-

@@ -38,11 +38,10 @@ $w.frame.scale set 75
 
 proc setWidth {w width} {
     incr width 21
-    set x2 [expr $width - 30]
+    set x2 [expr {$width - 30}]
     if {$x2 < 21} {
 	set x2 21
     }
     $w coords poly 20 15 20 35 $x2 35 $x2 45 $width 25 $x2 5 $x2 15 20 15
     $w coords line 20 15 20 35 $x2 35 $x2 45 $width 25 $x2 5 $x2 15 20 15
 }
-

@@ -31,30 +31,4 @@
 #pragma precompile_target "MW_TkHeader68K"
 #endif
 
-#include "tclMacCommonPch.h"
-
-#ifdef TCL_DEBUG
-    #define TK_TEST
-#endif
-
-/*
- * The following defines are for the Xlib.h file to force 
- * it to generate prototypes in the way we need it.  This is
- * defined here in case X.h & company are ever included before
- * tk.h.
- */
-
-#define NeedFunctionPrototypes 1
-#define NeedWidePrototypes 0
-
-/*
- * Place any includes below that will are needed by the majority of the
- * and is OK to be in any file in the system.
- */
-
-#include <tcl.h>
-#pragma export on
-#include "tk.h"
-#include "tkInt.h"
-#pragma export off
-
+#include "MW_TkHeaderCommon.h"

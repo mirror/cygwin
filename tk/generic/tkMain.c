@@ -8,7 +8,7 @@
  *	for Tk applications.
  *
  * Copyright (c) 1990-1994 The Regents of the University of California.
- * Copyright (c) 1994-1996 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -16,9 +16,6 @@
  * RCS: @(#) $Id$
  */
 
-#ifdef _WIN32
-# include <windows.h>
-#endif
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -46,7 +43,7 @@ typedef struct ThreadSpecificData {
 				 * terminal-like device.  Zero means it's
 				 * a file. */
 } ThreadSpecificData;
-Tcl_ThreadDataKey dataKey;
+static Tcl_ThreadDataKey dataKey;
 
 /*
  * Declarations for various library procedures and variables (don't want
@@ -58,11 +55,13 @@ Tcl_ThreadDataKey dataKey;
  */
 
 #if !defined(__WIN32__) && !defined(_WIN32)
+#if !defined(MAC_TCL)
 extern int		isatty _ANSI_ARGS_((int fd));
+#else
+#include <unistd.h>
+#endif
 extern char *		strrchr _ANSI_ARGS_((CONST char *string, int c));
 #endif
-extern void		TkpDisplayWarning _ANSI_ARGS_((char *msg,
-			    char *title));
 
 /*
  * Forward declarations for procedures defined later in this file.
@@ -100,7 +99,8 @@ Tk_MainEx(argc, argv, appInitProc, interp)
 					 * to execute commands. */
     Tcl_Interp *interp;
 {
-    char *args, *fileName;
+    char *args;
+    CONST char *fileName;
     char buf[TCL_INTEGER_SPACE];
     int code;
     size_t length;
@@ -163,18 +163,18 @@ Tk_MainEx(argc, argv, appInitProc, interp)
      * and "argv".
      */
 
-    args = Tcl_Merge(argc-1, argv+1);
+    args = Tcl_Merge(argc-1, (CONST char **)argv+1);
     Tcl_ExternalToUtfDString(NULL, args, -1, &argString);
     Tcl_SetVar(interp, "argv", Tcl_DStringValue(&argString), TCL_GLOBAL_ONLY);
     Tcl_DStringFree(&argString);
     ckfree(args);
     sprintf(buf, "%d", argc-1);
-    if (fileName == NULL) {
-        Tcl_ExternalToUtfDString(NULL, argv[0], -1, &argString);
-    } else {
-        fileName = Tcl_ExternalToUtfDString(NULL, fileName, -1, &argString);
-    }
 
+    if (fileName == NULL) {
+	Tcl_ExternalToUtfDString(NULL, argv[0], -1, &argString);
+    } else {
+	fileName = Tcl_ExternalToUtfDString(NULL, fileName, -1, &argString);
+    }
     Tcl_SetVar(interp, "argc", buf, TCL_GLOBAL_ONLY);
     Tcl_SetVar(interp, "argv0", Tcl_DStringValue(&argString), TCL_GLOBAL_ONLY);
 
@@ -221,7 +221,8 @@ Tk_MainEx(argc, argv, appInitProc, interp)
      */
 
     if ((*appInitProc)(interp) != TCL_OK) {
-	TkpDisplayWarning(interp->result, "Application initialization failed");
+	TkpDisplayWarning(Tcl_GetStringResult(interp),
+		"Application initialization failed");
     }
 
     /*
@@ -405,12 +406,12 @@ Prompt(interp, partial)
 					 * exists a partial command, so use
 					 * the secondary prompt. */
 {
-    char *promptCmd;
+    Tcl_Obj *promptCmd;
     int code;
     Tcl_Channel outChannel, errChannel;
 
-    promptCmd = Tcl_GetVar(interp,
-	partial ? "tcl_prompt2" : "tcl_prompt1", TCL_GLOBAL_ONLY);
+    promptCmd = Tcl_GetVar2Ex(interp,
+	partial ? "tcl_prompt2" : "tcl_prompt1", NULL, TCL_GLOBAL_ONLY);
     if (promptCmd == NULL) {
 defaultPrompt:
 	if (!partial) {
@@ -427,7 +428,7 @@ defaultPrompt:
             }
 	}
     } else {
-	code = Tcl_Eval(interp, promptCmd);
+	code = Tcl_EvalObjEx(interp, promptCmd, TCL_EVAL_GLOBAL);
 	if (code != TCL_OK) {
 	    Tcl_AddErrorInfo(interp,
 		    "\n    (script that generates prompt)");
@@ -450,5 +451,3 @@ defaultPrompt:
         Tcl_Flush(outChannel);
     }
 }
-
-

@@ -49,13 +49,7 @@
 #else
 #   include <stdlib.h>
 #endif
-/* CYGNUS LOCAL: Don't include the system string.h if we've already
-   included tcl/compat/string.h.  Otherwise you can't include both
-   tclInt.h and tkInt.h (not that you should anyhow, but some SN code
-   does).  */
-#ifndef _STRING
-#   include <string.h>
-#endif
+#include <string.h>
 #include <sys/types.h>
 #include <sys/file.h>
 #ifdef HAVE_SYS_SELECT_H
@@ -151,6 +145,8 @@ extern int errno;
 	(Region) b, (Region) r)
 #define TkRectInRegion(r, x, y, w, h) XRectInRegion((Region) r, x, y, w, h)
 #define TkSetRegion(d, gc, rgn) XSetRegion(d, gc, (Region) rgn)
+#define TkSubtractRegion(a, b, r) XSubtractRegion((Region) a, \
+	(Region) b, (Region) r)
 #define TkUnionRectWithRegion(rect, src, ret) XUnionRectWithRegion(rect, \
 	(Region) src, (Region) ret)
 
@@ -206,18 +202,12 @@ extern int errno;
 
 /*
  * This macro stores a representation of the window handle in a string.
+ * This should perhaps use the real size of an XID.
  */
 
 #define TkpPrintWindowId(buf,w) \
-	sprintf((buf), "0x%x", (unsigned int) (w))
-	    
-/*
- * TkpScanWindowId is just an alias for Tcl_GetInt on Unix.
- */
+	sprintf((buf), "%#08lx", (unsigned long) (w))
 
-#define TkpScanWindowId(i,s,wp) \
-	Tcl_GetInt((i),(s),(wp))
-	    
 /*
  * This macro indicates that entry and text widgets should display
  * the selection highlight regardless of which window has the focus.
@@ -235,4 +225,3 @@ extern int errno;
 #endif
 
 #endif /* _UNIXPORT */
-

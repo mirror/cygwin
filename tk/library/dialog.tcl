@@ -13,7 +13,7 @@
 #
 
 #
-# tk_dialog:
+# ::tk_dialog:
 #
 # This procedure displays a dialog box, waits for a button in the dialog
 # to be invoked, then returns the index of the selected button.  If the
@@ -29,8 +29,9 @@
 # args -	One or more strings to display in buttons across the
 #		bottom of the dialog box.
 
-proc tk_dialog {w title text bitmap default args} {
-    global tkPriv tcl_platform
+proc ::tk_dialog {w title text bitmap default args} {
+    global tcl_platform
+    variable ::tk::Priv
 
     # Check that $default was properly given
     if {[string is int $default]} {
@@ -51,7 +52,7 @@ proc tk_dialog {w title text bitmap default args} {
     toplevel $w -class Dialog
     wm title $w $title
     wm iconname $w Dialog
-    wm protocol $w WM_DELETE_WINDOW {set tkPriv(button) -1} 
+    wm protocol $w WM_DELETE_WINDOW { }
 
     # Dialog boxes should be transient with respect to their parent,
     # so that they will always stay on top of their parent window.  However,
@@ -60,17 +61,18 @@ proc tk_dialog {w title text bitmap default args} {
     # window, this can hang the entire application.  Therefore we only make
     # the dialog transient if the parent is viewable.
     #
-    if { [winfo viewable [winfo toplevel [winfo parent $w]]] } {
+    if {[winfo viewable [winfo toplevel [winfo parent $w]]] } {
 	wm transient $w [winfo toplevel [winfo parent $w]]
     }    
 
-    if {[string equal $tcl_platform(platform) "macintosh"]} {
-	unsupported1 style $w dBoxProc
+    if {[string equal $tcl_platform(platform) "macintosh"]
+	    || [string equal [tk windowingsystem] "aqua"]} {
+	::tk::unsupported::MacWindowStyle style $w dBoxProc
     }
 
     frame $w.bot
     frame $w.top
-    if {[string equal $tcl_platform(platform) "unix"]} {
+    if {[string equal [tk windowingsystem] "x11"]} {
 	$w.bot configure -relief raised -bd 1
 	$w.top configure -relief raised -bd 1
     }
@@ -82,7 +84,8 @@ proc tk_dialog {w title text bitmap default args} {
     # overridden by the caller).
 
     option add *Dialog.msg.wrapLength 3i widgetDefault
-    if {[string equal $tcl_platform(platform) "macintosh"]} {
+    if {[string equal $tcl_platform(platform) "macintosh"]
+	    || [string equal [tk windowingsystem] "aqua"]} {
 	option add *Dialog.msg.font system widgetDefault
     } else {
 	option add *Dialog.msg.font {Times 12} widgetDefault
@@ -91,7 +94,8 @@ proc tk_dialog {w title text bitmap default args} {
     label $w.msg -justify left -text $text
     pack $w.msg -in $w.top -side right -expand 1 -fill both -padx 3m -pady 3m
     if {[string compare $bitmap ""]} {
-	if {[string equal $tcl_platform(platform) "macintosh"] && \
+	if {([string equal $tcl_platform(platform) "macintosh"]
+	     || [string equal [tk windowingsystem] "aqua"]) &&\
 		[string equal $bitmap "error"]} {
 	    set bitmap "stop"
 	}
@@ -103,16 +107,18 @@ proc tk_dialog {w title text bitmap default args} {
 
     set i 0
     foreach but $args {
-	button $w.button$i -text $but -command [list set tkPriv(button) $i]
+	button $w.button$i -text $but -command [list set ::tk::Priv(button) $i]
 	if {$i == $default} {
 	    $w.button$i configure -default active
 	} else {
 	    $w.button$i configure -default normal
 	}
-	grid $w.button$i -in $w.bot -column $i -row 0 -sticky ew -padx 10
+	grid $w.button$i -in $w.bot -column $i -row 0 -sticky ew \
+		-padx 10 -pady 4
 	grid columnconfigure $w.bot $i
 	# We boost the size of some Mac buttons for l&f
-	if {[string equal $tcl_platform(platform) "macintosh"]} {
+	if {[string equal $tcl_platform(platform) "macintosh"]
+	    || [string equal [tk windowingsystem] "aqua"]} {
 	    set tmp [string tolower $but]
 	    if {[string equal $tmp "ok"] || [string equal $tmp "cancel"]} {
 		grid columnconfigure $w.bot $i -minsize [expr {59 + 20}]
@@ -129,7 +135,7 @@ proc tk_dialog {w title text bitmap default args} {
 	[list $w.button$default] configure -state active -relief sunken
 	update idletasks
 	after 100
-	set tkPriv(button) $default
+	set ::tk::Priv(button) $default
 	"
     }
 
@@ -137,7 +143,7 @@ proc tk_dialog {w title text bitmap default args} {
     # button variable to -1;  this is needed in case something happens
     # that destroys the window, such as its parent window being destroyed.
 
-    bind $w <Destroy> {set tkPriv(button) -1}
+    bind $w <Destroy> {set ::tk::Priv(button) -1}
 
     # 6. Withdraw the window, then update all the geometry information
     # so we know how big it wants to be, then center the window in the
@@ -150,7 +156,6 @@ proc tk_dialog {w title text bitmap default args} {
     set y [expr {[winfo screenheight $w]/2 - [winfo reqheight $w]/2 \
 	    - [winfo vrooty [winfo parent $w]]}]
     wm geom $w +$x+$y
-    update idle
     wm deiconify $w
 
     # 7. Set a grab and claim the focus too.
@@ -173,12 +178,12 @@ proc tk_dialog {w title text bitmap default args} {
     # may take the focus away so we can't redirect it.  Finally,
     # restore any grab that was in effect.
 
-    tkwait variable tkPriv(button)
+    vwait ::tk::Priv(button)
     catch {focus $oldFocus}
     catch {
 	# It's possible that the window has already been destroyed,
 	# hence this "catch".  Delete the Destroy handler so that
-	# tkPriv(button) doesn't get reset by it.
+	# Priv(button) doesn't get reset by it.
 
 	bind $w <Destroy> {}
 	destroy $w
@@ -190,7 +195,5 @@ proc tk_dialog {w title text bitmap default args} {
           grab -global $oldGrab
 	}
     }
-    return $tkPriv(button)
+    return $Priv(button)
 }
-
-

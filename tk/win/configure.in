@@ -1,3 +1,4 @@
+#! /bin/bash -norc
 # This file is an input file used by the GNU "autoconf" program to
 # generate the file "configure", which is run during Tk installation
 # to configure the system for the local environment.
@@ -5,12 +6,17 @@
 # RCS: @(#) $Id$
 
 AC_INIT(../generic/tk.h)
+AC_PREREQ(2.13)
 
-TK_VERSION=8.3
+TK_VERSION=8.4
 TK_MAJOR_VERSION=8
-TK_MINOR_VERSION=3
-TK_PATCH_LEVEL=".2"
+TK_MINOR_VERSION=4
+TK_PATCH_LEVEL=".1"
 VER=$TK_MAJOR_VERSION$TK_MINOR_VERSION
+
+#------------------------------------------------------------------------
+# Handle the --prefix=... option
+#------------------------------------------------------------------------
 
 if test "${prefix}" = "NONE"; then
     prefix=/usr/local
@@ -18,16 +24,36 @@ fi
 if test "${exec_prefix}" = "NONE"; then
     exec_prefix=$prefix
 fi
+# libdir must be a fully qualified path and (not ${exec_prefix}/lib)
+eval libdir="$libdir"
 
 #------------------------------------------------------------------------
 # Standard compiler checks
 #------------------------------------------------------------------------
 
+# If the user did not set CFLAGS, set it now to keep
+# the AC_PROG_CC macro from adding "-g -O2".
+if test "${CFLAGS+set}" != "set" ; then
+    CFLAGS=""
+fi
+
 AC_PROG_CC
 
-AC_CHECK_TOOL(AR, ar, :)
-AC_CHECK_TOOL(RANLIB, ranlib, :)
-AC_CHECK_TOOL(RC, windres, :)
+# To properly support cross-compilation, one would
+# need to use these tool checks instead of
+# the ones below and reconfigure with
+# autoconf 2.50. You can also just set
+# the CC, AR, RANLIB, and RC environment
+# variables if you want to cross compile.
+#AC_CHECK_TOOL(AR, ar, :)
+#AC_CHECK_TOOL(RANLIB, ranlib, :)
+#AC_CHECK_TOOL(RC, windres, :)
+
+if test "${GCC}" = "yes" ; then
+    AC_CHECK_PROG(AR, ar, ar)
+    AC_CHECK_PROG(RANLIB, ranlib, ranlib)
+    AC_CHECK_PROG(RC, windres, windres)
+fi
 
 #--------------------------------------------------------------------
 # Checks to see if the make progeam sets the $MAKE variable.
@@ -40,19 +66,6 @@ AC_PROG_MAKE_SET
 #--------------------------------------------------------------------
 
 AC_CYGWIN
-
-case "${host}" in
-*-*-cygwin*)
-        touch ac$$.c
-        if ${CC} -c -mwin32 ac$$.c >/dev/null 2>&1; then
-            case "$EXTRA_CFLAGS" in
-                *-mwin32*) ;;
-                *) EXTRA_CFLAGS="-mwin32 $EXTRA_CFLAGS" ;;
-            esac
-        fi
-        rm -f ac$$.o ac$$.c
-        ;;
-esac
 
 #--------------------------------------------------------------------
 # Determines the correct binary file extension (.o, .obj, .exe etc.)
@@ -106,6 +119,8 @@ TK_DBGX=${DBGX}
 SC_PATH_TCLCONFIG($TK_PATCH_LEVEL)
 SC_LOAD_TCLCONFIG
 
+SC_PROG_TCLSH
+
 #------------------------------------------------------------------------
 # tkConfig.sh refers to this by a different name
 #------------------------------------------------------------------------
@@ -116,51 +131,34 @@ TK_SHARED_BUILD=${SHARED_BUILD}
 # Perform final evaluations of variables with possible substitutions.
 #--------------------------------------------------------------------
 
-NODOT_VERSION=${VER}
-
 TK_SHARED_LIB_SUFFIX="\${NODOT_VERSION}${DLLSUFFIX}"
 TK_UNSHARED_LIB_SUFFIX="\${NODOT_VERSION}${LIBSUFFIX}"
 TK_EXPORT_FILE_SUFFIX="\${NODOT_VERSION}${LIBSUFFIX}"
 
-TCL_TOOL_PATH(TK_SRC_DIR, "`cd $srcdir/..; pwd`")
+eval "TK_SRC_DIR=`cd $srcdir/..; pwd`"
 
-TCL_TOOL_SHARED_LIB_LONGNAME(TK_DLL_FILE, tk, ${TK_SHARED_LIB_SUFFIX})
-TCL_TOOL_STATIC_LIB_LONGNAME(TK_LIB_FILE, tk, ${TK_UNSHARED_LIB_SUFFIX})
-TCL_TOOL_STATIC_LIB_LONGNAME(TK_STUB_LIB_FILE, tkstub, ${TK_UNSHARED_LIB_SUFFIX})
+eval "TK_DLL_FILE=tk$VER${DLLSUFFIX}"
+eval "TK_LIB_FILE=${LIBPREFIX}tk$VER${LIBSUFFIX}"
 
-if test "$GCC" = "yes"; then
-    GNU_TK_LIB_FILE=${TK_LIB_FILE}
-    MSVC_TK_LIB_FILE=
-else
-    GNU_TK_LIB_FILE=
-    MSVC_TK_LIB_FILE=${TK_LIB_FILE}
-fi
+eval "TK_STUB_LIB_FILE=${LIBPREFIX}tkstub${VER}${LIBSUFFIX}"
+# FIXME: All of this var junk needs to be done in tcl.m4 !!!!
+# I left out the other vars that also need to get defined here.
+# we also need to double check about including DBGX in lib names
+# and spaces in file or directory names for the eval
+eval "TK_STUB_LIB_FLAG=\"-ltkstub${VER}${TCL_DBGX}\""
+eval "TK_BUILD_STUB_LIB_SPEC=\"-L`pwd` ${TK_STUB_LIB_FLAG}\""
+TK_BUILD_LIB_SPEC="-L`pwd` -ltk${VER}${TCL_DBGX}"
+eval "TCL_DLL_FILE=\"tcl$VER${DLLSUFFIX}\""
+eval "TCL_LIB_FILE=\"${LIBPREFIX}tcl$VER${LIBSUFFIX}\""
 
-TCL_TOOL_LIB_SHORTNAME(TK_STUB_LIB_FLAG, tkstub, ${TK_VERSION})
-TCL_TOOL_LIB_SPEC(TK_BUILD_STUB_LIB_SPEC, `pwd`, ${TK_STUB_LIB_FLAG})
-TCL_TOOL_LIB_SPEC(TK_STUB_LIB_SPEC, ${exec_prefix}/lib, ${TK_STUB_LIB_FLAG})
-
-TCL_TOOL_LIB_PATH(TK_BUILD_STUB_LIB_PATH, `pwd`, ${TK_STUB_LIB_FILE})
-TCL_TOOL_LIB_PATH(TK_STUB_LIB_PATH, ${exec_prefix}/lib, ${TK_STUB_LIB_FILE})
+eval "TCL_STUB_LIB_FILE=\"${LIBPREFIX}tclstub${VER}${LIBSUFFIX}\""
+eval "TCL_STUB_LIB_FLAG=\"-ltclstub${VER}${TCL_DBGX}\""
+eval "TCL_BUILD_STUB_LIB_SPEC=\"-L`pwd` ${TCL_STUB_LIB_FLAG}\""
 
 eval "DLLSUFFIX=${DLLSUFFIX}"
 eval "LIBPREFIX=${LIBPREFIX}"
 eval "LIBSUFFIX=${LIBSUFFIX}"
 eval "EXESUFFIX=${EXESUFFIX}"
-
-TCL_TOOL_LIB_SHORTNAME(TK_LIB_FLAG, tk, $TK_VERSION)
-TCL_TOOL_LIB_SPEC(TK_BUILD_LIB_SPEC, `pwd`, ${TK_LIB_FLAG})
-TCL_TOOL_LIB_SPEC(TK_LIB_SPEC, ${exec_prefix}/lib, ${TK_LIB_FLAG})
-TCL_TOOL_LIB_PATH(TK_LIB_FULL_PATH, `pwd`, ${TK_LIB_FILE})
-
-if test "$SHARED_BUILD" = 0 -o $TCL_NEEDS_EXP_FILE = 0; then
-    WISH_RES=wish_static.${RES}
-    TK_RES=
-else
-    WISH_RES=wish_static.${RES}
-    TK_RES=tk_dll.${RES}
-fi
-TK_SHARED_BUILD=${SHARED_BUILD}
 
 CFG_TK_SHARED_LIB_SUFFIX=${TK_SHARED_LIB_SUFFIX}
 CFG_TK_UNSHARED_LIB_SUFFIX=${TK_UNSHARED_LIB_SUFFIX}
@@ -168,8 +166,30 @@ CFG_TK_EXPORT_FILE_SUFFIX=${TK_EXPORT_FILE_SUFFIX}
 
 # Add X include path, it must be in a format
 # like -I"C:/Dir" and not -I"C:\Dir" or VC++ will puke.
+# TCL_TOOL_PATH(XINCLUDES, `cd $srcdir/../xlib; pwd`)
 TCL_TOOL_PATH(XINCLUDES, `cd $srcdir/../xlib; pwd`)
 XINCLUDES="-I\"${XINCLUDES}\""
+
+#--------------------------------------------------------------------
+# Adjust the defines for how the resources are built depending
+# on symbols and static vs. shared.
+#--------------------------------------------------------------------
+
+if test "$SHARED_BUILD" = 0 -o "$TCL_NEEDS_EXP_FILE" = 0; then
+    if test "${DBGX}" = "d"; then
+        RC_DEFINES="${RC_DEFINE} STATIC_BUILD ${RC_DEFINE} DEBUG"
+    else
+        RC_DEFINES="${RC_DEFINE} STATIC_BUILD"
+    fi
+    TK_RES=""
+else
+    if test "${DBGX}" = "d"; then
+        RC_DEFINES="${RC_DEFINE} DEBUG"
+    else
+        RC_DEFINES=""
+    fi
+    TK_RES='tk.$(RES)'
+fi
 
 AC_SUBST(TK_VERSION)
 AC_SUBST(TK_MAJOR_VERSION)
@@ -177,25 +197,12 @@ AC_SUBST(TK_MINOR_VERSION)
 AC_SUBST(TK_PATCH_LEVEL)
 AC_SUBST(TK_DBGX)
 AC_SUBST(TK_LIB_FILE)
-AC_SUBST(GNU_TK_LIB_FILE)
-AC_SUBST(MSVC_TK_LIB_FILE)
 AC_SUBST(TK_DLL_FILE)
-AC_SUBST(TK_DLL_BASE)
-AC_SUBST(TK_LIB_FLAG)
 AC_SUBST(TK_STUB_LIB_FILE)
 AC_SUBST(TK_STUB_LIB_FLAG)
-AC_SUBST(TK_STUB_LIB_SPEC)
-AC_SUBST(TK_STUB_LIB_PATH)
 AC_SUBST(TK_BUILD_STUB_LIB_SPEC)
-AC_SUBST(TK_BUILD_STUB_LIB_PATH)
 AC_SUBST(TK_SRC_DIR)
 AC_SUBST(TK_BIN_DIR)
-AC_SUBST(TK_BUILD_LIB_SPEC)
-AC_SUBST(TK_LIB_SPEC)
-AC_SUBST(TK_LIB_FULL_PATH)
-AC_SUBST(TK_SHARED_BUILD)
-AC_SUBST(WISH_RES)
-AC_SUBST(TK_RES)
 
 AC_SUBST(TCL_VERSION)
 AC_SUBST(TCL_MAJOR_VERSION)
@@ -205,7 +212,6 @@ AC_SUBST(TCL_LIB_FILE)
 AC_SUBST(TCL_DLL_FILE)
 AC_SUBST(TCL_STUB_LIB_FILE)
 AC_SUBST(TCL_STUB_LIB_FLAG)
-AC_SUBST(TCL_BUILD_LIB_SPEC)
 AC_SUBST(TCL_BUILD_STUB_LIB_SPEC)
 AC_SUBST(TCL_SRC_DIR)
 AC_SUBST(TCL_BIN_DIR)
@@ -218,9 +224,6 @@ AC_SUBST(TK_SHARED_BUILD)
 AC_SUBST(CYGPATH)
 AC_SUBST(DEPARG)
 AC_SUBST(CFLAGS_DEFAULT)
-AC_SUBST(CFLAGS_DEBUG)
-AC_SUBST(CFLAGS_OPTIMIZE)
-AC_SUBST(CFLAGS_WARNING)
 AC_SUBST(EXTRA_CFLAGS)
 AC_SUBST(STLIB_LD)
 AC_SUBST(SHLIB_LD)
@@ -240,6 +243,9 @@ AC_SUBST(RC)
 AC_SUBST(RC_OUT)
 AC_SUBST(RC_TYPE)
 AC_SUBST(RC_INCLUDE)
+AC_SUBST(RC_DEFINE)
+AC_SUBST(RC_DEFINES)
+AC_SUBST(TK_RES)
 AC_SUBST(RES)
 AC_SUBST(LIBS)
 AC_SUBST(LIBS_GUI)
@@ -254,5 +260,15 @@ AC_SUBST(MAKE_DLL)
 AC_SUBST(MAKE_EXE)
 AC_SUBST(TK_XINCLUDES)
 AC_SUBST(XINCLUDES)
+
+# undefined at this point for win
+AC_SUBST(TK_BUILD_LIB_SPEC)
+AC_SUBST(TK_CC_SEARCH_FLAGS)
+AC_SUBST(TK_LD_SEARCH_FLAGS)
+AC_SUBST(TK_LIB_FLAG)
+AC_SUBST(TK_LIB_SPEC)
+AC_SUBST(TK_STUB_LIB_SPEC)
+AC_SUBST(TK_BUILD_STUB_LIB_PATH)
+AC_SUBST(TK_STUB_LIB_PATH)
 
 AC_OUTPUT(Makefile tkConfig.sh)

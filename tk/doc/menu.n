@@ -12,13 +12,17 @@
 .BS
 '\" Note:  do not modify the .SH NAME line immediately below!
 .SH NAME
-menu \- Create and manipulate menu widgets
+menu, tk_menuSetFocus \- Create and manipulate menu widgets
 .SH SYNOPSIS
+.nf
 \fBmenu\fR \fIpathName \fR?\fIoptions\fR?
+\fBtk_menuSetFocus\fR \fIpathName\fR
 .SO
-\-activebackground	\-background	\-disabledforeground	\-relief
-\-activeborderwidth	\-borderwidth	\-font	\-takefocus
-\-activeforeground	\-cursor	\-foreground
+\-activebackground	\-borderwidth		\-foreground
+\-activeborderwidth	\-cursor		\-relief
+\-activeforeground	\-disabledforeground	\-takefocus
+\-background	\-font
+
 .SE
 .SH "WIDGET-SPECIFIC OPTIONS"
 .VS
@@ -423,6 +427,17 @@ menu.
 Specifies a Tcl command to execute when the menu entry is invoked.
 Not available for separator or tear-off entries.
 .TP
+.VS 8.4
+\fB\-compound \fIvalue\fR
+Specifies whether the menu entry should display both an image and text,
+and if so, where the image should be placed relative to the text.
+Valid values for this option are \fBbottom\fR, \fBcenter\fR,
+\fBleft\fR, \fBnone\fR, \fBright\fR and \fBtop\fR.  The default value
+is \fBnone\fR, meaning that the button will display either an image or
+text, depending on the values of the \fB\-image\fR and \fB\-bitmap\fR
+options.
+.VE
+.TP
 \fB\-font \fIvalue\fR
 Specifies the font to use when drawing the label or accelerator
 string in this entry.
@@ -750,6 +765,12 @@ next menubutton to the right is posted.
 Disabled menu entries are non-responsive:  they don't activate and
 they ignore mouse button presses and releases.
 .PP
+.VS 8.4
+Several of the bindings make use of the command \fBtk_menuSetFocus\fR.
+It saves the current focus and sets the focus to its \fIpathName\fR
+argument, which is a menu widget.
+.VE
+.PP
 The behavior of menus can be changed by defining new bindings for
 individual widgets or by redefining the class bindings.
 
@@ -761,5 +782,3 @@ entries.
 
 .SH KEYWORDS
 menu, widget
-
-

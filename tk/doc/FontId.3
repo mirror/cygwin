@@ -10,7 +10,7 @@
 .TH Tk_FontId 3 8.0 Tk "Tk Library Procedures"
 .BS
 .SH NAME
-Tk_FontId, Tk_FontMetrics, Tk_PostscriptFontName \- accessor functions for 
+Tk_FontId, Tk_GetFontMetrics, Tk_PostscriptFontName \- accessor functions for 
 fonts
 .SH SYNOPSIS
 .nf
@@ -68,7 +68,7 @@ following screen font families should print correctly:
 Any other font families may not print correctly because the computed
 Postscript font name may be incorrect or not exist on the printer.
 .VS 8.0 br
-.SH DATA STRUCTURES
+.SH "DATA STRUCTURES"
 The Tk_FontMetrics data structure is used by Tk_GetFontMetrics to return 
 information about a font and is defined as follows:
 .CS
@@ -93,4 +93,3 @@ other line.
 .VE
 .SH KEYWORDS
 font
-

@@ -8,14 +8,12 @@
 # RCS: @(#) $Id$
 #
 
-if {[lsearch [namespace children] ::tcltest] == -1} {
-    source [file join [pwd] [file dirname [info script]] defs.tcl]
-}
-
-# Some tests require user interaction on non-unix platform
-set ::tcltest::testConfig(nonUnixUserInteraction) \
-    [expr {$::tcltest::testConfig(userInteraction) || \
-	$::tcltest::testConfig(unixOnly)}]
+package require tcltest 2.1
+namespace import -force tcltest::configure
+namespace import -force tcltest::testsDirectory
+configure -testdir [file join [pwd] [file dirname [info script]]]
+configure -loadfile [file join [testsDirectory] constraints.tcl]
+tcltest::loadTestedCommands
 
 test msgbox-1.1 {tk_messageBox command} {
     list [catch {tk_messageBox -foo} msg] $msg
@@ -72,7 +70,7 @@ test msgbox-1.10 {tk_messageBox command} {
     list [catch {tk_messageBox -parent foo.bar} msg] $msg
 } {1 {bad window path name "foo.bar"}}
 
-if {[info commands tkMessageBox] == ""} {
+if {[info commands tk::MessageBox] == ""} {
     set isNative 1
 } else {
     set isNative 0
@@ -185,4 +183,3 @@ wm deiconify .
 # cleanup
 ::tcltest::cleanupTests
 return
-

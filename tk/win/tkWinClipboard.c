@@ -452,5 +452,3 @@ TkSelPropProc(eventPtr)
     register XEvent *eventPtr;		/* X PropertyChange event. */
 {
 }
-
-

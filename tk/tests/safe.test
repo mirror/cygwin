@@ -8,22 +8,41 @@
 #
 # RCS: @(#) $Id$
 
-if {[lsearch [namespace children] ::tcltest] == -1} {
-    source [file join [pwd] [file dirname [info script]] defs.tcl]
-}
+package require tcltest 2.1
+namespace import -force tcltest::configure
+namespace import -force tcltest::testsDirectory
+configure -testdir [file join [pwd] [file dirname [info script]]]
+configure -loadfile [file join [testsDirectory] constraints.tcl]
+tcltest::loadTestedCommands
 
-foreach i [winfo children .] {
-    destroy $i
-}
+## NOTE: Any time tests fail here with an error like:
+
+# Can't find a usable tk.tcl in the following directories:
+#     {$p(:26:)}
+# 
+# $p(:26:)/tk.tcl: script error
+# script error
+#     invoked from within
+# "source {$p(:26:)/tk.tcl}"
+#     ("uplevel" body line 1)
+#     invoked from within
+# "uplevel #0 [list source $file]"
+# 
+# 
+# This probably means that tk wasn't installed properly.
+
+## it indicates that something went wrong sourcing tk.tcl.
+## Ensure that any changes that occured to tk.tcl will work or
+## are properly prevented in a safe interpreter.  -- hobbs
 
 # The set of hidden commands is platform dependent:
 
 if {"$tcl_platform(platform)" == "macintosh"} {
-    set hidden_cmds {beep bell cd clipboard echo encoding exit fconfigure file glob grab load ls menu open pwd selection send socket source tk tk_chooseColor tk_chooseDirectory tk_getOpenFile tk_getSaveFile toplevel wm}
+    set hidden_cmds {beep bell cd clipboard echo encoding exit fconfigure file glob grab load ls menu open pwd selection send socket source tk_chooseColor tk_chooseDirectory tk_getOpenFile tk_getSaveFile toplevel wm}
 } elseif {"$tcl_platform(platform)" == "windows"} {
-    set hidden_cmds {bell cd clipboard encoding exec exit fconfigure file glob grab load menu open pwd selection socket source tk tk_chooseColor tk_chooseDirectory tk_getOpenFile tk_getSaveFile tk_messageBox toplevel wm}
+    set hidden_cmds {bell cd clipboard encoding exec exit fconfigure file glob grab load menu open pwd selection socket source tk_chooseColor tk_chooseDirectory tk_getOpenFile tk_getSaveFile tk_messageBox toplevel wm}
 } else {
-    set hidden_cmds {bell cd clipboard encoding exec exit fconfigure file glob grab load menu open pwd selection send socket source tk toplevel wm}
+    set hidden_cmds {bell cd clipboard encoding exec exit fconfigure file glob grab load menu open pwd selection send socket source toplevel wm}
 }
 
 test safe-1.1 {Safe Tk loading into an interpreter} {
@@ -72,6 +91,28 @@ test safe-2.2 {Unsafe commands not available} {
     safe::interpDelete a
     set status
 } ok
+test safe-2.3 {Unsafe subcommands not available} {
+    catch {safe::interpDelete a}
+    safe::interpCreate a
+    safe::loadTk a
+    set status broken
+    if {[catch {interp eval a {tk appname}} msg]} {
+	set status ok
+    }
+    safe::interpDelete a
+    list $status $msg
+} {ok {appname not accessible in a safe interpreter}}
+test safe-2.4 {Unsafe subcommands not available} {
+    catch {safe::interpDelete a}
+    safe::interpCreate a
+    safe::loadTk a
+    set status broken
+    if {[catch {interp eval a {tk scaling}} msg]} {
+	set status ok
+    }
+    safe::interpDelete a
+    list $status $msg
+} {ok {scaling not accessible in a safe interpreter}}
 
 test safe-3.1 {Unsafe commands are available hidden} {
     catch {safe::interpDelete a}
@@ -176,16 +217,3 @@ test safe-7.1 {canvas printing} {
 unset hidden_cmds
 ::tcltest::cleanupTests
 return
-
-
-
-
-
-
-
-
-
-
-
-
-

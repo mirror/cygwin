@@ -16,14 +16,14 @@ label \- Create and manipulate label widgets
 .SH SYNOPSIS
 \fBlabel\fR \fIpathName \fR?\fIoptions\fR?
 .SO
-\-activebackground         \-activeforeground         \-anchor
-\-background               \-bitmap                   \-borderwidth
-\-cursor                   \-disabledforeground       \-font
-\-foreground               \-highlightbackground      \-highlightcolor
-\-highlightthickness       \-image                    \-justify
-\-padx                     \-pady                     \-relief
-\-takefocus                \-text                     \-textvariable
-\-underline                \-wraplength
+\-activebackground	\-font	\-pady
+\-activeforeground	\-foreground	\-relief
+\-anchor	\-highlightbackground	\-takefocus
+\-background	\-highlightcolor	\-text
+\-bitmap	\-highlightthickness	\-textvariable
+\-borderwidth	\-image	\-underline
+\-cursor	\-justify	\-wraplength
+\-disabledforeground	\-padx	
 .SE
 .SH "WIDGET-SPECIFIC OPTIONS"
 .OP \-height height Height
@@ -112,5 +112,3 @@ labels are not intended to be interactive.
 
 .SH KEYWORDS
 label, widget
-
-

@@ -76,7 +76,7 @@ static Tk_ConfigSpec tagConfigSpecs[] = {
 static void		ChangeTagPriority _ANSI_ARGS_((TkText *textPtr,
 			    TkTextTag *tagPtr, int prio));
 static TkTextTag *	FindTag _ANSI_ARGS_((Tcl_Interp *interp,
-			    TkText *textPtr, char *tagName));
+			    TkText *textPtr, CONST char *tagName));
 static void		SortTags _ANSI_ARGS_((int numTags,
 			    TkTextTag **tagArrayPtr));
 static int		TagSortProc _ANSI_ARGS_((CONST VOID *first,
@@ -105,7 +105,7 @@ TkTextTagCmd(textPtr, interp, argc, argv)
     register TkText *textPtr;	/* Information about text widget. */
     Tcl_Interp *interp;		/* Current interpreter. */
     int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings.  Someone else has already
+    CONST char **argv;		/* Argument strings.  Someone else has already
 				 * parsed this command enough to know that
 				 * argv[1] is "tag". */
 {
@@ -151,7 +151,7 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 		index2 = index1;
 		TkTextIndexForwChars(&index2, 1, &index2);
 	    }
-    
+
 	    if (tagPtr->affectsDisplay) {
 		TkTextRedrawTag(textPtr, &index1, &index2, tagPtr, !addTag);
 	    } else {
@@ -159,18 +159,34 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 		 * Still need to trigger enter/leave events on tags that
 		 * have changed.
 		 */
-    
+
 		TkTextEventuallyRepick(textPtr);
 	    }
 	    TkBTreeTag(&index1, &index2, tagPtr, addTag);
-    
+
 	    /*
 	     * If the tag is "sel" then grab the selection if we're supposed
 	     * to export it and don't already have it.  Also, invalidate
 	     * partially-completed selection retrievals.
 	     */
-    
+
 	    if (tagPtr == textPtr->selTagPtr) {
+		XEvent event;
+		/*
+		 * Send an event that the selection changed.
+		 * This is equivalent to
+		 * "event generate $textWidget <<Selection>>"
+		 */
+
+		memset((VOID *) &event, 0, sizeof(event));
+		event.xany.type = VirtualEvent;
+		event.xany.serial = NextRequest(Tk_Display(textPtr->tkwin));
+		event.xany.send_event = False;
+		event.xany.window = Tk_WindowId(textPtr->tkwin);
+		event.xany.display = Tk_Display(textPtr->tkwin);
+		((XVirtualEvent *) &event)->name = Tk_GetUid("Selection");
+		Tk_HandleEvent(&event);
+
 		if (addTag && textPtr->exportSelection
 			&& !(textPtr->flags & GOT_SELECTION)) {
 		    Tk_OwnSelection(textPtr->tkwin, XA_PRIMARY,
@@ -229,12 +245,12 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 		return TCL_ERROR;
 	    }
 	} else if (argc == 5) {
-	    char *command;
+	    CONST char *command;
     
 	    command = Tk_GetBinding(interp, textPtr->bindingTable,
 		    (ClientData) tagPtr, argv[4]);
 	    if (command == NULL) {
-		char *string = Tcl_GetStringResult(interp); 
+		CONST char *string = Tcl_GetStringResult(interp); 
 
 		/*
 		 * Ignore missing binding errors.  This is a special hack
@@ -248,7 +264,7 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 		    Tcl_ResetResult(interp);
 		}
 	    } else {
-		Tcl_SetResult(interp, command, TCL_STATIC);
+		Tcl_SetResult(interp, (char *) command, TCL_STATIC);
 	    }
 	} else {
 	    Tk_GetAllBindings(interp, textPtr->bindingTable,
@@ -462,6 +478,25 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 	    TkTextMakeByteIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree),
 		    0, &last),
 	    TkBTreeTag(&first, &last, tagPtr, 0);
+
+	    if (tagPtr == textPtr->selTagPtr) {
+		XEvent event;
+		/*
+		 * Send an event that the selection changed.
+		 * This is equivalent to
+		 * "event generate $textWidget <<Selection>>"
+		 */
+
+		memset((VOID *) &event, 0, sizeof(event));
+		event.xany.type = VirtualEvent;
+		event.xany.serial = NextRequest(Tk_Display(textPtr->tkwin));
+		event.xany.send_event = False;
+		event.xany.window = Tk_WindowId(textPtr->tkwin);
+		event.xany.display = Tk_Display(textPtr->tkwin);
+		((XVirtualEvent *) &event)->name = Tk_GetUid("Selection");
+		Tk_HandleEvent(&event);
+	    }
+
 	    Tcl_DeleteHashEntry(hPtr);
 	    if (textPtr->bindingTable != NULL) {
 		Tk_DeleteAllBindings(textPtr->bindingTable,
@@ -769,7 +804,7 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 TkTextTag *
 TkTextCreateTag(textPtr, tagName)
     TkText *textPtr;		/* Widget in which tag is being used. */
-    char *tagName;		/* Name of desired tag. */
+    CONST char *tagName;	/* Name of desired tag. */
 {
     register TkTextTag *tagPtr;
     Tcl_HashEntry *hPtr;
@@ -855,7 +890,7 @@ FindTag(interp, textPtr, tagName)
 				 * if NULL, then don't record an error
 				 * message. */
     TkText *textPtr;		/* Widget in which tag is being used. */
-    char *tagName;		/* Name of desired tag. */
+    CONST char *tagName;	/* Name of desired tag. */
 {
     Tcl_HashEntry *hPtr;
 
@@ -1386,4 +1421,3 @@ TkTextPickCurrent(textPtr, eventPtr)
 	ckfree((char *) copyArrayPtr);
     }
 }
-

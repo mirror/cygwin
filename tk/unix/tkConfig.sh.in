@@ -31,9 +31,6 @@ TK_DBGX=@TK_DBGX@
 # The name of the Tk library (may be either a .a file or a shared library):
 TK_LIB_FILE='@TK_LIB_FILE@'
 
-# The full path to the Tk library for dependency tracking
-TK_LIB_FULL_PATH='@TK_LIB_FULL_PATH@'
-
 # Additional libraries to use when linking Tk.
 TK_LIBS='@XLIBSW@ @DL_LIBS@ @LIBS@ @MATH_LIBS@'
 
@@ -44,12 +41,6 @@ TK_PREFIX='@prefix@'
 # Top-level directory in which Tcl's platform-specific files (e.g.
 # executables) are installed.
 TK_EXEC_PREFIX='@exec_prefix@'
-
-# CYGNUS LOCAL
-# -I switch(es) to pick up the tk.h header file from its build
-# directory.
-TK_BUILD_INCLUDES='@TK_BUILD_INCLUDES@'
-# END CYGNUS LOCAL
 
 # -I switch(es) to use to make all of the X11 include files accessible:
 TK_XINCLUDES='@XINCLUDES@'
@@ -78,8 +69,8 @@ TK_SRC_DIR='@TK_SRC_DIR@'
 
 # Needed if you want to make a 'fat' shared library library
 # containing tk objects or link a different wish.
-TK_CC_SEARCH_FLAGS='@TK_CC_SEARCH_FLAGS@'
-TK_LD_SEARCH_FLAGS='@TK_LD_SEARCH_FLAGS@'
+TK_CC_SEARCH_FLAGS='@CC_SEARCH_FLAGS@'
+TK_LD_SEARCH_FLAGS='@LD_SEARCH_FLAGS@'
 
 # The name of the Tk stub library (.a):
 TK_STUB_LIB_FILE='@TK_STUB_LIB_FILE@'
@@ -100,4 +91,3 @@ TK_BUILD_STUB_LIB_PATH='@TK_BUILD_STUB_LIB_PATH@'
 
 # Path to the Tk stub library in the install directory.
 TK_STUB_LIB_PATH='@TK_STUB_LIB_PATH@'
-

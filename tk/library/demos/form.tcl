@@ -38,4 +38,3 @@ $w.f5.label config -text Phone:
 pack $w.msg $w.f1 $w.f2 $w.f3 $w.f4 $w.f5 -side top -fill x
 bind $w <Return> "destroy $w"
 focus $w.f1.entry
-

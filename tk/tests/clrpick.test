@@ -8,15 +8,12 @@
 # RCS: @(#) $Id$
 #
 
-if {[lsearch [namespace children] ::tcltest] == -1} {
-    source [file join [pwd] [file dirname [info script]] defs.tcl]
-}
-
-# Some tests require user interaction on non-unix platform
-
-set ::tcltest::testConfig(nonUnixUserInteraction) \
-    [expr {$::tcltest::testConfig(userInteraction) || \
-	$::tcltest::testConfig(unixOnly)}]
+package require tcltest 2.1
+namespace import -force tcltest::configure
+namespace import -force tcltest::testsDirectory
+configure -testdir [file join [pwd] [file dirname [info script]]]
+configure -loadfile [file join [testsDirectory] constraints.tcl]
+tcltest::loadTestedCommands
 
 test clrpick-1.1 {tk_chooseColor command} {
     list [catch {tk_chooseColor -foo} msg] $msg
@@ -54,7 +51,7 @@ test clrpick-1.7 {tk_chooseColor command} {
     list [catch {tk_chooseColor -initialcolor ##badbadbaadcolor} msg] $msg
 } {1 {invalid color name "##badbadbaadcolor"}}
 
-if {[info commands tkColorDialog] == ""} {
+if {[info commands tk::dialog::color::] == ""} {
     set isNative 1
 } else {
     set isNative 0
@@ -82,7 +79,7 @@ proc PressButton {btn} {
 
 proc ChooseColorByKey {parent r g b} {
     set w .__tk__color
-    upvar #0 $w data
+    upvar ::tk::dialog::color::[winfo name $w] data
 
     update
     $data(red,entry)   delete 0 end
@@ -96,14 +93,14 @@ proc ChooseColorByKey {parent r g b} {
     # Manually force the refresh of the color values instead
     # of counting on the timing of the event stream to change
     # the values for us.
-    tkColorDialog_HandleRGBEntry $w
+    tk::dialog::color::HandleRGBEntry $w
 
     SendButtonPress $parent ok mouse
 }
 
 proc SendButtonPress {parent btn type} {
     set w .__tk__color
-    upvar #0 $w data
+    upvar ::tk::dialog::color::[winfo name $w] data
 
     set button $data($btn\Btn)
     if ![winfo ismapped $button] {
@@ -140,7 +137,7 @@ set verylongstring $verylongstring$verylongstring
 # machines with small color palettes still fail.
 # some tests will be skipped if there are no more colors
 set numcolors 32
-set ::tcltest::testConfig(colorsLeftover) 1
+testConstraint colorsLeftover 1
 set i 0
 canvas .c
 pack .c -expand 1 -fill both
@@ -158,7 +155,7 @@ while {$i<$numcolors} {
 	set g [expr $g/256]
 	set b [expr $b/256]
 	if {"$color" != "#[format %02x%02x%02x $r $g $b]"} {
-	    set ::tcltest::testConfig(colorsLeftover) 0
+	    testConstraint colorsLeftover 0
 	}
     }
     .c delete $i
@@ -220,4 +217,3 @@ test clrpick-4.1 {tk_chooseColor: screen is inherited from parent} unixOnly {
 # cleanup
 ::tcltest::cleanupTests
 return
-

@@ -42,9 +42,8 @@ user cancels the operation, both commands will return the empty
 string.
 .SH EXAMPLE
 .CS
-button .b \-fg [tk_chooseColor \-initialcolor gray \-title "Choose color"]
+button .b \-bg [tk_chooseColor \-initialcolor gray \-title "Choose color"]
 .CE
 
 .SH KEYWORDS
 color selection dialog
-

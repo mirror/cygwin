@@ -9,9 +9,12 @@
 #
 # RCS: @(#) $Id$
 
-if {[lsearch [namespace children] ::tcltest] == -1} {
-    source [file join [pwd] [file dirname [info script]] defs.tcl]
-}
+package require tcltest 2.1
+namespace import -force tcltest::configure
+namespace import -force tcltest::testsDirectory
+configure -testdir [file join [pwd] [file dirname [info script]]]
+configure -loadfile [file join [testsDirectory] constraints.tcl]
+tcltest::loadTestedCommands
 
 # First, test a single window packed in various ways in a parent
 
@@ -449,7 +452,7 @@ test pack-8.16 {syntax errors} {
     set msg ""
     set result [catch {pack append .pack .pack.blue {frame south}} msg]
     concat $result $msg
-} {1 bad anchor position "south": must be n, ne, e, se, s, sw, w, nw, or center}
+} {1 bad anchor "south": must be n, ne, e, se, s, sw, w, nw, or center}
 test pack-8.17 {syntax errors} {
     set msg ""
     set result [catch {pack append .pack .pack.blue {padx -2}} msg]

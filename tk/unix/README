@@ -6,11 +6,11 @@ UNIX versions of Tk.  This directory also contains source files for Tk
 that are specific to UNIX.
 
 The information in this file is maintained at:
-	http://dev.scriptics.com/doc/howto/compile.html
+	http://www.tcl.tk/doc/howto/compile.html
 
 For information on platforms where Tcl/Tk is known to compile, along
 with any porting notes for getting it to work on those platforms, see:
-	http://dev.scriptics.com/software/tcltk/platforms.html
+	http://www.tcl.tk/software/tcltk/platforms.html
 
 The rest of this file contains instructions on how to do this.  The
 release should compile and run either "out of the box" or with trivial
@@ -25,9 +25,9 @@ RCS: @(#) $Id$
 How To Compile And Install Tk:
 ------------------------------
 
-(a) Make sure that the Tcl 8.3 release is present in the directory
-    ../../tcl8.3 (or else use the "--with-tcl" switch described below). 
-    This release of Tk will only work with Tcl 8.3. Also, be sure that
+(a) Make sure that the Tcl 8.4.1 release is present in the directory
+    ../../tcl8.4.1 (or else use the "--with-tcl" switch described below). 
+    This release of Tk will only work with Tcl 8.4. Also, be sure that
     you have configured Tcl before you configure Tk.
 
 (b) Check for patches as described in ../README.
@@ -44,17 +44,13 @@ How To Compile And Install Tk:
     type "./configure -help" or refer to the autoconf documentation (not
     included here).  Tk's "configure" script supports the following
     special switches in addition to the standard ones:
-	--enable-gcc		If this switch is set, Tk will configure
-				itself to use gcc if it is available on your
-				system.  Note:  it is not safe to modify the
-				Makefile to use gcc after configure is run.
-	--enable-threads	Tk on Unix currently does not support
-				threaded builds.
 	--with-tcl=DIR		Specifies the directory containing the Tcl
 				binaries and Tcl's platform-dependent
 				configuration information.  By default
 				the Tcl directory is assumed to be in the
 				location given by (a) above.
+	--enable-threads	If this switch is set, Tcl will compile
+				itself with multithreading support.
 	--enable-shared		If this switch is specified, Tk will compile
 				itself as a shared library if it can figure
 				out how to do that on this platform.  This
@@ -62,8 +58,27 @@ How To Compile And Install Tk:
 				how to build shared libraries.
 	--disable-shared	If this switch is specified, Tk will compile
 				itself as a static library.
+	--enable-symbols	build with debugging symbols  By default
+				standard debugging symbols are used.  You
+				can specify the value "mem" to include
+				TCL_MEM_DEBUG memory debugging.
+	--disable-symbols	build without debugging symbols
+	--enable-64bit		enable 64bit support (where applicable)
+	--disable-64bit		disable 64bit support (where applicable)
+	--enable-64bit-vis	enable 64bit Sparc VIS support
+	--disable-64bit-vis	disable 64bit Sparc VIS support
+	--enable-man-symlinks	Use symlinks for linking the manpages that
+				should be reachable under several names.
+	--enable-man-compression=PROG
+				Compress the manpages using PROG.
+
+    Note: by default gcc will be used if it can be located on the PATH.
+    if you want to use cc instead of gcc, set the CC environment variable
+    to "cc" before running configure. It is not safe to change the Makefile
+    to use gcc after configure is run.
+
     Note: be sure to use only absolute path names (those starting with "/")
-    in the --prefix and --exec_prefix options.
+    in the --prefix and --exec-prefix options.
 
 (e) Type "make".  This will create a library archive called
     "libtk<version>.a" or "libtk<version>.so" and an interpreter
@@ -81,7 +96,7 @@ How To Compile And Install Tk:
     standard places.  You'll need write permission on the installation
     directoryies to do this.  The installation directories are
     determined by the "configure" script and may be specified with
-    the --prefix and --exec_prefix options to "configure".  See the
+    the --prefix and --exec-prefix options to "configure".  See the
     Makefile for information on what directories were chosen; you
     can override these choices by modifying the "prefix" and
     "exec_prefix" variables in the Makefile.
@@ -94,9 +109,9 @@ How To Compile And Install Tk:
     TCL_LIBRARY environment variable as well (see the Tcl README file
     for information on this).  Note that installed versions of wish,
     libtk.a, libtk.so, and the Tk library have a version number in their
-    names, such as "wish8.3" or "libtk8.3.so"; to use the installed
+    names, such as "wish8.4" or "libtk8.4.so"; to use the installed
     versions, either specify the version number or create a symbolic
-    link (e.g. from "wish" to "wish8.3").
+    link (e.g. from "wish" to "wish8.4").
 
 If you have trouble compiling Tk, see the URL noted above about working
 platforms.  It contains information that people have provided about changes
@@ -127,9 +142,9 @@ safe to conclude that any errors represent portability problems in the
 test suite and not fundamental flaws with Tk.
 
 There are also a number of visual tests for things such as screen layout,
-Postscript generation, etc.  These tests all have to be run manually and
-the results have to be verified visually.  To run the tests, cd to the
-"tests" directory and run the script "visual".  It will present a main
-window with a bunch of menus, which you can use to select various tests.
-
-
+Postscript generation, etc.  These tests all have to be run by manually
+enabling the "userInteraction" constraint when testing, and the results
+have to be verified visually..  This can be done with
+     make test TESTFLAGS="-constraints userInteraction"
+Some tests will present a main window with a bunch of menus, which you can
+use to select various tests.

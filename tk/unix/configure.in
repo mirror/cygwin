@@ -2,20 +2,22 @@
 dnl	This file is an input file used by the GNU "autoconf" program to
 dnl	generate the file "configure", which is run during Tk installation
 dnl	to configure the system for the local environment.
+#
 # RCS: @(#) $Id$
-
-# CYGNUS LOCAL, autoconf 2.5 or higher to get --bindir et al
-AC_PREREQ(2.5)
-# END CYGNUS LOCAL
 
 AC_INIT(../generic/tk.h)
-# RCS: @(#) $Id$
+AC_PREREQ(2.13)
 
-TK_VERSION=8.3
+TK_VERSION=8.4
 TK_MAJOR_VERSION=8
-TK_MINOR_VERSION=3
-TK_PATCH_LEVEL=".2"
+TK_MINOR_VERSION=4
+TK_PATCH_LEVEL=".1"
 VERSION=${TK_VERSION}
+LOCALES="cs de el en en_gb es fr it nl ru"
+
+#------------------------------------------------------------------------
+# Handle the --prefix=... option
+#------------------------------------------------------------------------
 
 if test "${prefix}" = "NONE"; then
     prefix=/usr/local
@@ -23,12 +25,32 @@ fi
 if test "${exec_prefix}" = "NONE"; then
     exec_prefix=$prefix
 fi
+# libdir must be a fully qualified path and (not ${exec_prefix}/lib)
+eval libdir="$libdir"
 # Make sure srcdir is fully qualified!
 srcdir=`cd $srcdir ; pwd`
-TCL_TOOL_PATH(TK_SRC_DIR, "`cd $srcdir/..; pwd`")
+TK_SRC_DIR=`cd $srcdir/..; pwd`
 
-AC_PROG_RANLIB
+#------------------------------------------------------------------------
+# Compress and/or soft link the manpages?
+#------------------------------------------------------------------------
+SC_CONFIG_MANPAGES
+
+#------------------------------------------------------------------------
+# Standard compiler checks
+#------------------------------------------------------------------------
+
+# If the user did not set CFLAGS, set it now to keep
+# the AC_PROG_CC macro from adding "-g -O2".
+if test "${CFLAGS+set}" != "set" ; then
+    CFLAGS=""
+fi
+
 AC_PROG_CC
+
+#------------------------------------------------------------------------
+# I'm not sure why these need to come before all of the other tests
+#------------------------------------------------------------------------
 
 AC_HAVE_HEADERS(unistd.h limits.h)
 
@@ -56,6 +78,14 @@ fi
 fi
 
 #--------------------------------------------------------------------
+#	Detect what compiler flags to set for 64-bit support.
+#--------------------------------------------------------------------
+
+SC_TCL_EARLY_FLAGS
+
+SC_TCL_64BIT_FLAGS
+
+#--------------------------------------------------------------------
 # Find and load the tclConfig.sh file
 #--------------------------------------------------------------------
 
@@ -65,6 +95,8 @@ SC_LOAD_TCLCONFIG
 #--------------------------------------------------------------------
 # Recompute the necessary flags to run the compiler
 #--------------------------------------------------------------------
+
+SC_ENABLE_SHARED
 
 SC_CONFIG_CFLAGS
 
@@ -208,104 +240,11 @@ if test "${TCL_LD_SEARCH_FLAGS}" = '-L${LIB_RUNTIME_DIR}'; then
 fi
 
 # The statement below is very tricky!  It actually *evaluates* the
-# string in TCL_LD_SEARCH_FLAGS, which causes a substitution of the
-# variable LIB_RUNTIME_DIR.
+# string in TCL_CC_SEARCH_FLAGS and TCL_LD_SEARCH_FLAGS which
+# causes a substitution of the variable LIB_RUNTIME_DIR.
 
-eval "TK_CC_SEARCH_FLAGS=\"$TCL_LD_SEARCH_FLAGS\""
-
-#
-# CYGNUS LOCAL:  statically link on Solaris, HPUX & SunOS so that
-#                we don't have problems with people not having libraries
-#                installed or not having LD_LIBRARY_PATH set.
-#
-
-    case "$host" in
-#
-# gdb linked statically w/ Solaris iff GCC and GNU ld are used,
-# otherwise dynamic
-#
-        *-*-solaris2*)
-	    sol_xlibsw=
-            if test "x$GCC" = "xyes" ; then
-	       # This is probably the simplest way to test for GNU ld.
-	       # It only works with relatively recent versions of GNU
-	       # ld.
-	       gld_text=`$CC -Wl,--version 2>&1 | sed 1q`
-	       case "$gld_text" in
-		GNU* | *BFD*)
-		    # sol2.* has libX*.so files in /usr/lib,
-		    # but not libX*.a files, so we need to force a
-		    # -L/usr/openwin/lib option, sometimes.
-		    # FIXME: this won't work right if someone has
-		    # their own X libraries in say /usr/local/lib.
-		    case "$XLIBSW" in
-		    *-L*) ;;
-		    *) if test ! -f /usr/lib/libXt.a; then
-			    XLIBSW="-L/usr/openwin/lib $XLIBSW"
-			fi
-			;;
-		    esac
-
-		   # Why do we link against libX11 twice?  Because the
-		   # Openwin X11 and Xext libraries are seriously broken.
-		   sol_xlibsw="-Wl,-Bstatic $XLIBSW -lXext -lX11 -Wl,-Bdynamic"
-		   ;;
-	       esac
-            fi
-	    if test -z "$sol_xlibsw"; then
-	      if test "x$x_libraries" != "x"; then
-		XLIBSW="$XLIBSW -R$x_libraries"
-	      fi
-	    else
-	       XLIBSW=$sol_xlibsw
-	       suppress_enable_shared=yes
-	    fi
-	    ;;
-#
-# gdb linked statically w/ SunOS or HPUX
-#
-        m68k-hp-hpux*|hppa*-hp-hpux*|sparc-sun-sunos*)
-            if test "x$x_libraries" != "x" ;
-            then
-	       XLIBSW="$x_libraries/libX11.a"
-            else
-	       XLIBSW="/usr/lib/libX11.a"
-            fi
-	    suppress_enable_shared=yes
-	    ;;
-
-#
-# GDB should be linked dynamically on NetBSD, but needs the linker
-# to set an RPATH in the binaries for the X11 library directory.  It's
-# assumed that if a shared libtk is being built, it will be RPATH'd
-# in via a directive in the tcl library configuration information.
-#
-	*-*-netbsd*)
-	    if test "x$x_libraries" != "x"; then
-	      XLIBSW="$XLIBSW -Wl,-rpath,$x_libraries"
-	    fi
-	    ;;
-
-#
-# default is to link dynamically
-#
-        *)
-	   ;;
-    esac
-#
-# END CYGNUS LOCAL
-
-# The following case handles the differences between linking with "ld"
-# and the compiler
-
-case $SHLIB_LD in
-    *ld*)
-      TK_LD_SEARCH_FLAGS=`echo ${TK_CC_SEARCH_FLAGS} |sed -e "s|-Wl,||g" -e "s|,| |g"`
-      ;;
-    *)
-      TK_LD_SEARCH_FLAGS="${TK_CC_SEARCH_FLAGS}"
-      ;;
-esac
+eval "CC_SEARCH_FLAGS=\"$TCL_CC_SEARCH_FLAGS\""
+eval "LD_SEARCH_FLAGS=\"$TCL_LD_SEARCH_FLAGS\""
 
 #--------------------------------------------------------------------
 #	Check for the existence of various libraries.  The order here
@@ -327,38 +266,17 @@ esac
 
 AC_CHECK_LIB(Xbsd, main, [LIBS="$LIBS -lXbsd"])
 
-# CYGNUS LOCAL: Store any socket library(ies) in the cache, and don't
-# mess up the cache values of the functions we check for.
-AC_CACHE_CHECK([for socket libraries], tcl_cv_lib_sockets,
- [tcl_cv_lib_sockets=
-  tk_checkBoth=0
-  unset ac_cv_func_connect
-  AC_CHECK_FUNC(connect, tk_checkSocket=0, tk_checkSocket=1)
-  if test "$tk_checkSocket" = 1; then
-      unset ac_cv_func_connect
-      AC_CHECK_LIB(socket, main, tcl_cv_lib_sockets="-lsocket",
-		   tk_checkBoth=1)
-  fi
-  if test "$tk_checkBoth" = 1; then
-      tk_oldLibs=$LIBS
-      LIBS="$LIBS -lsocket -lnsl"
-      unset ac_cv_func_accept
-      AC_CHECK_FUNC(accept,
-		    [tcl_checkNsl=0
-		     tcl_cv_lib_sockets="-lsocket -lnsl"])
-      unset ac_cv_func_accept
-      LIBS=$tk_oldLibs
-  fi
-  unset ac_cv_func_gethostbyname
-  tk_oldLibs=$LIBS
-  LIBS="$LIBS $tk_cv_lib_sockets"
-  AC_CHECK_FUNC(gethostbyname, ,
-		[AC_CHECK_LIB(nsl, main,
-			      [tcl_cv_lib_sockets="$tcl_cv_lib_sockets -lnsl"])])
-  unset ac_cv_func_gethostbyname
-  LIBS=$tcl_oldLIBS
-])
-test -z "$tcl_cv_lib_sockets" || LIBS="$LIBS $tcl_cv_lib_sockets"
+tk_checkBoth=0
+AC_CHECK_FUNC(connect, tk_checkSocket=0, tk_checkSocket=1)
+if test "$tk_checkSocket" = 1; then
+    AC_CHECK_LIB(socket, main, LIBS="$LIBS -lsocket", tk_checkBoth=1)
+fi
+if test "$tk_checkBoth" = 1; then
+    tk_oldLibs=$LIBS
+    LIBS="$LIBS -lsocket -lnsl"
+    AC_CHECK_FUNC(accept, tk_checkNsl=0, [LIBS=$tk_oldLibs])
+fi
+AC_CHECK_FUNC(gethostbyname, , [AC_CHECK_LIB(nsl, main, [LIBS="$LIBS -lnsl"])])
 
 # Add the threads support libraries
 
@@ -426,26 +344,17 @@ SC_BUGGY_STRTOD
 #	building libtk as a shared library instead of a static library.
 #--------------------------------------------------------------------
 
-SC_ENABLE_SHARED
-
 eval eval "TK_SHARED_LIB_SUFFIX=${SHARED_LIB_SUFFIX}"
 eval eval "TK_UNSHARED_LIB_SUFFIX=${UNSHARED_LIB_SUFFIX}"
 
 if test "${SHARED_BUILD}" = "1" -a "${SHLIB_SUFFIX}" != ""; then
-    TK_SHLIB_CFLAGS="${SHLIB_CFLAGS}"
-    TCL_TOOL_SHARED_LIB_LONGNAME(TK_LIB_FILE, tk, ${TK_SHARED_LIB_SUFFIX})
-    MAKE_LIB="\${SHLIB_LD} -o \${TK_LIB_FILE} \${OBJS} \$(TK_LD_SEARCH_FLAGS) ${TCL_BUILD_STUB_LIB_SPEC} \${LIBS}"
-    RANLIB=":"
-
-#    TCL_STUB_FLAGS="-DUSE_TCL_STUBS"
-    TCL_STUB_FLAGS=""
+    SHLIB_LD_LIBS="${SHLIB_LD_LIBS} \${TCL_STUB_LIB_SPEC}"
+    TCL_STUB_FLAGS="-DUSE_TCL_STUBS"
 else
-    TK_SHLIB_CFLAGS=""
-    TCL_TOOL_STATIC_LIB_LONGNAME(TK_LIB_FILE, tk, ${TK_UNSHARED_LIB_SUFFIX})
-    MAKE_LIB="\${STLIB_LD} \${TK_LIB_FILE} \${OBJS}"
-
     TCL_STUB_FLAGS=""
 fi
+TK_LIB_FILE=libtk${LIB_SUFFIX}
+eval "TK_LIB_FILE=${TK_LIB_FILE}"
 
 # Note:  in the following variable, it's important to use the absolute
 # path name of the Tcl directory rather than "..":  this is because
@@ -453,23 +362,28 @@ fi
 # up the Tcl library.
 
 if test "$SHARED_BUILD" = 0 -o $TCL_NEEDS_EXP_FILE = 0; then
-    TCL_TOOL_LIB_SHORTNAME(TK_LIB_FLAG, tk, $TK_VERSION)
-    TCL_TOOL_LIB_SPEC(TK_BUILD_LIB_SPEC, `pwd`, ${TK_LIB_FLAG})
-    TCL_TOOL_LIB_SPEC(TK_LIB_SPEC, ${exec_prefix}/lib, ${TK_LIB_FLAG})
+    if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
+	eval TK_LIB_FLAG="-ltk${VERSION}\${TK_DBGX}"
+    else
+	eval TK_LIB_FLAG="-ltk`echo ${VERSION} | tr -d .`\${TK_DBGX}"
+    fi
+    TK_BUILD_LIB_SPEC="-L`pwd` ${TK_LIB_FLAG}"
+    TK_LIB_SPEC="-L${libdir} ${TK_LIB_FLAG}"
     TK_BUILD_EXP_FILE=""
     TK_EXP_FILE=""
 else
     TK_BUILD_EXP_FILE="lib.exp"
     eval "TK_EXP_FILE=libtk${TCL_EXPORT_FILE_SUFFIX}"
-    
-    TK_BUILD_LIB_SPEC="-bI:`pwd`/${TK_BUILD_EXP_FILE}"
-    TK_LIB_SPEC="-bI:${exec_prefix}/lib/${TK_EXP_FILE}"
+
+    if test "$GCC" = "yes" ; then
+	TK_BUILD_LIB_SPEC="-Wl,-bI:`pwd`/${TK_BUILD_EXP_FILE} -L`pwd`"
+	TK_LIB_SPEC="-Wl,-bI:${libdir}/${TK_EXP_FILE} -L`pwd`"    
+    else
+	TK_BUILD_LIB_SPEC="-bI:`pwd`/${TK_BUILD_EXP_FILE}"
+	TK_LIB_SPEC="-bI:${libdir}/${TK_EXP_FILE}"    
+    fi
 fi
 TK_SHARED_BUILD=${SHARED_BUILD}
-
-dnl CYGNUS LOCAL
-TK_BUILD_INCLUDES="-I`cd $srcdir/../generic; pwd`"
-dnl END CYGNUS LOCAL
 
 #--------------------------------------------------------------------
 # The statements below define various symbols relating to creating
@@ -480,16 +394,27 @@ dnl END CYGNUS LOCAL
 # extension, linking the the Tcl stubs will be supported.
 #--------------------------------------------------------------------
 
-TCL_TOOL_STATIC_LIB_LONGNAME(TK_STUB_LIB_FILE, tkstub, ${TK_UNSHARED_LIB_SUFFIX})
+# Replace ${VERSION} with contents of ${TK_VERSION}
+eval "TK_STUB_LIB_FILE=libtkstub${TK_UNSHARED_LIB_SUFFIX}"
 
-MAKE_STUB_LIB="\${STLIB_LD} \${STUB_LIB_FILE} \${STUB_LIB_OBJS}"
+if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
+    eval TK_STUB_LIB_FLAG="-ltkstub${TK_VERSION}\${TK_DBGX}"
+else
+    eval TK_STUB_LIB_FLAG="-ltkstub`echo ${TK_VERSION} | tr -d .`\${TK_DBGX}"
+fi
 
-TCL_TOOL_LIB_SHORTNAME(TK_STUB_LIB_FLAG, tkstub, ${TK_VERSION})
-TCL_TOOL_LIB_SPEC(TK_BUILD_STUB_LIB_SPEC, `pwd`, ${TK_STUB_LIB_FLAG})
-TCL_TOOL_LIB_SPEC(TK_STUB_LIB_SPEC, ${exec_prefix}/lib, ${TK_STUB_LIB_FLAG})
+TK_BUILD_STUB_LIB_SPEC="-L`pwd` ${TK_STUB_LIB_FLAG}"
+TK_STUB_LIB_SPEC="-L${libdir} ${TK_STUB_LIB_FLAG}"
+TK_BUILD_STUB_LIB_PATH="`pwd`/${TK_STUB_LIB_FILE}"
+TK_STUB_LIB_PATH="${libdir}/${TK_STUB_LIB_FILE}"
 
-TCL_TOOL_LIB_PATH(TK_BUILD_STUB_LIB_PATH, `pwd`, ${TK_STUB_LIB_FILE})
-TCL_TOOL_LIB_PATH(TK_STUB_LIB_PATH, `pwd`, ${TK_STUB_LIB_FILE})
+eval "TK_LIB_FILE=${TK_LIB_FILE}"
+
+AC_SUBST(TK_VERSION)
+AC_SUBST(TK_MAJOR_VERSION)
+AC_SUBST(TK_MINOR_VERSION)
+AC_SUBST(TK_PATCH_LEVEL)
+AC_SUBST(TK_DBGX)
 
 AC_SUBST(TK_STUB_LIB_FILE)
 AC_SUBST(TK_STUB_LIB_FLAG)
@@ -497,7 +422,6 @@ AC_SUBST(TK_BUILD_STUB_LIB_SPEC)
 AC_SUBST(TK_STUB_LIB_SPEC)
 AC_SUBST(TK_BUILD_STUB_LIB_PATH)
 AC_SUBST(TK_STUB_LIB_PATH)
-AC_SUBST(MAKE_STUB_LIB)
 AC_SUBST(TK_STUB_FLAGS)
 AC_SUBST(TK_BUILD_EXP_FILE)
 AC_SUBST(TK_EXP_FILE)
@@ -506,61 +430,17 @@ AC_SUBST(TCL_STUB_FLAGS)
 AC_SUBST(TK_BUILD_EXP_FILE)
 AC_SUBST(TK_EXP_FILE)
 
-AC_SUBST(CFLAGS_DEFAULT)
-AC_SUBST(CFLAGS_DEBUG)
-AC_SUBST(CFLAGS_OPTIMIZE)
-AC_SUBST(LDFLAGS_DEFAULT)
-AC_SUBST(LDFLAGS_DEBUG)
-AC_SUBST(LDFLAGS_OPTIMIZE)
-AC_SUBST(TK_DBGX)
-AC_SUBST(DL_LIBS)
-AC_SUBST(EXTRA_CFLAGS)
+AC_SUBST(LD_LIBRARY_PATH_VAR)
+
 AC_SUBST(MATH_LIBS)
-AC_SUBST(AR)
-AC_SUBST(RANLIB)
-AC_SUBST(MAKE_LIB)
-AC_SUBST(SHLIB_CFLAGS)
-AC_SUBST(TK_SHLIB_CFLAGS)
-AC_SUBST(STLIB_LD)
-AC_SUBST(SHLIB_LD)
-AC_SUBST(SHLIB_LD_LIBS)
-AC_SUBST(SHLIB_SUFFIX)
-AC_SUBST(SHLIB_VERSION)
-AC_SUBST(TCL_BIN_DIR)
-AC_SUBST(TCL_LIB_FULL_PATH)
-AC_SUBST(TCL_LIB_SPEC)
-AC_SUBST(TCL_LIB_FLAG)
-AC_SUBST(TCL_BUILD_STUB_LIB_SPEC)
-AC_SUBST(TCL_BUILD_LIB_SPEC)
-AC_SUBST(TCL_DBGX)
-AC_SUBST(TCL_LIB_FLAG)
-AC_SUBST(TCL_SRC_DIR)
-AC_SUBST(TCL_VERSION)
 AC_SUBST(TK_BUILD_LIB_SPEC)
-AC_SUBST(TK_LIB_FULL_PATH)
-AC_SUBST(TK_CC_SEARCH_FLAGS)
-AC_SUBST(TK_LD_SEARCH_FLAGS)
 AC_SUBST(TK_LIB_FILE)
 AC_SUBST(TK_LIB_FLAG)
 AC_SUBST(TK_LIB_SPEC)
-AC_SUBST(TK_MAJOR_VERSION)
-AC_SUBST(TK_MINOR_VERSION)
-AC_SUBST(TK_PATCH_LEVEL)
 AC_SUBST(TK_SRC_DIR)
-AC_SUBST(TK_VERSION)
 AC_SUBST(XINCLUDES)
 AC_SUBST(XLIBSW)
 AC_SUBST(TK_SHARED_BUILD)
-dnl CYGNUS LOCAL
-AC_SUBST(TK_BUILD_INCLUDES)
-dnl END CYGNUS LOCAL
-# CYGNUS LOCAL
-# Need more variables to keep shared/static linking separate.
-AC_SUBST(TCL_SHARED_LIB_SUFFIX)
-AC_SUBST(TCL_UNSHARED_LIB_SUFFIX)
-AC_SUBST(TK_SHARED_LIB_FILE)
-AC_SUBST(TK_UNSHARED_LIB_FILE)
-# END CYGNUS LOCAL
+AC_SUBST(LOCALES)
 
 AC_OUTPUT(Makefile tkConfig.sh)
-

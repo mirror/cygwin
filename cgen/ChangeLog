@@ -1,3 +1,8 @@
+2000-10-13  matthew green  <mrg@cygnus.com>
+
+	* utils-cgen.scm (get-ifetch): Move from here ...
+	* sim.scm (get-ifetch): ... to here.
+
 2000-10-06  Dave Brolley  <brolley@redhat.com>
 
 	* utils-gen.scm (-gen-ifld-extract-base): Compute start position as

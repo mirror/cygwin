@@ -1,3 +1,7 @@
+2001-12-14  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cgen-engine.h (generic_scache_record): New template.
+
 2001-11-08  Frank Ch. Eigler  <fche@redhat.com>
 
 	* cgen-cpu.h (cgen_bi_endian_cpu): Remove trace_stream field: it's

@@ -55,6 +55,14 @@ enum branch_status {
 
 // Scache engine.
 
+template <typename scache_content>
+struct generic_scache_record
+{
+  PCADDR addr;
+  scache_content content;
+};
+
+
 template <typename scache_record>
 class scache_engine
 {

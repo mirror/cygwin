@@ -1,3 +1,9 @@
+2002-01-07  Phil Edwards <pedwards@disaster.jaj.com>
+
+	* unix/Makefile.in: When installing the tix
+	shared library check in the "tk8.1" and "tk8.3"
+	subdirectories for the library.
+
 2001-09-12  Ian Roxborough  <irox@redhat.com>
 
 	* win/Makefile.in: Remove hardcoded

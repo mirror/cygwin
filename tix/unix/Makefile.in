@@ -108,7 +108,7 @@ config.status: configure
 install:: install-basic install-binaries
 	@echo done
 
-BINDIRS = tk4.0 tk4.1 tk4.2 tk4.3 tk8.0 itcl2.0 itcl2.1 itcl2.2
+BINDIRS = tk4.0 tk4.1 tk4.2 tk4.3 tk8.0 tk8.1 tk8.3 itcl2.0 itcl2.1 itcl2.2
 
 install-binaries::
 	@for i in $(BINDIRS); \

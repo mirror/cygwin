@@ -1,6 +1,6 @@
 // cache.cxx -- A universal memory cache. -*- C++ -*-
 
-// Copyright (C) 2001, 2002 Red Hat.
+// Copyright (C) 2001, 2002, 2004 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -26,16 +26,16 @@ using std::endl;
 
 #include "cache.h"
 
-string line_sizes[] =
+static string line_sizes[] =
   { "16", "32", "64", "128" };
 
-string cache_sizes[] =
+static string cache_sizes[] =
   { "1", "2", "4", "8", "16", "32", "64", "128", "256", "512" };
 
-string assocs[] =
+static string assocs[] =
   { "direct", "full", "2way", "4way" };
 
-string replacement_algorithms[] =
+static string replacement_algorithms[] =
   { "lru", "fifo", "random" }; 
 
 // One per replacement policy
@@ -43,12 +43,14 @@ static cache_replacement_null null_replacement;
 static cache_replacement_lru lru_replacement;
 static cache_replacement_fifo fifo_replacement;
 static cache_replacement_random random_replacement;
+static cache_line_factory internal_line_factory;
 
 cache_component::cache_component (unsigned assocy,
 				  unsigned cache_sz, 
 				  unsigned line_sz,
-				  cache_replacement_algorithm& replacer)
-  :acache (cache_sz, line_sz, assocy, replacer),
+				  cache_replacement_algorithm& replacer,
+				  cache_line_factory& factory)
+  :acache (cache_sz, line_sz, assocy, replacer, factory),
    upstream (*this),
    downstream (0),
    report_pin (this, &cache_component::emit_report),
@@ -67,6 +69,7 @@ cache_component::cache_component (unsigned assocy,
    write_through_p (false),
    collect_p (true),
    report_heading ("cache profile report"),
+   line_factory (factory),
    line_size (line_sz),
    cache_size (cache_sz),
    assoc (assocy),
@@ -75,6 +78,7 @@ cache_component::cache_component (unsigned assocy,
    refill_latency (0),
    refill_latency_specified (false)
 {
+  acache.init ();
   memset (&stats, 0, sizeof (stats));
 
   add_bus ("upstream", &upstream);
@@ -168,7 +172,6 @@ template <typename DataType>
 bus::status
 cache_component::write_any (host_int_4 addr, DataType data)
 {
-  bool hit;
   bus::status st, read_status;
 
   if (UNLIKELY (downstream == 0))
@@ -177,22 +180,23 @@ cache_component::write_any (host_int_4 addr, DataType data)
   if (LIKELY (collect_p))
     stats.writes++;
 
+  cache_tag tag = acache.addr_to_tag (addr);
   if (UNLIKELY (addr % sizeof (data) != 0))
     {
       // Punt on misaligned accesses
       if (LIKELY (collect_p))
 	stats.misaligned_writes++;
 
-      cache_line& line = acache.find (acache.addr_to_tag (addr), hit);
-      if (hit)
+      cache_line* line = acache.find (tag);
+      if (line)
       {
-	if (line.dirty_p ())
+	if (line->dirty_p ())
         {	
 	  // flush a dirty line being replaced
-	  if ((st = write_line (line)) != bus::ok)
+	  if ((st = write_line (*line)) != bus::ok)
 	    return st;
 	}
-	acache.expunge (line);
+	acache.expunge (*line);
       }
 
       st = downstream->read (addr, data);
@@ -200,12 +204,12 @@ cache_component::write_any (host_int_4 addr, DataType data)
       return st;
     }
 
-  cache_line& line = acache.find (acache.addr_to_tag (addr), hit);
-  if (LIKELY (hit))
+  cache_line* line = acache.find (tag);
+  if (LIKELY (line))
     {
       if (LIKELY (collect_p))
 	stats.write_hits++;
-      line.insert (line_offset (line, addr), data);
+      line->insert (line_offset (*line, addr), data);
       if (write_through_p)
 	{
 	  if ((st = downstream->write (addr, data)) != bus::ok)
@@ -214,34 +218,34 @@ cache_component::write_any (host_int_4 addr, DataType data)
     }
   else
     {
-      if (write_allocate_p)
+      if (write_allocate_p && acache.vacancy_p (addr))
 	{
-	  if (acache.vacancy_p (addr))
+	  if (collect_p)
+	    stats.replacements++;
+
+	  cache_line *expelled_line = acache.expell_line (tag);
+	  assert (expelled_line);
+
+	  if (! write_through_p)
 	    {
-	      cache_line expelled_line (line_size);
-	      cache_line new_line (line_size, acache.addr_to_tag (addr));
-	      if ((read_status = read_line (new_line)) != bus::ok)
-		return read_status;
-	      
-	      new_line.insert (line_offset (new_line, addr), data);
-	      acache.replace (expelled_line, new_line);
-	      
-	      if (collect_p)
-		stats.replacements++;
-	      
-	      if (expelled_line.dirty_p () && !write_through_p)
+	      if (expelled_line->dirty_p ())
 		{
 		  // flush a dirty line being replaced
-		  if ((st = write_line (expelled_line)) != bus::ok)
-		    return st;
-		}
-	      
-	      if (write_through_p)
-		{
-		  if ((st = downstream->write (addr, data)) != bus::ok)
+		  if ((st = write_line (*expelled_line)) != bus::ok)
 		    return st;
 		}
 	    }
+	  else
+	    {
+	      if ((st = downstream->write (addr, data)) != bus::ok)
+		return st;
+	    }
+
+	  expelled_line->set_tag (tag);
+	  if ((read_status = read_line (*expelled_line)) != bus::ok)
+	    return read_status;
+	      
+	  expelled_line->insert (line_offset (*expelled_line, addr), data);
 	}
       else
 	{
@@ -252,7 +256,7 @@ cache_component::write_any (host_int_4 addr, DataType data)
     }
 
   st = bus::ok;
-  if (hit)
+  if (line)
     st.latency = hit_latency;
   else
     st.latency = read_status.latency + miss_latency;
@@ -282,36 +286,34 @@ cache_component::read_any (host_int_4 addr, DataType& data)
       return st;
     }
 
-  bool hit;
-  cache_line& line = acache.find (acache.addr_to_tag (addr), hit);
-  if (LIKELY (hit))
+  cache_tag tag = acache.addr_to_tag (addr);
+  cache_line* line = acache.find (tag);
+  if (LIKELY (line))
     {
       if (LIKELY (collect_p))
 	stats.read_hits++;
-      line.extract (line_offset (line, addr), data);
+      line->extract (line_offset (*line, addr), data);
     }
   else
     {
       // miss!
       if (acache.vacancy_p (addr))
 	{
-	  cache_line expelled_line (line_size);
-	  cache_line new_line (line_size, acache.addr_to_tag (addr));
-
-	  if ((read_status = read_line (new_line)) != bus::ok)
-	    return read_status;
-	  new_line.extract (line_offset (new_line, addr), data);
-	  acache.replace (expelled_line, new_line);
-
-	  if (collect_p)
+	  if (LIKELY (collect_p))
 	    stats.replacements++;
 	  
-	  if (expelled_line.dirty_p ())
+	  cache_line *expelled_line = acache.expell_line (tag);
+	  assert (expelled_line);
+	  if (expelled_line->dirty_p ())
 	    {
 	      // flush a dirty line being replaced
-	      if ((st = write_line (expelled_line)) != bus::ok)
+	      if ((st = write_line (*expelled_line)) != bus::ok)
 		  return st;
 	    }
+	  expelled_line->set_tag (tag);
+	  if ((read_status = read_line (*expelled_line)) != bus::ok)
+	    return read_status;
+	  expelled_line->extract (line_offset (*expelled_line, addr), data);
 	}
       else
 	{
@@ -322,7 +324,7 @@ cache_component::read_any (host_int_4 addr, DataType& data)
     }
 
   st = bus::ok;
-  if (hit)
+  if (line)
     st.latency += hit_latency;
   else
     st.latency = read_status.latency + miss_latency;
@@ -391,10 +393,9 @@ cache_component::flush_all_lines (host_int_4)
 void
 cache_component::flush_line (host_int_4 addr)
 {
-  bool hit;
-  cache_line& line = acache.find (acache.addr_to_tag (addr), hit);
-  if (hit && line.dirty_p ())
-    (void) write_line (line);
+  cache_line* line = acache.find (acache.addr_to_tag (addr));
+  if (line && line->dirty_p ())
+    (void) write_line (*line);
 }
 
 void
@@ -439,21 +440,19 @@ cache_component::invalidate_all_lines (host_int_4 ignore)
 void
 cache_component::invalidate_line (host_int_4 addr)
 {
-  bool hit;
-  cache_line& line = acache.find (acache.addr_to_tag (addr), hit);
-  if (hit)
-    line.invalidate ();
+  cache_line* line = acache.find (acache.addr_to_tag (addr));
+  if (line)
+    line->invalidate ();
 }
 
 void
 cache_component::flush_and_invalidate_line (host_int_4 addr)
 {
-  bool hit;
-  cache_line& line = acache.find (acache.addr_to_tag (addr), hit);
-  if (hit && line.dirty_p ())
+  cache_line* line = acache.find (acache.addr_to_tag (addr));
+  if (line && line->dirty_p ())
     {
-      (void) write_line (line);
-      line.invalidate ();
+      (void) write_line (*line);
+      line->invalidate ();
     }
 }
 
@@ -473,19 +472,17 @@ cache_component::prefetch_line (host_int_4 addr)
 void
 cache_component::lock_line (host_int_4 addr)
 {
-  bool hit;
-  cache_line& line = acache.find (acache.addr_to_tag (addr), hit);
-  if (hit)
-    line.lock ();
+  cache_line* line = acache.find (acache.addr_to_tag (addr));
+  if (line)
+    line->lock ();
 }
 
 void
 cache_component::unlock_line (host_int_4 addr)
 {
-  bool hit;
-  cache_line& line = acache.find (acache.addr_to_tag (addr), hit);
-  if (hit)
-    line.unlock ();
+  cache_line* line = acache.find (acache.addr_to_tag (addr));
+  if (line)
+    line->unlock ();
 }
 
 void
@@ -602,8 +599,8 @@ cache_component::write_hit_rate ()
     }
 }
 
-void
-cache_replacement_fifo::replace (cache_set& cset, cache_line& old_line, cache_line new_line)
+cache_line *
+cache_replacement_fifo::expell (cache_set& cset)
 {
   // If this is the first time through, expand fifo accordingly.
   if (fifo.size () != cset.num_lines ())
@@ -628,20 +625,18 @@ cache_replacement_fifo::replace (cache_set& cset, cache_line& old_line, cache_li
 	}
       else 
 	{
-	  old_line = line;
-	  old_line.invalidate ();
-	  cset.set_line (i, new_line);
-
 	  // update state
 	  fifo[i] = 0;
-	  return;
+	  return &line;
 	}
       n--;
     }
+
+  return 0;
 }
 
-void
-cache_replacement_lru::replace (cache_set& cset, cache_line& old_line, cache_line new_line)
+cache_line *
+cache_replacement_lru::expell (cache_set& cset)
 {
   unsigned oldest = 0;
   int index = -1;
@@ -663,12 +658,10 @@ cache_replacement_lru::replace (cache_set& cset, cache_line& old_line, cache_lin
     }
 
   if (index < 0)
-    return;
-  
-  old_line = cset.get_line (index);
-  old_line.invalidate ();
-  cset.set_line (index, new_line);
+    return 0;
+
   lru[index] = 0;
+  return &cset.get_line (index);
 }
 
 void
@@ -684,31 +677,24 @@ cache_replacement_lru::update (cache_set& cset, cache_line& selected_line)
     }
 }
 
-void
-cache_replacement_null::replace (cache_set& cset, cache_line& old_line, cache_line new_line)
+cache_line *
+cache_replacement_null::expell (cache_set& cset)
 {
   cache_line& line = cset.get_line (0);
   if (!line.locked_p ())
-    {
-      old_line = line;
-      old_line.invalidate ();
-      cset.set_line (0, new_line);
-    }
+    return &line;
+
+  return 0;
 }
 
-void
-cache_replacement_random::replace (cache_set& cset, cache_line& old_line, cache_line new_line)
+cache_line *
+cache_replacement_random::expell (cache_set& cset)
 {
   for (unsigned i = 0; i < cset.num_lines (); i++)
     {
       cache_line& line = cset.get_line (i);
       if (!line.valid_p ())
-	{
-	  old_line = line;
-	  old_line.invalidate ();
-	  cset.set_line (i, new_line);
-	  return;
-	}
+	return &line;
     }
 
   unsigned n = cset.num_lines ();
@@ -723,18 +709,13 @@ cache_replacement_random::replace (cache_set& cset, cache_line& old_line, cache_
 
       cache_line& line = cset.get_line (i);
       if (!line.locked_p ())
-	{
-	  old_line = line;
-	  old_line.invalidate ();
-	  cset.set_line (i, new_line);
-	  return;
-	}
-      else
-	{
-	  candidates[i] = false;
-	  n--;
-	}
+	return &line;
+
+      candidates[i] = false;
+      n--;
     }
+
+  return 0;
 }
 
 
@@ -782,10 +763,10 @@ CacheCreate (const string& typeName)
   bool match;
 
   if (typeName == "hw-cache-basic")
-    return new cache_component (1, 16384, 32, null_replacement);
+    return new cache_component (1, 16384, 32, null_replacement, internal_line_factory);
 
   if (typeName == "hw-cache-buffer-8")
-    return new cache_component (0, 8, 8, null_replacement);
+    return new cache_component (0, 8, 8, null_replacement, internal_line_factory);
   
   vector<string> parts = sidutil::tokenize (typeName, "-/");
 
@@ -856,14 +837,14 @@ CacheCreate (const string& typeName)
     }
 
   if (assoc == 1)
-    return new cache_component (assoc, cache_sz, line_sz, null_replacement);
+    return new cache_component (assoc, cache_sz, line_sz, null_replacement, internal_line_factory);
   
   if (replace_alg_string == "lru")
-    return new cache_component (assoc, cache_sz, line_sz, lru_replacement);
+    return new cache_component (assoc, cache_sz, line_sz, lru_replacement, internal_line_factory);
   else if (replace_alg_string == "fifo")
-    return new cache_component (assoc, cache_sz, line_sz, fifo_replacement);
+    return new cache_component (assoc, cache_sz, line_sz, fifo_replacement, internal_line_factory);
   else if (replace_alg_string == "random")
-    return new cache_component (assoc, cache_sz, line_sz, random_replacement);
+    return new cache_component (assoc, cache_sz, line_sz, random_replacement, internal_line_factory);
 
   return 0;
 }

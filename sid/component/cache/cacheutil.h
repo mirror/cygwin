@@ -1,6 +1,6 @@
 // cacheutil.h -- Helper classes for a generic memory cache. -*- C++ -*-
 
-// Copyright (C) 2001, 2002 Red Hat.
+// Copyright (C) 2001, 2002, 2004 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -17,24 +17,75 @@
 typedef sid::host_int_4 cache_tag;
 typedef sid::host_int_1 byte;
 
-// The cache_line class represents a line in a cache:
+// The cache_line class represents a line in a cache. It is a virtual base
+// class which requires an implementation.
+
+class cache_line
+{
+public:
+  virtual ~cache_line () {}
+
+  // Get the line's tag.
+  virtual void set_tag (cache_tag tag) = 0;
+  virtual cache_tag tag () const = 0;
+
+  // Mark the line dirty or clean.
+  virtual void dirty () = 0;
+  virtual void clean () = 0;
+
+  // Mark the line valid or invalid.
+  virtual void validate () = 0;
+  virtual void invalidate () = 0;
+
+  // Lock or unlock the line.
+  virtual void lock () = 0;
+  virtual void unlock () = 0;
+
+  // Is the line dirty?
+  virtual bool dirty_p () const = 0;
+
+  // Is the line valid?
+  virtual bool valid_p () const = 0;
+
+  // Is the line locked?
+  virtual bool locked_p () const = 0;
+
+  // Insert or extract a datum from the line, starting at byte offset.
+#define DEFN_METHOD(DataType) \
+  virtual void insert (unsigned offset, DataType new_data) = 0; \
+  virtual void extract (unsigned offset, DataType& new_data) const = 0;
+
+  DEFN_METHOD (sid::big_int_1)
+  DEFN_METHOD (sid::big_int_2)
+  DEFN_METHOD (sid::big_int_4)
+  DEFN_METHOD (sid::big_int_8)
+  DEFN_METHOD (sid::little_int_1)
+  DEFN_METHOD (sid::little_int_2)
+  DEFN_METHOD (sid::little_int_4)
+  DEFN_METHOD (sid::little_int_8)
+#undef DEFN_METHOD
+
+  // Dump a line in human readable form to cout.
+  virtual void dump () const;
+  virtual void dump_data () const = 0;
+};
+
+// The internal_cache_line class keeps its data internally and is the default
+// cache_line implementation.
 
 // +-------+-----+----------------+ M = modified (dirty) bit
 // | M V L | tag |     data       | V = valid bit
 // +-------+-----+----------------+ L = lock bit
 //           byte 0              N
 
-class cache_line
+class internal_cache_line : public cache_line
 {
 public:
-  cache_line (unsigned line_size);
-  cache_line (unsigned line_size, cache_tag tag);
-  cache_line (unsigned line_size, cache_tag tag, std::vector <byte> intial_data);
-  cache_line (const cache_line&);
-  cache_line& operator= (const cache_line&);
-  virtual ~cache_line ();
+  internal_cache_line (unsigned line_size);
+  ~internal_cache_line ();
 
   // Get the line's tag.
+  void set_tag (cache_tag tag);
   cache_tag tag () const;
 
   // Mark the line dirty or clean.
@@ -58,28 +109,36 @@ public:
   // Is the line locked?
   bool locked_p () const;
 
-  // Insert a datum into the line, starting at byte offset.
-  template <typename DataType>
-  void insert (unsigned offset, DataType new_data)
-  {
-    assert (offset + sizeof (new_data) <= size);
-    typename DataType::value_type mem_image = new_data.target_memory_value ();
-    memcpy (& data[offset], & mem_image, sizeof (new_data));
-    dirty_bit = true;
+#define DEFN_METHOD(DataType) \
+  /* Insert a datum into the line, starting at byte offset.  */ \
+  virtual void insert (unsigned offset, DataType new_data) \
+  { \
+    assert (offset + sizeof (new_data) <= size); \
+    DataType::value_type mem_image = new_data.target_memory_value (); \
+    memcpy (& data[offset], & mem_image, sizeof (new_data)); \
+    dirty_bit = true; \
+  } \
+  /* Extract a datum from the line, starting at byte offset.  */ \
+  virtual void extract (unsigned offset, DataType& new_data) const \
+  { \
+    assert (offset + sizeof (new_data) <= size); \
+    DataType::value_type mem_image; \
+    memcpy (& mem_image, & data[offset], sizeof (new_data)); \
+    new_data.set_target_memory_value (mem_image); \
   }
 
-  // Extract a datum from the line, starting at byte offset.
-  template <typename DataType>
-  void extract (unsigned offset, DataType& new_data) const
-  {
-    assert (offset + sizeof (new_data) <= size);
-    typename DataType::value_type mem_image;
-    memcpy (& mem_image, & data[offset], sizeof (new_data));
-    new_data.set_target_memory_value (mem_image);
-  }
+  DEFN_METHOD (sid::big_int_1)
+  DEFN_METHOD (sid::big_int_2)
+  DEFN_METHOD (sid::big_int_4)
+  DEFN_METHOD (sid::big_int_8)
+  DEFN_METHOD (sid::little_int_1)
+  DEFN_METHOD (sid::little_int_2)
+  DEFN_METHOD (sid::little_int_4)
+  DEFN_METHOD (sid::little_int_8)
+#undef DEFN_METHOD
 
   // Dump a line in human readable form to cout.
-  void dump () const;
+  void dump_data () const;
 
 private:
   unsigned size;
@@ -102,14 +161,30 @@ class cache_replacement_algorithm
 public:
   virtual ~cache_replacement_algorithm () {}
 
-  // Place new_line in a cache slot. Point old_line to the existing line.
-  // Return true if successful, false otherwise.
-  virtual void replace (cache_set& cset, cache_line& old_line, cache_line new_line) = 0;
+  // Choose a line to replace in a cache set. Return it, if successful
+  virtual cache_line *expell (cache_set &set) = 0;
 
   // Update state (for example, treating LRU bits), if required.
-  virtual void update (cache_set& cset, cache_line& accessed_line) {}
+  virtual void update (cache_set& cset, cache_line &accessed_line) {}
 };
 
+// The cache_line_factory creates and destroys cache lines. This default
+// implementation creates lines of type internal_cache_line.
+
+class cache_line_factory
+{
+public:
+  virtual ~cache_line_factory () {}
+
+  virtual cache_line *make_line (unsigned line_size, unsigned index, unsigned way)
+  {
+    return new internal_cache_line (line_size);
+  }
+  virtual void destroy_line (cache_line *line)
+  {
+    delete line;
+  }
+};
 
 // The cache_set class represents a set of cache_lines.  For a 2-way
 // associative cache, there will be just two lines in the set.
@@ -118,16 +193,16 @@ class cache_set
 {
 public:
   cache_set (unsigned line_size, unsigned nlines,
-	     cache_replacement_algorithm& alg);
+	     cache_replacement_algorithm& alg, cache_line_factory &f);
   virtual ~cache_set ();
- 
-  // Try to find a line in the cache with a matching tag. 
-  // If found, set "hit" to true and return a ref to the line.
-  // Otherwise, set "hit" to false.
-  virtual cache_line& find (const cache_tag& tag, bool& hit);
 
-  // Find any dirty cache line.  If found, set hit to true and return it.
-  // Otherwise, set hit to false.
+  void allocate_lines (unsigned index);
+
+  // Try to find a line in the cache with a matching tag. 
+  // If found, return it.
+  virtual cache_line* find (const cache_tag& tag);
+
+  // Find any dirty cache line.  If found, return the line
   virtual cache_line* find_any_dirty ();
 
   // Invalidate the entire set.
@@ -142,9 +217,8 @@ public:
   // Flush the entire set.
   void expunge (unsigned index);
 
-  // Replace a line in the set with new_line.
-  // Return false if the line cannot be placed, true otherwise.
-  void replace_line (cache_line& old_line, cache_line new_line);
+  // Choose a line to be replaced. Return it, if successful.
+  cache_line *expell_line ();
 
   // Return the number of lines in the set.
   unsigned num_lines () const;
@@ -153,7 +227,7 @@ public:
   cache_line& get_line (unsigned i) const;
 
   // Place a cache line into slot `i' of the set.
-  void set_line (unsigned i, const cache_line line);
+  void set_line (unsigned i, cache_line &line);
 
   // Dump diagnostics to cerr.
   virtual void dump () const;
@@ -166,7 +240,9 @@ public:
 
 private:
   cache_replacement_algorithm& replacer;
+  cache_line_factory& line_factory;
   std::vector <cache_line*> lines;
+  unsigned line_size;
   typedef std::vector <cache_line*>::iterator iterator_t;
   typedef std::vector <cache_line*>::const_iterator const_iterator_t;
 };
@@ -185,8 +261,11 @@ class cache
 {
 public:
   cache (unsigned cache_size, unsigned line_size,
-	 unsigned assoc, cache_replacement_algorithm& replacer);
+	 unsigned assoc, cache_replacement_algorithm& replacer,
+	 cache_line_factory &line_factory);
   virtual ~cache ();
+
+  void init ();
 
   // Calculate a tag.
   cache_tag addr_to_tag (const sid::host_int_4& addr) const;
@@ -194,9 +273,8 @@ public:
   // Perform the inverse operation.
   sid::host_int_4 tag_to_addr (const cache_tag& tag) const;
   
-  // Find a line, given a tag.  If found, set hit to true and return it.
-  // Otherwise, set hit to false.
-  cache_line& find (cache_tag tag, bool& hit);
+  // Find a line, given a tag.  If found, return it.
+  cache_line* find (cache_tag tag);
 
   // Find any dirty cache line.  If found, set hit to true and return it.
   // Otherwise, set hit to false.
@@ -208,10 +286,9 @@ public:
   // Vacancy in the cache?
   bool vacancy_p (const sid::host_int_4& addr) const;
 
-  // Replace a line in the cache with 'new_line'.  If the expelled
-  // line is dirty, set 'old_line' to it and return true, otherwise
-  // false.
-  void replace (cache_line& old_line, cache_line new_line);
+  // Choose a line in the cache to expell in place of one
+  // representing 'tag'. Return it, if successful.
+  cache_line *expell_line (cache_tag tag);
 
   // Invalidate the entire cache.
   void invalidate ();

@@ -1,3 +1,75 @@
+2004-04-29  Dave Brolley  <brolley@redhat.com>
+
+	* cacheutil.cxx (cache_set::expell_line): Don't update the set here.
+
+2004-04-29  Dave Brolley  <brolley@redhat.com>
+
+	* cache.cxx: Update calls to cache::find.
+	* cacheutil.cxx (cache_set::allocate_lines): Now takes cache index as
+	an argument. Update all callers.
+	(cache_set::find): Now returns a pointer to the line, if found. Update
+	all callers.
+	(cache::find): Ditto.
+	(cache_set::expell_line): Update the status of the expelled line.
+	* cacheutil.h (cache_line_factory::make_line): Now takes cache index as
+	an argument. Update all callers.
+	(cache_set::allocate_lines): Now takes cache index as
+	an argument. Update all callers.
+	(cache_set::find): Now returns a pointer to the line, if found. Update
+	all callers.
+	(cache::find): Ditto.
+
+2004-04-29  Dave Brolley  <brolley@redhat.com>
+
+	* cacheutil.h (cache_line): Removed copy constructor. Now virtual base
+	class.
+	(cache_line::operator=): Removed.
+	(internal_cache_line): New class implements former cache_line class.
+	(cache_set): Now takes cache_line_factory.
+	(allocate_lines): New method moves line allocation from the constructor.
+	(cache_set::set_line): Now takes reference to cache_line.
+	(cache_set::replace_line): Renamed to expell_line. Now returns a pointer
+	to the expelled line.
+	(cache): Now takes cache_line_factory argument.
+	(cache::init): New method moves set allocation from the constructor.
+	(cache_set::expell_line): Renamed to expell_line. Now returns a pointer
+	to the expelled line.
+	(cache_line_factory): New class.
+	* cacheutil.cxx (cache_line): Removed copy constructor. Now virtual base
+	class.
+	(cache_line::operator=): Removed.
+	(internal_cache_line): New class implements former cache_line class.
+	(cache_set): Now takes cache_line_factory.
+	(allocate_lines): New method moves line allocation from the constructor.
+	(cache_set::set_line): Now takes reference to cache_line.
+	(dummy): Now internal to cache_set::find.
+	(cache_set::replace_line): Renamed to expell_line. Now returns a pointer
+	to the expelled line.
+	(cache): Now takes cache_line_factory argument.
+	(cache::init): New method moves set allocation from the constructor.
+	(cache_set::expell_line): Renamed to expell_line. Now returns a pointer
+	to the expelled line.
+	* cache.h (cache_replacement_algorithm::expell): Renamed from 'replace'.
+	Returns a pointer to the expelled line. Update specializations.
+	(cache_component): Now takes a cache_line_factory as an argument.
+	Private data now protected.
+	(line_factory): New member of cache_component.
+	(~cache_component): Now virtual.
+	(CacheCreate): Pass internal_line_factory to cache_component.
+	* cache.cxx (line_sizes): Make it static.
+	(line_sizes): Ditto.
+	(replacement_algorithms): Ditto.
+	(internal_line_factory): New static cache_line_factory.
+	(cache_component): Now takes a cache_line_factory as an argument. Pass
+	the cache line factory to the constructor for acache. Save a reference
+	to the line factory. Call acache.init
+	(write_any): Rewrite to use cache::expell_line instead of the former
+	cache::replace.
+	(read_any): Ditto.
+	(cache_replacement_algorithm::expell): Renamed from 'replace'. Returns
+	a pointer to the expelled line. Update all callers and specializations.
+	(CacheCreate): Pass internal_line_factory to cache_component.
+
 2003-01-31  Frank Ch. Eigler  <fche@redhat.com>
 
 	* log2.h: #undef log2, in case a macro collides with the function.

@@ -1,6 +1,6 @@
 // cache.h -- A universal memory cache. -*- C++ -*-
 
-// Copyright (C) 2001, 2002 Red Hat.
+// Copyright (C) 2001, 2002, 2004 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -62,7 +62,7 @@ private:
 class cache_replacement_fifo: public cache_replacement_algorithm
 {
 public:
-  void replace (cache_set& cset, cache_line& old_line, cache_line new_line);
+  cache_line *expell (cache_set& set);
 
 private:
   vector <int> fifo;
@@ -73,7 +73,7 @@ private:
 class cache_replacement_lru: public cache_replacement_algorithm
 {
 public:
-  void replace (cache_set& cset, cache_line& old_line, cache_line new_line);
+  cache_line *expell (cache_set& set);
   void update (cache_set& cset, cache_line& selected);
 
 private:
@@ -85,7 +85,7 @@ private:
 class cache_replacement_random: public cache_replacement_algorithm
 {
 public:
-  void replace (cache_set& cset, cache_line& old_line, cache_line new_line);
+  cache_line *expell (cache_set& set);
 };
 
 // Null replacement algorithm; used by direct mapped caches
@@ -93,7 +93,7 @@ public:
 class cache_replacement_null: public cache_replacement_algorithm
 {
 public:
-  void replace (cache_set& cset, cache_line& old_line, cache_line new_line);
+  cache_line *expell (cache_set& set);
 };
 
 
@@ -106,9 +106,10 @@ class cache_component: public virtual component,
 {
 public:
   cache_component (unsigned asoctvty, unsigned cache_sz,
-		   unsigned line_sz, cache_replacement_algorithm& replacer);
+		   unsigned line_sz, cache_replacement_algorithm& replacer,
+		   cache_line_factory &line_factory);
 
-  ~cache_component () throw();
+  virtual ~cache_component () throw();
 
   template <typename DataType> bus::status 
   write_any (host_int_4 addr, DataType data);
@@ -116,7 +117,7 @@ public:
   template <typename DataType> bus::status
   read_any (host_int_4 addr, DataType& data);
 
-private:
+protected:
   cache acache;
 
   cache_bus upstream;
@@ -193,6 +194,7 @@ private:
     unsigned long replacements;
   } stats;
 
+  cache_line_factory &line_factory;
   unsigned line_size;
   unsigned cache_size;
   unsigned assoc;

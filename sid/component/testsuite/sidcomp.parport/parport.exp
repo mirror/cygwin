@@ -28,7 +28,7 @@ if {$bus == ""} {
 # Lets check default values in registers
 set test "Reading default PR reg. val 0"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x00"]
-if {[lindex $result 0] == "ok" } {
+if [sid_bus_ok_p $result] {
     if {[lindex $result 1] == 0x00 } { pass $test } else { fail $test } 
 } else {
     fail "$test bus error"
@@ -37,7 +37,7 @@ if {[lindex $result 0] == "ok" } {
 # this default SR test is little risky as I am predicting input pin value
 set test "Reading default SR reg val 0x07"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
-if {[lindex $result 0] == "ok" } {
+if [sid_bus_ok_p $result] {
    if {[lindex $result 1] == 0x07 } { 
       pass $test 
    } else { 
@@ -49,7 +49,7 @@ if {[lindex $result 0] == "ok" } {
 
 set test "Reading default COM reg val 0xE0"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x02"]
-if {[lindex $result 0] == "ok" } {
+if [sid_bus_ok_p $result] {
     if {[lindex $result 1] == 0xE0 } { pass $test } else { fail $test } 
 } else {
     fail "$test bus error"
@@ -172,7 +172,7 @@ foreach data { 0xFF 0xAB 0x00 } {
 # Read PR register    
     set test "reading PR register $data"
     set r_result [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
-    if { [lindex $r_result 0] == "ok" } {
+    if [sid_bus_ok_p $r_result] {
 	if { [lindex $r_result 1] == $data } { pass $test} else {fail $test}
     } else {
        fail "$test (bus error)"
@@ -263,7 +263,7 @@ foreach data {0x1F 0xC6 0x00} {
     set com_val [expr $data | 0xE0]
     set test "reading COM register expect $com_val"
     set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x02"]
-    if {[lindex $result 0] == "ok" } { 
+    if [sid_bus_ok_p $result] {
        pass $test 
     } else { 
        fail "$test bus error" 
@@ -323,7 +323,7 @@ foreach data { 0xF8 0xC0 0x00 } {
    }
     set test " Inspect SR reg expect val $data"
     set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
-   if {[lindex $result 0] == "ok"} {pass $test} else {fail "$test bus error"}
+    if [sid_bus_ok_p $result] {pass $test} else {fail "$test bus error"}
     set reg_val [lindex $result 1]
     if {[expr $reg_val & $SR_maskval] == $data } { 
       pass $test 
@@ -345,7 +345,7 @@ if {$state1 != ""} {pass $test} else {fail $test}
 set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x00 0xFF"]
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x00"]
 set test " Read mode check write to PR register "
-if { [lindex $result 0] == "ok" } { pass $test } else { fail "$test bus error"}
+if [sid_bus_ok_p $result] { pass $test } else { fail "$test bus error"}
 set test " Expecting read PR value 0x00 "
 if { [lindex $result 1] == 0x00 } { 
    pass $test 
@@ -374,7 +374,7 @@ foreach data { 0xFF 0x33 0x00} {
     }
     set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x00"]
     set test " Read mode PR register "
-    if { [lindex $result 0] == "ok" } { pass $test } else { fail "$test bus" }
+    if [sid_bus_ok_p $result] { pass $test } else { fail "$test bus" }
     set test " Read mode PR reg value $data "
     if {[lindex $result 1] == $data } { pass $test } else { fail $test }   
 }
@@ -401,7 +401,7 @@ foreach data { 0xAB 0x66 0x00} {
    }
     set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x00"]
     set test " Read mode PR register iosel "
-    if {[lindex $result 0] == "ok" } { pass $test } else { fail $test }
+    if [sid_bus_ok_p $result] { pass $test } else { fail $test }
     set test " Read mode iosel PR reg value $data "
     if {[lindex $result 1] == $data } { pass $test } else { fail $test }   
 }
@@ -421,7 +421,7 @@ foreach data { 0xCC 0x44 0x00 0xAA} {
    }
     set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x00"]
     set test " Read mode iosel0xAA PR register "
-    if {[lindex $result 0] == "ok" } { pass $test } else { fail $test }
+    if [sid_bus_ok_p $result] { pass $test } else { fail $test }
     set test " Read mode iosel0xAA PR reg value $data "
     if {[lindex $result 1] == $data } { pass $test } else { fail $test }   
 }
@@ -449,7 +449,7 @@ foreach data { 0xEE 0xAA 0x00 } {
 # Read PR register    
     set test " reading PR register iosel 0x55"
     set result [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
-    if { [lindex $result 0] == "ok" } {
+    if [sid_bus_ok_p $result] {
 	if { [lindex $result 1] == $data } { pass $test} else {fail $test}
     } else {
        fail "$test (bus error)"
@@ -473,11 +473,11 @@ if {$result =="ok"} {pass $test} else {fail $test}
 
 set test " test random regs after restore"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x00" ]
-if {[lindex $result 0] == "ok" } { pass $test } else { fail "$test bus err" }
+if [sid_bus_ok_p $result] { pass $test } else { fail "$test bus err" }
 if {[lindex $result 1] == 0x0 } { pass $test } else { fail $test }
 
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x02" ]
-if {[lindex $result 0] == "ok" } { pass $test } else { fail "$test bus err" }
+if [sid_bus_ok_p $result] { pass $test } else { fail "$test bus err" }
 if {[lindex $result 1] == 0xE0 } { pass $test } else { fail $test }
 
 # Time to test handshaking. One of the cool features of parallel port.
@@ -495,7 +495,7 @@ set test " set CON register bit 4 to 1 "
 sid_assert_success "sid::bus::write_h4_l1 $bus 0x02 0xD0"
 set test " read COM value expected 0xF0"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x02" ]
-if {[lindex $result 0] == "ok" } { pass $test } else { fail "$test bus err" }
+if [sid_bus_ok_p $result] { pass $test } else { fail "$test bus err" }
 if {[lindex $result 1] == 0xF0 } { pass $test } else { fail $test }
 
 set intp_pin [sid_cmd "sid::pin::new"]
@@ -523,7 +523,7 @@ foreach pin_val { 0 1 0 } {
    if { $result == $pin_val } { pass $test } else { fail $test }
    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
    set test " reading SR to see ack & bit 2 "
-   if {[lindex $result 0] == "ok" } { pass $test } else {fail "$test bus err"}
+   if [sid_bus_ok_p $result] { pass $test } else {fail "$test bus err"}
    set exp_val 3
    if {$pin_val != 0 }  {
       set exp_val 0x47
@@ -538,7 +538,7 @@ set result [sid_cmd "sid::component::set_attribute_value $victim INTSEL_VAL 1"]
 if { $result == "ok" } { pass $test } else { fail $test }
 set test " reading SR intsel 1"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
-if {[lindex $result 0] == "ok" } { pass $test } else { fail "$test bus error"}
+if [sid_bus_ok_p $result] { pass $test } else { fail "$test bus error"}
 if {[lindex $result 1] == 0x07 } { pass $test } else { fail $test }
 # set ack high 
 sid_cmd "sid::pin::driven_h4 $ip(6) 1"  
@@ -565,14 +565,14 @@ foreach pin_val { 1 0 1 } {
 # read the SR register & see clearing intp pin.
 set test "clearing interrupt"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
-if { [lindex $result 0] == "ok" } { pass $test} else { fail "$test bus err"}
+if [sid_bus_ok_p $result] { pass $test} else { fail "$test bus err"}
 set reg_val [lindex $result 1]
 if { [expr $reg_val & [expr 1 << 2]] == 0 } { pass $test} else { fail $test }
 
 # now bit 2 should go to one 
 set test " clearing interrupt bit 2 should be 1 "
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
-if {[lindex $result 0] == "ok" } { pass $test} else { fail $test}
+if [sid_bus_ok_p $result] { pass $test} else { fail $test}
 set reg_val [lindex $result 1]
 if { [expr $reg_val & [expr 1 << 2]] != 0 } { pass $test} else { fail $test }
 

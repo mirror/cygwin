@@ -40,41 +40,41 @@ set test "set / retrieve a load value (byte)"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 sid_cmd "sid::bus::write_h4_l1 $bus 0 0xAA"
 set val [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
-if {[lindex $val 0] == "ok" && [lindex $val 1] == 0xAA} then {pass $test} else {fail $test}
+if {[sid_bus_ok_p $val] && [lindex $val 1] == 0xAA} then {pass $test} else {fail $test}
 
 set test "set / retrieve a load value (half-word)"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 sid_cmd "sid::bus::write_h4_l2 $bus 0 0xAABB"
 set val [sid_cmd "sid::bus::read_h4_l2 $bus 0"]
-if {[lindex $val 0] == "ok" && [lindex $val 1] == 0xAABB} then {pass $test} else {fail $test}
+if {[sid_bus_ok_p $val] && [lindex $val 1] == 0xAABB} then {pass $test} else {fail $test}
 
 set test "set / retrieve a load value (word)"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 sid_cmd "sid::bus::write_h4_l4 $bus 0 0xC"
 set val [sid_cmd "sid::bus::read_h4_l4 $bus 0x0"]
-if {[lindex $val 0] == "ok" && [lindex $val 1] == 0xC} then {pass $test} else {fail $test}
+if {[sid_bus_ok_p $val] && [lindex $val 1] == 0xC} then {pass $test} else {fail $test}
 
 set test "retrieve timer value (word)"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 set val [sid_cmd "sid::bus::read_h4_l4 $bus 0x4"]
-if {[lindex $val 0] == "ok" && [lindex $val 1] == 0xC} then {pass $test} else {fail $test}
+if {[sid_bus_ok_p $val] && [lindex $val 1] == 0xC} then {pass $test} else {fail $test}
 
 set test "clear interrupts"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
-set val [sid_cmd "sid::bus::write_h4_l4 $bus 0x0C 0"]
-if {$val == "ok"} then {pass $test} else {fail $test}
+set result [sid_cmd "sid::bus::write_h4_l4 $bus 0x0C 0"]
+if [sid_bus_ok_p $result] then {pass $test} else {fail $test}
 
 set test "get control word"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
-set val [sid_cmd "sid::bus::read_h4_l4 $bus 0x08"]
+set result [sid_cmd "sid::bus::read_h4_l4 $bus 0x08"]
 # XXX: assert also the current value of the control word?
-if {[string match "ok*" $val]} then {pass $test} else {fail $test}
+if [sid_bus_ok_p $result] then { pass $test } else { fail $test }
 
 set test "turn timer on"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
-set val [sid_cmd "sid::bus::write_h4_l4 $bus 0x08 0xC4"]
+set result [sid_cmd "sid::bus::write_h4_l4 $bus 0x08 0xC4"]
 # C4: enabled | periodic | prescale=01 (divide-by-16)
-if {$val == "ok"} then {pass $test} else {fail $test}
+if [sid_bus_ok_p $result] then { pass $test } else { fail $test }
 
 set test "tick presence of scheduler clock pin"
 set clock_pin [sid_cmd "sid::component::find_pin $sched advance"]

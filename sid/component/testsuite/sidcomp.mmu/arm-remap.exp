@@ -247,7 +247,7 @@ sid_assert_success "sid::bus::write_h4_l4 $bus 0x30 0"
 set test "read identification register"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 set result [sid_cmd "sid::bus::read_h4_l4 $bus 0x10"]
-if {[lindex $result 0] == "ok" && [lindex $result 1] == 0} {
+if {[sid_bus_ok_p $result] && [lindex $result 1] == 0} {
     pass $test
 } else {
     fail $test
@@ -277,7 +277,7 @@ set test "reset status register is clear at power-up"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 set result [sid_cmd "sid::bus::read_h4_l4 $bus 0x30"]
 
-if {[lindex $result 0] == "ok" && [lindex $result 1] == 0} {
+if {[sid_bus_ok_p $result] && [lindex $result 1] == 0} {
     pass $test
 } else { 
     fail $test
@@ -291,7 +291,7 @@ sid_cmd "sid::pin::driven_h4 $pin 1"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 set result [sid_cmd "sid::bus::read_h4_l4 $bus 0x30"]
 
-if {[lindex $result 0] == "ok" && [lindex $result 1] == 1} {
+if {[sid_bus_ok_p $result] && [lindex $result 1] == 1} {
     pass $test
 } else {
     fail $test
@@ -311,7 +311,7 @@ set result [sid_cmd "sid::bus::read_h4_l4 $bus 0x34"]
 # should clear all bits in the "reset status" register, including bit
 # number 0.
 
-if {[lindex $result 0] == "ok" && [lindex $result 1] == 0} {
+if {[sid_bus_ok_p $result] && [lindex $result 1] == 0} {
     pass $test
 } else {
     fail $test

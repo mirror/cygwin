@@ -95,8 +95,7 @@ for {set i 0} {$i < $size} {incr i} {
     set data [expr {(($data * 19) + 13) % 256}]
     set addr $i
     set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
-    set status [lindex $result 0]
-    if {$status != "ok"} { fail "$test - bad"; break }
+    if ![sid_bus_ok_p $result] { fail $test; break }
     set result_data [lindex $result 1]
     if {$result_data != $data} {
 	fail "$test - mismatch @ $i - $result_data vs $data"
@@ -111,7 +110,7 @@ foreach hex_addr {0x0 0x100 0x1E0 0x20F 0x222 0x29A 0x4BC 0x551 0x555 0x6B0 0x10
     set hex_data 0xAA
 
     set result [sid_cmd "sid::bus::read_h4_l1 $bus $hex_addr"]
-    if {[lindex $result 0] == "ok" && [lindex $result 1] == $hex_data} {
+    if {[sid_bus_ok_p $result] && [lindex $result 1] == $hex_data} {
 	unresolved "magic byte already in address $hex_addr"
 	continue
     }
@@ -121,7 +120,7 @@ foreach hex_addr {0x0 0x100 0x1E0 0x20F 0x222 0x29A 0x4BC 0x551 0x555 0x6B0 0x10
 	fail "$test (bus error)"
     } else {
 	set result [sid_cmd "sid::bus::read_h4_l1 $bus $hex_addr"]
-	if {[lindex $result 0] == "ok" && [lindex $result 1] != $hex_data} {
+	if {[sid_bus_ok_p $result] && [lindex $result 1] != $hex_data} {
 	    pass $test
 	} else {
 	    fail "$test -- mismatch @ $hex_addr, $hex_data vs [lindex $result 1]"
@@ -161,9 +160,9 @@ set test "validate the first sector"
 set okay 1
 for {set addr 0} {$addr < $sector_size} {incr addr} {
     set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
-    if {[lindex $result 0] != "ok" || [lindex $result 1] != 0x66} {
+    if {![sid_bus_ok_p $result] || [lindex $result 1] != 0x66} {
 	set okay 0
-	warning "results: [lindex $result 0] [lindex $result 1]"
+	warning "results: $result"
 	break
     }
 }
@@ -188,7 +187,7 @@ set test "validate the second sector -- writes should have no effect"
 set okay 1
 for {set addr $sector_size} {$addr < [expr $sector_size + 16]} {incr addr} {
     set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
-    if {[lindex $result 0] != "ok" || [lindex $result 1] == 0x66} {
+    if {![sid_bus_ok_p $result] || [lindex $result 1] == 0x66} {
 	set okay 0
 	break
     }
@@ -229,9 +228,9 @@ set okay 1
 for {set addr 0} {$addr < $sector_size} {incr addr} {
     set addr [expr [expr 2 * $sector_size] + $addr]
     set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
-    if {[lindex $result 0] != "ok" || [lindex $result 1] != 0x66} {
+    if {![sid_bus_ok_p $result] || [lindex $result 1] != 0x66} {
 	set okay 0
-	warning "results: [lindex $result 0] [lindex $result 1]"
+	warning "results: $result"
 	break
     }
 }
@@ -240,7 +239,7 @@ if {$okay} { pass $test } else { fail $test }
 
 set test "read manufacturer code without issuing id command"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
-if {[lindex $result 0] == "ok" && [lindex $result 1] != 0x1F} { pass $test } else { fail $test }
+if {[sid_bus_ok_p $result] && [lindex $result 1] != 0x1F} { pass $test } else { fail $test }
 
 
 set test "writing magic bytes to enter identification mode"
@@ -259,7 +258,7 @@ if {$okay} { pass $test } else { fail "$test (bus error)" }
 
 set test "read manufacturer code"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
-if {[lindex $result 0] == "ok" && [lindex $result 1] == 0x1F} { pass $test } else { fail $test }
+if {[sid_bus_ok_p $result] && [lindex $result 1] == 0x1F} { pass $test } else { fail $test }
 
 
 set test "read device id code for a low-voltage flash (id=0x3B)"
@@ -269,7 +268,7 @@ if {$result != 0x3B} {
     fail $test
 } else {
     set result [sid_cmd "sid::bus::read_h4_l1 $bus 1"]
-    if {[lindex $result 0] == "ok" && [lindex $result 1] == 0x3B} { 
+    if {[sid_bus_ok_p $result] && [lindex $result 1] == 0x3B} { 
 	pass $test 
     } else { 
 	fail $test
@@ -293,7 +292,7 @@ if {$okay} { pass $test } else { fail "$test (bus error)" }
 
 set test "check for normal operating mode"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
-if {[lindex $result 0] == "ok" && [lindex $result 1] != 0x1F} { pass $test } else { fail $test }
+if {[sid_bus_ok_p $result] && [lindex $result 1] != 0x1F} { pass $test } else { fail $test }
 
 
 set test "sid stop"

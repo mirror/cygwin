@@ -960,13 +960,12 @@ Define an instruction, all arguments specified.
   ; them together.
   ; FIXME: This is a case where we need one attribute with several values.
   ; Presently each RELAX_FOO will use up a bit.
-  ; NOTE: Defined in operand.scm because we can't define it twice.
-  ;(define-attr '(for insn) '(type boolean) '(name RELAXABLE)
-  ;  '(comment "insn is relaxable"))
+  (define-attr '(for insn) '(type boolean) '(name RELAXABLE)
+    '(comment "insn is relaxable"))
 
-  ; RELAX: Large relaxable variant.  Avoided by assembler in first pass.
-  ; FIXME: Rename this to RELAXED.
-  (define-attr '(for insn) '(type boolean) '(name RELAX) '(comment "relaxed form of insn"))
+  ; RELAXED: Large relaxable variant.  Avoided by assembler in first pass.
+  (define-attr '(for insn) '(type boolean) '(name RELAXED)
+    '(comment "relaxed form of insn"))
 
   ; NO-DIS: For macro insns, do not use during disassembly.
   (define-attr '(for insn) '(type boolean) '(name NO-DIS) '(comment "don't use for disassembly"))

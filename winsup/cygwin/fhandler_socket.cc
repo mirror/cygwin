@@ -20,7 +20,6 @@
 #include <asm/byteorder.h>
 
 #include <stdlib.h>
-#include <unistd.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 #include "cygerrno.h"
@@ -33,6 +32,7 @@
 #include "cygheap.h"
 #include "sigproc.h"
 #include "wsock_event.h"
+#include <unistd.h>
 
 #define SECRET_EVENT_NAME "cygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x"
 #define ENTROPY_SOURCE_NAME "/dev/urandom"
@@ -48,7 +48,7 @@ fhandler_dev_random* entropy_source;
 /* cygwin internal: map sockaddr into internet domain address */
 static int
 get_inet_addr (const struct sockaddr *in, int inlen,
-               struct sockaddr_in *out, int *outlen, int* secret = 0)
+	       struct sockaddr_in *out, int *outlen, int* secret = 0)
 {
   int secret_buf [4];
   int* secret_ptr = (secret ? : secret_buf);
@@ -61,27 +61,27 @@ get_inet_addr (const struct sockaddr *in, int inlen,
     }
   else if (in->sa_family == AF_LOCAL)
     {
-      int fd = _open (in->sa_data, O_RDONLY);
+      int fd = open (in->sa_data, O_RDONLY);
       if (fd == -1)
-        return 0;
+	return 0;
 
       int ret = 0;
       char buf[128];
       memset (buf, 0, sizeof buf);
       if (read (fd, buf, sizeof buf) != -1)
-        {
-          sockaddr_in sin;
-          sin.sin_family = AF_INET;
-          sscanf (buf + strlen (SOCKET_COOKIE), "%hu %08x-%08x-%08x-%08x",
-                  &sin.sin_port,
-                  secret_ptr, secret_ptr + 1, secret_ptr + 2, secret_ptr + 3);
-          sin.sin_port = htons (sin.sin_port);
-          sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-          *out = sin;
-          *outlen = sizeof sin;
-          ret = 1;
-        }
-      _close (fd);
+	{
+	  sockaddr_in sin;
+	  sin.sin_family = AF_INET;
+	  sscanf (buf + strlen (SOCKET_COOKIE), "%hu %08x-%08x-%08x-%08x",
+		  &sin.sin_port,
+		  secret_ptr, secret_ptr + 1, secret_ptr + 2, secret_ptr + 3);
+	  sin.sin_port = htons (sin.sin_port);
+	  sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+	  *out = sin;
+	  *outlen = sizeof sin;
+	  ret = 1;
+	}
+      close (fd);
       return ret;
     }
   else
@@ -155,12 +155,17 @@ fhandler_socket::create_secret_event (int* secret)
   __small_sprintf (buf, SECRET_EVENT_NAME, sin.sin_port,
 		   secret_ptr [0], secret_ptr [1],
 		   secret_ptr [2], secret_ptr [3]);
-  secret_event = CreateEvent (get_inheritance(true), FALSE, FALSE, buf);
+  LPSECURITY_ATTRIBUTES sec = get_inheritance (true);
+  secret_event = CreateEvent (sec, FALSE, FALSE, buf);
   if (!secret_event && GetLastError () == ERROR_ALREADY_EXISTS)
     secret_event = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf);
 
-  if (secret_event)
+  if (!secret_event)
+    /* nothing to do */;
+  else if (sec == &sec_all_nih || sec == &sec_none_nih)
     ProtectHandle (secret_event);
+  else
+    ProtectHandleINH (secret_event);
 
   return secret_event;
 }
@@ -198,7 +203,7 @@ fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
   ev = CreateEvent (&sec_all_nih, FALSE, FALSE, buf);
   if (!ev && GetLastError () == ERROR_ALREADY_EXISTS)
     {
-      debug_printf ("%s event already exist");
+      debug_printf ("event \"%s\" already exists", buf);
       ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf);
     }
 
@@ -320,7 +325,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
     {
 #define un_addr ((struct sockaddr_un *) name)
       struct sockaddr_in sin;
-      int len = sizeof sin; 
+      int len = sizeof sin;
       int fd;
 
       if (strlen (un_addr->sun_path) >= UNIX_PATH_LEN)
@@ -349,9 +354,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 
       /* bind must fail if file system socket object already exists
 	 so _open () is called with O_EXCL flag. */
-      fd = _open (un_addr->sun_path,
-		  O_WRONLY | O_CREAT | O_EXCL | O_BINARY,
-		  0);
+      fd = ::open (un_addr->sun_path, O_WRONLY | O_CREAT | O_EXCL | O_BINARY, 0);
       if (fd < 0)
 	{
 	  if (get_errno () == EEXIST)
@@ -367,17 +370,17 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       len = strlen (buf) + 1;
 
       /* Note that the terminating nul is written.  */
-      if (_write (fd, buf, len) != len)
+      if (::write (fd, buf, len) != len)
 	{
 	  save_errno here;
-	  _close (fd);
-	  _unlink (un_addr->sun_path);
+	  ::close (fd);
+	  unlink (un_addr->sun_path);
 	}
       else
 	{
-	  _close (fd);
+	  ::close (fd);
 	  chmod (un_addr->sun_path,
-	    (S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask);
+		 (S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask);
 	  set_sun_path (un_addr->sun_path);
 	  res = 0;
 	}
@@ -400,8 +403,6 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   BOOL in_progress = FALSE;
   sockaddr_in sin;
   int secret [4];
-
-  sigframe thisframe (mainthread);
 
   if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
     return -1;
@@ -455,6 +456,10 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	}
     }
 
+  if (WSAGetLastError () == WSAEINPROGRESS)
+    set_connect_state (CONNECT_PENDING);
+  else
+    set_connect_state (CONNECTED);
   return res;
 }
 
@@ -464,6 +469,8 @@ fhandler_socket::listen (int backlog)
   int res = ::listen (get_socket (), backlog);
   if (res)
     set_winsock_errno ();
+  else
+    set_connect_state (CONNECTED);
   return res;
 }
 
@@ -474,8 +481,6 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   WSAEVENT ev[2] = { WSA_INVALID_EVENT, signal_arrived };
   BOOL secret_check_failed = FALSE;
   BOOL in_progress = FALSE;
-
-  sigframe thisframe (mainthread);
 
   /* Allows NULL peer and len parameters. */
   struct sockaddr_in peer_dummy;
@@ -495,55 +500,56 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   if (len && ((unsigned) *len < sizeof (struct sockaddr_in)))
     *len = sizeof (struct sockaddr_in);
 
-  if (!is_nonblocking())
+  if (!is_nonblocking ())
     {
       ev[0] = WSACreateEvent ();
 
       if (ev[0] != WSA_INVALID_EVENT &&
-          !WSAEventSelect (get_socket (), ev[0], FD_ACCEPT))
-        {
-          WSANETWORKEVENTS sock_event;
-          int wait_result;
+	  !WSAEventSelect (get_socket (), ev[0], FD_ACCEPT))
+	{
+	  WSANETWORKEVENTS sock_event;
+	  int wait_result;
 
-          wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
-	  					  FALSE);
-          if (wait_result == WSA_WAIT_EVENT_0)
-            WSAEnumNetworkEvents (get_socket (), ev[0], &sock_event);
+	  wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
+						  FALSE);
+	  if (wait_result == WSA_WAIT_EVENT_0)
+	    WSAEnumNetworkEvents (get_socket (), ev[0], &sock_event);
 
-          /* Unset events for listening socket and
-             switch back to blocking mode */
-          WSAEventSelect (get_socket (), ev[0], 0 );
-          ioctlsocket (get_socket (), FIONBIO, 0);
+	  /* Unset events for listening socket and
+	     switch back to blocking mode */
+	  WSAEventSelect (get_socket (), ev[0], 0);
+	  unsigned long nonblocking = 0;
+	  ioctlsocket (get_socket (), FIONBIO, &nonblocking);
 
-          switch (wait_result)
-            {
-            case WSA_WAIT_EVENT_0:
-              if (sock_event.lNetworkEvents & FD_ACCEPT)
-                {
-                  if (sock_event.iErrorCode[FD_ACCEPT_BIT])
-                    {
-                      WSASetLastError (sock_event.iErrorCode[FD_ACCEPT_BIT]);
-                      set_winsock_errno ();
-                      res = -1;
-                      goto done;
-                    }
-                }
-              /* else; : Should never happen since FD_ACCEPT is the only event
-                 that has been selected */
-              break;
-            case WSA_WAIT_EVENT_0 + 1:
-              debug_printf ("signal received during accept");
-              set_errno (EINTR);
-              res = -1;
-              goto done;
-            case WSA_WAIT_FAILED:
-            default: /* Should never happen */
-              WSASetLastError (WSAEFAULT);
-              set_winsock_errno ();
-              res = -1;
-              goto done;
-            }
-        }
+	  switch (wait_result)
+	    {
+	    case WSA_WAIT_EVENT_0:
+	      if (sock_event.lNetworkEvents & FD_ACCEPT)
+		{
+		  if (sock_event.iErrorCode[FD_ACCEPT_BIT])
+		    {
+		      WSASetLastError (sock_event.iErrorCode[FD_ACCEPT_BIT]);
+		      set_winsock_errno ();
+		      res = -1;
+		      goto done;
+		    }
+		}
+	      /* else; : Should never happen since FD_ACCEPT is the only event
+		 that has been selected */
+	      break;
+	    case WSA_WAIT_EVENT_0 + 1:
+	      debug_printf ("signal received during accept");
+	      set_errno (EINTR);
+	      res = -1;
+	      goto done;
+	    case WSA_WAIT_FAILED:
+	    default: /* Should never happen */
+	      WSASetLastError (WSAEFAULT);
+	      set_winsock_errno ();
+	      res = -1;
+	      goto done;
+	    }
+	}
     }
 
   res = ::accept (get_socket (), peer, len);
@@ -558,7 +564,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	{
 	  if (!create_secret_event ())
 	    secret_check_failed = TRUE;
-	  else if (in_progress) 
+	  else if (in_progress)
 	    signal_secret_event ();
 	}
 
@@ -591,12 +597,12 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
       set_winsock_errno ();
     else
       {
-        fhandler_socket* res_fh = fdsock (res_fd, get_name (), res);
-        if (get_addr_family () == AF_LOCAL)
-          res_fh->set_sun_path (get_sun_path ());
-        res_fh->set_addr_family (get_addr_family ());
-        res_fh->set_socket_type (get_socket_type ());
-        res = res_fd;
+	fhandler_socket* res_fh = fdsock (res_fd, get_name (), res);
+	if (get_addr_family () == AF_LOCAL)
+	  res_fh->set_sun_path (get_sun_path ());
+	res_fh->set_addr_family (get_addr_family ());
+	res_fh->set_socket_type (get_socket_type ());
+	res = res_fd;
       }
   }
 
@@ -611,8 +617,6 @@ int
 fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
 {
   int res = -1;
-
-  sigframe thisframe (mainthread);
 
   if (get_addr_family () == AF_LOCAL)
     {
@@ -647,8 +651,6 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
 int
 fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
 {
-  sigframe thisframe (mainthread);
-
   int res = ::getpeername (get_socket (), name, namelen);
   if (res)
     set_winsock_errno ();
@@ -657,99 +659,68 @@ fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
 }
 
 int
-fhandler_socket::recv (void *ptr, size_t len, unsigned int flags)
+fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
+			ssize_t tot)
 {
-  int res = -1;
-  wsock_event wsock_evt;
-  LPWSAOVERLAPPED ovr;
-
-  sigframe thisframe (mainthread);
-
-  if (is_nonblocking () || !(ovr = wsock_evt.prepare ()))
+  struct msghdr msg =
     {
-      debug_printf ("Fallback to winsock 1 recv call");
-      if ((res = ::recv (get_socket (), (char *) ptr, len, flags))
-	  == SOCKET_ERROR)
-	{
-	  set_winsock_errno ();
-	  res = -1;
-	}
-    }
-  else
-    {
-      WSABUF wsabuf = { len, (char *) ptr };
-      DWORD ret = 0;
-      if (WSARecv (get_socket (), &wsabuf, 1, &ret, (DWORD *)&flags,
-		   ovr, NULL) != SOCKET_ERROR)
-	res = ret;
-      else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
-	{
-	  set_winsock_errno ();
-	  res = -1;
-	}
-      else if ((res = wsock_evt.wait (get_socket (), (DWORD *)&flags)) == -1)
-	set_winsock_errno ();
-    }
-  return res;
-}
+      msg_name:		NULL,
+      msg_namelen:	0,
+      msg_iov:		(struct iovec *) iov, // const_cast
+      msg_iovlen:	iovcnt,
+      msg_accrights:	NULL,
+      msg_accrightslen:	0
+    };
 
-int __stdcall
-fhandler_socket::read (void *ptr, size_t len)
-{
-  return recv (ptr, len, 0);
+  return recvmsg (&msg, 0, tot);
 }
 
 int
-fhandler_socket::recvfrom (void *ptr, size_t len, unsigned int flags,
+fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 			   struct sockaddr *from, int *fromlen)
 {
-  int res = -1;
-  wsock_event wsock_evt;
-  LPWSAOVERLAPPED ovr;
+  int res;
+  DWORD ret;
 
-  sigframe thisframe (mainthread);
-
-  if (is_nonblocking () || !(ovr = wsock_evt.prepare ()))
-    {
-      debug_printf ("Fallback to winsock 1 recvfrom call");
-      if ((res = ::recvfrom (get_socket (), (char *) ptr, len, flags, from,
-			     fromlen))
-	  == SOCKET_ERROR)
-	{
-	  set_winsock_errno ();
-	  res = -1;
-	}
-    }
+  flags &= MSG_WINMASK;
+  if (!winsock2_active)
+    ret = res = ::recvfrom (get_socket (),
+			    (char *) ptr, len, flags,
+			    from, fromlen);
   else
     {
       WSABUF wsabuf = { len, (char *) ptr };
-      DWORD ret = 0;
-      if (WSARecvFrom (get_socket (), &wsabuf, 1, &ret, (DWORD *)&flags,
-		       from, fromlen, ovr, NULL) != SOCKET_ERROR)
-	res = ret;
-      else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
+
+      if (is_nonblocking ())
+	res = WSARecvFrom (get_socket (), &wsabuf, 1, &ret, (DWORD *) &flags,
+			   from, fromlen,
+			   NULL, NULL);
+      else
 	{
-	  set_winsock_errno ();
-	  res = -1;
+	  wsock_event wsock_evt;
+	  res = WSARecvFrom (get_socket (), &wsabuf, 1, &ret, (DWORD *) &flags,
+			     from, fromlen,
+			     wsock_evt.prepare (), NULL);
+
+	  if (res == SOCKET_ERROR && WSAGetLastError () == WSA_IO_PENDING)
+	    ret = res = wsock_evt.wait (get_socket (), (DWORD *) &flags);
 	}
-      else if ((res = wsock_evt.wait (get_socket (), (DWORD *)&flags)) == -1)
-	set_winsock_errno ();
     }
+
+  if (res == SOCKET_ERROR)
+    {
+      res = -1;
+      set_winsock_errno ();
+    }
+  else
+    res = ret;
 
   return res;
 }
 
 int
-fhandler_socket::recvmsg (struct msghdr *msg, int flags)
+fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 {
-  int res = -1;
-  int nb;
-  size_t tot = 0;
-  char *buf, *p;
-  struct iovec *iov = msg->msg_iov;
-
-  sigframe thisframe (mainthread);
-
   if (get_addr_family () == AF_LOCAL)
     {
       /* On AF_LOCAL sockets the (fixed-size) name of the shared memory
@@ -759,145 +730,293 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags)
 	 special handling for descriptor passing. */
       /*TODO*/
     }
-  for (int i = 0; i < msg->msg_iovlen; ++i)
-    tot += iov[i].iov_len;
-  buf = (char *) alloca (tot);
-  if (tot != 0 && buf == NULL)
-    {
-      set_errno (ENOMEM);
-      return -1;
-    }
-  nb = res = recvfrom (buf, tot, flags, (struct sockaddr *) msg->msg_name,
-		       (int *) &msg->msg_namelen);
-  p = buf;
-  while (nb > 0)
-    {
-      ssize_t cnt = min(nb, iov->iov_len);
-      memcpy (iov->iov_base, p, cnt);
-      p += cnt;
-      nb -= cnt;
-      ++iov;
-    }
-  return res;
-}
 
-int
-fhandler_socket::send (const void *ptr, size_t len, unsigned int flags)
-{
-  int res = -1;
-  wsock_event wsock_evt;
-  LPWSAOVERLAPPED ovr;
+  struct iovec *const iov = msg->msg_iov;
+  const int iovcnt = msg->msg_iovlen;
 
-  sigframe thisframe (mainthread);
+  struct sockaddr *from = (struct sockaddr *) msg->msg_name;
+  int *fromlen = from ? &msg->msg_namelen : NULL;
 
-  if (is_nonblocking () || !(ovr = wsock_evt.prepare ()))
+  int res;
+
+  if (!winsock2_active)
     {
-      debug_printf ("Fallback to winsock 1 send call");
-      if ((res = ::send (get_socket (), (const char *) ptr, len, flags))
-	  == SOCKET_ERROR)
+      if (iovcnt == 1)
+	res = recvfrom (iov->iov_base, iov->iov_len, flags,
+			from, fromlen);
+      else
 	{
-	  set_winsock_errno ();
-	  res = -1;
+	  if (tot == -1)	// i.e. if not pre-calculated by the caller.
+	    {
+	      tot = 0;
+	      const struct iovec *iovptr = iov + iovcnt;
+	      do
+		{
+		  iovptr -= 1;
+		  tot += iovptr->iov_len;
+		}
+	      while (iovptr != iov);
+	    }
+
+	  char *buf = (char *) alloca (tot);
+
+	  if (!buf)
+	    {
+	      set_errno (ENOMEM);
+	      res = -1;
+	    }
+	  else
+	    {
+	      res = recvfrom (buf, tot, flags,
+			      from, fromlen);
+
+	      const struct iovec *iovptr = iov;
+	      int nbytes = res;
+
+	      while (nbytes > 0)
+		{
+		  const int frag = min (nbytes, (ssize_t) iovptr->iov_len);
+		  memcpy (iovptr->iov_base, buf, frag);
+		  buf += frag;
+		  iovptr += 1;
+		  nbytes -= frag;
+		}
+	    }
 	}
     }
   else
     {
-      WSABUF wsabuf = { len, (char *) ptr };
-      DWORD ret = 0;
-      if (WSASend (get_socket (), &wsabuf, 1, &ret, (DWORD)flags,
-		   ovr, NULL) != SOCKET_ERROR)
-	res = ret;
-      else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
+      WSABUF wsabuf[iovcnt];
+
+      {
+	const struct iovec *iovptr = iov + iovcnt;
+	WSABUF *wsaptr = wsabuf + iovcnt;
+	do
+	  {
+	    iovptr -= 1;
+	    wsaptr -= 1;
+	    wsaptr->len = iovptr->iov_len;
+	    wsaptr->buf = (char *) iovptr->iov_base;
+	  }
+	while (wsaptr != wsabuf);
+      }
+
+      DWORD ret;
+
+      if (is_nonblocking ())
+	res = WSARecvFrom (get_socket (),
+			   wsabuf, iovcnt, &ret, (DWORD *) &flags,
+			   from, fromlen,
+			   NULL, NULL);
+      else
 	{
-	  set_winsock_errno ();
-	  res = -1;
+	  wsock_event wsock_evt;
+	  res = WSARecvFrom (get_socket (),
+			     wsabuf, iovcnt, &ret, (DWORD *) &flags,
+			     from, fromlen,
+			     wsock_evt.prepare (), NULL);
+
+	  if (res == SOCKET_ERROR && WSAGetLastError () == WSA_IO_PENDING)
+	    ret = res = wsock_evt.wait (get_socket (), (DWORD *) &flags);
 	}
-      else if ((res = wsock_evt.wait (get_socket (), (DWORD *)&flags)) == -1)
-	set_winsock_errno ();
+
+      if (res == SOCKET_ERROR)
+	{
+	  res = -1;
+	  set_winsock_errno ();
+	}
+      else
+	res = ret;
     }
+
   return res;
 }
 
 int
-fhandler_socket::write (const void *ptr, size_t len)
+fhandler_socket::writev (const struct iovec *const iov, const int iovcnt,
+			 ssize_t tot)
 {
-  return send (ptr, len, 0);
+  struct msghdr msg =
+    {
+      msg_name:		NULL,
+      msg_namelen:	0,
+      msg_iov:		(struct iovec *) iov, // const_cast
+      msg_iovlen:	iovcnt,
+      msg_accrights:	NULL,
+      msg_accrightslen:	0
+    };
+
+  return sendmsg (&msg, 0, tot);
 }
 
 int
-fhandler_socket::sendto (const void *ptr, size_t len, unsigned int flags,
+fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 			 const struct sockaddr *to, int tolen)
 {
-  int res = -1;
-  wsock_event wsock_evt;
-  LPWSAOVERLAPPED ovr;
   sockaddr_in sin;
 
-  sigframe thisframe (mainthread);
-
-  if (!get_inet_addr (to, tolen, &sin, &tolen))
+  if (to && !get_inet_addr (to, tolen, &sin, &tolen))
     return -1;
 
-  if (is_nonblocking () || !(ovr = wsock_evt.prepare ()))
-    {
-      debug_printf ("Fallback to winsock 1 sendto call");
-      if ((res = ::sendto (get_socket (), (const char *) ptr, len, flags,
-			   (sockaddr *) &sin, tolen)) == SOCKET_ERROR)
-	{
-	  set_winsock_errno ();
-	  res = -1;
-	}
-    }
+  int res;
+  DWORD ret;
+
+  if (!winsock2_active)
+    res = ::sendto (get_socket (), (const char *) ptr, len,
+		    flags & MSG_WINMASK,
+		    (to ? (const struct sockaddr *) &sin : NULL), tolen);
   else
     {
       WSABUF wsabuf = { len, (char *) ptr };
-      DWORD ret = 0;
-      if (WSASendTo (get_socket (), &wsabuf, 1, &ret, (DWORD)flags,
-		     (sockaddr *) &sin, tolen, ovr, NULL) != SOCKET_ERROR)
-	res = ret;
-      else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
+
+      if (is_nonblocking ())
+	res = WSASendTo (get_socket (), &wsabuf, 1, &ret,
+			 flags & MSG_WINMASK,
+			 (to ? (const struct sockaddr *) &sin : NULL), tolen,
+			 NULL, NULL);
+      else
 	{
-	  set_winsock_errno ();
-	  res = -1;
+	  wsock_event wsock_evt;
+	  res = WSASendTo (get_socket (), &wsabuf, 1, &ret,
+			   flags & MSG_WINMASK,
+			   (to ? (const struct sockaddr *) &sin : NULL), tolen,
+			   wsock_evt.prepare (), NULL);
+
+	  if (res == SOCKET_ERROR && WSAGetLastError () == WSA_IO_PENDING)
+	    ret = res = wsock_evt.wait (get_socket (), (DWORD *) &flags);
 	}
-      else if ((res = wsock_evt.wait (get_socket (), (DWORD *)&flags)) == -1)
-	set_winsock_errno ();
+    }
+
+  if (res == SOCKET_ERROR)
+    {
+      res = -1;
+      set_winsock_errno ();
+    }
+  else
+    res = ret;
+
+  /* Special handling for SIGPIPE */
+  if (res == -1 && get_errno () == ESHUTDOWN)
+    {
+      set_errno (EPIPE);
+      if (! (flags & MSG_NOSIGNAL))
+	raise (SIGPIPE);
     }
 
   return res;
 }
 
 int
-fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
+fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
 {
-    size_t tot = 0;
-    char *buf, *p;
-    struct iovec *iov = msg->msg_iov;
-
-    if (get_addr_family () == AF_LOCAL)
-      {
-        /* For AF_LOCAL/AF_UNIX sockets, if descriptors are given, start
-           the special handling for descriptor passing.  Otherwise just
-           transmit an empty string to tell the receiver that no
-           descriptor passing is done. */
+  if (get_addr_family () == AF_LOCAL)
+    {
+      /* For AF_LOCAL/AF_UNIX sockets, if descriptors are given, start
+	 the special handling for descriptor passing.  Otherwise just
+	 transmit an empty string to tell the receiver that no
+	 descriptor passing is done. */
       /*TODO*/
-      }
-    for(int i = 0; i < msg->msg_iovlen; ++i)
-        tot += iov[i].iov_len;
-    buf = (char *) alloca (tot);
-    if (tot != 0 && buf == NULL)
+    }
+
+  struct iovec *const iov = msg->msg_iov;
+  const int iovcnt = msg->msg_iovlen;
+
+  int res;
+
+  if (!winsock2_active)
+    {
+      if (iovcnt == 1)
+	res = sendto (iov->iov_base, iov->iov_len, flags,
+		      (struct sockaddr *) msg->msg_name,
+		      msg->msg_namelen);
+      else
+	{
+	  if (tot == -1)	// i.e. if not pre-calculated by the caller.
+	    {
+	      tot = 0;
+	      const struct iovec *iovptr = iov + iovcnt;
+	      do
+		{
+		  iovptr -= 1;
+		  tot += iovptr->iov_len;
+		}
+	      while (iovptr != iov);
+	    }
+
+	  char *const buf = (char *) alloca (tot);
+
+	  if (!buf)
+	    {
+	      set_errno (ENOMEM);
+	      res = -1;
+	    }
+	  else
+	    {
+	      char *bufptr = buf;
+	      const struct iovec *iovptr = iov;
+	      int nbytes = tot;
+
+	      while (nbytes != 0)
+		{
+		  const int frag = min (nbytes, (ssize_t) iovptr->iov_len);
+		  memcpy (bufptr, iovptr->iov_base, frag);
+		  bufptr += frag;
+		  iovptr += 1;
+		  nbytes -= frag;
+		}
+
+	      res = sendto (buf, tot, flags,
+			    (struct sockaddr *) msg->msg_name,
+			    msg->msg_namelen);
+	    }
+	}
+    }
+  else
+    {
+      WSABUF wsabuf[iovcnt];
+
       {
-        set_errno (ENOMEM);
-        return -1;
+	const struct iovec *iovptr = iov + iovcnt;
+	WSABUF *wsaptr = wsabuf + iovcnt;
+	do
+	  {
+	    iovptr -= 1;
+	    wsaptr -= 1;
+	    wsaptr->len = iovptr->iov_len;
+	    wsaptr->buf = (char *) iovptr->iov_base;
+	  }
+	while (wsaptr != wsabuf);
       }
-    p = buf;
-    for (int i = 0; i < msg->msg_iovlen; ++i)
-      {
-        memcpy (p, iov[i].iov_base, iov[i].iov_len);
-        p += iov[i].iov_len;
-      }
-    return sendto (buf, tot, flags, (struct sockaddr *) msg->msg_name,
-		   msg->msg_namelen);
+
+      DWORD ret;
+
+      if (is_nonblocking ())
+	res = WSASendTo (get_socket (), wsabuf, iovcnt, &ret, flags,
+			 (struct sockaddr *) msg->msg_name,
+			 msg->msg_namelen,
+			 NULL, NULL);
+      else
+	{
+	  wsock_event wsock_evt;
+	  res = WSASendTo (get_socket (), wsabuf, iovcnt, &ret, flags,
+			   (struct sockaddr *) msg->msg_name,
+			   msg->msg_namelen,
+			   wsock_evt.prepare (), NULL);
+
+	  if (res == SOCKET_ERROR && WSAGetLastError () == WSA_IO_PENDING)
+	    ret = res = wsock_evt.wait (get_socket (), (DWORD *) &flags);
+	}
+
+      if (res == SOCKET_ERROR)
+	{
+	  res = -1;
+	  set_winsock_errno ();
+	}
+      else
+	res = ret;
+    }
+
+  return res;
 }
 
 int
@@ -928,8 +1047,6 @@ int
 fhandler_socket::close ()
 {
   int res = 0;
-
-  sigframe thisframe (mainthread);
 
   /* HACK to allow a graceful shutdown even if shutdown() hasn't been
      called by the application. Note that this isn't the ultimate
@@ -973,8 +1090,6 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
   struct ifconf ifc, *ifcp;
   struct ifreq *ifr, *ifrp;
 
-  sigframe thisframe (mainthread);
-
   switch (cmd)
     {
     case SIOCGIFCONF:
@@ -986,7 +1101,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	}
       res = get_ifconf (ifcp, cmd);
       if (res)
-	debug_printf ("error in get_ifconf\n");
+	debug_printf ("error in get_ifconf");
       break;
     case SIOCGIFFLAGS:
       ifr = (struct ifreq *) p;
@@ -1016,7 +1131,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	ifr = (struct ifreq *) p;
 	if (ifr == 0)
 	  {
-	    debug_printf ("ifr == NULL\n");
+	    debug_printf ("ifr == NULL");
 	    set_errno (EINVAL);
 	    return -1;
 	  }
@@ -1024,16 +1139,16 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	res = get_ifconf (&ifc, cmd);
 	if (res)
 	  {
-	    debug_printf ("error in get_ifconf\n");
+	    debug_printf ("error in get_ifconf");
 	    break;
 	  }
 
-	debug_printf ("    name: %s\n", ifr->ifr_name);
+	debug_printf ("    name: %s", ifr->ifr_name);
 	for (ifrp = ifc.ifc_req;
 	     (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
 	     ++ifrp)
 	  {
-	    debug_printf ("testname: %s\n", ifrp->ifr_name);
+	    debug_printf ("testname: %s", ifrp->ifr_name);
 	    if (! strcmp (ifrp->ifr_name, ifr->ifr_name))
 	      {
 		switch (cmd)

@@ -1,6 +1,6 @@
 /* fhandler_serial.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -8,22 +8,24 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#include <fcntl.h>
+#include "winsup.h"
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include "winsup.h"
+#include "cygerrno.h"
+#include "security.h"
+#include "fhandler.h"
+#include "sigproc.h"
+#include "pinfo.h"
+#include <sys/termios.h>
+#include <ddk/ntddser.h>
 
 /**********************************************************************/
 /* fhandler_serial */
 
-fhandler_serial::fhandler_serial (const char *name, DWORD devtype, int unit) :
-	fhandler_base (devtype, name, unit)
+fhandler_serial::fhandler_serial (int unit)
+  : fhandler_base (FH_SERIAL, unit), vmin_ (0), vtime_ (0), pgrp_ (myself->pgid)
 {
-  set_cb (sizeof *this);
-  vmin_ = 0;
-  vtime_ = 0;
-  pgrp_ = myself->pgid;
   set_need_fork_fixup ();
 }
 
@@ -42,7 +44,7 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
   int tot;
   DWORD n;
   HANDLE w4[2];
-  DWORD minchars = vmin_ ?: ulen;
+  size_t minchars = vmin_ ?: ulen;
 
   w4[0] = io_status.hEvent;
   w4[1] = signal_arrived;
@@ -55,9 +57,8 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
       ResetEvent (io_status.hEvent);
     }
 
-  for (n = 0, tot = 0; ulen; ulen -= n, ptr = (char *)ptr + n)
+  for (n = 0, tot = 0; ulen; ulen -= n, ptr = (char *) ptr + n)
     {
-      DWORD ev;
       COMSTAT st;
       DWORD inq = 1;
 
@@ -72,15 +73,16 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
 			// if vmin > ulen then things won't work right.
 	  overlapped_armed = -1;
 	}
-      if (!overlapped_armed)
+
+      if (!ClearCommError (get_handle (), &ev, &st))
+	goto err;
+      else if (ev)
+	termios_printf ("error detected %x", ev);
+      else if (st.cbInQue)
+	inq = st.cbInQue;
+      else if (!overlapped_armed)
 	{
-	  if (!ClearCommError (get_handle (), &ev, &st))
-	    goto err;
-	  else if (ev)
-	    termios_printf ("error detected %x", ev);
-	  else if (st.cbInQue)
-	    inq = st.cbInQue;
-	  else if ((size_t)tot >= minchars)
+	  if ((size_t) tot >= minchars)
 	    break;
 	  else if (WaitCommEvent (get_handle (), &ev, &io_status))
 	    {
@@ -117,7 +119,7 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
       if (inq > ulen)
 	inq = ulen;
       debug_printf ("inq %d", inq);
-      if (ReadFile (get_handle(), ptr, min (inq, ulen), &n, &io_status))
+      if (ReadFile (get_handle (), ptr, min (inq, ulen), &n, &io_status))
 	/* Got something */;
       else if (GetLastError () != ERROR_IO_PENDING)
 	goto err;
@@ -153,15 +155,15 @@ int
 fhandler_serial::raw_write (const void *ptr, size_t len)
 {
   DWORD bytes_written;
+  OVERLAPPED write_status;
 
-  if (overlapped_armed)
-    PurgeComm (get_handle (), PURGE_TXABORT | PURGE_RXABORT);
-  ResetEvent (io_status.hEvent);
+  memset (&write_status, 0, sizeof (write_status));
+  write_status.hEvent = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+  ProtectHandle (write_status.hEvent);
 
   for (;;)
     {
-      overlapped_armed = TRUE;
-      if (WriteFile (get_handle(), ptr, len, &bytes_written, &io_status))
+      if (WriteFile (get_handle (), ptr, len, &bytes_written, &write_status))
 	break;
 
       switch (GetLastError ())
@@ -174,17 +176,19 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
 	    goto err;
 	}
 
-      if (!GetOverlappedResult (get_handle (), &io_status, &bytes_written, TRUE))
+      if (!GetOverlappedResult (get_handle (), &write_status, &bytes_written, TRUE))
 	goto err;
 
       break;
     }
 
-  overlapped_armed = FALSE;
+  ForceCloseHandle (write_status.hEvent);
+
   return bytes_written;
 
 err:
   __seterrno ();
+  ForceCloseHandle (write_status.hEvent);
   return -1;
 }
 
@@ -197,12 +201,11 @@ fhandler_serial::dump (void)
 void
 fhandler_serial::init (HANDLE f, DWORD flags, mode_t bin)
 {
-  fhandler_base::init (f, flags, bin);
-  (void) open (NULL, flags, bin ? O_BINARY : 0);
+  (void) open (NULL, flags, bin & (O_BINARY | O_TEXT));
 }
 
 int
-fhandler_serial::open (const char *name, int flags, mode_t mode)
+fhandler_serial::open (path_conv *, int flags, mode_t mode)
 {
   int res;
   COMMTIMEOUTS to;
@@ -211,10 +214,10 @@ fhandler_serial::open (const char *name, int flags, mode_t mode)
   syscall_printf ("fhandler_serial::open (%s, %p, %p)",
 			get_name (), flags, mode);
 
-  if (name && !(res = this->fhandler_base::open (flags, mode)))
+  if (!(res = this->fhandler_base::open (NULL, flags, mode)))
     return 0;
-  else
-    res = 1;
+
+  res = 1;
 
   (void) SetCommMask (get_handle (), EV_RXCHAR);
 
@@ -266,7 +269,25 @@ fhandler_serial::open (const char *name, int flags, mode_t mode)
 	system_printf ("couldn't set initial state for %s, %E", get_name ());
     }
 
+  /* setting rts and dtr to known state so that ioctl() function with
+  request TIOCMGET could return correct value of RTS and DTR lines.
+  Important only for Win 9x systems */
+
+  if (!wincap.supports_reading_modem_output_lines ())
+    {
+      if (EscapeCommFunction (get_handle (), SETDTR) == 0)
+	system_printf ("couldn't set initial state of DTR for %s, %E", get_name ());
+      if (EscapeCommFunction (get_handle (), SETRTS) == 0)
+	system_printf ("couldn't set initial state of RTS for %s, %E", get_name ());
+
+      /* even though one of above functions fail I have to set rts and dtr
+      variables to initial value. */
+      rts = TIOCM_RTS;
+      dtr = TIOCM_DTR;
+    }
+
   SetCommMask (get_handle (), EV_RXCHAR);
+  set_open_status ();
   syscall_printf ("%p = fhandler_serial::open (%s, %p, %p)",
 			res, get_name (), flags, mode);
   return res;
@@ -285,7 +306,7 @@ fhandler_serial::close ()
 int
 fhandler_serial::tcsendbreak (int duration)
 {
-  unsigned int sleeptime = 300;
+  unsigned int sleeptime = 300000;
 
   if (duration > 0)
     sleeptime *= duration;
@@ -355,6 +376,123 @@ fhandler_serial::tcflow (int action)
   return 0;
 }
 
+
+/* ioctl: */
+int
+fhandler_serial::ioctl (unsigned int cmd, void *buffer)
+{
+  int res = 0;
+
+# define ibuffer ((int) buffer)
+# define ipbuffer (*(int *) buffer)
+
+  DWORD ev;
+  COMSTAT st;
+  if (ClearCommError (get_handle (), &ev, &st))
+    {
+      __seterrno ();
+      res = -1;
+    }
+  else
+    switch (cmd)
+      {
+      case TCFLSH:
+	res = tcflush (ibuffer);
+	break;
+      case TIOCMGET:
+	DWORD modem_lines;
+	if (!GetCommModemStatus (get_handle (), &modem_lines))
+	  {
+	    __seterrno ();
+	    res = -1;
+	  }
+	else
+	  {
+	    ipbuffer = 0;
+	    if (modem_lines & MS_CTS_ON)
+	      ipbuffer |= TIOCM_CTS;
+	    if (modem_lines & MS_DSR_ON)
+	      ipbuffer |= TIOCM_DSR;
+	    if (modem_lines & MS_RING_ON)
+	      ipbuffer |= TIOCM_RI;
+	    if (modem_lines & MS_RLSD_ON)
+	      ipbuffer |= TIOCM_CD;
+
+	    DWORD cb;
+	    DWORD mcr;
+	    if (!DeviceIoControl (get_handle (), IOCTL_SERIAL_GET_DTRRTS,
+				  NULL, 0, &mcr, 4, &cb, 0) || cb != 4)
+	      ipbuffer |= rts | dtr;
+	    else
+	      {
+		if (mcr & 2)
+		  ipbuffer |= TIOCM_RTS;
+		if (mcr & 1)
+		  ipbuffer |= TIOCM_DTR;
+	      }
+	  }
+	break;
+      case TIOCMSET:
+	if (ipbuffer & TIOCM_RTS)
+	  {
+	    if (EscapeCommFunction (get_handle (), SETRTS))
+	      rts = TIOCM_RTS;
+	    else
+	      {
+		__seterrno ();
+		res = -1;
+	      }
+	  }
+	else
+	  {
+	    if (EscapeCommFunction (get_handle (), CLRRTS))
+	      rts = 0;
+	    else
+	      {
+		__seterrno ();
+		res = -1;
+	      }
+	  }
+	if (ipbuffer & TIOCM_DTR)
+	  {
+	    if (EscapeCommFunction (get_handle (), SETDTR))
+	      dtr = TIOCM_DTR;
+	    else
+	      {
+		__seterrno ();
+		res = -1;
+	      }
+	  }
+	else if (EscapeCommFunction (get_handle (), CLRDTR))
+	  dtr = 0;
+	else
+	  {
+	    __seterrno ();
+	    res = -1;
+	  }
+	break;
+     case TIOCINQ:
+       if (ev & CE_FRAME || ev & CE_IOE || ev & CE_OVERRUN || ev & CE_RXOVER
+	   || ev & CE_RXPARITY)
+	 {
+	   set_errno (EINVAL);	/* FIXME: Use correct errno */
+	   res = -1;
+	 }
+       else
+	 ipbuffer = st.cbInQue;
+       break;
+     default:
+       set_errno (ENOSYS);
+       res = -1;
+       break;
+     }
+
+  termios_printf ("%d = ioctl (%p, %p)", res, cmd, buffer);
+# undef ibuffer
+# undef ipbuffer
+  return res;
+}
+
 /* tcflush: POSIX 7.2.2.1 */
 int
 fhandler_serial::tcflush (int queue)
@@ -362,12 +500,11 @@ fhandler_serial::tcflush (int queue)
   if (queue == TCOFLUSH || queue == TCIOFLUSH)
     PurgeComm (get_handle (), PURGE_TXABORT | PURGE_TXCLEAR);
 
-  if (queue == TCIFLUSH | queue == TCIOFLUSH)
+  if (queue == TCIFLUSH || queue == TCIOFLUSH)
     /* Input flushing by polling until nothing turns up
        (we stop after 1000 chars anyway) */
     for (int max = 1000; max > 0; max--)
       {
-	DWORD ev;
 	COMSTAT st;
 	if (!PurgeComm (get_handle (), PURGE_RXABORT | PURGE_RXCLEAR))
 	  break;
@@ -393,6 +530,8 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
   COMMTIMEOUTS to;
   DCB ostate, state;
   unsigned int ovtime = vtime_, ovmin = vmin_;
+  int tmpDtr, tmpRts;
+  tmpDtr = tmpRts = 0;
 
   termios_printf ("action %d", action);
   if ((action == TCSADRAIN) || (action == TCSAFLUSH))
@@ -498,7 +637,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
     state.Parity = NOPARITY;
 
   state.fBinary = TRUE;     /* Binary transfer */
-  state.EofChar = 0;        /* No end-of-data in binary mode */
+  state.EofChar = 0;	    /* No end-of-data in binary mode */
   state.fNull = FALSE;      /* Don't discard nulls in binary mode */
 
   /* -------------- Parity errors ------------------ */
@@ -558,6 +697,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
     {							/* disable */
       state.fRtsControl = RTS_CONTROL_ENABLE;
       state.fOutxCtsFlow = FALSE;
+      tmpRts = TIOCM_RTS;
     }
 
   if (t->c_cflag & CRTSXOFF)
@@ -590,7 +730,10 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
   set_w_binary ((t->c_oflag & ONLCR) ? 0 : 1);
 
   if (dropDTR == TRUE)
-    EscapeCommFunction (get_handle (), CLRDTR);
+    {
+      EscapeCommFunction (get_handle (), CLRDTR);
+      tmpDtr = 0;
+    }
   else
     {
       /* FIXME: Sometimes when CLRDTR is set, setting
@@ -599,7 +742,11 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       parameters while DTR is still down. */
 
       EscapeCommFunction (get_handle (), SETDTR);
+      tmpDtr = TIOCM_DTR;
     }
+
+  rts = tmpRts;
+  dtr = tmpDtr;
 
   /*
   The following documentation on was taken from "Linux Serial Programming
@@ -634,7 +781,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
 
   if (t->c_lflag & ICANON)
     {
-      vmin_ = MAXDWORD;
+      vmin_ = 0;
       vtime_ = 0;
     }
   else
@@ -643,7 +790,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       vmin_ = t->c_cc[VMIN];
     }
 
-  debug_printf ("vtime %d, vmin %d\n", vtime_, vmin_);
+  debug_printf ("vtime %d, vmin %d", vtime_, vmin_);
 
   if (ovmin == vmin_ && ovtime == vtime_)
     return 0;
@@ -839,7 +986,7 @@ fhandler_serial::tcgetattr (struct termios *t)
     t->c_oflag |= ONLCR;
 
   debug_printf ("vmin_ %d, vtime_ %d", vmin_, vtime_);
-  if (vmin_ == MAXDWORD)
+  if (vmin_ == 0)
     {
       t->c_lflag |= ICANON;
       t->c_cc[VTIME] = t->c_cc[VMIN] = 0;
@@ -862,14 +1009,12 @@ fhandler_serial::fixup_after_fork (HANDLE parent)
   debug_printf ("io_status.hEvent %p", io_status.hEvent);
 }
 
-int
-fhandler_serial::de_linearize (const char *buf, const char *unix_name,
-			       const char *win32_name)
+void
+fhandler_serial::fixup_after_exec (HANDLE)
 {
-  int res = fhandler_base::de_linearize (buf, unix_name, win32_name);
   overlapped_setup ();
   debug_printf ("io_status.hEvent %p", io_status.hEvent);
-  return res;
+  return;
 }
 
 int

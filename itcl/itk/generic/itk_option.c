@@ -16,7 +16,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id: itk_option.c,v 1.2.172.1 2001/05/18 02:21:45 mdejong Exp $
+ *     RCS:  $Id: itk_option.c,v 1.1 1998/07/27 18:45:25 stanton Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------

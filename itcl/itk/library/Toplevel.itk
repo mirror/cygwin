@@ -24,7 +24,7 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id: Toplevel.itk,v 1.2.172.1 2001/05/18 02:21:45 mdejong Exp $
+#      RCS:  $Id: Toplevel.itk,v 1.1 1998/07/27 18:45:27 stanton Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
@@ -62,12 +62,6 @@ itcl::class itk::Toplevel {
                 bindtags $itk_hull [lreplace $tags $i $i]
             }
             destroy $itk_hull
-        }
-        itk_component delete hull
-
-        # Any remaining components must be outside the hull
-        foreach component [component] {
-            destroy [component $component]
         }
     }
 

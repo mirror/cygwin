@@ -6,7 +6,7 @@
 #   AUTHOR:  Michael J. McLennan       Phone: (610)712-2842
 #            AT&T Bell Laboratories   E-mail: michael.mclennan@att.com
 #
-#      RCS:  $Id: SmartToaster.tcl,v 1.2.172.1 2001/05/18 02:21:44 mdejong Exp $
+#      RCS:  $Id: SmartToaster.tcl,v 1.1 1998/07/27 18:41:31 stanton Exp $
 # ----------------------------------------------------------------------
 #               Copyright (c) 1993  AT&T Bell Laboratories
 # ======================================================================

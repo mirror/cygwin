@@ -6,7 +6,7 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id: widget.test,v 1.2.172.1 2001/05/18 02:21:46 mdejong Exp $
+#      RCS:  $Id: widget.test,v 1.4 2000/07/06 06:43:33 mmc Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
@@ -264,42 +264,6 @@ test widget-1.26 {when an internal component is deleted (but not destroyed) it i
          [bind itk-destroy-$comp <Destroy>] \
          [.testWidget configure]
 } {{itk-destroy-.testWidget.t2 .testWidget.t2 Button . all} {namespace inscope ::itk::Archetype {::.testWidget itk_component delete test2}} 0 {.testWidget.t2 Button . all} {} {{-background background Background linen linen} {-clientdata clientData ClientData {} {}} {-cursor cursor Cursor {} {}} {-status status Status {} {}}}}
-
-test widget-1.27 {when a mega-widget object is deleted, its window and any
-        components are destroyed (even if in another window) } {
-    itcl::class ButtonWidget {
-        inherit itk::Widget
-
-        constructor {args} {
-            eval itk_initialize $args
-
-           itk_component add button {
-                button $itk_option(-container).b -text Button
-           } {}
-            pack $itk_component(button)
-        }
-
-        itk_option define -container container Container {}
-    }
-
-    toplevel .t1
-    frame .t1.f
-    ButtonWidget .t1.bw -container .t1.f
-
-    pack .t1.f
-    pack .t1.bw
-
-    set button [.t1.bw component button]
-
-    itcl::delete object .t1.bw
-
-    set result [list $button [winfo exists $button]]
-
-    itcl::delete class ButtonWidget
-
-    set result
-} {.t1.f.b 0}
-
 
 # ----------------------------------------------------------------------
 #  Clean up

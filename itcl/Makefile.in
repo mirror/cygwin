@@ -33,7 +33,7 @@ all:
 	done;
 
 test check:
-	for dir in itcl itk iwidgets3.0.0 ; do \
+	for dir in itcl itk iwidgets ; do \
 		if test -d $$dir ; then \
 		    echo "$$dir: $(MAKE) $@" ;\
 		    if (cd $$dir; $(MAKE) $@) ; then true ; else exit 1 ; fi ; \

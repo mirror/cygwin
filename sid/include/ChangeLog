@@ -1,3 +1,15 @@
+2001-03-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidconfig.h (LIKELY, UNLIKELY): New conditional cover macros
+	for gcc's __builtin_expect branch probability hinting function.
+	* sidbusutil.h (passthrough_bus, mux_password_bus, harvard_bus):
+	Add some branch probability hints.
+	* sidcpuutil.h (step_pin_handler, stop_after_insns_p,
+	{read,write}_{insn,data}_memory): Ditto.
+	* sidpinutil.h (callback_pin::driven): Remove unnecessary assert
+	from critical path.
+	(callback_pin ctor, set_callback): Put them here instead.
+
 2001-01-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* sidbusutil.h (mux_passthrough_bus): New bus allowing one

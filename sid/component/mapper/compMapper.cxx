@@ -138,11 +138,12 @@ public:
       const host_int_4 slave_offset = r->offset;
 
       // Signal error if master access does not include all of slave bus
-      if ((master_offset > slave_offset) || (master_offset+master_size < slave_offset+slave_size))
+      if (UNLIKELY((master_offset > slave_offset) || 
+	 	   (master_offset+master_size < slave_offset+slave_size)))
 	return bus::misaligned;
 
       // Signal error if master access spans stride boundary.
-      if (master_size+master_offset > r->stride)
+      if (UNLIKELY(master_size+master_offset > r->stride))
 	return bus::misaligned;
 
       // Copy data bytes for slave
@@ -167,11 +168,12 @@ public:
       const host_int_4 slave_offset = r->offset;
 
       // Signal error if master access does not include all of slave bus
-      if ((master_offset > slave_offset) || (master_offset+master_size < slave_offset+slave_size))
+      if (UNLIKELY((master_offset > slave_offset) || 
+		   (master_offset+master_size < slave_offset+slave_size)))
 	return bus::misaligned;
 
       // Signal error if master access spans stride boundary.
-      if (master_size+master_offset > r->stride)
+      if (UNLIKELY(master_size+master_offset > r->stride))
 	return bus::misaligned;
 
       DataSlave ds;
@@ -193,10 +195,10 @@ public:
   write_any (host_int_4 address, Data data) throw ()
     {
       const mapping_record* r = this->locate (address);
-      if (r)
+      if (LIKELY (r))
 	{
 	  // bypass stride/offset calculations?
-	  if (! r->use_strideoffset_p)
+	  if (LIKELY(! r->use_strideoffset_p))
 	    {
 	      host_int_4 mapped_address = address - r->low;
 	      return r->accessor->write (mapped_address, data);
@@ -237,10 +239,10 @@ public:
   read_any (host_int_4 address, Data& data) throw ()
     {
       const mapping_record* r = this->locate (address);
-      if (r)
+      if (LIKELY (r))
 	{
 	  // bypass stride/offset calculations?
-	  if (! r->use_strideoffset_p)
+	  if (LIKELY(! r->use_strideoffset_p))
 	    {
 	      host_int_4 mapped_address = address - r->low;
 	      return r->accessor->read (mapped_address, data);
@@ -595,7 +597,7 @@ generic_mapper_bus::locate (host_int_4 address) const
 
   // check last-used entry first 
   mapping_record* cache = this->tlb; // one-entry tlb
-  if (cache && address <= cache->high && address >= cache->low)
+  if (LIKELY(cache && address <= cache->high && address >= cache->low))
     {
       this->target->cache_hit_count ++;
       cache->hit_count ++;
@@ -617,11 +619,11 @@ generic_mapper_bus::locate (host_int_4 address) const
       // cout << " [found: " << found.first << "-" << found.last << "]" << endl;
 
       // Incoming address is smaller than the first map entry?
-      if (address < found->low)
+      if (UNLIKELY(address < found->low))
 	break;
 
       // Incoming address is within this map entry?
-      if (address <= found->high)
+      if (LIKELY(address <= found->high))
 	{
 	  found->hit_count ++;
 	  this->tlb = found;

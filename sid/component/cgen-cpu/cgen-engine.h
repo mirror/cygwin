@@ -220,7 +220,7 @@ public:
   void
   set_pbb_engine ()
     {
-      if (! index_init_p)
+      if (UNLIKELY(! index_init_p))
 	{
 	  // Look up virtual insns indices so we only do the lookup once.
 	  // ??? Initialized here until pbb support finished.
@@ -313,11 +313,11 @@ private:
   chain (cpu_class* cpu, scache_record*& next, PCADDR npc)
     {
       // Goto next block if we're already chained to it.
-      if (next)
+      if (LIKELY(next))
 	return next;
       // Try to find next block.
       next = pbb_find (npc);
-      if (next)
+      if (LIKELY(next))
 	return next;
       // Have to compile next block.
       return & this->begin_insn;
@@ -333,7 +333,7 @@ public:
   get_next_vpc (PCADDR pc)
     {
       scache_record* vpc = this->next_vpc;
-      if (vpc->addr == pc)
+      if (LIKELY(vpc->addr == pc))
 	return vpc;
       return & this->begin_insn;
     }
@@ -354,7 +354,7 @@ public:
       hash_table_t* hte = & hash_table[pbb_hash (pc)];
 
       for (unsigned i = 0; i < max_tries; ++i, ++hte)
-	if (hte->addr == pc)
+	if (LIKELY(hte->addr == pc))
 	  return hte->abuf;
       return 0;
     }
@@ -369,7 +369,7 @@ public:
       unsigned i = 0;
       for (hash_table_t* p = hte; i < max_tries; ++i, ++p)
 	{
-	  if (p->addr == pc)
+	  if (LIKELY(p->addr == pc))
 	    {
 	      found = true;
 	      return p->abuf;
@@ -388,7 +388,7 @@ public:
       size_t remaining = cache_size - (next_free - cache);
 
       // Cache full?
-      if (remaining < n)
+      if (UNLIKELY(remaining < n))
 	{
 	  flush ();
 	  hte->addr = pc;
@@ -397,7 +397,7 @@ public:
 	  return hte->abuf;
 	}
       // Hash table full?
-      else if (i == max_tries)
+      else if (UNLIKELY(i == max_tries))
 	{
 	  static unsigned last_tossed = 0;
 
@@ -523,7 +523,7 @@ public:
   /*inline*/ void
   pbb_before (cpu_class* cpu, scache_record* abuf)
     {
-      if (cpu->trace_result_p)
+      if (UNLIKELY(cpu->trace_result_p))
 	{
 	  last_traced_pc_pbb = abuf->addr;
 	  cpu->trace_stream
@@ -535,7 +535,7 @@ public:
   /*inline*/ void
   pbb_after (cpu_class* cpu, scache_record* abuf)
     {
-      if (cpu->trace_result_p)
+      if (UNLIKELY(cpu->trace_result_p))
 	{
 	  cpu->trace_stream << endl;
 
@@ -544,8 +544,8 @@ public:
 	  // for example.  By emitting an "extra" trace entry here, the difference
 	  // between scache and pbb traces should disappear.
 
-	  if ((last_traced_pc_pbb != UNUSED_ADDR) && 
-	      (last_traced_pc_pbb != abuf->addr))
+	  if (UNLIKELY((last_traced_pc_pbb != UNUSED_ADDR) && 
+		       (last_traced_pc_pbb != abuf->addr)))
 	    {
 	      cpu->trace_stream
 		<< "0x" << hex << abuf->addr << dec

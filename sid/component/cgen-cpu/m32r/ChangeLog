@@ -1,3 +1,7 @@
+2001-03-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* m32r-decode.cxx, -sem.cxx: Regenerated with b.p. hints.
+
 2001-01-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* m32r-decode.h, -sem.cxx: Regenerated with more tracing improvements.

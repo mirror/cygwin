@@ -506,7 +506,7 @@ m32rbf_extract_sfmt_empty (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR 
 
 
   /* Record the fields for the semantic handler.  */
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_empty)\t"
@@ -531,7 +531,7 @@ m32rbf_extract_sfmt_add (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
   FLD (f_r2) = f_r2;
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_add)\t"
@@ -561,7 +561,7 @@ m32rbf_extract_sfmt_add3 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r1) = f_r1;
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_add3)\t"
@@ -592,7 +592,7 @@ m32rbf_extract_sfmt_and3 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r1) = f_r1;
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_and3)\t"
@@ -623,7 +623,7 @@ m32rbf_extract_sfmt_or3 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
   FLD (f_r1) = f_r1;
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_or3)\t"
@@ -650,7 +650,7 @@ m32rbf_extract_sfmt_addi (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r1) = f_r1;
   FLD (f_simm8) = f_simm8;
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_addi)\t"
@@ -677,7 +677,7 @@ m32rbf_extract_sfmt_addv (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r2) = f_r2;
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_addv)\t"
@@ -707,7 +707,7 @@ m32rbf_extract_sfmt_addv3 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR 
   FLD (f_r1) = f_r1;
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_addv3)\t"
@@ -735,7 +735,7 @@ m32rbf_extract_sfmt_addx (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r2) = f_r2;
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_addx)\t"
@@ -757,7 +757,7 @@ m32rbf_extract_sfmt_bc8 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp8) = f_disp8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bc8)\t"
@@ -777,7 +777,7 @@ m32rbf_extract_sfmt_bc24 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp24) = f_disp24;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bc24)\t"
@@ -805,7 +805,7 @@ m32rbf_extract_sfmt_beq (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
   FLD (i_disp16) = f_disp16;
   FLD (i_src1) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_beq)\t"
@@ -831,7 +831,7 @@ m32rbf_extract_sfmt_beqz (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r2) = f_r2;
   FLD (i_disp16) = f_disp16;
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_beqz)\t"
@@ -852,7 +852,7 @@ m32rbf_extract_sfmt_bl8 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp8) = f_disp8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bl8)\t"
@@ -872,7 +872,7 @@ m32rbf_extract_sfmt_bl24 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp24) = f_disp24;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bl24)\t"
@@ -892,7 +892,7 @@ m32rbf_extract_sfmt_bra8 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp8) = f_disp8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bra8)\t"
@@ -912,7 +912,7 @@ m32rbf_extract_sfmt_bra24 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR 
 
   /* Record the fields for the semantic handler.  */
   FLD (i_disp24) = f_disp24;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bra24)\t"
@@ -937,7 +937,7 @@ m32rbf_extract_sfmt_cmp (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
   FLD (f_r2) = f_r2;
   FLD (i_src1) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_cmp)\t"
@@ -963,7 +963,7 @@ m32rbf_extract_sfmt_cmpi (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_simm16) = f_simm16;
   FLD (f_r2) = f_r2;
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_cmpi)\t"
@@ -990,7 +990,7 @@ m32rbf_extract_sfmt_div (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
   FLD (f_r2) = f_r2;
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_div)\t"
@@ -1013,7 +1013,7 @@ m32rbf_extract_sfmt_jl (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc,
   /* Record the fields for the semantic handler.  */
   FLD (f_r2) = f_r2;
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_jl)\t"
@@ -1035,7 +1035,7 @@ m32rbf_extract_sfmt_jmp (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
   /* Record the fields for the semantic handler.  */
   FLD (f_r2) = f_r2;
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_jmp)\t"
@@ -1061,7 +1061,7 @@ m32rbf_extract_sfmt_ld (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc,
   FLD (f_r1) = f_r1;
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ld)\t"
@@ -1091,7 +1091,7 @@ m32rbf_extract_sfmt_ld_d (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r1) = f_r1;
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ld_d)\t"
@@ -1119,7 +1119,7 @@ m32rbf_extract_sfmt_ld_plus (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADD
   FLD (f_r1) = f_r1;
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ld_plus)\t"
@@ -1145,7 +1145,7 @@ m32rbf_extract_sfmt_ld24 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r1) = f_r1;
   FLD (i_uimm24) = f_uimm24;
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ld24)\t"
@@ -1170,7 +1170,7 @@ m32rbf_extract_sfmt_ldi8 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_simm8) = f_simm8;
   FLD (f_r1) = f_r1;
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ldi8)\t"
@@ -1196,7 +1196,7 @@ m32rbf_extract_sfmt_ldi16 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR 
   FLD (f_simm16) = f_simm16;
   FLD (f_r1) = f_r1;
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ldi16)\t"
@@ -1223,7 +1223,7 @@ m32rbf_extract_sfmt_lock (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r1) = f_r1;
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_lock)\t"
@@ -1250,7 +1250,7 @@ m32rbf_extract_sfmt_machi (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR 
   FLD (f_r2) = f_r2;
   FLD (i_src1) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_machi)\t"
@@ -1277,7 +1277,7 @@ m32rbf_extract_sfmt_mulhi (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR 
   FLD (f_r2) = f_r2;
   FLD (i_src1) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_mulhi)\t"
@@ -1304,7 +1304,7 @@ m32rbf_extract_sfmt_mv (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc,
   FLD (f_r1) = f_r1;
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_mv)\t"
@@ -1327,7 +1327,7 @@ m32rbf_extract_sfmt_mvfachi (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADD
   /* Record the fields for the semantic handler.  */
   FLD (f_r1) = f_r1;
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_mvfachi)\t"
@@ -1352,7 +1352,7 @@ m32rbf_extract_sfmt_mvfc (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r2) = f_r2;
   FLD (f_r1) = f_r1;
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_mvfc)\t"
@@ -1375,7 +1375,7 @@ m32rbf_extract_sfmt_mvtachi (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADD
   /* Record the fields for the semantic handler.  */
   FLD (f_r1) = f_r1;
   FLD (i_src1) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_mvtachi)\t"
@@ -1400,7 +1400,7 @@ m32rbf_extract_sfmt_mvtc (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r2) = f_r2;
   FLD (f_r1) = f_r1;
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_mvtc)\t"
@@ -1419,7 +1419,7 @@ m32rbf_extract_sfmt_nop (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
 
 
   /* Record the fields for the semantic handler.  */
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_nop)\t"
@@ -1436,7 +1436,7 @@ m32rbf_extract_sfmt_rac (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
 
 
   /* Record the fields for the semantic handler.  */
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_rac)\t"
@@ -1453,7 +1453,7 @@ m32rbf_extract_sfmt_rte (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
 
 
   /* Record the fields for the semantic handler.  */
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_rte)\t"
@@ -1477,7 +1477,7 @@ m32rbf_extract_sfmt_seth (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_hi16) = f_hi16;
   FLD (f_r1) = f_r1;
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_seth)\t"
@@ -1507,7 +1507,7 @@ m32rbf_extract_sfmt_sll3 (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r1) = f_r1;
   FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_sll3)\t"
@@ -1534,7 +1534,7 @@ m32rbf_extract_sfmt_slli (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r1) = f_r1;
   FLD (f_uimm5) = f_uimm5;
   FLD (i_dr) = & current_cpu->hardware.h_gr[f_r1];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_slli)\t"
@@ -1561,7 +1561,7 @@ m32rbf_extract_sfmt_st (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc,
   FLD (f_r2) = f_r2;
   FLD (i_src1) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_st)\t"
@@ -1591,7 +1591,7 @@ m32rbf_extract_sfmt_st_d (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
   FLD (f_r2) = f_r2;
   FLD (i_src1) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_st_d)\t"
@@ -1619,7 +1619,7 @@ m32rbf_extract_sfmt_stb (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
   FLD (f_r2) = f_r2;
   FLD (i_src1) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_stb)\t"
@@ -1649,7 +1649,7 @@ m32rbf_extract_sfmt_stb_d (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR 
   FLD (f_r2) = f_r2;
   FLD (i_src1) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_stb_d)\t"
@@ -1677,7 +1677,7 @@ m32rbf_extract_sfmt_sth (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
   FLD (f_r2) = f_r2;
   FLD (i_src1) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_sth)\t"
@@ -1707,7 +1707,7 @@ m32rbf_extract_sfmt_sth_d (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR 
   FLD (f_r2) = f_r2;
   FLD (i_src1) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_sth_d)\t"
@@ -1735,7 +1735,7 @@ m32rbf_extract_sfmt_st_plus (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADD
   FLD (f_r2) = f_r2;
   FLD (i_src1) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_st_plus)\t"
@@ -1757,7 +1757,7 @@ m32rbf_extract_sfmt_trap (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR p
 
   /* Record the fields for the semantic handler.  */
   FLD (f_uimm4) = f_uimm4;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_trap)\t"
@@ -1783,7 +1783,7 @@ m32rbf_extract_sfmt_unlock (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR
   FLD (f_r2) = f_r2;
   FLD (i_src1) = & current_cpu->hardware.h_gr[f_r1];
   FLD (i_src2) = & current_cpu->hardware.h_gr[f_r2];
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_unlock)\t"

@@ -1,3 +1,7 @@
+2001-03-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compConfig.cxx (run): Add branch probability hints.
+
 2001-01-13  matthew green  <mrg@redhat.com>
 
 	* compConfig.cxx (disconnect_bus): Fix typo in error message.

@@ -224,11 +224,11 @@ namespace sidutil
     // calls simpler.
 #define SID_GB_WRITE(dtype) \
       sid::bus::status write(sid::host_int_4 addr, dtype data) throw ()\
-	  { if (*target) return (*target)->write(addr, data); else return sid::bus::unpermitted; }
+	  { if (LIKELY(*target)) return (*target)->write(addr, data); else return sid::bus::unpermitted; }
 
 #define SID_GB_READ(dtype) \
       sid::bus::status read(sid::host_int_4 addr, dtype& data) throw ()\
-	  { if (*target) return (*target)->read(addr, data); else return sid::bus::unpermitted; }
+	  { if (LIKELY(*target)) return (*target)->read(addr, data); else return sid::bus::unpermitted; }
 
     SID_GB_WRITE(sid::little_int_1)
     SID_GB_WRITE(sid::big_int_1)
@@ -274,11 +274,11 @@ namespace sidutil
     // calls simpler.
 #define SID_GB_WRITE(dtype) \
       sid::bus::status write(sid::host_int_4 addr, dtype data) throw ()\
-	  { if (*target) return (*target)->write(addr, data); else return sid::bus::unpermitted; }
+	  { if (LIKELY(*target)) return (*target)->write(addr, data); else return sid::bus::unpermitted; }
 
 #define SID_GB_READ(dtype) \
       sid::bus::status read(sid::host_int_4 addr, dtype& data) throw ()\
-	  { if (*target) return (*target)->read(addr, data); else return sid::bus::unpermitted; }
+	  { if (LIKELY(*target)) return (*target)->read(addr, data); else return sid::bus::unpermitted; }
 
     SID_GB_WRITE(sid::little_int_1)
     SID_GB_WRITE(sid::big_int_1)
@@ -427,7 +427,7 @@ namespace sidutil
 #define SID_GB_WRITE(type1) \
       sid::bus::status write(sid::host_int_4 addr, type1 data) throw () \
 	  { sid::bus *bus = this->map_addr_to_bus (&addr); \
-            if (bus == NULL) \
+            if (UNLIKELY(bus == NULL)) \
               return sid::bus::unmapped; \
             else \
               return bus->write(addr, data); }
@@ -435,7 +435,7 @@ namespace sidutil
 #define SID_GB_READ(type1) \
       sid::bus::status read(sid::host_int_4 addr, type1& data) throw () \
 	  { sid::bus *bus = this->map_addr_to_bus (&addr); \
-            if (bus == NULL) \
+            if (UNLIKELY(bus == NULL)) \
               return sid::bus::unmapped; \
             else \
               return bus->read(addr, data); }

@@ -488,7 +488,11 @@ namespace sidutil
     
   public:
     callback_pin (Receiver* r, void (Receiver::*m) (sid::host_int_4)):
-      receiver (r), pmf (m) {}
+      receiver (r), pmf (m) 
+      {
+	assert (this->receiver != 0);
+	assert (this->pmf != 0);
+      }
     
     // Call configured pointer-to-member-function.
     void
@@ -496,10 +500,6 @@ namespace sidutil
       throw ()
       { 
 	input_pin::driven (v);
-
-	assert (receiver != 0);
-	assert (pmf != 0);
-
 	(receiver->*pmf) (v); 
       }
     
@@ -507,6 +507,7 @@ namespace sidutil
     void set_callback (void (Receiver::*m1) (sid::host_int_4))
       {
 	this->pmf = m1;
+	assert (this->pmf != 0);
       }
   };
   

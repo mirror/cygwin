@@ -1,3 +1,8 @@
+2001-01-10  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcpuutil.h (basic_cpu): Inherit from fixed_relation_map_component.
+	Define a operator new/delete pair to poison new memory.
+
 2000-11-27  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidattrutil.h (attribute_coder_alias): New coder for attribute

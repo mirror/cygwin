@@ -1,3 +1,9 @@
+2001-08-22  Ben Elliston  <bje@redhat.com>
+
+	* sidbusutil.h (class fixed_control_register): Add a new
+	convenience constructor which creates a register which is
+	readable, writable and initialised to 0.
+
 2001-08-03  matthew green  <mrg@redhat.com>
 
 	* sidbusutil.h (~control_register_bank): Add missing prototype.

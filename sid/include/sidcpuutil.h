@@ -361,6 +361,14 @@ namespace sidutil
       {
 	this->triggerpoint_manager.add_watchable_value ("gdb-register-pc", pc);
 	this->add_attribute_ro_value ("gdb-num-registers", count, "debugger");
+
+	// The "expedited" register list string is the list of
+	// register numbers that should be sent to gdb immediately
+	// every time sid stops, rather than let gdb ask for it
+	// subsequently.  Usually, the PC, frame and stack pointer,
+	// and status register should be included in the list.  It
+	// makes gdb step operations much faster.
+
 	this->add_attribute_ro_value ("gdb-exp-registers", expedited_regno_list, "debugger");
 	for (sid::host_int_4 i=0; i<count; i++)
 	  {

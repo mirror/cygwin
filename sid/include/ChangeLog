@@ -1,3 +1,8 @@
+2001-05-24  Ben Elliston  <bje@redhat.com>
+
+	* sidcpuutil.h (basic_cpu::create_gdb_register_attrs): Document
+	the meaning of the expedited_regno_list argument.
+
 2001-04-14  Harri Porten  <porten@kde.org>
 
 	* sidmiscutil.h (sidutil): added std:: prefixes for C++ ISO compliance.

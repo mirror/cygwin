@@ -1,21 +1,22 @@
 /* Target-specific definition for the Mitsubishi D30V
    Copyright (C) 1997 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #ifndef TM_D30V_H
 #define TM_D30V_H
@@ -33,22 +34,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* and instruction memory to. */
 
 #define DMEM_START	0x20000000
-#define IMEM_START	0x00000000 /* was 0x10000000 */
+#define IMEM_START	0x00000000	/* was 0x10000000 */
 #define STACK_START	0x20007ffe
 
-#ifdef __STDC__		/* Forward decls for prototypes */
+/* Forward decls for prototypes */
 struct frame_info;
-struct frame_saved_regs; 
+struct frame_saved_regs;
 struct type;
 struct value;
-#endif
 
 /* Advance PC across any function entry prologue instructions
    to reach some "real" code.  */
 
-extern CORE_ADDR d30v_skip_prologue ();
-#define SKIP_PROLOGUE(ip) \
-    {(ip) = d30v_skip_prologue(ip);}
+extern CORE_ADDR d30v_skip_prologue (CORE_ADDR);
+#define SKIP_PROLOGUE(ip) (d30v_skip_prologue (ip))
 
 
 /* Stack grows downward.  */
@@ -94,9 +93,9 @@ extern CORE_ADDR d30v_skip_prologue ();
 #define SPU_REGNUM	65	/* User stack pointer */
 #define CREGS_START	66
 
-#define PSW_REGNUM 	(CREGS_START + 0) /* psw, bpsw, or dpsw??? */
+#define PSW_REGNUM 	(CREGS_START + 0)	/* psw, bpsw, or dpsw??? */
 #define     PSW_SM (((unsigned long)0x80000000) >> 0)	/* Stack mode: 0/SPI */
-							/*	       1/SPU */
+							/*             1/SPU */
 #define     PSW_EA (((unsigned long)0x80000000) >> 2)	/* Execution status */
 #define     PSW_DB (((unsigned long)0x80000000) >> 3)	/* Debug mode */
 #define     PSW_DS (((unsigned long)0x80000000) >> 4)	/* Debug EIT status */
@@ -112,25 +111,25 @@ extern CORE_ADDR d30v_skip_prologue ();
 #define     PSW_VA (((unsigned long)0x80000000) >> 29)	/* Accum. overflow */
 #define     PSW_C  (((unsigned long)0x80000000) >> 31)	/* Carry/Borrow flag */
 
-#define BPSW_REGNUM	(CREGS_START + 1) /* Backup PSW (on interrupt) */
-#define PC_REGNUM 	(CREGS_START + 2) /* pc, bpc, or dpc??? */
-#define BPC_REGNUM 	(CREGS_START + 3) /* Backup PC (on interrupt) */
-#define DPSW_REGNUM	(CREGS_START + 4) /* Backup PSW (on debug trap) */
-#define DPC_REGNUM 	(CREGS_START + 5) /* Backup PC (on debug trap) */
-#define RPT_C_REGNUM	(CREGS_START + 7) /* Loop count */
-#define RPT_S_REGNUM	(CREGS_START + 8) /* Loop start address*/
-#define RPT_E_REGNUM	(CREGS_START + 9) /* Loop end address */
+#define BPSW_REGNUM	(CREGS_START + 1)	/* Backup PSW (on interrupt) */
+#define PC_REGNUM 	(CREGS_START + 2)	/* pc, bpc, or dpc??? */
+#define BPC_REGNUM 	(CREGS_START + 3)	/* Backup PC (on interrupt) */
+#define DPSW_REGNUM	(CREGS_START + 4)	/* Backup PSW (on debug trap) */
+#define DPC_REGNUM 	(CREGS_START + 5)	/* Backup PC (on debug trap) */
+#define RPT_C_REGNUM	(CREGS_START + 7)	/* Loop count */
+#define RPT_S_REGNUM	(CREGS_START + 8)	/* Loop start address */
+#define RPT_E_REGNUM	(CREGS_START + 9)	/* Loop end address */
 #define MOD_S_REGNUM	(CREGS_START + 10)
 #define MOD_E_REGNUM	(CREGS_START + 11)
-#define IBA_REGNUM	(CREGS_START + 14) /* Instruction break address */
-#define EIT_VB_REGNUM	(CREGS_START + 15) /* Vector base address */
-#define INT_S_REGNUM	(CREGS_START + 16) /* Interrupt status */
-#define INT_M_REGNUM	(CREGS_START + 17) /* Interrupt mask */
+#define IBA_REGNUM	(CREGS_START + 14)	/* Instruction break address */
+#define EIT_VB_REGNUM	(CREGS_START + 15)	/* Vector base address */
+#define INT_S_REGNUM	(CREGS_START + 16)	/* Interrupt status */
+#define INT_M_REGNUM	(CREGS_START + 17)	/* Interrupt mask */
 #define A0_REGNUM 	84
 #define A1_REGNUM 	85
 
 /* Say how much memory is needed to store a copy of the register set */
-#define REGISTER_BYTES    ((NUM_REGS - 2) * 4 + 2 * 8) 
+#define REGISTER_BYTES    ((NUM_REGS - 2) * 4 + 2 * 8)
 
 /* Index within `registers' of the first byte of the space for
    register N.  */
@@ -144,7 +143,7 @@ extern CORE_ADDR d30v_skip_prologue ();
 #define REGISTER_RAW_SIZE(N) ( ((N) >= A0_REGNUM) ? 8 : 4 )
 
 /* Number of bytes of storage in the program's representation
-   for register N.  */   
+   for register N.  */
 #define REGISTER_VIRTUAL_SIZE(N) REGISTER_RAW_SIZE(N)
 
 /* Largest value REGISTER_RAW_SIZE can have.  */
@@ -166,7 +165,7 @@ extern CORE_ADDR d30v_skip_prologue ();
 
 #define CANNOT_STORE_REGISTER(regno) ((regno) == R0_REGNUM)
 
-void d30v_do_registers_info PARAMS ((int regnum, int fpregs));
+void d30v_do_registers_info (int regnum, int fpregs);
 
 #define DO_REGISTERS_INFO d30v_do_registers_info
 
@@ -205,24 +204,26 @@ void d30v_do_registers_info PARAMS ((int regnum, int fpregs));
     int size;
 
 #define INIT_EXTRA_FRAME_INFO(fromleaf, fi) \
-    d30v_init_extra_frame_info(fromleaf, fi) 
+    d30v_init_extra_frame_info(fromleaf, fi)
 
-extern void d30v_init_extra_frame_info PARAMS (( int fromleaf, struct frame_info *fi ));
+extern void d30v_init_extra_frame_info (int fromleaf, struct frame_info *fi);
 
 /* A macro that tells us whether the function invocation represented
    by FI does not have a frame on the stack associated with it.  If it
    does not, FRAMELESS is set to 1, else 0.  */
 
-#define FRAMELESS_FUNCTION_INVOCATION(FI, FRAMELESS) \
-  (FRAMELESS) = frameless_look_for_prologue(FI)
+#define FRAMELESS_FUNCTION_INVOCATION(FI) \
+  (frameless_look_for_prologue (FI))
 
+CORE_ADDR d30v_frame_chain (struct frame_info *frame);
 #define FRAME_CHAIN(FRAME)       d30v_frame_chain(FRAME)
-extern int d30v_frame_chain_valid PARAMS ((CORE_ADDR, struct frame_info *));
+extern int d30v_frame_chain_valid (CORE_ADDR, struct frame_info *);
 #define FRAME_CHAIN_VALID(chain, thisframe) d30v_frame_chain_valid (chain, thisframe)
-#define FRAME_SAVED_PC(FRAME)    ((FRAME)->return_pc)   
+#define FRAME_SAVED_PC(FRAME)    ((FRAME)->return_pc)
 #define FRAME_ARGS_ADDRESS(fi)   (fi)->frame
 #define FRAME_LOCALS_ADDRESS(fi) (fi)->frame
 
+void d30v_init_frame_pc (int fromleaf, struct frame_info *prev);
 #define INIT_FRAME_PC_FIRST(fromleaf, prev)	d30v_init_frame_pc(fromleaf, prev)
 #define INIT_FRAME_PC(fromleaf, prev)	/* nada */
 
@@ -231,12 +232,12 @@ extern int d30v_frame_chain_valid PARAMS ((CORE_ADDR, struct frame_info *));
 /* stack and that may not be written yet. */
 
 #define SAVED_PC_AFTER_CALL(frame) (read_register(LR_REGNUM))
-    
+
 /* Set VAL to the number of args passed to frame described by FI.
    Can set VAL to -1, meaning no way to tell.  */
 /* We can't tell how many args there are */
 
-#define FRAME_NUM_ARGS(val,fi) (val = -1)
+#define FRAME_NUM_ARGS(fi) (-1)
 
 /* Return number of bytes at start of arglist that are not really args.  */
 
@@ -252,10 +253,9 @@ extern int d30v_frame_chain_valid PARAMS ((CORE_ADDR, struct frame_info *));
 #define FRAME_FIND_SAVED_REGS(frame_info, frame_saved_regs)	    \
    d30v_frame_find_saved_regs(frame_info, &(frame_saved_regs))
 
-extern void d30v_frame_find_saved_regs PARAMS ((struct frame_info *, struct frame_saved_regs *));
+extern void d30v_frame_find_saved_regs (struct frame_info *,
+					struct frame_saved_regs *);
 
-#define NAMES_HAVE_UNDERSCORE
-      
 /* DUMMY FRAMES.  Need these to support inferior function calls.
    They work like this on D30V:
    First we set a breakpoint at 0 or __start.
@@ -266,13 +266,13 @@ extern void d30v_frame_find_saved_regs PARAMS ((struct frame_info *, struct fram
    When it hits the breakpoint, clear the break point and pop the old
    register contents off the stack. */
 
-#define CALL_DUMMY		{ 0 }  
+#define CALL_DUMMY		{ 0 }
 #define PUSH_DUMMY_FRAME
-#define CALL_DUMMY_START_OFFSET	0	
+#define CALL_DUMMY_START_OFFSET	0
 #define CALL_DUMMY_LOCATION	AT_ENTRY_POINT
 #define CALL_DUMMY_BREAKPOINT_OFFSET (0)
 
-extern CORE_ADDR d30v_call_dummy_address PARAMS ((void));
+extern CORE_ADDR d30v_call_dummy_address (void);
 #define CALL_DUMMY_ADDRESS() d30v_call_dummy_address()
 
 #define FIX_CALL_DUMMY(dummyname, pc, fun, nargs, args, type, gcc_p) \
@@ -280,12 +280,13 @@ sp = d30v_fix_call_dummy (dummyname, pc, fun, nargs, args, type, gcc_p)
 
 #define PC_IN_CALL_DUMMY(pc, sp, frame_address)	( pc == IMEM_START + 4 )
 
-extern CORE_ADDR d30v_fix_call_dummy PARAMS ((char *, CORE_ADDR, CORE_ADDR,
-					   int, struct value **,
-					   struct type *, int));
+extern CORE_ADDR d30v_fix_call_dummy (char *, CORE_ADDR, CORE_ADDR,
+				      int, struct value **,
+				      struct type *, int);
 #define PUSH_ARGUMENTS(nargs, args, sp, struct_return, struct_addr) \
-    sp = d30v_push_arguments((nargs), (args), (sp), (struct_return), (struct_addr))
-extern CORE_ADDR d30v_push_arguments PARAMS ((int, struct value **, CORE_ADDR, int, CORE_ADDR));
+  (d30v_push_arguments((nargs), (args), (sp), (struct_return), (struct_addr)))
+extern CORE_ADDR d30v_push_arguments (int, struct value **, CORE_ADDR, int,
+				      CORE_ADDR);
 
 
 /* Extract from an array REGBUF containing the (raw) register state
@@ -294,14 +295,13 @@ extern CORE_ADDR d30v_push_arguments PARAMS ((int, struct value **, CORE_ADDR, i
 
 #define EXTRACT_RETURN_VALUE(TYPE,REGBUF,VALBUF) \
 d30v_extract_return_value(TYPE, REGBUF, VALBUF)
-  extern void
-d30v_extract_return_value PARAMS ((struct type *, char *, char *));
+extern void d30v_extract_return_value (struct type *, char *, char *);
 
 
 /* Discard from the stack the innermost frame,
    restoring all saved registers.  */
 #define POP_FRAME d30v_pop_frame();
-extern void d30v_pop_frame PARAMS((void));
+extern void d30v_pop_frame (void);
 
 #define REGISTER_SIZE 4
 

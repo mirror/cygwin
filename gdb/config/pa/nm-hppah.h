@@ -1,21 +1,22 @@
 /* Native support for HPPA-RISC machine running HPUX, for GDB.
    Copyright 1991, 1992 Free Software Foundation, Inc. 
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #define U_REGS_OFFSET 0
 
@@ -24,6 +25,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* What a coincidence! */
 #define REGISTER_U_ADDR(addr, blockend, regno)				\
 { addr = (int)(blockend) + REGISTER_BYTE (regno);}
+
+/* This isn't really correct, because ptrace is actually a 32-bit
+   interface.  However, the modern HP-UX targets all really use
+   ttrace, which is a 64-bit interface --- a debugger running in
+   either 32- or 64-bit mode can debug a 64-bit process.  BUT, the
+   code doesn't use ttrace directly --- it calls call_ptrace instead,
+   which is supposed to be drop-in substitute for ptrace.  In other
+   words, they access a 64-bit system call (ttrace) through a
+   compatibility layer which is allegedly a 32-bit interface.
+
+   So I don't feel the least bit guilty about this.  */
+#define PTRACE_ARG3_TYPE CORE_ADDR
 
 /* HPUX 8.0, in its infinite wisdom, has chosen to prototype ptrace
    with five arguments, so programs written for normal ptrace lose.  */
@@ -56,8 +69,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* While this is for use by threaded programs, it doesn't appear
  * to hurt non-threaded ones.  This is used in infrun.c: */
-#define PREPARE_TO_PROCEED() hppa_prepare_to_proceed()
-extern int hppa_prepare_to_proceed PARAMS(( void ));
+#define PREPARE_TO_PROCEED(select_it) hppa_prepare_to_proceed()
+extern int hppa_prepare_to_proceed (void);
 
 /* In infptrace.c or infttrace.c: */
 #define CHILD_PID_TO_EXEC_FILE
@@ -77,12 +90,13 @@ extern int hppa_prepare_to_proceed PARAMS(( void ));
 #define CHILD_HAS_SYSCALL_EVENT
 #define CHILD_POST_ATTACH
 #define CHILD_THREAD_ALIVE
+#define CHILD_PID_TO_STR
 
 #define REQUIRE_ATTACH(pid) hppa_require_attach(pid)
-extern int hppa_require_attach PARAMS ((int));
+extern int hppa_require_attach (int);
 
 #define REQUIRE_DETACH(pid,signal) hppa_require_detach(pid,signal)
-extern int hppa_require_detach PARAMS ((int,int));
+extern int hppa_require_detach (int, int);
 
 /* So we can cleanly use code in infptrace.c.  */
 #define PT_KILL		PT_EXIT
@@ -193,14 +207,14 @@ extern int hppa_require_detach PARAMS ((int,int));
 
    infptrace.c supplies dummy versions of these; infttrace.c is where the
    meaningful implementations are.
-   */
+ */
 #define TARGET_ENABLE_HW_WATCHPOINTS(pid) \
         hppa_enable_page_protection_events (pid)
-extern void  hppa_enable_page_protection_events PARAMS ((int));
+extern void hppa_enable_page_protection_events (int);
 
 #define TARGET_DISABLE_HW_WATCHPOINTS(pid) \
         hppa_disable_page_protection_events (pid)
-extern void  hppa_disable_page_protection_events PARAMS ((int));
+extern void hppa_disable_page_protection_events (int);
 
 /* Use these macros for watchpoint insertion/deletion.  */
 #define target_insert_watchpoint(addr, len, type) \
@@ -213,13 +227,12 @@ extern void  hppa_disable_page_protection_events PARAMS ((int));
  * than processes.  So we need a new way to print
  * the string.  Code is in hppah-nat.c.
  */
-#define target_pid_to_str( pid ) \
-        hppa_pid_to_str( pid )
-extern char * hppa_pid_to_str PARAMS ((pid_t));
+
+extern char *child_pid_to_str (pid_t);
 
 #define target_tid_to_str( pid ) \
         hppa_tid_to_str( pid )
-extern char * hppa_tid_to_str PARAMS ((pid_t));
+extern char *hppa_tid_to_str (pid_t);
 
 /* For this, ID can be either a process or thread ID, and the function
    will describe it appropriately, returning the description as a printable
@@ -227,10 +240,10 @@ extern char * hppa_tid_to_str PARAMS ((pid_t));
 
    The function that implements this macro is defined in infptrace.c and
    infttrace.c.
-   */
+ */
 #define target_pid_or_tid_to_str(ID) \
         hppa_pid_or_tid_to_str (ID)
-extern char * hppa_pid_or_tid_to_str PARAMS ((pid_t));
+extern char *hppa_pid_or_tid_to_str (pid_t);
 
 /* This is used when handling events caused by a call to vfork().  On ptrace-
    based HP-UXs, when you resume the vforked child, the parent automagically
@@ -240,15 +253,15 @@ extern char * hppa_pid_or_tid_to_str PARAMS ((pid_t));
 
    1. the vfork event for the new child process
    2. the exit or exec event of the new child process (actually, you get
-      two exec events on ptrace-based HP-UXs)
+   two exec events on ptrace-based HP-UXs)
    3. the vfork event for the original parent process
 
    The first is always received first.  The other two may be received in any
    order; HP-UX doesn't guarantee an order.
-   */
+ */
 #define ENSURE_VFORKING_PARENT_REMAINS_STOPPED(PID) \
         hppa_ensure_vforking_parent_remains_stopped (PID)
-extern void  hppa_ensure_vforking_parent_remains_stopped PARAMS((int));
+extern void hppa_ensure_vforking_parent_remains_stopped (int);
 
 /* This is used when handling events caused by a call to vfork().
 
@@ -259,23 +272,15 @@ extern void  hppa_ensure_vforking_parent_remains_stopped PARAMS((int));
    On ptrace-based HP-UXs, you must resume the child after its exec event is
    delivered or you won't get the parent's vfork.  I.e., you can't just wait()
    and get the parent vfork, after receiving the child exec.
-   */
+ */
 #define RESUME_EXECD_VFORKING_CHILD_TO_GET_PARENT_VFORK() \
         hppa_resume_execd_vforking_child_to_get_parent_vfork ()
-extern int  hppa_resume_execd_vforking_child_to_get_parent_vfork PARAMS ((void));
-
-#ifdef HAVE_HPUX_THREAD_SUPPORT
-
-#ifdef __STDC__
-struct objfile;
-#endif
-
-void hpux_thread_new_objfile PARAMS ((struct objfile *objfile));
-#define target_new_objfile(OBJFILE) hpux_thread_new_objfile (OBJFILE)
-
-extern char *hpux_pid_to_str PARAMS ((int pid));
-#define target_pid_to_str(PID) hpux_pid_to_str (PID)
-
-#endif /* HAVE_HPUX_THREAD_SUPPORT */
+extern int hppa_resume_execd_vforking_child_to_get_parent_vfork (void);
 
 #define HPUXHPPA
+
+#define MAY_SWITCH_FROM_INFERIOR_PID (1)
+
+#define MAY_FOLLOW_EXEC (1)
+
+#define USE_THREAD_STEP_NEEDED (1)

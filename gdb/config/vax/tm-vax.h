@@ -1,21 +1,22 @@
 /* Definitions to make GDB run on a vax under 4.2bsd.
    Copyright 1986, 1987, 1989, 1991, 1993 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 
 #define TARGET_BYTE_ORDER LITTLE_ENDIAN
@@ -28,26 +29,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Advance PC across any function entry prologue instructions
    to reach some "real" code.  */
 
-#define SKIP_PROLOGUE(pc)	\
-{ register int op = (unsigned char) read_memory_integer (pc, 1);  \
-  if (op == 0x11) pc += 2;  /* skip brb */			  \
-  if (op == 0x31) pc += 3;  /* skip brw */			  \
-  if (op == 0xC2 &&						  \
-      ((unsigned char) read_memory_integer (pc+2, 1)) == 0x5E)	  \
-    pc += 3;  /* skip subl2 */					  \
-  if (op == 0x9E &&						  \
-      ((unsigned char) read_memory_integer (pc+1, 1)) == 0xAE &&  \
-      ((unsigned char) read_memory_integer(pc+3, 1)) == 0x5E)	  \
-     pc += 4;  /* skip movab */					  \
-  if (op == 0x9E &&						  \
-      ((unsigned char) read_memory_integer (pc+1, 1)) == 0xCE &&  \
-      ((unsigned char) read_memory_integer(pc+4, 1)) == 0x5E)	  \
-    pc += 5;  /* skip movab */					  \
-  if (op == 0x9E &&						  \
-      ((unsigned char) read_memory_integer (pc+1, 1)) == 0xEE &&  \
-      ((unsigned char) read_memory_integer(pc+6, 1)) == 0x5E)	  \
-    pc += 7;  /* skip movab */					  \
-}
+extern CORE_ADDR vax_skip_prologue (CORE_ADDR);
+#define SKIP_PROLOGUE(pc) (vax_skip_prologue (pc))
 
 /* Immediately after a function call, return the saved pc.
    Can't always go through the frames for this because on some machines
@@ -169,8 +152,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    as a CORE_ADDR (or an expression that can be used as one).  */
 
 #define EXTRACT_STRUCT_VALUE_ADDRESS(REGBUF) (*(int *)(REGBUF))
-
 
+
 /* Describe the pointer in each stack frame to the previous stack frame
    (its caller).  */
 
@@ -191,7 +174,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    by FI does not have a frame on the stack associated with it.  If it
    does not, FRAMELESS is set to 1, else 0.  */
 /* On the vax, all functions have frames.  */
-#define FRAMELESS_FUNCTION_INVOCATION(FI, FRAMELESS)  {(FRAMELESS) = 0;}
+#define FRAMELESS_FUNCTION_INVOCATION(FI)  (0)
 
 /* Saved Pc.  Get it from sigcontext if within sigtramp.  */
 
@@ -231,8 +214,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Return number of args passed to a frame.
    Can return -1, meaning no way to tell.  */
 
-#define FRAME_NUM_ARGS(numargs, fi)  \
-{ numargs = (0xff & read_memory_integer (FRAME_ARGS_ADDRESS (fi), 1)); }
+extern int vax_frame_num_args (struct frame_info *fi);
+#define FRAME_NUM_ARGS(fi) (vax_frame_num_args ((fi)))
 
 /* Return number of bytes at start of arglist that are not really args.  */
 
@@ -308,13 +291,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 }
 
 /* This sequence of words is the instructions
-     calls #69, @#32323232
-     bpt
+   calls #69, @#32323232
+   bpt
    Note this is 8 bytes.  */
 
 #define CALL_DUMMY {0x329f69fb, 0x03323232}
 
-#define CALL_DUMMY_START_OFFSET 0  /* Start execution at beginning of dummy */
+#define CALL_DUMMY_START_OFFSET 0	/* Start execution at beginning of dummy */
 
 #define CALL_DUMMY_BREAKPOINT_OFFSET 7
 

@@ -1,26 +1,23 @@
 /* Target machine description for VxWorks m68k's, for GDB, the GNU debugger.
-   Copyright 1986, 1987, 1989, 1991, 1992, 1993 Free Software Foundation, Inc.
+   Copyright 1986, 1987, 1989, 1991, 1992, 1993, 1999 Free Software Foundation, Inc.
    Contributed by Cygnus Support.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
-
-#define	GDBINIT_FILENAME	".vxgdbinit"
-
-#define	DEFAULT_PROMPT		"(vxgdb) "
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* GCC is probably the only compiler used on this configuration.  So
    get this right even if the code which detects gcc2_compiled. is
@@ -32,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define	DECR_PC_AFTER_BREAK	0
 
 #include "m68k/tm-m68k.h"
+#include "tm-vxworks.h"
 
 /* Takes the current frame-struct pointer and returns the chain-pointer
    to get to the calling frame.
@@ -79,7 +77,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    This routine returns true on success */
 
 #define GET_LONGJMP_TARGET(ADDR) get_longjmp_target(ADDR)
-extern int get_longjmp_target PARAMS ((CORE_ADDR *));
+extern int get_longjmp_target (CORE_ADDR *);
 
 /* Number of registers in a ptrace_getregs call. */
 

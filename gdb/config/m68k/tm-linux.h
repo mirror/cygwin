@@ -1,21 +1,22 @@
 /* Definitions to target GDB to Linux on m680x0
    Copyright (C) 1996,1998 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* Number of traps that happen between exec'ing the shell to run an
    inferior, and when we finally get to the inferior code.  This is 2
@@ -71,7 +72,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
     }									\
 }
 
-#include "tm-sysv4.h"
+#include "tm-linux.h"
 #include "m68k/tm-m68k.h"
 
 /* Extract from an array REGBUF containing the (raw) register state
@@ -103,7 +104,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
     ? sigtramp_saved_pc (FRAME) \
     : read_memory_integer ((FRAME)->frame + 4, 4)))
 
-extern CORE_ADDR sigtramp_saved_pc PARAMS ((struct frame_info *));
+extern CORE_ADDR sigtramp_saved_pc (struct frame_info *);
 
 #define IN_SIGTRAMP(pc,name) in_sigtramp (pc)
-extern int in_sigtramp PARAMS ((CORE_ADDR pc));
+extern int in_sigtramp (CORE_ADDR pc);

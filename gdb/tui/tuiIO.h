@@ -1,21 +1,21 @@
 #ifndef _TUI_IO_H
 #define _TUI_IO_H
 /*
-** This header contains defitions to support tuiIO.c
-*/
+   ** This header contains defitions to support tuiIO.c
+ */
 
 
 #include <stdio.h>
 
-extern void             tuiPuts_unfiltered PARAMS ((const char *, GDB_FILE *));
-extern unsigned int     tuiGetc PARAMS ((void));
-extern unsigned int     tuiBufferGetc PARAMS ((void));
-extern int              tuiRead PARAMS ((int, char *, int));
-extern void             tuiStartNewLines PARAMS ((int));
-extern void             tui_vStartNewLines PARAMS ((va_list));
-extern unsigned int     tui_vwgetch PARAMS ((va_list));
-extern void             tuiTermSetup PARAMS ((int));
-extern void             tuiTermUnsetup PARAMS ((int, int));
+extern void tuiPuts_unfiltered  (const char *, struct ui_file *);
+extern unsigned int tuiGetc (void);
+extern unsigned int tuiBufferGetc (void);
+extern int tuiRead (int, char *, int);
+extern void tuiStartNewLines (int);
+extern void tui_vStartNewLines (va_list);
+extern unsigned int tui_vwgetch (va_list);
+extern void tuiTermSetup (int);
+extern void tuiTermUnsetup (int, int);
 
 
 
@@ -40,4 +40,5 @@ extern void             tuiTermUnsetup PARAMS ((int, int));
 #define m_isXdbStyleCommandChar(ch)     (m_isNextPage(ch) || m_isPrevPage(ch))
 
 
-#endif /*_TUI_IO_H*/
+#endif
+/*_TUI_IO_H*/

@@ -16,7 +16,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 
 /*  This file contains support code for C++ demangling that is common
@@ -39,6 +40,8 @@
 #ifndef DEFAULT_DEMANGLING_STYLE
 #define DEFAULT_DEMANGLING_STYLE AUTO_DEMANGLING_STYLE_STRING
 #endif
+
+extern void _initialize_demangler (void);
 
 /* String name for the current demangling style.  Set by the
    "set demangle-style" command, printed as part of the output by the
@@ -98,8 +101,7 @@ demanglers[] =
   }
 };
 
-static void
-set_demangling_command PARAMS ((char *, int, struct cmd_list_element *));
+static void set_demangling_command (char *, int, struct cmd_list_element *);
 
 /* Set current demangling style.  Called by the "set demangle-style"
    command after it has updated the current_demangling_style_string to
@@ -209,7 +211,8 @@ set_demangling_style (style)
    ensuring that it is the character that terminates the gcc<n>_compiled
    marker symbol (FIXME). */
 
-static char cplus_markers[] = {CPLUS_MARKER, '.', '$', '\0'};
+static char cplus_markers[] =
+{CPLUS_MARKER, '.', '$', '\0'};
 
 int
 is_cplus_marker (c)

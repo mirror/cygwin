@@ -1,13 +1,14 @@
 /*
-** tuiSource.c
-**         This module contains functions for displaying source in the source window
-*/
+   ** tuiSource.c
+   **         This module contains functions for displaying source in the source window
+ */
 
 #include "defs.h"
 #include <ctype.h>
 #include "symtab.h"
 #include "frame.h"
 #include "breakpoint.h"
+#include "source.h"
 
 #include "tui.h"
 #include "tuiData.h"
@@ -15,13 +16,6 @@
 #include "tuiSourceWin.h"
 #include "tuiSource.h"
 
-
-/*****************************************
-** EXTERNAL FUNCTION DECLS                **
-******************************************/
-
-extern int open_source_file PARAMS ((struct symtab *));
-extern void find_source_lines PARAMS ((struct symtab *, int));
 
 /*****************************************
 ** EXTERNAL DATA DECLS                    **
@@ -34,7 +28,7 @@ extern struct symtab *current_source_symtab;
 ** STATIC LOCAL FUNCTIONS FORWARD DECLS    **
 ******************************************/
 
-static struct breakpoint *_hasBreak PARAMS ((char *, int));
+static struct breakpoint *_hasBreak (char *, int);
 
 
 /*****************************************
@@ -51,9 +45,9 @@ static struct breakpoint *_hasBreak PARAMS ((char *, int));
 *********************************/
 
 /*
-** tuiSetSourceContent().
-**    Function to display source in the source window.
-*/
+   ** tuiSetSourceContent().
+   **    Function to display source in the source window.
+ */
 TuiStatus
 #ifdef __STDC__
 tuiSetSourceContent (
@@ -79,9 +73,9 @@ tuiSetSourceContent (s, lineNo, noerror)
 	{
 	  lineWidth = srcWin->generic.width - 1;
 	  /*
-            ** Take hilite (window border) into account, when calculating
-            ** the number of lines
-            */
+	     ** Take hilite (window border) into account, when calculating
+	     ** the number of lines
+	   */
 	  nlines = (lineNo + (srcWin->generic.height - 2)) - lineNo;
 	  desc = open_source_file (s);
 	  if (desc < 0)
@@ -116,9 +110,9 @@ tuiSetSourceContent (s, lineNo, noerror)
 		  register int offset, curLineNo, curLine, curLen, threshold;
 		  TuiGenWinInfoPtr locator = locatorWinInfoPtr ();
 		  /*
-                    ** Determine the threshold for the length of the line
-                    ** and the offset to start the display
-                    */
+		     ** Determine the threshold for the length of the line
+		     ** and the offset to start the display
+		   */
 		  offset = srcWin->detail.sourceInfo.horizontalOffset;
 		  threshold = (lineWidth - 1) + offset;
 		  stream = fdopen (desc, FOPEN_RT);
@@ -156,9 +150,9 @@ tuiSetSourceContent (s, lineNo, noerror)
 		      srcLine[curLen] = (char) 0;
 
 		      /*
-                        ** Set whether element is the execution point and
-                        ** whether there is a break point on it.
-                        */
+		         ** Set whether element is the execution point and
+		         ** whether there is a break point on it.
+		       */
 		      element->whichElement.source.lineOrAddr.lineNo =
 			curLineNo;
 		      element->whichElement.source.isExecPoint =
@@ -192,12 +186,12 @@ tuiSetSourceContent (s, lineNo, noerror)
 				    }
 				  else
 				    {	/*
-                                        ** Store the charcter in the line
-                                        ** buffer.  If it is a tab, then
-                                        ** translate to the correct number of
-                                        ** chars so we don't overwrite our
-                                        ** buffer.
-                                        */
+					   ** Store the charcter in the line
+					   ** buffer.  If it is a tab, then
+					   ** translate to the correct number of
+					   ** chars so we don't overwrite our
+					   ** buffer.
+					 */
 				      if (c == '\t')
 					{
 					  int j, maxTabLen = tuiDefaultTabLen ();
@@ -217,9 +211,9 @@ tuiSetSourceContent (s, lineNo, noerror)
 				}
 			      else
 				{	/*
-                                    ** if we have not reached EOL, then eat
-                                    ** chars until we do
-                                    */
+					   ** if we have not reached EOL, then eat
+					   ** chars until we do
+					 */
 				  while (c != EOF && c != '\n' && c != '\r')
 				    c = fgetc (stream);
 				}
@@ -256,7 +250,7 @@ tuiSetSourceContent (s, lineNo, noerror)
    except for a line in the middle with a warning message about the
    source not being available. This function is called by
    tuiEraseSourceContents, which in turn is invoked when the source files
-   cannot be accessed*/
+   cannot be accessed */
 
 void
 #ifdef __STDC__
@@ -277,12 +271,12 @@ tuiSetSourceContentNil (winInfo, warning_string)
   nLines = winInfo->generic.height - 2;
 
   /* set to empty each line in the window, except for the one
-    which contains the message*/
+     which contains the message */
   while (curr_line < winInfo->generic.contentSize)
     {
       /* set the information related to each displayed line
-     to null: i.e. the line number is 0, there is no bp,
-     it is not where the program is stopped */
+         to null: i.e. the line number is 0, there is no bp,
+         it is not where the program is stopped */
 
       TuiWinElementPtr element =
       (TuiWinElementPtr) winInfo->generic.content[curr_line];
@@ -290,14 +284,14 @@ tuiSetSourceContentNil (winInfo, warning_string)
       element->whichElement.source.isExecPoint = FALSE;
       element->whichElement.source.hasBreak = FALSE;
 
-      /* set the contents of the line to blank*/
+      /* set the contents of the line to blank */
       element->whichElement.source.line[0] = (char) 0;
 
       /* if the current line is in the middle of the screen, then we want to
-     display the 'no source available' message in it.
-     Note: the 'weird' arithmetic with the line width and height comes from
-     the function tuiEraseSourceContent. We need to keep the screen and the
-     window's actual contents in synch */
+         display the 'no source available' message in it.
+         Note: the 'weird' arithmetic with the line width and height comes from
+         the function tuiEraseSourceContent. We need to keep the screen and the
+         window's actual contents in synch */
 
       if (curr_line == (nLines / 2 + 1))
 	{
@@ -327,18 +321,18 @@ tuiSetSourceContentNil (winInfo, warning_string)
 
       curr_line++;
 
-    }				/* end while*/
+    }				/* end while */
 
-}				/*tuiSetSourceContentNil*/
+}				/*tuiSetSourceContentNil */
 
 
 
 
 /*
-** tuiShowSource().
-**        Function to display source in the source window.  This function
-**        initializes the horizontal scroll to 0.
-*/
+   ** tuiShowSource().
+   **        Function to display source in the source window.  This function
+   **        initializes the horizontal scroll to 0.
+ */
 void
 #ifdef __STDC__
 tuiShowSource (
@@ -360,9 +354,9 @@ tuiShowSource (s, line, noerror)
 
 
 /*
-** tuiSourceIsDisplayed().
-**        Answer whether the source is currently displayed in the source window.
-*/
+   ** tuiSourceIsDisplayed().
+   **        Answer whether the source is currently displayed in the source window.
+ */
 int
 #ifdef __STDC__
 tuiSourceIsDisplayed (
@@ -379,9 +373,9 @@ tuiSourceIsDisplayed (fname)
 
 
 /*
-** tuiVerticalSourceScroll().
-**      Scroll the source forward or backward vertically
-*/
+   ** tuiVerticalSourceScroll().
+   **      Scroll the source forward or backward vertically
+ */
 void
 #ifdef __STDC__
 tuiVerticalSourceScroll (
@@ -410,8 +404,8 @@ tuiVerticalSourceScroll (scrollDirection, numToScroll)
 	  line = content[0]->whichElement.source.lineOrAddr.lineNo +
 	    numToScroll;
 	  if (line > s->nlines)
-	    /*line = s->nlines - winInfo->generic.contentSize + 1;*/
-	    /*elz: fix for dts 23398*/
+	    /*line = s->nlines - winInfo->generic.contentSize + 1; */
+	    /*elz: fix for dts 23398 */
 	    line = content[0]->whichElement.source.lineOrAddr.lineNo;
 	}
       else
@@ -433,10 +427,10 @@ tuiVerticalSourceScroll (scrollDirection, numToScroll)
 ******************************************/
 
 /*
-** _hasBreak().
-**        Answer whether there is a break point at the input line in
-**        the source file indicated
-*/
+   ** _hasBreak().
+   **        Answer whether there is a break point at the input line in
+   **        the source file indicated
+ */
 static struct breakpoint *
 #ifdef __STDC__
 _hasBreak (

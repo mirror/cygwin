@@ -3,21 +3,22 @@
    Copyright (C) 1991, 1995 Free Software Foundation, Inc.
    Written by Fred Fish at Cygnus Support (fnf@cygint)
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* Define BPT_VECTOR if it is different than the default.
    This is the vector number used by traps to indicate a breakpoint. */
@@ -26,11 +27,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* How much to decrement the PC after a trap.  Depends on kernel. */
 
-#define DECR_PC_AFTER_BREAK 0		/* No decrement required */
+#define DECR_PC_AFTER_BREAK 0	/* No decrement required */
 
 /* Use the alternate method of determining valid frame chains. */
 
-#define FRAME_CHAIN_VALID(fp,fi) alternate_frame_chain_valid (fp, fi)
+#define FRAME_CHAIN_VALID(fp,fi) func_frame_chain_valid (fp, fi)
 
 #include "tm-sysv4.h"
 #include "m68k/tm-m68k.h"
@@ -56,7 +57,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define JB_A6	11
 #define JB_A7	12
 
-#define JB_PC	JB_A1	/* Setjmp()'s return PC saved in A1 */
+#define JB_PC	JB_A1		/* Setjmp()'s return PC saved in A1 */
 
 /* Figure out where the longjmp will land.  Slurp the args out of the stack.
    We expect the first arg to be a pointer to the jmp_buf structure from which
@@ -64,7 +65,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    This routine returns true on success */
 
 #define GET_LONGJMP_TARGET(ADDR) get_longjmp_target(ADDR)
-extern int get_longjmp_target PARAMS ((CORE_ADDR *));
+extern int get_longjmp_target (CORE_ADDR *);
 
 /* Convert a DWARF register number to a gdb REGNUM.  */
 #define DWARF_REG_TO_REGNUM(num) ((num) < 16 ? (num) : (num)+FP0_REGNUM-16)

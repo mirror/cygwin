@@ -1,21 +1,22 @@
 /* Definitions to make GDB run on an encore under umax 4.2
    Copyright 1987, 1989, 1991, 1993 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* This is also included by tm-ns32km3.h, as well as being used by umax.  */
 
@@ -33,14 +34,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Advance PC across any function entry prologue instructions
    to reach some "real" code.  */
 
-#define SKIP_PROLOGUE(pc)   				\
-{ register unsigned char op = read_memory_integer (pc, 1);	\
-  if (op == 0x82) { op = read_memory_integer (pc+2,1);  \
-  		    if ((op & 0x80) == 0) pc += 3;	\
-		    else if ((op & 0xc0) == 0x80) pc += 4;	\
-		    else pc += 6;			\
-		   }					\
-}
+extern CORE_ADDR umax_skip_prologue (CORE_ADDR);
+#define SKIP_PROLOGUE(pc) (umax_skip_prologue (pc))
 
 /* Immediately after a function call, return the saved pc.
    Can't always go through the frames for this because on some machines
@@ -70,11 +65,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #define DECR_PC_AFTER_BREAK 0
 
-#if 0 /* Disable until fixed *correctly*.  */
+#if 0				/* Disable until fixed *correctly*.  */
 #ifndef INVALID_FLOAT
 #ifndef NaN
 #include <nan.h>
-#endif NaN
+#endif /* NaN */
 
 /* Return 1 if P points to an invalid floating point value.  */
 /* Surely wrong for cross-debugging.  */
@@ -227,46 +222,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 extern CORE_ADDR ns32k_get_enter_addr ();
 
-/* Return number of args passed to a frame.
-   Can return -1, meaning no way to tell.
-   Encore's C compiler often reuses same area on stack for args,
-   so this will often not work properly.  If the arg names
-   are known, it's likely most of them will be printed. */
-
-#define FRAME_NUM_ARGS(numargs, fi)			\
-{ CORE_ADDR	pc;					\
-  CORE_ADDR	enter_addr;				\
-  unsigned int	insn;					\
-  unsigned int	addr_mode;				\
-  int width;						\
-							\
-  numargs = -1;						\
-  enter_addr = ns32k_get_enter_addr ((fi)->pc);		\
-  if (enter_addr > 0)					\
-    {							\
-      pc = (enter_addr == 1) ?				\
-	SAVED_PC_AFTER_CALL (fi) :			\
-	FRAME_SAVED_PC (fi);				\
-      insn = read_memory_integer (pc,2);		\
-      addr_mode = (insn >> 11) & 0x1f;			\
-      insn = insn & 0x7ff;				\
-      if ((insn & 0x7fc) == 0x57c &&			\
-		addr_mode == 0x14) /* immediate */	\
-	{						\
-	  if (insn == 0x57c) /* adjspb */		\
-  		width = 1;				\
-	  else if (insn == 0x57d) /* adjspw */		\
-  		width = 2;				\
-	  else if (insn == 0x57f) /* adjspd */		\
-  		width = 4;				\
-	  numargs = read_memory_integer (pc+2,width);	\
-	  if (width > 1)				\
-	    flip_bytes (&numargs, width);		\
-	  numargs = - sign_extend (numargs, width*8) / 4;\
-	}						\
-    }							\
-}
-
 /* Return number of bytes at start of arglist that are not really args.  */
 
 #define FRAME_ARGS_SKIP 8
@@ -277,35 +232,8 @@ extern CORE_ADDR ns32k_get_enter_addr ();
    ways in the stack frame.  sp is even more special:
    the address we return for it IS the sp for the next frame.  */
 
-#define FRAME_FIND_SAVED_REGS(frame_info, frame_saved_regs)	\
-{ 								\
-  register int	regmask, regnum;				\
-  int		localcount;					\
-  register CORE_ADDR	enter_addr;				\
-  register CORE_ADDR	next_addr;				\
-								\
-  memset (&(frame_saved_regs), '\0', sizeof (frame_saved_regs));	\
-  enter_addr = ns32k_get_enter_addr ((frame_info)->pc);		\
-  if (enter_addr > 1)						\
-    {								\
-      regmask = read_memory_integer (enter_addr+1, 1) & 0xff;	\
-      localcount = ns32k_localcount (enter_addr);		\
-      next_addr = (frame_info)->frame + localcount;		\
-      for (regnum = 0; regnum < 8; regnum++, regmask >>= 1)	\
-	(frame_saved_regs).regs[regnum] = (regmask & 1) ?	\
-					  (next_addr -= 4) : 0;	\
-      (frame_saved_regs).regs[SP_REGNUM] = (frame_info)->frame + 4;\
-      (frame_saved_regs).regs[PC_REGNUM] = (frame_info)->frame + 4;\
-      (frame_saved_regs).regs[FP_REGNUM] =			\
-		  (read_memory_integer ((frame_info)->frame, 4));\
-    }								\
-  else if (enter_addr == 1)					\
-    {								\
-      CORE_ADDR sp = read_register (SP_REGNUM);			\
-      (frame_saved_regs).regs[PC_REGNUM] = sp;			\
-      (frame_saved_regs).regs[SP_REGNUM] = sp + 4;		\
-    }								\
-}
+extern int umax_frame_num_args (struct frame_info *fi);
+#define FRAME_NUM_ARGS(fi) (umax_frame_num_args ((fi)))
 
 /* Things needed for making the inferior call functions.  */
 
@@ -342,10 +270,10 @@ extern CORE_ADDR ns32k_get_enter_addr ();
 }
 
 /* This sequence of words is the instructions
-     enter	0xff,0		82 ff 00
-     jsr	@0x00010203	7f ae c0 01 02 03
-     adjspd	0x69696969	7f a5 01 02 03 04
-     bpt			f2
+   enter        0xff,0          82 ff 00
+   jsr  @0x00010203     7f ae c0 01 02 03
+   adjspd       0x69696969      7f a5 01 02 03 04
+   bpt                  f2
    Note this is 16 bytes.  */
 
 #define CALL_DUMMY { 0x7f00ff82, 0x0201c0ae, 0x01a57f03, 0xf2040302 }

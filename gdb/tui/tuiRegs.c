@@ -1,9 +1,9 @@
 
 /*
-** tuiRegs.c
-**         This module contains functions to support display of registers
-**         in the data window.
-*/
+   ** tuiRegs.c
+   **         This module contains functions to support display of registers
+   **         in the data window.
+ */
 
 
 #include "defs.h"
@@ -32,7 +32,7 @@
 
 #define SINGLE_LABEL_WIDTH    10
 #define SINGLE_LABEL_FMT      "%10.10s: "
-#define SINGLE_VALUE_WIDTH    14/* minimum of 8 but may be in sci notation */
+#define SINGLE_VALUE_WIDTH    14	/* minimum of 8 but may be in sci notation */
 
 /* In the code HP gave Cygnus, this was actually a function call to a
    PA-specific function, which was supposed to determine whether the
@@ -50,34 +50,28 @@
 ** STATIC LOCAL FUNCTIONS FORWARD DECLS    **
 ******************************************/
 static TuiStatus _tuiSetRegsContent
-  PARAMS ((int, int, struct frame_info *,
-	   TuiRegisterDisplayType, int));
-static char *_tuiRegisterName PARAMS ((int));
-static TuiStatus _tuiGetRegisterRawValue
-  PARAMS ((int, char *, struct frame_info *));
+  (int, int, struct frame_info *, TuiRegisterDisplayType, int);
+static char *_tuiRegisterName (int);
+static TuiStatus _tuiGetRegisterRawValue (int, char *, struct frame_info *);
 static void _tuiSetRegisterElement
-  PARAMS ((int, struct frame_info *,
-	   TuiDataElementPtr, int));
-static void _tuiDisplayRegister
-  PARAMS ((int, TuiGenWinInfoPtr, enum precision_type));
+  (int, struct frame_info *, TuiDataElementPtr, int);
+static void _tuiDisplayRegister (int, TuiGenWinInfoPtr, enum precision_type);
 static void _tuiRegisterFormat
-  PARAMS ((char *, int, int, TuiDataElementPtr,
-	   enum precision_type));
-static TuiStatus _tuiSetGeneralRegsContent PARAMS ((int));
-static TuiStatus _tuiSetSpecialRegsContent PARAMS ((int));
-static TuiStatus _tuiSetGeneralAndSpecialRegsContent PARAMS ((int));
-static TuiStatus _tuiSetFloatRegsContent PARAMS ((TuiRegisterDisplayType, int));
+  (char *, int, int, TuiDataElementPtr, enum precision_type);
+static TuiStatus _tuiSetGeneralRegsContent (int);
+static TuiStatus _tuiSetSpecialRegsContent (int);
+static TuiStatus _tuiSetGeneralAndSpecialRegsContent (int);
+static TuiStatus _tuiSetFloatRegsContent (TuiRegisterDisplayType, int);
 static int _tuiRegValueHasChanged
-  PARAMS ((TuiDataElementPtr, struct frame_info *,
-	   char *));
-static void _tuiShowFloat_command PARAMS ((char *, int));
-static void _tuiShowGeneral_command PARAMS ((char *, int));
-static void _tuiShowSpecial_command PARAMS ((char *, int));
-static void _tui_vShowRegisters_commandSupport PARAMS ((va_list));
-static void _tuiToggleFloatRegs_command PARAMS ((char *, int));
-static void _tuiScrollRegsForward_command PARAMS ((char *, int));
-static void _tuiScrollRegsBackward_command PARAMS ((char *, int));
-static void _tui_vShowRegisters_commandSupport PARAMS ((va_list));
+  (TuiDataElementPtr, struct frame_info *, char *);
+static void _tuiShowFloat_command (char *, int);
+static void _tuiShowGeneral_command (char *, int);
+static void _tuiShowSpecial_command (char *, int);
+static void _tui_vShowRegisters_commandSupport (va_list);
+static void _tuiToggleFloatRegs_command (char *, int);
+static void _tuiScrollRegsForward_command (char *, int);
+static void _tuiScrollRegsBackward_command (char *, int);
+static void _tui_vShowRegisters_commandSupport (va_list);
 
 
 
@@ -86,10 +80,10 @@ static void _tui_vShowRegisters_commandSupport PARAMS ((va_list));
 ******************************************/
 
 /*
-** tuiLastRegsLineNo()
-**        Answer the number of the last line in the regs display.
-**        If there are no registers (-1) is returned.
-*/
+   ** tuiLastRegsLineNo()
+   **        Answer the number of the last line in the regs display.
+   **        If there are no registers (-1) is returned.
+ */
 int
 #ifdef __STDC__
 tuiLastRegsLineNo (void)
@@ -112,11 +106,11 @@ tuiLastRegsLineNo ()
 
 
 /*
-** tuiLineFromRegElementNo()
-**        Answer the line number that the register element at elementNo is
-**        on.  If elementNo is greater than the number of register elements
-**        there are, -1 is returned.
-*/
+   ** tuiLineFromRegElementNo()
+   **        Answer the line number that the register element at elementNo is
+   **        on.  If elementNo is greater than the number of register elements
+   **        there are, -1 is returned.
+ */
 int
 #ifdef __STDC__
 tuiLineFromRegElementNo (
@@ -148,10 +142,10 @@ tuiLineFromRegElementNo (elementNo)
 
 
 /*
-** tuiFirstRegElementNoInLine()
-**        Answer the index of the first element in lineNo.  If lineNo is
-**        past the register area (-1) is returned.
-*/
+   ** tuiFirstRegElementNoInLine()
+   **        Answer the index of the first element in lineNo.  If lineNo is
+   **        past the register area (-1) is returned.
+ */
 int
 #ifdef __STDC__
 tuiFirstRegElementNoInLine (
@@ -172,10 +166,10 @@ tuiFirstRegElementNoInLine (lineNo)
 
 
 /*
-** tuiLastRegElementNoInLine()
-**        Answer the index of the last element in lineNo.  If lineNo is past
-**        the register area (-1) is returned.
-*/
+   ** tuiLastRegElementNoInLine()
+   **        Answer the index of the last element in lineNo.  If lineNo is past
+   **        the register area (-1) is returned.
+ */
 int
 #ifdef __STDC__
 tuiLastRegElementNoInLine (
@@ -195,10 +189,10 @@ tuiLastRegElementNoInLine (lineNo)
 
 
 /*
-** tuiCalculateRegsColumnCount
-**        Calculate the number of columns that should be used to display
-**        the registers.
-*/
+   ** tuiCalculateRegsColumnCount
+   **        Calculate the number of columns that should be used to display
+   **        the registers.
+ */
 int
 #ifdef __STDC__
 tuiCalculateRegsColumnCount (
@@ -226,11 +220,11 @@ tuiCalculateRegsColumnCount (dpyType)
 
 
 /*
-** tuiShowRegisters().
-**        Show the registers int the data window as indicated by dpyType.
-**        If there is any other registers being displayed, then they are
-**        cleared.  What registers are displayed is dependent upon dpyType.
-*/
+   ** tuiShowRegisters().
+   **        Show the registers int the data window as indicated by dpyType.
+   **        If there is any other registers being displayed, then they are
+   **        cleared.  What registers are displayed is dependent upon dpyType.
+ */
 void
 #ifdef __STDC__
 tuiShowRegisters (
@@ -304,12 +298,12 @@ tuiShowRegisters (dpyType)
 
 
 /*
-** tuiDisplayRegistersFrom().
-**        Function to display the registers in the content from
-**        'startElementNo' until the end of the register content or the
-**        end of the display height.  No checking for displaying past
-**        the end of the registers is done here.
-*/
+   ** tuiDisplayRegistersFrom().
+   **        Function to display the registers in the content from
+   **        'startElementNo' until the end of the register content or the
+   **        end of the display height.  No checking for displaying past
+   **        the end of the registers is done here.
+ */
 void
 #ifdef __STDC__
 tuiDisplayRegistersFrom (
@@ -351,8 +345,8 @@ tuiDisplayRegistersFrom (startElementNo)
 	}
       itemWinWidth = valueCharsWide + labelWidth;
       /*
-        ** Now create each data "sub" window, and write the display into it.
-        */
+         ** Now create each data "sub" window, and write the display into it.
+       */
       curY = 1;
       while (i < dataWin->detail.dataDisplayInfo.regsContentCount &&
 	     curY <= dataWin->generic.viewportHeight)
@@ -364,7 +358,7 @@ tuiDisplayRegistersFrom (startElementNo)
 	      TuiGenWinInfoPtr dataItemWin;
 	      TuiDataElementPtr dataElementPtr;
 
-	      /* create the window if necessary*/
+	      /* create the window if necessary */
 	      dataItemWin = &dataWin->detail.dataDisplayInfo.
 		regsContent[i]->whichElement.dataWindow;
 	      dataElementPtr = &((TuiWinElementPtr)
@@ -379,9 +373,9 @@ tuiDisplayRegistersFrom (startElementNo)
 		  makeWindow (dataItemWin, DONT_BOX_WINDOW);
 		}
 	      /*
-                ** Get the printable representation of the register
-                ** and display it
-                */
+	         ** Get the printable representation of the register
+	         ** and display it
+	       */
 	      _tuiDisplayRegister (
 			    dataElementPtr->itemNo, dataItemWin, precision);
 	      i++;		/* next register */
@@ -395,13 +389,13 @@ tuiDisplayRegistersFrom (startElementNo)
 
 
 /*
-** tuiDisplayRegElementAtLine().
-**        Function to display the registers in the content from
-**        'startElementNo' on 'startLineNo' until the end of the
-**        register content or the end of the display height.
-**        This function checks that we won't display off the end
-**        of the register display.
-*/
+   ** tuiDisplayRegElementAtLine().
+   **        Function to display the registers in the content from
+   **        'startElementNo' on 'startLineNo' until the end of the
+   **        register content or the end of the display height.
+   **        This function checks that we won't display off the end
+   **        of the register display.
+ */
 void
 #ifdef __STDC__
 tuiDisplayRegElementAtLine (
@@ -427,10 +421,10 @@ tuiDisplayRegElementAtLine (startElementNo, startLineNo)
 	  if (firstLineOnLastPage < 0)
 	    firstLineOnLastPage = 0;
 	  /*
-            ** If there is no other data displayed except registers,
-            ** and the elementNo causes us to scroll past the end of the
-            ** registers, adjust what element to really start the display at.
-            */
+	     ** If there is no other data displayed except registers,
+	     ** and the elementNo causes us to scroll past the end of the
+	     ** registers, adjust what element to really start the display at.
+	   */
 	  if (dataWin->detail.dataDisplayInfo.dataContentCount <= 0 &&
 	      startLineNo > firstLineOnLastPage)
 	    elementNo = tuiFirstRegElementNoInLine (firstLineOnLastPage);
@@ -444,11 +438,11 @@ tuiDisplayRegElementAtLine (startElementNo, startLineNo)
 
 
 /*
-** tuiDisplayRegistersFromLine().
-**        Function to display the registers starting at line lineNo in
-**        the data window.  Answers the line number that the display
-**        actually started from.  If nothing is displayed (-1) is returned.
-*/
+   ** tuiDisplayRegistersFromLine().
+   **        Function to display the registers starting at line lineNo in
+   **        the data window.  Answers the line number that the display
+   **        actually started from.  If nothing is displayed (-1) is returned.
+ */
 int
 #ifdef __STDC__
 tuiDisplayRegistersFromLine (
@@ -470,9 +464,9 @@ tuiDisplayRegistersFromLine (lineNo, forceDisplay)
 	line = 0;
       else if (forceDisplay)
 	{			/*
-            ** If we must display regs (forceDisplay is true), then make
-            ** sure that we don't display off the end of the registers.
-            */
+				   ** If we must display regs (forceDisplay is true), then make
+				   ** sure that we don't display off the end of the registers.
+				 */
 	  if (lineNo >= tuiLastRegsLineNo ())
 	    {
 	      if ((line = tuiLineFromRegElementNo (
@@ -499,11 +493,11 @@ tuiDisplayRegistersFromLine (lineNo, forceDisplay)
 
 
 /*
-** tuiCheckRegisterValues()
-**        This function check all displayed registers for changes in
-**        values, given a particular frame.  If the values have changed,
-**        they are updated with the new value and highlighted.
-*/
+   ** tuiCheckRegisterValues()
+   **        This function check all displayed registers for changes in
+   **        values, given a particular frame.  If the values have changed,
+   **        they are updated with the new value and highlighted.
+ */
 void
 #ifdef __STDC__
 tuiCheckRegisterValues (
@@ -566,8 +560,8 @@ tuiCheckRegisterValues (frame)
 
 
 /*
-** tuiToggleFloatRegs().
-*/
+   ** tuiToggleFloatRegs().
+ */
 void
 #ifdef __STDC__
 tuiToggleFloatRegs (void)
@@ -626,9 +620,9 @@ registers.\n",
 
 
 /*
-** _tuiRegisterName().
-**        Return the register name.
-*/
+   ** _tuiRegisterName().
+   **        Return the register name.
+ */
 static char *
 #ifdef __STDC__
 _tuiRegisterName (
@@ -646,10 +640,10 @@ _tuiRegisterName (regNum)
 
 
 /*
-** _tuiRegisterFormat
-**        Function to format the register name and value into a buffer,
-**        suitable for printing or display
-*/
+   ** _tuiRegisterFormat
+   **        Function to format the register name and value into a buffer,
+   **        suitable for printing or display
+ */
 static void
 #ifdef __STDC__
 _tuiRegisterFormat (
@@ -669,12 +663,12 @@ _tuiRegisterFormat (buf, bufLen, regNum, dataElement, precision)
 {
   char tmpBuf[15];
   char *fmt;
-  GDB_FILE *stream;
+  struct ui_file *stream;
 
-  stream = gdb_file_init_astring(bufLen);
+  stream = tui_sfileopen (bufLen);
   pa_do_strcat_registers_info (regNum, 0, stream, precision);
-  strcpy (buf, gdb_file_get_strbuf(stream));
-  gdb_file_deallocate(&stream);
+  strcpy (buf, tui_file_get_strbuf (stream));
+  ui_file_delete (stream);
 
   return;
 }				/* _tuiRegisterFormat */
@@ -682,9 +676,9 @@ _tuiRegisterFormat (buf, bufLen, regNum, dataElement, precision)
 
 #define NUM_GENERAL_REGS    32
 /*
-** _tuiSetGeneralRegsContent().
-**      Set the content of the data window to consist of the general registers.
-*/
+   ** _tuiSetGeneralRegsContent().
+   **      Set the content of the data window to consist of the general registers.
+ */
 static TuiStatus
 #ifdef __STDC__
 _tuiSetGeneralRegsContent (
@@ -705,9 +699,9 @@ _tuiSetGeneralRegsContent (refreshValuesOnly)
 
 #define START_SPECIAL_REGS    PCOQ_HEAD_REGNUM
 /*
-** _tuiSetSpecialRegsContent().
-**      Set the content of the data window to consist of the special registers.
-*/
+   ** _tuiSetSpecialRegsContent().
+   **      Set the content of the data window to consist of the special registers.
+ */
 static TuiStatus
 #ifdef __STDC__
 _tuiSetSpecialRegsContent (
@@ -738,9 +732,9 @@ _tuiSetSpecialRegsContent (refreshValuesOnly)
 
 
 /*
-** _tuiSetGeneralAndSpecialRegsContent().
-**      Set the content of the data window to consist of the special registers.
-*/
+   ** _tuiSetGeneralAndSpecialRegsContent().
+   **      Set the content of the data window to consist of the special registers.
+ */
 static TuiStatus
 #ifdef __STDC__
 _tuiSetGeneralAndSpecialRegsContent (
@@ -767,9 +761,9 @@ _tuiSetGeneralAndSpecialRegsContent (refreshValuesOnly)
 }				/* _tuiSetGeneralAndSpecialRegsContent */
 
 /*
-** _tuiSetFloatRegsContent().
-**        Set the content of the data window to consist of the float registers.
-*/
+   ** _tuiSetFloatRegsContent().
+   **        Set the content of the data window to consist of the float registers.
+ */
 static TuiStatus
 #ifdef __STDC__
 _tuiSetFloatRegsContent (
@@ -802,10 +796,10 @@ _tuiSetFloatRegsContent (dpyType, refreshValuesOnly)
 
 
 /*
-** _tuiRegValueHasChanged().
-**        Answer TRUE if the register's value has changed, FALSE otherwise.
-**        If TRUE, newValue is filled in with the new value.
-*/
+   ** _tuiRegValueHasChanged().
+   **        Answer TRUE if the register's value has changed, FALSE otherwise.
+   **        If TRUE, newValue is filled in with the new value.
+ */
 static int
 #ifdef __STDC__
 _tuiRegValueHasChanged (
@@ -845,9 +839,9 @@ _tuiRegValueHasChanged (dataElement, frame, newValue)
 
 
 /*
-** _tuiGetRegisterRawValue().
-**        Get the register raw value.  The raw value is returned in regValue.
-*/
+   ** _tuiGetRegisterRawValue().
+   **        Get the register raw value.  The raw value is returned in regValue.
+ */
 static TuiStatus
 #ifdef __STDC__
 _tuiGetRegisterRawValue (
@@ -875,10 +869,10 @@ _tuiGetRegisterRawValue (regNum, regValue, frame)
 
 
 /*
-** _tuiSetRegisterElement().
-**       Function to initialize a data element with the input and
-**       the register value.
-*/
+   ** _tuiSetRegisterElement().
+   **       Function to initialize a data element with the input and
+   **       the register value.
+ */
 static void
 #ifdef __STDC__
 _tuiSetRegisterElement (
@@ -913,11 +907,11 @@ _tuiSetRegisterElement (regNum, frame, dataElement, refreshValueOnly)
 
 
 /*
-** _tuiSetRegsContent().
-**        Set the content of the data window to consist of the registers
-**        numbered from startRegNum to endRegNum.  Note that if
-**        refreshValuesOnly is TRUE, startRegNum and endRegNum are ignored.
-*/
+   ** _tuiSetRegsContent().
+   **        Set the content of the data window to consist of the registers
+   **        numbered from startRegNum to endRegNum.  Note that if
+   **        refreshValuesOnly is TRUE, startRegNum and endRegNum are ignored.
+ */
 static TuiStatus
 #ifdef __STDC__
 _tuiSetRegsContent (
@@ -967,8 +961,8 @@ _tuiSetRegsContent (startRegNum, endRegNum, frame, dpyType, refreshValuesOnly)
 	  dataWin->detail.dataDisplayInfo.regsContentCount = numRegs;
 	}
       /*
-        ** Now set the register names and values
-        */
+         ** Now set the register names and values
+       */
       for (i = startRegNum; (i <= endRegNum); i++)
 	{
 	  TuiGenWinInfoPtr dataItemWin;
@@ -1002,15 +996,15 @@ _tuiSetRegsContent (startRegNum, endRegNum, frame, dpyType, refreshValuesOnly)
 
 
 /*
-** _tuiDisplayRegister().
-**        Function to display a register in a window.  If hilite is TRUE,
-**        than the value will be displayed in reverse video
-*/
+   ** _tuiDisplayRegister().
+   **        Function to display a register in a window.  If hilite is TRUE,
+   **        than the value will be displayed in reverse video
+ */
 static void
 #ifdef __STDC__
 _tuiDisplayRegister (
 		      int regNum,
-		      TuiGenWinInfoPtr winInfo,	/* the data item window */
+		      TuiGenWinInfoPtr winInfo,		/* the data item window */
 		      enum precision_type precision)
 #else
 _tuiDisplayRegister (regNum, winInfo, precision)

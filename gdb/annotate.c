@@ -1,21 +1,22 @@
 /* Annotation routines for GDB.
-   Copyright 1986, 89, 90, 91, 92, 95, 1998 Free Software Foundation, Inc.
+   Copyright 1986, 89, 90, 91, 92, 95, 98, 1999 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #include "defs.h"
 #include "annotate.h"
@@ -27,14 +28,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* Prototypes for local functions. */
 
-static void print_value_flags PARAMS ((struct type *));
+extern void _initialize_annotate (void);
 
-static void breakpoint_changed PARAMS ((struct breakpoint *));
+static void print_value_flags (struct type *);
+
+static void breakpoint_changed (struct breakpoint *);
 
 void (*annotate_starting_hook) PARAMS ((void));
 void (*annotate_stopped_hook) PARAMS ((void));
 void (*annotate_signalled_hook) PARAMS ((void));
+void (*annotate_signal_hook) PARAMS ((void));
 void (*annotate_exited_hook) PARAMS ((void));
+
+static int ignore_count_changed = 0;
 
 static void
 print_value_flags (t)
@@ -53,7 +59,22 @@ breakpoints_changed ()
     {
       target_terminal_ours ();
       printf_unfiltered ("\n\032\032breakpoints-invalid\n");
+      if (ignore_count_changed)
+	ignore_count_changed = 0;	/* Avoid multiple break annotations. */
     }
+}
+
+/* The GUI needs to be informed of ignore_count changes, but we don't
+   want to provide successive multiple breakpoints-invalid messages
+   that are all caused by the fact that the ignore count is changing
+   (which could keep the GUI very busy).  One is enough, after the
+   target actually "stops". */
+
+void
+annotate_ignore_count_change (void)
+{
+  if (annotation_level > 1)
+    ignore_count_changed = 1;
 }
 
 void
@@ -89,9 +110,9 @@ annotate_starting ()
   else
     {
       if (annotation_level > 1)
-        {
-          printf_filtered ("\n\032\032starting\n");
-        }
+	{
+	  printf_filtered ("\n\032\032starting\n");
+	}
     }
 }
 
@@ -103,7 +124,12 @@ annotate_stopped ()
   else
     {
       if (annotation_level > 1)
-        printf_filtered ("\n\032\032stopped\n");
+	printf_filtered ("\n\032\032stopped\n");
+    }
+  if (annotation_level > 1 && ignore_count_changed)
+    {
+      ignore_count_changed = 0;
+      breakpoints_changed ();
     }
 }
 
@@ -116,7 +142,7 @@ annotate_exited (exitstatus)
   else
     {
       if (annotation_level > 1)
-        printf_filtered ("\n\032\032exited %d\n", exitstatus);
+	printf_filtered ("\n\032\032exited %d\n", exitstatus);
     }
 }
 
@@ -161,6 +187,9 @@ annotate_signal_string_end ()
 void
 annotate_signal ()
 {
+  if (annotate_signal_hook)
+    annotate_signal_hook ();
+
   if (annotation_level > 1)
     printf_filtered ("\n\032\032signal\n");
 }

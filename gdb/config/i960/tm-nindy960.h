@@ -2,21 +2,22 @@
    Copyright (C) 1990-1991 Free Software Foundation, Inc.
    Contributed by Intel Corporation and Cygnus Support.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /*****************************************************************************
  * Definitions to target GDB to an i960 debugged over a serial line.
@@ -25,9 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "i960/tm-i960.h"
 
 /* forward declarations */
-#ifdef __STDC__
 struct frame_info;
-#endif
 
 /* Override the standard gdb prompt when compiled for this target.  */
 
@@ -44,7 +43,7 @@ extern char *nindy_ttyname;	/* Name of serial port to talk to nindy */
 #define	ADDITIONAL_OPTIONS \
 	{"O", no_argument, &nindy_old_protocol, 1},	\
 	{"brk", no_argument, &nindy_initial_brk, 1},	\
-	{"ser", required_argument, 0, 1004},  /* 1004 is magic cookie for ADDL_CASES */
+	{"ser", required_argument, 0, 1004},	/* 1004 is magic cookie for ADDL_CASES */
 
 #define	ADDITIONAL_OPTION_CASES	\
 	case 1004:	/* -ser option:  remote nindy auto-start */	\
@@ -61,13 +60,18 @@ extern char *nindy_ttyname;	/* Name of serial port to talk to nindy */
 /* If specified on the command line, open tty for talking to nindy,
    and download the executable file if one was specified.  */
 
-#define	ADDITIONAL_OPTION_HANDLER	\
-	if (!SET_TOP_LEVEL () && nindy_ttyname) {		\
-	  nindy_open (nindy_ttyname, !batch);			\
-	  if (!SET_TOP_LEVEL () && execarg) {			\
-		target_load (execarg, !batch);			\
-	  }							\
-	}
+extern void nindy_open (char *name, int from_tty);
+#define	ADDITIONAL_OPTION_HANDLER					\
+	if (nindy_ttyname != NULL)					\
+          {								\
+            if (catch_command_errors (nindy_open, nindy_ttyname,	\
+				      !batch, RETURN_MASK_ALL))		\
+	      {								\
+                if (execarg != NULL)					\
+                  catch_command_errors (target_load, execarg, !batch,	\
+					RETURN_MASK_ALL);		\
+	      }								\
+	  }
 
 /* If configured for i960 target, we take control before main loop
    and demand that we configure for a nindy target.  */
@@ -76,7 +80,7 @@ extern char *nindy_ttyname;	/* Name of serial port to talk to nindy */
   nindy_before_main_loop();
 
 extern void
-nindy_before_main_loop();		/* In remote-nindy.c */
+  nindy_before_main_loop ();	/* In remote-nindy.c */
 
 /* FRAME_CHAIN_VALID returns zero if the given frame is the outermost one
    and has no caller.
@@ -85,11 +89,11 @@ nindy_before_main_loop();		/* In remote-nindy.c */
    since it differs between NINDY and VxWorks, the two currently supported
    targets types.  */
 
-extern int nindy_frame_chain_valid PARAMS ((CORE_ADDR, struct frame_info *));
+extern int nindy_frame_chain_valid (CORE_ADDR, struct frame_info *);
 #define	FRAME_CHAIN_VALID(chain, thisframe) nindy_frame_chain_valid (chain, thisframe)
 
 extern int
-nindy_frame_chain_valid();		/* See nindy-tdep.c */
+  nindy_frame_chain_valid ();	/* See nindy-tdep.c */
 
 /* Sequence of bytes for breakpoint instruction */
 

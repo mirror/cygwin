@@ -1,21 +1,22 @@
 /* Parameters for a Sun 386i target machine, for GDB, the GNU debugger.
    Copyright 1986, 1987, 1991, 1992, 1993 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #if !defined (TM_SUN386_H)
 #define TM_SUN386_H 1
@@ -25,7 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #ifndef sun386
 #define sun386
 #endif
-#define GDB_TARGET_IS_SUN386 1
 #define SUNOS4
 #define USE_MACHINE_REG_H
 
@@ -75,17 +75,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    but do serve to get the desired values when passed to read_register.  */
 
 #undef  FP_REGNUM
-#define FP_REGNUM   6	/* (ebp) Contains address of executing stack frame */
+#define FP_REGNUM   6		/* (ebp) Contains address of executing stack frame */
 #undef  SP_REGNUM
-#define SP_REGNUM  18	/* (usp) Contains address of top of stack */
+#define SP_REGNUM  18		/* (usp) Contains address of top of stack */
 #undef  PS_REGNUM
-#define PS_REGNUM  17	/* (ps)  Contains processor status */
+#define PS_REGNUM  17		/* (ps)  Contains processor status */
 #undef  PC_REGNUM
-#define PC_REGNUM  15	/* (eip) Contains program counter */
+#define PC_REGNUM  15		/* (eip) Contains program counter */
 #undef  FP0_REGNUM
-#define FP0_REGNUM 20	/* Floating point register 0 */
+#define FP0_REGNUM 20		/* Floating point register 0 */
 #undef  FPC_REGNUM
-#define FPC_REGNUM 28	/* 80387 control register */
+#define FPC_REGNUM 28		/* 80387 control register */
 
 /* Total amount of space needed to store our copies of the machine's
    register state, the array `registers'.  */
@@ -130,8 +130,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
   i387_to_double ((FROM), (char *)&val); \
   store_floating ((TO), TYPE_LENGTH (TYPE), val); \
 }
-extern void
-i387_to_double PARAMS ((char *, char *));
+extern void i387_to_double (char *, char *);
 
 /* Convert data from virtual format with type TYPE in buffer FROM
    to raw format for register REGNUM in buffer TO.  */
@@ -142,8 +141,7 @@ i387_to_double PARAMS ((char *, char *));
   double val = extract_floating ((FROM), TYPE_LENGTH (TYPE)); \
   double_to_i387((char *)&val, (TO)); \
 }
-extern void
-double_to_i387 PARAMS ((char *, char *));
+extern void double_to_i387 (char *, char *);
 
 /* Return the GDB type object for the "standard" data type
    of data in register N.  */
@@ -186,8 +184,8 @@ double_to_i387 PARAMS ((char *, char *));
    does not, FRAMELESS is set to 1, else 0.  */
 
 #undef  FRAMELESS_FUNCTION_INVOCATION
-#define FRAMELESS_FUNCTION_INVOCATION(FI, FRAMELESS) \
-{ (FRAMELESS) = frameless_look_for_prologue (FI); }
+#define FRAMELESS_FUNCTION_INVOCATION(FI) \
+     (frameless_look_for_prologue (FI))
 
 #undef  FRAME_SAVED_PC
 #define FRAME_SAVED_PC(FRAME) (read_memory_integer ((FRAME)->frame + 4, 4))
@@ -202,4 +200,3 @@ double_to_i387 PARAMS ((char *, char *));
 }
 
 #endif /* !defined (TM_SUN386_H) */
-

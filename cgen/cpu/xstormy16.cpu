@@ -61,9 +61,11 @@
 	  (psw 14) (sp 15)))
 
 (define-keyword
-  (name gr-Rbj-names)
+  (name gr-Rb-names)
   (print-name h-Rbj)
-  (values (r8 0) (r9 1)))
+  (values (r8 0) (r9 1) (r10 2) (r11 3)
+	  (r12 4) (r13 5) (r14 6) (r15 7)
+	  (psw 6) (sp 7)))
 
 (define-hardware
   (name h-gr)
@@ -75,11 +77,21 @@
 )
 
 (define-hardware
+  (name h-Rb)
+  (comment "Rb registers")
+  (attrs VIRTUAL)
+  (type register SI(8))
+  (indices extern-keyword gr-Rb-names)
+  (get (index) (reg h-gr (add index 8)))
+  (set (index newval) (set (reg h-gr (add index 8)) newval))
+)
+
+(define-hardware
   (name h-Rbj)
   (comment "Rbj registers")
   (attrs VIRTUAL)
   (type register SI(2))
-  (indices extern-keyword gr-Rbj-names)
+  (indices extern-keyword gr-Rb-names)
   (get (index) (reg h-gr (add index 8)))
   (set (index newval) (set (reg h-gr (add index 8)) newval))
 )
@@ -153,7 +165,7 @@
 (dnop Rs "general register source" ()  h-gr f-Rs)
 
 (dnf f-Rb  "base register" ()  17 3)
-(dnop Rb "base register" ()  h-gr f-Rb)
+(dnop Rb "base register" ()  h-Rb f-Rb)
 
 (dnf f-Rbj "base register for jump" () 11 1)
 (dnop Rbj "base register for jump" () h-Rbj f-Rbj)
@@ -1834,6 +1846,8 @@
 (dni halt "halt" () ("halt") (+ (f-op #x0008)) (c-call VOID "do_halt") ())
 
 (dni hold "hold" () ("hold") (+ (f-op #x000A)) (c-call VOID "do_hold") ())
+
+(dni holdx "holdx" () ("holdx") (+ (f-op #x000B)) (c-call VOID "do_holdx") ())
 
 (dni brk "brk" () ("brk") (+ (f-op #x0005)) (c-call VOID "do_brk") ())
 

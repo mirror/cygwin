@@ -338,6 +338,11 @@ xstormy16_cpu::do_hold ()
 {
 }
 
+void
+xstormy16_cpu::do_holdx ()
+{
+}
+
 // XXX finish me
 // CPU stops the execution of the instruction, the peripheral
 // circuits continue operating.  Status is released when then

@@ -1,3 +1,8 @@
+2002-01-10  matthew green  <mrg@redhat.com>
+
+	* xstormy16.cxx (do_holdx): Define.
+	* xstormy16.h (do_holdx): Declare.
+
 2001-10-04  matthew green  <mrg@redhat.com>
 
 	* xstormy16-cpu.h: Regenerate with Rbj fix.

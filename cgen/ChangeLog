@@ -1,3 +1,13 @@
+2002-01-10  matthew green  <mrg@redhat.com>
+
+	* cpu/xstormy16.cpu (gr-Rbj-names): Rename this ...
+	(gr-Rb-names): ... to this.
+	(h-Rb): New hardware peice.
+	(h-Rbj): Use gr-Rb-names.
+	(Rb): Use h-Rb.
+
+	(holdx): New instruction.
+
 2002-01-07  Ben Elliston  <bje@redhat.com>
 
 	* utils.scm (package-cygnus-simulators): Rename from this ..

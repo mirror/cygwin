@@ -24,8 +24,6 @@
 ;   including generic cgen documentation here
 ; - function units, timing, etc.
 ; - instruction framing
-; - ARM docs mix arm/thumb, should be separate,
-;   first try to split using keep-isa
 
 ; Global state variables.
 

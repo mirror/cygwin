@@ -76,7 +76,7 @@ parse_hi16 (cd, strp, opindex, valuep)
       if (errmsg == NULL
           && result_type == CGEN_PARSE_OPERAND_RESULT_NUMBER)
         value >>= 16;
-      *valuep = value;
+      *valuep = (long) (short) value;
 
       return errmsg;
     }
@@ -87,7 +87,7 @@ parse_hi16 (cd, strp, opindex, valuep)
       else
         errmsg = cgen_parse_unsigned_integer (cd, strp, opindex, &value);
     }
-  *valuep = value & 0xffff;
+  *valuep = (long) (short) (value & 0xffff);
   return errmsg;
 }
 
@@ -127,7 +127,7 @@ parse_lo16 (cd, strp, opindex, valuep)
       if (errmsg == NULL
           && result_type == CGEN_PARSE_OPERAND_RESULT_NUMBER)
         value &= 0xffff;
-      *valuep = value;
+      *valuep = (long) (short) value;
 
       return errmsg;
     }
@@ -136,7 +136,7 @@ parse_lo16 (cd, strp, opindex, valuep)
     errmsg = cgen_parse_signed_integer (cd, strp, opindex, (long *) &value);
   else
     errmsg = cgen_parse_unsigned_integer (cd, strp, opindex, &value);
-  *valuep = value & 0xffff;
+  *valuep = (long) (short) (value & 0xffff);
   return errmsg;
 }
 

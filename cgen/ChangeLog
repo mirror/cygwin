@@ -1,3 +1,15 @@
+2001-01-06  Johan Rydberg  <jrydberg@opencores.org>
+
+	* openrisc.cpu (or32): Setup semantics for h-delay-insn to
+	current insn plus 4.
+	(h-delay-insn): New hardware register.
+	(l-jal): Uses h-delay-insn instead of pc when setting link register.
+	(l-jalr): Likewise.
+	(l-bal): Likewise.
+
+	* openrisc.opc (parse_hi16): Sign extend value.
+	(parse_lo16): Likewise.
+
 2001-01-06  Ben Elliston  <bje@redhat.com>
 
 	* utils-gen.scm (gen-sfmt-enum-decl): Use @prefix@ and @PREFIX@

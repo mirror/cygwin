@@ -1,0 +1,110 @@
+nl	The file is CYGNUS LOCAL.  It is used for cygwin.
+
+dnl	This file is an input file used by the GNU "autoconf" program to
+dnl	generate the file "configure", which is run during Tcl installation
+dnl	to configure the system for the local environment.
+
+AC_PREREQ(2.5)
+
+AC_INIT(../generic/tk.h)
+
+if test "${prefix}" = "NONE"; then
+    prefix=/usr/local
+fi
+if test "${exec_prefix}" = "NONE"; then
+    exec_prefix=$prefix
+fi
+
+AC_CANONICAL_HOST
+
+AC_PROG_CC
+AC_OBJEXT
+NM=${NM-nm}
+AC_SUBST(NM)
+AS=${AS-as}
+AC_SUBST(AS)
+LD=${LD-ld}
+AC_SUBST(LD)
+DLLTOOL=${DLLTOOL-dlltool}
+AC_SUBST(DLLTOOL)
+WINDRES=${WINDRES-windres}
+AC_SUBST(WINDRES)
+AC_PROG_INSTALL
+
+# needed for the subtle differences between cygwin and mingw32
+case "${host}" in
+*-*-cygwin*)
+	DLL_LDLIBS=-lcygwin
+	DLL_LDFLAGS='-nostartfiles -Wl,--dll'
+	;;
+*-*-mingw32*)
+	DLL_LDLIBS=
+	DLL_LDFLAGS='-mdll'
+	;;
+esac
+
+AC_SUBST(TCL_ALLOC_OBJ)
+AC_SUBST(DLL_LDFLAGS)
+AC_SUBST(DLL_LDLIBS)
+
+# The following stuff is just for tkConfig.sh, not for Makefile. 
+
+AC_ARG_WITH(tcl, [  --with-tcl=DIR          use Tcl 8.0 binaries from DIR],
+	TCL_BIN_DIR=$withval, TCL_BIN_DIR=`cd ../../tcl/unix; pwd`)
+if test ! -d $TCL_BIN_DIR; then
+    AC_MSG_ERROR(Tcl directory $TCL_BIN_DIR doesn't exist)
+fi
+if test ! -f $TCL_BIN_DIR/tclConfig.sh; then
+    AC_MSG_ERROR(There's no tclConfig.sh in $TCL_BIN_DIR;  perhaps you didn't specify the Tcl *build* directory (not the toplevel Tcl directory) or you forgot to configure Tcl?)
+fi
+
+file=$TCL_BIN_DIR/tclConfig.sh
+. $file
+SHLIB_CFLAGS=$TCL_SHLIB_CFLAGS
+SHLIB_LD=$TCL_SHLIB_LD
+SHLIB_LD_LIBS=$TCL_SHLIB_LD_LIBS
+SHLIB_SUFFIX=$TCL_SHLIB_SUFFIX
+SHLIB_VERSION=$TCL_SHLIB_VERSION
+DL_LIBS=$TCL_DL_LIBS
+LD_FLAGS=$TCL_LD_FLAGS
+TK_LD_SEARCH_FLAGS=$TCL_LD_SEARCH_FLAGS
+
+LIBOBJS=
+AC_SUBST(LIBOBJS)
+TK_VERSION=8.0
+TK_MAJOR_VERSION=8
+TK_MINOR_VERSION=0
+TK_PATCH_LEVEL=p2
+VERSION=${TK_VERSION}
+
+MATH_LIBS=-lm
+LIBOBJS=
+
+TK_SHLIB_CFLAGS=""
+eval "TK_LIB_FILE=libtk${TCL_UNSHARED_LIB_SUFFIX}"
+
+TK_UNSHARED_LIB_FILE="$TK_LIB_FILE"
+TK_SRC_DIR=`cd $srcdir/..; pwd`
+
+XINCLUDES="-I`cd $srcdir/../xlib; pwd`"
+XLIBSW=
+TK_BUILD_INCLUDES="-I`cd $srcdir/../generic; pwd` -I`cd $srcdir/../xlib; pwd`"
+TK_BUILD_LIB_SPEC="-L`pwd` -ltk`echo ${VERSION} | tr -d .`"
+TK_LIB_SPEC="-L${exec_prefix}/lib -ltk`echo ${VERSION} | tr -d .`"
+
+AC_SUBST(DL_LIBS)
+AC_SUBST(LD_FLAGS)
+AC_SUBST(MATH_LIBS)
+AC_SUBST(TK_BUILD_INCLUDES)
+AC_SUBST(TK_BUILD_LIB_SPEC)
+AC_SUBST(TK_LIB_FILE)
+AC_SUBST(TK_LIB_SPEC)
+AC_SUBST(TK_MAJOR_VERSION)
+AC_SUBST(TK_MINOR_VERSION)
+AC_SUBST(TK_PATCH_LEVEL)
+AC_SUBST(TK_SRC_DIR)
+AC_SUBST(TK_VERSION)
+AC_SUBST(XINCLUDES)
+AC_SUBST(XLIBSW)
+
+AC_OUTPUT(Makefile ../unix/tkConfig.sh)

@@ -1,0 +1,646 @@
+# Visual C++ 2.x and 4.0 makefile
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+# 
+# Copyright (c) 1995-1996 Sun Microsystems, Inc.
+# SCCS: @(#) makefile.vc 1.63 97/08/13 13:33:32
+
+# Does not depend on the presence of any environment variables in
+# order to compile tcl; all needed information is derived from 
+# location of the compiler directories.
+
+# This file is CYGNUS LOCAL.  It is a copy of makefile.vc from the
+# standard tk distribution, modified to work with cygwin and an
+# autoconf configure script.  I have chosen to minimize the number of
+# changes, so the comments continue to refer to Visual C++ and the
+# like.  This should make it easier to merge in a new version if that
+# is necessary.
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+VPATH = @srcdir@:@srcdir@/../xlib:@srcdir@/../generic:@srcdir@/../unix:@srcdir@/../win/rc
+srcdir = @srcdir@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+CC = @CC@
+CFLAGS = @CFLAGS@
+NM = @NM@
+AS = @AS@
+LD = @LD@
+DLLTOOL = @DLLTOOL@
+WINDRES = @WINDRES@
+
+OBJEXT=@OBJEXT@
+
+DLL_LDFLAGS = @DLL_LDFLAGS@
+DLL_LDLIBS = @DLL_LDLIBS@
+
+# Current Tk version;  used in various names.
+
+DIRVERSION = @TK_VERSION@
+
+# The following definition can be set to non-null for special systems
+# like AFS with replication.  It allows the pathnames used for installation
+# to be different than those used for actually reference files at
+# run-time.  INSTALL_ROOT is prepended to $prefix and $exec_prefix
+# when installing files.
+INSTALL_ROOT =
+
+# Directory from which applications will reference the library of Tcl
+# scripts (note: you can set the TK_LIBRARY environment variable at
+# run-time to override the compiled-in location):
+TK_LIBRARY =		@datadir@/tk$(DIRVERSION)
+
+# Path name to use when installing library scripts:
+SCRIPT_INSTALL_DIR =	$(INSTALL_ROOT)$(TK_LIBRARY)
+
+# Directory in which to install the .a or .so binary for the Tk library:
+LIB_INSTALL_DIR =	$(INSTALL_ROOT)@libdir@
+
+# Directory in which to install the program wish:
+BIN_INSTALL_DIR =	$(INSTALL_ROOT)@bindir@
+
+# Directory in which to install the include file tk.h:
+INCLUDE_INSTALL_DIR =	$(INSTALL_ROOT)@includedir@
+
+# Directory in which to install the X11 header files.  These files are
+# not machine independent, so they should not go in includedir.
+X11_INCLUDE_INSTALL_DIR = $(INSTALL_ROOT)@exec_prefix@/@host_alias@/include/X11
+
+DEMOPROGS = browse hello ixset rmt rolodex square tcolor timer widget
+
+#
+# Project directories
+#
+# ROOT    = top of source tree
+#
+# TMPDIR  = location where .obj files should be stored during build
+#
+# TOOLS32 = location of VC++ 32-bit development tools. Note that the
+#	    VC++ 2.0 header files are broken, so you need to use the
+#	    ones that come with the developer network CD's, or later
+#	    versions of VC++.
+#
+# TCLDIR = location of top of Tcl source heirarchy
+#
+
+ROOT	= $(srcdir)/..
+TMPDIR	= .
+TOOLS32	= c:\msdev
+TCLDIR	= $(srcdir)/../../tcl
+
+# Set this to the appropriate value of /MACHINE: for your platform
+MACHINE	= IX86
+
+# Comment the following line to compile with symbols
+NODEBUG=1
+
+# uncomment the following two lines to compile with TCL_MEM_DEBUG
+#DEBUGDEFINES	=-DTCL_MEM_DEBUG
+
+######################################################################
+# Do not modify below this line
+######################################################################
+
+VERSION = 80
+
+TCLDLL = cygtcl$(VERSION).dll
+TCLLIB = libtcl$(VERSION).a
+TCLPLUGINDLL = cygtcl$(VERSION)p.dll
+TCLPLUGINLIB = libtcl$(VERSION)p.a
+TKDLL = cygtk$(VERSION).dll
+TKLIB = libtk$(VERSION).a
+TKPLUGINDLL = cygtk$(VERSION)p.dll
+TKPLUGINLIB = libtk$(VERSION)p.a
+
+WISH = cygwish$(VERSION).exe
+WISHP = cygwishp$(VERSION).exe
+TKTEST = tktest.exe
+DUMPEXTS = $(TMPDIR)/dumpexts.exe
+
+WISHOBJS = \
+	$(TMPDIR)/tkConsole.$(OBJEXT) \
+	$(TMPDIR)/winMain.$(OBJEXT)
+
+TKTESTOBJS = \
+	$(TMPDIR)/tkConsole.$(OBJEXT) \
+	$(TMPDIR)/tkTest.$(OBJEXT) \
+	$(TMPDIR)/tkSquare.$(OBJEXT) \
+	$(TMPDIR)/testMain.$(OBJEXT)
+
+XLIBOBJS = \
+	$(TMPDIR)/xcolors.$(OBJEXT) \
+	$(TMPDIR)/xdraw.$(OBJEXT) \
+	$(TMPDIR)/xgc.$(OBJEXT) \
+	$(TMPDIR)/ximage.$(OBJEXT) \
+	$(TMPDIR)/xutil.$(OBJEXT)
+
+TKOBJS = \
+	$(TMPDIR)/tkUnixMenubu.$(OBJEXT) \
+	$(TMPDIR)/tkUnixScale.$(OBJEXT) \
+	$(XLIBOBJS) \
+	$(TMPDIR)/tkWin3d.$(OBJEXT) \
+	$(TMPDIR)/tkWin32Dll.$(OBJEXT) \
+	$(TMPDIR)/tkWinButton.$(OBJEXT) \
+	$(TMPDIR)/tkWinClipboard.$(OBJEXT) \
+	$(TMPDIR)/tkWinColor.$(OBJEXT) \
+	$(TMPDIR)/tkWinCursor.$(OBJEXT) \
+	$(TMPDIR)/tkWinDialog.$(OBJEXT) \
+	$(TMPDIR)/tkWinDraw.$(OBJEXT) \
+	$(TMPDIR)/tkWinEmbed.$(OBJEXT) \
+	$(TMPDIR)/tkWinFont.$(OBJEXT) \
+	$(TMPDIR)/tkWinImage.$(OBJEXT) \
+	$(TMPDIR)/tkWinInit.$(OBJEXT) \
+	$(TMPDIR)/tkWinKey.$(OBJEXT) \
+	$(TMPDIR)/tkWinMenu.$(OBJEXT) \
+	$(TMPDIR)/tkWinPixmap.$(OBJEXT) \
+	$(TMPDIR)/tkWinPointer.$(OBJEXT) \
+	$(TMPDIR)/tkWinRegion.$(OBJEXT) \
+	$(TMPDIR)/tkWinScrlbr.$(OBJEXT) \
+	$(TMPDIR)/tkWinSend.$(OBJEXT) \
+	$(TMPDIR)/tkWinWindow.$(OBJEXT) \
+	$(TMPDIR)/tkWinWm.$(OBJEXT) \
+	$(TMPDIR)/tkWinX.$(OBJEXT) \
+	$(TMPDIR)/stubs.$(OBJEXT) \
+	$(TMPDIR)/tk3d.$(OBJEXT) \
+	$(TMPDIR)/tkArgv.$(OBJEXT) \
+	$(TMPDIR)/tkAtom.$(OBJEXT) \
+	$(TMPDIR)/tkBind.$(OBJEXT) \
+	$(TMPDIR)/tkBitmap.$(OBJEXT) \
+	$(TMPDIR)/tkButton.$(OBJEXT) \
+	$(TMPDIR)/tkCanvArc.$(OBJEXT) \
+	$(TMPDIR)/tkCanvBmap.$(OBJEXT) \
+	$(TMPDIR)/tkCanvImg.$(OBJEXT) \
+	$(TMPDIR)/tkCanvLine.$(OBJEXT) \
+	$(TMPDIR)/tkCanvPoly.$(OBJEXT) \
+	$(TMPDIR)/tkCanvPs.$(OBJEXT) \
+	$(TMPDIR)/tkCanvText.$(OBJEXT) \
+	$(TMPDIR)/tkCanvUtil.$(OBJEXT) \
+	$(TMPDIR)/tkCanvWind.$(OBJEXT) \
+	$(TMPDIR)/tkCanvas.$(OBJEXT) \
+	$(TMPDIR)/tkClipboard.$(OBJEXT) \
+	$(TMPDIR)/tkCmds.$(OBJEXT) \
+	$(TMPDIR)/tkColor.$(OBJEXT) \
+	$(TMPDIR)/tkConfig.$(OBJEXT) \
+	$(TMPDIR)/tkCursor.$(OBJEXT) \
+	$(TMPDIR)/tkEntry.$(OBJEXT) \
+	$(TMPDIR)/tkError.$(OBJEXT) \
+	$(TMPDIR)/tkEvent.$(OBJEXT) \
+	$(TMPDIR)/tkFileFilter.$(OBJEXT) \
+	$(TMPDIR)/tkFocus.$(OBJEXT) \
+	$(TMPDIR)/tkFont.$(OBJEXT) \
+	$(TMPDIR)/tkFrame.$(OBJEXT) \
+	$(TMPDIR)/tkGC.$(OBJEXT) \
+	$(TMPDIR)/tkGeometry.$(OBJEXT) \
+	$(TMPDIR)/tkGet.$(OBJEXT) \
+	$(TMPDIR)/tkGrab.$(OBJEXT) \
+	$(TMPDIR)/tkGrid.$(OBJEXT) \
+	$(TMPDIR)/tkImage.$(OBJEXT) \
+	$(TMPDIR)/tkImgBmap.$(OBJEXT) \
+	$(TMPDIR)/tkImgGIF.$(OBJEXT) \
+	$(TMPDIR)/tkImgPPM.$(OBJEXT) \
+	$(TMPDIR)/tkImgPhoto.$(OBJEXT) \
+	$(TMPDIR)/tkImgUtil.$(OBJEXT) \
+	$(TMPDIR)/tkListbox.$(OBJEXT) \
+	$(TMPDIR)/tkMacWinMenu.$(OBJEXT) \
+	$(TMPDIR)/tkMain.$(OBJEXT) \
+	$(TMPDIR)/tkMenu.$(OBJEXT) \
+	$(TMPDIR)/tkMenubutton.$(OBJEXT) \
+	$(TMPDIR)/tkMenuDraw.$(OBJEXT) \
+	$(TMPDIR)/tkMessage.$(OBJEXT) \
+	$(TMPDIR)/tkOption.$(OBJEXT) \
+	$(TMPDIR)/tkPack.$(OBJEXT) \
+	$(TMPDIR)/tkPlace.$(OBJEXT) \
+	$(TMPDIR)/tkPointer.$(OBJEXT) \
+	$(TMPDIR)/tkRectOval.$(OBJEXT) \
+	$(TMPDIR)/tkScale.$(OBJEXT) \
+	$(TMPDIR)/tkScrollbar.$(OBJEXT) \
+	$(TMPDIR)/tkSelect.$(OBJEXT) \
+	$(TMPDIR)/tkText.$(OBJEXT) \
+	$(TMPDIR)/tkTextBTree.$(OBJEXT) \
+	$(TMPDIR)/tkTextDisp.$(OBJEXT) \
+	$(TMPDIR)/tkTextImage.$(OBJEXT) \
+	$(TMPDIR)/tkTextIndex.$(OBJEXT) \
+	$(TMPDIR)/tkTextMark.$(OBJEXT) \
+	$(TMPDIR)/tkTextTag.$(OBJEXT) \
+	$(TMPDIR)/tkTextWind.$(OBJEXT) \
+	$(TMPDIR)/tkTrig.$(OBJEXT) \
+	$(TMPDIR)/tkUtil.$(OBJEXT) \
+	$(TMPDIR)/tkVisual.$(OBJEXT) \
+	$(TMPDIR)/tkWindow.$(OBJEXT)
+
+cc32		= $(TOOLS32)\bin\cl.exe
+link32		= $(TOOLS32)\bin\link.exe
+rc32		= $(TOOLS32)\bin\rc.exe
+include32	= -I$(TOOLS32)\include
+
+WINDIR          = $(ROOT)/win
+GENERICDIR	= $(ROOT)/generic
+XLIBDIR		= $(ROOT)/xlib
+BITMAPDIR	= $(ROOT)/bitmaps
+TCLLIBDIR       = ../../tcl/win
+RCDIR		= $(WINDIR)/rc
+
+TK_INCLUDES	= -I$(WINDIR) -I$(GENERICDIR) -I$(BITMAPDIR) -I$(XLIBDIR) \
+			-I$(TCLDIR)/generic
+TK_DEFINES	= $(DEBUGDEFINES)
+
+TK_CFLAGS	= $(cdebug) $(cflags) $(cvarsdll) \
+			$(TK_INCLUDES) $(TK_DEFINES) $(CFLAGS)
+
+######################################################################
+# Link flags
+######################################################################
+
+#!IFDEF NODEBUG
+#ldebug = /RELEASE
+#!ELSE
+#ldebug = -debug:full -debugtype:cv
+#!ENDIF
+
+# declarations common to all linker options
+# lcommon = /NODEFAULTLIB /RELEASE /NOLOGO
+
+# declarations for use on Intel i386, i486, and Pentium systems
+#!IF "$(MACHINE)" == "IX86"
+#DLLENTRY = @12
+#lflags   = $(lcommon) -align:0x1000 /MACHINE:$(MACHINE)
+#!ELSE
+#lflags   = $(lcommon) /MACHINE:$(MACHINE)
+#!ENDIF
+
+ifeq ($(OBJEXT),obj)
+
+lcommon = /NODEFAULTLIB /RELEASE /NOLOGO
+lflags   = $(lcommon) -align:0x1000 /MACHINE:$(MACHINE)
+conlflags = $(lflags)  -subsystem:console -entry:mainCRTStartup
+guilflags = $(lflags) -subsystem:windows -entry:WinMainCRTStartup
+dlllflags = $(lflags) -entry:_DllMainCRTStartup@12 -dll
+
+else
+
+conlflags = $(lflags) -Wl,--subsystem,console -mwindows
+guilflags = $(lflags) -mwindows
+dlllflags = $(lflags)
+
+endif
+
+#!IF "$(MACHINE)" == "PPC"
+#libc = libc.lib
+#libcdll = crtdll.lib
+#!ELSE
+#libc = libc.lib oldnames.lib
+#libcdll = msvcrt.lib oldnames.lib
+#!ENDIF
+
+ifeq ($(OBJEXT),o)
+
+baselibs   = -lkernel32 $(optlibs) -ladvapi32
+winlibs    = $(baselibs) -luser32 -lgdi32 -lcomdlg32 -lwinspool
+
+else
+
+baselibs   = kernel32.lib $(optlibs) advapi32.lib
+winlibs    = $(baselibs) user32.lib gdi32.lib comdlg32.lib winspool.lib
+libcdll    = msvcrt.lib oldnames.lib
+
+endif
+
+guilibs	   = $(libc) $(winlibs)
+
+guilibsdll = $(libcdll) $(winlibs)
+
+######################################################################
+# Compile flags
+######################################################################
+
+#!IFDEF NODEBUG
+#cdebug = -Ox
+#!ELSE
+#cdebug = -Z7 -Od -WX
+#!ENDIF
+
+# declarations common to all compiler options
+#ccommon = -c -W3 -nologo -YX
+
+#!IF "$(MACHINE)" == "IX86"
+#cflags = $(ccommon) -D_X86_=1
+#!ELSE
+#!IF "$(MACHINE)" == "MIPS"
+#cflags = $(ccommon) -D_MIPS_=1
+#!ELSE
+#!IF "$(MACHINE)" == "PPC"
+#cflags = $(ccommon) -D_PPC_=1
+#!ELSE
+#!IF "$(MACHINE)" == "ALPHA"
+#cflags = $(ccommon) -D_ALPHA_=1
+#!ENDIF
+#!ENDIF
+#!ENDIF
+#!ENDIF
+
+cvars      = -DWIN32 -D_WIN32
+cvarsmt    = $(cvars) -D_MT
+cvarsdll   = $(cvarsmt) -D_DLL
+
+CON_CFLAGS	= $(cdebug) $(cflags) $(cvars) $(include32) -DCONSOLE
+
+######################################################################
+# Project specific targets
+######################################################################
+
+all:    $(TKDLL) $(TKLIB) $(WISH)
+test:	$(TKTEST)
+plugin:	$(TKPLUGINDLL) $(WISHP)
+
+install: install-binaries install-libraries install-demos
+
+install-binaries: $(TKDLL) $(TKLIB) $(WISH)
+	@for i in $(LIB_INSTALL_DIR) $(BIN_INSTALL_DIR) ; \
+	    do \
+	    if [ ! -d $$i ] ; then \
+		echo "Making directory $$i"; \
+		mkdir $$i; \
+		chmod 755 $$i; \
+		else true; \
+		fi; \
+	    done;
+	@echo "Installing $(TKLIB)"
+	@$(INSTALL_DATA) $(TKLIB) $(LIB_INSTALL_DIR)/$(TKLIB)
+	@chmod 555 $(LIB_INSTALL_DIR)/$(TKLIB)
+	@echo "Installing wish"
+	@$(INSTALL_PROGRAM) $(WISH) $(BIN_INSTALL_DIR)/$(WISH)
+	@echo "Installing tkConfig.sh"
+	@$(INSTALL_DATA) ../unix/tkConfig.sh $(LIB_INSTALL_DIR)/tkConfig.sh
+
+install-libraries:
+	@echo "Installing DLL"
+	@$(INSTALL_DATA) $(TKDLL) $(BIN_INSTALL_DIR)/$(TKDLL)
+	@for i in $(INSTALL_ROOT)@datadir@ $(INCLUDE_INSTALL_DIR) \
+		$(SCRIPT_INSTALL_DIR) $(INSTALL_ROOT)@exec_prefix@ \
+		$(INSTALL_ROOT)@exec_prefix@/@host_alias@ \
+		$(INSTALL_ROOT)@exec_prefix@/@host_alias@/include \
+		$(X11_INCLUDE_INSTALL_DIR) ; \
+	    do \
+	    if [ ! -d $$i ] ; then \
+		echo "Making directory $$i"; \
+		mkdir $$i; \
+		chmod 755 $$i; \
+		else true; \
+		fi; \
+	    done;
+	@echo "Installing tk.h"
+	@$(INSTALL_DATA) $(GENERICDIR)/tk.h $(INCLUDE_INSTALL_DIR)/tk.h
+	for i in $(XLIBDIR)/X11/*.h; \
+	    do \
+	    echo "Installing $$i"; \
+	    $(INSTALL_DATA) $$i $(X11_INCLUDE_INSTALL_DIR); \
+	    done;
+	for i in $(ROOT)/library/*.tcl $(ROOT)/library/tclIndex $(ROOT)/library/prolog.ps $(ROOT)/unix/tkAppInit.c; \
+	    do \
+	    echo "Installing $$i"; \
+	    $(INSTALL_DATA) $$i $(SCRIPT_INSTALL_DIR); \
+	    done;
+
+install-minimal:
+	@echo "Installing DLL"
+	@$(INSTALL_DATA) $(TKDLL) $(BIN_INSTALL_DIR)/$(TKDLL)
+	@for i in $(INSTALL_ROOT)@datadir@ $(SCRIPT_INSTALL_DIR) ; \
+	    do \
+	    if [ ! -d $$i ] ; then \
+		echo "Making directory $$i"; \
+		mkdir $$i; \
+		chmod 755 $$i; \
+		else true; \
+		fi; \
+	    done;
+	for i in $(ROOT)/library/*.tcl $(ROOT)/library/tclIndex $(ROOT)/library/prolog.ps; \
+	    do \
+	    echo "Installing $$i"; \
+	    $(INSTALL_DATA) $$i $(SCRIPT_INSTALL_DIR); \
+	    done;
+
+install-demos:
+	@for i in $(INSTALL_ROOT)@datadir@ $(SCRIPT_INSTALL_DIR) \
+		$(SCRIPT_INSTALL_DIR)/demos \
+		$(SCRIPT_INSTALL_DIR)/demos/images ; \
+	    do \
+	    if [ ! -d $$i ] ; then \
+		echo "Making directory $$i"; \
+		mkdir $$i; \
+		chmod 755 $$i; \
+		else true; \
+		fi; \
+	    done;
+	@for i in $(ROOT)/library/demos/*; \
+	    do \
+	    if [ -f $$i ] ; then \
+		echo "Installing $$i"; \
+		sed -e '3 s|exec wish|exec $(WISH)|' \
+			$$i > $(SCRIPT_INSTALL_DIR)/demos/`basename $$i`; \
+	    fi; \
+	    done;
+	@for i in $(DEMOPROGS); \
+	    do \
+	    chmod 755 $(SCRIPT_INSTALL_DIR)/demos/$$i; \
+	    done;
+	@for i in $(ROOT)/library/demos/images/*; \
+	    do \
+	    if [ -f $$i ] ; then \
+		echo "Installing $$i"; \
+		$(INSTALL_DATA) $$i $(SCRIPT_INSTALL_DIR)/demos/images; \
+		fi; \
+	    done;
+
+ifeq ($(OBJEXT),o)
+
+$(TKDLL): $(TKOBJS) tkres.$(OBJEXT) tkcyg.def
+	$(CC) -s $(DLL_LDFLAGS) -Wl,--base-file,tk.base -o $(TKDLL) $(TKOBJS) tkres.$(OBJEXT) $(TCLLIBDIR)/$(TCLLIB) $(DLL_LDLIBS) -mwindows -Wl,-e,_DllMain@12 -Wl,--image-base,0x66300000
+	$(DLLTOOL) --as=$(AS) --dllname $(TKDLL) --def $(TMPDIR)/tkcyg.def --base-file tk.base --output-exp tk.exp
+	$(CC) -s $(DLL_LDFLAGS) -Wl,--base-file,tk.base tk.exp -o $(TKDLL) $(TKOBJS) tkres.$(OBJEXT) $(TCLLIBDIR)/$(TCLLIB) $(DLL_LDLIBS) -mwindows -Wl,-e,_DllMain@12 -Wl,--image-base,0x66300000
+	$(DLLTOOL) --as=$(AS) --dllname $(TKDLL) --def $(TMPDIR)/tkcyg.def --base-file tk.base --output-exp tk.exp
+	$(CC) $(DLL_LDFLAGS) tk.exp -o $(TKDLL) $(TKOBJS) tkres.$(OBJEXT) $(TCLLIBDIR)/$(TCLLIB) $(DLL_LDLIBS) -mwindows -Wl,-e,_DllMain@12 -Wl,--image-base,0x66300000
+
+else
+
+$(TKDLL): $(TKOBJS) tkres.$(OBJEXT) tkcyg.def
+	link $(ldebug) $(dlllflags) -def:tkcyg.def \
+		-out:$@ tkres.$(OBJEXT) $(TCLLIBDIR)/$(TCLLIB) \
+		$(guilibsdll) $(TKOBJS)
+	mv cygtk80.lib libtk80.a
+endif
+
+ifeq ($(OBJEXT),o)
+
+$(TKLIB): $(TMPDIR)/tkcyg.def
+	$(DLLTOOL) --as=$(AS) --dllname $(TKDLL) --def $(TMPDIR)/tkcyg.def --output-lib $(TKLIB)
+
+else
+
+$(TKLIB): $(TKDLL)
+
+endif
+
+$(TKPLUGINLIB): $(TMPDIR)/plugin.def
+	$(DLLTOOL) --as=$(AS) --dllname $(TKPLUGINDLL) --def $(TMPDIR)/plugin.def --output-lib $(TKPLUGINLIB)
+
+$(TKPLUGINDLL): $(TKOBJS) tkres.$(OBJEXT) $(TMPDIR)/plugin.def
+	$(CC) $(DLL_LDFLAGS) -Wl,--base-file,tkplugin.base -o $(TKPLUGINDLL) $(TKOBJS) tkres.$(OBJEXT) $(TCLLIBDIR)/$(TCLLIB) $(DLL_LDLIBS) -mwindows -Wl,-e,_DllMain@12 -Wl,--image-base,0x66800000
+	$(DLLTOOL) --as=$(AS) --dllname $(TKPLUGINDLL) --def $(TMPDIR)/plugin.def --base-file tkplugin.base --output-exp tk.exp
+	$(CC) $(DLL_LDFLAGS) -Wl,--base-file,tkplugin.base tk.exp -o $(TKPLUGINDLL) $(TKOBJS) tkres.$(OBJEXT) $(TCLLIBDIR)/$(TCLLIB) $(DLL_LDLIBS) -mwindows -Wl,-e,_DllMain@12 -Wl,--image-base,0x66800000
+	$(DLLTOOL) --as=$(AS) --dllname $(TKPLUGINDLL) --def $(TMPDIR)/plugin.def --base-file tkplugin.base --output-exp tk.exp
+	$(CC) $(DLL_LDFLAGS) tk.exp -o $(TKPLUGINDLL) $(TKOBJS) tkres.$(OBJEXT) $(TCLLIBDIR)/$(TCLLIB) $(DLL_LDLIBS) -mwindows -Wl,-e,_DllMain@12 -Wl,--image-base,0x66800000
+
+ifeq ($(OBJEXT),o)
+
+$(WISH): $(WISHOBJS) wishres.$(OBJEXT) $(TKLIB)
+	$(CC) $(ldebug) $(guilflags) $(WISHOBJS) wishres.$(OBJEXT) -o $@ \
+		$(TKLIB) $(TCLLIBDIR)/$(TCLLIB) $(guilibsdll)
+
+else
+
+$(WISH): $(WISHOBJS) wishres.$(OBJEXT) $(TKLIB)
+	link $(ldebug) $(guilflags) $(WISHOBJS) wishres.$(OBJEXT) -OUT:$@ \
+		$(TKLIB) $(TCLLIBDIR)/$(TCLLIB) $(guilibsdll)
+endif
+
+$(WISHP): $(WISHOBJS) $(TKPLUGINLIB) wishres.$(OBJEXT)
+	$(CC) $(ldebug) $(guilflags) $(WISHOBJS) wishres.$(OBJEXT) -o $@ \
+		$(TKPLUGINLIB) $(TCLLIBDIR)/$(TCLPLUGINLIB) $(guilibsdll)
+
+$(TKTEST): $(TKTESTOBJS) wishres.$(OBJEXT) $(TKLIB)
+	$(CC) $(ldebug) $(guilflags) $(TKTESTOBJS) wishres.$(OBJEXT) -o $@ \
+		$(TKLIB) $(TCLLIBDIR)/$(TCLLIB) $(guilibsdll)
+
+ifeq ($(OBJEXT),o)
+tkcyg.def: $(TKOBJS)
+	echo 'EXPORTS' > tmp.def
+	for o in $(TKOBJS); do \
+	  $(NM) --extern-only --defined-only $$o | sed -e 's/[^ ]* [^ ]* //' -e 's/^_//' | fgrep -v DllEntryPoint | fgrep -v DllMain | fgrep -v impure_ptr >> tmp.def; \
+	done
+	mv tmp.def $(TMPDIR)/tkcyg.def
+
+plugin.def: $(TKOBJS)
+	echo 'EXPORTS' > tmp.def
+	for o in $(TKOBJS); do \
+	  $(NM) --extern-only --defined-only $$o | sed -e 's/[^ ]* [^ ]* //' -e 's/^_//' | fgrep -v DllEntryPoint | fgrep -v DllMain | fgrep -v impure_ptr >> tmp.def; \
+	done
+	mv tmp.def $(TMPDIR)/plugin.def
+
+else
+
+# Source-Navigator need the extra Symbols.
+
+tkcyg.def: $(TKOBJS) $(DUMPEXTS)
+	$(DUMPEXTS) -o tkcyg.def $(TKDLL) $(TKOBJS)
+	echo "	tkWindowType" >> tkcyg.def
+	echo "	tkArcType" >> tkcyg.def
+	echo "	tkBitmapType" >> tkcyg.def
+	echo "	tkOvalType" >> tkcyg.def
+	echo "	tkImageType" >> tkcyg.def
+	echo "	tkPolygonType" >> tkcyg.def
+	echo "	tkLineType" >> tkcyg.def
+	echo "	tkTextType" >> tkcyg.def
+	echo "	tkRectangleType" >> tkcyg.def
+	echo "	tkTextCharType" >> tkcyg.def
+
+plugin.def: $(TKOBJS) $(DUMPEXTS)
+	$(DUMPEXTS) -o tkcyg.def $(TKDLL) $(TKOBJS) 
+
+
+$(DUMPEXTS): $(TCLDIR)/win/winDumpExts.c
+	$(CC) $(TCLDIR)/win/winDumpExts.c user32.lib -link -OUT:$(DUMPEXTS)
+
+endif
+
+#$(DUMPEXTS): $(TCLDIR)\win\winDumpExts.c
+#	$(cc32) $(CON_CFLAGS) -Fo$(TMPDIR)\ $?
+#	set LIB=$(TOOLS32)\lib
+#	$(link32) $(ldebug) $(conlflags) $(guilibs) -out:$@ \
+#		$(TMPDIR)\winDumpExts.$(OBJEXT)bj 
+
+#
+# Special case object file targets
+#
+
+$(TMPDIR)/testMain.$(OBJEXT): $(ROOT)/win/winMain.c
+	$(CC) -c $(TK_CFLAGS) -DTK_TEST -o $@ $?
+
+#
+# Implicit rules
+#
+.SUFFIXES: .S .c .o .obj .s
+.c.$(OBJEXT):
+	$(CC) -c $(TK_CFLAGS) $<
+
+ifeq ($(OBJEXT),o)
+
+tkres.$(OBJEXT): $(ROOT)/win/rc/tk.rc
+	$(WINDRES) --include $(ROOT)/win/rc --include $(ROOT)/generic --define VS_VERSION_INFO=1 $(ROOT)/win/rc/tk.rc tkres.$(OBJEXT)
+
+wishres.$(OBJEXT): $(ROOT)/win/rc/wish.rc
+	$(WINDRES) --include $(ROOT)/win/rc --include $(ROOT)/generic --define VS_VERSION_INFO=1 $(ROOT)/win/rc/wish.rc wishres.$(OBJEXT)
+
+else
+
+tkres.$(OBJEXT): $(ROOT)/win/rc/tk.rc
+	rc -i$(ROOT)/win/rc -i$(ROOT)/generic -dVS_VERSION_INFO=1 -fotkres.$(OBJEXT) $(ROOT)/win/rc/tk.rc 
+
+wishres.$(OBJEXT): $(ROOT)/win/rc/wish.rc
+	rc -i$(ROOT)/win/rc -i$(ROOT)/generic -dVS_VERSION_INFO=1 -fowishres.$(OBJEXT) $(ROOT)/win/rc/wish.rc 
+
+endif
+
+#{$(ROOT)\win\rc}.rc{$(TMPDIR)}.res:
+#	$(rc32) -fo $@ -r -i $(ROOT)\generic $<
+
+clean:
+	rm -f *.exp *.a *.dll *.exe $(TMPDIR)/*.$(OBJEXT) *.res *.def
+	rm -f tk.base tkplugin.base
+
+# dependencies
+
+$(TMPDIR)/tk.res: \
+    $(RCDIR)/buttons.bmp \
+    $(RCDIR)/cursor*.cur \
+    $(RCDIR)/tk.ico
+
+$(GENERICDIR)/default.h: $(WINDIR)/tkWinDefault.h
+$(GENERICDIR)/tkButton.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkCanvas.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkEntry.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkFrame.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkListbox.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkMenu.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkMenubutton.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkMessage.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkScale.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkScrollbar.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkText.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkTextIndex.c: $(GENERICDIR)/default.h
+$(GENERICDIR)/tkTextTag.c: $(GENERICDIR)/default.h
+
+$(GENERICDIR)/tkText.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextBTree.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextDisp.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextDisp.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextImage.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextIndex.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextMark.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextTag.c: $(GENERICDIR)/tkText.h
+$(GENERICDIR)/tkTextWind.c: $(GENERICDIR)/tkText.h
+
+$(GENERICDIR)/tkMacWinMenu.c: $(GENERICDIR)/tkMenu.h
+$(GENERICDIR)/tkMenu.c: $(GENERICDIR)/tkMenu.h
+$(GENERICDIR)/tkMenuDraw.c: $(GENERICDIR)/tkMenu.h
+$(WINDIR)/tkWinMenu.c: $(GENERICDIR)/tkMenu.h
+
+Makefile: $(WINDIR)/Makefile.in config.status
+	$(SHELL) config.status
+
+config.status: $(WINDIR)/configure
+	./config.status --recheck

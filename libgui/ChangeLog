@@ -1,3 +1,13 @@
+2000-04-18  James Ingham  <jingham@leda.cygnus.com>
+
+	* library/toolbar.tcl (TOOLBAR_button_up): If the pointer is still 
+	in the button, reraise the button after a press.
+
+2000-04-03  James Ingham  <jingham@leda.cygnus.com>
+
+	* src/paths.c: Follow links in determining the location of the
+	executable.
+
 Fri Sep 17 19:14:15 1999  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* src/guitcl.h (cyg_create_warp_pointer_command): Add declaration.

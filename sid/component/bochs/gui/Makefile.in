@@ -128,14 +128,16 @@ sidtarget_x86 = @sidtarget_x86@
 sidtarget_xstormy16 = @sidtarget_xstormy16@
 
 AUTOMAKE_OPTIONS = foreign
+@HAVE_XOS_HEADER_TRUE@GUI_FILES = @HAVE_XOS_HEADER_TRUE@x-gui.cc x-gui.h iconbochs.h
+@HAVE_XOS_HEADER_FALSE@GUI_FILES = @HAVE_XOS_HEADER_FALSE@dummy.cc
 
-INCLUDES = -I$(top_builddir)/../../include -I$(srcdir) -I$(srcdir)/.. -I$(srcdir)/../../../include -I$(srcdir)/../cpu
+INCLUDES = -I$(top_builddir)/../../include -I$(srcdir) -I$(srcdir)/.. -I$(srcdir)/../../../include -I$(srcdir)/../cpu -I$(srcdir)/../../memory
 
-noinst_LTLIBRARIES = libmemory.la
+noinst_LTLIBRARIES = libgui.la
 
-libmemory_la_SOURCES = memory.cc memory-sid.cc misc_mem.cc memory.h memory-sid.h
+libgui_la_SOURCES = $(GUI_FILES)
 
-libmemory_la_LDFLAGS = -no-undefined
+libgui_la_LDFLAGS = -no-undefined
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../config/mkinstalldirs
 CONFIG_HEADER = ../config.h
 CONFIG_CLEAN_FILES = 
@@ -150,8 +152,9 @@ X_CFLAGS = @X_CFLAGS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
-libmemory_la_LIBADD = 
-libmemory_la_OBJECTS =  memory.lo memory-sid.lo misc_mem.lo
+libgui_la_LIBADD = 
+@HAVE_XOS_HEADER_FALSE@libgui_la_OBJECTS =  dummy.lo
+@HAVE_XOS_HEADER_TRUE@libgui_la_OBJECTS =  x-gui.lo
 CXXFLAGS = @CXXFLAGS@
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -167,15 +170,15 @@ DIST_COMMON =  Makefile.am Makefile.in
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 GZIP_ENV = --best
-DEP_FILES =  .deps/memory-sid.P .deps/memory.P .deps/misc_mem.P
-SOURCES = $(libmemory_la_SOURCES)
-OBJECTS = $(libmemory_la_OBJECTS)
+DEP_FILES =  .deps/dummy.P .deps/x-gui.P
+SOURCES = $(libgui_la_SOURCES)
+OBJECTS = $(libgui_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .cc .lo .o .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign memory/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --foreign gui/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -223,8 +226,8 @@ distclean-libtool:
 
 maintainer-clean-libtool:
 
-libmemory.la: $(libmemory_la_OBJECTS) $(libmemory_la_DEPENDENCIES)
-	$(CXXLINK)  $(libmemory_la_LDFLAGS) $(libmemory_la_OBJECTS) $(libmemory_la_LIBADD) $(LIBS)
+libgui.la: $(libgui_la_OBJECTS) $(libgui_la_DEPENDENCIES)
+	$(CXXLINK)  $(libgui_la_LDFLAGS) $(libgui_la_OBJECTS) $(libgui_la_LIBADD) $(LIBS)
 .cc.o:
 	$(CXXCOMPILE) -c $<
 .cc.lo:
@@ -261,14 +264,14 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = memory
+subdir = gui
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign memory/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign gui/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \

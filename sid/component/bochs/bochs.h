@@ -543,6 +543,7 @@ extern bx_debug_t bx_dbg;
 enum PCS_OP { PCS_CLEAR, PCS_SET, PCS_TOGGLE };
 
 #if BX_SUPPORT_SID
+#include "vga/vga.h"
 #else
 #include "pc_system.h"
 

@@ -1,3 +1,36 @@
+2002-01-21  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* Makefile.am (SUBDIRLIST): Add vga, gui.
+	(SUBLIBLIST): Add vga/libvga.la, gui/libgui.la.
+	(INCLUDES): Add vga, gui directories.
+	* bochs.h: Include vga/vga.h.
+	* configure.in: Add check for X11/Xos.h header.
+	Add vga/Makefile and gui/Makefile to AC_OUTPUT.
+	* config.h.in (BX_USE_VGA_SMF): Set to 0.
+	(HAVE_X11_XOS_H): New define.
+	* components.cxx (compX86ListTypes): Add types hw-video-vga,
+	sid-io-vga.
+	(compX86Create): Likewise.
+	(compX86Delete): Handle deletion of x86_cpu, vga and x_gui components.
+
+	* gui/Makefile.am: New file.
+	* gui/Makefile.in: Likewise.
+	* gui/dummy.cc: Likewise.
+	* gui/icon_bochs.h: Likewise.
+	* gui/x-gui.h: Likewise.
+	* gui/x-gui.cc: Likewise.
+
+	* vga/Makefile.am: New file.
+	* vga/Makefile.in: Likewise.
+	* vga/sid-vga-wrapper.cc: Likewise.
+	* vga/sid-vga-wrapper.h: Likewise.
+	* vga/tests/vga-test-bounce.c: Likewise.
+	* vga/tests/vga-test-color.c: Likewise.
+	* vga/tests/vga-test-draw.c: Likewise.
+	* vga/tests/vga-test-modes.c: Likewise.
+	* vga/vga.cc: Likewise.
+	* vga/vga.cc: Likewise.
+
 2001-11-30  Frank Ch. Eigler  <fche@redhat.com>
 
 	* cpu/x86.h: Add dummy x86_cpu dtor.

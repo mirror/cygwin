@@ -677,9 +677,9 @@ gloss32::do_sys_exit()
     cerr << "*** exit(" << value << ")" << endl;
   
   if (value == 0)
-    process_signal_pin.drive(newlib::sigQuit);
+    process_signal_pin.drive((value << 8) | newlib::sigQuit);
   else
-    process_signal_pin.drive(newlib::sigAbrt);
+    process_signal_pin.drive((value << 8) | newlib::sigAbrt);
 }
 
 void

@@ -219,6 +219,7 @@ function gentest {
             -e 's/\\[/\\\\\\[/g' \
             -e 's/\\]/\\\\\\]/g' \
             -e 's/[+]/\\\\+/g' \
+            -e 's/[.]/\\\\./g' \
             -e 's/[*]/\\\\*/g' | \
 	sed -e 's/^.*file format.*$/.*: +file format .*/' \
 	>>${1}.d

@@ -1,0 +1,150 @@
+            hw-glue-sequence (libglue.la :: glue_component_library)
+
+Synopsis:
+
+   This component forwards signals received at its input to its output at a
+   specified number of signals per tick. This is useful for simulating baud
+   rates in serial devices.
+
+     ----------------------------------------------------------------------
+
+Functionality:
+
+  Modelling:
+
+   This component is a fifo for pin signals.
+
+   +-------------------------------------------------+
+   |                    Behaviors                    |
+   |-------------------------------------------------|
+   |   configuration | signals-per-tick designates   |
+   |                 | how many signal will be       |
+   |                 | driven (if available) per     |
+   |                 | incoming signal on the tick   |
+   |                 | pin.                          |
+   |-----------------+-------------------------------|
+   | data forwarding | This component is a fifo for  |
+   |                 | pin signals. It will generate |
+   |                 | a duplicate pin signal on its |
+   |                 | output for every pin signal   |
+   |                 | on its input at the pace      |
+   |                 | configured in the attribute   |
+   |                 | signals-per-tick. These       |
+   |                 | signals will be generated     |
+   |                 | whenever the tick input pin   |
+   |                 | is driven. If the fifo        |
+   |                 | contains less than            |
+   |                 | signals-per-tick signals when |
+   |                 | tick is driven, then          |
+   |                 | request-input will be driven. |
+   |                 | If no further signals arrive  |
+   |                 | when request-input is driven, |
+   |                 | then output will be driven    |
+   |                 | with whatever signals are     |
+   |                 | available in the fifo. (If    |
+   |                 | none are available, then none |
+   |                 | will be driven.) The fifo     |
+   |                 | size is limited only by       |
+   |                 | memory on the simulating pc.  |
+   |                 | Note that input rate is not   |
+   |                 | controlled. The device        |
+   |                 | generating data (for example  |
+   |                 | a stdio component or a socket |
+   |                 | component) can put data into  |
+   |                 | the fifo at whatver rate it   |
+   |                 | desires, which will simply    |
+   |                 | require more memory to store  |
+   |                 | the data until it can be      |
+   |                 | driven out at the next tick.  |
+   |                 | It is recommended that        |
+   |                 | request-input be connected to |
+   |                 | the polling pin on whatever   |
+   |                 | device is connected to input. |
+   |                 | On the stdio component for    |
+   |                 | example, this would replace   |
+   |                 | the input from a host         |
+   |                 | scheduler.                    |
+   +-------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |    functional | supported | This is a           |
+   |               |           | functional          |
+   |               |           | component.          |
+   |---------------+-----------+---------------------|
+   |         state | supported | This component      |
+   |  save/restore |           | supports state      |
+   |               |           | save/restore        |
+   |---------------+-----------+---------------------|
+   | triggerpoints | supported | This component      |
+   |               |           | supports            |
+   |               |           | triggerpoints.      |
+   |---------------+-----------+---------------------|
+   |     Recursion | supported | This component      |
+   |       Control |           | limits recursion on |
+   |               |           | the input pin.      |
+   |---------------+-----------+---------------------|
+   |  presentation | supported | This component      |
+   |               |           | presents attributes |
+   |               |           | in the "pin",       |
+   |               |           | "setting", and      |
+   |               |           | "watchable"         |
+   |               |           | categories.         |
+   +-------------------------------------------------+
+
+     ----------------------------------------------------------------------
+
+Environment:
+
+   This device is useful for modeling a baud rate on a serial device.
+
+     ----------------------------------------------------------------------
+
+Component Reference:
+
+  Component: hw-glue-sequence (Abstract)
+
+   +-------------------------------------------------+
+   |                      pins                       |
+   |-------------------------------------------------|
+   |    name     |direction|legalvalues|  behaviors  |
+   |-------------+---------+-----------+-------------|
+   |tick         |in       |any        |data         |
+   |             |         |           |forwarding   |
+   |-------------+---------+-----------+-------------|
+   |request_input|out      |any        |data         |
+   |             |         |           |forwarding   |
+   |-------------+---------+-----------+-------------|
+   |input        |in       |any        |data         |
+   |             |         |           |forwarding   |
+   |-------------+---------+-----------+-------------|
+   |output       |out      |any        |data         |
+   |             |         |           |forwarding   |
+   +-------------------------------------------------+
+
+   +----------------------------------------------------------+
+   |                        attributes                        |
+   |----------------------------------------------------------|
+   |      name      |category | legal  |default|  behaviors  ||
+   |                |         | values | value |             ||
+   |----------------+---------+--------+-------+-------------||
+   |state-snapshot  |no       |opaque  |-      |state        ||
+   |                |category |string  |       |save/restore ||
+   |----------------+---------+--------+-------+-------------||
+   |                |setting, |32 bit  |       |             ||
+   |signals-per-tick|watchable|positive|1      |configuration||
+   |                |         |number  |       |             ||
+   |----------------+---------+--------+-------+-------------||
+   |tick            |pin,     |-       |-      |data         ||
+   |                |watchable|        |       |forwarding   ||
+   |----------------+---------+--------+-------+-------------||
+   |request-input   |pin,     |-       |-      |data         ||
+   |                |watchable|        |       |forwarding   ||
+   |----------------+---------+--------+-------+-------------||
+   |input           |pin,     |-       |-      |data         ||
+   |                |watchable|        |       |forwarding   ||
+   |----------------+---------+--------+-------+-------------||
+   |output          |pin,     |-       |-      |data         ||
+   |                |watchable|        |       |forwarding   ||
+   +----------------------------------------------------------+

@@ -1,6 +1,7 @@
 // glue.cxx - miscellaneous glue components.  -*- C++ -*-
 
 // Copyright (C) 1999-2001 Red Hat.
+// Portions Copyright (C) 2004 Sirius Satellite Radio Inc.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -557,11 +558,184 @@ public:
 
 // ----------------------------------------------------------------------------
 
+  // The pin pacer component paces pin signals based on a trigger input 
+  class pin_pacer_component: public virtual component,
+			    protected fixed_pin_map_component,
+			    protected no_accessor_component,
+			    protected fixed_attribute_map_component,
+			    protected no_relation_component,
+			    protected no_bus_component,
+			    protected recursion_limited
+  {
+    host_int_4 trace;
+    host_int_4 signals_per_tick;
+    callback_pin<pin_pacer_component> tick;
+    callback_pin<pin_pacer_component> input;
+    output_pin request_input;
+    output_pin output;
+
+    deque<host_int_4> data_fifo;
+
+    friend class self_watcher<pin_pacer_component>;
+    self_watcher<pin_pacer_component> triggerpoint_manager;
+
+    void handle_input(host_int_4 value)
+      {
+        data_fifo.push_back(value);
+	triggerpoint_manager.check_and_dispatch();
+      }
+
+    void handle_tick(host_int_4 value)
+      {
+      	unsigned long output_count = data_fifo.size();
+
+	while(output_count < signals_per_tick)
+	{ 
+	  if(trace)
+	    printf("Requesting Data.\n");
+
+	  request_input.drive(0);
+
+	  // Give up if our souce isn't giving us any data.
+	  if(data_fifo.size() == output_count)
+	    break;
+
+	  output_count = data_fifo.size();
+	}
+
+	if(output_count > signals_per_tick)
+	  output_count = signals_per_tick;
+	
+	if(trace)
+	{
+	  printf("Tick:");
+	  if(output_count != signals_per_tick)
+	    printf(" Underflow:");
+	  printf(" Outputting:");
+	}
+        while(output_count-- > 0)
+	{
+	  if(trace)
+	    printf(" %X", data_fifo[0]);
+	  output.drive(data_fifo[0]);
+	  data_fifo.pop_front();
+	}
+	if(trace)
+	  printf(".\n");
+
+	triggerpoint_manager.check_and_dispatch();
+      }
+
+    friend ostream& operator << (ostream& o, const pin_pacer_component& it);
+    friend istream& operator >> (istream& i, pin_pacer_component& it);
+    string save_state() { return make_attribute(*this); }
+    component::status restore_state(const string& state) { return parse_attribute(state, *this); }
+
+    // Virtual pin interfaces between self_watcher and fixed_pin_map_component
+    sid::component::status 
+    pin_factory(const string& name)
+      {
+	return triggerpoint_manager.create_virtual_pin (name);
+      }
+
+    void
+    pin_junkyard(const string& name)
+      {
+	triggerpoint_manager.destroy_virtual_pin (name);
+      }
+
+
+  public:
+    pin_pacer_component ();
+    ~pin_pacer_component () throw() { };
+  };
+
+
+pin_pacer_component::pin_pacer_component():
+  recursion_limited ("pin signal sequencing"), 
+  signals_per_tick (1), 
+  trace (0), 
+  input (this, &pin_pacer_component::handle_input),
+  tick (this, &pin_pacer_component::handle_tick),
+  triggerpoint_manager (this)
+{
+  add_attribute ("trace?", &trace, "setting");
+  triggerpoint_manager.add_watchable_attribute ("trace?");
+  
+  add_attribute ("signals-per-tick", & signals_per_tick, "setting");
+  triggerpoint_manager.add_watchable_attribute ("signals-per-tick");
+  
+  add_pin ("input", & input);
+  add_attribute ("input", & input, "pin");
+  triggerpoint_manager.add_watchable_attribute ("input");
+  categorize ("input", "watchable");
+  
+  add_pin ("tick", & tick);
+  add_attribute ("tick", & tick, "pin");
+  triggerpoint_manager.add_watchable_attribute ("tick");
+  categorize ("tick", "watchable");
+  
+  add_pin ("request-input", & request_input);
+  add_attribute ("request-input", & request_input, "pin");
+  triggerpoint_manager.add_watchable_attribute ("request-input");
+  categorize ("request-input", "watchable");
+  
+  add_pin ("output", & output);
+  add_attribute ("output", & output, "pin");
+  triggerpoint_manager.add_watchable_attribute ("output");
+  categorize ("output", "watchable");
+  
+  add_attribute_virtual ("state-snapshot", this,
+			       & pin_pacer_component::save_state,
+			       & pin_pacer_component::restore_state);
+}
+  
+  
+  ostream& 
+  operator << (ostream& o, const pin_pacer_component& it)
+{
+  o << "pin_pacer ";
+  o << it.signals_per_tick << " ";
+  o << it.input << " ";
+  o << it.output << " ";
+  o << it.tick << " ";
+  o << it.request_input;
+  // NB: no whitespace at end!
+  return o;
+}
+
+  
+  istream&
+  operator >> (istream& i, pin_pacer_component& it)
+{
+  string key;
+  i >> key;
+  if (key != "pin_pacer")
+    {
+      i.setstate (ios::badbit);
+      return i;
+    }
+
+  i >> it.signals_per_tick;
+  
+  i >> it.input;
+  i >> it.output;
+  i >> it.tick;
+  i >> it.request_input;
+
+  return i;
+}
+
+
+
+// ----------------------------------------------------------------------------
+
   static
   vector<string>
   list_types()
 {
   vector<string> types;
+  types.push_back("hw-glue-pin-pacer");
   types.push_back("hw-glue-sequence");
   types.push_back("hw-glue-sequence-1");
   types.push_back("hw-glue-sequence-2");
@@ -577,6 +751,8 @@ public:
   component*
   create(const string& typeName)
 {
+  if (typeName == "hw-glue-pin-pacer")
+    return new pin_pacer_component ();
   if (typeName == "hw-glue-sequence")
     return new sequence_component ();
   if (typeName == "hw-glue-sequence-1")
@@ -609,6 +785,8 @@ public:
   if (g3) { delete g3; return; }
   bus_mux* g4 = dynamic_cast<bus_mux*>(c);
   if (g4) { delete g4; return; }
+  pin_pacer_component* g5 = dynamic_cast<pin_pacer_component*>(c);
+  if (g5) { delete g5; return; }
 }
 
   

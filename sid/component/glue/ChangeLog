@@ -1,3 +1,12 @@
+2004-08-06  Robert Shideleff <bigbob@shideleff.com>
+
+	* glue.cxx (pin_pacer_component): Add new component class & methods.
+	(list_types, create, do_delete): Support it.
+	* hw-glue-pin-pacer.xml: New file.
+	* hw-glue-pin-pacer.txt: Regenerated.
+	* Makefile.am: Add reference to new file.
+	* Makefile.in: Regenerated.
+
 2002-11-11  Frank Ch. Eigler  <fche@redhat.com>
 
 	* glue.cxx (bus_prober): Dtor throw() fixes.

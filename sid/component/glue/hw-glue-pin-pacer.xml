@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libglue.la" dlsym="glue_component_library">
+  <defcomponent name="hw-glue-sequence" type="abstract">
+
+    <!-- pins -->
+    <defpin name="tick" direction="in" legalvalues="any" behaviors="data forwarding" />
+    <defpin name="request_input" direction="out" legalvalues="any" behaviors="data forwarding" />
+    <defpin name="input" direction="in" legalvalues="any" behaviors="data forwarding" />
+    <defpin name="output" direction="out" legalvalues="any" behaviors="data forwarding" />
+
+    <!-- attributes -->
+    <defattribute name="state-snapshot" category="no category" legalvalues="opaque string" behaviors="state save/restore" />
+    <defattribute name="signals-per-tick" category="setting, watchable" legalvalues="32 bit positive number" defaultvalue="1" behaviors="configuration" />
+    <defattribute name="tick" category="pin, watchable" behaviors="data forwarding" />
+    <defattribute name="request-input" category="pin, watchable" behaviors="data forwarding" />
+    <defattribute name="input" category="pin, watchable" behaviors="data forwarding" />
+    <defattribute name="output" category="pin, watchable" behaviors="data forwarding" />
+  </defcomponent>
+  <synop>
+    <p>
+      This component forwards signals received at its input to its output at a specified number of signals per tick.
+      This is useful for simulating baud rates in serial devices.
+    </p>
+  </synop>
+  <func>
+    <modelling>
+      <p>
+	 This component is a fifo for pin signals.
+      </p>
+    </modelling>
+    <behavior name="configuration">
+      <p>
+        <attribute>signals-per-tick</attribute> designates how many signal will be driven (if available) per incoming signal
+	on the tick pin.
+      </p>
+    </behavior>
+    <behavior name="data forwarding">
+      <p>
+	 This component is a fifo for pin signals. It will generate a duplicate pin signal on its output for every pin
+	 signal on its input at the pace configured in the attribute <attribute>signals-per-tick</attribute>. These
+	 signals will be generated whenever the tick input pin is driven. If the fifo contains less than signals-per-tick
+	 signals when tick is driven, then request-input will be driven. If no further signals arrive when request-input
+	 is driven, then output will be driven with whatever signals are available in the fifo. (If none are available,
+	 then none will be driven.) The fifo size is limited only by memory on the simulating pc. Note that input rate is
+	 not controlled. The device generating data (for example a stdio component or a socket component) can put data
+	 into the fifo at whatver rate it desires, which will simply require more memory to store the data until it
+	 can be driven out at the next tick. It is recommended that <pin>request-input</pin> be connected to the polling
+	 pin on whatever device is connected to <pin>input</pin>. On the stdio component for example, this would replace
+	 the input from a host scheduler.
+      </p>
+    </behavior>
+    <convention name="functional" supported="true">
+      <p>
+	This is a functional component.</p>
+    </convention>
+    <convention name="state save/restore" supported="true">
+      <p>
+	This component supports state save/restore 
+     </p>
+    </convention>
+    <convention name="triggerpoints" supported="true">
+      <p>
+	This component supports triggerpoints.
+      </p>
+    </convention>
+    <convention name="Recursion Control" supported="true">
+      <p>
+	This component limits recursion on the <pin>input</pin> pin.</p>
+    </convention>
+    <convention name="presentation" supported="true">
+      <p>
+	This component presents attributes in the <name>pin</name>, <name>setting</name>, and <name>watchable</name> categories.</p>
+    </convention>
+  </func>
+  <env>
+      <p>
+        This device is useful for modeling a baud rate on a serial device.
+     </p>
+  </env>
+</defcomplib>
+

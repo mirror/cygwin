@@ -1,4 +1,4 @@
-This is a current list of sid component shared libraries. $Date: 2003/07/14 18:50:08 $
+This is a current list of sid component shared libraries. $Date: 2004/08/06 14:17:23 $
 
 DIRECTORY       DSO                     COMPONENT_LIBRARY                  MAINTAINERS
 
@@ -46,6 +46,7 @@ hw-cpu-xstormy16        Sanyo Xstormy16 CPU model
 hw-disk-harddrive	Newer IDE hard drive model (controller + drives)
 hw-disk-ide             IDE hard drive model (controller + drives)
 hw-glue-bus-mux         Bus multiplexer
+hw-glue-pin-pacer	Pin signal FIFO queue.
 hw-glue-probe-bus       Bus traffic tracer
 hw-glue-sequence        Sequential pin event dispatcher
 hw-input-keyboard	PC keyboard model

@@ -315,12 +315,10 @@ program_interrupt(cpu *processor,
       cpu_error(processor, cia, "program interrupt - %s",
 		"illegal instruction (optional instruction not supported)");
       break;
-#ifdef WITH_OPTION_MPC860C0
     case mpc860c0_instruction_program_interrupt:
       cpu_error(processor, cia, "program interrupt - %s",
         	"problematic branch detected, see MPC860 C0 errata");
       break;
-#endif // WITH_OPTION_MPC860C0
     default:
       error("internal error - program_interrupt - reason %d not implemented", reason);
     }
@@ -342,13 +340,11 @@ program_interrupt(cpu *processor,
       case trap_program_interrupt:
 	srr1_set = srr1_trap;
 	break;
-#ifdef WITH_OPTION_MPC860C0
       case mpc860c0_instruction_program_interrupt:
         srr1_set = 0;
-        error(processor, cia, "program interrupt - %s",
+        cpu_error(processor, cia, "program interrupt - %s",
               "problematic branch detected, see MPC860 C0 errata");
         break;
-#endif // WITH_OPTION_MPC860C0
       default:
 	srr1_set = 0;
 	error("internal error - program_interrupt - reason %d not implemented", reason);
@@ -473,7 +469,7 @@ deliver_hardware_interrupt(void *data)
       unsigned_word cia = cpu_get_program_counter(processor);
       unsigned_word nia = perform_oea_interrupt(processor,
 						cia, 0x00900, 0, 0, 0, 0);
-      TRACE(trace_interrupts, ("decrementer interrupt - cia=0x%lx time=0x%lx\n",
+      TRACE(trace_interrupts, ("decrementer interrupt - cia 0x%lx, time %ld\n",
 			       (unsigned long)cia,
 			       (unsigned long)event_queue_time(psim_event_queue(cpu_system(processor)))
 			       ));

@@ -5319,7 +5319,6 @@ else
 fi
 
 TCL_LIB_FULL_PATH="`pwd`/${TCL_LIB_FILE}"
-TCL_BIN_DIR="`pwd`"
 
 #--------------------------------------------------------------------
 #	The statements below define the symbol TCL_PACKAGE_PATH, which
@@ -5362,7 +5361,6 @@ fi
 
 
 # CYGNUS LOCAL
-
 
 
 # END CYGNUS LOCAL
@@ -5548,7 +5546,6 @@ s%@TCL_UNSHARED_LIB_SUFFIX@%$TCL_UNSHARED_LIB_SUFFIX%g
 s%@TCL_VERSION@%$TCL_VERSION%g
 s%@TCL_SHARED_LIB_FILE@%$TCL_SHARED_LIB_FILE%g
 s%@TCL_UNSHARED_LIB_FILE@%$TCL_UNSHARED_LIB_FILE%g
-s%@TCL_BIN_DIR@%$TCL_BIN_DIR%g
 
 CEOF
 EOF

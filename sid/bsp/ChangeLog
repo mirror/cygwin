@@ -1,3 +1,7 @@
+2000-12-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configrun-sid.in: Add support for default endianness for --gdb runs.
+
 2000-11-23  Frank Ch. Eigler  <fche@redhat.com>
 
 	* pregen/: New subdirectory.

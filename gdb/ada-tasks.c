@@ -4,7 +4,7 @@
 .
    This file is part of GDB.
 
-   [$Id: ada-tasks.c,v 1.5.2.1 2002/12/23 19:38:11 carlton Exp $]
+   [$Id: ada-tasks.c,v 1.5.2.2 2003/06/27 21:49:44 carlton Exp $]
    Authors: Roch-Alexandre Nomine Beguin, Arnaud Charlet <charlet@gnat.com>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 #include "inferior.h"
 #include "symtab.h"
 #include "target.h"
+#include "regcache.h"
 #include "gdbcore.h"
 
 #if (defined(__alpha__) && defined(__osf__) && !defined(__alpha_vxworks))
@@ -89,8 +90,6 @@ extern void *GET_CURRENT_THREAD ();
 
 #define READ_MEMORY(addr, var) read_memory (addr, (char*) &var, sizeof (var))
 /* external declarations */
-
-extern struct value *find_function_in_inferior (char *);
 
 /* Global visible variables */
 

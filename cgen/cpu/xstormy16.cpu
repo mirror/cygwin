@@ -30,6 +30,7 @@
   (endian little)
   (insn-endian little)
   (insn-chunk-bitsize 16)
+  (word-bitsize 32)
 )
 
 (define-mach
@@ -47,6 +48,24 @@
 	() () () ())
 )
 
+; IDOC attribute for instruction documentation.
+
+(define-attr
+  (for insn)
+  (type enum)
+  (name IDOC)
+  (comment "insn kind for documentation")
+  (attrs META)
+  (values
+   (MEM - () "Memory")
+   (ALU - () "ALU")
+   (FPU - () "FPU")
+   (BR - () "Branch")
+   (PRIV - () "Priviledged")
+   (MISC - () "Miscellaneous")
+  )
+)
+
 ; Hardware elements.
 
 (dsh h-pc "program counter" (PC) (pc))

@@ -1,4 +1,6 @@
-/* Copyright 1993, 1997, 1999, 2000 Free Software Foundation, Inc.
+/* Stack manipulation commands, for GDB the GNU Debugger.
+
+   Copyright 2003 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -17,16 +19,9 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#include "mips/tm-mips.h"
+#ifndef STACK_H
+#define STACK_H
 
-#undef  MIPS_REGISTER_NAMES
-#define MIPS_REGISTER_NAMES 	\
-    {	"sr",	"lo",	"hi",	"bad",	"cause","pc", \
-	"",   	"",   	"",   	"",   	"",   	"",   	"",   	"", \
-	"",   	"",   	"",  	"",  	"",  	"",  	"",  	"", \
-	"",  	"",  	"",  	"",  	"",  	"",  	"",  	"", \
-	"",  	"",  	"",  	"",  	"",  	"",  	"",  	"", \
-	"",  	"",  	"",	"", \
-	"",	"",	"",	"",	"",	"",	"",	"", \
-	"",	"", "config", "cache", "debug", "depc", "epc",	"" \
-    }
+void select_frame_command (char *level_exp, int from_tty);
+
+#endif /* #ifndef STACK_H */

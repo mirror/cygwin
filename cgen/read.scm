@@ -795,7 +795,7 @@ Define a preprocessor-style macro.
 
 (define (include file)
   (logit 1 "Including file " file " ...\n")
-  (reader-read-file! (string-append srcdir "/" file))
+  (reader-read-file! (string-append srcdir "/cpu/" file))
   (logit 2 "Resuming previous file ...\n")
 )
 
@@ -1162,7 +1162,7 @@ Define a preprocessor-style macro.
 
 	(if repl?
 	    (debug-repl nil))
-	(cpu-load (string-append srcdir "/" arch ".cpu")
+	(cpu-load (string-append srcdir "/cpu/" arch ".cpu")
 		  keep-mach keep-isa flags
 		  app-init! app-finish! app-analyze!)
 	; Start another repl loop if -d.

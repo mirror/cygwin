@@ -1,10 +1,10 @@
-This is the README for CGEN 0.7.1
+This is the README for CGEN 1.0.
 
 If you just want to read up on cgen, I suggest going directly to the
 doc directory, and in particular doc/intro.texi.
-
+
 What is it?
-===========
+-----------
 
 In a nutshell, CGEN is a project to provide a uniform framework for doing
 binutils and simulator ports without explicitly closing any doors on anything
@@ -23,9 +23,9 @@ because I think it should be.
 CGEN is short for "Cpu tools GENerator".  It's not a very good name.
 I'm not very good at picking names.  An early version of the name was
 "GENCPU"!  So give me a better one.
-
+
 Copyright
-=========
+--------
 
 CGEN is Copyright 2000 Red Hat, Inc.
 
@@ -33,9 +33,9 @@ The full text of the copyright for CGEN is contained in the file
 COPYING.CGEN.  The copyright of CGEN uses the Autoconf copyright
 as a guide.  The intent is to have CGEN under a GNU-style copyright but
 place no restrictions on the output of CGEN.
-
+
 Installation
-============
+------------
 
 CGEN 0.7.1 can be used with GNU Binutils snapshots as of ??????
 and GNU GDB snapshots as of ??????.
@@ -49,9 +49,9 @@ at this point is M32R and FR30.
 CGEN uses Guile so Guile must be installed.
 Guile 1.2 and 1.3 are supported.
 2) 
-
+
 Source Layout
-=============
+-------------
 
 CGEN sources are divided into several categories:
 
@@ -66,19 +66,24 @@ CGEN sources are divided into several categories:
 
 File naming rules:
 
-1) The top level script for each application shall be named cgen-<appl>.scm.
-   No other files shall be named cgen-*.scm.
-2) Files implementing a particular class (or related collection of classes)
-   shall be named <class-name>.scm, or a reasonable abbreviation thereof.
-3) CPU description files shall be named <arch>.cpu.
-   [it should go without saying that no other files shall be named <arch>.cpu]
-4) CPU opcode support files shall be named <arch>.opc.
-   [it should go without saying that no other files shall be named <arch>.opc]
+1. The top level script for each application shall be named
+   cgen-<appl>.scm. No other files shall be named cgen-*.scm.
+
+2. Files implementing a particular class (or related collection of
+   classes) shall be named <class-name>.scm, or a reasonable
+   abbreviation thereof.
+
+3. CPU description files shall be named <arch>.cpu and placed in the
+   `cpu' sub-directory.
+
+4. CPU opcode support files shall be named <arch>.opc and similarly
+   placed in the `cpu' sub-directory.
 
 ??? May wish to change (1) to <appl>-cgen.scm so that each application's
 files will be collected together in `ls' output by the <appl>- prefix.
 
-documentation
+
+Documentation
 -------------
 
 doc/cgen.texi - top level .texi file, includes the others
@@ -178,14 +183,3 @@ cpu specific files
 <arch>.opc - <arch> opcode support
 
 null.cpu - minimal .cpu file for debugging purposes
-
-C version of cgen
------------------
-
-Makefile.am, Makefile.in - automake stuff
-acconfig.h,aclocal.m4,config.in,stamp-h.in - autoconf stuff
-configure.in,configure - autoconf stuff
-gdbinit.in - source for .gdbinit file
-cgen.c - main()
-cgen-gh.[ch] - additional functionality to Guile's gh interface
-cos.[ch] - C implementation of cgen object system

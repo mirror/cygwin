@@ -1,6 +1,6 @@
 /* ptrace-target.c
 
-   Copyright 200, 2001, 2002 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
    This file is part of RDA, the Red Hat Debug Agent (and library).
 

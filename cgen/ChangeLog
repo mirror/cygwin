@@ -1,3 +1,7 @@
+2002-11-19  DJ Delorie  <dj@redhat.com>
+
+	* cpu/xstormy16.cpu (sdiv, divlh, sdivlh): New.
+
 2002-11-05  Frank Ch. Eigler  <fche@redhat.com>
 
 	* dev.scm: Call getenv with a string, not a symbol.

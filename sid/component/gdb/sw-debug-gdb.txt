@@ -20,11 +20,6 @@ Functionality:
    schedulers' yield-host-time? attributes through the host-schedulers
    relation. See sid-sched for an explanation of these pins.
 
-   Also note that the term "hw-breakpoint" used in a sid context could mean
-   the same thing as the term "software breakpoint" in a gdb context. This is
-   because breakpoints in sid are sometimes implemented as triggerpoints set
-   on the pc register.
-
    +-------------------------------------------------+
    |                    Behaviors                    |
    |-------------------------------------------------|
@@ -160,6 +155,26 @@ Functionality:
    |                  | process-signal pin when gdb  |
    |                  | detaches from the target.    |
    |                  |                              |
+   |                  | When the enable-E-packet?    |
+   |                  | attribute is true, the gdb   |
+   |                  | component recognizes e       |
+   |                  | packets that it receives     |
+   |                  | from gdb, and performs       |
+   |                  | efficient step-out-of-range  |
+   |                  | operations. Without this,    |
+   |                  | gdb often maps users' "step" |
+   |                  | operations to a sequence of  |
+   |                  | instruction-granularity      |
+   |                  | steps, multiplying the       |
+   |                  | amount of traffic (and time) |
+   |                  | required. Some versions of   |
+   |                  | gdb require running the      |
+   |                  |                              |
+   |                  |set remote E-packet on        |
+   |                  |                              |
+   |                  | command in order to activate |
+   |                  | this feature.                |
+   |                  |                              |
    |                  | When the enable-Z-packet?    |
    |                  | attribute is true, the gdb   |
    |                  | component recognizes Z       |
@@ -172,12 +187,29 @@ Functionality:
    |                  | breakpoints directly using   |
    |                  | the read memory (m) and      |
    |                  | write memory (M) packets.    |
+   |                  | Some CPU models allow        |
+   |                  | separate modelling of        |
+   |                  | software (memory-based) and  |
+   |                  | hardware                     |
+   |                  | (triggerpoint-based)         |
+   |                  | breakpoints in response to   |
+   |                  | gdb packets. Default         |
+   |                  | settings of the attributes   |
+   |                  | force-Z-hw-to-sw? (false),   |
+   |                  | force-Z-sw-to-hw? (false),   |
+   |                  | and fallback-Z-sw-to-hw?     |
+   |                  | (true) cooperate to          |
+   |                  | automatically provide        |
+   |                  | portable triggerpoint-based  |
+   |                  | breakpoints for CPU models   |
+   |                  | without software breakpoint  |
+   |                  | support.                     |
    |                  |                              |
-   |                  | The Z-packet-pc-mask         |
-   |                  | attribute is used when       |
-   |                  | passing Harvard-encoded PC   |
-   |                  | addresses to the gdb         |
-   |                  | component via a Z packet.    |
+   |                  | The gdb-pc-mask attribute is |
+   |                  | used when passing            |
+   |                  | Harvard-encoded PC addresses |
+   |                  | to the gdb component via a Z |
+   |                  | packet.                      |
    |                  |                              |
    |                  | When the operating-mode?     |
    |                  | attribute is true, the gdb   |
@@ -259,27 +291,35 @@ Component Reference:
    |deinit              |in       |any        |deinitialization|
    +-----------------------------------------------------------+
 
-   +------------------------------------------------------+
-   |                      attributes                      |
-   |------------------------------------------------------|
-   |      name      |category|  legal  |default|behaviors||
-   |                |        | values  | value |         ||
-   |----------------+--------+---------+-------+---------||
-   |trace-gdbserv?  |-       |boolean  |false  |setting  ||
-   |----------------+--------+---------+-------+---------||
-   |trace-gdbsid?   |-       |boolean  |false  |setting  ||
-   |----------------+--------+---------+-------+---------||
-   |exit-on-detach? |-       |boolean  |false  |setting  ||
-   |----------------+--------+---------+-------+---------||
-   |enable-Z-packet?|-       |boolean  |true   |setting  ||
-   |----------------+--------+---------+-------+---------||
-   |Z-packet-pc-mask|-       |number   |0      |setting  ||
-   |----------------+--------+---------+-------+---------||
-   |operating-mode? |-       |boolean  |true   |setting  ||
-   |----------------+--------+---------+-------+---------||
-   |connected?      |-       |boolean, |false  |execution||
-   |                |        |read-only|       |         ||
-   +------------------------------------------------------+
+   +----------------------------------------------------------+
+   |                        attributes                        |
+   |----------------------------------------------------------|
+   |        name        |category|  legal  |default|behaviors||
+   |                    |        | values  | value |         ||
+   |--------------------+--------+---------+-------+---------||
+   |trace-gdbserv?      |-       |boolean  |false  |setting  ||
+   |--------------------+--------+---------+-------+---------||
+   |trace-gdbsid?       |-       |boolean  |false  |setting  ||
+   |--------------------+--------+---------+-------+---------||
+   |exit-on-detach?     |-       |boolean  |false  |setting  ||
+   |--------------------+--------+---------+-------+---------||
+   |enable-Z-packet?    |-       |boolean  |true   |setting  ||
+   |--------------------+--------+---------+-------+---------||
+   |enable-E-packet?    |-       |boolean  |true   |setting  ||
+   |--------------------+--------+---------+-------+---------||
+   |gdb-pc-mask         |-       |number   |0      |setting  ||
+   |--------------------+--------+---------+-------+---------||
+   |force-Z-hw-to-sw?   |-       |boolean  |false  |setting  ||
+   |--------------------+--------+---------+-------+---------||
+   |force-Z-hw-to-sw?   |-       |boolean  |false  |setting  ||
+   |--------------------+--------+---------+-------+---------||
+   |fallback-Z-sw-to-hw?|-       |boolean  |true   |setting  ||
+   |--------------------+--------+---------+-------+---------||
+   |operating-mode?     |-       |boolean  |true   |setting  ||
+   |--------------------+--------+---------+-------+---------||
+   |connected?          |-       |boolean, |false  |execution||
+   |                    |        |read-only|       |         ||
+   +----------------------------------------------------------+
 
      ----------------------------------------------------------------------
 

@@ -1,3 +1,15 @@
+2002-05-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* gdb.cxx (add_sw_breakpoint, remove_sw_breakpoint): New functions
+	for managing software breakpoints (Z0/z0 packets).
+	(remove_all_hw_breakpoints): Ditto.
+	(set_breakpoint, remove_breakpoints): Dispatch to them as appropriate.
+	* gdb.h (force_Z_sw_to_hw, force_Z_hw_to_sw, fallback_Z_sw_to_hw):
+	New parameters / attributes.
+	(gdb_pc_mask): Renamed parameter from hw_breakpoint_pc_mask.
+	* sw-debug-gdb.xml: Document new attributes.
+	* sw-debug-gdb.txt: Regenerated.
+
 2002-02-11  Frank Ch. Eigler  <fche@redhat.com>
 
 	* gdb.cxx (rangestep_program_hook, rangestep_program): New functions.

@@ -24,7 +24,11 @@
     <defattribute name="trace-gdbsid?" legalvalues="boolean" defaultvalue="false" behaviors="setting"/>
     <defattribute name="exit-on-detach?" legalvalues="boolean" defaultvalue="false" behaviors="setting"/>
     <defattribute name="enable-Z-packet?" legalvalues="boolean" defaultvalue="true" behaviors="setting"/>
-    <defattribute name="Z-packet-pc-mask" legalvalues="number" defaultvalue="0" behaviors="setting"/>
+    <defattribute name="enable-E-packet?" legalvalues="boolean" defaultvalue="true" behaviors="setting"/>
+    <defattribute name="gdb-pc-mask" legalvalues="number" defaultvalue="0" behaviors="setting"/>
+    <defattribute name="force-Z-hw-to-sw?" legalvalues="boolean" defaultvalue="false" behaviors="setting"/>
+    <defattribute name="force-Z-hw-to-sw?" legalvalues="boolean" defaultvalue="false" behaviors="setting"/>
+    <defattribute name="fallback-Z-sw-to-hw?" legalvalues="boolean" defaultvalue="true" behaviors="setting"/>
     <defattribute name="operating-mode?" legalvalues="boolean" defaultvalue="true" behaviors="setting"/>
     <defattribute name="connected?" legalvalues="boolean, read-only" defaultvalue="false" behaviors="execution"/>
   </defcomponent>
@@ -51,12 +55,6 @@
 	yield-host-time? attributes through the host-schedulers
 	relation. See <complib>sid-sched</complib> for an explanation
 	of these pins.
-      </p>
-      <p>
-	Also note that the term "hw-breakpoint" used in a sid context
-	could mean the same thing as the term "software breakpoint" in
-	a gdb context. This is because breakpoints in sid are
-	sometimes implemented as triggerpoints set on the pc register.
       </p>
     </modelling>
     <behavior name="initialization">
@@ -161,15 +159,34 @@
 	pin when gdb detaches from the target.
       </p>
       <p>
-	When the <attribute> enable-Z-packet?</attribute> attribute is
-	true, the gdb component recognizes Z packets that it receives
-	from gdb, and sets breakpoints according to their contents. If
-	the <attribute> enable-Z-packet?</attribute> attribute is
-	false, then gdb sets breakpoints directly using the read
-	memory (m) and write memory (M) packets.
+	When the <attribute> enable-E-packet?</attribute> attribute is
+	true, the gdb component recognizes e packets that it receives
+	from gdb, and performs efficient step-out-of-range operations.
+        Without this, gdb often maps users' "step" operations to a
+        sequence of instruction-granularity steps, multiplying the
+        amount of traffic (and time) required.
+        Some versions of gdb require running the
+       <code>set remote E-packet on</code>
+        command in order to activate this feature.
       </p>
       <p>
-	The <attribute> Z-packet-pc-mask</attribute> attribute is used
+	When the <attribute>enable-Z-packet?</attribute> attribute is
+	true, the gdb component recognizes Z packets that it receives
+	from gdb, and sets breakpoints according to their contents. If
+	the <attribute>enable-Z-packet?</attribute> attribute is
+	false, then gdb sets breakpoints directly using the read
+	memory (m) and write memory (M) packets.  Some CPU models
+	allow separate modelling of software (memory-based) and
+	hardware (triggerpoint-based) breakpoints in response to
+        gdb packets.  Default settings of the attributes 
+        <attribute>force-Z-hw-to-sw?</attribute> (false),
+        <attribute>force-Z-sw-to-hw?</attribute> (false), and
+        <attribute>fallback-Z-sw-to-hw?</attribute> (true) cooperate to 
+        automatically provide portable triggerpoint-based breakpoints for
+        CPU models without software breakpoint support.
+      </p>
+      <p>
+	The <attribute>gdb-pc-mask</attribute> attribute is used
 	when passing Harvard-encoded PC addresses to the gdb component
 	via a Z packet.
       </p>

@@ -16,9 +16,9 @@
  *  DISCLAIMED. This includes but is not limited to warranties of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * $Revision: 1.2 $
+ * $Revision: 1.3 $
  * $Author: dannysmith $
- * $Date: 2002/08/28 21:24:59 $
+ * $Date: 2003/03/16 22:18:05 $
  *
  */
 
@@ -33,6 +33,9 @@
 #define BIG_ENDIAN	4321
 #define LITTLE_ENDIAN	1234
 #define BYTE_ORDER	LITTLE_ENDIAN
+
+#define MAXPATHLEN PATH_MAX
+
 #endif
 
 #endif

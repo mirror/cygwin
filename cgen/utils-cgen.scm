@@ -175,11 +175,13 @@
 ; FIXME: Isn't the plan to move ERRTXT to the 1st arg?
 
 (define (parse-name name errtxt)
-  (cond ((list? name)
-	 (string->symbol (string-map (lambda (elm) (parse-name elm errtxt)) name)))
-	((symbol? name) name)
-	((string? name) (string->symbol name))
-	(else (parse-error errtxt "improper name" name)))
+  (string->symbol
+   (let parse ((name name))
+     (cond
+      ((list? name) (string-map parse name))
+      ((symbol? name) (symbol->string name))
+      ((string? name) name)
+      (else (parse-error errtxt "improper name" name)))))
 )
 
 ; Parse an object comment.

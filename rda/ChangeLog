@@ -1,3 +1,8 @@
+2004-09-24  Jim Blandy  <jimb@redhat.com>
+
+	* lib/gdbserv-output.c, samples/demo-target.c, samples/main.c,
+	samples/poll.c: #include <string.h>.
+
 2004-09-14  Jim Blandy  <jimb@theseus.home>
 
 	* HOWTO: Fix typos.

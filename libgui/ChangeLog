@@ -1,3 +1,10 @@
+2002-02-24  Mo DeJong  <supermo@bayarea.net>
+
+        * src/Makefile.am: Add -DSTATIC_BUILD so
+        that no __declspec() is used in function
+        delarations. This fixes the build under VC++.
+        * src/Makefile.in: Regen.
+
 2002-02-05  Jim Blandy  <jimb@redhat.com>
 
 	De-Cygnify libgui.

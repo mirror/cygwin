@@ -47,7 +47,8 @@ $(TK_XINCLUDES) $(TCL_DEFS) $(TK_DEFS) \
 $(TKHDIR)/../unix $(TKHDIR)/../win \
 -DTBL_VERSION=\"$(TBL_VERSION)\"\
 -DTBL_COMMAND=\"$(TBL_COMMAND)\"\
--DTBL_RUNTIME=\"tkTable.tcl\" -DTBL_RUNTIME_DIR=\"$(guidir)\"
+-DTBL_RUNTIME=\"tkTable.tcl\" -DTBL_RUNTIME_DIR=\"$(guidir)\"\
+-DSTATIC_BUILD
 
 TKTABLE_SOURCES = tkTable.c tkTableCell.c tkTableCellSort.c \
 tkTableCmds.c tkTableEdit.c tkTableTag.c tkTableWin.c tkTableUtil.c

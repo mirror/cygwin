@@ -92,7 +92,8 @@
 			base-value ", "
 			(number->string total-length) ", "
 			; ??? Is passing total-length right here?
-			(number->string (ifld-start f total-length)) ", "
+			(number->string (+ (ifld-start f total-length)
+					   (ifld-word-offset f))) ", "
 			(number->string (ifld-length f))
 			")"))
 	(decode (ifld-decode f)))
@@ -220,13 +221,12 @@
    indent
    (gen-sym f)
    " = "
-   (if (ifld-beyond-base? f base-length total-length)
-       (-gen-ifld-extract-beyond f base-length total-length var-list)
-       (-gen-ifld-extract-base f 
-			       (if (adata-integral-insn? CURRENT-ARCH)
-				   total-length
-				   (min base-length total-length))
-			       base-value))
+   (if (adata-integral-insn? CURRENT-ARCH)
+       (-gen-ifld-extract-base f total-length base-value)
+       (if (ifld-beyond-base? f base-length total-length)
+	   (-gen-ifld-extract-beyond f base-length total-length var-list)
+	   (-gen-ifld-extract-base f (min base-length total-length)
+				   base-value)))
    ";"
    (if macro? " \\\n" "\n")
    )
@@ -324,7 +324,9 @@
 ; to each line).
 
 (define (gen-define-ifields ifields total-length indent macro?)
-  (let* ((base-length (state-base-insn-bitsize))
+  (let* ((base-length (if (adata-integral-insn? CURRENT-ARCH)
+			  32
+			  (state-base-insn-bitsize)))
 	 (chunk-specs (-extract-chunk-specs base-length total-length
 					    (current-arch-default-alignment))))
     (string-list
@@ -439,7 +441,9 @@
 ; doing this for now.
 
 (define (gen-extract-ifields ifields total-length indent macro?)
-  (let* ((base-length (state-base-insn-bitsize))
+  (let* ((base-length (if (adata-integral-insn? CURRENT-ARCH)
+			  32
+			  (state-base-insn-bitsize)))
 	 (chunk-specs (-extract-chunk-specs base-length total-length
 					    (current-arch-default-alignment))))
     (string-list

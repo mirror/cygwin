@@ -1,3 +1,8 @@
+Sat Jun 10 22:43:00 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* win/tclWinFile.c (TclMatchFiles): Revert Mon Jun 5 18:48:32 2000
+	Christopher Faylor <cgf@cygnus.com>.  Fails on Windows 95.
+
 Tue Jun  6 22:09:02 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* win/Makefile.in: Set up and use autoconf variables throughout to

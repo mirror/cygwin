@@ -22,8 +22,8 @@ namespace sid
   // COMPONENT_LIBRARY_MAGIC mechanism in sidso.h, and prevents
   // interopration attempts with obsolete component objects.
 
-  const unsigned API_MAJOR_VERSION = 4;
-  const unsigned API_MINOR_VERSION = 0;
+  const unsigned API_MAJOR_VERSION = 3;
+  const unsigned API_MINOR_VERSION = 1;
 
   // PART 1: Buses
   //

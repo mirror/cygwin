@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-# Copyright 2002 Free Software Foundation, Inc.
+# Copyright 2002, 2004 Free Software Foundation, Inc.
 
 # This file is part of SPU.
 
@@ -18,7 +18,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-AC_INIT([spu.c])
+AC_INIT
+AC_PREREQ([2.59])
+AC_CONFIG_SRCDIR([spu.c])
 
 # Checks for programs.
 AC_PROG_CC
@@ -37,4 +39,5 @@ dnl # The program doesn't actually handle failure.
 dnl AC_FUNC_MALLOC
 dnl AC_CHECK_FUNCS([memset strtol])
 
-AC_OUTPUT([Makefile])
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT

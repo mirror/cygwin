@@ -848,10 +848,9 @@
 	  (begin
 	    (cond 
 	     ; Handle escaped syntax metacharacters 
-	     ((and 
-	       (char=? #\$ (string-ref syntax 0))
-	       (char=? #\$ (string-ref syntax 1)))
-	      (set! result (cons "$" result))
+	     ((char=? #\\ (string-ref syntax 0))
+	      (set! result (cons (substring syntax 0 1) result))
+	      (set! result (cons (substring syntax 1 1) result))
 	      (set! syntax (string-drop 2 syntax)))
 	     ; Handle operand reference
 	     ((char=? #\$ (string-ref syntax 0))

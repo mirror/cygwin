@@ -1040,6 +1040,33 @@ gdb::process_detach ()
     }
 }
 
+// Increment a given attribute value, interpreted as a plain `int'.
+static void 
+increment_attribute (sid::component* comp, const string& attr, int increment)
+{
+  assert(comp);
+  string valstr = comp->attribute_value (attr);
+  int num;
+  component::status s = parse_attribute(valstr, num);
+  if (s != component::ok)
+    {
+      cerr << "Cannot parse " << attr << " attribute: string " << valstr
+	   << " status " << (int) s << endl;
+      return;
+    }
+  
+  num += increment;
+  
+  valstr = make_numeric_attribute (num);
+  
+  s = comp->set_attribute_value (attr, valstr);
+  if (s != component::ok)
+    {
+      cerr << "Cannot set " << attr << " attribute: string " << valstr
+	   << " status " << (int) s << endl;
+      return;
+    }
+}
 
 void
 gdb::target_power (bool on)
@@ -1053,26 +1080,34 @@ gdb::target_power (bool on)
   // signal target system to yield
   this->yield_pin.drive (0);
 
-  // Set/clear enabled? attribute of target schedulers
+  // increment/decrement enabled? attribute of target schedulers when 'on'
+  // is true/false respectively.  Do not increment/decrement the attribute
+  // if the scheduler is already enabled/disabled from our point of view.
+  int incr = on ? 1 : -1;
   for (unsigned i=0; i<target_schedulers.size(); i++)
     {
-      assert(target_schedulers[i]);
-      component::status s = target_schedulers[i]->set_attribute_value ("enabled?", (on ? "1" : "0"));
-      if (s != component::ok)
+      bool enabled = target_schedulers_enabled[i];
+      if (trace_gdbsid)
+	cerr << "  Target scheduler " << i << " enabled==" << enabled << endl;
+      if (enabled != on)
 	{
-	  cerr << "Cannot set enabled? attribute in scheduler: status " << (int) s << endl;
+	  increment_attribute (target_schedulers[i], "enabled?", incr);
+	  target_schedulers_enabled[i] = on;
 	}
     }
 
-  // Set/clear yield-host-time? attribute of host schedulers
+  // increment/decrement enabled? attribute of host schedulers when 'on'
+  // is false/true respectively.  Do not increment/decrement the attribute
+  // if the scheduler is already enabled/disabled from our point of view.
   for (unsigned j=0; j<host_schedulers.size(); j++)
     {
-      assert(host_schedulers[j]);
-      component::status s = host_schedulers[j]->set_attribute_value ("yield-host-time?",
-							      (on ? "0" : "1"));
-      if (s != component::ok)
+      bool yielded = host_schedulers_host_time_yielded[j];
+      if (trace_gdbsid)
+	cerr << "  Host scheduler " << j << " yielded==" << yielded << endl;
+      if (yielded == on)
 	{
-	  cerr << "Cannot set yield? attribute in scheduler: status " << (int) s << endl;
+	  increment_attribute (host_schedulers[j], "yield-host-time?", -incr);
+	  host_schedulers_host_time_yielded[j] = ! on;
 	}
     }
 }
@@ -1251,7 +1286,13 @@ gdb::init_handler (host_int_4)
       cerr << "sid-gdb: no debug cpu specified." << endl;
       return;
     }
-  
+
+  // Initialize vectors representing the state of each host/target scheduler.
+  for (unsigned i=0; i<target_schedulers.size(); i++)
+    target_schedulers_enabled.push_back (true);
+  for (unsigned j=0; j<host_schedulers.size(); j++)
+    host_schedulers_host_time_yielded.push_back (false);
+
   // suspend down target system
   target_power (false);
 }

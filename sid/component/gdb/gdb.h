@@ -114,6 +114,8 @@ private:
   output_pin yield_pin; // signal to target subsystem
   vector<component*> target_schedulers;
   vector<component*> host_schedulers;
+  vector<bool> target_schedulers_enabled;
+  vector<bool> host_schedulers_host_time_yielded;
   // turn target subsystem on/off
   output_pin process_signal_pin;  // signal to cfgroot
   output_pin restart_pin; // signal to hw-reset

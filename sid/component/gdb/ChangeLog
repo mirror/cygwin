@@ -1,3 +1,15 @@
+2001-10-16  Dave Brolley  <brolley@redhat.com>
+
+	* gdb.h (target_schedulers_enabled): New vector member of class gdb.
+	(host_schedulers_host_time_yielded): Ditto.
+	* gdb.cxx (increment_attribute): New function.
+	(target_power): Maintain internal vectors to track whether we have
+	enabled the target scheduler and asked the host scheduler to yield host
+	time. Increment/decrement the appropriate attribute of each scheduler
+	instead of setting to 1 or 0.
+	(init_handler): Initialize internal vectors representing the state of
+	the host and target schedulers.
+
 2001-10-03  Frank Ch. Eigler  <fche@redhat.com>
 
 	* gdb.cxx (ctor): Add "cfgroot" relationship.

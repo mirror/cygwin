@@ -1,3 +1,7 @@
+2001-06-22  Ben Elliston  <bje@redhat.com>
+
+	* glue.cxx (probing_bus::traceAccess): Omit bus::delayed.
+
 2001-03-28  Dave Brolley  <brolley@redhat.com>
 
 	* hw-glue-bus-mux.txt: Update description of switching behavior.

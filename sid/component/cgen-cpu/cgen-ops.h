@@ -55,10 +55,6 @@ namespace cgen {
 #define LEUQI(x, y) ((UQI) (x) <= (UQI) (y))
 #define GTUQI(x, y) ((UQI) (x) > (UQI) (y))
 #define GEUQI(x, y) ((UQI) (x) >= (UQI) (y))
-#define LTUUQI(x, y) ((UQI) (x) < (UQI) (y))
-#define LEUUQI(x, y) ((UQI) (x) <= (UQI) (y))
-#define GTUUQI(x, y) ((UQI) (x) > (UQI) (y))
-#define GEUUQI(x, y) ((UQI) (x) >= (UQI) (y))
 #define ABSQI(x)  ((x) > 0 ? (x) : -(x))
 
 #define ADDHI(x, y) ((x) + (y))
@@ -87,10 +83,6 @@ namespace cgen {
 #define LEUHI(x, y) ((UHI) (x) <= (UHI) (y))
 #define GTUHI(x, y) ((UHI) (x) > (UHI) (y))
 #define GEUHI(x, y) ((UHI) (x) >= (UHI) (y))
-#define LTUUHI(x, y) ((UHI) (x) < (UHI) (y))
-#define LEUUHI(x, y) ((UHI) (x) <= (UHI) (y))
-#define GTUUHI(x, y) ((UHI) (x) > (UHI) (y))
-#define GEUUHI(x, y) ((UHI) (x) >= (UHI) (y))
 #define ABSHI(x)  ((x) > 0 ? (x) : -(x))
 
 #define ADDSI(x, y) ((x) + (y))
@@ -119,10 +111,6 @@ namespace cgen {
 #define LEUSI(x, y) ((USI) (x) <= (USI) (y))
 #define GTUSI(x, y) ((USI) (x) > (USI) (y))
 #define GEUSI(x, y) ((USI) (x) >= (USI) (y))
-#define LTUUSI(x, y) ((USI) (x) < (USI) (y))
-#define LEUUSI(x, y) ((USI) (x) <= (USI) (y))
-#define GTUUSI(x, y) ((USI) (x) > (USI) (y))
-#define GEUUSI(x, y) ((USI) (x) >= (USI) (y))
 #define ABSSI(x)  ((x) > 0 ? (x) : -(x))
 
 #define ADDDI(x, y) ((x) + (y))
@@ -151,21 +139,12 @@ namespace cgen {
 #define LEUDI(x, y) ((UDI) (x) <= (UDI) (y))
 #define GTUDI(x, y) ((UDI) (x) > (UDI) (y))
 #define GEUDI(x, y) ((UDI) (x) >= (UDI) (y))
-#define LTUUDI(x, y) ((UDI) (x) < (UDI) (y))
-#define LEUUDI(x, y) ((UDI) (x) <= (UDI) (y))
-#define GTUUDI(x, y) ((UDI) (x) > (UDI) (y))
-#define GEUUDI(x, y) ((UDI) (x) >= (UDI) (y))
 #define ABSDI(x)  ((x) > 0 ? (x) : -(x))
 
 #define LTUINT(x, y) ((UINT) (x) < (UINT) (y))
 #define LEUINT(x, y) ((UINT) (x) <= (UINT) (y))
 #define GTUINT(x, y) ((UINT) (x) > (UINT) (y))
 #define GEUINT(x, y) ((UINT) (x) >= (UINT) (y))
-
-#define LTUUINT(x, y) ((UINT) (x) < (UINT) (y))
-#define LEUUINT(x, y) ((UINT) (x) <= (UINT) (y))
-#define GTUUINT(x, y) ((UINT) (x) > (UINT) (y))
-#define GEUUINT(x, y) ((UINT) (x) >= (UINT) (y))
 
 // XXX: fill out families of functions
 #define RORQI(x, y) (SRLQI((x), (y)) | SLLQI((x), 8-(y)))

@@ -9,9 +9,9 @@
  * Significantly revised and rewinddir, seekdir and telldir added by Colin
  * Peters <colin@fu.is.saga-u.ac.jp>
  *	
- * $Revision: 1.5 $
+ * $Revision: 1.6 $
  * $Author: dannysmith $
- * $Date: 2003/09/22 21:32:52 $
+ * $Date: 2003/10/02 21:29:51 $
  *
  */
 
@@ -165,7 +165,12 @@ _treaddir (_TDIR * dirp)
       /* Get the next search entry. */
       if (_tfindnext (dirp->dd_handle, &(dirp->dd_dta)))
 	{
-	  /* We are off the end or otherwise error. */
+	  /* We are off the end or otherwise error.	
+	     _findnext sets errno to ENOENT if no more file
+	     Undo this. */ 
+	  DWORD winerr = GetLastError();
+	  if (winerr == ERROR_NO_MORE_FILES)
+	    errno = 0;	
 	  _findclose (dirp->dd_handle);
 	  dirp->dd_handle = -1;
 	  dirp->dd_stat = -1;

@@ -1,3 +1,13 @@
+2004-09-27  Jim Blandy  <jimb@redhat.com>
+
+	Merge from trunk:
+	
+	2004-07-23  Martin Hunt  <hunt@redhat.com>
+	            Kevin Buettner <kevinb@redhat.com>
+
+	* dwarf2-frame.c (execute_cfa_program): Fix typo in which the
+	alignment was being added to the offset instead of multiplied.
+
 2004-09-22  Jim Blandy  <jimb@redhat.com>
 
 	* dwarf2loc.c (dwarf2_evaluate_loc_desc): Fix misapplied patch.

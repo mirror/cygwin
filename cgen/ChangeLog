@@ -10,6 +10,13 @@
 	* sid.scm (gen-cpu-insn-enum-decl): Do not append a dummy `max'
 	instruction onto the instruction list.
 	
+	* sim-decode.scm (@prefix@_init_idesc_table): Compute tabsize
+	using the size of the table and its elements.
+	(-gen-decode-insn-globals): Define the idesc table's size to be
+	the last instruction enum plus one, not @PREFIX@_INSN_MAX.
+	* sim-model.scm (-gen-mach-defns): Define CPU_MAX_INSNS as the
+	last instruction enum plus one, not @CPU@_INSN_MAX.
+
 2001-03-28  Ben Elliston  <bje@redhat.com>
 
 	* doc/version.texi (UPDATED, EDITION): Update.

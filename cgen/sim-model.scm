@@ -313,11 +313,13 @@ static const CGEN_INSN *
 ; Return C code to define the machine data.
 
 (define (-gen-mach-defns)
-  (string-list-map
-   (lambda (mach)
-     (gen-obj-sanitize
-      mach
-      (string-list "\
+  (let* ((insns (gen-obj-list-enums (non-multi-insns (current-insn-list))))
+	 (last-insn (string-upcase (gen-c-symbol (caar (list-take -1 insns))))))
+    (string-list-map
+     (lambda (mach)
+       (gen-obj-sanitize
+	mach
+	(string-list "\
 static void\n"
 (gen-sym mach) "_init_cpu (SIM_CPU *cpu)
 {
@@ -326,7 +328,7 @@ static void\n"
   CPU_PC_FETCH (cpu) = " (gen-sym (mach-cpu mach)) "_h_pc_get;
   CPU_PC_STORE (cpu) = " (gen-sym (mach-cpu mach)) "_h_pc_set;
   CPU_GET_IDATA (cpu) = @cpu@_get_idata;
-  CPU_MAX_INSNS (cpu) = @CPU@_INSN_MAX;
+  CPU_MAX_INSNS (cpu) = @CPU@_INSN_" last-insn " + 1;
   CPU_INSN_NAME (cpu) = cgen_insn_name;
   CPU_FULL_ENGINE_FN (cpu) = @cpu@_engine_run_full;
 #if WITH_FAST
@@ -352,7 +354,7 @@ const MACH " (gen-sym mach) "_mach =
 
 ")))
 
-   (current-mach-list))
+   (current-mach-list)))
 )
 
 ; Top level file generators.

@@ -1,5 +1,5 @@
 ; xstormy16 CPU core description. -*- Scheme -*-
-; Copyright (C) 2001 Red Hat, Inc.
+; Copyright (C) 2001, 2002 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -1836,6 +1836,38 @@
      (sequence ()
 	       (set R1 (umod R0 R2))
 	       (set-mem-psw R0 (udiv R0 R2)))
+     ()
+)
+(dni sdiv
+     "Signed Divide"
+     ()
+     ("sdiv")
+     (+ (f-op #x00C8))
+     (sequence ()
+	       (set R1 (mod HI R0 R2))
+	       (set-mem-psw R0 (div HI R0 R2)))
+     ()
+)
+(dni sdivlh
+     "Divide 32/16"
+     ()
+     ("sdivlh")
+     (+ (f-op #x00E0))
+     (sequence ((SI value))
+	       (set value (add SI (sll SI (and SI R1 #xffff) #x10) (and SI R0 #xffff)))
+	       (set R1 (mod SI value (ext SI (trunc HI R2))))
+	       (set-mem-psw R0 (div SI value (ext SI (trunc HI R2)))))
+     ()
+)
+(dni divlh
+     "Divide 32/16"
+     ()
+     ("divlh")
+     (+ (f-op #x00E8))
+     (sequence ((SI value))
+	       (set value (add SI (sll SI (and SI R1 #xffff) #x10) (and SI R0 #xffff)))
+	       (set R1 (umod SI value R2))
+	       (set-mem-psw R0 (udiv SI value R2)))
      ()
 )
 

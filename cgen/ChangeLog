@@ -1,3 +1,7 @@
+2003-08-19  Michael Snyder  <msnyder@redhat.com>
+
+	* cpu/frv.cpu: Fix typo, Frintkeven -> FRintkeven
+
 2003-08-07  Michael Meissner  <gnu@the-meissners.org>
 
 	* opc-opinst.scm (-gen-operand-instance-table): Initialize all of

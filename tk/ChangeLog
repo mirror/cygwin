@@ -1,3 +1,15 @@
+2003-02-07  Martin M. Hunt  <hunt@redhat.com>
+
+	* win/tcl.m4 (SC_CONFIG_CFLAGS): Don't default to -O.
+	* unix/tcl.m4 (SC_CONFIG_CFLAGS): Don't default to -O.	
+	CFLAGS gets set to "-O2" by default in top level
+	configure. Adding "-O" here causes the "-O2" to be
+	ignored, but only when the user types "make" within
+	the tcl subdirectory. This caused some confusion.
+	* win/configure: Rebuilt.
+	* unix/configure: Rebuilt.
+
+
 2002-10-22  Jeff Hobbs  <jeffh@ActiveState.com>
 
 	*** 8.4.1 TAGGED FOR RELEASE ***

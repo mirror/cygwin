@@ -12,13 +12,6 @@ $running_under_some_shell = 0;
 use Getopt::Long;
 require 5.004;
 
-# sid component library pointers: AUTOCONF these!
-$sidsharedir="@prefix@/share/sid";
-$sidsuffix_la=".la";
-$sidprefix="lib";
-
-# sid executable pointers
-$sid=$ENV{'SID'} ? $ENV{'SID'} : "sid"; # look in $SID or install tree
 
 
 %cpu_comptype = (
@@ -136,7 +129,6 @@ Options:
 sub configure_gloss
   {
     my $board = $_[0];
-
     $memspecs = $gloss_memspecs{$opt_cpu};
     @regions = split (/:/, $memspecs);
     foreach $region (@regions)
@@ -269,12 +261,20 @@ if ($opt_gdb)
 # ----------------------------------------------------------------------------
 # Configuration file construction
 
+# sid executable
+if ($ENV{'SID'}) {
+  $sid=$ENV{'SID'};
+} else {
+  $sid = qx{dirname $0};
+  chomp $sid;
+  $sid .= "/sid";
+}
 
 $whoami=qx{whoami}; chop ($whoami);
 $hostname=qx{hostname}; chop ($hostname);
 $date=qx{date}; chop ($date);
 $uname=qx{uname}; chop ($uname);
-$version=q$Id: configrun-sid.in,v 1.9 2001/01/23 21:24:23 fche Exp $;
+$version=q$Id: configrun-sid.in,v 1.10 2001/03/06 17:00:41 fche Exp $;
 $zeroth_section = "# sid configuration file
 # created by $version
 # run by $whoami @ $hostname ($uname) at $date
@@ -735,7 +735,7 @@ connect-bus cpu data-memory data-mapper access-port
 ";
       }
 
-    if ($opt_board =~ /gloss/ || $opt_board =~ /user/)
+    if ($opt_board =~ /gloss/)
       {
         $second_section .= "# $cpu harvard bus specific gloss .
 disconnect-bus gloss target-memory $bus_upstream
@@ -795,7 +795,7 @@ set gdb-socket sockaddr-local 0.0.0.0:$opt_gdb
 set gdb-socket verbose? $opt_verbose
 ";
 
-    if ($opt_board =~ /gloss/) 
+    if ($opt_board =~ /gloss/)
       {
 	$second_section .= "# gdb w/ gloss
 connect-pin gloss trap-chain <-> gdb trap
@@ -1023,7 +1023,7 @@ connect-pin init-sequence output-7 -> tcl-event-consumer !event
 foreach $lib (sort keys %component_libs)
   {
     $symbol = $component_libs{$lib};
-    $lib_la = "$sidprefix$lib$sidsuffix_la";
+    $lib_la = "lib" . $lib . ".la";
 
     # minor optimization: don't include large tcl dll unless needed
     next if ($any_tcl == 0 && $lib eq "tclapi");
@@ -1069,14 +1069,20 @@ push @args, ($tfile);
 
 # spawn sid child process
 system @args;
-$exit_value = $? >> 8;
+$exit_value = $?;
+
+# Process the exit code. 
+if (($exit_value & 0xff00) == 0xff00) # catch old perls' fork rc bugs
+ {
+   print "\nCannot run `@args': $!\n";
+ }
 
 if (! $opt_save_temps) 
   {
     unlink $tfile;
   }
 
-exit $exit_value;
+exit ($exit_value >> 8);
 
 
 # ----------------------------------------------------------------------------

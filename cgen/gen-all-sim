@@ -1,0 +1,59 @@
+#! /bin/sh
+# Utility script to generate the sim files for several ports.
+# This is useful for verifying changes to the generated files
+# without having to build every tool chain.
+#
+# Run this script in the src/cgen directory.
+
+# Exit on any error.
+set -e
+
+# For debugging.
+set -x
+
+cpus="i960 m32r"
+
+if [ ! -f sim.scm ]
+then
+    echo "Not in the src/cgen directory." >& 2
+    exit 1
+fi
+
+export cgendir=`pwd`
+
+for c in $cpus
+do
+  rm -rf /tmp/tmp-cgen
+  mkdir /tmp/tmp-cgen
+
+  case $c in
+  i960)
+    (
+	set -e
+	set -x
+	cd /tmp/tmp-cgen
+	$cgendir/../sim/i960/configure --prefix /tmp/junk --target i960-coff
+	make stamp-arch stamp-cpu stamp-desc
+    )
+    test $? == 0 || exit 1
+    ;;
+
+  m32r)
+    (
+	set -e
+	set -x
+	cd /tmp/tmp-cgen
+	$cgendir/../sim/m32r/configure --prefix /tmp/junk --target m32r-elf
+	make stamp-arch stamp-cpu stamp-xcpu
+    )
+    test $? == 0 || exit 1
+    ;;
+
+  *)
+    echo "unsupported cpu $c" >& 2
+    exit 1
+    ;;
+  esac
+done
+
+rm -rf /tmp/tmp-cgen

@@ -1,6 +1,6 @@
 /* winsup.h: main Cygwin header file.
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,8 +14,8 @@ details. */
 
 #define __INSIDE_CYGWIN__
 
-#define alloca(x) __builtin_alloca (x)
 #define strlen __builtin_strlen
+#define strcmp __builtin_strcmp
 #define strcpy __builtin_strcpy
 #define memcpy __builtin_memcpy
 #define memcmp __builtin_memcmp
@@ -23,32 +23,29 @@ details. */
 # define memset __builtin_memset
 #endif
 
+#define NO_COPY __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy")))
+
+#ifdef __cplusplus
+
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ >= 199900L
+#define NEW_MACRO_VARARGS
+#endif
+
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
+#endif
+
 #include <sys/types.h>
 #include <sys/strace.h>
-#include <sys/resource.h>
-#include <setjmp.h>
-#include <signal.h>
-#include <string.h>
 
-#undef strchr
-#define strchr cygwin_strchr
-extern inline char * strchr(const char * s, int c)
-{
-register char * __res;
-__asm__ __volatile__(
-	"movb %%al,%%ah\n"
-	"1:\tmovb (%1),%%al\n\t"
-	"cmpb %%ah,%%al\n\t"
-	"je 2f\n\t"
-	"incl %1\n\t"
-	"testb %%al,%%al\n\t"
-	"jne 1b\n\t"
-	"xorl %1,%1\n"
-	"2:\tmovl %1,%0\n\t"
-	:"=a" (__res), "=r" (s)
-	:"0" (c),      "1"  (s));
-return __res;
-}
+extern const char case_folded_lower[];
+#define cyg_tolower(c) (case_folded_lower[(unsigned char)(c)])
+extern const char case_folded_upper[];
+#define cyg_toupper(c) (case_folded_upper[(unsigned char)(c)])
+
+#ifndef MALLOC_DEBUG
+#define cfree newlib_cfree_dont_use
+#endif
 
 #define WIN32_LEAN_AND_MEAN 1
 #define _WINGDI_H
@@ -59,6 +56,7 @@ return __res;
 #define _WINSVC_H
 #include <windows.h>
 #include <wincrypt.h>
+#include <lmcons.h>
 #undef _WINGDI_H
 #undef _WINUSER_H
 #undef _WINNLS_H
@@ -66,30 +64,28 @@ return __res;
 #undef _WINNETWK_H
 #undef _WINSVC_H
 
+#include "wincap.h"
+
 /* The one function we use from winuser.h most of the time */
 extern "C" DWORD WINAPI GetLastError (void);
 
-/* Used for runtime OS check/decisions. */
-enum os_type {winNT = 1, win95, win98, win32s, unknown};
-extern os_type os_being_run;
+enum codepage_type {ansi_cp, oem_cp};
+extern codepage_type current_codepage;
+
+UINT get_cp ();
+
+int __stdcall sys_wcstombs(char *, const WCHAR *, int)
+  __attribute__ ((regparm(3)));
+
+int __stdcall sys_mbstowcs(WCHAR *, const char *, int)
+  __attribute__ ((regparm(3)));
 
 /* Used to check if Cygwin DLL is dynamically loaded. */
 extern int dynamically_loaded;
 
-#define sys_wcstombs(tgt,src,len) \
-                    WideCharToMultiByte(CP_ACP,0,(src),-1,(tgt),(len),NULL,NULL)
-#define sys_mbstowcs(tgt,src,len) \
-                    MultiByteToWideChar(CP_ACP,0,(src),-1,(tgt),(len))
-
-#include <cygwin/version.h>
+extern int cygserver_running;
 
 #define TITLESIZE 1024
-#define MAX_USER_NAME 20
-#define DEFAULT_UID 500
-#define DEFAULT_GID 544
-
-#define MAX_SID_LEN 40
-#define MAX_HOST_NAME 256
 
 /* status bit manipulation */
 #define __ISSETF(what, x, prefix) \
@@ -101,169 +97,12 @@ extern int dynamically_loaded;
 #define __CONDSETF(n, what, x, prefix) \
   ((n) ? __SETF (what, x, prefix) : __CLEARF (what, x, prefix))
 
-#include "thread.h"
-#include "shared.h"
-
-extern HANDLE hMainThread;
-extern HANDLE hMainProc;
-
-/* Now that pinfo has been defined, include... */
 #include "debug.h"
-#include "sync.h"
-#include "sigproc.h"
-#include "fhandler.h"
-#include "path.h"
-#include <sys/cygwin.h>
-
-/********************** Application Interface **************************/
-
-extern "C" per_process __cygwin_user_data; /* Pointer into application's static data */
-#define user_data (&__cygwin_user_data)
-
-/* We use the following to test that sizeof hasn't changed.  When adding
-   or deleting members, insert fillers or use the reserved entries.
-   Do not change this value. */
-#define SIZEOF_PER_PROCESS (42 * 4)
-
-class hinfo
-{
-  fhandler_base **fds;
-  fhandler_base **fds_on_hold;
-  int first_fd_for_open;
-public:
-  size_t size;
-  hinfo () {first_fd_for_open = 3;}
-  int vfork_child_dup ();
-  void vfork_parent_restore ();
-  fhandler_base *dup_worker (fhandler_base *oldfh);
-  int extend (int howmuch);
-  void fixup_after_fork (HANDLE parent);
-  fhandler_base *build_fhandler (int fd, DWORD dev, const char *name,
-				 int unit = -1);
-  fhandler_base *build_fhandler (int fd, const char *name, HANDLE h);
-  int not_open (int n);
-  int find_unused_handle (int start);
-  int find_unused_handle () { return find_unused_handle (first_fd_for_open);}
-  void release (int fd);
-  void init_std_file_from_handle (int fd, HANDLE handle, DWORD access, const char *name);
-  int dup2 (int oldfd, int newfd);
-  int linearize_fd_array (unsigned char *buf, int buflen);
-  LPBYTE de_linearize_fd_array (LPBYTE buf);
-  fhandler_base *operator [](int fd) { return fds[fd]; }
-  select_record *select_read (int fd, select_record *s);
-  select_record *select_write (int fd, select_record *s);
-  select_record *select_except (int fd, select_record *s);
-};
-
-/******************* Host-dependent constants **********************/
-/* Portions of the cygwin DLL require special constants whose values
-   are dependent on the host system.  Rather than dynamically
-   determine those values whenever they are required, initialize these
-   values once at process start-up. */
-
-class host_dependent_constants
-{
- public:
-  void init (void);
-
-  /* Used by fhandler_disk_file::lock which needs a platform-specific
-     upper word value for locking entire files. */
-  DWORD win32_upper;
-
-  /* fhandler_base::open requires host dependent file sharing
-     attributes. */
-  int shared;
-};
-
-extern host_dependent_constants host_dependent;
 
 /* Events/mutexes */
-extern HANDLE pinfo_mutex;
 extern HANDLE title_mutex;
 
-
-
-/*************************** Per Thread ******************************/
-
-#define PER_THREAD_FORK_CLEAR ((void *)0xffffffff)
-class per_thread
-{
-  DWORD tls;
-  int clear_on_fork_p;
-public:
-  per_thread (int forkval = 1) {tls = TlsAlloc (); clear_on_fork_p = forkval;}
-  DWORD get_tls () {return tls;}
-  int clear_on_fork () {return clear_on_fork_p;}
-
-  virtual void *get () {return TlsGetValue (get_tls ());}
-  virtual size_t size () {return 0;}
-  virtual void set (void *s = NULL);
-  virtual void set (int n) {TlsSetValue (get_tls (), (void *)n);}
-  virtual void *create ()
-  {
-    void *s = new char [size ()];
-    memset (s, 0, size ());
-    set (s);
-    return s;
-  }
-};
-
-class per_thread_waitq : public per_thread
-{
-public:
-  per_thread_waitq () : per_thread (0) {}
-  void *get () {return (waitq *) this->per_thread::get ();}
-  void *create () {return (waitq *) this->per_thread::create ();}
-  size_t size () {return sizeof (waitq);}
-};
-
-struct vfork_save
-{
-  int pid;
-  jmp_buf j;
-  char **vfork_ebp;
-  char *caller_ebp;
-  char *retaddr;
-  int is_active () { return pid < 0; }
-};
-
-class per_thread_vfork : public per_thread
-{
-public:
-  vfork_save *val () { return (vfork_save *) this->per_thread::get (); }
-  vfork_save *create () {return (vfork_save *) this->per_thread::create ();}
-  size_t size () {return sizeof (vfork_save);}
-};
-
-extern "C" {
-struct signal_dispatch
-{
-  int arg;
-  void (*func) (int);
-  int sig;
-  int saved_errno;
-  DWORD oldmask;
-  DWORD retaddr;
-  DWORD *retaddr_on_stack;
-};
-};
-
-struct per_thread_signal_dispatch : public per_thread
-{
-  signal_dispatch *get () { return (signal_dispatch *) this->per_thread::get (); }
-  signal_dispatch *create () {return (signal_dispatch *) this->per_thread::create ();}
-  size_t size () {return sizeof (signal_dispatch);}
-};
-
-extern per_thread_waitq waitq_storage;
-extern per_thread_vfork vfork_storage;
-extern per_thread_signal_dispatch signal_dispatch_storage;
-
-extern per_thread *threadstuff[];
-
 /**************************** Convenience ******************************/
-
-#define NO_COPY __attribute__((section(".data_cygwin_nocopy")))
 
 /* Used when treating / and \ as equivalent. */
 #define SLASH_P(ch) \
@@ -276,14 +115,11 @@ extern per_thread *threadstuff[];
 #define SIGTOMASK(sig)	(1<<((sig) - signal_shift_subtract))
 extern unsigned int signal_shift_subtract;
 
-#ifdef NOSTRACE
-#define MARK() 0
+#ifdef NEW_MACRO_VARARGS
+# define api_fatal(...) __api_fatal ("%P: *** " __VA_ARGS__)
 #else
-#define MARK() mark (__FILE__,__LINE__)
+# define api_fatal(fmt, args...) __api_fatal ("%P: *** " fmt,## args)
 #endif
-
-#define api_fatal(fmt, args...) \
-  __api_fatal ("%P: *** " fmt, ## args)
 
 #undef issep
 #define issep(ch) (strchr (" \t\n\r", (ch)) != NULL)
@@ -294,12 +130,13 @@ extern unsigned int signal_shift_subtract;
 
 /******************** Initialization/Termination **********************/
 
+class per_process;
 /* cygwin .dll initialization */
-void dll_crt0 (per_process *);
+void dll_crt0 (per_process *) __asm__ ("_dll_crt0__FP11per_process");
 extern "C" void __stdcall _dll_crt0 ();
 
 /* dynamically loaded dll initialization */
-extern "C" int dll_dllcrt0 (HMODULE, per_process*);
+extern "C" int dll_dllcrt0 (HMODULE, per_process *);
 
 /* dynamically loaded dll initialization for non-cygwin apps */
 extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
@@ -307,119 +144,110 @@ extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
 /* exit the program */
 extern "C" void __stdcall do_exit (int) __attribute__ ((noreturn));
 
-/* Initialize the environment */
-void environ_init (int);
-
-/* Heap management. */
-void heap_init (void);
-void malloc_init (void);
-
-/* fd table */
-void dtable_init (void);
-void hinfo_init (void);
-extern hinfo dtable;
-
 /* UID/GID */
 void uinfo_init (void);
+
+#define ILLEGAL_UID16 ((__uid16_t)-1)
+#define ILLEGAL_UID ((__uid32_t)-1)
+#define ILLEGAL_GID16 ((__gid16_t)-1)
+#define ILLEGAL_GID ((__gid32_t)-1)
+#define ILLEGAL_SEEK ((__off64_t)-1)
+
+#define uid16touid32(u16)  ((u16)==ILLEGAL_UID16?ILLEGAL_UID:(__uid32_t)(u16))
+#define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(__gid32_t)(g16))
+
+extern "C" __uid32_t getuid32 (void);
+extern "C" __uid32_t geteuid32 (void);
+extern "C" struct passwd *getpwuid32 (__uid32_t);
 
 /* various events */
 void events_init (void);
 void events_terminate (void);
 
 void __stdcall close_all_files (void);
-
-extern class strace strace;
+BOOL __stdcall check_pty_fds (void);
 
 /* Invisible window initialization/termination. */
 HWND __stdcall gethwnd (void);
-void __stdcall window_terminate (void);
 
 /* Globals that handle initialization of winsock in a child process. */
 extern HANDLE wsock32_handle;
+extern HANDLE ws2_32_handle;
 
 /* Globals that handle initialization of netapi in a child process. */
 extern HANDLE netapi32_handle;
 
 /* debug_on_trap support. see exceptions.cc:try_to_debug() */
 extern "C" void error_start_init (const char*);
-extern "C" int try_to_debug ();
+extern "C" int try_to_debug (bool waitloop = 1);
+
+void set_file_api_mode (codepage_type);
 
 extern int cygwin_finished_initializing;
 
 /**************************** Miscellaneous ******************************/
 
-const char * __stdcall find_exec (const char *name, path_conv& buf, const char *winenv = "PATH=",
-			int null_if_notfound = 0, const char **known_suffix = NULL);
-
-/* File manipulation */
-int __stdcall set_process_privileges ();
-int __stdcall get_file_attribute (int, const char *, int *,
-                                  uid_t * = NULL, gid_t * = NULL);
-int __stdcall set_file_attribute (int, const char *, int);
-int __stdcall set_file_attribute (int, const char *, uid_t, gid_t, int, const char *);
 void __stdcall set_std_handle (int);
 int __stdcall writable_directory (const char *file);
-int __stdcall stat_dev (DWORD, int, unsigned long, struct stat *);
+int __stdcall stat_dev (DWORD, int, unsigned long, struct __stat64 *);
 extern BOOL allow_ntsec;
 
-/* `lookup_name' should be called instead of LookupAccountName.
- * logsrv may be NULL, in this case only the local system is used for lookup.
- * The buffer for ret_sid (40 Bytes) has to be allocated by the caller! */
-BOOL __stdcall lookup_name (const char *, const char *, PSID);
-char *__stdcall convert_sid_to_string_sid (PSID, char *);
-PSID __stdcall convert_string_sid_to_sid (PSID, const char *);
-BOOL __stdcall get_pw_sid (PSID, struct passwd *);
-
-unsigned long __stdcall hash_path_name (unsigned long hash, const char *name);
-void __stdcall nofinalslash (const char *src, char *dst);
-extern "C" char *__stdcall rootdir (char *full_path);
-
-void __stdcall mark (const char *, int);
-
-extern "C" int _spawnve (HANDLE hToken, int mode, const char *path,
-			 const char *const *argv, const char *const *envp);
-int __stdcall spawn_guts (HANDLE hToken, const char *prog_arg,
-		   const char *const *argv, const char *const envp[],
-		   pinfo *child, int mode);
-
-/* For mmaps across fork(). */
-int __stdcall recreate_mmaps_after_fork (void *);
-void __stdcall set_child_mmap_ptr (pinfo *);
+unsigned long __stdcall hash_path_name (unsigned long hash, const char *name) __attribute__ ((regparm(2)));
+void __stdcall nofinalslash (const char *src, char *dst) __attribute__ ((regparm(2)));
+extern "C" char *__stdcall rootdir (char *full_path) __attribute__ ((regparm(1)));
 
 /* String manipulation */
-char *__stdcall strccpy (char *s1, const char **s2, char c);
-int __stdcall strcasematch (const char *s1, const char *s2);
-int __stdcall strncasematch (const char *s1, const char *s2, size_t n);
-char *__stdcall strcasestr (const char *searchee, const char *lookfor);
+extern "C" char *__stdcall strccpy (char *s1, const char **s2, char c);
+extern "C" int __stdcall strcasematch (const char *s1, const char *s2) __attribute__ ((regparm(2)));
+extern "C" int __stdcall strncasematch (const char *s1, const char *s2, size_t n) __attribute__ ((regparm(3)));
+extern "C" char *__stdcall strcasestr (const char *searchee, const char *lookfor) __attribute__ ((regparm(2)));
 
 /* Time related */
 void __stdcall totimeval (struct timeval *dst, FILETIME * src, int sub, int flag);
 long __stdcall to_time_t (FILETIME * ptr);
-
-/* pinfo table manipulation */
-#ifndef lock_pinfo_for_update
-int __stdcall lock_pinfo_for_update (DWORD timeout);
-#endif
-void unlock_pinfo (void);
-pinfo *__stdcall set_myself (pinfo *);
-
-/* Retrieve a security descriptor that allows all access */
-SECURITY_DESCRIPTOR *__stdcall get_null_sd (void);
-
-int __stdcall get_id_from_sid (PSID, BOOL);
-extern inline int get_uid_from_sid (PSID psid) { return get_id_from_sid (psid, FALSE);}
-extern inline int get_gid_from_sid (PSID psid) { return get_id_from_sid (psid, TRUE); }
-
-int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
-BOOL __stdcall NTWriteEA (const char *file, const char *attrname, char *buf, int len);
+void __stdcall to_timestruc_t (FILETIME * ptr, timestruc_t * out);
+void __stdcall time_as_timestruc_t (timestruc_t * out);
 
 void __stdcall set_console_title (char *);
-void set_console_handler ();
+void early_stuff_init ();
 
-void __stdcall fill_rusage (struct rusage *, HANDLE);
-void __stdcall add_rusage (struct rusage *, struct rusage *);
+int __stdcall check_null_str (const char *name) __attribute__ ((regparm(1)));
+int __stdcall check_null_empty_str (const char *name) __attribute__ ((regparm(1)));
+int __stdcall check_null_empty_str_errno (const char *name) __attribute__ ((regparm(1)));
+int __stdcall check_null_str_errno (const char *name) __attribute__ ((regparm(1)));
+int __stdcall __check_null_invalid_struct (void *s, unsigned sz) __attribute__ ((regparm(2)));
+int __stdcall __check_null_invalid_struct_errno (void *s, unsigned sz) __attribute__ ((regparm(2)));
+int __stdcall __check_invalid_read_ptr_errno (const void *s, unsigned sz) __attribute__ ((regparm(2)));
 
-void set_winsock_errno ();
+#define check_null_invalid_struct(s) \
+  __check_null_invalid_struct ((s), sizeof (*(s)))
+#define check_null_invalid_struct_errno(s) \
+  __check_null_invalid_struct_errno ((s), sizeof (*(s)))
+
+struct iovec;
+ssize_t check_iovec_for_read (const struct iovec *, int) __attribute__ ((regparm(2)));
+ssize_t check_iovec_for_write (const struct iovec *, int) __attribute__ ((regparm(2)));
+
+#define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)
+void __set_winsock_errno (const char *fn, int ln) __attribute__ ((regparm(2)));
+
+extern bool wsock_started;
+
+/* Printf type functions */
+extern "C" void __api_fatal (const char *, ...) __attribute__ ((noreturn));
+extern "C" int __small_sprintf (char *dst, const char *fmt, ...) /*__attribute__ ((regparm (2)))*/;
+extern "C" int __small_vsprintf (char *dst, const char *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
+extern void multiple_cygwin_problem (const char *, unsigned, unsigned);
+
+class path_conv;
+int __stdcall stat_worker (const char *name, struct __stat64 *buf, int nofollow,
+			   path_conv *pc = NULL) __attribute__ ((regparm (3)));
+
+int symlink_worker (const char *, const char *, bool, bool)
+  __attribute__ ((regparm (3)));
+
+int __stdcall low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
+#define SLEEP_0_STAY_LOW INFINITE
 
 /**************************** Exports ******************************/
 
@@ -432,13 +260,11 @@ int kill_pgrp (pid_t, int);
 int _kill (int, int);
 int _raise (int sig);
 
-int getdtablesize ();
-void setdtablesize (int);
-
 extern DWORD binmode;
 extern char _data_start__, _data_end__, _bss_start__, _bss_end__;
 extern void (*__CTOR_LIST__) (void);
 extern void (*__DTOR_LIST__) (void);
+extern SYSTEM_INFO system_info;
 };
 
 /*************************** Unsorted ******************************/
@@ -454,83 +280,28 @@ extern void (*__DTOR_LIST__) (void);
    issue and is neither of the Unixy ones [so we can punt on which
    one is the right one to use].  */
 
-/* Initial and increment values for cygwin's fd table */
-#define NOFILE_INCR    32
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include <sys/reent.h>
-
 #define STD_RBITS (S_IRUSR | S_IRGRP | S_IROTH)
 #define STD_WBITS (S_IWUSR)
 #define STD_XBITS (S_IXUSR | S_IXGRP | S_IXOTH)
-
-#define O_NOSYMLINK 0x080000
-#define O_DIROPEN   0x100000
-
-#ifdef __cplusplus
-}
-#endif
-
-/*************************** Environment ******************************/
-
-/* The structure below is used to control conversion to/from posix-style
- * file specs.  Currently, only PATH and HOME are converted, but PATH
- * needs to use a "convert path list" function while HOME needs a simple
- * "convert to posix/win32".  For the simple case, where a calculated length
- * is required, just return MAX_PATH.  *FIXME*
- */
-struct win_env
-  {
-    const char *name;
-    size_t namelen;
-    char *posix;
-    char *native;
-    int (*toposix) (const char *, char *);
-    int (*towin32) (const char *, char *);
-    int (*posix_len) (const char *);
-    int (*win32_len) (const char *);
-    void add_cache (const char *in_posix, const char *in_native = NULL);
-    const char * get_native () {return native ? native + namelen : NULL;}
-  };
-
-win_env * __stdcall getwinenv (const char *name, const char *posix = NULL);
-
-void __stdcall update_envptrs ();
-char * __stdcall winenv (const char * const *, int);
-extern char **__cygwin_environ, ***main_environ;
-extern "C" char __stdcall **cur_environ ();
-#define environ (cur_environ ())
+#define NO_W ~(S_IWUSR | S_IWGRP | S_IWOTH)
+#define NO_R ~(S_IRUSR | S_IRGRP | S_IROTH)
+#define NO_X ~(S_IXUSR | S_IXGRP | S_IXOTH)
 
 /* The title on program start. */
 extern char *old_title;
 extern BOOL display_title;
 
+extern HANDLE hMainThread;
+extern HANDLE hMainProc;
 
-/*************************** errno manipulation ******************************/
+extern bool cygwin_testing;
+extern unsigned _cygwin_testing_magic;
+extern HMODULE cygwin_hmodule;
 
-void seterrno_from_win_error (const char *file, int line, int code);
-void seterrno (const char *, int line);
+extern char almost_null[];
 
-#define __seterrno() seterrno (__FILE__, __LINE__)
-#define __seterrno_from_win_error(val) seterrno_from_win_error (__FILE__, __LINE__, val)
-#undef errno
-#define errno dont_use_this_since_were_in_a_shared library
-#define set_errno(val) (_impure_ptr->_errno = (val))
-#define get_errno()  (_impure_ptr->_errno)
-extern "C" void __stdcall set_sig_errno (int e);
+#define winsock2_active (wsadata.wVersion >= 512)
+#define winsock_active (wsadata.wVersion < 512)
+extern struct WSAData wsadata;
 
-class save_errno
-  {
-    int saved;
-  public:
-    save_errno () {saved = get_errno ();}
-    save_errno (int what) {saved = get_errno (); set_errno (what); }
-    void set (int what) {set_errno (what); saved = what;}
-    void reset () {saved = get_errno ();}
-    ~save_errno () {set_errno (saved);}
-  };
-
-extern const char *__sp_fn;
-extern int __sp_ln;
+#endif /* defined __cplusplus */

@@ -66,26 +66,26 @@ else
 fi
 
 
-rm -f tmp-desc.h1 tmp-desc.h
-rm -f tmp-cpu.h1 tmp-cpu.h
-rm -f tmp-defs.h1 tmp-defs.h
-rm -f tmp-sem.cxx1 tmp-sem.cxx
-rm -f tmp-semsw.cxx1 tmp-semsw.cxx
-rm -f tmp-dec.h1 tmp-dec.h
-rm -f tmp-dec.cxx1 tmp-dec.cxx
+rm -f tmp-desc-$$.h1 tmp-desc-$$.h
+rm -f tmp-cpu-$$.h1 tmp-cpu-$$.h
+rm -f tmp-defs-$$.h1 tmp-defs-$$.h
+rm -f tmp-sem-$$.cxx1 tmp-sem-$$.cxx
+rm -f tmp-semsw-$$.cxx1 tmp-semsw-$$.cxx
+rm -f tmp-dec-$$.h1 tmp-dec-$$.h
+rm -f tmp-dec-$$.cxx1 tmp-dec-$$.cxx
 
 fileopts=""
 for f in $filespecs
 do
     case $f in
-    desc.h) fileopts="$fileopts -H tmp-desc.h1" ;;
-    cpu.h) fileopts="$fileopts -C tmp-cpu.h1" ;;
-    defs.h) fileopts="$fileopts -E tmp-defs.h1" ;;
-    decode.h) fileopts="$fileopts -T tmp-dec.h1" ;;
-    decode.cxx) fileopts="$fileopts -D tmp-dec.cxx1" ;;
-    semantics.cxx) fileopts="$fileopts -S tmp-sem.cxx1" ;;
-    sem-switch.cxx) fileopts="$fileopts -X tmp-semsw.cxx1" ;;
-    write.cxx) fileopts="$fileopts -W tmp-write.cxx1" ;;
+    desc.h) fileopts="$fileopts -H tmp-desc-$$.h1" ;;
+    cpu.h) fileopts="$fileopts -C tmp-cpu-$$.h1" ;;
+    defs.h) fileopts="$fileopts -E tmp-defs-$$.h1" ;;
+    decode.h) fileopts="$fileopts -T tmp-dec-$$.h1" ;;
+    decode.cxx) fileopts="$fileopts -D tmp-dec-$$.cxx1" ;;
+    semantics.cxx) fileopts="$fileopts -S tmp-sem-$$.cxx1" ;;
+    sem-switch.cxx) fileopts="$fileopts -X tmp-semsw-$$.cxx1" ;;
+    write.cxx) fileopts="$fileopts -W tmp-write-$$.cxx1" ;;
     *) echo "unknown file spec: $f" >&2 ; exit 1 ;;
     esac
 done
@@ -110,68 +110,68 @@ do
 	sed -e "s,@ARCH@,${ARCH},g" -e "s,@arch@,${arch},g" \
 	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
 	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
-	    < tmp-desc.h1 > tmp-desc.h
-	${rootdir}/move-if-change tmp-desc.h ${srcdir}/${fileprefix}desc.h
+	    < tmp-desc-$$.h1 > tmp-desc-$$.h
+	${rootdir}/move-if-change tmp-desc-$$.h ${srcdir}/${fileprefix}desc.h
 	;;
     cpu.h)
 	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
 	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
 	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
-	    < tmp-cpu.h1 > tmp-cpu.h
-	${rootdir}/move-if-change tmp-cpu.h ${srcdir}/${fileprefix}cpu.h
+	    < tmp-cpu-$$.h1 > tmp-cpu-$$.h
+	${rootdir}/move-if-change tmp-cpu-$$.h ${srcdir}/${fileprefix}cpu.h
 	;;
     defs.h)
 	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
 	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
 	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
-	    < tmp-defs.h1 > tmp-defs.h
-	${rootdir}/move-if-change tmp-defs.h ${srcdir}/${fileprefix}defs.h
+	    < tmp-defs-$$.h1 > tmp-defs-$$.h
+	${rootdir}/move-if-change tmp-defs-$$.h ${srcdir}/${fileprefix}defs.h
 	;;
     decode.h)
 	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
 	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
 	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
-	    < tmp-dec.h1 > tmp-dec.h
-	${rootdir}/move-if-change tmp-dec.h ${srcdir}/${fileprefix}decode.h
+	    < tmp-dec-$$.h1 > tmp-dec-$$.h
+	${rootdir}/move-if-change tmp-dec-$$.h ${srcdir}/${fileprefix}decode.h
 	;;
     decode.cxx)
 	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
 	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
 	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
-	    < tmp-dec.cxx1 > tmp-dec.cxx
-	${rootdir}/move-if-change tmp-dec.cxx ${srcdir}/${fileprefix}decode.cxx
+	    < tmp-dec-$$.cxx1 > tmp-dec-$$.cxx
+	${rootdir}/move-if-change tmp-dec-$$.cxx ${srcdir}/${fileprefix}decode.cxx
 	;;
     semantics.cxx)
 	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
 	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
 	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
-	    < tmp-sem.cxx1 > tmp-sem.cxx
-	${rootdir}/move-if-change tmp-sem.cxx ${srcdir}/${fileprefix}sem.cxx
+	    < tmp-sem-$$.cxx1 > tmp-sem-$$.cxx
+	${rootdir}/move-if-change tmp-sem-$$.cxx ${srcdir}/${fileprefix}sem.cxx
 	;;
     sem-switch.cxx)
 	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
 	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
 	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
-	    < tmp-semsw.cxx1 > tmp-semsw.cxx
-	${rootdir}/move-if-change tmp-semsw.cxx ${srcdir}/${fileprefix}semsw.cxx
+	    < tmp-semsw-$$.cxx1 > tmp-semsw-$$.cxx
+	${rootdir}/move-if-change tmp-semsw-$$.cxx ${srcdir}/${fileprefix}semsw.cxx
 	;;
     write.cxx)
 	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
 	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
 	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
-	    < tmp-write.cxx1 > tmp-write.cxx
-	${rootdir}/move-if-change tmp-write.cxx ${srcdir}/${fileprefix}write.cxx
+	    < tmp-write-$$.cxx1 > tmp-write-$$.cxx
+	${rootdir}/move-if-change tmp-write-$$.cxx ${srcdir}/${fileprefix}write.cxx
 	;;
     esac
 done
 
-rm -f tmp-desc.h1 tmp-desc.h
-rm -f tmp-cpu.h1 tmp-cpu.h
-rm -f tmp-defs.h1 tmp-defs.h
-rm -f tmp-sem.cxx1 tmp-sem.cxx
-rm -f tmp-semsw.cxx1 tmp-semsw.cxx
-rm -f tmp-write.cxx1 tmp-write.cxx
-rm -f tmp-dec.h1 tmp-dec.h
-rm -f tmp-dec.cxx1 tmp-dec.cxx
+rm -f tmp-desc-$$.h1 tmp-desc-$$.h
+rm -f tmp-cpu-$$.h1 tmp-cpu-$$.h
+rm -f tmp-defs-$$.h1 tmp-defs-$$.h
+rm -f tmp-sem-$$.cxx1 tmp-sem-$$.cxx
+rm -f tmp-semsw-$$.cxx1 tmp-semsw-$$.cxx
+rm -f tmp-write-$$.cxx1 tmp-write-$$.cxx
+rm -f tmp-dec-$$.h1 tmp-dec-$$.h
+rm -f tmp-dec-$$.cxx1 tmp-dec-$$.cxx
 
 exit 0

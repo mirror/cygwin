@@ -1,3 +1,7 @@
+2002-09-19  Alexandre Oliva  <aoliva@redhat.com>
+
+	* CGEN.sh.in: Add $$ to temporary file names.
+
 2002-05-07  Frank Ch. Eigler  <fche@redhat.com>
 
 	* common-xml/interface.xml: Document gdb-breakpoint-{big,little}.

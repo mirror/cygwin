@@ -729,22 +729,25 @@
 		 (keep? (not superset-insn)))
 	    (if (not keep?) 
 		(logit 2
-		       "Instruction " (obj:name insn) "ambiguity-filtered by "
+		       "Instruction " (obj:name insn) " ambiguity-filtered by "
 		       (obj:name superset-insn) "\n"))
 	    keep?))
 	insn-list)
 )
 
 
-; Helper function for above: does (m1,v1) match a superset of (m2,v2) ?
+; Helper function for above: does (m1,v1) match a STRICT superset of (m2,v2) ?
 ;
 ; eg> mask-superset? #b1100 #b1000 #b1110 #b1010 -> #t
 ; eg> mask-superset? #b1100 #b1000 #b1010 #b1010 -> #f
 ; eg> mask-superset? #b1100 #b1000 #b1110 #b1100 -> #f
+; eg> mask-superset? #b1100 #b1000 #b1100 #b1000 -> #f
+; 
 (define (mask-superset? m1 v1 m2 v2)
   (let ((result
 	 (and (= (cg-logand m1 m2) m1)
-	      (= (cg-logand m1 v1) (cg-logand m1 v2)))))
+	      (= (cg-logand m1 v1) (cg-logand m1 v2))
+	      (not (and (= m1 m2) (= v1 v2))))))
     (if result (logit 4
 		      "(" (number->string m1 16) "," (number->string v1 16) ")"
 		      " contains "

@@ -1,3 +1,9 @@
+2002-11-26  Martin M. Hunt  <hunt@redhat.com>
+
+	* Makefile.in: Remove Tix references.
+	* library/Makefile.in: Remove Tix references.
+	* src/Makefile.in: Remove Tix references.
+
 2002-09-20  Fernando Nasser  <fnasser@totem.toronto.redhat.com>
 
 	* library/combobox.tcl (build): Add line missing from previous patch.

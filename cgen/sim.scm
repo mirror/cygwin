@@ -152,6 +152,24 @@
   (string-append c-cpu-macro " (" sym ")")
 )
 
+
+; Return C code to fetch a value from instruction memory.
+; PC-VAR is the C expression containing the address of the start of the
+; instruction.
+; ??? Aligned/unaligned support?
+
+(define (gen-ifetch pc-var bitoffset bitsize)
+  (string-append "GETIMEM"
+		 (case bitsize
+		   ((8) "UQI")
+		   ((16) "UHI")
+		   ((32) "USI")
+		   (else (error "bad bitsize argument to gen-ifetch" bitsize)))
+		 " (current_cpu, "
+		 pc-var " + " (number->string (quotient bitoffset 8))
+		 ")")
+)
+
 ; Instruction field support code.
 
 ; Return a <c-expr> object of the value of an ifield.

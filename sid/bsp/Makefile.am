@@ -1,5 +1,8 @@
 ## Process this with automake to create Makefile.in
 
+## FIXME: This is begging to be rewritten once Automake 1.5 is
+## released and the += operator works correctly inside conditionals.
+
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I $(srcdir)/../config
 
@@ -17,6 +20,8 @@ if SIDTARGET_M68K
 FAM3SCRIPTS = m68k-elf-sid
 endif
 
-ALLFAMSCRIPTS = $(FAM0SCRIPTS) $(FAM2SCRIPTS) $(FAM3SCRIPTS)
+ALLFAMSCRIPTS = $(FAM0SCRIPTS) $(FAM1SCRIPTS) $(FAM2SCRIPTS) $(FAM3SCRIPTS) \
+		$(FAM4SCRIPTS) $(FAM5SCRIPTS) $(FAM6SCRIPTS) $(FAM7SCRIPTS) \
+		$(FAM8SCRIPTS) $(FAM9SCRIPTS) $(FAM10SCRIPTS)
 
 bin_SCRIPTS = configrun-sid $(ALLFAMSCRIPTS)

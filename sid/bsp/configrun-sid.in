@@ -49,6 +49,8 @@ $opt_save_temps=0;
 $opt_no_run=0;
 $opt_trace_extract=0;
 $opt_trace_semantics=0;
+$opt_trace_disassemble=0;
+$opt_trace_counter=0;
 $opt_trace_core=0;
 $opt_trace_core_visual=0;
 $opt_enable_warnings=0;
@@ -64,11 +66,13 @@ $opt_EL=0;
 $opt_sidrtc="";
 $opt_sidcodec="";
 @opt_wrap = ();
+%opt_load=();
+%opt_gdbport=();
 
 $any_tcl = 0;
 
-# by default the loader data mapper connects to the mapper access-port
-$load_mapper_data = "mapper access-port";
+# by default the loader data mapper connects to the cpu-mapper access-port
+$load_mapper_data = "cpu-mapper access-port";
 
 # (see perldoc Getopt::Long)
 @options = (
@@ -78,11 +82,14 @@ $load_mapper_data = "mapper access-port";
 	    "save-temps!",
 	    "trace-extract!",
 	    "trace-semantics!",
+	    "trace-disassemble!",
+	    "trace-counter!",
 	    "trace-core!",
 	    "trace-core-visual!",
 	    "enable-warnings!",
 	    "memory-region=s@",
 	    "gdb=i",
+	    "gdbport=i%",
 	    "tv=i",
 	    "tksm!",
 	    "board=s",
@@ -96,6 +103,7 @@ $load_mapper_data = "mapper access-port";
 	    "sidrtc=s",
 	    "sidcodec=s",
 	    "wrap=s@",
+	    "load=s%",
 );
 
 sub usage {
@@ -108,6 +116,8 @@ Options:
  --save-temps               Keep generated sid configuration file.        [no]
  --trace-extract            Turn on CPU insn decode tracing.              [no]
  --trace-semantics          Turn on CPU insn execute tracing.             [no]
+ --trace-disassemble        Turn on CPU insn execute disassembly.         [no]
+ --trace-counter            Turn on CPU insn counter.                     [no]
  --trace-core               Turn on bus access tracing.                   [no]
  --enable-warnings          Enable CPU execution warnings.                [no]
  --memory-region=BASE,SIZE  Add RAM region from BASE to BASE+SIZE-1.      [no]
@@ -118,7 +128,12 @@ Options:
                                mmap           Memory map given file
                                latency=R:W    Set read, write latencies  [0:0]
                                latency=RW     Set both latencies           [0]
- --gdb=PORT                 Add a gdb/debugger interface on TCP port.   [none]
+ --gdb=PORT                 Add a gdb/debugger interface on TCP port.
+                            Equivalent to --gdbport cpu=PORT.           [none]
+ --gdbport PROCESSOR=PORT   Add a gdb/debugger interface on TCP port
+                            for the given processor. May be specified
+                            more than once to debug multiple
+                            processors.                                 [none]
  --board=BOARD              Model given board or system.               [gloss]
  --engine=scache|pbb        Set given cgen CPU engine.                   [pbb]
  -EB | -EL                  Set powerup CPU mode to big/little endian   [auto]
@@ -128,6 +143,9 @@ Options:
  --insn-count=N             Block of uninterrupted ticks for insns     [10000]
  --gprof                    GPROF-profile, collect every N ticks          [no]
  --wrap=COMPONENT           Turn on SID API tracing for named component [none]
+ --load PROCESSOR=NAME      Specify an executable to be loaded into
+                            a specific processor. May be specified more
+                            than once to load multiple processors.  [cpu=exec]
 ";
 
 # temporarily disabled, until BLT build problems are fixed:
@@ -226,6 +244,34 @@ foreach $arg (@ARGV) {
 #    warn "Executable name not supplied";
 #  }
 
+# --load cpu=<name> overrides $exec
+if ($opt_load{"cpu"})
+{
+    if ($exec && $exec ne $opt_load{"cpu"})
+    {
+	warn "--load cpu=" . $opt_load{"cpu"} . " overrides $exec\n";
+    }
+    $exec = $opt_load{"cpu"};
+}
+else
+  {
+      $opt_load{"cpu"} = "$exec";
+  }
+
+# --gdbport cpu=port overrides --gdb
+if ($opt_gdbport{"cpu"})
+{
+    if ($opt_gdb && $opt_gdb ne $opt_gdbport{"cpu"})
+    {
+	warn "--gdbport cpu=" . $opt_gdbport{"cpu"} . " overrides --gdb=$opt_gdb\n";
+    }
+    $opt_gdb = $opt_gdbport{"cpu"};
+}
+elsif ($opt_gdb)
+  {
+      $opt_gdbport{"cpu"} = $opt_gdb;
+  }
+
 if ($exec)
   {
     die "Cannot read executable `$exec'" if (! -r $exec && ! $opt_no_run);
@@ -297,7 +343,6 @@ if ($opt_persistent) { $zeroth_section .= "set main persistent? true\n"; }
 $cpu_component_type = $cpu_comptype{$opt_cpu} || die "Unknown cpu $opt_cpu for cpu component type\n";
 $first_section = "# first section\n" .
   &sidconf_new("$cpu_component_type", "cpu") . "\n" .
-  &sidconf_new("hw-mapper-basic", "mapper") . "\n" .
   &sidconf_new("hw-glue-sequence-8", "init-sequence") . "\n" .
   &sidconf_new("hw-glue-sequence-1", "hw-reset-net") . "\n" .
   &sidconf_new("hw-glue-sequence-8", "deinit-sequence") . "\n" .
@@ -314,7 +359,7 @@ if ($opt_trace_core || $opt_trace_core_visual)
   }
 else
   {
-    $bus_upstream = "mapper access-port";
+    $bus_upstream = "cpu-mapper access-port";
   }
 
 if ($opt_insn_count)
@@ -336,7 +381,9 @@ $enable_z_packet = "false";
 $second_section = "# second section
 # settings
 set cpu step-insn-count $cpu_insn_count
-set cpu trace-result? $opt_trace_semantics
+set cpu trace-semantics? $opt_trace_semantics
+set cpu trace-disassemble? $opt_trace_disassemble
+set cpu trace-counter? $opt_trace_counter
 set cpu trace-extract? $opt_trace_extract
 set cpu enable-warnings? $opt_enable_warnings
 set host-sched num-clients 10 # large enough?
@@ -357,7 +404,6 @@ connect-bus cpu insn-memory $bus_upstream
 connect-bus cpu data-memory $bus_upstream
 ";
 
-
 if ($opt_gprof)
   {
     $second_section .= "# gprof connections
@@ -372,7 +418,7 @@ set gprof bucket-size 4 # bytes per bucket
 if ($opt_trace_core || $opt_trace_core_visual)
   {
     $second_section .= "# core tracing
-connect-bus bus-probe downstream mapper access-port
+connect-bus bus-probe downstream cpu-mapper access-port
 ";
   }
 
@@ -458,14 +504,14 @@ connect-pin uart1 INTR -> intctrl interrupt-source-8
 connect-pin uart2 INTR -> intctrl interrupt-source-9
 connect-pin parport INTP -> intctrl interrupt-source-10
 # pid7t memory map
-connect-bus mapper intctrl:[0xA000000,0xA000013] intctrl irq-registers
-connect-bus mapper intctrl:[0xA000100,0xA00010F] intctrl fiq-registers
-connect-bus mapper timer1:[0xA800000,0xA80000F] timer1 registers
-connect-bus mapper timer2:[0xA800020,0xA80002F] timer2 registers
-connect-bus mapper remapper:[0xB000000,0xB000037] remapper registers
-connect-bus mapper uart1:[0xD800000,0xD80001F,4,1] uart1 Bus
-connect-bus mapper uart2:[0xD800020,0xD80003F,4,1] uart2 Bus
-connect-bus mapper parport:[0xD800040,0xD80005F,4,1] parport Bus
+connect-bus cpu-mapper intctrl:[0xA000000,0xA000013] intctrl irq-registers
+connect-bus cpu-mapper intctrl:[0xA000100,0xA00010F] intctrl fiq-registers
+connect-bus cpu-mapper timer1:[0xA800000,0xA80000F] timer1 registers
+connect-bus cpu-mapper timer2:[0xA800020,0xA80002F] timer2 registers
+connect-bus cpu-mapper remapper:[0xB000000,0xB000037] remapper registers
+connect-bus cpu-mapper uart1:[0xD800000,0xD80001F,4,1] uart1 Bus
+connect-bus cpu-mapper uart2:[0xD800020,0xD80003F,4,1] uart2 Bus
+connect-bus cpu-mapper parport:[0xD800040,0xD80005F,4,1] parport Bus
 # set uart unframed mode
 set uart1 sio-framing? 0
 set uart2 sio-framing? 0
@@ -517,8 +563,8 @@ connect-pin target-sched 2-event -> timer divided-clock-event
 connect-pin timer interrupt -> intctrl interrupt-source-4
 connect-pin intctrl interrupt -> cpu nirq
 # connect the on-cpu board devices
-connect-bus mapper intctrl:[0xF600000,0xF600037] intctrl irq-registers
-connect-bus mapper timer:[0xF700020,0xF70003F] timer registers
+connect-bus cpu-mapper intctrl:[0xF600000,0xF600037] intctrl irq-registers
+connect-bus cpu-mapper timer:[0xF700020,0xF70003F] timer registers
 ";
       }
     else
@@ -564,12 +610,12 @@ connect-pin lcd FR -> display FR
 #connect-bus PCI pcibus:[0x4000000,0x5FEFFFF] pcibus config-space
 #connect-bus ??? ??????:[0x5FF0000,0x5FFFFFF] v360epc registers
 # ARM EPROM/FLASH memory
-connect-bus mapper rtc:[0xE800000,0xE803FFF] rtc read-write-port
-connect-bus mapper uart1:[0xE900000,0xE90001F,4,1] uart1 Bus
-connect-bus mapper uart2:[0xE900020,0xE90003F,4,1] uart2 Bus
-connect-bus mapper parport:[0xE900080,0xE90009F,4,1] parport Bus
+connect-bus cpu-mapper rtc:[0xE800000,0xE803FFF] rtc read-write-port
+connect-bus cpu-mapper uart1:[0xE900000,0xE90001F,4,1] uart1 Bus
+connect-bus cpu-mapper uart2:[0xE900020,0xE90003F,4,1] uart2 Bus
+connect-bus cpu-mapper parport:[0xE900080,0xE90009F,4,1] parport Bus
 # kbd/ms
-connect-bus mapper lcd:[0xE900100,0xE90010F,4,1] lcd bus
+connect-bus cpu-mapper lcd:[0xE900100,0xE90010F,4,1] lcd bus
 # DIP switches
 #connect-bus PCI pcibus:[0xF200000,0xF2FFFFF] pcibus control-registers
 # set uart unframed mode
@@ -697,15 +743,15 @@ connect-pin uart2 Sin <- uart2-console rx
 
     if ($opt_board =~ /uart1:gdb/ && $opt_gdb != 0)
       {
-	$third_section .= "# uart1 <-> gdb also
-connect-pin uart1 Sout -> gdb target-tx
+	$third_section .= "# uart1 <-> cpu-gdb also
+connect-pin uart1 Sout -> cpu-gdb target-tx
 ";
       }
 
     if ($opt_board =~ /uart2:gdb/ && $opt_gdb != 0)
       {
-	$third_section .= "# uart2 <-> gdb also
-connect-pin uart2 Sout -> gdb target-tx
+	$third_section .= "# uart2 <-> cpu-gdb also
+connect-pin uart2 Sout -> cpu-gdb target-tx
 ";
       }
   }
@@ -731,7 +777,7 @@ disconnect-bus cpu data-memory $bus_upstream
       {
         $second_section .= "# $cpu harvard bus data probe.
 connect-bus cpu data-memory bus-probe upstream
-disconnect-bus bus-probe downstream mapper access-port
+disconnect-bus bus-probe downstream cpu-mapper access-port
 connect-bus bus-probe downstream data-mapper access-port
 ";
       }
@@ -759,6 +805,7 @@ if ($opt_cpu eq "arm")
   }
 
 
+
 # --engine
 if ($opt_engine eq "pbb")
   {
@@ -775,77 +822,92 @@ else
 
 
 # --gdb
-if ($opt_gdb != 0)
+# Generate a gdb component for each processor requested.
+foreach $processor (keys %opt_gdbport)
   {
-    $first_section .= "# gdb\n" .
-      &sidconf_new("sw-debug-gdb", "gdb") . "\n" .
-      &sidconf_new("sid-io-socket-server", "gdb-socket") . "\n" .
-      "";
-
-    $second_section .= "# gdb
-relate gdb cpu cpu
-relate gdb target-schedulers target-sched
-relate gdb host-schedulers host-sched
-connect-pin gdb process-signal -> main stop!
-connect-pin init-sequence output-3 -> gdb init
-connect-pin deinit-sequence output-5 -> gdb deinit
-connect-pin gdb yield -> yield-net input
-connect-pin gdb flush-icache -> cpu flush-icache
-connect-pin gdb restart -> hw-reset-net input
-set gdb exit-on-detach? 1
-set gdb trace-gdbsid? $opt_verbose
-set gdb trace-gdbserv? $opt_verbose
-# gdb-socket
-connect-pin init-sequence output-2 -> gdb-socket init
-connect-pin deinit-sequence output-6 -> gdb-socket fini
-connect-pin gdb-socket rx -> gdb remote-rx
-connect-pin gdb-socket tx <- gdb remote-tx
-connect-pin host-sched 6-event -> gdb-socket poll-event
-connect-pin host-sched 6-control <- gdb-socket poll-control
-set gdb-socket sockaddr-local 0.0.0.0:$opt_gdb
-set gdb-socket verbose? $opt_verbose
+    $first_section .= "# $processor gdb\n" .
+      &sidconf_new("sw-debug-gdb", "${processor}-gdb") . "\n" .
+      &sidconf_new("sid-io-socket-server", "${processor}-gdb-socket") . "\n";
+    $second_section .= "# ${processor}-gdb
+relate ${processor}-gdb cpu $processor
+relate ${processor}-gdb target-schedulers target-sched
+relate ${processor}-gdb host-schedulers host-sched
+connect-pin ${processor}-gdb process-signal -> main stop!
+connect-pin init-sequence output-3 -> ${processor}-gdb init
+connect-pin deinit-sequence output-5 -> ${processor}-gdb deinit
+connect-pin ${processor}-gdb yield -> yield-net input
+connect-pin ${processor}-gdb flush-icache -> $processor flush-icache
+connect-pin ${processor}-gdb restart -> hw-reset-net input
+set ${processor}-gdb exit-on-detach? 1
+set ${processor}-gdb trace-gdbsid? $opt_verbose
+set ${processor}-gdb trace-gdbserv? $opt_verbose
+# ${processor}-gdb-socket
+connect-pin init-sequence output-2 -> ${processor}-gdb-socket init
+connect-pin deinit-sequence output-6 -> ${processor}-gdb-socket fini
+connect-pin ${processor}-gdb-socket rx -> ${processor}-gdb remote-rx
+connect-pin ${processor}-gdb-socket tx <- ${processor}-gdb remote-tx
+connect-pin host-sched 6-event -> ${processor}-gdb-socket poll-event
+connect-pin host-sched 6-control <- ${processor}-gdb-socket poll-control
+set ${processor}-gdb-socket sockaddr-local 0.0.0.0:$opt_gdbport{$processor}
+set ${processor}-gdb-socket verbose? $opt_verbose
 ";
+  }
 
+# Additional settings for main cpu gdb.
+if ($opt_gdb)
+  {
     if ($opt_board =~ /gloss/)
       {
 	$second_section .= "# gdb w/ gloss
-connect-pin gloss trap-chain <-> gdb trap
-connect-pin gloss trap-code-chain -> gdb trap-code
-connect-pin gloss process-signal -> gdb gloss-process-signal
-connect-pin gloss debug-tx -> gdb target-tx
-relate gdb gloss gloss
-set gdb enable-Z-packet? $enable_z_packet
-set gdb operating-mode? false
+connect-pin gloss trap-chain <-> cpu-gdb trap
+connect-pin gloss trap-code-chain -> cpu-gdb trap-code
+connect-pin gloss process-signal -> cpu-gdb gloss-process-signal
+connect-pin gloss debug-tx -> cpu-gdb target-tx
+relate cpu-gdb gloss gloss
+set cpu-gdb enable-Z-packet? $enable_z_packet
+set cpu-gdb operating-mode? false
 ";
       }
     elsif ($opt_board =~ /pid7t/)
       {
-	$second_section .= "# gdb w/ pid7t
-connect-pin cpu trap <-> gdb trap
-connect-pin cpu trap-code -> gdb trap-code
+	$second_section .= "# cpu-gdb w/ pid7t
+connect-pin cpu trap <-> cpu-gdb trap
+connect-pin cpu trap-code -> cpu-gdb trap-code
 ";
       }
   }
 
-
-if ($exec)
+# Generate a loader and mapper for each processor
+foreach $processor (keys %opt_load)
   {
-    $first_section .= "# loader\n" .
-      &sidconf_new("sw-load-elf", "loader") . "\n";
-
-    $second_section .= "# loader
-set loader file \"$exec\"
-set loader verbose? $opt_verbose
-connect-bus loader load-accessor-data $load_mapper_data # don't trace loading
-connect-bus loader load-accessor-insn mapper access-port # don't trace loading
-connect-pin init-sequence output-1 -> loader load!
-connect-pin loader start-pc-set -> cpu start-pc-set!
-connect-pin loader endian-set -> cpu endian-set!
-connect-pin loader error -> main stop!
+    $first_section .= "# ${processor} loader\n" .
+	&sidconf_new("hw-mapper-basic", "${processor}-mapper") . "\n" .
+	&sidconf_new("sw-load-elf", "${processor}-loader") . "\n";
+    $second_section .= "# ${processor} loader
+set ${processor}-loader file \"$opt_load{$processor}\"
+set ${processor}-loader verbose? $opt_verbose
 ";
 
-  }
+    # Have the loader write data via $load_mapper_data for the "cpu" processor
+    if ($processor eq "cpu")
+      {
+	  $second_section .=
+	      "connect-bus ${processor}-loader load-accessor-data $load_mapper_data\n";
+      }
+    else
+      {
+	  $second_section .=
+	      "connect-bus ${processor}-loader load-accessor-data ${processor}-mapper access-port # don't trace loading\n";
+      }
 
+    $second_section .=
+	"connect-bus ${processor}-loader load-accessor-insn ${processor}-mapper access-port # don't trace loading
+connect-pin init-sequence output-1 -> ${processor}-loader load!
+connect-pin ${processor}-loader start-pc-set -> ${processor} start-pc-set!
+connect-pin ${processor}-loader endian-set -> ${processor} endian-set!
+connect-pin ${processor}-loader error -> main stop!
+";
+  }
 
 # --trace-core-visual
 
@@ -886,7 +948,7 @@ connect-pin host-sched 1-event -> tksm refresh
 if ($opt_tksm && $opt_gdb)
   {
     $third_section .= "# triggerpoint signal
-connect-pin tksm triggerpoint-hit -> gdb stop-target
+connect-pin tksm triggerpoint-hit -> cpu-gdb stop-target
 ";
   }
 
@@ -945,13 +1007,13 @@ while ($#opt_memory_region >= 0)
       }
 
     # process memory maps
-    $third_section .= "connect-bus mapper mem$mems:[$base,$last] mem$mems $membus\n";
+    $third_section .= "connect-bus cpu-mapper mem$mems:[$base,$last] mem$mems $membus\n";
 
     foreach $alias (@aliases)
       {
 	$alias = oct($alias) if ($alias =~ /^0/);
 	$aliasend = $alias + $size - 1;
-	$third_section .= "connect-bus mapper mem$mems:[$alias,$aliasend] mem$mems $membus\n";
+	$third_section .= "connect-bus cpu-mapper mem$mems:[$alias,$aliasend] mem$mems $membus\n";
       }
 
     foreach $relate (@relates) {
@@ -996,7 +1058,7 @@ if ($opt_sidrtc)
       &sidconf_new("hw-rtc-sid", "sidrtc") . "\n";
 
     $third_section .= "# special rtc mapping
-connect-bus mapper sidrtc:[$addr,$addrend] sidrtc registers
+connect-bus cpu-mapper sidrtc:[$addr,$addrend] sidrtc registers
 ";
   }
 
@@ -1014,7 +1076,7 @@ if ($opt_sidcodec)
       "";
 
     $third_section .= "# special codec mapping
-connect-bus mapper sidcodec:[$addr,$addrend] sidcodec registers
+connect-bus cpu-mapper sidcodec:[$addr,$addrend] sidcodec registers
 # codec <-> host audio connections
 connect-pin sidcodec tx-sample -> sidaudio tx-sample
 connect-pin sidcodec rx-sample <- sidaudio rx-sample

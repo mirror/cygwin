@@ -26,7 +26,7 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #include <ctype.h>
 #include <time.h>
 
-char *version_string = "0.4";
+char *version_string = "0.5";
 
 /* These values are the builtin defaults, mainly useful for testing
    purposes, or if the user is uninterested in setting a value.  */
@@ -52,6 +52,12 @@ char *version_string = "0.4";
 #define DEFAULT_NUM_LIB_STRUCTS 30
 
 #define DEFAULT_NUM_FIELDS 20
+
+#define DEFAULT_NUM_CLASSES 10
+
+#define DEFAULT_NUM_LIB_CLASSES 30
+
+#define DEFAULT_NUM_METHODS 20
 
 #define DEFAULT_NUM_FUNCTIONS 100
 
@@ -84,6 +90,7 @@ enum decl_types {
   d_macro,
   d_enum,
   d_struct,
+  d_class,
   d_function
 };
 
@@ -139,6 +146,17 @@ struct struct_desc
 
 /* (should add unions as type of struct) */
 
+struct class_desc
+{
+  int id;
+  char *name;
+  int numfields;
+  struct field_desc *fields;
+  int nummethods;
+  struct function_desc *methods;
+  int use;
+};
+
 struct type_desc
 {
   char *name;
@@ -157,6 +175,7 @@ struct function_desc
   int return_type;
   int numargs;
   struct arg_desc *args;
+  struct class_desc *class;
   int use;
 };
 
@@ -171,6 +190,7 @@ struct decl_entry {
     struct macro_desc *macro_d;
     struct enum_desc *enum_d;
     struct struct_desc *struct_d;
+    struct class_desc *class_d;
     struct function_desc *function_d;
   } decl;
   int seq;
@@ -229,6 +249,10 @@ void create_struct (struct struct_desc *structdesc, int lib);
 
 char *gen_random_field_name (int n);
 
+void create_classes (void);
+
+void create_class (struct class_desc *classdesc, int lib);
+
 void create_functions (void);
 
 void create_function (struct function_desc *fndesc, int lib);
@@ -247,9 +271,11 @@ void write_enum (FILE *fp, struct enum_desc *enumdesc);
 
 void write_struct (FILE *fp, struct struct_desc *structdesc);
 
-void write_function_decl (FILE *fp, struct function_desc *functiondesc);
+void write_class (FILE *fp, struct class_desc *classdesc);
 
-void write_function (FILE *fp, int n);
+void write_function_decl (FILE *fp, struct function_desc *fndesc);
+
+void write_function (FILE *fp, struct function_desc *fndesc);
 
 void write_lib_function (FILE *fp, int n);
 
@@ -274,6 +300,10 @@ enum languages language = c;
 
 char *extensions[] = { "c", "c", "cc", "m" };
 
+/* Names for each language.  */
+
+char *lang_names[] = { "K&R C", "standard C", "standard C++", "Objective-C" };
+
 int num_files = DEFAULT_NUM_FILES;
 
 int num_header_files = DEFAULT_NUM_HEADER_FILES;
@@ -295,6 +325,12 @@ int num_structs = DEFAULT_NUM_STRUCTS;
 int num_lib_structs = DEFAULT_NUM_LIB_STRUCTS;
 
 int num_fields = DEFAULT_NUM_FIELDS;
+
+int num_classes = DEFAULT_NUM_CLASSES;
+
+int num_lib_classes = DEFAULT_NUM_LIB_CLASSES;
+
+int num_methods = DEFAULT_NUM_METHODS;
 
 int num_functions = DEFAULT_NUM_FUNCTIONS;
 
@@ -341,6 +377,10 @@ struct enum_desc *lib_enums;
 struct struct_desc *structs;
 
 struct struct_desc *lib_structs;
+
+struct class_desc *classes;
+
+struct class_desc *lib_classes;
 
 struct function_desc *functions;
 
@@ -416,6 +456,11 @@ main (int argc, char **argv)
 	{
 	  file_base_name = copy_string(argv[++i]);
 	}
+      else if (strcmp(arg, "--classes") == 0)
+	{
+	  num = strtol (argv[++i], NULL, 10);
+	  num_classes = num;
+	}
       else if (strcmp(arg, "--comments") == 0)
 	{
 	  num = strtol (argv[++i], NULL, 10);
@@ -470,13 +515,18 @@ main (int argc, char **argv)
 	{
 	  if (strcmp (argv[i+1], "c") == 0)
 	    language = c;
-	  else if (strcmp (argv[i+1], "cpp") == 0)
+	  else if (strcmp (argv[i+1], "c++") == 0)
 	    language = cpp;
 	  else if (strcmp (argv[i+1], "knr") == 0)
 	    language = knr;
 	  else if (strcmp (argv[i+1], "objc") == 0)
 	    language = objc;
 	  ++i;
+	}
+      else if (strcmp(arg, "--lib-classes") == 0)
+	{
+	  num = strtol (argv[++i], NULL, 10);
+	  num_lib_classes = num;
 	}
       else if (strcmp(arg, "--lib-enums") == 0)
 	{
@@ -503,6 +553,11 @@ main (int argc, char **argv)
 	  num = strtol (argv[++i], NULL, 10);
 	  num_macros = num;
 	}
+      else if (strcmp(arg, "--methods") == 0)
+	{
+	  num = strtol (argv[++i], NULL, 10);
+	  num_methods = num;
+	}
       else if (strcmp(arg, "--seed") == 0)
 	{
 	  num = strtol (argv[++i], NULL, 10);
@@ -525,17 +580,20 @@ main (int argc, char **argv)
 	  display_usage ();
 	}
     }
+  if (language != cpp)
+    num_classes = num_lib_classes = 0;
   init_xrandom (seed);
   /* Round up the number of functions so each file gets the same
      number. */
   num_functions_per_file = (num_functions + num_files - 1) / num_files;
   num_functions = num_functions_per_file * num_files;
   /* Create the definitions of objects internally. */
-  order.size = num_macros + num_enums + num_structs + num_functions;
+  order.size =
+    num_macros + num_enums + num_structs + num_classes + num_functions;
   order.nextentry = 0;
   order.entries =
     (struct decl_entry *) xmalloc (order.size * sizeof(struct decl_entry));
-  lib_order.size = num_lib_macros + num_lib_enums + num_lib_structs + num_lib_functions;
+  lib_order.size = num_lib_macros + num_lib_enums + num_lib_structs + num_lib_classes + num_lib_functions;
   lib_order.nextentry = 0;
   lib_order.entries =
     (struct decl_entry *) xmalloc (lib_order.size * sizeof(struct decl_entry));
@@ -543,6 +601,7 @@ main (int argc, char **argv)
   create_enums ();
   create_structs ();
   create_functions ();
+  create_classes ();
   /* Write out a bunch of files. */
   printf ("Writing %d header files...\n", num_header_files);
   for (i = 0; i < num_header_files; ++i)
@@ -563,6 +622,7 @@ display_usage (void)
 {
   fprintf (stderr, "Usage: spu [ ... options ... ]\n");
   fprintf (stderr, "\t--basename str (default \"%s\")\n", "file");
+  fprintf (stderr, "\t--classes n (default %d)\n", DEFAULT_NUM_CLASSES);
   fprintf (stderr, "\t--comments n\n");
   fprintf (stderr, "\t--enums n (default %d)\n", DEFAULT_NUM_ENUMS);
   fprintf (stderr, "\t--enumerators n (default %d)\n", DEFAULT_NUM_ENUMERATORS);
@@ -574,11 +634,13 @@ display_usage (void)
   fprintf (stderr, "\t--header-files n (default %d)\n", DEFAULT_NUM_HEADER_FILES);
   fprintf (stderr, "\t--help\n");
   fprintf (stderr, "\t--language c|cpp|knr|objc (default c)\n");
+  fprintf (stderr, "\t--lib-classes n (default %d)\n", DEFAULT_NUM_LIB_CLASSES);
   fprintf (stderr, "\t--lib-enums n (default %d)\n", DEFAULT_NUM_LIB_ENUMS);
   fprintf (stderr, "\t--lib-functions n (default %d)\n", DEFAULT_NUM_LIB_FUNCTIONS);
   fprintf (stderr, "\t--lib-macros n (default %d)\n", DEFAULT_NUM_LIB_MACROS);
   fprintf (stderr, "\t--lib-structs n (default %d)\n", DEFAULT_NUM_LIB_STRUCTS);
   fprintf (stderr, "\t--macros n (default %d)\n", DEFAULT_NUM_MACROS);
+  fprintf (stderr, "\t--methods n (default %d)\n", DEFAULT_NUM_METHODS);
   fprintf (stderr, "\t--seed n\n");
   fprintf (stderr, "\t--structs n (default %d)\n", DEFAULT_NUM_STRUCTS);
   fprintf (stderr, "\t--version\n");
@@ -676,8 +738,14 @@ add_decl_to_table (enum decl_types type, void *desc, struct decl_table *table)
     case d_struct:
       table->entries[n].decl.struct_d = (struct struct_desc *) desc;
       break;
+    case d_class:
+      table->entries[n].decl.class_d = (struct class_desc *) desc;
+      break;
     case d_function:
       table->entries[n].decl.function_d = (struct function_desc *) desc;
+      break;
+    default:
+      fprintf (stderr, "Unknown decl type %d in add_decl_to_table\n", type);
       break;
     }
   table->entries[n].seq = n;
@@ -864,9 +932,66 @@ gen_random_field_name (int n)
   return copy_string (namebuf);
 }
 
-/* Create a number of functions with random numbers of arguments. */
+/* Create definitions of the desired number of classures.  */
 
-/* (should gen with random arg types also) */
+void
+create_classes (void)
+{
+  int i;
+
+  /* Do the library classes first, so that program classes may use
+     them in their definitions.  */
+  printf ("Creating %d library classes...\n", num_lib_classes);
+  lib_classes =
+    (struct class_desc *) xmalloc (num_lib_classes * sizeof(struct class_desc));
+  for (i = 0; i < num_lib_classes; ++i)
+    {
+      create_class (&(lib_classes[i]), 1);
+      if (!probability(lib_percent))
+	lib_classes[i].use = 0;
+      add_decl_to_table (d_class, &(lib_classes[i]), &lib_order);
+    }
+
+  printf ("Creating %d classes...\n", num_classes);
+  classes =
+    (struct class_desc *) xmalloc (num_classes * sizeof(struct class_desc));
+  for (i = 0; i < num_classes; ++i)
+    {
+      create_class (&(classes[i]), 0);
+      add_decl_to_table (d_class, &(classes[i]), &order);
+    }
+}
+
+void
+create_class (struct class_desc *classdesc, int lib)
+{
+  int j, numf, numm;
+
+  classdesc->id = next_id++;
+  classdesc->name = gen_unique_global_name (NULL, 0);
+  numf = xrandom (num_fields) + 1;
+  classdesc->fields =
+    (struct field_desc *) xmalloc (numf * sizeof(struct field_desc));
+  for (j = 0; j < numf; ++j)
+    {
+      classdesc->fields[j].type = random_type (lib);
+      classdesc->fields[j].name = gen_random_field_name (j);
+    }
+  classdesc->numfields = numf;
+  numm = xrandom (num_methods + 1);
+  classdesc->methods =
+    (struct function_desc *) xmalloc (numm * sizeof(struct function_desc));
+  for (j = 0; j < numm; ++j)
+    {
+      create_function (&(classdesc->methods[j]), lib);
+      classdesc->methods[j].class = classdesc;
+    }
+  classdesc->nummethods = numm;
+  classdesc->use = 1;
+}
+
+/* Create a number of functions with random numbers and types of
+   arguments. */
 
 void
 create_functions (void)
@@ -957,6 +1082,7 @@ create_function (struct function_desc *fndesc, int lib)
 	}
     }
   fndesc->numargs = numargs;
+  fndesc->class = NULL;
   fndesc->use = 1;
 }
 
@@ -993,6 +1119,8 @@ write_header_file (int n)
       fprintf (fp, "/* forward decls */\n");
       for (i = 0; i < num_structs; ++i)
 	fprintf (fp, "struct %s;\n", structs[i].name);
+      for (i = 0; i < num_classes; ++i)
+	fprintf (fp, "class %s;\n", classes[i].name);
       fprintf (fp, "\n");
     }
   qsort(order.entries, order.size, sizeof(struct decl_entry),
@@ -1010,8 +1138,15 @@ write_header_file (int n)
 	case d_struct:
 	  write_struct (fp, order.entries[i].decl.struct_d);
 	  break;
+	case d_class:
+	  write_class (fp, order.entries[i].decl.class_d);
+	  break;
 	case d_function:
 	  write_function_decl (fp, order.entries[i].decl.function_d);
+	  break;
+	default:
+	  fprintf (stderr, "Unknown decl type %d in write_header_file\n",
+		   order.entries[i].type);
 	  break;
 	}
     }
@@ -1038,6 +1173,8 @@ write_lib_header_file (void)
       fprintf (fp, "/* forward decls */\n");
       for (i = 0; i < num_lib_structs; ++i)
 	fprintf (fp, "struct %s;\n", lib_structs[i].name);
+      for (i = 0; i < num_lib_classes; ++i)
+	fprintf (fp, "class %s;\n", lib_classes[i].name);
       fprintf (fp, "\n");
     }
   qsort(lib_order.entries, lib_order.size, sizeof(struct decl_entry),
@@ -1055,8 +1192,15 @@ write_lib_header_file (void)
 	case d_struct:
 	  write_struct (fp, lib_order.entries[i].decl.struct_d);
 	  break;
+	case d_class:
+	  write_class (fp, lib_order.entries[i].decl.class_d);
+	  break;
 	case d_function:
 	  write_function_decl (fp, lib_order.entries[i].decl.function_d);
+	  break;
+	default:
+	  fprintf (stderr, "Unknown decl type %d in write_header_file\n",
+		   lib_order.entries[i].type);
 	  break;
 	}
     }
@@ -1066,7 +1210,7 @@ write_lib_header_file (void)
 void
 write_macro (FILE *fp, struct macro_desc *macrodesc)
 {
-  int i, j;
+  int j;
 
   fprintf (fp, "\n#define %s", macrodesc->name);
   /* Negative # arguments indicates an argumentless macro instead of
@@ -1142,6 +1286,28 @@ write_struct (FILE *fp, struct struct_desc *structdesc)
   fprintf (fp, "};\n\n");
 }
 
+/* Write out the definition of a classure. */
+
+void
+write_class (FILE *fp, struct class_desc *classdesc)
+{
+  int j;
+
+  fprintf (fp, "\nclass %s {\n", classdesc->name);
+  fprintf (fp, "public:\n");
+  for (j = 0; j < classdesc->numfields; ++j)
+    {
+      fprintf (fp, "  %s %s;\n",
+	       name_from_type (classdesc->fields[j].type),
+	       classdesc->fields[j].name);
+    }
+  for (j = 0; j < classdesc->nummethods; ++j)
+    {
+      write_function (fp, &(classdesc->methods[j]));
+    }
+  fprintf (fp, "};\n\n");
+}
+
 void
 write_function_decl (FILE *fp, struct function_desc *fndesc)
 {
@@ -1201,51 +1367,69 @@ write_source_file (int n)
 
   for (j = 0; j < num_functions_per_file; ++j)
     {
-      write_function (fp, n * num_functions_per_file + j);
+      write_function (fp, &(functions[n * num_functions_per_file + j]));
     }
   fclose (fp);
 }
 
+/* (should add option to define methods separately) */
+
 void
-write_function (FILE *fp, int n)
+write_function (FILE *fp, struct function_desc *fndesc)
 {
   int i, k;
 
-  fprintf(fp, "%s\n%s (",
-	  name_from_type (functions[n].return_type), functions[n].name);
-  for (i = 0; i < functions[n].numargs; ++i)
+  if (fndesc->class)
+    fprintf (fp, "  ");
+  fprintf (fp, "%s", name_from_type (fndesc->return_type));
+  fprintf (fp, (fndesc->class ? " " : "\n"));
+  fprintf (fp, "%s (", fndesc->name);
+  for (i = 0; i < fndesc->numargs; ++i)
     {
       if (language != knr)
 	{
-	  fprintf (fp, "%s ", name_from_type (functions[n].args[i].type));
+	  fprintf (fp, "%s ", name_from_type (fndesc->args[i].type));
 	}
-      fprintf (fp, "%s", functions[n].args[i].name);
-      if (i + 1 < functions[n].numargs)
+      fprintf (fp, "%s", fndesc->args[i].name);
+      if (i + 1 < fndesc->numargs)
 	fprintf (fp, ", ");
     }
-  fprintf(fp, ")\n");
+  fprintf(fp, ")");
+  fprintf (fp, (fndesc->class ? " " : "\n"));
   if (language == knr)
     {
-      for (i = 0; i < functions[n].numargs; ++i)
+      for (i = 0; i < fndesc->numargs; ++i)
 	{
 	  fprintf (fp, "%s %s;\n",
-		   name_from_type (functions[n].args[i].type),
-		   functions[n].args[i].name);
+		   name_from_type (fndesc->args[i].type),
+		   fndesc->args[i].name);
 	}
     }
-  fprintf(fp, "{\n");
-  /* Generate a plausible function body by writing a number of
-     statements. */
-  for (k = 0; k < function_length; ++k)
+  fprintf(fp, "{");
+  fprintf (fp, (fndesc->class ? " " : "\n"));
+  if (fndesc->class)
     {
-      write_statement (fp, 1, function_depth - 1 + xrandom (3));
+      /* (should generate something for the method sometimes) */
+    }
+  else
+    {
+      /* Generate a plausible function body by writing a number of
+	 statements. */
+      for (k = 0; k < function_length; ++k)
+	{
+	  write_statement (fp, 1, function_depth - 1 + xrandom (3));
+	}
     }
   /* Write a return statement if appropriate.  */
-  if (functions[n].return_type != t_void)
+  if (fndesc->return_type != t_void)
     {
-      fprintf (fp, "  return 0;\n");
+      fprintf (fp, "  return 0;");
+      fprintf (fp, (fndesc->class ? " " : "\n"));
     }
-  fprintf (fp, "}\n\n");
+  fprintf (fp, "}");
+  if (fndesc->class)
+    fprintf (fp, ";");
+  fprintf (fp, "\n");
 }
 
 /* Write "library source", which really just means empty function
@@ -1371,7 +1555,6 @@ write_expression (FILE *fp, int rslttype, int depth, int max_depth,
   /* Always do non-recursive statements if going too deep. */
   if (depth >= max_depth)
     {
-    getout:
       switch (xrandom(10))
 	{
 	case 7:
@@ -1537,6 +1720,7 @@ find_function (int rslttype, struct function_desc *fns, int numfns)
 {
   int j, n;
 
+  /* Try several times, but eventually give up.  */
   for (j = 0; j < 1000; ++j)
     {
       n = xrandom (numfns);
@@ -1554,14 +1738,26 @@ write_description_block (FILE *fp)
 {
   extern unsigned long initial_randstate;
 
-  fprintf (fp, "/* A fine software product by SPU %s  */\n",
+  fprintf (fp, "/* A fine software product by SPU %s.  */\n",
 	   version_string);
-  fprintf (fp, "/* Program: %d macros, %d enums, %d structs, %d functions */\n",
-	   num_macros, num_enums, num_structs, num_functions);
-  fprintf (fp, "/* Library: %d macros, %d enums, %d structs, %d functions */\n",
-	   num_lib_macros, num_lib_enums, num_lib_structs, num_lib_functions);
-  fprintf (fp, "/* Random seed is %d */\n", (int) initial_randstate);
-  /* (should write all other parameters too) */
+  fprintf (fp, "/* Written in %s. */\n", lang_names[language]);
+  fprintf (fp, "/* Program: %d macros, %d enums, %d structs, %d classes, %d functions, */\n",
+	   num_macros, num_enums, num_structs, num_classes, num_functions);
+  fprintf (fp, "/* divided into %d source file(s) and %d header(s).  */\n",
+	   num_files, num_header_files);
+  fprintf (fp, "/* Library: %d macros, %d enums, %d structs, %d classes, %d functions. */\n",
+	   num_lib_macros, num_lib_enums, num_lib_structs, num_lib_classes,
+	   num_lib_functions);
+  fprintf (fp, "/* Enumerators per enum range from %d to %d.  */\n",
+	   num_enumerators / 2, num_enumerators + 1);
+  fprintf (fp, "/* Fields per struct/class range from %d to %d.  */\n",
+	   1, num_fields);
+  if (num_classes > 0 || num_lib_classes > 0)
+    fprintf (fp, "/* Methods per class range from %d to %d.  */\n",
+	     0, num_methods);
+  fprintf (fp, "/* Function length is %d statements, expression depth is %d.  */\n",
+	   function_length, function_depth);
+  fprintf (fp, "/* Random seed is %d.  */\n", (int) initial_randstate);
   fprintf (fp, "\n");
 }
 

@@ -273,6 +273,19 @@ eval "TK_CC_SEARCH_FLAGS=\"$TCL_LD_SEARCH_FLAGS\""
             fi
 	    suppress_enable_shared=yes
 	    ;;
+
+#
+# GDB should be linked dynamically on NetBSD, but needs the linker
+# to set an RPATH in the binaries for the X11 library directory.  It's
+# assumed that if a shared libtk is being built, it will be RPATH'd
+# in via a directive in the tcl library configuration information.
+#
+	*-*-netbsd*)
+	    if test "x$x_libraries" != "x"; then
+	      XLIBSW="$XLIBSW -Wl,-rpath,$x_libraries"
+	    fi
+	    ;;
+
 #
 # default is to link dynamically
 #

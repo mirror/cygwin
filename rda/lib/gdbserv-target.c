@@ -69,10 +69,10 @@ gdbserv_fromtarget_exit (struct gdbserv *gdbserv, int exitval)
 
 /* compatibility */
 void
-gdbserv_fromtarget_terminate (struct gdbserv *gdbserv, int exitval)
+gdbserv_fromtarget_terminate (struct gdbserv *gdbserv, int sigval)
 {
   gdbserv_fromtarget (gdbserv, NULL, GDBSERV_FROMTARGET_TERMINATED,
-		      NULL, exitval);
+		      NULL, sigval);
 }
 
 /* compatibility */
@@ -110,7 +110,7 @@ gdbserv_totarget (struct gdbserv *parent,
 
   /* If there is a start_addr, then something needs to be done with
      it.  If the target hasn't provided a full-functional ->to()
-     method then perhaphs they have provided the legacy
+     method then perhaps they have provided the legacy
      process_set_pc() */
   if (start_addr != NULL
       && target->process_set_pc != NULL)

@@ -41,6 +41,19 @@ AC_PROG_MAKE_SET
 
 AC_CYGWIN
 
+case "${target}" in
+*-*-cygwin*)
+        touch ac$$.c
+        if ${CC} -c -mwin32 ac$$.c >/dev/null 2>&1; then
+            case "$EXTRA_CFLAGS" in
+                *-mwin32*) ;;
+                *) EXTRA_CFLAGS="-mwin32 $EXTRA_CFLAGS" ;;
+            esac
+        fi
+        rm -f ac$$.o ac$$.c
+        ;;
+esac
+
 #--------------------------------------------------------------------
 # Determines the correct binary file extension (.o, .obj, .exe etc.)
 #--------------------------------------------------------------------

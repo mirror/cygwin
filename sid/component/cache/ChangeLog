@@ -27,6 +27,17 @@
 	(cache_component::invalidate_set): Likewise.
 	* hw-cache.xml: Update documentation.
 
+2002-06-04  Graydon Hoare  <graydon@redhat.com>
+
+	* cache.h (cache_component::set_refill_latency): New method.
+	(cache_component::get_refill_latency): New method.
+	(cache_component::refill_latency_specified): New flag.
+	(cache_component): Virtualize "refill-latency" attribute,
+	note when it is set in "refill_latency_specified".
+	* cache.cxx (read_line): Return either refill latency or
+	downstream latencies, depending on whether explicit refill
+	latency has been specified, not sum of both.
+
 2002-05-17  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (DEJAGNUTESTS): Add refill.exp.

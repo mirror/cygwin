@@ -1,6 +1,6 @@
 /* tty.cc
 
-   Copyright 1997, 1998, 2000 Cygnus Solutions.
+   Copyright 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -8,24 +8,36 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <errno.h>
 #include <unistd.h>
 #include <utmp.h>
-#include <ctype.h>
-#include "winsup.h"
+#include <wingdi.h>
+#include <winuser.h>
+#include <sys/cygwin.h>
+#include "cygerrno.h"
+#include "security.h"
+#include "fhandler.h"
+#include "path.h"
+#include "dtable.h"
+#include "cygheap.h"
+#include "pinfo.h"
+#include "cygwin/cygserver.h"
+#include "shared_info.h"
+#include "cygthread.h"
 
 extern fhandler_tty_master *tty_master;
 
 extern "C"
 int
-grantpt (void)
+grantpt (int fd)
 {
   return 0;
 }
 
 extern "C"
 int
-unlockpt (void)
+unlockpt (int fd)
 {
   return 0;
 }
@@ -42,6 +54,9 @@ ttyslot (void)
 void __stdcall
 tty_init (void)
 {
+  if (!myself->ppid_handle && NOTSTATE (myself, PID_CYGPARENT))
+    cygheap->fdtab.get_debugger_info ();
+
   if (NOTSTATE (myself, PID_USETTY))
     return;
   if (myself->ctty == -1)
@@ -58,8 +73,8 @@ tty_init (void)
 void __stdcall
 create_tty_master (int ttynum)
 {
-  tty_master = (fhandler_tty_master *) dtable.build_fhandler (-1, FH_TTYM,
-							     "/dev/ttym", ttynum);
+  tty_master = (fhandler_tty_master *)
+    cygheap->fdtab.build_fhandler (-1, FH_TTYM, "/dev/ttym", NULL, ttynum);
   if (tty_master->init (ttynum))
     api_fatal ("Can't create master tty");
   else
@@ -73,6 +88,7 @@ create_tty_master (int ttynum)
       cygwin_gethostname (our_utmp.ut_host, sizeof (our_utmp.ut_host));
       __small_sprintf (our_utmp.ut_line, "tty%d", ttynum);
       our_utmp.ut_type = USER_PROCESS;
+      our_utmp.ut_pid = myself->pid;
       myself->ctty = ttynum;
       login (&our_utmp);
     }
@@ -126,9 +142,9 @@ tty_list::terminate (void)
 	}
 
       termios_printf ("tty %d master about to finish", ttynum);
-      CloseHandle (t->to_slave);
-      CloseHandle (t->from_slave);
-      WaitForSingleObject (tty_master->hThread, INFINITE);
+      ForceCloseHandle1 (t->to_slave, to_pty);
+      ForceCloseHandle1 (t->from_slave, from_pty);
+      CloseHandle (tty_master->inuse);
       t->init ();
 
       char buf[20];
@@ -178,7 +194,7 @@ tty_list::allocate_tty (int with_console)
 
   if (!with_console)
     console = NULL;
-  else
+  else if (!(console = GetConsoleWindow ()))
     {
       char *oldtitle = new char [TITLESIZE];
 
@@ -200,8 +216,12 @@ tty_list::allocate_tty (int with_console)
 
       __small_sprintf (buf, "cygwin.find.console.%d", myself->pid);
       SetConsoleTitle (buf);
-      Sleep (40);
-      console = FindWindow (NULL, buf);
+      for (int times = 0; times < 25; times++)
+	{
+	  Sleep (10);
+	  if ((console = FindWindow (NULL, buf)))
+	    break;
+	}
       SetConsoleTitle (oldtitle);
       Sleep (40);
       ReleaseMutex (title_mutex);
@@ -283,7 +303,7 @@ tty::alive (const char *fmt)
   char buf[sizeof (TTY_MASTER_ALIVE) + 16];
 
   __small_sprintf (buf, fmt, ntty);
-  if ((ev = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf)))
+  if ((ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf)))
     CloseHandle (ev);
   return ev != NULL;
 }
@@ -305,7 +325,7 @@ tty::create_inuse (const char *fmt)
 void
 tty::init (void)
 {
-  OutputStopped = 0;
+  output_stopped = 0;
   setsid (0);
   pgid = 0;
   hwnd = NULL;
@@ -315,13 +335,13 @@ tty::init (void)
 }
 
 HANDLE
-tty::get_event (const char *fmt, BOOL inherit)
+tty::get_event (const char *fmt, BOOL manual_reset)
 {
   HANDLE hev;
   char buf[40];
 
   __small_sprintf (buf, fmt, ntty);
-  if (!(hev = CreateEvent (inherit ? &sec_all : &sec_all_nih, FALSE, FALSE, buf)))
+  if (!(hev = CreateEvent (&sec_all, manual_reset, FALSE, buf)))
     {
       termios_printf ("couldn't create %s", buf);
       set_errno (ENOENT);	/* FIXME this can't be the right errno */
@@ -345,14 +365,20 @@ tty::make_pipes (fhandler_pty_master *ptym)
       return FALSE;
     }
 
+  // ProtectHandle1INH (to_slave, to_pty);
   if (CreatePipe (&from_slave, &to_master, &sec_all, 0) == FALSE)
     {
       termios_printf ("can't create output pipe");
       set_errno (ENOENT);
       return FALSE;
     }
+  // ProtectHandle1INH (from_slave, from_pty);
   termios_printf ("tty%d from_slave %p, to_slave %p", ntty, from_slave,
 		  to_slave);
+
+  DWORD pipe_mode = PIPE_NOWAIT;
+  if (!SetNamedPipeHandleState (to_slave, &pipe_mode, NULL, NULL))
+    termios_printf ("can't set to_slave to non-blocking mode");
   ptym->set_io_handle (from_slave);
   ptym->set_output_handle (to_slave);
   return TRUE;
@@ -366,7 +392,7 @@ tty::common_init (fhandler_pty_master *ptym)
 
   if (!make_pipes (ptym))
     return FALSE;
-  ptym->neednl_ = 0;
+  ptym->need_nl = 0;
 
   /* Save our pid  */
 
@@ -374,15 +400,22 @@ tty::common_init (fhandler_pty_master *ptym)
 
   /* Allow the others to open us (for handle duplication) */
 
-  if ((os_being_run == winNT) &&
-      (SetKernelObjectSecurity (hMainProc, DACL_SECURITY_INFORMATION,
-			       get_null_sd ()) == FALSE))
-    small_printf ("Can't set process security, %E");
+  /* FIXME: we shold NOT set the security wide open when the
+     daemon is running
+   */
+  if (wincap.has_security ())
+    {
+      if (cygserver_running == CYGSERVER_UNKNOWN)
+	cygserver_init ();
+
+      if (cygserver_running != CYGSERVER_OK
+	  && !SetKernelObjectSecurity (hMainProc,
+				       DACL_SECURITY_INFORMATION,
+				       get_null_sd ()))
+	system_printf ("Can't set process security, %E");
+    }
 
   /* Create synchronisation events */
-
-  if (!(ptym->restart_output_event = get_event (RESTART_OUTPUT_EVENT, TRUE)))
-    return FALSE;
 
   if (ptym->get_device () != FH_TTYM)
     {
@@ -391,13 +424,16 @@ tty::common_init (fhandler_pty_master *ptym)
     }
   else
     {
-      if (!(ptym->output_done_event = get_event (OUTPUT_DONE_EVENT, FALSE)))
+      if (!(ptym->output_done_event = get_event (OUTPUT_DONE_EVENT)))
 	return FALSE;
-      if (!(ptym->ioctl_done_event = get_event (IOCTL_DONE_EVENT, FALSE)))
+      if (!(ptym->ioctl_done_event = get_event (IOCTL_DONE_EVENT)))
 	return FALSE;
-      if (!(ptym->ioctl_request_event = get_event (IOCTL_REQUEST_EVENT, FALSE)))
+      if (!(ptym->ioctl_request_event = get_event (IOCTL_REQUEST_EVENT)))
 	return FALSE;
     }
+
+  if (!(ptym->input_available_event = get_event (INPUT_AVAILABLE_EVENT, TRUE)))
+    return FALSE;
 
   char buf[40];
   __small_sprintf (buf, OUTPUT_MUTEX, ntty);
@@ -408,10 +444,19 @@ tty::common_init (fhandler_pty_master *ptym)
       return FALSE;
     }
 
-  ProtectHandle1 (ptym->output_mutex, output_mutex);
+  __small_sprintf (buf, INPUT_MUTEX, ntty);
+  if (!(ptym->input_mutex = CreateMutex (&sec_all, FALSE, buf)))
+    {
+      termios_printf ("can't create %s", buf);
+      set_errno (ENOENT);
+      return FALSE;
+    }
+
+  ProtectHandle1INH (ptym->output_mutex, output_mutex);
+  ProtectHandle1INH (ptym->input_mutex, input_mutex);
   winsize.ws_col = 80;
   winsize.ws_row = 25;
 
-  termios_printf("tty%d opened", ntty);
+  termios_printf ("tty%d opened", ntty);
   return TRUE;
 }

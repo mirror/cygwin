@@ -1038,8 +1038,13 @@ gloss32::read (int fd, address32 addr, size32 len,
 
 	  if (rx_buffer.size() > 0)
 	    {
-	      c = rx_buffer.front();
-	      rx_buffer.erase(rx_buffer.begin());
+	      count_read = min (len, rx_buffer.size());
+	      for (int i = 0; i < count_read; ++i)
+		{
+		  c = rx_buffer.front();
+		  rx_buffer.erase (rx_buffer.begin());
+		  strbuf += c;
+		}
 	    }
 	  else
 	    {
@@ -1047,8 +1052,6 @@ gloss32::read (int fd, address32 addr, size32 len,
 	      errcode = EAGAIN;
 	      return false;
 	    }
-	  count_read = 1;
-	  strbuf = c;
 	}
       else
 	{
@@ -1095,6 +1098,11 @@ gloss32::read (int fd, address32 addr, size32 len,
       addr = addr + count_read;
       total_read += count_read;
       len -= count_read;
+
+      // if we have read from the rx_buffer, then we have either emptied it
+      // or read the required number of characters so we should exit the loop
+      if (use_rx_p && count_read > 0)
+	break;
     }
 
   len_read = total_read;

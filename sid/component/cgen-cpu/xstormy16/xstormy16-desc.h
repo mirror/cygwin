@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -26,9 +26,11 @@ typedef enum gr_names {
 } GR_NAMES;
 
 /* Enum declaration for .  */
-typedef enum gr_rbj_names {
-  H_RBJ_R8, H_RBJ_R9
-} GR_RBJ_NAMES;
+typedef enum gr_rb_names {
+  H_RBJ_R8 = 0, H_RBJ_R9 = 1, H_RBJ_R10 = 2, H_RBJ_R11 = 3
+ , H_RBJ_R12 = 4, H_RBJ_R13 = 5, H_RBJ_R14 = 6, H_RBJ_R15 = 7
+ , H_RBJ_PSW = 6, H_RBJ_SP = 7
+} GR_RB_NAMES;
 
 /* Enum declaration for insn op enums.  */
 typedef enum insn_op1 {

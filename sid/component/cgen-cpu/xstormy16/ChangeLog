@@ -1,3 +1,13 @@
+2002-11-15  DJ Delorie  <dj@redhat.com>
+
+	* xstormy16-cpu.h: Regenerate.
+	* xstormy16-decode.cxx: Regenerate.
+	* xstormy16-decode.h: Regenerate.
+	* xstormy16-defs.h: Regenerate.
+	* xstormy16-desc.h: Regenerate.
+	* xstormy16-sem.cxx: Regenerate.
+	* xstormy16-write.cxx: Regenerate.
+
 2002-01-10  matthew green  <mrg@redhat.com>
 
 	* xstormy16.cxx (do_holdx): Define.

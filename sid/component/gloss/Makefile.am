@@ -40,5 +40,8 @@ libgloss_la_LDFLAGS = -module -no-undefined
 pkgdata_DATA = $(ARMDATA) $(MIPSDATA) $(M32RDATA)
 
 DEJAGNUTESTS=angel.exp
-check-local: all
+check-local:
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs

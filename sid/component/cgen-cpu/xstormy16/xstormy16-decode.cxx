@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+Copyright (C) 2000-2004 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -182,6 +182,8 @@ static void
 xstormy16_extract_sfmt_movhgrmem (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
 xstormy16_extract_sfmt_movlmemgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
+static void
+xstormy16_extract_sfmt_movhmemgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
 xstormy16_extract_sfmt_movgrgri (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
@@ -1917,7 +1919,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 1532 : /* fall through */
       case 1533 : /* fall through */
       case 1534 : /* fall through */
-      case 1535 : itype = XSTORMY16_INSN_MOVHMEMGR; entire_insn = base_insn >> 16; xstormy16_extract_sfmt_movlmemgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 1535 : itype = XSTORMY16_INSN_MOVHMEMGR; entire_insn = base_insn >> 16; xstormy16_extract_sfmt_movhmemgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 1536 : /* fall through */
       case 1537 : /* fall through */
       case 1538 : /* fall through */
@@ -2601,6 +2603,35 @@ xstormy16_extract_sfmt_movlmemgr (xstormy16_scache* abuf, xstormy16_cpu* current
         << "0x" << hex << pc << dec << " (sfmt_movlmemgr)\t"
         << " f_Rm:0x" << hex << f_Rm << dec
         << " f_lmem8:0x" << hex << f_lmem8 << dec
+        << " f_op2m:0x" << hex << f_op2m << dec
+        << endl;
+    }
+
+#undef FLD
+}
+
+void
+xstormy16_extract_sfmt_movhmemgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
+    xstormy16_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_movhgrmem.f
+    UINT f_Rm;
+    UINT f_op2m;
+    HI f_hmem8;
+
+    f_Rm = EXTRACT_MSB0_UINT (insn, 16, 4, 3);
+    f_op2m = EXTRACT_MSB0_UINT (insn, 16, 7, 1);
+    f_hmem8 = ((EXTRACT_MSB0_UINT (insn, 16, 8, 8)) + (32512));
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_Rm) = f_Rm;
+  FLD (f_hmem8) = f_hmem8;
+  FLD (f_op2m) = f_op2m;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_movhmemgr)\t"
+        << " f_Rm:0x" << hex << f_Rm << dec
+        << " f_hmem8:0x" << hex << f_hmem8 << dec
         << " f_op2m:0x" << hex << f_op2m << dec
         << endl;
     }

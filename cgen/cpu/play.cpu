@@ -11,7 +11,7 @@
 (define-arch
   (name play) ; name of cpu
   (comment "experimental .cpu file")
-  (insn-lsb0? #f)
+  (insn-lsb0? #t)
   (machs playb)
   (isas play)
 )
@@ -44,15 +44,56 @@
 )
 
 ; Instruction fields.
+; Copies of all the variations.
 
-(dnf f-op1       "op1"                 () 0 4)
-(dnf f-op2       "op2"                 () 4 4)
-(dnf f-op3       "op3"                 () 8 4)
-(dnf f-op4       "op4"                 () 12 4)
-(dnf f-r1        "r1"                  () 8 4)
-(dnf f-r2        "r2"                  () 12 4)
-(df  f-simm16     "simm16"             () 16 16 INT #f #f)
+; little endian, lsb0? = #f
+;(dnf f-op1       "op1"                 () 0 4)
+;(dnf f-op2       "op2"                 () 4 4)
+;(dnf f-op3       "op3"                 () 8 4)
+;(dnf f-op4       "op4"                 () 12 4)
+;(dnf f-r1        "r1"                  () 8 4)
+;(dnf f-r2        "r2"                  () 12 4)
+;(df  f-simm16     "simm16"             () 16 16 INT #f #f)
+;(df  f-simm16b    "16 bit signed immediate after simm32" () 48 16 INT #f #f)
+;(df  f-simm32     "simm32"             () 16 32 INT #f #f)
+;(df  f-simm32b    "32 bit signed immediate after simm16" () 32 32 INT #f #f)
 
+; little endian, lsb0? = #t
+(dnf f-op1       "op1"                 () 15 4)
+(dnf f-op2       "op2"                 () 11 4)
+(dnf f-op3       "op3"                 () 7 4)
+(dnf f-op4       "op4"                 () 3 4)
+(dnf f-r1        "r1"                  () 7 4)
+(dnf f-r2        "r2"                  () 3 4)
+(df  f-simm16     "simm16"             () 31 16 INT #f #f)
+(df  f-simm16b    "16 bit signed immediate after simm32" () 63 16 INT #f #f)
+(df  f-simm32     "simm32"             () 47 32 INT #f #f)
+(df  f-simm32b    "32 bit signed immediate after simm16" () 63 32 INT #f #f)
+
+; big endian, lsb0? = #f
+;(dnf f-op1       "op1"                 () 0 4)
+;(dnf f-op2       "op2"                 () 4 4)
+;(dnf f-op3       "op3"                 () 8 4)
+;(dnf f-op4       "op4"                 () 12 4)
+;(dnf f-r1        "r1"                  () 8 4)
+;(dnf f-r2        "r2"                  () 12 4)
+;(df  f-simm16     "simm16"             () 16 16 INT #f #f)
+;(df  f-simm16b    "16 bit signed immediate after simm32" () 48 16 INT #f #f)
+;(df  f-simm32     "simm32"             () 16 32 INT #f #f)
+;(df  f-simm32b    "32 bit signed immediate after simm16" () 32 32 INT #f #f)
+
+; big endian, lsb0? = #t
+;(dnf f-op1       "op1"                 () 15 4)
+;(dnf f-op2       "op2"                 () 11 4)
+;(dnf f-op3       "op3"                 () 7 4)
+;(dnf f-op4       "op4"                 () 3 4)
+;(dnf f-r1        "r1"                  () 7 4)
+;(dnf f-r2        "r2"                  () 3 4)
+;(df  f-simm16     "simm16"             () 31 16 INT #f #f)
+;(df  f-simm16b    "16 bit signed immediate after simm32" () 63 16 INT #f #f)
+;(df  f-simm32     "simm32"             () 47 32 INT #f #f)
+;(df  f-simm32b    "32 bit signed immediate after simm16" () 63 32 INT #f #f)
+
 (define-normal-insn-enum insn-op1 "insn format enums" () OP1_ f-op1
   (.map .str (.iota 16))
 )
@@ -121,6 +162,9 @@
 (dnop dr     "destination register"    () h-gr   f-r1)
 (dnop sr     "source register"         () h-gr   f-r2)
 (dnop simm16 "16 bit signed immediate" (HASH-PREFIX) h-sint f-simm16)
+(dnop simm16b "16 bit signed immediate after simm32" (HASH-PREFIX) h-sint f-simm16b)
+(dnop simm32 "32 bit signed immediate" (HASH-PREFIX) h-sint f-simm32)
+(dnop simm32b "32 bit signed immediate after simm16" (HASH-PREFIX) h-sint f-simm32b)
 
 ; Note that `df' doesn't work as that is a pmacro.
 (dnop df-reg "df reg" () h-df f-nil)
@@ -157,11 +201,19 @@
      ()
 )
 
-(dni addi "addi"
+(dni addi16 "addi16"
      ()
-     "addi $dr,$sr,$simm16"
+     "addi16 $dr,$sr,$simm16"
      (+ OP1_4 OP2_2 dr sr simm16)
      (set dr (add sr simm16))
+     ()
+)
+
+(dni addi32 "addi32"
+     ()
+     "addi32 $dr,$sr,$simm32"
+     (+ OP1_4 OP2_3 dr sr simm32)
+     (set dr (add sr simm32))
      ()
 )
 

@@ -79,7 +79,7 @@ if ($ENV{'SID'}) {
   $sid .= "/sid";
 }
 
-$version=q$Id: configrun-sid.in,v 1.27 2001/10/26 18:51:59 fche Exp $;
+$version=q$Id: configrun-sid.in,v 1.28 2001/10/29 17:44:36 fche Exp $;
 
 # by default the loader data mapper connects to the cpu-mapper access-port
 $load_mapper_data = "cpu-mapper access-port";
@@ -941,9 +941,9 @@ set cpu-gdb enable-Z-packet? $enable_z_packet
 set cpu-gdb operating-mode? false
 ";
       }
-    elsif ($opt_board =~ /pid7t/)
+    else
       {
-	$second_section .= "# cpu-gdb w/ pid7t
+	$second_section .= "# gdb w/o gloss
 connect-pin cpu trap <-> cpu-gdb trap
 connect-pin cpu trap-code -> cpu-gdb trap-code
 ";

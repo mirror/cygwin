@@ -11,7 +11,10 @@
 
 (define (attr-int-gen-decl attr) "")
 
-(define (attr-int-gen-defn attr) "")
+(define (attr-int-gen-defn attr) 
+  (string-append
+   "static const CGEN_ATTR_ENTRY " (gen-sym attr)
+   "_attr [] = \n{\n  {\"integer\", " (number->string (attr-default attr)) "},\n  { 0, 0 }\n};\n\n" ))
 
 (define (attr-gen-decl attr)
   (gen-enum-decl (symbol-append (obj:name attr) '-attr)

@@ -1,3 +1,7 @@
+2003-01-30  Frank Ch. Eigler  <fche@redhat.com>
+
+	* baseCfg.cxx: Remove some erroneous default parameters in fn decls.
+
 2002-05-30  Frank Ch. Eigler  <fche@redhat.com>
 
 	* mainDynamic.cxx (main): Add new "--rc" option to control passing

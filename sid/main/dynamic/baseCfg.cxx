@@ -137,8 +137,8 @@ void ComponentCfg::add_post (Writable *w)
 
 void ComponentCfg::conn_pin (ComponentCfg *src, const string srcport, 
 			     ComponentCfg *dst, const string dstport, 
-			     const direction dir = src_to_dst, 
-			     bool virt = true)
+			     const direction dir, 
+			     bool virt)
 {
   add_post (new PinConnection (src, srcport, dst, dstport, dir, virt));
 }
@@ -147,7 +147,7 @@ void ComponentCfg::conn_bus (ComponentCfg *src,
 			     const string srcport,
 			     ComponentCfg *dst, 
 			     const string dstport,
-			     bool virt = true)
+			     bool virt)
 {
   add_post (new BusConnection (src, srcport, dst, dstport, virt));
 }
@@ -155,7 +155,7 @@ void ComponentCfg::conn_bus (ComponentCfg *src,
 void ComponentCfg::set (ComponentCfg *targ, 
 			const string attr, 
 			const string val,
-			bool virt = true)
+			bool virt)
 {
   add_post (new Setting (targ, attr, val, virt));
 }
@@ -163,7 +163,7 @@ void ComponentCfg::set (ComponentCfg *targ,
 void ComponentCfg::relate (ComponentCfg *relater, 
 			   const string relationship, 
 			   ComponentCfg *related,
-			   bool virt = true)
+			   bool virt)
 {
   add_post (new Relation (relater, relationship, related, virt));
 }

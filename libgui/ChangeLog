@@ -1,3 +1,12 @@
+2002-01-04  Ian Roxborough  <irox@redhat.com>
+
+	* src/tkCanvEdge.c (CreateEdge, EdgeCoords, ConfigureEdge):
+	Objectify functions to use Tcl_Obj instead of char**.
+
+	* src/tkGraphCanvas.c: Cut and paste parts of the new
+	Tcl8.3 tagsearch code in to replace old.  Rewrite much
+	of the code to use the new tagsearch features.
+
 2001-10-28  Christopher Faylor  <cgf@redhat.com>
 
 	* configure.in: Modify 2001-10-12 change to check for cygwin host

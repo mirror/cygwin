@@ -1,4 +1,4 @@
-# Copyright (C) 1998 Free Software Foundation, Inc.
+# Copyright (C) 1998, 1999 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,9 +39,18 @@ if $tracelevel then {
 set prms_id 0
 set bug_id 0
 
+if { [skip_cplus_tests] } { continue }
+
 set testfile "derivation"
 set srcfile ${testfile}.cc
 set binfile ${objdir}/${subdir}/${testfile}
+
+# Create and source the file that provides information about the compiler
+# used to compile the test case.
+
+if [get_compiler_info ${binfile} "c++"] {
+    return -1
+}
 
 if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {debug c++}] != "" } {
      gdb_suppress_entire_file "Testcase compile failed, so all tests in this file will automatically fail."
@@ -51,21 +60,6 @@ gdb_exit
 gdb_start
 gdb_reinitialize_dir $srcdir/$subdir
 gdb_load ${binfile}
-remote_file build delete ${binfile}.ci
- if {![istarget "hppa*-*-hpux*"]} {
-     if  { [gdb_compile "${srcdir}/${subdir}/compiler.cc" "${binfile}.ci" preprocess ""] != ""
-} {
-         gdb_suppress_entire_file "Testcase compile failed, so all tests in this file will auto
-matically fail."
-     }
- } else {
-     if { [gdb_preprocess "${srcdir}/${subdir}/compiler.cc" "${binfile}.ci" "c++"] != "" } {
-         perror "Couldn't make ${binfile}.ci file"
-         return 1;
-     }
- }
- 
-source ${binfile}.ci
 
 #
 # set it up at a breakpoint so we can play with the variable values
@@ -82,8 +76,11 @@ send_gdb "break marker1\n" ; gdb_expect -re ".*$gdb_prompt $"
         -re "Break.* marker1 \\(\\) at .*:$decimal.*$gdb_prompt $" {
             send_gdb "up\n"
             gdb_expect {
-                -re ".*$gdb_prompt $" {}
-                timeout { fail "up from marker1" }
+                -re ".*main.*$gdb_prompt $" {}
+                -re ".*$gdb_prompt $" {
+		    fail "up from marker1"
+		}
+                timeout { fail "up from marker1 (timeout)" }
             }
         }
         -re "$gdb_prompt $" { fail "continue to marker1"  }
@@ -104,7 +101,8 @@ gdb_expect {
 
 send_gdb "ptype a_instance\n"
 gdb_expect {
-    -re "type = class A \{\r\n\[\t \]*public:\r\n\[\t \]*int a;\r\n\[\t \]*int aa;\[\r\n\t \]+A\\(void\\);\r\n\[\t \]*int afoo\\(void\\);\r\n\[\t \]*int foo\\(void\\);\r\n\}.*$gdb_prompt $"  { pass "ptype a_instance" }
+    -re "type = class A \{\r\n\[\t \]*public:\r\n\[\t \]*int a;\r\n\[\t \]*int aa;\[\r\n\t ]+A & operator=\\(A const &\\);\[\r\n\t ]+A\\(A const &\\);\[\r\n\t ]+A\\(void\\);\r\n\[\t \]*int afoo\\(void\\);\r\n\[\t \]*int foo\\(void\\);\r\n\}.*$gdb_prompt $"  { pass "ptype a_instance (with synth ops)" }
+    -re "type = class A \{\r\n\[\t \]*public:\r\n\[\t \]*int a;\r\n\[\t \]*int aa;\[\r\n\t \]+A\\(void\\);\r\n\[\t \]*int afoo\\(void\\);\r\n\[\t \]*int foo\\(void\\);\r\n\}.*$gdb_prompt $"  { pass "ptype a_instance (no synth ops)" }
     -re ".*$gdb_prompt $"   {  fail "ptype a_instance" }
     timeout             { fail "(timeout) ptype a_instance" }
 }
@@ -125,7 +123,8 @@ gdb_expect {
   if {$gcc_compiled} then {
       send_gdb "ptype d_instance\n"
       gdb_expect {
-	  -re "type = class D : private A, public B, private C \{\r\n\[\t \]*public:\r\n\[\t \]*int d;\r\n\[\t \]*int dd;\[\r\n\t \]+D\\(void\\);\r\n\[\t \]*int dfoo\\(void\\);\r\n\[\t \]*int foo\\(void\\);\r\n\}.*$gdb_prompt $"  { pass "ptype d_instance" }
+	  -re "type = class D : private A, public B, (protected|private) C \{\r\n\[\t \]*public:\r\n\[\t \]*int d;\r\n\[\t \]*int dd;\[\r\n\t ]+D & operator=\\(D const &\\);\[\r\n\t ]+D\\(D const &\\);\[\r\n\t \]+D\\(void\\);\r\n\[\t \]*int dfoo\\(void\\);\r\n\[\t \]*int foo\\(void\\);\r\n\}.*$gdb_prompt $"  { pass "ptype d_instance" }
+          -re "type = class D : private A, public B, private C \{\r\n\[\t \]*public:\r\n\[\t \]*int d;\r\n\[\t \]*int dd;\[\r\n\t \]+D\\(void\\);\r\n\[\t \]*int dfoo\\(void\\);\r\n\[\t \]*int foo\\(void\\);\r\n\}.*$gdb_prompt $"  { pass "ptype d_instance" }
 	  -re ".*$gdb_prompt $"   {  fail "ptype d_instance" }
 	  timeout             { fail "(timeout) ptype d_instance" }
       }
@@ -154,7 +153,8 @@ gdb_expect {
   if {$gcc_compiled} {
       send_gdb "ptype e_instance\n"
       gdb_expect {
-	  -re "type = class E : public A, private B, private C \{\r\n\[\t \]*public:\r\n\[\t \]*int e;\r\n\[\t \]*int ee;\[\r\n\t \]+E\\(void\\);\r\n\[\t \]*int efoo\\(void\\);\r\n\[\t \]*int foo\\(void\\);\r\n\}.*$gdb_prompt $"  { pass "ptype e_instance" }
+	  -re "type = class E : public A, private B, (protected|private) C \{\r\n\[\t \]*public:\r\n\[\t \]*int e;\r\n\[\t \]*int ee;\[\r\n\t ]+E & operator=\\(E const &\\);\[\r\n\t ]+E\\(E const &\\);\[\r\n\t \]+E\\(void\\);\r\n\[\t \]*int efoo\\(void\\);\r\n\[\t \]*int foo\\(void\\);\r\n\}.*$gdb_prompt $"  { pass "ptype e_instance" }
+          -re "type = class E : public A, private B, private C \{\r\n\[\t \]*public:\r\n\[\t \]*int e;\r\n\[\t \]*int ee;\[\r\n\t \]+E\\(void\\);\r\n\[\t \]*int efoo\\(void\\);\r\n\[\t \]*int foo\\(void\\);\r\n\}.*$gdb_prompt $"  { pass "ptype e_instance" }
 	  -re ".*$gdb_prompt $"   {  fail "ptype e_instance" }
 	  timeout             { fail "(timeout) ptype e_instance" }
       }
@@ -182,6 +182,7 @@ gdb_expect {
 
 send_gdb "ptype f_instance\n"
 gdb_expect {
+    -re "type = class F : private A, public B, private C \{\r\n\[\t \]*public:\r\n\[\t \]*int f;\r\n\[\t \]*int ff;\[\r\n\t ]+F & operator=\\(F const &\\);\[\r\n\t ]+F\\(F const &\\);\[\r\n\t \]+F\\(void\\);\r\n\[\t \]*int ffoo\\(void\\);\r\n\[\t \]*int foo\\(void\\);\r\n\}.*$gdb_prompt $"  { pass "ptype f_instance" }
     -re "type = class F : private A, public B, private C \{\r\n\[\t \]*public:\r\n\[\t \]*int f;\r\n\[\t \]*int ff;\[\r\n\t \]+F\\(void\\);\r\n\[\t \]*int ffoo\\(void\\);\r\n\[\t \]*int foo\\(void\\);\r\n\}.*$gdb_prompt $"  { pass "ptype f_instance" }
     -re ".*$gdb_prompt $"   {  fail "ptype f_instance" }
     timeout             { fail "(timeout) ptype f_instance" }
@@ -263,6 +264,10 @@ gdb_expect {
 
 send_gdb "print g_instance.a\n"
 gdb_expect {
+    -re "warning.*$gdb_prompt $" {
+	# The compiler doesn't think this is ambiguous.
+	fail "print value of g_instance.a"
+    }
     -re ".\[0-9\]* = 15.*$gdb_prompt $" {
         pass "print value of g_instance.a"
       }
@@ -272,6 +277,10 @@ gdb_expect {
 
 send_gdb "print g_instance.b\n"
 gdb_expect {
+    -re "warning.*$gdb_prompt $" {
+	# The compiler doesn't think this is ambiguous.
+	fail "print value of g_instance.b"
+    }
     -re ".\[0-9\]* = 16.*$gdb_prompt $" {
         pass "print value of g_instance.b"
       }
@@ -281,6 +290,10 @@ gdb_expect {
 
 send_gdb "print g_instance.c\n"
 gdb_expect {
+    -re "warning.*$gdb_prompt $" {
+	# The compiler doesn't think this is ambiguous.
+	fail "print value of g_instance.c"
+    }
     -re ".\[0-9\]* = 17.*$gdb_prompt $" {
         pass "print value of g_instance.c"
       }
@@ -288,6 +301,10 @@ gdb_expect {
     timeout           { fail "(timeout) print value of g_instance.c" }
   }
 
+# The following cases always fail with g++ output, and should be fixed
+# someday. -sts 1999-08-25
+
+if { $gcc_compiled } { setup_xfail "*-*-*" }
 send_gdb "print g_instance.afoo()\n"
 gdb_expect {
     -re ".\[0-9\]* = 1.*$gdb_prompt $" {
@@ -297,6 +314,7 @@ gdb_expect {
     timeout           { fail "(timeout) print value of g_instance.afoo()" }
   }
 
+if { $gcc_compiled } { setup_xfail "*-*-*" }
 send_gdb "print g_instance.bfoo()\n"
 gdb_expect {
     -re ".\[0-9\]* = 2.*$gdb_prompt $" {
@@ -306,6 +324,7 @@ gdb_expect {
     timeout           { fail "(timeout) print value of g_instance.bfoo()" }
   }
 
+if { $gcc_compiled } { setup_xfail "*-*-*" }
 send_gdb "print g_instance.cfoo()\n"
 gdb_expect {
     -re ".\[0-9\]* = 3.*$gdb_prompt $" {

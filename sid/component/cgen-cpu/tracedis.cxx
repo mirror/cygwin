@@ -1,6 +1,6 @@
 // tracedis.cxx - disassembly tracing support.  -*- C++ -*-
 
-// Copyright (C) 2001, 2002 Red Hat.
+// Copyright (C) 2001-2004 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -12,7 +12,7 @@
 #include "sidcomputil.h"
 #include "sidcpuutil.h"
 
-void register_name(enum bfd_architecture, const char *);
+void register_name(enum bfd_architecture, const char *, int);
 
 // XXX: for compatibility with older libraries
 static
@@ -41,16 +41,18 @@ cgen_disassemble(bfd_vma pc,
 		 disassembler_ftype fp,
 		 enum bfd_flavour flavour,
 		 enum bfd_architecture arch,
+		 int machine,
 		 enum bfd_endian endian,
 		 const char *name,
 		 unsigned long isa_mask)
 {
-  register_name(arch, name);
+  register_name(arch, name, machine);
   INIT_DISASSEMBLE_INFO(*info, this_ptr, trace_printf);
   info->application_data = this_ptr;
   info->flavour = flavour;
   info->insn_sets = isa_mask; /* may be 0 */
   info->arch = arch;
+  info->mach = machine;
   info->endian = endian;
   info->read_memory_func = read_mem_func;
   info->memory_error_func = memory_error_func;
@@ -174,13 +176,14 @@ bfd_get_bits (const void* addr, int bits, int big_p)
 struct bfd_arch_hack {
   struct bfd_arch_hack *next;
   enum bfd_architecture arch;
+  int machine;
   const char *name;
 };
 
 struct bfd_arch_hack *hack_list;
 
 void
-register_name(enum bfd_architecture arch, const char *name)
+register_name(enum bfd_architecture arch, const char *name, int machine)
 {
   struct bfd_arch_hack *p;
 
@@ -189,6 +192,7 @@ register_name(enum bfd_architecture arch, const char *name)
       hack_list = (struct bfd_arch_hack *)xmalloc(sizeof *hack_list);
       hack_list->next = NULL;
       hack_list->arch = arch;
+      hack_list->machine = machine;
       hack_list->name = name;
       return;
     }
@@ -197,11 +201,13 @@ register_name(enum bfd_architecture arch, const char *name)
     if (strcmp(p->name, name) == 0)
       {
 	p->arch = arch;
+	p->machine = machine;
 	return;
       }
   p = (struct bfd_arch_hack *)xmalloc(sizeof *hack_list);
   p->next = hack_list;
   p->arch = arch;
+  p->machine = machine;
   p->name = name;
 }
 
@@ -213,7 +219,7 @@ bfd_lookup_arch (enum bfd_architecture arch, unsigned long machine)
 
   for (b = hack_list; b->name; b++)
     {
-      if (b->arch == arch)
+      if (b->arch == arch && b->machine == machine)
 	{
           info.printable_name = b->name;
           return &info;

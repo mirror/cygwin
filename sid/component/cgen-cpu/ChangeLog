@@ -1,3 +1,16 @@
+2004-06-25  Dave Brolley  <brolley@redhat.com>
+
+	* tracedis.cxx (register_name): Add parameter for the cgen MACH. Save
+	it in hack_list->machine or p->machine.
+	(cgen_disassemble): Add parameter for the cgen MACH. Pass it to
+	register_name. Use it to set info->mach.
+	(arch_hack): New field 'machine'.
+	(bfd_lookup_arch): Make sure the machines match.
+	* cgen-cpu.h (disassemble): Add parameter for the cgen MACH.
+	* compCGEN.cxx (disassemble): Add parameter for the cgen MACH. Pass it
+	to cgen_disassemble.
+	* tracedis.h (cgen_disassemble): Add parameter for the cgen MACH.
+
 2004-05-08  Robert Cragie <rcc@jennic.com>
 
 	* Makefile.am (_LIBADD, _DEPENDENCIES): Add opcodes/dis-init.c.

@@ -60,6 +60,7 @@ EXP_AND_TK_LIBS=$TK_LIBS
 
 # CYGNUS LOCAL dj/cygwin
 AC_CANONICAL_HOST
+EXP_CFLAGS=""
 # If we built a cygwin-specific tcl, use it here.
 case "${host}" in
 *-*-cygwin*)
@@ -70,6 +71,14 @@ case "${host}" in
     TCL_LIB_SPEC="../tcl/cygwin/libtcl_cygwin.a"
     EXP_CYGWIN_ALTTCL='-DCYGWIN_ALTTCL'
   fi
+  touch ac$$.c
+  if ${CC} -c -mno-win32 ac$$.c >/dev/null 2>&1; then
+      case "$EXP_CFLAGS" in
+	  *-mno-win32*) ;;
+	  *) EXP_CFLAGS="-mno-win32 $EXP_CFLAGS" ;;
+      esac
+  fi
+  rm -f ac$$.o ac$$.c
   ;;
 esac
 
@@ -131,7 +140,6 @@ AC_HEADER_TIME
 AC_HEADER_SYS_WAIT
 
 dnl CYGNUS LOCAL: always respect CFLAGS.
-EXP_CFLAGS=""
 dnl case "${host}" in
 # Use -g on all systems but Linux where it upsets the dynamic X libraries.
 dnl   i[[3456]]86-*-linux*)	EXP_CFLAGS="" ;;
@@ -1203,7 +1211,7 @@ fi
 
 dnl CYGNUS LOCAL
 dnl check for win32 dependencies
-CY_AC_CYGWIN32
+CY_AC_CYGWIN
 CY_AC_EXEEXT
 
 #--------------------------------------------------------------------

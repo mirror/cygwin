@@ -75,7 +75,7 @@ extern char *TclGetRegError();
 #  include <sys/strpty.h>
 #endif
 
-#if defined(HAVE_PTMX) && !defined(__CYGWIN32__)
+#if defined(HAVE_PTMX) && !defined(__CYGWIN__)
 #  include <sys/stropts.h>
 #endif
 
@@ -250,7 +250,7 @@ char *name;		/* name of pty */
 #ifdef STTY_READS_STDOUT
 	sprintf(buf,"/bin/stty %s > %s",s,name);
 #else
-#ifdef __CYGWIN32__
+#ifdef __CYGWIN__
         sprintf(buf,"stty %s < %s",s,name);
 #else
         sprintf(buf,"/bin/stty %s < %s",s,name);
@@ -623,7 +623,7 @@ char *stty_args;
 			debuglog("ioctl(%s,I_PUSH,\"ldterm\") = %s\n",Tcl_ErrnoMsg(errno));
 	}
 #else
-#if defined(HAVE_PTMX) && ! defined(__CYGWIN32__)
+#if defined(HAVE_PTMX) && !defined(__CYGWIN__)
 	if (ioctl(slave, I_PUSH, "ptem")) {
 		debuglog("ioctl(%s,I_PUSH,\"ptem\") = %s\n",Tcl_ErrnoMsg(errno));
 	}

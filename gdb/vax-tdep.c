@@ -1,21 +1,22 @@
 /* Print VAX instructions for GDB, the GNU debugger.
    Copyright 1986, 1989, 1991, 1992, 1996 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #include "defs.h"
 #include "symtab.h"
@@ -29,14 +30,52 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 static unsigned char *print_insn_arg ();
 
+/* Advance PC across any function entry prologue instructions
+   to reach some "real" code.  */
+
+CORE_ADDR
+vax_skip_prologue (CORE_ADDR pc)
+{
+  register int op = (unsigned char) read_memory_integer (pc, 1);
+  if (op == 0x11)
+    pc += 2;			/* skip brb */
+  if (op == 0x31)
+    pc += 3;			/* skip brw */
+  if (op == 0xC2
+      && ((unsigned char) read_memory_integer (pc + 2, 1)) == 0x5E)
+    pc += 3;			/* skip subl2 */
+  if (op == 0x9E
+      && ((unsigned char) read_memory_integer (pc + 1, 1)) == 0xAE
+      && ((unsigned char) read_memory_integer (pc + 3, 1)) == 0x5E)
+    pc += 4;			/* skip movab */
+  if (op == 0x9E
+      && ((unsigned char) read_memory_integer (pc + 1, 1)) == 0xCE
+      && ((unsigned char) read_memory_integer (pc + 4, 1)) == 0x5E)
+    pc += 5;			/* skip movab */
+  if (op == 0x9E
+      && ((unsigned char) read_memory_integer (pc + 1, 1)) == 0xEE
+      && ((unsigned char) read_memory_integer (pc + 6, 1)) == 0x5E)
+    pc += 7;			/* skip movab */
+  return pc;
+}
+
+/* Return number of args passed to a frame.
+   Can return -1, meaning no way to tell.  */
+
+int
+vax_frame_num_args (struct frame_info *fi)
+{
+  return (0xff & read_memory_integer (FRAME_ARGS_ADDRESS (fi), 1));
+}
+
+
+
 /* Print the vax instruction at address MEMADDR in debugged memory,
    from disassembler info INFO.
    Returns length of the instruction, in bytes.  */
 
 static int
-vax_print_insn (memaddr, info)
-     CORE_ADDR memaddr;
-     disassemble_info *info;
+vax_print_insn (CORE_ADDR memaddr, disassemble_info *info)
 {
   unsigned char buffer[MAXLEN];
   register int i;
@@ -52,7 +91,7 @@ vax_print_insn (memaddr, info)
 
   for (i = 0; i < NOPCODES; i++)
     if (votstrs[i].detail.code == buffer[0]
-	|| votstrs[i].detail.code == *(unsigned short *)buffer)
+	|| votstrs[i].detail.code == *(unsigned short *) buffer)
       break;
 
   /* Handle undefined instructions.  */
@@ -83,11 +122,8 @@ vax_print_insn (memaddr, info)
 }
 
 static unsigned char *
-print_insn_arg (d, p, addr, info)
-     char *d;
-     register char *p;
-     CORE_ADDR addr;
-     disassemble_info *info;
+print_insn_arg (char *d, register char *p, CORE_ADDR addr,
+		disassemble_info *info)
 {
   register int regnum = *p & 0xf;
   float floatlitbuf;
@@ -98,7 +134,7 @@ print_insn_arg (d, p, addr, info)
 	(*info->fprintf_func) (info->stream, "0x%x", addr + *p++ + 1);
       else
 	{
-	  (*info->fprintf_func) (info->stream, "0x%x", addr + *(short *)p + 2);
+	  (*info->fprintf_func) (info->stream, "0x%x", addr + *(short *) p + 2);
 	  p += 2;
 	}
     }
@@ -111,7 +147,7 @@ print_insn_arg (d, p, addr, info)
       case 3:			/* Literal mode */
 	if (d[1] == 'd' || d[1] == 'f' || d[1] == 'g' || d[1] == 'h')
 	  {
-	    *(int *)&floatlitbuf = 0x4000 + ((p[-1] & 0x3f) << 4);
+	    *(int *) &floatlitbuf = 0x4000 + ((p[-1] & 0x3f) << 4);
 	    (*info->fprintf_func) (info->stream, "$%f", floatlitbuf);
 	  }
 	else
@@ -138,7 +174,7 @@ print_insn_arg (d, p, addr, info)
 	if (regnum == PC_REGNUM)
 	  {
 	    (*info->fprintf_func) (info->stream, "#");
-	    info->target = *(long *)p;
+	    info->target = *(long *) p;
 	    (*info->print_address_func) (info->target, info);
 	    p += 4;
 	    break;
@@ -154,25 +190,25 @@ print_insn_arg (d, p, addr, info)
 		break;
 
 	      case 'w':
-		(*info->fprintf_func) (info->stream, "%d", *(short *)p);
+		(*info->fprintf_func) (info->stream, "%d", *(short *) p);
 		p += 2;
 		break;
 
 	      case 'l':
-		(*info->fprintf_func) (info->stream, "%d", *(long *)p);
+		(*info->fprintf_func) (info->stream, "%d", *(long *) p);
 		p += 4;
 		break;
 
 	      case 'q':
 		(*info->fprintf_func) (info->stream, "0x%x%08x",
-				       ((long *)p)[1], ((long *)p)[0]);
+				       ((long *) p)[1], ((long *) p)[0]);
 		p += 8;
 		break;
 
 	      case 'o':
 		(*info->fprintf_func) (info->stream, "0x%x%08x%08x%08x",
-				       ((long *)p)[3], ((long *)p)[2],
-				       ((long *)p)[1], ((long *)p)[0]);
+				       ((long *) p)[3], ((long *) p)[2],
+				       ((long *) p)[1], ((long *) p)[0]);
 		p += 16;
 		break;
 
@@ -190,7 +226,7 @@ print_insn_arg (d, p, addr, info)
 		if (INVALID_FLOAT (p, 8))
 		  (*info->fprintf_func) (info->stream,
 					 "<<invalid float 0x%x%08x>>",
-					 ((long *)p)[1], ((long *)p)[0]);
+					 ((long *) p)[1], ((long *) p)[0]);
 		else
 		  (*info->fprintf_func) (info->stream, "%f", *(double *) p);
 		p += 8;
@@ -230,12 +266,12 @@ print_insn_arg (d, p, addr, info)
       case 12:			/* Word displacement */
 	if (regnum == PC_REGNUM)
 	  {
-	    info->target = addr + *(short *)p + 3;
+	    info->target = addr + *(short *) p + 3;
 	    (*info->print_address_func) (info->target, info);
 	  }
 	else
 	  (*info->fprintf_func) (info->stream, "%d(%s)",
-				 *(short *)p, REGISTER_NAME (regnum));
+				 *(short *) p, REGISTER_NAME (regnum));
 	p += 2;
 	break;
 
@@ -244,12 +280,12 @@ print_insn_arg (d, p, addr, info)
       case 14:			/* Long displacement */
 	if (regnum == PC_REGNUM)
 	  {
-	    info->target = addr + *(short *)p + 5;
+	    info->target = addr + *(short *) p + 5;
 	    (*info->print_address_func) (info->target, info);
 	  }
 	else
 	  (*info->fprintf_func) (info->stream, "%d(%s)",
-				 *(long *)p, REGISTER_NAME (regnum));
+				 *(long *) p, REGISTER_NAME (regnum));
 	p += 4;
       }
 
@@ -257,7 +293,7 @@ print_insn_arg (d, p, addr, info)
 }
 
 void
-_initialize_vax_tdep ()
+_initialize_vax_tdep (void)
 {
   tm_print_insn = vax_print_insn;
 }

@@ -1,21 +1,22 @@
 /* General utility routines for the remote server for GDB.
    Copyright (C) 1986, 1989, 1993 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #include "server.h"
 #include <stdio.h>
@@ -28,13 +29,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    Then return to command level.  */
 
 void
-perror_with_name (string)
-     char *string;
+perror_with_name (char *string)
 {
+#ifndef STDC_HEADERS
   extern int sys_nerr;
   extern char *sys_errlist[];
   extern int errno;
-  char *err;
+#endif
+  const char *err;
   char *combined;
 
   if (errno < sys_nerr)
@@ -56,7 +58,7 @@ perror_with_name (string)
 
 #ifdef ANSI_PROTOTYPES
 NORETURN void
-error (const char *string, ...)
+error (const char *string,...)
 #else
 void
 error (va_alist)
@@ -82,7 +84,7 @@ error (va_alist)
   }
 #endif
   fprintf (stderr, "\n");
-  longjmp(toplevel, 1);
+  longjmp (toplevel, 1);
 }
 
 /* Print an error message and exit reporting failure.
@@ -92,7 +94,7 @@ error (va_alist)
 /* VARARGS */
 NORETURN void
 #ifdef ANSI_PROTOTYPES
-fatal (char *string, ...)
+fatal (char *string,...)
 #else
 fatal (va_alist)
      va_dcl

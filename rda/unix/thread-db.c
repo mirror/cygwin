@@ -53,15 +53,15 @@ int proc_service_noisy = 0;
  * in an "undefined" state, and then defined later.
  */
 
+/* The "defined_p" field may have one of the following three values. */
+enum symbol_cache_defined { UNDEFINED, REQUESTED, DEFINED };
+
 struct symbol_cache {
   char *name;
   paddr_t value;
-  int  defined_p;
+  enum symbol_cache_defined  defined_p;
   struct symbol_cache *next;
 } *symbol_list;
-
-/* The "defined_p" field may have one of the following three values. */
-enum { UNDEFINED, REQUESTED, DEFINED };
 
 /* Function: add_symbol_to_list
    Add a symbol to the symbol cache.  First checks to see if 

@@ -375,6 +375,9 @@ static td_err_e (*td_thr_setxregs_p)     (const td_thrhandle_t *th,
 static td_err_e (*td_thr_event_enable_p) (const td_thrhandle_t *th, 
 					  int event);
 static const char **(*td_symbol_list_p)  (void);
+static td_err_e (*td_thr_tls_get_addr_p) (const td_thrhandle_t *th,
+                                          void *map_address,
+					  size_t offset, void **address);
 
 
 /* Function: thread_db_state_str
@@ -828,6 +831,7 @@ thread_db_dlopen (void)
   td_thr_getxregs_p     = dlsym (dlhandle, "td_thr_getxregs");
   td_thr_setxregs_p     = dlsym (dlhandle, "td_thr_setxregs");
   td_symbol_list_p      = dlsym (dlhandle, "td_symbol_list");
+  td_thr_tls_get_addr_p = dlsym (dlhandle, "td_thr_tls_get_addr");
 
   return 0;		/* success */
 }
@@ -1012,7 +1016,7 @@ thread_db_thread_next (struct gdbserv *serv, struct gdbserv_thread *thread)
 
 /* Function: thread_db_get_gen
    Handle 'q' requests:
-     qSymbol
+     qSymbol and qGetTLSAddr
 */
 
 static void
@@ -1122,6 +1126,65 @@ thread_db_get_gen (struct gdbserv *serv)
 	{
 	  gdbserv_output_string (serv, "qSymbol:");
 	  gdbserv_output_bytes (serv, symbol_query, strlen (symbol_query));
+	}
+    }
+  else if (gdbserv_input_string_match (serv, "GetTLSAddr:") >= 0)
+    {
+      /* Message qGetTLSAddr:thread-id,offset,link-map-addr */
+      unsigned long thread_id, offset, link_map_addr;
+
+      if (thread_agent == NULL
+          || td_thr_tls_get_addr_p == 0)
+	{
+	  /* Not supported by thread library.  */
+	  gdbserv_output_string (serv, "E01");
+	}
+      else if (gdbserv_input_hex_ulong (serv, &thread_id) >= 0
+          && gdbserv_input_string_match (serv, ",") >= 0
+	  && gdbserv_input_hex_ulong (serv, &offset) >= 0
+	  && gdbserv_input_string_match (serv, ",") >= 0
+	  && gdbserv_input_hex_ulong (serv, &link_map_addr) >= 0)
+	{
+	  td_err_e ret;
+	  td_thrhandle_t thread_handle;
+	  ret = thread_db_map_id2thr (thread_agent, 
+				      (thread_t) thread_id,
+				      &thread_handle);
+
+	  if (ret == TD_OK)
+	    {
+	      void *addr;
+
+	      ret = td_thr_tls_get_addr_p (&thread_handle,
+				           (void *) link_map_addr, 
+				           (size_t) offset,
+				           &addr);
+	      if (ret == TD_OK)
+	        {
+		  struct gdbserv_reg addr_as_reg;
+
+		  gdbserv_ulonglong_to_reg (serv,
+		                            (unsigned long long)
+		                              (unsigned long) addr,
+		                            &addr_as_reg);
+		  gdbserv_output_reg_beb (serv, &addr_as_reg, 0);
+		}
+	      else
+		{
+		  /* Can't find TLS address.  */
+		  gdbserv_output_string (serv, "E04");
+		}
+	    }
+	  else
+	    {
+	      /* Unable to find thread.  */
+	      gdbserv_output_string (serv, "E03");
+	    }
+	}
+      else
+	{
+	  /* Malformed qGetTLSAddr packet.  */
+	  gdbserv_output_string (serv, "E02");
 	}
     }
   else if (parentvec.process_get_gen)

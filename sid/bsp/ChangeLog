@@ -85,10 +85,24 @@
 	($exec): Reconcile with new --load option.
 	($opt_gdb): Reconcile with new --gdbport option.
 
+2001-08-01  matthew green  <mrg@redhat.com>
+
+	* configrun-sid: Xstormy16 is little endian, pass -EL.
+
 2001-07-18  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configrun-sid.in: Add --enable-warnings option which connects
 	to enable-warnings? setting of cpu.
+
+2001-07-10  matthew green  <mrg@redhat.com>
+
+	* Makefile.am (FAM10SCRIPTS): New xstormy16 support.
+	(ALLFAMSCRIPTS): ADD $(FAM10SCRIPTS).
+	* Makefile.in: Regenerate.
+	* aclocal.m4: Regenerate.
+	* configure: Regenerate.
+	* configrun-sid.in: Add xstormy16 support.
+	* xstormy16-elf-sid: New file.
 
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 

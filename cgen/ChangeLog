@@ -1,3 +1,8 @@
+2005-02-07  Jim Blandy  <jimb@redhat.com>
+
+	* cos.scm: Profile elm-xset! when requested, not elm-set!; the
+	latter is a macro.
+
 2005-01-27  Jim Blandy  <jimb@redhat.com>
 
 	* utils.scm (string/symbol->append): Renamed from 'concat'.

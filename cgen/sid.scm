@@ -1,5 +1,5 @@
 ; Simulator generator support routines.
-; Copyright (C) 2000, 2002, 2003 Red Hat, Inc.
+; Copyright (C) 2000-2004 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; One goal of this file is to provide cover functions for all methods.
@@ -1064,21 +1064,6 @@
   (string-append
    "  {\n"
    "    " (mode:c-type mode) " opval = " (cx:c newval) ";\n"
-   ; Dispatch to setter code if appropriate
-   "    "
-   (if (op:setter op)
-       (let ((args (car (op:setter op)))
-	     (expr (cadr (op:setter op))))
-	 (rtl-c 'VOID expr
-		(if (= (length args) 0)
-		    (list (list 'newval mode "opval"))
-		    (list (list (car args) 'UINT index)
-			  (list 'newval mode "opval")))
-		#:rtl-cover-fns? #t
-		#:output-language (estate-output-language estate)))
-       ;else
-       (send (op:type op) 'gen-set-quiet estate mode index selector
-		(cx:make-with-atlist mode "opval" (cx:atlist newval))))
    (if (and (with-profile?)
 	    (op:cond? op))
        (string-append "    written |= (1ULL << "
@@ -1119,6 +1104,21 @@
 		"(USI) "
 		""))
 	"opval << dec << \"  \";\n"))
+   ; Dispatch to setter code if appropriate
+   "    "
+   (if (op:setter op)
+       (let ((args (car (op:setter op)))
+	     (expr (cadr (op:setter op))))
+	 (rtl-c 'VOID expr
+		(if (= (length args) 0)
+		    (list (list 'newval mode "opval"))
+		    (list (list (car args) 'UINT index)
+			  (list 'newval mode "opval")))
+		#:rtl-cover-fns? #t
+		#:output-language (estate-output-language estate)))
+       ;else
+       (send (op:type op) 'gen-set-quiet estate mode index selector
+		(cx:make-with-atlist mode "opval" (cx:atlist newval))))
    "  }\n")
 )
 
@@ -1126,12 +1126,6 @@
   (string-append
    "  {\n"
    "    " (mode:c-type mode) " opval = " (cx:c newval) ";\n"
-   (if (op-save-index? op)
-       (string-append "    " -par-operand-macro " (" (-op-index-name op) ")"
-		      " = " (-gen-hw-index index estate) ";\n")
-       "")
-   "    " -par-operand-macro " (" (gen-sym op) ")"
-   " = opval;\n"
    (if (op:cond? op)
        (string-append "    written |= (1ULL << "
 		      (number->string (op:num op))
@@ -1168,6 +1162,12 @@
 	   "(USI) "
 	   ""))
    "opval << dec << \"  \";\n"
+   (if (op-save-index? op)
+       (string-append "    " -par-operand-macro " (" (-op-index-name op) ")"
+		      " = " (-gen-hw-index index estate) ";\n")
+       "")
+   "    " -par-operand-macro " (" (gen-sym op) ")"
+   " = opval;\n"
    "  }\n")
 )
 

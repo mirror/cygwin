@@ -1,5 +1,5 @@
 ; Generic Utilities.
-; Copyright (C) 2000, 2002, 2003 Red Hat, Inc.
+; Copyright (C) 2000-2004 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -1216,7 +1216,7 @@
   (cons "\
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+Copyright 1996-2004 Free Software Foundation, Inc.
 "
 	"\
 This program is free software; you can redistribute it and/or modify
@@ -1241,7 +1241,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   (cons "\
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+Copyright (C) 2000-2004 Red Hat, Inc.
 "
 	"\
 "))

@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -23,19 +23,6 @@ public:
   SI h_gr[16];
   } hardware;
 
-  // C++ hardware and write_stack stream/destream functions
-  void stream_cgen_hardware (std::ostream &ost) const 
-  {
-    ost << hardware.h_pc << ' ';
-    for (int i = 0; i < 16; i++)
-      ost << hardware.h_gr[i] << ' ';
-  }
-  void destream_cgen_hardware (std::istream &ist) 
-  {
-    ist >> hardware.h_pc;
-    for (int i = 0; i < 16; i++)
-      ist >> hardware.h_gr[i];
-  }
   // C++ register access function templates
 #define current_cpu this
 
@@ -44,6 +31,10 @@ public:
 
   inline SI h_gr_get (UINT regno) const { return ((65535) & (current_cpu->hardware.h_gr[regno])); }
   inline void h_gr_set (UINT regno, SI newval) { current_cpu->hardware.h_gr[regno] = ((65535) & (newval));
+ }
+
+  inline SI h_Rb_get (UINT regno) const { return current_cpu->h_gr_get (((regno) + (8))); }
+  inline void h_Rb_set (UINT regno, SI newval) { current_cpu->h_gr_set (((regno) + (8)), newval);
  }
 
   inline SI h_Rbj_get (UINT regno) const { return current_cpu->h_gr_get (((regno) + (8))); }

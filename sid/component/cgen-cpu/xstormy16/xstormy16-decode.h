@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -11,11 +11,6 @@ This file is part of the Red Hat simulators.
 
 #ifndef XSTORMY16_DECODE_H
 #define XSTORMY16_DECODE_H
-
-namespace xstormy16 {
-// forward declaration of struct in -defs.h
-struct write_stacks;
-}
 
 namespace xstormy16 {
 
@@ -55,8 +50,9 @@ typedef enum xstormy16_insn_type {
  , XSTORMY16_INSN_BGR, XSTORMY16_INSN_BR, XSTORMY16_INSN_JMP, XSTORMY16_INSN_JMPF
  , XSTORMY16_INSN_CALLRGR, XSTORMY16_INSN_CALLRIMM, XSTORMY16_INSN_CALLGR, XSTORMY16_INSN_CALLFIMM
  , XSTORMY16_INSN_ICALLRGR, XSTORMY16_INSN_ICALLGR, XSTORMY16_INSN_ICALLFIMM, XSTORMY16_INSN_IRET
- , XSTORMY16_INSN_RET, XSTORMY16_INSN_MUL, XSTORMY16_INSN_DIV, XSTORMY16_INSN_NOP
- , XSTORMY16_INSN_HALT, XSTORMY16_INSN_HOLD, XSTORMY16_INSN_BRK, XSTORMY16_INSN_SYSCALL
+ , XSTORMY16_INSN_RET, XSTORMY16_INSN_MUL, XSTORMY16_INSN_DIV, XSTORMY16_INSN_SDIV
+ , XSTORMY16_INSN_SDIVLH, XSTORMY16_INSN_DIVLH, XSTORMY16_INSN_NOP, XSTORMY16_INSN_HALT
+ , XSTORMY16_INSN_HOLD, XSTORMY16_INSN_HOLDX, XSTORMY16_INSN_BRK, XSTORMY16_INSN_SYSCALL
 } XSTORMY16_INSN_TYPE;
 
 
@@ -211,6 +207,8 @@ struct xstormy16_scache {
   // argument buffer
   xstormy16_sem_fields fields;
 
+
+
   // decode given instruction
   void decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 };
@@ -339,9 +337,13 @@ extern xstormy16_sem_fn xstormy16_sem_iret;
 extern xstormy16_sem_fn xstormy16_sem_ret;
 extern xstormy16_sem_fn xstormy16_sem_mul;
 extern xstormy16_sem_fn xstormy16_sem_div;
+extern xstormy16_sem_fn xstormy16_sem_sdiv;
+extern xstormy16_sem_fn xstormy16_sem_sdivlh;
+extern xstormy16_sem_fn xstormy16_sem_divlh;
 extern xstormy16_sem_fn xstormy16_sem_nop;
 extern xstormy16_sem_fn xstormy16_sem_halt;
 extern xstormy16_sem_fn xstormy16_sem_hold;
+extern xstormy16_sem_fn xstormy16_sem_holdx;
 extern xstormy16_sem_fn xstormy16_sem_brk;
 extern xstormy16_sem_fn xstormy16_sem_syscall;
 

@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -12,7 +12,6 @@ This file is part of the Red Hat simulators.
 
 #include "xstormy16.h"
 
-using namespace xstormy16; // FIXME: namespace organization still wip
 using namespace xstormy16; // FIXME: namespace organization still wip
 
 #define GET_ATTR(name) GET_ATTR_##name ()
@@ -60,7 +59,7 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (ANDSI (tmp_ndest, 1)) {
@@ -72,7 +71,7 @@ if (ANDSI (tmp_ndest, 1)) {
   {
     HI opval = tmp_nvalue;
     current_cpu->SETMEMHI (pc, FLD (f_lmem8), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) FLD (f_lmem8) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -83,13 +82,13 @@ if (ANDSI (tmp_ndest, 1)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     QI opval = tmp_nvalue;
     current_cpu->SETMEMQI (pc, FLD (f_lmem8), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) FLD (f_lmem8) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -120,7 +119,7 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (ANDSI (tmp_ndest, 1)) {
@@ -132,7 +131,7 @@ if (ANDSI (tmp_ndest, 1)) {
   {
     HI opval = tmp_nvalue;
     current_cpu->SETMEMHI (pc, FLD (f_hmem8), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) FLD (f_hmem8) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -143,13 +142,13 @@ if (ANDSI (tmp_ndest, 1)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     QI opval = tmp_nvalue;
     current_cpu->SETMEMQI (pc, FLD (f_hmem8), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) FLD (f_hmem8) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -178,13 +177,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -195,13 +194,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -230,13 +229,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -247,13 +246,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -284,7 +283,7 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (ANDSI (tmp_ndest, 1)) {
@@ -296,7 +295,7 @@ if (ANDSI (tmp_ndest, 1)) {
   {
     HI opval = tmp_nvalue;
     current_cpu->SETMEMHI (pc, FLD (f_lmem8), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) FLD (f_lmem8) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -307,13 +306,13 @@ if (ANDSI (tmp_ndest, 1)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     QI opval = tmp_nvalue;
     current_cpu->SETMEMQI (pc, FLD (f_lmem8), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) FLD (f_lmem8) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -344,7 +343,7 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (ANDSI (tmp_ndest, 1)) {
@@ -356,7 +355,7 @@ if (ANDSI (tmp_ndest, 1)) {
   {
     HI opval = tmp_nvalue;
     current_cpu->SETMEMHI (pc, FLD (f_lmem8), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) FLD (f_lmem8) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -367,13 +366,13 @@ if (ANDSI (tmp_ndest, 1)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     QI opval = tmp_nvalue;
     current_cpu->SETMEMQI (pc, FLD (f_lmem8), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) FLD (f_lmem8) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -402,13 +401,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -419,13 +418,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -455,13 +454,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -472,13 +471,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -486,7 +485,7 @@ if (FLD (f_op2m)) {
   {
     SI opval = ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), ADDSI (1, FLD (f_op2m)));
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -511,7 +510,7 @@ xstormy16_sem_movgrgripredec (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = SUBSI (current_cpu->h_gr_get (FLD (f_Rs)), ADDSI (1, FLD (f_op2m)));
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_op2m)) {
@@ -521,13 +520,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -538,13 +537,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -584,7 +583,7 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
     current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -592,7 +591,7 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
     current_cpu->SETMEMQI (pc, current_cpu->h_gr_get (FLD (f_Rs)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->h_gr_get (FLD (f_Rs)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -602,7 +601,7 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -641,7 +640,7 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
     current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -649,7 +648,7 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
     current_cpu->SETMEMQI (pc, current_cpu->h_gr_get (FLD (f_Rs)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->h_gr_get (FLD (f_Rs)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -659,13 +658,13 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -694,13 +693,13 @@ xstormy16_sem_movgripredecgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -720,7 +719,7 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
     current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -728,7 +727,7 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
     current_cpu->SETMEMQI (pc, current_cpu->h_gr_get (FLD (f_Rs)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->h_gr_get (FLD (f_Rs)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -757,13 +756,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -774,13 +773,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -810,13 +809,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -827,13 +826,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -841,7 +840,7 @@ if (FLD (f_op2m)) {
   {
     SI opval = ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), ADDSI (FLD (f_op2m), 1));
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -866,7 +865,7 @@ xstormy16_sem_movgrgriipredec (xstormy16_cpu* current_cpu, xstormy16_scache* sem
   {
     SI opval = SUBSI (current_cpu->h_gr_get (FLD (f_Rs)), ADDSI (FLD (f_op2m), 1));
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_op2m)) {
@@ -876,13 +875,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -893,13 +892,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -939,7 +938,7 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
     current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -947,7 +946,7 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
     current_cpu->SETMEMQI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -957,13 +956,13 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1002,7 +1001,7 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
     current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1010,7 +1009,7 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
     current_cpu->SETMEMQI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -1020,13 +1019,13 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1055,13 +1054,13 @@ xstormy16_sem_movgriipredecgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1081,7 +1080,7 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
     current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1089,7 +1088,7 @@ if (ANDSI (tmp_nwhere, 1)) {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
     current_cpu->SETMEMQI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -1117,13 +1116,13 @@ xstormy16_sem_movgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1150,13 +1149,13 @@ xstormy16_sem_movwimm8 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (current_cpu->h_Rpsw_get (), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (current_cpu->h_Rpsw_get (), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << current_cpu->h_Rpsw_get () << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1183,13 +1182,13 @@ xstormy16_sem_movwgrimm8 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1216,13 +1215,13 @@ xstormy16_sem_movwgrimm16 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1249,13 +1248,13 @@ xstormy16_sem_movlowgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1282,13 +1281,13 @@ xstormy16_sem_movhighgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1316,13 +1315,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1333,13 +1332,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1369,13 +1368,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1386,13 +1385,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1400,7 +1399,7 @@ if (FLD (f_op2m)) {
   {
     SI opval = ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), ADDSI (FLD (f_op2m), 1));
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1425,7 +1424,7 @@ xstormy16_sem_movfgrgripredec (xstormy16_cpu* current_cpu, xstormy16_scache* sem
   {
     SI opval = SUBSI (current_cpu->h_gr_get (FLD (f_Rs)), ADDSI (FLD (f_op2m), 1));
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_op2m)) {
@@ -1435,13 +1434,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1452,13 +1451,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1489,13 +1488,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1506,13 +1505,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1523,13 +1522,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1559,13 +1558,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1576,13 +1575,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1593,13 +1592,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1628,13 +1627,13 @@ xstormy16_sem_movfgripredecgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1645,13 +1644,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1662,13 +1661,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1694,34 +1693,34 @@ xstormy16_sem_movfgrgrii (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))), 255))) : (current_cpu->GETMEMHI (pc, ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)))));
+  tmp_nvalue = ((ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))), 255))) : (current_cpu->GETMEMHI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)))));
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))));
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1747,34 +1746,34 @@ xstormy16_sem_movfgrgriipostinc (xstormy16_cpu* current_cpu, xstormy16_scache* s
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))), 255))) : (current_cpu->GETMEMHI (pc, ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)))));
+  tmp_nvalue = ((ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))), 255))) : (current_cpu->GETMEMHI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)))));
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))));
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1782,7 +1781,7 @@ if (FLD (f_op2m)) {
   {
     SI opval = ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), ADDSI (FLD (f_op2m), 1));
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1807,40 +1806,40 @@ xstormy16_sem_movfgrgriipredec (xstormy16_cpu* current_cpu, xstormy16_scache* se
   {
     SI opval = SUBSI (current_cpu->h_gr_get (FLD (f_Rs)), ADDSI (FLD (f_op2m), 1));
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))), 255))) : (current_cpu->GETMEMHI (pc, ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)))));
+  tmp_nvalue = ((ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))), 255))) : (current_cpu->GETMEMHI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)))));
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 } else {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))));
+  tmp_nvalue = ANDSI (255, current_cpu->GETMEMSI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))));
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rdm), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rdm) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1867,16 +1866,16 @@ xstormy16_sem_movfgriigr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 if (FLD (f_op2m)) {
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMHI (pc, ANDSI (ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 0xfffffffe), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 0xfffffffe) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->SETMEMHI (pc, ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 0xfffffffe), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 0xfffffffe) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 } else {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
+    current_cpu->SETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
 {
@@ -1885,13 +1884,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1917,16 +1916,16 @@ xstormy16_sem_movfgriipostincgr (xstormy16_cpu* current_cpu, xstormy16_scache* s
 if (FLD (f_op2m)) {
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMHI (pc, ANDSI (ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 0xfffffffe), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 0xfffffffe) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->SETMEMHI (pc, ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 0xfffffffe), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 0xfffffffe) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 } else {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
+    current_cpu->SETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
 {
@@ -1935,13 +1934,13 @@ if (FLD (f_op2m)) {
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1970,29 +1969,29 @@ xstormy16_sem_movfgriipredecgr (xstormy16_cpu* current_cpu, xstormy16_scache* se
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rs), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 if (FLD (f_op2m)) {
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMHI (pc, ANDSI (ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 0xfffffffe), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 0xfffffffe) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
+    current_cpu->SETMEMHI (pc, ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 0xfffffffe), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 0xfffffffe) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 } else {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (JOINHISI (current_cpu->h_gr_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
+    current_cpu->SETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
 }
@@ -2019,13 +2018,13 @@ xstormy16_sem_maskgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2052,13 +2051,13 @@ xstormy16_sem_maskgrimm16 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2083,13 +2082,13 @@ xstormy16_sem_pushgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rd));
     current_cpu->SETMEMHI (pc, current_cpu->h_gr_get (((UINT) 15)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->h_gr_get (((UINT) 15)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->h_gr_get (((UINT) 15)), 2);
     current_cpu->h_gr_set (((UINT) 15), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 15) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2114,13 +2113,13 @@ xstormy16_sem_popgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ADDSI (current_cpu->h_gr_get (((UINT) 15)), -2);
     current_cpu->h_gr_set (((UINT) 15), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 15) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->GETMEMHI (pc, current_cpu->h_gr_get (((UINT) 15)));
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2147,13 +2146,13 @@ xstormy16_sem_swpn (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2180,13 +2179,13 @@ xstormy16_sem_swpb (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2213,7 +2212,7 @@ xstormy16_sem_swpw (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = current_cpu->h_gr_get (FLD (f_Rd));
     current_cpu->h_gr_set (FLD (f_Rs), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
@@ -2222,13 +2221,13 @@ xstormy16_sem_swpw (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2256,13 +2255,13 @@ xstormy16_sem_andgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2289,13 +2288,13 @@ xstormy16_sem_andimm8 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (current_cpu->h_Rpsw_get (), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (current_cpu->h_Rpsw_get (), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << current_cpu->h_Rpsw_get () << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2322,13 +2321,13 @@ xstormy16_sem_andgrimm16 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2355,13 +2354,13 @@ xstormy16_sem_orgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2388,13 +2387,13 @@ xstormy16_sem_orimm8 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (current_cpu->h_Rpsw_get (), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (current_cpu->h_Rpsw_get (), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << current_cpu->h_Rpsw_get () << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2421,13 +2420,13 @@ xstormy16_sem_orgrimm16 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2454,13 +2453,13 @@ xstormy16_sem_xorgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2487,13 +2486,13 @@ xstormy16_sem_xorimm8 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (current_cpu->h_Rpsw_get (), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (current_cpu->h_Rpsw_get (), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << current_cpu->h_Rpsw_get () << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2520,13 +2519,13 @@ xstormy16_sem_xorgrimm16 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2553,13 +2552,13 @@ xstormy16_sem_notgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2586,13 +2585,13 @@ xstormy16_sem_addgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (ADDOFHI (current_cpu->h_gr_get (FLD (f_Rd)), current_cpu->h_gr_get (FLD (f_Rs)), 0), 4), SLLHI (ADDCFHI (current_cpu->h_gr_get (FLD (f_Rd)), current_cpu->h_gr_get (FLD (f_Rs)), 0), 2)), ORHI (ANDHI (SRLHI (ADDCHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), 15), ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 15), 0), 1), 8), SLLSI (FLD (f_Rd), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2619,13 +2618,13 @@ xstormy16_sem_addgrimm4 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (ADDOFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm4), 0), 4), SLLHI (ADDCFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm4), 0), 2)), ORHI (ANDHI (SRLHI (ADDCHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), 15), ANDSI (FLD (f_imm4), 15), 0), 1), 8), SLLSI (FLD (f_Rd), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2652,13 +2651,13 @@ xstormy16_sem_addimm8 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (ADDOFHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), FLD (f_imm8), 0), 4), SLLHI (ADDCFHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), FLD (f_imm8), 0), 2)), ORHI (ANDHI (SRLHI (ADDCHI (ANDHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), 15), ANDSI (FLD (f_imm8), 15), 0), 1), 8), SLLSI (current_cpu->h_Rpsw_get (), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (current_cpu->h_Rpsw_get (), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << current_cpu->h_Rpsw_get () << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2685,13 +2684,13 @@ xstormy16_sem_addgrimm16 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (ADDOFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm16), 0), 4), SLLHI (ADDCFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm16), 0), 2)), ORHI (ANDHI (SRLHI (ADDCHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), 15), ANDSI (FLD (f_imm16), 15), 0), 1), 8), SLLSI (FLD (f_Rd), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2718,13 +2717,13 @@ xstormy16_sem_adcgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (ADDOFHI (current_cpu->h_gr_get (FLD (f_Rd)), current_cpu->h_gr_get (FLD (f_Rs)), current_cpu->h_cy_get ()), 4), SLLHI (ADDCFHI (current_cpu->h_gr_get (FLD (f_Rd)), current_cpu->h_gr_get (FLD (f_Rs)), current_cpu->h_cy_get ()), 2)), ORHI (ANDHI (SRLHI (ADDCHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), 15), ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 15), current_cpu->h_cy_get ()), 1), 8), SLLSI (FLD (f_Rd), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2751,13 +2750,13 @@ xstormy16_sem_adcgrimm4 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (ADDOFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm4), current_cpu->h_cy_get ()), 4), SLLHI (ADDCFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm4), current_cpu->h_cy_get ()), 2)), ORHI (ANDHI (SRLHI (ADDCHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), 15), ANDSI (FLD (f_imm4), 15), current_cpu->h_cy_get ()), 1), 8), SLLSI (FLD (f_Rd), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2784,13 +2783,13 @@ xstormy16_sem_adcimm8 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (ADDOFHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), FLD (f_imm8), current_cpu->h_cy_get ()), 4), SLLHI (ADDCFHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), FLD (f_imm8), current_cpu->h_cy_get ()), 2)), ORHI (ANDHI (SRLHI (ADDCHI (ANDHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), 15), ANDSI (FLD (f_imm8), 15), current_cpu->h_cy_get ()), 1), 8), SLLSI (current_cpu->h_Rpsw_get (), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (current_cpu->h_Rpsw_get (), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << current_cpu->h_Rpsw_get () << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2817,13 +2816,13 @@ xstormy16_sem_adcgrimm16 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (ADDOFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm16), current_cpu->h_cy_get ()), 4), SLLHI (ADDCFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm16), current_cpu->h_cy_get ()), 2)), ORHI (ANDHI (SRLHI (ADDCHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), 15), ANDSI (FLD (f_imm16), 15), current_cpu->h_cy_get ()), 1), 8), SLLSI (FLD (f_Rd), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2850,13 +2849,13 @@ xstormy16_sem_subgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (SUBOFHI (current_cpu->h_gr_get (FLD (f_Rd)), current_cpu->h_gr_get (FLD (f_Rs)), 0), 4), SLLHI (SUBCFHI (current_cpu->h_gr_get (FLD (f_Rd)), current_cpu->h_gr_get (FLD (f_Rs)), 0), 2)), ORHI (ANDHI (SRLHI (SUBCHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), 15), ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 15), 0), 1), 8), SLLSI (FLD (f_Rd), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2883,13 +2882,13 @@ xstormy16_sem_subgrimm4 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (SUBOFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm4), 0), 4), SLLHI (SUBCFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm4), 0), 2)), ORHI (ANDHI (SRLHI (SUBCHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), 15), ANDSI (FLD (f_imm4), 15), 0), 1), 8), SLLSI (FLD (f_Rd), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2916,13 +2915,13 @@ xstormy16_sem_subimm8 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (SUBOFHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), FLD (f_imm8), 0), 4), SLLHI (SUBCFHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), FLD (f_imm8), 0), 2)), ORHI (ANDHI (SRLHI (SUBCHI (ANDHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), 15), ANDSI (FLD (f_imm8), 15), 0), 1), 8), SLLSI (current_cpu->h_Rpsw_get (), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (current_cpu->h_Rpsw_get (), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << current_cpu->h_Rpsw_get () << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2949,13 +2948,13 @@ xstormy16_sem_subgrimm16 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (SUBOFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm16), 0), 4), SLLHI (SUBCFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm16), 0), 2)), ORHI (ANDHI (SRLHI (SUBCHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), 15), ANDSI (FLD (f_imm16), 15), 0), 1), 8), SLLSI (FLD (f_Rd), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2982,13 +2981,13 @@ xstormy16_sem_sbcgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (SUBOFHI (current_cpu->h_gr_get (FLD (f_Rd)), current_cpu->h_gr_get (FLD (f_Rs)), current_cpu->h_cy_get ()), 4), SLLHI (SUBCFHI (current_cpu->h_gr_get (FLD (f_Rd)), current_cpu->h_gr_get (FLD (f_Rs)), current_cpu->h_cy_get ()), 2)), ORHI (ANDHI (SRLHI (SUBCHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), 15), ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 15), current_cpu->h_cy_get ()), 1), 8), SLLSI (FLD (f_Rd), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3015,13 +3014,13 @@ xstormy16_sem_sbcgrimm4 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (SUBOFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm4), current_cpu->h_cy_get ()), 4), SLLHI (SUBCFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm4), current_cpu->h_cy_get ()), 2)), ORHI (ANDHI (SRLHI (SUBCHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), 15), ANDSI (FLD (f_imm4), 15), current_cpu->h_cy_get ()), 1), 8), SLLSI (FLD (f_Rd), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3048,13 +3047,13 @@ xstormy16_sem_sbcgrimm8 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (SUBOFHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), FLD (f_imm8), current_cpu->h_cy_get ()), 4), SLLHI (SUBCFHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), FLD (f_imm8), current_cpu->h_cy_get ()), 2)), ORHI (ANDHI (SRLHI (SUBCHI (ANDHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), 15), ANDSI (FLD (f_imm8), 15), current_cpu->h_cy_get ()), 1), 8), SLLSI (current_cpu->h_Rpsw_get (), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (current_cpu->h_Rpsw_get (), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << current_cpu->h_Rpsw_get () << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3081,13 +3080,13 @@ xstormy16_sem_sbcgrimm16 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (SUBOFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm16), current_cpu->h_cy_get ()), 4), SLLHI (SUBCFHI (current_cpu->h_gr_get (FLD (f_Rd)), FLD (f_imm16), current_cpu->h_cy_get ()), 2)), ORHI (ANDHI (SRLHI (SUBCHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), 15), ANDSI (FLD (f_imm16), 15), current_cpu->h_cy_get ()), 1), 8), SLLSI (FLD (f_Rd), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_value;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3114,13 +3113,13 @@ xstormy16_sem_incgrimm2 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3147,13 +3146,13 @@ xstormy16_sem_decgrimm2 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3184,13 +3183,13 @@ xstormy16_sem_rrcgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3992), SLLSI (ANDSI (SRLSI (tmp_tmpfoo, 16), 1), 2)), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3222,13 +3221,13 @@ xstormy16_sem_rrcgrimm4 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3992), SLLSI (ANDSI (SRLSI (tmp_tmpfoo, 16), 1), 2)), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3260,13 +3259,13 @@ xstormy16_sem_rlcgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3992), SLLSI (ANDSI (SRLSI (tmp_tmpfoo, 16), 1), 2)), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3298,13 +3297,13 @@ xstormy16_sem_rlcgrimm4 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3992), SLLSI (ANDSI (SRLSI (tmp_tmpfoo, 16), 1), 2)), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3332,13 +3331,13 @@ xstormy16_sem_shrgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3992), SLLSI (ANDSI (((EQSI (ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 15), 0)) ? (current_cpu->h_gr_get (FLD (f_Rd))) : (SRLSI (current_cpu->h_gr_get (FLD (f_Rd)), SUBSI (ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 15), 1)))), 1), 2)), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3365,13 +3364,13 @@ xstormy16_sem_shrgrimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3992), SLLSI (ANDSI (((EQSI (FLD (f_imm4), 0)) ? (current_cpu->h_gr_get (FLD (f_Rd))) : (SRLSI (current_cpu->h_gr_get (FLD (f_Rd)), SUBSI (FLD (f_imm4), 1)))), 1), 2)), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3398,13 +3397,13 @@ xstormy16_sem_shlgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3992), SLLSI (SRLSI (((EQSI (ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 15), 0)) ? (current_cpu->h_gr_get (FLD (f_Rd))) : (SLLSI (current_cpu->h_gr_get (FLD (f_Rd)), SUBSI (ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 15), 1)))), 15), 2)), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3431,13 +3430,13 @@ xstormy16_sem_shlgrimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3992), SLLSI (SRLSI (((EQSI (FLD (f_imm4), 0)) ? (current_cpu->h_gr_get (FLD (f_Rd))) : (SLLSI (current_cpu->h_gr_get (FLD (f_Rd)), SUBSI (FLD (f_imm4), 1)))), 15), 2)), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3464,13 +3463,13 @@ xstormy16_sem_asrgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3992), SLLSI (ANDSI (((EQSI (ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 15), 0)) ? (current_cpu->h_gr_get (FLD (f_Rd))) : (SRLSI (current_cpu->h_gr_get (FLD (f_Rd)), SUBSI (ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 15), 1)))), 1), 2)), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3497,13 +3496,13 @@ xstormy16_sem_asrgrimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3992), SLLSI (ANDSI (((EQSI (FLD (f_imm4), 0)) ? (current_cpu->h_gr_get (FLD (f_Rd))) : (SRLSI (current_cpu->h_gr_get (FLD (f_Rd)), SUBSI (FLD (f_imm4), 1)))), 1), 2)), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3530,13 +3529,13 @@ xstormy16_sem_set1grimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3563,13 +3562,13 @@ xstormy16_sem_set1grgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3596,13 +3595,13 @@ xstormy16_sem_set1lmemimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     QI opval = tmp_nvalue;
     current_cpu->SETMEMQI (pc, FLD (f_lmem8), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) FLD (f_lmem8) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -3629,13 +3628,13 @@ xstormy16_sem_set1hmemimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     QI opval = tmp_nvalue;
     current_cpu->SETMEMQI (pc, FLD (f_hmem8), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) FLD (f_hmem8) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -3662,13 +3661,13 @@ xstormy16_sem_clr1grimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3695,13 +3694,13 @@ xstormy16_sem_clr1grgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3728,13 +3727,13 @@ xstormy16_sem_clr1lmemimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     QI opval = tmp_nvalue;
     current_cpu->SETMEMQI (pc, FLD (f_lmem8), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) FLD (f_lmem8) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -3761,13 +3760,13 @@ xstormy16_sem_clr1hmemimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     QI opval = tmp_nvalue;
     current_cpu->SETMEMQI (pc, FLD (f_hmem8), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) FLD (f_hmem8) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 }
@@ -3794,13 +3793,13 @@ xstormy16_sem_cbwgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3827,13 +3826,13 @@ xstormy16_sem_revgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3996), ORSI (SLLSI (FLD (f_Rd), 12), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6)))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rd), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3861,7 +3860,7 @@ xstormy16_sem_bccgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (SUBOFHI (current_cpu->h_gr_get (FLD (f_Rd)), current_cpu->h_gr_get (FLD (f_Rs)), 0), 4), SLLHI (SUBCFHI (current_cpu->h_gr_get (FLD (f_Rd)), current_cpu->h_gr_get (FLD (f_Rs)), 0), 2)), ORHI (ANDHI (SRLHI (SUBHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), 15), ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 15)), 1), 8), SLLSI (FLD (f_Rd), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3938,7 +3937,7 @@ if (tmp_tmp) {
   {
     USI opval = FLD (f_rel12);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3968,7 +3967,7 @@ xstormy16_sem_bccgrimm8 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (SUBOFHI (current_cpu->h_gr_get (FLD (f_Rm)), FLD (f_imm8), 0), 4), SLLHI (SUBCFHI (current_cpu->h_gr_get (FLD (f_Rm)), FLD (f_imm8), 0), 2)), ORHI (ANDHI (SRLHI (SUBHI (ANDSI (current_cpu->h_gr_get (FLD (f_Rm)), 15), ANDSI (FLD (f_imm8), 15)), 1), 8), SLLSI (FLD (f_Rm), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4045,7 +4044,7 @@ if (tmp_tmp) {
   {
     USI opval = FLD (f_rel12);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4075,7 +4074,7 @@ xstormy16_sem_bccimm16 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 3968), ORBI (ORBI (EQHI (ANDHI (tmp_value, 255), 0), SLLHI (EQHI (tmp_value, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_value), 5), SLLHI (LTHI (tmp_value, 0), 6)))), ORHI (ORHI (SLLHI (SUBOFHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), FLD (f_imm16), 0), 4), SLLHI (SUBCFHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), FLD (f_imm16), 0), 2)), ORHI (ANDHI (SRLHI (SUBHI (ANDHI (current_cpu->h_gr_get (current_cpu->h_Rpsw_get ()), 15), ANDSI (FLD (f_imm16), 15)), 1), 8), SLLSI (current_cpu->h_Rpsw_get (), 12))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4152,7 +4151,7 @@ if (tmp_tmp) {
   {
     USI opval = FLD (f_rel8_4);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4179,14 +4178,14 @@ xstormy16_sem_bngrimm4 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = FLD (f_Rd);
     current_cpu->h_Rpsw_set (opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "Rpsw" << ":=0x" << hex << opval << dec << "  ";
   }
 if (EQSI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), SLLSI (1, FLD (f_imm4))), 0)) {
   {
     USI opval = FLD (f_rel12);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4212,14 +4211,14 @@ xstormy16_sem_bngrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = FLD (f_Rd);
     current_cpu->h_Rpsw_set (opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "Rpsw" << ":=0x" << hex << opval << dec << "  ";
   }
 if (EQSI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), SLLSI (1, current_cpu->h_gr_get (FLD (f_Rs)))), 0)) {
   {
     USI opval = FLD (f_rel12);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4245,7 +4244,7 @@ if (EQQI (ANDQI (current_cpu->GETMEMQI (pc, FLD (f_lmem8)), SLLSI (1, FLD (f_imm
   {
     USI opval = FLD (f_rel12);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4270,7 +4269,7 @@ if (EQQI (ANDQI (current_cpu->GETMEMQI (pc, FLD (f_hmem8)), SLLSI (1, FLD (f_imm
   {
     USI opval = FLD (f_rel12);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4295,14 +4294,14 @@ xstormy16_sem_bpgrimm4 (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = FLD (f_Rd);
     current_cpu->h_Rpsw_set (opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "Rpsw" << ":=0x" << hex << opval << dec << "  ";
   }
 if (NESI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), SLLSI (1, FLD (f_imm4))), 0)) {
   {
     USI opval = FLD (f_rel12);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4328,14 +4327,14 @@ xstormy16_sem_bpgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = FLD (f_Rd);
     current_cpu->h_Rpsw_set (opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "Rpsw" << ":=0x" << hex << opval << dec << "  ";
   }
 if (NESI (ANDSI (current_cpu->h_gr_get (FLD (f_Rd)), SLLSI (1, current_cpu->h_gr_get (FLD (f_Rs)))), 0)) {
   {
     USI opval = FLD (f_rel12);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4361,7 +4360,7 @@ if (NEQI (ANDQI (current_cpu->GETMEMQI (pc, FLD (f_lmem8)), SLLSI (1, FLD (f_imm
   {
     USI opval = FLD (f_rel12);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4386,7 +4385,7 @@ if (NEQI (ANDQI (current_cpu->GETMEMQI (pc, FLD (f_hmem8)), SLLSI (1, FLD (f_imm
   {
     USI opval = FLD (f_rel12);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4480,7 +4479,7 @@ if (tmp_tmp) {
   {
     USI opval = FLD (f_rel8_2);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4505,7 +4504,7 @@ xstormy16_sem_bgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     USI opval = ADDSI (ADDSI (pc, 2), current_cpu->h_gr_get (FLD (f_Rd)));
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -4528,7 +4527,7 @@ xstormy16_sem_br (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     USI opval = FLD (f_rel12a);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -4551,7 +4550,7 @@ xstormy16_sem_jmp (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     USI opval = JOINHISI (current_cpu->h_Rbj_get (FLD (f_Rbj)), current_cpu->h_gr_get (FLD (f_Rd)));
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -4574,7 +4573,7 @@ xstormy16_sem_jmpf (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     USI opval = FLD (f_abs24);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -4598,19 +4597,19 @@ xstormy16_sem_callrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ADDSI (pc, 2);
     current_cpu->SETMEMSI (pc, current_cpu->h_gr_get (((UINT) 15)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->h_gr_get (((UINT) 15)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->h_gr_get (((UINT) 15)), 4);
     current_cpu->h_gr_set (((UINT) 15), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 15) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = ADDSI (current_cpu->h_gr_get (FLD (f_Rd)), ADDSI (pc, 2));
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4635,19 +4634,19 @@ xstormy16_sem_callrimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ADDSI (pc, 2);
     current_cpu->SETMEMSI (pc, current_cpu->h_gr_get (((UINT) 15)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->h_gr_get (((UINT) 15)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->h_gr_get (((UINT) 15)), 4);
     current_cpu->h_gr_set (((UINT) 15), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 15) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = FLD (f_rel12a);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4672,19 +4671,19 @@ xstormy16_sem_callgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ADDSI (pc, 2);
     current_cpu->SETMEMSI (pc, current_cpu->h_gr_get (((UINT) 15)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->h_gr_get (((UINT) 15)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->h_gr_get (((UINT) 15)), 4);
     current_cpu->h_gr_set (((UINT) 15), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 15) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = JOINHISI (current_cpu->h_Rbj_get (FLD (f_Rbj)), current_cpu->h_gr_get (FLD (f_Rd)));
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4709,19 +4708,19 @@ xstormy16_sem_callfimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ADDSI (pc, 4);
     current_cpu->SETMEMSI (pc, current_cpu->h_gr_get (((UINT) 15)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->h_gr_get (((UINT) 15)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->h_gr_get (((UINT) 15)), 4);
     current_cpu->h_gr_set (((UINT) 15), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 15) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = FLD (f_abs24);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4746,25 +4745,25 @@ xstormy16_sem_icallrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ADDSI (pc, 2);
     current_cpu->SETMEMSI (pc, current_cpu->h_gr_get (((UINT) 15)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->h_gr_get (((UINT) 15)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = current_cpu->h_gr_get (((UINT) 14));
     current_cpu->SETMEMHI (pc, ADDSI (current_cpu->h_gr_get (((UINT) 15)), 4), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (current_cpu->h_gr_get (((UINT) 15)), 4) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->h_gr_get (((UINT) 15)), 6);
     current_cpu->h_gr_set (((UINT) 15), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 15) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = ADDSI (current_cpu->h_gr_get (FLD (f_Rd)), ADDSI (pc, 2));
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4789,25 +4788,25 @@ xstormy16_sem_icallgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ADDSI (pc, 2);
     current_cpu->SETMEMSI (pc, current_cpu->h_gr_get (((UINT) 15)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->h_gr_get (((UINT) 15)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = current_cpu->h_gr_get (((UINT) 14));
     current_cpu->SETMEMHI (pc, ADDSI (current_cpu->h_gr_get (((UINT) 15)), 4), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (current_cpu->h_gr_get (((UINT) 15)), 4) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->h_gr_get (((UINT) 15)), 6);
     current_cpu->h_gr_set (((UINT) 15), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 15) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = JOINHISI (current_cpu->h_Rbj_get (FLD (f_Rbj)), current_cpu->h_gr_get (FLD (f_Rd)));
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4832,25 +4831,25 @@ xstormy16_sem_icallfimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ADDSI (pc, 4);
     current_cpu->SETMEMSI (pc, current_cpu->h_gr_get (((UINT) 15)), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->h_gr_get (((UINT) 15)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     HI opval = current_cpu->h_gr_get (((UINT) 14));
     current_cpu->SETMEMHI (pc, ADDSI (current_cpu->h_gr_get (((UINT) 15)), 4), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (current_cpu->h_gr_get (((UINT) 15)), 4) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->h_gr_get (((UINT) 15)), 6);
     current_cpu->h_gr_set (((UINT) 15), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 15) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = FLD (f_abs24);
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4875,19 +4874,19 @@ xstormy16_sem_iret (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = SUBSI (current_cpu->h_gr_get (((UINT) 15)), 6);
     current_cpu->h_gr_set (((UINT) 15), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 15) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = current_cpu->GETMEMSI (pc, current_cpu->h_gr_get (((UINT) 15)));
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->GETMEMHI (pc, ADDSI (current_cpu->h_gr_get (((UINT) 15)), 4));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4912,13 +4911,13 @@ xstormy16_sem_ret (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = SUBSI (current_cpu->h_gr_get (((UINT) 15)), 4);
     current_cpu->h_gr_set (((UINT) 15), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 15) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = current_cpu->GETMEMSI (pc, current_cpu->h_gr_get (((UINT) 15)));
     current_cpu->branch (opval, npc, status);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4945,19 +4944,19 @@ xstormy16_sem_mul (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (TRUNCSIHI (tmp_value), 255), 0), SLLHI (EQHI (TRUNCSIHI (tmp_value), 0), 1)), ORHI (SLLHI (current_cpu->parity (TRUNCSIHI (tmp_value)), 5), SLLHI (LTHI (TRUNCSIHI (tmp_value), 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = TRUNCSIHI (tmp_value);
     current_cpu->h_gr_set (((UINT) 0), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = TRUNCSIHI (SRLSI (tmp_value, 16));
     current_cpu->h_gr_set (((UINT) 1), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -4982,7 +4981,7 @@ xstormy16_sem_div (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = UMODSI (current_cpu->h_gr_get (((UINT) 0)), current_cpu->h_gr_get (((UINT) 2)));
     current_cpu->h_gr_set (((UINT) 1), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
@@ -4991,13 +4990,140 @@ xstormy16_sem_div (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   {
     SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
     current_cpu->h_gr_set (((UINT) 14), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = tmp_nvalue;
     current_cpu->h_gr_set (((UINT) 0), opval);
-    if (UNLIKELY(current_cpu->trace_semantics_p))
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
+  }
+}
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** sdiv: sdiv
+
+sem_status
+xstormy16_sem_sdiv (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
+{
+#define FLD(f) abuf->fields.fmt_empty.f
+  sem_status status = SEM_STATUS_NORMAL;
+  xstormy16_scache* abuf = sem;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 2;
+
+{
+  {
+    SI opval = MODHI (current_cpu->h_gr_get (((UINT) 0)), current_cpu->h_gr_get (((UINT) 2)));
+    current_cpu->h_gr_set (((UINT) 1), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+  }
+{
+  HI tmp_nvalue;
+  tmp_nvalue = DIVHI (current_cpu->h_gr_get (((UINT) 0)), current_cpu->h_gr_get (((UINT) 2)));
+  {
+    SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
+    current_cpu->h_gr_set (((UINT) 14), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+  }
+  {
+    SI opval = tmp_nvalue;
+    current_cpu->h_gr_set (((UINT) 0), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
+  }
+}
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** sdivlh: sdivlh
+
+sem_status
+xstormy16_sem_sdivlh (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
+{
+#define FLD(f) abuf->fields.fmt_empty.f
+  sem_status status = SEM_STATUS_NORMAL;
+  xstormy16_scache* abuf = sem;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 2;
+
+{
+  SI tmp_value;
+  tmp_value = ADDSI (SLLSI (ANDSI (current_cpu->h_gr_get (((UINT) 1)), 65535), 16), ANDSI (current_cpu->h_gr_get (((UINT) 0)), 65535));
+  {
+    SI opval = MODSI (tmp_value, EXTHISI (TRUNCSIHI (current_cpu->h_gr_get (((UINT) 2)))));
+    current_cpu->h_gr_set (((UINT) 1), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+  }
+{
+  HI tmp_nvalue;
+  tmp_nvalue = DIVSI (tmp_value, EXTHISI (TRUNCSIHI (current_cpu->h_gr_get (((UINT) 2)))));
+  {
+    SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
+    current_cpu->h_gr_set (((UINT) 14), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+  }
+  {
+    SI opval = tmp_nvalue;
+    current_cpu->h_gr_set (((UINT) 0), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
+  }
+}
+}
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** divlh: divlh
+
+sem_status
+xstormy16_sem_divlh (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
+{
+#define FLD(f) abuf->fields.fmt_empty.f
+  sem_status status = SEM_STATUS_NORMAL;
+  xstormy16_scache* abuf = sem;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 2;
+
+{
+  SI tmp_value;
+  tmp_value = ADDSI (SLLSI (ANDSI (current_cpu->h_gr_get (((UINT) 1)), 65535), 16), ANDSI (current_cpu->h_gr_get (((UINT) 0)), 65535));
+  {
+    SI opval = UMODSI (tmp_value, current_cpu->h_gr_get (((UINT) 2)));
+    current_cpu->h_gr_set (((UINT) 1), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+  }
+{
+  HI tmp_nvalue;
+  tmp_nvalue = UDIVSI (tmp_value, current_cpu->h_gr_get (((UINT) 2)));
+  {
+    SI opval = ORSI (ANDSI (current_cpu->h_gr_get (((UINT) 14)), 65436), ORBI (ORBI (EQHI (ANDHI (tmp_nvalue, 255), 0), SLLHI (EQHI (tmp_nvalue, 0), 1)), ORHI (SLLHI (current_cpu->parity (tmp_nvalue), 5), SLLHI (LTHI (tmp_nvalue, 0), 6))));
+    current_cpu->h_gr_set (((UINT) 14), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+  }
+  {
+    SI opval = tmp_nvalue;
+    current_cpu->h_gr_set (((UINT) 0), opval);
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -5056,6 +5182,24 @@ xstormy16_sem_hold (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   PCADDR npc = pc + 2;
 
 current_cpu->do_hold ();
+
+  current_cpu->done_insn (npc, status);
+  return status;
+#undef FLD
+}
+
+// ********** holdx: holdx
+
+sem_status
+xstormy16_sem_holdx (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
+{
+#define FLD(f) abuf->fields.fmt_empty.f
+  sem_status status = SEM_STATUS_NORMAL;
+  xstormy16_scache* abuf = sem;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = pc + 2;
+
+current_cpu->do_holdx ();
 
   current_cpu->done_insn (npc, status);
   return status;

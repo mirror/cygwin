@@ -189,7 +189,7 @@ cache_set::find_any_dirty ()
   for (iterator_t it = lines.begin (); it != lines.end (); it++)
     {
       cache_line* i = * it;
-      if (i->dirty_p ()) return i;
+      if (i->valid_p () && i->dirty_p ()) return i;
     }
 
   return 0;
@@ -206,7 +206,7 @@ bool
 cache_set::vacancy_p () const
 {
   for (const_iterator_t it = lines.begin (); it != lines.end (); it++)
-    if (!(*it)->locked_p ())
+    if (!(*it)->valid_p () || !(*it)->locked_p ())
       return true;
 
   return false;

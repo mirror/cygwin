@@ -1,3 +1,9 @@
+2004-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* cacheutil.cxx (find_any_dirty): Make sure the line is valid before
+	checking the dirty bit.
+	(vacancy_p): Line is also vacant if it is not valid.
+
 2004-04-29  Dave Brolley  <brolley@redhat.com>
 
 	* cacheutil.cxx (cache_set::expell_line): Don't update the set here.

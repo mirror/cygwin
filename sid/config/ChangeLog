@@ -1,3 +1,13 @@
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.docs: Support xsltproc; prefer it to sabcmd.
+	* docbuild.m4: Look for xsltproc.
+
+2001-07-05  graydon hoare  <graydon@redhat.com>
+
+	* Makefile.docs: Add.
+	* docbuild.m4: Add.
+
 2001-06-23  Ben Elliston  <bje@redhat.com>
 
 	* config.guess: Import latest version from FSF sources.
@@ -10,6 +20,10 @@
 
 	* unix.exp (sid_bus_ok_p): Adjust for new bus status structure.
 
+2001-06-20  matthew green  <mrg@redhat.com>
+
+	* cgen-bfd-dis.m4: Remove.
+
 2001-06-20  Ben Elliston  <bje@redhat.com>
 
 	* unix.exp (sid_bus_ok_p): Rename sid_assert_bus_ok.
@@ -17,6 +31,10 @@
 2001-06-20  Ben Elliston  <bje@redhat.com>
 
 	* unix.exp (sid_assert_bus_ok): New proc.
+
+2001-05-29  matthew green  <mrg@redhat.com>
+
+	* cgen-bfd-dis.m4: New file.
 
 2001-04-17  Frank Ch. Eigler  <fche@redhat.com>
 

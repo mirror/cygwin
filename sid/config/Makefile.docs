@@ -1,0 +1,33 @@
+
+# Makefile.docs -*- Makefile -*-
+# Copyright (C) 2001 Red Hat.
+# This file is part of SID and is licensed under the GPL.
+# See the file COPYING.SID for conditions for redistribution.
+#
+# ... to be included in document-building Makefile.am's
+#
+
+SUFFIXES=.xml .txt .html
+if MAINTAINER_MODE
+if HAVE_XSLTPROC
+
+.xml.html:
+	xsltproc --output $@ $(html_stylesheet) $<
+
+else
+if HAVE_SABLOTRON
+
+.xml.html:
+	sabcmd $(html_stylesheet) $< $@
+
+endif # HAVE_SABLOTRON
+endif # HAVE_XSLTPROC
+
+if HAVE_LINKS
+
+.html.txt:
+	links -dump $< > $@
+	cp $@ $(srcdir)/$@
+
+endif # HAVE_LINKS
+endif # MAINTAINER_MODE

@@ -1,3 +1,9 @@
+2002-01-10  Keith Seitz  <keiths@redhat.com>
+
+	* unix/Makefile.in (TCL_RANLIB): Renamed from just "RANLIB".
+	Changed all references to "RANLIB" to "TCL_RANLIB" so that
+	toplevel Makefile doesn't override our own settings.
+
 2001-09-18  Ian Roxborough  <irox@redhat.com>
 
 	* Makefile.in: Added TCL_CFLAGS for flags that

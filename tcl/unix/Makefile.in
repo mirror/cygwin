@@ -243,7 +243,7 @@ COMPAT_OBJS		= @LIBOBJS@
 
 AC_FLAGS		= @EXTRA_CFLAGS@ @DEFS@
 AR			= @AR@
-RANLIB			= @RANLIB@
+TCL_RANLIB		= @RANLIB@
 SRC_DIR			= @srcdir@
 TOP_DIR			= @srcdir@/..
 GENERIC_DIR		= $(TOP_DIR)/generic
@@ -438,12 +438,12 @@ doc:
 ${TCL_LIB_FILE}: ${OBJS} ${STUB_LIB_FILE}
 	rm -f ${TCL_LIB_FILE}
 	@MAKE_LIB@
-	$(RANLIB) ${TCL_LIB_FILE}
+	$(TCL_RANLIB) ${TCL_LIB_FILE}
 
 ${STUB_LIB_FILE}: ${STUB_LIB_OBJS}
 	rm -f ${STUB_LIB_FILE}
 	@MAKE_STUB_LIB@
-	$(RANLIB) ${STUB_LIB_FILE}
+	$(TCL_RANLIB) ${STUB_LIB_FILE}
 
 # Make target which outputs the list of the .o contained in the Tcl lib
 # usefull to build a single big shared library containing Tcl and other
@@ -554,7 +554,7 @@ install-binaries: binaries
 	    fi
 	@echo "Installing $(TCL_LIB_FILE) to $(LIB_INSTALL_DIR)/"
 	@$(INSTALL_DATA) $(TCL_LIB_FILE) $(LIB_INSTALL_DIR)/$(TCL_LIB_FILE)
-	@(cd $(LIB_INSTALL_DIR); $(RANLIB) $(TCL_LIB_FILE))
+	@(cd $(LIB_INSTALL_DIR); $(TCL_RANLIB) $(TCL_LIB_FILE))
 	@chmod 555 $(LIB_INSTALL_DIR)/$(TCL_LIB_FILE)
 	@if test "$(TCL_BUILD_EXP_FILE)" != ""; then \
 	    echo "Installing $(TCL_EXP_FILE) to $(LIB_INSTALL_DIR)/"; \

@@ -23,8 +23,8 @@ details. */
 /**********************************************************************/
 /* fhandler_serial */
 
-fhandler_serial::fhandler_serial (int unit)
-  : fhandler_base (FH_SERIAL, unit), vmin_ (0), vtime_ (0), pgrp_ (myself->pgid)
+fhandler_serial::fhandler_serial ()
+  : fhandler_base (FH_SERIAL), vmin_ (0), vtime_ (0), pgrp_ (myself->pgid)
 {
   set_need_fork_fixup ();
 }
@@ -38,8 +38,8 @@ fhandler_serial::overlapped_setup ()
   overlapped_armed = 0;
 }
 
-int
-fhandler_serial::raw_read (void *ptr, size_t ulen)
+void
+fhandler_serial::raw_read (void *ptr, size_t& ulen)
 {
   int tot;
   DWORD n;
@@ -146,7 +146,7 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
     }
 
 out:
-  return tot;
+  ulen = tot;
 }
 
 /* Cover function to WriteFile to provide Posix interface and semantics
@@ -508,7 +508,7 @@ fhandler_serial::tcflush (int queue)
 	COMSTAT st;
 	if (!PurgeComm (get_handle (), PURGE_RXABORT | PURGE_RXCLEAR))
 	  break;
-	Sleep (100);
+	low_priority_sleep (100);
 	if (!ClearCommError (get_handle (), &ev, &st) || !st.cbInQue)
 	  break;
       }
@@ -985,17 +985,10 @@ fhandler_serial::tcgetattr (struct termios *t)
   if (!get_w_binary ())
     t->c_oflag |= ONLCR;
 
+  t->c_cc[VTIME] = vtime_ / 100;
+  t->c_cc[VMIN] = vmin_;
+
   debug_printf ("vmin_ %d, vtime_ %d", vmin_, vtime_);
-  if (vmin_ == 0)
-    {
-      t->c_lflag |= ICANON;
-      t->c_cc[VTIME] = t->c_cc[VMIN] = 0;
-    }
-  else
-    {
-      t->c_cc[VTIME] = vtime_ / 100;
-      t->c_cc[VMIN] = vmin_;
-    }
 
   return 0;
 }

@@ -36,7 +36,6 @@
 
 #define SECRET_EVENT_NAME "cygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x"
 #define ENTROPY_SOURCE_NAME "/dev/urandom"
-#define ENTROPY_SOURCE_DEV_UNIT 9
 
 extern fhandler_socket *fdsock (int& fd, const char *name, SOCKET soc);
 extern "C" {
@@ -116,7 +115,8 @@ fhandler_socket::set_connect_secret ()
   if (!entropy_source)
     {
       void *buf = malloc (sizeof (fhandler_dev_random));
-      entropy_source = new (buf) fhandler_dev_random (ENTROPY_SOURCE_DEV_UNIT);
+      entropy_source = new (buf) fhandler_dev_random ();
+      entropy_source->dev = *urandom_dev;
     }
   if (entropy_source &&
       !entropy_source->open (NULL, O_RDONLY))
@@ -124,10 +124,13 @@ fhandler_socket::set_connect_secret ()
       delete entropy_source;
       entropy_source = NULL;
     }
-  if (!entropy_source ||
-      (entropy_source->read (connect_secret, sizeof (connect_secret)) !=
-					     sizeof (connect_secret)))
-    bzero ((char*) connect_secret, sizeof (connect_secret));
+  if (!entropy_source)
+    {
+      size_t len = sizeof (connect_secret);
+      entropy_source->read (connect_secret, len);
+      if (len != sizeof (connect_secret))
+	bzero ((char*) connect_secret, sizeof (connect_secret));
+    }
 }
 
 void
@@ -862,9 +865,9 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
   DWORD ret;
 
   if (!winsock2_active)
-    res = ::sendto (get_socket (), (const char *) ptr, len,
-		    flags & MSG_WINMASK,
-		    (to ? (const struct sockaddr *) &sin : NULL), tolen);
+    ret = res = ::sendto (get_socket (), (const char *) ptr, len,
+			  flags & MSG_WINMASK,
+			  (to ? (const struct sockaddr *) &sin : NULL), tolen);
   else
     {
       WSABUF wsabuf = { len, (char *) ptr };
@@ -1111,7 +1114,8 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	  return -1;
 	}
       ifr->ifr_flags = IFF_NOTRAILERS | IFF_UP | IFF_RUNNING;
-      if (ntohl (((struct sockaddr_in *) &ifr->ifr_addr)->sin_addr.s_addr)
+      if (!strncmp(ifr->ifr_name, "lo", 2)
+          || ntohl (((struct sockaddr_in *) &ifr->ifr_addr)->sin_addr.s_addr)
 	  == INADDR_LOOPBACK)
 	ifr->ifr_flags |= IFF_LOOPBACK;
       else

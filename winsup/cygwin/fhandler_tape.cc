@@ -1,7 +1,7 @@
 /* fhandler_tape.cc.  See fhandler.h for a description of the fhandler
    classes.
 
-   Copyright 1999, 2000 Cygnus Solutions.
+   Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,13 +9,18 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <sys/termios.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
-#include "winsup.h"
-
 #include <sys/mtio.h>
+#include "cygerrno.h"
+#include "perprocess.h"
+#include "security.h"
+#include "fhandler.h"
+#include "path.h"
+#include "dtable.h"
+#include "cygheap.h"
 
 /**********************************************************************/
 /* fhandler_dev_tape */
@@ -23,7 +28,6 @@ details. */
 void
 fhandler_dev_tape::clear (void)
 {
-  norewind = 0;
   lasterr = 0;
   fhandler_dev_raw::clear ();
 }
@@ -49,51 +53,43 @@ fhandler_dev_tape::is_eof (int win_error)
   return ret;
 }
 
-fhandler_dev_tape::fhandler_dev_tape (const char *name, int unit) : fhandler_dev_raw (FH_TAPE, name, unit)
+fhandler_dev_tape::fhandler_dev_tape ()
+  : fhandler_dev_raw (FH_TAPE)
 {
-  set_cb (sizeof *this);
+  debug_printf ("unit: %d", dev.minor);
 }
 
 int
-fhandler_dev_tape::open (const char *path, int flags, mode_t)
+fhandler_dev_tape::open (path_conv *real_path, int flags, mode_t)
 {
   int ret;
-  int minor;
 
-  if (get_device_number (path, minor) != FH_TAPE)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  norewind = (minor >= 128);
   devbufsiz = 1L;
 
-  ret = fhandler_dev_raw::open (path, flags);
+  ret = fhandler_dev_raw::open (real_path, flags);
   if (ret)
     {
       struct mtget get;
       struct mtop op;
       struct mtpos pos;
 
-      if (! ioctl (MTIOCGET, &get))
-	{
+      if (!ioctl (MTIOCGET, &get))
+	/* Tape drive supports and is set to variable block size. */
+	if (get.mt_dsreg == 0)
+	  devbufsiz = get.mt_maxblksize;
+	else
 	  devbufsiz = get.mt_dsreg;
-	}
+	varblkop = get.mt_dsreg == 0;
 
       if (devbufsiz > 1L)
-	{
-	  devbuf = new char [ devbufsiz ];
-	}
+	devbuf = new char [devbufsiz];
 
-      /*
-       * The following rewind in position 0 solves a problem which appears
+      /* The following rewind in position 0 solves a problem which appears
        * in case of multi volume archives: The last ReadFile on first medium
        * returns ERROR_NO_DATA_DETECTED. After media change, all subsequent
-       * ReadFile calls return ERROR_NO_DATA_DETECTED, too!
-       * The call to tape_set_pos seems to reset some internal flags!
-      */
-      if ((! ioctl (MTIOCPOS, &pos)) && (! pos.mt_blkno))
+       * ReadFile calls return ERROR_NO_DATA_DETECTED, too.
+       * The call to tape_set_pos seems to reset some internal flags. */
+      if ((!ioctl (MTIOCPOS, &pos)) && (!pos.mt_blkno))
 	{
 	  op.mt_op = MTREW;
 	  ioctl (MTIOCTOP, &op);
@@ -123,7 +119,7 @@ fhandler_dev_tape::close (void)
       if ((has_written) && (! eom_detected))
 	{
 	  /* if last operation was writing, write a filemark */
-	  debug_printf ("writing filemark\n");
+	  debug_printf ("writing filemark");
 	  op.mt_op = MTWEOF;
 	  op.mt_count = 1;
 	  ioctl (MTIOCTOP, &op);
@@ -133,9 +129,9 @@ fhandler_dev_tape::close (void)
   // To protected reads on signaling (e.g. Ctrl-C)
   eof_detected = 1;
 
-  if (! norewind)
+  if (is_rewind_device ())
     {
-      debug_printf ("rewinding\n");
+      debug_printf ("rewinding");
       op.mt_op = MTREW;
       ioctl (MTIOCTOP, &op);
     }
@@ -150,30 +146,28 @@ fhandler_dev_tape::close (void)
 }
 
 int
-fhandler_dev_tape::fstat (struct stat *buf)
+fhandler_dev_tape::fstat (struct __stat64 *buf, path_conv *pc)
 {
   int ret;
 
-  if (! (ret = fhandler_dev_raw::fstat (buf)))
+  if (!(ret = fhandler_base::fstat (buf, pc)))
     {
       struct mtget get;
 
-      if (! ioctl (MTIOCGET, &get))
-	{
-	  buf->st_blocks = get.mt_capacity / buf->st_blksize;
-	}
+      if (!ioctl (MTIOCGET, &get))
+	buf->st_blocks = get.mt_capacity / buf->st_blksize;
     }
 
   return ret;
 }
 
-off_t
-fhandler_dev_tape::lseek (off_t offset, int whence)
+__off64_t
+fhandler_dev_tape::lseek (__off64_t offset, int whence)
 {
   struct mtop op;
   struct mtpos pos;
 
-  debug_printf ("lseek (%s, %d, %d)\n", get_name (), offset, whence);
+  debug_printf ("lseek (%s, %d, %d)", get_name (), offset, whence);
 
   writebuf ();
   eom_detected = eof_detected = 0;
@@ -182,7 +176,7 @@ fhandler_dev_tape::lseek (off_t offset, int whence)
 
   if (ioctl (MTIOCPOS, &pos))
     {
-      return (off_t) -1;
+      return ILLEGAL_SEEK;
     }
 
   switch (whence)
@@ -228,7 +222,6 @@ fhandler_dev_tape::dup (fhandler_base *child)
 {
   fhandler_dev_tape *fhc = (fhandler_dev_tape *) child;
 
-  fhc->norewind = norewind;
   fhc->lasterr = lasterr;
   return fhandler_dev_raw::dup (child);
 }
@@ -263,7 +256,12 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    ret = tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS, -op->mt_count);
 	    break;
 	  case MTWEOF:
-	    ret = tape_write_marks (TAPE_FILEMARKS, op->mt_count);
+	    if (tape_get_feature (TAPE_DRIVE_WRITE_FILEMARKS))
+	      ret = tape_write_marks (TAPE_FILEMARKS, op->mt_count);
+	    else if (tape_get_feature (TAPE_DRIVE_WRITE_LONG_FMKS))
+	      ret = tape_write_marks (TAPE_LONG_FILEMARKS, op->mt_count);
+	    else
+	      ret = tape_write_marks (TAPE_SHORT_FILEMARKS, op->mt_count);
 	    break;
 	  case MTREW:
 	    ret = tape_set_pos (TAPE_REWIND, 0);
@@ -275,14 +273,9 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    break;
 	  case MTRETEN:
 	    if (! tape_get_feature (TAPE_DRIVE_END_OF_DATA))
-	      {
-		ret = ERROR_INVALID_PARAMETER;
-		break;
-	      }
-	    if (! (ret = tape_set_pos (TAPE_REWIND, 0, FALSE)))
-	      {
-		ret = tape_prepare (TAPE_TENSION);
-	      }
+	      ret = ERROR_INVALID_PARAMETER;
+	    else if (! (ret = tape_set_pos (TAPE_REWIND, 0, FALSE)))
+	      ret = tape_prepare (TAPE_TENSION);
 	    break;
 	  case MTBSFM:
 	    ret = tape_set_pos (TAPE_SPACE_FILEMARKS, -op->mt_count, TRUE);
@@ -292,13 +285,9 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    break;
 	  case MTEOM:
 	    if (tape_get_feature (TAPE_DRIVE_END_OF_DATA))
-	      {
-		ret = tape_set_pos (TAPE_SPACE_END_OF_DATA, 0);
-	      }
+	      ret = tape_set_pos (TAPE_SPACE_END_OF_DATA, 0);
 	    else
-	      {
-		ret = tape_set_pos (TAPE_SPACE_FILEMARKS, 32767);
-	      }
+	      ret = tape_set_pos (TAPE_SPACE_FILEMARKS, 32767);
 	    break;
 	  case MTERASE:
 	    ret = tape_erase (TAPE_ERASE_SHORT);
@@ -319,40 +308,57 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 		}
 	      ret = tape_get_blocksize (&min, NULL, &max, NULL);
 	      if (ret)
-		{
 		  break;
-		}
-	      if (op->mt_count < min || op->mt_count > max)
-		{
-		  ret = ERROR_INVALID_PARAMETER;
-		  break;
-		}
-	      if (devbuf && (size_t) op->mt_count == devbufsiz)
+	      if (devbuf && (size_t) op->mt_count == devbufsiz && !varblkop)
 		{
 		  ret = 0;
 		  break;
 		}
-	      if (devbuf && (size_t) op->mt_count < devbufend - devbufstart)
+	      if ((op->mt_count == 0
+		   && !tape_get_feature (TAPE_DRIVE_VARIABLE_BLOCK))
+		  || (op->mt_count > 0
+		      && (op->mt_count < min || op->mt_count > max)))
 		{
 		  ret = ERROR_INVALID_PARAMETER;
 		  break;
 		}
+	      if (devbuf && op->mt_count > 0
+		  && (size_t) op->mt_count < devbufend - devbufstart)
+		{
+		  ret = ERROR_MORE_DATA;
+		  break;
+		}
 	      if (! (ret = tape_set_blocksize (op->mt_count)))
 		{
-		  char *buf = new char [ op->mt_count ];
-		  if (devbuf)
+		  size_t size = 0;
+		  if (op->mt_count == 0)
 		    {
-		      memcpy(buf,devbuf + devbufstart, devbufend - devbufstart);
+		      struct mtget get;
+		      if ((ret = tape_status (&get)) != NO_ERROR)
+			break;
+		      size = get.mt_maxblksize;
+		      ret = NO_ERROR;
+		    }
+		  char *buf = NULL;
+		  if (size > 1L && !(buf = new char [size]))
+		    {
+		      ret = ERROR_OUTOFMEMORY;
+		      break;
+		    }
+		  if (devbufsiz > 1L && size > 1L)
+		    {
+		      memcpy (buf, devbuf + devbufstart,
+			      devbufend - devbufstart);
 		      devbufend -= devbufstart;
-		      delete [] devbuf;
 		    }
 		  else
-		    {
-		      devbufend = 0;
-		    }
-		    devbufstart = 0;
-		    devbuf = buf;
-		    devbufsiz = op->mt_count;
+		    devbufend = 0;
+		  if (devbufsiz > 1L)
+		    delete [] devbuf;
+		  devbufstart = 0;
+		  devbuf = buf;
+		  devbufsiz = size;
+		  varblkop = op->mt_count == 0;
 		}
 	    }
 	    break;
@@ -438,7 +444,7 @@ static int
 tape_error (DWORD lasterr, const char *txt)
 {
   if (lasterr)
-    debug_printf ("%s: error: %d\n", txt, lasterr);
+    debug_printf ("%s: error: %d", txt, lasterr);
 
   return lasterr;
 }
@@ -446,7 +452,7 @@ tape_error (DWORD lasterr, const char *txt)
 int
 fhandler_dev_tape::tape_write_marks (int marktype, DWORD len)
 {
-  syscall_printf ("write_tapemark\n");
+  syscall_printf ("write_tapemark");
   while (((lasterr = WriteTapemark (get_handle (),
 				    marktype,
 				    len,
@@ -652,7 +658,7 @@ fhandler_dev_tape::tape_get_blocksize (long *min, long *def, long *max, long *cu
 
   while (((lasterr = GetTapeParameters (get_handle (),
 					GET_TAPE_MEDIA_INFORMATION,
-					(varlen = sizeof mp, &varlen),
+					(varlen = sizeof dp, &varlen),
 					&mp)) == ERROR_MEDIA_CHANGED)
 	 || (lasterr == ERROR_BUS_RESET))
     ;
@@ -683,7 +689,7 @@ fhandler_dev_tape::tape_set_blocksize (long count)
   if (lasterr)
     return lasterr;
 
-  if (count < min || count > max)
+  if (count != 0 && (count < min || count > max))
     return tape_error (ERROR_INVALID_PARAMETER, "tape_set_blocksize");
 
   mp.BlockSize = count;
@@ -723,9 +729,12 @@ fhandler_dev_tape::tape_status (struct mtget *get)
 	 || (lasterr == ERROR_BUS_RESET))
     ;
 
+  /* Setting varlen to sizeof DP is by intention, actually! Never set
+     it to sizeof MP which seems to be more correct but results in a
+     ERROR_MORE_DATA error at least on W2K. */
   if ((lasterr) || (lasterr = GetTapeParameters (get_handle (),
 						 GET_TAPE_MEDIA_INFORMATION,
-						 (varlen = sizeof mp, &varlen),
+						 (varlen = sizeof dp, &varlen),
 						 &mp)))
     notape = 1;
 
@@ -783,6 +792,7 @@ fhandler_dev_tape::tape_status (struct mtget *get)
   get->mt_defblksize = dp.DefaultBlockSize;
   get->mt_featureslow = dp.FeaturesLow;
   get->mt_featureshigh = dp.FeaturesHigh;
+  get->mt_eotwarningzonesize = dp.EOTWarningZoneSize;
 
   return 0;
 }

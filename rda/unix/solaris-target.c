@@ -61,7 +61,7 @@ solaris_detach (struct gdbserv *serv, struct gdbserv_target *target)
   assert (solaris_connect_lock == serv);
 
   dummy_target->detach (serv);
-  fprintf (stderr, "linux - detached.\n");
+  fprintf (stderr, "solaris - detached.\n");
   solaris_connect_lock = NULL;
 
   /* Quit out of main loop for this demo.  In general, this is not
@@ -122,17 +122,17 @@ solaris_attach (struct gdbserv *serv, void *data)
 
   if (solaris_connect_lock != NULL)
     {
-      fprintf (stderr, "linux: rejected duplicate connection.\n");
+      fprintf (stderr, "solaris: rejected duplicate connection.\n");
       return NULL;
     }
 
   if ((dummy_target = dummy_attach (serv, data)) == NULL)
     {
-      fprintf (stderr, "Linux: unable to open %s\n", process->argv[0]);
+      fprintf (stderr, "Solaris: unable to open %s\n", process->argv[0]);
       return NULL;
     }
 
-  fprintf (stderr, "linux: accepted gdb connection.\n");
+  fprintf (stderr, "solaris: accepted gdb connection.\n");
   solaris_connect_lock = serv;
 
   solaris_target = malloc (sizeof (struct gdbserv_target));

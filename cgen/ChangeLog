@@ -1,5 +1,8 @@
 2005-02-07  Jim Blandy  <jimb@redhat.com>
 
+	* cgen-opc.scm: Don't load fixup.scm here.  (See corresponding
+	changes in the opcodes directory.)
+
 	* guile.scm: New file, containing Guile-specific definitions and
 	adaptations.  This is loaded by the app-specific shell scripts.
 	Initially identical to fixup.scm.

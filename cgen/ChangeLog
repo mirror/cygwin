@@ -1,16 +1,16 @@
 2000-08-22  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.in (DIST_COMMON): Regenerated.
-	* ifield.scm (derived-ifield needed-iflds): New method.
+	* ifield.scm (<derived-ifield> needed-iflds): New method.
 	* iformat.scm (-ifmt-lookup-sfmt!): Use base ifields for
-	sfmts built from derived-ifields.
-	* operand.scm (-derived-parse-encoding): Give derived-ifield a fixed
+	sfmts built from <derived-ifield>s.
+	* operand.scm (-derived-parse-encoding): Give <derived-ifield> a fixed
 	type symbol 'derived-ifield, not an unparseable string.
 	* utils-sim.scm (op-needed-iflds) Handler 'derived-ifield case.
 	(-sfmt-contents): Add tracing.
 
 	From Doug Evans <dje@transmeta.com>:
-	* sim.scm (operand cxmake-get): Result is a <c-expr>, not a string of
+	* sim.scm (<operand> cxmake-get): Result is a <c-expr>, not a string of
 	C code.
 
 2000-08-20  Doug Evans  <dje@casey.transmeta.com>

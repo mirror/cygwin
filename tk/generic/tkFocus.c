@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkFocus.c,v 1.7.6.1 2000/05/04 21:26:23 spolk Exp $
+ * RCS: @(#) $Id: tkFocus.c,v 1.9 2002/06/19 19:37:54 mdejong Exp $
  */
 
 #include "tkInt.h"
@@ -121,8 +121,9 @@ Tk_FocusObjCmd(clientData, interp, objc, objv)
     int objc;			/* Number of arguments. */
     Tcl_Obj *CONST objv[];	/* Argument objects. */
 {
-    static char *focusOptions[] = {"-displayof", "-force", "-lastfor",
-				   (char *) NULL};
+    static CONST char *focusOptions[] = {
+	"-displayof", "-force", "-lastfor", (char *) NULL
+    };
     Tk_Window tkwin = (Tk_Window) clientData;
     TkWindow *winPtr = (TkWindow *) clientData;
     TkWindow *newPtr, *focusWinPtr, *topLevelPtr;
@@ -215,7 +216,7 @@ Tk_FocusObjCmd(clientData, interp, objc, objv)
 	    }
 	    for (topLevelPtr = newPtr; topLevelPtr != NULL;
 		    topLevelPtr = topLevelPtr->parentPtr)  {
-		if (topLevelPtr->flags & TK_TOP_LEVEL) {
+		if (topLevelPtr->flags & TK_TOP_HIERARCHY) {
 		    for (tlFocusPtr = newPtr->mainPtr->tlFocusPtr;
 			    tlFocusPtr != NULL;
 			    tlFocusPtr = tlFocusPtr->nextPtr) {
@@ -587,7 +588,7 @@ TkSetFocusWin(winPtr, force)
 	if (!(topLevelPtr->flags & TK_MAPPED)) {
 	    allMapped = 0;
 	}
-	if (topLevelPtr->flags & TK_TOP_LEVEL) {
+	if (topLevelPtr->flags & TK_TOP_HIERARCHY) {
 	    break;
 	}
     }
@@ -812,6 +813,14 @@ TkFocusDeadWindow(winPtr)
     TkDisplay *dispPtr = winPtr->dispPtr;
 
     /*
+     * Certain special windows like those used for send and clipboard
+     * have no mainPtr.
+     */
+
+    if (winPtr->mainPtr == NULL)
+        return;
+
+    /*
      * Search for focus records that refer to this window either as
      * the top-level window or the current focus window.
      */
@@ -1011,4 +1020,39 @@ FindDisplayFocusInfo(mainPtr, dispPtr)
     mainPtr->displayFocusPtr = displayFocusPtr;
     return displayFocusPtr;
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkFocusFree --
+ *
+ *	Free resources associated with maintaining the focus.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	This mainPtr should no long access focus information.
+ *
+ *----------------------------------------------------------------------
+ */
 
+void
+TkFocusFree(mainPtr)
+    TkMainInfo *mainPtr;	/* Record that identifies a particular
+				 * application. */
+{
+    DisplayFocusInfo *displayFocusPtr;
+    ToplevelFocusInfo *tlFocusPtr;
+
+    while (mainPtr->displayFocusPtr != NULL) {
+	displayFocusPtr          = mainPtr->displayFocusPtr;
+	mainPtr->displayFocusPtr = mainPtr->displayFocusPtr->nextPtr;
+	ckfree((char *) displayFocusPtr);
+    }
+    while (mainPtr->tlFocusPtr != NULL) {
+	tlFocusPtr          = mainPtr->tlFocusPtr;
+	mainPtr->tlFocusPtr = mainPtr->tlFocusPtr->nextPtr;
+	ckfree((char *) tlFocusPtr);
+    }
+}

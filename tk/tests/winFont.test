@@ -10,11 +10,14 @@
 # Copyright (c) 1998-1999 by Scriptics Corporation.
 # All rights reserved.
 #
-# RCS: @(#) $Id: winFont.test,v 1.7.6.1 2000/05/04 21:26:30 spolk Exp $
+# RCS: @(#) $Id: winFont.test,v 1.8 2002/07/13 20:28:36 dgp Exp $
 
-if {[lsearch [namespace children] ::tcltest] == -1} {
-    source [file join [pwd] [file dirname [info script]] defs.tcl]
-}
+package require tcltest 2.1
+namespace import -force tcltest::configure
+namespace import -force tcltest::testsDirectory
+configure -testdir [file join [pwd] [file dirname [info script]]]
+configure -loadfile [file join [testsDirectory] constraints.tcl]
+tcltest::loadTestedCommands
 
 catch {destroy .b}
 catch {font delete xyz}
@@ -183,15 +186,3 @@ test winfont-7.4 {AllocFont procedure: extract info from textmetric} {pcOnly} {
 destroy .b
 ::tcltest::cleanupTests
 return
-
-
-
-
-
-
-
-
-
-
-
-

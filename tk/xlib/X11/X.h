@@ -33,14 +33,18 @@ SOFTWARE.
 #define X_PROTOCOL	11		/* current protocol version */
 #define X_PROTOCOL_REVISION 0		/* current minor version */
 
-#ifdef MAC_TCL
+#if defined(MAC_TCL) || defined(MAC_OSX_TK)
 #   define Cursor XCursor
 #   define Region XRegion
 #endif
 
 /* Resources */
 
+#ifdef _WIN64
+typedef __int64 XID;
+#else
 typedef unsigned long XID;
+#endif
 
 typedef XID Window;
 typedef XID Drawable;
@@ -665,7 +669,7 @@ are reserved in the protocol for errors and replies. */
 #define LSBFirst		0
 #define MSBFirst		1
 
-#ifdef MAC_TCL
+#if defined(MAC_TCL) || defined(MAC_OSX_TK)
 #   undef Cursor
 #   undef Region
 #endif

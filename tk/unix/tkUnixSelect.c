@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkUnixSelect.c,v 1.7.6.1 2000/05/04 21:26:30 spolk Exp $
+ * RCS: @(#) $Id: tkUnixSelect.c,v 1.9 2002/08/05 04:30:41 dgp Exp $
  */
 
 #include "tkInt.h"
@@ -597,7 +597,7 @@ TkSelEventProc(tkwin, eventPtr)
 	    Tcl_Encoding encoding;
 	    if (format != 8) {
 		char buf[64 + TCL_INTEGER_SPACE];
-		
+
 		sprintf(buf, 
 			"bad format for string selection: wanted \"8\", got \"%d\"",
 			format);
@@ -633,6 +633,35 @@ TkSelEventProc(tkwin, eventPtr)
 		    interp, Tcl_DStringValue(&ds));
 	    Tcl_DStringFree(&ds);
 	    Tcl_Release((ClientData) interp);
+	} else if (type == dispPtr->utf8Atom) {
+	    /*
+	     * The X selection data is in UTF-8 format already.
+	     * We can't guarantee that propInfo is NULL-terminated,
+	     * so we might have to copy the string.
+	     */
+	    char *propData = propInfo;
+
+	    if (format != 8) {
+		char buf[64 + TCL_INTEGER_SPACE];
+
+		sprintf(buf, 
+			"bad format for string selection: wanted \"8\", got \"%d\"",
+			format);
+		Tcl_SetResult(retrPtr->interp, buf, TCL_VOLATILE);
+		retrPtr->result = TCL_ERROR;
+		return;
+	    }
+
+	    if (propInfo[numItems] != '\0') {
+		propData = ckalloc((size_t) numItems + 1);
+		strcpy(propData, propInfo);
+		propData[numItems] = '\0';
+	    }
+	    retrPtr->result = (*retrPtr->proc)(retrPtr->clientData,
+		    retrPtr->interp, propData);
+	    if (propData != propInfo) {
+		ckfree((char *) propData);
+	    }
 	} else if (type == dispPtr->incrAtom) {
 
 	    /*
@@ -657,7 +686,7 @@ TkSelEventProc(tkwin, eventPtr)
 
 	    if (format != 32) {
 		char buf[64 + TCL_INTEGER_SPACE];
-		
+
 		sprintf(buf, 
 			"bad format for selection: wanted \"32\", got \"%d\"",
 			format);
@@ -940,6 +969,15 @@ ConvertSelection(winPtr, eventPtr)
 	    XChangeProperty(reply.display, reply.requestor,
 		    property, type, format, PropModeReplace,
 		    (unsigned char *) propPtr, numItems);
+	} else if (type == winPtr->dispPtr->utf8Atom) {
+	    /*
+	     * This matches selection requests of type UTF8_STRING,
+	     * which allows us to pass our utf-8 information untouched.
+	     */
+
+	    XChangeProperty(reply.display, reply.requestor,
+		    property, type, 8, PropModeReplace,
+		    (unsigned char *) buffer, numItems);
 	} else if ((type == XA_STRING)
 		|| (type == winPtr->dispPtr->compoundTextAtom)) {
 	    Tcl_DString ds;
@@ -1159,6 +1197,7 @@ SelRcvIncrProc(clientData, eventPtr)
 	     */
 
 	    retrPtr->result = TCL_OK;
+	    Tcl_Release((ClientData) interp);
 	    goto done;
 	} else {
 	    src = propInfo;
@@ -1458,7 +1497,7 @@ SelCvtFromX(propPtr, numValues, type, tkwin)
 {
     char *result;
     int resultSpace, curSize, fieldSize;
-    char *atomName;
+    CONST char *atomName;
 
     /*
      * Convert each long in the property to a string value, which is
@@ -1504,4 +1543,3 @@ SelCvtFromX(propPtr, numValues, type, tkwin)
     }
     return result;
 }
-

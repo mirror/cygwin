@@ -10,8 +10,9 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkStubLib.c,v 1.3 1999/08/30 18:04:19 spolk Exp $
+ * RCS: @(#) $Id: tkStubLib.c,v 1.8 2002/08/31 06:12:27 das Exp $
  */
+
 
 /*
  * We need to ensure that we use the stub macros so that this file contains
@@ -19,7 +20,6 @@
  * to build an extension that references Tk_InitStubs but doesn't end up
  * including the rest of the stub functions.
  */
-
 
 #ifndef USE_TCL_STUBS
 #define USE_TCL_STUBS
@@ -37,8 +37,13 @@
 #ifdef __WIN32__
 #include "tkWinInt.h"
 #endif
+
 #ifdef MAC_TCL
 #include "tkMacInt.h"
+#endif
+
+#ifdef MAC_OSX_TK
+#include "tkMacOSXInt.h"
 #endif
 
 #include "tkDecls.h"
@@ -80,13 +85,17 @@ TkIntXlibStubs *tkIntXlibStubsPtr;
  *----------------------------------------------------------------------
  */
 
-char *
+#ifdef Tk_InitStubs
+#undef Tk_InitStubs
+#endif
+
+CONST char *
 Tk_InitStubs(interp, version, exact)
     Tcl_Interp *interp;
     char *version;
     int exact;
 {
-    char *actualVersion;
+    CONST char *actualVersion;
 
     actualVersion = Tcl_PkgRequireEx(interp, "Tk", version, exact,
 		(ClientData *) &tkStubsPtr);

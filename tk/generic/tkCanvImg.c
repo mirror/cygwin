@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkCanvImg.c,v 1.7.6.1 2000/05/04 21:26:23 spolk Exp $
+ * RCS: @(#) $Id: tkCanvImg.c,v 1.5 2002/08/05 04:30:38 dgp Exp $
  */
 
 #include <stdio.h>
@@ -319,8 +319,8 @@ ConfigureImage(interp, canvas, itemPtr, argc, argv, flags)
     Tk_Image image;
 
     tkwin = Tk_CanvasTkwin(canvas);
-    if (Tk_ConfigureWidget(interp, tkwin, configSpecs, argc, (char **) argv,
-	    (char *) imgPtr, flags|TK_CONFIG_OBJS) != TCL_OK) {
+    if (TCL_OK != Tk_ConfigureWidget(interp, tkwin, configSpecs, argc,
+	    (CONST char **) argv, (char *) imgPtr, flags|TK_CONFIG_OBJS)) {
 	return TCL_ERROR;
     }
 
@@ -897,4 +897,3 @@ ImageChangedProc(clientData, x, y, width, height, imgWidth, imgHeight)
 	    imgPtr->header.y1 + y, (int) (imgPtr->header.x1 + x + width),
 	    (int) (imgPtr->header.y1 + y + height));
 }
-

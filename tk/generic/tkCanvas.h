@@ -11,7 +11,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkCanvas.h,v 1.7.6.1 2000/05/04 21:26:23 spolk Exp $
+ * RCS: @(#) $Id: tkCanvas.h,v 1.5 2002/08/05 04:30:38 dgp Exp $
  */
 
 #ifndef _TKCANVAS
@@ -293,7 +293,7 @@ typedef struct TkCanvas {
  */
 
 extern int		TkCanvPostscriptCmd _ANSI_ARGS_((TkCanvas *canvasPtr,
-			    Tcl_Interp *interp, int argc, char **argv));
+			    Tcl_Interp *interp, int argc, CONST char **argv));
 
 /*
  * The following definition is shared between tkCanvPs.c and tkCanvImg.c, 
@@ -310,4 +310,3 @@ typedef struct TkColormapData {	/* Hold color information for a window */
 } TkColormapData;
 
 #endif /* _TKCANVAS */
-

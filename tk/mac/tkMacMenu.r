@@ -11,7 +11,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacMenu.r,v 1.7.6.1 2000/05/04 21:26:26 spolk Exp $
+ * RCS: @(#) $Id: tkMacMenu.r,v 1.3 1998/09/14 18:23:38 stanton Exp $
  */
 
 #include <Types.r>
@@ -45,4 +45,3 @@ resource 'SICN' (128, preload, locked) {
 		$"0FE0 1FF0 3FF8"
 	}
 };
-

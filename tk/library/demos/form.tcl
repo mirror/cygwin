@@ -3,7 +3,7 @@
 # This demonstration script creates a simple form with a bunch
 # of entry widgets.
 #
-# RCS: @(#) $Id: form.tcl,v 1.7.6.1 2000/05/04 21:26:25 spolk Exp $
+# RCS: @(#) $Id: form.tcl,v 1.2 1998/09/14 18:23:28 stanton Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -38,4 +38,3 @@ $w.f5.label config -text Phone:
 pack $w.msg $w.f1 $w.f2 $w.f3 $w.f4 $w.f5 -side top -fill x
 bind $w <Return> "destroy $w"
 focus $w.f1.entry
-

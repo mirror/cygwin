@@ -4,7 +4,7 @@
 # both horizontally and vertically.  It displays a collection of
 # well-known sayings.
 #
-# RCS: @(#) $Id: sayings.tcl,v 1.7.6.1 2000/05/04 21:26:26 spolk Exp $
+# RCS: @(#) $Id: sayings.tcl,v 1.2 1998/09/14 18:23:30 stanton Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -44,4 +44,3 @@ grid columnconfig $w.frame 0 -weight 1 -minsize 0
 
 
 $w.frame.list insert 0 "Waste not, want not" "Early to bed and early to rise makes a man healthy, wealthy, and wise" "Ask not what your country can do for you, ask what you can do for your country" "I shall return" "NOT" "A picture is worth a thousand words" "User interfaces are hard to build" "Thou shalt not steal" "A penny for your thoughts" "Fool me once, shame on you;  fool me twice, shame on me" "Every cloud has a silver lining" "Where there's smoke there's fire" "It takes one to know one" "Curiosity killed the cat" "Take this job and shove it" "Up a creek without a paddle" "I'm mad as hell and I'm not going to take it any more" "An apple a day keeps the doctor away" "Don't look a gift horse in the mouth"
-

@@ -13,7 +13,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: limits.h,v 1.7.6.1 2000/05/04 21:26:20 spolk Exp $
+ * RCS: @(#) $Id: limits.h,v 1.2 1998/09/14 18:39:44 stanton Exp $
  */
 
 #define LONG_MIN		0x80000000
@@ -22,4 +22,3 @@
 #define INT_MAX			0x7fffffff
 #define SHRT_MIN		0x8000
 #define SHRT_MAX		0x7fff
-

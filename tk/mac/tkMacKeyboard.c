@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacKeyboard.c,v 1.7.6.2 2000/09/26 16:08:58 spolk Exp $
+ * RCS: @(#) $Id: tkMacKeyboard.c,v 1.8 2002/02/08 02:57:11 dgp Exp $
  */
 
 #include "tkInt.h"
@@ -646,5 +646,3 @@ TkpInitKeymapInfo(dispPtr)
     }
     XFreeModifiermap(modMapPtr);
 }
-
-

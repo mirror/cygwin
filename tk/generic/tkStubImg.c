@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkStubImg.c,v 1.1.2.2 2000/09/26 16:08:25 spolk Exp $
+ * RCS: @(#) $Id: tkStubImg.c,v 1.2 2000/07/17 23:03:20 ericm Exp $
  */
 
 #include "tcl.h"
@@ -61,6 +61,8 @@ Tk_InitImageArgs(interp, argc, argvPtr)
 	}
 	if (cmdInfo.isNativeObjectProc == 1) {
 	    useNewImage = 1; /* Tk uses the new image interface */
+	} else {
+	    useNewImage = 0; /* Tk uses old image interface */
 	}
     }
     if (useNewImage && (argc > 0)) {
@@ -72,4 +74,3 @@ Tk_InitImageArgs(interp, argc, argvPtr)
 	*argvPtr = (char **) argv;
     }
 }
-

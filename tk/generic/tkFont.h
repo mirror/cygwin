@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkFont.h,v 1.7.6.1 2000/05/04 21:26:23 spolk Exp $
+ * RCS: @(#) $Id: tkFont.h,v 1.5 1999/04/16 01:51:14 stanton Exp $
  */
 
 #ifndef _TKFONT
@@ -220,13 +220,7 @@ EXTERN void		TkpGetFontFamilies _ANSI_ARGS_((Tcl_Interp *interp,
 EXTERN TkFont *		TkpGetNativeFont _ANSI_ARGS_((Tk_Window tkwin,
 			    CONST char *name));
 
-/* CYGNUS LOCAL */
-EXTERN void		TkUpdateFonts _ANSI_ARGS_((Tk_Window tkwin,
-			    int (*changed) (TkFontAttributes *faPtr)));
-
 # undef TCL_STORAGE_CLASS
 # define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif	/* _TKFONT */
-
-

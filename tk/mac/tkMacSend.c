@@ -31,7 +31,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacSend.c,v 1.7.6.1 2000/05/04 21:26:26 spolk Exp $
+ * RCS: @(#) $Id: tkMacSend.c,v 1.6 2002/08/05 04:30:40 dgp Exp $
  */
 
 #include <Gestalt.h>
@@ -234,12 +234,12 @@ static int		ValidateName _ANSI_ARGS_((TkDisplay *dispPtr,
  *--------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tk_SetAppName(
     Tk_Window tkwin,		/* Token for any window in the application
 				 * to be named:  it is just used to identify
 				 * the application and the display.  */
-    char *name)			/* The name that will be used to
+    CONST char *name)		/* The name that will be used to
 				 * refer to the interpreter in later
 				 * "send" commands.  Must be globally
 				 * unique. */
@@ -361,7 +361,7 @@ Tk_SendObjCmd(
     int objc,			/* Number of arguments */
     Tcl_Obj *CONST objv[])	/* The arguments */
 {
-    static char *sendOptions[] = {"-async", "-displayof", "-", (char *) NULL};
+    static CONST char *sendOptions[] = {"-async", "-displayof", "-", (char *) NULL};
     char *stringRep, *destName;
     int async = 0;
     int i, index, firstArg;
@@ -546,4 +546,3 @@ SendInit(
 {
     return TCL_OK;
 }
-

@@ -1,6 +1,6 @@
 /*
  * This file is generated from $(INCLUDESRC)/keysymdef.h.  Do not edit.
- * RCS: $Id: ks_names.h,v 1.7.6.2 2000/09/26 16:07:42 spolk Exp $ 
+ * RCS: $Id: ks_names.h,v 1.4 2000/04/15 00:33:08 ericm Exp $ 
  */
 { "BackSpace", 0xFF08 },
 { "Tab", 0xFF09 },
@@ -921,5 +921,3 @@
 { "hebrew_shin", 0xcf9 },
 { "hebrew_taf", 0xcfa },
 { "Hebrew_switch", 0xFF7E },
-
-

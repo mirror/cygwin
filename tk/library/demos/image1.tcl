@@ -2,7 +2,7 @@
 #
 # This demonstration script displays two image widgets.
 #
-# RCS: @(#) $Id: image1.tcl,v 1.7.6.1 2000/05/04 21:26:25 spolk Exp $
+# RCS: @(#) $Id: image1.tcl,v 1.2 1998/09/14 18:23:28 stanton Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -34,4 +34,3 @@ image create photo image1b \
 label $w.l2 -image image1b -bd 1 -relief sunken
 
 pack $w.l1 $w.l2 -side top -padx .5m -pady .5m
-

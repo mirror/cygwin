@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacScale.c,v 1.7.6.2 2000/09/26 16:09:03 spolk Exp $
+ * RCS: @(#) $Id: tkMacScale.c,v 1.7 2000/04/19 09:25:54 hobbs Exp $
  */
 
 #include "tkScale.h"
@@ -436,6 +436,4 @@ ScaleActionProc(ControlRef theControl, ControlPartCode partCode)
     Tcl_DoOneEvent(TCL_IDLE_EVENTS);
     Tcl_Release((ClientData) scalePtr);
 }
-
-
 

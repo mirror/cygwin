@@ -4,7 +4,7 @@
 # many of the colors from the X color database.  You can click on
 # a color to change the application's palette.
 #
-# RCS: @(#) $Id: colors.tcl,v 1.7.6.1 2000/05/04 21:26:25 spolk Exp $
+# RCS: @(#) $Id: colors.tcl,v 1.2 1998/09/14 18:23:27 stanton Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -99,4 +99,3 @@ $w.frame.list insert 0 gray60 gray70 gray80 gray85 gray90 gray95 \
     purple2 purple3 purple4 MediumPurple1 MediumPurple2 \
     MediumPurple3 MediumPurple4 thistle1 thistle2 thistle3 \
     thistle4
-

@@ -2,7 +2,7 @@
 #
 # This demonstration script creates message boxes of various type
 #
-# RCS: @(#) $Id: msgbox.tcl,v 1.7.6.1 2000/05/04 21:26:25 spolk Exp $
+# RCS: @(#) $Id: msgbox.tcl,v 1.2 1998/09/14 18:23:29 stanton Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -63,4 +63,3 @@ proc showMessageBox {w} {
     tk_messageBox -icon info -message "You have selected \"$button\"" -type ok\
 	-parent $w
 }
-

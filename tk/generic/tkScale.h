@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkScale.h,v 1.7.6.2 2000/09/26 16:08:24 spolk Exp $
+ * RCS: @(#) $Id: tkScale.h,v 1.8 2000/04/14 08:33:16 hobbs Exp $
  */
 
 #ifndef _TKSCALE
@@ -254,5 +254,3 @@ EXTERN int		TkScaleValueToPixel _ANSI_ARGS_((TkScale *scalePtr,
 # define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif /* _TKSCALE */
-
-

@@ -12,7 +12,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkTrig.c,v 1.7.6.1 2000/05/04 21:26:25 spolk Exp $
+ * RCS: @(#) $Id: tkTrig.c,v 1.4 1999/12/14 06:52:33 hobbs Exp $
  */
 
 #include <stdio.h>
@@ -1473,4 +1473,3 @@ TkGetButtPoints(p1, p2, width, project, m1, m2)
 	}
     }
 }
-

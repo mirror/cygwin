@@ -2,7 +2,7 @@
 #
 # This demonstration script shows an example with a vertical scale.
 #
-# RCS: @(#) $Id: vscale.tcl,v 1.7.6.1 2000/05/04 21:26:26 spolk Exp $
+# RCS: @(#) $Id: vscale.tcl,v 1.3 2001/06/14 10:56:58 dkf Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -39,11 +39,10 @@ $w.frame.scale set 75
 
 proc setHeight {w height} {
     incr height 21
-    set y2 [expr $height - 30]
+    set y2 [expr {$height - 30}]
     if {$y2 < 21} {
 	set y2 21
     }
     $w coords poly 15 20 35 20 35 $y2 45 $y2 25 $height 5 $y2 15 $y2 15 20
     $w coords line 15 20 35 20 35 $y2 45 $y2 25 $height 5 $y2 15 $y2 15 20
 }
-

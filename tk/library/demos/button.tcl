@@ -3,7 +3,7 @@
 # This demonstration script creates a toplevel window containing
 # several button widgets.
 #
-# RCS: @(#) $Id: button.tcl,v 1.7.6.1 2000/05/04 21:26:25 spolk Exp $
+# RCS: @(#) $Id: button.tcl,v 1.2 1998/09/14 18:23:27 stanton Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -34,4 +34,3 @@ button $w.b3 -text "Sea Green" -width 10 \
 button $w.b4 -text "Yellow" -width 10 \
     -command "$w config -bg Yellow1;    $w.buttons config -bg Yellow1"
 pack $w.b1 $w.b2 $w.b3 $w.b4 -side top -expand yes -pady 2
-

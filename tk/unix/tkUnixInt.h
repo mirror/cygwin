@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkUnixInt.h,v 1.7.6.1 2000/05/04 21:26:30 spolk Exp $
+ * RCS: @(#) $Id: tkUnixInt.h,v 1.4 1999/04/16 01:51:46 stanton Exp $
  */
 
 #ifndef _TKUNIXINT
@@ -27,4 +27,3 @@
 #include "tkIntPlatDecls.h"
 
 #endif /* _TKUNIXINT */
-

@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkWin.h,v 1.7.6.1 2000/05/04 21:26:31 spolk Exp $
+ * RCS: @(#) $Id: tkWin.h,v 1.6 1999/04/16 01:51:48 stanton Exp $
  */
 
 #ifndef _TKWIN
@@ -53,4 +53,3 @@
 # define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif /* _TKWIN */
-

@@ -1,3 +1,36 @@
+2004-09-01  Jim Blandy  <jimb@redhat.com>
+
+	Allow access to all 64 bits of the SPE GPR's in multi-threaded
+	programs.
+	* ppc-tdep.h (struct speregset): New struct type.
+	* ppc-linux-tdep.c: #include "gdb_assert.h".
+	(ppc_linux_supply_speregset, ppc_linux_collect_speregset): New
+	functions.
+	(ppc_linux_speregset): New structure.
+	(ppc_linux_init_abi): Describe how to pass the full 64-bit values
+	of the SPE GPRs across the thread-db interface.
+	* ppc-linux-nat.c (struct gdb_evrregset_t): Doc fix.
+	* Makefile.in (ppc-linux-tdep.o): Update dependencies.
+
+	Allow targets to specify an extended register set, to be passed
+	through libthread_db via its 'xregs' functions.
+	* gdbarch.sh (XREGS_REGSET, XREGS_SIZE, XREGS_NAME): New gdbarch
+	members.
+	* gdbarch.c, gdbarch.h: Regenerated.
+	* proc-service.c: #include "regset.h" and "regcache.h".
+	(ps_lgetxregsize, ps_lgetxregs, ps_lsetxregs): Fill in real
+	implementations of these functions.
+	* thread-db.c: #include "regset.h".
+	(td_thr_getxregsize_p, td_thr_getxregs_p, td_thr_setxregs_p): New
+	variables.
+	(thread_db_load): Initialize them.
+	(warned_xregs_not_implemented): New variable.
+	(thread_db_new_objfile): Clear it here.
+	(thread_db_fetch_registers, thread_db_store_registers): Supply and
+	collect the xregset, too, if the architecture says it has one, and
+	libthread_db seems to be able to support it.
+	* Makefile.in (proc-service.o, thread-db.o): Update dependencies.
+
 2004-08-25  Jim Blandy  <jimb@redhat.com>
 
 	Merge changes from trunk:

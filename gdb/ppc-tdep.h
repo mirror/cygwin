@@ -373,4 +373,16 @@ enum
     ppc_spr_pbu2      = 1023
   };
 
+
+/* The ABI for Motorola's PowerPC Signal Processing Extension (SPE)
+   APU specifies this structure for holding SPE registers in core files.
+
+   At the moment, the kernel doesn't actually dump these, but we use
+   this for passing those registers through libthread_db.  */
+struct speregset {
+  unsigned char gpr[32][8]; /* The full 64-bit general-purpose registers  */ 
+  unsigned char acc[8];     /* accumulator */
+  unsigned char spefscr[4]; /* SPR 512: SPE float status control reg */
+};
+
 #endif

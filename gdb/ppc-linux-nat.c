@@ -129,7 +129,12 @@ typedef char gdb_vrregset_t[SIZEOF_VRREGS];
    bottom halves together.
 
    This is the structure filled in by PTRACE_GETEVRREGS and written to
-   the inferior's registers by PTRACE_SETEVRREGS.  */
+   the inferior's registers by PTRACE_SETEVRREGS.
+
+   Note that this is not the same as 'struct speregset', which
+   describes how the ABI says the kernel dumps SPE-style 64-bit GPR's
+   in core files.  It would be nicer if PTRACE_{GET,SET}EVRREGS and
+   core files used the same layout, but they don't.  */
 struct gdb_evrregset_t
 {
   unsigned long evr[32];

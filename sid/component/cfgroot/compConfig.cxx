@@ -657,28 +657,6 @@ cfgroot_component::run(host_int_4)
   if (! running.ok())
     return;
 
-  // check for time bomb expiration
-  time_t timebomb = SID_TIMEBOMB;
-  if (timebomb != 0)
-    {
-      time_t now = time (0);
-#ifdef HAVE_CTIME
-      const char* timebomb_formatted = ctime (& timebomb);
-#else
-#error "Need ctime!"
-#endif
-
-      if (now > timebomb)
-	{
-	  cerr << "SID license has expired at " << timebomb_formatted << flush;
-	  return;
-	}
-      else if (this->verbose_p)
-	{
-	  cerr << "SID license will expire at " << timebomb_formatted << flush;
-	}
-    }
-
   if (this->component_map.size() == 1)
     {
       cout << "No components - aborting run." << endl;

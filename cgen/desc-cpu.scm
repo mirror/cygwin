@@ -221,6 +221,7 @@ const CGEN_IFLD @arch@_cgen_ifld_table[] =
    "/* Hardware decls.  */\n\n"
    (string-map -gen-hw-decl (current-hw-list))
    "\n"
+   "extern const CGEN_HW_ENTRY @arch@_cgen_hw_table[];\n"
    )
 )
 

@@ -1,5 +1,8 @@
 2003-10-09  Jim Blandy  <jimb@redhat.com>
 
+	* desc-cpu.scm (gen-hw-table-decls): Emit an 'extern' declaration
+	for @arch@_cgen_hw_table.  GDB needs to be able to find this.
+
 	* mach.scm (def-isa-attr!): hardware can have ISA attributes, too.
 
 2003-10-06  Dave Brolley  <brolley@redhat.com>

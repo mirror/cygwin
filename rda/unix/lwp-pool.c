@@ -241,16 +241,16 @@ enum lwp_state {
      stop with a boring WIFSTOPPED SIGSTOP status, but may report an
      interesting status first.
 
-     It's always safe to wait for a thread in this state, so we do
-     that as soon as possible; there shouldn't be any threads in this
-     state between calls to public lwp_pool functions.  This is an
+     It's always safe to wait for an LWP in this state, so we do that
+     as soon as possible; there shouldn't be any LWPs in this state
+     between calls to public lwp_pool functions.  This is an
      internal-use state.  */
   lwp_state_running_stop_pending,
 
   /* STOPPED, STOP PENDING.  This LWP is stopped, and has no
      interesting status to report, but still has a boring status on
      the way.  After we report the status for a STOPPED, STOP PENDING,
-     and INTERESTING thread, this is the state it enters.
+     and INTERESTING LWP, this is the state it enters.
 
      See the note below on why this state is not avoidable.  */
   lwp_state_stopped_stop_pending,
@@ -266,7 +266,7 @@ enum lwp_state {
 /* Why we need lwp_state_stopped_stop_pending:
 
    I originally thought we could avoid having this state at all by
-   simply always continuing STOPPED, STOP PENDING, INTERESTING threads
+   simply always continuing STOPPED, STOP PENDING, INTERESTING LWPs
    in lwp_pool_waitpid as soon as we reported their wait status, and
    then waiting for them immediately, making them either STOPPED and
    un-INTERESTING, or STOPPED, STOP PENDING, and INTERESTING again.
@@ -311,8 +311,8 @@ struct lwp
 
      If STATE is lwp_state_running_stop_pending, then this LWP is on
      the stopping LWP queue, stopping_queue.  (Note that
-     stopping_queue is local to lwp_pool_stop_all; no thread should be
-     in that state by the time that function returns.  */
+     stopping_queue is local to lwp_pool_stop_all; no LWP should be in
+     that state by the time that function returns.  */
   struct lwp *prev, *next;
 
   /* If STATE is one of the lwp_state_*_interesting states, then
@@ -931,11 +931,10 @@ wait_and_handle (struct lwp *l, int flags)
      up multiple statuses per LWP (which we'd rather not implement if
      we can avoid it).
 
-   So, this function takes a thread in lwp_state_running_stop_pending,
-   and puts that thread in either lwp_state_stopped (no stop pending)
-   or some INTERESTING state.  It's really just
-   wait_and_handle, with some error checking wrapped around
-   it.  */
+   So, this function takes an LWP in lwp_state_running_stop_pending,
+   and puts that LWP in either lwp_state_stopped (no stop pending) or
+   some INTERESTING state.  It's really just wait_and_handle, with
+   some error checking wrapped around it.  */
 static int
 check_stop_pending (struct lwp *l)
 {
@@ -1138,7 +1137,7 @@ lwp_pool_stop_all (void)
 	      break;
 
 	    case lwp_state_running_stop_pending:
-	      /* Threads should never be in this state between calls to
+	      /* LWPs should never be in this state between calls to
 		 public lwp_pool functions.  */
 	      assert (l->state != lwp_state_running_stop_pending);
 	      break;
@@ -1163,7 +1162,7 @@ lwp_pool_stop_all (void)
 	return;
       }
 
-  /* Now all threads should be stopped or dead.  But let's check.  */
+  /* Now all LWPs should be stopped or dead.  But let's check.  */
   for (i = 0; i < hash_size; i++)
     {
       struct lwp *l = hash[i];
@@ -1242,7 +1241,7 @@ lwp_pool_continue_all (void)
 	      break;
 
 	    case lwp_state_running_stop_pending:
-	      /* There shouldn't be any threads in this state at this
+	      /* There shouldn't be any LWPs in this state at this
 		 point.  We should be calling check_stop_pending or
 		 wait_and_handle as soon as we create them.  */
 	      assert (l->state != lwp_state_running_stop_pending);

@@ -1,3 +1,7 @@
+2000-12-20  Frank Ch. Eigler  <fche@redhat.com>
+
+	* libstdc++.m4 (CY_LIBSTDCXX_CHECK): Check for cygwin host, not target.
+
 2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
 
         * ltconfig: Changed to accept host AR which is needed by libtool.

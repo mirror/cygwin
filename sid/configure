@@ -1524,7 +1524,7 @@ else
 echo "configure:1613: checking for libstdc++ {static/shared}" >&5
 
   stlibname=libstdc++.a
-  case ${target} in
+  case ${host} in
     *-*-cygwin*) shlibname=libstdc++.dll ;;
     *)           shlibname=libstdc++.so ;;
   esac

@@ -18,7 +18,7 @@ else
   AC_MSG_CHECKING(for libstdc++ {static/shared})
 
   stlibname=libstdc++.a
-  case ${target} in
+  case ${host} in
     *-*-cygwin*) shlibname=libstdc++.dll ;;
     *)           shlibname=libstdc++.so ;;
   esac

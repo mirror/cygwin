@@ -229,7 +229,7 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian, const struc
 	  if (fetchQuad(secHdr+8, littleEndian) & SHF_EXECINSTR)
 	    {
 	      textSections[textSectionCount].lbound = 
-		fetchQuad(secHdr+24, littleEndian);
+		fetchQuad(secHdr+16, littleEndian);
 	      textSections[textSectionCount].hbound = 
 		textSections[textSectionCount].lbound
 		+ fetchQuad(secHdr+32, littleEndian) - 1;
@@ -242,7 +242,7 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian, const struc
 	  if (fetchWord(secHdr+8, littleEndian) & SHF_EXECINSTR)
 	    {
 	      textSections[textSectionCount].lbound = 
-		fetchWord(secHdr+16, littleEndian);
+		fetchWord(secHdr+12, littleEndian);
 	      textSections[textSectionCount].hbound = 
 		textSections[textSectionCount].lbound
 		+ fetchWord(secHdr+20, littleEndian) - 1;

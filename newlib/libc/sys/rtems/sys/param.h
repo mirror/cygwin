@@ -36,11 +36,35 @@
  * SUCH DAMAGE.
  *
  *	@(#)param.h	8.3 (Berkeley) 4/4/95
- * $Id: param.h,v 1.1 2002/11/07 19:27:36 jjohnstn Exp $
+ * $Id: param.h,v 1.2 2003/01/16 22:37:54 jjohnstn Exp $
  */
 
 #ifndef _SYS_PARAM_H_
 #define _SYS_PARAM_H_
+
+/* from newlib's <sys/param.h> */
+
+#include <sys/config.h>
+
+#ifndef BIG_ENDIAN
+#define BIG_ENDIAN 4321
+#endif
+#ifndef LITTLE_ENDIAN
+#define LITTLE_ENDIAN 1234
+#endif
+
+# define HZ (60)
+# define PATHSIZE (1024)
+
+#ifndef BYTE_ORDER
+#ifdef __IEEE_LITTLE_ENDIAN
+#define BYTE_ORDER LITTLE_ENDIAN
+#else
+#define BYTE_ORDER BIG_ENDIAN
+#endif
+#endif
+
+/* end of from newlib's <sys/param.h> */
 
 #include <unistd.h>
 

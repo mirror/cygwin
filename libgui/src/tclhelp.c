@@ -390,6 +390,8 @@ help_command_deleted (ClientData cd)
     free (hdata->filename);
   if (hdata->header_filename != NULL)
     free (hdata->header_filename);
+  if (hdata->help_dir != NULL)
+    free (hdata->help_dir);
   if (hdata->hash_initialized)
     Tcl_DeleteHashTable (&hdata->topic_hash);
   if (hdata->memory_block != NULL)

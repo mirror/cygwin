@@ -1,3 +1,11 @@
+2002-03-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compSched.cxx (host_time_keeper_base ctor): On Cygwin, call
+	timeBeginPeriod to shrink scheduling granularity.  Keep more 
+	statistics.  Initialize more variables.
+	(yield): Rewrite.
+	(operator <<): Print extra stats.
+
 2001-10-17  Dave Brolley  <brolley@redhat.com>
 
 	* compSched.cxx (operator <<): Save state of enable_threshold and

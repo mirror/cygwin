@@ -1,6 +1,6 @@
 // compSched.cxx - the scheduler component.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -43,6 +43,16 @@
 #endif
 #ifdef HAVE_SYS_TIMEB_H
 #include <sys/timeb.h>
+#endif
+#ifdef HAVE_WINDOWS_H
+#include <windows.h>
+#endif
+#ifdef HAVE_MMSYSTEM_H
+#include <mmsystem.h>
+#endif
+
+#ifdef HAVE_SCHED_H
+#include <sched.h>
 #endif
 
 #ifndef HAVE_USLEEP_DECL
@@ -99,11 +109,6 @@ namespace scheduler_component
 
   // Measure time in this size value.
   typedef host_int_8 tick_t;
-
-  // XXX: Due to cygwin 99r1 compiler problems, functions should avoid
-  // returning instances of tick_t.  Instead they return through
-  // references.
-
 
   struct scheduling_event
   {
@@ -193,6 +198,8 @@ operator >> (istream& i, target_time_keeper& it)
   protected:
     unsigned long num_yields;
     float total_yield_time;
+    unsigned long num_sleeping_yields;
+    float total_sleep_time;
     float drowsiness; // the amount by which select/usleep tend to oversleep
 
   public:
@@ -204,43 +211,86 @@ operator >> (istream& i, target_time_keeper& it)
 	this->drowsiness = 0.0;
 	this->num_yields = 0;
 	this->total_yield_time = 0.0;
+	this->num_sleeping_yields = 0;
+	this->total_sleep_time = 0.0;
+
+#if HAVE_LIBWINMM
+	// On Windows, this call is needed to request that the kernel
+	// scheduler make its granularity smaller than the default
+	// 10-100 ms.
+	timeBeginPeriod (1); // 1 ms
+#endif
       }
 
+    ~host_time_keeper_base () throw ()
+    {
+#if HAVE_LIBWINMM
+      timeEndPeriod (1);
+#endif
+    }
 
+
+    // Put the process to sleep until `then'.
     void yield(tick_t then)
       {
 	tick_t n;
 	this->system_now (n);
 
+	if (then < n) then = n;
+
+	// NB: Since we've been asked to yield, let's do so,
+	// even if then == n.
+
+	this->num_yields ++;
+	this->total_yield_time += (then - n);
+
 	// compensate for drowsiness
 	tick_t drowsiness_int = (tick_t) drowsiness;
-	if ((then >= n) && ((then - n) > drowsiness_int))
+
+	if ((then - n) <= drowsiness_int)
 	  {
-	    unsigned long us = ((then - n) - drowsiness_int) * 1000;
-
-	    this->num_yields ++;
-	    this->total_yield_time += (us / 1000.0);
-
-	    // select() is too slow (drowsy) on cygwin
-#if defined(HAVE_SELECT) && !defined(__CYGWIN__)
-	    timeval tv;
-	    tv.tv_usec = (then - n) * 1000;
-	    tv.tv_sec = (then - n) / 1000;
-
-	    select (0, NULL, NULL, NULL, & tv);
-#elif HAVE_USLEEP
-	    usleep (us);
-#else
-	    sleep (us / 1000000);
+	    // usleep is deemed too drowsy .. but we can do a plain process
+	    // yield anyway
+#if HAVE_SCHED_YIELD
+	    sched_yield ();
+#elif __CYGWIN__
+	    Sleep (0);
 #endif
 
+	    // Decay drowsiness slowly, to prevent a momentary
+	    // high-drowsiness pulse from keeping us from trying 
+            // again.
+	    if (UNLIKELY(((this->num_yields & 0xff) == 0) &&
+			 (this->drowsiness > 3.0)))
+	      this->drowsiness *= 0.5;
+
+	    return;
+	  }
+
+	unsigned long ms = ((then - n) - drowsiness_int);
+	if (ms > 1000) ms = 1000; // Clamp it
+	unsigned long us = ms * 1000;
+	
+	this->num_sleeping_yields ++;
+	this->total_sleep_time += ms;
+	
+#if HAVE_USLEEP
+	usleep (us);
+#else
+	sleep (us / 1000000);
+#endif
+	
+	// Help recalibrate the drowsiness measure periodically
+	if (UNLIKELY((this->num_sleeping_yields & 0xf) == 0))
+	  {
 	    tick_t n2;
 	    this->system_now (n2);
-
-	    // Compute moving average
-	    this->drowsiness = 
-	      ((0.99 * this->drowsiness) +
-	       (0.01 * (n2 > then ? (n2 - then) : 0)));
+	    
+	    // Update moving average
+	    this->drowsiness += 0.01 * (n2 - (n + ms));
+            // Clamp it to within reasonable limits
+	    if (this->drowsiness < 0.0) this->drowsiness = 0.0;
+	    if (this->drowsiness > 100.0) this->drowsiness = 100.0;
 	  }
       }
   };
@@ -472,10 +522,13 @@ operator << (ostream& o, const exact_host_time_keeper& it)
   tick_t n;
   it.get_now (n);
   o << "ahtk"
-    << " drwsy=" << it.drowsiness 
-    << " yld=" << it.num_yields;
+    << " drwsy=" << it.drowsiness;
   if (it.num_yields > 0)
-    o << " avg=" << it.total_yield_time / (float)it.num_yields;
+    o << " yld=" << it.num_yields
+      << "*" << it.total_yield_time / (float)it.num_yields << "ms";
+  if (it.num_sleeping_yields > 0)
+    o << " sleep=" << it.num_sleeping_yields
+      << "*" << it.total_sleep_time / (float)it.num_sleeping_yields << "ms";
   return o;
 }
 
@@ -536,8 +589,8 @@ operator >> (istream& i, exact_host_time_keeper& it)
 	else if (irnext)
 	  yield_until = irnext->when;
 	else
-	  // We have no idea how long to yield.  Yield just one
-	  // quantum.
+	  // We have no pending events -> no idea how long to yield.
+	  // Yield just one quantum.
 	  {
 	    this->timer.get_now (yield_until);
 	    yield_until ++;
@@ -1412,13 +1465,14 @@ public:
     clients(0),
     num_clients(0),
     enable_threshold(1),
+    enable_p(1),
     yield_host_time_threshold(1), 
     yield_host_time_p(0), 
+    advance_count(0),
     advance_pin(this, & scheduler_component::advance),
     time_query_pin(this, & scheduler_component::time_query),
     yield_pin(this, & scheduler_component::yield_step_loop)
     {
-      enable_p = enable_threshold;
       scheduler_component_ctor_1();
       scheduler_component_ctor_2();
       scheduler_component_ctor_3();

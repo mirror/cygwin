@@ -1,3 +1,8 @@
+2001-12-18  Dave Brolley  <brolley@redhat.com>
+
+	* cgen-ops.h (ROLHI): New macro.
+	(RORHI): New macro.
+
 2001-12-17  Dave Brolley  <brolley@redhat.com>
 
 	* cgen-ops.h (ADDCHI): Correct return type.

@@ -4098,13 +4098,6 @@ fi
 rm -f conftest*
 
 
-# Tcl8.1 requires writable strings for gcc
-
-if test "$GCC" = "yes"; then
-   LIBGUI_CFLAGS=-fwritable-strings
-else
-   LIBGUI_CFLAGS=
-fi
 
 echo "$as_me:$LINENO: checking for cygwin32" >&5
 echo $ECHO_N "checking for cygwin32... $ECHO_C" >&6

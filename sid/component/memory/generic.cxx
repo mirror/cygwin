@@ -278,7 +278,10 @@ generic_memory::stream_state (ostream& out) const
   out << string2stream(this->image_file_name) << " "
       << this->imageload_pin << " "
       << this->imagestore_pin << endl;
-  
+
+  out << "read-latency " << read_latency;
+  out << "write-latency " << write_latency;
+
   if (this->buffer_length <= 4096) // encode small memories literally
     {
       out << "uncompressed "
@@ -358,6 +361,22 @@ generic_memory::destream_state (istream& in)
       return;
     }
   in >> stream2string(this->image_file_name) >> this->imageload_pin >> this->imagestore_pin;
+
+  in >> key;
+  if (key != "read-latency")
+    {
+      in.setstate (ios::badbit);
+      return;
+    }
+  in >> read_latency;
+
+  in >> key;
+  if (key != "write-latency")
+    {
+      in.setstate (ios::badbit);
+      return;
+    }
+  in >> write_latency;
 
   string coding;
   in >> coding;

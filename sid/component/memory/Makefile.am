@@ -10,8 +10,11 @@ libmemory_la_SOURCES = components.cxx generic.cxx ramrom.cxx flash.cxx \
                        at29.cxx am29.cxx
 libmemory_la_LDFLAGS = -module -no-undefined
 
-pkgdata_DATA = hw-memory-ram_rom-basic.txt hw-memory-flash-am29.txt hw-memory-flash-at29.txt
+pkgdata_DATA = hw-memory-ram_rom-basic.txt hw-memory-flash.txt
 
 DEJAGNUTESTS = am29.exp at29.exp at29xx.exp at29inv.exp at29val.exp genericmemory.exp memdocs.exp memmonkey.exp
 check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs

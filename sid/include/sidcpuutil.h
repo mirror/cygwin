@@ -1,6 +1,6 @@
 // sidcpuutil.h - Elements common to CPU models.  -*- C++ -*-
 
-// Copyright (C) 1999-2001 Red Hat.
+// Copyright (C) 1999, 2000, 2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -195,6 +195,7 @@ namespace sidutil
     bool yield_p;
     sid::host_int_4 step_insn_count;
     sid::host_int_8 total_insn_count;
+    mutable sid::host_int_8 total_latency;
     sid::host_int_4 current_step_insn_count;
     output_pin step_cycles_pin;
   public:
@@ -214,18 +215,21 @@ namespace sidutil
 	this->triggerpoint_manager.check_and_dispatch ();
 
 	// Enter insn loop.  Poll continue_after_insn_p after each instruction
+	sid::host_int_8 prev_latency = this->total_latency;
 	sid::host_int_8 prev_insn_count = this->total_insn_count;
 	if (! this->yield_p)
 	  this->step_insns ();
 	sid::host_int_8 num_insns = this->total_insn_count - prev_insn_count;
+	sid::host_int_8 latency = this->total_latency - prev_latency;
 
 	// Clamp
 	const sid::host_int_4 min_num_cycles = 1;
 	const sid::host_int_4 max_num_cycles = 0x7FFFFFFF;
-	sid::host_int_4 num_cycles = 
-	  num_insns <= min_num_cycles ? min_num_cycles :
-	  num_insns >= max_num_cycles ? max_num_cycles :
-	  num_insns;
+	sid::host_int_8 insn_cycles = num_insns + latency_to_cycles (latency);
+	sid::host_int_4 num_cycles =
+	  insn_cycles <= min_num_cycles ? min_num_cycles :
+	  insn_cycles >= max_num_cycles ? max_num_cycles :
+	  insn_cycles;
 	this->stepped (num_cycles);
       }
     void yield ()
@@ -243,6 +247,12 @@ namespace sidutil
       }
 
   protected:
+    virtual sid::host_int_8 latency_to_cycles (sid::host_int_8 num)
+    {
+      // Identity relationship: 1 latency unit = 1 cycle.
+      return num;
+    }
+
     virtual void step_insns () = 0;
     bool stop_after_insns_p (sid::host_int_4 num)
       {
@@ -313,6 +323,7 @@ namespace sidutil
 	  << " " << this->step_insn_count
 	  << " " << this->enable_step_trap_p
 	  << " " << this->total_insn_count
+	  << " " << this->total_latency
 	  << " " << this->trace_extract_p
 	  << " " << this->trace_result_p
 	  // pins
@@ -333,6 +344,7 @@ namespace sidutil
 	i >> this->step_insn_count
 	  >> this->enable_step_trap_p
 	  >> this->total_insn_count
+	  >> this->total_latency
 	  >> this->trace_extract_p
 	  >> this->trace_result_p
 	  // pins
@@ -406,6 +418,7 @@ namespace sidutil
     
 public:
     basic_cpu ():
+      total_latency (0),
       step_limit ("instruction stepping", 1),
       triggerpoint_manager (this),
       step_pin (this, & basic_cpu::step_pin_handler),
@@ -468,6 +481,7 @@ public:
 	BigOrLittleInt value;
 	sid::bus::status s = 
 	  (LIKELY(this->insn_bus)) ? this->insn_bus->read (address, value) : sid::bus::unmapped;
+	total_latency += s.latency;
 	if (LIKELY(s == sid::bus::ok))
 	  return value;
 
@@ -479,6 +493,7 @@ public:
       {
 	sid::bus::status s = 
 	  (LIKELY(this->insn_bus)) ? this->insn_bus->write (address, value) : sid::bus::unmapped;
+	total_latency += s.latency;
 	if (LIKELY(s == sid::bus::ok))
 	  return value;
 
@@ -491,6 +506,7 @@ public:
 	BigOrLittleInt value;
 	sid::bus::status s = 
 	  (LIKELY(this->data_bus)) ? this->data_bus->read (address, value) : sid::bus::unmapped;
+	total_latency += s.latency;
 	if (LIKELY(s == sid::bus::ok))
 	  return value;
 
@@ -502,6 +518,7 @@ public:
       {
 	sid::bus::status s = 
 	  (LIKELY(this->data_bus)) ? this->data_bus->write (address, value) : sid::bus::unmapped;
+	total_latency += s.latency;
 	if (LIKELY(s == sid::bus::ok))
 	  return value;
 

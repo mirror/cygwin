@@ -1,3 +1,16 @@
+2001-06-24  Ben Elliston  <bje@redhat.com>
+
+	* sidcpuutil.h (basic_cpu::total_latency): New member.
+	(basic_cpu constructor): Initialise it.
+	(basic_cpu::step_pin_handler): Include latency in cycle counts.
+	(basic_cpu::latency_to_cycles): New virtual method.
+	(basic_cpu::read_insn_memory): Add bus latency to total_latency.
+	(basic_cpu::write_insn_memory): Ditto.
+	(basic_cpu::read_data_memory): Ditto.
+	(basic_cpu::write_data_memory): Ditto.
+	(basic_cpu::stream_state): Add total_latency to state snapshot.
+	(basic_cpu::destream_state): Likewise.
+
 2001-06-22  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidcomp.h (API_MAJOR_VERSION, API_MINOR_VERSION): Relabel

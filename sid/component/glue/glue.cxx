@@ -383,6 +383,7 @@ class bus_prober: public virtual component,
   output_pin accesstype_pin;
 
   host_int_4 sample_interval; // 0: disabled
+  string label;
 
 public:
   bus_prober::bus_prober ():
@@ -407,6 +408,7 @@ public:
       
       add_attribute ("sample-interval", & this->sample_interval, "setting");
       add_attribute ("trace?", & this->upstream.verbose_p, "setting");
+      add_attribute ("label", & this->label, "setting");
       add_attribute_ro ("interval-counter", & this->upstream.counter, "register");
 
       // XXX: make watchable
@@ -433,6 +435,9 @@ probing_bus::traceAccess(host_int_4 addr, DataType data, host_int_4 code, bus::s
     (s == bus::unmapped) ? " unmapped!" :
     (s == bus::unpermitted) ? " unpermitted!" : " (unknown)!";
 
+  if (prober->label != "")
+    cout << prober->label << ": ";
+    
   cout << access_type1 << '-' << access_endian << '-' << access_size << ':'
        << make_numeric_attribute (addr, ios::hex | ios::showbase) << ' '
        << access_type2 << ' '

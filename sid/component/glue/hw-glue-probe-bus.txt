@@ -46,7 +46,8 @@ Functionality:
 |           |One line per transaction is shown in a format resembling the common gdb |
 |           |simulators' --trace-core output:                                        |
 |           |                                                                        |
-|           |MODE:ADDRESS ARROW DATA [LATENCY] [STATUS] where MODE is an encoding of |
+|           |[LABEL:] MODE:ADDRESS ARROW DATA [LATENCY] [STATUS] where LABEL is an   |
+|           |optional label identifying the probe component. MODE is an encoding of  |
 |           |the access type: zzz where le and be represent little- or               |
 |           |big-endianness, and 1-8 represent the number of bytes transferred. ARROW|
 |           |is a redundant encoding of direction: {->,<-} for {read,write} ADDRESS  |
@@ -181,6 +182,10 @@ Component Reference:
    |----------------+--------+-------+-------+---------||
    |                |        |       |       |bus      ||
    |type            |pin     |numeric|-      |traffic  ||
+   |                |        |       |       |sampling ||
+   |----------------+--------+-------+-------+---------||
+   |                |        |any    |       |bus      ||
+   |label           |setting |string |-      |traffic  ||
    |                |        |       |       |sampling ||
    +----------------------------------------------------+
 

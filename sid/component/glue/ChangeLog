@@ -1,3 +1,10 @@
+2002-05-27  Ben Elliston  <bje@redhat.com>
+
+	* glue.cxx (bus_prober::label): New member.
+	(bus_prober ctor): Add a corresponding "label" attribute.
+	(probing_bus::traceAccess): Output a component label, if given.
+	* hw-glue-probe-bus.xml: Update documentation.
+
 2001-08-03  matthew green  <mrg@redhat.com>
 
 	* glue.cxx (~sequence_component): Add prototype.

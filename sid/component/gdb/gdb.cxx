@@ -348,7 +348,7 @@ gdb::process_set_reg (int reg)
   string reg_image;
 
   if (trace_gdbsid)
-    cerr << "process_set_reg " << reg << endl;
+    cerr << "process_set_reg " << reg << " = [" << hex;
   
   dbg_register_number_t regno = reg;
   string reg_name = string("gdb-register-") + make_numeric_attribute(regno);
@@ -356,12 +356,15 @@ gdb::process_set_reg (int reg)
   int byte = gdbserv_input_byte (gdbserv);
   while (byte >= 0) 
     {
-      // if (trace_gdbsid)
-      // cerr << "[" << hex << byte << "]" << dec << endl;
+      if (trace_gdbsid)
+	cerr << setw(2) << (unsigned) byte << " ";
       
       reg_image += (char) byte;
       byte = gdbserv_input_byte (gdbserv);
     }
+
+  if (trace_gdbsid)
+    cerr << "]" << dec << endl;
 
   component::status s = cpu->set_attribute_value (reg_name, reg_image);
   if (s != component::ok)

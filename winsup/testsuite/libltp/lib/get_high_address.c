@@ -1,5 +1,3 @@
-/* $Header: /cvs/src/src/winsup/testsuite/libltp/lib/get_high_address.c,v 1.1 2000/09/03 03:52:30 cgf Exp $ */
-
 /*
  *	(C) COPYRIGHT CRAY RESEARCH, INC.
  *	UNPUBLISHED PROPRIETARY INFORMATION.
@@ -7,9 +5,16 @@
  */
 
 #include <unistd.h> 
+#ifdef __CYGWIN__
+#include <windows.h>
+#endif
 
 char *
 get_high_address()
 {
+#ifdef __CYGWIN__
+       return VirtualAlloc (NULL, 4096, MEM_COMMIT, PAGE_NOACCESS) + 2048;
+#else
        return (char *)sbrk(0) + 16384;
+#endif
 }

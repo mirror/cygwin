@@ -1,5 +1,3 @@
-/* $Header: /cvs/src/src/winsup/testsuite/libltp/lib/search_path.c,v 1.1 2000/09/03 03:52:30 cgf Exp $ */
-
 /*
  *	(C) COPYRIGHT CRAY RESEARCH, INC.
  *	UNPUBLISHED PROPRIETARY INFORMATION.

@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: stat06.c,v 1.2 2001/09/15 19:54:04 duda Exp $ */
+/* $Id: stat06.c,v 1.3 2001/09/20 15:44:41 duda Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -128,6 +128,8 @@ void cleanup();
 char *TCID="stat06";		/* Test program identifier.    */
 int TST_TOTAL=8;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
+
+extern char *get_high_address();
 
 int exp_enos[]={0, 0};
 
@@ -327,11 +329,7 @@ high_address_setup()
     for (ind=0; Test_cases[ind].desc != NULL; ind++ ) {
 	if ( Test_cases[ind].pathname == High_address ) {
 	/*if ( strcmp(Test_cases[ind].pathname, HIGH_ADDRESS) == 0 ) { ***/
-#ifndef __CYGWIN__
-	    Test_cases[ind].pathname = (char *)(sbrk(0)+5);
-#else
-	    Test_cases[ind].pathname = (char *)0xffff0000;
-#endif
+	    Test_cases[ind].pathname = get_high_address();
 	    break;
 	}
     }

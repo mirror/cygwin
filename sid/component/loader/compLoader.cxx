@@ -239,7 +239,7 @@ elf_loader::load_function(host_int_8 dest_addr, char *host_addr, host_int_8 file
 	     << " bytes from file offset "
 	     << make_numeric_attribute (file_offset, ios::hex | ios::showbase)
 	     << " into target " << who << " memory at "
-	     << make_numeric_attribute ((void *)dest_addr, ios::hex | ios::showbase)
+	     << make_numeric_attribute (dest_addr, ios::hex | ios::showbase)
 	     << endl;
     }
 
@@ -278,12 +278,7 @@ elf_loader::load_function(host_int_8 dest_addr, char *host_addr, host_int_8 file
 	  little_int_1 data = c;
 	  host_int_4 addr = a;
 
-	  bus::status s;
-
-	  do // loop while memory getting ready
-	    {
-	      s = b->write(addr, data);
-	    } while (s == bus::delayed);
+	  bus::status s = b->write(addr, data);
 
 	  if (s != bus::ok) // abort on error
 	    {

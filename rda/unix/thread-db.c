@@ -1088,10 +1088,30 @@ thread_db_get_gen (struct gdbserv *serv)
 	    }
 	}
 
+      /* If we have no more symbols to look up, try opening a thread
+	 agent.  It's possible that opening an agent could succeed
+	 before we have finished looking up all the symbols, but since
+	 we always loop until all the symbols we know about have been
+	 requested anyway, it's unnecessary.
+
+	 This ensures that ps_pglobal_lookup will always succeed in
+	 the case where we can obtain the full list of symbol names
+	 before opening the agent; this may be a little more robust
+	 than assuming it will handle all errors gracefully.
+	 
+	 Otherwise, if ps_pglobal_lookup fails, it will at least add
+	 the missing symbol's name to the list, and we'll request
+	 their values the next time around.  */
+      symbol_query = next_undefined_symbol ();
+      if (! symbol_query)
+	{
+	  thread_db_open (serv, process->pid);
+	  symbol_query = next_undefined_symbol ();
+	}
+
       /* Now the reply depends on whether there is another 
 	 symbol in need of lookup.  */
-      thread_db_open (serv, process->pid);
-      if ((symbol_query = next_undefined_symbol ()) == NULL)
+      if (! symbol_query)
 	{
 	  gdbserv_output_string (serv, "OK");
 	}

@@ -1,5 +1,9 @@
 2004-10-20  Jim Blandy  <jimb@redhat.com>
 
+	* thread-db.c (thread_db_get_gen): There's no reason to try to
+	open a thread agent until we've at least requested values for all
+	the symbols we know about.
+
 	* server.c (usage): Don't include the entire pathname in the usage
 	message.
 

@@ -43,7 +43,7 @@ else
   # The heuristics are meant to detect and prevent the case where the host may
   # have *some other* shared libstdc++.so installed, say in /usr/lib, even though
   # the compiler only came with a libstdc++.a in some other directory.
-  if test "x$gxx_shlibdir" != "x" -a "x$gxx_stlibdir" = "x$gxx_shlibdir"
+  if test "x$gxx_shlibdir" != "x" -a "x$gxx_shlibdir" != "x." -a "x$gxx_stlibdir" = "x$gxx_shlibdir"
   then
     have_libstdcxx_shared=yes
   else

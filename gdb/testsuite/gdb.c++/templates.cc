@@ -290,7 +290,7 @@ void printf(const char *format, ... )
 
 class T1 {
 public:
-    static void* operator new(size_t);
+    static void* operator new(size_t) throw ();
     static void operator delete(void *pointer);
 
     void operator=(const T1&);
@@ -365,7 +365,7 @@ public:
 };
 
 void* 
-T1::operator new(size_t)
+T1::operator new(size_t) throw ()
 { return 0; }
 
 void
@@ -456,7 +456,7 @@ public:
     T5(int);
     T5(const T5<T>&);
     ~T5();
-    static void* operator new(size_t);
+    static void* operator new(size_t) throw ();
     static void operator delete(void *pointer);
     int value();
     
@@ -479,7 +479,7 @@ T5<T>::~T5()
 
 template<class T>
 void*
-T5<T>::operator new(size_t)
+T5<T>::operator new(size_t) throw ()
 { return 0; }
 
 template<class T>
@@ -516,14 +516,14 @@ public:
     int (*manage[5])(double,
 		     void *(*malloc)(unsigned size),
 		     void (*free)(void *pointer));
-    int (*device[5])(int open(const char *, unsigned mode, unsigned perms, int extra = 0), 
+    int (*device[5])(int open(const char *, unsigned mode, unsigned perms, int extra), 
 		     int *(*read)(int fd, void *place, unsigned size),
 		     int *(*write)(int fd, void *place, unsigned size),
 		     void (*close)(int fd));
 };
 T5<x> t5x(5);
 
-#if !defined(__GNUC__) || (__GNUC__ >= 2 && __GNUC_MINOR__ >= 6)
+#if !defined(__GNUC__) || (__GNUC__ > 2) || (__GNUC__ == 2 && __GNUC_MINOR__ >= 6)
 template class T5<char>;
 template class T5<int>;
 template class T5<int (*)(char, void *)>;
@@ -716,7 +716,7 @@ int main()
 
   Foo<int> fint;
   Foo<char> fchar;
-  Foo<volatile char *> fvpchar;
+  Foo<volatile char *> fvpchar = {0, 0};
 
   Bar<int, 33> bint;
   Bar<int, (4 > 3)> bint2;

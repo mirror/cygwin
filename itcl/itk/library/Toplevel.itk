@@ -63,6 +63,12 @@ itcl::class itk::Toplevel {
             }
             destroy $itk_hull
         }
+        itk_component delete hull
+
+        # Any remaining components must be outside the hull
+        foreach component [component] {
+            destroy [component $component]
+        }
     }
 
     itk_option define -title title Title "" {

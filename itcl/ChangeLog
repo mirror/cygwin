@@ -1,3 +1,16 @@
+2002-02-21  Mo DeJong  <supermo@bayarea.net>
+
+        * itk/library/Toplevel.itk (destructor):
+        * itk/library/Widget.itk (destructor): Remove the
+        hull component after destroying the hull.
+        Destroy any component that still exists after
+        destroying the hull since it must have been
+        created outside the hull.
+        * itk/tests/toplevel.test:
+        * itk/tests/widget.test: Test that a component
+        outside the hull is destroyed when the mega-widget
+        is destroyed.
+
 2002-01-15  Keith Seitz  <keiths@redhat.com>
 
         * itcl/library/itcl.tcl: Add recognition for "class", "body",

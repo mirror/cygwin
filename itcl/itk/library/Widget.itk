@@ -64,6 +64,12 @@ itcl::class itk::Widget {
             }
             destroy $itk_hull
         }
+        itk_component delete hull
+
+        # Any remaining components must be outside the hull
+        foreach component [component] {
+            destroy [component $component]
+        }
     }
 
     private variable itk_hull ""

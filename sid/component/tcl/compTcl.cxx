@@ -624,7 +624,6 @@ tcl_component::tcl_component_ctor_0 ()
   this->bus_status_lut.add (bus::misaligned, "misaligned");
   this->bus_status_lut.add (bus::unmapped, "unmapped");
   this->bus_status_lut.add (bus::unpermitted, "unpermitted");
-  this->bus_status_lut.add (bus::delayed, "delayed");
   
   this->component_status_lut.add (component::ok, "ok");
   this->component_status_lut.add (component::not_found, "not_found");

@@ -61,6 +61,7 @@ namespace xstormy16
       void do_brk ();
       void do_halt ();
       void do_hold ();
+      void do_holdx ();
       
       // Called by semantic code to perform branches.
       inline void

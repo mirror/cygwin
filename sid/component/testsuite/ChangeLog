@@ -1,3 +1,7 @@
+2001-07-13  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.audio/linusraw.exp (deassert tx): Mark test as XFAIL.
+
 2001-06-29  Ben Elliston  <bje@redhat.com>
 
 	* sidcomp.interrupt/cma222-interrupt.exp: Return the right

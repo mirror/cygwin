@@ -4436,7 +4436,8 @@ _ACEOF
   i?86*linux* | \
   powerpc*linux* | \
   arm*linux* | \
-  mips*linux*)
+  mips*linux* | \
+  frv*linux*)
     TARGET_MODULES="linux-target.o thread-db.o ptrace-target.o"
     cat >>confdefs.h <<\_ACEOF
 #define LINUX_TARGET 1

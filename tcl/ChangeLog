@@ -1,3 +1,9 @@
+Fri Oct  5 16:03:53 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* win/configure.in: Add detection for -mwin32 option requirement under
+	cygwin.
+	* win/configure: Regenerate.
+
 2001-09-13  Ian Roxborough  <irox@redhat.com>
 
 	* generic/tclStubInit.tcl: Export tclAlloc functions

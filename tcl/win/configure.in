@@ -41,6 +41,19 @@ AC_PROG_MAKE_SET
 
 AC_CYGWIN
 
+case "${target}" in
+*-*-cygwin*)
+        touch ac$$.c
+        if ${CC} -c -mwin32 ac$$.c >/dev/null 2>&1; then
+            case "$EXTRA_CFLAGS" in
+                *-mwin32*) ;;
+                *) EXTRA_CFLAGS="-mwin32 $EXTRA_CFLAGS" ;;
+            esac
+        fi
+        rm -f ac$$.o ac$$.c
+        ;;
+esac
+
 #--------------------------------------------------------------------
 # Determines the correct binary file extension (.o, .obj, .exe etc.)
 #--------------------------------------------------------------------
@@ -128,7 +141,6 @@ else
     MSVC_TCL_LIB_FILE=${TCL_LIB_FILE}
 fi
 TCL_BIN_DIR=`pwd`
-
 
 TCL_TOOL_LIB_SHORTNAME(TCL_LIB_FLAG, tcl, $TCL_VERSION)
 TCL_TOOL_LIB_SPEC(TCL_BUILD_LIB_SPEC, `pwd`, ${TCL_LIB_FLAG})

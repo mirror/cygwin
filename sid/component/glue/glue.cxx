@@ -1,6 +1,6 @@
 // glue.cxx - miscellaneous glue components.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999-2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -423,16 +423,20 @@ probing_bus::traceAccess(host_int_4 addr, DataType data, host_int_4 code, bus::s
   string access_type2 = (code & 0x100) ? "->" : "<-";
   string access_endian = (code & 0x10) ? "le" : "be";
   unsigned access_size = 1 << (code & 0xF);
+  string access_latency =
+    (s.latency == 0) ? "" : // print nothing for no latency
+    (" l:" + make_numeric_attribute (s.latency));
   string access_status = 
     (s == bus::ok) ? "" : // print nothing for "ok"
     (s == bus::misaligned) ? " misaligned!" :
     (s == bus::unmapped) ? " unmapped!" :
     (s == bus::unpermitted) ? " unpermitted!" : " (unknown)!";
-  
+
   cout << access_type1 << '-' << access_endian << '-' << access_size << ':'
        << make_numeric_attribute (addr, ios::hex | ios::showbase) << ' '
        << access_type2 << ' '
        << make_numeric_attribute (data, ios::hex | ios::showbase) // no trailing space here
+       << access_latency
        << access_status
        << endl;
 }

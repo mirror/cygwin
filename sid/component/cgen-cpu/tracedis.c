@@ -46,8 +46,8 @@ cgen_disassemble(bfd_vma pc,
 //	const bfd_arch_info_type *bfd_lookup_arch(enum bfd_architecture arch, unsigned long machine);
 //		- cgen generated disassemblers call this to find subarch(?).  this one is not easy to
 //		  fix as it uses bfd data.
-//	bfd_vma bfd_get_bits (bfd_byte *addr, int bits, boolean big_p);
-//	void bfd_put_bits (bfd_vma data, bfd_byte *addr, int bits, boolean big_p);
+//	bfd_vma bfd_get_bits (bfd_byte *addr, int bits, bfd_boolean big_p);
+//	void bfd_put_bits (bfd_vma data, bfd_byte *addr, int bits, bfd_boolean big_p);
 //		- these two are small and can be replicated.
 //
 // so that only really leaves bfd_lookup_arch() as an issue...we can hack it.
@@ -105,7 +105,7 @@ bfd_put_bits (data, addr, bits, big_p)
      bfd_vma data;
      bfd_byte *addr;
      int bits;
-     boolean big_p;
+     bfd_boolean big_p;
 {
   int i;
   int bytes;
@@ -128,7 +128,7 @@ bfd_vma
 bfd_get_bits (addr, bits, big_p)
      bfd_byte *addr;
      int bits;
-     boolean big_p;
+     bfd_boolean big_p;
 {
   bfd_vma data;
   int i;

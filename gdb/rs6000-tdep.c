@@ -40,6 +40,7 @@
 #include "sim-regno.h"
 #include "gdb/sim-ppc.h"
 #include "reggroups.h"
+#include "dwarf2-frame.h"
 
 #include "libbfd.h"		/* for bfd_default_set_arch_mach */
 #include "coff/internal.h"	/* for libcoff.h */
@@ -2067,6 +2068,10 @@ rs6000_dwarf2_reg_to_regnum (int num)
   else
     switch (num)
       {
+        /* FIXME: jimb/2004-09-02: I think it's a bug that GCC ever
+           emits this.  But GCC 3.4 does use it in .debug_frame.  */
+      case 65:
+        return tdep->ppc_lr_regnum;
       case 67:
         return tdep->ppc_vrsave_regnum - 1; /* vscr */
       case 99:
@@ -3280,6 +3285,9 @@ rs6000_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
 
   /* Helpers for function argument information.  */
   set_gdbarch_fetch_pointer_argument (gdbarch, rs6000_fetch_pointer_argument);
+
+  /* Hook in the DWARF CFI frame unwinder.  */
+  frame_unwind_append_sniffer (gdbarch, dwarf2_frame_sniffer);
 
   /* Hook in ABI-specific overrides, if they have been registered.  */
   gdbarch_init_osabi (info, gdbarch);

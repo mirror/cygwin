@@ -1,8 +1,8 @@
 .rn '' }`
-''' $RCSfile: strings.1,v $$Revision: 1.7 $$Date: 2001/03/25 20:32:25 $
+''' $RCSfile: readelf.1,v $$Revision: 1.1 $$Date: 2001/03/25 20:32:25 $
 '''
-''' $Log: strings.1,v $
-''' Revision 1.7  2001/03/25 20:32:25  nickc
+''' $Log: readelf.1,v $
+''' Revision 1.1  2001/03/25 20:32:25  nickc
 ''' Automate generate on man pages
 '''
 '''
@@ -96,7 +96,7 @@
 .nr % 0
 .rr F
 .\}
-.TH STRINGS.1 1 "binutils-2.11.90" "23/Mar/101" "GNU"
+.TH READELF.1 1 "binutils-2.11.90" "23/Mar/101" "GNU"
 .UC
 .if n .hy 0
 .ds C+ C\v'-.1v'\h'-1p'\s-2+\h'-1p'+\s0\v'.1v'\h'-1p'
@@ -190,55 +190,105 @@
 .\}
 .rm #[ #] #H #V #F C
 .SH "NAME"
-strings \- print the strings of printable characters in files.
+readelf \- Displays information about ELF files.
 .SH "SYNOPSIS"
-strings [\-afov] [\-\fImin-len\fR] [\-n \fImin-len\fR] [\-t \fIradix\fR] [\-]
-        [--all] [--print-file-name] [--bytes=\fImin-len\fR]
-        [--radix=\fIradix\fR] [--target=\fIbfdname\fR]
-        [--help] [--version] \fIfile\fR...
+readelf [ \-a | --all ] 
+        [ \-h | --file-header]
+        [ \-l | --program-headers | --segments]
+        [ \-S | --section-headers | --sections]
+        [ \-e | --headers]
+        [ \-s | --syms | --symbols]
+        [ \-n | --notes]
+        [ \-r | --relocs]
+        [ \-u | --unwind]
+        [ \-d | --dynamic]
+        [ \-V | --version-info]
+        [ \-D | --use-dynamic]
+        [ \-x <number> | --hex-dump=<number>]
+        [ \-w[liaprf] | --debug-dump[=info,=line,=abbrev,=pubnames,=ranges,=frames]]
+        [      --histogram]
+        [ \-v | --version]
+        [ \-H | --help]
+        \fIelffile\fR...
 .SH "DESCRIPTION"
-For each \fIfile\fR given, GNU \f(CWstrings\fR prints the printable
-character sequences that are at least 4 characters long (or the number
-given with the options below) and are followed by an unprintable
-character.  By default, it only prints the strings from the initialized
-and loaded sections of object files; for other types of files, it prints
-the strings from the whole file.
+\f(CWreadelf\fR displays information about one or more ELF format object
+files.  The options control what particular information to display.
 .PP
-\f(CWstrings\fR is mainly useful for determining the contents of non-text
-files.
+\fIelffile\fR... are the object files to be examined.  At the
+moment, \f(CWreadelf\fR does not support examining archives, nor does it
+support examing 64 bit ELF files.
 .SH "OPTIONS"
+The long and short forms of options, shown here as alternatives, are
+equivalent.  At least one option besides \fB\-v\fR or \fB\-H\fR must be
+given. 
 .Ip "\f(CW-a\fR" 4
 .Ip "\f(CW--all\fR" 4
-.Ip "\f(CW-\fR" 4
-Do not scan only the initialized and loaded sections of object files;
-scan the whole files.
-.Ip "\f(CW-f\fR" 4
-.Ip "\f(CW--print-file-name\fR" 4
-Print the name of the file before each string.
-.Ip "\f(CW--help\fR" 4
-Print a summary of the program usage on the standard output and exit.
-.Ip "\f(CW-\fImin-len\fR\fR" 4
-.Ip "\f(CW-n \fImin-len\fR\fR" 4
-.Ip "\f(CW--bytes=\fImin-len\fR\fR" 4
-Print sequences of characters that are at least \fImin-len\fR characters
-long, instead of the default 4.
-.Ip "\f(CW-o\fR" 4
-Like \fB\-t o\fR.  Some other versions of \f(CWstrings\fR have \fB\-o\fR
-act like \fB\-t d\fR instead.  Since we can not be compatible with both
-ways, we simply chose one.
-.Ip "\f(CW-t \fIradix\fR\fR" 4
-.Ip "\f(CW--radix=\fIradix\fR\fR" 4
-Print the offset within the file before each string.  The single
-character argument specifies the radix of the offset---\fBo\fR for
-octal, \fBx\fR for hexadecimal, or \fBd\fR for decimal.
-.Ip "\f(CW--target=\fIbfdname\fR\fR" 4
-Specify an object code format other than your system's default format.
+Equivalent to specifiying \fB--file-header\fR,
+\fB--program-headers\fR, \fB--sections\fR, \fB--symbols\fR,
+\fB--relocs\fR, \fB--dynamic\fR, \fB--notes\fR and
+\fB--version-info\fR. 
+.Ip "\f(CW-h\fR" 4
+.Ip "\f(CW--file-header\fR" 4
+Displays the information contained in the \s-1ELF\s0 header at the start of the
+file.
+.Ip "\f(CW-l\fR" 4
+.Ip "\f(CW--program-headers\fR" 4
+.Ip "\f(CW--segments\fR" 4
+Displays the information contained in the file's segment headers, if it
+has any.
+.Ip "\f(CW-S\fR" 4
+.Ip "\f(CW--sections\fR" 4
+.Ip "\f(CW--section-headers\fR" 4
+Displays the information contained in the file's section headers, if it
+has any.
+.Ip "\f(CW-s\fR" 4
+.Ip "\f(CW--symbols\fR" 4
+.Ip "\f(CW--syms\fR" 4
+Displays the entries in symbol table section of the file, if it has one.
+.Ip "\f(CW-e\fR" 4
+.Ip "\f(CW--headers\fR" 4
+Display all the headers in the file.  Equivalent to \fB\-h \-l \-S\fR.
+.Ip "\f(CW-n\fR" 4
+.Ip "\f(CW--notes\fR" 4
+Displays the contents of the \s-1NOTE\s0 segment, if it exists.
+.Ip "\f(CW-r\fR" 4
+.Ip "\f(CW--relocs\fR" 4
+Displays the contents of the file's relocation section, if it has one.
+.Ip "\f(CW-u\fR" 4
+.Ip "\f(CW--unwind\fR" 4
+Displays the contents of the file's unwind section, if it has one.  Only
+the unwind sections for \s-1IA64\s0 \s-1ELF\s0 files are currently supported.
+.Ip "\f(CW-d\fR" 4
+.Ip "\f(CW--dynamic\fR" 4
+Displays the contents of the file's dynamic section, if it has one.
+.Ip "\f(CW-V\fR" 4
+.Ip "\f(CW--version-info\fR" 4
+Displays the contents of the version sections in the file, it they
+exist.
+.Ip "\f(CW-D\fR" 4
+.Ip "\f(CW--use-dynamic\fR" 4
+When displaying symbols, this option makes \f(CWreadelf\fR use the
+symbol table in the file's dynamic section, rather than the one in the
+symbols section.
+.Ip "\f(CW-x <number>\fR" 4
+.Ip "\f(CW--hex-dump=<number>\fR" 4
+Displays the contents of the indicated section as a hexadecimal dump.
+.Ip "\f(CW-w[liaprf]\fR" 4
+.Ip "\f(CW--debug-dump[=line,=info,=abbrev,=pubnames,=ranges,=frames]\fR" 4
+Displays the contents of the debug sections in the file, if any are
+present.  If one of the optional letters or words follows the switch
+then only data found in those specific sections will be dumped.
+.Ip "\f(CW--histogram\fR" 4
+Display a histogram of bucket list lengths when displaying the contents
+of the symbol tables.
 .Ip "\f(CW-v\fR" 4
 .Ip "\f(CW--version\fR" 4
-Print the program version number on the standard output and exit.
+Display the version number of readelf.
+.Ip "\f(CW-H\fR" 4
+.Ip "\f(CW--help\fR" 4
+Display the command line options understood by \f(CWreadelf\fR.
 .SH "SEE ALSO"
-\fIar\fR\|(1), \fInm\fR\|(1), \fIobjdump\fR\|(1), \fIranlib\fR\|(1), \fIreadelf\fR\|(1)
-and the Info entries for \fIbinutils\fR.
+\fIobjdump\fR\|(1), and the Info entries for \fIbinutils\fR.
 .SH "COPYRIGHT"
 Copyright (c) 1991, 92, 93, 94, 95, 96, 97, 98, 99, 2000, 2001 Free Software Foundation, Inc.
 .PP
@@ -250,8 +300,8 @@ Back-Cover Texts.  A copy of the license is included in the
 section entitled \*(L"GNU Free Documentation License\*(R".
 
 .rn }` ''
-.IX Title "STRINGS.1 1"
-.IX Name "strings - print the strings of printable characters in files."
+.IX Title "READELF.1 1"
+.IX Name "readelf - Displays information about ELF files."
 
 .IX Header "NAME"
 
@@ -265,31 +315,73 @@ section entitled \*(L"GNU Free Documentation License\*(R".
 
 .IX Item "\f(CW--all\fR"
 
-.IX Item "\f(CW-\fR"
+.IX Item "\f(CW-h\fR"
 
-.IX Item "\f(CW-f\fR"
+.IX Item "\f(CW--file-header\fR"
 
-.IX Item "\f(CW--print-file-name\fR"
+.IX Item "\f(CW-l\fR"
 
-.IX Item "\f(CW--help\fR"
+.IX Item "\f(CW--program-headers\fR"
 
-.IX Item "\f(CW-\fImin-len\fR\fR"
+.IX Item "\f(CW--segments\fR"
 
-.IX Item "\f(CW-n \fImin-len\fR\fR"
+.IX Item "\f(CW-S\fR"
 
-.IX Item "\f(CW--bytes=\fImin-len\fR\fR"
+.IX Item "\f(CW--sections\fR"
 
-.IX Item "\f(CW-o\fR"
+.IX Item "\f(CW--section-headers\fR"
 
-.IX Item "\f(CW-t \fIradix\fR\fR"
+.IX Item "\f(CW-s\fR"
 
-.IX Item "\f(CW--radix=\fIradix\fR\fR"
+.IX Item "\f(CW--symbols\fR"
 
-.IX Item "\f(CW--target=\fIbfdname\fR\fR"
+.IX Item "\f(CW--syms\fR"
+
+.IX Item "\f(CW-e\fR"
+
+.IX Item "\f(CW--headers\fR"
+
+.IX Item "\f(CW-n\fR"
+
+.IX Item "\f(CW--notes\fR"
+
+.IX Item "\f(CW-r\fR"
+
+.IX Item "\f(CW--relocs\fR"
+
+.IX Item "\f(CW-u\fR"
+
+.IX Item "\f(CW--unwind\fR"
+
+.IX Item "\f(CW-d\fR"
+
+.IX Item "\f(CW--dynamic\fR"
+
+.IX Item "\f(CW-V\fR"
+
+.IX Item "\f(CW--version-info\fR"
+
+.IX Item "\f(CW-D\fR"
+
+.IX Item "\f(CW--use-dynamic\fR"
+
+.IX Item "\f(CW-x <number>\fR"
+
+.IX Item "\f(CW--hex-dump=<number>\fR"
+
+.IX Item "\f(CW-w[liaprf]\fR"
+
+.IX Item "\f(CW--debug-dump[=line,=info,=abbrev,=pubnames,=ranges,=frames]\fR"
+
+.IX Item "\f(CW--histogram\fR"
 
 .IX Item "\f(CW-v\fR"
 
 .IX Item "\f(CW--version\fR"
+
+.IX Item "\f(CW-H\fR"
+
+.IX Item "\f(CW--help\fR"
 
 .IX Header "SEE ALSO"
 

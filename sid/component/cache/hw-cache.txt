@@ -18,7 +18,7 @@ Functionality:
 
    The parameters of the cache are a matter of configuration. At
    instantiation time, the following parameters are specified:
-     * cache size in KB (8, 16, 32, 64, 128, 256, 512)
+     * cache size in KB (4, 8, 16, 32, 64, 128, 256, 512)
      * line size in bytes (16, 32, 64, 128)
      * associativity (direct, full, 2way, 4way)
      * replacement policy for N-way and fully associative caches (lru, fifo,

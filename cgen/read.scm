@@ -87,20 +87,6 @@
 ; If a routine to initialize compiled-in code is defined, run it.
 (if (defined? 'cgen-init-c) (cgen-init-c))
 
-; Don't use the debugging evaluator unless asked for.
-(if (not (defined? 'DEBUG-EVAL))
-    (define DEBUG-EVAL #f))
-
-(if (and (not DEBUG-EVAL)
-	 (memq 'debug-extensions *features*))
-    (begin
-      (debug-disable 'debug)
-      (read-disable 'positions)
-      ))
-
-; Extend the default limits of the interpreter stack
-(debug-set! stack 100000)
-
 ; If this is set to #f, the file is always loaded.
 ; Don't override any current setting, e.g. from dev.scm.
 (if (not (defined? 'CHECK-LOADED?))
@@ -913,24 +899,6 @@ Define a preprocessor-style macro.
 	       (cons (cons opt #f) (cdr argv))))))
 )
 
-; Used to ensure backtraces are printed if an error occurs.
-
-(define (catch-with-backtrace thunk)
-  (lazy-catch #t thunk
-	      (lambda args
-		;(display args (current-error-port))
-		;(newline (current-error-port))
-		; display-error takes 6 arguments.
-		; If `quit' is called from elsewhere, it may not have 6
-		; arguments.  Not sure how best to handle this.
-		(if (= (length args) 5)
-		    (begin
-		      (apply display-error #f (current-error-port) (cdr args))
-		      (save-stack)
-		      (backtrace)))
-		(quit 1)))
-)
-
 ; Return (cadr args) or print a pretty error message if not possible.
 
 (define (option-arg args)
@@ -1088,6 +1056,7 @@ Define a preprocessor-style macro.
 	    (keep-isa "all")  ; default is all isas
 	    (flags "")
 	    (moreopts? #t)
+	    (debugging #f)    ; default is off, for speed
 	    (cep (current-error-port))
 	    (str=? string=?)
 	    )
@@ -1105,15 +1074,7 @@ Define a preprocessor-style macro.
 		      (set! arch-file arg)
 		      )
 		     ((str=? "-b" (car opt))
-		      (if (memq 'debug-extensions *features*)
-			  (begin
-			    (debug-enable 'backtrace)
-			    (debug-enable 'debug)
-			    (debug-enable 'backwards)
-			    (debug-set! depth 2000)
-			    (debug-set! maxdepth 2000)
-			    (debug-set! frames 10)
-			    (read-enable 'positions)))
+		      (set! debugging #t)
 		      )
 		     ((str=? "-d" (car opt))
 		      (let ((prompt (string-append "cgen-" app-name "> ")))
@@ -1167,51 +1128,51 @@ Define a preprocessor-style macro.
 
 	; All arguments have been parsed.
 
-	(if (not arch-file)
-	    (error "-a option missing, no architecture specified"))
+	(cgen-call-with-debugging
+	 debugging
+	 (lambda ()
 
-	(if repl?
-	    (debug-repl nil))
-	(cpu-load arch-file
-		  keep-mach keep-isa flags
-		  app-init! app-finish! app-analyze!)
-	; Start another repl loop if -d.
-	; Awkward.  Both places are useful, though this is more useful.
-	(if repl?
-	    (debug-repl nil))
+	   (if (not arch-file)
+	       (error "-a option missing, no architecture specified"))
 
-	; Done with processing the arguments.
-	; Application arguments are processed in two passes.
-	; This is because the app may have arguments that specify things
-	; that affect file generation (e.g. to specify another input file)
-	; and we don't want to require an ordering of the options.
+	   (if repl?
+	       (debug-repl nil))
+	   (cpu-load arch-file
+		     keep-mach keep-isa flags
+		     app-init! app-finish! app-analyze!)
 
-	(for-each (lambda (opt-arg)
-		    (let ((opt (car opt-arg))
-			  (arg (cdr opt-arg)))
-		      (if (cadr opt)
-			  ((opt-get-first-pass opt) arg)
-			  ((opt-get-first-pass opt)))))
-		  (reverse app-args))
+	   ;; Start another repl loop if -d.
+	   ;; Awkward.  Both places are useful, though this is more useful.
+	   (if repl?
+	       (debug-repl nil))
 
-	(for-each (lambda (opt-arg)
-		    (let ((opt (car opt-arg))
-			  (arg (cdr opt-arg)))
-		      (if (cadr opt)
-			  ((opt-get-second-pass opt) arg)
-			  ((opt-get-second-pass opt)))))
-		  (reverse app-args))
+	   ;; Done with processing the arguments.  Application arguments
+	   ;; are processed in two passes.  This is because the app may
+	   ;; have arguments that specify things that affect file
+	   ;; generation (e.g. to specify another input file) and we
+	   ;; don't want to require an ordering of the options.
+	   (for-each (lambda (opt-arg)
+		       (let ((opt (car opt-arg))
+			     (arg (cdr opt-arg)))
+			 (if (cadr opt)
+			     ((opt-get-first-pass opt) arg)
+			     ((opt-get-first-pass opt)))))
+		     (reverse app-args))
+
+	   (for-each (lambda (opt-arg)
+		       (let ((opt (car opt-arg))
+			     (arg (cdr opt-arg)))
+			 (if (cadr opt)
+			     ((opt-get-second-pass opt) arg)
+			     ((opt-get-second-pass opt)))))
+		     (reverse app-args))))
 	)
       )
     #f) ; end of lambda
 )
 
 ; Main entry point called by application file generators.
-; Cover fn to -cgen that uses catch-with-backtrace.
-; ??? (debug-enable 'backtrace) might also work except I seem to remember
-; having problems with it.  They may be fixed now.
-
 (define cgen
   (lambda args
-    (catch-with-backtrace (lambda () (apply -cgen args))))
+    (cgen-debugging-stack-start -cgen args))
 )

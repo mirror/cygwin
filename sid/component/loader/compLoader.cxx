@@ -68,7 +68,8 @@ class loader_probe_bus: public sidutil::passthrough_bus
   public:
     loader_probe_bus (sid::bus **t, output_pin *p) :
       sidutil::passthrough_bus (t),
-      write_to_code_address_pin (p)
+      write_to_code_address_pin (p),
+      section_table (0)
     {
       assert (t);
     }

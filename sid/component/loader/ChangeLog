@@ -1,3 +1,8 @@
+2004-04-29  Dave Brolley  <brolley@redhat.com>
+
+	* elfload.c (textSectionAddress): Check section table before accessing.
+	* compLoader.cxx (loader_probe_bus): Initialize section_table.
+
 2004-02-26  Dave Brolley  <brolley@redhat.com>
 
 	* elfload.c (textSectionNum): Now file level static.

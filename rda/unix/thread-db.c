@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <dlfcn.h>
 #include <thread_db.h>
 #include <signal.h>
@@ -33,6 +34,7 @@
 #include <sys/wait.h>
 
 #include "gdbserv.h"
+#include "gdbserv-utils.h"
 #include "gdbserv-target.h"
 #include "server.h"
 #include "gdb_proc_service.h"
@@ -866,8 +868,7 @@ thread_db_open (struct gdbserv *serv, int pid)
 	}
       else if (thread_db_noisy)
 	{
-	  fprintf (stderr, "< -- failed, thread_agent = 0x%08x>\n", 
-		   (long) thread_agent);
+	  fprintf (stderr, "< -- failed, thread_agent = %p>\n", thread_agent);
 	}
       return 0;		/* failure */
     }
@@ -1646,7 +1647,7 @@ wait_all_threads (struct child_process *process)
 	    else
 	      {
 		if (thread_db_noisy)
-		  fprintf (stderr, "<wait_all_threads: stash sig %d for %d at 0x%08x>\n",
+		  fprintf (stderr, "<wait_all_threads: stash sig %d for %d at 0x%08lx>\n",
 			   stopsig, thread->ti.ti_lid,
 			  (unsigned long) debug_get_pc (process->serv,
 			                                thread->ti.ti_lid));
@@ -1691,9 +1692,7 @@ continue_thread (struct gdbserv_thread *thread, int signal)
 static void
 continue_all_threads (struct gdbserv *serv)
 {
-  struct child_process *process = gdbserv_target_data (serv);
   struct gdbserv_thread *thread;
-  int signal;
 
   for (thread = first_thread_in_list ();
        thread;
@@ -1922,9 +1921,10 @@ thread_db_check_child_state (struct child_process *process)
 	     bad from the point of view of synchronization. */
 	  handle_waitstatus (process, w);
 	  if (thread_db_noisy)
-	    fprintf (stderr, "<check_child_state: %d got '%c' - %d at 0x%08x>\n", 
+	    fprintf (stderr,
+		     "<check_child_state: %d got '%c' - %d at 0x%08lx>\n", 
 		     process->pid, process->stop_status, process->stop_signal,
-		     (unsigned long) debug_get_pc (process->serv, process->pid));
+		     debug_get_pc (process->serv, process->pid));
 
 	  /* Update the thread list. */
 	  update_thread_list ();
@@ -2038,7 +2038,6 @@ thread_db_get_thread_reg (struct gdbserv *serv,
 {
   struct child_process *process = gdbserv_target_data (serv);
   td_thrhandle_t thread_handle;
-  td_thrinfo_t   ti;
   FPREGSET_T fpregset;
   GREGSET_T gregset;
   td_err_e ret;
@@ -2082,8 +2081,8 @@ thread_db_get_thread_reg (struct gdbserv *serv,
     }
   else if (ret != TD_OK)
     {
-      fprintf (stderr, "<<< ERROR get_thread_reg map_id2thr %d >>>\n",
-	       thread->ti.ti_tid);
+      fprintf (stderr, "<<< ERROR get_thread_reg map_id2thr %lu >>>\n",
+	       (unsigned long) thread->ti.ti_tid);
       return -1;	/* fail */
     }
 
@@ -2098,8 +2097,8 @@ thread_db_get_thread_reg (struct gdbserv *serv,
       /* Now extract the register from the fpregset. */
       if (reg_from_fpregset (serv, reg, regnum, &fpregset) < 0)
 	{
-	  fprintf (stderr, "<<< ERROR reg_from_fpregset %d %d>>>\n",
-		   thread->ti.ti_tid, regnum);
+	  fprintf (stderr, "<<< ERROR reg_from_fpregset %lu %d>>>\n",
+		   (unsigned long) thread->ti.ti_tid, regnum);
 	  return -1;
 	}
     }
@@ -2138,8 +2137,8 @@ thread_db_get_thread_reg (struct gdbserv *serv,
       /* Now extract the register from the extended regset.  */
       if (reg_from_xregset (serv, reg, regnum, xregset) < 0)
 	{
-	  fprintf (stderr, "<<< ERROR reg_from_xregset %d %d>>>\n",
-		   thread->ti.ti_tid, regnum);
+	  fprintf (stderr, "<<< ERROR reg_from_xregset %lu %d>>>\n",
+		   (unsigned long) thread->ti.ti_tid, regnum);
 	  return -1;
 	}
     }
@@ -2147,15 +2146,16 @@ thread_db_get_thread_reg (struct gdbserv *serv,
     {
       if (thread_db_getgregs (&thread_handle, gregset) != TD_OK)
 	{
-	  fprintf (stderr, "<<< ERROR get_thread_reg td_thr_getgregs %d >>>\n",
-		   thread->ti.ti_tid);
+	  fprintf (stderr,
+		   "<<< ERROR get_thread_reg td_thr_getgregs %lu >>>\n",
+		   (unsigned long) thread->ti.ti_tid);
 	  return -1;	/* fail */
 	}
       /* Now extract the requested register from the gregset. */
       if (reg_from_gregset (serv, reg, regnum, gregset) < 0)
 	{
-	  fprintf (stderr, "<<< ERROR reg_from_gregset %d %d>>>\n", 
-		   thread->ti.ti_tid, regnum);
+	  fprintf (stderr, "<<< ERROR reg_from_gregset %lu %d>>>\n", 
+		   (unsigned long) thread->ti.ti_tid, regnum);
 	  return -1;	/* fail */
 	}
     }
@@ -2219,8 +2219,8 @@ thread_db_set_thread_reg (struct gdbserv *serv,
     }
   else if (ret != TD_OK)
     {
-      fprintf (stderr, "<<< ERROR set_thread_reg map_id2thr %d >>>\n",
-	       thread->ti.ti_tid);
+      fprintf (stderr, "<<< ERROR set_thread_reg map_id2thr %lu >>>\n",
+	       (unsigned long) thread->ti.ti_tid);
       return -1;	/* fail */
     }
 
@@ -2237,15 +2237,16 @@ thread_db_set_thread_reg (struct gdbserv *serv,
       /* Now write the new reg value into the fpregset. */
       if (reg_to_fpregset (serv, reg, regnum, &fpregset) < 0)
 	{
-	  fprintf (stderr, "<<< ERROR reg_to_fpregset %d %d >>>\n",
-		   thread->ti.ti_tid, regnum);
+	  fprintf (stderr, "<<< ERROR reg_to_fpregset %lu %d >>>\n",
+		   (unsigned long) thread->ti.ti_tid, regnum);
 	  return -1;	/* fail */
 	}
       /* Now write the fpregset back to the child. */
       if (thread_db_setfpregs (&thread_handle, &fpregset) != TD_OK)
 	{
-	  fprintf (stderr, "<<< ERROR set_thread_reg td_thr_setfpregs %d>>>\n",
-		   thread->ti.ti_tid);
+	  fprintf (stderr,
+		   "<<< ERROR set_thread_reg td_thr_setfpregs %lu>>>\n",
+		   (unsigned long) thread->ti.ti_tid);
 	  return -1;	/* fail */
 	}
     }
@@ -2284,15 +2285,16 @@ thread_db_set_thread_reg (struct gdbserv *serv,
       /* Now write the new reg value into the extended regset. */
       if (reg_to_xregset (serv, reg, regnum, xregset) < 0)
 	{
-	  fprintf (stderr, "<<< ERROR reg_to_xregset %d %d >>>\n", 
-		   thread->ti.ti_tid, regnum);
+	  fprintf (stderr, "<<< ERROR reg_to_xregset %lu %d >>>\n", 
+		   (unsigned long) thread->ti.ti_tid, regnum);
 	  return -1;	/* fail */
 	}
       /* Now write the extended regset back to the child. */
       if (td_thr_setxregs_p (&thread_handle, gregset) != TD_OK)
 	{
-	  fprintf (stderr, "<<< ERROR set_thread_reg td_thr_setxregs %d >>>\n",
-		   thread->ti.ti_tid);
+	  fprintf (stderr,
+		   "<<< ERROR set_thread_reg td_thr_setxregs %lu >>>\n",
+		   (unsigned long) thread->ti.ti_tid);
 	  return -1;	/* fail */
 	}
     }
@@ -2301,22 +2303,24 @@ thread_db_set_thread_reg (struct gdbserv *serv,
       /* First get the current gregset.  */
       if (thread_db_getgregs (&thread_handle, gregset) != TD_OK)
 	{
-	  fprintf (stderr, "<<< ERROR set_thread_reg td_thr_getgregs %d >>>\n",
-		   thread->ti.ti_tid);
+	  fprintf (stderr,
+		   "<<< ERROR set_thread_reg td_thr_getgregs %lu >>>\n",
+		   (unsigned long) thread->ti.ti_tid);
 	  return -1;	/* fail */
 	}
       /* Now write the new reg value into the gregset. */
       if (reg_to_gregset (serv, reg, regnum, gregset) < 0)
 	{
-	  fprintf (stderr, "<<< ERROR reg_to_gregset %d %d >>>\n", 
-		   thread->ti.ti_tid, regnum);
+	  fprintf (stderr, "<<< ERROR reg_to_gregset %lu %d >>>\n", 
+		   (unsigned long) thread->ti.ti_tid, regnum);
 	  return -1;	/* fail */
 	}
       /* Now write the gregset back to the child. */
       if (thread_db_setgregs (&thread_handle, gregset) != TD_OK)
 	{
-	  fprintf (stderr, "<<< ERROR set_thread_reg td_thr_setgregs %d >>>\n",
-		   thread->ti.ti_tid);
+	  fprintf (stderr,
+		   "<<< ERROR set_thread_reg td_thr_setgregs %lu >>>\n",
+		   (unsigned long) thread->ti.ti_tid);
 	  return -1;	/* fail */
 	}
     }
@@ -2336,7 +2340,6 @@ thread_db_attach (struct gdbserv *serv, struct gdbserv_target *target)
   td_err_e ret;
   struct child_process *process = target->data;
   extern struct server_vector gdbserver;
-  paddr_t dummy;
 
   if ((thread_db_dlopen ()) < 0)
     return -1;			/* fail */

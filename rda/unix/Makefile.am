@@ -2,6 +2,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+AM_CFLAGS = -Wall
+
 noinst_PROGRAMS = rda
 
 INCLUDES = -I$(srcdir) -I$(srcdir)/../include 

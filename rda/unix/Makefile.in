@@ -179,6 +179,7 @@ target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
 AUTOMAKE_OPTIONS = foreign
+AM_CFLAGS = -Wall
 INCLUDES = -I$(srcdir) -I$(srcdir)/../include 
 rda_SOURCES = server.c 
 EXTRA_rda_SOURCES = linux-target.c solaris-target.c \

@@ -1,3 +1,11 @@
+2005-01-27  Jim Blandy  <jimb@redhat.com>
+
+	* utils.scm (string/symbol->append): Renamed from 'concat'.
+	* opcodes.scm (gen-switch): Use new name.
+	* insn.scm (-sub-insn-make!): Same.
+	* rtl.scm (rtx-dump): Same.
+	* semantics.scm (semantic-compile): Same.
+
 2005-01-20  Jim Blandy  <jimb@redhat.com>
 
 	* opcodes.scm (gen-switch): Use concat instead of string-map. 

@@ -53,7 +53,7 @@
         (log_summary): Add summary for KFAIL and KPASS.
         (unknown): Update comment.
         * doc/dejagnu.texi: Document the above.
-        * lib/libsup.exp: Add counters for KFAIL and KPASS.
+        * testsuite/lib/libsup.exp: Add counters for KFAIL and KPASS.
         * testsuite/runtest.all/stats-sub.exp: Test kfail and kpass.
         * testsuite/runtest.all/stats.exp: Ditto.
 

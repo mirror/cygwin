@@ -1,21 +1,22 @@
 /* Target definitions for delta68.
    Copyright 1993, 1994, 1998 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* Define BPT_VECTOR if it is different than the default.
    This is the vector number used by traps to indicate a breakpoint. */
@@ -75,18 +76,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Return number of args passed to a frame.
    Can return -1, meaning no way to tell.  */
 
-#define FRAME_NUM_ARGS(val, fi)  \
-{ register CORE_ADDR pc = FRAME_SAVED_PC (fi);			\
-  register int insn = 0177777 & read_memory_integer (pc, 2);	\
-  val = 0;							\
-  if (insn == 0047757 || insn == 0157374)  /* lea W(sp),sp or addaw #W,sp */ \
-    val = read_memory_integer (pc + 2, 2);			\
-  else if ((insn & 0170777) == 0050217 /* addql #N, sp */	\
-	   || (insn & 0170777) == 0050117)  /* addqw */		\
-    { val = (insn >> 9) & 7; if (val == 0) val = 8; }		\
-  else if (insn == 0157774) /* addal #WW, sp */			\
-    val = read_memory_integer (pc + 2, 4);			\
-  val >>= 2; }
+extern int delta68_frame_num_args PARAMS ((struct frame_info * fi));
+#define FRAME_NUM_ARGS(fi) (delta68_frame_num_args ((fi)))
 
 /* On M68040 versions of sysV68 R3V7.1, ptrace(PT_WRITE_I) does not clear
    the processor's instruction cache as it should.  */
@@ -101,3 +92,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #undef EXTRACT_STRUCT_VALUE_ADDRESS
 #define EXTRACT_STRUCT_VALUE_ADDRESS(REGBUF)\
 	(*(CORE_ADDR *)((char*)(REGBUF) + 8 * 4))
+
+extern int delta68_in_sigtramp PARAMS ((CORE_ADDR pc, char * name));
+#define IN_SIGTRAMP(pc,name) delta68_in_sigtramp (pc, name)
+
+extern CORE_ADDR delta68_frame_saved_pc PARAMS ((struct frame_info * fi));
+#undef FRAME_SAVED_PC
+#define FRAME_SAVED_PC(fi) delta68_frame_saved_pc (fi)
+
+extern CORE_ADDR delta68_frame_args_address PARAMS ((struct frame_info * fi));
+#undef FRAME_ARGS_ADDRESS
+#define FRAME_ARGS_ADDRESS(fi) delta68_frame_args_address (fi)

@@ -100,10 +100,8 @@ CYG_AC_PATH_TKH
 CYG_AC_PATH_ITCLCONFIG
 CYG_AC_LOAD_ITCLCONFIG
 
-dnl what is the path to itclsh?
 case ${host} in
 *cygwin*)
-	ITCL_DIR=itcl/itcl/win
         touch ac$$.c
         if ${CC} -c -mwin32 ac$$.c >/dev/null 2>&1; then
             case "$LIBGUI_CFLAGS" in
@@ -113,7 +111,8 @@ case ${host} in
         fi
         rm -f ac$$.o ac$$.c
 	;;
-*)		ITCL_DIR=itcl/itcl/unix ;;
+*)
+	;;
 esac
 
 AC_SUBST(LIBGUI_CFLAGS) 
@@ -126,7 +125,6 @@ AC_SUBST(TCL_LIBS)
 AC_SUBST(TK_BUILD_LIB_SPEC)
 AC_SUBST(TCL_BUILD_LIB_SPEC)
 AC_SUBST(TK_LIBS)
-AC_SUBST(ITCL_DIR)
 
 AM_CONDITIONAL(TCL_SHARED, test x$TCL_SHARED_BUILD = x1)
 

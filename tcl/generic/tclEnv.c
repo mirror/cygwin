@@ -19,13 +19,13 @@
 #include "tclPort.h"
 
 /* CYGNUS LOCAL */
-#ifdef __CYGWIN32__
+#if defined(__CYGWIN__) && defined(__WIN32__)
 
-/* On cygwin32, the environment is imported from the cygwin32 DLL.  */
+/* Under cygwin, the environment is imported from the cygwin DLL.  */
 
-extern char ***__imp___cygwin_environ;
+extern char ***_imp____cygwin_environ;
 
-#define environ (*__imp___cygwin_environ)
+#define environ (*_imp____cygwin_environ)
 
 /* We need to use a special putenv function to handle PATH.  */
 #ifndef USE_PUTENV
@@ -83,7 +83,7 @@ void			TclSetEnv _ANSI_ARGS_((CONST char *name,
 void			TclUnsetEnv _ANSI_ARGS_((CONST char *name));
 
 /* CYGNUS LOCAL */
-#ifdef __CYGWIN32__
+#if defined (__CYGWIN__) && defined(__WIN32__)
 static void		TclCygwin32Putenv _ANSI_ARGS_((CONST char *string));
 #endif
 
@@ -745,12 +745,12 @@ TclFinalizeEnvironment()
 }
 
 /* CYGNUS LOCAL */
-#ifdef __CYGWIN32__
+#if defined(__CYGWIN__) && defined(__WIN32__)
 
 #include "windows.h"
 
-/* When using cygwin32, when an environment variable changes, we need
-   to synch with both the cygwin32 environment (in case the
+/* When using cygwin, when an environment variable changes, we need
+   to synch with both the cygwin environment (in case the
    application C code calls fork) and the Windows environment (in case
    the application TCL code calls exec, which calls the Windows
    CreateProcess function).  */
@@ -777,7 +777,7 @@ TclCygwin32Putenv(str)
   if (*value == '\0')
     value = NULL;
 
-  /* Set the cygwin32 environment variable.  */
+  /* Set the cygwin environment variable.  */
 #undef putenv
   if (value == NULL)
     unsetenv (name);
@@ -816,14 +816,14 @@ TclCygwin32Putenv(str)
 	{
 	  int size;
 
-	  size = cygwin32_posix_to_win32_path_list_buf_size (value);
+	  size = cygwin_posix_to_win32_path_list_buf_size (value);
 	  buf = (char *) alloca (size + 1);
-	  cygwin32_posix_to_win32_path_list (value, buf);
+	  cygwin_posix_to_win32_path_list (value, buf);
 	}
 
       SetEnvironmentVariable (name, buf);
     }
 }
 
-#endif /* __CYGWIN32__ */
+#endif /* __CYGWIN__ */
 /* END CYGNUS LOCAL */

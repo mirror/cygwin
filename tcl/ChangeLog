@@ -1,3 +1,17 @@
+2001-04-06  Christopher Faylor <cgf@redhat.com>
+
+	Throughout change __CYGWIN32__ to __CYGWIN__.
+	* cygwin/configure.in: When targeting cygwin, detect if C compiler
+	supports -mno-win32 flag and use it if so.
+	* cygwin/Makefile.in (EXTRA_CFLAGS): New variable.  Holds results of
+	-mno-win32 test.
+	(COMPILE): Add EXTRA_CFLAGS variable to options.
+	* generic/tclEnv.c: Only compile special Cygwin code if building under
+	Cygwin and want native windows understanding.
+	* win/tclWin32Dll.c (DllMain): #ifdef out CYGWIN impure_ptr stuff.
+	* win/Makefile.in: Add -D__USE_W32_SOCKETS to accomodate newer
+	newlib/w32api conventions.
+
 Sat Jun 10 22:43:00 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* win/tclWinFile.c (TclMatchFiles): Revert Mon Jun 5 18:48:32 2000

@@ -15,7 +15,7 @@
 #include "tclWinInt.h"
 
 /* CYGNUS LOCAL */
-#ifndef __CYGWIN32__
+#ifndef __CYGWIN__
 #include <dos.h>
 #endif
 /* END CYGNUS LOCAL */
@@ -2639,8 +2639,8 @@ Tcl_WaitPid(pid, statPtr, options)
 	}
     } else if (ret != WAIT_FAILED) {
 	GetExitCodeProcess(infoPtr->hProcess, (DWORD*)statPtr);
-#ifdef __CYGWIN32__
-	/* A cygwin32 program that exits because of a signal will set
+#ifdef __OLD_CYGWIN__
+	/* A cygwin program that exits because of a signal will set
            the exit status to 0x10000 | (sig << 8).  Fix that back
            into a standard Unix wait status.  */
 	if ((*statPtr & 0x10000) != 0

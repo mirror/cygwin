@@ -46,7 +46,6 @@ if test "$GCC" = "yes"; then
 else
    LIBGUI_CFLAGS=
 fi
-AC_SUBST(LIBGUI_CFLAGS) 
 
 AC_CACHE_CHECK([for cygwin32], ide_cv_os_cygwin32,
 [AC_EGREP_CPP(lose, [
@@ -102,10 +101,21 @@ CYG_AC_LOAD_ITCLCONFIG
 dnl what is the path to itclsh?
 AC_CANONICAL_HOST
 case ${host} in
-*cygwin*)	ITCL_DIR=itcl/itcl/win  ;;
+*cygwin*)
+	ITCL_DIR=itcl/itcl/win
+        touch ac$$.c
+        if ${CC} -c -mwin32 ac$$.c >/dev/null 2>&1; then
+            case "$LIBGUI_CFLAGS" in
+                *-mwin32*) ;;
+                *) LIBGUI_CFLAGS="-mwin32 $LIBGUI_CFLAGS" ;;
+            esac
+        fi
+        rm -f ac$$.o ac$$.c
+	;;
 *)		ITCL_DIR=itcl/itcl/unix ;;
 esac
 
+AC_SUBST(LIBGUI_CFLAGS) 
 AC_SUBST(TCL_DEFS)
 AC_SUBST(TK_DEFS)
 AC_SUBST(TCLHDIR)

@@ -26,7 +26,7 @@
 #   define RCHECK
 #endif
 
-#ifndef __CYGWIN32__
+#ifndef __CYGWIN__
 typedef unsigned long caddr_t;
 #endif
 

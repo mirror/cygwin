@@ -16,7 +16,7 @@
 
 #include "tclWinInt.h"
 #include <sys/stat.h>
-#ifndef __CYGWIN32__
+#ifndef __WIN32__
 #include <shlobj.h>
 #endif
 
@@ -363,9 +363,9 @@ TclChdir(interp, dirName)
 	ckfree(currentDir);
 	currentDir = NULL;
     }
-    /* CYGNUS LOCAL: On cygwin32, we must use chdir.  Otherwise, the
-       cygwin32 notion of the current directory will get messed up.  */
-#ifdef __CYGWIN32__
+    /* CYGNUS LOCAL: On cygwin, we must use chdir.  Otherwise, the
+       cygwin notion of the current directory will get messed up.  */
+#ifdef __CYGWIN__
     if (chdir(dirName) < 0) {
 #else
     if (!SetCurrentDirectory(dirName)) {
@@ -567,7 +567,7 @@ TclpStat(path, buf)
 
     result = stat(path, buf);
 
-#if ! defined (_MSC_VER) && ! defined (__CYGWIN32__)
+#if ! defined (_MSC_VER) && ! defined (__CYGWIN__)
 
     /*
      * Borland's stat doesn't take into account localtime.

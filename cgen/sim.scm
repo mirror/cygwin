@@ -42,6 +42,8 @@
 ;	and doing a post-semantics writeback pass.
 ; with-parallel-only
 ;	Only generate parallel versions of each insn.
+; with-multiple-isa
+;	Enable multiple-isa support (eg. arm+thumb).
 ; copyright fsf|cygnus
 ;	emit an FSF or Cygnus copyright (temporary, pending decision)
 ; package gnusim|cygsim
@@ -60,6 +62,10 @@
 (define -with-profile? #f)
 (define (with-profile?) -with-profile?)
 (define (with-any-profile?) (or -with-profile-fn? -with-profile-sw?))
+
+; #t if multiple isa support is enabled
+(define -with-multiple-isa? #f)
+(define (with-multiple-isa?) -with-multiple-isa?)
 
 ; Handle parallel execution with generic writeback pass.
 (define -with-generic-write? #f)
@@ -81,6 +87,7 @@
   (set! -with-scache? #f)
   (set! -with-profile-fn? #f)
   (set! -with-profile-sw? #f)
+  (set! -with-multiple-isa? #f)
   (set! -with-generic-write? #f)
   (set! -with-parallel-only? #f)
   (set! CURRENT-COPYRIGHT copyright-fsf)
@@ -98,6 +105,7 @@
 			  ((equal? value '("sw"))
 			   (set! -with-profile-sw? #t))
 			  (else (error "invalid with-profile value" value))))
+    ((with-multiple-isa) (set! -with-multiple-isa? #t))
     ((with-generic-write) (set! -with-generic-write? #t))
     ((with-parallel-only) (set! -with-parallel-only? #t))
     ((copyright) (cond ((equal?  value '("fsf"))

@@ -1,3 +1,7 @@
+2001-02-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* pregen-configs.in (mvic): Robustify, verbosify.
+
 2001-01-23  Frank Ch. Eigler  <fche@redhat.com>
 
 	* arm-pid-cygmon.conf, arm-pid-cygmon-tksm.com: Regenerated.

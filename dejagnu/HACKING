@@ -1,7 +1,0 @@
-Sun Jan 18 14:17:42 EST 2004
-
-DejaGnu is now actively maintained in the GNU Savannah system.  The
-project web page can be found at http://www.gnu.org/software/dejagnu/.
-The version of DejaGnu in this tree should be imported from the master
-repository.  Please send patches to <dejagnu@gnu.org> rather than just
-commit patches to this tree!

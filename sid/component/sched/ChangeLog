@@ -1,12 +1,11 @@
 2003-08-29  Dave Brolley  <brolley@redhat.com>
 
-	* compSched.cxx (operator <<): Stream active_p and active_pin.
+	* compSched.cxx (operator <<): Stream active_pin.
 	(operator >>): Ditto.
-	(active_p): New member of scheduler_component.
-	(active_pin): Ditto.
+	(active_pin): New member of scheduler_component.
 	(advance): Drive active_pin with 1 or 0 as the enable
 	threshold is crossed.
-	(scheduler_component): Initialize active_p. Add "active_pin".
+	(scheduler_component): Add "active_pin".
 	(sid-sched.xml): Document "active" pin and interaction between
 	"enabled?" and "enable-threshold".
 	(sid-sched.txt): Regenerated.

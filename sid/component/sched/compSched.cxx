@@ -1215,7 +1215,6 @@ operator << (ostream& o, const scheduler_component<Scheduler>& it)
   o << "scheduler-state "
     << it.enable_threshold << " "
     << it.enable_p << " "
-    << it.active_p << " "
     << it.yield_host_time_threshold << " "
     << it.yield_host_time_p << " "
     << it.sched.step_cycle_limit << " "   // this is a component attribute
@@ -1262,7 +1261,6 @@ operator >> (istream& i, scheduler_component<Scheduler>& it)
     {
       i >> it.enable_threshold
         >> it.enable_p
-        >> it.active_p
 	>> it.yield_host_time_threshold
 	>> it.yield_host_time_p
 	>> it.sched.step_cycle_limit
@@ -1337,7 +1335,6 @@ class scheduler_component: public scheduler_component_base
   int enable_p;
   int yield_host_time_threshold;
   int yield_host_time_p;
-  bool active_p;
   host_int_8 advance_count;
   callback_pin<this_t> advance_pin;
   callback_pin<this_t> time_query_pin;
@@ -1399,11 +1396,8 @@ protected:
 	       << this->yield_host_time_threshold << endl;
 #endif
 	  // Drive the active pin if the threshold has been crossed.
-	  if (UNLIKELY(! this->active_p))
-	    {
-	      this->active_pin.drive (1);
-	      this->active_p = true;
-	    }
+	  if (this->active_pin.recall() != 1)
+	    this->active_pin.drive(1);
 
           this->advance_count ++;
   	  this->sched.advance (this->yield_host_time_p >= this->yield_host_time_threshold);
@@ -1411,11 +1405,8 @@ protected:
       else
 	{
 	  // Drive the active pin if the threshold has been crossed.
-	  if (UNLIKELY(this->active_p))
-	    {
-	      this->active_pin.drive (0);
-	      this->active_p = false;
-	    }
+	  if (this->active_pin.recall() != 0)
+	    this->active_pin.drive(0);
 	}
     }
 
@@ -1453,7 +1444,6 @@ public:
     clients(0),
     num_clients(0),
     enable_threshold(1),
-    active_p (false),
     enable_p(1),
     yield_host_time_threshold(1), 
     yield_host_time_p(0), 

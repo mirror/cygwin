@@ -40,7 +40,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.43 $";
+static const char version[] = "$Revision: 1.44 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -791,6 +791,7 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
   static char empty[] = "";
   buf[0] = '\0';
   fgets (buf, sizeof (buf), f);
+  pclose (f);
   char *uid = strtok (buf, ")");
   if (uid)
     uid += strlen ("uid=");

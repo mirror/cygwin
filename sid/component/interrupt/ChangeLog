@@ -1,3 +1,10 @@
+2001-07-11  Ben Elliston  <bje@redhat.com>
+
+	* components.cxx (operator<<): Move this function template ..
+	(operator>>): .. and this one from here ..
+	* components.h (operator<<): .. to here.
+	(operator>>): .. and here.
+
 2001-07-06  Frank Ch. Eigler  <fche@redhat.com>
 
 	* components.h (IntController fiq_read_word): Provide dummy body.

@@ -331,8 +331,8 @@ namespace sidutil
       {
 	int rc = cygwin_conv_to_full_posix_path (sep, conv_fn);
 	if (rc != 0)
-	  cerr << "sid_file_search_path: cygwin_conv_to_full_posix_path failed: " 
-	       << std_error_string () << endl;
+	  std::cerr << "sid_file_search_path: cygwin_conv_to_full_posix_path failed: " 
+		    << std_error_string () << std::endl;
 	else
 	  sep = conv_fn;
       }

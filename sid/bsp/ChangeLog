@@ -1,3 +1,8 @@
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Graydon Hoare  <graydon@redhat.com>
+	* configrun-sid.in: Add --tksched option for scheduler control panel.
+
 2001-12-27  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configrun-sid.in: Make cpu<->sched pin connections for time queries.

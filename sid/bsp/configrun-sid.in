@@ -120,6 +120,7 @@ $load_mapper_data = "cpu-mapper access-port";
 	    "gdbport=i%" => ["gdbport PROCESSOR=PORT", "Add a gdb/debugger interface on TCP port", "",
 			     "for the given processor. May be specified",
 			     "more than once to debug multiple CPUs.      [none]"],
+	    "tksched!" => ["tksched", "Add a simple visual scheduler controller.", "no"],
 	    "tksm!" => ["tksm", "Add an experimental Tk system monitor.", "no"],
 	    "board=s" => ["board=BOARD", "Model given board or system.", "gloss"],
 	    "engine=s" => ["engine=scache|pbb", "Set given cgen CPU engine.", "pbb"],
@@ -1207,6 +1208,18 @@ connect-pin host-sched 7-event -> sidaudio poll
 ";
   }
 
+# --tksched
+if ($opt_tksched != 0)
+  {
+    $any_tcl = 1;
+
+    $first_section .= "# tk visual scheduler controller\n" .
+      &sidconf_new("sid-visual-sched", "tksched") . "\n";
+
+    $second_section .= "# tk system monitor
+relate tksched scheduler target-sched
+";
+  }
 
 # any tcl stuff?
 if ($any_tcl)

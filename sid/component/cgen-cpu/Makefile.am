@@ -57,6 +57,6 @@ check-local: all
 .PHONY: cgen-all
 cgen-all:
 	for subdir in @cpu_subdirs@; do \
-		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) cgen-all); \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) cgen-all) || exit 1 ; \
 	done
 

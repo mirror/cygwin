@@ -24,7 +24,7 @@ esac])
 
 dnl headers
 AC_CHECK_HEADERS(errno.h ptrace.h signal.h string.h strings.h sys/procfs.h \
-	asm/reg.h sys/ptrace.h sys/reg.h sys/user.h sys/wait.h )
+	asm/reg.h sys/ptrace.h sys/reg.h sys/wait.h )
 
 case "$target" in
   mips64*linux*)
@@ -201,6 +201,15 @@ case "$target" in
     	    AC_DEFINE(PTRACE_ARG4_TYPE_LONG_LONG)
 	fi
 	;;
+  frv*linux*)
+    AC_DEFINE(FRV_LINUX_TARGET)
+    AC_DEFINE(PTRACE_XFER_SIZE, 4)
+    AC_DEFINE(PTRACE_XFER_TYPE_LONG)
+    AC_DEFINE(PTRACE_ARG1_TYPE_LONG)
+    AC_DEFINE(PTRACE_ARG2_TYPE_LONG)
+    AC_DEFINE(PTRACE_ARG3_TYPE_LONG)
+    AC_DEFINE(PTRACE_ARG4_TYPE_LONG)
+    ;;
 esac
 
 dnl Outputs

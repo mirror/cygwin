@@ -1,5 +1,5 @@
 /*
- * ctype_old.c
+ * iscsym.c
  *
  * Oldnames from ANSI header ctype.h
  *
@@ -19,31 +19,13 @@
  *  DISCLAMED. This includes but is not limited to warrenties of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * $Revision: 1.5 $
- * $Author: cgf $
- * $Date: 2000/02/05 04:04:41 $
+ * $Revision: 1.1 $
+ * $Author: dannysmith $
+ * $Date: 2003/05/15 00:21:12 $
  *
  */
 
 #include <ctype.h>
-
-int
-isascii (int c)
-{
-	return __isascii(c);
-}
-
-int
-toascii (int c)
-{
-	return __toascii(c);
-}
-
-int
-iscsymf (int c)
-{
-	return __iscsymf(c);
-}
 
 int
 iscsym (int c)

@@ -1,5 +1,5 @@
 /*
- * string_old.c
+ * wcscmpi.c
  *
  * Oldnames from ANSI header string.h
  *
@@ -19,25 +19,13 @@
  *  DISCLAMED. This includes but is not limited to warrenties of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * $Revision: 1.5 $
- * $Author: cgf $
- * $Date: 2000/02/05 04:04:46 $
+ * $Revision: 1.1 $
+ * $Author: dannysmith $
+ * $Date: 2003/05/15 00:21:12 $
  *
  */
 
 #include <string.h>
-
-int
-strcasecmp (const char *sz1, const char *sz2)
-{
-  return _stricmp (sz1, sz2);
-}
-
-int
-strncasecmp (const char *sz1, const char *sz2, size_t sizeMaxCompare)
-{
-  return _strnicmp (sz1, sz2, sizeMaxCompare);
-}
 
 int
 wcscmpi (const wchar_t * ws1, const wchar_t * ws2)

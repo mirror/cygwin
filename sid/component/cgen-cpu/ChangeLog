@@ -1,3 +1,12 @@
+2002-10-03  Dave Brolley  <brolley@redhat.com>
+       From Ben Elliston  <bje@redhat.com>
+
+	* compCGEN.cxx (cgen_bi_endian_cpu::cgen_read_memory): Don't
+	bother fiddling the latency values.  Have the disassembler read
+	memory using the disassembler-memory accessor, if available.
+	* common-xml/interface.xml: Document disassembler-memory accessor.
+	* common-xml/behavior.xml (execution): Likewise.
+
 2002-09-19  Alexandre Oliva  <aoliva@redhat.com>
 
 	* CGEN.sh.in: Add $$ to temporary file names.

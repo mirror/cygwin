@@ -47,8 +47,13 @@
  <keyword> 'test-data
  (lambda (self n)
    (let* ((test-cases (elm-get self 'values))
-	  (selection (map (lambda (z) (random (length test-cases))) (iota n))))
-     (map (lambda (n) (car (list-ref test-cases n))) selection)))
+	  (selection (map (lambda (z) (random (length test-cases))) (iota n)))
+	  (prefix (elm-get self 'prefix)))
+     (map (lambda (n)
+	    (string-append 
+	     (if (eq? (string-ref prefix 0) #\$) "\\" "")
+	     (elm-get self 'prefix) (car (list-ref test-cases n))))
+	  selection)))
 )
 
 (method-make!

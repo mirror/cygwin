@@ -383,7 +383,7 @@ static void
 do_child_store_inferior_registers (int r)
 {
   if (r >= 0)
-    read_register_gen (r, ((char *) &current_thread->context) + mappings[r]);
+    deprecated_read_register_gen (r, ((char *) &current_thread->context) + mappings[r]);
   else
     {
       for (r = 0; r < NUM_REGS; r++)
@@ -1482,6 +1482,8 @@ child_create_inferior (char *exec_file, char *allargs, char **env)
   char *toexec;
   char shell[MAX_PATH + 1]; /* Path to shell */
   const char *sh;
+  int tty;
+  int ostdin, ostdout, ostderr;
 
   if (!exec_file)
     error ("No executable specified, use `target exec'.\n");
@@ -1594,6 +1596,27 @@ child_create_inferior (char *exec_file, char *allargs, char **env)
     *temp = 0;
   }
 
+  if (!inferior_io_terminal)
+    tty = ostdin = ostdout = ostderr = -1;
+  else
+    {
+      tty = open (inferior_io_terminal, O_RDWR | O_NOCTTY);
+      if (tty < 0)
+	{
+	  print_sys_errmsg (inferior_io_terminal, errno);
+	  ostdin = ostdout = ostderr = -1;
+	}
+      else
+	{
+	  ostdin = dup (0);
+	  ostdout = dup (1);
+	  ostderr = dup (2);
+	  dup2 (tty, 0);
+	  dup2 (tty, 1);
+	  dup2 (tty, 2);
+	}
+    }
+
   ret = CreateProcess (0,
 		       args,	/* command line */
 		       NULL,	/* Security */
@@ -1604,6 +1627,17 @@ child_create_inferior (char *exec_file, char *allargs, char **env)
 		       NULL,	/* current directory */
 		       &si,
 		       &pi);
+  if (tty >= 0)
+    {
+      close (tty);
+      dup2 (ostdin, 0);
+      dup2 (ostdout, 1);
+      dup2 (ostderr, 2);
+      close (ostdin);
+      close (ostdout);
+      close (ostderr);
+    }
+
   if (!ret)
     error ("Error creating process %s, (error %d)\n", exec_file, (unsigned) GetLastError ());
 
@@ -1815,24 +1849,18 @@ init_child_ops (void)
   child_ops.to_terminal_save_ours = terminal_save_ours;
   child_ops.to_terminal_info = child_terminal_info;
   child_ops.to_kill = child_kill_inferior;
-  child_ops.to_load = 0;
-  child_ops.to_lookup_symbol = 0;
   child_ops.to_create_inferior = child_create_inferior;
   child_ops.to_mourn_inferior = child_mourn_inferior;
   child_ops.to_can_run = child_can_run;
-  child_ops.to_notice_signals = 0;
   child_ops.to_thread_alive = win32_child_thread_alive;
   child_ops.to_pid_to_str = cygwin_pid_to_str;
   child_ops.to_stop = child_stop;
   child_ops.to_stratum = process_stratum;
-  child_ops.DONT_USE = 0;
   child_ops.to_has_all_memory = 1;
   child_ops.to_has_memory = 1;
   child_ops.to_has_stack = 1;
   child_ops.to_has_registers = 1;
   child_ops.to_has_execution = 1;
-  child_ops.to_sections = 0;
-  child_ops.to_sections_end = 0;
   child_ops.to_magic = OPS_MAGIC;
 }
 

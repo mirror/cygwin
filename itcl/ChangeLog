@@ -1,3 +1,7 @@
+2001-10-12  Christopher Faylor  <cgf@redhat.com>
+
+	* itcl/win/Makefile.in: Fix typo in cygitcl.res build.
+
 2001-08-08  Mo DeJong  <mdejong@redhat.com>
 
 	* cygtcl.m4: Update from Tcl.

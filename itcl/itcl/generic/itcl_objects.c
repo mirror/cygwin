@@ -98,9 +98,13 @@ Itcl_CreateObject(interp, name, cdefn, objc, objv, roPtr)
 
     /*
      *  If installing an object access command will clobber another
-     *  command, signal an error.
+     *  command, signal an error.  Be careful to look for the object
+     *  only in the current namespace context.  Otherwise, we might
+     *  find a global command, but that wouldn't be clobbered!
      */
-    cmd = Tcl_FindCommand(interp, name, (Tcl_Namespace*)NULL, /* flags */ 0);
+    cmd = Tcl_FindCommand(interp, name, (Tcl_Namespace*)NULL,
+        TCL_NAMESPACE_ONLY);
+
     if (cmd != NULL && !Itcl_IsStub(cmd)) {
         Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
             "command \"", name, "\" already exists in namespace \"",
@@ -233,10 +237,10 @@ Itcl_CreateObject(interp, name, cdefn, objc, objv, roPtr)
      */
     if (result != TCL_OK) {
         istate = Itcl_SaveInterpState(interp, result);
-	if (newObj->accessCmd != NULL) {
-	    Tcl_DeleteCommandFromToken(interp, newObj->accessCmd);
-	    newObj->accessCmd = NULL;
-	}
+
+        Tcl_DeleteCommandFromToken(interp, newObj->accessCmd);
+        newObj->accessCmd = NULL;
+
         result = Itcl_RestoreInterpState(interp, istate);
     }
 

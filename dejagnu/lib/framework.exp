@@ -653,9 +653,19 @@ proc record_test { type message args } {
 
     global multipass_name
     if { $multipass_name != "" } {
-	clone_output "$type: $multipass_name: $message"
+	set message [format "$type: %s: $message" "$multipass_name"]
     } else {
-	clone_output "$type: $message"
+	set message "$type: $message"
+    }
+    clone_output "$message"
+
+    # If a command name exists in the $local_record_procs associative
+    # array for this type of result, then invoke it.
+
+    set lowcase_type [string tolower $type]
+    global local_record_procs
+    if {[info exists local_record_procs($lowcase_type)]} {
+	$local_record_procs($lowcase_type) "$message"
     }
     
     # Reset these so they're ready for the next test case.  We don't reset

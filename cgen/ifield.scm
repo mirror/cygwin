@@ -971,6 +971,15 @@ Define an instruction multi-field, all arguments specified.
 	      nil)
 )
 
+
+(method-make!
+ <derived-ifield> 'needed-iflds
+ (lambda (self)
+   (find (lambda (ifld) (not (ifld-constant? ifld)))
+	 (elm-get self 'subfields)))
+)
+
+
 (method-make!
  <derived-ifield> 'make!
  (lambda (self name comment attrs owner subfields)

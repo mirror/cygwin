@@ -766,7 +766,7 @@
   (let ((iflds (-parse-insn-format "anyof encoding" encoding)))
     (make <derived-ifield>
 	  operand-name
-	  (string-append "<derived-ifield> for " operand-name)
+	  'derived-ifield ; (string-append "<derived-ifield> for " operand-name)
 	  atlist-empty
 	  #f ; owner
 	  iflds ; subfields
@@ -846,6 +846,8 @@
 						  (length args)))
 		       )))
 	    (elm-set! result 'hw-name (obj:name (hardware-for-mode mode-obj)))
+	    ;(elm-set! result 'hw-name (obj:name parsed-encoding))
+	    ;(elm-set! result 'hw-name base-ifield)
 	    (elm-set! result 'index parsed-encoding)
 	    ; (elm-set! result 'index (hw-index-derived)) ; A temporary dummy
 	    (logit 1 "new derived-operand; name=" name " hw-name= " (op:hw-name result) 

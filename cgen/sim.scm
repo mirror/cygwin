@@ -1075,11 +1075,11 @@
 	   ((op:getter self)
 	    (let ((args (car (op:getter self)))
 		  (expr (cadr (op:getter self))))
-	      (rtl-c mode expr
-		     (if (= (length args) 0)
-			 nil
-			 (list (list (car args) 'UINT index)))
-		     #:rtl-cover-fns? #t)))
+	      (rtl-c-expr mode expr
+			  (if (= (length args) 0)
+			      nil
+			      (list (list (car args) 'UINT index)))
+			  #:rtl-cover-fns? #t)))
 	   (else
 	    (send (op:type self) 'cxmake-get estate mode index selector)))))
 )

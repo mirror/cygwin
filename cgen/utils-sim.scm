@@ -56,11 +56,18 @@
 
 (define (op-needed-iflds op sfmt)
   (let ((indx (op:index op)))
-    (if (and (eq? (hw-index:type indx) 'ifield)
-	     (not (= (ifld-length (hw-index:value indx)) 0)))
-	(hw-needed-iflds (op:type op) op sfmt)
-	nil))
-)
+    (logit 4 "op-needed-iflds op=" (obj:name op) " indx=" (obj:name indx)
+	   " indx-type=" (hw-index:type indx) " sfmt=" (obj:name sfmt) "\n")
+    (cond
+     ((and 
+       (eq? (hw-index:type indx) 'ifield)
+       (not (= (ifld-length (hw-index:value indx)) 0)))
+      (hw-needed-iflds (op:type op) op sfmt))
+     ((eq? (hw-index:type indx) 'derived-ifield)
+      (ifld-needed-iflds indx))
+     (else nil)))
+  ;;;; EUREKA ******
+  )
 
 ; Operand extraction (ARGBUF) support code.
 ;
@@ -223,6 +230,13 @@
 			   (else
 			    #f))))
 	)
+    (logit 4 
+	   "-sfmt-contents sfmt=" (obj:name sfmt) 
+	   " needed-iflds=" (string-map obj:name needed-iflds)
+	   " extracted-ops=" (string-map obj:name extracted-ops)
+	   " in-ops=" (string-map obj:name in-ops)
+	   " out-ops=" (string-map obj:name out-ops)
+	   "\n")
     (cons sfmt
 	  (sort
 	   ; Compute list of all things we need to record at extraction time.

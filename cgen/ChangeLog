@@ -1,3 +1,10 @@
+2001-09-17  graydon hoare  <graydon@redhat.com>
+
+	* insn.scm (syntax-break-out): Change $ escape specifier
+	from \$ to $$, to reduce interactions with scheme and C escaping
+	conventions.
+	* doc/rtl.texi (Instructions): Document change.
+
 2001-07-12  Jeff Johnston  <jjohnstn@redhat.com>
 
         * opc-itab.scm (@arch@_cgen_init_opcode_table): Unconditionally

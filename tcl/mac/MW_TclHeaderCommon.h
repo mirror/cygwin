@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: MW_TclHeaderCommon.h,v 1.1 2002/09/24 19:56:54 kseitz Exp $
+ * RCS: @(#) $Id: MW_TclHeaderCommon.h,v 1.2 2002/11/26 19:47:59 hunt Exp $
  */
 
 #pragma once

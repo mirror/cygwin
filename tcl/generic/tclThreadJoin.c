@@ -11,7 +11,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclThreadJoin.c,v 1.1 2002/09/24 19:56:08 kseitz Exp $
+ * RCS: @(#) $Id: tclThreadJoin.c,v 1.2 2002/11/26 19:47:53 hunt Exp $
  */
 
 #include "tclInt.h"

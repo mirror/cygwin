@@ -19,33 +19,119 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-IFS=:
+read="class level macro returntype function formal actual attrib default init invalid_p fmt print print_p description"
 
-read="class level macro returntype function formal actual attrib default init init_p fmt print print_p description"
+# dump out/verify the doco
+for field in ${read}
+do
+  case ${field} in
+
+    class ) : ;;
+
+      # # -> line disable
+      # f -> function
+      #   hiding a function
+      # v -> variable
+      #   hiding a variable
+      # i -> set from info
+      #   hiding something from the ``struct info'' object
+
+    level ) : ;;
+
+      # See GDB_MULTI_ARCH description.  Having GDB_MULTI_ARCH >=
+      # LEVEL is a predicate on checking that a given method is
+      # initialized (using INVALID_P).
+
+    macro ) : ;;
+
+      # The name of the MACRO that this method is to be accessed by.
+
+    returntype ) : ;;
+
+      # For functions, the return type; for variables, the data type
+
+    function ) : ;;
+
+      # For functions, the member function name; for variables, the
+      # variable name.  Member function names are always prefixed with
+      # ``gdbarch_'' for name-space purity.
+
+    formal ) : ;;
+
+      # The formal argument list.  It is assumed that the formal
+      # argument list includes the actual name of each list element.
+      # A function with no arguments shall have ``void'' as the formal
+      # argument list.
+
+    actual ) : ;;
+
+      # The list of actual arguments.  The arguments specified shall
+      # match the FORMAL list given above.  Functions with out
+      # arguments leave this blank.
+
+    attrib ) : ;;
+
+      # Any GCC attributes that should be attached to the function
+      # declaration.  At present this field is unused.
+
+    default ) : ;;
+
+      # To help with the GDB startup a default static gdbarch object
+      # is created.  DEFAULT is the value to insert into the static
+      # gdbarch object. If empty ZERO is used.
+
+    init ) : ;;
+
+      # Any initial value to assign to a new gdbarch object after it
+      # as been malloc()ed.  Zero is used by default.
+
+    invalid_p ) : ;;
+
+      # A predicate equation that validates MEMBER. Non-zero is returned
+      # if the code creating the new architecture failed to initialize
+      # the MEMBER or initialized the member to something invalid.
+      # By default, a check that the value is no longer equal to INIT
+      # is performed.  The equation ``0'' disables the invalid_p check.
+
+    fmt ) : ;;
+
+      # printf style format string that can be used to print out the
+      # MEMBER.  The default is to assume "%ld" is safe.  Sometimes
+      # "%s" is useful.  For functions, this is ignored and the
+      # function address is printed.
+
+    print ) : ;;
+
+      # An optional equation that converts the MEMBER into a value
+      # suitable for that FMT.  By default it is assumed that the
+      # member's MACRO cast to long is safe.
+
+    print_p ) : ;;
+
+      # An optional indicator for any predicte to wrap around the
+      # print member code.
+      #   # -> Wrap print up in ``#ifdef MACRO''
+      #   exp -> Wrap print up in ``if (${print_p}) ...
+
+    description ) : ;;
+
+      # Currently unused.
+
+    *) exit 1;;
+  esac
+done
+
+IFS=:
 
 function_list ()
 {
-  # category:
-  #        # -> disable
-  #        f -> function
-  #        v -> variable
-  #        i -> set from info
-  # macro-name
-  # return-type
-  # name
-  # formal argument list
-  # actual argument list
-  # attrib
-  # default exp
-  # init exp
-  # init_p exp
-  # print
-  # description
+  # See below (DOCO) for description of each field
   cat <<EOF |
 i:2:TARGET_ARCHITECTURE:const struct bfd_arch_info *:bfd_arch_info::::&bfd_default_arch_struct:::%s:TARGET_ARCHITECTURE->printable_name:TARGET_ARCHITECTURE != NULL
 #
 i:2:TARGET_BYTE_ORDER:int:byte_order::::BIG_ENDIAN
 #
+v:1:TARGET_BFD_VMA_BIT:int:bfd_vma_bit::::8 * sizeof (void*):TARGET_ARCHITECTURE->bits_per_address:0
 v:1:TARGET_PTR_BIT:int:ptr_bit::::8 * sizeof (void*):0
 #v:1:TARGET_CHAR_BIT:int:char_bit::::8 * sizeof (char):0
 v:1:TARGET_SHORT_BIT:int:short_bit::::8 * sizeof (short):0
@@ -125,6 +211,8 @@ f:2:INIT_EXTRA_FRAME_INFO:void:init_extra_frame_info:int fromleaf, struct frame_
 f:2:SKIP_PROLOGUE:CORE_ADDR:skip_prologue:CORE_ADDR ip:ip::0:0
 f:2:INNER_THAN:int:inner_than:CORE_ADDR lhs, CORE_ADDR rhs:lhs, rhs::0:0
 f:2:BREAKPOINT_FROM_PC:unsigned char *:breakpoint_from_pc:CORE_ADDR *pcptr, int *lenptr:pcptr, lenptr::0:0
+f:2:MEMORY_INSERT_BREAKPOINT:int:memory_insert_breakpoint:CORE_ADDR addr, char *contents_cache:addr, contents_cache::0:default_memory_insert_breakpoint:0
+f:2:MEMORY_REMOVE_BREAKPOINT:int:memory_remove_breakpoint:CORE_ADDR addr, char *contents_cache:addr, contents_cache::0:default_memory_remove_breakpoint:0
 v:2:DECR_PC_AFTER_BREAK:CORE_ADDR:decr_pc_after_break::::0:-1
 v:2:FUNCTION_START_OFFSET:CORE_ADDR:function_start_offset::::0:-1
 #
@@ -157,7 +245,7 @@ ${class} ${macro}(${actual})
     level=${level}
     default=${default}
     init=${init}
-    init_p=${init_p}
+    invalid_p=${invalid_p}
     fmt=${fmt}
     print=${print}
     print_p=${print_p}
@@ -479,6 +567,7 @@ extern void *gdbarch_data (struct gdbarch_data*);
 
 typedef void (gdbarch_swap_ftype) (void);
 extern void register_gdbarch_swap (void *data, unsigned long size, gdbarch_swap_ftype *init);
+#define REGISTER_GDBARCH_SWAP(VAR) register_gdbarch_swap (&(VAR), sizeof ((VAR)), NULL)
 
 
 
@@ -628,6 +717,11 @@ extern void set_gdbarch_from_file (bfd *);
 extern void set_architecture_from_arch_mach (enum bfd_architecture, unsigned long);
 
 
+/* Initialize the current architecture to the "first" one we find on
+   our list.  */
+
+extern void initialize_current_architecture (void);
+
 /* Helper function for targets that don't know how my arguments are
    being passed */
 
@@ -676,7 +770,7 @@ cat <<EOF
 #include "frame.h"
 #include "inferior.h"
 #include "breakpoint.h"
-#include "wait.h"
+#include "gdb_wait.h"
 #include "gdbcore.h"
 #include "gdbcmd.h"
 #include "target.h"
@@ -877,10 +971,10 @@ function_list | while eval read $read
 do
   case "${class}" in
     "f" | "v" )
-	if [ "${init_p}" ]
+ 	if [ "${invalid_p}" ]
 	then
 	  echo "  if ((GDB_MULTI_ARCH >= ${level})"
-	  echo "      && (${init_p}))"
+	  echo "      && (${invalid_p}))"
 	  echo "    internal_error (\"gdbarch: verify_gdbarch: ${function} invalid\");"
 	elif [ "${init}" ]
 	then
@@ -983,7 +1077,7 @@ do
 	echo ""
 	echo "void"
 	echo "set_gdbarch_${function} (struct gdbarch *gdbarch,"
-        echo "            `echo ${function} | tr '[0-9a-z_]' ' '`  gdbarch_${function}_ftype ${function})"
+        echo "            `echo ${function} | sed -e 's/./ /g'`  gdbarch_${function}_ftype ${function})"
 	echo "{"
 	echo "  gdbarch->${function} = ${function};"
 	echo "}"
@@ -993,9 +1087,9 @@ do
 	echo "${returntype}"
 	echo "gdbarch_${function} (struct gdbarch *gdbarch)"
 	echo "{"
-	if [ "${init_p}" ]
+	if [ "${invalid_p}" ]
 	then
-	  echo "  if (${init_p})"
+	  echo "  if (${invalid_p})"
 	  echo "    internal_error (\"gdbarch: gdbarch_${function} invalid\");"
 	elif [ "${init}" ]
 	then
@@ -1010,7 +1104,7 @@ do
 	echo ""
 	echo "void"
 	echo "set_gdbarch_${function} (struct gdbarch *gdbarch,"
-        echo "            `echo ${function} | tr '[0-9a-z_]' ' '`  ${returntype} ${function})"
+        echo "            `echo ${function} | sed -e 's/./ /g'`  ${returntype} ${function})"
 	echo "{"
 	echo "  gdbarch->${function} = ${function};"
 	echo "}"
@@ -1803,6 +1897,35 @@ LONGEST call_dummy_words[] = CALL_DUMMY;
 int sizeof_call_dummy_words = sizeof (call_dummy_words);
 #endif
 
+
+/* Initialize the current architecture.  */
+void
+initialize_current_architecture ()
+{
+  if (GDB_MULTI_ARCH)
+    {
+      struct gdbarch_init_registration *rego;
+      const struct bfd_arch_info *chosen = NULL;
+      for (rego = gdbarch_init_registrary; rego != NULL; rego = rego->next)
+	{
+	  const struct bfd_arch_info *ap
+	    = bfd_lookup_arch (rego->bfd_architecture, 0);
+
+	  /* Choose the first architecture alphabetically.  */
+	  if (chosen == NULL
+	      || strcmp (ap->printable_name, chosen->printable_name) < 0)
+	    chosen = ap;
+	}
+
+      if (chosen != NULL)
+	{
+	  struct gdbarch_info info;
+	  memset (&info, 0, sizeof info);
+	  info.bfd_arch_info = chosen;
+	  gdbarch_update (info);
+	}
+    }
+}
 
 extern void _initialize_gdbarch (void);
 void

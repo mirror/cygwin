@@ -22,19 +22,21 @@ then
     exit 1
 fi
 
+builddir=tmp-sim
+
 export cgendir=`pwd`
 
 for c in $cpus
 do
-  rm -rf ./tmp-sim
-  mkdir ./tmp-sim
+  rm -rf $builddir
+  mkdir $builddir
 
   case $c in
   i960)
     (
 	set -e
 	set -x
-	cd ./tmp-sim
+	cd $builddir
 	$cgendir/../sim/i960/configure --prefix /tmp/junk --target i960-coff
 	make stamp-arch stamp-cpu stamp-desc
     )
@@ -45,7 +47,7 @@ do
     (
 	set -e
 	set -x
-	cd ./tmp-sim
+	cd $builddir
 	$cgendir/../sim/m32r/configure --prefix /tmp/junk --target m32r-elf
 	make stamp-arch stamp-cpu stamp-xcpu
     )
@@ -56,7 +58,7 @@ do
     (
 	set -e
 	set -x
-	cd ./tmp-sim
+	cd $builddir
 	$cgendir/../sim/fr30/configure --prefix /tmp/junk --target fr30-elf
 	make stamp-arch stamp-cpu
     )
@@ -67,7 +69,7 @@ do
     (
 	set -e
 	set -x
-	cd ./tmp-sim
+	cd $builddir
 	$cgendir/../sim/sh64/configure --prefix /tmp/junk --target ???
 	make stamp-all
     )
@@ -80,5 +82,3 @@ do
     ;;
   esac
 done
-
-rm -rf ./tmp-sim

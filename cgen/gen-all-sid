@@ -31,13 +31,13 @@ then
     exit 1
 fi
 
-rm -rf /tmp/tmp-sid
-mkdir /tmp/tmp-sid
+builddir=tmp-sid
 
-cd /tmp/tmp-sid
+rm -rf $builddir
+mkdir $builddir
+
+cd $builddir
 $siddir/configure --prefix /tmp/junk --enable-ltdl-install
 make configure-sid
 cd sid/component/cgen-cpu
 make cgen-all
-
-rm -rf /tmp/tmp-sid

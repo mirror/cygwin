@@ -1,3 +1,10 @@
+2003-07-08  Doug Evans  <dje@sebabeach.org>
+
+	* gen-all-doc: Ensure run from cgen src dir.
+	* gen-all-opcodes: Build in ./tmp-opcodes.  Don't delete dir when done.
+	* gen-all-sid: Similarily, in ./tmp-sid.
+	* gen-all-sim: Similarily, in ./tmp-sim.
+
 2003-06-20  Doug Evans  <dje@sebabeach.org>
 
 	* gen-all-sim: Add fr30,sh64 support.  Only generate m32r by default.

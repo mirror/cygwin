@@ -17,8 +17,8 @@
 extern "C" {
 #include "bfd.h"
 #include "dis-asm.h"
-#include "tracedis.h"
 }
+#include "tracedis.h"
 
 #if SIDTARGET_ARM
 #include "arm7f.h"

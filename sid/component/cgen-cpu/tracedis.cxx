@@ -1,17 +1,39 @@
-// tracedis.c - disassembly tracing support.  -*- C -*-
+// tracedis.cxx - disassembly tracing support.  -*- C++ -*-
 
 // Copyright (C) 2001, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
+#include <cstdlib>
+#include <stdarg.h>
+#include "config.h"
+#include "libiberty.h"
 #include "tracedis.h"
+#include "sidcomputil.h"
+#include "sidcpuutil.h"
 
 void register_name(enum bfd_architecture, const char *);
+
+// XXX: for compatibility with older libraries
+static
+int trace_printf(void *obj_ptr, const char *fmt, ...)
+{
+  va_list ap;
+  char buf[1024];
+  sidutil::basic_cpu* object = (sidutil::basic_cpu*) obj_ptr;
+  
+  va_start (ap, fmt);
+  vsprintf (buf, fmt, ap);
+  object->trace_stream << buf;
+
+  // XXX: FIXME.
+  return 0;
+}
 
 void
 cgen_disassemble(bfd_vma pc,
 		 disassemble_info *info,
-		 void *this,
+		 void *this_ptr,
 		 READMEM read_mem_func,
 		 MEMERR memory_error_func,
 		 PRINTADDR print_addr_func,
@@ -24,8 +46,8 @@ cgen_disassemble(bfd_vma pc,
 		 unsigned long isa_mask)
 {
   register_name(arch, name);
-  INIT_DISASSEMBLE_INFO(*info, stdout, fprintf);
-  info->application_data = this;
+  INIT_DISASSEMBLE_INFO(*info, this_ptr, trace_printf);
+  info->application_data = this_ptr;
   info->flavour = flavour;
   info->insn_sets = isa_mask; /* may be 0 */
   info->arch = arch;
@@ -35,9 +57,9 @@ cgen_disassemble(bfd_vma pc,
   info->print_address_func = print_addr_func;
   info->symbol_at_address_func = sym_at_addr_func;
 
-  printf("0x%08x\t", (unsigned int)pc);
+  trace_printf (this_ptr, "0x%08x\t", (unsigned int) pc);
   (void) (*fp) (pc, info);
-  printf("\t");
+  trace_printf (this_ptr, "\t");
 }
 
 // opcodes needs:
@@ -46,8 +68,8 @@ cgen_disassemble(bfd_vma pc,
 //	const bfd_arch_info_type *bfd_lookup_arch(enum bfd_architecture arch, unsigned long machine);
 //		- cgen generated disassemblers call this to find subarch(?).  this one is not easy to
 //		  fix as it uses bfd data.
-//	bfd_vma bfd_get_bits (bfd_byte *addr, int bits, bfd_boolean big_p);
-//	void bfd_put_bits (bfd_vma data, bfd_byte *addr, int bits, bfd_boolean big_p);
+//	bfd_vma bfd_get_bits (bfd_byte *addr, int bits, boolean big_p);
+//	void bfd_put_bits (bfd_vma data, bfd_byte *addr, int bits, boolean big_p);
 //		- these two are small and can be replicated.
 //
 // so that only really leaves bfd_lookup_arch() as an issue...we can hack it.
@@ -55,28 +77,25 @@ cgen_disassemble(bfd_vma pc,
 enum bfd_architecture
 bfd_get_arch(bfd *abfd)
 { 
-  return 0;
+  return static_cast<enum bfd_architecture> (0);
 }
 
 /* Stolen from libbfd.  */
 
 bfd_vma
-bfd_getb16 (addr)
-     register const bfd_byte *addr;
+bfd_getb16 (register const bfd_byte *addr)
 {
   return (addr[0] << 8) | addr[1];
 }
 
 bfd_vma
-bfd_getl16 (addr)
-     register const bfd_byte *addr;
+bfd_getl16 (register const bfd_byte *addr)
 {
   return (addr[1] << 8) | addr[0];
 }
 
 bfd_vma
-bfd_getb32 (addr)
-     register const bfd_byte *addr;
+bfd_getb32 (register const bfd_byte *addr)
 {
   unsigned long v;
 
@@ -88,8 +107,7 @@ bfd_getb32 (addr)
 }
 
 bfd_vma
-bfd_getl32 (addr)
-     register const bfd_byte *addr;
+bfd_getl32 (register const bfd_byte *addr)
 {
   unsigned long v;
 
@@ -101,11 +119,7 @@ bfd_getl32 (addr)
 }
 
 void
-bfd_put_bits (data, addr, bits, big_p)
-     bfd_vma data;
-     bfd_byte *addr;
-     int bits;
-     bfd_boolean big_p;
+bfd_put_bits (bfd_vma data, bfd_byte* addr, int bits, boolean big_p)
 {
   int i;
   int bytes;
@@ -125,10 +139,7 @@ bfd_put_bits (data, addr, bits, big_p)
 
 /* Stolen from libbfd.  */
 bfd_vma
-bfd_get_bits (addr, bits, big_p)
-     bfd_byte *addr;
-     int bits;
-     bfd_boolean big_p;
+bfd_get_bits (bfd_byte* addr, int bits, boolean big_p)
 {
   bfd_vma data;
   int i;
@@ -189,9 +200,7 @@ register_name(enum bfd_architecture arch, const char *name)
 }
 
 const bfd_arch_info_type *
-bfd_lookup_arch (arch, machine)
-     enum bfd_architecture arch;
-     unsigned long machine;
+bfd_lookup_arch (enum bfd_architecture arch, unsigned long machine)
 { 
   static bfd_arch_info_type info;
   struct bfd_arch_hack *b;

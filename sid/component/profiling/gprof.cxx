@@ -327,6 +327,7 @@ namespace profiling_components
 		    else
 		      {
 			put_bytes (of, host_int_2(count), 2);
+			b->second = 0; // in case we iterate due to overflow
 		      }
 		  }
 		

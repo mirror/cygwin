@@ -4614,6 +4614,49 @@ fi
 done
 
 
+# Provide descriptions for the various preprocessor symbols.
+# (Autoheader is happy even if only one of the AC_DEFINEs has a
+# description, so we could put these with the first AC_DEFINE.  But
+# it's better to have the descriptions for symbols that are used
+# across multiple architectures in an architecture-independent spot;
+# we don't want them going away if architectures get dropped.)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 case "$target" in
   mips64*linux*)
     TARGET_MODULES="linux-target.o thread-db.o ptrace-target.o"
@@ -4714,12 +4757,14 @@ _ACEOF
     ;;
   *solaris*)
     TARGET_MODULES="solaris-target.o dummy-target.o"
-    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define SOLARIS_TARGET 1
 _ACEOF
 
 # Place-holders -- not necessarily correct...
-    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define GREGSET_T gregset_t
 _ACEOF
 
@@ -4734,7 +4779,8 @@ esac
 
 case "$target" in
   *solaris*)
-        cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define SPARC32_SOLARIS_TARGET 1
 _ACEOF
 
@@ -4764,7 +4810,8 @@ _ACEOF
 
     ;;
   sh*linux*)
-    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define SH_LINUX_TARGET 1
 _ACEOF
 
@@ -4794,7 +4841,8 @@ _ACEOF
 
     ;;
   mips64*linux*)
-    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define MIPS64_LINUX_TARGET 1
 _ACEOF
 
@@ -4887,7 +4935,8 @@ rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
 echo "${ECHO_T}$mipsabi" >&6
     case $mipsabi in
       o32)
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define MIPS_ABI_O32 1
 _ACEOF
 
@@ -4917,7 +4966,8 @@ _ACEOF
 
         ;;
       n32)
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define MIPS_ABI_N32 1
 _ACEOF
 
@@ -4947,7 +4997,8 @@ _ACEOF
 
         ;;
       n64)
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define MIPS_ABI_N64 1
 _ACEOF
 
@@ -4979,7 +5030,8 @@ _ACEOF
     esac
     ;;
   mips*linux*)
-    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define MIPS_LINUX_TARGET 1
 _ACEOF
 
@@ -5013,7 +5065,8 @@ _ACEOF
 
     ;;
   i?86*linux*)
-    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define X86_LINUX_TARGET 1
 _ACEOF
 
@@ -5043,7 +5096,8 @@ _ACEOF
 
     ;;
   powerpc*linux*)
-    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PPC_LINUX_TARGET 1
 _ACEOF
 
@@ -5073,7 +5127,8 @@ _ACEOF
 
     ;;
   m68k*linux*)
-    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define M68K_LINUX_TARGET 1
 _ACEOF
 
@@ -5103,7 +5158,8 @@ _ACEOF
 
     ;;
   alpha*linux*)
-    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define ALPHA_LINUX_TARGET 1
 _ACEOF
 
@@ -5134,7 +5190,8 @@ _ACEOF
     ;;
   arm*linux*)
 	if test "$arm32" = "yes"; then
-	    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define ARM_LINUX_TARGET 1
 _ACEOF
 
@@ -5194,7 +5251,8 @@ _ACEOF
 	fi
 	;;
   frv*linux*)
-    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define FRV_LINUX_TARGET 1
 _ACEOF
 

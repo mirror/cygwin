@@ -26,6 +26,43 @@ dnl headers
 AC_CHECK_HEADERS(errno.h ptrace.h signal.h string.h strings.h sys/procfs.h \
 	asm/reg.h sys/ptrace.h sys/reg.h sys/wait.h )
 
+# Provide descriptions for the various preprocessor symbols.
+# (Autoheader is happy even if only one of the AC_DEFINEs has a
+# description, so we could put these with the first AC_DEFINE.  But
+# it's better to have the descriptions for symbols that are used
+# across multiple architectures in an architecture-independent spot;
+# we don't want them going away if architectures get dropped.)
+AH_TEMPLATE(FPREGSET_T, [Define the type name of an fpregset])
+AH_TEMPLATE(HAVE_LWPID_T, [Define if system headers will define lwpid_t])
+AH_TEMPLATE(HAVE_PRFPREGSET_T,
+            [Define if system headers will define prfpregset_t])
+AH_TEMPLATE(HAVE_PRGREGSET_T, [Define if system headers will define psaddr_t])
+AH_TEMPLATE(HAVE_PSADDR_T, [Define if system headers will define psaddr_t])
+AH_TEMPLATE(LIBTHREAD_DB_SO, [Define name / location of libthread_db.so])
+AH_TEMPLATE(LINUX_TARGET, [Define if target is any Linux])
+AH_TEMPLATE(PTRACE_ARG1_TYPE_LONG,
+            [Define if ptrace arg1 type is long or unsigned long.])
+AH_TEMPLATE(PTRACE_ARG1_TYPE_LONG_LONG,
+            [Define if ptrace arg1 type is long long or unsigned long long.])
+AH_TEMPLATE(PTRACE_ARG2_TYPE_LONG,
+            [Define if ptrace arg2 type is long or unsigned long.])
+AH_TEMPLATE(PTRACE_ARG2_TYPE_LONG_LONG,
+            [Define if ptrace arg2 type is long long or unsigned long long.])
+AH_TEMPLATE(PTRACE_ARG3_TYPE_LONG,
+            [Define if ptrace arg3 type is long or unsigned long.])
+AH_TEMPLATE(PTRACE_ARG3_TYPE_LONG_LONG,
+            [Define if ptrace arg3 type is long long or unsigned long long.])
+AH_TEMPLATE(PTRACE_ARG4_TYPE_LONG,
+            [Define if ptrace arg4 type is long or unsigned long.])
+AH_TEMPLATE(PTRACE_ARG4_TYPE_LONG_LONG,
+            [Define if ptrace arg4 type is long long or unsigned long long.])
+AH_TEMPLATE(PTRACE_XFER_SIZE,
+	    [Define for ptrace systems, to the size of a ptrace word.])
+AH_TEMPLATE(PTRACE_XFER_TYPE_LONG,
+            [Define if ptrace transfer type is long or unsigned long.])
+AH_TEMPLATE(PTRACE_XFER_TYPE_LONG_LONG,
+          [Define if ptrace transfer type is long long or unsigned long long.])
+
 case "$target" in
   mips64*linux*)
     TARGET_MODULES="linux-target.o thread-db.o ptrace-target.o" 
@@ -63,9 +100,10 @@ case "$target" in
     ;;
   *solaris*)
     TARGET_MODULES="solaris-target.o dummy-target.o" 
-    AC_DEFINE(SOLARIS_TARGET)
+    AC_DEFINE(SOLARIS_TARGET, [1], [Define if target is any Solaris])
 # Place-holders -- not necessarily correct...
-    AC_DEFINE(GREGSET_T,  gregset_t)
+    AC_DEFINE(GREGSET_T,  gregset_t,
+              [Define the type name of a gregset])
     AC_DEFINE(FPREGSET_T, fpregset_t)
     ;;
 esac
@@ -75,7 +113,8 @@ AC_SUBST(TARGET_MODULES)
 case "$target" in
   *solaris*)
     dnl FIXME: differentiate between flavors of Solaris!
-    AC_DEFINE(SPARC32_SOLARIS_TARGET)
+    AC_DEFINE(SPARC32_SOLARIS_TARGET, [1],
+              [Define if target is 32-bit SPARC Solaris.])
     AC_DEFINE(PTRACE_XFER_SIZE, 4)
     AC_DEFINE(PTRACE_XFER_TYPE_LONG)
     AC_DEFINE(PTRACE_ARG1_TYPE_LONG)
@@ -84,7 +123,7 @@ case "$target" in
     AC_DEFINE(PTRACE_ARG4_TYPE_LONG)
     ;;
   sh*linux*)
-    AC_DEFINE(SH_LINUX_TARGET)
+    AC_DEFINE(SH_LINUX_TARGET, [1], [Define if target is SH (3? 4?) Linux])
     AC_DEFINE(PTRACE_XFER_SIZE, 4)
     AC_DEFINE(PTRACE_XFER_TYPE_LONG)
     AC_DEFINE(PTRACE_ARG1_TYPE_LONG)
@@ -93,7 +132,7 @@ case "$target" in
     AC_DEFINE(PTRACE_ARG4_TYPE_LONG)
     ;;
   mips64*linux*)
-    AC_DEFINE(MIPS64_LINUX_TARGET)
+    AC_DEFINE(MIPS64_LINUX_TARGET, [1], [Define if target is 64-bit MIPS Linux])
     AC_MSG_CHECKING([mips abi])
     mipsabi=o32
     AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
@@ -109,7 +148,7 @@ case "$target" in
     AC_MSG_RESULT([$mipsabi])
     case $mipsabi in
       o32)
-	AC_DEFINE(MIPS_ABI_O32)
+	AC_DEFINE(MIPS_ABI_O32, [1], [Define if target uses MIPS o32 ABI])
 	AC_DEFINE(PTRACE_XFER_SIZE, 4)
 	AC_DEFINE(PTRACE_XFER_TYPE_LONG)
 	AC_DEFINE(PTRACE_ARG1_TYPE_LONG)
@@ -118,7 +157,7 @@ case "$target" in
 	AC_DEFINE(PTRACE_ARG4_TYPE_LONG)
         ;;
       n32)
-	AC_DEFINE(MIPS_ABI_N32)
+	AC_DEFINE(MIPS_ABI_N32, [1], [Define if target uses MIPS n32 ABI])
 	AC_DEFINE(PTRACE_XFER_SIZE, 8)
 	AC_DEFINE(PTRACE_XFER_TYPE_LONG_LONG)
 	AC_DEFINE(PTRACE_ARG1_TYPE_LONG_LONG)
@@ -127,7 +166,7 @@ case "$target" in
 	AC_DEFINE(PTRACE_ARG4_TYPE_LONG_LONG)
         ;;
       n64)
-	AC_DEFINE(MIPS_ABI_N64)
+	AC_DEFINE(MIPS_ABI_N64, [1], [Define if target uses MIPS n64 ABI])
 	AC_DEFINE(PTRACE_XFER_SIZE, 8)
 	AC_DEFINE(PTRACE_XFER_TYPE_LONG)
 	AC_DEFINE(PTRACE_ARG1_TYPE_LONG)
@@ -138,7 +177,7 @@ case "$target" in
     esac
     ;;
   mips*linux*)
-    AC_DEFINE(MIPS_LINUX_TARGET)
+    AC_DEFINE(MIPS_LINUX_TARGET, [1], [Define if target is (32-bit) MIPS Linux])
     AC_DEFINE(MIPS_ABI_O32)
     AC_DEFINE(PTRACE_XFER_SIZE, 4)
     AC_DEFINE(PTRACE_XFER_TYPE_LONG)
@@ -148,7 +187,7 @@ case "$target" in
     AC_DEFINE(PTRACE_ARG4_TYPE_LONG)
     ;;
   i?86*linux*)
-    AC_DEFINE(X86_LINUX_TARGET)
+    AC_DEFINE(X86_LINUX_TARGET, [1], [Define if target is x86 Linux])
     AC_DEFINE(PTRACE_XFER_SIZE, 4)
     AC_DEFINE(PTRACE_XFER_TYPE_LONG)
     AC_DEFINE(PTRACE_ARG1_TYPE_LONG)
@@ -157,7 +196,7 @@ case "$target" in
     AC_DEFINE(PTRACE_ARG4_TYPE_LONG)
     ;;
   powerpc*linux*)
-    AC_DEFINE(PPC_LINUX_TARGET)
+    AC_DEFINE(PPC_LINUX_TARGET, [1], [Define if target is powerpc Linux])
     AC_DEFINE(PTRACE_XFER_SIZE, 4)
     AC_DEFINE(PTRACE_XFER_TYPE_LONG)
     AC_DEFINE(PTRACE_ARG1_TYPE_LONG)
@@ -166,7 +205,7 @@ case "$target" in
     AC_DEFINE(PTRACE_ARG4_TYPE_LONG)
     ;;
   m68k*linux*)
-    AC_DEFINE(M68K_LINUX_TARGET)
+    AC_DEFINE(M68K_LINUX_TARGET, [1], [Define if target is m68k Linux])
     AC_DEFINE(PTRACE_XFER_SIZE, 4)
     AC_DEFINE(PTRACE_XFER_TYPE_LONG)
     AC_DEFINE(PTRACE_ARG1_TYPE_LONG)
@@ -175,7 +214,8 @@ case "$target" in
     AC_DEFINE(PTRACE_ARG4_TYPE_LONG)
     ;;
   alpha*linux*)
-    AC_DEFINE(ALPHA_LINUX_TARGET)
+    AC_DEFINE(ALPHA_LINUX_TARGET, [1],
+              [Define if target is Alpha Linux])
     AC_DEFINE(PTRACE_XFER_SIZE, 8)
     AC_DEFINE(PTRACE_XFER_TYPE_LONG_LONG)
     AC_DEFINE(PTRACE_ARG1_TYPE_LONG_LONG)
@@ -185,7 +225,8 @@ case "$target" in
     ;;
   arm*linux*)
 	if test "$arm32" = "yes"; then
-	    AC_DEFINE(ARM_LINUX_TARGET)
+	    AC_DEFINE(ARM_LINUX_TARGET, [1],
+	              [Define if target is ARM Linux])
     	    AC_DEFINE(PTRACE_XFER_SIZE, 4)
     	    AC_DEFINE(PTRACE_XFER_TYPE_LONG)
     	    AC_DEFINE(PTRACE_ARG1_TYPE_LONG)
@@ -203,7 +244,8 @@ case "$target" in
 	fi
 	;;
   frv*linux*)
-    AC_DEFINE(FRV_LINUX_TARGET)
+    AC_DEFINE(FRV_LINUX_TARGET, [1],
+              [Define if target is FRV Linux])
     AC_DEFINE(PTRACE_XFER_SIZE, 4)
     AC_DEFINE(PTRACE_XFER_TYPE_LONG)
     AC_DEFINE(PTRACE_ARG1_TYPE_LONG)

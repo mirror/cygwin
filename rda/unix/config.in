@@ -1,53 +1,127 @@
-/* config.in.  At one time this was generated automatically from
-  configure.in by autoheader.  It is now being maintained by hand.  */
+/* config.in.  Generated from configure.in by autoheader.  */
+
+/* Define if target is Alpha Linux */
+#undef ALPHA_LINUX_TARGET
+
+/* Define if target is ARM Linux */
+#undef ARM_LINUX_TARGET
+
+/* Define the type name of an fpregset */
+#undef FPREGSET_T
+
+/* Define if target is FRV Linux */
+#undef FRV_LINUX_TARGET
+
+/* Define the type name of a gregset */
+#undef GREGSET_T
+
+/* Define to 1 if you have the <asm/reg.h> header file. */
+#undef HAVE_ASM_REG_H
+
+/* Define to 1 if you have the <errno.h> header file. */
+#undef HAVE_ERRNO_H
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define if system headers will define lwpid_t */
+#undef HAVE_LWPID_T
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define if system headers will define prfpregset_t */
+#undef HAVE_PRFPREGSET_T
+
+/* Define if system headers will define psaddr_t */
+#undef HAVE_PRGREGSET_T
+
+/* Define if system headers will define psaddr_t */
+#undef HAVE_PSADDR_T
+
+/* Define to 1 if you have the <ptrace.h> header file. */
+#undef HAVE_PTRACE_H
+
+/* Define to 1 if you have the <signal.h> header file. */
+#undef HAVE_SIGNAL_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/procfs.h> header file. */
+#undef HAVE_SYS_PROCFS_H
+
+/* Define to 1 if you have the <sys/ptrace.h> header file. */
+#undef HAVE_SYS_PTRACE_H
+
+/* Define to 1 if you have the <sys/reg.h> header file. */
+#undef HAVE_SYS_REG_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <sys/wait.h> header file. */
+#undef HAVE_SYS_WAIT_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define name / location of libthread_db.so */
+#undef LIBTHREAD_DB_SO
+
+/* Define if target is any Linux */
+#undef LINUX_TARGET
+
+/* Define if target is m68k Linux */
+#undef M68K_LINUX_TARGET
+
+/* Define if target is 64-bit MIPS Linux */
+#undef MIPS64_LINUX_TARGET
+
+/* Define if target uses MIPS n32 ABI */
+#undef MIPS_ABI_N32
+
+/* Define if target uses MIPS n64 ABI */
+#undef MIPS_ABI_N64
+
+/* Define if target uses MIPS o32 ABI */
+#undef MIPS_ABI_O32
+
+/* Define if target is (32-bit) MIPS Linux */
+#undef MIPS_LINUX_TARGET
 
 /* Name of package */
 #undef PACKAGE
 
-/* Version number of package */
-#undef VERSION
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
 
-/* Define if system has <errno.h> */
-#undef HAVE_ERRNO_H
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
 
-/* Define if system has <ptrace.h> */
-#undef HAVE_PTRACE_H
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
 
-/* Define if system has <signal.h> */
-#undef HAVE_SIGNAL_H
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
 
-/* Define if system has <string.h> */
-#undef HAVE_STRING_H
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
 
-/* Define if system has <strings.h> */
-#undef HAVE_STRINGS_H
-
-/* Define if system has <sys/procfs.h> */
-#undef HAVE_SYS_PROCFS_H
-
-/* Define if system has <asm/reg.h> */
-#undef HAVE_ASM_REG_H
-
-/* Define if system has <sys/ptrace.h> */
-#undef HAVE_SYS_PTRACE_H
-
-/* Define if system has <sys/reg.h> */
-#undef HAVE_SYS_REG_H
-
-/* Define if system has <sys/user.h> */
-#undef HAVE_SYS_USER_H
-
-/* Define if system has <sys/wait.h> */
-#undef HAVE_SYS_WAIT_H
-
-/* Define for ptrace systems, to the size of a ptrace word. */
-#undef PTRACE_XFER_SIZE
-
-/* Define if ptrace transfer type is long or unsigned long. */
-#undef PTRACE_XFER_TYPE_LONG
-
-/* Define if ptrace transfer type is long long or unsigned long long. */
-#undef PTRACE_XFER_TYPE_LONG_LONG
+/* Define if target is powerpc Linux */
+#undef PPC_LINUX_TARGET
 
 /* Define if ptrace arg1 type is long or unsigned long. */
 #undef PTRACE_ARG1_TYPE_LONG
@@ -73,66 +147,29 @@
 /* Define if ptrace arg4 type is long long or unsigned long long. */
 #undef PTRACE_ARG4_TYPE_LONG_LONG
 
+/* Define for ptrace systems, to the size of a ptrace word. */
+#undef PTRACE_XFER_SIZE
 
-/* Define if target is x86 Linux */
-#undef X86_LINUX_TARGET
+/* Define if ptrace transfer type is long or unsigned long. */
+#undef PTRACE_XFER_TYPE_LONG
 
-/* Define if target is powerpc Linux */
-#undef PPC_LINUX_TARGET
-
-/* Define if target is m68k Linux */
-#undef M68K_LINUX_TARGET
-
-/* Define if target is alpha Linux */
-#undef ALPHA_LINUX_TARGET
-
-/* Define if target is arm Linux */
-#undef ARM_LINUX_TARGET
+/* Define if ptrace transfer type is long long or unsigned long long. */
+#undef PTRACE_XFER_TYPE_LONG_LONG
 
 /* Define if target is SH (3? 4?) Linux */
 #undef SH_LINUX_TARGET
 
-/* Define if target is 64-bit MIPS Linux */
-#undef MIPS64_LINUX_TARGET
-
-/* Define if target is (32-bit) MIPS Linux */
-#undef MIPS_LINUX_TARGET
-
-/* Define if target uses MIPS n64 ABI */
-#undef MIPS_ABI_N64
-
-/* Define if target uses MIPS n32 ABI */
-#undef MIPS_ABI_N32
-
-/* Define if target uses MIPS o32 ABI */
-#undef MIPS_ABI_O32
-
-/* Define if target is FR-V Linux r FR-V uClinux */
-#undef FRV_LINUX_TARGET
-
-/* Define if target is any Linux */
-#undef LINUX_TARGET
-
 /* Define if target is any Solaris */
 #undef SOLARIS_TARGET
 
-/* Define the type name of a gregset */
-#undef GREGSET_T
+/* Define if target is 32-bit SPARC Solaris. */
+#undef SPARC32_SOLARIS_TARGET
 
-/* Define the type name of an fpregset */
-#undef FPREGSET_T
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
 
-/* Define if system headers will define lwpid_t */
-#undef HAVE_LWPID_T
+/* Version number of package */
+#undef VERSION
 
-/* Define if system headers will define psaddr_t */
-#undef HAVE_PSADDR_T
-
-/* Define if system headers will define prgregset_t */
-#undef HAVE_PRGREGSET_T
-
-/* Define if system headers will define prfpregset_t */
-#undef HAVE_PRFPREGSET_T
-
-/* Define name / location of libthread_db.so */
-#undef LIBTHREAD_DB_SO
+/* Define if target is x86 Linux */
+#undef X86_LINUX_TARGET

@@ -1,5 +1,12 @@
 2001-09-13  graydon hoare  <graydon@redhat.com>
 
+	* sid-visual-sched.tk: Rename file.
+	* Makefile.am (pkgdata_DATA): s/sw-visual/sid-visual/.
+	* Makefile.in: Ditto.
+	* compSched.cxx (scheduler_component_ctor_1): Ditto.
+
+2001-09-13  graydon hoare  <graydon@redhat.com>
+
 	* sw-visual-sched.tk: New file.
 	* Makefile.am (pkgdata_DATA): Add sw-visual-sched.tk.
 	* Makefile.in: Regenerate.

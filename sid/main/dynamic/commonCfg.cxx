@@ -528,6 +528,7 @@ SessionCfg::SessionCfg (const string name)
     tksched (NULL),
     tksm (NULL),
     tcl_bridge (NULL),
+    loader (NULL),
     verbose (false),
     use_stdio (true)
 {
@@ -546,11 +547,11 @@ SessionCfg::SessionCfg (const string name)
   yield_net->add_output (0, host_sched, "yield");
   init_seq->add_output (0, reset_net, "input");
 
-  AtomicCfg *ulog = new AtomicCfg ("ulog-*",
+  AtomicCfg *ulog = new AtomicCfg ("ulog-cout",
 				   "libconsoles.la", 
 				   "console_component_library", 
-				   "sid-io-stdio");
-  ulog_map["*"] = ulog;
+				   "sid-io-fileio");
+  ulog_map["-"] = ulog;
   add_child (ulog);
 }
 
@@ -564,10 +565,18 @@ SessionCfg::add_ulog_file (const string name)
   AtomicCfg *ulog = new AtomicCfg ("ulog-" + name, 
 				   "libconsoles.la", 
 				   "console_component_library", 
-				   "sid-io-stdio");
+				   "sid-io-fileio");
   set (ulog, "filename", name);
   ulog_map[name] = ulog;
   add_child (ulog);
+}
+
+void SessionCfg::set_loader (LoaderCfg *l)
+{
+  if (loader)
+    return;
+  loader = l;
+  add_child (l);
 }
 
 void SessionCfg::use_no_stdio ()
@@ -862,7 +871,8 @@ BoardCfg::BoardCfg (const string name,
   gloss (NULL),
   main_mapper (NULL),
   icache (NULL),
-  dcache (NULL)
+  dcache (NULL),
+  loader (NULL)
 {
   assert (sess);
   cpu = new CpuCfg ("cpu", default_cpu_variant, sess);
@@ -909,6 +919,15 @@ void BoardCfg::set_gdb (const string port)
   gdb = new GdbCfg ("gdb", port, cpu, this, sess);
   add_child (gdb);
   sess->use_no_stdio ();
+}
+
+
+void BoardCfg::set_loader (LoaderCfg *l)
+{
+  if (loader)
+    return;
+  loader = l;
+  add_child (l);
 }
 
 void BoardCfg::write_config (Writer &w)

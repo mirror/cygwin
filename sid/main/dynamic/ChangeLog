@@ -1,3 +1,17 @@
+2003-10-21  Dave Brolley  <brolley@redhat.com>
+
+	* mainDynamic.cxx (try_load_file): Call set_loader of
+	session or board as appropriate.
+	* commonCfg.h (loader): New member of SessionCfg.
+	(set_loader): New method of SessionCfg.
+	(loader): New member of SessionCfg.
+	(set_loader): New method of BoardCfg.
+	* commonCfg.cxx (SessionCfg): Initialize loader.
+	(set_loader): New method of SessionCfg.
+	(BoardCfg): Initialize loader.
+	(set_loader): New method of SessionCfg.
+	(set_loader): New method of BoardCfg.
+
 2003-06-10  Dave Brolley  <brolley@redhat.com>
 
 	* mainDynamic.cxx (usage): Document --ulog-* options.

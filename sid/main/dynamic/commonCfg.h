@@ -182,6 +182,8 @@ struct UlogCfg
 
 // you should really only make one of these, with an empty name,
 // unless you want some crazy multi-session support.
+class LoaderCfg;
+
 struct SessionCfg :
   virtual public AggregateCfg, public UlogCfg
 {
@@ -195,6 +197,7 @@ struct SessionCfg :
   GlueSeqCfg *yield_net;
   AtomicCfg *stdio_obj;
   AtomicCfg *main_obj;
+  LoaderCfg *loader;
   // optional bits
   virtual void write_load (Writer &w);
   void use_audio();
@@ -202,6 +205,7 @@ struct SessionCfg :
   void use_tksm();
   void use_tcl_bridge();
   void use_no_stdio ();
+  virtual void set_loader (LoaderCfg *l);
   AtomicCfg *audio;
   AtomicCfg *tksched;
   AtomicCfg *tksm;
@@ -293,6 +297,7 @@ class GdbCfg :
   AtomicCfg *sock;
 };
 
+class LoaderCfg;
 class BoardCfg :
 virtual public AggregateCfg, public UlogCfg
 {
@@ -305,6 +310,7 @@ public:
 	    bool with_cpu_main_mem_connect = false);    
   virtual void use_gloss ();
   virtual void set_cpu (const string variant);
+  virtual void set_loader (LoaderCfg *l);
   virtual void set_gdb (const string port);
   virtual void set_gprof (const string filename, gprof_type type, int interval);
   virtual void set_engine (const string engine);
@@ -339,6 +345,7 @@ public:
   AtomicCfg *core_probe;
   AtomicCfg *icache;
   AtomicCfg *dcache;  
+  LoaderCfg *loader;
 };
 
 #endif // __commonCfg_h__

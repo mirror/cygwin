@@ -213,28 +213,12 @@ AC_DEFUN(TCL_TOOL_LIB_SHORTNAME, [
   libname=$2
   version=$3
 
-  if test "$TCL_LIB_SUFFIX" = "" ; then
-    AC_MSG_ERROR([The TCL_LIB_SUFFIX variable is not defined])
-  fi
-
   # If the . character is not allowed in lib name, remove it from version
   if test "${TCL_LIB_VERSIONS_OK}" != "ok"; then
         version=`echo $version | tr -d .`
   fi
 
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "$GCC" != yes; then
-        eval "short_libname=\"${TCL_VENDOR_PREFIX}${libname}${version}${TCL_LIB_SUFFIX}\""
-      else
-        short_libname="-l${TCL_VENDOR_PREFIX}${libname}${version}${TCL_DBGX}"
-      fi
-    ;;
-    *)
-      short_libname="-l${TCL_VENDOR_PREFIX}${libname}${version}\${TCL_DBGX}"
-    ;;
-  esac
-
+  short_libname="-l${TCL_VENDOR_PREFIX}${libname}${version}\${TCL_DBGX}"
   $1=$short_libname
 ])
 

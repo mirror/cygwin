@@ -255,14 +255,8 @@ Itcl_ClassCmd(clientData, interp, objc, objv)
         /* isProcCallFrame */ 0);
 
     if (result == TCL_OK) {
-      /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
-      result = Tcl_EvalObj(interp, objv[2], 0);
-#else
-      result = Tcl_EvalObj(interp, objv[2]);
-#endif
-      /* END CYGNUS LOCAL */
-      Tcl_PopCallFrame(interp);
+        result = Tcl_EvalObj(interp, objv[2]);
+        Tcl_PopCallFrame(interp);
     }
     Itcl_PopStack(&info->cdefnStack);
 
@@ -580,13 +574,7 @@ Itcl_ClassProtectionCmd(clientData, interp, objc, objv)
     oldLevel = Itcl_Protection(interp, pInfo->pLevel);
 
     if (objc == 2) {
-      /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
-      result = Tcl_EvalObj(interp, objv[1], 0);
-#else
-      result = Tcl_EvalObj(interp, objv[1]);
-#endif
-      /* END CYGNUS LOCAL */
+        result = Tcl_EvalObj(interp, objv[1]);
     } else {
         result = Itcl_EvalArgs(interp, objc-1, objv+1);
     }

@@ -31,7 +31,6 @@
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 #include "itclInt.h"
-#include "tclCompile.h"
 
 /*
  *  FORWARD DECLARATIONS
@@ -1001,13 +1000,7 @@ Itcl_EvalMemberCode(interp, mfunc, member, contextObj, objc, objv)
         ckfree((char*)argv);
     }
     else if ((mcode->flags & ITCL_IMPLEMENT_TCL) != 0) {
-      /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
-      result = Tcl_EvalObj(interp, mcode->procPtr->bodyPtr, 0);
-#else
-      result = Tcl_EvalObj(interp, mcode->procPtr->bodyPtr);
-#endif
-      /* END CYGNUS LOCAL */
+        result = Tcl_EvalObj(interp, mcode->procPtr->bodyPtr);
     }
     else {
         panic("itcl: bad implementation flag for %s", member->fullname);
@@ -1345,7 +1338,7 @@ Itcl_GetMemberFuncUsage(mfunc, contextObj, objPtr)
     Tcl_Obj *objPtr;            /* returns: string showing usage */
 {
     int argcount;
-    char *name;
+    CONST char *name;
     CompiledLocal *arglist, *argPtr;
     Tcl_HashEntry *entry;
     ItclMemberFunc *mf;
@@ -2302,14 +2295,8 @@ Itcl_ConstructBase(interp, contextObj, contextClass)
      *    now--just before the body of the constructor is executed.
      */
     if (contextClass->initCode) {
-      /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
-      if (Tcl_EvalObj(interp, contextClass->initCode, 0) != TCL_OK) {
-#else
-	if (Tcl_EvalObj(interp, contextClass->initCode) != TCL_OK) {
-#endif
-	  /* END CYGNUS LOCAL */
-	  return TCL_ERROR;
+        if (Tcl_EvalObj(interp, contextClass->initCode) != TCL_OK) {
+            return TCL_ERROR;
         }
     }
 

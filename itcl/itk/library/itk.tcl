@@ -37,7 +37,6 @@ if {$tcl_platform(os) == "MacOS"} {
 #  Tcl than C.
 # ----------------------------------------------------------------------
 proc ::itk::remove_destroy_hook {widget} {
-    if {![winfo exists $widget]} {return}
     set tags [bindtags $widget]
     set i [lsearch $tags "itk-destroy-$widget"]
     if {$i >= 0} {

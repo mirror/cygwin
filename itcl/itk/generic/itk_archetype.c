@@ -54,11 +54,6 @@ typedef struct ArchComponent {
     ItclMember *member;         /* contains protection level for this comp */
     Tcl_Command accessCmd;      /* access command for component widget */
     Tk_Window tkwin;            /* Tk window for this component widget */
-    char *pathName;             /* Tk path name for this component widget.
-                                   We can't use the tkwin pointer after
-                                   the window has been destroyed so we
-                                   need to save a copy for use in
-                                   Itk_ArchCompDeleteCmd() */
 } ArchComponent;
 
 /*
@@ -795,13 +790,7 @@ Itk_ArchCompAddCmd(dummy, interp, objc, objv)
     uplevelFramePtr = _Tcl_GetCallFrame(interp, 1);
     oldFramePtr = _Tcl_ActivateCallFrame(interp, uplevelFramePtr);
 
-      /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
-    if (Tcl_EvalObj(interp, objv[2], 0) != TCL_OK) {
-#else
     if (Tcl_EvalObj(interp, objv[2]) != TCL_OK) {
-#endif
-      /* END CYGNUS LOCAL */
         goto compFail;
     }
 
@@ -990,14 +979,8 @@ Itk_ArchCompAddCmd(dummy, interp, objc, objv)
         parserNs, /* isProcCallFrame */ 0);
 
     if (result == TCL_OK) {
-      /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
-      result = Tcl_EvalObj(interp, objPtr, 0);
-#else
-      result = Tcl_EvalObj(interp, objPtr);
-#endif
-      /* END CYGNUS LOCAL */
-      Tcl_PopCallFrame(interp);
+        result = Tcl_EvalObj(interp, objPtr);
+        Tcl_PopCallFrame(interp);
     }
 
     if (objPtr != objv[3]) {
@@ -1158,7 +1141,7 @@ Itk_ArchCompDeleteCmd(dummy, interp, objc, objv)
         */
         Tcl_DStringInit(&buffer);
         Tcl_DStringAppend(&buffer, "itk::remove_destroy_hook ", -1);
-        Tcl_DStringAppend(&buffer, archComp->pathName, -1);
+        Tcl_DStringAppend(&buffer, Tk_PathName(archComp->tkwin), -1);
         (void) Tcl_Eval(interp, Tcl_DStringValue(&buffer));
         Tcl_ResetResult(interp);
         Tcl_DStringFree(&buffer);
@@ -1585,13 +1568,7 @@ Itk_ArchOptUsualCmd(clientData, interp, objc, objv)
     entry = Tcl_FindHashEntry(&mergeInfo->usualCode, tag);
     if (entry) {
         codePtr = (Tcl_Obj*)Tcl_GetHashValue(entry);
-      /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
-        return Tcl_EvalObj(interp, codePtr, 0);
-#else
         return Tcl_EvalObj(interp, codePtr);
-#endif
-      /* END CYGNUS LOCAL */
     }
 
     Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
@@ -1832,6 +1809,11 @@ Itk_ArchInitCmd(dummy, interp, objc, objv)
         for (objc--,objv++; objc > 0; objc-=2, objv+=2) {
             token = Tcl_GetStringFromObj(objv[0], (int*)NULL);
             if (objc < 2) {
+	        /* Bug 227814
+		 * Ensure that the interp result is unshared.
+		 */
+
+	        Tcl_ResetResult(interp);
                 Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
                     "value for \"", token, "\" missing",
                     (char*)NULL);
@@ -2894,6 +2876,11 @@ Itk_ArchConfigOption(interp, info, name, value)
      */
     entry = Tcl_FindHashEntry(&info->options, name);
     if (!entry) {
+        /* Bug 227876
+	 * Ensure that the interp result is unshared.
+	 */
+
+        Tcl_ResetResult (interp);
         Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
             "unknown option \"", name, "\"",
             (char*)NULL);
@@ -3098,7 +3085,8 @@ Itk_CreateArchComponent(interp, info, name, cdefn, accessCmd)
     ItclClass *cdefn;              /* component created in this class */
     Tcl_Command accessCmd;         /* access command for component */
 {
-    char *wname, *init;
+    char *init;
+    CONST char *wname;
     ArchComponent *archComp;
     ArchOption *archOpt;
     Tk_Window tkwin;
@@ -3110,14 +3098,14 @@ Itk_CreateArchComponent(interp, info, name, cdefn, accessCmd)
      *  Save this component in the itk_component() array.
      */
     wname = Tcl_GetCommandName(interp, accessCmd);
-    Tcl_SetVar2(interp, "itk_component", name, wname, 0);
+    Tcl_SetVar2(interp, "itk_component", name, (char *)wname, 0);
 
     /*
      *  If the symbolic name for the component is "hull", then this
      *  is the toplevel or frame that embodies a mega-widget.  Update
      *  the Archtype info to include the window token.
      */
-    tkwin = Tk_NameToWindow(interp, wname, Tk_MainWindow(interp));
+    tkwin = Tk_NameToWindow(interp, (char *)wname, Tk_MainWindow(interp));
 
     if (strcmp(name, "hull") == 0) {
         if (tkwin == NULL) {
@@ -3176,8 +3164,6 @@ Itk_CreateArchComponent(interp, info, name, cdefn, accessCmd)
     archComp->member     = memPtr;
     archComp->accessCmd  = accessCmd;
     archComp->tkwin      = tkwin;
-    archComp->pathName   = (char *) ckalloc((unsigned)(strlen(wname)+1));
-    strcpy(archComp->pathName, wname);
 
     return archComp;
 }
@@ -3196,7 +3182,6 @@ Itk_DelArchComponent(archComp)
     ArchComponent *archComp;  /* pointer to component data */
 {
     ckfree((char*)archComp->member);
-    ckfree((char*)archComp->pathName);
     ckfree((char*)archComp);
 }
 
@@ -4087,13 +4072,7 @@ Itk_CreateGenericOpt(interp, switchName, accessCmd)
     Tcl_AppendToObj(codePtr, " configure ", -1);
     Tcl_AppendToObj(codePtr, name, -1);
 
-      /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
-    if (Tcl_EvalObj(interp, codePtr, 0) != TCL_OK) {
-#else
-      if (Tcl_EvalObj(interp, codePtr) != TCL_OK) {
-#endif
-      /* END CYGNUS LOCAL */
+    if (Tcl_EvalObj(interp, codePtr) != TCL_OK) {
         goto optionDone;
     }
 

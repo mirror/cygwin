@@ -30,7 +30,7 @@ subdirs=
 if test -d ${srcdir}/../snavigator && test ! -d ${srcdir}/../gdb/gdbtk ; then
     subdirs="itcl itk"
 else
-    subdirs="itcl itk iwidgets3.0.0"
+    subdirs="itcl itk iwidgets"
 fi
 AC_CONFIG_SUBDIRS($subdirs)
 

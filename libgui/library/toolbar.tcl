@@ -71,25 +71,33 @@ proc TOOLBAR_button_up {w} {
     set TOOLBAR_state(button) ""
     
     #restore original relief
-    $w configure -relief $TOOLBAR_state(relief)
+      $w configure -relief $TOOLBAR_state(relief)      
     
     if {$TOOLBAR_state(window) == $w
 	&& [$w cget -state] != "disabled"} then {
-	
-#SN does the toolbar bindings using "+" so that older
-#bindings don't disapear. So no need to invoke the command.
-#other applications should do the same so that we can delete
-#this hack
-global sn_options
-if {! [array exists sn_options]} {
-      #invoke the binding
-      uplevel \#0 [list $w invoke]
-}
+
+      #SN does the toolbar bindings using "+" so that older
+      #bindings don't disapear. So no need to invoke the command.
+      #other applications should do the same so that we can delete
+      #this hack
+      global sn_options
+      if {! [array exists sn_options]} {
+	#invoke the binding
+	uplevel \#0 [list $w invoke]
+      }
       if {[winfo exists $w]} then {
 	if {[$w cget -state] != "disabled"} then {
 	  $w configure -state normal
 	}
       }
+      # HOWEVER, if the pointer is still over the button, and it
+      # is enabled, then raise it again.
+
+      if {[string compare [winfo containing \
+			     [winfo pointerx $w] \
+			     [winfo pointery $w]] $w] == 0} { 
+	$w configure -relief raised
+      }	
     }
   }
 }

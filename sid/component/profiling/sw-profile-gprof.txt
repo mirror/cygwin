@@ -7,6 +7,7 @@
 
   Attributes: value-count value-min value-max value-attribute 
 		output-file output-file-endianness sample reset store
+		limit-min limit-max
   Pins: sample reset store
   Relations: target-component
   Shared library: libprof.la
@@ -43,7 +44,8 @@
 
       If the target component is unset, or its target attribute does not
       result in a valid numeric string, no sample is accumulated.  If a
-      sample was collected, "value-count" is incremented, and "value-min"
+      sample was collected, and falls between the "limit-min" and "limit-max"
+      attributes' bounds, "value-count" is incremented, and "value-min"
       and "value-max" registers are updated.
 
       Whenever the "reset" pin is driven, the entire accumulated
@@ -116,6 +118,8 @@
       - value-count | register | decimal string | n/a | data gathering
       - value-min | register | decimal string | n/a | data gathering
       - value-max | register | decimal string | n/a | data gathering
+      - limit-min | setting | decimal string | 0 | data gathering
+      - limit-max | setting | decimal string | infinity | data gathering
       - value-attribute | setting | name | "pc" | data gathering
       - output-file | setting | file name | "gmon.out" | configuration
       - output-file-endianness | setting | 0/1/2/little/big/unknown | unknown | configuration

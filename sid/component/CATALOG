@@ -1,4 +1,4 @@
-This is a current list of sid component shared libraries. $Date: 2001/06/25 17:49:33 $
+This is a current list of sid component shared libraries. $Date: 2001/06/26 18:52:12 $
 
 DIRECTORY       DSO                     COMPONENT_LIBRARY                  MAINTAINERS
 
@@ -23,7 +23,6 @@ parport         libparport.la           parport_component_library          Red H
 profiling       libprof.la              prof_component_library             Red Hat
 rtc             librtc.la               rtc_component_library              Red Hat
 sched           libsched.la             sched_component_library            Red Hat
-targetview      libtargetview.la        targetview_component_library       Red Hat
 tcl             libtclapi.la            tcl_bridge_library                 Red Hat
 timers          libtimers.la            timer_component_library            Red Hat
 uart            libuart.la              uart_component_library             Red Hat

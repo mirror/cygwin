@@ -1,3 +1,10 @@
+2003-09-11  Doug Evans  <dje@sebabeach.org>
+
+	* Makefile.am (ARCHFILE): New var.
+	(desc): Pass $(ARCHFILE) for -a parm, not $(ARCH).
+	(html,opcodes,sim-arch,sim-cpu,gas-test,sim-test): Ditto.
+	* Makefile.in: Regenerate.
+
 2003-09-08  Dave Brolley  <brolley@redhat.com>
 
 	On behalf of Doug Evans <dje@sebabeach.org>

@@ -398,7 +398,7 @@ cache_component::unlock_line (host_int_4 addr)
 void
 cache_component::emit_report (host_int_4 ignore)
 {
-  cout << report_heading << endl << endl
+  cout << report_heading << endl
        << "reads:        " << make_attribute (stats.reads) << endl
        << "read hits:    " << read_hit_rate () << endl
        << "writes:       " << make_attribute (stats.writes) << endl
@@ -420,7 +420,7 @@ cache_component::get_hash_shift ()
 }
 
 sid::component::status
-cache_component::set_hash_mask (const string& value)
+cache_component::set_hash_shift (const string& value)
 {
   unsigned shift;
 
@@ -435,7 +435,7 @@ cache_component::set_hash_mask (const string& value)
 }
 
 sid::component::status
-cache_component::set_hash_shift (const string& value)
+cache_component::set_hash_mask (const string& value)
 {
   sid::host_int_4 mask;
 

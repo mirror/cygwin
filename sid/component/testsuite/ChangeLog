@@ -1,5 +1,16 @@
 2001-07-19  Ben Elliston  <bje@redhat.com>
 
+	* sidcomp.cache/cache.exp: Call sid_stop at test completion.
+	* sidcomp.cache/coherency.exp: Likewise.
+	* sidcomp.cache/fifo.exp: Likewise.
+	* sidcomp.cache/lock.exp: Likewise.
+	* sidcomp.cache/lru.exp: Likewise.
+	* sidcomp.cache/misaligned.exp: Likewise.
+	* sidcomp.cache/prefetch.exp: Likewise.
+	* sidcomp.cache/random.exp: Likewise.
+	* sidcomp.cache/writealloc.exp: Likewise.
+	* sidcomp.cache/writethru.exp: Likewise.
+
 	* config/default.exp (sid_stop): Don't close with -slave.
 
 2001-07-13  Frank Ch. Eigler  <fche@redhat.com>

@@ -1,3 +1,12 @@
+2001-10-26  Vladimir Makarov  <vmakarov@redhat.com>
+
+	* gloss.h (gloss32::do_sys_unlink): New function.
+
+	* gloss.cxx (gloss32::syscall_trap): Add processing SYS_unlink.
+	(gloss32::do_sys_unlink): New function.
+	(gloss32::do_sys_exit): Add breaks after each case.
+	(gloss32::do_sys_lseek): Set up correct results.
+
 2001-10-10  Frank Ch. Eigler  <fche@redhat.com>
 
 	On advice of Keith Rautenbach <Keith.Rautenbach@insignia.com>:

@@ -148,6 +148,7 @@ protected:
   void do_sys_time();
   void do_sys_gettimeofday();
   void do_sys_times();
+  void do_sys_unlink();
   virtual void do_nonstandard_target_syscalls(int32 syscall);
   virtual bool target_to_host_open_flags (int open_flags, int& flags);
   virtual int32 target_to_host_syscall (int32 syscall);

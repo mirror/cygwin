@@ -1,3 +1,14 @@
+2002-04-17  Keith Seitz  <keiths@redhat.com>
+
+	From investigative work by Ton van Overbeek <tvoverbe@cistron.nl>:
+	* iwidgets3.0.0/generic/scrolledhtml.itk (_defUnknownImg): Add
+	global namespace qualifier to "image" command, since a parent
+	class now defines an image method.
+	(::iwidgets::scrolledhtml::destructor): Likewise.
+	(::iwidgets::Scrolledhtml::unknownimage): Likewise.
+	(::iwidgets::scrolledhtml::clear): Likewise.
+	(::iwidgets::scrolledhtml::_entity_img): Likewise.
+	
 2002-04-01  Keith Seitz  <keiths@redhat.com>
 
 	* iwidgets3.0.0/generic/feedback.itk: Import version 1.5.

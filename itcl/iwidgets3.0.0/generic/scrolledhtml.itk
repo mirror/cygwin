@@ -42,7 +42,7 @@
 # ----------------------------------------------------------------------
 #  AUTHOR: Kris Raney                    EMAIL: kraney@spd.dsccc.com
 #
-#  @(#) $Id: scrolledhtml.itk,v 1.2 1999/01/27 18:56:35 jingham Exp $
+#  @(#) $Id: scrolledhtml.itk,v 1.2.172.1 2001/05/18 02:21:49 mdejong Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1996 DSC Technologies Corporation
 # ======================================================================
@@ -141,6 +141,7 @@ class iwidgets::Scrolledhtml {
   itk_option define -unknownimage unknownimage File {}
   itk_option define -textbackground textBackground Background {}
   itk_option define -update update Update 1
+  itk_option define -debug debug Debug 0
 
   public method import {args}
   public method clear {}
@@ -304,7 +305,7 @@ class iwidgets::Scrolledhtml {
 
   private variable _initialized 0
 
-  private variable _defUnknownImg [image create photo -data {
+  private variable _defUnknownImg [::image create photo -data {
 R0lGODdhHwAgAPQAAP///wAAAMzMzC9PT76+vvnTogCR/1WRVaoAVf//qvT09OKdcWlcx19f
 X9/f339/f8vN/J2d/aq2qoKCggAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 ACwAAAAAHwAgAAAF/iAgjqRDnmiKmqOkqsTaToDjvudTttLjOITJbTQhGI+iQE0xMvZqQIDw
@@ -349,10 +350,10 @@ body iwidgets::Scrolledhtml::constructor {args} {
 # ------------------------------------------------------------------
 body iwidgets::Scrolledhtml::destructor {} {
     foreach x $_images {
-      image delete $x
+      ::image delete $x
     }
     if {$_unknownimg != $_defUnknownImg} {
-      image delete $_unknownimg
+      ::image delete $_unknownimg
     }
 }
 
@@ -431,14 +432,14 @@ configbody iwidgets::Scrolledhtml::unknownimage {
    set oldimage $_unknownimg
    if {$itk_option(-unknownimage) != {}} {
       set uki $itk_option(-unknownimage)
-      if [catch { set _unknownimg [image create photo -file $uki] } err] {
+      if [catch { set _unknownimg [::image create photo -file $uki] } err] {
          error "Couldn't create image $uki:\n$err\nUnknown image not found"
       }
    } else {
       set _unknownimg $_defUnknownImg
    }
    if {$oldimage != {} && $oldimage != $_defUnknownImg} {
-      image delete $oldimage
+      ::image delete $oldimage
    }
 }
 
@@ -482,7 +483,7 @@ body iwidgets::Scrolledhtml::clear {} {
     $itk_component(text) config -state normal
     $itk_component(text) delete 1.0 end
     foreach x $_images {
-      image delete $x
+      ::image delete $x
     }
     set _images {}
     _setup
@@ -544,7 +545,7 @@ body iwidgets::Scrolledhtml::import {args} {
                   append _cwd [file dirname $filename]
                 } else {
                   set f [open $filename r]
-g                  set _cwd [file dirname $filename]
+                  set _cwd [file dirname $filename]
                 }
               }
           }
@@ -611,7 +612,12 @@ body iwidgets::Scrolledhtml::render {html {wd .}} {
 			    [lindex $entity 1]] "" entity
 		set cmd [string tolower [lindex $entity 0]]
 		if {[info command _entity_$cmd]!=""} {
-		    catch {eval _entity_$cmd [lrange $entity 1 end]}
+		  if {[catch {eval _entity_$cmd [lrange $entity 1 end]} bad]} {
+		    if {$itk_option(-debug)} {
+		      global errorInfo
+		      puts stderr "render: _entity_$cmd [lrange $entity 1 end] = Error:$bad\n$errorInfo"
+		    }
+		  }
 		}
 		set html \
 		    [string range $html [expr [lindex $match 1]+1] end]
@@ -728,16 +734,24 @@ body iwidgets::Scrolledhtml::_append_text {text} {
 	if ![string length $text] return
     }
     if {!$_pre && !$_intitle} {
-	set p [$_hottext get "end - 2c"]
+     	if {[catch {$_hottext get "end - 2c"} p]} {
+     	    set p ""
+     	}
 	set n [string index $text 0]
         if {$n == " " && $p == " "} {
           set text [string range $text 1 end]
         }
-	$_hottext insert end $text $_tag
+ 	if {[catch {$_hottext insert end $text $_tag}]} {
+ 	    set pht [winfo parent $_hottext]
+ 	    catch {$pht insert end $text $_tag}
+ 	}
 	return
     }
     if {$_pre && !$_intitle} {
-	$_hottext insert end $text $_tag
+ 	if {[catch {$_hottext insert end $text $_tag}]} {
+ 	    set pht [winfo parent $_hottext]
+ 	    catch {$pht insert end $text $_tag}
+ 	}
 	return
     }
     append _title $text
@@ -807,7 +821,7 @@ body iwidgets::Scrolledhtml::_set_tag {} {
     if {![info exists _tagl($_tag)]} {
 	set _tagfont($_tag) 1
 	eval $_hottext tag configure $_tag \
-	    -foreground $_color \
+	    -foreground ${_color} \
 	    -lmargin1 ${_left}m \
 	    -lmargin2 ${_left2}m $args
 	if [catch {eval $_hottext tag configure $_tag \
@@ -1628,7 +1642,7 @@ body iwidgets::Scrolledhtml::_entity_img {{args {}}} {
     } else {
        set file $_cwd/$ar(src)
     }
-    if [catch {set img [image create photo -file $file]} err] {
+    if [catch {set img [::image create photo -file $file]} err] {
       if {[info exists ar(width)] && [info exists ar(height)] } {
         # suggestions exist, so make frame appropriate size and add a border
         $imgframe configure -width $ar(width) -height $ar(height) -borderwidth 2
@@ -2062,8 +2076,10 @@ body iwidgets::Scrolledhtml::_entity_table {{args {}}} {
     _push link $_link
     _push alink $_alink
     # push fake first row to avoid using optional /tr tag
-    _push color {}
-    _push bgcolor {}
+    # (This needs to set a real color - not the empty string
+    # becaule later code will try to use those values.)
+    _push color $_color
+    _push bgcolor $_bgcolor
     _push link {}
     _push alink {}
 
@@ -2125,7 +2141,7 @@ body iwidgets::Scrolledhtml::_entity_table {{args {}}} {
 # end table
 # ------------------------------------------------------------------
 body iwidgets::Scrolledhtml::_entity_/table {} {
-  if $_intable {
+  if {$_intable} {
     _pop tableborder
     set table [[_pop table] childsite]
     _pop row
@@ -2147,11 +2163,23 @@ body iwidgets::Scrolledhtml::_entity_/table {} {
     set _bgcolor [_pop bgcolor]
     set _link [_pop link]
     set _alink [_pop alink]
-      foreach x [grid slaves $table] {
-	  if {[$x cget -height] == 1} {
-              $x configure -height [lindex [split [$x index "end - 1 chars"] "."] 0]
-          }
-      }
+    foreach x [grid slaves $table] {
+ 	set text [$x get 1.0 end]
+ 	set tl [split $text \n]
+ 	set max 0
+ 	foreach l $tl {
+ 	    set len [string length $l]
+ 	    if {$len > $max} {
+ 	        set max $len
+ 	    }
+ 	}
+ 	if {$max > [$x cget -width]} {
+ 	    $x configure -width $max
+ 	}
+	if {[$x cget -height] == 1} {
+            $x configure -height [lindex [split [$x index "end - 1 chars"] "."] 0]
+        }
+    }
     $_hottext configure -state disabled
     set _hottext [_pop hottext]
     $_hottext configure -state normal
@@ -2217,17 +2245,29 @@ body iwidgets::Scrolledhtml::_entity_td {{args {}}} {
       set cellspacing [_peek cellspacing]
     set _hottext $table.cell[incr _counter]
     text $_hottext -relief flat -width $ar(width) -height $ar(height) \
-             -foreground $_color -background $_bgcolor -highlightthickness 0 \
+	     -highlightthickness 0 -wrap word -cursor $itk_option(-cursor) \
              -wrap word -cursor $itk_option(-cursor) \
              -padx $cellpadding -pady $cellpadding
-      if [info exists ar(nowrap)] {
-          $_hottext configure -wrap none
-      }
+    if {$_color != ""} {
+        $_hottext config -foreground $_color
+    }
+    if {$_bgcolor != ""} {
+        $_hottext config -background $_bgcolor
+    }
+    if [info exists ar(nowrap)] {
+	$_hottext configure -wrap none
+    }
     if [_peek tableborder] {
        $_hottext configure -relief sunken
     }
     set row [_peek row]
+    if {$row < 0} {
+        set row 0
+    }
     set column [_pop column]
+    if {$column < 0} {
+        set column 0
+    }
     while {[grid slaves $table -row $row -column $column] != ""} {
       incr column
     }

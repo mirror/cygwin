@@ -532,7 +532,7 @@ gdb::process_get_exp_regs ()
 // Helper functions
 
 template <class Type>
-void 
+bus::status
 read_bus_word(gdbserv* gdbserv, 
 	      sid::bus* bus,
 	      host_int_4 address,
@@ -545,13 +545,15 @@ read_bus_word(gdbserv* gdbserv,
       for (unsigned i=0; i < sizeof(typename Type::value_type); i++)
 	gdbserv_output_byte (gdbserv, value.read_byte(i));
     }
-  else
+  // misaligned will be handled by the caller
+  else if (s != bus::misaligned)
     gdbserv_output_string (gdbserv, "E05");
+  return s;
 }
 
 
 template <class Type>
-void 
+bus::status
 write_bus_word(gdbserv* gdbserv, 
 	       int binary,
 	       sid::bus* bus,
@@ -572,10 +574,11 @@ write_bus_word(gdbserv* gdbserv,
     }
 
   bus::status s = bus->write (address, value);
-  if (s == bus::ok)
-    ; // No response means "OK"
+  if (s == bus::ok || s == bus::misaligned)
+    ; // No response means "OK" -- misaligned will be handled by the caller
   else
     gdbserv_output_string (gdbserv, "E05");
+  return s;
 }
 
 
@@ -620,26 +623,27 @@ gdb::process_get_mem (struct gdbserv_reg *reg_addr,
     }
   host_int_4 addr = addr8; // truncate
 
-  if (addr % len == 0)
-    {
-      if (len==1 && e==endian_big) 
-	{ read_bus_word (gdbserv, memory, addr, big_int_1()); return; }
-      if (len==1 && e==endian_little)
-	{ read_bus_word (gdbserv, memory, addr, little_int_1()); return; }
-      if (len==2 && e==endian_big) 
-	{ read_bus_word (gdbserv, memory, addr, big_int_2()); return; }
-      if (len==2 && e==endian_little)
-	{ read_bus_word (gdbserv, memory, addr, little_int_2()); return; }
-      if (len==4 && e==endian_big) 
-	{ read_bus_word (gdbserv, memory, addr, big_int_4()); return; }
-      if (len==4 && e==endian_little)
-	{ read_bus_word (gdbserv, memory, addr, little_int_4()); return; }
-      if (len==8 && e==endian_big) 
-	{ read_bus_word (gdbserv, memory, addr, big_int_8()); return; }
-      if (len==8 && e==endian_little)
-	{ read_bus_word (gdbserv, memory, addr, little_int_8()); return; }
-    }
+  bus::status b = bus::misaligned;
+  if (len==1 && e==endian_big) 
+    b = read_bus_word (gdbserv, memory, addr, big_int_1());
+  else if (len==1 && e==endian_little)
+    b = read_bus_word (gdbserv, memory, addr, little_int_1());
+  else if (len==2 && e==endian_big) 
+    b = read_bus_word (gdbserv, memory, addr, big_int_2());
+  else if (len==2 && e==endian_little)
+    b = read_bus_word (gdbserv, memory, addr, little_int_2());
+  else if (len==4 && e==endian_big) 
+    b = read_bus_word (gdbserv, memory, addr, big_int_4());
+  else if (len==4 && e==endian_little)
+    b = read_bus_word (gdbserv, memory, addr, little_int_4());
+  else if (len==8 && e==endian_big) 
+    b = read_bus_word (gdbserv, memory, addr, big_int_8());
+  else if (len==8 && e==endian_little)
+    b = read_bus_word (gdbserv, memory, addr, little_int_8());
 
+  if (b != bus::misaligned)
+    return;
+  
   // Unaligned access or unsupported size.
   if (e==endian_little)
     {
@@ -705,25 +709,26 @@ gdb::process_set_mem (struct gdbserv_reg *reg_addr,
     }
   host_int_4 addr = addr8; // truncate
 
-  if (addr % len == 0)
-    {
-      if (len==1 && e==endian_big) 
-	{ write_bus_word (gdbserv, binary, memory, addr, big_int_1()); return; }
-      if (len==1 && e==endian_little)
-	{ write_bus_word (gdbserv, binary, memory, addr, little_int_1()); return; }
-      if (len==2 && e==endian_big) 
-	{ write_bus_word (gdbserv, binary, memory, addr, big_int_2()); return; }
-      if (len==2 && e==endian_little)
-	{ write_bus_word (gdbserv, binary, memory, addr, little_int_2()); return; }
-      if (len==4 && e==endian_big) 
-	{ write_bus_word (gdbserv, binary, memory, addr, big_int_4()); return; }
-      if (len==4 && e==endian_little)
-	{ write_bus_word (gdbserv, binary, memory, addr, little_int_4()); return; }
-      if (len==8 && e==endian_big) 
-	{ write_bus_word (gdbserv, binary, memory, addr, big_int_8()); return; }
-      if (len==8 && e==endian_little)
-	{ write_bus_word (gdbserv, binary, memory, addr, little_int_8()); return; }
-    }
+  bus::status b = bus::misaligned;
+  if (len==1 && e==endian_big) 
+    b = write_bus_word (gdbserv, binary, memory, addr, big_int_1());
+  if (len==1 && e==endian_little)
+    b = write_bus_word (gdbserv, binary, memory, addr, little_int_1());
+  if (len==2 && e==endian_big) 
+    b = write_bus_word (gdbserv, binary, memory, addr, big_int_2());
+  if (len==2 && e==endian_little)
+    b = write_bus_word (gdbserv, binary, memory, addr, little_int_2());
+  if (len==4 && e==endian_big) 
+    b = write_bus_word (gdbserv, binary, memory, addr, big_int_4());
+  if (len==4 && e==endian_little)
+    b = write_bus_word (gdbserv, binary, memory, addr, little_int_4());
+  if (len==8 && e==endian_big) 
+    b = write_bus_word (gdbserv, binary, memory, addr, big_int_8());
+  if (len==8 && e==endian_little)
+    b = write_bus_word (gdbserv, binary, memory, addr, little_int_8());
+
+  if (b != bus::misaligned)
+    return;
 
   // Unaligned access or unsupported size.
   if (e==endian_little)

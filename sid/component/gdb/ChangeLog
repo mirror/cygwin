@@ -1,3 +1,12 @@
+2004-07-01  Dave Brolley  <brolley@redhat.com>
+
+	* gdb.cxx (read_bus_word): Now returns bus::status. Return status
+	from bus->read.
+	(write_bus_word): Ditto for status from bus->write.
+	(process_get_mem): Back out previous patch. Retry access
+	one byte at a time if bus::misaligned is returned from downstream.
+	(process_set_mem): Ditto.
+
 2004-06-28  Dave Brolley  <brolley@redhat.com>
 
 	* gdb.cxx (process_get_mem): Use byte-at-a-time access for unaligned

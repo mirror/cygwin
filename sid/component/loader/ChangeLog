@@ -1,3 +1,8 @@
+2004-02-23  Dave Brolley  <brolley@redhat.com>
+
+	* elfload.c (readElfFile): Get address from offset 16 for 64 bit and
+	offset 12 for 16 bit.
+
 2004-02-14  Dave Brolley  <brolley@redhat.com>
 
         * Makefile.am (INCLUDES): Add $(srcdir)/../../../include to find

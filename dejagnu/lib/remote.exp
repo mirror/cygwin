@@ -581,7 +581,7 @@ proc standard_send { dest string } {
 }
 
 proc file_on_host { op file args } {
-    return [eval remote_file host \"$op\" '\$file\" $args];
+    return [eval remote_file host \"$op\" \"$file\" $args];
 }
 
 proc file_on_build { op file args } {

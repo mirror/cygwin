@@ -1103,8 +1103,8 @@ frv_fdpic_loadmap_addresses (struct gdbserv *serv, int pid, int regno,
                       (void *)reginfo[regno].ptrace_offset,
 		      &val);
       if (process->debug_backend)
-	fprintf (stderr, "PTRACE_GETFDPIC pid=%d offset=%d val=%x\n",
-	         pid,reginfo[regno].ptrace_offset,val);
+	fprintf (stderr, "PTRACE_GETFDPIC pid=%d offset=%d val=%lx\n",
+	         pid, reginfo[regno].ptrace_offset, val);
       if (status < 0)
 	return errno;
       else

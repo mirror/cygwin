@@ -93,22 +93,22 @@ noinst_LTLIBRARIES = libt6963c-test.la libt6963c-japan.la libhd-two-line.la libh
 INCLUDES = -I. -I../../../include -I$(srcdir)/../../../include -I$(srcdir)/..
 
 libt6963c_test_la_SOURCES = t6963c-tester.cxx
-libt6963c_test_la_LDFLAGS = -rpath $(pkglibdir) -module -no-undefined
+libt6963c_test_la_LDFLAGS = -rpath `pwd` -module -no-undefined
 
 libt6963c_japan_la_SOURCES = t6963c-japan.cxx
-libt6963c_japan_la_LDFLAGS = -rpath $(pkglibdir) -module -no-undefined
+libt6963c_japan_la_LDFLAGS = -rpath `pwd` -module -no-undefined
 
 libhd_two_line_la_SOURCES = hd-two-line.cxx hd-tester.cxx
-libhd_two_line_la_LDFLAGS = -rpath $(pkglibdir) -module -no-undefined
+libhd_two_line_la_LDFLAGS = -rpath `pwd` -module -no-undefined
 
 libhd_one_line_la_SOURCES = hd-one-line.cxx hd-tester.cxx
-libhd_one_line_la_LDFLAGS = -rpath $(pkglibdir) -module -no-undefined
+libhd_one_line_la_LDFLAGS = -rpath `pwd` -module -no-undefined
 
 libhd_5X10_la_SOURCES = hd-5X10.cxx hd-tester.cxx
-libhd_5X10_la_LDFLAGS = -rpath $(pkglibdir) -module -no-undefined
+libhd_5X10_la_LDFLAGS = -rpath `pwd` -module -no-undefined
 
 libhd_europe_la_SOURCES = hd-europe.cxx hd-tester.cxx
-libhd_europe_la_LDFLAGS = -rpath $(pkglibdir) -module -no-undefined
+libhd_europe_la_LDFLAGS = -rpath `pwd` -module -no-undefined
 mkinstalldirs = $(SHELL) $(top_srcdir)/../config/mkinstalldirs
 CONFIG_HEADER = ../../config.h
 CONFIG_CLEAN_FILES = 

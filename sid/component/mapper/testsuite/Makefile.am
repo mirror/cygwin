@@ -7,5 +7,5 @@ INCLUDES = -I. -I../../../include -I$(srcdir)/../../../include -I$(srcdir)/..
 noinst_LTLIBRARIES = libbusif.la
 
 libbusif_la_SOURCES = busif.cxx
-libbusif_la_LDFLAGS = -rpath $(VPATH) -module -no-undefined
+libbusif_la_LDFLAGS = -rpath `pwd` -module -no-undefined
 

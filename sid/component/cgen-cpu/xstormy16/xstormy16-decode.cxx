@@ -199,6 +199,8 @@ xstormy16_extract_sfmt_movgrgriipredec (xstormy16_scache* abuf, xstormy16_cpu* c
 static void
 xstormy16_extract_sfmt_movgriigr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
+xstormy16_extract_sfmt_movgriipostincgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
+static void
 xstormy16_extract_sfmt_movgriipredecgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
 xstormy16_extract_sfmt_movgrgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
@@ -219,6 +221,8 @@ xstormy16_extract_sfmt_movfgrgripredec (xstormy16_scache* abuf, xstormy16_cpu* c
 static void
 xstormy16_extract_sfmt_movfgrigr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
+xstormy16_extract_sfmt_movfgripostincgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
+static void
 xstormy16_extract_sfmt_movfgripredecgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
 xstormy16_extract_sfmt_movfgrgrii (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
@@ -228,6 +232,8 @@ static void
 xstormy16_extract_sfmt_movfgrgriipredec (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
 xstormy16_extract_sfmt_movfgriigr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
+static void
+xstormy16_extract_sfmt_movfgriipostincgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
 xstormy16_extract_sfmt_movfgriipredecgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn);
 static void
@@ -1154,7 +1160,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 793 : /* fall through */
       case 795 : /* fall through */
       case 797 : /* fall through */
-      case 799 : itype = XSTORMY16_INSN_MOVGRIIPOSTINCGR; xstormy16_extract_sfmt_movgriigr (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 799 : itype = XSTORMY16_INSN_MOVGRIIPOSTINCGR; xstormy16_extract_sfmt_movgriipostincgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 800 : /* fall through */
       case 802 : /* fall through */
       case 804 : /* fall through */
@@ -1178,7 +1184,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 824 : /* fall through */
       case 826 : /* fall through */
       case 828 : /* fall through */
-      case 830 : itype = XSTORMY16_INSN_MOVFGRIPOSTINCGR; xstormy16_extract_sfmt_movfgrigr (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 830 : itype = XSTORMY16_INSN_MOVFGRIPOSTINCGR; xstormy16_extract_sfmt_movfgripostincgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 817 : /* fall through */
       case 819 : /* fall through */
       case 821 : /* fall through */
@@ -1186,7 +1192,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
       case 825 : /* fall through */
       case 827 : /* fall through */
       case 829 : /* fall through */
-      case 831 : itype = XSTORMY16_INSN_MOVFGRIIPOSTINCGR; xstormy16_extract_sfmt_movfgriigr (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 831 : itype = XSTORMY16_INSN_MOVFGRIIPOSTINCGR; xstormy16_extract_sfmt_movfgriipostincgr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 832 : /* fall through */
       case 834 : /* fall through */
       case 836 : /* fall through */
@@ -2888,6 +2894,39 @@ xstormy16_extract_sfmt_movgriigr (xstormy16_scache* abuf, xstormy16_cpu* current
 }
 
 void
+xstormy16_extract_sfmt_movgriipostincgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
+    xstormy16_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_movfgrgrii.f
+    UINT f_op2m;
+    UINT f_Rs;
+    UINT f_Rdm;
+    INT f_imm12;
+
+    f_op2m = EXTRACT_MSB0_UINT (insn, 32, 7, 1);
+    f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
+    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_Rdm) = f_Rdm;
+  FLD (f_Rs) = f_Rs;
+  FLD (f_imm12) = f_imm12;
+  FLD (f_op2m) = f_op2m;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_movgriipostincgr)\t"
+        << " f_Rdm:0x" << hex << f_Rdm << dec
+        << " f_Rs:0x" << hex << f_Rs << dec
+        << " f_imm12:0x" << hex << f_imm12 << dec
+        << " f_op2m:0x" << hex << f_op2m << dec
+        << endl;
+    }
+
+#undef FLD
+}
+
+void
 xstormy16_extract_sfmt_movgriipredecgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
     xstormy16_insn_word insn = entire_insn;
 #define FLD(f) abuf->fields.sfmt_movfgrgrii.f
@@ -3154,6 +3193,35 @@ xstormy16_extract_sfmt_movfgrigr (xstormy16_scache* abuf, xstormy16_cpu* current
 }
 
 void
+xstormy16_extract_sfmt_movfgripostincgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
+    xstormy16_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_movfgrgrii.f
+    UINT f_op2m;
+    UINT f_Rs;
+    UINT f_Rdm;
+
+    f_op2m = EXTRACT_MSB0_UINT (insn, 16, 7, 1);
+    f_Rs = EXTRACT_MSB0_UINT (insn, 16, 8, 4);
+    f_Rdm = EXTRACT_MSB0_UINT (insn, 16, 13, 3);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_Rdm) = f_Rdm;
+  FLD (f_Rs) = f_Rs;
+  FLD (f_op2m) = f_op2m;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_movfgripostincgr)\t"
+        << " f_Rdm:0x" << hex << f_Rdm << dec
+        << " f_Rs:0x" << hex << f_Rs << dec
+        << " f_op2m:0x" << hex << f_op2m << dec
+        << endl;
+    }
+
+#undef FLD
+}
+
+void
 xstormy16_extract_sfmt_movfgripredecgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
     xstormy16_insn_word insn = entire_insn;
 #define FLD(f) abuf->fields.sfmt_movfgrgrii.f
@@ -3319,6 +3387,43 @@ xstormy16_extract_sfmt_movfgriigr (xstormy16_scache* abuf, xstormy16_cpu* curren
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_movfgriigr)\t"
+        << " f_Rb:0x" << hex << f_Rb << dec
+        << " f_Rdm:0x" << hex << f_Rdm << dec
+        << " f_Rs:0x" << hex << f_Rs << dec
+        << " f_imm12:0x" << hex << f_imm12 << dec
+        << " f_op2m:0x" << hex << f_op2m << dec
+        << endl;
+    }
+
+#undef FLD
+}
+
+void
+xstormy16_extract_sfmt_movfgriipostincgr (xstormy16_scache* abuf, xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_word base_insn, xstormy16_insn_word entire_insn){
+    xstormy16_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_movfgrgrii.f
+    UINT f_op2m;
+    UINT f_Rs;
+    UINT f_Rdm;
+    UINT f_Rb;
+    INT f_imm12;
+
+    f_op2m = EXTRACT_MSB0_UINT (insn, 32, 7, 1);
+    f_Rs = EXTRACT_MSB0_UINT (insn, 32, 8, 4);
+    f_Rdm = EXTRACT_MSB0_UINT (insn, 32, 13, 3);
+    f_Rb = EXTRACT_MSB0_UINT (insn, 32, 17, 3);
+    f_imm12 = EXTRACT_MSB0_INT (insn, 32, 20, 12);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_Rb) = f_Rb;
+  FLD (f_Rdm) = f_Rdm;
+  FLD (f_Rs) = f_Rs;
+  FLD (f_imm12) = f_imm12;
+  FLD (f_op2m) = f_op2m;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_movfgriipostincgr)\t"
         << " f_Rb:0x" << hex << f_Rb << dec
         << " f_Rdm:0x" << hex << f_Rdm << dec
         << " f_Rs:0x" << hex << f_Rs << dec

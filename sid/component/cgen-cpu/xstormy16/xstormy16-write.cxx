@@ -43,15 +43,15 @@ xstormy16_write_sfmt_movlmemimm (xstormy16_cpu* current_cpu, xstormy16_scache* s
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  if (written & (1ULL << 5))
+  if (written & (1ULL << 4))
     {
-      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_lmem8_idx), OPRND (h_memory_HI_lmem8));
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_lmem8_65534_idx), OPRND (h_memory_HI_and__DFLT_lmem8_65534));
     }
-  if (written & (1ULL << 6))
+  if (written & (1ULL << 5))
     {
       current_cpu->SETMEMQI (pc, OPRND (h_memory_QI_lmem8_idx), OPRND (h_memory_QI_lmem8));
     }
-  if (written & (1ULL << 7))
+  if (written & (1ULL << 6))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -73,15 +73,15 @@ xstormy16_write_sfmt_movhmemimm (xstormy16_cpu* current_cpu, xstormy16_scache* s
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  if (written & (1ULL << 5))
+  if (written & (1ULL << 4))
     {
-      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_hmem8_idx), OPRND (h_memory_HI_hmem8));
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_hmem8_65534_idx), OPRND (h_memory_HI_and__DFLT_hmem8_65534));
     }
-  if (written & (1ULL << 6))
+  if (written & (1ULL << 5))
     {
       current_cpu->SETMEMQI (pc, OPRND (h_memory_QI_hmem8_idx), OPRND (h_memory_QI_hmem8));
     }
-  if (written & (1ULL << 7))
+  if (written & (1ULL << 6))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -155,15 +155,15 @@ xstormy16_write_sfmt_movlmemgr (xstormy16_cpu* current_cpu, xstormy16_scache* se
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  if (written & (1ULL << 5))
+  if (written & (1ULL << 4))
     {
-      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_lmem8_idx), OPRND (h_memory_HI_lmem8));
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_lmem8_65534_idx), OPRND (h_memory_HI_and__DFLT_lmem8_65534));
     }
-  if (written & (1ULL << 6))
+  if (written & (1ULL << 5))
     {
       current_cpu->SETMEMQI (pc, OPRND (h_memory_QI_lmem8_idx), OPRND (h_memory_QI_lmem8));
     }
-  if (written & (1ULL << 7))
+  if (written & (1ULL << 6))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -292,7 +292,7 @@ xstormy16_write_sfmt_movgripostincgr (xstormy16_cpu* current_cpu, xstormy16_scac
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rs_idx), OPRND (h_gr_HI_index_of__DFLT_Rs));
+  current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
   if (written & (1ULL << 6))
     {
       current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
@@ -320,7 +320,7 @@ xstormy16_write_sfmt_movgripredecgr (xstormy16_cpu* current_cpu, xstormy16_scach
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rs_idx), OPRND (h_gr_HI_index_of__DFLT_Rs));
+  current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
   if (written & (1ULL << 6))
     {
       current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
@@ -428,7 +428,34 @@ xstormy16_write_sfmt_movgriigr (xstormy16_cpu* current_cpu, xstormy16_scache* se
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rs_idx), OPRND (h_gr_HI_index_of__DFLT_Rs));
+  if (written & (1ULL << 6))
+    {
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
+    }
+  if (written & (1ULL << 7))
+    {
+      current_cpu->SETMEMQI (pc, OPRND (h_memory_QI_add__DFLT_Rs_imm12_idx), OPRND (h_memory_QI_add__DFLT_Rs_imm12));
+    }
+  current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
+
+  return status;
+#undef OPRND
+#undef FLD
+}
+
+
+sem_status
+xstormy16_write_sfmt_movgriipostincgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem, xstormy16_parexec* par_exec)
+{
+#define FLD(f) abuf->fields.sfmt_movfgrgrii.f
+#define OPRND(f) par_exec->operands.sfmt_movgriipostincgr.f
+  xstormy16_scache* abuf = sem;
+  unsigned long long written = abuf->written;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = 0; // dummy value for branches
+  sem_status status = SEM_STATUS_NORMAL; // ditto
+
+  current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
   if (written & (1ULL << 7))
     {
       current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
@@ -456,7 +483,7 @@ xstormy16_write_sfmt_movgriipredecgr (xstormy16_cpu* current_cpu, xstormy16_scac
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rs_idx), OPRND (h_gr_HI_index_of__DFLT_Rs));
+  current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
   if (written & (1ULL << 7))
     {
       current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
@@ -664,14 +691,43 @@ xstormy16_write_sfmt_movfgrigr (xstormy16_cpu* current_cpu, xstormy16_scache* se
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  if (written & (1ULL << 9))
+  if (written & (1ULL << 6))
     {
-      current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rs_idx), OPRND (h_gr_HI_index_of__DFLT_Rs));
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
     }
-  if (written & (1ULL << 10))
+  if (written & (1ULL << 7))
     {
-      current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
+      current_cpu->SETMEMQI (pc, OPRND (h_memory_QI_join__SI_HI_R8_Rs_idx), OPRND (h_memory_QI_join__SI_HI_R8_Rs));
     }
+  current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
+
+  return status;
+#undef OPRND
+#undef FLD
+}
+
+
+sem_status
+xstormy16_write_sfmt_movfgripostincgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem, xstormy16_parexec* par_exec)
+{
+#define FLD(f) abuf->fields.sfmt_movfgrgrii.f
+#define OPRND(f) par_exec->operands.sfmt_movfgripostincgr.f
+  xstormy16_scache* abuf = sem;
+  unsigned long long written = abuf->written;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = 0; // dummy value for branches
+  sem_status status = SEM_STATUS_NORMAL; // ditto
+
+  current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
+  if (written & (1ULL << 7))
+    {
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
+    }
+  if (written & (1ULL << 8))
+    {
+      current_cpu->SETMEMQI (pc, OPRND (h_memory_QI_join__SI_HI_R8_Rs_idx), OPRND (h_memory_QI_join__SI_HI_R8_Rs));
+    }
+  current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
 
   return status;
 #undef OPRND
@@ -690,7 +746,15 @@ xstormy16_write_sfmt_movfgripredecgr (xstormy16_cpu* current_cpu, xstormy16_scac
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rs_idx), OPRND (h_gr_HI_index_of__DFLT_Rs));
+  current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
+  if (written & (1ULL << 7))
+    {
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
+    }
+  if (written & (1ULL << 8))
+    {
+      current_cpu->SETMEMQI (pc, OPRND (h_memory_QI_join__SI_HI_R8_Rs_idx), OPRND (h_memory_QI_join__SI_HI_R8_Rs));
+    }
   current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
 
   return status;
@@ -790,7 +854,34 @@ xstormy16_write_sfmt_movfgriigr (xstormy16_cpu* current_cpu, xstormy16_scache* s
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rs_idx), OPRND (h_gr_HI_index_of__DFLT_Rs));
+  if (written & (1ULL << 7))
+    {
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_add__DFLT_join__SI_HI_Rb_Rs_imm12_4294967294_idx), OPRND (h_memory_HI_and__DFLT_add__DFLT_join__SI_HI_Rb_Rs_imm12_4294967294));
+    }
+  if (written & (1ULL << 8))
+    {
+      current_cpu->SETMEMQI (pc, OPRND (h_memory_QI_add__DFLT_join__SI_HI_Rb_Rs_imm12_idx), OPRND (h_memory_QI_add__DFLT_join__SI_HI_Rb_Rs_imm12));
+    }
+  current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
+
+  return status;
+#undef OPRND
+#undef FLD
+}
+
+
+sem_status
+xstormy16_write_sfmt_movfgriipostincgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem, xstormy16_parexec* par_exec)
+{
+#define FLD(f) abuf->fields.sfmt_movfgrgrii.f
+#define OPRND(f) par_exec->operands.sfmt_movfgriipostincgr.f
+  xstormy16_scache* abuf = sem;
+  unsigned long long written = abuf->written;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = 0; // dummy value for branches
+  sem_status status = SEM_STATUS_NORMAL; // ditto
+
+  current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
   if (written & (1ULL << 8))
     {
       current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_add__DFLT_join__SI_HI_Rb_Rs_imm12_4294967294_idx), OPRND (h_memory_HI_and__DFLT_add__DFLT_join__SI_HI_Rb_Rs_imm12_4294967294));
@@ -818,7 +909,7 @@ xstormy16_write_sfmt_movfgriipredecgr (xstormy16_cpu* current_cpu, xstormy16_sca
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rs_idx), OPRND (h_gr_HI_index_of__DFLT_Rs));
+  current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
   if (written & (1ULL << 8))
     {
       current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_add__DFLT_join__SI_HI_Rb_Rs_imm12_4294967294_idx), OPRND (h_memory_HI_and__DFLT_add__DFLT_join__SI_HI_Rb_Rs_imm12_4294967294));

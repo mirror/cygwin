@@ -287,6 +287,11 @@
 	* cpu/m32r.opc: The same.
 	* cpu/openrisc.opc: The same.
 
+2001-09-17  graydon hoare  <graydon@redhat.com>
+
+	* insn.scm (syntax-break-out): Correct logic in handling escaped
+	syntax characters.
+
 2001-07-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* opc-itab.scm (@arch@_cgen_init_opcode_table): Unconditionally

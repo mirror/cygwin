@@ -709,7 +709,7 @@
 
 ; Filter out instructions whose ifield patterns are strict supersets of
 ; another, keeping the less general cousin.  Used to resolve ambiguity
-; when there are no more bits to consider while decoding.
+; when there are no more bits to consider.
 
 (define (filter-non-specialized-ambiguous-insns insn-list)
   (logit 3 "Filtering " (length insn-list) " instructions for non specializations.\n")
@@ -875,10 +875,12 @@
 	    (cond 
 	     ; Handle escaped syntax metacharacters 
 	     ((char=? #\\ (string-ref syntax 0))
-	      (set! result (cons (substring syntax 0 1) result))
-	      (set! result (cons (substring syntax 1 1) result))
-	      (set! syntax (string-drop 2 syntax)))
-	     ; Handle operand reference
+	      (begin
+		(if (= (string-length syntax) 1)
+		    (parse-error context "syntax-break-out: missing char after '\\' in " syntax))
+		(set! result (cons (substring syntax 1 2) result))
+		(set! syntax (string-drop 2 syntax))))
+		; Handle operand reference
 	     ((char=? #\$ (string-ref syntax 0))
 	      ; Extract the symbol from the string, get the operand.
 	      (if (char=? #\{ (string-ref syntax 1))

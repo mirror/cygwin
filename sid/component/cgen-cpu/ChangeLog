@@ -1,3 +1,10 @@
+2002-01-23  Ben Elliston  <bje@redhat.com>
+
+	* tracedis.c (bfd_getb16): New function.
+	(bfd_getl16): Likewise.
+	(bfd_getb32): Likewise.
+	(bfd_getl32): Likewise.
+
 2001-12-27  Frank Ch. Eigler  <fche@redhat.com>
 
 	* cgen-cpu.h (cgen_bi_endian_cpu): Make trace_count a host_int_8.

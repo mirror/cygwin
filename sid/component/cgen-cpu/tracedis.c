@@ -1,6 +1,6 @@
 // tracedis.c - disassembly tracing support.  -*- C -*-
 
-// Copyright (C) 2001 Red Hat.
+// Copyright (C) 2001, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -60,6 +60,47 @@ bfd_get_arch(bfd *abfd)
 }
 
 /* Stolen from libbfd.  */
+
+bfd_vma
+bfd_getb16 (addr)
+     register const bfd_byte *addr;
+{
+  return (addr[0] << 8) | addr[1];
+}
+
+bfd_vma
+bfd_getl16 (addr)
+     register const bfd_byte *addr;
+{
+  return (addr[1] << 8) | addr[0];
+}
+
+bfd_vma
+bfd_getb32 (addr)
+     register const bfd_byte *addr;
+{
+  unsigned long v;
+
+  v = (unsigned long) addr[0] << 24;
+  v |= (unsigned long) addr[1] << 16;
+  v |= (unsigned long) addr[2] << 8;
+  v |= (unsigned long) addr[3];
+  return (bfd_vma) v;
+}
+
+bfd_vma
+bfd_getl32 (addr)
+     register const bfd_byte *addr;
+{
+  unsigned long v;
+
+  v = (unsigned long) addr[0];
+  v |= (unsigned long) addr[1] << 8;
+  v |= (unsigned long) addr[2] << 16;
+  v |= (unsigned long) addr[3] << 24;
+  return (bfd_vma) v;
+}
+
 void
 bfd_put_bits (data, addr, bits, big_p)
      bfd_vma data;

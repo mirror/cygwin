@@ -43,7 +43,7 @@ regarded as a program in the language TeX).
 @page
 @tex
 \def\$#1${{#1}}  % Kluge: collect RCS revision info without $...$
-\xdef\manvers{\$Revision: 2.128 $}  % For use in headers, footers too
+\xdef\manvers{\$Revision: 2.130 $}  % For use in headers, footers too
 {\parskip=0pt
 \hfill Cygnus Support\par
 \hfill \manvers\par
@@ -86,6 +86,10 @@ This document describes the stabs debugging format.
 @end menu
 @end ifinfo
 
+@c TeX can handle the contents at the start but makeinfo 3.12 can not
+@iftex
+@contents
+@end iftex
 
 @node Overview
 @chapter Overview of Stabs
@@ -872,7 +876,7 @@ produces the following stabs:
 .stabn 224,0,0,LBE2             # @r{224 is N_RBRAC}
 @end example
 
-@xref{Procedures} for more information on the @code{N_FUN} stab, and
+See @ref{Procedures} for more information on the @code{N_FUN} stab, and
 @ref{Block Structure} for more information on the @code{N_LBRAC} and
 @code{N_RBRAC} stabs.
 
@@ -3048,7 +3052,7 @@ the derivation of this class is encoded as follows.
 @node Virtual Base Classes
 @section Virtual Base Classes
 
-A derived class object consists of a concatination in memory of the data
+A derived class object consists of a concatenation in memory of the data
 areas defined by each base class, starting with the leftmost and ending
 with the rightmost in the list of base classes.  The exception to this
 rule is for virtual inheritence.  In the example above, class @code{D}
@@ -3370,7 +3374,7 @@ for more information about their use.
 Variable on the stack; see @ref{Stack Variables}.
 
 @item :
-C++ nested symbol; see @xref{Nested Symbols}
+C++ nested symbol; see @xref{Nested Symbols}.
 
 @item a
 Parameter passed by reference in register; see @ref{Reference Parameters}.
@@ -4015,5 +4019,12 @@ However, no one has yet designed or implemented such a scheme.
 
 @printindex fn
 
+@c TeX can handle the contents at the start but makeinfo 3.12 can not
+@ifinfo
 @contents
+@end ifinfo
+@ifhtml
+@contents
+@end ifhtml
+
 @bye

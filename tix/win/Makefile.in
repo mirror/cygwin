@@ -215,10 +215,10 @@ endif
 ifeq ($(TCL_VER),8.3)
 
 TMPDIR	= tcl8.3
-TCLDIR	= ../../tcl8.1
-TCLSRCDIR = $(srcdir)/../../tcl8.1
-TKDIR	= ../../tk8.1
-TKSRCDIR = $(srcdir)/../../tk8.1
+TCLDIR	= ../../tcl
+TCLSRCDIR = $(srcdir)/../../tcl
+TKDIR	= ../../tk
+TKSRCDIR = $(srcdir)/../../tk
 
 ifeq ($(CYGWIN),yes)
 TCLLIB  = libcygtcl83.a

@@ -12,15 +12,17 @@ set -x
 # ??? Some are missing, need to add them after some research.
 archs="arm frv i960 m32r openrisc xstormy16"
 
-rm -rf /tmp/tmp-cgen-doc
-mkdir /tmp/tmp-cgen-doc
+builddir=tmp-doc
+
+rm -rf $builddir
+mkdir $builddir
 
 export cgendir=`pwd`
 
 (
   set -e
   set -x
-  cd /tmp/tmp-cgen-doc
+  cd $builddir
   $cgendir/configure --prefix /tmp/junk --target m32r-elf
 
   for a in $archs

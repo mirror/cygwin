@@ -305,6 +305,35 @@
 
 ; Output routines.
 
+;; Given some state that has a setter function (SETTER NEW-VALUE) and
+;; a getter function (GETTER), call THUNK with the state set to VALUE,
+;; and restore the original value when THUNK returns.  Ensure that the
+;; original value is restored whether THUNK returns normally, throws
+;; an exception, or invokes a continuation that leaves the call's
+;; dynamic scope.
+(define (setter-getter-fluid-let setter getter value thunk)
+  (let ((swap (lambda ()
+		(let ((temp (getter)))
+		  (setter value)
+		  (set! value temp)))))
+    (dynamic-wind swap thunk swap)))
+      
+
+;; Call THUNK with the current input and output ports set to PORT, and
+;; then restore the current ports to their original values.
+;; 
+;; This ensures the current ports get restored whether THUNK exits
+;; normally, throws an exception, or leaves the call's dynamic scope
+;; by applying a continuation.
+(define (with-input-and-output-to port thunk)
+  (setter-getter-fluid-let
+   set-current-input-port current-input-port port
+   (lambda ()
+     (setter-getter-fluid-let
+      set-current-output-port current-output-port port
+      thunk))))
+
+
 ; Extension to the current-output-port.
 ; Only valid inside string-write.
 

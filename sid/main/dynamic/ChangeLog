@@ -1,3 +1,7 @@
+2003-04-16  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.cxx (final_insn_count): Set cpu attribute 'final-insn-count'.
+	
 2003-01-31  Frank Ch. Eigler  <fche@redhat.com>
 
 	* baseCfg.cxx, commonCfg.cxx: More of the same.

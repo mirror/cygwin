@@ -1,3 +1,8 @@
+2001-01-05  Johan Rydberg  <jrydberg@opencores.org>
+
+	* openrisc.cpu: New file.
+	* openrisc.opc: Likewise.
+
 2000-12-12  Ben Elliston  <bje@redhat.com>
 
 	* doc/rtl.texi (Expressions): Document the (delay ..) rtx.

@@ -17,6 +17,9 @@
 #include <cctype>
 #include <cerrno>
 #include <cstring>
+#ifdef __CYGWIN__
+#include <sys/cygwin.h>
+#endif
 
 
 namespace sidutil

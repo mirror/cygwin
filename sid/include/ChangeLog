@@ -1,3 +1,7 @@
+2001-05-25  Will Cohen  <wcohen@redhat.com>
+
+	* sidmiscutil.h: Added #include <sys/cygwin.h> for cygwin builds.
+
 2001-05-24  Ben Elliston  <bje@redhat.com>
 
 	* sidcpuutil.h (basic_cpu::create_gdb_register_attrs): Document

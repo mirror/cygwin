@@ -374,6 +374,7 @@ main (int argc, char **argv)
 
   signal (SIGCHLD, chld_handler);
 
+#if defined(__SIGRTMIN) && defined(__SIGRTMAX)
   {
     int sig;
     /* Ignore realtime signals.  We do this so as to not terminate
@@ -381,9 +382,10 @@ main (int argc, char **argv)
        realtime signals are used for thread support, and, for some
        reason, some environments send these signals to RDA as well
        as the application.  (And some don't.)  */
-    for (sig = SIGRTMIN; sig <= SIGRTMAX; sig++)
+    for (sig = __SIGRTMIN; sig <= __SIGRTMAX; sig++)
       signal (sig, SIG_IGN);
   }
+#endif
 
   if (portno != 0)
     {

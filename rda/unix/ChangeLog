@@ -1,3 +1,8 @@
+2004-06-03  Kevin Buettner  <kevinb@redhat.com>
+
+	* server.c (main): Ensure that thread related realtime signals
+	are ignored.
+
 2004-04-20  Kevin Buettner  <kevinb@redhat.com>
 
 	* thread-db.c (lookup_sym): New function.

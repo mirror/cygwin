@@ -1,3 +1,9 @@
+2000-06-15  Jonathan Larmour  <jlarmour@redhat.co.uk>
+
+	* iwidgets3.0.0/unix/configure.in: Use config scripts from build
+	tree before exec_prefix
+	* iwidgets3.0.0/unix/configure: regenerate
+
 Tue Jun  6 22:09:02 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* itcl/win/Makefile.in: Set up and use autoconf variables throughout to

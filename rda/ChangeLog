@@ -1,5 +1,11 @@
 2004-10-07  Jim Blandy  <jimb@redhat.com>
 
+	* lib/gdbserv-state.c (do_get_registers_p_packet): Don't produce a
+	';' trailing the register value unless there are more register
+	values to come.  This makes the multi-register packet
+	upward-compatible with the single-register request / reply
+	expected by GDB.
+
 	* samples/async.c: #define _GNU_SOURCE before #including any
 	files, to get prototypes for GNU-specific functions like
 	strsignal.

@@ -605,13 +605,13 @@ do_get_registers_p_packet (struct gdbserv *gdbserv)
 	      result = "E02";
 	      break;
 	    }
-	  gdbserv_output_string (gdbserv, ";");
 	  if (gdbserv_input_string_match (gdbserv, ";") < 0)
 	    {
 	      if (gdbserv_input_size (gdbserv) > 0)
 		result = "E03";
 	      break;
 	    }
+          gdbserv_output_string (gdbserv, ";");
 	}
       if (result != NULL)
 	{

@@ -1,5 +1,10 @@
 2002-12-19  Doug Evans  <dje@sebabeach.org>
 
+	* mode.scm (mode-sem-mode): New fn.
+	* operand.scm (op:new-mode): Update. mode-name.
+	(op-natural-mode?) New fn.
+	* rtl.scm (hw): Set hw-name,mode-name.
+
 	Back out sim*.scm changes of 2001-04-02  Ben Elliston  <bje@redhat.com>
 	Instead do:
 	* sim-decode.scm (-gen-decode-insn-globals): Use @PREFIX@_INSN__MAX

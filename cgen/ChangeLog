@@ -1,5 +1,7 @@
 2005-01-20  Jim Blandy  <jimb@redhat.com>
 
+	* opcodes.scm (gen-switch): Use concat instead of string-map. 
+
 	* utils.scm (concat): New function.
 	* insn.scm (-sub-insn-make!): Use concat instead of string-map.
 	* rtl.scm (rtx-dump): Same.

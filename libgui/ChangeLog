@@ -1,3 +1,8 @@
+2004-03-31  Martin Hunt  <hunt@redhat.com>
+
+	* library/combobox.tcl (::combobox::Configure): Remove
+	debug line.
+
 2003-12-02  Martin Hunt  <hunt@redhat.com>
 
 	* library/combobox.tcl: Merge in latest changes

@@ -1703,7 +1703,6 @@ proc ::combobox::Configure {w args} {
 	    }
 
 	    -state {
-	      debug "newValue=$newValue"
 		if {$newValue == "normal"} {
 		    set updateVisual 1
 		    # it's enabled

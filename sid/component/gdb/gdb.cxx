@@ -1,6 +1,6 @@
 // gdb.cxx - GDB stub implementation.  -*- C++ -*-
 
-// Copyright (C) 1999-2001 Red Hat.
+// Copyright (C) 1999-2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -186,6 +186,15 @@ singlestep_program_hook (struct gdbserv *gdbserv)
   return g->singlestep_program ();
 }
 
+extern "C" int
+rangestep_program_hook (struct gdbserv *gdbserv, struct gdbserv_reg *val1,
+			struct gdbserv_reg *val2)
+{
+  gdb* g = static_cast<gdb*> (gdbserv_target_data (gdbserv));
+  return g->rangestep_program (val1, val2);
+}
+
+
 extern "C" void
 sigkill_program_hook (struct gdbserv *gdbserv)
 {
@@ -266,6 +275,7 @@ gdb::gdbsid_target_attach (struct gdbserv *gdbserv)
       gdbtarget->break_program = break_program_hook;
       gdbtarget->restart_program = restart_program_hook;
       gdbtarget->singlestep_program = singlestep_program_hook;
+      gdbtarget->rangestep_program = rangestep_program_hook;
       gdbtarget->sigkill_program = sigkill_program_hook;
       gdbtarget->continue_program = continue_program_hook;
       gdbtarget->remove_breakpoint = remove_breakpoint_hook;
@@ -728,9 +738,32 @@ void
 gdb::process_set_pc (struct gdbserv_reg* val) 
 {
   if (trace_gdbsid)
-    cerr << "process_set_pc" << endl;
+    cerr << "process_set_pc ";
 
-  // XXX: why is this a stub?
+  host_int_8 pc;
+  gdbserv_reg_to_ulonglong (gdbserv, val, & pc);
+
+  if (trace_gdbsid)
+    cerr << pc;
+
+  // Handle disharvardization
+  if (this->hw_breakpoint_pc_mask)
+    {
+      pc &= this->hw_breakpoint_pc_mask;
+      if (trace_gdbsid)
+	cerr << " =Z=> "
+	     << pc;
+    }
+      
+  if (trace_gdbsid)
+    cerr << endl;
+
+  component::status s = cpu->set_attribute_value ("gdb-register-pc",
+						  make_numeric_attribute (pc));
+  if (s != component::ok)
+    {
+      cerr << "cannot set gdb-register-pc " << pc << endl;
+    }
 }
 
 
@@ -783,6 +816,10 @@ gdb::exit_program ()
   if (trace_gdbsid)
     cerr << "exit_program " << endl;
 
+  // Turn off the range-stepping!
+  this->step_range_start = 0;
+  this->step_range_end = 0;
+
   // shut down target
   target_power (false);
 
@@ -802,6 +839,10 @@ gdb::break_program ()
 {
   if (trace_gdbsid)
     cerr << "break_program " << endl;
+
+  // Turn off the range-stepping!
+  this->step_range_start = 0;
+  this->step_range_end = 0;
 
   // shut down target
   target_power (false);
@@ -837,11 +878,57 @@ gdb::singlestep_program ()
       cerr << "Cannot set enable-step-trap? attribute in cpu: status " << (int)s << endl;
     }
 
+  this->step_range_start = 0;
+  this->step_range_end = 0;
+
   // turn on target subsystem
   target_power (true);
 
   return 0;
 }
+
+
+int
+gdb::rangestep_program (struct gdbserv_reg* range_start, struct gdbserv_reg* range_end)
+{
+  if (! this->enable_E_packet)
+    return GDBSERV_TARGET_RC_ERROR;
+
+  if (trace_gdbsid)
+    cerr << "rangestep_program ";
+
+  assert (cpu != 0);
+  component::status s = cpu->set_attribute_value ("enable-step-trap?", "1");
+  if (s != component::ok)
+    {
+      cerr << "Cannot set enable-step-trap? attribute in cpu: status " << (int)s << endl;
+    }
+
+  gdbserv_reg_to_ulonglong (gdbserv, range_start, & this->step_range_start);
+  gdbserv_reg_to_ulonglong (gdbserv, range_end, & this->step_range_end);
+
+  if (trace_gdbsid)
+    cerr << "[" << this->step_range_start << "," << this->step_range_end << ")";
+
+  // Handle disharvardization
+  if (this->hw_breakpoint_pc_mask)
+    {
+      this->step_range_start &= this->hw_breakpoint_pc_mask;
+      this->step_range_end &= this->hw_breakpoint_pc_mask;
+      if (trace_gdbsid)
+	cerr << " =Z=> "
+	     << "[" << this->step_range_start << "," << this->step_range_end << ")";
+    }
+
+  if (trace_gdbsid)
+    cerr << endl;
+
+  // turn on target subsystem
+  target_power (true);
+
+  return GDBSERV_TARGET_RC_OK;
+}
+
 
 void
 gdb::sigkill_program ()
@@ -868,6 +955,9 @@ gdb::continue_program ()
     {
       cerr << "Cannot clear enable-step-trap? attribute in cpu: status " << (int) s << endl;
     }
+
+  this->step_range_start = 0;
+  this->step_range_end = 0;
 
   // turn on target subsystem
   target_power (true);
@@ -1263,8 +1353,11 @@ gdb::gdb ():
   trace_gdbsid = false;
   exit_on_detach = false;
   enable_Z_packet = true;
+  enable_E_packet = true;
   operating_mode_p = true;
   hw_breakpoint_pc_mask = 0;
+  step_range_start = 0;
+  step_range_end = 0;
 
   add_attribute_notify ("trace-gdbserv?", & trace_gdbserv, 
 			this, & gdb::update_trace_flags, "setting");
@@ -1272,6 +1365,7 @@ gdb::gdb ():
 			this, & gdb::update_trace_flags, "setting");
   add_attribute ("exit-on-detach?", & exit_on_detach, "setting");
   add_attribute ("enable-Z-packet?", & enable_Z_packet, "setting");
+  add_attribute ("enable-E-packet?", & enable_E_packet, "setting");
   add_attribute ("operating-mode?", & operating_mode_p, "setting");
   add_attribute ("Z-packet-pc-mask", & hw_breakpoint_pc_mask, "setting");
 }
@@ -1323,6 +1417,10 @@ gdb::stop_handler (host_int_4)
   if (trace_gdbsid)
     cerr << "stop_handler" << endl;
 
+  // Turn off the range-stepping!
+  this->step_range_start = 0;
+  this->step_range_end = 0;
+
   // ignore if signal is pending
   if (this->pending_signal_counts [GDBSERV_SIGINT] > 0)
     {
@@ -1362,6 +1460,10 @@ gdb::trapstop_handler (host_int_4)
       this->pending_signal_counts [GDBSERV_SIGTRAP] --;
       return;
     }
+
+  // Turn off the range-stepping!
+  this->step_range_start = 0;
+  this->step_range_end = 0;
 
   // shut down target
   target_power (false);
@@ -1441,6 +1543,38 @@ gdb::cpu_trap_handler (host_int_4 trap_type)
   if (this->operating_mode_p &&
       (trap_type != sidutil::cpu_trap_stepped))
     return;
+
+  // Handle pending step-out-of-range packet
+  if (trap_type == sidutil::cpu_trap_stepped &&
+      this->step_range_end)
+    {
+      host_int_8 pc;
+      string pcval = cpu->attribute_value ("gdb-register-pc");
+      component::status s = parse_attribute (pcval, pc);
+      if (s != component::ok)
+	{
+	  cerr << "cannot parse gdb-register-pc " << pcval << endl;
+	}
+      else
+	{
+	  // Handle disharvardization
+	  if (this->hw_breakpoint_pc_mask)
+	    pc &= this->hw_breakpoint_pc_mask;
+
+	  // Note the [start, end) interpretation!
+	  if (pc >= this->step_range_start && pc < this->step_range_end)
+	    {
+	      if (trace_gdbsid)
+		cerr << "(pc=" << pc << " - resuming)" << endl;
+	      this->cpu_trap_opin.drive (cpu_trap_handled);
+	      return;
+	    }
+
+	  // Turn off the range-stepping!
+	  this->step_range_start = 0;
+	  this->step_range_end = 0;
+	}
+    }
 
   host_int_4 trapsig =
     trap_type == sidutil::cpu_trap_software ? GDBSERV_SIGTRAP :

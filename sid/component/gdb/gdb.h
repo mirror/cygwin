@@ -1,6 +1,6 @@
 // gdb.h - description.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -133,6 +133,9 @@ private:
   typedef map<int,int> pending_signal_counts_t;
   pending_signal_counts_t pending_signal_counts;
 
+  // pending step control tracking
+  host_int_8 step_range_start, step_range_end;
+
   // sid<->gdb target control
   callback_pin<gdb> stop_pin; // special-purpose "interrupt target" pin
   void stop_handler (host_int_4);
@@ -147,6 +150,7 @@ private:
   bool trace_gdbsid;
   void update_trace_flags();
   bool enable_Z_packet;
+  bool enable_E_packet;
   bool operating_mode_p;
 
   // gdbserv state
@@ -179,6 +183,7 @@ public:
   int break_program ();
   void restart_program ();
   int singlestep_program ();
+  int rangestep_program (struct gdbserv_reg *range_start, struct gdbserv_reg *range_end);
   void sigkill_program ();
   int continue_program ();
   int Z_breakpoint_ok_p (unsigned long type, struct gdbserv_reg *addr, struct gdbserv_reg *len);
@@ -215,6 +220,9 @@ extern "C" int exit_program_hook (struct gdbserv *gdbserv);
 extern "C" int break_program_hook (struct gdbserv *gdbserv);
 extern "C" void restart_program_hook (struct gdbserv *gdbserv);
 extern "C" int singlestep_program_hook (struct gdbserv *gdbserv);
+extern "C" int rangestep_program_hook (struct gdbserv *gdbserv, 
+				       struct gdbserv_reg *val1, 
+				       struct gdbserv_reg *val2);
 extern "C" void sigkill_program_hook (struct gdbserv *gdbserv);
 extern "C" int continue_program_hook (struct gdbserv *gdbserv );
 extern "C" int remove_breakpoint_hook (struct gdbserv *gdbserv, unsigned long type,

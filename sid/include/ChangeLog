@@ -1,3 +1,9 @@
+2002-02-12  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcpuutil.h (basic_cpu ctor): Add full gdb-register-pc attribute.
+	(basic_cpu add_watchable_register): Associate watchable with raw
+	Value*, not attribute string.
+
 2001-12-27  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidcpuutil.h (basic_cpu): Add scheduler_time_query member.

@@ -1,7 +1,7 @@
 /*
  * gdbserv-state.c -- part of GDB remote server
  *
- * Copyright (C) 2000 Red Hat.
+ * Copyright (C) 2000, 2002 Red Hat.
  * This file is part of SID and is licensed under the GPL.
  * See the file COPYING.SID for conditions for redistribution.
  */
@@ -433,6 +433,7 @@ gdbserv_data_packet (struct gdbserv *gdbserv)
 	      gdbserv_input_char (gdbserv);
 	  }
 
+	// If there was a first address argument, set it as as the PC
 	if (gdbserv_input_reg_beb (gdbserv, &addr, 0) >= 0)
 	  gdbserv->target->process_set_pc (gdbserv, &addr);
 
@@ -472,6 +473,71 @@ gdbserv_data_packet (struct gdbserv *gdbserv)
 	    gdbserv->state = GDBSERV_STATE_RUNNING;
 	  }
 	return;
+      }
+
+    case 'E':
+    case 'e':    /* eAA..AA,BB..BB   Step out of address range [AA .. BB) */
+      /* try to read optional parameter, pc unchanged if no parm */
+
+      {
+	struct gdbserv_reg addr;
+	struct gdbserv_reg addr_limit;
+	unsigned long sigval = 0;
+	int rc;
+
+	if (packet_type == 'E')
+	  {
+	    gdbserv_input_hex_ulong (gdbserv, &sigval);
+	    if (gdbserv_input_peek (gdbserv) == ',')
+	      gdbserv_input_char (gdbserv);
+	  }
+
+	if (gdbserv_input_reg_beb (gdbserv, &addr, 0) < 0)
+ 	  {
+	    gdbserv_output_string (gdbserv, "E01");
+	    break;
+	  }
+
+	if (gdbserv_input_peek (gdbserv) == ',')
+	  gdbserv_input_char (gdbserv);
+
+	if (gdbserv_input_reg_beb (gdbserv, &addr_limit, 0) < 0)
+	  {
+	    gdbserv_output_string (gdbserv, "E02"); 
+	    break;
+	  }
+	
+	gdbserv->target->flush_i_cache (gdbserv);
+	
+	/* If we have a function to handle signals, call it. */
+	if (sigval != 0 && gdbserv->target->process_signal != NULL)
+	  {
+	    /* If 0 is returned, we either ignored the signal or invoked a user
+	       handler. Otherwise, the user program should die. */
+	    if (! gdbserv->target->process_signal (gdbserv, sigval))
+	      sigval = 0;
+	  }
+	
+	/* if we didn't have a function to handle signals, nuke the
+           target program */
+	if (sigval != 0)
+	  {
+	    gdbserv->target->sigkill_program (gdbserv);
+	    return;
+	  }
+	
+	rc = gdbserv->target->rangestep_program (gdbserv, & addr, & addr_limit);
+	if (rc == GDBSERV_TARGET_RC_OK)
+	  {
+	    gdbserv->state = GDBSERV_STATE_RUNNING;
+	    gdbserv_output_string (gdbserv, "OK");
+	  }
+	else
+	  {
+	    gdbserv_output_string (gdbserv, ""); /* act as if unsupported */
+	  }
+
+	break;
       }
     
     /* kill the program */
@@ -628,6 +694,7 @@ gdbserv_fromtarget_break (struct gdbserv *gdbserv,
       break;
     case GDBSERV_STATE_RUNNING:
     case GDBSERV_STATE_STEPPING:
+      gdbserv_output_discard (gdbserv);
       gdbserv_output_char (gdbserv, 'T');
       gdbserv_output_byte (gdbserv, sigval);
       /* When the target knows how, expedite the supply of register

@@ -1,3 +1,7 @@
+2001-04-04  Richard Henderson  <rth@redhat.com>
+
+	* baseboards/unix.exp (ieee_multilib_flags): Set for alpha targets.
+
 2001-02-22  Ben Elliston  <bje@redhat.com>
 
 	* config/sid.exp: New file.

@@ -409,7 +409,7 @@ static const CGEN_OPCODE @arch@_cgen_insn_opcode_table[MAX_INSNS] =
 
 static int
 asm_hash_insn_p (insn)
-     const CGEN_INSN *insn;
+     const CGEN_INSN *insn ATTRIBUTE_UNUSED;
 {
   return CGEN_ASM_HASH_P (insn);
 }
@@ -459,8 +459,8 @@ asm_hash_insn (mnem)
 
 static unsigned int
 dis_hash_insn (buf, value)
-     const char * buf;
-     CGEN_INSN_INT value;
+     const char * buf ATTRIBUTE_UNUSED;
+     CGEN_INSN_INT value ATTRIBUTE_UNUSED;
 {
   return CGEN_DIS_HASH (buf, value);
 }
@@ -624,6 +624,8 @@ static const CGEN_OPCODE @arch@_cgen_macro_insn_opcode_table[] =
 (define (-gen-opcode-init-fn)
   (string-write
    "\
+static void set_fields_bitsize PARAMS ((CGEN_FIELDS *, int));
+
 /* Set the recorded length of the insn in the CGEN_FIELDS struct.  */
 
 static void

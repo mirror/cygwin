@@ -1,5 +1,5 @@
 /* FR30 opcode support.  -*- C -*-
-   Copyright (C) 2000 Red Hat, Inc.
+   Copyright (C) 2000, 2001 Red Hat, Inc.
    This file is part of CGEN.  */
 
 /* This file is an addendum to fr30.cpu.  Heavy use of C code isn't
@@ -29,7 +29,20 @@
 /* -- */
 
 /* -- asm.c */
-/* Handle register lists for LDMx and STMx  */
+/* Handle register lists for LDMx and STMx.  */
+
+static int parse_register_number
+  PARAMS ((const char **));
+static const char * parse_register_list
+  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *, int, int));
+static const char * parse_low_register_list_ld
+  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
+static const char * parse_hi_register_list_ld
+  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
+static const char * parse_low_register_list_st
+  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
+static const char * parse_hi_register_list_st
+  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
 
 static int
 parse_register_number (strp)
@@ -37,7 +50,7 @@ parse_register_number (strp)
 {
   int regno;
   if (**strp < '0' || **strp > '9')
-    return -1; /* error */
+    return -1; /* error.  */
   regno = **strp - '0';
   ++*strp;
 
@@ -52,14 +65,15 @@ parse_register_number (strp)
 
 static const char *
 parse_register_list (cd, strp, opindex, valuep, high_low, load_store)
-     CGEN_CPU_DESC cd;
+     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
      const char **strp;
-     int opindex;
+     int opindex ATTRIBUTE_UNUSED;
      unsigned long *valuep;
      int high_low;   /* 0 == high, 1 == low */
      int load_store; /* 0 == load, 1 == store */
 {
   int regno;
+
   *valuep = 0;
   while (**strp && **strp != ')')
     {
@@ -78,7 +92,7 @@ parse_register_list (cd, strp, opindex, valuep, high_low, load_store)
       if (high_low)
 	regno -= 8;
 
-      if (load_store) /* mask is reversed for store */
+      if (load_store) /* Mask is reversed for store.  */
 	*valuep |= 0x80 >> regno;
       else
 	*valuep |= 1 << regno;
@@ -140,6 +154,18 @@ parse_hi_register_list_st (cd, strp, opindex, valuep)
 /* -- */
 
 /* -- dis.c */
+static void print_register_list
+  PARAMS ((PTR, long, long, int));
+static void print_hi_register_list_ld
+  PARAMS ((CGEN_CPU_DESC, PTR, long, unsigned, bfd_vma, int));
+static void print_low_register_list_ld
+  PARAMS ((CGEN_CPU_DESC, PTR, long, unsigned, bfd_vma, int));
+static void print_hi_register_list_st
+  PARAMS ((CGEN_CPU_DESC, PTR, long, unsigned, bfd_vma, int));
+static void print_low_register_list_st
+  PARAMS ((CGEN_CPU_DESC, PTR, long, unsigned, bfd_vma, int));
+static void print_m4
+  PARAMS ((CGEN_CPU_DESC, PTR, long, unsigned, bfd_vma, int));
 
 static void
 print_register_list (dis_info, value, offset, load_store)

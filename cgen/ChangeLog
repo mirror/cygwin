@@ -1,3 +1,15 @@
+2001-10-08  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* desc-cpu.scm: Add missing function prototypes (for generated
+	C files).  Fix compile time warning messages about unused
+	parameters (for generated C files).
+	* opc-asmdis.scm: The same.
+	* opc-ibld.c: The same.
+	* opc-itab.scm: The same.
+	* cpu/fr30.opc: The same.
+	* cpu/m32r.opc: The same.
+	* cpu/openrisc.opc: The same.
+
 2001-07-12  Jeff Johnston  <jjohnstn@redhat.com>
 
         * opc-itab.scm (@arch@_cgen_init_opcode_table): Unconditionally

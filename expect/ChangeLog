@@ -1,3 +1,8 @@
+Thu Sep 20 16:00:44 2001  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* Makefile.in (shared/tcl_regexp.o, tcl_regexp.o): Add explict
+ 	build rules that include @TCL_DEFS@ in the list of compiler flags.
+
 Tue Sep 11 15:24:00 2001  Christopher Faylor <cgf@cygnus.com>
 
 	Remove unneeded CYGWIN code throughout.

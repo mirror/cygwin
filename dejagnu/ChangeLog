@@ -1,3 +1,8 @@
+2001-04-18  Elena Zannoni  <ezannoni@redhat.com>
+
+	* baseboards/sh-hms.exp: Enable inferior function calls testing.
+	* baseboards/sh-hms-sim.exp: Likewise.
+
 2001-04-04  Richard Henderson  <rth@redhat.com>
 
 	* baseboards/unix.exp (ieee_multilib_flags): Set for alpha targets.

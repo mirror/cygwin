@@ -2,7 +2,7 @@
 #
 # Implementation of the history command.
 #
-# RCS: @(#) $Id: history.tcl,v 1.6.8.2 2000/09/15 16:55:35 spolk Exp $
+# RCS: @(#) $Id: history.tcl,v 1.5 2001/05/17 08:18:56 hobbs Exp $
 #
 # Copyright (c) 1997 Sun Microsystems, Inc.
 #
@@ -166,6 +166,12 @@ proc history {args} {
 
  proc tcl::HistAdd {command {exec {}}} {
     variable history
+
+    # Do not add empty commands to the history
+    if {[string trim $command] == ""} {
+	return ""
+    }
+
     set i [incr history(nextid)]
     set history($i) $command
     set j [incr history(oldest)]
@@ -368,4 +374,3 @@ proc history {args} {
     set i [HistIndex $event]
     set history($i) $cmd
 }
-

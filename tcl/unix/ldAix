@@ -10,7 +10,7 @@
 # symbols exported by those files, and then invokes "ldCmd" to
 # perform the real link.
 #
-# RCS: @(#) $Id: ldAix,v 1.6.8.1 2000/04/06 22:38:38 spolk Exp $
+# RCS: @(#) $Id: ldAix,v 1.3 1999/03/10 05:52:52 stanton Exp $
 
 # Extract from the arguments the names of all of the object files.
 
@@ -72,4 +72,3 @@ if test "$noDotA" = "" ; then
 else
     eval $args
 fi
-

@@ -10,7 +10,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: winNotify.test,v 1.6.8.2 2000/09/15 16:58:02 spolk Exp $
+# RCS: @(#) $Id: winNotify.test,v 1.7 2000/04/10 17:19:06 ericm Exp $
 
 if {[lsearch [namespace children] ::tcltest] == -1} {
     package require tcltest
@@ -160,7 +160,6 @@ test winNotify-3.8 {NotifierProc: modal idle timer, rescheduled} {pcOnly} {
 # cleanup
 ::tcltest::cleanupTests
 return
-
 
 
 

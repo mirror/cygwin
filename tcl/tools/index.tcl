@@ -9,7 +9,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 # 
-# RCS: @(#) $Id: index.tcl,v 1.6.8.1 2000/04/06 22:38:32 spolk Exp $
+# RCS: @(#) $Id: index.tcl,v 1.3 1998/09/14 18:40:15 stanton Exp $
 # 
 
 # Global variables used by these scripts:

@@ -9,11 +9,11 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclMacTest.c,v 1.6.8.1 2000/04/06 22:38:31 spolk Exp $
+ * RCS: @(#) $Id: tclMacTest.c,v 1.5 2002/08/05 03:24:41 dgp Exp $
  */
 
 #define TCL_TEST
-
+#define USE_COMPAT_CONST
 #include "tclInt.h"
 #include "tclMacInt.h"
 #include "tclMacPort.h"

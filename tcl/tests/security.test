@@ -10,7 +10,7 @@
 # Copyright (c) 1998-1999 by Scriptics Corporation.
 # All rights reserved.
 #
-# RCS: @(#) $Id: security.test,v 1.5.8.2 2000/09/15 16:57:30 spolk Exp $
+# RCS: @(#) $Id: security.test,v 1.5 2000/04/10 17:19:04 ericm Exp $
 
 if {[lsearch [namespace children] ::tcltest] == -1} {
     package require tcltest
@@ -41,7 +41,6 @@ test sec-1.1 {tcl_endOfPreviousWord} {
 # cleanup
 ::tcltest::cleanupTests
 return
-
 
 
 

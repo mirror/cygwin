@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclXtNotify.c,v 1.3.8.1 2000/04/06 22:38:39 spolk Exp $
+ * RCS: @(#) $Id: tclXtNotify.c,v 1.4 1999/07/02 06:05:34 welch Exp $
  */
 
 #include <X11/Intrinsic.h>

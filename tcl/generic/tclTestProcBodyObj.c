@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclTestProcBodyObj.c,v 1.3.8.1 2000/04/06 22:38:29 spolk Exp $
+ * RCS: @(#) $Id: tclTestProcBodyObj.c,v 1.2 1998/11/10 06:54:44 jingham Exp $
  */
 
 #include "tclInt.h"

@@ -13,7 +13,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclMacLibrary.c,v 1.6.8.1 2000/04/06 22:38:30 spolk Exp $
+ * RCS: @(#) $Id: tclMacLibrary.c,v 1.5 2001/11/23 01:27:39 das Exp $
  */
 
 /*
@@ -25,6 +25,15 @@
 #include <Resources.h>
 #include <Strings.h>
 #include "tclMacInt.h"
+
+#if defined(TCL_REGISTER_LIBRARY) && defined(USE_TCL_STUBS)
+#error "Can't use TCL_REGISTER_LIBRARY and USE_TCL_STUBS at the same time!"
+/*
+ * Can't register a library with Tcl when using stubs in the current
+ * implementation, since Tcl_InitStubs hasn't been called yet
+ *  when OpenLibraryResource is executing. 
+ */
+#endif
 
 /*
  * These function are not currently defined in any header file.  The

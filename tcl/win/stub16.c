@@ -9,14 +9,13 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: stub16.c,v 1.6.8.1 2000/04/06 22:38:39 spolk Exp $
+ * RCS: @(#) $Id: stub16.c,v 1.4 1999/04/21 21:50:34 rjohnson Exp $
  */
 
 #define STRICT
 
 #include <windows.h>
 #include <stdio.h>
-#include <string.h>
 
 static HANDLE		CreateTempFile(void);
 
@@ -197,5 +196,3 @@ CreateTempFile()
 	    CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE,
 	    NULL);
 }
-
-

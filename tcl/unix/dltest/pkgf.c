@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: pkgf.c,v 1.6.8.1 2000/04/06 22:38:39 spolk Exp $
+ * RCS: @(#) $Id: pkgf.c,v 1.4 1999/04/16 00:48:06 stanton Exp $
  */
 #include "tcl.h"
 
@@ -51,4 +51,3 @@ Pkgf_Init(interp)
     }
     return Tcl_Eval(interp, script);
 }
-

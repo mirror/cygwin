@@ -17,7 +17,7 @@
  *	for any results of using the software, alterations are clearly marked
  *	as such, and this notice is not modified.
  *
- * RCS: @(#) $Id: tclLoadAix.c,v 1.6.8.1 2000/04/06 22:38:38 spolk Exp $
+ * RCS: @(#) $Id: tclLoadAix.c,v 1.3 1999/04/16 00:48:04 stanton Exp $
  *
  * Note:  this file has been altered from the original in a few
  * ways in order to work properly with Tcl.
@@ -546,5 +546,4 @@ static void * findMain(void)
 	free(buf);
 	return ret;
 }
-
 

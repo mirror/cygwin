@@ -6,7 +6,7 @@
 #
 #    HTML:		 1. Build the html target on Unix
 
-# RCS: @(#) $Id: Makefile.in,v 1.6.8.2 2000/09/15 16:58:06 spolk Exp $
+# RCS: @(#) $Id: Makefile.in,v 1.9 2000/04/20 01:30:20 hobbs Exp $
 
 TCL		= tcl@TCL_VERSION@
 TK		= tk@TCL_VERSION@

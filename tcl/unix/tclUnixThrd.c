@@ -13,11 +13,23 @@
  */
 
 #include "tclInt.h"
+#include "tclPort.h"
 
 #ifdef TCL_THREADS
 
-#include "tclPort.h"
 #include "pthread.h"
+
+typedef struct ThreadSpecificData {
+    char	    	nabuf[16];
+    struct tm   	gtbuf;
+    struct tm   	ltbuf;
+    struct {
+	Tcl_DirEntry ent;
+	char name[PATH_MAX+1];
+    } rdbuf;
+} ThreadSpecificData;
+
+static Tcl_ThreadDataKey dataKey;
 
 /*
  * masterLock is used to serialize creation of mutexes, condition
@@ -51,8 +63,6 @@ static pthread_mutex_t *allocLockPtr = &allocLock;
 #define MASTER_UNLOCK	pthread_mutex_unlock(&masterLock)
 
 #endif /* TCL_THREADS */
-
-
 
 
 /*
@@ -131,6 +141,40 @@ Tcl_CreateThread(idPtr, proc, clientData, stackSize, flags)
 #else
     return TCL_ERROR;
 #endif /* TCL_THREADS */
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tcl_JoinThread --
+ *
+ *	This procedure waits upon the exit of the specified thread.
+ *
+ * Results:
+ *	TCL_OK if the wait was successful, TCL_ERROR else.
+ *
+ * Side effects:
+ *	The result area is set to the exit code of the thread we
+ *	waited upon.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+Tcl_JoinThread(id, state)
+    Tcl_ThreadId id;	/* Id of the thread to wait upon */
+    int*     state;	/* Reference to the storage the result
+			 * of the thread we wait upon will be
+			 * written into. */
+{
+#ifdef TCL_THREADS
+    int result;
+
+    result = pthread_join ((pthread_t) id, (VOID**) state);
+    return (result == 0) ? TCL_OK : TCL_ERROR;
+#else
+    return TCL_ERROR;
+#endif
 }
 
 #ifdef TCL_THREADS
@@ -649,8 +693,17 @@ Tcl_ConditionWait(condPtr, mutexPtr, timePtr)
     if (timePtr == NULL) {
 	pthread_cond_wait(pcondPtr, pmutexPtr);
     } else {
-	ptime.tv_sec = timePtr->sec + TclpGetSeconds();
-	ptime.tv_nsec = 1000 * timePtr->usec;
+	Tcl_Time now;
+
+	/*
+	 * Make sure to take into account the microsecond component of the
+	 * current time, including possible overflow situations. [Bug #411603]
+	 */
+
+	Tcl_GetTime(&now);
+	ptime.tv_sec = timePtr->sec + now.sec +
+	    (timePtr->usec + now.usec) / 1000000;
+	ptime.tv_nsec = 1000 * ((timePtr->usec + now.usec) % 1000000);
 	pthread_cond_timedwait(pcondPtr, pmutexPtr, &ptime);
     }
 }
@@ -719,8 +772,180 @@ TclpFinalizeCondition(condPtr)
 	*condPtr = NULL;
     }
 }
-
-
-
 #endif /* TCL_THREADS */
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TclpReaddir, TclpLocaltime, TclpGmtime, TclpInetNtoa --
+ *
+ *	These procedures replace core C versions to be used in a
+ *	threaded environment.
+ *
+ * Results:
+ *	See documentation of C functions.
+ *
+ * Side effects:
+ *	See documentation of C functions.
+ *
+ *----------------------------------------------------------------------
+ */
 
+#if defined(TCL_THREADS) && !defined(HAVE_READDIR_R)
+TCL_DECLARE_MUTEX( rdMutex )
+#undef readdir
+#endif
+
+Tcl_DirEntry *
+TclpReaddir(DIR * dir)
+{
+    Tcl_DirEntry *ent;
+#ifdef TCL_THREADS
+    ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
+
+#ifdef HAVE_READDIR_R
+    ent = &tsdPtr->rdbuf.ent; 
+    if (TclOSreaddir_r(dir, ent, &ent) != 0) {
+	ent = NULL;
+    }
+
+#else /* !HAVE_READDIR_R */
+
+    Tcl_MutexLock(&rdMutex);
+#   ifdef HAVE_STRUCT_DIRENT64
+    ent = readdir64(dir);
+#   else /* !HAVE_STRUCT_DIRENT64 */
+    ent = readdir(dir);
+#   endif /* HAVE_STRUCT_DIRENT64 */
+    if (ent != NULL) {
+	memcpy((VOID *) &tsdPtr->rdbuf.ent, (VOID *) ent,
+		sizeof(Tcl_DirEntry) + sizeof(char) * (PATH_MAX+1));
+	ent = &tsdPtr->rdbuf.ent;
+    }
+    Tcl_MutexUnlock(&rdMutex);
+
+#endif /* HAVE_READDIR_R */
+#else
+#   ifdef HAVE_STRUCT_DIRENT64
+    ent = readdir64(dir);
+#   else /* !HAVE_STRUCT_DIRENT64 */
+    ent = readdir(dir);
+#   endif /* HAVE_STRUCT_DIRENT64 */
+#endif
+    return ent;
+}
+
+#if defined(TCL_THREADS) && (!defined(HAVE_GMTIME_R) || !defined(HAVE_LOCALTIME_R))
+TCL_DECLARE_MUTEX( tmMutex )
+#undef localtime
+#undef gmtime
+#endif
+
+struct tm *
+TclpLocaltime(time_t * clock)
+{
+#ifdef TCL_THREADS
+    ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
+
+#ifdef HAVE_LOCALTIME_R
+    return localtime_r(clock, &tsdPtr->ltbuf);
+#else
+    Tcl_MutexLock( &tmMutex );
+    memcpy( (VOID *) &tsdPtr->ltbuf, (VOID *) localtime( clock ), sizeof (struct tm) );
+    Tcl_MutexUnlock( &tmMutex );
+    return &tsdPtr->ltbuf;
+#endif    
+#else
+    return localtime(clock);
+#endif
+}
+
+struct tm *
+TclpGmtime(time_t * clock)
+{
+#ifdef TCL_THREADS
+    ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
+
+#ifdef HAVE_GMTIME_R
+    return gmtime_r(clock, &tsdPtr->gtbuf);
+#else
+    Tcl_MutexLock( &tmMutex );
+    memcpy( (VOID *) &tsdPtr->gtbuf, (VOID *) gmtime( clock ), sizeof (struct tm) );
+    Tcl_MutexUnlock( &tmMutex );
+    return &tsdPtr->gtbuf;
+#endif    
+#else
+    return gmtime(clock);
+#endif
+}
+
+char *
+TclpInetNtoa(struct in_addr addr)
+{
+#ifdef TCL_THREADS
+    ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
+    union {
+    	unsigned long l;
+    	unsigned char b[4];
+    } u;
+    
+    u.l = (unsigned long) addr.s_addr;
+    sprintf(tsdPtr->nabuf, "%u.%u.%u.%u", u.b[0], u.b[1], u.b[2], u.b[3]);
+    return tsdPtr->nabuf;
+#else
+    return inet_ntoa(addr);
+#endif
+}
+
+#ifdef TCL_THREADS
+/*
+ * Additions by AOL for specialized thread memory allocator.
+ */
+#ifdef USE_THREAD_ALLOC
+static int initialized = 0;
+static pthread_key_t	key;
+static pthread_once_t	once = PTHREAD_ONCE_INIT;
+
+Tcl_Mutex *
+TclpNewAllocMutex(void)
+{
+    struct lock {
+        Tcl_Mutex       tlock;
+        pthread_mutex_t plock;
+    } *lockPtr;
+
+    lockPtr = malloc(sizeof(struct lock));
+    if (lockPtr == NULL) {
+	panic("could not allocate lock");
+    }
+    lockPtr->tlock = (Tcl_Mutex) &lockPtr->plock;
+    pthread_mutex_init(&lockPtr->plock, NULL);
+    return &lockPtr->tlock;
+}
+
+static void
+InitKey(void)
+{
+    extern void TclFreeAllocCache(void *);
+
+    pthread_key_create(&key, TclFreeAllocCache);
+    initialized = 1;
+}
+
+void *
+TclpGetAllocCache(void)
+{
+    if (!initialized) {
+	pthread_once(&once, InitKey);
+    }
+    return pthread_getspecific(key);
+}
+
+void
+TclpSetAllocCache(void *arg)
+{
+    pthread_setspecific(key, arg);
+}
+
+#endif /* USE_THREAD_ALLOC */
+#endif /* TCL_THREADS */

@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: pkge.c,v 1.6.8.2 2000/09/15 16:58:34 spolk Exp $
+ * RCS: @(#) $Id: pkge.c,v 1.5 2000/04/04 08:06:07 hobbs Exp $
  */
 
 #include "tcl.h"
@@ -44,5 +44,3 @@ Pkge_Init(interp)
     }
     return Tcl_Eval(interp, script);
 }
-
-

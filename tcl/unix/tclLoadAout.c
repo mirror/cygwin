@@ -14,13 +14,18 @@
  * and Design Engineering (MADE) Initiative through ARPA contract
  * F33615-94-C-4400.
  *
- * RCS: @(#) $Id: tclLoadAout.c,v 1.6.8.2 2000/09/15 16:58:20 spolk Exp $
+ * RCS: @(#) $Id: tclLoadAout.c,v 1.13 2002/07/18 16:26:04 vincentdarley Exp $
  */
 
 #include "tclInt.h"
 #include <fcntl.h>
 #ifdef HAVE_EXEC_AOUT_H
 #   include <sys/exec_aout.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#else
+#   include "../compat/unistd.h"
 #endif
 
 /*
@@ -84,7 +89,7 @@ static char * SymbolTableFile = NULL;
  * Type of the dictionary function that begins each load module.
  */
 
-typedef Tcl_PackageInitProc * (* DictFn) _ANSI_ARGS_ ((char * symbol));
+typedef Tcl_PackageInitProc * (* DictFn) _ANSI_ARGS_ ((CONST char * symbol));
 
 /*
  * Prototypes for procedures referenced only in this file:
@@ -97,17 +102,14 @@ static void UnlinkSymbolTable _ANSI_ARGS_((void));
 /*
  *----------------------------------------------------------------------
  *
- * TclpLoadFile --
+ * TclpDlopen --
  *
  *	Dynamically loads a binary code file into memory and returns
- *	the addresses of two procedures within that file, if they
- *	are defined.
+ *	a handle to the new code.
  *
  * Results:
  *	A standard Tcl completion code.  If an error occurs, an error
- *	message is left in the interp's result.  *proc1Ptr and *proc2Ptr
- *	are filled in with the addresses of the symbols given by
- *	*sym1 and *sym2, or NULL if those symbols can't be found.
+ *	message is left in the interp's result. 
  *
  * Side effects:
  *	New code suddenly appears in memory.
@@ -136,18 +138,17 @@ static void UnlinkSymbolTable _ANSI_ARGS_((void));
  */
 
 int
-TclpLoadFile(interp, fileName, sym1, sym2, proc1Ptr, proc2Ptr, clientDataPtr)
+TclpDlopen(interp, pathPtr, loadHandle, unloadProcPtr)
     Tcl_Interp *interp;		/* Used for error reporting. */
-    char *fileName;		/* Name of the file containing the desired
+    Tcl_Obj *pathPtr;		/* Name of the file containing the desired
 				 * code (UTF-8). */
-    char *sym1, *sym2;		/* Names of two procedures to look up in
-				 * the file's symbol table. */
-    Tcl_PackageInitProc **proc1Ptr, **proc2Ptr;
-				/* Where to return the addresses corresponding
-				 * to sym1 and sym2. */
-    ClientData *clientDataPtr;	/* Filled with token for dynamically loaded
+    Tcl_LoadHandle *loadHandle;	/* Filled with token for dynamically loaded
 				 * file which will be passed back to 
-				 * TclpUnloadFile() to unload the file. */
+				 * (*unloadProcPtr)() to unload the file. */
+    Tcl_FSUnloadFileProc **unloadProcPtr;	
+				/* Filled with address of Tcl_FSUnloadFileProc
+				 * function which should be used for
+				 * this file. */
 {
   char * inputSymbolTable;	/* Name of the file containing the 
 				 * symbol table from the last link. */
@@ -162,12 +163,9 @@ TclpLoadFile(interp, fileName, sym1, sym2, proc1Ptr, proc2Ptr, clientDataPtr)
   struct exec relocatedHead;	/* Header of the relocated text */
   unsigned long relocatedSize;	/* Size of the relocated text */
   char * startAddress;		/* Starting address of the module */
-  DictFn dictionary;		/* Dictionary function in the load module */
   int status;			/* Status return from Tcl_ calls */
   char * p;
 
-  *clientDataPtr = NULL;
-  
   /* Find the file that contains the symbols for the run-time link. */
 
   if (SymbolTableFile != NULL) {
@@ -189,13 +187,13 @@ TclpLoadFile(interp, fileName, sym1, sym2, proc1Ptr, proc2Ptr, clientDataPtr)
   Tcl_DStringAppend (&linkCommandBuf, " -G 0 ", -1);
 #endif
   Tcl_DStringAppend (&linkCommandBuf, " -u TclLoadDictionary_", -1);
-  TclGuessPackageName(fileName, &linkCommandBuf);
+  TclGuessPackageName(Tcl_GetString(pathPtr), &linkCommandBuf);
   Tcl_DStringAppend (&linkCommandBuf, " -A ", -1);
   Tcl_DStringAppend (&linkCommandBuf, inputSymbolTable, -1);
   Tcl_DStringAppend (&linkCommandBuf, " -N -T XXXXXXXX ", -1);
-  Tcl_DStringAppend (&linkCommandBuf, fileName, -1);
+  Tcl_DStringAppend (&linkCommandBuf, Tcl_GetString(pathPtr), -1);
   Tcl_DStringAppend (&linkCommandBuf, " ", -1);
-  if (FindLibraries (interp, fileName, &linkCommandBuf) != TCL_OK) {
+  if (FindLibraries (interp, Tcl_GetString(pathPtr), &linkCommandBuf) != TCL_OK) {
     Tcl_DStringFree (&linkCommandBuf);
     return TCL_ERROR;
   }
@@ -258,7 +256,14 @@ TclpLoadFile(interp, fileName, sym1, sym2, proc1Ptr, proc2Ptr, clientDataPtr)
 
   (void) brk (startAddress + relocatedSize);
 
-  /* Seek to the start of the module's text */
+  /*
+   * Seek to the start of the module's text.
+   *
+   * Note that this does not really work with large files (i.e. where
+   * lseek64 exists and is different to lseek), but anyone trying to
+   * dynamically load a binary that is larger than what can fit in
+   * addressable memory is in trouble anyway...
+   */
 
 #if defined(__mips) || defined(mips)
   status = lseek (relocatedFd,
@@ -300,14 +305,36 @@ TclpLoadFile(interp, fileName, sym1, sym2, proc1Ptr, proc2Ptr, clientDataPtr)
   SymbolTableFile = ckalloc (strlen (relocatedFileName) + 1);
   strcpy (SymbolTableFile, relocatedFileName);
   
-  /* Look up the entry points in the load module's dictionary. */
-
-  dictionary = (DictFn) startAddress;
-  *proc1Ptr = dictionary (sym1);
-  *proc2Ptr = dictionary (sym2);
-
+  *loadHandle = startAddress;
   return TCL_OK;
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TclpFindSymbol --
+ *
+ *	Looks up a symbol, by name, through a handle associated with
+ *	a previously loaded piece of code (shared library).
+ *
+ * Results:
+ *	Returns a pointer to the function associated with 'symbol' if
+ *	it is found.  Otherwise returns NULL and may leave an error
+ *	message in the interp's result.
+ *
+ *----------------------------------------------------------------------
+ */
+Tcl_PackageInitProc*
+TclpFindSymbol(interp, loadHandle, symbol) 
+    Tcl_Interp *interp;
+    Tcl_LoadHandle loadHandle;
+    CONST char *symbol;
+{
+    /* Look up the entry point in the load module's dictionary. */
+    DictFn dictionary = (DictFn) loadHandle;
+    return (Tcl_PackageInitProc*) dictionary(sym1);
+}
+
 
 /*
  *------------------------------------------------------------------------
@@ -331,7 +358,7 @@ FindLibraries (interp, fileName, buf)
      Tcl_DString * buf;		/* Buffer where the -l an -L flags */
 {
   FILE * f;			/* The load module */
-  int c;			/* Byte from the load module */
+  int c = 0;			/* Byte from the load module */
   char * p;
   Tcl_DString ds;
   CONST char *native;
@@ -434,9 +461,9 @@ UnlinkSymbolTable ()
  */
 
 void
-TclpUnloadFile(clientData)
-    ClientData clientData;	/* ClientData returned by a previous call
-				 * to TclpLoadFile().  The clientData is 
+TclpUnloadFile(loadHandle)
+    Tcl_LoadHandle loadHandle;	/* loadHandle returned by a previous call
+				 * to TclpDlopen().  The loadHandle is 
 				 * a token that represents the loaded 
 				 * file. */
 {
@@ -464,15 +491,15 @@ TclpUnloadFile(clientData)
 
 int
 TclGuessPackageName(fileName, bufPtr)
-    char *fileName;		/* Name of file containing package (already
+    CONST char *fileName;	/* Name of file containing package (already
 				 * translated to local form if needed). */
     Tcl_DString *bufPtr;	/* Initialized empty dstring.  Append
 				 * package name to this if possible. */
 {
-    char *p, *q, *r;
-    int srcOff, dstOff;
+    CONST char *p, *q;
+    char *r;
 
-    if (q = strrchr(fileName,'/')) {
+    if ((q = strrchr(fileName,'/'))) {
 	q++;
     } else {
 	q = fileName;
@@ -505,5 +532,3 @@ TclGuessPackageName(fileName, bufPtr)
 
     return 1;
 }
-
-

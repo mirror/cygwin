@@ -12,7 +12,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclMacUnix.c,v 1.6.8.1 2000/04/06 22:38:31 spolk Exp $
+ * RCS: @(#) $Id: tclMacUnix.c,v 1.4 2001/11/23 01:28:46 das Exp $
  */
 
 #include <Files.h>
@@ -206,7 +206,7 @@ Tcl_LsObjCmd(
 
     resultObjPtr = Tcl_GetObjResult(interp);
     Tcl_IncrRefCount(resultObjPtr);
-    if (Tcl_ListObjGetElements(interp, resultObjPtr, &objc, &objv) != TCL_OK) {
+    if (Tcl_ListObjGetElements(interp, resultObjPtr, &objc, (Tcl_Obj ***)&objv) != TCL_OK) {
     	Tcl_DecrRefCount(resultObjPtr);
     	return TCL_ERROR;
     }

@@ -11,7 +11,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclAppInit.c,v 1.8.8.1 2000/04/06 22:38:39 spolk Exp $
+ * RCS: @(#) $Id: tclAppInit.c,v 1.8 2002/02/21 21:20:08 davygrvy Exp $
  */
 
 #include "tcl.h"
@@ -299,5 +299,3 @@ setargv(argcPtr, argvPtr)
     *argcPtr = argc;
     *argvPtr = argv;
 }
-
-

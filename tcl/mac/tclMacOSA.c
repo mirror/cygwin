@@ -12,7 +12,7 @@
  * See the file "License Terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclMacOSA.c,v 1.6.8.1 2000/04/06 22:38:30 spolk Exp $
+ * RCS: @(#) $Id: tclMacOSA.c,v 1.9 2002/04/08 09:02:48 das Exp $
  */
 
 #define MAC_TCL
@@ -2067,8 +2067,8 @@ tclOSAStore(
     short saveRef, fileRef = -1;
     char idStr[16 + TCL_INTEGER_SPACE];
     FSSpec fileSpec;
-    Tcl_DString buffer;
-    char *nativeName;
+    Tcl_DString ds, buffer;
+    CONST char *nativeName;
     OSErr myErr = noErr;
     OSAID scriptID;
     Size scriptSize;
@@ -2105,13 +2105,14 @@ tclOSAStore(
     if (fileName != NULL) {
 	OSErr err;
 		
-	Tcl_DStringInit(&buffer);	
-	nativeName = Tcl_TranslateFileName(interp, fileName, &buffer);
-	if (nativeName == NULL) {
+	if (Tcl_TranslateFileName(interp, fileName, &buffer) == NULL) {
 	    return TCL_ERROR;
 	}
+	nativeName = Tcl_UtfToExternalDString(NULL, Tcl_DStringValue(&buffer), 
+    	    Tcl_DStringLength(&buffer), &ds);
 	err = FSpLocationFromPath(strlen(nativeName), nativeName, &fileSpec);
 		
+	Tcl_DStringFree(&ds);
 	Tcl_DStringFree(&buffer);
 	if ((err != noErr) && (err != fnfErr)) {
 	    Tcl_AppendResult(interp,
@@ -2120,7 +2121,7 @@ tclOSAStore(
 	    return TCL_ERROR;
 	}
 		
-	FSpCreateResFileCompat(&fileSpec,
+	FSpCreateResFileCompatTcl(&fileSpec,
 		'WiSH', 'osas', smSystemScript);	
 	myErr = ResError();
 	
@@ -2132,7 +2133,7 @@ tclOSAStore(
 	    goto rezEvalCleanUp;
 	}
 		
-	fileRef = FSpOpenResFileCompat(&fileSpec, fsRdWrPerm);
+	fileRef = FSpOpenResFileCompatTcl(&fileSpec, fsRdWrPerm);
 	if (fileRef == -1) {
 	    Tcl_AppendResult(interp, "Error reading the file: \"", 
 		    fileName, "\".", NULL);
@@ -2286,20 +2287,21 @@ tclOSALoad(
     short saveRef, fileRef = -1;
     char idStr[16 + TCL_INTEGER_SPACE];
     FSSpec fileSpec;
-    Tcl_DString buffer;
-    char *nativeName;
+    Tcl_DString ds, buffer;
+    CONST char *nativeName;
 
     saveRef = CurResFile();
 	
     if (fileName != NULL) {
 	OSErr err;
 		
-	Tcl_DStringInit(&buffer);	
-	nativeName = Tcl_TranslateFileName(interp, fileName, &buffer);
-	if (nativeName == NULL) {
+	if (Tcl_TranslateFileName(interp, fileName, &buffer) == NULL) {
 	    return TCL_ERROR;
 	}
+	nativeName = Tcl_UtfToExternalDString(NULL, Tcl_DStringValue(&buffer), 
+    	    Tcl_DStringLength(&buffer), &ds);
 	err = FSpLocationFromPath(strlen(nativeName), nativeName, &fileSpec);
+	Tcl_DStringFree(&ds);
 	Tcl_DStringFree(&buffer);
 	if (err != noErr) {
 	    Tcl_AppendResult(interp, "Error finding the file: \"", 
@@ -2307,7 +2309,7 @@ tclOSALoad(
 	    return TCL_ERROR;
 	}
 			
-	fileRef = FSpOpenResFileCompat(&fileSpec, fsRdPerm);
+	fileRef = FSpOpenResFileCompatTcl(&fileSpec, fsRdPerm);
 	if (fileRef == -1) {
 	    Tcl_AppendResult(interp, "Error reading the file: \"", 
 		    fileName, "\".", NULL);

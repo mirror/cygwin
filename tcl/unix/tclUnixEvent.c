@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclUnixEvent.c,v 1.6.8.1 2000/04/06 22:38:39 spolk Exp $
+ * RCS: @(#) $Id: tclUnixEvent.c,v 1.4 2001/11/21 02:36:21 hobbs Exp $
  */
 
 #include "tclInt.h"
@@ -44,7 +44,7 @@ Tcl_Sleep(ms)
      * early, go back to sleep again.
      */
 
-    TclpGetTime(&before);
+    Tcl_GetTime(&before);
     after = before;
     after.sec += ms/1000;
     after.usec += (ms%1000)*1000;
@@ -71,7 +71,6 @@ Tcl_Sleep(ms)
 	}
 	(void) select(0, (SELECT_MASK *) 0, (SELECT_MASK *) 0,
 		(SELECT_MASK *) 0, &delay);
-	TclpGetTime(&before);
+	Tcl_GetTime(&before);
     }
 }
-

@@ -11,7 +11,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: lreplace.test,v 1.6.8.2 2000/09/15 16:56:59 spolk Exp $
+# RCS: @(#) $Id: lreplace.test,v 1.7 2000/04/10 17:19:01 ericm Exp $
 
 if {[lsearch [namespace children] ::tcltest] == -1} {
     package require tcltest
@@ -136,4 +136,3 @@ test lreplace-3.1 {lreplace won't modify shared argument objects} {
 catch {unset foo}
 ::tcltest::cleanupTests
 return
-

@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclMacChan.c,v 1.6.8.1 2000/04/06 22:38:30 spolk Exp $
+ * RCS: @(#) $Id: tclMacChan.c,v 1.17 2002/07/08 10:08:58 vincentdarley Exp $
  */
 
 #include "tclInt.h"
@@ -25,6 +25,12 @@
 #include <MoreFiles.h>
 #include <MoreFilesExtras.h>
 
+#ifdef __MSL__
+#include <unix.mac.h>
+#define TCL_FILE_CREATOR (__getcreator(0))
+#else
+#define TCL_FILE_CREATOR 'MPW '
+#endif
 
 /*
  * The following are flags returned by GetOpenMode.  They
@@ -108,7 +114,7 @@ static ThreadSpecificData *FileInit _ANSI_ARGS_((void));
 static int		FileInput _ANSI_ARGS_((ClientData instanceData,
 			    char *buf, int toRead, int *errorCode));
 static int		FileOutput _ANSI_ARGS_((ClientData instanceData,
-			    char *buf, int toWrite, int *errorCode));
+			    CONST char *buf, int toWrite, int *errorCode));
 static int		FileSeek _ANSI_ARGS_((ClientData instanceData,
 			    long offset, int mode, int *errorCode));
 static void		FileSetupProc _ANSI_ARGS_((ClientData clientData,
@@ -124,7 +130,7 @@ static int		StdIOClose _ANSI_ARGS_((ClientData instanceData,
 static int		StdIOInput _ANSI_ARGS_((ClientData instanceData,
 			    char *buf, int toRead, int *errorCode));
 static int		StdIOOutput _ANSI_ARGS_((ClientData instanceData,
-			    char *buf, int toWrite, int *errorCode));
+			    CONST char *buf, int toWrite, int *errorCode));
 static int		StdIOSeek _ANSI_ARGS_((ClientData instanceData,
 			    long offset, int mode, int *errorCode));
 static int		StdReady _ANSI_ARGS_((ClientData instanceData,
@@ -136,7 +142,7 @@ static int		StdReady _ANSI_ARGS_((ClientData instanceData,
 
 static Tcl_ChannelType consoleChannelType = {
     "file",			/* Type name. */
-    StdIOBlockMode,		/* Set blocking/nonblocking mode.*/
+    (Tcl_ChannelTypeVersion)StdIOBlockMode,		/* Set blocking/nonblocking mode.*/
     StdIOClose,			/* Close proc. */
     StdIOInput,			/* Input proc. */
     StdIOOutput,		/* Output proc. */
@@ -153,7 +159,7 @@ static Tcl_ChannelType consoleChannelType = {
 
 static Tcl_ChannelType fileChannelType = {
     "file",			/* Type name. */
-    FileBlockMode,		/* Set blocking or
+    (Tcl_ChannelTypeVersion)FileBlockMode,		/* Set blocking or
                                  * non-blocking mode.*/
     FileClose,			/* Close proc. */
     FileInput,			/* Input proc. */
@@ -548,7 +554,7 @@ StdIOInput(
 static int
 StdIOOutput(
     ClientData instanceData,		/* Unused. */
-    char *buf,				/* The data buffer. */
+    CONST char *buf,			/* The data buffer. */
     int toWrite,			/* How many bytes to write? */
     int *errorCode)			/* Where to store error code. */
 {
@@ -558,7 +564,7 @@ StdIOOutput(
     *errorCode = 0;
     errno = 0;
     fd = (int) ((FileState*)instanceData)->fileRef;
-    written = write(fd, buf, (size_t) toWrite);
+    written = write(fd, (void*)buf, (size_t) toWrite);
     if (written > -1) {
         return written;
     }
@@ -586,11 +592,10 @@ StdIOOutput(
 
 static int
 StdIOSeek(
-    ClientData instanceData,			/* Unused. */
-    long offset,				/* Offset to seek to. */
-    int mode,					/* Relative to where
-                                                 * should we seek? */
-    int *errorCodePtr)				/* To store error code. */
+    ClientData instanceData,	/* Unused. */
+    long offset,		/* Offset to seek to. */
+    int mode,			/* Relative to where should we seek? */
+    int *errorCodePtr)		/* To store error code. */
 {
     int newLoc;
     int fd;
@@ -736,7 +741,7 @@ TclpGetDefaultStdChannel(
  *
  * TclpOpenFileChannel --
  *
- *	Open an File based channel on Unix systems.
+ *	Open a File based channel on MacOS systems.
  *
  * Results:
  *	The new channel or NULL. If NULL, the output argument
@@ -753,38 +758,28 @@ Tcl_Channel
 TclpOpenFileChannel(
     Tcl_Interp *interp,			/* Interpreter for error reporting;
                                          * can be NULL. */
-    char *fileName,			/* Name of file to open. */
-    char *modeString,			/* A list of POSIX open modes or
-                                         * a string such as "rw". */
+    Tcl_Obj *pathPtr,			/* Name of file to open. */
+    int mode,				/* POSIX open mode. */
     int permissions)			/* If the open involves creating a
                                          * file, with what modes to create
                                          * it? */
 {
     Tcl_Channel chan;
-    int mode;
-    char *native;
-    Tcl_DString ds, buffer;
+    CONST char *native;
     int errorCode;
     
-    mode = GetOpenMode(interp, modeString);
-    if (mode == -1) {
+    native = Tcl_FSGetNativePath(pathPtr);
+    if (native == NULL) {
 	return NULL;
     }
-
-    if (Tcl_TranslateFileName(interp, fileName, &buffer) == NULL) {
-	return NULL;
-    }
-    native = Tcl_UtfToExternalDString(NULL, Tcl_DStringValue(&buffer), 
-    	    Tcl_DStringLength(&buffer), &ds);
     chan = OpenFileChannel(native, mode, permissions, &errorCode);
-    Tcl_DStringFree(&ds);
-    Tcl_DStringFree(&buffer);
 
     if (chan == NULL) {
 	Tcl_SetErrno(errorCode);
 	if (interp != (Tcl_Interp *) NULL) {
-            Tcl_AppendResult(interp, "couldn't open \"", fileName, "\": ",
-                    Tcl_PosixError(interp), (char *) NULL);
+            Tcl_AppendResult(interp, "couldn't open \"", 
+			     Tcl_GetString(pathPtr), "\": ",
+			     Tcl_PosixError(interp), (char *) NULL);
         }
 	return NULL;
     }
@@ -862,7 +857,7 @@ OpenFileChannel(
     }
 
     if ((err == fnfErr) && (mode & TCL_CREAT)) {
-	err = HCreate(fileSpec.vRefNum, fileSpec.parID, fileSpec.name, 'MPW ', 'TEXT');
+	err = HCreate(fileSpec.vRefNum, fileSpec.parID, fileSpec.name, TCL_FILE_CREATOR, 'TEXT');
 	if (err != noErr) {
 	    *errorCodePtr = errno = TclMacOSErrorToPosixError(err);
 	    Tcl_SetErrno(errno);
@@ -1085,7 +1080,7 @@ FileInput(
 static int
 FileOutput(
     ClientData instanceData,		/* Unused. */
-    char *buffer,			/* The data buffer. */
+    CONST char *buffer,			/* The data buffer. */
     int toWrite,			/* How many bytes to write? */
     int *errorCodePtr)			/* Where to store error code. */
 {
@@ -1132,10 +1127,9 @@ FileOutput(
 static int
 FileSeek(
     ClientData instanceData,	/* Unused. */
-    long offset,				/* Offset to seek to. */
-    int mode,					/* Relative to where
-                                 * should we seek? */
-    int *errorCodePtr)			/* To store error code. */
+    long offset,		/* Offset to seek to. */
+    int mode,			/* Relative to where should we seek? */
+    int *errorCodePtr)		/* To store error code. */
 {
     FileState *fileState = (FileState *) instanceData;
     IOParam pb;
@@ -1285,7 +1279,7 @@ GetOpenMode(
 					 * "RDONLY CREAT". */
 {
     int mode, modeArgc, c, i, gotRW;
-    char **modeArgv, *flag;
+    CONST char **modeArgv, *flag;
 
     /*
      * Check for the simpler fopen-like access modes (e.g. "r").  They

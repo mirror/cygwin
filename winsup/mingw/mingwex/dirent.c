@@ -9,9 +9,9 @@
  * Significantly revised and rewinddir, seekdir and telldir added by Colin
  * Peters <colin@fu.is.saga-u.ac.jp>
  *	
- * $Revision: 1.4 $
- * $Author: earnie $
- * $Date: 2003/06/18 13:54:47 $
+ * $Revision: 1.5 $
+ * $Author: dannysmith $
+ * $Date: 2003/09/22 21:32:52 $
  *
  */
 
@@ -76,8 +76,8 @@ _topendir (const _TCHAR *szPath)
 
   /* Allocate enough space to store DIR structure and the complete
    * directory path given. */
-  nd = (_TDIR *) malloc (sizeof (_TDIR) + _tcslen (szFullPath) + _tcslen (SLASH) +
-		       _tcslen (SUFFIX));
+  nd = (_TDIR *) malloc (sizeof (_TDIR) + (_tcslen(szFullPath) + _tcslen (SLASH) +
+			 _tcslen(SUFFIX) + 1) * sizeof(_TCHAR));
 
   if (!nd)
     {

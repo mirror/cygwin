@@ -1,3 +1,9 @@
+2000-06-30  Syd Polk  <spolk@cygnus.com>
+
+	* src/paths.c: Chris Faylor's path changes from 2000-06-09 blow
+	out MSVC's stupid path limitation. This is only a problem
+	for Source-Navigator.
+
 2000-06-22  Mo DeJong  <mdejong@redhat.com>
 
 	* library/tree.tcl: Remove use of watch
@@ -266,6 +272,7 @@ Wed Mar  3 16:57:21 1999  Khamis Abuelkombuz  <khamis@cygnus.com>
         1998-08-10  Jim Ingham   <jingham@cygnus.com>
 
         * src/paths.c: Figure out how to run from the build tree.
+
 1999-01-14  Ben Elliston  <bje@cygnus.com>
 
 	* src/tkTreeTable.c: Remove unnecessary #includes that collide

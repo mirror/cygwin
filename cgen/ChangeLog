@@ -1,3 +1,9 @@
+2004-01-29  Dave Brolley  <brolley@redhat.com>
+
+	* decode.scm (-opcode-slots): For short insns, generate 'opcode' with
+	zeroes in the extra bit positions and generate 'opcode-mask' with ones
+	in the extra bit positions.
+
 2003-12-15  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
 
 	* cpu/m32r.cpu: Add PIPE_O attribute to "pop" instruction.

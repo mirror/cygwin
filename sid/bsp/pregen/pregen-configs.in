@@ -36,7 +36,6 @@ mvic() {
     rm -f $1
 }
 
-
 crs --cpu=arm --no-run --gdb=5000 -EL
 mvic sid.conf arm-gloss.conf
 
@@ -66,5 +65,3 @@ mvic sid.conf arm-cma.conf
 
 crs --cpu=arm --no-run --gdb=5000 --board=cma110:cma222-uart1:gdb -EL --tksm
 mvic sid.conf arm-cma-tksm.conf
-
-

@@ -1,7 +1,18 @@
+2001-08-01  Dave Brolley  <brolley@redhat.com>
+
+	* configrun-sid.in (opt_load): New option.
+	(opt_gdbport): New option.
+	(mapper): Renamed to cpu-mapper.
+	(loader): Renamed to cpu-loader.
+	(gdb): Renamed to cpu-gdb.
+	(gdb-socket): Renamed to cpu-gdb-socket.
+	($exec): Reconcile with new --load option.
+	($opt_gdb): Reconcile with new --gdbport option.
+
 2001-07-18  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* configrun-sid.in: Added --enable-warnings option which ties to
-	the enable-warnings? setting of the cpu.
+	* configrun-sid.in: Add --enable-warnings option which connects
+	to enable-warnings? setting of cpu.
 
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -12,6 +23,15 @@
 
 	* configrun-sid.in: Add support for --memory-region latency settings.
 
+2001-05-29  matthew green  <mrg@redhat.com>
+
+	* configrun-sid.in ($opt_trace_disassemble): New option variable
+	for inline disassembly of running code, using new
+	`--trace-disassemble' option.
+	($opt_trace_counter): Display a count for instructions as they
+	run, either for semantic or disassembly tracing, using new
+	`--trace-counter' option.
+	
 2001-04-05  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configrun-sid.in: Remove unused "--board=none" clause.
@@ -22,15 +42,15 @@
 
 	* configrun-sid.in: For arm target, set emable_z_packet.
 
-2001-04-04  Ben Elliston  <bje@redhat.com>
+2001-03-22  Ben Elliston  <bje@redhat.com>
 
-	* Makefile.am: Clean up.
 	* Makefile.in: Regenerate.
+	* configure: Likewise.
+	* aclocal.m4: Likewise.
 
 2001-03-21  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.in: Regenerate.
-	* configure: Likewise.
 
 2001-03-13  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -55,8 +75,8 @@
 
 2001-02-23  John Healy  <jhealy@redhat.com>
 
-	* configrun-sid.in: Added $gloss_specified variable.
-	Added error reporting for sim run.
+        * configrun-sid.in: Added $gloss_specified variable.
+        Added error reporting for sim run.
 
 2001-01-23  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -86,12 +106,12 @@
 	* configrun-sid.in: `load-accessor' becomes Harvard architecture
 	friendly.  Split into `load-accessor-insn' and `load-accessor-data'.
 
-2001-01-11  Nicholas Duffek  <nsd@redhat.com>
+2001-01-09  Nicholas Duffek  <nsd@redhat.com>
 
 	* configrun-sid.in ($enable_z_packet): New variable.
 	($opt_gdb != 0): Use $enable_z_packet.
 
-2001-01-03  Jeff Johnston  <jjohnstn@redhat.com>
+2001-01-04  Jeff Johnston  <jjohnstn@redhat.com>
 
         * configrun-sid.in: Imply --persistent if --gdb=xxxx specified.
         Also set gdb "exit-on-detach" setting if gdb specified and

@@ -1,4 +1,4 @@
-@c Copyright (C) 2000 Red Hat, Inc.
+@c Copyright (C) 2000, 2003 Red Hat, Inc.
 @c This file is part of the CGEN manual.
 @c For copying conditions, see the file cgen.texi.
 
@@ -1892,10 +1892,10 @@ that supports the instruction.  The default function unit is the u-exec unit.
 The syntax is:
 
 @example
-(mach-name (unit name (direction unit-var-name1 insn-operand-name1)
-                      (direction unit-var-name2 insn-operand-name2)
-                      ...
-                      (cycles cycle-count))
+(model-name (unit name (direction unit-var-name1 insn-operand-name1)
+                       (direction unit-var-name2 insn-operand-name2)
+                       ...
+                       (cycles cycle-count))
 @end example
 
 direction/unit-var-name/insn-operand-name mappings are optional.

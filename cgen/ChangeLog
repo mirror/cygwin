@@ -1,3 +1,9 @@
+2002-03-05  DJ Delorie  <dj@redhat.com>
+
+	* cpu/xstormy16.cpu (set-psw-add): Use temporaries to prevent
+	prematurely overwriting needed inputs.
+	(set-psw-sub): Likewise.
+
 Fri Feb 21 19:48:19 2003  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* cpu/sh64-media.cpu (make-mextr): Fix setting of count.

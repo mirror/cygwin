@@ -1,4 +1,4 @@
-cr100942.badconf:9: component cpu has no output pin ttttrap
-cr100942.badconf:10: component angel has no input pin trap-1-code
-cr100942.badconf:11: component angel has no input pin trap-1-code
+cr100942.badconf:4: component main has no output pin staring
+cr100942.badconf:5: component loader has no input pin load-me!
+cr100942.badconf:6: component loader has no input pin load-me!
 Configuration error.  Aborting.

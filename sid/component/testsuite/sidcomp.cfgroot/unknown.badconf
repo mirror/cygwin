@@ -24,25 +24,20 @@ load libtimers.la timer_component_library	# unknown command (conf file is case s
 
 
 
-unknowncommand hw-cpu-arm7t cpu		# unknown command
-newnew hw-cpu-arm7t cpu			# unknown command
+unknowncommand hw-mapper-basic mapper	# unknown command
+newnew sid-io-stdio stdio		# unknown command
 n sw-load-elf loader			# unknown command
--> new hw-cpu-arm7t cpu			# unknown command
+-> new hw-mapper-basic mapper		# unknown command
 
 # Components (original)
 
-new hw-cpu-arm7t cpu
 new sw-load-elf loader
 new sid-io-stdio stdio
-new sw-gloss-arm/angel angel
-new hw-interrupt-arm/ref intctrl
 new hw-mapper-basic bus
-new hw-remap/pause-arm/ref remapper
 new sid-sched-host host-sched
 new sid-sched-sim target-sched
 new hw-memory-ram/rom-basic mem
-new hw-timer-arm/ref-sched timer1
-New hw-timer-arm/ref-sched timer2	# unknown command (conf file is case sensitive)
+New hw-memory-ram/rom-basic mem		# unknown command (conf file is case sensitive)
 
 # Scheduler
 settarget target-sched enabled? 1	# unknown command

@@ -250,6 +250,7 @@ GetEdgeNodes(interp,canvasPtr,i,fp,tp)
 {
     int argc;
     char** argv;
+    char * buf;
 
     /* Read the from node id of this edge. */
     Tk_ConfigureInfo(interp, canvasPtr->tkwin,
@@ -259,7 +260,10 @@ GetEdgeNodes(interp,canvasPtr,i,fp,tp)
 			  &argc, &argv) != TCL_OK) {
 	return TCL_ERROR;
     }
-    *fp = strdup(argv[4]);
+    /* This should actuall be a call like Tcl_Strdup() */
+    buf = (char*)ckalloc (strlen(argv[4])+1);
+    strcpy (buf, argv[4]);
+    *fp = buf;
     ckfree((char*)argv);
     /* Read the to node id of this edge. */
     Tk_ConfigureInfo(interp, canvasPtr->tkwin,
@@ -269,7 +273,9 @@ GetEdgeNodes(interp,canvasPtr,i,fp,tp)
 			  &argc, &argv) != TCL_OK) {
 	return TCL_ERROR;
     }
-    *tp = strdup(argv[4]);
+    buf = (char*)ckalloc (strlen(argv[4])+1);
+    strcpy (buf, argv[4]);
+    *tp = buf;
     ckfree((char*)argv);
     Tcl_ResetResult(interp);
     return TCL_OK;

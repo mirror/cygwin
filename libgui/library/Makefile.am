@@ -28,7 +28,7 @@ WISH = wish
 if CROSS_COMPILING
 ITCL_SH = itclsh
 else
-ITCL_SH = $$here/../../itcl/itcl/unix/itclsh$(EXEEXT)
+ITCL_SH = $$here/../../itcl/itcl/@ITCL_DIR@/itclsh$(EXEEXT)
 endif
 
 tclIndex: $(TCL)
@@ -42,6 +42,6 @@ pkgIndex.tcl: @MAINT@ $(PACKAGES)
 	here=`pwd`;	 \
 	$(SET_LIB_PATH) \
 	cd $(srcdir) && \
-	echo "pkg_mkIndex . $(PACKAGES); exit" | $(WISH)
+	echo "pkg_mkIndex . $(PACKAGES); exit" | @ITCL_SH@
 
 ETAGS_ARGS = --lang=none --regex='/[ \t]*\(proc\|method\|itcl_class\)[ \t]+\([^ \t]+\)/\1/' $(TCL) --lang=auto

@@ -22,7 +22,7 @@ namespace sid
   // COMPONENT_LIBRARY_MAGIC mechanism in sidso.h, and prevents
   // interopration attempts with obsolete component objects.
 
-  const unsigned API_MAJOR_VERSION = 3;
+  const unsigned API_MAJOR_VERSION = 4;
   const unsigned API_MINOR_VERSION = 0;
 
   // PART 1: Buses
@@ -45,7 +45,6 @@ namespace sid
       misaligned   = 0x01, // address misaligned
       unmapped     = 0x02, // address not in mapped range
       unpermitted  = 0x04, // may not read or may not write at address
-      delayed      = 0x10, // data not yet available - try again after yielding
     };
 
     struct status

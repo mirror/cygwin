@@ -10,8 +10,8 @@ applications, including the assembler, disassembler and simulator
 generators. A handful of CPU descriptions are also included:
 
 	* ARM7T
-	* Intel i960
-	* Intel IA-32 and IA-64
+	* Intel i960 [incomplete]
+	* Intel IA-32 and IA-64 [incomplete]
 	* Fujitsu FR-30
 	* Mitsubishi M32R/D
-	* SPARC
+	* SPARC [incomplete]

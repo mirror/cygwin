@@ -1,5 +1,5 @@
 ; Simulator generator support routines.
-; Copyright (C) 2000, 2001 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; One goal of this file is to provide cover functions for all methods.
@@ -44,7 +44,7 @@
 ;	Only generate parallel versions of each insn.
 ; with-multiple-isa
 ;	Enable multiple-isa support (eg. arm+thumb).
-; copyright fsf|cygnus
+; copyright fsf|redhat
 ;	emit an FSF or Cygnus copyright (temporary, pending decision)
 ; package gnusim|cygsim
 ;	indicate the software package
@@ -110,8 +110,8 @@
     ((with-parallel-only) (set! -with-parallel-only? #t))
     ((copyright) (cond ((equal?  value '("fsf"))
 			(set! CURRENT-COPYRIGHT copyright-fsf))
-		       ((equal? value '("cygnus"))
-			(set! CURRENT-COPYRIGHT copyright-cygnus))
+		       ((equal? value '("redhat"))
+			(set! CURRENT-COPYRIGHT copyright-red-hat))
 		       (else (error "invalid copyright value" value))))
     ((package) (cond ((equal?  value '("gnusim"))
 		      (set! CURRENT-PACKAGE package-gnu-simulators))

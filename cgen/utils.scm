@@ -1,5 +1,5 @@
 ; Generic Utilities.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2002 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -1141,7 +1141,7 @@
   (cons "\
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright 1996, 1997, 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 "
 	"\
 This program is free software; you can redistribute it and/or modify
@@ -1162,16 +1162,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 ; Pair of header,trailer parts of copyright.
 
-(define copyright-cygnus
+(define copyright-red-hat
   (cons "\
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 "
 	"\
 "))
 
-; Set this to one of copyright-fsf, copyright-cygnus.
+; Set this to one of copyright-fsf, copyright-red-hat.
 
 (define CURRENT-COPYRIGHT copyright-fsf)
 

@@ -1,5 +1,5 @@
 ; Decoder generation.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2002 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Return decode entries for each insn.
@@ -711,7 +711,7 @@ void
 
   (string-write
    (gen-copyright "Decode header for @prefix@."
-		  copyright-cygnus package-cygnus-simulators)
+		  copyright-red-hat package-cygnus-simulators)
    "\
 #ifndef @PREFIX@_DECODE_H
 #define @PREFIX@_DECODE_H
@@ -763,7 +763,7 @@ typedef UINT @prefix@_insn_word;
 
   (string-write
    (gen-copyright "Simulator instruction decoder for @prefix@."
-		  copyright-cygnus package-cygnus-simulators)
+		  copyright-red-hat package-cygnus-simulators)
    "\
 
 #include \"@cpu@.h\"

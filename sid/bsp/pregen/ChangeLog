@@ -1,3 +1,7 @@
+2002-02-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* ALL.conf: Regenerated with scheduler slot names etc.
+
 2001-12-27  Frank Ch. Eigler  <fche@redhat.com>
 
 	* ALL.conf: Regenerated with cpu/sched etc. changes.
@@ -13,10 +17,6 @@
 2001-12-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* ALL.conf: Regenerated with endianness-setting tweak.
-
-2001-10-29  Frank Ch. Eigler  <fche@redhat.com>
-
-	* pregen-configs.in (mep): Add --tksm for some configurations.
 
 2001-10-29  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -68,11 +68,24 @@
 	* arm-pid-tksm.conf: Ditto.
 	* arm-pid.conf: Ditto.
 	* arm-pidBE.conf: Ditto.
+	* xstormy16-gdb.conf: Ditto.
+	* xstormy16-gloss-gdb-tksm.conf: Ditto.
+	* xstormy16-gloss-gdb.conf: Ditto.
+	* xstormy16-gloss.conf: Ditto.
 
 2001-07-18  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* (*.conf): Regenerated after adding --enable-warnings option
 	to configrun-sid.in.
+
+2001-07-10  matthew green  <mrg@redhat.com>
+
+	* Makefile.in: Regenerate.
+	* pregen-configs.in: Add xstormy16 support.
+	* xstormy16-gdb.conf: New file.
+	* xstormy16-gloss-gdb-tksm.conf: New file.
+	* xstormy16-gloss-gdb.conf: New file.
+	* xstormy16-gloss.conf: New file.
 
 2001-07-02  Ben Elliston  <bje@redhat.com>
 

@@ -93,7 +93,7 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian)
 	    }
 	  if (fetchWord (psymHdr, littleEndian) == PT_LOAD)
 	    {
-	      loadAreas[loadAreaCount].loadAddr = fetchQuad(psymHdr+16,
+	      loadAreas[loadAreaCount].loadAddr = fetchQuad(psymHdr+24,
 							    littleEndian);
 	      loadAreas[loadAreaCount].offset = fetchQuad(psymHdr+8, littleEndian);
 	      loadAreas[loadAreaCount].filesize = fetchQuad(psymHdr+32,
@@ -111,7 +111,7 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian)
 	    }
 	  if (fetchWord (psymHdr, littleEndian) == PT_LOAD)
 	    {
-	      loadAreas[loadAreaCount].loadAddr = fetchWord(psymHdr+8,
+	      loadAreas[loadAreaCount].loadAddr = fetchWord(psymHdr+12,
 								    littleEndian);
 	      loadAreas[loadAreaCount].offset = fetchWord(psymHdr+4, littleEndian);
 	      loadAreas[loadAreaCount].filesize = fetchWord(psymHdr+16,

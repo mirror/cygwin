@@ -1,3 +1,8 @@
+2002-02-05  Dave Brolley  <brolley@redhat.com>
+
+	* elfload.c (readElfFile): Obtain the load address from offset 24 for
+	elf64 and from offset 12 for elf32.
+
 2001-08-15  John Healy  <jhealy@redhat.com>
 
 	* sw-load-elf.xml: Changed "set loader file" to "set cpu-loader file".

@@ -1,3 +1,7 @@
+2001-06-22  Ben Elliston  <bje@redhat.com>
+
+	* m32rbf.cxx (m32rbf_cpu::memory_trap): Ignore bus::delayed.
+
 2001-03-21  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.in: Regenerate.

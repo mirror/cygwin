@@ -255,6 +255,17 @@ fi
 
 TIX_LIB_FULL_PATH="`pwd`/${TIX_LIB_FILE}"
 
+# BEGIN RED HAT LOCAL
+#--------------------------------------------------------------------
+#	Find out where tcl is installed.
+#--------------------------------------------------------------------
+if test x"${exec_prefix}" = xNONE; then
+    TCL_BIN_DIR="${prefix}/bin"
+else
+    TCL_BIN_DIR="${exec_prefix}/bin"
+fi
+# END RED HAT LOCAL
+
 #--------------------------------------------------------------------
 #	Check for the existence of the -lsocket and -lnsl libraries.
 #	The order here is important, so that they end up in the right

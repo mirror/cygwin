@@ -1,3 +1,12 @@
+2000-07-06  Mo DeJong  <mdejong@redhat.com>
+
+	* library/debug.tcl (logfile): Use non-blocking IO.
+	* library/tree.tcl (set_column_filter, bind, exchange,
+	ide_treetable): Don't fully qualify global commands.
+	Use itcl::delete. Use non-blocking IO. Rename bind
+	method to __bind. Brace exprs. Set default value
+	for when_post_menu variable. Itcl 3.0 fixups.
+
 2000-06-30  Mo DeJong  <mdejong@redhat.com>
 
 	* library/tree.tcl: Fix typo made in patch

@@ -340,7 +340,7 @@ after idle "update idletasks ; if \[winfo exists $top\] \{pack propagate $top\}"
 	
 	resize_widget $tree
 	
-	::unset fltentry
+	unset fltentry
     }
 
     method calculate_column_filter {} {
@@ -1421,11 +1421,11 @@ after idle "update idletasks ; if \[winfo exists $top\] \{pack propagate $top\}"
 	}
 	set lst [join $lst \n]
 
-	$print_dialog delete
+	itcl::delete object $print_dialog
 
 	set tmpf [sn_tmpFileName]
 	set fd [open $tmpf "w+"]
-	::fconfigure $fd -encoding $sn_options(def,system-encoding)
+	fconfigure $fd -encoding $sn_options(def,system-encoding) -blocking 0
 	puts $fd $lst
 	close $fd
 
@@ -1458,8 +1458,8 @@ after idle "update idletasks ; if \[winfo exists $top\] \{pack propagate $top\}"
 	return [eval ::bind $tree $args]
     }
 
-    method bind {args} {
-	return [eval ::bind $tree $args]
+    method __bind {args} {
+	return [eval bind $tree $args]
     }
 
     method header {args} {
@@ -1484,9 +1484,9 @@ after idle "update idletasks ; if \[winfo exists $top\] \{pack propagate $top\}"
 	    return
 	}
 
-	set y [::$w nearest $y]
+	set y [$w nearest $y]
 
-	set len [expr [llength $sel] -1]
+	set len [expr {[llength $sel] - 1}]
 	set first [lindex $sel 0]
 	set last  [lindex $sel $len]
 
@@ -1495,15 +1495,15 @@ after idle "update idletasks ; if \[winfo exists $top\] \{pack propagate $top\}"
 	}
 
 	if {$first <= $y} {
-	    set y [expr $y - $len]
+	    set y [expr {$y - $len}]
 	}
 	if {$y < 0} {
 	    return
 	}
-	::$w delete $first $last
-	eval ::$w insert $y $exchange
-	::$w selection clear 0 end
-	::$w selection set $y [expr $y + $len]
+	$w delete $first $last
+	eval $w insert $y $exchange
+	$w selection clear 0 end
+	$w selection set $y [expr {$y + $len}]
     }
     proc exchange_mark {w} {
 	set sel [$w curselection]
@@ -1814,7 +1814,7 @@ after idle "update idletasks ; if \[winfo exists $top\] \{pack propagate $top\}"
 
     #can be set external to be executed when option menu
     #is launched.
-    public when_post_menu
+    public when_post_menu ""
 }
 #############################################################################
 ##  END CLASS for TreeWidget with tab stop support                         ##
@@ -2091,7 +2091,7 @@ proc ide_treetable args {
 
     bind $tree <Configure> {
 				puts stdout "resize %W"
-				Tree :: resize_widget %W
+				Tree::resize_widget %W
 			   }
 
     return $tree

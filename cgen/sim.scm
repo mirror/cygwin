@@ -1157,8 +1157,20 @@
   (string-append
    "  {\n"
    "    " (mode:c-type mode) " opval = " (cx:c newval) ";\n"
-   "    " (send (op:type op) 'gen-set-quiet estate mode index selector
-		(cx:make-with-atlist mode "opval" (cx:atlist newval)))
+   ; Dispatch to setter code if appropriate
+   "    "
+   (if (op:setter op)
+       (let ((args (car (op:setter op)))
+	     (expr (cadr (op:setter op))))
+	 (rtl-c 'VOID expr
+		(if (= (length args) 0)
+		    (list (list 'newval mode "opval"))
+		    (list (list (car args) 'UINT index)
+			  (list 'newval mode "opval")))
+		#:rtl-cover-fns? #t))
+       ;else
+       (send (op:type op) 'gen-set-quiet estate mode index selector
+	     (cx:make-with-atlist mode "opval" (cx:atlist newval))))
    (if (op:cond? op)
        (string-append "    written |= (1 << "
 		      (number->string (op:num op))

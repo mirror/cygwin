@@ -423,7 +423,7 @@
 		  (cx-new-mode mode src))
 		 (else
 		  (error (string-append "incompatible mode for "
-					"(" (obj:name (cx:mode src)) ") "
+					"(" (obj:name (cx:mode src)) " vs " (obj:name mode) ") in "
 					"\"" (cx:c src) "\""
 					": ")
 			 (obj:name mode)))))

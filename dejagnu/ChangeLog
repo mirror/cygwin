@@ -37,6 +37,26 @@
 	* baseboards/frv-tiger.exp: New board description.
 	* baseboards/frv-tomcat.exp: New board description.
 
+2002-05-02  Fernando Nasser  <fnasser@localhost.localdomain>
+
+        * runtest.exp: Add kfail_flag and kfail_prms variable
+        initializations.
+        * lib/framework.exp (setup_kfail): New proc. Like setup_xfail, but  
+        for known tool bugs already registered in a bug database.
+        (kfail): New proc. Record that a test has failed due to a known bug.
+        (kpass): New proc. Record that a test for a known bug has passed
+        unexpectedly.
+        (clear_kfail): Like clear_xfail, but for known bugs.
+        (record_test): Handle KFAIL and KPASS.
+        (pass, fail): Test for known failures.
+        (clone_output): Add KFAIL to list of message types to be cloned.
+        (log_summary): Add summary for KFAIL and KPASS.
+        (unknown): Update comment.
+        * doc/dejagnu.texi: Document the above.
+        * lib/libsup.exp: Add counters for KFAIL and KPASS.
+        * testsuite/runtest.all/stats-sub.exp: Test kfail and kpass.
+        * testsuite/runtest.all/stats.exp: Ditto.
+
 2002-04-25  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* example/calc/configure.in (AM_MAINTAINER_MODE): Add invocation.

@@ -496,6 +496,7 @@ namespace sidutil
   protected:
     sid::bus* data_bus;
     sid::bus* insn_bus;
+    sid::bus* disassembler_bus;
 
   protected:
     template <typename BigOrLittleInt>
@@ -530,6 +531,8 @@ public:
 	add_accessor ("data-memory", & this->data_bus);
 	this->insn_bus = 0;
 	add_accessor ("insn-memory", & this->insn_bus);
+	this->disassembler_bus = 0;
+	add_accessor ("disassembler-memory", & this->disassembler_bus);
 	add_bus ("debugger-bus", & this->debugger_bus);
 
 	// pins

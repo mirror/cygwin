@@ -1,3 +1,8 @@
+2000-10-19  Michael Snyder  <msnyder@cleaver.cygnus.com>
+
+	* baseboards/linux-gdbserver.exp: New file.
+	* baseboards/linux-libremote.exp: New file.
+
 2000-08-14  Jimmy Guo  <guo@cup.hp.com>
 
 	* runtest.exp: Eliminate from test_top_dirs entries that

@@ -1067,32 +1067,19 @@ if ($opt_no_run)
 @args = ("$sid");
 push @args, ($tfile);
 
-
-# fork & exec
-$pid = fork();
-if ($pid < 0)
-  {
-    die "Fork failed\n";
-  }
-elsif ($pid == 0)
-  {
-    # child
-    exec @args;
-    die "Exec failed\n";
-  }
-else
-  {
-    $SIG{'INT'} = sub { kill 'INT', $pid; };
-    $SIG{'QUIT'} = sub { kill 'QUIT', $pid; };
-    $SIG{'TERM'} = sub { kill 'TERM', $pid; };
-    wait;
-  }
+# spawn sid child process
+system @args;
+$exit_value = $? >> 8;
 
 if (! $opt_save_temps) 
   {
     unlink $tfile;
   }
-exit 0;
+
+exit $exit_value;
+
+
+# ----------------------------------------------------------------------------
 
 
 sub sidconf_new {

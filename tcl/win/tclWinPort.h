@@ -73,10 +73,6 @@ typedef float *TCHAR;
 #include <windows.h>
 #undef WIN32_LEAN_AND_MEAN
 
-#ifdef _MSC_VER
-#define PASCAL
-#endif
-
 #ifdef BUILD_tcl
 # undef TCL_STORAGE_CLASS
 # define TCL_STORAGE_CLASS DLLEXPORT

@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkUnixSelect.c,v 1.9 2002/08/05 04:30:41 dgp Exp $
+ * RCS: @(#) $Id: tkUnixSelect.c,v 1.11 2002/10/01 08:48:08 dkf Exp $
  */
 
 #include "tkInt.h"
@@ -246,15 +246,10 @@ TkSelPropProc(eventPtr)
     register XEvent *eventPtr;		/* X PropertyChange event. */
 {
     register IncrInfo *incrPtr;
-    int i, length, numItems, flags;
-    Tcl_Encoding encoding;
-    int srcLen, dstLen, result, srcRead, dstWrote, soFar;
-    Tcl_DString ds;
-    char *src, *dst;
-    Atom target, formatType;
     register TkSelHandler *selPtr;
+    int i, length, numItems;
+    Atom target, formatType;
     long buffer[TK_SEL_WORDS_AT_ONCE];
-    char *propPtr;
     TkDisplay *dispPtr = TkGetDisplay(eventPtr->xany.display);
     Tk_ErrorHandler errorHandler;
     ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
@@ -361,27 +356,37 @@ TkSelPropProc(eventPtr)
 	    }
 	    ((char *) buffer)[numItems] = 0;
 
+	    errorHandler = Tk_CreateErrorHandler(eventPtr->xproperty.display,
+		    -1, -1, -1, (int (*)()) NULL, (ClientData) NULL);
 	    /*
 	     * Encode the data using the proper format for each type.
 	     */
 
 	    if ((formatType == XA_STRING)
-		    || (dispPtr
-			    && (formatType == dispPtr->compoundTextAtom))) {
+		    || (dispPtr && formatType==dispPtr->utf8Atom)
+		    || (dispPtr && formatType==dispPtr->compoundTextAtom)) {
+		Tcl_DString ds;
+		int encodingCvtFlags;
+		int srcLen, dstLen, result, srcRead, dstWrote, soFar;
+		char *src, *dst;
+		Tcl_Encoding encoding;
+
 		/*
 		 * Set up the encoding state based on the format and whether
 		 * this is the first and/or last chunk.
 		 */
 
-		flags = 0;
+		encodingCvtFlags = 0;
 		if (incrPtr->converts[i].offset == 0) {
-		    flags |= TCL_ENCODING_START;
+		    encodingCvtFlags |= TCL_ENCODING_START;
 		}
 		if (numItems < TK_SEL_BYTES_AT_ONCE) {
-		    flags |= TCL_ENCODING_END;
+		    encodingCvtFlags |= TCL_ENCODING_END;
 		}
 		if (formatType == XA_STRING) {
 		    encoding = Tcl_GetEncoding(NULL, "iso8859-1");
+		} else if (dispPtr && formatType==dispPtr->utf8Atom) {
+		    encoding = Tcl_GetEncoding(NULL, "utf-8");
 		} else {
 		    encoding = Tcl_GetEncoding(NULL, "iso2022");
 		}
@@ -404,11 +409,11 @@ TkSelPropProc(eventPtr)
 
 		while (1) {
 		    result = Tcl_UtfToExternal(NULL, encoding,
-			    src, srcLen, flags,
+			    src, srcLen, encodingCvtFlags,
 			    &incrPtr->converts[i].state,
 			    dst, dstLen, &srcRead, &dstWrote, NULL);
 		    soFar = dst + dstWrote - Tcl_DStringValue(&ds);
-		    flags &= ~TCL_ENCODING_START;
+		    encodingCvtFlags &= ~TCL_ENCODING_START;
 		    src += srcRead;
 		    srcLen -= srcRead;
 		    if (result != TCL_CONVERT_NOSPACE) {
@@ -418,8 +423,7 @@ TkSelPropProc(eventPtr)
 		    if (Tcl_DStringLength(&ds) == 0) {
 			Tcl_DStringSetLength(&ds, dstLen);
 		    }
-		    Tcl_DStringSetLength(&ds,
-			    2 * Tcl_DStringLength(&ds) + 1);
+		    Tcl_DStringSetLength(&ds, 2 * Tcl_DStringLength(&ds) + 1);
 		    dst = Tcl_DStringValue(&ds) + soFar;
 		    dstLen = Tcl_DStringLength(&ds) - soFar - 1;
 		}
@@ -433,16 +437,11 @@ TkSelPropProc(eventPtr)
 		 * Set the property to the encoded string value.
 		 */
 
-		errorHandler = Tk_CreateErrorHandler(
-		    eventPtr->xproperty.display, -1, -1, -1,
-		    (int (*)()) NULL, (ClientData) NULL);
 		XChangeProperty(eventPtr->xproperty.display,
-			eventPtr->xproperty.window,
-			eventPtr->xproperty.atom, formatType, 8,
-			PropModeReplace,
+			eventPtr->xproperty.window, eventPtr->xproperty.atom,
+			formatType, 8, PropModeReplace,
 			(unsigned char *) Tcl_DStringValue(&ds),
 			Tcl_DStringLength(&ds));
-		Tk_DeleteErrorHandler(errorHandler);
 
 		/*
 		 * Preserve any left-over bytes.
@@ -454,26 +453,21 @@ TkSelPropProc(eventPtr)
 		memcpy(incrPtr->converts[i].buffer, src, (size_t) srcLen+1);
 		Tcl_DStringFree(&ds);
 	    } else {
-		propPtr = (char *) SelCvtToX((char *) buffer,
-			formatType, (Tk_Window) incrPtr->winPtr,
-			&numItems);
-
 		/*
 		 * Set the property to the encoded string value.
 		 */
 
-		errorHandler = Tk_CreateErrorHandler(
-		    eventPtr->xproperty.display, -1, -1, -1,
-		    (int (*)()) NULL, (ClientData) NULL);
-		XChangeProperty(eventPtr->xproperty.display,
-			eventPtr->xproperty.window,
-			eventPtr->xproperty.atom, formatType, 8,
-			PropModeReplace,
-			(unsigned char *) Tcl_DStringValue(&ds), numItems);
-		Tk_DeleteErrorHandler(errorHandler);
+		char *propPtr = (char *) SelCvtToX((char *) buffer,
+			formatType, (Tk_Window) incrPtr->winPtr,
+			&numItems);
 
+		XChangeProperty(eventPtr->xproperty.display,
+			eventPtr->xproperty.window, eventPtr->xproperty.atom,
+			formatType, 32, PropModeReplace,
+			(unsigned char *) propPtr, numItems);
 		ckfree(propPtr);
 	    }
+	    Tk_DeleteErrorHandler(errorHandler);
 
 	    /*
 	     * Compute the next offset value.  If this was the last chunk,
@@ -1127,13 +1121,11 @@ SelRcvIncrProc(clientData, eventPtr)
     register XEvent *eventPtr;		/* X PropertyChange event. */
 {
     register TkSelRetrievalInfo *retrPtr = (TkSelRetrievalInfo *) clientData;
-    char *propInfo, *dst, *src;
+    char *propInfo;
     Atom type;
-    int format, result, srcLen, dstLen, srcRead, dstWrote, soFar;
+    int format, result;
     unsigned long numItems, bytesAfter;
-    Tcl_DString *dstPtr, temp;
     Tcl_Interp *interp;
-    Tcl_Encoding encoding;
 
     if ((eventPtr->xproperty.atom != retrPtr->property)
 	    || (eventPtr->xproperty.state != PropertyNewValue)
@@ -1156,7 +1148,13 @@ SelRcvIncrProc(clientData, eventPtr)
     }
     if ((type == XA_STRING)
 	    || (type == retrPtr->winPtr->dispPtr->textAtom)
+	    || (type == retrPtr->winPtr->dispPtr->utf8Atom)
 	    || (type == retrPtr->winPtr->dispPtr->compoundTextAtom)) {
+	char *dst, *src;
+	int srcLen, dstLen, srcRead, dstWrote, soFar;
+	Tcl_Encoding encoding;
+	Tcl_DString *dstPtr, temp;
+
 	if (format != 8) {
 	    char buf[64 + TCL_INTEGER_SPACE];
 	    
@@ -1172,6 +1170,8 @@ SelRcvIncrProc(clientData, eventPtr)
 
 	if (type == retrPtr->winPtr->dispPtr->compoundTextAtom) {
 	    encoding = Tcl_GetEncoding(NULL, "iso2022");
+	} else if (type == retrPtr->winPtr->dispPtr->utf8Atom) {
+	    encoding = Tcl_GetEncoding(NULL, "utf-8");
 	} else {
 	    encoding = Tcl_GetEncoding(NULL, "iso8859-1");
 	}

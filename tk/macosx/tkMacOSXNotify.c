@@ -12,17 +12,17 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacOSXNotify.c,v 1.1.1.1 2002/09/24 20:38:45 kseitz Exp $
+ * RCS: @(#) $Id: tkMacOSXNotify.c,v 1.1.1.2 2003/01/21 19:54:39 hunt Exp $
  */
 
 #include "tclInt.h"
-#include "tclPort.h"
 
 /* FIXME - Why do I need these here? */
 
 #undef environ
 #include "tkMacOSX.h"
 #include "tkMacOSXEvent.h"
+
 #include <signal.h> 
 
 extern TclStubs tclStubs;
@@ -233,7 +233,7 @@ Tk_MacOSXSetupTkNotifier()
      */
 
     TclFinalizeNotifier();
-
+    
     Tcl_SetNotifier(&macNotifierProcs);
 
     /* HACK ALERT: There is a bug in Jaguar where when it goes to make
@@ -243,9 +243,9 @@ Tk_MacOSXSetupTkNotifier()
      * the main thread.  Calling GetMainEventQueue will force this to
      * happen.
      */
-
+    
     mainEventQueue = GetMainEventQueue();
-
+    
     /* 
      * Tcl_SetNotifier doesn't call the TclInitNotifier
      * so we call it now. If we don't do this the
@@ -705,6 +705,7 @@ DoActualWait(timePtr)
     Tcl_Time *timePtr;		/* Maximum block time, or NULL. */
 {
     ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
+    OSErr err;
     
     if (!tsdPtr->isMainLoop) {
             Tcl_ConditionWait(&tsdPtr->waitCV, &notifierMutex, timePtr);
@@ -719,7 +720,7 @@ DoActualWait(timePtr)
             waitTime = timePtr->sec * kEventDurationSecond 
                     + timePtr->usec * kEventDurationMicrosecond;
         }
-        ReceiveNextEvent(0, NULL, waitTime, false, &eventRef);
+        err = ReceiveNextEvent(0, NULL, waitTime, false, &eventRef);
         Tcl_MutexLock(&notifierMutex);
     }
 }
@@ -1097,9 +1098,14 @@ NotifierThreadProc(clientData)
                 }
                 tsdPtr->eventReady = 1;
                 if (tsdPtr->isMainLoop) {
+                    OSErr err;
+                    
                     /* We need to wake up the main loop, and let it have the event. */
                     EventRef fakeEvent = TkMacOSXCreateFakeEvent();
-                    PostEventToQueue(GetMainEventQueue(), fakeEvent, kEventPriorityHigh);
+                    EventQueueRef mainEventQueue = GetMainEventQueue();
+                    
+                    err = PostEventToQueue(mainEventQueue, fakeEvent,
+                                           kEventPriorityHigh);
                     ReleaseEvent(fakeEvent);
                 } else {
                     Tcl_ConditionNotify(&tsdPtr->waitCV);
@@ -1116,7 +1122,6 @@ NotifierThreadProc(clientData)
 
 	if (masks[index] & bit) {
 	    i = read(receivePipe, buf, 1);
-
 	    if ((i == 0) || ((i == 1) && (buf[0] == 'q'))) {
 		/*
 		 * Someone closed the write end of the pipe or sent us a

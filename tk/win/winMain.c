@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: winMain.c,v 1.12 2002/08/26 14:32:18 dgp Exp $
+ * RCS: @(#) $Id: winMain.c,v 1.14 2002/10/19 02:10:07 hobbs Exp $
  */
 
 #include <tk.h>
@@ -93,16 +93,6 @@ WinMain(hInstance, hPrevInstance, lpszCmdLine, nCmdShow)
     char *p;
 
     Tcl_SetPanicProc(WishPanic);
-
-    /*
-     * Increase the application queue size from default value of 8.
-     * At the default value, cross application SendMessage of WM_KILLFOCUS
-     * will fail because the handler will not be able to do a PostMessage!
-     * This is only needed for Windows 3.x, since NT dynamically expands
-     * the queue.
-     */
-
-    SetMessageQueue(64);
 
     /*
      * Create the console channels and install them as the standard
@@ -354,8 +344,8 @@ setargv(argcPtr, argvPtr)
     *argcPtr = argc;
     *argvPtr = argv;
 }
-
 
+#if !defined(__GNUC__) || defined(TK_TEST)
 /*
  *----------------------------------------------------------------------
  *
@@ -383,15 +373,6 @@ int main(int argc, char **argv)
      */
 
     setlocale(LC_ALL, "C");
-    /*
-     * Increase the application queue size from default value of 8.
-     * At the default value, cross application SendMessage of WM_KILLFOCUS
-     * will fail because the handler will not be able to do a PostMessage!
-     * This is only needed for Windows 3.x, since NT dynamically expands
-     * the queue.
-     */
-
-    SetMessageQueue(64);
 
     /*
      * Create the console channels and install them as the standard
@@ -404,4 +385,4 @@ int main(int argc, char **argv)
     Tk_Main(argc, argv, Tcl_AppInit);
     return 0;
 }
-
+#endif /* !__GNUC__ || TK_TEST */

@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkAboutDlg.r,v 1.1.1.1 2002/09/24 20:38:47 kseitz Exp $
+ * RCS: @(#) $Id: tkAboutDlg.r,v 1.1.1.2 2003/01/21 19:54:42 hunt Exp $
  */
 
 
@@ -28,7 +28,7 @@
  * the version string for Tcl.
  */
 
-#define RESOURCE_INCLUDED
+#define RC_INVOKED
 #include <Carbon.r>
 #include <tcl.h>
 #include "tk.h"

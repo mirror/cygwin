@@ -12,7 +12,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacOSXWm.c,v 1.1.1.1 2002/09/24 20:38:47 kseitz Exp $
+ * RCS: @(#) $Id: tkMacOSXWm.c,v 1.1.1.2 2003/01/21 19:54:42 hunt Exp $
  */
 #include <Carbon/Carbon.h>
 
@@ -5214,6 +5214,11 @@ int
 TkpIsWindowFloating(WindowRef wRef)
 {
     WindowClass class;
+
+    if (wRef == NULL) {
+        return 0;
+    }
+    
     GetWindowClass(wRef, &class);
     return (class == kFloatingWindowClass);
 }

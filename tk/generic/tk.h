@@ -12,7 +12,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tk.h,v 1.69 2002/09/02 20:16:59 hobbs Exp $
+ * RCS: @(#) $Id: tk.h,v 1.73 2002/10/09 19:35:37 dgp Exp $
  */
 
 #ifndef _TK
@@ -36,6 +36,8 @@ extern "C" {
  * win/makefile.vc	(not patchlevel)
  * README		(sections 0 and 1)
  * mac/README		(not patchlevel)
+ * macosx/Wish.pbproj/project.pbxproj
+ * 			(14 LOC total, 4 LOC patch)
  * win/README		(not patchlevel)
  * unix/README		(not patchlevel)
  * unix/tk.spec		(3 LOC Major/Minor, 2 LOC patch)
@@ -48,19 +50,11 @@ extern "C" {
 #define TK_MAJOR_VERSION   8
 #define TK_MINOR_VERSION   4
 #define TK_RELEASE_LEVEL   TCL_FINAL_RELEASE
-#define TK_RELEASE_SERIAL  0
+#define TK_RELEASE_SERIAL  1
 
 #define TK_VERSION	"8.4"
-#define TK_PATCH_LEVEL	"8.4.0"
+#define TK_PATCH_LEVEL	"8.4.1"
 
-/*
- * A special define for MacOS & MacOS X, allows us to use the header
- * in the resource compiler without having it choke on the more complex
- * C preprocessor constructs.
- */
-    
-#ifndef RESOURCE_INCLUDED
-    
 /*
  * The following definitions set up the proper options for Macintosh
  * compilers.  We use this method because there is no autoconf equivalent.
@@ -80,12 +74,17 @@ extern "C" {
 #endif
 
 /* 
- * A special definition used to allow this header file to be included 
- * in resource files.
+ * A special definition used to allow this header file to be included
+ * from windows or mac resource files so that they can obtain version
+ * information.  RC_INVOKED is defined by default by the windows RC tool
+ * and manually set for macintosh.
+ *
+ * Resource compilers don't like all the C stuff, like typedefs and
+ * procedure declarations, that occur below, so block them out.
  */
-
+    
 #ifndef RC_INVOKED
-
+    
 #ifndef _XLIB_H
 #   if defined (MAC_TCL)
 #	include <Xlib.h>
@@ -1601,12 +1600,10 @@ typedef int (Tk_SelectionProc) _ANSI_ARGS_((ClientData clientData,
  */
 
 
-#endif /* RC_INVOKED */
-
 #undef TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLIMPORT
 
-#endif /* RESOURCE_INCLUDED */
+#endif /* RC_INVOKED */
 
 /*
  * end block for C++

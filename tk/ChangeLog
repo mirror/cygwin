@@ -1,3 +1,330 @@
+2002-10-22  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	*** 8.4.1 TAGGED FOR RELEASE ***
+
+	* changes: updated for 8.4.1 release
+
+2002-10-21  Daniel Steffen  <das@users.sourceforge.net>
+
+	* macosx/README: revised according to Jim's suggestions
+	* macosx/tkMacOSXAppInit.c: use standard PATH_MAX from <limits.h>
+	
+2002-10-18  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* win/winMain.c (WinMain, main): remove obsolete SetMessageQueue call
+
+	* win/configure: Regen. 
+	* win/tcl.m4 (SC_CONFIG_CFLAGS): Check for bug in Cygwin version
+	of windres and work around that case by passing a POSIX path
+	instead of a Windows native path. One can't always pass a POSIX
+	path because the mingw native toolchain accepts only Windows
+	native paths. (dejong)
+
+	* win/tkWinPort.h: define OPEN_MAX only if not defined.
+	[Patch #625472] (howell)
+
+2002-10-18  Daniel Steffen  <das@users.sourceforge.net>
+
+	* mac/tkMacAppInit.c: removed tcltest dependency.
+	[Bug #592639] (porter)
+
+2002-10-17  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* tests/imgPhoto.test:
+	* generic/tkImgPhoto.c (ImgPhotoConfigureMaster): fix arg handling
+	for missing -format or -data options. [Bug #624974]
+
+	* tests/text.test:                    properly return the number of
+	* unix/tkUnixFont.c (ControlUtfProc): bytes consumed. [Bug #624732]
+
+2002-10-17  Daniel Steffen  <das@users.sourceforge.net>
+
+	* macosx/README: info specific to building and running
+	TclTk on Mac OS X, answers to tcl-mac list FAQs.
+	* macosx/Makefile: permission fix after embedded install.
+	* macosx/Wish.pbproj/project.pbxproj: after install, fix
+	permissions of uninstalled products.
+
+2002-10-17  Daniel Steffen  <das@users.sourceforge.net>
+
+	* macosx/Wish.pbproj/project.pbxproj: added TEXT document
+	type to plist so that files can be dragged onto Wish Shell.
+
+	* macosx/tkMacOSXInt.h:
+	* macosx/tkMacOSXInit.c:
+	* macosx/tkMacOSXFont.c: added private proc
+	TkMacOSXUseAntialiasedText() to enable/disable quickdraw
+	text antialiasing where available, default is enabled.
+	Added a linked boolean ::tk::mac::antialiasedtext with
+	write trace to allow control of antialiasing from tcl.
+
+2002-10-16  Vince Darley  <vincentdarley@users.sourceforge.net>
+
+	* macosx/tkMacOSXMenu.c: fix to accelerators shown in menus
+	with non-alphanumeric keys.
+	* macosx/tkMacOSXKeyEvent.c: 
+	* macosx/tkMacOSXKeyboard.c: applied first patch from [Patch
+	#622582] to fix some of [Bug #616988].  Further work is needed
+	in this area, but this will let foreign keyboards at least work
+	reasonably with Tk.
+
+2002-10-15  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* unix/configure:
+	* unix/tcl.m4: add AIX-5 ppc build support. Remove unused
+	SC_ENABLE_MEMDEBUG.
+
+	* win/configure:
+	* win/tcl.m4: Add --enable-shared=mem support.
+
+2002-10-10  Peter Spjuth  <peter.spjuth@space.se>
+
+	* tests/grid.test:
+	* generic/tkGrid.c: The grid size was not updated properly
+	when removing a widget from a grid. [Bug #621241] (forssen)
+
+2002-10-10  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* tests/canvPs.test: tests for canvas embedded window ps generation
+	* generic/tkCanvWind.c (CanvasPsWindow): removed dead code loop.
+	* generic/tkCanvas.h: moved TkColormapData struct to tkCanvPs.c
+	* generic/tkCanvPs.c (TkImageGetColor): corrected bogus use of
+	TkColormapData on Windows (Windows now requires RGB pixel data
+	from image).
+	* win/tkWinImage.c (XGetImage, XGetImageZPixmap): added support
+	for generating ps for embedded widgets on canvases on Windows,
+	tested for 8, 16, 24 and 32-bit depths (XGetImageZPixmap not used).
+
+	* library/tk.tcl: simplified the adding of extra <ISO_Left_Tab>
+	and <hpBackTab> events to <<PrevWindow>>.
+
+2002-10-09  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* unix/README: doc'ed --enable-symbols options.
+	* unix/Makefile.in: comment docs
+	* unix/configure: regen
+	* unix/tcl.m4: replaced SC_ENABLE_MEMDEBUG with a more intelligent
+	SC_ENABLE_SYMBOLS that takes yes|no|mem|all as options now.
+
+2002-10-09  Don Porter <dgp@users.sf.net>
+
+	* generic/tk.h:  Added reminder comment to edit
+	macosx/Wish.pbproj/project.pbxproj when version number changes.
+
+2002-10-09  Daniel Steffen  <das@users.sourceforge.net>
+
+	* macosx/Makefile: don't remove tclsh after building embedded.
+	
+	* macosx/Wish.pbproj/project.pbxproj: bumped version to 8.4.1;
+	added missing library/mkpsenc.tcl to framework.
+
+2002-10-09  Daniel Steffen  <das@users.sourceforge.net>
+
+	* generic/tkInt.decls(tkIntXlib): added XQueryTree declaration for
+	mac & aqua, since it's now called from ParentXId via Tk_HandleEvent.
+	* generic/tkIntXlibDecls.h:
+	* generic/tkStubInit.c: regen.
+	* mac/tkMacXStubs.c: added XQueryTree stub
+
+	* mac/tkMacEmbed.c (TkpUseWindow): check that container window
+	has -container option set (sync with other platforms).
+
+	* mac/tkMacBitmap.c:
+	* mac/tkMacFont.c: 
+	* mac/tkMacSend.c: 
+	* mac/tkMacTest.c: 
+	* mac/tkMacWm.c: CONSTification.
+
+	* mac/tkMacProjects.sea.hqx: added tkStyle.c and tkUndo.c to
+	tk library projects.
+
+2002-10-09  Donal K. Fellows  <fellowsd@cs.man.ac.uk>
+
+	* generic/tkImgPhoto.c (ImgPhotoSetSize): Only error-out if we
+	fail to allocate a non-empty buffer; getting a NULL when we
+	allocate an empty buffer is no problem since nothing will look at
+	the value anyway. [Bug 619544]
+	Also tidied up file to take into account the fact that we're using
+	32 bits per pixel in the master to accommodate the alpha channel
+	as well as RGB.
+
+2002-10-08  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* tests/winButton.test: add option clear to top to prevent option
+	leakage from other tests causing problems. [Bug #582382]
+
+	* generic/tkPanedWindow.c (Tk_PanedWindowObjCmd): leave the
+	DestroyPanedWindow proc to free the pwPtr, add a Preserve
+	reference to the pwPtr->tkwin.
+	(DestroyPanedWindow): Release the pwPtr->tkwin.
+
+	* generic/tkFocus.c (TkFocusFilterEvent): Ignore event if we are
+	focusing into a dead window. [Bug #588831] (griffin)
+
+2002-10-02  Jim Ingham  <jingham@apple.com>
+
+	* macosx/tkMacOSXScrlbr.c (TkpDisplayScrollbar): Put the Tk scrollbar
+	pointer into the control reference data for the Mac scrollbar, so we
+	can get it out again in the ScrollbarActionProc.
+
+2002-10-02  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* generic/tkText.c (TextBlinkProc): don't blink the cursor unless
+	it is visible. [Bug #616791] [Patch #614474] (bonfield)
+
+	* tests/entry.test: added entry-20.7
+	* generic/tkEntry.c (EntryTextVarProc): check if the entry is
+	being deleted before handling an associated textvariable.
+	[Bug #607390 #617446]
+
+2002-10-01  Donal K. Fellows  <fellowsd@cs.man.ac.uk>
+
+	* tests/unixSelect.test (unixSelect-1.1[89]): Altered these tests
+	to work around [Bug #616923]
+	* unix/tkUnixSelect.c (SelRcvIncrProc,TkSelPropProc): It turns out
+	a much simpler and more robust solution is possible if we leverage
+	Tcl's encoding engine by using the same code path as for the
+	normal string selection.  It might be a bit slower, but it should
+	be a lot more correct.  [Bug #614650]
+
+2002-09-30  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* tests/panedwindow.test: added panedwindow-28.[12]
+	* generic/tkPanedWindow.c (PanedWindowCmdDeletedProc): 
+	(Tk_PanedWindowObjCmd): when destroying the panedwindow, destroy
+	the proxy before the parent to avoid dependency conflicts.
+	[Bug #616589]
+
+2002-09-30  Donal K. Fellows  <fellowsd@cs.man.ac.uk>
+
+	* tests/unixSelect.test: Test for various things that can fail to
+	work in 8.4.0...
+	* unix/tkUnixSelect.c (TkSelPropProc,SelRcvIncrProc): Incremental
+	transfers of UTF8_STRING selections should now work; Tk will now
+	tag them with the right size and only transfer complete UTF8
+	characters.  Previously, things only worked when the transfer
+	could only happen in one go, and even then not always. [Bug 614650]
+
+	* doc/bind.n: Doc-fix to mention that %A substitutes UNICODE
+	characters rather than ASCII ones.  Tk's done this ever since 8.1
+	in any case; after all, it is the right thing to do.
+
+2002-09-27  Don Porter <dgp@users.sf.net>
+
+	* README:		Bumped to version 8.4.1 to avoid confusion
+	* generic/tk.h:		of CVS snapshots with release 8.4.0.
+	* unix/README:
+	* unix/configure.in:
+	* unix/tk.spec
+	* win/configure.in:
+
+	* unix/configure:	autoconf
+	* win/configure:
+
+2002-09-26  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* unix/configure: regen.
+	* unix/tcl.m4: improve AIX-4/5 64bit compilation support.
+
+	* unix/Makefile.in: add macosx subdir to dist target.
+	Do not generate .Z, only .gz and .zip in alldist target.
+
+2002-09-18  Mumit Khan  <khan@nanotech.wisc.edu>
+
+	Added basic Cygwin support.
+
+	* win/tcl.m4 (SC_PATH_TCLCONFIG): Support one-tree build.
+	(SC_PATH_TKCONFIG): Likewise.
+	(SC_PROG_TCLSH): Likewise.
+	(SC_CONFIG_CFLAGS): Assume real Cygwin port and remove -mno-cygwin 
+	flags.  Add -mwin32 to extra_cflags and extra_ldflags.
+	Remove ``-e _WinMain@16'' from LDFLAGS_WINDOW.
+	* win/configure: Regenerate.
+
+	* win/tkWinPort.h (tchar.h): Do not include on Cygwin.
+	(_T): Define for Cygwin.
+	* win/winMain.c (main): Conditionally define.
+
+2002-09-26  Daniel Steffen  <das@users.sourceforge.net>
+
+	* macosx/Makefile: preserve environment value of INSTALL_ROOT.
+	When embedding only use deployment build. Force relink before
+	embedded build to ensure new linker flags are picked up.
+
+	* macosx/buildTkConfig.tcl (new):
+	* macosx/Wish.pbproj/project.pbxproj: synthesize tkConfig.sh
+	based on tclConfig.sh in Tcl.framework and tkConfig.sh.in.
+	Add symbolic links to debug lib, stub libs and tkConfig.sh
+	in framework toplevel. Made tkIntXlibDecls.h a public header
+	since Headers/X11/Xlib.h includes it. Install wish8.4 script
+	that runs "Wish Shell.app" and corresponding wish link.
+	Use tcl headers from built Tcl.framework instead of from tcl
+	source directory.
+
+	* macosx/tkMacOSXPort.h: added missing standard unix includes 
+	and defines, similarly to tkUnixPort.h.
+	* macosx/tkMacOSXNotify.c: removed dependency on internal tcl
+	header "tclPort.h"
+
+	* unix/Makefile.in:
+	* unix/install-sh: copied support for 'install-strip' target
+	over from tcl/unix/{Makefile.in,install-sh}
+
+2002-09-22  Jim Ingham <jingham@apple.com>
+
+	* macosx/tkMacOSXScrlbr.c (UpdateControlValue): HiliteControl
+	doesn't give the proper "nothing to scroll" look on Mac OS X.
+	You have to set the min value greater than the max value to
+	get this.
+
+2002-09-15  Mo DeJong  <mdejong@users.sourceforge.net>
+
+	* unix/configure: Regen.
+	* unix/tcl.m4: Update from Tcl.
+	* unix/tkUnixEvent.c (TkpCloseDisplay): Use PEEK_XCLOSEIM
+	to examine the input context queue before invoking
+	XCloseIM. Generate an assert if there is an input
+	context that has not been freed.
+	[Patch 570902]
+
+2002-09-13  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
+
+	* generic/tk.h: Moved RC_INVOKED down so that tcl.h is still
+	  included when running the resource compiler. <tcl.h> excludes
+	  the unnecessary parts on its own. This reenables the Windows
+	  build. It failed because the non-inclusion of tcl.h caused the
+	  resource compiler to miss some vital macro definitions
+	  (TCL_FINAL_RELEASE, STRINGIFY, ...).
+
+2002-09-12  Daniel Steffen  <das@users.sourceforge.net>
+
+	* generic/tk.h:
+	* mac/tkMacApplication.r:
+	* mac/tkMacLibrary.r:
+	* mac/tkMacResource.r:
+	* macosx/tkAboutDlg.r:
+	* macosx/tkMacOSXApplication.r:
+	* macosx/tkMacOSXLibrary.r:
+	* macosx/tkMacOSXResource.r: unified use of the two equivalent 
+	resource compiler header inclusion defines RC_INVOKED and
+	RESOURCE_INCLUDED, now use RC_INVOKED throughout.
+
+	* macosx/tkMacOSXAppInit.c: improved detection of Wish startup
+	by the finder (by checking if stdin is /dev/null), in which
+	case we want to bring up the Tk console window.
+
+	* macosx/tkMacOSXHLEvents.c: added 'rapp' apple event handler.
+
+2002-09-12  Daniel Steffen  <das@users.sourceforge.net>
+
+	* macosx/Wish.pbproj/project.pbxproj: reference & install
+	tk/generic/prolog.ps instead of tk/library/prolog.ps.
+
+2002-09-10  Daniel Steffen  <das@users.sourceforge.net>
+
+	* macosx/Wish.pbproj/project.pbxproj: added backwards
+	compatibility for OSX 10.1 ProjectBuilder 2.0.
+
 2002-09-10  Daniel Steffen  <das@users.sourceforge.net>
 
 	* unix/Makefile.in: added DYLIB_INSTALL_DIR variable for Darwin
@@ -11,7 +338,7 @@
 	framework, i.e. using an dyld install_name containing
 	@executable_path/../Frameworks via the new DYLIB_INSTALL_DIR
 	unix/Makefile variable.
-	
+
 2002-09-10  Jeff Hobbs  <jeffh@ActiveState.com>
 
 	*** 8.4.0 TAGGED FOR RELEASE ***

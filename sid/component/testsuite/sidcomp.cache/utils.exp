@@ -1,0 +1,47 @@
+# utils.exp -*- Tcl -*-
+# Utility routines for the cache component testsuite
+#
+# Copyright (C) 2001 Red Hat
+
+proc get_attr {attr} {
+    global victim
+    return [sid_cmd "sid::component::attribute_value $victim $attr"]
+}
+
+proc miss_p {} { return [expr [sid_cmd "set thru"] == 1] }
+proc hit_p {} { return ![miss_p] }
+proc clear_miss_flag {} { sid_cmd "set thru 0" }
+
+# Assert that a cache access causes bus activity (ie. a miss).
+proc assert_miss {} { global test; if [miss_p] { pass "$test (miss)" } else { fail "$test (miss)" }}
+
+# Assert that a cache access causes bus activity (ie. a hit).
+proc assert_hit {} { global test; if [hit_p] { pass "$test (hit)" } else { fail "$test (hit)" }}
+
+# Assert that an attribute is variant (by delta).
+proc assert_variant {attr prior {delta 1}} {
+    global victim
+    set test "$attr attribute has been incremented"
+    set value [get_attr $attr]
+    if {[expr $prior + $delta] == $value} { pass $test } else { fail $test }
+}
+
+# Assert that an attribute is invariant.
+proc assert_invariant {attr prior} {
+    global victim
+    set test "$attr attribute is invariant"
+    set value [get_attr $attr]
+    if {$prior == $value} { pass $test } else { fail $test }
+}
+
+# Instrument $bus as a test bus.
+proc instrument_bus {bus} {
+    sid_cmd "if {[info exists hook_written]} { unset hook_written }"
+    sid_cmd "if {[info exists hook_read]} { unset hook_read }"
+    foreach endian {l b} {
+	foreach width {1 2 4 8} {
+	    sid_cmd "set hook_read(h4,${endian}${width},$bus) { set thru 1 ; return {ok 0}}"
+	    sid_cmd "set hook_written(h4,${endian}${width},$bus) { set thru 1 ; return ok}"
+	}
+    }
+}

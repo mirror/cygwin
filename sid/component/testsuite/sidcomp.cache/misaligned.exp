@@ -1,0 +1,56 @@
+# misaligned.exp -*- Tcl -*-
+# Basic testing for the cache component. 
+#
+# Copyright (C) 2001 Red Hat, Inc.
+
+source $srcdir/$subdir/utils.exp
+
+set test "sid startup"
+sid_config_component_test_with_tracing "cache.conf" \
+        "load [sid_find_file libcache.la] cache_component_library" \
+        "hw-cache-basic"
+if {[sid_start "cache.conf"]} { pass $test } else { fail $test; return }
+
+set test "acquire upstream bus handle"
+set cache_bus [sid_cmd "sid::component::find_bus $victim upstream"]
+if {$cache_bus != ""} { pass $test } else { fail $test }
+
+set test "generate test bus for downstream"
+set mem_bus [sid_cmd "sid::bus::new"]
+if {$mem_bus == ""} { fail $test } else { pass $test }
+
+set test "connect test bus to cache"
+set result [sid_cmd "sid::component::connect_accessor $victim downstream $mem_bus"]
+if {$result == "ok"} { pass $test } else { fail $test }
+
+instrument_bus $mem_bus
+
+# read a 32-bit word from 0x101 (misaligned)
+set test "misaligned read from 0x101"
+clear_miss_flag
+set prior(reads) [get_attr read-accesses]
+set prior(writes) [get_attr write-accesses]
+set prior(misaligned-reads) [get_attr misaligned-reads]
+set prior(misaligned-writes) [get_attr misaligned-writes]
+set result [sid_cmd "sid::bus::read_h4_l4 $cache_bus 0x101"]
+assert_miss
+assert_variant read-accesses $prior(reads)
+assert_variant misaligned-reads $prior(misaligned-reads)
+assert_invariant write-accesses $prior(writes)
+assert_invariant misaligned-writes $prior(misaligned-writes)
+
+
+# write a 16-bit word from 0x105 (misaligned)
+set test "misaligned write to 0x105"
+clear_miss_flag
+set prior(reads) [get_attr read-accesses]
+set prior(writes) [get_attr write-accesses]
+set prior(misaligned-reads) [get_attr misaligned-reads]
+set prior(misaligned-writes) [get_attr misaligned-writes]
+set result [sid_cmd "sid::bus::write_h4_l2 $cache_bus 0x101 0x5555"]
+assert_miss
+assert_variant write-accesses $prior(writes)
+assert_variant misaligned-writes $prior(misaligned-writes) 
+assert_invariant read-accesses $prior(reads)
+assert_invariant misaligned-reads $prior(misaligned-reads)
+

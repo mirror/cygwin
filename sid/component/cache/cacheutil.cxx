@@ -1,0 +1,355 @@
+// cacheutil.cxx -- Helper classes for a generic memory cache. -*- C++ -*-
+
+// Copyright (C) 2001 Red Hat.
+// This file is part of SID and is licensed under the GPL.
+// See the file COPYING.SID for conditions for redistribution.
+
+#include "cacheutil.h"
+
+bool
+std::operator== (const cache_tag& tag, const cache_line& line)
+{
+  return (line.valid_p () && tag == line.tag ());
+}
+
+bool
+std::operator== (const cache_line& line, const cache_tag& tag)
+{
+  return (line.valid_p () && tag == line.tag ());
+}
+
+cache_line::cache_line (const cache_line& other)
+{
+  size = other.size;
+  valid_bit = other.valid_bit;
+  dirty_bit = other.dirty_bit;
+  lock_bit = other.lock_bit;
+  atag = other.atag;
+  data = new byte [size];
+  memcpy (data, other.data, size);
+}
+
+cache_line&
+cache_line::operator= (const cache_line& other)
+{
+  if (this != &other)
+    {
+      // Beware of self-assignment.
+      size = other.size;
+      valid_bit = other.valid_bit;
+      dirty_bit = other.dirty_bit;
+      lock_bit = other.lock_bit;
+      atag = other.atag;
+      delete [] data;
+      data = new byte [size];
+      memcpy (data, other.data, size);
+    }
+  return *this;
+}
+
+void
+cache_line::dump () const
+{
+  cerr << "  ";
+
+  if (dirty_p ())  cerr << 'M'; else cerr << '-';
+  if (valid_p ())  cerr << 'V'; else cerr << '-';
+  if (locked_p ()) cerr << 'L'; else cerr << '-';
+
+  cerr << "  " << hex << setw (4) << setfill ('0') << atag << "\t";
+  for (unsigned i = 0; i < size; i++)
+    cerr << setw (2) << setfill ('0') << static_cast<unsigned> (data[i]);
+
+  cerr << dec << endl;
+}
+
+cache_line::cache_line (unsigned line_size)
+  :size (line_size), valid_bit (false), dirty_bit (false), lock_bit (false), atag (0)
+{
+  data = new byte[line_size];
+  memset (data, 0, line_size);
+}
+
+cache_line::cache_line (unsigned line_size, cache_tag t)
+  :size (line_size), valid_bit (false), dirty_bit (false), lock_bit (false), atag (t)
+{
+  data = new byte[line_size];
+  memset (data, 0, line_size);
+}
+
+cache_line::cache_line (unsigned line_size, cache_tag t, vector<byte> initial_data)
+  :size (line_size), valid_bit (false), dirty_bit (false), lock_bit (false), atag (t)
+{
+  assert (initial_data.size () == line_size);
+  data = new byte[line_size];
+  for (unsigned i = 0; i < line_size; i++)
+    data[i] = initial_data[i];
+}
+
+cache_line::~cache_line ()
+{
+  delete [] data;
+}
+
+void
+cache_line::dirty ()
+{
+  dirty_bit = true;
+}
+
+void
+cache_line::clean ()
+{
+  dirty_bit = false;
+}
+
+void
+cache_line::validate ()
+{
+  valid_bit = true;
+}
+
+void
+cache_line::invalidate ()
+{
+  valid_bit = false;
+}
+
+void
+cache_line::lock ()
+{
+  lock_bit = true;
+}
+
+void
+cache_line::unlock ()
+{
+  lock_bit = false;
+}
+
+cache_tag
+cache_line::tag () const
+{
+  return atag;
+}
+
+bool
+cache_line::dirty_p () const
+{
+  return dirty_bit;
+}
+
+bool
+cache_line::valid_p () const
+{
+  return valid_bit;
+}
+
+bool
+cache_line::locked_p () const
+{
+  return lock_bit;
+}
+
+cache_set::cache_set (unsigned line_size, unsigned nlines, cache_replacement_algorithm& alg)
+  :replacer (alg)
+{
+  lines.resize (nlines);
+  for (iterator_t it = lines.begin(); it != lines.end (); it++)
+    *it = new cache_line (line_size);
+}
+
+cache_set::~cache_set ()
+{
+  for (iterator_t it = lines.begin (); it != lines.end (); it++)
+    delete *it;
+}
+
+unsigned
+cache_set::num_lines () const
+{
+  return lines.size ();
+}
+
+cache_line&
+cache_set::get_line (unsigned i) const
+{
+  return *lines[i];
+}
+
+void
+cache_set::set_line (unsigned i, const cache_line line)
+{
+  *lines[i] = line;
+}
+
+cache_line&
+cache_set::find (const cache_tag& tag, bool& hit)
+{
+  static cache_line dummy(0);
+
+  // Scan the lines in this set for tag. Might as well be linear; the
+  // order of associativity will be small.
+
+  for (const_iterator_t it = lines.begin (); it != lines.end (); it++)
+    if (tag == *(*it))
+      {
+	hit = true;
+	replacer.update (*this, *(*it));
+	return *(*it);
+      }
+  hit = false;
+  return dummy;
+}
+
+void
+cache_set::invalidate ()
+{
+  for (iterator_t it = lines.begin (); it != lines.end (); it++)
+    (*it)->invalidate ();
+}
+
+bool
+cache_set::vacancy_p () const
+{
+  for (const_iterator_t it = lines.begin (); it != lines.end (); it++)
+    if (!(*it)->locked_p ())
+      return true;
+
+  return false;
+}
+    
+void
+cache_set::expunge_line (cache_line& line)
+{
+  line.unlock ();
+  line.clean ();
+  line.invalidate ();
+}
+
+void
+cache_set::replace_line (cache_line& old_line, cache_line new_line)
+{
+  return replacer.replace (*this, old_line, new_line);
+}
+
+void
+cache_set::dump () const
+{
+  for (const_iterator_t it = lines.begin (); it != lines.end (); it++)
+    (*it)->dump ();
+}
+
+cache::cache (unsigned cache_size, unsigned line_size, unsigned assoc,
+	      cache_replacement_algorithm& replacer)
+{
+  assert (power_of_two_p (line_size));
+  assert (cache_size >= line_size);
+
+  // The cache size must be an even multiple of the line size.
+  assert ((cache_size % line_size) == 0);
+
+  int num_lines = cache_size / line_size;
+  if (assoc > 0)
+    assert (num_lines % assoc == 0 && assoc < num_lines);
+  
+  // The number of sets.  
+  // If the cache is fully associative, there is only one set.
+  int num_sets = (assoc == 0) ? 1 : (num_lines / assoc);
+  sets.resize (num_sets);
+
+  // The number of lines per set.
+  // If the cache is fully associative, there is one set with as many
+  // lines as there are in the cache.
+  int lines_per_set = (assoc == 0) ? num_lines : assoc;
+ 
+  for (iterator_t it = sets.begin (); it != sets.end (); it++)
+    *it = new cache_set (line_size, lines_per_set, replacer);
+  
+  num_non_tag_bits = log2 (line_size);
+
+  // suitable defaults
+  hash_params.mask = 0x3fe0;
+  hash_params.shift = 5;
+}
+
+cache::~cache ()
+{
+  for (unsigned i = 0; i < sets.size (); i++)
+    delete sets[i];
+}
+
+cache_tag
+cache::addr_to_tag (const sid::host_int_4& addr) const
+{
+  return addr >> num_non_tag_bits;
+}
+
+sid::host_int_4
+cache::tag_to_addr (const cache_tag& tag) const
+{
+  return tag << num_non_tag_bits;
+}
+
+cache_line&
+cache::find (cache_tag tag, bool& hit)
+{
+  unsigned index = hash_fn (tag);
+  return sets[index]->find (tag, hit);
+}
+
+int
+cache::num_sets ()
+{
+  return sets.size ();
+}
+
+bool
+cache::vacancy_p (const sid::host_int_4& addr) const
+{
+  unsigned index = hash_fn (addr_to_tag (addr));
+  return sets[index]->vacancy_p ();
+}
+
+void
+cache::invalidate ()
+{
+  for (iterator_t it = sets.begin (); it != sets.end(); it++)
+    (*it)->invalidate ();
+}
+
+// Remove a line from the cache.
+void
+cache::expunge (cache_line& line)
+{
+  unsigned index = hash_fn (line.tag ());
+  sets[index]->expunge_line (line);
+}
+
+// Replace a line in the cache with 'new_line'.  If the expelled
+// line is dirty, set 'old_line' to it and return true, otherwise
+// false.
+void
+cache::replace (cache_line& old_line, cache_line new_line)
+{
+  unsigned index = hash_fn (new_line.tag ());
+  return sets[index]->replace_line (old_line, new_line);
+}
+
+unsigned
+cache::hash_fn (const cache_tag& tag) const
+{
+  sid::host_int_4 addr = tag_to_addr (tag);
+  return (addr & hash_params.mask) >> hash_params.shift;
+}
+
+void
+cache::dump () const
+{
+  unsigned i = 0;
+  for (const_iterator_t it = sets.begin (); it != sets.end (); it++, i++)
+    {
+      cerr << "set " << i << endl;
+      (*it)->dump ();
+    }
+}

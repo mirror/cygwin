@@ -1,0 +1,101 @@
+# lock.exp -*- Tcl -*-
+# Testing of the lock/unlock pins.
+#
+# Copyright (C) 2001 Red Hat, Inc.
+
+source $srcdir/$subdir/utils.exp
+
+set test "sid startup"
+sid_config_component_test_with_tracing "cache.conf" \
+        "load [sid_find_file libcache.la] cache_component_library" \
+        "hw-cache-basic"
+if {[sid_start "cache.conf"]} { pass $test } else { fail $test; return }
+
+set test "acquire upstream bus handle"
+set cache_bus [sid_cmd "sid::component::find_bus $victim upstream"]
+if {$cache_bus != ""} { pass $test } else { fail $test }
+
+set test "generate test bus for downstream"
+set mem_bus [sid_cmd "sid::bus::new"]
+if {$mem_bus == ""} { fail $test } else { pass $test }
+
+set test "connect test bus to cache"
+set result [sid_cmd "sid::component::connect_accessor $victim downstream $mem_bus"]
+if {$result == "ok"} { pass $test } else { fail $test }
+
+instrument_bus $mem_bus
+
+# read a byte from 0x100 and make sure we get a miss
+set test "read a byte from 0x100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x100"]
+assert_miss
+
+# read a byte from 0x100 and make sure we get a hit
+set test "read another byte from 0x100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x100"]
+assert_hit
+
+# drive 0x100 down the lock pin
+set test "lock 0x100"
+set lock_pin [sid_cmd "sid::component::find_pin $victim lock"]
+sid_cmd "sid::pin::driven_h4 $lock_pin 0x100"
+pass $test
+
+set test "double lock"
+set lock_pin [sid_cmd "sid::component::find_pin $victim lock"]
+sid_cmd "sid::pin::driven_h4 $lock_pin 0x100"
+pass $test
+
+# read a byte from 0x100 and make sure we get a hit
+set test "read a byte from 0x100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x100"]
+assert_hit
+
+# read a byte from 0x4100 and make sure we get a miss
+set test "read a byte from 0x4100"
+clear_miss_flag
+sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x4100"
+assert_miss
+
+# read a byte from 0x4100 and make sure we get another miss
+set test "read another byte from 0x4100"
+clear_miss_flag
+sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x4100"
+assert_miss
+
+# read a byte from 0x100 and make sure we get a hit
+set test "read a byte from 0x100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x100"]
+assert_hit
+
+# drive 0x100 down the unlock pin
+set test "unlock 0x100"
+set unlock_pin [sid_cmd "sid::component::find_pin $victim unlock"]
+sid_cmd "sid::pin::driven_h4 $unlock_pin 0x100"
+pass $test
+
+set test "double unlock"
+set unlock_pin [sid_cmd "sid::component::find_pin $victim unlock"]
+sid_cmd "sid::pin::driven_h4 $unlock_pin 0x100"
+pass $test
+
+# read a byte from 0x4100 and make sure we get a miss
+set test "read a byte from 0x4100"
+clear_miss_flag
+sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x4100"
+assert_miss
+
+# read a byte from 0x4100 and make sure we get a hit
+set test "read another byte from 0x4100"
+clear_miss_flag
+sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x4100"
+assert_hit
+
+# ensure only one line replacement occured
+set test "replacements stat equals 2"
+set value [get_attr replacements]
+if {$value == 2} { pass $test } else { fail "$test ($value)" }

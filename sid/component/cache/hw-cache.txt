@@ -1,0 +1,207 @@
+* Name
+  hw-cache-basic
+
+* Synopsis
+  This component models a variety of memory cache designs.
+
+  Buses: upstream
+  Accessors: downstream
+  Pins: report! flush invalidate invalidate-all prefetch lock unlock
+  Attributes: associativity cache-size line-size write-through?
+	write-allocate? hash-bit-mask hash-shift-amount
+	flushes replacements read-hit-rate write-hit-rate
+	read-accesses write-accesses misaligned-reads
+	misaligned-writes collect-statistics? report-heading dump!
+
+  Library: libcache.la
+  Symbol name: cache_component_library
+
+* Functionality
+  - Modeling
+
+     * This component models a memory cache suitable for use at
+       different levels of the memory hierarchy.  It provides a bus
+       interface and connects to another bus, providing a transparent
+       pass-through.  In this documentation, "CPU" and "main memory"
+       are synonymous for "upstream bus" and "downstream bus", as this
+       is the most common usage (but not the only possible).
+
+    * The parameters of the cache are a matter of configuration.  At
+      instantiation time, the following parameters are specified:
+
+	    + cache size (in kilobytes)
+	      { 8, 16, 32, 64, 128, 256, 512 }
+	    + line size (in bytes)
+	      { 16, 32, 64, 128 }
+	    + associativity
+	      { "direct", "full", "2-way", "4-way" }
+	    + replacement policy (for N-way and fully associative)
+	      { "lru", "fifo", "random" }
+
+      For a 16kb cache with a line size of 32 bytes, 2-way set
+      associativity and a "least recently used" (LRU) replacement
+      policy, the component name is "hw-cache-2way/16kb/32/lru".
+
+      For direct mapped caches, replacement policies are not
+      applicable and should be omitted from the component name.  For
+      example: "hw-cache-direct/64kb/16".  This particular 64KB
+      direct-mapped cache configuration is also known by the type name
+      of "hw-cache-basic".
+
+      Other parameters affecting the operation of the cache are
+      controlled by modifying attributes (see Behaviors).
+
+  - Behaviors
+    * Tag calculation
+      The size of a tag is dynamically computed based on the line
+      size.  Unlike physical caches which economise on the number of
+      tag bits to reduce hardware costs, the model uses a full
+      address, but discards the redundant bits that can be inferred by
+      a bytes position in the cache line.  For example, a 32 (2^5)
+      byte line uses 27 bits for the tag.
+
+    * Hash algorithm
+      A simple hashing algorithm is used to select a set from a target
+      address.  The algorithm uses values from the "hash-bit-mask" and
+      "hash-shift-amount" attributes to compute:
+		
+		index = (address & mask) >> shift_amount;
+      
+      These two values must be chosen carefully to ensure good cache
+      utilisation.  In particular, the "all-ones" value of "mask"
+      should not exceed the number of sets in the cache.
+
+    * Misaligned accesses
+      The component does not handle memory accesses that are not
+      aligned on the natural boundary of the data being referenced.
+      In such cases, the cache is bypassed and memory is accessed
+      directly.
+
+    * Write strategy
+      When a write is made to the cache, the "write-through?"
+      attribute determines if the data will be simultaneously written
+      to the memory.  Otherwise, writes will only be made to the cache
+      and will not be synchronised with main memory until the line is
+      flushed due to line replacement or an explicit flush (see
+      Flushing).
+
+      In the case of a write miss, the "write-allocate?" attribute
+      specifies the component's action.  If this attribute is set to
+      "yes", then a miss will cause the missed line to be loaded into
+      the cache in anticipation of future references.
+
+    * Prefetching
+      The component supports prefetching of data into the cache by
+      driving the "prefetch" pin with an address.  If, due to the line
+      replacement policy, the prefetch cannot be performed, this
+      operation has no effect.
+
+    * Flushing
+      If dirty lines are flushed from the cache, the component will
+      ensure that their contents are synchronized with main memory.
+      Some architectures provide a facility for explicitly flushing a
+      line to memory.  For this purpose, the component provides a
+      "flush" pin that can be driven with an address.  If the address
+      falls on a line that is present and dirty, it will be flushed to
+      memory and marked as not dirty.
+
+    * Invalidating
+      Lines in the cache that contain accurate contents are marked as
+      valid.  Some architectures provide a facility for explicitly
+      marking a line as invalid so that future accesses will cause a
+      new memory access.  For this purpose, the component provides an
+      "invalidate" pin that can be driven with an address.  If the
+      address falls on a line that is present, it will be invalidated.
+      No consideration is made for dirty lines, so a line should be
+      flushed before being invalidated.  The entire cache can be
+      invalidated by driving the "invalidate-all" pin.
+
+    * Line locking
+      The component supports locking lines in the cache to prevent
+      them from being removed to accommodate more recently referenced
+      lines.  A line can be locked by driving the "lock" pin with any
+      address that falls on the line.  Subsequently, a line can be
+      unlocked by driving the "unlock" pin.
+
+    * Statistics gathering
+      The component gathers statistics for a number of significant
+      events and records them in read-only attributes.  The collection
+      of statistics may be disabled with the "collect-statistics?"
+      attribute.
+
+    * Statistics reporting
+      The component will write a summary report of the statistics it
+      collects to standard error when the "report!" pin is driven.
+      The "report heading" attribute value, prepended to the report,
+      allows reports from multiple caches to be distinguished.
+
+  - SID conventions
+    * This is a functional component.
+    * It presents attributes in the "setting" and "register" categories.
+
+* Environment
+  - Related components
+    * This component is typically used as a cache between a CPU and
+      main memory.  A sample configuration fragment is:
+
+        new hw-cpu-arm7t cpu
+        new hw-cache-basic cache
+        connect-bus cpu insn-memory cache upstream
+        connect-bus cpu data-memory cache upstream
+	connect-bus cache downstream mem read-write-port
+
+    * More extensive modeling of the memory hierarchy could be
+      achieved by daisy-chaining two caches:
+
+        new hw-cpu-arm7t cpu
+        new hw-cache-basic l1-cache
+        new hw-cache-basic l2-cache
+        connect-bus cpu insn-memory l1-cache upstream
+        connect-bus cpu data-memory l1-cache upstream
+	connect-bus l1-cache downstream l2-cache upstream
+	connect-bus l2-cache downstream mem read-write-port
+
+    * The cache can operate using virtual or physical addresses.  This
+      is determined by the location of the cache in the memory
+      hierarchy.  The cache can manage physical addresses by placing
+      it "downstream" from an MMU or bus mapper (see hw-mapper-basic).
+
+* SID interface reference
+  - low level:
+    * pins
+      - report! | input | any | statistics reporting
+      - flush | input | any | flushing
+      - invalidate | input | any | invalidating
+      - invalidate-all | input | any | invalidating
+      - prefetch | input | any | prefetching
+      - lock | input | any | line locking
+      - unlock | input | any | line locking
+    * buses
+      - upstream | any address | any access | pass-through
+    * accessors
+      - downstram | any address | any access | pass-through
+    * attributes
+      - associativity | settings | string | n/a | configuration
+      - cache-size | settings | numeric | n/a | configuration
+      - line-size | settings | numeric | n/a | configuration
+      - hash-bit-mask | setting | numeric | 0xf | configuration
+      - hash-shift-amount | setting | 0..31 | 0 | configuration
+      - write-through? | setting | boolean | false | write strategy
+      - write-allocate? | setting | boolean | false | write strategy
+      - read-accesses | register | numeric | 0 | statistics gathering
+      - write-accesses | register | numeric | 0 | statistics gathering
+      - misaligned-reads | register | numeric | 0 | statistics gathering
+      - misaligned-writes | register | numeric | 0 | statistics gathering
+      - flushes | register | numeric | 0 | statistics gathering
+      - replacements | register | numeric | 0 | statistics gathering
+      - read-hit-rate | register | %age string | 0% | statistics gathering
+      - write-hit-rate | register | %age string | 0% | statistics gathering
+      - collect-statistics? | setting | boolean | true | statistics gathering
+      - report-heading | setting | string | cache profile report | stats g.
+      - dump! | setting | empty string | empty | internal diagnostics
+
+* References
+
+  ``Computer Architecture: A Quantitative Approach'', Hennessy & Patterson.
+  ``Advanced Microprocessors'', D. Tabak.
+  ``UNIX Systems for Modern Architectures'', C. Schimmel. 

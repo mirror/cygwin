@@ -1,0 +1,77 @@
+# fifo.exp -*- Tcl -*-
+# Basic testing for the first-in first-out (FIFO) replacement policy.
+#
+# Copyright (C) 2001 Red Hat, Inc.
+
+source $srcdir/$subdir/utils.exp
+
+set test "sid startup"
+sid_config_component_test_with_tracing "cache.conf" \
+        "load [sid_find_file libcache.la] cache_component_library" \
+        "hw-cache-4way/16kb/32/fifo"
+if {[sid_start "cache.conf"]} { pass $test } else { fail $test; return }
+
+set test "acquire upstream bus handle"
+set cache_bus [sid_cmd "sid::component::find_bus $victim upstream"]
+if {$cache_bus != ""} { pass $test } else { fail $test }
+
+set test "generate test bus for downstream"
+set mem_bus [sid_cmd "sid::bus::new"]
+if {$mem_bus == ""} { fail $test } else { pass $test }
+
+set test "connect test bus to cache"
+set result [sid_cmd "sid::component::connect_accessor $victim downstream $mem_bus"]
+if {$result == "ok"} { pass $test } else { fail $test }
+
+instrument_bus $mem_bus
+
+foreach addr {0x100 0x4100 0x8100 0xc100} {
+    set test "read byte from $addr"
+    clear_miss_flag
+    set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus $addr"]
+    assert_miss
+}
+
+# These should still hit, since there are four lines per set.
+foreach addr {0x100 0x4100 0x8100 0xc100} {
+    set test "read byte again from $addr"
+    clear_miss_flag
+    set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus $addr"]
+    assert_hit
+}
+
+# Out of lines in the set!
+set test "read byte from 0x10100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x10100"]
+assert_miss
+
+# This line should still be present, since it isn't old.
+set test "line for 0x8100 is still in the cache"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x8100"]
+assert_hit
+
+# This is the oldest line in the set and should have been removed.
+set test "line for 0x100 has been removed from the cache"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x100"]
+assert_miss
+
+# This line should still be present.
+set test "line for 0x8100 is still in the cache"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x8100"]
+assert_hit
+
+# Now load another byte, which will flush the 0x4100 line.
+set test "read byte from 0x14100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x14100"]
+assert_miss
+
+# Check that 0x8100 has been removed.
+set test "line for 0x8100 has been removed from the cache"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x8100"]
+assert_miss

@@ -1,0 +1,6 @@
+# Run a monkey test on the components in this component library. 
+
+load_lib "monkey.exp"
+
+proc state_safe_p {} { return 0 }
+monkey_test hw-cache-basic cache_component_library libcache.la

@@ -1,0 +1,66 @@
+# flush.exp -*- Tcl -*-
+# Testing of flush operations.
+#
+# Copyright (C) 2001 Red Hat, Inc.
+
+source $srcdir/$subdir/utils.exp
+
+set test "sid startup"
+sid_config_component_test_with_tracing "cache.conf" \
+        "load [sid_find_file libcache.la] cache_component_library" \
+        "hw-cache-basic"
+if {[sid_start "cache.conf"]} { pass $test } else { fail $test; return }
+
+set test "acquire upstream bus handle"
+set cache_bus [sid_cmd "sid::component::find_bus $victim upstream"]
+if {$cache_bus != ""} { pass $test } else { fail $test }
+
+set test "generate test bus for downstream"
+set mem_bus [sid_cmd "sid::bus::new"]
+if {$mem_bus == ""} { fail $test } else { pass $test }
+
+set test "connect test bus to cache"
+set result [sid_cmd "sid::component::connect_accessor $victim downstream $mem_bus"]
+if {$result == "ok"} { pass $test } else { fail $test }
+
+instrument_bus $mem_bus
+
+set test "read a byte from 0x100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x100"]
+assert_miss
+
+set test "write a byte to 0x100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::write_h4_l1 $cache_bus 0x100 0x55"]
+assert_hit
+
+set test "flush dirty line"
+clear_miss_flag
+set flush_pin [sid_cmd "sid::component::find_pin $victim flush"]
+sid_cmd "sid::pin::driven_h4 $flush_pin 0x100"
+assert_miss
+
+set test "flush clean line"
+clear_miss_flag
+sid_cmd "sid::pin::driven_h4 $flush_pin 0x100"
+assert_hit
+
+# Test flushes of modified cache lines to memory.
+# Populate a known line; modify it; read from an address that collides
+# with the line index and causes a flush.
+
+set test "read a line"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x500"]
+assert_miss
+
+set test "make a line dirty"
+clear_miss_flag
+set result [sid_cmd "sid::bus::write_h4_l1 $cache_bus 0x500 0x55"]
+assert_hit
+
+set test "displacing a dirty line causes bus activity"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x4500"]
+assert_miss

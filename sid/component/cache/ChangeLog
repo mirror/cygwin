@@ -1,0 +1,13 @@
+2001-06-15  Ben Elliston  <bje@redhat.com>
+
+	* cache.cxx: New file. 
+	* cache.h: Likewise.
+	* cacheutil.cxx: Likewise.
+	* cacheutil.h: Likewise.
+	* log2.h: Likewise.
+	* hw-cache.txt: Likewise.
+
+2001-06-05  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am: New file.
+	* Makefile.in: Generate.

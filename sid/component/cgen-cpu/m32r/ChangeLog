@@ -1,3 +1,8 @@
+2002-05-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* hw-cpu-m32r_d.txt: Regenerated with new gdb attributes.
+	* m32rbf.cxx (m32rbf_cpu ctor): Define big-endian sw breakpoint.
+
 2001-08-16  graydon hoare  <graydon@redhat.com>
 
 	* Makefile.am: gcc -> $(CC) fix.

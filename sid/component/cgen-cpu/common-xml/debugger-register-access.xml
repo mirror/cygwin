@@ -11,3 +11,7 @@
 
       <p>The <bus>debugger-bus</bus> bus provides access to the target program's
       address space, and is used by gdb to access target memory.</p>
+      <p>The <attribute>gdb-breakpoint-big</attribute> and
+      <attribute>gdb-breakpoint-little</attribute> attributes, if present,
+      are used as memory images of software breakpoint instructions for the
+      appropriate run-time endianness mode.</p>

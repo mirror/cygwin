@@ -36,6 +36,8 @@
     <defattribute name="gdb-register-N" category="debugger" legalvalues="byte array" behaviors="register access" />
     <defattribute name="gdb-num-registers" category="debugger" legalvalues="number" behaviors="register access" />
     <defattribute name="gdb-exp-registers" category="debugger" legalvalues="number list" behaviors="register access" />
+    <defattribute name="gdb-breakpoint-big" category="debugger" legalvalues="byte array" behaviors="register access" />
+    <defattribute name="gdb-breakpoint-little" category="debugger" legalvalues="byte array" behaviors="register access" />
     <defattribute name="state-snapshot" legalvalues="opaque string" behaviors="state save/restore" />
     <defattribute name="step-cycles" category="watchable pin" legalvalues="number" behaviors="execution" />
     <defattribute name="trap" category="watchable pin" legalvalues="number" behaviors="execution/traps" />

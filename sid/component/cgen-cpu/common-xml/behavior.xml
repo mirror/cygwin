@@ -74,7 +74,9 @@
       overwritten each time they are opened.  The
       <pin>print-insn-summary!</pin> pin can be driven to print a
       summary of instruction and cycle counts, usually at the end of
-      the simulation.</p>
+      the simulation. The <pin>trace</pin> pin can be driven with
+      any value which will be output as a character into the trace
+      stream.</p>
     </behavior>
 
     <behavior name="exceptions/traps">

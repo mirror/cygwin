@@ -60,6 +60,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
+AR = @AR@
 BFDHDIR = @BFDHDIR@
 BFDLIB = @BFDLIB@
 CC = @CC@
@@ -198,7 +199,6 @@ tclmsgbox.$(OBJEXT) tclcursor.$(OBJEXT) tkTable.$(OBJEXT) \
 tkTableCmd.$(OBJEXT) tkTableCell.$(OBJEXT) tkTableTag.$(OBJEXT) \
 tkTableWin.$(OBJEXT) tkWinPrintText.$(OBJEXT) \
 tkWinPrintCanvas.$(OBJEXT) tkWarpPointer.$(OBJEXT)
-AR = ar
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -210,7 +210,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 SOURCES = $(libgui_a_SOURCES)
 OBJECTS = $(libgui_a_OBJECTS)

@@ -26,22 +26,29 @@ endif
 WISH = wish
 
 if CROSS_COMPILING
-ITCL_SH = itclsh
+ITCL_SH = itclsh3.0
 else
-ITCL_SH = $$here/../../itcl/itcl/@ITCL_DIR@/itclsh$(EXEEXT)
+ITCL_SH = @ITCL_SH@
 endif
 
+if MAINTAINER_MODE
 tclIndex: $(TCL)
 	TCL_LIBRARY=$(srcdir)/../../tcl/library; export TCL_LIBRARY; \
 	here=`pwd`; \
 	$(SET_LIB_PATH) \
 	cd $(srcdir) && \
-	  echo "auto_mkindex $(LIBGUI_LIBRARY_DIR) $(TCL)" | @ITCL_SH@
+	  echo "auto_mkindex $(LIBGUI_LIBRARY_DIR) $(TCL)" | $(ITCL_SH)
 
 pkgIndex.tcl: @MAINT@ $(PACKAGES)
 	here=`pwd`;	 \
 	$(SET_LIB_PATH) \
 	cd $(srcdir) && \
-	echo "pkg_mkIndex . $(PACKAGES); exit" | @ITCL_SH@
+	echo "pkg_mkIndex . $(PACKAGES); exit" | $(ITCL_SH)
+else
+tclIndex:
+
+pkgIndex.tcl:
+
+endif
 
 ETAGS_ARGS = --lang=none --regex='/[ \t]*\(proc\|method\|itcl_class\)[ \t]+\([^ \t]+\)/\1/' $(TCL) --lang=auto

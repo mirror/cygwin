@@ -1,3 +1,8 @@
+2000-07-12  Syd Polk  <spolk@redhat.com>
+
+	* library/Makefile.am: Only regenerate tclIndex and pkgIndex.tcl
+	if this is configured with --enable-maintainer-mode.
+
 2000-07-11  Mo DeJong  <mdejong@redhat.com>
 
 	* README:

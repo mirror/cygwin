@@ -545,6 +545,29 @@ SessionCfg::SessionCfg (const string name)
   conn_pin (main_obj, "stopping", shutdown_seq, "input");
   yield_net->add_output (0, host_sched, "yield");
   init_seq->add_output (0, reset_net, "input");
+
+  AtomicCfg *ulog = new AtomicCfg ("ulog-*",
+				   "libconsoles.la", 
+				   "console_component_library", 
+				   "sid-io-stdio");
+  ulog_map["*"] = ulog;
+  add_child (ulog);
+}
+
+void
+SessionCfg::add_ulog_file (const string name)
+{
+  if (ulog_map.find (name) != ulog_map.end ())
+    return; // already there
+
+  // There is no existing logger for this file, so add a new one.
+  AtomicCfg *ulog = new AtomicCfg ("ulog-" + name, 
+				   "libconsoles.la", 
+				   "console_component_library", 
+				   "sid-io-stdio");
+  set (ulog, "filename", name);
+  ulog_map[name] = ulog;
+  add_child (ulog);
 }
 
 void SessionCfg::use_no_stdio ()
@@ -830,6 +853,7 @@ BoardCfg::BoardCfg (const string name,
 		    bool with_cpu_main_mem_connect) :
   ComponentCfg (name),
   AggregateCfg (name),
+  UlogCfg (),
   cache_flush_net (NULL),
   z_packet (with_z_packet),
   sess (s),
@@ -1078,7 +1102,10 @@ void BoardCfg::add_icache (const string type)
 void BoardCfg::add_memory (const Mapping &m)
 {
   if (main_mapper)
-    main_mapper->map (m);
+    {
+      Mapping map(m);
+      main_mapper->map (map.base(0));
+    }
 }
 
 

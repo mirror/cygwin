@@ -166,10 +166,24 @@ class GlueSeqCfg :
   int n;
 };
 
+// Configs which support logging should inherit this
+struct UlogCfg
+{
+  UlogCfg (sid::host_int_4 l = 0, const string m = "less", const string f = "-")
+    : ulog_level (l), ulog_mode (m), ulog_file (f)
+  {}
+  virtual void set_ulog_level (sid::host_int_4 l) { ulog_level = l; }
+  virtual void set_ulog_mode (const string m) { ulog_mode = m; }
+  virtual void set_ulog_file (const string f) { ulog_file = f; }
+  sid::host_int_4 ulog_level;
+  string ulog_mode;
+  string ulog_file;
+};
+
 // you should really only make one of these, with an empty name,
 // unless you want some crazy multi-session support.
 struct SessionCfg :
-  virtual public AggregateCfg
+  virtual public AggregateCfg, public UlogCfg
 {
   SessionCfg (const string name);
   virtual ~SessionCfg ();  
@@ -194,6 +208,8 @@ struct SessionCfg :
   AtomicCfg *tcl_bridge;
   bool verbose;
   bool use_stdio;
+  void add_ulog_file (const string filename);
+  map<const string, AtomicCfg *> ulog_map;
 };
 
 class CpuCfg :
@@ -278,7 +294,7 @@ class GdbCfg :
 };
 
 class BoardCfg :
-  virtual public AggregateCfg
+virtual public AggregateCfg, public UlogCfg
 {
 public:
   BoardCfg (const string name,
@@ -307,6 +323,7 @@ public:
   virtual void trace_disassemble ();
   virtual void trace_core ();
   virtual void write_config (Writer &w);
+
   virtual ~BoardCfg ();
 
   GlueSeqCfg *cache_flush_net;

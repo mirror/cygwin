@@ -1,3 +1,22 @@
+2003-06-10  Dave Brolley  <brolley@redhat.com>
+
+	* mainDynamic.cxx (usage): Document --ulog-* options.
+	(try_add_memory): Don't make the base of the mapping zero by default.
+	(Defs): New members: ulog_level, ulog_mode, ulog_file.
+	(option_num): New members: opt_ulog_level, opt_ulog_mode,
+	opt_ulog_file.
+	(long_options): Add ulog-*.
+	(main): Provide defaults for ulog-*. Handle opt_ulog_*.
+	* commonCfg.h (struct UlogCfg): New struct.
+	(SessionCfg): Now inherits UlogCfg.
+	(add_ulog_file): New method of SessionCfg.
+	(ulog_map): New member of SessionCfg.
+	(BoardCfg): Now inherits UlogCfg.
+	* commonCfg.cxx (SessionCfg): Add a ulog mapping for "-" to ulog_map.
+	(add_ulog_file): New method of SeessionCfg.
+	(BoardCfg): Initialize UlogCfg.
+	(add_memory): Set the base for the mapping to 0.
+
 2003-04-16  Dave Brolley  <brolley@redhat.com>
 
 	* commonCfg.cxx (final_insn_count): Set cpu attribute 'final-insn-count'.

@@ -1,6 +1,6 @@
 set test "sid configuration"
 sid_config_component_test_with_tracing "base5.conf" \
-    "load [sid_find_file libglue.la] glue_component_library" \
+    "load libglue.la glue_component_library" \
     "hw-glue-sequence"
 pass $test
 

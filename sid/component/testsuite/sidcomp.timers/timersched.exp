@@ -2,9 +2,9 @@ if {! $sidtarget(arm)} then { untested "hw-timer-arm/ref-* not available"; retur
 
 set test "sid configuration w/ scheduler"
 sid_config_component_etc_test_with_tracing "sched.conf" \
-    "load [sid_find_file libtimers.la] timer_component_library" \
+    "load libtimers.la timer_component_library" \
     "hw-timer-arm/ref-sched" \
-    "load [sid_find_file libsched.la] sched_component_library
+    "load libsched.la sched_component_library
 new sid-sched-sim sched
 set sched num-clients 1
 set sched enabled? 1

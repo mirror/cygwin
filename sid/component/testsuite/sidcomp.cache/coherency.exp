@@ -5,9 +5,9 @@
 
 set test "sid startup"
 sid_config_component_etc_test_with_tracing "coherency.conf" \
-        "load [sid_find_file libcache.la] cache_component_library" \
+        "load libcache.la cache_component_library" \
         "hw-cache-basic" \
-	"load [sid_find_file libmemory.la] mem_component_library
+	"load libmemory.la mem_component_library
 new hw-memory-ram/rom-basic mem
 set mem size 2048
 set real-victim write-through? no

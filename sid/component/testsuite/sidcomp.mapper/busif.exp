@@ -8,9 +8,9 @@ if {$enable_shared == "no"} then {
 
 proc build-config { file target } {
     set f [open $file "w"]
-    puts $f "load [sid_find_file libtclapi.la] tcl_bridge_library"
-    puts $f "load [sid_find_file libmapper.la] mapper_component_library"
-    puts $f "load [sid_find_file lib${target}.la] ${target}_component_library"
+    puts $f "load libtclapi.la tcl_bridge_library"
+    puts $f "load libmapper.la mapper_component_library"
+    puts $f "load lib${target}.la ${target}_component_library"
     puts $f "new bridge-tcl tester"
     puts $f "new hw-mapper-basic mapper"
     puts $f "new ${target}-big-1 big-1-bus"

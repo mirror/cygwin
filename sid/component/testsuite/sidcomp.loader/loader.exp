@@ -2,10 +2,10 @@
 # addresses used by the 2 test binaries.
 set test "sid configuration"
 sid_config_component_etc_test "loader.conf" \
-    "load [sid_find_file libloader.la] loader_component_library" \
+    "load libloader.la loader_component_library" \
     "sw-load-elf" \
-    "load [sid_find_file libmemory.la] mem_component_library
-load [sid_find_file libmapper.la] mapper_component_library
+    "load libmemory.la mem_component_library
+load libmapper.la mapper_component_library
 new hw-memory-ram/rom-basic gloss-insn
 new hw-memory-ram/rom-basic gloss-data
 new hw-mapper-basic mapper

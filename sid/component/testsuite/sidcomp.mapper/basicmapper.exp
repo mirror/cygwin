@@ -8,7 +8,7 @@
 
 set test "sid configuration"
 sid_config_component_test_with_tracing "basicmapper.conf" \
-	"load [sid_find_file libmapper.la] mapper_component_library" \
+	"load libmapper.la mapper_component_library" \
 	"hw-mapper-basic"
 pass $test
 

@@ -14,7 +14,7 @@ set all_ones 0xFFFFFFFF
 
 set test "sid configuration"
 sid_config_component_test "arm-intr.conf" \
-    "load [sid_find_file libinterrupt.la] interrupt_component_library" \
+    "load libinterrupt.la interrupt_component_library" \
     "hw-interrupt-arm/ref"
 pass $test
 

@@ -8,9 +8,9 @@ return
 
 set test "sid configuration"
 sid_config_component_etc_test_with_tracing "server.conf" \
-    "load [sid_find_file libconsoles.la] console_component_library" \
+    "load libconsoles.la console_component_library" \
     "sid-io-socket-server" \
-    "load [sid_find_file libsched.la] sched_component_library
+    "load libsched.la sched_component_library
 new sid-sched-host-accurate sched
 new sid-io-socket-client client
 set sched num-clients 2

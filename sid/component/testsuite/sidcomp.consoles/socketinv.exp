@@ -4,7 +4,7 @@
 
 set test "sid configuration"
 sid_config_component_test_with_tracing "server2.conf" \
-    "load [sid_find_file libconsoles.la] console_component_library" \
+    "load libconsoles.la console_component_library" \
     "sid-io-socket-server" 
 pass $test
 

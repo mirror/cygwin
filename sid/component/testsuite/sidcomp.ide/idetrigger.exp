@@ -1,6 +1,6 @@
 set test "sid configuration"
 sid_config_component_test_with_tracing "idetrig.conf" \
-    "load [sid_find_file libide.la] ide_component_library" \
+    "load libide.la ide_component_library" \
     "hw-disk-ide"
 pass $test
 

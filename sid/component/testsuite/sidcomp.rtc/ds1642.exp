@@ -43,11 +43,11 @@ proc end_read {} {
 
 set test "sid configuration"
 sid_config_component_etc_test_with_tracing "ds1642.conf" \
-    "load [sid_find_file librtc.la] rtc_component_library" \
+    "load librtc.la rtc_component_library" \
     "hw-rtc-ds1642" \
-    "load [sid_find_file libsched.la] sched_component_library
+    "load libsched.la sched_component_library
 new sid-sched-host-accurate sched
-load [sid_find_file libmemory.la] mem_component_library
+load libmemory.la mem_component_library
 new hw-memory-ram/rom-basic nvram
 set sched num-clients 1
 set sched enabled? 1

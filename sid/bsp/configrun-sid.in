@@ -1,8 +1,12 @@
-#! /usr/bin/env perl
+:
 # -*- perl -*-
 #
 # Emulate a standalone simulator.  Construct a sid configuration file
 # and run it.
+
+eval 'exec perl -S $0 ${1+"$@"}'
+    if $running_under_some_shell;
+$running_under_some_shell = 0;
 
 #use strict;
 use Getopt::Long;
@@ -270,7 +274,7 @@ $whoami=qx{whoami}; chop ($whoami);
 $hostname=qx{hostname}; chop ($hostname);
 $date=qx{date}; chop ($date);
 $uname=qx{uname}; chop ($uname);
-$version=q$Id: configrun-sid.in,v 1.6 2001/01/15 19:14:42 fche Exp $;
+$version=q$Id: configrun-sid.in,v 1.7 2001/01/23 17:04:23 fche Exp $;
 $zeroth_section = "# sid configuration file
 # created by $version
 # run by $whoami @ $hostname ($uname) at $date
@@ -407,12 +411,12 @@ elsif ($opt_board =~ /pid7t/)
     if ($opt_board =~ /cygmon/)
       {
 	die "board pid7t-cygmon only supported in little-endian mode (-EL)\n" unless ($opt_EL);
-	unshift @opt_memory_region, ( "0x04000000,0x00100000,file=$sidsharedir/armpid-cygmon.img,read-only" );
+	unshift @opt_memory_region, ( "0x04000000,0x00100000,file=armpid-cygmon.img,read-only" );
       }
     elsif ($opt_board =~ /eCosstub/)
       {
 	die "board pid7t-eCos only supported in little-endian mode (-EL)\n" unless ($opt_EL);
-	unshift @opt_memory_region, ( "0x04000000,0x00100000,file=$sidsharedir/armpid-eCos.img,read-only" );
+	unshift @opt_memory_region, ( "0x04000000,0x00100000,file=armpid-eCos.img,read-only" );
       }
     else
       {

@@ -1,3 +1,12 @@
+2001-01-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configrun-sid.in: Become a shell script.  Use "eval exec perl" hack
+	to divert to a perl interpreter on $PATH, instead of /usr/bin/env.
+
+2001-01-23  Frank Ch. Eigler  <fche@redhat.com>
+	* configrun-sid.in (cpu=arm): Don't include $sidsharelib in ROM image
+	file paths.
+
 2001-01-15  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configrun-sid.in (--verbose, --persistent): Only emit these settings

@@ -794,7 +794,7 @@ Define a preprocessor-style macro.
 ; .cpu file include mechanism
 
 (define (include file)
-  (display (string-append "Including file " file " ...\n"))
+  (logit 1 "Including file " file " ...\n")
   (reader-read-file! (string-append srcdir "/" file))
   (logit 2 "Resuming previous file ...\n")
 )
@@ -843,17 +843,10 @@ Define a preprocessor-style macro.
 (define (cpu-load file keep-mach keep-isa options
 		  app-initer! app-finisher! analyzer!)
   (-init-parse-cpu! keep-mach keep-isa options)
-
   (app-initer!)
-
-  ; This used to be done here, but is now defered until define-arch.
-  ;(reader-install-builtin!)
-
-  (display (string-append "Loading cpu file " file " ...\n"))
-
+  (logit 1 "Loading cpu description " file "\n")
   (reader-read-file! file)
-
-  (display (string-append "Processing cpu file " file " ...\n"))
+  (logit 2 "Processing cpu description " file "\n")
   (-finish-parse-cpu!)
   (app-finisher!)
   (-global-error-checks)

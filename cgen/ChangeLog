@@ -1,3 +1,11 @@
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* read.scm (include): Log "Including file" message at level 1,
+	rather than outputting it with (display).
+	(cpu-load): Log "Loading cpu description" and "Processing cpu
+	description" messages at levels 1 and 2, respectively, rather than
+	using (display).
+
 2001-06-14  Geoffrey Keating  <geoffk@redhat.com>
 
 	* desc.scm (<keyword> 'gen-defn): Add extra zero into

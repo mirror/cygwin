@@ -22,7 +22,7 @@
 
 2000-12-22  Frank Ch. Eigler  <fche@redhat.com>
 
-	* cgen-ops.h (JIUNUQIUHI, SUBWORDHIUHI, SUBWORDUHIUQI): New fns.
+	* cgen-ops.h (JOINUQIUHI, SUBWORDHIUHI, SUBWORDUHIUQI): New fns.
 
 2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
 

@@ -1,3 +1,7 @@
+2001-08-06  Frank Ch. Eigler  <fche@redhat.com>
+
+	* (*.conf): Regenerated without dud loader in gdb configurations.
+
 2001-08-06  Ben Elliston  <bje@redhat.com>
 
 	* (*.conf): Regenerate with cache component included.

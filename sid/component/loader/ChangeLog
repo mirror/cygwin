@@ -1,3 +1,10 @@
+2004-02-26  Dave Brolley  <brolley@redhat.com>
+
+	* elfload.c (textSectionNum): Now file level static.
+	(readElfFile): Initialize textSections, textSectionNum and
+	textSectionCount for each load. Set *section_table after all
+	sections have been saved.
+
 2004-02-23  Dave Brolley  <brolley@redhat.com>
 
 	* elfload.c (readElfFile): Get address from offset 16 for 64 bit and

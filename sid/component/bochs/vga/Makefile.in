@@ -129,13 +129,13 @@ sidtarget_xstormy16 = @sidtarget_xstormy16@
 
 AUTOMAKE_OPTIONS = foreign
 
-INCLUDES = -I$(top_builddir)/../../include -I$(srcdir) -I$(srcdir)/.. -I$(srcdir)/../../../include -I$(srcdir)/../memory -I$(srcdir)/../debug
+INCLUDES = -I$(top_builddir)/../../include -I$(srcdir) -I$(srcdir)/.. -I$(srcdir)/../../../include -I$(srcdir)/../cpu -I$(srcdir)/../../memory
 
-noinst_LTLIBRARIES = libcpu.la
+noinst_LTLIBRARIES = libvga.la
 
-libcpu_la_SOURCES = exception-sid.cc cpu.cc cpu.h cpu-sid.h cpu-sid.cc init-sid.cc state_file.h main-hack.cc x86.cc access.cc ctrl_xfer8.cc flag_ctrl.cc mult32.cc shift16.cc ctrl_xfer_pro.cc flag_ctrl_pro.cc mult8.cc shift32.cc arith16.cc data_xfer16.cc init.cc paging.cc shift8.cc arith32.cc data_xfer32.cc io.cc proc_ctrl.cc soft_int.cc soft_int-sid.cc arith8.cc data_xfer8.cc io_pro.cc protect_ctrl.cc stack16.cc bcd.cc debugstuff.cc debugstuff-sid.cc lazy_flags.cc protect_ctrl_pro.cc stack32.cc bit.cc decode16.cc logical16.cc resolve16.cc stack_pro.cc decode32.cc logical32.cc resolve32.cc string.cc ctrl_xfer16.cc exception.cc logical8.cc segment_ctrl.cc tasking.cc ctrl_xfer32.cc ctrl_xfer32-sid.cc fetchdecode.cc fetchdecode-sid.cc mult16.cc segment_ctrl_pro.cc vm8086.cc lazy_flags.h x86.h x86-memory-modes.cc
+libvga_la_SOURCES = sid-vga-wrapper.cc sid-vga-wrapper.h vga.cc vga.h
 
-libcpu_la_LDFLAGS = -no-undefined
+libvga_la_LDFLAGS = -no-undefined
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../config/mkinstalldirs
 CONFIG_HEADER = ../config.h
 CONFIG_CLEAN_FILES = 
@@ -150,19 +150,8 @@ X_CFLAGS = @X_CFLAGS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
-libcpu_la_LIBADD = 
-libcpu_la_OBJECTS =  exception-sid.lo cpu.lo cpu-sid.lo init-sid.lo \
-main-hack.lo x86.lo access.lo ctrl_xfer8.lo flag_ctrl.lo mult32.lo \
-shift16.lo ctrl_xfer_pro.lo flag_ctrl_pro.lo mult8.lo shift32.lo \
-arith16.lo data_xfer16.lo init.lo paging.lo shift8.lo arith32.lo \
-data_xfer32.lo io.lo proc_ctrl.lo soft_int.lo soft_int-sid.lo arith8.lo \
-data_xfer8.lo io_pro.lo protect_ctrl.lo stack16.lo bcd.lo debugstuff.lo \
-debugstuff-sid.lo lazy_flags.lo protect_ctrl_pro.lo stack32.lo bit.lo \
-decode16.lo logical16.lo resolve16.lo stack_pro.lo decode32.lo \
-logical32.lo resolve32.lo string.lo ctrl_xfer16.lo exception.lo \
-logical8.lo segment_ctrl.lo tasking.lo ctrl_xfer32.lo \
-ctrl_xfer32-sid.lo fetchdecode.lo fetchdecode-sid.lo mult16.lo \
-segment_ctrl_pro.lo vm8086.lo x86-memory-modes.lo
+libvga_la_LIBADD = 
+libvga_la_OBJECTS =  sid-vga-wrapper.lo vga.lo
 CXXFLAGS = @CXXFLAGS@
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -178,31 +167,15 @@ DIST_COMMON =  Makefile.am Makefile.in
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 GZIP_ENV = --best
-DEP_FILES =  .deps/access.P .deps/arith16.P .deps/arith32.P \
-.deps/arith8.P .deps/bcd.P .deps/bit.P .deps/cpu-sid.P .deps/cpu.P \
-.deps/ctrl_xfer16.P .deps/ctrl_xfer32-sid.P .deps/ctrl_xfer32.P \
-.deps/ctrl_xfer8.P .deps/ctrl_xfer_pro.P .deps/data_xfer16.P \
-.deps/data_xfer32.P .deps/data_xfer8.P .deps/debugstuff-sid.P \
-.deps/debugstuff.P .deps/decode16.P .deps/decode32.P \
-.deps/exception-sid.P .deps/exception.P .deps/fetchdecode-sid.P \
-.deps/fetchdecode.P .deps/flag_ctrl.P .deps/flag_ctrl_pro.P \
-.deps/init-sid.P .deps/init.P .deps/io.P .deps/io_pro.P \
-.deps/lazy_flags.P .deps/logical16.P .deps/logical32.P .deps/logical8.P \
-.deps/main-hack.P .deps/mult16.P .deps/mult32.P .deps/mult8.P \
-.deps/paging.P .deps/proc_ctrl.P .deps/protect_ctrl.P \
-.deps/protect_ctrl_pro.P .deps/resolve16.P .deps/resolve32.P \
-.deps/segment_ctrl.P .deps/segment_ctrl_pro.P .deps/shift16.P \
-.deps/shift32.P .deps/shift8.P .deps/soft_int-sid.P .deps/soft_int.P \
-.deps/stack16.P .deps/stack32.P .deps/stack_pro.P .deps/string.P \
-.deps/tasking.P .deps/vm8086.P .deps/x86-memory-modes.P .deps/x86.P
-SOURCES = $(libcpu_la_SOURCES)
-OBJECTS = $(libcpu_la_OBJECTS)
+DEP_FILES =  .deps/sid-vga-wrapper.P .deps/vga.P
+SOURCES = $(libvga_la_SOURCES)
+OBJECTS = $(libvga_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .cc .lo .o .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign cpu/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --foreign vga/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -250,8 +223,8 @@ distclean-libtool:
 
 maintainer-clean-libtool:
 
-libcpu.la: $(libcpu_la_OBJECTS) $(libcpu_la_DEPENDENCIES)
-	$(CXXLINK)  $(libcpu_la_LDFLAGS) $(libcpu_la_OBJECTS) $(libcpu_la_LIBADD) $(LIBS)
+libvga.la: $(libvga_la_OBJECTS) $(libvga_la_DEPENDENCIES)
+	$(CXXLINK)  $(libvga_la_LDFLAGS) $(libvga_la_OBJECTS) $(libvga_la_LIBADD) $(LIBS)
 .cc.o:
 	$(CXXCOMPILE) -c $<
 .cc.lo:
@@ -288,14 +261,14 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = cpu
+subdir = vga
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign cpu/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign vga/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \

@@ -1,6 +1,7 @@
-/* Macro definitions for GDB on an Intel i386 running SVR4.2MP
-   Copyright 1991, 1994, 1997, 1999, 2000 Free Software Foundation, Inc.
-   Written by Fred Fish at Cygnus Support (fnf@cygnus.com)
+/* Native support for i386 running SVR4.
+   Copyright 1986, 1987, 1989, 1992, 1996, 1997, 1998
+   Free Software Foundation, Inc.
+   Changes for 80386 by Pace Willisson (pace@prep.ai.mit.edu), July 1988.
 
    This file is part of GDB.
 
@@ -19,12 +20,10 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#ifndef TM_I386V42MP_H
-#define TM_I386V42MP_H 1
+#ifndef NM_I386V42MP_H
+#define NM_I386V42MP_H
 
-/* pick up more generic x86 sysv4 stuff */
-
-#include "i386/tm-i386.h"
+#include "config/nm-sysv4.h"
 
 /* define to select for other sysv4.2mp weirdness (see procfs.c) */
 
@@ -90,4 +89,4 @@
 /* Return whether PID contains a user-space thread id. */
 #define ISTID(PID) (ptid_get_tid (PID))
 
-#endif /* ifndef TM_I386V42MP_H */
+#endif /* NM_I386V42MP_H */

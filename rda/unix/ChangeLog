@@ -1,5 +1,10 @@
 2004-10-19  Jim Blandy  <jimb@redhat.com>
 
+	* thread-db.c (enum symbol_cache_defined): Move this definition
+	above that of (struct symbol_cache), and give it a name.
+	(struct symbol_cache): Use that enum as the type of 'defined_p', so
+	the debugger will print symbol cache entries more helpfully.
+
 	* ptrace-target.c (ptrace_create_child): Don't use sys_nerr to
 	check that errno is in a valid range.  The use sys_nerr is
 	deprecated on GNU/Linux, and according to the ISO C standard and

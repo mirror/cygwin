@@ -1,24 +1,28 @@
 /* Header file for GDB-specific command-line stuff.
-   Copyright 1986, 1989, 1990, 1992 Free Software Foundation, Inc.
+   Copyright 1986, 1989, 1990, 1992, 2000 Free Software Foundation, Inc.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #if !defined (GDBCMD_H)
 #define GDBCMD_H 1
 
 #include "command.h"
+#ifdef UI_OUT
+#include "ui-out.h"
+#endif
 
 /* Chain containing all defined commands.  */
 
@@ -92,6 +96,10 @@ extern struct cmd_list_element *setprintlist;
 
 extern struct cmd_list_element *showprintlist;
 
+extern struct cmd_list_element *setdebuglist;
+
+extern struct cmd_list_element *showdebuglist;
+
 extern struct cmd_list_element *setchecklist;
 
 extern struct cmd_list_element *showchecklist;
@@ -105,10 +113,15 @@ execute_command PARAMS ((char *, int));
 enum command_control_type
 execute_control_command PARAMS ((struct command_line *));
 
-void print_command_line PARAMS ((struct command_line *, unsigned int));
+extern void print_command_line (struct command_line *, unsigned int,
+				struct ui_file *);
+#ifdef UI_OUT
+extern void print_command_lines PARAMS ((struct ui_out *,
+				      struct command_line *, unsigned int));
+#endif
 
 extern char **noop_completer PARAMS ((char *, char *));
 
 extern char **filename_completer PARAMS ((char *, char *));
 
-#endif	/* !defined (GDBCMD_H) */
+#endif /* !defined (GDBCMD_H) */

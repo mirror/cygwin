@@ -1,5 +1,7 @@
 2004-09-22  Jim Blandy  <jimb@theseus.home>
 
+	* thread-db.c (thread_db_open, thread_db_get_gen): Doc fixes.
+
 	* thread-db.c (thread_db_detach, thread_db_set_gen,
 	thread_db_thread_id): Make these functions static.
 

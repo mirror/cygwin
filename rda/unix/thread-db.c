@@ -831,7 +831,7 @@ thread_db_dlopen (void)
 
 /* Function: thread_db_open
    Open a channel to the child's thread library.
-   Returns: -1 for failure, 0 for success
+   Returns: -1 for success, 0 for failure
    FIXME: closure.
    FIXME: where should we be called from?  We will not succeed
    until the thread shlib is loaded.  The call from attach will not
@@ -1049,7 +1049,7 @@ thread_db_get_gen (struct gdbserv *serv)
 	{
 	  /* So far we've matched "qSymbol::".  We're looking at either 
 	     form #1 ("qSymbol::", open a symbol lookup session), or
-	     form #2 ("qSymbol::<name>", a reply that "this symbol is
+	     form #3 ("qSymbol::<name>", a reply that "this symbol is
 	     not defined".  */
 
 	  len = gdbserv_input_bytes (serv, tempname, sizeof (tempname));
@@ -1062,8 +1062,10 @@ thread_db_get_gen (struct gdbserv *serv)
 	    }
 	  else
 	    {
-	      /* Form #2, this symbol not currently defined.
-		 Nothing to do, since we already have it marked undefined. */
+	      /* Form #3, this symbol not currently defined.  Nothing
+		 to do, since we marked it REQUESTED when we sent it,
+		 and lookup_cached_symbol treats REQUESTED like
+		 UNDEFINED. */
 	    }
 	}
       else if (gdbserv_input_hex_ulong (serv, &tempval) >= 0 &&
@@ -1071,7 +1073,7 @@ thread_db_get_gen (struct gdbserv *serv)
 	       (len = gdbserv_input_bytes (serv, tempname, sizeof (tempname))) 
 	       > 0)
 	{
-	  /* Message contains a symbol and a value (form #3). */
+	  /* Message contains a symbol and a value (form #2). */
 
 	  tempname[len] = '\0';
 	  add_symbol_to_list (tempname, (paddr_t) tempval, DEFINED);

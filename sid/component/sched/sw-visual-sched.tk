@@ -1,0 +1,92 @@
+#!/usr/bin/wish -f
+#
+# -*- tcl -*-
+#
+# copyright 2001 Red Hat Inc.
+#
+# this is a bridge-tk based component which manages a set of subscriptions
+# a single related scheduler, and puts up a little toggle for "pausing" them.
+#
+
+variable names
+
+proc get_sub {sched n} {
+    set time [sid::component::attribute_value $sched $n-time]
+    set regular [sid::component::attribute_value $sched $n-regular?]
+    return [list $time $regular]
+}
+
+
+proc set_sub {sched n pair} {
+    set time [lindex $pair 0]
+    set regular [lindex $pair 1]
+    set time [sid::component::set_attribute_value $sched $n-time $time]
+    set regular [sid::component::set_attribute_value $sched $n-regular? $regular]
+}
+
+
+proc set_enable {sched flag} {
+    sid::component::set_attribute_value $sched enabled? $flag
+}
+
+
+proc toggle_subscription {sched n} {
+    global saved_subs
+    set_enable $sched 0
+    set new_sub $saved_subs($sched,$n)
+    set saved_subs($sched,$n) [get_sub $sched $n]
+    set_sub $sched $n $new_sub
+    set_enable $sched 1
+}
+
+
+proc make_toggle {sched n caption} {
+    global saved_subs
+    set saved_subs($sched,$n) {0 no}
+    checkbutton .rc.toggle-$n -text $caption -command [list toggle_subscription $sched $n]
+    grid .rc.toggle-$n -sticky w
+}
+
+
+proc relate {rel comp} {
+    global names
+    set n [sid::component::attribute_value $comp num-clients]
+    for {set i 0} {$i < $n} {incr i} {
+	if {[array get names $i] == {}} {
+	    make_toggle $comp $i "pause subscription $i"
+	} else {
+	    make_toggle $comp $i "pause $names($i)"
+	}
+    }
+    return ok
+}
+
+proc set_attribute_value {name value} {
+    global names
+    if {[regexp {^([0-9]+)-name$} $name zz num] != 0} {
+	set names($num) $value
+	return ok
+    } else {
+	return bad_value 
+    }
+}
+
+
+# basic stubs
+proc find_pin { name } { return "" }
+proc pin_names {} { return "" }
+proc connect_pin {name pin} { return not_found }
+proc disconnect_pin {name pin} { return not_found }
+proc connected_pins {name} { return "" }
+proc attribute_names_in_category {c} { return "" }
+proc attribute_names {} { return "" }
+proc bus_names {} { return "" }
+proc find_bus {b} { return "" }
+proc accessor_names {} { return "" }
+proc relationship_names {} { return "" }
+
+
+frame .rc
+pack .rc
+wm title . "scheduler controls"
+update

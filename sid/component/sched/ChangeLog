@@ -1,3 +1,11 @@
+2001-09-13  graydon hoare  <graydon@redhat.com>
+
+	* sw-visual-sched.tk: New file.
+	* Makefile.am (pkgdata_DATA): Add sw-visual-sched.tk.
+	* Makefile.in: Regenerate.
+	* compSched.cxx (scheduler_component_ctor_1): Add gui attribute for
+	tksm to introspect and find sw-visual-sched.
+
 2001-08-03  matthew green  <mrg@redhat.com>
 
 	* compSched.cxx (~scheduler_component): Add prototype.

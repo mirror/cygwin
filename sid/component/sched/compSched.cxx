@@ -1421,6 +1421,7 @@ scheduler_component<Scheduler>::scheduler_component_ctor_1()
   add_attribute ("yield", & this->yield_pin, "pin");
   add_attribute ("enabled?", & this->enable_p, "setting");
   add_attribute ("yield-host-time?", & this->yield_host_time_p, "setting");
+  add_attribute_ro_value ("scheduler-control-gui", string("sw-visual-sched"), "gui");
 }
 
 template <class Scheduler>

@@ -8,7 +8,7 @@ INCLUDES = -I. -I../../include -I$(srcdir)/../../include
 libsched_la_SOURCES = compSched.cxx
 libsched_la_LDFLAGS = -module -no-undefined
 
-pkgdata_DATA = sid-sched.txt
+pkgdata_DATA = sw-visual-sched.tk sid-sched.txt
 
 DEJAGNUTESTS=schedbase.exp schedhost.exp schedhost2.exp schedmonkey.exp
 check-local: all

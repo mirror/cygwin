@@ -1,6 +1,6 @@
 // cache.cxx -- A universal memory cache. -*- C++ -*-
 
-// Copyright (C) 2001 Red Hat.
+// Copyright (C) 2001, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -67,7 +67,8 @@ cache_component::cache_component (unsigned assocy,
    cache_size (cache_sz),
    assoc (assocy),
    hit_latency (0),
-   miss_latency (0)
+   miss_latency (0),
+   refill_latency (0)
 {
   memset (&stats, 0, sizeof (stats));
 
@@ -130,6 +131,7 @@ cache_component::cache_component (unsigned assocy,
 
   add_attribute ("hit-latency", &hit_latency, "setting");
   add_attribute ("miss-latency", &miss_latency, "setting");
+  add_attribute ("refill-latency", &refill_latency, "setting");
 
   // FIXME: state save/restore
 }
@@ -322,7 +324,7 @@ cache_component::read_line (cache_line& line)
     {
       sid::big_int_4 data;
       st = downstream->read (base + offset, data);
-      // Latency for line fills is the latency of the first read
+      // Record the latency of the first read.
       if (offset == 0)
 	overall_latency = st.latency;
       if (st != bus::ok)
@@ -332,7 +334,7 @@ cache_component::read_line (cache_line& line)
   line.unlock ();
   line.clean ();
   line.validate ();
-  st.latency = overall_latency;
+  st.latency = refill_latency + overall_latency;
   return st;
 }
 

@@ -4,7 +4,7 @@ AC_INIT(runtest.exp)
 AC_CONFIG_AUX_DIR(..)
 
 dnl These are required by automake
-AM_INIT_AUTOMAKE(dejagnu, 1.4)
+AM_INIT_AUTOMAKE(dejagnu, 20000518)
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 AC_EXEEXT

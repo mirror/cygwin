@@ -1,5 +1,10 @@
 2001-01-23  Frank Ch. Eigler  <fche@redhat.com>
 
+	* configrun-sid.in: Use system perlfunc, not fork/exec, to spawn
+	child sid process.
+
+2001-01-23  Frank Ch. Eigler  <fche@redhat.com>
+
 	* configrun-sid.in: Generate sorted list of "load" commands.
 
 2001-01-23  Frank Ch. Eigler  <fche@redhat.com>

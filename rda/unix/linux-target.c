@@ -30,7 +30,7 @@
 #if !defined(_MIPSEL) && !defined(_MIPSEB)
 #include <stdint.h>
 #else
-#include <asm-mips/inst.h>
+#include <asm/inst.h>
 #endif
 
 #include <sys/ptrace.h>
@@ -473,8 +473,14 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
      asm-mips/reg.h.  Note, however, that the kernel header sandwiches
      the status register (sr, above) in between ``bad'' and ``cause''.  */
 
+#if 0
+  /* CAUSE and BADVADDR are readable via ptrace, but they're not writable.  */
   { BADVADDR,      4, GREGS,  35 * 4, 4, PROTO_SIZE },      /* bad */
   { CAUSE,         4, GREGS,  36 * 4, 4, PROTO_SIZE },      /* cause */
+#else
+  { 0,             8, NOREGS, 0,      8, 8 },               /* bad */
+  { 0,             8, NOREGS, 0,      8, 8 },               /* cause */
+#endif
   { PC,            4, GREGS,  34 * 4, 4, PROTO_SIZE },      /* pc */
 
   /* Linux/MIPS floating point is a bit of a mess.  On the one hand,
@@ -587,8 +593,14 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
      asm-mips/reg.h.  Note, however, that the kernel header sandwiches
      the status register (sr, above) in between ``bad'' and ``cause''.  */
 
+#if 0
+  /* CAUSE and BADVADDR are readable via ptrace, but they're not writable.  */
   { 66,            8, GREGS,  35 * 4, 8, 8 },      /* bad */
   { 65,            8, GREGS,  36 * 4, 8, 8 },      /* cause */
+#else
+  { 0,             8, NOREGS, 0,      8, 8 },      /* bad */
+  { 0,             8, NOREGS, 0,      8, 8 },      /* cause */
+#endif
   { 64,            8, GREGS,  34 * 4, 8, 8 },      /* pc */
 
   /* Linux/MIPS floating point is a bit of a mess.  On the one hand,

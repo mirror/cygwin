@@ -1,3 +1,11 @@
+2003-06-10  Dave Brolley  <brolley@redhat.com>
+
+	* sidattrutil.h (sidpinutil.h): #include it.
+	(iostream): Ditto.
+	(stdio.h): Ditto.
+	(stdarg.h): Ditto.
+	(fixed_attribute_map_with_logging_component): New class.
+
 2003-04-16  Dave Brolley  <brolley@redhat.com>
 
 	* sidcpuutil.h (final_insn_count_p): New member of basic_cpu.

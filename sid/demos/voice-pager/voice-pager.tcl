@@ -1,6 +1,6 @@
 option add *font {Helvetica 10 bold}
 
-wm title . {Cygnus Voice Pager $Revision$}
+wm title . {Red Hat Voice Pager $Revision$}
 
 if {0} {
     # not needed - just bind to the <Destroy> event.

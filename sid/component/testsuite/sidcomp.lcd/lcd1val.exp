@@ -7,6 +7,10 @@ pass $test
 set test "sid startup"
 if [sid_start "lcd1.conf"] then { pass $test } else { fail $test ; return }
 
+set test "initialise"
+set init_pin [sid_cmd "sid::component::find_pin $victim init"]
+sid_assert_success "sid::pin::driven_h4 $init_pin 0"
+
 set test "check attribute list"
 sid_assert_includes_all "sid::component::attribute_names $victim" {state-snapshot width height}
 

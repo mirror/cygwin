@@ -40,7 +40,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.42 $";
+static const char version[] = "$Revision: 1.43 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -852,7 +852,7 @@ dump_sysinfo ()
   time_t now;
   char *found_cygwin_dll;
 
-  printf ("\nCygwin Win95/NT Configuration Diagnostics\n");
+  printf ("\nCygwin Configuration Diagnostics\n");
   time (&now);
   printf ("Current System Time: %s\n", ctime (&now));
 

@@ -44,7 +44,7 @@ details. */
   /* The current cygwin version is 1.1.0 */
 
 #define CYGWIN_VERSION_DLL_MAJOR 1001
-#define CYGWIN_VERSION_DLL_MINOR 0
+#define CYGWIN_VERSION_DLL_MINOR 4
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -53,6 +53,8 @@ details. */
 
       /* CYGWIN_VERSION_DLL_COMBINED gives us a single number
 	 representing the combined DLL major and minor numbers. */
+
+      /* WATCH OUT FOR OCTAL!  Don't use, say, "00020" for 0.20 */
 
 #define CYGWIN_VERSION_DLL_MAKE_COMBINED(maj, min) (((maj) * 1000) + min)
 #define CYGWIN_VERSION_DLL_COMBINED \
@@ -65,10 +67,17 @@ details. */
 
     /* API versions <= this had a termios structure whose members were
        too small to accomodate modern settings. */
-#define CYGWIN_VERSION_DLL_OLD_TERMIOS		00005
+#define CYGWIN_VERSION_DLL_OLD_TERMIOS		5
 #define CYGWIN_VERSION_DLL_IS_OLD_TERMIOS \
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
   CYGWIN_VERSION_DLL_OLD_TERMIOS)
+
+     /* Old APIs had getc/putc macros that conflict with new CR/LF
+	handling in the stdio buffers */
+#define CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING \
+  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
+  20)
+
 
      /* We used to use the DLL major/minor to track
 	non-backward-compatible interface changes to the API.  Now we
@@ -92,10 +101,25 @@ details. */
        14: Export snprintf and vnsprintf.
        15: Export glob
        16: Export cygwin_stackdump
+       17: Export fast math stuff
+       18: Stop exporting _strace_wm
+       19: Export fchown, lchown, lacl
+       20: regsub, inet_network
+       21: incompatible change to stdio cr/lf and buffering
+       22: Export cygwin_logon_user, cygwin_set_impersonation_token.
+           geteuid, getegid return effective uid/gid.
+           getuid, getgid return real uid/gid.
+           seteuid, setegid set only effective uid/gid.
+           setuid, setgid set effective and real uid/gid.
+       23: Export new dll_crt0 interface and cygwin_user_data for use
+	   with crt0 startup code.
+       24: Export poll and _poll.
+       25: Export getmode and _getmode.
+       26: CW_GET_CYGDRIVE_PREFIXES addition to external.cc
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 16
+#define CYGWIN_VERSION_API_MINOR 26
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

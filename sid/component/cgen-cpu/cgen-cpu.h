@@ -70,8 +70,18 @@ public:
     {
       return this->read_data_memory_1 (pc, addr);
     }
+  inline UQI
+  GETMEMUQI(PCADDR pc, ADDR addr) const
+    {
+      return this->read_data_memory_1 (pc, addr);
+    }
   inline void
   SETMEMQI(PCADDR pc, ADDR addr, QI value) const
+    {
+      return this->write_data_memory_1 (pc, addr, value);
+    }
+  inline void
+  SETMEMUQI(PCADDR pc, ADDR addr, UQI value) const
     {
       return this->write_data_memory_1 (pc, addr, value);
     }
@@ -80,8 +90,18 @@ public:
     {
       return this->read_data_memory_2 (pc, addr);
     }
+  inline UHI
+  GETMEMUHI(PCADDR pc, ADDR addr) const
+    {
+      return this->read_data_memory_2 (pc, addr);
+    }
   inline void
   SETMEMHI(PCADDR pc, ADDR addr, HI value) const
+    {
+      return this->write_data_memory_2 (pc, addr, value);
+    }
+  inline void
+  SETMEMUHI(PCADDR pc, ADDR addr, UHI value) const
     {
       return this->write_data_memory_2 (pc, addr, value);
     }

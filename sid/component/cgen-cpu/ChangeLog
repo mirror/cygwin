@@ -1,3 +1,10 @@
+2001-04-03  Ben Elliston  <bje@redhat.com>
+
+	* cgen-cpu.h (cgen_bi_endian_cpu::GETMEMUQI): New method.
+	(cgen_bi_endian_cpu::SETMEMUQI): Ditto.
+	(cgen_bi_endian_cpu::GETMEMUHI): Ditto.
+	(cgen_bi_endain_cpu::SETMEMUHI): Ditto.
+
 2001-03-21  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.in: Regenerate.

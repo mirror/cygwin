@@ -29,7 +29,7 @@
  * 
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  */
-/* $Id: access01.c,v 1.2 2000/09/06 14:21:53 duda Exp $ */
+/* $Id: access01.c,v 1.3 2001/03/10 16:45:28 duda Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -137,25 +137,25 @@ extern int Tst_count;		/* Test Case counter for tst_* routines */
 
 char Fname[255];
 
-static struct test_case_t {
-    char *file;
-    int mode;
-    char *string;
-    int experrno;
-} Test_cases[] = {
-    { Fname, F_OK,  "F_OK", 0 },
-    { Fname, X_OK,  "X_OK", 0 },
-    { Fname, W_OK,  "W_OK", 0 },
-    { Fname, R_OK,  "R_OK", 0 },
-};
-
-int Ntc = sizeof(Test_cases) / sizeof(struct test_case_t);
 
 /***********************************************************************
  * Main
  ***********************************************************************/
 int main(int ac, char **av)
 {
+    struct test_case_t {
+        char *file;
+        unsigned mode;
+        const char *string;
+        int experrno;
+    } Test_cases[] = {
+        { Fname, F_OK,  "F_OK", 0 },
+        { Fname, X_OK,  "X_OK", 0 },
+        { Fname, W_OK,  "W_OK", 0 },
+        { Fname, R_OK,  "R_OK", 0 },
+    };
+
+    int Ntc = sizeof(Test_cases) / sizeof(struct test_case_t);
     int lc;		/* loop counter */
     const char *msg;		/* message returned from parse_opts */
     int tc;

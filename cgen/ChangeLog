@@ -1,5 +1,7 @@
 2005-02-15  Jim Blandy  <jimb@redhat.com>
 
+	* guile.scm (cgen-call-with-debugging): Doc fix.
+
 	Make backtraces work more reliably.
 	* guile.scm: Set up debugging parameters, and enable debugging and
 	source positions while loading.

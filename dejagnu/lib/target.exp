@@ -1,4 +1,4 @@
-# Copyright (C) 92, 93, 94, 95, 96, 97, 98, 1999 Free Software Foundation, Inc.
+# Copyright (C) 92, 93, 94, 95, 96, 97, 98, 1999, 2000 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -260,6 +260,9 @@ proc prune_warnings { text } {
     # Or the IRIX 6 ones.
     regsub -all "(^|\n)(ld(|32|64): WARNING \[^\n\]*\n?)+" $text "\\1" text
     regsub -all "(^|\n)(ld(|32|64): Giving up.*Use -wall\[^\n\]*\n?)+" $text "\\1" text
+
+    # GNU ld warns about functions marked as dangerous in GNU libc.
+    regsub -all "(^|\n)\[^\n\]*: In function\[^\n\]*\n\[^\n\]\[^\n\]*function is dangerous*\[^\n\]*" $text "" text
 
     # It might be tempting to get carried away and delete blank lines, etc.
     # Just delete *exactly* what we're ask to, and that's it.

@@ -11,6 +11,11 @@ bin_PROGRAMS = sid
 # statically link in a bunch of component libraries using libtool's
 # '-dlpreopen' flag.
 
+
+
+ALLFAMLIBS = $(FAM9LIB)
+ALLFAMLIBS2 = $(FAM9LIB2)
+
 if SID_STATIC
 NEARBY_LIBS = \
 	-dlpreopen ../../component/audio/libaudio.la \
@@ -18,6 +23,7 @@ NEARBY_LIBS = \
 	-dlpreopen ../../component/cfgroot/libconfig.la \
 	-dlpreopen ../../component/cgen-cpu/libcgencpu.la \
 	-dlpreopen ../../component/consoles/libconsoles.la \
+	$(ALLFAMLIBS2) \
 	-dlpreopen ../../component/gdb/libgdb.la \
 	-dlpreopen ../../component/gloss/libgloss.la \
 	-dlpreopen ../../component/glue/libglue.la \
@@ -43,6 +49,7 @@ NEARBY_DEPS_LIBS = \
 	../../component/cfgroot/libconfig.la \
 	../../component/cgen-cpu/libcgencpu.la \
 	../../component/consoles/libconsoles.la \
+	$(ALLFAMLIBS) \
 	../../component/gdb/libgdb.la \
 	../../component/gloss/libgloss.la \
 	../../component/glue/libglue.la \

@@ -76,6 +76,11 @@ OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
+sidtarget_arm = @sidtarget_arm@
+sidtarget_m32r = @sidtarget_m32r@
+sidtarget_m68k = @sidtarget_m68k@
+sidtarget_mips = @sidtarget_mips@
+sidtarget_ppc = @sidtarget_ppc@
 
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
@@ -83,12 +88,21 @@ ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include
 
 bin_PROGRAMS = sid
+
+# If sid is being compiled without shared library support, arrange to
+# statically link in a bunch of component libraries using libtool's
+# '-dlpreopen' flag.
+
+
+ALLFAMLIBS = $(FAM9LIB)
+ALLFAMLIBS2 = $(FAM9LIB2)
 @SID_STATIC_TRUE@NEARBY_LIBS = @SID_STATIC_TRUE@\
 @SID_STATIC_TRUE@	-dlpreopen ../../component/audio/libaudio.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/cache/libcache.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/cfgroot/libconfig.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/cgen-cpu/libcgencpu.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/consoles/libconsoles.la \
+@SID_STATIC_TRUE@	$(ALLFAMLIBS2) \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/gdb/libgdb.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/gloss/libgloss.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/glue/libglue.la \
@@ -115,6 +129,7 @@ bin_PROGRAMS = sid
 @SID_STATIC_TRUE@	../../component/cfgroot/libconfig.la \
 @SID_STATIC_TRUE@	../../component/cgen-cpu/libcgencpu.la \
 @SID_STATIC_TRUE@	../../component/consoles/libconsoles.la \
+@SID_STATIC_TRUE@	$(ALLFAMLIBS) \
 @SID_STATIC_TRUE@	../../component/gdb/libgdb.la \
 @SID_STATIC_TRUE@	../../component/gloss/libgloss.la \
 @SID_STATIC_TRUE@	../../component/glue/libglue.la \

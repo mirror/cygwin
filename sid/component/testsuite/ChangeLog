@@ -1,5 +1,10 @@
 2001-06-22  Ben Elliston  <bje@redhat.com>
 
+	* lib/monkey.exp (monkey_test): If an individual monkey test
+	fails, bail out immediately.
+
+2001-06-22  Ben Elliston  <bje@redhat.com>
+
 	* sidcomp.cfgroot/comment.badconf: Remove ARM-specific components.
 	* sidcomp.cfgroot/cr100925.badconf: Likewise.
 	* sidcomp.cfgroot/cr100931.badconf: Likewise.

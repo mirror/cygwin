@@ -1,6 +1,6 @@
 2001-06-25  Ben Elliston  <bje@redhat.com>
 
-	* sidcomp.h (bus::status code): Change type to host_int_1.
+	* sidcomp.h (bus::status::code): Change type to host_int_1.
 	(bus::status constructors): Cast status_t to host_int_1.
 	(API_MINOR_VERSION): Bump it.
 	

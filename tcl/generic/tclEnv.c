@@ -12,7 +12,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclEnv.c,v 1.20 1999/10/19 21:38:01 dj Exp $
+ * RCS: @(#) $Id: tclEnv.c,v 1.21 2000/01/26 20:03:51 dj Exp $
  */
 
 #include "tclInt.h"
@@ -23,9 +23,9 @@
 
 /* On cygwin32, the environment is imported from the cygwin32 DLL.  */
 
-extern char ***__imp___cygwin_environ;
+extern char ***_imp____cygwin_environ;
 
-#define environ (*__imp___cygwin_environ)
+#define environ (*_imp____cygwin_environ)
 
 /* We need to use a special putenv function to handle PATH.  */
 #ifndef USE_PUTENV

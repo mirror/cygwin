@@ -812,6 +812,7 @@ proc find_ld { } {
 
 proc build_wrapper { gluefile } {
     global libdir
+    global tool
 
     if [target_info exists wrap_m68k_aout] {
 	set flags "additional_flags=-DWRAP_M68K_AOUT";
@@ -832,7 +833,7 @@ proc build_wrapper { gluefile } {
 	lappend flags "additional_flags=[target_info wrap_compile_flags]";
     }
     if { [target_compile ${libdir}/testglue.c ${gluefile} object $flags] == "" } {
-	set gluefile [remote_download host ${gluefile} testglue.o];
+      set gluefile [remote_download host ${gluefile} ${tool}_tg.o];
 	return [list $gluefile $result];
     } else {
 	return ""

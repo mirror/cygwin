@@ -21,11 +21,10 @@ details. */
 #include <sys/cygwin.h>
 #include <ctype.h>
 
-static const char version[] = "$Revision: 1.23 $";
+static const char version[] = "$Revision: 1.24 $";
 
 static char *prog_name;
 static char *file_arg;
-static char *close_arg;
 static int path_flag, unix_flag, windows_flag, absolute_flag;
 static int shortname_flag, longname_flag;
 static int ignore_flag, allusers_flag, output_flag;

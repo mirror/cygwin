@@ -68,7 +68,7 @@ public:
 
   HD44780U_tester();
 
-  ~HD44780U_tester() {}
+  ~HD44780U_tester() throw() {}
 };
 
 #endif // HD44780U_TESTER_DEF_H

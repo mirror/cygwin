@@ -66,7 +66,7 @@ gloss32::gloss32() :
   fd_table = 0;
 }
 
-gloss32::~gloss32()
+gloss32::~gloss32() throw()
 {
   if (host_ops)
     delete host_ops;
@@ -1029,7 +1029,7 @@ gloss32::read (int fd, address32 addr, size32 len,
 
 	  if (rx_buffer.size() > 0)
 	    {
-	      count_read = min (len, rx_buffer.size());
+	      count_read = std::min (len, rx_buffer.size());
 	      for (int i = 0; i < count_read; ++i)
 		{
 		  c = rx_buffer.front();

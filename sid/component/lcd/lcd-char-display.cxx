@@ -69,7 +69,7 @@ private:
 public:
 
   lcd_char_display();
-  ~lcd_char_display();
+  ~lcd_char_display() throw ();
 
   // Save & restore state
   string save_state ();
@@ -77,9 +77,9 @@ public:
 };
 
 lcd_char_display :: lcd_char_display() : 
-  row_col_pin( this, &(lcd_char_display::set_pixel) ),
-  frame_pin( this, &(lcd_char_display::new_frame) ),
-  init_pin( this, &(lcd_char_display::init) ),
+  row_col_pin( this, &lcd_char_display::set_pixel ),
+  frame_pin( this, &lcd_char_display::new_frame ),
+  init_pin( this, &lcd_char_display::init ),
   trigger_mgr( this )
 {
   add_pin( "row-col", &row_col_pin );
@@ -112,7 +112,7 @@ lcd_char_display :: lcd_char_display() :
 #endif
 }
 
-lcd_char_display :: ~lcd_char_display() { 
+lcd_char_display :: ~lcd_char_display() throw () { 
 #ifdef HAVE_CURSES_H
   endwin(); 
 #endif

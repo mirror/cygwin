@@ -60,8 +60,8 @@ public:
   void end_trace ();
 
 public:
-  cgen_bi_endian_cpu();
-  ~cgen_bi_endian_cpu();
+  cgen_bi_endian_cpu ();
+  ~cgen_bi_endian_cpu () throw();
 
 public:
   // rtl memory access methods

@@ -1,3 +1,13 @@
+2001-08-03  matthew green  <mrg@redhat.com>
+
+	* hd-5X10.h (dtor): Add throw() specifier.
+	* hd-europe.h (dtor): Add throw() specifier.
+	* hd-one-line.h (dtor): Add throw() specifier.
+	* hd-tester.h (dtor): Add throw() specifier.
+	* hd-two-line.h (dtor): Add throw() specifier.
+	* t6963c-japan.h (dtor): Add throw() specifier.
+	* t6963c-tester.h (dtor): Add throw() specifier.
+
 2001-08-01  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am (all-local): Tolerate $srcdir==$builddir.

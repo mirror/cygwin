@@ -50,6 +50,7 @@ private:
 
 public:
   m32rbf_cpu ();
+  ~m32rbf_cpu () throw() { };
   void set_pc (host_int_4 v) 
     { 
       this->hardware.h_pc = (PCADDR) v; 

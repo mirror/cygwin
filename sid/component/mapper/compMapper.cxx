@@ -237,14 +237,14 @@ public:
 #undef SID_GB_WRITE
 #undef SID_GB_READ
 
-  ~generic_mapper_bus ();
+  ~generic_mapper_bus () throw ();
 
 private:
   generic_mapper* target;
   mutable struct mapping_record* tlb;
 };
 
-generic_mapper_bus::~generic_mapper_bus () {
+generic_mapper_bus::~generic_mapper_bus () throw () {
 }
 
 
@@ -260,7 +260,7 @@ class generic_mapper: public virtual component,
 {
 public:
   generic_mapper ();
-  ~generic_mapper () {}
+  ~generic_mapper () throw() {}
 
   std::vector<string> accessor_names () throw();
   component::status connect_accessor (const string& name, bus* bus) throw();

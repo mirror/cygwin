@@ -211,7 +211,7 @@ private:
 
 public:
   Uart();
-  ~Uart() {}
+  ~Uart() throw () {}
   void reset( host_int_4 );
 };
 

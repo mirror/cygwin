@@ -112,7 +112,7 @@ public:
   void write( char *s );
   int read( char *buf );
 
-  ~DeviceDriver()	{}
+  ~DeviceDriver() throw () {}
 };
 
 class SerialSink : public virtual component,

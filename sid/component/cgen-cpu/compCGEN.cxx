@@ -41,7 +41,7 @@ cgen_bi_endian_cpu::cgen_bi_endian_cpu ():
 }
 
 
-cgen_bi_endian_cpu::~cgen_bi_endian_cpu () 
+cgen_bi_endian_cpu::~cgen_bi_endian_cpu () throw()
 {
 }
 

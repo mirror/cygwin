@@ -108,6 +108,8 @@ public:
   cache_component (unsigned asoctvty, unsigned cache_sz,
 		   unsigned line_sz, cache_replacement_algorithm& replacer);
 
+  ~cache_component () throw();
+
   template <typename DataType> bus::status 
   write_any (host_int_4 addr, DataType data);
   

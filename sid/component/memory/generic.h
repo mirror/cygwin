@@ -69,7 +69,7 @@ class generic_memory: public virtual component,
 {
 public:
   generic_memory() throw (bad_alloc);
-  ~generic_memory();
+  ~generic_memory() throw ();
 
 protected:
   // memory buffers

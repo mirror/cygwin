@@ -341,6 +341,9 @@ gdb::process_set_args ()
     }
 }
 
+using std::hex;
+using std::setw;
+using std::dec;
 
 int
 gdb::process_set_reg (int reg)
@@ -1422,7 +1425,7 @@ gdb::target_tx_handler (host_int_4 value)
 
 
 
-gdb::~gdb()
+gdb::~gdb() throw()
 {
   // Do nothing here; disconnection and gdbserv memory cleanup ought
   // to have occurred during deinit / detach earlier.

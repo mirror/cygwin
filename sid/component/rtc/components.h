@@ -60,6 +60,7 @@ class ds1642: public virtual component,
 {
 public:
   ds1642();
+  ~ds1642() throw () { }
 
 protected:
   virtual bus::status read_7f8(host_int_4 addr, host_int_1& data);
@@ -255,7 +256,7 @@ class sidrtc: public virtual component,
 
 public:
   sidrtc();
-  ~sidrtc() {}
+  ~sidrtc() throw () {}
 };
 
 

@@ -127,7 +127,7 @@ public:
 
   void reset();
 
-  ~HD44780U() {}
+  ~HD44780U () throw() {}
 
   // save & restore
 

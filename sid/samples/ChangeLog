@@ -1,3 +1,7 @@
+2001-08-03  matthew green  <mrg@redhat.com>
+
+	* timer.cxx (~Timer): Add prototype.
+		
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configure, Makefile.in, aclocal.m4: Regenerated.

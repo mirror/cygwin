@@ -83,6 +83,7 @@ private:
 
 public:
   ide_hooking_register_bus(ide_controller* f): foe(f) {}
+  ~ide_hooking_register_bus () throw() {}
 };
 
 
@@ -451,7 +452,7 @@ public:
       ide_controller_ctor_0();
     }
 
-  ~ide_controller() {}
+  ~ide_controller() throw() {}
 };
 
 

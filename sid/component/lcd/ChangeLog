@@ -1,3 +1,15 @@
+2001-08-03  matthew green  <mrg@redhat.com>
+
+	* HD44780U.cxx (ctor): Remove unnecessary parens GCC 3.0 is
+	unable to deal with.
+	* HD44780U.h (dtor): Add throw() specifier.
+	* T6963C.cxx (ctor): Remove unnecessary parens GCC 3.0 is
+	unable to deal with.
+	* T6963C.h (dtor): Add throw() specifier.
+	* lcd-char-display.cxx (ctor): Remove unnecessary parens GCC 3.0 is
+	unable to deal with.
+	* lcd-char-display.h (dtor): Add throw() specifier.
+
 2001-07-20  Ben Elliston  <bje@redhat.com>
 
 	* lcd-char-display.cxx (set_pixel): Guard against w = nil.

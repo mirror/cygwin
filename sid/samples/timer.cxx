@@ -34,6 +34,7 @@ class Timer: public virtual sid::component
 public:
   Timer()
     :scheduler_pin(0), clock_pin(this), bus(this), enabled(false) { }
+  ~Timer() throw () { }
   
   // Provide implementations for abstract methods in sid::component.
   // See include/sidcomp.h.

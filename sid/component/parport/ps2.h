@@ -59,6 +59,7 @@ class ParPort: public virtual component,
 {
  public: 
   ParPort();
+  ~ParPort() throw ();
   void reset(host_int_4);
   
  private:

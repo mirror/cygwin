@@ -67,6 +67,7 @@ class armTimer: public virtual component,
 {
 public:
   armTimer();
+  ~armTimer() throw () { }
 
 private:
   class bus_interface: public word_bus<little_int_4>

@@ -138,7 +138,8 @@ namespace glue_components
 
 
   public:
-    sequence_component(unsigned nc = 0);
+    sequence_component (unsigned nc = 0);
+    ~sequence_component () throw() { };
   };
 
 
@@ -272,7 +273,7 @@ sequence_component::sequence_component(unsigned nc):
 
   public:
     attr_storage_component() {}
-    ~attr_storage_component() {}
+    ~attr_storage_component() throw() {}
 
     vector<string>
     attribute_names() throw()
@@ -359,7 +360,7 @@ public:
     {
       assert (this->prober);
     }
-  ~probing_bus () {}
+  ~probing_bus () throw() {}
 };
 
 
@@ -539,7 +540,7 @@ public:
       add_pin ("switch", &switch_pin);
       add_attribute ("switch", &switch_pin, "pin");
     }
-  ~bus_mux () {}
+  ~bus_mux () throw() {}
 
   void handle_switch_pin (host_int_4 value)
     {

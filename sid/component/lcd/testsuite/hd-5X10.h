@@ -36,7 +36,7 @@ public:
 
   hd_5X10() { add_pin( "force-refresh", &refresh ); }
 
-  ~hd_5X10() {}
+  ~hd_5X10() throw() {}
 };
 
 #endif // HD44780U_TESTER_DEF_H

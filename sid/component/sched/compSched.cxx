@@ -1055,7 +1055,7 @@ private:
     }
 
 public:
-  ~scheduler_client()
+  ~scheduler_client() throw ()
     {
       // unschedule my events
       set_time (0);
@@ -1236,7 +1236,7 @@ public:
   scheduler_component_base():
     recursion_limited ("advancing", 1)
     {}
-  ~scheduler_component_base() {}
+  ~scheduler_component_base() throw () {}
 };
 
 
@@ -1404,6 +1404,7 @@ public:
       scheduler_component_ctor_2();
       scheduler_component_ctor_3();
     }
+  ~scheduler_component() throw () { }
 };
 
 

@@ -31,7 +31,7 @@ public:
 
   hd_europe() {}
 
-  ~hd_europe() {}
+  ~hd_europe() throw() {}
 };
 
 #endif // HD_EUROPE_DEF_H

@@ -94,7 +94,7 @@ public:
     add_bus( "bus", &bus );
   }
 
-  ~Busif() {}
+  ~Busif() throw () {}
 };
 
 static vector<string>

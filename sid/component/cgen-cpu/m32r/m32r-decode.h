@@ -169,10 +169,7 @@ struct m32rbf_scache {
   // argument buffer
   m32rbf_sem_fields fields;
 
-  // writeback flags
-  // Only used if profiling or parallel execution support enabled during
-  // file generation.
-  unsigned written;
+
 
   // decode given instruction
   void decode (m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn);

@@ -234,10 +234,7 @@ struct arm_scache {
   // argument buffer
   arm_sem_fields fields;
 
-  // writeback flags
-  // Only used if profiling or parallel execution support enabled during
-  // file generation.
-  unsigned written;
+
 
   // decode given instruction
   void decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, arm_insn_word entire_insn);

@@ -154,7 +154,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -162,7 +162,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -199,7 +199,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -207,7 +207,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -244,7 +244,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -252,7 +252,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -289,7 +289,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -297,7 +297,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -334,7 +334,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -342,7 +342,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -379,7 +379,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -387,7 +387,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -424,7 +424,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -432,7 +432,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -469,7 +469,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -477,7 +477,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -514,7 +514,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -554,7 +554,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -594,7 +594,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -634,7 +634,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -674,7 +674,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -682,7 +682,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -719,7 +719,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -727,7 +727,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -764,7 +764,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -772,7 +772,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -809,7 +809,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -817,7 +817,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -854,7 +854,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -862,7 +862,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -899,7 +899,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -907,7 +907,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -944,7 +944,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -952,7 +952,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -989,7 +989,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -997,7 +997,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1034,7 +1034,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -1042,7 +1042,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1079,7 +1079,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -1087,7 +1087,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1124,7 +1124,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -1132,7 +1132,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1169,7 +1169,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -1177,7 +1177,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1214,7 +1214,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -1254,7 +1254,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -1294,7 +1294,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -1334,7 +1334,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -1374,7 +1374,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -1382,7 +1382,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1419,7 +1419,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -1427,7 +1427,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1464,7 +1464,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -1472,7 +1472,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1509,7 +1509,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -1517,7 +1517,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1553,7 +1553,7 @@ arm_sem_str_post_dec_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1589,7 +1589,7 @@ arm_sem_str_post_dec_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1625,7 +1625,7 @@ arm_sem_str_post_inc_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1661,7 +1661,7 @@ arm_sem_str_post_inc_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1697,7 +1697,7 @@ arm_sem_str_post_dec_nonpriv_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1733,7 +1733,7 @@ arm_sem_str_post_dec_nonpriv_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1769,7 +1769,7 @@ arm_sem_str_post_inc_nonpriv_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1805,7 +1805,7 @@ arm_sem_str_post_inc_nonpriv_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -1965,7 +1965,7 @@ arm_sem_str_pre_dec_wb_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2001,7 +2001,7 @@ arm_sem_str_pre_dec_wb_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2037,7 +2037,7 @@ arm_sem_str_pre_inc_wb_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2073,7 +2073,7 @@ arm_sem_str_pre_inc_wb_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2109,7 +2109,7 @@ arm_sem_strb_post_dec_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2145,7 +2145,7 @@ arm_sem_strb_post_dec_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2181,7 +2181,7 @@ arm_sem_strb_post_inc_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2217,7 +2217,7 @@ arm_sem_strb_post_inc_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2253,7 +2253,7 @@ arm_sem_strb_post_dec_nonpriv_imm_offset (arm7f_cpu* current_cpu, arm_scache* se
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2289,7 +2289,7 @@ arm_sem_strb_post_dec_nonpriv_reg_offset (arm7f_cpu* current_cpu, arm_scache* se
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2325,7 +2325,7 @@ arm_sem_strb_post_inc_nonpriv_imm_offset (arm7f_cpu* current_cpu, arm_scache* se
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2361,7 +2361,7 @@ arm_sem_strb_post_inc_nonpriv_reg_offset (arm7f_cpu* current_cpu, arm_scache* se
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2521,7 +2521,7 @@ arm_sem_strb_pre_dec_wb_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2557,7 +2557,7 @@ arm_sem_strb_pre_dec_wb_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2593,7 +2593,7 @@ arm_sem_strb_pre_inc_wb_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2629,7 +2629,7 @@ arm_sem_strb_pre_inc_wb_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2789,7 +2789,7 @@ arm_sem_strh_pre_dec_wb_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2825,7 +2825,7 @@ arm_sem_strh_pre_dec_wb_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2861,7 +2861,7 @@ arm_sem_strh_pre_inc_wb_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2897,7 +2897,7 @@ arm_sem_strh_pre_inc_wb_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2933,7 +2933,7 @@ arm_sem_strh_post_dec_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -2969,7 +2969,7 @@ arm_sem_strh_post_dec_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3005,7 +3005,7 @@ arm_sem_strh_post_inc_imm_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3041,7 +3041,7 @@ arm_sem_strh_post_inc_reg_offset (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3078,7 +3078,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3118,7 +3118,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3158,7 +3158,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3198,7 +3198,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3238,7 +3238,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3246,7 +3246,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3283,7 +3283,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3291,7 +3291,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3328,7 +3328,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3336,7 +3336,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3373,7 +3373,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3381,7 +3381,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3418,7 +3418,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -3426,7 +3426,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3463,7 +3463,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -3471,7 +3471,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3508,7 +3508,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -3516,7 +3516,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3553,7 +3553,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -3561,7 +3561,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3598,7 +3598,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3638,7 +3638,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3678,7 +3678,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3718,7 +3718,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3758,7 +3758,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3766,7 +3766,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3803,7 +3803,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3811,7 +3811,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3848,7 +3848,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3856,7 +3856,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3893,7 +3893,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -3901,7 +3901,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3938,7 +3938,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -3946,7 +3946,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -3983,7 +3983,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -3991,7 +3991,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -4028,7 +4028,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -4036,7 +4036,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -4073,7 +4073,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -4081,7 +4081,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -4118,7 +4118,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -4158,7 +4158,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -4198,7 +4198,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -4238,7 +4238,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -4278,7 +4278,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -4286,7 +4286,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -4323,7 +4323,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -4331,7 +4331,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -4368,7 +4368,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -4376,7 +4376,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -4413,7 +4413,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 ((void) 0); /*nop*/
@@ -4421,7 +4421,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -4458,7 +4458,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -4466,7 +4466,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -4503,7 +4503,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = SUBSI (* FLD (i_rn), tmp_offset);
@@ -4511,7 +4511,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -4548,7 +4548,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -4556,7 +4556,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -4593,7 +4593,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, tmp_addr));
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
   tmp_addr = ADDSI (* FLD (i_rn), tmp_offset);
@@ -4601,7 +4601,7 @@ if (EQSI (FLD (f_rd), 15)) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -4628,7 +4628,7 @@ arm_sem_mul (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_result;
     * FLD (i_mul_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "mul-rd" << '[' << FLD (f_mul_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_mul_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -4670,7 +4670,7 @@ arm_sem_mla (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = ADDSI (MULSI (* FLD (i_rm), * FLD (i_rs)), * FLD (i_mul_rn));
     * FLD (i_mul_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "mul-rd" << '[' << FLD (f_mul_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_mul_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -4715,13 +4715,13 @@ arm_sem_umull (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = SUBWORDDISI (tmp_mul_result, 0);
     * FLD (i_rdhi) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rdhi" << '[' << FLD (f_rdhi) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rdhi) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = SUBWORDDISI (tmp_mul_result, 1);
     * FLD (i_rdlo) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rdlo" << '[' << FLD (f_rdlo) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rdlo) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -4767,13 +4767,13 @@ arm_sem_umlal (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = SUBWORDDISI (tmp_mul_result, 0);
     * FLD (i_rdhi) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rdhi" << '[' << FLD (f_rdhi) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rdhi) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = SUBWORDDISI (tmp_mul_result, 1);
     * FLD (i_rdlo) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rdlo" << '[' << FLD (f_rdlo) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rdlo) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -4818,13 +4818,13 @@ arm_sem_smull (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = SUBWORDDISI (tmp_mul_result, 0);
     * FLD (i_rdhi) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rdhi" << '[' << FLD (f_rdhi) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rdhi) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = SUBWORDDISI (tmp_mul_result, 1);
     * FLD (i_rdlo) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rdlo" << '[' << FLD (f_rdlo) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rdlo) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -4870,13 +4870,13 @@ arm_sem_smlal (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = SUBWORDDISI (tmp_mul_result, 0);
     * FLD (i_rdhi) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rdhi" << '[' << FLD (f_rdhi) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rdhi) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = SUBWORDDISI (tmp_mul_result, 1);
     * FLD (i_rdlo) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rdlo" << '[' << FLD (f_rdlo) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rdlo) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -4925,7 +4925,7 @@ arm_sem_swp (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_temp;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -4958,7 +4958,7 @@ arm_sem_swpb (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = tmp_temp;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -5031,7 +5031,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -5107,7 +5107,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -5179,7 +5179,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -5247,7 +5247,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -5323,7 +5323,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -5395,7 +5395,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -5463,7 +5463,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -5539,7 +5539,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -5611,7 +5611,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -5679,7 +5679,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -5755,7 +5755,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -5827,7 +5827,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -5895,7 +5895,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -5971,7 +5971,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -6043,7 +6043,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -6111,7 +6111,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -6187,7 +6187,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -6259,7 +6259,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -6329,7 +6329,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -6415,7 +6415,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -6527,7 +6527,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -6581,7 +6581,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -6667,7 +6667,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -6779,7 +6779,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -6833,7 +6833,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -6919,7 +6919,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -7031,7 +7031,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -7085,7 +7085,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -7171,7 +7171,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -7283,7 +7283,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -7337,7 +7337,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -7423,7 +7423,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -7535,7 +7535,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -7589,7 +7589,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -7675,7 +7675,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_set_cc_)) {
 {
@@ -7787,7 +7787,7 @@ if (FLD (f_set_cc_)) {
     SI opval = tmp_result;
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -8841,7 +8841,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -9241,7 +9241,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -9641,7 +9641,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -10041,7 +10041,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -10441,7 +10441,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -10841,7 +10841,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -11241,7 +11241,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -11641,7 +11641,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     SI opval = tmp_addr;
     * FLD (i_rn) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rn" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rn) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 
@@ -11665,7 +11665,7 @@ arm_sem_mrs_c (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = current_cpu->h_cpsr_get ();
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);
@@ -11688,7 +11688,7 @@ arm_sem_mrs_s (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = current_cpu->h_spsr_get ();
     * FLD (i_rd) = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "rd" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
   current_cpu->done_insn (npc, status);

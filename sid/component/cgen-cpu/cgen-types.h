@@ -12,6 +12,7 @@ namespace cgen {
 // Modes.
 
 typedef bool BI;
+typedef void VOID;
 
 typedef sid::signed_host_int_1 QI;
 typedef sid::signed_host_int_2 HI;

@@ -1,3 +1,7 @@
+2001-05-23  Ben Elliston  <bje@redhat.com>
+
+	* cgen-types.h (cgen::VOID): Typedef for void.
+
 2001-04-03  Ben Elliston  <bje@redhat.com>
 
 	* cgen-cpu.h (cgen_bi_endian_cpu::GETMEMUQI): New method.

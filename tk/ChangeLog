@@ -1,3 +1,7 @@
+2002-01-24  DJ Delorie  <dj@redhat.com>
+
+	* xlib/X11/Xutil.h (XEmptyRegion): Returns Bool.
+
 2001-10-28  Christopher Faylor  <cgf@redhat.com>
 
 	* win/configure.in: Modify 2001-10-10 change to check for cygwin host

@@ -44,7 +44,7 @@ GENERIC_MAPPING access_mapping;
 DWORD request_count = 0;
 
 // Version string.
-static const char version[] = "$Revision: 1.1.2.21 $";
+static const char version[] = "$Revision: 1.1.2.22 $";
 
 /*
  * Support function for the XXX_printf() macros in "woutsup.h".
@@ -440,7 +440,13 @@ request_loop (LPVOID LpParam)
   class transport_layer_base * transport = params->transport;
   while (queue->active)
   {
-    transport_layer_base * new_conn = transport->accept ();
+    bool recoverable = false;
+    transport_layer_base * const new_conn = transport->accept (&recoverable);
+    if (!new_conn && !recoverable)
+      {
+	system_printf ("fatal error on IPC transport: closing down");
+	queue->active = false;
+      }
     /* FIXME: this is a little ugly. What we really want is to wait on two objects:
      * one for the pipe/socket, and one for being told to shutdown. Otherwise
      * this will stay a problem (we won't actually shutdown until the request
@@ -648,23 +654,10 @@ main (const int argc, char *argv[])
       exit (1);
     }
 
-  /*
-   * This has been run in the cygwin DLL but we use some of the DLL
-   * functions, e.g. client_request::make_request() in the server so
-   * we need to duplicate it all up here.  Sigh.
-   */
-  cygserver_init (false);		// false == don't check version
-
-  assert (   cygserver_running == CYGSERVER_OK		\
-	  || cygserver_running == CYGSERVER_DEAD);
-
   if (shutdown)
     {
-      if (cygserver_running != CYGSERVER_OK)
-	{
-	  cout << pgm << ": cygserver is not running" << endl;
-	  exit (1);
-	}
+      // Needed for client_request::make_request ().
+      cygserver_running = CYGSERVER_OK;
 
       client_request_shutdown req;
 
@@ -678,12 +671,6 @@ main (const int argc, char *argv[])
       // FIXME: It would be nice to wait here for the daemon to exit.
 
       return 0;
-    }
-
-  if (cygserver_running == CYGSERVER_OK)
-    {
-      cout << pgm << ": cygserver is already running" << endl;
-      exit (1);
     }
 
   if (signal (SIGQUIT, handle_signal) == SIG_ERR)

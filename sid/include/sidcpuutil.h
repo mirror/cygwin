@@ -234,7 +234,11 @@ namespace sidutil
 	else
 	  *this << std::endl;
       }
+    private:
       bool cout_p;
+
+      template <typename T> friend
+      basic_cpu::cpu_trace_stream& operator<< (basic_cpu::cpu_trace_stream& s, T t);
     };
 
     template <typename T> friend
@@ -316,7 +320,9 @@ namespace sidutil
     }
 
   public:
+    void set_total_latency (sid::host_int_8 latency) { this->total_latency = latency; }
     void update_total_latency (sid::host_int_8 latency) { this->total_latency += latency; }
+    sid::host_int_8 get_total_latency () const  { return this->total_latency; }
 
   protected:
     virtual sid::host_int_8 latency_to_cycles (sid::host_int_8 num)

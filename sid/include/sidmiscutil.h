@@ -8,8 +8,10 @@
 #define SIDMISCUTIL_H
 
 #include <sidconfig.h>
+#include <sidpinutil.h>
 
 #include <string>
+#include <iostream>
 #include <fstream>
 #include <vector>
 #include <map>
@@ -20,7 +22,19 @@
 #ifdef __CYGWIN__
 #include <sys/cygwin.h>
 #endif
+// XXX: kludge for compatibility both with old & new libstdc++
+#if STD_CCTYPE
+#define STDCTYPE(func) std::func
+#else
+#define STDCTYPE(func) func
+#endif
 
+#include <limits.h>
+#include <stdio.h>
+#include <stdarg.h>
+
+using std::string;
+using std::vector;
 
 namespace sidutil
 {
@@ -376,6 +390,145 @@ namespace sidutil
     return file;
   }
 
+  class logger
+  {
+#define SID_LOG_PERSISTENT_BUFFER (HAVE_VSNPRINTF || ! HAVE_VASPRINTF)
+#define SID_LOG_TRANSIENT_MALLOC_BUFFER (! SID_LOG_PERSISTENT_BUFFER)
+  public:
+    logger (sidutil::output_pin *p_ulog_out_pin,
+	    bool p_buffer_output,
+	    sid::host_int_4 p_ulog_level,
+	    std::string p_ulog_mode) :
+      ulog_level (p_ulog_level),
+      ulog_mode (p_ulog_mode),
+      buffer_output (p_buffer_output),
+      buffer_size (4096), // big enough for now
+      saved_messages (),
+      saved_levels ()
+      {
+	ulog_out_pin = p_ulog_out_pin;
+#if SID_LOG_PERSISTENT_BUFFER
+	buffer = new char[buffer_size];
+#endif
+      }
+    ~logger () throw()
+      {
+	// Output any saved messages.
+	output_saved_messages ();
+#if SID_LOG_PERSISTENT_BUFFER
+	delete [] buffer;
+#endif
+      }
+
+    void set_attributes (bool p_buffer_output,
+ 			 sid::host_int_4 p_ulog_level,
+ 			 std::string p_ulog_mode)
+    {
+      buffer_output = p_buffer_output;
+      ulog_level  = p_ulog_level;
+      ulog_mode = p_ulog_mode;
+    }
+
+    virtual void log (sid::host_int_4 level, const char *fmt, va_list ap)
+      {
+	if (! buffer_output)
+	  {
+	    // Output any saved messages first
+	    output_saved_messages ();
+
+	    // Check the logging level and mode.
+	    if (! check_level (level))
+	      return;
+	  }
+
+	// Write the message into a buffer.
+	int length;
+	for (;;)
+	  {
+#if HAVE_VSNPRINTF
+	    length = vsnprintf (buffer, buffer_size, fmt, ap);
+	    if (length < buffer_size)
+	      break;
+	    delete [] buffer;
+	    buffer_size = length + 256;
+	    buffer = new char[buffer_size];
+#elif HAVE_VASPRINTF
+	    length = vasprintf (&buffer, fmt, ap);
+	    break;
+#else
+	    length = STDCTYPE(vsprintf) (buffer, fmt, ap);
+	    if (length >= buffer_size)
+	      std::cerr << "Error: ulog buffer overflow!!!" << std::endl;
+	    break;
+#endif
+	  }
+
+	// If the output pin is not connected yet, Save the message for
+	// later. This happens when the log message is issued from the
+	// component's constructor.
+	if (buffer_output)
+	  {
+	    saved_messages.push_back (std::string (buffer));
+	    saved_levels.push_back (level);
+	  }
+	else
+	  {
+	    // Otherwise, output the new message.
+	    for (int i = 0; i < length; ++i)
+	      ulog_out_pin->drive (buffer[i]);
+	  }
+
+#if SID_LOG_TRANSIENT_MALLOC_BUFFER
+	free (buffer);
+#endif
+      }
+
+  public:
+    bool check_level (sid::host_int_4 level)
+      {
+	if (level > ulog_level)
+	  return false;
+
+	if (level != ulog_level
+	    && (ulog_mode == "match" || ulog_mode == "equal"))
+	  return false;
+
+	return true;
+      }
+
+  public:
+    void output_saved_messages ()
+      {
+	while (saved_messages.size () > 0)
+	  {
+	    if (check_level (saved_levels[0]))
+	      {
+		std::string s = saved_messages[0];
+		for (int i = 0; i < s.size (); ++i)
+		  ulog_out_pin->drive (s[i]);
+	      }
+	    saved_messages.erase (saved_messages.begin ());
+	    saved_levels.erase (saved_levels.begin ());
+	  }
+      }
+
+  private:
+    sid::host_int_4 ulog_level;
+    std::string ulog_mode;
+    sidutil::output_pin *ulog_out_pin;
+    bool buffer_output;
+    char *buffer;
+    long buffer_size;
+    std::vector<std::string> saved_messages;
+    std::vector<sid::host_int_4> saved_levels;
+#undef SID_LOG_PERSISTENT_BUFFER
+#undef SID_LOG_TRANSIENT_MALLOC_BUFFER
+  public:
+    void delete_saved_messages ()
+    {
+      saved_messages.erase (saved_messages.end ());
+    }
+  };
 
 }
 

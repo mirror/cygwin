@@ -251,7 +251,7 @@ namespace sidutil
 #undef SID_GB_WRITE
 #undef SID_GB_READ
 
-  private:
+  protected:
     sid::bus** target;
   };
 

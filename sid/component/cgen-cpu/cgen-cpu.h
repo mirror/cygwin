@@ -1,6 +1,6 @@
 // cgen-cpu.h  -*- C++ -*-
 
-// Copyright (C) 2000, 2001, 2002 Red Hat.
+// Copyright (C) 2000, 2001, 2002, 2003 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -80,7 +80,6 @@ protected:
   static int cgen_symbol_at_address(bfd_vma addr, struct disassemble_info * info);
   // Counter tracing support
   void trace_counter (PCADDR pc);
-  host_int_8 trace_count;
 
 public:
   cgen_bi_endian_cpu ();

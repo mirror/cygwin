@@ -1,3 +1,9 @@
+2003-01-15  Dave Brolley  <brolley@redhat.com>
+
+	* compCGEN.cxx (cgen_bi_endian_cpu): Don't initialize trace_count.
+	(trace_counter): Use total_insn_count and total_latency.
+	* cgen-cpu.h (class cgen_bi_endian_cpu): Remove trace_count.
+
 2003-01-09  Frank Ch. Eigler  <fche@redhat.com>
 
 	* tracedis.cxx (bfd_{get,put}_bits): Use int, not obsolete bfd

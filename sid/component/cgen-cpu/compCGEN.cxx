@@ -1,6 +1,6 @@
 // compCGEN.cxx - CPU components.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2003 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -39,7 +39,6 @@ using namespace cgen;
 // ----------------------------------------------------------------------------
 cgen_bi_endian_cpu::cgen_bi_endian_cpu ()
 {
-  trace_count = 0;
   warnings_enabled = false;
   add_attribute ("enable-warnings?", & warnings_enabled, "setting");
   this->engine_type = ENGINE_UNKNOWN;
@@ -260,11 +259,8 @@ void
 cgen_bi_endian_cpu::trace_counter (PCADDR pc)
 {
   this->trace_stream
-    << this->trace_count++ << ' ' 
-    << (this->sched_query.now()-1) << '\t';
-
-  // Invalidate any local icaches; they distort approximate cycle counting.
-  this->flush_icache (pc);
+    << this->total_insn_count << ' ' 
+    << this->total_insn_count + this->total_latency << '\t';
 }
 
 

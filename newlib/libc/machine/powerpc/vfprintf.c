@@ -135,7 +135,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 #if defined(LIBC_SCCS) && !defined(lint)
 /*static char *sccsid = "from: @(#)vfprintf.c	5.50 (Berkeley) 12/16/92";*/
-static char *rcsid = "$Id: vfprintf.c,v 1.8 2002/08/23 01:56:03 fitzsim Exp $";
+static char *rcsid = "$Id: vfprintf.c,v 1.9 2004/05/26 00:19:14 jjohnstn Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 /*
@@ -153,11 +153,6 @@ static char *rcsid = "$Id: vfprintf.c,v 1.8 2002/08/23 01:56:03 fitzsim Exp $";
 #ifndef NO_FLOATING_POINT
 #define FLOATING_POINT
 #endif
-#endif
-
-#define _NO_LONGLONG
-#if defined WANT_PRINTF_LONG_LONG && defined __GNUC__
-# undef _NO_LONGLONG
 #endif
 
 #include <_ansi.h>
@@ -186,8 +181,13 @@ static char *rcsid = "$Id: vfprintf.c,v 1.8 2002/08/23 01:56:03 fitzsim Exp $";
    This could be changed in the future should the _ldtoa_r code be
    preferred over _dtoa_r.  */
 #define _NO_LONGDBL
-#if defined WANT_IO_LONG_DBL && (LDBL_MANT_DIG > DBL_MANT_DIG)
+#if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
+#endif
+
+#define _NO_LONGLONG
+#if defined _WANT_IO_LONG_LONG && defined __GNUC__
+# undef _NO_LONGLONG
 #endif
 
 #ifdef __ALTIVEC__

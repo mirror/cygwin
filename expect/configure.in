@@ -65,9 +65,10 @@ case "${host}" in
 *-*-cygwin*)
   if test -d $srcdir/../tcl/cygwin/.
   then
-    TCL_BUILD_LIB_SPEC="../tcl/cygwin/libtcl8.0.a"
+    TCL_BUILD_LIB_SPEC="../tcl/cygwin/libtcl_cygwin.a"
     # Use the same static lib for installed_expect
-    TCL_LIB_SPEC="../tcl/cygwin/libtcl8.0.a"
+    TCL_LIB_SPEC="../tcl/cygwin/libtcl_cygwin.a"
+    EXP_CYGWIN_ALTTCL='-DCYGWIN_ALTTCL'
   fi
   ;;
 esac
@@ -136,6 +137,7 @@ dnl case "${host}" in
 dnl   i[[3456]]86-*-linux*)	EXP_CFLAGS="" ;;
 dnl esac
 dnl END CYGNUS LOCAL
+EXP_CFLAGS="$EXP_CFLAGS $EXP_CYGWIN_ALTTCL"
 
 AC_MSG_CHECKING([if running Mach])
 mach=0

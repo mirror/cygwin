@@ -461,7 +461,7 @@ exp_init_event()
 }
 
 #ifdef __CYGWIN32__
-#if 0
+#ifndef CYGWIN_ALTTCL
 
 /* The Tcl_CreateFileHandler call is only defined on Unix.  We provide
    our own implementation here that works on cygwin32.  */
@@ -1077,5 +1077,5 @@ int fd;
 	}
 }
 
-#endif
+#endif /* CYGWIN_ALTTCL */
 #endif /* __CYGWIN32__ */

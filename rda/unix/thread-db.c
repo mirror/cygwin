@@ -45,7 +45,7 @@
 #include "lwp-pool.h"
 
 /* Make lots of noise (debugging output). */
-int thread_db_noisy = 1;
+int thread_db_noisy = 0;
 int proc_service_noisy = 0;
 
 /*

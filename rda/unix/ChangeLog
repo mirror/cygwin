@@ -1,5 +1,9 @@
 2004-12-03  Jim Blandy  <jimb@redhat.com>
 
+	Disable debugging messages by default.
+	* lwp-pool.c (debug_lwp_pool): Initialize to zero.
+	* thread-db.c (thread_db_noisy): Same.
+
 	Remove code to handle threads exiting without generating a wait
 	status; that was a kernel bug, not an intended feature, and
 	there's no easy way to support both.

@@ -37,7 +37,7 @@
 #include "lwp-pool.h"
 #include "lwp-ctrl.h"
 
-static int debug_lwp_pool = 1;
+static int debug_lwp_pool = 0;
 
 
 /* THE LIFETIME OF A TRACED LWP

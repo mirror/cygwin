@@ -385,7 +385,7 @@ is_extended_reg (int regnum)
 
 enum
 {
-  NUM_REGS = 70,
+  NUM_REGS = 72,
   PC_REGNUM = 37,
   sign_extend = 1
 };
@@ -478,8 +478,8 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
   { BADVADDR,      4, GREGS,  35 * 4, 4, PROTO_SIZE },      /* bad */
   { CAUSE,         4, GREGS,  36 * 4, 4, PROTO_SIZE },      /* cause */
 #else
-  { 0,             8, NOREGS, 0,      8, 8 },               /* bad */
-  { 0,             8, NOREGS, 0,      8, 8 },               /* cause */
+  { 0,             8, NOREGS, 0,      8, PROTO_SIZE },      /* bad */
+  { 0,             8, NOREGS, 0,      8, PROTO_SIZE },      /* cause */
 #endif
   { PC,            4, GREGS,  34 * 4, 4, PROTO_SIZE },      /* pc */
 
@@ -522,7 +522,10 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
   { FPR_BASE + 29, 4, FPREGS, 29 * 4, 4, PROTO_SIZE },      /* $f29 */
   { FPR_BASE + 30, 4, FPREGS, 30 * 4, 4, PROTO_SIZE },      /* $f30 */
   { FPR_BASE + 31, 4, FPREGS, 31 * 4, 4, PROTO_SIZE },      /* $f31 */
-  { FPC_CSR,       4, FPREGS, 64 * 4, 4, PROTO_SIZE }       /* fsr */
+  { FPC_CSR,       4, FPREGS, 64 * 4, 4, PROTO_SIZE },      /* fsr */
+  /* The "fir" value actually ends up occupying fp_pad in the fpregset
+     struct.  */
+  { FPC_EIR,       4, FPREGS, 65 * 4, 4, PROTO_SIZE }       /* fir */
 };
 
 static void mips_singlestep_program (struct gdbserv *serv);
@@ -535,7 +538,7 @@ static void mips_singlestep_program (struct gdbserv *serv);
 
 enum
 {
-  NUM_REGS = 70,
+  NUM_REGS = 72,
   PC_REGNUM = 37,
   sign_extend = 1
 };
@@ -642,7 +645,10 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
   { 32       + 29, 8, FPREGS, 29 * 8, 8, 8 },      /* $f29 */
   { 32       + 30, 8, FPREGS, 30 * 8, 8, 8 },      /* $f30 */
   { 32       + 31, 8, FPREGS, 31 * 8, 8, 8 },      /* $f31 */
-  { 69,            4, FPREGS, 32 * 8, 4, 8 }       /* fsr */
+  { 69,            8, FPREGS, 32 * 8, 4, 8 },      /* fsr */
+  /* The "fir" value actually ends up occupying fp_pad in the fpregset
+     struct.  */
+  { 70,            8, FPREGS, 33 * 8 + 4, 4, 8}    /* fir */
 };
 
 static void mips_singlestep_program (struct gdbserv *serv);

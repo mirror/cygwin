@@ -118,6 +118,7 @@ public:
 			     & generic_loader::save_state,
 			     & generic_loader::restore_state);
     }
+  ~generic_loader() throw() { }
     
 };
 

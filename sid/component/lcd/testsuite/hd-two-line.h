@@ -43,7 +43,7 @@ public:
 
   hd_two_line() {}
 
-  ~hd_two_line() {}
+  ~hd_two_line() throw() {}
 };
 
 #endif // HD_TWO_LINE_DEF_H

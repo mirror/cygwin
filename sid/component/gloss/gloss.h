@@ -67,7 +67,7 @@ class gloss32: public virtual component,
 public:
 
   gloss32();
-  virtual ~gloss32();
+  virtual ~gloss32() throw();
 
 protected:
 
@@ -198,7 +198,7 @@ class gloss64 : public gloss32
 public:
 
   gloss64();
-  virtual ~gloss64();
+  virtual ~gloss64() throw();
 
 protected:
 

@@ -32,8 +32,8 @@ enum {
 extern void init_rom_t6963c( bool japanese, unsigned char rom[][8] );
 
 T6963C :: T6963C( bool use_japan_rom ) : 
-  busif( this, &(T6963C::busRead), &(T6963C::busWrite) ),
-  refresh_sync( "refresh-sync", this, &(T6963C::refresh) ),
+  busif( this, &T6963C::busRead, &T6963C::busWrite ),
+  refresh_sync( "refresh-sync", this, &T6963C::refresh ),
   trigger_mgr( this )
 {
   add_pin( "row-col", &row_col );

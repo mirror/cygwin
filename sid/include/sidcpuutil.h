@@ -110,7 +110,7 @@ namespace sidutil
   public:
     void* operator new (size_t sz)
     {
-      void* p = std::operator new (sz);
+      void* p = ::operator new (sz);
       // Initialize the object with garbage, to ease detection of missing initialization.
       char* q = (char*) p;
       char deadbeef[] = { 0xde, 0xad, 0xbe, 0xef };
@@ -120,7 +120,7 @@ namespace sidutil
     }
     void operator delete (void* p)
     {
-      std::operator delete (p);
+      ::operator delete (p);
     }
 
     // recursion protection

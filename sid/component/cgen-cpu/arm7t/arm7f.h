@@ -60,7 +60,7 @@ class arm7f_cpu: public arm7f_cpu_cgen, public cgen_bi_endian_cpu
 {
 public:
   arm7f_cpu ();
-  ~arm7f_cpu () {}
+  ~arm7f_cpu () throw() {}
 
   // Called by the semantic code to perform a branch.
   // The result is the new address.

@@ -7,13 +7,13 @@
 #include "cacheutil.h"
 
 bool
-std::operator== (const cache_tag& tag, const cache_line& line)
+operator== (const cache_tag& tag, const cache_line& line)
 {
   return (line.valid_p () && tag == line.tag ());
 }
 
 bool
-std::operator== (const cache_line& line, const cache_tag& tag)
+operator== (const cache_line& line, const cache_tag& tag)
 {
   return (line.valid_p () && tag == line.tag ());
 }
@@ -47,6 +47,13 @@ cache_line::operator= (const cache_line& other)
   return *this;
 }
 
+using std::cerr;
+using std::hex;
+using std::setw;
+using std::setfill;
+using std::endl;
+using std::dec;
+
 void
 cache_line::dump () const
 {
@@ -66,22 +73,22 @@ cache_line::dump () const
 cache_line::cache_line (unsigned line_size)
   :size (line_size), valid_bit (false), dirty_bit (false), lock_bit (false), atag (0)
 {
-  data = new byte[line_size];
+  data = new byte [line_size];
   memset (data, 0, line_size);
 }
 
 cache_line::cache_line (unsigned line_size, cache_tag t)
   :size (line_size), valid_bit (false), dirty_bit (false), lock_bit (false), atag (t)
 {
-  data = new byte[line_size];
+  data = new byte [line_size];
   memset (data, 0, line_size);
 }
 
-cache_line::cache_line (unsigned line_size, cache_tag t, vector<byte> initial_data)
+cache_line::cache_line (unsigned line_size, cache_tag t, std::vector <byte> initial_data)
   :size (line_size), valid_bit (false), dirty_bit (false), lock_bit (false), atag (t)
 {
   assert (initial_data.size () == line_size);
-  data = new byte[line_size];
+  data = new byte [line_size];
   for (unsigned i = 0; i < line_size; i++)
     data[i] = initial_data[i];
 }

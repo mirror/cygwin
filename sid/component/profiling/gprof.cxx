@@ -341,6 +341,7 @@ namespace profiling_components
 	add_attribute ("output-file-endianness", & this->output_file_format, "setting");
 	add_uni_relation ("target-component", & this->target_component);
       }
+    ~gprof_component () throw () { }
   };
 
 

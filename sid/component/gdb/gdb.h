@@ -74,7 +74,7 @@ class gdb: public virtual component,
 {
 public:
   gdb();
-  ~gdb();
+  ~gdb() throw();
 
 private:
   friend class callback_pin<gdb>;

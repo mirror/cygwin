@@ -184,7 +184,8 @@ private:
 
 
   public:
-    socketio(bool server_p);
+    socketio (bool server_p);
+    ~socketio () throw();
   };
 
 

@@ -1,3 +1,8 @@
+2001-08-03  matthew green  <mrg@redhat.com>
+
+	* compIDE.cxx (~ide_hooking_register_bus): Add prototype.
+	(~ide_controller): Add throw() specifier.
+
 2001-07-13  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (check-local): Rename target from "checkme".

@@ -20,8 +20,8 @@ extern void init_rom_europe( unsigned char rom[][8] );
 extern void init_rom_5X10( unsigned char rom[][11] );
 
 HD44780U :: HD44780U( bool use_japan_rom ) : 
-  busif( this, &(HD44780U::busRead), &(HD44780U::busWrite) ),
-  refresh_sync( "refresh-sync", this, &(HD44780U::refresh) ),
+  busif( this, &HD44780U::busRead, &HD44780U::busWrite ),
+  refresh_sync( "refresh-sync", this, &HD44780U::refresh ),
   trigger_mgr( this )
 {
   int i, j;

@@ -1,3 +1,7 @@
+2001-08-03  matthew green  <mrg@redhat.com>
+
+	* arm7t-timer.h (dtor): Add prototype.
+
 2001-07-06  Frank Ch. Eigler  <fche@redhat.com>
 
         * Makefile.am (ACLOCAL_AMFLAGS): Define.

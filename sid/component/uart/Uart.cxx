@@ -192,9 +192,9 @@ public:
 
 Uart :: Uart()
    :triggerpoint_manager(this), 
-    busif( this, &(Uart::busReadHandler), &(Uart::busWriteHandler) ),
+    busif( this, &Uart::busReadHandler, &Uart::busWriteHandler ),
     sin( this, &Uart::sinHandler ), 
-    reset_pin( this, &(Uart::reset) ),
+    reset_pin( this, &Uart::reset ),
     rx_timeout( "rx-timeout", this, &Uart::rxWatchdog ),
     tx_timeout( "tx-timeout", this, &Uart::txWatchdog )
 {

@@ -610,6 +610,7 @@ namespace sidutil
 			       sid::host_int_4 address);
     void add_readwrite_register(control_register<DataType>* reg,
 				sid::host_int_4 address);
+    ~control_register_bank () throw () { }
     
   private:
     typedef std::vector<control_register<DataType>*> reg_vector;

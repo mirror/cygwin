@@ -82,7 +82,7 @@ public:
 
   void run( host_int_4 );
 
-  ~T6963C_tester() {}
+  ~T6963C_tester() throw() {}
 };
 
 #endif // T6963C_JAPAN_DEF_H

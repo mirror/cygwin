@@ -177,7 +177,7 @@ public:
 
   void reset();
 
-  ~T6963C() {}
+  ~T6963C() throw() {}
 };
 
 #endif // T6963C_DEF_H

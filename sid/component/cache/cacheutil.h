@@ -89,10 +89,8 @@ private:
 };
 
 // Allow cache tags and a line's cache tag to be compared directly.
-
-bool std::operator== (const cache_tag&, const cache_line&);
-bool std::operator== (const cache_line&, const cache_tag&);
-
+bool operator== (const cache_tag&, const cache_line&);
+bool operator== (const cache_line&, const cache_tag&);
 
 // A class from which all replacement algorithms should be derived.
 

@@ -28,7 +28,7 @@ public:
 
   hd_one_line() { add_pin( "force-refresh", &refresh ); }
 
-  ~hd_one_line() {}
+  ~hd_one_line() throw () {}
 };
 
 #endif // HD_ONE_LINE_DEF_H

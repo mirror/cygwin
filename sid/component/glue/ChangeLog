@@ -1,3 +1,9 @@
+2001-08-03  matthew green  <mrg@redhat.com>
+
+	* glue.cxx (~sequence_component): Add prototype.
+	(~attr_storage_component, ~probing_bus, ~bus_mux): Add throw()
+	specifier.
+
 2001-07-13  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (check-local): Rename target from "checkme".

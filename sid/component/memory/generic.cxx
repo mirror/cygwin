@@ -91,7 +91,7 @@ generic_memory::generic_memory() throw (bad_alloc):
 }
 
 
-generic_memory::~generic_memory ()
+generic_memory::~generic_memory () throw()
 {
   assert (this->buffer);
   if (this->mmapping_p)

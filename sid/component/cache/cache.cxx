@@ -12,6 +12,7 @@
 #include <sidattrutil.h>
 #include <sidpinutil.h>
 #include <sidbusutil.h>
+#include <sidmiscutil.h>
 #include <sidtypes.h>
 
 #include <algorithm>
@@ -628,91 +629,73 @@ CacheListTypes ()
 static component*
 CacheCreate (const string& typeName)
 {
+  int i;
   bool match;
-  int i, index = 0, pos;
-  int assoc, linesz, cachesz;
 
   if (typeName == "hw-cache-basic")
     return new cache_component (1, 16384, 32, null_replacement);
-
-  if (typeName.find ("hw-cache-", index) != 0)
-    return 0;
-  index += strlen ("hw-cache-");
   
-  // parse assoc + "/"
-  if ((pos = typeName.find_first_of ("/", index)) == string::npos)
+  vector<string> parts = sidutil::tokenize (typeName, "-/");
+
+  if (parts.size () < 5 || parts[0] != "hw" || parts[1] != "cache")
     return 0;
-  string assoc_string = typeName.substr (index, (pos - index));
-  index = pos + 1;
-
-  string cache_size_string;
-
-  // Parse "<x>kb", where <x> is a positive integer. 
-  if ((pos = typeName.find_first_of ("/", index)) == string::npos)
-    return 0;
-  cache_size_string = typeName.substr (index, (pos - index));
-  index = pos + 1;
-
-  if ((pos = cache_size_string.find ("kb", 0)) == string::npos)
-    return 0;
-  cache_size_string.erase (pos, cache_size_string.length () - pos);
-
-  string line_size_string;
-  string replace_alg_string;
-
-  if (assoc_string == "direct")
-    line_size_string = typeName.substr (index, (typeName.length () - index));
-  else
-    {
-      if ((pos = typeName.find_first_of ("/", index)) == string::npos)
-	return 0;
-      line_size_string = typeName.substr (index, (pos - index));
-      index = pos + 1;
-      replace_alg_string = typeName.substr (index, (typeName.length () - index));
-    }
-
+  
+  string assoc_string = parts[2];
   for (match = false, i = 0; i < sizeof (assocs) / sizeof (string); i++)
-    if (assoc_string == assocs[i]) 
+    if (assoc_string == assocs[i])
       match = true;
+
   if (!match)
     return 0;
-
+  
+  // Parse "<x>kb", where <x> is a positive integer. 
+  int cache_sz;
+  string cache_size_string = parts[3].substr (0, parts[3].length() - 2);
   for (match = false, i = 0; i < sizeof (cache_sizes) / sizeof (string); i++)
     if (cache_size_string == cache_sizes[i])
       {
-	cachesz = atoi (cache_size_string.c_str ()) * 1024;
+	cache_sz = atoi (cache_size_string.c_str ()) * 1024;
 	match = true;
       }
+
   if (!match)
     return 0;
   
+  int line_sz;
+  string line_size_string = parts[4];
   for (match = false, i = 0; i < sizeof (line_sizes) / sizeof (string); i++)
     if (line_size_string == line_sizes[i])
       {
-	linesz = atoi (line_size_string.c_str ());
+	line_sz = atoi (line_size_string.c_str ());
 	match = true;
       }
+
   if (!match)
     return 0;
   
+  string replace_alg_string;
   if (assoc_string != "direct")
-    {
-      for (match = false, i = 0;
-	   i < sizeof (replacement_algorithms) / sizeof (string); i++)
-	{
+    if (parts.size () < 6)
+      return 0;
+    else
+      {
+	replace_alg_string = parts[5];
+	for (match = false, i = 0; i < sizeof (replacement_algorithms) / sizeof (string); i++)
 	  if (replace_alg_string == replacement_algorithms[i])
 	    match = true;
-	}
-      if (!match)
-	return 0;
-    }
-
+	
+	if (!match)
+	  return 0;
+      }
+  
+  int assoc;
   if (assoc_string == "full")
     assoc = 0;
   else if (assoc_string == "direct")
     assoc = 1;
   else
     {
+      int pos;
       if ((pos = assoc_string.find ("way", 0)) == string::npos)
         return 0;
       assoc_string.erase (pos, assoc_string.length () - pos);
@@ -721,14 +704,14 @@ CacheCreate (const string& typeName)
     }
 
   if (assoc == 1)
-    return new cache_component (assoc, cachesz, linesz, null_replacement);
-
+    return new cache_component (assoc, cache_sz, line_sz, null_replacement);
+  
   if (replace_alg_string == "lru")
-    return new cache_component (assoc, cachesz, linesz, lru_replacement);
+    return new cache_component (assoc, cache_sz, line_sz, lru_replacement);
   else if (replace_alg_string == "fifo")
-    return new cache_component (assoc, cachesz, linesz, fifo_replacement);
+    return new cache_component (assoc, cache_sz, line_sz, fifo_replacement);
   else if (replace_alg_string == "random")
-    return new cache_component (assoc, cachesz, linesz, random_replacement);
+    return new cache_component (assoc, cache_sz, line_sz, random_replacement);
 
   return 0;
 }

@@ -401,7 +401,7 @@ The syntax of @code{define-isa} is:
   (default-insn-word-bitsize n)
   (default-insn-bitsize n)
   (base-insn-bitsize n)
-  (decode-assist (b0 b1 b2 ...))
+  (decode-assist (b0 b1 b2 ...)) ; optional
   (liw-insns n)
   (parallel-insns n)
   (condition ifield-name expr)
@@ -455,11 +455,11 @@ at a time as 16 bit instructions always come in pairs.
 @subsubsection decode-assist
 @cindex decode-assist
 
-Which bits to initially use to decode the instruction.
-For example on the SPARC these are bits: 31 30 24 23 22 21 20 19.
-The rest of the decoder is machine generated.
-The intent of @code{decode-assist} is to give the machine generated
-code a head start.
+Override CGEN's guess about which bits to initially use to decode the
+instruction.  For example on the SPARC these are bits: 31 30 24 23 22 21 20 19.
+The entire decoder can be machine generated, so this field is entirely
+optional.  The intent of @code{decode-assist} is to give the machine
+generated code a head start, to prime the built-in heuristics.
 
 ??? It might be useful to provide greater control, but this is sufficient
 for now.

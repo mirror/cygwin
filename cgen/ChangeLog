@@ -1,3 +1,20 @@
+2002-01-03  Dave Brolley  <brolley@redhat.com>
+
+	* decode.scm (-distinguishing-bit-population): Compute num-insns, the
+	number of insns in the list.  Update the population count function to
+	identify and prioritize 3 catgories of useful bits.
+	(-population-top-few): Don't consider bits with a population count of
+	zero.
+	(-build-decode-table-entry): Don't call
+	filter-harmlessly-ambiguous-insns.  Filter out non-specialized and
+	identical insns at the next tree level.
+	* insn.scm (filter-harmlessly-ambiguous-insns): Note in a comment that
+	this function is no longer used.
+	(filter-non-specialized-ambiguous-insns): New function.
+	(filter-identical-ambiguous-insns): New function.
+	(find-identical-insn): New function.
+	(filter-harmlessly-ambiguous-insns): Removed.
+
 2001-11-26  Geoffrey Keating  <geoffk@redhat.com>
 	    matthew green  <mrg@redhat.com>
 	    Frank Ch. Eigler  <fche@redhat.com>

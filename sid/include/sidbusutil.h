@@ -255,6 +255,58 @@ namespace sidutil
     sid::bus** target;
   };
   
+  // This sort of bus passes accesses through to one of two buses which
+  // are specified by meta-pointers.  Access can be switched dynamically.
+  class mux_passthrough_bus: public sid::bus
+  {
+  public:
+    mux_passthrough_bus(sid::bus** t1, sid::bus** t2): index(0), target(t1) 
+      {
+	assert (t1 != 0);
+        assert (t2 != 0);
+        t[0] = t1;
+        t[1] = t2;
+      }
+    ~mux_passthrough_bus() {}
+    void switch_bus() { index ^= 1; target = t[index]; }
+    
+    // Some macros to make manufacturing of the cartesian-product
+    // calls simpler.
+#define SID_GB_WRITE(dtype) \
+      sid::bus::status write(sid::host_int_4 addr, dtype data) throw ()\
+	  { if (*target) return (*target)->write(addr, data); else return sid::bus::unpermitted; }
+
+#define SID_GB_READ(dtype) \
+      sid::bus::status read(sid::host_int_4 addr, dtype& data) throw ()\
+	  { if (*target) return (*target)->read(addr, data); else return sid::bus::unpermitted; }
+
+    SID_GB_WRITE(sid::little_int_1)
+    SID_GB_WRITE(sid::big_int_1)
+    SID_GB_WRITE(sid::little_int_2)
+    SID_GB_WRITE(sid::big_int_2)
+    SID_GB_WRITE(sid::little_int_4)
+    SID_GB_WRITE(sid::big_int_4)
+    SID_GB_WRITE(sid::little_int_8)
+    SID_GB_WRITE(sid::big_int_8)
+
+    SID_GB_READ(sid::little_int_1)
+    SID_GB_READ(sid::big_int_1)
+    SID_GB_READ(sid::little_int_2)
+    SID_GB_READ(sid::big_int_2)
+    SID_GB_READ(sid::little_int_4)
+    SID_GB_READ(sid::big_int_4)
+    SID_GB_READ(sid::little_int_8)
+    SID_GB_READ(sid::big_int_8)
+
+#undef SID_GB_WRITE
+#undef SID_GB_READ
+
+  private:
+    int index;
+    sid::bus** target;
+    sid::bus** t[2];
+  };
+
   // The passthrough_word_bus maps memory and either directly passes through to the underlying
   // bus or else converts the incoming bus access call to a particular
   // preferred size & type.  The bus object is addressable as if it

@@ -1,5 +1,5 @@
 setInvAttV.badconf:4: component main attribute verbose? bad value anything
-setInvAttV.badconf:24: component target-sched attribute enabled? bad value -234
+setInvAttV.badconf:28: component host-sched attribute enabled? bad value true
 setInvAttV.badconf:30: component host-sched attribute 0-regular? not found
 setInvAttV.badconf:31: component host-sched attribute 0-time not found
 setInvAttV.badconf:34: component mem attribute size bad value ~!@#$%^&

@@ -1,3 +1,9 @@
+2001-12-10  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.cfgroot/setInvAttV.badconf: Allow numeric values to
+	accomodate for a recent change to sid-sched-* components.
+	* sidcomp.cfgroot/setInvAttV.expect: Ditto.
+
 2001-10-10  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidcomp.gloss/angel.exp (syscalls): Correct read<->readc numbers.

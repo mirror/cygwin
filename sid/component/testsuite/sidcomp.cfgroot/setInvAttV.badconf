@@ -21,11 +21,11 @@ new hw-memory-ram/rom-basic mem
 
 # Scheduler
 
-set target-sched enabled? -234			# should be positive value
+set target-sched enabled? -234
 set target-sched num-clients 0			# should be positive numeric value
 # unsigned num-clients
 
-set host-sched enabled? true			# should be 0 or 1
+set host-sched enabled? true			# should be numeric
 set host-sched num-clients -0
 set host-sched 0-regular? 1
 set host-sched 0-time fifty			# should be numeric value

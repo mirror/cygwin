@@ -105,11 +105,11 @@ AUTOMAKE_OPTIONS = foreign
 pkglib_LTLIBRARIES = libconsoles.la
 
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include
-libconsoles_la_SOURCES = stdio.cxx socketio.cxx components.cxx
+libconsoles_la_SOURCES = stdio.cxx fileio.cxx socketio.cxx components.cxx
 libconsoles_la_LDFLAGS = -module -no-undefined
 libconsoles_la_LIBADD = $(socket_libs)
 
-pkgdata_DATA = sid-io-stdio.txt sid-io-socket.txt hw-visual-tty.tk
+pkgdata_DATA = sid-io-stdio.txt sid-io-fileio.txt sid-io-socket.txt hw-visual-tty.tk
 
 DEJAGNUTESTS = stdio.exp consdocs.exp consmonkey.exp stdioval.exp stdioinv.exp socketval.exp socketinv.exp
 
@@ -127,7 +127,7 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libconsoles_la_DEPENDENCIES = 
-libconsoles_la_OBJECTS =  stdio.lo socketio.lo components.lo
+libconsoles_la_OBJECTS =  stdio.lo fileio.lo socketio.lo components.lo
 CXXFLAGS = @CXXFLAGS@
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -147,7 +147,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/components.P .deps/socketio.P .deps/stdio.P
+DEP_FILES =  .deps/components.P .deps/fileio.P .deps/socketio.P \
+.deps/stdio.P
 SOURCES = $(libconsoles_la_SOURCES)
 OBJECTS = $(libconsoles_la_OBJECTS)
 

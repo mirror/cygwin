@@ -62,6 +62,9 @@
     <title>Related components</title>
 
 <p>
+    See sid-io-fileio for writing to a stream.
+</p>
+<p>
     You can connect a stdio console to a serial data transmission
     component, such as a UART. You can also connect it to a 
     ROM monitor/system call emulator, such as the <complib>sw-gloss-arm/angel</complib> 

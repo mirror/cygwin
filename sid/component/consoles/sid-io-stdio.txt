@@ -53,6 +53,8 @@ Environment:
 
    Related components
 
+   See sid-io-fileio for writing to a stream.
+
    You can connect a stdio console to a serial data transmission component,
    such as a UART. You can also connect it to a ROM monitor/system call
    emulator, such as the sw-gloss-arm/angel which performs I/O across some

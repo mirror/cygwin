@@ -1,7 +1,7 @@
 // file.cxx - Joint header file for nearby component classes.
 // -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2003 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -109,7 +109,36 @@ private:
   // save & restore state
   string save_state ( );
   component::status restore_state (const string& state);
+};
 
+
+// -------------------------------------------------------------------------
+
+class fileioConsole: public virtual component, 
+		    protected fixed_attribute_map_component,
+		    protected no_bus_component,
+		    protected fixed_pin_map_component,
+		    protected no_accessor_component,
+		    protected no_relation_component
+{
+public:
+  fileioConsole();
+ ~fileioConsole () throw();
+
+private:
+  void filename_attribute_set ();
+
+  void write(host_int_4 value);
+  void closeOutStream ();
+
+  callback_pin<fileioConsole> out_pin;
+
+  // save & restore state
+  string save_state ( );
+  component::status restore_state (const string& state);
+
+  string out_filename;
+  ostream *out_stream;
 };
 
 

@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libconsoles.la" dlsym="console_component_library">
+  <defcomponent name="sid-io-fileio" type="concrete">
+
+
+    <!-- pins -->
+    <defpin name="write" direction="in" legalvalues="any character code" behaviors="output" />
+
+
+    <!-- attributes -->
+    <defattribute name="filename" legalvalues="valid file name" />
+    <defattribute name="state-snapshot" legalvalues="opaque string" behaviors="state save/restore" />
+  </defcomponent>
+  <synop>
+  This component performs input/output on the standard input/output. 
+  </synop>
+  <func>
+    <modelling>
+
+<p>
+    This component acts as an interface between the host system's
+    file system and pins in the simulated system.
+</p>
+
+    </modelling>
+
+    <behavior name="output">
+    When the <pin>write</pin> input pin is driven with a value between 0 and
+    255, the value is immediately written to the stream associated with this component.
+
+    Setting the <attribute>filename</attribute> attribute associates a file with the
+    output stream. Setting this attribute with the value "-" associates the output
+    stream with cout.
+
+    By default, the output stream is associated with cout.
+    </behavior>
+
+    <convention name="functional" supported="true"/>
+    <convention name="save/restore" supported="true">
+      <p>null state save/restore.</p>
+    </convention>
+  </func>
+  
+  
+
+  <env>
+    <title>Related components</title>
+
+<p>
+    See sid-io-stdio for input and output from stdin/stdout.
+</p>    
+
+  </env>
+</defcomplib>
+
+

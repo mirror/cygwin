@@ -1,10 +1,8 @@
 // generic.cxx - a class of generic memories.  -*- C++ -*-
 
-// Copyright (C) 1999-2001 Red Hat.
+// Copyright (C) 1999-2001,2003 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
-
-#define _POSIX_C_SOURCE 199506L
 
 #include "config.h"
 #include "generic.h"

@@ -1,3 +1,7 @@
+2003-06-10  Dave Brolley  <brolley@redhat.com>
+
+	* generic.cxx: Don't define _POSIX_C_SOURCE.
+
 2001-08-03  matthew green  <mrg@redhat.com>
 
 	* generic.cxx (~generic_memory): Add throw() specifier.

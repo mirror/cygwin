@@ -1,3 +1,9 @@
+2002-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sid-cpu.scm (-gen-hardware-types): Generate single hardware union
+	for multiple-isa configurations.
+	* sid-decode.scm (-gen-decode-fn): Tolerate empty insn list.
+
 2002-02-04  Ben Elliston  <bje@redhat.com>
 
 	* cpu/sh.cpu, cpu/sh.opc: New files.

@@ -1566,7 +1566,7 @@ parse_foo (CGEN_CPU_DESC cd,
 	   unsigned long *valuep);
 @end example
 
-@code{cd} is the result of @code{<arch>_cgen_opcode_open}.
+@code{cd} is the result of @code{<arch>_cgen_cpu_open}.
 @code{strp} is a pointer to a pointer to the assembler and is updated by
 the function.
 @c FIXME
@@ -1590,7 +1590,7 @@ void print_foo (CGEN_CPU_DESC cd,
                 int length);
 @end example
 
-@samp{cd} is the result of @code{<arch>_cgen_opcode_open}.
+@samp{cd} is the result of @code{<arch>_cgen_cpu_open}.
 @samp{ptr} is the `info' argument to print_insn_<arch>.
 @samp{value} is the value to be printed.
 @samp{attrs} is the set of boolean attributes.

@@ -1,3 +1,9 @@
+2001-05-09  Ben Elliston  <bje@redhat.com>
+
+	* doc/porting.texi (Doing a GAS port): Replace `cgen_opcode_open'
+	with `cgen_cpu_open'; documentation had become out of date.
+	* doc/rtl.texi (Instruction operands): Likewise.
+
 2001-05-07  Frank Ch. Eigler  <fche@redhat.com>
 
 	* iformat.scm (compute-insn-base-mask-length): Rewrite to tolerate

@@ -19,7 +19,7 @@ itk::usual PanedWindow {
 # ------------------------------------------------------------------
 #                            PANEDWINDOW
 # ------------------------------------------------------------------
-class cyg::PanedWindow {
+itcl::class cyg::PanedWindow {
   inherit itk::Widget
 
   constructor {args} {}
@@ -102,7 +102,7 @@ option add *PanedWindow.height 10 widgetDefault
 # ------------------------------------------------------------------
 #                        CONSTRUCTOR
 # ------------------------------------------------------------------
-body cyg::PanedWindow::constructor {args} {
+itcl::body cyg::PanedWindow::constructor {args} {
   itk_option add hull.width hull.height
 
   pack propagate $itk_component(hull) no
@@ -124,7 +124,7 @@ body cyg::PanedWindow::constructor {args} {
 # Specifies the orientation of the sashes.  Once the paned window
 # has been mapped, set the sash bindings and place the panes.
 # ------------------------------------------------------------------
-configbody cyg::PanedWindow::orient {
+itcl::configbody cyg::PanedWindow::orient {
   #puts "orient $_initialized"
   if {$_initialized} {
     set orient $itk_option(-orient)
@@ -150,7 +150,7 @@ configbody cyg::PanedWindow::orient {
 #
 # Specifies the width of the sash.
 # ------------------------------------------------------------------
-configbody cyg::PanedWindow::sashwidth {
+itcl::configbody cyg::PanedWindow::sashwidth {
   set pixels [winfo pixels $itk_component(hull) $itk_option(-sashwidth)]
   set itk_option(-sashwidth) $pixels
   
@@ -172,7 +172,7 @@ configbody cyg::PanedWindow::sashwidth {
 #
 # Specifies the color of the sash.
 # ------------------------------------------------------------------
-configbody cyg::PanedWindow::sashcolor {
+itcl::configbody cyg::PanedWindow::sashcolor {
   if {$_initialized} {
     for {set i 1} {$i < [llength $_panes]} {incr i} {
       $itk_component(sash$i) configure -background $itk_option(-sashcolor)
@@ -191,7 +191,7 @@ configbody cyg::PanedWindow::sashcolor {
 # requested tag, numerical index, or keyword "end".  Returns the pane's 
 # numerical index if found, otherwise error.
 # ------------------------------------------------------------------    
-body cyg::PanedWindow::index {index} {
+itcl::body cyg::PanedWindow::index {index} {
   if {[llength $_panes] > 0} {
     if {[regexp {(^[0-9]+$)} $index]} {
       if {$index < [llength $_panes]} {
@@ -220,7 +220,7 @@ body cyg::PanedWindow::index {index} {
 # without an index return a list of all the child site panes.  The 
 # list is ordered from the near side (left/top).
 # ------------------------------------------------------------------
-body cyg::PanedWindow::childsite {args} {
+itcl::body cyg::PanedWindow::childsite {args} {
   #puts "childsite $args ($_initialized)"
   
   if {[llength $args] == 0} {
@@ -244,7 +244,7 @@ body cyg::PanedWindow::childsite {args} {
 # pane constructor.  These include -margin, and -minimum.  The path 
 # of the pane is returned.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::add {tag args} {
+itcl::body cyg::PanedWindow::add {tag args} {
   itk_component add $tag {
     eval cyg::Pane $itk_interior.pane[incr _unique] $args
   } {
@@ -265,7 +265,7 @@ body cyg::PanedWindow::add {tag args} {
 # pane constructor.  These include -margin, -minimum.  The path of 
 # the pane is returned.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::insert {index tag args} {
+itcl::body cyg::PanedWindow::insert {index tag args} {
   itk_component add $tag {
     eval cyg::Pane $itk_interior.pane[incr _unique] $args
   } {
@@ -284,7 +284,7 @@ body cyg::PanedWindow::insert {index tag args} {
 #
 # Delete the specified pane.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::delete {index} {
+itcl::body cyg::PanedWindow::delete {index} {
   set index [index $index]
   set tag [lindex $_panes $index]
 
@@ -308,7 +308,7 @@ body cyg::PanedWindow::delete {index} {
 #
 # Remove the specified pane from the paned window. 
 # ------------------------------------------------------------------
-body cyg::PanedWindow::hide {index} {
+itcl::body cyg::PanedWindow::hide {index} {
   set index [index $index]
   set tag [lindex $_panes $index]
   
@@ -320,7 +320,7 @@ body cyg::PanedWindow::hide {index} {
   reset
 }
 
-body cyg::PanedWindow::replace {pane1 pane2} {
+itcl::body cyg::PanedWindow::replace {pane1 pane2} {
   set ind1 [lsearch -exact $_activePanes $pane1]
   if {$ind1 == -1} {
     error "$pane1 is not an active pane name."
@@ -338,7 +338,7 @@ body cyg::PanedWindow::replace {pane1 pane2} {
 #
 # Display the specified pane in the paned window.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::show {index} {
+itcl::body cyg::PanedWindow::show {index} {
   set index [index $index]
   set tag [lindex $_panes $index]
   
@@ -356,7 +356,7 @@ body cyg::PanedWindow::show {index} {
 # panes from the PanedWindow level.  The options may have any of the 
 # values accepted by the add method.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::paneconfigure {index args} {
+itcl::body cyg::PanedWindow::paneconfigure {index args} {
   set index [index $index]
   set tag [lindex $_panes $index]
   return [uplevel $itk_component($tag) configure $args]
@@ -367,7 +367,7 @@ body cyg::PanedWindow::paneconfigure {index args} {
 #
 # Redisplay the panes based on the default percentages of the panes.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::reset {} {
+itcl::body cyg::PanedWindow::reset {} {
   if {$_initialized && [llength $_panes]} {
     #puts RESET
     _setActivePanes
@@ -382,7 +382,7 @@ body cyg::PanedWindow::reset {} {
 #
 # Resets the active pane list.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_setActivePanes {} {
+itcl::body cyg::PanedWindow::_setActivePanes {} {
   set _prevActivePanes $_activePanes
   set _activePanes {}
   
@@ -399,7 +399,7 @@ body cyg::PanedWindow::_setActivePanes {} {
 # Performs operations necessary following a configure event.  This
 # includes placing the panes.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_eventHandler {width height} {
+itcl::body cyg::PanedWindow::_eventHandler {width height} {
   #puts "Event $width $height"
   set _width $width
   set _height $height
@@ -434,7 +434,7 @@ body cyg::PanedWindow::_eventHandler {width height} {
 #
 # _where($i) contains the relative position of the top of pane$i
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_resizeArray {} {
+itcl::body cyg::PanedWindow::_resizeArray {} {
   set numpanes 0
   set _rPixels 0
   set totalFrac 0.0
@@ -594,7 +594,7 @@ body cyg::PanedWindow::_resizeArray {} {
 # stored in protected variables for later access during the drag
 # handling routines.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_startDrag {num} {
+itcl::body cyg::PanedWindow::_startDrag {num} {
   #puts "startDrag $num"
   
   set _minsashmoved $num
@@ -608,7 +608,7 @@ body cyg::PanedWindow::_startDrag {num} {
 #
 # Ends the sash drag and drop operation.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_endDrag {where num} {
+itcl::body cyg::PanedWindow::_endDrag {where num} {
   #puts "endDrag $where $num"
 
   grab release $itk_component(sash$num)
@@ -625,7 +625,7 @@ body cyg::PanedWindow::_endDrag {where num} {
 #
 # Configure  action for sash.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_configDrag {where num} {
+itcl::body cyg::PanedWindow::_configDrag {where num} {
   set _sashloc($num) $where
 }
 
@@ -634,7 +634,7 @@ body cyg::PanedWindow::_configDrag {where num} {
 #
 # Motion action for sash.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_handleDrag {where num} {
+itcl::body cyg::PanedWindow::_handleDrag {where num} {
   #puts "handleDrag $where $num"
   _moveSash [expr $where + $_sashloc($num)] $num
   _placePanes [expr $_minsashmoved - 1] $_maxsashmoved
@@ -645,7 +645,7 @@ body cyg::PanedWindow::_handleDrag {where num} {
 #
 # Move the sash to the absolute pixel location
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_moveSash {where num {dir ""}} {
+itcl::body cyg::PanedWindow::_moveSash {where num {dir ""}} {
   #puts "moveSash $where $num"
   set _minsashmoved [expr ($_minsashmoved<$num)?$_minsashmoved:$num]
   set _maxsashmoved [expr ($_maxsashmoved>$num)?$_maxsashmoved:$num]
@@ -659,7 +659,7 @@ body cyg::PanedWindow::_moveSash {where num {dir ""}} {
 # Determines the new position for the sash.  Make sure the position does
 # not go past the minimum for the pane on each side of the sash.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_calcPos {where num {direction ""}} {
+itcl::body cyg::PanedWindow::_calcPos {where num {direction ""}} {
   set dir [expr $where - $_ploc($num)]
   #puts "calcPos $where $num $dir $direction"
   if {$dir == 0} { return }
@@ -742,7 +742,7 @@ body cyg::PanedWindow::_calcPos {where num {direction ""}} {
 #
 # Removes any previous sashes and creates new ones.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_makeSashes {} {
+itcl::body cyg::PanedWindow::_makeSashes {} {
   #
   # Remove any existing sashes.
   #
@@ -811,7 +811,7 @@ body cyg::PanedWindow::_makeSashes {} {
 #
 # Places the position of the sash
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_placeSash {i} {
+itcl::body cyg::PanedWindow::_placeSash {i} {
   if {[string compare $itk_option(-orient) "vertical"]} {
     place $itk_component(sash$i) -in $itk_component(hull) \
       -x 0 -relwidth 1 -rely $_where($i) -anchor w \
@@ -828,7 +828,7 @@ body cyg::PanedWindow::_placeSash {i} {
 #
 # Resets the panes of the window following movement of the sash.
 # ------------------------------------------------------------------
-body cyg::PanedWindow::_placePanes {{start 0} {end end} {forget 0}} {
+itcl::body cyg::PanedWindow::_placePanes {{start 0} {end end} {forget 0}} {
   #puts "placeplanes $start $end"
 
   if {!$_initialized} {

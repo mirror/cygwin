@@ -115,6 +115,7 @@ struct _sim_cpu {
   int trace_trap_p;			/* If unknown traps dump out the regs */
   int trace_action;			/* trace bits at end of instructions */
   int left_kills_right_p;               /* left insn kills insn in right slot of -> */
+  int mvtsys_left_p;			/* left insn was mvtsys */
   int did_trap;				/* we did a trap & need to finish it */
   struct _write32 write32;		/* queued up 32-bit writes */
   struct _write64 write64;		/* queued up 64-bit writes */
@@ -136,7 +137,7 @@ struct _sim_cpu {
 #define IBA 	(STATE_CPU (sd, 0)->regs.control[instruction_break_address_cr])
 #define EIT_VB	(STATE_CPU (sd, 0)->regs.control[eit_vector_base_cr])
 #define GPR	(STATE_CPU (sd, 0)->regs.general_purpose)
-#define GPR_SET(N,VAL) (GPR[(N)] = (VAL))
+#define GPR_CLEAR(N) (GPR[(N)] = 0)
 #define ACC	(STATE_CPU (sd, 0)->regs.accumulator)
 #define CREG	(STATE_CPU (sd, 0)->regs.control)
 #define SP      (GPR[STACK_POINTER_GPR])
@@ -238,5 +239,11 @@ extern int d30v_write_mem
  unsigned long taddr,
  const char *buf,
  int bytes);
+
+/* Process all of the queued up writes in order now */
+void unqueue_writes
+(SIM_DESC sd,
+ sim_cpu *cpu,
+ address_word cia);
 
 #endif /* _CPU_H_ */

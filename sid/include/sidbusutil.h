@@ -266,19 +266,37 @@ namespace sidutil
         assert (t2 != 0);
         t[0] = t1;
         t[1] = t2;
+	t[2] = NULL;
       }
     ~mux_passthrough_bus() {}
-    void switch_bus() { index ^= 1; target = t[index]; }
+    void switch_bus()
+    {
+      // Switch to the next bus if the current one is valid (0 or 1)
+      if ((index & ~1) == 0)
+	{
+	  index ^= 1;
+	  target = t[index];
+	}
+    }
+    void select_bus (int i)
+    {
+      // Set index to 2 (error) unless i is 0 or 1
+      if ((i & ~1) == 0)
+	index = i;
+      else
+	index = 2;
+      target = t[index];
+    }
     
     // Some macros to make manufacturing of the cartesian-product
     // calls simpler.
 #define SID_GB_WRITE(dtype) \
       sid::bus::status write(sid::host_int_4 addr, dtype data) throw ()\
-	  { if (LIKELY(*target)) return (*target)->write(addr, data); else return sid::bus::unpermitted; }
+	  { if (LIKELY(*target)) return (*target)->write(addr, data); else return sid::bus::unmapped; }
 
 #define SID_GB_READ(dtype) \
       sid::bus::status read(sid::host_int_4 addr, dtype& data) throw ()\
-	  { if (LIKELY(*target)) return (*target)->read(addr, data); else return sid::bus::unpermitted; }
+	  { if (LIKELY(*target)) return (*target)->read(addr, data); else return sid::bus::unmapped; }
 
     SID_GB_WRITE(sid::little_int_1)
     SID_GB_WRITE(sid::big_int_1)
@@ -304,7 +322,7 @@ namespace sidutil
   private:
     int index;
     sid::bus** target;
-    sid::bus** t[2];
+    sid::bus** t[3];
   };
 
   // The passthrough_word_bus maps memory and either directly passes through to the underlying

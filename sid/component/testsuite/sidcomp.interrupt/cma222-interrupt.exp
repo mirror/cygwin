@@ -101,11 +101,10 @@ foreach pattern {0x0 0x12 0x55 0xAA 0xFF} {
     set test "validate all interrupt lines are disabled"
     set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x10"]
 
-    set status [lindex $result 0]
-    if {[lindex $result 0] == "ok"} {
+    if [sid_bus_ok_p $result] {
 	if {[lindex $result 1] == 0} { pass $test } else { fail $test }
     } else {
-	fail "$test (bus error; status $status)"
+	fail "$test (bus error; status $result)"
     }
 
     set test "initialise set of enabled interrupt lines"
@@ -113,11 +112,10 @@ foreach pattern {0x0 0x12 0x55 0xAA 0xFF} {
 
     set test "validate set of enabled interrupt lines"
     set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x10"]
-    set status [lindex $result 0]
-    if {[lindex $result 0] == "ok"} {
+    if [sid_bus_ok_p $result] then {
 	if {[lindex $result 1] == $pattern} { pass $test } else { fail "$test (pattern $pattern; result $result)" }
     } else {
-	fail "$test (bus error; status $status)"
+	fail "$test (bus error; status $result)"
     }
 }
 
@@ -164,7 +162,7 @@ for {set i 0} {$i < $numLines} {incr i} {
 
     set test "validate all interrupt lines are cleared"
     set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x0"]
-    if {[lindex $result 0] == "ok"} {
+    if [sid_bus_ok_p $result] then {
 	set val [lindex $result 1]
 	if {$val != 0} {
 	    incr failures
@@ -177,7 +175,7 @@ for {set i 0} {$i < $numLines} {incr i} {
 
     set test "validate all interrupt lines are disabled"
     set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x10"]
-    if {[lindex $result 0] == "ok"} {
+    if [sid_bus_ok_p $result] then {
 	set val [lindex $result 1]
 	if {$val != 0} {
 	    incr failures
@@ -193,7 +191,8 @@ for {set i 0} {$i < $numLines} {incr i} {
 
     set test "validate only interrupt line $i is enabled"
     set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x10"]
-    if {[lindex $result 0] == "ok"} {
+    
+    if [sid_bus_ok_p $result] {
 	if {[lindex $result 1] != [expr 1 << $i]} {
 	    incr failures
 	    fail $test
@@ -221,13 +220,12 @@ for {set i 0} {$i < $numLines} {incr i} {
 	    if {$j == $i && $old_failures == $failures} {
 		set test "validate interrupt $j is still enabled"
 		set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x0"]
-		set status [lindex $result 0]
-		if {$status == "ok"} {
+		if [sid_bus_ok_p $result] {
 		    set val [lindex $result 1]
 		    if {$val == [expr 1 << $j]} { pass $test } else { fail "$test (result $val)" }
 		} else {
 		    incr failures
-		    fail "$test (bus error; status $status)"
+		    fail "$test (bus error; status $result)"
 		}
 	    }
             sid_assert_success "sid::bus::write_h4_l1 $bus 0x8 0xFF"
@@ -239,11 +237,10 @@ for {set i 0} {$i < $numLines} {incr i} {
 	if {0 == 1} {
 	    set test "making sure interrupt $j is no longer pending"
 	    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x0"]
-	    set status [lindex $result 0]
-	    if {$status == "ok"} {
+	    if [sid_bus_ok_p $result] {
 		if {[lindex $result 1] == 0} { pass $test } else { fail "$test (result $result)" }
 	    } else {
-		fail "$test (bus error; status $status)"
+		fail "$test (bus error; status $result)"
 	    }
 	}
 
@@ -268,7 +265,7 @@ for {set i 0} {$i < $numLines} {incr i} {
 		set test_save $test
 		set test "bit $i is set in the masked status register"
 		set result [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
-		if {[lindex $result 0] == "ok"} {
+		if [sid_bus_ok_p $result] {
 		    if {[lindex $result 1] != [expr 1 << $i]} {
 			incr failures
 			fail $test

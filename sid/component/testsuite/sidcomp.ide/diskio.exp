@@ -24,7 +24,7 @@ proc wait_ide_bit  { bus address mask value } {
     set iters 0
     while {$iters < 10} {
 	set result [sid_cmd "sid::bus::read_h4_l1 $bus $address"]
-	if {[lindex $result 0] != "ok"} then { 
+	if ![sid_bus_ok_p $result] then {
 	    fail "$test - wait $address $mask $value - [lindex $result 0]" 
 	    return "oops1"
 	}
@@ -71,7 +71,7 @@ proc read_sector { size } {
 	} else {
 	    set result [sid_cmd "sid::bus::read_h4_b2 $commandbus 00"]
 	}
-	if {[lindex $result 0] != "ok"} then { 
+	if ![sid_bus_ok_p $result] then {
 	    fail "$test - read sector - read status [lindex $result 0]" 
 	    return "gack"
 	}

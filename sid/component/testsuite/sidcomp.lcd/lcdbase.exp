@@ -38,7 +38,7 @@ if {$result != "ok"} {
     fail $test
 } else {
     set result [sid_cmd "sid::bus::read_h4_l1 $bus $LCD(AC)"]
-    if {[lindex $result 0] == "ok" && [lindex $result 1] == 1} {
+    if {[sid_bus_ok_p $result] && [lindex $result 1] == 1} {
 	pass $test
     } else {
 	fail $test
@@ -52,7 +52,7 @@ if {$result != "ok"} {
     fail $test
 } else {
     set result [sid_cmd "sid::bus::read_h4_l1 $bus $LCD(AC)"]
-    if {[lindex $result 0] == "ok" && [lindex $result 1] == 2} {
+    if {[sid_bus_ok_p $result] && [lindex $result 1] == 2} {
 	pass $test
     } else {
 	fail $test
@@ -63,7 +63,7 @@ set test "DR read"
 sid_cmd "sid::bus::write_h4_l1 $bus $LCD(IR) 4"
 sid_cmd "sid::bus::read_h4_l1 $bus $LCD(DR)"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus $LCD(DR)"]
-if {[lindex $result 0] == "ok" && [lindex $result 1] == 0x23} {
+if {[sid_bus_ok_p $result] && [lindex $result 1] == 0x23} {
     pass $test
 } else {
     fail $test
@@ -72,7 +72,7 @@ if {[lindex $result 0] == "ok" && [lindex $result 1] == 0x23} {
 
 set test "AC read"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus $LCD(AC)"]
-if {[lindex $result 0] == "ok" && [lindex $result 1] == 0} {
+if {[sid_bus_ok_p $result] && [lindex $result 1] == 0} {
     pass $test
 } else {
     fail $test

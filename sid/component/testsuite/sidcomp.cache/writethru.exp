@@ -38,25 +38,25 @@ if {$result != "ok" } { fail $test; return }
 set test "read byte from 0x100"
 clear_miss_flag
 set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x100"]
-if {[lindex $result 0] != "ok"} { fail $test; return }
+if ![sid_bus_ok_p $result] then { fail $test; return }
 assert_miss
 
 set test "read byte from 0x100"
 clear_miss_flag
 set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x100"]
-if {[lindex $result 0] != "ok"} { fail $test; return }
+if ![sid_bus_ok_p $result] then { fail $test; return }
 assert_hit
 
 set test "write byte to 0x100"
 clear_miss_flag
 set result [sid_cmd "sid::bus::write_h4_l1 $cache_bus 0x100 0x55"]
-if {[lindex $result 0] != "ok"} { fail $test; return }
+if ![sid_bus_ok_p $result] then { fail $test; return }
 assert_miss
 
 set test "read byte back from 0x100"
 clear_miss_flag
 set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x100"]
-if {[lindex $result 0] != "ok"} { fail $test; return }
+if ![sid_bus_ok_p $result] then { fail $test; return }
 assert_hit
 
 # Now disable write through.
@@ -71,23 +71,23 @@ if {$result != "ok" } { fail $test; return }
 set test "read byte from 0x500"
 clear_miss_flag
 set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x500"]
-if {[lindex $result 0] != "ok"} { fail $test; return }
+if ![sid_bus_ok_p $result] then { fail $test; return }
 assert_miss
 
 set test "read byte from 0x500"
 clear_miss_flag
 set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x500"]
-if {[lindex $result 0] != "ok"} { fail $test; return }
+if ![sid_bus_ok_p $result] then { fail $test; return }
 assert_hit
 
 set test "write byte to 0x500"
 clear_miss_flag
 set result [sid_cmd "sid::bus::write_h4_l1 $cache_bus 0x500 0x55"]
-if {[lindex $result 0] != "ok"} { fail $test; return }
+if ![sid_bus_ok_p $result] then { fail $test; return }
 assert_hit
 
 set test "read byte back from 0x500"
 clear_miss_flag
 set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x500"]
-if {[lindex $result 0] != "ok"} { fail $test; return }
+if ![sid_bus_ok_p $result] then { fail $test; return }
 assert_hit

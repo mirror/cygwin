@@ -54,7 +54,7 @@ set test "set / retrieve a load value (byte)"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 sid_cmd "sid::bus::write_h4_l1 $bus 0 0xAA"
 set val [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
-if {[lindex $val 0] == "ok" && [lindex $val 1] == 0xAA} then {pass $test} else {fail $test}
+if {[sid_bus_ok_p $val] && [lindex $val 1] == 0xAA} then {pass $test} else {fail $test}
 
 set test "save state"
 set state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
@@ -64,7 +64,7 @@ set test "set / retrieve a load value (half-word)"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 sid_cmd "sid::bus::write_h4_l2 $bus 0 0xAABB"
 set val [sid_cmd "sid::bus::read_h4_l2 $bus 0"]
-if {[lindex $val 0] == "ok" && [lindex $val 1] == 0xAABB} then {pass $test} else {fail $test}
+if {[sid_bus_ok_p $val] && [lindex $val 1] == 0xAABB} then {pass $test} else {fail $test}
 
 set test "Re save state"
 set resave_state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
@@ -84,17 +84,17 @@ set test "set / retrieve a load value (word)"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 sid_cmd "sid::bus::write_h4_l4 $bus 0 0xC"
 set val [sid_cmd "sid::bus::read_h4_l4 $bus 0"]
-if {[lindex $val 0] == "ok" && [lindex $val 1] == 0xC} then {pass $test} else {fail $test}
+if {[sid_bus_ok_p $val] && [lindex $val 1] == 0xC} then {pass $test} else {fail $test}
 
 set test "retrieve timer value (word)"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 set val [sid_cmd "sid::bus::read_h4_l4 $bus 4"]
-if {[lindex $val 0] == "ok" && [lindex $val 1] == 0xC} then {pass $test} else {fail $test}
+if {[sid_bus_ok_p $val] && [lindex $val 1] == 0xC} then {pass $test} else {fail $test}
 
 set test "clear interrupts"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 set val [sid_cmd "sid::bus::write_h4_l4 $bus 0x0C 0"]
-if {$val == "ok"} then {pass $test} else {fail $test}
+if [sid_bus_ok_p $val] then {pass $test} else {fail $test}
 
 set test "get control word"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]

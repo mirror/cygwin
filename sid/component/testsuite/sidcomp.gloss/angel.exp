@@ -173,7 +173,7 @@ proc memWriteByte {addr data} {
 proc memReadByte {addr} {
     global rwbus test
     set result [sid_cmd "sid::bus::read_h4_l1 $rwbus $addr"]
-    if {[lindex $result 0] != "ok"} { 
+    if ![sid_bus_ok_p $result] {
 	fail "read byte from $addr (bus error)"
 	return 0
     } else {
@@ -185,7 +185,7 @@ proc memReadWord {addr} {
     global rwbus test
     set test "read a word @ $addr"
     set result [sid_cmd "sid::bus::read_h4_l4 $rwbus $addr"]
-    if {[lindex $result 0] != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	fail "read word from $addr (bus error)"
 	return 0
     } else {

@@ -77,7 +77,7 @@ set okay 1
 set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
 foreach addr {100 200 300 512 968 1024 2048 3000} {
     set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
-    if {[lindex $result 0] != "ok" || [lindex $result 1] != "0xFF"} {
+    if {![sid_bus_ok_p $result] || [lindex $result 1] != "0xFF"} {
 	set okay 0
 	fail "$test -- got unexpected $result @ address $addr"
 	break
@@ -194,7 +194,7 @@ if {[autoselect_mode]} {
 	    break
 	}
 	set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
-	if {[lindex $result 0] != "ok"} {
+	if ![sid_bus_ok_p $result] {
 	    fail "$test -- bus error"
 	    break
 	}
@@ -226,7 +226,7 @@ if {$mode != "3"} {
 set test "read manufacturer code without entering autoselect mode"
 set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
-if {[lindex $result 0] == "ok" && [lindex $result 1] != 0x1F} {
+if {[sid_bus_ok_p $result] && [lindex $result 1] != 0x1F} {
     pass $test
 } else {
     fail "$test -- read 0x1F from address 0!"
@@ -237,7 +237,7 @@ set test "read device id code without entering autoselect mode"
 set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 1"]
 sid_cmd "sid::component::set_attribute_value $victim device-code 0x4F"
-if {[lindex $result 0] == "ok" && [lindex $result 1] != 0x4F} {
+if {[sid_bus_ok_p $result] && [lindex $result 1] != 0x4F} {
     pass $test
 } else {
     fail "$test -- read 0x4F from address 1!"
@@ -250,7 +250,7 @@ if {![autoselect_mode]} {
     fail $test
 } else {
     set result [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
-    if {[lindex $result 0] == "ok" && [lindex $result 1] == "0x01"} {
+    if {[sid_bus_ok_p $result] && [lindex $result 1] == "0x01"} {
 	pass $test
     } else {
 	fail "$test -- expected 0x01, got $result"
@@ -262,7 +262,7 @@ set test "read device id code for a typical flash (id=0x4F)"
 set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
 sid_cmd "sid::component::set_attribute_value $victim device-code 0x4F"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 1"]
-if {[lindex $result 0] == "ok" && [lindex $result 1] == "0x4F"} {
+if {[sid_bus_ok_p $result] && [lindex $result 1] == "0x4F"} {
     pass $test
 } else {
     fail "$test -- expected 0x4F, got $result"
@@ -277,7 +277,7 @@ set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
 for {set i 0} {$i < $numsectors} {incr i} {
     set addr [expr [expr $i << 16] | 2]
     set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
-    if {[lindex $result 0] != "ok" || [lindex $result 1] != "0"} {
+    if {![sid_bus_ok_p $result] || [lindex $result 1] != "0"} {
 	fail "$test -- expected {ok,0}, got $result"
 	set okay 0
 	break
@@ -340,7 +340,7 @@ for {set i 0} {$i < $size} {set i [expr $i + 256]} {
     if {[program_mode]} {
 	set result [sid_cmd "sid::bus::write_h4_l1 $bus $i 0"]
 	if {$result != "ok"} { fail $test; set okay 0; break }
-    } else {<
+    } else {
 	fail "$test -- failed to enter programming mode"; set okay 0; break
     }
 }
@@ -352,7 +352,7 @@ if {$okay && [erase_mode]} {
 	# Validate all ones are set in locations previously set to 0.
 	for {set i 0} {$i < $size} {set i [expr $i + 256]} {
 	    set result [sid_cmd "sid::bus::read_h4_l1 $bus $i"]
-	    if {[lindex $result 0] != "ok" || [lindex $result 1] != "0xFF"} {
+	    if {![sid_bus_ok_p $result] || [lindex $result 1] != "0xFF"} {
 		fail "$test -- @ $i expected {ok,0xFF} got $result"
 		set okay 0
 		break
@@ -409,7 +409,7 @@ set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
 set okay 1
 foreach addr {0x10 0x39 0x120 0x290 0x391 0x500 0x800 0x1024 0x1701} {
     set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
-    if {[lindex $result 0] == "ok" && [lindex $result 1] == "0x39"} {
+    if {[sid_bus_ok_p $result] && [lindex $result 1] == "0x39"} {
 	pass $test
     } else {
 	fail "$test -- mismatch @ $addr: [lindex $result 1] != 0x39"
@@ -464,7 +464,7 @@ if {[bypass_mode]} {
 	    if {$result != "ok"} {
 		fail "$test -- bus error ($result)"
 		set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x123"]
-		if {[lindex $result 0] != "ok" || [lindex $result 1] != "0x77"} {
+		if {[sid_bus_ok_p $result] || [lindex $result 1] != "0x77"} {
 		    fail "$test -- expected ok,0x77, got $result"
 		} else {
 		    pass $test
@@ -491,7 +491,7 @@ if {![program_mode]} {
 	fail "$test -- bus error ($result)"
     } else {
 	set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x123"]
-	if {[lindex $result 0] != "ok"} {
+	if ![sid_bus_ok_p $result] {
 	    fail "$test -- bus error ($result)"
 	} else {
 	    if {[lindex $result 1] != "0"} {
@@ -503,7 +503,7 @@ if {![program_mode]} {
 		    fail "$test -- bus error ($result)"
 		} else {
 		    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x123"]
-		    if {[lindex $result 0] != "ok"} {
+		    if ![sid_bus_ok_p $result] {
 			fail "$test -- bus error ($result)"
 		    } else {
 			if {[lindex $result 1] != "0"} {
@@ -570,7 +570,7 @@ if {![erase_mode]} {
 	    # Now check the lay of the land.
 	    for {set i 0} {$i < [expr 3 * $sectorsize]} {incr i} {
 		set result [sid_cmd "sid::bus::read_h4_l1 $bus $i"]
-		if {[lindex $result 0] != "ok"} {
+		if ![sid_bus_ok_p $result] {
 		    fail "$test -- bus error ($result)"
 		} else {
 		    if {$i < $sectorsize && [lindex $result 1] != "0x77"} {
@@ -624,8 +624,7 @@ for {set i 0} {$i < $size} {incr i} {
     set data [expr {(($data * 19) + 13) % 256}]
     set addr $i
     set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
-    set status [lindex $result 0]
-    if {$status != "ok"} { fail "$test - bad"; break }
+    if ![sid_bus_ok_p $result] { fail "$test - bad"; break }
     set result_data [lindex $result 1]
     if {$result_data != $data} {
 	fail "$test - mismatch @ $i - $result_data vs $data"

@@ -222,7 +222,7 @@ foreach width {1 2 4 8} {
 		}
 		
 		set result [sid_cmd "sid::bus::read_h4_${endian}${width} $mbus $addr"]
-		if {[lindex $result 0] != "ok" || \
+		if {![sid_bus_ok_p $result] || \
 			[sid_cmd "set read_addr"] != $expected_index || \
 			[string index [sid_cmd "set read_endian"] 0] != $endian || \
 			[sid_cmd "set read_width"] != $width} {

@@ -249,7 +249,7 @@ if {$bus == ""} {
     for {set addr 0} {$addr < [expr $size - 8]} {incr addr} {
 	if {$addr % 2} { set data 0x55 } else { set data 0xAA }
 	set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
-	if {[lindex $result 0] != "ok" || [lindex $result 1] != $data} {
+	if {![sid_bus_ok_p $result] || [lindex $result 1] != $data} {
 	    set okay 0
 	    break
 	}
@@ -271,7 +271,7 @@ if {$bus == ""} {
 
 set test "battery is not flat"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FC"]
-if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x80] == 0x80} {
+if {[sid_bus_ok_p $result] && [mask [lindex $result 1] 0x80] == 0x80} {
     pass $test
 } else {
     fail "$test -- got $result, expected 0x80 to be set"
@@ -305,7 +305,7 @@ if {[start_write] && [end_write]} {
 set test "read year register"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FF"]
 scan [clock format $origin -gmt true -format %y] %x year
-if {[lindex $result 0] == "ok" && [lindex $result 1] == $year} {
+if {[sid_bus_ok_p $result] && [lindex $result 1] == $year} {
     pass $test
 } else {
     fail $test
@@ -315,7 +315,7 @@ if {[lindex $result 0] == "ok" && [lindex $result 1] == $year} {
 set test "read month register"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FE"]
 scan [clock format $origin -gmt true -format %m] %x month
-if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x1F] == $month} {
+if {[sid_bus_ok_p $result] && [mask [lindex $result 1] 0x1F] == $month} {
     pass $test
 } else {
     fail $test
@@ -325,7 +325,7 @@ if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x1F] == $month} {
 set test "read date register"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FD"]
 scan [clock format $origin -gmt true -format %d] %x date
-if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x3F] == $date} {
+if {[sid_bus_ok_p $result] && [mask [lindex $result 1] 0x3F] == $date} {
     pass $test
 } else {
     fail $test
@@ -336,7 +336,7 @@ set test "read day register"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FC"]
 set wday [expr [clock format $origin -gmt true -format %w] + 1]
 
-if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x07] == $wday} {
+if {[sid_bus_ok_p $result] && [mask [lindex $result 1] 0x07] == $wday} {
     pass $test
 } else {
     fail $test
@@ -346,7 +346,7 @@ if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x07] == $wday} {
 set test "read hour register"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FB"]
 scan [clock format $origin -gmt true -format %H] %x hour
-if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x3F] == $hour} {
+if {[sid_bus_ok_p $result] && [mask [lindex $result 1] 0x3F] == $hour} {
     pass $test
 } else {
     fail $test
@@ -356,7 +356,7 @@ if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x3F] == $hour} {
 set test "read minutes register"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FA"]
 scan [clock format $origin -gmt true -format %M] %x mins
-if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x7F] == $mins} {
+if {[sid_bus_ok_p $result] && [mask [lindex $result 1] 0x7F] == $mins} {
     pass $test
 } else {
     fail $test
@@ -368,7 +368,7 @@ set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7F9"]
 scan [clock format $origin -gmt true -format %S] %x secs
 set sec [mask [lindex $result 1] 0x7F]
 
-if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x7F] == $secs} {
+if {[sid_bus_ok_p $result] && [mask [lindex $result 1] 0x7F] == $secs} {
     pass $test
 } else {
     fail $test
@@ -425,7 +425,7 @@ for {set i 0} {$i < 5} {incr i} {
 set test "read year register with oscillator disconnected"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FF"]
 scan [clock format $origin -gmt true -format %y] %x year
-if {[lindex $result 0] == "ok" && [lindex $result 1] == $year} {
+if {[sid_bus_ok_p $result] && [lindex $result 1] == $year} {
     pass $test
 } else {
     fail $test
@@ -435,7 +435,7 @@ if {[lindex $result 0] == "ok" && [lindex $result 1] == $year} {
 set test "read month register with oscillator disconnected"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FE"]
 scan [clock format $origin -gmt true -format %m] %x month
-if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x1F] == $month} {
+if {[sid_bus_ok_p $result] && [mask [lindex $result 1] 0x1F] == $month} {
     pass $test
 } else {
     fail $test
@@ -445,7 +445,7 @@ if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x1F] == $month} {
 set test "read date register with oscillator disconnected"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FD"]
 scan [clock format $origin -gmt true -format %d] %x date
-if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x3F] == $date} {
+if {[sid_bus_ok_p $result] && [mask [lindex $result 1] 0x3F] == $date} {
     pass $test
 } else {
     fail $test
@@ -455,7 +455,7 @@ if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x3F] == $date} {
 set test "read day register with oscillator disconnected"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FC"]
 set wday [expr [clock format $origin -gmt true -format %w] + 1]
-if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x07] == $wday} {
+if {[sid_bus_ok_p $result] && [mask [lindex $result 1] 0x07] == $wday} {
     pass $test
 } else {
     fail $test
@@ -465,7 +465,7 @@ if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x07] == $wday} {
 set test "read hour register with oscillator disconnected"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FB"]
 scan [clock format $origin -gmt true -format %H] %x hour
-if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x3F] == $hour} {
+if {[sid_bus_ok_p $result] && [mask [lindex $result 1] 0x3F] == $hour} {
     pass $test
 } else {
     fail $test
@@ -475,7 +475,7 @@ if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x3F] == $hour} {
 set test "read minutes register with oscillator disconnected"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FA"]
 scan [clock format $origin -gmt true -format %M] %x mins
-if {[lindex $result 0] == "ok" && [mask [lindex $result 1] 0x7F] == $mins} {
+if {[sid_bus_ok_p $result] && [mask [lindex $result 1] 0x7F] == $mins} {
     pass $test
 } else {
     fail $test
@@ -486,7 +486,7 @@ set test "read seconds register with oscillator disconnected"
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7F9"]
 scan [clock format $origin -gmt true -format %S] %x secs
 set sec [mask [lindex $result 1] 0x7F]
-if {[lindex $result 0] == "ok" && $sec == $secs} {
+if {[sid_bus_ok_p $result] && $sec == $secs} {
     pass $test
 } else {
     fail $test
@@ -529,7 +529,7 @@ set test "modify the month register"
 set origin [get_epoch]
 start_read
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FE"]
-if {[lindex $result 0] != "ok"} {
+if ![sid_bus_ok_p $result] {
     fail $test
 } else {
     end_read
@@ -551,7 +551,7 @@ set test "modify the date register"
 set origin [get_epoch]
 start_read
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FD"]
-if {[lindex $result 0] != "ok"} {
+if ![sid_bus_ok_p $result] {
     fail $test
 } else {
     end_read
@@ -579,7 +579,7 @@ set test "modify the day register"
 set origin [get_epoch]
 start_read
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FC"]
-if {[lindex $result 0] != "ok"} {
+if ![sid_bus_ok_p $result] {
     fail $test
 } else {
     end_read
@@ -603,7 +603,7 @@ set test "modify the hour register"
 set origin [get_epoch]
 start_read
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FB"]
-if {[lindex $result 0] != "ok"} {
+if ![sid_bus_ok_p $result] {
     fail $test
 } else {
     end_read
@@ -625,7 +625,7 @@ set test "modify the minute register"
 set origin [get_epoch]
 start_read
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7FA"]
-if {[lindex $result 0] != "ok"} {
+if ![sid_bus_ok_p $result] {
     fail $test
 } else {
     end_read
@@ -647,7 +647,7 @@ set test "modify the second register"
 set origin [get_epoch]
 start_read
 set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x7F9"]
-if {[lindex $result 0] != "ok"} {
+if ![sid_bus_ok_p $result] {
     fail $test
 } else {
     end_read
@@ -677,7 +677,7 @@ foreach pair {{0x7FE 0xE0} {0x7FD 0xC0} {0x7FC 0x38} {0x7FB 0xC0} {0x7FA 0x80}} 
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $hex_addr 0xFF"]
     if {$result == "ok"} {
 	set result [sid_cmd "sid::bus::read_h4_l1 $bus $hex_addr"]
-	if {[lindex $result 0] == "ok" && \
+	if {[sid_bus_ok_p $result] && \
 		[mask [lindex $result 1] $hex_mask] == $hex_mask} {
 	    pass $test
 	} else {

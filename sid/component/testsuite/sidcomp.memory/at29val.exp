@@ -129,8 +129,7 @@ for {set i 0} {$i < $size} {incr i} {
     set data [expr {(($data * 19) + 13) % 256}]
     set addr $i
     set result [sid_cmd "sid::bus::read_h4_l1 $rwp $addr"]
-    set status [lindex $result 0]
-    if {$status != "ok"} { fail "$test - bad"; break }
+    if ![sid_bus_ok_p $result] { fail "$test - bad"; break }
     set result_data [lindex $result 1]
     if {$result_data != $data} {
        fail "$test - mismatch @ $i - $result_data vs $data"
@@ -165,8 +164,7 @@ for {set i 0} {$i < $size} {incr i} {
     }
     set addr $i
     set result [sid_cmd "sid::bus::read_h4_l1 $rwp $addr"]
-    set status [lindex $result 0]
-    if {$status != "ok"} { fail "$test - $status @ $addr"; break }
+    if ![sid_bus_ok_p $result] { fail "$test (bus error @ $addr)"; break }
     set result_data [lindex $result 1]
     if {$result_data != $data} {
        fail "$test - mismatch @ $i - $result_data vs $data"
@@ -204,7 +202,7 @@ if {[expr $num_bytes % $sector_size] != 0} {
 	set result [sid_cmd "sid::bus::write_h4_l1 $rwp $addr $data"]
 	if {$result != "ok"} then { fail "$test - $result @ $addr "; break }
 	set result [sid_cmd "sid::bus::read_h4_l1 $rwp $addr"]
-	if {[lindex $result 0] != "ok" || [lindex $result 1] != $data} {
+        if {![sid_bus_ok_p $result] || [lindex $result 1] != $data} {
 	    warning "$test -- validating data @ $addr, got $result"
 	}
     }
@@ -253,8 +251,7 @@ for {set i 0} {$i < $size} {incr i} {
 	set data [expr ($i - 4096) % 256]
     }
     set result [sid_cmd "sid::bus::read_h4_l1 $rwp $addr"]
-    set status [lindex $result 0]
-    if {$status != "ok"} { fail "$test - bad"; break }
+    if ![sid_bus_ok_p $result] { fail "$test - bad"; break }
     set result_data [lindex $result 1]
     if {$result_data != $data} {
        fail "$test - mismatch @ $i - $result_data vs $data"

@@ -1,3 +1,27 @@
+2001-06-20  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.cache/coherency.exp: Use sid_bus_ok_p to detect bus read
+	errors instead of the frequently used (and less readable)
+	construction: if {[lindex $result] 0 == "ok"}.
+	* sidcomp.cache/writealloc.exp: Likewise.
+	* sidcomp.cache/writethru.exp: Likewise.
+	* sidcomp.gloss/angel.exp: Likewise.
+	* sidcomp.ide/diskio.exp: Likewise.
+	* sidcomp.interrupt/arm-interrupt.exp: Likewise.
+	* sidcomp.interrupt/cma222-interrupt.exp: Likewise.
+	* sidcomp.lcd/lcdbase.exp: Likewise.
+	* sidcomp.mapper/basicmapper.exp: Likewise.
+	* sidcomp.memory/am29.exp: Likewise.
+	* sidcomp.memory/at29.exp: Likewise.
+	* sidcomp.memory/at29val.exp: Likewise.
+	* sidcomp.memory/genericmemory.exp: Likewise.
+	* sidcomp.mmu/arm-remap.exp: Likewise.
+	* sidcomp.parport/parport.exp: Likewise.
+	* sidcomp.rtc/ds1642.exp: Likewise.
+	* sidcomp.rtc/ds1742.exp: Likewise.
+	* sidcomp.timers/timerbase.exp: Likewise.
+	* sidcomp.timers/timersched.exp: Likewise.
+
 2001-06-18  Ben Elliston  <bje@redhat.com>
 
 	* sidcomp.interrupt/interruptmonkey.exp: Only monkey test ARM

@@ -1,3 +1,116 @@
+2000-03-02  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure: Regenerated.
+
+Tue Feb  8 18:35:01 2000  Donald Lindsay  <dlindsay@hound.cygnus.com>
+
+	* interp.c, mips.igen: all 5 DEADC0DE situations now have sim_io_eprintf
+	calls, conditional on the simulator being in verbose mode.
+
+Fri Feb  4 09:45:15 2000  Donald Lindsay  <dlindsay@cygnus.com>
+
+	* sim-main.c (cache_op): Added case arm so that CACHE ops to a secondary
+	cache don't get ReservedInstruction traps.
+
+1999-11-29  Mark Salter  <msalter@cygnus.com>
+
+	* dv-tx3904sio.c (tx3904sio_io_write_buffer): Use write value as a mask
+	to clear status bits in sdisr register. This is how the hardware works.
+
+	* interp.c (sim_open): Added more memory aliases for jmr3904 hardware
+	being used by cygmon.
+
+1999-11-11  Andrew Haley  <aph@cygnus.com>
+
+	* interp.c (decode_coproc): Correctly handle DMFC0 and DMTC0
+	instructions.
+
+Thu Sep  9 15:12:08 1999  Geoffrey Keating  <geoffk@cygnus.com>
+
+	* mips.igen (MULT): Correct previous mis-applied patch.
+
+Tue Sep  7 13:34:54 1999  Geoffrey Keating  <geoffk@cygnus.com>
+
+	* mips.igen (delayslot32): Handle sequence like
+	mtc1 $at,$f12 ; jal fp_add ; mov.s $f13,$f12
+	correctly by calling ENGINE_ISSUE_PREFIX_HOOK() before issue.
+	(MULT): Actually pass the third register...
+
+1999-09-03  Mark Salter  <msalter@cygnus.com>
+
+	* interp.c (sim_open): Added more memory aliases for additional
+	hardware being touched by cygmon on jmr3904 board.
+
+Thu Sep  2 18:15:53 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Tue Jul 27 16:36:51 1999  Andrew Cagney  <cagney@amy.cygnus.com>
+
+	* interp.c (sim_store_register): Handle case where client - GDB -
+ 	specifies that a 4 byte register is 8 bytes in size.
+	(sim_fetch_register): Ditto.
+	
+1999-07-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	Implement "sim firmware" option, inspired by jimb's version of 1998-01.
+	* interp.c (firmware_option_p): New global flag: "sim firmware" given.
+	(idt_monitor_base): Base address for IDT monitor traps.
+	(pmon_monitor_base): Ditto for PMON.
+	(lsipmon_monitor_base): Ditto for LSI PMON.
+	(MONITOR_BASE, MONITOR_SIZE): Removed macros.
+	(mips_option): Add "firmware" option with new OPTION_FIRMWARE key.
+	(sim_firmware_command): New function.
+	(mips_option_handler): Call it for OPTION_FIRMWARE.
+	(sim_open): Allocate memory for idt_monitor region.  If "--board"
+	option was given, add no monitor by default.  Add BREAK hooks only if
+	monitors are also there.
+	
+Mon Jul 12 00:02:27 1999  Andrew Cagney  <cagney@amy.cygnus.com>
+
+	* interp.c (sim_monitor): Flush output before reading input.
+
+Sun Jul 11 19:28:11 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* tconfig.in (SIM_HANDLES_LMA): Always define.
+
+Thu Jul  8 16:06:59 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	From Mark Salter <msalter@cygnus.com>:
+	* interp.c (BOARD_BSP): Define.  Add to list of possible boards.
+	(sim_open): Add setup for BSP board.
+
+Wed Jul  7 12:45:58 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* mips.igen (MULT, MULTU): Add syntax for two operand version.
+	(DMFC0, DMTC0): Recognize.  Call DecodeCoproc which will report
+ 	them as unimplemented.
+
+1999-05-08  Felix Lee  <flee@cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+	
+1999-04-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mips.igen (bc0f): For the TX39 only, decode this as a no-op stub.
+
+Thu Apr 15 14:15:17 1999  Andrew Cagney  <cagney@amy.cygnus.com>
+
+	* configure.in: Any mips64vr5*-*-* target should have
+ 	-DTARGET_ENABLE_FR=1.
+	(default_endian): Any mips64vr*el-*-* target should default to
+	LITTLE_ENDIAN.
+	* configure: Re-generate.
+
+1999-02-19  Gavin Romig-Koch  <gavin@cygnus.com>
+
+	* mips.igen (ldl): Extend from _16_, not 32.
+
+Wed Jan 27 18:51:38 1999  Andrew Cagney  <cagney@chook.cygnus.com>
+
+	* interp.c (sim_store_register): Force registers written to by GDB
+ 	into an un-interpreted state.
+
 1999-02-05  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* dv-tx3904sio.c (tx3904sio_tickle): After a polled I/O from the

@@ -1,83 +1,109 @@
-* Name
-  sid-io-stdio
+           sid-io-stdio (libconsoles.la :: console_component_library)
 
-* Synopsis
-  This component performs input/output on the standard input/output. 
+Synopsis:
 
-  Pins: stdin stdout poll
-  Attributes: state-snapshot
+   This component performs input/output on the standard input/output.
 
-  Library: libconsoles.la
-  Symbol name: console_component_library
+     ----------------------------------------------------------------------
 
-* Functionality
-  - Modelling
+Functionality:
 
-    This component acts as an interface between the host system's
-    stdio streams and pins in the simulated system.
+  Modelling:
 
-    This component uses non-blocking I/O on the host. It cannot use
-    blocking I/O because the entire simulation would block. As a
-    result, this component requires time slices from the simulator to
-    check for pending data that must be read from stdin.  To do this,
-    you can use a common scheduler component (sid-sched-*) to
-    efficiently yield time to the sid-io-stdio component.  However, you
-    should carefully consider the choice of the time interval to be
-    used by the scheduler.  We recommend approximately 10 times per
-    second.
+   This component acts as an interface between the host system's stdio
+   streams and pins in the simulated system.
 
-  - Behaviors
+   This component uses non-blocking I/O on the host. It cannot use blocking
+   I/O because the entire simulation would block. As a result, this component
+   requires time slices from the simulator to check for pending data that
+   must be read from stdin. To do this, you can use a common scheduler
+   component (sid-sched-*) to efficiently yield time to the sid-io-stdio
+   component. However, you should carefully consider the choice of the time
+   interval to be used by the scheduler. We recommend approximately 10 times
+   per second.
 
-    * Output
+   +-------------------------------------------------+
+   |                    Behaviors                    |
+   |-------------------------------------------------|
+   | output | When the stdout input pin is driven    |
+   |        | with a value between 0 and 255, the    |
+   |        | value is immediately written to        |
+   |        | stdout.                                |
+   |--------+----------------------------------------|
+   |  input | When the poll pin is driven, the stdin |
+   |        | stream is checked for unread input,    |
+   |        | without blocking. All available input  |
+   |        | is consumed, and transmitted           |
+   |        | individually by driving the stdin pin  |
+   |        | with each byte, in sequence.           |
+   +-------------------------------------------------+
 
-    When the "stdout" input pin is driven with a value between 0 and
-    255, the value is immediately written to stdout.
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |   functional | supported | -                    |
+   |--------------+-----------+----------------------|
+   | save/restore | supported | null state           |
+   |              |           | save/restore.        |
+   +-------------------------------------------------+
 
-    * Input
+     ----------------------------------------------------------------------
 
-    When the "poll" pin is driven, the stdin stream is checked for
-    unread input, without blocking.  All available input is
-    consumed, and transmitted individually by driving the "stdin"
-    pin with each byte, in sequence.
+Environment:
 
-  - SID conventions
-    * This is a functional component.
-    * This component supports null state save/restore.
+   Related components
 
-* Environment
-  - Related components
-    You can connect a stdio console to a serial data transmission
-    component, such as a UART. You can also connect it to a 
-    ROM monitor/system call emulator, such as the sw-gloss-arm/angel 
-    which performs I/O across some sort of debug channel.
-    In order for a stdio console component to collect data from
-    standard input without blocking the entire simulation,
-    non-blocking I/O is used. It is necessary to give simulation time
-    to the component to collect any data from stdin and to buffer the data.
-    To do this, you can use the common scheduler component (see
-    Functionality, Modelling).
-    
-    The following is an example of how a stdio console might be 
-    configured to connect into a system:
+   You can connect a stdio console to a serial data transmission component,
+   such as a UART. You can also connect it to a ROM monitor/system call
+   emulator, such as the sw-gloss-arm/angel which performs I/O across some
+   sort of debug channel. In order for a stdio console component to collect
+   data from standard input without blocking the entire simulation,
+   non-blocking I/O is used. It is necessary to give simulation time to the
+   component to collect any data from stdin and to buffer the data. To do
+   this, you can use the common scheduler component (see Functionality,
+   Modelling).
 
-	new sid-sched-host sched
-	new sw-gloss-arm/angel angel
-	new sid-io-stdio stdio
-	set sched enabled? 1
-	set sched num-clients 1
-	set sched 0-regular? 1
-	set sched 0-time 50
-	connect-pin sched 0-event -> stdio poll
-	connect-pin angel debug-tx -> stdio stdout
-	connect-pin angel debug-rx <- stdio stdin
+   The following is an example of how a stdio console might be configured to
+   connect into a system:
 
-* SID interface reference
+         new sid-sched-host sched
+         new sw-gloss-arm/angel angel
+         new sid-io-stdio stdio
+         set sched enabled? 1
+         set sched num-clients 1
+         set sched 0-regular? 1
+         set sched 0-time 50
+         connect-pin sched 0-event -> stdio poll
+         connect-pin angel debug-tx -> stdio stdout
+         connect-pin angel debug-rx <- stdio stdin
 
-  - low level:
-    * pins
-      - poll | input | N/A | input
-      - stdin | output | any character code | input
-      - stdout | input | any character code | output
 
-    * attributes
-      - state-snapshot | | opaque string | n/a | state save/restore
+     ----------------------------------------------------------------------
+
+Component Reference:
+
+  Component: sid-io-stdio
+
+   +-------------------------------------------------+
+   |                      pins                       |
+   |-------------------------------------------------|
+   |  name  | direction |  legalvalues   | behaviors |
+   |--------+-----------+----------------+-----------|
+   | poll   | in        | N/A            | input     |
+   |--------+-----------+----------------+-----------|
+   | stdin  | out       | any character  | input     |
+   |        |           | code           |           |
+   |--------+-----------+----------------+-----------|
+   | stdout | in        | any character  | output    |
+   |        |           | code           |           |
+   +-------------------------------------------------+
+
+   +----------------------------------------------------+
+   |                     attributes                     |
+   |----------------------------------------------------|
+   |     name     |category|legal |default| behaviors  ||
+   |              |        |values| value |            ||
+   |--------------+--------+------+-------+------------||
+   |state-snapshot|-       |opaque|-      |state       ||
+   |              |        |string|       |save/restore||
+   +----------------------------------------------------+

@@ -1,0 +1,357 @@
+            hw-memory-flash (libmemory.la :: mem_component_library)
+
+Synopsis:
+
+   This is a simulated ATMEL AT29 or AMD Am29 series flash memory. It can be
+   configured to emulate any of the AT29 or Am29 family members.
+
+     ----------------------------------------------------------------------
+
+Functionality:
+
+  Modelling:
+
+   Memory operations such as programming and erasing are achieved instantly
+   in simulation. As such, device facilities for performing in-progress
+   operations such as suspending and resuming erase operations are not
+   implemented.
+
+   Hardware sector protection is not implemented.
+
+   In the actual hardware, the ATMEL flash memory has timing sensitivities
+   when programming sectors. During such programming, the final byte that is
+   modified in a sector is set to an incorrect value until the programming
+   has been completed. In simulation, the programming of a sector appears to
+   be instantaneous. Therefore, it may not be possible to detect software
+   programs that are not sensitive to the timing requirements in real
+   hardware.
+
+   In AMTEL components, the data security facility that prevents the memory
+   from being inadvertently modified in the presence of bus transients, has a
+   similar restriction that forces data writes to be performed in rapid
+   succession. If an interval elapses, data security is re-enabled and the
+   unlocking code sequence must be reissued (see ``References'' for more
+   details).
+
+   +-------------------------------------------------+
+   |                    Behaviors                    |
+   |-------------------------------------------------|
+   |   configuration | Flash memory chips are        |
+   |                 | self-describing using their   |
+   |                 | device-code and               |
+   |                 | manufacturer-code values,     |
+   |                 | accessible both to a target   |
+   |                 | program, and to the simulator |
+   |                 | user via attributes. Since a  |
+   |                 | target program may infer      |
+   |                 | memory size from these        |
+   |                 | values, further simulation    |
+   |                 | configuration that overrides  |
+   |                 | these values should be        |
+   |                 | avoided unless necessary.     |
+   |                 |                               |
+   |                 | The device-code attribute     |
+   |                 | represents the device code of |
+   |                 | the flash memory part being   |
+   |                 | simulated. Refer to the ATMEL |
+   |                 | or AMD data sheet for a       |
+   |                 | complete list of device       |
+   |                 | identification codes. The     |
+   |                 | manufacturer-code read-only   |
+   |                 | attribute represents the      |
+   |                 | manufacturer code of the      |
+   |                 | flash memory. It is a         |
+   |                 | constant value for ATMEL and  |
+   |                 | AMD. The sector-size          |
+   |                 | attribute specifies the size  |
+   |                 | of an individual sector in    |
+   |                 | the flash memory. Typical     |
+   |                 | values are 64 to 512 bytes.   |
+   |                 |                               |
+   |                 | When the size attribute is    |
+   |                 | written-to with a legal       |
+   |                 | value, a new cleared byte     |
+   |                 | array is allocated with the   |
+   |                 | new size. The old byte array  |
+   |                 | is thrown away. The size-max  |
+   |                 | read-only attribute supplies  |
+   |                 | to the user the maximum size  |
+   |                 | that this component will      |
+   |                 | attempt to allocate.          |
+   |-----------------+-------------------------------|
+   | image save/load | When the image-load pin is    |
+   |                 | driven, this component will   |
+   |                 | open and attempt to load the  |
+   |                 | contents of the file given by |
+   |                 | the image-file attribute into |
+   |                 | the memory image. The file is |
+   |                 | copied byte-for-byte. If the  |
+   |                 | file is too short, zeroes are |
+   |                 | used to fill out the rest of  |
+   |                 | the memory.                   |
+   |                 |                               |
+   |                 | Similarly, when the           |
+   |                 | image-store pin is driven,    |
+   |                 | the component will write to   |
+   |                 | the image-file file a         |
+   |                 | byte-for-byte dump of the     |
+   |                 | entire memory image.          |
+   |-----------------+-------------------------------|
+   | reading/writing | When an access is received on |
+   |                 | the read-write-port bus, the  |
+   |                 | component checks the incoming |
+   |                 | address and rejects it if     |
+   |                 | out-of-range. The component   |
+   |                 | also rejects non-byte-sized   |
+   |                 | accesses.                     |
+   |                 |                               |
+   |                 | Memory can be read at will,   |
+   |                 | but for the AMD models, AMD's |
+   |                 | protocol must be followed to  |
+   |                 | put the device into byte      |
+   |                 | program mode or unlock bypass |
+   |                 | mode. The mode read-only      |
+   |                 | attribute reveals the         |
+   |                 | internal state of the device  |
+   |                 | state machine. This is        |
+   |                 | primarily designed for        |
+   |                 | testing purposes. For AMTEL   |
+   |                 | models, the data security     |
+   |                 | protocol must be followed     |
+   |                 | when writing to the memory -  |
+   |                 | see ATMEL documentation.      |
+   |-----------------+-------------------------------|
+   |  memory latency | The component models the      |
+   |                 | effects of memory latency.    |
+   |                 | The read-latency and          |
+   |                 | write-latency values specify  |
+   |                 | the latencies for memory      |
+   |                 | reads and writes,             |
+   |                 | respectively.                 |
+   +-------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |    functional | supported  | -                  |
+   |---------------+------------+--------------------|
+   |       latency | supported  | The component      |
+   |               |            | models memory      |
+   |               |            | latency.           |
+   |---------------+------------+--------------------|
+   |  save/restore | supported  | The component      |
+   |               |            | supports saving    |
+   |               |            | and restoring      |
+   |               |            | state in addition  |
+   |               |            | to memory          |
+   |               |            | persistence, via   |
+   |               |            | the image-store    |
+   |               |            | pin/attribute.     |
+   |---------------+------------+--------------------|
+   | triggerpoints | not        | -                  |
+   |               | supported  |                    |
+   +-------------------------------------------------+
+
+     ----------------------------------------------------------------------
+
+Environment:
+
+   Related components
+     * Customized versions of this component are available for standard
+       members of the AT29 flash family. Instantiating each of them is
+       equivalent to instantiating this generic component and setting the
+       appropriate sector-size, size, and device-code attribute settings.
+
+     * A flash memory will usually form a small part of the complete memory
+       subsystem, providing a region of non-volatile memory. The following
+       configuration file fragment demonstrates this:
+
+         new hw-mapper-basic bus
+         new hw-memory-flash-at29lv040 flash # AT29LV040: 512KB size, 512 sector-size
+         connect-bus bus [0,0x7FFFF] flash read-write-port
+        
+
+   Host system
+
+   The memory is modelled as a contiguous array of bytes in host memory. As
+   such, a component configured for 8MB of memory requires 8MB of host
+   memory. This is an important consideration for simulations running on
+   machines with low memory or on busy multiuser systems. Similarly, when a
+   memory image is written to disk, the same amount of space may be used
+   there.
+
+     ----------------------------------------------------------------------
+
+Component Reference:
+
+  Component: hw-memory-flash (Abstract)
+
+   +-------------------------------------------------+
+   |                      pins                       |
+   |-------------------------------------------------|
+   |   name    |direction|legalvalues|   behaviors   |
+   |-----------+---------+-----------+---------------|
+   |image-load |in       |any        |image          |
+   |           |         |           |load/store     |
+   |-----------+---------+-----------+---------------|
+   |image-store|in       |any        |image          |
+   |           |         |           |load/store     |
+   +-------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                      buses                      |
+   |-------------------------------------------------|
+   |     name      | addresses | accesses  |behaviors|
+   |---------------+-----------+-----------+---------|
+   |read-write-port|0 .. size-1|byte-wide  |         |
+   |               |           |access only|         |
+   +-------------------------------------------------+
+
+   +----------------------------------------------------------+
+   |                        attributes                        |
+   |----------------------------------------------------------|
+   |      name       |category| legal  |default|  behaviors  ||
+   |                 |        | values | value |             ||
+   |-----------------+--------+--------+-------+-------------||
+   |device-code      |setting |0 ..    |0x5B   |configuration||
+   |                 |        |0xFF    |       |             ||
+   |-----------------+--------+--------+-------+-------------||
+   |manufacturer-code|setting |0x1F    |0x1F   |configuration||
+   |-----------------+--------+--------+-------+-------------||
+   |size             |setting |numeric |524288 |configuration||
+   |-----------------+--------+--------+-------+-------------||
+   |size-max         |setting |numeric |fixed  |configuration||
+   |                 |        |        |at 32MB|             ||
+   |-----------------+--------+--------+-------+-------------||
+   |sector-size      |setting |numeric |512    |configuration||
+   |-----------------+--------+--------+-------+-------------||
+   |image-file       |setting |filename|-      |image        ||
+   |                 |        |        |       |save/load    ||
+   |-----------------+--------+--------+-------+-------------||
+   |read-latency     |setting |numeric |0      |memory       ||
+   |                 |        |        |       |latency      ||
+   |-----------------+--------+--------+-------+-------------||
+   |write-latency    |setting |numeric |0      |memory       ||
+   |                 |        |        |       |latency      ||
+   +----------------------------------------------------------+
+
+  Variant: hw-memory-flash-atmel (Abstract)
+
+  Variant: hw-memory-flash-at29
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29c256
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29lv256
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29c257
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29c512
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29lv512
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29c010a
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29lv010a
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29bv010a
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29c020
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29lv020
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29bv020
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29c040
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29lv040
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29bv040
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29c040a
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29lv040a
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-at29bv040a
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-amd (Abstract)
+
+   +-------------------------------------------------+
+   |                   attributes                    |
+   |-------------------------------------------------|
+   |name|category|legal |  default  |   behaviors   ||
+   |    |        |values|   value   |               ||
+   |----+--------+------+-----------+---------------||
+   |mode|-       |0 .. 9|0 for read |reading/writing||
+   |    |        |      |mode       |               ||
+   +-------------------------------------------------+
+
+  Variant: hw-memory-flash-am29
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-am29f010a
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-am29lv010b
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-am29lv040b
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-am29lv081b
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-am29lv017b
+
+   Same as hw-memory-flash-atmel
+
+  Variant: hw-memory-flash-am29lv033c
+
+   Same as hw-memory-flash-atmel
+
+     ----------------------------------------------------------------------
+
+References:
+
+   AMD Am29 series data sheets, application notes, ATMEL AT29 series data
+   sheets, application notes.

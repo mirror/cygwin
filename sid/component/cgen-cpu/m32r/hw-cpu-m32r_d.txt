@@ -1,163 +1,313 @@
-* Name
-  hw-cpu-m32r/d
+            hw-cpu-m32r/d (libcgencpu.la :: cgen_component_library)
 
-* Synopsis
-  This component models the M32R/D processor.
+Synopsis:
 
-  Buses: debugger-bus 
-  Pins: start-pc-set! reset! trap trap-code step! yield flush-icache
-  Accessors: data-memory insn-memory
-  Attributes: trace-extract? trace-result? engine-type
-        step-insn-count insn-count rN pc gdb-register-N gdb-num-registers state-snapshot
-	trap trap-code
+   This component models the M32R/D processor.
 
-  Library: libcgencpu.la
-  Symbol name: cgen_component_library
+     ----------------------------------------------------------------------
 
-* Functionality
+Functionality:
 
-  - Modelling
+  Modelling:
 
-    * This component models a simplified M32R/D processor.  
-    * It does not model supervisory functions such as
-      exceptions/traps.  It implements only a subset of user-level
-      M32R/D instructions.
+   This component models a simplified M32R/D processor.
 
-  - Behaviors
+   It does not model supervisory functions such as exceptions/traps. It
+   implements only a subset of user-level M32R/D instructions.
 
-    * Initialization
+   +-----------------------------------------------------+
+   |                      Behaviors                      |
+   |-----------------------------------------------------|
+   |  initialization|The CPU performs a power-on-reset   |
+   |                |style of operation when the reset!  |
+   |                |pin is driven.                      |
+   |                |                                    |
+   |                |Other mode settings may be          |
+   |                |controlled by pins and/or           |
+   |                |attributes: endian-set!/endian to   |
+   |                |set endianness, start-pc-set! to set|
+   |                |the PC. These are useful if the     |
+   |                |standard powerup state of the CPU   |
+   |                |needs to be changed for running a   |
+   |                |program that expects an initialized |
+   |                |environment.                        |
+   |----------------+------------------------------------|
+   |       execution|The component executes zero or more |
+   |                |instructions when the step! pin is  |
+   |                |driven. You can specify the maximum |
+   |                |number of instructions to be        |
+   |                |executed via the step-insn-count    |
+   |                |attribute. If the yield pin is      |
+   |                |driven in a reentrant fashion while |
+   |                |the instruction loop is active, the |
+   |                |loop will be exited at the next     |
+   |                |opportunity. At the end of the loop,|
+   |                |the step-cycles output pin is driven|
+   |                |with the number of instructions     |
+   |                |actually executed, though this value|
+   |                |is clamped to be at least 1. The    |
+   |                |insn-count attribute accumulates the|
+   |                |total number of instructions        |
+   |                |executed since reset.               |
+   |                |                                    |
+   |                |Each instruction is first fetched   |
+   |                |from memory via the insn-memory     |
+   |                |accessor, and its decoding traced if|
+   |                |the trace-extract? attribute is set |
+   |                |to a true value. The decoded form   |
+   |                |may be cached indefinitely          |
+   |                |afterwards, although this cache is  |
+   |                |flushed when the flush-icache pin is|
+   |                |driven.                             |
+   |                |                                    |
+   |                |The engine-type attribute specifies |
+   |                |whether the "scache" ("semantic     |
+   |                |cache") or "pbb" ("pseudo basic     |
+   |                |block") dispatching mechanism is    |
+   |                |used during execution. The "scache" |
+   |                |mode executes each instruction in   |
+   |                |isolation and checks all            |
+   |                |triggerpoints after each. If the    |
+   |                |enable-step-trap? attribute is set, |
+   |                |after each instruction, a           |
+   |                |single-stepping trap is signalled as|
+   |                |described in the exceptions/traps   |
+   |                |behavior below.                     |
+   |                |                                    |
+   |                |The "pbb" mode executes a series of |
+   |                |sequential instructions in one      |
+   |                |uninterruptible sequence, and is    |
+   |                |thus faster. However, it cannot     |
+   |                |handle triggerpoints or             |
+   |                |single-stepping, nor can it respond |
+   |                |to icache flushing as quickly. The  |
+   |                |"pbb" mode is temporarily and       |
+   |                |transparently downgraded to the     |
+   |                |"scache" mode when needed.          |
+   |                |                                    |
+   |                |During the execution of an          |
+   |                |instruction, this component may make|
+   |                |accesses using the data-memory      |
+   |                |accessor, may update its simulated  |
+   |                |registers, and may trigger an       |
+   |                |exception/trap.                     |
+   |----------------+------------------------------------|
+   |exceptions/traps|When encountering exception/trap    |
+   |                |conditions such as memory access    |
+   |                |errors or software interrupts, this |
+   |                |component signals the event using   |
+   |                |the trap pin. (For some traps, the  |
+   |                |trap-code pin is driven with extra  |
+   |                |information just beforehand.) An    |
+   |                |external component may interpret the|
+   |                |values in the table below, and      |
+   |                |declare a disposition for the       |
+   |                |condition. In the absence of input, |
+   |                |the condition will be treated as the|
+   |                |hardware would, that is by          |
+   |                |dispatching to exception vectors,   |
+   |                |switching processor modes, etc.     |
+   |                |                                    |
+   |                |The trap codes sent on the trap     |
+   |                |output pin are:                     |
+   |                |                                    |
+   |                |+----------------------------------+|
+   |                || trap | cause       | trap-code   ||
+   |                ||------+-------------+-------------||
+   |                || 1    | software    | instruction ||
+   |                ||      | trap        | bitmap      ||
+   |                ||------+-------------+-------------||
+   |                || 2    | breakpoint  | bkpt number ||
+   |                ||------+-------------+-------------||
+   |                || 3    | system call | syscall     ||
+   |                ||      |             | number      ||
+   |                ||------+-------------+-------------||
+   |                || 4    | invalid     | n/a         ||
+   |                ||      | instruction |             ||
+   |                ||------+-------------+-------------||
+   |                || 5    | memory      | faulting    ||
+   |                ||      | fault       | address     ||
+   |                ||------+-------------+-------------||
+   |                || 6    | arithmetic  | faulting    ||
+   |                ||      | overflow    | address     ||
+   |                ||------+-------------+-------------||
+   |                || 7    | stepped     | n/a         ||
+   |                |+----------------------------------+|
+   |                |                                    |
+   |                |The disposition codes returned on   |
+   |                |the trap input pin are:             |
+   |                |                                    |
+   |                |+----------------------------------+|
+   |                || trap     | effect                ||
+   |                ||----------+-----------------------||
+   |                || 0 or n/a | dispatch as hardware  ||
+   |                ||          | would                 ||
+   |                ||----------+-----------------------||
+   |                || 1        | handled; continue     ||
+   |                ||----------+-----------------------||
+   |                || 2        | reissue               ||
+   |                ||----------+-----------------------||
+   |                ||          | handled; skip         ||
+   |                || 3        | instruction and       ||
+   |                ||          | continue              ||
+   |                |+----------------------------------+|
+   |----------------+------------------------------------|
+   | register access|Most general purpose registers are  |
+   |                |accessible as attributes r0 through |
+   |                |r14. The pc attribute is also       |
+   |                |available.                          |
+   |                |                                    |
+   |                |This component exports a number of  |
+   |                |attributes for use by the           |
+   |                |sw-debug-gdb component. These are   |
+   |                |the gdb-* attributes, in the        |
+   |                |"debugger" category. The            |
+   |                |gdb-register-N group access all     |
+   |                |registers in gdb's indexing scheme, |
+   |                |in raw target byte order. The       |
+   |                |gdb-register-pc is a special        |
+   |                |watchable value with no associated  |
+   |                |attribute. The gdb-num-registers    |
+   |                |attribute provides the limit for N. |
+   |                |The gdb-exp-registers attribute     |
+   |                |provides a semicolon-separated list |
+   |                |of "expedited" register numbers.    |
+   |                |                                    |
+   |                |The debugger-bus bus provides access|
+   |                |to the target program's address     |
+   |                |space, and is used by gdb to access |
+   |                |target memory.                      |
+   +-----------------------------------------------------+
 
-      The cpu performs a power-on-reset of style operation when the
-      "reset!" pin is driven.  Other mode settings may be controlled
-      by pins and/or attributes, for instance, "start-pc-set!" to set 
-      the PC.  These are useful if the standard powerup state of the 
-      CPU needs to be changed for running a program that expects an 
-      initialized environment.
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |        functional | supported | -               |
+   |-------------------+-----------+-----------------|
+   |      save/restore | supported | -               |
+   |-------------------+-----------+-----------------|
+   |     triggerpoints | supported | Triggerpoints   |
+   |                   |           | are supported   |
+   |                   |           | for CPU         |
+   |                   |           | registers.      |
+   |-------------------+-----------+-----------------|
+   | inhibit-recursion | supported | It prevents     |
+   |                   |           | harmful         |
+   |                   |           | recursion from  |
+   |                   |           | the step! input |
+   |                   |           | pin.            |
+   +-------------------------------------------------+
 
-    * Execution
+     ----------------------------------------------------------------------
 
-      The component executes zero or more instructions when the
-      "step!" pin is driven.  You can specify the maximum number 
-      of instructions to be executed via the "step-insn-count"
-      attribute.  If the "yield" pin is driven in a reentrant fashion 
-      while the instruction loop is active, the loop will be exited at 
-      the next opportunity.  The "insn-count" attribute accumulates
-      the total number of instructions executed since reset.
+Environment:
 
-      Each instruction is first fetched from memory via the
-      "insn-memory" accessor, and its decoding traced if the
-      "trace-extract?" attribute is set to a true value.  The decoded
-      form may be cached indefinitely afterwards, although this cache is
-      flushed when the "flush-icache" pin is driven.
+   Related components:
 
-      During the execution of an instruction, this component may make
-      accesses using the "data-memory" accessor, may update its
-      simulated registers, and may trigger an exception/trap.  
+   CPUs connect to many components: memory to store data and instructions, a
+   scheduler to provide step! signals, software trap emulators, debugger
+   interfaces. The step-cycles output pin may be used as a N-event-control
+   input for a target scheduler to track an estimate of consumed target time.
 
-      If the "enable-step-trap?" attribute is set, after each
-      instruction, a single-stepping trap is signalled as described in
-      the "Exceptions/traps" behavior below.
+   Host system:
 
-    * Exceptions/traps
+   Some error conditions are signalled by messages to standard error. These
+   include some illegal CPU states caused by the simulated program.
 
-      When encountering exception/trap conditions such as memory
-      access errors or software interrupts, this component signals the
-      event using the "trap" pin.  (For some traps, the "trap-code"
-      pin is driven with extra information just beforehand.)  An
-      external component may interpret the values in the table below,
-      and declare a disposition for the condition.  In the absence of
-      input, the condition will be treated as the hardware would, that
-      is by dispatching to exception vectors, switching processor
-      modes, etc.
+     ----------------------------------------------------------------------
 
-      The trap codes sent on the "trap" output pin are:
-      "trap"    cause                   "trap-code"
-      1         software trap           instruction bitmap
-      2         breakpoint              bkpt number
-      3         system call             syscall number
-      4         invalid instruction     n/a
-      5         memory fault            faulting address
-      6         arithmetic overflow     faulting address
-      7         stepped                 n/a
+Component Reference:
 
-      The disposition codes returned on the "trap" input pin are:
-      "trap"    effect
-      0 or n/a  dispatch as hardware would
-      1         handled; continue
-      2         reissue
-      3         handled; skip instruction and continue
+  Component: hw-cpu-m32r/d
 
-    * Register access
+   +-----------------------------------------------------------+
+   |                           pins                            |
+   |-----------------------------------------------------------|
+   |    name     |direction|   legalvalues    |   behaviors    |
+   |-------------+---------+------------------+----------------|
+   |endian-set!  |in       |1 (big) / 2       |initialization  |
+   |             |         |(little)          |                |
+   |-------------+---------+------------------+----------------|
+   |start-pc-set!|in       |any value         |initialization  |
+   |-------------+---------+------------------+----------------|
+   |reset!       |in       |0 or 1            |initialization  |
+   |-------------+---------+------------------+----------------|
+   |trap         |inout    |enum values       |exceptions/traps|
+   |-------------+---------+------------------+----------------|
+   |trap-code    |out      |various values    |exceptions/traps|
+   |-------------+---------+------------------+----------------|
+   |step-cycles  |out      |1..step-insn-count|execution       |
+   |-------------+---------+------------------+----------------|
+   |step!        |in       |any value         |execution       |
+   |-------------+---------+------------------+----------------|
+   |yield        |in       |any               |execution       |
+   |-------------+---------+------------------+----------------|
+   |flush-icache |in       |any               |execution       |
+   +-----------------------------------------------------------+
 
-      Most general purpose registers are accessible as attributes "r0"
-      through "r14".  The "pc" attribute is also available.
+   +-------------------------------------------------+
+   |                      buses                      |
+   |-------------------------------------------------|
+   |     name     | addresses | accesses | behaviors |
+   |--------------+-----------+----------+-----------|
+   | debugger-bus | any       | any      | debugger  |
+   |              |           |          | access    |
+   +-------------------------------------------------+
 
-      This component exports a number of attributes for use by the
-      sw-debug-gdb component.  These are the "gdb-*" attributes, in
-      the "debugger" category.  The "gdb-register-N" group access all
-      registers in gdb's indexing scheme, in raw target byte order.
-      The "gdb-register-pc" is a special watchable with no associated
-      attribute.  The "gdb-num-registers" attribute provides the limit
-      for N.
+   +---------------------------------------------------------------------------+
+   |                                attributes                                 |
+   |---------------------------------------------------------------------------|
+   |      name       |category |     legal values     |default|   behaviors   ||
+   |                 |         |                      | value |               ||
+   |-----------------+---------+----------------------+-------+---------------||
+   |endian           |register |'1'/'big'/'2'/'little'|big    |initialization,||
+   |                 |         |                      |       |register access||
+   |-----------------+---------+----------------------+-------+---------------||
+   |trace-extract?   |setting  |boolean               |false  |initialization ||
+   |-----------------+---------+----------------------+-------+---------------||
+   |trace-result?    |setting  |boolean               |false  |initialization ||
+   |-----------------+---------+----------------------+-------+---------------||
+   |engine-type      |setting  |scache or pbb         |pbb    |execution      ||
+   |-----------------+---------+----------------------+-------+---------------||
+   |insn-count       |watchable|number                |-      |execution      ||
+   |                 |register |                      |       |               ||
+   |-----------------+---------+----------------------+-------+---------------||
+   |step-insn-count  |setting  |number                |1      |execution      ||
+   |-----------------+---------+----------------------+-------+---------------||
+   |enable-step-trap?|setting  |boolean               |false  |execution      ||
+   |-----------------+---------+----------------------+-------+---------------||
+   |rN               |watchable|number                |-      |register access||
+   |                 |register |                      |       |               ||
+   |-----------------+---------+----------------------+-------+---------------||
+   |pc               |watchable|number                |-      |register access||
+   |                 |register |                      |       |               ||
+   |-----------------+---------+----------------------+-------+---------------||
+   |gdb-register-N   |debugger |byte array            |-      |register access||
+   |-----------------+---------+----------------------+-------+---------------||
+   |gdb-num-registers|debugger |number                |-      |register access||
+   |-----------------+---------+----------------------+-------+---------------||
+   |gdb-exp-registers|debugger |number list           |-      |register access||
+   |-----------------+---------+----------------------+-------+---------------||
+   |state-snapshot   |-        |opaque string         |-      |state          ||
+   |                 |         |                      |       |save/restore   ||
+   |-----------------+---------+----------------------+-------+---------------||
+   |step-cycles      |watchable|number                |-      |execution      ||
+   |                 |pin      |                      |       |               ||
+   |-----------------+---------+----------------------+-------+---------------||
+   |trap             |watchable|number                |-      |execution/traps||
+   |                 |pin      |                      |       |               ||
+   |-----------------+---------+----------------------+-------+---------------||
+   |trap-code        |watchable|number                |-      |execution/traps||
+   |                 |pin      |                      |       |               ||
+   +---------------------------------------------------------------------------+
 
-      The "debugger-bus" bus provides access to the target program's
-      address space, and is used by gdb to access target memory.
-
-  - SID conventions
-
-    * This is a functional component.
-    * It supports save/restore of the CPU state.
-    * Triggerpoints are supported for CPU registers.
-    * It prevents harmful recursion from the "step!" input pin.
-
-* Environment
-
-  Related components:
-
-  * CPUs connect to many components: memory to store data and
-    instructions, a scheduler to provide "step!" signals, software
-    trap emulators, debugger interfaces.
-
-  Host system:
-
-  * Some error conditions are signalled by messages to standard error.
-    These include some illegal CPU states caused by the simulated
-    program.
-
-* SID interface reference
-
-  Low level:
-
-  * pins
-
-  start-pc-set! | input | any value | initialization
-  reset! | input | 0 or 1 | initialization
-  trap | input/output | enum values | exceptions/traps
-  trap-code | output | various values | exceptions/traps
-  step! | input | any value | execution
-  yield | input | any | execution
-  flush-icache | input | any | execution
-
-  * accessors
-
-  data-memory | any | execution
-  insn-memory | typically 4-byte accesses | execution
-
-  * buses
-
-  debugger-bus | any | any | debugger access
-
-  * attributes
-
-  trace-extract? | setting | boolean | false | initialization
-  trace-result? | setting | boolean | false | initialization
-  step-insn-count | setting | number | 1 | execution
-  insn-count | watchable register | number | n/a | execution
-  enable-step-trap? | setting | boolean | false | execution
-  rN | watchable register | number | n/a | register access
-  pc | watchable register | number | n/a | register access
-  gdb-register-N | debugger | byte array | n/a | register access
-  gdb-num-registers | debugger | number | n/a | register access
-  state-snapshot | | opaque string | n/a | state save/restore
-  trap | watchable pin | number | n/a | execution/traps
-  trap-code | watchable pin | number | n/a | execution/traps
+   +-------------------------------------------------+
+   |                    accessors                    |
+   |-------------------------------------------------|
+   |    name     |       accesses        | behaviors |
+   |-------------+-----------------------+-----------|
+   | data-memory | any                   | execution |
+   |-------------+-----------------------+-----------|
+   | insn-memory | typically 4-byte      | execution |
+   |             | accesses              |           |
+   +-------------------------------------------------+

@@ -1,114 +1,194 @@
-* Name
-  hw-glue-probe-bus
+            hw-glue-probe-bus (libglue.la :: glue_component_library)
 
-* Synopsis
-  This component samples and/or traces bus traffic.
+Synopsis:
 
-  Buses: upstream
-  Accessors: downstream
-  Attributes: sample-interval trace? interval-counter address data-high 
-              data-low status type
-  Pins: address data-high data-low status type
-  Shared library: libglue.la
-  Symbol: glue_component_library
+   This component samples and/or traces bus traffic.
 
-* Functionality
- 
-  - Modelling
-    * This component resembles a probe that transparently monitors bus traffic.
+     ----------------------------------------------------------------------
 
-  - Behaviors
-    * Bus traffic passthrough When the "downstream" accessor is
-      configured, all incoming bus API calls to the "upstream" bus are
-      passed through verbatim.  Without the "downstream" accessor
-      configured, the "upstream" bus will return bus::unmapped for all
-      calls.  Still, the sampling and tracing functions are still
-      active.
+Functionality:
 
-    * Bus traffic sampling
-      Every now and then (at an interval configured by the "sample-interval"
-      attribute), a transaction is also reported via a collection of output
-      pins.  In sequence, the following output pins are driven:
-        * "address" - address parameter
-        * "data-high" - top 32 bits of bus data being read/written
-        * "data-low" - bottom 32 bits of same
-        * "status" - bus::status value returned from downstream
-        * "type" - an encoded value identifying the size, endianness, and
-          direction of the data transfer.  Specifically, in C lingo,
-          (type & 0x00F): log2 of access size (0/1/2/3 for *_int_1/2/4/8)
-          (type & 0x010): 0x10 (little-endian) or 0x00 (big-endian)
-          (type & 0x100): 0x100 (read) or 0x00 (write)
-      This sampling function is disabled if "sample-interval" is zero.  The
-      read-only "interval-counter" attribute indicates the current value of
-      the modular transaction counter.
+  Modelling:
 
-    * Bus traffic tracing
-      If the "trace?" attribute is set, sampled bus traffic is traced to stdout
-      in a compact format.  The sampling counter is shared with the traffic probing
-      behavior above.
+   This component resembles a probe that transparently monitors bus traffic.
 
-      One line per transaction is shown in a format resembling the common gdb simulators'
-      "--trace-core" output:
-                MODE:ADDRESS ARROW DATA [LATENCY] [STATUS]
-      where
-      MODE is an encoding of the access type: {read,write}-{le,be}-{1,2,4,8}
-           where "le" and "be" represent little- or big-endianness,
-           and 1-8 represent the number of bytes transferred.
-      ARROW is a redundant encoding of direction: {->,<-} for {read,write}
-      ADDRESS and DATA are hex-encoded host-endian values,
-      LATENCY is a string encoding of the bus access latency, though 0 is omitted
-      STATUS is a string encoding of the bus::status, though "ok" is omitted
++------------------------------------------------------------------------------------+
+|                                     Behaviors                                      |
+|------------------------------------------------------------------------------------|
+|bus traffic|When the downstream accessor is configured, all incoming bus API calls  |
+|passthrough|to the upstream bus are passed through verbatim. Without the downstream |
+|           |accessor configured, the upstream bus will return bus::unmapped for all |
+|           |calls. Still, the sampling and tracing functions are still active.      |
+|-----------+------------------------------------------------------------------------|
+|bus traffic|Every now and then (at an interval configured by the sample-interval    |
+|   sampling|attribute), a transaction is also reported via a collection of output   |
+|           |pins. In sequence, the following output pins are driven:                |
+|           |                                                                        |
+|           |  * "address" - address parameter                                       |
+|           |  * "data-high" - top 32 bits of bus data being read/written            |
+|           |  * "data-low" - bottom 32 bits of same                                 |
+|           |  * "status" - bus::status value returned from downstream               |
+|           |  * "type" - an encoded value identifying the size, endianness, and     |
+|           |    direction of the data transfer. Specifically, in C lingo,           |
+|           |                                                                        |
+|           |         (type & 0x00F): log2 of access size (0/1/2/3 for *_int_1/2/4/8)|
+|           |         (type & 0x010): 0x10 (little-endian) or 0x00 (big-endian)      |
+|           |         (type & 0x100): 0x100 (read) or 0x00 (write)                   |
+|           |                                                                        |
+|           |This sampling function is disabled if sample-interval is zero. The      |
+|           |read-only interval-counter attribute indicates the current value of the |
+|           |modular transaction counter.                                            |
+|-----------+------------------------------------------------------------------------|
+|bus traffic|If the trace? attribute is set, sampled bus traffic is traced to stdout |
+|    tracing|in a compact format. The sampling counter is shared with the traffic    |
+|           |probing behavior above.                                                 |
+|           |                                                                        |
+|           |One line per transaction is shown in a format resembling the common gdb |
+|           |simulators' --trace-core output:                                        |
+|           |                                                                        |
+|           |MODE:ADDRESS ARROW DATA [LATENCY] [STATUS] where MODE is an encoding of |
+|           |the access type: zzz where le and be represent little- or               |
+|           |big-endianness, and 1-8 represent the number of bytes transferred. ARROW|
+|           |is a redundant encoding of direction: {->,<-} for {read,write} ADDRESS  |
+|           |and DATA are hex-encoded host-endian values, LATENCY is a string        |
+|           |encoding of the bus access latency, though 0 is ommited STATUS is a     |
+|           |string encoding of the bus::status, though ok is omitted Examples:      |
+|           |                                                                        |
+|           |      write-be-2:0xa002001c <- 0x3442                                   |
+|           |      read-le-8:0x807fff30 -> 0xffffffff807fff68 l:10                   |
+|           |      write-be-4:0xfeedface <- 0xdeadbeef unmapped!                     |
++------------------------------------------------------------------------------------+
 
-      Examples:
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |   functional | supported  | This is a           |
+   |              |            | functional          |
+   |              |            | component.          |
+   |--------------+------------+---------------------|
+   |        state | not        | This component does |
+   | save/restore | supported  | not support state   |
+   |              |            | save/restore.       |
+   |--------------+------------+---------------------|
+   |  watchpoints | not        | This component does |
+   |              | supported  | not support         |
+   |              |            | watchpoints.        |
+   |--------------+------------+---------------------|
+   |   Reentrancy | not        | Reentrancy is not   |
+   |      Control | supported  | controlled.         |
+   |--------------+------------+---------------------|
+   | presentation | supported  | This component      |
+   |              |            | presents attributes |
+   |              |            | in the "pin",       |
+   |              |            | "setting", and      |
+   |              |            | "register"          |
+   |              |            | categories.         |
+   +-------------------------------------------------+
 
-      write-be-2:0xa002001c <- 0x3442
-      read-le-8:0x807fff30 -> 0xffffffff807fff68 l:10
-      write-be-4:0xfeedface <- 0xdeadbeef unmapped!
+     ----------------------------------------------------------------------
 
-  - SID conventions
-    * This is a functional component.
-    * It does not support state save/restore.
-    * It does not support watchpoints.
-    * Reentrancy is not controlled.
-    * It presents attributes in the "pin", "setting", and "register" 
-      categories.
+Environment:
 
-* Environment
-  - Related components
-    * This component may be interjected between bus masters and a mapper to
-      trace traffic.
+   Related components
 
-	new hw-glue-probe-bus bus-prober
-	new SOME_KIND_OF_CPU cpu
-        new SOME_KIND_OF_MAPPER mapper
-        connect-bus cpu insn-memory bus-prober upstream
-        connect-bus bus-prober downstream mapper access-port
-        set bus-prober trace? 1
+   This component may be interjected between bus masters and a mapper to
+   trace traffic.
 
-    * A statistics-gathering component could attach to the sampling output
-      pins to maintain a picture of a program's memory access patterns.
+         new hw-glue-probe-bus bus-prober
+         new SOME_KIND_OF_CPU cpu
+         new SOME_KIND_OF_MAPPER mapper
+         connect-bus cpu insn-memory bus-prober upstream
+         connect-bus bus-prober downstream mapper access-port
+         set bus-prober trace? 1
 
-* SID interface reference
-  - low level:
-    * buses
-      - upstream | unrestricted | unrestricted | bus traffic passthrough/etc.
+   A statistics-gathering component could attach to the sampling output pins
+   to maintain a picture of a program's memory access patterns.
 
-    * accessors
-      - downstream | unrestricted | unrestricted | bus traffic passthrough
+     ----------------------------------------------------------------------
 
-    * pins
-      - address | output | any | bus traffic sampling
-      - data-high | output | any | bus traffic sampling
-      - data-low | output | any | bus traffic sampling
-      - status | output | bus::status values | bus traffic sampling
-      - type | output | enum values  | bus traffic sampling
+Component Reference:
 
-    * attributes
-      - trace? | setting | boolean | 0 | bus traffic tracing
-      - sample-interval | setting | numeric | 1 | bus traffic sampling
-      - interval-counter | register | numeric | n/a | bus traffic sampling
-      - address | pin | numeric | n/a | bus traffic sampling
-      - data-high | pin | numeric | n/a | bus traffic sampling
-      - data-low | pin | numeric | n/a | bus traffic sampling
-      - status | pin | numeric | n/a | bus traffic sampling
-      - type | pin | numeric | n/a | bus traffic sampling
+  Component: hw-glue-probe-bus
+
+   +-------------------------------------------------+
+   |                      pins                       |
+   |-------------------------------------------------|
+   |   name    | direction | legalvalues | behaviors |
+   |-----------+-----------+-------------+-----------|
+   |           |           |             | bus       |
+   | address   | out       | any         | traffic   |
+   |           |           |             | sampling  |
+   |-----------+-----------+-------------+-----------|
+   |           |           |             | bus       |
+   | data-high | out       | any         | traffic   |
+   |           |           |             | sampling  |
+   |-----------+-----------+-------------+-----------|
+   |           |           |             | bus       |
+   | data-low  | out       | any         | traffic   |
+   |           |           |             | sampling  |
+   |-----------+-----------+-------------+-----------|
+   |           |           | bus::status | bus       |
+   | status    | out       | values      | traffic   |
+   |           |           |             | sampling  |
+   |-----------+-----------+-------------+-----------|
+   |           |           |             | bus       |
+   | type      | out       | enum values | traffic   |
+   |           |           |             | sampling  |
+   +-------------------------------------------------+
+
+   +---------------------------------------------------+
+   |                       buses                       |
+   |---------------------------------------------------|
+   |  name  | addresses  |  accesses  |   behaviors    |
+   |--------+------------+------------+----------------|
+   |upstream|unrestricted|unrestricted|bus traffic     |
+   |        |            |            |passthrough/etc.|
+   +---------------------------------------------------+
+
+   +----------------------------------------------------+
+   |                     attributes                     |
+   |----------------------------------------------------|
+   |      name      |category| legal |default|behaviors||
+   |                |        |values | value |         ||
+   |----------------+--------+-------+-------+---------||
+   |                |        |       |       |bus      ||
+   |trace?          |setting |boolean|0      |traffic  ||
+   |                |        |       |       |tracing  ||
+   |----------------+--------+-------+-------+---------||
+   |                |        |       |       |bus      ||
+   |sample-interval |setting |numeric|1      |traffic  ||
+   |                |        |       |       |sampling ||
+   |----------------+--------+-------+-------+---------||
+   |                |        |       |       |bus      ||
+   |interval-counter|register|numeric|-      |traffic  ||
+   |                |        |       |       |sampling ||
+   |----------------+--------+-------+-------+---------||
+   |                |        |       |       |bus      ||
+   |address         |pin     |numeric|-      |traffic  ||
+   |                |        |       |       |sampling ||
+   |----------------+--------+-------+-------+---------||
+   |                |        |       |       |bus      ||
+   |data-high       |pin     |numeric|-      |traffic  ||
+   |                |        |       |       |sampling ||
+   |----------------+--------+-------+-------+---------||
+   |                |        |       |       |bus      ||
+   |data-low        |pin     |numeric|-      |traffic  ||
+   |                |        |       |       |sampling ||
+   |----------------+--------+-------+-------+---------||
+   |                |        |       |       |bus      ||
+   |status          |pin     |numeric|-      |traffic  ||
+   |                |        |       |       |sampling ||
+   |----------------+--------+-------+-------+---------||
+   |                |        |       |       |bus      ||
+   |type            |pin     |numeric|-      |traffic  ||
+   |                |        |       |       |sampling ||
+   +----------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                    accessors                    |
+   |-------------------------------------------------|
+   |    name    |   accesses   |      behaviors      |
+   |------------+--------------+---------------------|
+   | downstream | unrestricted | bus traffic         |
+   |            |              | passthrough         |
+   +-------------------------------------------------+

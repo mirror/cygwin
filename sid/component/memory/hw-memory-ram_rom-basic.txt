@@ -1,149 +1,232 @@
-* Name
-  hw-memory-ram/rom-basic
+        hw-memory-ram/rom-basic (libmemory.la :: mem_component_library)
 
-* Synopsis
-  This is a general-purpose byte-addressable RAM or ROM.  Its contents
-  may be primed with existing data from a file.  The size of the
-  memory may be altered at any time.
+Synopsis:
 
-  Buses: read-only-port read-write-port
-  Pins: image-load image-store image-mmap image-msync error
-  Attributes: size size-max image-file image-load image-store
-              state-snapshot read-latency write-latency
-  Library: libmemory.la
-  Symbol name: mem_component_library
+   This is a general-purpose byte-addressable RAM or ROM. Its contents may be
+   primed with existing data from a file. The size of the memory may be
+   altered at any time.
 
-* Functionality
+     ----------------------------------------------------------------------
 
-  - Modelling
-    * This component does not model any particular hardware component.
-      It models a generic memory without any access delays.
+Functionality:
 
-  - Behaviors
+  Modelling:
 
-    * Configuration
+   This component does not model any particular hardware component. It models
+   a generic memory without any access delays.
 
-      When the "size" attribute is written-to with a legal value, a
-      new cleared byte array is allocated with the new size.  The old
-      byte array is thrown away.  The "size-max" read-only attribute
-      supplies to the user the maximum size that this component will
-      attempt to allocate.  (Larger memory banks may be modelled by
-      using multiple instances of this component.)
+   +-------------------------------------------------+
+   |                    Behaviors                    |
+   |-------------------------------------------------|
+   |    configuration | When the size attribute is   |
+   |                  | written-to with a legal      |
+   |                  | value, a new cleared byte    |
+   |                  | array is allocated with the  |
+   |                  | new size. The old byte array |
+   |                  | is thrown away. The size-max |
+   |                  | read-only attribute supplies |
+   |                  | to the user the maximum size |
+   |                  | that this component will     |
+   |                  | attempt to allocate. (Larger |
+   |                  | memory banks may be modelled |
+   |                  | by using multiple instances  |
+   |                  | of this component.)          |
+   |------------------+------------------------------|
+   |  image save/load | When the image-load pin is   |
+   |                  | driven, this component will  |
+   |                  | open and attempt to load the |
+   |                  | contents of the file given   |
+   |                  | by the image-file attribute  |
+   |                  | into the memory image. The   |
+   |                  | file is copied               |
+   |                  | byte-for-byte. If the file   |
+   |                  | is too short, zeroes are     |
+   |                  | used to fill out the rest of |
+   |                  | the memory.                  |
+   |                  |                              |
+   |                  | Similarly, when the          |
+   |                  | image-store pin is driven,   |
+   |                  | the component will write to  |
+   |                  | the image-file file a        |
+   |                  | byte-for-byte dump of the    |
+   |                  | entire memory image.         |
+   |------------------+------------------------------|
+   |       image mmap | As an alternative to the     |
+   |                  | batch image load/store       |
+   |                  | function, when the           |
+   |                  | image-mmap pin is driven,    |
+   |                  | the component will map into  |
+   |                  | memory the first size bytes  |
+   |                  | of image-file. It is mapped  |
+   |                  | in MAP_SHARED,               |
+   |                  | PROT_READ|PROT_WRITE mode.   |
+   |                  | Additionally, when the       |
+   |                  | image-msync pin is driven,   |
+   |                  | the msync system call is     |
+   |                  | invoked to force a           |
+   |                  | synchronization between the  |
+   |                  | physical file and the memory |
+   |                  | image.                       |
+   |                  |                              |
+   |                  | The file will be unmapped    |
+   |                  | when the component is        |
+   |                  | deleted, or when the size    |
+   |                  | attribute is written to.     |
+   |                  | State save/restore stores    |
+   |                  | the content of the mapped    |
+   |                  | memory buffer, not the       |
+   |                  | mapped-ness.                 |
+   |------------------+------------------------------|
+   | error indication | When operating system errors |
+   |                  | prevent some                 |
+   |                  | configuration-related action |
+   |                  | from succeeding, the error   |
+   |                  | output pin is driven.        |
+   |                  | Reasons may include          |
+   |                  | attempting to access         |
+   |                  | nonexistent files,           |
+   |                  | out-of-memory conditions,    |
+   |                  | permission problems, and so  |
+   |                  | on. It is advantageous to    |
+   |                  | configure the connection     |
+   |                  | from this pin to some        |
+   |                  | system-wide recepient before |
+   |                  | failure-prone component      |
+   |                  | configuration occurs.        |
+   |------------------+------------------------------|
+   |   memory latency | The component models the     |
+   |                  | effects of memory latency.   |
+   |                  | The read-latency and         |
+   |                  | write-latency values specify |
+   |                  | the latencies for memory     |
+   |                  | reads and writes,            |
+   |                  | respectively.                |
+   |------------------+------------------------------|
+   |  reading/writing | When an access is received   |
+   |                  | on either the read-only-port |
+   |                  | or read-write-port bus, the  |
+   |                  | component checks the         |
+   |                  | incoming address. If it is   |
+   |                  | an in-range read access, it  |
+   |                  | will be carried out. If it   |
+   |                  | is a write access, it will   |
+   |                  | be prevented through the     |
+   |                  | read-only-port.              |
+   |                  |                              |
+   |                  | There are no restrictions on |
+   |                  | access alignment or size     |
+   |                  | imposed by this model.       |
+   +-------------------------------------------------+
 
-    * Image save/load/mmap
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |         functional | supported          | -     |
+   |--------------------+--------------------+-------|
+   |            latency | supported          | -     |
+   |--------------------+--------------------+-------|
+   |       save/restore | supported          | -     |
+   |--------------------+--------------------+-------|
+   |      triggerpoints | not supported      | -     |
+   +-------------------------------------------------+
 
-      When the "image-load" pin is driven, this component will open
-      and attempt to load the contents of the file given by the
-      "image-file" attribute into the memory image.  The file is
-      copied byte-for-byte.  If the file is too short, zeroes are used
-      to fill out the rest of the memory.
- 
-      Similarly, when the "image-store" pin is driven, the component
-      will write to the "image-file" file a byte-for-byte dump of the
-      entire memory image.
+     ----------------------------------------------------------------------
 
-    * Image mmap
+Environment:
 
-      As an alternative to the batch image load/store function, when the
-      "image-mmap" pin is driven, the component will map into memory 
-      the first "size" bytes of "image-file".  It is mapped in MAP_SHARED,
-      PROT_READ|PROT_WRITE mode.  Additionally, when the "image-msync"
-      pin is driven, the msync system call is invoked to force a
-      synchronization between the physical file and the memory image.
+   Related components
 
-      The file will be unmapped when the component is deleted, or when
-      the "size" attribute is written to.  State save/restore stores
-      the content of the mapped memory buffer, not the mapped-ness.
+   It is most likely that this component will be used as the main memory for
+   a CPU and connected through a mapper component such as hw-mapper-basic.
 
-    * Error indication
+   A configuration file fragment appears below:
 
-      When operating system errors prevent some configuration-related 
-      action from succeeding, the "error" output pin is driven.  Reasons
-      may include attempting to access nonexistent files, out-of-memory
-      conditions, permission problems, and so on.  It is advantageous to
-      configure the connection from this pin to some system-wide recepient
-      before failure-prone component configuration occurs.
+         new hw-mapper-basic bus
+         new hw-cpu-arm7t cpu
+         new hw-memory-ram/rom-basic mem
+         # error indication
+         connect-pin mem error -> main stop!
+         set mem size 65536
+         connect-bus cpu insn-memory bus access-port
+         connect-bus cpu data-memory bus access-port
+         connect bus [0-65535] mem read-write-port
+         # a read-only shadow in high memory
+         connect-bus [400000,465535] mem read-only-port
+    
 
-    * Memory latency
+   Host system
 
-      The component models the effects of memory latency.  The
-      read-latency and write-latency attribute values specify the
-      latencies for memory reads and writes, respectively.
+   The memory is modelled as a contiguous array of bytes in host memory. As
+   such, a component configured for 8MB of memory requires 8MB of host
+   memory. This is an important consideration for simulations running on
+   machines with low memory or on busy multiuser systems. Similarly, when a
+   memory image is written to disk, the same amount of space may be used
+   there.
 
-    * Reading/writing
+   When using memory mapped files, the host's virtual memory system may
+   reduce physical RAM requirements considerably.
 
-      When an access is received on either the "read-only-port" or
-      "read-write-port" bus, the component checks the incoming
-      address.  If it is an in-range read access, it will be carried
-      out.  If it is a write access, it will be prevented through the
-      "read-only-port".
+     ----------------------------------------------------------------------
 
-      There are no restrictions on access alignment or size imposed by
-      this model.
+Component Reference:
 
-  - SID conventions
-    * This is a functional component.
-    * The component models memory latency.
-    * The component supports saving and restoring state in addition to
-      memory persistence, via the image-store pin/attribute.
-    * Triggerpoints are not supported.
+  Component: hw-memory-ram/rom-basic
 
-* Environment
+   +-------------------------------------------------+
+   |                      pins                       |
+   |-------------------------------------------------|
+   |   name    |direction|legalvalues|   behaviors   |
+   |-----------+---------+-----------+---------------|
+   |image-load |in       |any        |image save/load|
+   |-----------+---------+-----------+---------------|
+   |image-store|in       |any        |image save/load|
+   |-----------+---------+-----------+---------------|
+   |image-mmap |in       |any        |image mmap     |
+   |-----------+---------+-----------+---------------|
+   |image-msync|in       |any        |image mmap     |
+   |-----------+---------+-----------+---------------|
+   |error      |out      |any        |error          |
+   |           |         |           |indication     |
+   +-------------------------------------------------+
 
-  - Related components
+   +--------------------------------------------------+
+   |                      buses                       |
+   |--------------------------------------------------|
+   |     name      |addresses|accesses|   behaviors   |
+   |---------------+---------+--------+---------------|
+   |read-only-port |0..size-1|any     |reading/writing|
+   |               |         |access  |               |
+   |---------------+---------+--------+---------------|
+   |read-write-port|0..size-1|any     |reading/writing|
+   |               |         |access  |               |
+   +--------------------------------------------------+
 
-  * It is most likely that this component will be used as the main
-    memory for a CPU and connected through a mapper component such
-    as hw-mapper-basic.
-
-  * A configuration file fragment appears below:
-
-	new hw-mapper-basic bus
-	new hw-cpu-arm7t cpu
-	new hw-memory-ram/rom-basic mem
-	# error indication
-	connect-pin mem error -> main stop!
-	set mem size 65536
-	connect-bus cpu insn-memory bus access-port
-	connect-bus cpu data-memory bus access-port
-	connect bus [0-65535] mem read-write-port
-	# a read-only shadow in high memory
-	connect-bus [400000,465535] mem read-only-port
-
-  - Host system
-
-  * The memory is modelled as a contiguous array of bytes in host
-    memory.  As such, a component configured for 8MB of memory
-    requires 8MB of host memory.  This is an important consideration
-    for simulations running on machines with low memory or on busy
-    multiuser systems.  Similarly, when a memory image is written to
-    disk, the same amount of space may be used there.
-
-    When using memory mapped files, the host's virtual memory system
-    may reduce physical RAM requirements considerably.
-
-* SID interface reference
-
-  - low level:
-
-    * buses
-    - read-only-port | 0 .. size-1 | any access | reading/writing
-    - read-write-port | 0 .. size-1 | any access | reading/writing
-
-    * attributes
-    - size | setting | numeric | default 0 | configuration
-    - size-max | setting | numeric | fixed at 32MB | configuration
-    - read-latency | setting | numeric | default 0 | memory latency
-    - write-latency | setting | numeric | default 0 | memory latency
-    - image-file | setting | filename | no default | image save/load
-    - image-load | pin | any | no default | image save/load
-    - image-store | pin | any | no default | image save/load
-    - state-snapshot | state | opaque string | none | state save/restore
-
-    * pins
-    - image-load | input | any | image save/load
-    - image-store | input | any | image save/load
-    - image-mmap | input | any | image mmap
-    - image-msync | input | any | image mmap
-    - error | output | any | error indication
-
+   +-------------------------------------------------------+
+   |                      attributes                       |
+   |-------------------------------------------------------|
+   |     name     |category| legal  |default|  behaviors  ||
+   |              |        | values | value |             ||
+   |--------------+--------+--------+-------+-------------||
+   |size          |setting |numeric |0      |configuration||
+   |--------------+--------+--------+-------+-------------||
+   |size-max      |setting |numeric |fixed  |configuration||
+   |              |        |        |at 32MB|             ||
+   |--------------+--------+--------+-------+-------------||
+   |image-file    |setting |filename|-      |image        ||
+   |              |        |        |       |save/load    ||
+   |--------------+--------+--------+-------+-------------||
+   |image-load    |pin     |any     |-      |image        ||
+   |              |        |        |       |save/load    ||
+   |--------------+--------+--------+-------+-------------||
+   |image-store   |pin     |any     |-      |image        ||
+   |              |        |        |       |save/load    ||
+   |--------------+--------+--------+-------+-------------||
+   |read-latency  |setting |numeric |0      |memory       ||
+   |              |        |        |       |latency      ||
+   |--------------+--------+--------+-------+-------------||
+   |write-latency |setting |numeric |0      |memory       ||
+   |              |        |        |       |latency      ||
+   |--------------+--------+--------+-------+-------------||
+   |state-snapshot|state   |opaque  |-      |state        ||
+   |              |        |string  |       |save/restore ||
+   +-------------------------------------------------------+

@@ -1,68 +1,136 @@
-* Name
-  hw-glue-sequence hw-glue-sequence-1 hw-glue-sequence-2 hw-glue-sequence-8
+            hw-glue-sequence (libglue.la :: glue_component_library)
 
-* Synopsis
-  This component family distributes pin signals from a source to a sequence 
-  of sinks.
+Synopsis:
 
-  Attributes: num-outputs state-snapshot input
-  Pins: input output-NNN
-  Shared library: libglue.la
-  Symbol: glue_component_library
+   This component family distributes pin signals from a source to a sequence
+   of sinks.
 
-* Functionality
- 
-  - Modelling
-    * This component resembles a fan-out net in a circuit, or a very fast
-      shift register.
-    * The number of outputs is a matter of configuration.  For the "-1", "-2",
-      and "-8" family members, the num-outputs is initialized. 
+     ----------------------------------------------------------------------
 
-  - Behaviors
-    * Configuration
-      When the "num-outputs" is written-to, this
-      component adjusts its list of output pins, named "output-0",
-      "output-1", and so on.  New ones may be generated or old ones may
-      disappear.
+Functionality:
 
-    * Data forwarding
-      Each input signal on the "input" pin is forwarded to
-      all external pins connected to the "output-0" pin, then
-      "output-1", and so on, in sequence, for all configured outputs.
+  Modelling:
 
-  - SID conventions
-    * This is a functional component.
-    * It supports state save/restore, though state is minimal (the number 
-      of outputs).
-    * It supports triggerpoints by watching the input pin and the 
-     "num-outputs" attribute.
-    * It limits recursion on the "input" pin.
-    * It presents attributes in the "pin", "setting", and "watchable" categories.
+     * This component resembles a fan-out net in a circuit, or a very fast
+       shift register.
+     * The number of outputs is a matter of configuration. For the -1, -2,
+       and -8 family members, the num-outputs is initialized.
 
-* Environment
-  - Related components
-    * This component may be used as an initialization sequencer in a
-      scenario with ordering dependencies.  See this configuration fragment:
+   +-------------------------------------------------+
+   |                    Behaviors                    |
+   |-------------------------------------------------|
+   |   configuration | When the num-outputs is       |
+   |                 | written-to, this component    |
+   |                 | adjusts its list of output    |
+   |                 | pins, named output-0,         |
+   |                 | output-1, and so on. New ones |
+   |                 | may be generated or old ones  |
+   |                 | may disappear.                |
+   |-----------------+-------------------------------|
+   | data forwarding | Each input signal on the      |
+   |                 | input pin is forwarded to all |
+   |                 | external pins connected to    |
+   |                 | the output-0 pin, then        |
+   |                 | output-1, and so on, in       |
+   |                 | sequence, for all configured  |
+   |                 | outputs.                      |
+   +-------------------------------------------------+
 
-	new hw-glue-sequence reset-manager
-	new SOME_KIND_OF_CPU cpu
-	new SOME_KIND_OF_LOADER loader
-	set reset-manager num-outputs 3
-	connect-pin reset-manager input <- main running
-	connect-pin reset-manager output-0 -> cpu reset
-	connect-pin reset-manager output-1 -> loader load!
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |    functional | supported | This is a           |
+   |               |           | functional          |
+   |               |           | component.          |
+   |---------------+-----------+---------------------|
+   |         state | supported | This component      |
+   |  save/restore |           | supports state      |
+   |               |           | save/restore,       |
+   |               |           | though state is     |
+   |               |           | minimal (the number |
+   |               |           | of outputs).        |
+   |---------------+-----------+---------------------|
+   | triggerpoints | supported | This component      |
+   |               |           | supports            |
+   |               |           | triggerpoints by    |
+   |               |           | watching the input  |
+   |               |           | pin and the         |
+   |               |           | num-outputs         |
+   |               |           | attribute.          |
+   |---------------+-----------+---------------------|
+   |     Recursion | supported | This component      |
+   |       Control |           | limits recursion on |
+   |               |           | the input pin.      |
+   |---------------+-----------+---------------------|
+   |  presentation | supported | This component      |
+   |               |           | presents attributes |
+   |               |           | in the "pin",       |
+   |               |           | "setting", and      |
+   |               |           | "watchable"         |
+   |               |           | categories.         |
+   +-------------------------------------------------+
 
-    * It could be used as a central point to distribute a many-to-many
-      broadcast signal.
+     ----------------------------------------------------------------------
 
-* SID interface reference
-  - low level:
-    * pins
-      - input | input | any | data forwarding
-      - output-NNN | output | any | data forwarding
-	See above.
+Environment:
 
-    * attributes
-      - state-snapshot | no category | opaque string | n/a | state save/restore
-      - num-outputs | setting, watchable | small positive number | 0 | configuration
-      - input | pin, watchable | n/a | n/a | data forwarding
+   Related components
+
+   This component may be used as an initialization sequencer in a scenario
+   with ordering dependencies. See this configuration fragment:
+
+         new hw-glue-sequence reset-manager
+         new SOME_KIND_OF_CPU cpu
+         new SOME_KIND_OF_LOADER loader
+         set reset-manager num-outputs 3
+         connect-pin reset-manager input <- main running
+         connect-pin reset-manager output-0 -> cpu reset
+         connect-pin reset-manager output-1 -> loader load!
+
+   It could be used as a central point to distribute a many-to-many broadcast
+   signal.
+
+     ----------------------------------------------------------------------
+
+Component Reference:
+
+  Component: hw-glue-sequence (Abstract)
+
+   +-------------------------------------------------+
+   |                      pins                       |
+   |-------------------------------------------------|
+   |   name    |direction|legalvalues|   behaviors   |
+   |-----------+---------+-----------+---------------|
+   |input      |in       |any        |data forwarding|
+   |-----------+---------+-----------+---------------|
+   |output-NNN |out      |any        |data forwarding|
+   +-------------------------------------------------+
+
+   +--------------------------------------------------------+
+   |                       attributes                       |
+   |--------------------------------------------------------|
+   |     name     |category | legal  |default|  behaviors  ||
+   |              |         | values | value |             ||
+   |--------------+---------+--------+-------+-------------||
+   |state-snapshot|no       |opaque  |-      |state        ||
+   |              |category |string  |       |save/restore ||
+   |--------------+---------+--------+-------+-------------||
+   |              |setting, |small   |       |             ||
+   |num-outputs   |watchable|positive|0      |configuration||
+   |              |         |number  |       |             ||
+   |--------------+---------+--------+-------+-------------||
+   |input         |pin,     |-       |-      |data         ||
+   |              |watchable|        |       |forwarding   ||
+   +--------------------------------------------------------+
+
+  Variant: hw-glue-sequence-1
+
+   Same as hw-glue-sequence
+
+  Variant: hw-glue-sequence-2
+
+   Same as hw-glue-sequence
+
+  Variant: hw-glue-sequence-8
+
+   Same as hw-glue-sequence

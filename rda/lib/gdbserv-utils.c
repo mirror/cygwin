@@ -336,7 +336,7 @@ gdbserv_le_bytes_from_reg (struct gdbserv *gdbserv,
 	      buflen - reg->len);
     }
 
-  reverse_copy_bytes (buf, reg->buf + regoffset, reg->len);
+  reverse_copy_bytes (buf, reg->buf + regoffset, len);
 }
 
 void

@@ -1,3 +1,8 @@
+2003-05-20  Kevin Buettner  <kevinb@redhat.com>
+
+	* gdbserv-utils.c (gdbserv_le_bytes_from_reg): Fix typo that caused
+	incorrect number of bytes to be copied.
+
 2003-01-16  Kevin Buettner  <kevinb@redhat.com>
 
 	* lib/gdbserv-state.c (do_status_packet, gdbserv_data_packet): Fix

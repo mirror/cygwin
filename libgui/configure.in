@@ -14,6 +14,8 @@ AM_CONDITIONAL(CROSS_COMPILING, test x$cross_compiling = xyes)
 AM_CONDITIONAL(INSTALL_LIBGUI, test x$enable_install_libgui = xyes)
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 AC_CHECK_TOOL(AR, ar, :)
+AC_CHECK_PROG(ITCL_SH, itcl_sh, itcl_sh,
+	[\$\$here/\$(top_builddir)/../itcl/itcl/unix/itcl_sh\$(EXEEXT)])
 
 AC_FUNC_ALLOCA
 AC_HAVE_HEADERS(stddef.h stdlib.h getopt.h unistd.h fcntl.h sys/file.h sys/wait.h string.h strings.h)
@@ -48,6 +50,7 @@ if test "$GCC" = "yes"; then
 else
    LIBGUI_CFLAGS=
 fi
+AC_SUBST(LIBGUI_CFLAGS) 
 
 AC_CACHE_CHECK([for cygwin32], ide_cv_os_cygwin32,
 [AC_EGREP_CPP(lose, [
@@ -57,10 +60,6 @@ lose
 ac_win_build="no"
 if test x$ide_cv_os_cygwin32 = xyes; then
   ac_win_build="yes"
-fi
-
-if test x"$ac_win_build" = xyes; then
-  LIBGUI_CFLAGS="-DWIN32 $LIBGUI_CFLAGS"
 fi
 
 tmp="`cd $srcdir/library; pwd`"
@@ -101,25 +100,7 @@ CYG_AC_LOAD_TKCONFIG
 CYG_AC_PATH_TCLH
 # FIXME: consider only doing this if --with-x given.
 CYG_AC_PATH_TKH
-CYG_AC_PATH_ITCLCONFIG
-CYG_AC_LOAD_ITCLCONFIG
 
-case ${host} in
-*cygwin*)
-        touch ac$$.c
-        if ${CC} -c -mwin32 ac$$.c >/dev/null 2>&1; then
-            case "$LIBGUI_CFLAGS" in
-                *-mwin32*) ;;
-                *) LIBGUI_CFLAGS="-mwin32 $LIBGUI_CFLAGS" ;;
-            esac
-        fi
-        rm -f ac$$.o ac$$.c
-	;;
-*)
-	;;
-esac
-
-AC_SUBST(LIBGUI_CFLAGS) 
 AC_SUBST(TCL_DEFS)
 AC_SUBST(TK_DEFS)
 AC_SUBST(TCLHDIR)

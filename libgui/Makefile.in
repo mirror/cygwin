@@ -149,7 +149,8 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  README ./stamp-h.in ChangeLog Makefile.am Makefile.in \
-acconfig.h acinclude.m4 aclocal.m4 config.h.in configure configure.in
+TODO acconfig.h acinclude.m4 aclocal.m4 config.h.in configure \
+configure.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)

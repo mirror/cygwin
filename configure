@@ -89,7 +89,7 @@ subdirs=
 target_alias=NOTARGET
 target_makefile_frag=
 undefs=NOUNDEFS
-version="$Revision: 1.17.12.1 $"
+version="$Revision: 1.17.12.2 $"
 x11=default
 bindir='${exec_prefix}/bin'
 sbindir='${exec_prefix}/sbin'
@@ -1356,8 +1356,7 @@ EOF
                 rm -f ${subdir}/Makefile.tm2
                 sedtemp=sed.$$
                 cat >$sedtemp <<EOF
-s:^SUBDIRS[ 	]*=.*$:SUBDIRS = ${configdirs}:
-s:^NONSUBDIRS[ 	]*=.*$:NONSUBDIRS = ${noconfigdirs}:
+s:@configdirs@:${configdirs}:
 EOF
                 sed -f $sedtemp \
                     ${subdir}/Makefile.tem > ${subdir}/Makefile.tm2

@@ -1,3 +1,7 @@
+2002-11-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* armRemap.cxx: Dtor throw () fixes.
+
 2001-07-13  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (check-local): Rename target from "checkme".

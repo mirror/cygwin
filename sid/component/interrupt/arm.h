@@ -15,7 +15,7 @@ class armIntController: public IntController<little_int_4>
  public:
   armIntController():
     IntController<little_int_4>(32, 1, (RSTPIN|FIQREGS|FIQBUS)) { }
-  ~armIntController() { }
+  ~armIntController() throw () { }
   
  private:
   // required virtual methods

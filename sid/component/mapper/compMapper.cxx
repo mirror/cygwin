@@ -394,7 +394,7 @@ generic_mapper::bank_changed ()
        if (selected_p (*it, this->bank))
 	 {
 	   // cout << "mapper bank " << this->bank << " sel: " << it->spec << endl;
-	   this->selected_accessors.push_back (it);
+	   this->selected_accessors.push_back (& (*it));
 	 }
      }
 

@@ -1,3 +1,8 @@
+2002-11-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* lcd-char-display.cxx: #include "/usr/include/curses.h" if
+	it exists, to work around occasional buggy fixincluded headers.
+
 2001-09-24  Frank Ch. Eigler  <fche@redhat.com>
 
 	* lcd-char-display.cxx: Be sensitive to ! HAVE_CURSES_LIBRARY.

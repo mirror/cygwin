@@ -1,3 +1,7 @@
+2002-11-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm.h, cma222.h, components.h: Dtor throw () fixes.
+
 2001-11-28  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* Makefile.am (libinterrupt_la_SOURCES): Fix 'cma22.h' typo.

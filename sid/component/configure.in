@@ -50,7 +50,7 @@ LIBS="$LIBS $socket_libs"
 AC_CHECK_FUNCS(inet_aton inet_addr)
 LIBS="$old_libs"
 
-AC_CHECK_HEADERS(curses.h time.h unistd.h)
+AC_CHECK_HEADERS(curses.h /usr/include/curses.h time.h unistd.h)
 AC_CHECK_HEADERS(sys/time.h sys/timeb.h sys/types.h sched.h)
 AC_CHECK_HEADERS(sys/socket.h netinet/in.h netinet/tcp.h arpa/inet.h)
 AC_CHECK_HEADERS(mmsystem.h windows.h)

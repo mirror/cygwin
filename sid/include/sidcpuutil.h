@@ -597,9 +597,9 @@ public:
     basic_cpu::cpu_trace_stream& operator<< (basic_cpu::cpu_trace_stream& s, T t)
     {
       if (LIKELY (s.cout_p))
-	cout << t;
+	std::cout << t;
       else
-	dynamic_cast <ofstream&> (s) << t;
+	dynamic_cast <std::ofstream&> (s) << t;
       return s;
     }
   

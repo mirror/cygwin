@@ -1,3 +1,7 @@
+2002-11-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compMapper.cxx (bank_changed): Fix iterator->pointer conversion.
+
 2002-04-09  Dave Brolley  <brolley@redhat.com>
 
 	* hw-mapper-basic.xml: Describe <mapped_base> usage.

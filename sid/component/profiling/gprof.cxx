@@ -78,6 +78,10 @@ namespace profiling_components
   using std::pair;
   using std::make_pair;
   using std::ostream;
+  using std::ios;
+  using std::ofstream;
+  using std::ios;
+  using std::ofstream;
 
 
 // ----------------------------------------------------------------------------

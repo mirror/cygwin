@@ -158,10 +158,9 @@ Environment:
    is recorded, so sparse values may generate large blocks of zeroes in the
    output.
 
-   Since this component generates a histogram-type gprof file instead of the
-   arc-type file that -pg-compiled target programs usually generate, gprof
-   must be run with an option such as --flat-profile. Call graph information
-   is not collected.
+   Depending on whether the connected CPU model sends call-graph events, the
+   resulting gmon.out may contain histogram with or without call-graph data.
+   If the former, gprof must be run with an option such as --flat-profile.
 
      ----------------------------------------------------------------------
 

@@ -40,7 +40,7 @@ do
 	$cgendir/../sim/i960/configure --prefix /tmp/junk --target i960-coff
 	make stamp-arch stamp-cpu stamp-desc
     )
-    test $? == 0 || exit 1
+    test $? = 0 || exit 1
     ;;
 
   m32r)
@@ -51,7 +51,7 @@ do
 	$cgendir/../sim/m32r/configure --prefix /tmp/junk --target m32r-elf
 	make stamp-arch stamp-cpu stamp-xcpu
     )
-    test $? == 0 || exit 1
+    test $? = 0 || exit 1
     ;;
 
   fr30)
@@ -62,7 +62,7 @@ do
 	$cgendir/../sim/fr30/configure --prefix /tmp/junk --target fr30-elf
 	make stamp-arch stamp-cpu
     )
-    test $? == 0 || exit 1
+    test $? = 0 || exit 1
     ;;
 
   sh64)
@@ -73,7 +73,7 @@ do
 	$cgendir/../sim/sh64/configure --prefix /tmp/junk --target ???
 	make stamp-all
     )
-    test $? == 0 || exit 1
+    test $? = 0 || exit 1
     ;;
 
   *)

@@ -1,3 +1,8 @@
+2001-12-04  Frank Ch. Eigler  <fche@redhat.com>
+ 
+ 	* cache.cxx (cache_sizes): Add "4" for "4kb".
+ 	* hw-cache.xml, hw-cache.txt: Modified accordingly.
+
 2001-11-30  Frank Ch. Eigler  <fche@redhat.com>
 
 	* cacheutil.cxx (hash_fn): Fix std:: namespace reference.

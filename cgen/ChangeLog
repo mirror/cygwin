@@ -1,5 +1,8 @@
 2003-05-15  Doug Evans  <dje@sebabeach.org>
 
+	* utils-sim.scm (-gen-decoder-switch): Back out patch of 2003-01-09.
+	(-gen-decode-bits): Instead put in better fix here.
+
 	* cpu/i960.cpu (index): Rename to indx.  All uses updated.
 
 2003-05-01  DJ Delorie  <dj@redhat.com>

@@ -1,7 +1,7 @@
 // socketio.cxx - A console that uses a socket to do its I/O.
 // -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2002 Red Hat.
+// Copyright (C) 1999-2002, 2004 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -297,6 +297,10 @@ void
 socketio::fini_handler (host_int_4)
 {
   this->poll_control.cancel ();
+
+  // Flush out any remaining data
+  while (this->connected_p && this->out_buffer.length() != 0)
+    this->poll_transmit ();
 
   if (this->connected_p)
     {

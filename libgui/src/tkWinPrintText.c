@@ -273,7 +273,7 @@ PrintTextCmd(clientData, interp, argc, argv)
 	Tcl_AppendResult(interp, "wrong # args: should be \"",
 			 argv[0], " text \"",
 			 (char *) NULL);
-	return TCL_ERROR;
+	goto error;
     }
 
     /*
@@ -282,7 +282,7 @@ PrintTextCmd(clientData, interp, argc, argv)
     if (!Tcl_GetCommandInfo(interp, argv[1], &textCmd)) {
 	Tcl_AppendResult(interp, "couldn't get text information for \"",
 			 argv[1], "\"", (char *) NULL);
-	return TCL_ERROR;
+	goto error;
     }
     
     memset(&dm,0,sizeof(DEVMODE));
@@ -446,8 +446,12 @@ PrintTextCmd(clientData, interp, argc, argv)
     textPtr->dInfoPtr->flags|=DINFO_OUT_OF_DATE;
 
 done:
+    free ((char*) lpdi->lpszDocName);
+    free (lpdi);
     return TCL_OK;
- error:
+error:
+    free ((char*) lpdi->lpszDocName);
+    free (lpdi);
     return TCL_ERROR;
 }
 

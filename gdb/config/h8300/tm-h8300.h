@@ -1,30 +1,29 @@
 /* Parameters for execution on a H8/300 series machine.
    Copyright 1992, 1993 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* Contributed by Steve Chamberlain sac@cygnus.com */
 
-#ifdef __STDC__
 struct frame_info;
 struct frame_saved_regs;
 struct value;
 struct type;
-#endif
 
 /* 1 if debugging H8/300H application */
 extern int h8300hmode;
@@ -51,7 +50,7 @@ extern int h8300smode;
 
 extern void h8300_init_extra_frame_info ();
 
-#define IEEE_FLOAT
+#define IEEE_FLOAT (1)
 /* Define the bit, byte, and word ordering of the machine.  */
 #define TARGET_BYTE_ORDER BIG_ENDIAN
 #undef TARGET_INT_BIT
@@ -69,7 +68,7 @@ extern void h8300_init_extra_frame_info ();
 /* Advance PC across any function entry prologue instructions
    to reach some "real" code.  */
 
-#define SKIP_PROLOGUE(ip)   {(ip) = h8300_skip_prologue(ip);}
+#define SKIP_PROLOGUE(ip)   (h8300_skip_prologue(ip))
 extern CORE_ADDR h8300_skip_prologue ();
 
 /* Immediately after a function call, return the saved pc.
@@ -84,9 +83,9 @@ extern CORE_ADDR h8300_skip_prologue ();
 
 #define INNER_THAN(lhs,rhs) ((lhs) < (rhs))
 
-/*#define BREAKPOINT {0x7A, 0xFF}*/
-#define BREAKPOINT {0x01, 0x80}  /* Sleep */
-#define REMOTE_BREAKPOINT { 0x57, 0x30}  /* trapa #3 */
+/*#define BREAKPOINT {0x7A, 0xFF} */
+#define BREAKPOINT {0x01, 0x80}	/* Sleep */
+#define REMOTE_BREAKPOINT { 0x57, 0x30}		/* trapa #3 */
 /* If your kernel resets the pc after the trap happens you may need to
    define this before including this file.    */
 
@@ -96,7 +95,7 @@ extern CORE_ADDR h8300_skip_prologue ();
 
 #define REGISTER_SIZE 4
 
-#define NUM_REGS 13  
+#define NUM_REGS 13
 
 #define REGISTER_BYTES (NUM_REGS * 4)
 
@@ -160,7 +159,7 @@ extern char **h8300_register_names;
 
 /* FIXME: Won't work with both h8/300's.  */
 
-extern void h8300_extract_return_value PARAMS((struct type *, char *, char *));
+extern void h8300_extract_return_value PARAMS ((struct type *, char *, char *));
 #define EXTRACT_RETURN_VALUE(TYPE,REGBUF,VALBUF) \
     h8300_extract_return_value (TYPE, (char *)(REGBUF), (char *)(VALBUF))
 
@@ -169,7 +168,7 @@ extern void h8300_extract_return_value PARAMS((struct type *, char *, char *));
    in d0/d1.  */
 /* FIXME: Won't work with both h8/300's.  */
 
-extern void h8300_store_return_value PARAMS((struct type *, char *));
+extern void h8300_store_return_value PARAMS ((struct type *, char *));
 #define STORE_RETURN_VALUE(TYPE,VALBUF) \
     h8300_store_return_value(TYPE, (char *) (VALBUF))
 
@@ -186,7 +185,7 @@ extern void h8300_store_return_value PARAMS((struct type *, char *));
 #define EXTRACT_STRUCT_VALUE_ADDRESS(REGBUF) \
      extract_address (REGBUF + REGISTER_BYTE (0), \
 		      REGISTER_RAW_SIZE (0))
-     
+
 /* Describe the pointer in each stack frame to the previous stack frame
    (its caller).  */
 
@@ -206,15 +205,15 @@ CORE_ADDR h8300_frame_chain PARAMS ((struct frame_info *));
    the frame chain or following frames back into the startup code.
    See the comments in objfile.h */
 
-#define FRAME_CHAIN_VALID(fp,fi) alternate_frame_chain_valid (fp, fi)
+#define FRAME_CHAIN_VALID(fp,fi) func_frame_chain_valid (fp, fi)
 
 /* Define other aspects of the stack frame.  */
 
 /* A macro that tells us whether the function invocation represented
    by FI does not have a frame on the stack associated with it.  If it
    does not, FRAMELESS is set to 1, else 0.  */
-#define FRAMELESS_FUNCTION_INVOCATION(FI, FRAMELESS) \
-  (FRAMELESS) = frameless_look_for_prologue(FI)
+#define FRAMELESS_FUNCTION_INVOCATION(FI) \
+  (frameless_look_for_prologue (FI))
 
 /* Any function with a frame looks like this
    SECOND ARG
@@ -225,7 +224,7 @@ CORE_ADDR h8300_frame_chain PARAMS ((struct frame_info *));
    SAVED FP   <-FP POINTS HERE
    LOCALS0
    LOCALS1    <-SP POINTS HERE
-   */
+ */
 
 #define FRAME_SAVED_PC(FRAME) h8300_frame_saved_pc(FRAME)
 
@@ -239,7 +238,7 @@ CORE_ADDR h8300_frame_chain PARAMS ((struct frame_info *));
 /* We can't tell how many args there are
    now that the C compiler delays popping them.  */
 
-#define FRAME_NUM_ARGS(val,fi) (val = -1)
+#define FRAME_NUM_ARGS(fi) (-1)
 
 /* Return number of bytes at start of arglist that are not really args.  */
 
@@ -263,7 +262,7 @@ typedef unsigned short INSN_WORD;
 #define GDB_TARGET_IS_H8300
 
 #define NUM_REALREGS 10
-#define NOP { 0x01, 0x80} /* A sleep insn */
+#define NOP { 0x01, 0x80}	/* A sleep insn */
 
 #define BELIEVE_PCC_PROMOTION 1
 
@@ -271,7 +270,7 @@ typedef unsigned short INSN_WORD;
  * CALL_DUMMY stuff:
  */
 
-#define USE_GENERIC_DUMMY_FRAMES
+#define USE_GENERIC_DUMMY_FRAMES 1
 #define CALL_DUMMY			{0}
 #define CALL_DUMMY_LENGTH		(0)
 #define CALL_DUMMY_ADDRESS()		entry_point_address ()
@@ -279,17 +278,17 @@ typedef unsigned short INSN_WORD;
 #define CALL_DUMMY_START_OFFSET		(0)
 #define CALL_DUMMY_BREAKPOINT_OFFSET	(0)
 
-extern CORE_ADDR h8300_push_arguments PARAMS ((int nargs, 
-					       struct value **args, 
+extern CORE_ADDR h8300_push_arguments PARAMS ((int nargs,
+					       struct value ** args,
 					       CORE_ADDR sp,
 					       unsigned char struct_return,
 					       CORE_ADDR struct_addr));
 extern CORE_ADDR h8300_push_return_address PARAMS ((CORE_ADDR, CORE_ADDR));
 
-#define PC_IN_CALL_DUMMY(PC, SP, FP)	generic_pc_in_call_dummy (PC, SP)
+#define PC_IN_CALL_DUMMY(PC, SP, FP)	generic_pc_in_call_dummy (PC, SP, FP)
 #define FIX_CALL_DUMMY(DUMMY, START_SP, FUNADDR, NARGS, ARGS, TYPE, GCCP)
 #define PUSH_ARGUMENTS(NARGS, ARGS, SP, STRUCT_RETURN, STRUCT_ADDR) \
-  (SP) = h8300_push_arguments (NARGS, ARGS, SP, STRUCT_RETURN, STRUCT_ADDR)
+  (h8300_push_arguments (NARGS, ARGS, SP, STRUCT_RETURN, STRUCT_ADDR))
 /* Push an empty stack frame, to record the current PC, etc.  */
 #define PUSH_DUMMY_FRAME	generic_push_dummy_frame ()
 /* Discard from the stack the innermost frame, restoring all registers.  */
@@ -298,6 +297,5 @@ extern CORE_ADDR h8300_push_return_address PARAMS ((CORE_ADDR, CORE_ADDR));
 
 /* override the standard get_saved_register function with 
    one that takes account of generic CALL_DUMMY frames */
-#define GET_SAVED_REGISTER
-
-
+#define GET_SAVED_REGISTER(raw_buffer, optimized, addrp, frame, regnum, lval) \
+     generic_get_saved_register (raw_buffer, optimized, addrp, frame, regnum, lval)

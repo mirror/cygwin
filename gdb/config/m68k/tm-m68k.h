@@ -1,25 +1,26 @@
 /* Parameters for execution on a 68000 series machine.
    Copyright 1986, 1987, 1989, 1990, 1992 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* Generic 68000 stuff, to be included by other tm-*.h files.  */
 
-#define IEEE_FLOAT 1
+#define IEEE_FLOAT (1)
 
 /* Define the bit, byte, and word ordering of the machine.  */
 #define TARGET_BYTE_ORDER BIG_ENDIAN
@@ -33,19 +34,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    to reach some "real" code.  */
 
 #if !defined(SKIP_PROLOGUE)
-#define SKIP_PROLOGUE(ip)   {(ip) = m68k_skip_prologue(ip);}
-extern CORE_ADDR m68k_skip_prologue PARAMS ((CORE_ADDR ip));
+#define SKIP_PROLOGUE(ip) (m68k_skip_prologue (ip))
 #endif
+extern CORE_ADDR m68k_skip_prologue PARAMS ((CORE_ADDR ip));
 
 /* Immediately after a function call, return the saved pc.
    Can't always go through the frames for this because on some machines
    the new frame is not set up until the new function executes
    some instructions.  */
 
-#ifdef __STDC__
 struct frame_info;
 struct frame_saved_regs;
-#endif
 
 extern CORE_ADDR m68k_saved_pc_after_call PARAMS ((struct frame_info *));
 extern void m68k_find_saved_regs PARAMS ((struct frame_info *, struct frame_saved_regs *));
@@ -274,13 +273,8 @@ do									\
 /* A macro that tells us whether the function invocation represented
    by FI does not have a frame on the stack associated with it.  If it
    does not, FRAMELESS is set to 1, else 0.  */
-#define FRAMELESS_FUNCTION_INVOCATION(FI, FRAMELESS) \
-  do { \
-    if ((FI)->signal_handler_caller) \
-      (FRAMELESS) = 0; \
-    else \
-      (FRAMELESS) = frameless_look_for_prologue(FI); \
-  } while (0)
+#define FRAMELESS_FUNCTION_INVOCATION(FI) \
+     (((FI)->signal_handler_caller) ? 0 : frameless_look_for_prologue(FI))
 
 /* This was determined by experimentation on hp300 BSD 4.3.  Perhaps
    it corresponds to some offset in /usr/include/sys/user.h or
@@ -311,7 +305,7 @@ do									\
 /* We can't tell how many args there are
    now that the C compiler delays popping them.  */
 #if !defined (FRAME_NUM_ARGS)
-#define FRAME_NUM_ARGS(val,fi) (val = -1)
+#define FRAME_NUM_ARGS(fi) (-1)
 #endif
 
 /* Return number of bytes at start of arglist that are not really args.  */
@@ -327,8 +321,8 @@ do									\
 #if !defined (FRAME_FIND_SAVED_REGS)
 #define FRAME_FIND_SAVED_REGS(fi,fsr) m68k_find_saved_regs ((fi), &(fsr))
 #endif /* no FIND_FRAME_SAVED_REGS.  */
-
 
+
 /* Things needed for making the inferior call functions.  */
 
 /* The CALL_DUMMY macro is the sequence of instructions, as disassembled
@@ -337,20 +331,20 @@ do									\
    These instructions exist only so that m68k_find_saved_regs can parse
    them as a "prologue"; they are never executed.
 
-	fmovemx fp0-fp7,sp@-			0xf227 0xe0ff
-	moveml d0-a5,sp@-			0x48e7 0xfffc
-	clrw sp@-				0x4267
-	movew ccr,sp@-				0x42e7
+   fmovemx fp0-fp7,sp@-                 0xf227 0xe0ff
+   moveml d0-a5,sp@-                    0x48e7 0xfffc
+   clrw sp@-                            0x4267
+   movew ccr,sp@-                               0x42e7
 
    The arguments are pushed at this point by GDB; no code is needed in
    the dummy for this.  The CALL_DUMMY_START_OFFSET gives the position
    of the following jsr instruction.  That is where we start
    executing.
 
-	jsr @#0x32323232			0x4eb9 0x3232 0x3232
-	addal #0x69696969,sp			0xdffc 0x6969 0x6969
-	trap #<your BPT_VECTOR number here>	0x4e4?
-	nop					0x4e71
+   jsr @#0x32323232                     0x4eb9 0x3232 0x3232
+   addal #0x69696969,sp                 0xdffc 0x6969 0x6969
+   trap #<your BPT_VECTOR number here>  0x4e4?
+   nop                                  0x4e71
 
    Note this is CALL_DUMMY_LENGTH bytes (28 for the above example).
 
@@ -362,8 +356,8 @@ do									\
    CALL_DUMMY_BREAKPOINT_OFFSET.  */
 
 #define CALL_DUMMY {0xf227e0ff, 0x48e7fffc, 0x426742e7, 0x4eb93232, 0x3232dffc, 0x69696969, (0x4e404e71 | (BPT_VECTOR << 16))}
-#define CALL_DUMMY_LENGTH 28		/* Size of CALL_DUMMY */
-#define CALL_DUMMY_START_OFFSET 12	/* Offset to jsr instruction*/
+#define CALL_DUMMY_LENGTH 28	/* Size of CALL_DUMMY */
+#define CALL_DUMMY_START_OFFSET 12	/* Offset to jsr instruction */
 #define CALL_DUMMY_BREAKPOINT_OFFSET (CALL_DUMMY_START_OFFSET + 12)
 
 /* Insert the specified number of args and function address

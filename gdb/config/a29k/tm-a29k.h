@@ -2,21 +2,22 @@
    Copyright 1990, 1991, 1993, 1994 Free Software Foundation, Inc.
    Contributed by Cygnus Support.  Written by Jim Kingdon.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* Parameters for an EB29K (a board which plugs into a PC and is
    accessed through EBMON software running on the PC, which we
@@ -30,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define TARGET_BYTE_ORDER BIG_ENDIAN
 
 /* Floating point uses IEEE representations.  */
-#define IEEE_FLOAT
+#define IEEE_FLOAT (1)
 
 /* Recognize our magic number.  */
 #define BADMAG(x) ((x).f_magic != 0572)
@@ -43,9 +44,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Advance PC across any function entry prologue instructions
    to reach some "real" code.  */
 
-#define SKIP_PROLOGUE(pc) \
-  { pc = skip_prologue (pc); }
-CORE_ADDR skip_prologue ();
+#define SKIP_PROLOGUE(pc) (a29k_skip_prologue (pc))
+CORE_ADDR a29k_skip_prologue ();
 
 /* Immediately after a function call, return the saved pc.
    Can't go through the frames for this because on some machines
@@ -136,7 +136,7 @@ CORE_ADDR skip_prologue ();
 /*
  * Converts an sdb register number to an internal gdb register number.
  * Currently under epi, gr96->0...gr127->31...lr0->32...lr127->159, or...
- * 		  	gr64->0...gr95->31, lr0->32...lr127->159.
+ *                      gr64->0...gr95->31, lr0->32...lr127->159.
  */
 #define SDB_REG_TO_REGNUM(value) \
   (((value) >= 96 && (value) <= 127) ? ((value) - 96) : \
@@ -149,8 +149,8 @@ CORE_ADDR skip_prologue ();
  * register sets.  Namely, gcc can compile (-mkernel-registers) so that
  * it uses gr64-gr95 in stead of gr96-gr127.
  */
-#define MSP_HW_REGNUM	125		/* gr125 */
-#define RAB_HW_REGNUM	126		/* gr126 */
+#define MSP_HW_REGNUM	125	/* gr125 */
+#define RAB_HW_REGNUM	126	/* gr126 */
 
 /* Convert Processor Special register #x to REGISTER_NAMES register # */
 #define SR_REGNUM(x) \
@@ -171,7 +171,7 @@ CORE_ADDR skip_prologue ();
 /* This needs to be the memory stack pointer, not the register stack pointer,
    to make call_function work right.  */
 #define SP_REGNUM MSP_REGNUM
-#define FP_REGNUM 33 /* lr1 */
+#define FP_REGNUM 33		/* lr1 */
 
 /* Return register for transparent calling convention (gr122).  */
 #define TPC_REGNUM (122 - 96 + GR96_REGNUM)
@@ -208,8 +208,8 @@ CORE_ADDR skip_prologue ();
 #define RBP_REGNUM (VAB_REGNUM + 7)
 #define TMC_REGNUM (VAB_REGNUM + 8)
 #define TMR_REGNUM (VAB_REGNUM + 9)
-#define NPC_REGNUM (VAB_REGNUM + 10)  /* pc0 */
-#define PC_REGNUM  (VAB_REGNUM + 11)  /* pc1 */
+#define NPC_REGNUM (VAB_REGNUM + 10)	/* pc0 */
+#define PC_REGNUM  (VAB_REGNUM + 11)	/* pc1 */
 #define PC2_REGNUM (VAB_REGNUM + 12)
 #define MMU_REGNUM (VAB_REGNUM + 13)
 #define LRU_REGNUM (VAB_REGNUM + 14)
@@ -224,7 +224,7 @@ CORE_ADDR skip_prologue ();
 #define IPA_REGNUM (VAB_REGNUM + 22)
 #define IPB_REGNUM (VAB_REGNUM + 23)
 
-#endif	/* !defined(REGISTER_NAMES) */
+#endif /* !defined(REGISTER_NAMES) */
 
 /* Total amount of space needed to store our copies of the machine's
    register state, the array `registers'.  */
@@ -310,7 +310,7 @@ extern use_struct_convention_fn a29k_use_struct_convention;
     write_register_bytes (REGISTER_BYTE (RETURN_REGNUM), (char *)(VALBUF),  \
 			  TYPE_LENGTH (TYPE));				  \
   }
-
+/* *INDENT-OFF* */
 /* The a29k user's guide documents well what the stacks look like.
    But what isn't so clear there is how this interracts with the
    symbols, or with GDB.
@@ -321,10 +321,10 @@ extern use_struct_convention_fn a29k_use_struct_convention;
    alloca()), the result of the calculation msp + msize.
 
    LOC_ARG, LOC_LOCAL - For GCC, these are relative to saved_msp.
-     For high C, these are relative to msp (making alloca impossible).
+   For high C, these are relative to msp (making alloca impossible).
    LOC_REGISTER, LOC_REGPARM - The register number is the number at the
-     time the function is running (after the prologue), or in the case
-     of LOC_REGPARM, may be a register number in the range 160-175.
+   time the function is running (after the prologue), or in the case
+   of LOC_REGPARM, may be a register number in the range 160-175.
 
    The compilers do things like store an argument into memory, and then put out
    a LOC_ARG for it, or put it into global registers and put out a
@@ -349,73 +349,75 @@ extern use_struct_convention_fn a29k_use_struct_convention;
    registers need to be filled in the function epilogue.
 
    Consider the code:
-              < call bar>
-       	loc1: . . .
-        bar:  sub gr1,gr1,rsize_b
-	      . . .
-	      add mfp,msp,0
-	      sub msp,msp,msize_b
-	      . . .
-	      < call foo >
-	loc2: . . .
-        foo:  sub gr1,gr1,rsize_f
-	      . . .
-	      add mfp,msp,0
-	      sub msp,msp,msize_f
-	      . . .
-        loc3: < suppose the inferior stops here >
+   < call bar>
+   loc1: . . .
+   bar:  sub gr1,gr1,rsize_b
+   . . .
+   add mfp,msp,0
+   sub msp,msp,msize_b
+   . . .
+   < call foo >
+   loc2: . . .
+   foo:  sub gr1,gr1,rsize_f
+   . . .
+   add mfp,msp,0
+   sub msp,msp,msize_f
+   . . .
+   loc3: < suppose the inferior stops here >
 
-                   memory stack      register stack
-		   |           |     |____________|
-		   |           |     |____loc1____|
-	  +------->|___________|     |            |   ^
-	  |        | ^         |     |  locals_b  |   |
-	  |        | |         |     |____________|   |
-	  |        | |         |     |            |   | rsize_b
-	  |        | | msize_b |     | args_to_f  |   |
-	  |        | |         |     |____________|   |
-	  |        | |         |     |____lr1_____|   V
-	  |        | V         |     |____loc2____|<----------------+
-	  |   +--->|___________|<---------mfp     |   ^             |
-	  |   |    | ^         |     |  locals_f  |   |             |
-	  |   |    | | msize_f |     |____________|   |             |
-	  |   |    | |         |     |            |   | rsize_f     |
-	  |   |    | V         |     |   args     |   |             |
-	  |   |    |___________|<msp |____________|   |             |
-	  |   |                      |_____lr1____|   V             |
-	  |   |                      |___garbage__| <- gr1 <----+   |
- 	  |   |                 		                |   |
-          |   |                 		                |   |
-	  |   |	       	       	     pc=loc3	                |   |
-	  |   |         		      	                |   |
-	  |   |         		      	                |   |
-	  |   |            frame cache	      	                |   |
-          |   |       |_________________|     	                |   |
-          |   |       |rsize=rsize_b    |     	                |   |
-          |   |       |msize=msize_b    |     	                |   |
-          +---|--------saved_msp        |     	                |   |
-              |       |frame------------------------------------|---+
-              |       |pc=loc2          |                       |
-              |       |_________________|                       |
-              |       |rsize=rsize_f    |                       |
-              |       |msize=msize_f    |                       |
-              +--------saved_msp        |                       |
-                      |frame------------------------------------+
-                      |pc=loc3          |
-                      |_________________|
+   memory stack      register stack
+   |           |     |____________|
+   |           |     |____loc1____|
+   +------->|___________|     |            |   ^
+   |        | ^         |     |  locals_b  |   |
+   |        | |         |     |____________|   |
+   |        | |         |     |            |   | rsize_b
+   |        | | msize_b |     | args_to_f  |   |
+   |        | |         |     |____________|   |
+   |        | |         |     |____lr1_____|   V
+   |        | V         |     |____loc2____|<----------------+
+   |   +--->|___________|<---------mfp     |   ^             |
+   |   |    | ^         |     |  locals_f  |   |             |
+   |   |    | | msize_f |     |____________|   |             |
+   |   |    | |         |     |            |   | rsize_f     |
+   |   |    | V         |     |   args     |   |             |
+   |   |    |___________|<msp |____________|   |             |
+   |   |                      |_____lr1____|   V             |
+   |   |                      |___garbage__| <- gr1 <----+   |
+   |   |                                                |   |
+   |   |                                                |   |
+   |   |                             pc=loc3                    |   |
+   |   |                                                |   |
+   |   |                                                |   |
+   |   |            frame cache                         |   |
+   |   |       |_________________|                      |   |
+   |   |       |rsize=rsize_b    |                      |   |
+   |   |       |msize=msize_b    |                      |   |
+   +---|--------saved_msp        |                      |   |
+   |       |frame------------------------------------|---+
+   |       |pc=loc2          |                       |
+   |       |_________________|                       |
+   |       |rsize=rsize_f    |                       |
+   |       |msize=msize_f    |                       |
+   +--------saved_msp        |                       |
+   |frame------------------------------------+
+   |pc=loc3          |
+   |_________________|
 
    So, is that sufficiently confusing?  Welcome to the 29000.
    Notes:
    * The frame for foo uses a memory frame pointer but the frame for
-     bar does not.  In the latter case the saved_msp is
-     computed by adding msize to the saved_msp of the
-     next frame.
+   bar does not.  In the latter case the saved_msp is
+   computed by adding msize to the saved_msp of the
+   next frame.
    * msize is in the frame cache only for high C's sake.  */
+/* *INDENT-ON* */
+
 
 void read_register_stack ();
 long read_register_stack_integer ();
 
-#define FRAME_INIT_SAVED_REGS(fi) /*no-op*/
+#define FRAME_INIT_SAVED_REGS(fi)	/*no-op */
 
 #define EXTRA_FRAME_INFO  \
   CORE_ADDR saved_msp;    \
@@ -429,14 +431,14 @@ long read_register_stack_integer ();
 
 /* Because INIT_FRAME_PC gets passed fromleaf, that's where we init
    not only ->pc and ->frame, but all the extra stuff, when called from
-   get_prev_frame_info, that is.  */
+   get_prev_frame, that is.  */
 #define INIT_EXTRA_FRAME_INFO(fromleaf, fci)  init_extra_frame_info(fci)
 void init_extra_frame_info ();
 
 #define INIT_FRAME_PC(fromleaf, fci) init_frame_pc(fromleaf, fci)
 void init_frame_pc ();
-
 
+
 /* FRAME_CHAIN takes a FRAME
    and produces the frame's chain-pointer.
 
@@ -472,11 +474,10 @@ void init_frame_pc ();
 
 /* Define other aspects of the stack frame.  */
 
-/* A macro that tells us whether the function invocation represented
-   by FI does not have a frame on the stack associated with it.  If it
-   does not, FRAMELESS is set to 1, else 0.  */
-#define FRAMELESS_FUNCTION_INVOCATION(FI, FRAMELESS) \
-  (FRAMELESS) = frameless_look_for_prologue(FI)
+/* An expression that tells us whether the function invocation represented
+   by FI does not have a frame on the stack associated with it. */
+#define FRAMELESS_FUNCTION_INVOCATION(FI) \
+  (frameless_look_for_prologue (FI))
 
 /* Saved pc (i.e. return address).  */
 #define FRAME_SAVED_PC(fraim) \
@@ -495,7 +496,7 @@ extern CORE_ADDR frame_locals_address ();
    the argcount field from it, to support debugging assembler code.
    Problem was, the "argcount" field never did hold the argument
    count.  */
-#define	FRAME_NUM_ARGS(numargs, fi) ((numargs) = -1)
+#define	FRAME_NUM_ARGS(fi) (-1)
 
 #define FRAME_ARGS_ADDRESS(fi) FRAME_LOCALS_ADDRESS (fi)
 
@@ -506,10 +507,13 @@ extern CORE_ADDR frame_locals_address ();
 /* Provide our own get_saved_register.  HAVE_REGISTER_WINDOWS is insufficient
    because registers get renumbered on the a29k without getting saved.  */
 
-#define GET_SAVED_REGISTER
+struct frame_info;
+void a29k_get_saved_register PARAMS ((char *raw_buffer, int *optimized, CORE_ADDR * addrp, struct frame_info * frame, int regnum, enum lval_type * lvalp));
+#define GET_SAVED_REGISTER(raw_buffer, optimized, addrp, frame, regnum, lval) \
+      a29k_get_saved_register (raw_buffer, optimized, addrp, frame, regnum, lval)
 
 /* Call function stuff.  */
-
+/* *INDENT-OFF* */
 /* The dummy frame looks like this (see also the general frame picture
    above):
 
@@ -559,7 +563,10 @@ extern CORE_ADDR frame_locals_address ();
    retaddr_sproc:  Contains the PC at the time we call the function.
       set by PUSH_DUMMY_FRAME and read by POP_FRAME.
    retaddr_dummy:  This points to a breakpoint instruction in the dummy.  */
+/* *INDENT-ON* */
 
+
+
 /* Rsize for dummy frame, in bytes.  */
 
 /* Bytes for outgoing args, lr1, and retaddr.  */
@@ -596,14 +603,14 @@ extern void pop_frame ();
    mtsrim cr, 15
    loadm 0, 0, lr2, msp     ; load first 16 words of arguments into registers
    add msp, msp, 16 * 4     ; point to the remaining arguments
- CONST_INSN:
-   const lr0,inf		; (replaced by       half of target addr)
-   consth lr0,inf		; (replaced by other half of target addr)
+   CONST_INSN:
+   const lr0,inf                ; (replaced by       half of target addr)
+   consth lr0,inf               ; (replaced by other half of target addr)
    calli lr0, lr0 
    aseq 0x40,gr1,gr1   ; nop
- BREAKPT_INSN:
-   asneq 0x50,gr1,gr1  ; breakpoint	(replaced by local breakpoint insn)
-   */
+   BREAKPT_INSN:
+   asneq 0x50,gr1,gr1  ; breakpoint     (replaced by local breakpoint insn)
+ */
 
 #if TARGET_BYTE_ORDER == HOST_BYTE_ORDER
 #define BS(const)	const
@@ -628,7 +635,7 @@ extern void pop_frame ();
 		BS(0x72500101)}
 #define CALL_DUMMY_LENGTH (8 * 4)
 
-#define CALL_DUMMY_START_OFFSET 0  /* Start execution at beginning of dummy */
+#define CALL_DUMMY_START_OFFSET 0	/* Start execution at beginning of dummy */
 
 /* Helper macro for FIX_CALL_DUMMY.  WORDP is a long * which points to a
    word in target byte order; bits 0-7 and 16-23 of *WORDP are replaced with
@@ -643,9 +650,9 @@ extern void pop_frame ();
 #else /* Target is little endian.  */
 #define STUFF_I16(WORDP, DATA) \
   {
-    *(char *)(WORDP) = ((DATA) & 0xff);
-    *((char *)(WORDP) + 2) = (((DATA) >> 8) & 0xff);
-  }
+*(char *) (WORDP) = ((DATA) & 0xff);
+*((char *) (WORDP) + 2) = (((DATA) >> 8) & 0xff);
+}
 #endif /* Target is little endian.  */
 
 /* Insert the specified number of args and function address
@@ -689,7 +696,8 @@ extern void pop_frame ();
 	         (num), SYMBOL_SOURCE_NAME (sym)), (num)	\
 	   : (num))
 
-extern enum a29k_processor_types {
+extern enum a29k_processor_types
+{
   a29k_unknown,
 
   /* Bit 0x400 of the CPS does *not* identify freeze mode, i.e. 29000,
@@ -698,7 +706,8 @@ extern enum a29k_processor_types {
 
   /* Bit 0x400 of the CPS does identify freeze mode, i.e. 29050.  */
   a29k_freeze_mode
-} processor_type;
+}
+processor_type;
 
 /* We need three arguments for a general frame specification for the
    "frame" or "info frame" command.  */

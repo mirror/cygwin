@@ -1,6 +1,6 @@
 // gdb.cxx - GDB stub implementation.  -*- C++ -*-
 
-// Copyright (C) 1999-2002 Red Hat.
+// Copyright (C) 1999-2002, 2004 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -1550,7 +1550,13 @@ gdb::deinit_handler (host_int_4)
 {
   // disconnect if needed
   if (this->connected_p)
-    this->remote_rx_eof_handler ();
+    {
+      // shut down target
+      target_power (false);
+      // signal gdb
+      gdbserv_fromtarget_exit (gdbserv, 0);
+      this->remote_rx_eof_handler ();
+    }
 }
 
 

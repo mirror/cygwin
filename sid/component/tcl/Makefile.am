@@ -12,3 +12,6 @@ noinst_DATA = tester.tcl
 
 libtclapi_la_SOURCES = compTcl.cxx
 libtclapi_la_LDFLAGS = -module -no-undefined
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs

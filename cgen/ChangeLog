@@ -1,3 +1,7 @@
+2003-06-20  Doug Evans  <dje@sebabeach.org>
+
+	* gen-all-sim: Add fr30,sh64 support.  Only generate m32r by default.
+
 2003-06-19  Doug Evans  <dje@sebabeach.org>
 
 	* mach.scm (-ifld-already-defined?): New proc.

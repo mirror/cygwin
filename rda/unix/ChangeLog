@@ -1,5 +1,9 @@
 2004-10-29  Jim Blandy  <jimb@redhat.com>
 
+	* gdbserv-thread-db.h (stop_lwp, handle_waitstatus, ps_pdread,
+	ps_pdwrite): Add declarations for these functions to
+	gdbserv-thread-db.h.
+
 	* Makefile.am (AM_CFLAGS): Add '-Wall'.
 	* Makefile.in: Update.
 

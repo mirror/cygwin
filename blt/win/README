@@ -1,0 +1,122 @@
+
+This file describes how to build BLT under Window 95/98/NT.
+
+It's not necessary to compile BLT for Windows 95/98/NT.  Binary versions
+are available on ftp.tcltk.com/pub/blt.  
+
+	ftp://ftp.tcltk.com/pub/blt/blt2.4v-for-8.0.exe
+  		           -or-
+	ftp://ftp.tcltk.com/pub/blt/blt2.4v-for-8.1.exe
+  		           -or-
+	ftp://ftp.tcltk.com/pub/blt/blt2.4v-for-8.2.exe
+  		           -or-
+	ftp://ftp.tcltk.com/pub/blt/blt2.4v-for-8.3.exe
+
+They will dynamically load into a vanilla wish80.exe, wish81.exe,
+wish82.exe, or wish83.exe  by invoking
+
+	package require BLT
+
+from within your script.
+
+Most Windows software is designed to be delivered as a self-installing 
+binary executable, so most Windows installations don't have the tools 
+needed to build and install BLT from the source code.  It's a lot more 
+difficult to build BLT under Windows than under Unix.  So hold your hat.
+
+1. What's needed?
+
+First build and install the Tcl/Tk sources.  They should reside in the
+same directory tree as the BLT sources.  The Tcl/Tk sources are
+required for Windows, since they contain X11 header files that aren't
+normally installed.
+
+      	______________|______________
+     	|          |       |        |
+      blt2.4   tcl8.3.1  tk8.3.2   jpeg-6b
+
+
+I've built this version of BLT with Tcl/Tk versions 8.0.5, 8.1.1, and
+8.2.3, and 8.3.2.
+
+By default, JPEG support is added into BLT.  It uses the jpeg-6b
+libraries from ftp.uu.net.  You can pick up the sources from
+
+	ftp://ftp.uu.net/graphics/jpeg/jpegsrc.v6b.tar.gz
+
+Note: JPEG support is optional.  See below how to disable it.
+
+The BLT Makefiles work with GNU make, not Microsoft's nmake.  This is
+what I use to build BLT.  But you'll need the Cygnus cygwin32-b20.1
+tool suite.  You can pick this up from
+
+  http://go.cygnus.com/pub/sourceware.cygnus.com/pub/cygwin/latest/full.exe
+
+Alternatively, I've included a sample nmakefile called "blt.mak". It
+compiles BLT with using the Microsoft Visual C++ compiler.  The catch
+is that that to install BLT, you must use the ./win/install.tcl
+script.  The limitations of Windows shell tools make it too painful to
+install with nmake.
+
+I've built BLT under Windows 95/NT 4.0 using the
+
+	Cygnus egcs-1.1.[1-2]
+	Microsoft Visual C++ 5.0/6.0
+
+C compilers.  I don't know whether or not BLT will build with other
+compilers.
+
+Note:	Use the same compiler for both Tcl/Tk and BLT.  That is, if you
+	compiled Tcl/Tk with the Cygnus mingw32 compiler, compile BLT
+	with it too.  This will make your life a lot easier.
+
+The BLT24.dll you build should dynamically load into "wish",
+regardless of the compiler that was used to build "wish".
+
+2. What files do you need to edit?
+
+You should only need to edit ./win/makedefs.  The following macros may
+need to be reset.
+
+	v1		Tcl/Tk version.
+	v2		Version number without dots.
+	v3		Suffix of Tcl/Tk directories 
+	prefix		Location of installed Tcl/Tk binaries.
+	TOOLS32		Location of MS C compiler and tools.
+
+	EXTRA_DEFINES   By default set to -DHAVE_JPEGLIB_H.  
+	JPEGLIB		By default set $(JPEGDIR)/libjpeg.lib.  
+
+If you don't want JPEG support included, set both the EXTRA_DEFINES
+and JPEGLIB macros to nothing.
+
+	JPEGLIB = 
+	EXTRA_DEFINES = 
+
+3. Compiling and installing
+
+Using "make"
+
+    From the top directory run make.  Use the Makefile for your compiler.
+
+	make -f Makefile.vc		Microsoft Visual C++ compiler
+		   -or-
+	make -f Makefile.gnu		Cygnus egcs-1.1.2 compiler 
+    
+    To install, run make again with the "install" target.
+
+	make -f Makefile.vc install
+		   -or-
+	make -f Makefile.gnu install
+
+Using "nmake"
+
+    From the top directory run nmake using the "blt.mak" nmakefile.
+    It assumes that you are using the Microsoft Visual C++ compiler.  
+
+	nmake -f blt.mak		
+
+    To install, run the ./win/install.tcl script from wish.
+
+	wish82.exe ./win/install.tcl
+

@@ -8,7 +8,7 @@
 # ----------------------------------------------------------------------
 #  AUTHOR: Mark L. Ulferts              EMAIL: mulferts@austin.dsccc.com
 #
-#  @(#) $Id: pane.itk,v 1.2 1999/01/27 18:56:35 jingham Exp $
+#  @(#) $Id: pane.itk,v 1.2.172.1 2001/05/18 02:21:49 mdejong Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1995 DSC Technologies Corporation
 # ======================================================================
@@ -97,7 +97,7 @@ configbody iwidgets::Pane::minimum {
     set pixels \
 	    [winfo pixels $itk_component(hull) $itk_option(-minimum)]
     
-    set $itk_option(-minimum) $pixels
+    set itk_option(-minimum) $pixels
 }
 
 # ------------------------------------------------------------------

@@ -8,7 +8,7 @@
 # ----------------------------------------------------------------------
 #   AUTHOR:  Mark L. Ulferts          E-mail: mulferts@austin.dsccc.com
 #
-#   @(#) $Id: timeentry.itk,v 1.2 1999/01/27 18:56:37 jingham Exp $
+#   @(#) $Id: timeentry.itk,v 1.2.172.1 2001/05/18 02:21:49 mdejong Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1997 DSC Technologies Corporation
 # ======================================================================
@@ -394,6 +394,5 @@ body iwidgets::Timeentry::_releaseGrab {} {
     grab release $itk_component(popup)
     $itk_component(iconbutton) configure -relief raised
     destroy $itk_component(popup) 
-    unset itk_component(popup)
     bind $itk_component(iconbutton) <Button-1> [code $this _popup]
 }

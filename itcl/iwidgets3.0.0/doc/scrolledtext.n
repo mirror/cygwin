@@ -193,9 +193,10 @@ commands are possible for scrolledtext widgets:
 .nf
 .ta 4c 8c 12c
 \fBbbox\fR	\fBcompare\fR	\fBdebug\fR	\fBdelete\fR	
-\fBdlineinfo\fR	\fBget\fR	\fBindex\fR	\fBinsert\fR
-\fBmark\fR	\fBscan\fR	\fBsearch\fR	\fBsee\fR
-\fBtag\fR	\fBwindow\fR	\fBxview\fR	\fByview\fR
+\fBdlineinfo\fR	\fBget\fR	\fBimage\fR	\fBindex\fR
+\fBinsert\fR	\fBmark\fR	\fBscan\fR	\fBsearch\fR
+\fBsee\fR	\fBtag\fR	\fBwindow\fR	\fBxview\fR
+\fByview\fR
 .fi
 .LP
 See the "text" manual entry for details on the standard methods.

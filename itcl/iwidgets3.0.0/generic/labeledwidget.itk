@@ -13,7 +13,7 @@
 # ----------------------------------------------------------------------
 #  AUTHOR: Mark L. Ulferts             EMAIL: mulferts@austin.dsccc.com
 #
-#  @(#) $Id: labeledwidget.itk,v 1.2 1999/01/27 18:56:34 jingham Exp $
+#  @(#) $Id: labeledwidget.itk,v 1.2.172.1 2001/05/18 02:21:48 mdejong Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1995 DSC Technologies Corporation
 # ======================================================================

@@ -11,7 +11,10 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# @(#) $Id: entryfield.test,v 1.2 1999/01/27 18:56:40 jingham Exp $
+# @(#) $Id: entryfield.test,v 1.2.172.1 2001/05/18 02:21:49 mdejong Exp $
+
+package require tcltest
+namespace import -force ::tcltest::*
 
 package require Iwidgets 3.0
 
@@ -43,7 +46,7 @@ incr c
 #
 test Entryfield-2.$o {configuration option} {
     llength [.ef configure]
-} {38}
+} {39}
 
 incr o
 
@@ -85,6 +88,7 @@ foreach test {
     {-labelpos s s} 
     {-labelpos sw sw} 
     {-labeltext Label Label} 
+    {-pasting 1 1} 
     {-relief raised raised} 
     {-relief sunken sunken} 
     {-state disabled disabled} 
@@ -170,3 +174,6 @@ test Entryfield-1.$c {Entryfield destruction} {
     destroy .ef
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

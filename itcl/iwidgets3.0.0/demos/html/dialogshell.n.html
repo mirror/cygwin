@@ -1,254 +1,269 @@
-<HTML>
-<HEAD>
-<TITLE>iwidgets2.2.0 User Commands - dialogshell</TITLE>
-</HEAD>
-<BODY BGCOLOR="#FFFFFF">
-<H1>iwidgets2.2.0 User Commands - dialogshell</H1>
-<HR>
-<PRE>
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-</PRE>
-<H2>NAME</H2><PRE>
-     dialogshell - Create and manipulate a dialog shell widget
-
-
-</PRE>
-<H2>SYNOPSIS</H2><PRE>
-     <STRONG>dialogshell</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
-
-
-</PRE>
-<H2>INHERITANCE</H2><PRE>
-     itk::Toplevel &lt;- Shell &lt;- Dialogshell
-
-
-</PRE>
-<H2>STANDARD OPTIONS</H2><PRE>
-     <STRONG>background</STRONG>      <STRONG>cursor</STRONG>         <STRONG>foreground</STRONG>
-
-     See the "options" manual entry for details on  the  standard
-     options.
-
-
-</PRE>
-<H2>INHERITED OPTIONS</H2><PRE>
-     <STRONG>master</STRONG>          <STRONG>modality</STRONG>       <STRONG>title</STRONG>
-
-     See the "shell" manual entry for details on the above inher-
-     ited options.
-
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC OPTIONS</H2><PRE>
-     Name:           <STRONG>buttonBoxPadX</STRONG>
-     Class:          <STRONG>Pad</STRONG>
-     Command-Line Switch:           <STRONG>-buttonboxpadx</STRONG>
-
-          Specifies a  non-negative  padding  distance  to  leave
-          between the button group and the outer edge of the but-
-          ton box in the x direction.  The value may be given  in
-          any  of  the  forms  accpetable  to  <STRONG>Tk_GetPixels</STRONG>.  The
-          default is 5 pixels.
-
-     Name:           <STRONG>buttonBoxPadY</STRONG>
-     Class:          <STRONG>Pad</STRONG>
-     Command-Line Switch:           <STRONG>-buttonboxpady</STRONG>
-
-          Specifies a  non-negative  padding  distance  to  leave
-          between the button group and the outer edge of the but-
-          ton box in the y direction.  The value may be given  in
-          any  of  the  forms  accpetable  to  <STRONG>Tk_GetPixels</STRONG>.  The
-          default is 5 pixels.
-
-     Name:           <STRONG>buttonBoxPos</STRONG>
-     Class:          <STRONG>Position</STRONG>
-     Command-Line Switch:           <STRONG>-buttonboxpos</STRONG>
-
-          Attaches buttons to the given side of the dialog: <STRONG>n</STRONG>, <STRONG>s</STRONG>,
-          <STRONG>e</STRONG> or <STRONG>w</STRONG>.  The default is s.
-
-     Name:           <STRONG>padX</STRONG>
-     Class:          <STRONG>Pad</STRONG>
-     Command-Line Switch:           <STRONG>-padx</STRONG>
-
-          Specifies a padding distance for the childsite  in  the
-          X-direction   in   any   of  the  forms  acceptable  to
-          <STRONG>Tk_GetPixels</STRONG>.  The default is 10.
-
-     Name:           <STRONG>padY</STRONG>
-     Class:          <STRONG>Pad</STRONG>
-     Command-Line Switch:           <STRONG>-pady</STRONG>
-
-          Specifies a padding distance for the childsite  in  the
-          Y-direction   in   any   of  the  forms  acceptable  to
-          <STRONG>Tk_GetPixels</STRONG>.  The default is 10.
-
-     Name:           <STRONG>separator</STRONG>
-     Class:          <STRONG>Separator</STRONG>
-     Command-Line Switch:           <STRONG>-separator</STRONG>
-
-          Specifies whether a line is drawn to separate the  but-
-          tons  from  the dialog box contents in any of the forms
-          acceptable to <STRONG>Tcl_GetBoolean</STRONG>.  The default is true.
-
-     Name:           <STRONG>thickness</STRONG>
-     Class:          <STRONG>Thickness</STRONG>
-     Command-Line Switch:           <STRONG>-thickness</STRONG>
-
-          Specifies the thickness of the separator in any of  the
-          forms  acceptable  to  <STRONG>Tk_GetPixels</STRONG>.   The default is 3
-          pixels.
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-
-</PRE>
-<H2>DESCRIPTION</H2><PRE>
-     The <STRONG>dialogshell</STRONG> command creates a dialog shell  which  is  a
-     top  level  widget  composed of a button box, separator, and
-     child site area.  The class also has methods to control but-
-     ton construction.
-
-
-
-</PRE>
-<H2>METHODS</H2><PRE>
-     The <STRONG>dialogshell</STRONG> command create a new Tcl command whose  name
-     is  <EM>pathName</EM>.   This  command  may be used to invoke various
-     operations on the widget.   It  has  the  following  general
-     form:
-
-          <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
-
-     <EM>Option</EM> and the <EM>arg</EM>s determine the exact behavior of the com-
-     mand.   The  following commands are possible for dialogshell
-     widgets:
-
-
-</PRE>
-<H2>INHERITED METHODS</H2><PRE>
-     <STRONG>activate</STRONG>        <STRONG>center</STRONG>         <STRONG>deactivate</STRONG>
-
-     See the "shell" manual entry for details on the above inher-
-     ited methods.
-
-
-</PRE>
-<H2>ASSOCIATED METHODS</H2><PRE>
-     <STRONG>add</STRONG>             <STRONG>buttonconfigure</STRONG>                <STRONG>defaultdelete</STRONG>
-     <STRONG>hide</STRONG>            <STRONG>index</STRONG>          <STRONG>insert</STRONG>          <STRONG>invoke</STRONG>
-     <STRONG>show</STRONG>
-
-     See the "buttonbox" manual entry for details on the  associ-
-     ated methods.
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC METHODS</H2><PRE>
-     <EM>pathName</EM> <STRONG>cget</STRONG> <EM>option</EM>
-          Returns the current value of the  configuration  option
-          given  by  <EM>option</EM>.   <EM>Option</EM>  may have any of the values
-          accepted by the <STRONG>dialogshell</STRONG> command.
-
-     <EM>pathName</EM> <STRONG>childsite</STRONG>
-          Returns the pathname of the child site widget.
-
-     <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
-          Query  or  modify  the  configuration  options  of  the
-          widget.   If  no  <EM>option</EM>  is  specified, returns a list
-          describing all of the available  options  for  <EM>pathName</EM>
-          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of
-          this list).  If <EM>option</EM> is specified with no <EM>value</EM>, then
-          the  command  returns  a  list describing the one named
-          option (this list will be identical to the  correspond-
-          ing  sublist  of  the  value  returned  if no <EM>option</EM> is
-          specified).  If one or more  <EM>option</EM> - <EM>value</EM>  pairs  are
-          specified,  then  the command modifies the given widget
-          option(s) to have the given value(s);  in this case the
-          command  returns  an empty string.  <EM>Option</EM> may have any
-          of the values accepted by the <STRONG>dialogshell</STRONG> command.
-
-
-
-</PRE>
-<H2>COMPONENTS</H2><PRE>
-     Name:           <STRONG>dschildsite</STRONG>
-     Class:          <STRONG>frame</STRONG>
-
-          The dschildsite component is the user  child  site  for
-          the  dialog shell.  See the "frame" widget manual entry
-          for details on the dschildsite component item.
-
-     Name:           <STRONG>separator</STRONG>
-     Class:          <STRONG>frame</STRONG>
-
-          The separator component devides the  area  between  the
-          user  child  site  and the button box.  See the "frame"
-          widget manual entry for details on the  separator  com-
-          ponent item.
-
-     Name:           <STRONG>bbox</STRONG>
-     Class:          <STRONG>ButtonBox</STRONG>
-
-          The bbox component is the  button  box  containing  the
-          buttons  for  the  dialog  shell.   See the "ButtonBox"
-          widget manual entry for details on the  bbox  component
-          item.
-
-
-
-</PRE>
-<H2>EXAMPLE</H2><PRE>
-           dialogshell .ds -modality none
-
-           .ds add OK -text "OK"
-           .ds add Cancel -text "Cancel"
-           .ds default OK
-
-           .ds activate
-
-
-
-</PRE>
-<H2>AUTHOR</H2><PRE>
-     Mark L. Ulferts
-
-
-</PRE>
-<H2>KEYWORDS</H2><PRE>
-     dialogshell, dialog, shell, widget
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</PRE>
-</BODY>
-</HTML>
+<TITLE>dialogshell - Create and manipulate a dialog shell widget</TITLE>
+<H1>dialogshell - Create and manipulate a dialog shell widget</H1>
+
+</pre><H2>SYNOPSIS</H2>
+<B>dialogshell<I> <I>pathName </I>?<I>options</I>?
+</pre><H2>INHERITANCE</H2>
+itk::Toplevel &lt;- Shell &lt;- Dialogshell
+</pre><H2>STANDARD OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>background</B><br>
+</td>
+<td valign=top>
+<B>cursor</B><br>
+</td>
+<td valign=top>
+<B>foreground</B><br>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/options.n.html"> "options" </A> manual entry for details on the standard options.
+</pre><H2>INHERITED OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>height</B><br>
+</td>
+<td valign=top>
+<B>master</B><br>
+</td>
+<td valign=top>
+<B>modality</B><br>
+</td>
+<td valign=top>
+<B>width</B><br>
+</td>
+</table>
+<P>
+See the "shell" manual entry for details on the above inherited options.
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>title</B><br>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the "Toplevel" manual entry for details on the above inherited options.
+
+</pre><H2>WIDGET-SPECIFIC OPTIONS</H2>
+<P>
+<pre>
+Name:                   <B>buttonBoxPadX</B>
+Class:                  <B>Pad</B>
+Command-Line Switch:	<B>-buttonboxpadx</B>
+</pre>
+<UL>
+Specifies a non-negative padding distance to leave between the button group and
+the outer edge of the button box in the x direction.  The value may be 
+given in any of the forms accpetable to <B>Tk_GetPixels</B>.  The default 
+is 5 pixels.
+</UL>
+<P>
+<pre>
+Name:                   <B>buttonBoxPadY</B>
+Class:                  <B>Pad</B>
+Command-Line Switch:	<B>-buttonboxpady</B>
+</pre>
+<UL>
+Specifies a non-negative padding distance to leave between the button group and
+the outer edge of the button box in the y direction.  The value may be 
+given in any of the forms accpetable to <B>Tk_GetPixels</B>.  The default 
+is 5 pixels.
+</UL>
+<P>
+<pre>
+Name:                   <B>buttonBoxPos</B>
+Class:                  <B>Position</B>
+Command-Line Switch:	<B>-buttonboxpos</B>
+</pre>
+<UL>
+Attaches buttons to the given side of the dialog: <B>n</B>, <B>s</B>, 
+<B>e</B> or <B>w</B>.  The default is s.
+</UL>
+<P>
+<pre>
+Name:                   <B>padX</B>
+Class:                  <B>Pad</B>
+Command-Line Switch:	<B>-padx</B>
+</pre>
+<UL>
+Specifies a padding distance for the childsite in the X-direction in
+any of the forms acceptable to <B>Tk_GetPixels</B>.  The default is 10.
+</UL>
+<P>
+<pre>
+Name:                   <B>padY</B>
+Class:                  <B>Pad</B>
+Command-Line Switch:	<B>-pady</B>
+</pre>
+<UL>
+Specifies a padding distance for the childsite in the Y-direction in
+any of the forms acceptable to <B>Tk_GetPixels</B>.  The default is 10.
+</UL>
+<P>
+<pre>
+Name:                   <B>separator</B>
+Class:                  <B>Separator</B>
+Command-Line Switch:	<B>-separator</B>
+</pre>
+<UL>
+Specifies whether a line is drawn to separate the 
+buttons from the dialog box contents in any of the forms
+acceptable to <B>Tcl_GetBoolean</B>.  The default is true.
+</UL>
+<P>
+<pre>
+Name:                   <B>thickness</B>
+Class:                  <B>Thickness</B>
+Command-Line Switch:	<B>-thickness</B>
+</pre>
+<UL>
+Specifies the thickness of the separator in any of the forms acceptable
+to <B>Tk_GetPixels</B>.  The default is 3 pixels.
+</UL>
+</pre><HR>
+
+</pre><H2>DESCRIPTION</H2>
+<P>
+The <B>dialogshell</B> command creates a dialog shell which is a top 
+level widget composed of a button box, separator, and child site area.
+The class also has methods to control button construction.
+
+</pre><H2>METHODS</H2>
+<P>
+The <B>dialogshell</B> command create a new Tcl command whose
+name is <I>pathName</I>.  This command may be used to invoke various
+operations on the widget.  It has the following general form:
+<pre>
+<I>pathName option </I>?<I>arg arg ...</I>?
+</pre>
+<I>Option</I> and the <I>arg</I>s
+determine the exact behavior of the command.  The following
+commands are possible for dialogshell widgets:
+</pre><H2>INHERITED METHODS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>activate</B><br>
+</td>
+<td valign=top>
+<B>center</B><br>
+</td>
+<td valign=top>
+<B>deactivate</B><br>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the "shell" manual entry for details on the above inherited methods.
+</pre><H2>ASSOCIATED METHODS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>add</B><br>
+<B>hide</B><br>
+<B>show</B><br>
+</td>
+<td valign=top>
+<B>buttonconfigure</B><br>
+<B>index</B><br>
+</td>
+<td valign=top>
+<B>default</B><br>
+<B>insert</B><br>
+</td>
+<td valign=top>
+<B>delete</B><br>
+<B>invoke</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="buttonbox.n.html"> "buttonbox" </A> manual entry for details on the associated methods.
+</pre><H2>WIDGET-SPECIFIC METHODS</H2>
+<DL>
+<DT> <I>pathName <B>cget</B> <I>option</I>
+</I></B>
+<DD> Returns the current value of the configuration option given
+by <I>option</I>.
+<I>Option</I> may have any of the values accepted by the <B>dialogshell</B>
+command.
+</DL>
+<DL>
+<DT> <I>pathName <B>childsite</B>
+</I></B>
+<DD> Returns the pathname of the child site widget.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>configure</B> ?<I>option</I>? ?<I>value option value ...</I>?
+</I></B>
+<DD> Query or modify the configuration options of the widget.
+If no <I>option</I> is specified, returns a list describing all of
+the available options for <I>pathName</I> (see <B>Tk_ConfigureInfo</B> for
+information on the format of this list).  If <I>option</I> is specified
+with no <I>value</I>, then the command returns a list describing the
+one named option (this list will be identical to the corresponding
+sublist of the value returned if no <I>option</I> is specified).  If
+one or more <I>option-value</I> pairs are specified, then the command
+modifies the given widget option(s) to have the given value(s);  in
+this case the command returns an empty string.
+<I>Option</I> may have any of the values accepted by the <B>dialogshell</B>
+command.
+
+</DL>
+</pre><H2>COMPONENTS</H2>
+<P>
+<pre>
+Name:                   <B>dschildsite</B>
+Class:                  <B>frame</B>
+</pre>
+<UL>
+The dschildsite component is the user child site for the dialog shell.  See 
+the "frame" widget manual entry for details on the dschildsite component item.
+</UL>
+<P>
+<pre>
+Name:                   <B>separator</B>
+Class:                  <B>frame</B>
+</pre>
+<UL>
+The separator component devides the area between the user child site and
+the button box.  See the "frame" widget manual entry for details on the 
+separator component item.
+</UL>
+<P>
+<pre>
+Name:                   <B>bbox</B>
+Class:                  <B>ButtonBox</B>
+</pre>
+<UL>
+The bbox component is the button box containing the buttons for the dialog 
+shell.  See the "ButtonBox" widget manual entry for details on the 
+bbox component item.
+</UL>
+</table>
+
+</pre><H2>EXAMPLE</H2>
+<pre>
+ dialogshell .ds -modality none
+ 
+ .ds add OK -text "OK" 
+ .ds add Cancel -text "Cancel"
+ .ds default OK
+ 
+ .ds activate
+</pre>
+</pre><H2>AUTHOR</H2>
+<A HREF="mailto:mulferts@spd.dsccc.com">Mark L. Ulferts</A>
+</pre><H2>KEYWORDS</H2>
+dialogshell, dialog, shell, widget

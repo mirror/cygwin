@@ -8,7 +8,7 @@
 #  AUTHOR: Mark L. Ulferts              EMAIL: mulferts@austin.dsccc.com
 #          Kris Raney                   EMAIL: kraney@spd.dsccc.com
 #
-#  @(#) $Id: shell.itk,v 1.2 1999/01/27 18:56:36 jingham Exp $
+#  @(#) $Id: shell.itk,v 1.2.172.1 2001/05/18 02:21:49 mdejong Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1996 DSC Technologies Corporation
 # ======================================================================
@@ -240,8 +240,8 @@ body iwidgets::Shell::activate {} {
     } 
 
     set _wait($this) 0
-    wm deiconify $itk_component(hull)
     raise $itk_component(hull)
+    wm deiconify $itk_component(hull)
     tkwait visibility $itk_component(hull)
     
     if {$itk_option(-modality) == "application"} {

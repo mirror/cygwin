@@ -20,7 +20,7 @@
 .ta 4c 8c 12c
 \fBactiveBackground\fR	\fBfont\fR	\fBinsertForeground\fR	\fBselectForeground\fR
 \fBactiveForeground\fR	\fBforeground\fR	\fBorient\fR	\fBstate\fR
-\fBbackground\fR	\fBhighlightBackground\fR	\fBrelief\fR	\fBtroughColor\fR
+\fBbackground\fR	\fBhighlightBackground\fR	\fBtroughColor\fR
 \fBborderWidth\fR	\fBhighlightColor\fR	\fBselectBackground\fR	\fBcursor\fR
 \fBhighlightThickness\fR	\fBselectBorderWidth\fR	\fBdisabledForeground\fR	\fBinsertBackground\fR
 \fBselectColor\fR

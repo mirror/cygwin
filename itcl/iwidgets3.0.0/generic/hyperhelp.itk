@@ -6,7 +6,7 @@
 # ----------------------------------------------------------------------
 #  AUTHOR: Kris Raney                   EMAIL: kraney@spd.dsccc.com
 #
-#  @(#) $Id: hyperhelp.itk,v 1.2 1999/01/27 18:56:34 jingham Exp $
+#  @(#) $Id: hyperhelp.itk,v 1.2.172.1 2001/05/18 02:21:48 mdejong Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1996 DSC Technologies Corporation
 # ======================================================================
@@ -261,9 +261,8 @@ configbody iwidgets::Hyperhelp::title {
 # Set location of help files
 # ------------------------------------------------------------------
 configbody iwidgets::Hyperhelp::helpdir {
-    if {[string index [file dirname $itk_option(-helpdir)] 0] != "/" && \
-        [string index [file dirname $itk_option(-helpdir)] 0] != "~"} {
-      configure -helpdir [pwd]/$itk_option(-helpdir)
+    if {[file pathtype $itk_option(-helpdir)] == "relative"} {
+      configure -helpdir [file join [pwd] $itk_option(-helpdir)]
     } else {
       set _history {}
       set _history_len 0

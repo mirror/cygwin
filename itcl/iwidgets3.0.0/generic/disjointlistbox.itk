@@ -50,9 +50,6 @@
 #
 # Default resources.
 #
-
-set tk_strictMotif 1
-
 option add *Disjointlistbox.lhsLabelText 	Available	widgetDefault
 option add *Disjointlistbox.rhsLabelText 	Current		widgetDefault
 option add *Disjointlistbox.lhsButtonLabel 	{Insert >>}	widgetDefault

@@ -594,7 +594,7 @@ configbody ::iwidgets::Watch::secondcolor {
 # Configure the color of the ticks.
 #
 configbody ::iwidgets::Watch::tickcolor {
-    watch itemconfigure tick -fill $itk_option(-tickcolor)
+    watch itemconfigure tick -outline $itk_option(-tickcolor)
 }
 
 # ------------------------------------------------------------------

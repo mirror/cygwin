@@ -1,247 +1,211 @@
-<HTML>
-<HEAD>
-<TITLE>iwidgets2.2.0 User Commands - radiobox</TITLE>
-</HEAD>
-<BODY BGCOLOR="#FFFFFF">
-<H1>iwidgets2.2.0 User Commands - radiobox</H1>
-<HR>
-<PRE>
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-</PRE>
-<H2>NAME</H2><PRE>
-     radiobox - Create and manipulate a radiobox widget
-
-
-</PRE>
-<H2>SYNOPSIS</H2><PRE>
-     <STRONG>radiobox</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
-
-
-</PRE>
-<H2>INHERITANCE</H2><PRE>
-     itk::Widget &lt;- labeledwidget &lt;- radiobox
-
-
-</PRE>
-<H2>STANDARD OPTIONS</H2><PRE>
-     <STRONG>background</STRONG>      <STRONG>borderWidth</STRONG>    <STRONG>cursor</STRONG>          <STRONG>foreground</STRONG>
-     <STRONG>relief</STRONG>
-
-     See the "options" manual entry for details on  the  standard
-     options.
-
-
-</PRE>
-<H2>INHERITED OPTIONS</H2><PRE>
-     <STRONG>labelBitmap</STRONG>     <STRONG>labelFont</STRONG>      <STRONG>labelImage</STRONG>      <STRONG>labelMargin</STRONG>
-     <STRONG>labelPos</STRONG>        <STRONG>labelText</STRONG>      <STRONG>labelVariable</STRONG>
-
-     See the "labeledwidget" class manual entry  for  details  on
-     the inherited options.
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC OPTIONS</H2><PRE>
-     Name:   <STRONG>command</STRONG>
-     Class:  <STRONG>Command</STRONG>
-     Command-Line Switch:    <STRONG>-command</STRONG>
-
-          Specifies a Tcl command procedure to be evaluated  fol-
-          lowing a  change in the current radio box selection.
-
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-
-</PRE>
-<H2>DESCRIPTION</H2><PRE>
-     The <STRONG>radiobox</STRONG> command creates a radio button box widget capa-
-     ble of adding, inserting, deleting, selecting, and configur-
-     ing radiobuttons as well as obtaining the currently selected
-     button.
-
-
-
-</PRE>
-<H2>METHODS</H2><PRE>
-     The <STRONG>radiobox</STRONG> command creates a new Tcl command whose name is
-     <EM>pathName</EM>.  This command may be used to invoke various opera-
-     tions on the widget.  It has the following general form:
-
-          <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
-
-     <EM>Option</EM> and the <EM>arg</EM>s determine the exact behavior of the com-
-     mand.
-     Many of the widget commands for the  <STRONG>radiobox</STRONG>  take  as  one
-     argument  an  indicator of which radiobutton of the radiobox
-     to operate on.  These  indicators  are  called  <EM>indexes</EM>  and
-     allow  reference and manipulation of radiobuttons.  Radiobox
-     indexes may be specified in any of the following forms:
-
-     <EM>number</EM>      Specifies the radiobutton numerically,  where  0
-                 corresponds   to  the  top  radiobutton  of  the
-                 radiobox.
-
-     <STRONG>end</STRONG>         Indicates the last radiobutton of the radiobox.
-
-     <EM>pattern</EM>     If the index doesn't satisfy one  of  the  above
-                 forms  then  this  form  is  used.   <EM>Pattern</EM>  is
-                 pattern-matched  against   the   tag   of   each
-                 radiobutton  in  the radiobox, in order from top
-                 to bottom, until a matching entry is found.  The
-                 rules of <STRONG>Tcl_StringMatch</STRONG> are used.
-
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC METHODS</H2><PRE>
-     <EM>pathName</EM> <STRONG>add</STRONG> <EM>tag</EM> ?<EM>option</EM> <EM>value</EM> <EM>option</EM> <EM>value</EM>?
-          Adds a new radiobutton to the  radiobuttond  window  on
-          the bottom.  The command takes additional options which
-          are passed on to the radiobutton as construction  argu-
-          ments.   These  include  the  standard  Tk  radiobutton
-          options.  The tag is returned.
-
-     <EM>pathName</EM> <STRONG>buttonconfigure</STRONG> <EM>index</EM> ?<EM>options</EM>?
-          This command  is  similar  to  the  <STRONG>configure</STRONG>  command,
-          except that it applies to the options for an individual
-          radiobutton, whereas <STRONG>configure</STRONG>applies  to  the  options
-          for  the  radiobox as a whole.  <EM>Options</EM> may have any of
-          the values accepted by  the  <STRONG>add</STRONG>  widget  command.   If
-          <EM>options</EM>  are  specified,  options are modified as indi-
-          cated in the command and the command returns  an  empty
-          string.   If  no  <EM>options</EM> are specified, returns a list
-          describing the current options  for  entry  <EM>index</EM>  (see
-          <STRONG>Tk_ConfigureInfo</STRONG>  for information on the format of this
-          list).
-
-     <EM>pathName</EM> <STRONG>cget</STRONG> <EM>option</EM>
-          Returns the current value of the  configuration  option
-          given  by  <EM>option</EM>.   <EM>Option</EM>  may have any of the values
-          accepted by the <STRONG>radiobox</STRONG> command.
-
-     <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
-          Query  or  modify  the  configuration  options  of  the
-          widget.   If  no  <EM>option</EM>  is  specified, returns a list
-          describing all of the available  options  for  <EM>pathName</EM>
-          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of
-          this list).  If <EM>option</EM> is specified with no <EM>value</EM>, then
-          the  command  returns  a  list describing the one named
-          option (this list will be identical to the  correspond-
-          ing  sublist  of  the  value  returned  if no <EM>option</EM> is
-          specified).  If one or more  <EM>option</EM> - <EM>value</EM>  pairs  are
-          specified,  then  the command modifies the given widget
-          option(s) to have the given value(s);  in this case the
-          command  returns  an empty string.  <EM>Option</EM> may have any
-          of the values accepted by the <STRONG>radiobox</STRONG> command.
-
-     <EM>pathName</EM> <STRONG>delete</STRONG> <EM>index</EM>
-          Deletes a specified radiobutton given an <EM>index</EM>.
-
-     <EM>pathName</EM> <STRONG>deselect</STRONG> <EM>index</EM>
-          Deselects a specified radiobutton given an <EM>index</EM>.
-
-     <EM>pathName</EM> <STRONG>flash</STRONG> <EM>index</EM>
-          Flashes a specified radiobutton given an <EM>index</EM>.
-
-     <EM>pathName</EM> <STRONG>get</STRONG>
-          Returns the tag of the currently selected radiobutton.
-
-     <EM>pathName</EM> <STRONG>index</STRONG> <EM>index</EM>
-          Returns the numerical index corresponding to index.
-
-     <EM>pathName</EM> <STRONG>insert</STRONG> <EM>index</EM> <EM>tag</EM> ?<EM>option</EM> <EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
-          Same as the <STRONG>add</STRONG> command except that it inserts the  new
-          radiobutton just before the one given by <EM>index</EM>, instead
-          of appending to the end of the radiobox.   The  <EM>option</EM>,
-          and <EM>value</EM> arguments have the same interpretation as for
-          the <STRONG>add</STRONG> widget command.
-
-     <EM>pathName</EM> <STRONG>select</STRONG> <EM>index</EM>
-          Selects a specified radiobutton given an <EM>index</EM>.
-
-
-
-</PRE>
-<H2>EXAMPLE</H2><PRE>
-           radiobox .rb -labeltext Fonts
-           .rb add times -text Times
-           .rb add helvetica -text Helvetica
-           .rb add courier -text Courier
-           .rb add symbol -text Symbol
-           .rb select courier
-
-           pack .rb -padx 10 -pady 10 -fill both -expand yes
-
-
-
-
-</PRE>
-<H2>AUTHOR</H2><PRE>
-     Michael J. McLennan
-
-     Mark L. Ulferts
-
-
-</PRE>
-<H2>KEYWORDS</H2><PRE>
-     radiobox, widget
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</PRE>
-</BODY>
-</HTML>
+<TITLE>radiobox - Create and manipulate a radiobox widget</TITLE>
+<H1>radiobox - Create and manipulate a radiobox widget</H1>
+
+</pre><H2>SYNOPSIS</H2>
+<B>radiobox<I> <I>pathName </I>?<I>options</I>?
+</pre><H2>INHERITANCE</H2>
+itk::Widget &lt;- labeledframe &lt;- radiobox
+</pre><H2>STANDARD OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>background</B><br>
+<B>foreground</B><br>
+</td>
+<td valign=top>
+<B>borderWidth</B><br>
+<B>relief</B><br>
+</td>
+<td valign=top>
+<B>cursor</B><br>
+<B>selectColor</B><br>
+</td>
+<td valign=top>
+<B>disabledForeground</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/options.n.html"> "options" </A> manual entry for details on the standard options.
+</pre><H2>INHERITED OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>labelBitmap</B><br>
+<B>labelPos</B><br>
+</td>
+<td valign=top>
+<B>labelFont</B><br>
+<B>labelText</B><br>
+</td>
+<td valign=top>
+<B>labelImage</B><br>
+<B>labelVariable</B><br>
+</td>
+<td valign=top>
+<B>labelMargin</B><br>
+</td>
+</table>
+<P>
+See the "labeledframe" class manual entry for details on the 
+inherited options.
+</pre><H2>WIDGET-SPECIFIC OPTIONS</H2>
+<P>
+<pre>
+Name:                   <B>command</B>
+Class:                  <B>Command</B>
+Command-Line Switch:    <B>-command</B>
+</pre>
+<UL>
+Specifies a Tcl command procedure to be evaluated following a  change in 
+the current radio box selection.
+</UL>
+<P>
+</pre><HR>
+
+</pre><H2>DESCRIPTION</H2>
+<P>
+The <B>radiobox</B> command creates a radio button box widget 
+capable of adding, inserting, deleting, selecting, and configuring 
+radiobuttons as well as obtaining the currently selected button.
+
+</pre><H2>METHODS</H2>
+<P>
+The <B>radiobox</B> command creates a new Tcl command whose
+name is <I>pathName</I>.  This
+command may be used to invoke various
+operations on the widget.  It has the following general form:
+<pre>
+<I>pathName option </I>?<I>arg arg ...</I>?
+</pre>
+<I>Option</I> and the <I>arg</I>s
+determine the exact behavior of the command.  
+<P>
+Many of the widget commands for the <B>radiobox</B> take as one argument an
+indicator of which radiobutton of the radiobox to operate on.  These indicators
+are called <I>indexes</I> and allow reference and manipulation of radiobuttons.
+Radiobox indexes may be specified in any of the following forms:
+<DL>
+<DT> <I>number</I>
+</I></B>
+<DD> Specifies the radiobutton numerically, where 0 corresponds to the top 
+radiobutton of the radiobox.
+</DL>
+<DL>
+<DT> <B>end</B>
+</I></B>
+<DD> Indicates the last radiobutton of the radiobox.
+</DL>
+<DL>
+<DT> <I>pattern</I>
+</I></B>
+<DD> If the index doesn't satisfy one of the above forms then this
+form is used.  <I>Pattern</I> is pattern-matched against the tag of
+each radiobutton in the radiobox, in order from top to bottom,
+until a matching entry is found.  The rules of <B>Tcl_StringMatch</B>
+are used.
+
+</DL>
+</pre><H2>WIDGET-SPECIFIC METHODS</H2>
+<DL>
+<DT> <I>pathName <B>add</B> <I>tag</I> ?<I>option value option value</I>?
+</I></B>
+<DD> Adds a new radiobutton to the radiobuttond window on the bottom.  The command
+takes additional options which are passed on to the radiobutton as construction
+arguments.  These include the standard Tk radiobutton options.  The tag is
+returned.
+</DL>
+<DL>
+<DT> <I>pathName <B>buttonconfigure</B> <I>index</I> ?<I>options</I>?
+</I></B>
+<DD> This command is similar to the <B>configure</B> command, except that
+it applies to the options for an individual radiobutton, 
+whereas <B>configure</B>applies to the options for the radiobox as a whole.
+<I>Options</I> may have any of the values accepted by the <B>add</B>
+widget command.  If <I>options</I> are specified, options are modified
+as indicated in the command and the command returns an empty string.
+If no <I>options</I> are specified, returns a list describing
+the current options for entry <I>index</I> (see <B>Tk_ConfigureInfo</B> for
+information on the format of this list).
+</DL>
+<DL>
+<DT> <I>pathName <B>cget</B> <I>option</I>
+</I></B>
+<DD> Returns the current value of the configuration option given
+by <I>option</I>.
+<I>Option</I> may have any of the values accepted by the <B>radiobox</B>
+command.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>configure</B> ?<I>option</I>? ?<I>value option value ...</I>?
+</I></B>
+<DD> Query or modify the configuration options of the widget.
+If no <I>option</I> is specified, returns a list describing all of
+the available options for <I>pathName</I> (see <B>Tk_ConfigureInfo</B> for
+information on the format of this list).  If <I>option</I> is specified
+with no <I>value</I>, then the command returns a list describing the
+one named option (this list will be identical to the corresponding
+sublist of the value returned if no <I>option</I> is specified).  If
+one or more <I>option-value</I> pairs are specified, then the command
+modifies the given widget option(s) to have the given value(s);  in
+this case the command returns an empty string.
+<I>Option</I> may have any of the values accepted by the <B>radiobox</B>
+command.
+</DL>
+<DL>
+<DT> <I>pathName <B>delete</B> <I>index</I>
+</I></B>
+<DD> Deletes a specified radiobutton given an <I>index</I>.
+</DL>
+<DL>
+<DT> <I>pathName <B>deselect</B> <I>index</I>
+</I></B>
+<DD> Deselects a specified radiobutton given an <I>index</I>.
+</DL>
+<DL>
+<DT> <I>pathName <B>flash</B> <I>index</I>
+</I></B>
+<DD> Flashes a specified radiobutton given an <I>index</I>.
+</DL>
+<DL>
+<DT> <I>pathName <B>get</B>
+</I></B>
+<DD> Returns the tag of the currently selected radiobutton.
+</DL>
+<DL>
+<DT> <I>pathName <B>index</B> <I>index</I>
+</I></B>
+<DD> Returns the numerical index corresponding to index.
+</DL>
+<DL>
+<DT> <I>pathName <B>insert <I>index</I> <I>tag</I> ?<I>option value option value ...</I>?
+</I></B>
+<DD> Same as the <B>add</B> command except that it inserts the new
+radiobutton just before the one given by <I>index</I>, instead of appending
+to the end of the radiobox.  The <I>option</I>, and <I>value</I>
+arguments have the same interpretation as for the <B>add</B> widget
+command.  
+</DL>
+<DL>
+<DT> <I>pathName <B>select</B> <I>index</I>
+</I></B>
+<DD> Selects a specified radiobutton given an <I>index</I>.
+
+</DL>
+</pre><H2>EXAMPLE</H2>
+<pre>
+ radiobox .rb -labeltext Fonts
+ .rb add times -text Times
+ .rb add helvetica -text Helvetica
+ .rb add courier -text Courier
+ .rb add symbol -text Symbol
+ .rb select courier
+
+ pack .rb -padx 10 -pady 10 -fill both -expand yes
+</pre>
+
+</pre><H2>AUTHOR</H2>
+Michael J. McLennan
+</pre>
+<A HREF="mailto:mulferts@spd.dsccc.com">Mark L. Ulferts</A>
+</pre><H2>KEYWORDS</H2>
+radiobox, widget

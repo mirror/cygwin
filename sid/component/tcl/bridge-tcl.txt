@@ -210,8 +210,8 @@ vector<string>			list of strings
 component,bus,pin pointer	opaque string
 {little,big,host}_int_{1,2,4,8}	numeric integer - care with 64-bit ints!
 component::status		string: "ok", "bad_value", "not_found"
-bus::status			string: "ok", "misaligned", "unmapped",
-					"unpermitted", "delayed"
+bus::status			status list: {code latency}
+				eg. {ok 3}, {misaligned 0}, {unmapped 0}
 vector<component*>              list of opaque strings
 vector<pin*>                    list of opaque strings
 0 (null pointer)		""
@@ -247,8 +247,8 @@ driven(value)				driven_h4 $pin $value
 
 -- in sid::bus, for host_int_4 address and {big,little}_int_Y data types
 
-read(address,data)			read_h4_{l,b}Y $address   ** return [list $status $data] **
-write(address,data)			write_h4_{l,b}Y $address $data
+read(address,data)			read_h4_{l,b}Y $address        ** return [list $status $data] **
+write(address,data)			write_h4_{l,b}Y $address $data ** return $status **
 
 
 Outgoing sid API calls

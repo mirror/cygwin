@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: stat06.c,v 1.1 2001/09/09 13:38:17 duda Exp $ */
+/* $Id: stat06.c,v 1.2 2001/09/15 19:54:04 duda Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -327,7 +327,11 @@ high_address_setup()
     for (ind=0; Test_cases[ind].desc != NULL; ind++ ) {
 	if ( Test_cases[ind].pathname == High_address ) {
 	/*if ( strcmp(Test_cases[ind].pathname, HIGH_ADDRESS) == 0 ) { ***/
+#ifndef __CYGWIN__
 	    Test_cases[ind].pathname = (char *)(sbrk(0)+5);
+#else
+	    Test_cases[ind].pathname = (char *)0xffff0000;
+#endif
 	    break;
 	}
     }

@@ -189,7 +189,7 @@ if {[string match "macintosh" $tcl_platform(platform)]} {
 # Results:
 #   Returns the selection, or an error if none could be found
 #
-if {[string equal $tcl_platform(platform) "unix"]} {
+if {[string compare $tcl_platform(platform) "unix"] == 0} {
     proc ::tk::table::GetSelection {w {sel PRIMARY}} {
 	if {[catch {selection get -displayof $w -selection $sel \
 		-type UTF8_STRING} txt] \

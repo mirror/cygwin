@@ -9,12 +9,12 @@
  *	declare all the procedures needed here (such as strtod).
  *
  * Copyright (c) 1991 The Regents of the University of California.
- * Copyright (c) 1994 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1998 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: stdlib.h,v 1.7 1999/01/26 04:11:13 jingham Exp $
+ * RCS: @(#) $Id: stdlib.h,v 1.7.6.1 2000/05/04 21:26:20 spolk Exp $
  */
 
 #ifndef _STDLIB
@@ -43,3 +43,4 @@ extern unsigned long	strtoul _ANSI_ARGS_((CONST char *string,
 			    char **endPtr, int base));
 
 #endif /* _STDLIB */
+

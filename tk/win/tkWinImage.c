@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkWinImage.c,v 1.12 1999/01/26 04:11:44 jingham Exp $
+ * RCS: @(#) $Id: tkWinImage.c,v 1.7.6.1 2000/05/04 21:26:31 spolk Exp $
  */
 
 #include "tkWinInt.h"
@@ -35,7 +35,7 @@ static int		PutPixel _ANSI_ARGS_((XImage *image, int x, int y,
  *----------------------------------------------------------------------
  */
 
-int
+static int
 DestroyImage(imagePtr)
      XImage *imagePtr;		/* image to free */
 {
@@ -64,7 +64,7 @@ DestroyImage(imagePtr)
  *----------------------------------------------------------------------
  */
 
-unsigned long
+static unsigned long
 ImageGetPixel(image, x, y)
     XImage *image;
     int x, y;
@@ -327,3 +327,4 @@ XGetImage(display, d, x, y, width, height, plane_mask, format)
 
     return imagePtr;
 }
+

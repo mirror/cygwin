@@ -2,7 +2,7 @@
 # widgets.  It is part of the Tk visual test suite, which is invoked
 # via the "visual" script.
 #
-# RCS: @(#) $Id: bevel.tcl,v 1.8 1999/01/26 04:11:33 jingham Exp $
+# RCS: @(#) $Id: bevel.tcl,v 1.7.6.1 2000/05/04 21:26:28 spolk Exp $
 
 catch {destroy .t}
 toplevel .t
@@ -126,3 +126,16 @@ foreach i {1 2 3} {
 .t.t insert end rrr r1
 .t.t insert end *****
 .t.t insert end rrr r1
+
+
+
+
+
+
+
+
+
+
+
+
+

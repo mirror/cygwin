@@ -11,7 +11,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacXCursors.r,v 1.6 1999/01/26 04:11:33 jingham Exp $
+ * RCS: @(#) $Id: tkMacXCursors.r,v 1.7.6.1 2000/05/04 21:26:27 spolk Exp $
  */
 
 /*
@@ -958,4 +958,5 @@ data 'crsr' (3075, "watch", purgeable) {
 	$"EEEE 0003 BBBB BBBB BBBB 000F 0000 0000"
 	$"0000"                                   
 };
+
 

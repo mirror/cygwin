@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkWinRegion.c,v 1.8 1999/01/26 04:11:45 jingham Exp $
+ * RCS: @(#) $Id: tkWinRegion.c,v 1.7.6.1 2000/05/04 21:26:31 spolk Exp $
  */
 
 #include "tkWinInt.h"
@@ -177,3 +177,4 @@ TkRectInRegion(r, x, y, width, height)
     rect.right = x+width;
     return RectInRegion((HRGN)r, &rect) ? RectanglePart : RectangleOut;
 }
+

@@ -2,7 +2,7 @@
 # for bitmaps in canvases.  It is part of the Tk visual test suite,
 # which is invoked via the "visual" script.
 #
-# RCS: @(#) $Id: canvPsArc.tcl,v 1.7 1999/01/26 04:11:34 jingham Exp $
+# RCS: @(#) $Id: canvPsArc.tcl,v 1.7.6.1 2000/05/04 21:26:29 spolk Exp $
 
 catch {destroy .t}
 toplevel .t

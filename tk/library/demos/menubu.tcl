@@ -3,7 +3,7 @@
 # This demonstration script creates a window with a bunch of menus
 # and cascaded menus using menubuttons.
 #
-# # SCCS: @(#) menubu.tcl 1.9 97/06/19 18:11:06
+# # RCS: @(#) $Id: menubu.tcl,v 1.7.6.1 2000/05/04 21:26:25 spolk Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -88,6 +88,7 @@ foreach i {Black gray75 gray50 White} {
 }
 
 pack $body.buttons.colors -side left -padx 25 -pady 25
+
 
 
 

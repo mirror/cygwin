@@ -4,7 +4,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" RCS: @(#) $Id: DrawFocHlt.3,v 1.7 1999/01/26 04:11:14 jingham Exp $
+'\" RCS: @(#) $Id: DrawFocHlt.3,v 1.7.6.2 2000/09/26 16:07:25 spolk Exp $
 '\" 
 .so man.macros
 .TH Tk_DrawFocusHighlight 3 4.0 Tk "Tk Library Procedures"
@@ -15,7 +15,7 @@ Tk_DrawFocusHighlight \- draw the traversal highlight ring for a widget
 .nf
 \fB#include <tk.h>\fR
 .sp
-\fBTk_GetPixels(\fItkwin, gc, width, drawable\fB)\fR
+\fBTk_DrawFocusHighlight(\fItkwin, gc, width, drawable\fB)\fR
 .SH ARGUMENTS
 .AS "Tcl_Interp" *joinPtr
 .AP Tk_Window tkwin in
@@ -38,3 +38,5 @@ It is typically invoked by widgets during redisplay.
 
 .SH KEYWORDS
 focus, traversal highlight
+
+

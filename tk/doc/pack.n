@@ -5,7 +5,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" RCS: @(#) $Id: pack.n,v 1.9 1999/01/26 04:11:16 jingham Exp $
+'\" RCS: @(#) $Id: pack.n,v 1.7.6.1 2000/05/04 21:26:21 spolk Exp $
 '\" 
 .so man.macros
 .TH pack n 4.0 Tk "Tk Built-In Commands"
@@ -264,3 +264,4 @@ the stacking order of either the master or the slave.
 
 .SH KEYWORDS
 geometry manager, location, packer, parcel, propagation, size
+

@@ -2,7 +2,7 @@
 #
 # This demonstration script creates a dialog box with a global grab.
 #
-# SCCS: @(#) dialog2.tcl 1.2 96/02/16 10:49:53
+# RCS: @(#) $Id: dialog2.tcl,v 1.7.6.1 2000/05/04 21:26:25 spolk Exp $
 
 after idle {
     .dialog2.msg configure -wraplength 4i
@@ -17,3 +17,4 @@ switch $i {
     1 {puts "You pressed Cancel"}
     2 {showCode .dialog2}
 }
+

@@ -4,7 +4,7 @@
 # allow you to load a file into a text widget, then perform searches
 # on that file.
 #
-# SCCS: @(#) search.tcl 1.5 97/03/02 16:27:25
+# RCS: @(#) $Id: search.tcl,v 1.7.6.1 2000/05/04 21:26:26 spolk Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -139,3 +139,4 @@ $w.text mark set insert 0.0
 
 set fileName ""
 set searchString ""
+

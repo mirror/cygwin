@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: xutil.c,v 1.7 1999/01/26 04:11:45 jingham Exp $
+ * RCS: @(#) $Id: xutil.c,v 1.7.6.1 2000/05/04 21:26:31 spolk Exp $
  */
 
 #include <stdlib.h>
@@ -114,3 +114,4 @@ XGetVisualInfo(display, vinfo_mask, vinfo_template, nitems_return)
     *nitems_return = 1;
     return info;
 }
+

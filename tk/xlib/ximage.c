@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: ximage.c,v 1.8 1999/01/26 04:11:45 jingham Exp $
+ * RCS: @(#) $Id: ximage.c,v 1.7.6.1 2000/05/04 21:26:31 spolk Exp $
  */
 
 #include "tkInt.h"
@@ -69,3 +69,4 @@ XCreateBitmapFromData(display, d, data, width, height)
     XFreeGC(display, gc);
     return pix;
 }
+

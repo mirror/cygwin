@@ -626,7 +626,7 @@
 (define-operand
   (name disp8)
   (comment "8 bit displacement")
-  (attrs RELAXABLE)
+  (attrs RELAX)
   (type h-iaddr)
   (index f-disp8)
   ; ??? Early experiments had insert/extract fields here.
@@ -635,7 +635,7 @@
 )
 
 (dnop disp16 "16 bit displacement" () h-iaddr f-disp16)
-(dnop disp24 "24 bit displacement" (RELAXABLE) h-iaddr f-disp24)
+(dnop disp24 "24 bit displacement" (RELAX) h-iaddr f-disp24)
 
 ; These hardware elements are refered to frequently.
 
@@ -785,7 +785,7 @@
 )
 
 (dnmi bc24r "relaxable bc24"
-     (COND-CTI RELAX (IDOC BR))
+     (COND-CTI RELAXED (IDOC BR))
      "bc $disp24"
      (emit bc24 disp24)
 )
@@ -845,7 +845,7 @@
 )
 
 (dnmi bl24r "relaxable bl24"
-     (UNCOND-CTI RELAX (IDOC BR))
+     (UNCOND-CTI RELAXED (IDOC BR))
      "bl $disp24"
      (emit bl24 disp24)
 )
@@ -881,7 +881,7 @@
 )
 
 (dnmi bcl24r "relaxable bcl24"
-     (COND-CTI (MACH m32rx) RELAX (IDOC BR))
+     (COND-CTI (MACH m32rx) RELAXED (IDOC BR))
      "bcl $disp24"
      (emit bcl24 disp24)
 )
@@ -911,7 +911,7 @@
 )
 
 (dnmi bnc24r "relaxable bnc24"
-     (COND-CTI RELAX (IDOC BR))
+     (COND-CTI RELAXED (IDOC BR))
      "bnc $disp24"
      (emit bnc24 disp24)
 )
@@ -950,7 +950,7 @@
 )
 
 (dnmi bra24r "relaxable bra24"
-     (UNCOND-CTI RELAX (IDOC BR))
+     (UNCOND-CTI RELAXED (IDOC BR))
      "bra $disp24"
      (emit bra24 disp24)
 )
@@ -986,7 +986,7 @@
 )
 
 (dnmi bncl24r "relaxable bncl24"
-     (COND-CTI (MACH m32rx) RELAX (IDOC BR))
+     (COND-CTI (MACH m32rx) RELAXED (IDOC BR))
      "bncl $disp24"
      (emit bncl24 disp24)
 )

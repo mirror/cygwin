@@ -1556,10 +1556,9 @@ Define an anyof operand, name/value pair list version.
   (define-attr '(for operand) '(type boolean) '(name NEGATIVE)
     '(comment "value is negative"))
 
-  ; Also used for insns, and we can't define it twice, so we specify
-  ; for insn here.
-  (define-attr '(for operand insn) '(type boolean) '(name RELAXABLE)
-    '(comment "operand/insn is relaxable"))
+  ; Operand plays a part in RELAXABLE/RELAXED insns.
+  (define-attr '(for operand) '(type boolean) '(name RELAX)
+    '(comment "operand is the relax participant"))
 
   ; ??? Might be able to make SEM-ONLY go away (or machine compute it)
   ; by scanning which operands are refered to by the insn syntax strings.

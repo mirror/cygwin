@@ -1,3 +1,9 @@
+2001-10-28  Christopher Faylor  <cgf@redhat.com>
+
+	* win/configure.in: Modify 2001-10-05 change to check for cygwin host
+	rather than cygwin target.
+	* win/configure: Regenerate.
+
 Fri Oct  5 16:03:53 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* win/configure.in: Add detection for -mwin32 option requirement under

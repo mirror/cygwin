@@ -1110,8 +1110,7 @@ echo "$ac_t""$ac_cv_cygwin" 1>&6
 CYGWIN=
 test "$ac_cv_cygwin" = yes && CYGWIN=yes
 
-set -x
-case "${target}" in
+case "${host}" in
 *-*-cygwin*)
         touch ac$$.c
         if ${CC} -c -mwin32 ac$$.c >/dev/null 2>&1; then
@@ -1123,7 +1122,6 @@ case "${target}" in
         rm -f ac$$.o ac$$.c
         ;;
 esac
-set +x
 
 #--------------------------------------------------------------------
 # Determines the correct binary file extension (.o, .obj, .exe etc.)

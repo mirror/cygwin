@@ -1,6 +1,6 @@
 // gdb.cxx - GDB stub implementation.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -776,7 +776,8 @@ gdb::restart_program ()
   if (trace_gdbsid)
     cerr << "restart_program " << endl;
 
-  // XXX: what to do here?
+  // Drive restart pin so reset can be performed
+  this->restart_pin.drive (1);
 }
 
 
@@ -1116,6 +1117,7 @@ gdb::gdb ():
   add_attribute ("deinit", & deinit_pin, "pin");
   add_pin ("trap-code", & cpu_trap_code_pin);
   add_pin ("process-signal", & process_signal_pin);
+  add_pin ("restart", & restart_pin);
   add_pin ("gloss-process-signal", & gloss_process_signal_pin);
   add_pin ("remote-rx", & remote_rx_pin);
   add_attribute ("remote-rx", & remote_rx_pin, "pin");

@@ -179,8 +179,14 @@ static void		TranslateEdge _ANSI_ARGS_((Tk_Canvas canvas,
 static Tk_CustomOption arrowShapeOption =
 { ParseArrowShape, PrintArrowShape, (ClientData) NULL};
 
-static Tk_CustomOption tagsOption = {Tk_CanvasTagsParseProc,
-    Tk_CanvasTagsPrintProc, (ClientData) NULL};
+/*
+ * The callbacks for tagsOption are initialized in ConfigureEdge()
+ */
+
+static Tk_CustomOption tagsOption =
+{ (Tk_OptionParseProc *) NULL,
+  (Tk_OptionPrintProc *) NULL,
+  (ClientData) NULL};
 
 static Tk_ConfigSpec configSpecs[] = {
   {TK_CONFIG_UID, "-arrow", (char *) NULL, (char *) NULL,
@@ -530,6 +536,17 @@ ConfigureEdge(interp, canvas, itemPtr, argc, argv, flags)
 
   tkwin = Tk_CanvasTkwin(canvas);
   bgBorder = ((TkCanvas *) canvas)->bgBorder;
+
+  /*
+   * Init callbacks in tagsOption before accessing configSpecs.
+   * This init can't be done statically when using Windows gcc
+   * since these symbols are imported from the Tk dll.
+   */
+
+  if (tagsOption.parseProc == NULL) {
+    tagsOption.parseProc = Tk_CanvasTagsParseProc;
+    tagsOption.printProc = Tk_CanvasTagsPrintProc;
+  }
 
   if (Tk_ConfigureWidget(interp, tkwin,
 			 configSpecs, argc, argv,

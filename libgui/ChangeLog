@@ -1,3 +1,11 @@
+2001-08-12  Mo DeJong  <mdejong@redhat.com>
+
+	* src/tkCanvEdge.c: Work around Windows gcc problem
+	initializing a static member with a dll imported
+	symbol by assigning the function pointer at runtime.
+	Static initialization works just fine in VC++ but
+	fails when compiling with the Windows version of gcc.
+
 2001-08-12  Keith Seitz  <keiths@redhat.com>
 
 	Update tkTable to version 2.7:

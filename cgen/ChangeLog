@@ -1,5 +1,18 @@
 2002-12-19  Doug Evans  <dje@sebabeach.org>
 
+	Back out sim*.scm changes of 2001-04-02  Ben Elliston  <bje@redhat.com>
+	Instead do:
+	* sim-decode.scm (-gen-decode-insn-globals): Use @PREFIX@_INSN__MAX
+	as size of IDESC-TABLE-VAR.
+	(@prefix@_init_idesc_table): Ditto.
+	* sim-model.scm (-gen-mach-defns): Ditto.
+	* sim.scm (gen-cpu-insn-enum-decl): Rename last elm from max to -max.
+
+	* utils-scm.scm (-gen-decode-insn-entry): Fix some spacing in output.
+
+	* insn.scm (-parse-insn-format-symbol): Improve error message.
+	(-parse-insn-format): Ditto.
+
 	* gen-all-sim: New script.
 
 2002-12-16  DJ Delorie  <dj@delorie.com>

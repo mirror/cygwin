@@ -22,6 +22,7 @@
 #include "hw-base.h"
 #include "hw-tree.h"
 
+#include "sim-io.h"
 #include "sim-assert.h"
 
 #ifdef HAVE_STDLIB_H
@@ -680,7 +681,7 @@ parse_string_property (struct hw *current,
       /* copy it in */
       if (*chp == '"')
 	{
-	  /* a quoted string - watch for '\' et.al. */
+	  /* a quoted string - watch for '\' et al. */
 	  /* estimate the size and allocate space for it */
 	  int pos;
 	  chp++;

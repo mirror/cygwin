@@ -1,3 +1,14 @@
+2002-01-29  Hans-Peter Nilsson  <hp@axis.com>
+
+	* doc/rtl.texi: Fix typo: define-attr, not define-attribute.
+	(Enumerated constants): Mention that an ifield must not specify a
+	multi-ifield.
+	(Instruction operands): Ditto for index.
+	(Expressions) <parallel>: Remove misplaced mention of local
+	variables.
+	<if>: Mention that mode must be specified and non-VOID when the
+	result is used.
+
 2002-01-28  Hans-Peter Nilsson  <hp@axis.com>
 
 	* doc/porting.texi: When referring to *.opc, mention they are in

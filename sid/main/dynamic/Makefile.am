@@ -14,6 +14,7 @@ bin_PROGRAMS = sid
 if SID_STATIC
 NEARBY_LIBS = \
 	-dlpreopen ../../component/audio/libaudio.la \
+	-dlpreopen ../../component/cache/libcache.la \
 	-dlpreopen ../../component/cfgroot/libconfig.la \
 	-dlpreopen ../../component/cgen-cpu/libcgencpu.la \
 	-dlpreopen ../../component/consoles/libconsoles.la \
@@ -36,12 +37,38 @@ NEARBY_LIBS = \
 	-dlpreopen ../../component/tcl/libtclapi.la \
 	-dlpreopen ../../component/timers/libtimers.la \
 	-dlpreopen ../../component/uart/libuart.la
+NEARBY_DEPS_LIBS = \
+	../../component/audio/libaudio.la \
+	../../component/cache/libcache.la \
+	../../component/cfgroot/libconfig.la \
+	../../component/cgen-cpu/libcgencpu.la \
+	../../component/consoles/libconsoles.la \
+	../../component/gdb/libgdb.la \
+	../../component/gloss/libgloss.la \
+	../../component/glue/libglue.la \
+	../../component/ide/libide.la \
+	../../component/interrupt/libinterrupt.la \
+	../../component/lcd/libhd44780u.la \
+	../../component/lcd/liblcd-char-display.la \
+	../../component/lcd/libt6963c.la \
+	../../component/loader/libloader.la \
+	../../component/mapper/libmapper.la \
+	../../component/memory/libmemory.la \
+	../../component/mmu/libmmu.la \
+	../../component/parport/libparport.la \
+	../../component/profiling/libprof.la \
+	../../component/rtc/librtc.la \
+	../../component/sched/libsched.la \
+	../../component/tcl/libtclapi.la \
+	../../component/timers/libtimers.la \
+	../../component/uart/libuart.la
 AM_CXXFLAGS = -DSID_STATIC
 else
-NEARBY_LIBS =
+NEARBY_LIBS = ../../component/cfgroot/libconfig.la
+NEARBY_DEPS_LIBS = $(NEARBY_LIBS)
 AM_CXXFLAGS = 
 endif
 
 sid_SOURCES = mainDynamic.cxx
 sid_LDFLAGS = -export-dynamic -static -export-symbols-regex '[a-zA-Z0-9]*_library$$' $(NEARBY_LIBS)
-sid_LDADD = ../../component/cfgroot/libconfig.la
+sid_DEPENDENCIES = $(NEARBY_DEPS_LIBS)

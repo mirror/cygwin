@@ -1,3 +1,14 @@
+2001-06-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (NEARBY_LIBS, NEARBY_DEPS_LIBS): Add libcache.la.
+	* Makefile.in: Regenerated.
+
+2001-03-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (NEARBY_DEPS_LIBS): New macro.
+	(sid_DEPENDENCIES, sid_LDADD): Use it.
+	* Makefile.in: Regenerated.
+
 2001-03-21  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.in: Regenerate.

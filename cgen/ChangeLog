@@ -1,5 +1,8 @@
 2002-12-21  Doug Evans  <dje@sebabeach.org>
 
+	* ifield.scm (-ifield-parse): Rewrite <bitrange> computation.
+	(-get-ifld-word-offset,-get-ifld-word-length): New fns.
+
 	* dev.scm (cload): Update location of .cpu files.
 
 2002-12-19  Doug Evans  <dje@sebabeach.org>
@@ -26,7 +29,7 @@
 	* sim-model.scm (-gen-mach-defns): Ditto.
 	* sim.scm (gen-cpu-insn-enum-decl): Rename last elm from max to -max.
 
-	* utils-scm.scm (-gen-decode-insn-entry): Fix some spacing in output.
+	* utils-sim.scm (-gen-decode-insn-entry): Fix some spacing in output.
 
 	* insn.scm (-parse-insn-format-symbol): Improve error message.
 	(-parse-insn-format): Ditto.

@@ -16,7 +16,7 @@
 	(do_sys_times): Likewise.
 	(do_sys_gettimeofday): Likewise.
 	(syscall_trap): Call do_sys_time().  Call new do_sys_times() and
-	do_sys_gettimeofday() for times() and .
+	do_sys_gettimeofday() for times() and gettimeofday(), respectively.
 	* gloss.h (do_sys_time): Prototype.
 	(do_sys_times): Likewise.
 	(do_sys_gettimeofday): Likewise.

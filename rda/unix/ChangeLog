@@ -1,5 +1,7 @@
 2004-10-31  Jim Blandy  <jimb@redhat.com>
 
+	* thread-db.c (thread_db_get_thread_reg): Delete unused variable.
+
 	* stock-breakpoints.c: #include all headers necessary to get
 	prototypes for functions used in this file.
 	* thread-db.c: Same.

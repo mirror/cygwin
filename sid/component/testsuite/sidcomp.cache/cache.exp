@@ -112,3 +112,10 @@ assert_miss
 assert_variant read-accesses $prior(reads)
 assert_variant replacements $prior(replacements)
 assert_invariant flushes $prior(flushes)
+
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test; return }
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "cache.conf" }

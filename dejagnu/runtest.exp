@@ -55,6 +55,8 @@ set kfail_flag  0		;# indicates that it is a known failure
 set kfail_prms	0		;# bug id for the description of the known failure 
 set sum_file	""		;# name of the file that contains the summary log
 set base_dir	""		;# the current working directory
+set xml_file    ""              ;# name of the xml output if requested
+set xml         0               ;# flag for requesting xml
 set logname     ""		;# the users login name
 set prms_id	0               ;# GNATS prms id number
 set bug_id	0               ;# optional bug id number
@@ -160,6 +162,8 @@ proc verbose { args } {
 		set newline 0
 	    } elseif { [lindex $args $i] == "-log" } {
 		set logfile 1
+            } elseif { [lindex $args $i] == "-x" } {
+                set xml 1
 	    } elseif { [string index [lindex $args $i] 0] == "-" } {
 		clone_output "ERROR: verbose: illegal argument: [lindex $args $i]"
 		return
@@ -1160,6 +1164,12 @@ for { set i 0 } { $i < $argc } { incr i } {
 	    verbose "Testing $tool"
 	    continue
         }
+
+        "--x*" {
+            set xml 1
+            verbose "XML logging turned on"
+            continue
+	}
 
 	"--he*" {			# (--help) help text
 	    usage;

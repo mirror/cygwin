@@ -32,18 +32,55 @@ proc mail_file { file to subject } {
 }
 
 #
+# Check for xml output flag or environment variable
+#
+proc check_xml { } {
+    global env
+
+    set x "RUNTESTFLAGS"
+    return [format "%s" $env($x)]
+}
+
+#
+# Insert DTD for xml format checking
+#
+proc insertdtd { } {
+    xml_output "<!DOCTYPE testsuite \[
+<!-- testsuite.dtd -->
+<!ELEMENT testsuite (test | summary)+>
+<!ELEMENT test (log, result, name, prms_id )>
+  <!ELEMENT log                        (#PCDATA)>
+  <!ELEMENT result             (#PCDATA)>
+  <!ELEMENT name               (#PCDATA)>
+  <!ELEMENT prms_id            (#PCDATA)>
+  <!ELEMENT summary (result, description, total)>
+  <!ELEMENT description        (#PCDATA)>
+  <!ELEMENT total              (#PCDATA)>
+\]>"
+}
+
+#
 # Open the output logs
 #
 proc open_logs { } {
     global outdir
     global tool
     global sum_file
+    global xml_file
+    global xml
     
     if { ${tool} ==  "" } {
 	set tool testrun
     }
     catch "exec rm -f $outdir/$tool.sum"
     set sum_file [open "$outdir/$tool.sum" w]
+    if { $xml } {
+       catch "exec rm -f $outdir/$tool.xml"
+       set xml_file [open "$outdir/$tool.xml" w]
+        xml_output "<?xml version=\"1.0\"?>"
+        insertdtd
+        xml_output "<testsuite>"
+    }
     catch "exec rm -f $outdir/$tool.log"
     log_file -a "$outdir/$tool.log"
     verbose "Opening log files in $outdir"
@@ -58,7 +95,14 @@ proc open_logs { } {
 #
 proc close_logs { } {
     global sum_file
-    
+    global xml
+    global xml_file
+   
+    if { $xml } {
+        xml_output "</testsuite>"
+        catch "close $xml_file"
+    }
+
     catch "close $sum_file"
 }
 
@@ -330,12 +374,22 @@ proc log_and_exit {} {
     remote_close target
     exit $exit_status
 }
+
+proc xml_output { message } {
+    global xml_file
+    if { $xml_file != "" } {
+       puts $xml_file "$message"
+    }
+}
+
 #
 # Print summary of all pass/fail counts
 #
 proc log_summary { args } {
     global tool
     global sum_file
+    global xml_file
+    global xml
     global exit_status
     global mail_logs
     global outdir
@@ -392,6 +446,13 @@ proc log_summary { args } {
 	set val $test_counts($x,$which);
 	if { $val > 0 } {
 	    set mess "# of $test_counts($x,name)";
+            if { $xml } {
+                xml_output "  <summary>"
+                xml_output "    <result>$x</result>"
+                xml_output "    <description>$mess</description>"
+                xml_output "    <total>$val</total>"
+                xml_output "  </summary>"
+            }
 	    if { [string length $mess] < 24 } {
 		append mess "\t";
 	    }
@@ -622,6 +683,7 @@ proc clear_kfail { args } {
 #
 proc record_test { type message args } {
     global exit_status
+    global xml
     global prms_id bug_id
     global xfail_flag xfail_prms
     global kfail_flag kfail_prms
@@ -649,7 +711,24 @@ proc record_test { type message args } {
 
     incr_count $type;
 
-    switch $type {
+    if { $xml } {
+	global errorInfo
+        set error ""
+        if [info exists errorInfo] {
+	    set error $errorInfo
+        }
+        global expect_out
+	
+        set output ""
+        xml_output "  <test>"
+        xml_output "    <log>$output</log>"
+        xml_output "    <result>$type</result>"
+        xml_output "    <name>$message</name>"
+        xml_output "    <prms_id>$prms_id</prms_id>"
+        xml_output "  </test>"
+    }
+
+   switch $type {
 	PASS {
 	    if $prms_id {
 		set message [concat $message "\t(PRMS $prms_id)"]

@@ -161,14 +161,14 @@
 ; lsb0? = #t
 ; insn-word-length = 2
 ; endian = little
-; [note that this is the little endian canonical form
+; [note that this is the little endian canonical form (*)
 ;  - word length is irrelevant]
 ; | 7 ... 0 | 15 ... 8 | 23 ... 16 | 31 ... 24 | 39 ... 32 | 47 ... 40 |
 ;
 ; lsb0? = #f
 ; insn-word-length = 2
 ; endian = big
-; [note that this is the big endian canonical form
+; [note that this is the big endian canonical form (*)
 ;  - word length is irrelevant]
 ; | 0 ... 7 | 8 ... 15 | 16 ... 23 | 24 ... 31 | 32 ... 39 | 40 ... 47 |
 ;
@@ -177,11 +177,16 @@
 ; endian = big
 ; | 15 ... 8 | 7 ... 0 | 31 ... 24 | 23 ... 16 | 47 ... 40 | 39 ... 32 |
 ;
-; While there are no current examples, the intent is to not preclude
-; situations where each "word" in an insn isn't the same size.  For example a
-; 48 bit insn with a 16 bit opcode and a 32 bit immediate value might [but not
-; necessarily] consist of one 16 bit "word" and one 32 bit "word".
-; Bitranges support this situation, however none of the rest of the code does.
+; (*) NOTE: This canonical form should not be confused with what might be
+; called the canonical form when writing .cpu ifield descriptions: lsb0? = #f.
+; The ifield canonical form is lsb0? = #f because the starting bit number of
+; ifields is defined to be the MSB.
+; ---
+; At the bitrange level, insns with different sized words is supported.
+; This is because each <bitrange> contains the specs of the word it resides in.
+; For example a 48 bit insn with a 16 bit opcode and a 32 bit immediate value
+; might [but not necessarily] consist of one 16 bit "word" and one 32 bit
+; "word".
 ;
 ; Examples:
 ;
@@ -214,7 +219,8 @@
 		; [this allows the bitrange to be independent of the lengths
 		; of words preceding this one]
 		word-offset
-		; starting bit number within the word
+		; starting bit number within the word,
+		; this is the MSB of the bitrange within the word
 		; [externally, = word-offset + start]
 		start
 		; number of bits in the value

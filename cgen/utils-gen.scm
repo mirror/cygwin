@@ -114,33 +114,45 @@
 ; Subroutine of -gen-ifld-extract-beyond to extract the relevant value
 ; from WORD-NAME and move it into place.
 
-(define (-gen-extract-word word-name word-start word-length start length
+(define (-gen-extract-word word-name word-start word-length
+			   field-start field-length
 			   unsigned? lsb0?)
-  ; ??? lsb0?
-  (let ((word-end (+ word-start word-length))
-	(end (+ start length))
-	(base (if (< start word-start) word-start start)))
+  (let* ((word-end (+ word-start word-length))
+	 (start (if lsb0? (+ 1 (- field-start field-length)) field-start))
+	 (end (+ start field-length))
+	 (base (if (< start word-start) word-start start)))
     (string-append "("
 		   "EXTRACT_"
-		   (if (current-arch-insn-lsb0?) "LSB0" "MSB0")
+		   (if lsb0? "LSB0" "MSB0")
 		   (if (and (not unsigned?)
 			    ; Only want sign extension for word with sign bit.
-			    (bitrange-overlap? start 1 word-start word-length
+			    (bitrange-overlap? field-start 1
+					       word-start word-length
 					       lsb0?))
 		       "_INT ("
 		       "_UINT (")
+		   ; What to extract from.
 		   word-name
 		   ", "
+		   ; Size of this chunk.
 		   (number->string word-length)
 		   ", "
-		   (number->string (if (< start word-start)
-				       0
-				       (- start word-start)))
+		   ; MSB of this chunk.
+		   (number->string
+		    (if lsb0?
+			(if (> end word-end)
+			    (- word-end 1)
+			    (- end word-start 1))
+			(if (< start word-start)
+			    0
+			    (- start word-start))))
 		   ", "
+		   ; Length of field within this chunk.
 		   (number->string (if (< end word-end)
 				       (- end base)
 				       (- word-end base)))
 		   ") << "
+		   ; Adjustment for this chunk within a full field.
 		   (number->string (if (> end word-end)
 				       (- end word-end)
 				       0))

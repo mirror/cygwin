@@ -1,3 +1,69 @@
+2002-02-14  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* debug/debug.h: Move to top-level bochs directory.
+	* debug: Remove directory.
+	* pic/*: New files.
+	* floppy/*: New files.
+	* cmos/*: New files.
+	* unmapped/*: New files.
+	* dma/*: New files.
+	* pit/*: New files.
+	* cpu/x86.h: Rename to sid-x86-cpu-wrapper.h.
+	* cpu/x86.cc: Rename to sid-x86-cpu-wrapper.cc.
+	* cpu/x86-memory-modes.cc: Rename to sid-x86-memory-modes.cc.
+	* memory/*: Move to cpu/memory/*.
+	* fpu/*: Move to cpu/fpu/*.
+	* bochs.h: Change #include's to reflect new and moved files.
+	Add sid expansions for A20ADDR(x), BX_INP(addr, len),
+	BX_OUTP(addr, val, len), BX_RAISE_HLDA(),
+	BX_SET_ENABLE_A20(enabled), BX_GET_ENABLE_A20(), and
+	BX_NULL_TIMER_HANDLE.
+	* components.cxx: Add support for cmos, dma, pic, pit, floppy,
+	unmapped.
+	* config.h.in: Set BX_SUPPORT_TASKING, BX_DMA_FLOPPY_IO and
+	BX_SUPPORT_A20 to 1 by default.
+	Set SMF macros to 0 for cmos, dma, pic, pit, floppy and unmapped
+	components.
+	* configure.in: Add pic, pit, cmos, dma, floppy, and unmapped
+	Makefiles to AC_OUTPUT.
+	* cpu/exception-sid.cc: Remove.  Merge differences into
+	cpu/exception.cc.
+	* cpu/cpu-sid.h: Remove.  Merge differences into cpu/cpu.h.
+	* cpu/cpu-sid.cc: Remove.  Merge differences into cpu/cpu.cc.
+	* cpu/init-sid.cc: Remove.  Merge differences into cpu/init.cc.
+	* cpu/soft_int-sid.cc: Remove.
+	* cpu/debugstuff-sid.cc: Remove.  Merge differences into
+	cpu/debugstuff.cc.
+	* cpu/ctrl_xfer32-sid.cc: Remove.
+	* cpu/fetchdecode-sid.cc: Remove.
+	* cpu/Makefile.am: Remove references to removed files.
+	(SUBDIRS) Add memory and fpu.
+	(SUBLIBS) Add memory/libmemory.la and fpu/libfpu.la.
+	(INCLUDES) Add memory and fpu directories.
+	* cpu/cpu.cc: Remove BX_HRQ related FIXME's.
+	Add interrupt pin support.
+	* cpu/debugstuff.cc (BX_SUPPORT_SID): Add implementations of
+	dbg_get_reg, dbg_set_reg, and dbg_get_eflags for when
+	BX_DEBUGGER isn't defined.
+	* cpu/io.cc: Remove #if 0's -- no longer needed.
+	* cpu/io_pro.cc: Likewise.
+	* gui/x-gui.cc: Change title bar messages.
+	* keyboard/keyboard.cc: Change keyboard to remove serial delay
+	pin.
+	* keyboard/sid-keyboard-wrapper.cc: Add a20-related pins.
+	Remove serial-delay pin.
+	Add cmos accessor.
+	Add trigger-irq pin.
+	* keyboard/sid-keyboard-wrapper.h: Likewise.
+	* vga/sid-vga-wrapper.cc: Rename buses from eg. 3b4 to 0x3b4.
+	Import imagemmap code from generic.cxx.
+	* vga/vga.cc: Cap number of rows at BX_MAX_TEXT_LINES.
+	* Makefile.am (SUBDIRLIST): Add pic, pit, cmos, dma, floppy,
+	unmapped.
+	Removed fpu, memory.
+	(SUBLIBLIST): Likewise.
+	(INCLUDES): Likewise.
+
 2002-01-29  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* Makefile.am (SUBDIRLIST): Add keyboard.

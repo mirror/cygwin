@@ -18,19 +18,24 @@
 #include <sidmiscutil.h>
 #include <sidwatchutil.h>
 #include <sidso.h>
-#include "generic.h"
 
 #include "bochs.h"
 
 using sid::component;
 using sid::bus;
+using sid::host_int_1;
 using sid::host_int_4;
 using sid::little_int_1;
+
 using sidutil::callback_word_bus;
 using sidutil::callback_pin;
 using sidutil::output_pin;
 
-class vga : public generic_memory
+class vga : public sidutil::fixed_pin_map_component,
+            public sidutil::fixed_accessor_map_component,
+            public sidutil::fixed_attribute_map_component,
+            public sidutil::no_relation_component,
+            public sidutil::fixed_bus_map_component
 {
 public:
   vga();
@@ -63,28 +68,54 @@ protected:
 
   output_pin palette_change_index_pin;
 
-  bus::status read_port_3b4_3b5 (host_int_4 addr, little_int_1 mask, little_int_1 & data);
-  bus::status write_port_3b4_3b5 (host_int_4 addr, little_int_1 mask, little_int_1 data);
-  bus::status read_port_3ba (host_int_4 addr, little_int_1 mask, little_int_1 & data);
-  bus::status write_port_3ba (host_int_4 addr, little_int_1 mask, little_int_1 data);
-  bus::status read_port_3c0_3cf (host_int_4 addr, little_int_1 mask, little_int_1 & data);
-  bus::status write_port_3c0_3cf (host_int_4 addr, little_int_1 mask, little_int_1 data);
-  bus::status read_port_3d4_3d5 (host_int_4 addr, little_int_1 mask, little_int_1 & data);
-  bus::status write_port_3d4_3d5 (host_int_4 addr, little_int_1 mask, little_int_1 data);
-  bus::status read_port_3da (host_int_4 addr, little_int_1 mask, little_int_1 & data);
-  bus::status write_port_3da (host_int_4 addr, little_int_1 mask, little_int_1 data);
+  bus::status read_port_0x3b4_0x3b5 (host_int_4 addr, little_int_1 mask, little_int_1 & data);
+  bus::status write_port_0x3b4_0x3b5 (host_int_4 addr, little_int_1 mask, little_int_1 data);
+  bus::status read_port_0x3ba (host_int_4 addr, little_int_1 mask, little_int_1 & data);
+  bus::status write_port_0x3ba (host_int_4 addr, little_int_1 mask, little_int_1 data);
+  bus::status read_port_0x3c0_0x3cf (host_int_4 addr, little_int_1 mask, little_int_1 & data);
+  bus::status write_port_0x3c0_0x3cf (host_int_4 addr, little_int_1 mask, little_int_1 data);
+  bus::status read_port_0x3d4_0x3d5 (host_int_4 addr, little_int_1 mask, little_int_1 & data);
+  bus::status write_port_0x3d4_0x3d5 (host_int_4 addr, little_int_1 mask, little_int_1 data);
+  bus::status read_port_0x3da (host_int_4 addr, little_int_1 mask, little_int_1 & data);
+  bus::status write_port_0x3da (host_int_4 addr, little_int_1 mask, little_int_1 data);
   
-  callback_word_bus<vga, little_int_1> ports_3b4_3b5_bus;
-  callback_word_bus<vga, little_int_1> ports_3ba_bus;
-  callback_word_bus<vga, little_int_1> ports_3c0_3cf_bus;
-  callback_word_bus<vga, little_int_1> ports_3d4_3d5_bus;
-  callback_word_bus<vga, little_int_1> ports_3da_bus;
+  callback_word_bus<vga, little_int_1> ports_0x3b4_0x3b5_bus;
+  callback_word_bus<vga, little_int_1> port_0x3ba_bus;
+  callback_word_bus<vga, little_int_1> ports_0x3c0_0x3cf_bus;
+  callback_word_bus<vga, little_int_1> ports_0x3d4_0x3d5_bus;
+  callback_word_bus<vga, little_int_1> port_0x3da_bus;
 
   bus::status read_mem (host_int_4 addr, little_int_1 mask, little_int_1 & data);
   bus::status write_mem (host_int_4 addr, little_int_1 mask, little_int_1 data);
 
   callback_word_bus<vga, little_int_1> framebuffer_bus;
 
+  bus *cmos_registers_bus;
+
   bx_vga_c bx_vga;
+
+  // copied from sid/component/memory/generic.h
+
+  host_int_1* buffer;
+  host_int_4 buffer_length;
+  bool mmapping_p;
+
+  host_int_4 max_buffer_length;
+  bool attempt_resize (host_int_4 new_length) throw();
+
+  string get_size_attr ();
+  component::status set_size_attr (const string& s);
+
+  string image_file_name;
+  callback_pin<vga> imageload_pin;
+  void imageload_handler (host_int_4);
+  callback_pin<vga> imagestore_pin;
+  void imagestore_handler (host_int_4);
+  output_pin error_pin;
+  callback_pin<vga> imagemmap_pin;
+  void imagemmap_handler (host_int_4);
+  callback_pin<vga> imagemsync_pin;
+  void imagemsync_handler (host_int_4);
+
 };
 #endif // SID_VGA_WRAPPER_DEF_H

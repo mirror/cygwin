@@ -27,6 +27,9 @@
 #include "bochs.h"
 #define LOG_THIS BX_CPU_THIS_PTR
 
+#if BX_SUPPORT_SID
+#include "sid-x86-cpu-wrapper.h"
+#endif
 #if BX_USE_CPU_SMF
 #define this (BX_CPU(0))
 #endif
@@ -59,12 +62,12 @@ const Boolean bx_parity_lookup[256] = {
   };
 #endif
 
+#if BX_SUPPORT_SID
+static Bit8u *sid_prefetch_data = NULL;
+#endif
 
 #if BX_SMP_PROCESSORS==1
-#if BX_SUPPORT_SID
-sid_cpu_c bx_cpu;
-sid_mem_c bx_mem;
-#else
+#if BX_SUPPORT_SID==0
 // single processor simulation, so there's one of everything
 BX_CPU_C    bx_cpu;
 BX_MEM_C    bx_mem;
@@ -202,7 +205,19 @@ async_events_processed:
   if (BX_CPU_THIS_PTR bytesleft < 16)
     maxisize = BX_CPU_THIS_PTR bytesleft;
   ret = FetchDecode(fetch_ptr, &i, maxisize, is_32);
+#if BX_SUPPORT_SID
+#if X86_CPU_DEBUG
+  //  fprintf(stderr, "FetchDecode returned: %d\n", ret);
+  if (ret)
+    {
+      for (int deb = 0; deb < i.ilen; deb++)
+        printf("%c", *(fetch_ptr + deb));
+    }
 
+  //  if (ret)
+  //    printf("Current opcode: %p, with length: %d, EIP = %p\n", i.b1, i.ilen, this->eip);
+#endif // X86_CPU_DEBUG
+#endif // BX_SUPPORT_SID
   if (ret) {
     if (i.ResolveModrm) {
       // call method on BX_CPU_C object
@@ -291,6 +306,9 @@ repeat_done:
 
 debugger_check:
 
+#if BX_SUPPORT_SID
+    CHECK_MAX_INSTRUCTIONS(max_instr_count);
+#else    
 #if (BX_SMP_PROCESSORS>1 && BX_DEBUGGER==0)
     // The CHECK_MAX_INSTRUCTIONS macro allows cpu_loop to execute a few
     // instructions and then return so that the other processors have a chance
@@ -299,6 +317,7 @@ debugger_check:
     // with the debugger because its guard mechanism provides the same
     // functionality.
     CHECK_MAX_INSTRUCTIONS(max_instr_count);
+#endif
 #endif
 
 #if BX_DEBUGGER
@@ -385,6 +404,18 @@ static Bit8u FetchBuffer[16];
       FetchBuffer[j] = *temp_ptr++;
       }
     ret = FetchDecode(FetchBuffer, &i, 16, is_32);
+#if BX_SUPPORT_SID
+#if X86_CPU_DEBUG
+    //  fprintf(stderr, "Prefetch: FetchDecode returned: %d\n", ret);
+    if (ret)
+      {
+        for (int deb = 0; deb < i.ilen; deb++)
+          printf("%c", *(fetch_ptr + deb));
+      }
+                 //      printf("Current opcode: %p, with length: %d, EIP = %p\n", i.b1, i.ilen, this->eip);
+#endif // X86_CPU_DEBUG
+#endif // BX_SUPPORT_SID
+
     if (ret==0)
       BX_PANIC(("fetchdecode: cross boundary: ret==0\n"));
     if (i.ResolveModrm) {
@@ -411,6 +442,13 @@ handle_async_event:
   if (BX_CPU_THIS_PTR debug_trap & 0x80000000) {
     // I made up the bitmask above to mean HALT state.
 #if BX_SMP_PROCESSORS==1
+#if BX_SUPPORT_SID
+    // XXX: not tested yet:
+    if (!(BX_CPU_THIS_PTR INTR && BX_CPU_THIS_PTR eflags.if_))
+      {
+        x86_cpu_component->yield();
+      }
+#else
     // for one processor, pass the time as quickly as possible until
     // an interrupt wakes up the CPU.
     while (1) {
@@ -419,6 +457,7 @@ handle_async_event:
         }
       BX_TICK1();
     }
+#endif
 #else      /* BX_SMP_PROCESSORS != 1 */
     // for multiprocessor simulation, even if this CPU is halted we still
     // must give the others a chance to simulate.  If an interrupt has 
@@ -492,7 +531,10 @@ handle_async_event:
     else
       vector = BX_IAC(); // may set INTR with next interrupt
 #else
-#if 0 // FIXME: look into this later
+#if BX_SUPPORT_SID
+    x86_cpu_component->drive_interrupt_acknowledge_pin();
+    vector = x86_cpu_component->interrupt_acknowledged();
+#else
     // if no local APIC, always acknowledge the PIC.
     vector = BX_IAC(); // may set INTR with next interrupt
 #endif
@@ -504,13 +546,12 @@ handle_async_event:
     interrupt(vector, 0, 0, 0);
     BX_INSTR_HWINTERRUPT(vector, BX_CPU_THIS_PTR sregs[BX_SEG_REG_CS].selector.value, BX_CPU_THIS_PTR eip);
     }
-#if 0 // FIXME: look into this later
   else if (BX_HRQ && BX_DBG_ASYNC_DMA) {
     // NOTE: similar code in ::take_dma()
     // assert Hold Acknowledge (HLDA) and go into a bus hold state
     BX_RAISE_HLDA();
     }
-#endif
+
   // Priority 6: Faults from fetching next instruction
   //   Code breakpoint fault
   //   Code segment limit violation (priority 7 on 486/Pentium)
@@ -542,13 +583,13 @@ handle_async_event:
     // next instruction, the code above will invoke the trap.
     BX_CPU_THIS_PTR debug_trap |= 0x00004000; // BS flag in DR6
     }
-#if 0 // FIXME: look into this later
+
   if ( !(BX_CPU_THIS_PTR INTR ||
          BX_CPU_THIS_PTR debug_trap ||
          BX_HRQ ||
          BX_CPU_THIS_PTR eflags.tf) )
     BX_CPU_THIS_PTR async_event = 0;
-#endif
+
   goto async_events_processed;
 }
 #endif  // #if BX_DYNAMIC_TRANSLATION == 0
@@ -597,6 +638,19 @@ BX_CPU_C::prefetch(void)
     }
 #endif // BX_SUPPORT_PAGING
 
+#if BX_SUPPORT_SID
+  // max physical address as confined by page boundary
+  BX_CPU_THIS_PTR prev_phy_page = new_phy_addr & 0xfffff000;
+  BX_CPU_THIS_PTR max_phy_addr = BX_CPU_THIS_PTR prev_phy_page | 0x00000fff;
+
+  if(!sid_prefetch_data)
+    sid_prefetch_data = new Bit8u[16];
+
+  BX_CPU_THIS_PTR mem->read_physical(this, new_phy_addr, 16, (void *)sid_prefetch_data);
+
+  BX_CPU_THIS_PTR bytesleft = 16;
+  BX_CPU_THIS_PTR fetch_ptr = sid_prefetch_data;
+#else
   if ( new_phy_addr >= BX_CPU_THIS_PTR mem->len ) {
     // don't take this out if dynamic translation enabled,
     // otherwise you must make a check to see if bytesleft is 0 after
@@ -614,6 +668,7 @@ BX_CPU_C::prefetch(void)
 
   BX_CPU_THIS_PTR bytesleft = (BX_CPU_THIS_PTR max_phy_addr - new_phy_addr) + 1;
   BX_CPU_THIS_PTR fetch_ptr = &BX_CPU_THIS_PTR mem->vector[new_phy_addr];
+#endif
 }
 
 
@@ -633,8 +688,18 @@ BX_CPU_C::revalidate_prefetch_q(void)
     // same linear address, old linear->physical translation valid
     new_linear_offset = new_linear_addr & 0x00000fff;
     new_phy_addr = BX_CPU_THIS_PTR prev_phy_page | new_linear_offset;
+#if BX_SUPPORT_SID
+    if(!sid_prefetch_data)
+        sid_prefetch_data = new Bit8u[16];
+
+    BX_CPU_THIS_PTR mem->read_physical(this, new_phy_addr, 16, (void *)sid_prefetch_data);
+
+    BX_CPU_THIS_PTR bytesleft = 16;
+    BX_CPU_THIS_PTR fetch_ptr = sid_prefetch_data;
+#else
     BX_CPU_THIS_PTR bytesleft = (BX_CPU_THIS_PTR max_phy_addr - new_phy_addr) + 1;
     BX_CPU_THIS_PTR fetch_ptr = &BX_CPU_THIS_PTR mem->vector[new_phy_addr];
+#endif
     }
   else {
     BX_CPU_THIS_PTR bytesleft = 0; // invalidate prefetch Q

@@ -29,9 +29,12 @@
 
 
 #include "bochs.h"
+#if BX_SUPPORT_SID
 #include "sid-keyboard-wrapper.h"
 #define LOG_THIS
-
+#else
+#define LOG_THIS  bx_keyboard.
+#endif
 
 #define VERBOSE_KBD_DEBUG 0
 
@@ -40,7 +43,9 @@
 #define MOUSE_MODE_STREAM 11
 #define MOUSE_MODE_REMOTE 12
 #define MOUSE_MODE_WRAP   13
-
+#if BX_SUPPORT_SID==0
+bx_keyb_c bx_keyboard;
+#endif
 #if BX_USE_KEY_SMF
 #define this (&bx_keyboard)
 #endif
@@ -49,6 +54,9 @@
 
 bx_keyb_c::bx_keyb_c(void)
 {
+#if BX_SUPPORT_SID
+  bx_dbg.keyboard = 1;
+#endif
   // constructor
   // should zero out state info here???
   memset( &s, 0, sizeof(s) );
@@ -153,11 +161,11 @@ bx_keyb_c::init(bx_devices_c *d, bx_cmos_c *cmos)
     BX_KEY_THIS s.controller_Q[i] = 0;
   BX_KEY_THIS s.controller_Qsize = 0;
   BX_KEY_THIS s.controller_Qsource = 0;
-#if BX_SUPPORT_SID==0
+#if BX_SUPPORT_SID
+  kbd_component = kbd_comp;
+#else
   // mouse port installed on system board
   cmos->s.reg[0x14] |= 0x04;
-#else
-  kbd_component = kbd_comp;
 #endif
   BX_DEBUG(("Init.\n"));
 }
@@ -323,6 +331,8 @@ bx_keyb_c::write( Bit32u   address, Bit32u   value, unsigned io_len)
 
   if (bx_dbg.keyboard)
 	BX_INFO(("keyboard: 8-bit write to %04x = %02x\n", (unsigned)address, (unsigned)value));
+
+
 //BX_DEBUG(("WRITE(%02x) = %02x\n", (unsigned) address,
 //      (unsigned) value));
 
@@ -1064,7 +1074,7 @@ bx_keyb_c::periodic( Bit32u   usec_delta )
   retval = BX_KEY_THIS s.kbd_controller.irq1_requested | (BX_KEY_THIS s.kbd_controller.irq12_requested << 1);
   BX_KEY_THIS s.kbd_controller.irq1_requested = 0;
   BX_KEY_THIS s.kbd_controller.irq12_requested = 0;
-#if BX_SUPPORT_SID==0
+
   if ( BX_KEY_THIS s.kbd_controller.timer_pending == 0 ) {
     return(retval);
     }
@@ -1076,7 +1086,7 @@ bx_keyb_c::periodic( Bit32u   usec_delta )
     BX_KEY_THIS s.kbd_controller.timer_pending -= usec_delta;
     return(retval);
     }
-#endif
+
   if (BX_KEY_THIS s.kbd_controller.outb) {
     return(retval);
     }
@@ -1131,7 +1141,6 @@ bx_keyb_c::activate_timer(void)
 {
   if (BX_KEY_THIS s.kbd_controller.timer_pending == 0) {
     BX_KEY_THIS s.kbd_controller.timer_pending = bx_options.keyboard_serial_delay;
-    kbd_component->drive_serial_delay_pin(bx_options.keyboard_serial_delay);
     }
 }
 

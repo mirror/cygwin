@@ -25,6 +25,10 @@
 #include "bochs.h"
 #define LOG_THIS BX_CPU_THIS_PTR
 
+#if BX_SUPPORT_SID
+#include "sid-x86-cpu-wrapper.h"
+#endif
+
 
 /* the device id and stepping id are loaded into DH & DL upon processor
    startup.  for device id: 3 = 80386, 4 = 80486.  just make up a
@@ -43,13 +47,17 @@ BX_CPU_C::BX_CPU_C()
 }
 
 #if BX_SUPPORT_SID
-void BX_CPU_C::init(sid_mem_c *addrspace)
+void BX_CPU_C::init(x86_cpu *x86_cpu_comp, sid_bx_mem_c *addrspace)
 #else
 void BX_CPU_C::init(BX_MEM_C *addrspace)
 #endif
 {
   // BX_CPU_C constructor
   BX_CPU_THIS_PTR set_INTR (0);
+#if BX_SUPPORT_SID
+  BX_CPU_THIS_PTR set_HRQ (0);
+#endif
+
 #if BX_SUPPORT_APIC
   local_apic.init ();
 #endif
@@ -184,7 +192,12 @@ void BX_CPU_C::init(BX_MEM_C *addrspace)
   DTDirBrHandler = (BxDTShim_t) DTASDirBrHandler;
 #endif
 
+#if BX_SUPPORT_SID
+  x86_cpu_component = x86_cpu_comp;
+#endif
   mem = addrspace;
+  mem->init(x86_cpu_component);
+
   sprintf (name, "CPU %p", this);
 
   BX_INSTR_INIT();
@@ -557,7 +570,7 @@ BX_CPU_C::reset(unsigned source)
 
   BX_CPU_THIS_PTR EXT = 0;
   //BX_INTR = 0;
-  
+
 #if BX_SUPPORT_PAGING
 #if BX_USE_TLB
   TLB_init();
@@ -687,3 +700,13 @@ BX_CPU_C::set_INTR(Boolean value)
   BX_CPU_THIS_PTR INTR = value;
   BX_CPU_THIS_PTR async_event = 1;
 }
+
+#if BX_SUPPORT_SID
+void
+BX_CPU_C::set_HRQ(Boolean value)
+{
+  BX_CPU_THIS_PTR BX_HRQ = value;
+  if (value)
+    BX_CPU_THIS_PTR async_event = 1;
+}
+#endif

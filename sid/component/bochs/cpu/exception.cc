@@ -27,6 +27,9 @@
 #define LOG_THIS BX_CPU_THIS_PTR
 
 
+#if BX_SUPPORT_SID
+#include "sid-x86-cpu-wrapper.h"
+#endif
 
 
 /* Exception classes.  These are used as indexes into the 'is_exception_OK'
@@ -50,6 +53,30 @@ const Boolean BX_CPU_C::is_exception_OK[3][3] = {
 BX_CPU_C::interrupt(Bit8u vector, Boolean is_INT, Boolean is_error_code,
                     Bit16u error_code)
 {
+#if BX_SUPPORT_SID
+  bx_dbg.interrupts = 1;
+  if (!x86_cpu_component->hardware_mode())
+    {
+      // Use 0x80 as the syscall interrupt number.
+      if (vector == 0x80)
+        {
+          int temp = this->gen_reg[0].erx;
+          x86_cpu_component->do_syscall();
+#if X86_CPU_DEBUG
+          printf("Syscall number: %d was executed with the following return value: %d\n", temp, this->gen_reg[0].erx);
+#endif
+          return;
+        }
+      else if (vector == 0x03)
+        {
+          // INT3 was encountered -- trap to debugger.
+          x86_cpu_component->do_breakpoint();
+          return;
+        }
+      // If not performing a syscall, or trapping to the debugger,
+      // fall through to generic interrupt handling.
+    }
+#endif
 #if BX_DEBUGGER
   BX_CPU_THIS_PTR show_flag |= Flag_intsig;
 #if BX_DEBUG_LINUX

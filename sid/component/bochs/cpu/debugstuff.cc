@@ -152,7 +152,161 @@ BX_CPU_C::debug(Bit32u offset)
 #endif  // #if BX_DISASM
 }
 
+#if BX_SUPPORT_SID
+  Bit32u
+BX_CPU_C::dbg_get_reg(unsigned reg)
+{
+  Bit32u return_val32;
 
+  switch (reg) {
+    case BX_DBG_REG_EAX: return(EAX);
+    case BX_DBG_REG_ECX: return(ECX);
+    case BX_DBG_REG_EDX: return(EDX);
+    case BX_DBG_REG_EBX: return(EBX);
+    case BX_DBG_REG_ESP: return(ESP);
+    case BX_DBG_REG_EBP: return(EBP);
+    case BX_DBG_REG_ESI: return(ESI);
+    case BX_DBG_REG_EDI: return(EDI);
+    case BX_DBG_REG_EIP: return(EIP);
+    case BX_DBG_REG_EFLAGS:
+      return_val32 = dbg_get_eflags();
+      return(return_val32);
+    case BX_DBG_REG_CS: return(BX_CPU_THIS_PTR sregs[BX_SEG_REG_CS].selector.value);
+    case BX_DBG_REG_SS: return(BX_CPU_THIS_PTR sregs[BX_SEG_REG_SS].selector.value);
+    case BX_DBG_REG_DS: return(BX_CPU_THIS_PTR sregs[BX_SEG_REG_DS].selector.value);
+    case BX_DBG_REG_ES: return(BX_CPU_THIS_PTR sregs[BX_SEG_REG_ES].selector.value);
+    case BX_DBG_REG_FS: return(BX_CPU_THIS_PTR sregs[BX_SEG_REG_FS].selector.value);
+    case BX_DBG_REG_GS: return(BX_CPU_THIS_PTR sregs[BX_SEG_REG_GS].selector.value);
+    default:
+      BX_PANIC(("get_reg: request for unknown register\n"));
+      return(0);
+    }
+}
+
+  Boolean
+BX_CPU_C::dbg_set_reg(unsigned reg, Bit32u val)
+{
+  // returns 1=OK, 0=can't change
+  bx_segment_reg_t *seg;
+  Bit32u current_sys_bits;
+
+  switch (reg) {
+    case BX_DBG_REG_EAX: EAX = val; return(1);
+    case BX_DBG_REG_ECX: ECX = val; return(1);
+    case BX_DBG_REG_EDX: EDX = val; return(1);
+    case BX_DBG_REG_EBX: EBX = val; return(1);
+    case BX_DBG_REG_ESP: ESP = val; return(1);
+    case BX_DBG_REG_EBP: EBP = val; return(1);
+    case BX_DBG_REG_ESI: ESI = val; return(1);
+    case BX_DBG_REG_EDI: EDI = val; return(1);
+    case BX_DBG_REG_EIP: EIP = val; return(1);
+    case BX_DBG_REG_EFLAGS:
+      BX_INFO(("dbg_set_reg: can not handle eflags yet.\n"));
+      if ( val & 0xffff0000 ) {
+        BX_INFO(("dbg_set_reg: can not set upper 16 bits of eflags.\n"));
+        return(0);
+        }
+      // make sure none of the system bits are being changed
+      current_sys_bits = (BX_CPU_THIS_PTR eflags.nt << 14) |
+                         (BX_CPU_THIS_PTR eflags.iopl << 12) |
+                         (BX_CPU_THIS_PTR eflags.tf << 8);
+      if ( current_sys_bits != (val & 0x0000f100) ) {
+        BX_INFO(("dbg_set_reg: can not modify NT, IOPL, or TF.\n"));
+        return(0);
+        }
+      BX_CPU_THIS_PTR set_CF(val & 0x01); val >>= 2;
+      BX_CPU_THIS_PTR set_PF(val & 0x01); val >>= 2;
+      BX_CPU_THIS_PTR set_AF(val & 0x01); val >>= 2;
+      BX_CPU_THIS_PTR set_ZF(val & 0x01); val >>= 1;
+      BX_CPU_THIS_PTR set_SF(val & 0x01); val >>= 2;
+      BX_CPU_THIS_PTR eflags.if_ = val & 0x01; val >>= 1;
+      BX_CPU_THIS_PTR eflags.df  = val & 0x01; val >>= 1;
+      BX_CPU_THIS_PTR set_OF(val & 0x01);
+      if (BX_CPU_THIS_PTR eflags.if_)
+        BX_CPU_THIS_PTR async_event = 1;
+      return(1);
+    case BX_DBG_REG_CS:
+      seg = &BX_CPU_THIS_PTR sregs[BX_SEG_REG_CS];
+      break;
+    case BX_DBG_REG_SS:
+      seg = &BX_CPU_THIS_PTR sregs[BX_SEG_REG_SS];
+      break;
+    case BX_DBG_REG_DS:
+      seg = &BX_CPU_THIS_PTR sregs[BX_SEG_REG_DS];
+      break;
+    case BX_DBG_REG_ES:
+      seg = &BX_CPU_THIS_PTR sregs[BX_SEG_REG_ES];
+      break;
+    case BX_DBG_REG_FS:
+      seg = &BX_CPU_THIS_PTR sregs[BX_SEG_REG_FS];
+      break;
+    case BX_DBG_REG_GS:
+      seg = &BX_CPU_THIS_PTR sregs[BX_SEG_REG_GS];
+      break;
+    default:
+      BX_PANIC(("dbg_set_reg: unrecognized register ID (%u)\n", reg));
+      return(0);
+    }
+
+  if (BX_CPU_THIS_PTR real_mode()) {
+    seg->selector.value = val;
+    seg->cache.valid = 1;
+    seg->cache.p = 1;
+    seg->cache.dpl = 0;
+    seg->cache.segment = 1; // regular segment
+    if (reg == BX_DBG_REG_CS) {
+      seg->cache.u.segment.executable = 1; // code segment
+      }
+    else {
+      seg->cache.u.segment.executable = 0; // data segment
+      }
+    seg->cache.u.segment.c_ed = 0;       // expand up/non-conforming
+    seg->cache.u.segment.r_w = 1;        // writeable
+    seg->cache.u.segment.a = 1;          // accessed
+    seg->cache.u.segment.base = val << 4;
+    seg->cache.u.segment.limit        = 0xffff;
+    seg->cache.u.segment.limit_scaled = 0xffff;
+    seg->cache.u.segment.g     = 0;      // byte granular
+    seg->cache.u.segment.d_b   = 0;      // default 16bit size
+    seg->cache.u.segment.avl   = 0;
+    return(1); // ok
+    }
+
+  return(0); // can't change when not in real mode
+}
+
+  Bit32u
+BX_CPU_C::dbg_get_eflags(void)
+{
+  Bit32u val32;
+
+  val32 =
+    (BX_CPU_THIS_PTR get_CF()) |
+    (BX_CPU_THIS_PTR eflags.bit1 << 1) |
+    ((BX_CPU_THIS_PTR get_PF()) << 2) |
+    (BX_CPU_THIS_PTR eflags.bit3 << 3) |
+    ((BX_CPU_THIS_PTR get_AF()>0) << 4) |
+    (BX_CPU_THIS_PTR eflags.bit5 << 5) |
+    ((BX_CPU_THIS_PTR get_ZF()>0) << 6) |
+    ((BX_CPU_THIS_PTR get_SF()>0) << 7) |
+    (BX_CPU_THIS_PTR eflags.tf << 8) |
+    (BX_CPU_THIS_PTR eflags.if_ << 9) |
+    (BX_CPU_THIS_PTR eflags.df << 10) |
+    ((BX_CPU_THIS_PTR get_OF()>0) << 11) |
+    (BX_CPU_THIS_PTR eflags.iopl << 12) |
+    (BX_CPU_THIS_PTR eflags.nt << 14) |
+    (BX_CPU_THIS_PTR eflags.bit15 << 15) |
+    (BX_CPU_THIS_PTR eflags.rf << 16) |
+    (BX_CPU_THIS_PTR eflags.vm << 17);
+#if BX_CPU_LEVEL >= 4
+  val32 |= (BX_CPU_THIS_PTR eflags.ac << 18);
+  //val32 |= (BX_CPU_THIS_PTR eflags.vif << 19);
+  //val32 |= (BX_CPU_THIS_PTR eflags.vip << 20);
+  val32 |= (BX_CPU_THIS_PTR eflags.id << 21);
+#endif
+  return(val32);
+}
+#else // BX_SUPPORT_SID
 #if BX_DEBUGGER
   Bit32u
 BX_CPU_C::dbg_get_reg(unsigned reg)
@@ -998,6 +1152,7 @@ bx_dbg_init_cpu_mem_env1(bx_dbg_callback_t *callback, int argc, char *argv[])
 }
 
 #endif  // #if BX_DEBUGGER
+#endif // BX_SUPPORT_SID
 
   void
 BX_CPU_C::atexit(void)

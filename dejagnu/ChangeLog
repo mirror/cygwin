@@ -1,3 +1,10 @@
+2002-04-25  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* example/calc/configure.in (AM_MAINTAINER_MODE): Add invocation.
+	* example/calc/aclocal.m4: Regenerate.
+	* example/calc/configure: Regenerate.
+	* example/calc/Makefile.in: Regenerate.
+
 2002-04-21  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* Finish off import of new files and changes from the savanah

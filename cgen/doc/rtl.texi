@@ -755,7 +755,9 @@ function unit called @samp{u-cmp} is defined as:
 This handles instructions that use src1 and src2 as operands.  The
 organization of units is arbitrary.  On the M32R, src1/src2 instructions
 are typically compare instructions so a separate function unit was
-created for them.
+created for them.  Current limitations require that each hardware item
+behind the operands must be marked with the attribute @code{PROFILE} and
+the hardware item must not be scalar.
 
 @node Hardware elements
 @section Hardware Elements
@@ -813,8 +815,9 @@ with @code{VIRTUAL} (??? revisit).
 
 @item PROFILE
 
-Ignore.  This is a work-in-progress to define how to profile references
-to hardware elements.
+This attribute must be present for hardware elements to which references
+are profiled.  Beware, this is work-in-progress.  If you use this
+attribute it is likely you have to hack CGEN.  (Please submit patches.)
 
 @item VIRTUAL
 
@@ -1866,14 +1869,17 @@ that supports the instruction.  The default function unit is the u-exec unit.
 The syntax is:
 
 @example
-(mach-name (unit name (unit-var-name1 insn-operand-name1)
-                      (unit-var-name2 insn-operand-name2)
+(mach-name (unit name (direction unit-var-name1 insn-operand-name1)
+                      (direction unit-var-name2 insn-operand-name2)
                       ...
                       (cycles cycle-count))
 @end example
 
-unit-var-name/insn-operand-name mappings are optional.
-They map unit inputs/outputs to semantic elements.
+direction/unit-var-name/insn-operand-name mappings are optional.
+They map unit inputs/outputs to semantic elements.  The
+direction specifier can be @code{in} or @code{out} mapping the
+name of a unit input or output, respectively, to an insn
+operand.
 
 @code{cycles} overrides the @code{done} value (latency) of the function
 unit and is optional.

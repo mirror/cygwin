@@ -836,8 +836,11 @@ gloss32::do_sys_fstat()
       set_host_error_result (errno);
       set_int_result (-1);
     }
-
-  set_int_result (::fstat (handle, &st));
+  else
+    {
+      set_error_result (0);
+      set_int_result (rc);
+    }
 
   // Populate struct stat in target memory.
   set_halfword (ptr, st.st_dev);

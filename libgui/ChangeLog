@@ -1,3 +1,19 @@
+2001-08-12  Keith Seitz  <keiths@redhat.com>
+
+	Update tkTable to version 2.7:
+	* src/tkTableCmds.c, src/tkTable.tcl.h, src/tkTableCellSort.c,
+	src/tkTableEdit.c, src/tkTableInitScript.h, src/tkTablePs.c,
+	src/tkTableUtil.c, doc/tkTable.html: New files.
+	* src/tkTable.c, src/tkTable.h, src/TkTable.tcl, src/tkTableCell.c,
+	src/tkTableTag.c, src/tkTableWin.c, src/tkTable_version.in: Update to
+	version 2.7.
+	* configure.in: If compiling with cygwin, we need to have
+	WIN32 defined to build tkTable modules.
+	* configure: Regenerate.
+	* src/Makefile.am: Add new tkTable files and update build rules
+	for new version of tkTable.
+	* src/Makefile.in: Regenerate.
+
 2001-08-06  Mo DeJong  <mdejong@redhat.com>
 
 	* Makefile.in: Regen.

@@ -1,19 +1,28 @@
 # table.tcl --
 #
-# version 1.8, jeff.hobbs@acm.org
+# Version align with tkTable 2.7, jeff.hobbs@acm.org
 # This file defines the default bindings for Tk table widgets
 # and provides procedures that help in implementing those bindings.
 #
 
 #--------------------------------------------------------------------------
-# tkPriv elements used in this file:
+# ::tk::table::Priv elements used in this file:
 #
+# x && y -		Coords in widget
 # afterId -		Token returned by "after" for autoscanning.
 # tablePrev -		The last element to be selected or deselected
 #			during a selection operation.
+# mouseMoved -		Boolean to indicate whether mouse moved while
+#			the button was pressed.
 #--------------------------------------------------------------------------
 
-# tkTableClipboardKeysyms --
+namespace eval ::tk::table {
+    # Ensure that a namespace is created for us
+    variable Priv
+    array set Priv { x 0 y 0 afterId {} mouseMoved 0 }
+}
+
+# ::tk::table::ClipboardKeysyms --
 # This procedure is invoked to identify the keys that correspond to
 # the "copy", "cut", and "paste" functions for the clipboard.
 #
@@ -23,17 +32,18 @@
 # cut -		Name of the key used for the cut operation.
 # paste -	Name of the key used for the paste operation.
 
-proc tkTableClipboardKeysyms {copy cut paste} {
+proc ::tk::table::ClipboardKeysyms {copy cut paste} {
     bind Table <$copy>	{tk_tableCopy %W}
     bind Table <$cut>	{tk_tableCut %W}
     bind Table <$paste>	{tk_tablePaste %W}
 }
+::tk::table::ClipboardKeysyms <Copy> <Cut> <Paste>
 
-## Interactive row resizing, affected by -resizeborders option
+## Interactive cell resizing, affected by -resizeborders option
 ##
 bind Table <3>		{
-    ## You might want to check for row returned if you want to
-    ## restrict the resizing of certain rows
+    ## You might want to check for cell returned if you want to
+    ## restrict the resizing of certain cells
     %W border mark %x %y
 }
 bind Table <B3-Motion>	{ %W border dragto %x %y }
@@ -42,65 +52,72 @@ bind Table <B3-Motion>	{ %W border dragto %x %y }
 
 bind Table <1> {
     if {[winfo exists %W]} {
-	tkTableBeginSelect %W [%W index @%x,%y]
+	::tk::table::BeginSelect %W [%W index @%x,%y]
 	focus %W
     }
+    array set ::tk::table::Priv {x %x y %y}
+    set ::tk::table::Priv(mouseMoved) 0
 }
 bind Table <B1-Motion> {
-    array set tkPriv {x %x y %y}
-    tkTableMotion %W [%W index @%x,%y]
+    # If we already had motion, or we moved more than 1 pixel,
+    # then we start the Motion routine
+    if {
+	$::tk::table::Priv(mouseMoved)
+	|| abs(%x-$::tk::table::Priv(x)) > 1
+	|| abs(%y-$::tk::table::Priv(y)) > 1
+    } {
+	set ::tk::table::Priv(mouseMoved) 1
+    }
+    if {$::tk::table::Priv(mouseMoved)} {
+	::tk::table::Motion %W [%W index @%x,%y]
+    }
 }
 bind Table <Double-1> {
     # empty
 }
 bind Table <ButtonRelease-1> {
     if {[winfo exists %W]} {
-	tkCancelRepeat
+	::tk::table::CancelRepeat
 	%W activate @%x,%y
     }
 }
 
-bind Table <Shift-1>	{tkTableBeginExtend %W [%W index @%x,%y]}
-bind Table <Control-1>	{tkTableBeginToggle %W [%W index @%x,%y]}
-bind Table <B1-Enter>	{tkCancelRepeat}
+bind Table <Shift-1>	{::tk::table::BeginExtend %W [%W index @%x,%y]}
+bind Table <Control-1>	{::tk::table::BeginToggle %W [%W index @%x,%y]}
+bind Table <B1-Enter>	{::tk::table::CancelRepeat}
 bind Table <B1-Leave>	{
-    array set tkPriv {x %x y %y}
-    tkTableAutoScan %W
+    array set ::tk::table::Priv {x %x y %y}
+    ::tk::table::AutoScan %W
 }
 bind Table <2> {
     %W scan mark %x %y
-    array set tkPriv {x %x y %y}
-    set tkPriv(mouseMoved) 0
+    array set ::tk::table::Priv {x %x y %y}
+    set ::tk::table::Priv(mouseMoved) 0
 }
 bind Table <B2-Motion> {
-    if {(%x != $tkPriv(x)) || (%y != $tkPriv(y))} { set tkPriv(mouseMoved) 1 }
-    if $tkPriv(mouseMoved) { %W scan dragto %x %y }
+    if {(%x != $::tk::table::Priv(x)) || (%y != $::tk::table::Priv(y))} {
+	set ::tk::table::Priv(mouseMoved) 1
+    }
+    if {$::tk::table::Priv(mouseMoved)} { %W scan dragto %x %y }
 }
 bind Table <ButtonRelease-2> {
-    if {!$tkPriv(mouseMoved)} { tk_tablePaste %W [%W index @%x,%y] }
+    if {!$::tk::table::Priv(mouseMoved)} { tk_tablePaste %W [%W index @%x,%y] }
 }
 
 ## Key events
 
-if {[string comp {} [info command event]]} {
-    tkTableClipboardKeysyms <Copy> <Cut> <Paste>
-} else {
-    tkTableClipboardKeysyms Control-c Control-x Control-v
-}
-
-bind Table <Any-Tab> {
-    # empty to allow Tk focus movement
-}
 # This forces a cell commit if an active cell exists
-# Remove this if you don't want cell commit to occur
-# on every FocusOut
-bind Table <FocusOut> {
+bind Table <<Table_Commit>> {
     catch {%W activate active}
 }
-bind Table <Shift-Up>		{tkTableExtendSelect %W -1  0}
-bind Table <Shift-Down>		{tkTableExtendSelect %W  1  0}
-bind Table <Shift-Left>		{tkTableExtendSelect %W  0 -1}
-bind Table <Shift-Right>	{tkTableExtendSelect %W  0  1}
+# Remove this if you don't want cell commit to occur on every
+# Leave of the table.  Another possible choice is <FocusOut>.
+event add <<Table_Commit>> <Leave>
+
+bind Table <Shift-Up>		{::tk::table::ExtendSelect %W -1  0}
+bind Table <Shift-Down>		{::tk::table::ExtendSelect %W  1  0}
+bind Table <Shift-Left>		{::tk::table::ExtendSelect %W  0 -1}
+bind Table <Shift-Right>	{::tk::table::ExtendSelect %W  0  1}
 bind Table <Prior>		{%W yview scroll -1 pages; %W activate @0,0}
 bind Table <Next>		{%W yview scroll  1 pages; %W activate @0,0}
 bind Table <Control-Prior>	{%W xview scroll -1 pages}
@@ -119,44 +136,128 @@ bind Table <Control-End> {
     %W selection set active
     %W see active
 }
-bind Table <Shift-Control-Home>	{tkTableDataExtend %W origin}
-bind Table <Shift-Control-End>	{tkTableDataExtend %W end}
-bind Table <Select>		{tkTableBeginSelect %W [%W index active]}
-bind Table <Shift-Select>	{tkTableBeginExtend %W [%W index active]}
-bind Table <Control-slash>	{tkTableSelectAll %W}
+bind Table <Shift-Control-Home>	{::tk::table::DataExtend %W origin}
+bind Table <Shift-Control-End>	{::tk::table::DataExtend %W end}
+bind Table <Select>		{::tk::table::BeginSelect %W [%W index active]}
+bind Table <Shift-Select>	{::tk::table::BeginExtend %W [%W index active]}
+bind Table <Control-slash>	{::tk::table::SelectAll %W}
 bind Table <Control-backslash> {
     if {[string match browse [%W cget -selectmode]]} {%W selection clear all}
 }
-bind Table <Up>			{tkTableMoveCell %W -1  0}
-bind Table <Down>		{tkTableMoveCell %W  1  0}
-bind Table <Left>		{tkTableMoveCell %W  0 -1}
-bind Table <Right>		{tkTableMoveCell %W  0  1}
-bind Table <Any-KeyPress> {
-    if {[string compare {} %A]} { %W insert active insert %A }
-}
-bind Table <BackSpace> {
-    set tkPriv(junk) [%W icursor]
-    if {[string compare {} $tkPriv(junk)] && $tkPriv(junk)} {
-	%W delete active [expr {$tkPriv(junk)-1}]
-    }
-}
+bind Table <Up>			{::tk::table::MoveCell %W -1  0}
+bind Table <Down>		{::tk::table::MoveCell %W  1  0}
+bind Table <Left>		{::tk::table::MoveCell %W  0 -1}
+bind Table <Right>		{::tk::table::MoveCell %W  0  1}
+bind Table <KeyPress>		{::tk::table::Insert %W %A}
+bind Table <BackSpace>		{::tk::table::BackSpace %W}
 bind Table <Delete>		{%W delete active insert}
 bind Table <Escape>		{%W reread}
 
-#bind Table <Return>		{tkTableMoveCell %W 1 0}
-bind Table <Return> {
-    %W insert active insert "\n"
-}
+#bind Table <Return>		{::tk::table::MoveCell %W 1 0}
+bind Table <Return>		{::tk::table::Insert %W "\n"}
 
 bind Table <Control-Left>	{%W icursor [expr {[%W icursor]-1}]}
 bind Table <Control-Right>	{%W icursor [expr {[%W icursor]+1}]}
 bind Table <Control-e>		{%W icursor end}
 bind Table <Control-a>		{%W icursor 0}
 bind Table <Control-k>		{%W delete active insert end}
-bind Table <Control-equal>	{tkTableChangeWidth %W active  1}
-bind Table <Control-minus>	{tkTableChangeWidth %W active -1}
+bind Table <Control-equal>	{::tk::table::ChangeWidth %W active  1}
+bind Table <Control-minus>	{::tk::table::ChangeWidth %W active -1}
 
-# tkTableBeginSelect --
+# Ignore all Alt, Meta, and Control keypresses unless explicitly bound.
+# Otherwise, if a widget binding for one of these is defined, the
+# <KeyPress> class binding will also fire and insert the character,
+# which is wrong.  Ditto for Tab.
+
+bind Table <Alt-KeyPress>	{# nothing}
+bind Table <Meta-KeyPress>	{# nothing}
+bind Table <Control-KeyPress>	{# nothing}
+bind Table <Any-Tab>		{# nothing}
+if {[string match "macintosh" $tcl_platform(platform)]} {
+    bind Table <Command-KeyPress> {# nothing}
+}
+
+# ::tk::table::GetSelection --
+#   This tries to obtain the default selection.  On Unix, we first try
+#   and get a UTF8_STRING, a type supported by modern Unix apps for
+#   passing Unicode data safely.  We fall back on the default STRING
+#   type otherwise.  On Windows, only the STRING type is necessary.
+# Arguments:
+#   w	The widget for which the selection will be retrieved.
+#	Important for the -displayof property.
+#   sel	The source of the selection (PRIMARY or CLIPBOARD)
+# Results:
+#   Returns the selection, or an error if none could be found
+#
+if {[string equal $tcl_platform(platform) "unix"]} {
+    proc ::tk::table::GetSelection {w {sel PRIMARY}} {
+	if {[catch {selection get -displayof $w -selection $sel \
+		-type UTF8_STRING} txt] \
+		&& [catch {selection get -displayof $w -selection $sel} txt]} {
+	    return -code error "could not find default selection"
+	} else {
+	    return $txt
+	}
+    }
+} else {
+    proc ::tk::table::GetSelection {w {sel PRIMARY}} {
+	if {[catch {selection get -displayof $w -selection $sel} txt]} {
+	    return -code error "could not find default selection"
+	} else {
+	    return $txt
+	}
+    }
+}
+
+# ::tk::table::CancelRepeat --
+# A copy of tkCancelRepeat, just in case it's not available or changes.
+# This procedure is invoked to cancel an auto-repeat action described
+# by ::tk::table::Priv(afterId).  It's used by several widgets to auto-scroll
+# the widget when the mouse is dragged out of the widget with a
+# button pressed.
+#
+# Arguments:
+# None.
+
+proc ::tk::table::CancelRepeat {} {
+    variable Priv
+    after cancel $Priv(afterId)
+    set Priv(afterId) {}
+}
+
+# ::tk::table::Insert --
+#
+#   Insert into the active cell
+#
+# Arguments:
+#   w	- the table widget
+#   s	- the string to insert
+# Results:
+#   Returns nothing
+#
+proc ::tk::table::Insert {w s} {
+    if {[string compare $s {}]} {
+	$w insert active insert $s
+    }
+}
+
+# ::tk::table::BackSpace --
+#
+#   BackSpace in the current cell
+#
+# Arguments:
+#   w	- the table widget
+# Results:
+#   Returns nothing
+#
+proc ::tk::table::BackSpace {w} {
+    set cur [$w icursor]
+    if {[string compare {} $cur] && $cur} {
+	$w delete active [expr {$cur-1}]
+    }
+}
+
+# ::tk::table::BeginSelect --
 #
 # This procedure is typically invoked on button-1 presses. It begins
 # the process of making a selection in the table. Its exact behavior
@@ -168,8 +269,8 @@ bind Table <Control-minus>	{tkTableChangeWidth %W active -1}
 # el	- The element for the selection operation (typically the
 #	one under the pointer).  Must be in row,col form.
 
-proc tkTableBeginSelect {w el} {
-    global tkPriv
+proc ::tk::table::BeginSelect {w el} {
+    variable Priv
     if {[scan $el %d,%d r c] != 2} return
     switch [$w cget -selectmode] {
 	multiple {
@@ -194,7 +295,7 @@ proc tkTableBeginSelect {w el} {
 		set inc $el
 		set el2 $el
 	    }
-	    if [$w selection includes $inc] {
+	    if {[$w selection includes $inc]} {
 		$w selection clear $el $el2
 	    } else {
 		$w selection set $el $el2
@@ -206,7 +307,8 @@ proc tkTableBeginSelect {w el} {
 		if {$r < [$w cget -titlerows]+[$w cget -roworigin]} {
 		    ## We're in a column header
 		    if {$c < [$w cget -titlecols]+[$w cget -colorigin]} {
-			$w selection set origin end
+			## We're in the topleft title area
+			$w selection set $el end
 		    } else {
 			$w selection set $el [$w index end row],$c
 		    }
@@ -218,20 +320,20 @@ proc tkTableBeginSelect {w el} {
 		$w selection set $el
 	    }
 	    $w selection anchor $el
-	    set tkPriv(tablePrev) $el
+	    set Priv(tablePrev) $el
 	}
 	default {
 	    if {![$w tag includes title $el]} {
 		$w selection clear all
 		$w selection set $el
-		set tkPriv(tablePrev) $el
+		set Priv(tablePrev) $el
 	    }
 	    $w selection anchor $el
 	}
     }
 }
 
-# tkTableMotion --
+# ::tk::table::Motion --
 #
 # This procedure is called to process mouse motion events while
 # button 1 is down. It may move or extend the selection, depending
@@ -241,21 +343,21 @@ proc tkTableBeginSelect {w el} {
 # w	- The table widget.
 # el	- The element under the pointer (must be in row,col form).
 
-proc tkTableMotion {w el} {
-    global tkPriv
-    if {![info exists tkPriv(tablePrev)]} {
-	set tkPriv(tablePrev) $el
+proc ::tk::table::Motion {w el} {
+    variable Priv
+    if {![info exists Priv(tablePrev)]} {
+	set Priv(tablePrev) $el
 	return
     }
-    if {[string match $tkPriv(tablePrev) $el]} return
+    if {[string match $Priv(tablePrev) $el]} return
     switch [$w cget -selectmode] {
 	browse {
 	    $w selection clear all
 	    $w selection set $el
-	    set tkPriv(tablePrev) $el
+	    set Priv(tablePrev) $el
 	}
 	extended {
-	    scan $tkPriv(tablePrev) %d,%d r c
+	    scan $Priv(tablePrev) %d,%d r c
 	    scan $el %d,%d elr elc
 	    if {[$w tag includes title $el]} {
 		if {$r < [$w cget -titlerows]+[$w cget -roworigin]} {
@@ -273,15 +375,15 @@ proc tkTableMotion {w el} {
 		    $w selection set anchor $elr,[$w index end col]
 		}
 	    } else {
-		$w selection clear anchor $tkPriv(tablePrev)
+		$w selection clear anchor $Priv(tablePrev)
 		$w selection set anchor $el
 	    }
-	    set tkPriv(tablePrev) $el
+	    set Priv(tablePrev) $el
 	}
     }
 }
 
-# tkTableBeginExtend --
+# ::tk::table::BeginExtend --
 #
 # This procedure is typically invoked on shift-button-1 presses. It
 # begins the process of extending a selection in the table. Its
@@ -293,14 +395,14 @@ proc tkTableMotion {w el} {
 # el - The element for the selection operation (typically the
 # one under the pointer). Must be in numerical form.
 
-proc tkTableBeginExtend {w el} {
+proc ::tk::table::BeginExtend {w el} {
     if {[string match extended [$w cget -selectmode]] &&
 	[$w selection includes anchor]} {
-	tkTableMotion $w $el
+	::tk::table::Motion $w $el
     }
 }
 
-# tkTableBeginToggle --
+# ::tk::table::BeginToggle --
 #
 # This procedure is typically invoked on control-button-1 presses. It
 # begins the process of toggling a selection in the table. Its
@@ -312,34 +414,52 @@ proc tkTableBeginExtend {w el} {
 # el - The element for the selection operation (typically the
 # one under the pointer). Must be in numerical form.
 
-proc tkTableBeginToggle {w el} {
-    global tkPriv
+proc ::tk::table::BeginToggle {w el} {
     if {[string match extended [$w cget -selectmode]]} {
-	set tkPriv(tablePrev) $el
+	variable Priv
+	set Priv(tablePrev) $el
 	$w selection anchor $el
-	if [$w selection includes $el] {
-	    $w selection clear $el
+	if {[$w tag includes title $el]} {
+	    scan $el %d,%d r c
+	    if {$r < [$w cget -titlerows]+[$w cget -roworigin]} {
+		## We're in a column header
+		if {$c < [$w cget -titlecols]+[$w cget -colorigin]} {
+		    ## We're in the topleft title area
+		    set end end
+		} else {
+		    set end [$w index end row],$c
+		}
+	    } else {
+		## We're in a row header
+		set end $r,[$w index end col]
+	    }
 	} else {
-	    $w selection set $el
+	    ## We're in a non-title cell
+	    set end $el
 	}
+	if {[$w selection includes  $end]} {
+	    $w selection clear $el $end
+	} else {
+	    $w selection set   $el $end
+        }
     }
 }
 
-# tkTableAutoScan --
-# This procedure is invoked when the mouse leaves an entry window
+# ::tk::table::AutoScan --
+# This procedure is invoked when the mouse leaves an table window
 # with button 1 down. It scrolls the window up, down, left, or
 # right, depending on where the mouse left the window, and reschedules
 # itself as an "after" command so that the window continues to scroll until
 # the mouse moves back into the window or the mouse button is released.
 #
 # Arguments:
-# w - The entry window.
+# w - The table window.
 
-proc tkTableAutoScan {w} {
-    global tkPriv
+proc ::tk::table::AutoScan {w} {
     if {![winfo exists $w]} return
-    set x $tkPriv(x)
-    set y $tkPriv(y)
+    variable Priv
+    set x $Priv(x)
+    set y $Priv(y)
     if {$y >= [winfo height $w]} {
 	$w yview scroll 1 units
     } elseif {$y < 0} {
@@ -351,26 +471,43 @@ proc tkTableAutoScan {w} {
     } else {
 	return
     }
-    tkTableMotion $w [$w index @$x,$y]
-    set tkPriv(afterId) [after 50 tkTableAutoScan $w]
+    ::tk::table::Motion $w [$w index @$x,$y]
+    set Priv(afterId) [after 50 ::tk::table::AutoScan $w]
 }
 
-# tkTableMoveCell --
+# ::tk::table::MoveCell --
 #
 # Moves the location cursor (active element) by the specified number
 # of cells and changes the selection if we're in browse or extended
-# selection mode.
+# selection mode.  If the new cell is "hidden", we skip to the next
+# visible cell if possible, otherwise just abort.
 #
 # Arguments:
 # w - The table widget.
 # x - +1 to move down one cell, -1 to move up one cell.
 # y - +1 to move right one cell, -1 to move left one cell.
 
-proc tkTableMoveCell {w x y} {
-    global tkPriv
+proc ::tk::table::MoveCell {w x y} {
     if {[catch {$w index active row} r]} return
     set c [$w index active col]
-    $w activate [incr r $x],[incr c $y]
+    set cell [$w index [incr r $x],[incr c $y]]
+    while {[string compare [set true [$w hidden $cell]] {}]} {
+	# The cell is in some way hidden
+	if {[string compare $true [$w index active]]} {
+	    # The span cell wasn't the previous cell, so go to that
+	    set cell $true
+	    break
+	}
+	if {$x > 0} {incr r} elseif {$x < 0} {incr r -1}
+	if {$y > 0} {incr c} elseif {$y < 0} {incr c -1}
+	if {[string compare $cell [$w index $r,$c]]} {
+	    set cell [$w index $r,$c]
+	} else {
+	    # We couldn't find a non-hidden cell, just don't move
+	    return
+	}
+    }
+    $w activate $cell
     $w see active
     switch [$w cget -selectmode] {
 	browse {
@@ -378,15 +515,16 @@ proc tkTableMoveCell {w x y} {
 	    $w selection set active
 	}
 	extended {
+	    variable Priv
 	    $w selection clear all
 	    $w selection set active
 	    $w selection anchor active
-	    set tkPriv(tablePrev) [$w index active]
+	    set Priv(tablePrev) [$w index active]
 	}
     }
 }
 
-# tkTableExtendSelect --
+# ::tk::table::ExtendSelect --
 #
 # Does nothing unless we're in extended selection mode; in this
 # case it moves the location cursor (active element) by the specified
@@ -397,16 +535,16 @@ proc tkTableMoveCell {w x y} {
 # x - +1 to move down one cell, -1 to move up one cell.
 # y - +1 to move right one cell, -1 to move left one cell.
 
-proc tkTableExtendSelect {w x y} {
+proc ::tk::table::ExtendSelect {w x y} {
     if {[string compare extended [$w cget -selectmode]] ||
 	[catch {$w index active row} r]} return
     set c [$w index active col]
     $w activate [incr r $x],[incr c $y]
     $w see active
-    tkTableMotion $w [$w index active]
+    ::tk::table::Motion $w [$w index active]
 }
 
-# tkTableDataExtend
+# ::tk::table::DataExtend
 #
 # This procedure is called for key-presses such as Shift-KEndData.
 # If the selection mode isnt multiple or extend then it does nothing.
@@ -417,19 +555,19 @@ proc tkTableExtendSelect {w x y} {
 # w - The table widget.
 # el - An integer cell number.
 
-proc tkTableDataExtend {w el} {
+proc ::tk::table::DataExtend {w el} {
     set mode [$w cget -selectmode]
     if {[string match extended $mode]} {
 	$w activate $el
 	$w see $el
-	if [$w selection includes anchor] {tkTableMotion $w $el}
+	if {[$w selection includes anchor]} {::tk::table::Motion $w $el}
     } elseif {[string match multiple $mode]} {
 	$w activate $el
 	$w see $el
     }
 }
 
-# tkTableSelectAll
+# ::tk::table::SelectAll
 #
 # This procedure is invoked to handle the "select all" operation.
 # For single and browse mode, it just selects the active element.
@@ -438,17 +576,19 @@ proc tkTableDataExtend {w el} {
 # Arguments:
 # w - The table widget.
 
-proc tkTableSelectAll {w} {
+proc ::tk::table::SelectAll {w} {
     if {[regexp {^(single|browse)$} [$w cget -selectmode]]} {
 	$w selection clear all
 	$w selection set active
-	tkTableHandleType $w [$w index active]
+	::tk::table::HandleType $w [$w index active]
+    } elseif {[$w cget -selecttitles]} {
+	$w selection set [$w cget -roworigin],[$w cget -colorigin] end
     } else {
 	$w selection set origin end
     }
 }
 
-# tkTableChangeWidth --
+# ::tk::table::ChangeWidth --
 # Adjust the widget of the specified cell by $a.
 #
 # Arguments:
@@ -456,12 +596,12 @@ proc tkTableSelectAll {w} {
 # i - cell index
 # a - amount to adjust by
 
-proc tkTableChangeWidth {w i a} {
+proc ::tk::table::ChangeWidth {w i a} {
     set tmp [$w index $i col]
     if {[set width [$w width $tmp]] >= 0} {
 	$w width $tmp [incr width $a]
     } else {
-	$w width $tmp [incr width -$a]
+	$w width $tmp [incr width [expr {-$a}]]
     }
 }
 
@@ -475,7 +615,7 @@ proc tkTableChangeWidth {w i a} {
 proc tk_tableCopy w {
     if {[selection own -displayof $w] == "$w"} {
 	clipboard clear -displayof $w
-	catch {clipboard append -displayof $w [selection get -displayof $w]}
+	catch {clipboard append -displayof $w [::tk::table::GetSelection $w]}
     }
 }
 
@@ -491,8 +631,8 @@ proc tk_tableCut w {
     if {[selection own -displayof $w] == "$w"} {
 	clipboard clear -displayof $w
 	catch {
-	    clipboard append -displayof $w [selection get -displayof $w]
-	    $w cursel set {}
+	    clipboard append -displayof $w [::tk::table::GetSelection $w]
+	    $w cursel {}
 	    $w selection clear all
 	}
     }
@@ -508,9 +648,9 @@ proc tk_tableCut w {
 
 proc tk_tablePaste {w {cell {}}} {
     if {[string compare {} $cell]} {
-	if {[catch {selection get -displayof $w} data]} return
+	if {[catch {::tk::table::GetSelection $w} data]} return
     } else {
-	if {[catch {selection get -displayof $w -selection CLIPBOARD} data]} {
+	if {[catch {::tk::table::GetSelection $w CLIPBOARD} data]} {
 	    return
 	}
 	set cell active

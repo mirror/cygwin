@@ -59,6 +59,10 @@ if test x$ide_cv_os_cygwin32 = xyes; then
   ac_win_build="yes"
 fi
 
+if test x"$ac_win_build" = xyes; then
+  LIBGUI_CFLAGS="-DWIN32 $LIBGUI_CFLAGS"
+fi
+
 tmp="`cd $srcdir/library; pwd`"
 if test x"$ac_cv_prog_CC" = xcl ; then
   tmp2="`cygpath --windows $tmp`"

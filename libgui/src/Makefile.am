@@ -11,6 +11,9 @@ include_HEADERS = \
 
 endif
 
+datadir = @datadir@
+guidir  = $(datadir)/cygnus/gui
+
 # tkTable version info
 include $(srcdir)/tkTable_version.in
 
@@ -19,8 +22,8 @@ include $(srcdir)/tkTable_version.in
 # for those with another built-in "table" command
 TBL_COMMAND     = table
 
-tkTabletcl.h: $(srcdir)/tkTable.tcl
-	sed -e '/^$\#/d' -e '/^$$/d' -e 's/\"/\\"/g' -e 's/^/"/' -e 's/$$/\\n"/' <$(srcdir)/tkTable.tcl >tkTabletcl.h || rm tkTabletcl.h 
+tkTable.tcl.h: $(srcdir)/tkTable.tcl
+	sed -e '/^$\#/d' -e '/^$$/d' -e 's/\"/\\"/g' -e 's/^/"/' -e 's/$$/\\n"/' <$(srcdir)/tkTable.tcl >tkTable.tcl.h || rm tkTable.tcl.h 
 
 
 
@@ -44,15 +47,17 @@ $(TK_XINCLUDES) $(TCL_DEFS) $(TK_DEFS) \
 $(TKHDIR)/../unix $(TKHDIR)/../win \
 -DTBL_VERSION=\"$(TBL_VERSION)\"\
 -DTBL_COMMAND=\"$(TBL_COMMAND)\"\
--DTCL_RUNTIME=\"tkTable.tcl\"
+-DTBL_RUNTIME=\"tkTable.tcl\" -DTBL_RUNTIME_DIR=\"$(guidir)\"
+
+TKTABLE_SOURCES = tkTable.c tkTableCell.c tkTableCellSort.c \
+tkTableCmds.c tkTableEdit.c tkTableTag.c tkTableWin.c tkTableUtil.c
 
 libgui_a_SOURCES = guitcl.h paths.c subcommand.c subcommand.h \
 xpmlib.c tclmain.c tkGraphCanvas.c \
 tkCanvEdge.c tkCanvLayout.c tkCanvLayout.h tclhelp.c tclgetdir.c \
 tclwinprint.c tclsizebox.c tclshellexe.c tclmapi.c tclwinfont.c	\
 tclwingrab.c tclwinmode.c tclwinpath.c tclmsgbox.c tclcursor.c \
-tkTable.c tkTableCmd.c tkTableCell.c tkTableTag.c tkTableWin.c \
-tkWinPrintText.c tkWinPrintCanvas.c tkWarpPointer.c
+tkWinPrintText.c tkWinPrintCanvas.c tkWarpPointer.c $(TKTABLE_SOURCES)
 
 ## Dependencies
 
@@ -75,10 +80,14 @@ tclwinfont.$(OBJEXT): tclwinfont.c guitcl.h
 tclwingrab.$(OBJEXT): tclwingrab.c guitcl.h
 tclwinpath.$(OBJEXT): tclwinpath.c guitcl.h subcommand.h
 tclwinmode.$(OBJEXT): tclwinmode.c guitcl.h
-tkTable.$(OBJEXT): tkTable.c tkTable.h tkTableCmd.h tkTabletcl.h
-tkTableCell.$(OBJEXT): tkTableCell.c tkTable.h tkTableCmd.h
-tkTableTag.$(OBJEXT): tkTableTag.c tkTable.h tkTableCmd.h
-tkTableWin.$(OBJEXT):tkTableWin.c  tkTable.h tkTableCmd.h
-tkTableCmd.$(OBJEXT): tkTableCmd.c tkTableCmd.h
-tkTabletcl.h: tkTable.tcl
+tkTable.$(OBJEXT): tkTable.c tkTable.h tkTableInitScript.h tkTable.tcl.h
+tkTableCell.$(OBJEXT): tkTableCell.c tkTable.h
+tkTableCellSort.$(OBJEXT): tkTableCellSort.c tkTable.h
+tkTableCmds.$(OBJEXT): tkTableCmds.c tkTable.h
+tkTableEdit.$(OBJEXT): tkTableEdit.c tkTable.h
+tkTableTag.$(OBJEXT): tkTableTag.c tkTable.h
+tkTablePs.$(OBJECT): tkTablePs.c tkTable.h
+tkTableWin.$(OBJEXT):tkTableWin.c  tkTable.h
+tkTableUtil.$(OBJEXT): tkTableUtil.c tkTable.h
+tkTable.tcl.h: tkTable.tcl
 

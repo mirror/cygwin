@@ -1,5 +1,9 @@
 2001-01-23  Frank Ch. Eigler  <fche@redhat.com>
 
+	* configrun-sid.in: Generate sorted list of "load" commands.
+
+2001-01-23  Frank Ch. Eigler  <fche@redhat.com>
+
 	* configrun-sid.in: Become a shell script.  Use "eval exec perl" hack
 	to divert to a perl interpreter on $PATH, instead of /usr/bin/env.
 

@@ -1020,8 +1020,9 @@ connect-pin init-sequence output-7 -> tcl-event-consumer !event
 
 
 # add dso commands
-while(($lib,$symbol) = each %component_libs)
+foreach $lib (sort keys %component_libs)
   {
+    $symbol = $component_libs{$lib};
     $lib_la = "$sidprefix$lib$sidsuffix_la";
 
     # minor optimization: don't include large tcl dll unless needed

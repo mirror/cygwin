@@ -14,6 +14,8 @@
 #include <sidmiscutil.h>
 #include <sidwatchutil.h>
 
+using std::string;
+
 namespace sidutil
 {
   // kinds of endianness

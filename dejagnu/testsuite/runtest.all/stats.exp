@@ -36,6 +36,8 @@ set tests {
     { fail "unexpected failures\[ \t\]+1\n" }
     { xpass "unexpected successes\[ \t\]+1\n" }
     { xfail "expected failures\[ \t\]+1\n" }
+    { kpass "unknown successes\[ \t\]+1\n" }
+    { kfail "known failures\[ \t\]+1\n" }
     { untested "untested testcases\[ \t\]+1\n" }
     { unresolved "unresolved testcases\[ \t\]+1\n" }
     { unsupported "unsupported tests\[ \t\]+1\n" }

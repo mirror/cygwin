@@ -251,8 +251,8 @@ proc unknown { args } {
 # Without this, all messages that start with a keyword are written only to the
 # detail log file.  All messages that go to the screen will also appear in the
 # detail log.  This should only be used by the framework itself using pass,
-# fail, xpass, xfail, warning, perror, note, untested, unresolved, or
-# unsupported procedures.
+# fail, xpass, xfail, kpass, kfail, warning, perror, note, untested, unresolved,
+# or unsupported procedures.
 #
 proc clone_output { message } {
     global sum_file
@@ -264,7 +264,7 @@ proc clone_output { message } {
 
     regsub "^\[ \t\]*(\[^ \t\]+).*$" "$message" "\\1" firstword;
     case "$firstword" in {
-	{"PASS:" "XFAIL:" "UNRESOLVED:" "UNSUPPORTED:" "UNTESTED:"} {
+	{"PASS:" "XFAIL:" "KFAIL:" "UNRESOLVED:" "UNSUPPORTED:" "UNTESTED:"} {
 	    if $all_flag {
 		send_user "$message\n"
 		return "$message"
@@ -364,7 +364,7 @@ proc log_summary { args } {
 	if { $testcnt > 0 } {
 	    set totlcnt 0;
 	    # total all the testcases reported
-	    foreach x { FAIL PASS XFAIL XPASS UNTESTED UNRESOLVED UNSUPPORTED } {
+	    foreach x { FAIL PASS XFAIL KFAIL XPASS KPASS UNTESTED UNRESOLVED UNSUPPORTED } {
 		incr totlcnt test_counts($x,$which);
 	    }
 	    set testcnt test_counts(total,$which);
@@ -388,7 +388,7 @@ proc log_summary { args } {
 	    }
 	}
     }
-    foreach x { PASS FAIL XPASS XFAIL UNRESOLVED UNTESTED UNSUPPORTED } {
+    foreach x { PASS FAIL XPASS XFAIL KPASS KFAIL UNRESOLVED UNTESTED UNSUPPORTED } {
 	set val $test_counts($x,$which);
 	if { $val > 0 } {
 	    set mess "# of $test_counts($x,name)";
@@ -437,6 +437,43 @@ proc setup_xfail { args } {
 	    set xfail_flag 1
 	    continue
 	}
+    }
+}
+
+
+#
+# Setup a flag to control whether it is a known failure
+#
+# A bug report ID _MUST_ be specified, and is the first argument.
+# It still must be a string without '-' so we can be sure someone
+# did not just forget it and we end-up using a taget triple as
+# bug id.
+#
+# Multiple target triplet patterns can be specified for targets
+# for which the test is known to fail.  
+#
+#
+proc setup_kfail { args } {
+    global kfail_flag
+    global kfail_prms
+    
+    set kfail_prms 0
+    set argc [ llength $args ]
+    for { set i 0 } { $i < $argc } { incr i } {
+	set sub_arg [ lindex $args $i ]
+	# is a prms number. we assume this is a string with no '-' characters
+	if [regexp "^\[^\-\]+$" $sub_arg] { 
+	    set kfail_prms $sub_arg
+	    continue
+	}
+	if [istarget $sub_arg] {
+	    set kfail_flag 1
+	    continue
+	}
+    }
+
+    if {$kfail_prms == 0} {
+	perror "Attempt to set a kfail without specifying bug tracking id"
     }
 }
 
@@ -557,6 +594,28 @@ proc clear_xfail { args } {
 }
 
 #
+# Clear the kfail flag for a particular target
+#
+proc clear_kfail { args } {
+    global kfail_flag
+    global kfail_prms
+    
+    set argc [ llength $args ]
+    for { set i 0 } { $i < $argc } { incr i } {
+	set sub_arg [ lindex $args $i ]
+	case $sub_arg in {
+	    "*-*-*" {			# is a configuration triplet
+		if [istarget $sub_arg] {
+		    set kfail_flag 0
+		    set kfail_prms 0
+		}
+		continue
+	    }
+	}
+    }
+}
+
+#
 # Record that a test has passed or failed (perhaps unexpectedly)
 #
 # This is an internal procedure, only used in this file.
@@ -565,6 +624,7 @@ proc record_test { type message args } {
     global exit_status
     global prms_id bug_id
     global xfail_flag xfail_prms
+    global kfail_flag kfail_prms
     global errcnt warncnt
     global warning_threshold perror_threshold
     global pf_prefix
@@ -612,10 +672,23 @@ proc record_test { type message args } {
 		set message [concat $message "\t(PRMS $xfail_prms)"]
 	    }
 	}
+	KPASS {
+	    set exit_status 1
+	    if { $kfail_prms != 0 } {
+		set message [concat $message "\t(PRMS $kfail_prms)"]
+	    }
+	}
+	KFAIL {
+	    if { $kfail_prms != 0 } {
+		set message [concat $message "\t(PRMS: $kfail_prms)"]
+	    }
+	}
 	UNTESTED {
-	    # The only reason we look at the xfail stuff is to pick up
+	    # The only reason we look at the xfail/kfail stuff is to pick up
 	    # `xfail_prms'.
-	    if { $xfail_flag && $xfail_prms != 0 } {
+	    if { $kfail_flag && $kfail_prms != 0 } {
+		set message [concat $message "\t(PRMS $kfail_prms)"]
+	    } elseif { $xfail_flag && $xfail_prms != 0 } {
 		set message [concat $message "\t(PRMS $xfail_prms)"]
 	    } elseif $prms_id {
 		set message [concat $message "\t(PRMS $prms_id)"]
@@ -623,18 +696,22 @@ proc record_test { type message args } {
 	}
 	UNRESOLVED {
 	    set exit_status 1
-	    # The only reason we look at the xfail stuff is to pick up
+	    # The only reason we look at the xfail/kfail stuff is to pick up
 	    # `xfail_prms'.
-	    if { $xfail_flag && $xfail_prms != 0 } {
+	    if { $kfail_flag && $kfail_prms != 0 } {
+		set message [concat $message "\t(PRMS $kfail_prms)"]
+	    } elseif { $xfail_flag && $xfail_prms != 0 } {
 		set message [concat $message "\t(PRMS $xfail_prms)"]
 	    } elseif $prms_id {
 		set message [concat $message "\t(PRMS $prms_id)"]
 	    }
 	}
 	UNSUPPORTED {
-	    # The only reason we look at the xfail stuff is to pick up
+	    # The only reason we look at the xfail/kfail stuff is to pick up
 	    # `xfail_prms'.
-	    if { $xfail_flag && $xfail_prms != 0 } {
+	    if { $kfail_flag && $kfail_prms != 0 } {
+		set message [concat $message "\t(PRMS $kfail_prms)"]
+	    } elseif { $xfail_flag && $xfail_prms != 0 } {
 		set message [concat $message "\t(PRMS $xfail_prms)"]
 	    } elseif $prms_id {
 		set message [concat $message "\t(PRMS $prms_id)"]
@@ -675,14 +752,16 @@ proc record_test { type message args } {
     set warncnt 0
     set errcnt 0
     set xfail_flag 0
+    set kfail_flag 0
     set xfail_prms 0
+    set kfail_prms 0
 }
 
 #
 # Record that a test has passed
 #
 proc pass { message } {
-    global xfail_flag compiler_conditional_xfail_data
+    global xfail_flag kfail_flag compiler_conditional_xfail_data
 
     # if we have a conditional xfail setup, then see if our compiler flags match
     if [ info exists compiler_conditional_xfail_data ] {
@@ -692,7 +771,9 @@ proc pass { message } {
 	unset compiler_conditional_xfail_data
     }
     
-    if $xfail_flag {
+    if $kfail_flag {
+	record_test KPASS $message
+    } elseif $xfail_flag {
 	record_test XPASS $message
     } else {
 	record_test PASS $message
@@ -703,7 +784,7 @@ proc pass { message } {
 # Record that a test has failed
 #
 proc fail { message } {
-    global xfail_flag compiler_conditional_xfail_data
+    global xfail_flag kfail_flag compiler_conditional_xfail_data
 
     # if we have a conditional xfail setup, then see if our compiler flags match
     if [ info exists compiler_conditional_xfail_data ] {
@@ -713,7 +794,9 @@ proc fail { message } {
 	unset compiler_conditional_xfail_data
     }
 
-    if $xfail_flag {
+    if $kfail_flag {
+	record_test KFAIL $message
+    } elseif $xfail_flag {
 	record_test XFAIL $message
     } else {
 	record_test FAIL $message
@@ -721,17 +804,37 @@ proc fail { message } {
 }
 
 #
-# Record that a test has passed unexpectedly
+# Record that a test that was expected to fail has passed unexpectedly
 #
 proc xpass { message } {
     record_test XPASS $message
 }
 
 #
-# Record that a test has failed unexpectedly
+# Record that a test that was expected to fail did indeed fail
 #
 proc xfail { message } {
     record_test XFAIL $message
+}
+
+#
+# Record that a test for a known bug has passed unexpectedly
+#
+proc kpass { bugid message } {
+    global kfail_flag kfail_prms
+    set kfail_flag 1
+    set kfail_prms $bugid
+    record_test KPASS $message
+}
+
+#
+# Record that a test has failed due to a known bug
+#
+proc kfail { bugid message } {
+    global kfail_flag kfail_prms
+    set kfail_flag 1
+    set kfail_prms $bugid
+    record_test KFAIL $message
 }
 
 #
@@ -845,6 +948,8 @@ proc init_testcounts { } {
     set test_counts(FAIL,name) "unexpected failures"
     set test_counts(XFAIL,name) "expected failures"
     set test_counts(XPASS,name) "unexpected successes"
+    set test_counts(KFAIL,name) "known failures"
+    set test_counts(KPASS,name) "unknown successes"
     set test_counts(WARNING,name) "warnings"
     set test_counts(ERROR,name) "errors"
     set test_counts(UNSUPPORTED,name) "unsupported tests"

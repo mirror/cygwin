@@ -49,8 +49,10 @@ set psum_file   "latest"	;# file name of previous summary to diff against
 
 set exit_status	0		;# exit code returned by this program
 
-set xfail_flag  0
-set xfail_prms	0
+set xfail_flag  0		;# indicates that a failure is expected
+set xfail_prms	0		;# GNATS prms id number for this expected failure
+set kfail_flag  0		;# indicates that it is a known failure
+set kfail_prms	0		;# bug id for the description of the known failure 
 set sum_file	""		;# name of the file that contains the summary log
 set base_dir	""		;# the current working directory
 set logname     ""		;# the users login name

@@ -1,3 +1,7 @@
+2001-09-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.cache/cachemonkey.exp: Test more cache types.
+
 2001-09-25  Frank Ch. Eigler  <fche@redhat.com>
 
 	* lib/monkey.exp (do_one_test): Set a short timeout.

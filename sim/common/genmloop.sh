@@ -1,5 +1,5 @@
 # Generate the main loop of the simulator.
-# Copyright (C) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 # Contributed by Cygnus Support.
 #
 # This file is part of the GNU simulators.
@@ -85,12 +85,24 @@
 #
 # -parallel-read: support parallel execution with read-before-exec support.
 # -parallel-write: support parallel execution with write-after-exec support.
+# -parallel-generic-write: support parallel execution with generic queued
+#       writes.
 #
 #	One of these options is specified in addition to -simple, -scache,
 #	-pbb.  Note that while the code can determine if the cpu supports
 #	parallel execution with HAVE_PARALLEL_INSNS [and thus this option is
 #	technically unnecessary], having this option cuts down on the clutter
 #	in the result.
+#
+# -parallel-only: semantic code only supports parallel version of insn
+#
+#	Semantic code only supports parallel versions of each insn.
+#	Things can be sped up by generating both serial and parallel versions
+#	and is better suited to mixed parallel architectures like the m32r.
+#
+# -prefix: string to prepend to function names in mloop.c/eng.h.
+#
+#       If no prefix is specified, the cpu type is used.
 #
 # -switch file: specify file containing semantics implemented as a switch()
 #
@@ -101,6 +113,10 @@
 # -infile <input-file>
 #
 #	Specify the mainloop.in input file.
+#
+# -outfile-suffix <output-file-suffix>
+#
+#	Specify the suffix to append to output files.
 #
 # Only one of -scache/-pbb may be selected.
 # -simple is the default.
@@ -116,9 +132,12 @@ type=mono
 #full_switch=
 #pbb=
 parallel=no
+parallel_only=no
 switch=
 cpu="unknown"
 infile=""
+prefix="unknown"
+outsuffix=""
 
 while test $# -gt 0
 do
@@ -132,8 +151,12 @@ do
 	-scache) scache=yes ;;
 	-pbb) pbb=yes ;;
 	-no-parallel) ;;
+	-outfile-suffix) shift ; outsuffix=$1 ;;
 	-parallel-read) parallel=read ;;
 	-parallel-write) parallel=write ;;
+	-parallel-generic-write) parallel=genwrite ;;
+	-parallel-only) parallel_only=yes ;;
+	-prefix) shift ; prefix=$1 ;;
 	-switch) shift ; switch=$1 ;;
 	-cpu) shift ; cpu=$1 ;;
 	-infile) shift ; infile=$1 ;;
@@ -159,14 +182,19 @@ if [ "x$infile" = x ] ; then
     exit 1
 fi
 
+if [ "x$prefix" = xunknown ] ; then
+    prefix=$cpu
+fi
+
 lowercase='abcdefghijklmnopqrstuvwxyz'
 uppercase='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 CPU=`echo ${cpu} | tr "${lowercase}" "${uppercase}"`
+PREFIX=`echo ${prefix} | tr "${lowercase}" "${uppercase}"`
 
 ##########################################################################
 
-rm -f eng.hin
-exec 1>eng.hin
+rm -f eng${outsuffix}.hin
+exec 1>eng${outsuffix}.hin
 
 echo "/* engine configuration for ${cpu} */"
 echo ""
@@ -180,31 +208,45 @@ else
 fi
 
 echo ""
-echo "/* WITH_SCACHE_PBB_${CPU}: non-zero if the pbb engine was selected.  */"
+echo "/* WITH_SCACHE_PBB_${PREFIX}: non-zero if the pbb engine was selected.  */"
 if [ x$pbb = xyes ] ; then
-	echo "#define WITH_SCACHE_PBB_${CPU} 1"
+	echo "#define WITH_SCACHE_PBB_${PREFIX} 1"
 else
-	echo "#define WITH_SCACHE_PBB_${CPU} 0"
+	echo "#define WITH_SCACHE_PBB_${PREFIX} 0"
 fi
 
 echo ""
 echo "/* HAVE_PARALLEL_INSNS: non-zero if cpu can parallelly execute > 1 insn.  */"
-if [ x$parallel != xno ] ; then
-	echo "#define HAVE_PARALLEL_INSNS 1"
-	if [ x$parallel = xread ] ; then
-	    echo "/* Parallel execution is supported by read-before-exec.  */"
-	    echo "#define WITH_PARALLEL_READ 1"
-	    echo "#define WITH_PARALLEL_WRITE 0"
-	else
-	    echo "/* Parallel execution is supported by write-after-exec.  */"
-	    echo "#define WITH_PARALLEL_READ 0"
-	    echo "#define WITH_PARALLEL_WRITE 1"
-	fi
-else
-	echo "#define HAVE_PARALLEL_INSNS 0"
-	echo "#define WITH_PARALLEL_READ 0"
-	echo "#define WITH_PARALLEL_WRITE 0"
-fi
+# blah blah blah, other ways to do this, blah blah blah
+case x$parallel in
+xno)
+    echo "#define HAVE_PARALLEL_INSNS 0"
+    echo "#define WITH_PARALLEL_READ 0"
+    echo "#define WITH_PARALLEL_WRITE 0"
+    echo "#define WITH_PARALLEL_GENWRITE 0"
+    ;;
+xread)
+    echo "#define HAVE_PARALLEL_INSNS 1"
+    echo "/* Parallel execution is supported by read-before-exec.  */"
+    echo "#define WITH_PARALLEL_READ 1"
+    echo "#define WITH_PARALLEL_WRITE 0"
+    echo "#define WITH_PARALLEL_GENWRITE 0"
+    ;;
+xwrite)
+    echo "#define HAVE_PARALLEL_INSNS 1"
+    echo "/* Parallel execution is supported by write-after-exec.  */"
+    echo "#define WITH_PARALLEL_READ 0"
+    echo "#define WITH_PARALLEL_WRITE 1"
+    echo "#define WITH_PARALLEL_GENWRITE 0"
+    ;;
+xgenwrite)
+    echo "#define HAVE_PARALLEL_INSNS 1"
+    echo "/* Parallel execution is supported by generic write-after-exec.  */"
+    echo "#define WITH_PARALLEL_READ 0"
+    echo "#define WITH_PARALLEL_WRITE 0"
+    echo "#define WITH_PARALLEL_GENWRITE 1"
+    ;;
+esac
 
 if [ "x$switch" != x ] ; then
 	echo ""
@@ -231,22 +273,22 @@ echo ""
 echo "/* Functions defined in the generated mainloop.c file"
 echo "   (which doesn't necessarily have that file name).  */"
 echo ""
-echo "extern ENGINE_FN ${cpu}_engine_run_full;"
-echo "extern ENGINE_FN ${cpu}_engine_run_fast;"
+echo "extern ENGINE_FN ${prefix}_engine_run_full;"
+echo "extern ENGINE_FN ${prefix}_engine_run_fast;"
 
 if [ x$pbb = xyes ] ; then
 	echo ""
-	echo "extern SEM_PC ${cpu}_pbb_begin (SIM_CPU *, int);"
-	echo "extern SEM_PC ${cpu}_pbb_chain (SIM_CPU *, SEM_ARG);"
-	echo "extern SEM_PC ${cpu}_pbb_cti_chain (SIM_CPU *, SEM_ARG, SEM_PC *, PCADDR);"
-	echo "extern void ${cpu}_pbb_before (SIM_CPU *, SCACHE *);"
-	echo "extern void ${cpu}_pbb_after (SIM_CPU *, SCACHE *);"
+	echo "extern SEM_PC ${prefix}_pbb_begin (SIM_CPU *, int);"
+	echo "extern SEM_PC ${prefix}_pbb_chain (SIM_CPU *, SEM_ARG);"
+	echo "extern SEM_PC ${prefix}_pbb_cti_chain (SIM_CPU *, SEM_ARG, SEM_BRANCH_TYPE, PCADDR);"
+	echo "extern void ${prefix}_pbb_before (SIM_CPU *, SCACHE *);"
+	echo "extern void ${prefix}_pbb_after (SIM_CPU *, SCACHE *);"
 fi
 
 ##########################################################################
 
-rm -f tmp-mloop.cin mloop.cin
-exec 1>tmp-mloop.cin
+rm -f tmp-mloop-$$.cin mloop${outsuffix}.cin
+exec 1>tmp-mloop-$$.cin
 
 # We use @cpu@ instead of ${cpu} because we still need to run sed to handle
 # transformation of @cpu@ for mainloop.in, so there's no need to use ${cpu}
@@ -271,7 +313,7 @@ cat << EOF
    virtual and real.  */
 
 static INLINE void
-@cpu@_fill_argbuf (const SIM_CPU *cpu, ARGBUF *abuf, const IDESC *idesc,
+@prefix@_fill_argbuf (const SIM_CPU *cpu, ARGBUF *abuf, const IDESC *idesc,
 		    PCADDR pc, int fast_p)
 {
 #if WITH_SCACHE
@@ -284,7 +326,7 @@ static INLINE void
 /* Fill in tracing/profiling fields of an ARGBUF.  */
 
 static INLINE void
-@cpu@_fill_argbuf_tp (const SIM_CPU *cpu, ARGBUF *abuf,
+@prefix@_fill_argbuf_tp (const SIM_CPU *cpu, ARGBUF *abuf,
 		       int trace_p, int profile_p)
 {
   ARGBUF_TRACE_P (abuf) = trace_p;
@@ -299,13 +341,13 @@ static INLINE void
    of parallel insns.  */
 
 static INLINE void
-@cpu@_emit_before (SIM_CPU *current_cpu, SCACHE *sc, PCADDR pc, int first_p)
+@prefix@_emit_before (SIM_CPU *current_cpu, SCACHE *sc, PCADDR pc, int first_p)
 {
   ARGBUF *abuf = &sc[0].argbuf;
-  const IDESC *id = & CPU_IDESC (current_cpu) [@CPU@_INSN_X_BEFORE];
+  const IDESC *id = & CPU_IDESC (current_cpu) [@PREFIX@_INSN_X_BEFORE];
 
   abuf->fields.before.first_p = first_p;
-  @cpu@_fill_argbuf (current_cpu, abuf, id, pc, 0);
+  @prefix@_fill_argbuf (current_cpu, abuf, id, pc, 0);
   /* no need to set trace_p,profile_p */
 }
 
@@ -314,12 +356,12 @@ static INLINE void
    parallel insns.  */
 
 static INLINE void
-@cpu@_emit_after (SIM_CPU *current_cpu, SCACHE *sc, PCADDR pc)
+@prefix@_emit_after (SIM_CPU *current_cpu, SCACHE *sc, PCADDR pc)
 {
   ARGBUF *abuf = &sc[0].argbuf;
-  const IDESC *id = & CPU_IDESC (current_cpu) [@CPU@_INSN_X_AFTER];
+  const IDESC *id = & CPU_IDESC (current_cpu) [@PREFIX@_INSN_X_AFTER];
 
-  @cpu@_fill_argbuf (current_cpu, abuf, id, pc, 0);
+  @prefix@_fill_argbuf (current_cpu, abuf, id, pc, 0);
   /* no need to set trace_p,profile_p */
 }
 
@@ -348,7 +390,7 @@ if [ x$scache != xyes -a x$pbb != xyes ] ; then
 #define FAST_P 0
 
 void
-@cpu@_engine_run_full (SIM_CPU *current_cpu)
+@prefix@_engine_run_full (SIM_CPU *current_cpu)
 {
 #define FAST_P 0
   SIM_DESC current_state = CPU_STATE (current_cpu);
@@ -360,22 +402,24 @@ void
 
 EOF
 
-if [ x$parallel != xno ] ; then
-  cat << EOF
+case x$parallel in
+xread | xwrite)
+    cat << EOF
   PAREXEC pbufs[MAX_PARALLEL_INSNS];
   PAREXEC *par_exec;
 
 EOF
-fi
+    ;;
+esac
 
 # Any initialization code before looping starts.
 # Note that this code may declare some locals.
 ${SHELL} $infile init
 
-if [ x$parallel != xno ] ; then
+if [ x$parallel = xread ] ; then
   cat << EOF
 
-#if defined (HAVE_PARALLEL_EXEC) && defined (__GNUC__)
+#if defined (__GNUC__)
   {
     if (! CPU_IDESC_READ_INIT_P (current_cpu))
       {
@@ -392,17 +436,19 @@ fi
 
 cat << EOF
 
-#if WITH_SEM_SWITCH_FULL && defined (__GNUC__)
-  {
-    if (! CPU_IDESC_SEM_INIT_P (current_cpu))
-      {
+  if (! CPU_IDESC_SEM_INIT_P (current_cpu))
+    {
+#if WITH_SEM_SWITCH_FULL
+#if defined (__GNUC__)
 /* ??? Later maybe paste sem-switch.c in when building mainloop.c.  */
 #define DEFINE_LABELS
 #include "$switch"
-	CPU_IDESC_SEM_INIT_P (current_cpu) = 1;
-      }
-  }
 #endif
+#else
+      @prefix@_sem_init_idesc_table (current_cpu);
+#endif
+      CPU_IDESC_SEM_INIT_P (current_cpu) = 1;
+    }
 
   do
     {
@@ -446,14 +492,15 @@ fi # simple engine
 
 ##########################################################################
 
-# Scache engine: lookup insn in scache, fetch if missing, then execute it.
+# Non-parallel scache engine: lookup insn in scache, fetch if missing,
+# then execute it.
 
-if [ x$scache = xyes ] ; then
+if [ x$scache = xyes -a x$parallel = xno ] ; then
 
     cat << EOF
 
 static INLINE SCACHE *
-@cpu@_scache_lookup (SIM_CPU *current_cpu, PCADDR vpc, SCACHE *scache,
+@prefix@_scache_lookup (SIM_CPU *current_cpu, PCADDR vpc, SCACHE *scache,
                      unsigned int hash_mask, int FAST_P)
 {
   /* First step: look up current insn in hash table.  */
@@ -463,9 +510,7 @@ static INLINE SCACHE *
      fetch and decode the instruction.  */
   if (sc->argbuf.addr != vpc)
     {
-      insn_t insn;
-
-      if (FAST_P)
+      if (! FAST_P)
 	PROFILE_COUNT_SCACHE_MISS (current_cpu);
 
 /* begin extract-scache */
@@ -476,7 +521,7 @@ ${SHELL} $infile extract-scache
 cat << EOF
 /* end extract-scache */
     }
-  else if (FAST_P)
+  else if (! FAST_P)
     {
       PROFILE_COUNT_SCACHE_HIT (current_cpu);
       /* Make core access statistics come out right.
@@ -490,7 +535,7 @@ cat << EOF
 #define FAST_P 0
 
 void
-@cpu@_engine_run_full (SIM_CPU *current_cpu)
+@prefix@_engine_run_full (SIM_CPU *current_cpu)
 {
   SIM_DESC current_state = CPU_STATE (current_cpu);
   SCACHE *scache = CPU_SCACHE_CACHE (current_cpu);
@@ -499,37 +544,19 @@ void
 
 EOF
 
-if [ x$parallel != xno ] ; then
-  cat << EOF
-  PAREXEC pbufs[MAX_PARALLEL_INSNS];
-  PAREXEC *par_exec;
-
-EOF
-fi
-
 # Any initialization code before looping starts.
 # Note that this code may declare some locals.
 ${SHELL} $infile init
 
-if [ x$parallel != xno ] ; then
-  cat << EOF
-
-#if defined (HAVE_PARALLEL_EXEC) && defined (__GNUC__)
-  {
-    if (! CPU_IDESC_READ_INIT_P (current_cpu))
-      {
-/* ??? Later maybe paste read.c in when building mainloop.c.  */
-#define DEFINE_LABELS
-#include "readx.c"
-	CPU_IDESC_READ_INIT_P (current_cpu) = 1;
-      }
-  }
-#endif
-
-EOF
-fi
-
 cat << EOF
+
+  if (! CPU_IDESC_SEM_INIT_P (current_cpu))
+    {
+#if ! WITH_SEM_SWITCH_FULL
+      @prefix@_sem_init_idesc_table (current_cpu);
+#endif
+      CPU_IDESC_SEM_INIT_P (current_cpu) = 1;
+    }
 
   vpc = GET_H_PC ();
 
@@ -537,7 +564,7 @@ cat << EOF
     {
       SCACHE *sc;
 
-      sc = @cpu@_scache_lookup (current_cpu, vpc, scache, hash_mask, FAST_P);
+      sc = @prefix@_scache_lookup (current_cpu, vpc, scache, hash_mask, FAST_P);
 
 /* begin full-exec-scache */
 EOF
@@ -560,7 +587,7 @@ EOF
 
 ####################################
 
-# Scache engine: fast version.
+# Non-parallel scache engine: fast version.
 
 if [ x$fast = xyes ] ; then
 
@@ -569,7 +596,7 @@ if [ x$fast = xyes ] ; then
 #define FAST_P 1
 
 void
-@cpu@_engine_run_fast (SIM_CPU *current_cpu)
+@prefix@_engine_run_fast (SIM_CPU *current_cpu)
 {
   SIM_DESC current_state = CPU_STATE (current_cpu);
   SCACHE *scache = CPU_SCACHE_CACHE (current_cpu);
@@ -578,49 +605,25 @@ void
 
 EOF
 
-if [ x$parallel != xno ] ; then
-  cat << EOF
-  PAREXEC pbufs[MAX_PARALLEL_INSNS];
-  PAREXEC *par_exec;
-
-EOF
-fi
-
 # Any initialization code before looping starts.
 # Note that this code may declare some locals.
 ${SHELL} $infile init
 
-if [ x$parallel != xno ] ; then
-  cat << EOF
-
-#if defined (HAVE_PARALLEL_EXEC) && defined (__GNUC__)
-  {
-    if (! CPU_IDESC_READ_INIT_P (current_cpu))
-      {
-/* ??? Later maybe paste read.c in when building mainloop.c.  */
-#define DEFINE_LABELS
-#include "readx.c"
-	CPU_IDESC_READ_INIT_P (current_cpu) = 1;
-      }
-  }
-#endif
-
-EOF
-fi # parallel != no
-
 cat << EOF
 
-#if WITH_SEM_SWITCH_FAST && defined (__GNUC__)
-  {
-    if (! CPU_IDESC_SEM_INIT_P (current_cpu))
-      {
+  if (! CPU_IDESC_SEM_INIT_P (current_cpu))
+    {
+#if WITH_SEM_SWITCH_FAST
+#if defined (__GNUC__)
 /* ??? Later maybe paste sem-switch.c in when building mainloop.c.  */
 #define DEFINE_LABELS
 #include "$switch"
-	CPU_IDESC_SEM_INIT_P (current_cpu) = 1;
-      }
-  }
 #endif
+#else
+      @prefix@_semf_init_idesc_table (current_cpu);
+#endif
+      CPU_IDESC_SEM_INIT_P (current_cpu) = 1;
+    }
 
   vpc = GET_H_PC ();
 
@@ -628,7 +631,7 @@ cat << EOF
     {
       SCACHE *sc;
 
-      sc = @cpu@_scache_lookup (current_cpu, vpc, scache, hash_mask, FAST_P);
+      sc = @prefix@_scache_lookup (current_cpu, vpc, scache, hash_mask, FAST_P);
 
 /* begin fast-exec-scache */
 EOF
@@ -651,7 +654,197 @@ EOF
 
 fi # -fast
 
-fi # -scache
+fi # -scache && ! parallel
+
+##########################################################################
+
+# Parallel scache engine: lookup insn in scache, fetch if missing,
+# then execute it.
+# For the parallel case we give the target more flexibility.
+
+if [ x$scache = xyes -a x$parallel != xno ] ; then
+
+    cat << EOF
+
+static INLINE SCACHE *
+@prefix@_scache_lookup (SIM_CPU *current_cpu, PCADDR vpc, SCACHE *scache,
+                     unsigned int hash_mask, int FAST_P)
+{
+  /* First step: look up current insn in hash table.  */
+  SCACHE *sc = scache + SCACHE_HASH_PC (vpc, hash_mask);
+
+  /* If the entry isn't the one we want (cache miss),
+     fetch and decode the instruction.  */
+  if (sc->argbuf.addr != vpc)
+    {
+      if (! FAST_P)
+	PROFILE_COUNT_SCACHE_MISS (current_cpu);
+
+#define SET_LAST_INSN_P(last_p) do { sc->last_insn_p = (last_p); } while (0)
+/* begin extract-scache */
+EOF
+
+${SHELL} $infile extract-scache
+
+cat << EOF
+/* end extract-scache */
+#undef SET_LAST_INSN_P
+    }
+  else if (! FAST_P)
+    {
+      PROFILE_COUNT_SCACHE_HIT (current_cpu);
+      /* Make core access statistics come out right.
+	 The size is a guess, but it's currently not used either.  */
+      PROFILE_COUNT_CORE (current_cpu, vpc, 2, exec_map);
+    }
+
+  return sc;
+}
+
+#define FAST_P 0
+
+void
+@prefix@_engine_run_full (SIM_CPU *current_cpu)
+{
+  SIM_DESC current_state = CPU_STATE (current_cpu);
+  SCACHE *scache = CPU_SCACHE_CACHE (current_cpu);
+  unsigned int hash_mask = CPU_SCACHE_HASH_MASK (current_cpu);
+  SEM_PC vpc;
+
+EOF
+
+# Any initialization code before looping starts.
+# Note that this code may declare some locals.
+${SHELL} $infile init
+
+if [ x$parallel = xread ] ; then
+cat << EOF
+#if defined (__GNUC__)
+  {
+    if (! CPU_IDESC_READ_INIT_P (current_cpu))
+      {
+/* ??? Later maybe paste read.c in when building mainloop.c.  */
+#define DEFINE_LABELS
+#include "readx.c"
+	CPU_IDESC_READ_INIT_P (current_cpu) = 1;
+      }
+  }
+#endif
+
+EOF
+fi
+
+cat << EOF
+
+  if (! CPU_IDESC_SEM_INIT_P (current_cpu))
+    {
+#if ! WITH_SEM_SWITCH_FULL
+      @prefix@_sem_init_idesc_table (current_cpu);
+#endif
+      CPU_IDESC_SEM_INIT_P (current_cpu) = 1;
+    }
+
+  vpc = GET_H_PC ();
+
+  do
+    {
+/* begin full-exec-scache */
+EOF
+
+${SHELL} $infile full-exec-scache
+
+cat << EOF
+/* end full-exec-scache */
+    }
+  while (0 /*CPU_RUNNING_P (current_cpu)*/);
+}
+
+#undef FAST_P
+
+EOF
+
+####################################
+
+# Parallel scache engine: fast version.
+
+if [ x$fast = xyes ] ; then
+
+    cat << EOF
+
+#define FAST_P 1
+
+void
+@prefix@_engine_run_fast (SIM_CPU *current_cpu)
+{
+  SIM_DESC current_state = CPU_STATE (current_cpu);
+  SCACHE *scache = CPU_SCACHE_CACHE (current_cpu);
+  unsigned int hash_mask = CPU_SCACHE_HASH_MASK (current_cpu);
+  SEM_PC vpc;
+  PAREXEC pbufs[MAX_PARALLEL_INSNS];
+  PAREXEC *par_exec;
+
+EOF
+
+# Any initialization code before looping starts.
+# Note that this code may declare some locals.
+${SHELL} $infile init
+
+if [ x$parallel = xread ] ; then
+cat << EOF
+
+#if defined (__GNUC__)
+  {
+    if (! CPU_IDESC_READ_INIT_P (current_cpu))
+      {
+/* ??? Later maybe paste read.c in when building mainloop.c.  */
+#define DEFINE_LABELS
+#include "readx.c"
+	CPU_IDESC_READ_INIT_P (current_cpu) = 1;
+      }
+  }
+#endif
+
+EOF
+fi
+
+cat << EOF
+
+  if (! CPU_IDESC_SEM_INIT_P (current_cpu))
+    {
+#if WITH_SEM_SWITCH_FAST
+#if defined (__GNUC__)
+/* ??? Later maybe paste sem-switch.c in when building mainloop.c.  */
+#define DEFINE_LABELS
+#include "$switch"
+#endif
+#else
+      @prefix@_semf_init_idesc_table (current_cpu);
+#endif
+      CPU_IDESC_SEM_INIT_P (current_cpu) = 1;
+    }
+
+  vpc = GET_H_PC ();
+
+  do
+    {
+/* begin fast-exec-scache */
+EOF
+
+${SHELL} $infile fast-exec-scache
+
+cat << EOF
+/* end fast-exec-scache */
+    }
+  while (0 /*CPU_RUNNING_P (current_cpu)*/);
+}
+
+#undef FAST_P
+
+EOF
+
+fi # -fast
+
+fi # -scache && parallel
 
 ##########################################################################
 
@@ -674,7 +867,7 @@ if [ x$pbb = xyes ] ; then
    FAST_P is non-zero if no tracing/profiling/etc. is wanted.  */
 
 INLINE SEM_PC
-@cpu@_pbb_begin (SIM_CPU *current_cpu, int FAST_P)
+@prefix@_pbb_begin (SIM_CPU *current_cpu, int FAST_P)
 {
   SEM_PC new_vpc;
   PCADDR pc;
@@ -757,21 +950,23 @@ cat << EOF
 	/* Was pbb terminated by a cti?  */
 	if (_cti_sc)
 	  {
-	    id = & CPU_IDESC (current_cpu) [@CPU@_INSN_X_CTI_CHAIN];
+	    id = & CPU_IDESC (current_cpu) [@PREFIX@_INSN_X_CTI_CHAIN];
 	  }
 	else
 	  {
-	    id = & CPU_IDESC (current_cpu) [@CPU@_INSN_X_CHAIN];
+	    id = & CPU_IDESC (current_cpu) [@PREFIX@_INSN_X_CHAIN];
 	  }
 	SEM_SET_CODE (&sc->argbuf, id, FAST_P);
 	sc->argbuf.idesc = id;
 	sc->argbuf.addr = pc;
 	sc->argbuf.fields.chain.insn_count = _insn_count;
 	sc->argbuf.fields.chain.next = 0;
+	sc->argbuf.fields.chain.branch_target = 0;
 	++sc;
       }
 
-      /* Update the pointer to the next free entry.  */
+      /* Update the pointer to the next free entry, may not have used as
+	 many entries as was asked for.  */
       CPU_SCACHE_NEXT_FREE (current_cpu) = sc;
       /* Record length of chain if profiling.
 	 This includes virtual insns since they count against
@@ -786,7 +981,7 @@ cat << EOF
 /* Chain to the next block from a non-cti terminated previous block.  */
 
 INLINE SEM_PC
-@cpu@_pbb_chain (SIM_CPU *current_cpu, SEM_ARG sem_arg)
+@prefix@_pbb_chain (SIM_CPU *current_cpu, SEM_ARG sem_arg)
 {
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
 
@@ -818,16 +1013,16 @@ INLINE SEM_PC
 }
 
 /* Chain to the next block from a cti terminated previous block.
-   NEW_VPC_PTR is one of SEM_BRANCH_UNTAKEN, SEM_BRANCH_UNCACHEABLE, or
-   a pointer to a location containing the SEM_PC of the branch's address.
+   BR_TYPE indicates whether the branch was taken and whether we can cache
+   the vpc of the branch target.
    NEW_PC is the target's branch address, and is only valid if
-   NEW_VPC_PTR != SEM_BRANCH_UNTAKEN.  */
+   BR_TYPE != SEM_BRANCH_UNTAKEN.  */
 
 INLINE SEM_PC
-@cpu@_pbb_cti_chain (SIM_CPU *current_cpu, SEM_ARG sem_arg,
-		     SEM_PC *new_vpc_ptr, PCADDR new_pc)
+@prefix@_pbb_cti_chain (SIM_CPU *current_cpu, SEM_ARG sem_arg,
+		     SEM_BRANCH_TYPE br_type, PCADDR new_pc)
 {
-  ARGBUF *abuf;
+  SEM_PC *new_vpc_ptr;
 
   PBB_UPDATE_INSN_COUNT (current_cpu, sem_arg);
 
@@ -844,7 +1039,7 @@ INLINE SEM_PC
 
   /* Restart compiler if we branched to an uncacheable address
      (e.g. "j reg").  */
-  if (new_vpc_ptr == SEM_BRANCH_UNCACHEABLE)
+  if (br_type == SEM_BRANCH_UNCACHEABLE)
     {
       SET_H_PC (new_pc);
       return CPU_SCACHE_PBB_BEGIN (current_cpu);
@@ -852,22 +1047,25 @@ INLINE SEM_PC
 
   /* If branch wasn't taken, update the pc and set BR_ADDR_PTR to our
      next chain ptr.  */
-  if (new_vpc_ptr == SEM_BRANCH_UNTAKEN)
+  if (br_type == SEM_BRANCH_UNTAKEN)
     {
-      abuf = SEM_ARGBUF (sem_arg);
-      SET_H_PC (abuf->addr);
+      ARGBUF *abuf = SEM_ARGBUF (sem_arg);
+      new_pc = abuf->addr;
+      SET_H_PC (new_pc);
       new_vpc_ptr = &abuf->fields.chain.next;
     }
   else
     {
+      ARGBUF *abuf = SEM_ARGBUF (sem_arg);
       SET_H_PC (new_pc);
+      new_vpc_ptr = &abuf->fields.chain.branch_target;
     }
 
   /* If chained to next block, go straight to it.  */
   if (*new_vpc_ptr)
     return *new_vpc_ptr;
   /* See if next block has already been compiled.  */
-  *new_vpc_ptr = scache_lookup (current_cpu, GET_H_PC ());
+  *new_vpc_ptr = scache_lookup (current_cpu, new_pc);
   if (*new_vpc_ptr)
     return *new_vpc_ptr;
   /* Nope, so next insn is a virtual insn to invoke the compiler
@@ -879,7 +1077,7 @@ INLINE SEM_PC
    This is called before each insn.  */
 
 void
-@cpu@_pbb_before (SIM_CPU *current_cpu, SCACHE *sc)
+@prefix@_pbb_before (SIM_CPU *current_cpu, SCACHE *sc)
 {
   SEM_ARG sem_arg = sc;
   const ARGBUF *abuf = SEM_ARGBUF (sem_arg);
@@ -906,7 +1104,7 @@ void
 	  if (ARGBUF_PROFILE_P (prev_abuf))
 	    {
 	      cycles = (*prev_idesc->timing->model_fn) (current_cpu, prev_sem_arg);
-	      @cpu@_model_insn_after (current_cpu, 0 /*last_p*/, cycles);
+	      @prefix@_model_insn_after (current_cpu, 0 /*last_p*/, cycles);
 	    }
 	}
 
@@ -916,7 +1114,7 @@ void
   /* FIXME: Later make cover macros: PROFILE_INSN_{INIT,FINI}.  */
   if (PROFILE_MODEL_P (current_cpu)
       && ARGBUF_PROFILE_P (cur_abuf))
-    @cpu@_model_insn_before (current_cpu, first_p);
+    @prefix@_model_insn_before (current_cpu, first_p);
 
   TRACE_INSN_INIT (current_cpu, cur_abuf, first_p);
   TRACE_INSN (current_cpu, cur_idesc->idata, cur_abuf, pc);
@@ -927,7 +1125,7 @@ void
    insns.  */
 
 void
-@cpu@_pbb_after (SIM_CPU *current_cpu, SCACHE *sc)
+@prefix@_pbb_after (SIM_CPU *current_cpu, SCACHE *sc)
 {
   SEM_ARG sem_arg = sc;
   const ARGBUF *abuf = SEM_ARGBUF (sem_arg);
@@ -942,7 +1140,7 @@ void
       int cycles;
 
       cycles = (*prev_idesc->timing->model_fn) (current_cpu, prev_sem_arg);
-      @cpu@_model_insn_after (current_cpu, 1 /*last_p*/, cycles);
+      @prefix@_model_insn_after (current_cpu, 1 /*last_p*/, cycles);
     }
   TRACE_INSN_FINI (current_cpu, prev_abuf, 1 /*last_p*/);
 }
@@ -950,7 +1148,7 @@ void
 #define FAST_P 0
 
 void
-@cpu@_engine_run_full (SIM_CPU *current_cpu)
+@prefix@_engine_run_full (SIM_CPU *current_cpu)
 {
   SIM_DESC current_state = CPU_STATE (current_cpu);
   SCACHE *scache = CPU_SCACHE_CACHE (current_cpu);
@@ -958,19 +1156,21 @@ void
   SEM_PC vpc;
 #if WITH_SEM_SWITCH_FULL
   /* For communication between cti's and cti-chain.  */
+  SEM_BRANCH_TYPE pbb_br_type;
   PCADDR pbb_br_npc;
-  SEM_PC *pbb_br_npc_ptr;
 #endif
 
 EOF
 
-if [ x$parallel != xno ] ; then
-  cat << EOF
+case x$parallel in
+xread | xwrite)
+    cat << EOF
   PAREXEC pbufs[MAX_PARALLEL_INSNS];
   PAREXEC *par_exec = &pbufs[0];
 
 EOF
-fi
+    ;;
+esac
 
 # Any initialization code before looping starts.
 # Note that this code may declare some locals.
@@ -986,17 +1186,21 @@ cat << EOF
 	 a pbb).  And in the "let's run until we're done" case we don't return
 	 until the program exits.  */
 
-#if WITH_SEM_SWITCH_FULL && defined (__GNUC__)
+#if WITH_SEM_SWITCH_FULL
+#if defined (__GNUC__)
 /* ??? Later maybe paste sem-switch.c in when building mainloop.c.  */
 #define DEFINE_LABELS
 #include "$switch"
+#endif
+#else
+      @prefix@_sem_init_idesc_table (current_cpu);
 #endif
 
       /* Initialize the "begin (compile) a pbb" virtual insn.  */
       vpc = CPU_SCACHE_PBB_BEGIN (current_cpu);
       SEM_SET_FULL_CODE (SEM_ARGBUF (vpc),
-			 & CPU_IDESC (current_cpu) [@CPU@_INSN_X_BEGIN]);
-      vpc->argbuf.idesc = & CPU_IDESC (current_cpu) [@CPU@_INSN_X_BEGIN];
+			 & CPU_IDESC (current_cpu) [@PREFIX@_INSN_X_BEGIN]);
+      vpc->argbuf.idesc = & CPU_IDESC (current_cpu) [@PREFIX@_INSN_X_BEGIN];
 
       CPU_IDESC_SEM_INIT_P (current_cpu) = 1;
     }
@@ -1006,7 +1210,7 @@ cat << EOF
      pbb we don't want to call pbb_begin each time (which hashes on the pc
      and does a table lookup).  A way to speed this up is to save vpc
      between calls.  */
-  vpc = @cpu@_pbb_begin (current_cpu, FAST_P);
+  vpc = @prefix@_pbb_begin (current_cpu, FAST_P);
 
   do
     {
@@ -1036,7 +1240,7 @@ if [ x$fast = xyes ] ; then
 #define FAST_P 1
 
 void
-@cpu@_engine_run_fast (SIM_CPU *current_cpu)
+@prefix@_engine_run_fast (SIM_CPU *current_cpu)
 {
   SIM_DESC current_state = CPU_STATE (current_cpu);
   SCACHE *scache = CPU_SCACHE_CACHE (current_cpu);
@@ -1044,19 +1248,21 @@ void
   SEM_PC vpc;
 #if WITH_SEM_SWITCH_FAST
   /* For communication between cti's and cti-chain.  */
+  SEM_BRANCH_TYPE pbb_br_type;
   PCADDR pbb_br_npc;
-  SEM_PC *pbb_br_npc_ptr;
 #endif
 
 EOF
 
-if [ x$parallel != xno ] ; then
-  cat << EOF
+case x$parallel in
+xread | xwrite)
+    cat << EOF
   PAREXEC pbufs[MAX_PARALLEL_INSNS];
   PAREXEC *par_exec = &pbufs[0];
 
 EOF
-fi
+    ;;
+esac
 
 # Any initialization code before looping starts.
 # Note that this code may declare some locals.
@@ -1072,17 +1278,21 @@ cat << EOF
 	 a pbb).  And in the "let's run until we're done" case we don't return
 	 until the program exits.  */
 
-#if WITH_SEM_SWITCH_FAST && defined (__GNUC__)
+#if WITH_SEM_SWITCH_FAST
+#if defined (__GNUC__)
 /* ??? Later maybe paste sem-switch.c in when building mainloop.c.  */
 #define DEFINE_LABELS
 #include "$switch"
+#endif
+#else
+      @prefix@_semf_init_idesc_table (current_cpu);
 #endif
 
       /* Initialize the "begin (compile) a pbb" virtual insn.  */
       vpc = CPU_SCACHE_PBB_BEGIN (current_cpu);
       SEM_SET_FAST_CODE (SEM_ARGBUF (vpc),
-			 & CPU_IDESC (current_cpu) [@CPU@_INSN_X_BEGIN]);
-      vpc->argbuf.idesc = & CPU_IDESC (current_cpu) [@CPU@_INSN_X_BEGIN];
+			 & CPU_IDESC (current_cpu) [@PREFIX@_INSN_X_BEGIN]);
+      vpc->argbuf.idesc = & CPU_IDESC (current_cpu) [@PREFIX@_INSN_X_BEGIN];
 
       CPU_IDESC_SEM_INIT_P (current_cpu) = 1;
     }
@@ -1092,7 +1302,7 @@ cat << EOF
      pbb we don't want to call pbb_begin each time (which hashes on the pc
      and does a table lookup).  A way to speed this up is to save vpc
      between calls.  */
-  vpc = @cpu@_pbb_begin (current_cpu, FAST_P);
+  vpc = @prefix@_pbb_begin (current_cpu, FAST_P);
 
   do
     {
@@ -1114,9 +1324,11 @@ fi # -fast
 
 fi # -pbb
 
-# Process @cpu@,@CPU@ appearing in mainloop.in.
-sed -e "s/@cpu@/$cpu/g" -e "s/@CPU@/$CPU/g" < tmp-mloop.cin > mloop.cin
+# Expand @..@ macros appearing in tmp-mloop-{pid}.cin.
+sed \
+  -e "s/@cpu@/$cpu/g" -e "s/@CPU@/$CPU/g" \
+  -e "s/@prefix@/$prefix/g" -e "s/@PREFIX@/$PREFIX/g" < tmp-mloop-$$.cin > mloop${outsuffix}.cin
 rc=$?
-rm -f tmp-mloop.cin
+rm -f tmp-mloop-$$.cin
 
 exit $rc

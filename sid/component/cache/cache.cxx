@@ -21,6 +21,9 @@
 #include <string>
 #include <iostream>
 
+using std::cout;
+using std::endl;
+
 #include "cache.h"
 
 string line_sizes[] =

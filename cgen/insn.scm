@@ -707,34 +707,60 @@
 )
 
 
-; Filter out instructions whose ifield patterns are strict subsets of
-; another.  For decoding purpose, it is sufficient to consider the
-; more general cousin.
+; Filter out instructions whose ifield patterns are strict supersets of
+; another, keeping the less general cousin.  Used to resolve ambiguity
+; when there are no more bits to consider while decoding.
 
-(define (filter-harmlessly-ambiguous-insns insn-list)
-  (logit 3 "Filtering " (length insn-list) " instructions.\n")
+(define (filter-non-specialized-ambiguous-insns insn-list)
+  (logit 3 "Filtering " (length insn-list) " instructions for non specializations.\n")
   (find (lambda (insn)
 	  (let* ((i-mask (insn-base-mask insn))
 		 (i-mask-len (insn-base-mask-length insn))
 		 (i-value (insn-value insn))
-		 (superset-insn (find-first 
-				  (lambda (insn2) ; insn2: possible supermatch (fewer mask bits)
+		 (subset-insn (find-first 
+			       (lambda (insn2) ; insn2: possible submatch (more mask bits)
 				    (let ((i2-mask (insn-base-mask insn2))
 					  (i2-mask-len (insn-base-mask-length insn2))
 					  (i2-value (insn-value insn2)))
 				      (and (not (eq? insn insn2))
 					   (= i-mask-len i2-mask-len)
-					   (mask-superset? i2-mask i2-value i-mask i-value))))
+					   (mask-superset? i-mask i-value i2-mask i2-value))))
 				  insn-list))
-		 (keep? (not superset-insn)))
+		 (keep? (not subset-insn)))
 	    (if (not keep?) 
 		(logit 2
-		       "Instruction " (obj:name insn) " ambiguity-filtered by "
-		       (obj:name superset-insn) "\n"))
+		       "Instruction " (obj:name insn) " specialization-filtered by "
+		       (obj:name subset-insn) "\n"))
 	    keep?))
 	insn-list)
 )
 
+; Filter out instructions whose ifield patterns are identical.
+
+(define (filter-identical-ambiguous-insns insn-list)
+  (logit 3 "Filtering " (length insn-list) " instructions for identical variants.\n")
+  (let loop ((l insn-list) (result nil))
+    (cond ((null? l) (reverse! result))
+	  ((find-identical-insn (car l) (cdr l)) (loop (cdr l) result))
+	  (else (loop (cdr l) (cons (car l) result)))
+	  )
+    )
+)
+
+(define (find-identical-insn insn insn-list)
+  (let ((i-mask (insn-base-mask insn))
+	(i-mask-len (insn-base-mask-length insn))
+	(i-value (insn-value insn)))
+    (find-first 
+     (lambda (insn2)
+       (let ((i2-mask (insn-base-mask insn2))
+	     (i2-mask-len (insn-base-mask-length insn2))
+	     (i2-value (insn-value insn2)))
+	 (and (= i-mask-len i2-mask-len)
+	      (= i-mask i2-mask)
+	      (= i-value i2-value))))
+       insn-list))
+)
 
 ; Helper function for above: does (m1,v1) match a STRICT superset of (m2,v2) ?
 ;

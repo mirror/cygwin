@@ -222,7 +222,8 @@
 (define (-distinguishing-bit-population masks mask-lens values lsb0?)
   (let* ((max-length (apply max mask-lens))
 	 (0-population (make-vector max-length 0))
-	 (1-population (make-vector max-length 0)))
+	 (1-population (make-vector max-length 0))
+	 (num-insns (length masks)))
     ; Compute the 1- and 0-population vectors
     (for-each (lambda (mask len value)
 		(logit 5 " population count mask=" (number->hex mask) " len=" len "\n")
@@ -240,8 +241,25 @@
     (list->vector
      (map (lambda (p0 p1)
 	    (logit 4 p0 "/" p1 " ")
-	    ; (sqrt (+ p0 p1 (* p0 p1))) ; funny function - nice curve
-	    (sqrt (* p0 p1))) ; geometric mean
+	    ; The most useful bits for decoding are those with counts in both
+	    ; p0 and p1. These are the bits which distinguish one insn from
+	    ; another. Assign these bits a high value (greater than num-insns).
+	    ;
+	    ; The next most useful bits are those with counts in either p0
+	    ; or p1.  These bits represent specializations of other insns.
+	    ; Assign these bits a value between 0 and (num-insns - 1). Note that
+	    ; p0 + p1 is guaranteed to be <= num-insns. The value 0 is assigned
+	    ; to bits for which p0 or p1 is equal to num_insns. These are bits
+	    ; which are always 1 or always 0 in the ISA and are useless for
+	    ; decoding purposes.
+	    ;
+	    ; Bits with no count in either p0 or p1 are useless for decoding
+	    ; and should never be considered. Assigning these bits a value of
+	    ; 0 ensures this.
+	    (cond
+	     ((= (+ p0 p1) 0) 0)
+	     ((= (* p0 p1) 0) (- num-insns (+ p0 p1)))
+	     (else (+ num-insns (sqrt (* p0 p1))))))
 	  (vector->list 0-population) (vector->list 1-population))))
 )
 
@@ -302,10 +320,16 @@
 	       " picks=(" old-picks ") pop=(" remaining-population ")"
 	       " threshold=" count-threshold " new-picks=(" new-picks ")\n")
 	(cond 
+	 ; No point picking bits with population count of zero.  This leads to
+	 ; the generation of layers of subtables which resolve nothing.  Generating
+	 ; these tables can slow the build by several orders of magnitude.
+	 ((= 0 count-threshold)
+	  (logit 2 "-population-top-few: count-threshold is zero!\n")
+	  old-picks)
 	 ; No new matches?
 	 ((null? new-picks)
 	  (if (null? old-picks)
-	      (logit 1 "-population-top-few: No bits left to pick from!\n"))
+	      (logit 2 "-population-top-few: No bits left to pick from!\n"))
 	  old-picks)
 	 ; Way too many matches?
 	 ((> (+ (length new-picks) (length old-picks)) (+ size 3))
@@ -495,7 +519,7 @@
 (define -build-decode-table-entry-args #f)
 
 (define (-build-decode-table-entry insn-vec startbit decode-bitsize index index-list lsb0? invalid-insn)
-  (let ((slot (filter-harmlessly-ambiguous-insns (vector-ref insn-vec index))))
+  (let ((slot (vector-ref insn-vec index)))
     (logit 2 "Processing decode entry "
 	   (number->string index)
 	   " in "
@@ -553,42 +577,58 @@
 
 	; If bitnums is still nil there is an ambiguity.
 	(if (null? bitnums)
-
 	    (begin
-	      ; If all insns are marked as DECODE-SPLIT, don't warn.
-	      (if (not (all-true? (map (lambda (insn)
-					 (obj-has-attr? insn 'DECODE-SPLIT))
-				       slot)))
-		  (message "WARNING: Decoder ambiguity detected: "
-			   (string-drop1 ; drop leading comma
-			    (string-map (lambda (insn)
-					  (string-append ", " (obj:name insn)))
-					slot))
-			   "\n"))
-	      ; Things aren't entirely hopeless.  See if any ifield-assertion
-	      ; specs are present.
-	      ; FIXME: For now we assume that if they all have an
-	      ; ifield-assertion spec, then there is no ambiguity (it's left
-	      ; to the programmer to get it right).  This can be made more
-	      ; clever later.
-	      ; FIXME: May need to back up startbit if we've tried to read
-	      ; more of the instruction.
-	      (let ((assertions (map insn-ifield-assertion slot)))
-		(if (not (all-true? assertions))
-		    (begin
-		      ; Save arguments for debugging purposes.
-		      (set! -build-decode-table-entry-args
-			    (list insn-vec startbit decode-bitsize index index-list lsb0? invalid-insn))
-		      (error "Unable to resolve ambiguity (maybe need some ifield-assertion specs?)")))
-		; FIXME: Punt on even simple cleverness for now.
-		(let ((exprtable-entries
-		       (exprtable-sort (map exprtable-entry-make
-					    slot
-					    assertions))))
-		  (dtable-entry-make index 'expr
-				     (exprtable-make
-				      (-gen-exprtable-name exprtable-entries)
-				      exprtable-entries)))))
+	      ; Try filtering out insns which are more general cases of
+	      ; other insns in the slot.  The filtered insns will appear
+	      ; in other slots as appropriate.
+	      (set! slot (filter-non-specialized-ambiguous-insns slot))
+
+	      (if (= 1 (length slot))
+		  ; Only 1 insn left in the slot, so take it.
+		  (dtable-entry-make index 'insn (car slot))
+		  ; There is still more than one insn in 'slot', so there is still an ambiguity.
+		  (begin
+		    ; If all insns are marked as DECODE-SPLIT, don't warn.
+		    (if (not (all-true? (map (lambda (insn)
+					       (obj-has-attr? insn 'DECODE-SPLIT))
+					     slot)))
+			(message "WARNING: Decoder ambiguity detected: "
+				 (string-drop1 ; drop leading comma
+				  (string-map (lambda (insn)
+						(string-append ", " (obj:name insn)))
+					      slot))
+				 "\n"))
+			; Things aren't entirely hopeless.  We've warned about the ambiguity.
+		        ; Now, if there are any identical insns, filter them out.  If only one
+		        ; remains, then use it.
+		    (set! slot (filter-identical-ambiguous-insns slot))
+		    (if (= 1 (length slot))
+			; Only 1 insn left in the slot, so take it.
+			(dtable-entry-make index 'insn (car slot))
+		        ; Otherwise, see if any ifield-assertion
+			; specs are present.
+			; FIXME: For now we assume that if they all have an
+			; ifield-assertion spec, then there is no ambiguity (it's left
+			; to the programmer to get it right).  This can be made more
+			; clever later.
+			; FIXME: May need to back up startbit if we've tried to read
+			; more of the instruction.
+			(let ((assertions (map insn-ifield-assertion slot)))
+			  (if (not (all-true? assertions))
+			      (begin
+					; Save arguments for debugging purposes.
+				(set! -build-decode-table-entry-args
+				      (list insn-vec startbit decode-bitsize index index-list lsb0? invalid-insn))
+				(error "Unable to resolve ambiguity (maybe need some ifield-assertion specs?)")))
+					; FIXME: Punt on even simple cleverness for now.
+			  (let ((exprtable-entries
+				 (exprtable-sort (map exprtable-entry-make
+						      slot
+						      assertions))))
+			    (dtable-entry-make index 'expr
+					       (exprtable-make
+						(-gen-exprtable-name exprtable-entries)
+						exprtable-entries))))))))
 
 	    ; There is no ambiguity so generate the subtable.
 	    ; Need to build `subtable' separately because we

@@ -1,3 +1,8 @@
+2001-09-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* lib/target.exp (prune_warnings): Tolerate g++ cpplib warnings
+	for -isystem vs. -I duplication.
+
 2001-08-24  Frank Ch. Eigler  <fche@redhat.com>
 
 	* baseboards/basic-sid.exp (find_sid_conf): Tolerate not finding

@@ -582,8 +582,8 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
   { 30,            8, GREGS,  30 * 8, 8, 8 },      /* s8/fp */
   { 31,            8, GREGS,  31 * 8, 8, 8 },      /* ra */
   { 0,             8, NOREGS, 0,      8, 8 },      /* sr */
-  { 68,            8, GREGS,  33 * 4, 8, 8 },      /* lo */
-  { 67,            8, GREGS,  32 * 4, 8, 8 },      /* hi */
+  { 68,            8, GREGS,  33 * 8, 8, 8 },      /* lo */
+  { 67,            8, GREGS,  32 * 8, 8, 8 },      /* hi */
 
   /* glibc's ucontext.h doesn't specify the order of the following
      three registerss.  But there is space allocated for them.  (Well,
@@ -595,13 +595,13 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
 
 #if 0
   /* CAUSE and BADVADDR are readable via ptrace, but they're not writable.  */
-  { 66,            8, GREGS,  35 * 4, 8, 8 },      /* bad */
-  { 65,            8, GREGS,  36 * 4, 8, 8 },      /* cause */
+  { 66,            8, GREGS,  35 * 8, 8, 8 },      /* bad */
+  { 65,            8, GREGS,  36 * 8, 8, 8 },      /* cause */
 #else
   { 0,             8, NOREGS, 0,      8, 8 },      /* bad */
   { 0,             8, NOREGS, 0,      8, 8 },      /* cause */
 #endif
-  { 64,            8, GREGS,  34 * 4, 8, 8 },      /* pc */
+  { 64,            8, GREGS,  34 * 8, 8, 8 },      /* pc */
 
   /* Linux/MIPS floating point is a bit of a mess.  On the one hand,
      the elf_fpregset_t contains space for 32 doubles plus the control
@@ -610,39 +610,39 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
      16 double precision floats via ptrace().  It also means that only
      slightly more than half of elf_fpregset_t is unused.  */
 
-  { 32       + 0,  8, FPREGS, 0 * 4,  8, 8 },      /* $f0 */
-  { 32       + 1,  8, FPREGS, 1 * 4,  8, 8 },      /* $f1 */
-  { 32       + 2,  8, FPREGS, 2 * 4,  8, 8 },      /* $f2 */
-  { 32       + 3,  8, FPREGS, 3 * 4,  8, 8 },      /* $f3 */
-  { 32       + 4,  8, FPREGS, 4 * 4,  8, 8 },      /* $f4 */
-  { 32       + 5,  8, FPREGS, 5 * 4,  8, 8 },      /* $f5 */
-  { 32       + 6,  8, FPREGS, 6 * 4,  8, 8 },      /* $f6 */
-  { 32       + 7,  8, FPREGS, 7 * 4,  8, 8 },      /* $f7 */
-  { 32       + 8,  8, FPREGS, 8 * 4,  8, 8 },      /* $f8 */
-  { 32       + 9,  8, FPREGS, 9 * 4,  8, 8 },      /* $f9 */
-  { 32       + 10, 8, FPREGS, 10 * 4, 8, 8 },      /* $f10 */
-  { 32       + 11, 8, FPREGS, 11 * 4, 8, 8 },      /* $f11 */
-  { 32       + 12, 8, FPREGS, 12 * 4, 8, 8 },      /* $f12 */
-  { 32       + 13, 8, FPREGS, 13 * 4, 8, 8 },      /* $f13 */
-  { 32       + 14, 8, FPREGS, 14 * 4, 8, 8 },      /* $f14 */
-  { 32       + 15, 8, FPREGS, 15 * 4, 8, 8 },      /* $f15 */
-  { 32       + 16, 8, FPREGS, 16 * 4, 8, 8 },      /* $f16 */
-  { 32       + 17, 8, FPREGS, 17 * 4, 8, 8 },      /* $f17 */
-  { 32       + 18, 8, FPREGS, 18 * 4, 8, 8 },      /* $f18 */
-  { 32       + 19, 8, FPREGS, 19 * 4, 8, 8 },      /* $f19 */
-  { 32       + 20, 8, FPREGS, 20 * 4, 8, 8 },      /* $f20 */
-  { 32       + 21, 8, FPREGS, 21 * 4, 8, 8 },      /* $f21 */
-  { 32       + 22, 8, FPREGS, 22 * 4, 8, 8 },      /* $f22 */
-  { 32       + 23, 8, FPREGS, 23 * 4, 8, 8 },      /* $f23 */
-  { 32       + 24, 8, FPREGS, 24 * 4, 8, 8 },      /* $f24 */
-  { 32       + 25, 8, FPREGS, 25 * 4, 8, 8 },      /* $f25 */
-  { 32       + 26, 8, FPREGS, 26 * 4, 8, 8 },      /* $f26 */
-  { 32       + 27, 8, FPREGS, 27 * 4, 8, 8 },      /* $f27 */
-  { 32       + 28, 8, FPREGS, 28 * 4, 8, 8 },      /* $f28 */
-  { 32       + 29, 8, FPREGS, 29 * 4, 8, 8 },      /* $f29 */
-  { 32       + 30, 8, FPREGS, 30 * 4, 8, 8 },      /* $f30 */
-  { 32       + 31, 8, FPREGS, 31 * 4, 8, 8 },      /* $f31 */
-  { 69,            8, FPREGS, 64 * 4, 8, 8 }       /* fsr */
+  { 32       + 0,  8, FPREGS, 0 * 8,  8, 8 },      /* $f0 */
+  { 32       + 1,  8, FPREGS, 1 * 8,  8, 8 },      /* $f1 */
+  { 32       + 2,  8, FPREGS, 2 * 8,  8, 8 },      /* $f2 */
+  { 32       + 3,  8, FPREGS, 3 * 8,  8, 8 },      /* $f3 */
+  { 32       + 4,  8, FPREGS, 4 * 8,  8, 8 },      /* $f4 */
+  { 32       + 5,  8, FPREGS, 5 * 8,  8, 8 },      /* $f5 */
+  { 32       + 6,  8, FPREGS, 6 * 8,  8, 8 },      /* $f6 */
+  { 32       + 7,  8, FPREGS, 7 * 8,  8, 8 },      /* $f7 */
+  { 32       + 8,  8, FPREGS, 8 * 8,  8, 8 },      /* $f8 */
+  { 32       + 9,  8, FPREGS, 9 * 8,  8, 8 },      /* $f9 */
+  { 32       + 10, 8, FPREGS, 10 * 8, 8, 8 },      /* $f10 */
+  { 32       + 11, 8, FPREGS, 11 * 8, 8, 8 },      /* $f11 */
+  { 32       + 12, 8, FPREGS, 12 * 8, 8, 8 },      /* $f12 */
+  { 32       + 13, 8, FPREGS, 13 * 8, 8, 8 },      /* $f13 */
+  { 32       + 14, 8, FPREGS, 14 * 8, 8, 8 },      /* $f14 */
+  { 32       + 15, 8, FPREGS, 15 * 8, 8, 8 },      /* $f15 */
+  { 32       + 16, 8, FPREGS, 16 * 8, 8, 8 },      /* $f16 */
+  { 32       + 17, 8, FPREGS, 17 * 8, 8, 8 },      /* $f17 */
+  { 32       + 18, 8, FPREGS, 18 * 8, 8, 8 },      /* $f18 */
+  { 32       + 19, 8, FPREGS, 19 * 8, 8, 8 },      /* $f19 */
+  { 32       + 20, 8, FPREGS, 20 * 8, 8, 8 },      /* $f20 */
+  { 32       + 21, 8, FPREGS, 21 * 8, 8, 8 },      /* $f21 */
+  { 32       + 22, 8, FPREGS, 22 * 8, 8, 8 },      /* $f22 */
+  { 32       + 23, 8, FPREGS, 23 * 8, 8, 8 },      /* $f23 */
+  { 32       + 24, 8, FPREGS, 24 * 8, 8, 8 },      /* $f24 */
+  { 32       + 25, 8, FPREGS, 25 * 8, 8, 8 },      /* $f25 */
+  { 32       + 26, 8, FPREGS, 26 * 8, 8, 8 },      /* $f26 */
+  { 32       + 27, 8, FPREGS, 27 * 8, 8, 8 },      /* $f27 */
+  { 32       + 28, 8, FPREGS, 28 * 8, 8, 8 },      /* $f28 */
+  { 32       + 29, 8, FPREGS, 29 * 8, 8, 8 },      /* $f29 */
+  { 32       + 30, 8, FPREGS, 30 * 8, 8, 8 },      /* $f30 */
+  { 32       + 31, 8, FPREGS, 31 * 8, 8, 8 },      /* $f31 */
+  { 69,            4, FPREGS, 32 * 8, 4, 8 }       /* fsr */
 };
 
 static void mips_singlestep_program (struct gdbserv *serv);
@@ -2504,11 +2504,9 @@ decr_pc_after_break (struct gdbserv *serv, pid_t pid)
  */
 
 static ptrace_xfer_type
-mips_get_reg(struct gdbserv *serv, int regno)
+mips_get_reg(struct gdbserv *serv, int pid, int regno)
 {
   ptrace_xfer_type value;
-  struct child_process *process = gdbserv_target_data (serv);
-  pid_t pid = process->pid;
 
   if (read_reg_bytes (serv, pid, regno, &value) < 0)
     return 0;
@@ -2516,14 +2514,59 @@ mips_get_reg(struct gdbserv *serv, int regno)
     return value;
 }
 
+static struct gdbserv_reg
+mips_addr_as_reg (struct gdbserv *serv, ptrace_arg3_type addr)
+{
+  struct gdbserv_reg addr_as_reg;
+
+  gdbserv_host_bytes_to_reg (serv, &addr, sizeof (addr),
+                             &addr_as_reg, sizeof (ptrace_arg3_type),
+			     sign_extend);
+  return addr_as_reg;
+}
+
+/* peek / poke mips instructions.  Using an ``unsigned int'' to represent
+   a mips instruction is correct (with regard to size) for the o32, n32,
+   and n64 ABIs.  */
+static unsigned int
+mips_peek_instruction (struct gdbserv *serv, ptrace_arg3_type addr)
+{
+  struct gdbserv_reg addr_as_reg;
+  unsigned int insn;
+
+  addr_as_reg = mips_addr_as_reg (serv, addr);
+  ptrace_get_mem (serv, &addr_as_reg, &insn, sizeof (insn));
+  return insn;
+}
+
+static void
+mips_poke_instruction (struct gdbserv *serv, ptrace_arg3_type addr,
+                       unsigned int insn)
+{
+  struct gdbserv_reg addr_as_reg;
+
+  addr_as_reg = mips_addr_as_reg (serv, addr);
+  ptrace_set_mem (serv, &addr_as_reg, &insn, sizeof (insn));
+}
+
 /*
  * mips singlestep
  *
  * necessary since no support in ptrace.
  */
-
 static void
 mips_singlestep_program (struct gdbserv *serv)
+{
+  struct child_process *process = gdbserv_target_data (serv);
+
+  mips_singlestep (serv, process->pid, process->signal_to_send);
+  process->stop_signal = 0;
+  process->stop_status = 0;
+  process->signal_to_send = 0;
+}
+
+int
+mips_singlestep (struct gdbserv *serv, pid_t pid, int sig)
 {
   struct child_process *process = gdbserv_target_data (serv);
   ptrace_arg3_type targ;
@@ -2532,25 +2575,23 @@ mips_singlestep_program (struct gdbserv *serv)
   union mips_instruction insn;
   int is_branch, is_cond, i;
 
-  ptrace_xfer_type bp_inst = 0x0000000d;
+  unsigned int bp_inst = 0x0000000d;
 
   /* FIXME: handle signals! */
   if (process->debug_backend)
-    fprintf (stderr, "mips_singlestep_program %ld\n", process->signal_to_send);
-  process->stop_signal = 0;
-  process->stop_status = 0;
+    fprintf (stderr, "mips_singlestep %d %ld\n", pid, sig);
 
   errno = 0;
 
-  /* Following is equiv to  ptrace (PTRACE_SINGLESTEP, process->pid, 1L, process->signal_to_send); */
+  /* Following is equiv to  ptrace (PTRACE_SINGLESTEP, pid, 1L, sig); */
 
   /* get the current PC */
-  mips_pc = mips_get_reg(serv, PC_REGNUM);			
+  mips_pc = mips_get_reg(serv, pid, PC_REGNUM);
   targ = mips_pc;
 
   /* get the word there (opcode) */
 
-  insn.word = ptrace (PTRACE_PEEKTEXT, process->pid, mips_pc, 0L);
+  insn.word = mips_peek_instruction (serv, mips_pc);
 
   is_branch = is_cond = 0;
 
@@ -2565,7 +2606,7 @@ mips_singlestep_program (struct gdbserv *serv)
     switch (insn.r_format.func) {
     case jalr_op:
     case jr_op:
-    	targ = mips_get_reg(serv, insn.r_format.rs);
+    	targ = mips_get_reg(serv, pid, insn.r_format.rs);
     	is_branch = 1;
     	break;
     }
@@ -2613,25 +2654,33 @@ mips_singlestep_program (struct gdbserv *serv)
     break;
   }
       	
-  if (is_branch) {
-    i = 0;
-    if (is_cond && targ != (mips_pc + 8)) {
-    	process->ss_info[i].ss_addr = mips_pc + 8;
- 	process->ss_info[i++].ss_val = ptrace (PTRACE_PEEKTEXT, process->pid, mips_pc+8, 0L);
-	ptrace (PTRACE_POKETEXT, process->pid, mips_pc+8, bp_inst);
+  process->ss_info[1].in_use = 0;	/* Mark unused.  */
+  if (is_branch)
+    {
+      i = 0;
+      if (is_cond && targ != (mips_pc + 8))
+	{
+	  process->ss_info[i].in_use = 1;
+	  process->ss_info[i].ss_addr = mips_addr_as_reg (serv, mips_pc + 8);
+	  process->ss_info[i++].ss_val 
+	    = mips_peek_instruction (serv, mips_pc + 8);
+	  mips_poke_instruction (serv, mips_pc + 8, bp_inst);
+	}
+      process->ss_info[i].in_use = 1;
+      process->ss_info[i].ss_addr = mips_addr_as_reg (serv, targ);
+      process->ss_info[i].ss_val = mips_peek_instruction (serv, targ);
+      mips_poke_instruction (serv, targ, bp_inst);
     }
-    process->ss_info[i].ss_addr = targ;
-    process->ss_info[i].ss_val = ptrace (PTRACE_PEEKTEXT, process->pid, targ, 0L);
-    ptrace (PTRACE_POKETEXT, process->pid, targ, bp_inst);
-  } else {
-    process->ss_info[0].ss_addr = mips_pc + 4;
-    process->ss_info[0].ss_val = ptrace (PTRACE_PEEKTEXT, process->pid, mips_pc+4, 0L);
-    process->ss_info[1].ss_addr = 0;
-    ptrace (PTRACE_POKETEXT, process->pid, mips_pc+4, bp_inst);
-  }
+  else
+    {
+      process->ss_info[0].in_use = 1;
+      process->ss_info[0].ss_addr = mips_addr_as_reg (serv, mips_pc + 4);
+      process->ss_info[0].ss_val = mips_peek_instruction (serv, mips_pc + 4);
+      mips_poke_instruction (serv, mips_pc + 4, bp_inst);
+    }
 
-  process->signal_to_send = 0;
-  ptrace (PTRACE_CONT, process->pid, 1L, process->signal_to_send); 
+  ptrace (PTRACE_CONT, pid, 1L, sig); 
+  return 0;
 }
 #endif /* _MIPSEL */
 

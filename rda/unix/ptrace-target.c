@@ -28,9 +28,6 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "server.h"
-#include "ptrace-target.h"
-
 #include <sys/wait.h>
 #include <string.h>
 #include <errno.h>
@@ -43,6 +40,8 @@
 #include "gdb_proc_service.h"
 #include "gdbserv-thread-db.h"
 
+#include "server.h"
+#include "ptrace-target.h"
 /* This is unix ptrace gdbserv target that uses the RDA library to implement
    a remote gdbserver on a unix ptrace host.  It controls the process
    to be debugged on the linux host, allowing GDB to pull the strings
@@ -149,13 +148,16 @@ handle_waitstatus (struct child_process *process, union wait w)
    */
   if (process->is_ss)
     {
-      ptrace (PTRACE_POKETEXT, process->pid, process->ss_info[0].ss_addr, process->ss_info[0].ss_val);
-      process->ss_info[0].ss_addr = 0;
-      
-      if (process->ss_info[1].ss_addr) {
-	ptrace (PTRACE_POKETEXT, process->pid, process->ss_info[1].ss_addr, process->ss_info[1].ss_val);
-	process->ss_info[1].ss_addr = 0;
-      }
+      int i;
+      for (i = 0; i < 2; i++)
+	if (process->ss_info[i].in_use)
+	  {
+	    ptrace_set_mem (process->serv,
+	                    &process->ss_info[i].ss_addr,
+			    &process->ss_info[i].ss_val,
+			    sizeof (process->ss_info[i].ss_val));
+	    process->ss_info[i].in_use = 0;
+	  }
       process->is_ss = 0;
     }
 #endif /* _MIPSEL */
@@ -1083,7 +1085,7 @@ ptrace_xfer_mem (struct gdbserv *serv,
   return len;
 }
 
-static long
+long
 ptrace_set_mem (struct gdbserv *serv, 
 		struct gdbserv_reg *addr, 
 		void *data, 
@@ -1092,7 +1094,7 @@ ptrace_set_mem (struct gdbserv *serv,
   return ptrace_xfer_mem (serv, addr, data, len, 0);
 }
 
-static long
+long
 ptrace_get_mem (struct gdbserv *serv, 
 		struct gdbserv_reg *addr, 
 		void *data, 
@@ -1269,9 +1271,18 @@ continue_lwp (lwpid_t lwpid, int signal)
    Send PTRACE_SINGLESTEP to an lwp.
    Returns -1 for failure, zero for success. */
 
-extern int
-singlestep_lwp (lwpid_t lwpid, int signal)
+int
+singlestep_lwp (struct gdbserv *serv, lwpid_t lwpid, int signal)
 {
+
+#if defined (MIPS_LINUX_TARGET) || defined (MIPS64_LINUX_TARGET)
+  {
+    if (thread_db_noisy)
+      fprintf (stderr, "<singlestep_lwp lwpid=%d signal=%d>\n", lwpid, signal);
+    mips_singlestep (serv, lwpid, signal);
+    return 0;
+  }
+#else
   if (thread_db_noisy)
     fprintf (stderr, "<ptrace (PTRACE_SINGLESTEP, %d, 0, %d)>\n", lwpid, signal);
 
@@ -1280,6 +1291,7 @@ singlestep_lwp (lwpid_t lwpid, int signal)
       fprintf (stderr, "<<< ERROR: PTRACE_SINGLESTEP %d failed >>>\n", lwpid);
       return -1;
     }
+#endif
   return 0;
 }
 

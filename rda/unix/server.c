@@ -32,6 +32,7 @@
 
 #include "gdbsocket.h"
 #include "gdbloop.h"
+#include "gdbserv.h"
 #include "server.h"
 
 /* Signal a request to terminate main loop. */

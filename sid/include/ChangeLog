@@ -1,3 +1,7 @@
+2001-03-28  Dave Brolley  <brolley@redhat.com>
+
+	* sidbusutil.h (mux_passthrough_bus::select_bus): New function.
+
 2001-03-26  Dave Brolley  <brolley@redhat.com>
 
 	* sidcpuutil.h (basic_cpu::stepped): Make it virtual and public so

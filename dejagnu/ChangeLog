@@ -1,3 +1,10 @@
+2002-02-05  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* lib/libgloss.exp (g++_include_flags): Add top level
+	libstdc++-v3 build include path, remove duplicate src path.
+	(libstdc++_include_flags): Add top level libstdc++-v3 build
+	include path.
+
 2002-01-21  Ben Elliston  <bje@redhat.com>
 
 	* baseboards/sh-sid.exp: New file.

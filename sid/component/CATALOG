@@ -80,6 +80,7 @@ sid-io-audio-nop        NOP audio interface.
 sid-io-socket-server    Socket server<->tx/rx data pump
 sid-io-socket-client    Socket client<->tx/rx data pump
 sid-io-stdio            Nonblocking stdio-to-pins data bridge
+sid-io-fileio           Pins to output file data bridge
 sid-io-vga-x		X front-end to the Video Graphics Adapter model
 sid-sched-host          Generic scheduler for host time tracking (25ms accuracy)
 sid-sched-host-accurate More accurate version of same

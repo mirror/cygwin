@@ -5,7 +5,8 @@ ACLOCAL_AMFLAGS = -I $(srcdir)/../../../config
 
 noinst_LTLIBRARIES = libarm7t.la
 
-INCLUDES = -I$(srcdir) -I$(srcdir)/.. -I../../../include -I$(srcdir)/../../../include
+BFDINCLUDES =  -I../../../../bfd -I$(srcdir)/../../../../include
+INCLUDES = -I$(srcdir) -I$(srcdir)/.. -I../../../include -I$(srcdir)/../../../include $(BFDINCLUDES)
 CXXFLAGS = $(TOP_CXXFLAGS)
 
 pkgdata_DATA = hw-cpu-arm7t.txt
@@ -50,3 +51,6 @@ cgen-arm7f-thumb:
 	$(SHELL) ../CGEN.sh cpu-decode $(srcdir) $(cgendir) "$(CGENFLAGS)" \
 	arm "with-multiple-isa with-scache with-pbb" arm7f thumb arm7tdmi thumb "thumb-" \
 	"decode.h decode.cxx semantics.cxx sem-switch.cxx"
+
+html_stylesheet=$(srcdir)/../../component_html.xsl
+include $(srcdir)/../../../config/Makefile.docs

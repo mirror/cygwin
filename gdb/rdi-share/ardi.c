@@ -27,13 +27,13 @@
 #undef uint
 
 
-#include "endian.h"
+#include "angel_endian.h"
 #include "ardi.h"
 #include "buffers.h"
 #include "channels.h"
 #include "hostchan.h"
 #include "host.h"
-#include "bytesex.h"
+#include "angel_bytesex.h"
 #include "dbg_cp.h"
 #include "adp.h"
 #include "hsys.h"
@@ -320,9 +320,12 @@ static AdpErrs negotiate_params( const ParameterOptions *user_options )
 
     time_t t;
 
-    static volatile NegotiateState    n_state = {
-        FALSE, FALSE, FALSE, &accepted_config };
-
+    static volatile NegotiateState    n_state;
+    n_state.negotiate_resp = FALSE;
+    n_state.negotiate_ack = FALSE;
+    n_state.link_check_resp = FALSE;
+    n_state.accepted_config = &accepted_config;
+    
 #ifdef DEBUG
     angel_DebugPrint( "negotiate_params\n" );
 #endif
@@ -392,6 +395,8 @@ static void (*old_handler)();
 #endif
 
 static bool boot_interrupted = FALSE;
+static volatile bool interrupt_request = FALSE;
+static volatile bool stop_request = FALSE;
 
 static void ardi_sigint_handler(int sig) {
 #ifdef DEBUG
@@ -401,6 +406,7 @@ static void ardi_sigint_handler(int sig) {
     IGNORE(sig);
 #endif
     boot_interrupted = TRUE;
+    interrupt_request = TRUE;
 #ifndef __unix
     signal(SIGINT, ardi_sigint_handler);
 #endif
@@ -1300,13 +1306,12 @@ static int HandleStoppedMessage(Packet *packet, void *stateptr) {
     stopped_info->stopped_status = RDIError_NoError;
     break;
   default:
-    stopped_info->stopped_status = RDIError_NoError;
+    stopped_info->stopped_status = RDIError_Error;
     break;
   }
   return RDIError_NoError;
 }
 
-static volatile bool interrupt_request = FALSE;
 
 static void interrupt_target( void )
 {
@@ -1339,10 +1344,16 @@ static void interrupt_target( void )
                                     Packet *packet );
 #endif
 
+void angel_RDI_stop_request(void)
+{
+  stop_request = 1;
+}
+
 /* Core functionality for execute and step */
 static int angel_RDI_ExecuteOrStep(PointHandle *handle, word type, 
                                    unsigned ninstr)
 {
+  extern int (*ui_loop_hook) (int);
   int err;
   adp_stopped_struct stopped_info;
   void* stateptr = (void *)&stopped_info;
@@ -1397,15 +1408,25 @@ static int angel_RDI_ExecuteOrStep(PointHandle *handle, word type,
   angel_DebugPrint("Waiting for program to finish...\n");
 #endif
 
+  interrupt_request = FALSE;
+  stop_request = FALSE;
+  
+  signal(SIGINT, ardi_sigint_handler);
   while( executing )
   {
-      if (interrupt_request)
+    if (ui_loop_hook)
+      ui_loop_hook(0);
+    
+    if (interrupt_request || stop_request)
       {
         interrupt_target();
         interrupt_request = FALSE;
+        stop_request = FALSE;
       }
-      Adp_AsynchronousProcessing( async_block_on_nothing );
+    Adp_AsynchronousProcessing( async_block_on_nothing );
   }
+  signal(SIGINT, SIG_IGN);
+
 
 #ifdef TEST_DC_APPL
   Adp_Install_DC_Appl_Handler( NULL );

@@ -95,6 +95,7 @@ namespace profiling_components
     hitcount_map_t value_hitcount_map;
     host_int_4 value_count;
     host_int_4 value_min, value_max;
+    host_int_4 limit_min, limit_max;
     host_int_4 bucket_size;
 
     string target_attribute;
@@ -149,6 +150,9 @@ namespace profiling_components
 	host_int_4 value;
 	component::status s = parse_attribute (value_str, value);
 	if (s != component::ok) return;
+
+	// Reject out-of-bounds samples
+	if (value < this->limit_min || value > this->limit_max) return;
 
 	value_count ++;
 
@@ -306,6 +310,8 @@ namespace profiling_components
       value_count (0),
       value_min (~0),
       value_max (0),
+      limit_min (0),
+      limit_max (~0),
       bucket_size (1), // != 0
       target_attribute ("pc"),
       target_component (0),
@@ -328,6 +334,8 @@ namespace profiling_components
 	add_attribute_ro ("value-min", & this->value_min, "register");
 	add_attribute_ro ("value-max", & this->value_max, "register");
 	add_attribute_ro ("value-count", & this->value_count, "register");
+	add_attribute ("limit-min", & this->limit_min, "setting");
+	add_attribute ("limit-max", & this->limit_max, "setting");
 	add_attribute ("value-attribute", & this->target_attribute, "setting");
 	add_attribute ("output-file", & this->output_file, "setting");
 	add_attribute ("output-file-endianness", & this->output_file_format, "setting");

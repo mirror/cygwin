@@ -32,7 +32,9 @@
    teensy bit of cpu in the decoder.  Moving it to malloc space is trivial
    but won't be done until necessary (we don't currently support the runtime
    addition of instructions nor an SMP machine with different cpus).  */
-static IDESC " IDESC-TABLE-VAR "[@PREFIX@_INSN_MAX];
+static IDESC " IDESC-TABLE-VAR "[@PREFIX@_INSN_"
+   (string-upcase (gen-c-symbol (caar (list-take -1
+       (gen-obj-list-enums (non-multi-insns (current-insn-list))))))) " + 1];
 
 /* Commas between elements are contained in the macros.
    Some of these are conditionally compiled out.  */
@@ -145,7 +147,7 @@ void
 {
   IDESC *id,*tabend;
   const struct insn_sem *t,*tend;
-  int tabsize = @PREFIX@_INSN_MAX;
+  int tabsize = sizeof (" IDESC-TABLE-VAR ") / sizeof (IDESC);
   IDESC *table = " IDESC-TABLE-VAR ";
 
   memset (table, 0, tabsize * sizeof (IDESC));

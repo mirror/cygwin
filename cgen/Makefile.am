@@ -8,6 +8,8 @@ GUILE = `if test -f ../guile/libguile/guile ; then echo ../guile/libguile/guile;
 CGENFLAGS = -v
 ARCH = @arch@
 
+srcroot = $(srcdir)/..
+
 # Applications depend on stamp-cgen to tell them when .scm files have
 # been changed (so files need to be regenerated).
 # ??? Application specific files are kept with cgen for now, but may
@@ -39,6 +41,17 @@ desc: desc.scm
 		-f "$(OPTIONS)" \
 		-m all -a $(ARCH) \
 		-H tmp-desc.h -C tmp-desc.c
+
+.PHONY: html
+html: desc.scm html.scm cgen-doc.scm
+	rm -f tmp-doc.html
+	$(GUILE) -s $(srcdir)/cgen-doc.scm \
+		-s $(srcdir) \
+		$(CGENFLAGS) \
+		-f "$(OPTIONS)" \
+		-m all -a $(ARCH) \
+		-H tmp-doc.html
+	$(SHELL) $(srcroot)/move-if-change tmp-doc.html $(ARCH)-doc.html
 
 # Build the opcodes files.
 # We just stuff them in tmp-* files.

@@ -1,5 +1,20 @@
 2003-05-15  Doug Evans  <dje@sebabeach.org>
 
+	* Makefile.am (srcroot): New var.
+	(html): New rule.
+	* Makefile.in: Regenerate.
+	* cgen-doc.scm: New file.
+	* html.scm: New file.
+	* gen-all-doc: New file.
+	* dev.scm (cload): Handle DOC application.
+	(load-doc): New fn.
+	* machs.scm (machs-for-cpu): New fn.
+	* model.scm (models-for-cpu): New fn.
+	* utils.scm (gen-c-copyright): Renamed from gen-copyright.
+	All uses updated.
+	(iota): Rewrite to be identical to pmacro version.  All uses updated.
+	* utils-cgen.scm (alpha-sort-obj-list): New fn.
+
 	* utils-sim.scm (-gen-decoder-switch): Back out patch of 2003-01-09.
 	(-gen-decode-bits): Instead put in better fix here.
 

@@ -1,3 +1,9 @@
+2001-05-11  Ben Elliston  <bje@redhat.com>
+
+	* gas-test.scm (cgen-build.sh, gentest): Escape $ with a backslash
+	when generating allinsn.d from objdump output. Without it, the
+	testsuite will treat $ as the regular expression for end of line.
+
 2001-05-09  Ben Elliston  <bje@redhat.com>
 
 	* doc/porting.texi (Doing a GAS port): Replace `cgen_opcode_open'

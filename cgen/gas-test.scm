@@ -215,6 +215,7 @@ function gentest {
     $BUILD/../binutils/objdump -dr a.out | \
 	sed -e 's/(/\\\\(/g' \
             -e 's/)/\\\\)/g' \
+            -e 's/\\$/\\\\$/g' \
             -e 's/\\[/\\\\\\[/g' \
             -e 's/\\]/\\\\\\]/g' \
             -e 's/[+]/\\\\+/g' \

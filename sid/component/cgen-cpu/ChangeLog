@@ -1,3 +1,7 @@
+2003-08-21  Dave Brolley  <brolley@redhat.com>
+
+	* compCGEN.cxx (end_trace): Call end_line.
+
 2003-06-17  Doug Evans  <dje@sebabeach.org>
 
 	* Makefile.am (cgen-all): Exit early if file generation fails.

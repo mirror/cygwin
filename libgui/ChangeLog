@@ -1,5 +1,11 @@
 2001-08-03  Mo DeJong  <mdejong@redhat.com>
 
+	* src/tclhelp.c (help_display_file_command): Pass int
+	address to Tcl_GetInt instead of an unsigned long to
+	avoid compiler warning.
+
+2001-08-03  Mo DeJong  <mdejong@redhat.com>
+
 	* src/subcommand.c:
 	* src/tclgetdir.c:
 	* src/tclhelp.c:

@@ -1,8 +1,23 @@
-/*
-** tuiCommand.c
-**     This module contains functions specific to command window processing.
-*/
+/* Specific command window processing.
+   Copyright 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+   Contributed by Hewlett-Packard Company.
 
+   This file is part of GDB.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #include "defs.h"
 #include "tui.h"
@@ -22,9 +37,9 @@
 ******************************************/
 
 /*
-** tuiDispatchCtrlChar().
-**        Dispatch the correct tui function based upon the control character.
-*/
+   ** tuiDispatchCtrlChar().
+   **        Dispatch the correct tui function based upon the control character.
+ */
 unsigned int
 #ifdef __STDC__
 tuiDispatchCtrlChar (
@@ -37,10 +52,10 @@ tuiDispatchCtrlChar (ch)
   TuiWinInfoPtr winInfo = tuiWinWithFocus ();
 
   /*
-    ** If the command window has the logical focus, or no-one does
-    ** assume it is the command window; in this case, pass the
-    ** character on through and do nothing here.
-    */
+     ** If the command window has the logical focus, or no-one does
+     ** assume it is the command window; in this case, pass the
+     ** character on through and do nothing here.
+   */
   if (winInfo == (TuiWinInfoPtr) NULL || winInfo == cmdWin)
     return ch;
   else
@@ -50,9 +65,9 @@ tuiDispatchCtrlChar (ch)
       char *term;
 
       /* If this is an xterm, page next/prev keys aren't returned
-        ** by keypad as a single char, so we must handle them here.
-        ** Seems like a bug in the curses library?
-        */
+         ** by keypad as a single char, so we must handle them here.
+         ** Seems like a bug in the curses library?
+       */
       term = (char *) getenv ("TERM");
       for (i = 0; (term && term[i]); i++)
 	term[i] = toupper (term[i]);
@@ -109,10 +124,10 @@ tuiDispatchCtrlChar (ch)
 
 
 /*
-** tuiIncrCommandCharCountBy()
-**     Increment the current character count in the command window,
-**     checking for overflow.  Returns the new value of the char count.
-*/
+   ** tuiIncrCommandCharCountBy()
+   **     Increment the current character count in the command window,
+   **     checking for overflow.  Returns the new value of the char count.
+ */
 int
 #ifdef __STDC__
 tuiIncrCommandCharCountBy (
@@ -136,10 +151,10 @@ tuiIncrCommandCharCountBy (count)
 
 
 /*
-** tuiDecrCommandCharCountBy()
-**     Decrement the current character count in the command window,
-**     checking for overflow.  Returns the new value of the char count.
-*/
+   ** tuiDecrCommandCharCountBy()
+   **     Decrement the current character count in the command window,
+   **     checking for overflow.  Returns the new value of the char count.
+ */
 int
 #ifdef __STDC__
 tuiDecrCommandCharCountBy (
@@ -163,9 +178,9 @@ tuiDecrCommandCharCountBy (count)
 
 
 /*
-** tuiSetCommandCharCountTo()
-**     Set the character count to count.
-*/
+   ** tuiSetCommandCharCountTo()
+   **     Set the character count to count.
+ */
 int
 #ifdef __STDC__
 tuiSetCommandCharCountTo (
@@ -192,9 +207,9 @@ tuiSetCommandCharCountTo (count)
 
 
 /*
-** tuiClearCommandCharCount()
-**     Clear the character count to count.
-*/
+   ** tuiClearCommandCharCount()
+   **     Clear the character count to count.
+ */
 int
 #ifdef __STDC__
 tuiClearCommandCharCount (void)

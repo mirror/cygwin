@@ -1,3 +1,9 @@
+Thu Apr 20 17:01:19 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	From Alexandre Oliva <aoliva@cygnus.com>
+	* generic/tclPosixStr.c (Tcl_SignalId, Tcl_SignalMsg): Do not
+	issue SIGPWR case if it's the same as SIGLOST.
+
 2000-01-26  DJ Delorie  <dj@cygnus.com>
 
 	* win/tclWin32Dll.c (DllMain): Use standard _imp__reent_data,

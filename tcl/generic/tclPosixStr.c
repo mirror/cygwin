@@ -986,7 +986,7 @@ Tcl_SignalId(sig)
 #ifdef SIGPROF
 	case SIGPROF: return "SIGPROF";
 #endif
-#if defined(SIGPWR) && (!defined(SIGXFSZ) || (SIGPWR != SIGXFSZ))
+#if defined(SIGPWR) && (!defined(SIGXFSZ) || (SIGPWR != SIGXFSZ)) && (!defined(SIGLOST) || (SIGPWR != SIGLOST))
 	case SIGPWR: return "SIGPWR";
 #endif
 #ifdef SIGQUIT
@@ -1118,7 +1118,7 @@ Tcl_SignalMsg(sig)
 #ifdef SIGPROF
 	case SIGPROF: return "profiling alarm";
 #endif
-#if defined(SIGPWR) && (!defined(SIGXFSZ) || (SIGPWR != SIGXFSZ))
+#if defined(SIGPWR) && (!defined(SIGXFSZ) || (SIGPWR != SIGXFSZ)) && (!defined(SIGLOST) || (SIGPWR != SIGLOST))
 	case SIGPWR: return "power-fail restart";
 #endif
 #ifdef SIGQUIT

@@ -3354,11 +3354,78 @@ Fri Dec 18 14:23:34 1998  Andrew Cagney  <cagney@chook>
  	functions, handle commands.
 	(mips_push_arguments, mips_push_dummy_frame, mips_pop_frame,
  	mips_extract_return_value): Update.
+	(_initialize_mips_tdep): Set mips_fpu_type according to current
+ 	processor.
+	(_initialize_mips_tdep): Only define ``set processor'' command
+ 	when not multi-sim.
+	
+Fri Dec 18 12:56:56 1998  Andrew Cagney  <cagney@chook>
+
+	* gdbarch.h (gdbarch_init_ftype): Pass struct gdbarch_info
+ 	by-value.
+	(struct gdbarch_info): Add struct gdbarch_tdep_info *tdep_info.
+	* gdbarch.c (gdbarch_update): Update.
+	* mips-tdep.c: (mips_gdbarch_init): Update
+
+	* gdbarch.c (gdbarch_update): Add more tracing.
 	
 Thu Dec 17 02:15:40 1998  Andrew Cagney  <cagney@chook.cygnus.com>
 
 	* configure.tgt (gdb_target): Identify mips64*vr4100*-*-elf* as
  	vr4100.
+	* config/mips/vr4100.mt, config/mips/tm-vr4100.h: Replace
+ 	vr4xxx.mt and tm-vr4xxx.h.
+	
+Thu Dec 17 02:06:17 1998  Andrew Cagney  <cagney@chook.cygnus.com>
+
+	* mips-tdep.c (mips_gdbarch_init): New function. Initialize a MIPS
+ 	architecture vector.
+	(_initialize_mips_tdep): Register MIPS with GDBARCH.
+	(struct gdbarch_tdep): Define.
+	(MIPS_EABI, MIPS_LAST_FP_ARG_REGNUM, MIPS_LAST_ARG_REGNUM): When
+ 	multi-arch, get value from gdbarch->tdep.
+
+Thu Dec 17 02:01:58 1998  Andrew Cagney  <cagney@chook>
+
+	* gdbtypes.c (_initialize_gdbtypes): Register all builtin types
+ 	with gdbarch so that they are updated whenever the architecture is
+ 	changed.
+
+Thu Dec 17 01:58:16 1998  Andrew Cagney  <cagney@chook>
+
+	* gdbarch.h (GDB_MULTI_ARCH): New macro, default to zero.
+	(current_gdbarch): Current architecture pointer.
+	* gdbarch.c (struct gdbarch): Define.
+
+	* gdbarch.h (TARGET_ARCHITECTURE, TARGET_BYTE_ORDER,
+ 	TARGET_LONG_BIT, TARGET_LONG_LONG_BIT, TARGET_PTR_BIT): When
+ 	multi-arch force definition.
+	* gdbarch.h, gdbarch.c (gdbarch_tdep, gdbarch_bfd_arch_info,
+ 	gdbarch_byte_order, {set,}gdbarch_long_bit,
+ 	{set,}gdbarch_long_long_bit, {set,}gdbarch_ptr_bit): Corresponding
+ 	functions.
+
+	* gdbarch.h (struct gdbarch_list, struct gdbarch_info,
+ 	gdbarch_init_ftype), gdbarch.c (register_gdbarch_init): Mechanism
+ 	for registering an architecture with GDB.
+	(gdbarch_list_lookup_by_info, gdbarch_alloc, gdbarch_update,
+ 	verify_gdbarch): Support functions.
+
+	* gdbarch.h (gdbarch_data_ftype), gdbarch.c
+ 	(register_gdbarch_data, gdbarch_data): Mechanism for maintaining
+ 	per-architecture pointers.
+	(init_gdbarch_data): Support functions.
+	
+	* gdbarch.h (gdbarch_swap_ftype), gdbarch.c
+ 	(register_gdbarch_swap): Ditto for swapped memory regions.
+	(init_gdbarch_swap, swapout_gdbarch_swap, swapin_gdbarch_swap):
+ 	Support functions.
+	
+	* gdbarch.c (set_endian_big, set_endian_little, set_architecture,
+ 	info_architecture, set_gdbarch_from_file): Hook in multi-arch
+ 	code by calling gdbarch_update.
+	(default_gdbarch): Default multi-arch vector.  Use host's type
+ 	system for values.
 	
 Thu Dec 17 01:34:36 1998  Andrew Cagney  <cagney@chook>
 
@@ -4402,6 +4469,11 @@ Thu Oct  8 08:40:42 1998  Mark Alexander  <marka@cygnus.com>
 	* rs6000-tdep.c (get_saved_register): Define only if
 	USE_GENERIC_DUMMY_FRAMES is defined.
 
+Tue Oct  6 21:35:10 1998  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* Makefile.in (DEPFILES): Add TARGET_OBS.
+	(TARGET_OBS): Defined by configure.
+
 1998-10-06  Jason Molenda  (jsm@bugshack.cygnus.com)
 
  	Eliminate a few warnings from the compiler.
@@ -4877,6 +4949,13 @@ Thu Jul 30 13:53:50 1998  Mark Alexander  <marka@cygnus.com>
 	* symfile.c (add_symbol_file_command): Test for the from_tty
 	parameter and avoid query when not interactive.
 
+Wed Jul 29 10:39:29 1998  Jeffrey A Law  (law@cygnus.com)
+
+	* mn10300-tdep.c (set_movm_offsets): Do nothing for the am33
+	registers if we are not in am33 mode.
+	(mn10300_frame_chain, mn10300_frame_saved_pc): Similarly.
+	(set_machine_hook): Keep track of whether or not we're in am33 mode.
+
 Mon Jul 27 16:11:42 1998  Michael Snyder  <msnyder@cleaver.cygnus.com>
 
 	* tracepoint.c (remote_set_transparent_ranges): new function.
@@ -4902,6 +4981,12 @@ Mon Jul 27 10:45:56 1998  Martin M. Hunt  <hunt@cygnus.com>
 	* config/d10v/tm-d10v.h (REGISTER_NAMES): sp -> r15.  The
 	stack pointer et al are synthesized from the SP_REGNUM (etc)
 	defines and should not be mentioned in REGISTER_NAMES.
+
+Mon Jul 27 08:54:41 1998  Jeffrey A Law  (law@cygnus.com)
+
+	* mn10300-tdep.c (mn10300_frame_chain): Account for space saved
+	by am33 register saves.
+	(mn10300_frame_saved_pc): Similarly.
 
 Fri Jul 24 14:41:19 1998  Michael Snyder  <msnyder@cleaver.cygnus.com>
 
@@ -5006,6 +5091,9 @@ Thu Jul  9 16:16:47 1998  Jeffrey A Law  (law@cygnus.com)
 	* tm-mn10300 (NUM_REGS): Bump to 32.
 	(REGISTER_NAMES): Updated accordingly.
 
+	* mn10300-tdep.c (am33_register_names): New variable.
+	(mn10300_analyze_prologue): Handle regs saved by am33 prologues.
+	* tm-mn10300.h (E0_REGNUM): Define.
 
 Tue Jul 7 7:40:13 1998  Ron Unrau  <runrau@cygnus.com>
 
@@ -5717,6 +5805,13 @@ Wed Apr 29 14:02:59 1998  David Taylor  <taylor@texas.cygnus.com>
 	to extend the result.
 
 Wed Apr 29 10:20:40 1998  John Metzler  <jmetzler@cygnus.com>
+
+	* nec4102rom.c: New file implements ROM monitor adapter for
+        nec-vr4102 board.  This board hosts the vr4111 chip.  This file
+        required extensions to the monitor_ops structure, hooks for wait
+        filter, new flags. This version does not support more than one
+        breakpoint and resuming after a breakpoint in 16 bit mode is
+        completely disfunctional.  
 
 	* monitor.h: Defined additional hooks for dmpregs, configure_hooks
 	and wait_filter. These additions require that all ROM monitor
@@ -6481,6 +6576,9 @@ Wed Mar  4 01:39:08 1998  Ron Unrau  <runrau@cygnus.com>
 
 Tue Mar  3 17:19:08 1998  John Metzler  <jmetzler@cygnus.com>
 
+	* config/mips/tm-vr4xxx.h:  implements vr4111 as separate from 4300
+	* config/mips/vr4xxx.tm:    implements vr4111 as separate from 4300
+	* configure.tgt:  Recognise mips64vr4111-*-elf as vr4xxx
 	* dwarfread.c (read_tag_pointer_type): Pointer sizes now come from
 	TARGET_PTR_BIT rather from sizeof(char *) on host.
 
@@ -7112,7 +7210,7 @@ Fri Jan  2 17:06:05 1998  Michael Snyder  (msnyder@cleaver.cygnus.com)
 	since list elements may be deleted during loop.
 	(read_actions): add actions to history list.
 
-For older changes see ChangeLog-97
+For older changes see ChangeLog-1997
 
 Local Variables:
 mode: change-log

@@ -1,3 +1,10 @@
+2000-12-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am: Simplify to install all srcdir *.conf/*.img files.
+	* pregen-configs.in: Overwrite srcdir files only if non-comment
+	lines are different.
+	* Makefile.in: Regenerated.
+
 2000-11-23  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am: New file.  Conditionally maintain pregenerated

@@ -1,3 +1,9 @@
+2003-12-02  Martin Hunt  <hunt@redhat.com>
+
+	* library/combobox.tcl: Merge in latest changes
+	from Bryan Oakley.  Fixes a problem with Solaris
+	X servers.
+
 2003-02-11  Martin M. Hunt  <hunt@redhat.com>
 
 	* src/Makefile.am (libgui_a_SOURCES): Remove files that

@@ -43,13 +43,6 @@ dnl here.
 AC_EGREP_CPP(strncasecmp, [#include <string.h>],
   AC_DEFINE(HAVE_STRNCASECMP_DECL))
 
-# Tcl8.1 requires writable strings for gcc
-
-if test "$GCC" = "yes"; then
-   LIBGUI_CFLAGS=-fwritable-strings
-else
-   LIBGUI_CFLAGS=
-fi
 
 AC_CACHE_CHECK([for cygwin32], ide_cv_os_cygwin32,
 [AC_EGREP_CPP(lose, [

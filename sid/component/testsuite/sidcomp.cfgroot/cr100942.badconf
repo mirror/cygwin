@@ -1,11 +1,6 @@
 set main verbose? 0
-
-load libcgencpu.la cgen_component_library
-load libgloss.la gloss_component_library
-
-new hw-cpu-arm7t cpu
-new sw-gloss-arm/angel angel
-
-connect-pin cpu ttttrap -> angel trap                             # ERROR: cpu pin should be trap
-connect-pin cpu trap-code <-> angel trap-1-code  # ERROR: angel pin should be trap
-connect-pin cpu ttttrap <-> angel trap-1-code           # ERROR: both pin names are incorrect
+load libloader.la loader_component_library
+new sw-load-elf loader
+connect-pin main staring -> loader load!         # ERROR: main pin name is "starting"
+connect-pin main starting <-> loader load-me!    # ERROR: loader pin name is "load!"
+connect-pin main staring <-> loader load-me!     # ERROR: both pin names are incorrect

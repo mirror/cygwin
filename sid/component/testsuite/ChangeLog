@@ -1,5 +1,30 @@
 2001-06-22  Ben Elliston  <bje@redhat.com>
 
+	* sidcomp.cfgroot/comment.badconf: Remove ARM-specific components.
+	* sidcomp.cfgroot/cr100925.badconf: Likewise.
+	* sidcomp.cfgroot/cr100931.badconf: Likewise.
+	* sidcomp.cfgroot/cr100942.badconf: Likewise.
+	* sidcomp.cfgroot/dupRel.badconf: Likewise.
+	* sidcomp.cfgroot/illegCh.badconf: Likewise.
+	* sidcomp.cfgroot/invaName.badconf: Likewise.
+	* sidcomp.cfgroot/invaRel.badconf: Likewise.
+	* sidcomp.cfgroot/multiSet.badconf: Likewise.
+	* sidcomp.cfgroot/unknown.badconf: Likewise.
+	* sidcomp.cfgroot/wrongOrd.badconf: Likewise.
+	* sidcomp.cfgroot/comment.expect: Update to reflect new errors.
+	* sidcomp.cfgroot/cr100925.expect: Likewise.
+	* sidcomp.cfgroot/cr100931.expect: Likewise.
+	* sidcomp.cfgroot/cr100942.expect: Likewise.
+	* sidcomp.cfgroot/dupRel.expect: Likewise.
+	* sidcomp.cfgroot/illegCh.expect: Likewise.
+	* sidcomp.cfgroot/invaName.expect: Likewise.
+	* sidcomp.cfgroot/invaRel.expect: Likewise.
+	* sidcomp.cfgroot/multiSet.expect: Likewise.
+	* sidcomp.cfgroot/unknown.expect: Likewise.
+	* sidcomp.cfgroot/wrongOrd.expect: Likewise.
+	
+2001-06-22  Ben Elliston  <bje@redhat.com>
+
 	* lib/monkey.exp (monkey_test): Correct logic thinko when deciding
 	whether or not to output the finishing time.
 

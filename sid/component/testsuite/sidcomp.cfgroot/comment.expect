@@ -1,6 +1,6 @@
-comment.badconf:48: directional arrow expected
-comment.badconf:48: unknown command divided-clock-control
-comment.badconf:70: component angel has no input pin halt#
-comment.badconf:70: unknown command !
-comment.badconf:101: unexpected end of file
+comment.badconf:42: directional arrow expected
+comment.badconf:42: unknown command stdin
+comment.badconf:56: component loader has no input pin load#
+comment.badconf:56: unknown command !
+comment.badconf:70: unexpected end of file
 Configuration error.  Aborting.

@@ -31,6 +31,7 @@
 #maintenance dump-me -- Get fatal error; make debugger dump its core
 #maintenance print -- Maintenance command for printing GDB internal state
 #maintenance info -- Commands for showing internal info about the program being debugged
+#maintenance internal-error -- Give GDB an internal error.
 #
 #maintenance print statistics -- Print statistics about internal gdb state
 #maintenance print objfiles -- Print dump of current object file definitions
@@ -92,10 +93,18 @@ match_max 6000
 # so that branch will really never be covered in this tests here!!
 #
 
+# guo: on linux this command output is huge.  for some reason splitting up
+# the regexp checks works.
+#
 send_gdb "maint check-symtabs\n"
 gdb_expect  {
-        -re "^maint check-symtabs.*$gdb_prompt $"\
+        -re "^maint check-symtabs" {
+	    gdb_expect {
+		-re "$gdb_prompt $" \
                           { pass "maint check-symtabs" }
+		timeout { fail "(timeout) maint check-symtabs" }
+	    }
+	}
         -re ".*$gdb_prompt $"       { fail "maint check-symtabs" }
         timeout         { fail "(timeout) maint check-symtabs" }
         }
@@ -176,28 +185,40 @@ gdb_expect  {
         }
 
 send_gdb "maint print objfiles\n"
+
 # To avoid timeouts, we avoid expects with many .* patterns that match
-# many lines.
-gdb_expect  {
-    -re ".*Object file.*break:  Objfile at $hex, bfd at $hex, \[0-9\]* minsyms\[\r\t \]+\n"
-                            { pass "maint print objfiles: header" }
-    -re ".*$gdb_prompt $"   { fail "maint print objfiles: header" }
-    timeout                 { fail "(timeout) maint print objfiles: header" }
+# many lines.  Instead, we keep track of which milestones we've seen
+# in the output, and stop when we've seen all of them.
+
+set header 0
+set psymtabs 0
+set symtabs 0
+set keep_looking 1
+
+while {$keep_looking} {
+    gdb_expect  {
+
+	-re ".*Object file.*break:  Objfile at $hex, bfd at $hex, \[0-9\]* minsyms\[\r\t \]+\n" { set header 1 }
+	-re ".*Psymtabs:\[\r\t \]+\n" { set psymtabs 1 }
+	-re ".*Symtabs:\[\r\t \]+\n" { set symtabs 1 }
+
+	-re ".*$gdb_prompt $" { 
+	    set keep_looking 0
+	}
+	timeout { 
+	    fail "(timeout) maint print objfiles" 
+	    set keep_looking 0
+	}
+    }
 }
-gdb_expect {
-    -re ".*Psymtabs:\[\r\t \]+\n" { pass "maint print objfiles: psymtabs" }
-    -re ".*$gdb_prompt $"         { fail "maint print objfiles: psymtabs" }
-    timeout                { fail "(timeout) maint print objfiles: psymtabs" }
+
+proc maint_pass_if {val name} {
+    if $val { pass $name } else { fail $name }
 }
-gdb_expect {
-    -re ".*Symtabs:\[\r\t \]+\n"  { pass "maint print objfiles: symtabs" }
-    -re ".*$gdb_prompt $"         { fail "maint print objfiles: symtabs" }
-    timeout                { fail "(timeout) maint print objfiles: symtabs" }
-}
-gdb_expect {
-    -re ".*$gdb_prompt $"   { pass "maint print objfiles: prompt" }
-    timeout                 { fail "(timeout) maint print objfiles: prompt" }
-}
+
+maint_pass_if $header   "maint print objfiles: header"
+maint_pass_if $psymtabs "maint print objfiles: psymtabs"
+maint_pass_if $symtabs  "maint print objfiles: symtabs"
 
 send_gdb "maint print psymbols\n"
 gdb_expect  {
@@ -223,7 +244,9 @@ gdb_expect  {
                   send_gdb "shell grep 'main.*function' psymbols_output\n"
                   gdb_expect {
                         -re ".main., function, $hex.*$gdb_prompt $"\
-                                               { pass "maint print psymbols" }
+                                               { pass "maint print psymbols 1" }
+                        -re ".*main.  .., function, $hex.*$gdb_prompt $"\
+                                               { pass "maint print psymbols 2" }
                         -re ".*$gdb_prompt $"       { fail "maint print psymbols" }
                          timeout         { fail "(timeout) maint print psymbols" }
                          }
@@ -282,6 +305,13 @@ gdb_expect  {
         timeout         { fail "(timeout) maint print symbols w/o args" }
         }
 
+# This command can legitimately take many minutes to execute.  If the
+# executable is dynamically linked, then you get all the debugging
+# info for the entire library --- 89Mb on my system.  -jimb
+
+set old_timeout $timeout
+set timeout 600
+
 send_gdb "maint print symbols symbols_output\n"
 gdb_expect  {
         -re "^maint print symbols symbols_output\r\n$gdb_prompt $"\
@@ -291,7 +321,7 @@ gdb_expect  {
                 -re "symbols_output\r\n$gdb_prompt $"\
                  {
 	          # See comments for `maint print psymbols'.
-                  send_gdb "shell grep 'main.*block' symbols_output\n"
+                  send_gdb "shell grep 'main(.*block' symbols_output\n"
                   gdb_expect {
                         -re "int main\\(int, char \\*\\*, char \\*\\*\\); block.*$gdb_prompt $"\
                                                { pass "maint print symbols" }
@@ -309,6 +339,7 @@ gdb_expect  {
         timeout         { fail "(timeout) maint print symbols" }
         }
 
+set timeout $old_timeout
 
 send_gdb "maint print type argc\n"
 gdb_expect  {
@@ -318,13 +349,18 @@ gdb_expect  {
         timeout         { fail "(timeout) maint print type" }
         }
 
-#send_gdb "maint print unwind &main\n"
-#gdb_expect  {
-#        -re ".*unwind_table_entry \\($hex\\):\r\n\tregion_start = $hex <main>\r\n\tregion_end = $hex <main\\+220>\r\n\tflags = Args_stored Save_RP\r\n\tRegion_description = $hex\r\n\tEntry_FR = $hex\r\n\tEntry_GR = $hex\r\n\tTotal_frame_size = $hex\r\n$gdb_prompt $"\
-#                        { pass "maint print unwind" }
-#        -re ".*$gdb_prompt $"       { fail "maint print unwind" }
-#        timeout         { fail "(timeout) maint print unwind" }
-#        }
+if [istarget "hppa*-*-11*"] {
+    setup_xfail hppa*-*-*11* CLLbs14860
+    send "maint print unwind &main\n"
+    expect  {
+        -re ".*unwind_table_entry \\($hex\\):\r\n\tregion_start = $hex <main>\r\n\tregion_end = $hex <main\\+\[0-9\]*>\r\n\tflags = Args_stored Save_RP\r\n\tRegion_description = $hex\r\n\tEntry_FR = $hex\r\n\tEntry_GR = $hex\r\n\tTotal_frame_size = $hex\r\n$gdb_prompt $"\
+	    { pass "maint print unwind" }
+        -re ".*unwind_table_entry \\($hex\\):\r\n\tregion_start = $hex <main>\r\n\tregion_end = $hex <main\\+\[0-9\]*>\r\n\tflags = Args_stored Save_RP\r\n\tFLD = $hex\r\n\tFLD = $hex\r\n\tFLD = $hex\r\n\tFLD = $hex\r\n$gdb_prompt $"\
+	    { xfail "maint print unwind" }
+        -re ".*$gdb_prompt $"       { xfail "maint info unwind" }
+        timeout         { fail "(timeout) maint print unwind" }
+    }
+}
 
 set oldtimeout $timeout
 set timeout [expr $timeout + 300]
@@ -349,19 +385,23 @@ gdb_expect  {
 
 send_gdb "maint info breakpoints\n"
 gdb_expect {
-    -re "Num\[ \t\]+Type\[ \t\]+Disp\[ \t\]+Enb\[ \t\]+Address\[ \t\]+What\r\n1\[ \t\]+breakpoint\[ \t\]+keep\[ \t\]+y\[ \t\]+$hex in main at.*break.c:60\r\n\[ \t\]+breakpoint already hit 1 time\r\n.*$gdb_prompt $"\
+    -re "Num\[ \t\]+Type\[ \t\]+Disp\[ \t\]+Enb\[ \t\]+Address\[ \t\]+What\r\n1\[ \t\]+breakpoint\[ \t\]+keep\[ \t\]+y\[ \t\]+$hex in main at.*break.c:75\r\n\[ \t\]+breakpoint already hit 1 time\r\n.*$gdb_prompt $"\
 				{ pass "maint info breakpoints" }
     -re ".*$gdb_prompt $"       { fail "maint info breakpoints" }
     timeout			{ fail "(timeout) maint info breakpoints" }
 }
 
 # Try it again, and check for shlib event info.  Not supported everywhere.
-if {! [istarget "hppa*-*-hpux*"]} then {
+if {! ([istarget "hppa*-*-hpux*"] 
+       || [istarget "*-*-linux*"]
+       || [istarget "*-*-solaris*"])} then {
     setup_xfail "*-*-*"
 }
 send_gdb "maint info breakpoints\n"
 gdb_expect  {
-    -re "Num\[ \t\]+Type\[ \t\]+Disp\[ \t\]+Enb\[ \t\]+Address\[ \t\]+What\r\n1\[ \t\]+breakpoint\[ \t\]+keep\[ \t\]+y\[ \t\]+$hex in main at.*break.c:60\r\n\[ \t\]+breakpoint already hit 1 time\r\n-1\[ \t\]+shlib events\[ \t\]+keep\[ \t\]+y\[ \t\]+$hex.*breakpoint already hit.*$gdb_prompt $"\
+        -re "Num\[ \t\]+Type\[ \t\]+Disp\[ \t\]+Enb\[ \t\]+Address\[ \t\]+What\r\n1\[ \t\]+breakpoint\[ \t\]+keep\[ \t\]+y\[ \t\]+$hex in main at.*break.c:75\r\n\[ \t\]+breakpoint already hit 1 time\r\n.*$gdb_prompt $"\
+                        { pass "maint info breakpoints" }
+    -re "Num\[ \t\]+Type\[ \t\]+Disp\[ \t\]+Enb\[ \t\]+Address\[ \t\]+What\r\n1\[ \t\]+breakpoint\[ \t\]+keep\[ \t\]+y\[ \t\]+$hex in main at.*break.c:75\r\n\[ \t\]+breakpoint already hit 1 time\r\n-1\[ \t\]+shlib events\[ \t\]+keep\[ \t\]+y\[ \t\]+$hex.*breakpoint already hit.*$gdb_prompt $"\
 	    { pass "maint info breakpoints: shlib events" }
     -re ".*$gdb_prompt $" {
 	fail "maint info breakpoints: shlib events"
@@ -403,7 +443,7 @@ set timeout $oldtimeout
 
 send_gdb "help maint\n"
 gdb_expect  {
-        -re "Commands for use by GDB maintainers\\..*Includes commands to dump specific internal GDB structures in.*a human readable form, to cause GDB to deliberately dump core,.*to test internal functions such as the C.. demangler, etc\\..*List of maintenance subcommands:.*maintenance check-symtabs.*maintenance demangle.*maintenance dump-me.*maintenance info.*maintenance print.*maintenance space.*maintenance time.*Type.*help maintenance.*followed by maintenance subcommand name for full documentation\\..*Command name abbreviations are allowed if unambiguous\\..*$gdb_prompt $"\
+        -re "Commands for use by GDB maintainers\\..*Includes commands to dump specific internal GDB structures in.*a human readable form, to cause GDB to deliberately dump core,.*to test internal functions such as the C.. demangler, etc\\..*List of maintenance subcommands:.*maintenance check-symtabs.*maintenance demangle.*maintenance dump-me.*maintenance info.*maintenance internal-error.*maintenance print.*maintenance space.*maintenance time.*Type.*help maintenance.*followed by maintenance subcommand name for full documentation\\..*Command name abbreviations are allowed if unambiguous\\..*$gdb_prompt $"\
  { pass "help maint" }
         -re ".*$gdb_prompt $"       { fail "help maint" }
         timeout         { fail "(timeout) help maint" }
@@ -448,6 +488,14 @@ gdb_expect  {
                         { pass "help maint dump-me" }
         -re ".*$gdb_prompt $"       { fail "help maint dump-me" }
         timeout         { fail "(timeout) help maint dump-me" }
+        }
+
+send_gdb "help maint internal-error\n"
+gdb_expect  {
+        -re "Give GDB an internal error\\.\r\nCause GDB to behave as if an internal error was detected\\..*$gdb_prompt $"\
+                        { pass "help maint internal-error" }
+        -re ".*$gdb_prompt $"       { fail "help maint internal-error" }
+        timeout         { fail "(timeout) help maint internal-error" }
         }
 
 send_gdb "help maint print statistics\n"
@@ -499,13 +547,15 @@ gdb_expect  {
         timeout         { fail "(timeout) help maint print type" }
         }
 
-#send_gdb "help maint print unwind\n"
-#gdb_expect  {
-#        -re "Print unwind table entry at given address\\..*$gdb_prompt $"\
-#                        { pass "help maint print unwind" }
-#        -re ".*$gdb_prompt $"       { fail "help maint print unwind" }
-#        timeout         { fail "(timeout) help maint print unwind" }
-#        }
+if [istarget "hppa*-*-*"] {
+    send_gdb "help maint print unwind\n"
+    gdb_expect  {
+        -re "Print unwind table entry at given address\\..*$gdb_prompt $"\
+	    { pass "help maint print unwind" }
+        -re ".*$gdb_prompt $"       { fail "help maint print unwind" }
+        timeout         { fail "(timeout) help maint print unwind" }
+    }
+}
 
 send_gdb "help maint info sections\n"
 gdb_expect  {
@@ -541,7 +591,7 @@ gdb_expect  {
 
 send_gdb "help maint print\n"
 gdb_expect  {
-        -re "Maintenance command for printing GDB internal state\\.\[\r\n\]+List of maintenance print subcommands:\[\r\n\]+maintenance print msymbols -- Print dump of current minimal symbol definitions.*maintenance print objfiles -- Print dump of current object file definitions.*maintenance print psymbols -- Print dump of current partial symbol definitions.*maintenance print statistics -- Print statistics about internal gdb state.*maintenance print symbols -- Print dump of current symbol definitions.*maintenance print type -- Print a type chain for a given symbol.*Type .help maintenance print. followed by maintenance print subcommand name for full documentation\\.\[\r\n\]+Command name abbreviations are allowed if unambiguous\\..*$gdb_prompt $"\
+        -re "Maintenance command for printing GDB internal state\\.\[\r\n\]+List of maintenance print subcommands:\[\r\n\]+maintenance print architecture -- Print the internal architecture configuration.*maintenance print msymbols -- Print dump of current minimal symbol definitions.*maintenance print objfiles -- Print dump of current object file definitions.*maintenance print psymbols -- Print dump of current partial symbol definitions.*maintenance print statistics -- Print statistics about internal gdb state.*maintenance print symbols -- Print dump of current symbol definitions.*maintenance print type -- Print a type chain for a given symbol.*Type .help maintenance print. followed by maintenance print subcommand name for full documentation\\.\[\r\n\]+Command name abbreviations are allowed if unambiguous\\..*$gdb_prompt $"\
                         { pass "help maint print" }
         -re ".*$gdb_prompt $"       { fail "help maint print" }
         timeout         { fail "(timeout) help maint print" }
@@ -570,6 +620,38 @@ gdb_expect  {
         -re ".*$gdb_prompt $"       { fail "maint dump-me" }
         timeout         { fail "(timeout) maint dump-me" }
         }
+
+send_gdb "maint internal-error\n"
+gdb_expect  {
+    -re "Continue this debugging session.*\\(y or n\\) $" {
+	send_gdb "y\n"
+	gdb_expect {
+	    -re "Create a core file.*\\(y or n\\) $" {
+		send_gdb "n\n"
+		gdb_expect {
+		    -re ".*$gdb_prompt $" {
+			pass "maint internal-error"
+		    }
+		    timeout {
+			fail "(timeout)  maint internal-error"
+		    }
+		}
+	    }
+	    -re ".*$gdb_prompt $" {
+		fail "maint internal-error"
+	    }
+	    timeout {
+		fail "(timeout)  maint internal-error"
+	    }
+	}
+    }
+    -re ".*$gdb_prompt $" {
+	fail "maint internal-error"
+    }
+    timeout {
+	fail "(timeout) maint internal-error"
+    }
+}
 
 #set timeout $oldtimeout
 

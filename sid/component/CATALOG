@@ -46,6 +46,7 @@ hw-cpu-xstormy16        Sanyo Xstormy16 CPU model
 hw-disk-harddrive	Newer IDE hard drive model (controller + drives)
 hw-disk-ide             IDE hard drive model (controller + drives)
 hw-glue-bus-mux         Bus multiplexer
+hw-glue-pin-pacer	Pin signal FIFO queue.
 hw-glue-probe-bus       Bus traffic tracer
 hw-glue-sequence        Sequential pin event dispatcher
 hw-input-keyboard	PC keyboard model

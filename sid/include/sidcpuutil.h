@@ -223,7 +223,7 @@ namespace sidutil
       void divert_to_cout () { cout_p = true; }
       void open (const std::string& filename)
       {
-	std::ofstream::open (filename.c_str ());
+	std::ofstream::open (filename.c_str (), std::ios::app);
 	cout_p = false;
       }
     private:
@@ -340,6 +340,7 @@ namespace sidutil
 	{
 	  trace_stream.close ();
 	  trace_stream.open (trace_filename);
+	  trace_stream << "start of trace" << std::endl;
 	  if (trace_stream.good ())
 	    trace_stream.divert_to_file ();
 	  else

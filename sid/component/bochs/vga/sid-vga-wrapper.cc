@@ -9,12 +9,28 @@
 #include <cstdlib>
 #include <cerrno>
 #include <ctime>
+#include <new>
+#include <new>
 #include <unistd.h>
-#include <fstream>
+#include <iostream>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/types.h>
+
+using std::cerr;
+using std::nothrow;
+using std::endl;
+using std::ifstream;
+using std::ofstream;
+using std::ios;
 #include <sys/stat.h>
+
+using std::cerr;
+using std::nothrow;
+using std::endl;
+using std::ifstream;
+using std::ofstream;
+using std::ios;
 
 using sidutil::make_attribute;
 using sidutil::parse_attribute;

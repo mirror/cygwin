@@ -84,7 +84,7 @@ public:
   IntController<bus_size>(host_int_4 num_irq = 0,
 			  host_int_4 num_fiq = 0,
 			  host_int_4 ctrlr_features = 0);
-  virtual ~IntController<bus_size>() { }
+  virtual ~IntController<bus_size>() throw () { }
   
 private:
   class interrupt_bus: public word_bus<bus_size>
@@ -97,7 +97,7 @@ private:
         (host_int_4, bus_size, bus_size)):
 	  host(who), read(rd), write(wr) { }
   
-    ~interrupt_bus() { }
+    ~interrupt_bus() throw () { }
   
     sid::bus::status word_write
       (host_int_4 addr, bus_size mask, bus_size data)
@@ -125,7 +125,7 @@ private:
       void (IntController<bus_size>::*fp) (host_int_4, host_int_4)):
   		     bit_num(pos), host(who), driveit(fp) { }
   
-    ~interrupt_lines()
+    ~interrupt_lines() throw ()
       { host = NULL; driveit = NULL; }
   
     void driven(host_int_4 value) throw ()

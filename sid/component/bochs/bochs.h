@@ -60,6 +60,12 @@ extern "C" {
 #endif
 }
 
+#include <iostream>
+using namespace std;
+
+#include <iostream>
+using namespace std;
+
 // Hacks for win32: always return regular file.
 #ifdef WIN32
 #ifndef __MINGW32__

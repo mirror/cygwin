@@ -157,10 +157,10 @@
       the output.
     </p>
     <p>
-     Since this component generates a histogram-type gprof file
-      instead of the arc-type file that <tt>-pg</tt>-compiled target programs
-      usually generate, gprof must be run with an option such as
-      <tt>--flat-profile</tt>.  Call graph information is not collected.
+      Depending on whether the connected CPU model sends call-graph events,
+      the resulting <tt>gmon.out</tt> may contain histogram with or without
+      call-graph data.  If the former, gprof must be run with an option such
+      as <tt>--flat-profile</tt>.
     </p>
   </env>
 </defcomplib>

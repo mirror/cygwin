@@ -14,7 +14,7 @@ class cma222IntController: public IntController<little_int_1>
 public:
   cma222IntController():
     IntController<little_int_1>(8, 0, 0) { }
-  cma222IntController::~cma222IntController() { }
+  cma222IntController::~cma222IntController() throw () { }
 
 private:
 

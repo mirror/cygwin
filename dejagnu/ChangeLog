@@ -1,5 +1,8 @@
 2000-08-02  Jimmy Guo  <guo@hpcleara.cup.hp.com>
 
+	* runtest.exp: Cleanup reference to $env(MULTIPASS) and
+        $env(PASS).  These were added by HP but unused since.
+
 	* lib/framework.exp (pass): make compiler_conditional_xfail_data
 	a global, corresponding to a recent change to 'proc fail'.
 	

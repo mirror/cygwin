@@ -980,8 +980,8 @@ for { set i 0 } { $i < $argc } { incr i } {
 	"--ou*" -
 	"--sr*" -
 	"--st*" -
-
         "--ta*" -
+	"--di*" -
 	"--to*" {
 	    incr i
 	    set optarg [lindex $argv $i]
@@ -1029,8 +1029,14 @@ for { set i 0 } { $i < $argc } { incr i } {
 	    continue
 	}
 	
+	"--di*" {
+	    # Already parsed (and don't set again).  Let $DEJAGNU rename it.
+	    # set cmdline_dir_to_run $optarg
+	    continue
+	}
+
 	
-	"--d*" {			# (--debug) expect internal debugging
+	"--de*" {			# (--debug) expect internal debugging
 	    if [file exists ./dbg.log] {
 		catch "exec rm -f ./dbg.log"
 	    }
@@ -1598,20 +1604,16 @@ foreach current_target $target_list {
 
     if { [info exists MULTIPASS] } {
 	set multipass $MULTIPASS
-    } elseif {[info exists env(MULTIPASS)]} {
-	set multipass $env(MULTIPASS)
     }
     if { $multipass == "" } {
 	set multipass { "" }
     }
 
-# If PASS is specified, either as a TCL variable or in environment, we
-# want to run only the tests specified. Its value should be a number
-# or a list of numbers that specify the passes that we want to run.
+# If PASS is specified, we want to run only the tests specified.
+# Its value should be a number or a list of numbers that specify
+# the passes that we want to run.
     if [info exists PASS] {
 	set pass $PASS
-    } elseif [info exists env(PASS)] {
-	set pass $env(PASS)
     } else {
 	set pass ""
     }

@@ -176,6 +176,10 @@ cgen_bi_endian_cpu::cgen_read_memory(bfd_vma memaddr, bfd_byte *myaddr,
 {
   cgen_bi_endian_cpu *thisp = static_cast<cgen_bi_endian_cpu *>(info->application_data);
 
+  // We don't want to penalize the disassembler with memory latency counts, so we
+  // store it away here ...
+  host_int_8 prev_latency = thisp->total_latency;
+
   switch (length) {
 #if 0 // XXX not sure if this has byte order dependancies or not
   case 1:
@@ -195,6 +199,10 @@ cgen_bi_endian_cpu::cgen_read_memory(bfd_vma memaddr, bfd_byte *myaddr,
     for (int i = 0; i < length; i++)
       *(myaddr + i) = thisp->read_insn_memory_1(0, memaddr + i);
   }
+
+  // ... and restore it here.
+  thisp->total_latency = prev_latency;
+
   return 0;
 }
 
@@ -247,7 +255,12 @@ cgen_bi_endian_cpu::end_trace ()
 void
 cgen_bi_endian_cpu::trace_counter (PCADDR pc)
 {
-  this->trace_stream << this->trace_count++ << "\t";
+  this->trace_stream
+    << this->trace_count++ << ' ' 
+    << (this->sched_query.now()-1) << '\t';
+
+  // Invalidate any local icaches; they distort approximate cycle counting.
+  this->flush_icache (pc);
 }
 
 

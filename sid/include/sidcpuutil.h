@@ -13,6 +13,7 @@
 #include <sidcomputil.h>
 #include <sidmiscutil.h>
 #include <sidwatchutil.h>
+#include <sidschedutil.h>
 
 using std::string;
 
@@ -127,6 +128,11 @@ namespace sidutil
   protected:
     recursion_limited step_limit;
 
+    // scheduler querying
+  protected:
+    friend class scheduler_time_query<basic_cpu>;
+    scheduler_time_query<basic_cpu> sched_query;
+
     // triggerpoint support
   protected:
     friend class self_watcher<basic_cpu>;
@@ -191,7 +197,7 @@ namespace sidutil
     }
 
     // step/yield control pins
-  private:
+  protected:
     callback_pin<basic_cpu> step_pin;
     callback_pin<basic_cpu> yield_pin;
     bool yield_p;
@@ -315,8 +321,10 @@ namespace sidutil
     // Flush internal abstract icache (if any)
   private:
     callback_pin<basic_cpu> flush_icache_pin;
-    virtual void flush_icache () = 0;
     void flush_icache_pin_handler(sid::host_int_4 v) { this->flush_icache(); }
+  protected:
+    virtual void flush_icache () = 0;
+    virtual void flush_icache (sid::host_int_4 pc) { this->flush_icache (); }
 
     // Set the initial PC after reset
   private:
@@ -460,6 +468,7 @@ public:
     basic_cpu ():
       total_latency (0),
       step_limit ("instruction stepping", 1),
+      sched_query (this),
       triggerpoint_manager (this),
       step_pin (this, & basic_cpu::step_pin_handler),
       yield_pin (this, & basic_cpu::yield_pin_handler),

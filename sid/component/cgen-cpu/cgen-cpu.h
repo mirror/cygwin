@@ -80,7 +80,7 @@ protected:
   static int cgen_symbol_at_address(bfd_vma addr, struct disassemble_info * info);
   // Counter tracing support
   void trace_counter (PCADDR pc);
-  int trace_count;
+  host_int_8 trace_count;
 
 public:
   cgen_bi_endian_cpu ();

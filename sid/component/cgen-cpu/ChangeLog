@@ -1,3 +1,8 @@
+2001-12-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cgen-cpu.h (cgen_bi_endian_cpu): Make trace_count a host_int_8.
+	* compCGEN.cxx (cgen_read_memory): Don't distort memory latency
+
 2001-12-18  Dave Brolley  <brolley@redhat.com>
 
 	* cgen-ops.h (ROLHI): New macro.

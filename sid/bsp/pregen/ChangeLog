@@ -1,3 +1,7 @@
+2001-12-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* ALL.conf: Regenerated with cpu/sched etc. changes.
+
 2001-12-17  matthew green  <mrg@redhat.com>
 
 	* pregen-configs.in: Add support for Xstormy16.

@@ -277,66 +277,12 @@ namespace sidutil
 	  }
       }
 
-    component::status
-    set_trace_sem (const string &s)
+    // Infer a change to trace_result_p after one of the other general 
+    // trace flags are changed.
+    void
+    update_trace_result_p ()
     {
-      if (s == "1")
-        trace_semantics_p = true;
-      else if (s == "0")
-        trace_semantics_p = false;
-      else
-	return sid::component::bad_value;
-      trace_result_p = (trace_semantics_p || trace_disass_p);
-      return sid::component::ok;
-    }
-
-    string
-    get_trace_sem ()
-    {
-      return trace_semantics_p ? "1" : "0";
-    }
-
-    component::status
-    set_trace_disasm (const string& s)
-    {
-      if (s == "1")
-        trace_disass_p = true;
-      else if (s == "0")
-        trace_disass_p = false;
-      else
-	return sid::component::bad_value;
-      trace_result_p = (trace_semantics_p || trace_disass_p);
-      return sid::component::ok;
-    }
-
-    string
-    get_trace_disasm ()
-    {
-      return trace_disass_p ? "1" : "0";
-    }
-
-    component::status
-    set_trace_count (const string& s)
-    {
-      if (s == "1")
-        trace_counter_p = true;
-      else if (s == "0")
-        trace_counter_p = false;
-      else
-	return sid::component::bad_value;
-      return sid::component::ok;
-    }
-
-    string
-    get_trace_count ()
-    {
-      return trace_counter_p ? "1" : "0";
-    }
-
-    string
-    get_trace_result ()
-    {
-      return trace_result_p ? "1" : "0";
+      this->trace_result_p = (this->trace_semantics_p || this->trace_disass_p);
     }
 
 
@@ -532,24 +478,16 @@ public:
 			       & basic_cpu::save_state,
 			       & basic_cpu::restore_state);
 	add_attribute ("trace-extract?", & trace_extract_p, "setting");
-	add_attribute_virtual ("trace-semantics?", this,
-			       & basic_cpu::set_trace_sem, 
-			       & basic_cpu::get_trace_sem, 
+	add_attribute_notify ("trace-semantics?", & this->trace_semantics_p, this,
+			       & basic_cpu::update_trace_result_p, 
+			       "setting");
+	add_attribute_notify ("trace-disassemble?", & this->trace_disass_p, this,
+			       & basic_cpu::update_trace_result_p, 
 			       "setting");
 	// `trace-result?' should go away after all simulators are updated to
 	// use `trace-semantics?'.
-	add_attribute_virtual ("trace-result?", this,
-			       & basic_cpu::set_trace_sem, 
-			       & basic_cpu::get_trace_sem, 
-			       "setting");
-	add_attribute_virtual ("trace-disassemble?", this,
-			       & basic_cpu::set_trace_disasm, 
-			       & basic_cpu::get_trace_disasm, 
-			       "setting");
-	add_attribute_virtual ("trace-counter?", this,
-			       & basic_cpu::set_trace_count, 
-			       & basic_cpu::get_trace_count, 
-			       "setting");
+	add_attribute ("trace-result?", & this->trace_result_p, "setting");
+	add_attribute ("trace-counter?", & this->trace_counter_p, "setting");
       }
 
     virtual ~basic_cpu() throw() {}

@@ -164,6 +164,9 @@
 		 (let ((n (id-len (string-drop1 syn))))
 		   (if (= n 0)
 		       (parse-error context "empty or invalid operand name" syntax))
+		   (let ((operand (string->symbol (substring syn 1 (1+ n)))))
+		     (if (not (current-op-lookup operand))
+			 (parse-error context "undefined operand " operand syntax)))
 		   (loop (string-drop (1+ n) syn)
 			 (string-append result op-macro " ("
 					(string-upcase

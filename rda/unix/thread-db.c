@@ -1205,9 +1205,19 @@ set_target_int_by_name (char *name, void *value, int size)
 }
 
 /* Function: get_thread_signals
-   Obtain the values of the "cancel", "restart" and "debug" signals 
-   used by linux threads, and store them in a set of global variables
-   for use by check_child_state and friends. */
+
+   Obtain the values of the "cancel", "restart" and "debug" signals
+   used by LinuxThreads, and store them in a set of global variables
+   for use by check_child_state and friends.
+
+   Recent versions of NPTL don't define these symbols at all; you must
+   use the libthread_db event functions instead (td_ta_event_addr,
+   ...) to find out about thread creation, thread exits, and so on.
+
+   Older versions of LinuxThreads provide both interfaces.  To avoid
+   changing RDA's behavior on any system it supports, we use the older
+   signal-based interface if present, and use the event-based
+   interface as a fall-back.  */
 
 static int cancel_signal;
 static int restart_signal;

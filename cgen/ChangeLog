@@ -1,3 +1,11 @@
+2004-12-16  Jim Blandy  <jimb@redhat.com>
+
+	* read.scm (debug-repl): Temporarily redirect input and output to
+	/dev/tty while we debug, so we don't interfere with whatever CGEN
+	is reading or writing.
+	* utils.scm (setter-getter-fluid-let, with-input-and-output-to):
+	New functions.
+
 2004-11-15  Michael K. Lechner <mike.lechner@gmail.com>
 
 	* cpu/iq2000.cpu: Added quotes around macro arguments so that they

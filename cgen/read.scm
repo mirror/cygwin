@@ -952,6 +952,17 @@ Define a preprocessor-style macro.
 
 (define (debug-var name) (assq-ref debug-env name))
 
+; A handle on /dev/tty, so we can be sure we're talking with the user.
+; We open this the first time we actually need it.
+(define debug-tty #f)
+
+; Return the port we should use for interacting with the user,
+; opening it if necessary.
+(define (debug-tty-port)
+  (if (not debug-tty)
+      (set! debug-tty (open-file "/dev/tty" "r+")))
+  debug-tty)
+
 ; Enter a repl loop for debugging purposes.
 ; Use (quit) to exit cgen completely.
 ; Use (debug-quit) or (quit 0) to exit the debugging session and
@@ -964,13 +975,16 @@ Define a preprocessor-style macro.
 ; FIXME: Move to utils.scm.
 
 (define (debug-repl env-alist)
-  (set! debug-env env-alist)
-  (let loop ()
-    (let ((rc (top-repl)))
-      (if (null? rc)
-	  (quit 1)) ; indicate error to `make'
-      (if (not (equal? rc '(0)))
-	  (loop))))
+  (with-input-and-output-to
+   (debug-tty-port)
+   (lambda ()
+     (set! debug-env env-alist)
+     (let loop ()
+       (let ((rc (top-repl)))
+	 (if (null? rc)
+	     (quit 1))			; indicate error to `make'
+	 (if (not (equal? rc '(0)))
+	     (loop))))))
 )
 
 ; Utility for debug-repl.

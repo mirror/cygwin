@@ -18,6 +18,3 @@
 /* Version number of package */
 #undef VERSION
 
-/* Timebomb - seconds since epoch - 0=unlimited */
-#undef SID_TIMEBOMB
-

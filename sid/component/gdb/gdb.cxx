@@ -620,23 +620,28 @@ gdb::process_get_mem (struct gdbserv_reg *reg_addr,
     }
   host_int_4 addr = addr8; // truncate
 
-  if (len==1 && e==endian_big) 
-    read_bus_word (gdbserv, memory, addr, big_int_1());
-  else if (len==1 && e==endian_little)
-    read_bus_word (gdbserv, memory, addr, little_int_1());
-  else if (len==2 && e==endian_big) 
-    read_bus_word (gdbserv, memory, addr, big_int_2());
-  else if (len==2 && e==endian_little)
-    read_bus_word (gdbserv, memory, addr, little_int_2());
-  else if (len==4 && e==endian_big) 
-    read_bus_word (gdbserv, memory, addr, big_int_4());
-  else if (len==4 && e==endian_little)
-    read_bus_word (gdbserv, memory, addr, little_int_4());
-  else if (len==8 && e==endian_big) 
-    read_bus_word (gdbserv, memory, addr, big_int_8());
-  else if (len==8 && e==endian_little)
-    read_bus_word (gdbserv, memory, addr, little_int_8());
-  else if (e==endian_little)
+  if (addr % len == 0)
+    {
+      if (len==1 && e==endian_big) 
+	{ read_bus_word (gdbserv, memory, addr, big_int_1()); return; }
+      if (len==1 && e==endian_little)
+	{ read_bus_word (gdbserv, memory, addr, little_int_1()); return; }
+      if (len==2 && e==endian_big) 
+	{ read_bus_word (gdbserv, memory, addr, big_int_2()); return; }
+      if (len==2 && e==endian_little)
+	{ read_bus_word (gdbserv, memory, addr, little_int_2()); return; }
+      if (len==4 && e==endian_big) 
+	{ read_bus_word (gdbserv, memory, addr, big_int_4()); return; }
+      if (len==4 && e==endian_little)
+	{ read_bus_word (gdbserv, memory, addr, little_int_4()); return; }
+      if (len==8 && e==endian_big) 
+	{ read_bus_word (gdbserv, memory, addr, big_int_8()); return; }
+      if (len==8 && e==endian_little)
+	{ read_bus_word (gdbserv, memory, addr, little_int_8()); return; }
+    }
+
+  // Unaligned access or unsupported size.
+  if (e==endian_little)
     {
       for (unsigned long i=0; i<len; i++)
 	read_bus_word (gdbserv, memory, addr + i, little_int_1());
@@ -700,23 +705,28 @@ gdb::process_set_mem (struct gdbserv_reg *reg_addr,
     }
   host_int_4 addr = addr8; // truncate
 
-  if (len==1 && e==endian_big) 
-    write_bus_word (gdbserv, binary, memory, addr, big_int_1());
-  else if (len==1 && e==endian_little)
-    write_bus_word (gdbserv, binary, memory, addr, little_int_1());
-  else if (len==2 && e==endian_big) 
-    write_bus_word (gdbserv, binary, memory, addr, big_int_2());
-  else if (len==2 && e==endian_little)
-    write_bus_word (gdbserv, binary, memory, addr, little_int_2());
-  else if (len==4 && e==endian_big) 
-    write_bus_word (gdbserv, binary, memory, addr, big_int_4());
-  else if (len==4 && e==endian_little)
-    write_bus_word (gdbserv, binary, memory, addr, little_int_4());
-  else if (len==8 && e==endian_big) 
-    write_bus_word (gdbserv, binary, memory, addr, big_int_8());
-  else if (len==8 && e==endian_little)
-    write_bus_word (gdbserv, binary, memory, addr, little_int_8());
-  else if (e==endian_little)
+  if (addr % len == 0)
+    {
+      if (len==1 && e==endian_big) 
+	{ write_bus_word (gdbserv, binary, memory, addr, big_int_1()); return; }
+      if (len==1 && e==endian_little)
+	{ write_bus_word (gdbserv, binary, memory, addr, little_int_1()); return; }
+      if (len==2 && e==endian_big) 
+	{ write_bus_word (gdbserv, binary, memory, addr, big_int_2()); return; }
+      if (len==2 && e==endian_little)
+	{ write_bus_word (gdbserv, binary, memory, addr, little_int_2()); return; }
+      if (len==4 && e==endian_big) 
+	{ write_bus_word (gdbserv, binary, memory, addr, big_int_4()); return; }
+      if (len==4 && e==endian_little)
+	{ write_bus_word (gdbserv, binary, memory, addr, little_int_4()); return; }
+      if (len==8 && e==endian_big) 
+	{ write_bus_word (gdbserv, binary, memory, addr, big_int_8()); return; }
+      if (len==8 && e==endian_little)
+	{ write_bus_word (gdbserv, binary, memory, addr, little_int_8()); return; }
+    }
+
+  // Unaligned access or unsupported size.
+  if (e==endian_little)
     {
       for (unsigned long i=0; i<len; i++)
 	write_bus_word (gdbserv, binary, memory, addr + i, little_int_1());

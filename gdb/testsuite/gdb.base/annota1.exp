@@ -62,7 +62,7 @@ if [target_info exists gdb_stub] {
 #
 # the line at which break main will put the breakpoint
 #
-set main_line 20
+set main_line 32
 
 # The commands we test here produce many lines of output; disable "press 
 # <return> to continue" prompts.
@@ -140,14 +140,16 @@ gdb_expect {
 # annotate-frame-end
 # annotate-stopped
 #
+#exp_internal 1
 send_gdb "run\n"
   gdb_expect {
-    -re "\r\n\032\032post-prompt\r\nStarting program: $binfile \r\n\r\n\032\032frames-invalid\r\n\r\n\032\032frames-invalid\r\n\r\n\032\032breakpoints-invalid\r\n\r\n\032\032starting\(\r\n\r\n\032\032frames-invalid\)+\r\n\r\n\032\032breakpoint 1\r\n\r\nBreakpoint 1, \r\n\032\032frame-begin 0 $hex\r\n\r\n\032\032frame-function-name\r\nmain\r\n\032\032frame-args\r\n \\(\\)\r\n\032\032frame-source-begin\r\n at \r\n\032\032frame-source-file\r\n.*annota1.c\r\n\032\032frame-source-file-end\r\n:\r\n\032\032frame-source-line\r\n$main_line\r\n\032\032frame-source-end\r\n\r\n\r\n\032\032source.*$srcfile:$main_line:.*:beg:$hex\r\n\r\n\032\032frame-end\r\n\r\n\032\032stopped\r\n$gdb_prompt$" \
+    -re "\r\n\032\032post-prompt\r\nStarting program: $binfile \(\r\n\r\n\032\032frames-invalid\)+\(\r\n\r\n\032\032breakpoints-invalid\)*.*\(\r\n\r\n\032\032frames-invalid\)*\r\n\r\n\032\032starting\(\r\n\r\n\032\032frames-invalid\)+\r\n\r\n\032\032breakpoint 1\r\n\r\nBreakpoint 1, \r\n\032\032frame-begin 0 $hex\r\n\r\n\032\032frame-function-name\r\nmain\r\n\032\032frame-args\r\n \\(\\)\r\n\032\032frame-source-begin\r\n at \r\n\032\032frame-source-file\r\n.*annota1.c\r\n\032\032frame-source-file-end\r\n:\r\n\032\032frame-source-line\r\n$main_line\r\n\032\032frame-source-end\r\n\r\n\r\n\032\032source.*$srcfile:$main_line:.*:beg:$hex\r\n\r\n\032\032frame-end\r\n\r\n\032\032stopped\r\n.*$gdb_prompt$" \
 	                    { pass "run until main breakpoint" }
     -re ".*$gdb_prompt$"       { fail "run until main breakpoint" }
     timeout	            { fail "run until main breakpoint (timeout)" }
   }
-
+#exp_internal 0
+#exit 0
 
 #
 # Let's do a next, to get to a point where the array is initialized
@@ -226,7 +228,7 @@ gdb_expect {
 #
 send_gdb "continue\n"
 gdb_expect {
-  -re "\r\n\032\032post-prompt\r\nContinuing.\r\n\r\n\032\032starting\r\n\r\n\032\032frames-invalid\r\n\r\n\032\032breakpoint 3\r\n\r\nBreakpoint 3, \r\n\032\032frame-begin 0 $hex\r\n\r\n\032\032frame-address\r\n$hex\r\n\032\032frame-address-end\r\n in \r\n\032\032frame-function-name\r\nprintf\r\n\032\032frame-args\r\n \\(\\)\r\n\032\032frame-where\r\n from.*\032\032frame-end\r\n\r\n\032\032stopped\r\n$gdb_prompt$" \
+  -re "\r\n\032\032post-prompt\r\nContinuing.\r\n\r\n\032\032starting\r\n\r\n\032\032frames-invalid\r\n\r\n\032\032breakpoint 3\r\n\r\nBreakpoint 3, \r\n\032\032frame-begin 0 $hex\r\n\r\n(\032\032frame-address\r\n$hex\r\n\032\032frame-address-end\r\n in \r\n)*\032\032frame-function-name\r\nprintf\r\n\032\032frame-args\r\n.*\032\032frame-end\r\n\r\n\032\032stopped\r\n$gdb_prompt$" \
 	  { pass "continue to printf" }
   -re ".*$gdb_prompt$"     { fail "continue to printf" }
   timeout	            { fail "continue to printf (timeout)" }
@@ -240,7 +242,7 @@ gdb_expect {
 #
 send_gdb "backtrace\n"
 gdb_expect {
-  -re "\r\n\032\032post-prompt\r\n\r\n\032\032frame-begin 0 $hex\r\n.0  \r\n\032\032frame-address\r\n$hex\r\n\032\032frame-address-end\r\n in \r\n\032\032frame-function-name\r\nprintf\r\n\032\032frame-args\r\n \\(\\)\r\n\032\032frame-where\r\n from.*\r\n\032\032frame-end\r\n\r\n\032\032frame-begin 1 $hex\r\n.1  \r\n\032\032frame-address\r\n$hex\r\n\032\032frame-address-end\r\n in \r\n\032\032frame-function-name\r\nmain\r\n\032\032frame-args\r\n \\(\\)\r\n\032\032frame-source-begin\r\n at \r\n\032\032frame-source-file\r\n${srcdir}/${subdir}/${srcfile}\r\n\032\032frame-source-file-end\r\n:\r\n\032\032frame-source-line\r\n.*\r\n\032\032frame-source-end\r\n\r\n\r\n\032\032frame-end\r\n$gdb_prompt$" \
+  -re "\r\n\032\032post-prompt\r\n\r\n\032\032frame-begin 0 $hex\r\n.0  \r\n(\032\032frame-address\r\n$hex\r\n\032\032frame-address-end\r\n in \r\n)*\032\032frame-function-name\r\nprintf\r\n\032\032frame-args\r\n \\(.*frame-end\r\n\r\n\032\032frame-begin 1 $hex\r\n.1  \r\n\032\032frame-address\r\n$hex\r\n\032\032frame-address-end\r\n in \r\n\032\032frame-function-name\r\nmain\r\n\032\032frame-args\r\n \\(\\)\r\n\032\032frame-source-begin\r\n at \r\n\032\032frame-source-file\r\n${srcdir}/${subdir}/${srcfile}\r\n\032\032frame-source-file-end\r\n:\r\n\032\032frame-source-line\r\n.*\r\n\032\032frame-source-end\r\n\r\n\r\n\032\032frame-end\r\n$gdb_prompt$" \
 	  { pass "bactrace from shlibrary" }
   -re ".*$gdb_prompt$"     { fail "backtrace from shlibrary" }
   timeout	            { fail "backtrace from shlibrary (timeout)" }
@@ -256,7 +258,7 @@ gdb_expect {
 #
 send_gdb "signal SIGUSR1\n"
 gdb_expect {
-  -re "\r\n\032\032post-prompt\r\nContinuing with signal SIGUSR1.\r\n\r\n\032\032starting\r\n\r\n\032\032frames-invalid\r\n\r\n\032\032breakpoint 2\r\n\r\nBreakpoint 2, \r\n\032\032frame-begin 0 $hex\r\n\r\n\032\032frame-function-name\r\nhandle_USR1\r\n\032\032frame-args\r\n \\(\r\n\032\032arg-begin\r\nsig\r\n\032\032arg-name-end\r\n=\r\n\032\032arg-value -\r\n16\r\n\032\032arg-end\r\n\\)\r\n\032\032frame-source-begin\r\n at \r\n\032\032frame-source-file\r\n${srcdir}/${subdir}/${srcfile}\r\n\032\032frame-source-file-end\r\n:\r\n\032\032frame-source-line\r\n.*\r\n\032\032frame-source-end\r\n\r\n\r\n\032\032source.*annota1.c:.*:185:beg:$hex\r\n\r\n\032\032frame-end\r\n\r\n\032\032stopped\r\n$gdb_prompt$" \
+  -re "\r\n\032\032post-prompt\r\nContinuing with signal SIGUSR1.\r\n\r\n\032\032starting\r\n\r\n\032\032frames-invalid\r\n\r\n\032\032breakpoint 2\r\n\r\nBreakpoint 2, \r\n\032\032frame-begin 0 $hex\r\n\r\n\032\032frame-function-name\r\nhandle_USR1\r\n\032\032frame-args\r\n \\(\r\n\032\032arg-begin\r\nsig\r\n\032\032arg-name-end\r\n=\r\n\032\032arg-value -\r\n$decimal\r\n\032\032arg-end\r\n\\)\r\n\032\032frame-source-begin\r\n at \r\n\032\032frame-source-file\r\n${srcdir}/${subdir}/${srcfile}\r\n\032\032frame-source-file-end\r\n:\r\n\032\032frame-source-line\r\n.*\r\n\032\032frame-source-end\r\n\r\n\r\n\032\032source.*annota1.c:.*:.*:beg:$hex\r\n\r\n\032\032frame-end\r\n\r\n\032\032stopped\r\n$gdb_prompt$" \
 	{ pass "send SIGUSR1" }
   -re ".*$gdb_prompt$"     { fail "send SIGUSR1" }
   timeout	            { fail "send SIGUSR1 (timeout)" }
@@ -267,12 +269,19 @@ gdb_expect {
 # test:
 # annotate-signal-handler-caller
 #
+verbose "match_max local is: [match_max]"
+verbose "match_max default is: [match_max -d]"
+# This is necessary because a 2000 buffer is not enought to get everything
+# up to the prompt ad the test gets a timeout.
+match_max 3000
+verbose "match_max now is: [match_max]"
 send_gdb "backtrace\n"
 gdb_expect {
-  -re ".*frame-begin 0 $hex.*0.*frame-end.*frame-begin 1 $hex.*1.*\032\032signal-handler-caller\r\n.signal handler called.\r\n\r\n\032\032frame-end\r\n\r\n.*frame-begin 2 $hex.*2.*frame-begin 3 $hex.*3.*frame-end.*$gdb_prompt$" \
-	{ pass "backtrace @ signal handler" }
-  -re ".*$gdb_prompt$"     { fail "backtrace @ signal handler" }
-  timeout	            { fail "backtrace @ signal handler (timeout)" }
+    -re "frame-begin 0 $hex\r\n#0.*frame-end.*frame-begin 1 $hex\r\n#1.*(\032\032signal-handler-caller\r\n.signal handler called.\r\n\r\n)*\032\032frame-end\r\n\r\n\032\032frame-begin 2 $hex\r\n#2.*(frame-begin 3 $hex\r\n#3.*)*frame-end.*$gdb_prompt$" {
+	pass "backtrace @ signal handler"
+    }
+    -re ".*$gdb_prompt$"   { fail "backtrace @ signal handler" }
+    timeout                { fail "backtrace @ signal handler (timeout)" }
 }
 
 #
@@ -351,6 +360,54 @@ gdb_expect {
   timeout { fail "re-run (timeout)" }
 }
 
+#
+# Test that breakpoints-invalid is issued once and only once for
+# breakpoint ignore count changes, after annotation stopped.
+#
+send_gdb "break 46\n"
+gdb_expect {
+    -re "Breakpoint 5 at $hex: file .*$srcfile, line 46.*$gdb_prompt$" {
+	pass "break at 46"
+    }
+    -re ".*$gdb_prompt$" { fail "break at 46" }
+    timeout { fail "break at 46 (timeout)" }
+}
+
+send_gdb "ignore 5 4\n"
+gdb_expect {
+    -re "Will ignore next 4 crossings of breakpoint 5.*$gdb_prompt$" {
+	pass "ignore 5 4"
+    }
+    -re ".*$gdb_prompt$" { fail "ignore 5 4" }
+    timeout { fail "ignore 5 4 (timeout)" }
+}
+
+send_gdb "continue\n"
+gdb_expect {
+    -re ".*$srcfile:46:.*\032\032stopped\r\n\r\n\032\032breakpoints-invalid\r\n$gdb_prompt$" {
+	pass "annotate ignore count change"
+    }
+    -re ".*$gdb_prompt$" { fail "annotate ignore count change" }
+    timeout { fail "annotate ignore count change (timeout)" }
+}
+
+# check that ignore command is working, or the above can provide
+# misleading assurance ...
+
+send_gdb "next\n"
+gdb_expect {
+    -re "$gdb_prompt$" {}
+    timeout { fail "next to exit loop" }
+}
+
+send_gdb "next\n"
+gdb_expect {
+    -re ".*$srcfile:49:.*$gdb_prompt$" {
+	pass "breakpoint ignore count"
+    }
+    -re ".*$gdb_prompt$" { fail "breakpoint ignore count" }
+    timeout { fail "breakpoint ignore count (timeout)" }
+}
 
 #
 # Send a signal that is not handled; test:
@@ -364,7 +421,7 @@ gdb_expect {
 #
 send_gdb "signal SIGTRAP\n"
 gdb_expect {
-  -re ".*\032\032post-prompt\r\nContinuing with signal SIGTRAP.\r\n\r\n\032\032starting\r\n\r\n\032\032frames-invalid\r\n\r\n\032\032signalled\r\n\r\n\032\032frames-invalid\r\n\r\nProgram terminated with signal \r\n\032\032signal-name\r\nSIGTRAP\r\n\032\032signal-name-end\r\n, \r\n\032\032signal-string\r\nTrace.breakpoint trap\r\n\032\032signal-string-end\r\n.\r\nThe program no longer exists.\r\n\r\n\032\032stopped\r\n$gdb_prompt$" \
+  -re ".*\032\032post-prompt\r\nContinuing with signal SIGTRAP.\r\n\r\n\032\032starting\r\n\r\n\032\032frames-invalid\r\n\r\n\032\032frames-invalid\r\n\r\n\032\032signalled\r\n\r\nProgram terminated with signal \r\n\032\032signal-name\r\nSIGTRAP\r\n\032\032signal-name-end\r\n, \r\n\032\032signal-string\r\nTrace.breakpoint trap\r\n\032\032signal-string-end\r\n.\r\nThe program no longer exists.\r\n\r\n\032\032stopped\r\n$gdb_prompt$" \
 	  { pass "signal sent" }
   -re ".*$gdb_prompt$" { fail "signal sent" }
   timeout { fail "signal sent (timeout)" }
@@ -386,7 +443,6 @@ if [ regexp "core not found" $exec_output]  {
       pass "Core dumped and removed"
   }
 }
-
 
 # restore the original prompt for the rest of the testsuite
 

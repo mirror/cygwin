@@ -1,4 +1,10 @@
-Fri Jan 19 18:37:19 2001  Andrew Cagney  <cagney@b1.cygnus.com>
+2001-01-20  Ben Elliston  <bje@redhat.com>
+
+	* runtest.exp (usage): Replace --mail in usage output.
+	* doc/runtest.1: Re-document --mail option, which was erroneously
+	removed from this man page in 1994.
+
+2001-01-19  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* lib/target.exp (prune_warnings): Avoid ``.*'' in NetBSD warnings
  	pattern.

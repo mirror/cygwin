@@ -1,5 +1,11 @@
 2000-08-02  Jimmy Guo  <guo@hpcleara.cup.hp.com>
 
+	* lib/target.exp (default_target_compile,default_target_assemble,
+        default_link): Remove env() interface for *_FOR_TARGET TCL vars.
+
+	* lib/framework.exp (setup_xfail): Relax PRMS string pattern
+        to allow a more general bug ID specification (without '-').
+
 	* lib/utils.exp: Add support for a -maxdepth <n>
         option to limit find to <n> directories deep.
 

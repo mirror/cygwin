@@ -1,5 +1,22 @@
 2004-09-07  Jim Blandy  <jimb@redhat.com>
 
+	* rs6000-tdep.c: #include "dwarf2expr.h".
+	(dwarf_piece_is_ev_upper_reg, dwarf_piece_is_gpr)
+	(e500_dwarf_simplify_register_pieces): New functions.
+	(rs6000_gdbarch_init): If the architecture is E500, register
+	e500_dwarf_simplify_register_pieces.
+	* Makefile.in (rs6000-tdep.o): Update dependencies.
+
+	* gdbarch.sh (dwarf_simplify_register_pieces): New method.
+	Add forward declaration for 'struct dwarf_expr_piece'.
+	* gdbarch.c, gdbarch.h: Regenerated.
+	* dwarf2loc.c (dwarf2_evaluate_loc_desc): Try to simplify
+	multi-piece expression results before giving up.
+	* arch-utils.c (dwarf_never_simplify_pieces): New function.
+	* arch-utils.h (struct dwarf_expr_piece): Forward decl for struct
+	type, used in ...
+	(dwarf_never_simplify_pieces): New declaration.
+
 	* rs6000-tdep.c: #include "dwarf2-frame.h".
 	(rs6000_dwarf2_reg_to_regnum): Recognize 65 as another number for lr.
 	(rs6000_gdbarch_init): Hook in dwarf2_frame_sniffer.

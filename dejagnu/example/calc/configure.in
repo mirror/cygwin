@@ -16,6 +16,8 @@ AC_CHECK_HEADERS(stdlib.h)
 #
 AC_CHECK_FUNC(strcmp)
 
+AM_MAINTAINER_MODE
+	
 #
 # Output Makefile with substitutions
 AC_SUBST(CC)

@@ -6,7 +6,7 @@ load_lib "monkey.exp"
 if {$sidtarget(arm)} then {
     # thorough 3-minute test
     monkey_test hw-cpu-arm7t cgen_component_library libcgencpu.la 3m
-} else { untested "monkey test hw-cpu-arm7t" }
+} else { untested "hw-cpu-arm7t not available" }
 
 
 # the others are wimpy
@@ -27,7 +27,7 @@ proc pin_safe_p {pin_name} {
 
 if {$sidtarget(m32r)} then {
     monkey_test hw-cpu-m32r/d cgen_component_library libcgencpu.la
-} else { untested "monkey test hw-cpu-m32r/d" }
+} else { untested "hw-cpu-m32r/d not available" }
 
 # special handling for step! pin - depends on prior initialization
 proc pin_safe_p {pin_name} {

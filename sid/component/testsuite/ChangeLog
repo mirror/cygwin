@@ -1,5 +1,8 @@
 2001-04-04  Ben Elliston  <bje@redhat.com>
 
+	* sidcomp.cgen-cpu/cpumonkey.exp: Make "untested" test messages
+	more informative.
+
 	* sidcomp.timers/timerdocs.exp: Look for ARM timer doco in the
 	timers/arm7t subdirectory.
 

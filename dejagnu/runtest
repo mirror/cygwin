@@ -61,6 +61,11 @@ if [ -z "$expectbin" ]; then
   exit 1
 fi
 
+# This wrapper script will set up run-time library search PATHs
+if [ -x "$expectbin-bld.sh" ]; then
+  expectbin="${CONFIG_SHELL-/bin/sh} $expectbin-bld.sh"
+fi
+
 #
 # Extract a few options from the option list.
 #

@@ -67,6 +67,7 @@ namespace glue_components
   using sidutil::recursion_limited;
   using sidutil::recursion_record;
   using sidutil::self_watcher;
+  using sidutil::mux_passthrough_bus;
 
   using std::map;
   using std::deque;
@@ -509,6 +510,42 @@ probing_bus::readAny(host_int_4 addr, DataType& data, host_int_4 code) throw ()
   return s;
 }
 
+class bus_mux: public virtual component,
+               protected fixed_pin_map_component,
+               protected fixed_accessor_map_component,
+               protected fixed_attribute_map_component,
+               protected no_relation_component,
+               protected fixed_bus_map_component
+
+{
+  mux_passthrough_bus upstream;
+  bus* downstream1;
+  bus* downstream2;
+
+  callback_pin<bus_mux> switch_pin;
+
+public:
+  bus_mux ():
+    switch_pin (this, &bus_mux::handle_switch_pin),
+    upstream (&this->downstream1, &this->downstream2),
+    downstream1 (0), downstream2 (0)
+    {
+      add_bus ("upstream", &this->upstream);
+      add_accessor ("downstream1", &this->downstream1); 
+      add_accessor ("downstream2", &this->downstream2);
+      add_pin ("switch", &switch_pin);
+      add_attribute ("switch", &switch_pin, "pin");
+    }
+  ~bus_mux () {}
+
+  void handle_switch_pin (host_int_4 value)
+    {
+      if (value != 0)
+        {
+          upstream.switch_bus();
+        }
+    }
+};
 
 // ----------------------------------------------------------------------------
 
@@ -523,6 +560,7 @@ probing_bus::readAny(host_int_4 addr, DataType& data, host_int_4 code) throw ()
   types.push_back("hw-glue-sequence-8");
   types.push_back("sw-glue-attribbank");
   types.push_back("hw-glue-probe-bus");
+  types.push_back("hw-glue-bus-mux");
   return types;
 }
   
@@ -543,6 +581,8 @@ probing_bus::readAny(host_int_4 addr, DataType& data, host_int_4 code) throw ()
     return new attr_storage_component ();
   if (typeName == "hw-glue-probe-bus")
     return new bus_prober ();
+  if (typeName == "hw-glue-bus-mux")
+    return new bus_mux ();
   else
     return 0;
 }
@@ -552,13 +592,15 @@ probing_bus::readAny(host_int_4 addr, DataType& data, host_int_4 code) throw ()
   void
   do_delete(component* c)
 {
-  // Two of these dynamic_cast<>s will return 0.  It is safe to delete 0.
+  // Three of these dynamic_cast<>s will return 0.  It is safe to delete 0.
   sequence_component* g1 = dynamic_cast<sequence_component*>(c);
   if (g1) { delete g1; return; }
   attr_storage_component* g2 = dynamic_cast<attr_storage_component*>(c);
   if (g2) { delete g2; return; }
   bus_prober* g3 = dynamic_cast<bus_prober*>(c);
   if (g3) { delete g3; return; }
+  bus_mux* g4 = dynamic_cast<bus_mux*>(c);
+  if (g4) { delete g4; return; }
 }
 
   

@@ -12,7 +12,7 @@ DEJAGNUTESTS=attribbank.exp attribinval.exp attribval.exp \
 seqinval.exp sequence.exp sequence1.exp sequence2.exp sequence8.exp \
 seqvalid.exp gluemonkey.exp traffic.exp
 
-pkgdata_DATA = hw-glue-sequence.txt hw-glue-probe-bus.txt sw-glue-attribbank.txt
+pkgdata_DATA = hw-glue-sequence.txt hw-glue-probe-bus.txt sw-glue-attribbank.txt hw-glue-bus-mux.txt
 
 checkme:
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )

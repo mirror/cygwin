@@ -1,16 +1,16 @@
+2002-01-15  Keith Seitz  <keiths@redhat.com>
+
+        * itcl/library/itcl.tcl: Add recognition for "class", "body",
+        "ensemble", and "configbody" without the "itcl::" namespace
+        qualifier.
+        (auto_mkindex_parser::command public): If given an argument
+        list of just one item, re-eval it again so that the whole
+        thing is not interpreted as one humongous command.
+
 2002-01-11  Keith Seitz  <keiths@redhat.com>
 
 	* iwidgets3.0.0/Makefile.in (install-libraries): Don't install
 	$(GENERIC_DIR)/*.tcl: there are no such files.
-
-2002-01-10  Keith Seitz  <keiths@redhat.com>
-
-	* itcl/library/itcl.tcl: Add recognition for "class", "body",
-	"ensemble", and "configbody" without the "itc::" namespace
-	qualifier.
-	(auto_mkindex_parser::command public): If given an argument
-	list of just one item, re-eval it again so that the whole
-	thing is not interpreted as one humongous command.
 
 2001-10-12  Christopher Faylor  <cgf@redhat.com>
 

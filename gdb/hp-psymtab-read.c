@@ -15,7 +15,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.
 
    Written by the Center for Software Science at the University of Utah
    and by Cygnus Support.  */
@@ -44,7 +45,7 @@ void
 do_pxdb PARAMS ((bfd *));
 
 void hpread_build_psymtabs
-  PARAMS ((struct objfile *, struct section_offsets *, int));
+  PARAMS ((struct objfile *, int));
 
 void hpread_symfile_finish
   PARAMS ((struct objfile *));
@@ -56,7 +57,7 @@ static unsigned long hpread_get_textlow
   PARAMS ((int, int, struct objfile *, int));
 
 static struct partial_symtab *hpread_start_psymtab
-  PARAMS ((struct objfile *, struct section_offsets *, char *, CORE_ADDR, int,
+  PARAMS ((struct objfile *, char *, CORE_ADDR, int,
 	   struct partial_symbol **, struct partial_symbol **));
 
 static struct partial_symtab *hpread_end_psymtab
@@ -74,7 +75,6 @@ static struct partial_symtab *hpread_end_psymtab
 
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 /* check for the existance of a file, given its full pathname */
 int
@@ -99,7 +99,7 @@ trans_lang (in_lang)
   else if (in_lang == HP_LANGUAGE_CPLUSPLUS)
     return language_cplus;
 
-  else if (in_lang == HP_LANGUAGE_F77)
+  else if (in_lang == HP_LANGUAGE_FORTRAN)
     return language_fortran;
 
   else
@@ -282,7 +282,7 @@ hpread_pxdb_needed (sym_bfd)
 /* Check whether the file needs to be preprocessed by pxdb. 
    If so, call pxdb. */
 
-void 
+void
 do_pxdb (sym_bfd)
      bfd *sym_bfd;
 {
@@ -292,21 +292,21 @@ do_pxdb (sym_bfd)
 
   /* This code will not be executed if the file is not in SOM
      format (i.e. if compiled with gcc) */
-    if (hpread_pxdb_needed (sym_bfd)) 
-      {
-	/*This file has not been pre-processed. Preprocess now */
-	  
-	if (hpread_call_pxdb (sym_bfd->filename))
-	  {
-	    /* The call above has changed the on-disk file, 
-               we can close the file anyway, because the
-	       symbols will be reread in when the target is run */
-	    bfd_close (sym_bfd); 
-	  }
-      }
-}
+  if (hpread_pxdb_needed (sym_bfd))
+    {
+      /*This file has not been pre-processed. Preprocess now */
 
+      if (hpread_call_pxdb (sym_bfd->filename))
+	{
+	  /* The call above has changed the on-disk file, 
+	     we can close the file anyway, because the
+	     symbols will be reread in when the target is run */
+	  bfd_close (sym_bfd);
+	}
+    }
+}
 
+
 
 #ifdef QUICK_LOOK_UP
 
@@ -363,10 +363,10 @@ do_pxdb (sym_bfd)
    psymtabs created so far */
 
 typedef struct
-  {
-    int start;
-    int end;
-  }
+{
+  int start;
+  int end;
+}
 pst_syms_struct;
 
 static pst_syms_struct *pst_syms_array = 0;
@@ -516,7 +516,7 @@ find_next_module_isym (index, qMD, curr_md, pxdb_header_p)
    organized in a separate routine, although it does take lots of arguments. pai/1997-10-08 */
 
 static int
-scan_procs (curr_pd_p, qPD, max_procs, start_adr, end_adr, pst, vt_bits, objfile, section_offsets)
+scan_procs (curr_pd_p, qPD, max_procs, start_adr, end_adr, pst, vt_bits, objfile)
      int *curr_pd_p;		/* pointer to current proc index */
      quick_procedure_entry *qPD;	/* the procedure quick lookup table */
      int max_procs;		/* number of entries in proc. table */
@@ -525,7 +525,6 @@ scan_procs (curr_pd_p, qPD, max_procs, start_adr, end_adr, pst, vt_bits, objfile
      struct partial_symtab *pst;	/* current psymtab */
      char *vt_bits;		/* strings table of SOM debug space */
      struct objfile *objfile;	/* current object file */
-     struct section_offsets *section_offsets;	/* not really used for HP-UX currently */
 {
   union dnttentry *dn_bufp;
   int symbol_count = 0;		/* Total number of symbols in this psymtab */
@@ -601,10 +600,10 @@ scan_procs (curr_pd_p, qPD, max_procs, start_adr, end_adr, pst, vt_bits, objfile
 					   VAR_NAMESPACE,
 					   LOC_BLOCK,	/* "I am a routine"        */
 					   &objfile->global_psymbols,
-					   (qPD[curr_pd].adrStart + /* Starting address of rtn */
-					    ANOFFSET (section_offsets, SECT_OFF_TEXT)),
+					   (qPD[curr_pd].adrStart +	/* Starting address of rtn */
+				 ANOFFSET (objfile->section_offsets, SECT_OFF_TEXT (objfile))),
 					   0,	/* core addr?? */
-					   trans_lang ((enum hp_language) qPD[curr_pd].language),
+		      trans_lang ((enum hp_language) qPD[curr_pd].language),
 					   objfile);
       else
 	add_psymbol_with_dem_name_to_list (rtn_name,
@@ -614,10 +613,10 @@ scan_procs (curr_pd_p, qPD, max_procs, start_adr, end_adr, pst, vt_bits, objfile
 					   VAR_NAMESPACE,
 					   LOC_BLOCK,	/* "I am a routine"        */
 					   &objfile->static_psymbols,
-					   (qPD[curr_pd].adrStart +  /* Starting address of rtn */
-					    ANOFFSET (section_offsets, SECT_OFF_TEXT)),
+					   (qPD[curr_pd].adrStart +	/* Starting address of rtn */
+				 ANOFFSET (objfile->section_offsets, SECT_OFF_TEXT (objfile))),
 					   0,	/* core addr?? */
-					   trans_lang ((enum hp_language) qPD[curr_pd].language),
+		      trans_lang ((enum hp_language) qPD[curr_pd].language),
 					   objfile);
 
       symbol_count++;
@@ -647,12 +646,11 @@ scan_procs (curr_pd_p, qPD, max_procs, start_adr, end_adr, pst, vt_bits, objfile
    entry for it, so in such cases we create a psymtab for the file.  */
 
 int
-hpread_quick_traverse (objfile,	section_offsets, gntt_bits, vt_bits, pxdb_header_p)	
-     struct objfile *objfile;        /* The object file descriptor */
-     struct section_offsets *section_offsets; /* ?? Null for HP */
-     char *gntt_bits;                /* GNTT entries, loaded in from the file */
-     char *vt_bits;                  /* VT (string) entries ditto. */
-     PXDB_header_ptr pxdb_header_p;  /* Pointer to pxdb header ditto */
+hpread_quick_traverse (objfile, gntt_bits, vt_bits, pxdb_header_p)
+     struct objfile *objfile;	/* The object file descriptor */
+     char *gntt_bits;		/* GNTT entries, loaded in from the file */
+     char *vt_bits;		/* VT (string) entries ditto. */
+     PXDB_header_ptr pxdb_header_p;	/* Pointer to pxdb header ditto */
 {
   struct partial_symtab *pst;
 
@@ -679,8 +677,8 @@ hpread_quick_traverse (objfile,	section_offsets, gntt_bits, vt_bits, pxdb_header
 
   struct partial_symbol **global_syms;	/* We'll be filling in the "global"   */
   struct partial_symbol **static_syms;	/* and "static" tables in the objfile
-                                           as we go, so we need a pair of     
-                                           current pointers. */
+					   as we go, so we need a pair of     
+					   current pointers. */
 
 #ifdef DUMPING
   /* Turn this on for lots of debugging information in this routine.
@@ -862,24 +860,23 @@ hpread_quick_traverse (objfile,	section_offsets, gntt_bits, vt_bits, pxdb_header
 	     might help.  */
 
 	  pst = hpread_start_psymtab (objfile,
-				      section_offsets,	        /* ?? */
 				      mod_name_string,
 				      CURR_MODULE_START,	/* Low text address: bogus! */
-				      (CURR_MODULE_ISYM * sizeof (struct dntt_type_block)),
-				                                /* ldsymoff */
+		       (CURR_MODULE_ISYM * sizeof (struct dntt_type_block)),
+	  /* ldsymoff */
 				      global_syms,
 				      static_syms);
 
 	  pst = hpread_end_psymtab (pst,
 				    NULL,	/* psymtab_include_list */
-				    0,		/* includes_used        */
-				    end_sym * sizeof (struct dntt_type_block),
-				                /* byte index in LNTT of end 
-				                   = capping symbol offset  
-				                   = LDSYMOFF of nextfile */
-				    0,	        /* text high            */
+				    0,	/* includes_used        */
+				  end_sym * sizeof (struct dntt_type_block),
+	  /* byte index in LNTT of end 
+	     = capping symbol offset  
+	     = LDSYMOFF of nextfile */
+				    0,	/* text high            */
 				    NULL,	/* dependency_list      */
-				    0);	        /* dependencies_used    */
+				    0);		/* dependencies_used    */
 
 	  global_syms = objfile->global_psymbols.next;
 	  static_syms = objfile->static_psymbols.next;
@@ -964,11 +961,10 @@ hpread_quick_traverse (objfile,	section_offsets, gntt_bits, vt_bits, pxdb_header
 	         And it's not even the right byte offset, as we're using
 	         the size of a union! FIXME!  */
 	      pst = hpread_start_psymtab (objfile,
-					  section_offsets,	/* ?? */
 					  full_name_string,
-					  start_adr,	        /* Low text address */
-					  (start_sym * sizeof (struct dntt_type_block)),
-					                        /* ldsymoff */
+					  start_adr,	/* Low text address */
+			      (start_sym * sizeof (struct dntt_type_block)),
+	      /* ldsymoff */
 					  global_syms,
 					  static_syms);
 
@@ -980,8 +976,7 @@ hpread_quick_traverse (objfile,	section_offsets, gntt_bits, vt_bits, pxdb_header
 	         file, based on the starting addresses. */
 
 	      syms_in_pst = scan_procs (&curr_pd, qPD, pxdb_header_p->pd_entries,
-					start_adr, end_adr,
-					pst, vt_bits, objfile, section_offsets);
+					start_adr, end_adr, pst, vt_bits, objfile);
 
 	      /* Get ending symbol offset */
 
@@ -1030,10 +1025,10 @@ hpread_quick_traverse (objfile,	section_offsets, gntt_bits, vt_bits, pxdb_header
 	      pst = hpread_end_psymtab (pst,
 					NULL,	/* psymtab_include_list */
 					0,	/* includes_used        */
-					end_sym * sizeof (struct dntt_type_block),
-					        /* byte index in LNTT of end 
-						   = capping symbol offset   
-						   = LDSYMOFF of nextfile */
+				  end_sym * sizeof (struct dntt_type_block),
+	      /* byte index in LNTT of end 
+	         = capping symbol offset   
+	         = LDSYMOFF of nextfile */
 					end_adr,	/* text high */
 					NULL,	/* dependency_list */
 					0);	/* dependencies_used */
@@ -1194,11 +1189,10 @@ hpread_quick_traverse (objfile,	section_offsets, gntt_bits, vt_bits, pxdb_header
 	         And it's not even the right byte offset, as we're using
 	         the size of a union! FIXME!  */
 	      pst = hpread_start_psymtab (objfile,
-					  section_offsets,	/* ?? */
 					  full_name_string,
 					  start_adr,	/* Low text address */
-					  (start_sym * sizeof (struct dntt_type_block)),
-					                /* ldsymoff */
+			      (start_sym * sizeof (struct dntt_type_block)),
+	      /* ldsymoff */
 					  global_syms,
 					  static_syms);
 
@@ -1210,8 +1204,7 @@ hpread_quick_traverse (objfile,	section_offsets, gntt_bits, vt_bits, pxdb_header
 	         module, based on the starting addresses. */
 
 	      syms_in_pst = scan_procs (&curr_pd, qPD, pxdb_header_p->pd_entries,
-					start_adr, end_adr,
-					pst, vt_bits, objfile, section_offsets);
+					start_adr, end_adr, pst, vt_bits, objfile);
 
 	      /* Get ending symbol offset */
 
@@ -1260,10 +1253,10 @@ hpread_quick_traverse (objfile,	section_offsets, gntt_bits, vt_bits, pxdb_header
 	      pst = hpread_end_psymtab (pst,
 					NULL,	/* psymtab_include_list */
 					0,	/* includes_used        */
-					end_sym * sizeof (struct dntt_type_block),
-					        /* byte index in LNTT of end 
-						   = capping symbol offset   
-						   = LDSYMOFF of nextfile */
+				  end_sym * sizeof (struct dntt_type_block),
+	      /* byte index in LNTT of end 
+	         = capping symbol offset   
+	         = LDSYMOFF of nextfile */
 					end_adr,	/* text high */
 					NULL,	/* dependency_list      */
 					0);	/* dependencies_used    */
@@ -1308,25 +1301,23 @@ hpread_quick_traverse (objfile,	section_offsets, gntt_bits, vt_bits, pxdb_header
 	}
 #endif
       pst = hpread_start_psymtab (objfile,
-				  section_offsets,	/* ?? */
 				  "orphans",
 				  start_adr,	/* Low text address */
-				  (CURR_PROC_ISYM * sizeof (struct dntt_type_block)),
-				                /* ldsymoff */
+			 (CURR_PROC_ISYM * sizeof (struct dntt_type_block)),
+      /* ldsymoff */
 				  global_syms,
 				  static_syms);
 
       scan_procs (&curr_pd, qPD, pxdb_header_p->pd_entries,
-		  start_adr, end_adr,
-		  pst, vt_bits, objfile, section_offsets);
+		  start_adr, end_adr, pst, vt_bits, objfile);
 
       pst = hpread_end_psymtab (pst,
 				NULL,	/* psymtab_include_list */
 				0,	/* includes_used */
-				pxdb_header_p->globals * sizeof (struct dntt_type_block),
-				        /* byte index in LNTT of end 
-					   = capping symbol offset   
-					   = LDSYMOFF of nextfile */
+		   pxdb_header_p->globals * sizeof (struct dntt_type_block),
+      /* byte index in LNTT of end 
+         = capping symbol offset   
+         = LDSYMOFF of nextfile */
 				end_adr,	/* text high  */
 				NULL,	/* dependency_list */
 				0);	/* dependencies_used */
@@ -1340,7 +1331,6 @@ hpread_quick_traverse (objfile,	section_offsets, gntt_bits, vt_bits, pxdb_header
      If null psts were kept on the chain, this would be
      a solution.  FIXME */
   pst = hpread_start_psymtab (objfile,
-			      section_offsets,
 			      "globals",
 			      0,
 			      (pxdb_header_p->globals
@@ -1507,7 +1497,7 @@ hpread_symfile_init (objfile)
 		     bfd_section_size (objfile->obfd, gntt_section));
 
   bfd_get_section_contents (objfile->obfd, gntt_section, GNTT (objfile),
-			    0, bfd_section_size (objfile->obfd, gntt_section));
+			 0, bfd_section_size (objfile->obfd, gntt_section));
 
   GNTT_SYMCOUNT (objfile)
     = bfd_section_size (objfile->obfd, gntt_section)
@@ -1529,7 +1519,7 @@ hpread_symfile_init (objfile)
 		     bfd_section_size (objfile->obfd, lntt_section));
 
   bfd_get_section_contents (objfile->obfd, lntt_section, LNTT (objfile),
-			    0, bfd_section_size (objfile->obfd, lntt_section));
+			 0, bfd_section_size (objfile->obfd, lntt_section));
 
   LNTT_SYMCOUNT (objfile)
     = bfd_section_size (objfile->obfd, lntt_section)
@@ -1546,7 +1536,7 @@ hpread_symfile_init (objfile)
 		   bfd_section_size (objfile->obfd, slt_section));
 
   bfd_get_section_contents (objfile->obfd, slt_section, SLT (objfile),
-			    0, bfd_section_size (objfile->obfd, slt_section));
+			  0, bfd_section_size (objfile->obfd, slt_section));
 
   /* Read in data from the $VT$ subspace.  $VT$ contains things like
      names and constants.  Keep track of the number of symbols in the VT.  */
@@ -1578,14 +1568,12 @@ hpread_symfile_init (objfile)
    We assume hpread_symfile_init has been called to initialize the
    symbol reader's private data structures.
 
-   SECTION_OFFSETS contains offsets relative to which the symbols in the
-   various sections are (depending where the sections were actually loaded).
    MAINLINE is true if we are reading the main symbol table (as
    opposed to a shared lib or dynamically loaded file). */
+
 void
-hpread_build_psymtabs (objfile, section_offsets, mainline)
+hpread_build_psymtabs (objfile, mainline)
      struct objfile *objfile;
-     struct section_offsets *section_offsets;
      int mainline;
 {
 
@@ -1621,7 +1609,7 @@ hpread_build_psymtabs (objfile, section_offsets, mainline)
 
   /* Just in case the stabs reader left turds lying around.  */
   free_pending_blocks ();
-  make_cleanup ((make_cleanup_func) really_free_pendings, 0);
+  make_cleanup (really_free_pendings, 0);
 
   pst = (struct partial_symtab *) 0;
 
@@ -1679,23 +1667,22 @@ hpread_build_psymtabs (objfile, section_offsets, mainline)
 	   not found we give up on the quick table stuff, 
 	   and fall back on the slower method  */
 	found_modules_in_program = hpread_quick_traverse (objfile,
-							  section_offsets,
 							  GNTT (objfile),
 							  VT (objfile),
 							  &pxdb_header);
 
 	discard_cleanups (old_chain);
 
-		/* Set up to scan the global section of the LNTT.
+	/* Set up to scan the global section of the LNTT.
 
-		   This field is not always correct: if there are
-		   no globals, it will point to the last record in
-		   the regular LNTT, which is usually an END MODULE.
+	   This field is not always correct: if there are
+	   no globals, it will point to the last record in
+	   the regular LNTT, which is usually an END MODULE.
 
-		   Since it might happen that there could be a file
-		   with just one global record, there's no way to
-		   tell other than by looking at the record, so that's
-		   done below. */
+	   Since it might happen that there could be a file
+	   with just one global record, there's no way to
+	   tell other than by looking at the record, so that's
+	   done below. */
 	if (found_modules_in_program)
 	  scan_start = pxdb_header.globals;
       }
@@ -1709,8 +1696,8 @@ hpread_build_psymtabs (objfile, section_offsets, mainline)
   }
 #endif /* QUICK_LOOK_UP */
 
-    /* Make two passes, one over the GNTT symbols, the other for the
-       LNTT symbols.
+  /* Make two passes, one over the GNTT symbols, the other for the
+     LNTT symbols.
 
      JB comment: above isn't true--they only make one pass, over
      the LNTT.  */
@@ -1829,11 +1816,11 @@ hpread_build_psymtabs (objfile, section_offsets, mainline)
 		  past_first_source_file = 1;
 
 		valu = hpread_get_textlow (i, hp_symnum, objfile, symcount);
-		valu += ANOFFSET (section_offsets, SECT_OFF_TEXT);
-		pst = hpread_start_psymtab (objfile, section_offsets,
+		valu += ANOFFSET (objfile->section_offsets, SECT_OFF_TEXT (objfile));
+		pst = hpread_start_psymtab (objfile,
 					    namestring, valu,
 					    (hp_symnum
-					     * sizeof (struct dntt_type_block)),
+					 * sizeof (struct dntt_type_block)),
 					    objfile->global_psymbols.next,
 					    objfile->static_psymbols.next);
 		texthigh = valu;
@@ -1863,13 +1850,13 @@ hpread_build_psymtabs (objfile, section_offsets, mainline)
 	      /* Now begin a new module and a new psymtab for it */
 	      SET_NAMESTRING (dn_bufp, &namestring, objfile);
 	      valu = hpread_get_textlow (i, hp_symnum, objfile, symcount);
-	      valu += ANOFFSET (section_offsets, SECT_OFF_TEXT);
+	      valu += ANOFFSET (objfile->section_offsets, SECT_OFF_TEXT (objfile));
 	      if (!pst)
 		{
-		  pst = hpread_start_psymtab (objfile, section_offsets,
+		  pst = hpread_start_psymtab (objfile,
 					      namestring, valu,
 					      (hp_symnum
-					       * sizeof (struct dntt_type_block)),
+					 * sizeof (struct dntt_type_block)),
 					      objfile->global_psymbols.next,
 					      objfile->static_psymbols.next);
 		  texthigh = valu;
@@ -1881,12 +1868,12 @@ hpread_build_psymtabs (objfile, section_offsets, mainline)
 	    case DNTT_TYPE_ENTRY:
 	      /* The beginning of a function.  DNTT_TYPE_ENTRY may also denote
 	         a secondary entry point.  */
-	      valu = dn_bufp->dfunc.hiaddr + ANOFFSET (section_offsets,
-						       SECT_OFF_TEXT);
+	      valu = dn_bufp->dfunc.hiaddr + ANOFFSET (objfile->section_offsets,
+						       SECT_OFF_TEXT (objfile));
 	      if (valu > texthigh)
 		texthigh = valu;
 	      valu = dn_bufp->dfunc.lowaddr +
-		ANOFFSET (section_offsets, SECT_OFF_TEXT);
+		ANOFFSET (objfile->section_offsets, SECT_OFF_TEXT (objfile));
 	      SET_NAMESTRING (dn_bufp, &namestring, objfile);
 	      if (dn_bufp->dfunc.global)
 		add_psymbol_to_list (namestring, strlen (namestring),
@@ -1902,12 +1889,12 @@ hpread_build_psymtabs (objfile, section_offsets, mainline)
 	      continue;
 
 	    case DNTT_TYPE_DOC_FUNCTION:
-	      valu = dn_bufp->ddocfunc.hiaddr + ANOFFSET (section_offsets,
-							  SECT_OFF_TEXT);
+	      valu = dn_bufp->ddocfunc.hiaddr + ANOFFSET (objfile->section_offsets,
+							  SECT_OFF_TEXT (objfile));
 	      if (valu > texthigh)
 		texthigh = valu;
 	      valu = dn_bufp->ddocfunc.lowaddr +
-		ANOFFSET (section_offsets, SECT_OFF_TEXT);
+		ANOFFSET (objfile->section_offsets, SECT_OFF_TEXT (objfile));
 	      SET_NAMESTRING (dn_bufp, &namestring, objfile);
 	      if (dn_bufp->ddocfunc.global)
 		add_psymbol_to_list (namestring, strlen (namestring),
@@ -1985,19 +1972,19 @@ hpread_build_psymtabs (objfile, section_offsets, mainline)
 		SET_NAMESTRING (dn_bufp, &namestring, objfile);
 		if (!pst)
 		  {
-		    pst = hpread_start_psymtab (objfile, section_offsets,
+		    pst = hpread_start_psymtab (objfile,
 						"globals", 0,
 						(hp_symnum
-						 * sizeof (struct dntt_type_block)),
-						objfile->global_psymbols.next,
-						objfile->static_psymbols.next);
+					 * sizeof (struct dntt_type_block)),
+					      objfile->global_psymbols.next,
+					     objfile->static_psymbols.next);
 		  }
 
 		/* Compute address of the data symbol */
 		valu = dn_bufp->dsvar.location;
 		/* Relocate in case it's in a shared library */
 		if (storage == LOC_STATIC)
-		  valu += ANOFFSET (section_offsets, SECT_OFF_DATA);
+		  valu += ANOFFSET (objfile->section_offsets, SECT_OFF_DATA (objfile));
 
 		/* Luckily, dvar, svar, typedef, and tagdef all
 		   have their "global" bit in the same place, so it works
@@ -2048,7 +2035,7 @@ hpread_build_psymtabs (objfile, section_offsets, mainline)
 						 VAR_NAMESPACE, storage,
 						 &objfile->global_psymbols,
 						 dn_bufp->dsvar.location,
-						 0, language_unknown, objfile);
+					      0, language_unknown, objfile);
 			  }
 			else
 			  {
@@ -2056,7 +2043,7 @@ hpread_build_psymtabs (objfile, section_offsets, mainline)
 						 VAR_NAMESPACE, storage,
 						 &objfile->static_psymbols,
 						 dn_bufp->dsvar.location,
-						 0, language_unknown, objfile);
+					      0, language_unknown, objfile);
 			  }
 		      }
 		  }
@@ -2069,10 +2056,10 @@ hpread_build_psymtabs (objfile, section_offsets, mainline)
 	      SET_NAMESTRING (dn_bufp, &namestring, objfile);
 	      if (!pst)
 		{
-		  pst = hpread_start_psymtab (objfile, section_offsets,
+		  pst = hpread_start_psymtab (objfile,
 					      "globals", 0,
 					      (hp_symnum
-					       * sizeof (struct dntt_type_block)),
+					 * sizeof (struct dntt_type_block)),
 					      objfile->global_psymbols.next,
 					      objfile->static_psymbols.next);
 		}
@@ -2212,20 +2199,19 @@ hpread_get_textlow (global, index, objfile, symcount)
    (normal). */
 
 static struct partial_symtab *
-hpread_start_psymtab (objfile, section_offsets,
+hpread_start_psymtab (objfile,
 		      filename, textlow, ldsymoff, global_syms, static_syms)
      struct objfile *objfile;
-     struct section_offsets *section_offsets;
      char *filename;
      CORE_ADDR textlow;
      int ldsymoff;
      struct partial_symbol **global_syms;
      struct partial_symbol **static_syms;
 {
-  int offset = ANOFFSET (section_offsets, SECT_OFF_TEXT);
+  int offset = ANOFFSET (objfile->section_offsets, SECT_OFF_TEXT (objfile));
   extern void hpread_psymtab_to_symtab ();
   struct partial_symtab *result =
-  start_psymtab_common (objfile, section_offsets,
+  start_psymtab_common (objfile, objfile->section_offsets,
 			filename, textlow, global_syms, static_syms);
 
   result->textlow += offset;
@@ -2260,7 +2246,7 @@ hpread_end_psymtab (pst, include_list, num_includes, capping_symbol_offset,
 {
   int i;
   struct objfile *objfile = pst->objfile;
-  int offset = ANOFFSET (pst->section_offsets, SECT_OFF_TEXT);
+  int offset = ANOFFSET (pst->section_offsets, SECT_OFF_TEXT (objfile));
 
 #ifdef DUMPING
   /* Turn on to see what kind of a psymtab we've built. */
@@ -2296,7 +2282,7 @@ hpread_end_psymtab (pst, include_list, num_includes, capping_symbol_offset,
     {
       pst->dependencies = (struct partial_symtab **)
 	obstack_alloc (&objfile->psymbol_obstack,
-		       number_dependencies * sizeof (struct partial_symtab *));
+		    number_dependencies * sizeof (struct partial_symtab *));
       memcpy (pst->dependencies, dependency_list,
 	      number_dependencies * sizeof (struct partial_symtab *));
     }
@@ -2377,5 +2363,3 @@ hpread_end_psymtab (pst, include_list, num_includes, capping_symbol_offset,
 ***c - basic - offset:4
 *** End:
 #endif
-
-

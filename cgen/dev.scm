@@ -189,7 +189,7 @@ sid options:
 
 ; If ~/.cgenrc exists, load it.
 
-(let ((cgenrc (string-append (getenv 'HOME) "/.cgenrc")))
+(let ((cgenrc (string-append (getenv "HOME") "/.cgenrc")))
   (if (file-exists? cgenrc)
       (load cgenrc))
 )

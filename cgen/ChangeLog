@@ -1,3 +1,7 @@
+2002-11-05  Frank Ch. Eigler  <fche@redhat.com>
+
+	* dev.scm: Call getenv with a string, not a symbol.
+
 2002-10-08  Doug Evans  <dje@transmeta.com>
 	    Hans-Peter Nilsson  <hp@axis.com>
 

@@ -1,3 +1,41 @@
+Tue May 23 21:39:23 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Thu Sep  2 18:15:53 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Wed Sep  1 11:38:21 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* d30v-insns: Cast CIA to LONG in printfs.
+
+Tue Aug 31 01:32:22 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* cpu.h (unqueue_writes): Add declaration.
+
+1999-05-27  Michael Meissner  <meissner@cygnus.com>
+
+	* d30v-insns (do_repeat): Print a warning if a REPEAT or REPEATI
+	instruction loop is too small.
+
+1999-05-08  Felix Lee  <flee@cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+	
+1999-03-16  Martin Hunt  <hunt@cygnus.com>
+	From Frank Ch. Eigler  <fche@cygnus.com>
+
+        * cpu.h (mvtsys_left_p): New flag for MVTSYS instruction history.
+        * d30v-insns (mvtsys): Set this flag instead of left_kills_right_p.
+        (do_sath): Detect MVTSYS by new flag.
+        * engine.c (unqueue_writes): Detect MVTSYS by new flag.
+        (do_2_short, do_parallel): Initialize new flag.
+       
+1999-02-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* tconfig.in (SIM_HANDLES_LMA): Make it so.
+
 1999-01-12  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* engine.c (unqueue_writes): Make PSW conflict resolution code

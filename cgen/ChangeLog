@@ -1,3 +1,7 @@
+2001-06-14  Geoffrey Keating  <geoffk@redhat.com>
+
+	* gas-test.scm (cgen-build.sh): Escape '.' as well.
+
 2001-06-01  Frank Ch. Eigler  <fche@redhat.com>
 
 	* rtl.scm (hw): Encode hw access mode into <operand> name, since this

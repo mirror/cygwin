@@ -589,14 +589,22 @@
 
      (else
       (string-append indent "  case "
-		     (number->string (dtable-entry-index entry))
-		     " : itype = "
-		     (gen-cpu-insn-enum (current-cpu) insn)
-		     "; "
+		     (number->string (dtable-entry-index entry)) " : "
+		     "itype = " (gen-cpu-insn-enum (current-cpu) insn) ";"
+		     ; Compensate for base-insn-size > current-insn-size by adjusting entire_insn.
+		     ; Activate this logic only for sid simulators; they are consistent in
+		     ; interpreting base-insn-bitsize this way.
+		     (if (and (equal? APPLICATION 'SID-SIMULATOR)
+			      (> (state-base-insn-bitsize) (insn-length insn)))
+			 (string-append
+			  " entire_insn = base_insn >> "
+			  (number->string (- (state-base-insn-bitsize) (insn-length insn)))
+			  ";")
+			 "")
 		     (if (with-scache?)
 			 (if fn?
-			     (string-append "@prefix@_extract_" fmt-name " (this, current_cpu, pc, base_insn, entire_insn);  goto done;\n")
-			     (string-append "goto extract_" fmt-name ";"))
+			     (string-append " @prefix@_extract_" fmt-name " (this, current_cpu, pc, base_insn, entire_insn); goto done;\n")
+			     (string-append "goto extract_" fmt-name ";\n"))
 			 "goto done;\n")))))
 )
 

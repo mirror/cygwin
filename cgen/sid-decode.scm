@@ -629,7 +629,7 @@ static void
   ; of the instruction.
   ; ??? Make this a parameter later but only if necessary.
 
-  (let ((decode-bitsize (apply min (map insn-base-mask-length insn-list))))
+  (let ((decode-bitsize (state-base-insn-bitsize)))
 
     ; Compute INITIAL-BITNUMS if not supplied.
     ; 0 is passed for the start bit (it is independent of lsb0?)

@@ -1,5 +1,17 @@
 2001-06-14  Geoffrey Keating  <geoffk@redhat.com>
 
+	* gas-test.scm (gen-gas-test): Create 8 testcases, not just 5.
+	(<operand> 'test-data): Involve both the index and the hardware
+	in testcase generation.
+	(<hw-indx> 'test-data): Generate test data from the underlying
+	object.
+	(<ifield> 'test-data): Generate test data by computing bit
+	patterns for the field, then decoding them.
+	(<hw-address> 'test-data): Allow for new calling convention.
+	(<hw-iaddress> 'test-data): Likewise.
+	(<keyword> 'test-data): Convert index values into keywords.
+	(<hw-asm> 'test-data): Convert index values into integer strings.
+
 	* gas-test.scm (cgen-build.sh): Escape '.' as well.
 
 2001-06-01  Frank Ch. Eigler  <fche@redhat.com>

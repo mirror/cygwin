@@ -29,45 +29,43 @@
 ; The result is a list of strings to be inserted in the assembler
 ; in the operand's position.
 
+; For a general assembler operand, just turn the value into a string.
 (method-make!
  <hw-asm> 'test-data
- (lambda (self n)
-   ; FIXME: floating point support
-   (let* ((signed (list 0 1 -1 2 -2))
-	  (unsigned (list 0 1 2 3 4))
-	  (mode (elm-get self 'mode))
-	  (test-cases (if (eq? (mode:class mode) 'UINT) unsigned signed))
-	  (selection (map (lambda (z) (random (length test-cases))) (iota n))))
-     ; FIXME: wider ranges.
-     (map number->string
-	  (map (lambda (n) (list-ref test-cases n)) selection))))
+ (lambda (self ops)
+   (map number->string ops))
 )
 
+; For a keyword operand, choose the appropriate keyword.
 (method-make!
  <keyword> 'test-data
- (lambda (self n)
+ (lambda (self ops)
    (let* ((test-cases (elm-get self 'values))
-	  (selection (map (lambda (z) (random (length test-cases))) (iota n)))
 	  (prefix (elm-get self 'prefix)))
      (map (lambda (n)
-	    (string-append 
-	     (if (eq? (string-ref prefix 0) #\$) "\\" "")
-	     (elm-get self 'prefix) (car (list-ref test-cases n))))
-	  selection)))
+ 	    (string-append 
+ 	     (if (and (not (string=? prefix ""))
+		      (eq? (string-ref prefix 0) #\$))
+		 "\\" "")
+ 	     prefix 
+	     (car (list-ref test-cases n))))
+ 	  ops)))
 )
 
 (method-make!
  <hw-address> 'test-data
- (lambda (self n)
+ (lambda (self ops)
    (let* ((test-cases '("foodata" "4" "footext" "-4"))
+	  (n (length ops))
 	  (selection (map (lambda (z) (random (length test-cases))) (iota n))))
      (map (lambda (n) (list-ref test-cases n)) selection)))
 )
 
 (method-make!
  <hw-iaddress> 'test-data
- (lambda (self n)
+ (lambda (self ops)
    (let* ((test-cases '("footext" "4" "foodata" "-4"))
+	  (n (length ops))
 	  (selection (map (lambda (z) (random (length test-cases))) (iota n))))
      (map (lambda (n) (list-ref test-cases n)) selection)))
 )
@@ -75,13 +73,50 @@
 (method-make-forward! <hw-register> 'indices '(test-data))
 (method-make-forward! <hw-immediate> 'values '(test-data))
 
-; This can't use method-make-forward! as we need to call op:type to
-; resolve the hardware reference.
+; Test data for a field is chosen firstly out of some bit patterns,
+; then randomly.  It is then interpreted based on whether there 
+; is a decode method.
+(method-make!
+ <ifield> 'test-data
+ (lambda (self n)
+   (let* ((bf-len (ifld-length self))
+	  (field-max (inexact->exact (round (expt 2 bf-len))))
+	  (highbit (quotient field-max 2))
+	  (values (map (lambda (n) 
+			 (case n
+			   ((0) 0)
+			   ((1) (- field-max 1))
+			   ((2) highbit)
+			   ((3) (- highbit 1))
+			   ((4) 1)
+			   (else (random field-max))))
+		       (iota n)))
+	  (decode (ifld-decode self)))
+     (if decode
+	 ; FIXME: need to run the decoder.
+	 values
+	 ; no decode method
+	 (case (mode:class (ifld-mode self))
+	   ((INT) (map (lambda (n) (if (>= n highbit) (- n field-max) n)) 
+		       values))
+	   ((UINT) values)
+	   (else (error "unsupported mode class" 
+			(mode:class (ifld-mode self))))))))
+)
+
+(method-make!
+ <hw-index> 'test-data
+ (lambda (self n)
+   (case (hw-index:type self)
+     ((ifield operand) (send (hw-index:value self) 'test-data n))
+     ((constant) (hw-index:value self))
+     (else nil)))
+)
 
 (method-make!
  <operand> 'test-data
  (lambda (self n)
-   (send (op:type self) 'test-data n))
+   (send (op:type self) 'test-data (send (op:index self) 'test-data n)))
 )
 
 ; Given an operand, return a set of N test data.
@@ -152,7 +187,7 @@
    (gen-sym insn) ":\n"
    (let* ((syntax-list (insn-tmp insn))
 	  (op-list (extract-operands syntax-list))
-	  (test-set (build-test-set op-list 5)))
+	  (test-set (build-test-set op-list 8)))
      (string-map (lambda (test-data)
 		   (build-asm-testcase syntax-list test-data))
 		 test-set))

@@ -2307,7 +2307,7 @@ esac
 
 
 echo $ac_n "checking ARM family support""... $ac_c" 1>&6
-echo "configure:2311: checking ARM family support" >&5
+echo "configure:2368: checking ARM family support" >&5
 
 
 
@@ -2321,7 +2321,7 @@ fi
 echo "$ac_t""$sidtarget_arm" 1>&6
 
 echo $ac_n "checking X86 family support""... $ac_c" 1>&6
-echo "configure:2325: checking X86 family support" >&5
+echo "configure:2382: checking X86 family support" >&5
 
 
 
@@ -2335,7 +2335,7 @@ fi
 echo "$ac_t""$sidtarget_x86" 1>&6
 
 echo $ac_n "checking MIPS family support""... $ac_c" 1>&6
-echo "configure:2339: checking MIPS family support" >&5
+echo "configure:2412: checking MIPS family support" >&5
 
 
 
@@ -2349,7 +2349,7 @@ fi
 echo "$ac_t""$sidtarget_mips" 1>&6
 
 echo $ac_n "checking M32R family support""... $ac_c" 1>&6
-echo "configure:2353: checking M32R family support" >&5
+echo "configure:2426: checking M32R family support" >&5
 
 
 
@@ -2363,7 +2363,7 @@ fi
 echo "$ac_t""$sidtarget_m32r" 1>&6
 
 echo $ac_n "checking M68K family support""... $ac_c" 1>&6
-echo "configure:2367: checking M68K family support" >&5
+echo "configure:2440: checking M68K family support" >&5
 
 
 
@@ -2377,7 +2377,7 @@ fi
 echo "$ac_t""$sidtarget_m68k" 1>&6
 
 echo $ac_n "checking PPC family support""... $ac_c" 1>&6
-echo "configure:2381: checking PPC family support" >&5
+echo "configure:2470: checking PPC family support" >&5
 
 
 
@@ -2391,7 +2391,7 @@ fi
 echo "$ac_t""$sidtarget_ppc" 1>&6
 
 echo $ac_n "checking Sanyo Xstormy16 family support""... $ac_c" 1>&6
-echo "configure:2395: checking Sanyo Xstormy16 family support" >&5
+echo "configure:2561: checking Sanyo Xstormy16 family support" >&5
 
 
 
@@ -2437,7 +2437,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2441: checking for $ac_word" >&5
+echo "configure:2645: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_GUILE'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2473,7 +2473,7 @@ test -n "$GUILE" || GUILE="false"
 # Extract the first word of "links", so it can be a program name with args.
 set dummy links; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2477: checking for $ac_word" >&5
+echo "configure:2681: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_LINKS'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2513,7 +2513,7 @@ fi
 # Extract the first word of "xsltproc", so it can be a program name with args.
 set dummy xsltproc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2517: checking for $ac_word" >&5
+echo "configure:2721: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_XSLTPROC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2553,7 +2553,7 @@ fi
 # Extract the first word of "sabcmd", so it can be a program name with args.
 set dummy sabcmd; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2557: checking for $ac_word" >&5
+echo "configure:2761: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_SABLOTRON'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2590,6 +2590,68 @@ else
   HAVE_SABLOTRON_FALSE=
 fi
 
+
+
+for ac_func in vasprintf asprintf basename
+do
+  ac_tr_decl=HAVE_DECL_`echo $ac_func | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
+echo $ac_n "checking whether $ac_func is declared""... $ac_c" 1>&6
+echo "configure:2804: checking whether $ac_func is declared" >&5
+if eval "test \"`echo '$''{'gcc_cv_have_decl_$ac_func'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  cat > conftest.$ac_ext <<EOF
+#line 2809 "configure"
+#include "confdefs.h"
+#undef $ac_tr_decl
+#define $ac_tr_decl 1
+  
+#include <stdio.h>
+#include <string.h>
+
+
+int main() {
+#ifndef $ac_func
+char *(*pfn) = (char *(*)) $ac_func ;
+#endif
+; return 0; }
+EOF
+if { (eval echo configure:2824: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+  rm -rf conftest*
+  eval "gcc_cv_have_decl_$ac_func=yes"
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  eval "gcc_cv_have_decl_$ac_func=no"
+fi
+rm -f conftest*
+fi
+
+if eval "test \"`echo '$gcc_cv_have_decl_'$ac_func`\" = yes"; then
+  echo "$ac_t""yes" 1>&6 ; cat >> confdefs.h <<EOF
+#define $ac_tr_decl 1
+EOF
+ 
+else
+  echo "$ac_t""no" 1>&6 ; cat >> confdefs.h <<EOF
+#define $ac_tr_decl 0
+EOF
+ 
+fi
+
+done
+if test x = y ; then
+  cat >> confdefs.h <<\EOF
+#define HAVE_DECL_VASPRINTF 1
+EOF
+ cat >> confdefs.h <<\EOF
+#define HAVE_DECL_ASPRINTF 1
+EOF
+ cat >> confdefs.h <<\EOF
+#define HAVE_DECL_BASENAME 1
+EOF
+fi
 
 
 trap '' 1 2 15
@@ -2806,7 +2868,7 @@ cat >> $CONFIG_STATUS <<\EOF
 
 # Split the substitutions into bite-sized pieces for seds with
 # small command number limits, like on Digital OSF/1 and HP-UX.
-ac_max_sed_cmds=60 # Maximum number of lines to put in a sed script.
+ac_max_sed_cmds=90 # Maximum number of lines to put in a sed script.
 ac_file=1 # Number of current file.
 ac_beg=1 # First line for current file.
 ac_end=$ac_max_sed_cmds # Line after last line for current file.

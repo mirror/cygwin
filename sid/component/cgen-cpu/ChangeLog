@@ -1,11 +1,15 @@
-2002-12-02  Frank Ch. Eigler  <fche@redhat.com>
-
-	* tracedis.c: s/boolean/bfd_boolean/ throughout, to match bfd change.
-
 2002-11-29  Ben Elliston  <bje@redhat.com>
  
 	* common-xml/interface.xml (print-insn-summary!): New pin.
 	* common-xml/behavior.xml (tracing): Mention print-insn-summary!.
+
+2002-10-16  Alexandre Oliva  <aoliva@redhat.com>
+
+	* acinclude.m4 (gcc_AC_CHECK_DECL, gcc_AC_CHECK_DECLS): Copied
+	from gcc/aclocal.m4.
+	* configure.in: Check for decls of vasprintf, asprintf and
+	basename.
+	* tracedis.cxx: Include config.h.
 
 2002-10-03  Dave Brolley  <brolley@redhat.com>
        From Ben Elliston  <bje@redhat.com>
@@ -25,12 +29,32 @@
 	* common-xml/interface.xml: Document gdb-breakpoint-{big,little}.
 	* common-xml/debugger-register-access.xml: Cont'd.
 
+2002-04-03  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (TRACEDIS): Remove.
+	(libcgencpu_la_SOURCES): Add tracedis.cxx.
+	* tracedis.c: Rename from this ..
+	* tracedis.cxx: .. to this.
+	(trace_printf): New static function.
+	(cgen_disassemble): Pass trace_printf with INIT_DISASSEMBLE_INFO.
+	* compCGEN.cxx: Do not #include "tracedis.h" within extern "C".
+
 2002-03-14  Ben Elliston  <bje@redhat.com>
 
 	* common-xml/behavior.xml (tracing): New behavior section.
 	* common-xml/interface.xml (trace-filename): New attribute.
 	(trace-extract?): Associate with "tracing" behavior.
 	(trace-result?): Likewise.
+
+2002-02-11  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (libcgencpu_la_SOURCES): Add fp.h, fp.cxx.
+	* fp.h: New file.
+	* fp.cxx: Likewise.
+
+2002-02-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure, Makefile.in: Regenerated to correct build problem.
 
 2002-02-06  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -248,6 +272,8 @@
 
 2001-03-22  Ben Elliston  <bje@redhat.com>
 
+	* configure.in: Add xstormy16 support.
+	* compCGEN.cxx: Add xstormy16 support.
 	* Makefile.in: Regenerate.
 	* configure: Likewise.
 	* aclocal.m4: Likewise.

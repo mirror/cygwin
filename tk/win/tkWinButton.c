@@ -732,7 +732,7 @@ TkpComputeButtonGeometry(butPtr)
 
 	if (butPtr->type == TYPE_BUTTON) {
 		height = butPtr->height * fm.ascent;
-	} else {
+	} else if (butPtr->height > 0) {
 	    height = butPtr->height * fm.linespace;
 	}
 

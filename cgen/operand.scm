@@ -215,7 +215,7 @@
 (method-make!
  <operand> 'gen-pretty-name
  (lambda (self mode)
-   (let* ((name (op:sem-name self))
+   (let* ((name (if (elm-bound? self 'sem-name) (elm-get self 'sem-name) (obj:name self)))
 	  (pname (cond ((string=? "h-memory" (string-take 8 name)) "memory")
 		       ((string=? "h-" (string-take 2 name)) (string-drop 2 name))
 		       (else name))))

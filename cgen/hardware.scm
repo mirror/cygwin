@@ -1019,6 +1019,14 @@
 			(memq new-mode-class '(INT UINT))))))))
 )
 
+
+; These are scalars.
+(method-make!
+ <hw-immediate> 'get-index-mode
+ (lambda (self) #f)
+)
+
+
 ; Addresses.
 ; These are usually symbols.
 

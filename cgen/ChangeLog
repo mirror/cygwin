@@ -1,3 +1,7 @@
+2000-07-28  Ben Elliston  <bje@redhat.com>
+
+	* NEWS: Update.
+
 2000-07-25  Ben Elliston  <bje@redhat.com>
 
 	* doc/credits.texi (Credits): Add Frank Eigler.

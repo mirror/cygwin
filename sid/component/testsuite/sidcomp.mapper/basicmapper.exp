@@ -18,7 +18,7 @@ if {[sid_start "basicmapper.conf"]} { pass $test } else { fail $test; return }
 
 set test "all attributes are present"
 sid_assert_includes_all "sid::component::attribute_names $victim" \
-	{"state-snapshot"}
+	{state-snapshot latency}
 
 
 set test "access-port bus is present"

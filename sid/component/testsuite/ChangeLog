@@ -1,5 +1,10 @@
 2001-06-21  Ben Elliston  <bje@redhat.com>
 
+	* sidcomp.mapper/basicmapper.exp: Test for the existence of a
+	"latency" attribute.
+	* sidcomp.memory/genericmemory.exp: Test for the existence of
+	"read-latency" and "write-latency" attributes.
+
 	* sidcomp.cache/utils.exp: Use sid_bus_ok_p to detect bus write
 	errors instead of the common construction: if {$result == "ok"}.
 	* sidcomp.ide/diskio.exp: Likewise.

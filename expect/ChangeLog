@@ -1,3 +1,9 @@
+2003-01-29  Andrew Cagney  <ac131313@redhat.com>
+
+	* configure.in (EXP_AND_TCL_LIBS): Set to TCL_CC_SEARCH_FLAGS
+	instead of TCL_LD_SEARCH_FLAGS.
+	(EXP_AND_TK_LIBS): Ditto.
+	
 2002-11-19  Andrew Cagney  <ac131313@redhat.com>
 
 	* exp_clib.c (ecases;): Cast value returned by TclRegComp to a

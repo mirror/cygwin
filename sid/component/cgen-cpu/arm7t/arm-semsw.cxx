@@ -615,7 +615,7 @@ arm7f_cpu::arm_pbb_run ()
       static void** frag_label_table;
       int max_insns = ARM_INSN_MSR_S + 1;
       int tabsize = max_insns * 4;
-      frag_label_table = new (void*) [tabsize];
+      frag_label_table = new void* [tabsize];
       memset (frag_label_table, 0, sizeof (void*) * tabsize);
       int i;
       void** v;

@@ -512,7 +512,7 @@
 	(cond ((derived-operand? op)
 	       ; There is a one-to-one relationship b/w derived operands and
 	       ; the associated derived ifield.
-	       (let ((ifld (op-ifld op)))
+	       (let ((ifld (op-ifield op)))
 		 (assert (derived-ifield? ifld))
 		 ifld))
 	      ((anyof-operand? op)

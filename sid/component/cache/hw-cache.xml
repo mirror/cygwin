@@ -40,6 +40,7 @@
     <defattribute name="report-heading" category="setting" legalvalues="string" defaultvalue="cache profile report" behaviors="statistics reporting" />
     <defattribute name="hit-latency" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="memory latency" />
     <defattribute name="miss-latency" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="memory latency" />
+    <defattribute name="refill-latency" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="memory latency" />
     <defattribute name="dump!" category="setting" legalvalues="empty string" defaultvalue="empty" behaviors="internal diagnostics" />
 
     <variants>
@@ -191,7 +192,10 @@
 	<attribute>hit-latency</attribute> and
 	<attribute>miss-latency</attribute> values specify the
 	cumulative latencies for hit and missed cache operations.  Any
-	misaligned accesses are penalised as if they are a miss.</p>
+	misaligned accesses are penalised as if they are a miss. Cache
+	line refills incur an additional latency, specified by the
+	<attribute>refill-latency</attribute> attribute.</p>
+
     </behavior>
 
     <behavior name="statistics gathering">

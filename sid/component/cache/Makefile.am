@@ -12,7 +12,7 @@ pkgdata_DATA = hw-cache.txt
 
 DEJAGNUTESTS=cache.exp cachemonkey.exp cachedocs.exp coherency.exp \
 	fifo.exp flush.exp lock.exp lru.exp misaligned.exp \
-	prefetch.exp random.exp writealloc.exp writethru.exp
+	prefetch.exp random.exp refill.exp writealloc.exp writethru.exp
 
 check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)")

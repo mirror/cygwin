@@ -165,7 +165,10 @@ Functionality:
    |                 | hit and missed cache          |
    |                 | operations. Any misaligned    |
    |                 | accesses are penalised as if  |
-   |                 | they are a miss.              |
+   |                 | they are a miss. Cache line   |
+   |                 | refills incur an additional   |
+   |                 | latency, specified by the     |
+   |                 | refill-latency attribute.     |
    |-----------------+-------------------------------|
    |      statistics | The component gathers         |
    |       gathering | statistics for a number of    |
@@ -323,6 +326,9 @@ Component Reference:
    |                   |        |          |       |latency      ||
    |-------------------+--------+----------+-------+-------------||
    |miss-latency       |setting |numeric   |0      |memory       ||
+   |                   |        |          |       |latency      ||
+   |-------------------+--------+----------+-------+-------------||
+   |refill-latency     |setting |numeric   |0      |memory       ||
    |                   |        |          |       |latency      ||
    |-------------------+--------+----------+-------+-------------||
    |dump!              |setting |empty     |empty  |internal     ||

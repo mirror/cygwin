@@ -1,3 +1,12 @@
+2002-05-17  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (DEJAGNUTESTS): Add refill.exp.
+	* cache.h (cache_component::refill_latency): New member.
+	* cache.cxx (cache_component::read_line): Add refill latency.
+	(cache_component::cache_component): Initialise it and add a
+	corresponding "refill-latency" attribute.
+	* hw-cache.xml (memory latency) : Document refill latency.
+
 2002-04-09  Ben Elliston  <bje@redhat.com>
 
 	* cache.cxx (cache_component::read_line): Set the overall latency

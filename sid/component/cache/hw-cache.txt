@@ -246,10 +246,14 @@ Component Reference:
    |--------------+---------+-----------+------------|
    |flush-all     |in       |any        |flushing    |
    |--------------+---------+-----------+------------|
+   |flush-set     |in       |set index  |flushing    |
+   |--------------+---------+-----------+------------|
    |invalidate    |in       |32-bit     |invalidating|
    |              |         |address    |            |
    |--------------+---------+-----------+------------|
    |invalidate-all|in       |any        |invalidating|
+   |--------------+---------+-----------+------------|
+   |invalidate-set|in       |set index  |invalidating|
    |--------------+---------+-----------+------------|
    |prefetch      |in       |32-bit     |prefetching |
    |              |         |address    |            |

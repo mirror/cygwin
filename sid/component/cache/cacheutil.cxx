@@ -1,6 +1,6 @@
 // cacheutil.cxx -- Helper classes for a generic memory cache. -*- C++ -*-
 
-// Copyright (C) 2001 Red Hat.
+// Copyright (C) 2001, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -349,6 +349,14 @@ cache::invalidate ()
 {
   for (iterator_t it = sets.begin (); it != sets.end(); it++)
     (*it)->invalidate ();
+}
+
+void
+cache::invalidate (unsigned index)
+{
+  if (index >= sets.size ())
+    return;
+  sets[index]->invalidate ();
 }
 
 // Remove a line from the cache.

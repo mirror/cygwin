@@ -873,7 +873,7 @@ thread_db_open (struct gdbserv *serv, int pid)
    thread_db interface, but it's not really where this should
    be done. */
 
-void
+static void
 thread_db_detach (struct gdbserv *serv, struct gdbserv_target *target)
 {
   struct child_process *process = gdbserv_target_data (serv);
@@ -1107,14 +1107,14 @@ thread_db_get_gen (struct gdbserv *serv)
    Handle 'Q' requests:
 */
 
-void
+static void
 thread_db_set_gen (struct gdbserv *serv)
 {
     if (parentvec.process_set_gen)
       parentvec.process_set_gen (serv);
 }
 
-void
+static void
 thread_db_thread_id (struct gdbserv *serv, 
 		     struct gdbserv_thread *thread,
 		     struct gdbserv_reg *id)

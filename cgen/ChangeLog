@@ -1,3 +1,7 @@
+2000-12-01  Greg McGary  <greg@mcgary.org>
+
+	* desc.scm ((<keyword>,gen-defn): Prepend prefix to keyword names.
+
 2000-12-01  Ben Elliston  <bje@redhat.com>
 
 	* sim-cpu.scm (cgen-cpu.h): Only emit argbuf, scache and extract

@@ -28,6 +28,8 @@
     <defattribute name="trace-extract?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="tracing" />
     <defattribute name="trace-filename" category="setting" legalvalues="string" defaultvalue="-" behaviors="tracing" />
     <defattribute name="trace-result?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="tracing" />
+    <defattribute name="trace-counter?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="tracing" />
+    <defattribute name="final-insn-count?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="tracing" />
     <defattribute name="engine-type" category="setting" legalvalues="scache or pbb" defaultvalue="pbb" behaviors="execution" />
     <defattribute name="insn-count" category="watchable register" legalvalues="number" behaviors="execution" />
     <defattribute name="step-insn-count" category="setting" legalvalues="number" defaultvalue="1" behaviors="execution" />

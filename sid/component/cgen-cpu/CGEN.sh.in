@@ -13,6 +13,8 @@
 #	defs.h             - generate defs.h file (cpu-family specific decls)
 #	decode.h           - generate decoder header file
 #	decode.cxx         - generate decoder
+#	model.h            - generate model header file
+#	model.cxx          - generate model
 #	semantics.cxx      - generate semantics
 #	sem-switch.cxx     - generate semantics, pbb switch version
 #
@@ -83,6 +85,8 @@ do
     defs.h) fileopts="$fileopts -E tmp-defs-$$.h1" ;;
     decode.h) fileopts="$fileopts -T tmp-dec-$$.h1" ;;
     decode.cxx) fileopts="$fileopts -D tmp-dec-$$.cxx1" ;;
+    model.h) fileopts="$fileopts -N tmp-mod-$$.h1" ;;
+    model.cxx) fileopts="$fileopts -M tmp-mod-$$.cxx1" ;;
     semantics.cxx) fileopts="$fileopts -S tmp-sem-$$.cxx1" ;;
     sem-switch.cxx) fileopts="$fileopts -X tmp-semsw-$$.cxx1" ;;
     write.cxx) fileopts="$fileopts -W tmp-write-$$.cxx1" ;;
@@ -141,6 +145,20 @@ do
 	    < tmp-dec-$$.cxx1 > tmp-dec-$$.cxx
 	${rootdir}/move-if-change tmp-dec-$$.cxx ${srcdir}/${fileprefix}decode.cxx
 	;;
+    model.h)
+	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
+	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
+	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
+	    < tmp-mod-$$.h1 > tmp-mod-$$.h
+	${rootdir}/move-if-change tmp-mod-$$.h ${srcdir}/${fileprefix}model.h
+	;;
+    model.cxx)
+	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
+	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
+	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
+	    < tmp-mod-$$.cxx1 > tmp-mod-$$.cxx
+	${rootdir}/move-if-change tmp-mod-$$.cxx ${srcdir}/${fileprefix}model.cxx
+	;;
     semantics.cxx)
 	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
 	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
@@ -173,5 +191,7 @@ rm -f tmp-semsw-$$.cxx1 tmp-semsw-$$.cxx
 rm -f tmp-write-$$.cxx1 tmp-write-$$.cxx
 rm -f tmp-dec-$$.h1 tmp-dec-$$.h
 rm -f tmp-dec-$$.cxx1 tmp-dec-$$.cxx
+rm -f tmp-mod-$$.h1 tmp-mod-$$.h
+rm -f tmp-mod-$$.cxx1 tmp-mod-$$.cxx
 
 exit 0

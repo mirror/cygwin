@@ -552,7 +552,6 @@ struct @prefix@_scache {
     (if (and (null? in-ops) (null? out-ops))
 	""
 	(string-list
-	 "#if WITH_PROFILE_MODEL_P\n"
 	 "  /* Record the fields for profiling.  */\n"
 	 "  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))\n"
 	 "    {\n"
@@ -561,7 +560,6 @@ struct @prefix@_scache {
 	 (string-list-map (lambda (op) (op:record-profile op sfmt #t))
 			  out-ops)
 	 "    }\n"
-	 "#endif\n"
 	 )))
 )
 

@@ -1,6 +1,6 @@
 #! /bin/sh
 # Configuration validation subroutine script, version 1.1.
-#   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000
+#   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2003
 #   Free Software Foundation, Inc.
 
 version='2000-08-29'
@@ -252,6 +252,9 @@ case $basic_machine in
 	mips64vr4111 | mips64vr4111el) # CYGNUS LOCAL dj/vr4111
 		basic_machine=$basic_machine-unknown
 		;;
+	frv)
+		basic_machine=$basic_machine-unknown
+		;;
 	m6811 | m68hc11 | m6812 | m68hc12)
 		# Motorola 68HC11/12.
 		basic_machine=$basic_machine-unknown
@@ -300,6 +303,8 @@ case $basic_machine in
 	      | mips64vr4111-* | mips64vr4111el-*)
 		;;
         # END CYGNUS LOCAL
+	frv-*)
+	        ;;
 	mips64vr4300-* | mips64vr4300el-*) # EGCS LOCAL jsmith/vr4300
 		;;
 	mips64vr4100-* | mips64vr4100el-*) # EGCS LOCAL jsmith/vr4100

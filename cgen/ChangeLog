@@ -1,3 +1,13 @@
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* desc-cpu.scm (-gen-mach-table-defns): Emit fourth field: the
+	mach->cpu insn-chunk-bitsize.
+	(-gen-cpu-open): In @arch@_cgen_rebuild_tables, process above new
+	field toward CGEN_CPU_TABLE->insn_chunk_bitsize.
+	* mach.scm (<cpu>): New field insn-chunk-bitsize.
+	(-cpu-parse, -cpu-read): Parse/initialize it.
+	* doc/rtl.texi (define-cpu): Document it.
+
 2001-07-09  Geoffrey Keating  <geoffk@redhat.com>
 
 	* ifield.scm (<ifield> 'field-start): Don't look at word-len.

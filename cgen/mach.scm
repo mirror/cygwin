@@ -992,6 +992,10 @@
 		; number of bits in a word.
 		word-bitsize
 
+		; number of bits in a chunk of an instruction word, for
+		; endianness conversion purposes; 0 = no chunking
+		insn-chunk-bitsize
+
 		; Transformation to use in generated files should one be
 		; needed.  At present the only supported value is a string
 		; which is the file suffix.
@@ -1010,7 +1014,7 @@
 
 ; Accessors.
 
-(define-getters <cpu> cpu (word-bitsize file-transform parallel-insns))
+(define-getters <cpu> cpu (word-bitsize insn-chunk-bitsize file-transform parallel-insns))
 
 ; Return endianness of instructions.
 
@@ -1046,7 +1050,7 @@
 
 (define (-cpu-parse name comment attrs
 		    endian insn-endian data-endian float-endian
-		    word-bitsize file-transform parallel-insns)
+		    word-bitsize insn-chunk-bitsize file-transform parallel-insns)
   (logit 2 "Processing cpu family " name " ...\n")
   ; Pick out name first 'cus we need it as a string(/symbol).
   (let* ((name (parse-name name "cpu"))
@@ -1058,6 +1062,7 @@
 	      (atlist-parse attrs "cpu" errtxt)
 	      endian insn-endian data-endian float-endian
 	      word-bitsize
+	      insn-chunk-bitsize
 	      file-transform
 	      parallel-insns)
 	(begin
@@ -1082,6 +1087,7 @@
 	  (data-endian #f)
 	  (float-endian #f)
 	  (word-bitsize nil)
+	  (insn-chunk-bitsize 0)
 	  (file-transform "")
 	  ; FIXME: Hobbit computes the wrong symbol for `parallel-insns'
 	  ; in the `case' expression below because there is a local var
@@ -1103,6 +1109,7 @@
 		((data-endian) (set! data-endian (cadr arg)))
 		((float-endian) (set! float-endian (cadr arg)))
 		((word-bitsize) (set! word-bitsize (cadr arg)))
+		((insn-chunk-bitsize) (set! insn-chunk-bitsize (cadr arg)))
 		((file-transform) (set! file-transform (cadr arg)))
 		((parallel-insns) (set! parallel-insns- (cadr arg)))
 		(else (parse-error errtxt "invalid cpu arg" arg)))
@@ -1110,7 +1117,7 @@
       ; Now that we've identified the elements, build the object.
       (-cpu-parse name comment attrs
 		  endian insn-endian data-endian float-endian
-		  word-bitsize file-transform parallel-insns-)
+		  word-bitsize insn-chunk-bitsize file-transform parallel-insns-)
       )
     )
 )

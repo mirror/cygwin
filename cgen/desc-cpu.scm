@@ -70,11 +70,12 @@ static const CGEN_MACH @arch@_cgen_mach_table[] = {
 		       (string-append "  { "
 				      "\"" (obj:name mach) "\", "
 				      "\"" (mach-bfd-name mach) "\", "
-				      (mach-enum mach)
+				      (mach-enum mach) ", "
+				      (number->string (cpu-insn-chunk-bitsize (mach-cpu mach)))
 				      " },\n")))
 		    (current-mach-list))
    "\
-  { 0, 0, 0 }
+  { 0, 0, 0, 0 }
 };
 \n"
    )
@@ -635,11 +636,9 @@ static void
 @arch@_cgen_rebuild_tables (cd)
      CGEN_CPU_TABLE *cd;
 {
-  int i,n_isas;
+  int i;
   unsigned int isas = cd->isas;
-#if 0
   unsigned int machs = cd->machs;
-#endif
 
   cd->int_insn_p = CGEN_INT_INSN_P;
 
@@ -677,20 +676,26 @@ static void
 	  cd->min_insn_bitsize = isa->min_insn_bitsize;
 	if (isa->max_insn_bitsize > cd->max_insn_bitsize)
 	  cd->max_insn_bitsize = isa->max_insn_bitsize;
-
-	++n_isas;
       }
 
-#if 0 /* Does nothing?? */
   /* Data derived from the mach spec.  */
   for (i = 0; i < MAX_MACHS; ++i)
     if (((1 << i) & machs) != 0)
       {
 	const CGEN_MACH *mach = & @arch@_cgen_mach_table[i];
 
-	++n_machs;
+	if (mach->insn_chunk_bitsize != 0)
+	{
+	  if (cd->insn_chunk_bitsize != 0 && cd->insn_chunk_bitsize != mach->insn_chunk_bitsize)
+	    {
+	      fprintf (stderr, \"@arch@_cgen_rebuild_tables: conflicting insn-chunk-bitsize values: `%d' vs. `%d'\\n\",
+		       cd->insn_chunk_bitsize, mach->insn_chunk_bitsize);
+	      abort ();
+	    }
+
+ 	  cd->insn_chunk_bitsize = mach->insn_chunk_bitsize;
+	}
       }
-#endif
 
   /* Determine which hw elements are used by MACH.  */
   build_hw_table (cd);

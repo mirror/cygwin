@@ -12,9 +12,10 @@ keyboard::keyboard ()
       update_keyboard_pin(this, & keyboard::update_keyboard),
       port_0x60_bus(this, & keyboard::read_port_0x60, & keyboard::write_port_0x60),
       port_0x64_bus(this, & keyboard::read_port_0x64, & keyboard::write_port_0x64),
-      cmos_registers_bus(0), timer_delta(100), keyboard_irq_number(1), have_mouse(false)
+      port_0x92_bus(this, & keyboard::read_port_0x92, & keyboard::write_port_0x92),
+      cmos_registers_bus(0), timer_delta(100), have_mouse(false)
 {
-  add_pin("trigger-irq", & this->trigger_irq_pin);
+  add_pin("interrupt", & this->interrupt_pin);
   add_pin("enable-a20", & this->enable_a20_pin);
   add_pin("a20-enabled", & this->a20_enabled_pin);
 
@@ -24,12 +25,16 @@ keyboard::keyboard ()
 
   add_bus("port-0x60", & this->port_0x60_bus);
   add_bus("port-0x64", & this->port_0x64_bus);
+  add_bus("port-0x92", & this->port_0x92_bus);
 
   add_attribute("timer-delta", & this->timer_delta, "setting");
-  add_attribute("keyboard-irq-number", & this->keyboard_irq_number, "setting");
   add_attribute("have-mouse?", & this->have_mouse, "setting");
 
   add_accessor("cmos-registers", & this->cmos_registers_bus);
+
+  bx_keyboard.serial_delay = 250;
+
+  add_attribute("serial-delay", & this->bx_keyboard.serial_delay, "setting");
 }
 
 void
@@ -63,7 +68,7 @@ keyboard::update_keyboard(host_int_4)
   unsigned val = bx_keyboard.periodic(timer_delta);
 
   if((val & 0x01))
-    trigger_irq_pin.drive(keyboard_irq_number);
+    interrupt_pin.drive(1);
 }
 
 void
@@ -106,6 +111,22 @@ bus::status
 keyboard::write_port_0x64 (host_int_4 addr, little_int_1 mask, little_int_1 data)
 {
   addr += 0x064;
+  bx_keyboard.write(addr, data, 1);
+  return bus::ok;
+}
+
+bus::status
+keyboard::read_port_0x92 (host_int_4 addr, little_int_1 mask, little_int_1 & data)
+{
+  addr += 0x092;
+  data = bx_keyboard.read(addr, 1);
+  return bus::ok;
+}
+
+bus::status
+keyboard::write_port_0x92 (host_int_4 addr, little_int_1 mask, little_int_1 data)
+{
+  addr += 0x092;
   bx_keyboard.write(addr, data, 1);
   return bus::ok;
 }

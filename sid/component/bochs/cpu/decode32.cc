@@ -34,7 +34,6 @@
   void
 BX_CPU_C::decode_exgx32(unsigned modrm)
 {
-#if 0
   unsigned  mod, rm, ss;
   unsigned sib, base, index;
   Bit32u displ32, index_reg_val, base_reg_val;
@@ -173,5 +172,4 @@ BX_CPU_C::decode_exgx32(unsigned modrm)
       return;
       }
     } /* if (mod != 3) */
-#endif
 }

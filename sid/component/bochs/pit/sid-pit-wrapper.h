@@ -44,7 +44,7 @@ public:
   
 protected:
 
-  output_pin trigger_irq_pin;
+  output_pin interrupt_pin;
 
   callback_pin<pit> init_pin;
   callback_pin<pit> update_pit_pin;
@@ -59,7 +59,6 @@ protected:
   callback_word_bus<pit, little_int_1> port_0x61_bus;
 
   host_int_4 timer_delta;
-  host_int_4 pit_irq_number;
   bx_pit_c bx_pit;
 };
 #endif // SID_PIT_WRAPPER_DEF_H

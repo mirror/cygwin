@@ -30,7 +30,6 @@
 
 
 
-#if 0
 static Bit16u *aaa[8] = {
   & BX,
   & BX,
@@ -52,7 +51,6 @@ static Bit16u *bbb[8] = {
   (Bit16u *) & BX_CPU_THIS_PTR empty_register,
   (Bit16u *) & BX_CPU_THIS_PTR empty_register
   };
-#endif
 
 
 
@@ -60,7 +58,6 @@ static Bit16u *bbb[8] = {
   void
 BX_CPU_C::decode_exgx16(unsigned modrm)
 {
-#if 0
   Bit8u  displ8;
   Bit16u displ16;
   unsigned mod, rm;
@@ -116,5 +113,4 @@ BX_CPU_C::decode_exgx16(unsigned modrm)
       i->seg_reg = i->seg_reg;
     return;
     }
-#endif
 }

@@ -602,7 +602,7 @@ ifelse([AC_DISABLE_FAST_INSTALL])dnl
 
 dnl sidtargets.m4  -*- m4 -*-
 
-dnl Copyright (C) 1999, 2000, 2001 Red Hat.
+dnl Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
 dnl This file is part of SID and is licensed under the GPL.
 dnl See the file COPYING.SID for conditions for redistribution.
 
@@ -644,6 +644,7 @@ sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
 sidtarget_ppc=$sidtarget_default
+sidtarget_sh=$sidtarget_default
 sidtarget_xstormy16=$sidtarget_default
 
 dnl Iterate over all listed targets
@@ -658,6 +659,7 @@ do
       m68k*)  sidtarget_m68k=1 ;;
       powerpc*) sidtarget_ppc=1 ;;
       ppc*)   sidtarget_ppc=1 ;;
+      sh*) sidtarget_sh=1 ;;
       xstormy16*) sidtarget_xstormy16=1 ;;
       *)      AC_MSG_WARN("Unknown target $targ") ;;
    esac
@@ -671,6 +673,7 @@ case 1 in
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
   ${sidtarget_ppc}) ;;
+  ${sidtarget_sh}) ;;
   ${sidtarget_xstormy16}) ;;
   *) AC_MSG_WARN([No selected sid targets: use --enable-targets or --target])
 	;;
@@ -709,6 +712,11 @@ AC_MSG_CHECKING(PPC family support)
 AC_SUBST(sidtarget_ppc)
 AM_CONDITIONAL(SIDTARGET_PPC,[test "x$sidtarget_ppc" = x1])
 AC_MSG_RESULT($sidtarget_ppc)
+
+AC_MSG_CHECKING([Hitachi SH family support])
+AC_SUBST(sidtarget_sh)
+AM_CONDITIONAL(SIDTARGET_SH,[test "x$sidtarget_sh" = x1])
+AC_MSG_RESULT($sidtarget_sh)
 
 AC_MSG_CHECKING(Sanyo Xstormy16 family support)
 AC_SUBST(sidtarget_xstormy16)

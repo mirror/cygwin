@@ -26,6 +26,7 @@
 
 
 
+
 #define NEED_CPU_REG_SHORTCUTS 1
 #include "bochs.h"
 #define LOG_THIS BX_CPU_THIS_PTR
@@ -34,6 +35,9 @@
 #define this (BX_CPU(0))
 #endif
 
+#if BX_SUPPORT_SID
+#include "sid-x86-cpu-wrapper.h"
+#endif
   void
 BX_CPU_C::UndefinedOpcode(BxInstruction_t *i)
 {
@@ -1128,9 +1132,20 @@ BX_CPU_C::RSM(BxInstruction_t *i)
 BX_CPU_C::RDTSC(BxInstruction_t *i)
 {
   // RDTSC -- Read Time-Stamp Counter
-  // We need a clock-cycle counter to support this.
-  // 
-#if 0
+#if BX_SUPPORT_SID
+  Boolean tsd = (BX_CPU_THIS_PTR cr4 & 4)? 1 : 0;
+  Boolean cpl = CPL;
+  if ((tsd==0) || (tsd==1 && cpl==0)) {
+    // return ticks
+    Bit64u ticks = x86_cpu_component->now();
+    EAX = (Bit32u) (ticks & 0xffffffff);
+    EDX = (Bit32u) ((ticks >> 32) & 0xffffffff);
+    //BX_INFO(("RDTSC: returning EDX:EAX = %08x:%08x\n", EDX, EAX));
+  } else {
+    // not allowed to use RDTSC!
+    exception (BX_GP_EXCEPTION, 0, 0);
+  }
+#else
 #if BX_CPU_LEVEL >= 5
   Boolean tsd = (BX_CPU_THIS_PTR cr4 & 4)? 1 : 0;
   Boolean cpl = CPL;
@@ -1147,7 +1162,7 @@ BX_CPU_C::RDTSC(BxInstruction_t *i)
 #else
   UndefinedOpcode(i);
 #endif
-#endif
+#endif // BX_SUPPORT_SID
 }
 
   void

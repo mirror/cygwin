@@ -50,7 +50,7 @@ bx_dma_c bx_dma;
 bx_dma_c::bx_dma_c(void)
 {
 #if BX_SUPPORT_SID
-  bx_dbg.dma = 1;
+  bx_dbg.dma = 0;
 #endif
 	setprefix("[DMA ]");
 	settype(DMALOG);

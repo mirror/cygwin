@@ -1,3 +1,33 @@
+2002-03-04  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* Makefile.am (SUBDIRLIST): Add harddrv.
+	(SUBLIBLIST): Add harddrv/libharddrv.la.
+	(INCLUDES): Add harddrv.
+	* bochs.h: Include harddrv.h header.
+	* components.cxx: Add hw-disk-harddrive type.
+	* configure.in (AC_OUTPUT): Add harddrv/Makefile.
+	* cmos/sid-cmos-wrapper.cc: Remove cmos_irq_number,
+	use_host_time and start_time attributes.
+	Add base_memory_in_k, extended_memory_in_k attributes.
+	Remove get_time function.
+	* cpu/cpu.cc: Change mem->read_physical calls to access_linear
+	calls.
+	* cpu/cpu.h: Change _16_bit_base_reg references to
+	a_16_bit_base_reg, to prevent compiler warnings on some hosts.
+	* cpu/init.cc: Likewise.
+	* cpu/proc_ctrl.cc: Add RDTSC implementation.
+	* floppy/sid-floppy-wrapper.cc: Split up io memory range so that
+	3f6 is left for hard drive.
+	Add command-delay attribute.
+	* keyboard/keyboard.cc: Handle reads from, and writes to port
+	0x92.
+	* keyboard/sid-keyboard-wrapper.cc: Add serial-delay attribute.
+	* pic/sid-pic-wrapper.cc: Change implementation; provide one pin
+	per irq, rather than one irq-number pin.
+	* vga/sid-vga-wrapper.cc: Fix cmos writing bug.
+	* vga/vga.cc: Add BX_SUPPORT_SID ifdefs, so that diffs between
+	this file and the bochs version are clearer.
+
 2002-02-14  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* debug/debug.h: Move to top-level bochs directory.

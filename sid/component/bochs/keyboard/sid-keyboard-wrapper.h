@@ -49,7 +49,7 @@ public:
   host_int_4 sense_a20_enabled_pin(void);
 protected:
 
-  output_pin trigger_irq_pin;
+  output_pin interrupt_pin;
   output_pin enable_a20_pin;
   input_pin a20_enabled_pin;
   
@@ -63,13 +63,16 @@ protected:
   bus::status read_port_0x64 (host_int_4 addr, little_int_1 mask, little_int_1 & data);
   bus::status write_port_0x64 (host_int_4 addr, little_int_1 mask, little_int_1 data);
 
+  bus::status read_port_0x92 (host_int_4 addr, little_int_1 mask, little_int_1 & data);
+  bus::status write_port_0x92 (host_int_4 addr, little_int_1 mask, little_int_1 data);
+
   callback_word_bus<keyboard, little_int_1> port_0x60_bus;
   callback_word_bus<keyboard, little_int_1> port_0x64_bus;
+  callback_word_bus<keyboard, little_int_1> port_0x92_bus;
 
   bus *cmos_registers_bus;
 
   host_int_4 timer_delta;
-  host_int_4 keyboard_irq_number;
   bool have_mouse;
 
   bx_keyb_c bx_keyboard;

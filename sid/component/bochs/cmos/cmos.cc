@@ -28,11 +28,11 @@
 #if BX_SUPPORT_SID
 #define LOG_THIS
 #include "sid-cmos-wrapper.h"
-#else
+#else // BX_SUPPORT_SID
 #define LOG_THIS bx_cmos.
 
 bx_cmos_c bx_cmos;
-#endif
+#endif // BX_SUPPORT_SID
 
 #if BX_USE_CMOS_SMF
 #define this (&bx_cmos)
@@ -50,7 +50,7 @@ bx_cmos_c bx_cmos;
 bx_cmos_c::bx_cmos_c(void)
 {
 #if BX_SUPPORT_SID
-  bx_dbg.cmos = 1;
+  bx_dbg.cmos = 0;
 #endif
 	setprefix("[CMOS]");
 	settype(CMOSLOG);
@@ -70,7 +70,7 @@ bx_cmos_c::init(cmos *cmos_comp)
 #else
   void
 bx_cmos_c::init(bx_devices_c *d)
-#endif
+#endif // BX_SUPPORT_SID
 {
   unsigned i;
 
@@ -104,15 +104,12 @@ bx_cmos_c::init(bx_devices_c *d)
   BX_CMOS_THIS s.one_second_timer_index =
     bx_pc_system.register_timer(this, one_second_timer_handler,
       1000000, 1,0); // continuous, not-active
-#endif
+#endif // BX_SUPPORT_SID
 
   for (i=0; i<BX_NUM_CMOS_REGS; i++) {
     BX_CMOS_THIS s.reg[i] = 0;
     }
 
-#if BX_SUPPORT_SID
-  s.timeval = cmos_component->get_time();
-#else
 #if BX_USE_SPECIFIED_TIME0 == 0
   // ??? this will not be correct for using an image file.
   // perhaps take values in CMOS and work backwards to find
@@ -126,7 +123,6 @@ bx_cmos_c::init(bx_devices_c *d)
           BX_CMOS_THIS s.timeval = time(NULL);
   else if (bx_options.cmos.time0 != 0)
           BX_CMOS_THIS s.timeval = bx_options.cmos.time0;
-#endif // BX_SUPPORT_SID
 
   BX_INFO(("Setting initial clock to: %s",
     ctime(&(BX_CMOS_THIS s.timeval)) ));
@@ -214,9 +210,35 @@ bx_cmos_c::load_cmos_image(std::string path)
 void
 bx_cmos_c::generate_cmos_values(void)
 {
-#if BX_SUPPORT_SID
+  // FIXME: add boot-first attributes to floppy and harddrive components
   BX_CMOS_THIS s.reg[0x2d] |= 0x20; // system boot sequence A:, C:
-#endif
+
+
+  // FIXME: create cmos-registers bus on harddrive component  
+  BX_CMOS_THIS s.reg[0x12] = 0x00; // start out with: no hard drive 0, no hard drive 1
+
+  // Flag drive type as Fh, use extended CMOS location as real type
+  s.reg[0x12] = (s.reg[0x12] & 0x0f) | 0xf0;
+  s.reg[0x19] = 47; // user definable type
+  // AMI BIOS: 1st hard disk #cyl low byte
+  s.reg[0x1b] = (128 & 0x00ff);
+  // AMI BIOS: 1st hard disk #cyl high byte
+  s.reg[0x1c] = (128 & 0xff00) >> 8;
+  // AMI BIOS: 1st hard disk #heads
+  s.reg[0x1d] = (10);
+  // AMI BIOS: 1st hard disk write precompensation cylinder, low byte
+  s.reg[0x1e] = 0xff; // -1
+  // AMI BIOS: 1st hard disk write precompensation cylinder, high byte
+  s.reg[0x1f] = 0xff; // -1
+  // AMI BIOS: 1st hard disk control byte
+  s.reg[0x20] = 0xc0 | ((10 > 8) << 3);
+  // AMI BIOS: 1st hard disk landing zone, low byte
+  s.reg[0x21] = s.reg[0x1b];
+  // AMI BIOS: 1st hard disk landing zone, high byte
+  s.reg[0x22] = s.reg[0x1c];
+  // AMI BIOS: 1st hard disk sectors/track
+  s.reg[0x23] = 32;
+  
   // CMOS values generated
   BX_CMOS_THIS s.reg[0x0a] = 0x26;
   BX_CMOS_THIS s.reg[0x0b] = 0x02;
@@ -524,7 +546,7 @@ bx_cmos_c::write(Bit32u address, Bit32u value, unsigned io_len)
 #else
               bx_pc_system.deactivate_timer(
                 BX_CMOS_THIS s.periodic_timer_index);
-#endif
+#endif // BX_SUPPORT_SID
               }
             else {
               // transition from 0 to 1
@@ -542,7 +564,7 @@ bx_cmos_c::write(Bit32u address, Bit32u value, unsigned io_len)
                 bx_pc_system.activate_timer(
                   BX_CMOS_THIS s.periodic_timer_index,
                   BX_CMOS_THIS s.periodic_interval_usec, 1);
-#endif
+#endif // BX_SUPPORT_SID
                 }
               }
             }
@@ -634,7 +656,7 @@ bx_cmos_c::periodic_timer_handler(void)
     {
       s.reg[0x0c] |= 0xc0; // Interrupt Request, Periodic Int
       if (cmos_component)
-        cmos_component->drive_trigger_irq_pin();
+        cmos_component->drive_interrupt_pin();
       else
         {
           cerr << "cmos: Drive init pin before other cmos pins." << endl;
@@ -662,7 +684,7 @@ bx_cmos_c::one_second_timer_handler(void)
     {
       s.reg[0x0c] |= 0x90; // Interrupt Request, Update Ended
       if (cmos_component)
-        cmos_component->drive_trigger_irq_pin();
+        cmos_component->drive_interrupt_pin();
       else
         {
           cerr << "cmos: Drive init pin before other cmos pins." << endl;
@@ -697,7 +719,7 @@ bx_cmos_c::one_second_timer_handler(void)
       {
         s.reg[0x0c] |= 0xa0; // Interrupt Request, Alarm Int
         if (cmos_component)
-          cmos_component->drive_trigger_irq_pin();
+          cmos_component->drive_interrupt_pin();
         else
           {
             cerr << "cmos: Drive init pin before other cmos pins." << endl;
@@ -706,7 +728,7 @@ bx_cmos_c::one_second_timer_handler(void)
       }
     }
 }
-#else
+#else // BX_SUPPORT_SID
   void
 bx_cmos_c::periodic_timer_handler(void *this_ptr)
 {
@@ -767,8 +789,7 @@ bx_cmos_c::one_second_timer_handler(void *this_ptr)
       }
     }
 }
-#endif
-
+#endif // BX_SUPPORT_SID
 
   void
 bx_cmos_c::update_clock()

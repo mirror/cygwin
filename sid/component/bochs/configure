@@ -5641,6 +5641,7 @@ sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
 sidtarget_ppc=$sidtarget_default
+sidtarget_sh=$sidtarget_default
 sidtarget_xstormy16=$sidtarget_default
 
 for targ in $all_targets
@@ -5654,6 +5655,7 @@ do
       m68k*)  sidtarget_m68k=1 ;;
       powerpc*) sidtarget_ppc=1 ;;
       ppc*)   sidtarget_ppc=1 ;;
+      sh*) sidtarget_sh=1 ;;
       xstormy16*) sidtarget_xstormy16=1 ;;
       *)      echo "configure: warning: "Unknown target $targ"" 1>&2 ;;
    esac
@@ -5666,6 +5668,7 @@ case 1 in
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
   ${sidtarget_ppc}) ;;
+  ${sidtarget_sh}) ;;
   ${sidtarget_xstormy16}) ;;
   *) echo "configure: warning: No selected sid targets: use --enable-targets or --target" 1>&2
 	;;
@@ -5673,7 +5676,7 @@ esac
 
 
 echo $ac_n "checking ARM family support""... $ac_c" 1>&6
-echo "configure:5734: checking ARM family support" >&5
+echo "configure:5737: checking ARM family support" >&5
 
 
 
@@ -5687,7 +5690,7 @@ fi
 echo "$ac_t""$sidtarget_arm" 1>&6
 
 echo $ac_n "checking X86 family support""... $ac_c" 1>&6
-echo "configure:5748: checking X86 family support" >&5
+echo "configure:5751: checking X86 family support" >&5
 
 
 
@@ -5701,7 +5704,7 @@ fi
 echo "$ac_t""$sidtarget_x86" 1>&6
 
 echo $ac_n "checking MIPS family support""... $ac_c" 1>&6
-echo "configure:5778: checking MIPS family support" >&5
+echo "configure:5781: checking MIPS family support" >&5
 
 
 
@@ -5715,7 +5718,7 @@ fi
 echo "$ac_t""$sidtarget_mips" 1>&6
 
 echo $ac_n "checking M32R family support""... $ac_c" 1>&6
-echo "configure:5792: checking M32R family support" >&5
+echo "configure:5795: checking M32R family support" >&5
 
 
 
@@ -5729,7 +5732,7 @@ fi
 echo "$ac_t""$sidtarget_m32r" 1>&6
 
 echo $ac_n "checking M68K family support""... $ac_c" 1>&6
-echo "configure:5806: checking M68K family support" >&5
+echo "configure:5809: checking M68K family support" >&5
 
 
 
@@ -5743,7 +5746,7 @@ fi
 echo "$ac_t""$sidtarget_m68k" 1>&6
 
 echo $ac_n "checking PPC family support""... $ac_c" 1>&6
-echo "configure:5836: checking PPC family support" >&5
+echo "configure:5839: checking PPC family support" >&5
 
 
 
@@ -5756,8 +5759,22 @@ else
 fi
 echo "$ac_t""$sidtarget_ppc" 1>&6
 
+echo $ac_n "checking Hitachi SH family support""... $ac_c" 1>&6
+echo "configure:5914: checking Hitachi SH family support" >&5
+
+
+
+if test "x$sidtarget_sh" = x1; then
+  SIDTARGET_SH_TRUE=
+  SIDTARGET_SH_FALSE='#'
+else
+  SIDTARGET_SH_TRUE='#'
+  SIDTARGET_SH_FALSE=
+fi
+echo "$ac_t""$sidtarget_sh" 1>&6
+
 echo $ac_n "checking Sanyo Xstormy16 family support""... $ac_c" 1>&6
-echo "configure:5927: checking Sanyo Xstormy16 family support" >&5
+echo "configure:5944: checking Sanyo Xstormy16 family support" >&5
 
 
 
@@ -5873,7 +5890,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile vga/Makefile gui/Makefile keyboard/Makefile pic/Makefile pit/Makefile cmos/Makefile dma/Makefile floppy/Makefile unmapped/Makefile cpu/Makefile cpu/memory/Makefile cpu/fpu/Makefile config.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile vga/Makefile gui/Makefile keyboard/Makefile pic/Makefile pit/Makefile cmos/Makefile dma/Makefile floppy/Makefile unmapped/Makefile harddrv/Makefile cpu/Makefile cpu/memory/Makefile cpu/fpu/Makefile config.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -6007,6 +6024,9 @@ s%@SIDTARGET_M68K_FALSE@%$SIDTARGET_M68K_FALSE%g
 s%@sidtarget_ppc@%$sidtarget_ppc%g
 s%@SIDTARGET_PPC_TRUE@%$SIDTARGET_PPC_TRUE%g
 s%@SIDTARGET_PPC_FALSE@%$SIDTARGET_PPC_FALSE%g
+s%@sidtarget_sh@%$sidtarget_sh%g
+s%@SIDTARGET_SH_TRUE@%$SIDTARGET_SH_TRUE%g
+s%@SIDTARGET_SH_FALSE@%$SIDTARGET_SH_FALSE%g
 s%@sidtarget_xstormy16@%$sidtarget_xstormy16%g
 s%@SIDTARGET_XSTORMY16_TRUE@%$SIDTARGET_XSTORMY16_TRUE%g
 s%@SIDTARGET_XSTORMY16_FALSE@%$SIDTARGET_XSTORMY16_FALSE%g
@@ -6051,7 +6071,7 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile vga/Makefile gui/Makefile keyboard/Makefile pic/Makefile pit/Makefile cmos/Makefile dma/Makefile floppy/Makefile unmapped/Makefile cpu/Makefile cpu/memory/Makefile cpu/fpu/Makefile"}
+CONFIG_FILES=\${CONFIG_FILES-"Makefile vga/Makefile gui/Makefile keyboard/Makefile pic/Makefile pit/Makefile cmos/Makefile dma/Makefile floppy/Makefile unmapped/Makefile harddrv/Makefile cpu/Makefile cpu/memory/Makefile cpu/fpu/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then

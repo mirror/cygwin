@@ -28,6 +28,7 @@
 #define X86_CPU_DEBUG 0
 
 using sid::component;
+using sid::host_int_8;
 using sid::host_int_4;
 using sid::host_int_1;
 using sid::little_int_1;
@@ -79,7 +80,9 @@ public:
 
   void drive_interrupt_acknowledge_pin(void);
   host_int_1 interrupt_acknowledged(void);
-  
+
+  host_int_8 now(void);
+
   host_int_4 a20_mask;
 protected:
   bx_cpu_c bx_cpu;

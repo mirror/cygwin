@@ -68,6 +68,7 @@ private:
 #if !BX_USE_KEY_SMF
 #if BX_SUPPORT_SID
  public:
+  unsigned long serial_delay;
 #endif
   void     write(Bit32u   address, Bit32u   value, unsigned io_len);
   Bit32u   read(Bit32u   address, unsigned io_len);

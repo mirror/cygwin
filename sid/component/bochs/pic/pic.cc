@@ -45,7 +45,7 @@ bx_pic_c bx_pic;
 bx_pic_c::bx_pic_c(void)
 {
 #if BX_SUPPORT_SID
-  bx_dbg.pic = 1;
+  bx_dbg.pic = 0;
 #endif
 	setprefix("[PIC ]");
 	settype(PICLOG);

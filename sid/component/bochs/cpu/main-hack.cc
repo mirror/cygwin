@@ -534,7 +534,7 @@ bx_bochs_init(int argc, char *argv[])
   BX_MEM(0)->load_ROM(bx_options.vgarom.path, 0xc0000);
   BX_CPU(0)->init (BX_MEM(0));
   BX_CPU(0)->reset(BX_RESET_HARDWARE);
-#endif
+#endif // BX_SUPPORT_SID
 #else
   // SMP initialization
   bx_mem_array[0] = new BX_MEM_C ();
@@ -582,7 +582,7 @@ bx_bochs_init(int argc, char *argv[])
   void
 bx_init_debug(void)
 {
-  bx_dbg.floppy = 1;
+  bx_dbg.floppy = 0;
   bx_dbg.keyboard = 0;
   bx_dbg.video = 0;
   bx_dbg.disk = 0;

@@ -38,7 +38,7 @@ pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
 
-top_builddir = ../..
+top_builddir = ..
 
 ACLOCAL = @ACLOCAL@
 AUTOCONF = @AUTOCONF@
@@ -130,20 +130,20 @@ sidtarget_xstormy16 = @sidtarget_xstormy16@
 
 AUTOMAKE_OPTIONS = foreign
 
-INCLUDES = -I$(srcdir)/../.. -I$(srcdir) -I$(srcdir)/stubs -DUSE_WITH_CPU_SIM -DPARANOID -DNO_ASSEMBLER
+INCLUDES = -I$(top_builddir)/../../include -I$(srcdir) -I$(srcdir)/.. -I$(srcdir)/../../../include -I$(srcdir)/../cpu
 
-noinst_LTLIBRARIES = libfpu.la
+noinst_LTLIBRARIES = libharddrv.la
 
-libfpu_la_SOURCES = fpu.cc wmFPUemu_glue.cc fpu_entry.c errors.c reg_ld_str.c load_store.c fpu_arith.c fpu_aux.c fpu_etc.c fpu_tags.c fpu_trig.c poly_atan.c poly_l2.c poly_2xm1.c poly_sin.c poly_tan.c reg_add_sub.c reg_compare.c reg_constant.c reg_convert.c reg_divide.c reg_mul.c reg_u_add.c reg_u_div.c reg_u_mul.c reg_u_sub.c div_small.c reg_norm.c reg_round.c wm_shrx.c wm_sqrt.c div_Xsig.c polynom_Xsig.c round_Xsig.c shr_Xsig.c mul_Xsig.c
+libharddrv_la_SOURCES = sid-harddrv-wrapper.cc sid-harddrv-wrapper.h harddrv.cc harddrv.h
 
-libfpu_la_LDFLAGS = -no-undefined
+libharddrv_la_LDFLAGS = -no-undefined
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../config/mkinstalldirs
-CONFIG_HEADER = ../../config.h
+CONFIG_HEADER = ../config.h
 CONFIG_CLEAN_FILES = 
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 
-DEFS = @DEFS@ -I. -I$(srcdir) -I../..
+DEFS = @DEFS@ -I. -I$(srcdir) -I..
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
@@ -151,15 +151,8 @@ X_CFLAGS = @X_CFLAGS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
-libfpu_la_LIBADD = 
-libfpu_la_OBJECTS =  fpu.lo wmFPUemu_glue.lo fpu_entry.lo errors.lo \
-reg_ld_str.lo load_store.lo fpu_arith.lo fpu_aux.lo fpu_etc.lo \
-fpu_tags.lo fpu_trig.lo poly_atan.lo poly_l2.lo poly_2xm1.lo \
-poly_sin.lo poly_tan.lo reg_add_sub.lo reg_compare.lo reg_constant.lo \
-reg_convert.lo reg_divide.lo reg_mul.lo reg_u_add.lo reg_u_div.lo \
-reg_u_mul.lo reg_u_sub.lo div_small.lo reg_norm.lo reg_round.lo \
-wm_shrx.lo wm_sqrt.lo div_Xsig.lo polynom_Xsig.lo round_Xsig.lo \
-shr_Xsig.lo mul_Xsig.lo
+libharddrv_la_LIBADD = 
+libharddrv_la_OBJECTS =  sid-harddrv-wrapper.lo harddrv.lo
 CXXFLAGS = @CXXFLAGS@
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -169,31 +162,21 @@ CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-DIST_COMMON =  README Makefile.am Makefile.in
+DIST_COMMON =  Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 GZIP_ENV = --best
-DEP_FILES =  .deps/div_Xsig.P .deps/div_small.P .deps/errors.P \
-.deps/fpu.P .deps/fpu_arith.P .deps/fpu_aux.P .deps/fpu_entry.P \
-.deps/fpu_etc.P .deps/fpu_tags.P .deps/fpu_trig.P .deps/load_store.P \
-.deps/mul_Xsig.P .deps/poly_2xm1.P .deps/poly_atan.P .deps/poly_l2.P \
-.deps/poly_sin.P .deps/poly_tan.P .deps/polynom_Xsig.P \
-.deps/reg_add_sub.P .deps/reg_compare.P .deps/reg_constant.P \
-.deps/reg_convert.P .deps/reg_divide.P .deps/reg_ld_str.P \
-.deps/reg_mul.P .deps/reg_norm.P .deps/reg_round.P .deps/reg_u_add.P \
-.deps/reg_u_div.P .deps/reg_u_mul.P .deps/reg_u_sub.P \
-.deps/round_Xsig.P .deps/shr_Xsig.P .deps/wmFPUemu_glue.P \
-.deps/wm_shrx.P .deps/wm_sqrt.P
-SOURCES = $(libfpu_la_SOURCES)
-OBJECTS = $(libfpu_la_OBJECTS)
+DEP_FILES =  .deps/harddrv.P .deps/sid-harddrv-wrapper.P
+SOURCES = $(libharddrv_la_SOURCES)
+OBJECTS = $(libharddrv_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .cc .lo .o .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign cpu/fpu/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --foreign harddrv/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -241,8 +224,8 @@ distclean-libtool:
 
 maintainer-clean-libtool:
 
-libfpu.la: $(libfpu_la_OBJECTS) $(libfpu_la_DEPENDENCIES)
-	$(CXXLINK)  $(libfpu_la_LDFLAGS) $(libfpu_la_OBJECTS) $(libfpu_la_LIBADD) $(LIBS)
+libharddrv.la: $(libharddrv_la_OBJECTS) $(libharddrv_la_DEPENDENCIES)
+	$(CXXLINK)  $(libharddrv_la_LDFLAGS) $(libharddrv_la_OBJECTS) $(libharddrv_la_LIBADD) $(LIBS)
 .cc.o:
 	$(CXXCOMPILE) -c $<
 .cc.lo:
@@ -279,14 +262,14 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = cpu/fpu
+subdir = harddrv
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign cpu/fpu/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign harddrv/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \

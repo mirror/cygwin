@@ -43,14 +43,12 @@ public:
 
   void init(host_int_4);
   void reset(host_int_4);
-  void drive_trigger_irq_pin(void);
+  void drive_interrupt_pin(void);
   void drive_command_delay_control_pin(host_int_4 value, bool regular);
   void channel_request(host_int_4 channel, little_int_1 val);
   bool terminal_count(void);
   host_int_4 dma_channel_number(void);
   void dma_channel(host_int_4 phy_addr);
-  void dma_write(host_int_4 addr, little_int_1 data);
-  void dma_read(host_int_4 addr, unsigned char *data);
   void command_delay(host_int_4);
 protected:
 
@@ -63,15 +61,20 @@ protected:
   callback_pin<floppy> command_delay_pin;
   output_pin command_delay_control_pin;
 
-  output_pin trigger_irq_pin;
+  output_pin interrupt_pin;
 
   callback_pin<floppy> init_pin;
   callback_pin<floppy> reset_pin;
 
-  bus::status read_port_0x3f2_0x3f7 (host_int_4 addr, little_int_1 mask, little_int_1 & data);
-  bus::status write_port_0x3f2_0x3f7 (host_int_4 addr, little_int_1 mask, little_int_1 data);
+  bus::status read_port_0x3f2_0x3f5 (host_int_4 addr, little_int_1 mask, little_int_1 & data);
+  bus::status write_port_0x3f2_0x3f5 (host_int_4 addr, little_int_1 mask, little_int_1 data);
 
-  callback_word_bus<floppy, little_int_1> ports_0x3f2_0x3f7_bus;
+  callback_word_bus<floppy, little_int_1> ports_0x3f2_0x3f5_bus;
+
+  bus::status read_port_0x3f7 (host_int_4 addr, little_int_1 mask, little_int_1 & data);
+  bus::status write_port_0x3f7 (host_int_4 addr, little_int_1 mask, little_int_1 data);
+
+  callback_word_bus<floppy, little_int_1> port_0x3f7_bus;
 
   bus *cmos_registers_bus;
   bus *dma_channels_bus;
@@ -87,7 +90,6 @@ protected:
   bool floppy_b_is_inserted;
 
   host_int_4 floppy_dma_channel;
-  host_int_4 floppy_irq_number;
   bx_floppy_ctrl_c bx_floppy;
 };
 #endif // SID_FLOPPY_WRAPPER_DEF_H

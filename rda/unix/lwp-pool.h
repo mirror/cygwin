@@ -103,18 +103,18 @@ void lwp_pool_stop_all (void);
 void lwp_pool_continue_all (void);
 
 
-/* Continue LWP.  If SIGNAL is non-zero, continue it with signal
+/* Continue PID.  If SIGNAL is non-zero, continue it with signal
    SIGNAL.  Return zero on success, -1 on failure.  */
 int lwp_pool_continue_lwp (pid_t pid, int signal);
 
 
-/* Continue LWP in SERV for one instruction, delivering SIGNAL if it
+/* Continue PID in SERV for one instruction, delivering SIGNAL if it
    is non-zero, and stop with SIGSTOP if/when that instruction has
    been completed.
 
    The SERV argument is there because singlestep_lwp requires it.
    Inconsistency, bleah.  */
-int lwp_pool_singlestep_lwp (struct gdbserv *serv, pid_t lwp, int signal);
+int lwp_pool_singlestep_lwp (struct gdbserv *serv, pid_t pid, int signal);
 
 
 /* Under NPTL, LWP's simply disappear, without becoming a zombie or

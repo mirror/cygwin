@@ -63,6 +63,8 @@ hw-uart-ns16550         16550 UART model
 hw-visual-clock         tk xclock gui
 hw-visual-lcd           tk lcd display gui
 hw-visual-tty           tk mini-xterm gui
+hw-visual-probe-pin	tk pin-activity monitoring gui
+hw-visual-probe-bus	tk/blt bus-activity monitoring gui
 sid-control-cfgroot     Configuration file reader; top level loop
 sid-control-tksm        tk System Monitor
 sid-io-audio            Host audio interface.

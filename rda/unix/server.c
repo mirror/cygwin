@@ -108,7 +108,7 @@ tty_raw (int fd, speed_t speed)
   buf.c_cc[VMIN] = 1;
   buf.c_cc[VTIME] = 0;
 
-  if (speed != 0)
+  if (speed != B0)
     {
       cfsetispeed (&buf, speed);
       cfsetospeed (&buf, speed);
@@ -290,10 +290,10 @@ main (int argc, char **argv)
   int verbose = 0;
   int attach = 0;
   int optidx;
-  int infd, outfd;
+  int infd = 0, outfd = 0;
   struct child_process *process;
   char *devicename = "";
-  speed_t speed;
+  speed_t speed = B0;
 
   /* Parse options.  */
   for (optidx = 1; optidx < argc; optidx++)

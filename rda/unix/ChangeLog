@@ -1,5 +1,8 @@
 2004-10-31  Jim Blandy  <jimb@redhat.com>
 
+	* server.c (main): Initialize infd, outfd, and speed.
+	(tty_raw): Use proper name for speed_t "zero baud" value.
+
 	* linux-target.c (decr_pc_after_break): Fix printf format
 	directive to match arguments.
 	* ptrace-target.c (ptrace_singlestep_program): Same.

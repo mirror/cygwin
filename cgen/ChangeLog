@@ -1,7 +1,28 @@
+2001-01-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sid-cpu.scm (gen-parallel-exec-type): Use unsigned long long for
+	writeback tracking.
+	(-gen-write-fn, -gen-sem-case, -gen-sfrag-case): Ditto.
+	* sid-decode.scm (-gen-scache-decls): Exclude writeback tracking field
+	if unnecessary.
+	* sid.scm (<operand> gen-write): Use unsigned long long expression
+	for writeback.
+	(-op-gen-set-trace, -op-gen-set-trace-parallel): Ditto.
+	(<unit> gen-profile-code): Ditto.
+
 2001-01-23  Johan Rydberg  <jrydberg@opencores.org>
 
 	* doc/rtl.texi (Expressions): Document the (index-of ...) and
 	(regno ...) rtx.
+
+2001-01-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* operand.scm (<operand> pretty-sem-name): New field.
+	(<operand> make): Initialize it from hw-name.
+	(op:set-pretty-sem-name!): New function.
+	(<operand> gen-pretty-name): Default to fetching new field.
+	* rtl.scm (hw): Copy hw-name to pretty-sem-name instead.  Restore
+	sem-name setting from -rtx-hw-name.
 
 2001-01-08  Frank Ch. Eigler  <fche@redhat.com>
 

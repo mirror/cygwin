@@ -50,7 +50,6 @@ if test "$GCC" = "yes"; then
 else
    LIBGUI_CFLAGS=
 fi
-AC_SUBST(LIBGUI_CFLAGS) 
 
 AC_CACHE_CHECK([for cygwin32], ide_cv_os_cygwin32,
 [AC_EGREP_CPP(lose, [
@@ -61,6 +60,20 @@ ac_win_build="no"
 if test x$ide_cv_os_cygwin32 = xyes; then
   ac_win_build="yes"
 fi
+
+case "${target}" in
+*-*-cygwin*)
+        touch ac$$.c
+        if ${CC} -c -mwin32 ac$$.c >/dev/null 2>&1; then
+            case "$LIBGUI_CFLAGS" in
+                *-mwin32*) ;;
+                *) LIBGUI_CFLAGS="-mwin32 $LIBGUI_CFLAGS" ;;
+            esac
+        fi
+        rm -f ac$$.o ac$$.c
+        ;;
+esac
+AC_SUBST(LIBGUI_CFLAGS) 
 
 tmp="`cd $srcdir/library; pwd`"
 if test x"$ac_cv_prog_CC" = xcl ; then

@@ -17,10 +17,10 @@ details. */
 #include <sys/un.h>
 
 #define Win32_Winsock
-#include "winsup.h"
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "winsup.h"
 #include "autoload.h"
 #include <winsock.h>
 
@@ -127,6 +127,17 @@ cygwin_inet_addr (const char *cp)
   return res;
 }
 
+/* undocumented in wsock32.dll */
+extern "C" unsigned int	WINAPI inet_network (const char *);
+
+extern "C"
+unsigned int 
+cygwin_inet_network (const char *cp)
+{
+  unsigned int res = inet_network (cp);
+  return res;
+}
+
 /* inet_netof is in the standard BSD sockets library.  It is useless
    for modern networks, since it assumes network values which are no
    longer meaningful, but some existing code calls it.  */
@@ -225,7 +236,7 @@ static struct tl errmap[] =
  {WSAEREMOTE, "WSAEREMOTE", EREMOTE},
  {WSAEINVAL, "WSAEINVAL", EINVAL},
  {WSAEFAULT, "WSAEFAULT", EFAULT},
- {0}
+ {0, NULL, 0}
 };
 
 /* Cygwin internal */
@@ -256,7 +267,7 @@ static struct tl host_errmap[] =
   {WSATRY_AGAIN, "WSATRY_AGAIN", TRY_AGAIN},
   {WSANO_RECOVERY, "WSANO_RECOVERY", NO_RECOVERY},
   {WSANO_DATA, "WSANO_DATA", NO_DATA},
-  {0}
+  {0, NULL, 0}
 };
 
 /* Cygwin internal */
@@ -410,6 +421,7 @@ cygwin_sendto (int fd,
 {
   fhandler_socket *h = (fhandler_socket *) dtable[fd];
   sockaddr_in sin;
+  sigframe thisframe (mainthread, 0);
 
   if (get_inet_addr (to, tolen, &sin, &tolen) == 0)
     return -1;
@@ -435,6 +447,7 @@ cygwin_recvfrom (int fd,
 		   int *fromlen)
 {
   fhandler_socket *h = (fhandler_socket *) dtable[fd];
+  sigframe thisframe (mainthread, 0);
 
   debug_printf ("recvfrom %d", h->get_socket ());
 
@@ -591,6 +604,7 @@ cygwin_connect (int fd,
   int res;
   fhandler_socket *sock = get (fd);
   sockaddr_in sin;
+  sigframe thisframe (mainthread, 0);
 
   if (get_inet_addr (name, namelen, &sin, &namelen) == 0)
     return -1;
@@ -703,6 +717,7 @@ int
 cygwin_accept (int fd, struct sockaddr *peer, int *len)
 {
   int res = -1;
+  sigframe thisframe (mainthread, 0);
 
   fhandler_socket *sock = get (fd);
   if (sock)
@@ -888,7 +903,7 @@ int
 cygwin_shutdown (int fd, int how)
 {
   int res = -1;
-
+  sigframe thisframe (mainthread, 0);
 
   fhandler_socket *sock = get (fd);
   if (sock)
@@ -904,7 +919,7 @@ cygwin_shutdown (int fd, int how)
 /* exported as herror: standards? */
 extern "C"
 void
-cygwin_herror (const char *p)
+cygwin_herror (const char *)
 {
   debug_printf ("********%d*************", __LINE__);
 }
@@ -931,6 +946,7 @@ int
 cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 {
   fhandler_socket *h = (fhandler_socket *) dtable[fd];
+  sigframe thisframe (mainthread, 0);
 
   int res = recv (h->get_socket (), (char *) buf, len, flags);
   if (res == SOCKET_ERROR)
@@ -956,6 +972,7 @@ int
 cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 {
   fhandler_socket *h = (fhandler_socket *) dtable[fd];
+  sigframe thisframe (mainthread, 0);
 
   int res = send (h->get_socket (), (const char *) buf, len, flags);
   if (res == SOCKET_ERROR)
@@ -1342,6 +1359,7 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
 {
   int res = -1;
   SOCKET fd2s;
+  sigframe thisframe (mainthread, 0);
 
   int res_fd = dtable.find_unused_handle ();
   if (res_fd == -1)
@@ -1381,6 +1399,7 @@ int
 cygwin_rresvport (int *port)
 {
   int res = -1;
+  sigframe thisframe (mainthread, 0);
 
   int res_fd = dtable.find_unused_handle ();
   if (res_fd == -1)
@@ -1409,6 +1428,7 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
 {
   int res = -1;
   SOCKET fd2s;
+  sigframe thisframe (mainthread, 0);
 
   int res_fd = dtable.find_unused_handle ();
   if (res_fd == -1)
@@ -1586,6 +1606,7 @@ fhandler_socket::~fhandler_socket ()
 int
 fhandler_socket::read (void *ptr, size_t len)
 {
+  sigframe thisframe (mainthread);
   int res = recv (get_socket (), (char *) ptr, len, 0);
   if (res == SOCKET_ERROR)
     {
@@ -1597,6 +1618,7 @@ fhandler_socket::read (void *ptr, size_t len)
 int
 fhandler_socket::write (const void *ptr, size_t len)
 {
+  sigframe thisframe (mainthread);
   int res = send (get_socket (), (const char *) ptr, len, 0);
   if (res == SOCKET_ERROR)
     {
@@ -1612,6 +1634,7 @@ int
 fhandler_socket::close ()
 {
   int res = 0;
+  sigframe thisframe (mainthread);
 
   if (closesocket (get_socket ()))
     {
@@ -1650,6 +1673,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
   int res;
   struct ifconf *ifc;
   struct ifreq *ifr;
+  sigframe thisframe (mainthread);
 
   switch (cmd)
     {
@@ -1758,6 +1782,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
   return res;
 }
 
+extern "C" {
 /* Initialize WinSock */
 LoadDLLinitfunc (wsock32)
 {
@@ -1791,37 +1816,44 @@ LoadDLLinitfunc (wsock32)
 
 LoadDLLinit (wsock32)
 
-LoadDLLfunc (WSAAsyncSelect, WSAAsyncSelect@16, wsock32)
-LoadDLLfunc (WSACleanup, WSACleanup@0, wsock32)
-LoadDLLfunc (WSAGetLastError, WSAGetLastError@0, wsock32)
-LoadDLLfunc (WSAStartup, WSAStartup@8, wsock32)
-LoadDLLfunc (__WSAFDIsSet, __WSAFDIsSet@8, wsock32)
-LoadDLLfunc (accept, accept@12, wsock32)
-LoadDLLfunc (bind, bind@12, wsock32)
-LoadDLLfunc (closesocket, closesocket@4, wsock32)
-LoadDLLfunc (connect, connect@12, wsock32)
-LoadDLLfunc (gethostbyaddr, gethostbyaddr@12, wsock32)
-LoadDLLfunc (gethostbyname, gethostbyname@4, wsock32)
-LoadDLLfunc (gethostname, gethostname@8, wsock32)
-LoadDLLfunc (getpeername, getpeername@12, wsock32)
-LoadDLLfunc (getprotobyname, getprotobyname@4, wsock32)
-LoadDLLfunc (getprotobynumber, getprotobynumber@4, wsock32)
-LoadDLLfunc (getservbyname, getservbyname@8, wsock32)
-LoadDLLfunc (getservbyport, getservbyport@8, wsock32)
-LoadDLLfunc (getsockname, getsockname@12, wsock32)
-LoadDLLfunc (getsockopt, getsockopt@20, wsock32)
-LoadDLLfunc (inet_addr, inet_addr@4, wsock32)
-LoadDLLfunc (inet_ntoa, inet_ntoa@4, wsock32)
-LoadDLLfunc (ioctlsocket, ioctlsocket@12, wsock32)
-LoadDLLfunc (listen, listen@8, wsock32)
-LoadDLLfunc (rcmd, rcmd@24, wsock32)
-LoadDLLfunc (recv, recv@16, wsock32)
-LoadDLLfunc (recvfrom, recvfrom@24, wsock32)
-LoadDLLfunc (rexec, rexec@24, wsock32)
-LoadDLLfunc (rresvport, rresvport@4, wsock32)
-LoadDLLfunc (select, select@20, wsock32)
-LoadDLLfunc (send, send@16, wsock32)
-LoadDLLfunc (sendto, sendto@24, wsock32)
-LoadDLLfunc (setsockopt, setsockopt@20, wsock32)
-LoadDLLfunc (shutdown, shutdown@8, wsock32)
-LoadDLLfunc (socket, socket@12, wsock32)
+static void dummy_autoload (void) __attribute__ ((unused));
+static void
+dummy_autoload (void)
+{
+LoadDLLfunc (WSAAsyncSelect, 16, wsock32)
+LoadDLLfunc (WSACleanup, 0, wsock32)
+LoadDLLfunc (WSAGetLastError, 0, wsock32)
+LoadDLLfunc (WSAStartup, 8, wsock32)
+LoadDLLfunc (__WSAFDIsSet, 8, wsock32)
+LoadDLLfunc (accept, 12, wsock32)
+LoadDLLfunc (bind, 12, wsock32)
+LoadDLLfunc (closesocket, 4, wsock32)
+LoadDLLfunc (connect, 12, wsock32)
+LoadDLLfunc (gethostbyaddr, 12, wsock32)
+LoadDLLfunc (gethostbyname, 4, wsock32)
+LoadDLLfunc (gethostname, 8, wsock32)
+LoadDLLfunc (getpeername, 12, wsock32)
+LoadDLLfunc (getprotobyname, 4, wsock32)
+LoadDLLfunc (getprotobynumber, 4, wsock32)
+LoadDLLfunc (getservbyname, 8, wsock32)
+LoadDLLfunc (getservbyport, 8, wsock32)
+LoadDLLfunc (getsockname, 12, wsock32)
+LoadDLLfunc (getsockopt, 20, wsock32)
+LoadDLLfunc (inet_addr, 4, wsock32)
+LoadDLLfunc (inet_network, 4, wsock32)
+LoadDLLfunc (inet_ntoa, 4, wsock32)
+LoadDLLfunc (ioctlsocket, 12, wsock32)
+LoadDLLfunc (listen, 8, wsock32)
+LoadDLLfunc (rcmd, 24, wsock32)
+LoadDLLfunc (recv, 16, wsock32)
+LoadDLLfunc (recvfrom, 24, wsock32)
+LoadDLLfunc (rexec, 24, wsock32)
+LoadDLLfunc (rresvport, 4, wsock32)
+LoadDLLfunc (select, 20, wsock32)
+LoadDLLfunc (send, 16, wsock32)
+LoadDLLfunc (sendto, 24, wsock32)
+LoadDLLfunc (setsockopt, 20, wsock32)
+LoadDLLfunc (shutdown, 8, wsock32)
+LoadDLLfunc (socket, 12, wsock32)
+}
+}

@@ -50,7 +50,24 @@ __asm__ __volatile__(
 return __res;
 }
 
+#define WIN32_LEAN_AND_MEAN 1
+#define _WINGDI_H
+#define _WINUSER_H
+#define _WINNLS_H
+#define _WINVER_H
+#define _WINNETWK_H
+#define _WINSVC_H
 #include <windows.h>
+#include <wincrypt.h>
+#undef _WINGDI_H
+#undef _WINUSER_H
+#undef _WINNLS_H
+#undef _WINVER_H
+#undef _WINNETWK_H
+#undef _WINSVC_H
+
+/* The one function we use from winuser.h most of the time */
+extern "C" DWORD WINAPI GetLastError (void);
 
 /* Used for runtime OS check/decisions. */
 enum os_type {winNT = 1, win95, win98, win32s, unknown};
@@ -59,12 +76,20 @@ extern os_type os_being_run;
 /* Used to check if Cygwin DLL is dynamically loaded. */
 extern int dynamically_loaded;
 
+#define sys_wcstombs(tgt,src,len) \
+                    WideCharToMultiByte(CP_ACP,0,(src),-1,(tgt),(len),NULL,NULL)
+#define sys_mbstowcs(tgt,src,len) \
+                    MultiByteToWideChar(CP_ACP,0,(src),-1,(tgt),(len))
+
 #include <cygwin/version.h>
 
 #define TITLESIZE 1024
 #define MAX_USER_NAME 20
 #define DEFAULT_UID 500
 #define DEFAULT_GID 544
+
+#define MAX_SID_LEN 40
+#define MAX_HOST_NAME 256
 
 /* status bit manipulation */
 #define __ISSETF(what, x, prefix) \
@@ -82,10 +107,9 @@ extern int dynamically_loaded;
 extern HANDLE hMainThread;
 extern HANDLE hMainProc;
 
-#include "sync.h"
-
 /* Now that pinfo has been defined, include... */
 #include "debug.h"
+#include "sync.h"
 #include "sigproc.h"
 #include "fhandler.h"
 #include "path.h"
@@ -93,99 +117,8 @@ extern HANDLE hMainProc;
 
 /********************** Application Interface **************************/
 
-/* This lives in the app and is initialized before jumping into the DLL.
-   It should only contain stuff which the user's process needs to see, or
-   which is needed before the user pointer is initialized, or is needed to
-   carry inheritance information from parent to child.  Note that it cannot
-   be used to carry inheritance information across exec!
-
-   Remember, this structure is linked into the application's executable.
-   Changes to this can invalidate existing executables, so we go to extra
-   lengths to avoid having to do it.
-
-   When adding/deleting members, remember to adjust {public,internal}_reserved.
-   The size of the class shouldn't change [unless you really are prepared to
-   invalidate all existing executables].  The program does a check (using
-   SIZEOF_PER_PROCESS) to make sure you remember to make the adjustment.
-*/
-
-class per_process
-{
- public:
-  char *initial_sp;
-
-  /* The offset of these 3 values can never change. */
-  /* magic_biscuit is the size of this class and should never change. */
-  DWORD magic_biscuit;
-  DWORD dll_major;
-  DWORD dll_minor;
-
-  struct _reent **impure_ptr_ptr;
-  char ***envptr;
-
-  /* Used to point to the memory machine we should use.  Usually these
-     point back into the dll, but they can be overridden by the user. */
-  void *(*malloc)(size_t);
-  void (*free)(void *);
-  void *(*realloc)(void *, size_t);
-
-  int *fmode_ptr;
-
-  int (*main)(int, char **, char **);
-  void (**ctors)(void);
-  void (**dtors)(void);
-
-  /* For fork */
-  void *data_start;
-  void *data_end;
-  void *bss_start;
-  void *bss_end;
-
-  void *(*calloc)(size_t, size_t);
-  /* For future expansion of values set by the app. */
-  void *public_reserved[4];
-
-  /* The rest are *internal* to cygwin.dll.
-     Those that are here because we want the child to inherit the value from
-     the parent (which happens when bss is copied) are marked as such. */
-
-  /* non-zero of ctors have been run.  Inherited from parent. */
-  int run_ctors_p;
-
-  /* These will be non-zero if the above (malloc,free,realloc) have been
-     overridden. */
-  /* FIXME: not currently used */
-  int __imp_malloc;
-  int __imp_free;
-  int __imp_realloc;
-
-  /* Heap management.  Inherited from parent. */
-  void *heapbase;		/* bottom of the heap */
-  void *heapptr;		/* current index into heap */
-  void *heaptop;		/* current top of heap */
-
-  HANDLE reserved1;		/* unused */
-
-  /* Non-zero means the task was forked.  The value is the pid.
-     Inherited from parent. */
-  int forkee;
-
-  HMODULE hmodule;
-
-  DWORD api_major;		/* API version that this program was */
-  DWORD api_minor;		/*  linked with */
-  /* For future expansion, so apps won't have to be relinked if we
-     add an item. */
-#ifdef _MT_SAFE
-  ResourceLocks *resourcelocks;
-  MTinterface *threadinterface;
-  void *internal_reserved[6];
-#else
-  void *internal_reserved[8];
-#endif
-};
-
-extern per_process *user_data; /* Pointer into application's static data */
+extern "C" per_process __cygwin_user_data; /* Pointer into application's static data */
+#define user_data (&__cygwin_user_data)
 
 /* We use the following to test that sizeof hasn't changed.  When adding
    or deleting members, insert fillers or use the reserved entries.
@@ -309,9 +242,9 @@ struct signal_dispatch
   void (*func) (int);
   int sig;
   int saved_errno;
-  CONTEXT *cx;
   DWORD oldmask;
   DWORD retaddr;
+  DWORD *retaddr_on_stack;
 };
 };
 
@@ -357,15 +290,16 @@ extern unsigned int signal_shift_subtract;
 
 #define isdirsep SLASH_P
 #define isabspath(p) \
-  (isdirsep (*(p)) || (isalpha (*(p)) && (p)[1] == ':'))
+  (isdirsep (*(p)) || (isalpha (*(p)) && (p)[1] == ':' && (!(p)[2] || isdirsep ((p)[2]))))
 
 /******************** Initialization/Termination **********************/
 
 /* cygwin .dll initialization */
 void dll_crt0 (per_process *);
+extern "C" void __stdcall _dll_crt0 ();
 
 /* dynamically loaded dll initialization */
-extern "C" int dll_dllcrt0 (HMODULE,per_process*);
+extern "C" int dll_dllcrt0 (HMODULE, per_process*);
 
 /* dynamically loaded dll initialization for non-cygwin apps */
 extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
@@ -374,7 +308,7 @@ extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
 extern "C" void __stdcall do_exit (int) __attribute__ ((noreturn));
 
 /* Initialize the environment */
-void environ_init (void);
+void environ_init (int);
 
 /* Heap management. */
 void heap_init (void);
@@ -394,8 +328,7 @@ void events_terminate (void);
 
 void __stdcall close_all_files (void);
 
-/* Strace facility.  See strace.cc, sys/strace.h and utils/strace.cc. */
-extern DWORD strace_active;
+extern class strace strace;
 
 /* Invisible window initialization/termination. */
 HWND __stdcall gethwnd (void);
@@ -411,13 +344,17 @@ extern HANDLE netapi32_handle;
 extern "C" void error_start_init (const char*);
 extern "C" int try_to_debug ();
 
+extern int cygwin_finished_initializing;
+
 /**************************** Miscellaneous ******************************/
 
-const char * __stdcall find_exec (const char *name, char *buf, const char *winenv = "PATH=",
+const char * __stdcall find_exec (const char *name, path_conv& buf, const char *winenv = "PATH=",
 			int null_if_notfound = 0, const char **known_suffix = NULL);
 
 /* File manipulation */
-int __stdcall get_file_attribute (int, const char *, int *);
+int __stdcall set_process_privileges ();
+int __stdcall get_file_attribute (int, const char *, int *,
+                                  uid_t * = NULL, gid_t * = NULL);
 int __stdcall set_file_attribute (int, const char *, int);
 int __stdcall set_file_attribute (int, const char *, uid_t, gid_t, int, const char *);
 void __stdcall set_std_handle (int);
@@ -428,7 +365,10 @@ extern BOOL allow_ntsec;
 /* `lookup_name' should be called instead of LookupAccountName.
  * logsrv may be NULL, in this case only the local system is used for lookup.
  * The buffer for ret_sid (40 Bytes) has to be allocated by the caller! */
-BOOL __stdcall lookup_name (const char *name, const char *logsrv, PSID ret_sid);
+BOOL __stdcall lookup_name (const char *, const char *, PSID);
+char *__stdcall convert_sid_to_string_sid (PSID, char *);
+PSID __stdcall convert_string_sid_to_sid (PSID, const char *);
+BOOL __stdcall get_pw_sid (PSID, struct passwd *);
 
 unsigned long __stdcall hash_path_name (unsigned long hash, const char *name);
 void __stdcall nofinalslash (const char *src, char *dst);
@@ -495,15 +435,13 @@ int _raise (int sig);
 int getdtablesize ();
 void setdtablesize (int);
 
+extern DWORD binmode;
 extern char _data_start__, _data_end__, _bss_start__, _bss_end__;
 extern void (*__CTOR_LIST__) (void);
 extern void (*__DTOR_LIST__) (void);
 };
 
 /*************************** Unsorted ******************************/
-
-/* The size of the console title */
-#define TITLESIZE 1024
 
 #define WM_ASYNCIO	0x8000		// WM_APP
 
@@ -524,9 +462,9 @@ extern "C" {
 #endif
 #include <sys/reent.h>
 
-#define STD_RBITS S_IRUSR | S_IRGRP | S_IROTH
-#define STD_WBITS S_IWUSR
-#define STD_XBITS S_IXUSR | S_IXGRP | S_IXOTH
+#define STD_RBITS (S_IRUSR | S_IRGRP | S_IROTH)
+#define STD_WBITS (S_IWUSR)
+#define STD_XBITS (S_IXUSR | S_IXGRP | S_IXOTH)
 
 #define O_NOSYMLINK 0x080000
 #define O_DIROPEN   0x100000
@@ -557,10 +495,13 @@ struct win_env
     const char * get_native () {return native ? native + namelen : NULL;}
   };
 
-win_env *getwinenv (const char *name, const char *posix = NULL);
+win_env * __stdcall getwinenv (const char *name, const char *posix = NULL);
 
-char *winenv (const char * const *);
-extern char **__cygwin_environ;
+void __stdcall update_envptrs ();
+char * __stdcall winenv (const char * const *, int);
+extern char **__cygwin_environ, ***main_environ;
+extern "C" char __stdcall **cur_environ ();
+#define environ (cur_environ ())
 
 /* The title on program start. */
 extern char *old_title;

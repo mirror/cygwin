@@ -1,3 +1,10 @@
+2000-11-24  Ben Elliston  <bje@redhat.com>
+
+	* sim.scm (-with-multiple-isa?): New symbol.
+	(with-multiple-isa?): New function.
+	(option-init!): Initialise -with-multiple-isa?.
+	(option-set!): Handle with-multiple-isa option.
+
 2000-11-21  Ben Elliston  <bje@redhat.com>
 
 	* utils.scm (copyright-fsf): Add the year 2000.

@@ -409,7 +409,7 @@ TclUnsetEnv(name)
      */
 
 #ifdef USE_PUTENV
-    string = ckalloc(length+2);
+    string = ckalloc((unsigned int) length+2);
     memcpy((VOID *) string, (VOID *) name, (size_t) length);
     string[length] = '=';
     string[length+1] = '\0';

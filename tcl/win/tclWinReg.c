@@ -228,7 +228,7 @@ Registry_Init(
     }
 
     Tcl_CreateObjCommand(interp, "registry", RegistryObjCmd, NULL, NULL);
-    return Tcl_PkgProvide(interp, "registry", "1.0");
+    return Tcl_PkgProvide(interp, "registry", "1.1");
 }
 
 /*
@@ -1341,7 +1341,7 @@ BroadcastValue(
 
     if (objc > 3) {
 	str = Tcl_GetStringFromObj(objv[3], &len);
-	if ((len < 2) || (*str != '-') || strncmp(str, "-timeout", len)) {
+	if ((len < 2) || (*str != '-') || strncmp(str, "-timeout", (size_t) len)) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "keyName ?-timeout millisecs?");
 	    return TCL_ERROR;
 	}
@@ -1351,7 +1351,7 @@ BroadcastValue(
     }
 
     str = Tcl_GetStringFromObj(objv[2], &len);
-    if (len = 0) {
+    if (len == 0) {
 	str = NULL;
     }
 
@@ -1362,8 +1362,8 @@ BroadcastValue(
 	    (WPARAM) 0, (LPARAM) str, SMTO_ABORTIFHUNG, timeout, &sendResult);
 
     objPtr = Tcl_NewObj();
-    Tcl_ListObjAppendElement(NULL, objPtr, Tcl_NewIntObj(result));
-    Tcl_ListObjAppendElement(NULL, objPtr, Tcl_NewIntObj(sendResult));
+    Tcl_ListObjAppendElement(NULL, objPtr, Tcl_NewIntObj((int) result));
+    Tcl_ListObjAppendElement(NULL, objPtr, Tcl_NewIntObj((int) sendResult));
     Tcl_SetObjResult(interp, objPtr);
 
     return TCL_OK;

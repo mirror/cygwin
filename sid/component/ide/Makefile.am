@@ -10,7 +10,7 @@ libide_la_LDFLAGS = -module -no-undefined
 
 pkgdata_DATA = hw-disk-ide.txt
 
-DEJAGNUTESTS = diskio.exp idebase.exp idetrigger.exp
+DEJAGNUTESTS = diskio.exp idebase.exp idedocs.exp idetrigger.exp
 checkme:
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
 

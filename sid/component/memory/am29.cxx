@@ -143,34 +143,27 @@ bus::status
 am29_flash_memory::am29_bus::read(host_int_4 address,
 				  little_int_1& data) throw ()
 {
-  try
+  if (target->mode == STATE_AUTOSELECT)
     {
-      if (target->mode == STATE_AUTOSELECT)
+      if ((address & 0xF) == 0)
+	data = target->manufacturerCode;
+      else if ((address & 0xF) == 1)
+	data = target->deviceIdCode;
+      else if ((address & 0xF) == 2)
 	{
-	  if ((address & 0xF) == 0)
-	    data = target->manufacturerCode;
-	  else if ((address & 0xF) == 1)
-	    data = target->deviceIdCode;
-	  else if ((address & 0xF) == 2)
-	    {
-	      // FIXME: All sectors are unprotected.
-	      data = 0;
-	    }
-	  return bus::ok;
+	  // FIXME: All sectors are unprotected.
+	  data = 0;
 	}
-
-      // Bounds check the memory reference.
-      if (address > target->buffer_length)
-	{
-	  return bus::unmapped;
-	}
-      data = target->buffer[address];
-      return sid::bus::ok;
+      return bus::ok;
     }
-  catch (...)
+  
+  // Bounds check the memory reference.
+  if (address > target->buffer_length)
     {
-      return sid::bus::delayed;
+      return bus::unmapped;
     }
+  data = target->buffer[address];
+  return sid::bus::ok;
 }
  
 
@@ -178,17 +171,10 @@ bus::status
 am29_flash_memory::am29_bus::read(host_int_4 address,
 				  big_int_1& data) throw ()
 {
-  try
-    {
-      little_int_1 littleData(data);
-      bus::status result = read(address, littleData);
-      data = littleData;
-      return result;
-    }
-  catch (...)
-    {
-      return sid::bus::delayed;
-    }
+  little_int_1 littleData(data);
+  bus::status result = read(address, littleData);
+  data = littleData;
+  return result;
 }	
 
 
@@ -196,121 +182,113 @@ bus::status
 am29_flash_memory::am29_bus::write(host_int_4 address, 
 				   little_int_1 le_data) throw()
 {
-  try
-    {
-      host_int_1 data = le_data;
+  host_int_1 data = le_data;
       
-      switch (target->mode)
-	{
-	case STATE_READ:
-	  if (address == UNLOCK && data == UNLOCK1_CMD)
-	    {
-	      target->mode = STATE_UNLOCK1;
-	      return bus::ok;
-	    }
-          return bus::unpermitted;
-
-	case STATE_AUTOSELECT:
-	  // Don't care about the address bits for the reset command.
-	  if (data == 0xF0)
-	    {
-	      target->mode = STATE_READ;
-	      return bus::ok;
-	    }
-          return bus::ok;
-
-	case STATE_BYPASS:
-	  // Don't care about address bits for the bypass program cmd.
-	  if (data == BYPASS_PROG_CMD)
-	    target->mode = STATE_PROGRAM;
-	  else if (data == BYPASS_RESET_CMD)
-	    target->mode = STATE_BYPASS_RESET;
-	  else
-	    target->mode = STATE_READ;
-	  return bus::ok;
-
-	case STATE_BYPASS_RESET:
-	  // Go back to read mode unconditionally -- this is the
-	  // expected behaviour even if the magic codes are wrong.
-	  target->mode = STATE_READ;
-	  return bus::ok;
-
-	case STATE_ERASE0:
-	  if (address == UNLOCK && data == UNLOCK1_CMD)
-	    target->mode = STATE_ERASE1;
-	  else
-	    target->mode = STATE_READ;
-	  return bus::ok;
-
-	case STATE_ERASE1:
-	  if (address == UNLOCK2 && data == UNLOCK2_CMD)
-	    target->mode = STATE_ERASE2;
-	  else
-	    target->mode = STATE_READ;
-	  return bus::ok;
-
-	case STATE_ERASE2:
-	  if (address == UNLOCK && data == ERASE_CHIP_CMD)
-	    {
-	      target->erase();
-	    }
-	  else if (UNLOCK && data == ERASE_SECTOR_CMD)
-	    {
-	      target->erase((address >> 16));
-	    }
-	  target->mode = STATE_READ;
-	  return bus::ok;
-	  
-	case STATE_UNLOCK1:
-	  if (address == UNLOCK2 && data == UNLOCK2_CMD)
-	    target->mode = STATE_UNLOCK2;
-	  else
-	    target->mode = STATE_READ;
-	  return bus::ok;
-	  
-	case STATE_UNLOCK2:
-	  if (address == UNLOCK && data == AUTOSELECT_CMD)
-	    target->mode = STATE_AUTOSELECT;
-	  else if (address == UNLOCK && data == PROGRAM_CMD)
-	    target->mode = STATE_PROGRAM;
-	  else if (address == UNLOCK && data == ERASE_CMD)
-	    target->mode = STATE_ERASE0;
-	  else if (address == UNLOCK && data == BYPASS_CMD)
-	    target->mode = STATE_BYPASS;
-	  else
-	    target->mode = STATE_READ;
-	  return bus::ok;
-	}
-
-      if (address > target->buffer_length)
-	{
-	  return bus::unmapped;
-	}
-
-      if (target->write_ok(address))
-        {
-	  little_int_1 old_data = target->buffer[address];
-	  for (int i = 0; i < 8; i++)
-	    {
-	      int mask = 1 << i;
-	      if (((old_data & mask) == 0) && ((data & mask) != 0))
-		{
-		  // Cannot change a 0 back to a 1, so clear this bit.
-		  data &= ~mask;
-		}
-	    }
-		  
-          target->buffer[address] = data;
-	  target->mode = STATE_READ;
-          return bus::ok;
-        }
-      else
-        return bus::delayed;
-    }
-  catch (...)
+  switch (target->mode)
     {
-      return bus::delayed;
+    case STATE_READ:
+      if (address == UNLOCK && data == UNLOCK1_CMD)
+	{
+	  target->mode = STATE_UNLOCK1;
+	  return bus::ok;
+	}
+      return bus::unpermitted;
+
+    case STATE_AUTOSELECT:
+      // Don't care about the address bits for the reset command.
+      if (data == 0xF0)
+	{
+	  target->mode = STATE_READ;
+	  return bus::ok;
+	}
+      return bus::ok;
+
+    case STATE_BYPASS:
+      // Don't care about address bits for the bypass program cmd.
+      if (data == BYPASS_PROG_CMD)
+	target->mode = STATE_PROGRAM;
+      else if (data == BYPASS_RESET_CMD)
+	target->mode = STATE_BYPASS_RESET;
+      else
+	target->mode = STATE_READ;
+      return bus::ok;
+
+    case STATE_BYPASS_RESET:
+      // Go back to read mode unconditionally -- this is the
+      // expected behaviour even if the magic codes are wrong.
+      target->mode = STATE_READ;
+      return bus::ok;
+
+    case STATE_ERASE0:
+      if (address == UNLOCK && data == UNLOCK1_CMD)
+	target->mode = STATE_ERASE1;
+      else
+	target->mode = STATE_READ;
+      return bus::ok;
+
+    case STATE_ERASE1:
+      if (address == UNLOCK2 && data == UNLOCK2_CMD)
+	target->mode = STATE_ERASE2;
+      else
+	target->mode = STATE_READ;
+      return bus::ok;
+
+    case STATE_ERASE2:
+      if (address == UNLOCK && data == ERASE_CHIP_CMD)
+	{
+	  target->erase();
+	}
+      else if (UNLOCK && data == ERASE_SECTOR_CMD)
+	{
+	  target->erase((address >> 16));
+	}
+      target->mode = STATE_READ;
+      return bus::ok;
+	  
+    case STATE_UNLOCK1:
+      if (address == UNLOCK2 && data == UNLOCK2_CMD)
+	target->mode = STATE_UNLOCK2;
+      else
+	target->mode = STATE_READ;
+      return bus::ok;
+	  
+    case STATE_UNLOCK2:
+      if (address == UNLOCK && data == AUTOSELECT_CMD)
+	target->mode = STATE_AUTOSELECT;
+      else if (address == UNLOCK && data == PROGRAM_CMD)
+	target->mode = STATE_PROGRAM;
+      else if (address == UNLOCK && data == ERASE_CMD)
+	target->mode = STATE_ERASE0;
+      else if (address == UNLOCK && data == BYPASS_CMD)
+	target->mode = STATE_BYPASS;
+      else
+	target->mode = STATE_READ;
+      return bus::ok;
     }
+
+  if (address > target->buffer_length)
+    {
+      return bus::unmapped;
+    }
+
+  if (target->write_ok(address))
+    {
+      little_int_1 old_data = target->buffer[address];
+      for (int i = 0; i < 8; i++)
+	{
+	  int mask = 1 << i;
+	  if (((old_data & mask) == 0) && ((data & mask) != 0))
+	    {
+	      // Cannot change a 0 back to a 1, so clear this bit.
+	      data &= ~mask;
+	    }
+	}
+		  
+      target->buffer[address] = data;
+      target->mode = STATE_READ;
+      return bus::ok;
+    }
+ // XXX: error
 }
 
 

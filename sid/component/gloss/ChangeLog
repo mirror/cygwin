@@ -1,3 +1,26 @@
+2002-01-25  Ben Elliston  <bje@redhat.com>
+
+	* libgloss.h (libgloss::SYS_argc): New enumerator.
+	(libgloss::SYS_argnlen, libgloss::SYS_argn): Likewise.
+	(libgloss::SYS_unsupported): Raise its value.
+	* gloss.cxx (gloss32::gloss32): Virtualise "command-line".
+	(gloss32::get_command_line): New method.
+	(gloss32::set_command_line): Likewise.
+	(gloss32::set_string [string&]): Call char* version.
+	(gloss32::set_string [char*]): Implement.
+	(gloss32::syscall_trap): Handle SYS_argc, SYS_argn, SYS_argnlen.
+	(gloss32::do_sys_argc): New method.
+	(gloss32::do_sys_argn): Likewise.
+	(gloss32::do_sys_argnlen): Likewise.
+	* gloss.h (gloss32::set_string): New method which has a length
+	parameter for binary data and null-terminated strings.
+	(gloss32::do_sys_argc): Declare.
+	(gloss32::do_sys_argn): Likewise.
+	(gloss32::do_sys_argnlen): Likewise.
+	(gloss32::command_line): Change type to vector<string>.
+	(gloss32::get_command_line): New virtual attribute callback.
+	(gloss32::set_command_line): Likewise.
+
 2001-11-30  Frank Ch. Eigler  <fche@redhat.com>
 
 	* gloss.cxx (write): Add missing ios:: namespace prefix.

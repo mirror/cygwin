@@ -1,6 +1,6 @@
 // gloss.cxx - Gloss routines.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -42,11 +42,12 @@ gloss32::gloss32() :
   rx_pin(this, &gloss32::rx_handler),
   cpu (0),
   cpu_memory_bus (0),
-  command_line("<unknown>"),
   syscall_numbering_scheme("libgloss"),
   max_fds(32),
   verbose_p(false)
 {
+  command_line.push_back ("<unknown>");
+
   // ??? There's a naming disconnect between "cpu" and "target_memory".
   add_accessor("target-memory", &this->cpu_memory_bus);
 
@@ -64,7 +65,11 @@ gloss32::gloss32() :
 
   add_uni_relation("cpu", &this->cpu);
 
-  add_attribute("command-line", &this->command_line, "setting");
+  add_attribute_virtual("command-line", this,
+			&gloss32::get_command_line,
+			&gloss32::set_command_line,
+			"setting");
+
   add_attribute("syscall-numbering-scheme", &this->syscall_numbering_scheme, "setting");
   add_attribute("verbose?", &this->verbose_p, "setting");
   
@@ -78,6 +83,45 @@ gloss32::~gloss32() throw()
   if (host_ops)
     delete host_ops;
   delete [] fd_table;
+}
+
+string
+gloss32::get_command_line ()
+{
+  string cline;
+  for (std::vector<string>::const_iterator it = command_line.begin();
+       it != command_line.end ();
+       it++)
+    {
+      cline += *it;
+      if (it + 1 != command_line.end ())
+	cline += " ";
+    }
+  return cline;
+}
+
+component::status
+gloss32::set_command_line (const string& cline)
+{
+  vector<string> argv = sidutil::tokenize (cline, " ");
+  command_line.clear();
+
+  if (argv.empty())
+    {
+      command_line.push_back ("<unknown>");
+      return component::bad_value;
+    }
+
+  // Insert all non-empty strings into command_line.
+  for (std::vector<string>::iterator it = argv.begin();
+       it != argv.end ();
+       it++)
+    {
+      if (*it != "")
+	command_line.push_back (*it);
+    }
+
+  return command_line.empty() ? component::bad_value : component::ok;
 }
 
 void
@@ -196,7 +240,7 @@ gloss32::get_string (address32 address, string& value, unsigned length = 0)
 }
 
 bool
-gloss32::set_string(address32 address, const string& value) 
+gloss32::set_string (address32 address, const char* value, unsigned length)
 {
   if (! this->cpu_memory_bus)
     {
@@ -206,12 +250,12 @@ gloss32::set_string(address32 address, const string& value)
   
   if (verbose_p)
     {
-      cerr << "Writing " << value.size() << " byte(s) to target memory at "
+      cerr << "Writing " << length << " byte(s) to target memory at "
 	   << make_numeric_attribute (address, ios::hex | ios::showbase)
            << ": ";
     }
   
-  for (unsigned i = 0; i < value.size(); i++)
+  for (unsigned i = 0; i < length; i++)
     {
       char c = value[i];
       little_int_1 byte = c;
@@ -238,6 +282,12 @@ gloss32::set_string(address32 address, const string& value)
     cerr << endl;
 
   return true;
+}
+
+bool
+gloss32::set_string(address32 address, const string& value)
+{
+  return set_string (address, value.c_str(), value.length () + 1);
 }
 
 bool
@@ -728,6 +778,15 @@ gloss32::syscall_trap()
     case libgloss::SYS_unlink:
       do_sys_unlink();
       break;
+    case libgloss::SYS_argc:
+      do_sys_argc();
+      break;
+    case libgloss::SYS_argnlen:
+      do_sys_argnlen();
+      break;
+    case libgloss::SYS_argn:
+      do_sys_argn();
+      break;
     default:
       do_nonstandard_target_syscalls (syscall);
       break;
@@ -741,6 +800,60 @@ gloss32::do_nonstandard_target_syscalls (int32 target_syscall)
     cerr << "Unimplemented syscall " << target_syscall << endl;
   set_int_result(-1);
   set_error_result(newlib::eNoSys);
+}
+
+void
+gloss32::do_sys_argc ()
+{
+  set_int_result (command_line.size ());
+  set_error_result (0);
+}
+
+void
+gloss32::do_sys_argnlen ()
+{
+  int32 n;
+  get_int_argument(1, n);
+
+  if (n < command_line.size ())
+    {
+      set_int_result (command_line[n].length ());
+      set_error_result (0);
+    }
+  else
+    {
+      set_int_result (-1);
+      set_error_result (newlib::eInval);
+    }
+}
+
+void
+gloss32::do_sys_argn ()
+{
+  int32 n, str_ptr;
+  get_int_argument (1, n);
+  get_int_argument(2, str_ptr);
+
+  if (n < command_line.size ())
+    {
+      // Include the NULL byte.
+      int i = command_line[n].length () + 1;
+      if (set_string (str_ptr, command_line[n]))
+	{
+	  set_int_result (i);
+	  set_error_result (0);
+	}
+      else
+	{
+	  set_int_result (-1);
+	  set_error_result (newlib::eFault);
+	}
+    }
+  else
+    {
+      set_int_result (-1);
+      set_error_result (newlib::eInval);
+    }
 }
 
 void

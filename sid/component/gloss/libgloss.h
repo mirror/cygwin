@@ -1,6 +1,6 @@
 // libgloss.h - Interface details for libgloss.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -38,7 +38,10 @@ public:
     SYS_time = 18,
     SYS_gettimeofday = 19,
     SYS_times = 20,
-    SYS_unsupported = 99 // arbitrary syscall number, unsupported by default gloss component
+    SYS_argc = 172,
+    SYS_argnlen = 173,
+    SYS_argn = 174,
+    SYS_unsupported = 255 // arbitrary syscall number, unsupported by default gloss component
   };
 };
 

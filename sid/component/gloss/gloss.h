@@ -1,7 +1,7 @@
 // gloss.h - Basic process emulation plus ROM monitor support.
 // -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -121,6 +121,7 @@ protected:
   // Calling get_string with length = 0 indicates that there is no
   // imposed length limit; read from memory until a NUL is encountered.
   bool set_string(address32 address, const string& value);
+  bool set_string(address32 address, const char* value, unsigned length);
   bool get_string(address32 address, string& value, unsigned length = 0);
 
   // Get the value of the cpu's program counter.
@@ -149,6 +150,9 @@ protected:
   void do_sys_gettimeofday();
   void do_sys_times();
   void do_sys_unlink();
+  void do_sys_argc();
+  void do_sys_argn();
+  void do_sys_argnlen();
   virtual void do_nonstandard_target_syscalls(int32 syscall);
   virtual bool target_to_host_open_flags (int open_flags, int& flags);
   virtual int32 target_to_host_syscall (int32 syscall);
@@ -157,7 +161,9 @@ protected:
   virtual void fault_trap(host_int_4 trap_type, host_int_4 trap_code);
 
   // For Unix process emulation.
-  string command_line;
+  vector<string> command_line;
+  string get_command_line ();
+  component::status set_command_line (const string& cmd_line);
 
   // System calls.
 

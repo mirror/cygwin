@@ -1,3 +1,11 @@
+2001-04-05  Frank Ch. Eigler  <fche@redhat.com>
+
+	* pregen-configs.in (arm): Generate redboot rather than cygmon .conf
+	files.
+	* arm-pid-redboot.conf, arm-pid-redboot-tksm.conf: New files.
+	* armpid-redboot.img: New ROM image for RedBoot snapshot 2001-04-05.
+	* arm-pid-cygmon.conf, arm-pid-cygmon-tksm.conf: Zapped files.
+
 2001-04-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* arm-*.conf: Regenerated with new enable_z_packet default.

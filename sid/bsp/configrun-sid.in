@@ -395,16 +395,7 @@ if ($opt_EL) { $third_section .= "set cpu endian little\n"; }
 # Board-dependent logic
 
 
-if ($opt_board eq "none")
-  {
-    $memspecs = $gloss_memspecs{$opt_cpu} || die "Unknown cpu $opt_cpu for gloss memory specs\n";
-    @regions = split (/:/, $memspecs);
-    foreach $region (@regions)
-      {
-	push @opt_memory_region, $region;
-      }
-  }
-elsif ($opt_board =~ /pid7t/)
+if ($opt_board =~ /pid7t/)
   {
     # XXX: incorrect!
     # XXX: what about SRAM, SSRAM memory regions???
@@ -418,6 +409,11 @@ elsif ($opt_board =~ /pid7t/)
       {
 	die "board pid7t-eCos only supported in little-endian mode (-EL)\n" unless ($opt_EL);
 	unshift @opt_memory_region, ( "0x04000000,0x00100000,file=armpid-eCos.img,read-only" );
+      }
+    if ($opt_board =~ /redboot/)
+      {
+	die "board pid7t-redboot only supported in little-endian mode (-EL)\n" unless ($opt_EL);
+	unshift @opt_memory_region, ( "0x04000000,0x00100000,file=armpid-redboot.img,read-only" );
       }
     else
       {

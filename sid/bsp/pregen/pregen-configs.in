@@ -57,11 +57,11 @@ mvic sid.conf arm-pid-tksm.conf
 crs --cpu=arm --no-run --gdb=5000 --board=pid7t-uart1:gdb -EB
 mvic sid.conf arm-pidBE.conf
 
-crs --cpu=arm --no-run --board=pid7t-cygmon-uart1:5000 -EL
-mvic sid.conf arm-pid-cygmon.conf
+crs --cpu=arm --no-run --board=pid7t-redboot-uart1:5000 -EL
+mvic sid.conf arm-pid-redboot.conf
 
-crs --cpu=arm --no-run --board=pid7t-cygmon-uart1:5000 -EL --tksm
-mvic sid.conf arm-pid-cygmon-tksm.conf
+crs --cpu=arm --no-run --board=pid7t-redboot-uart1:5000 -EL --tksm
+mvic sid.conf arm-pid-redboot-tksm.conf
 
 crs --cpu=arm --no-run --gdb=5000 --board=cma110:cma222-uart1:gdb -EL
 mvic sid.conf arm-cma.conf

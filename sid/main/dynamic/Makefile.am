@@ -11,8 +11,6 @@ bin_PROGRAMS = sid
 # statically link in a bunch of component libraries using libtool's
 # '-dlpreopen' flag.
 
-
-
 ALLFAMLIBS = $(FAM9LIB)
 ALLFAMLIBS2 = $(FAM9LIB2)
 

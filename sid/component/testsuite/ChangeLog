@@ -1,3 +1,7 @@
+2001-07-19  Ben Elliston  <bje@redhat.com>
+
+	* config/default.exp (sid_stop): Don't close with -slave.
+
 2001-07-13  Frank Ch. Eigler  <fche@redhat.com>
 
 	* config/default.exp: Stop using [sid_find_file] for component libs.

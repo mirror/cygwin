@@ -107,7 +107,7 @@ proc sid_start {file} {
 proc sid_stop {} {
     global spawn_id
     verbose "closing down sid" 2
-    catch {close -slave}
+    catch {close}
     catch {exec "kill" [exp_pid]}
     wait
     return 1

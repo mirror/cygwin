@@ -2640,6 +2640,15 @@ mips_singlestep (struct gdbserv *serv, pid_t pid, int sig)
     targ |= (insn.j_format.target << 2);
     break;
 
+  /* Some cop instructions are conditional... */
+  case cop0_op:
+  case cop1_op:
+  case cop2_op:
+    if (insn.i_format.rs != bc_op)
+      break;
+    else
+      ; /* fall through... */
+
   /*
    * These are conditional.
    */
@@ -2651,9 +2660,6 @@ mips_singlestep (struct gdbserv *serv, pid_t pid, int sig)
   case blezl_op:
   case bgtz_op:
   case bgtzl_op:
-  case cop0_op:
-  case cop1_op:
-  case cop2_op:
   case cop1x_op:
     is_branch = is_cond = 1;
     targ += 4 + (insn.i_format.simmediate << 2);

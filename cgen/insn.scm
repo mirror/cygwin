@@ -524,7 +524,7 @@
 	(let ((e (ienum-lookup-val sym)))
 	  (if e
 	      (ifld-new-value (ienum:fld (cdr e)) (car e))
-	      (parse-error errtxt "bad format element" sym)))))
+	      (parse-error errtxt "bad format element, expecting symbol to be operand or insn enum" sym)))))
 )
 
 ; Subroutine of -parse-insn-format to parse an (ifield-name value) ifield spec.
@@ -613,7 +613,7 @@
 			     (if (and (list? f)
 				      (ifield? (car f)))
 				 (parse-error errtxt "FIXME: <ifield> object in format spec"))
-			     (parse-error errtxt "bad format element" f)))))
+			     (parse-error errtxt "bad format element, neither symbol nor ifield spec" f)))))
 		  (cdr fld-list)))
 	((=) (begin
 	       (if (or (!= (length fld-list) 2)
@@ -901,7 +901,7 @@
 		   (set! syntax (string-drop1 syntax))))
 	    (loop))))
     (reverse result))
-  )
+)
 
 ; Given a list of syntax elements (e.g. the result of syntax-break-out),
 ; create a syntax string.

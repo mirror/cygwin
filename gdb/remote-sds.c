@@ -1,21 +1,22 @@
 /* Remote target communications for serial-line targets using SDS' protocol.
    Copyright 1997 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* This interface was written by studying the behavior of the SDS
    monitor on an ADS 821/860 board, and by consulting the
@@ -30,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "bfd.h"
 #include "symfile.h"
 #include "target.h"
-#include "wait.h"
+#include "gdb_wait.h"
 #include "gdbcmd.h"
 #include "objfiles.h"
 #include "gdb-stabs.h"
@@ -53,7 +54,7 @@ static int sds_write_bytes PARAMS ((CORE_ADDR, char *, int));
 
 static int sds_read_bytes PARAMS ((CORE_ADDR, char *, int));
 
-static void sds_files_info PARAMS ((struct target_ops *ignore));
+static void sds_files_info PARAMS ((struct target_ops * ignore));
 
 static int sds_xfer_memory PARAMS ((CORE_ADDR, char *,
 				    int, int, struct target_ops *));
@@ -142,8 +143,8 @@ static int next_msg_id;
 static int just_started;
 
 static int message_pending;
-
 
+
 /* Clean up connection to a remote debugger.  */
 
 /* ARGSUSED */
@@ -242,7 +243,7 @@ device is attached to the remote system (e.g. /dev/ttya).");
   /* Start the remote connection; if error (0), discard this target.
      In particular, if the user quits, be sure to discard it (we'd be
      in an inconsistent state otherwise).  */
-  if (!catch_errors (sds_start_remote, NULL, 
+  if (!catch_errors (sds_start_remote, NULL,
 		     "Couldn't establish connection to remote target\n",
 		     RETURN_MASK_ALL))
     pop_target ();
@@ -284,7 +285,7 @@ fromhex (a)
     return a - '0';
   else if (a >= 'a' && a <= 'f')
     return a - 'a' + 10;
-  else 
+  else
     error ("Reply contains invalid hex digit %d", a);
 }
 
@@ -295,9 +296,9 @@ tohex (nib)
      int nib;
 {
   if (nib < 10)
-    return '0'+nib;
+    return '0' + nib;
   else
-    return 'a'+nib-10;
+    return 'a' + nib - 10;
 }
 
 static int
@@ -317,13 +318,13 @@ tob64 (inbuf, outbuf, len)
     {
       /* Collect the next three bytes into a number.  */
       sum = ((long) *inbuf++) << 16;
-      sum |= ((long) *inbuf++) <<  8;
+      sum |= ((long) *inbuf++) << 8;
       sum |= ((long) *inbuf++);
 
       /* Spit out 4 6-bit encodings.  */
       *p++ = ((sum >> 18) & 0x3f) + '0';
       *p++ = ((sum >> 12) & 0x3f) + '0';
-      *p++ = ((sum >>  6) & 0x3f) + '0';
+      *p++ = ((sum >> 6) & 0x3f) + '0';
       *p++ = (sum & 0x3f) + '0';
     }
   return (p - outbuf);
@@ -342,22 +343,22 @@ fromb64 (inbuf, outbuf, len)
   for (i = 0; i < len; i += 4)
     {
       /* Collect 4 6-bit digits.  */
-      sum  = (*inbuf++ - '0') << 18;
+      sum = (*inbuf++ - '0') << 18;
       sum |= (*inbuf++ - '0') << 12;
-      sum |= (*inbuf++ - '0') <<  6;
+      sum |= (*inbuf++ - '0') << 6;
       sum |= (*inbuf++ - '0');
 
       /* Now take the resulting 24-bit number and get three bytes out
          of it.  */
       *outbuf++ = (sum >> 16) & 0xff;
-      *outbuf++ = (sum >>  8) & 0xff;
+      *outbuf++ = (sum >> 8) & 0xff;
       *outbuf++ = sum & 0xff;
     }
 
   return (len / 4) * 3;
 }
-
 
+
 /* Tell the remote machine to resume.  */
 
 static enum target_signal last_sent_signal = TARGET_SIGNAL_0;
@@ -376,7 +377,7 @@ sds_resume (pid, step, siggnal)
   last_sent_step = step;
 
   buf[0] = (step ? 21 : 20);
-  buf[1] = 0;  /* (should be signal?) */
+  buf[1] = 0;			/* (should be signal?) */
 
   sds_send (buf, 2);
 }
@@ -392,15 +393,15 @@ sds_interrupt (signo)
 
   /* If this doesn't work, try more severe steps.  */
   signal (signo, sds_interrupt_twice);
-  
+
   if (remote_debug)
-    printf_unfiltered ("sds_interrupt called\n");
+    fprintf_unfiltered (gdb_stdlog, "sds_interrupt called\n");
 
   buf[0] = 25;
   sds_send (buf, 1);
 }
 
-static void (*ofunc)();
+static void (*ofunc) ();
 
 /* The user typed ^C twice.  */
 
@@ -409,7 +410,7 @@ sds_interrupt_twice (signo)
      int signo;
 {
   signal (signo, ofunc);
-  
+
   interrupt_query ();
 
   signal (signo, sds_interrupt);
@@ -471,8 +472,8 @@ sds_wait (pid, status)
 	  retlen = sds_send (buf, 1);
 	  if (remote_debug)
 	    {
-	      fprintf_unfiltered (gdb_stderr, "Signals: %04x %02x %02x\n",
-				  ((int) buf[0]) << 8 + buf[1],
+	      fprintf_unfiltered (gdb_stdlog, "Signals: %02x%02x %02x %02x\n",
+				  buf[0], buf[1],
 				  buf[2], buf[3]);
 	    }
 	  message_pending = 0;
@@ -481,7 +482,7 @@ sds_wait (pid, status)
 	  goto got_status;
 	}
     }
- got_status:
+got_status:
   return inferior_pid;
 }
 
@@ -497,7 +498,6 @@ sds_fetch_registers (regno)
 {
   unsigned char buf[PBUFSIZ];
   int i, retlen;
-  char *p;
   char regs[REGISTER_BYTES];
 
   /* Unimplemented registers read as all bits zero.  */
@@ -524,17 +524,17 @@ sds_fetch_registers (regno)
   /* (should warn about reply too short) */
 
   for (i = 0; i < NUM_REGS; i++)
-    supply_register (i, &regs[REGISTER_BYTE(i)]);
+    supply_register (i, &regs[REGISTER_BYTE (i)]);
 }
 
 /* Prepare to store registers.  Since we may send them all, we have to
    read out the ones we don't want to change first.  */
 
-static void 
+static void
 sds_prepare_to_store ()
 {
   /* Make sure the entire registers array is valid.  */
-  read_register_bytes (0, (char *)NULL, REGISTER_BYTES);
+  read_register_bytes (0, (char *) NULL, REGISTER_BYTES);
 }
 
 /* Store register REGNO, or all registers if REGNO == -1, from the contents
@@ -607,8 +607,8 @@ sds_write_bytes (memaddr, myaddr, len)
       buf[1] = 0;
       buf[2] = (int) (memaddr >> 24) & 0xff;
       buf[3] = (int) (memaddr >> 16) & 0xff;
-      buf[4] = (int) (memaddr >>  8) & 0xff;
-      buf[5] = (int) (memaddr      ) & 0xff;
+      buf[4] = (int) (memaddr >> 8) & 0xff;
+      buf[5] = (int) (memaddr) & 0xff;
       buf[6] = 1;
       buf[7] = 0;
 
@@ -658,10 +658,10 @@ sds_read_bytes (memaddr, myaddr, len)
       buf[1] = 0;
       buf[2] = (int) (memaddr >> 24) & 0xff;
       buf[3] = (int) (memaddr >> 16) & 0xff;
-      buf[4] = (int) (memaddr >>  8) & 0xff;
-      buf[5] = (int) (memaddr      ) & 0xff;
+      buf[4] = (int) (memaddr >> 8) & 0xff;
+      buf[5] = (int) (memaddr) & 0xff;
       buf[6] = (int) (todo >> 8) & 0xff;
-      buf[7] = (int) (todo     ) & 0xff;
+      buf[7] = (int) (todo) & 0xff;
       buf[8] = 1;
 
       retlen = sds_send (buf, 9);
@@ -691,17 +691,17 @@ sds_read_bytes (memaddr, myaddr, len)
 
 /* ARGSUSED */
 static int
-sds_xfer_memory(memaddr, myaddr, len, should_write, target)
+sds_xfer_memory (memaddr, myaddr, len, should_write, target)
      CORE_ADDR memaddr;
      char *myaddr;
      int len;
      int should_write;
-     struct target_ops *target;			/* ignored */
+     struct target_ops *target;	/* ignored */
 {
   return dcache_xfer_memory (sds_dcache, memaddr, myaddr, len, should_write);
 }
-
 
+
 static void
 sds_files_info (ignore)
      struct target_ops *ignore;
@@ -723,7 +723,7 @@ readchar (timeout)
   ch = SERIAL_READCHAR (sds_desc, timeout);
 
   if (remote_debug > 1 && ch >= 0)
-    printf_unfiltered("%c(%x)", ch, ch);
+    fprintf_unfiltered (gdb_stdlog, "%c(%x)", ch, ch);
 
   switch (ch)
     {
@@ -779,22 +779,20 @@ putmessage (buf, len)
   unsigned char csum = 0;
   char buf2[PBUFSIZ], buf3[PBUFSIZ];
   unsigned char header[3];
-  int ch;
-  int tcount = 0;
   char *p;
 
   /* Copy the packet into buffer BUF2, encapsulating it
      and giving it a checksum.  */
 
   if (len > 170)		/* Prosanity check */
-    abort();
+    abort ();
 
   if (remote_debug)
     {
-      fprintf_unfiltered (gdb_stderr, "Message to send: \"");
+      fprintf_unfiltered (gdb_stdlog, "Message to send: \"");
       for (i = 0; i < len; ++i)
-	fprintf_unfiltered (gdb_stderr, "%02x", buf[i]);
-      fprintf_unfiltered (gdb_stderr, "\"\n");
+	fprintf_unfiltered (gdb_stdlog, "%02x", buf[i]);
+      fprintf_unfiltered (gdb_stdlog, "\"\n");
     }
 
   p = buf2;
@@ -803,7 +801,7 @@ putmessage (buf, len)
   if (len % 3 != 0)
     {
       buf[len] = '\0';
-      buf[len+1] = '\0';
+      buf[len + 1] = '\0';
     }
 
   header[1] = next_msg_id;
@@ -830,23 +828,20 @@ putmessage (buf, len)
 
   while (1)
     {
-      int started_error_output = 0;
-
       if (remote_debug)
 	{
 	  *p = '\0';
-	  printf_unfiltered ("Sending encoded: \"%s\"", buf2);
-	  printf_unfiltered ("  (Checksum %d, id %d, length %d)\n",
-			     header[0], header[1], header[2]);
-	  gdb_flush (gdb_stdout);
+	  fprintf_unfiltered (gdb_stdlog, "Sending encoded: \"%s\"", buf2);
+	  fprintf_unfiltered (gdb_stdlog,
+			      "  (Checksum %d, id %d, length %d)\n",
+			      header[0], header[1], header[2]);
+	  gdb_flush (gdb_stdlog);
 	}
       if (SERIAL_WRITE (sds_desc, buf2, p - buf2))
 	perror_with_name ("putmessage: write failed");
 
       return 1;
-
     }
-
 }
 
 /* Come here after finding the start of the frame.  Collect the rest
@@ -869,11 +864,12 @@ read_frame (buf)
 	{
 	case SERIAL_TIMEOUT:
 	  if (remote_debug)
-	    puts_filtered ("Timeout in mid-message, retrying\n");
+	    fputs_filtered ("Timeout in mid-message, retrying\n", gdb_stdlog);
 	  return 0;
 	case '$':
 	  if (remote_debug)
-	    puts_filtered ("Saw new packet start in middle of old one\n");
+	    fputs_filtered ("Saw new packet start in middle of old one\n",
+			    gdb_stdlog);
 	  return 0;		/* Start a new packet, count retries */
 	case '\r':
 	  break;
@@ -882,7 +878,7 @@ read_frame (buf)
 	  {
 	    *bp = '\000';
 	    if (remote_debug)
-	      fprintf_unfiltered (gdb_stderr, "Received encoded: \"%s\"\n",
+	      fprintf_unfiltered (gdb_stdlog, "Received encoded: \"%s\"\n",
 				  buf);
 	    return 1;
 	  }
@@ -925,11 +921,7 @@ getmessage (buf, forever)
 
   if (forever)
     {
-#ifdef MAINTENANCE_CMDS
       timeout = watchdog > 0 ? watchdog : -1;
-#else
-      timeout = -1;
-#endif
     }
 
   else
@@ -940,12 +932,12 @@ getmessage (buf, forever)
   for (tries = 1; tries <= MAX_TRIES; tries++)
     {
       /* This can loop forever if the remote side sends us characters
-	 continuously, but if it pauses, we'll get a zero from readchar
-	 because of timeout.  Then we'll count that as a retry.  */
+         continuously, but if it pauses, we'll get a zero from readchar
+         because of timeout.  Then we'll count that as a retry.  */
 
       /* Note that we will only wait forever prior to the start of a packet.
-	 After that, we expect characters to arrive at a brisk pace.  They
-	 should show up within sds_timeout intervals.  */
+         After that, we expect characters to arrive at a brisk pace.  They
+         should show up within sds_timeout intervals.  */
 
       do
 	{
@@ -953,22 +945,20 @@ getmessage (buf, forever)
 
 	  if (c == SERIAL_TIMEOUT)
 	    {
-#ifdef MAINTENANCE_CMDS
 	      if (forever)	/* Watchdog went off.  Kill the target. */
 		{
 		  target_mourn_inferior ();
 		  error ("Watchdog has expired.  Target detached.\n");
 		}
-#endif
 	      if (remote_debug)
-		puts_filtered ("Timed out.\n");
+		fputs_filtered ("Timed out.\n", gdb_stdlog);
 	      goto retry;
 	    }
 	}
       while (c != '$' && c != '{');
 
       /* We might have seen a "trigraph", a sequence of three characters
-	 that indicate various sorts of communication state.  */
+         that indicate various sorts of communication state.  */
 
       if (c == '{')
 	{
@@ -976,12 +966,12 @@ getmessage (buf, forever)
 	  c2 = readchar (timeout);
 	  c3 = readchar (timeout);
 	  if (remote_debug)
-	    fprintf_unfiltered (gdb_stderr, "Trigraph %c%c%c received\n",
+	    fprintf_unfiltered (gdb_stdlog, "Trigraph %c%c%c received\n",
 				c, c2, c3);
 	  if (c3 == '+')
 	    {
 	      message_pending = 1;
-	      return 0; /*????*/
+	      return 0;		/*???? */
 	    }
 	  continue;
 	}
@@ -1002,7 +992,7 @@ getmessage (buf, forever)
 
 	  if (csum != header[0])
 	    fprintf_unfiltered (gdb_stderr,
-				"Checksum mismatch: computed %d, received %d\n",
+			    "Checksum mismatch: computed %d, received %d\n",
 				csum, header[0]);
 
 	  if (header[2] == 0xff)
@@ -1010,15 +1000,15 @@ getmessage (buf, forever)
 
 	  if (remote_debug)
 	    {
-	      fprintf_unfiltered (gdb_stderr,
-				  "... (Got checksum %d, id %d, length %d)\n",
+	      fprintf_unfiltered (gdb_stdlog,
+				"... (Got checksum %d, id %d, length %d)\n",
 				  header[0], header[1], header[2]);
-	      fprintf_unfiltered (gdb_stderr, "Message received: \"");
+	      fprintf_unfiltered (gdb_stdlog, "Message received: \"");
 	      for (i = 0; i < len; ++i)
 		{
-		  fprintf_unfiltered (gdb_stderr, "%02x", (unsigned char) buf[i]);
+		  fprintf_unfiltered (gdb_stdlog, "%02x", (unsigned char) buf[i]);
 		}
-	      fprintf_unfiltered (gdb_stderr, "\"\n");
+	      fprintf_unfiltered (gdb_stdlog, "\"\n");
 	    }
 
 	  /* no ack required? */
@@ -1066,8 +1056,8 @@ sds_create_inferior (exec_file, args, env)
 
 static void
 sds_load (filename, from_tty)
-    char *filename;
-    int from_tty;
+     char *filename;
+     int from_tty;
 {
   generic_load (filename, from_tty);
 
@@ -1091,9 +1081,9 @@ sds_insert_breakpoint (addr, contents_cache)
   *p++ = 0;
   *p++ = (int) (addr >> 24) & 0xff;
   *p++ = (int) (addr >> 16) & 0xff;
-  *p++ = (int) (addr >>  8) & 0xff;
-  *p++ = (int) (addr      ) & 0xff;
-  
+  *p++ = (int) (addr >> 8) & 0xff;
+  *p++ = (int) (addr) & 0xff;
+
   retlen = sds_send (buf, p - buf);
 
   for (i = 0; i < 4; ++i)
@@ -1115,8 +1105,8 @@ sds_remove_breakpoint (addr, contents_cache)
   *p++ = 0;
   *p++ = (int) (addr >> 24) & 0xff;
   *p++ = (int) (addr >> 16) & 0xff;
-  *p++ = (int) (addr >>  8) & 0xff;
-  *p++ = (int) (addr      ) & 0xff;
+  *p++ = (int) (addr >> 8) & 0xff;
+  *p++ = (int) (addr) & 0xff;
   for (i = 0; i < 4; ++i)
     *p++ = contents_cache[i];
 
@@ -1125,7 +1115,7 @@ sds_remove_breakpoint (addr, contents_cache)
   return 0;
 }
 
-static void 
+static void
 init_sds_ops ()
 {
   sds_ops.to_shortname = "sds";
@@ -1186,7 +1176,7 @@ sds_command (args, from_tty)
   for (i = 0; i < retlen; ++i)
     {
       printf_filtered ("%02x", buf[i]);
-    }  
+    }
   printf_filtered ("\n");
 }
 
@@ -1197,10 +1187,10 @@ _initialize_remote_sds ()
   add_target (&sds_ops);
 
   add_show_from_set (add_set_cmd ("sdstimeout", no_class,
-				  var_integer, (char *)&sds_timeout,
-				  "Set timeout value for sds read.\n", &setlist),
+				  var_integer, (char *) &sds_timeout,
+			     "Set timeout value for sds read.\n", &setlist),
 		     &showlist);
 
   add_com ("sds", class_obscure, sds_command,
-	   "Send a command to the SDS monitor."); 
+	   "Send a command to the SDS monitor.");
 }

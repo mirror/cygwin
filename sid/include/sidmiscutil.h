@@ -1,6 +1,6 @@
 // sidmiscutil.h - Useful utility classes.  -*- C++ -*-
 
-// Copyright (C) 1999-2002 Red Hat.
+// Copyright (C) 1999-2003 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -526,7 +526,8 @@ namespace sidutil
   public:
     void delete_saved_messages ()
     {
-      saved_messages.erase (saved_messages.end ());
+      saved_messages.clear ();
+      saved_levels.clear ();
     }
   };
 

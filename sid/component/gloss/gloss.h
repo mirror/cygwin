@@ -93,10 +93,10 @@ protected:
   {
     return parse_attribute(state, *this);
   }
-  void stream_state (ostream& o) const;
-  void destream_state (istream& i);
-  friend ostream& operator << (ostream& o, const gloss32& it);
-  friend istream& operator >> (istream& i, gloss32& it);
+  void stream_state (std::ostream& o) const;
+  void destream_state (std::istream& i);
+  friend std::ostream& operator << (std::ostream& o, const gloss32& it);
+  friend std::istream& operator >> (std::istream& i, gloss32& it);
 
   // Trap invocation and response.
   callback_pin<gloss32> trap_type_ipin;

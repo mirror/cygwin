@@ -1,3 +1,7 @@
+2001-12-17  Dave Brolley  <brolley@redhat.com>
+
+	* cgen-ops.h: Correct return type of ADDCHI.
+
 2001-12-17  matthew green  <mrg@redhat.com>
 
 	* compCGEN.cxx: If SIDTARGET_XSTORMY16, add hw-cpu-xstormy16 support.

@@ -83,8 +83,10 @@ sidtarget_m68k = @sidtarget_m68k@
 sidtarget_mips = @sidtarget_mips@
 sidtarget_ppc = @sidtarget_ppc@
 sidtarget_x86 = @sidtarget_x86@
+sidtarget_xstormy16 = @sidtarget_xstormy16@
 
 AUTOMAKE_OPTIONS = foreign
+ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
 SUBDIRS = @family_subdirs@
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../config/mkinstalldirs
@@ -106,7 +108,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in 
-	cd $(srcdir) && $(ACLOCAL)
+	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck

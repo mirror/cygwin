@@ -159,6 +159,93 @@ set state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
 set o2 [sid_cmd "sid::component::set_attribute_value $victim state-snapshot [list $state]"]
 if {$state != "" && $o1 == "ok" && $o2 == "ok"} then { pass $test } else { fail "$test - $o1 $o2" }
 
+set size 8192
+set test "reset memory size to $size"
+set result [sid_cmd "sid::component::set_attribute_value $victim size $size"]
+if {$result == "ok"} then {pass $test} else {fail $test}
+
+set test "map memory image from a file"
+set file [open "test.dat" "w"]
+fconfigure $file -translation binary
+set data 0
+for {set i 0} {$i < $size} {incr i} {
+    set data [expr {(($data * 17) + 19) % 256}]
+    puts -nonewline $file [binary format "c" $data]
+}
+close $file
+file copy -force "test.dat" "test.dat.orig"
+set res [sid_cmd "sid::component::set_attribute_value $victim image-file test.dat"]
+set pin [sid_cmd "sid::component::find_pin $victim image-mmap"]
+sid_cmd "sid::pin::driven_h4 $pin 0"
+if {$res == "ok" && $pin != ""} then { pass $test } else { fail $test }
+
+set test "verify mmap memory image via read"
+set data 0
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+for {set i 0} {$i < $size} {incr i} {
+    set data [expr {(($data * 17) + 19) % 256}]
+    set result [sid_cmd "sid::bus::read_h4_l1 $robus $i"]
+    set status [lindex $result 0]
+    if {$status != "ok"} then {fail "$test - $status @ $i" ; break}
+    set result_data [lindex $result 1]
+    if {$result_data != $data} then {fail "$test - mismatch @ $i - $result_data vs $data" ; break}
+}
+if {$i == $size} then { pass $test } else { fail $test }
+
+set test "modify mmap memory image"
+set data 0
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+for {set i 0} {$i < $size} {incr i} {
+    set data [expr {(($data * 13) + 29) % 256}]
+    set result [sid_cmd "sid::bus::write_h4_l1 $rwbus $i $data"]
+    if {$result != "ok"} then {fail "$test - $result @ $i" ; break}
+    set result [sid_cmd "sid::bus::read_h4_l1 $rwbus $i"]
+    if {[lindex $result 0] != "ok" || [lindex $result 1] != $data} then {
+	fail "$test - mismatch @ $i - $result vs $data" ; break }
+}
+if {$i == $size} then { pass $test } else { fail $test }
+
+set test "write out memory image"
+set res [sid_cmd "sid::component::set_attribute_value $victim image-file \"test.dat.save\""]
+set pin [sid_cmd "sid::component::find_pin $victim image-store"]
+sid_cmd "sid::pin::driven_h4 $pin 0"
+if {$res == "ok" && $pin != ""} then { pass $test } else { fail $test }
+
+set test "check written memory image"
+set file [open "test.dat.save" "r"]
+fconfigure $file -translation binary
+set data 0
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+for {set i 0} {$i < $size} {incr i} {
+    set data [expr {(($data * 13) + 29) % 256}]
+    binary scan [read $file 1] "c" result_data
+    set result_data [expr {$result_data + 256} & 255]
+    if {$result_data != $data} then {fail "$test - mismatch @ $i - $result_data vs $data" ; break}
+}
+close $file
+if {$i == $size} then { pass $test } else { fail $test }
+
+set test "msync memory"
+set pin [sid_cmd "sid::component::find_pin $victim image-msync"]
+sid_cmd "sid::pin::driven_h4 $pin 0"
+file copy -force "test.dat" "test.dat.msync"
+if {$pin != ""} then { pass $test } else { fail $test }
+
+set test "check msync'd memory image"
+set file [open "test.dat.msync" "r"]
+fconfigure $file -translation binary
+set data 0
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+for {set i 0} {$i < $size} {incr i} {
+    set data [expr {(($data * 13) + 29) % 256}]
+    binary scan [read $file 1] "c" result_data
+    set result_data [expr {$result_data + 256} & 255]
+    if {$result_data != $data} then {fail "$test - mismatch @ $i - $result_data vs $data" ; break}
+}
+close $file
+if {$i == $size} then { pass $test } else { fail $test }
+
+
 set test "sid stop"
 if [sid_stop] then { pass $test } else { fail $test ; return }
 

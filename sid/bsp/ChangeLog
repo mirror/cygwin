@@ -1,3 +1,13 @@
+2001-03-13  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configrun-sid.in: Add "mmap" memory region option.
+	Document it and others in "--help" text.
+
+2001-03-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configrun-sid.in: Move gloss board check until after all
+	other board checks so board-specific stuff takes precedence.
+
 2001-03-06  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configrun-sid.in: Remove unused configuration variables.

@@ -1,3 +1,8 @@
+2001-03-13  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.mapper/busif.exp: Disable if !enable_shared.
+	* sidcomp.memory/genericmemory.exp: Add tests for mmap functions.
+
 2001-03-01  Frank Ch. Eigler  <fche@redhat.com>
 
 	* lib/monkey.exp (monkey_test): Disabled this class of tests

@@ -1344,7 +1344,7 @@ gloss32::write (int fd, address32 addr, size32 len,
 		  && host_fd == fd);
 
   if (verbose_p)
-    cerr << "*** write(" << fd << ", 0x" << hex << addr << ", " << dec << len << ")" << endl;
+    cerr << "*** write(" << fd << ", 0x" << ios::hex << addr << ", " << ios::dec << len << ")" << endl;
 
   if (host_fd == -1)
     {

@@ -415,9 +415,17 @@ main (int argc, char **argv)
 		break;
 	      case 'X':
 		gdbserver.fromtarget_terminate (process);
+		server_quit_p = 1;		/* See below.  */
 		break;
 	      case 'W':
 		gdbserver.fromtarget_exit (process);
+		/* If we're connected to a serial port which is not
+		   observing the modem control signals (e.g. "stty
+		   clocal"), then we'll never notice that the port has
+		   been closed.  For this reason, when we notice that
+		   the target has exited or terminated, we need to set
+		   ``server_quit_p'' explicitly.  */
+		server_quit_p = 1;
 		break;
 	      }
 	    }

@@ -1,3 +1,8 @@
+2004-07-19  Kevin Buettner  <kevinb@redhat.com>
+
+	* server.c (main): Set ``server_quit_p'' when debugged process
+	exits or terminates.
+
 2004-06-03  Kevin Buettner  <kevinb@redhat.com>
 
 	* server.c (main): Ensure that thread related realtime signals

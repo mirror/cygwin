@@ -1,3 +1,9 @@
+2003-04-15  Rohit Kumar Srivastava <rohits@kpitcummins.com>
+
+	* cpu/sh.cpu: Replace occurrances of 'Hitachi' with 'Renesas'.
+	* cpu/sh64-compact.cpu: Likewise.
+	* cpu/sh64-media.cpu: Likewise.
+
 2003-03-21  DJ Delorie  <dj@redhat.com>
 
 	* cpu/xstormy16.cpu (basic-psw): New argument ws (wordsize),

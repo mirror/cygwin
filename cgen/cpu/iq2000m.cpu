@@ -358,14 +358,14 @@
      ())
 
 (dni pkrlr1 "pkrlr1" (MACH2000 USES-RT YIELD-INSN)
-     "pkrlr1 $rt,$index,$count"
-     (+ OP_COP3 (f-rs 29) rt count index)
+     "pkrlr1 $rt,$count"
+     (+ OP_COP3 (f-rs 29) rt count)
      (unimp pkrlr1)
      ())
 
 (dni pkrlr30 "pkrlr30" (MACH2000 USES-RT YIELD-INSN)
-     "pkrlr30 $rt,$index,$count"
-     (+ OP_COP3 (f-rs 31) rt count index)
+     "pkrlr30 $rt,$count"
+     (+ OP_COP3 (f-rs 31) rt count)
      (unimp pkrlr30)
      ())
 
@@ -376,14 +376,14 @@
      ())
 
 (dni rbr1 "dma read bytes using r1" (MACH2000 USES-RT YIELD-INSN)
-     "rbr1 $rt,$index,$count"
-     (+ OP_COP3 (f-rs 24) rt count index)
+     "rbr1 $rt,$count"
+     (+ OP_COP3 (f-rs 24) rt count)
      (unimp rbr1)
      ())
 
 (dni rbr30 "dma read bytes using r30" (MACH2000 USES-RT YIELD-INSN)
-     "rbr30 $rt,$index,$count"
-     (+ OP_COP3 (f-rs 26) rt count index)
+     "rbr30 $rt,$count"
+     (+ OP_COP3 (f-rs 26) rt count)
      (unimp rbr30)
      ())
 
@@ -400,14 +400,14 @@
      ())
 
 (dni rxr1 "dma read word64s using r1" (MACH2000 USES-RT YIELD-INSN)
-     "rxr1 $rt,$index,$count"
-     (+ OP_COP3 (f-rs 28) rt count index)
+     "rxr1 $rt,$count"
+     (+ OP_COP3 (f-rs 28) rt count)
      (unimp rxr1)
      ())
 
 (dni rxr30 "dma read word 64s using r30" (MACH2000 USES-RT YIELD-INSN)
-     "rxr30 $rt,$index,$count"
-     (+ OP_COP3 (f-rs 30) rt count index)
+     "rxr30 $rt,$count"
+     (+ OP_COP3 (f-rs 30) rt count)
      (unimp rxr30)
      ())
 
@@ -478,26 +478,26 @@
      ())
 
 (dni wbr1 "dma write bytes using r1" (MACH2000 USES-RT YIELD-INSN)
-     "wbr1 $rt,$index,$count"
-     (+ OP_COP3 (f-rs 16) rt count index)
+     "wbr1 $rt,$count"
+     (+ OP_COP3 (f-rs 16) rt count)
      (unimp wbr1)
      ())
 
 (dni wbr1u "dma write bytes using r1 and unlock" (MACH2000 USES-RT YIELD-INSN)
-     "wbr1u $rt,$index,$count"
-     (+ OP_COP3 (f-rs 17) rt count index)
+     "wbr1u $rt,$count"
+     (+ OP_COP3 (f-rs 17) rt count)
      (unimp wbr1u)
      ())
 
 (dni wbr30 "dma write bytes using r30" (MACH2000 USES-RT YIELD-INSN)
-     "wbr30 $rt,$index,$count"
-     (+ OP_COP3 (f-rs 18) rt count index)
+     "wbr30 $rt,$count"
+     (+ OP_COP3 (f-rs 18) rt count)
      (unimp wbr30)
      ())
 
 (dni wbr30u "dma write bytes using r30 and unlock" (MACH2000 USES-RT YIELD-INSN)
-     "wbr30u $rt,$index,$count"
-     (+ OP_COP3 (f-rs 19) rt count index)
+     "wbr30u $rt,$count"
+     (+ OP_COP3 (f-rs 19) rt count)
      (unimp wbr30u)
      ())
 
@@ -514,26 +514,26 @@
      ())
 
 (dni wxr1 "dma write word64s using r1" (MACH2000 USES-RT YIELD-INSN)
-     "wxr1 $rt,$index,$count"
-     (+ OP_COP3 (f-rs 20) rt count index)
+     "wxr1 $rt,$count"
+     (+ OP_COP3 (f-rs 20) rt count)
      (unimp wxr1)
      ())
 
 (dni wxr1u "dma write word64s using r1 and unlock" (MACH2000 USES-RT YIELD-INSN)
-     "wxr1u $rt,$index,$count"
-     (+ OP_COP3 (f-rs 21) rt count index)
+     "wxr1u $rt,$count"
+     (+ OP_COP3 (f-rs 21) rt count)
      (unimp wxr1u)
      ())
 
 (dni wxr30 "dma write word64s using r30" (MACH2000 USES-RT YIELD-INSN)
-     "wxr30 $rt,$index,$count"
-     (+ OP_COP3 (f-rs 22) rt count index)
+     "wxr30 $rt,$count"
+     (+ OP_COP3 (f-rs 22) rt count)
      (unimp wxr30)
      ())
 
 (dni wxr30u "dma write word64s using r30 and unlock" (MACH2000 USES-RT YIELD-INSN)
-     "wxr30u $rt,$index,$count"
-     (+ OP_COP3 (f-rs 23) rt count index)
+     "wxr30u $rt,$count"
+     (+ OP_COP3 (f-rs 23) rt count)
      (unimp wxr30u)
      ())
 

@@ -1,5 +1,12 @@
 2001-07-13  Frank Ch. Eigler  <fche@redhat.com>
 
+	* config/default.exp: Stop using [sid_find_file] for component libs.
+	Forget about mksid.
+	* sidcomp.*/*.exp: Stop using [sid_find_file] to find component
+	shared libraries for "load" cmds in sid configuration files.
+
+2001-07-13  Frank Ch. Eigler  <fche@redhat.com>
+
 	* sidcomp.audio/linuxraw.exp: Add polling loop test after tx-sample
 	drive sequence.
 	(deassert tx): Unxfail.

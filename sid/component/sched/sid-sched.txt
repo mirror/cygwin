@@ -28,7 +28,12 @@ Functionality:
    |               | clients. Each "client"          |
    |               | corresponds to a set of "N-"    |
    |               | pins and attributes, with its   |
-   |               | own signalling schedule.        |
+   |               | own signalling schedule. During |
+   |               | configuration, the clients can  |
+   |               | also be named using the N-name  |
+   |               | attributes, which provides a    |
+   |               | more informative name for the   |
+   |               | scheduler's TK GUI              |
    |---------------+---------------------------------|
    |        timing | There is no global concept of   |
    |               | simulation time in sid.         |
@@ -265,6 +270,8 @@ Component Reference:
    |                         |category|string  |                |save/restore ||
    |-------------------------+--------+--------+----------------+-------------||
    |num-clients              |setting |numeric |'0'             |configuration||
+   |-------------------------+--------+--------+----------------+-------------||
+   |N-name                   |setting |-       |-               |configuration||
    |-------------------------+--------+--------+----------------+-------------||
    |N-regular?               |setting |boolean |'0'             |subscription ||
    |-------------------------+--------+--------+----------------+-------------||

@@ -18,6 +18,7 @@
     <!-- attributes -->
     <defattribute name="state-snapshot" category="no category" legalvalues="opaque string" behaviors="state save/restore" />
     <defattribute name="num-clients" category="setting" legalvalues="numeric" defaultvalue="'0'" behaviors="configuration" />
+    <defattribute name="N-name" category="setting" behaviors="configuration" />
     <defattribute name="N-regular?" category="setting" legalvalues="boolean" defaultvalue="'0'" behaviors="subscription" />
     <defattribute name="N-time" category="setting" legalvalues="numeric" defaultvalue="'0'" behaviors="subscription" />
     <defattribute name="N-scale" category="setting" legalvalues="numeric fraction" defaultvalue="'1'" behaviors="subscription" />
@@ -59,10 +60,13 @@
     </modelling>
 
     <behavior name="configuration">
-      <p>When the <attribute>num-clients</attribute> is written-to, this component adjusts
-      its list of scheduler clients.  Each "client" corresponds to a
-      set of "N-" pins and attributes, with its own signalling
-      schedule.</p>
+      <p>When the <attribute>num-clients</attribute> is written-to,
+      this component adjusts its list of scheduler clients.  Each
+      "client" corresponds to a set of "N-" pins and attributes, with
+      its own signalling schedule. During configuration, the clients
+      can also be named using the <attribute>N-name</attribute>
+      attributes, which provides a more informative name for the
+      scheduler's TK GUI</p>
     </behavior>
 
     <behavior name="timing">

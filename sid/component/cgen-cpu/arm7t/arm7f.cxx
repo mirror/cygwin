@@ -827,9 +827,6 @@ arm7f_cpu::memory_trap (const cpu_memory_fault& t)
   this->h_gr_set (H_GR_PC, t.pc);
   this->h_pc_set (t.pc);
 
-  if (t.status == bus::delayed)
-    return;
-
   if (this->debug_exec_p)
     cerr << "MEMORY TRAP "
 	 << " operation=" << t.operation

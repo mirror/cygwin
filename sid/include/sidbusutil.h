@@ -260,32 +260,48 @@ namespace sidutil
   class mux_passthrough_bus: public sid::bus
   {
   public:
-    mux_passthrough_bus(sid::bus** t1, sid::bus** t2): index(0), target(t1) 
+    mux_passthrough_bus(sid::bus** t1, sid::bus** t2)
       {
 	assert (t1 != 0);
         assert (t2 != 0);
-        t[0] = t1;
-        t[1] = t2;
-	t[2] = NULL;
+	this->dummy_target = 0;
+        this->t[0] = t1;
+	this->index = 0;
+	this->target = t1;
+        this->t[1] = t2;
       }
     ~mux_passthrough_bus() throw() {}
     void switch_bus()
     {
       // Switch to the next bus if the current one is valid (0 or 1)
-      if ((index & ~1) == 0)
+      switch (this->index) 
 	{
-	  index ^= 1;
-	  target = t[index];
+	case 0:
+	case 1:
+	  this->index = 1 - this->index;
+	  this->target = this->t[this->index];
+	  break;
+
+	default:
+	  ;
+	  // do nothing
 	}
     }
     void select_bus (int i)
     {
       // Set index to 2 (error) unless i is 0 or 1
-      if ((i & ~1) == 0)
-	index = i;
-      else
-	index = 2;
-      target = t[index];
+      switch (i)
+	{
+	case 0:
+	case 1:
+	  this->index = i;
+	  this->target = this->t[i];
+	  break;
+
+	default:
+	  this->index = 2;
+	  this->target = & this->dummy_target;
+	}
     }
     
     // Some macros to make manufacturing of the cartesian-product
@@ -321,8 +337,9 @@ namespace sidutil
 
   private:
     int index;
+    sid::bus* dummy_target;
     sid::bus** target;
-    sid::bus** t[3];
+    sid::bus** t[2];
   };
 
   // The passthrough_word_bus maps memory and either directly passes through to the underlying

@@ -15,7 +15,7 @@
  *  OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
  *  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  *
- *  $Id: pthread.h,v 1.2 2002/06/20 19:51:19 fitzsim Exp $
+ *  $Id: pthread.h,v 1.3 2002/10/08 13:03:07 joel Exp $
  */
 
 #ifndef __PTHREAD_h
@@ -257,6 +257,8 @@ int	_EXFUN(pthread_key_delete, (pthread_key_t key));
 
 #define PTHREAD_CANCEL_DEFERRED 0
 #define PTHREAD_CANCEL_ASYNCHRONOUS 1
+
+#define PTHREAD_CANCELED ((void *) -1)
 
 int	_EXFUN(pthread_cancel, (pthread_t thread));
 

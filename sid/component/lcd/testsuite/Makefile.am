@@ -7,12 +7,12 @@ noinst_LTLIBRARIES = libt6963c-test.la libt6963c-japan.la libhd-two-line.la libh
 INCLUDES = -I. -I../../../include -I$(srcdir)/../../../include -I$(srcdir)/..
 
 all-local:
-	cp $(srcdir)/hd-one-line.conf .
-	cp $(srcdir)/hd-two-line.conf .
-	cp $(srcdir)/hd-5X10.conf .
-	cp $(srcdir)/hd-europe.conf .
-	cp $(srcdir)/t6963c-tcl.conf .
-	cp $(srcdir)/t6963c-japan.conf .
+	-cp $(srcdir)/hd-one-line.conf .
+	-cp $(srcdir)/hd-two-line.conf .
+	-cp $(srcdir)/hd-5X10.conf .
+	-cp $(srcdir)/hd-europe.conf .
+	-cp $(srcdir)/t6963c-tcl.conf .
+	-cp $(srcdir)/t6963c-japan.conf .
 
 libt6963c_test_la_SOURCES = t6963c-tester.cxx
 libt6963c_test_la_LDFLAGS = -rpath `pwd` -module -no-undefined

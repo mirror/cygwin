@@ -6,9 +6,5 @@ SUBDIRS = @subdirs@
 
 EXTRA_DIST = COPYING.SID
 
-install-data-local:
-	$(INSTALL_DATA) $(srcdir)/COPYING.SID $(prefix)
-
 install-info:
 	true
-

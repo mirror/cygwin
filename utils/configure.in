@@ -1,40 +1,69 @@
-# This file is a shell script fragment that supplies the information
-# necessary to tailor a template configure script into the configure
-# script appropriate for this directory.  For more information, check
-# any existing configure script.
+AC_INIT([Makefile.in])
 
-srctrigger=Makefile.in
-srcname="utilities"
+AC_PROG_INSTALL
+AC_CANONICAL_SYSTEM
 
-configdirs="spu"
-
-# per-host:
-
-case "${host}" in
-  *-*-go32)
-        configdirs="$configdirs msdos"
-        ;;
-esac
-
-# per-target:
+if test -d ${srcdir}/spu ; then
+  configdirs="spu"
+fi
 
 case "${target}" in
-  *-*-go32)
-        configdirs="$configdirs msdos"
-        ;;
-  *-amd-udi)
-        configdirs="$configdirs amd-udi"
-        ;;
   sparclite-*-*)
-        configdirs="$configdirs sparclite"
-        ;;
+    if test -d ${srcdir}/sparclite ; then
+      configdirs="$configdirs sparclite"
+    fi
+    ;;
   *mips*-*-pe* | *sh*-*-pe* | *arm*-*-wince | *arm*-wince-pe* )
-        configdirs="$configdirs wince"
-        ;;
+    if test -d ${srcdir}/wince ; then
+      configdirs="$configdirs wince"
+    fi
+    ;;
 esac
 
-# post-target:
+all_subdirs=""
+install_subdirs=""
+mostlyclean_subdirs=""
+clean_subdirs=""
+distclean_subdirs=""
+maintainer_clean_subdirs=""
 
-sed -e "s|^SUBDIRS[ 	]*=.*$|SUBDIRS = $configdirs|" \
-    Makefile > Makefile.tem
-mv Makefile.tem Makefile
+for dir in $configdirs ; do
+    all_subdirs="${all_subdirs} all-$dir"
+    install_subdirs="${install_subdirs} install-$dir"
+    mostlyclean_subdirs="${mostlyclean_subdirs} mostlyclean-$dir"
+    clean_subdirs="${clean_subdirs} clean-$dir"
+    distclean_subdirs="${distclean_subdirs} distclean-$dir"
+    maintainer_clean_subdirs="${maintainer_clean_subdirs} maintainer-clean-$dir"
+done
+
+AC_SUBST([all_subdirs])
+AC_SUBST([install_subdirs])
+AC_SUBST([mostlyclean_subdirs])
+AC_SUBST([clean_subdirs])
+AC_SUBST([distclean_subdirs])
+AC_SUBST([maintainer_clean_subdirs])
+
+case "${srcdir}" in
+  [[\\/]]* | ?:[[\\/]]* ) # Absolute
+    abs_srcdir=${srcdir}
+    ;;
+  *) 
+    abs_srcdir="../${srcdir}"
+    ;;
+esac
+AC_SUBST([abs_srcdir])
+
+case "${cache_file}" in
+  [[\\/]]* | ?:[[\\/]]* ) # Absolute
+    abs_cache_file=${cache_file}
+    ;;
+  *) 
+    abs_cache_file="../${cache_file}"
+    ;;
+esac
+subconfigure_args=${ac_configure_args}
+subconfigure_args="${subconfigure_args} --cache-file=${abs_cache_file}"
+AC_SUBST([subconfigure_args])
+
+AC_OUTPUT([Makefile])
+

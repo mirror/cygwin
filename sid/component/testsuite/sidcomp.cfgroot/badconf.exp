@@ -41,7 +41,8 @@ proc sid_check_err {filename} {
 	    #            gets rid of the path
 	    if { [gets $expfile  expectline] >= 0 } then {
                 if {[string match $expectline $resultline] == "0"} then {
-		    fail "$test - mismatch on line [expr $i + 1]\n  expected $expectline\n  result   $resultline"
+		    fail $test
+		    verbose "$test - mismatch on line [expr $i + 1]\n  expected $expectline\n  result   $resultline"
 		    close $expfile
 		    return
                 }
@@ -62,6 +63,6 @@ foreach file [glob -nocomplain "$srcdir/sidcomp.cfgroot/*.badconf"] {
    set wholepath [split $file /]
    set name [lindex $wholepath [expr [llength $wholepath] -1 ]]
    set conffile [lindex [split $name .] 0]
-   set test "testing sid with bad config file $conffile.badconf"
+   set test "handle bad configuration file ($conffile.badconf)"
    set id [sid_check_err $conffile]
 }

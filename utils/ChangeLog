@@ -1,3 +1,9 @@
+2000-02-28  Nick Clifton  <nickc@cygnus.com>
+
+	* configure.in: Add WinCE support.
+
+	* wince: New Directory: Contains WinCE support code.
+
 Fri Apr 24 12:51:21 1998  Jason Molenda  (crash@bugshack.cygnus.com)
 
         * Makefile.in (dvi): Do nothing target.

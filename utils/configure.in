@@ -28,6 +28,9 @@ case "${target}" in
   sparclite-*-*)
         configdirs="$configdirs sparclite"
         ;;
+  *mips*-*-pe* | *sh*-*-pe* | *arm*-*-wince | *arm*-wince-pe* )
+        configdirs="$configdirs wince"
+        ;;
 esac
 
 # post-target:

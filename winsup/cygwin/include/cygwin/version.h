@@ -1,6 +1,6 @@
 /* version.h -- Cygwin version numbers and accompanying documentation.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -41,10 +41,8 @@ details. */
 	 the Cygwin library".  This version is used to track important
 	 changes to the DLL and is mainly informative in nature. */
 
-  /* The current cygwin version is 1.3.6 */
-
 #define CYGWIN_VERSION_DLL_MAJOR 1003
-#define CYGWIN_VERSION_DLL_MINOR 5
+#define CYGWIN_VERSION_DLL_MINOR 15
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -145,10 +143,30 @@ details. */
        45: perprocess change, gamma_r, gammaf_r, lgamma_r, lgammaf_r
        46: Remove cygwin_getshared
        47: Report EOTWarningZoneSize in struct mtget.
+       48: Export "posix" regex functions
+       49: Export setutent, endutent, utmpname, getutent, getutid, getutline.
+       50: Export fnmatch.
+       51: Export recvmsg, sendmsg.
+       52: Export strptime
+       53: Export strlcat, strlcpy.
+       54: Export __fpclassifyd, __fpclassifyf, __signbitd, __signbitf.
+       55: Export fcloseall, fcloseall_r.
+       56: Make ntsec on by default.
+       57: Export setgroups.
+       58: Export memalign, valloc, malloc_trim, malloc_usable_size, mallopt,
+           malloc_stats
+       59: getsid
+       60: MSG_NOSIGNAL
+       61: Export getc_unlocked, getchar_unlocked, putc_unlocked,
+	   putchar_unlocked
+       62: Erroneously bumped.
+       63: Export pututline.
      */
 
+     /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
+
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 47
+#define CYGWIN_VERSION_API_MINOR 63
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
@@ -213,3 +231,5 @@ details. */
 	cygwin_internal (CW_GETVERSIONINFO).
      */
 
+#define CYGWIN_VERSION_MAGIC(a, b) ((unsigned) ((((unsigned short) a) << 16) | (unsigned short) b))
+#define CYGWIN_VERSION_MAGIC_VERSION(a) ((unsigned) ((unsigned)a & 0xffff))

@@ -1,4 +1,4 @@
-# Copyright (C) 1992 - 2001, 2002 Free Software Foundation, Inc.
+# Copyright (C) 1992 - 2001, 2002, 2003 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -411,7 +411,42 @@ proc remote_download { dest file args } {
 #
 
 proc standard_download {dest file destfile} {
-    return [rsh_download $dest $file $destfile];
+    set orig_destfile $destfile
+
+    if [board_info $dest exists nfsdir] {
+	set destdir [board_info $dest nfsdir]
+	if [board_info $dest exists nfsroot_server] {
+	    set dest [board_info $dest nfsroot_server];
+	} else {
+	    set dest "";
+	}
+	set destfile "$destdir/$destfile";
+    }
+
+    if { "$dest" != "" } {
+	set result [rsh_download $dest $file $destfile];
+	if { $result == $destfile } {
+	    return $orig_destfile;
+	} else {
+	    return $result;
+	}
+    }
+
+    set result [catch "exec cp -p $file $destfile" output];
+    if [regexp "same file|are identical" $output] {
+	set result 0
+	set output ""
+    } else {
+	# try to make sure we can read it
+	# and write it (in case we copy onto it again)
+	catch {exec chmod u+rw $destfile}
+    }
+    if { $result != 0 || $output != "" } {
+	perror "remote_download to $dest of $file to $destfile: $output"
+	return "";
+    } else {
+	return $orig_destfile;
+    }
 }
 
 proc remote_upload {dest srcfile args} {
@@ -433,6 +468,38 @@ proc remote_upload {dest srcfile args} {
 }
 
 proc standard_upload { dest srcfile destfile } {
+    set orig_srcfile $srcfile
+
+    if [board_info $dest exists nfsdir] {
+	set destdir [board_info $dest nfsdir]
+	if [board_info $dest exists nfsroot_server] {
+	    set dest [board_info $dest nfsroot_server];
+	} else {
+	    set dest "";
+	}
+	set srcfile "$destdir/$srcfile";
+    }
+
+    if { "$dest" != "" } {
+	return [rsh_upload $dest $srcfile $destfile];
+    }
+
+    set result [catch "exec cp -p $srcfile $destfile" output];
+    if [regexp "same file|are identical" $output] {
+	set result 0
+	set output ""
+    } else {
+	# try to make sure we can read it
+	# and write it (in case we copy onto it again)
+	catch {exec chmod u+rw $destfile}
+    }
+    if { $result != 0 || $output != "" } {
+	perror "remote_upload to $dest of $file to $destfile: $output"
+	return "";
+    } else {
+	return $destfile;
+    }
+
     return [rsh_upload $dest $srcfile $destfile];
 }
 

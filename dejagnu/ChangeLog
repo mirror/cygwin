@@ -1,3 +1,8 @@
+2003-03-06  Alexandre Oliva  <aoliva@redhat.com>
+
+	* lib/remote.exp (standard_download, standard_upload): Support
+	nfsdir and nfsroot_server.
+
 2002-10-21  Adam Nemet  <anemet@lnxw.com>
 
 	* libgloss.exp (get_multilibs): Don't use the first argument

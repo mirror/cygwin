@@ -246,7 +246,7 @@ subcommands. For more details on what these subcommands do see the manual
 page for the \fBfile\fR command.
 .TP
 \fBencoding\fR ?\fIsubCmd args...\fR?
-The \fBenconding\fR alias provides access to a safe subset of the
+The \fBencoding\fR alias provides access to a safe subset of the
 subcommands of the \fBencoding\fR command;  it disallows setting of
 the system encoding, but allows all other subcommands including
 \fBsystem\fR to check the current encoding.

@@ -99,6 +99,11 @@ typedef struct ThreadSpecificData {
 static Tcl_ThreadDataKey dataKey;
 
 /*
+ * Common string for the library path for sharing across threads.
+ */
+char *tclLibraryPathStr;
+
+/*
  * Prototypes for procedures referenced only in this file:
  */
 
@@ -106,8 +111,8 @@ static void		BgErrorDeleteProc _ANSI_ARGS_((ClientData clientData,
 			    Tcl_Interp *interp));
 static void		HandleBgErrors _ANSI_ARGS_((ClientData clientData));
 static char *		VwaitVarProc _ANSI_ARGS_((ClientData clientData,
-			    Tcl_Interp *interp, char *name1, char *name2,
-			    int flags));
+			    Tcl_Interp *interp, CONST char *name1, 
+			    CONST char *name2, int flags));
 
 /*
  *----------------------------------------------------------------------
@@ -135,7 +140,7 @@ Tcl_BackgroundError(interp)
 				 * occurred. */
 {
     BgError *errPtr;
-    char *errResult, *varValue;
+    CONST char *errResult, *varValue;
     ErrAssocData *assocPtr;
     int length;
 
@@ -217,7 +222,7 @@ HandleBgErrors(clientData)
     ClientData clientData;	/* Pointer to ErrAssocData structure. */
 {
     Tcl_Interp *interp;
-    char *argv[2];
+    CONST char *argv[2];
     int code;
     BgError *errPtr;
     ErrAssocData *assocPtr = (ErrAssocData *) clientData;
@@ -285,7 +290,7 @@ HandleBgErrors(clientData)
 		int len;
 
 		string = Tcl_GetStringFromObj(Tcl_GetObjResult(interp), &len);
-                if (strcmp(string, "\"bgerror\" is an invalid command name or ambiguous abbreviation") == 0) {
+		if (Tcl_FindCommand(interp, "bgerror", NULL, TCL_GLOBAL_ONLY) == NULL) {
                     Tcl_WriteChars(errChannel, assocPtr->firstBgPtr->errorInfo, -1);
                     Tcl_WriteChars(errChannel, "\n", -1);
                 } else {
@@ -596,6 +601,12 @@ TclSetLibraryPath(pathPtr)
 	Tcl_DecrRefCount(tsdPtr->tclLibraryPath);
     }
     tsdPtr->tclLibraryPath = pathPtr;
+
+    /*
+     *  No mutex locking is needed here as up the stack we're within
+     *  TclpInitLock().
+     */
+    tclLibraryPathStr = Tcl_GetStringFromObj(pathPtr, NULL);
 }
 
 /*
@@ -619,6 +630,17 @@ Tcl_Obj *
 TclGetLibraryPath()
 {
     ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
+
+    if (tsdPtr->tclLibraryPath == NULL) {
+	/*
+	 * Grab the shared string and place it into a new thread specific
+	 * Tcl_Obj.
+	 */
+	tsdPtr->tclLibraryPath = Tcl_NewStringObj(tclLibraryPathStr, -1);
+
+	/* take ownership */
+	Tcl_IncrRefCount(tsdPtr->tclLibraryPath);
+    }
     return tsdPtr->tclLibraryPath;
 }
 
@@ -744,9 +766,10 @@ Tcl_Finalize()
     ThreadSpecificData *tsdPtr;
 
     TclpInitLock();
-    tsdPtr = TCL_TSD_INIT(&dataKey);
     if (subsystemsInitialized != 0) {
 	subsystemsInitialized = 0;
+
+	tsdPtr = TCL_TSD_INIT(&dataKey);
 
 	/*
 	 * Invoke exit handlers first.
@@ -770,15 +793,6 @@ Tcl_Finalize()
 	}    
 	firstExitPtr = NULL;
 	Tcl_MutexUnlock(&exitMutex);
-
-	/*
-	 * Clean up the library path now, before we invalidate thread-local
-	 * storage.
-	 */
-	if (tsdPtr->tclLibraryPath != NULL) {
-	    Tcl_DecrRefCount(tsdPtr->tclLibraryPath);
-	    tsdPtr->tclLibraryPath = NULL;
-	}
 
 	/*
 	 * Clean up after the current thread now, after exit handlers.
@@ -822,13 +836,12 @@ Tcl_Finalize()
 
 	TclFinalizeSynchronization();
 
-	/*
-	 * We defer unloading of packages until very late 
-	 * to avoid memory access issues.  Both exit callbacks and
-	 * synchronization variables may be stored in packages.
+	/**
+	 * Finalizing the filesystem must come after anything which
+	 * might conceivably interact with the 'Tcl_FS' API.  This
+	 * will also unload any extensions which have been loaded.
 	 */
-
-	TclFinalizeLoad();
+	TclFinalizeFilesystem();
 
 	/*
 	 * There shouldn't be any malloc'ed memory after this.
@@ -870,6 +883,17 @@ Tcl_FinalizeThread()
 	 */
 
 	tsdPtr->inExit = 1;
+
+	/*
+	 * Clean up the library path now, before we invalidate thread-local
+	 * storage or calling thread exit handlers.
+	 */
+
+	if (tsdPtr->tclLibraryPath != NULL) {
+	    Tcl_DecrRefCount(tsdPtr->tclLibraryPath);
+	    tsdPtr->tclLibraryPath = NULL;
+	}
+
 	for (exitPtr = tsdPtr->firstExitPtr; exitPtr != NULL;
 		exitPtr = tsdPtr->firstExitPtr) {
 	    /*
@@ -884,6 +908,7 @@ Tcl_FinalizeThread()
 	}
 	TclFinalizeIOSubsystem();
 	TclFinalizeNotifier();
+	TclFinalizeAsync();
 
 	/*
 	 * Blow away all thread local storage blocks.
@@ -912,8 +937,13 @@ Tcl_FinalizeThread()
 int
 TclInExit()
 {
-    ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
-    return tsdPtr->inExit;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *)
+	    TclThreadDataKeyGet(&dataKey);
+    if (tsdPtr == NULL) {
+	return inFinalize;
+    } else {
+	return tsdPtr->inExit;
+    }
 }
 
 /*
@@ -982,8 +1012,8 @@ static char *
 VwaitVarProc(clientData, interp, name1, name2, flags)
     ClientData clientData;	/* Pointer to integer to set to 1. */
     Tcl_Interp *interp;		/* Interpreter containing variable. */
-    char *name1;		/* Name of variable. */
-    char *name2;		/* Second part of variable name. */
+    CONST char *name1;		/* Name of variable. */
+    CONST char *name2;		/* Second part of variable name. */
     int flags;			/* Information about what happened. */
 {
     int *donePtr = (int *) clientData;
@@ -1019,7 +1049,7 @@ Tcl_UpdateObjCmd(clientData, interp, objc, objv)
 {
     int optionIndex;
     int flags = 0;		/* Initialized to avoid compiler warning. */
-    static char *updateOptions[] = {"idletasks", (char *) NULL};
+    static CONST char *updateOptions[] = {"idletasks", (char *) NULL};
     enum updateOptions {REGEXP_IDLETASKS};
 
     if (objc == 1) {
@@ -1055,4 +1085,3 @@ Tcl_UpdateObjCmd(clientData, interp, objc, objv)
     Tcl_ResetResult(interp);
     return TCL_OK;
 }
-

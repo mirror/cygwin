@@ -17,7 +17,7 @@ if {[lsearch [namespace children] ::tcltest] == -1} {
     namespace import -force ::tcltest::*
 }
 
-test binary-2.1 {DupByteArrayInternalRep} {
+test binary-0.1 {DupByteArrayInternalRep} {
     set hdr [binary format cc 0 0316]
     set buf hellomatt
     
@@ -40,7 +40,6 @@ test binary-1.3 {Tcl_BinaryObjCmd: format error} {
 test binary-1.4 {Tcl_BinaryObjCmd: format} {
     binary format ""
 } {}
-
 
 
 test binary-2.1 {Tcl_BinaryObjCmd: format} {
@@ -607,7 +606,7 @@ test binary-20.4 {Tcl_BinaryObjCmd: scan} {
 } {1 abc}
 test binary-20.5 {Tcl_BinaryObjCmd: scan} {
     catch {unset arg1}
-    list [binary scan abc a5 arg1] [info exist arg1]
+    list [binary scan abc a5 arg1] [info exists arg1]
 } {0 0}
 test binary-20.6 {Tcl_BinaryObjCmd: scan} {
     set arg1 foo
@@ -646,7 +645,7 @@ test binary-21.4 {Tcl_BinaryObjCmd: scan} {
 } {1 abc}
 test binary-21.5 {Tcl_BinaryObjCmd: scan} {
     catch {unset arg1}
-    list [binary scan abc A5 arg1] [info exist arg1]
+    list [binary scan abc A5 arg1] [info exists arg1]
 } {0 0}
 test binary-21.6 {Tcl_BinaryObjCmd: scan} {
     set arg1 foo
@@ -1461,19 +1460,32 @@ test binary-42.1 {Tcl_BinaryObjCmd: bad arguments} {} {
     set result
 } {bad option "": must be format or scan}
 
+# Wide int (guaranteed at least 64-bit) handling
+test binary-43.1 {Tcl_BinaryObjCmd: format wide int} {} {
+    binary format w 7810179016327718216
+} HelloTcl
+test binary-43.2 {Tcl_BinaryObjCmd: format wide int} {} {
+    binary format W 7810179016327718216
+} lcTolleH
+
+test binary-44.1 {Tcl_BinaryObjCmd: scan wide int} {} {
+    binary scan HelloTcl W x
+    set x
+} 5216694956358656876
+test binary-44.2 {Tcl_BinaryObjCmd: scan wide int} {} {
+    binary scan lcTolleH w x
+    set x
+} 5216694956358656876
+
+test binary-45.1 {Tcl_BinaryObjCmd: combined wide int handling} {
+    binary scan [binary format sws 16450 -1 19521] c* x
+    set x
+} {66 64 -1 -1 -1 -1 -1 -1 -1 -1 65 76}
+test binary-45.2 {Tcl_BinaryObjCmd: combined wide int handling} {
+    binary scan [binary format sWs 16450 0x7fffffff 19521] c* x
+    set x
+} {66 64 0 0 0 0 127 -1 -1 -1 65 76}
+
 # cleanup
 ::tcltest::cleanupTests
 return
-
-
-
-
-
-
-
-
-
-
-
-
-

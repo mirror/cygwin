@@ -40,6 +40,8 @@ typedef struct FileInfo {
     int flags;			/* State flags, see above for a list. */
     HANDLE handle;		/* Input/output file. */
     struct FileInfo *nextPtr;	/* Pointer to next registered file. */
+    int dirty;                  /* Boolean flag. Set if the OS may have data
+				 * pending on the channel */
 } FileInfo;
 
 typedef struct ThreadSpecificData {
@@ -86,9 +88,11 @@ static ThreadSpecificData *FileInit _ANSI_ARGS_((void));
 static int		FileInputProc _ANSI_ARGS_((ClientData instanceData,
 	            	    char *buf, int toRead, int *errorCode));
 static int		FileOutputProc _ANSI_ARGS_((ClientData instanceData,
-			    char *buf, int toWrite, int *errorCode));
+			    CONST char *buf, int toWrite, int *errorCode));
 static int		FileSeekProc _ANSI_ARGS_((ClientData instanceData,
 			    long offset, int mode, int *errorCode));
+static Tcl_WideInt	FileWideSeekProc _ANSI_ARGS_((ClientData instanceData,
+			    Tcl_WideInt offset, int mode, int *errorCode));
 static void		FileSetupProc _ANSI_ARGS_((ClientData clientData,
 			    int flags));
 static void		FileWatchProc _ANSI_ARGS_((ClientData instanceData,
@@ -101,7 +105,7 @@ static void		FileWatchProc _ANSI_ARGS_((ClientData instanceData,
 
 static Tcl_ChannelType fileChannelType = {
     "file",			/* Type name. */
-    TCL_CHANNEL_VERSION_2,	/* v2 channel */
+    TCL_CHANNEL_VERSION_3,	/* v3 channel */
     FileCloseProc,		/* Close proc. */
     FileInputProc,		/* Input proc. */
     FileOutputProc,		/* Output proc. */
@@ -114,7 +118,13 @@ static Tcl_ChannelType fileChannelType = {
     FileBlockProc,		/* Set blocking or non-blocking mode.*/
     NULL,			/* flush proc. */
     NULL,			/* handler proc. */
+    FileWideSeekProc,		/* Wide seek proc. */
 };
+
+#ifdef HAVE_NO_SEH
+static void *ESP;
+static void *EBP;
+#endif /* HAVE_NO_SEH */
 
 
 /*
@@ -431,15 +441,15 @@ FileCloseProc(instanceData, interp)
 
 static int
 FileSeekProc(instanceData, offset, mode, errorCodePtr)
-    ClientData instanceData;			/* File state. */
-    long offset;				/* Offset to seek to. */
-    int mode;					/* Relative to where
-                                                 * should we seek? */
-    int *errorCodePtr;				/* To store error code. */
+    ClientData instanceData;	/* File state. */
+    long offset;		/* Offset to seek to. */
+    int mode;			/* Relative to where should we seek? */
+    int *errorCodePtr;		/* To store error code. */
 {
     FileInfo *infoPtr = (FileInfo *) instanceData;
     DWORD moveMethod;
-    DWORD newPos;
+    DWORD newPos, newPosHigh;
+    DWORD oldPos, oldPosHigh;
 
     *errorCodePtr = 0;
     if (mode == SEEK_SET) {
@@ -450,13 +460,94 @@ FileSeekProc(instanceData, offset, mode, errorCodePtr)
         moveMethod = FILE_END;
     }
 
-    newPos = SetFilePointer(infoPtr->handle, offset, NULL, moveMethod);
-    if (newPos == 0xFFFFFFFF) {
-        TclWinConvertError(GetLastError());
-        *errorCodePtr = errno;
+    /*
+     * Save our current place in case we need to roll-back the seek.
+     */
+    oldPosHigh = (DWORD)0;
+    oldPos = SetFilePointer(infoPtr->handle, (LONG)0, &oldPosHigh,
+	    FILE_CURRENT);
+    if (oldPos == INVALID_SET_FILE_POINTER) {
+	int winError = GetLastError();
+	if (winError != NO_ERROR) {
+	    TclWinConvertError(winError);
+	    *errorCodePtr = errno;
+	    return -1;
+	}
+    }
+
+    newPosHigh = (DWORD)(offset < 0 ? -1 : 0);
+    newPos = SetFilePointer(infoPtr->handle, (LONG) offset, &newPosHigh,
+			    moveMethod);
+    if (newPos == INVALID_SET_FILE_POINTER) {
+	int winError = GetLastError();
+	if (winError != NO_ERROR) {
+	    TclWinConvertError(winError);
+	    *errorCodePtr = errno;
+	    return -1;
+	}
+    }
+
+    /*
+     * Check for expressability in our return type, and roll-back otherwise.
+     */
+    if (newPosHigh != 0) {
+	*errorCodePtr = EOVERFLOW;
+	SetFilePointer(infoPtr->handle, (LONG)oldPos, &oldPosHigh, FILE_BEGIN);
 	return -1;
     }
-    return newPos;
+    return (int) newPos;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * FileWideSeekProc --
+ *
+ *	Seeks on a file-based channel. Returns the new position.
+ *
+ * Results:
+ *	-1 if failed, the new position if successful. If failed, it
+ *	also sets *errorCodePtr to the error code.
+ *
+ * Side effects:
+ *	Moves the location at which the channel will be accessed in
+ *	future operations.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static Tcl_WideInt
+FileWideSeekProc(instanceData, offset, mode, errorCodePtr)
+    ClientData instanceData;	/* File state. */
+    Tcl_WideInt offset;		/* Offset to seek to. */
+    int mode;			/* Relative to where should we seek? */
+    int *errorCodePtr;		/* To store error code. */
+{
+    FileInfo *infoPtr = (FileInfo *) instanceData;
+    DWORD moveMethod;
+    DWORD newPos, newPosHigh;
+
+    *errorCodePtr = 0;
+    if (mode == SEEK_SET) {
+        moveMethod = FILE_BEGIN;
+    } else if (mode == SEEK_CUR) {
+        moveMethod = FILE_CURRENT;
+    } else {
+        moveMethod = FILE_END;
+    }
+
+    newPosHigh = (DWORD)(offset >> 32);
+    newPos = SetFilePointer(infoPtr->handle, (LONG) offset, &newPosHigh,
+			    moveMethod);
+    if (newPos == INVALID_SET_FILE_POINTER) {
+	int winError = GetLastError();
+	if (winError != NO_ERROR) {
+	    TclWinConvertError(winError);
+	    *errorCodePtr = errno;
+	    return -1;
+	}
+    }
+    return ((Tcl_WideInt) newPos) | (((Tcl_WideInt) newPosHigh) << 32);
 }
 
 /*
@@ -533,7 +624,7 @@ FileInputProc(instanceData, buf, bufSize, errorCode)
 static int
 FileOutputProc(instanceData, buf, toWrite, errorCode)
     ClientData instanceData;		/* File state. */
-    char *buf;				/* The data buffer. */
+    CONST char *buf;			/* The data buffer. */
     int toWrite;			/* How many bytes to write? */
     int *errorCode;			/* Where to store error code. */
 {
@@ -557,7 +648,7 @@ FileOutputProc(instanceData, buf, toWrite, errorCode)
         *errorCode = errno;
         return -1;
     }
-    FlushFileBuffers(infoPtr->handle);
+    infoPtr->dirty = 1;
     return bytesWritten;
 }
 
@@ -653,50 +744,30 @@ FileGetHandleProc(instanceData, direction, handlePtr)
  */
 
 Tcl_Channel
-TclpOpenFileChannel(interp, fileName, modeString, permissions)
+TclpOpenFileChannel(interp, pathPtr, mode, permissions)
     Tcl_Interp *interp;			/* Interpreter for error reporting;
                                          * can be NULL. */
-    char *fileName;			/* Name of file to open. */
-    char *modeString;			/* A list of POSIX open modes or
-                                         * a string such as "rw". */
+    Tcl_Obj *pathPtr;			/* Name of file to open. */
+    int mode;				/* POSIX mode. */
     int permissions;			/* If the open involves creating a
                                          * file, with what modes to create
                                          * it? */
 {
     Tcl_Channel channel = 0;
-    int seekFlag, mode, channelPermissions;
+    int channelPermissions;
     DWORD accessMode, createMode, shareMode, flags, consoleParams, type;
-    TCHAR *nativeName;
-    Tcl_DString ds, buffer;
+    CONST TCHAR *nativeName;
     DCB dcb;
     HANDLE handle;
     char channelName[16 + TCL_INTEGER_SPACE];
     TclFile readFile = NULL;
     TclFile writeFile = NULL;
-#ifdef __CYGWIN__
-    char winbuf[MAX_PATH];
-#endif
 
-    mode = TclGetOpenMode(interp, modeString, &seekFlag);
-    if (mode == -1) {
-        return NULL;
-    }
-
-    if (Tcl_TranslateFileName(interp, fileName, &ds) == NULL) {
+    nativeName = (TCHAR*) Tcl_FSGetNativePath(pathPtr);
+    if (nativeName == NULL) {
 	return NULL;
     }
-    nativeName = Tcl_WinUtfToTChar(Tcl_DStringValue(&ds), 
-	    Tcl_DStringLength(&ds), &buffer);
-
-#ifdef __CYGWIN__
-    /* In the Cygwin world, call conv_to_win32_path in order to use
-       the mount table to translate the file name into something
-       Windows will understand.  */
-    cygwin_conv_to_win32_path(nativeName, winbuf);
-    Tcl_DStringFree(&buffer);
-    Tcl_DStringAppend(&buffer, winbuf, -1);
-#endif
-
+    
     switch (mode & (O_RDONLY | O_WRONLY | O_RDWR)) {
 	case O_RDONLY:
 	    accessMode = GENERIC_READ;
@@ -778,10 +849,10 @@ TclpOpenFileChannel(interp, fileName, modeString, permissions)
 	}
         TclWinConvertError(err);
 	if (interp != (Tcl_Interp *) NULL) {
-            Tcl_AppendResult(interp, "couldn't open \"", fileName, "\": ",
+            Tcl_AppendResult(interp, "couldn't open \"", 
+			     Tcl_GetString(pathPtr), "\": ",
 			     Tcl_PosixError(interp), (char *) NULL);
         }
-        Tcl_DStringFree(&buffer);
         return NULL;
     }
     
@@ -809,6 +880,20 @@ TclpOpenFileChannel(interp, fileName, modeString, permissions)
 
     switch (type) {
     case FILE_TYPE_SERIAL:
+	/*
+	 * Reopen channel for OVERLAPPED operation
+	 * Normally this shouldn't fail, because the channel exists
+	 */
+	handle = TclWinSerialReopen(handle, nativeName, accessMode);
+	if (handle == INVALID_HANDLE_VALUE) {
+	    TclWinConvertError(GetLastError());
+	    if (interp != (Tcl_Interp *) NULL) {
+		Tcl_AppendResult(interp, "couldn't reopen serial \"",
+			Tcl_GetString(pathPtr), "\": ",
+			Tcl_PosixError(interp), (char *) NULL);
+	    }
+	    return NULL;
+	}
 	channel = TclWinOpenSerialChannel(handle, channelName,
 	        channelPermissions);
 	break;
@@ -840,28 +925,12 @@ TclpOpenFileChannel(interp, fileName, modeString, permissions)
 	 */
 	
 	channel = NULL;
-	Tcl_AppendResult(interp, "couldn't open \"", fileName, "\": ",
-		"bad file type", (char *) NULL);
+	Tcl_AppendResult(interp, "couldn't open \"", 
+			 Tcl_GetString(pathPtr), "\": ",
+			 "bad file type", (char *) NULL);
 	break;
     }
 
-    Tcl_DStringFree(&buffer);
-    Tcl_DStringFree(&ds);
-
-    if (channel != NULL) {
-	if (seekFlag) {
-	    if (Tcl_Seek(channel, 0, SEEK_END) < 0) {
-		if (interp != (Tcl_Interp *) NULL) {
-		    Tcl_AppendResult(interp,
-			    "could not seek to end of file on \"",
-			    channelName, "\": ", Tcl_PosixError(interp),
-			    (char *) NULL);
-		}
-		Tcl_Close(NULL, channel);
-		return NULL;
-	    }
-	}
-    }
     return channel;
 }
 
@@ -891,15 +960,20 @@ Tcl_MakeFileChannel(rawHandle, mode)
     char channelName[16 + TCL_INTEGER_SPACE];
     Tcl_Channel channel = NULL;
     HANDLE handle = (HANDLE) rawHandle;
+    HANDLE dupedHandle;
     DCB dcb;
-    DWORD consoleParams;
-    DWORD type;
+    DWORD consoleParams, type;
     TclFile readFile = NULL;
     TclFile writeFile = NULL;
+    BOOL result;
 
     if (mode == 0) {
 	return NULL;
     }
+
+    /*
+     * GetFileType() returns FILE_TYPE_UNKNOWN for invalid handles.
+     */
 
     type = GetFileType(handle);
 
@@ -942,23 +1016,109 @@ Tcl_MakeFileChannel(rawHandle, mode)
 
     case FILE_TYPE_DISK:
     case FILE_TYPE_CHAR:
-    case FILE_TYPE_UNKNOWN:
 	channel = TclWinOpenFileChannel(handle, channelName, mode, 0);
 	break;
 	
+    case FILE_TYPE_UNKNOWN:
     default:
 	/*
-	 * The handle is of an unknown type, probably /dev/nul equivalent
-	 * or possibly a closed handle.
+	 * The handle is of an unknown type.  Test the validity of this OS
+	 * handle by duplicating it, then closing the dupe.  The Win32 API
+	 * doesn't provide an IsValidHandle() function, so we have to emulate
+	 * it here.  This test will not work on a console handle reliably,
+	 * which is why we can't test every handle that comes into this
+	 * function in this way.
 	 */
-	
-	channel = NULL;
-	break;
 
+	result = DuplicateHandle(GetCurrentProcess(), handle,
+		GetCurrentProcess(), &dupedHandle, 0, FALSE,
+		DUPLICATE_SAME_ACCESS);
+
+	if (result != 0) {
+	    /* 
+	     * Unable to make a duplicate. It's definately invalid at this
+	     * point.
+	     */
+
+	    return NULL;
+	}
+
+	/*
+	 * Use structured exception handling (Win32 SEH) to protect the close
+	 * of this duped handle which might throw EXCEPTION_INVALID_HANDLE.
+	 */
+
+#ifdef HAVE_NO_SEH
+        __asm__ __volatile__ (
+                "movl  %esp, _ESP" "\n\t"
+                "movl  %ebp, _EBP");
+
+        __asm__ __volatile__ (
+                "pushl $__except_makefilechannel_handler" "\n\t"
+                "pushl %fs:0" "\n\t"
+                "mov   %esp, %fs:0");
+
+        result = 0;
+#else
+	__try {
+#endif /* HAVE_NO_SEH */
+	    CloseHandle(dupedHandle);
+#ifdef HAVE_NO_SEH
+        __asm__ __volatile__ (
+                "jmp   makefilechannel_pop" "\n"
+                "makefilechannel_reentry:" "\n\t"
+                "movl  _ESP, %esp" "\n\t"
+                "movl  _EBP, %ebp");
+
+        result = 1;  /* True when exception was raised */
+
+        __asm__ __volatile__ (
+                "makefilechannel_pop:" "\n\t"
+                "mov   (%esp), %eax" "\n\t"
+                "mov   %eax, %fs:0" "\n\t"
+                "add   $8, %esp");
+
+        if (result)
+            return NULL;
+#else
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+	    /*
+	     * Definately an invalid handle.  So, therefore, the original
+	     * is invalid also.
+	     */
+
+	    return NULL;
+	}
+#endif /* HAVE_NO_SEH */
+
+	/* Fall through, the handle is valid. */
+
+	/*
+	 * Create the undefined channel, anyways, because we know the handle
+	 * is valid to something.
+	 */
+
+	channel = TclWinOpenFileChannel(handle, channelName, mode, 0);
     }
 
     return channel;
 }
+#ifdef HAVE_NO_SEH
+static
+__attribute__ ((cdecl))
+EXCEPTION_DISPOSITION
+_except_makefilechannel_handler(
+    struct _EXCEPTION_RECORD *ExceptionRecord,
+    void *EstablisherFrame,
+    struct _CONTEXT *ContextRecord,
+    void *DispatcherContext)
+{
+    __asm__ __volatile__ (
+            "jmp makefilechannel_reentry");
+    return 0; /* Function does not return */
+}
+#endif
 
 /*
  *----------------------------------------------------------------------
@@ -986,6 +1146,7 @@ TclpGetDefaultStdChannel(type)
     int mode;
     char *bufMode;
     DWORD handleId;		/* Standard handle to retrieve. */
+
 
     switch (type) {
 	case TCL_STDIN:
@@ -1015,15 +1176,15 @@ TclpGetDefaultStdChannel(type)
      * is not a console mode application, even though this is not a valid
      * handle.
      */
-    
+
     if ((handle == INVALID_HANDLE_VALUE) || (handle == 0)) {
-	return NULL;
+	return (Tcl_Channel) NULL;
     }
-    
+
     channel = Tcl_MakeFileChannel(handle, mode);
 
     if (channel == NULL) {
-	return NULL;
+	return (Tcl_Channel) NULL;
     }
 
     /*
@@ -1093,7 +1254,7 @@ TclWinOpenFileChannel(handle, channelName, permissions, appendMode)
     infoPtr->watchMask = 0;
     infoPtr->flags = appendMode;
     infoPtr->handle = handle;
-	
+    infoPtr->dirty = 0;
     wsprintfA(channelName, "file%lx", (int) infoPtr);
     
     infoPtr->channel = Tcl_CreateChannel(&fileChannelType, channelName,
@@ -1111,3 +1272,45 @@ TclWinOpenFileChannel(handle, channelName, permissions, appendMode)
 }
 
 
+/*
+ *----------------------------------------------------------------------
+ *
+ * TclWinFlushDirtyChannels --
+ *
+ *	Flush all dirty channels to disk, so that requesting the
+ *	size of any file returns the correct value.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Information is actually written to disk now, rather than
+ *	later.  Don't call this too often, or there will be a 
+ *	performance hit (i.e. only call when we need to ask for
+ *	the size of a file).
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TclWinFlushDirtyChannels ()
+{
+    FileInfo *infoPtr;
+    ThreadSpecificData *tsdPtr;
+
+    tsdPtr = FileInit();
+
+    /*
+     * Flush all channels which are dirty, i.e. may have data pending
+     * in the OS
+     */
+    
+    for (infoPtr = tsdPtr->firstFilePtr;
+	 infoPtr != NULL; 
+	 infoPtr = infoPtr->nextPtr) {
+	if (infoPtr->dirty) {
+	    FlushFileBuffers(infoPtr->handle);
+	    infoPtr->dirty = 0;
+	}
+    }
+}

@@ -21,9 +21,16 @@ puts \- Write to a channel
 .PP
 Writes the characters given by \fIstring\fR to the channel given
 by \fIchannelId\fR.
-\fIChannelId\fR must be a channel identifier such as returned from a
-previous invocation of \fBopen\fR or \fBsocket\fR. It must have been opened
-for output. If no \fIchannelId\fR is specified then it defaults to
+.PP
+.VS
+\fIChannelId\fR must be an identifier for an open channel such as a
+Tcl standard channel (\fBstdout\fR or \fBstderr\fR), the return
+value from an invocation of \fBopen\fR or \fBsocket\fR, or the result
+of a channel creation command provided by a Tcl extension. The channel
+must have been opened for output.
+.VE
+.PP
+If no \fIchannelId\fR is specified then it defaults to
 \fBstdout\fR. \fBPuts\fR normally outputs a newline character after
 \fIstring\fR, but this feature may be suppressed by specifying the
 \fB\-nonewline\fR switch.
@@ -63,7 +70,7 @@ be used in an event-driven fashion with the \fBfileevent\fR command
 via a file event that the channel is ready for more output data).
 
 .SH "SEE ALSO"
-fileevent(n)
+file(n), fileevent(n), Tcl_StandardChannels(3)
 
 .SH KEYWORDS
 channel, newline, output, write

@@ -41,7 +41,7 @@ char *
 TCHAR *
 \fBTcl_WinUtfToTChar\fR(\fIsrc, srcLen, dstPtr\fR)
 .sp
-char *
+CONST char *
 \fBTcl_GetEncodingName\fR(\fIencoding\fR)
 .sp
 int
@@ -53,7 +53,7 @@ void
 Tcl_Encoding
 \fBTcl_CreateEncoding\fR(\fItypePtr\fR)
 .sp
-char *
+CONST char *
 \fBTcl_GetDefaultEncodingDir\fR(\fIvoid\fR)
 .sp
 void
@@ -124,7 +124,7 @@ Filled with the number of characters that correspond to the number of bytes
 stored in the output buffer.  May be NULL.
 .AP Tcl_EncodingType *typePtr in
 Structure that defines a new type of encoding.  
-.AP char *path in
+.AP "CONST char" *path in
 A path to the location of the encoding file.  
 .BE
 .SH INTRODUCTION
@@ -244,7 +244,7 @@ encoding of NULL (the current system encoding).  On the other hand,
 if you planned to use the Unicode interface when running on Windows NT
 and the "char" interfaces when running on Windows 95, you would have
 to perform the following type of test over and over in your program
-(as represented in psuedo-code):
+(as represented in pseudo-code):
 .CS
 if (running NT) {
     encoding <- Tcl_GetEncoding("unicode");

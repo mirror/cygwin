@@ -75,6 +75,7 @@ test rename-3.5 {error conditions} {
 
 catch {rename unknown {}}
 catch {rename unknown.old unknown}
+catch {rename bar {}}
 
 if {[info command testdel] == "testdel"} {
     test rename-4.1 {reentrancy issues with command deletion and renaming} {
@@ -168,7 +169,7 @@ test rename-6.1 {old code invalidated (epoch incremented) when cmd with compile 
     proc incr {} {puts "new incr called!"}
     catch {x} msg
     set msg
-} {called "incr" with too many arguments}
+} {wrong # args: should be "incr"}
 
 if {[info commands incr.old] != {}} {
     catch {rename incr {}}
@@ -176,4 +177,3 @@ if {[info commands incr.old] != {}} {
 }
 ::tcltest::cleanupTests
 return
-

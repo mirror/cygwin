@@ -33,10 +33,35 @@ test winTime-1.2 {TclpGetDate} {pcOnly} {
     set result
 } {1969}
 
+# Next test tries to make sure that the Tcl clock stays in step
+# with the Windows clock.  3000 iterations really isn't enough,
+# but how many does a tester have patience for?
+
+test winTime-2.1 {Synchronization of Tcl and Windows clocks} {pcOnly} {
+    set failed 0
+    foreach { sys_sec sys_usec tcl_sec tcl_usec } [testwinclock] {}
+    set olddiff [expr { abs ( $tcl_sec - $sys_sec
+			   + 1.0e-6 * ( $tcl_usec - $sys_usec ) ) }]
+    set ok 1
+    for { set i 0 } { $i < 3000 } { incr i } {
+	foreach { sys_sec sys_usec tcl_sec tcl_usec } [testwinclock] {}
+	set diff [expr { abs ( $tcl_sec - $sys_sec
+			       + 1.0e-6 * ( $tcl_usec - $sys_usec ) ) }]
+	if { ( $diff > $olddiff + 1000 )
+	     || ( $diff > 11000 ) } {
+	    set failed 1
+	    break
+	} else {
+	    set olddiff $diff
+	    after 1
+	}
+    }
+    set failed
+} {0}
+
 # cleanup
 ::tcltest::cleanupTests
 return
-
 
 
 

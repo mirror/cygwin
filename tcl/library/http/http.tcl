@@ -171,7 +171,7 @@ proc http::Finish { token {errormsg ""} {skipCB 0}} {
 		set state(status) error
 	    }
 	}
-	if {[info exist state(-command)]} {
+	if {[info exists state(-command)]} {
 	    # Command callback may already have unset our state
 	    unset state(-command)
 	}
@@ -556,7 +556,7 @@ proc http::error {token} {
 proc http::cleanup {token} {
     variable $token
     upvar 0 $token state
-    if {[info exist state]} {
+    if {[info exists state]} {
 	unset state
     }
 }

@@ -62,7 +62,7 @@ TCL_DECLARE_MUTEX(hostMutex)
  *----------------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tcl_GetHostName()
 {
 #ifndef NO_UNAME
@@ -84,6 +84,21 @@ Tcl_GetHostName()
     (VOID *) memset((VOID *) &u, (int) 0, sizeof(struct utsname));
     if (uname(&u) > -1) {				/* INTL: Native. */
         hp = gethostbyname(u.nodename);			/* INTL: Native. */
+	if (hp == NULL) {
+	    /*
+	     * Sometimes the nodename is fully qualified, but gets truncated
+	     * as it exceeds SYS_NMLN.  See if we can just get the immediate
+	     * nodename and get a proper answer that way.
+	     */
+	    char *dot = strchr(u.nodename, '.');
+	    if (dot != NULL) {
+		char *node = ckalloc((unsigned) (dot - u.nodename + 1));
+		memcpy(node, u.nodename, (size_t) (dot - u.nodename));
+		node[dot - u.nodename] = '\0';
+		hp = gethostbyname(node);
+		ckfree(node);
+	    }
+	}
         if (hp != NULL) {
 	    native = hp->h_name;
         } else {
@@ -133,4 +148,3 @@ TclpHasSockets(interp)
 {
     return TCL_OK;
 }
-

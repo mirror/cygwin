@@ -31,12 +31,12 @@ Tcl interpreter to use for error reporting.  If non-NULL and an
 error occurs, an error message is left in the interpreter's result.
 .AP int port in
 A port number to connect to as a client or to listen on as a server.
-.AP char *host in
+.AP "CONST char" *host in
 A string specifying a host name or address for the remote end of the connection.
 .AP int myport in
 A port number for the client's end of the socket.  If 0, a port number
 is allocated at random.
-.AP char *myaddr in
+.AP "CONST char" *myaddr in
 A string specifying the host name or address for network interface to use
 for the local end of the connection.  If NULL, a default interface is
 chosen.
@@ -177,4 +177,3 @@ Tcl_OpenFileChannel(3), Tcl_RegisterChannel(3), vwait(n)
 
 .SH KEYWORDS
 client, server, TCP
-

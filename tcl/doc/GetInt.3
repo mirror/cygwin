@@ -28,7 +28,7 @@ int
 .AS Tcl_Interp *doublePtr
 .AP Tcl_Interp *interp in
 Interpreter to use for error reporting.
-.AP char *string in
+.AP "CONST char" *string in
 Textual value to be converted.
 .AP int *intPtr out
 Points to place to store integer value converted from \fIstring\fR.
@@ -79,4 +79,3 @@ are also acceptable.
 
 .SH KEYWORDS
 boolean, conversion, double, floating-point, integer
-

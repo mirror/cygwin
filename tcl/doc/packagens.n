@@ -46,8 +46,10 @@ specifies a Tcl library that must be loaded with the
 \fBsource\fR command.  Any number of \fB\-source\fR parameters may be
 specified.
 .PP
-At least one \fB\-load\fR or \fB\-source\fR paramter must be given.
+At least one \fB\-load\fR or \fB\-source\fR parameter must be given.
+
+.SH "SEE ALSO"
+package(n)
 
 .SH KEYWORDS
 auto-load, index, package, version
-

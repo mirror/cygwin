@@ -63,15 +63,19 @@ match \fIpattern\fR (using the matching rules of
 If \fIarrayName\fR isn't the name of an array variable, or if
 the array contains no elements, then an empty list is returned.
 .TP
-\fBarray names \fIarrayName\fR ?\fIpattern\fR?
+\fBarray names \fIarrayName\fR ?\fImode\fR? ?\fIpattern\fR?
 Returns a list containing the names of all of the elements in
-the array that match \fIpattern\fR (using the matching
-rules of \fBstring match\fR).
+the array that match \fIpattern\fR.  \fIMode\fR may be one of
+\fB-exact\fR, \fB-glob\fR, or \fB-regexp\fR.  If specified, \fImode\fR
+designates which matching rules to use to match \fIpattern\fR against
+the names of the elements in the array.  If not specified, \fImode\fR
+defaults to \fB-glob\fR.  See the documentation for \fBstring match\fR
+for information on glob style matching, and the documentation for
+\fBregexp\fR for information on regexp matching.
 If \fIpattern\fR is omitted then the command returns all of
-the element names in the array.
-If there are no (matching) elements in the array, or if \fIarrayName\fR
-isn't the name of an array variable, then an empty string is
-returned.
+the element names in the array.  If there are no (matching) elements
+in the array, or if \fIarrayName\fR isn't the name of an array
+variable, then an empty string is returned.
 .TP
 \fBarray nextelement \fIarrayName searchId\fR
 Returns the name of the next element in \fIarrayName\fR, or
@@ -111,15 +115,27 @@ The return value is a
 search identifier that must be used in \fBarray nextelement\fR
 and \fBarray donesearch\fR commands; it allows multiple
 searches to be underway simultaneously for the same array.
+.VS 8.4
+.TP
+\fBarray statistics \fIarrayName\fR
+Returns statistics about the distribution of data within the hashtable
+that represents the array.  This information includes the number of
+entries in the table, the number of buckets, and the utilization of
+the buckets.
+.VE 8.4
 .VS 8.3
 .TP
 \fBarray unset \fIarrayName\fR ?\fIpattern\fR?
 Unsets all of the elements in the array that match \fIpattern\fR (using the
 matching rules of \fBstring match\fR).  If \fIarrayName\fR isn't the name
-of an array variable or there are no matching elements in the array, then
-an empty string is returned.  If \fIpattern\fR is omitted and is it an
-array variable, then the command unsets the entire array.
+of an array variable or there are no matching elements in the array, no
+error will be raised.  If \fIpattern\fR is omitted and \fIarrayName\fR is
+an array variable, then the command unsets the entire array.
+The command always returns an empty string.
 .VE 8.3
+
+.SH "SEE ALSO"
+list(n), string(n), variable(n), trace(n)
 
 .SH KEYWORDS
 array, element names, search

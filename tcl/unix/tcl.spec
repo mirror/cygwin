@@ -1,7 +1,7 @@
 # $Id$
 # This file is the basis for a binary Tcl RPM for Linux.
 
-%define version 8.3.2
+%define version 8.4.1
 %define directory /usr/local
 
 Summary: Tcl scripting language development environment
@@ -10,9 +10,9 @@ Version: %{version}
 Release: 1
 Copyright: BSD
 Group: Development/Languages
-Source: ftp://ftp.scriptics.com/pub/tcl/tcl8_3/tcl%{version}.tar.gz
-URL: http://dev.scriptics.com/
-Packager: Scriptics Corporation
+Source: http://prdownloads.sourceforge.net/tcl/tcl%{version}-src.tar.gz
+URL: http://www.tcl.tk/
+Packager: Carina
 Buildroot: /var/tmp/%{name}%{version}
 
 %description

@@ -22,7 +22,9 @@ Tcl_Command
 .AS Tcl_CmdDeleteProc **deleteProcPtr
 .AP Tcl_Interp *interp in
 Interpreter in which to create new command.
-.AP char *cmdName in
+.VS 8.4
+.AP "CONST char" *cmdName in
+.VE
 Name of command.
 .AP Tcl_CmdProc *proc in
 Implementation of new command:  \fIproc\fR will be called whenever
@@ -82,7 +84,7 @@ typedef int Tcl_CmdProc(
 	ClientData \fIclientData\fR,
 	Tcl_Interp *\fIinterp\fR,
 	int \fIargc\fR,
-	char *\fIargv\fR[]);
+	CONST char *\fIargv\fR[]);
 .CE
 When \fIproc\fR is invoked the \fIclientData\fR and \fIinterp\fR
 parameters will be copies of the \fIclientData\fR and \fIinterp\fR

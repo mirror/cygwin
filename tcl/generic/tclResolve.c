@@ -63,7 +63,7 @@ Tcl_AddInterpResolvers(interp, name, cmdProc, varProc, compiledVarProc)
 
     Tcl_Interp *interp;			/* Interpreter whose name resolution
 					 * rules are being modified. */
-    char *name;				/* Name of this resolution scheme. */
+    CONST char *name;			/* Name of this resolution scheme. */
     Tcl_ResolveCmdProc *cmdProc;	/* New procedure for command
 					 * resolution */
     Tcl_ResolveVarProc *varProc;	/* Procedure for variable resolution
@@ -142,7 +142,7 @@ Tcl_GetInterpResolvers(interp, name, resInfoPtr)
 
     Tcl_Interp *interp;			/* Interpreter whose name resolution
 					 * rules are being queried. */
-    char *name;                         /* Look for a scheme with this name. */
+    CONST char *name;                   /* Look for a scheme with this name. */
     Tcl_ResolverInfo *resInfoPtr;	/* Returns pointers to the procedures,
 					 * if found */
 {
@@ -194,7 +194,7 @@ Tcl_RemoveInterpResolvers(interp, name)
 
     Tcl_Interp *interp;			/* Interpreter whose name resolution
 					 * rules are being modified. */
-    char *name;                         /* Name of the scheme to be removed. */
+    CONST char *name;                   /* Name of the scheme to be removed. */
 {
     Interp *iPtr = (Interp*)interp;
     ResolverScheme **prevPtrPtr, *resPtr;
@@ -291,7 +291,7 @@ BumpCmdRefEpochs(nsPtr)
  *	type:
  *
  *	  typedef int (Tcl_ResolveCmdProc) _ANSI_ARGS_((
- *		Tcl_Interp* interp, char* name, Tcl_Namespace *context,
+ *		Tcl_Interp* interp, CONST char* name, Tcl_Namespace *context,
  *              int flags, Tcl_Command *rPtr));
  *          
  *	Whenever a command is executed or Tcl_FindCommand is invoked
@@ -308,7 +308,7 @@ BumpCmdRefEpochs(nsPtr)
  *	time:
  *
  *        typedef int (Tcl_ResolveCompiledVarProc) _ANSI_ARGS_((
- *	        Tcl_Interp* interp, char* name, Tcl_Namespace *context,
+ *	        Tcl_Interp* interp, CONST char* name, Tcl_Namespace *context,
  *	        Tcl_ResolvedVarInfo *rPtr));
  *
  *      If this procedure is able to resolve the name, it should return
@@ -325,7 +325,7 @@ BumpCmdRefEpochs(nsPtr)
  *	Tcl_FindNamespaceVar.) This procedure has the following type:
  *
  *	  typedef int (Tcl_ResolveVarProc) _ANSI_ARGS_((
- *	        Tcl_Interp* interp, char* name, Tcl_Namespace *context,
+ *	        Tcl_Interp* interp, CONST char* name, Tcl_Namespace *context,
  *	        int flags, Tcl_Var *rPtr));
  *
  *	This procedure is quite similar to the compile-time version.

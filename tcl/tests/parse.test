@@ -732,11 +732,14 @@ test parse-16.1 {Tcl_EvalEx, check termOffset is set correctly for non TCL_OK ca
     subst {[eval {return foo}]bar}
 } foobar
 
+test parse-17.1 {Correct return codes from errors during substitution} {
+    catch {eval {w[continue]}}
+} 4
+
 # cleanup
 catch {unset a}
 ::tcltest::cleanupTests
 return
-
 
 
 

@@ -16,12 +16,12 @@ Tcl_Concat \- concatenate a collection of strings
 .nf
 \fB#include <tcl.h>\fR
 .sp
-char *
+CONST char *
 \fBTcl_Concat\fR(\fIargc, argv\fR)
 .SH ARGUMENTS
 .AP int argc in
 Number of strings.
-.AP char *argv[] in
+.AP "CONST char * CONST" argv[] in
 Array of strings to concatenate.  Must have \fIargc\fR entries.
 .BE
 

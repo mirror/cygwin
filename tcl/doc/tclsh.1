@@ -80,6 +80,14 @@ instead to start up \fBtclsh\fR to reprocess the entire script.
 When \fBtclsh\fR starts up, it treats all three lines as comments,
 since the backslash at the end of the second line causes the third
 line to be treated as part of the comment on the second line.
+.PP
+.VS
+You should note that it is also common practise to install tclsh with
+its version number as part of the name.  This has the advantage of
+allowing multiple versions of Tcl to exist on the same system at once,
+but also the disadvantage of making it harder to write scripts that
+start up uniformly across different versions of Tcl.
+.VE
 
 .SH "VARIABLES"
 .PP
@@ -114,6 +122,13 @@ The variable \fBtcl_prompt2\fR is used in a similar way when
 a newline is typed but the current command isn't yet complete;
 if \fBtcl_prompt2\fR isn't set then no prompt is output for
 incomplete commands.
+
+.SH "STANDARD CHANNELS"
+.PP
+See \fBTcl_StandardChannels\fR for more explanations.
+
+.SH "SEE ALSO"
+fconfigure(n), tclvars(n)
 
 .SH KEYWORDS
 argument, interpreter, prompt, script file, shell

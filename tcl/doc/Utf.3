@@ -10,7 +10,7 @@
 .TH Utf 3 "8.1" Tcl "Tcl Library Procedures"
 .BS
 .SH NAME
-Tcl_UniChar, Tcl_UniCharToUtf, Tcl_UtfToUniChar, Tcl_UniCharToUtfDString, Tcl_UtfToUniCharDString, Tcl_UniCharLen, Tcl_UniCharNcmp, Tcl_UtfCharComplete, Tcl_NumUtfChars, Tcl_UtfFindFirst, Tcl_UtfFindLast, Tcl_UtfNext, Tcl_UtfPrev, Tcl_UniCharAtIndex, Tcl_UtfAtIndex, Tcl_UtfBackslash \- routines for manipulating UTF-8 strings.
+Tcl_UniChar, Tcl_UniCharCaseMatch, Tcl_UniCharNcasecmp, Tcl_UniCharToUtf, Tcl_UtfToUniChar, Tcl_UniCharToUtfDString, Tcl_UtfToUniCharDString, Tcl_UniCharLen, Tcl_UniCharNcmp, Tcl_UtfCharComplete, Tcl_NumUtfChars, Tcl_UtfFindFirst, Tcl_UtfFindLast, Tcl_UtfNext, Tcl_UtfPrev, Tcl_UniCharAtIndex, Tcl_UtfAtIndex, Tcl_UtfBackslash \- routines for manipulating UTF-8 strings.
 .SH SYNOPSIS
 .nf
 \fB#include <tcl.h>\fR
@@ -22,18 +22,28 @@ int
 .sp
 int
 \fBTcl_UtfToUniChar\fR(\fIsrc, chPtr\fR)
+.VS 8.4
 .sp
 char *
 \fBTcl_UniCharToUtfDString\fR(\fIuniStr, numChars, dstPtr\fR)
 .sp
 Tcl_UniChar *
 \fBTcl_UtfToUniCharDString\fR(\fIsrc, len, dstPtr\fR)
+.VE 8.4
 .sp
 int
 \fBTcl_UniCharLen\fR(\fIuniStr\fR)
 .sp
 int
 \fBTcl_UniCharNcmp\fR(\fIuniStr, uniStr, num\fR)
+.VS 8.4
+.sp
+int
+\fBTcl_UniCharNcasecmp\fR(\fIuniStr, uniStr, num\fR)
+.sp
+int
+\fBTcl_UniCharCaseMatch\fR(\fIuniStr, uniPattern, nocase\fR)
+.VE 8.4
 .sp
 int
 \fBTcl_UtfNcmp\fR(\fIsrc, src, num\fR)
@@ -46,24 +56,28 @@ int
 .sp
 int 
 \fBTcl_NumUtfChars\fR(\fIsrc, len\fR)
+.VS 8.4
 .sp
-char *
+CONST char *
 \fBTcl_UtfFindFirst\fR(\fIsrc, ch\fR)
 .sp
-char *
+CONST char *
 \fBTcl_UtfFindLast\fR(\fIsrc, ch\fR)
 .sp
-char *
+CONST char *
 \fBTcl_UtfNext\fR(\fIsrc\fR)
 .sp
-char *
+CONST char *
 \fBTcl_UtfPrev\fR(\fIsrc, start\fR)
+.VE 8.4
 .sp
 Tcl_UniChar
 \fBTcl_UniCharAtIndex\fR(\fIsrc, index\fR)
+.VS 8.4
 .sp
-char *
+CONST char *
 \fBTcl_UtfAtIndex\fR(\fIsrc, index\fR)
+.VE 8.4
 .sp
 int
 \fBTcl_UtfBackslash\fR(\fIsrc, readPtr, dst\fR)
@@ -79,6 +93,8 @@ Filled with the Tcl_UniChar represented by the head of the UTF-8 string.
 .AP "CONST char" *src in
 Pointer to a UTF-8 string.
 .AP "CONST Tcl_UniChar" *uniStr in
+A NULL-terminated Unicode string.
+.AP "CONST Tcl_UniChar" *uniPattern in
 A NULL-terminated Unicode string.
 .AP int len in
 The length of the UTF-8 string in bytes (not UTF-8 characters).  If
@@ -100,6 +116,11 @@ including the backslash character.
 .AP char *dst out
 Buffer in which the bytes represented by the backslash sequence are stored.
 At most TCL_UTF_MAX bytes are stored in the buffer.
+.VS 8.4
+.AP int nocase in
+Specifies whether the match should be done case-sensitive (0) or
+case-insensitive (1).
+.VE 8.4
 .BE
 
 .SH DESCRIPTION
@@ -134,8 +155,8 @@ The return value is a pointer to the UTF-8 representation of the
 Unicode string.  Storage for the return value is appended to the
 end of the \fBTcl_DString\fR.
 .PP
-\fBTcl_UtfToUniCharDString\fR coverts the given UTF-8 string to Unicode,
-storing the result in the previously-initialized \fBTcl_Dstring\fR.
+\fBTcl_UtfToUniCharDString\fR converts the given UTF-8 string to Unicode,
+storing the result in the previously-initialized \fBTcl_DString\fR.
 you may either specify the length of the given UTF-8 string or "-1",
 in which case \fBTcl_UtfToUniCharDString\fR uses \fBstrlen\fR to
 calculate the length.  The return value is a pointer to the Unicode
@@ -147,15 +168,22 @@ is terminated with a Unicode NULL character.
 characters.  It accepts a NULL-terminated Unicode string and returns
 the number of Unicode characters (not bytes) in that string.
 .PP
-\fBTcl_UniCharNcmp\fR corresponds to \fBstrncmp\fR for Unicode
-characters.  It accepts two NULL-terminated Unicode strings
-and the number of characters to compare.  (Both strings are
-assumed to be at least \fIlen\fR characters long.)
-\fBTcl_UniCharNcmp\fR compares the two strings character-by-character
-according to the Unicode character ordering.  It returns an integer
-greater than, equal to,
-or less than 0 if the first string is greater than, equal to, or
-less than the second string respectively.
+\fBTcl_UniCharNcmp\fR and \fBTcl_UniCharNcasecmp\fR correspond to
+\fBstrncmp\fR and \fBstrncasecmp\fR, respectively, for Unicode characters.
+They accepts two NULL-terminated Unicode strings and the number of characters
+to compare.  Both strings are assumed to be at least \fIlen\fR characters
+long. \fBTcl_UniCharNcmp\fR  compares the two strings character-by-character
+according to the Unicode character ordering.  It returns an integer greater
+than, equal to, or less than 0 if the first string is greater than, equal
+to, or less than the second string respectively.  \fBTcl_UniCharNcasecmp\fR
+is the Unicode case insensitive version.
+.PP
+.VS 8.4
+\fBTcl_UniCharCaseMatch\fR is the Unicode equivalent to
+\fBTcl_StringCaseMatch\fR.  It accepts a NULL-terminated Unicode string,
+a Unicode pattern, and a boolean value specifying whether the match should
+be case sensitive and returns whether the string matches the pattern.
+.VE 8.4
 .PP
 \fBTcl_UtfNcmp\fR corresponds to \fBstrncmp\fR for UTF-8 strings. It
 accepts two NULL-terminated UTF-8 strings and the number of characters
@@ -184,12 +212,12 @@ returns the number of Tcl_UniChars that are represented by the UTF-8 string
 length is negative, all bytes up to the first NULL byte are used.
 .PP
 \fBTcl_UtfFindFirst\fR corresponds to \fBstrchr\fR for UTF-8 strings.  It
-returns a pointer to the first occurance of the Tcl_UniChar \fIch\fR
+returns a pointer to the first occurrence of the Tcl_UniChar \fIch\fR
 in the NULL-terminated UTF-8 string \fIsrc\fR.  The NULL terminator is
 considered part of the UTF-8 string.  
 .PP
 \fBTcl_UtfFindLast\fR corresponds to \fBstrrchr\fR for UTF-8 strings.  It
-returns a pointer to the last occurance of the Tcl_UniChar \fIch\fR
+returns a pointer to the last occurrence of the Tcl_UniChar \fIch\fR
 in the NULL terminated UTF-8 string \fIsrc\fR.  The NULL terminator is
 considered part of the UTF-8 string.  
 .PP
@@ -230,4 +258,3 @@ supported by \fBTcl_UtfBackslash\fR.
 
 .SH KEYWORDS
 utf, unicode, backslash
-

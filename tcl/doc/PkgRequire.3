@@ -15,16 +15,16 @@ Tcl_PkgRequire, Tcl_PkgRequireEx, Tcl_PkgPresent, Tcl_PkgPresentEx, Tcl_PkgProvi
 .nf
 \fB#include <tcl.h>\fR
 .sp
-char *
+CONST char *
 \fBTcl_PkgRequire\fR(\fIinterp, name, version, exact\fR)
 .sp
-char *
+CONST char *
 \fBTcl_PkgRequireEx\fR(\fIinterp, name, version, exact, clientDataPtr\fR)
 .sp
-char *
+CONST char *
 \fBTcl_PkgPresent\fR(\fIinterp, name, version, exact\fR)
 .sp
-char *
+CONST char *
 \fBTcl_PkgPresentEx\fR(\fIinterp, name, version, exact, clientDataPtr\fR)
 .sp
 int
@@ -33,12 +33,12 @@ int
 int
 \fBTcl_PkgProvideEx\fR(\fIinterp, name, version, clientData\fR)
 .SH ARGUMENTS
-.AS Tcl_FreeProc clientDataPtr
+.AS ClientData clientDataPtr
 .AP Tcl_Interp *interp in
 Interpreter where package is needed or available.
-.AP char *name in
+.AP "CONST char" *name in
 Name of package.
-.AP char *version in
+.AP "CONST char" *version in
 A version string consisting of one or more decimal numbers
 separated by dots.
 .AP int exact in
@@ -85,4 +85,3 @@ functions.
 
 .SH KEYWORDS
 package, present, provide, require, version
-

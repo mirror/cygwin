@@ -11,6 +11,7 @@
  * RCS: @(#) $Id$
  */
 
+#define USE_COMPAT_CONST
 #include "tclWinInt.h"
 
 /*
@@ -22,6 +23,10 @@ static int	TesteventloopCmd _ANSI_ARGS_((ClientData dummy,
 static int	TestvolumetypeCmd _ANSI_ARGS_((ClientData dummy,
 	Tcl_Interp *interp, int objc,
 	Tcl_Obj *CONST objv[]));
+static int      TestwinclockCmd _ANSI_ARGS_(( ClientData dummy,
+					      Tcl_Interp* interp,
+					      int objc,
+					      Tcl_Obj *CONST objv[] ));
 
 /*
  *----------------------------------------------------------------------
@@ -51,6 +56,8 @@ TclplatformtestInit(interp)
     Tcl_CreateCommand(interp, "testeventloop", TesteventloopCmd,
             (ClientData) 0, (Tcl_CmdDeleteProc *) NULL);
     Tcl_CreateObjCommand(interp, "testvolumetype", TestvolumetypeCmd,
+            (ClientData) 0, (Tcl_CmdDeleteProc *) NULL);
+    Tcl_CreateObjCommand(interp, "testwinclock", TestwinclockCmd,
             (ClientData) 0, (Tcl_CmdDeleteProc *) NULL);
     return TCL_OK;
 }
@@ -188,5 +195,74 @@ TestvolumetypeCmd(clientData, interp, objc, objv)
     return TCL_OK;
 #undef VOL_BUF_SIZE
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TestclockCmd --
+ *
+ *	Command that returns the seconds and microseconds portions of
+ *	the system clock and of the Tcl clock so that they can be
+ *	compared to validate that the Tcl clock is staying in sync.
+ *
+ * Usage:
+ *	testclock
+ *
+ * Parameters:
+ *	None.
+ *
+ * Results:
+ *	Returns a standard Tcl result comprising a four-element list:
+ *	the seconds and microseconds portions of the system clock,
+ *	and the seconds and microseconds portions of the Tcl clock.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
 
+static int
+TestwinclockCmd( ClientData dummy,
+				/* Unused */
+		 Tcl_Interp* interp,
+				/* Tcl interpreter */
+		 int objc,
+				/* Argument count */
+		 Tcl_Obj *CONST objv[] )
+				/* Argument vector */
+{
+    CONST static FILETIME posixEpoch = { 0xD53E8000, 0x019DB1DE };
+				/* The Posix epoch, expressed as a
+				 * Windows FILETIME */
+    Tcl_Time tclTime;		/* Tcl clock */
+    FILETIME sysTime;		/* System clock */
+    Tcl_Obj* result;		/* Result of the command */
+    LARGE_INTEGER t1, t2;
 
+    if ( objc != 1 ) {
+	Tcl_WrongNumArgs( interp, 1, objv, "" );
+	return TCL_ERROR;
+    }
+
+    Tcl_GetTime( &tclTime );
+    GetSystemTimeAsFileTime( &sysTime );
+    t1.LowPart = posixEpoch.dwLowDateTime;
+    t1.HighPart = posixEpoch.dwHighDateTime;
+    t2.LowPart = sysTime.dwLowDateTime;
+    t2.HighPart = sysTime.dwHighDateTime;
+    t2.QuadPart -= t1.QuadPart;
+
+    result = Tcl_NewObj();
+    Tcl_ListObjAppendElement
+	( interp, result, Tcl_NewIntObj( (int) (t2.QuadPart / 10000000 ) ) );
+    Tcl_ListObjAppendElement
+	( interp, result,
+	  Tcl_NewIntObj( (int) ( (t2.QuadPart / 10 ) % 1000000 ) ) );
+    Tcl_ListObjAppendElement( interp, result, Tcl_NewIntObj( tclTime.sec ) );
+    Tcl_ListObjAppendElement( interp, result, Tcl_NewIntObj( tclTime.usec ) );
+
+    Tcl_SetObjResult( interp, result );
+
+    return TCL_OK;
+}

@@ -1,3 +1,11 @@
+2001-02-28  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (NEARBY_LIBS): Enumerate component libraries for
+	static linking.
+	(sid_LDFLAGS): Correct export-symbols-regex param to
+	include tcl bridge component.  Use $(NEARBY_LIBS).
+	* Makefile.in: Regenerated.
+
 2001-02-05  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am (sid_LDFLAGS): Add export-symbols-regex parameter to

@@ -312,7 +312,7 @@ SIM_DESC
 sim_open (kind, cb, abfd, argv)
      SIM_OPEN_KIND kind;
      host_callback *cb;
-     struct _bfd *abfd;
+     struct bfd *abfd;
      char **argv;
 {
   struct simops *s;
@@ -852,7 +852,7 @@ sim_info (sd, verbose)
 SIM_RC
 sim_create_inferior (sd, abfd, argv, env)
      SIM_DESC sd;
-     struct _bfd *abfd;
+     struct bfd *abfd;
      char **argv;
      char **env;
 {
@@ -946,7 +946,7 @@ SIM_DESC
 sim_open (kind, cb, abfd, argv)
      SIM_OPEN_KIND kind;
      host_callback *cb;
-     struct _bfd *abfd;
+     struct bfd *abfd;
      char **argv;
 {
   SIM_DESC sd = sim_state_alloc (kind, cb);
@@ -1114,10 +1114,10 @@ sim_open (kind, cb, abfd, argv)
     }
   else
     {
-      if ( NULL != board )
-	{
-	  printf("Error: invalid --board option.\n");
-	  return 0;
+      if (board != NULL)
+        {
+	  sim_io_eprintf (sd, "Error: Board `%s' unknown.\n", board);
+          return 0;
 	}
     }
   
@@ -1170,7 +1170,7 @@ sim_close (sd, quitting)
 SIM_RC
 sim_create_inferior (sd, prog_bfd, argv, env)
      SIM_DESC sd;
-     struct _bfd *prog_bfd;
+     struct bfd *prog_bfd;
      char **argv;
      char **env;
 {
@@ -1329,19 +1329,39 @@ program_interrupt (SIM_DESC sd,
 {
   int status;
   struct hw *device;
+  static int in_interrupt = 0;
 
 #ifdef SIM_CPU_EXCEPTION_TRIGGER
   SIM_CPU_EXCEPTION_TRIGGER(sd,cpu,cia);
 #endif
 
-  /* copy NMI handler code from dv-mn103cpu.c */
-  /* XXX: possible infinite recursion if these store_*() calls fail! */
-  store_word (SP - 4, CIA_GET (cpu));
-  store_half (SP - 8, PSW);
+  /* avoid infinite recursion */
+  if (in_interrupt)
+    {
+      (*mn10300_callback->printf_filtered) (mn10300_callback, 
+					    "ERROR: recursion in program_interrupt during software exception dispatch.");
+    }
+  else
+    {
+      in_interrupt = 1;
+      /* copy NMI handler code from dv-mn103cpu.c */
+      store_word (SP - 4, CIA_GET (cpu));
+      store_half (SP - 8, PSW);
+
+      /* Set the SYSEF flag in NMICR by backdoor method.  See
+	 dv-mn103int.c:write_icr().  This is necessary because
+         software exceptions are not modelled by actually talking to
+         the interrupt controller, so it cannot set its own SYSEF
+         flag. */
+     if ((NULL != board) && (strcmp(board, BOARD_AM32) == 0))
+       store_byte (0x34000103, 0x04);
+    }
+
   PSW &= ~PSW_IE;
   SP = SP - 8;
   CIA_SET (cpu, 0x40000008);
 
+  in_interrupt = 0;
   sim_engine_halt(sd, cpu, NULL, cia, sim_stopped, sig);
 }
 

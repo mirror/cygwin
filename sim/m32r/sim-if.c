@@ -56,7 +56,7 @@ SIM_DESC
 sim_open (kind, callback, abfd, argv)
      SIM_OPEN_KIND kind;
      host_callback *callback;
-     struct _bfd *abfd;
+     struct bfd *abfd;
      char **argv;
 {
   SIM_DESC sd = sim_state_alloc (kind, callback);
@@ -155,8 +155,8 @@ sim_open (kind, callback, abfd, argv)
 
   /* Open a copy of the cpu descriptor table.  */
   {
-    CGEN_CPU_DESC cd = m32r_cgen_cpu_open (STATE_ARCHITECTURE (sd)->mach,
-					   CGEN_ENDIAN_BIG);
+    CGEN_CPU_DESC cd = m32r_cgen_cpu_open_1 (STATE_ARCHITECTURE (sd)->printable_name,
+					     CGEN_ENDIAN_BIG);
     for (i = 0; i < MAX_NR_PROCESSORS; ++i)
       {
 	SIM_CPU *cpu = STATE_CPU (sd, i);
@@ -199,7 +199,7 @@ sim_close (sd, quitting)
 SIM_RC
 sim_create_inferior (sd, abfd, argv, envp)
      SIM_DESC sd;
-     struct _bfd *abfd;
+     struct bfd *abfd;
      char **argv;
      char **envp;
 {
@@ -235,6 +235,11 @@ print_m32r_misc_cpu (SIM_CPU *cpu, int verbose)
 		     PROFILE_LABEL_WIDTH, "Fill nops:",
 		     sim_add_commas (buf, sizeof (buf),
 				     CPU_M32R_MISC_PROFILE (cpu)->fillnop_count));
+      if (STATE_ARCHITECTURE (sd)->mach == bfd_mach_m32rx)
+	sim_io_printf (sd, "  %-*s %s\n\n",
+		       PROFILE_LABEL_WIDTH, "Parallel insns:",
+		       sim_add_commas (buf, sizeof (buf),
+				       CPU_M32R_MISC_PROFILE (cpu)->parallel_count));
     }
 }
 

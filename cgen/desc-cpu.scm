@@ -128,8 +128,7 @@ static const CGEN_MACH @arch@_cgen_mach_table[] = {
 
 (define (gen-ifld-defns)
   (logit 2 "Generating ifield table ...\n")
-  (let* ((ifld-list (find (lambda (f) (not (has-attr? f 'VIRTUAL)))
-			  (non-derived-ifields (current-ifld-list))))
+  (let* ((ifld-list (current-ifld-list))
 	 (all-attrs (current-ifld-attr-list))
 	 (num-non-bools (attr-count-non-bools all-attrs)))
     (string-list
@@ -149,12 +148,17 @@ const CGEN_IFLD @arch@_cgen_ifld_table[] =
 			   "  { "
 			   (ifld-enum ifld) ", "
 			   "\"" (obj:name ifld) "\", "
-			   (number->string (ifld-word-offset ifld)) ", "
-			   (number->string (ifld-word-length ifld)) ", "
-			   (number->string (ifld-start ifld #f)) ", "
-			   (number->string (ifld-length ifld)) ", "
+                           (if
+                            (or (has-attr? ifld 'VIRTUAL)
+                                (derived-ifield? ifld))
+                             "0, 0, 0, 0,"
+                             (string-append
+		              (number->string (ifld-word-offset ifld)) ", "
+			      (number->string (ifld-word-length ifld)) ", "
+			      (number->string (ifld-start ifld #f)) ", "
+			      (number->string (ifld-length ifld)) ", "))
 			   (gen-obj-attr-defn 'ifld ifld all-attrs
-					      num-non-bools gen-A-attr-mask)
+				      num-non-bools gen-A-attr-mask)
 			   "  },\n")))
       ifld-list)
      "\
@@ -404,7 +408,7 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
 	      (set! field-ref (string-append "&" (ifld-enum fld) "_MULTI_IFIELD[0]"))
 	      (set! field-count (number->string (length (elm-get fld 'subfields)))))
 	    ; else	    
-	      (set! field-ref (string-append "&@arch@_cgen_ifld_table[" (ifld-number fld) "]"))))
+	      (set! field-ref (string-append "&@arch@_cgen_ifld_table[" (ifld-enum fld) "]"))))
     (string-append "{ " field-count ", { (const PTR) " field-ref " } }")))
 
 (define (gen-multi-ifield-nodes)

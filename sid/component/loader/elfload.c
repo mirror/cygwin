@@ -82,7 +82,8 @@ textSectionAddress (unsigned long long address, const struct TextSection *sectio
 */
 
 int
-readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian, const struct TextSection **section_table)
+readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian,
+	     unsigned* e_flags, const struct TextSection **section_table)
 {
   unsigned char fileHeader [64];
   unsigned char psymHdr [56];
@@ -90,6 +91,7 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian, const struc
   unsigned long long psymOffset;
   int psymSize;
   int psymNum;
+  int eFlags;
   unsigned long long secOffset;
   int secSize;
   int secNum;
@@ -125,6 +127,7 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian, const struc
     {
       entryPoint = fetchQuad (fileHeader+24, littleEndian);
       psymOffset = fetchQuad (fileHeader+32, littleEndian);
+      eFlags = fetchWord (fileHeader+40, littleEndian);
       psymSize = fetchShort (fileHeader+54, littleEndian);
       psymNum = fetchShort (fileHeader+56, littleEndian);
     }
@@ -132,6 +135,7 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian, const struc
     {
       entryPoint = fetchWord (fileHeader+24, littleEndian);
       psymOffset = fetchWord (fileHeader+28, littleEndian);
+      eFlags = fetchWord (fileHeader+36, littleEndian);
       psymSize = fetchShort (fileHeader+42, littleEndian);
       psymNum = fetchShort (fileHeader+44, littleEndian);
     }
@@ -266,6 +270,7 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian, const struc
   *entry_point = entryPoint;
   *little_endian = littleEndian;
   *section_table = textSections;
+  *e_flags = eFlags;
 
   return 1;
 }

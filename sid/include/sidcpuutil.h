@@ -407,6 +407,9 @@ namespace sidutil
     callback_pin<basic_cpu> endian_set_pin;
     virtual void set_endian(sid::host_int_4) = 0;
     void endian_set_pin_handler(sid::host_int_4 v) { this->set_endian (v); }
+    callback_pin<basic_cpu> eflags_set_pin;
+    virtual void set_eflags(sid::host_int_4) {}
+    void eflags_set_pin_handler(sid::host_int_4 v) { this->set_eflags (v); }
 
     // Signal trap type code and argument
   private:
@@ -550,6 +553,7 @@ public:
       flush_icache_pin (this, & basic_cpu::flush_icache_pin_handler),
       pc_set_pin (this, & basic_cpu::pc_set_pin_handler),
       endian_set_pin (this, & basic_cpu::endian_set_pin_handler),
+      eflags_set_pin (this, & basic_cpu::eflags_set_pin_handler),
       debugger_bus (& this->data_bus),
       trace_stream (),
       trace_filename ("-"), // standard output
@@ -575,6 +579,7 @@ public:
 	add_pin ("cg-callee", & this->cg_callee_pin);
 	add_pin ("print-insn-summary!", & this->print_insn_summary_pin);
 	add_pin ("endian-set!", & this->endian_set_pin);
+	add_pin ("eflags-set!", & this->eflags_set_pin);
 	add_watchable_pin ("trap", & this->trap_type_pin); // output side
 	add_watchable_pin ("trap-code", & this->trap_code_pin);
 	add_pin ("trap", & this->trap_disposition_pin); // input side
@@ -706,6 +711,7 @@ public:
   class basic_big_endian_cpu: public basic_cpu
   {
     void set_endian(sid::host_int_4) {}
+    void set_eflags(sid::host_int_4) {}
 
   protected:
 
@@ -802,6 +808,7 @@ public:
   class basic_little_endian_cpu: public basic_cpu
   {
     void set_endian(sid::host_int_4) {}
+    void set_eflags(sid::host_int_4) {}
 
   protected:
     basic_little_endian_cpu ()

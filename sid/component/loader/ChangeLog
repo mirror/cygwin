@@ -1,3 +1,10 @@
+2004-06-29  Stan Cox  <scox@redhat.com>
+
+	* compLoader.cxx (generic_loader):  Add eflags_pin.
+	(elf_loader): Add eflags.
+	(load_it): Set eflags.
+	* elfload.c (readElfFile): Add eflags.
+	
 2004-05-10  Frank Ch. Eigler  <fche@elastic.org>
 
 	* elfload.c (textSectionAddress): Fix declaration placement typo.

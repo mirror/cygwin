@@ -708,6 +708,7 @@ void LoaderCfg::add_cpu (CpuCfg *cpu)
   assert (cpu);
   conn_pin (this, "start-pc-set", cpu, "start-pc-set!");
   conn_pin (this, "endian-set", cpu, "endian-set!");
+  conn_pin (this, "eflags-set", cpu, "eflags-set!");
 }
 
 void LoaderCfg::set_file (const string filename)

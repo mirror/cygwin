@@ -1,3 +1,7 @@
+2004-06-29  Stan Cox  <scox@redhat.com>
+
+	* commonCfg.cxx (add_cpu):  Add eflags-set pin.
+
 2004-04-27  Dave Brolley  <brolley@redhat.com>
 
 	* commonCfg.h (CacheCfg::compute_comptype): Now virtual.

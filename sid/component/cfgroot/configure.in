@@ -23,27 +23,8 @@ dnl AC_CHECK_HEADERS(ltdl.h)
 AC_SUBST(LIBLTDL)
 
 AC_CHECK_FUNCS(cygwin_conv_to_full_posix_path)
-
-dnl Timebomb processing
 AC_CHECK_HEADERS(time.h)
 AC_CHECK_FUNCS(ctime)
-AC_ARG_ENABLE(timebomb, 
-	[  --enable-timebomb=TIME  refuse to start after TIME seconds past epoch])	
-SID_TIMEBOMB=0
-if test -z "$enable_timebomb"
-then
-	SID_TIMEBOMB=0
-elif test "$enable_timebomb" = "no"
-then
-	SID_TIMEBOMB=0
-elif expr "$enable_timebomb" : '[[0-9]]*$' >/dev/null
-then
-	SID_TIMEBOMB=$enable_timebomb
-# XXX: support relative "days from now" format
-else
-	AC_ERROR([Must specify timebomb time in proper format])
-fi
-AC_DEFINE_UNQUOTED(SID_TIMEBOMB, $SID_TIMEBOMB, [Timebomb - seconds since epoch - 0=unlimited])
 
 dnl Outputs
 AC_CONFIG_SUBDIRS(libltdl)

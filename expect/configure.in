@@ -867,6 +867,9 @@ if test -r /dev/ptmx -a "x$svr4_ptys_broken" = x -a "$cross_compiling" != "yes" 
 /* _XOPEN_SOURCE can remove NSIG on UnixWare or OSF/1. */
 #define _XOPEN_SOURCE
 #include <signal.h>
+#ifndef NSIG
+#define NSIG _NSIG
+#endif
 char junk[NSIG];],
     [],
 	AC_DEFINE(_XOPEN_SOURCE)

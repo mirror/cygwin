@@ -94,7 +94,7 @@ extern "C" {
  * C run-time library issues.
  */
 
-#   ifndef __CYGWIN__
+#   if !defined(__CYGWIN__) || defined(__WIN32__)
 #       ifndef USE_TCLALLOC
 #	    define USE_TCLALLOC 1
 #       endif 

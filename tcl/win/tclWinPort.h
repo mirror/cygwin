@@ -209,7 +209,7 @@ typedef float *TCHAR;
 /* On cygwin, we just use the supplied malloc and free, rather than
    using tclAlloc.c.  The cygwin32 malloc is derived from the same
    sources as tclAlloc.c, anyhow.  */
-#if defined(__CYGWIN__) && !defined(__MWIN32__)
+#if defined(__CYGWIN__) && !defined(__WIN32__)
 #define TclpAlloc(size)		malloc(size)
 #define TclpFree(ptr)		free(ptr)
 #define TclpRealloc(ptr, size)	realloc(ptr, size)

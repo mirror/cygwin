@@ -186,8 +186,7 @@ const char * @arch@_cgen_insert_operand
    This function could be moved into `parse_insn_normal', but keeping it
    separate makes clear the interface between `parse_insn_normal' and each of
    the handlers.  It's also needed by GAS to insert operands that couldn't be
-   resolved during parsing.
-*/
+   resolved during parsing.  */
 
 const char *
 @arch@_cgen_insert_operand (cd, opindex, fields, buffer, pc)
@@ -237,8 +236,7 @@ int @arch@_cgen_extract_operand
 
    This function could be moved into `print_insn_normal', but keeping it
    separate makes clear the interface between `print_insn_normal' and each of
-   the handlers.
-*/
+   the handlers.  */
 
 int
 @arch@_cgen_extract_operand (cd, opindex, ex_info, insn_value, fields, pc)

@@ -351,7 +351,7 @@ ADDCQI (QI a, QI b, BI c)
   return res;
 }
 
-inline QI
+inline HI
 ADDCHI (HI a, HI b, HI c)
 {
   HI res = ADDHI (a, ADDHI (b, c));

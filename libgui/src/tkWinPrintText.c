@@ -212,7 +212,8 @@ typedef struct TextStyle {
 
 
 
-void DisplayDLineToDrawable(TkText *textPtr, DLine *dlPtr, DLine *prevPtr, TkWinDrawable *drawable);
+static void
+DisplayDLineToDrawable(TkText *textPtr, DLine *dlPtr, DLine *prevPtr, TkWinDrawable *drawable);
 
 /*
  *--------------------------------------------------------------
@@ -248,7 +249,7 @@ PrintTextCmd(clientData, interp, argc, argv)
     Pixmap pixmap;
     int bottomY = 0;		/* Initialization needed only to stop
 				 * compiler warnings. */
-    DOCINFO *lpdi = malloc(sizeof(DOCINFO));
+    DOCINFO *lpdi = (DOCINFO *) ckalloc(sizeof(DOCINFO));
     TkTextIndex first, last;
     int numLines;
     HDC hDCpixmap;
@@ -272,7 +273,7 @@ PrintTextCmd(clientData, interp, argc, argv)
 	Tcl_AppendResult(interp, "wrong # args: should be \"",
 			 argv[0], " text \"",
 			 (char *) NULL);
-	return TCL_ERROR;
+	goto error;
     }
 
     /*
@@ -281,7 +282,7 @@ PrintTextCmd(clientData, interp, argc, argv)
     if (!Tcl_GetCommandInfo(interp, argv[1], &textCmd)) {
 	Tcl_AppendResult(interp, "couldn't get text information for \"",
 			 argv[1], "\"", (char *) NULL);
-	return TCL_ERROR;
+	goto error;
     }
     
     memset(&dm,0,sizeof(DEVMODE));
@@ -290,7 +291,7 @@ PrintTextCmd(clientData, interp, argc, argv)
 
     memset(lpdi,0,sizeof(DOCINFO));
     lpdi->cbSize=sizeof(DOCINFO);
-    lpdi->lpszDocName=malloc(255);
+    lpdi->lpszDocName = (LPCSTR) ckalloc(255);
     sprintf((char*)lpdi->lpszDocName,"SN - Printing\0");
     lpdi->lpszOutput=NULL;
 
@@ -445,8 +446,12 @@ PrintTextCmd(clientData, interp, argc, argv)
     textPtr->dInfoPtr->flags|=DINFO_OUT_OF_DATE;
 
 done:
+    ckfree ((char*) lpdi->lpszDocName);
+    ckfree ((char*) lpdi);
     return TCL_OK;
- error:
+error:
+    ckfree ((char*) lpdi->lpszDocName);
+    ckfree ((char*) lpdi);
     return TCL_ERROR;
 }
 

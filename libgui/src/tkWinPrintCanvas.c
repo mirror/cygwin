@@ -52,20 +52,20 @@ PrintCanvasCmd(clientData, interp, argc, argv)
     int tiles_wide,tiles_high;
     int tile_y, tile_x;
     int screenX1, screenX2, screenY1, screenY2, width, height;
-    DOCINFO *lpdi = malloc(sizeof(DOCINFO));
+    DOCINFO *lpdi = (DOCINFO *) ckalloc(sizeof(DOCINFO));
 
     if (argc < 2) {
 	Tcl_AppendResult(interp, "wrong # args: should be \"",
 			 argv[0], " canvas \"",
 			 (char *) NULL);
-	return TCL_ERROR;
+	goto error;
     }
 
     /* The second arg is the canvas widget */
     if (!Tcl_GetCommandInfo(interp, argv[1], &canvCmd)) {
 	Tcl_AppendResult(interp, "couldn't get canvas information for \"",
 			 argv[1], "\"", (char *) NULL);
-	return TCL_ERROR;
+	goto error;
     }
     
     memset(&dm,0,sizeof(DEVMODE));
@@ -74,7 +74,7 @@ PrintCanvasCmd(clientData, interp, argc, argv)
 
     memset(lpdi,0,sizeof(DOCINFO));
     lpdi->cbSize=sizeof(DOCINFO);
-    lpdi->lpszDocName=malloc(255);
+    lpdi->lpszDocName= (LPCSTR) ckalloc(255);
     sprintf((char*)lpdi->lpszDocName,"SN - Printing\0");
     lpdi->lpszOutput=NULL;
 
@@ -164,8 +164,12 @@ PrintCanvasCmd(clientData, interp, argc, argv)
     EndDoc(pd.hDC);
 
 done:
+    ckfree ((char*) lpdi->lpszDocName);
+    ckfree ((char*) lpdi);
     return TCL_OK;
- error:
+error:
+    ckfree ((char*) lpdi->lpszDocName);
+    ckfree ((char*) lpdi);
     return TCL_ERROR;
 }
 

@@ -499,7 +499,7 @@ struct @prefix@_scache {
 		      iflds)
      (string-list-map (lambda (op) (-gen-op-extract op sfmt #f))
 		      operands)
-     "  if (current_cpu->trace_extract_p)\n"
+     "  if (UNLIKELY(current_cpu->trace_extract_p))\n"
      "    {\n"
      "      current_cpu->trace_stream \n"
      "        << \"0x\" << hex << pc << dec << \" (" (gen-sym sfmt) ")\\t\"\n"

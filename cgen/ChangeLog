@@ -1,3 +1,9 @@
+2001-03-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sid.cpu (-op-gen-set-trace[-parallel], -create-virtual-insns!):
+	Emit LIKELY/UNLIKELY branch probability hints.
+	* sid-decode.cpu (-gen-record-args): Ditto.
+
 2001-02-02  Patrick Macdonald  <patrickm@redhat.com>
 
 	* desc-cpu.scm (-gen-hash-defines): Rename

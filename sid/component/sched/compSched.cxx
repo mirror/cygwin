@@ -370,7 +370,7 @@ apprx_host_time_keeper<dilution>::get_now(tick_t& out) const
   this->iterations ++;
 
   // Short circuit measurement using heuristic
-  if (this->iterations < this->iterations_per_dms)
+  if (LIKELY(this->iterations < this->iterations_per_dms))
     {
       // Don't fetch new system time yet.  Assume we're
       // still in the same host interval.
@@ -410,7 +410,7 @@ apprx_host_time_keeper<dilution>::get_now(tick_t& out) const
     }
   // In the ideal case, within around one tick past the previous,
   // so we must have skipped the right number of iterations.
-  else if (new_now <= this->prev_now + dilution*3/2)
+  else if (UNLIKELY(new_now <= this->prev_now + dilution*3/2))
     {
       this->iterations = 0;
       this->prev_now = new_now;
@@ -700,13 +700,13 @@ operator >> (istream& i, exact_host_time_keeper& it)
 	    loop = this->advance_any();
             if (! loop) break;
 	    count ++;
-	  } while ((this->yield_step_loop_p == false) 
-		   && (count < this->step_cycle_limit));
+	  } while (LIKELY((this->yield_step_loop_p == false) 
+			  && (count < this->step_cycle_limit)));
 
 	// Yield the CPU if this scheduling cycle did not run to
 	// conclusion.  This can happen if there aren't enough
 	// events in the queue to keep this scheduler busy.
-	if (yield_host_time_p && (count < this->step_cycle_limit))
+	if (UNLIKELY(yield_host_time_p && (count < this->step_cycle_limit)))
 	  {
 	    // cerr << "yielding; count=" << count << " limit=" << this->step_cycle_limit << endl;
 	    this->yield();
@@ -763,7 +763,7 @@ operator >> (istream& i, exact_host_time_keeper& it)
 	     it != this->irregular_events.end();
 	     it ++)
 	  {
-	    if (it->what == what) // found it
+	    if (UNLIKELY(it->what == what)) // found it
 	      {
 		this->irregular_events.erase(it);	// zap it
 		// resort irregular event heap
@@ -779,7 +779,7 @@ operator >> (istream& i, exact_host_time_keeper& it)
 	     it2 != this->regular_events.end();
 	     it2 ++)
 	  {
-	    if (it2->what == what) // found it
+	    if (UNLIKELY(it2->what == what)) // found it
 	      {
 		this->regular_events.erase(it2); 	// zap it
 		// refill regular event table
@@ -1031,7 +1031,7 @@ private:
 	this->scale_div = 1;
       tick_t sched_time = t * this->scale_mul / this->scale_div;
 
-      if (t != 0)
+      if (LIKELY(t != 0))
 	{
 	  // round up away from zero
 	  if (sched_time == 0)
@@ -1279,7 +1279,7 @@ private:
     {
       tick_t then;
       component::status s = parse_attribute(t, then); 
-      if (s != component::ok) return s;
+      if (UNLIKELY(s != component::ok)) return s;
       this->sched.set_now (then);
       tick_t now;
       this->sched.get_now (now);
@@ -1296,10 +1296,10 @@ protected:
   advance(host_int_4)
     {
       recursion_record limit (this);
-      if (!limit.ok())
+      if (UNLIKELY(!limit.ok()))
 	return;
 
-      if (this->enable_p)
+      if (LIKELY(this->enable_p))
         {
           this->advance_count ++;
   	  this->sched.advance (this->yield_host_time_p);

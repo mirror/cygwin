@@ -700,7 +700,7 @@ cfgroot_component::run(host_int_4)
       // starting_pin.drive() clears it, it has effect.
       this->running = true;
       this->starting_pin.drive (1);
-      while (this->running)
+      while (LIKELY(this->running))
 	{
 	  this->activity_pin.drive (1);
 	  this->activity_count ++;

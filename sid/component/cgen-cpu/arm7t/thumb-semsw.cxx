@@ -215,7 +215,7 @@ restart:
     // If we don't have to give up control, don't.
     // Note that we may overrun step_insn_count since we do the test at the
     // end of the block.  This is defined to be ok.
-    if (current_cpu->stop_after_insns_p (abuf->fields.chain.insn_count))
+    if (UNLIKELY(current_cpu->stop_after_insns_p (abuf->fields.chain.insn_count)))
       BREAK (vpc);
   }
 
@@ -237,7 +237,7 @@ restart:
     // If we don't have to give up control, don't.
     // Note that we may overrun step_insn_count since we do the test at the
     // end of the block.  This is defined to be ok.
-    if (current_cpu->stop_after_insns_p (abuf->fields.chain.insn_count))
+    if (UNLIKELY(current_cpu->stop_after_insns_p (abuf->fields.chain.insn_count)))
       BREAK (vpc);
   }
 

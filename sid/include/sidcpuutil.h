@@ -205,7 +205,7 @@ namespace sidutil
     void step_pin_handler (sid::host_int_4)
       {
 	recursion_record limit (& this->step_limit);
-	if (! limit.ok()) return;
+	if (UNLIKELY(! limit.ok())) return;
 
 	this->current_step_insn_count = 0;
 	this->yield_p = false;
@@ -243,8 +243,8 @@ namespace sidutil
     bool stop_after_insns_p (sid::host_int_4 num)
       {
 	this->current_step_insn_count += num;
-	if (this->yield_p ||
-	    (this->current_step_insn_count >= this->step_insn_count))
+	if (UNLIKELY(this->yield_p ||
+		    (this->current_step_insn_count >= this->step_insn_count)))
           {
             // Batch updates to total_insn_count to avoid long-long
             // arithmetic overhead in the inner insn-stepping loops.
@@ -455,8 +455,8 @@ public:
       {
 	BigOrLittleInt value;
 	sid::bus::status s = 
-	  this->insn_bus ? this->insn_bus->read (address, value) : sid::bus::unmapped;
-	if (s == sid::bus::ok)
+	  (LIKELY(this->insn_bus)) ? this->insn_bus->read (address, value) : sid::bus::unmapped;
+	if (LIKELY(s == sid::bus::ok))
 	  return value;
 
 	throw cpu_memory_fault (pc, address, s, "insn read");
@@ -466,8 +466,8 @@ public:
     BigOrLittleInt basic_cpu::write_insn_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt value) const
       {
 	sid::bus::status s = 
-	  this->insn_bus ? this->insn_bus->write (address, value) : sid::bus::unmapped;
-	if (s == sid::bus::ok)
+	  (LIKELY(this->insn_bus)) ? this->insn_bus->write (address, value) : sid::bus::unmapped;
+	if (LIKELY(s == sid::bus::ok))
 	  return value;
 
 	throw cpu_memory_fault (pc, address, s, "insn write");
@@ -478,8 +478,8 @@ public:
       {
 	BigOrLittleInt value;
 	sid::bus::status s = 
-	  this->data_bus ? this->data_bus->read (address, value) : sid::bus::unmapped;
-	if (s == sid::bus::ok)
+	  (LIKELY(this->data_bus)) ? this->data_bus->read (address, value) : sid::bus::unmapped;
+	if (LIKELY(s == sid::bus::ok))
 	  return value;
 
 	throw cpu_memory_fault (pc, address, s, "data read");
@@ -489,8 +489,8 @@ public:
     BigOrLittleInt basic_cpu::write_data_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt value) const
       {
 	sid::bus::status s = 
-	  this->data_bus ? this->data_bus->write (address, value) : sid::bus::unmapped;
-	if (s == sid::bus::ok)
+	  (LIKELY(this->data_bus)) ? this->data_bus->write (address, value) : sid::bus::unmapped;
+	if (LIKELY(s == sid::bus::ok))
 	  return value;
 
 	throw cpu_memory_fault (pc, address, s, "data write");

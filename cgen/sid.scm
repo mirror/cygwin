@@ -1093,7 +1093,7 @@
    (if (current-pbb-engine?)
        ""
        (string-append
-	"    if (current_cpu->trace_result_p)\n"
+	"    if (UNLIKELY(current_cpu->trace_result_p))\n"
 	"      current_cpu->trace_stream << "
 	(send op 'gen-pretty-name mode)
 	(if (send op 'get-index-mode)
@@ -1142,7 +1142,7 @@
 ; operand instance table].
 ; Could just scan the operand table for the operand or hardware number,
 ; assuming the operand number is stored in `op'.
-   "    if (current_cpu->trace_result_p)\n"
+   "    if (UNLIKELY(current_cpu->trace_result_p))\n"
    "      current_cpu->trace_stream << "
    (send op 'gen-pretty-name mode)
    (if (send op 'get-index-mode)
@@ -1743,7 +1743,7 @@
     // If we don't have to give up control, don't.
     // Note that we may overrun step_insn_count since we do the test at the
     // end of the block.  This is defined to be ok.
-    if (current_cpu->stop_after_insns_p (abuf->fields.chain.insn_count))
+    if (UNLIKELY(current_cpu->stop_after_insns_p (abuf->fields.chain.insn_count)))
       BREAK (vpc);
   }
 "))
@@ -1761,7 +1761,7 @@
     // If we don't have to give up control, don't.
     // Note that we may overrun step_insn_count since we do the test at the
     // end of the block.  This is defined to be ok.
-    if (current_cpu->stop_after_insns_p (abuf->fields.chain.insn_count))
+    if (UNLIKELY(current_cpu->stop_after_insns_p (abuf->fields.chain.insn_count)))
       BREAK (vpc);
   }
 "))

@@ -56,7 +56,7 @@ thumb_sem_lsl (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = SLLSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset5));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
@@ -64,20 +64,20 @@ thumb_sem_lsl (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = tmp_carry_out;
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -105,7 +105,7 @@ thumb_sem_lsr (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = SRLSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset5));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
@@ -113,20 +113,20 @@ thumb_sem_lsr (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = tmp_carry_out;
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -154,7 +154,7 @@ thumb_sem_asr (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = SRASI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset5));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
@@ -162,20 +162,20 @@ thumb_sem_asr (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = tmp_carry_out;
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -205,33 +205,33 @@ thumb_sem_add (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0);
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -260,33 +260,33 @@ thumb_sem_addi (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0);
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -315,33 +315,33 @@ thumb_sem_sub (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0));
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)), 0);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     SI opval = SUBSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->thumb_h_gr_t_get (FLD (f_rn)));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -370,33 +370,33 @@ thumb_sem_subi (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0));
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3), 0);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     SI opval = SUBSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), FLD (f_offset3));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -421,20 +421,20 @@ thumb_sem_mov (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = FLD (f_offset8);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
   {
     BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -463,26 +463,26 @@ thumb_sem_cmp (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0));
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -511,33 +511,33 @@ thumb_sem_addi8 (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8));
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -566,33 +566,33 @@ thumb_sem_subi8 (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0));
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8), 0);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     SI opval = SUBSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd)), FLD (f_offset8));
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -617,20 +617,20 @@ thumb_sem_alu_and (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = ANDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
   {
     BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -656,20 +656,20 @@ thumb_sem_alu_eor (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = XORSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
   {
     BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -699,7 +699,7 @@ thumb_sem_alu_lsl (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = tmp_result;
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
@@ -707,20 +707,20 @@ thumb_sem_alu_lsl (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = tmp_carry_out;
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -750,7 +750,7 @@ thumb_sem_alu_lsr (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = tmp_result;
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
@@ -758,20 +758,20 @@ thumb_sem_alu_lsr (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = tmp_carry_out;
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -801,7 +801,7 @@ thumb_sem_alu_asr (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = tmp_result;
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
@@ -809,20 +809,20 @@ thumb_sem_alu_asr (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = tmp_carry_out;
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -852,7 +852,7 @@ thumb_sem_alu_ror (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = tmp_result;
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
@@ -860,20 +860,20 @@ thumb_sem_alu_ror (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = tmp_carry_out;
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -905,33 +905,33 @@ thumb_sem_alu_adc (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->hardware.h_cbit);
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), current_cpu->hardware.h_cbit);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     SI opval = tmp_result;
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -962,33 +962,33 @@ thumb_sem_alu_sbc (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), NOTBI (current_cpu->hardware.h_cbit)));
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), NOTBI (current_cpu->hardware.h_cbit));
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     SI opval = tmp_result;
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1016,13 +1016,13 @@ thumb_sem_alu_tst (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_x, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_x, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1054,33 +1054,33 @@ thumb_sem_alu_neg (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = NOTSI (SUBCFSI (0, current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0));
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = SUBOFSI (0, current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     SI opval = tmp_result;
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1108,26 +1108,26 @@ thumb_sem_alu_cmp (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0));
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1155,26 +1155,26 @@ thumb_sem_alu_cmn (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = ADDCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = ADDOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1199,20 +1199,20 @@ thumb_sem_alu_orr (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = ORSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
   {
     BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1238,20 +1238,20 @@ thumb_sem_alu_mul (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = MULSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
   {
     BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1277,20 +1277,20 @@ thumb_sem_alu_bic (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = ANDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), INVSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs))));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
   {
     BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1316,20 +1316,20 @@ thumb_sem_alu_mvn (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = INVSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 {
   {
     BI opval = EQSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1354,7 +1354,7 @@ thumb_sem_add_rd_hs (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -1378,14 +1378,14 @@ if (EQSI (FLD (f_rd), 7)) {
   {
     USI opval = ADDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 } else {
   {
     SI opval = ADDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)));
     current_cpu->thumb_h_hiregs_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "hiregs" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1410,14 +1410,14 @@ if (EQSI (FLD (f_rd), 7)) {
   {
     USI opval = ADDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)));
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 } else {
   {
     SI opval = ADDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)));
     current_cpu->thumb_h_hiregs_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "hiregs" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1445,26 +1445,26 @@ thumb_sem_cmp_rd_hs (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0));
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = SUBOFSI (current_cpu->thumb_h_gr_t_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1492,26 +1492,26 @@ thumb_sem_cmp_hd_rs (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0));
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = SUBOFSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 0);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1539,26 +1539,26 @@ thumb_sem_cmp_hd_hs (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     BI opval = EQSI (tmp_result, 0);
     current_cpu->hardware.h_zbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "zbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = LTSI (tmp_result, 0);
     current_cpu->hardware.h_nbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "nbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
   {
     BI opval = NOTSI (SUBCFSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0));
     current_cpu->hardware.h_cbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "cbit" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     BI opval = SUBOFSI (current_cpu->thumb_h_hiregs_get (FLD (f_rd)), current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 0);
     current_cpu->hardware.h_vbit = opval;
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "vbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1582,7 +1582,7 @@ thumb_sem_mov_rd_hs (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = current_cpu->thumb_h_hiregs_get (FLD (f_rs));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -1606,14 +1606,14 @@ if (EQSI (FLD (f_rd), 7)) {
   {
     USI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rs));
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 } else {
   {
     SI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rs));
     current_cpu->thumb_h_hiregs_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "hiregs" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1638,14 +1638,14 @@ if (EQSI (FLD (f_rd), 7)) {
   {
     USI opval = current_cpu->thumb_h_hiregs_get (FLD (f_rs));
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 } else {
   {
     SI opval = current_cpu->thumb_h_hiregs_get (FLD (f_rs));
     current_cpu->thumb_h_hiregs_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "hiregs" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1670,14 +1670,14 @@ thumb_sem_bx_rs (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     USI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rs));
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 if (NOTSI (ANDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rs)), 1))) {
   {
     BI opval = 0;
     current_cpu->h_tbit_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "tbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1703,14 +1703,14 @@ thumb_sem_bx_hs (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     USI opval = current_cpu->thumb_h_hiregs_get (FLD (f_rs));
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 if (NOTSI (ANDSI (current_cpu->thumb_h_hiregs_get (FLD (f_rs)), 1))) {
   {
     BI opval = 0;
     current_cpu->h_tbit_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "tbit" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -1735,7 +1735,7 @@ thumb_sem_ldr_pc (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = current_cpu->GETMEMSI (pc, ADDSI (ANDSI (ADDSI (pc, 4), -4), FLD (f_word8)));
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -1758,7 +1758,7 @@ thumb_sem_str (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rd));
     current_cpu->SETMEMSI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -1781,7 +1781,7 @@ thumb_sem_strb (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     QI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rd));
     current_cpu->SETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 
@@ -1804,7 +1804,7 @@ thumb_sem_ldr (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = current_cpu->GETMEMSI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -1827,7 +1827,7 @@ thumb_sem_ldrb (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro)))));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -1850,7 +1850,7 @@ thumb_sem_strh (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     HI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rd));
     current_cpu->SETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro))) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -1873,7 +1873,7 @@ thumb_sem_ldrh (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro)))));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -1896,7 +1896,7 @@ thumb_sem_ldsb (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = EXTQISI (current_cpu->GETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro)))));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -1919,7 +1919,7 @@ thumb_sem_ldsh (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = EXTHISI (current_cpu->GETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), current_cpu->thumb_h_gr_t_get (FLD (f_ro)))));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -1942,7 +1942,7 @@ thumb_sem_str_imm (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rd));
     current_cpu->SETMEMSI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_7)), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_7)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -1965,7 +1965,7 @@ thumb_sem_ldr_imm (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = current_cpu->GETMEMSI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_7)));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -1988,7 +1988,7 @@ thumb_sem_strb_imm (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     QI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rd));
     current_cpu->SETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5)), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5)) << dec << ']' << ":=0x" << hex << (SI) opval << dec << "  ";
   }
 
@@ -2011,7 +2011,7 @@ thumb_sem_ldrb_imm (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = ZEXTQISI (current_cpu->GETMEMQI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5))));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -2034,7 +2034,7 @@ thumb_sem_strh_imm (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     HI opval = current_cpu->thumb_h_gr_t_get (FLD (f_rd));
     current_cpu->SETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_6)), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_6)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -2057,7 +2057,7 @@ thumb_sem_ldrh_imm (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = ZEXTHISI (current_cpu->GETMEMHI (pc, ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_rb)), FLD (f_offset5_6))));
     current_cpu->thumb_h_gr_t_set (FLD (f_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -2080,7 +2080,7 @@ thumb_sem_str_sprel (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rd));
     current_cpu->SETMEMSI (pc, ADDSI (current_cpu->thumb_h_sp_t_get (), FLD (f_word8)), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ADDSI (current_cpu->thumb_h_sp_t_get (), FLD (f_word8)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -2103,7 +2103,7 @@ thumb_sem_ldr_sprel (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = current_cpu->GETMEMSI (pc, ADDSI (current_cpu->thumb_h_sp_t_get (), FLD (f_word8)));
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -2126,7 +2126,7 @@ thumb_sem_lda_pc (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = ADDSI (ANDSI (ADDSI (pc, 4), -4), FLD (f_word8));
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -2149,7 +2149,7 @@ thumb_sem_lda_sp (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), FLD (f_word8));
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rd), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rd) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -2172,7 +2172,7 @@ thumb_sem_add_sp (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), FLD (f_sword7));
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -2195,7 +2195,7 @@ thumb_sem_sub_sp (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), FLD (f_sword7));
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -2221,13 +2221,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 7));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2237,13 +2237,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 6))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 6));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2253,13 +2253,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 5))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 5));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2269,13 +2269,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 4))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 4));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2285,13 +2285,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 3))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 3));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2301,13 +2301,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 2))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 2));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2317,13 +2317,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 1))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 1));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2333,13 +2333,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 0));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2366,13 +2366,13 @@ thumb_sem_push_lr (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_lr_t_get ();
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
@@ -2380,13 +2380,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 7));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2396,13 +2396,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 6))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 6));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2412,13 +2412,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 5))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 5));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2428,13 +2428,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 4))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 4));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2444,13 +2444,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 3))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 3));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2460,13 +2460,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 2))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 2));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2476,13 +2476,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 1))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 1));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2492,13 +2492,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
   {
     SI opval = SUBSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 0));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_sp_t_get (), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_sp_t_get () << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2527,13 +2527,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 0), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2543,13 +2543,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 1))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 1), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2559,13 +2559,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 2))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 2), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2575,13 +2575,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 3))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 3), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2591,13 +2591,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 4))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 4), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2607,13 +2607,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 5))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 5), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2623,13 +2623,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 6))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 6), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2639,13 +2639,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 7), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2674,13 +2674,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 0), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2690,13 +2690,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 1))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 1), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2706,13 +2706,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 2))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 2), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2722,13 +2722,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 3))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 3), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2738,13 +2738,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 4))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 4), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2754,13 +2754,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 5))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 5), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2770,13 +2770,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 6))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 6), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2786,13 +2786,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->thumb_h_gr_t_set (((UINT) 7), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2800,13 +2800,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
   {
     USI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_sp_t_get ());
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_sp_t_get (), 4);
     current_cpu->thumb_h_sp_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "sp-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2833,13 +2833,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 0));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2849,13 +2849,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 1))) {
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 1));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2865,13 +2865,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 2))) {
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 2));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2881,13 +2881,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 3))) {
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 3));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2897,13 +2897,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 4))) {
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 4));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2913,13 +2913,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 5))) {
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 5));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2929,13 +2929,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 6))) {
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 6));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2945,13 +2945,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
   {
     SI opval = current_cpu->thumb_h_gr_t_get (((UINT) 7));
     current_cpu->SETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2980,13 +2980,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 0))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
     current_cpu->thumb_h_gr_t_set (((UINT) 0), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -2996,13 +2996,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 1))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
     current_cpu->thumb_h_gr_t_set (((UINT) 1), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3012,13 +3012,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 2))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
     current_cpu->thumb_h_gr_t_set (((UINT) 2), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3028,13 +3028,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 3))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
     current_cpu->thumb_h_gr_t_set (((UINT) 3), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3044,13 +3044,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 4))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
     current_cpu->thumb_h_gr_t_set (((UINT) 4), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3060,13 +3060,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 5))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
     current_cpu->thumb_h_gr_t_set (((UINT) 5), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3076,13 +3076,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 6))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
     current_cpu->thumb_h_gr_t_set (((UINT) 6), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3092,13 +3092,13 @@ if (ANDSI (FLD (f_rlist), SLLSI (1, 7))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)));
     current_cpu->thumb_h_gr_t_set (((UINT) 7), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ADDSI (current_cpu->thumb_h_gr_t_get (FLD (f_bit10_rb)), 4);
     current_cpu->thumb_h_gr_t_set (FLD (f_bit10_rb), opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "gr-t" << '[' << FLD (f_bit10_rb) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3125,7 +3125,7 @@ if (current_cpu->hardware.h_zbit) {
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3150,7 +3150,7 @@ if (NOTBI (current_cpu->hardware.h_zbit)) {
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3175,7 +3175,7 @@ if (current_cpu->hardware.h_cbit) {
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3200,7 +3200,7 @@ if (NOTBI (current_cpu->hardware.h_cbit)) {
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3225,7 +3225,7 @@ if (current_cpu->hardware.h_nbit) {
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3250,7 +3250,7 @@ if (NOTBI (current_cpu->hardware.h_nbit)) {
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3275,7 +3275,7 @@ if (current_cpu->hardware.h_vbit) {
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3300,7 +3300,7 @@ if (NOTBI (current_cpu->hardware.h_vbit)) {
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3325,7 +3325,7 @@ if (ANDBI (current_cpu->hardware.h_cbit, NOTBI (current_cpu->hardware.h_zbit))) 
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3350,7 +3350,7 @@ if (ORBI (NOTBI (current_cpu->hardware.h_cbit), current_cpu->hardware.h_zbit)) {
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3375,7 +3375,7 @@ if (NOTBI (XORBI (current_cpu->hardware.h_nbit, current_cpu->hardware.h_vbit))) 
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3400,7 +3400,7 @@ if (XORBI (current_cpu->hardware.h_nbit, current_cpu->hardware.h_vbit)) {
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3425,7 +3425,7 @@ if (NOTBI (ORBI (current_cpu->hardware.h_zbit, XORBI (current_cpu->hardware.h_nb
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3450,7 +3450,7 @@ if (ORBI (current_cpu->hardware.h_zbit, XORBI (current_cpu->hardware.h_nbit, cur
   {
     USI opval = FLD (i_soffset8);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 }
@@ -3474,7 +3474,7 @@ thumb_sem_swi (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     USI opval = current_cpu->thumb_swi (pc, FLD (f_value8));
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -3497,7 +3497,7 @@ thumb_sem_b (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     USI opval = FLD (i_offset11);
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -3520,7 +3520,7 @@ thumb_sem_bl_hi (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     SI opval = ADDSI (ADDSI (pc, 4), SLLSI (FLD (f_lbwl_hi), 12));
     current_cpu->thumb_h_lr_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "lr-t" << ":=0x" << hex << opval << dec << "  ";
   }
 
@@ -3546,13 +3546,13 @@ thumb_sem_bl_lo (arm7f_cpu* current_cpu, thumb_scache* sem)
   {
     USI opval = ADDSI (current_cpu->thumb_h_lr_t_get (), SLLSI (FLD (f_lbwl_lo), 1));
     current_cpu->branch (opval, npc, status);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
   {
     SI opval = ORSI (ADDSI (tmp_cur_pc, 2), 1);
     current_cpu->thumb_h_lr_t_set (opval);
-    if (current_cpu->trace_result_p)
+    if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "lr-t" << ":=0x" << hex << opval << dec << "  ";
   }
 }

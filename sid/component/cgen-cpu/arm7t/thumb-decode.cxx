@@ -613,7 +613,7 @@ thumb_extract_sfmt_empty (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc,
 
 
   /* Record the fields for the semantic handler.  */
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_empty)\t"
@@ -639,7 +639,7 @@ thumb_extract_sfmt_lsl (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
   FLD (f_offset5) = f_offset5;
   FLD (f_rd) = f_rd;
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_lsl)\t"
@@ -668,7 +668,7 @@ thumb_extract_sfmt_add (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
   FLD (f_rn) = f_rn;
   FLD (f_rs) = f_rs;
   FLD (f_rd) = f_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_add)\t"
@@ -697,7 +697,7 @@ thumb_extract_sfmt_addi (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, 
   FLD (f_offset3) = f_offset3;
   FLD (f_rs) = f_rs;
   FLD (f_rd) = f_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_addi)\t"
@@ -723,7 +723,7 @@ thumb_extract_sfmt_mov (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
   /* Record the fields for the semantic handler.  */
   FLD (f_bit10_rd) = f_bit10_rd;
   FLD (f_offset8) = f_offset8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_mov)\t"
@@ -748,7 +748,7 @@ thumb_extract_sfmt_cmp (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
   /* Record the fields for the semantic handler.  */
   FLD (f_bit10_rd) = f_bit10_rd;
   FLD (f_offset8) = f_offset8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_cmp)\t"
@@ -773,7 +773,7 @@ thumb_extract_sfmt_addi8 (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc,
   /* Record the fields for the semantic handler.  */
   FLD (f_bit10_rd) = f_bit10_rd;
   FLD (f_offset8) = f_offset8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_addi8)\t"
@@ -798,7 +798,7 @@ thumb_extract_sfmt_alu_and (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR p
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_alu_and)\t"
@@ -823,7 +823,7 @@ thumb_extract_sfmt_alu_lsl (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR p
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_alu_lsl)\t"
@@ -848,7 +848,7 @@ thumb_extract_sfmt_alu_adc (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR p
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_alu_adc)\t"
@@ -873,7 +873,7 @@ thumb_extract_sfmt_alu_tst (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR p
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_alu_tst)\t"
@@ -898,7 +898,7 @@ thumb_extract_sfmt_alu_neg (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR p
   /* Record the fields for the semantic handler.  */
   FLD (f_rs) = f_rs;
   FLD (f_rd) = f_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_alu_neg)\t"
@@ -923,7 +923,7 @@ thumb_extract_sfmt_alu_cmp (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR p
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_alu_cmp)\t"
@@ -948,7 +948,7 @@ thumb_extract_sfmt_add_rd_hs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR
   /* Record the fields for the semantic handler.  */
   FLD (f_rs) = f_rs;
   FLD (f_rd) = f_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_add_rd_hs)\t"
@@ -973,7 +973,7 @@ thumb_extract_sfmt_add_hd_rs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_add_hd_rs)\t"
@@ -998,7 +998,7 @@ thumb_extract_sfmt_add_hd_hs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_add_hd_hs)\t"
@@ -1023,7 +1023,7 @@ thumb_extract_sfmt_cmp_rd_hs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR
   /* Record the fields for the semantic handler.  */
   FLD (f_rs) = f_rs;
   FLD (f_rd) = f_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_cmp_rd_hs)\t"
@@ -1048,7 +1048,7 @@ thumb_extract_sfmt_cmp_hd_rs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_cmp_hd_rs)\t"
@@ -1073,7 +1073,7 @@ thumb_extract_sfmt_cmp_hd_hs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_cmp_hd_hs)\t"
@@ -1098,7 +1098,7 @@ thumb_extract_sfmt_mov_rd_hs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR
   /* Record the fields for the semantic handler.  */
   FLD (f_rs) = f_rs;
   FLD (f_rd) = f_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_mov_rd_hs)\t"
@@ -1123,7 +1123,7 @@ thumb_extract_sfmt_mov_hd_rs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_mov_hd_rs)\t"
@@ -1148,7 +1148,7 @@ thumb_extract_sfmt_mov_hd_hs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR
   /* Record the fields for the semantic handler.  */
   FLD (f_rd) = f_rd;
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_mov_hd_hs)\t"
@@ -1170,7 +1170,7 @@ thumb_extract_sfmt_bx_rs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc,
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bx_rs)\t"
@@ -1191,7 +1191,7 @@ thumb_extract_sfmt_bx_hs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc,
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rs) = f_rs;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bx_hs)\t"
@@ -1215,7 +1215,7 @@ thumb_extract_sfmt_ldr_pc (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc
   /* Record the fields for the semantic handler.  */
   FLD (f_word8) = f_word8;
   FLD (f_bit10_rd) = f_bit10_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ldr_pc)\t"
@@ -1243,7 +1243,7 @@ thumb_extract_sfmt_str (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
   FLD (f_rb) = f_rb;
   FLD (f_rd) = f_rd;
   FLD (f_ro) = f_ro;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_str)\t"
@@ -1272,7 +1272,7 @@ thumb_extract_sfmt_ldr (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
   FLD (f_rb) = f_rb;
   FLD (f_ro) = f_ro;
   FLD (f_rd) = f_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ldr)\t"
@@ -1301,7 +1301,7 @@ thumb_extract_sfmt_str_imm (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR p
   FLD (f_offset5_7) = f_offset5_7;
   FLD (f_rb) = f_rb;
   FLD (f_rd) = f_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_str_imm)\t"
@@ -1330,7 +1330,7 @@ thumb_extract_sfmt_ldr_imm (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR p
   FLD (f_offset5_7) = f_offset5_7;
   FLD (f_rb) = f_rb;
   FLD (f_rd) = f_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ldr_imm)\t"
@@ -1359,7 +1359,7 @@ thumb_extract_sfmt_strb_imm (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR 
   FLD (f_offset5) = f_offset5;
   FLD (f_rb) = f_rb;
   FLD (f_rd) = f_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_strb_imm)\t"
@@ -1388,7 +1388,7 @@ thumb_extract_sfmt_ldrb_imm (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR 
   FLD (f_offset5) = f_offset5;
   FLD (f_rb) = f_rb;
   FLD (f_rd) = f_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ldrb_imm)\t"
@@ -1417,7 +1417,7 @@ thumb_extract_sfmt_strh_imm (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR 
   FLD (f_offset5_6) = f_offset5_6;
   FLD (f_rb) = f_rb;
   FLD (f_rd) = f_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_strh_imm)\t"
@@ -1446,7 +1446,7 @@ thumb_extract_sfmt_ldrh_imm (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR 
   FLD (f_offset5_6) = f_offset5_6;
   FLD (f_rb) = f_rb;
   FLD (f_rd) = f_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ldrh_imm)\t"
@@ -1472,7 +1472,7 @@ thumb_extract_sfmt_str_sprel (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR
   /* Record the fields for the semantic handler.  */
   FLD (f_bit10_rd) = f_bit10_rd;
   FLD (f_word8) = f_word8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_str_sprel)\t"
@@ -1497,7 +1497,7 @@ thumb_extract_sfmt_ldr_sprel (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR
   /* Record the fields for the semantic handler.  */
   FLD (f_word8) = f_word8;
   FLD (f_bit10_rd) = f_bit10_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ldr_sprel)\t"
@@ -1522,7 +1522,7 @@ thumb_extract_sfmt_lda_pc (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc
   /* Record the fields for the semantic handler.  */
   FLD (f_word8) = f_word8;
   FLD (f_bit10_rd) = f_bit10_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_lda_pc)\t"
@@ -1547,7 +1547,7 @@ thumb_extract_sfmt_lda_sp (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc
   /* Record the fields for the semantic handler.  */
   FLD (f_word8) = f_word8;
   FLD (f_bit10_rd) = f_bit10_rd;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_lda_sp)\t"
@@ -1569,7 +1569,7 @@ thumb_extract_sfmt_add_sp (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc
 
   /* Record the fields for the semantic handler.  */
   FLD (f_sword7) = f_sword7;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_add_sp)\t"
@@ -1590,7 +1590,7 @@ thumb_extract_sfmt_push (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, 
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rlist) = f_rlist;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_push)\t"
@@ -1611,7 +1611,7 @@ thumb_extract_sfmt_push_lr (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR p
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rlist) = f_rlist;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_push_lr)\t"
@@ -1632,7 +1632,7 @@ thumb_extract_sfmt_pop (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rlist) = f_rlist;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_pop)\t"
@@ -1653,7 +1653,7 @@ thumb_extract_sfmt_pop_pc (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc
 
   /* Record the fields for the semantic handler.  */
   FLD (f_rlist) = f_rlist;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_pop_pc)\t"
@@ -1677,7 +1677,7 @@ thumb_extract_sfmt_stmia (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc,
   /* Record the fields for the semantic handler.  */
   FLD (f_bit10_rb) = f_bit10_rb;
   FLD (f_rlist) = f_rlist;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_stmia)\t"
@@ -1702,7 +1702,7 @@ thumb_extract_sfmt_ldmia (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc,
   /* Record the fields for the semantic handler.  */
   FLD (f_bit10_rb) = f_bit10_rb;
   FLD (f_rlist) = f_rlist;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ldmia)\t"
@@ -1724,7 +1724,7 @@ thumb_extract_sfmt_beq (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_beq)\t"
@@ -1744,7 +1744,7 @@ thumb_extract_sfmt_bcs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bcs)\t"
@@ -1764,7 +1764,7 @@ thumb_extract_sfmt_bmi (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bmi)\t"
@@ -1784,7 +1784,7 @@ thumb_extract_sfmt_bvs (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bvs)\t"
@@ -1804,7 +1804,7 @@ thumb_extract_sfmt_bhi (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bhi)\t"
@@ -1824,7 +1824,7 @@ thumb_extract_sfmt_bge (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bge)\t"
@@ -1844,7 +1844,7 @@ thumb_extract_sfmt_bgt (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 
   /* Record the fields for the semantic handler.  */
   FLD (i_soffset8) = f_soffset8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bgt)\t"
@@ -1864,7 +1864,7 @@ thumb_extract_sfmt_swi (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 
   /* Record the fields for the semantic handler.  */
   FLD (f_value8) = f_value8;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_swi)\t"
@@ -1885,7 +1885,7 @@ thumb_extract_sfmt_b (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thu
 
   /* Record the fields for the semantic handler.  */
   FLD (i_offset11) = f_offset11;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_b)\t"
@@ -1905,7 +1905,7 @@ thumb_extract_sfmt_bl_hi (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc,
 
   /* Record the fields for the semantic handler.  */
   FLD (f_lbwl_hi) = f_lbwl_hi;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bl_hi)\t"
@@ -1926,7 +1926,7 @@ thumb_extract_sfmt_bl_lo (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc,
 
   /* Record the fields for the semantic handler.  */
   FLD (f_lbwl_lo) = f_lbwl_lo;
-  if (current_cpu->trace_extract_p)
+  if (UNLIKELY(current_cpu->trace_extract_p))
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_bl_lo)\t"

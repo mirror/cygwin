@@ -11,4 +11,14 @@
 #undef VERSION
 #include <sidconfutil.h>
 
+// Globally useful macros
+
+#ifdef __GNUC__
+#define LIKELY(expression) (__builtin_expect(!!(expression), 1))
+#define UNLIKELY(expression) (__builtin_expect(!!(expression), 0))
+#else
+#define LIKELY(expression) (expression)
+#define UNLIKELY(expression) (expression)
+#endif
+
 #endif // SIDCONFIG_H

@@ -197,7 +197,7 @@ generic_read_write_bus::write_any(host_int_4 address, DataType data)
   const unsigned width = sizeof(typename DataType::value_type); 
 
   // Range check address
-  if ((address >= 0) && ((address+width) <= target->buffer_length))
+  if (LIKELY((address >= 0) && ((address+width) <= target->buffer_length)))
     {
       typename DataType::value_type mem_image = data.target_memory_value();
       memcpy (& target->buffer[address], & mem_image, width);
@@ -215,7 +215,7 @@ generic_read_only_bus::read_any(host_int_4 address, DataType& data)
   const unsigned width = sizeof(typename DataType::value_type);
 
   // Range check address
-  if ((address >= 0) && ((address+width) <= target->buffer_length))
+  if (LIKELY((address >= 0) && ((address+width) <= target->buffer_length)))
     {
       typename DataType::value_type mem_image;
       memcpy (& mem_image, & target->buffer[address], width);

@@ -1,3 +1,8 @@
+2001-03-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm-decode.cxx, -sem.cxx, -semsw.cxx: Regenerated w/ b.p. hints.
+	* thumb-decode.cxx, -sem.cxx, -semsw.cxx: Ditto.
+
 2001-01-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* arm-decode.h, -sem.cxx: Regenerated with more tracing improvements,

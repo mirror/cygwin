@@ -1,5 +1,8 @@
 /* config.in.  Generated automatically from configure.in by autoheader.  */
 
+/* Define if you have the getopt function.  */
+#undef HAVE_GETOPT
+
 /* Define if you have the m library (-lm).  */
 #undef HAVE_LIBM
 
@@ -17,4 +20,7 @@
 
 /* Define to 1 if we found this declaration otherwise define to 0. */
 #undef HAVE_DECL_BASENAME
+
+/* Define to 1 if we found this declaration otherwise define to 0. */
+#undef HAVE_DECL_GETOPT
 

@@ -14,6 +14,7 @@ AC_EXEEXT
 AC_LANG_CPLUSPLUS
 
 AC_CHECK_LIB(m, main)
+AC_CHECK_FUNCS(getopt)
 
 dnl Check if we need libintl.
 AC_MSG_CHECKING([whether libintl is required for gettext])
@@ -59,7 +60,7 @@ AC_CHECK_PROGS(GUILE, guile, false)
 dnl building docs
 RH_DOCBUILD_CHECK
 
-gcc_AC_CHECK_DECLS([vasprintf asprintf basename], [], [], [
+gcc_AC_CHECK_DECLS([vasprintf asprintf basename getopt], [], [], [
 #include <stdio.h>
 #include <string.h>
 ])

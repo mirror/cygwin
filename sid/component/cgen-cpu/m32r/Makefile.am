@@ -55,6 +55,7 @@ cgen-all: $(CGEN_ALL)
 cgen-m32r:
 	$(SHELL) ../CGEN.sh cpu-decode $(srcdir) $(cgendir) "$(CGENFLAGS)" \
 	m32r "with-scache" m32rbf m32r m32r m32rbf "m32r-" \
+	$(cgendir)/cpu/m32r.cpu \
 	"desc.h cpu.h decode.h decode.cxx semantics.cxx write.cxx defs.h"
 
 html_stylesheet=$(srcdir)/../../component_html.xsl

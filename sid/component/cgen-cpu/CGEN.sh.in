@@ -3,7 +3,8 @@
 #
 # Usage: /bin/sh cgen.sh cpu-decode srcdir \
 #	cgen cgendir cgenflags \
-#	arch archflags cpu isa mach prefix file-prefix file-specs
+#	arch archflags cpu isa mach prefix file-prefix \
+#	arch-file file-specs
 #
 # cpu-decode: specified as is, exists for consistency with other such scripts.
 #
@@ -47,6 +48,7 @@ mach=$9
 # bring parms past 9 portably into view
 shift ; prefix=$9
 shift ; fileprefix=$9
+shift ; archfile=$9
 shift ; filespecs=$9
 
 rootdir=${srcdir}/../../../..
@@ -100,7 +102,7 @@ ${cgen} -s ${cgendir}/cgen-sid.scm \
 	-f "${archflags}" \
 	-m ${mach} \
 	-i ${isa} \
-	-a ${arch} \
+	-a ${archfile} \
 	${fileopts}
 
 

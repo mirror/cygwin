@@ -142,11 +142,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   int i;
 
   for (i = 0; labels[i].label != 0; ++i)
+    {
 #if FAST_P
-    CPU_IDESC (current_cpu) [labels[i].index].sem_fast_lab = labels[i].label;
+      CPU_IDESC (current_cpu) [labels[i].index].sem_fast_lab = labels[i].label;
 #else
-    CPU_IDESC (current_cpu) [labels[i].index].sem_full_lab = labels[i].label;
+      CPU_IDESC (current_cpu) [labels[i].index].sem_full_lab = labels[i].label;
 #endif
+    }
 
 #undef DEFINE_LABELS
 #endif /* DEFINE_LABELS */
@@ -202,13 +204,15 @@ SWITCH (sem, SEM_ARGBUF (vpc) -> semantic.sem_case)
   vpc = SEM_NEXT_VPC (sem_arg, pc, 0);
 
   {
-#if WITH_SCACHE
-    /* Update the recorded pc in the cpu state struct.  */
+    /* Update the recorded pc in the cpu state struct.
+       Only necessary for WITH_SCACHE case, but to avoid the
+       conditional compilation ....  */
     SET_H_PC (pc);
-#endif
-    sim_engine_invalid_insn (current_cpu, pc);
-    sim_io_error (CPU_STATE (current_cpu), "invalid insn not handled\n");
-    /* NOTREACHED */
+    /* Virtual insns have zero size.  Overwrite vpc with address of next insn
+       using the default-insn-bitsize spec.  When executing insns in parallel
+       we may want to queue the fault and continue execution.  */
+    vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
+    vpc = sim_engine_invalid_insn (current_cpu, pc, vpc);
   }
 
 #undef FLD
@@ -266,12 +270,12 @@ SWITCH (sem, SEM_ARGBUF (vpc) -> semantic.sem_case)
 #if WITH_SCACHE_PBB_M32RBF
 #ifdef DEFINE_SWITCH
     vpc = m32rbf_pbb_cti_chain (current_cpu, sem_arg,
-			       pbb_br_npc_ptr, pbb_br_npc);
+			       pbb_br_type, pbb_br_npc);
     BREAK (sem);
 #else
     /* FIXME: Allow provision of explicit ifmt spec in insn spec.  */
     vpc = m32rbf_pbb_cti_chain (current_cpu, sem_arg,
-			       CPU_PBB_BR_NPC_PTR (current_cpu),
+			       CPU_PBB_BR_TYPE (current_cpu),
 			       CPU_PBB_BR_NPC (current_cpu));
 #endif
 #endif
@@ -332,7 +336,7 @@ SWITCH (sem, SEM_ARGBUF (vpc) -> semantic.sem_case)
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_add.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -351,7 +355,7 @@ SWITCH (sem, SEM_ARGBUF (vpc) -> semantic.sem_case)
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_add3.f
+#define FLD(f) abuf->fields.sfmt_add3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -370,7 +374,7 @@ SWITCH (sem, SEM_ARGBUF (vpc) -> semantic.sem_case)
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_add.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -389,7 +393,7 @@ SWITCH (sem, SEM_ARGBUF (vpc) -> semantic.sem_case)
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_and3.f
+#define FLD(f) abuf->fields.sfmt_and3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -408,7 +412,7 @@ SWITCH (sem, SEM_ARGBUF (vpc) -> semantic.sem_case)
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_add.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -427,7 +431,7 @@ SWITCH (sem, SEM_ARGBUF (vpc) -> semantic.sem_case)
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_or3.f
+#define FLD(f) abuf->fields.sfmt_and3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -446,7 +450,7 @@ SWITCH (sem, SEM_ARGBUF (vpc) -> semantic.sem_case)
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_add.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -465,7 +469,7 @@ SWITCH (sem, SEM_ARGBUF (vpc) -> semantic.sem_case)
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_and3.f
+#define FLD(f) abuf->fields.sfmt_and3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -484,7 +488,7 @@ SWITCH (sem, SEM_ARGBUF (vpc) -> semantic.sem_case)
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_addi.f
+#define FLD(f) abuf->fields.sfmt_addi.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -503,13 +507,13 @@ SWITCH (sem, SEM_ARGBUF (vpc) -> semantic.sem_case)
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_addv.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
-  BI temp1;SI temp0;
+{
+  SI temp0;BI temp1;
   temp0 = ADDSI (* FLD (i_dr), * FLD (i_sr));
   temp1 = ADDOFSI (* FLD (i_dr), * FLD (i_sr), 0);
   {
@@ -522,7 +526,7 @@ do {
     CPU (h_cond) = opval;
     TRACE_RESULT (current_cpu, abuf, "condbit", 'x', opval);
   }
-} while (0);
+}
 
 #undef FLD
 }
@@ -532,13 +536,13 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_addv3.f
+#define FLD(f) abuf->fields.sfmt_add3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
 
-do {
-  BI temp1;SI temp0;
+{
+  SI temp0;BI temp1;
   temp0 = ADDSI (* FLD (i_sr), FLD (f_simm16));
   temp1 = ADDOFSI (* FLD (i_sr), FLD (f_simm16), 0);
   {
@@ -551,7 +555,7 @@ do {
     CPU (h_cond) = opval;
     TRACE_RESULT (current_cpu, abuf, "condbit", 'x', opval);
   }
-} while (0);
+}
 
 #undef FLD
 }
@@ -561,13 +565,13 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_addx.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
-  BI temp1;SI temp0;
+{
+  SI temp0;BI temp1;
   temp0 = ADDCSI (* FLD (i_dr), * FLD (i_sr), CPU (h_cond));
   temp1 = ADDCFSI (* FLD (i_dr), * FLD (i_sr), CPU (h_cond));
   {
@@ -580,7 +584,7 @@ do {
     CPU (h_cond) = opval;
     TRACE_RESULT (current_cpu, abuf, "condbit", 'x', opval);
   }
-} while (0);
+}
 
 #undef FLD
 }
@@ -590,7 +594,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_bc8.f
+#define FLD(f) abuf->fields.sfmt_bl8.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -599,7 +603,7 @@ do {
 if (CPU (h_cond)) {
   {
     USI opval = FLD (i_disp8);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     written |= (1 << 2);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
@@ -615,7 +619,7 @@ if (CPU (h_cond)) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_bc24.f
+#define FLD(f) abuf->fields.sfmt_bl24.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -624,7 +628,7 @@ if (CPU (h_cond)) {
 if (CPU (h_cond)) {
   {
     USI opval = FLD (i_disp24);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     written |= (1 << 2);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
@@ -640,7 +644,7 @@ if (CPU (h_cond)) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_beq.f
+#define FLD(f) abuf->fields.sfmt_beq.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -649,7 +653,7 @@ if (CPU (h_cond)) {
 if (EQSI (* FLD (i_src1), * FLD (i_src2))) {
   {
     USI opval = FLD (i_disp16);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     written |= (1 << 3);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
@@ -665,7 +669,7 @@ if (EQSI (* FLD (i_src1), * FLD (i_src2))) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_beqz.f
+#define FLD(f) abuf->fields.sfmt_beq.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -674,7 +678,7 @@ if (EQSI (* FLD (i_src1), * FLD (i_src2))) {
 if (EQSI (* FLD (i_src2), 0)) {
   {
     USI opval = FLD (i_disp16);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     written |= (1 << 2);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
@@ -690,7 +694,7 @@ if (EQSI (* FLD (i_src2), 0)) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_beqz.f
+#define FLD(f) abuf->fields.sfmt_beq.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -699,7 +703,7 @@ if (EQSI (* FLD (i_src2), 0)) {
 if (GESI (* FLD (i_src2), 0)) {
   {
     USI opval = FLD (i_disp16);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     written |= (1 << 2);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
@@ -715,7 +719,7 @@ if (GESI (* FLD (i_src2), 0)) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_beqz.f
+#define FLD(f) abuf->fields.sfmt_beq.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -724,7 +728,7 @@ if (GESI (* FLD (i_src2), 0)) {
 if (GTSI (* FLD (i_src2), 0)) {
   {
     USI opval = FLD (i_disp16);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     written |= (1 << 2);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
@@ -740,7 +744,7 @@ if (GTSI (* FLD (i_src2), 0)) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_beqz.f
+#define FLD(f) abuf->fields.sfmt_beq.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -749,7 +753,7 @@ if (GTSI (* FLD (i_src2), 0)) {
 if (LESI (* FLD (i_src2), 0)) {
   {
     USI opval = FLD (i_disp16);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     written |= (1 << 2);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
@@ -765,7 +769,7 @@ if (LESI (* FLD (i_src2), 0)) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_beqz.f
+#define FLD(f) abuf->fields.sfmt_beq.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -774,7 +778,7 @@ if (LESI (* FLD (i_src2), 0)) {
 if (LTSI (* FLD (i_src2), 0)) {
   {
     USI opval = FLD (i_disp16);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     written |= (1 << 2);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
@@ -790,7 +794,7 @@ if (LTSI (* FLD (i_src2), 0)) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_beqz.f
+#define FLD(f) abuf->fields.sfmt_beq.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -799,7 +803,7 @@ if (LTSI (* FLD (i_src2), 0)) {
 if (NESI (* FLD (i_src2), 0)) {
   {
     USI opval = FLD (i_disp16);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     written |= (1 << 2);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
@@ -815,13 +819,13 @@ if (NESI (* FLD (i_src2), 0)) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_bl8.f
+#define FLD(f) abuf->fields.sfmt_bl8.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
+{
   {
     SI opval = ADDSI (ANDSI (pc, -4), 4);
     CPU (h_gr[((UINT) 14)]) = opval;
@@ -829,10 +833,10 @@ do {
   }
   {
     USI opval = FLD (i_disp8);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
-} while (0);
+}
 
   SEM_BRANCH_FINI (vpc);
 #undef FLD
@@ -843,13 +847,13 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_bl24.f
+#define FLD(f) abuf->fields.sfmt_bl24.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
 
-do {
+{
   {
     SI opval = ADDSI (pc, 4);
     CPU (h_gr[((UINT) 14)]) = opval;
@@ -857,10 +861,10 @@ do {
   }
   {
     USI opval = FLD (i_disp24);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
-} while (0);
+}
 
   SEM_BRANCH_FINI (vpc);
 #undef FLD
@@ -871,7 +875,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_bc8.f
+#define FLD(f) abuf->fields.sfmt_bl8.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -880,7 +884,7 @@ do {
 if (NOTBI (CPU (h_cond))) {
   {
     USI opval = FLD (i_disp8);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     written |= (1 << 2);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
@@ -896,7 +900,7 @@ if (NOTBI (CPU (h_cond))) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_bc24.f
+#define FLD(f) abuf->fields.sfmt_bl24.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -905,7 +909,7 @@ if (NOTBI (CPU (h_cond))) {
 if (NOTBI (CPU (h_cond))) {
   {
     USI opval = FLD (i_disp24);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     written |= (1 << 2);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
@@ -921,7 +925,7 @@ if (NOTBI (CPU (h_cond))) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_beq.f
+#define FLD(f) abuf->fields.sfmt_beq.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -930,7 +934,7 @@ if (NOTBI (CPU (h_cond))) {
 if (NESI (* FLD (i_src1), * FLD (i_src2))) {
   {
     USI opval = FLD (i_disp16);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     written |= (1 << 3);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
@@ -946,7 +950,7 @@ if (NESI (* FLD (i_src1), * FLD (i_src2))) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_bra8.f
+#define FLD(f) abuf->fields.sfmt_bl8.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -954,7 +958,7 @@ if (NESI (* FLD (i_src1), * FLD (i_src2))) {
 
   {
     USI opval = FLD (i_disp8);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
 
@@ -967,7 +971,7 @@ if (NESI (* FLD (i_src1), * FLD (i_src2))) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_bra24.f
+#define FLD(f) abuf->fields.sfmt_bl24.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -975,7 +979,7 @@ if (NESI (* FLD (i_src1), * FLD (i_src2))) {
 
   {
     USI opval = FLD (i_disp24);
-    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc, SEM_BRANCH_ADDR_CACHE (sem_arg));
+    SEM_BRANCH_VIA_CACHE (current_cpu, sem_arg, opval, vpc);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
 
@@ -988,7 +992,7 @@ if (NESI (* FLD (i_src1), * FLD (i_src2))) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_cmp.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1007,7 +1011,7 @@ if (NESI (* FLD (i_src1), * FLD (i_src2))) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_cmpi.f
+#define FLD(f) abuf->fields.sfmt_st_d.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -1026,7 +1030,7 @@ if (NESI (* FLD (i_src1), * FLD (i_src2))) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_cmp.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1045,7 +1049,7 @@ if (NESI (* FLD (i_src1), * FLD (i_src2))) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_cmpi.f
+#define FLD(f) abuf->fields.sfmt_st_d.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -1064,7 +1068,7 @@ if (NESI (* FLD (i_src1), * FLD (i_src2))) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_div.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -1087,7 +1091,7 @@ if (NESI (* FLD (i_sr), 0)) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_div.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -1110,7 +1114,7 @@ if (NESI (* FLD (i_sr), 0)) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_div.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -1133,7 +1137,7 @@ if (NESI (* FLD (i_sr), 0)) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_div.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -1156,14 +1160,14 @@ if (NESI (* FLD (i_sr), 0)) {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_jl.f
+#define FLD(f) abuf->fields.sfmt_jl.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
-  USI temp1;SI temp0;
+{
+  SI temp0;USI temp1;
   temp0 = ADDSI (ANDSI (pc, -4), 4);
   temp1 = ANDSI (* FLD (i_sr), -4);
   {
@@ -1176,7 +1180,7 @@ do {
     SEM_BRANCH_VIA_ADDR (current_cpu, sem_arg, opval, vpc);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
-} while (0);
+}
 
   SEM_BRANCH_FINI (vpc);
 #undef FLD
@@ -1187,7 +1191,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_jmp.f
+#define FLD(f) abuf->fields.sfmt_jl.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
@@ -1208,7 +1212,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ld.f
+#define FLD(f) abuf->fields.sfmt_ld_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1227,7 +1231,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ld_d.f
+#define FLD(f) abuf->fields.sfmt_add3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -1246,7 +1250,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ldb.f
+#define FLD(f) abuf->fields.sfmt_ld_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1265,7 +1269,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ldb_d.f
+#define FLD(f) abuf->fields.sfmt_add3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -1284,7 +1288,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ldh.f
+#define FLD(f) abuf->fields.sfmt_ld_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1303,7 +1307,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ldh_d.f
+#define FLD(f) abuf->fields.sfmt_add3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -1322,7 +1326,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ldb.f
+#define FLD(f) abuf->fields.sfmt_ld_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1341,7 +1345,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ldb_d.f
+#define FLD(f) abuf->fields.sfmt_add3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -1360,7 +1364,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ldh.f
+#define FLD(f) abuf->fields.sfmt_ld_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1379,7 +1383,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ldh_d.f
+#define FLD(f) abuf->fields.sfmt_add3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -1398,13 +1402,13 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ld_plus.f
+#define FLD(f) abuf->fields.sfmt_ld_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
-  SI temp1;SI temp0;
+{
+  SI temp0;SI temp1;
   temp0 = GETMEMSI (current_cpu, pc, * FLD (i_sr));
   temp1 = ADDSI (* FLD (i_sr), 4);
   {
@@ -1417,7 +1421,7 @@ do {
     * FLD (i_sr) = opval;
     TRACE_RESULT (current_cpu, abuf, "sr", 'x', opval);
   }
-} while (0);
+}
 
 #undef FLD
 }
@@ -1427,7 +1431,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ld24.f
+#define FLD(f) abuf->fields.sfmt_ld24.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -1446,7 +1450,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ldi8.f
+#define FLD(f) abuf->fields.sfmt_addi.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1465,7 +1469,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_ldi16.f
+#define FLD(f) abuf->fields.sfmt_add3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -1484,23 +1488,23 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_lock.f
+#define FLD(f) abuf->fields.sfmt_ld_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
+{
   {
     BI opval = 1;
     CPU (h_lock) = opval;
-    TRACE_RESULT (current_cpu, abuf, "lock-0", 'x', opval);
+    TRACE_RESULT (current_cpu, abuf, "lock", 'x', opval);
   }
   {
     SI opval = GETMEMSI (current_cpu, pc, * FLD (i_sr));
     * FLD (i_dr) = opval;
     TRACE_RESULT (current_cpu, abuf, "dr", 'x', opval);
   }
-} while (0);
+}
 
 #undef FLD
 }
@@ -1510,7 +1514,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_machi.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1529,7 +1533,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_machi.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1548,7 +1552,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_machi.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1567,7 +1571,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_machi.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1586,7 +1590,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_add.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1605,7 +1609,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mulhi.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1624,7 +1628,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mulhi.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1643,7 +1647,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mulhi.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1662,7 +1666,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mulhi.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1681,7 +1685,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mv.f
+#define FLD(f) abuf->fields.sfmt_ld_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1700,7 +1704,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mvfachi.f
+#define FLD(f) abuf->fields.sfmt_seth.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1719,7 +1723,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mvfachi.f
+#define FLD(f) abuf->fields.sfmt_seth.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1738,7 +1742,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mvfachi.f
+#define FLD(f) abuf->fields.sfmt_seth.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1757,7 +1761,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mvfc.f
+#define FLD(f) abuf->fields.sfmt_ld_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1776,7 +1780,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mvtachi.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1795,7 +1799,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mvtachi.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1814,7 +1818,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mvtc.f
+#define FLD(f) abuf->fields.sfmt_ld_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1833,7 +1837,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mv.f
+#define FLD(f) abuf->fields.sfmt_ld_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1852,7 +1856,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_nop.f
+#define FLD(f) abuf->fields.fmt_empty.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1867,7 +1871,7 @@ PROFILE_COUNT_FILLNOPS (current_cpu, abuf->addr);
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_mv.f
+#define FLD(f) abuf->fields.sfmt_ld_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -1886,12 +1890,12 @@ PROFILE_COUNT_FILLNOPS (current_cpu, abuf->addr);
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_rac.f
+#define FLD(f) abuf->fields.fmt_empty.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
+{
   DI tmp_tmp1;
   tmp_tmp1 = SLLDI (GET_H_ACCUM (), 1);
   tmp_tmp1 = ADDDI (tmp_tmp1, MAKEDI (0, 32768));
@@ -1900,7 +1904,7 @@ do {
     SET_H_ACCUM (opval);
     TRACE_RESULT (current_cpu, abuf, "accum", 'D', opval);
   }
-} while (0);
+}
 
 #undef FLD
 }
@@ -1910,12 +1914,12 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_rac.f
+#define FLD(f) abuf->fields.fmt_empty.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
+{
   DI tmp_tmp1;
   tmp_tmp1 = ANDDI (GET_H_ACCUM (), MAKEDI (16777215, 0xffffffff));
 if (ANDIF (GEDI (tmp_tmp1, MAKEDI (16383, 0x80000000)), LEDI (tmp_tmp1, MAKEDI (8388607, 0xffffffff)))) {
@@ -1933,7 +1937,7 @@ if (ANDIF (GEDI (tmp_tmp1, MAKEDI (8388608, 0)), LEDI (tmp_tmp1, MAKEDI (1676083
     SET_H_ACCUM (opval);
     TRACE_RESULT (current_cpu, abuf, "accum", 'D', opval);
   }
-} while (0);
+}
 
 #undef FLD
 }
@@ -1943,13 +1947,13 @@ if (ANDIF (GEDI (tmp_tmp1, MAKEDI (8388608, 0)), LEDI (tmp_tmp1, MAKEDI (1676083
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_rte.f
+#define FLD(f) abuf->fields.fmt_empty.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
+{
   {
     USI opval = ANDSI (GET_H_CR (((UINT) 6)), -4);
     SEM_BRANCH_VIA_ADDR (current_cpu, sem_arg, opval, vpc);
@@ -1963,14 +1967,14 @@ do {
   {
     UQI opval = CPU (h_bpsw);
     SET_H_PSW (opval);
-    TRACE_RESULT (current_cpu, abuf, "psw-0", 'x', opval);
+    TRACE_RESULT (current_cpu, abuf, "psw", 'x', opval);
   }
   {
     UQI opval = CPU (h_bbpsw);
     CPU (h_bpsw) = opval;
-    TRACE_RESULT (current_cpu, abuf, "bpsw-0", 'x', opval);
+    TRACE_RESULT (current_cpu, abuf, "bpsw", 'x', opval);
   }
-} while (0);
+}
 
   SEM_BRANCH_FINI (vpc);
 #undef FLD
@@ -1981,7 +1985,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_seth.f
+#define FLD(f) abuf->fields.sfmt_seth.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -2000,7 +2004,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_add.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -2019,7 +2023,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_sll3.f
+#define FLD(f) abuf->fields.sfmt_add3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -2038,7 +2042,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_slli.f
+#define FLD(f) abuf->fields.sfmt_slli.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -2057,7 +2061,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_add.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -2076,7 +2080,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_sll3.f
+#define FLD(f) abuf->fields.sfmt_add3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -2095,7 +2099,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_slli.f
+#define FLD(f) abuf->fields.sfmt_slli.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -2114,7 +2118,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_add.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -2133,7 +2137,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_sll3.f
+#define FLD(f) abuf->fields.sfmt_add3.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -2152,7 +2156,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_slli.f
+#define FLD(f) abuf->fields.sfmt_slli.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -2171,7 +2175,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_st.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -2190,7 +2194,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_st_d.f
+#define FLD(f) abuf->fields.sfmt_st_d.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -2209,7 +2213,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_stb.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -2228,7 +2232,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_stb_d.f
+#define FLD(f) abuf->fields.sfmt_st_d.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -2247,7 +2251,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_sth.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -2266,7 +2270,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_sth_d.f
+#define FLD(f) abuf->fields.sfmt_st_d.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 4);
@@ -2285,12 +2289,12 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_st_plus.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
+{
   SI tmp_new_src2;
   tmp_new_src2 = ADDSI (* FLD (i_src2), 4);
   {
@@ -2303,7 +2307,7 @@ do {
     * FLD (i_src2) = opval;
     TRACE_RESULT (current_cpu, abuf, "src2", 'x', opval);
   }
-} while (0);
+}
 
 #undef FLD
 }
@@ -2313,12 +2317,12 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_st_plus.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
+{
   SI tmp_new_src2;
   tmp_new_src2 = SUBSI (* FLD (i_src2), 4);
   {
@@ -2331,7 +2335,7 @@ do {
     * FLD (i_src2) = opval;
     TRACE_RESULT (current_cpu, abuf, "src2", 'x', opval);
   }
-} while (0);
+}
 
 #undef FLD
 }
@@ -2341,7 +2345,7 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_add.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
@@ -2360,13 +2364,13 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_addv.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
-  BI temp1;SI temp0;
+{
+  SI temp0;BI temp1;
   temp0 = SUBSI (* FLD (i_dr), * FLD (i_sr));
   temp1 = SUBOFSI (* FLD (i_dr), * FLD (i_sr), 0);
   {
@@ -2379,7 +2383,7 @@ do {
     CPU (h_cond) = opval;
     TRACE_RESULT (current_cpu, abuf, "condbit", 'x', opval);
   }
-} while (0);
+}
 
 #undef FLD
 }
@@ -2389,13 +2393,13 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_addx.f
+#define FLD(f) abuf->fields.sfmt_add.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
-  BI temp1;SI temp0;
+{
+  SI temp0;BI temp1;
   temp0 = SUBCSI (* FLD (i_dr), * FLD (i_sr), CPU (h_cond));
   temp1 = SUBCFSI (* FLD (i_dr), * FLD (i_sr), CPU (h_cond));
   {
@@ -2408,7 +2412,7 @@ do {
     CPU (h_cond) = opval;
     TRACE_RESULT (current_cpu, abuf, "condbit", 'x', opval);
   }
-} while (0);
+}
 
 #undef FLD
 }
@@ -2418,13 +2422,13 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.cti.fields.fmt_trap.f
+#define FLD(f) abuf->fields.sfmt_trap.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   SEM_BRANCH_INIT
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
+{
   {
     USI opval = GET_H_CR (((UINT) 6));
     SET_H_CR (((UINT) 14), opval);
@@ -2438,24 +2442,24 @@ do {
   {
     UQI opval = CPU (h_bpsw);
     CPU (h_bbpsw) = opval;
-    TRACE_RESULT (current_cpu, abuf, "bbpsw-0", 'x', opval);
+    TRACE_RESULT (current_cpu, abuf, "bbpsw", 'x', opval);
   }
   {
     UQI opval = GET_H_PSW ();
     CPU (h_bpsw) = opval;
-    TRACE_RESULT (current_cpu, abuf, "bpsw-0", 'x', opval);
+    TRACE_RESULT (current_cpu, abuf, "bpsw", 'x', opval);
   }
   {
     UQI opval = ANDQI (GET_H_PSW (), 128);
     SET_H_PSW (opval);
-    TRACE_RESULT (current_cpu, abuf, "psw-0", 'x', opval);
+    TRACE_RESULT (current_cpu, abuf, "psw", 'x', opval);
   }
   {
     SI opval = m32r_trap (current_cpu, pc, FLD (f_uimm4));
     SEM_BRANCH_VIA_ADDR (current_cpu, sem_arg, opval, vpc);
     TRACE_RESULT (current_cpu, abuf, "pc", 'x', opval);
   }
-} while (0);
+}
 
   SEM_BRANCH_FINI (vpc);
 #undef FLD
@@ -2466,12 +2470,12 @@ do {
 {
   SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);
   ARGBUF *abuf = SEM_ARGBUF (sem_arg);
-#define FLD(f) abuf->fields.fmt_unlock.f
+#define FLD(f) abuf->fields.sfmt_st_plus.f
   int UNUSED written = 0;
   IADDR UNUSED pc = abuf->addr;
   vpc = SEM_NEXT_VPC (sem_arg, pc, 2);
 
-do {
+{
 if (CPU (h_lock)) {
   {
     SI opval = * FLD (i_src1);
@@ -2483,9 +2487,9 @@ if (CPU (h_lock)) {
   {
     BI opval = 0;
     CPU (h_lock) = opval;
-    TRACE_RESULT (current_cpu, abuf, "lock-0", 'x', opval);
+    TRACE_RESULT (current_cpu, abuf, "lock", 'x', opval);
   }
-} while (0);
+}
 
   abuf->written = written;
 #undef FLD

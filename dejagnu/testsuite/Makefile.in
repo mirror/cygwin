@@ -76,7 +76,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 EXPECT = `if test -f $(top_builddir)/../expect/expect; then echo $(top_builddir)/../expect/expect; else echo expect; fi`
 RUNTEST = `if test -f $(top_srcdir)/../dejagnu/runtest; then echo $(top_srcdir)/../dejagnu/runtest; else echo runtest; fi`
@@ -101,7 +101,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

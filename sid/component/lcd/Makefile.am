@@ -20,5 +20,5 @@ liblcd_char_display_la_LIBADD = @lcd_libs@
 pkgdata_DATA = hw-visual-lcd.tk hw-visual-lcd.txt hw-lcd-t6963c.txt hw-lcd-hd44780u.txt hw-lcd-char-display.txt
 
 DEJAGNUTESTS=lcdbase.exp lcdmonkey.exp lcd1val.exp lcd1inv.exp
-checkme: all
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )

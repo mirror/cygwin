@@ -20,8 +20,7 @@ libcgencpu_la_LIBADD = @cpu_libs@
 libcgencpu_la_DEPENDENCIES = @cpu_libs@
 
 DEJAGNUTESTS = cpumonkey.exp dhrystone.exp
-.PHONY: checkme
-checkme:
+check-local: all
 	-(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
 	for subdir in @cpu_subdirs@; do \
 		( cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) checkme ); \

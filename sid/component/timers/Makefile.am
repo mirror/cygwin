@@ -15,6 +15,5 @@ libtimers_la_DEPENDENCIES = @cpu_libs@
 
 DEJAGNUTESTS=timerbase.exp timersched.exp timermonkey.exp
 
-.PHONY: checkme
-checkme:
+check-local: all
 	-(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )

@@ -11,5 +11,5 @@ libmmu_la_LDFLAGS = -module -no-undefined
 pkgdata_DATA = hw-remap_pause-arm_ref.txt
 
 DEJAGNUTESTS=arm-remap.exp mmumonkey.exp
-checkme: all
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )

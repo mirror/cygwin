@@ -11,5 +11,5 @@ libsched_la_LDFLAGS = -module -no-undefined
 pkgdata_DATA = sid-sched.txt
 
 DEJAGNUTESTS=schedbase.exp schedhost.exp schedhost2.exp schedmonkey.exp
-checkme:
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )

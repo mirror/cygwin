@@ -15,8 +15,7 @@ libm32r_la_SOURCES = m32rbf.cxx \
 libm32r_la_LDFLAGS =
 
 DEJAGNUTESTS = m32rbsp.exp
-.PHONY: checkme
-checkme:
+check-local: all
 	(cd ../../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
 
 cgendir = $(srcdir)/../../../../cgen

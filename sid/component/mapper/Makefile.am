@@ -13,5 +13,5 @@ libmapper_la_LDFLAGS = -module -no-undefined
 pkgdata_DATA = hw-mapper-basic.txt
 
 DEJAGNUTESTS=basicmapper.exp mapperdocs.exp mappermonkey.exp
-checkme: all
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )

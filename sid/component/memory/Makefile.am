@@ -13,5 +13,5 @@ libmemory_la_LDFLAGS = -module -no-undefined
 pkgdata_DATA = hw-memory-ram_rom-basic.txt hw-memory-flash-am29.txt hw-memory-flash-at29.txt
 
 DEJAGNUTESTS = am29.exp at29.exp at29xx.exp at29inv.exp at29val.exp genericmemory.exp memdocs.exp memmonkey.exp
-checkme: all
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )

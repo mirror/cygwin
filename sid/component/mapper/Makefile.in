@@ -347,6 +347,7 @@ info: info-recursive
 dvi-am:
 dvi: dvi-recursive
 check-am:
+	$(MAKE) $(AM_MAKEFLAGS) check-local
 check: check-recursive
 installcheck-am:
 installcheck: installcheck-recursive
@@ -421,14 +422,14 @@ installcheck-recursive info-recursive dvi-recursive \
 mostlyclean-recursive distclean-recursive clean-recursive \
 maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
 distclean-tags clean-tags maintainer-clean-tags distdir info-am info \
-dvi-am dvi check check-am installcheck-am installcheck install-info-am \
-install-info install-exec-am install-exec install-data-am install-data \
-install-am install uninstall-am uninstall all-redirect all-am all \
-installdirs-am installdirs mostlyclean-generic distclean-generic \
-clean-generic maintainer-clean-generic clean mostlyclean distclean \
-maintainer-clean
+dvi-am dvi check-local check check-am installcheck-am installcheck \
+install-info-am install-info install-exec-am install-exec \
+install-data-am install-data install-am install uninstall-am uninstall \
+all-redirect all-am all installdirs-am installdirs mostlyclean-generic \
+distclean-generic clean-generic maintainer-clean-generic clean \
+mostlyclean distclean maintainer-clean
 
-checkme: all
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

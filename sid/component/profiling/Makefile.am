@@ -11,6 +11,6 @@ libprof_la_LDFLAGS = -module -no-undefined
 pkgdata_DATA = sw-profile-gprof.txt
 
 DEJAGNUTESTS=runprof.exp
-checkme:
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
 

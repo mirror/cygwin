@@ -11,5 +11,5 @@ libparport_la_SOURCES = ps2.h ps2.cxx
 libparport_la_LDFLAGS = -module -no-undefined
 
 DEJAGNUTESTS = parport.exp parportdocs.exp parmonkey.exp
-checkme:
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )

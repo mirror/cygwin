@@ -239,6 +239,7 @@ namespace sidutil
     bool trace_disass_p;
     bool trace_semantics_p;
     bool trace_counter_p;
+    bool final_insn_count_p;
     bool enable_step_trap_p;
     cpu_trace_stream trace_stream;
 
@@ -306,6 +307,9 @@ namespace sidutil
 	                     << "  ";
 	}
     }
+
+  public:
+    void update_total_latency (sid::host_int_8 latency) { this->total_latency += latency; }
 
   protected:
     virtual sid::host_int_8 latency_to_cycles (sid::host_int_8 num)
@@ -417,6 +421,7 @@ namespace sidutil
 	  << " " << this->trace_disass_p
 	  << " " << this->trace_semantics_p
 	  << " " << this->trace_counter_p
+	  << " " << this->final_insn_count_p
 	  // pins
 	  << " " << this->step_cycles_pin
 	  << " " << this->trap_type_pin
@@ -441,6 +446,7 @@ namespace sidutil
 	  >> this->trace_disass_p
 	  >> this->trace_semantics_p
 	  >> this->trace_counter_p
+	  >> this->final_insn_count_p
 	  // pins
 	  >> this->step_cycles_pin
 	  >> this->trap_type_pin
@@ -582,6 +588,8 @@ public:
 	add_attribute ("trace-result?", & this->trace_result_p, "setting");
 	this->trace_counter_p = false;
 	add_attribute ("trace-counter?", & this->trace_counter_p, "setting");
+	this->final_insn_count_p = false;
+	add_attribute ("final-insn-count?", & this->final_insn_count_p, "setting");
       }
 
     virtual ~basic_cpu() throw() {}

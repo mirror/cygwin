@@ -1,3 +1,16 @@
+2002-12-18  Kevin Buettner  <kevinb@redhat.com>
+
+	* ptrace-target.h, ptrace-target.c (ptrace_write_user)
+	(ptrace_read_user): Add struct gdbserv argument.
+	* linux-target.c: Fix all callers.
+	* ptrace-target.c (ptrace_write_user, ptrace_read_user): Add
+	debugging printf()s.
+	(ptrace_xfer_mem): Fix debugging printf()s so that they'll print
+	useful results when sizeof (long long) is the same as
+	sizeof (ptrace_xfer_type).
+	(ptrace_xfer_mem): Decode address using gdbserv_host_bytes_from_reg()
+	instead of gdbserv_reg_to_ulong().
+
 2002-12-02  Kevin Buettner  <kevinb@redhat.com>
 
 	* linux-target.c (linux_get_reg, linux_set_reg, reg_from_regset)

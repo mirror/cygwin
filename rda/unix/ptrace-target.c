@@ -183,11 +183,13 @@ ptrace_kill_program (struct child_process *process, int signum)
  */
 
 extern int
-ptrace_read_user (int pid, 
+ptrace_read_user (struct gdbserv *serv,
+		  int pid, 
 		  ptrace_arg3_type addr, 
 		  int len, 
 		  void *buff)
 {
+  struct child_process *process = gdbserv_target_data (serv);
   int i;
 
   /* Require: addr is on the proper boundary, and 
@@ -199,6 +201,12 @@ ptrace_read_user (int pid,
       errno = 0;
       *(ptrace_xfer_type *) &((char *)buff)[i] =
 	ptrace (PTRACE_PEEKUSER, pid, addr + i, 0);
+#if 0 /* too noisy!  */
+      if (process->debug_backend)
+	fprintf (stderr, "PTRACE_PEEKUSER 0x%08llx in %d, 0x%08llx\n", 
+		 (long long) addr + i, pid,
+	         (long long) * (ptrace_xfer_type *) &((char *)buff)[i]);
+#endif
       if (errno != 0)
 	return errno;
     }
@@ -211,11 +219,13 @@ ptrace_read_user (int pid,
  */
 
 extern int
-ptrace_write_user (int pid, 
+ptrace_write_user (struct gdbserv *serv,
+		   int pid, 
 		   ptrace_arg3_type addr, 
 		   int len, 
 		   const void *buff)
 {
+  struct child_process *process = gdbserv_target_data (serv);
   int i;
 
   /* Require: addr is on the proper boundary, and 
@@ -231,6 +241,10 @@ ptrace_write_user (int pid,
       errno = 0;
       ptrace (PTRACE_POKEUSER, pid, addr + i, 
 	      * (ptrace_xfer_type *) &((char *)buff)[i]);
+      if (process->debug_backend)
+	fprintf (stderr, "PTRACE_POKEUSER 0x%08llx in %d, 0x%08llx\n", 
+		 (long long) addr + i, pid,
+	         (long long) * (ptrace_xfer_type *) &((char *)buff)[i]);
 #if defined(_MIPSEL) || defined(MIPS_LINUX_TARGET)
       /* mips linux kernel 2.4 has a bug where PTRACE_POKEUSER
         returns -ESRCH even when it succeeds */
@@ -956,12 +970,14 @@ ptrace_xfer_mem (struct gdbserv *serv,
   int i;
 
   /* Get request address.  */
-  gdbserv_reg_to_ulong (serv, addr, &request_base);
+  gdbserv_host_bytes_from_reg (serv, &request_base, sizeof (request_base),
+                               addr, 0);
   /* Round down to a PTRACE word boundary. */
   xfer_base = request_base & - PTRACE_XFER_SIZE;
   /* Round length up to a PTRACE word boundary. */
   xfer_count = (((request_base + len) - xfer_base) + PTRACE_XFER_SIZE - 1)
     / PTRACE_XFER_SIZE;
+
   /* Allocate space for xfer.  */
   buf = (ptrace_xfer_type *) alloca (xfer_count * PTRACE_XFER_SIZE);
 
@@ -976,8 +992,8 @@ ptrace_xfer_mem (struct gdbserv *serv,
 	  buf[i] = ptrace (PTRACE_PEEKTEXT, process->pid, temp_addr, 0L);
 
 	  if (process->debug_backend)
-	    fprintf (stderr, "PTRACE_PEEKTEXT-1 0x%08lx in %d, 0x%08lx\n", 
-		     (long) temp_addr, process->pid, (long) buf[i]);
+	    fprintf (stderr, "PTRACE_PEEKTEXT-1 0x%08llx in %d, 0x%08llx\n", 
+		     (long long) temp_addr, process->pid, (long long) buf[i]);
 	  if (errno)
 	    {
 	      if (errno != EIO)
@@ -1004,15 +1020,15 @@ ptrace_xfer_mem (struct gdbserv *serv,
 	  buf[0] = ptrace (PTRACE_PEEKTEXT, 
 			   process->pid, xfer_base, 0L);
 	  if (process->debug_backend)
-	    fprintf (stderr, "PTRACE_PEEKTEXT-2 0x%08lx in %d, 0x%08lx\n", 
-		     (long) xfer_base, process->pid, (long) buf[0]);
+	    fprintf (stderr, "PTRACE_PEEKTEXT-2 0x%08llx in %d, 0x%08llx\n", 
+		     (long long) xfer_base, process->pid, (long long) buf[0]);
 
 	  if (errno)
 	    {
 	      if (errno != EIO)
 		fprintf (stderr, 
-			 "xfer_mem(2): ptrace error at 0x%08lx in %d: %s\n", 
-			 (long) xfer_base, process->pid, strerror (errno));
+			 "xfer_mem(2): ptrace error at 0x%08llx in %d: %s\n", 
+			 (long long) xfer_base, process->pid, strerror (errno));
 	      return -1;
 	    }
 	}
@@ -1025,9 +1041,9 @@ ptrace_xfer_mem (struct gdbserv *serv,
 	  buf[xfer_count - 1] =
 	    ptrace (PTRACE_PEEKTEXT, process->pid, temp_addr, 0L);
 	  if (process->debug_backend)
-	    fprintf (stderr, "PTRACE_PEEKTEXT-3 0x%08lx in %d, 0x%08lx\n", 
-		     (long) temp_addr, process->pid, 
-		     (long) buf[xfer_count - 1]);
+	    fprintf (stderr, "PTRACE_PEEKTEXT-3 0x%08llx in %d, 0x%08llx\n", 
+		     (long long) temp_addr, process->pid, 
+		     (long long) buf[xfer_count - 1]);
 
 	  if (errno)
 	    {
@@ -1050,15 +1066,15 @@ ptrace_xfer_mem (struct gdbserv *serv,
 	  ptrace (PTRACE_POKETEXT, process->pid, temp_addr, buf[i]);
 
 	  if (process->debug_backend)
-	    fprintf (stderr, "PTRACE_POKETEXT 0x%08lx in %d, 0x%08lx\n", 
-		     (long) temp_addr, process->pid, (long) buf[i]);
+	    fprintf (stderr, "PTRACE_POKETEXT 0x%08llx in %d, 0x%08llx\n", 
+		     (long long) temp_addr, process->pid, (long long) buf[i]);
 
 	  if (errno)
 	    {
 	      if (errno != EIO)
 		fprintf (stderr, 
-			 "xfer_mem(4): ptrace error at 0x%08lx in %d: %s\n", 
-			 (long) temp_addr, process->pid, strerror (errno));
+			 "xfer_mem(4): ptrace error at 0x%08llx in %d: %s\n", 
+			 (long long) temp_addr, process->pid, strerror (errno));
 	      return -1;
 	    }
 	}

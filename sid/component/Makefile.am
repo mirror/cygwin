@@ -9,3 +9,6 @@ bin_SCRIPTS=siddoc
 
 all-local:
 	chmod a+x siddoc
+
+check-recursive:
+	(cd testsuite && $(MAKE) $(AM_MAKEFLAGS) check)

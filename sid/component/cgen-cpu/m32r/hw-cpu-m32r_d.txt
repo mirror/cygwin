@@ -7,7 +7,7 @@
   Buses: debugger-bus 
   Pins: start-pc-set! reset! trap trap-code step! yield flush-icache
   Accessors: data-memory insn-memory
-  Attributes: debug-exec? trace-extract? trace-result? engine-type
+  Attributes: trace-extract? trace-result? engine-type
         step-insn-count insn-count rN pc gdb-register-N gdb-num-registers state-snapshot
 	trap trap-code
 
@@ -149,7 +149,6 @@
 
   * attributes
 
-  debug-exec? | setting | boolean | false | initialization
   trace-extract? | setting | boolean | false | initialization
   trace-result? | setting | boolean | false | initialization
   step-insn-count | setting | number | 1 | execution

@@ -98,14 +98,6 @@ m32rbf_cpu::memory_trap (const cpu_memory_fault& t)
 {
   this->h_pc_set (t.pc);
 
-  if (this->debug_exec_p)
-    cerr << "MEMORY TRAP "
-	 << " operation=" << t.operation
-	 << " pc=0x" << hex << t.pc << dec
-	 << " address=0x" << hex << t.address << dec
-	 << " status=" << (int) t.status 
-	 << endl;
-  
   cpu_trap_disposition whatnext = this->signal_trap (cpu_trap_memory_fault, t.address);
 
   switch (whatnext)

@@ -1,5 +1,8 @@
 2004-11-29  Jim Blandy  <jimb@redhat.com>
 
+	* lwp-pool.h (lwp_pool_singlestep_lwp, lwp_pool_continue_lwp): Doc
+	fixes.
+
 	* lwp-pool.c (wait_flags_str): Return "0" when FLAGS == 0, not the
 	empty string.
 

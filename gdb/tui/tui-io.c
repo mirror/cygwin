@@ -1,7 +1,7 @@
 /* TUI support I/O functions.
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation,
-   Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004 Free Software
+   Foundation, Inc.
 
    Contributed by Hewlett-Packard Company.
 
@@ -30,13 +30,13 @@
 #include "command.h"
 #include "top.h"
 #include "readline/readline.h"
-#include "tui.h"
-#include "tuiData.h"
-#include "tuiIO.h"
-#include "tuiCommand.h"
-#include "tuiWin.h"
-#include "tuiGeneralWin.h"
-#include "tui-file.h"
+#include "tui/tui.h"
+#include "tui/tui-data.h"
+#include "tui/tui-io.h"
+#include "tui/tui-command.h"
+#include "tui/tui-win.h"
+#include "tui/tui-wingeneral.h"
+#include "tui/tui-file.h"
 #include "ui-out.h"
 #include "cli-out.h"
 #include <fcntl.h>
@@ -50,6 +50,34 @@
 #include <curses.h>
 #endif
 #endif
+
+int
+key_is_start_sequence (int ch)
+{
+  return (ch == 27);
+}
+
+int
+key_is_end_sequence (int ch)
+{
+  return (ch == 126);
+}
+
+int
+key_is_backspace (int ch)
+{
+  return (ch == 8);
+}
+
+int
+key_is_command_char (int ch)
+{
+  return ((ch == KEY_NPAGE) || (ch == KEY_PPAGE)
+	  || (ch == KEY_LEFT) || (ch == KEY_RIGHT)
+	  || (ch == KEY_UP) || (ch == KEY_DOWN)
+	  || (ch == KEY_SF) || (ch == KEY_SR)
+	  || (ch == (int)'\f') || key_is_start_sequence (ch));
+}
 
 /* Use definition from readline 4.3.  */
 #undef CTRL_CHAR
@@ -139,7 +167,7 @@ tui_puts (const char *string)
   char c;
   WINDOW *w;
 
-  w = cmdWin->generic.handle;
+  w = TUI_CMD_WIN->generic.handle;
   while ((c = *string++) != 0)
     {
       /* Catch annotation and discard them.  We need two \032 and
@@ -156,9 +184,9 @@ tui_puts (const char *string)
       else if (c == '\n')
         tui_skip_line = -1;
     }
-  getyx (w, cmdWin->detail.commandInfo.curLine,
-         cmdWin->detail.commandInfo.curch);
-  cmdWin->detail.commandInfo.start_line = cmdWin->detail.commandInfo.curLine;
+  getyx (w, TUI_CMD_WIN->detail.command_info.cur_line,
+         TUI_CMD_WIN->detail.command_info.curch);
+  TUI_CMD_WIN->detail.command_info.start_line = TUI_CMD_WIN->detail.command_info.cur_line;
 
   /* We could defer the following.  */
   wrefresh (w);
@@ -183,18 +211,18 @@ tui_redisplay_readline (void)
 
   /* Detect when we temporarily left SingleKey and now the readline
      edit buffer is empty, automatically restore the SingleKey mode.  */
-  if (tui_current_key_mode == tui_one_command_mode && rl_end == 0)
-    tui_set_key_mode (tui_single_key_mode);
+  if (tui_current_key_mode == TUI_ONE_COMMAND_MODE && rl_end == 0)
+    tui_set_key_mode (TUI_SINGLE_KEY_MODE);
 
-  if (tui_current_key_mode == tui_single_key_mode)
+  if (tui_current_key_mode == TUI_SINGLE_KEY_MODE)
     prompt = "";
   else
     prompt = tui_rl_saved_prompt;
   
   c_pos = -1;
   c_line = -1;
-  w = cmdWin->generic.handle;
-  start_line = cmdWin->detail.commandInfo.start_line;
+  w = TUI_CMD_WIN->generic.handle;
+  start_line = TUI_CMD_WIN->detail.command_info.start_line;
   wmove (w, start_line, 0);
   prev_col = 0;
   height = 1;
@@ -227,8 +255,8 @@ tui_redisplay_readline (void)
 	}
       if (c == '\n')
         {
-          getyx (w, cmdWin->detail.commandInfo.start_line,
-                 cmdWin->detail.commandInfo.curch);
+          getyx (w, TUI_CMD_WIN->detail.command_info.start_line,
+                 TUI_CMD_WIN->detail.command_info.curch);
         }
       getyx (w, line, col);
       if (col < prev_col)
@@ -236,15 +264,15 @@ tui_redisplay_readline (void)
       prev_col = col;
     }
   wclrtobot (w);
-  getyx (w, cmdWin->detail.commandInfo.start_line,
-         cmdWin->detail.commandInfo.curch);
+  getyx (w, TUI_CMD_WIN->detail.command_info.start_line,
+         TUI_CMD_WIN->detail.command_info.curch);
   if (c_line >= 0)
     {
       wmove (w, c_line, c_pos);
-      cmdWin->detail.commandInfo.curLine = c_line;
-      cmdWin->detail.commandInfo.curch = c_pos;
+      TUI_CMD_WIN->detail.command_info.cur_line = c_line;
+      TUI_CMD_WIN->detail.command_info.curch = c_pos;
     }
-  cmdWin->detail.commandInfo.start_line -= height - 1;
+  TUI_CMD_WIN->detail.command_info.start_line -= height - 1;
 
   wrefresh (w);
   fflush(stdout);
@@ -387,7 +415,7 @@ tui_rl_display_match_list (matches, len, max)
   char *temp;
 
   /* Screen dimension correspond to the TUI command window.  */
-  int screenwidth = cmdWin->generic.width;
+  int screenwidth = TUI_CMD_WIN->generic.width;
 
   /* If there are many items, then ask the user if she really wants to
      see them all. */
@@ -556,13 +584,13 @@ tui_cont_sig (int sig)
       resetty ();
 
       /* Force a refresh of the screen.  */
-      tuiRefreshAll ();
+      tui_refresh_all_win ();
 
       /* Update cursor position on the screen.  */
-      wmove (cmdWin->generic.handle,
-             cmdWin->detail.commandInfo.start_line,
-             cmdWin->detail.commandInfo.curch);
-      wrefresh (cmdWin->generic.handle);
+      wmove (TUI_CMD_WIN->generic.handle,
+             TUI_CMD_WIN->detail.command_info.start_line,
+             TUI_CMD_WIN->detail.command_info.curch);
+      wrefresh (TUI_CMD_WIN->generic.handle);
     }
   signal (sig, tui_cont_sig);
 }
@@ -623,7 +651,7 @@ tui_getc (FILE *fp)
   int ch;
   WINDOW *w;
 
-  w = cmdWin->generic.handle;
+  w = TUI_CMD_WIN->generic.handle;
 
 #ifdef TUI_USE_PIPE_FOR_READLINE
   /* Flush readline output.  */
@@ -643,7 +671,7 @@ tui_getc (FILE *fp)
          user we recognized the command.  */
       if (rl_end == 0)
         {
-          wmove (w, cmdWin->detail.commandInfo.curLine, 0);
+          wmove (w, TUI_CMD_WIN->detail.command_info.cur_line, 0);
 
           /* Clear the line.  This will blink the gdb prompt since
              it will be redrawn at the same line.  */
@@ -653,19 +681,19 @@ tui_getc (FILE *fp)
         }
       else
         {
-          wmove (w, cmdWin->detail.commandInfo.curLine,
-                 cmdWin->detail.commandInfo.curch);
+          wmove (w, TUI_CMD_WIN->detail.command_info.cur_line,
+                 TUI_CMD_WIN->detail.command_info.curch);
           waddch (w, ch);
         }
     }
   
-  if (m_isCommandChar (ch))
+  if (key_is_command_char (ch))
     {				/* Handle prev/next/up/down here */
-      ch = tuiDispatchCtrlChar (ch);
+      ch = tui_dispatch_ctrl_char (ch);
     }
   
   if (ch == '\n' || ch == '\r' || ch == '\f')
-    cmdWin->detail.commandInfo.curch = 0;
+    TUI_CMD_WIN->detail.command_info.curch = 0;
 #if 0
   else
     tuiIncrCommandCharCountBy (1);
@@ -682,11 +710,11 @@ tui_getc (FILE *fp)
 static unsigned int
 _tuiHandleResizeDuringIO (unsigned int originalCh)
 {
-  if (tuiWinResized ())
+  if (tui_win_resized ())
     {
-      tuiRefreshAll ();
+      tui_refresh_all_win ();
       dont_repeat ();
-      tuiSetWinResizedTo (FALSE);
+      tui_set_win_resized_to (FALSE);
       return '\n';
     }
   else

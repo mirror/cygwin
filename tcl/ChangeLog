@@ -1,3 +1,10 @@
+2004-01-21  Keith Seitz  <kseitz@uglyboxes.com>
+
+	From tcl repository:
+	2003-10-22  Donal K. Fellows  <fellowsd@cs.man.ac.uk>
+	* generic/tclCmdAH.c (Tcl_FileObjCmd): Changed FILE_ prefix to FCMD_
+	to stop symbol/#def clashes on Cygwin/Mingw32 on NT.
+
 2003-02-11  Martin M. Hunt  <hunt@redhat.com>
 	From Mumit Khan  <khan@nanotech.wisc.edu>
 

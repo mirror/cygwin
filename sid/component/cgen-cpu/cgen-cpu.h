@@ -1,6 +1,6 @@
 // cgen-cpu.h  -*- C++ -*-
 
-// Copyright (C) 2000, 2001 Red Hat.
+// Copyright (C) 2000, 2001, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -68,7 +68,7 @@ public:
   // Disassembly tracing support
   void disassemble (PCADDR pc, disassembler_ftype printfn,
 		    enum bfd_flavour flavour, enum bfd_architecture arch,
-		    enum bfd_endian endian, const char *name);
+		    enum bfd_endian endian, const char *name, unsigned long isa_mask = 0);
   struct disassemble_info info;
 protected:
   static int cgen_read_memory (bfd_vma memaddr, bfd_byte *myaddr,

@@ -1,3 +1,10 @@
+2002-02-06  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compCGEN.cxx (cgen_disassemble): New "isa_mask" argument.
+	* tracedis.c (disassemble): Ditto.  Support it.
+	(cgen_disassemble): Defeat initialization bypass cache.
+	* cgen-cpu.h, tracedis.h: Corresponding changes.
+
 2002-01-31  Ben Elliston  <bje@redhat.com>
 
 	* cgen-ops.h (SUBWORDSIQI): New.

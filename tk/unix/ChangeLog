@@ -1,3 +1,11 @@
+2002-07-15  Keith Seitz  <keiths@redhat.com>
+
+        From Mo DeJong  <supermo@bayarea.net>:
+        * configure.in: Use TCL_BUILD_STUB_LIB_SPEC instead of
+        TCL_STUB_LIB_SPEC when defining MAKE_LIB since we want to
+        link to the libtclstub in the build directory.
+        * configure: Regenerated.
+
 2002-02-09  Chris Demetriou  <cgd@broadcom.com>
 
 	* configure.in: When building for NetBSD host systems, tell

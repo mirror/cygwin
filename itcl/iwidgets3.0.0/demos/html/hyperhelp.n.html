@@ -1,0 +1,200 @@
+<HTML>
+<HEAD>
+<TITLE>iwidgets2.2.0 User Commands - hyperhelp</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<H1>iwidgets2.2.0 User Commands - hyperhelp</H1>
+<HR>
+<PRE>
+
+</PRE>
+<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
+
+
+</PRE>
+<H2>NAME</H2><PRE>
+     hyperhelp - Create and manipulate a hyperhelp widget
+
+
+</PRE>
+<H2>SYNOPSIS</H2><PRE>
+     <STRONG>hyperhelp</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
+
+
+</PRE>
+<H2>INHERITANCE</H2><PRE>
+     itk::Toplevel &lt;- shell &lt;- hyperhelp
+
+
+</PRE>
+<H2>STANDARD OPTIONS</H2><PRE>
+     <STRONG>activeBackground</STRONG>    <STRONG>background</STRONG>         <STRONG>borderWidth</STRONG>
+     <STRONG>cursor</STRONG>              <STRONG>exportSelection</STRONG>    <STRONG>foreground</STRONG>
+     <STRONG>highlightColor</STRONG>      <STRONG>highlightThickness</STRONG> <STRONG>insertBackground</STRONG>
+     <STRONG>insertBorderWidth</STRONG>   <STRONG>insertOffTime</STRONG>      <STRONG>insertOnTime</STRONG>
+     <STRONG>insertWidth</STRONG>         <STRONG>padX</STRONG>               <STRONG>padY</STRONG>
+     <STRONG>relief</STRONG>              <STRONG>repeatDelay</STRONG>        <STRONG>repeatInterval</STRONG>
+     <STRONG>selectBackground</STRONG>    <STRONG>selectBorderWidth</STRONG>  <STRONG>selectForeground</STRONG>
+     <STRONG>setGrid</STRONG>
+
+     See the "options" manual entry for details on  the  standard
+     options.
+
+
+</PRE>
+<H2>ASSOCIATED OPTIONS</H2><PRE>
+     <STRONG>hscrollmode</STRONG>     <STRONG>vscrollmode</STRONG>    <STRONG>textbackground</STRONG>  <STRONG>fontname</STRONG>
+     <STRONG>fontsize</STRONG>        <STRONG>fixedfont</STRONG>      <STRONG>link</STRONG>            <STRONG>linkhighlight</STRONG>
+     <STRONG>width</STRONG>           <STRONG>height</STRONG>         <STRONG>state</STRONG>           <STRONG>wrap</STRONG>
+     <STRONG>unknownimage</STRONG>
+
+     See the "scrolledhtml" widget manual entry  for  details  on
+     the above associated options.
+
+
+</PRE>
+<H2>INHERITED OPTIONS</H2><PRE>
+     <STRONG>modality</STRONG>        <STRONG>title</STRONG>
+
+     See the "shell" manual entry for details on the above inher-
+     ited options.
+
+
+</PRE>
+<H2>WIDGET-SPECIFIC OPTIONS</H2><PRE>
+     Name:   <STRONG>topics</STRONG>
+     Class:  <STRONG>Topics</STRONG>
+     Command-Line Switch:    <STRONG>-topics</STRONG>
+
+          Specifies a list of help topics in  the  form  {?<EM>topic</EM>?
+          ...  }. <EM>Topic</EM> may either be a topic name, in which case
+          the document associated with the topic should be in the
+          file <STRONG>helpdir</STRONG>/<EM>topic</EM>.html, or it may be of the form {<EM>name</EM>
+          <EM>file</EM>}. In the latter case, <EM>name</EM>  is  displayed  in  the
+          topic  menu, and selecting the name loads <EM>file</EM>. If file
+          has a relative path, it is assumed to  be  relative  to
+          helpdir.
+
+     Name:   <STRONG>helpdir</STRONG>
+     Class:  <STRONG>Directory</STRONG>
+     Command-Line Switch:    <STRONG>-helpdir</STRONG>
+
+          Specifies the directory where help files are located.
+
+
+</PRE>
+<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
+
+
+
+</PRE>
+<H2>DESCRIPTION</H2><PRE>
+     The <STRONG>hyperhelp</STRONG> command creates a shell window with a pulldown
+     menu  showing  a list of topics. The topics are displayed by
+     importing a HTML formatted  file  named  <STRONG>helpdir</STRONG>/<EM>topic</EM>.html.
+     For a list of supported HTML tags, see <STRONG>scrolledhtml(n)</STRONG>.
+
+
+
+</PRE>
+<H2>METHODS</H2><PRE>
+     The <STRONG>hyperhelp</STRONG> command creates a new Tcl command  whose  name
+     is  <EM>pathName</EM>.   This  command  may be used to invoke various
+     operations on the widget.   It  has  the  following  general
+     form:
+
+          <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
+
+     <EM>Option</EM> and the <EM>arg</EM>s determine the exact behavior of the com-
+     mand.   The following commands are possible for dialog widg-
+     ets:
+
+
+</PRE>
+<H2>INHERITED METHODS</H2><PRE>
+     <STRONG>activate</STRONG>        <STRONG>center</STRONG>         <STRONG>childsite</STRONG>       <STRONG>deactivate</STRONG>
+
+     See the "shell" manual entry for details on the above inher-
+     ited methods.
+
+
+
+</PRE>
+<H2>WIDGET-SPECIFIC METHODS</H2><PRE>
+     <EM>pathName</EM> <STRONG>cget</STRONG> <EM>option</EM>
+          Returns the current value of the  configuration  option
+          given  by  <EM>option</EM>.   <EM>Option</EM>  may have any of the values
+          accepted by the <STRONG>hyperhelp</STRONG> command.
+
+     <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
+          Query  or  modify  the  configuration  options  of  the
+          widget.   If  no  <EM>option</EM>  is  specified, returns a list
+          describing all of the available  options  for  <EM>pathName</EM>
+          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of
+          this list).  If <EM>option</EM> is specified with no <EM>value</EM>, then
+          the  command  returns  a  list describing the one named
+          option (this list will be identical to the  correspond-
+          ing  sublist  of  the  value  returned  if no <EM>option</EM> is
+          specified).  If one or more  <EM>option</EM> - <EM>value</EM>  pairs  are
+          specified,  then  the command modifies the given widget
+          option(s) to have the given value(s);  in this case the
+          command  returns  an empty string.  <EM>Option</EM> may have any
+          of the values accepted by the <STRONG>hyperhelp</STRONG> command.
+
+     <EM>pathName</EM> <STRONG>showtopic</STRONG> <EM>topic</EM>
+          Display html file <STRONG>helpdir</STRONG>/<EM>topic</EM>.html. <EM>Topic</EM> may option-
+          ally be of the form <EM>topicname</EM>#<EM>anchorname</EM>. In this form,
+          either <EM>topicname</EM> or <EM>anchorname</EM> or both may be empty. If
+          <EM>topicname</EM>  is  empty,  the current topic is assumed. If
+          <EM>anchorname</EM> is empty, the top of the document is assumed
+
+     <EM>pathName</EM> <STRONG>followlink</STRONG> <EM>href</EM>
+          Display html file <EM>href</EM>. <EM>Href</EM> may be  optionally  be  of
+          the  form  <EM>filename</EM>#<EM>anchorname</EM>.  In  this  form, either
+          <EM>filename</EM>  or  <EM>anchorname</EM>  or  both  may  be  empty.  If
+          <EM>filename</EM>  is empty, the current document is assumed. If
+          <EM>anchorname</EM>  is  empty,  the  top  of  the  document  is
+          assumed.
+
+     <EM>pathName</EM> <STRONG>forward</STRONG>
+          Display html file  one  forward  in  history  list,  if
+          applicable.
+
+     <EM>pathName</EM> <STRONG>back</STRONG>
+          Display html file one back in history list, if applica-
+          ble.
+
+
+
+</PRE>
+<H2>EXAMPLE</H2><PRE>
+           hyperhelp .h -topics { Intro Help } -helpdir ~/help
+           .h showtopic Intro
+
+
+
+
+</PRE>
+<H2>AUTHOR</H2><PRE>
+     Kris Raney
+
+
+</PRE>
+<H2>KEYWORDS</H2><PRE>
+     hyperhelp, html, help, shell, widget
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

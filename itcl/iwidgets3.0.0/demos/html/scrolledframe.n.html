@@ -1,0 +1,306 @@
+<HTML>
+<HEAD>
+<TITLE>iwidgets2.2.0 User Commands - scrolledframe</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<H1>iwidgets2.2.0 User Commands - scrolledframe</H1>
+<HR>
+<PRE>
+
+</PRE>
+<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
+
+
+</PRE>
+<H2>NAME</H2><PRE>
+     scrolledframe - Create and manipulate scrolled frame widgets
+
+
+</PRE>
+<H2>SYNOPSIS</H2><PRE>
+     <STRONG>scrolledframe</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
+
+
+</PRE>
+<H2>INHERITANCE</H2><PRE>
+     itk::Widget &lt;- Labeledwidget &lt;- scrolledframe
+
+
+</PRE>
+<H2>STANDARD OPTIONS</H2><PRE>
+     <STRONG>activeBackground</STRONG>               <STRONG>background</STRONG>      <STRONG>borderWidthcursor</STRONG>
+     <STRONG>font</STRONG>            <STRONG>foreground</STRONG>     <STRONG>highlightColor</STRONG>  <STRONG>highlightThickness</STRONG>
+     <STRONG>relief</STRONG>          <STRONG>repeatDelay</STRONG>    <STRONG>repeatInterval</STRONG>  <STRONG>selectBackground</STRONG>
+     <STRONG>selectBorderWidth</STRONG>              <STRONG>selectForeground</STRONG>
+
+     See the "options" manual entry for details on  the  standard
+     options.
+
+
+</PRE>
+<H2>ASSOCIATED OPTIONS</H2><PRE>
+     <STRONG>activeRelief</STRONG>    <STRONG>elementBorderWidth</STRONG>             <STRONG>jumptroughColor</STRONG>
+
+     See the "scrollbar" manual entry for details on the  associ-
+     ated options.
+
+
+</PRE>
+<H2>INHERITED OPTIONS</H2><PRE>
+     <STRONG>LabelBitmap</STRONG>     <STRONG>labelFont</STRONG>      <STRONG>labelImage</STRONG>      <STRONG>labelMargin</STRONG>
+     <STRONG>labelPos</STRONG>        <STRONG>labelText</STRONG>      <STRONG>labelVariable</STRONG>
+
+     See the "labeledwidget" class manual entry  for  details  on
+     the inherited options.
+
+
+</PRE>
+<H2>WIDGET-SPECIFIC OPTIONS</H2><PRE>
+     Name:           <STRONG>height</STRONG>
+     Class:          <STRONG>Height</STRONG>
+     Command-Line Switch:           <STRONG>-height</STRONG>
+
+          Specifies the height of the scrolled  frame  widget  in
+          any  of  the  forms  acceptable  to  <STRONG>Tk_GetPixels</STRONG>.  The
+          default height is 100 pixels.
+
+     Name:           <STRONG>hscrollMode</STRONG>
+     Class:          <STRONG>ScrollMode</STRONG>
+     Command-Line Switch:           <STRONG>-hscrollmode</STRONG>
+
+          Specifies the the display mode to be used for the  hor-
+          izontal scrollbar: <STRONG>static</STRONG>, <STRONG>dynamic</STRONG>, or <STRONG>none</STRONG>.  In static
+          mode,  the  scroll  bar  is  displayed  at  all  times.
+          Dynamic  mode  displays the scroll bar as required, and
+          none disables the scroll bar display.  The  default  is
+          static.
+
+     Name:           <STRONG>sbWidth</STRONG>
+     Class:          <STRONG>Width</STRONG>
+     Command-Line Switch:           <STRONG>-sbwidth</STRONG>
+
+          Specifies the width of the  scrollbar  in  any  of  the
+          forms acceptable to <STRONG>Tk_GetPixels</STRONG>.  The default width is
+          15 pixels.
+
+     Name:           <STRONG>scrollMargin</STRONG>
+     Class:          <STRONG>Margin</STRONG>
+     Command-Line Switch:           <STRONG>-scrollmargin</STRONG>
+
+          Specifies the distance between the frame and  scrollbar
+          in  any  of  the forms acceptable to <STRONG>Tk_GetPixels</STRONG>.  The
+          default is 3 pixels.
+
+     Name:           <STRONG>vscrollMode</STRONG>
+     Class:          <STRONG>ScrollMode</STRONG>
+     Command-Line Switch:           <STRONG>-vscrollmode</STRONG>
+
+          Specifies the the display mode to be used for the vert-
+          ical  scrollbar:  <STRONG>static</STRONG>,  <STRONG>dynamic</STRONG>, or <STRONG>none</STRONG>.  In static
+          mode,  the  scroll  bar  is  displayed  at  all  times.
+          Dynamic  mode  displays the scroll bar as required, and
+          none disables the scroll bar display.  The  default  is
+          static.
+
+     Name:           <STRONG>width</STRONG>
+     Class:          <STRONG>Width</STRONG>
+     Command-Line Switch:           <STRONG>-width</STRONG>
+
+          Specifies the width of the scrolled frame widget in any
+          of  the  forms acceptable to <STRONG>Tk_GetPixels</STRONG>.  The default
+          height is 100 pixels.
+
+</PRE>
+<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
+
+
+
+</PRE>
+<H2>DESCRIPTION</H2><PRE>
+     The <STRONG>scrolledframe</STRONG> combines the functionallity  of  scrolling
+     with  that of a typical frame widget to implement a clipable
+     viewing area whose visible region may be modified  with  the
+     scroll bars. This enables the contruction of visually larger
+     areas than which could normally be displayed,  containing  a
+     heterogenous mix of other widgets. Options exist which allow
+     full control over which scrollbars  are  displayed  and  the
+     method, i.e. statically or dynamically. The frame itself may
+     be accessed by the <STRONG>childsite</STRONG> method  and  then  filled  with
+     other widget combinations.
+
+
+
+</PRE>
+<H2>METHODS</H2><PRE>
+
+     The <STRONG>scrolledframe</STRONG> command creates a new  Tcl  command  whose
+     name  is <EM>pathName</EM>.  This command may be used to invoke vari-
+     ous operations on the widget.  It has the following  general
+     form:
+
+          <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
+
+     <EM>Option</EM> and the <EM>arg</EM>s determine the exact behavior of the com-
+     mand.  The following commands are possible for scrolledframe
+     widgets:
+
+
+</PRE>
+<H2>ASSOCIATED METHODS</H2><PRE>
+     <STRONG>xview</STRONG>           <STRONG>yview</STRONG>
+
+     See the "canvas" manual entry for details on the  associated
+     methods.
+
+
+
+</PRE>
+<H2>WIDGET-SPECIFIC METHODS</H2><PRE>
+     <EM>pathName</EM> <STRONG>cget</STRONG> <EM>option</EM>
+          Returns the current value of the  configuration  option
+          given  by  <EM>option</EM>.   <EM>Option</EM>  may have any of the values
+          accepted by the <STRONG>scrolledframe</STRONG> command.
+
+     <EM>pathName</EM> <STRONG>childsite</STRONG>
+          Return the path name of the child site.
+
+     <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
+          Query  or  modify  the  configuration  options  of  the
+          widget.   If  no  <EM>option</EM>  is  specified, returns a list
+          describing all of the available  options  for  <EM>pathName</EM>
+          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of
+          this list).  If <EM>option</EM> is specified with no <EM>value</EM>, then
+          the  command  returns  a  list describing the one named
+          option (this list will be identical to the  correspond-
+          ing  sublist  of  the  value  returned  if no <EM>option</EM> is
+          specified).  If one or more  <EM>option</EM> - <EM>value</EM>  pairs  are
+          specified,  then  the command modifies the given widget
+          option(s) to have the given value(s);  in this case the
+          command  returns  an empty string.  <EM>Option</EM> may have any
+          of the values accepted by the <STRONG>scrolledframe</STRONG> command.
+
+     <EM>pathName</EM> <STRONG>justify</STRONG> <EM>direction</EM>
+          Justifies the frame contents via the scroll bars in one
+          of four directions:  <STRONG>left</STRONG>, <STRONG>right</STRONG>, <STRONG>top</STRONG>, or <STRONG>bottom</STRONG>.
+
+
+
+</PRE>
+<H2>COMPONENTS</H2><PRE>
+     Name:           <STRONG>canvasFrame</STRONG>
+     Class:          <STRONG>Frame</STRONG>
+
+          The  canvasFrame  component  provides  relief  for  the
+          scrCanvas  component.   See  the  "frame" widget manual
+          entry for details on the canvasFrame component item.
+
+     Name:           <STRONG>scrCanvas</STRONG>
+     Class:          <STRONG>Canvas</STRONG>
+
+          The scrCanvas component provides the  scrolling  region
+          for the scrolled frame.  See the "canvas" widget manual
+          entry for details on the scrCanvas component item.
+
+     Name:           <STRONG>scrFrame</STRONG>
+     Class:          <STRONG>Frame</STRONG>
+
+          The scrFrame component is  internal  to  the  scrCanvas
+          component,  providing  a  container for children of the
+          scrolled frame.  See the "frame"  widget  manual  entry
+          for details on the scrFrame component item.
+
+     Name:           <STRONG>hSB</STRONG>
+     Class:          <STRONG>Scrollbar</STRONG>
+
+          The hSB component is the horizontal  scroll  bar.   See
+          the  "ScrollBar" widget manual entry for details on the
+          hSB component item.
+
+     Name:           <STRONG>vSB</STRONG>
+     Class:          <STRONG>Scrollbar</STRONG>
+
+          The vSB component is the vertical scroll bar.  See  the
+          "ScrollBar"  widget manual entry for details on the vSB
+          component item.
+
+
+
+</PRE>
+<H2>EXAMPLE</H2><PRE>
+          scrolledframe .sf -width 150 -height 180 -labelon yes -labeltext scrolledframe
+
+          set cs [.sf childsite]
+          pack [button $cs.b1 -text Hello] -pady 10
+          pack [button $cs.b2 -text World] -pady 10
+          pack [button $cs.b3 -text "This is a test"] -pady 10
+          pack [button $cs.b4 -text "This is a really big button"] -pady 10
+          pack [button $cs.b5 -text "This is another really big button"] -pady 10
+          pack [button $cs.b6 -text "This is the last really big button"] -pady 10
+
+          pack .sf -expand yes -fill both -padx 10 -pady 10
+
+
+
+</PRE>
+<H2>AUTHOR</H2><PRE>
+     Sue Yockey
+
+     Mark L. Ulferts
+
+
+</PRE>
+<H2>KEYWORDS</H2><PRE>
+     scrolledframe, frame, widget
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

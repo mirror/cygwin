@@ -1,0 +1,37 @@
+dnl This entire file is CYGNUS LOCAL.
+dnl Itcl configure file.
+
+AC_PREREQ(2.5)
+
+AC_INIT(itcl/generic/itcl.h)
+AC_CANONICAL_HOST
+
+if test -d itcl; then
+  true
+else
+  mkdir itcl
+fi
+if test -d itk; then
+  true
+else
+  mkdir itk
+fi
+if test -d iwidgets3.0.0; then
+  true
+else
+  mkdir iwidgets3.0.0
+fi
+
+case "${host}" in
+*-*-cygwin*)
+  CONFIGDIR="itcl/win itk/win iwidgets3.0.0/unix" ;;
+*)
+  CONFIGDIR="itcl/unix itk/unix iwidgets3.0.0/unix" ;;
+esac
+AC_SUBST(CONFIGDIR)
+
+AC_PROG_MAKE_SET
+
+AC_CONFIG_SUBDIRS($CONFIGDIR)
+
+AC_OUTPUT(Makefile)

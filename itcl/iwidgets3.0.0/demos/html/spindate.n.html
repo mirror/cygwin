@@ -1,0 +1,303 @@
+<HTML>
+<HEAD>
+<TITLE>iwidgets2.2.0 User Commands - spindate</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<H1>iwidgets2.2.0 User Commands - spindate</H1>
+<HR>
+<PRE>
+
+</PRE>
+<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
+
+
+</PRE>
+<H2>NAME</H2><PRE>
+     spindate - Create and manipulate time spinner widgets
+
+
+</PRE>
+<H2>SYNOPSIS</H2><PRE>
+     <STRONG>spindate</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
+
+
+</PRE>
+<H2>INHERITANCE</H2><PRE>
+     itk::Widget &lt;- Spindate
+
+
+
+</PRE>
+<H2>STANDARD OPTIONS</H2><PRE>
+     <STRONG>background</STRONG>      <STRONG>cursor</STRONG>         <STRONG>foreground</STRONG>      <STRONG>highlightColor</STRONG>
+     <STRONG>highlightThickness</STRONG>             <STRONG>relief</STRONG>          <STRONG>selectBackgroundselectBorderWidth</STRONG>
+     <STRONG>selectForeground</STRONG>
+
+     See the "options" manual entry for details on  the  standard
+     options.
+
+
+</PRE>
+<H2>ASSOCIATED OPTIONS</H2><PRE>
+     <STRONG>textBackground</STRONG>  <STRONG>textFont</STRONG>
+
+     See the "entryfield" manual entry for details on  the  above
+     associated options.
+
+     <STRONG>labelFont</STRONG>       <STRONG>labelMargin</STRONG>
+
+     See the "labeledwidget" manual  entry  for  details  on  the
+     above associated options.
+
+     <STRONG>step</STRONG>
+
+     See the "spinint" manual entry  for  details  on  the  above
+     associated options.
+
+     <STRONG>arrowOrient</STRONG>     <STRONG>repeatDelay</STRONG>    <STRONG>repeatInterval</STRONG>
+
+     See the "spinner" manual entry  for  details  on  the  above
+     associated options.
+
+
+
+</PRE>
+<H2>WIDGET-SPECIFIC OPTIONS</H2><PRE>
+     Name:           <STRONG>dateMargin</STRONG>
+     Class:          <STRONG>Margin</STRONG>
+     Command-Line Switch:           <STRONG>-datemargin</STRONG>
+
+          Specifies the margin space between the month, day,  and
+          year  spinners  is  any  of  the  forms  accpetable  to
+          <STRONG>Tcl_GetPixels</STRONG>.  The default is 1 pixel.
+
+
+     Name:           <STRONG>dayLabel</STRONG>
+     Class:          <STRONG>Text</STRONG>
+     Command-Line Switch:           <STRONG>-daylabel</STRONG>
+
+          Specifies the text of the label for  the  day  spinner.
+          The default is "Day".
+
+     Name:           <STRONG>dayOn</STRONG>
+     Class:          <STRONG>dayOn</STRONG>
+     Command-Line Switch:           <STRONG>-dayon</STRONG>
+
+          Specifies whether or not to display the day spinner  in
+          any  of  the  forms  acceptable to <STRONG>Tcl_GetBoolean</STRONG>.  The
+          default is true.
+
+     Name:           <STRONG>dayWidth</STRONG>
+     Class:          <STRONG>Width</STRONG>
+     Command-Line Switch:           <STRONG>-daywidth</STRONG>
+
+          Specifies the width of the day spinner in  any  of  the
+          forms  acceptable  to  <STRONG>Tcl_GetPixels</STRONG>.  The default is 3
+          pixels.
+
+     Name:           <STRONG>labelPos</STRONG>
+     Class:          <STRONG>Position</STRONG>
+     Command-Line Switch:           <STRONG>-labelpos</STRONG>
+
+          Specifies the position of the label along the sides  of
+          the various spinners: <STRONG>n</STRONG>, <STRONG>e</STRONG>, <STRONG>s</STRONG>, or <STRONG>w</STRONG>.  The default is w.
+
+     Name:           <STRONG>monthFormat</STRONG>
+     Class:          <STRONG>MonthFormat</STRONG>
+     Command-Line Switch:           <STRONG>-monthformat</STRONG>
+
+          Specifies the format of month display,  <STRONG>integer</STRONG>  (1-12)
+          or  <STRONG>string</STRONG>  (Jan  -  Dec),  or a user specified list of
+          values.
+
+     Name:           <STRONG>monthLabel</STRONG>
+     Class:          <STRONG>Text</STRONG>
+     Command-Line Switch:           <STRONG>-monthlabel</STRONG>
+
+          Specifies the text of the label for the month  spinner.
+          The default is "Month".
+
+     Name:           <STRONG>monthOn</STRONG>
+     Class:          <STRONG>monthOn</STRONG>
+     Command-Line Switch:           <STRONG>-monthon</STRONG>
+
+          Specifies whether or not to display the  month  spinner
+          in  any of the forms acceptable to <STRONG>Tcl_GetBoolean</STRONG>.  The
+          default is true.
+
+     Name:           <STRONG>monthWidth</STRONG>
+     Class:          <STRONG>Width</STRONG>
+     Command-Line Switch:           <STRONG>-monthwidth</STRONG>
+
+          Specifies the width of the month spinner in any of  the
+          forms  acceptable  to  <STRONG>Tcl_GetPixels</STRONG>.  The default is 3
+          pixels.
+
+     Name:           <STRONG>orient</STRONG>
+     Class:          <STRONG>Orient</STRONG>
+     Command-Line Switch:           <STRONG>-orient</STRONG>
+
+          Specifies the orientation of the month, day,  and  year
+          spinners:  <STRONG>vertical</STRONG> or <STRONG>horizontal</STRONG>.  The default is hor-
+          izontal.
+
+     Name:           <STRONG>yearDigits</STRONG>
+     Class:          <STRONG>YearDigits</STRONG>
+     Command-Line Switch:           <STRONG>-yeardigits</STRONG>
+
+          Specifies the number of digits to be displayed  as  the
+          value for the year spinner.  The valid values are 2 and
+          4.  The default is 2.
+
+     Name:           <STRONG>yearLabel</STRONG>
+     Class:          <STRONG>Text</STRONG>
+     Command-Line Switch:           <STRONG>-yearlabel</STRONG>
+
+          Specifies the text of the label for the  year  spinner.
+          The default is "Year"
+
+     Name:           <STRONG>yearOn</STRONG>
+     Class:          <STRONG>yearOn</STRONG>
+     Command-Line Switch:           <STRONG>-yearon</STRONG>
+
+          Specifies whether or not to display the year spinner in
+          any  of  the  forms  acceptable to <STRONG>Tcl_GetBoolean</STRONG>.  The
+          default is true.
+
+     Name:           <STRONG>yearWidth</STRONG>
+     Class:          <STRONG>Width</STRONG>
+     Command-Line Switch:           <STRONG>-yearwidth</STRONG>
+
+          Specifies the width of the year spinner in any  of  the
+          forms  acceptable  to  <STRONG>Tcl_GetPixels</STRONG>.  The default is 3
+          pixels.
+
+
+</PRE>
+<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
+
+
+
+</PRE>
+<H2>DESCRIPTION</H2><PRE>
+
+     The <STRONG>spindate</STRONG> command creates a set of spinners  for  use  in
+     date  value entry.  The set includes an month, day, and year
+     spinner widget.
+
+
+
+</PRE>
+<H2>METHODS</H2><PRE>
+     The <STRONG>spindate</STRONG> command creates a new Tcl command whose name is
+     <EM>pathName</EM>.  This command may be used to invoke various opera-
+     tions on the widget. It has the following general form:
+
+          <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
+
+     <EM>Option</EM> and the <EM>arg</EM>s determine the exact behavior of the com-
+     mand. The following commands are possible for spindate widg-
+     ets:
+
+
+
+</PRE>
+<H2>WIDGET-SPECIFIC METHODS</H2><PRE>
+     <EM>pathName</EM> <STRONG>cget</STRONG> <EM>option</EM>
+          Returns the current value of the  configuration  option
+          given  by  <EM>option</EM>.   <EM>Option</EM>  may have any of the values
+          accepted by the <STRONG>spindate</STRONG> command.
+
+     <EM>pathName</EM> <STRONG>clear</STRONG>
+          Delete the contents of all spinner components.
+
+     <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
+          Query  or  modify  the  configuration  options  of  the
+          widget.   If  no  <EM>option</EM>  is  specified, returns a list
+          describing all of the available  options  for  <EM>pathName</EM>
+          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of
+          this list).  If <EM>option</EM> is specified with no <EM>value</EM>, then
+          the  command  returns  a  list describing the one named
+          option (this list will be identical to the  correspond-
+          ing  sublist  of  the  value  returned  if no <EM>option</EM> is
+          specified).  If one or more  <EM>option</EM> - <EM>value</EM>  pairs  are
+          specified,  then  the command modifies the given widget
+          option(s) to have the given value(s);  in this case the
+          command  returns  an empty string.  <EM>Option</EM> may have any
+          of the values accepted by the <STRONG>spindate</STRONG> command.
+
+     <EM>pathName</EM> <STRONG>delete</STRONG> <EM>component</EM> <EM>first</EM> ?<EM>last</EM>?
+          Delete one or more characters  of  the  specified  <EM>com-</EM>
+          <EM>ponent</EM>,  where  <EM>component</EM>  can  be <STRONG>month</STRONG>, <STRONG>day</STRONG>, or <STRONG>year</STRONG>.
+          <EM>First</EM> is the index of the first  character  to  delete,
+          and  <EM>last</EM>  is the index of the character just after the
+          last one to delete.
+
+     <EM>pathName</EM> <STRONG>get</STRONG> ?<EM>component</EM>?
+          Get returns the  value  for  the  speicifed  component:
+          <STRONG>month</STRONG>,  <STRONG>day</STRONG>,  or  <STRONG>year</STRONG>.  Without parameters the command
+          returns the all three values as a list.
+
+     <EM>pathName</EM> <STRONG>insert</STRONG> <EM>component</EM> <EM>index</EM> <EM>string</EM>
+          Inserts the characters of <EM>string</EM> just before the  char-
+          acter  indicated  by <EM>index</EM> in the <EM>component</EM>, where <EM>com-</EM>
+          <EM>ponent</EM> can be <STRONG>month</STRONG>, <STRONG>day</STRONG>, or <STRONG>year</STRONG>.
+
+
+
+</PRE>
+<H2>COMPONENTS</H2><PRE>
+     Name:           <STRONG>month</STRONG>
+     Class:          <STRONG>Spinner</STRONG>
+
+          The month spinner component is the month spinner of the
+          date  spinner.  See the Spinner widget manual entry for
+          details on the month component item.
+
+     Name:           <STRONG>day</STRONG>
+     Class:          <STRONG>Spinint</STRONG>
+
+          The day spinner component is the  day  spinner  of  the
+          date  spinner.  See the SpinInt widget manual entry for
+          details on the day component item.
+
+     Name:           <STRONG>year</STRONG>
+     Class:          <STRONG>Spinint</STRONG>
+
+          The year spinner component is the year spinner  of  the
+          date spinner.  See the SpinInt widget manual entry for-
+          details on the year component item.
+
+
+
+</PRE>
+<H2>EXAMPLE</H2><PRE>
+          spindate .sd
+          pack .sd -padx 10 -pady 10
+
+
+
+</PRE>
+<H2>AUTHOR</H2><PRE>
+     Sue Yockey
+
+     Mark L. Ulferts
+
+
+</PRE>
+<H2>KEYWORDS</H2><PRE>
+     spindate, spinint, spinner, entryfield, entry, widget
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

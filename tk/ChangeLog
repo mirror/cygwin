@@ -1,0 +1,886 @@
+2000-01-26  DJ Delorie  <dj@cygnus.com>
+
+	* win/tkWin32Dll.c (DllMain): Use _imp__ instead of __imp_
+
+1999-03-02  James Ingham  <jingham@cygnus.com>
+
+	Copying over irox's 3D changes from Tk8.1 for a more Win95 look.
+	The button changes don't seem to work, so I will leave them out
+	for now.
+	
+	* win/tkWin3d.c (Tk_3DVerticalBevel, Tk_3DHorizontalBevel): The
+	dark pixels are drawn inside the bevel, not outside.
+
+Fri Feb 26 17:40:55 1999  Geoffrey Noer  <noer@cygnus.com>
+
+        * win/configure.in: change "cygwin32*" to "cygwin*"
+        * win/configure: Regenerated.
+        * configure.in: Change "cygwin32*" to "cygwin*"
+        * configure: Regenerate.
+
+1999-02-11  Syd Polk  <spolk@cygnus.com>
+
+	* unix/configure.in: Forgot to AC_SUBST TK_LIB_FULL_PATH.
+	* unix/configure: Regenerate.
+
+1999-02-10  Syd Polk  <spolk@cygnus.com>
+
+	* unix/configure.in unix/tkConfig.sh.in: Export TK_LIB_FULL_PATH.
+	* unix/configure: Regenerate.
+
+1999-01-29  James Ingham  <jingham@cygnus.com>
+
+	* win/configure.in: Fill in the XINCLUDE symbol.
+	* win/configure: regenerate.
+
+Mon Jan 11 10:57:05 1999  Jim Ingham  <jingham@cygnus.com>
+
+	* win/tkTextDisp.c (tkTextSeeCmd): This is only a workaround for 
+        a bug somewhere in Tk.  If you change the font for the gdbtk
+        debug window the see command that follows the report of the 
+	destruction of the preferences window will return a NULL from 
+	FindDLine.  This should not happen, but I can't find a simple
+        case that shows the behavior, and have not taken the time to 
+	chase it all the way down.  This fix makes the error harmless.
+
+Thu Dec 17 10:43:53 1998  Jim Ingham  <jingham@cygnus.com>
+
+        * win/tkWinFont.c (Tk_MeasureChar): Add dummy max argument and
+        bogus (infinte) maxLength to second call to
+        GetTextExtentExPoint to work around a bug in NT/J 4.0 service
+        pack 3 or less.
+
+Thu Dec  3 12:34:18 1998 Jim Ingham    jingham@cygnus.com
+
+        * library/tkfbox.tcl (tkIconListInvoke): Fixed a merge goof 
+	that was preventing double-clicking in the file dialog from
+	working.
+
+Tue Nov 24 18:27:40 1998 Jim Ingham    jingham@cygnus.com
+
+        * Import of Tk 8.0.4 from Scriptics.
+
+Thu Aug 20 14:32:59 1998  Jim Ingham    jingham@cygnus.com
+
+	* Import of Tk 8.0.3 from Scriptics, with our modifications.
+
+Thu Aug 20 18:14:43 1998  Khamis Abuelkomboz  <khamis@cygnus.com>
+
+	* win/tkWinDialog.c: Enlarged the file dialog buffer to include more
+	files that the magic (14 files) limit.
+
+Wed Aug 12 18:24:45 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/Makefile.in (TK_CFLAGS): Remove $(include32).
+
+Fri Jul 31 14:37:29 1998  Ian Roxborough  <irox@cygnus.com>
+
+	* win/Makefile.in: add tkTextCharType symbol to tkcyg.def require by SN.
+
+Mon Jul 22 15:44:19 1998  Ian Roxborough  <irox@cygnus.com>
+
+	* win/Makefile.in: add some symbols to tkcyg.def require by SN.
+
+Mon Jul 13 14:12:39 1998  Jeff Holcomb  <jeffh@cygnus.com>
+
+	* win/tkWinX.c: Removed temporary define for MNC_CLOSE.
+
+Mon Jul  6 18:13:02 1998  Martin M. Hunt  <hunt@cygnus.com>
+
+	* win/Makefile.in: Remove bad line with just "mv" on it.
+
+Mon Jul  6 15:53:35 1998  Ian Roxborough  <irox@cygnus.com>
+	* win/Makefile.in: Don't set lflags or lcommon if you're not
+	setting OBJEXT to 'obj', (i.e. for MSVC).
+
+Sat Jul  4 16:21:25 1998  Ian Roxborough  <irox@cygnus.com>
+	* win/Makefile.in: Don't make dumpext.exe unless you're using MSVC
+	and setting OBJEXT = obj.
+
+1998-07-03  Ben Elliston  <bje@cygnus.com>
+
+	Patches from Ian Roxborough <irox@cygnus.com>.
+	* win/configure.in: Add AC_OBJEXT macro invocation.
+
+	* win/configure: Regenerate.
+
+	* win/Makefile.in: Don't assume object files end in `.o'.
+	
+Wed Jul  1 00:11:02 1998  Khamis Abuelkomboz  <khamis@cygnus.com>
+
+	* unix/tkUnixDefault.h (DEF_TEXT_TAB_SIZE): new macro to define
+	the default tab size "8".
+	
+	* win/tkWinDefault.h (DEF_TEXT_TAB_SIZE): new macro to define the
+	default tab size "8".
+
+	* mac/tkMacDefault.h (DEF_TEXT_TAB_SIZE): new macro to define the
+	default tab size "8".
+
+	* generic/tkTextDisp.c (NextTabStop): Added the text widget pointer
+	as an argument for this function to read the set tab-width for
+	the default tabulator behavior. Default is 8.
+
+	* generic/tkText.c: (configSpecs) Added "-tabsize" to the option
+ 	command list of	the text widget. It defines the width of the
+	default tabulator, default 8.
+
+	* generic/tkText.h: added a new structur member to TkText "tabsize",
+	it stores the tab width (default 8). "-tabs" doesn't support
+	normal text tabulator behaviar, so we can't use it in SN.
+
+Thu Jun 18 10:27:00 1998  Syd Polk  <spolk@cygnus.com>
+	
+	* Removed all of the files in Tk 8.1a2 not in Tk 8.0p2. They
+	were added when the import was done.
+
+Fri Jun 12 11:48:26 1998  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* configure.in (*-*-mingw32*): Support.
+	* win/Makefile.in (DLL_LDLIBS, DLL_LDFLAGS): New variables.
+	(tkcyg.def): Ignore errors.
+	(plugin.def): Likewise.
+	($(TKDLL),$(TKPLUGINDLL)): Cleanup DLL build flags and use
+	DLL_LDLIBS and DLL_LDFLAGS.
+	* win/configure.in (DLL_LDLIBS, DLL_LDFLAGS): Define and substitute.
+	(TK_PATCH_LEVEL): Bump to p2.
+	* win/tkWinPort.h (TK_READ_DATA_PENDING): Define for Mingw32.
+	(timezone,timeval,gettimeofday): Don't define/declare for Mingw32.
+	* win/tkWinX.c (GetCurrentTime): Define as GetTickCount if
+	__MINGW32__ as well.
+	* win/configure: Rebuild.
+
+Fri May 29 17:12:29 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/Makefile.in (X11_INCLUDE_INSTALL_DIR): New variable.
+	(install-libraries): Install X11 header files in
+	X11_INCLUDE_INSTALL_DIR.
+	(install-minimal): Don't create INCLUDE_INSTALL_DIR.
+	* win/configure.in: Call AC_CANONICAL_HOST.
+	* win/configure: Rebuild.
+
+Wed May 27 17:00:35 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* library/tkfbox.tcl (tkFDialog): Save the old multiple setting,
+	and recreate the dialog if it changes.
+
+Thu Apr 30 18:10:15 1998  Geoffrey Noer  <noer@cygnus.com>
+
+	* win/Makefile.in: invoke gcc instead of ld when producing
+	dlls.  Pass the linker options down via args to -Wl options.
+
+Sun Apr 26 15:45:18 1998  Khamis Abuelkomboz  <khamis@mxbig.multix.de>
+
+	* generic/tkCanvBmap.c (tkCreateBitmap): renamed from "CreateBitmap"
+	to avoid conflicts with the already defined MSVC procedure.
+
+Thu Apr 23 10:09:29 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* library/tkfbox.tcl (tkFDialog_Config): Use lindex, not join, to
+	extract list item.
+	(tkFDialog_Config): Recognize -choosedir option.
+	(tkFDialog_OkCmd): If -choosedir set, then don't special-case
+	directories.
+	(tkFDialog_VerifyFileName): Handle -choosedir.
+	(tkFDialog_ListBrowse): Likewise.
+
+Thu Apr 16 17:30:46 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/tkWinButton.c (WinButton): Add pixFlags field.
+	(TkpCreateButton): Initialize new pixFlags field.
+	(TkpDestroyButton): Clear pixmap field if we free the pixmap.
+	(TkpRealDisplayButton): Don't free the pixmap just because we're
+	unmapping the window.  Check pixFlags field to see if we can use
+	the cached pixmap.  Set pixFlag field if we cache the pixmap.
+	* generic/tkButton.c (TkButtonWorldChanged): Remove Cygnus local
+	patch; once again check whether the button is mapped before
+	scheduling a call to TkpDisplayButton.
+	(ButtonVarProc): Likewise.
+
+Thu Apr 16 15:59:55 MEST 1998 Khamis Abuelkomboz <khamis@multix.de>
+	* library/tkfbox.tcl
+	-One COMMENT: I have never seen so bad tcl/source code as how this 
+	 stuped tk/filedialog is implemented!!!!!!!!!!!!!
+
+	(tkIconList_Select): Include the fact that by multi-selection a file 
+		could contain blanks, so that the file is added as a list 
+		element.
+	(tkFDialog): When the dialog is not new created (withdrawn) don't 
+		center it again
+		-Define Tracer before calling the dialog and immediatly remove
+		 it after selection.
+		-tk dialog box doesn't use dynamic array names, so it's
+		 not possible to use more than one dialog box at the same
+		 time. Other dialogs must be deleted!
+	(tkFDialog_SetPath): Accept the fact that the variable could be bound
+		on a already deleted widget (trace).
+		-No tracer here.
+	(tkFDialog_Config): "glob" command returns a list of items, so we must
+		join the result, this was bugy when a file has contained blanks.
+	(tkFDialog_ActivateEnt): We can't trim a list.
+	(tkFDialog_OkCmd): Join file name only by single selection.
+	(tkFDialog_ListInvoke): Differ between single and multi selection by
+		joining files.
+		-return a list of files by multi-selection and the file itself
+		 by single-selection.
+
+Tue Apr 14 15:01:10 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* generic/tkText.c (TextBlinkProc): Remove test of TkTextCharBbox,
+	since it is a difference from standard releases, and it will never
+	change what happens.
+
+Mon Apr 13 17:55:13 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* compat/memmove.c: Remove.
+
+Thu Apr  9 15:00:47 1998  Martin M. Hunt  <hunt@cygnus.com>
+
+	* library/msgbox.tcl (tkMessageBox): When a default button
+	is supplied, simply set the focus on it, don't bind <Return>.
+	For all buttons, bind <Return> for them so the button command
+	is invoked.
+
+Tue Apr  7 20:32:40 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* tests/msgbox.test: Update unknown option message for -modal
+	option.
+
+Fri Mar 27 15:18:30 1998  Jeff Holcomb  <jeffh@cygnus.com>
+
+	* win/tkWinX.c: Added temporary define for MNC_CLOSE.
+
+Wed Mar 11 13:48:31 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* library/entry.tcl: Only bind <Insert> when not on Windows.
+
+Sat Mar 21 21:18:06 1998  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
+
+	Merged changes from Foundry (list follows in reverse chronological order)
+
+        - Tom Tromey  <tromey@cygnus.com>
+	* win/tkWinWm.c (InitWm): Look for "tk" icon first in
+	application's resources and then in Tk DLL's.
+	* generic/tkButton.c (TkButtonWorldChanged): Don't check to see if
+	button is unmapped before scheduling a redraw.
+	* win/tkWinWm.c (Tk_WmCmd): In "frame" case, make window exist if
+	it doesn't already.
+	* generic/tkButton.c (ButtonVarProc): Don't check to see if button
+	is unmapped before scheduling a redraw.
+	* win/tkWinButton.c (TkpRealDisplayButton): Destroy backing pixmap
+	if window is unmapped.
+	* win/tkWinWm.c (EX_TRANSIENT_STYLE): Define as 0.
+	* win/tkWinX.c (Tk_TranslateWinEvent): Handle WM_MENUCHAR.
+	(GenerateXEvent): Likewise.
+	* win/tkWinWm.c (UpdateWrapper): Turn off maximize box and sizebox
+	for non-resizable windows.
+	* win/tkWinDialog.c (Tk_MessageBoxCmd): Don't pass
+	MB_SETFOREGROUND for "-modal system".
+
+        -  Ian Lance Taylor  <ian@cygnus.com>
+	* win/Makefile.in ($(TKDLL)): Don't generate relocs for debugging
+	information.
+	* win/tkWinFont.c (Tk_MeasureChars): Free the partials array.
+	* win/tkWinFont.c (Tk_MeasureChars): Rearrange to always use sizes
+	from partials array, rather than size.cx.
+
+        -  Tom Tromey  <tromey@cygnus.com>
+	* win/tkWinMenu.c (TkWinHandleMenuEvent): Don't use height element
+	of indicatorDimensions when computing width.
+	* win/tkWinDialog.c: Reverted previous change.  It turns out that
+	with the change, if the user selects too many files, the list will
+	be truncated in the middle but no error message will be returned.
+	This makes it impossible to detect failures.
+	* win/tkWinDialog.c (ParseFileDlgArgs): If -multiple passed, don't
+	require files to exist.  This is a hack to work around a bug in
+	the common dialog.
+	(CYG_MAX_PATH): New define.
+	(_OpenFileData): Use CYG_MAX_PATH.
+	(GetFileName): Likewise.
+	* generic/tkTextDisp.c (DisplayDLine): Display cursor for disabled
+	widgets on Windows.
+
+        -  Ian Lance Taylor  <ian@cygnus.com>
+	* win/tkWinFont.c (WinFont): Remove widths field.
+	(Tk_MeasureChars): Rewrite to use GetTextExtentExPoint, and not
+	assume that Windows doesn't do kerning, since in reality it does
+	do kerning.
+	(AllocFont): Don't initialize widths field.
+
+        -  Tom Tromey  <tromey@cygnus.com>
+	* library/text.tcl (tkTextButton1): Unconditionally set the
+	focus.
+
+        -  Ian Lance Taylor  <ian@cygnus.com>
+	* win/tkWinDialog.c (Tk_MessageBoxCmd): If -modal system, pass
+	MB_SETFOREGROUND.  May or may not be useless.
+	* generic/tkFocus.c (SetFocus): If force, then don't just return
+	even if the desired window is already the focus window.
+	* win/tkWinPointer.c (TkpChangeFocus): Call XSetInputFocus even if
+	force.
+	* win/tkWinWm.c (EX_TRANSIENT_STYLE): Remove WS_EX_TOOLWINDOW.
+
+Mon Jan 12 15:45:03 1997  Syd Polk <spolk@cygnus.com>
+
+	* library/tkfbox.tcl (tk_getOpenFile): tk_getOpenFile would complain
+	and behave incorrectly if the -initialdir argument had a space
+	in it.
+
+Wed Dec 31 12:27:25 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/Makefile.in (install-libraries): Install the X11 header
+	files as well as tk.h.
+
+Tue Dec 23 16:31:07 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/Makefile.in ($(TKDLL)): Don't generate relocs for debugging
+	information.
+
+Mon Nov 17 18:07:12 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/tkWinButton.c (TkpCreateButton): Initialize pixmap field.
+	(TkpDestroyButton): Free pixmap field.
+	(TkpDisplayButton): Entire function moved into
+	TkpRealDisplayButton.
+	(TkpRealDisplayButton): New static function, from old
+	TkpDisplayButton.
+	(TkpComputeButtonGeometry): Discard any saved pixmap.
+	(ButtonProc): Call TkpRealDisplayButton, not TkpDisplayButton.
+
+Fri Nov 14 12:24:04 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/tkWinMenu.c (TkpDestroyMenu): Remove the menu handle from
+	winMenuTable.  Clear modalMenuPtr if we're destroying it.
+	(TkWinHandleMenuEvent): Don't treat WM_SYSCOMMAND like
+	WM_COMMAND.
+
+	* win/tkWinDialog.c (Tk_MessageBoxCmd): If -modal task, and
+	-parent not used, pass hWnd as NULL to MessageBox.
+
+Tue Nov 11 20:07:04 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/tkWinMenu.c (TkWinHandleMenuEvent): If TkPreprocessMenu
+	returns an error, call Tcl_BackgroundError.
+
+Fri Nov  7 15:52:23 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/tkWinDialog.c (Tk_MessageBoxCmd): Accept -modal option.
+	* library/msgbox.tcl (tkMessageBox): Accept and ignore -modal
+	option.
+
+Tue Oct 28 17:51:06 1997  Martin M. Hunt  <hunt@cygnus.com>
+
+	* generic/tkText.c: Patch text.txt from the net. Fixes
+	Win95 selection bug.
+
+	* library/dialog.tcl (tk_dialog): Two fixes from the net for
+	Windows 95 dialogs. Patch "dialog.txt" from "Robert Embleton" 
+	<embleton@crystal.cirrus.com>
+
+Tue Oct 28 16:36:11 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* Makefile.in (install-minimal): New target.
+	* win/Makefile.in (install-minimal): New target.
+
+Thu Oct 23 12:59:18 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* generic/tkScale.c (ConfigureScale): When setting scale value,
+	don't cause scale to invoke command.
+
+Fri Oct 10 19:41:57 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* xlib/X11/Xlib.h: On Windows, use a typdef for Status.
+
+	* win/tkWinPort.h: Declare struct timeval.
+
+Wed Oct  8 18:33:41 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* generic/tkText.c: Avoid ANSI-C code.
+
+Tue Oct  7 10:32:01 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* library/button.tcl: Bind <Return> to invoke buttons on Windows.
+
+Thu Oct  2 17:05:14 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* generic/tkColor.c (struct TkGCList): Define.
+	(Tk_GetColor): Initialize gcList element.
+	(Tk_GetColorByValue): Likewise.
+	(TkMapOverColors): New function.
+	(TkRegisterColorGC, TkDeregisterColorGC): New functions.
+	(TkColorChanged): New function.
+	* generic/tkColor.h (TkGCList): Define typedef.
+	(TkColor): Add gcList field.
+	(TkMapOverColors, TkColorChanged): Declare.
+	* generic/tkGC.c: Include tkInt.h.
+	(TkGC): Add foreground and background fields.
+	(ValueKey): Add foreground and background fields.
+	(Tk_GetGCColor): Rename from Tk_GetGC.  Add foreground and
+	background parameters.  Register the GC with the colors.
+	(Tk_GetGC): New function which just calls Tk_GetGCColor.
+	(Tk_FreeGC): Deregister colors.
+	* generic/tk.h (Tk_GetGCColor): Declare.
+	* generic/tkInt.h (TkRegisterColorGC): Declare.
+	(TkDeregisterColorGC): Declare.
+	* win/tkWinColor.c (ChangeColor): New static function.
+	(TkWinSysColorChange): New function.
+	* win/tkWinWm.c	(WmProc): Handle WM_SYSCOLORCHANGE.
+	* win/tkWinInt.h (TkWinSysColorChange): Declare.
+	* generic/tk3d.c: Change some calls to Tk_GetGC to call
+	Tk_GetGCColor instead.
+	* generic/tkButton.c: Likewise.
+	* generic/tkCanvArc.c: Likewise.
+	* generic/tkCanvBmap.c: Likewise.
+	* generic/tkCanvLine.c: Likewise.
+	* generic/tkCanvPoly.c: Likewise.
+	* generic/tkCanvText.c: Likewise.
+	* generic/tkCanvas.c: Likewise.
+	* generic/tkEntry.c: Likewise.
+	* generic/tkImgBmap.c: Likewise.
+	* generic/tkImgPhoto.c: Likewise.
+	* generic/tkListbox.c: Likewise.
+	* generic/tkMenuDraw.c: Likewise.
+	* generic/tkMenuButton.c: Likewise.
+	* generic/tkMessage.c: Likewise.
+	* generic/tkRectOval.c: Likewise.
+	* generic/tkScale.c: Likewise.
+	* generic/tkTextDisp.c: Likewise.
+
+Tue Sep 30 17:13:16 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/tkWinPointer.c (TkWinCancelMouseTimer): New function.
+	* win/tkWinWm.c (WmProc): Call it in WM_ENTERSIZEMOVE case.
+
+Mon Sep 15 16:29:16 PDT 1997 Khamis Abuelkomboz <khamis@cygnus.com>
+	generic/tkText.[ch]
+	Added a new functionality for the editor '-synccommand'. When it es
+	not empty, this command is called, when ever the contents in the
+	editor is changed (insert, delete). The function is called with the
+	same parameters how it called for the editor.
+	This functionality is used in the new GUI for SN to be able to open
+	more than one editor with the same file (like emacs multiple buffers).
+
+Wed Sep 10 12:56:43 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* generic/tkImgPhoto.c (FreeColorTable): Add force parameter.
+	Change all callers.
+	(DisposeInstance): Force FreeColorTable to free the color table
+	immediately, in case we are being called from TkDeleteAllImages
+	when Tk is exiting.
+
+	* win/tkWinMenu.c (TkWinHandleMenuEvent): If TkInvokeMenu returns
+	an error, call Tcl_BackgroundError.
+
+	* win/Makefile.in (install-libraries): Don't try to install *.gif
+	or *.xbm.
+
+Mon Sep  8 17:13:49 MET DST 1997 Zsolt Koppany <zkoppany@multix.de>
+	unix/tkUnixEvent.c
+	Deleted the second unnecessary call of XOpenDisplay().
+
+Thu Sep  4 20:07:23 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/tkWinFont.c (nonClientMap): New static array.
+	(TkpGetFontFromAttributes): If the font is in a magic windows-*
+	family, use SystemParametersInfo to get the attributes.
+	(TkWinNCMetricsChanged): New function.
+	(FontChanged): New static function.
+	* win/tkWinInt.h (TkWinNCMetricsChanged): Declare.
+	* generic/tkFont.c (TkUpdateFonts): New function.
+	* generic/tkFont.h (TkUpdateFonts): Declare.
+	* win/tkWinWm.c (WmProc): Handle WM_SETTINGCHANGE with a wParam
+	value of SPI_SETNONCLIENTMETRICS.
+
+Thu Sep  4 11:34:20 1997  Martin M. Hunt  <hunt@cygnus.com>
+
+	* library/palette.tcl (tkRecolorTree): If color isn't
+	set don't try to apply it.
+
+	* library/menu.tcl: Apply patch "menu2.txt" from patches
+	archive.
+
+Fri Aug 29 11:27:17 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* library/menu.tcl (tk_popup): Use Tcl syntax for call to
+	tk_menuSetFocus.
+
+Thu Aug 28 15:25:31 MET DST 1997 Zsolt Koppany <zkoppany@multix.de>
+	* generic/tkImgGIF.c
+	Memory bug fix.
+
+Thu Aug 28 13:36:30 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* testsuite/tk.tests/tk-test.exp: Permit capital letters in test
+	case names.  Try better error string handling.
+
+	* generic/tkInitScript.h (initScript): Don't call pwd in a safe
+	interpreter.
+
+	* library/tkfbox.tcl (tkFDialog_VerifyFileName): Only add file to
+	selectFile using lappend if -multiple.
+	* tests/filebox.tcl: Set the expected unknown options based on the
+	command and mode.
+
+Sun Aug 24 21:40:30 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/Makefile.in ($(TKDLL)): Set base address to 0x66300000.
+
+Mon Aug 18 18:13:00 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/tkWinDialog.c (GetFileName): Handle the case of a single
+	file when OFN_ALLOWMULTISELECT is set.
+
+Fri Aug 15 19:26:39 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/tkWinInit.c (initScript): Don't append share to [info
+	library] (revert patch of Aug 7).
+
+Thu Aug 14 09:29:45 1997  Tom Tromey  <tromey@sanguine.cygnus.com>
+
+	* library/dialog.tcl (tk_dialog): Run update after setting
+	geometry.  From the net.
+
+Wed Aug 13 12:28:08 1997  Tom Tromey  <tromey@sanguine.cygnus.com>
+
+	* library/tkfbox.tcl (tkFDialog_VerifyFileName): Use fname and not
+	contents of entry to compute flat, path, and file.
+
+Tue Aug 12 18:02:15 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/rc/cygnus.ico: Change color to match other Cygnus designs.
+
+Tue Aug 12 17:37:36 MET DST 1997 Zsolt Koppany <zkoppany@multix.de>
+
+	* unix/tkUnixWm.c
+	  Memory leak bug fixes.
+
+	* generic/tkText.c
+	  TkTextRedrawRegion() should be called only if TkTextCharBbox()
+	  does not return -1, because in that case x,y and h variables
+	  will not be set.
+
+Mon Aug 11 16:58:08 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* configure.in: Call AC_CANONICAL_HOST.  Check host, not target,
+	for cygwin32.
+	* configure: Rebuild.
+
+	* win/rc/cygnus.ico: New file.
+	* win/rc/tk.rc: Replace tk.ico with cygnus.ico.
+
+Mon Aug 11 11:14:31 1997  Martin M. Hunt  <hunt@cygnus.com>
+
+	* generic/tk.h, generic/tkImage.c, generic/tkImgBmap.c,
+  	generic/tkImgGIF.c, generic/tkImgPhoto.c, generic/tkTest.c, 
+	generic/tkWindow.c, library/tkfbox.tcl,	tests/imgPhoto.test, 
+	doc/photo.n: Two patches from Jan.Nijtmans@cmg.nl. Fixes 
+	numerous image problems including GIF transparency.
+
+Fri Aug  8 21:14:55 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/tkWinPointer.c (TkpChangeFocus): If force is set, call
+	SetForegroundWindow.
+
+Thu Aug  7 12:55:50 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* generic/tkFrame.c (mapFrameWindow): New static variable.
+	(mapFrameFrame): New static variable.
+	(MapFrame): Set new variables.
+	(TkInstallFrameMenu): Use new variables.
+
+	* win/tkWinInit.c (initScript): Look under share.
+
+Wed Aug  6 23:47:01 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/Makefile.in: Update for Tk 8.0.
+	* win/configure.in: Likewise.
+	* win/configure: Rebuild.
+	* win/tkWinInt.h (TkFontAttributes): Don't use typedef if
+	__GNUC__.
+	* win/tkWinPort.h (strnicmp, stricmp): Define if __CYGWIN32__.
+	(strncasecmp, strcasecmp): Don't define if __CYGWIN32__.
+
+Tue Aug  5 14:00:53 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* tests/all: Preserved local changes.
+	* tests/defs: Preserved local changes.
+
+Fri Jul 25 12:42:54 1997  Stephen Peters  <speters@cygnus.com>
+
+	* win/tkWinDialog.c (GetFileName, ParseFileDlgArgs): Changes to
+	  let tk_getOpenFile and tk_getSaveFile deal with multi-file
+	  selections on Windows.
+	* doc/getOpenFile.n: Add documentation for `-multiple' option.
+
+Thu Jul 24 13:12:02 1997  Stephen Peters  <speters@cygnus.com>
+
+	* library/tkfbox.tcl: Changes to let tk_getOpenFile take a
+	  `-multiple yes' argument and handle multi-file selections.
+
+Tue Jul 22 12:40:50 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/Makefile.in (.c.o): Use CFLAGS.
+
+Sat Jul 12 11:28:22 MET DST 1997 Zsolt Koppany <zkoppany@multix.de>
+
+	* generic/tkImgGIF.c
+	  Patch from tk8.b2 in GetCode().
+	* generic/tkImgPhoto.c
+	 Purify UMR bug fix in AllocateColors().
+
+Wed Jul  9 14:43:57 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* generic/tkMain.c: Include winuser.h if _WIN32.
+	(Tk_Main): If _WIN32, call MessageBox on error.
+
+Fri Jul  4 13:36:03 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/tkWinImage.c (PutPixel): Correct yet another bug.
+
+Thu Jul  3 16:00:57 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/tkWinImage.c (PutPixel): For a depth of 16 bits, convert a
+	24 bit truecolor value into a 16 bit truecolor value.  Correct
+	error in storing high byte.  For a depth of 1 bit, correct error
+	in clearing bit.
+
+Thu Jun 26 14:02:03 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/Makefile.in (WINDRES): New variable.
+	(install-binaries): Don't install DLL here...
+	(install-libraries): ...install it here instead.
+	($(TKDLL)): Depend upon and link with tkres.o.
+	($(WISH)): Depend upon and link with wishres.o.
+	($(TKTEST)): Likewise.
+	(tkres.o, wishres.o): New targets.
+	* win/tkWinX.c (TkWinGetTkModule): If __CYGWIN32__, use cygtkdll
+	as the DLL name.
+	* win/configure.in: Define and substitute WINDRES.
+	* win/configure: Rebuild.
+
+Tue Jun 24 11:42:06 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* library/palette.tcl (tkRecolorTree): Properly quote color name.
+	From Jeffrey Hobbs.
+
+Mon Jun 23 10:15:56 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* Makefile.in (install-binaries, install-libraries): New targets.
+
+Wed Jun 18 12:21:57 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/Makefile.in: Copy install, install-binaries,
+ 	install-libraries, and install-demos rules, and associated
+ 	variables from unix/Makefile.in, with appropriate adjustments.
+
+Thu Jun 12 19:20:57 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/Makefile.in (tkcyg.def): Don't export impure_ptr.
+
+Tue Jun 10 19:16:39 1997  Stephen Peters  <speters@cygnus.com>
+
+	* unix/configure.in: Use a real replacement for memmove, instead
+	  of using memcpy (which doesn't guarantee overlaps will copy
+	  correctly).  
+	* unix/configure: Rebuilt.
+	* unix/Makefile.in: Use replacement memmove if needed. 
+	* compat/memmove.c: New file for replacing memmove.
+
+Mon Jun  9 16:26:13 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/configure.in: Set TK_BUILD_INCLUDES.
+	* win/configure: Rebuild.
+
+Fri Jun  6 23:43:34 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	Add support for building with cygwin32:
+	* win/Makefile.in: Rewrite completely based on makefile.vc.
+	* win/configure.in: Rewrite completely.
+	* win/configure: Rebuild.
+	* win/tkWin32Dll.c (_impure_ptr): Define if __CYGWIN32__.
+	(__imp_reent_data): Declare if __CYGWIN32__.
+	(DllMain): Initialize _impure_ptr if __CYGWIN32__.
+	* win/tkWinX.c (GetCurrentTime): Define as GetTickCount if
+	__CYGWIN32__.
+
+Thu May 22 15:49:40 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* win/configure.in: Use win rather than CONFIGDIR.
+	* win/configure: Rebuild.
+
+Fri May  9 19:07:17 1997  Zsolt Koppany <zkoppany@multix.de>
+
+	* generic/tkWindow.c (GetScreen): Init metaModMask, altModMask
+	(from Purify).
+
+Tue May 13 23:19:20 1997  Zsolt Koppany  <zsolt@cygnus.com>
+
+	* generic/tkText.c (ConfigureText): Bug fix from Ousterhout.
+
+Wed Apr 23 14:36:14 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* library/tkfbox.tcl: Incorporated version from Tk 8.0.
+
+Tue Mar 25 23:35:02 1997  Martin M. Hunt  <hunt@cygnus.com>
+
+	* library/palette.tcl: Patch from kcorey@eng.sun.com 
+	(Ken Corey) 
+
+Tue Mar 18 16:01:05 1997  Martin M. Hunt  <hunt@cygnus.com>
+
+	* generic/tkImgGIF.c: Fix GIF transparency.  Patch from
+	nijtmans@nici.kun.nl
+
+Thu Mar 13 10:42:01 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* win/configure.in: Don't run AC_C_CROSS.
+	(AC_CONFIG_AUX_DIR): Look in srcdir.
+
+Fri Mar  7 13:08:47 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* Updated to Tk 4.2p2.
+
+Thu Nov 21 10:07:02 1996  Tom Tromey  <tromey@cygnus.com>
+
+	* generic/tkGrid.c (Tk_GridCmd): Applied fix suggested by Stephen
+	Uhler.
+
+	* library/menu.tcl: Applied patch from Ousterhout.
+
+Mon Oct 14 12:17:11 1996  Tom Tromey  <tromey@cygnus.com>
+
+	* Makefile.in (RUNTEST): Use srcdir, not SRC_DIR.
+	(tk-check): Ditto.
+	(check): Renamed from tk-check.
+
+	* testsuite/config/default.exp (find_x_display): New proc.
+	(tk_start): Use find_x_display.
+
+Mon Aug 19 12:30:51 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* testsuite/config/default.exp, testsuite/tk.tests/tk-test.exp:
+	New files.
+
+	* Makefile.in (EXPECT, RUNTESTFLAGS, RUNTEST): New variables.
+	(tk-check): New target.
+
+	* tests/all: Look for tests in srcdir.
+	* tests/defs: Set srcdir if not already set.
+
+Thu Aug 15 12:50:47 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* generic/tkArgv.c (defaultTable): Added -version.
+	(Tk_ParseArgv): Handle -version option.
+	* generic/tk.h (TK_ARGV_VERSION): New define.
+
+Mon Aug  5 10:47:09 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* Makefile.in (configure): Don't depend on configure.in.
+	(config.status): Depend on configure.
+
+Wed Jun 26 12:51:43 1996  Jason Molenda  (crash@godzilla.cygnus.co.jp)
+
+	* configure.in (AC_PREREQ): autoconf 2.5 or higher.
+	* configure: Rebuilt.
+
+Mon May  6 09:45:20 1996  Tom Tromey  <tromey@lisa.cygnus.com>
+
+	* generic/tkMain.c (Tk_Main): Exit after printing version number.
+
+Tue Apr 30 13:40:04 1996  Tom Tromey  <tromey@snuffle.cygnus.com>
+
+	* generic/tkMain.c (Tk_Main): Removed "-inet-1.0".
+
+Mon Apr 29 17:43:15 1996  Tom Tromey  <tromey@snuffle.cygnus.com>
+
+	* generic/tkMain.c (argTable): Added -version.
+	(Tk_Main): Handle -version.
+
+Thu Mar  7 10:08:57 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* Makefile.in (config.status): Depend on nothing.
+
+Wed Mar  6 19:07:38 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* Makefile.in (Makefile): Removed redundant target.
+
+Thu Feb 29 21:32:44 1996  Fred Fish  <fnf@cygnus.com>
+
+	* Makefile.in (srcdir): Add macro.
+	(configure): Run autoconf in source dir, not build dir.
+
+Thu Feb 29 14:59:03 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* Makefile.in (Makefile): New rule.
+	(config.status): New rule.
+
+Wed Jan 24 09:42:29 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* Makefile.in: Replaced realclean with maintainer-clean.
+
+Fri Jan 12 11:00:06 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* library/tclIndex: Removed all references to console.tcl.
+	(Hack).
+
+	* library/console.tcl (tkConsoleInvoke): Use "interp eval" with
+	history command, not nonexistent "interp record" command.
+	(tkConsoleHistory, tkConsolePrompt): Include pathname argument to
+	"interp eval".
+
+Wed Jan 10 12:49:00 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* configure.in, configure, Makefile.in, README.configure: New
+	files.
+
+	* Tk: Updated to Tk4.1a2.  Entries after this line mostly likely
+	apply to files in some subdirectory.
+
+Tue Dec 19 18:32:36 1995  Brendan Kehoe  <brendan@lisa.cygnus.com>
+
+	* Makefile.in (check, installcheck): New null rules.
+
+Wed Oct 25 20:12:01 1995  Brendan Kehoe  <brendan@lisa.cygnus.com>
+
+	* Makefile.in (prefix, exec_prefix): Set to @prefix@ and
+	@exec_prefix@, so configure can substitute them properly.
+
+Tue Oct 24 18:49:59 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
+
+	* Makefile.in (X11_INCLUDES, X11_LIB_SWITCHES): switch to
+	X11_CFLAGS, X11_LDFLAGS and X11_LIBS.
+	(CC_SWITCHES): Use X11_CFLAGS.
+
+	* configure.in: Statically link X libraries on Solaris, SunOS,
+	and HPUX.
+
+Tue Oct 10 14:33:17 1995  Stu Grossman  (grossman@cygnus.com)
+
+	* tkConfig.c (Tk_ConfigureInfo), tkSelect.c (HandleTclCommand
+	LostSelection):  Use free() instead of TCL_DYNAMIC in
+	interp->freeProc to prevent crashes.  Apparantly tcl7.4 changed
+	the result protocol around slightly.
+
+Sat Sep 30 09:39:11 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
+
+	* configure.in:  Upgraded to autoconf v2, removed cruft which did a poor
+        job of finding X location in favor of AC_PATH_X.
+	* configure: Regenerated.
+
+Sun Aug 20 00:15:51 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
+
+	* tkMain.c:  make tcl_RcFileName defn an extern so it doesn't
+	conflict with the one in the new tcl/tclBasic.c.
+
+Mon Jun 12 17:09:28 1995  Stu Grossman  (grossman@cygnus.com)
+
+	* configure:  Ignore --cache-file option instead of bombing out.
+
+Mon Dec 12 12:17:16 1994  Stu Grossman  (grossman@cygnus.com)
+
+	* tkConfig.h:  Don't use prototype for select.  This allows HPUX
+	8.x build.
+
+Tue Oct 18 12:41:49 1994  Jim Wilson  (wilson@chestnut.cygnus.com)
+
+	* Makefile.in (CC_SWITCHES): Add X11_INCLUDE_FLAGS.

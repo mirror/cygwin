@@ -87,7 +87,12 @@ extern int reg_from_xregset (struct gdbserv *serv,
 extern int continue_lwp (lwpid_t lid, int signal);
 
 /* Step a stopped LWP. */
-extern int singlestep_lwp (lwpid_t lid, int signal);
+extern int singlestep_lwp (struct gdbserv *serv, lwpid_t lid, int signal);
+
+/* Software singlestep for mips.  */
+#if defined (MIPS_LINUX_TARGET) || defined (MIPS64_LINUX_TARGET)
+extern int mips_singlestep (struct gdbserv *serv, pid_t pid, int sig);
+#endif
 
 /* Attach an LWP. */
 extern int attach_lwp (lwpid_t lid);

@@ -1520,7 +1520,8 @@ wait_all_threads (struct child_process *process)
 	      {
 		/* This signal does not need to be forwarded. */
 		if (thread_db_noisy)
-		  fprintf (stderr, "<wait_all_threads: ignoring SIGDEBUG for %d>\n",
+		  fprintf (stderr, "<wait_all_threads: ignoring SIGDEBUG (%d) for %d>\n",
+			  debug_signal,
 			  thread->ti.ti_lid);
 	      }
 	    else
@@ -1617,9 +1618,11 @@ thread_db_continue_program (struct gdbserv *serv)
    Send SINGLESTEP to a struct gdbserv_thread. */
 
 static void
-singlestep_thread (struct gdbserv_thread *thread, int signal)
+singlestep_thread (struct gdbserv *serv,
+                   struct gdbserv_thread *thread,
+                   int signal)
 {
-  singlestep_lwp (thread->ti.ti_lid, signal);
+  singlestep_lwp (serv, thread->ti.ti_lid, signal);
   thread->stopped = thread->attached = thread->waited = 0;
   thread->stepping = 1;
 }
@@ -1638,9 +1641,9 @@ thread_db_singlestep_program (struct gdbserv *serv)
 
   /* First singlestep the event thread. */
   if (process->event_thread)
-    singlestep_thread (process->event_thread, process->signal_to_send);
+    singlestep_thread (serv, process->event_thread, process->signal_to_send);
   else
-    singlestep_lwp (process->pid, process->signal_to_send);
+    singlestep_lwp (serv, process->pid, process->signal_to_send);
 
   process->stop_status = process->stop_signal =
     process->signal_to_send = 0;
@@ -1712,7 +1715,7 @@ thread_db_singlestep_thread (struct gdbserv *serv,
     thread_db_singlestep_program (serv);
   else
     {
-      singlestep_thread (thread, process->signal_to_send);
+      singlestep_thread (serv, thread, process->signal_to_send);
       process->stop_status = process->stop_signal =
 	process->signal_to_send = 0;
       process->running = 1;

@@ -78,3 +78,5 @@ int ptrace_set_fpregs (struct gdbserv *serv, int alt_pid,  const void *buff);
 int ptrace_get_fpxregs (struct gdbserv *serv, int alt_pid, void *buff);
 int ptrace_set_fpxregs (struct gdbserv *serv, int alt_pid, const void *buff);
 int ptrace_check_child_state (struct child_process *process);
+long ptrace_set_mem (struct gdbserv *serv, struct gdbserv_reg *addr, void *data, long len);
+long ptrace_get_mem (struct gdbserv *serv, struct gdbserv_reg *addr, void *data, long len);

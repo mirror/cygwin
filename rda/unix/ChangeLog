@@ -1,3 +1,37 @@
+2003-02-07  Kevin Buettner  <kevinb@redhat.com>
+
+	* gdbserv-thread-db.h (singlestep_lwp): Add ``struct gdbserv *''
+	argument.  Adjust all callers.
+	(mips_singlestep) [MIPS_LINUX_TARGET, MIPS64_LINUX_TARGET]: New
+	function.
+	* linux-target.c (reginfo) [MIPS64_LINUX_TARGET]: Adjust some
+	of the fpregset/gregset related constants in this table.
+	(mips_get_reg): Add ``struct gdbserv *'' argument.  Adjust all
+	callers.
+	(mips_addr_as_reg, mips_peek_instruction, mips_poke_instruction):
+	New functions.
+	(mips_singlestep_program): Move bulk of implementation to and call...
+	(mips_singlestep): ...new function.  This new function no longer
+	makes any direct PTRACE_PEEKTEXT or PTRACE_POKETEXT operations.
+	Shadow breakpoint information is also stored in a slightly different
+	format.
+	* ptrace-target.c (server.h, ptrace-target.h): Adjust location
+	of #include statements so that gdbserv.h is included first.
+	(handle_waitstatus): Call ptrace_set_mem() instead of invoking
+	ptrace() directly.  Also adjust code to use somewhat different
+	shadow breakpoint structs.
+	(ptrace_set_mem, ptrace_get_mem): Remove ``static'' qualifier
+	from function declarators.
+	(singlestep_lwp): Add ``struct gdbserv *'' argument.
+	* ptrace-target.h (ptrace_get_mem, ptrace_set_mem): Declare.
+	* server.c (gdbserv.h): Include.
+	* server.h (struct ss_save): Add field ``in_use''.  Change
+	type of field ``ss_addr'' to struct ``gdbserv_reg''.
+	* thread-db.c (wait_all_threads): Revise diagnostic message to
+	print signal number for SIGDEBUG symbol.
+	(singlestep_thread): Add ``struct gdbserv *'' argument.  Adjust
+	all callers.
+
 2003-01-22  Kevin Buettner  <kevinb@redhat.com>
 
 	* linux-target.c (struct peekuser_pokeuser_reginfo)

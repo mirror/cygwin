@@ -33,7 +33,8 @@
  */
 
 struct ss_save {
-	unsigned int ss_addr;
+	int in_use;
+	struct gdbserv_reg ss_addr;
         unsigned int ss_val;
 };
 #endif

@@ -1,3 +1,9 @@
+2001-10-03  Ian Roxborough  <irox@redhat.com>
+
+	* configure.in:  Updated Tcl and Tk library
+	version numbers.
+	* configure: Regenerated.
+
 2001-07-12  matthew green  <mrg@redhat.com>
 
 	* compTcl.cxx (tcl_component): Add missing throw() specifiers to this

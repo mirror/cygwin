@@ -120,7 +120,7 @@
 
 (dnop dr     "destination register"    () h-gr   f-r1)
 (dnop sr     "source register"         () h-gr   f-r2)
-(dnop simm-16 "16 bit signed immediate" (HASH-PREFIX) h-sint f-simm16)
+(dnop simm16 "16 bit signed immediate" (HASH-PREFIX) h-sint f-simm16)
 
 ; Note that `df' doesn't work as that is a pmacro.
 (dnop df-reg "df reg" () h-df f-nil)
@@ -159,9 +159,9 @@
 
 (dni addi "addi"
      ()
-     "addi $dr,$sr,$simm-16"
-     (+ OP1_4 OP2_2 dr sr simm-16)
-     (set dr (add sr simm-16))
+     "addi $dr,$sr,$simm16"
+     (+ OP1_4 OP2_2 dr sr simm16)
+     (set dr (add sr simm16))
      ()
 )
 

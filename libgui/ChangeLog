@@ -1,3 +1,11 @@
+2002-03-07  Martin M. Hunt  <hunt@redhat.com>
+
+	* library/balloon.tcl (_set_variable): Set the public
+	variable before calling notifiers.  Set the help text
+	from the public variable afterwards.
+	(BALLOON_command_variable): Fix call with no args to
+	return variable name.
+
 2002-02-25  Ian Roxborough  <irox@redhat.com>
 
 	* src/library/looknfeel.tcl (standard_look_and_feel):

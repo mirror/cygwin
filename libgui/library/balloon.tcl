@@ -260,18 +260,26 @@ itcl_class Balloon {
     if {$index == ""} then {
       set value ""
     } elseif {[info exists _notifiers($index)] && ! $_in_notifier} then {
+      if {$variable != ""} {
+	upvar $variable var
+	set var $_help_text($index)
+      }
       set _in_notifier 1
       uplevel \#0 $_notifiers($index)
       set _in_notifier 0
       # Get value afterwards to give notifier a chance to change it.
+      if {$variable != ""} {
+	upvar $variable var
+	set _help_text($index) $var
+      } 
       set value $_help_text($index)
     } else {
       set value $_help_text($index)
     }
 
     if {$variable != ""} then {
-      # itcl 1.5 forces us to do this in a strange way.
-      ::uplevel \#0 [list set $variable $value]
+      upvar $variable var
+      set var $value
     }
   }
 
@@ -283,7 +291,6 @@ itcl_class Balloon {
       # An ordinary window.  Position below the window, and right of
       # center.
       set _active $W
-      set help $_help_text($W)
       set left [expr {[winfo rootx $W] + round ([winfo width $W] * .75)}]
       set ypos [expr {[winfo rooty $W] + [winfo height $W]}]
       set alt_ypos [winfo rooty $W]
@@ -292,8 +299,6 @@ itcl_class Balloon {
       set _recent_parent [winfo parent $W]
     } else {
       set _active $W,$tag
-      set help $_help_text($W,$tag)
-
       # Switching on class name is bad.  Do something better.  Can't
       # just use the widget's bbox method, because the results differ
       # for Text and Canvas widgets.  Bummer.
@@ -328,6 +333,8 @@ itcl_class Balloon {
 	}
       }
     }
+
+    set help $_help_text($_active)
 
     # On Windows, the popup location is always determined by the
     # cursor.  Actually, the rule seems to be somewhat more complex.
@@ -489,8 +496,8 @@ proc BALLOON_command_withdraw {window} {
 proc BALLOON_command_variable {window args} {
   if {[llength $args] == 0} then {
     # Fetch.
-    set b [BALLOON_find_balloon [lindex $args 0]]
-    return [lindex [$b configure -variable] 4]
+    set b [BALLOON_find_balloon $window]
+    return [$b cget -variable]
   } else {
     # FIXME: no arg checking here.
     # Set.

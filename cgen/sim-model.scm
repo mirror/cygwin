@@ -1,8 +1,15 @@
 ; Simulator model support, plus misc. things associated with a cpu family.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2003 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Return C code to define cpu implementation properties.
+
+(define (unit:enum u)
+  (gen-c-symbol (string-append "UNIT_"
+			       (string-upcase (obj:name (unit:model u)))
+			       "_"
+			       (string-upcase (obj:name u))))
+)
 
 (define (-gen-cpu-imp-properties)
   (string-list

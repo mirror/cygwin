@@ -1,5 +1,5 @@
 ; Simulator generator support routines.
-; Copyright (C) 2000, 2002 Red Hat, Inc.
+; Copyright (C) 2000, 2002, 2003 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; One goal of this file is to provide cover functions for all methods.
@@ -1281,11 +1281,12 @@
 
 (method-make!
  <operand> 'gen-profile-code
- (lambda (self insn out?)
+ (lambda (self insn when out?)
    (string-append "  "
 		  "@prefix@_model_mark_"
 		  (if out? "set_" "get_")
 		  (gen-sym (op:type self))
+		  "_" when
 		  " (current_cpu"
 		  (if (hw-scalar? (op:type self))
 		      ""
@@ -1376,39 +1377,7 @@
 			       (current-model-list))
 			  '((max))))
    "#define MAX_MODELS ((int) MODEL_MAX)\n\n"
-   (gen-enum-decl 'unit_type "unit types"
-		  "UNIT_"
-		  (cons '(none)
-			(append
-			 ; "apply append" squeezes out nils.
-			 (apply append
-				; create <model_name>-<unit-name> for each unit
-				(map (lambda (model)
-				       (let ((units (model:units model)))
-					 (if (null? units)
-					     nil
-					     (map (lambda (unit)
-						    (cons (symbol-append (obj:name model) '-
-									 (obj:name unit))
-							  (cons '- (atlist-attrs (obj-atlist model)))))
-						  units))))
-				     (current-model-list)))
-			 '((max)))))
-   ; FIXME: revisit MAX_UNITS
-   "#define MAX_UNITS ("
-   (number->string
-    (apply max
-	   (map (lambda (lengths) (apply max lengths))
-		(map (lambda (insn)
-		       (let ((timing (insn-timing insn)))
-			 (if (null? timing)
-			     '(1)
-			     (map (lambda (insn-timing)
-				    (length (timing:units (cdr insn-timing))))
-				  timing))))
-		     (non-multi-insns (real-insns (current-insn-list)))))))
-   ")\n\n"
-   )
+  )
 )
 
 ; Function units.
@@ -1451,7 +1420,8 @@
 
 (method-make!
  <unit> 'gen-profile-code
- (lambda (self unit-num insn overrides cycles-var-name)
+ (lambda (self unit-num insn when overrides cycles-var-name)
+   (logit 3 "  'gen-profile-code\n")
    (let (
 	 (inputs (unit:inputs self))
 	 (outputs (unit:outputs self))
@@ -1463,6 +1433,7 @@
 	  ; UNIT-REFERENCED-VAR.
 	  ; ??? For now we assume all input operands are read.
 	  (gen-ref-arg (lambda (arg num in-out)
+			 (logit 3 "    gen-ref-arg\n")
 			 (let* ((op-name (assq-ref overrides (car arg)))
 				(op (insn-op-lookup (if op-name
 							(car op-name)
@@ -1492,6 +1463,7 @@
 	  ; Initialize unit argument ARG.
 	  ; OUT? is #f for input args, #t for output args.
 	  (gen-arg-init (lambda (arg out?)
+			 (logit 3 "    gen-arg-unit\n")
 			  (if (or
 			       ; Ignore scalars.
 			       (null? (cdr arg))
@@ -1513,6 +1485,7 @@
 	  ; Return C code to declare variable to hold unit argument ARG.
 	  ; OUT? is #f for input args, #t for output args.
 	  (gen-arg-decl (lambda (arg out?)
+			 (logit 3 "    gen-arg-decl " arg out? "\n")
 			  (if (null? (cdr arg)) ; ignore scalars
 			      ""
 			      (string-append "    "
@@ -1529,6 +1502,7 @@
 	  ; Return C code to pass unit argument ARG to the handler.
 	  ; OUT? is #f for input args, #t for output args.
 	  (gen-arg-arg (lambda (arg out?)
+			 (logit 3 "    gen-arg-arg\n")
 			 (if (null? (cdr arg)) ; ignore scalars
 			     ""
 			     (string-append ", "
@@ -1538,8 +1512,11 @@
 
      (string-append
       "  {\n"
-      "    int referenced = 0;\n"
-      "    unsigned long long UNUSED insn_referenced = abuf->written;\n"
+      (if (equal? when 'after)
+	  (string-append
+	   "    int referenced = 0;\n"
+	   "    unsigned long long insn_referenced = abuf->written;\n")
+	  "")
       ; Declare variables to hold unit arguments.
       (string-map (lambda (arg) (gen-arg-decl arg #f))
 		  inputs)
@@ -1596,19 +1573,22 @@
 				    "invalid spec" arg))))
 		  overrides)
       ; Create bitmask indicating which args were referenced.
-      (string-map (lambda (arg num) (gen-ref-arg arg num 'in))
-		  inputs
-		  (iota (length inputs)))
-      (string-map (lambda (arg num) (gen-ref-arg arg num 'out))
-		  outputs
-		  (iota (length inputs)
-			(length outputs)))
+      (if (equal? when 'after)
+	  (string-append
+	   (string-map (lambda (arg num) (gen-ref-arg arg num 'in))
+		       inputs
+		       (iota (length inputs)))
+	   (string-map (lambda (arg num) (gen-ref-arg arg num 'out))
+		       outputs
+		       (iota (length inputs)
+			     (length outputs))))
+	  "")
       ; Emit the call to the handler.
       "    " cycles-var-name " += "
-      (gen-model-unit-fn-name (unit:model self) self)
-      " (current_cpu, abuf->idesc"
+      (gen-model-unit-fn-name (unit:model self) self when)
+      " (current_cpu, idesc"
       ", " (number->string unit-num)
-      ", referenced"
+      (if (equal? when 'after) ", referenced" "")
       (string-map (lambda (arg) (gen-arg-arg arg #f))
 		  inputs)
       (string-map (lambda (arg) (gen-arg-arg arg #t))
@@ -1623,10 +1603,10 @@
 
 (method-make!
  <iunit> 'gen-profile-code
- (lambda (self unit-num insn cycles-var-name)
+ (lambda (self unit-num insn when cycles-var-name)
    (let ((args (iunit:args self))
 	 (unit (iunit:unit self)))
-     (send unit 'gen-profile-code unit-num insn args cycles-var-name)))
+     (send unit 'gen-profile-code unit-num insn when args cycles-var-name)))
 )
 
 ; Mode support.
@@ -1665,15 +1645,15 @@
 
 (method-make!
  <insn> 'gen-profile-code
- (lambda (self model cycles-var-name)
+ (lambda (self model when cycles-var-name)
    (string-append
     (let ((timing (assq-ref (insn-timing self) (obj:name model))))
       (if timing
 	  (string-map (lambda (iunit unit-num)
-			(send iunit 'gen-profile-code unit-num self cycles-var-name))
+			(send iunit 'gen-profile-code unit-num self when cycles-var-name))
 		      (timing:units timing)
 		      (iota (length (timing:units timing))))
-	  (send (model-default-unit model) 'gen-profile-code 0 self nil cycles-var-name)))
+	  (send (model-default-unit model) 'gen-profile-code 0 self when nil cycles-var-name)))
     ))
 )
 

@@ -1,5 +1,5 @@
 ; CPU implementation description.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2003 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -65,13 +65,6 @@
     (elm-xset! result 'issue issue)
     (elm-xset! result 'done done)
     result)
-)
-
-(define (unit:enum u)
-  (gen-c-symbol (string-append "UNIT_"
-			       (string-upcase (obj:name (unit:model u)))
-			       "_"
-			       (string-upcase (obj:name u))))
 )
 
 ; The `<model>' class.
@@ -272,6 +265,7 @@
 ; are returned as (model1), i.e. an empty unit list.
 
 (define (parse-insn-timing context insn-timing-desc)
+  (logit 2 "parse-insn-timing: context==" context ", desc==" insn-timing-desc "\n")
   (map (lambda (model-timing-desc)
 	 (let* ((model-name (car model-timing-desc))
 		(model (current-model-lookup model-name)))

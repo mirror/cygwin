@@ -1,7 +1,7 @@
 ; Simulator generator entry point.
 ; This is invoked to build: desc.h, cpu.h, defs.h, decode.h, decode.cxx,
-; semantics.cxx, sem-switch.cxx.
-; Copyright (C) 2000 Red Hat, Inc.
+; semantics.cxx, sem-switch.cxx, model.h, model.cxx
+; Copyright (C) 2000, 2003 Red Hat, Inc.
 ; This file is part of CGEN.
 ;
 ; This is a standalone script, we don't load anything until we parse the
@@ -41,6 +41,8 @@
 	 (lambda (arg) (file-write arg cgen-sem-switch.cxx)))
    (list '-M "file" "generate model.cxx in <file>"
 	 (lambda (arg) (file-write arg cgen-model.cxx)))
+   (list '-N "file" "generate model.h in <file>"
+	 (lambda (arg) (file-write arg cgen-model.h)))
    )
 )
 

@@ -1,3 +1,8 @@
+2000-07-08  Angela Marie Thomas <angela@cygnus.com>
+
+	* lib/framework.exp: Use compiler_conditional_xfail_data as a global
+	rather than assuming it's set in the level above us.
+
 Fri Jun  9 09:10:48 2000  Catherine Moore  <clm@cygnus.com>
 
 	* lib/libgloss.exp (proc_get_multilibs):  Handle multilib

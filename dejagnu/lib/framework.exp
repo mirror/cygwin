@@ -693,14 +693,14 @@ proc pass { message } {
 # Record that a test has failed
 #
 proc fail { message } {
-    global xfail_flag
+    global xfail_flag compiler_conditional_xfail_data
 
     # if we have a conditional xfail setup, then see if our compiler flags match
-    if [uplevel {info exists compiler_conditional_xfail_data}] {
-	if [uplevel {check_conditional_xfail $compiler_conditional_xfail_data}] {
+    if [ info exists compiler_conditional_xfail_data ] {
+	if [check_conditional_xfail $compiler_conditional_xfail_data] {
 	    set xfail_flag 1
 	}
-	uplevel {unset compiler_conditional_xfail_data}
+	unset compiler_conditional_xfail_data
     }
 
     if $xfail_flag {

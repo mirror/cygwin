@@ -122,10 +122,11 @@ class generic_mapper;
 class generic_mapper_bus: public bus
 {
 public:
-  generic_mapper_bus (generic_mapper* target): target (target)
+  generic_mapper_bus (generic_mapper* target, bool transparent_p): target (target)
     {
       this->tlb1 = 0;
       this->tlb2 = 0;
+      this->low_multiplier = (transparent_p ? 0 : 1);
     }
 
 
@@ -158,7 +159,7 @@ public:
       for (unsigned i=0; i<slave_size; i++)
 	ds.write_byte (i, data.read_byte (i + slave_offset - master_offset));
 
-      host_int_4 mapped_address = (address - r->low) >> (r->stride_shift - r->width_shift);
+      host_int_4 mapped_address = (address - (this->low_multiplier * r->low)) >> (r->stride_shift - r->width_shift);
       
       bus::status st = r->accessor->write (mapped_address, ds);
       st.latency += target->latency;
@@ -187,7 +188,7 @@ public:
 	return bus::misaligned;
 
       DataSlave ds;
-      host_int_4 mapped_address = (address - r->low) >> (r->stride_shift - r->width_shift);
+      host_int_4 mapped_address = (address - (this->low_multiplier * r->low)) >> (r->stride_shift - r->width_shift);
       bus::status s = r->accessor->read (mapped_address, ds);
 
       // Copy data bytes for master
@@ -244,6 +245,7 @@ private:
   generic_mapper* target;
   mutable struct mapping_record* tlb1;
   mutable struct mapping_record* tlb2;
+  unsigned low_multiplier;
 };
 
 generic_mapper_bus::~generic_mapper_bus () throw () {
@@ -261,7 +263,7 @@ class generic_mapper: public virtual component,
 		      protected fixed_bus_map_component
 {
 public:
-  generic_mapper ();
+  generic_mapper (bool transparent_p);
   ~generic_mapper () throw() {}
 
   std::vector<string> accessor_names () throw();
@@ -292,8 +294,8 @@ private:
 };
 
 
-generic_mapper::generic_mapper ()
-  :my_bus (this),
+generic_mapper::generic_mapper (bool transparent_p)
+  :my_bus (this, transparent_p),
    latency (0)
 {
   add_bus ("access-port", &this->my_bus);
@@ -403,7 +405,7 @@ generic_mapper_bus::write_any (host_int_4 address, Data data) throw ()
 	// bypass stride/offset calculations?
 	if (LIKELY(! r->use_strideoffset_p))
 	  {
-	    host_int_4 mapped_address = address - r->low;
+	    host_int_4 mapped_address = address - (this->low_multiplier * r->low);
 	    bus::status st = r->accessor->write (mapped_address, data);
 	    st.latency += target->latency;
 	    return st;
@@ -447,7 +449,7 @@ generic_mapper_bus::read_any (host_int_4 address, Data& data) throw ()
 	// bypass stride/offset calculations?
 	if (LIKELY(! r->use_strideoffset_p))
 	  {
-	    host_int_4 mapped_address = address - r->low;
+	    host_int_4 mapped_address = address - (this->low_multiplier * r->low);
 	    bus::status st = r->accessor->read (mapped_address, data);
 	    st.latency += target->latency;
 	    return st;
@@ -744,6 +746,7 @@ compMapperListTypes ()
 {
   vector<string> types;
   types.push_back ("hw-mapper-basic");
+  types.push_back ("hw-mapper-transparent");
   return types;
 }
 
@@ -753,7 +756,9 @@ component*
 compMapperCreate (const string& typeName)
 {
   if (typeName == "hw-mapper-basic")
-    return new generic_mapper ();
+    return new generic_mapper (false);
+  else if (typeName == "hw-mapper-transparent")
+    return new generic_mapper (true);
   else
     return 0;
 }

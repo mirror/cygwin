@@ -3,7 +3,8 @@
 
 <defcomplib lib="libmapper.la" dlsym="mapper_component_library">
   <defcomponent name="hw-mapper-basic" type="concrete">
-
+    <variants><defcomponent name="hw-mapper-transparent"></defcomponent>
+    </variants>
 
     <!-- buses -->
     <defbus name="access-port" addresses="any address" accesses="any access" behaviors="mapping" />
@@ -79,7 +80,15 @@
 	  range limits).  The second form is appropriate if the slave
 	  device is willing to accept only accesses to addressable units
 	  of fixed width at a fixed stride from one another.</p>
-	
+
+	<p>
+          The downstream addresses passed by the
+          <component>hw-mapper-basic</component> variant are relative
+          to the matching region, so are zero-based.  The
+          <component>hw-mapper-transparent</component> does not make
+          downstream addresses relative, so it may be more suitable for 
+          carving up an address space by multiple layers of mapping.</p>
+
 	<p>
 	  See the "mapping" behavior below for more details.</p></p>
     </modelling>
@@ -107,7 +116,9 @@
 	  <ul>
 	    <li>
 	      The accessor's &lt;low&gt; address is subtracted from the incoming
-	      address, so outgoing addresses will be relative and zero-based.</li>
+	      address, so outgoing addresses will be relative and zero-based.
+              The <component>hw-mapper-transparent</component> component variant 
+              omits this subtraction.</li>
 	    <li>
 	      If the accessor has stride/width values, divide the relative
 	      address by the quotient (&lt;stride&gt;/&lt;width&gt;).  As a result,

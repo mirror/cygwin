@@ -1,3 +1,7 @@
+2001-01-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* doc/rtl.texi: Deprecate and depreciate the decode-assist construct.
+
 2001-01-06  Johan Rydberg  <jrydberg@opencores.org>
 
 	* openrisc.cpu (or32): Setup semantics for h-delay-insn to

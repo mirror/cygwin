@@ -401,12 +401,12 @@ The syntax of @code{define-isa} is:
   (default-insn-word-bitsize n)
   (default-insn-bitsize n)
   (base-insn-bitsize n)
-  (decode-assist (b0 b1 b2 ...)) ; optional
+  ; (decode-assist (b0 b1 b2 ...)) ; generally unnecessary
   (liw-insns n)
   (parallel-insns n)
   (condition ifield-name expr)
   (setup-semantics expr)
-  (decode-splits decode-split-list)
+  ; (decode-splits decode-split-list) ; support temporarily disabled
   ; ??? missing here are fetch/execute specs
 )
 @end example
@@ -455,11 +455,13 @@ at a time as 16 bit instructions always come in pairs.
 @subsubsection decode-assist
 @cindex decode-assist
 
-Override CGEN's guess about which bits to initially use to decode the
-instruction.  For example on the SPARC these are bits: 31 30 24 23 22 21 20 19.
-The entire decoder can be machine generated, so this field is entirely
-optional.  The intent of @code{decode-assist} is to give the machine
-generated code a head start, to prime the built-in heuristics.
+Override CGEN's heuristics about which bits to initially use to decode
+instructions in a simulator.  For example on the SPARC these are bits: 
+31 30 24 23 22 21 20 19.  The entire decoder can be machine generated, 
+so this field is entirely optional.  Since the heuristics are quite
+good, you should only use this field if you have evidence that you
+can pick a better set, in which case the CGEN developers would like to 
+hear from you!
 
 ??? It might be useful to provide greater control, but this is sufficient
 for now.

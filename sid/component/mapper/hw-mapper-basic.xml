@@ -47,6 +47,10 @@
 	    <li><tt>[&lt;wordsize&gt;*&lt;low&gt;-&lt;high&gt;]</tt></li>
 	    <li><tt>[&lt;low&gt;-&lt;high&gt;,&lt;stride&gt;,&lt;width&gt;]</tt></li>
 	    <li><tt>[&lt;wordsize&gt;*&lt;low&gt;-&lt;high&gt;,&lt;stride&gt;,&lt;width&gt;]</tt></li>
+	    <li><tt>[&lt;mapped_base&gt;=&lt;low&gt;-&lt;high&gt;]</tt></li>
+	    <li><tt>[&lt;wordsize&gt;*&lt;mapped_base&gt;=&lt;low&gt;-&lt;high&gt;]</tt></li>
+	    <li><tt>[&lt;mapped_base&gt;=&lt;low&gt;-&lt;high&gt;,&lt;stride&gt;,&lt;width&gt;]</tt></li>
+	    <li><tt>[&lt;wordsize&gt;*&lt;mapped_base&gt;=&lt;low&gt;-&lt;high&gt;,&lt;stride&gt;,&lt;width&gt;]</tt></li>
 	  </ul>
 
 	  where:
@@ -63,6 +67,13 @@
 	    &lt;wordsize&gt;</tt> is the number of bytes in an address unit:
 	  a constant multiplier you can use to permit specifying &lt;low&gt;, &lt;high&gt;,
 	  &lt;stride&gt; and &lt;width&gt; in terms of multi-byte words.</li>
+	  <li><tt>
+	    &lt;mapped_base&gt;</tt> is the base address of the mapped bytes on the
+	    target bus.  Addresses in the mapped region will be adjusted to start at
+	    &lt;mapped_base&gt;. For <component>hw-mapper-transparent</component>,
+	    the default &lt;mapped_base&gt; is the value of &lt;start&gt;. For
+	    <component>hw-mapper-basic</component>, the default &lt;mapped_base&gt;
+	    is zero.</li>
 	  </ul>
 	</p>
 	
@@ -94,10 +105,12 @@
 	<p>
           The downstream addresses passed by the
           <component>hw-mapper-basic</component> variant are relative
-          to the matching region, so are zero-based.  The
+          to the matching region, so are zero-based, by default.  The
           <component>hw-mapper-transparent</component> does not make
-          downstream addresses relative, so it may be more suitable for 
-          carving up an address space by multiple layers of mapping.</p>
+          downstream addresses relative by default, so it may be more suitable for 
+          carving up an address space by multiple layers of mapping.
+          Use of &lt;mapped_base&gt; for either component overrides this
+          default behavior.</p>
 
 	<p>
 	  See the "mapping" behavior below for more details.</p></p>
@@ -136,10 +149,8 @@
 
 	  <ul>
 	    <li>
-	      The accessor's &lt;low&gt; address is subtracted from the incoming
-	      address, so outgoing addresses will be relative and zero-based.
-              The <component>hw-mapper-transparent</component> component variant 
-              omits this subtraction.</li>
+	      The accessor's &lt;mapped_base&gt; address is subtracted from the incoming
+	      address, so outgoing addresses will be relative.</li>
 	    <li>
 	      If the accessor has stride/width values, divide the relative
 	      address by the quotient (&lt;stride&gt;/&lt;width&gt;).  As a result,

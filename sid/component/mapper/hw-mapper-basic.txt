@@ -23,6 +23,10 @@ Functionality:
      * [<wordsize>*<low>-<high>]
      * [<low>-<high>,<stride>,<width>]
      * [<wordsize>*<low>-<high>,<stride>,<width>]
+     * [<mapped_base>=<low>-<high>]
+     * [<wordsize>*<mapped_base>=<low>-<high>]
+     * [<mapped_base>=<low>-<high>,<stride>,<width>]
+     * [<wordsize>*<mapped_base>=<low>-<high>,<stride>,<width>]
    where:
      * <low> is the starting address for the mapped region.
      * <high> is the ending address for the mapped region.
@@ -31,6 +35,11 @@ Functionality:
      * <wordsize> is the number of bytes in an address unit: a constant
        multiplier you can use to permit specifying <low>, <high>, <stride>
        and <width> in terms of multi-byte words.
+     * <mapped_base> is the base address of the mapped bytes on the target
+       bus. Addresses in the mapped region will be adjusted to start at
+       <mapped_base>. For hw-mapper-transparent, the default <mapped_base> is
+       the value of <start>. For hw-mapper-basic, the default <mapped_base>
+       is zero.
 
    To the right of the "]" closing bracket, an optional specification block
    may list the numbers of mapping banks for this record. This block is
@@ -52,10 +61,11 @@ Functionality:
    another.
 
    The downstream addresses passed by the hw-mapper-basic variant are
-   relative to the matching region, so are zero-based. The
-   hw-mapper-transparent does not make downstream addresses relative, so it
-   may be more suitable for carving up an address space by multiple layers of
-   mapping.
+   relative to the matching region, so are zero-based, by default. The
+   hw-mapper-transparent does not make downstream addresses relative by
+   default, so it may be more suitable for carving up an address space by
+   multiple layers of mapping. Use of <mapped_base> for either component
+   overrides this default behavior.
 
    See the "mapping" behavior below for more details.
 
@@ -97,14 +107,12 @@ Functionality:
    |                | address is transformed         |
    |                | according to the following     |
    |                | rules:                         |
-   |                |   * The accessor's <low>       |
-   |                |     address is subtracted from |
-   |                |     the incoming address, so   |
+   |                |   * The accessor's             |
+   |                |     <mapped_base> address is   |
+   |                |     subtracted from the        |
+   |                |     incoming address, so       |
    |                |     outgoing addresses will be |
-   |                |     relative and zero-based.   |
-   |                |     The hw-mapper-transparent  |
-   |                |     component variant omits    |
-   |                |     this subtraction.          |
+   |                |     relative.                  |
    |                |   * If the accessor has        |
    |                |     stride/width values,       |
    |                |     divide the relative        |

@@ -1,3 +1,17 @@
+2002-04-09  Dave Brolley  <brolley@redhat.com>
+
+	* hw-mapper-basic.xml: Describe <mapped_base> usage.
+	* compMapper.cxx (struct mapping_record): New field, 'mapped_base'.
+	(class generic_mapper_bus): Remove 'transparent_t' parameter,
+	'low_multiplier' member  and 'is_transparent' member.
+	(generic_mapper_bus::write_strideoffset_any): Compute mapped_address
+	relative to mapped_base.
+	(generic_mapper_bus::read_strideoffset_any): Ditto.
+	(generic_mapper_bus::write_any): Ditto.
+	(generic_mapper_bus::read_any): Ditto.
+	(make_name_mapping): Remove 'garbage1' -- not used. Detect wordsize and
+	mapped_base specifications using their operators.
+
 2002-03-15  Frank Ch. Eigler  <fche@redhat.com>
 
 	* compMapper.cxx (make_name_mapping): Tolerate bank-less suffix form.

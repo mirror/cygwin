@@ -15,7 +15,7 @@
 #include "tcl.h"
 
 static int	TesteventloopCmd _ANSI_ARGS_((ClientData clientData,
-		    Tcl_Interp *interp, int argc, char **argv));
+		    Tcl_Interp *interp, int argc, CONST char **argv));
 extern void	InitNotifier _ANSI_ARGS_((void));
 
 
@@ -75,7 +75,7 @@ TesteventloopCmd(clientData, interp, argc, argv)
     ClientData clientData;		/* Not used. */
     Tcl_Interp *interp;			/* Current interpreter. */
     int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+    CONST char **argv;			/* Argument strings. */
 {
     static int *framePtr = NULL; /* Pointer to integer on stack frame of
 				  * innermost invocation of the "wait"
@@ -118,4 +118,3 @@ TesteventloopCmd(clientData, interp, argc, argv)
     }
     return TCL_OK;
 }
-

@@ -23,7 +23,7 @@ If not NULL, points to an interpreter into which the package has
 already been loaded (i.e., the caller has already invoked the
 appropriate initialization procedure).  NULL means the package
 hasn't yet been incorporated into any interpreter.
-.AP char *pkgName in
+.AP "CONST char" *pkgName in
 Name of the package;  should be properly capitalized (first letter
 upper-case, all others lower-case).
 .AP Tcl_PackageInitProc *initProc in
@@ -67,4 +67,3 @@ initialization procedure to be invoked.
 
 .SH KEYWORDS
 initialization procedure, package, static linking
-

@@ -21,7 +21,7 @@ int
 .AS Tcl_Interp checkUsage
 .AP Tcl_Interp *interp in
 Tcl interpreter from which file handle is to be obtained.
-.AP char *string in
+.AP "CONST char" *string in
 String identifying channel, such as \fBstdin\fR or \fBfile4\fR.
 .AP int write in
 Non-zero means the file will be used for writing, zero means it will
@@ -59,4 +59,3 @@ Note that this interface is only supported on the Unix platform.
 
 .SH KEYWORDS
 channel, file handle, permissions, pipeline, read, write
-

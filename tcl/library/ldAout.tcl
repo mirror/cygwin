@@ -182,7 +182,7 @@ proc tclLdAout {{cc {}} {shlib_suffix {}} {shlib_cflags none}} {
     append C {typedef int Tcl_PackageInitProc (Tcl_Interp *);} \n
     append C {Tcl_PackageInitProc *} \n
     append C TclLoadDictionary_ $modName { (symbol)} \n
-    append C {    char * symbol;} \n
+    append C {    CONST char * symbol;} \n
     append C {
 	{
 	    int i;

@@ -80,13 +80,13 @@ HasStubSupport (interp)
 #undef Tcl_InitStubs
 #endif
 
-char *
+CONST char *
 Tcl_InitStubs (interp, version, exact)
     Tcl_Interp *interp;
-    char *version;
+    CONST char *version;
     int exact;
 {
-    char *actualVersion;
+    CONST char *actualVersion;
     TclStubs *tmp;
     
     if (!tclStubsPtr) {

@@ -145,8 +145,8 @@ static int		ConsoleGetHandleProc(ClientData instanceData,
 static ThreadSpecificData *ConsoleInit(void);
 static int		ConsoleInputProc(ClientData instanceData, char *buf,
 			    int toRead, int *errorCode);
-static int		ConsoleOutputProc(ClientData instanceData, char *buf,
-			    int toWrite, int *errorCode);
+static int		ConsoleOutputProc(ClientData instanceData,
+			    CONST char *buf, int toWrite, int *errorCode);
 static DWORD WINAPI	ConsoleReaderThread(LPVOID arg);
 static void		ConsoleSetupProc(ClientData clientData, int flags);
 static void		ConsoleWatchProc(ClientData instanceData, int mask);
@@ -503,7 +503,13 @@ ConsoleCloseProc(
      */
     
     if (consolePtr->writeThread) {
-	WaitForSingleObject(consolePtr->writable, INFINITE);
+	if (consolePtr->toWrite) {
+	    /*
+	     * We only need to wait if there is something to write.
+	     * This may prevent infinite wait on exit. [python bug 216289]
+	     */
+	    WaitForSingleObject(consolePtr->writable, INFINITE);
+	}
 
 	/*
 	 * Forcibly terminate the background thread.  We cannot rely on the
@@ -626,11 +632,11 @@ ConsoleInputProc(
 	 */
 
 	if (bufSize < (infoPtr->bytesRead - infoPtr->offset)) {
-	    memcpy(buf, &infoPtr->buffer[infoPtr->offset], bufSize);
+	    memcpy(buf, &infoPtr->buffer[infoPtr->offset], (size_t) bufSize);
 	    bytesRead = bufSize;
 	    infoPtr->offset += bufSize;
 	} else {
-	    memcpy(buf, &infoPtr->buffer[infoPtr->offset], bufSize);
+	    memcpy(buf, &infoPtr->buffer[infoPtr->offset], (size_t) bufSize);
 	    bytesRead = infoPtr->bytesRead - infoPtr->offset;
 
 	    /*
@@ -680,7 +686,7 @@ ConsoleInputProc(
 static int
 ConsoleOutputProc(
     ClientData instanceData,		/* Console state. */
-    char *buf,				/* The data buffer. */
+    CONST char *buf,			/* The data buffer. */
     int toWrite,			/* How many bytes to write? */
     int *errorCode)			/* Where to store error code. */
 {
@@ -724,9 +730,9 @@ ConsoleOutputProc(
 		ckfree(infoPtr->writeBuf);
 	    }
 	    infoPtr->writeBufLen = toWrite;
-	    infoPtr->writeBuf = ckalloc(toWrite);
+	    infoPtr->writeBuf = ckalloc((unsigned int) toWrite);
 	}
-	memcpy(infoPtr->writeBuf, buf, toWrite);
+	memcpy(infoPtr->writeBuf, buf, (size_t) toWrite);
 	infoPtr->toWrite = toWrite;
 	ResetEvent(infoPtr->writable);
 	SetEvent(infoPtr->startWriter);
@@ -819,7 +825,7 @@ ConsoleEventProc(
     mask = 0;
     if (infoPtr->watchMask & TCL_WRITABLE) {
 	if (WaitForSingleObject(infoPtr->writable, 0) != WAIT_TIMEOUT) {
-	  mask = TCL_WRITABLE;
+	    mask = TCL_WRITABLE;
 	}
     }
 
@@ -1076,7 +1082,7 @@ ConsoleReaderThread(LPVOID arg)
 	 * that are not KEY_EVENTs 
 	 */
 	if (ReadConsole(handle, infoPtr->buffer, CONSOLE_BUFFER_SIZE,
-		&infoPtr->bytesRead, NULL) != FALSE) {
+		(LPDWORD) &infoPtr->bytesRead, NULL) != FALSE) {
 	    /*
 	     * Data was stored in the buffer.
 	     */
@@ -1266,4 +1272,3 @@ TclWinOpenConsoleChannel(handle, channelName, permissions)
 
     return infoPtr->channel;
 }
-

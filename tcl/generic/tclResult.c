@@ -297,7 +297,7 @@ Tcl_SetResult(interp, string, freeProc)
  *----------------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tcl_GetStringResult(interp)
      register Tcl_Interp *interp; /* Interpreter whose result to return. */
 {

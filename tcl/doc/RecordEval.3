@@ -22,7 +22,7 @@ int
 .AS Tcl_Interp *interp;
 .AP Tcl_Interp *interp in
 Tcl interpreter in which to evaluate command.
-.AP char *cmd in
+.AP "CONST char" *cmd in
 Command (or sequence of commands) to execute.
 .AP int flags in
 An OR'ed combination of flag bits.  TCL_NO_EVAL means record the
@@ -55,4 +55,3 @@ Tcl_RecordAndEvalObj
 
 .SH KEYWORDS
 command, event, execute, history, interpreter, record
-

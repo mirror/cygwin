@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: strtoll.c,v 1.1.2.3 2002/12/23 19:40:01 carlton Exp $
+ * RCS: @(#) $Id: strtoll.c,v 1.1.2.4 2003/02/07 19:18:07 carlton Exp $
  */
 
 #include "tcl.h"

@@ -22,6 +22,15 @@ gets \- Read a line from a channel
 This command reads the next line from \fIchannelId\fR, returns everything
 in the line up to (but not including) the end-of-line character(s), and
 discards the end-of-line character(s).
+.PP
+.VS
+\fIChannelId\fR must be an identifier for an open channel such as the
+Tcl standard input channel (\fBstdin\fR), the return value from an
+invocation of \fBopen\fR or \fBsocket\fR, or the result of a channel
+creation command provided by a Tcl extension. The channel must have
+been opened for input.
+.VE
+.PP
 If \fIvarName\fR is omitted the line is returned as the result of the
 command.
 If \fIvarName\fR is specified then the line is placed in the variable by
@@ -44,7 +53,7 @@ The \fBeof\fR and \fBfblocked\fR commands can be used to distinguish
 these three cases.
 
 .SH "SEE ALSO"
-eof(n), fblocked(n)
+file(n), eof(n), fblocked(n), Tcl_StandardChannels(3)
 
 .SH KEYWORDS
 blocking, channel, end of file, end of line, line, nonblocking, read

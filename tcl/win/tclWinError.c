@@ -147,11 +147,11 @@ static char errorTable[] = {
     EINVAL,	/* 124 */
     EINVAL,	/* 125 */
     EINVAL,	/* 126 */
-    ESRCH,	/* ERROR_PROC_NOT_FOUND		127 */
+    EINVAL,	/* ERROR_PROC_NOT_FOUND		127 */
     ECHILD,	/* ERROR_WAIT_NO_CHILDREN	128 */
     ECHILD,	/* ERROR_CHILD_NOT_COMPLETE	129 */
     EBADF,	/* ERROR_DIRECT_ACCESS_HANDLE	130 */
-    EINVAL,	/* 131 */
+    EINVAL,	/* ERROR_NEGATIVE_SEEK		131 */
     ESPIPE,	/* ERROR_SEEK_ON_DEVICE		132 */
     EINVAL,	/* 133 */
     EINVAL,	/* 134 */
@@ -390,5 +390,3 @@ TclWinConvertWSAError(errCode)
 	Tcl_SetErrno(EINVAL);
     }
 }
-
-

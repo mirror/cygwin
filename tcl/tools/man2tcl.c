@@ -88,7 +88,7 @@ main(argc, argv)
     char **argv;		/* Values of command-line arguments. */
 {
     FILE *f;
-#define MAX_LINE_SIZE 500
+#define MAX_LINE_SIZE 1000
     char line[MAX_LINE_SIZE];
     char *p;
 
@@ -136,6 +136,12 @@ main(argc, argv)
 		continue;
 	    }
     
+	    if (strlen(line) >= MAX_LINE_SIZE -1) {
+		fprintf(stderr, "Too long line. Max is %d chars.\n",
+			MAX_LINE_SIZE - 1);
+		exit(1);
+	    }
+
 	    if ((line[0] == '.') || (line[0] == '\'')) {
 		/*
 		 * This line is a macro invocation.

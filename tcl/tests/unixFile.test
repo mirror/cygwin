@@ -23,12 +23,14 @@ if {[info commands testobj] == {}} {
     return
 }
 
+set oldpwd [pwd]
+cd [temporaryDirectory]
+
 catch {
     set oldPath $env(PATH)
-    close [open junk w]
-    file attributes junk -perm 0777
+    file attributes [makeFile "" junk] -perm 0777
 }
-set absPath [file join [pwd] junk]
+set absPath [file join [temporaryDirectory] junk]
 
 test unixFile-1.1 {Tcl_FindExecutable} {unixOnly} {
     set env(PATH) ""
@@ -61,19 +63,7 @@ test unixFile-1.7 {Tcl_FindExecutable} {unixOnly} {
 
 # cleanup
 catch {set env(PATH) $oldPath}
-file delete junk
+removeFile junk
+cd $oldpwd
 ::tcltest::cleanupTests
 return
-
-
-
-
-
-
-
-
-
-
-
-
-

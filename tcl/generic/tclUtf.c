@@ -61,8 +61,8 @@
  * The following structures are used when mapping between Unicode (UCS-2)
  * and UTF-8.
  */
- 
-CONST unsigned char totalBytes[256] = {
+
+static CONST unsigned char totalBytes[256] = {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -111,7 +111,7 @@ static int UtfCount _ANSI_ARGS_((int ch));
  *---------------------------------------------------------------------------
  */
  
-static int
+INLINE static int
 UtfCount(ch)
     int ch;			/* The Tcl_UniChar whose size is returned. */
 {
@@ -309,7 +309,7 @@ Tcl_UtfToUniChar(str, chPtr)
 	 * Also treats \0 and naked trail bytes 0x80 to 0xBF as valid
 	 * characters representing themselves.
 	 */
-	 
+
 	*chPtr = (Tcl_UniChar) byte;
 	return 1;
     } else if (byte < 0xE0) {
@@ -317,7 +317,7 @@ Tcl_UtfToUniChar(str, chPtr)
 	    /*
 	     * Two-byte-character lead-byte followed by a trail-byte.
 	     */
-	     
+
 	    *chPtr = (Tcl_UniChar) (((byte & 0x1F) << 6) | (str[1] & 0x3F));
 	    return 2;
 	}
@@ -325,7 +325,7 @@ Tcl_UtfToUniChar(str, chPtr)
 	 * A two-byte-character lead-byte not followed by trail-byte
 	 * represents itself.
 	 */
-	 
+
 	*chPtr = (Tcl_UniChar) byte;
 	return 1;
     } else if (byte < 0xF0) {
@@ -536,7 +536,7 @@ Tcl_NumUtfChars(str, len)
  *
  *---------------------------------------------------------------------------
  */
-char *
+CONST char *
 Tcl_UtfFindFirst(string, ch)
     CONST char *string;		/* The UTF-8 string to be searched. */
     int ch;			/* The Tcl_UniChar to search for. */
@@ -547,7 +547,7 @@ Tcl_UtfFindFirst(string, ch)
     while (1) {
 	len = Tcl_UtfToUniChar(string, &find);
 	if (find == ch) {
-	    return (char *) string;
+	    return string;
 	}
 	if (*string == '\0') {
 	    return NULL;
@@ -576,7 +576,7 @@ Tcl_UtfFindFirst(string, ch)
  *---------------------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tcl_UtfFindLast(string, ch)
     CONST char *string;		/* The UTF-8 string to be searched. */
     int ch;			/* The Tcl_UniChar to search for. */
@@ -596,7 +596,7 @@ Tcl_UtfFindLast(string, ch)
 	}
 	string += len;
     }
-    return (char *) last;
+    return last;
 }
 
 /*
@@ -619,13 +619,13 @@ Tcl_UtfFindLast(string, ch)
  *---------------------------------------------------------------------------
  */
  
-char *
+CONST char *
 Tcl_UtfNext(str) 
     CONST char *str;		    /* The current location in the string. */
 {
     Tcl_UniChar ch;
 
-    return (char *) str + Tcl_UtfToUniChar(str, &ch);
+    return str + Tcl_UtfToUniChar(str, &ch);
 }
 
 /*
@@ -634,7 +634,8 @@ Tcl_UtfNext(str)
  * Tcl_UtfPrev --
  *
  *	Given a pointer to some current location in a UTF-8 string,
- *	move backwards one character.
+ *	move backwards one character.  This works correctly when the
+ *	pointer is in the middle of a UTF-8 character.
  *
  * Results:
  *	The return value is a pointer to the previous character in the
@@ -648,7 +649,7 @@ Tcl_UtfNext(str)
  *---------------------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tcl_UtfPrev(str, start)
     CONST char *str;		    /* The current location in the string. */
     CONST char *start;		    /* Pointer to the beginning of the
@@ -670,16 +671,13 @@ Tcl_UtfPrev(str, start)
 	byte = *((unsigned char *) look);
 	if (byte < 0x80) {
 	    break;
-	} 
+	}
 	if (byte >= 0xC0) {
-	    if (totalBytes[byte] != i + 1) {
-		break;
-	    }
-	    return (char *) look;
+	    return look;
 	}
 	look--;
     }
-    return (char *) str;
+    return str;
 }
 	
 /*
@@ -730,7 +728,7 @@ Tcl_UniCharAtIndex(src, index)
  *---------------------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tcl_UtfAtIndex(src, index)
     register CONST char *src;	/* The UTF-8 string. */
     register int index;		/* The position of the desired character. */
@@ -741,7 +739,7 @@ Tcl_UtfAtIndex(src, index)
 	index--;
 	src += Tcl_UtfToUniChar(src, &ch);
     }
-    return (char *) src;
+    return src;
 }
 
 /*
@@ -780,118 +778,19 @@ Tcl_UtfBackslash(src, readPtr, dst)
     char *dst;			/* Filled with the bytes represented by the
 				 * backslash sequence. */
 {
-    register CONST char *p = src+1;
-    int result, count, n;
-    char buf[TCL_UTF_MAX];
+#define LINE_LENGTH 128
+    int numRead;
+    int result;
 
-    if (dst == NULL) {
-	dst = buf;
+    result = TclParseBackslash(src, LINE_LENGTH, &numRead, dst);
+    if (numRead == LINE_LENGTH) {
+	/* We ate a whole line.  Pay the price of a strlen() */
+	result = TclParseBackslash(src, (int)strlen(src), &numRead, dst);
     }
-
-    count = 2;
-    switch (*p) {
-	/*
-         * Note: in the conversions below, use absolute values (e.g.,
-         * 0xa) rather than symbolic values (e.g. \n) that get converted
-         * by the compiler.  It's possible that compilers on some
-         * platforms will do the symbolic conversions differently, which
-         * could result in non-portable Tcl scripts.
-         */
-
-        case 'a':
-            result = 0x7;
-            break;
-        case 'b':
-            result = 0x8;
-            break;
-        case 'f':
-            result = 0xc;
-            break;
-        case 'n':
-            result = 0xa;
-            break;
-        case 'r':
-            result = 0xd;
-            break;
-        case 't':
-            result = 0x9;
-            break;
-        case 'v':
-            result = 0xb;
-            break;
-        case 'x':
-            if (isxdigit(UCHAR(p[1]))) { /* INTL: digit */
-                char *end;
-
-                result = (unsigned char) strtoul(p+1, &end, 16);
-                count = end - src;
-            } else {
-                count = 2;
-                result = 'x';
-            }
-            break;
-	case 'u':
-	    result = 0;
-	    for (count = 0; count < 4; count++) {
-		p++;
-		if (!isxdigit(UCHAR(*p))) { /* INTL: digit */
-		    break;
-		}
-		n = *p - '0';
-		if (n > 9) {
-		    n = n + '0' + 10 - 'A';
-		}
-		if (n > 16) {
-		    n = n + 'A' - 'a';
-		}
-		result = (result << 4) + n;
-	    }
-	    if (count == 0) {
-		result = 'u';
-	    }
-	    count += 2;
-	    break;
-		    
-        case '\n':
-            do {
-                p++;
-            } while ((*p == ' ') || (*p == '\t'));
-            result = ' ';
-            count = p - src;
-            break;
-        case 0:
-            result = '\\';
-            count = 1;
-            break;
-	default:
-	    /*
-	     * Check for an octal number \oo?o?
-	     */
-	    if (isdigit(UCHAR(*p)) && (UCHAR(*p) < '8')) { /* INTL: digit */
-		result = (unsigned char)(*p - '0');
-		p++;
-		if (!isdigit(UCHAR(*p)) || (UCHAR(*p) >= '8')) { /* INTL: digit */
-		    break;
-		}
-		count = 3;
-		result = (unsigned char)((result << 3) + (*p - '0'));
-		p++;
-		if (!isdigit(UCHAR(*p)) || (UCHAR(*p) >= '8')) { /* INTL: digit */
-		    break;
-		}
-		count = 4;
-		result = (unsigned char)((result << 3) + (*p - '0'));
-		break;
-	    }
-	    result = *p;
-	    count = 2;
-	    break;
-    }
-
     if (readPtr != NULL) {
-	*readPtr = count;
+	*readPtr = numRead;
     }
-    return Tcl_UniCharToUtf(result, dst);
+    return result;
 }
 
 /*
@@ -1065,6 +964,51 @@ Tcl_UtfToTitle(str)
 /*
  *----------------------------------------------------------------------
  *
+ * TclpUtfNcmp2 --
+ *
+ *	Compare at most n bytes of utf-8 strings cs and ct.  Both cs
+ *	and ct are assumed to be at least n bytes long.
+ *
+ * Results:
+ *	Return <0 if cs < ct, 0 if cs == ct, or >0 if cs > ct.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+TclpUtfNcmp2(cs, ct, n)
+    CONST char *cs;		/* UTF string to compare to ct. */
+    CONST char *ct;		/* UTF string cs is compared to. */
+    unsigned long n;		/* Number of *bytes* to compare. */
+{
+    /*
+     * We can't simply call 'memcmp(cs, ct, n);' because we need to check
+     * for Tcl's \xC0\x80 non-utf-8 null encoding.
+     * Otherwise utf-8 lexes fine in the strcmp manner.
+     */
+    register int result = 0;
+
+    for ( ; n != 0; n--, cs++, ct++) {
+	if (*cs != *ct) {
+	    result = UCHAR(*cs) - UCHAR(*ct);
+	    break;
+	}
+    }
+    if (n && ((UCHAR(*cs) == 0xC0) || (UCHAR(*ct) == 0xC0))) {
+	unsigned char c1, c2;
+	c1 = ((UCHAR(*cs) == 0xC0) && (UCHAR(cs[1]) == 0x80)) ? 0 : UCHAR(*cs);
+	c2 = ((UCHAR(*ct) == 0xC0) && (UCHAR(ct[1]) == 0x80)) ? 0 : UCHAR(*ct);
+	result = (c1 - c2);
+    }
+    return result;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
  * Tcl_UtfNcmp --
  *
  *	Compare at most n UTF chars of string cs to string ct.  Both cs
@@ -1087,11 +1031,9 @@ Tcl_UtfNcmp(cs, ct, n)
 {
     Tcl_UniChar ch1, ch2;
     /*
-     * Another approach that should work is:
-     *   return memcmp(cs, ct, (unsigned) (Tcl_UtfAtIndex(cs, n) - cs));
-     * That assumes that ct is a properly formed UTF, so we will just
-     * be comparing the bytes that compromise those strings to the
-     * char length n.
+     * Cannot use 'memcmp(cs, ct, n);' as byte representation of
+     * \u0000 (the pair of bytes 0xc0,0x80) is larger than byte
+     * representation of \u0001 (the byte 0x01.)
      */
     while (n-- > 0) {
 	/*
@@ -1265,7 +1207,7 @@ Tcl_UniCharToTitle(ch)
 
 int
 Tcl_UniCharLen(str)
-    Tcl_UniChar *str;		/* Unicode string to find length of. */
+    CONST Tcl_UniChar *str;	/* Unicode string to find length of. */
 {
     int len = 0;
     
@@ -1299,12 +1241,53 @@ Tcl_UniCharNcmp(cs, ct, n)
     CONST Tcl_UniChar *ct;		/* Unicode string cs is compared to. */
     unsigned long n;			/* Number of unichars to compare. */
 {
-    for ( ; n != 0; n--, cs++, ct++) {
+#ifdef WORDS_BIGENDIAN
+    /*
+     * We are definitely on a big-endian machine; memcmp() is safe
+     */
+    return memcmp(cs, ct, n*sizeof(Tcl_UniChar));
+
+#else /* !WORDS_BIGENDIAN */
+    /*
+     * We can't simply call memcmp() because that is not lexically correct.
+     */
+    for ( ; n != 0; cs++, ct++, n--) {
 	if (*cs != *ct) {
-	    return *cs - *ct;
+	    return (*cs - *ct);
 	}
-	if (*cs == '\0') {
-	    break;
+    }
+    return 0;
+#endif /* WORDS_BIGENDIAN */
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tcl_UniCharNcasecmp --
+ *
+ *	Compare at most n unichars of string cs to string ct case
+ *	insensitive.  Both cs and ct are assumed to be at least n
+ *	unichars long.
+ *
+ * Results:
+ *	Return <0 if cs < ct, 0 if cs == ct, or >0 if cs > ct.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+Tcl_UniCharNcasecmp(cs, ct, n)
+    CONST Tcl_UniChar *cs;		/* Unicode string to compare to ct. */
+    CONST Tcl_UniChar *ct;		/* Unicode string cs is compared to. */
+    unsigned long n;			/* Number of unichars to compare. */
+{
+    for ( ; n != 0; n--, cs++, ct++) {
+	if ((*cs != *ct) &&
+		(Tcl_UniCharToLower(*cs) != Tcl_UniCharToLower(*ct))) {
+	    return (*cs - *ct);
 	}
     }
     return 0;
@@ -1583,4 +1566,183 @@ Tcl_UniCharIsWordChar(ch)
     register int category = (GetUniCharInfo(ch) & UNICODE_CATEGORY_MASK);
 
     return (((ALPHA_BITS | DIGIT_BITS | CONNECTOR_BITS) >> category) & 1);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tcl_UniCharCaseMatch --
+ *
+ *	See if a particular Unicode string matches a particular pattern.
+ *	Allows case insensitivity.  This is the Unicode equivalent of
+ *	the char* Tcl_StringCaseMatch.
+ *
+ * Results:
+ *	The return value is 1 if string matches pattern, and
+ *	0 otherwise.  The matching operation permits the following
+ *	special characters in the pattern: *?\[] (see the manual
+ *	entry for details on what these mean).
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+Tcl_UniCharCaseMatch(string, pattern, nocase)
+    CONST Tcl_UniChar *string;	/* Unicode String. */
+    CONST Tcl_UniChar *pattern;	/* Pattern, which may contain special
+				 * characters. */
+    int nocase;			/* 0 for case sensitive, 1 for insensitive */
+{
+    Tcl_UniChar ch1, p;
+    
+    while (1) {
+	p = *pattern;
+	
+	/*
+	 * See if we're at the end of both the pattern and the string.  If
+	 * so, we succeeded.  If we're at the end of the pattern but not at
+	 * the end of the string, we failed.
+	 */
+	
+	if (p == 0) {
+	    return (*string == 0);
+	}
+	if ((*string == 0) && (p != '*')) {
+	    return 0;
+	}
+
+	/*
+	 * Check for a "*" as the next pattern character.  It matches any
+	 * substring.  We handle this by skipping all the characters up to the
+	 * next matching one in the pattern, and then calling ourselves
+	 * recursively for each postfix of string, until either we match or we
+	 * reach the end of the string.
+	 */
+	
+	if (p == '*') {
+	    /*
+	     * Skip all successive *'s in the pattern
+	     */
+	    while (*(++pattern) == '*') {}
+	    p = *pattern;
+	    if (p == 0) {
+		return 1;
+	    }
+	    if (nocase) {
+		p = Tcl_UniCharToLower(p);
+	    }
+	    while (1) {
+		/*
+		 * Optimization for matching - cruise through the string
+		 * quickly if the next char in the pattern isn't a special
+		 * character
+		 */
+		if ((p != '[') && (p != '?') && (p != '\\')) {
+		    if (nocase) {
+			while (*string && (p != *string)
+				&& (p != Tcl_UniCharToLower(*string))) {
+			    string++;
+			}
+		    } else {
+			while (*string && (p != *string)) { string++; }
+		    }
+		}
+		if (Tcl_UniCharCaseMatch(string, pattern, nocase)) {
+		    return 1;
+		}
+		if (*string == 0) {
+		    return 0;
+		}
+		string++;
+	    }
+	}
+
+	/*
+	 * Check for a "?" as the next pattern character.  It matches
+	 * any single character.
+	 */
+
+	if (p == '?') {
+	    pattern++;
+	    string++;
+	    continue;
+	}
+
+	/*
+	 * Check for a "[" as the next pattern character.  It is followed
+	 * by a list of characters that are acceptable, or by a range
+	 * (two characters separated by "-").
+	 */
+	
+	if (p == '[') {
+	    Tcl_UniChar startChar, endChar;
+
+	    pattern++;
+	    ch1 = (nocase ? Tcl_UniCharToLower(*string) : *string);
+	    string++;
+	    while (1) {
+		if ((*pattern == ']') || (*pattern == 0)) {
+		    return 0;
+		}
+		startChar = (nocase ? Tcl_UniCharToLower(*pattern) : *pattern);
+		pattern++;
+		if (*pattern == '-') {
+		    pattern++;
+		    if (*pattern == 0) {
+			return 0;
+		    }
+		    endChar = (nocase ? Tcl_UniCharToLower(*pattern)
+			    : *pattern);
+		    pattern++;
+		    if (((startChar <= ch1) && (ch1 <= endChar))
+			    || ((endChar <= ch1) && (ch1 <= startChar))) {
+			/*
+			 * Matches ranges of form [a-z] or [z-a].
+			 */
+			break;
+		    }
+		} else if (startChar == ch1) {
+		    break;
+		}
+	    }
+	    while (*pattern != ']') {
+		if (*pattern == 0) {
+		    pattern--;
+		    break;
+		}
+		pattern++;
+	    }
+	    pattern++;
+	    continue;
+	}
+
+	/*
+	 * If the next pattern character is '\', just strip off the '\'
+	 * so we do exact matching on the character that follows.
+	 */
+
+	if (p == '\\') {
+	    if (*(++pattern) == '\0') {
+		return 0;
+	    }
+	}
+
+	/*
+	 * There's no special character.  Just make sure that the next
+	 * bytes of each string match.
+	 */
+
+	if (nocase) {
+	    if (Tcl_UniCharToLower(*string) != Tcl_UniCharToLower(*pattern)) {
+		return 0;
+	    }
+	} else if (*string != *pattern) {
+	    return 0;
+	}
+	string++;
+	pattern++;
+    }
 }

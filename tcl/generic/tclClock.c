@@ -67,13 +67,13 @@ Tcl_ClockObjCmd (client, interp, objc, objv)
     Tcl_Obj *baseObjPtr = NULL;
     char *scanStr;
     
-    static char *switches[] =
+    static CONST char *switches[] =
 	{"clicks", "format", "scan", "seconds", (char *) NULL};
     enum command { COMMAND_CLICKS, COMMAND_FORMAT, COMMAND_SCAN,
 		       COMMAND_SECONDS
     };
-    static char *formatSwitches[] = {"-format", "-gmt", (char *) NULL};
-    static char *scanSwitches[] = {"-base", "-gmt", (char *) NULL};
+    static CONST char *formatSwitches[] = {"-format", "-gmt", (char *) NULL};
+    static CONST char *scanSwitches[] = {"-base", "-gmt", (char *) NULL};
 
     resultPtr = Tcl_GetObjResult(interp);
     if (objc < 2) {
@@ -109,7 +109,7 @@ Tcl_ClockObjCmd (client, interp, objc, objv)
 		 * We can enforce at least millisecond granularity
 		 */
 		Tcl_Time time;
-		TclpGetTime(&time);
+		Tcl_GetTime(&time);
 		Tcl_SetLongObj(resultPtr,
 			(long) (time.sec*1000 + time.usec/1000));
 	    } else {
@@ -266,9 +266,6 @@ FormatClock(interp, clockVal, useGMT, format)
 #ifndef HAVE_TM_ZONE
     int savedTimeZone = 0;	/* lint. */
     char *savedTZEnv = NULL;	/* lint. */
-#  ifndef timezone
-    int timezone=0;
-#  endif
 #endif
 
 #ifdef HAVE_TZSET
@@ -292,7 +289,7 @@ FormatClock(interp, clockVal, useGMT, format)
 	return TCL_OK;
     }
 
-#ifndef HAVE_TM_ZONE
+#if !defined(HAVE_TM_ZONE) && !defined(WIN32)
     /*
      * This is a kludge for systems not having the timezone string in
      * struct tm.  No matter what was specified, they use the local
@@ -300,7 +297,7 @@ FormatClock(interp, clockVal, useGMT, format)
      */
 
     if (useGMT) {
-        char *varValue;
+        CONST char *varValue;
 
         varValue = Tcl_GetVar2(interp, "env", "TZ", TCL_GLOBAL_ONLY);
         if (varValue != NULL) {
@@ -330,15 +327,18 @@ FormatClock(interp, clockVal, useGMT, format)
 	    bufSize++;
 	}
     }
+    Tcl_DStringInit(&uniBuffer);
+    Tcl_UtfToExternalDString(NULL, format, -1, &uniBuffer);
     Tcl_DStringInit(&buffer);
     Tcl_DStringSetLength(&buffer, bufSize);
 
     Tcl_MutexLock(&clockMutex);
-    result = TclpStrftime(buffer.string, (unsigned int) bufSize, format,
-	    timeDataPtr);
+    result = TclpStrftime(buffer.string, (unsigned int) bufSize,
+	    Tcl_DStringValue(&uniBuffer), timeDataPtr, useGMT);
     Tcl_MutexUnlock(&clockMutex);
+    Tcl_DStringFree(&uniBuffer);
 
-#ifndef HAVE_TM_ZONE
+#if !defined(HAVE_TM_ZONE) && !defined(WIN32)
     if (useGMT) {
         if (savedTZEnv != NULL) {
             Tcl_SetVar2(interp, "env", "TZ", savedTZEnv, TCL_GLOBAL_ONLY);
@@ -364,8 +364,7 @@ FormatClock(interp, clockVal, useGMT, format)
     }
 
     /*
-     * Convert the time to external encoding, in case we asked for
-     * a localized return value.  [Bug: 3345]
+     * Convert the time to UTF from external encoding [Bug: 3345]
      */
     Tcl_DStringInit(&uniBuffer);
     Tcl_ExternalToUtfDString(NULL, buffer.string, -1, &uniBuffer);
@@ -376,5 +375,4 @@ FormatClock(interp, clockVal, useGMT, format)
     Tcl_DStringFree(&buffer);
     return TCL_OK;
 }
-
 

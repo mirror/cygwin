@@ -75,6 +75,12 @@ Otherwise, \fBTcl_GetBooleanFromObj\fR returns \fBTCL_OK\fR
 and stores the boolean value in the address given by \fIboolPtr\fR.
 If the object is not already a boolean object,
 the conversion will free any old internal representation.
+Objects having a string representation equal to any of \fB0\fR,
+\fBfalse\fR, \fBno\fR, or \fBoff\fR have a boolean value 0; if the
+string representation is any of \fB1\fR, \fBtrue\fR, \fByes\fR, or
+\fBon\fR the boolean value is 1.
+Any of these string values may be abbreviated, and upper-case spellings
+are also acceptable.
 
 .SH "SEE ALSO"
 Tcl_NewObj, Tcl_DecrRefCount, Tcl_IncrRefCount, Tcl_GetObjResult

@@ -89,10 +89,13 @@ typedef struct TclWinProcs {
 	    CONST TCHAR *, DWORD, WCHAR *, TCHAR **);
     BOOL (WINAPI *setCurrentDirectoryProc)(CONST TCHAR *);
     BOOL (WINAPI *setFileAttributesProc)(CONST TCHAR *, DWORD);
+    BOOL (WINAPI *getFileAttributesExProc)(CONST TCHAR *, 
+	    GET_FILEEX_INFO_LEVELS, LPVOID);
+    BOOL (WINAPI *createHardLinkProc)(CONST TCHAR*, CONST TCHAR*, 
+				      LPSECURITY_ATTRIBUTES);
 } TclWinProcs;
 
 EXTERN TclWinProcs *tclWinProcs;
-EXTERN Tcl_Encoding tclWinTCharEncoding;
 
 /*
  * Declarations of functions that are not accessible by way of the
@@ -100,12 +103,26 @@ EXTERN Tcl_Encoding tclWinTCharEncoding;
  */
 
 EXTERN void		TclWinInit(HINSTANCE hInst);
+EXTERN int              TclWinSymLinkCopyDirectory(CONST TCHAR* LinkOriginal,
+						   CONST TCHAR* LinkCopy);
+EXTERN int              TclWinSymLinkDelete(CONST TCHAR* LinkOriginal, 
+					    int linkOnly);
+#if defined(TCL_THREADS) && defined(USE_THREAD_ALLOC)
+EXTERN void		TclWinFreeAllocCache(void);
+EXTERN void		TclFreeAllocCache(void *);
+EXTERN Tcl_Mutex	*TclpNewAllocMutex(void);
+EXTERN void		*TclpGetAllocCache(void);
+EXTERN void		TclpSetAllocCache(void *);
+#endif /* TCL_THREADS */
+
+/* Needed by tclWinFile.c and tclWinFCmd.c */
+#ifndef FILE_ATTRIBUTE_REPARSE_POINT
+#define FILE_ATTRIBUTE_REPARSE_POINT 0x00000400
+#endif
+
+#include "tclIntPlatDecls.h"
 
 # undef TCL_STORAGE_CLASS
 # define TCL_STORAGE_CLASS DLLIMPORT
 
-#include "tclIntPlatDecls.h"
-
 #endif	/* _TCLWININT */
-
-

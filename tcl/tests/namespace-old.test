@@ -804,17 +804,17 @@ test namespace-old-10.4 {command "namespace code" gets current namesp context} {
     namespace eval test_ns_inscope {
         namespace code {"1 2 3" "4 5" 6}
     }
-} {namespace inscope ::test_ns_inscope {"1 2 3" "4 5" 6}}
+} {::namespace inscope ::test_ns_inscope {"1 2 3" "4 5" 6}}
 
 test namespace-old-10.5 {with one arg, first "scope" sticks} {
     set sval [namespace eval test_ns_inscope {namespace code {one two}}]
     namespace code $sval
-} {namespace inscope ::test_ns_inscope {one two}}
+} {::namespace inscope ::test_ns_inscope {one two}}
 
 test namespace-old-10.6 {with many args, each "scope" adds new args} {
     set sval [namespace eval test_ns_inscope {namespace code {one two}}]
     namespace code "$sval three"
-} {namespace inscope ::test_ns_inscope {one two} three}
+} {::namespace inscope ::test_ns_inscope {one two} three}
 
 test namespace-old-10.7 {scoped commands work with eval} {
     set cref [namespace eval test_ns_inscope {namespace code show}]
@@ -850,7 +850,6 @@ eval namespace delete [namespace children :: test_ns_*]
 # cleanup
 ::tcltest::cleanupTests
 return
-
 
 
 

@@ -64,5 +64,5 @@ strstr(string, substring)
 	}
 	b = substring;
     }
-    return (char *) 0;
+    return NULL;
 }

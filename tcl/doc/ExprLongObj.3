@@ -27,7 +27,7 @@ int
 int
 \fBTcl_ExprObj\fR(\fIinterp, objPtr, resultPtrPtr\fR)
 .SH ARGUMENTS
-.AS Tcl_Interp *resultPtrPtr out
+.AS Tcl_Interp **resultPtrPtr out
 .AP Tcl_Interp *interp in
 Interpreter in whose context to evaluate \fIstring\fR or \fIobjPtr\fR.
 .AP Tcl_Obj *objPtr in
@@ -41,7 +41,7 @@ expression.
 .AP int *booleanPtr out
 Pointer to location in which to store the 0/1 boolean value of the
 expression.
-.AP Tcl_Obj *resultPtrPtr out
+.AP Tcl_Obj **resultPtrPtr out
 Pointer to location in which to store a pointer to the object
 that is the result of the expression.
 .BE

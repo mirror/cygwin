@@ -75,16 +75,16 @@ auto_reset
 catch {rename parray {}}
 
 test init-2.0 {load parray - stage 1} {
-    set ret [catch {namespace eval ::tcltest {parray}} error]
+    set ret [catch {parray} error]
     rename parray {} ; # remove it, for the next test - that should not fail.
     list $ret $error
-} {1 {no value given for parameter "a" to "parray"}}
+} {1 {wrong # args: should be "parray a ?pattern?"}}
 
 
 test init-2.1 {load parray - stage 2} {
-    set ret [catch {namespace eval ::tcltest {parray}} error]
+    set ret [catch {parray} error]
     list $ret $error
-} {1 {no value given for parameter "a" to "parray"}}
+} {1 {wrong # args: should be "parray a ?pattern?"}}
 
 
 auto_reset
@@ -135,11 +135,11 @@ catch {rename ::http::geturl {}}
 
 test init-2.8 {load http::geturl (package)} {
     # 3 ':' on purpose
-    set ret [catch {namespace eval ::tcltest {http:::geturl}} error]
+    set ret [catch {http:::geturl} error]
     # removing it, for the next test. should not fail.
     rename ::http::geturl {} ; 
     list $ret $error
-} {1 {no value given for parameter "url" to "http:::geturl"}}
+} {1 {wrong # args: should be "http:::geturl url args"}}
 
 
 test init-3.0 {random stuff in the auto_index, should still work} {
@@ -149,22 +149,61 @@ test init-3.0 {random stuff in the auto_index, should still work} {
     foo:::bar::blah
 } 1
 
+# Tests that compare the error stack trace generated when autoloading
+# with that generated when no autoloading is necessary.  Ideally they
+# should be the same.
+
+set count 0
+foreach arg {
+		c
+                {argument
+                which spans
+                multiple lines}
+                {argument which is all on one line but which is of such great length that the Tcl C library will truncate it when appending it onto the global error stack}
+                {argument which spans multiple lines
+                and is long enough to be truncated and
+"               <- includes a false lead in the prune point search
+                and must be longer still to force truncation}
+                {contrived example: rare circumstance 
+		where the point at which to prune the
+		error stack cannot be uniquely determined.
+		foo bar foo
+"}
+                {contrived example: rare circumstance 
+		where the point at which to prune the
+		error stack cannot be uniquely determined.
+		foo bar
+"}
+	} {
+
+    test init-4.$count.0 {::errorInfo produced by [unknown]} {
+	auto_reset
+	catch {parray a b $arg}
+	set first $::errorInfo
+	catch {parray a b $arg}
+	set second $::errorInfo
+	string equal $first $second
+    } 1
+
+    test init-4.$count.1 {::errorInfo produced by [unknown]} {
+	auto_reset
+	namespace eval junk [list array set $arg [list 1 2 3 4]]
+	trace variable ::junk::$arg r \
+		"[list error [subst {Variable \"$arg\" is write-only}]] ;# "
+	catch {parray ::junk::$arg}
+	set first $::errorInfo
+	catch {parray ::junk::$arg}
+	set second $::errorInfo
+	string equal $first $second
+    } 1
+
+    incr count
 }
+
+}	;#  End of [interp eval $testInterp]
 
 # cleanup
 interp delete $testInterp
 ::tcltest::cleanupTests
 return
-
-
-
-
-
-
-
-
-
-
-
-
 

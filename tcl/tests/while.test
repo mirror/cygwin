@@ -30,7 +30,7 @@ test while-1.2 {TclCompileWhileCmd: error in test expression} {
     set i 0
     catch {while {$i<} break} msg
     set errorInfo
-} {syntax error in expression "$i<"
+} {syntax error in expression "$i<": premature end of expression
     ("while" test expression)
     while compiling
 "while {$i<} break"}
@@ -310,7 +310,7 @@ test while-4.3 {while (not compiled): error in test expression} {
     set z while
     catch {$z {$i<} {set x 1}} msg
     set errorInfo
-} {syntax error in expression "$i<"
+} {syntax error in expression "$i<": premature end of expression
     while executing
 "$z {$i<} {set x 1}"}
 test while-4.4 {while (not compiled): error in test expression} {
@@ -609,27 +609,21 @@ test while-6.5 {continue tests, long command body with computed command names} {
 
 # Test for incorrect "double evaluation" semantics
 
-test while-7.1 {delayed substitution of body} {knownBug} {
+test while-7.1 {delayed substitution of body} {
     set i 0
     while {[incr i] < 10} "
        set result $i
     "
-    set result
-} {0}
+    proc p {} {
+	set i 0
+	while {[incr i] < 10} "
+	    set result $i
+	"
+	set result
+    }
+    append result [p]
+} {00}
 
 # cleanup
 ::tcltest::cleanupTests
 return
-
-
-
-
-
-
-
-
-
-
-
-
-

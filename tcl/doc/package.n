@@ -114,12 +114,14 @@ the command returns immediately.
 Otherwise, the command searches the database of information provided by
 previous \fBpackage ifneeded\fR commands to see if an acceptable
 version of the package is available.
-If so, the script for the highest acceptable version number is invoked;
+If so, the script for the highest acceptable version number is evaluated
+in the global namespace;
 it must do whatever is necessary to load the package,
 including calling \fBpackage provide\fR for the package.
 If the \fBpackage ifneeded\fR database does not contain an acceptable
 version of the package and a \fBpackage unknown\fR command has been
-specified for the interpreter then that command is invoked;  when
+specified for the interpreter then that command is evaluated in the
+global namespace;  when
 it completes, Tcl checks again to see if the package is now provided
 or if there is a \fBpackage ifneeded\fR script for it.
 If all of these steps fail to provide an acceptable version of the
@@ -189,6 +191,8 @@ Once you've done this, packages will be loaded automatically
 in response to \fBpackage require\fR commands.
 See the documentation for \fBpkg_mkIndex\fR for details.
 
+.SH "SEE ALSO"
+msgcat(n), packagens(n), pkgMkIndex(n)
+
 .SH KEYWORDS
 package, version
-

@@ -1,3 +1,10 @@
+2002-11-29  Ben Elliston  <bje@redhat.com>
+
+	* sidcpuutil.h (basic_cpu::print_insn_summary_pin): New pin.
+	(basic_cpu::print_insn_summary): New virtual method.
+	(basic_cpu::basic_cpu): Construct print_insn_summary_pin and
+	instantiate it with add_pin().
+
 2002-11-22  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidattrutil.h: Give up on hash tables - too many incompatible

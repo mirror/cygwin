@@ -200,6 +200,7 @@ namespace sidutil
   protected:
     callback_pin<basic_cpu> step_pin;
     callback_pin<basic_cpu> yield_pin;
+    callback_pin<basic_cpu> print_insn_summary_pin;
     bool yield_p;
     sid::host_int_4 step_insn_count;
     sid::host_int_8 total_insn_count;
@@ -278,6 +279,11 @@ namespace sidutil
     void yield_pin_handler (sid::host_int_4)
       {
 	this->yield ();
+      }
+    virtual void print_insn_summary (sid::host_int_4)
+      {
+	std::cerr << "instruction count: " << this->total_insn_count << "  "
+		  << "simulated cycles: " << this->total_latency << std::endl;
       }
     virtual void stepped (sid::host_int_4 n)
       {
@@ -515,6 +521,7 @@ public:
       step_pin (this, & basic_cpu::step_pin_handler),
       yield_pin (this, & basic_cpu::yield_pin_handler),
       reset_pin (this, & basic_cpu::reset_pin_handler),
+      print_insn_summary_pin (this, & basic_cpu::print_insn_summary),
       flush_icache_pin (this, & basic_cpu::flush_icache_pin_handler),
       pc_set_pin (this, & basic_cpu::pc_set_pin_handler),
       endian_set_pin (this, & basic_cpu::endian_set_pin_handler),
@@ -540,6 +547,7 @@ public:
 	add_pin ("start-pc-set!", & this->pc_set_pin);
 	add_pin ("cg-caller", & this->cg_caller_pin);
 	add_pin ("cg-callee", & this->cg_callee_pin);
+	add_pin ("print-insn-summary!", & this->print_insn_summary_pin);
 	add_pin ("endian-set!", & this->endian_set_pin);
 	add_watchable_pin ("trap", & this->trap_type_pin); // output side
 	add_watchable_pin ("trap-code", & this->trap_code_pin);

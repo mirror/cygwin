@@ -1,3 +1,11 @@
+2002-04-01  Keith Seitz  <keiths@redhat.com>
+
+	* iwidgets3.0.0/generic/feedback.itk: Import version 1.5.
+	(iwidgets::Feedback): Define new option, "-fraction".
+	(fraction): New configbody.
+	(step): Cap the step increment at the total number of
+	requested steps.
+
 2002-02-21  Mo DeJong  <supermo@bayarea.net>
 
         * itk/library/Toplevel.itk (destructor):

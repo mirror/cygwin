@@ -78,13 +78,14 @@ itk::usual Feedback {
 # ------------------------------------------------------------------
 #                          FEEDBACK
 # ------------------------------------------------------------------
-class iwidgets::Feedback {
+itcl::class iwidgets::Feedback {
     inherit iwidgets::Labeledwidget
 
     constructor {args} {}
     destructor {}
 
     itk_option define -steps steps Steps 10
+    itk_option define -fraction fraction Fraction 0
 
     public {
 	method reset {}
@@ -109,7 +110,7 @@ proc ::iwidgets::feedback {pathName args} {
 # ------------------------------------------------------------------
 #                        CONSTRUCTOR
 # ------------------------------------------------------------------
-body iwidgets::Feedback::constructor {args} {
+itcl::body iwidgets::Feedback::constructor {args} {
     itk_component add trough {
 	frame $itk_interior.trough -relief sunken
     } {
@@ -138,13 +139,15 @@ body iwidgets::Feedback::constructor {args} {
     grid rowconfigure $itk_interior 1 -weight 1
     grid columnconfigure $itk_interior 0 -weight 1
 
+    bind $itk_component(hull) <Configure> [itcl::code $this _display]
+
     eval itk_initialize $args
 }
 
 # ------------------------------------------------------------------
 #                          DESTRUCTOR
 # ------------------------------------------------------------------
-body iwidgets::Feedback::destructor {} {
+itcl::body iwidgets::Feedback::destructor {} {
 }
 
 # ------------------------------------------------------------------
@@ -156,8 +159,25 @@ body iwidgets::Feedback::destructor {} {
 #
 # Set the total number of steps.
 # ------------------------------------------------------------------
-configbody iwidgets::Feedback::steps {
+itcl::configbody iwidgets::Feedback::steps {
     step 0
+}
+
+# ------------------------------------------------------------------
+# OPTION: -fraction
+#
+# Configure the widget to display the given fractional completion
+# ------------------------------------------------------------------
+itcl::configbody iwidgets::Feedback::fraction {
+
+    set newval [expr {ceil($itk_option(-steps) * $itk_option(-fraction))}]
+    if {$newval > $itk_option(-steps)} {
+      set newval $itk_option(-steps)
+    }
+    if {$newval != $_stepval} {
+      set _stepval $newval
+      _display
+    }
 }
 
 # ------------------------------------------------------------------
@@ -170,13 +190,16 @@ configbody iwidgets::Feedback::steps {
 # Displays the bar in the trough with the width set using the current number
 # of steps.
 # -----------------------------------------------------------------------------
-body iwidgets::Feedback::_display {} {
+itcl::body iwidgets::Feedback::_display {} {
+    update idletasks
     set troughwidth [winfo width $itk_component(trough)]
-    set _barwidth [expr $troughwidth.0/$itk_option(-steps)]
-    set fraction [expr int((1.0*$_stepval)/$itk_option(-steps)*100.0)]
+    set _barwidth [expr {
+      (1.0*$troughwidth-(2.0*[$itk_component(trough) cget -borderwidth])) /
+      $itk_option(-steps)}]
+    set fraction [expr {int((1.0*$_stepval)/$itk_option(-steps)*100.0)}]
 
     $itk_component(percentage) config -text "$fraction%"
-    $itk_component(bar) config -width [expr $_barwidth*$_stepval]
+    $itk_component(bar) config -width [expr {$_barwidth*$_stepval}]
 
     update
 }
@@ -186,7 +209,7 @@ body iwidgets::Feedback::_display {} {
 #
 # Resets the status bar to 0
 # ------------------------------------------------------------------
-body iwidgets::Feedback::reset {} {
+itcl::body iwidgets::Feedback::reset {} {
     set _stepval 0
     _display 
 }
@@ -196,12 +219,15 @@ body iwidgets::Feedback::reset {} {
 #
 # Increase the value of the status bar by inc. Default to 1
 # ------------------------------------------------------------------
-body iwidgets::Feedback::step {{inc 1}} {
+itcl::body iwidgets::Feedback::step {{inc 1}} {
 
     if {$_stepval >= $itk_option(-steps)} {
 	return
     }
 
     incr _stepval $inc
+    if {$_stepval > $itk_option(-steps)} {
+	set _stepval $itk_option(-steps)
+    }
     _display 
 }

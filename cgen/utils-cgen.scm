@@ -636,3 +636,26 @@ Mark an entry as being sanitized.
 
   *UNSPECIFIED*
 )
+
+; Return a pair of definitions for a C macro that concatenates its
+; argument symbols.  The definitions are conditional on ANSI C
+; semantics: one contains ANSI concat operators (##), and the other
+; uses the empty-comment trick (/**/).  We must do this, rather than
+; use CONCATn(...) as defined in include/symcat.h, in order to avoid
+; spuriously expanding our macro's args.
+
+(define (gen-define-with-symcat head . args)
+  (string-append
+   "\
+#if defined (__STDC__) || defined (ALMOST_STDC) || defined (HAVE_STRINGIZE)
+#define "
+   head (string-map (lambda (elm) (string-append "##" elm)) args)
+   "
+#else
+#define "
+   head (string-map (lambda (elm) (string-append "/**/" elm)) args)
+   "
+#endif
+"
+   )
+)

@@ -1001,9 +1001,10 @@ void
 #include \"cgen-ops.h\"
 
 #undef GET_ATTR
-#define GET_ATTR(cpu, num, attr) \
-CGEN_ATTR_VALUE (NULL, abuf->idesc->attrs, CGEN_INSN_##attr)
-
+"
+   (gen-define-with-symcat "GET_ATTR(cpu, num, attr) \
+CGEN_ATTR_VALUE (NULL, abuf->idesc->attrs, CGEN_INSN_" "attr)")
+"
 /* This is used so that we can compile two copies of the semantic code,
    one with full feature support and one without that runs fast(er).
    FAST_P, when desired, is defined on the command line, -DFAST_P=1.  */
@@ -1112,9 +1113,10 @@ CGEN_ATTR_VALUE (NULL, abuf->idesc->attrs, CGEN_INSN_##attr)
 #endif
 
 #undef GET_ATTR
-#define GET_ATTR(cpu, num, attr) \
-CGEN_ATTR_VALUE (NULL, abuf->idesc->attrs, CGEN_INSN_##attr)
-
+"
+   (gen-define-with-symcat "GET_ATTR(cpu, num, attr) \
+CGEN_ATTR_VALUE (NULL, abuf->idesc->attrs, CGEN_INSN_" "attr)")
+"
 {
 
 #if WITH_SCACHE_PBB

@@ -155,7 +155,7 @@ CFG_TK_EXPORT_FILE_SUFFIX=${TK_EXPORT_FILE_SUFFIX}
 
 # Add X include path, it must be in a format
 # like -I"C:/Dir" and not -I"C:\Dir" or VC++ will puke.
-TCL_TOOL_PATH(XINCLUDES, $srcdir/../xlib)
+TCL_TOOL_PATH(XINCLUDES, `cd $srcdir/../xlib; pwd`)
 XINCLUDES="-I\"${XINCLUDES}\""
 
 AC_SUBST(TK_VERSION)

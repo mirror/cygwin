@@ -36,6 +36,7 @@ static Tcl_ThreadDataKey dataKey;
  * arguments and return results.
  */
 
+
 static const TkStateMap iconMap[] = {
     {MB_ICONERROR,		"error"},
     {MB_ICONINFORMATION,	"info"},
@@ -1522,7 +1523,7 @@ ChooseDirectoryHookProc(
 		     * Directory must exist.  Complain, then rehighlight text.
 		     */
 
-		    wsprintf(tmp, _T("Cannot change directory to \"%.200s\"."), 
+		    wsprintf(tmp, __TEXT("Cannot change directory to \"%.200s\"."), 
 			    cdPtr->path);
 		    MessageBox(hwnd, tmp, NULL, MB_OK);
 		    SendDlgItemMessage(hwnd, edt10, EM_SETSEL, 0, -1);

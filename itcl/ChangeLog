@@ -1,3 +1,17 @@
+2002-06-03  Keith Seitz  <keiths@redhat.com>
+
+	From Mo Dejong  <supermo@bayarea.net>:
+	 * itk/generic/itk_archetype.c (ArchComponent, Itk_ArchCompDeleteCmd,
+	Itk_CreateArchComponent, Itk_DelArchComponent): Save a copy
+	of the window path name in the ArchComponent struct and use
+	it in the Itk_ArchCompDeleteCmd method. The old code was
+	invoking Tk_PathName(tkwin) on a Tk_Window which lead to
+	a memory access on memory that has already been free'd
+	when the widget was destroyed.
+	* itk/library/itk.tcl (itk::remove_destroy_hook): Don't attempt
+	to remove the widget binding if the widget has already been
+	destroyed.
+
 2002-04-17  Keith Seitz  <keiths@redhat.com>
 
 	From investigative work by Ton van Overbeek <tvoverbe@cistron.nl>:

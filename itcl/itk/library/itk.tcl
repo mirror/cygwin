@@ -9,7 +9,7 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id: itk.tcl,v 1.2 1999/01/27 18:56:16 jingham Exp $
+#      RCS:  $Id: itk.tcl,v 1.2.172.1 2001/05/18 02:21:45 mdejong Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
@@ -23,6 +23,27 @@ if {$tcl_platform(os) == "MacOS"} {
     source -rsrc itk:tclIndex
 } else {
     lappend auto_path ${itk::library}
+}
+
+# ----------------------------------------------------------------------
+#  USAGE:  itk::remove_destroy_hook <widget>
+#
+#  Used internally via "itk_component delete" when disconnecting a
+#  component <widget> from the mega-widget that contains it.
+#  Each component has a special binding for the <Destroy> event
+#  that causes it to disconnect itself from its parent when destroyed.
+#  This procedure removes the binding from the binding tag list and
+#  deletes the binding.  It is much easier to implement this in
+#  Tcl than C.
+# ----------------------------------------------------------------------
+proc ::itk::remove_destroy_hook {widget} {
+    if {![winfo exists $widget]} {return}
+    set tags [bindtags $widget]
+    set i [lsearch $tags "itk-destroy-$widget"]
+    if {$i >= 0} {
+        bindtags $widget [lreplace $tags $i $i]
+    }
+    bind itk-destroy-$widget <Destroy> {}
 }
 
 #

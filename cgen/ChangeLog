@@ -1,3 +1,15 @@
+2001-04-02  Ben Elliston  <bje@redhat.com>
+
+	* sid-cpu.scm (-last-insn): New function.
+	(-gen-sem-switch-engine): Loop through idesc while less than or
+	equal to the last instruction enum, not less than the MAX enum.
+	(-gen-sfrag-engine-fn): Clean up frag_label_table initialisation.
+	* sid-decode.scm (-gen-decode-insn-globals): Define the idesc
+	table's size to be the last instruction enum plus one, not
+	@PREFIX@_INSN_MAX.
+	* sid.scm (gen-cpu-insn-enum-decl): Do not append a dummy `max'
+	instruction onto the instruction list.
+	
 2001-03-28  Ben Elliston  <bje@redhat.com>
 
 	* doc/version.texi (UPDATED, EDITION): Update.

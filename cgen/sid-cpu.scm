@@ -5,6 +5,10 @@
 ; ***********
 ; cgen-desc.h
 
+(define (-last-insn)
+  (string-upcase (gen-c-symbol (caar (list-take -1
+       (gen-obj-list-enums (non-multi-insns (current-insn-list))))))))
+
 ; Declare the attributes.
 
 (define (-gen-attr-decls)
@@ -807,7 +811,7 @@ void
 	@prefix@_idesc::idesc_table[labels[i].insn].cgoto.label = labels[i].label; 
 
       // confirm that table is all filled up
-      for (int i=0; i<@PREFIX@_INSN_MAX; i++)
+      for (int i = 0; i <= @PREFIX@_INSN_" (-last-insn) "; i++)
         assert (@prefix@_idesc::idesc_table[i].cgoto.label != 0);
 
       // Initialize the compiler virtual insn.
@@ -1049,12 +1053,7 @@ const @prefix@_insn_frag @prefix@_frag_usage[] = {\n"
 			       ", @PREFIX@_FRAG_LIST_END },\n"))
 	       insn-list frag-usage)
      "")
-
-   "\
-  { @PREFIX@_INSN_MAX }
-};
-\n"
-   )
+   "};\n\n")
 )
 
 ; Return sfrag computed-goto engine.
@@ -1112,20 +1111,18 @@ void
       // Allocate frag label table and point idesc table entries at it.
       // FIXME: Temporary hack, to be redone.
       static void** frag_label_table;
-      frag_label_table = new (void*) [@PREFIX@_INSN_MAX * 4];
-      memset (frag_label_table, 0, sizeof (void*) * @PREFIX@_INSN_MAX * 4);
+      int max_insns = @PREFIX@_INSN_" (-last-insn) " + 1;
+      int tabsize = max_insns * 4;
+      frag_label_table = new (void*) [tabsize];
+      memset (frag_label_table, 0, sizeof (void*) * tabsize);
       int i;
       void** v;
-      for (i = 0, v = frag_label_table; i < @PREFIX@_INSN_MAX; ++i)
+      for (i = 0, v = frag_label_table; i < max_insns; ++i)
 	{
 	  @prefix@_idesc::idesc_table[@prefix@_frag_usage[i].itype].cgoto.frags = v;
 	  for (int j = 0; @prefix@_frag_usage[i].ftype[j] != @PREFIX@_FRAG_LIST_END; ++j)
 	    *v++ = labels[@prefix@_frag_usage[i].ftype[j]].label;
 	}
-
-      // Record frags used by each insn.
-      //for (int i = 0; @prefix@_frag_usage[i].itype != @PREFIX@_INSN_MAX; ++i)
-      //  @prefix@_idesc::idesc_table[@prefix@_frag_usage[i].itype].frags = & @prefix@_frag_usage[i];
 
       // Initialize the compiler virtual insn.
       // FIXME: Also needed if !gnuc.

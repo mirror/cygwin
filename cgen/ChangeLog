@@ -1,3 +1,7 @@
+2001-07-06  Ben Elliston  <bje@redhat.com>
+
+	* opcodes.scm (read-cpu.opc): Read .opc files from subdir/cpu.
+
 2001-07-05  Ben Elliston  <bje@redhat.com>
 
 	* README: Update.

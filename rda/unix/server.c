@@ -29,6 +29,13 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+#include <ctype.h>
+#include <termios.h>
 
 #include "gdbsocket.h"
 #include "gdbloop.h"
@@ -50,41 +57,239 @@ chld_handler (int sig)
 {
 }
 
+static struct termios save_termios;
+
+static void
+close_device (int infd, int outfd)
+{
+  if (isatty (infd))
+    {
+      tcsetattr (infd, TCSAFLUSH, &save_termios);
+    }
+  close (infd);
+  close (outfd);
+}
+
+/* Put a tty into "raw" mode.  Mostly taken from Stevens' book, "Advanced
+   Programming in the UNIX Environment.  */
+static int
+tty_raw (int fd, speed_t speed)
+{
+  struct termios buf;
+
+  /* Don't do anything for non-tty devices.  */
+  if (!isatty (fd))
+    return 0;
+
+  if (tcgetattr (fd, &save_termios) < 0)
+    return -1;
+
+  buf = save_termios;
+
+  /* Set the following local modes: echo off, canonical mode off, extended
+     input processing off, signal chars off.  */
+  buf.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+
+  /* Set the following input modes: no SIGINT on BREAK, CR-to-NL off, input
+     parity check off, don't strip 7th bit on input, output flow control
+     off.  */
+  buf.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+
+  /* Set the following control modes: clear size bits, parity checking off.  */
+  buf.c_cflag &= ~(CSIZE | PARENB); 
+
+  /* Enable 8 bits/char.  */
+  buf.c_cflag |= CS8;
+
+  /* Turn output processing off.  */
+  buf.c_oflag &= ~(OPOST);
+
+  /* Case B: 1 byte at a time, no timer */
+  buf.c_cc[VMIN] = 1;
+  buf.c_cc[VTIME] = 0;
+
+  if (speed != 0)
+    {
+      cfsetispeed (&buf, speed);
+      cfsetospeed (&buf, speed);
+    }
+
+  if (tcsetattr(fd, TCSAFLUSH, &buf) < 0)
+    return -1;
+  return 0;
+}
+
+/* Table of serial port speed values.  */
+static struct
+  {
+    long speed;		/* speed value as an integer */
+    speed_t bspeed;	/* speed value as one of the termios.h constants
+    			   suitable for passing to cfsetispeed() or
+			   cfsetospeed().  */
+  }
+speed_table[] = {
+  { 50, B50 },
+  { 75, B75 },
+  { 110, B110 },
+  { 134, B134 },
+  { 150, B150 },
+  { 200, B200 },
+  { 300, B300 },
+  { 600, B600 },
+  { 1200, B1200 },
+  { 1800, B1800 },
+  { 2400, B2400 },
+  { 4800, B4800 },
+  { 9600, B9600 },
+  { 19200, B19200 },
+  { 38400, B38400 }
+#ifdef B57600 
+  ,{ 57600, B57600 }
+#endif
+#ifdef B115200
+  ,{ 115200, B115200 }
+#endif
+#ifdef B230400
+  ,{ 230400, B230400 }
+#endif
+#ifdef B460800
+  ,{ 460800, B460800 }
+#endif
+#ifdef B500000
+  ,{ 500000, B500000 }
+#endif
+#ifdef B576000
+  ,{ 576000, B576000 }
+#endif
+#ifdef B921600
+  ,{ 921600, B921600 }
+#endif
+#ifdef B2000000
+  ,{ 1000000, B1000000 }
+#endif
+#ifdef B1152000
+  ,{ 1152000, B1152000 }
+#endif
+#ifdef B1500000
+  ,{ 1500000, B1500000 }
+#endif
+#ifdef B2000000
+  ,{ 2000000, B2000000 }
+#endif
+#ifdef B2500000
+  ,{ 2500000, B2500000 }
+#endif
+#ifdef B3000000
+  ,{ 3000000, B3000000 }
+#endif
+#ifdef B3500000
+  ,{ 3500000, B3500000 }
+#endif
+#ifdef B4000000
+  ,{ 4000000, B4000000 }
+#endif
+};
+
+/* Print error for erroneous -s switch and exit.  */
+static void
+invalid_speed (char *str)
+{
+  int i;
+  int ll;
+
+  fprintf (stderr, "Error: Invalid -s switch \"%s\".\n", str);
+  ll = fprintf (stderr, "Valid speeds are:");
+  
+  for (i = 0; i < sizeof (speed_table) / sizeof (speed_table[0]); i++)
+    {
+      char str[20];
+      int cnt;
+      cnt = snprintf (str, sizeof (str), "%d", speed_table[i].speed);
+      if (cnt + ll + 1 > 80)
+	{
+	  fprintf (stderr, "\n");
+	  ll = 0;
+	}
+      else
+	{
+	  fprintf (stderr, " ");
+	  ll++;
+	}
+      fprintf (stderr, "%s", str);
+      ll += cnt;
+    }
+  fprintf (stderr, "\n");
+  exit (1);
+}
+
+/* Attempt to parse a speed and return the speed value.  */
+static speed_t
+parse_speed (char *str)
+{
+  int i;
+  long speed;
+  char *endptr;
+
+  speed = strtol (str, &endptr, 10);
+  if (speed == 0 || *endptr != '\0')
+    {
+      invalid_speed (str);
+      /* won't return */
+    }
+
+  for (i = 0; i < sizeof (speed_table) / sizeof (speed_table[0]); i++)
+    if (speed_table[i].speed == speed)
+      return speed_table[i].bspeed;
+
+  /* Speed not found.  Error out.  */
+  invalid_speed (str);
+  return 0;	/* won't actually return */
+}
+
 /* Print a usage message and exit.  */
 static void
 usage (char *progname)
 {
   fprintf (stderr,
-    "Usage: %s [-h] [-v] tcp-port-num executable-file [arguments ...]\n"
-    "   or: %s -a [-v] tcp-port-num process-id\n\n"
-    "Start the Red Hat debug agent listening on port ``tcp-port-num'' for\n"
-    "debugging``executable-file'' with optional arguments.\n\n"
+    "Usage: %s [-v] tcp-port-num executable-file [arguments ...]\n"
+    "   or: %s -a [-v] tcp-port-num process-id\n"
+    "   or: %s [-v] [-s speed] device-name executable-file [arguments ...]\n"
+    "   or: %s -a [-v] [-s speed] device-name process-id\n"
+    "   or: %s -h\n"
+    "Start the Red Hat debug agent for use with a remote debugger.\n"
     "Options and arguments:\n"
     "  -a               Attach to already running process.\n"
     "  -h               Print this usage message.\n"
+    "  -s speed         Set speed (e.g. 115200) at which device \"device-name\"\n"
+    "                   will communicate with remote debugger.\n"
     "  -v               Increase verbosity.  One -v flag enables informational\n"
     "                   messages.  Two -v flags turn on internal debugging\n"
     "                   messages.\n"
-    "  tcp-port-num     Port number to which debugger connects for purpose\n"
-    "                   of communicating with the debug agent using the GDB\n"
-    "                   remote protocol.\n"
-    "  executable-file  Name of program to debug.\n"
     "  arguments ...    Command line arguments with which to start program\n"
     "                   being debugged.\n"
-    "  process-id       Process ID (PID) of process to attach to.\n",
-    progname, progname);
+    "  device-name      Name of serial device over which RDA will communicate\n"
+    "                   with remote debugger.\n"
+    "  executable-file  Name of program to debug.\n"
+    "  process-id       Process ID (PID) of process to attach to.\n"
+    "  tcp-port-num     Port number to which debugger connects for purpose\n"
+    "                   of communicating with the debug agent using the GDB\n"
+    "                   remote protocol.\n",
+    progname, progname, progname, progname, progname);
   exit (1);
 }
 
 int
 main (int argc, char **argv)
 {
-  int portno;
+  int portno = 0;
   char *endptr;
   int verbose = 0;
   int attach = 0;
   int optidx;
+  int infd, outfd;
   struct child_process *process;
+  char *devicename = "";
+  speed_t speed;
 
   /* Parse options.  */
   for (optidx = 1; optidx < argc; optidx++)
@@ -99,6 +304,12 @@ main (int argc, char **argv)
 	      case 'h':
 		usage (argv[0]);
 		/* not reached */
+		break;
+	      case 's':
+		optidx++;
+		if (optidx >= argc)
+		  usage(argv[0]);
+		speed = parse_speed (argv[optidx]);
 		break;
 	      case 'v':
 		verbose++;
@@ -116,10 +327,31 @@ main (int argc, char **argv)
   if (argc - optidx < 2)
     usage (argv[0]);
 
-  errno = 0;
-  portno = strtol (argv[optidx], &endptr, 10);
-  if (errno != 0 || endptr == argv[optidx])
-    usage (argv[0]);
+  if (isdigit (*argv[optidx]))
+    {
+      errno = 0;
+      portno = strtol (argv[optidx], &endptr, 10);
+      if (errno != 0 || portno == 0)
+	usage (argv[0]);
+    }
+  else if (strcmp (argv[optidx], "-") == 0)
+    {
+      infd = STDIN_FILENO;
+      outfd = STDOUT_FILENO;
+      devicename = "stdin/stdout";
+    }
+  else
+    {
+      devicename = argv[optidx];
+      infd = open (devicename, O_RDWR);
+      if (infd < 0)
+	{
+	  fprintf (stderr, "Error opening device %s: %s\n", devicename,
+	           strerror (errno));
+	  exit (1);
+	}
+      outfd = infd;
+    }
 
   process = malloc (sizeof (struct child_process));
   memset (process, 0, sizeof (struct child_process));
@@ -142,9 +374,19 @@ main (int argc, char **argv)
 
   signal (SIGCHLD, chld_handler);
 
-  gdbsocket_startup (portno, gdbserver.attach, process);
-  if (process->debug_informational)
-    fprintf (stderr, "Started listening socket on port %d.\n", portno);
+  if (portno != 0)
+    {
+      gdbsocket_startup (portno, gdbserver.attach, process);
+      if (process->debug_informational)
+	fprintf (stderr, "Started listening socket on port %d.\n", portno);
+    }
+  else
+    {
+      tty_raw (infd, speed);
+      if (process->debug_informational)
+	fprintf (stderr, "Waiting for input on %s.\n", devicename);
+      gdbsocket_reopen (infd, outfd, close_device, gdbserver.attach, process);
+    }
 
   /* Poll for socket traffic. */
   while (! server_quit_p)

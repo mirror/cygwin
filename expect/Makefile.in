@@ -848,3 +848,8 @@ pty_sgttyb.o: $(srcdir)/pty_sgttyb.c expect_cf.h exp_rename.h exp_tty_in.h \
 pty_termios.o: $(srcdir)/pty_termios.c expect_cf.h exp_win.h \
 	exp_tty_in.h exp_tty.h exp_rename.h exp_pty.h 
 pty_unicos.o: $(srcdir)/pty_unicos.c expect_cf.h exp_rename.h 
+tcl_regexp.o: $(srcdir)/tcl_regexp.c
+	$(CC) -c $(CFLAGS_INT) @TCL_DEFS@ $(HDEFS) $<
+shared/tcl_regexp.o: $(srcdir)/tcl_regexp.c
+	$(CC) -c $(CFLAGS_INT) @EXP_SHLIB_CFLAGS@ @TCL_DEFS@ $(HDEFS) $< -o shared/$@
+

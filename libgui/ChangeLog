@@ -1,3 +1,8 @@
+2000-06-30  Mo DeJong  <mdejong@redhat.com>
+
+	* library/tree.tcl: Fix typo made in patch
+	from 2000-06-22.
+
 2000-06-30  Syd Polk  <spolk@cygnus.com>
 
 	* src/paths.c: Chris Faylor's path changes from 2000-06-09 blow

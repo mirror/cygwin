@@ -336,7 +336,7 @@ after idle "update idletasks ; if \[winfo exists $top\] \{pack propagate $top\}"
 	
 	calculate_column_filter
 	
-	fillg
+	fill
 	
 	resize_widget $tree
 	

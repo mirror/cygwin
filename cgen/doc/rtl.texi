@@ -1532,9 +1532,9 @@ several predefined operand attributes:
 The operand contains negative values (not used yet so definition is
 still nebulous.
 
-@item RELAXABLE
+@item RELAX
 This operand contains the changeable field (usually a branch address) of
-a relaxable instruction.
+a relaxable/relaxed instruction.
 
 @item SEM-ONLY
 Use the SEM-ONLY attribute for cases where the operand will only be used
@@ -1815,7 +1815,7 @@ The instruction has one or more identical variants.  The assembler tries
 this one first and then the relaxation phases switches to larger ones as
 necessary.
 
-@item RELAX
+@item RELAXED
 The instruction is a non-minimal variant of a relaxable instruction.  It
 is avoided by the assembler in the first pass.
 

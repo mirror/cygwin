@@ -1,3 +1,8 @@
+2001-10-13  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* desc-cpu.scm: Do not include ctype.h in generated desc
+	files.  They will inherit safe-ctype.h instead.
+
 2001-10-08  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* desc-cpu.scm: Add missing function prototypes (for generated

@@ -1,3 +1,10 @@
+2002-04-02  Daniel Jacobowitz  <drow@mvista.com>
+
+	From Nathanael Nerode <neroden@doctormoo.dyndns.org>:
+        * utils/spu/configure.in: Autoconfiscated.
+        * utils/spu/Makefile.in: Autoconfiscated.
+        * utils/spu/configure: New generated file.
+
 2000-07-21  Stan Shebs  <shebs@shebs.cnchost.com>
 
 	Add the generation of C++ classes.

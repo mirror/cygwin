@@ -11,7 +11,9 @@
   ; Print the higher detailed stuff at higher verbosity.
   (logit 2 "Processing decode insn globals ...\n")
 
-  (let* ((all-attrs (current-insn-attr-list)))
+  (let* ((all-attrs (current-insn-attr-list))
+	 (last-insn (string-upcase (gen-c-symbol (caar (list-take -1
+                      (gen-obj-list-enums (non-multi-insns (current-insn-list)))))))))
 
     (string-write
      "
@@ -27,7 +29,7 @@ bool @prefix@_idesc::idesc_table_initialized_p = false;\n\n"
 	 "")
 
      "\
-@prefix@_idesc @prefix@_idesc::idesc_table[@PREFIX@_INSN_MAX] =
+@prefix@_idesc @prefix@_idesc::idesc_table[@PREFIX@_INSN_" last-insn " + 1] =
 {\n"
 
      (string-map

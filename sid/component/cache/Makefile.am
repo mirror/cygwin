@@ -16,3 +16,6 @@ DEJAGNUTESTS=cache.exp cachemonkey.exp cachedocs.exp coherency.exp \
 
 check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)")
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs

@@ -8,15 +8,23 @@
 	* cacheutil.h (std::operator==, operator==): Move this into the
 	global name space.
 
+2001-07-13  Dave Brolley  <brolley@redhat.com>
+
+        * cache.h (cache:bus::DEFN_METHOD): Generate function prototypes only.
+	(::DEFN_METHOD): Generate actual inline function bodies after
+	cache_component is defined.
+
 2001-07-13  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (check-local): Rename target from "checkme".
 
-2001-07-13  Dave Brolley  <brolley@redhat.com>
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
 
-	* cache.h (cache:bus::DEFN_METHOD): Generate function prototypes only.
-	(::DEFN_METHOD): Generate actual inline function bodies after
-	cache_component is defined.
+	* hw-cache.xml: Add <?xml ... ?> prefix.
+
+2001-07-10  matthew green  <mrg@redhat.com>
+
+	* Makefile.in: Regenerate.
 
 2001-07-10  Ben Elliston  <bje@redhat.com>
 
@@ -27,6 +35,14 @@
 2001-07-09  Ben Elliston  <bje@redhat.com>
 
 	* cache.cxx: Use std::cout and std::endl for C++ conformance.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* hw-cache.txt: Generate.
+
+2001-07-02  Ben Elliston  <bje@redhat.com>
+
+	* hw-cache.xml: New file.
 
 2001-06-24  Ben Elliston  <bje@redhat.com>
 

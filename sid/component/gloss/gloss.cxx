@@ -145,10 +145,13 @@ gloss32::update_endian()
 
 // Memory access methods.
 
+// Calling get_string with length = 0 indicates that there is no
+// imposed length limit; read from memory until a NUL is encountered.
+
 bool
-gloss32::get_string(address32 address, string& value, unsigned length)
+gloss32::get_string (address32 address, string& value, unsigned length = 0)
 {
-  if (! this->cpu_memory_bus)
+  if (! cpu_memory_bus)
     {
       cerr << "*** CPU memory bus not configured!" << endl;
       return false;
@@ -160,33 +163,30 @@ gloss32::get_string(address32 address, string& value, unsigned length)
 	   << make_numeric_attribute (address, ios::hex | ios::showbase) << ": ";
     }
 
-  for (unsigned i = 0; i < length; i++)
+  for (unsigned i = 0; (i < length || length == 0); i++)
     {
-      little_int_1 byte; // equivalent to big_int_1
-      while(true)
+      char c;
+      little_int_1 byte;
+
+      bus::status s = cpu_memory_bus->read (address, byte);
+      if (s != bus::ok) 
 	{
-	  bus::status s = this->cpu_memory_bus->read(address, byte);
-	  if (s == bus::ok) 
-	    break;
-	  else 
-	    {
-	      if (verbose_p)
-		cerr << "failed" << endl;
-	      return false;
-	    }
+	  if (verbose_p)
+	    cerr << "failed" << endl;
+	  return false;
 	}
 
-      char c = byte;
+      c = byte;
+      if (length == 0 && c == '\0')
+	break;
+
       value += c;
+      address++;
+      
       if (verbose_p)
 	cerr << "[" << c << "]";
-
-      address = address + 1;
-
-      if (c == '\0')
-	break;
     }
-  
+
   if (verbose_p)
     cerr << endl;
   return true;
@@ -208,10 +208,11 @@ gloss32::set_string(address32 address, const string& value)
            << ": ";
     }
   
-  for (unsigned i=0; i < value.size(); i++)
+  for (unsigned i = 0; i < value.size(); i++)
     {
       char c = value[i];
-      little_int_1 byte = c; // equivalent to big_int_1
+      little_int_1 byte = c;
+
       while (true)
 	{
 	  bus::status s = this->cpu_memory_bus->write(address, byte);
@@ -224,11 +225,10 @@ gloss32::set_string(address32 address, const string& value)
 	      return false;
 	    }
 	}
-
+      address++;
+      
       if (verbose_p)
 	cerr << "[" << c << "]";
-
-      address = address + 1;
     }
 
   if (verbose_p)
@@ -933,7 +933,12 @@ gloss32::do_sys_open()
   get_int_argument(2, open_flags);
   get_int_argument(3, mode);
 
-  get_string(str_ptr, filename, 100);
+  if (!get_string (str_ptr, filename))
+    {
+      set_error_result (newlib::eFault);
+      set_int_result (-1);
+      return;
+    }
 
   if (!target_to_host_open_flags (open_flags, flags))
     {
@@ -1269,7 +1274,7 @@ gloss32::write (int fd, address32 addr, size32 len,
 		  && host_fd == fd);
 
   if (verbose_p)
-    cerr << "*** write(" << fd << "," << addr << "," << len << ")" << endl;
+    cerr << "*** write(" << fd << ", 0x" << hex << addr << ", " << dec << len << ")" << endl;
 
   if (host_fd == -1)
     {

@@ -118,9 +118,10 @@ protected:
   bool set_word(address32 address, int32 value);
 
   // Read/write a string in memory.
-  // Note that this is a string of bytes, not a nul-terminated string.
-  bool get_string(address32 address, string& value, unsigned length);
+  // Calling get_string with length = 0 indicates that there is no
+  // imposed length limit; read from memory until a NUL is encountered.
   bool set_string(address32 address, const string& value);
+  bool get_string(address32 address, string& value, unsigned length = 0);
 
   // Get the value of the cpu's program counter.
   virtual bool get_pc(address32& value);

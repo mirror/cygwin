@@ -1,3 +1,12 @@
+2001-09-26  Ben Elliston  <bje@redhat.com>
+
+	* gloss.h (gloss32::get_string): Give length parameter a default
+	of 0, in which case memory is read until a NUL is reached.
+	* gloss.cxx (gloss32::get_string): Handle both fixed length and
+	NUL-terminated strings.
+	(gloss32::write): Improve verbose message.
+	(gloss32::do_sys_open): Improve failure mode for get_string().
+
 2001-09-24  Ben Elliston  <bje@redhat.com>
 
 	* gloss.cxx (do_sys_fstat): Clear error result on success.

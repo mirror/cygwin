@@ -9,7 +9,7 @@
 # See the file "license.terms" for information on usage and
 # redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: http.tcl,v 1.1.1.1 2002/09/24 19:56:14 kseitz Exp $
+# RCS: @(#) $Id: http.tcl,v 1.1.1.2 2002/11/26 20:00:37 hunt Exp $
 
 # Rough version history:
 # 1.0	Old http_get interface
@@ -171,7 +171,7 @@ proc http::Finish { token {errormsg ""} {skipCB 0}} {
 		set state(status) error
 	    }
 	}
-	if {[info exist state(-command)]} {
+	if {[info exists state(-command)]} {
 	    # Command callback may already have unset our state
 	    unset state(-command)
 	}
@@ -556,7 +556,7 @@ proc http::error {token} {
 proc http::cleanup {token} {
     variable $token
     upvar 0 $token state
-    if {[info exist state]} {
+    if {[info exists state]} {
 	unset state
     }
 }

@@ -462,7 +462,9 @@ AC_DEFUN(SC_ENABLE_THREADS, [
 #------------------------------------------------------------------------
 # SC_ENABLE_SYMBOLS --
 #
-#	Specify if debugging symbols should be used
+#	Specify if debugging symbols should be used.
+#	Memory (TCL_MEM_DEBUG) and compile (TCL_COMPILE_DEBUG) debugging
+#	can also be enabled.
 #
 # Arguments:
 #	none
@@ -491,19 +493,38 @@ AC_DEFUN(SC_ENABLE_SYMBOLS, [
     AC_MSG_CHECKING([for build with symbols])
     AC_ARG_ENABLE(symbols, [  --enable-symbols        build with debugging symbols [--disable-symbols]],    [tcl_ok=$enableval], [tcl_ok=no])
 # FIXME: Currently, LDFLAGS_DEFAULT is not used, it should work like CFLAGS_DEFAULT.
-    if test "$tcl_ok" = "yes"; then
-	CFLAGS_DEFAULT='$(CFLAGS_DEBUG)'
-	LDFLAGS_DEFAULT='$(LDFLAGS_DEBUG)'
-	DBGX=g
-	AC_MSG_RESULT([yes])
-    else
+    if test "$tcl_ok" = "no"; then
 	CFLAGS_DEFAULT='$(CFLAGS_OPTIMIZE)'
 	LDFLAGS_DEFAULT='$(LDFLAGS_OPTIMIZE)'
 	DBGX=""
 	AC_MSG_RESULT([no])
+    else
+	CFLAGS_DEFAULT='$(CFLAGS_DEBUG)'
+	LDFLAGS_DEFAULT='$(LDFLAGS_DEBUG)'
+	DBGX=g
+	if test "$tcl_ok" = "yes"; then
+	    AC_MSG_RESULT([yes (standard debugging)])
+	fi
     fi
     AC_SUBST(CFLAGS_DEFAULT)
     AC_SUBST(LDFLAGS_DEFAULT)
+
+    if test "$tcl_ok" = "mem" -o "$tcl_ok" = "all"; then
+	AC_DEFINE(TCL_MEM_DEBUG)
+    fi
+
+    if test "$tcl_ok" = "compile" -o "$tcl_ok" = "all"; then
+	AC_DEFINE(TCL_COMPILE_DEBUG)
+	AC_DEFINE(TCL_COMPILE_STATS)
+    fi
+
+    if test "$tcl_ok" != "yes" -a "$tcl_ok" != "no"; then
+	if test "$tcl_ok" = "all"; then
+	    AC_MSG_RESULT([enabled symbols mem compile debugging])
+	else
+	    AC_MSG_RESULT([enabled $tcl_ok debugging])
+	fi
+    fi
 ])
 
 #------------------------------------------------------------------------
@@ -592,42 +613,6 @@ AC_DEFUN(SC_CONFIG_MANPAGES, [
 
 	AC_SUBST(MKLINKS_FLAGS)
 ])
-
-#------------------------------------------------------------------------
-# SC_ENABLE_MEMDEBUG --
-#
-#	Specify if the memory debugging code should be used
-#
-# Arguments:
-#	none
-#	
-#	Requires the following vars to be set in the Makefile:
-#		None.
-#	
-# Results:
-#
-#	Adds the following arguments to configure:
-#		--enable-memdebug
-#
-#	Defines the following @vars@:
-#		MEM_DEBUG_FLAGS	Sets to -DTCL_MEM_DEBUG if true
-#				Sets to "" if false
-#
-#------------------------------------------------------------------------
-
-AC_DEFUN(SC_ENABLE_MEMDEBUG, [
-    AC_MSG_CHECKING([for build with memory debugging])
-    AC_ARG_ENABLE(memdebug, [  --enable-memdebug       build with memory debugging [--disable-memdebug]],    [tcl_ok=$enableval], [tcl_ok=no])
-    if test "$tcl_ok" = "yes"; then
-	MEM_DEBUG_FLAGS=-DTCL_MEM_DEBUG
-	AC_MSG_RESULT([yes])
-    else
-	MEM_DEBUG_FLAGS=""
-	AC_MSG_RESULT([no])
-    fi
-    AC_SUBST(MEM_DEBUG_FLAGS)
-])
-
 
 #--------------------------------------------------------------------
 # SC_CONFIG_CFLAGS
@@ -784,6 +769,10 @@ AC_DEFUN(SC_CONFIG_CFLAGS, [
 
     AC_CHECK_LIB(dl, dlopen, have_dl=yes, have_dl=no)
 
+    # Require ranlib early so we can override it in special cases below.
+
+    AC_REQUIRE([AC_PROG_RANLIB])
+
     # Step 3: set configuration options based on system name and version.
 
     do64bit_ok=no
@@ -821,24 +810,34 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	    LIBS="$LIBS -lc"
 	    # AIX-5 uses ELF style dynamic libraries
 	    SHLIB_CFLAGS=""
-	    SHLIB_LD="/usr/ccs/bin/ld -G -z text"
+	    SHLIB_LD_LIBS='${LIBS}'
+	    SHLIB_SUFFIX=".so"
+	    if test "`uname -m`" = "ia64" ; then
+		# AIX-5 uses ELF style dynamic libraries on IA-64, but not PPC
+		SHLIB_LD="/usr/ccs/bin/ld -G -z text"
+		# AIX-5 has dl* in libc.so
+		DL_LIBS=""
+		if test "$GCC" = "yes" ; then
+		    CC_SEARCH_FLAGS='-Wl,-R,${LIB_RUNTIME_DIR}'
+		else
+		    CC_SEARCH_FLAGS='-R${LIB_RUNTIME_DIR}'
+		fi
+		LD_SEARCH_FLAGS='-R ${LIB_RUNTIME_DIR}'
+	    else
+		SHLIB_LD="${TCL_SRC_DIR}/unix/ldAix /bin/ld -bhalt:4 -bM:SRE -bE:lib.exp -H512 -T512 -bnoentry"
+		DL_LIBS="-ldl"
+		CC_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
+		LD_SEARCH_FLAGS=${CC_SEARCH_FLAGS}
+		TCL_NEEDS_EXP_FILE=1
+		TCL_EXPORT_FILE_SUFFIX='${VERSION}\$\{DBGX\}.exp'
+	    fi
 
 	    # Note: need the LIBS below, otherwise Tk won't find Tcl's
 	    # symbols when dynamically loaded into tclsh.
 
-	    SHLIB_LD_LIBS='${LIBS}'
-	    SHLIB_SUFFIX=".so"
 	    DL_OBJS="tclLoadDl.o"
-	    # AIX-5 has dl* in libc.so
-	    DL_LIBS=""
 	    LDFLAGS=""
 
-	    if test "$GCC" = "yes" ; then
-	        CC_SEARCH_FLAGS='-Wl,-R,${LIB_RUNTIME_DIR}'
-	    else
-	        CC_SEARCH_FLAGS='-R ${LIB_RUNTIME_DIR}'
-	    fi
-	    LD_SEARCH_FLAGS='-R ${LIB_RUNTIME_DIR}'
 	    LD_LIBRARY_PATH_VAR="LIBPATH"
 
 	    # Check to enable 64-bit flags for compiler/linker
@@ -849,6 +848,9 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 		    do64bit_ok=yes
 		    EXTRA_CFLAGS="-q64"
 		    LDFLAGS="-q64"
+		    RANLIB="${RANLIB} -X64"
+		    AR="${AR} -X64"
+		    SHLIB_LD_FLAGS="-b64"
 		fi
 	    fi
 	    ;;
@@ -906,6 +908,9 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 		    do64bit_ok=yes
 		    EXTRA_CFLAGS="-q64"
 		    LDFLAGS="-q64"
+		    RANLIB="${RANLIB} -X64"
+		    AR="${AR} -X64"
+		    SHLIB_LD_FLAGS="-b64"
 		fi
 	    fi
 	    ;;
@@ -966,7 +971,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	    # Check to enable 64-bit flags for compiler/linker
 	    if test "$do64bit" = "yes" ; then
 		if test "$GCC" = "yes" ; then
-		    hpux_arch='`gcc -dumpmachine`'
+		    hpux_arch=`gcc -dumpmachine`
 		    case $hpux_arch in
 			hppa64*)
 			    # 64-bit gcc in use.  Fix flags for GNU ld.
@@ -974,6 +979,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 			    SHLIB_LD="gcc -shared"
 			    SHLIB_LD_LIBS=""
 			    LD_SEARCH_FLAGS=''
+			    CC_SEARCH_FLAGS=''
 			    ;;
 			*)
 			    AC_MSG_WARN("64bit mode not supported with GCC on $system")
@@ -1073,7 +1079,6 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	            LDFLAGS="-64"
 	        fi
 	    fi
-
 	    ;;
 	Linux*)
 	    SHLIB_CFLAGS="-fPIC"
@@ -1116,6 +1121,9 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	    if test x"${LIBOBJS}" != x ; then
 	        EXTRA_CFLAGS="${EXTRA_CFLAGS} -fno-inline"
 	    fi
+
+	    # XIM peeking works under XFree86.
+	    AC_DEFINE(PEEK_XCLOSEIM)
 
 	    ;;
 	GNU*)
@@ -1661,8 +1669,6 @@ dnl AC_CHECK_TOOL(AR, ar, :)
     if test "$UNSHARED_LIB_SUFFIX" = "" ; then
 	UNSHARED_LIB_SUFFIX='${VERSION}\$\{DBGX\}.a'
     fi
-
-    AC_REQUIRE([AC_PROG_RANLIB])
 
     if test "${SHARED_BUILD}" = "1" && test "${SHLIB_SUFFIX}" != "" ; then
         LIB_SUFFIX=${SHARED_LIB_SUFFIX}
@@ -2380,12 +2386,18 @@ AC_DEFUN(SC_TCL_EARLY_FLAGS,[
 AC_DEFUN(SC_TCL_64BIT_FLAGS, [
     AC_MSG_CHECKING([for 64-bit integer type])
     AC_CACHE_VAL(tcl_cv_type_64bit,[
+	tcl_cv_type_64bit=none
+	# See if the compiler knows natively about __int64
 	AC_TRY_COMPILE(,[__int64 value = (__int64) 0;],
-           tcl_cv_type_64bit=__int64,tcl_cv_type_64bit=none
-           AC_TRY_RUN([#include <unistd.h>
-		int main() {exit(!(sizeof(long long) > sizeof(long)));}
-		], tcl_cv_type_64bit="long long"))])
+	    tcl_type_64bit=__int64, tcl_type_64bit="long long")
+	# See if we should use long anyway  Note that we substitute in the
+	# type that is our current guess for a 64-bit type inside this check
+	# program, so it should be modified only carefully...
+	AC_TRY_RUN([#include <unistd.h>
+	    int main() {exit(!(sizeof(]${tcl_type_64bit}[) > sizeof(long)));}
+	    ], tcl_cv_type_64bit=${tcl_type_64bit},:,:)])
     if test "${tcl_cv_type_64bit}" = none ; then
+	AC_DEFINE(TCL_WIDE_INT_IS_LONG)
 	AC_MSG_RESULT(using long)
     else
 	AC_DEFINE_UNQUOTED(TCL_WIDE_INT_TYPE,${tcl_cv_type_64bit})

@@ -3,7 +3,7 @@
 # generate the file "configure", which is run during Tcl installation
 # to configure the system for the local environment.
 #
-# RCS: @(#) $Id: configure.in,v 1.54 2002/09/02 20:11:06 hobbs Exp $
+# RCS: @(#) $Id: configure.in,v 1.58 2002/10/22 18:56:28 hobbs Exp $
 
 AC_INIT(../generic/tcl.h)
 AC_PREREQ(2.13)
@@ -11,7 +11,7 @@ AC_PREREQ(2.13)
 TCL_VERSION=8.4
 TCL_MAJOR_VERSION=8
 TCL_MINOR_VERSION=4
-TCL_PATCH_LEVEL=".0"
+TCL_PATCH_LEVEL=".1"
 VER=$TCL_MAJOR_VERSION$TCL_MINOR_VERSION
 
 TCL_DDE_VERSION=1.2
@@ -20,9 +20,9 @@ TCL_DDE_MINOR_VERSION=2
 TCL_DDE_PATCH_LEVEL=""
 DDEVER=$TCL_DDE_MAJOR_VERSION$TCL_DDE_MINOR_VERSION
 
-TCL_REG_VERSION=1.0
+TCL_REG_VERSION=1.1
 TCL_REG_MAJOR_VERSION=1
-TCL_REG_MINOR_VERSION=0
+TCL_REG_MINOR_VERSION=1
 TCL_REG_PATCH_LEVEL=""
 REGVER=$TCL_REG_MAJOR_VERSION$TCL_REG_MINOR_VERSION
 
@@ -79,10 +79,10 @@ AC_PROG_MAKE_SET
 
 AC_CYGWIN
 
-if test "$ac_cv_cygwin" = "yes" ; then
-    AC_MSG_ERROR([Compiling with the Cygwin version of gcc is not supported.
-    Use the Mingw version of gcc from www.mingw.org instead.])
-fi
+#if test "$ac_cv_cygwin" = "yes" ; then
+#    AC_MSG_ERROR([Compiling with the Cygwin version of gcc is not supported.
+#    Use the Mingw version of gcc from www.mingw.org instead.])
+#fi
 
 
 AC_CACHE_CHECK(for SEH support in compiler,
@@ -108,8 +108,32 @@ int main(int argc, char** argv) {
         tcl_cv_seh=no)
 )
 if test "$tcl_cv_seh" = "no" ; then
-    AC_DEFINE(HAVE_NO_SEH,,
+    AC_DEFINE(HAVE_NO_SEH, 1,
             [Defined when mingw does not support SEH])
+fi
+
+#
+# Check to see if the excpt.h include file provided contains the
+# definition for EXCEPTION_DISPOSITION; if not, which is the case
+# with Cygwin's version as of 2002-04-10, define it to be int, 
+# sufficient for getting the current code to work.
+#
+AC_CACHE_CHECK(for EXCEPTION_DISPOSITION support in include files,
+    tcl_cv_eh_disposition,
+AC_TRY_COMPILE([
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef WIN32_LEAN_AND_MEAN
+],
+[
+  EXCEPTION_DISPOSITION x;
+],
+        tcl_cv_eh_disposition=yes,
+        tcl_cv_eh_disposition=no)
+)
+if test "$tcl_cv_eh_disposition" = "no" ; then
+    AC_DEFINE(EXCEPTION_DISPOSITION, int,
+            [Defined when cygwin/mingw does not support EXCEPTION DISPOSITION])
 fi
 
 #--------------------------------------------------------------------
@@ -147,7 +171,6 @@ SC_CONFIG_CFLAGS
 #--------------------------------------------------------------------
 
 SC_ENABLE_SYMBOLS
-SC_ENABLE_MEMDEBUG
 
 TCL_DBGX=${DBGX}
 

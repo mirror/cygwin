@@ -13,7 +13,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tcl.h,v 1.142 2002/09/02 20:10:59 hobbs Exp $
+ * RCS: @(#) $Id: tcl.h,v 1.147 2002/10/21 04:35:50 das Exp $
  */
 
 #ifndef _TCL
@@ -46,6 +46,8 @@ extern "C" {
  * win/makefile.vc	(not patchlevel) 2 LOC
  * README		(sections 0 and 2)
  * mac/README		(2 LOC, not patchlevel)
+ * macosx/Tcl.pbproj/project.pbxproj
+ * 			(7 LOC total, 2 LOC patch)
  * win/README.binary	(sections 0-4)
  * win/README		(not patchlevel) (sections 0 and 2)
  * unix/tcl.spec	(2 LOC Major/Minor, 1 LOC patch)
@@ -57,10 +59,10 @@ extern "C" {
 #define TCL_MAJOR_VERSION   8
 #define TCL_MINOR_VERSION   4
 #define TCL_RELEASE_LEVEL   TCL_FINAL_RELEASE
-#define TCL_RELEASE_SERIAL  0
+#define TCL_RELEASE_SERIAL  1
 
 #define TCL_VERSION	    "8.4"
-#define TCL_PATCH_LEVEL	    "8.4.0"
+#define TCL_PATCH_LEVEL	    "8.4.1"
 
 /*
  * The following definitions set up the proper options for Windows
@@ -68,7 +70,7 @@ extern "C" {
  */
 
 #ifndef __WIN32__
-#   if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
+#   if defined(_WIN32) || defined(WIN32) || defined(__MINGW32__) || defined(__BORLANDC__)
 #	define __WIN32__
 #	ifndef WIN32
 #	    define WIN32
@@ -117,23 +119,15 @@ extern "C" {
 
 /* 
  * A special definition used to allow this header file to be included
- * from windows resource files so that they can obtain version
- * information.  RC_INVOKED is defined by default by the RC tool.
+ * from windows or mac resource files so that they can obtain version
+ * information.  RC_INVOKED is defined by default by the windows RC tool
+ * and manually set for macintosh.
+ *
  * Resource compilers don't like all the C stuff, like typedefs and
  * procedure declarations, that occur below, so block them out.
  */
 
 #ifndef RC_INVOKED
-
-/* 
- * A special definition for Macintosh used to allow this header file
- * to be included in resource files so that they can get obtain
- * version information from this file.  Resource compilers don't like
- * all the C stuff, like typedefs and procedure declarations, that
- * occur below.  
-*/
-
-#ifndef RESOURCE_INCLUDED
 
 /*
  * Special macro to define mutexes, that doesn't do anything
@@ -336,8 +330,6 @@ typedef long LONG;
  * and define Tcl_WideUInt to be the unsigned variant of that type
  * (assuming that where we have one, we can have the other.)
  *
- * At the moment, this only works on Unix systems anyway...
- *
  * Also defines the following macros:
  * TCL_WIDE_INT_IS_LONG - if wide ints are really longs (i.e. we're on
  *	a real 64-bit system.)
@@ -351,15 +343,19 @@ typedef long LONG;
  *
  * Note on converting between Tcl_WideInt and strings.  This
  * implementation (in tclObj.c) depends on the functions strtoull()
- * and, where sprintf(...,"%lld",...) does not work, lltostr().
- * Although strtoull() is fairly straight-forward, lltostr() is a most
- * unusual function on Solaris8 (taking its operating buffer
- * backwards) so any changes you make will need to be done
- * cautiously...
+ * and sprintf(...,"%" TCL_LL_MODIFIER "d",...).  TCL_LL_MODIFIER_SIZE
+ * is the length of the modifier string, which is "ll" on most 32-bit
+ * Unix systems.  It has to be split up like this to allow for the more
+ * complex formats sometimes needed (e.g. in the format(n) command.)
  */
 
 #if !defined(TCL_WIDE_INT_TYPE)&&!defined(TCL_WIDE_INT_IS_LONG)
-#   ifdef __WIN32__
+#   ifdef __CYGWIN__
+#      define TCL_WIDE_INT_TYPE long long
+#      define TCL_LL_MODIFIER	"L"
+typedef struct stat	Tcl_StatBuf;
+#      define TCL_LL_MODIFIER_SIZE	1
+#   elif defined(__WIN32__)
 #      define TCL_WIDE_INT_TYPE __int64
 #      ifdef __BORLANDC__
 typedef struct stati64 Tcl_StatBuf;
@@ -401,8 +397,16 @@ typedef struct stat	Tcl_StatBuf;
 #   define Tcl_LongAsWide(val)		((long)(val))
 #   define Tcl_WideAsDouble(val)	((double)((long)(val)))
 #   define Tcl_DoubleAsWide(val)	((long)((double)(val)))
+#   ifndef TCL_LL_MODIFIER
+#      define TCL_LL_MODIFIER		"l"
+#      define TCL_LL_MODIFIER_SIZE	1
+#   endif /* !TCL_LL_MODIFIER */
 #else /* TCL_WIDE_INT_IS_LONG */
-#   ifndef __WIN32__
+/*
+ * The next short section of defines are only done when not running on
+ * Windows or some other strange platform.
+ */
+#   ifndef TCL_LL_MODIFIER
 #      ifdef HAVE_STRUCT_STAT64
 typedef struct stat64	Tcl_StatBuf;
 #      else
@@ -410,7 +414,7 @@ typedef struct stat	Tcl_StatBuf;
 #      endif /* HAVE_STRUCT_STAT64 */
 #      define TCL_LL_MODIFIER		"ll"
 #      define TCL_LL_MODIFIER_SIZE	2
-#   endif /* !__WIN32__ */
+#   endif /* !TCL_LL_MODIFIER */
 #   define Tcl_WideAsLong(val)		((long)((Tcl_WideInt)(val)))
 #   define Tcl_LongAsWide(val)		((Tcl_WideInt)((long)(val)))
 #   define Tcl_WideAsDouble(val)	((double)((Tcl_WideInt)(val)))
@@ -2282,12 +2286,10 @@ EXTERN void Tcl_Main _ANSI_ARGS_((int argc, char **argv,
 
 EXTERN int		Tcl_AppInit _ANSI_ARGS_((Tcl_Interp *interp));
 
-#endif /* RC_INVOKED */
-
 #undef TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLIMPORT
 
-#endif /* RESOURCE_INCLUDED */
+#endif /* RC_INVOKED */
 
 /*
  * end block for C++

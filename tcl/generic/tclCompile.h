@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclCompile.h,v 1.31 2002/08/07 15:50:29 msofer Exp $
+ * RCS: @(#) $Id: tclCompile.h,v 1.33 2002/10/09 11:54:05 das Exp $
  */
 
 #ifndef _TCLCOMPILATION
@@ -805,7 +805,7 @@ EXTERN int		TclPrintInstruction _ANSI_ARGS_((ByteCode* codePtr,
 EXTERN void		TclPrintObject _ANSI_ARGS_((FILE *outFile,
 			    Tcl_Obj *objPtr, int maxChars));
 EXTERN void		TclPrintSource _ANSI_ARGS_((FILE *outFile,
-			    char *string, int maxChars));
+			    CONST char *string, int maxChars));
 EXTERN void		TclRegisterAuxDataType _ANSI_ARGS_((AuxDataType *typePtr));
 EXTERN int		TclRegisterLiteral _ANSI_ARGS_((CompileEnv *envPtr,
 			    char *bytes, int length, int onHeap));
@@ -819,6 +819,8 @@ EXTERN void		TclVerifyGlobalLiteralTable _ANSI_ARGS_((
 EXTERN void		TclVerifyLocalLiteralTable _ANSI_ARGS_((
 			    CompileEnv *envPtr));
 #endif
+EXTERN int		TclCompileVariableCmd _ANSI_ARGS_((
+			    Tcl_Interp *interp, Tcl_Parse *parsePtr, CompileEnv *envPtr));
 
 /*
  *----------------------------------------------------------------

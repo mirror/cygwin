@@ -1,3 +1,361 @@
+2002-10-22  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	*** 8.4.1 TAGGED FOR RELEASE ***
+
+	* changes: updated for 8.4.1 release
+
+	* win/Makefile.in: removed @MEM_DEBUG_FLAGS@ subst.
+	* win/configure: regen
+	* win/configure.in: removed SC_ENABLE_MEMDEBUG call
+	* win/tcl.m4: replaced SC_ENABLE_MEMDEBUG with a more intelligent
+	SC_ENABLE_SYMBOLS that takes yes|no|mem|compile|all as options now.
+
+2002-10-22  Daniel Steffen  <das@users.sourceforge.net>
+
+	* library/auto.tcl (tcl_findLibrary):
+	* library/package.tcl (tclPkgUnknown): on macosx, search inside the
+	Resources/Scripts subdirectory of any potential package directory
+	* macosx/Tcl.pbproj/project.pbxproj: add standard Frameworks dirs
+	to TCL_PACKAGE_PATH make argument.
+	* unix/tclUnixInit.c (TclpSetVariables): on macosx, add embedded
+	framework dirs to tcl_pkgPath: @executable_path/../Frameworks and
+	@executable_path/../PrivateFrameworks (if they exist), as well as
+	the dirs in DYLD_FRAMEWORK_PATH (if set). [Patch #624509]
+	use standard MAXPATHLEN instead of literal 1024
+
+2002-10-22  Donal K. Fellows  <fellowsd@cs.man.ac.uk>
+
+	* doc/StringObj.3, doc/Object.3: Documented that Tcl_Obj's
+	standard string form is a modified UTF-8; apparently, this was not
+	mentioned anywhere in the main docs, and lead to [Bug 624919].
+
+2002-10-21  Daniel Steffen  <das@users.sourceforge.net>
+
+	* macosx/Tcl.pbproj/project.pbxproj: bumped version to 8.4.1
+	* generic/tcl.h: Added reminder comment to edit
+	macosx/Tcl.pbproj/project.pbxproj when version number changes.
+
+2002-10-18  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* library/reg/pkgIndex.tcl:
+	* win/configure:
+	* win/configure.in:
+	* win/Makefile.in:
+	* win/makefile.vc:
+	* win/makefile.bc:    Updated to reg1.1
+
+	* doc/registry.n:      Added support for broadcasting changes to
+	* tests/registry.test: the registry Environment. Noted proper code
+	* win/tclWinReg.c:     in the docs. [Patch #625453]
+
+	* unix/Makefile.in (dist): add any mac/tcl*.sea.hqx files
+
+2002-10-17  Don Porter  <dgp@users.sourceforge.net>
+
+	* generic/tclVar.c:	Fixed code that check for proper # of args to
+	* tests/var.test:	[array names].  Added test.  [Bug 624755]
+
+2002-10-16  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* win/configure:                 add workaround for cygwin windres
+	* win/tcl.m4 (SC_CONFIG_CFLAGS): problem. [Patch #624010] (howell)
+
+2002-10-15  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* README: added archives.tcl.tk note
+
+	* unix/configure:
+	* unix/tcl.m4: Correct AIX-5 ppc build flags.
+	Correct HP 11 64-bit gcc building. [Patch #601051] (martin)
+
+2002-10-15  Vince Darley  <vincentdarley@users.sourceforge.net>
+
+	* generic/tclCmdMZ.c:
+	* tests/trace.test: applied patch from Hemang Levana to fix
+	[Bug #615043] in execution traces with idle tasks firing.
+
+2002-10-14  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* generic/tclEnv.c (Tcl_PutEnv): correct possible mem leak.
+	[Patch #623269] (brouwers)
+
+2002-10-11  Donal K. Fellows  <fellowsd@cs.man.ac.uk>
+
+	* generic/tcl.h: Need a different strategy through the maze of
+	#defines to let people building with Cygwin build correctly.  Also
+	made some comments less misleading...
+
+2002-10-10  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* README: fixed minor nits [Bug #607776] (virden)
+
+	* win/configure:
+	* win/tcl.m4: enable USE_THREAD_ALLOC (new threaded allocator) by
+	default in cygwin configure on Windows.
+
+2002-10-10  Don Porter  <dgp@users.sourceforge.net>
+
+	* doc/Tcl.n:	Clarified that namespace separators are legal in
+			the variable names during $-subtitution. [Bug 615139]
+	
+	* doc/regexp.n:	Typo correction.  Thanks Ronnie Brunner. [Bug 606826]
+
+2002-10-10  Vince Darley  <vincentdarley@users.sourceforge.net>
+
+	* unix/tclLoadAout.c
+	* unix/tclLoadDl.c
+	* unix/tclLoadDld.c
+	* unix/tclLoadDyld.c
+	* unix/tclLoadNext.c
+	* unix/tclLoadOSF.c
+	* unix/tclLoadShl.c
+	* win/tclWinLoad.c: allow either full paths or simply dll names
+	to be specified when loading files (the latter will be looked
+	up by the OS on your PATH/LD_LIBRARY_PATH as appropriate).
+	Fixes [Bug 611108]
+
+2002-10-09  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* unix/README: doc'ed --enable-symbols options.
+	* unix/Makefile.in: removed @MEM_DEBUG_FLAGS@ subst.
+	* unix/configure: regen
+	* unix/configure.in: removed SC_ENABLE_MEMDEBUG call
+	* unix/tcl.m4: replaced SC_ENABLE_MEMDEBUG with a more intelligent
+	SC_ENABLE_SYMBOLS that takes yes|no|mem|compile|all as options now.
+
+2002-10-09  Kevin B. Kenny  <kennykb@acm.org>
+
+	* win/tclWinTime.c: Added code to set an exit handler that
+	terminates the thread that calibrates the performance counter, so
+	that the thread won't outlive unloading the Tcl DLL. [Tcl bug
+	620735].
+
+2002-10-09  Donal K. Fellows  <fellowsd@cs.man.ac.uk>
+
+	* doc/binary.n: More clarification of [binary scan]'s behaviour.
+
+2002-10-09  Daniel Steffen  <das@users.sourceforge.net>
+
+	* generic/tclIntDecls.h: fixed botched regen.
+
+2002-10-09  Daniel Steffen  <das@users.sourceforge.net>
+
+	* generic/tclInt.decls: made TclSetPreInitScript() declaration
+	generic as it is used on mac & aqua as well.
+	* generic/tclIntDecls.h:
+	* generic/tclStubInit.c: regen.
+	* generic/tclCompile.h: added prototype for TclCompileVariableCmd.
+
+	* mac/tclMacPort.h: removed incorrect <fcntl.h> definitions
+	and obsolete <stat.h> definitions.
+	* mac/tclMacChan.c: removed obsolete GetOpenMode() and replaced 
+	associated constants with the <fcntl.h> analogues (they existing
+	defs were inconsistent with <fcntl.h> which was causing havoc when
+	Tcl_GetOpenMode was used instead of private GetOpenMode).
+
+	* mac/tclMacFCmd.c: removed GenerateUniqueName(), use equivalent
+	(and identiaclly named) routine from MoreFiles instead.
+
+	* mac/tclMacLoad.c: CONSTification, fixes to Vince's last changes.
+
+	* mac/tclMacFile.c: 
+	* mac/tclMacTest.c:
+	* mac/tclMacUnix.c: CONSTification.
+
+	* mac/tclMacOSA.c: CONSTificcation, sprintf fixes, UH 3.4.x changes;
+	fix for missing autoname token from TclOSACompileCmd. (bdesgraupes)
+	* mac/AppleScript.html(AppleScript delete): doc fix. (bdesgraupes)
+
+	* mac/tcltkMacBuildSupport.sea.hqx: updated MoreFiles to 1.5.3, 
+	updated build instructions for 8.4.
+	* mac/tclMacProjects.sea.hqx: rebuilt archive.
+
+2002-10-09  Donal K. Fellows  <fellowsd@cs.man.ac.uk>
+
+	* doc/Alloc.3: Added a note to mention that attempting to allocate
+	a zero-length block can return NULL.  [Tk bug 619544]
+
+2002-10-04  Donal K. Fellows  <fellowsd@cs.man.ac.uk>
+
+	* doc/binary.n: Doc improvements [Patch 616480]
+
+	* tests/fCmd.test, tests/winFCmd.test:
+	* tools/eolFix.tcl, tools/genStubs.tcl: [file exist] -> [file exists]
+	Thanks to David Welton.
+
+2002-10-03  Don Porter  <dgp@users.sourceforge.net>
+
+	* doc/tcltest.n: fixed typo [Bug 618018].  Thanks to "JJM".
+
+2002-10-03  Donal K. Fellows  <fellowsd@cs.man.ac.uk>
+
+	* tools/man2help2.tcl: 
+	* tests/http.test, tests/httpd, tests/httpold.test: 
+	* tests/env.test, tests/binary.test, tests/autoMkindex.test: 
+	* library/init.tcl, library/http/http.tcl: [info exist] should
+	really be [info exists].  [Bug 602566]
+
+	* doc/lsearch.n: Better specification of what happens when -sorted
+	is mixed with other options. [Bug 617816]
+
+2002-10-01  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* generic/tclProc.c (TclCreateProc): mask out VAR_UNDEFINED for
+	precompiled locals to support 8.3 precompiled code.
+	(Tcl_ProcObjCmd): correct 2002-09-26 fix to look for tclProcBodyType.
+
+2002-10-01  Donal K. Fellows  <fellowsd@cs.man.ac.uk>
+
+	* doc/socket.n: Mentioned that ports may be specified as serivce
+	names as well as integers. [Bug 616843]
+
+2002-09-30  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* generic/tclCompCmds.c (TclCompileRegexpCmd): correct the
+	checking for bad re's that didn't terminate the re string.
+	Resultant compiles were correct, but much slower than necessary.
+
+2002-09-29  David Gravereaux <davygrvy@pobox.com>
+
+	* win/tclAppInit.c: Added proper exiting conditions using Win32
+	console signals.  This handles the existing lack of a Ctrl+C exit
+	to call exit handlers when built for thread support.  Also, properly
+	handles exits from other conditions such as CTRL_CLOSE_EVENT,
+	CTRL_LOGOFF_EVENT, and CTRL_SHUTDOWN_EVENT signals.  In all cases,
+	exit handlers will be called.  [Bug 219355]
+
+	* win/makefile.vc: Added missing tclThreadAlloc.c to the build
+	rules and defines USE_THREAD_ALLOC when TCL_THREADS is defined
+	to get the new behavior by default.
+
+2002-09-27  Don Porter  <dgp@users.sourceforge.net>
+
+	* README:		Bumped to version 8.4.1 to avoid confusion
+	* generic/tcl.h:	of CVS snapshots with the actual 8.4.0
+	* tools/tcl.wse.in:	release.
+	* unix/configure.in:
+	* unix/tcl.spec:
+	* win/configure.in:
+
+	* unix/configure:	autoconf
+	* win/configure:
+
+2002-09-26  Jeff Hobbs  <jeffh@ActiveState.com>
+
+	* unix/configure: regen.
+	* unix/tcl.m4: improve AIX-4/5 64bit compilation support.
+
+	* generic/tclProc.c (Tcl_ProcObjCmd): correct overeager
+	optimization of noop proc to handle the precompiled case. (sofer)
+
+	* unix/ldAix (nmopts): add -X32_64 to make it work for 32 or 64bit
+	mode compilation.
+
+	* library/encoding/koi8-u.enc: removed extraneous spaces that
+	confused encoding reader. [Bug #615115]
+
+	* unix/Makefile.in: generate source dists with -src designator and
+	do not generate .Z anymore (just .gz and .zip).
+
+2002-09-18  Mumit Khan <khan@nanotech.wisc.edu>
+
+	Added basic Cygwin support.
+
+	* win/tcl.m4 (SC_PATH_TCLCONFIG): Support one-tree build.
+	(SC_PATH_TKCONFIG): Likewise.
+	(SC_PROG_TCLSH): Likewise.
+	(SC_CONFIG_CFLAGS): Assume real Cygwin port and remove -mno-cygwin 
+	flags.  Add -mwin32 to extra_cflags and extra_ldflags.
+	Remove ``-e _WinMain@16'' from LDFLAGS_WINDOW.
+	* win/configure.in: Allow Cygwin build.
+	(SEH test): Define to be 1 instead of empty value.
+	(EXCEPTION_DISPOSITION): Add test.
+	* win/configure: Regenerate.
+
+	* generic/tcl.h: Don't explicitly define __WIN32__ for Cygwin, let
+	the user decide whether to use Windows or POSIX personality.
+	(TCL_WIDE_INT_TYPE, TCL_LL_MODIFIER, struct Tcl_StatBuf): Define
+	for Cygwin.
+	* generic/tclEnv.c (Tcl_CygwinPutenv): putenv replacement for
+	Cygwin.
+	* generic/tclFileName.c (Tcl_TranslateFileName): Convert POSIX 
+	to native format.
+	(TclDoGlob): Likewise.
+	* generic/tclPlatDecls.h (TCHAR): Define for Cygwin.
+	* win/tclWinPort.h (putenv, TclpSysAlloc, TclpSysFree, 
+	TclpSysRealloc): Define for Cygwin.
+
+2002-09-26  Daniel Steffen  <das@users.sourceforge.net>
+
+	* macosx/Makefile: preserve environment value of INSTALL_ROOT.
+	When embedding only use deployment build. Force relink before
+	embedded build to ensure new linker flags are picked up.
+
+	* macosx/Tcl.pbproj/project.pbxproj: add symbolic links to
+	debug lib, stub libs and tclConfig.sh in framework toplevel.
+	Configure target dependency fix. Fix to 'clean' action. Added
+	private tcl headers to framework. Install tclsh symbolic link.
+	Html doc build works when no installed tclsh available. Made
+	html doc structure in framework more like in Apple frameworks.
+
+2002-09-24  Donal K. Fellows  <fellowsd@cs.man.ac.uk>
+
+	* unix/tcl.m4 (SC_TCL_64BIT_FLAGS): Yet more robust 64-bit value
+	detection to close [Bug 613117] on more systems.
+
+	* generic/tclCompile.c (TclPrintSource): More CONSTifying.
+	* generic/tclExecute.c (EvalStatsCmd): Object-ify to reduce
+	warnings.  Thanks to 'CoderX2' on the chat for bringing this to my
+	attention...
+
+	* unix/tcl.m4: Forgot to define TCL_WIDE_INT_IS_LONG at the
+	appropriate moment.  I believe this is the cause of [Bug 613117]
+
+	* doc/lset.n: Changed 'list' to 'varName' for consistency with
+	lappend documentation.  Thanks to Glenn Jackman [Bug 611719]
+
+2002-09-22  Don Porter  <dgp@users.sourceforge.net>
+
+	* library/tcltest/tcltest.tcl:  Corrected [puts -nonewline] within
+	test bodies.  Thanks to Harald Kirsch.  [Bug 612786, Patch 612788]
+	Also corrected reporting of body return code.  Thanks to David
+	Taback [Bug 611922]
+	* library/tcltest/pkgIndex.tcl: Bump to version 2.2.1.
+	* tests/tcltest.test: added tests for these bugs.
+
+2002-09-15  Mo DeJong  <mdejong@users.sourceforge.net>
+
+	* unix/configure: Regen.
+	* unix/tcl.m4 (SC_CONFIG_CFLAGS): Add PEEK_XCLOSEIM
+	define under Linux. This is used by Tk to double
+	check that an X input context is cleaned up
+	before it is closed.
+
+2002-09-12  David Gravereaux <davygrvy@pobox.com>
+
+	* win/coffbase.txt: Added BLT to the virtual base address
+	listings table should BLT's build tools decide to use it.
+
+2002-09-12  Daniel Steffen  <das@users.sourceforge.net>
+
+	* generic/tcl.h:
+	* mac/tclMacApplication.r:
+	* mac/tclMacLibrary.r:
+	* mac/tclMacResource.r: unified use of the two equivalent 
+	resource compiler header inclusion defines RC_INVOKED and
+	RESOURCE_INCLUDED, now use RC_INVOKED throughout. 
+
+2002-09-10  Mo DeJong  <mdejong@users.sourceforge.net>
+
+	* unix/README: Add note about building extensions
+	with the same compiler Tcl was built with.
+	[Tk Bug 592096]
+
+2002-09-10  Daniel Steffen  <das@users.sourceforge.net>
+
+	* macosx/Tcl.pbproj/project.pbxproj: disabled building html
+	documentation during embedded build.
+
 2002-09-10  Daniel Steffen  <das@users.sourceforge.net>
 
 	* unix/Makefile.in: added DYLIB_INSTALL_DIR variable for macosx

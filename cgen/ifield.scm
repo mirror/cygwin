@@ -506,15 +506,17 @@
 ; This is easy to visualize, hard to put into words.
 ; Imagine several words of size DIWB laid out from the start of the insn.
 ; On top of that lay the ifield.
-; Now pick the set of words that are required to contain the ifield.
+; Now pick the minimal set of words that are required to contain the ifield.
 ; That's what we want.
 ; No claim is made that this is always the correct choice for any
 ; particular architecture.  For those where this isn't correct, the ifield
-; must be fully specified.
+; must be fully specified (i.e. word-offset,word-length explicitly specified).
 
 (define (-get-ifld-word-offset start flength diwb lsb0?)
   (if lsb0?
       ; Convert to non-lsb0 case, then it's easy.
+      ; NOTE: The conversion is seemingly wrong because `start' is misnamed.
+      ; It's now `end'.
       (set! start (+ (- start flength) 1)))
   (- start (remainder start diwb))
 )
@@ -528,6 +530,8 @@
 (define (-get-ifld-word-length start flength diwb lsb0?)
   (if lsb0?
       ; Convert to non-lsb0 case, then it's easy.
+      ; NOTE: The conversion is seemingly wrong because `start' is misnamed.
+      ; It's now `end'.
       (set! start (+ (- start flength) 1)))
   (* (quotient (+ (remainder start diwb) flength (- diwb 1))
 	       diwb)

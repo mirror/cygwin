@@ -1,7 +1,9 @@
-2000-11-02  Ben Elliston  <bje@redhat.com>
+2000-11-09  Doug Evans  <dje@casey.transmeta.com>
 
-	* doc/porting.texi (Building a GAS test suite): Document my change
-	to gas-build.sh.
+	* dev.scm: Add srcdir to %load-path.
+
+	* rtx-funcs.scm (subword): Mode of argument can be different
+	than mode of result, so don't use OP0 to specify argument's mode.
 
 2000-11-01  Ben Elliston  <bje@redhat.com>
 

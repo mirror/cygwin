@@ -189,8 +189,8 @@
 
 2001-03-20  Patrick Macdonald  <patrickm@redhat.com>
 
-	* desc-cpu.scm (@arch@_cgen_cpu_open): Correct machine calculation for
-	arg_type CGEN_CPU_OPEN_BFDMACH.
+	* desc-cpu.scm (@arch@_cgen_cpu_open): Correct machine calculation
+	for arg_type CGEN_CPU_OPEN_BFDMACH.
 
 2001-03-20  Ben Elliston  <bje@redhat.com>
 
@@ -327,7 +327,7 @@
 
 2000-12-01  Greg McGary  <greg@mcgary.org>
 
-	* desc.scm ((<keyword>,gen-defn): Prepend prefix to keyword names.
+	* desc.scm (<keyword>,gen-defn): Prepend prefix to keyword names.
 
 2000-12-01  Ben Elliston  <bje@redhat.com>
 

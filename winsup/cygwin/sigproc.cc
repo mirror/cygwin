@@ -41,8 +41,6 @@ details. */
 #define WSPX		   20000 // Wait for wait_sig to terminate
 #define WWSP		   20000 // Wait for wait_subproc to terminate
 
-#define WAIT_SIG_PRIORITY		THREAD_PRIORITY_TIME_CRITICAL
-
 #define TOTSIGS	(NSIG + __SIGOFFSET)
 
 #define wake_wait_subproc() SetEvent (events[0])
@@ -172,10 +170,12 @@ out:
 void __stdcall
 wait_for_sigthread ()
 {
-  assert (wait_sig_inited);
-  (void) WaitForSingleObject (wait_sig_inited, INFINITE);
-  (void) ForceCloseHandle (wait_sig_inited);
+  sigproc_printf ("wait_sig_inited %p", wait_sig_inited);
+  HANDLE hsig_inited = wait_sig_inited;
+  assert (hsig_inited);
+  (void) WaitForSingleObject (hsig_inited, INFINITE);
   wait_sig_inited = NULL;
+  (void) ForceCloseHandle1 (hsig_inited, wait_sig_inited);
 }
 
 /* Get the sync_proc_subproc muto to control access to
@@ -518,6 +518,12 @@ sig_dispatch_pending (int justwake)
 {
   if (!hwait_sig)
     return 0;
+  DWORD tid = GetCurrentThreadId ();
+
+  sigframe thisframe (mainthread);
+
+  if (tid == sigtid && !justwake)
+    justwake = 1;
 
   int was_pending = pending_signals;
 #ifdef DEBUGGING
@@ -531,7 +537,6 @@ sig_dispatch_pending (int justwake)
 #endif
   else
     {
-      assert (!wait_sig_inited);
       if (!justwake)
 	(void) sig_send (myself, __SIGFLUSH);
       else if (ReleaseSemaphore (sigcatch_nosync, 1, NULL))
@@ -546,6 +551,9 @@ sig_dispatch_pending (int justwake)
 	system_printf ("%E releasing sigcatch_nosync(%p)", sigcatch_nosync);
 
     }
+  if (was_pending && !justwake)
+    thisframe.call_signal_handler ();
+
   return was_pending;
 }
 
@@ -600,7 +608,7 @@ sigproc_terminate (void)
   hwait_sig = NULL;
 
   if (!sig_loop_wait)
-    sigproc_printf ("sigproc_terminate: sigproc handling not active");
+    sigproc_printf ("sigproc handling not active");
   else
     {
       sigproc_printf ("entering");
@@ -648,7 +656,8 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
     {
       if (no_signals_available ())
 	goto out;		// Either exiting or not yet initializing
-      assert (!wait_sig_inited);
+      if (wait_sig_inited)
+	wait_for_sigthread ();
       wait_for_completion = p != myself_nowait;
       p = myself;
     }
@@ -886,7 +895,7 @@ getsem (_pinfo *p, const char *str, int init, int max)
       sigproc_printf ("pid %d, ppid %d, wait %d, initializing %x", p->pid, p->ppid, wait,
 		  ISSTATE (p, PID_INITIALIZING));
       for (int i = 0; ISSTATE (p, PID_INITIALIZING) && i < wait; i++)
-	Sleep (1);
+	low_priority_sleep (1);
     }
 
   SetLastError (0);
@@ -1014,6 +1023,15 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
   return -potential_match;
 }
 
+static void
+talktome ()
+{
+  winpids pids;
+  for (unsigned i = 0; i < pids.npids; i++)
+    if (pids[i]->hello_pid == myself->pid)
+      pids[i]->commune_recv ();
+}
+
 /* Process signals by waiting for a semaphore to become signaled.
  * Then scan an in-memory array representing queued signals.
  * Executes in a separate thread.
@@ -1087,6 +1105,7 @@ wait_sig (VOID *self)
   for (;;)
     {
       DWORD rc = WaitForMultipleObjects (3, catchem, FALSE, sig_loop_wait);
+      (void) SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
 
       /* sigproc_terminate sets sig_loop_wait to zero to indicate that
        * this thread should terminate.
@@ -1141,6 +1160,10 @@ wait_sig (VOID *self)
 		/* Internal signal to turn on stracing. */
 		case __SIGSTRACE:
 		  strace.hello ();
+		  break;
+
+		case __SIGCOMMUNE:
+		  talktome ();
 		  break;
 
 		/* A normal UNIX signal */

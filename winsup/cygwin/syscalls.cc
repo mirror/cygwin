@@ -1,6 +1,6 @@
 /* syscalls.cc: syscalls
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -55,9 +55,6 @@ details. */
 
 SYSTEM_INFO system_info;
 
-static int __stdcall mknod_worker (const char *, mode_t, mode_t, _major_t,
-				   _minor_t);
-
 /* Close all files and process any queued deletions.
    Lots of unix style applications will open a tmp file, unlink it,
    but never call close.  This function is called by _exit to
@@ -78,23 +75,6 @@ close_all_files (void)
 
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
   cygwin_shared->delqueue.process_queue ();
-}
-
-BOOL __stdcall
-check_pty_fds (void)
-{
-  int res = FALSE;
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK, "check_pty_fds");
-  fhandler_base *fh;
-  for (int i = 0; i < (int) cygheap->fdtab.size; i++)
-    if ((fh = cygheap->fdtab[i]) != NULL &&
-	(fh->get_device () == FH_TTYS || fh->get_device () == FH_PTYM))
-      {
-	res = TRUE;
-	break;
-      }
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK, "check_pty_fds");
-  return res;
 }
 
 int
@@ -150,35 +130,46 @@ unlink (const char *ourname)
   if (!writable_directory (win32_name))
     {
       syscall_printf ("non-writable directory");
+      set_errno (EPERM);
       goto done;
     }
 
-  /* Check for shortcut as symlink condition. */
-  if (win32_name.has_attribute (FILE_ATTRIBUTE_READONLY))
+  /* Allow us to delete even if read-only */
+  SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
+  /* Attempt to use "delete on close" semantics to handle removing
+     a file which may be open. */
+  HANDLE h;
+  h = CreateFile (win32_name, 0, FILE_SHARE_READ, &sec_none_nih,
+		  OPEN_EXISTING, FILE_FLAG_DELETE_ON_CLOSE, 0);
+  if (h != INVALID_HANDLE_VALUE)
     {
-      int len = strlen (win32_name);
-      if (len > 4 && strcasematch ((char *) win32_name + len - 4, ".lnk"))
-	SetFileAttributes (win32_name, (DWORD) win32_name & ~FILE_ATTRIBUTE_READONLY);
+      (void) SetFileAttributes (win32_name, (DWORD) win32_name);
+      BOOL res = CloseHandle (h);
+      syscall_printf ("%d = CloseHandle (%p)", res, h);
+      if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
+	  || (!win32_name.isremote () && wincap.has_delete_on_close ()))
+	{
+	  syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) succeeded");
+	  goto ok;
+	}
+      else
+	{
+	  syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) failed");
+	  SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
+	}
+    }
+
+  /* Try a delete with attributes reset */
+  if (DeleteFile (win32_name))
+    {
+      syscall_printf ("DeleteFile after CreateFile/ClosHandle succeeded");
+      goto ok;
     }
 
   DWORD lasterr;
-  lasterr = 0;
-  for (int i = 0; i < 2; i++)
-    {
-      if (DeleteFile (win32_name))
-	{
-	  syscall_printf ("DeleteFile succeeded");
-	  goto ok;
-	}
+  lasterr = GetLastError ();
 
-      lasterr = GetLastError ();
-      if (i || lasterr != ERROR_ACCESS_DENIED || win32_name.issymlink ())
-	break;		/* Couldn't delete it. */
-
-      /* if access denied, chmod to be writable, in case it is not,
-	 and try again */
-      (void) chmod (win32_name, 0777);
-    }
+  (void) SetFileAttributes (win32_name, (DWORD) win32_name);
 
   /* Windows 9x seems to report ERROR_ACCESS_DENIED rather than sharing
      violation.  So, set lasterr to ERROR_SHARING_VIOLATION in this case
@@ -186,45 +177,6 @@ unlink (const char *ourname)
   if (wincap.access_denied_on_delete () && lasterr == ERROR_ACCESS_DENIED
       && !win32_name.isremote ())
     lasterr = ERROR_SHARING_VIOLATION;
-
-  /* Tried to delete file by normal DeleteFile and by resetting protection
-     and then deleting.  That didn't work.
-
-     There are two possible reasons for this:  1) The file may be opened and
-     Windows is not allowing it to be deleted, or 2) We may not have permissions
-     to delete the file.
-
-     So, first assume that it may be 1) and try to remove the file using the
-     Windows FILE_FLAG_DELETE_ON_CLOSE semantics.  This seems to work only
-     spottily on Windows 9x/Me but it does seem to work reliably on NT as
-     long as the file doesn't exist on a remote drive. */
-
-  bool delete_on_close_ok;
-
-  delete_on_close_ok  = !win32_name.isremote ()
-			&& wincap.has_delete_on_close ();
-
-  /* Attempt to use "delete on close" semantics to handle removing
-     a file which may be open. */
-  HANDLE h;
-  h = CreateFile (win32_name, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih,
-		  OPEN_EXISTING, FILE_FLAG_DELETE_ON_CLOSE, 0);
-  if (h == INVALID_HANDLE_VALUE)
-    {
-      if (GetLastError () == ERROR_FILE_NOT_FOUND)
-	goto ok;
-    }
-  else
-    {
-      CloseHandle (h);
-      syscall_printf ("CreateFile/CloseHandle succeeded");
-      /* Everything is fine if the file has disappeared or if we know that the
-	 FILE_FLAG_DELETE_ON_CLOSE will eventually work. */
-      if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
-	  || delete_on_close_ok)
-	goto ok;	/* The file is either gone already or will eventually be
-			   deleted by the OS. */
-    }
 
   /* FILE_FLAGS_DELETE_ON_CLOSE was a bust.  If this is a sharing
      violation, then queue the file for deletion when the process
@@ -305,11 +257,13 @@ setsid (void)
 
   if (myself->pgid != myself->pid)
     {
-      if (myself->ctty == TTY_CONSOLE
-	  && !cygheap->fdtab.has_console_fds ()
-	  && !check_pty_fds ())
-	FreeConsole ();
       myself->ctty = -1;
+      if (fhandler_console::open_fhs <= 0)
+	{
+	  syscall_printf ("open_fhs %d, freeing console",
+			  fhandler_console::open_fhs);
+	  FreeConsole ();
+	}
       myself->sid = getpid ();
       myself->pgid = getpid ();
       syscall_printf ("sid %d, pgid %d, ctty %d", myself->sid, myself->pgid, myself->ctty);
@@ -536,11 +490,6 @@ open (const char *unix_path, int flags, ...)
 	  if (!(fh = cygheap->fdtab.build_fhandler_from_name (fd, unix_path,
 							      NULL, pc)))
 	    res = -1;		// errno already set
-	  else if (fh->is_fs_special () && fh->device_access_denied (flags))
-	    {
-	      fd.release ();
-	      res = -1;
-	    }
 	  else if (!fh->open (&pc, flags, (mode & 07777) & ~cygheap->umask))
 	    {
 	      fd.release ();
@@ -643,8 +592,9 @@ link (const char *a, const char *b)
 {
   int res = -1;
   sigframe thisframe (mainthread);
-  path_conv real_a (a, PC_SYM_FOLLOW | PC_FULL);
+  path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
   path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
+  extern BOOL allow_winsymlinks;
 
   if (real_a.error)
     {
@@ -672,14 +622,20 @@ link (const char *a, const char *b)
       goto done;
     }
 
+  /* Shortcut hack. */
+  char new_lnk_buf[MAX_PATH + 5];
+  if (allow_winsymlinks && real_a.is_lnk_symlink () && !real_b.case_clash)
+    {
+      strcpy (new_lnk_buf, b);
+      strcat (new_lnk_buf, ".lnk");
+      b = new_lnk_buf;
+      real_b.check (b, PC_SYM_NOFOLLOW | PC_FULL);
+    }
   /* Try to make hard link first on Windows NT */
   if (wincap.has_hard_links ())
     {
       if (CreateHardLinkA (real_b, real_a, NULL))
-	{
-	  res = 0;
-	  goto done;
-	}
+	goto success;
 
       HANDLE hFileSource;
 
@@ -761,7 +717,13 @@ link (const char *a, const char *b)
       if (!bSuccess)
 	goto docopy;
 
+    success:
       res = 0;
+      if (!allow_winsymlinks && real_a.is_lnk_symlink ())
+	SetFileAttributes (real_b, (DWORD) real_a
+			           | FILE_ATTRIBUTE_SYSTEM
+				   | FILE_ATTRIBUTE_READONLY);
+
       goto done;
     }
 docopy:
@@ -805,20 +767,20 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 
       /* FIXME: This makes chown on a device succeed always.  Someday we'll want
 	 to actually allow chown to work properly on devices. */
-      if (win32_path.is_auto_device ())
+      if (win32_path.is_device ())
 	{
 	  res = 0;
 	  goto done;
 	}
 
-      DWORD attrib = 0;
+      mode_t attrib = 0;
       if (win32_path.isdir ())
 	attrib |= S_IFDIR;
       res = get_file_attribute (win32_path.has_acls (),
 				win32_path.get_win32 (),
-				(int *) &attrib);
+				&attrib);
       if (!res)
-         res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
+	 res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
 				   gid, attrib);
       if (res != 0 && (!win32_path.has_acls () || !allow_ntsec))
 	{
@@ -906,12 +868,6 @@ umask (mode_t mask)
   return oldmask;
 }
 
-int
-chmod_device (path_conv& pc, mode_t mode)
-{
-  return mknod_worker (pc, pc.dev.mode & S_IFMT, mode, pc.dev.major, pc.dev.minor);
-}
-
 /* chmod: POSIX 5.6.4.1 */
 extern "C" int
 chmod (const char *path, mode_t mode)
@@ -929,14 +885,9 @@ chmod (const char *path, mode_t mode)
 
   /* FIXME: This makes chmod on a device succeed always.  Someday we'll want
      to actually allow chmod to work properly on devices. */
-  if (win32_path.is_auto_device ())
+  if (win32_path.is_device ())
     {
       res = 0;
-      goto done;
-    }
-  if (win32_path.is_fs_special ())
-    {
-      res = chmod_device (win32_path, mode);
       goto done;
     }
 
@@ -961,7 +912,7 @@ chmod (const char *path, mode_t mode)
       else
 	(DWORD) win32_path |= FILE_ATTRIBUTE_READONLY;
 
-      if (S_ISLNK (mode) || S_ISSOCK (mode))
+      if (!win32_path.is_lnk_symlink () && S_ISLNK (mode) || S_ISSOCK (mode))
 	(DWORD) win32_path |= FILE_ATTRIBUTE_SYSTEM;
 
       if (!SetFileAttributes (win32_path, win32_path))
@@ -1032,15 +983,15 @@ fstat64 (int fd, struct __stat64 *buf)
     res = -1;
   else
     {
-      path_conv pc (cfd->get_win32_name (), PC_SYM_NOFOLLOW);
+      path_conv pc (cfd->get_name (), PC_SYM_NOFOLLOW);
       memset (buf, 0, sizeof (struct __stat64));
       res = cfd->fstat (buf, &pc);
-      if (!res)
+      if (!res && cfd->get_device () != FH_SOCKET)
 	{
 	  if (!buf->st_ino)
 	    buf->st_ino = hash_path_name (0, cfd->get_win32_name ());
 	  if (!buf->st_dev)
-	    buf->st_dev = cfd->get_device ();
+	    buf->st_dev = (cfd->get_device () << 16) | cfd->get_unit ();
 	  if (!buf->st_rdev)
 	    buf->st_rdev = buf->st_dev;
 	}
@@ -1125,12 +1076,12 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
 		    pc, (DWORD) real_path);
       memset (buf, 0, sizeof (*buf));
       res = fh->fstat (buf, pc);
-      if (!res)
+      if (!res && fh->get_device () != FH_SOCKET)
 	{
 	  if (!buf->st_ino)
 	    buf->st_ino = hash_path_name (0, fh->get_win32_name ());
 	  if (!buf->st_dev)
-	    buf->st_dev = fh->get_device ();
+	    buf->st_dev = (fh->get_device () << 16) | fh->get_unit ();
 	  if (!buf->st_rdev)
 	    buf->st_rdev = buf->st_dev;
 	}
@@ -1182,8 +1133,6 @@ cygwin_lstat (const char *name, struct __stat32 *buf)
   return ret;
 }
 
-extern int acl_access (const char *, int);
-
 extern "C" int
 access (const char *fn, int flags)
 {
@@ -1195,8 +1144,30 @@ access (const char *fn, int flags)
       return -1;
     }
 
-  if (allow_ntsec)
-    return acl_access (fn, flags);
+  path_conv real_path (fn, PC_SYM_FOLLOW | PC_FULL, stat_suffixes);
+  if (real_path.error)
+    {
+      set_errno (real_path.error);
+      return -1;
+    }
+
+  if (!real_path.exists ())
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
+
+  if (!(flags & (R_OK | W_OK | X_OK)))
+    return 0;
+
+  if (real_path.has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK))
+    {
+      set_errno (EACCES);
+      return -1;
+    }
+
+  if (real_path.has_acls () && allow_ntsec)
+    return check_file_access (real_path, flags);
 
   struct __stat64 st;
   int r = stat_worker (fn, &st, 0);
@@ -1275,16 +1246,12 @@ rename (const char *oldpath, const char *newpath)
 
   /* Shortcut hack. */
   char new_lnk_buf[MAX_PATH + 5];
-  if (real_old.issymlink () && !real_new.error && !real_new.case_clash)
+  if (real_old.is_lnk_symlink () && !real_new.error && !real_new.case_clash)
     {
-      int len_old = strlen (real_old.get_win32 ());
-      if (strcasematch (real_old.get_win32 () + len_old - 4, ".lnk"))
-	{
-	  strcpy (new_lnk_buf, newpath);
-	  strcat (new_lnk_buf, ".lnk");
-	  newpath = new_lnk_buf;
-	  real_new.check (newpath, PC_SYM_NOFOLLOW);
-	}
+      strcpy (new_lnk_buf, newpath);
+      strcat (new_lnk_buf, ".lnk");
+      newpath = new_lnk_buf;
+      real_new.check (newpath, PC_SYM_NOFOLLOW);
     }
 
   if (real_new.error || real_new.case_clash)
@@ -1314,9 +1281,8 @@ rename (const char *oldpath, const char *newpath)
     SetFileAttributes (real_new, (DWORD) real_new & ~FILE_ATTRIBUTE_READONLY);
 
   /* Shortcut hack No. 2, part 1 */
-  if (!real_old.issymlink () && !real_new.error && real_new.issymlink () &&
-      real_new.known_suffix && strcasematch (real_new.known_suffix, ".lnk") &&
-      (lnk_suffix = strrchr (real_new.get_win32 (), '.')))
+  if (!real_old.issymlink () && !real_new.error && real_new.is_lnk_symlink ()
+      && (lnk_suffix = strrchr (real_new.get_win32 (), '.')))
      *lnk_suffix = '\0';
 
   if (!MoveFile (real_old, real_new))
@@ -1390,31 +1356,50 @@ done:
   return res;
 }
 
+struct system_cleanup_args
+{
+  _sig_func_ptr oldint, oldquit;
+  sigset_t old_mask;
+};
+
+static void system_cleanup (void *args)
+{
+  struct system_cleanup_args *cleanup_args = (struct system_cleanup_args *) args;
+
+  signal (SIGINT, cleanup_args->oldint);
+  signal (SIGQUIT, cleanup_args->oldquit);
+  (void) sigprocmask (SIG_SETMASK, &cleanup_args->old_mask, 0);
+}
+
 extern "C" int
 system (const char *cmdstring)
 {
+  pthread_testcancel ();
+
   if (check_null_empty_str_errno (cmdstring))
     return -1;
 
   sigframe thisframe (mainthread);
   int res;
   const char* command[4];
-  _sig_func_ptr oldint, oldquit;
-  sigset_t child_block, old_mask;
+  struct system_cleanup_args cleanup_args;
+  sigset_t child_block;
 
   if (cmdstring == (const char *) NULL)
 	return 1;
 
-  oldint = signal (SIGINT, SIG_IGN);
-  oldquit = signal (SIGQUIT, SIG_IGN);
+  cleanup_args.oldint = signal (SIGINT, SIG_IGN);
+  cleanup_args.oldquit = signal (SIGQUIT, SIG_IGN);
   sigemptyset (&child_block);
   sigaddset (&child_block, SIGCHLD);
-  (void) sigprocmask (SIG_BLOCK, &child_block, &old_mask);
+  (void) sigprocmask (SIG_BLOCK, &child_block, &cleanup_args.old_mask);
 
   command[0] = "sh";
   command[1] = "-c";
   command[2] = cmdstring;
   command[3] = (const char *) NULL;
+
+  pthread_cleanup_push (system_cleanup, (void *) &cleanup_args);
 
   if ((res = spawnvp (_P_WAIT, "sh", command)) == -1)
     {
@@ -1423,9 +1408,8 @@ system (const char *cmdstring)
       res = 127;
     }
 
-  signal (SIGINT, oldint);
-  signal (SIGQUIT, oldquit);
-  (void) sigprocmask (SIG_SETMASK, &old_mask, 0);
+  pthread_cleanup_pop (1);
+
   return res;
 }
 
@@ -1524,7 +1508,7 @@ fpathconf (int fd, int v)
 	}
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
-      if (cfd->get_device () == FH_FS)
+      if (cfd->get_device () == FH_DISK)
 	return check_posix_perm (cfd->get_win32_name (), v);
       set_errno (EINVAL);
       return -1;
@@ -1566,7 +1550,7 @@ pathconf (const char *file, int v)
 	    set_errno (full_path.error);
 	    return -1;
 	  }
-	if (full_path.is_auto_device ())
+	if (full_path.is_device ())
 	  {
 	    set_errno (EINVAL);
 	    return -1;
@@ -1584,7 +1568,9 @@ ttyname (int fd)
 {
   cygheap_fdget cfd (fd);
   if (cfd < 0 || !cfd->is_tty ())
-    return 0;
+    {
+      return 0;
+    }
   return (char *) (cfd->ttyname ());
 }
 
@@ -1619,7 +1605,7 @@ _cygwin_istext_for_stdio (int fd)
       return 0;
     }
 
-  if (cfd->get_device () != FH_FS)
+  if (cfd->get_device () != FH_DISK)
     {
       syscall_printf (" _cifs: fd not disk file");
       return 0;
@@ -1939,16 +1925,6 @@ regfree ()
   return 0;
 }
 
-static int __stdcall
-mknod_worker (const char *path, mode_t type, mode_t mode, _major_t major,
-	      _minor_t minor)
-{
-  char buf[sizeof (":00000000:00000000:00000000") + MAX_PATH];
-  sprintf (buf, ":%x:%x:%x", major, minor,
-	   type | (mode & (S_IRWXU | S_IRWXG | S_IRWXO)));
-  return symlink_worker (buf, path, true, true);
-}
-
 /* mknod was the call to create directories before the introduction
    of mkdir in 4.2BSD and SVR3.  Use of mknod required superuser privs
    so the mkdir command had to be setuid root.
@@ -1956,56 +1932,16 @@ mknod_worker (const char *path, mode_t type, mode_t mode, _major_t major,
    fileutils) assume its existence so we must provide a stub that always
    fails. */
 extern "C" int
-mknod (const char *path, mode_t mode, dev_t dev)
+mknod (const char *_path, mode_t mode, dev_t dev)
 {
-  if (check_null_empty_str_errno (path))
-    return -1;
-
-  if (strlen (path) >= MAX_PATH)
-    return -1;
-
-  path_conv w32path (path, PC_SYM_NOFOLLOW | PC_FULL);
-  if (w32path.exists ())
-    {
-      set_errno (EEXIST);
-      return -1;
-    }
-
-  mode_t type = mode & S_IFMT;
-  _major_t major = dev >> 8 /* SIGH.  _major (dev) */;
-  _minor_t minor = dev & 0xff /* SIGH _minor (dev) */;
-  switch (type)
-    {
-    case S_IFCHR:
-    case S_IFBLK:
-      break;
-
-    case S_IFIFO:
-      major = _major (FH_FIFO);
-      minor = _minor (FH_FIFO) & 0xff; /* SIGH again */
-      break;
-
-    case 0:
-    case S_IFREG:
-      {
-	int fd = open (path, O_CREAT, mode);
-	if (fd < 0)
-	  return -1;
-	close (fd);
-	return 0;
-      }
-
-    default:
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  return mknod_worker (w32path, type, mode, major, minor);
+  set_errno (ENOSYS);
+  return -1;
 }
 
 extern "C" int
 mkfifo (const char *_path, mode_t mode)
 {
+  set_errno (ENOSYS);
   return -1;
 }
 
@@ -2013,19 +1949,12 @@ mkfifo (const char *_path, mode_t mode)
 extern "C" int
 seteuid32 (__uid32_t uid)
 {
-  debug_printf ("uid: %d myself->gid: %d", uid, myself->gid);
+  debug_printf ("uid: %u myself->gid: %u", uid, myself->gid);
 
-  if (!wincap.has_security ()
-      || (uid == myself->uid && !cygheap->user.groups.ischanged))
+  if (uid == myself->uid && !cygheap->user.groups.ischanged)
     {
       debug_printf ("Nothing happens");
       return 0;
-    }
-
-  if (uid == ILLEGAL_UID)
-    {
-      set_errno (EINVAL);
-      return -1;
     }
 
   sigframe thisframe (mainthread);
@@ -2038,6 +1967,8 @@ seteuid32 (__uid32_t uid)
   PSID origpsid, psid2 = NO_SID;
 
   pw_new = internal_getpwuid (uid);
+  if (!wincap.has_security () && pw_new)
+    goto success;
   if (!usersid.getfrompw (pw_new))
     {
       set_errno (EINVAL);
@@ -2093,7 +2024,8 @@ seteuid32 (__uid32_t uid)
 
   /* Set process def dacl to allow access to impersonated token */
   char dacl_buf[MAX_DACL_LEN (5)];
-  if (usersid != (origpsid =  cygheap->user.orig_sid ())) psid2 = usersid;
+  if (usersid != (origpsid = cygheap->user.orig_sid ()))
+    psid2 = usersid;
   if (sec_acl ((PACL) dacl_buf, FALSE, origpsid, psid2))
     {
       TOKEN_DEFAULT_DACL tdacl;
@@ -2156,18 +2088,18 @@ seteuid32 (__uid32_t uid)
       sav_token != cygheap->user.token &&
       sav_token_is_internal_token)
       CloseHandle (sav_token);
-  cygheap->user.set_name (pw_new->pw_name);
   cygheap->user.set_sid (usersid);
 success:
+  cygheap->user.set_name (pw_new->pw_name);
   myself->uid = uid;
   groups.ischanged = FALSE;
   return 0;
 
- failed:
+failed:
   cygheap->user.token = sav_token;
   cygheap->user.impersonated = sav_impersonated;
   if (cygheap->user.issetuid ()
-       && !ImpersonateLoggedOnUser (cygheap->user.token))
+      && !ImpersonateLoggedOnUser (cygheap->user.token))
     system_printf ("Impersonating in seteuid failed: %E");
   return -1;
 }
@@ -2195,26 +2127,50 @@ setuid (__uid16_t uid)
   return setuid32 (uid16touid32 (uid));
 }
 
+extern "C" int
+setreuid32 (__uid32_t ruid, __uid32_t euid)
+{
+  int ret = 0;
+  bool tried = false;
+  __uid32_t old_euid = myself->uid;
+
+  if (ruid != ILLEGAL_UID && cygheap->user.real_uid != ruid && euid != ruid)
+    tried = !(ret = seteuid32 (ruid));
+  if (!ret && euid != ILLEGAL_UID)
+    ret = seteuid32 (euid);
+  if (tried && (ret || euid == ILLEGAL_UID) && seteuid32 (old_euid))
+    system_printf ("Cannot restore original euid %u", old_euid);
+  if (!ret && ruid != ILLEGAL_UID)
+    cygheap->user.real_uid = ruid;
+  debug_printf ("real: %u, effective: %u", cygheap->user.real_uid, myself->uid);
+  return ret;
+}
+
+extern "C" int
+setreuid (__uid16_t ruid, __uid16_t euid)
+{
+  return setreuid32 (uid16touid32 (ruid), uid16touid32 (euid));
+}
+
 /* setegid: from System V.  */
 extern "C" int
 setegid32 (__gid32_t gid)
 {
-  if (!wincap.has_security () || gid == myself->gid)
-    return 0;
+  debug_printf ("new egid: %u current: %u", gid, myself->gid);
 
-  if (gid == ILLEGAL_GID)
+  if (gid == myself->gid || !wincap.has_security ())
     {
-      set_errno (EINVAL);
-      return -1;
+      myself->gid = gid;
+      return 0;
     }
 
   sigframe thisframe (mainthread);
   user_groups * groups = &cygheap->user.groups;
   cygsid gsid;
   HANDLE ptok;
-
   struct __group32 * gr = internal_getgrgid (gid);
-  if (!gr || gr->gr_gid != gid || !gsid.getfromgr (gr))
+
+  if (!gsid.getfromgr (gr))
     {
       set_errno (EINVAL);
       return -1;
@@ -2271,6 +2227,31 @@ setgid (__gid16_t gid)
   if (!ret)
     cygheap->user.real_gid = myself->gid;
   return ret;
+}
+
+extern "C" int
+setregid32 (__gid32_t rgid, __gid32_t egid)
+{
+  int ret = 0;
+  bool tried = false;
+  __gid32_t old_egid = myself->gid;
+
+  if (rgid != ILLEGAL_GID && cygheap->user.real_gid != rgid && egid != rgid)
+    tried = !(ret = setegid32 (rgid));
+  if (!ret && egid != ILLEGAL_GID)
+    ret = setegid32 (egid);
+  if (tried && (ret || egid == ILLEGAL_GID) && setegid32 (old_egid))
+    system_printf ("Cannot restore original egid %u", old_egid);
+  if (!ret && rgid != ILLEGAL_GID)
+    cygheap->user.real_gid = rgid;
+  debug_printf ("real: %u, effective: %u", cygheap->user.real_gid, myself->gid);
+  return ret;
+}
+
+extern "C" int
+setregid (__gid16_t rgid, __gid16_t egid)
+{
+  return setregid32 (gid16togid32 (rgid), gid16togid32 (egid));
 }
 
 /* chroot: privileged Unix system call.  */
@@ -2475,6 +2456,7 @@ login (struct utmp *ut)
   register int fd;
 
   pututline (ut);
+  endutent ();
   if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
     {
       (void) write (fd, (char *) ut, sizeof (struct utmp));
@@ -2522,8 +2504,8 @@ logout (char *line)
 	      /* Found the entry for LINE; mark it as logged out.  */
 	      {
 		/* Zero out entries describing who's logged in.  */
-		bzero (ut->ut_name, sizeof (ut->ut_name));
-		bzero (ut->ut_host, sizeof (ut->ut_host));
+		memset (ut->ut_name, 0, sizeof (ut->ut_name));
+		memset (ut->ut_host, 0, sizeof (ut->ut_host));
 		time (&ut->ut_time);
 
 		/* Now seek back to the position in utmp at which UT occured,
@@ -2554,10 +2536,9 @@ setutent ()
 {
   sigframe thisframe (mainthread);
   if (utmp_fd == -2)
-    {
-      utmp_fd = open (utmp_file, O_RDWR);
-    }
-  lseek (utmp_fd, 0, SEEK_SET);
+    utmp_fd = open (utmp_file, O_RDWR);
+  else
+    lseek (utmp_fd, 0, SEEK_SET);
 }
 
 extern "C" void

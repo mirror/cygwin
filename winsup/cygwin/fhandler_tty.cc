@@ -1,6 +1,6 @@
 /* fhandler_tty.cc
 
-   Copyright 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -35,15 +35,9 @@ static DWORD WINAPI process_input (void *);		// Input queue thread
 static DWORD WINAPI process_output (void *);		// Output queue thread
 static DWORD WINAPI process_ioctl (void *);		// Ioctl requests thread
 
-fhandler_tty_master::fhandler_tty_master ()
-  : fhandler_pty_master (), console (NULL)
+fhandler_tty_master::fhandler_tty_master (int unit)
+  : fhandler_pty_master (FH_TTYM, unit), console (NULL)
 {
-}
-
-int
-fhandler_tty_slave::get_unit ()
-{
-  return dev == FH_TTY ? myself->ctty : dev.minor;
 }
 
 void
@@ -57,11 +51,9 @@ fhandler_tty_master::set_winsize (bool sendSIGWINCH)
 }
 
 int
-fhandler_tty_master::init ()
+fhandler_tty_master::init (int ntty)
 {
-  termios_printf ("Creating master for tty%d", get_unit ());
-
-  slave = dev;
+  termios_printf ("Creating master for tty%d", ntty);
 
   if (init_console ())
     {
@@ -73,7 +65,9 @@ fhandler_tty_master::init ()
   memset (&ti, 0, sizeof (ti));
   console->tcsetattr (0, &ti);
 
-  cygwin_shared->tty[get_unit ()]->common_init (this);
+  ttynum = ntty;
+
+  cygwin_shared->tty[ttynum]->common_init (this);
 
   set_winsize (false);
 
@@ -217,7 +211,9 @@ process_input (void *)
     {
       size_t nraw = INP_BUFFER_SIZE;
       tty_master->console->read ((void *) rawbuf, nraw);
-      (void) tty_master->line_edit (rawbuf, nraw, tty_master->get_ttyp ()->ti);
+      if (tty_master->line_edit (rawbuf, nraw, tty_master->get_ttyp ()->ti)
+	  == line_edit_signalled)
+	tty_master->console->eat_readahead (-1);
     }
 }
 
@@ -430,8 +426,14 @@ process_ioctl (void *)
 /**********************************************************************/
 /* Tty slave stuff */
 
+fhandler_tty_slave::fhandler_tty_slave (int num)
+  : fhandler_tty_common (FH_TTYS, num)
+{
+  set_r_no_interrupt (1);
+}
+
 fhandler_tty_slave::fhandler_tty_slave ()
-  : fhandler_tty_common ()
+  : fhandler_tty_common (FH_TTYS, 0)
 {
   set_r_no_interrupt (1);
 }
@@ -441,10 +443,10 @@ fhandler_tty_slave::fhandler_tty_slave ()
 int
 fhandler_tty_slave::open (path_conv *, int flags, mode_t)
 {
-  tcinit (cygwin_shared->tty[get_unit ()]);
+  tcinit (cygwin_shared->tty[ttynum]);
 
-  attach_tty (get_unit ());
-  tc->set_ctty (get_unit (), flags);
+  attach_tty (ttynum);
+  tc->set_ctty (ttynum, flags);
 
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   /* Create synchronisation events */
@@ -455,7 +457,7 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
      startup if use_tty is non-zero.  It will not exist if this is a
      pty opened by fhandler_pty_master::open.  In the former case, tty
      output is handled by a separate thread which controls output.  */
-  __small_sprintf (buf, OUTPUT_DONE_EVENT, get_unit ());
+  __small_sprintf (buf, OUTPUT_DONE_EVENT, ttynum);
   output_done_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf);
 
   if (!(output_mutex = get_ttyp ()->open_output_mutex ()))
@@ -470,7 +472,7 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
       __seterrno ();
       return 0;
     }
-  __small_sprintf (buf, INPUT_AVAILABLE_EVENT, get_unit ());
+  __small_sprintf (buf, INPUT_AVAILABLE_EVENT, ttynum);
   if (!(input_available_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf)))
     {
       termios_printf ("open input event failed, %E");
@@ -480,9 +482,9 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
 
   /* The ioctl events may or may not exist.  See output_done_event,
      above.  */
-  __small_sprintf (buf, IOCTL_REQUEST_EVENT, get_unit ());
+  __small_sprintf (buf, IOCTL_REQUEST_EVENT, ttynum);
   ioctl_request_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf);
-  __small_sprintf (buf, IOCTL_DONE_EVENT, get_unit ());
+  __small_sprintf (buf, IOCTL_DONE_EVENT, ttynum);
   ioctl_done_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf);
 
   /* FIXME: Needs a method to eliminate tty races */
@@ -516,7 +518,7 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
       if (tty_owner == NULL)
 	{
 	  termios_printf ("can't open tty (%d) handle process %d",
-			  get_unit (), get_ttyp ()->master_pid);
+			  ttynum, get_ttyp ()->master_pid);
 	  __seterrno ();
 	  return 0;
 	}
@@ -550,9 +552,25 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
   set_output_handle (to_master_local);
 
   set_open_status ();
-  termios_printf ("tty%d opened", get_unit ());
+  if (!output_done_event)
+    {
+      fhandler_console::open_fhs++;
+      termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
+    }
+  termios_printf ("tty%d opened", ttynum);
 
   return 1;
+}
+
+int
+fhandler_tty_slave::close ()
+{
+  if (!output_done_event && !cygheap->fdtab.in_vfork_cleanup ())
+    {
+      fhandler_console::open_fhs--;
+      termios_printf ("decremented open_fhs %d", fhandler_console::open_fhs);
+    }
+  return fhandler_tty_common::close ();
 }
 
 int
@@ -595,7 +613,7 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
 {
   DWORD n, towrite = len;
 
-  termios_printf ("tty%d, write(%x, %d)", get_unit (), ptr, len);
+  termios_printf ("tty%d, write(%x, %d)", ttynum, ptr, len);
 
   acquire_output_mutex (INFINITE);
 
@@ -812,15 +830,27 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 }
 
 int
+fhandler_tty_slave::dup (fhandler_base *child)
+{
+  if (!output_done_event)
+    {
+      fhandler_console::open_fhs++;
+      termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
+    }
+  return fhandler_tty_common::dup (child);
+}
+
+int
 fhandler_tty_common::dup (fhandler_base *child)
 {
   fhandler_tty_slave *fts = (fhandler_tty_slave *) child;
   int errind;
 
+  fts->ttynum = ttynum;
   fts->tcinit (get_ttyp ());
 
-  attach_tty (get_unit ());
-  tc->set_ctty (get_unit (), openflags);
+  attach_tty (ttynum);
+  tc->set_ctty (ttynum, openflags);
 
   HANDLE nh;
 
@@ -935,7 +965,7 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
   termios_printf ("ioctl (%x)", cmd);
 
   if (myself->pgid && get_ttyp ()->getpgid () != myself->pgid
-      && myself->ctty == get_unit () && (get_ttyp ()->ti.c_lflag & TOSTOP))
+      && myself->ctty == ttynum && (get_ttyp ()->ti.c_lflag & TOSTOP))
     {
       /* background process */
       termios_printf ("bg ioctl pgid %d, tpgid %d, ctty %d",
@@ -1002,26 +1032,24 @@ out:
 /*******************************************************
  fhandler_pty_master
 */
-fhandler_pty_master::fhandler_pty_master ()
-  : fhandler_tty_common ()
+fhandler_pty_master::fhandler_pty_master (DWORD devtype, int unit)
+  : fhandler_tty_common (devtype, unit)
 {
 }
 
 int
 fhandler_pty_master::open (path_conv *, int flags, mode_t)
 {
-  int ntty = cygwin_shared->tty.allocate_tty (0);
-  if (ntty < 0)
+  ttynum = cygwin_shared->tty.allocate_tty (0);
+  if (ttynum < 0)
     return 0;
 
-  slave = *ttys_dev;
-  slave.setunit (ntty);
-  cygwin_shared->tty[ntty]->common_init (this);
+  cygwin_shared->tty[ttynum]->common_init (this);
   inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 
-  termios_printf ("opened pty master tty%d", get_unit ());
+  termios_printf ("opened pty master tty%d<%p>", ttynum, this);
   return 1;
 }
 
@@ -1056,7 +1084,7 @@ fhandler_tty_common::close ()
     termios_printf ("CloseHandle (get_output_handle ()<%p>), %E", get_output_handle ());
 
   inuse = NULL;
-  termios_printf ("tty%d <%p,%p> closed", get_unit (), get_handle (), get_output_handle ());
+  termios_printf ("tty%d <%p,%p> closed", ttynum, get_handle (), get_output_handle ());
   return 0;
 }
 
@@ -1067,11 +1095,11 @@ fhandler_pty_master::close ()
   while (accept_input () > 0)
     continue;
 #endif
-  this->fhandler_tty_common::close ();
+  fhandler_tty_common::close ();
 
   if (!get_ttyp ()->master_alive ())
     {
-      termios_printf ("freeing tty%d (%d)", get_unit (), get_ttyp ()->ntty);
+      termios_printf ("freeing tty%d (%d)", ttynum, get_ttyp ()->ntty);
 #if 0
       if (get_ttyp ()->to_slave)
 	ForceCloseHandle1 (get_ttyp ()->to_slave, to_slave);
@@ -1118,14 +1146,14 @@ fhandler_pty_master::read (void *ptr, size_t& len)
 int
 fhandler_pty_master::tcgetattr (struct termios *t)
 {
-  *t = cygwin_shared->tty[get_unit ()]->ti;
+  *t = cygwin_shared->tty[ttynum]->ti;
   return 0;
 }
 
 int
 fhandler_pty_master::tcsetattr (int, const struct termios *t)
 {
-  cygwin_shared->tty[get_unit ()]->ti = *t;
+  cygwin_shared->tty[ttynum]->ti = *t;
   return 0;
 }
 
@@ -1165,11 +1193,11 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 }
 
 char *
-fhandler_pty_master::ptsname ()
+fhandler_pty_master::ptsname (void)
 {
   static char buf[32];
 
-  __small_sprintf (buf, "/dev/tty%d", get_unit ());
+  __small_sprintf (buf, "/dev/tty%d", ttynum);
   return buf;
 }
 
@@ -1177,7 +1205,7 @@ void
 fhandler_tty_common::set_close_on_exec (int val)
 {
 #ifndef DEBUGGING
-  this->fhandler_base::set_close_on_exec (val);
+  fhandler_base::set_close_on_exec (val);
 #else
   /* FIXME: This is a duplication from fhandler_base::set_close_on_exec.
      It is here because we need to specify the "from_pty" stuff here or
@@ -1200,9 +1228,20 @@ fhandler_tty_common::set_close_on_exec (int val)
 }
 
 void
+fhandler_tty_slave::fixup_after_fork (HANDLE parent)
+{
+  if (!output_done_event)
+    {
+      fhandler_console::open_fhs++;
+      termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
+    }
+  fhandler_tty_common::fixup_after_fork (parent);
+}
+
+void
 fhandler_tty_common::fixup_after_fork (HANDLE parent)
 {
-  this->fhandler_termios::fixup_after_fork (parent);
+  fhandler_termios::fixup_after_fork (parent);
   if (output_done_event)
     fork_fixup (parent, output_done_event, "output_done_event");
   if (ioctl_request_event)
@@ -1221,7 +1260,7 @@ fhandler_tty_common::fixup_after_fork (HANDLE parent)
 void
 fhandler_pty_master::set_close_on_exec (int val)
 {
-  this->fhandler_tty_common::set_close_on_exec (val);
+  fhandler_tty_common::set_close_on_exec (val);
 
   /* FIXME: There is a console handle leak here. */
   if (get_ttyp ()->master_pid == GetCurrentProcessId ())
@@ -1236,7 +1275,7 @@ fhandler_pty_master::set_close_on_exec (int val)
 void
 fhandler_tty_master::fixup_after_fork (HANDLE child)
 {
-  this->fhandler_pty_master::fixup_after_fork (child);
+  fhandler_pty_master::fixup_after_fork (child);
   console->fixup_after_fork (child);
 }
 
@@ -1250,8 +1289,7 @@ fhandler_tty_master::fixup_after_exec (HANDLE)
 int
 fhandler_tty_master::init_console ()
 {
-  console = (fhandler_console *)
-    cygheap->fdtab.build_fhandler (-1, *console_dev, "/dev/ttym");
+  console = (fhandler_console *) cygheap->fdtab.build_fhandler (-1, FH_CONSOLE, "/dev/ttym");
   if (console == NULL)
     return -1;
 

@@ -491,7 +491,7 @@
   (let ((machs (atlist-attr-value-no-default atlist 'MACH obj)))
     (if (null? machs)
 	#t
-	(keep-mach? (map string->symbol (string-cut machs #\,)))))
+	(keep-mach? (bitset-attr->list machs))))
 )
 
 ; Return a boolean indicating if the object containing ATLIST is to be kept.
@@ -607,7 +607,7 @@
 
 (define (keep-isa-atlist? atlist obj)
   (let ((isas (atlist-attr-value atlist 'ISA obj)))
-    (keep-isa? (map string->symbol (string-cut isas #\,))))
+    (keep-isa? (bitset-attr->list isas)))
 )
 
 ; Return non-#f if object OBJ is to be kept, according to its ISA attribute.
@@ -815,16 +815,16 @@ Define a preprocessor-style macro.
   (case (car test)
     ((keep-isa?)
      (if (keep-isa? (cadr test))
-	 (eval then)
+	 (eval1 then)
 	 (if (null? else)
 	     #f
-	     (eval (car else)))))
+	     (eval1 (car else)))))
     ((keep-mach?)
      (if (keep-mach? (cadr test))
-	 (eval then)
+	 (eval1 then)
 	 (if (null? else)
 	     #f
-	     (eval (car else))))))
+	     (eval1 (car else))))))
 )
 
 ; Top level routine for loading .cpu files.

@@ -516,7 +516,7 @@
    (lambda (ops)
      ; OPS is a list of operands with the same name that for whatever reason
      ; were defined separately.
-     (logit 3 (string-append "Processing " (obj:name (car ops)) " " what " ...\n"))
+     (logit 3 (string-append "Processing " (obj:str-name (car ops)) " " what " ...\n"))
      (if (= (length ops) 1)
 	 (gen-obj-sanitize
 	  (car ops)
@@ -559,7 +559,7 @@
  (lambda (self what)
    (let ((handlers (elm-get self 'handlers)))
      (let ((fn (assq-ref handlers what)))
-       (and fn (string-append what "_" (car fn))))))
+       (and fn (string-append (symbol->string what) "_" (car fn))))))
 )
 
 ; Interface fns.
@@ -709,7 +709,9 @@
 ; it up into manageable chunks.
 
 (define (read-cpu.opc srcdir cpu delim)
-  (let ((file (string-append srcdir "/cpu/" (current-arch-name) ".opc"))
+  (let ((file (string-append srcdir "/cpu/"
+			     (symbol->string (current-arch-name))
+			     ".opc"))
 	(start-delim (string-append "/* -- " delim))
 	(end-delim "/* -- "))
     (if (file-exists? file)

@@ -504,7 +504,7 @@ static unsigned int dis_hash_insn PARAMS ((const char *, CGEN_INSN_INT));
     "  {\n"
     "    "
     "-1, " ; macro-insns are not currently enumerated, no current need to
-    "\"" (obj:name minsn) "\", "
+    "\"" (obj:str-name minsn) "\", "
     "\"" (minsn-mnemonic minsn) "\",\n"
     "    " (gen-syntax-entry "MNEM" "OP" (minsn-syntax minsn)) ",\n"
     "    (PTR) & macro_" (gen-sym minsn) "_expansions[0],\n"
@@ -525,7 +525,7 @@ static unsigned int dis_hash_insn PARAMS ((const char *, CGEN_INSN_INT));
     "  {\n"
     "    "
     "-1, " ; macro-insns are not currently enumerated, no current need to
-    "\"" (obj:name minsn) "\", "
+    "\"" (obj:str-name minsn) "\", "
     "\"" (minsn-mnemonic minsn) "\",\n"
     "    " (gen-syntax-entry "MNEM" "OP" (minsn-syntax minsn)) ",\n"
     "    (PTR) & macro_" (gen-sym minsn) "_expansions[0],\n"

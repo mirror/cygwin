@@ -134,7 +134,7 @@
 
 (define (ifield? x) (class-instance? <ifield> x))
 
-; Return ilk of field.
+; Return ilk of field as a string.
 ; ("ilk" sounds klunky but "type" is too ambiguous.  Here "ilk" means
 ; the kind of the hardware element, enum, etc.)
 ; The result is a character string naming the field type.
@@ -144,7 +144,7 @@
     ; ??? One could require that the `value' field always be an object.
     ; I can't get too worked up over it yet.
     (if (object? value)
-	(obj:name value) ; send's message 'get-name to fetch object's `name'
+	(symbol->string (obj:name value)) ; send 'get-name to fetch the name
 	"#")) ; # -> "it's a number"
 )
 

@@ -200,7 +200,7 @@
 
 ; List of all classes.
 
-(define -class-list ())
+(define -class-list '())
 
 ; ??? Were written as a procedures for Hobbit's sake (I think).
 (define -object-unspecified #:unspecified)
@@ -331,7 +331,7 @@
 (define (-class-parent-classes class)
   ; -class-parents returns the names, we want the actual classes.
   (let loop ((parents (-class-parents class))
-	     (result ()))
+	     (result '()))
     (if (null? parents)
 	(reverse! result)
 	(let ((parent (class-lookup (car parents))))
@@ -420,7 +420,7 @@
 
       (append! result
 	       (let loop ((parents (-class-parents class))
-			  (parent-descs ())
+			  (parent-descs '())
 			  (base-offset base-offset))
 		 (if (null? parents)
 		     (reverse! parent-descs)
@@ -646,7 +646,7 @@
     ; offset).
     ; Elements are recorded as (symbol initial-value private? . vector-index)
     ; FIXME: For now all elements are marked as "public".
-    (let loop ((elm-list-tmp ()) (index 0) (elms elms))
+    (let loop ((elm-list-tmp '()) (index 0) (elms elms))
       (if (null? elms)
 	  (set! elm-list (reverse! elm-list-tmp)) ; done
 	  (if (pair? (car elms))
@@ -725,7 +725,7 @@
 					  (list 'quote elm) elm))
 		      args)
 		 '(self))))
-    (method-make! class 'make! (eval lambda-expr))
+    (method-make! class 'make! (eval1 lambda-expr))
     )
 )
 
@@ -733,7 +733,7 @@
 ; This puts all that in a cover function.
 
 (define (make class . operands)
-  (apply send (append (cons (new class) ()) '(make!) operands))
+  (apply send (append (cons (new class) '()) '(make!) operands))
 )
 
 ; Return #t if class X is a subclass of BASE-NAME.
@@ -1047,12 +1047,12 @@
   (for-each (lambda (method-name)
 	      (method-make!
 	       class method-name
-	       (eval `(lambda args
-			(apply send
-			       (cons (elm-get (car args)
-					      (quote ,elm-name))
-				     (cons (quote ,method-name)
-					   (cdr args))))))))
+	       (eval1 `(lambda args
+			 (apply send
+				(cons (elm-get (car args)
+					       (quote ,elm-name))
+				      (cons (quote ,method-name)
+					    (cdr args))))))))
 	    methods)
   -object-unspecified
 )
@@ -1064,12 +1064,12 @@
   (for-each (lambda (method-name)
 	      (method-make-virtual!
 	       class method-name
-	       (eval `(lambda args
-			(apply send
-			       (cons (elm-get (car args)
-					      (quote ,elm-name))
-				     (cons (quote ,method-name)
-					   (cdr args))))))))
+	       (eval1 `(lambda args
+			 (apply send
+				(cons (elm-get (car args)
+					       (quote ,elm-name))
+				      (cons (quote ,method-name)
+					    (cdr args))))))))
 	    methods)
   -object-unspecified
 )
@@ -1230,7 +1230,7 @@
 ; Reset the object system (delete all classes).
 
 (define (object-reset!)
-  (set! -class-list ())
+  (set! -class-list '())
   -object-unspecified
 )
 

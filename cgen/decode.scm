@@ -91,11 +91,11 @@
 		 (lambda (elm)
 		   (case (dtable-entry-type elm)
 		     ((insn)
-		      (string-append " " (obj:name (dtable-entry-value elm))))
+		      (stringsym-append " " (obj:name (dtable-entry-value elm))))
 		     ((table)
-		      (string-append " " (subdtable-name (dtable-entry-value elm))))
+		      (stringsym-append " " (subdtable-name (dtable-entry-value elm))))
 		     ((expr)
-		      (string-append " " (exprtable-name (dtable-entry-value elm))))
+		      (stringsym-append " " (exprtable-name (dtable-entry-value elm))))
 		     (else (error "bad dtable entry type:"
 				  (dtable-entry-type elm)))))
 		 (dtable-guts-entries subtable-guts)))))
@@ -145,7 +145,7 @@
 
 (define (-gen-exprtable-name insn-exprs)
   (string-map (lambda (x)
-		(string-append (obj:name (exprtable-entry-insn x))
+		(string-append (obj:str-name (exprtable-entry-insn x))
 			       "-"
 			       (rtx-strdump (exprtable-entry-expr x))))
 	      insn-exprs)
@@ -464,7 +464,7 @@
 ; Each "slot" is a list of matching instructions.
 
 (define (-fill-slot! insn-vec insn bitnums lsb0?)
-  ;(display (string-append "fill-slot!: " (obj:name insn) " ")) (display bitnums) (newline)
+  ;(display (string-append "fill-slot!: " (obj:str-name insn) " ")) (display bitnums) (newline)
   (let ((slot-nums (-opcode-slots insn bitnums lsb0?)))
     ;(display (list "Filling slot(s)" slot-nums "...")) (newline)
     (for-each (lambda (slot-num)
@@ -597,7 +597,7 @@
 			(message "WARNING: Decoder ambiguity detected: "
 				 (string-drop1 ; drop leading comma
 				  (string-map (lambda (insn)
-						(string-append ", " (obj:name insn)))
+						(string-append ", " (obj:str-name insn)))
 					      slot))
 				 "\n"))
 			; Things aren't entirely hopeless.  We've warned about the ambiguity.

@@ -96,7 +96,7 @@
 (define model:units (elm-make-getter <model> 'units))
 
 (define (model:enum m)
-  (gen-c-symbol (string-append "MODEL_" (string-upcase (obj:name m))))
+  (gen-c-symbol (string-append "MODEL_" (string-upcase (obj:str-name m))))
 )
 
 (define (models-for-mach mach)
@@ -147,7 +147,7 @@
   (logit 2 "Processing model " name " ...\n")
   (let ((name (parse-name name errtxt))
 	; FIXME: switch to `context' like in cver.
-	(errtxt (string-append errtxt " " name))
+	(errtxt (stringsym-append errtxt " " name))
 	(mach (current-mach-lookup mach-name)))
     (if (null? units)
 	(parse-error errtxt "there must be at least one function unit" name))
@@ -280,7 +280,7 @@
 		 (if model
 		     (-insn-timing-parse-model context model
 					       (cdr model-timing-desc))
-		     ()))))
+		     '()))))
        insn-timing-desc)
 )
 

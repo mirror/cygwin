@@ -322,7 +322,7 @@
 ;                 ??? Could just call this gen-set as there is no gen-set-trace
 ;                 but for consistency with the messages passed to operands
 ;                 we use this same.
-; gen-type      - C type to use to record value.
+; gen-type      - C type to use to record value, as a string.
 ;                 ??? Delete and just use get-mode?
 ; save-index?   - return #t if an index needs to be saved for parallel
 ;                 execution post-write processing
@@ -677,7 +677,7 @@
 
 (define (gen-reg-access-defn hw prefix type scalar? get-code set-code)
   (string-append
-   "/* Get the value of " (obj:name hw) ".  */\n\n"
+   "/* Get the value of " (obj:str-name hw) ".  */\n\n"
    type "\n"
    (gen-reg-getter-fn hw prefix)
    " (SIM_CPU *current_cpu"
@@ -685,7 +685,7 @@
    ")\n{\n"
    get-code
    "}\n\n"
-   "/* Set a value for " (obj:name hw) ".  */\n\n"
+   "/* Set a value for " (obj:str-name hw) ".  */\n\n"
    "void\n"
    (gen-reg-setter-fn hw prefix)
    " (SIM_CPU *current_cpu, "
@@ -706,7 +706,7 @@
 		   mode))
 	 (default-selector? (hw-selector-default? selector)))
      (cx:make mode
-	      (string-append "GETMEM" (obj:name mode)
+	      (string-append "GETMEM" (obj:str-name mode)
 			     (if default-selector? "" "ASI")
 			     " ("
 			     "current_cpu, pc, "
@@ -725,7 +725,7 @@
 		   (hw-mode self)
 		   mode))
 	 (default-selector? (hw-selector-default? selector)))
-     (string-append "SETMEM" (obj:name mode)
+     (string-append "SETMEM" (obj:str-name mode)
 		    (if default-selector? "" "ASI")
 		    " ("
 		    "current_cpu, pc, "
@@ -1834,7 +1834,7 @@ struct scache {
   (string-append
    "const char *mode_names[] = {\n"
    (string-map (lambda (m)
-		 (string-append "  \"" (string-upcase (obj:name m)) "\",\n"))
+		 (string-append "  \"" (string-upcase (obj:str-name m)) "\",\n"))
 	       ; We don't treat aliases as being different from the real
 	       ; mode here, so ignore them.
 	       (mode-list-non-alias-values))
@@ -1900,7 +1900,7 @@ struct scache {
 
     (define-full-insn 'x-begin "pbb begin handler"
       `(VIRTUAL PBB (ISA ,all))
-      "--begin--" () () '(c-code VOID "\
+      "--begin--" '() '() '(c-code VOID "\
   {
 #if WITH_SCACHE_PBB_@PREFIX@
 #if defined DEFINE_SWITCH || defined FAST_P
@@ -1920,7 +1920,7 @@ struct scache {
 
     (define-full-insn 'x-chain "pbb chain handler"
       `(VIRTUAL PBB (ISA ,all))
-      "--chain--" () () '(c-code VOID "\
+      "--chain--" '() '() '(c-code VOID "\
   {
 #if WITH_SCACHE_PBB_@PREFIX@
     vpc = @prefix@_pbb_chain (current_cpu, sem_arg);
@@ -1933,7 +1933,7 @@ struct scache {
 
     (define-full-insn 'x-cti-chain "pbb cti-chain handler"
       `(VIRTUAL PBB (ISA ,all))
-      "--cti-chain--" () () '(c-code VOID "\
+      "--cti-chain--" '() '() '(c-code VOID "\
   {
 #if WITH_SCACHE_PBB_@PREFIX@
 #ifdef DEFINE_SWITCH
@@ -1952,7 +1952,7 @@ struct scache {
 
     (define-full-insn 'x-before "pbb begin handler"
       `(VIRTUAL PBB (ISA ,all))
-      "--before--" () () '(c-code VOID "\
+      "--before--" '() '() '(c-code VOID "\
   {
 #if WITH_SCACHE_PBB_@PREFIX@
     @prefix@_pbb_before (current_cpu, sem_arg);
@@ -1962,7 +1962,7 @@ struct scache {
 
     (define-full-insn 'x-after "pbb after handler"
       `(VIRTUAL PBB (ISA ,all))
-      "--after--" () () '(c-code VOID "\
+      "--after--" '() '() '(c-code VOID "\
   {
 #if WITH_SCACHE_PBB_@PREFIX@
     @prefix@_pbb_after (current_cpu, sem_arg);
@@ -1972,7 +1972,7 @@ struct scache {
 
     (define-full-insn 'x-invalid "invalid insn handler"
       `(VIRTUAL (ISA ,all))
-      "--invalid--" () () (list 'c-code 'VOID (string-append "\
+      "--invalid--" '() '() (list 'c-code 'VOID (string-append "\
   {
     /* Update the recorded pc in the cpu state struct.
        Only necessary for WITH_SCACHE case, but to avoid the

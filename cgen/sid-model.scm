@@ -4,7 +4,7 @@
 
 (define (unit:enum u)
   (gen-c-symbol (string-append "UNIT_"
-			       (string-upcase (obj:name u))))
+			       (string-upcase (obj:str-name u))))
 )
 
 ; Return C code to define cpu implementation properties.

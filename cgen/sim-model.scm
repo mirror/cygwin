@@ -6,9 +6,9 @@
 
 (define (unit:enum u)
   (gen-c-symbol (string-append "UNIT_"
-			       (string-upcase (obj:name (unit:model u)))
+			       (string-upcase (obj:str-name (unit:model u)))
 			       "_"
-			       (string-upcase (obj:name u))))
+			       (string-upcase (obj:str-name u))))
 )
 
 (define (-gen-cpu-imp-properties)
@@ -83,7 +83,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 (define (gen-model-fn-decls)
   (let ((gen-args (lambda (args)
 		    (gen-c-args (map (lambda (arg)
-				       (string-append
+				       (stringsym-append
 					(mode:c-type (mode:lookup (cadr arg)))
 					" /*" (car arg) "*/"))
 				     (find (lambda (arg)
@@ -98,7 +98,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
      (string-list-map
       (lambda (model)
 	(string-list-map (lambda (unit)
-			   (string-append
+			   (stringsym-append
 			    "extern int "
 			    (gen-model-unit-fn-name model unit)
 			    " (SIM_CPU *, const IDESC *,"
@@ -226,7 +226,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 
 (define (-gen-model-timing-table model)
   (string-write
-   "/* Model timing data for `" (obj:name model) "'.  */\n\n"
+   "/* Model timing data for `" (obj:str-name model) "'.  */\n\n"
    "static const INSN_TIMING " (gen-sym model) "_timing[] = {\n"
    (lambda () (string-write-map (lambda (insn) (-gen-insn-timing model insn))
 				(non-alias-insns (current-insn-list))))
@@ -252,7 +252,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 static const MODEL " (gen-sym mach) "_models[] =\n{\n"
    (string-list-map (lambda (model)
 		      (string-list "  { "
-				   "\"" (obj:name model) "\", "
+				   "\"" (obj:str-name model) "\", "
 				   "& " (gen-sym (model:mach model)) "_mach, "
 				   (model:enum model) ", "
 				   "TIMING_DATA (& "
@@ -345,7 +345,7 @@ static void\n"
 
 const MACH " (gen-sym mach) "_mach =
 {
-  \"" (obj:name mach) "\", "
+  \"" (obj:str-name mach) "\", "
   "\"" (mach-bfd-name mach) "\", "
   (mach-enum mach) ",\n"
   "  " (number->string (cpu-word-bitsize (mach-cpu mach))) ", "

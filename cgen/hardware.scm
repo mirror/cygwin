@@ -216,7 +216,7 @@
 (define <keyword>
   (class-make '<keyword> '(<hw-asm>)
 	      '(
-		; Name to use in generated code.
+		; Name to use in generated code, as a string.
 		print-name
 
 		; Prefix of each name in VALUES, as a string.
@@ -312,7 +312,7 @@
 	    ; to make periphery C/C++ code more legible.
 	    (define-full-enum (obj:name kw) (obj:comment kw)
 	      (atlist-source-form (obj-atlist kw))
-	      (string-upcase (symbol-append (kw-print-name kw) '-))
+	      (string-upcase (string-append (kw-print-name kw) "-"))
 	      (kw-values kw))))
       kw))
 )

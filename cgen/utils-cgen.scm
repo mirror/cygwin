@@ -70,7 +70,7 @@
 ; Each named entry in the description file typically has these three members:
 ; name, comment attrs.
 
-(define <ident> (class-make '<ident> () '(name comment attrs) ()))
+(define <ident> (class-make '<ident> '() '(name comment attrs) '()))
 
 (method-make! <ident> 'get-name (lambda (self) (elm-get self 'name)))
 (method-make! <ident> 'get-comment (lambda (self) (elm-get self 'comment)))
@@ -90,6 +90,10 @@
 (define (obj:name obj) (send obj 'get-name))
 (define (obj-set-name! obj name) (send obj 'set-name! name))
 (define (obj:comment obj) (send obj 'get-comment))
+
+; Utility to return the name as a string.
+
+(define (obj:str-name obj) (symbol->string (obj:name obj)))
 
 ; Utility to add standard access methods for name, comment, attrs.
 ; ??? Old.  Using <ident> baseclass now.
@@ -187,7 +191,7 @@
   (cond ((list? comment)
 	 (string-map (lambda (elm) (parse-comment elm errtxt)) comment))
 	((or (string? comment) (symbol? comment))
-	 comment)
+	 (->string comment))
 	(else (parse-error errtxt "improper comment" comment)))
 )
 
@@ -195,16 +199,16 @@
 
 (define (parse-symbol context value)
   (if (and (not (symbol? value)) (not (string? value)))
-      (parse-error context "not a symbol" value))
-  value
+      (parse-error context "not a symbol or string" value))
+  (->symbol value)
 )
 
 ; Parse a string.
 
 (define (parse-string context value)
   (if (and (not (symbol? value)) (not (string? value)))
-      (parse-error context "not a string" value))
-  value
+      (parse-error context "not a string or symbol" value))
+  (->string value)
 )
 
 ; Parse a number.
@@ -261,7 +265,7 @@
        (not (null? x))
        (or (keyword? (car x))
 	   (and (symbol? (car x))
-		(char=? (string-ref (car x) 0) #\:))))
+		(char=? (string-ref (symbol->string (car x)) 0) #\:))))
 )
 
 ; Convert a list like (#:key1 val1 #:key2 val2 ...) to
@@ -281,7 +285,7 @@
 		 nil
 		 (cdr rkl)))
 	  ((and (symbol? (car rkl))
-		(char=? (string-ref (car rkl) 0) #\:))
+		(char=? (string-ref (symbol->string (car rkl)) 0) #\:))
 	   (loop (acons (string->symbol
 			 (substring (car rkl) 1 (string-length (car rkl))))
 			current result)
@@ -487,7 +491,8 @@
 ; PREFIX is the prefix arg to gen-attr-enum-decl.
 
 (define (gen-attr-name prefix attr-name)
-  (string-upcase (gen-c-symbol (string-append prefix "_" attr-name)))
+  (string-upcase (gen-c-symbol (string-append prefix "_"
+					      (symbol->string attr-name))))
 )
 
 ; Normal gen-mask argument to gen-bool-attrs.
@@ -631,7 +636,7 @@
 (define (alpha-sort-obj-list l)
   (sort l
 	(lambda (o1 o2)
-	  (string<? (obj:name o1) (obj:name o2))))
+	  (symbol<? (obj:name o1) (obj:name o2))))
 )
 
 ; Called before loading the .cpu file to initialize.

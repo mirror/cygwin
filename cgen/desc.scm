@@ -25,7 +25,7 @@
 		  attr
 		  (string-append "  { "
 				 "\""
-				 (string-upcase (obj:name attr))
+				 (string-upcase (obj:str-name attr))
 				 "\", "
 				 (if (class-instance? <boolean-attribute> attr)
 				     "&bool_attr[0], &bool_attr[0]"
@@ -122,7 +122,8 @@ static const CGEN_ATTR_ENTRY bool_attr[] =
 		 (string-map (lambda (e)
 			       (string-append
 				"  { \""
-				(elm-get self 'prefix) (car e) ; operand name
+				(->string (elm-get self 'prefix))
+				(->string (car e)) ; operand name
 				"\", "
 				(if (string? (cadr e))
 				    (cadr e)

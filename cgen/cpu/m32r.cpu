@@ -722,8 +722,8 @@
 
 (dni addi "addi"
      ((PIPE OS) (IDOC ALU))
-     ; #.: experiment
-     #.(string-append "addi " "$dr,$simm8")
+     ;#.(string-append "addi " "$dr,$simm8") ; #. experiment
+     "addi $dr,$simm8"
      (+ OP1_4 dr simm8)
      (set dr (add dr simm8))
      ((m32r/d (unit u-exec))

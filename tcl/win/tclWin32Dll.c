@@ -190,8 +190,6 @@ DllMain(hInst, reason, reserved)
     DWORD reason;		/* Reason this function is being called. */
     LPVOID reserved;		/* Not used. */
 {
-    OSVERSIONINFO os;
-
     /* CYGNUS LOCAL */
 #ifdef __CYGWIN__0
     /* Cygwin requires the impure data pointer to be initialized

@@ -1,3 +1,14 @@
+2002-09-13  Keith Seitz  <keiths@redhat.com>
+
+	From Mo Dejong  <supermo@bayarea.net>:
+	* win/tclWin32Dll.c (DllMain): Remove unused os
+	variable since VC++ treats warnings as errors
+	when compiling with symbols.
+
+	* win/tclWinPort.h: Remove undefine of PASCAL
+	symbol added on 2001-09-12. It caused
+	crashing problems with sockets.
+
 2002-07-31  Keith Seitz  <keiths@redhat.com>
 
 	* generic/tclIntDecls.h (TclIntStubs): Do not include definitions

@@ -243,9 +243,13 @@ proc sid_assert_includes_none {cmd patterns} {
     pass $test
 }
 
-# assert that a bus transaction was "ok"
+# Verify a bus transaction.  $arg is the result of a sid::bus
+# operation.  This proc relies on a subtle characteristic of Tcl:
+# lindex 0 of a scalar is the scalar itself.  Thus, this handles both
+# read and write status values (e.g. {{ok 0} 55} or {ok 0}).
+
 proc sid_bus_ok_p {arg} {
-    return [string match ok [lindex $arg 0]]
+    return [string match ok [lindex [lindex $arg 0] 0]]
 }
 
 

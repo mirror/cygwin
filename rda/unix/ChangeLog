@@ -1,3 +1,7 @@
+2004-04-20  Kevin Buettner  <kevinb@redhat.com>
+
+	* server.c (main): Ignore realtime signals.
+
 2004-04-05  Kevin Buettner  <kevinb@redhat.com>
 
 	* linux-target.c (reginfo) [FRV_LINUX_TARGET]: Add support for

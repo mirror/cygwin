@@ -1,3 +1,7 @@
+2001-07-13  Dave Brolley  <brolley@redhat.com>
+
+	* cgen-ops.h (ADDCFDI): New function.
+
 2001-06-28  Jeff Johnston  <jjohnstn@redhat.com>
 
         * compCGEN.cxx (cgen_cpu::stream_state): Change reference to

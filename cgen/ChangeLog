@@ -1,3 +1,7 @@
+2003-10-09  Jim Blandy  <jimb@redhat.com>
+
+	* mach.scm (def-isa-attr!): hardware can have ISA attributes, too.
+
 2003-10-06  Dave Brolley  <brolley@redhat.com>
 
 	* gen-all-doc: Add fr550.

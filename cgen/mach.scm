@@ -642,7 +642,7 @@
       ; for it.
       (if (= (length isas) 1)
 	  '(for)
-	  '(for ifield operand insn))
+	  '(for ifield operand insn hardware))
       (cons 'values isa-enums))
     )
 

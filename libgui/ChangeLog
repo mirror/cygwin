@@ -1,3 +1,16 @@
+2002-02-05  Jim Blandy  <jimb@redhat.com>
+
+	De-Cygnify libgui.
+	
+	* library/Makefile.am (guidir): Name dir `redhat', not `cygnus'.
+	* src/Makefile.am (guidir): Same.
+	* library/Makefile.in, src/Makefile.in: Regenerated.
+	* library/sendpr.tcl (itcl_class Sendpr): Update company name in
+	PR headers.
+	* src/paths.c: Rename environment variables CYGNUS_GUI_LIBRARY
+	and CYGNUS_IDE_LIBRARY to REDHAT_GUI_LIBRARY and
+	REDHAT_IDE_LIBRARY.  Name dir `redhat', not `cygnus'.
+
 2002-01-04  Ian Roxborough  <irox@redhat.com>
 
 	* src/tkCanvEdge.c (CreateEdge, EdgeCoords, ConfigureEdge):

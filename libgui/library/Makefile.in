@@ -154,7 +154,7 @@ pane.tcl panedwindow.tcl
 
 PACKAGES = combobox.tcl
 
-guidir = $(datadir)/cygnus/gui
+guidir = $(datadir)/redhat/gui
 gui_DATA = tclIndex pkgIndex.tcl $(TCL) $(PACKAGES)
 @TCL_SHARED_TRUE@SET_LIB_PATH = @TCL_SHARED_TRUE@$(RPATH_ENVVAR)=$$here/../../tcl/unix:$$here/../../itcl/itcl/unix:$$$(RPATH_ENVVAR); export $(RPATH_ENVVAR);
 @TCL_SHARED_FALSE@SET_LIB_PATH = 

@@ -31,7 +31,7 @@ itcl_class Sendpr {
     set _site(field,Submitter-Id) cygnus
     set _site(field,Originator) Nobody
     set _site(field,Release) "Internal"
-    set _site(field,Organization) "Cygnus Solutions"
+    set _site(field,Organization) "Red Hat, Inc."
     set _site(field,Environment) ""
     foreach item {byteOrder machine os osVersion platform} {
       append _site(field,Environment) "$item = $tcl_platform($item)\n"

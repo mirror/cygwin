@@ -14,7 +14,7 @@ pane.tcl panedwindow.tcl
 PACKAGES = combobox.tcl
 
 ## This directory is also referenced in paths.c, which see.
-guidir = $(datadir)/cygnus/gui
+guidir = $(datadir)/redhat/gui
 gui_DATA = tclIndex pkgIndex.tcl $(TCL) $(PACKAGES)
 
 if TCL_SHARED

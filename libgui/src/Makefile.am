@@ -12,7 +12,7 @@ include_HEADERS = \
 endif
 
 datadir = @datadir@
-guidir  = $(datadir)/cygnus/gui
+guidir  = $(datadir)/redhat/gui
 
 # tkTable version info
 include $(srcdir)/tkTable_version.in

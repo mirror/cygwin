@@ -12,14 +12,14 @@
 /* This Tcl code sets up all the path information we care about.
 
    We first look for the gui library.  This can be set by the
-   CYGNUS_GUI_LIBRARY environment variable.  Otherwise, it is named
-   gui, and is found in $prefix/share/cygnus, where $prefix is
+   REDHAT_GUI_LIBRARY environment variable.  Otherwise, it is named
+   gui, and is found in $prefix/share/redhat, where $prefix is
    determined by looking at the directory where the running executable
    is installed.
 
    We then look for the ide library.  This can be set by the
-   CYGNUS_IDE_LIBRARY environment variable.  Otherwise, it is named
-   ide, and is also found in $prefix/share/cygnus.
+   REDHAT_IDE_LIBRARY environment variable.  Otherwise, it is named
+   ide, and is also found in $prefix/share/redhat.
 
    It is OK if only one of these libraries exist.  If neither exists,
    we report an error.
@@ -36,7 +36,7 @@
    bitmapdir      -- see below
 
    Paths(appdir) is set based on the ide_initialize_paths APPNAME
-   parameter.  If a directory $prefix/share/cygnus/APPNAME exists, we
+   parameter.  If a directory $prefix/share/redhat/APPNAME exists, we
    set Paths(appdir) to it.  More precisely, we set Paths(appdir) if
    an APPNAME directory exists which is a sibling directory of the gui
    or ide directory.  For convenience of some tools, we also check for
@@ -55,8 +55,8 @@ proc initialize_paths {} {\n\
   # First find the GUI library.\n\
   set guidirs {}\n\
   set prefdirs {}\n\
-  if [info exists env(CYGNUS_GUI_LIBRARY)] {\n\
-    lappend guidirs $env(CYGNUS_GUI_LIBRARY)\n\
+  if [info exists env(REDHAT_GUI_LIBRARY)] {\n\
+    lappend guidirs $env(REDHAT_GUI_LIBRARY)\n\
   }\n\
   set here [pwd]\n\
   set exec_name [info nameofexecutable]\n\
@@ -70,13 +70,13 @@ proc initialize_paths {} {\n\
   # Handle build with --exec-prefix and build without.\n\
   set d [file join [file dirname [pwd]] usr share]\n\
   lappend prefdirs $d\n\
-  lappend guidirs [file join $d cygnus gui]\n\
+  lappend guidirs [file join $d redhat gui]\n\
   set d [file join [file dirname [pwd]] share]\n\
   lappend prefdirs $d\n\
-  lappend guidirs [file join $d cygnus gui]\n\
+  lappend guidirs [file join $d redhat gui]\n\
   set d [file join [file dirname [file dirname [pwd]]] share]\n\
   lappend prefdirs $d\n\
-  lappend guidirs [file join $d cygnus gui]\n\
+  lappend guidirs [file join $d redhat gui]\n\
   set Paths(bindir) [pwd]\n\
  	# Base `prefix' on where the `share' dir is found\n\
  	foreach sd $prefdirs {\n\
@@ -103,11 +103,11 @@ proc initialize_paths {} {\n\
   }\n\
   # Now find the IDE library, if it exists.\n\
   set idedirs {}\n\
-  if [info exists env(CYGNUS_IDE_LIBRARY)] {\n\
-    lappend idedirs $env(CYGNUS_IDE_LIBRARY)\n\
+  if [info exists env(REDHAT_IDE_LIBRARY)] {\n\
+    lappend idedirs $env(REDHAT_IDE_LIBRARY)\n\
   }\n\
   foreach d $prefdirs {\n\
-    lappend idedirs [file join $d cygnus ide]\n\
+    lappend idedirs [file join $d redhat ide]\n\
   }\n\
   # Try to handle running from the build tree:\n\
   lappend idedirs [file join [file dirname [file dirname $tcl_library]] libide library]\n\
@@ -177,9 +177,9 @@ proc initialize_paths {} {\n\
   set here [pwd]\n\
   cd [file dirname [info nameofexecutable]]\n\
   set d [file join [file dirname [pwd]] share]\n\
-  lappend guidirs [file join $d cygnus gui]\n\
+  lappend guidirs [file join $d redhat gui]\n\
   set d [file join [file dirname [file dirname [pwd]]] share]\n\
-  lappend guidirs [file join $d cygnus gui]\n\
+  lappend guidirs [file join $d redhat gui]\n\
   lappend guidirs [file join [file dirname [file dirname $tcl_library]] libgui library]\n\
   foreach sd $guidirs {\n\
     if {[file exists [file join $sd tclIndex]]} {\n\

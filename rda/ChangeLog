@@ -1,3 +1,11 @@
+2004-07-09  Michael Snyder  <msnyder@redhat.com>
+
+	* lib/gdbserv-target.c (gdbserv_fromtarget_terminate): Rename
+	parameter from exitval to sigval (it's a signal number).
+	* lib/gdbserv-target.c (gdbserv_totarget): Comment spelling fix.
+	* lib/gdbserv-state.c (gdbserv_fromclient_break): Add break 
+	statement to default.
+
 2003-05-20  Kevin Buettner  <kevinb@redhat.com>
 
 	* lib/gdbserv-utils.c (gdbserv_le_bytes_from_reg): Fix typo that

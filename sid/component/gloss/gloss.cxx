@@ -74,8 +74,13 @@ gloss32::gloss32() :
   add_attribute("verbose?", &this->verbose_p, "setting");
   
   add_attribute("max-fds", &this->max_fds, "setting");
+  add_attribute("exit-code", &this->exit_code, "register");
+  add_attribute_virtual ("state-snapshot", this,
+                         & gloss32::save_state,
+                         & gloss32::restore_state);
   host_ops = 0;
   fd_table = 0;
+  exit_code = 0;
 }
 
 gloss32::~gloss32() throw()
@@ -132,12 +137,12 @@ gloss32::reset_pin_handler(host_int_4 ignore)
 }
 
 void
-gloss32::reset()
+gloss32::setup_fds (int new_max_fds)
 {
-  if (max_fds < 0 || max_fds > 256)
+  if (new_max_fds < 0 || new_max_fds > 256)
     {
-      cerr << "*** Bad value " << max_fds << " for max_fds." << endl;
-      max_fds = 32;
+      cerr << "*** Bad value " << new_max_fds << " for max_fds." << endl;
+      new_max_fds = 32;
     }
   if (fd_table)
     {
@@ -153,12 +158,52 @@ gloss32::reset()
 	}
       delete [] fd_table;
     }
+  max_fds = new_max_fds;
   fd_table = new int[max_fds];
   for (int i = 0; i < max_fds; ++i)
     fd_table[i] = -1;
   fd_table[0] = 0;
   fd_table[1] = 1;
   fd_table[2] = 2;
+}
+
+void
+gloss32::reset()
+{
+  this->setup_fds (max_fds);
+  this->exit_code = 0;
+}
+
+// streaming/destreaming of gloss32
+void
+gloss32::stream_state (ostream& o) const
+{
+  o << " gloss32";
+  /* FIXME: the fds eventually should be saved and restored in some manner. */
+  o << " " << max_fds;
+  o << " " << syscall_numbering_scheme; 
+}
+
+void
+gloss32::destream_state (istream& i)
+{
+  string key;
+  int new_max_fds;
+
+  i >> key;
+
+  if (key != "gloss32")
+    {
+      i.setstate (ios::badbit);
+      return;
+    }
+
+  /* FIXME: the fds eventually should be saved and restored in some manner. */
+  i >> new_max_fds;
+
+  i >> syscall_numbering_scheme;
+
+  this->setup_fds (new_max_fds);
 }
 
 // Called when rx pin is driven.  Record byte in buffer.
@@ -951,6 +996,8 @@ gloss32::do_sys_exit()
   get_int_argument(1, value);
   if (verbose_p)
     cerr << "*** exit(" << value << ")" << endl;
+
+  this->exit_code = value;
   
   if (value == 0)
     process_signal_pin.drive((value << 8) | newlib::sigQuit);
@@ -1617,3 +1664,18 @@ gloss32::isatty (int fd, bool& result, int& errcode)
     result = false;
   return true;
 }
+
+ostream& 
+operator << (ostream& out, const gloss32& it)
+{
+  it.stream_state(out);
+  return out;
+}
+
+istream& 
+operator >> (istream& in, gloss32& it)
+{
+  it.destream_state(in);
+  return in;
+}
+

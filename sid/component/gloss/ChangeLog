@@ -1,3 +1,21 @@
+2002-06-03  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* gloss.cxx (gloss32::gloss32): Add "state-snapshot" attribute.
+	Also Add new attribute "exit-code" which points to the exit code.
+	Set initial value to 0.
+	(gloss32::setup_fds): New method that sets up fds.
+	(gloss32::reset): Code moved to setup_fds.  New code is call to
+	setup_fds(). Set initial exit code to 0.
+	(gloss32::stream_state): New method to save state.
+	(gloss32::destream_state): New method to restore state.
+	(gloss32::do_sys_exit): Set exit_code with
+	exit value.
+	(operator <<, operator >>): New functions to stream/destream
+	gloss32.
+	* gloss.h (gloss32): Add setup_fds, stream_state, and destream_state
+	prototypes as well as declaring operator << and operator >> friends.
+	(gloss32::exit_code): New variable.
+
 2002-05-30  Frank Ch. Eigler  <fche@redhat.com>
 
 	* m32r.cxx (syscall_trap): Pass exit rc to cfgroot.

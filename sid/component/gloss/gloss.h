@@ -85,6 +85,19 @@ protected:
   // For derived classes to do additional things.
   virtual void reset();
 
+  void setup_fds (int max_fds);
+
+  // streaming/destreaming of state
+  virtual string save_state() { return make_attribute(*this); }
+  virtual component::status restore_state(const string& state)
+  {
+    return parse_attribute(state, *this);
+  }
+  void stream_state (ostream& o) const;
+  void destream_state (istream& i);
+  friend ostream& operator << (ostream& o, const gloss32& it);
+  friend istream& operator >> (istream& i, gloss32& it);
+
   // Trap invocation and response.
   callback_pin<gloss32> trap_type_ipin;
   output_pin trap_type_opin;
@@ -167,6 +180,7 @@ protected:
 
   // System calls.
 
+  int exit_code;
   // Size of file descriptor table.
   int max_fds;
   // Open file handles; indexed by fd.

@@ -1,3 +1,10 @@
+2002-12-16  Andrew MacLeod  <amacleod@redhat.com>
+
+	* cpu/xstormy16.cpu (imm16): Call handler immediate16.
+	* cpu/xstormy16.opc (parse_small_immediate): Return on '@'.
+	(parse_immediate16): Handle immediate16 values, which now include
+	@hi(label) and @lo(label)
+
 2002-12-03  Alan Modra  <amodra@bigpond.net.au>
 
 	* desc-cpu.scm (gen-maybe-multi-ifld): Remove superfluous parens.

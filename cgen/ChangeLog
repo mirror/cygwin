@@ -1,3 +1,10 @@
+2002-11-21  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* cpu/iq10.cpu: New file.
+	* cpu/iq2000.cpu: Likewise.
+	* cpu/iq2000.opc: Likewise.
+	* cpu/iq2000m.cpu: Likewise.
+
 2002-11-19  DJ Delorie  <dj@redhat.com>
 
 	* cpu/xstormy16.cpu (sdiv, divlh, sdivlh): New.

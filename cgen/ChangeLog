@@ -1,11 +1,10 @@
 2003-06-10  Doug Evans  <dje@sebabeach.org>
 
+	* insn.scm (insn-builtin!): RELAX renamed to RELAXABLE.
+	* cpu/m32r.cpu (all insns): Ditto.
+
 	* mach.scm (current-*-add!): Disallow redefinition.  Make result
 	"unspecified".
-	* insn.scm (insn-builtin!): Don't define relaxable here, now defined in
-	operand.scm.
-	* operand.scm (operand-builtin!): Define RELAXABLE for insns too.
-	* cpu/m32r.cpu (disp8,disp24): RELAX renamed to RELAXABLE.
 
 	* gen-all-doc: Split arm and frv docs up a bit.
 

@@ -554,7 +554,7 @@ struct @prefix@_scache {
 	(string-list
 	 "#if WITH_PROFILE_MODEL_P\n"
 	 "  /* Record the fields for profiling.  */\n"
-	 "  if (PROFILE_MODEL_P (current_cpu))\n"
+	 "  if (UNLIKELY (current_cpu->trace_counter_p || current_cpu->final_insn_count_p))\n"
 	 "    {\n"
 	 (string-list-map (lambda (op) (op:record-profile op sfmt #f))
 			  in-ops)
@@ -589,7 +589,7 @@ struct @prefix@_scache {
    "\n"
    (-gen-record-args sfmt)
    "\n"
-   ;(-gen-record-profile-args sfmt) ??? not supported yet
+   (-gen-record-profile-args sfmt)
    (gen-undef-field-macro sfmt)
    "}\n\n"
    )

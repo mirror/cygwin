@@ -1,3 +1,9 @@
+2004-07-21  DJ Delorie  <dj@redhat.com>
+
+	* xstormy16-decode.cxx: Regenerate.
+	* xstormy16-sem.cxx: Regenerate.
+	* xstormy16-write.cxx: Regenerate.
+
 2003-09-08  Doug Evans  <dje@casey.transmeta.com>
 
 	* xstormy16/Makefile.am (cgen-xstormy16): Update call to CGEN.sh.

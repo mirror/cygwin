@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+Copyright (C) 2000-2004 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -162,6 +162,36 @@ xstormy16_write_sfmt_movlmemgr (xstormy16_cpu* current_cpu, xstormy16_scache* se
   if (written & (1ULL << 5))
     {
       current_cpu->SETMEMQI (pc, OPRND (h_memory_QI_lmem8_idx), OPRND (h_memory_QI_lmem8));
+    }
+  if (written & (1ULL << 6))
+    {
+      current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
+    }
+
+  return status;
+#undef OPRND
+#undef FLD
+}
+
+
+sem_status
+xstormy16_write_sfmt_movhmemgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem, xstormy16_parexec* par_exec)
+{
+#define FLD(f) abuf->fields.sfmt_movhgrmem.f
+#define OPRND(f) par_exec->operands.sfmt_movhmemgr.f
+  xstormy16_scache* abuf = sem;
+  unsigned long long written = abuf->written;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = 0; // dummy value for branches
+  sem_status status = SEM_STATUS_NORMAL; // ditto
+
+  if (written & (1ULL << 4))
+    {
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_hmem8_65534_idx), OPRND (h_memory_HI_and__DFLT_hmem8_65534));
+    }
+  if (written & (1ULL << 5))
+    {
+      current_cpu->SETMEMQI (pc, OPRND (h_memory_QI_hmem8_idx), OPRND (h_memory_QI_hmem8));
     }
   if (written & (1ULL << 6))
     {

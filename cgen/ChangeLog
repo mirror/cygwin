@@ -1,3 +1,8 @@
+2005-02-16  Dave Brolley  <brolley@redhat.com>
+
+	* operand.scm (-derived-operand-parse): Move logit message from level 1
+	to level 2.
+
 2005-02-15  Nick Clifton  <nickc@redhat.com>
 
 	* opc-itab.scm (-gen-ifmt-table-1): Add an ATTRIBUTE_UNUSED to

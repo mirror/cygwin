@@ -1,5 +1,5 @@
 ; Operands
-; Copyright (C) 2000, 2001 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2005 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -869,7 +869,7 @@
 	    ;(elm-set! result 'hw-name base-ifield)
 	    (elm-set! result 'index parsed-encoding)
 	    ; (elm-set! result 'index (hw-index-derived)) ; A temporary dummy
-	    (logit 1 "new derived-operand; name=" name " hw-name= " (op:hw-name result) 
+	    (logit 2 "new derived-operand; name=" name " hw-name= " (op:hw-name result) 
 		   " index=" (obj:name parsed-encoding) "\n")
 	    (derived-ifield-set-owner! parsed-encoding result)
 	    result))

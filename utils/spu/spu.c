@@ -24,8 +24,9 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
-char *version_string = "0.3";
+char *version_string = "0.4";
 
 /* These values are the builtin defaults, mainly useful for testing
    purposes, or if the user is uninterested in setting a value.  */
@@ -78,8 +79,29 @@ struct hash_table
   int numadds;
 };
 
+enum decl_types {
+  d_nothing,
+  d_macro,
+  d_enum,
+  d_struct,
+  d_function
+};
+
+enum {
+  t_nothing = 0,
+  t_void = 1,
+  t_int = 2,
+  t_short = 3,
+  t_char = 4,
+  t_first_user = 100,
+  t_char_ptr = 1000004
+};
+
+char *typenames[] = { "?", "void", "int", "short", "char" };
+
 struct macro_desc
 {
+  int id;
   char *name;
   int numargs;
   char **args;
@@ -93,6 +115,7 @@ struct enumerator_desc
 
 struct enum_desc
 {
+  int id;
   char *name;
   int num_enumerators;
   struct enumerator_desc *enumerators;
@@ -107,6 +130,7 @@ struct field_desc
 
 struct struct_desc
 {
+  int id;
   char *name;
   int numfields;
   struct field_desc *fields;
@@ -128,7 +152,9 @@ struct arg_desc
 
 struct function_desc
 {
+  int id;
   char *name;
+  int return_type;
   int numargs;
   struct arg_desc *args;
   int use;
@@ -137,6 +163,24 @@ struct function_desc
 struct file_desc
 {
   char *name;
+};
+
+struct decl_entry {
+  enum decl_types type;
+  union {
+    struct macro_desc *macro_d;
+    struct enum_desc *enum_d;
+    struct struct_desc *struct_d;
+    struct function_desc *function_d;
+  } decl;
+  int seq;
+  int order;
+};
+
+struct decl_table {
+  int size;
+  int nextentry;
+  struct decl_entry *entries;
 };
 
 /* Function declarations.  */
@@ -181,19 +225,21 @@ char *gen_random_enumerator_name (void);
 
 void create_structs (void);
 
-void create_struct (struct struct_desc *structdesc);
+void create_struct (struct struct_desc *structdesc, int lib);
 
 char *gen_random_field_name (int n);
 
 void create_functions (void);
 
-void create_function (struct function_desc *fndesc);
+void create_function (struct function_desc *fndesc, int lib);
 
 void write_header_file (int n);
 
 void write_lib_header_file (void);
 
 void write_source_file (int n);
+
+void write_lib_source_file (void);
 
 void write_macro (FILE *fp, struct macro_desc *macrodesc);
 
@@ -209,7 +255,10 @@ void write_lib_function (FILE *fp, int n);
 
 void write_statement (FILE *fp, int depth, int max_depth);
 
-void write_expression (FILE *fp, int depth, int max_depth);
+void write_expression (FILE *fp, int rslttype, int depth, int max_depth,
+		       int exclude_id);
+
+void write_description_block (FILE *fp);
 
 void write_makefile (void);
 
@@ -261,6 +310,8 @@ int function_depth = DEFAULT_FUNCTION_DEPTH;
 
 int lib_percent = DEFAULT_LIB_PERCENT;
 
+int randomize_order = 1;
+
 int num_functions_per_file;
 
 /* The amount of commenting in the source.  */
@@ -274,6 +325,8 @@ struct hash_table *global_hash_table;
 /* The seed for the random number generator.  */
 
 int seed = -1;
+
+int next_id = 1;
 
 /* Space to record info about generated constructs.  */
 
@@ -293,6 +346,10 @@ struct function_desc *functions;
 
 struct function_desc *lib_functions;
 
+struct decl_table order;
+
+struct decl_table lib_order;
+
 int num_computer_terms;
 
 /* Likely words to appear in names of things.  These must never be
@@ -301,23 +358,28 @@ int num_computer_terms;
 
 char *computerese[] = {
   "add", "all", "alloc", "allocate", "area", "array", "at",
-  "by", "btree",
-  "count", "create", "cull",
-  "del", "delete_", "desc", "discard", "dismiss",
+  "bogus", "buf", "buff", "buffer", "by", "btree",
+  "ch", "chr", "clean", "cleanup", "count", "create", "cull",
+  "data", "del", "delete_", "depth", "desc", "dest", "discard", "dismiss",
+  "dma", "done", "dst",
   "fill", "find", "fn", "for_",
-  "grok",
-  "last", "line", "lis", "list", "lose",
-  "make", "mod", "modify", "more",
-  "new_", "node", "null", "num",
+  "gc", "go", "goto_", "grok", "gronk", "group", "grovel",
+  "hack", "hacked", "have", "heap",
+  "in", "ind", "index", "ini", "init", "initial", "inside",
+  "lab", "label", "last", "len", "length", "line", "lis", "list", "lose",
+  "make", "mark", "mod", "modify", "more",
+  "name", "nest", "nesting", "new_", "next", "node", "null", "num", "number",
   "part", "partial",
   "query", "queue",
   "ob", "obj", "object", "of",
-  "pnt", "point", "pos", "position",
-  "rect", "rectangle", "remove", "reset",
-  "see", "set", "shape", "str",
-  "tag", "tree",
+  "pc", "pnt", "point", "pop", "pos", "position", "push",
+  "raw", "recalc", "rect", "rectangle", "rel", "relative", "ret", "rslt",
+  "remove", "reset", "rmv",
+  "see", "set", "shape", "stack", "str", "string",
+  "tab", "table", "tbl", "tag", "tree",
+  "undel", "undo", "unmark", "use",
   "vary", "vec", "vect", "vector", "virt", "virtual_",
-  "win", "wind", "window",
+  "win", "wind", "window", "word",
   "zbuf",
   NULL
 };
@@ -464,14 +526,23 @@ main (int argc, char **argv)
 	}
     }
   init_xrandom (seed);
+  /* Round up the number of functions so each file gets the same
+     number. */
+  num_functions_per_file = (num_functions + num_files - 1) / num_files;
+  num_functions = num_functions_per_file * num_files;
   /* Create the definitions of objects internally. */
+  order.size = num_macros + num_enums + num_structs + num_functions;
+  order.nextentry = 0;
+  order.entries =
+    (struct decl_entry *) xmalloc (order.size * sizeof(struct decl_entry));
+  lib_order.size = num_lib_macros + num_lib_enums + num_lib_structs + num_lib_functions;
+  lib_order.nextentry = 0;
+  lib_order.entries =
+    (struct decl_entry *) xmalloc (lib_order.size * sizeof(struct decl_entry));
   create_macros ();
   create_enums ();
   create_structs ();
   create_functions ();
-  /* Round up the number of functions so each file gets the same
-     number. */
-  num_functions_per_file = (num_functions + num_files - 1) / num_files;
   /* Write out a bunch of files. */
   printf ("Writing %d header files...\n", num_header_files);
   for (i = 0; i < num_header_files; ++i)
@@ -514,9 +585,39 @@ display_usage (void)
 }
 
 int
-random_type (void)
+random_type (int libonly)
 {
-  return xrandom (3);
+  int i, n;
+
+  switch (xrandom (6))
+    {
+    case 0:
+      return t_short;
+    case 1:
+      return t_char;
+    case 2:
+      return t_char_ptr;
+    case 3:
+      for (i = 0; i < 1000; ++i)
+	{
+	  n = xrandom (num_lib_structs);
+	  if (lib_structs[n].id > 0 && lib_structs[n].use)
+	    return t_first_user + lib_structs[n].id;
+	}
+      return t_int;
+    case 4:
+      if (libonly)
+	return t_int;
+      for (i = 0; i < 1000; ++i)
+	{
+	  n = xrandom (num_structs);
+	  if (structs[n].id > 0)
+	    return t_first_user + structs[n].id;
+	}
+      return t_int;
+    default:
+      return t_int;
+    }
 }
 
 /* Given a numbered type, return its name.  */
@@ -524,14 +625,64 @@ random_type (void)
 char *
 name_from_type (int n)
 {
-  switch (n)
+  int i;
+  char tmpbuf[100];
+
+  if (n < t_first_user)
     {
-    case 0:
-      return "char";
-    case 1:
-      return "short";
+      return typenames[n];
     }
-  return "int";
+  else if (n >= 1000000 && (n - 1000000) < t_first_user)
+    {
+      sprintf (tmpbuf, "%s *", typenames[n - 1000000]);
+      return copy_string (tmpbuf);
+    }
+  else
+    {
+      for (i = 0; i < num_structs; ++i)
+	{
+	  if (structs[i].id == (n - t_first_user))
+	    {
+	      sprintf (tmpbuf, "struct %s *", structs[i].name);
+	      return copy_string (tmpbuf);
+	    }
+	}
+      for (i = 0; i < num_lib_structs; ++i)
+	{
+	  if (lib_structs[i].id == (n - t_first_user))
+	    {
+	      sprintf (tmpbuf, "struct %s *", lib_structs[i].name);
+	      return copy_string (tmpbuf);
+	    }
+	}
+    }
+  return "?type?";
+}
+
+void
+add_decl_to_table (enum decl_types type, void *desc, struct decl_table *table)
+{
+  int n = table->nextentry++;
+
+  table->entries[n].type = type;
+  switch (type)
+    {
+    case d_macro:
+      table->entries[n].decl.macro_d = (struct macro_desc *) desc;
+      break;
+    case d_enum:
+      table->entries[n].decl.enum_d = (struct enum_desc *) desc;
+      break;
+    case d_struct:
+      table->entries[n].decl.struct_d = (struct struct_desc *) desc;
+      break;
+    case d_function:
+      table->entries[n].decl.function_d = (struct function_desc *) desc;
+      break;
+    }
+  table->entries[n].seq = n;
+  if (randomize_order)
+    table->entries[n].order = xrandom (10000);
 }
 
 /* Create basic definitions of macros.  Negative number of arguments
@@ -548,7 +699,14 @@ create_macros (void)
   for (i = 0; i < num_macros; ++i)
     {
       create_macro (&(macros[i]));
+      add_decl_to_table (d_macro, &(macros[i]), &order);
     }
+
+  /* It's important to create library macros second, so that their ids
+     are higher than those for program macros.  This is so that
+     library macro bodies are excluded from referencing any program
+     macros (because of the exclude_id bits in write_expression).  */
+
   printf ("Creating %d library macros...\n", num_lib_macros);
   lib_macros =
     (struct macro_desc *) xmalloc (num_lib_macros * sizeof(struct macro_desc));
@@ -557,6 +715,7 @@ create_macros (void)
       create_macro (&(lib_macros[i]));
       if (!probability(lib_percent))
 	lib_macros[i].use = 0;
+      add_decl_to_table (d_macro, &(lib_macros[i]), &lib_order);
     }
 }
 
@@ -565,6 +724,7 @@ create_macro (struct macro_desc *macrodesc)
 {
   int j, numargs;
 
+  macrodesc->id = next_id++;
   macrodesc->name = gen_new_macro_name ();
   numargs = xrandom (DEFAULT_MAX_MACRO_ARGS + 1);
   --numargs;
@@ -601,8 +761,9 @@ create_enums (void)
   for (i = 0; i < num_enums; ++i)
     {
       create_enum (&(enums[i]));
+      add_decl_to_table (d_enum, &(enums[i]), &order);
     }
-  printf ("Creating %d lib_enums...\n", num_lib_enums);
+  printf ("Creating %d library enums...\n", num_lib_enums);
   lib_enums =
     (struct enum_desc *) xmalloc (num_lib_enums * sizeof(struct enum_desc));
   for (i = 0; i < num_lib_enums; ++i)
@@ -610,6 +771,7 @@ create_enums (void)
       create_enum (&(lib_enums[i]));
       if (!probability(lib_percent))
 	lib_enums[i].use = 0;
+      add_decl_to_table (d_enum, &(lib_enums[i]), &lib_order);
     }
 }
 
@@ -618,6 +780,7 @@ create_enum (struct enum_desc *enumdesc)
 {
   int j, num;
 
+  enumdesc->id = next_id++;
   /* Let some enums be anonymous. */
   if (xrandom (100) < 50)
     enumdesc->name = gen_unique_global_name (NULL, 0);
@@ -649,36 +812,42 @@ create_structs (void)
 {
   int i;
 
-  printf ("Creating %d structs...\n", num_structs);
-  structs =
-    (struct struct_desc *) xmalloc (num_structs * sizeof(struct struct_desc));
-  for (i = 0; i < num_structs; ++i)
-    {
-      create_struct (&(structs[i]));
-    }
+  /* Do the library structs first, so that program structs may use
+     them in their definitions.  */
   printf ("Creating %d library structs...\n", num_lib_structs);
   lib_structs =
     (struct struct_desc *) xmalloc (num_lib_structs * sizeof(struct struct_desc));
   for (i = 0; i < num_lib_structs; ++i)
     {
-      create_struct (&(lib_structs[i]));
+      create_struct (&(lib_structs[i]), 1);
       if (!probability(lib_percent))
 	lib_structs[i].use = 0;
+      add_decl_to_table (d_struct, &(lib_structs[i]), &lib_order);
+    }
+
+  printf ("Creating %d structs...\n", num_structs);
+  structs =
+    (struct struct_desc *) xmalloc (num_structs * sizeof(struct struct_desc));
+  for (i = 0; i < num_structs; ++i)
+    {
+      create_struct (&(structs[i]), 0);
+      add_decl_to_table (d_struct, &(structs[i]), &order);
     }
 }
 
 void
-create_struct (struct struct_desc *structdesc)
+create_struct (struct struct_desc *structdesc, int lib)
 {
   int j, numf;
 
+  structdesc->id = next_id++;
   structdesc->name = gen_unique_global_name (NULL, 0);
   numf = xrandom (num_fields) + 1;
   structdesc->fields =
     (struct field_desc *) xmalloc (numf * sizeof(struct field_desc));
   for (j = 0; j < numf; ++j)
     {
-      structdesc->fields[j].type = random_type ();
+      structdesc->fields[j].type = random_type (lib);
       structdesc->fields[j].name = gen_random_field_name (j);
     }
   structdesc->numfields = numf;
@@ -707,14 +876,35 @@ create_functions (void)
   printf ("Creating %d functions...\n", num_functions);
   functions =
     (struct function_desc *) xmalloc (num_functions * sizeof(struct function_desc));
+
   /* Generate the main program, as the first function.  */
+  functions[0].id = next_id++;
   functions[0].name = "main";
+  functions[0].return_type = t_int;
   functions[0].numargs = 0;
-  /* Generate all the other functions.  The bodies don't get created
-     until the functions are being written out.  */
+  functions[0].use = 1;
+  add_decl_to_table (d_function, &(functions[0]), &order);
+
+  /* Generate all the other functions.  */
   for (i = 1; i < num_functions; ++i)
     {
-      create_function (&(functions[i]));
+      create_function (&(functions[i]), 0);
+      add_decl_to_table (d_function, &(functions[i]), &order);
+#if 0 /* use forward decls for now instead */
+      {
+	int j, type;
+	struct function_desc *fndesc = &(functions[i]);
+      
+	for (j = 0; j < fndesc->numargs; ++j)
+	  {
+	    type = fndesc->args[i].type;
+	    if (type >= t_first_user)
+	      {
+		/* (should find arg types and increase fndesc->order) */
+	      }
+	  }
+      }
+#endif
     }
 
   printf ("Creating %d library functions...\n", num_lib_functions);
@@ -722,22 +912,27 @@ create_functions (void)
     (struct function_desc *) xmalloc (num_lib_functions * sizeof(struct function_desc));
   for (i = 0; i < num_lib_functions; ++i)
     {
-      create_function (&(lib_functions[i]));
+      create_function (&(lib_functions[i]), 1);
+      /* Mark some functions as not to be referenced from the program.  */
       if (!probability(lib_percent))
 	lib_functions[i].use = 0;
+      add_decl_to_table (d_function, &(lib_functions[i]), &lib_order);
     }
 }
 
 /* Generate the details of a single function.  */
 
 void
-create_function (struct function_desc *fndesc)
+create_function (struct function_desc *fndesc, int lib)
 {
   int j, range, numargs;
 
+  fndesc->id = next_id++;
   fndesc->name = gen_unique_global_name ("fn", 0);
-  /* Choose the number of arguments, preferring shorter argument
-     lists by using a simple binomial distribution.  */
+  fndesc->return_type = ((xrandom (4) == 0) ? t_void : random_type (lib));
+  /* Choose the number of arguments, preferring shorter argument lists
+     by using a simple binomial distribution that is "folded" in the
+     middle so zero-arg functions are the most common.  */
   range = 2 * (max_function_args + 1);
   numargs = 0;
   for (j = 0; j < 6; ++j)
@@ -751,15 +946,31 @@ create_function (struct function_desc *fndesc)
     numargs = -numargs;
   if (numargs > max_function_args)
     numargs = max_function_args;
-  fndesc->args =
-    (struct arg_desc *) xmalloc (numargs * sizeof(struct arg_desc));
-  for (j = 0; j < numargs; ++j)
+  if (numargs > 0)
     {
-      fndesc->args[j].type = 0;
-      fndesc->args[j].name = gen_random_local_name (j, NULL);
+      fndesc->args =
+	(struct arg_desc *) xmalloc (numargs * sizeof(struct arg_desc));
+      for (j = 0; j < numargs; ++j)
+	{
+	  fndesc->args[j].type = random_type (lib);
+	  fndesc->args[j].name = gen_random_local_name (j, NULL);
+	}
     }
   fndesc->numargs = numargs;
   fndesc->use = 1;
+}
+
+int
+compare_entries(const void *x1, const void *x2)
+{
+  struct decl_entry *e1 = (struct decl_entry *) x1;
+  struct decl_entry *e2 = (struct decl_entry *) x2;
+
+  if (e1->order != e2->order)
+    return (e1->order - e2->order);
+  /* Randomized order may have pairs of matching numbers, so use this
+     as fallback.  */
+  return (e1->seq - e2->seq);
 }
 
 void
@@ -771,46 +982,40 @@ write_header_file (int n)
 
   sprintf (tmpbuf, "%s%d.h", file_base_name, n);
   fp = fopen (tmpbuf, "w");
-  if (fp)
+  if (fp == NULL)
+    return;
+  write_description_block (fp);
+  if (commenting > 0)
+    fprintf (fp, "/* header */\n");
+  /* Ensure that structure decls exist before functions mentioning them.  */
+  if (randomize_order)
     {
-      if (commenting > 0)
-	fprintf (fp, "/* header */\n");
-      if (1)
-	{
-	  printf ("Writing %d macros...\n", num_macros);
-	  for (i = 0; i < num_macros; ++i)
-	    {
-	      write_macro (fp, &(macros[i]));
-	    }
-	}
-      if (1)
-	{
-	  printf ("Writing %d enums...\n", num_enums);
-	  printf ("  (Each enum contains up to %d values)\n", num_enumerators);
-	  for (i = 0; i < num_enums; ++i)
-	    {
-	      write_enum (fp, &(enums[i]));
-	    }
-	}
-      if (1)
-	{
-	  printf ("Writing %d structs...\n", num_structs);
-	  printf ("  (Each struct contains %d fields)\n", num_fields);
-	  for (i = 0; i < num_structs; ++i)
-	    {
-	      write_struct (fp, &(structs[i]));
-	    }
-	}
-      if (1)
-	{
-	  printf ("Writing %d function decls...\n", num_functions);
-	  for (i = 0; i < num_functions; ++i)
-	    {
-	      write_function_decl (fp, &(functions[i]));
-	    }
-	}
-      fclose (fp);
+      fprintf (fp, "/* forward decls */\n");
+      for (i = 0; i < num_structs; ++i)
+	fprintf (fp, "struct %s;\n", structs[i].name);
+      fprintf (fp, "\n");
     }
+  qsort(order.entries, order.size, sizeof(struct decl_entry),
+	compare_entries);
+  for (i = 0; i < order.size; ++i)
+    {
+      switch (order.entries[i].type)
+	{
+	case d_macro:
+	  write_macro (fp, order.entries[i].decl.macro_d);
+	  break;
+	case d_enum:
+	  write_enum (fp, order.entries[i].decl.enum_d);
+	  break;
+	case d_struct:
+	  write_struct (fp, order.entries[i].decl.struct_d);
+	  break;
+	case d_function:
+	  write_function_decl (fp, order.entries[i].decl.function_d);
+	  break;
+	}
+    }
+  fclose (fp);
 }
 
 void
@@ -822,46 +1027,40 @@ write_lib_header_file (void)
 
   sprintf (tmpbuf, "%slib.h", file_base_name);
   fp = fopen (tmpbuf, "w");
-  if (fp)
+  if (fp == NULL)
+    return;
+  if (commenting > 0)
+    fprintf (fp, "/* library header */\n");
+  write_description_block (fp);
+  /* Ensure that structure decls exist before functions mentioning them.  */
+  if (randomize_order)
     {
-      if (commenting > 0)
-	fprintf (fp, "/* library header */\n");
-      if (1)
-	{
-	  printf ("Writing %d library macros...\n", num_lib_macros);
-	  for (i = 0; i < num_lib_macros; ++i)
-	    {
-	      write_macro (fp, &(lib_macros[i]));
-	    }
-	}
-      if (1)
-	{
-	  printf ("Writing %d library enums...\n", num_lib_enums);
-	  printf ("  (Each enum contains up to %d values)\n", num_enumerators);
-	  for (i = 0; i < num_lib_enums; ++i)
-	    {
-	      write_enum (fp, &(lib_enums[i]));
-	    }
-	}
-      if (1)
-	{
-	  printf ("Writing %d library structs...\n", num_lib_structs);
-	  printf ("  (Each struct contains %d fields)\n", num_fields);
-	  for (i = 0; i < num_lib_structs; ++i)
-	    {
-	      write_struct (fp, &(lib_structs[i]));
-	    }
-	}
-      if (1)
-	{
-	  printf ("Writing %d lib function decls...\n", num_lib_functions);
-	  for (i = 0; i < num_lib_functions; ++i)
-	    {
-	      write_function_decl (fp, &(lib_functions[i]));
-	    }
-	}
-      fclose (fp);
+      fprintf (fp, "/* forward decls */\n");
+      for (i = 0; i < num_lib_structs; ++i)
+	fprintf (fp, "struct %s;\n", lib_structs[i].name);
+      fprintf (fp, "\n");
     }
+  qsort(lib_order.entries, lib_order.size, sizeof(struct decl_entry),
+	compare_entries);
+  for (i = 0; i < lib_order.size; ++i)
+    {
+      switch (lib_order.entries[i].type)
+	{
+	case d_macro:
+	  write_macro (fp, lib_order.entries[i].decl.macro_d);
+	  break;
+	case d_enum:
+	  write_enum (fp, lib_order.entries[i].decl.enum_d);
+	  break;
+	case d_struct:
+	  write_struct (fp, lib_order.entries[i].decl.struct_d);
+	  break;
+	case d_function:
+	  write_function_decl (fp, lib_order.entries[i].decl.function_d);
+	  break;
+	}
+    }
+  fclose (fp);
 }
 
 void
@@ -869,7 +1068,7 @@ write_macro (FILE *fp, struct macro_desc *macrodesc)
 {
   int i, j;
 
-  fprintf (fp, "#define %s", macrodesc->name);
+  fprintf (fp, "\n#define %s", macrodesc->name);
   /* Negative # arguments indicates an argumentless macro instead of
      one with zero arguments. */
   if (macrodesc->numargs >= 0)
@@ -884,38 +1083,25 @@ write_macro (FILE *fp, struct macro_desc *macrodesc)
       fprintf (fp, ")");
     }
   /* Generate a macro body. */
-  switch (xrandom(2))
+  fprintf (fp, " (");
+  switch (xrandom(4))
     {
     case 0:
-      fprintf (fp, " \\\n");
-      fprintf (fp, "(");
-      if (macrodesc->numargs > 0)
-	{
-	  for (i = 0; i < macrodesc->numargs; ++i)
-	    {
-	      if (i > 0)
-		fprintf (fp, ",");
-	      fprintf (fp, " \\\n");
-	      fprintf (fp, "  (%s)", macrodesc->args[i]);
-	      if (xrandom (2) == 0)
-		{
-		  fprintf (fp, ",");
-		  fprintf (fp, " \\\n");
-		  fprintf (fp, " ((int) (%s))", macrodesc->args[i]);
-		}
-	    }
-	  fprintf (fp, " \\\n");
-	}
-      else
-	{
-	  fprintf (fp, " (1)");
-	}
-      fprintf (fp, ")");
+      write_expression (fp, t_int, 0, 2, macrodesc->id);
+      break;
+    case 1:
+      /* A very common expansion for macros.  */
+      fprintf (fp, "0");
+      break;
+    case 2:
+      /* Likewise.  */
+      fprintf (fp, "1");
       break;
     default:
-      fprintf (fp, " (%d)", xrandom (100));
+      fprintf (fp, "%d", xrandom (100));
       break;
     }
+  fprintf (fp, ")");
   fprintf (fp, "\n\n");
 }
 
@@ -926,7 +1112,7 @@ write_enum (FILE *fp, struct enum_desc *enumdesc)
 {
   int j;
 
-  fprintf (fp, "enum");
+  fprintf (fp, "\nenum");
   if (enumdesc->name)
     fprintf (fp, " %s", enumdesc->name);
   fprintf (fp, " {");
@@ -946,7 +1132,7 @@ write_struct (FILE *fp, struct struct_desc *structdesc)
 {
   int j;
 
-  fprintf (fp, "struct %s {\n", structdesc->name);
+  fprintf (fp, "\nstruct %s {\n", structdesc->name);
   for (j = 0; j < structdesc->numfields; ++j)
     {
       fprintf (fp, "  %s %s;\n",
@@ -961,12 +1147,15 @@ write_function_decl (FILE *fp, struct function_desc *fndesc)
 {
   int i;
 
-  fprintf (fp, "int %s (", fndesc->name);
+  fprintf (fp, "extern %s %s (",
+	   name_from_type (fndesc->return_type), fndesc->name);
   if (language != knr)
     {
       for (i = 0; i < fndesc->numargs; ++i)
 	{
-	  fprintf (fp, "int %s", fndesc->args[i].name);
+	  fprintf (fp, "%s %s",
+		   name_from_type (fndesc->args[i].type),
+		   fndesc->args[i].name);
 	  if (i + 1 < fndesc->numargs)
 	    fprintf (fp, ", ");
 	}
@@ -982,41 +1171,37 @@ write_source_file (int n)
   char tmpbuf[100];
   int j;
   FILE *fp;
-  extern unsigned long initial_randstate;
 
   sprintf (tmpbuf, "%s%d.%s",
 	   file_base_name, n, extensions[language]);
   fp = fopen (tmpbuf, "w");
-  if (fp)
+  if (fp == NULL)
+    return;
+  write_description_block (fp);
+  if (1 /*num_lib_header_files*/ > 0)
     {
-      fprintf (fp,
-	       "/* A fine software product by SPU %s, random seed == %d */\n\n",
-	       version_string, (int) initial_randstate);
-      if (1 /*num_lib_header_files*/ > 0)
+      for (j = 0; j < 1 /*num_header_files*/; ++j)
 	{
-	  for (j = 0; j < 1 /*num_header_files*/; ++j)
-	    {
-	      fprintf (fp, "#include \"%slib.h\"\n", file_base_name);
-	    }
-	  fprintf (fp, "\n");
+	  fprintf (fp, "#include \"%slib.h\"\n", file_base_name);
 	}
-      if (num_header_files > 0)
+      fprintf (fp, "\n");
+    }
+  if (num_header_files > 0)
+    {
+      for (j = 0; j < num_header_files; ++j)
 	{
-	  for (j = 0; j < num_header_files; ++j)
-	    {
-	      fprintf (fp, "#include \"%s%d.h\"\n", file_base_name, j);
-	    }
-	  fprintf (fp, "\n");
+	  fprintf (fp, "#include \"%s%d.h\"\n", file_base_name, j);
 	}
+      fprintf (fp, "\n");
+    }
 
-      if (n == 0)
-	printf ("  (Each file contains %d functions)\n",
-		num_functions_per_file);
+  if (n == 0)
+    printf ("  (Each file contains %d functions)\n",
+	    num_functions_per_file);
 
-      for (j = 0; j < num_functions_per_file; ++j)
-	{
-	  write_function (fp, n * num_functions_per_file + j);
-	}
+  for (j = 0; j < num_functions_per_file; ++j)
+    {
+      write_function (fp, n * num_functions_per_file + j);
     }
   fclose (fp);
 }
@@ -1026,12 +1211,13 @@ write_function (FILE *fp, int n)
 {
   int i, k;
 
-  fprintf(fp, "int\n%s (", functions[n].name);
+  fprintf(fp, "%s\n%s (",
+	  name_from_type (functions[n].return_type), functions[n].name);
   for (i = 0; i < functions[n].numargs; ++i)
     {
       if (language != knr)
 	{
-	  fprintf (fp, "int ");
+	  fprintf (fp, "%s ", name_from_type (functions[n].args[i].type));
 	}
       fprintf (fp, "%s", functions[n].args[i].name);
       if (i + 1 < functions[n].numargs)
@@ -1042,7 +1228,9 @@ write_function (FILE *fp, int n)
     {
       for (i = 0; i < functions[n].numargs; ++i)
 	{
-	  fprintf (fp, "int %s;\n", functions[n].args[i].name);
+	  fprintf (fp, "%s %s;\n",
+		   name_from_type (functions[n].args[i].type),
+		   functions[n].args[i].name);
 	}
     }
   fprintf(fp, "{\n");
@@ -1052,8 +1240,16 @@ write_function (FILE *fp, int n)
     {
       write_statement (fp, 1, function_depth - 1 + xrandom (3));
     }
+  /* Write a return statement if appropriate.  */
+  if (functions[n].return_type != t_void)
+    {
+      fprintf (fp, "  return 0;\n");
+    }
   fprintf (fp, "}\n\n");
 }
+
+/* Write "library source", which really just means empty function
+   bodies, done so the program will link.  */
 
 void
 write_lib_source_file (void)
@@ -1064,21 +1260,21 @@ write_lib_source_file (void)
 
   sprintf (tmpbuf, "%slib.%s", file_base_name, extensions[language]);
   fp = fopen (tmpbuf, "w");
-  if (fp)
+  if (fp == NULL)
+    return;
+  write_description_block (fp);
+  if (1 /*num_lib_header_files*/ > 0)
     {
-      if (1 /*num_lib_header_files*/ > 0)
+      for (j = 0; j < 1 /*num_lib_header_files*/; ++j)
 	{
-	  for (j = 0; j < 1 /*num_header_files*/; ++j)
-	    {
-	      fprintf (fp, "#include \"%slib.h\"\n", file_base_name);
-	    }
-	  fprintf (fp, "\n");
+	  fprintf (fp, "#include \"%slib.h\"\n", file_base_name);
 	}
+      fprintf (fp, "\n");
+    }
 
-      for (j = 0; j < num_lib_functions; ++j)
-	{
-	  write_lib_function (fp, j);
-	}
+  for (j = 0; j < num_lib_functions; ++j)
+    {
+      write_lib_function (fp, j);
     }
   fclose (fp);
 }
@@ -1090,12 +1286,14 @@ write_lib_function (FILE *fp, int n)
 {
   int i;
 
-  fprintf (fp, "int\n%s (", lib_functions[n].name);
+  fprintf (fp, "%s\n%s (",
+	   name_from_type (lib_functions[n].return_type),
+	   lib_functions[n].name);
   for (i = 0; i < lib_functions[n].numargs; ++i)
     {
       if (language != knr)
 	{
-	  fprintf (fp, "int ");
+	  fprintf (fp, "%s ", name_from_type (lib_functions[n].args[i].type));
 	}
       fprintf (fp, "%s", lib_functions[n].args[i].name);
       if (i + 1 < lib_functions[n].numargs)
@@ -1103,16 +1301,20 @@ write_lib_function (FILE *fp, int n)
     }
   fprintf (fp, ")");
   if (!lib_functions[n].use)
-    fprintf (fp, "/* unused */");
+    fprintf (fp, " /* unused */");
   fprintf (fp, "\n");
   if (language == knr)
     {
       for (i = 0; i < lib_functions[n].numargs; ++i)
 	{
-	  fprintf (fp, "int %s;\n", lib_functions[n].args[i].name);
+	  fprintf (fp, "%s %s;\n",
+		   name_from_type (lib_functions[n].args[i].type),
+		   lib_functions[n].args[i].name);
 	}
     }
   fprintf (fp, "{\n");
+  if (lib_functions[n].return_type != t_void)
+    fprintf (fp, "  return 0;\n");
   fprintf (fp, "}\n\n");
 }
 
@@ -1126,19 +1328,19 @@ write_statement (FILE *fp, int depth, int max_depth)
   /* Always do non-recursive statements if going too deep. */
   if (depth >= max_depth)
     {
-      write_expression (fp, 0, xrandom(4) + 1);
+      write_expression (fp, t_void, 0, xrandom(4) + 1, 0);
       fprintf (fp, ";\n");
       return;
     }
   switch (xrandom(2))
     {
     case 0:
-      write_expression (fp, 0, xrandom(4) + 1);
+      write_expression (fp, t_void, 0, xrandom(4) + 1, 0);
       fprintf (fp, ";");
       break;
     case 1:
       fprintf (fp, "if (");
-      write_expression (fp, 0, xrandom(2) + 1);
+      write_expression (fp, t_int, 0, xrandom(2) + 1, 0);
       fprintf (fp, ") {\n");
       write_statement(fp, depth + 1, max_depth);
       for (i = 0; i < depth; ++i)
@@ -1151,10 +1353,20 @@ write_statement (FILE *fp, int depth, int max_depth)
 
 /* Write a single expression. */
 
+void cast_integer_type (FILE *fp, int type);
+struct function_desc *find_function (int rslttype,
+				     struct function_desc *fns, int numfns);
+struct macro_desc *find_macro (int rslttype,
+			       struct macro_desc *macs, int nummacros,
+			       int exclude_id);
+
 void
-write_expression (FILE *fp, int depth, int max_depth)
+write_expression (FILE *fp, int rslttype, int depth, int max_depth,
+		  int exclude_id)
 {
   int n, n2, j;
+  struct macro_desc *macrodesc;
+  struct function_desc *fndesc;
 
   /* Always do non-recursive statements if going too deep. */
   if (depth >= max_depth)
@@ -1163,9 +1375,11 @@ write_expression (FILE *fp, int depth, int max_depth)
       switch (xrandom(10))
 	{
 	case 7:
+	  cast_integer_type (fp, rslttype);
 	  fprintf (fp, "%d", xrandom (1000));
 	  break;
 	default:
+	  cast_integer_type (fp, rslttype);
 	  fprintf (fp, "%d", xrandom (127));
 	  break;
 	}
@@ -1174,97 +1388,181 @@ write_expression (FILE *fp, int depth, int max_depth)
   switch (xrandom(10))
     {
     case 0:
-      for (j = 0; j < 1000; ++j)
+      fndesc = find_function (rslttype, lib_functions, num_lib_functions);
+      if (fndesc == NULL)
 	{
-	  n = xrandom (num_lib_functions);
-	  if (lib_functions[n].use)
-	    break;
+	  cast_integer_type (fp, rslttype);
+	  fprintf (fp, "%d", xrandom (100));
+	  return;
 	}
-      if (!lib_functions[n].use)
-	goto getout;
-      n = xrandom (num_lib_functions);
-      fprintf(fp, "%s (", lib_functions[n].name);
-      for (j = 0; j < lib_functions[n].numargs; ++j)
+      fprintf (fp, "%s (", fndesc->name);
+      for (j = 0; j < fndesc->numargs; ++j)
 	{
 	  if (j > 0)
 	    fprintf (fp, ", ");
-	  write_expression(fp, depth + 1, max_depth - 1);
+	  write_expression (fp, fndesc->args[j].type, depth + 1,
+			    max_depth - 1, exclude_id);
 	}
       fprintf(fp, ")");
       break;
     case 7:
-      n = xrandom (num_functions);
-      fprintf(fp, "%s (", functions[n].name);
-      for (j = 0; j < functions[n].numargs; ++j)
+      fndesc = find_function (rslttype, functions, num_functions);
+      if (fndesc == NULL)
+	{
+	  cast_integer_type (fp, rslttype);
+	  fprintf (fp, "%d", xrandom (100));
+	  return;
+	}
+      fprintf (fp, "%s (", fndesc->name);
+      for (j = 0; j < fndesc->numargs; ++j)
 	{
 	  if (j > 0)
 	    fprintf (fp, ", ");
-	  write_expression(fp, depth + 1, max_depth - 1);
+	  write_expression (fp, fndesc->args[j].type, depth + 1,
+			    max_depth - 1, exclude_id);
 	}
       fprintf(fp, ")");
       break;
     case 1:
     case 6:
-      for (j = 0; j < 1000; ++j)
+      macrodesc = find_macro (t_int, lib_macros, num_lib_macros, exclude_id);
+      if (macrodesc == NULL)
 	{
-	  n = xrandom (num_lib_macros);
-	  if (lib_macros[n].use)
-	    break;
+	  cast_integer_type (fp, rslttype);
+	  fprintf (fp, "%d", xrandom (100));
+	  return;
 	}
-      if (!lib_macros[n].use)
-	goto getout;
-      fprintf(fp, "%s", lib_macros[n].name);
-      if (lib_macros[n].numargs >= 0)
+      cast_integer_type (fp, rslttype);
+      fprintf (fp, "%s", macrodesc->name);
+      if (macrodesc->numargs >= 0)
 	{
-	  fprintf(fp, " (");
-	  for (j = 0; j < lib_macros[n].numargs; ++j)
+	  fprintf (fp, " (");
+	  for (j = 0; j < macrodesc->numargs; ++j)
 	    {
 	      if (j > 0)
 		fprintf (fp, ", ");
-	      write_expression(fp, depth + 1, max_depth - 1);
+	      write_expression (fp, t_int, depth + 1, max_depth - 1,
+				exclude_id);
 	    }
-	  fprintf(fp, ")");
+	  fprintf (fp, ")");
 	}
       break;
     case 8:
-      n = xrandom (num_macros);
-      fprintf(fp, "%s", macros[n].name);
-      if (macros[n].numargs >= 0)
+      macrodesc = find_macro (t_int, macros, num_macros, exclude_id);
+      if (macrodesc == NULL)
 	{
-	  fprintf(fp, " (");
-	  for (j = 0; j < macros[n].numargs; ++j)
+	  cast_integer_type (fp, rslttype);
+	  fprintf (fp, "%d", xrandom (100));
+	  return;
+	}
+      cast_integer_type (fp, rslttype);
+      fprintf (fp, "%s", macrodesc->name);
+      if (macrodesc->numargs >= 0)
+	{
+	  fprintf (fp, " (");
+	  for (j = 0; j < macrodesc->numargs; ++j)
 	    {
 	      if (j > 0)
 		fprintf (fp, ", ");
-	      write_expression(fp, depth + 1, max_depth - 1);
+	      write_expression (fp, t_int, depth + 1, max_depth - 1,
+				exclude_id);
 	    }
-	  fprintf(fp, ")");
+	  fprintf (fp, ")");
 	}
       break;
     case 2:
-      write_expression (fp, depth + 1, max_depth);
+      cast_integer_type (fp, rslttype);
+      fprintf (fp, "(");
+      write_expression (fp, t_int, depth + 1, max_depth, exclude_id);
       fprintf (fp, " + ");
-      write_expression (fp, depth + 1, max_depth);
+      write_expression (fp, t_int, depth + 1, max_depth, exclude_id);
+      fprintf (fp, ")");
       break;
     case 3:
-      write_expression (fp, depth + 1, max_depth);
+      cast_integer_type (fp, rslttype);
+      fprintf (fp, "(");
+      write_expression (fp, t_int, depth + 1, max_depth, exclude_id);
       fprintf (fp, " - ");
-      write_expression (fp, depth + 1, max_depth);
+      write_expression (fp, t_int, depth + 1, max_depth, exclude_id);
+      fprintf (fp, ")");
       break;
     case 4:
-      write_expression (fp, depth + 1, max_depth);
+      cast_integer_type (fp, rslttype);
+      fprintf (fp, "(");
+      write_expression (fp, t_int, depth + 1, max_depth, exclude_id);
       fprintf (fp, " * ");
-      write_expression (fp, depth + 1, max_depth);
+      write_expression (fp, t_int, depth + 1, max_depth, exclude_id);
+      fprintf (fp, ")");
       break;
     case 5:
+      cast_integer_type (fp, rslttype);
       n = xrandom (num_enums);
       n2 = xrandom (enums[n].num_enumerators);
       fprintf (fp, "%s", enums[n].enumerators[n2].name);
       break;
     default:
+      cast_integer_type (fp, rslttype);
       fprintf (fp, "%d", xrandom (127));
       break;
     }
+}
+
+void
+cast_integer_type (FILE *fp, int type)
+{
+  if (type == t_void || type == t_int)
+    return;
+  fprintf (fp, "(%s) ", name_from_type (type));
+}
+
+struct macro_desc *
+find_macro (int rslttype, struct macro_desc *macs, int nummacros,
+	    int exclude_id)
+{
+  int j, n;
+
+  for (j = 0; j < 1000; ++j)
+    {
+      n = xrandom (nummacros);
+      if (macs[n].use && macs[n].id > exclude_id)
+	return &(macs[n]);
+    }
+  return NULL;
+}
+
+/* Find a function that has the right return type.  */
+
+struct function_desc *
+find_function (int rslttype, struct function_desc *fns, int numfns)
+{
+  int j, n;
+
+  for (j = 0; j < 1000; ++j)
+    {
+      n = xrandom (numfns);
+      if (fns[n].use && fns[n].return_type == rslttype)
+	return &(fns[n]);
+    }
+  return NULL;
+}
+
+/* Write out a comment block that lists all the parameters used to
+   generate this program.  */
+
+void
+write_description_block (FILE *fp)
+{
+  extern unsigned long initial_randstate;
+
+  fprintf (fp, "/* A fine software product by SPU %s  */\n",
+	   version_string);
+  fprintf (fp, "/* Program: %d macros, %d enums, %d structs, %d functions */\n",
+	   num_macros, num_enums, num_structs, num_functions);
+  fprintf (fp, "/* Library: %d macros, %d enums, %d structs, %d functions */\n",
+	   num_lib_macros, num_lib_enums, num_lib_structs, num_lib_functions);
+  fprintf (fp, "/* Random seed is %d */\n", (int) initial_randstate);
+  /* (should write all other parameters too) */
+  fprintf (fp, "\n");
 }
 
 /* Write out a makefile that will compile the program just generated. */
@@ -1283,7 +1581,7 @@ write_makefile (void)
       /* Name the compiler so we can change it easily.  */
       fprintf (fp, "CC = cc\n\n");
       /* Write dependencies and action line for the executable.  */
-      fprintf (fp, "%s:	", file_base_name);
+      fprintf (fp, "%s.out:	", file_base_name);
       for (i = 0; i < num_files; ++i)
 	fprintf (fp, " %s%d.o", file_base_name, i);
       fprintf (fp, " %slib.o", file_base_name);
@@ -1305,6 +1603,9 @@ write_makefile (void)
 	  fprintf (fp, "\t$(CC) -c %s%d.%s\n",
 		   file_base_name, i, extensions[language]);
 	}
+
+      /* Library stuff.  */
+      fprintf (fp, "\nlib:	%slib.o\n\n", file_base_name);
       fprintf (fp, " %slib.o:	%slib.%s %slib.h",
 	       file_base_name, file_base_name, extensions[language],
 	       file_base_name);
@@ -1315,8 +1616,9 @@ write_makefile (void)
     }
 }
 
-
 /* Utility/general functions. */
+
+/* Generate a name that is guaranteed to be a valid C/C++ identifier.  */
 
 char *
 gen_unique_global_name (char *root, int upcase)
@@ -1331,7 +1633,7 @@ gen_unique_global_name (char *root, int upcase)
     }
   str = NULL;
   /* Keep trying until we get a unique name. */
-  for (i = 0; i < 100; ++i)
+  for (i = 0; i < 10000; ++i)
     {
       gen_random_global_name (root, namebuf);
       if (upcase)
@@ -1353,6 +1655,9 @@ gen_unique_global_name (char *root, int upcase)
   return str;
 }
 
+/* Synthesize a random name that is a valid C/C++ identifier and that
+   "looks like" something one might see in a program.  */
+
 void
 gen_random_global_name (char *root, char *namebuf)
 {
@@ -1373,7 +1678,7 @@ gen_random_global_name (char *root, char *namebuf)
       i = 0;
       while (n > 0)
 	{
-	  if (xrandom(6) == 0)
+	  if (xrandom (6) == 0)
 	    namebuf[i++] = '_';
 	  namebuf[i++] = 'a' + (n % 26);
 	  n /= 26;
@@ -1389,7 +1694,7 @@ gen_random_global_name (char *root, char *namebuf)
       strcat (namebuf, "_");
       strcat (namebuf, root);
     }
-  switch (xrandom (4))
+  switch (xrandom (5))
     {
     case 0:
       strcat (namebuf, "_");
@@ -1402,11 +1707,33 @@ gen_random_global_name (char *root, char *namebuf)
       sprintf (smallbuf, "%d", xrandom (10000));
       strcat (namebuf, smallbuf);
       break;
+    case 2:
+      n = xrandom (10000);
+      len = strlen (namebuf);
+      i = len;
+      while (n > 0)
+	{
+	  if (xrandom (6) == 0)
+	    namebuf[i++] = '_';
+	  namebuf[i++] = 'a' + (n % 26);
+	  n /= 26;
+	}
+      namebuf[i] = '\0';
+      break;
     default:
       strcat (namebuf, "_");
       strcat (namebuf, random_computer_word ());
       break;
     }
+  if (xrandom (5) == 0)
+    {
+      strcat (namebuf, "_");
+      sprintf (smallbuf, "%d", xrandom (10000));
+      strcat (namebuf, smallbuf);
+    }
+#if 0 /* enable to study random name distribution */
+  printf ("Try %s\n", namebuf);
+#endif
 }
 
 /* Generate a local variable name. */
@@ -1513,8 +1840,6 @@ get_from_hash_table (char *buf, struct hash_table *table)
   return "?!hash!?";
 }
 
-#include <time.h>
-
 /* Random number handling is important but terrible/nonexistent in
    some systems.  Do it ourselves.  Also, this will give repeatable
    results across multiple platforms, which is important if this is
@@ -1551,9 +1876,9 @@ init_xrandom (int seed)
       time (&tm);
       randstate = tm;
     }
-  /* Whatever its source, put the randstate into known range (0 - 99999).  */
+  /* Whatever its source, put the randstate into known range (0 - 199999).  */
   randstate = abs (randstate);
-  randstate %= 100000L;
+  randstate %= 200000;
   /* This is kept around for the sake of error reporting. */
   initial_randstate = randstate;
 }
@@ -1564,8 +1889,14 @@ init_xrandom (int seed)
 int
 xrandom (int m)
 {
-  randstate = (8121 * randstate + 28411) % 134456L;
-  return ((m * randstate) / 134456L);
+  int rslt;
+
+  randstate = (9301 * randstate + 49297) % 233280;
+  rslt = (m * randstate) / 233280;
+#if 0 /* enable to study random number distribution */
+  printf ("# %lu -> %d\n", randstate, rslt);
+#endif
+  return rslt;
 }
 
 /* Percentage probability, with bounds checking. */
@@ -1577,7 +1908,7 @@ probability(int prob)
     return 0;
   if (prob >= 100)
     return 1;
-  return (xrandom(100) < prob);
+  return (xrandom (100) < prob);
 }
 
 char *

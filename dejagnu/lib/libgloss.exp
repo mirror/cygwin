@@ -418,8 +418,16 @@ proc get_multilibs { args } {
 	set comp_base_dir [file dirname [file dirname [file dirname [file dirname [file dirname [exec $compiler --print-prog-name=cc1]]]]]];
     }
 
+    # set output [exec $objdump_name --file-headers objfmtst.o ]
+    set default_multilib [exec $compiler --print-multi-lib]
+    set default_multilib [lindex $default_multilib 0];
+    set extra [string trimleft $default_multilib "."]
+
     # extract the options and their directory names as know by gcc
     foreach i "[exec $compiler --print-multi-lib]" {
+    	if {$extra != ""} {
+	  set i [string trimright $i $extra"]
+	}
 	set opts ""
 	set dir ""
 	regexp -- "\[a-z0-9=/\.-\]*;" $i dir

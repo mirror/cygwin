@@ -11,9 +11,9 @@ pit::pit ()
       update_pit_pin(this, & pit::update_pit),
       ports_0x40_0x43_bus(this, & pit::read_port_0x40_0x43, & pit::write_port_0x40_0x43),
       port_0x61_bus(this, & pit::read_port_0x61, & pit::write_port_0x61),
-      timer_delta(100), pit_irq_number(0)
+      timer_delta(100)
 {
-  add_pin("trigger-irq", & this->trigger_irq_pin);
+  add_pin("interrupt", & this->interrupt_pin);
 
   add_pin("init", & this->init_pin);
   add_pin("update-pit", & this->update_pit_pin);
@@ -21,7 +21,6 @@ pit::pit ()
   add_bus("ports-0x40-0x43", & this->ports_0x40_0x43_bus);
   add_bus("port-0x61", & this->port_0x61_bus);
 
-  add_attribute("irq-number", & this->pit_irq_number, "setting");
   add_attribute("timer-delta", & this->timer_delta, "setting");
 }
 
@@ -35,7 +34,7 @@ void
 pit::update_pit(host_int_4)
 {
   if(bx_pit.periodic(timer_delta))
-    trigger_irq_pin.drive(pit_irq_number);
+    interrupt_pin.drive(1);
 }
 
 bus::status

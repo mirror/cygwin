@@ -43,6 +43,7 @@ void
 dma::init(host_int_4)
 {
   bx_dma.init(this);
+  terminal_count_pin.drive(0);
 }
 
 void

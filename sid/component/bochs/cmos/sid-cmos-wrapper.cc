@@ -17,9 +17,9 @@ cmos::cmos ()
       register_0x14 (& this->register_bus, host_int_4(0x14), little_int_1(0xff),
                      true, true, this, & cmos::set_register_0x14, & cmos::get_register_0x14),
       ports_0x70_0x71_bus(this, & cmos::read_port_0x70_0x71, & cmos::write_port_0x70_0x71),
-      cmos_irq_number(8), use_host_time(true), start_time(917385580), use_image_file(false)
+      base_memory_in_k(640), extended_memory_in_k(32768), use_image_file(false)
 {
-  add_pin("trigger-irq", & this->trigger_irq_pin);
+  add_pin("interrupt", & this->interrupt_pin);
 
   add_pin("periodic-timer-control", & this->periodic_timer_control_pin);
   add_pin("one-second-timer-control", & this->one_second_timer_control_pin);
@@ -29,24 +29,20 @@ cmos::cmos ()
   add_pin("image-load", & this->image_load_pin);
   add_pin("periodic-timer", & this->periodic_timer_pin);
   add_pin("one-second-timer", & this->one_second_timer_pin);
-  add_pin("host-time", & this->host_time_pin);
-  add_pin("time-query", & this->time_query_pin);
 
   add_bus("ports-0x70-0x71", & this->ports_0x70_0x71_bus);
   add_bus("registers", & this->register_bus);
 
   add_attribute("image-file", & this->image_file_path, "setting");
   add_attribute("use-image-file?", & this->use_image_file, "setting");
-  add_attribute("irq-number", & this->cmos_irq_number, "setting");
-  add_attribute("use-host-time?", & this->use_host_time, "setting");
-  add_attribute("start-time", & this->start_time, "setting");
+  add_attribute("base-memory-in-k", & this->base_memory_in_k, "setting");
+  add_attribute("extended-memory-in-k", & this->extended_memory_in_k, "setting");
 }
 
 void
 cmos::init(host_int_4)
 {
   bx_cmos.init(this);
-  bx_cmos.checksum_cmos();
 }
 
 void
@@ -61,7 +57,18 @@ cmos::image_load(host_int_4)
   if (use_image_file)
     bx_cmos.load_cmos_image(image_file_path);
   else
-    bx_cmos.generate_cmos_values();
+    {
+      bx_cmos.generate_cmos_values();
+
+      bx_cmos.s.reg[0x15] = (Bit8u) base_memory_in_k;
+      bx_cmos.s.reg[0x16] = (Bit8u) (base_memory_in_k >> 8);
+      bx_cmos.s.reg[0x17] = (Bit8u) (extended_memory_in_k - 1024);
+      bx_cmos.s.reg[0x18] = (Bit8u) ((extended_memory_in_k - 1024) >> 8);
+      bx_cmos.s.reg[0x30] = (Bit8u) (extended_memory_in_k - 1024);
+      bx_cmos.s.reg[0x31] = (Bit8u) ((extended_memory_in_k - 1024) >> 8);
+
+      bx_cmos.checksum_cmos();
+    }
 }
 
 void
@@ -77,9 +84,9 @@ cmos::one_second_timer(host_int_4)
 }
 
 void
-cmos::drive_trigger_irq_pin(void)
+cmos::drive_interrupt_pin(void)
 {
-  trigger_irq_pin.drive(cmos_irq_number);
+  interrupt_pin.drive(1);
 }
 
 void
@@ -96,19 +103,6 @@ cmos::drive_one_second_timer_control_pin(host_int_4 value, bool regular)
   host_int_4 code = value | (regular << 31);
 
   one_second_timer_control_pin.drive(code);
-}
-
-host_int_4
-cmos::get_time(void)
-{
-  static host_int_4 host_start_time = host_time_pin.sense();
-
-  time_query_pin.drive(1);
-
-  if (use_host_time)
-    return host_time_pin.sense();
-  else
-    return start_time + (host_time_pin.sense() - host_start_time);
 }
 
 bus::status

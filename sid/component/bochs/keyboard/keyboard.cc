@@ -55,7 +55,7 @@ bx_keyb_c bx_keyboard;
 bx_keyb_c::bx_keyb_c(void)
 {
 #if BX_SUPPORT_SID
-  bx_dbg.keyboard = 1;
+  bx_dbg.keyboard = 0;
 #endif
   // constructor
   // should zero out state info here???
@@ -269,6 +269,18 @@ bx_keyb_c::read(Bit32u   address, unsigned io_len)
     }
 
 #if BX_CPU_LEVEL >= 2
+#if BX_SUPPORT_SID
+  else if (address == 0x92)
+    {
+      if (io_len > 1)
+        BX_PANIC(("devices.c: port 92h: io read from address %08x, len=%u\n",
+                  (unsigned) address, (unsigned) io_len));
+      
+      BX_INFO(("devices: port92h read partially supported!!!\n"));
+      BX_INFO(("devices:   returning %02x\n", (unsigned) (BX_GET_ENABLE_A20() << 1)));
+      return(BX_GET_ENABLE_A20() << 1);
+    }
+#endif // BX_SUPPORT_SID
   else if (address == 0x64) { /* status register */
     Bit8u   val;
 
@@ -566,6 +578,26 @@ BX_PANIC(("kbd: OUTB set and command 0x%02x encountered\n", value));
         }
       break;
 
+#if BX_SUPPORT_SID
+  case 0x92:
+    Boolean bx_cpu_reset;
+    
+    if (io_len > 1)
+      BX_PANIC(("devices.c: port 92h: io read from address %08x, len=%u\n",
+                (unsigned) address, (unsigned) io_len));
+    
+    BX_INFO(("devices: port92h write of %02x partially supported!!!\n",
+             (unsigned) value));
+    BX_INFO(("devices: A20: set_enable_a20() called\n"));
+    BX_SET_ENABLE_A20( (value & 0x02) >> 1 );
+    BX_INFO(("A20: now %u\n", (unsigned) BX_GET_ENABLE_A20()));
+    bx_cpu_reset  = (value & 0x01); /* high speed reset */
+    if (bx_cpu_reset)
+      {
+        BX_PANIC(("PORT 92h write: CPU reset requested!\n"));
+      }
+    break;
+#endif // BX_SUPPORT_SID
     default: BX_PANIC(("unknown address in bx_keyb_c::write()\n"));
     }
 }
@@ -1139,9 +1171,15 @@ bx_keyb_c::periodic( Bit32u   usec_delta )
   void
 bx_keyb_c::activate_timer(void)
 {
+#if BX_SUPPORT_SID
+  if (BX_KEY_THIS s.kbd_controller.timer_pending == 0) {
+    BX_KEY_THIS s.kbd_controller.timer_pending = serial_delay;
+    }
+#else
   if (BX_KEY_THIS s.kbd_controller.timer_pending == 0) {
     BX_KEY_THIS s.kbd_controller.timer_pending = bx_options.keyboard_serial_delay;
     }
+#endif // BX_SUPPORT_SID
 }
 
 

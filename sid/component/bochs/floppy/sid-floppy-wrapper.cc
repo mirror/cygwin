@@ -11,20 +11,22 @@ floppy::floppy ()
       reset_pin(this, & floppy::reset),
       command_delay_pin(this, & floppy::command_delay),
       dma_channel_pin(this, & floppy::dma_channel),
-      ports_0x3f2_0x3f7_bus(this, & floppy::read_port_0x3f2_0x3f7, & floppy::write_port_0x3f2_0x3f7),
-      floppy_dma_channel(2), floppy_irq_number(6), floppy_a_type("1.44"), floppy_b_type("none"),
+      ports_0x3f2_0x3f5_bus(this, & floppy::read_port_0x3f2_0x3f5, & floppy::write_port_0x3f2_0x3f5),
+      port_0x3f7_bus(this, & floppy::read_port_0x3f7, & floppy::write_port_0x3f7),
+      floppy_dma_channel(2), floppy_a_type("1.44"), floppy_b_type("none"),
       cmos_registers_bus(0), dma_channels_bus(0), dma_bus(0)
 {
   add_pin("terminal-count", & this->terminal_count_pin);
 
-  add_pin("trigger-irq", & this->trigger_irq_pin);
+  add_pin("interrupt", & this->interrupt_pin);
   add_pin("command-delay-control", & this->command_delay_control_pin);
 
   add_pin("init", & this->init_pin);
   add_pin("reset", & this->reset_pin);
   add_pin("command-delay", & this->command_delay_pin);
 
-  add_bus("ports-0x3f2-0x3f7", & this->ports_0x3f2_0x3f7_bus);
+  add_bus("ports-0x3f2-0x3f5", & this->ports_0x3f2_0x3f5_bus);
+  add_bus("port-0x3f7", & this->port_0x3f7_bus);
 
   add_accessor("cmos-registers", & this->cmos_registers_bus);
   add_accessor("dma-channels", & this->dma_channels_bus);
@@ -43,7 +45,10 @@ floppy::floppy ()
   add_attribute("floppy-b-inserted?", & this->floppy_b_is_inserted, "setting");
 
   add_attribute("dma-channel", & this->floppy_dma_channel, "setting");
-  add_attribute("irq-number", & this->floppy_irq_number, "setting");
+
+  bx_floppy.command_delay = 500;
+
+  add_attribute("command-delay", & this->bx_floppy.command_delay, "setting");
 }
 
 void
@@ -161,9 +166,9 @@ floppy::reset(host_int_4)
 }
 
 void
-floppy::drive_trigger_irq_pin(void)
+floppy::drive_interrupt_pin(void)
 {
-  trigger_irq_pin.drive(floppy_irq_number);
+  interrupt_pin.drive(1);
 }
 
 void
@@ -190,7 +195,7 @@ floppy::terminal_count(void)
 }
 
 bus::status
-floppy::read_port_0x3f2_0x3f7 (host_int_4 addr, little_int_1 mask, little_int_1 & data)
+floppy::read_port_0x3f2_0x3f5 (host_int_4 addr, little_int_1 mask, little_int_1 & data)
 {
   addr += 0x3f2;
   data = bx_floppy.read(addr, 1);
@@ -198,9 +203,25 @@ floppy::read_port_0x3f2_0x3f7 (host_int_4 addr, little_int_1 mask, little_int_1 
 }
 
 bus::status
-floppy::write_port_0x3f2_0x3f7 (host_int_4 addr, little_int_1 mask, little_int_1 data)
+floppy::write_port_0x3f2_0x3f5 (host_int_4 addr, little_int_1 mask, little_int_1 data)
 {
   addr += 0x3f2;
+  bx_floppy.write(addr, data, 1);
+  return bus::ok;
+}
+
+bus::status
+floppy::read_port_0x3f7 (host_int_4 addr, little_int_1 mask, little_int_1 & data)
+{
+  addr += 0x3f7;
+  data = bx_floppy.read(addr, 1);
+  return bus::ok;
+}
+
+bus::status
+floppy::write_port_0x3f7 (host_int_4 addr, little_int_1 mask, little_int_1 data)
+{
+  addr += 0x3f7;
   bx_floppy.write(addr, data, 1);
   return bus::ok;
 }
@@ -214,28 +235,28 @@ floppy::dma_channel_number(void)
 void
 floppy::dma_channel(host_int_4 phy_addr)
 {
+  little_int_1 sid_data_byte;
+  Bit8u bochs_data_byte;
+
   if (read_write_pin.sense())
-    // read mode
-    bx_floppy.dma_read(phy_addr);
+    {
+      // read mode
+      dma_bus->read(phy_addr, sid_data_byte);
+
+      bochs_data_byte = sid_data_byte;
+      
+      bx_floppy.dma_read(& bochs_data_byte);
+    }
   else
-    // write mode
-    bx_floppy.dma_write(phy_addr);
-}
+    {
+      // write mode
+      
+      bx_floppy.dma_write(& bochs_data_byte);
 
-void
-floppy::dma_write(host_int_4 addr, little_int_1 data)
-{
-  dma_bus->write(addr, data);
-}
-
-void
-floppy::dma_read(host_int_4 addr, unsigned char *data)
-{
-  little_int_1 read_data;
-
-  dma_bus->read(addr, read_data);
-
-  *data = read_data;
+      sid_data_byte = bochs_data_byte;
+      
+      dma_bus->write(phy_addr, sid_data_byte);
+    }
 }
 
 void

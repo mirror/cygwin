@@ -141,7 +141,7 @@ bx_pit_c bx_pit;
 bx_pit_c::bx_pit_c( void )
 {
 #if BX_SUPPORT_SID
-  bx_dbg.pit = 1;
+  bx_dbg.pit = 0;
 #endif
   setprefix("[PIT ]");
   settype(PITLOG);

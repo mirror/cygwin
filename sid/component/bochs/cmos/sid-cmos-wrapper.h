@@ -49,10 +49,9 @@ public:
   void periodic_timer(host_int_4);
   void one_second_timer(host_int_4);
 
-  void drive_trigger_irq_pin(void);
+  void drive_interrupt_pin(void);
   void drive_periodic_timer_control_pin(host_int_4 value, bool regular);
   void drive_one_second_timer_control_pin(host_int_4 value, bool regular);
-  host_int_4 get_time(void);
 
 protected:
 
@@ -61,12 +60,10 @@ protected:
   callback_pin<cmos> image_load_pin;
   callback_pin<cmos> periodic_timer_pin;
   callback_pin<cmos> one_second_timer_pin;
-  input_pin host_time_pin;
 
-  output_pin trigger_irq_pin;
+  output_pin interrupt_pin;
   output_pin periodic_timer_control_pin;
   output_pin one_second_timer_control_pin;
-  output_pin time_query_pin;
 
   bus::status read_port_0x70_0x71 (host_int_4 addr, little_int_1 mask, little_int_1 & data);
   bus::status write_port_0x70_0x71 (host_int_4 addr, little_int_1 mask, little_int_1 data);
@@ -87,11 +84,10 @@ protected:
   callback_control_register<little_int_1, cmos> register_0x10;
   callback_control_register<little_int_1, cmos> register_0x14;
 
+  host_int_4 base_memory_in_k;
+  host_int_4 extended_memory_in_k;
   bool use_image_file;
   std::string image_file_path;
-  host_int_4 cmos_irq_number;
-  bool use_host_time;
-  host_int_4 start_time;
   bx_cmos_c bx_cmos;
 };
 #endif // SID_CMOS_WRAPPER_DEF_H

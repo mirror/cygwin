@@ -54,7 +54,7 @@ BX_CPU_C::interrupt(Bit8u vector, Boolean is_INT, Boolean is_error_code,
                     Bit16u error_code)
 {
 #if BX_SUPPORT_SID
-  bx_dbg.interrupts = 1;
+  bx_dbg.interrupts = 0;
   if (!x86_cpu_component->hardware_mode())
     {
       // Use 0x80 as the syscall interrupt number.

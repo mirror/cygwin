@@ -173,7 +173,7 @@ class sid_mem_c;
 #else
 #define BX_HRQ                      (bx_pc_system.HRQ)
 #define BX_RAISE_HLDA()             bx_pc_system.raise_HLDA()
-#endif
+#endif // BX_SUPPORT_SID
 #if BX_SUPPORT_SID
 #define BX_TICK1()
 #else
@@ -568,6 +568,7 @@ enum PCS_OP { PCS_CLEAR, PCS_SET, PCS_TOGGLE };
 #include "cmos/cmos.h"
 #include "floppy/floppy.h"
 #include "unmapped/unmapped.h"
+#include "harddrv/harddrv.h"
 #else
 #include "pc_system.h"
 

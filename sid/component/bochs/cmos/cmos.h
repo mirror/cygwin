@@ -89,7 +89,7 @@ private:
 public:
   static void periodic_timer_handler(void *);
   static void one_second_timer_handler(void *);
-#endif
+#endif // BX_SUPPORT_SID
 private:
   BX_CMOS_SMF void update_clock(void);
   BX_CMOS_SMF void CRA_change(void);

@@ -61,7 +61,7 @@ bx_floppy_ctrl_c bx_floppy;
 bx_floppy_ctrl_c::bx_floppy_ctrl_c(void)
 {
 #if BX_SUPPORT_SID
-  bx_dbg.floppy = 1;
+  bx_dbg.floppy = 0;
 #endif
 	setprefix("[FDD ]");
 	settype(FDLOG);
@@ -199,15 +199,19 @@ bx_floppy_ctrl_c::init(bx_devices_c *d, bx_cmos_c *cmos)
 #if BX_SUPPORT_SID
   floppy_component = floppy_comp;
   floppy_component->drive_command_delay_control_pin(0, 0);
+
+  BX_INFO(("bx_options.floppy_command_delay = %u\n",
+    (unsigned) command_delay));
 #else
 
   BX_FD_THIS s.floppy_timer_index =
     bx_pc_system.register_timer( this, timer_handler,
       bx_options.floppy_command_delay, 0,0);
-#endif
 
   BX_INFO(("bx_options.floppy_command_delay = %u\n",
     (unsigned) bx_options.floppy_command_delay));
+#endif
+
 }
 
 
@@ -335,7 +339,7 @@ bx_floppy_ctrl_c::read(Bit32u address, unsigned io_len)
 #if 0 // Change this when adding bochs hard drive component to sid.
       value = BX_FD_THIS devices->hard_drive->read_handler(BX_FD_THIS devices->hard_drive, address, io_len);
 #else
-      value = 0;
+      value = 0xff;
 #endif
       value &= 0x7f;
       // add in diskette change line
@@ -420,7 +424,7 @@ bx_floppy_ctrl_c::write(Bit32u address, Bit32u value, unsigned io_len)
         BX_FD_THIS s.pending_command = 0xfe; // RESET pending
 
 #if BX_SUPPORT_SID
-        floppy_component->drive_command_delay_control_pin(bx_options.floppy_command_delay, 0);
+        floppy_component->drive_command_delay_control_pin(command_delay, 0);
 #else
         bx_pc_system.activate_timer( BX_FD_THIS s.floppy_timer_index,
              bx_options.floppy_command_delay, 0 );
@@ -631,7 +635,7 @@ bx_floppy_ctrl_c::floppy_command(void)
       BX_FD_THIS s.cylinder[drive] = 0;
 
 #if BX_SUPPORT_SID
-      floppy_component->drive_command_delay_control_pin(bx_options.floppy_command_delay, 0);
+      floppy_component->drive_command_delay_control_pin(command_delay, 0);
 #else
       bx_pc_system.activate_timer( BX_FD_THIS s.floppy_timer_index,
         bx_options.floppy_command_delay, 0 );
@@ -692,7 +696,7 @@ bx_floppy_ctrl_c::floppy_command(void)
       /* ??? should also check cylinder validity */
 
 #if BX_SUPPORT_SID
-      floppy_component->drive_command_delay_control_pin(bx_options.floppy_command_delay, 0);
+      floppy_component->drive_command_delay_control_pin(command_delay, 0);
 #else
       bx_pc_system.activate_timer( BX_FD_THIS s.floppy_timer_index,
         bx_options.floppy_command_delay, 0 );
@@ -734,7 +738,7 @@ bx_floppy_ctrl_c::floppy_command(void)
       BX_FD_THIS s.result[5] = 0; /* sector at completion */
       BX_FD_THIS s.result[6] = 2;
 #if BX_SUPPORT_SID
-      floppy_component->drive_command_delay_control_pin(bx_options.floppy_command_delay, 0);
+      floppy_component->drive_command_delay_control_pin(command_delay, 0);
 #else
       bx_pc_system.activate_timer( BX_FD_THIS s.floppy_timer_index,
         bx_options.floppy_command_delay, 0 );
@@ -798,7 +802,7 @@ bx_floppy_ctrl_c::floppy_command(void)
         BX_FD_THIS s.pending_command = 0;
         BX_FD_THIS s.main_status_reg = FD_MS_MRQ | FD_MS_DIO | FD_MS_BUSY;
 #if BX_SUPPORT_SID
-        floppy_component->drive_trigger_irq_pin();
+        floppy_component->drive_interrupt_pin();
 #else
         BX_FD_THIS devices->pic->trigger_irq(6);
 #endif
@@ -845,7 +849,7 @@ bx_floppy_ctrl_c::floppy_command(void)
 
 
 #if BX_SUPPORT_SID
-      floppy_component->drive_command_delay_control_pin(bx_options.floppy_command_delay, 0);
+      floppy_component->drive_command_delay_control_pin(command_delay, 0);
 #else
         bx_pc_system.activate_timer( BX_FD_THIS s.floppy_timer_index,
           bx_options.floppy_command_delay, 0 );
@@ -1002,7 +1006,7 @@ bx_floppy_ctrl_c::timer()
       /* write ready, not busy */
       BX_FD_THIS s.main_status_reg = FD_MS_MRQ;
 #if BX_SUPPORT_SID
-      floppy_component->drive_trigger_irq_pin();
+      floppy_component->drive_interrupt_pin();
 #else
       BX_FD_THIS devices->pic->trigger_irq(6);
 #endif
@@ -1014,7 +1018,7 @@ bx_floppy_ctrl_c::timer()
       /* write ready, not busy */
       BX_FD_THIS s.main_status_reg = FD_MS_MRQ;
 #if BX_SUPPORT_SID
-      floppy_component->drive_trigger_irq_pin();
+      floppy_component->drive_interrupt_pin();
 #else
       BX_FD_THIS devices->pic->trigger_irq(6);
 #endif
@@ -1029,7 +1033,7 @@ bx_floppy_ctrl_c::timer()
       /* read ready, busy */
       BX_FD_THIS s.main_status_reg = FD_MS_MRQ | FD_MS_DIO;
 #if BX_SUPPORT_SID
-      floppy_component->drive_trigger_irq_pin();
+      floppy_component->drive_interrupt_pin();
 #else
       BX_FD_THIS devices->pic->trigger_irq(6);
 #endif
@@ -1040,7 +1044,7 @@ bx_floppy_ctrl_c::timer()
       BX_FD_THIS s.pending_command = 0;
       BX_FD_THIS s.main_status_reg = FD_MS_MRQ;
 #if BX_SUPPORT_SID
-      floppy_component->drive_trigger_irq_pin();
+      floppy_component->drive_interrupt_pin();
 #else
       BX_FD_THIS devices->pic->trigger_irq(6);
 #endif
@@ -1059,24 +1063,15 @@ reset_changeline:
     BX_FD_THIS s.DIR &= ~0x80; // clear disk change line
 }
 
-#if BX_SUPPORT_SID
-void
-bx_floppy_ctrl_c::dma_write(Bit32u phy_addr)
-#else
   void
 bx_floppy_ctrl_c::dma_write(Bit8u *data_byte)
-#endif
 {
   // A DMA write is from I/O to Memory
   // We need to return then next data byte from the floppy buffer
   // to be transfered via the DMA to memory. (read block from floppy)
 
 
-#if BX_SUPPORT_SID
-  floppy_component->dma_write(phy_addr, s.floppy_buffer[s.floppy_buffer_index++]);
-#else
   *data_byte = BX_FD_THIS s.floppy_buffer[BX_FD_THIS s.floppy_buffer_index++];
-#endif
 
   if (BX_FD_THIS s.floppy_buffer_index >= 512) {
     Bit8u drive;
@@ -1111,7 +1106,7 @@ bx_floppy_ctrl_c::dma_write(Bit8u *data_byte)
         }
 
 #if BX_SUPPORT_SID
-      floppy_component->drive_trigger_irq_pin();
+      floppy_component->drive_interrupt_pin();
       floppy_component->channel_request(FLOPPY_DMA_CHAN, 0);
 #else
       BX_FD_THIS devices->pic->trigger_irq(6);
@@ -1131,13 +1126,8 @@ bx_floppy_ctrl_c::dma_write(Bit8u *data_byte)
     }
 }
 
-#if BX_SUPPORT_SID
-  void
-bx_floppy_ctrl_c::dma_read(Bit32u phy_addr)
-#else
   void
 bx_floppy_ctrl_c::dma_read(Bit8u *data_byte)
-#endif
 {
   // A DMA read is from Memory to I/O
   // We need to write the data_byte which was already transfered from memory
@@ -1146,11 +1136,7 @@ bx_floppy_ctrl_c::dma_read(Bit8u *data_byte)
   Bit8u drive;
   Bit32u logical_sector;
 
-#if BX_SUPPORT_SID
-  floppy_component->dma_read(phy_addr, & s.floppy_buffer[s.floppy_buffer_index++]);
-#else
   BX_FD_THIS s.floppy_buffer[BX_FD_THIS s.floppy_buffer_index++] = *data_byte;
-#endif
 
   if (BX_FD_THIS s.floppy_buffer_index >= 512) {
     drive = BX_FD_THIS s.DOR & 0x03;
@@ -1187,7 +1173,7 @@ bx_floppy_ctrl_c::dma_read(Bit8u *data_byte)
         }
 
 #if BX_SUPPORT_SID
-      floppy_component->drive_trigger_irq_pin();
+      floppy_component->drive_interrupt_pin();
       floppy_component->channel_request(FLOPPY_DMA_CHAN, 0);
 #else
       BX_FD_THIS devices->pic->trigger_irq(6);

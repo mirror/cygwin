@@ -139,6 +139,15 @@
 #define BX_READ_16BIT_REG(index) (BX_CPU_THIS_PTR gen_reg[index].word.rx)
 #define BX_READ_32BIT_REG(index) (BX_CPU_THIS_PTR gen_reg[index].erx)
 
+#if BX_SUPPORT_SID
+#define BX_READ_16BIT_BASE_REG(var, index) {\
+  var = *BX_CPU_THIS_PTR a_16bit_base_reg[index];\
+  }
+
+#define BX_READ_16BIT_INDEX_REG(var, index) {\
+  var = *BX_CPU_THIS_PTR a_16bit_index_reg[index];\
+  }
+#else // BX_SUPPORT_SID
 #define BX_READ_16BIT_BASE_REG(var, index) {\
   var = *BX_CPU_THIS_PTR _16bit_base_reg[index];\
   }
@@ -146,6 +155,7 @@
 #define BX_READ_16BIT_INDEX_REG(var, index) {\
   var = *BX_CPU_THIS_PTR _16bit_index_reg[index];\
   }
+#endif // BX_SUPPORT_SID
 
 #define BX_WRITE_8BIT_REG(index, val) {\
   if ((index) < 4) \
@@ -384,7 +394,7 @@ typedef void * (*BxVoidFPtr_t)(void);
 class BX_CPU_C;
 #if BX_SUPPORT_SID
 class x86_cpu;
-#endif
+#endif // BX_SUPPORT_SID
 
 typedef struct BxInstruction_tag {
   // prefix stuff here...
@@ -649,7 +659,7 @@ typedef void (*BxDTShim_t)(void);
 class sid_bx_mem_c;
 #else
 class BX_MEM_C;
-#endif
+#endif // BX_SUPPORT_SID
 
 class BX_CPU_C : public logfunctions {
 
@@ -754,7 +764,7 @@ public: // for now...
 #else
   // pointer to the address space that this processor uses.
   BX_MEM_C *mem;
-#endif
+#endif // BX_SUPPORT_SID
 
   Boolean EXT; /* 1 if processing external interrupt or exception
                 * or if not related to current instruction,
@@ -769,8 +779,13 @@ public: // for now...
   Boolean BX_HRQ;
 #endif
   // for accessing registers by index number
+#if BX_SUPPORT_SID
+  Bit16u *a_16bit_base_reg[8];
+  Bit16u *a_16bit_index_reg[8];
+#else
   Bit16u *_16bit_base_reg[8];
   Bit16u *_16bit_index_reg[8];
+#endif // BX_SUPPORT_SID  
   Bit32u empty_register;
 
   // for decoding instructions; accessing seg reg's by index
@@ -844,7 +859,7 @@ public: // for now...
   void init (x86_cpu *x86_cpu_comp, sid_bx_mem_c *addrspace);
 #else
   void init (BX_MEM_C *addrspace);
-#endif
+#endif // BX_SUPPORT_SID
 
   // prototypes for CPU instructions...
   BX_SMF void ADD_EbGb(BxInstruction_t *);
@@ -1379,7 +1394,7 @@ public: // for now...
   BX_SMF Boolean  dbg_is_end_instr_bpoint(Bit32u cs, Bit32u eip,
                                           Bit32u laddr, Bit32u is_32);
 #endif
-#endif
+#endif // BX_SUPPORT_SID
 #if BX_DEBUGGER || BX_DISASM || BX_INSTRUMENTATION
   BX_SMF void     dbg_xlate_linear2phy(Bit32u linear, Bit32u *phy, Boolean *valid);
 #endif

@@ -27,6 +27,7 @@
 
 #if BX_SUPPORT_SID
 #include "sid-x86-cpu-wrapper.h"
+extern Bit8u *sid_prefetch_data;
 #endif
 
 
@@ -55,7 +56,9 @@ void BX_CPU_C::init(BX_MEM_C *addrspace)
   // BX_CPU_C constructor
   BX_CPU_THIS_PTR set_INTR (0);
 #if BX_SUPPORT_SID
+  bx_dbg.interrupts = 0;
   BX_CPU_THIS_PTR set_HRQ (0);
+  sid_prefetch_data = new Bit8u[16];
 #endif
 
 #if BX_SUPPORT_APIC
@@ -73,6 +76,26 @@ void BX_CPU_C::init(BX_MEM_C *addrspace)
 
   // 16bit address mode base register, used for mod-rm decoding
 
+#if BX_SUPPORT_SID
+  a_16bit_base_reg[0] = &gen_reg[BX_16BIT_REG_BX].word.rx;
+  a_16bit_base_reg[1] = &gen_reg[BX_16BIT_REG_BX].word.rx;
+  a_16bit_base_reg[2] = &gen_reg[BX_16BIT_REG_BP].word.rx;
+  a_16bit_base_reg[3] = &gen_reg[BX_16BIT_REG_BP].word.rx;
+  a_16bit_base_reg[4] = (Bit16u*) &empty_register;
+  a_16bit_base_reg[5] = (Bit16u*) &empty_register;
+  a_16bit_base_reg[6] = &gen_reg[BX_16BIT_REG_BP].word.rx;
+  a_16bit_base_reg[7] = &gen_reg[BX_16BIT_REG_BX].word.rx;
+
+  // 16bit address mode index register, used for mod-rm decoding
+  a_16bit_index_reg[0] = &gen_reg[BX_16BIT_REG_SI].word.rx;
+  a_16bit_index_reg[1] = &gen_reg[BX_16BIT_REG_DI].word.rx;
+  a_16bit_index_reg[2] = &gen_reg[BX_16BIT_REG_SI].word.rx;
+  a_16bit_index_reg[3] = &gen_reg[BX_16BIT_REG_DI].word.rx;
+  a_16bit_index_reg[4] = &gen_reg[BX_16BIT_REG_SI].word.rx;
+  a_16bit_index_reg[5] = &gen_reg[BX_16BIT_REG_DI].word.rx;
+  a_16bit_index_reg[6] = (Bit16u*) &empty_register;
+  a_16bit_index_reg[7] = (Bit16u*) &empty_register;
+#else
   _16bit_base_reg[0] = &gen_reg[BX_16BIT_REG_BX].word.rx;
   _16bit_base_reg[1] = &gen_reg[BX_16BIT_REG_BX].word.rx;
   _16bit_base_reg[2] = &gen_reg[BX_16BIT_REG_BP].word.rx;
@@ -91,7 +114,8 @@ void BX_CPU_C::init(BX_MEM_C *addrspace)
   _16bit_index_reg[5] = &gen_reg[BX_16BIT_REG_DI].word.rx;
   _16bit_index_reg[6] = (Bit16u*) &empty_register;
   _16bit_index_reg[7] = (Bit16u*) &empty_register;
-
+#endif // BX_SUPPORT_SID
+  
   // for decoding instructions: access to seg reg's via index number
   sreg_mod00_rm16[0] = BX_SEG_REG_DS;
   sreg_mod00_rm16[1] = BX_SEG_REG_DS;
@@ -697,6 +721,10 @@ BX_CPU_C::sanity_checks(void)
   void
 BX_CPU_C::set_INTR(Boolean value)
 {
+#if BX_SUPPORT_SID
+  if (bx_dbg.interrupts)
+    fprintf(stderr, "[SYS ] pc_system: Setting INTR=%d on bootstrap processor 0\n", (int)value);
+#endif
   BX_CPU_THIS_PTR INTR = value;
   BX_CPU_THIS_PTR async_event = 1;
 }

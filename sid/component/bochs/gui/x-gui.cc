@@ -208,6 +208,8 @@ x_gui::x_gui ()
 
   add_attribute("font-name", & this->font_name, "setting");
   add_attribute("private-colormap?", & this->private_colormap, "setting");
+
+  setprefix("[XGUI]");
 }
 
 void

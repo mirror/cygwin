@@ -91,7 +91,7 @@ vga::init (host_int_4)
 
       cmos_registers_bus->read(host_int_4(0x14), old_register_value);
       new_register_value = (old_register_value & 0xcf) | 0x00;
-      cmos_registers_bus->write(host_int_4(0x14), little_int_1(0x00)); /* video card with BIOS ROM */
+      cmos_registers_bus->write(host_int_4(0x14), new_register_value); /* video card with BIOS ROM */
     }
 }
 

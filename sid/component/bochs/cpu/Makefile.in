@@ -124,6 +124,7 @@ sidtarget_m32r = @sidtarget_m32r@
 sidtarget_m68k = @sidtarget_m68k@
 sidtarget_mips = @sidtarget_mips@
 sidtarget_ppc = @sidtarget_ppc@
+sidtarget_sh = @sidtarget_sh@
 sidtarget_x86 = @sidtarget_x86@
 sidtarget_xstormy16 = @sidtarget_xstormy16@
 
@@ -137,7 +138,7 @@ INCLUDES = -I$(top_builddir)/../../include -I$(srcdir) -I$(srcdir)/.. -I$(srcdir
 
 noinst_LTLIBRARIES = libcpu.la
 
-libcpu_la_SOURCES = cpu.cc cpu.h state_file.h main-hack.cc sid-x86-cpu-wrapper.cc access.cc ctrl_xfer8.cc flag_ctrl.cc mult32.cc shift16.cc ctrl_xfer_pro.cc flag_ctrl_pro.cc mult8.cc shift32.cc arith16.cc data_xfer16.cc init.cc paging.cc shift8.cc arith32.cc data_xfer32.cc io.cc proc_ctrl.cc soft_int.cc arith8.cc data_xfer8.cc io_pro.cc protect_ctrl.cc stack16.cc bcd.cc debugstuff.cc lazy_flags.cc protect_ctrl_pro.cc stack32.cc bit.cc decode16.cc logical16.cc resolve16.cc stack_pro.cc decode32.cc logical32.cc resolve32.cc string.cc ctrl_xfer16.cc exception.cc logical8.cc segment_ctrl.cc tasking.cc ctrl_xfer32.cc fetchdecode.cc mult16.cc segment_ctrl_pro.cc vm8086.cc lazy_flags.h sid-x86-cpu-wrapper.h sid-x86-memory-modes.cc
+libcpu_la_SOURCES = init.cc access.cc cpu.cc resolve32.cc fetchdecode.cc exception.cc ctrl_xfer_pro.cc flag_ctrl_pro.cc io_pro.cc protect_ctrl_pro.cc segment_ctrl_pro.cc stack_pro.cc lazy_flags.cc paging.cc vm8086.cc tasking.cc debugstuff.cc arith32.cc mult32.cc data_xfer32.cc logical32.cc ctrl_xfer32.cc stack32.cc shift32.cc arith8.cc mult8.cc data_xfer8.cc logical8.cc ctrl_xfer8.cc shift8.cc resolve16.cc arith16.cc mult16.cc data_xfer16.cc logical16.cc ctrl_xfer16.cc stack16.cc shift16.cc bit.cc flag_ctrl.cc io.cc proc_ctrl.cc protect_ctrl.cc segment_ctrl.cc soft_int.cc string.cc bcd.cc cpu.h lazy_flags.h main-hack.cc sid-x86-cpu-wrapper.cc sid-x86-memory-modes.cc sid-x86-cpu-wrapper.h state_file.h
 libcpu_la_LDFLAGS = -no-undefined
 libcpu_la_LIBADD = $(SUBLIBS)
 libcpu_la_DEPENDENCIES = $(SUBLIBS)
@@ -155,17 +156,16 @@ X_CFLAGS = @X_CFLAGS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
-libcpu_la_OBJECTS =  cpu.lo main-hack.lo sid-x86-cpu-wrapper.lo \
-access.lo ctrl_xfer8.lo flag_ctrl.lo mult32.lo shift16.lo \
-ctrl_xfer_pro.lo flag_ctrl_pro.lo mult8.lo shift32.lo arith16.lo \
-data_xfer16.lo init.lo paging.lo shift8.lo arith32.lo data_xfer32.lo \
-io.lo proc_ctrl.lo soft_int.lo arith8.lo data_xfer8.lo io_pro.lo \
-protect_ctrl.lo stack16.lo bcd.lo debugstuff.lo lazy_flags.lo \
-protect_ctrl_pro.lo stack32.lo bit.lo decode16.lo logical16.lo \
-resolve16.lo stack_pro.lo decode32.lo logical32.lo resolve32.lo \
-string.lo ctrl_xfer16.lo exception.lo logical8.lo segment_ctrl.lo \
-tasking.lo ctrl_xfer32.lo fetchdecode.lo mult16.lo segment_ctrl_pro.lo \
-vm8086.lo sid-x86-memory-modes.lo
+libcpu_la_OBJECTS =  init.lo access.lo cpu.lo resolve32.lo \
+fetchdecode.lo exception.lo ctrl_xfer_pro.lo flag_ctrl_pro.lo io_pro.lo \
+protect_ctrl_pro.lo segment_ctrl_pro.lo stack_pro.lo lazy_flags.lo \
+paging.lo vm8086.lo tasking.lo debugstuff.lo arith32.lo mult32.lo \
+data_xfer32.lo logical32.lo ctrl_xfer32.lo stack32.lo shift32.lo \
+arith8.lo mult8.lo data_xfer8.lo logical8.lo ctrl_xfer8.lo shift8.lo \
+resolve16.lo arith16.lo mult16.lo data_xfer16.lo logical16.lo \
+ctrl_xfer16.lo stack16.lo shift16.lo bit.lo flag_ctrl.lo io.lo \
+proc_ctrl.lo protect_ctrl.lo segment_ctrl.lo soft_int.lo string.lo \
+bcd.lo main-hack.lo sid-x86-cpu-wrapper.lo sid-x86-memory-modes.lo
 CXXFLAGS = @CXXFLAGS@
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -185,17 +185,17 @@ DEP_FILES =  .deps/access.P .deps/arith16.P .deps/arith32.P \
 .deps/arith8.P .deps/bcd.P .deps/bit.P .deps/cpu.P .deps/ctrl_xfer16.P \
 .deps/ctrl_xfer32.P .deps/ctrl_xfer8.P .deps/ctrl_xfer_pro.P \
 .deps/data_xfer16.P .deps/data_xfer32.P .deps/data_xfer8.P \
-.deps/debugstuff.P .deps/decode16.P .deps/decode32.P .deps/exception.P \
-.deps/fetchdecode.P .deps/flag_ctrl.P .deps/flag_ctrl_pro.P \
-.deps/init.P .deps/io.P .deps/io_pro.P .deps/lazy_flags.P \
-.deps/logical16.P .deps/logical32.P .deps/logical8.P .deps/main-hack.P \
-.deps/mult16.P .deps/mult32.P .deps/mult8.P .deps/paging.P \
-.deps/proc_ctrl.P .deps/protect_ctrl.P .deps/protect_ctrl_pro.P \
-.deps/resolve16.P .deps/resolve32.P .deps/segment_ctrl.P \
-.deps/segment_ctrl_pro.P .deps/shift16.P .deps/shift32.P .deps/shift8.P \
-.deps/sid-x86-cpu-wrapper.P .deps/sid-x86-memory-modes.P \
-.deps/soft_int.P .deps/stack16.P .deps/stack32.P .deps/stack_pro.P \
-.deps/string.P .deps/tasking.P .deps/vm8086.P
+.deps/debugstuff.P .deps/exception.P .deps/fetchdecode.P \
+.deps/flag_ctrl.P .deps/flag_ctrl_pro.P .deps/init.P .deps/io.P \
+.deps/io_pro.P .deps/lazy_flags.P .deps/logical16.P .deps/logical32.P \
+.deps/logical8.P .deps/main-hack.P .deps/mult16.P .deps/mult32.P \
+.deps/mult8.P .deps/paging.P .deps/proc_ctrl.P .deps/protect_ctrl.P \
+.deps/protect_ctrl_pro.P .deps/resolve16.P .deps/resolve32.P \
+.deps/segment_ctrl.P .deps/segment_ctrl_pro.P .deps/shift16.P \
+.deps/shift32.P .deps/shift8.P .deps/sid-x86-cpu-wrapper.P \
+.deps/sid-x86-memory-modes.P .deps/soft_int.P .deps/stack16.P \
+.deps/stack32.P .deps/stack_pro.P .deps/string.P .deps/tasking.P \
+.deps/vm8086.P
 SOURCES = $(libcpu_la_SOURCES)
 OBJECTS = $(libcpu_la_OBJECTS)
 

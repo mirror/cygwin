@@ -25,6 +25,7 @@
 #include "sid-pit-wrapper.h"
 #include "sid-floppy-wrapper.h"
 #include "sid-unmapped-wrapper.h"
+#include "sid-harddrv-wrapper.h"
 
 using std::vector;
 using std::string;
@@ -57,6 +58,7 @@ compX86ListTypes()
   types.push_back("hw-timer-x86");
   types.push_back("hw-disk-floppy");
   types.push_back("hw-bochs-misc");
+  types.push_back("hw-disk-harddrive");
 #endif
 
   return types;
@@ -93,6 +95,8 @@ compX86Create(const string& typeName)
         return new floppy();
       else if(typeName == "hw-bochs-misc")
         return new unmapped();
+      else if(typeName == "hw-disk-harddrive")
+        return new harddrive();
     }
   catch (...) { }
 #endif
@@ -165,6 +169,12 @@ compX86Delete(component* c)
   if(d10)
     {
       delete d10;
+      return;
+    }
+  harddrive *d11 = dynamic_cast<harddrive *>(c);
+  if(d11)
+    {
+      delete d11;
       return;
     }
 #endif

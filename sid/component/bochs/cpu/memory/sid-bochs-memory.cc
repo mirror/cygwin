@@ -39,27 +39,35 @@ sid_bx_mem_c::write_physical(BX_CPU_C *cpu, Bit32u addr, unsigned len, void *dat
         {
         case 4:
           {
-            Bit32u data32 = * ((Bit32u *) data);
+            Bit32u data32;
+
+            data32 = * ((Bit32u *) data);
             x86_cpu_component->write_data_memory_4 (cpu->eip, a20addr, data32);
-            break;
           }
+          break;
         case 2:
           {
-            Bit16u data16 = * ((Bit16u *) data);
+            Bit16u data16;
+
+            data16 = * ((Bit16u *) data);
             x86_cpu_component->write_data_memory_2 (cpu->eip, a20addr, data16);
-            break;
           }
+          break;
         case 1:
           {
-            Bit8u data8 =  * ((Bit8u *) data);
+            Bit8u data8;
+
+            data8 =  * ((Bit8u *) data);
             x86_cpu_component->write_data_memory_1 (cpu->eip, a20addr, data8);
-            break;
           }
+          break;
         default:
           {
             Bit8u data8;
-            Bit8u *data_ptr = (Bit8u *) data;
-            
+            Bit8u *data_ptr;
+
+            data_ptr = (Bit8u *) data;
+       
             for (unsigned i = 0; i < len; i++)
               {
                 data8 = * data_ptr;
@@ -68,8 +76,8 @@ sid_bx_mem_c::write_physical(BX_CPU_C *cpu, Bit32u addr, unsigned len, void *dat
                 addr++;
                 a20addr = A20ADDR(addr);
               }
-            break;
           }
+          break;
         }
     }
   catch (sidutil::cpu_memory_fault e)
@@ -91,7 +99,7 @@ sid_bx_mem_c::read_physical(BX_CPU_C *cpu, Bit32u addr, unsigned len, void *data
 {
 
   Bit32u a20addr;
-
+  
   a20addr = A20ADDR(addr);
 
   try
@@ -99,25 +107,44 @@ sid_bx_mem_c::read_physical(BX_CPU_C *cpu, Bit32u addr, unsigned len, void *data
       switch (len)
         {
         case 4:
-          * ((Bit32u *) data) = x86_cpu_component->read_data_memory_4 (cpu->eip, a20addr);
+          {
+            Bit32u data32;
+
+            data32 = x86_cpu_component->read_data_memory_4 (cpu->eip, a20addr);
+            * (Bit32u *) data = data32;
+          }
           break;
         case 2:
-          * ((Bit16u *) data) = x86_cpu_component->read_data_memory_2 (cpu->eip, a20addr);
+          {
+            Bit16u data16;
+
+            data16 = x86_cpu_component->read_data_memory_2 (cpu->eip, a20addr);
+            * (Bit16u *) data =  data16;
+          }
           break;
         case 1:
-          * ((Bit8u *) data) = x86_cpu_component->read_data_memory_1 (cpu->eip, a20addr);
+          {
+            Bit8u data8;
+
+            data8 = x86_cpu_component->read_data_memory_1 (cpu->eip, a20addr);
+            * ((Bit8u *) data) = data8;
+          }
           break;
         default:
-          Bit8u data8;
-          Bit8u * data_ptr = (Bit8u *) data;
-          
-          for (unsigned i = 0; i < len; i++)
-            {
-              * data_ptr = x86_cpu_component->read_data_memory_1 (cpu->eip, a20addr);
-              data_ptr++;
-              addr++;
-              a20addr = A20ADDR(addr);
-            }
+          {
+            Bit8u data8;
+            Bit8u * data_ptr;
+
+            data_ptr = (Bit8u *) data;
+
+            for (unsigned i = 0; i < len; i++)
+              {
+                * data_ptr = x86_cpu_component->read_data_memory_1 (cpu->eip, a20addr);
+                data_ptr++;
+                addr++;
+                a20addr = A20ADDR(addr);
+              }
+          }
           break;          
         }
     }

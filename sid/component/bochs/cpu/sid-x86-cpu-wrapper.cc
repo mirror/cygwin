@@ -63,7 +63,7 @@ x86_cpu::x86_cpu ()
   add_attribute ("enable-warnings?", & this->warnings_enabled, "setting");
   add_attribute ("hardware-mode?", & this->in_hardware_mode, "setting");
   add_attribute ("memory-mode", & this->memory_mode, "setting");
-  add_attribute("verbose?", & this->verbose_p, "setting");
+  add_attribute ("verbose?", & this->verbose_p, "setting");
 }
 
 void
@@ -130,7 +130,7 @@ x86_cpu::step_insns ()
   try
     {
       if (!this->blocking_on_syscall)
-        bx_cpu.cpu_loop(1);
+          bx_cpu.cpu_loop(1);
       else
         do_syscall();
     }
@@ -150,6 +150,7 @@ x86_cpu::reset ()
 
   if (!in_hardware_mode)
     enter_protected_mode();
+
 }
 
 void
@@ -217,6 +218,12 @@ x86_cpu::hold_request(host_int_4 val)
   bx_cpu.set_HRQ(val);
 }
 
+host_int_8
+x86_cpu::now(void)
+{
+  return sched_query.now();
+}
+
 void
 x86_cpu::enable_a20(host_int_4 val)
 {
@@ -280,7 +287,11 @@ x86_cpu::read_io_memory_1 (host_int_4 addr)
       cerr << "[IOMEM ] val: " << setbase(16) << addr << setbase(10) << endl;
       cerr << "[IOMEM ] status: " << (status == bus::misaligned ? "misaligned" :
                                      (status == bus::unmapped ? "unmapped" : "unpermitted")) << endl;
-      //      exit(0);
+      // FIXME: range check needed?
+      if (addr >= 0x02e0 && addr <= 0x02ef)
+        return 0;
+      else
+        return 0xff;
     }
   else
     {
@@ -302,7 +313,6 @@ x86_cpu::write_io_memory_1 (host_int_4 addr, little_int_1 value)
       cerr << "[IOMEM ] val: " << setbase(16) << value << setbase(10) << endl;
       cerr << "[IOMEM ] status: " << (status == bus::misaligned ? "misaligned" :
                                       (status == bus::unmapped ? "unmapped" : "unpermitted")) << endl;
-      //      exit(0);
     }
 }
 
@@ -321,7 +331,11 @@ x86_cpu::read_io_memory_2 (host_int_4 addr)
       cerr << "[IOMEM ] val: " << setbase(16) << addr << setbase(10) << endl;
       cerr << "[IOMEM ] status: " << (status == bus::misaligned ? "misaligned" :
                                      (status == bus::unmapped ? "unmapped" : "unpermitted")) << endl;
-      //      exit(0);
+      // FIXME: range check needed?
+      if (addr >= 0x02e0 && addr <= 0x02ef)
+        return 0;
+      else
+        return 0xffff;
     }
   else
     {
@@ -343,7 +357,6 @@ x86_cpu::write_io_memory_2 (host_int_4 addr, little_int_2 value)
       cerr << "[IOMEM ] val: " << setbase(16) << value << setbase(10) << endl;
       cerr << "[IOMEM ] status: " << (status == bus::misaligned ? "misaligned" :
                                       (status == bus::unmapped ? "unmapped" : "unpermitted")) << endl;
-      //      exit(0);
     }
 }
 
@@ -362,7 +375,11 @@ x86_cpu::read_io_memory_4 (host_int_4 addr)
       cerr << "[IOMEM ] val: " << setbase(16) << addr << setbase(10) << endl;
       cerr << "[IOMEM ] status: " << (status == bus::misaligned ? "misaligned" :
                                      (status == bus::unmapped ? "unmapped" : "unpermitted")) << endl;
-      //      exit(0);
+      // FIXME: range check needed?
+      if (addr >= 0x02e0 && addr <= 0x02ef)
+        return 0;
+      else
+        return 0xffffffff;
     }
   else
     {
@@ -384,7 +401,5 @@ x86_cpu::write_io_memory_4 (host_int_4 addr, little_int_4 value)
       cerr << "[IOMEM ] val: " << setbase(16) << value << setbase(10) << endl;
       cerr << "[IOMEM ] status: " << (status == bus::misaligned ? "misaligned" :
                                       (status == bus::unmapped ? "unmapped" : "unpermitted")) << endl;
-      //      exit(0);
     }
 }
-

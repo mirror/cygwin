@@ -57,13 +57,8 @@ public:
   BX_FD_SMF void   init(bx_devices_c *d, bx_cmos_c *cmos);
 #endif
   BX_FD_SMF void   reset(unsigned source);
-#if BX_SUPPORT_SID
-  BX_FD_SMF void   dma_write(Bit32u phy_addr);
-  BX_FD_SMF void   dma_read(Bit32u phy_addr);
-#else  
   BX_FD_SMF void   dma_write(Bit8u *data_byte);
   BX_FD_SMF void   dma_read(Bit8u *data_byte);
-#endif
   BX_FD_SMF unsigned set_media_status(unsigned drive, unsigned status);
   BX_FD_SMF unsigned get_media_status(unsigned drive);
 
@@ -143,6 +138,7 @@ public:
   BX_FD_SMF void   timer(void);
   BX_FD_SMF void   increment_sector(void);
 #if BX_SUPPORT_SID
+  unsigned long command_delay;
   BX_FD_SMF void call_evaluate_media(unsigned type, const char * path, unsigned floppy_num);
   BX_FD_SMF Boolean evaluate_media(unsigned type, const char *path, floppy_t *floppy);
 #else

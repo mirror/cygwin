@@ -29,7 +29,7 @@
 
 #if BX_SUPPORT_SID
 #include "sid-x86-cpu-wrapper.h"
-#endif
+#endif // BX_SUPPORT_SID
 #if BX_USE_CPU_SMF
 #define this (BX_CPU(0))
 #endif
@@ -63,8 +63,8 @@ const Boolean bx_parity_lookup[256] = {
 #endif
 
 #if BX_SUPPORT_SID
-static Bit8u *sid_prefetch_data = NULL;
-#endif
+Bit8u *sid_prefetch_data = NULL;
+#endif // BX_SUPPORT_SID
 
 #if BX_SMP_PROCESSORS==1
 #if BX_SUPPORT_SID==0
@@ -318,7 +318,7 @@ debugger_check:
     // functionality.
     CHECK_MAX_INSTRUCTIONS(max_instr_count);
 #endif
-#endif
+#endif // BX_SUPPORT_SID
 
 #if BX_DEBUGGER
     // BW vm mode switch support is in dbg_is_begin_instr_bpoint
@@ -643,10 +643,7 @@ BX_CPU_C::prefetch(void)
   BX_CPU_THIS_PTR prev_phy_page = new_phy_addr & 0xfffff000;
   BX_CPU_THIS_PTR max_phy_addr = BX_CPU_THIS_PTR prev_phy_page | 0x00000fff;
 
-  if(!sid_prefetch_data)
-    sid_prefetch_data = new Bit8u[16];
-
-  BX_CPU_THIS_PTR mem->read_physical(this, new_phy_addr, 16, (void *)sid_prefetch_data);
+  access_linear(new_linear_addr, 16, sregs[BX_SEG_REG_CS].cache.dpl, BX_READ, sid_prefetch_data);
 
   BX_CPU_THIS_PTR bytesleft = 16;
   BX_CPU_THIS_PTR fetch_ptr = sid_prefetch_data;
@@ -680,7 +677,7 @@ BX_CPU_C::revalidate_prefetch_q(void)
 {
   Bit32u new_linear_addr, new_linear_page, new_linear_offset;
   Bit32u new_phy_addr;
-
+  
   new_linear_addr = BX_CPU_THIS_PTR sregs[BX_SEG_REG_CS].cache.u.segment.base + BX_CPU_THIS_PTR eip;
 
   new_linear_page = new_linear_addr & 0xfffff000;
@@ -689,17 +686,15 @@ BX_CPU_C::revalidate_prefetch_q(void)
     new_linear_offset = new_linear_addr & 0x00000fff;
     new_phy_addr = BX_CPU_THIS_PTR prev_phy_page | new_linear_offset;
 #if BX_SUPPORT_SID
-    if(!sid_prefetch_data)
-        sid_prefetch_data = new Bit8u[16];
 
-    BX_CPU_THIS_PTR mem->read_physical(this, new_phy_addr, 16, (void *)sid_prefetch_data);
-
+    access_linear(new_linear_addr, 16, sregs[BX_SEG_REG_CS].cache.dpl, BX_READ, sid_prefetch_data);
+    
     BX_CPU_THIS_PTR bytesleft = 16;
     BX_CPU_THIS_PTR fetch_ptr = sid_prefetch_data;
 #else
     BX_CPU_THIS_PTR bytesleft = (BX_CPU_THIS_PTR max_phy_addr - new_phy_addr) + 1;
     BX_CPU_THIS_PTR fetch_ptr = &BX_CPU_THIS_PTR mem->vector[new_phy_addr];
-#endif
+#endif // BX_SUPPORT_SID
     }
   else {
     BX_CPU_THIS_PTR bytesleft = 0; // invalidate prefetch Q

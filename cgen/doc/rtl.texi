@@ -2215,6 +2215,11 @@ first argument.
 Indicate that @samp{object} is written in mode @samp{mode}, without
 saying how. This could be useful in conjunction with the C escape hooks.
 
+@item (delay mode num expr)
+Indicate that there are @samp{num} delay slots in the processing of
+@samp{expr}.  When using this rtx in instruction semantics, CGEN will
+infer that the instruction has the DELAY-SLOT attribute.
+
 @item (annul yes?)
 @c FIXME: put annul into the glossary.
 Annul the following instruction if @samp{yes?} is non-zero. This rtx is

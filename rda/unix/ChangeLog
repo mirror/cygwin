@@ -1,5 +1,8 @@
 2004-12-02  Jim Blandy  <jimb@redhat.com>
 
+	* thread-db.c (thread_db_attach): Always preload the symbol list
+	with the names of the symbols RDA uses itself.
+
 	* thread-db.c (thread_db_break_program): New function.
 	(thread_db_attach): Register it as the 'break_program' method.
 

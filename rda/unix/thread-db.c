@@ -2662,6 +2662,36 @@ thread_db_attach (struct gdbserv *serv, struct gdbserv_target *target)
   else
     fprintf (stderr, "< ERROR attach: GDB will not read thread regs. >>>\n");
 
+  /* Preload the symbol list with the names of the symbols whose names
+     we use ourselves.  
+
+     This might be a kludge, but it's not a gratuitous kludge.  On
+     older LinuxThreads libraries, RDA must manage LinuxThreads
+     signals.  Since libthread_db provides no abstraction for managing
+     them, RDA must look up the addresses of the signal variables and
+     read their values itself.  However, libthread_db may never look
+     those symbols up itself, and they may not appear in the list
+     provided by td_symbol_list_p.  (In fact, in glibc-2.2.93, they
+     don't.)
+
+     So RDA may as well preload them into the symbol list; otherwise,
+     get_thread_signals will fail even though the symbols are defined,
+     because the names will only get added to symbol_list as we
+     attempt to look them up; each remote protocol symbol lookup dance
+     will resolve exactly one new symbol, allowing get_thread_signal
+     to get as far as requesting the next one and failing.
+
+     As it turns out, this is actually necessary, not just efficient,
+     because failures from get_thread_signal cause RDA to try the
+     libthread_db event-based interface; we may end up using that even
+     when the signal-based interface is actually available.  And we'd
+     rather use the signal-based interface when we can, to avoid
+     changing the behavior of RDA on older systems.  */
+  add_symbol_to_list ("__pthread_sig_restart",   0, UNDEFINED);
+  add_symbol_to_list ("__pthread_sig_cancel",    0, UNDEFINED);
+  add_symbol_to_list ("__pthread_sig_debug",     0, UNDEFINED);
+  add_symbol_to_list ("__pthread_threads_debug", 0, UNDEFINED);
+
   if (td_symbol_list_p)
     {
       /* Take all the symbol names libthread_db might try to look up
@@ -2672,17 +2702,6 @@ thread_db_attach (struct gdbserv *serv, struct gdbserv_target *target)
 
       for (i = 0; symbol_list[i]; i++)
 	add_symbol_to_list (symbol_list[i], 0, UNDEFINED);
-    }
-  else
-    {
-      /* KLUDGE: Insert some magic symbols into the cached symbol list,
-	 to be looked up later.  This is badly wrong -- we should be 
-	 obtaining these values thru the thread_db interface.  Their names
-	 should not be hard-coded here <sob>. */
-      add_symbol_to_list ("__pthread_sig_restart",   0, UNDEFINED);
-      add_symbol_to_list ("__pthread_sig_cancel",    0, UNDEFINED);
-      add_symbol_to_list ("__pthread_sig_debug",     0, UNDEFINED);
-      add_symbol_to_list ("__pthread_threads_debug", 0, UNDEFINED);
     }
 
   /* Attempt to open the thread_db interface.  This attempt will 

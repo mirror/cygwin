@@ -1,3 +1,8 @@
+2002-09-20  Fernando Nasser  <fnasser@totem.toronto.redhat.com>
+
+	* library/combobox.tcl (build): New variable to save grabs.
+	(widgetProc): Save and restore previous grabs.
+
 2002-07-03  Martin M. Hunt  <hunt@redhat.com>
 
 	* library/panedwindow.tcl (_placePlanes): Make certain things 

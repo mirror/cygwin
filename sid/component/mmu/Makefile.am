@@ -13,3 +13,6 @@ pkgdata_DATA = hw-remap_pause-arm_ref.txt
 DEJAGNUTESTS=arm-remap.exp mmumonkey.exp
 check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs

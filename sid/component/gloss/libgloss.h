@@ -35,7 +35,9 @@ public:
     SYS_stat = 15, 
     SYS_chmod = 16, 
     SYS_utime = 17,
-    SYS_time = 18
+    SYS_time = 18,
+    SYS_gettimeofday = 19,
+    SYS_times = 20
   };
 };
 

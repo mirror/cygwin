@@ -10,6 +10,12 @@
 #include "libgloss.h"
 // ??? For now.  grep for newlib below.
 #include "newlib.h"
+#ifdef HAVE_TIMES
+#include <sys/times.h>
+#endif
+#ifdef HAVE_GETTIMEOFDAY
+#include <sys/time.h>
+#endif
 
 #include <cstdlib>
 #include <unistd.h>
@@ -570,7 +576,13 @@ gloss32::syscall_trap()
       do_sys_open();
       break;
     case libgloss::SYS_time:
-      set_int_result(time(NULL));
+      do_sys_time();
+      break;
+    case libgloss::SYS_gettimeofday:
+      do_sys_gettimeofday();
+      break;
+    case libgloss::SYS_times:
+      do_sys_times();
       break;
     default:
       do_nonstandard_target_syscalls (syscall);
@@ -585,6 +597,73 @@ gloss32::do_nonstandard_target_syscalls (int32 target_syscall)
     cerr << "Unimplemented syscall " << target_syscall << endl;
   set_int_result(-1);
   set_error_result(newlib::eNoSys);
+}
+
+void
+gloss32::do_sys_time()
+{
+  int32 timetp, rv;
+
+  get_int_argument(1, timetp);
+  rv = time(NULL);
+  if (timetp)
+    set_word(timetp, rv);
+
+  set_int_result(rv);
+}
+
+void
+gloss32::do_sys_gettimeofday()
+{
+#ifdef HAVE_GETTIMEOFDAY
+  int32 timevalp, rv, value;
+  struct timeval tv;
+
+  /* Ignore 2nd parameter to gettimeofday().  */
+  get_int_argument(1, timevalp);
+  rv = gettimeofday(&tv, NULL);
+  if (rv != -1)
+    {
+      value = tv.tv_sec;
+      set_word(timevalp, value);
+      value = tv.tv_usec;
+      set_word(timevalp + 4, value);
+    }
+  set_int_result(rv);
+#else
+  set_int_result(-1);
+#endif
+}
+
+void
+gloss32::do_sys_times()
+{
+#ifdef HAVE_TIMES
+  int32 value, rv, tmsp;
+  struct tms tms;
+
+  get_int_argument(1, tmsp);
+  if (!tmsp)
+    {
+      set_int_result(EFAULT);
+      return;
+    }
+  rv = times(&tms);
+  if (rv != -1) 
+    {
+      value = tms.tms_utime;
+      set_word(tmsp, value);
+      value = tms.tms_stime;
+      set_word(tmsp + 4, value);
+      value = tms.tms_cutime;
+      set_word(tmsp + 8, value);
+      value = tms.tms_cstime;
+      set_word(tmsp + 12, value);
+    }
+  set_int_result(rv);
+#else
+  set_int_result(-1);
+#endif
 }
 
 void
@@ -758,50 +837,43 @@ gloss32::do_sys_open()
     }
 }
 
+// This only handles O_RDONLY, O_WRONLY, O_RDWR, O_APPEND, O_CREAT & O_TRUNC.
+#define NEWLIB_O_RDONLY		0x0000
+#define NEWLIB_O_WRONLY		0x0001
+#define NEWLIB_O_RDWR		0x0002
+#define NEWLIB_O_APPEND		0x0008
+#define NEWLIB_O_CREAT		0x0200
+#define NEWLIB_O_TRUNC		0x0400
 bool
 gloss32::target_to_host_open_flags (int open_flags, int& flags)
 {
-  switch (open_flags)
+  switch (open_flags & 3)
     {
-    case 0:
-      flags = hostops::open_read_only | hostops::open_text;
-      break;
-    case 1:
+    case NEWLIB_O_RDONLY:
       flags = hostops::open_read_only;
       break;
-    case 2:
-      flags = hostops::open_read_write | hostops::open_text;
+    case NEWLIB_O_WRONLY:
+      flags = hostops::open_write_only;
       break;
-    case 3:
+    case NEWLIB_O_RDWR:
       flags = hostops::open_read_write;
-      break;
-    case 4:
-      flags = hostops::open_write_only | hostops::open_create | hostops::open_trunc | hostops::open_text;
-      break;
-    case 5:
-      flags = hostops::open_write_only | hostops::open_create | hostops::open_trunc;
-      break;
-    case 6:
-      flags = hostops::open_read_write | hostops::open_create | hostops::open_trunc | hostops::open_text;
-      break;
-    case 7:
-      flags = hostops::open_read_write | hostops::open_create | hostops::open_trunc;
-      break;
-    case 8:
-      flags = hostops::open_write_only | hostops::open_create | hostops::open_append | hostops::open_text;
-      break;
-    case 9:
-      flags = hostops::open_write_only | hostops::open_create | hostops::open_append;
-      break;
-    case 10:
-      flags = hostops::open_read_write | hostops::open_create | hostops::open_append | hostops::open_text;
-      break;
-    case 11:
-      flags = hostops::open_read_write | hostops::open_create | hostops::open_append;
       break;
     default:
       return false;
     }
+
+  if ((open_flags & ~(3|NEWLIB_O_APPEND|NEWLIB_O_CREAT|NEWLIB_O_TRUNC)) != 0)
+    return false;
+
+  if (open_flags & NEWLIB_O_APPEND)
+    flags |= hostops::open_append;
+
+  if (open_flags & NEWLIB_O_CREAT)
+    flags |= hostops::open_create;
+
+  if (open_flags & NEWLIB_O_TRUNC)
+    flags |= hostops::open_trunc;
+
   return true;
 }
 

@@ -38,7 +38,7 @@ AC_CHECK_LIB(nsl, gethostbyname, socket_libs="$socket_libs -lnsl",
 		socket_libs="$socket_libs -lresolv"))
 AC_SUBST(socket_libs)
 
-AC_CHECK_FUNCS(ftime gettimeofday usleep strtoul strtoull select)
+AC_CHECK_FUNCS(ftime times gettimeofday usleep strtoul strtoull select)
 
 old_libs="$LIBS"
 LIBS="$LIBS $socket_libs"

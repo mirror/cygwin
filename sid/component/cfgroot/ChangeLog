@@ -1,3 +1,8 @@
+2001-08-27  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libltdl/ltdl.c (lt_dlinit): Initialize loaders to 0.
+	(lt_dlexit): Reset loaders to 0 after freeing all loaders.
+
 2001-07-13  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (check-local): Rename target from "checkme".

@@ -818,6 +818,7 @@ lt_dlinit LTDL_PARAMS((void))
 		return 0;
 	}
 	handles = 0;
+	loaders = 0;
 	user_search_path = 0; /* empty search path */
 	
 #if HAVE_LIBDL
@@ -907,6 +908,7 @@ lt_dlexit LTDL_PARAMS((void))
 		loader = next;
 	}
 
+	loaders = 0;
 	initialized = 0;
 	return errors;
 }

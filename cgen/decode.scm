@@ -214,18 +214,35 @@
 
 
 ; Compute population counts for each bit.  Return it as a vector indexed by bit number.
-(define (-mask-bit-population masks mask-lens lsb0?)
+; Rather than computing raw popularity, attempt to compute "disinguishing value" or
+; inverse-entropy for each bit.  The idea is that the larger the number for any particular
+; bit slot, the more instructions it can be used to distinguish.  Raw mask popularity
+; is not enough -- popular masks may include useless "reserved" fields whose values
+; don't change, and thus are useless in distinguishing.
+(define (-distinguishing-bit-population masks mask-lens values lsb0?)
   (let* ((max-length (apply max mask-lens))
-	 (population (make-vector max-length 0)))
-    (for-each (lambda (mask len)
+	 (0-population (make-vector max-length 0))
+	 (1-population (make-vector max-length 0)))
+    ; Compute the 1- and 0-population vectors
+    (for-each (lambda (mask len value)
 		(logit 5 " population count mask=" (number->hex mask) " len=" len "\n")
 		(for-each (lambda (bitno)
-			    (if (bit-set? mask (if lsb0? bitno (- len bitno 1)))
-				(vector-set! population bitno 
-					     (+ 1 (vector-ref population bitno)))))
+			    (let ((lsb-bitno (if lsb0? bitno (- len bitno 1))))
+			      ; ignore this bit if it's not set in the mask
+			      (if (bit-set? mask lsb-bitno)
+				(let ((chosen-pop-vector (if (bit-set? value lsb-bitno)
+							     1-population 0-population)))
+				  (vector-set! chosen-pop-vector bitno 
+					     (+ 1 (vector-ref chosen-pop-vector bitno)))))))
 			  (-range len)))
-	      masks mask-lens)
-    population)
+	      masks mask-lens values)
+    ; Compute an aggregate "distinguishing value" for each bit.
+    (list->vector
+     (map (lambda (p0 p1)
+	    (logit 4 p0 "/" p1 " ")
+	    ; (sqrt (+ p0 p1 (* p0 p1))) ; funny function - nice curve
+	    (sqrt (* p0 p1))) ; geometric mean
+	  (vector->list 0-population) (vector->list 1-population))))
 )
 
 
@@ -257,17 +274,23 @@
 
 
 ; Return a list of indices whose counts in the given vector exceed the given threshold.
+; Sort them in decreasing order of populatority.
 (define (-population-above-threshold population threshold)
-  (find (lambda (index) (if (vector-ref population index) 
-			    (>= (vector-ref population index) threshold)
-			    #f))
-	(-range (vector-length population)))
+  (let* ((unsorted
+	  (find (lambda (index) (if (vector-ref population index) 
+				    (>= (vector-ref population index) threshold)
+				    #f))
+		(-range (vector-length population))))
+	 (sorted
+	  (sort unsorted (lambda (i1 i2) (> (vector-ref population i1)
+					    (vector-ref population i2))))))
+    sorted)
 )
 
 
-; Return the top few most popular indices in the population vector, ignoring any
-; that are already used (marked by negative count).  Don't exceed `size' unless
-; the clustering is just too good to pass up.
+; Return the top few most popular indices in the population vector,
+; ignoring any that are already used (marked by #f).  Don't exceed
+; `size' unless the clustering is just too good to pass up.
 (define (-population-top-few population size)
   (let loop ((old-picks (list))
 	     (remaining-population population)
@@ -275,6 +298,7 @@
 					      (vector->list population)))))
       (let* ((new-picks (-population-above-threshold remaining-population count-threshold)))
 	(logit 4 "-population-top-few"
+	       " desired=" size
 	       " picks=(" old-picks ") pop=(" remaining-population ")"
 	       " threshold=" count-threshold " new-picks=(" new-picks ")\n")
 	(cond 
@@ -284,16 +308,18 @@
 	      (logit 1 "-population-top-few: No bits left to pick from!\n"))
 	  old-picks)
 	 ; Way too many matches?
-	 ((> (+ (length new-picks) (length old-picks)) (+ 2 size))
-	  (list-take (+ 2 size) (append new-picks old-picks)))
+	 ((> (+ (length new-picks) (length old-picks)) (+ size 3))
+	  (list-take (+ 3 size) (append old-picks new-picks))) ; prefer old-picks
 	 ; About right number of matches?
-	 ((> (+ (length new-picks) (length old-picks)) (- 1 size))
+	 ((> (+ (length new-picks) (length old-picks)) (- size 1))
 	  (append old-picks new-picks))
 	 ; Not enough?  Lower the threshold a bit and try to add some more.
 	 (else
 	  (loop (append old-picks new-picks)
 		(-vector-copy-set-all remaining-population new-picks #f)
-		(truncate (* 0.8 count-threshold)))))))
+		; Notice magic clustering decay parameter
+		;  vvvv
+		(* 0.75 count-threshold))))))
 )
 
 
@@ -328,9 +354,10 @@
 ; the optimization is left for later.  Also, see preceding FIXME.
 
 (define (decode-get-best-bits insn-list already-used startbit max decode-bitsize lsb0?)
-  (let* ((raw-population (-mask-bit-population (map insn-base-mask insn-list)
-					       (map insn-base-mask-length insn-list)
-					       lsb0?))
+  (let* ((raw-population (-distinguishing-bit-population (map insn-base-mask insn-list)
+							 (map insn-base-mask-length insn-list)
+							 (map insn-value insn-list)
+							 lsb0?))
 	 ; (undecoded (if lsb0?
 	; 		(-range2 startbit (+ startbit decode-bitsize))
 		;	(-range2 (- startbit decode-bitsize) startbit)))

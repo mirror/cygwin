@@ -1,3 +1,21 @@
+2000-11-10  Frank Ch. Eigler  <fche@redhat.com>
+
+	* decode.scm (-distinguishing-bit-population): Significantly
+	improve popularity heuristic.  Renamed from
+	(-mask-bit-population): Gone.
+	(-population-above-threshold): Sort new bit numbers in order of
+	popularity.
+	(-population-top-few): Allow up to three more bits to be selected
+	than requested.  Correct selection order to prefer better bits.
+	Correct bug in fewer-than-requested case.  Keep threshold as
+	floating-point.
+	(decode-best-get-bits): Pass also the insn-values.
+
+	* utils-sim.scm (-gen-decoder-switch): Add comment suggesting a
+	future optimization.
+
+	* utils.scm (message): Format nested lists better.
+
 2000-11-09  Doug Evans  <dje@casey.transmeta.com>
 
 	* dev.scm: Add srcdir to %load-path.

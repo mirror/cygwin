@@ -879,6 +879,13 @@
 ; DECODE-BITSIZE is the number of bits of the insn that `insn' holds.
 ; LSB0? is non-#f if bit number 0 is the least significant bit.
 ; INVALID-INSN is the <insn> object of the pseudo insn to handle invalid ones.
+; FIXME: for the few-alternative case (say, 2), generating
+; if (0) {}
+; else if (val == 0) { ... }
+; else if (val == 1) { ... }
+; else {}
+; may well be less stressful on the compiler to optimize than small switch() stmts.
+
 
 (define (-gen-decoder-switch switch-num startbit decode-bitsize table-guts indent lsb0? invalid-insn)
   ; For entries that are a single insn, we're done, otherwise recurse.

@@ -1,3 +1,8 @@
+2003-09-08  Doug Evans  <dje@casey.transmeta.com>
+
+	* m32r/Makefile.am (cgen-m32r): Update call to CGEN.sh.
+	* m32r/Makefile.in: Regenerate.
+
 2003-07-05  Doug Evans  <dje@sebabeach.org>
 
 	* m32r-cpu.h: Regenerate.

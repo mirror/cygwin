@@ -1,5 +1,11 @@
 2001-08-02  Mo DeJong  <mdejong@redhat.com>
 
+	* src/tkWinPrintText.c (DisplayDLineToDrawable): Fix
+	compiler warning by adding missing static modifier
+	to funciton declaration.
+
+2001-08-02  Mo DeJong  <mdejong@redhat.com>
+
 	* config.h.in: Regen.
 	* configure: Regen.
 	* configure.in: Don't check for strdup since it

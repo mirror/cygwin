@@ -33,6 +33,7 @@ sid_assert_includes_all "sid::component::bus_names $victim" upstream
 set test "downstream accessor is present"
 sid_assert_includes_all "sid::component::accessor_names $victim" downstream
 
+catch {unset attr}
 foreach attr {read-accesses write-accesses misaligned-reads \
 	misaligned-writes flushes replacements} {
     set test "$attr initialised to 0"

@@ -15,3 +15,9 @@ pkgdata_DATA = hw-mapper-basic.txt
 DEJAGNUTESTS=basicmapper.exp mapperdocs.exp mappermonkey.exp
 check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
+
+stylesheet=$(srcdir)/../component_html.xsl
+
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs

@@ -45,4 +45,4 @@ if [sid_stop] then { pass $test } else { fail $test ; return }
 
 # zap temp file if tests were successful 
 global exit_status
-if {$exit_status == "0"} then { file delete "idebase.conf" }
+if {$exit_status == "0"} then { file delete "idebase.conf" "D:\\drive0" }

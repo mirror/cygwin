@@ -1,3 +1,7 @@
+2002-01-22  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.ide/idebase.exp: Delete "D:\\drive0" on completion.
+
 2002-01-08  Ben Elliston  <bje@redhat.com>
 
 	* lib/monkey.exp (monkey_stop): Delete monkey.conf on success.

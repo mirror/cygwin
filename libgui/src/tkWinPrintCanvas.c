@@ -58,14 +58,14 @@ PrintCanvasCmd(clientData, interp, argc, argv)
 	Tcl_AppendResult(interp, "wrong # args: should be \"",
 			 argv[0], " canvas \"",
 			 (char *) NULL);
-	return TCL_ERROR;
+	goto error;
     }
 
     /* The second arg is the canvas widget */
     if (!Tcl_GetCommandInfo(interp, argv[1], &canvCmd)) {
 	Tcl_AppendResult(interp, "couldn't get canvas information for \"",
 			 argv[1], "\"", (char *) NULL);
-	return TCL_ERROR;
+	goto error;
     }
     
     memset(&dm,0,sizeof(DEVMODE));
@@ -164,8 +164,12 @@ PrintCanvasCmd(clientData, interp, argc, argv)
     EndDoc(pd.hDC);
 
 done:
+    free ((char*) lpdi->lpszDocName);
+    free (lpdi);
     return TCL_OK;
- error:
+error:
+    free ((char*) lpdi->lpszDocName);
+    free (lpdi);
     return TCL_ERROR;
 }
 

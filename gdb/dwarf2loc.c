@@ -245,6 +245,7 @@ dwarf2_evaluate_loc_desc (struct symbol *var, struct frame_info *frame,
                SYMBOL_NATURAL_NAME (var));
     }
   else if (ctx->in_reg)
+    {
       CORE_ADDR dwarf_regnum = dwarf_expr_fetch (ctx, 0);
       int gdb_regnum = DWARF2_REG_TO_REGNUM (dwarf_regnum);
       retval = value_from_register (SYMBOL_TYPE (var), gdb_regnum, frame);

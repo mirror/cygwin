@@ -4,7 +4,7 @@
 .
    This file is part of GDB.
 
-   [$Id: ada-tasks.c,v 1.7 2003/06/17 20:58:32 ciceron Exp $]
+   [$Id: ada-tasks.c,v 1.8 2004/04/28 16:36:25 cagney Exp $]
    Authors: Roch-Alexandre Nomine Beguin, Arnaud Charlet <charlet@gnat.com>
 
    This program is free software; you can redistribute it and/or modify
@@ -794,10 +794,8 @@ task_command (char *tidstr, int from_tty)
     {
       /* FIXME: find_printable_frame should be defined in frame.h, and
          implemented in ada-lang.c */
-      /*      find_printable_frame (deprecated_selected_frame, frame_relative_level (deprecated_selected_frame)); */
       printf_filtered ("[Switching to task %d]\n", num);
-      print_stack_frame (deprecated_selected_frame,
-			 frame_relative_level (deprecated_selected_frame), 1);
+      print_stack_frame (get_selected_frame (), 1, SRC_AND_LOC);
     }
   else
     printf_filtered ("Unable to switch to task %d\n", num);

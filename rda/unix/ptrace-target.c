@@ -68,10 +68,12 @@ close_open_files (void)
 
 /* ptrace_create_child:
 
-   Fork the child process and capture it via ptrace.
+   Either attach to an existing process or fork a child and capture
+   it via PTRACE_TRACEME.
+
+   The single argument PROCESS is a struct containing either the
+   process id to attach to or the file name and arguments to execute.
    
-   Args: char *exec_path;	\* path to executable file *\
-	 char **all_args;	\* argv array for child.   *\
 */
 
 /* Local Functions: */
@@ -81,37 +83,51 @@ ptrace_create_child (struct child_process *process)
 {
   int pid;
 
-  pid = fork ();
-  if (pid < 0)
+  if (process->pid > 0)
     {
-      /*perror_with_name ("fork");*/
-      fprintf (stderr, "PTRACE: fork failed!\n");
-      return 0;
-    }
+      pid = process->pid;
 
-  if (pid == 0)
-    {
-      close_open_files ();
-      if (process->debug_backend)
-	fprintf (stderr, "PTRACE_TRACEME\n");
       errno = 0;
-      ptrace (PTRACE_TRACEME, 0L, 0L, 0L);
+      ptrace (PTRACE_ATTACH, pid, 0L, 0L);
       if (errno != 0)
 	{
-	  fprintf (stderr, "PTRACE: child cannot be traced!\n");
-	  goto fail;
+	  fprintf (stderr, "Could not attach to process id %d\n", pid);
+	  exit (1);
 	}
-      if (process->executable != NULL && process->argv != NULL)
-	execv (process->executable, process->argv);
-      else
-	sleep (-1);	/* FIXME ??? */
+    }
+  else
+    {
+      pid = vfork ();
+      if (pid < 0)
+	{
+	  fprintf (stderr, "PTRACE: vfork failed!\n");
+	  return 0;
+	}
 
-      fprintf (stderr, "Cannot exec %s: %s.\n", process->executable,
-	       errno > 0 && errno < sys_nerr ? 
-	       strerror (errno) : "unknown error");
-    fail:
-      fflush (stderr);
-      _exit (0177);
+      if (pid == 0)
+	{
+	  close_open_files ();
+	  if (process->debug_backend)
+	    fprintf (stderr, "PTRACE_TRACEME\n");
+	  errno = 0;
+	  ptrace (PTRACE_TRACEME, 0L, 0L, 0L);
+	  if (errno != 0)
+	    {
+	      fprintf (stderr, "PTRACE: child cannot be traced!\n");
+	      goto fail;
+	    }
+	  if (process->executable != NULL && process->argv != NULL)
+	    execv (process->executable, process->argv);
+	  else
+	    sleep (-1);	/* FIXME ??? */
+
+	  fprintf (stderr, "Cannot exec %s: %s.\n", process->executable,
+		   errno > 0 && errno < sys_nerr ? 
+		   strerror (errno) : "unknown error");
+	fail:
+	  fflush (stderr);
+	  _exit (0177);
+	}
     }
 
   return pid;

@@ -1,3 +1,10 @@
+2004-03-10  Kevin Buettner  <kevinb@redhat.com>
+
+	* ptrace-target.c (ptrace_create_child): Use vfork() instead of
+	fork().  Use PTRACE_ATTACH to attach to an existing process.
+	* server.c (usage): Update to include text about "-a".
+	(main): Allow use of -a switch to attach to an existing process.
+
 2003-11-14  Kevin Buettner  <kevinb@redhat.com>
 
 	* config.in (FRV_LINUX_TARGET): Add.

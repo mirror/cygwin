@@ -121,6 +121,9 @@ cache_component::cache_component (unsigned assocy,
 			 &cache_component::set_nothing,
 			 "register");
 
+  add_attribute ("hit-latency", &hit_latency, "setting");
+  add_attribute ("miss-latency", &miss_latency, "setting");
+
   // FIXME: state save/restore
 }
 
@@ -135,7 +138,7 @@ bus::status
 cache_component::write_any (host_int_4 addr, DataType data)
 {
   bool hit;
-  bus::status st;
+  bus::status st, read_status;
 
   if (UNLIKELY (downstream == 0))
     return bus::unmapped;
@@ -160,7 +163,10 @@ cache_component::write_any (host_int_4 addr, DataType data)
 	}
 	acache.expunge (line);
       }
-      return downstream->read (addr, data);
+
+      st = downstream->read (addr, data);
+      st.latency += miss_latency;
+      return st;
     }
 
   cache_line& line = acache.find (acache.addr_to_tag (addr), hit);
@@ -183,8 +189,8 @@ cache_component::write_any (host_int_4 addr, DataType data)
 	    {
 	      cache_line expelled_line (line_size);
 	      cache_line new_line (line_size, acache.addr_to_tag (addr));
-	      if ((st = read_line (new_line)) != bus::ok)
-		return st;
+	      if ((read_status = read_line (new_line)) != bus::ok)
+		return read_status;
 	      
 	      new_line.insert (line_offset (new_line, addr), data);
 	      acache.replace (expelled_line, new_line);
@@ -213,13 +219,21 @@ cache_component::write_any (host_int_4 addr, DataType data)
 	    return st;
 	}
     }
-  return bus::ok;
+
+  st = bus::ok;
+  if (hit)
+    st.latency = hit_latency;
+  else
+    st.latency = read_status.latency + miss_latency;
+  return st;
 }
 
 template <typename DataType>
 bus::status
 cache_component::read_any (host_int_4 addr, DataType& data)
 {
+  bus::status st, read_status;
+
   if (UNLIKELY (downstream == 0))
     return bus::unmapped;
 
@@ -231,12 +245,13 @@ cache_component::read_any (host_int_4 addr, DataType& data)
     {
       if (LIKELY (collect_p))
 	stats.misaligned_reads++;
-      return downstream->read (addr, data);
+
+      st = downstream->read (addr, data);
+      st.latency += miss_latency;
+      return st;
     }
 
   bool hit;
-  bus::status st;
-
   cache_line& line = acache.find (acache.addr_to_tag (addr), hit);
   if (LIKELY (hit))
     {
@@ -251,11 +266,10 @@ cache_component::read_any (host_int_4 addr, DataType& data)
 	{
 	  cache_line expelled_line (line_size);
 	  cache_line new_line (line_size, acache.addr_to_tag (addr));
-	  
-	  if ((st = read_line (new_line)) != bus::ok)
-	    return st;
-	  new_line.extract (line_offset (new_line, addr), data);
 
+	  if ((read_status = read_line (new_line)) != bus::ok)
+	    return read_status;
+	  new_line.extract (line_offset (new_line, addr), data);
 	  acache.replace (expelled_line, new_line);
 
 	  if (collect_p)
@@ -265,23 +279,34 @@ cache_component::read_any (host_int_4 addr, DataType& data)
 	    {
 	      // flush a dirty line being replaced
 	      if ((st = write_line (expelled_line)) != bus::ok)
-		return st;
+		  return st;
 	    }
 	}
       else
-	return downstream->read (addr, data);
+	{
+	  st = downstream->read (addr, data);
+	  st.latency += miss_latency;
+	  return st;
+	}
     }
-  return bus::ok;
+
+  st = bus::ok;
+  if (hit)
+    st.latency += hit_latency;
+  else
+    st.latency = read_status.latency + miss_latency;
+  return st;
 }
 
 bus::status
 cache_component::read_line (cache_line& line)
 {
+  bus::status st;
   host_int_4 base = acache.tag_to_addr (line.tag ());
   for (host_int_4 offset = 0; offset < line_size; offset += 4)
     {
       sid::big_int_4 data;
-      bus::status st = downstream->read (base + offset, data);
+      st = downstream->read (base + offset, data);
       if (st != bus::ok)
 	return st;
       line.insert (offset, data);
@@ -289,25 +314,26 @@ cache_component::read_line (cache_line& line)
   line.unlock ();
   line.clean ();
   line.validate ();
-  return bus::ok;
+  return st;
 }
 
 bus::status
 cache_component::write_line (cache_line& line)
 {
+  bus::status st;
   host_int_4 base = acache.tag_to_addr (line.tag ());
   for (host_int_4 offset = 0; offset < line_size; offset += 4)
     {
       sid::big_int_4 data;
       line.extract (offset, data);
-      bus::status st = downstream->write (base + offset, data);
+      st = downstream->write (base + offset, data);
       if (st != bus::ok)
 	return st;
     }
   line.clean ();
   if (LIKELY (collect_p))
     stats.flushes++;
-  return bus::ok;
+  return st;
 }
 
 void

@@ -1,3 +1,16 @@
+2001-06-21  Ben Elliston  <bje@redhat.com>
+
+	* cache.h (cache_component::hit_latency): New member.
+	(cache_component::miss_latency): Likewise.
+	* cache.cxx (cache_component ctor): Add attributes for these.
+	(cache_component::write_any): Add miss latency for misaligned
+	accesses. Set latency correctly for return.
+	(cache_component::read_any): Add miss latency for misaligned
+	accesses. Set latency correctly for return.
+	(cache_component::read_line): Return the true result of reads.
+	(cache_component::write_line): Likewise for writes.
+	* hw-cache.txt: Document latency extensions.
+
 2001-06-19  Ben Elliston  <bje@redhat.com>
 
 	* cache.cxx (CacheCreate): Re-work using sidutil::tokenize.

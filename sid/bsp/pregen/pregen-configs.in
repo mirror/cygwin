@@ -31,8 +31,6 @@ mvic() {
 	if [ "$sum1" != "$sum2" ]; then
 	    mv -f $1 $srcdir/$2
 	    echo "$2 updated."
-	else
-	    echo "$2 effectively unchanged."
 	fi
     fi
     rm -f $1

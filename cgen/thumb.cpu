@@ -716,7 +716,7 @@
 
 (define-normal-insn-enum cc-tests
   "condition code tests"
-  () "" f-cond
+  ((ISA thumb)) "" f-cond
   (
    (CC_EQ 0)   ; equal
    (CC_NE 1)   ; not equal

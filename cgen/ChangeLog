@@ -1,3 +1,7 @@
+2000-10-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* thumb.scm (cc-tests): Add (ISA thumb) attribute.
+
 2000-10-13  matthew green  <mrg@cygnus.com>
 
 	* utils-cgen.scm (get-ifetch): Move from here ...

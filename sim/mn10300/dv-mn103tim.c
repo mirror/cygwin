@@ -1,6 +1,6 @@
 /*  This file is part of the program GDB, the GNU debugger.
     
-    Copyright (C) 1998 Free Software Foundation, Inc.
+    Copyright (C) 1998, 2003 Free Software Foundation, Inc.
     Contributed by Cygnus Solutions.
     
     This program is free software; you can redistribute it and/or modify
@@ -495,6 +495,7 @@ read_special_timer6_reg (struct hw *me,
 	break;
       
       default:
+	break;
       }
       break;
     }
@@ -842,7 +843,7 @@ write_tm6md (struct hw *me,
 
   unsigned_word offset = address - timers->block[0].base;
   
-  if ( offset != 0x84 && nr_bytes > 1 || nr_bytes > 2 )
+  if ((offset != 0x84 && nr_bytes > 1) || nr_bytes > 2 )
     {
       hw_abort (me, "Bad write size of %d bytes to TM6MD", nr_bytes);
     }
@@ -950,6 +951,7 @@ write_special_timer6_reg (struct hw *me,
 	break;
       
       default:
+	break;
       }
       break;
     }

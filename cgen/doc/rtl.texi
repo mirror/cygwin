@@ -1806,7 +1806,7 @@ This is a character string consisting of raw characters and operands.
 Fields are denoted by @code{$operand} or
 @code{$@{operand@}}@footnote{Support for @code{$@{operand@}} is
 work-in-progress.}.  If a @samp{$} is required in the syntax, it is
-specified with @samp{\$}.  At most one white-space character may be
+specified with @samp{$$}.  At most one white-space character may be
 present and it must be a blank separating the instruction mnemonic from
 the operands.  This doesn't restrict the user's assembler, this is
 @c Is this reasonable?

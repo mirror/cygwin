@@ -9,6 +9,7 @@
 ; (use-c)
 ; (load-opc)
 ; (load-sim)
+; (load-sid)
 ; (cload #:arch arch #:machs "mach-list" #:isas "isa-list" #:options "options")
 
 ; First load fixup.scm to coerce guile into something we've been using.
@@ -106,6 +107,16 @@
   (set! APPLICATION 'GAS-TEST)
 )
 
+(define (load-sid)
+  (load "read")
+  (load "utils-sim")
+  (load "sid")
+  (load "sid-cpu")
+  (load "sid-model")
+  (load "sid-decode")
+  (set! verbose-level 3)
+  (set! APPLICATION 'SIMULATOR)
+)
 
 (define (load-sim)
   (load "read")
@@ -171,6 +182,10 @@ sim test options:
 [none yet]
 \n")
 
+(display "\
+sid options:
+[wip]
+\n")
 
 ; If ~/.cgenrc exists, load it.
 

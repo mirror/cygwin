@@ -1201,10 +1201,9 @@ Bit numbering is determined by the @code{insn-lsb0?} field of
 @code{define-arch}.
 
 @subsection length
-The number of bits in the field.
-The field must be contiguous.
-For non-contiguous instruction fields use "multi-ifields".
-(*xref: Non-contiguous fields).
+The number of bits in the field.  The field must be contiguous.  For
+non-contiguous instruction fields use "multi-ifields"
+(@pxref{Non-contiguous fields}).
 
 @subsection follows
 Optional.  Experimental.
@@ -1212,7 +1211,7 @@ This should not be used for the specification of RISC-like architectures.
 It is an experiment in supporting CISC-like architectures.
 The argument is the name of the ifield or operand that immediately precedes
 this one.  In general the argument is an "anyof" operand.  The @code{follows}
-spec allows subsequent ifields to "float".
+spec allows subsequent ifields to ``float''.
 
 @subsection mode
 The mode the value is to be interpreted in.
@@ -1273,6 +1272,7 @@ There's no need to provide an error case as presumably @code{value}
 would never have an invalid value, though certainly one could provide an
 error case if one wanted to.
 
+@node Non-contiguous fields
 @subsection Non-contiguous fields
 @cindex Fields, non-contiguous
 
@@ -1838,17 +1838,17 @@ Format elements can be any of:
 @cindex Semantics
 
 This field provides a mathematical description of what the instruction
-does.  Its syntax is GCC-RTL-like on purpose since GCC's RTL is well known
-by the intended audience.  However, it is not intended that it be precisely
-GCC-RTL.
+does.  Its syntax is GCC RTL-like on purpose since GCC's RTL is well
+known by the intended audience.  However, it is not intended that it be
+precisely GCC RTL.
 
 Obviously there are some instructions that are difficult if not
 impossible to provide a description for (e.g. I/O instructions).  Rather
 than create a new semantic function for each quirky operation, escape
 hatches to C are provided to handle all such cases.  The @code{c-code},
 @code{c-call} and @code{c-raw-call} semantic functions provide an
-escape-hatch to invoke C code to perform the operation.  (*xref:
-Expressions)
+escape-hatch to invoke C code to perform the
+operation. @xref{Expressions}.
 
 @subsection timing
 @cindex Timing

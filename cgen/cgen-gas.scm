@@ -1,10 +1,9 @@
 ; CPU description file generator for the GAS testsuite.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; This file is part of CGEN.
 
-; This is invoked to build several .s files and a script to run to
-; generate the .d files and .exp file.
-; This is invoked to build: tmp-build.sh cpu-cpu.exp
+; This is invoked to build several .s files and a "build script",
+; which generates the .d files and .exp DejaGNU test case.
 
 ; Load the various support routines.
 
@@ -25,7 +24,7 @@
 
 (define gas-arguments
   (list
-   (list '-B "file" "generate build.sh in <file>"
+   (list '-B "file" "generate build script in <file>"
 	 (lambda (arg) (file-write arg cgen-build.sh)))
    (list '-E "file" "generate allinsn.exp in <file>"
 	 (lambda (arg) (file-write arg cgen-allinsn.exp)))

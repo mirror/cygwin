@@ -1,3 +1,7 @@
+2001-03-23  Ben Elliston  <bje@redhat.com>
+
+	* cgen-gas.scm: Inline documentation improvements.
+
 2001-03-21  Ben Elliston  <bje@redhat.com>
 
 	* opc-itab.scm (compute-syntax): Emit a parse error if an operand

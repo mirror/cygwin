@@ -1,3 +1,8 @@
+2002-04-14  Elena Zannoni  <ezannoni@redhat.com>
+
+	* baseboards/powerpc-sim.exp: Don't disable inferior
+	function calls.
+
 2002-04-14  Jason Merrill  <jason@redhat.com>
 
 	* lib/remote.exp (check_for_board_status): Remove both CR and LF

@@ -16,7 +16,6 @@ details. */
 
 #include <assert.h>
 #include <ctype.h>
-#include <errno.h>
 #include <getopt.h>
 #include <signal.h>
 #include <stdio.h>
@@ -32,7 +31,7 @@ details. */
 #include "cygwin/cygserver_transport.h"
 
 // Version string.
-static const char version[] = "$Revision: 1.5 $";
+static const char version[] = "$Revision: 1.6 $";
 
 /*
  * Support function for the XXX_printf () macros in "woutsup.h".

@@ -25,7 +25,7 @@
 #  define HOST_BIG_ENDIAN true
 # endif
 #else
-# if defined(__i386__) || defined(__alpha__)
+# if defined(__i386__) || defined(__x86_64__) || defined(__alpha__) 
 #  define HOST_BIG_ENDIAN false
 # elif defined(__sparc__) || defined(__powerpc__)
 #  define HOST_BIG_ENDIAN true

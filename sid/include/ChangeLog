@@ -1,3 +1,7 @@
+2004-12-09  Jim Blandy  <jimb@redhat.com>
+
+	* sidtypes.h: Recognize AMD64 (x86-64) as a little-endian machine.
+
 2004-06-29  Stan Cox  <scox@redhat.com>
 
 	* sidcpuutil.h (basic_cpu): Add eflags_set_pin, set_eflags.

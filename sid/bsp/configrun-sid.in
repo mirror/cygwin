@@ -24,6 +24,10 @@ $sid=$ENV{'SID'} ? $ENV{'SID'} : "sid"; # look in $SID or install tree
 		 "m32r" => "hw-cpu-m32r/d"
 		 );
 
+%cpu_defaultendian = (
+		      "m32r" => "-EB"
+		      );
+
 %gloss_comptype = (
 		   "arm" => "sw-gloss-arm/angel",
 		   "thumb" => "sw-gloss-arm/angel",
@@ -106,7 +110,6 @@ Options:
  --trace-extract            Turn on CPU insn decode tracing.              [no]
  --trace-semantics          Turn on CPU insn execute tracing.             [no]
  --trace-core               Turn on bus access tracing.                   [no]
- --trace-core-visual        Turn on visual bus access tracing.            [no]
  --memory-region=BASE,SIZE  Add RAM region from BASE to BASE+SIZE-1.      [no]
  --gdb=PORT                 Add a gdb/debugger interface on TCP port.   [none]
  --board=BOARD              Model given board or system.               [gloss]
@@ -119,6 +122,10 @@ Options:
  --gprof                    GPROF-profile, collect every N ticks          [no]
  --wrap=COMPONENT           Turn on SID API tracing for named component [none]
 ";
+
+# temporarily disabled, until BLT build problems are fixed:
+# --trace-core-visual        Turn on visual bus access tracing.            [no]
+
   exit (0);
 }
 
@@ -355,7 +362,16 @@ if ($opt_trace_core)
 
 $third_section = "";
 if ($opt_EB && $opt_EL) { die "Both -EB and -EL specified\n"; }
-if (!$opt_EB && !$opt_EL && !$exec) { warn "Should specify executable or endianness"; &usage; }
+if (!$opt_EB && !$opt_EL && $opt_gdb != 0) 
+  {
+    if ($cpu_defaultendian{$opt_cpu} eq "-EB") { $opt_EB = 1; }
+    elsif ($cpu_defaultendian{$opt_cpu} eq "-EL") { $opt_EL = 1; }
+    else { warn "Should specify endianness"; &usage; }
+  }
+elsif (!$opt_EB && !$opt_EL && !$exec) 
+  {
+    warn "Should specify executable"; &usage;
+  }
 if ($opt_EB) { $third_section .= "set cpu endian big\n"; }
 if ($opt_EL) { $third_section .= "set cpu endian little\n"; }
 

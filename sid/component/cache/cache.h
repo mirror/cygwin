@@ -131,11 +131,17 @@ private:
   callback_pin<cache_component> flush_pin;
   void flush_line (host_int_4 addr);
 
+  callback_pin<cache_component> flush_set_pin;
+  void flush_set (host_int_4 set);
+
   callback_pin<cache_component> invalidate_all_pin;
   void invalidate_all_lines (host_int_4 ignore);
 
   callback_pin<cache_component> invalidate_pin;
   void invalidate_line (host_int_4 addr);
+
+  callback_pin<cache_component> invalidate_set_pin;
+  void invalidate_set (host_int_4 set);
 
   callback_pin<cache_component> prefetch_pin;
   void prefetch_line (host_int_4 addr);

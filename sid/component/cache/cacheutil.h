@@ -1,6 +1,6 @@
 // cacheutil.h -- Helper classes for a generic memory cache. -*- C++ -*-
 
-// Copyright (C) 2001 Red Hat.
+// Copyright (C) 2001, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -139,6 +139,9 @@ public:
   // Remove a line from the set.
   void expunge_line (cache_line& line);
 
+  // Flush the entire set.
+  void expunge (unsigned index);
+
   // Replace a line in the set with new_line.
   // Return false if the line cannot be placed, true otherwise.
   void replace_line (cache_line& old_line, cache_line new_line);
@@ -154,6 +157,12 @@ public:
 
   // Dump diagnostics to cerr.
   virtual void dump () const;
+
+  cache_line& operator[] (unsigned index)
+  {
+    assert (index < num_lines ());
+    return *(lines[index]);
+  }
 
 private:
   cache_replacement_algorithm& replacer;
@@ -207,6 +216,9 @@ public:
   // Invalidate the entire cache.
   void invalidate ();
 
+  // Invalidate a specific set (indexed).
+  void invalidate (unsigned index);
+
   // The number of sets in the cache.
   unsigned num_sets ();
 
@@ -220,6 +232,12 @@ public:
     unsigned shift;
   } hash_params;
 
+  cache_set& operator[] (unsigned index)
+  {
+    assert (index < num_sets ());
+    return *(sets[index]);
+  }
+    
 private:
   // Compute the index into the cache.
   unsigned hash_fn (const cache_tag& tag) const;

@@ -1,3 +1,20 @@
+2002-06-08  Ben Elliston  <bje@redhat.com>
+
+	* cacheutil.h (cache_set::expunge): New method.
+	(cache_set::operator[]): Likewise.
+	(cache::invalidate): Likewise.
+	(cache::operator[]): Likewise.
+	* cacheutil.cxx (cache::invalidate): Implement.
+	* cache.h (cache_component::flush_set_pin): New pin.
+	(cache_component::flush_set): New callback method.
+	(cache_component::invalidate_set_pin): New pin.
+	(cache_component::invalidate_set): New method.
+	* cache.cxx (cache_component constructor): Initialise and add
+	"flush-set" and "invalidate-set" pins.
+	(cache_component::flush_set): Implement.
+	(cache_component::invalidate_set): Likewise.
+	* hw-cache.xml: Update documentation.
+
 2002-05-17  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (DEJAGNUTESTS): Add refill.exp.

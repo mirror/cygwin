@@ -1,3 +1,28 @@
+2004-02-12  Dave Brolley  <brolley@redhat.com>
+
+	* elfload.h: Use 'unsigned long long' instead of host_int_8.
+	(struct TextSection): Moved here from elfload.c
+	(SHF_EXECINSTR): New macro.
+	* elfload.c (loadAreas): Now a pointer to a dynamically allocated
+	table.
+	(textSections): Ditto.
+	(newLoadArea): New static function.
+	(newTextSection): Ditto.
+	(textSectionAddress): Now takes a pointer to a section table.
+	(readElfFile): fileHeader, psymHdr, secHdr now automatic arrays.
+	Allocate loadAreas and textSections as required. Build textSections
+	from the ELF section table; one for each executable loaded.
+	* compLoader.cxx (sid::host_int_8): Add 'using' clause.
+	(textSegmentAddress): renamed to textSectionAddress and moved to
+	elfload.h.
+	(setSection_table): New method of loader_probe_bus.
+	(SID_GB_WRITE): Call textSectionAddress and pass section_table.
+	(section_table): New member of loader_probe_bus.
+	(load_it): Get section_table address from readElfFile.
+	* Makefile.am (LIBIBERTY): New variable.
+	(libloader_la_LIBADD): Add $(LIBIBERTY).
+	* Makefile.in: Regenerated.
+
 2003-10-07  Dave Brolley  <brolley@redhat.com>
 
 	* compLoader.cxx (loader_probe_bus): Now takes pin as an argument.

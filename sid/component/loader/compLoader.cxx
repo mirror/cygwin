@@ -1,6 +1,6 @@
 // compLoader.cxx - object file loader component.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2003 Red Hat.
+// Copyright (C) 1999, 2000, 2003, 2004 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -41,6 +41,7 @@ using sid::bus;
 using sid::host_int_1;
 using sid::little_int_1;
 using sid::host_int_4;
+using sid::host_int_8;
 using sid::component_library;
 using sid::COMPONENT_LIBRARY_MAGIC;
 
@@ -62,8 +63,6 @@ using sidutil::std_error_string;
 
 // A bus for allowing the loader to perform random checks against reads and writes
 // to memory. For example writing to a code area. Default implementation
-extern "C" int textSegmentAddress(int);
-
 class loader_probe_bus: public sidutil::passthrough_bus
   {
   public:
@@ -75,13 +74,15 @@ class loader_probe_bus: public sidutil::passthrough_bus
     }
     ~loader_probe_bus() throw() {}
     
+    void set_section_table (const struct TextSection *s) { section_table = s; }
+
     // Some macros to make manufacturing of the cartesian-product
     // calls simpler.
 #define SID_GB_WRITE(dtype) \
       sid::bus::status write(sid::host_int_4 addr, dtype data) throw ()\
 	  { if (LIKELY(*target)) \
               { \
-                if (write_to_code_address_pin && textSegmentAddress (addr)) \
+                if (write_to_code_address_pin && textSectionAddress (addr, section_table)) \
                   write_to_code_address_pin->drive (addr); \
                 return (*target)->write(addr, data); \
               } \
@@ -100,6 +101,7 @@ class loader_probe_bus: public sidutil::passthrough_bus
 #undef SID_GB_WRITE
 
     output_pin *write_to_code_address_pin;
+    const struct TextSection *section_table;
   };
 
 class generic_loader: public virtual component,
@@ -246,8 +248,11 @@ class elf_loader: public generic_loader
       elf_loader::freeloader = this;
       unsigned entry_point;
       int little_endian_p;
+      const struct TextSection *section_table;
       int success_p = readElfFile(& elf_loader::load_function,
-				  & entry_point, & little_endian_p);
+				  & entry_point, & little_endian_p,
+				  & section_table);
+      probe_upstream.set_section_table (section_table);
       elf_loader::freeloader = 0;
 
       if (success_p)

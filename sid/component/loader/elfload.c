@@ -1,6 +1,6 @@
 /* Simple ELF loader
  *
- * Copyright (c) 1998, 2002 Red Hat
+ * Copyright (c) 1998, 2002, 2004 Red Hat
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -14,38 +14,57 @@
  */
 #include <elfload.h>
 #include <unistd.h>
-
-unsigned char fileHeader [64];
-unsigned char psymHdr[56];
+#include "libiberty.h"
 
 #define PT_LOAD 1
 
-struct LoadAreas
+/* The loadAreas table is reused by each loader.  */
+static struct LoadAreas
 {
-  host_int_8 loadAddr;
-  host_int_8 filesize;
-  host_int_8 offset;
+  unsigned long long loadAddr;
+  unsigned long long filesize;
+  unsigned long long offset;
   int flags;
   int loaded;
-} loadAreas[100]; // XXX: limit on number of loadable sections
+} *loadAreas = 0;
 
-static struct TextSegment
+static void
+newLoadArea (int index)
 {
-  host_int_8 lbound;
-  host_int_8 hbound;
-} textSegments[100];
-static int textSegmentsCount = 0;
-enum {execute_flag = 1};
+  static loadAreaNum = 0;
+  if (index >= loadAreaNum)
+    {
+      loadAreaNum = index + 10;
+      loadAreas = xrealloc (loadAreas, loadAreaNum * sizeof (*loadAreas));
+    }
+}
 
+/* The section table is kept for the duration of the simulation.
+   It is divided into sub tables, one for each loader in the system.  */
+static int textSectionCount = 0;
+static struct TextSection *textSections = 0;
+
+static void
+newTextSection (int index)
+{
+  static textSectionNum = 0;
+  if (index >= textSectionNum)
+    {
+      textSectionNum = index + 10;
+      textSections = xrealloc (textSections, textSectionNum * sizeof (*textSections));
+    }
+}
 
 int
-textSegmentAddress (int address)
+textSectionAddress (unsigned long long address, const struct TextSection *section_table)
 {
+  /* The table begins with the given pointer and is terminated by an entry with
+     zeroes for both the high and low bounds.  */
   int i;
-  for (i = 0; i < textSegmentsCount ; i++)
+  for (i = 0; section_table[i].lbound != 0 || section_table[i].hbound != 0; i++)
     {
-      if (textSegments[i].lbound <= address
-	  && address <= textSegments[i].hbound)
+      if (section_table[i].lbound <= address
+	  && address <= section_table[i].hbound)
 	return 1;
     }
   return 0;
@@ -59,16 +78,22 @@ textSegmentAddress (int address)
 */
 
 int
-readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian)
+readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian, const struct TextSection **section_table)
 {
-  host_int_8 psymOffset;
+  unsigned char fileHeader [64];
+  unsigned char psymHdr [56];
+  unsigned char secHdr [64];
+  unsigned long long psymOffset;
   int psymSize;
   int psymNum;
-  host_int_8 entryPoint = 0;
-  int loadAreaCount = 0;
+  unsigned long long secOffset;
+  int secSize;
+  int secNum;
+  unsigned long long entryPoint = 0;
   int x;
   int littleEndian;
   int sixtyfourbit;
+  int loadAreaCount = 0;
 
   /* This is relatively straightforward. We first read in the file header,
      find out how many sections there are, determine which ones are loadable
@@ -77,7 +102,7 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian)
      There is one major failing, tho--if the psym header isn't at the front
      of the file, and we're loading from a stream that we can't back
      up on, we will lose.  */
-  if (func (NULL, fileHeader, 0, 64, 0) != 64)
+  if (func (0, fileHeader, 0, 64, 0) != 64)
     {
       return 0;
     }
@@ -108,14 +133,15 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian)
     }
   for (x = 0; x < psymNum; x++)
     {
+      if (func (0, psymHdr, psymOffset, psymSize, 0) != psymSize)
+	{
+	  return 0;
+	}
       if (sixtyfourbit)
         {
-	  if (func (NULL, psymHdr, psymOffset, 56, 0) != 56)
-	    {
-	      return 0;
-	    }
 	  if (fetchWord (psymHdr, littleEndian) == PT_LOAD)
 	    {
+	      newLoadArea (loadAreaCount);
 	      loadAreas[loadAreaCount].loadAddr = fetchQuad(psymHdr+24,
 							    littleEndian);
 	      loadAreas[loadAreaCount].offset = fetchQuad(psymHdr+8, littleEndian);
@@ -123,28 +149,14 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian)
 							    littleEndian);
 	      loadAreas[loadAreaCount].flags = fetchWord(psymHdr+4, littleEndian);
 	      loadAreas[loadAreaCount].loaded = 0;
-	      
-	      if (loadAreas[loadAreaCount].flags & execute_flag)
-		{
-		  textSegments[textSegmentsCount].lbound = 
-		    loadAreas[loadAreaCount].loadAddr;
-		  textSegments[textSegmentsCount].hbound = 
-		    loadAreas[loadAreaCount].loadAddr
-		    + loadAreas[loadAreaCount].filesize;
-		  textSegmentsCount++;
-		}
-
 	      loadAreaCount++;
 	    }
         }
       else
         {
-	  if (func (NULL, psymHdr, psymOffset, 32, 0) != 32)
-	    {
-	      return 0;
-	    }
 	  if (fetchWord (psymHdr, littleEndian) == PT_LOAD)
 	    {
+	      newLoadArea (loadAreaCount);
 	      loadAreas[loadAreaCount].loadAddr = fetchWord(psymHdr+12,
 								    littleEndian);
 	      loadAreas[loadAreaCount].offset = fetchWord(psymHdr+4, littleEndian);
@@ -152,17 +164,6 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian)
 							    littleEndian);
 	      loadAreas[loadAreaCount].flags = fetchWord(psymHdr+24, littleEndian);
 	      loadAreas[loadAreaCount].loaded = 0;
-
-	      if (loadAreas[loadAreaCount].flags & execute_flag)
-		{
-		  textSegments[textSegmentsCount].lbound = 
-		    loadAreas[loadAreaCount].loadAddr;
-		  textSegments[textSegmentsCount].hbound = 
-		    loadAreas[loadAreaCount].loadAddr
-		    + loadAreas[loadAreaCount].filesize;
-		  textSegmentsCount++;
-		}
-
 	      loadAreaCount++;
 	    }
         }
@@ -200,6 +201,62 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian)
 
   /* FIXME: If no program segment header, loop over sections instead.  */
   /* FIXME: admin part of program segment is loaded.  */
+
+  /* Look in the section table in order to determine which sections contain
+     code and which contain data.  */
+  newTextSection (textSectionCount);
+  *section_table = textSections + textSectionCount;
+  if (sixtyfourbit) 
+    {
+      secOffset = fetchQuad (fileHeader+40, littleEndian);
+      secSize = fetchShort (fileHeader+58, littleEndian);
+      secNum = fetchShort (fileHeader+60, littleEndian);
+    }
+  else
+    {
+      secOffset = fetchWord (fileHeader+32, littleEndian);
+      secSize = fetchShort (fileHeader+46, littleEndian);
+      secNum = fetchShort (fileHeader+48, littleEndian);
+    }
+  for (x = 0; x < secNum; x++)
+    {
+      if (func (0, secHdr, secOffset, secSize, 0) != secSize)
+	{
+	  return 0;
+	}
+      if (sixtyfourbit)
+        {
+	  if (fetchQuad(secHdr+8, littleEndian) & SHF_EXECINSTR)
+	    {
+	      textSections[textSectionCount].lbound = 
+		fetchQuad(secHdr+24, littleEndian);
+	      textSections[textSectionCount].hbound = 
+		textSections[textSectionCount].lbound
+		+ fetchQuad(secHdr+32, littleEndian) - 1;
+	      textSectionCount++;
+	      newTextSection (textSectionCount);
+	    }
+        }
+      else
+        {
+	  if (fetchWord(secHdr+8, littleEndian) & SHF_EXECINSTR)
+	    {
+	      textSections[textSectionCount].lbound = 
+		fetchWord(secHdr+16, littleEndian);
+	      textSections[textSectionCount].hbound = 
+		textSections[textSectionCount].lbound
+		+ fetchWord(secHdr+20, littleEndian) - 1;
+	      textSectionCount++;
+	      newTextSection (textSectionCount);
+	    }
+        }
+      secOffset += secSize;
+    }
+
+  /* Terminate this portion of the section table.  */
+  textSections[textSectionCount].lbound = 0;
+  textSections[textSectionCount].hbound = 0;
+  textSectionCount++;
 
   *entry_point = entryPoint;
   *little_endian = littleEndian;

@@ -1,4 +1,4 @@
-# Copyright (C) 92, 93, 94, 95, 96, 97, 98, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1992 - 2001, 2002 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,9 +15,9 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  
 
 # Please email any bugs, comments, and/or additions to this file to:
-# bug-dejagnu@prep.ai.mit.edu
+# bug-dejagnu@gnu.org
 
-# This file was written by Rob Savoye. (rob@cygnus.com)
+# This file was written by Rob Savoye. (rob@welcomehome.org)
 
 # load various protocol support modules
 
@@ -606,7 +606,7 @@ proc remote_raw_file { dest args } {
 
 proc standard_file { dest op args } {
     set file [lindex $args 0];
-    verbose "dest in standard_file is $dest";
+    verbose "dest in proc standard_file is $dest" 3;
     if { ![is_remote $dest] } {
 	switch $op {
 	    cmp {
@@ -785,12 +785,29 @@ proc remote_raw_spawn { dest commandline } {
 proc standard_spawn { dest commandline } {
     global board_info
 
+    if ![board_info $dest exists rsh_prog] {
+        if { [which remsh] != 0 } {
+            set RSH remsh
+        } else {
+            set RSH rsh
+        }
+    } else {
+        set RSH [board_info $dest rsh_prog];
+    }
+
+    if ![board_info $dest exists username] {
+        set rsh_useropts ""
+    } else {
+        set rsh_useropts "-l $username"
+    }
+
     if [board_info $dest exists hostname] {
 	set remote [board_info $dest hostname];
     } else {
 	set remote $dest;
     }
-    spawn rsh $remote $commandline;
+
+    spawn $RSH $rsh_useropts $remote $commandline;
     set board_info($dest,fileid) $spawn_id;
     return $spawn_id;
 }
@@ -1054,21 +1071,31 @@ proc standard_wait { dest timeout } {
 proc check_for_board_status  { variable } {
     upvar $variable output;
 
+    # If all programs of this board have a wrapper that always outputs a
+    # status message, then the absence of it means that the program
+    # crashed, regardless of status found elsewhere (e.g. simulator exit
+    # code).
+    if { [target_info needs_status_wrapper] != "" } then {  
+       set nomatch_return 2  
+    } else {
+       set nomatch_return -1
+    }
+
     if [regexp "(^|\[\r\n\])\\*\\*\\* EXIT code" $output] {
 	regsub "^.*\\*\\*\\* EXIT code " $output "" result;
 	regsub "\[\r\n\].*$" $result "" result;
-	regsub -all "(^|\r?\n)\\*\\*\\* EXIT code \[^\r\n\]*(\r?\n|$)" $output "" output;
+        regsub -all "(^|\[\r\n\]|\r\n)\\*\\*\\* EXIT code \[^\r\n\]*(\[\r\n\]\[\r\n\]?|$)" $output "" output;
 	regsub "^\[^0-9\]*" $result "" result
 	regsub "\[^0-9\]*$" $result "" result
 	verbose "got board status $result" 3
 	verbose "output is $output" 3
 	if { $result == "" } {
-	    return -1;
+	    return $nomatch_return
 	} else {
-	    return [expr $result];
+	    return [expr $result]
 	}
     } else {
-	return -1;
+	return $nomatch_return;
     }
 }
 

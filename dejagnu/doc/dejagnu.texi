@@ -4,7 +4,7 @@ o\input texinfo               @c             -*- Texinfo -*-
 @c
 @c This file documents the GNU Testing Framework ``DejaGnu''
 @c
-@c Copyright (C) 92, 93, 94, 95, 1996 Free Software Foundation, Inc.
+@c Copyright (C) 92 - 2000, 2001 Free Software Foundation, Inc.
 @c
 @c This text may be freely distributed under the terms of the GNU
 @c General Public License.
@@ -43,7 +43,7 @@ END-INFO-DIR-ENTRY
 @end tex
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 92, 93, 94, 95, 1996 Free Software Foundation, Inc.
+Copyright @copyright{} 92, 93, 94, 95, 96, 97, 98, 99, 2000 Free Software Foundation, Inc.
 
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice
@@ -60,7 +60,7 @@ into another language, under the above conditions for modified versions.
 @end titlepage
 
 @ifinfo
-Copyright @copyright{} 92, 93, 94, 95, 1996 Free Software Foundation, Inc.
+Copyright @copyright{} 92, 93, 94, 95, 96, 97, 98, 99, 2000 Free Software Foundation, Inc.
 
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice
@@ -1422,7 +1422,7 @@ variable in the top section, then just put a duplicate value in this
 second section. Usually the values defined in this config file are
 related to the configuration of the test run. This is the ideal place to
 set the variables @code{host_triplet}, @code{build_triplet},
-@code{target_triplet}. All other variables are tool dependant. ie for
+@code{target_triplet}. All other variables are tool dependant, i.e., for
 testing a compiler, the value for @var{CC} might be set to a freshly
 built binary, as opposed to one in the user's path.
 

@@ -3,7 +3,7 @@
 # runtest -- basically all this script does is find the proper expect
 #	     shell and then run DejaGnu.
 #
-# Written by Rob Savoye <rob@cygnus.com>
+# Written by Rob Savoye <rob@welcomehome.org>
 #
 
 #

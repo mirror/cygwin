@@ -1,4 +1,4 @@
-# Copyright (C) 92, 93, 94, 95, 96, 97, 98, 1999, 2000 Free Software Foundation, Inc.
+# Copyright (C) 1992 - 2001 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,9 +15,9 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
 
 # Please email any bugs, comments, and/or additions to this file to:
-# bug-dejagnu@prep.ai.mit.edu
+# bug-dejagnu@gnu.org
 
-# This file was written by Rob Savoye. (rob@cygnus.com)
+# This file was written by Rob Savoye. (rob@welcomehome.org)
 # and extensively modified by Bob Manson. (manson@cygnus.com)
 
 # a hairy pattern to recognize text
@@ -267,6 +267,7 @@ proc prune_warnings { text } {
 
     # GNU ld warns about functions marked as dangerous in GNU libc.
     regsub -all "(^|\n)\[^\n\]*: In function\[^\n\]*\n\[^\n\]\[^\n\]*is dangerous\[^\n\]*" $text "" text
+    regsub -all "(^|\n)\[^\n\]*: In function\[^\n\]*\n\[^\n\]\[^\n\]*the use of \[^\n\]* is dangerous, better use \[^\n\]*" $text "" text
     regsub -all "(^|\n)\[^\n\]*is dangerous\[^\n\]*" $text "" text
 
     # Libgloss libnosys defines functions that warn when linked in
@@ -276,6 +277,9 @@ proc prune_warnings { text } {
     # libstdc++-v3 tests can emit cpplib warnings due to duplicate -isystem / -I flags
     regsub -all "(^|\n)\[^\n\]*: warning: changing search order for system directory\[^\n\]*" $text "" text
     regsub -all "(^|\n)\[^\n\]*: warning:   as it has already been specified\[^\n\]*" $text "" text
+
+    # Cygwin cc1 warns about -fpic and -fPIC
+    regsub -all ".*: warning: -f(pic|PIC) ignored for target .*" $text "" text
 
     # It might be tempting to get carried away and delete blank lines, etc.
     # Just delete *exactly* what we're ask to, and that's it.
@@ -500,6 +504,7 @@ proc default_target_compile {source destfile type options} {
     }
 
     if { $type == "executable" } {
+	append add_flags " $ldflags"
 	foreach x $libs {
 	    if [file exists $x] {
 		append source " $x"
@@ -507,7 +512,6 @@ proc default_target_compile {source destfile type options} {
 		append add_flags " $x";
 	    }
 	}
-	append add_flags " $ldflags"
 
 	if [board_info $dest exists libs] {
 	    append add_flags " [board_info $dest libs]"

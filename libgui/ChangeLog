@@ -1,3 +1,9 @@
+2001-10-26  Keith Seitz  <keiths@redhat.com>
+
+	* configure.in (ac_win_build): Actually want "-DWIN32" with
+	cygwin hosts, not just cygwin targets.
+	* configure: Regenerate.
+
 2001-10-24  Keith Seitz  <keiths@redhat.com>
 
 	* configure.in (ac_win_build): Put "-DWIN32" back into LIBGUI_CFLAGS.

@@ -63,7 +63,6 @@ fi
 
 case "${target}" in
 *-*-cygwin*)
-	LIBGUI_CFLAGS="-DWIN32 $LIBGUI_CFLAGS"
         touch ac$$.c
         if ${CC} -c -mwin32 ac$$.c >/dev/null 2>&1; then
             case "$LIBGUI_CFLAGS" in
@@ -73,6 +72,10 @@ case "${target}" in
         fi
         rm -f ac$$.o ac$$.c
         ;;
+esac
+case "${host}" in
+*-*-cygwin*)
+	LIBGUI_CFLAGS="-DWIN32 $LIBGUI_CFLAGS" ;;
 esac
 AC_SUBST(LIBGUI_CFLAGS) 
 

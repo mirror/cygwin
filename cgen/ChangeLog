@@ -1,5 +1,9 @@
 2000-09-06  Frank Ch. Eigler  <fche@redhat.com>
 
+	* doc/rtl.texi (decode-assist): Describe this field as optional.
+
+2000-09-06  Frank Ch. Eigler  <fche@redhat.com>
+
 	* utils-gen.scm (gen-multi-ifld-extract): Handle case of multi-ifield
 	with decode proc.
 

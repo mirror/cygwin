@@ -1,6 +1,6 @@
 // gdb.cxx - GDB stub implementation.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001 Red Hat.
+// Copyright (C) 1999-2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -885,11 +885,25 @@ gdb::remove_hw_breakpoint (host_int_8 address)
       return false;
     }
 
-  string watcher_name = 
-    string("watch:") + 
-    map_watchable_name ("gdb-register-pc") +
-    string(":value:") + 
-    make_numeric_attribute (address);
+  string watcher_name;
+  if (this->hw_breakpoint_pc_mask)
+    {
+      watcher_name =
+	string ("watch:") + 
+	map_watchable_name ("gdb-register-pc") + string (":") +
+	string ("mask/value:") + 
+	make_numeric_attribute (this->hw_breakpoint_pc_mask) + string (":") +
+	make_numeric_attribute (address);
+    }
+  else
+    {
+      watcher_name =
+	string ("watch:") + 
+	map_watchable_name ("gdb-register-pc") + string (":") +
+	string ("value:") + 
+	make_numeric_attribute (address);
+    }
+  // see also ::add_hw_breakpoint()
   
   this->hw_breakpoints[address] --;
   if (this->hw_breakpoints[address] == 0)
@@ -922,11 +936,26 @@ gdb::set_breakpoint (unsigned long type, struct gdbserv_reg *addr, struct gdbser
 bool
 gdb::add_hw_breakpoint (host_int_8 address)
 {  
-  string watcher_name = 
-    string("watch:") + 
-    map_watchable_name ("gdb-register-pc") +
-    string(":value:") + 
-    make_numeric_attribute (address);
+  string watcher_name;
+  if (this->hw_breakpoint_pc_mask)
+    {
+      watcher_name =
+	string ("watch:") + 
+	map_watchable_name ("gdb-register-pc") + string (":") +
+	string ("mask/value:") + 
+	make_numeric_attribute (this->hw_breakpoint_pc_mask) + string (":") +
+	make_numeric_attribute (address);
+    }
+  else
+    {
+      watcher_name =
+	string ("watch:") + 
+	map_watchable_name ("gdb-register-pc") + string (":") +
+	string ("value:") + 
+	make_numeric_attribute (address);
+    }
+  // see also ::remove_hw_breakpoint()
+
   
   this->hw_breakpoints[address] ++;
   if (this->hw_breakpoints[address] == 1)
@@ -1158,6 +1187,7 @@ gdb::gdb ():
   exit_on_detach = false;
   enable_Z_packet = true;
   operating_mode_p = true;
+  hw_breakpoint_pc_mask = 0;
 
   add_attribute_notify ("trace-gdbserv?", & trace_gdbserv, 
 			this, & gdb::update_trace_flags, "setting");
@@ -1166,6 +1196,7 @@ gdb::gdb ():
   add_attribute ("exit-on-detach?", & exit_on_detach, "setting");
   add_attribute ("enable-Z-packet?", & enable_Z_packet, "setting");
   add_attribute ("operating-mode?", & operating_mode_p, "setting");
+  add_attribute ("Z-packet-pc-mask", & hw_breakpoint_pc_mask, "setting");
 }
 
 

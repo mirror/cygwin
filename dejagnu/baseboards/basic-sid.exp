@@ -27,8 +27,7 @@ proc find_sid_conf { config } {
     global srcdir
 
     set try [lookfor_file ${srcdir} sid/bsp/pregen/${config}.conf]
-    if { $try == "" } { error "No ${config}.conf available." }
-    return $try
+    if { $try == "" } then { return ${config}.conf } else { return $try }
 }
 
 # find_rawsid -- find a usable SID simulator.

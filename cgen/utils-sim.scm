@@ -938,9 +938,11 @@
 			";\n"
 			indent "  val = "))
        (string-append indent "  unsigned int val = "))
-   (-gen-decode-bits (dtable-guts-bitnums table-guts)
-		     (dtable-guts-startbit table-guts)
-		     (dtable-guts-bitsize table-guts) "insn" lsb0?)
+   (if (< (length (dtable-guts-bitnums table-guts)) 1)
+       "0"
+       (-gen-decode-bits (dtable-guts-bitnums table-guts)
+			 (dtable-guts-startbit table-guts)
+			 (dtable-guts-bitsize table-guts) "insn" lsb0?))
    ";\n"
    indent "  switch (val)\n"
    indent "  {\n"

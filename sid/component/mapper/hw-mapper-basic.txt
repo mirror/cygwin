@@ -94,8 +94,17 @@
       attribute is incremented.  (The ACCESSOR string is the name of
       the accessor.)
 
+    * Memory latency
+
+      This component models constant latency for accesses which pass
+      through the mapper.  The value of the "latency" attribute is
+      added to the total latency of every bus transaction.  The units
+      of latency are nominal, but typically represent a number of
+      system clock cycles.
+      
   - SID conventions
     * This is a functional component.
+    * The component models memory latency.
     * This component does not support triggerpoints, nor does it support
       state save/restore.
 
@@ -136,3 +145,4 @@
       - cache-hit-count | register | number | 0 | mapping
       - ACCESSOR-count | register | number | 0 | mapping
       - state-snapshot | | opaque string | n/a | state save/restore
+      - latency | setting | number | 0 | memory latency

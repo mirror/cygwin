@@ -1,3 +1,13 @@
+2001-06-21  Ben Elliston  <bje@redhat.com>
+
+	* compMapper.cxx (generic_mapper::latency): New member.
+	(generic_mapper constructor): Add a "latency" attribute.
+	(generic_mapper_bus::write_strideoffset_any): Accumulate latency.
+	(generic_mapper_bus::read_strideoffset_any): Likewise.
+	(generic_mapper_bus::write_any): Likewise.
+	(generic_mapper_bus::read_any): Likewise.
+	* hw-mapper-basic.txt: Document extension.
+
 2001-03-01  Frank Ch. Eigler  <fche@redhat.com>
 
 	* compMapper.cxx ({read,write}_strideoffset_any): Added b.p. hints.

@@ -130,11 +130,13 @@ TclMatchFiles(interp, separators, dirPtr, pattern, tail)
 	Tcl_DStringAppend(&buffer, Tcl_DStringValue(dirPtr),
 		Tcl_DStringLength(dirPtr));
     }
+#ifndef __CYGWIN__
     for (p = Tcl_DStringValue(&buffer); *p != '\0'; p++) {
 	if (*p == '/') {
 	    *p = '\\';
 	}
     }
+#endif
     p--;
     if (*p != '\\' && *p != ':') {
 	Tcl_DStringAppend(&buffer, "\\", 1);

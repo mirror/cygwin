@@ -92,6 +92,7 @@ static char initScript[] = "if {[info proc tclInit]==\"\"} {\n\
         }\n\
 	set parentDir [file dirname [file dirname $execName]]\n\
         lappend dirs [file join $parentDir share tcl$tcl_version]\n\
+        lappend dirs [file join $parentDir \"usr\" share tcl$tcl_version]\n\
 	lappend dirs [file join [file dirname $parentDir] share tcl$tcl_version]\n\
         # NOW, let's try to find it in the build tree...\n\
         # Rather than play all the games Scriptics does, if we are in the build\n\

@@ -40,7 +40,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.47 $";
+static const char version[] = "$Revision: 1.48 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -130,7 +130,10 @@ add_path (char *s, int maxlen)
     *--e = 0;
   for (int i = 1; i < num_paths; i++)
     if (strcasecmp (paths[num_paths], paths[i]) == 0)
-      return;
+      {
+	free (paths[num_paths]);
+	return;
+      }
   num_paths++;
 }
 

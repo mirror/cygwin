@@ -38,7 +38,7 @@ details. */
 #define DEF_CONFIG_FILE	"" SYSCONFDIR "/cygserver.conf"
 
 // Version string.
-static const char version[] = "$Revision: 1.9 $";
+static const char version[] = "$Revision: 1.10 $";
 
 GENERIC_MAPPING access_mapping;
 
@@ -726,6 +726,8 @@ main (const int argc, char *argv[])
   if (wincap.has_security () && !setup_privileges ())
     panic ("Setting process privileges failed.");
 
+  ipcinit ();
+
   /*XXXXX*/
   threaded_queue request_queue (request_threads);
 
@@ -739,11 +741,7 @@ main (const int argc, char *argv[])
   request_queue.add_submission_loop (&submission_loop);
 
   if (transport->listen () == -1)
-    {
-      exit (1);
-    }
-
-  ipcinit ();
+    return 1;
 
   cache.start ();
 

@@ -8,9 +8,20 @@
 	* Makefile.am (all-local): Create version.h file with $(VERSION) in it.
 	* Makefile.in: Regenerated.
 
+2001-09-17  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	Changes to many generated files -- incorporate bochs into
+	build system and configrun-sid.
+
 2001-07-24  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (install-data-local): Remove target.
+
+2001-07-10  matthew green  <mrg@redhat.com>
+
+	* Makefile.in: Regenerate.
+	* aclocal.m4: Regenerate.
+	* configure: Regenerate.
 
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -19,8 +30,14 @@
 
 2001-03-26  Frank Ch. Eigler  <fche@redhat.com>
 
-        * Makefile.am (install-data-local): Install COPYING.SID in $prefix.
-        * Makefile.in: Regenerated.
+	* Makefile.am (install-data-local): Install COPYING.SID in $prefix.
+	* Makefile.in: Regenerated.
+
+2001-03-22  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.in: Regenerate.
+	* configure: Likewise.
+	* aclocal.m4: Likewise.
 
 2001-03-21  Ben Elliston  <bje@redhat.com>
 

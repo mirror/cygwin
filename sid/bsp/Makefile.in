@@ -68,6 +68,7 @@ sidtarget_m32r = @sidtarget_m32r@
 sidtarget_m68k = @sidtarget_m68k@
 sidtarget_mips = @sidtarget_mips@
 sidtarget_ppc = @sidtarget_ppc@
+sidtarget_x86 = @sidtarget_x86@
 
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I $(srcdir)/../config
@@ -80,9 +81,12 @@ SUBDIRS = . pregen
 
 @SIDTARGET_M68K_TRUE@FAM3SCRIPTS = @SIDTARGET_M68K_TRUE@m68k-elf-sid
 
+@SIDTARGET_X86_TRUE@FAM11SCRIPTS = @SIDTARGET_X86_TRUE@i386-elf-sid
+
 ALLFAMSCRIPTS = $(FAM0SCRIPTS) $(FAM1SCRIPTS) $(FAM2SCRIPTS) $(FAM3SCRIPTS) \
 		$(FAM4SCRIPTS) $(FAM5SCRIPTS) $(FAM6SCRIPTS) $(FAM7SCRIPTS) \
-		$(FAM8SCRIPTS) $(FAM9SCRIPTS) $(FAM10SCRIPTS)
+		$(FAM8SCRIPTS) $(FAM9SCRIPTS) $(FAM10SCRIPTS) $(FAM11SCRIPTS) \
+		$(FAM12SCRIPTS)
 
 
 bin_SCRIPTS = configrun-sid $(ALLFAMSCRIPTS)

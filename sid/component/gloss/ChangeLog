@@ -35,6 +35,16 @@
 	(gloss32::set_halfword): Likewise.
 	(gloss32::do_sys_fstat): Likewise.
 
+2001-08-31  Ben Elliston  <bje@redhat.com>
+
+	* sw-gloss-arm_angel.txt: Regenerate.
+
+2001-08-30  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* gloss.cxx: Add syscall-numbering-scheme setting.
+	* libcygmon.h: New file.  It contains cygmon syscall numbers.
+	* sw-gloss-arm_angel.xml: Add syscall-numbering-scheme documentation.
+
 2001-08-12  Richard Henderson  <rth@redhat.com>
 
 	* gloss.cxx (gloss32::read): Fix argument type mismatch for min.

@@ -90,7 +90,7 @@ dnl cfgroot is here because it's statically linked, and libltdl is its baby.
 dnl tcl is here because it looks for tcl/tk in a too complex way for this file.
 dnl audio is here because it has more host-dependent configuration
 dnl cgen-cpu is here because it has target-dependent configuration
-AC_CONFIG_SUBDIRS([cfgroot tcl audio cgen-cpu families timers])
+AC_CONFIG_SUBDIRS([bochs cfgroot tcl audio cgen-cpu families timers])
 
 
 
@@ -101,7 +101,7 @@ AC_SUBST(make_subdirs)
 
 dnl List all component subdirectory files not covered by AC_CONFIG_SUBDIRS
 dnl that need autoconf @substitution@.
-AC_OUTPUT([Makefile testsuite/Makefile tconfig.h:tconfig.in siddoc
+AC_OUTPUT([Makefile testsuite/Makefile tconfig.h:tconfig.in siddoc	
 	cache/Makefile
 	consoles/Makefile
 	gdb/Makefile

@@ -1859,12 +1859,42 @@
      debug the simulation exactly as if it were a "real" target
      environment.
     </PARA>
-<PARA>Configuring the GDB stub and socket components is somewhat
-     lengthy and verbose, but is performed automatically by the
-     <FILENAME>configrun-sid</FILENAME> command when
-     invoked with the
-     <FILENAME>---gdb=<REPLACEABLE>PORT</REPLACEABLE></FILENAME>
-     option.  For complete details of the connection process, see
+<EXAMPLE>
+<TITLE>Debugging a Program Running in SID</TITLE>
+<SCREEN>
+% <USERINPUT>i386-elf-sid --gdb=2345&</USERINPUT>
+[1] 25135
+% <USERINPUT>i386-elf-gdb -nw hello</USERINPUT>
+GNU gdb 2001-10-12-cvs (MI_OUT)
+Copyright 2001 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "--host=i686-pc-linux-gnu --target=i386-elf"...
+(gdb) <USERINPUT>target remote :2345</USERINPUT>
+Remote debugging using :2345
+0x0000fff0 in ?? ()
+(gdb) <USERINPUT>load</USERINPUT>
+Loading section .text, size 0x5994 lma 0x100000
+Loading section .data, size 0x78c lma 0x1059a0
+Loading section .rodata, size 0x2c9 lma 0x106140
+Start address 0x100000, load size 25577
+Transfer rate: 102308 bits/sec, 97 bytes/write.
+(gdb) <USERINPUT>continue</USERINPUT>
+Continuing.
+Hello, World
+
+Program exited normally.
+(gdb) 
+</SCREEN>
+</EXAMPLE>
+<PARA>Configuring the GDB stub and I/O socket components is
+     somewhat lengthy and verbose, but is performed automatically by
+     the <FILENAME>configrun-sid</FILENAME> command when invoked with
+     the <FILENAME>--gdb=<REPLACEABLE>PORT</REPLACEABLE></FILENAME>
+     option, as in the above example.  For a detailed description of
+     the GDB stub component's pins and attributes, see
      <FILENAME>siddoc sw-debug-gdb</FILENAME>.
     </PARA>
 </SECT2>

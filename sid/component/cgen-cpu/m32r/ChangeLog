@@ -1,3 +1,21 @@
+2001-08-16  graydon hoare  <graydon@redhat.com>
+
+	* Makefile.am: gcc -> $(CC) fix.
+	* Makefile.in: Regenerate.
+
+2001-08-15  graydon hoare  <graydon@redhat.com>
+
+	* m32rbf.cxx (step_insns): Fix for bi-endian
+	disassembly.
+
+2001-08-15  graydon hoare  <graydon@redhat.com>
+
+	* m32rbf.cxx (step_insns): Add disassembly
+	tracing support.
+	* Makefile.am: Add support for building and
+	linking invididual objects from opcodes.
+	* Makefile.in: Regenerate.
+
 2001-08-03  matthew green  <mrg@redhat.com>
 
 	* m32rbf.h (dtor): Add throw() specifier.

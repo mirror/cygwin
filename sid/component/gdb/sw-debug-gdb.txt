@@ -1,0 +1,288 @@
+               sw-debug-gdb (libgdb.la :: gdb_component_library)
+
+Synopsis:
+
+   The gdb component is an implementation of the GDB stub.
+
+     ----------------------------------------------------------------------
+
+Functionality:
+
+  Modelling:
+
+   The gdb component communicates with other components through its pins, and
+   also through four relations: a cpu uni-relation, a gloss uni-relation, a
+   target-schedulers multi-relation and a host-schedulers multi-relation.
+
+   Note that in sid, "turning the target power on or off" means that the gdb
+   component drives its yield pin, sets the target schedulers' enabled?
+   attributes through the target-schedulers relation and sets the host
+   schedulers' yield-host-time? attributes through the host-schedulers
+   relation. See sid-sched for an explanation of these pins.
+
+   Also note that the term "hw-breakpoint" used in a sid context could mean
+   the same thing as the term "software breakpoint" in a gdb context. This is
+   because breakpoints in sid are sometimes implemented as triggerpoints set
+   on the pc register.
+
+   +-------------------------------------------------+
+   |                    Behaviors                    |
+   |-------------------------------------------------|
+   |   initialization | When init is driven, target  |
+   |                  | power is turned off.         |
+   |                  | Basically, this means the    |
+   |                  | target will wait for further |
+   |                  | input from gdb.              |
+   |------------------+------------------------------|
+   |        execution | When the gdb component wants |
+   |                  | the target system to yield,  |
+   |                  | it drives the yield pin.     |
+   |                  | Likewise, it will drive the  |
+   |                  | restart pin to restart the   |
+   |                  | target system. The restart   |
+   |                  | pin is typically connected   |
+   |                  | to a hw-reset                |
+   |                  | hw-glue-sequence component   |
+   |                  | that has connections to any  |
+   |                  | of the target components     |
+   |                  | that need to be reset.       |
+   |                  |                              |
+   |                  | When the start-target pin is |
+   |                  | driven, the target power     |
+   |                  | will be turned on. The       |
+   |                  | start-target pin should be   |
+   |                  | driven by a sid-side         |
+   |                  | component that wants the     |
+   |                  | target cpu to start again.   |
+   |                  | Use this pin with caution;   |
+   |                  | driving it could upset an    |
+   |                  | attached external debugger.  |
+   |                  |                              |
+   |                  | The stop-target pin should   |
+   |                  | be driven from a sid-side    |
+   |                  | component that wants to stop |
+   |                  | the target cpu. This pin     |
+   |                  | will be ignored if there are |
+   |                  | signals pending.             |
+   |                  |                              |
+   |                  | When gdb itself or the gdb   |
+   |                  | component (see the           |
+   |                  | explanation of the           |
+   |                  | enable-Z-packet? attribute)  |
+   |                  | sets a software breakpoint,  |
+   |                  | it puts the cpu's            |
+   |                  | instruction cache out of     |
+   |                  | sync with the actual         |
+   |                  | contents of memory. So the   |
+   |                  | gdb component will drive the |
+   |                  | flush-icache pin when it     |
+   |                  | wants the cpu to invalidate  |
+   |                  | its instruction cache.       |
+   |                  |                              |
+   |                  | As long as gdb is connected  |
+   |                  | to the gdb component, the    |
+   |                  | connected? attribute will be |
+   |                  | true.                        |
+   |------------------+------------------------------|
+   |      system call | When gdb detaches from the   |
+   |        emulation | gdb component, the component |
+   |                  | drives the process-signal    |
+   |                  | pin.                         |
+   |                  |                              |
+   |                  | The gloss-process-signal pin |
+   |                  | is typically driven by a     |
+   |                  | gloss component. It tells    |
+   |                  | the gdb component that the   |
+   |                  | gloss component has          |
+   |                  | processed an exit system     |
+   |                  | call.                        |
+   |                  |                              |
+   |                  | The gdb component's trap pin |
+   |                  | is usually connected to the  |
+   |                  | gloss component's            |
+   |                  | trap-code-chain pin. The     |
+   |                  | gloss component sends any    |
+   |                  | trap code that it cannot     |
+   |                  | handle down the trap code    |
+   |                  | chain (via the               |
+   |                  | trap-code-chain pin), and    |
+   |                  | any debugging-related trap   |
+   |                  | will be handled by the gdb   |
+   |                  | component. If the gdb        |
+   |                  | component knows how to       |
+   |                  | handle the trap code, it     |
+   |                  | will handle it and then      |
+   |                  | drive the trap pin with the  |
+   |                  | cpu_trap_handled value. See  |
+   |                  | sw-gloss-arm_angel and       |
+   |                  | hw-cpu-arm7t for more        |
+   |                  | information on trap and      |
+   |                  | trap-code pins.              |
+   |------------------+------------------------------|
+   |          pin i/o | The remote-rx and remote-tx  |
+   |                  | pins are the pins that the   |
+   |                  | gdb component uses to        |
+   |                  | receive data from and        |
+   |                  | transmit data to gdb. They   |
+   |                  | are typically connected to a |
+   |                  | sid-io-socket's rx and tx    |
+   |                  | pins respectively. gdb       |
+   |                  | connects to this             |
+   |                  | sid-io-socket component via  |
+   |                  | TCP, and can then be used    |
+   |                  | just as if it were debugging |
+   |                  | a normal remote target.      |
+   |                  |                              |
+   |                  | The target-tx pin is used to |
+   |                  | transmit characters coming   |
+   |                  | from the target's standard   |
+   |                  | out back to gdb. These       |
+   |                  | characters are transmitted   |
+   |                  | using an "O" packet.         |
+   |------------------+------------------------------|
+   | deinitialization | When the deinit pin is       |
+   |                  | driven, the gdb component    |
+   |                  | disconnects from gdb.        |
+   |------------------+------------------------------|
+   |          setting | When set to true, the        |
+   |                  | trace-gdbsid? and            |
+   |                  | trace-gdbserv? attributes    |
+   |                  | turn on trace messages for   |
+   |                  | the gdb component member     |
+   |                  | functions and the stub       |
+   |                  | functions respectively.      |
+   |                  | Trace messages are printed   |
+   |                  | to stderr.                   |
+   |                  |                              |
+   |                  | When the exit-on-detach?     |
+   |                  | attribute is true, the gdb   |
+   |                  | component drives its         |
+   |                  | process-signal pin when gdb  |
+   |                  | detaches from the target.    |
+   |                  |                              |
+   |                  | When the enable-Z-packet?    |
+   |                  | attribute is true, the gdb   |
+   |                  | component recognizes Z       |
+   |                  | packets that it receives     |
+   |                  | from gdb, and sets           |
+   |                  | breakpoints according to     |
+   |                  | their contents. If the       |
+   |                  | enable-Z-packet? attribute   |
+   |                  | is false, then gdb sets      |
+   |                  | breakpoints directly using   |
+   |                  | the read memory (m) and      |
+   |                  | write memory (M) packets.    |
+   |                  |                              |
+   |                  | The Z-packet-pc-mask         |
+   |                  | attribute is used when       |
+   |                  | passing Harvard-encoded PC   |
+   |                  | addresses to the gdb         |
+   |                  | component via a Z packet.    |
+   |                  |                              |
+   |                  | When the operating-mode?     |
+   |                  | attribute is true, the gdb   |
+   |                  | component doesn't handle any |
+   |                  | cpu traps except for single  |
+   |                  | stepping.                    |
+   +-------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |         functional | supported          | -     |
+   |--------------------+--------------------+-------|
+   |       save/restore | not supported      | -     |
+   |--------------------+--------------------+-------|
+   |      triggerpoints | supported          | -     |
+   +-------------------------------------------------+
+
+     ----------------------------------------------------------------------
+
+Environment:
+
+   Related Components
+
+   The gdb component connects to many other sid components:
+     * target memory to inspect and set values there
+     * the cpu to set triggerpoints, and to view register values
+     * a gloss component that sends it trap codes
+     * hw-glue-sequences so that it is initialized and deinitialized at the
+       proper times
+     * schedulers to change control between the target and the host
+     * a sid-io-socket component to interface with gdb via TCP
+
+   Host System
+
+   The gdb component prints error and tracing messages to stderr.
+
+     ----------------------------------------------------------------------
+
+Component Reference:
+
+  Component: sw-debug-gdb
+
+   +-----------------------------------------------------------+
+   |                           pins                            |
+   |-----------------------------------------------------------|
+   |        name        |direction|legalvalues|   behaviors    |
+   |--------------------+---------+-----------+----------------|
+   |init                |in       |any        |initialization  |
+   |--------------------+---------+-----------+----------------|
+   |remote-rx           |in       |any        |pin i/o         |
+   |--------------------+---------+-----------+----------------|
+   |remote-tx           |out      |any        |pin i/o         |
+   |--------------------+---------+-----------+----------------|
+   |target-tx           |in       |any        |pin i/o         |
+   |--------------------+---------+-----------+----------------|
+   |process-signal      |out      |enum values|system call     |
+   |                    |         |           |emulation       |
+   |--------------------+---------+-----------+----------------|
+   |gloss-process-signal|in       |enum values|system call     |
+   |                    |         |           |emulation       |
+   |--------------------+---------+-----------+----------------|
+   |trap                |inout    |enum values|system call     |
+   |                    |         |           |emulation       |
+   |--------------------+---------+-----------+----------------|
+   |trap-code           |in       |various    |system call     |
+   |                    |         |values     |emulation       |
+   |--------------------+---------+-----------+----------------|
+   |yield               |out      |any        |execution       |
+   |--------------------+---------+-----------+----------------|
+   |restart             |out      |any        |execution       |
+   |--------------------+---------+-----------+----------------|
+   |flush-icache        |out      |any        |execution       |
+   |--------------------+---------+-----------+----------------|
+   |stop-target         |in       |any        |execution       |
+   |--------------------+---------+-----------+----------------|
+   |start-target        |in       |any        |execution       |
+   |--------------------+---------+-----------+----------------|
+   |deinit              |in       |any        |deinitialization|
+   +-----------------------------------------------------------+
+
+   +------------------------------------------------------+
+   |                      attributes                      |
+   |------------------------------------------------------|
+   |      name      |category|  legal  |default|behaviors||
+   |                |        | values  | value |         ||
+   |----------------+--------+---------+-------+---------||
+   |trace-gdbserv?  |-       |boolean  |false  |setting  ||
+   |----------------+--------+---------+-------+---------||
+   |trace-gdbsid?   |-       |boolean  |false  |setting  ||
+   |----------------+--------+---------+-------+---------||
+   |exit-on-detach? |-       |boolean  |false  |setting  ||
+   |----------------+--------+---------+-------+---------||
+   |enable-Z-packet?|-       |boolean  |true   |setting  ||
+   |----------------+--------+---------+-------+---------||
+   |Z-packet-pc-mask|-       |number   |0      |setting  ||
+   |----------------+--------+---------+-------+---------||
+   |operating-mode? |-       |boolean  |true   |setting  ||
+   |----------------+--------+---------+-------+---------||
+   |connected?      |-       |boolean, |false  |execution||
+   |                |        |read-only|       |         ||
+   +------------------------------------------------------+
+
+     ----------------------------------------------------------------------
+
+References:
+
+   Debugging with GDB

@@ -28,6 +28,10 @@
 	Check for gdb components attached to processors other than the main
 	cpu. Adjust the enable-threshold of target-sched accordingly.
 
+2001-10-12  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* configrun-sid.in: Add -EL as default option for x86.
+
 2001-10-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configrun-sid.in: Throughout, set boolean attributes only to
@@ -35,11 +39,16 @@
 
 2001-10-03  Frank Ch. Eigler  <fche@redhat.com>
 
-        * configrun-sid.in (gdb): Add cfgroot relationship.
+	* configrun-sid.in (gdb): Add cfgroot relationship.
 
 2001-09-27  Frank Ch. Eigler  <fche@redhat.com>
 
-        * configrun-sid.in (icache, dcache): New options.
+	* configrun-sid.in (icache, dcache): New options.
+
+2001-09-14  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* configrun-sid.in: Add x86 support.
+	* i386-elf-sid: New file.
 
 2001-08-07  Ben Elliston  <bje@redhat.com>
 

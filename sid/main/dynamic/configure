@@ -2122,7 +2122,7 @@ then
     echo "configure: warning: Assuming --enable-targets=all" 1>&2
     all_targets=""
     sidtarget_default=1
-else
+else 
     all_targets="$target"
     sidtarget_default=0
 fi
@@ -2142,6 +2142,7 @@ fi
 
 
 sidtarget_arm=$sidtarget_default
+sidtarget_x86=$sidtarget_default
 sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
@@ -2152,6 +2153,7 @@ do
    case "$targ" in
       arm*)   sidtarget_arm=1 ;;
       thumb*) sidtarget_arm=1 ;;
+      i386*) sidtarget_x86=1 ;;
       mips*)  sidtarget_mips=1 ;;
       m32r*)  sidtarget_m32r=1 ;;
       m68k*)  sidtarget_m68k=1 ;;
@@ -2163,6 +2165,7 @@ done
 
 case 1 in
   ${sidtarget_arm}) ;;
+  ${sidtarget_x86}) ;;
   ${sidtarget_mips}) ;;
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
@@ -2173,7 +2176,7 @@ esac
 
 
 echo $ac_n "checking ARM family support""... $ac_c" 1>&6
-echo "configure:2234: checking ARM family support" >&5
+echo "configure:2180: checking ARM family support" >&5
 
 
 
@@ -2186,8 +2189,22 @@ else
 fi
 echo "$ac_t""$sidtarget_arm" 1>&6
 
+echo $ac_n "checking X86 family support""... $ac_c" 1>&6
+echo "configure:2194: checking X86 family support" >&5
+
+
+
+if test "x$sidtarget_x86" = x1; then
+  SIDTARGET_X86_TRUE=
+  SIDTARGET_X86_FALSE='#'
+else
+  SIDTARGET_X86_TRUE='#'
+  SIDTARGET_X86_FALSE=
+fi
+echo "$ac_t""$sidtarget_x86" 1>&6
+
 echo $ac_n "checking MIPS family support""... $ac_c" 1>&6
-echo "configure:2264: checking MIPS family support" >&5
+echo "configure:2208: checking MIPS family support" >&5
 
 
 
@@ -2201,7 +2218,7 @@ fi
 echo "$ac_t""$sidtarget_mips" 1>&6
 
 echo $ac_n "checking M32R family support""... $ac_c" 1>&6
-echo "configure:2278: checking M32R family support" >&5
+echo "configure:2222: checking M32R family support" >&5
 
 
 
@@ -2215,7 +2232,7 @@ fi
 echo "$ac_t""$sidtarget_m32r" 1>&6
 
 echo $ac_n "checking M68K family support""... $ac_c" 1>&6
-echo "configure:2292: checking M68K family support" >&5
+echo "configure:2236: checking M68K family support" >&5
 
 
 
@@ -2229,7 +2246,7 @@ fi
 echo "$ac_t""$sidtarget_m68k" 1>&6
 
 echo $ac_n "checking PPC family support""... $ac_c" 1>&6
-echo "configure:2322: checking PPC family support" >&5
+echo "configure:2250: checking PPC family support" >&5
 
 
 
@@ -2424,6 +2441,9 @@ s%@CXXCPP@%$CXXCPP%g
 s%@sidtarget_arm@%$sidtarget_arm%g
 s%@SIDTARGET_ARM_TRUE@%$SIDTARGET_ARM_TRUE%g
 s%@SIDTARGET_ARM_FALSE@%$SIDTARGET_ARM_FALSE%g
+s%@sidtarget_x86@%$sidtarget_x86%g
+s%@SIDTARGET_X86_TRUE@%$SIDTARGET_X86_TRUE%g
+s%@SIDTARGET_X86_FALSE@%$SIDTARGET_X86_FALSE%g
 s%@sidtarget_mips@%$sidtarget_mips%g
 s%@SIDTARGET_MIPS_TRUE@%$SIDTARGET_MIPS_TRUE%g
 s%@SIDTARGET_MIPS_FALSE@%$SIDTARGET_MIPS_FALSE%g
@@ -2446,7 +2466,7 @@ cat >> $CONFIG_STATUS <<\EOF
 
 # Split the substitutions into bite-sized pieces for seds with
 # small command number limits, like on Digital OSF/1 and HP-UX.
-ac_max_sed_cmds=90 # Maximum number of lines to put in a sed script.
+ac_max_sed_cmds=60 # Maximum number of lines to put in a sed script.
 ac_file=1 # Number of current file.
 ac_beg=1 # First line for current file.
 ac_end=$ac_max_sed_cmds # Line after last line for current file.

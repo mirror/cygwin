@@ -1,0 +1,221 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib  
+	PUBLIC "-//Red Hat//DTD Component Library//EN"
+        "http://sources.redhat.com/sid/component.dtd">
+<defcomplib lib="libgdb.la" dlsym="gdb_component_library">
+  <defcomponent name="sw-debug-gdb">
+    <!-- pins -->
+    <defpin name="init" direction="in" legalvalues="any" behaviors="initialization"/>
+    <defpin name="remote-rx" direction="in" legalvalues="any" behaviors="pin i/o"/>
+    <defpin name="remote-tx" direction="out" legalvalues="any" behaviors="pin i/o"/>
+    <defpin name="target-tx" direction="in" legalvalues="any" behaviors="pin i/o"/>
+    <defpin name="process-signal" direction="out" legalvalues="enum values" behaviors="system call emulation"/>
+    <defpin name="gloss-process-signal" direction="in" legalvalues="enum values" behaviors="system call emulation"/>
+    <defpin name="trap" direction="inout" legalvalues="enum values" behaviors="system call emulation"/>
+    <defpin name="trap-code" direction="in" legalvalues="various values" behaviors="system call emulation"/>
+    <defpin name="yield" direction="out" legalvalues="any" behaviors="execution"/>
+    <defpin name="restart" direction="out" legalvalues="any" behaviors="execution"/>
+    <defpin name="flush-icache" direction="out" legalvalues="any" behaviors="execution"/>
+    <defpin name="stop-target" direction="in" legalvalues="any" behaviors="execution"/>
+    <defpin name="start-target" direction="in" legalvalues="any" behaviors="execution"/>
+    <defpin name="deinit" direction="in" legalvalues="any" behaviors="deinitialization"/>
+    <!-- attributes -->
+    <defattribute name="trace-gdbserv?" legalvalues="boolean" defaultvalue="false" behaviors="setting"/>
+    <defattribute name="trace-gdbsid?" legalvalues="boolean" defaultvalue="false" behaviors="setting"/>
+    <defattribute name="exit-on-detach?" legalvalues="boolean" defaultvalue="false" behaviors="setting"/>
+    <defattribute name="enable-Z-packet?" legalvalues="boolean" defaultvalue="true" behaviors="setting"/>
+    <defattribute name="Z-packet-pc-mask" legalvalues="number" defaultvalue="0" behaviors="setting"/>
+    <defattribute name="operating-mode?" legalvalues="boolean" defaultvalue="true" behaviors="setting"/>
+    <defattribute name="connected?" legalvalues="boolean, read-only" defaultvalue="false" behaviors="execution"/>
+  </defcomponent>
+  <synop>
+    <p>
+      The gdb component is an implementation of the <a type="url"
+	href="http://sources.redhat.com/gdb/onlinedocs/gdb_15.html#SEC129">GDB
+	stub</a>.
+    </p>
+  </synop>
+  <func>
+    <modelling>
+      <p>
+	The gdb component communicates with other components
+	through its pins, and also through four relations: a cpu
+	uni-relation, a gloss uni-relation, a target-schedulers
+	multi-relation and a host-schedulers multi-relation.
+      </p>
+      <p>
+	Note that in sid, "turning the target power on or off" means
+	that the gdb component drives its <pin> yield</pin> pin, sets
+	the target schedulers' enabled?  attributes through the
+	target-schedulers relation and sets the host schedulers'
+	yield-host-time? attributes through the host-schedulers
+	relation. See <complib>sid-sched</complib> for an explanation
+	of these pins.
+      </p>
+      <p>
+	Also note that the term "hw-breakpoint" used in a sid context
+	could mean the same thing as the term "software breakpoint" in
+	a gdb context. This is because breakpoints in sid are
+	sometimes implemented as triggerpoints set on the pc register.
+      </p>
+    </modelling>
+    <behavior name="initialization">
+      <p>
+	When <pin> init</pin> is driven, target power is turned
+	off. Basically, this means the target will wait for further
+	input from gdb.
+      </p>
+    </behavior>
+    <behavior name="execution">
+      <p>
+	When the gdb component wants the target system to yield, it
+	drives the <pin> yield</pin> pin. Likewise, it will drive the
+	<pin> restart</pin> pin to restart the target system. The
+	restart pin is typically connected to a hw-reset <complib>
+	hw-glue-sequence</complib> component that has connections to
+	any of the target components that need to be reset.
+      </p>
+      <p>
+	When the <pin> start-target</pin> pin is driven, the target
+	power will be turned on. The <pin> start-target</pin> pin
+	should be driven by a sid-side component that wants the target
+	cpu to start again. Use this pin with caution; driving it
+	could upset an attached external debugger.
+      </p>
+      <p>
+	The <pin> stop-target</pin> pin should be driven from a
+	sid-side component that wants to stop the target cpu. This pin
+	will be ignored if there are signals pending.
+      </p>
+      <p>
+	When gdb itself or the gdb component (see the explanation of
+	the <attribute> enable-Z-packet?</attribute> attribute) sets a
+	software breakpoint, it puts the cpu's instruction cache out
+	of sync with the actual contents of memory. So the gdb
+	component will drive the <pin> flush-icache</pin> pin when it
+	wants the cpu to invalidate its instruction cache.
+      </p>
+      <p>
+	As long as gdb is connected to the gdb component, the
+	<attribute> connected?</attribute> attribute will be true.
+      </p>
+    </behavior>
+    <behavior name="system call emulation">
+      <p>
+	When gdb detaches from the gdb component, the component drives
+	the <pin> process-signal</pin> pin.
+      </p>
+      <p>
+	The <pin> gloss-process-signal</pin> pin is typically driven
+	by a <complib> gloss</complib> component.  It tells the gdb
+	component that the gloss component has processed an exit
+	system call.
+      </p>
+      <p>
+	The gdb component's <pin> trap</pin> pin is usually connected
+	to the gloss component's trap-code-chain pin. The gloss
+	component sends any trap code that it cannot handle down the
+	trap code chain (via the trap-code-chain pin), and any
+	debugging-related trap will be handled by the gdb
+	component. If the gdb component knows how to handle the trap
+	code, it will handle it and then drive the trap pin with the
+	cpu_trap_handled value. See <complib>
+	sw-gloss-arm_angel</complib> and <complib>
+	hw-cpu-arm7t</complib> for more information on trap and
+	trap-code pins.
+      </p>
+    </behavior>
+    <behavior name="pin i/o">
+      <p>
+	The <pin> remote-rx</pin> and <pin> remote-tx</pin> pins are
+	the pins that the gdb component uses to receive data from and
+	transmit data to gdb.  They are typically connected to a
+	<complib> sid-io-socket</complib>'s rx and tx pins
+	respectively. gdb connects to this sid-io-socket component via
+	TCP, and can then be used just as if it were debugging a
+	normal remote target.
+      </p>
+      <p>
+	The <pin> target-tx</pin> pin is used to transmit characters
+	coming from the target's standard out back to gdb. These
+	characters are transmitted using an "O" packet.
+      </p>
+    </behavior>
+    <behavior name="deinitialization">
+      <p>
+	When the <pin> deinit</pin> pin is driven, the gdb component
+	disconnects from gdb.
+      </p>
+    </behavior>
+    <behavior name="setting">
+      <p>
+	When set to true, the <attribute> trace-gdbsid?</attribute>
+	and <attribute> trace-gdbserv?</attribute> attributes turn on
+	trace messages for the gdb component member functions and the
+	stub functions respectively. Trace messages are printed to
+	stderr.
+      </p>
+      <p>
+	When the <attribute> exit-on-detach?</attribute> attribute is
+	true, the gdb component drives its <pin> process-signal</pin>
+	pin when gdb detaches from the target.
+      </p>
+      <p>
+	When the <attribute> enable-Z-packet?</attribute> attribute is
+	true, the gdb component recognizes Z packets that it receives
+	from gdb, and sets breakpoints according to their contents. If
+	the <attribute> enable-Z-packet?</attribute> attribute is
+	false, then gdb sets breakpoints directly using the read
+	memory (m) and write memory (M) packets.
+      </p>
+      <p>
+	The <attribute> Z-packet-pc-mask</attribute> attribute is used
+	when passing Harvard-encoded PC addresses to the gdb component
+	via a Z packet.
+      </p>
+      <p>
+	When the <attribute> operating-mode?</attribute> attribute is
+	true, the gdb component doesn't handle any cpu traps except
+	for single stepping.
+      </p>
+    </behavior>
+    <convention name="functional" supported="true">
+    </convention>
+    <convention name="save/restore" supported="false">
+    </convention>
+    <convention name="triggerpoints" supported="true">
+      This component supports triggerpoints on the PC register.
+    </convention>
+  </func>
+  <env>
+    <title>
+      Related Components </title>
+    <p>
+      The gdb component connects to many other sid components:
+      <ul>
+	<li>
+	  target memory to inspect and set values there </li>
+	<li>
+	  the cpu to set triggerpoints, and to view register values </li>
+	<li>
+	  a gloss component that sends it trap codes </li>
+	<li>
+	  hw-glue-sequences so that it is initialized and deinitialized
+	  at the proper times </li>
+	<li>
+	  schedulers to change control between the target and the host </li>
+	<li>
+	  a sid-io-socket component to interface with gdb via TCP </li>
+      </ul>
+    </p>
+    <title>
+      Host System </title>
+    <p>
+      The gdb component prints error and tracing
+      messages to stderr.
+    </p>
+  </env>
+  <refs>
+    <a type="url" href="http://sources.redhat.com/gdb/onlinedocs/gdb.html">Debugging with GDB</a>
+  </refs>
+</defcomplib>

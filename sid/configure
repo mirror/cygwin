@@ -1383,7 +1383,7 @@ then
     echo "configure: warning: Assuming --enable-targets=all" 1>&2
     all_targets=""
     sidtarget_default=1
-else
+else 
     all_targets="$target"
     sidtarget_default=0
 fi
@@ -1403,6 +1403,7 @@ fi
 
 
 sidtarget_arm=$sidtarget_default
+sidtarget_x86=$sidtarget_default
 sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
@@ -1413,6 +1414,7 @@ do
    case "$targ" in
       arm*)   sidtarget_arm=1 ;;
       thumb*) sidtarget_arm=1 ;;
+      i386*) sidtarget_x86=1 ;;
       mips*)  sidtarget_mips=1 ;;
       m32r*)  sidtarget_m32r=1 ;;
       m68k*)  sidtarget_m68k=1 ;;
@@ -1424,6 +1426,7 @@ done
 
 case 1 in
   ${sidtarget_arm}) ;;
+  ${sidtarget_x86}) ;;
   ${sidtarget_mips}) ;;
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
@@ -1434,7 +1437,7 @@ esac
 
 
 echo $ac_n "checking ARM family support""... $ac_c" 1>&6
-echo "configure:1438: checking ARM family support" >&5
+echo "configure:1441: checking ARM family support" >&5
 
 
 
@@ -1447,8 +1450,22 @@ else
 fi
 echo "$ac_t""$sidtarget_arm" 1>&6
 
+echo $ac_n "checking X86 family support""... $ac_c" 1>&6
+echo "configure:1455: checking X86 family support" >&5
+
+
+
+if test "x$sidtarget_x86" = x1; then
+  SIDTARGET_X86_TRUE=
+  SIDTARGET_X86_FALSE='#'
+else
+  SIDTARGET_X86_TRUE='#'
+  SIDTARGET_X86_FALSE=
+fi
+echo "$ac_t""$sidtarget_x86" 1>&6
+
 echo $ac_n "checking MIPS family support""... $ac_c" 1>&6
-echo "configure:1452: checking MIPS family support" >&5
+echo "configure:1469: checking MIPS family support" >&5
 
 
 
@@ -1462,7 +1479,7 @@ fi
 echo "$ac_t""$sidtarget_mips" 1>&6
 
 echo $ac_n "checking M32R family support""... $ac_c" 1>&6
-echo "configure:1466: checking M32R family support" >&5
+echo "configure:1483: checking M32R family support" >&5
 
 
 
@@ -1476,7 +1493,7 @@ fi
 echo "$ac_t""$sidtarget_m32r" 1>&6
 
 echo $ac_n "checking M68K family support""... $ac_c" 1>&6
-echo "configure:1480: checking M68K family support" >&5
+echo "configure:1497: checking M68K family support" >&5
 
 
 
@@ -1490,7 +1507,7 @@ fi
 echo "$ac_t""$sidtarget_m68k" 1>&6
 
 echo $ac_n "checking PPC family support""... $ac_c" 1>&6
-echo "configure:1494: checking PPC family support" >&5
+echo "configure:1511: checking PPC family support" >&5
 
 
 
@@ -1506,7 +1523,7 @@ echo "$ac_t""$sidtarget_ppc" 1>&6
 
 
 echo $ac_n "checking whether can build shared SID component libraries""... $ac_c" 1>&6
-echo "configure:1510: checking whether can build shared SID component libraries" >&5
+echo "configure:1527: checking whether can build shared SID component libraries" >&5
 if eval "test \"`echo '$''{'ac_cv_libstdcxx_shared'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1519,7 +1536,7 @@ then
   echo "configure: warning: Cannot test for libstdc++ without g++" 1>&2
 else
   echo $ac_n "checking for libstdc++ {static/shared}""... $ac_c" 1>&6
-echo "configure:1523: checking for libstdc++ {static/shared}" >&5
+echo "configure:1540: checking for libstdc++ {static/shared}" >&5
 
   stlibname=libstdc++.a
   case ${host} in
@@ -1576,6 +1593,7 @@ then
 else
   enable_shared=yes
 fi
+
 
 
 
@@ -1747,6 +1765,9 @@ s%@CXXCPP@%$CXXCPP%g
 s%@sidtarget_arm@%$sidtarget_arm%g
 s%@SIDTARGET_ARM_TRUE@%$SIDTARGET_ARM_TRUE%g
 s%@SIDTARGET_ARM_FALSE@%$SIDTARGET_ARM_FALSE%g
+s%@sidtarget_x86@%$sidtarget_x86%g
+s%@SIDTARGET_X86_TRUE@%$SIDTARGET_X86_TRUE%g
+s%@SIDTARGET_X86_FALSE@%$SIDTARGET_X86_FALSE%g
 s%@sidtarget_mips@%$sidtarget_mips%g
 s%@SIDTARGET_MIPS_TRUE@%$SIDTARGET_MIPS_TRUE%g
 s%@SIDTARGET_MIPS_FALSE@%$SIDTARGET_MIPS_FALSE%g

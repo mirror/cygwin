@@ -256,7 +256,7 @@
           has a bus named "data-bus" through which it expects to
           receive read/write requests. The scenario is depicted blow.
         </PARA>
-<GRAPHIC FILEREF="images/accessor-bus.png" SCALE="55"></GRAPHIC>
+<GRAPHIC FILEREF="images/accessor-bus.png"></GRAPHIC>
 <PARA>    Recall that the accessor is the <EMPHASIS>sending</EMPHASIS>
           end of the connection we wish to make, and that the bus is
           the <EMPHASIS>receiving</EMPHASIS> end. Some people find the

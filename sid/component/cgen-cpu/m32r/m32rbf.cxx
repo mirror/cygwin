@@ -215,6 +215,13 @@ m32rbf_cpu::step_insns ()
       // Execute the instruction  -----------------------------------
       if (this->trace_result_p)
 	this->begin_trace (pc, sem->idesc->insn_name);
+      if (trace_disass_p)
+	this->disassemble (pc, print_insn_m32r,
+			   bfd_target_elf_flavour,
+			   bfd_arch_m32r,
+			   (current_endianness() == endian_little ? 
+			    BFD_ENDIAN_LITTLE : BFD_ENDIAN_BIG), 
+			   "m32r");
       try
 	{
 	  sem->idesc->execute (this, sem);

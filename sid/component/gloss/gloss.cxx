@@ -8,6 +8,7 @@
 #include <errno.h>
 #include "gloss.h"
 #include "libgloss.h"
+#include "libcygmon.h"
 // ??? For now.  grep for newlib below.
 #include "newlib.h"
 #ifdef HAVE_TIMES
@@ -42,6 +43,7 @@ gloss32::gloss32() :
   cpu (0),
   cpu_memory_bus (0),
   command_line("<unknown>"),
+  syscall_numbering_scheme("libgloss"),
   max_fds(32),
   verbose_p(false)
 {
@@ -63,8 +65,9 @@ gloss32::gloss32() :
   add_uni_relation("cpu", &this->cpu);
 
   add_attribute("command-line", &this->command_line, "setting");
+  add_attribute("syscall-numbering-scheme", &this->syscall_numbering_scheme, "setting");
   add_attribute("verbose?", &this->verbose_p, "setting");
-
+  
   add_attribute("max-fds", &this->max_fds, "setting");
   host_ops = 0;
   fd_table = 0;
@@ -621,11 +624,53 @@ gloss32::set_error_result(int32 value)
 
 
 
-// default syscall conversion routine
+// syscall conversion routine
 int32 
 gloss32::target_to_host_syscall (int32 target_syscall)
 {
-  return target_syscall;
+  if(syscall_numbering_scheme == "cygmon")
+    {
+      switch(target_syscall)
+        {
+        case cygmon::SYS_exit:
+          return libgloss::SYS_exit;
+          break;
+        case cygmon::SYS_open:
+          return libgloss::SYS_open;
+          break;
+        case cygmon::SYS_close:
+          return libgloss::SYS_close;
+          break;
+        case cygmon::SYS_read:
+          return libgloss::SYS_read;
+          break;
+        case cygmon::SYS_write:
+          return libgloss::SYS_write;
+          break;
+        case cygmon::SYS_kill:
+          return libgloss::SYS_kill;
+          break;
+        case cygmon::SYS_time:
+          return libgloss::SYS_time;
+          break;
+        case cygmon::SYS_gettimeofday:
+          return libgloss::SYS_gettimeofday;
+          break;
+        default:
+          return libgloss::SYS_unsupported;
+          break;
+        };
+    }
+  else if (syscall_numbering_scheme == "libgloss")
+    {
+      return target_syscall;
+    }
+  else
+    {
+      cerr << "gloss: unsupported syscall numbering scheme. Assuming default (libgloss)" << endl;
+      syscall_numbering_scheme = "libgloss";
+      return target_syscall;
+    };
 }
 
 // System call support.

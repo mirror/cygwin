@@ -20,6 +20,7 @@
 
     <!-- attributes -->
     <defattribute name="verbose?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="system call emulation" />
+    <defattribute name="syscall-numbering-scheme" category="setting" legalvalues="string" defaultvalue="libgloss" behaviors="system call emulation" />
     <defattribute name="heap-base" category="setting" legalvalues="number" defaultvalue="0x80000" behaviors="initialization" />
     <defattribute name="heap-limit" category="setting" legalvalues="number" defaultvalue="1024" behaviors="initialization" />
     <defattribute name="stack-base" category="setting" legalvalues="number" defaultvalue="0x200000" behaviors="initialization" />
@@ -74,7 +75,6 @@
 	output pin is driven with an exit code similar to that used by
 	UNIX <tt>wait(2)</tt>.  Such conditions include memory faults,
 	invalid instructions, etc.
-
       </p>
       <p> See the documentation of <complib>hw-cpu-arm7t</complib> for
       the list of supported trap &amp; trap-code values.
@@ -84,6 +84,12 @@
 	true value, detailed tracing messages will be printed to
 	stderr during a system call emulation.
       </p>
+      <p> The <attribute>syscall-numbering-scheme</attribute> setting causes the gloss component to use the
+          system call numbering scheme specified. The gloss component may then properly interpret non-standard syscall
+          numbers that come from target-program libgloss routines. Currently, the only available non-standard
+          numbering scheme is cygmon.
+      </p>
+
     </behavior>
 
     <behavior name="initialization">

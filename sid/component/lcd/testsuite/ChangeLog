@@ -13,7 +13,7 @@
 	* Makefile.am (all-local): Tolerate $srcdir==$builddir.
 
 2001-03-23  John Healy  <jhealy@redhat.com>
-	
+
 	* Makefile.in: Regenerated.
 
 2001-01-15  Frank Ch. Eigler  <fche@redhat.com>

@@ -1,10 +1,28 @@
 2001-10-29  Frank Ch. Eigler  <fche@redhat.com>
 
+	* pregen-configs.in (mep): Add --tksm for some configurations.
+
+2001-10-29  Frank Ch. Eigler  <fche@redhat.com>
+
 	* (*.conf): Regenerated with memory component tweaks.
 
 2001-10-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* (*.conf): Regenerated with reset-net etc. tweaks.
+
+2001-10-19  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* i386-gdb.conf: New file.
+	* pregen-configs.in: Add lines for i386-gdb.conf.
+
+2001-10-17  Dave Brolley  <brolley@redhat.com>
+
+	* All configs using --gdb regenerated.
+
+2001-10-12  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* i386-gloss.conf: New file.
+	* pregen-configs.in: Add code to generate i386-gloss.conf.
 
 2001-10-04  Frank Ch. Eigler  <fche@redhat.com>
 

@@ -1,7 +1,16 @@
+2001-11-13  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* CATALOG: Document the x86_component_library.  Add
+	hw-cpu-x86.
+
+2001-10-01  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* tconfig.in: Add x86 support.
+
 2001-09-24  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configure.in (lcd_libs): Set HAVE_CURSES_LIBRARY if found some
-	usable curses library.  
+	usable curses library.
 	* config.in, configure: Regenerated.
 
 2001-07-25  Frank Ch. Eigler  <fche@redhat.com>

@@ -14,6 +14,7 @@ set target_alias "@target@"
 # pull out "--enable-targets"/"--target" settings
 global sidtarget
 set sidtarget(arm) @sidtarget_arm@
+set sidtarget(x86) @sidtarget_x86@
 set sidtarget(mips) @sidtarget_mips@
 set sidtarget(m32r) @sidtarget_m32r@
 set sidtarget(m68k) @sidtarget_m68k@

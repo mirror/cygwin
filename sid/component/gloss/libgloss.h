@@ -37,7 +37,8 @@ public:
     SYS_utime = 17,
     SYS_time = 18,
     SYS_gettimeofday = 19,
-    SYS_times = 20
+    SYS_times = 20,
+    SYS_unsupported = 99 // arbitrary syscall number, unsupported by default gloss component
   };
 };
 

@@ -22,6 +22,7 @@ NEARBY_LIBS = \
 	-dlpreopen ../../component/cache/libcache.la \
 	-dlpreopen ../../component/cfgroot/libconfig.la \
 	-dlpreopen ../../component/cgen-cpu/libcgencpu.la \
+	-dlpreopen ../../component/bochs/libx86.la \
 	-dlpreopen ../../component/consoles/libconsoles.la \
 	$(ALLFAMLIBS2) \
 	-dlpreopen ../../component/gdb/libgdb.la \
@@ -48,6 +49,7 @@ NEARBY_DEPS_LIBS = \
 	../../component/cache/libcache.la \
 	../../component/cfgroot/libconfig.la \
 	../../component/cgen-cpu/libcgencpu.la \
+	../../component/bochs/libx86.la \
 	../../component/consoles/libconsoles.la \
 	$(ALLFAMLIBS) \
 	../../component/gdb/libgdb.la \

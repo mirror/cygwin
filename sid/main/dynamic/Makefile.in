@@ -81,6 +81,7 @@ sidtarget_m32r = @sidtarget_m32r@
 sidtarget_m68k = @sidtarget_m68k@
 sidtarget_mips = @sidtarget_mips@
 sidtarget_ppc = @sidtarget_ppc@
+sidtarget_x86 = @sidtarget_x86@
 
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
@@ -100,6 +101,7 @@ ALLFAMLIBS2 = $(FAM9LIB2)
 @SID_STATIC_TRUE@	-dlpreopen ../../component/cache/libcache.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/cfgroot/libconfig.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/cgen-cpu/libcgencpu.la \
+@SID_STATIC_TRUE@	-dlpreopen ../../component/bochs/libx86.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/consoles/libconsoles.la \
 @SID_STATIC_TRUE@	$(ALLFAMLIBS2) \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/gdb/libgdb.la \
@@ -127,6 +129,7 @@ ALLFAMLIBS2 = $(FAM9LIB2)
 @SID_STATIC_TRUE@	../../component/cache/libcache.la \
 @SID_STATIC_TRUE@	../../component/cfgroot/libconfig.la \
 @SID_STATIC_TRUE@	../../component/cgen-cpu/libcgencpu.la \
+@SID_STATIC_TRUE@	../../component/bochs/libx86.la \
 @SID_STATIC_TRUE@	../../component/consoles/libconsoles.la \
 @SID_STATIC_TRUE@	$(ALLFAMLIBS) \
 @SID_STATIC_TRUE@	../../component/gdb/libgdb.la \

@@ -2261,7 +2261,7 @@ esac
 
 
 echo $ac_n "checking ARM family support""... $ac_c" 1>&6
-echo "configure:2295: checking ARM family support" >&5
+echo "configure:2265: checking ARM family support" >&5
 
 
 
@@ -2276,7 +2276,7 @@ echo "$ac_t""$sidtarget_arm" 1>&6
 
 
 echo $ac_n "checking MIPS family support""... $ac_c" 1>&6
-echo "configure:2325: checking MIPS family support" >&5
+echo "configure:2280: checking MIPS family support" >&5
 
 
 
@@ -2290,7 +2290,7 @@ fi
 echo "$ac_t""$sidtarget_mips" 1>&6
 
 echo $ac_n "checking M32R family support""... $ac_c" 1>&6
-echo "configure:2339: checking M32R family support" >&5
+echo "configure:2294: checking M32R family support" >&5
 
 
 
@@ -2304,7 +2304,7 @@ fi
 echo "$ac_t""$sidtarget_m32r" 1>&6
 
 echo $ac_n "checking M68K family support""... $ac_c" 1>&6
-echo "configure:2353: checking M68K family support" >&5
+echo "configure:2308: checking M68K family support" >&5
 
 
 
@@ -2318,7 +2318,7 @@ fi
 echo "$ac_t""$sidtarget_m68k" 1>&6
 
 echo $ac_n "checking PPC family support""... $ac_c" 1>&6
-echo "configure:2367: checking PPC family support" >&5
+echo "configure:2322: checking PPC family support" >&5
 
 
 

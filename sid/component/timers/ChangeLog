@@ -1,3 +1,8 @@
+2001-03-21  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.in: Regenerate.
+	* configure: Likewise.
+
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 
         * configure, aclocal.m4, Makefile.in: Regenerated.

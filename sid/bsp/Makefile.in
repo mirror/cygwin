@@ -118,9 +118,9 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in  \
-		../config/am_rpm_init.m4 ../config/libstdc++.m4 \
-		../config/libtool.m4 ../config/ltdl.m4 \
-		../config/sidtargets.m4
+		../config/am_rpm_init.m4 ../config/cgen-maint.m4 \
+		../config/libstdc++.m4 ../config/libtool.m4 \
+		../config/ltdl.m4 ../config/sidtargets.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)

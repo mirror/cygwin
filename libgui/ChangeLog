@@ -1,5 +1,8 @@
 2002-06-07  Martin M. Hunt  <hunt@redhat.com>
 
+	* src/tkTableTag.c (Table_TagCmd): Don't decrement past
+	beginning of array.
+
 	* library/combobox.tcl (::combobox::configure): Don't
 	force background to white.
 

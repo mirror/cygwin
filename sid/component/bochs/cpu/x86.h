@@ -40,6 +40,7 @@ class x86_cpu : public sidutil::basic_bi_endian_cpu {
     bool verbose_p;
     
     x86_cpu ();
+    ~x86_cpu () throw () {}
 
     void do_syscall();
     void do_breakpoint();

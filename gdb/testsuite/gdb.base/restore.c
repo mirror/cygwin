@@ -14,11 +14,12 @@
    (defun caller (n) (format "caller%d" n))
    (defun local  (n) (format "l%d"  n))
    (defun local-sum (n)
-     (let ((j 1))
-       (while (<= j n)
-         (insert (local j))
-	 (if (< j n) (insert "+"))
-         (setq j (1+ j)))))
+     (if (zerop n) (insert "0")
+       (let ((j 1))
+         (while (<= j n)
+           (insert (local j))
+           (if (< j n) (insert "+"))
+           (setq j (1+ j))))))
    (defun local-chain (n previous first-end)
      (let ((j 1))
        (while (<= j n)
@@ -53,8 +54,7 @@
 	   (insert "{\n")
 	   (local-chain i "n" (callee i))
 	   (insert "  return ")
-	   (if (<= i 0) (insert "n")
-	     (local-sum i))
+	   (local-sum i)
 	   (insert ";\n")
 	   (insert "}\n\n")
 	   (setq i (1+ i))))
@@ -65,7 +65,7 @@
 	   (insert "int\n")
 	   (insert (caller i) " (void)\n")
 	   (insert "{\n")
-	   (let ((last (local-chain i "0xfeeb" (caller i))))
+	   (let ((last (local-chain i "0x7eeb" (caller i))))
 	     (insert "  register int n;\n")
 	     (let ((j 0))
 	       (while (<= j limit)
@@ -103,7 +103,7 @@ increment (int n)
 int
 callee0 (int n)
 {
-  return n;
+  return 0;
 }
 
 /* Returns n * 1 + 1 */
@@ -159,7 +159,7 @@ callee5 (int n)
 int
 caller1 (void)
 {
-  register int l1 = increment (0xfeeb);  /* caller1 */
+  register int l1 = increment (0x7eeb);  /* caller1 */
   register int n;
   n = callee0 (l1);
   n = callee1 (n + l1);
@@ -173,7 +173,7 @@ caller1 (void)
 int
 caller2 (void)
 {
-  register int l1 = increment (0xfeeb);  /* caller2 */
+  register int l1 = increment (0x7eeb);  /* caller2 */
   register int l2 = increment (l1);
   register int n;
   n = callee0 (l2);
@@ -188,7 +188,7 @@ caller2 (void)
 int
 caller3 (void)
 {
-  register int l1 = increment (0xfeeb);  /* caller3 */
+  register int l1 = increment (0x7eeb);  /* caller3 */
   register int l2 = increment (l1);
   register int l3 = increment (l2);
   register int n;
@@ -204,7 +204,7 @@ caller3 (void)
 int
 caller4 (void)
 {
-  register int l1 = increment (0xfeeb);  /* caller4 */
+  register int l1 = increment (0x7eeb);  /* caller4 */
   register int l2 = increment (l1);
   register int l3 = increment (l2);
   register int l4 = increment (l3);
@@ -221,7 +221,7 @@ caller4 (void)
 int
 caller5 (void)
 {
-  register int l1 = increment (0xfeeb);  /* caller5 */
+  register int l1 = increment (0x7eeb);  /* caller5 */
   register int l2 = increment (l1);
   register int l3 = increment (l2);
   register int l4 = increment (l3);
@@ -248,7 +248,7 @@ driver (void)
 
 /* generated code ends here */
 
-main ()
+int main ()
 {
   register int local;
 #ifdef usestubs

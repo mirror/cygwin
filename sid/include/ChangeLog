@@ -1,3 +1,11 @@
+2003-04-16  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (final_insn_count_p): New member of basic_cpu.
+	(update_total_latency): New method of basic_cpu.
+	(stream_state): Output final_insn_count_p.
+	(destream_state): Input final_insn_count_p.
+	(basic_cpu): Add attribute final-insn-count.
+
 2003-02-06  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidbusutil.h (control_register_bus word_read,write): C++ cleanup.

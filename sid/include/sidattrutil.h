@@ -2,7 +2,7 @@
 // mappings between application objects and their string
 // representations.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2002, 2003 Red Hat.
+// Copyright (C) 1999, 2000, 2003 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -43,6 +43,7 @@
 #endif
 
 #include <cassert>
+#include <sidmiscutil.h>
 
 
 namespace sidutil
@@ -687,7 +688,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
     operator () (const std::string& s) const
       {
 	// XXX: improve? 
-	return hash<const char*> () (s.c_str ()); 
+	return std::hash<const char*> () (s.c_str ()); 
       }
   };
 #endif
@@ -699,7 +700,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
   private:
     // use hash table for this, if available
 #ifdef HAVE_HASHING
-    typedef hash_map<std::string,attribute_coder_base*,hash_string> attribute_map_t;
+    typedef std::hash_map<std::string,attribute_coder_base*,hash_string> attribute_map_t;
 #else
     typedef std::map<std::string,attribute_coder_base*> attribute_map_t;
 #endif
@@ -1037,6 +1038,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	add_attribute ("ulog-level", &ulog_level, "setting");
 	add_attribute ("ulog-mode",  &ulog_mode,  "setting");
 	add_pin ("ulog-out", & ulog_out_pin);
+	ulog_logger =  new logger (& ulog_out_pin, buffer_output, ulog_level, ulog_mode);
 #if SID_LOG_PERSISTENT_BUFFER
 	buffer = new char[buffer_size];
 #endif
@@ -1044,82 +1046,27 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
     ~fixed_attribute_map_with_logging_component () throw()
       {
 	// Output any saved messages.
-	output_saved_messages ();
+	// output_saved_messages ();
+	ulog_logger->output_saved_messages ();
 #if SID_LOG_PERSISTENT_BUFFER
 	delete [] buffer;
 #endif
       }
 
-    virtual void log (sid::host_int_4 level, const char *fmt, ...)
+    void log (sid::host_int_4 level, const char *fmt, ...)
       {
-	if (! buffer_output)
-	  {
-	    // Output any saved messages first
-	    output_saved_messages ();
-
-	    // Check the logging level and mode.
-	    if (! check_level (level))
-	      return;
-	  }
-
-	// Write the message into a buffer.
-	int length;
-	for (;;)
-	  {
-	    va_list ap;
-	    va_start (ap, fmt);
-#if HAVE_VSNPRINTF
-	    length = vsnprintf (buffer, buffer_size, fmt, ap);
-	    va_end (ap);
-	    if (length < buffer_size)
-	      break;
-	    delete [] buffer;
-	    buffer_size = length + 256;
-	    buffer = new char[buffer_size];
-#elif HAVE_VASPRINTF
-	    length = vasprintf (&buffer, fmt, ap);
-	    va_end (ap);
-	    break;
-#else
-	    length = STDCTYPE(vsprintf) (buffer, fmt, ap);
-	    va_end (ap);
-	    if (length >= buffer_size)
-	      std::cerr << "Error: ulog buffer overflow!!!" << std::endl;
-	    break;
-#endif
-	  }
-
-	// If the output pin is not connected yet, Save the message for
-	// later. This happens when the log message is issued from the
-	// component's constructor.
-	if (buffer_output)
-	  {
-	    saved_messages.push_back (std::string (buffer));
-	    saved_levels.push_back (level);
-	  }
-	else
-	  {
-	    // Otherwise, output the new message.
-	    for (int i = 0; i < length; ++i)
-	      ulog_out_pin.drive (buffer[i]);
-	  }
-
-#if SID_LOG_TRANSIENT_MALLOC_BUFFER
-	free (buffer);
-#endif
+	va_list ap;
+	va_start (ap, fmt);
+	// In case values changed
+	ulog_logger->set_attributes (buffer_output, ulog_level, ulog_mode);
+	ulog_logger->log (level, fmt, ap);
+	va_end (ap);
       }
 
 private:
     bool check_level (sid::host_int_4 level)
       {
-	if (level > ulog_level)
-	  return false;
-
-	if (level != ulog_level
-	    && (ulog_mode == "match" || ulog_mode == "equal"))
-	  return false;
-
-	return true;
+	ulog_logger->check_level (level);
       }
 
     void output_saved_messages ()
@@ -1141,6 +1088,7 @@ private:
     std::string ulog_mode;
     sidutil::output_pin ulog_out_pin;
     bool buffer_output;
+    sidutil::logger *ulog_logger;
     char *buffer;
     long buffer_size;
     std::vector<std::string> saved_messages;

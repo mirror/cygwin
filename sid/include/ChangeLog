@@ -1,3 +1,61 @@
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* sidbusutil.h (passthrough_bus::target): Now 'protected'.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* sidmiscutil.h (logger): New class.
+	* sidattrutil.h (fixed_attribute_map_with_logging_component): Convert
+	to use logger.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (set_total_latency): New method of basic_cpu.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* sidattrutil.h (SID_LOG_PERSISTENT_BUFFER): New macro.
+	(SID_LOG_TRANSIENT_MALLOC_BUFFER): New macro.
+	(buffer_output): New member of
+	fixed_attribute_map_with_logging_component.
+	(fixed_attribute_with_logging_component): Add buffer-output attribute.
+	Use SID_LOG_PERSISTENT_BUFFER.
+	(~fixed_attribute_with_logging_component): Use
+	SID_LOG_PERSISTENT_BUFFER.
+	(log): Buffer output based on buffer_output. Use
+	SID_LOG_TRANSIENT_MALLOC_BUFFER.
+	* sidcpuutil.h (get_total_latency): New method of basic_cpu.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* sidattrutil.h (log): Don't use STDCTYPE for vsnprint or vasprintf.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* sidmiscutil.h (bijection::find): Add typename.
+	* sidbusutil.h (ro_value_control_register): New ValueType typedef.
+	(control_register_bus::word_write, control_register_bus::word_read):
+	Add typename
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* sidattrutil.h (iostream): #include it.
+	(log): Use std::cerr and std::endl.
+	
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* sidattrutil.h (fixed_attribute_map_with_logging_component):
+	Initialize saved_messages and saved_levels.
+	(~fixed_attribute_map_with_logging_component): Output saved messages.
+	Delete buffer if necessary.
+	(log): Save message for later if output pin not connected. Otherwise
+	output saved messages before the new message. Use vsnprintf or
+	vasprintf if possible.
+	(check_level): New member of fixed_attribute_map_with_logging_component.
+	(output_saved_messages): Ditto.
+
 2003-08-21  Dave Brolley  <brolley@redhat.com>
 
 	* sidcpuutil.h (end_line): New method of basic_cpu::cpu_trace_stream.

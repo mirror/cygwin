@@ -40,7 +40,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.45 $";
+static const char version[] = "$Revision: 1.46 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -958,9 +958,9 @@ dump_sysinfo ()
     {
       for (e = s; *e && *e != sep; e++);
       if (e-s)
-        printf ("\t%.*s\n", e - s, s);
+	printf ("\t%.*s\n", e - s, s);
       else
-        puts ("\tWarning: Empty path-component");
+	puts ("\t.");
       count_path_items++;
       if (!*e)
 	break;

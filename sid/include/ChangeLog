@@ -1,3 +1,7 @@
+2002-03-01  Benjamin Kosnik  <bkoz@redhat.com>
+
+	* sidbusutil.h: Make typename usage explicit.
+
 2002-02-12  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidcpuutil.h (basic_cpu ctor): Add full gdb-register-pc attribute.

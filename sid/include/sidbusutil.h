@@ -1,6 +1,6 @@
 // sidbusutil.h -*- C++ -*- Different types and sizes of buses.
 
-// Copyright (C) 1999, 2000, 2001 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -811,6 +811,8 @@ namespace sidutil
   class ro_value_control_register: public value_control_register<DataType>
   {
   public:
+    typedef typename value_control_register<DataType>::ValueType ValueType;
+
     ro_value_control_register(control_register_bank<DataType>* b,
 			      sid::host_int_4 o,
 			      DataType m,
@@ -949,14 +951,14 @@ namespace sidutil
 				DataType mask,
 				DataType data)
       {
-	reg_map::iterator i = write_map.find(addr);
+	typename reg_map::iterator i = write_map.find(addr);
 	if (i == write_map.end())
 	  return sid::bus::unmapped; // XXX: or unpermitted?
 	
 	DataType unmatched_mask = mask;
 
 	// scan through all registers at this address
-	for(reg_vector::iterator it = i->second.begin();
+	for(typename reg_vector::iterator it = i->second.begin();
 	    it != i->second.end();
 	    it++)
 	  {
@@ -984,7 +986,7 @@ namespace sidutil
 			       DataType mask,
 			       DataType& data_out)
       {
-	reg_map::iterator i = read_map.find(addr);
+	typename reg_map::iterator i = read_map.find(addr);
 	if (i == read_map.end())
 	  return sid::bus::unmapped; // XXX: or unpermitted?
 
@@ -992,7 +994,7 @@ namespace sidutil
 	DataType unmatched_mask = mask;
 
 	// scan through all registers at this address
-	for(reg_vector::iterator it = i->second.begin();
+	for(typename reg_vector::iterator it = i->second.begin();
 	    it != i->second.end();
 	    it++)
 	  {

@@ -1,5 +1,10 @@
 2000-11-24  Ben Elliston  <bje@redhat.com>
 
+	* sim-cpu.scm (-gen-hardware-struct): New function.
+	(-gen-hardware-types): If with-multiple-isa is specified, emit all
+	hardware elements wich have share one or more ISAs with the ISAs
+	being kept.
+
 	* sim.scm (-with-multiple-isa?): New symbol.
 	(with-multiple-isa?): New function.
 	(option-init!): Initialise -with-multiple-isa?.

@@ -40,6 +40,23 @@
   (and (register? hw) (not (obj-has-attr? hw 'VIRTUAL)))
 )
 
+; Subroutine of -gen-hardware-types to generate the struct containing
+; hardware elements of one isa.
+
+(define (-gen-hardware-struct hw-list)
+  (if (null? hw-list)
+      ; If struct is empty, leave it out to simplify generated code.
+      ""
+      (string-list-map (lambda (hw)
+			 (string-list
+			  (gen-decl hw)
+			  (gen-obj-sanitize hw
+					    (string-list
+					     (send hw 'gen-get-macro)
+					     (send hw 'gen-set-macro)))))
+		       (find hw-need-storage? hw-list)))
+  )
+
 ; Return C type declarations of all of the hardware elements.
 ; The name of the type is prepended with the cpu family name.
 
@@ -49,15 +66,15 @@
    "typedef struct {\n"
    "  /* Hardware elements.  */\n"
    "  struct {\n"
-   (string-list-map (lambda (hw)
-		      (string-list
-		       (gen-decl hw)
-		       (gen-obj-sanitize hw
-					 (string-list
-					  (send hw 'gen-get-macro)
-					  (send hw 'gen-set-macro)))
-		       ))
-		    (find hw-need-storage? (current-hw-list)))
+   (-gen-hardware-struct 
+    (find (lambda (hw)
+	    (or (not (with-multiple-isa?))
+		(>= (count-common
+		     (current-keep-isa-name-list)
+		     (bitset-attr->list (obj-attr-value hw 'ISA)))
+		    1)))
+	  (current-hw-list))
+    )
    "  } hardware;\n"
    "#define CPU_CGEN_HW(cpu) (& (cpu)->cpu_data.hardware)\n"
    ;"  /* CPU profiling state information.  */\n"

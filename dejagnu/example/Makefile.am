@@ -2,4 +2,5 @@
 
 AUTOMAKE_OPTIONS = dejagnu cygnus
 
-SUBDIRS = calc
+all-local:
+	cd calc; $(MAKE) all

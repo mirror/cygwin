@@ -100,7 +100,9 @@ proc monkey_test {type sym lib {iterations 30s}} {
 	    d { set finishtime [expr 3600 * 24 * $units + $now] }
 	    default { error "unknown unit of time in $iterations" }
 	}
-	note "Testing $type until [clock format $finishtime]"
+        if {[clock seconds] - $finishtime > 60} {
+	    note "Testing $type until [clock format $finishtime]"
+	}
 	while {[clock seconds] < $finishtime} {
 	    do_one_test
 	}

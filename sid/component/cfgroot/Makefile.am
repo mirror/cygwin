@@ -18,3 +18,6 @@ pkgdata_DATA = sid-control-cfgroot.txt
 DEJAGNUTESTS=badconf.exp
 check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs

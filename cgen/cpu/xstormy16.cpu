@@ -1852,7 +1852,7 @@
      "Divide 32/16"
      ()
      ("sdivlh")
-     (+ (f-op #x00E0))
+     (+ (f-op #x00E8))
      (sequence ((SI value))
 	       (set value (add SI (sll SI (and SI R1 #xffff) #x10) (and SI R0 #xffff)))
 	       (set R1 (mod SI value (ext SI (trunc HI R2))))
@@ -1863,7 +1863,7 @@
      "Divide 32/16"
      ()
      ("divlh")
-     (+ (f-op #x00E8))
+     (+ (f-op #x00E0))
      (sequence ((SI value))
 	       (set value (add SI (sll SI (and SI R1 #xffff) #x10) (and SI R0 #xffff)))
 	       (set R1 (umod SI value R2))

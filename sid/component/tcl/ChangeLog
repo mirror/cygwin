@@ -1,3 +1,8 @@
+2003-02-06  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in: Look for tcl/tk 8.4 instead of 8.3.
+	* configure: Regenerated.
+
 2002-03-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sid-control-tksm.tk (open_component_window): Make value entry

@@ -1,3 +1,13 @@
+2002-07-17  Frank Ch. Eigler  <fche@redhat.com>
+	    Ben Elliston  <bje@redhat.com>
+	    John Healy  <jhealy@redhat.com>
+	    Jeff Johnston  <jjohnstn@redhat.com>
+	    Alan Lehotsky  <alehotsky@redhat.com>
+	    Ubicom Inc. <SupportDesk@ubicom.com>
+
+	* cpu/ip2k.cpu: New file.
+	* cpu/ip2k.opc: Likewise.
+
 2002-07-01  Hans-Peter Nilsson  <hp@axis.com>
 
 	* utils-gen.scm (-gen-extract-word): Handle lsb0?.

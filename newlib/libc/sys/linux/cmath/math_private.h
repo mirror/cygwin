@@ -11,7 +11,7 @@
 
 /*
  * from: @(#)fdlibm.h 5.1 93/09/24
- * $Id: math_private.h,v 1.1 2002/08/16 21:29:44 fitzsim Exp $
+ * $Id: math_private.h,v 1.2 2002/08/23 01:56:04 fitzsim Exp $
  */
 
 #ifndef _MATH_PRIVATE_H_
@@ -200,6 +200,8 @@ extern int32_t __ieee754_rem_pio2 (double,double*);
 extern double __ieee754_scalb (double,double);
 #endif
 
+/* This is necessary because the hardware accelerated version of libm
+   does not provide the __ieee754 functions. */
 #define __ieee754_sinh   sinh
 #define __ieee754_hypot  hypot
 #define __ieee754_hypotf hypotf

@@ -135,7 +135,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 #if defined(LIBC_SCCS) && !defined(lint)
 /*static char *sccsid = "from: @(#)vfprintf.c	5.50 (Berkeley) 12/16/92";*/
-static char *rcsid = "$Id: vfprintf.c,v 1.7 2002/08/20 01:40:39 jjohnstn Exp $";
+static char *rcsid = "$Id: vfprintf.c,v 1.8 2002/08/23 01:56:03 fitzsim Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 /*
@@ -166,6 +166,7 @@ static char *rcsid = "$Id: vfprintf.c,v 1.7 2002/08/20 01:40:39 jjohnstn Exp $";
 #include <stdlib.h>
 #include <string.h>
 #include <reent.h>
+#include <wchar.h>
 #include <string.h>
 #ifdef __ALTIVEC__
 #include <altivec.h>
@@ -388,7 +389,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	int vec_print_count;    /* number of vector chunks remaining */
 	vec_16_byte_union vec_tmp;
 #endif /* __ALTIVEC__ */ 
-        int state;              /* mbtowc calls from library must not change state */
+        mbstate_t state;          /* mbtowc calls from library must not change state */
 
 	/*
 	 * Choose PADSIZE to trade efficiency vs. size.  If larger printf

@@ -1,4 +1,4 @@
-This is a current list of sid component shared libraries. $Date: 2001/12/17 09:31:18 $
+This is a current list of sid component shared libraries. $Date: 2002/01/23 20:59:47 $
 
 DIRECTORY       DSO                     COMPONENT_LIBRARY                  MAINTAINERS
 
@@ -65,6 +65,7 @@ hw-rtc-sid              Fictional high-precision wall-clock timer.
 hw-timer-arm/ref-nosched        ARM7 reference peripheral: timer
 hw-timer-arm/ref-sched  Same as above, but using external scheduler for timing
 hw-uart-ns16550         16550 UART model
+hw-video-vga		Video Graphics Adapter model
 hw-visual-clock         tk xclock gui
 hw-visual-lcd           tk lcd display gui
 hw-visual-tty           tk mini-xterm gui
@@ -77,6 +78,7 @@ sid-io-audio-nop        NOP audio interface.
 sid-io-socket-server    Socket server<->tx/rx data pump
 sid-io-socket-client    Socket client<->tx/rx data pump
 sid-io-stdio            Nonblocking stdio-to-pins data bridge
+sid-io-vga-x		X front-end to the Video Graphics Adapter model
 sid-sched-host          Generic scheduler for host time tracking (25ms accuracy)
 sid-sched-host-accurate More accurate version of same
 sid-sched-sim           Generic scheduler for arbitrary target time tracking

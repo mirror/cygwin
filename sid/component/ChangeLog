@@ -1,3 +1,7 @@
+2002-01-23  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* CATALOG: Add hw-video-vga, sid-io-vga-x.
+
 2001-11-13  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* CATALOG: Document the x86_component_library.  Add

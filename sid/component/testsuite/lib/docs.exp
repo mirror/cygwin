@@ -1,15 +1,11 @@
-# -*- Tcl -*-
-# docs.exp
+# docs.exp -*- Tcl -*-
 #
-# Copyright (C) 1999 Red Hat
+# Copyright (C) 1999, 2001 Red Hat
 #
-# Description:
-# Procedures for performing an integrity check on a documentation file
-# formatted in the documented SID template format. These procs are
-# quite simplistic right now, but will grow as we think of better
-# ways to test it.
+# Procedures for performing an integrity check on an XML documentation
+# file according to the component DTD.
 #
-# doc_test runs a integrity test on a documentation file.
+# doc_test runs a integrity test on documentation.
 
 proc doc_test {subdirectory compname} {
     global docname contents subdir
@@ -18,9 +14,9 @@ proc doc_test {subdirectory compname} {
     regsub -all -- / $compname _ docname
 
     # Each sub-test, one by one.
-    doc_exists $compname
+    doc_exists $compname txt
+    doc_exists $compname xml
     doc_includes_component $compname
-    doc_trailing_whitespace
 
     if {[info exists contents]} { unset contents }
 }
@@ -43,7 +39,7 @@ proc doc_load {} {
 # Test if a doc file exists in the source tree.
 # Passes or fails the test.
 
-proc doc_exists {compname} {
+proc doc_exists {compname extension} {
     global srcdir subdir docname
 
     # search for related file names first
@@ -51,16 +47,16 @@ proc doc_exists {compname} {
     for {set i [expr [llength $parts] - 1]} {$i > 0} {set i [expr $i - 1]} {
 	set candidate [join [lrange $parts 0 $i] {}]
 	set dir [file join [file join $srcdir ".."] $subdir]
-	set pattern "[file join $dir $candidate]*.txt"
+	set pattern "[file join $dir $candidate]*.${extension}"
 	set candidates [glob -nocomplain -- $pattern]
 	verbose "Candidates: $pattern -> $candidates"
 	if {[llength $candidates] == 1} then {
-	    pass "Documentation file for ${compname} exists"
+	    pass "Documentation file (${extension}) for ${compname} exists"
 	    set docname [lindex $candidates 0]
 	    return
 	}
     }
-    fail "Documentation file for ${compname} is missing"
+    fail "Documentation file (${extension}) for ${compname} is missing"
 }
 
 
@@ -72,23 +68,9 @@ proc doc_includes_component {component} {
 
     if {![doc_load]} { return }
     
-    if {[regexp "\\* Name\n  .*${component}\.*n" $contents]} {
+    if {[regexp "<defcomponent name=\"${component}\"" $contents]} {
 	pass "Documentation file seems to document $component"
     } else {
 	fail "Documentation file does not seem to document $component"
-    }
-}
-
-# Look for any trailing whitespace on any line.
-
-proc doc_trailing_whitespace {} {
-    global docname contents
-    
-    if {![doc_load]} { return }
-
-    if {[regexp "\[ \\t\]+$" $contents]} {
-	fail "Documentation file contains trailing whitespace"
-    } else {
-	pass "Documentation file contains no trailing whitespace"
     }
 }

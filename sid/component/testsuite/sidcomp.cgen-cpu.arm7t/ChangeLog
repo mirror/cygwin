@@ -1,3 +1,7 @@
+2001-08-02  Dave Brolley  <brolley@redhat.com>
+
+	* armeit.conf: Rename loader to cpu-loader.
+
 2001-06-25  Frank Ch. Eigler  <fche@redhat.com>
 
 	* armeit.tcl (write_h4_l1): Adapt to new bus::status encoding.

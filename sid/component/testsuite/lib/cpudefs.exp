@@ -11,6 +11,123 @@ set build_ltldpath [join [glob "../*" "$srcdir/../*"] ":"]
 set install_ltldpath "$prefix/lib/sidcomp"
 set sid_run_repetitions 1
 
+# run-sid-tests-raw is used for perl-free testing.  
+#
+# The sid configuration file is specified in one of two ways:
+#
+# 1. As an option in the call to run-sid-tests-raw. 
+#
+# 2. In the "# confgfile():" option at the top of a given testcase source
+#    file.
+#
+# If both are specified, the file specified using the "# configfile():" option
+# takes precedence.  This allows for the case where there are many testfiles
+# being run from a single .exp file and most of them (but not all of them)
+# require the same configuration file.  For this, one specifies the config
+# file used by most of the testcases as a parameter in the call, then
+# uses the "# configfile():" option in the other testcases to specify which
+# configuration file they should use.  Only the file name is required on
+# the option line.  Do not include -f.  An option line should look like this:
+#
+# #configfile(): myconfig.conf
+#
+# A config file must be specified.  If one is not present either as a
+# parameter in the call or in the #configfile() option, an error is returned.
+ 
+proc run-sid-tests-raw { toolchain-prefix all-machs testcase-srcdir pattern as-opts ld-opts sid-opts cfile exe-suffix } {
+        global runtests
+        global srcdir
+
+    set as [sid_find_gas ${toolchain-prefix}]
+    set ld [sid_find_ld ${toolchain-prefix}]
+    set sid [find_rawsid]
+    set runner sid-run-conf
+
+    foreach src [lsort [glob -nocomplain ${testcase-srcdir}/$pattern]] {
+
+       # If we're only testing specific files and this isn't one of them,
+       # skip it.
+       if ![runtest_file_p $runtests $src] {
+           continue
+       }
+
+       set file $src
+       
+       # At this point we need to see if a configuration file has been 
+       # specified using the # configfile() option.  That's the only option
+       # we're interested in right now, but since the code is already 
+       # available and the overhead is low, we'll just slurp in all of the 
+       # options and only worry about processing the one we want.
+       set opt_array [slurp_options "${file}"]
+       if { $opt_array == -1 } {
+           unresolved $name
+           return
+       }
+
+       # Process the configfile option.  We may need to handle multiple machs.
+       set opts(configfile) {}
+       foreach i $opt_array {
+           if ![string compare [lindex $i 0] "configfile"] {
+              set opt_name [lindex $i 0]
+              set opt_machs [lindex $i 1]
+              set opt_val [lindex $i 2]
+              if ![info exists opts($opt_name)] {
+                  perror "unknown option $opt_name in file $file"
+                  unresolved $name
+                  return
+              }
+              foreach m $opt_machs {
+               set opts($opt_name,$m) $opt_val
+              }
+              if { "$opt_machs" == "" } {
+                  set opts($opt_name) $opt_val
+              } 
+           }
+       }
+
+       # A configuration file must be specified, so make sure we have one.
+       if { $opts(configfile) == "" && $cfile == ""} {
+          perror "A sid configuration file must be specified."
+          return
+       }
+
+       # A configuration file specified using # configfile() in a testcase
+       # source file takes precedence over one that was specified in the 
+       # call to run-sid-tests-raw.
+       if { $opts(configfile) != "" } {
+          set {conf-file} $opts(configfile)
+       } else {
+          set {conf-file} $cfile
+       }
+
+       # Look for the configuration file in the pregen directory first and
+       # if it's not there, then assume it's in the testcase source directory.
+       set try [lookfor_file ${srcdir} sid/bsp/pregen/${conf-file}]
+       if { $try != "" } {
+          set {conf-file} "-f $try"
+       } else {
+          set {conf-file} "-f ${testcase-srcdir}/${conf-file}"
+       }
+ 
+       # Prepare to set the sid options which will include the -f and -e info
+       set name [file tail $src]
+       set testcase-dir [file dirname $src]
+       set exe-name ${name}.${exe-suffix}
+
+       # Set sid-opts and run the test.
+       set sid-opts "${conf-file} -e \"set cpu-loader file ${exe-name}\""
+       run-one-sid-test \
+               $as ${as-opts} \
+               $ld ${ld-opts} \
+               {} {} \
+               $sid ${sid-opts} \
+               ${all-machs} $src ${exe-suffix} \
+               $runner
+    }
+
+}
+
+
 proc run-sid-tests { toolchain-prefix all-machs testcase-srcdir pattern as-opts ld-opts sid-opts exe-suffix } {
     set as-prog [sid_find_gas ${toolchain-prefix}]
     set ld-prog [sid_find_ld ${toolchain-prefix}]
@@ -91,34 +208,14 @@ proc run-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-machs te
 # testcases using a .conf file.
 
 proc sid-run-conf { sid sid-opts conf-file test-prog run-options } {
-    global srcdir subdir
-    global prefix
-    # Install a usable .conf file in the build directory.
-    set filename [file tail ${conf-file}]
-    set rc [remote_download host $srcdir/$subdir/${conf-file} ${filename}.in]
-    if { $rc == "" } {
-	verbose -log "download failed, $srcdir/$subdir/${conf-file}"
-	return [list unresolved ""]
-    }
-    set remote-conf-file $rc
-    # s/@-prefix-@/$prefix/
-    # ??? Another way to do this would be to do it entirely in tcl [open,
-    # read,regsub,write].
-    # ??? Another way would be to be able to pass command line arguments
-    # to sid that are usable in the .conf file.
-    set rc [remote_exec host sed "-e s,@-prefix-@,$prefix, -e s,@-srcdir-@,$srcdir, -e s,@-testprog-@,${test-prog}, " \
-	    "${remote-conf-file}" "${filename}" 10]
-    if { [lindex $rc 0] == -1 } {
-	verbose -log "@-prefix-@ substitution failed, [lindex $rc 1]"
-	return [list unresolved ""]
-    }
 
     # compute component library search path: build tree, then install tree
     global prefix build_ltldpath install_ltldpath
     set sidpath [sid_find_sid]
     global build_ltldpath
     set ltldpath ":$build_ltldpath:$install_ltldpath:"
-    return [sid_run "$sid ${sid-opts} ${conf-file}" "" "" "${run-options} \"env(SID)=$sidpath\" \"env(SID_LIBRARY_PATH)=$ltldpath\""]
+    
+    return [sid_run "$sid ${conf-file} ${sid-opts}" "" "" "${run-options} \"env(SID)=$sidpath\" \"env(SID_LIBRARY_PATH)=$ltldpath\""]
 }
 
 # Argument to run-one-sid-test to compute the command_line argument for
@@ -176,6 +273,7 @@ proc run-one-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-mach
     set opts(output) {}
     set opts(mach) {}
     set opts(timeout) {}
+    set opts(configfile) {}
     set opts(xerror) "no"
 
     foreach i $opt_array {
@@ -264,12 +362,12 @@ proc run-one-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-mach
 	if { "$opts(timeout)" != "" } {
 	    set options "$options timeout=$opts(timeout)"
 	}
-
+	
         global sid_run_repetitions
 	global last_sid_run_time
 	set last_sid_run_time 99999
         for {set iter 0} {$iter < $sid_run_repetitions} {incr iter} {
-	    set result [$runner $sid "${sid-opts}" "$opts(sim,$mach)" ${exe-name} "$options"]
+	    set result [$runner $sid "${sid-opts}" "" ${exe-name} "$options"]
 	    if {$iter == 0} { 
 		set min_sid_run_time $last_sid_run_time
 	    } elseif {$last_sid_run_time < $min_sid_run_time} {
@@ -347,6 +445,7 @@ proc run-one-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-mach
 
 # sim sim_opts prog prog_opts
 proc sid_run { command_line required_files redir options } {
+
     # Set the default value of the timeout.
     # FIXME: The timeout value we actually want is a function of
     # host, target, and testcase.
@@ -383,7 +482,6 @@ proc sid_run { command_line required_files redir options } {
     if { "$testcase_env" != "" } {
 	set command_line "env $testcase_env $command_line"
     }
-
     send_log "$command_line\n"
 
     set start_time [clock clicks]

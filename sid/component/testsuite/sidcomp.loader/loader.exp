@@ -1,5 +1,3 @@
-# test the elf32/elf64 loader.  note that the address map corresponds to the
-# addresses used by the 2 test binaries.
 set test "sid configuration"
 sid_config_component_etc_test "loader.conf" \
     "load libloader.la loader_component_library" \

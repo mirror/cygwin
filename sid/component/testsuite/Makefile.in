@@ -69,6 +69,7 @@ DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
 LD = @LD@
 LIBTOOL = @LIBTOOL@
+LINKS = @LINKS@
 LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -76,7 +77,9 @@ NM = @NM@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
+SABLOTRON = @SABLOTRON@
 VERSION = @VERSION@
+XSLTPROC = @XSLTPROC@
 lcd_libs = @lcd_libs@
 make_subdirs = @make_subdirs@
 sidtarget_arm = @sidtarget_arm@
@@ -87,6 +90,16 @@ sidtarget_ppc = @sidtarget_ppc@
 socket_libs = @socket_libs@
 
 AUTOMAKE_OPTIONS = foreign dejagnu
+
+EXPECT = `if [ -f ../../../expect/expect ] ; then \
+	  echo ../../../expect/expect ; \
+	  else echo expect ; fi`
+
+
+RUNTEST = `if [ -f ${srcdir}/../../../dejagnu/runtest ] ; then \
+	   echo ${srcdir}/../../../dejagnu/runtest ; \
+	   else echo runtest ;  fi`
+
 mkinstalldirs = $(SHELL) $(top_srcdir)/../config/mkinstalldirs
 CONFIG_HEADER = ../config.h
 CONFIG_CLEAN_FILES = 
@@ -97,8 +110,6 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-EXPECT = `if test -f $(top_builddir)/../expect/expect; then echo $(top_builddir)/../expect/expect; else echo expect; fi`
-RUNTEST = `if test -f $(top_srcdir)/../dejagnu/runtest; then echo $(top_srcdir)/../dejagnu/runtest; else echo runtest; fi`
 all: all-redirect
 .SUFFIXES:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 

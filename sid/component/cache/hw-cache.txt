@@ -123,6 +123,12 @@
       address that falls on the line.  Subsequently, a line can be
       unlocked by driving the "unlock" pin.
 
+    * Memory latency
+      The component models the effects of memory latency.  The
+      "hit-latency" and "miss-latency" attribute values specify the
+      cumulative latencies for hit and missed cache operations.  Any
+      misaligned accesses are penalised as if they are a miss.
+
     * Statistics gathering
       The component gathers statistics for a number of significant
       events and records them in read-only attributes.  The collection
@@ -137,6 +143,7 @@
 
   - SID conventions
     * This is a functional component.
+    * The component models memory latency.
     * It presents attributes in the "setting" and "register" categories.
 
 * Environment
@@ -198,6 +205,8 @@
       - write-hit-rate | register | %age string | 0% | statistics gathering
       - collect-statistics? | setting | boolean | true | statistics gathering
       - report-heading | setting | string | cache profile report | stats g.
+      - hit-latency | setting | numeric | 0 | memory latency
+      - miss-latency | setting | numeric | 0 | memory latency
       - dump! | setting | empty string | empty | internal diagnostics
 
 * References

@@ -14,6 +14,7 @@ using std::vector;
 
 using sid::bus;
 using sid::component;
+using sid::host_int_2;
 using sid::host_int_4;
 
 using sidutil::fixed_attribute_map_component;
@@ -181,6 +182,9 @@ private:
   unsigned line_size;
   unsigned cache_size;
   unsigned assoc;
+
+  host_int_2 hit_latency;
+  host_int_2 miss_latency;
 };
 
 #endif // CACHE_H

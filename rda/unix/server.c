@@ -55,10 +55,12 @@ static void
 usage (char *progname)
 {
   fprintf (stderr,
-    "Usage: %s [-h] [-v] tcp-port-num executable-file [arguments ...]\n\n"
+    "Usage: %s [-h] [-v] tcp-port-num executable-file [arguments ...]\n"
+    "   or: %s -a [-v] tcp-port-num process-id\n\n"
     "Start the Red Hat debug agent listening on port ``tcp-port-num'' for\n"
     "debugging``executable-file'' with optional arguments.\n\n"
     "Options and arguments:\n"
+    "  -a               Attach to already running process.\n"
     "  -h               Print this usage message.\n"
     "  -v               Increase verbosity.  One -v flag enables informational\n"
     "                   messages.  Two -v flags turn on internal debugging\n"
@@ -68,8 +70,9 @@ usage (char *progname)
     "                   remote protocol.\n"
     "  executable-file  Name of program to debug.\n"
     "  arguments ...    Command line arguments with which to start program\n"
-    "                   being debugged.\n",
-    progname);
+    "                   being debugged.\n"
+    "  process-id       Process ID (PID) of process to attach to.\n",
+    progname, progname);
   exit (1);
 }
 
@@ -79,6 +82,7 @@ main (int argc, char **argv)
   int portno;
   char *endptr;
   int verbose = 0;
+  int attach = 0;
   int optidx;
   struct child_process *process;
 
@@ -89,6 +93,9 @@ main (int argc, char **argv)
 	{
 	  switch (argv[optidx][1])
 	    {
+	      case 'a':
+		attach = 1;
+		break;
 	      case 'h':
 		usage (argv[0]);
 		/* not reached */
@@ -116,8 +123,17 @@ main (int argc, char **argv)
 
   process = malloc (sizeof (struct child_process));
   memset (process, 0, sizeof (struct child_process));
-  process->argv       = &argv[optidx + 1];
-  process->executable =  argv[optidx + 1];
+  if (attach)
+    {
+      process->pid = strtol (argv[optidx + 1], &endptr, 10);
+      if (errno != 0 || endptr == argv[optidx] || process->pid <= 0)
+	usage (argv[0]);
+    }
+  else
+    {
+      process->argv       = &argv[optidx + 1];
+      process->executable =  argv[optidx + 1];
+    }
 
   if (verbose > 1)
     process->debug_backend = 1;

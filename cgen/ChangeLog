@@ -1,3 +1,8 @@
+2002-01-28  Hans-Peter Nilsson  <hp@axis.com>
+
+	* doc/pmacros.texi: Fix .substr typo to .substring.
+	Mention that .sym expansions are not further expanded.
+
 2002-01-22  Graydon Hoare  <graydon@redhat.com>
 
 	* desc-cpu.scm (ifld-number-cache): Add.

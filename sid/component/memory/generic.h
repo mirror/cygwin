@@ -36,6 +36,7 @@ using std::ifstream;
 using sid::component;
 using sid::bus;
 using sid::host_int_1;
+using sid::host_int_2;
 using sid::host_int_4;
 using sid::little_int_1;
 using sid::little_int_2;
@@ -96,6 +97,9 @@ protected:
 private:
   string get_size_attr ();
   component::status set_size_attr (const string& s);
+
+  host_int_2 read_latency;
+  host_int_2 write_latency;
 
   string image_file_name;
   callback_pin<generic_memory> imageload_pin;
@@ -208,7 +212,9 @@ generic_read_write_bus::write_any(host_int_4 address, DataType data)
     {
       typename DataType::value_type mem_image = data.target_memory_value();
       memcpy (& target->buffer[address], & mem_image, width);
-      return bus::ok; 
+      bus::status st (bus::ok);
+      st.latency = target->write_latency;
+      return st;
     }
 
   return bus::unmapped;
@@ -227,7 +233,9 @@ generic_read_only_bus::read_any(host_int_4 address, DataType& data)
       typename DataType::value_type mem_image;
       memcpy (& mem_image, & target->buffer[address], width);
       data.set_target_memory_value (mem_image);
-      return bus::ok;
+      bus::status st (bus::ok);
+      st.latency = target->read_latency;
+      return st;
     }
 
   return bus::unmapped;

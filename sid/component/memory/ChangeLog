@@ -1,7 +1,19 @@
- 2001-03-26  Frank Ch. Eigler  <fche@redhat.com>
+2001-06-21  Ben Elliston  <bje@redhat.com>
 
- 	* generic.cxx (image{load,store,mmap}_handler): Use find_sid_data_file
- 	to locate image-file.
+	* generic.h (generic_memory::read_latency): New member.
+	(generic_memory::write_latency): Likewise.
+	(generic_read_write_bus::write_any): Set write latency on return.
+	(generic_read_only_bus::read_any): Likewise for read latency.
+	* generic.cxx (generic_memory constructor): Initialise new
+	read_latency and write_latency members. Add attributes for them.
+	* hw-memory-ram_rom-basic.txt: Document extensions.
+	* hw-memory-flash-am29.txt: Likewise.
+	* hw-memory-flash-at29.txt: Likewise.
+
+2001-03-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* generic.cxx (image{load,store,mmap}_handler): Locate image-file
+	using find_sid_data_file.
 
 2001-03-16  Frank Ch. Eigler  <fche@redhat.com>
 

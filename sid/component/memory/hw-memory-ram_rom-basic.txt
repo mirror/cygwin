@@ -9,7 +9,7 @@
   Buses: read-only-port read-write-port
   Pins: image-load image-store image-mmap image-msync error
   Attributes: size size-max image-file image-load image-store
-              state-snapshot
+              state-snapshot read-latency write-latency
   Library: libmemory.la
   Symbol name: mem_component_library
 
@@ -64,6 +64,12 @@
       configure the connection from this pin to some system-wide recepient
       before failure-prone component configuration occurs.
 
+    * Memory latency
+
+      The component models the effects of memory latency.  The
+      read-latency and write-latency attribute values specify the
+      latencies for memory reads and writes, respectively.
+
     * Reading/writing
 
       When an access is received on either the "read-only-port" or
@@ -77,6 +83,7 @@
 
   - SID conventions
     * This is a functional component.
+    * The component models memory latency.
     * The component supports saving and restoring state in addition to
       memory persistence, via the image-store pin/attribute.
     * Triggerpoints are not supported.
@@ -126,6 +133,8 @@
     * attributes
     - size | setting | numeric | default 0 | configuration
     - size-max | setting | numeric | fixed at 32MB | configuration
+    - read-latency | setting | numeric | default 0 | memory latency
+    - write-latency | setting | numeric | default 0 | memory latency
     - image-file | setting | filename | no default | image save/load
     - image-load | pin | any | no default | image save/load
     - image-store | pin | any | no default | image save/load

@@ -55,7 +55,9 @@ generic_memory::generic_memory() throw (bad_alloc):
   imageload_pin (this, & generic_memory::imageload_handler),
   imagestore_pin (this, & generic_memory::imagestore_handler),
   imagemmap_pin (this, & generic_memory::imagemmap_handler),
-  imagemsync_pin (this, & generic_memory::imagemsync_handler)
+  imagemsync_pin (this, & generic_memory::imagemsync_handler),
+  read_latency (0),
+  write_latency (0)
 {
   this->max_buffer_length = 32UL * 1024UL * 1024UL;
   this->buffer = 0;
@@ -79,6 +81,9 @@ generic_memory::generic_memory() throw (bad_alloc):
   add_attribute ("image-mmap", & this->imagemmap_pin, "pin");
   add_pin ("image-msync", & this->imagemsync_pin);
   add_attribute ("image-msync", & this->imagemsync_pin, "pin");
+
+  add_attribute ("read-latency", & this->read_latency, "setting");
+  add_attribute ("write-latency", & this->write_latency, "setting");
 
   add_attribute_virtual ("state-snapshot", this,
 			 & generic_memory::save_state,

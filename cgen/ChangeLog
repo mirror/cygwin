@@ -1,3 +1,8 @@
+2001-11-14  Dave Brolley  <brolley@redhat.com>
+
+	* utils-gen.scm (-gen-extract-word): Correct computation of the length
+	of the field being extracted.
+
 2001-10-29  Johan Rydberg  <johan@rydberg.com> 
 
 	* doc/rtl.texi (Expressions): Document the (error ..), (sqrt ..),

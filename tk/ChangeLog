@@ -1,3 +1,9 @@
+Wed Oct 10 21:06:11 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* win/configure.in: Add detection for -mwin32 option requirement under
+	cygwin.
+	* win/configure: Regenerate.
+
 2001-09-12  Ian Roxborough  <irox@redhat.com>
 
 	* configure: Regenerated.

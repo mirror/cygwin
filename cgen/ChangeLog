@@ -65,7 +65,7 @@
 
 	* cpu/xstormy16.cpu (gr-Rbj-names): Rename this ...
 	(gr-Rb-names): ... to this.
-	(h-Rb): New hardware peice.
+	(h-Rb): New hardware piece.
 	(h-Rbj): Use gr-Rb-names.
 	(Rb): Use h-Rb.
 	(holdx): New instruction.

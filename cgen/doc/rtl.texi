@@ -2246,6 +2246,12 @@ Return non-zero if the value of attribute @samp{attr-name} is
 @samp{value}. If @samp{value} is a list return ``true'' if
 @samp{attr-name} is any of the listed values.
 
+@item (index-of operand)
+Return the index of @samp{operand}. For registers this is the register number.
+
+@item (regno operand)
+Same as @code{index-of}, but improves readability for registers
+
 @item (nop)
 A no-op.
 

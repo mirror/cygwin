@@ -1,12 +1,13 @@
 // VoicePager.h - description.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
 #ifndef VOICE_PAGER_H
 #define VOICE_PAGER_H
 
+#include <iostream>
 #include <vector>
 #include <string>
 #include <map>
@@ -17,8 +18,11 @@
 #include "parport-driver.h"
 #include "adac-driver.h"
 
-class VoicePager {
+using std::map;
+using std::vector;
 
+class VoicePager
+{
  private:
   parport_driver pport_drobj;   // Object of type parallel port driver
   rtc_driver rtc_drobj;		// object of type rtc driver.

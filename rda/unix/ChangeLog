@@ -1,3 +1,22 @@
+2002-12-02  Kevin Buettner  <kevinb@redhat.com>
+
+	* linux-target.c (linux_get_reg, linux_set_reg, reg_from_regset)
+	(reg_to_regset, get_regset, put_regset reg_from_gregset)
+	(reg_to_gregset, reg_from_fpregset, reg_to_fpregset)
+	(reg_from_xregset, reg_to_xregset): Adjust all calls to
+	gdbserv_host_bytes_to_reg() and gdbserv_host_bytes_from_reg()
+	to account for change in interface.  Remove code which is
+	no longer needed due to improvements in the aforementioned
+	functions.
+	(sign_extend): New constant.
+	(FPR_BASE, PC, CAUSE, BADVADDR, MMHI, MMLO, FPC_CSR, FPC_EIR):
+	Make sure these are defined.
+	(PROTO_SIZE): Define.
+	(reginfo) [MIPS_LINUX_TARGET]: Use PROTO_SIZE to initialize
+	table with size (width) of registers to use when communicating
+	with the client.
+	(NUM_REGS, PC_REGNUM, reginfo) [MIPS64_LINUX_TARGET]: Define.
+
 2002-11-19  Michael Snyder  <msnyder@redhat.com>
 
 	* ptrace-target.c: Fix typo in copyright.

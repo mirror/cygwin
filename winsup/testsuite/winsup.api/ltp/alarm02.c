@@ -29,7 +29,7 @@
  * 
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  */
-/* $Id: alarm02.c,v 1.1 2000/09/03 03:58:16 cgf Exp $ */
+/* $Id: alarm02.c,v 1.2 2000/09/06 14:21:53 duda Exp $ */
 /**********************************************************
  *
  *    OS Test - Silicon Graphics, Inc.
@@ -119,7 +119,7 @@ main(int ac, char **av)
 
     /* Parameters for usc code  */
     int lc;             /* loop counter */
-    char *msg;          /* message returned from parse_opts */
+    const char *msg;          /* message returned from parse_opts */
 
     /* Parameters for alarm test */
     char *buf[] = { "-1", "ULONG_MAX", "ULONG_MAX+1"};

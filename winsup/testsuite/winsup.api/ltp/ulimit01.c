@@ -29,7 +29,7 @@
  * 
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  */
-/* $Id: ulimit01.c,v 1.1 2000/09/03 03:58:18 cgf Exp $ */
+/* $Id: ulimit01.c,v 1.2 2000/09/06 14:21:53 duda Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -157,7 +157,7 @@ main(int ac, char **av)
 {
     int lc;		/* loop counter */
     int i;		/* inner loop (test case) counter */
-    char *msg;		/* message returned from parse_opts */
+    const char *msg;		/* message returned from parse_opts */
     int tmp;
 
     TST_TOTAL = sizeof(Scenarios)/sizeof(struct limits_t);

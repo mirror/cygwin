@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  */
 
-/* $Id: usctest.h,v 1.1 2000/09/03 03:52:30 cgf Exp $ */
+/* $Id: usctest.h,v 1.2 2000/09/06 14:21:52 duda Exp $ */
 
 /**********************************************************
  * 
@@ -142,7 +142,7 @@ extern float STD_LOOP_DURATION, /* wall clock time to iterate */
 /**********************************************************************
  * Prototype for parse_opts routine
  **********************************************************************/
-extern char *parse_opts(int ac, char **av, option_t *user_optarr, void (*uhf)());
+extern const char *parse_opts(int ac, char **av, option_t *user_optarr, void (*uhf)());
 
 
 /*

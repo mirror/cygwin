@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: unlink07.c,v 1.1 2000/09/03 03:58:18 cgf Exp $ */
+/* $Id: unlink07.c,v 1.2 2000/09/06 14:21:53 duda Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -166,7 +166,7 @@ int
 main(int ac, char **av)
 {
     int lc;		/* loop counter */
-    char *msg;		/* message returned from parse_opts */
+    const char *msg;		/* message returned from parse_opts */
     char *fname;
     char *desc;
     int ind;

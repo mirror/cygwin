@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: asyncio02.c,v 1.1 2000/09/03 03:58:17 cgf Exp $ */
+/* $Id: asyncio02.c,v 1.2 2000/09/06 14:21:53 duda Exp $ */
 /************************************************************
  * OS Test - Silicon Graphics, Inc.
  * Mendota Heights, Minnesota
@@ -151,7 +151,7 @@ main(int ac, char **av)
     int ret_val;	/* return value from testrun call */
     int eok;		/* everything is ok flag */
     int lc;             /* loop counter */
-    char *msg;          /* message returned from parse_opts */
+    const char *msg;          /* message returned from parse_opts */
     int flag_cnt;
 
     Tst_nobuf=1;

@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  */
 
-/* $Id: tst_sig.c,v 1.1 2000/09/03 03:52:30 cgf Exp $ */
+/* $Id: tst_sig.c,v 1.2 2000/09/06 14:21:53 duda Exp $ */
 
 /*****************************************************************************
 	OS Testing  - Silicon Graphics, Inc.
@@ -150,7 +150,15 @@ tst_sig(int fork_flag, void (*handler)(), void (*cleanup)())
 #ifdef SIGPTRESCHED
                 case SIGPTRESCHED:
 #endif /* SIGPTRESCHED */
-
+#ifdef __CYGWIN__
+		case SIGSEGV:
+		case SIGILL:
+		case SIGTRAP:
+		case SIGABRT:
+		case SIGEMT:
+		case SIGFPE:
+		case SIGBUS:
+#endif
 	            break;
 
 	        case SIGCLD:

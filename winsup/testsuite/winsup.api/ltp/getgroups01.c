@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: getgroups01.c,v 1.1 2000/09/03 03:58:17 cgf Exp $ */
+/* $Id: getgroups01.c,v 1.2 2000/09/06 14:21:53 duda Exp $ */
 /***********************************************************************
 TEST IDENTIFIER:  getgroups01 :	Getgroups system call critical test
 
@@ -97,7 +97,7 @@ int
 main(int ac, char **av)
 {
     int lc;             /* loop counter */
-    char *ptr;          /* message returned from parse_opts */
+    const char *ptr;          /* message returned from parse_opts */
 
     int	i,			/* counter */
 	group,			/* return value from Getgid() call */

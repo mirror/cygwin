@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  */
 
-/* $Id: test.h,v 1.1 2000/09/03 03:52:30 cgf Exp $ */
+/* $Id: test.h,v 1.2 2000/09/06 14:21:52 duda Exp $ */
 
 #ifndef __TEST_H__
 #define __TEST_H__
@@ -190,14 +190,14 @@ extern void tst_clear_error();
  * The following prototypes are needed to remove compile errors
  * on IRIX systems when compiled with -n32 and -64.
  */
-extern void tst_res(int ttype, char *fname, char *arg_fmt, ...);
-extern void tst_resm(int ttype, char *arg_fmt, ...);
+extern void tst_res(int ttype, char *fname, const char *arg_fmt, ...);
+extern void tst_resm(int ttype, const char *arg_fmt, ...);
 extern void tst_brk(int ttype, char *fname, void (*func)(), 
-							char *arg_fmt, ...);
+							const char *arg_fmt, ...);
 extern void tst_brkloop(int ttype, char *fname, void (*func)(), 
-							char *arg_fmt, ...);
-extern void tst_brkm(int ttype, void (*func)(), char *arg_fmt, ...);
-extern void tst_brkloopm(int ttype, void (*func)(), char *arg_fmt, ...);
+							const char *arg_fmt, ...);
+extern void tst_brkm(int ttype, void (*func)(), const char *arg_fmt, ...);
+extern void tst_brkloopm(int ttype, void (*func)(), const char *arg_fmt, ...);
 
 extern int  tst_environ();
 extern void tst_exit();

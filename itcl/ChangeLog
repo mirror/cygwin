@@ -1,3 +1,8 @@
+Wed Apr 19 13:58:32 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* itcl/unix/config.log, itcl/unix/confdefs.h: Delete generated
+ 	files.
+
 2000-01-26  DJ Delorie  <dj@cygnus.com>
 
 	* itcl/win/dllEntryPoint.c (DllMain): Use _imp__ instead of __imp_

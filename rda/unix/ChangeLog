@@ -1,3 +1,8 @@
+2004-08-11  Corinna Vinschen  <vinschen@redhat.com>
+
+	* linux-target.c (linux_write_reg): Print process->pid in case of
+	an error.
+
 2004-07-19  Kevin Buettner  <kevinb@redhat.com>
 
 	* server.c (main): Set ``server_quit_p'' when debugged process

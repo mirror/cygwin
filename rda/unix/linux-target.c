@@ -2250,7 +2250,7 @@ linux_write_reg (struct gdbserv *serv, int regno, ptrace_xfer_type regval)
   if (errno)
     {
       fprintf (stderr, "PT_WRITE_U 0x%08lx from 0x%08lx in process %d\n",
-	       (long) regval, (long) regaddr, pid);
+	       (long) regval, (long) regaddr, process->pid);
       return -1;
     }
   else

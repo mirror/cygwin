@@ -980,8 +980,8 @@ for { set i 0 } { $i < $argc } { incr i } {
 	"--ou*" -
 	"--sr*" -
 	"--st*" -
-
         "--ta*" -
+	"--di*" -
 	"--to*" {
 	    incr i
 	    set optarg [lindex $argv $i]
@@ -1029,8 +1029,14 @@ for { set i 0 } { $i < $argc } { incr i } {
 	    continue
 	}
 	
+	"--di*" {
+	    # Already parsed (and don't set again).  Let $DEJAGNU rename it.
+	    # set cmdline_dir_to_run $optarg
+	    continue
+	}
+
 	
-	"--d*" {			# (--debug) expect internal debugging
+	"--de*" {			# (--debug) expect internal debugging
 	    if [file exists ./dbg.log] {
 		catch "exec rm -f ./dbg.log"
 	    }

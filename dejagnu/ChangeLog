@@ -1,3 +1,11 @@
+2001-02-22  Ben Elliston  <bje@redhat.com>
+
+	* config/sid.exp: New file.
+	* baseboards/basic-sid.exp: Likewise.
+	* baseboards/arm-sid.exp: Likewise.
+	* baseboards/m32r-sid.exp: Likewise.
+	* baseboards/m68k-sid.exp: Likewise.
+
 2001-01-24  Fernando Nasser  <fnasser@redhat.com>
 
 	From Gabriel Dos Reis  <gdr@codesourcery.com>

@@ -11,7 +11,10 @@ set -e
 # For debugging.
 set -x
 
-cpus="i960 m32r"
+# fr30 not included, sim has been marked as obsolete.
+# sh64 not included, not sure which configuration to use.
+# i960 not included, it's being deleted.
+cpus="m32r"
 
 if [ ! -f sim.scm ]
 then
@@ -23,15 +26,15 @@ export cgendir=`pwd`
 
 for c in $cpus
 do
-  rm -rf /tmp/tmp-cgen
-  mkdir /tmp/tmp-cgen
+  rm -rf ./tmp-sim
+  mkdir ./tmp-sim
 
   case $c in
   i960)
     (
 	set -e
 	set -x
-	cd /tmp/tmp-cgen
+	cd ./tmp-sim
 	$cgendir/../sim/i960/configure --prefix /tmp/junk --target i960-coff
 	make stamp-arch stamp-cpu stamp-desc
     )
@@ -42,9 +45,31 @@ do
     (
 	set -e
 	set -x
-	cd /tmp/tmp-cgen
+	cd ./tmp-sim
 	$cgendir/../sim/m32r/configure --prefix /tmp/junk --target m32r-elf
 	make stamp-arch stamp-cpu stamp-xcpu
+    )
+    test $? == 0 || exit 1
+    ;;
+
+  fr30)
+    (
+	set -e
+	set -x
+	cd ./tmp-sim
+	$cgendir/../sim/fr30/configure --prefix /tmp/junk --target fr30-elf
+	make stamp-arch stamp-cpu
+    )
+    test $? == 0 || exit 1
+    ;;
+
+  sh64)
+    (
+	set -e
+	set -x
+	cd ./tmp-sim
+	$cgendir/../sim/sh64/configure --prefix /tmp/junk --target ???
+	make stamp-all
     )
     test $? == 0 || exit 1
     ;;
@@ -56,4 +81,4 @@ do
   esac
 done
 
-rm -rf /tmp/tmp-cgen
+rm -rf ./tmp-sim

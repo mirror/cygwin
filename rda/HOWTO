@@ -119,7 +119,7 @@ either reject the connection (returning NULL) or accept the connection
 (returning a target object).  That is where you come in.
 
 You must provide a routine like (please see the precise API in the header file
-lib/gdbserv-client.h):
+include/gdbserv-client.h):
 
 typedef struct gdbserv_target *(gdbserv_target_attach) (struct gdbserv *gdbserv,                                                        void *attatch_data);
 
@@ -127,7 +127,7 @@ This will be called by the server to notify that the client has initiated a
 connection.  You must return a GDBSERV_TARGET struct for the session or null
 if your target has rejected the connection.
 
-The recommended way to create your gdbsert_target object is:
+The recommended way to create your gdbserv_target object is:
 
 struct gdbserv_target *gdbtarget = malloc (sizeof (struct gdbserv_target));
 memset (gdbtarget, 0, sizeof (*gdbtarget));
@@ -140,19 +140,21 @@ new entries are added to this struct.
 
 Handling target events:
 
-The fromtarget_* routines may be called by your target.  Before you despair, let
-me tell you that they are only three: reset, break and exit.  They indicate that
-some interesting condition happened in your target that requires debugger
-attention.  Reset and exit are quite obvious and break is for everything else.
-These routines must *not* be called from within a gdbserv_target callback
-function, so it may be necessary for your target to set some flags to signal
-state change calls later.
+The fromtarget_* routines may be called by your target.  Before you
+despair, let me tell you that they are only three: reset, break and
+exit.  They indicate that some interesting condition happened in your
+target that requires debugger attention.  Reset and exit are quite
+obvious and break is for everything else.  These routines must *not*
+be called from within a gdbserv_target callback function, so it may be
+necessary for your target to set some flags to signal state change
+calls later.
 
 If your target is a simulator, call those when the corresponding
-condition arises in your simulated target.  If it is a board, it will probably
-be called from your ISRs.  A special case occurs if your target is a device that
-has to be polled in order to detect state changes.  If this is the case, you
-will call these routines from the polling code.
+condition arises in your simulated target.  If it is a board, it will
+probably be called from your ISRs.  A special case occurs if your
+target is a device that has to be polled in order to detect state
+changes.  If this is the case, you will call these routines from the
+polling code.
 
 
 The main loop:
@@ -163,10 +165,10 @@ At some point you must get things going by:
 2) causing remote protocol commands to be read from the input port (socket).
 
 You must (repeatedly) call a function called gdbloop_poll().  This
-will be in your main loop.  If it is a server it will be in you main()
-function.  If it is a simulator that also accepts input from other
-sources, it will have to be added to the existing main loop. If it is
-a board, it will probably be called from the timer ISR.
+will be in your main loop.  If it is a server it will be in your
+main() function.  If it is a simulator that also accepts input from
+other sources, it will have to be added to the existing main loop. If
+it is a board, it will probably be called from the timer ISR.
 
 Before doing that you must initialize your socket interface.  Look in
 the main() routine of the sample program to see what to call.  When

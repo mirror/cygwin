@@ -917,7 +917,7 @@ when trapping, see below in child half of fork */
 #endif /* TCL_MAJOR_VERSION < 8 */
 		}
 
-		master = ((mode & TCL_READABLE)?rfd:wfd);
+		master = (int)((mode & TCL_READABLE)?rfd:wfd);
 
 		/* make a new copy of file descriptor */
 		if (-1 == (write_master = master = dup(master))) {
@@ -927,7 +927,7 @@ when trapping, see below in child half of fork */
 
 		/* if writefilePtr is different, dup that too */
 		if ((mode & TCL_READABLE) && (mode & TCL_WRITABLE) && (wfd != rfd)) {
-			if (-1 == (write_master = dup(wfd))) {
+			if (-1 == (write_master = dup((int)wfd))) {
 				exp_error(interp,"fdopen: %s",Tcl_PosixError(interp));
 				return TCL_ERROR;
 			}

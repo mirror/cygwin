@@ -773,7 +773,7 @@ struct exp_case *ecases;
 	for (ec=ecases;ec->type != exp_end;ec++) {
 		if ((ec->type == exp_regexp) && !ec->re) {
 			TclRegError((char *)0);
-			if (!(ec->re = TclRegComp(ec->pattern))) {
+			if (!(ec->re = (void*)TclRegComp(ec->pattern))) {
 				fprintf(stderr,"regular expression %s is bad: %s",ec->pattern,TclGetRegError());
 				return_errno(EINVAL);
 			  }

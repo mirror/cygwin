@@ -1,0 +1,577 @@
+# -*- Tcl -*-
+# Fuzzy Dice: graphical pin-activity monitoring component
+# 
+# Copyright (C) 2001 Red Hat.
+# This file is part of SID and is licensed under the GPL.
+# See the file COPYING.SID for conditions for redistribution.
+
+
+proc find_pin {name} {
+    global pin_list
+    if {[info exist pin_list($name)]} {
+	return $pin_list($name)
+    } else {
+	return {}
+    }
+}
+
+proc attribute_names_in_category {category} {
+    switch $category {
+      default { return "" }
+    }
+}
+
+proc attribute_value {name} {
+    return ""
+}
+
+proc set_attribute_value {name value} {
+    return not_found
+}
+
+proc relate {rel comp} {
+    return not_found
+}
+
+proc add_pin {name script} {
+    global pin_list
+    global hook_driven_h4
+
+    set temp [sid::pin::new]
+    set pin_list($name) $temp
+    set hook_driven_h4($temp) $script
+}
+
+proc driven_h4 {pin value} {
+    global hook_driven_h4 h4_driven_value
+    set h4_driven_value $value
+    if {[info exists hook_driven_h4($pin)]} {
+	uplevel \#0 $hook_driven_h4($pin)
+    } else {
+	error "pin driven without hook: $pin"
+    }
+}
+
+
+
+add_pin "stimulus" {
+    global h4_driven_value
+    stimulus $h4_driven_value
+}
+
+
+
+# ----------------------------------------------------------------------------
+
+# Window update procedures
+
+set image_names [list]
+#set image_ids [list]
+
+set fuzzy_dice_names [list]
+#set fuzzy_dice_ids [list]
+
+# per-image position vector
+#set image_x
+#set image_y
+# per-image velocity vector: angle & pixels / ms
+#set image_angle
+#set image_speed
+# refresh interval (ms)
+set refresh_interval 200
+# friction parameter; speed loss per iteration
+set friction 0.995
+
+
+set clicks_per_ms 0
+set clicks_last_call 0
+
+proc ms_since_last_call {} {
+    global clicks_per_ms
+    if {$clicks_per_ms <= 0} then {
+	# need to measure
+	set c1 [clock clicks]
+	after 1000
+	set c2 [clock clicks]
+	set clicks_per_ms [expr ($c2 - $c1) / 1000]
+    }
+    global clicks_last_call
+    if {$clicks_last_call == 0} then {
+	set clicks_last_call [clock clicks]
+	return 0
+    }
+    set now [clock clicks]
+    set ms [expr ($now - $clicks_last_call) / $clicks_per_ms]
+    set clicks_last_call $now
+    return $ms
+}
+
+
+set twopi [expr 2*4*atan(1)]
+
+proc stimulus {value} {
+    global quitting
+    if $quitting then return
+
+    set name $value 
+    global image_names
+    if {[lsearch -exact $image_names $name] >= 0} then {
+	global image_speed image_angle twopi
+
+	# give a push and a spin to this object
+	set speed $image_speed($name)
+	set angle $image_angle($name)
+
+	set init_speed 0.002
+	set init_angle [expr rand()*$twopi]
+
+	set image_speed($name) [expr {($speed == 0) ?
+				      $init_speed :
+				      ($speed * 1.01)}]
+	set image_angle($name) [expr {($speed == 0) ?
+				      $init_angle :
+				      ($angle + 0.01)}]
+    } else {
+	add_image $name
+    }
+}
+
+
+proc add_image {name} {
+    # create fuzzy dice instead!
+    set item [.boing create text 0 0 -text "$name"]
+
+    # add it to update list
+    global image_names image_ids image_x image_y image_speed image_angle boing_x boing_y twopi
+    lappend image_names $name
+    lappend image_ids($name) $item
+    set image_x($name) [expr rand()*$boing_x]
+    set image_y($name) [expr rand()*$boing_y]
+    set image_speed($name) 0
+    set image_angle($name) 0
+}
+
+
+
+proc clamp_abs {pos_limit value} {
+    set neg_limit [expr - $pos_limit]
+    if {$neg_limit > $value} then { return $neg_limit }
+    if {$pos_limit < $value} then { return $pos_limit }
+    return $value
+}
+
+proc refresh_img {name dt} {
+    global image_x image_y
+    global image_speed image_angle
+    set speed $image_speed($name)
+    set angle $image_angle($name)
+    set x $image_x($name)
+    set y $image_y($name)
+
+    # update physics
+    set x [expr $x + (cos($angle) * $speed * $dt)]
+    set y [expr $y + (sin($angle) * $speed * $dt)]
+    global friction
+    set speed [clamp_abs 0.15 [expr $friction * $speed]]
+
+    # clamp/bounce image into canvas
+    global boing_x boing_y twopi
+    set margin 20
+    if {$x > $boing_x - $margin} { 
+	set x [expr $boing_x - $margin]; 
+	set speed [expr $speed * 0.8]
+	set angle [expr $angle + $twopi/4]
+    }
+    if {$y > $boing_y - $margin} { 
+	set y [expr $boing_y - $margin]
+	set speed [expr $speed * 0.8]
+	set angle [expr $angle + $twopi/4]
+    }
+    if {$x < $margin} { 
+	set x $margin
+	set speed [expr $speed * 0.8]
+	set angle [expr $angle + $twopi/4]
+    }
+    if {$y < $margin} { 
+	set y $margin 
+	set speed [expr $speed * 0.8]
+	set angle [expr $angle + $twopi/4]
+    }
+    
+    global image_ids
+    # puts "$name -> $x $y"
+    .boing coords $image_ids($name) $x $y
+    set image_x($name) $x
+    set image_y($name) $y
+    set image_speed($name) $speed
+    set image_angle($name) $angle
+}
+
+
+proc compare_img_speeds {a b} {
+    global image_speed
+    if {$image_speed($a) < $image_speed($b)} then { return -1 }
+    if {$image_speed($a) > $image_speed($b)} then { return 1 }
+    return 0
+}
+
+
+proc fuzzify_leaders {} {
+    global image_names
+    set sorted_imgnames [lsort -decreasing -command compare_img_speeds $image_names]
+    global fuzzy_dice_names
+    set first_few [lrange $sorted_imgnames 0 [expr [llength $fuzzy_dice_names] - 1]]
+
+    foreach leader_img $first_few fuzzy_img $fuzzy_dice_names {
+	if {$leader_img == {}} then {
+	    set x 0
+	    set y 0
+	} else {
+	    global image_x image_y
+	    set x [expr $image_x($leader_img) - 30]
+	    set y [expr $image_y($leader_img) - 30]
+	}
+	# puts "Aligning $fuzzy_img with $leader_img at $x $y"
+	global fuzzy_dice_ids image_ids
+	.boing coords $fuzzy_dice_ids($fuzzy_img) $x $y
+	# .boing lower $fuzzy_dice_ids($fuzzy_img) $image_ids($leader_img)
+    }
+}
+
+
+set quitting 0
+proc refresh {} {
+    global quitting
+    if $quitting then return
+
+    set ms_since_last_refresh [ms_since_last_call]
+
+    global image_names
+    foreach name $image_names {
+	refresh_img $name $ms_since_last_refresh
+    }
+
+    fuzzify_leaders
+
+    update
+    global refresh_interval
+    after $refresh_interval {refresh}
+}
+
+
+# ----------------------------------------------------------------------------
+
+# Fuzzy dice images
+
+proc create_fuzzy_dice {} {
+    set id [image create photo -format gif -data \
+"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
+czwKWezGQyEHM0AHDIAMyH4hEH/cI8sbEAA7
+"]
+
+    set item [.boing create image 0 0 -image $id]
+    global fuzzy_dice_names fuzzy_dice_ids
+    lappend fuzzy_dice_names "blue6"
+    set fuzzy_dice_ids(blue6) $item
+
+    # next one
+
+    set id [image create photo -format gif -data \
+"R0lGODdhQgA+AOcAADazPmTDM4CrZlW4QlrAM1q8M1fOR/37+CCqMk65Mf35+CCxKEq0N0i2
+NUK2L7CuqVfBPVi/PmG/M1m5P1euR1i+NEGtJFe8MzenLiuwLF+fRVS6MEi4OPf/9Ui5Lkm3
+L0W0NVy8O6Tgo0JvOVe+NkG+NMXDvUmoPD+0MgEbA0B8MECxKVmzRQAVAly9NBJNGj/FPzes
+Kub+3U65OlC8MlCoRoqehmC/T1/JOgo8CFW8Og4CCUy8Mfb88/b282ezRUKmO2W6OVm/N23A
+WFi/NlK+Ole9Nf7+/k68NknCMVW3M1e0KzOTNmHDQliuLDSfI1e+Qi7CKlbFN17ANSZpJli9
+OUrBP12+NFa7N1C0O2DHRAACAUi0M1zDQEe5KEm1KkK0Lc7fwXLOT17COFW8Q1y5QDJaK1S/
+OCS5LcvTvle+MVS5OFG7NWvHPl/OPKCfofrx9k2gOxUBElvAOB9IGEnEOu/x61HELnrWXVC0
+LUa3LVLNPCuELQAPAJ7Eh0i6PAAHACypJ0O4N024LUO0N0KrQFLDP1LGNVS8N0yuQ026MAEn
+B4LEbqStnVG4N0+6NVS7ME26M/72/F2/PEyrKEG+PlS5MzZIKk24NiavKgEAAGzBOji6NeTi
+4iOfJ2DAOG7JUzG4Llu8MwcCCVK9NFS5Nkm4NZ65iU63MDq/ME64JlO+QkrKOQ0AEl7DLzaz
+LFK9N0u+OlW8MFm9KgEABme5TzfFMOv+8sfnvoDETVi9QFrAOBYsDVi+Nk+4QdD1yla+NP//
+/0OTPDWyJP77/lS4Mki2Oki5MGarUTm5IVe8OEKeNFi/L0+7OlW6Nkm4Pli7L0+3Ola0N1a9
+LVi5L0m0Ply6Kf3+9gADAREOC0mwKlO/QUyUQVi+PEO0JOj36xIeD1O9LUq+LkG6OUHDL0K6
+JkK2Jl7GMVbBM067P+/s61a7MwYAA0KIOk27KkCwO/P08jq5K57Th0m+R1i/OFa9NgIQAna6
+T1K/MlS7NFC9MAAKAFG3MQAEAAIAAgAAACwAAAAAQgA+AAAI/gCDCRxIsKDBgwgTKlzIsKHD
+hxAjLlQgsaLFguoOBIN3sWPFEfCO3LolidiRDt9+4RLBEpcMGXbgSJJ0RMatTsRMelR4xMSI
+EZcU2Ll27ZaMXyIYIVvGBACCpwDmDZH369eta8Qkwfu2M1iHI0Sv9RgrIwyvFnRUijhVi0Ii
+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
+"]
+
+    set item [.boing create image 0 0 -image $id]
+    global fuzzy_dice_names fuzzy_dice_ids
+    lappend fuzzy_dice_names "green3"
+    set fuzzy_dice_ids(green3) $item
+
+    # next one
+
+    set id [image create photo -format gif -data \
+"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
+ghoLBn4aCXQaEAA7
+"]
+
+    set item [.boing create image 0 0 -image $id]
+    global fuzzy_dice_names fuzzy_dice_ids
+    lappend fuzzy_dice_names "red2"
+    set fuzzy_dice_ids(red2) $item
+
+    # next one
+}
+
+
+
+
+# ----------------------------------------------------------------------------
+
+# Create top-level window
+
+wm title . "Boing"
+wm minsize . 100 100
+canvas .boing
+
+expr srand([clock clicks])
+
+bind .boing <Configure> { 
+    global boing_x boing_y
+    set boing_x %w
+    set boing_y %h
+}
+bind .boing <Destroy> {
+    global guitting
+    set quitting 1
+}
+
+pack .boing -fill both
+create_fuzzy_dice
+update
+
+refresh
+

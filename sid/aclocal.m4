@@ -137,7 +137,7 @@ fi])
 
 dnl sidtargets.m4  -*- m4 -*-
 
-dnl Copyright (C) 1999, 2000 Red Hat.
+dnl Copyright (C) 1999, 2000, 2001 Red Hat.
 dnl This file is part of SID and is licensed under the GPL.
 dnl See the file COPYING.SID for conditions for redistribution.
 
@@ -214,7 +214,6 @@ AC_SUBST(sidtarget_arm)
 AM_CONDITIONAL(SIDTARGET_ARM,[test "x$sidtarget_arm" = x1])
 AC_MSG_RESULT($sidtarget_arm)
 
-
 AC_MSG_CHECKING(MIPS family support)
 AC_SUBST(sidtarget_mips)
 AM_CONDITIONAL(SIDTARGET_MIPS,[test "x$sidtarget_mips" = x1])
@@ -234,7 +233,6 @@ AC_MSG_CHECKING(PPC family support)
 AC_SUBST(sidtarget_ppc)
 AM_CONDITIONAL(SIDTARGET_PPC,[test "x$sidtarget_ppc" = x1])
 AC_MSG_RESULT($sidtarget_ppc)
-
 
 ])
 

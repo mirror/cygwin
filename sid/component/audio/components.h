@@ -323,7 +323,7 @@ class cygwin_audio: public generic_audio
 {
 public:
   cygwin_audio ();
-  ~cygwin_audio ();
+  ~cygwin_audio () throw ();
 
 private:
   host_int_2 rx_buffer_size;

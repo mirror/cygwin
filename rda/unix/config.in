@@ -92,8 +92,20 @@
 /* Define if target is SH (3? 4?) Linux */
 #undef SH_LINUX_TARGET
 
-/* Define if target is MIPS Linux */
+/* Define if target is 64-bit MIPS Linux */
+#undef MIPS64_LINUX_TARGET
+
+/* Define if target is (32-bit) MIPS Linux */
 #undef MIPS_LINUX_TARGET
+
+/* Define if target uses MIPS n64 ABI */
+#undef MIPS_ABI_N64
+
+/* Define if target uses MIPS n32 ABI */
+#undef MIPS_ABI_N32
+
+/* Define if target uses MIPS o32 ABI */
+#undef MIPS_ABI_O32
 
 /* Define if target is any Linux */
 #undef LINUX_TARGET

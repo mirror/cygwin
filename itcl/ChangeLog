@@ -1,3 +1,10 @@
+2000-10-13  Mo DeJong  <mdejong@redhat.com>
+
+	* itcl/generic/itcl_objects.c (Itcl_CreateObject):
+	Add code to check for an object that deletes itself
+	inside its own constructor. We need to avoid adding
+	this object to the global object list.
+
 2000-06-22  Syd Polk  <spolk@redhat.com>
 
 	* itcl/win/Makefile.in: Added target install-shared-libraries.

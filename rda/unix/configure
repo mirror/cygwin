@@ -4101,7 +4101,6 @@ fi
 done
 
 
-
 case "$target" in
   mips64*linux*)
     TARGET_MODULES="linux-target.o thread-db.o ptrace-target.o"
@@ -4280,107 +4279,162 @@ _ACEOF
 _ACEOF
 
     ;;
-  mips64*linux*n64)
+  mips64*linux*)
     cat >>confdefs.h <<\_ACEOF
 #define MIPS64_LINUX_TARGET 1
 _ACEOF
 
-    cat >>confdefs.h <<\_ACEOF
-#define MIPS_ABI_N64 1
-_ACEOF
+    echo "$as_me:$LINENO: checking mips abi" >&5
+echo $ECHO_N "checking mips abi... $ECHO_C" >&6
+    mipsabi=o32
+    cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
 
-    cat >>confdefs.h <<\_ACEOF
-#define PTRACE_XFER_SIZE 8
-_ACEOF
+#if !defined(_ABIN32) || _MIPS_SIM != _ABIN32
+#error not n32
+#endif
 
-    cat >>confdefs.h <<\_ACEOF
-#define PTRACE_XFER_TYPE_LONG 1
 _ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  mipsabi=n32
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+    cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
 
-    cat >>confdefs.h <<\_ACEOF
-#define PTRACE_ARG1_TYPE_LONG 1
+#if !defined(_ABI64) || _MIPS_SIM != _ABI64
+#error not n64
+#endif
+
 _ACEOF
-
-    cat >>confdefs.h <<\_ACEOF
-#define PTRACE_ARG2_TYPE_LONG 1
-_ACEOF
-
-    cat >>confdefs.h <<\_ACEOF
-#define PTRACE_ARG3_TYPE_LONG 1
-_ACEOF
-
-    cat >>confdefs.h <<\_ACEOF
-#define PTRACE_ARG4_TYPE_LONG 1
-_ACEOF
-
-    ;;
-  mips64*linux*n32)
-    cat >>confdefs.h <<\_ACEOF
-#define MIPS64_LINUX_TARGET 1
-_ACEOF
-
-    cat >>confdefs.h <<\_ACEOF
-#define MIPS_ABI_N32 1
-_ACEOF
-
-    cat >>confdefs.h <<\_ACEOF
-#define PTRACE_XFER_SIZE 8
-_ACEOF
-
-    cat >>confdefs.h <<\_ACEOF
-#define PTRACE_XFER_TYPE_LONG_LONG 1
-_ACEOF
-
-    cat >>confdefs.h <<\_ACEOF
-#define PTRACE_ARG1_TYPE_LONG_LONG 1
-_ACEOF
-
-    cat >>confdefs.h <<\_ACEOF
-#define PTRACE_ARG2_TYPE_LONG_LONG 1
-_ACEOF
-
-    cat >>confdefs.h <<\_ACEOF
-#define PTRACE_ARG3_TYPE_LONG_LONG 1
-_ACEOF
-
-    cat >>confdefs.h <<\_ACEOF
-#define PTRACE_ARG4_TYPE_LONG_LONG 1
-_ACEOF
-
-    ;;
-  mips64*linux*o32)
-    cat >>confdefs.h <<\_ACEOF
-#define MIPS64_LINUX_TARGET 1
-_ACEOF
-
-    cat >>confdefs.h <<\_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  mipsabi=n64
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+    echo "$as_me:$LINENO: result: $mipsabi" >&5
+echo "${ECHO_T}$mipsabi" >&6
+    case $mipsabi in
+      o32)
+	cat >>confdefs.h <<\_ACEOF
 #define MIPS_ABI_O32 1
 _ACEOF
 
-    cat >>confdefs.h <<\_ACEOF
+	cat >>confdefs.h <<\_ACEOF
 #define PTRACE_XFER_SIZE 4
 _ACEOF
 
-    cat >>confdefs.h <<\_ACEOF
+	cat >>confdefs.h <<\_ACEOF
 #define PTRACE_XFER_TYPE_LONG 1
 _ACEOF
 
-    cat >>confdefs.h <<\_ACEOF
+	cat >>confdefs.h <<\_ACEOF
 #define PTRACE_ARG1_TYPE_LONG 1
 _ACEOF
 
-    cat >>confdefs.h <<\_ACEOF
+	cat >>confdefs.h <<\_ACEOF
 #define PTRACE_ARG2_TYPE_LONG 1
 _ACEOF
 
-    cat >>confdefs.h <<\_ACEOF
+	cat >>confdefs.h <<\_ACEOF
 #define PTRACE_ARG3_TYPE_LONG 1
 _ACEOF
 
-    cat >>confdefs.h <<\_ACEOF
+	cat >>confdefs.h <<\_ACEOF
 #define PTRACE_ARG4_TYPE_LONG 1
 _ACEOF
 
+        ;;
+      n32)
+	cat >>confdefs.h <<\_ACEOF
+#define MIPS_ABI_N32 1
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define PTRACE_XFER_SIZE 8
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define PTRACE_XFER_TYPE_LONG_LONG 1
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define PTRACE_ARG1_TYPE_LONG_LONG 1
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define PTRACE_ARG2_TYPE_LONG_LONG 1
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define PTRACE_ARG3_TYPE_LONG_LONG 1
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define PTRACE_ARG4_TYPE_LONG_LONG 1
+_ACEOF
+
+        ;;
+      n64)
+	cat >>confdefs.h <<\_ACEOF
+#define MIPS_ABI_N64 1
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define PTRACE_XFER_SIZE 8
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define PTRACE_XFER_TYPE_LONG 1
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define PTRACE_ARG1_TYPE_LONG 1
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define PTRACE_ARG2_TYPE_LONG 1
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define PTRACE_ARG3_TYPE_LONG 1
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define PTRACE_ARG4_TYPE_LONG 1
+_ACEOF
+
+        ;;
+    esac
     ;;
   mips*linux*)
     cat >>confdefs.h <<\_ACEOF

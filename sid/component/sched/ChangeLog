@@ -6,14 +6,15 @@
 	yield_host_time_threshold.
 	(class scheduler_component): New members: enable_threshold,
 	yield_host_time_threshold.
-	(scheduler_component::advance): Check enable_p against enable_threshold.
-	Check yield_host_time_p against yield_host_time_theshold.
+	(scheduler_component::advance): Check enable_p against
+	enable_threshold.  Check yield_host_time_p against
+	yield_host_time_theshold.
 	(scheduler_component): Initialize enable_threshold, enable_p,
 	yield_host_time_p and yield_host_time_threshold.
 	(scheduler_component_ctor_1): Add attributes 'enable-threshold' and
 	'yield-host-time-threshold'.
-	* sid-sched.xml (enabled?): Update defscription.
-	(yield-host-time): Update defscription.
+	* sid-sched.xml (enabled?): Update description.
+	(yield-host-time): Update description.
 	(enable-threshold): New attribute.
 	(yield-host-time-threshold): New attribute.
 	* sid-sched.txt: Regenerate.

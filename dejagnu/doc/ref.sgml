@@ -3458,11 +3458,12 @@
 	  <para>Search <emphasis>runtest</emphasis>s for
 	  <emphasis>testcase</emphasis> and return <emphasis>1</emphasis> if
 	  found, <emphasis>0</emphasis> if not. <emphasis>runtests</emphasis>
-	  is a list of two elements.  The first is the pathname of the
-	  testsuite expect script running.  The second is a copy of what was on
+	  is a list of two elements.  The first is a copy of what was on
 	  the right side of the <emphasis>=</emphasis> if
 	  <programlisting>foo.exp="..."</programlisting>" was specified, or
-	  an empty string if no such argument is present. This is used by tools
+	  an empty string if no such argument is present. The second is the
+	  pathname of the current testcase under consideration.
+          This is used by tools
 	  like compilers where each testcase is a file.</para>
 
 	<funcsynopsis role="tcl"> 
@@ -3473,8 +3474,8 @@
 	<variablelist>
           <varlistentry>
 	    <term><parameter>runtests</parameter></term>
-	    <listitem><para>The pathname of the testsuite expect script
-	    running</para></listitem> 
+	    <listitem><para>The list of patterns to compare against.
+              </para></listitem> 
           </varlistentry>
           <varlistentry>
 	    <term><parameter>testcase</parameter></term>

@@ -308,13 +308,12 @@ proc psource { file } {
 # file names (ie: the "foo" in make check RUNTESTFLAGS="bar.exp=foo").
 # "glob" style expressions are supported as well as multiple files (with
 # spaces between them).
-# Eg: RUNTESTFLAGS="bar.exp=foo1.c foo2.c foo3*.c bar*.c"
+# Eg: RUNTESTFLAGS="bar.exp=foo1.c foo2.c foo3*.c bar/baz*.c"
 #
 proc runtest_file_p { runtests testcase } {
     if [string length [lindex $runtests 1]] {
-	set basename [file tail $testcase]
 	foreach ptn [lindex $runtests 1] {
-	    if [string match $ptn $basename] {
+	    if [string match "*/$ptn" $testcase] {
 		return 1
 	    }
 	    if [string match $ptn $testcase] {

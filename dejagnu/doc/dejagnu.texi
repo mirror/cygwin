@@ -2181,10 +2181,10 @@ otherwise it returns @code{NULL}.
 @cindex selecting a range of tests
 @cindex tests, running specifically
 Search @var{runtests} for @var{testcase} and return 1 if found, 0 if not.
-@var{runtests} is a list of two elements.  The first is the pathname of
-the testsuite expect script running.  The second is a copy of what was
+@var{runtests} is a list of two elements.  The first is a copy of what was
 on the right side of the @code{=} if @samp{foo.exp="@dots{}"} was specified,
-or an empty string if no such argument is present.
+or an empty string if no such argument is present.  The second is the 
+pathname of the current testcase under consideration.
 This is used by tools like compilers where each testcase is a file.
 
 @item prune_system_crud @var{system} @var{text}

@@ -53,11 +53,9 @@ $(TKHDIR)/../unix $(TKHDIR)/../win \
 TKTABLE_SOURCES = tkTable.c tkTableCell.c tkTableCellSort.c \
 tkTableCmds.c tkTableEdit.c tkTableTag.c tkTableWin.c tkTableUtil.c
 
-libgui_a_SOURCES = guitcl.h paths.c subcommand.c subcommand.h \
-xpmlib.c tclmain.c tkGraphCanvas.c \
-tkCanvEdge.c tkCanvLayout.c tkCanvLayout.h tclhelp.c tclgetdir.c \
-tclwinprint.c tclshellexe.c tclmapi.c tclwinfont.c	\
-tclwingrab.c tclwinmode.c tclwinpath.c tclmsgbox.c tclcursor.c \
+libgui_a_SOURCES = guitcl.h subcommand.c subcommand.h \
+tclwinprint.c tclshellexe.c paths.c \
+tclwingrab.c tclwinpath.c tclmsgbox.c tclcursor.c \
 tkWinPrintText.c tkWinPrintCanvas.c tkWarpPointer.c $(TKTABLE_SOURCES)
 
 ## Dependencies

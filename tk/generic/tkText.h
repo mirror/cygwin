@@ -628,10 +628,6 @@ typedef struct TkText {
 				 * horizontal scrollbar when view changes. */
     char *yScrollCmd;		/* Prefix of command to issue to update
 				 * vertical scrollbar when view changes. */
-    /* KHAMIS */
-    char *SyncCmd;		/* Used to synchronize more than editor with the
-    				 * same file*/
-				 
     int flags;			/* Miscellaneous flags;  see below for
 				 * definitions. */
 } TkText;

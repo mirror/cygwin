@@ -146,7 +146,6 @@ proc tkMessageBox {args} {
 	{-default "" "" ""}
         {-icon "" "" "info"}
         {-message "" "" ""}
-        {-modal "" "" ""}
         {-parent "" "" .}
         {-title "" "" " "}
         {-type "" "" "ok"}

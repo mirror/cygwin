@@ -111,7 +111,7 @@ test text-1.[incr i] {text options} {
 	lappend result [lindex $i 4]
     }
     set result
-} {blue {} {} 7 watch 0 {} fixed #012 5 #123 #234 0 green 45 100 47 2 3 82 raised #ffff01234567 21 yellow 0 0 0 0 disabled {1i 2i 3i 4i} {any old thing} 73 word {x scroll command} {test command}}
+} {blue {} {} 7 watch 0 {} fixed #012 5 #123 #234 0 green 45 100 47 2 3 82 raised #ffff01234567 21 yellow 0 0 0 0 disabled {1i 2i 3i 4i} {any old thing} 73 word {x scroll command} {test command} 8}
 
 test text-2.1 {Tk_TextCmd procedure} {
     list [catch {text} msg] $msg

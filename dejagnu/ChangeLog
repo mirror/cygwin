@@ -1,3 +1,23 @@
+2002-04-19  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	Import the following files from the dejagnu repository:
+	* .clean: New file.
+	* Clean.tcl: New file.
+	* config.sub: New file.
+	* dejagnu.h: New file.
+	* missing: New file
+	* redhat: New directory.
+	* redhat/dejagnu.spec: New file.
+	* debian: New file.
+	* debian/ChangeLog: New file.
+	* debian/conffiles : New file.
+	* debian/control : New file.
+	* debian/copyright : New file.
+	* debian/postinst : New file.
+	* debian/preinst : New file.
+	* debian/rules : New file.
+	* debian/site.exp : New file.
+
 2002-04-14  Elena Zannoni  <ezannoni@redhat.com>
 
 	* baseboards/powerpc-sim.exp: Don't disable inferior

@@ -1,3 +1,8 @@
+2005-02-12  Frank Ch. Eigler  <fche@elastic.org>
+
+	* gdbserv-state.c (gdbserv_fromclient_break): Fix statementless
+	label at end of block.
+
 2004-08-11  Dave Brolley  <brolley@redhat.com>
 
 	* gdb.cxx (read_bus_word): Handle bus::misaligned. Return type now

@@ -85,6 +85,7 @@ private:
     armTimer *host;
   };
   friend class bus_interface;
+  friend class armTimerSched;
 
 protected:
   virtual void tick();

@@ -1327,7 +1327,7 @@ class scheduler_component: public scheduler_component_base
   Scheduler sched;
   typedef scheduler_component<Scheduler> this_t;
   typedef scheduler_client<this_t> client_t;
-  friend class client_t;
+  friend class scheduler_client<this_t>;
 
   vector<client_t*> clients;  
   host_int_1 num_clients;

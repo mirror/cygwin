@@ -1,3 +1,7 @@
+2005-02-12  Frank Ch. Eigler  <fche@elastic.org>
+
+	* compSched.cxx (scheduler_component): Clarify friend decl.
+
 2003-10-07  Dave Brolley  <brolley@redhat.com>
 
 	For Graydon Hoare  <graydon@redhat.com>

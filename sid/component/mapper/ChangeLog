@@ -1,3 +1,8 @@
+2005-02-12  Frank Ch. Eigler  <fche@elastic.org>
+
+	* compMapper.cxx (read/write_strideoffset_any, read/write_any):
+	Move these generic_mapper_bus functions out of line.
+
 2003-02-13  Dave Brolley  <brolley@redhat.com>
 
 	* compMapper.cxx (make_name_mapping): Compute the upper bound of a

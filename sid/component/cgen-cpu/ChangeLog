@@ -1,3 +1,7 @@
+2002-12-02  Frank Ch. Eigler  <fche@redhat.com>
+
+	* tracedis.c: s/boolean/bfd_boolean/ throughout, to match bfd change.
+
 2002-11-29  Ben Elliston  <bje@redhat.com>
  
 	* common-xml/interface.xml (print-insn-summary!): New pin.

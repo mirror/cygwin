@@ -1,8 +1,83 @@
+2001-08-11  Mo DeJong  <mdejong@cygnus.com>
+
+	* win/Makefile.in: Don't generate a def file by
+	filtering the output of running nm over the object
+	files. Generate an import library as a side
+	effect of creating the dll. Avoid creating the dll
+	multiple times when building with gcc.
+
+2001-08-11  Mo DeJong  <mdejong@cygnus.com>
+
+	* win/Makefile.in: Add console and tixwishres objects
+	to WISHOBJS variable.
+
+2001-08-11  Mo DeJong  <mdejong@cygnus.com>
+
+	* generic/tixForm.c:
+	* generic/tixGrFmt.c:
+	* generic/tixGrRC.c:
+	* generic/tixGrSel.c:
+	* generic/tixGrSort.c:
+	* generic/tixGrid.c:
+	* generic/tixItcl.c:
+	* generic/tixItcl.h:
+	* generic/tixMethod.c:
+	* unix/samAppInit.c: Define TCL_STORAGE_CLASS as
+	DLLEXPORT when BUILD_tix is define to fix dll export
+	declarations under Windows.
+
+2001-08-09  Mo DeJong  <mdejong@cygnus.com>
+
+	* win/Makefile.in: Remove unused LD variable. Fix up
+	a couple of object rules so that the -c argument
+	is only passed to CC once.
+	* win/configure: Regen.
+	* win/configure.in: Use AC_CANONICAL_HOST and AC_CHECK_TOOL
+	macros to figure out cross tool name like NM instead of
+	just looking at environment variables.
+
+2001-08-09  Mo DeJong  <mdejong@cygnus.com>
+
+	* win/Makefile.in: Add CYGWIN and GCC variables and use
+	them to support building with Cygwin, Mingw, and VC++.
+	Remove unused nmake variables. Use GCC instead of OBJEXT
+	to switch between gcc and VC++ style build rules. Don't
+	pass libraries that are added by default when linking
+	with CC instead of LD.
+	* win/configure: Regen.
+	* win/configure.in: Call AC_CYGWIN, define CYGWIN and
+	subst it into the Makefile. Subst GCC into the Makefile.
+
+2001-07-12  Mo DeJong  <mdejong@cygnus.com>
+
+	* win/Makefile.in: Compile the tkConsole81.c file when
+	building tix for Tcl/Tk 8.3.
+
+2001-07-12  Mo DeJong  <mdejong@cygnus.com>
+
+	* configure:
+	* configure.in: Add support for mingw32 and windows32 hosts.
+
+2001-06-01  Mo DeJong  <mdejong@cygnus.com>
+
+	* win/Makefile.in: Add build targets to support Tcl/Tk 8.3.
+
+2001-03-27  Ian Roxborough  <irox@redhat.com>
+
+	* unix/tk8.3:  New directory for tcl/tk8.3 support.
+
+	* unix/tk8.3/Makefile.in
+	* unix/tk8.3/aclocal.m4
+	* unix/tk8.3/configure
+	* unix/tk8.3/configure.in
+	* unix/tk8.3/pkgIndex.tcl.in
+	* unix/tk8.3/tixAppInit.c: New files for tcl/tk8.3 support.
+	
 2000-01-26  DJ Delorie  <dj@cygnus.com>
 
 	* win/tixWCmpt.c (DllMain): Use _imp__ instead of __imp_
 
-1999-12-06  Mo DeJong <mdejong@cygnus.com>
+1999-12-06  Mo DeJong  <mdejong@cygnus.com>
 
 	* win/Makefile.in: removed export of symbols that start with _real@.
 	this is needed for VC++ 6.0

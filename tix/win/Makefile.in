@@ -10,10 +10,11 @@ CC = @CC@
 CFLAGS = @CFLAGS@
 NM = @NM@
 AS = @AS@
-LD = @LD@
 DLLTOOL = @DLLTOOL@
 WINDRES = @WINDRES@
 OBJEXT = @OBJEXT@
+CYGWIN = @CYGWIN@
+GCC = @GCC@
 
 # makefile.vc --
 #
@@ -203,6 +204,48 @@ CONSOLE_OBJ = tkConsole81.$(OBJEXT)
 endif
 
 
+ifeq ($(TCL_VER),8.3)
+
+TMPDIR	= tcl8.3
+TCLDIR	= ../../tcl8.1
+TCLSRCDIR = $(srcdir)/../../tcl8.1
+TKDIR	= ../../tk8.1
+TKSRCDIR = $(srcdir)/../../tk8.1
+
+ifeq ($(CYGWIN),yes)
+TCLLIB  = libcygtcl83.a
+TKLIB   = libcygtk83.a
+TIXLIB  = $(TMPDIR)/libtix4183.a
+TIXLIBNAME = libtix4183.a
+TIXDLL  = $(TMPDIR)/cygtix4183.dll
+TIXDLLNAME = cygtix4183.dll
+else
+ifeq ($(GCC),yes)
+TCLLIB  = librhtcl83.a
+TKLIB   = librhtk83.a
+TIXLIB  = $(TMPDIR)/libtix4183.a
+TIXLIBNAME = libtix4183.a
+TIXDLL  = $(TMPDIR)/tix4183.dll
+TIXDLLNAME = tix4183.dll
+else
+TCLLIB  = rhtcl83.lib
+TKLIB   = rhtk83.lib
+TIXRAWLIBNAME = $(TMPDIR)/tix4183.lib
+TIXLIB  = $(TMPDIR)/libtix4183.a
+TIXLIBNAME = libtix4183.a
+TIXDLL  = $(TMPDIR)/tix4183.dll
+TIXDLLNAME = tix4183.dll
+endif
+endif
+
+TIXWISH = $(TMPDIR)/tix4183.exe
+TIXWISHNAME = tix4183.exe
+
+CONSOLE_OBJ = tkConsole81.$(OBJEXT)
+
+endif
+
+
 ifeq ($(TCL_VER),2.2i)
 
 TMPDIR	= itcl2.2
@@ -247,18 +290,11 @@ ROOT	= ..
 # uncomment the following two lines to compile with TCL_MEM_DEBUG
 #DEBUGDEFINES	=-DTCL_MEM_DEBUG
 
-# Make sure the VC++ tools are at the head of the path
-#PATH=$(TOOLS32)\bin;$(PATH)
-
 TCLLIBDIR       = $(TCLDIR)/win
 TKLIBDIR	= $(TKDIR)/win
 WINDIR		= $(ROOT)/win
 GENERICDIR	= $(ROOT)/generic
 XLIBDIR		= $(ROOT)/xlib
-
-cc32 = $(TOOLS32)\bin\cl -I$(TOOLS32)\include
-rc32 = $(TOOLS32)\bin\rc
-link32 = $(TOOLS32)\bin\link
 
 #----------------------------------------------------------------------
 # You shouldn't normally modify anything below this line
@@ -274,10 +310,11 @@ TK_DEFINES = \
 	-nologo $(DEBUGDEFINES)
 
 WISHOBJS = \
-	$(TMPDIR)/tixWinMain.$(OBJEXT)
+	$(TMPDIR)/tixWinMain.$(OBJEXT) \
+	$(TMPDIR)/$(CONSOLE_OBJ) \
+	$(TMPDIR)/tixwishres.$(OBJEXT)
 
 TIXOBJS = \
-	$(TMPDIR)/$(CONSOLE_OBJ)  \
 	$(TMPDIR)/tixClass.$(OBJEXT)    \
 	$(TMPDIR)/tixCmds.$(OBJEXT)     \
 	$(TMPDIR)/tixCompat.$(OBJEXT)   \
@@ -325,13 +362,6 @@ CP = copy
 
 all:    $(TIXDLL) $(TIXWISH)
 
-$(TMPDIR)/tixcyg.def: $(TIXOBJS)
-	echo 'EXPORTS' > tmp.def
-	for o in $(TIXOBJS); do \
-	  $(NM) --extern-only --defined-only $$o | sed -e 's/[^ ]* [^ ]* //' -e 's/^_//' | fgrep -v DllEntryPoint | fgrep -v DllMain | fgrep -v impure_ptr | fgrep -v _real@ >> tmp.def; \
-	done
-	mv tmp.def $(TMPDIR)/tixcyg.def
-
 # USE THESE IF YOU DO NOT WANT TO LINK TO ON MSVCRT.DLL
 #XGUILIBS = $(guilibs)
 #XCVARS   = $(cvars)
@@ -342,35 +372,33 @@ XCVARS   = $(cvarsdll)
 # (ToDo) $(TIXDLL) doesn't have resources to define its icon, etc.
 #
 
-ifeq ($(OBJEXT),o)
+ifeq ($(GCC),yes)
 
-$(TIXDLL): $(TIXOBJS) $(TMPDIR)/tixcyg.def
-	$(CC) -s -nostartfiles -Wl,--base-file,tix.base -Wl,--dll -o $(TIXDLLNAME) $(TIXOBJS) $(TKLIBDIR)/$(TKLIB) $(TCLLIBDIR)/$(TCLLIB) -lcygwin -ladvapi32 -luser32 -lgdi32 -lcomdlg32 -lkernel32 -Wl,--subsystem,windows -Wl,-e,_DllMain@12 -Wl,--image-base,0x66600000
-	$(DLLTOOL) --as=$(AS) --dllname $(TIXDLLNAME) --def $(TMPDIR)/tixcyg.def --base-file tix.base --output-exp tix.exp
-	$(CC) -s -nostartfiles -Wl,--base-file,tix.base -Wl,tix.exp -Wl,-dll -o $(TIXDLLNAME) $(TIXOBJS) $(TKLIBDIR)/$(TKLIB) $(TCLLIBDIR)/$(TCLLIB) -lcygwin -ladvapi32 -luser32 -lgdi32 -lcomdlg32 -lkernel32 -Wl,--subsystem,windows -Wl,-e,_DllMain@12 -Wl,--image-base,0x66600000
-	$(DLLTOOL) --as=$(AS) --dllname $(TIXDLLNAME) --def $(TMPDIR)/tixcyg.def --base-file tix.base --output-exp tix.exp
-	$(CC) -nostartfiles -Wl,tix.exp -Wl,--dll -o $(TIXDLLNAME) $(TIXOBJS) $(TKLIBDIR)/$(TKLIB) $(TCLLIBDIR)/$(TCLLIB) -lcygwin -ladvapi32 -luser32 -lgdi32 -lcomdlg32 -lkernel32 -Wl,--subsystem,windows -Wl,-e,_DllMain@12 -Wl,--image-base,0x66600000
+$(TIXDLL): $(TIXOBJS)
+	$(CC) -shared -s -nostartfiles -o $(TIXDLLNAME) $(TIXOBJS) \
+	$(TKLIBDIR)/$(TKLIB) $(TCLLIBDIR)/$(TCLLIB) -lgdi32 \
+	-mwindows -e _DllMain@12 -Wl,--image-base,0x66600000 \
+	-Wl,--out-implib,$(TIXLIB)
 	cp $(TIXDLLNAME) $(TIXDLL)
 
-$(TIXLIB): $(TMPDIR)/tixcyg.def
-	$(DLLTOOL) --as=$(AS) --dllname $(TIXDLLNAME) --def $(TMPDIR)/tixcyg.def --output-lib $(TIXLIB)
+$(TIXLIB): $(TIXDLL)
 
-$(TIXWISH): $(WISHOBJS) $(TIXOBJS) $(TIXLIB) $(TMPDIR)/tixwishres.$(OBJEXT)
-	$(CC) -mwindows $(WISHOBJS) $(TMPDIR)/tixwishres.$(OBJEXT) $(TIXLIB) \
+$(TIXWISH): $(WISHOBJS) $(TIXLIB)
+	$(CC) -mwindows $(WISHOBJS) $(TIXLIB) \
 		$(TKLIBDIR)/$(TKLIB) $(TCLLIBDIR)/$(TCLLIB) \
 		-o $(TIXWISH)
 else
 
-$(TIXDLL): $(TIXOBJS) $(TMPDIR)/tixcyg.def
+$(TIXDLL): $(TIXOBJS)
 	link -debug -dll -out:$(TIXDLL) $(TKLIBDIR)/$(TKLIB) \
-	$(TCLLIBDIR)/$(TCLLIB) $(TIXOBJS) -def:$(TMPDIR)/tixcyg.def \
+	$(TCLLIBDIR)/$(TCLLIB) $(TIXOBJS) \
 	gdi32.lib user32.lib
 	mv $(TIXRAWLIBNAME) $(TIXLIB)
 
 $(TIXLIB): $(TIXDLL)
 
-$(TIXWISH): $(WISHOBJS) $(TIXOBJS) $(TIXLIB) $(TMPDIR)/tixwishres.$(OBJEXT)
-	link -DEBUG $(WISHOBJS) $(TMPDIR)/tixwishres.$(OBJEXT) $(TIXLIB) \
+$(TIXWISH): $(WISHOBJS) $(TIXLIB)
+	link -DEBUG $(WISHOBJS) $(TIXLIB) \
 		$(TKLIBDIR)/$(TKLIB) $(TCLLIBDIR)/$(TCLLIB) \
 		-OUT:$(TIXWISH) user32.lib
 endif
@@ -381,12 +409,12 @@ endif
 #
 
 $(TMPDIR)/testMain.$(OBJEXT): $(ROOT)/win/tixWinMain.c
-	$(CC) -c $(TK_INCLUDES) -DSTATIC_BUILD -DTK_TEST $(CFLAGS) -o $@ $?
+	$(CC) $(TK_INCLUDES) -DSTATIC_BUILD -DTK_TEST $(CFLAGS) -c -o $@ $?
 
 $(TMPDIR)/tixWinMain.$(OBJEXT): $(ROOT)/win/tixWinMain.c
-	$(CC) -c $(TK_INCLUDES) -DSTATIC_BUILD $(CFLAGS) -o $@ $?
+	$(CC) $(TK_INCLUDES) -DSTATIC_BUILD $(CFLAGS) -c -o $@ $?
 
-ifeq ($(OBJEXT),o)
+ifeq ($(GCC),yes)
 
 $(TMPDIR)/tixwishres.$(OBJEXT): $(ROOT)/win/rc/tixwish.rc
 	$(WINDRES) --include $(srcdir)/rc --include $(srcdir)/../generic --define VS_VERSION_INFO=1 $(srcdir)/rc/tixwish.rc $(TMPDIR)/tixwishres.$(OBJEXT)
@@ -402,13 +430,13 @@ endif
 #
 
 .c.$(OBJEXT):
-	$(CC) -c $(CFLAGS) -DDLL_BUILD -DBUILD_tix $(TK_INCLUDES) -c -o $@ $<
+	$(CC) $(CFLAGS) -DDLL_BUILD -DBUILD_tix $(TK_INCLUDES) -c -o $@ $<
 
 $(TMPDIR)/%.$(OBJEXT): %.c
-	$(CC) -c $(CFLAGS) -DDLL_BUILD -DBUILD_tix $(TK_INCLUDES) -c -o $@ $<
+	$(CC) $(CFLAGS) -DDLL_BUILD -DBUILD_tix $(TK_INCLUDES) -c -o $@ $<
 
 clean:
-	rm -f $(TMPDIR)/*.$(OBJEXT) $(TMPDIR)/*.exp $(TMPDIR)/*.def 
+	rm -f $(TMPDIR)/*.$(OBJEXT) $(TMPDIR)/*.exp 
 	rm -f $(TIXLIB) $(TIXDLL) $(TIXDLLNAME) $(TIXWISH)
 
 Makefile: $(srcdir)/Makefile.in config.status

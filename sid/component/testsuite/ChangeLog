@@ -1,3 +1,21 @@
+2001-08-02  John Healy  <jhealy@redhat.com>
+
+	* lib/cpudefs.exp (run-sid-tests-raw): Renamed loader to cpu-loader.
+	(run-one-sid-test): Removed un-necessary setting of sid-opts.
+	
+2001-08-02  Dave Brolley  <brolley@redhat.com>
+
+	* lib/cpudefs.exp: Rename loader to cpu-loader.
+
+2001-07-27  John Healy  <jhealy@redhat.com>
+
+	* lib/cpudefs.exp (run-one-sid-test): Added check to see if
+	protocol was set to sid the baseboard/<target>-sid.exp file
+	and if so, set sid-opts accordingly.
+	(sid-run-conf):  Essentially re-written to properly implement
+	perl-free testing.  Fixed the call to sid-run-conf.
+	(sid-run-bsp-tests): Added handling for perl-free testing.
+
 2001-07-23  graydon hoare  <graydon@redhat.com>
 
 	* sidcomp.mapper/basicmapper.exp: Add tests for mapping
@@ -39,6 +57,14 @@
 
 	* sidcomp.audio/linusraw.exp (deassert tx): Mark test as XFAIL.
 
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* lib/docs.exp (doc_exists): Add "extension" arg. Update callers.
+	(doc_trailing_whitespace): Remove.
+	(doc_test): Don't invoke doc_trailing_whitespace. Test for the
+	existence of both .txt and .xml documentation files.
+	(doc_includes_component): Adjust regexp for XML syntax.
+
 2001-06-29  Ben Elliston  <bje@redhat.com>
 
 	* sidcomp.interrupt/cma222-interrupt.exp: Return the right
@@ -58,7 +84,6 @@
 	* sidcomp.cfgroot/multiCB.expect: Likewise.
 	* sidcomp.cfgroot/multiCP.expect: Likewise.
 
-	* sidcomp.cfgroot/setInvAtt.badconf: Remove ARM-specific parts.
 	* sidcomp.cfgroot/setInvAtt.badconf: Remove ARM-specific parts.
 	* sidcomp.cfgroot/setInvAttV.badconf: Likewise.
 	* sidcomp.cfgroot/setInvComp.badconf: Likewise.
@@ -194,9 +219,19 @@
 
 2001-05-31  Ben Elliston  <bje@redhat.com>
 
-	* lib/docs.exp (doc_includes_component): Fail on regexp misses.
+	* lib/docs.exp (doc_includes_component): Don't pass failures!
 	* lib/monkey.exp (monkey_test): Re-enable tests.
 	* sidcomp.ide/diskio.exp: Unset $contents at completion.
+
+2001-05-29  matthew green  <mrg@redhat.com>
+
+	* sidcomp.cgen-cpu.arm7t/armeit.conf: Update for new
+	--trace-semantics, etc. options.
+
+2001-05-23  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (EXPECT): Define.
+	* Makefile.in: Regenerate.
 
 2001-05-17  Ben Elliston  <bje@redhat.com>
 
@@ -234,6 +269,11 @@
 	* sidcomp.timers/timerdocs.exp: Look for ARM timer doco in the
 	timers/arm7t subdirectory.
 
+2001-04-04  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (RUNTEST): Define.
+	* Makefile.in: Regenerate.
+
 2001-03-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidcomp.bsp/armbsp.exp: Adapt to modern combined arm/thumb gcc.
@@ -258,14 +298,14 @@
 
 2001-01-14  matthew green  <mrg@redhat.com>
 
-	* sidcomp.loader/loader.exp: New test.
+        * sidcomp.loader/loader.exp: New test.
 	* sidcomp.loader/x32.x: Elf32 test file.
 	* sidcomp.loader/x64.x: Elf64 test file.
 
 2001-01-12  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* sidcomp.glue/gluemonkey.exp: Add test for hw-glue-bus-mux.
-	* sidcomp.glue/gluedocs.exp: Add hw-glue-bus-mux.txt.
+        * sidcomp.glue/gluemonkey.exp: Add test for hw-glue-bus-mux.
+        * sidcomp.glue/gluedocs.exp: Add hw-glue-bus-mux.txt.
 
 2000-11-27  Frank Ch. Eigler  <fche@redhat.com>
 

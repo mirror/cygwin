@@ -306,7 +306,7 @@ esac
 #
 # gdb linked statically w/ SunOS or HPUX, but not hpux11 wide
 #
-	hppa*w-hp-hpux*)
+	hppa*64*-hp-hpux*)
 	    ;;
 
         m68k-hp-hpux*|hppa*-hp-hpux*|sparc-sun-sunos*)

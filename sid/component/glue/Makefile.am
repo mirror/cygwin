@@ -17,3 +17,6 @@ pkgdata_DATA = hw-glue-sequence.txt hw-glue-probe-bus.txt sw-glue-attribbank.txt
 check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
 
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs

@@ -8,6 +8,35 @@
 
 	* Makefile.am (check-local): Rename target from "checkme".
 
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* *.xml: Add <?xml ... ?> prefix.
+
+2001-07-04  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add maintainer-mode doc building configury.
+	* configure: Regenerate.
+	* Makefile.am: Add maintainer-mode doc building.
+	* Makefile.in: Regenerate.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* hw-glue-probe-bus.txt: Generate.
+	* hw-glue-sequence.txt: Likewise.
+	* hw-glue-bus-mux.txt: Likewise.
+	* sw-glue-attribbank.txt: Likewise.
+
+2001-06-28  Ben Elliston  <bje@redhat.com>
+
+	* hw-glue-probe-bus.xml: Merge in changes since 2001-06-01.
+
+2001-06-27  graydon hoare  <graydon@redhat.com>
+
+	* sw-glue-attribbank.xml: Add.
+	* hw-glue-probe-bus.xml: Add.
+	* hw-glue-sequence.xml: Add.
+	* hw-glue-bus-mux.xml: Add.
+
 2001-06-23  Frank Ch. Eigler  <fche@redhat.com>
 
 	* glue.cxx (probing_bus::traceAccess): Print non-zero latency.
@@ -17,10 +46,14 @@
 
 	* glue.cxx (probing_bus::traceAccess): Omit bus::delayed.
 
-2001-03-28  Dave Brolley  <brolley@redhat.com>
+2001-03-27  Dave Brolley  <brolley@redhat.com>
 
 	* hw-glue-bus-mux.txt: Update description of switching behavior.
 	* glue.cxx (bus_mux::handle_switch_pin): Call upstream.select_bus.
+
+2001-03-23  John Healy  <jhealy@redhat.com>
+
+	* Makefile.in: Regenerated.
 
 2001-01-12  Jeff Johnston  <jjohnstn@redhat.com>
 
@@ -30,7 +63,7 @@
 	(create): Ditto.
 	(do_delete): Ditto.
 	* hw-glue-bus-mux.txt: New documentation for bus_mux.
-	* Makefile.am: Add reference to new documentation.
+	* Makefile.am: Added new bus_mux documentation.
 	* Makefile.in: Regenerated.
 
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>

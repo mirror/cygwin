@@ -1,3 +1,8 @@
+2005-02-22  Alan Modra  <amodra@bigpond.net.au>
+
+	* desc-cpu.scm (gen-ifld-decls): Move cgen_ifld_table from here..
+	(cgen-desc.h): ..to here, after opcode/cgen.h include.
+
 2005-02-16  Dave Brolley  <brolley@redhat.com>
 
 	* utils.scm: Update copyright years.

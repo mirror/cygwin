@@ -105,7 +105,7 @@ pkglib_LTLIBRARIES = libinterrupt.la
 
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include
 
-libinterrupt_la_SOURCES = arm.h arm.cxx cma22.h cma222.cxx \
+libinterrupt_la_SOURCES = arm.h arm.cxx cma222.h cma222.cxx \
 			  components.h components.cxx
 
 libinterrupt_la_LDFLAGS = -module -no-undefined

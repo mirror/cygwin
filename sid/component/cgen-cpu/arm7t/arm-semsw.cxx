@@ -2,9 +2,9 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 
-This file is part of the Cygnus Simulators.
+This file is part of the Red Hat simulators.
 
 
 */
@@ -24,63 +24,68 @@ typedef enum arm_frag_type {
   ARM_FRAG_LIST_END, ARM_FRAG_MVN_REG_REG_SHIFT_HDR, ARM_FRAG_CMP_REG_REG_SHIFT_HDR, ARM_FRAG_TST_REG_REG_SHIFT_HDR
  , ARM_FRAG_ORR_REG_REG_SHIFT_HDR, ARM_FRAG_MVN_REG_IMM_SHIFT_HDR, ARM_FRAG_CMP_REG_IMM_SHIFT_HDR, ARM_FRAG_TST_REG_IMM_SHIFT_HDR
  , ARM_FRAG_ORR_REG_IMM_SHIFT_HDR, ARM_FRAG_STRB_POST_INC_NONPRIV_REG_OFFSET_HDR, ARM_FRAG_LDR_PRE_DEC_WB_REG_OFFSET_HDR, ARM_FRAG_LDR_POST_INC_NONPRIV_REG_OFFSET_HDR
- , ARM_FRAG_STR_POST_DEC_REG_OFFSET_HDR, ARM_FRAG_LDR_POST_DEC_NONPRIV_REG_OFFSET_HDR, ARM_FRAG_STRB_POST_DEC_NONPRIV_IMM_OFFSET_HDR, ARM_FRAG_LDRB_POST_DEC_NONPRIV_IMM_OFFSET_HDR
- , ARM_FRAG_LDR_POST_DEC_NONPRIV_IMM_OFFSET_HDR, ARM_FRAG_X_HEADER, ARM_FRAG_TST_REG_REG_SHIFT_TRLR, ARM_FRAG_TEQ_REG_IMM_SHIFT_TRLR
- , ARM_FRAG_AND_IMM_TRLR, ARM_FRAG_AND_REG_REG_SHIFT_TRLR, ARM_FRAG_ORR_REG_IMM_SHIFT_TRLR, ARM_FRAG_UMULL_TRLR
- , ARM_FRAG_LDR_PRE_INC_IMM_OFFSET_TRLR, ARM_FRAG_LDRB_PRE_DEC_REG_OFFSET_TRLR, ARM_FRAG_STR_PRE_DEC_REG_OFFSET_TRLR, ARM_FRAG_STR_PRE_DEC_IMM_OFFSET_TRLR
- , ARM_FRAG_STRH_PRE_DEC_IMM_OFFSET_TRLR, ARM_FRAG_LDRSB_PRE_DEC_IMM_OFFSET_TRLR, ARM_FRAG_LDR_PRE_DEC_IMM_OFFSET_TRLR, ARM_FRAG_LDR_PRE_INC_REG_OFFSET_TRLR
- , ARM_FRAG_LDR_PRE_INC_WB_IMM_OFFSET_TRLR, ARM_FRAG_LDRB_PRE_DEC_WB_REG_OFFSET_TRLR, ARM_FRAG_STR_PRE_DEC_WB_REG_OFFSET_TRLR, ARM_FRAG_STR_PRE_DEC_WB_IMM_OFFSET_TRLR
- , ARM_FRAG_STRH_PRE_DEC_WB_IMM_OFFSET_TRLR, ARM_FRAG_LDRSB_PRE_DEC_WB_IMM_OFFSET_TRLR, ARM_FRAG_LDR_PRE_DEC_WB_IMM_OFFSET_TRLR, ARM_FRAG_LDR_PRE_INC_WB_REG_OFFSET_TRLR
- , ARM_FRAG_STRB_POST_INC_REG_OFFSET_TRLR, ARM_FRAG_STR_POST_INC_REG_OFFSET_TRLR, ARM_FRAG_STR_POST_INC_IMM_OFFSET_TRLR, ARM_FRAG_LDRB_POST_INC_REG_OFFSET_TRLR
- , ARM_FRAG_STRB_POST_DEC_REG_OFFSET_TRLR, ARM_FRAG_STR_POST_DEC_REG_OFFSET_TRLR, ARM_FRAG_STR_POST_DEC_IMM_OFFSET_TRLR, ARM_FRAG_LDRB_POST_DEC_REG_OFFSET_TRLR
- , ARM_FRAG_X_TRAILER, ARM_FRAG_X_COND_MID, ARM_FRAG_X_AFTER_MID, ARM_FRAG_X_BEFORE_MID
- , ARM_FRAG_X_CTI_CHAIN_MID, ARM_FRAG_X_CHAIN_MID, ARM_FRAG_X_BEGIN_MID, ARM_FRAG_X_INVALID_MID
- , ARM_FRAG_B_MID, ARM_FRAG_BL_MID, ARM_FRAG_BX_MID, ARM_FRAG_LDR_POST_DEC_IMM_OFFSET_MID
- , ARM_FRAG_LDR_POST_DEC_REG_OFFSET_MID, ARM_FRAG_LDR_POST_INC_IMM_OFFSET_MID, ARM_FRAG_LDR_POST_INC_REG_OFFSET_MID, ARM_FRAG_LDR_POST_DEC_NONPRIV_IMM_OFFSET_MID
- , ARM_FRAG_LDR_POST_DEC_NONPRIV_REG_OFFSET_MID, ARM_FRAG_LDR_POST_INC_NONPRIV_IMM_OFFSET_MID, ARM_FRAG_LDR_POST_INC_NONPRIV_REG_OFFSET_MID, ARM_FRAG_LDR_PRE_DEC_IMM_OFFSET_MID
- , ARM_FRAG_LDR_PRE_DEC_REG_OFFSET_MID, ARM_FRAG_LDR_PRE_INC_IMM_OFFSET_MID, ARM_FRAG_LDR_PRE_INC_REG_OFFSET_MID, ARM_FRAG_LDR_PRE_DEC_WB_IMM_OFFSET_MID
- , ARM_FRAG_LDR_PRE_DEC_WB_REG_OFFSET_MID, ARM_FRAG_LDR_PRE_INC_WB_IMM_OFFSET_MID, ARM_FRAG_LDR_PRE_INC_WB_REG_OFFSET_MID, ARM_FRAG_LDRB_POST_DEC_IMM_OFFSET_MID
- , ARM_FRAG_LDRB_POST_INC_IMM_OFFSET_MID, ARM_FRAG_LDRB_POST_DEC_NONPRIV_IMM_OFFSET_MID, ARM_FRAG_LDRB_POST_INC_NONPRIV_IMM_OFFSET_MID, ARM_FRAG_LDRB_PRE_DEC_IMM_OFFSET_MID
- , ARM_FRAG_LDRB_PRE_DEC_REG_OFFSET_MID, ARM_FRAG_LDRB_PRE_INC_IMM_OFFSET_MID, ARM_FRAG_LDRB_PRE_INC_REG_OFFSET_MID, ARM_FRAG_LDRB_PRE_DEC_WB_IMM_OFFSET_MID
- , ARM_FRAG_LDRB_PRE_DEC_WB_REG_OFFSET_MID, ARM_FRAG_LDRB_PRE_INC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRB_PRE_INC_WB_REG_OFFSET_MID, ARM_FRAG_STR_POST_DEC_IMM_OFFSET_MID
- , ARM_FRAG_STR_POST_INC_IMM_OFFSET_MID, ARM_FRAG_STR_POST_DEC_NONPRIV_IMM_OFFSET_MID, ARM_FRAG_STR_POST_INC_NONPRIV_IMM_OFFSET_MID, ARM_FRAG_STR_PRE_DEC_IMM_OFFSET_MID
- , ARM_FRAG_STR_PRE_DEC_REG_OFFSET_MID, ARM_FRAG_STR_PRE_INC_IMM_OFFSET_MID, ARM_FRAG_STR_PRE_INC_REG_OFFSET_MID, ARM_FRAG_STR_PRE_DEC_WB_IMM_OFFSET_MID
- , ARM_FRAG_STR_PRE_DEC_WB_REG_OFFSET_MID, ARM_FRAG_STR_PRE_INC_WB_IMM_OFFSET_MID, ARM_FRAG_STR_PRE_INC_WB_REG_OFFSET_MID, ARM_FRAG_STRB_POST_DEC_IMM_OFFSET_MID
- , ARM_FRAG_STRB_POST_INC_IMM_OFFSET_MID, ARM_FRAG_STRB_POST_DEC_NONPRIV_IMM_OFFSET_MID, ARM_FRAG_STRB_POST_INC_NONPRIV_IMM_OFFSET_MID, ARM_FRAG_STRB_POST_INC_NONPRIV_REG_OFFSET_MID
- , ARM_FRAG_STRB_PRE_DEC_IMM_OFFSET_MID, ARM_FRAG_STRB_PRE_DEC_REG_OFFSET_MID, ARM_FRAG_STRB_PRE_INC_IMM_OFFSET_MID, ARM_FRAG_STRB_PRE_INC_REG_OFFSET_MID
- , ARM_FRAG_STRB_PRE_DEC_WB_IMM_OFFSET_MID, ARM_FRAG_STRB_PRE_DEC_WB_REG_OFFSET_MID, ARM_FRAG_STRB_PRE_INC_WB_IMM_OFFSET_MID, ARM_FRAG_STRB_PRE_INC_WB_REG_OFFSET_MID
- , ARM_FRAG_STRH_PRE_DEC_IMM_OFFSET_MID, ARM_FRAG_STRH_PRE_DEC_REG_OFFSET_MID, ARM_FRAG_STRH_PRE_INC_IMM_OFFSET_MID, ARM_FRAG_STRH_PRE_INC_REG_OFFSET_MID
- , ARM_FRAG_STRH_PRE_DEC_WB_IMM_OFFSET_MID, ARM_FRAG_STRH_PRE_DEC_WB_REG_OFFSET_MID, ARM_FRAG_STRH_PRE_INC_WB_IMM_OFFSET_MID, ARM_FRAG_STRH_PRE_INC_WB_REG_OFFSET_MID
- , ARM_FRAG_STRH_POST_DEC_IMM_OFFSET_MID, ARM_FRAG_STRH_POST_DEC_REG_OFFSET_MID, ARM_FRAG_STRH_POST_INC_IMM_OFFSET_MID, ARM_FRAG_STRH_POST_INC_REG_OFFSET_MID
- , ARM_FRAG_LDRSB_PRE_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRSB_PRE_DEC_REG_OFFSET_MID, ARM_FRAG_LDRSB_PRE_INC_IMM_OFFSET_MID, ARM_FRAG_LDRSB_PRE_INC_REG_OFFSET_MID
- , ARM_FRAG_LDRSB_PRE_DEC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRSB_PRE_DEC_WB_REG_OFFSET_MID, ARM_FRAG_LDRSB_PRE_INC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRSB_PRE_INC_WB_REG_OFFSET_MID
- , ARM_FRAG_LDRSB_POST_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRSB_POST_DEC_REG_OFFSET_MID, ARM_FRAG_LDRSB_POST_INC_IMM_OFFSET_MID, ARM_FRAG_LDRSB_POST_INC_REG_OFFSET_MID
- , ARM_FRAG_LDRH_PRE_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRH_PRE_DEC_REG_OFFSET_MID, ARM_FRAG_LDRH_PRE_INC_IMM_OFFSET_MID, ARM_FRAG_LDRH_PRE_INC_REG_OFFSET_MID
- , ARM_FRAG_LDRH_PRE_DEC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRH_PRE_DEC_WB_REG_OFFSET_MID, ARM_FRAG_LDRH_PRE_INC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRH_PRE_INC_WB_REG_OFFSET_MID
- , ARM_FRAG_LDRH_POST_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRH_POST_DEC_REG_OFFSET_MID, ARM_FRAG_LDRH_POST_INC_IMM_OFFSET_MID, ARM_FRAG_LDRH_POST_INC_REG_OFFSET_MID
- , ARM_FRAG_LDRSH_PRE_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRSH_PRE_DEC_REG_OFFSET_MID, ARM_FRAG_LDRSH_PRE_INC_IMM_OFFSET_MID, ARM_FRAG_LDRSH_PRE_INC_REG_OFFSET_MID
- , ARM_FRAG_LDRSH_PRE_DEC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRSH_PRE_DEC_WB_REG_OFFSET_MID, ARM_FRAG_LDRSH_PRE_INC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRSH_PRE_INC_WB_REG_OFFSET_MID
- , ARM_FRAG_LDRSH_POST_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRSH_POST_DEC_REG_OFFSET_MID, ARM_FRAG_LDRSH_POST_INC_IMM_OFFSET_MID, ARM_FRAG_LDRSH_POST_INC_REG_OFFSET_MID
- , ARM_FRAG_MUL_MID, ARM_FRAG_MLA_MID, ARM_FRAG_UMULL_MID, ARM_FRAG_UMLAL_MID
- , ARM_FRAG_SMULL_MID, ARM_FRAG_SMLAL_MID, ARM_FRAG_SWP_MID, ARM_FRAG_SWPB_MID
- , ARM_FRAG_SWI_MID, ARM_FRAG_AND_REG_IMM_SHIFT_MID, ARM_FRAG_AND_REG_REG_SHIFT_MID, ARM_FRAG_AND_IMM_MID
- , ARM_FRAG_ORR_REG_IMM_SHIFT_MID, ARM_FRAG_ORR_REG_REG_SHIFT_MID, ARM_FRAG_ORR_IMM_MID, ARM_FRAG_EOR_REG_IMM_SHIFT_MID
- , ARM_FRAG_EOR_REG_REG_SHIFT_MID, ARM_FRAG_EOR_IMM_MID, ARM_FRAG_MOV_REG_IMM_SHIFT_MID, ARM_FRAG_MOV_REG_REG_SHIFT_MID
- , ARM_FRAG_MOV_IMM_MID, ARM_FRAG_BIC_REG_IMM_SHIFT_MID, ARM_FRAG_BIC_REG_REG_SHIFT_MID, ARM_FRAG_BIC_IMM_MID
- , ARM_FRAG_MVN_REG_IMM_SHIFT_MID, ARM_FRAG_MVN_REG_REG_SHIFT_MID, ARM_FRAG_MVN_IMM_MID, ARM_FRAG_ADD_REG_IMM_SHIFT_MID
- , ARM_FRAG_ADD_REG_REG_SHIFT_MID, ARM_FRAG_ADD_IMM_MID, ARM_FRAG_ADC_REG_IMM_SHIFT_MID, ARM_FRAG_ADC_REG_REG_SHIFT_MID
- , ARM_FRAG_ADC_IMM_MID, ARM_FRAG_SUB_REG_IMM_SHIFT_MID, ARM_FRAG_SUB_REG_REG_SHIFT_MID, ARM_FRAG_SUB_IMM_MID
- , ARM_FRAG_SBC_REG_IMM_SHIFT_MID, ARM_FRAG_SBC_REG_REG_SHIFT_MID, ARM_FRAG_SBC_IMM_MID, ARM_FRAG_RSB_REG_IMM_SHIFT_MID
- , ARM_FRAG_RSB_REG_REG_SHIFT_MID, ARM_FRAG_RSB_IMM_MID, ARM_FRAG_RSC_REG_IMM_SHIFT_MID, ARM_FRAG_RSC_REG_REG_SHIFT_MID
- , ARM_FRAG_RSC_IMM_MID, ARM_FRAG_TST_REG_IMM_SHIFT_MID, ARM_FRAG_TST_REG_REG_SHIFT_MID, ARM_FRAG_TST_IMM_MID
- , ARM_FRAG_TEQ_REG_IMM_SHIFT_MID, ARM_FRAG_TEQ_REG_REG_SHIFT_MID, ARM_FRAG_TEQ_IMM_MID, ARM_FRAG_CMP_REG_IMM_SHIFT_MID
- , ARM_FRAG_CMP_REG_REG_SHIFT_MID, ARM_FRAG_CMP_IMM_MID, ARM_FRAG_CMN_REG_IMM_SHIFT_MID, ARM_FRAG_CMN_REG_REG_SHIFT_MID
- , ARM_FRAG_CMN_IMM_MID, ARM_FRAG_LDMDA_MID, ARM_FRAG_LDMDA_WB_MID, ARM_FRAG_LDMIB_MID
- , ARM_FRAG_LDMIB_WB_MID, ARM_FRAG_LDMIA_MID, ARM_FRAG_LDMIA_WB_MID, ARM_FRAG_LDMDB_MID
- , ARM_FRAG_LDMDB_WB_MID, ARM_FRAG_STMDB_MID, ARM_FRAG_STMDB_WB_MID, ARM_FRAG_STMIB_MID
- , ARM_FRAG_STMIB_WB_MID, ARM_FRAG_STMIA_MID, ARM_FRAG_STMIA_WB_MID, ARM_FRAG_STMDA_MID
- , ARM_FRAG_STMDA_WB_MID, ARM_FRAG_MRS_C_MID, ARM_FRAG_MRS_S_MID, ARM_FRAG_MSR_C_MID
- , ARM_FRAG_MSR_S_MID, ARM_FRAG_MAX
+ , ARM_FRAG_STR_POST_DEC_REG_OFFSET_HDR, ARM_FRAG_LDR_POST_DEC_NONPRIV_REG_OFFSET_HDR, ARM_FRAG_STMDA_WB_HDR, ARM_FRAG_STMIA_WB_HDR
+ , ARM_FRAG_STMIB_WB_HDR, ARM_FRAG_STMDB_WB_HDR, ARM_FRAG_LDMIA_WB_HDR, ARM_FRAG_LDMIB_WB_HDR
+ , ARM_FRAG_STRB_POST_DEC_NONPRIV_IMM_OFFSET_HDR, ARM_FRAG_LDRB_POST_DEC_NONPRIV_IMM_OFFSET_HDR, ARM_FRAG_LDR_POST_DEC_NONPRIV_IMM_OFFSET_HDR, ARM_FRAG_X_HEADER
+ , ARM_FRAG_TST_REG_REG_SHIFT_TRLR, ARM_FRAG_TEQ_REG_IMM_SHIFT_TRLR, ARM_FRAG_AND_IMM_TRLR, ARM_FRAG_AND_REG_REG_SHIFT_TRLR
+ , ARM_FRAG_ORR_REG_IMM_SHIFT_TRLR, ARM_FRAG_UMULL_TRLR, ARM_FRAG_LDR_PRE_INC_IMM_OFFSET_TRLR, ARM_FRAG_LDRB_PRE_DEC_REG_OFFSET_TRLR
+ , ARM_FRAG_STR_PRE_DEC_REG_OFFSET_TRLR, ARM_FRAG_STR_PRE_DEC_IMM_OFFSET_TRLR, ARM_FRAG_STRH_PRE_DEC_IMM_OFFSET_TRLR, ARM_FRAG_LDRSB_PRE_DEC_IMM_OFFSET_TRLR
+ , ARM_FRAG_LDR_PRE_DEC_IMM_OFFSET_TRLR, ARM_FRAG_LDR_PRE_INC_REG_OFFSET_TRLR, ARM_FRAG_LDR_PRE_INC_WB_IMM_OFFSET_TRLR, ARM_FRAG_LDRB_PRE_DEC_WB_REG_OFFSET_TRLR
+ , ARM_FRAG_STR_PRE_DEC_WB_REG_OFFSET_TRLR, ARM_FRAG_STR_PRE_DEC_WB_IMM_OFFSET_TRLR, ARM_FRAG_STRH_PRE_DEC_WB_IMM_OFFSET_TRLR, ARM_FRAG_LDRSB_PRE_DEC_WB_IMM_OFFSET_TRLR
+ , ARM_FRAG_LDR_PRE_DEC_WB_IMM_OFFSET_TRLR, ARM_FRAG_LDR_PRE_INC_WB_REG_OFFSET_TRLR, ARM_FRAG_STRB_POST_INC_REG_OFFSET_TRLR, ARM_FRAG_STR_POST_INC_REG_OFFSET_TRLR
+ , ARM_FRAG_STR_POST_INC_IMM_OFFSET_TRLR, ARM_FRAG_LDRB_POST_INC_REG_OFFSET_TRLR, ARM_FRAG_STRB_POST_DEC_REG_OFFSET_TRLR, ARM_FRAG_STR_POST_DEC_REG_OFFSET_TRLR
+ , ARM_FRAG_STR_POST_DEC_IMM_OFFSET_TRLR, ARM_FRAG_LDRB_POST_DEC_REG_OFFSET_TRLR, ARM_FRAG_X_TRAILER, ARM_FRAG_X_COND_MID
+ , ARM_FRAG_X_AFTER_MID, ARM_FRAG_X_BEFORE_MID, ARM_FRAG_X_CTI_CHAIN_MID, ARM_FRAG_X_CHAIN_MID
+ , ARM_FRAG_X_BEGIN_MID, ARM_FRAG_X_INVALID_MID, ARM_FRAG_B_MID, ARM_FRAG_BL_MID
+ , ARM_FRAG_BX_MID, ARM_FRAG_LDR_POST_DEC_IMM_OFFSET_MID, ARM_FRAG_LDR_POST_DEC_REG_OFFSET_MID, ARM_FRAG_LDR_POST_INC_IMM_OFFSET_MID
+ , ARM_FRAG_LDR_POST_INC_REG_OFFSET_MID, ARM_FRAG_LDR_POST_DEC_NONPRIV_IMM_OFFSET_MID, ARM_FRAG_LDR_POST_DEC_NONPRIV_REG_OFFSET_MID, ARM_FRAG_LDR_POST_INC_NONPRIV_IMM_OFFSET_MID
+ , ARM_FRAG_LDR_POST_INC_NONPRIV_REG_OFFSET_MID, ARM_FRAG_LDR_PRE_DEC_IMM_OFFSET_MID, ARM_FRAG_LDR_PRE_DEC_REG_OFFSET_MID, ARM_FRAG_LDR_PRE_INC_IMM_OFFSET_MID
+ , ARM_FRAG_LDR_PRE_INC_REG_OFFSET_MID, ARM_FRAG_LDR_PRE_DEC_WB_IMM_OFFSET_MID, ARM_FRAG_LDR_PRE_DEC_WB_REG_OFFSET_MID, ARM_FRAG_LDR_PRE_INC_WB_IMM_OFFSET_MID
+ , ARM_FRAG_LDR_PRE_INC_WB_REG_OFFSET_MID, ARM_FRAG_LDRB_POST_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRB_POST_INC_IMM_OFFSET_MID, ARM_FRAG_LDRB_POST_DEC_NONPRIV_IMM_OFFSET_MID
+ , ARM_FRAG_LDRB_POST_INC_NONPRIV_IMM_OFFSET_MID, ARM_FRAG_LDRB_PRE_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRB_PRE_DEC_REG_OFFSET_MID, ARM_FRAG_LDRB_PRE_INC_IMM_OFFSET_MID
+ , ARM_FRAG_LDRB_PRE_INC_REG_OFFSET_MID, ARM_FRAG_LDRB_PRE_DEC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRB_PRE_DEC_WB_REG_OFFSET_MID, ARM_FRAG_LDRB_PRE_INC_WB_IMM_OFFSET_MID
+ , ARM_FRAG_LDRB_PRE_INC_WB_REG_OFFSET_MID, ARM_FRAG_STR_POST_DEC_IMM_OFFSET_MID, ARM_FRAG_STR_POST_INC_IMM_OFFSET_MID, ARM_FRAG_STR_POST_DEC_NONPRIV_IMM_OFFSET_MID
+ , ARM_FRAG_STR_POST_INC_NONPRIV_IMM_OFFSET_MID, ARM_FRAG_STR_PRE_DEC_IMM_OFFSET_MID, ARM_FRAG_STR_PRE_DEC_REG_OFFSET_MID, ARM_FRAG_STR_PRE_INC_IMM_OFFSET_MID
+ , ARM_FRAG_STR_PRE_INC_REG_OFFSET_MID, ARM_FRAG_STR_PRE_DEC_WB_IMM_OFFSET_MID, ARM_FRAG_STR_PRE_DEC_WB_REG_OFFSET_MID, ARM_FRAG_STR_PRE_INC_WB_IMM_OFFSET_MID
+ , ARM_FRAG_STR_PRE_INC_WB_REG_OFFSET_MID, ARM_FRAG_STRB_POST_DEC_IMM_OFFSET_MID, ARM_FRAG_STRB_POST_INC_IMM_OFFSET_MID, ARM_FRAG_STRB_POST_DEC_NONPRIV_IMM_OFFSET_MID
+ , ARM_FRAG_STRB_POST_INC_NONPRIV_IMM_OFFSET_MID, ARM_FRAG_STRB_POST_INC_NONPRIV_REG_OFFSET_MID, ARM_FRAG_STRB_PRE_DEC_IMM_OFFSET_MID, ARM_FRAG_STRB_PRE_DEC_REG_OFFSET_MID
+ , ARM_FRAG_STRB_PRE_INC_IMM_OFFSET_MID, ARM_FRAG_STRB_PRE_INC_REG_OFFSET_MID, ARM_FRAG_STRB_PRE_DEC_WB_IMM_OFFSET_MID, ARM_FRAG_STRB_PRE_DEC_WB_REG_OFFSET_MID
+ , ARM_FRAG_STRB_PRE_INC_WB_IMM_OFFSET_MID, ARM_FRAG_STRB_PRE_INC_WB_REG_OFFSET_MID, ARM_FRAG_STRH_PRE_DEC_IMM_OFFSET_MID, ARM_FRAG_STRH_PRE_DEC_REG_OFFSET_MID
+ , ARM_FRAG_STRH_PRE_INC_IMM_OFFSET_MID, ARM_FRAG_STRH_PRE_INC_REG_OFFSET_MID, ARM_FRAG_STRH_PRE_DEC_WB_IMM_OFFSET_MID, ARM_FRAG_STRH_PRE_DEC_WB_REG_OFFSET_MID
+ , ARM_FRAG_STRH_PRE_INC_WB_IMM_OFFSET_MID, ARM_FRAG_STRH_PRE_INC_WB_REG_OFFSET_MID, ARM_FRAG_STRH_POST_DEC_IMM_OFFSET_MID, ARM_FRAG_STRH_POST_DEC_REG_OFFSET_MID
+ , ARM_FRAG_STRH_POST_INC_IMM_OFFSET_MID, ARM_FRAG_STRH_POST_INC_REG_OFFSET_MID, ARM_FRAG_LDRSB_PRE_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRSB_PRE_DEC_REG_OFFSET_MID
+ , ARM_FRAG_LDRSB_PRE_INC_IMM_OFFSET_MID, ARM_FRAG_LDRSB_PRE_INC_REG_OFFSET_MID, ARM_FRAG_LDRSB_PRE_DEC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRSB_PRE_DEC_WB_REG_OFFSET_MID
+ , ARM_FRAG_LDRSB_PRE_INC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRSB_PRE_INC_WB_REG_OFFSET_MID, ARM_FRAG_LDRSB_POST_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRSB_POST_DEC_REG_OFFSET_MID
+ , ARM_FRAG_LDRSB_POST_INC_IMM_OFFSET_MID, ARM_FRAG_LDRSB_POST_INC_REG_OFFSET_MID, ARM_FRAG_LDRH_PRE_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRH_PRE_DEC_REG_OFFSET_MID
+ , ARM_FRAG_LDRH_PRE_INC_IMM_OFFSET_MID, ARM_FRAG_LDRH_PRE_INC_REG_OFFSET_MID, ARM_FRAG_LDRH_PRE_DEC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRH_PRE_DEC_WB_REG_OFFSET_MID
+ , ARM_FRAG_LDRH_PRE_INC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRH_PRE_INC_WB_REG_OFFSET_MID, ARM_FRAG_LDRH_POST_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRH_POST_DEC_REG_OFFSET_MID
+ , ARM_FRAG_LDRH_POST_INC_IMM_OFFSET_MID, ARM_FRAG_LDRH_POST_INC_REG_OFFSET_MID, ARM_FRAG_LDRSH_PRE_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRSH_PRE_DEC_REG_OFFSET_MID
+ , ARM_FRAG_LDRSH_PRE_INC_IMM_OFFSET_MID, ARM_FRAG_LDRSH_PRE_INC_REG_OFFSET_MID, ARM_FRAG_LDRSH_PRE_DEC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRSH_PRE_DEC_WB_REG_OFFSET_MID
+ , ARM_FRAG_LDRSH_PRE_INC_WB_IMM_OFFSET_MID, ARM_FRAG_LDRSH_PRE_INC_WB_REG_OFFSET_MID, ARM_FRAG_LDRSH_POST_DEC_IMM_OFFSET_MID, ARM_FRAG_LDRSH_POST_DEC_REG_OFFSET_MID
+ , ARM_FRAG_LDRSH_POST_INC_IMM_OFFSET_MID, ARM_FRAG_LDRSH_POST_INC_REG_OFFSET_MID, ARM_FRAG_MUL_MID, ARM_FRAG_MLA_MID
+ , ARM_FRAG_UMULL_MID, ARM_FRAG_UMLAL_MID, ARM_FRAG_SMULL_MID, ARM_FRAG_SMLAL_MID
+ , ARM_FRAG_SWP_MID, ARM_FRAG_SWPB_MID, ARM_FRAG_SWI_MID, ARM_FRAG_AND_REG_IMM_SHIFT_MID
+ , ARM_FRAG_AND_REG_REG_SHIFT_MID, ARM_FRAG_AND_IMM_MID, ARM_FRAG_ORR_REG_IMM_SHIFT_MID, ARM_FRAG_ORR_REG_REG_SHIFT_MID
+ , ARM_FRAG_ORR_IMM_MID, ARM_FRAG_EOR_REG_IMM_SHIFT_MID, ARM_FRAG_EOR_REG_REG_SHIFT_MID, ARM_FRAG_EOR_IMM_MID
+ , ARM_FRAG_MOV_REG_IMM_SHIFT_MID, ARM_FRAG_MOV_REG_REG_SHIFT_MID, ARM_FRAG_MOV_IMM_MID, ARM_FRAG_BIC_REG_IMM_SHIFT_MID
+ , ARM_FRAG_BIC_REG_REG_SHIFT_MID, ARM_FRAG_BIC_IMM_MID, ARM_FRAG_MVN_REG_IMM_SHIFT_MID, ARM_FRAG_MVN_REG_REG_SHIFT_MID
+ , ARM_FRAG_MVN_IMM_MID, ARM_FRAG_ADD_REG_IMM_SHIFT_MID, ARM_FRAG_ADD_REG_REG_SHIFT_MID, ARM_FRAG_ADD_IMM_MID
+ , ARM_FRAG_ADC_REG_IMM_SHIFT_MID, ARM_FRAG_ADC_REG_REG_SHIFT_MID, ARM_FRAG_ADC_IMM_MID, ARM_FRAG_SUB_REG_IMM_SHIFT_MID
+ , ARM_FRAG_SUB_REG_REG_SHIFT_MID, ARM_FRAG_SUB_IMM_MID, ARM_FRAG_SBC_REG_IMM_SHIFT_MID, ARM_FRAG_SBC_REG_REG_SHIFT_MID
+ , ARM_FRAG_SBC_IMM_MID, ARM_FRAG_RSB_REG_IMM_SHIFT_MID, ARM_FRAG_RSB_REG_REG_SHIFT_MID, ARM_FRAG_RSB_IMM_MID
+ , ARM_FRAG_RSC_REG_IMM_SHIFT_MID, ARM_FRAG_RSC_REG_REG_SHIFT_MID, ARM_FRAG_RSC_IMM_MID, ARM_FRAG_TST_REG_IMM_SHIFT_MID
+ , ARM_FRAG_TST_REG_REG_SHIFT_MID, ARM_FRAG_TST_IMM_MID, ARM_FRAG_TEQ_REG_IMM_SHIFT_MID, ARM_FRAG_TEQ_REG_REG_SHIFT_MID
+ , ARM_FRAG_TEQ_IMM_MID, ARM_FRAG_CMP_REG_IMM_SHIFT_MID, ARM_FRAG_CMP_REG_REG_SHIFT_MID, ARM_FRAG_CMP_IMM_MID
+ , ARM_FRAG_CMN_REG_IMM_SHIFT_MID, ARM_FRAG_CMN_REG_REG_SHIFT_MID, ARM_FRAG_CMN_IMM_MID, ARM_FRAG_LDMDA_MID
+ , ARM_FRAG_LDMDA_SW_MID, ARM_FRAG_LDMDA_WB_MID, ARM_FRAG_LDMDA_SW_WB_MID, ARM_FRAG_LDMIB_MID
+ , ARM_FRAG_LDMIB_SW_MID, ARM_FRAG_LDMIB_WB_MID, ARM_FRAG_LDMIB_SW_WB_MID, ARM_FRAG_LDMIA_MID
+ , ARM_FRAG_LDMIA_SW_MID, ARM_FRAG_LDMIA_WB_MID, ARM_FRAG_LDMIA_SW_WB_MID, ARM_FRAG_LDMDB_MID
+ , ARM_FRAG_LDMDB_SW_MID, ARM_FRAG_LDMDB_WB_MID, ARM_FRAG_LDMDB_SW_WB_MID, ARM_FRAG_STMDB_MID
+ , ARM_FRAG_STMDB_SW_MID, ARM_FRAG_STMDB_WB_MID, ARM_FRAG_STMDB_SW_WB_MID, ARM_FRAG_STMIB_MID
+ , ARM_FRAG_STMIB_SW_MID, ARM_FRAG_STMIB_WB_MID, ARM_FRAG_STMIB_SW_WB_MID, ARM_FRAG_STMIA_MID
+ , ARM_FRAG_STMIA_SW_MID, ARM_FRAG_STMIA_WB_MID, ARM_FRAG_STMIA_SW_WB_MID, ARM_FRAG_STMDA_MID
+ , ARM_FRAG_STMDA_SW_MID, ARM_FRAG_STMDA_WB_MID, ARM_FRAG_STMDA_SW_WB_MID, ARM_FRAG_MRS_C_MID
+ , ARM_FRAG_MRS_S_MID, ARM_FRAG_MSR_C_MID, ARM_FRAG_MSR_S_MID, ARM_FRAG_MAX
 } ARM_FRAG_TYPE;
 
 struct arm_insn_frag {
@@ -279,26 +284,41 @@ const arm_insn_frag arm_frag_usage[] = {
   { ARM_INSN_CMN_REG_REG_SHIFT, ARM_FRAG_CMN_REG_REG_SHIFT_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_CMN_IMM, ARM_FRAG_CMN_IMM_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_LDMDA, ARM_FRAG_LDMDA_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_LDMDA_SW, ARM_FRAG_LDMDA_SW_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_LDMDA_WB, ARM_FRAG_LDMDA_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_LDMDA_SW_WB, ARM_FRAG_LDMDA_SW_WB_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_LDMIB, ARM_FRAG_LDMIB_MID, ARM_FRAG_LIST_END },
-  { ARM_INSN_LDMIB_WB, ARM_FRAG_LDMIB_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_LDMIB_SW, ARM_FRAG_LDMIB_WB_HDR, ARM_FRAG_LDMIB_SW_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_LDMIB_WB, ARM_FRAG_LDMIB_WB_HDR, ARM_FRAG_LDMIB_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_LDMIB_SW_WB, ARM_FRAG_LDMIB_SW_WB_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_LDMIA, ARM_FRAG_LDMIA_MID, ARM_FRAG_LIST_END },
-  { ARM_INSN_LDMIA_WB, ARM_FRAG_LDMIA_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_LDMIA_SW, ARM_FRAG_LDMIA_WB_HDR, ARM_FRAG_LDMIA_SW_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_LDMIA_WB, ARM_FRAG_LDMIA_WB_HDR, ARM_FRAG_LDMIA_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_LDMIA_SW_WB, ARM_FRAG_LDMIA_SW_WB_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_LDMDB, ARM_FRAG_LDMDB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_LDMDB_SW, ARM_FRAG_LDMDB_SW_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_LDMDB_WB, ARM_FRAG_LDMDB_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_LDMDB_SW_WB, ARM_FRAG_LDMDB_SW_WB_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_STMDB, ARM_FRAG_STMDB_MID, ARM_FRAG_LIST_END },
-  { ARM_INSN_STMDB_WB, ARM_FRAG_STMDB_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_STMDB_SW, ARM_FRAG_STMDB_WB_HDR, ARM_FRAG_STMDB_SW_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_STMDB_WB, ARM_FRAG_STMDB_WB_HDR, ARM_FRAG_STMDB_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_STMDB_SW_WB, ARM_FRAG_STMDB_SW_WB_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_STMIB, ARM_FRAG_STMIB_MID, ARM_FRAG_LIST_END },
-  { ARM_INSN_STMIB_WB, ARM_FRAG_STMIB_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_STMIB_SW, ARM_FRAG_STMIB_WB_HDR, ARM_FRAG_STMIB_SW_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_STMIB_WB, ARM_FRAG_STMIB_WB_HDR, ARM_FRAG_STMIB_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_STMIB_SW_WB, ARM_FRAG_STMIB_SW_WB_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_STMIA, ARM_FRAG_STMIA_MID, ARM_FRAG_LIST_END },
-  { ARM_INSN_STMIA_WB, ARM_FRAG_STMIA_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_STMIA_SW, ARM_FRAG_STMIA_WB_HDR, ARM_FRAG_STMIA_SW_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_STMIA_WB, ARM_FRAG_STMIA_WB_HDR, ARM_FRAG_STMIA_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_STMIA_SW_WB, ARM_FRAG_STMIA_SW_WB_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_STMDA, ARM_FRAG_STMDA_MID, ARM_FRAG_LIST_END },
-  { ARM_INSN_STMDA_WB, ARM_FRAG_STMDA_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_STMDA_SW, ARM_FRAG_STMDA_WB_HDR, ARM_FRAG_STMDA_SW_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_STMDA_WB, ARM_FRAG_STMDA_WB_HDR, ARM_FRAG_STMDA_WB_MID, ARM_FRAG_LIST_END },
+  { ARM_INSN_STMDA_SW_WB, ARM_FRAG_STMDA_SW_WB_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_MRS_C, ARM_FRAG_MRS_C_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_MRS_S, ARM_FRAG_MRS_S_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_MSR_C, ARM_FRAG_MSR_C_MID, ARM_FRAG_LIST_END },
   { ARM_INSN_MSR_S, ARM_FRAG_MSR_S_MID, ARM_FRAG_LIST_END },
-  { ARM_INSN_MAX }
 };
 
 void
@@ -331,6 +351,12 @@ arm7f_cpu::arm_pbb_run ()
       { ARM_FRAG_LDR_POST_INC_NONPRIV_REG_OFFSET_HDR, && case_FRAG_LDR_POST_INC_NONPRIV_REG_OFFSET_HDR },
       { ARM_FRAG_STR_POST_DEC_REG_OFFSET_HDR, && case_FRAG_STR_POST_DEC_REG_OFFSET_HDR },
       { ARM_FRAG_LDR_POST_DEC_NONPRIV_REG_OFFSET_HDR, && case_FRAG_LDR_POST_DEC_NONPRIV_REG_OFFSET_HDR },
+      { ARM_FRAG_STMDA_WB_HDR, && case_FRAG_STMDA_WB_HDR },
+      { ARM_FRAG_STMIA_WB_HDR, && case_FRAG_STMIA_WB_HDR },
+      { ARM_FRAG_STMIB_WB_HDR, && case_FRAG_STMIB_WB_HDR },
+      { ARM_FRAG_STMDB_WB_HDR, && case_FRAG_STMDB_WB_HDR },
+      { ARM_FRAG_LDMIA_WB_HDR, && case_FRAG_LDMIA_WB_HDR },
+      { ARM_FRAG_LDMIB_WB_HDR, && case_FRAG_LDMIB_WB_HDR },
       { ARM_FRAG_STRB_POST_DEC_NONPRIV_IMM_OFFSET_HDR, && case_FRAG_STRB_POST_DEC_NONPRIV_IMM_OFFSET_HDR },
       { ARM_FRAG_LDRB_POST_DEC_NONPRIV_IMM_OFFSET_HDR, && case_FRAG_LDRB_POST_DEC_NONPRIV_IMM_OFFSET_HDR },
       { ARM_FRAG_LDR_POST_DEC_NONPRIV_IMM_OFFSET_HDR, && case_FRAG_LDR_POST_DEC_NONPRIV_IMM_OFFSET_HDR },
@@ -535,21 +561,37 @@ arm7f_cpu::arm_pbb_run ()
       { ARM_FRAG_CMN_REG_REG_SHIFT_MID, && case_FRAG_CMN_REG_REG_SHIFT_MID },
       { ARM_FRAG_CMN_IMM_MID, && case_FRAG_CMN_IMM_MID },
       { ARM_FRAG_LDMDA_MID, && case_FRAG_LDMDA_MID },
+      { ARM_FRAG_LDMDA_SW_MID, && case_FRAG_LDMDA_SW_MID },
       { ARM_FRAG_LDMDA_WB_MID, && case_FRAG_LDMDA_WB_MID },
+      { ARM_FRAG_LDMDA_SW_WB_MID, && case_FRAG_LDMDA_SW_WB_MID },
       { ARM_FRAG_LDMIB_MID, && case_FRAG_LDMIB_MID },
+      { ARM_FRAG_LDMIB_SW_MID, && case_FRAG_LDMIB_SW_MID },
       { ARM_FRAG_LDMIB_WB_MID, && case_FRAG_LDMIB_WB_MID },
+      { ARM_FRAG_LDMIB_SW_WB_MID, && case_FRAG_LDMIB_SW_WB_MID },
       { ARM_FRAG_LDMIA_MID, && case_FRAG_LDMIA_MID },
+      { ARM_FRAG_LDMIA_SW_MID, && case_FRAG_LDMIA_SW_MID },
       { ARM_FRAG_LDMIA_WB_MID, && case_FRAG_LDMIA_WB_MID },
+      { ARM_FRAG_LDMIA_SW_WB_MID, && case_FRAG_LDMIA_SW_WB_MID },
       { ARM_FRAG_LDMDB_MID, && case_FRAG_LDMDB_MID },
+      { ARM_FRAG_LDMDB_SW_MID, && case_FRAG_LDMDB_SW_MID },
       { ARM_FRAG_LDMDB_WB_MID, && case_FRAG_LDMDB_WB_MID },
+      { ARM_FRAG_LDMDB_SW_WB_MID, && case_FRAG_LDMDB_SW_WB_MID },
       { ARM_FRAG_STMDB_MID, && case_FRAG_STMDB_MID },
+      { ARM_FRAG_STMDB_SW_MID, && case_FRAG_STMDB_SW_MID },
       { ARM_FRAG_STMDB_WB_MID, && case_FRAG_STMDB_WB_MID },
+      { ARM_FRAG_STMDB_SW_WB_MID, && case_FRAG_STMDB_SW_WB_MID },
       { ARM_FRAG_STMIB_MID, && case_FRAG_STMIB_MID },
+      { ARM_FRAG_STMIB_SW_MID, && case_FRAG_STMIB_SW_MID },
       { ARM_FRAG_STMIB_WB_MID, && case_FRAG_STMIB_WB_MID },
+      { ARM_FRAG_STMIB_SW_WB_MID, && case_FRAG_STMIB_SW_WB_MID },
       { ARM_FRAG_STMIA_MID, && case_FRAG_STMIA_MID },
+      { ARM_FRAG_STMIA_SW_MID, && case_FRAG_STMIA_SW_MID },
       { ARM_FRAG_STMIA_WB_MID, && case_FRAG_STMIA_WB_MID },
+      { ARM_FRAG_STMIA_SW_WB_MID, && case_FRAG_STMIA_SW_WB_MID },
       { ARM_FRAG_STMDA_MID, && case_FRAG_STMDA_MID },
+      { ARM_FRAG_STMDA_SW_MID, && case_FRAG_STMDA_SW_MID },
       { ARM_FRAG_STMDA_WB_MID, && case_FRAG_STMDA_WB_MID },
+      { ARM_FRAG_STMDA_SW_WB_MID, && case_FRAG_STMDA_SW_WB_MID },
       { ARM_FRAG_MRS_C_MID, && case_FRAG_MRS_C_MID },
       { ARM_FRAG_MRS_S_MID, && case_FRAG_MRS_S_MID },
       { ARM_FRAG_MSR_C_MID, && case_FRAG_MSR_C_MID },
@@ -571,20 +613,18 @@ arm7f_cpu::arm_pbb_run ()
       // Allocate frag label table and point idesc table entries at it.
       // FIXME: Temporary hack, to be redone.
       static void** frag_label_table;
-      frag_label_table = new (void*) [ARM_INSN_MAX * 4];
-      memset (frag_label_table, 0, sizeof (void*) * ARM_INSN_MAX * 4);
+      int max_insns = ARM_INSN_MSR_S + 1;
+      int tabsize = max_insns * 4;
+      frag_label_table = new (void*) [tabsize];
+      memset (frag_label_table, 0, sizeof (void*) * tabsize);
       int i;
       void** v;
-      for (i = 0, v = frag_label_table; i < ARM_INSN_MAX; ++i)
+      for (i = 0, v = frag_label_table; i < max_insns; ++i)
 	{
 	  arm_idesc::idesc_table[arm_frag_usage[i].itype].cgoto.frags = v;
 	  for (int j = 0; arm_frag_usage[i].ftype[j] != ARM_FRAG_LIST_END; ++j)
 	    *v++ = labels[arm_frag_usage[i].ftype[j]].label;
 	}
-
-      // Record frags used by each insn.
-      //for (int i = 0; arm_frag_usage[i].itype != ARM_INSN_MAX; ++i)
-      //  arm_idesc::idesc_table[arm_frag_usage[i].itype].frags = & arm_frag_usage[i];
 
       // Initialize the compiler virtual insn.
       // FIXME: Also needed if !gnuc.
@@ -889,6 +929,320 @@ if (((FLD (f_rd)) == (15))) {
 npc = current_cpu->GETMEMSI (pc, addr); br_status = BRANCH_UNCACHEABLE;
 } else {
 * FLD (i_rd) = current_cpu->GETMEMSI (pc, addr);
+}
+}
+
+#undef FLD
+    }
+    NEXT_FRAG (fragpc);
+
+// ********** used by: stmda-wb, stmda-sw
+
+  CASE (FRAG_STMDA_WB_HDR):
+    {
+      abuf = vpc;
+      vpc = vpc + 1;
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
+
+{
+  addr = * FLD (i_rn);
+if (((FLD (f_reg_list)) & (((1) << (15))))) {
+{
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
+  addr = SUBSI (addr, 4);
+}
+}
+}
+
+#undef FLD
+    }
+    NEXT_FRAG (fragpc);
+
+// ********** used by: stmia-wb, stmia-sw
+
+  CASE (FRAG_STMIA_WB_HDR):
+    {
+      abuf = vpc;
+      vpc = vpc + 1;
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
+
+{
+  addr = * FLD (i_rn);
+if (((FLD (f_reg_list)) & (((1) << (0))))) {
+{
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (1))))) {
+{
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (2))))) {
+{
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (3))))) {
+{
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (4))))) {
+{
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (5))))) {
+{
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (6))))) {
+{
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (7))))) {
+{
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
+  addr = ADDSI (addr, 4);
+}
+}
+}
+
+#undef FLD
+    }
+    NEXT_FRAG (fragpc);
+
+// ********** used by: stmib-wb, stmib-sw
+
+  CASE (FRAG_STMIB_WB_HDR):
+    {
+      abuf = vpc;
+      vpc = vpc + 1;
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
+
+{
+  addr = * FLD (i_rn);
+if (((FLD (f_reg_list)) & (((1) << (0))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 0)]);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (1))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 1)]);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (2))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 2)]);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (3))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 3)]);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (4))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 4)]);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (5))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 5)]);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (6))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 6)]);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (7))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->SETMEMSI (pc, addr, current_cpu->hardware.h_gr[((UINT) 7)]);
+}
+}
+}
+
+#undef FLD
+    }
+    NEXT_FRAG (fragpc);
+
+// ********** used by: stmdb-wb, stmdb-sw
+
+  CASE (FRAG_STMDB_WB_HDR):
+    {
+      abuf = vpc;
+      vpc = vpc + 1;
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
+
+{
+  addr = * FLD (i_rn);
+if (((FLD (f_reg_list)) & (((1) << (15))))) {
+{
+  addr = SUBSI (addr, 4);
+current_cpu->SETMEMSI (pc, addr, ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4));
+}
+}
+}
+
+#undef FLD
+    }
+    NEXT_FRAG (fragpc);
+
+// ********** used by: ldmia-wb, ldmia-sw
+
+  CASE (FRAG_LDMIA_WB_HDR):
+    {
+      abuf = vpc;
+      vpc = vpc + 1;
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+      br_status = BRANCH_UNTAKEN;
+      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
+
+{
+  addr = * FLD (i_rn);
+if (((FLD (f_reg_list)) & (((1) << (0))))) {
+{
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (1))))) {
+{
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (2))))) {
+{
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (3))))) {
+{
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (4))))) {
+{
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (5))))) {
+{
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (6))))) {
+{
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
+  addr = ADDSI (addr, 4);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (7))))) {
+{
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
+  addr = ADDSI (addr, 4);
+}
+}
+}
+
+#undef FLD
+    }
+    NEXT_FRAG (fragpc);
+
+// ********** used by: ldmib-wb, ldmib-sw
+
+  CASE (FRAG_LDMIB_WB_HDR):
+    {
+      abuf = vpc;
+      vpc = vpc + 1;
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+      br_status = BRANCH_UNTAKEN;
+      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
+
+{
+  addr = * FLD (i_rn);
+if (((FLD (f_reg_list)) & (((1) << (0))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->hardware.h_gr[((UINT) 0)] = current_cpu->GETMEMSI (pc, addr);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (1))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->hardware.h_gr[((UINT) 1)] = current_cpu->GETMEMSI (pc, addr);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (2))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->hardware.h_gr[((UINT) 2)] = current_cpu->GETMEMSI (pc, addr);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (3))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->hardware.h_gr[((UINT) 3)] = current_cpu->GETMEMSI (pc, addr);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (4))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->hardware.h_gr[((UINT) 4)] = current_cpu->GETMEMSI (pc, addr);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (5))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->hardware.h_gr[((UINT) 5)] = current_cpu->GETMEMSI (pc, addr);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (6))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->hardware.h_gr[((UINT) 6)] = current_cpu->GETMEMSI (pc, addr);
+}
+}
+if (((FLD (f_reg_list)) & (((1) << (7))))) {
+{
+  addr = ADDSI (addr, 4);
+current_cpu->hardware.h_gr[((UINT) 7)] = current_cpu->GETMEMSI (pc, addr);
+}
 }
 }
 
@@ -7162,6 +7516,224 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     }
     NEXT_INSN (vpc, fragpc);
 
+// ********** used only by: ldmda-sw
+
+  CASE (FRAG_LDMDA_SW_MID):
+    {
+      abuf = vpc;
+      vpc = vpc + 1;
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+      br_status = BRANCH_UNTAKEN;
+      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
+
+{
+  addr = * FLD (i_rn);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  {
+    USI opval = current_cpu->GETMEMSI (pc, addr);
+    npc = opval; br_status = BRANCH_UNCACHEABLE;
+  }
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->h_spsr_get ();
+    current_cpu->h_cpsr_set (opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+}
+
+      pbb_br_npc = npc;
+      pbb_br_status = br_status;
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
 // ********** used only by: ldmda-wb
 
   CASE (FRAG_LDMDA_WB_MID):
@@ -7244,6 +7816,228 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 8)] = opval;
   }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+  {
+    SI opval = addr;
+    * FLD (i_rn) = opval;
+  }
+}
+
+      pbb_br_npc = npc;
+      pbb_br_status = br_status;
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
+// ********** used only by: ldmda-sw-wb
+
+  CASE (FRAG_LDMDA_SW_WB_MID):
+    {
+      abuf = vpc;
+      vpc = vpc + 1;
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+      br_status = BRANCH_UNTAKEN;
+      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
+
+{
+  addr = * FLD (i_rn);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  {
+    USI opval = current_cpu->GETMEMSI (pc, addr);
+    npc = opval; br_status = BRANCH_UNCACHEABLE;
+  }
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->h_spsr_get ();
+    current_cpu->h_cpsr_set (opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
+  }
+}
   addr = SUBSI (addr, 4);
 }
 }
@@ -7496,9 +8290,242 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
     }
     NEXT_INSN (vpc, fragpc);
 
+// ********** used only by: ldmib-sw
+
+  CASE (FRAG_LDMIB_SW_MID):
+    {
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    USI opval = current_cpu->GETMEMSI (pc, addr);
+    npc = opval; br_status = BRANCH_UNCACHEABLE;
+  }
+  {
+    SI opval = current_cpu->h_spsr_get ();
+    current_cpu->h_cpsr_set (opval);
+  }
+}
+}
+}
+
+      pbb_br_npc = npc;
+      pbb_br_status = br_status;
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
 // ********** used only by: ldmib-wb
 
   CASE (FRAG_LDMIB_WB_MID):
+    {
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    USI opval = current_cpu->GETMEMSI (pc, addr);
+    npc = opval; br_status = BRANCH_UNCACHEABLE;
+  }
+}
+}
+  {
+    SI opval = addr;
+    * FLD (i_rn) = opval;
+  }
+}
+
+      pbb_br_npc = npc;
+      pbb_br_status = br_status;
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
+// ********** used only by: ldmib-sw-wb
+
+  CASE (FRAG_LDMIB_SW_WB_MID):
     {
       abuf = vpc;
       vpc = vpc + 1;
@@ -7584,64 +8611,113 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 8)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 9)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 10)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 11)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 12)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 13)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
@@ -7650,6 +8726,10 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     USI opval = current_cpu->GETMEMSI (pc, addr);
     npc = opval; br_status = BRANCH_UNCACHEABLE;
+  }
+  {
+    SI opval = current_cpu->h_spsr_get ();
+    current_cpu->h_cpsr_set (opval);
   }
 }
 }
@@ -7830,9 +8910,242 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
     }
     NEXT_INSN (vpc, fragpc);
 
+// ********** used only by: ldmia-sw
+
+  CASE (FRAG_LDMIA_SW_MID):
+    {
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  {
+    USI opval = current_cpu->GETMEMSI (pc, addr);
+    npc = opval; br_status = BRANCH_UNCACHEABLE;
+  }
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->h_spsr_get ();
+    current_cpu->h_cpsr_set (opval);
+  }
+}
+}
+}
+
+      pbb_br_npc = npc;
+      pbb_br_status = br_status;
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
 // ********** used only by: ldmia-wb
 
   CASE (FRAG_LDMIA_WB_MID):
+    {
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  {
+    USI opval = current_cpu->GETMEMSI (pc, addr);
+    npc = opval; br_status = BRANCH_UNCACHEABLE;
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+  {
+    SI opval = addr;
+    * FLD (i_rn) = opval;
+  }
+}
+
+      pbb_br_npc = npc;
+      pbb_br_status = br_status;
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
+// ********** used only by: ldmia-sw-wb
+
+  CASE (FRAG_LDMIA_SW_WB_MID):
     {
       abuf = vpc;
       vpc = vpc + 1;
@@ -7917,64 +9230,113 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 8)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 9)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 10)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 11)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 12)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 13)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
   }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
@@ -7985,6 +9347,10 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
     npc = opval; br_status = BRANCH_UNCACHEABLE;
   }
   addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->h_spsr_get ();
+    current_cpu->h_cpsr_set (opval);
+  }
 }
 }
   {
@@ -8082,6 +9448,224 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
     SI opval = current_cpu->GETMEMSI (pc, addr);
     current_cpu->hardware.h_gr[((UINT) 8)] = opval;
   }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
+  }
+}
+}
+}
+
+      pbb_br_npc = npc;
+      pbb_br_status = br_status;
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
+// ********** used only by: ldmdb-sw
+
+  CASE (FRAG_LDMDB_SW_MID):
+    {
+      abuf = vpc;
+      vpc = vpc + 1;
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+      br_status = BRANCH_UNTAKEN;
+      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
+
+{
+  addr = * FLD (i_rn);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    USI opval = current_cpu->GETMEMSI (pc, addr);
+    npc = opval; br_status = BRANCH_UNCACHEABLE;
+  }
+  {
+    SI opval = current_cpu->h_spsr_get ();
+    current_cpu->h_cpsr_set (opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
@@ -8333,6 +9917,228 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     }
     NEXT_INSN (vpc, fragpc);
 
+// ********** used only by: ldmdb-sw-wb
+
+  CASE (FRAG_LDMDB_SW_WB_MID):
+    {
+      abuf = vpc;
+      vpc = vpc + 1;
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+      br_status = BRANCH_UNTAKEN;
+      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
+
+{
+  addr = * FLD (i_rn);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    USI opval = current_cpu->GETMEMSI (pc, addr);
+    npc = opval; br_status = BRANCH_UNCACHEABLE;
+  }
+  {
+    SI opval = current_cpu->h_spsr_get ();
+    current_cpu->h_cpsr_set (opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 14)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (14, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 13)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (13, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 12)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (12, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 11)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (11, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 10)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (10, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 9)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (9, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 8)] = opval;
+  }
+} else {
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr_usr[SUBSI (8, 8)] = opval;
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 7)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 6)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 5)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 4)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 3)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 2)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 1)] = opval;
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->GETMEMSI (pc, addr);
+    current_cpu->hardware.h_gr[((UINT) 0)] = opval;
+  }
+}
+}
+  {
+    SI opval = addr;
+    * FLD (i_rn) = opval;
+  }
+}
+
+      pbb_br_npc = npc;
+      pbb_br_status = br_status;
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
 // ********** used only by: stmdb
 
   CASE (FRAG_STMDB_MID):
@@ -8495,27 +10301,212 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     }
     NEXT_INSN (vpc, fragpc);
 
-// ********** used only by: stmdb-wb
+// ********** used only by: stmdb-sw
 
-  CASE (FRAG_STMDB_WB_MID):
+  CASE (FRAG_STMDB_SW_MID):
     {
-      abuf = vpc;
-      vpc = vpc + 1;
 #define FLD(f) abuf->fields.sfmt_ldmda.f
       PCADDR pc = abuf->addr;
-      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
 
 {
-  addr = * FLD (i_rn);
-if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
+    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
 }
 }
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
+// ********** used only by: stmdb-wb
+
+  CASE (FRAG_STMDB_WB_MID):
+    {
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+
+{
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = SUBSI (addr, 4);
@@ -8577,6 +10568,221 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
     SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+  {
+    SI opval = addr;
+    * FLD (i_rn) = opval;
+  }
+}
+
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
+// ********** used only by: stmdb-sw-wb
+
+  CASE (FRAG_STMDB_SW_WB_MID):
+    {
+      abuf = vpc;
+      vpc = vpc + 1;
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
+
+{
+  addr = * FLD (i_rn);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  addr = SUBSI (addr, 4);
+  {
+    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+  addr = SUBSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
@@ -8823,9 +11029,234 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
     }
     NEXT_INSN (vpc, fragpc);
 
+// ********** used only by: stmib-sw
+
+  CASE (FRAG_STMIB_SW_MID):
+    {
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+  addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+}
+
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
 // ********** used only by: stmib-wb
 
   CASE (FRAG_STMIB_WB_MID):
+    {
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  addr = ADDSI (addr, 4);
+  {
+    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+}
+  {
+    SI opval = addr;
+    * FLD (i_rn) = opval;
+  }
+}
+
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
+// ********** used only by: stmib-sw-wb
+
+  CASE (FRAG_STMIB_SW_WB_MID):
     {
       abuf = vpc;
       vpc = vpc + 1;
@@ -8910,64 +11341,113 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   addr = ADDSI (addr, 4);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
@@ -9151,9 +11631,234 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
     }
     NEXT_INSN (vpc, fragpc);
 
+// ********** used only by: stmia-sw
+
+  CASE (FRAG_STMIA_SW_MID):
+    {
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  {
+    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+}
+
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
 // ********** used only by: stmia-wb
 
   CASE (FRAG_STMIA_WB_MID):
+    {
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  {
+    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = ADDSI (addr, 4);
+}
+}
+  {
+    SI opval = addr;
+    * FLD (i_rn) = opval;
+  }
+}
+
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
+// ********** used only by: stmia-sw-wb
+
+  CASE (FRAG_STMIA_SW_WB_MID):
     {
       abuf = vpc;
       vpc = vpc + 1;
@@ -9237,64 +11942,113 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
   {
     SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
   addr = ADDSI (addr, 4);
 }
 }
@@ -9479,27 +12233,212 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     }
     NEXT_INSN (vpc, fragpc);
 
-// ********** used only by: stmda-wb
+// ********** used only by: stmda-sw
 
-  CASE (FRAG_STMDA_WB_MID):
+  CASE (FRAG_STMDA_SW_MID):
     {
-      abuf = vpc;
-      vpc = vpc + 1;
 #define FLD(f) abuf->fields.sfmt_ldmda.f
       PCADDR pc = abuf->addr;
-      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
 
 {
-  addr = * FLD (i_rn);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
 {
   {
-    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
+    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
   addr = SUBSI (addr, 4);
 }
 }
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+}
+
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
+// ********** used only by: stmda-wb
+
+  CASE (FRAG_STMDA_WB_MID):
+    {
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+
+{
 if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
 {
   {
@@ -9560,6 +12499,221 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
     SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
     current_cpu->SETMEMSI (pc, addr, opval);
   }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 7)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 6)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 5)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 4)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 3)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 2)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 1)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
+{
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 0)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+  {
+    SI opval = addr;
+    * FLD (i_rn) = opval;
+  }
+}
+
+#undef FLD
+    }
+    NEXT_INSN (vpc, fragpc);
+
+// ********** used only by: stmda-sw-wb
+
+  CASE (FRAG_STMDA_SW_WB_MID):
+    {
+      abuf = vpc;
+      vpc = vpc + 1;
+#define FLD(f) abuf->fields.sfmt_ldmda.f
+      PCADDR pc = abuf->addr;
+      current_cpu->hardware.h_gr[((UINT) 15)] = ADDSI (pc, GET_ATTR (R15_OFFSET));
+
+{
+  addr = * FLD (i_rn);
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+{
+  {
+    SI opval = ADDSI (current_cpu->hardware.h_gr[((UINT) 15)], 4);
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 14)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (14, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 13)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (13, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 12)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (12, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 11)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (11, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 10)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (10, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 9)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (9, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
+  addr = SUBSI (addr, 4);
+}
+}
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
+{
+if (ANDSI (FLD (f_reg_list), SLLSI (1, 15))) {
+  {
+    SI opval = current_cpu->hardware.h_gr[((UINT) 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+} else {
+  {
+    SI opval = current_cpu->hardware.h_gr_usr[SUBSI (8, 8)];
+    current_cpu->SETMEMSI (pc, addr, opval);
+  }
+}
   addr = SUBSI (addr, 4);
 }
 }

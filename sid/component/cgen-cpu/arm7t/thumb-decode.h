@@ -2,9 +2,9 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 
-This file is part of the Cygnus Simulators.
+This file is part of the Red Hat simulators.
 
 
 */
@@ -43,7 +43,7 @@ typedef enum thumb_insn_type {
  , THUMB_INSN_BPL, THUMB_INSN_BVS, THUMB_INSN_BVC, THUMB_INSN_BHI
  , THUMB_INSN_BLS, THUMB_INSN_BGE, THUMB_INSN_BLT, THUMB_INSN_BGT
  , THUMB_INSN_BLE, THUMB_INSN_SWI, THUMB_INSN_B, THUMB_INSN_BL_HI
- , THUMB_INSN_BL_LO, THUMB_INSN_MAX
+ , THUMB_INSN_BL_LO
 } THUMB_INSN_TYPE;
 
 

@@ -2,9 +2,9 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 
-This file is part of the Cygnus Simulators.
+This file is part of the Red Hat simulators.
 
 
 */
@@ -22,7 +22,7 @@ using namespace arm7f; // FIXME: namespace organization still wip
 // functions to handle machine variants.
 bool thumb_idesc::idesc_table_initialized_p = false;
 
-thumb_idesc thumb_idesc::idesc_table[THUMB_INSN_MAX] =
+thumb_idesc thumb_idesc::idesc_table[THUMB_INSN_BL_LO + 1] =
 {
   { 0, 0, "X_AFTER", THUMB_INSN_X_AFTER, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), (1<<ISA_THUMB) } },
   { 0, 0, "X_BEFORE", THUMB_INSN_X_BEFORE, { 0|(1<<CGEN_INSN_PBB)|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), (1<<ISA_THUMB) } },
@@ -190,7 +190,15 @@ thumb_extract_sfmt_ldr_pc (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc
 static void
 thumb_extract_sfmt_str (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn);
 static void
+thumb_extract_sfmt_strb (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn);
+static void
 thumb_extract_sfmt_ldr (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn);
+static void
+thumb_extract_sfmt_ldrb (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn);
+static void
+thumb_extract_sfmt_strh (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn);
+static void
+thumb_extract_sfmt_ldrh (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn);
 static void
 thumb_extract_sfmt_str_imm (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn);
 static void
@@ -269,7 +277,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 4 : /* fall through */
       case 5 : /* fall through */
       case 6 : /* fall through */
-      case 7 : itype = THUMB_INSN_LSL; thumb_extract_sfmt_lsl (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 7 : itype = THUMB_INSN_LSL; thumb_extract_sfmt_lsl (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 8 : /* fall through */
       case 9 : /* fall through */
       case 10 : /* fall through */
@@ -277,7 +285,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 12 : /* fall through */
       case 13 : /* fall through */
       case 14 : /* fall through */
-      case 15 : itype = THUMB_INSN_LSR; thumb_extract_sfmt_lsl (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 15 : itype = THUMB_INSN_LSR; thumb_extract_sfmt_lsl (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 16 : /* fall through */
       case 17 : /* fall through */
       case 18 : /* fall through */
@@ -285,15 +293,15 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 20 : /* fall through */
       case 21 : /* fall through */
       case 22 : /* fall through */
-      case 23 : itype = THUMB_INSN_ASR; thumb_extract_sfmt_lsl (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 23 : itype = THUMB_INSN_ASR; thumb_extract_sfmt_lsl (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 24 : /* fall through */
-      case 25 : itype = THUMB_INSN_ADD; thumb_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 25 : itype = THUMB_INSN_ADD; thumb_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 26 : /* fall through */
-      case 27 : itype = THUMB_INSN_SUB; thumb_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 27 : itype = THUMB_INSN_SUB; thumb_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 28 : /* fall through */
-      case 29 : itype = THUMB_INSN_ADDI; thumb_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 29 : itype = THUMB_INSN_ADDI; thumb_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 30 : /* fall through */
-      case 31 : itype = THUMB_INSN_SUBI; thumb_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 31 : itype = THUMB_INSN_SUBI; thumb_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 32 : /* fall through */
       case 33 : /* fall through */
       case 34 : /* fall through */
@@ -301,7 +309,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 36 : /* fall through */
       case 37 : /* fall through */
       case 38 : /* fall through */
-      case 39 : itype = THUMB_INSN_MOV; thumb_extract_sfmt_mov (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 39 : itype = THUMB_INSN_MOV; thumb_extract_sfmt_mov (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 40 : /* fall through */
       case 41 : /* fall through */
       case 42 : /* fall through */
@@ -309,7 +317,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 44 : /* fall through */
       case 45 : /* fall through */
       case 46 : /* fall through */
-      case 47 : itype = THUMB_INSN_CMP; thumb_extract_sfmt_cmp (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 47 : itype = THUMB_INSN_CMP; thumb_extract_sfmt_cmp (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 48 : /* fall through */
       case 49 : /* fall through */
       case 50 : /* fall through */
@@ -317,7 +325,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 52 : /* fall through */
       case 53 : /* fall through */
       case 54 : /* fall through */
-      case 55 : itype = THUMB_INSN_ADDI8; thumb_extract_sfmt_addi8 (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 55 : itype = THUMB_INSN_ADDI8; thumb_extract_sfmt_addi8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 56 : /* fall through */
       case 57 : /* fall through */
       case 58 : /* fall through */
@@ -325,16 +333,16 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 60 : /* fall through */
       case 61 : /* fall through */
       case 62 : /* fall through */
-      case 63 : itype = THUMB_INSN_SUBI8; thumb_extract_sfmt_addi8 (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 63 : itype = THUMB_INSN_SUBI8; thumb_extract_sfmt_addi8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 64 :
         {
           unsigned int val = (((insn >> 6) & (3 << 0)));
           switch (val)
           {
-          case 0 : itype = THUMB_INSN_ALU_AND; thumb_extract_sfmt_alu_and (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 1 : itype = THUMB_INSN_ALU_EOR; thumb_extract_sfmt_alu_and (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 2 : itype = THUMB_INSN_ALU_LSL; thumb_extract_sfmt_alu_lsl (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 3 : itype = THUMB_INSN_ALU_LSR; thumb_extract_sfmt_alu_lsl (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 : itype = THUMB_INSN_ALU_AND; thumb_extract_sfmt_alu_and (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 : itype = THUMB_INSN_ALU_EOR; thumb_extract_sfmt_alu_and (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 : itype = THUMB_INSN_ALU_LSL; thumb_extract_sfmt_alu_lsl (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 3 : itype = THUMB_INSN_ALU_LSR; thumb_extract_sfmt_alu_lsl (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = THUMB_INSN_X_INVALID; thumb_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
           }
         }
@@ -343,10 +351,10 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
           unsigned int val = (((insn >> 6) & (3 << 0)));
           switch (val)
           {
-          case 0 : itype = THUMB_INSN_ALU_ASR; thumb_extract_sfmt_alu_lsl (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 1 : itype = THUMB_INSN_ALU_ADC; thumb_extract_sfmt_alu_adc (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 2 : itype = THUMB_INSN_ALU_SBC; thumb_extract_sfmt_alu_adc (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 3 : itype = THUMB_INSN_ALU_ROR; thumb_extract_sfmt_alu_lsl (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 : itype = THUMB_INSN_ALU_ASR; thumb_extract_sfmt_alu_lsl (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 : itype = THUMB_INSN_ALU_ADC; thumb_extract_sfmt_alu_adc (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 : itype = THUMB_INSN_ALU_SBC; thumb_extract_sfmt_alu_adc (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 3 : itype = THUMB_INSN_ALU_ROR; thumb_extract_sfmt_alu_lsl (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = THUMB_INSN_X_INVALID; thumb_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
           }
         }
@@ -355,10 +363,10 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
           unsigned int val = (((insn >> 6) & (3 << 0)));
           switch (val)
           {
-          case 0 : itype = THUMB_INSN_ALU_TST; thumb_extract_sfmt_alu_tst (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 1 : itype = THUMB_INSN_ALU_NEG; thumb_extract_sfmt_alu_neg (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 2 : itype = THUMB_INSN_ALU_CMP; thumb_extract_sfmt_alu_cmp (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 3 : itype = THUMB_INSN_ALU_CMN; thumb_extract_sfmt_alu_cmp (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 : itype = THUMB_INSN_ALU_TST; thumb_extract_sfmt_alu_tst (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 : itype = THUMB_INSN_ALU_NEG; thumb_extract_sfmt_alu_neg (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 : itype = THUMB_INSN_ALU_CMP; thumb_extract_sfmt_alu_cmp (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 3 : itype = THUMB_INSN_ALU_CMN; thumb_extract_sfmt_alu_cmp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = THUMB_INSN_X_INVALID; thumb_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
           }
         }
@@ -367,10 +375,10 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
           unsigned int val = (((insn >> 6) & (3 << 0)));
           switch (val)
           {
-          case 0 : itype = THUMB_INSN_ALU_ORR; thumb_extract_sfmt_alu_and (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 1 : itype = THUMB_INSN_ALU_MUL; thumb_extract_sfmt_alu_and (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 2 : itype = THUMB_INSN_ALU_BIC; thumb_extract_sfmt_alu_and (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 3 : itype = THUMB_INSN_ALU_MVN; thumb_extract_sfmt_alu_and (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 : itype = THUMB_INSN_ALU_ORR; thumb_extract_sfmt_alu_and (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 : itype = THUMB_INSN_ALU_MUL; thumb_extract_sfmt_alu_and (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 : itype = THUMB_INSN_ALU_BIC; thumb_extract_sfmt_alu_and (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 3 : itype = THUMB_INSN_ALU_MVN; thumb_extract_sfmt_alu_and (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = THUMB_INSN_X_INVALID; thumb_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
           }
         }
@@ -379,9 +387,9 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
           unsigned int val = (((insn >> 6) & (3 << 0)));
           switch (val)
           {
-          case 1 : itype = THUMB_INSN_ADD_RD_HS; thumb_extract_sfmt_add_rd_hs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 2 : itype = THUMB_INSN_ADD_HD_RS; thumb_extract_sfmt_add_hd_rs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 3 : itype = THUMB_INSN_ADD_HD_HS; thumb_extract_sfmt_add_hd_hs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 1 : itype = THUMB_INSN_ADD_RD_HS; thumb_extract_sfmt_add_rd_hs (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 : itype = THUMB_INSN_ADD_HD_RS; thumb_extract_sfmt_add_hd_rs (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 3 : itype = THUMB_INSN_ADD_HD_HS; thumb_extract_sfmt_add_hd_hs (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = THUMB_INSN_X_INVALID; thumb_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
           }
         }
@@ -390,9 +398,9 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
           unsigned int val = (((insn >> 6) & (3 << 0)));
           switch (val)
           {
-          case 1 : itype = THUMB_INSN_CMP_RD_HS; thumb_extract_sfmt_cmp_rd_hs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 2 : itype = THUMB_INSN_CMP_HD_RS; thumb_extract_sfmt_cmp_hd_rs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 3 : itype = THUMB_INSN_CMP_HD_HS; thumb_extract_sfmt_cmp_hd_hs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 1 : itype = THUMB_INSN_CMP_RD_HS; thumb_extract_sfmt_cmp_rd_hs (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 : itype = THUMB_INSN_CMP_HD_RS; thumb_extract_sfmt_cmp_hd_rs (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 3 : itype = THUMB_INSN_CMP_HD_HS; thumb_extract_sfmt_cmp_hd_hs (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = THUMB_INSN_X_INVALID; thumb_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
           }
         }
@@ -401,9 +409,9 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
           unsigned int val = (((insn >> 6) & (3 << 0)));
           switch (val)
           {
-          case 1 : itype = THUMB_INSN_MOV_RD_HS; thumb_extract_sfmt_mov_rd_hs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 2 : itype = THUMB_INSN_MOV_HD_RS; thumb_extract_sfmt_mov_hd_rs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 3 : itype = THUMB_INSN_MOV_HD_HS; thumb_extract_sfmt_mov_hd_hs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 1 : itype = THUMB_INSN_MOV_RD_HS; thumb_extract_sfmt_mov_rd_hs (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 : itype = THUMB_INSN_MOV_HD_RS; thumb_extract_sfmt_mov_hd_rs (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 3 : itype = THUMB_INSN_MOV_HD_HS; thumb_extract_sfmt_mov_hd_hs (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = THUMB_INSN_X_INVALID; thumb_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
           }
         }
@@ -412,8 +420,8 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
           unsigned int val = (((insn >> 6) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = THUMB_INSN_BX_RS; thumb_extract_sfmt_bx_rs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 1 : itype = THUMB_INSN_BX_HS; thumb_extract_sfmt_bx_hs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 : itype = THUMB_INSN_BX_RS; thumb_extract_sfmt_bx_rs (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 : itype = THUMB_INSN_BX_HS; thumb_extract_sfmt_bx_hs (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = THUMB_INSN_X_INVALID; thumb_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
           }
         }
@@ -424,23 +432,23 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 76 : /* fall through */
       case 77 : /* fall through */
       case 78 : /* fall through */
-      case 79 : itype = THUMB_INSN_LDR_PC; thumb_extract_sfmt_ldr_pc (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 79 : itype = THUMB_INSN_LDR_PC; thumb_extract_sfmt_ldr_pc (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 80 : /* fall through */
-      case 81 : itype = THUMB_INSN_STR; thumb_extract_sfmt_str (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 81 : itype = THUMB_INSN_STR; thumb_extract_sfmt_str (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 82 : /* fall through */
-      case 83 : itype = THUMB_INSN_STRH; thumb_extract_sfmt_str (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 83 : itype = THUMB_INSN_STRH; thumb_extract_sfmt_strh (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 84 : /* fall through */
-      case 85 : itype = THUMB_INSN_STRB; thumb_extract_sfmt_str (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 85 : itype = THUMB_INSN_STRB; thumb_extract_sfmt_strb (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 86 : /* fall through */
-      case 87 : itype = THUMB_INSN_LDSB; thumb_extract_sfmt_ldr (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 87 : itype = THUMB_INSN_LDSB; thumb_extract_sfmt_ldrb (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 88 : /* fall through */
-      case 89 : itype = THUMB_INSN_LDR; thumb_extract_sfmt_ldr (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 89 : itype = THUMB_INSN_LDR; thumb_extract_sfmt_ldr (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 90 : /* fall through */
-      case 91 : itype = THUMB_INSN_LDRH; thumb_extract_sfmt_ldr (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 91 : itype = THUMB_INSN_LDRH; thumb_extract_sfmt_ldrh (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 92 : /* fall through */
-      case 93 : itype = THUMB_INSN_LDRB; thumb_extract_sfmt_ldr (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 93 : itype = THUMB_INSN_LDRB; thumb_extract_sfmt_ldrb (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 94 : /* fall through */
-      case 95 : itype = THUMB_INSN_LDSH; thumb_extract_sfmt_ldr (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 95 : itype = THUMB_INSN_LDSH; thumb_extract_sfmt_ldrh (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 96 : /* fall through */
       case 97 : /* fall through */
       case 98 : /* fall through */
@@ -448,7 +456,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 100 : /* fall through */
       case 101 : /* fall through */
       case 102 : /* fall through */
-      case 103 : itype = THUMB_INSN_STR_IMM; thumb_extract_sfmt_str_imm (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 103 : itype = THUMB_INSN_STR_IMM; thumb_extract_sfmt_str_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 104 : /* fall through */
       case 105 : /* fall through */
       case 106 : /* fall through */
@@ -456,7 +464,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 108 : /* fall through */
       case 109 : /* fall through */
       case 110 : /* fall through */
-      case 111 : itype = THUMB_INSN_LDR_IMM; thumb_extract_sfmt_ldr_imm (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 111 : itype = THUMB_INSN_LDR_IMM; thumb_extract_sfmt_ldr_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 112 : /* fall through */
       case 113 : /* fall through */
       case 114 : /* fall through */
@@ -464,7 +472,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 116 : /* fall through */
       case 117 : /* fall through */
       case 118 : /* fall through */
-      case 119 : itype = THUMB_INSN_STRB_IMM; thumb_extract_sfmt_strb_imm (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 119 : itype = THUMB_INSN_STRB_IMM; thumb_extract_sfmt_strb_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 120 : /* fall through */
       case 121 : /* fall through */
       case 122 : /* fall through */
@@ -472,7 +480,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 124 : /* fall through */
       case 125 : /* fall through */
       case 126 : /* fall through */
-      case 127 : itype = THUMB_INSN_LDRB_IMM; thumb_extract_sfmt_ldrb_imm (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 127 : itype = THUMB_INSN_LDRB_IMM; thumb_extract_sfmt_ldrb_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 128 : /* fall through */
       case 129 : /* fall through */
       case 130 : /* fall through */
@@ -480,7 +488,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 132 : /* fall through */
       case 133 : /* fall through */
       case 134 : /* fall through */
-      case 135 : itype = THUMB_INSN_STRH_IMM; thumb_extract_sfmt_strh_imm (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 135 : itype = THUMB_INSN_STRH_IMM; thumb_extract_sfmt_strh_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 136 : /* fall through */
       case 137 : /* fall through */
       case 138 : /* fall through */
@@ -488,7 +496,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 140 : /* fall through */
       case 141 : /* fall through */
       case 142 : /* fall through */
-      case 143 : itype = THUMB_INSN_LDRH_IMM; thumb_extract_sfmt_ldrh_imm (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 143 : itype = THUMB_INSN_LDRH_IMM; thumb_extract_sfmt_ldrh_imm (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 144 : /* fall through */
       case 145 : /* fall through */
       case 146 : /* fall through */
@@ -496,7 +504,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 148 : /* fall through */
       case 149 : /* fall through */
       case 150 : /* fall through */
-      case 151 : itype = THUMB_INSN_STR_SPREL; thumb_extract_sfmt_str_sprel (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 151 : itype = THUMB_INSN_STR_SPREL; thumb_extract_sfmt_str_sprel (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 152 : /* fall through */
       case 153 : /* fall through */
       case 154 : /* fall through */
@@ -504,7 +512,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 156 : /* fall through */
       case 157 : /* fall through */
       case 158 : /* fall through */
-      case 159 : itype = THUMB_INSN_LDR_SPREL; thumb_extract_sfmt_ldr_sprel (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 159 : itype = THUMB_INSN_LDR_SPREL; thumb_extract_sfmt_ldr_sprel (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 160 : /* fall through */
       case 161 : /* fall through */
       case 162 : /* fall through */
@@ -512,7 +520,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 164 : /* fall through */
       case 165 : /* fall through */
       case 166 : /* fall through */
-      case 167 : itype = THUMB_INSN_LDA_PC; thumb_extract_sfmt_lda_pc (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 167 : itype = THUMB_INSN_LDA_PC; thumb_extract_sfmt_lda_pc (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 168 : /* fall through */
       case 169 : /* fall through */
       case 170 : /* fall through */
@@ -520,21 +528,21 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 172 : /* fall through */
       case 173 : /* fall through */
       case 174 : /* fall through */
-      case 175 : itype = THUMB_INSN_LDA_SP; thumb_extract_sfmt_lda_sp (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 175 : itype = THUMB_INSN_LDA_SP; thumb_extract_sfmt_lda_sp (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 176 :
         {
           unsigned int val = (((insn >> 7) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = THUMB_INSN_ADD_SP; thumb_extract_sfmt_add_sp (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-          case 1 : itype = THUMB_INSN_SUB_SP; thumb_extract_sfmt_add_sp (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 : itype = THUMB_INSN_ADD_SP; thumb_extract_sfmt_add_sp (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 : itype = THUMB_INSN_SUB_SP; thumb_extract_sfmt_add_sp (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = THUMB_INSN_X_INVALID; thumb_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
           }
         }
-      case 180 : itype = THUMB_INSN_PUSH; thumb_extract_sfmt_push (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 181 : itype = THUMB_INSN_PUSH_LR; thumb_extract_sfmt_push_lr (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 188 : itype = THUMB_INSN_POP; thumb_extract_sfmt_pop (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 189 : itype = THUMB_INSN_POP_PC; thumb_extract_sfmt_pop_pc (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 180 : itype = THUMB_INSN_PUSH; thumb_extract_sfmt_push (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 181 : itype = THUMB_INSN_PUSH_LR; thumb_extract_sfmt_push_lr (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 188 : itype = THUMB_INSN_POP; thumb_extract_sfmt_pop (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 189 : itype = THUMB_INSN_POP_PC; thumb_extract_sfmt_pop_pc (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 192 : /* fall through */
       case 193 : /* fall through */
       case 194 : /* fall through */
@@ -542,7 +550,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 196 : /* fall through */
       case 197 : /* fall through */
       case 198 : /* fall through */
-      case 199 : itype = THUMB_INSN_STMIA; thumb_extract_sfmt_stmia (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 199 : itype = THUMB_INSN_STMIA; thumb_extract_sfmt_stmia (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 200 : /* fall through */
       case 201 : /* fall through */
       case 202 : /* fall through */
@@ -550,22 +558,22 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 204 : /* fall through */
       case 205 : /* fall through */
       case 206 : /* fall through */
-      case 207 : itype = THUMB_INSN_LDMIA; thumb_extract_sfmt_ldmia (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 208 : itype = THUMB_INSN_BEQ; thumb_extract_sfmt_beq (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 209 : itype = THUMB_INSN_BNE; thumb_extract_sfmt_beq (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 210 : itype = THUMB_INSN_BCS; thumb_extract_sfmt_bcs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 211 : itype = THUMB_INSN_BCC; thumb_extract_sfmt_bcs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 212 : itype = THUMB_INSN_BMI; thumb_extract_sfmt_bmi (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 213 : itype = THUMB_INSN_BPL; thumb_extract_sfmt_bmi (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 214 : itype = THUMB_INSN_BVS; thumb_extract_sfmt_bvs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 215 : itype = THUMB_INSN_BVC; thumb_extract_sfmt_bvs (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 216 : itype = THUMB_INSN_BHI; thumb_extract_sfmt_bhi (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 217 : itype = THUMB_INSN_BLS; thumb_extract_sfmt_bhi (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 218 : itype = THUMB_INSN_BGE; thumb_extract_sfmt_bge (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 219 : itype = THUMB_INSN_BLT; thumb_extract_sfmt_bge (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 220 : itype = THUMB_INSN_BGT; thumb_extract_sfmt_bgt (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 221 : itype = THUMB_INSN_BLE; thumb_extract_sfmt_bgt (this, current_cpu, pc, base_insn, entire_insn);  goto done;
-      case 223 : itype = THUMB_INSN_SWI; thumb_extract_sfmt_swi (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 207 : itype = THUMB_INSN_LDMIA; thumb_extract_sfmt_ldmia (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 208 : itype = THUMB_INSN_BEQ; thumb_extract_sfmt_beq (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 209 : itype = THUMB_INSN_BNE; thumb_extract_sfmt_beq (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 210 : itype = THUMB_INSN_BCS; thumb_extract_sfmt_bcs (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 211 : itype = THUMB_INSN_BCC; thumb_extract_sfmt_bcs (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 212 : itype = THUMB_INSN_BMI; thumb_extract_sfmt_bmi (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 213 : itype = THUMB_INSN_BPL; thumb_extract_sfmt_bmi (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 214 : itype = THUMB_INSN_BVS; thumb_extract_sfmt_bvs (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 215 : itype = THUMB_INSN_BVC; thumb_extract_sfmt_bvs (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 216 : itype = THUMB_INSN_BHI; thumb_extract_sfmt_bhi (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 217 : itype = THUMB_INSN_BLS; thumb_extract_sfmt_bhi (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 218 : itype = THUMB_INSN_BGE; thumb_extract_sfmt_bge (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 219 : itype = THUMB_INSN_BLT; thumb_extract_sfmt_bge (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 220 : itype = THUMB_INSN_BGT; thumb_extract_sfmt_bgt (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 221 : itype = THUMB_INSN_BLE; thumb_extract_sfmt_bgt (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 223 : itype = THUMB_INSN_SWI; thumb_extract_sfmt_swi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 224 : /* fall through */
       case 225 : /* fall through */
       case 226 : /* fall through */
@@ -573,7 +581,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 228 : /* fall through */
       case 229 : /* fall through */
       case 230 : /* fall through */
-      case 231 : itype = THUMB_INSN_B; thumb_extract_sfmt_b (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 231 : itype = THUMB_INSN_B; thumb_extract_sfmt_b (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 240 : /* fall through */
       case 241 : /* fall through */
       case 242 : /* fall through */
@@ -581,7 +589,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 244 : /* fall through */
       case 245 : /* fall through */
       case 246 : /* fall through */
-      case 247 : itype = THUMB_INSN_BL_HI; thumb_extract_sfmt_bl_hi (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 247 : itype = THUMB_INSN_BL_HI; thumb_extract_sfmt_bl_hi (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 248 : /* fall through */
       case 249 : /* fall through */
       case 250 : /* fall through */
@@ -589,7 +597,7 @@ thumb_scache::decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_in
       case 252 : /* fall through */
       case 253 : /* fall through */
       case 254 : /* fall through */
-      case 255 : itype = THUMB_INSN_BL_LO; thumb_extract_sfmt_bl_lo (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      case 255 : itype = THUMB_INSN_BL_LO; thumb_extract_sfmt_bl_lo (this, current_cpu, pc, base_insn, entire_insn); goto done;
       default : itype = THUMB_INSN_X_INVALID; thumb_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
       }
     }
@@ -1257,6 +1265,35 @@ thumb_extract_sfmt_str (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
 }
 
 void
+thumb_extract_sfmt_strb (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn){
+    thumb_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_str.f
+    UINT f_ro;
+    UINT f_rb;
+    UINT f_rd;
+
+    f_ro = EXTRACT_LSB0_UINT (insn, 16, 8, 3);
+    f_rb = EXTRACT_LSB0_UINT (insn, 16, 5, 3);
+    f_rd = EXTRACT_LSB0_UINT (insn, 16, 2, 3);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_rb) = f_rb;
+  FLD (f_rd) = f_rd;
+  FLD (f_ro) = f_ro;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_strb)\t"
+        << " f_rb:0x" << hex << f_rb << dec
+        << " f_rd:0x" << hex << f_rd << dec
+        << " f_ro:0x" << hex << f_ro << dec
+        << endl;
+    }
+
+#undef FLD
+}
+
+void
 thumb_extract_sfmt_ldr (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn){
     thumb_insn_word insn = entire_insn;
 #define FLD(f) abuf->fields.sfmt_str.f
@@ -1276,6 +1313,93 @@ thumb_extract_sfmt_ldr (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, t
     {
       current_cpu->trace_stream 
         << "0x" << hex << pc << dec << " (sfmt_ldr)\t"
+        << " f_rb:0x" << hex << f_rb << dec
+        << " f_ro:0x" << hex << f_ro << dec
+        << " f_rd:0x" << hex << f_rd << dec
+        << endl;
+    }
+
+#undef FLD
+}
+
+void
+thumb_extract_sfmt_ldrb (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn){
+    thumb_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_str.f
+    UINT f_ro;
+    UINT f_rb;
+    UINT f_rd;
+
+    f_ro = EXTRACT_LSB0_UINT (insn, 16, 8, 3);
+    f_rb = EXTRACT_LSB0_UINT (insn, 16, 5, 3);
+    f_rd = EXTRACT_LSB0_UINT (insn, 16, 2, 3);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_rb) = f_rb;
+  FLD (f_ro) = f_ro;
+  FLD (f_rd) = f_rd;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_ldrb)\t"
+        << " f_rb:0x" << hex << f_rb << dec
+        << " f_ro:0x" << hex << f_ro << dec
+        << " f_rd:0x" << hex << f_rd << dec
+        << endl;
+    }
+
+#undef FLD
+}
+
+void
+thumb_extract_sfmt_strh (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn){
+    thumb_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_str.f
+    UINT f_ro;
+    UINT f_rb;
+    UINT f_rd;
+
+    f_ro = EXTRACT_LSB0_UINT (insn, 16, 8, 3);
+    f_rb = EXTRACT_LSB0_UINT (insn, 16, 5, 3);
+    f_rd = EXTRACT_LSB0_UINT (insn, 16, 2, 3);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_rb) = f_rb;
+  FLD (f_rd) = f_rd;
+  FLD (f_ro) = f_ro;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_strh)\t"
+        << " f_rb:0x" << hex << f_rb << dec
+        << " f_rd:0x" << hex << f_rd << dec
+        << " f_ro:0x" << hex << f_ro << dec
+        << endl;
+    }
+
+#undef FLD
+}
+
+void
+thumb_extract_sfmt_ldrh (thumb_scache* abuf, arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn){
+    thumb_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_str.f
+    UINT f_ro;
+    UINT f_rb;
+    UINT f_rd;
+
+    f_ro = EXTRACT_LSB0_UINT (insn, 16, 8, 3);
+    f_rb = EXTRACT_LSB0_UINT (insn, 16, 5, 3);
+    f_rd = EXTRACT_LSB0_UINT (insn, 16, 2, 3);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_rb) = f_rb;
+  FLD (f_ro) = f_ro;
+  FLD (f_rd) = f_rd;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_ldrh)\t"
         << " f_rb:0x" << hex << f_rb << dec
         << " f_ro:0x" << hex << f_ro << dec
         << " f_rd:0x" << hex << f_rd << dec

@@ -2,9 +2,9 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 
-This file is part of the Cygnus Simulators.
+This file is part of the Red Hat simulators.
 
 
 */
@@ -66,11 +66,15 @@ typedef enum arm_insn_type {
  , ARM_INSN_TST_REG_REG_SHIFT, ARM_INSN_TST_IMM, ARM_INSN_TEQ_REG_IMM_SHIFT, ARM_INSN_TEQ_REG_REG_SHIFT
  , ARM_INSN_TEQ_IMM, ARM_INSN_CMP_REG_IMM_SHIFT, ARM_INSN_CMP_REG_REG_SHIFT, ARM_INSN_CMP_IMM
  , ARM_INSN_CMN_REG_IMM_SHIFT, ARM_INSN_CMN_REG_REG_SHIFT, ARM_INSN_CMN_IMM, ARM_INSN_LDMDA
- , ARM_INSN_LDMDA_WB, ARM_INSN_LDMIB, ARM_INSN_LDMIB_WB, ARM_INSN_LDMIA
- , ARM_INSN_LDMIA_WB, ARM_INSN_LDMDB, ARM_INSN_LDMDB_WB, ARM_INSN_STMDB
- , ARM_INSN_STMDB_WB, ARM_INSN_STMIB, ARM_INSN_STMIB_WB, ARM_INSN_STMIA
- , ARM_INSN_STMIA_WB, ARM_INSN_STMDA, ARM_INSN_STMDA_WB, ARM_INSN_MRS_C
- , ARM_INSN_MRS_S, ARM_INSN_MSR_C, ARM_INSN_MSR_S, ARM_INSN_MAX
+ , ARM_INSN_LDMDA_SW, ARM_INSN_LDMDA_WB, ARM_INSN_LDMDA_SW_WB, ARM_INSN_LDMIB
+ , ARM_INSN_LDMIB_SW, ARM_INSN_LDMIB_WB, ARM_INSN_LDMIB_SW_WB, ARM_INSN_LDMIA
+ , ARM_INSN_LDMIA_SW, ARM_INSN_LDMIA_WB, ARM_INSN_LDMIA_SW_WB, ARM_INSN_LDMDB
+ , ARM_INSN_LDMDB_SW, ARM_INSN_LDMDB_WB, ARM_INSN_LDMDB_SW_WB, ARM_INSN_STMDB
+ , ARM_INSN_STMDB_SW, ARM_INSN_STMDB_WB, ARM_INSN_STMDB_SW_WB, ARM_INSN_STMIB
+ , ARM_INSN_STMIB_SW, ARM_INSN_STMIB_WB, ARM_INSN_STMIB_SW_WB, ARM_INSN_STMIA
+ , ARM_INSN_STMIA_SW, ARM_INSN_STMIA_WB, ARM_INSN_STMIA_SW_WB, ARM_INSN_STMDA
+ , ARM_INSN_STMDA_SW, ARM_INSN_STMDA_WB, ARM_INSN_STMDA_SW_WB, ARM_INSN_MRS_C
+ , ARM_INSN_MRS_S, ARM_INSN_MSR_C, ARM_INSN_MSR_S
 } ARM_INSN_TYPE;
 
 
@@ -419,21 +423,37 @@ extern arm_sem_fn arm_sem_cmn_reg_imm_shift;
 extern arm_sem_fn arm_sem_cmn_reg_reg_shift;
 extern arm_sem_fn arm_sem_cmn_imm;
 extern arm_sem_fn arm_sem_ldmda;
+extern arm_sem_fn arm_sem_ldmda_sw;
 extern arm_sem_fn arm_sem_ldmda_wb;
+extern arm_sem_fn arm_sem_ldmda_sw_wb;
 extern arm_sem_fn arm_sem_ldmib;
+extern arm_sem_fn arm_sem_ldmib_sw;
 extern arm_sem_fn arm_sem_ldmib_wb;
+extern arm_sem_fn arm_sem_ldmib_sw_wb;
 extern arm_sem_fn arm_sem_ldmia;
+extern arm_sem_fn arm_sem_ldmia_sw;
 extern arm_sem_fn arm_sem_ldmia_wb;
+extern arm_sem_fn arm_sem_ldmia_sw_wb;
 extern arm_sem_fn arm_sem_ldmdb;
+extern arm_sem_fn arm_sem_ldmdb_sw;
 extern arm_sem_fn arm_sem_ldmdb_wb;
+extern arm_sem_fn arm_sem_ldmdb_sw_wb;
 extern arm_sem_fn arm_sem_stmdb;
+extern arm_sem_fn arm_sem_stmdb_sw;
 extern arm_sem_fn arm_sem_stmdb_wb;
+extern arm_sem_fn arm_sem_stmdb_sw_wb;
 extern arm_sem_fn arm_sem_stmib;
+extern arm_sem_fn arm_sem_stmib_sw;
 extern arm_sem_fn arm_sem_stmib_wb;
+extern arm_sem_fn arm_sem_stmib_sw_wb;
 extern arm_sem_fn arm_sem_stmia;
+extern arm_sem_fn arm_sem_stmia_sw;
 extern arm_sem_fn arm_sem_stmia_wb;
+extern arm_sem_fn arm_sem_stmia_sw_wb;
 extern arm_sem_fn arm_sem_stmda;
+extern arm_sem_fn arm_sem_stmda_sw;
 extern arm_sem_fn arm_sem_stmda_wb;
+extern arm_sem_fn arm_sem_stmda_sw_wb;
 extern arm_sem_fn arm_sem_mrs_c;
 extern arm_sem_fn arm_sem_mrs_s;
 extern arm_sem_fn arm_sem_msr_c;

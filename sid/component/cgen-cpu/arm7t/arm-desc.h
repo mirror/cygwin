@@ -2,9 +2,9 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 
-This file is part of the Cygnus Simulators.
+This file is part of the Red Hat simulators.
 
 
 */
@@ -113,6 +113,7 @@ struct arm_insn_attr {
   inline int get_pbb_attr () { return (bools & (1<<CGEN_INSN_PBB)) != 0; }
 };
 
+#define MACH_ARM7TDMI_INSN_CHUNK_BITSIZE 0
 
 } // end arm namespace
 

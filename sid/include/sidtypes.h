@@ -25,9 +25,9 @@
 #  define HOST_BIG_ENDIAN true
 # endif
 #else
-# if defined(__i386__) || defined(__x86_64__) || defined(__alpha__) 
+# if defined(__i386__) || defined(__x86_64__) || defined(__alpha__) || (defined(__mips__) && defined(_MIPSEL))
 #  define HOST_BIG_ENDIAN false
-# elif defined(__sparc__) || defined(__powerpc__)
+# elif defined(__sparc__) || defined(__powerpc__) || (defined(__mips__) && defined(_MIPSEB))
 #  define HOST_BIG_ENDIAN true
 # else
 #  error "Unknown host platform"

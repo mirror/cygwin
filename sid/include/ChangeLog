@@ -1,7 +1,12 @@
+2005-01-26  Thiemo Seufer  <seufer@csv.ica.uni-stuttgart.de>
+
+	* sidtypes.h (HOST_BIG_ENDIAN): Add support for both MIPS
+	endiannesses.
+
 2004-12-16  Jim Blandy  <jimb@redhat.com>
 
 	* sidtypes.h: (bytereverse (host_int_2)): The x86-64 has an
-        xchgb instruction, too.
+	xchgb instruction, too.
 	(bytereverse (host_int_4)): The x86-64 has a bswap instruction, too.
 	(bytereverse (host_int_8)): Use bswap on the x86-64.
 

@@ -1,3 +1,7 @@
+2001-06-18  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.cache/types.exp: Remove rogue test case.
+
 2001-06-15  Ben Elliston  <bje@redhat.com>
 
 	* sidcomp.cache/cache.exp: New test case.

@@ -1,5 +1,5 @@
 ; Top level file for reading and recording .cpu file contents.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -58,8 +58,7 @@
 ;   usually these procs return "*UNSPECIFIED*"
 ; - all -foo-parse,parse-foo procs shall have `context' as the first arg
 ;   [FIXME: not all such procs have been converted]
-; - stay away from non-portable C symbols, it makes using hobbit more difficult
-;   e.g. don't have anything named `index', sigh.
+; - stay away from non-portable C symbols.
 
 ; Variables representing misc. global constants.
 
@@ -167,6 +166,7 @@
 ; Used to pretty-print debugging messages.
 (maybe-load "slib/pp" #f 'pretty-print)
 ; Used by pretty-print.
+(maybe-load "slib/random" #f 'random)
 (maybe-load "slib/genwrite" #f 'generic-write)
 (maybe-load "utils" #f 'logit)
 (maybe-load "utils-cgen" "utils_cgen" 'obj:name)

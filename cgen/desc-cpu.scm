@@ -983,7 +983,7 @@ init_tables ()
 (define (cgen-desc.h)
   (logit 1 "Generating " (current-arch-name) " desc.h ...\n")
   (string-write
-   (gen-copyright "CPU data header for @arch@."
+   (gen-c-copyright "CPU data header for @arch@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #ifndef @ARCH@_CPU_H
@@ -1035,7 +1035,7 @@ init_tables ()
 (define (cgen-desc.c)
   (logit 1 "Generating " (current-arch-name) " desc.c ...\n")
   (string-write
-   (gen-copyright "CPU data for @arch@."
+   (gen-c-copyright "CPU data for @arch@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #include \"sysdep.h\"

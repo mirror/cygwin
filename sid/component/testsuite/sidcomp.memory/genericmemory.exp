@@ -9,7 +9,8 @@ set test "sid startup"
 if [sid_start "base.conf"] then { pass $test } else { fail $test ; return }
 
 set test "attribute list"
-sid_assert_includes_all "sid::component::attribute_names $victim" "size state-snapshot"
+sid_assert_includes_all "sid::component::attribute_names $victim" \
+	"size state-snapshot read-latency write-latency"
 
 set test "set size = 512"
 sid_assert_success "sid::component::set_attribute_value $victim size 0x200"

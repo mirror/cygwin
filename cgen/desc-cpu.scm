@@ -1,5 +1,5 @@
 ; Generate .c/.h versions of main elements of cpu description file.
-; Copyright (C) 2000, 2001 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; ISA support code.
@@ -401,11 +401,11 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
     (if (equal? ty 'ifield)
 	(if (multi-ifield? fld) 
 	    (begin
-	      (set! field-ref (string-append "&(" (ifld-enum fld) "_MULTI_IFIELD[0])"))
+	      (set! field-ref (string-append "&" (ifld-enum fld) "_MULTI_IFIELD[0]"))
 	      (set! field-count (number->string (length (elm-get fld 'subfields)))))
 	    ; else	    
-	      (set! field-ref (string-append "&(@arch@_cgen_ifld_table[" (ifld-number fld) "])"))))    
-    (string-append "{ " field-count ", " field-ref " }"))) 
+	      (set! field-ref (string-append "&@arch@_cgen_ifld_table[" (ifld-number fld) "]"))))
+    (string-append "{ " field-count ", { (const PTR) " field-ref " } }")))
 
 (define (gen-multi-ifield-nodes)
   (let ((multis (find multi-ifield? (current-ifld-list))))
@@ -429,7 +429,7 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
 		(apply string-append 
 		       (map (lambda (x) (string-append "\n    " (gen-maybe-multi-ifld 'ifield x) ",")) 
 			    (elm-get ifld 'subfields)))
-		"\n    {0,0}\n};\n"))
+		"\n    { 0, { (const PTR) 0 } }\n};\n"))
 	     multis)))))
 
 (define (gen-operand-table)
@@ -470,8 +470,8 @@ const CGEN_OPERAND @arch@_cgen_operand_table[] =
 			         "  },\n"
 			      )))))
       (current-op-list))
-     "\
-  { 0, 0, 0, 0, 0, {0, {0}} }
+     "/* sentinel */\n\
+  { 0, 0, 0, 0, 0,\n    { 0, { (const PTR) 0 } },\n    { 0, { 0 } } }
 };
 
 #undef A
@@ -900,7 +900,7 @@ void
      CGEN_CPU_DESC cd;
 {
   unsigned int i;
-  CGEN_INSN *insns;
+  const CGEN_INSN *insns;
 
   if (cd->macro_insn_table.init_entries)
     {
@@ -908,7 +908,7 @@ void
       for (i = 0; i < cd->macro_insn_table.num_init_entries; ++i, ++insns)
 	{
 	  if (CGEN_INSN_RX ((insns)))
-	    regfree(CGEN_INSN_RX (insns));
+	    regfree (CGEN_INSN_RX (insns));
 	}
     }
 
@@ -918,7 +918,7 @@ void
       for (i = 0; i < cd->insn_table.num_init_entries; ++i, ++insns)
 	{
 	  if (CGEN_INSN_RX (insns))
-	    regfree(CGEN_INSN_RX (insns));
+	    regfree (CGEN_INSN_RX (insns));
 	}
     }
 
@@ -1044,6 +1044,7 @@ init_tables ()
 #include \"@arch@-opc.h\"
 #include \"opintl.h\"
 #include \"libiberty.h\"
+#include \"xregex.h\"
 \n"
    (lambda () (gen-extra-cpu.c srcdir (current-arch-name))) ; from <arch>.opc
    gen-attr-table-defns

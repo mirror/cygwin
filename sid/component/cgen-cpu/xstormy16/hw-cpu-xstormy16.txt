@@ -89,6 +89,22 @@ Functionality:
    |                |registers, and may trigger an       |
    |                |exception/trap.                     |
    |----------------+------------------------------------|
+   |         tracing|The component can be configured to  |
+   |                |perform certain kinds of tracing as |
+   |                |target programs execute. These are  |
+   |                |controlled by the family of trace-* |
+   |                |boolean attributes. By default,     |
+   |                |trace output is directed to the     |
+   |                |standard output stream. The         |
+   |                |trace-filename attribute allows the |
+   |                |user to specify the name of a file  |
+   |                |where trace output will be          |
+   |                |collected. A special filename of "-"|
+   |                |is used to represent standard       |
+   |                |output. Trace output files are not  |
+   |                |appended, but overwritten each time |
+   |                |they are opened.                    |
+   |----------------+------------------------------------|
    |exceptions/traps|When encountering exception/trap    |
    |                |conditions such as memory access    |
    |                |errors or software interrupts, this |
@@ -261,9 +277,11 @@ Component Reference:
   |endian            |register |'1'/'big'/'2'/'little'|big    |initialization,||
   |                  |         |                      |       |register access||
   |------------------+---------+----------------------+-------+---------------||
-  |trace-extract?    |setting  |boolean               |false  |initialization ||
+  |trace-extract?    |setting  |boolean               |false  |tracing        ||
   |------------------+---------+----------------------+-------+---------------||
-  |trace-result?     |setting  |boolean               |false  |initialization ||
+  |trace-filename    |setting  |string                |-      |tracing        ||
+  |------------------+---------+----------------------+-------+---------------||
+  |trace-result?     |setting  |boolean               |false  |tracing        ||
   |------------------+---------+----------------------+-------+---------------||
   |engine-type       |setting  |scache or pbb         |pbb    |execution      ||
   |------------------+---------+----------------------+-------+---------------||

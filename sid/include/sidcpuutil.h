@@ -200,6 +200,8 @@ namespace sidutil
     mutable sid::host_int_8 total_latency;
     sid::host_int_4 current_step_insn_count;
     output_pin step_cycles_pin;
+    output_pin cg_caller_pin;
+    output_pin cg_callee_pin;
   public:
     bool trace_extract_p;
     bool trace_result_p;
@@ -207,6 +209,7 @@ namespace sidutil
     bool trace_semantics_p;
     bool trace_counter_p;
     bool enable_step_trap_p;
+    std::ostream& trace_stream;
 
     void step_pin_handler (sid::host_int_4)
       {
@@ -250,6 +253,23 @@ namespace sidutil
       {
 	this->step_cycles_pin.drive (n);
       }
+    void cg_profile (sid::host_int_4 caller, sid::host_int_4 callee)
+    {
+      // The drive sequence is important: see sw-profile-gprof
+      this->cg_caller_pin.drive (caller);
+      this->cg_callee_pin.drive (callee);
+
+      if (UNLIKELY(this->trace_result_p)) 
+	{
+	  this->trace_stream << "cg-profile "
+			     << make_numeric_attribute (caller, 
+							std::ios::hex|std::ios::showbase)
+			     << "->" 
+			     << make_numeric_attribute (callee,
+							std::ios::hex|std::ios::showbase)
+	                     << "  ";
+	}
+    }
 
   protected:
     virtual sid::host_int_8 latency_to_cycles (sid::host_int_8 num)
@@ -442,6 +462,7 @@ public:
       triggerpoint_manager (this),
       step_pin (this, & basic_cpu::step_pin_handler),
       yield_pin (this, & basic_cpu::yield_pin_handler),
+      trace_stream (std::cout),
       reset_pin (this, & basic_cpu::reset_pin_handler),
       flush_icache_pin (this, & basic_cpu::flush_icache_pin_handler),
       pc_set_pin (this, & basic_cpu::pc_set_pin_handler),
@@ -462,6 +483,8 @@ public:
 	add_pin ("reset!", & this->reset_pin);
 	add_pin ("yield", & this->yield_pin);
 	add_pin ("start-pc-set!", & this->pc_set_pin);
+	add_pin ("cg-caller", & this->cg_caller_pin);
+	add_pin ("cg-callee", & this->cg_callee_pin);
 	add_pin ("endian-set!", & this->endian_set_pin);
 	add_watchable_pin ("trap", & this->trap_type_pin); // output side
 	add_watchable_pin ("trap-code", & this->trap_code_pin);

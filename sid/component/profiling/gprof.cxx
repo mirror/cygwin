@@ -1,6 +1,6 @@
 // gprof.cxx - A component for generating gprof profile data.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999-2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -58,6 +58,7 @@ namespace profiling_components
   using sidutil::no_bus_component;
   using sidutil::no_accessor_component;
   using sidutil::fixed_relation_map_component;
+  using sidutil::input_pin;
   using sidutil::callback_pin;
   using sidutil::make_attribute;
   using sidutil::parse_attribute;
@@ -74,7 +75,9 @@ namespace profiling_components
   using std::ofstream;
   using std::cerr;
   using std::endl;
+  using std::pair;
   using std::ostream;
+
 
 // ----------------------------------------------------------------------------
 
@@ -86,13 +89,24 @@ namespace profiling_components
 			 protected no_bus_component
   {
 #ifdef HAVE_HASHING
+    struct hash_cg_pair
+    {
+      size_t operator () (const pair<host_int_4,host_int_4>& s) const
+      {
+	return (s.first << 1) ^ s.second;
+      }
+    };
+
     typedef hash_map<host_int_4,host_int_4> hitcount_map_t;
+    typedef hash_map<pair<host_int_4,host_int_4>,host_int_4,hash_cg_pair> cg_count_map_t;
 #else
     typedef map<host_int_4,host_int_4> hitcount_map_t;
+    typedef map<pair<host_int_4,host_int_4>,host_int_4> cg_count_map_t;
 #endif
     
     // statistics
     hitcount_map_t value_hitcount_map;
+    cg_count_map_t cg_count_map;
     host_int_4 value_count;
     host_int_4 value_min, value_max;
     host_int_4 limit_min, limit_max;
@@ -105,9 +119,12 @@ namespace profiling_components
     endian output_file_format;
 
     callback_pin<gprof_component> accumulate_pin;
+
+    input_pin cg_caller_pin;
+    callback_pin<gprof_component> cg_callee_pin;
+
     callback_pin<gprof_component> reset_pin;
     callback_pin<gprof_component> store_pin;
-
 
     string bucket_size_get()
       {
@@ -164,8 +181,32 @@ namespace profiling_components
 	this->value_hitcount_map [quantized] ++;
       }
 
+    void accumulate_call (host_int_4 selfpc)
+      {
+	host_int_4 callerpc = this->cg_caller_pin.sense();
+
+	// Reject out-of-bounds samples
+	if (selfpc < this->limit_min || selfpc > this->limit_max) return;
+	if (callerpc < this->limit_min || callerpc > this->limit_max) return;
+
+	value_count ++;
+
+	assert (this->bucket_size != 0);
+	host_int_4 c_quantized = (callerpc / this->bucket_size) * this->bucket_size;
+	host_int_4 s_quantized = (selfpc / this->bucket_size) * this->bucket_size;
+
+	if (c_quantized < this->value_min) this->value_min = c_quantized;
+	if (s_quantized < this->value_min) this->value_min = s_quantized;
+	if (c_quantized > this->value_max) this->value_max = c_quantized;
+	if (s_quantized > this->value_max) this->value_max = s_quantized;
+
+	this->cg_count_map [make_pair(c_quantized,s_quantized)] ++;
+      }
+
+
     void reset (host_int_4)
       {
+	this->cg_count_map.clear ();
 	this->value_hitcount_map.clear ();
 	this->value_min = ~0;
 	this->value_max = 0;
@@ -244,61 +285,80 @@ namespace profiling_components
 	put_bytes (of, host_int_4(0), 4);      // gmon_hdr.spare
 	put_bytes (of, host_int_4(0), 4);      // gmon_hdr.spare
 
-	// We may have to loop and dump out several adjacent histogram
-	// tables, because histogram bucket count overflow.  The
-	// bucket counts are limited to 16 bits, but a 32-bit counter
-	// in gprof may be accumulated my multiple overlapping
-	// histogram tables.  We copy the histogram table here, since
-	// its counters will be decremented by up to 2**16-1 per
-	// iteration.
-	hitcount_map_t value_hitcount_map_copy = this->value_hitcount_map;
-	while (true)
+	if (! this->value_hitcount_map.empty())
+	  {
+	    // We may have to loop and dump out several adjacent histogram
+	    // tables, because histogram bucket count overflow.  The
+	    // bucket counts are limited to 16 bits, but a 32-bit counter
+	    // in gprof may be accumulated my multiple overlapping
+	    // histogram tables.  We copy the histogram table here, since
+	    // its counters will be decremented by up to 2**16-1 per
+	    // iteration.
+	    hitcount_map_t value_hitcount_map_copy = this->value_hitcount_map;
+	    while (true)
+	      {
+		// write a new histogram record
+		// GMON_Record_Tag
+		put_bytes (of, host_int_1(0), 1);      // GMON_TAG_TIME_HIST
+		// gmon_hist_hdr
+		put_bytes (of, this->value_min, 4);    // gmon_hist_hdr.low_pc
+		put_bytes (of, this->value_max, 4);    // gmon_hist_hdr.high_pc
+		assert (this->bucket_size != 0);
+		host_int_4 num_buckets = 1 + (this->value_max - this->value_min) / this->bucket_size;
+		put_bytes (of, num_buckets, 4);        // gmon_hist_hdr.hist_size
+		// XXX: actual prof_rate not available here ...
+		put_bytes (of, host_int_4(1), 4);      // gmon_hist_hdr.prof_rate
+		put_bytes (of, "tick", 15);            // gmon_hist_hdr.dimen
+		put_bytes (of, "t", 1);                // gmon_hist_hdr.dimen_abbrev
+		
+		// Dump out histogram counts
+		bool overflow = false;
+		for (host_int_4 bucket = this->value_min;
+		     bucket <= this->value_max;
+		     bucket += this->bucket_size)
+		  {
+		    const host_int_4 max_count = 65535;
+		    host_int_4 count = 0;
+		    
+		    // Check if this bucket exists by find() instead of a
+		    // blind []-lookup, because the latter would allocate
+		    // fresh & useless 0-count buckets for all non-touched
+		    // values.
+		    hitcount_map_t::iterator b = value_hitcount_map_copy.find (bucket);
+		    if (b != value_hitcount_map_copy.end())
+		      count = b->second;
+		    
+		    if (count > max_count) // overflow!
+		      {
+			put_bytes (of, host_int_2(max_count), 2);
+			b->second -= max_count;
+			overflow = true;
+		      }
+		    else
+		      {
+			put_bytes (of, host_int_2(count), 2);
+		      }
+		  }
+		
+		if (!overflow)
+		  break;
+	      }
+	  } // (emitting hash table?)
+
+	// Now spit out the call graph stastics.
+	cg_count_map_t::const_iterator ci = this->cg_count_map.begin();
+	while (ci != this->cg_count_map.end())
 	  {
 	    // write a new histogram record
 	    // GMON_Record_Tag
-	    put_bytes (of, host_int_1(0), 1);      // GMON_TAG_TIME_HIST
+	    put_bytes (of, host_int_1(1), 1);      // GMON_TAG_CG_ARC
+
 	    // gmon_hist_hdr
-	    put_bytes (of, this->value_min, 4);    // gmon_hist_hdr.low_pc
-	    put_bytes (of, this->value_max, 4);    // gmon_hist_hdr.high_pc
-	    assert (this->bucket_size != 0);
-	    host_int_4 num_buckets = 1 + (this->value_max - this->value_min) / this->bucket_size;
-	    put_bytes (of, num_buckets, 4);        // gmon_hist_hdr.hist_size
-	    // XXX: actual prof_rate not available here ...
-	    put_bytes (of, host_int_4(1), 4);      // gmon_hist_hdr.prof_rate
-	    put_bytes (of, "tick", 15);            // gmon_hist_hdr.dimen
-	    put_bytes (of, "t", 1);                // gmon_hist_hdr.dimen_abbrev
-
-	    // Dump out histogram counts
-	    bool overflow = false;
-	    for (host_int_4 bucket = this->value_min;
-		 bucket <= this->value_max;
-		 bucket += this->bucket_size)
-	      {
-		const host_int_4 max_count = 65535;
-		host_int_4 count = 0;
-
-		// Check if this bucket exists by find() instead of a
-		// blind []-lookup, because the latter would allocate
-		// fresh & useless 0-count buckets for all non-touched
-		// values.
-		hitcount_map_t::iterator b = value_hitcount_map_copy.find (bucket);
-		if (b != value_hitcount_map_copy.end())
-		  count = b->second;
-
-		if (count > max_count) // overflow!
-		  {
-		    put_bytes (of, host_int_2(max_count), 2);
-		    b->second -= max_count;
-		    overflow = true;
-		  }
-		else
-		  {
-		    put_bytes (of, host_int_2(count), 2);
-		  }
-	      }
-
-	    if (!overflow)
-	      break;
+	    put_bytes (of, ci->first.first, 4);    // cg caller
+	    put_bytes (of, ci->first.second, 4);    // cg self
+	    put_bytes (of, ci->second, 4);    // cg count
+	    
+	    ci ++;
 	  }
 
 	of.close ();
@@ -318,11 +378,16 @@ namespace profiling_components
       output_file ("gmon.out"),
       output_file_format (endian_unknown),
       accumulate_pin (this, & gprof_component::accumulate),
+      cg_callee_pin (this, & gprof_component::accumulate_call),
       reset_pin (this, & gprof_component::reset),
       store_pin (this, & gprof_component::store)
       {
 	add_pin ("sample", & this->accumulate_pin);
 	add_attribute ("sample", & this->accumulate_pin, "pin");
+	add_pin ("cg-caller", & this->cg_caller_pin);
+	add_attribute ("cg-caller", & this->cg_caller_pin, "pin");
+	add_pin ("cg-callee", & this->cg_callee_pin);
+	add_attribute ("cg-callee", & this->cg_callee_pin, "pin");
 	add_pin ("reset", & this->reset_pin);
 	add_attribute ("reset", & this->reset_pin, "pin");
 	add_pin ("store", & this->store_pin);

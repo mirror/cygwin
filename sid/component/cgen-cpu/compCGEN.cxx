@@ -34,8 +34,7 @@ using namespace cgen;
 
 
 // ----------------------------------------------------------------------------
-cgen_bi_endian_cpu::cgen_bi_endian_cpu ():
-  trace_stream (cout)
+cgen_bi_endian_cpu::cgen_bi_endian_cpu ()
 {
   trace_count = 0;
   warnings_enabled = false;

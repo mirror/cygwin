@@ -1,5 +1,5 @@
 /* Semantics ops support for CGEN-based simulators.
-   Copyright (C) 1996, 1997, 1998 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
    Contributed by Cygnus Solutions.
 
 This file is part of the GNU Simulators.
@@ -23,8 +23,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #ifndef CGEN_SEM_OPS_H
 #define CGEN_SEM_OPS_H
 
+#if defined (__GNUC__) && ! defined (SEMOPS_DEFINE_INLINE)
+#define SEMOPS_DEFINE_INLINE
+#define SEMOPS_INLINE extern inline
+#else
+#define SEMOPS_INLINE
+#endif
+
 /* Semantic operations.
    At one point this file was machine generated.  Maybe it will be again.  */
+
+/* TODO: Lazy encoding/decoding of fp values.  */
 
 /* These don't really have a mode.  */
 #define ANDIF(x, y) ((x) && (y))
@@ -46,7 +55,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define LEUBI(x, y) ((BI) (x) <= (BI) (y))
 #define GTUBI(x, y) ((BI) (x) > (BI) (y))
 #define GEUBI(x, y) ((BI) (x) >= (BI) (y))
-
+
 #define ADDQI(x, y) ((x) + (y))
 #define SUBQI(x, y) ((x) - (y))
 #define MULQI(x, y) ((x) * (y))
@@ -57,14 +66,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define SRAQI(x, y) ((QI) (x) >> (y))
 #define SRLQI(x, y) ((UQI) (x) >> (y))
 #define SLLQI(x, y) ((UQI) (x) << (y))
-extern QI RORQI PARAMS ((QI, int));
-extern QI ROLQI PARAMS ((QI, int));
+extern QI RORQI (QI, int);
+extern QI ROLQI (QI, int);
 #define ANDQI(x, y) ((x) & (y))
 #define ORQI(x, y) ((x) | (y))
 #define XORQI(x, y) ((x) ^ (y))
 #define NEGQI(x) (- (x))
 #define NOTQI(x) (! (QI) (x))
 #define INVQI(x) (~ (x))
+#define ABSQI(x) ((x) < 0 ? -(x) : (x))
 #define EQQI(x, y) ((QI) (x) == (QI) (y))
 #define NEQI(x, y) ((QI) (x) != (QI) (y))
 #define LTQI(x, y) ((QI) (x) < (QI) (y))
@@ -75,7 +85,7 @@ extern QI ROLQI PARAMS ((QI, int));
 #define LEUQI(x, y) ((UQI) (x) <= (UQI) (y))
 #define GTUQI(x, y) ((UQI) (x) > (UQI) (y))
 #define GEUQI(x, y) ((UQI) (x) >= (UQI) (y))
-
+
 #define ADDHI(x, y) ((x) + (y))
 #define SUBHI(x, y) ((x) - (y))
 #define MULHI(x, y) ((x) * (y))
@@ -86,14 +96,15 @@ extern QI ROLQI PARAMS ((QI, int));
 #define SRAHI(x, y) ((HI) (x) >> (y))
 #define SRLHI(x, y) ((UHI) (x) >> (y))
 #define SLLHI(x, y) ((UHI) (x) << (y))
-extern HI RORHI PARAMS ((HI, int));
-extern HI ROLHI PARAMS ((HI, int));
+extern HI RORHI (HI, int);
+extern HI ROLHI (HI, int);
 #define ANDHI(x, y) ((x) & (y))
 #define ORHI(x, y) ((x) | (y))
 #define XORHI(x, y) ((x) ^ (y))
 #define NEGHI(x) (- (x))
 #define NOTHI(x) (! (HI) (x))
 #define INVHI(x) (~ (x))
+#define ABSHI(x) ((x) < 0 ? -(x) : (x))
 #define EQHI(x, y) ((HI) (x) == (HI) (y))
 #define NEHI(x, y) ((HI) (x) != (HI) (y))
 #define LTHI(x, y) ((HI) (x) < (HI) (y))
@@ -104,7 +115,7 @@ extern HI ROLHI PARAMS ((HI, int));
 #define LEUHI(x, y) ((UHI) (x) <= (UHI) (y))
 #define GTUHI(x, y) ((UHI) (x) > (UHI) (y))
 #define GEUHI(x, y) ((UHI) (x) >= (UHI) (y))
-
+
 #define ADDSI(x, y) ((x) + (y))
 #define SUBSI(x, y) ((x) - (y))
 #define MULSI(x, y) ((x) * (y))
@@ -115,14 +126,15 @@ extern HI ROLHI PARAMS ((HI, int));
 #define SRASI(x, y) ((SI) (x) >> (y))
 #define SRLSI(x, y) ((USI) (x) >> (y))
 #define SLLSI(x, y) ((USI) (x) << (y))
-extern SI RORSI PARAMS ((SI, int));
-extern SI ROLSI PARAMS ((SI, int));
+extern SI RORSI (SI, int);
+extern SI ROLSI (SI, int);
 #define ANDSI(x, y) ((x) & (y))
 #define ORSI(x, y) ((x) | (y))
 #define XORSI(x, y) ((x) ^ (y))
 #define NEGSI(x) (- (x))
 #define NOTSI(x) (! (SI) (x))
 #define INVSI(x) (~ (x))
+#define ABSSI(x) ((x) < 0 ? -(x) : (x))
 #define EQSI(x, y) ((SI) (x) == (SI) (y))
 #define NESI(x, y) ((SI) (x) != (SI) (y))
 #define LTSI(x, y) ((SI) (x) < (SI) (y))
@@ -133,36 +145,36 @@ extern SI ROLSI PARAMS ((SI, int));
 #define LEUSI(x, y) ((USI) (x) <= (USI) (y))
 #define GTUSI(x, y) ((USI) (x) > (USI) (y))
 #define GEUSI(x, y) ((USI) (x) >= (USI) (y))
-
+
 #ifdef DI_FN_SUPPORT
-extern DI ADDDI PARAMS ((DI, DI));
-extern DI SUBDI PARAMS ((DI, DI));
-extern DI MULDI PARAMS ((DI, DI));
-extern DI DIVDI PARAMS ((DI, DI));
-extern DI UDIVDI PARAMS ((DI, DI));
-extern DI MODDI PARAMS ((DI, DI));
-extern DI UMODDI PARAMS ((DI, DI));
-extern DI SRADI PARAMS ((DI, int));
-extern UDI SRLDI PARAMS ((UDI, int));
-extern UDI SLLDI PARAMS ((UDI, int));
-extern DI RORDI PARAMS ((DI, int));
-extern DI ROLDI PARAMS ((DI, int));
-extern DI ANDDI PARAMS ((DI, DI));
-extern DI ORDI PARAMS ((DI, DI));
-extern DI XORDI PARAMS ((DI, DI));
-extern DI NEGDI PARAMS ((DI));
-extern int NOTDI PARAMS ((DI));
-extern DI INVDI PARAMS ((DI));
-extern int EQDI PARAMS ((DI, DI));
-extern int NEDI PARAMS ((DI, DI));
-extern int LTDI PARAMS ((DI, DI));
-extern int LEDI PARAMS ((DI, DI));
-extern int GTDI PARAMS ((DI, DI));
-extern int GEDI PARAMS ((DI, DI));
-extern int LTUDI PARAMS ((UDI, UDI));
-extern int LEUDI PARAMS ((UDI, UDI));
-extern int GTUDI PARAMS ((UDI, UDI));
-extern int GEUDI PARAMS ((UDI, UDI));
+extern DI ADDDI (DI, DI);
+extern DI SUBDI (DI, DI);
+extern DI MULDI (DI, DI);
+extern DI DIVDI (DI, DI);
+extern DI UDIVDI (DI, DI);
+extern DI MODDI (DI, DI);
+extern DI UMODDI (DI, DI);
+extern DI SRADI (DI, int);
+extern UDI SRLDI (UDI, int);
+extern UDI SLLDI (UDI, int);
+extern DI RORDI (DI, int);
+extern DI ROLDI (DI, int);
+extern DI ANDDI (DI, DI);
+extern DI ORDI (DI, DI);
+extern DI XORDI (DI, DI);
+extern DI NEGDI (DI);
+extern int NOTDI (DI);
+extern DI INVDI (DI);
+extern int EQDI (DI, DI);
+extern int NEDI (DI, DI);
+extern int LTDI (DI, DI);
+extern int LEDI (DI, DI);
+extern int GTDI (DI, DI);
+extern int GEDI (DI, DI);
+extern int LTUDI (UDI, UDI);
+extern int LEUDI (UDI, UDI);
+extern int GTUDI (UDI, UDI);
+extern int GEUDI (UDI, UDI);
 #else /* ! DI_FN_SUPPORT */
 #define ADDDI(x, y) ((x) + (y))
 #define SUBDI(x, y) ((x) - (y))
@@ -174,14 +186,15 @@ extern int GEUDI PARAMS ((UDI, UDI));
 #define SRADI(x, y) ((DI) (x) >> (y))
 #define SRLDI(x, y) ((UDI) (x) >> (y))
 #define SLLDI(x, y) ((UDI) (x) << (y))
-extern DI RORDI PARAMS ((DI, int));
-extern DI ROLDI PARAMS ((DI, int));
+extern DI RORDI (DI, int);
+extern DI ROLDI (DI, int);
 #define ANDDI(x, y) ((x) & (y))
 #define ORDI(x, y) ((x) | (y))
 #define XORDI(x, y) ((x) ^ (y))
 #define NEGDI(x) (- (x))
 #define NOTDI(x) (! (DI) (x))
 #define INVDI(x) (~ (x))
+#define ABSDI(x) ((x) < 0 ? -(x) : (x))
 #define EQDI(x, y) ((DI) (x) == (DI) (y))
 #define NEDI(x, y) ((DI) (x) != (DI) (y))
 #define LTDI(x, y) ((DI) (x) < (DI) (y))
@@ -193,632 +206,214 @@ extern DI ROLDI PARAMS ((DI, int));
 #define GTUDI(x, y) ((UDI) (x) > (UDI) (y))
 #define GEUDI(x, y) ((UDI) (x) >= (UDI) (y))
 #endif /* DI_FN_SUPPORT */
-
-#ifdef SF_FN_SUPPORT
-extern SF ADDSF PARAMS ((SF, SF));
-extern SF SUBSF PARAMS ((SF, SF));
-extern SF NEGSF PARAMS ((SF));
-extern SF MULSF PARAMS ((SF, SF));
-extern SF DIVSF PARAMS ((SF, SF));
-extern int EQSF PARAMS ((SF, SF));
-extern int NESF PARAMS ((SF, SF));
-extern int LTSF PARAMS ((SF, SF));
-extern int LESF PARAMS ((SF, SF));
-extern int GTSF PARAMS ((SF, SF));
-extern int GESF PARAMS ((SF, SF));
-extern SF ABSSF PARAMS ((SF));
-extern SF SQRTSF PARAMS ((SF));
-extern SF COSSF PARAMS ((SF));
-extern SF SINSF PARAMS ((SF));
-#else /* ! SF_FN_SUPPORT */
-#define ADDSF(x, y) ((x) + (y))
-#define SUBSF(x, y) ((x) - (y))
-#define NEGSF(x) (- (x))
-#define MULSF(x, y) ((x) * (y))
-#define DIVSF(x, y) ((x) / (y))
-#define EQSF(x, y) ((SF) (x) == (SF) (y))
-#define NESF(x, y) ((SF) (x) != (SF) (y))
-#define LTSF(x, y) ((SF) (x) < (SF) (y))
-#define LESF(x, y) ((SF) (x) <= (SF) (y))
-#define GTSF(x, y) ((SF) (x) > (SF) (y))
-#define GESF(x, y) ((SF) (x) >= (SF) (y))
-extern SF ABSSF PARAMS ((SF));
-extern SF SQRTSF PARAMS ((SF));
-extern SF COSSF PARAMS ((SF));
-extern SF SINSF PARAMS ((SF));
-#endif /* SF_FN_SUPPORT */
-
-#ifdef DF_FN_SUPPORT
-extern DF ADDDF PARAMS ((DF, DF));
-extern DF SUBDF PARAMS ((DF, DF));
-extern DF NEGDF PARAMS ((DF));
-extern DF MULDF PARAMS ((DF, DF));
-extern DF DIVDF PARAMS ((DF, DF));
-extern int EQDF PARAMS ((DF, DF));
-extern int NEDF PARAMS ((DF, DF));
-extern int LTDF PARAMS ((DF, DF));
-extern int LEDF PARAMS ((DF, DF));
-extern int GTDF PARAMS ((DF, DF));
-extern int GEDF PARAMS ((DF, DF));
-extern DF ABSDF PARAMS ((DF));
-extern DF SQRTDF PARAMS ((DF));
-extern DF COSDF PARAMS ((DF));
-extern DF SINDF PARAMS ((DF));
-#else /* ! DF_FN_SUPPORT */
-#define ADDDF(x, y) ((x) + (y))
-#define SUBDF(x, y) ((x) - (y))
-#define NEGDF(x) (- (x))
-#define MULDF(x, y) ((x) * (y))
-#define DIVDF(x, y) ((x) / (y))
-#define EQDF(x, y) ((DF) (x) == (DF) (y))
-#define NEDF(x, y) ((DF) (x) != (DF) (y))
-#define LTDF(x, y) ((DF) (x) < (DF) (y))
-#define LEDF(x, y) ((DF) (x) <= (DF) (y))
-#define GTDF(x, y) ((DF) (x) > (DF) (y))
-#define GEDF(x, y) ((DF) (x) >= (DF) (y))
-extern DF ABSDF PARAMS ((DF));
-extern DF SQRTDF PARAMS ((DF));
-extern DF COSDF PARAMS ((DF));
-extern DF SINDF PARAMS ((DF));
-#endif /* DF_FN_SUPPORT */
-
-#ifdef XF_FN_SUPPORT
-extern XF ADDXF PARAMS ((XF, XF));
-extern XF SUBXF PARAMS ((XF, XF));
-extern XF NEGXF PARAMS ((XF));
-extern XF MULXF PARAMS ((XF, XF));
-extern XF DIVXF PARAMS ((XF, XF));
-extern int EQXF PARAMS ((XF, XF));
-extern int NEXF PARAMS ((XF, XF));
-extern int LTXF PARAMS ((XF, XF));
-extern int LEXF PARAMS ((XF, XF));
-extern int GTXF PARAMS ((XF, XF));
-extern int GEXF PARAMS ((XF, XF));
-extern XF ABSXF PARAMS ((XF));
-extern XF SQRTXF PARAMS ((XF));
-extern XF COSXF PARAMS ((XF));
-extern XF SINXF PARAMS ((XF));
-#else /* ! XF_FN_SUPPORT */
-#define ADDXF(x, y) ((x) + (y))
-#define SUBXF(x, y) ((x) - (y))
-#define NEGXF(x) (- (x))
-#define MULXF(x, y) ((x) * (y))
-#define DIVXF(x, y) ((x) / (y))
-#define EQXF(x, y) ((XF) (x) == (XF) (y))
-#define NEXF(x, y) ((XF) (x) != (XF) (y))
-#define LTXF(x, y) ((XF) (x) < (XF) (y))
-#define LEXF(x, y) ((XF) (x) <= (XF) (y))
-#define GTXF(x, y) ((XF) (x) > (XF) (y))
-#define GEXF(x, y) ((XF) (x) >= (XF) (y))
-extern XF ABSXF PARAMS ((XF));
-extern XF SQRTXF PARAMS ((XF));
-extern XF COSXF PARAMS ((XF));
-extern XF SINXF PARAMS ((XF));
-#endif /* XF_FN_SUPPORT */
-
-#ifdef TF_FN_SUPPORT
-extern TF ADDTF PARAMS ((TF, TF));
-extern TF SUBTF PARAMS ((TF, TF));
-extern TF NEGTF PARAMS ((TF));
-extern TF MULTF PARAMS ((TF, TF));
-extern TF DIVTF PARAMS ((TF, TF));
-extern int EQTF PARAMS ((TF, TF));
-extern int NETF PARAMS ((TF, TF));
-extern int LTTF PARAMS ((TF, TF));
-extern int LETF PARAMS ((TF, TF));
-extern int GTTF PARAMS ((TF, TF));
-extern int GETF PARAMS ((TF, TF));
-extern TF ABSTF PARAMS ((TF));
-extern TF SQRTTF PARAMS ((TF));
-extern TF COSTF PARAMS ((TF));
-extern TF SINTF PARAMS ((TF));
-#else /* ! TF_FN_SUPPORT */
-#define ADDTF(x, y) ((x) + (y))
-#define SUBTF(x, y) ((x) - (y))
-#define NEGTF(x) (- (x))
-#define MULTF(x, y) ((x) * (y))
-#define DIVTF(x, y) ((x) / (y))
-#define EQTF(x, y) ((TF) (x) == (TF) (y))
-#define NETF(x, y) ((TF) (x) != (TF) (y))
-#define LTTF(x, y) ((TF) (x) < (TF) (y))
-#define LETF(x, y) ((TF) (x) <= (TF) (y))
-#define GTTF(x, y) ((TF) (x) > (TF) (y))
-#define GETF(x, y) ((TF) (x) >= (TF) (y))
-extern TF ABSTF PARAMS ((TF));
-extern TF SQRTTF PARAMS ((TF));
-extern TF COSTF PARAMS ((TF));
-extern TF SINTF PARAMS ((TF));
-#endif /* TF_FN_SUPPORT */
-
-
+
 #define EXTBIQI(x) ((QI) (BI) (x))
 #define EXTBIHI(x) ((HI) (BI) (x))
 #define EXTBISI(x) ((SI) (BI) (x))
 #if defined (DI_FN_SUPPORT)
-extern DI EXTBIDI PARAMS ((BI));
+extern DI EXTBIDI (BI);
 #else
 #define EXTBIDI(x) ((DI) (BI) (x))
 #endif
 #define EXTQIHI(x) ((HI) (QI) (x))
 #define EXTQISI(x) ((SI) (QI) (x))
 #if defined (DI_FN_SUPPORT)
-extern DI EXTQIDI PARAMS ((QI));
+extern DI EXTQIDI (QI);
 #else
 #define EXTQIDI(x) ((DI) (QI) (x))
 #endif
+#define EXTHIHI(x) ((HI) (HI) (x))
 #define EXTHISI(x) ((SI) (HI) (x))
+#define EXTSISI(x) ((SI) (SI) (x))
 #if defined (DI_FN_SUPPORT)
-extern DI EXTHIDI PARAMS ((HI));
+extern DI EXTHIDI (HI);
 #else
 #define EXTHIDI(x) ((DI) (HI) (x))
 #endif
 #if defined (DI_FN_SUPPORT)
-extern DI EXTSIDI PARAMS ((SI));
+extern DI EXTSIDI (SI);
 #else
 #define EXTSIDI(x) ((DI) (SI) (x))
 #endif
-#if defined (SF_FN_SUPPORT) || defined (DF_FN_SUPPORT)
-extern DF EXTSFDF PARAMS ((SF));
-#else
-#define EXTSFDF(x) ((DF) (SF) (x))
-#endif
-#if defined (SF_FN_SUPPORT) || defined (XF_FN_SUPPORT)
-extern XF EXTSFXF PARAMS ((SF));
-#else
-#define EXTSFXF(x) ((XF) (SF) (x))
-#endif
-#if defined (SF_FN_SUPPORT) || defined (TF_FN_SUPPORT)
-extern TF EXTSFTF PARAMS ((SF));
-#else
-#define EXTSFTF(x) ((TF) (SF) (x))
-#endif
-#if defined (DF_FN_SUPPORT) || defined (XF_FN_SUPPORT)
-extern XF EXTDFXF PARAMS ((DF));
-#else
-#define EXTDFXF(x) ((XF) (DF) (x))
-#endif
-#if defined (DF_FN_SUPPORT) || defined (TF_FN_SUPPORT)
-extern TF EXTDFTF PARAMS ((DF));
-#else
-#define EXTDFTF(x) ((TF) (DF) (x))
-#endif
-#if defined (XF_FN_SUPPORT) || defined (TF_FN_SUPPORT)
-extern TF EXTXFTF PARAMS ((XF));
-#else
-#define EXTXFTF(x) ((TF) (XF) (x))
-#endif
+
 #define ZEXTBIQI(x) ((QI) (BI) (x))
 #define ZEXTBIHI(x) ((HI) (BI) (x))
 #define ZEXTBISI(x) ((SI) (BI) (x))
 #if defined (DI_FN_SUPPORT)
-extern DI ZEXTBIDI PARAMS ((BI));
+extern DI ZEXTBIDI (BI);
 #else
 #define ZEXTBIDI(x) ((DI) (BI) (x))
 #endif
 #define ZEXTQIHI(x) ((HI) (UQI) (x))
 #define ZEXTQISI(x) ((SI) (UQI) (x))
 #if defined (DI_FN_SUPPORT)
-extern DI ZEXTQIDI PARAMS ((QI));
+extern DI ZEXTQIDI (QI);
 #else
 #define ZEXTQIDI(x) ((DI) (UQI) (x))
 #endif
 #define ZEXTHISI(x) ((SI) (UHI) (x))
+#define ZEXTHIHI(x) ((HI) (UHI) (x))
+#define ZEXTSISI(x) ((SI) (USI) (x))
 #if defined (DI_FN_SUPPORT)
-extern DI ZEXTHIDI PARAMS ((HI));
+extern DI ZEXTHIDI (HI);
 #else
 #define ZEXTHIDI(x) ((DI) (UHI) (x))
 #endif
 #if defined (DI_FN_SUPPORT)
-extern DI ZEXTSIDI PARAMS ((SI));
+extern DI ZEXTSIDI (SI);
 #else
 #define ZEXTSIDI(x) ((DI) (USI) (x))
 #endif
+
 #define TRUNCQIBI(x) ((BI) (QI) (x))
 #define TRUNCHIBI(x) ((BI) (HI) (x))
 #define TRUNCHIQI(x) ((QI) (HI) (x))
 #define TRUNCSIBI(x) ((BI) (SI) (x))
 #define TRUNCSIQI(x) ((QI) (SI) (x))
 #define TRUNCSIHI(x) ((HI) (SI) (x))
+#define TRUNCSISI(x) ((SI) (SI) (x))
 #if defined (DI_FN_SUPPORT)
-extern BI TRUNCDIBI PARAMS ((DI));
+extern BI TRUNCDIBI (DI);
 #else
 #define TRUNCDIBI(x) ((BI) (DI) (x))
 #endif
 #if defined (DI_FN_SUPPORT)
-extern QI TRUNCDIQI PARAMS ((DI));
+extern QI TRUNCDIQI (DI);
 #else
 #define TRUNCDIQI(x) ((QI) (DI) (x))
 #endif
 #if defined (DI_FN_SUPPORT)
-extern HI TRUNCDIHI PARAMS ((DI));
+extern HI TRUNCDIHI (DI);
 #else
 #define TRUNCDIHI(x) ((HI) (DI) (x))
 #endif
 #if defined (DI_FN_SUPPORT)
-extern SI TRUNCDISI PARAMS ((DI));
+extern SI TRUNCDISI (DI);
 #else
 #define TRUNCDISI(x) ((SI) (DI) (x))
 #endif
-#if defined (DF_FN_SUPPORT) || defined (SF_FN_SUPPORT)
-extern SF TRUNCDFSF PARAMS ((DF));
-#else
-#define TRUNCDFSF(x) ((SF) (DF) (x))
-#endif
-#if defined (XF_FN_SUPPORT) || defined (SF_FN_SUPPORT)
-extern SF TRUNCXFSF PARAMS ((XF));
-#else
-#define TRUNCXFSF(x) ((SF) (XF) (x))
-#endif
-#if defined (XF_FN_SUPPORT) || defined (DF_FN_SUPPORT)
-extern DF TRUNCXFDF PARAMS ((XF));
-#else
-#define TRUNCXFDF(x) ((DF) (XF) (x))
-#endif
-#if defined (TF_FN_SUPPORT) || defined (SF_FN_SUPPORT)
-extern SF TRUNCTFSF PARAMS ((TF));
-#else
-#define TRUNCTFSF(x) ((SF) (TF) (x))
-#endif
-#if defined (TF_FN_SUPPORT) || defined (DF_FN_SUPPORT)
-extern DF TRUNCTFDF PARAMS ((TF));
-#else
-#define TRUNCTFDF(x) ((DF) (TF) (x))
-#endif
-#if defined (TF_FN_SUPPORT) || defined (XF_FN_SUPPORT)
-extern XF TRUNCTFXF PARAMS ((TF));
-#else
-#define TRUNCTFXF(x) ((XF) (TF) (x))
-#endif
-#if defined (SF_FN_SUPPORT)
-extern SF FLOATQISF PARAMS ((QI));
-#else
-#define FLOATQISF(x) ((SF) (QI) (x))
-#endif
-#if defined (DF_FN_SUPPORT)
-extern DF FLOATQIDF PARAMS ((QI));
-#else
-#define FLOATQIDF(x) ((DF) (QI) (x))
-#endif
-#if defined (XF_FN_SUPPORT)
-extern XF FLOATQIXF PARAMS ((QI));
-#else
-#define FLOATQIXF(x) ((XF) (QI) (x))
-#endif
-#if defined (TF_FN_SUPPORT)
-extern TF FLOATQITF PARAMS ((QI));
-#else
-#define FLOATQITF(x) ((TF) (QI) (x))
-#endif
-#if defined (SF_FN_SUPPORT)
-extern SF FLOATHISF PARAMS ((HI));
-#else
-#define FLOATHISF(x) ((SF) (HI) (x))
-#endif
-#if defined (DF_FN_SUPPORT)
-extern DF FLOATHIDF PARAMS ((HI));
-#else
-#define FLOATHIDF(x) ((DF) (HI) (x))
-#endif
-#if defined (XF_FN_SUPPORT)
-extern XF FLOATHIXF PARAMS ((HI));
-#else
-#define FLOATHIXF(x) ((XF) (HI) (x))
-#endif
-#if defined (TF_FN_SUPPORT)
-extern TF FLOATHITF PARAMS ((HI));
-#else
-#define FLOATHITF(x) ((TF) (HI) (x))
-#endif
-#if defined (SF_FN_SUPPORT)
-extern SF FLOATSISF PARAMS ((SI));
-#else
-#define FLOATSISF(x) ((SF) (SI) (x))
-#endif
-#if defined (DF_FN_SUPPORT)
-extern DF FLOATSIDF PARAMS ((SI));
-#else
-#define FLOATSIDF(x) ((DF) (SI) (x))
-#endif
-#if defined (XF_FN_SUPPORT)
-extern XF FLOATSIXF PARAMS ((SI));
-#else
-#define FLOATSIXF(x) ((XF) (SI) (x))
-#endif
-#if defined (TF_FN_SUPPORT)
-extern TF FLOATSITF PARAMS ((SI));
-#else
-#define FLOATSITF(x) ((TF) (SI) (x))
-#endif
-#if defined (DI_FN_SUPPORT) || defined (SF_FN_SUPPORT)
-extern SF FLOATDISF PARAMS ((DI));
-#else
-#define FLOATDISF(x) ((SF) (DI) (x))
-#endif
-#if defined (DI_FN_SUPPORT) || defined (DF_FN_SUPPORT)
-extern DF FLOATDIDF PARAMS ((DI));
-#else
-#define FLOATDIDF(x) ((DF) (DI) (x))
-#endif
-#if defined (DI_FN_SUPPORT) || defined (XF_FN_SUPPORT)
-extern XF FLOATDIXF PARAMS ((DI));
-#else
-#define FLOATDIXF(x) ((XF) (DI) (x))
-#endif
-#if defined (DI_FN_SUPPORT) || defined (TF_FN_SUPPORT)
-extern TF FLOATDITF PARAMS ((DI));
-#else
-#define FLOATDITF(x) ((TF) (DI) (x))
-#endif
-#if defined (SF_FN_SUPPORT)
-extern SF UFLOATQISF PARAMS ((QI));
-#else
-#define UFLOATQISF(x) ((SF) (UQI) (x))
-#endif
-#if defined (DF_FN_SUPPORT)
-extern DF UFLOATQIDF PARAMS ((QI));
-#else
-#define UFLOATQIDF(x) ((DF) (UQI) (x))
-#endif
-#if defined (XF_FN_SUPPORT)
-extern XF UFLOATQIXF PARAMS ((QI));
-#else
-#define UFLOATQIXF(x) ((XF) (UQI) (x))
-#endif
-#if defined (TF_FN_SUPPORT)
-extern TF UFLOATQITF PARAMS ((QI));
-#else
-#define UFLOATQITF(x) ((TF) (UQI) (x))
-#endif
-#if defined (SF_FN_SUPPORT)
-extern SF UFLOATHISF PARAMS ((HI));
-#else
-#define UFLOATHISF(x) ((SF) (UHI) (x))
-#endif
-#if defined (DF_FN_SUPPORT)
-extern DF UFLOATHIDF PARAMS ((HI));
-#else
-#define UFLOATHIDF(x) ((DF) (UHI) (x))
-#endif
-#if defined (XF_FN_SUPPORT)
-extern XF UFLOATHIXF PARAMS ((HI));
-#else
-#define UFLOATHIXF(x) ((XF) (UHI) (x))
-#endif
-#if defined (TF_FN_SUPPORT)
-extern TF UFLOATHITF PARAMS ((HI));
-#else
-#define UFLOATHITF(x) ((TF) (UHI) (x))
-#endif
-#if defined (SF_FN_SUPPORT)
-extern SF UFLOATSISF PARAMS ((SI));
-#else
-#define UFLOATSISF(x) ((SF) (USI) (x))
-#endif
-#if defined (DF_FN_SUPPORT)
-extern DF UFLOATSIDF PARAMS ((SI));
-#else
-#define UFLOATSIDF(x) ((DF) (USI) (x))
-#endif
-#if defined (XF_FN_SUPPORT)
-extern XF UFLOATSIXF PARAMS ((SI));
-#else
-#define UFLOATSIXF(x) ((XF) (USI) (x))
-#endif
-#if defined (TF_FN_SUPPORT)
-extern TF UFLOATSITF PARAMS ((SI));
-#else
-#define UFLOATSITF(x) ((TF) (USI) (x))
-#endif
-#if defined (DI_FN_SUPPORT) || defined (SF_FN_SUPPORT)
-extern SF UFLOATDISF PARAMS ((DI));
-#else
-#define UFLOATDISF(x) ((SF) (UDI) (x))
-#endif
-#if defined (DI_FN_SUPPORT) || defined (DF_FN_SUPPORT)
-extern DF UFLOATDIDF PARAMS ((DI));
-#else
-#define UFLOATDIDF(x) ((DF) (UDI) (x))
-#endif
-#if defined (DI_FN_SUPPORT) || defined (XF_FN_SUPPORT)
-extern XF UFLOATDIXF PARAMS ((DI));
-#else
-#define UFLOATDIXF(x) ((XF) (UDI) (x))
-#endif
-#if defined (DI_FN_SUPPORT) || defined (TF_FN_SUPPORT)
-extern TF UFLOATDITF PARAMS ((DI));
-#else
-#define UFLOATDITF(x) ((TF) (UDI) (x))
-#endif
-#if defined (SF_FN_SUPPORT)
-extern BI FIXSFBI PARAMS ((SF));
-#else
-#define FIXSFBI(x) ((BI) (SF) (x))
-#endif
-#if defined (SF_FN_SUPPORT)
-extern QI FIXSFQI PARAMS ((SF));
-#else
-#define FIXSFQI(x) ((QI) (SF) (x))
-#endif
-#if defined (SF_FN_SUPPORT)
-extern HI FIXSFHI PARAMS ((SF));
-#else
-#define FIXSFHI(x) ((HI) (SF) (x))
-#endif
-#if defined (SF_FN_SUPPORT)
-extern SI FIXSFSI PARAMS ((SF));
-#else
-#define FIXSFSI(x) ((SI) (SF) (x))
-#endif
-#if defined (SF_FN_SUPPORT) || defined (DI_FN_SUPPORT)
-extern DI FIXSFDI PARAMS ((SF));
-#else
-#define FIXSFDI(x) ((DI) (SF) (x))
-#endif
-#if defined (DF_FN_SUPPORT)
-extern BI FIXDFBI PARAMS ((DF));
-#else
-#define FIXDFBI(x) ((BI) (DF) (x))
-#endif
-#if defined (DF_FN_SUPPORT)
-extern QI FIXDFQI PARAMS ((DF));
-#else
-#define FIXDFQI(x) ((QI) (DF) (x))
-#endif
-#if defined (DF_FN_SUPPORT)
-extern HI FIXDFHI PARAMS ((DF));
-#else
-#define FIXDFHI(x) ((HI) (DF) (x))
-#endif
-#if defined (DF_FN_SUPPORT)
-extern SI FIXDFSI PARAMS ((DF));
-#else
-#define FIXDFSI(x) ((SI) (DF) (x))
-#endif
-#if defined (DF_FN_SUPPORT) || defined (DI_FN_SUPPORT)
-extern DI FIXDFDI PARAMS ((DF));
-#else
-#define FIXDFDI(x) ((DI) (DF) (x))
-#endif
-#if defined (XF_FN_SUPPORT)
-extern BI FIXXFBI PARAMS ((XF));
-#else
-#define FIXXFBI(x) ((BI) (XF) (x))
-#endif
-#if defined (XF_FN_SUPPORT)
-extern QI FIXXFQI PARAMS ((XF));
-#else
-#define FIXXFQI(x) ((QI) (XF) (x))
-#endif
-#if defined (XF_FN_SUPPORT)
-extern HI FIXXFHI PARAMS ((XF));
-#else
-#define FIXXFHI(x) ((HI) (XF) (x))
-#endif
-#if defined (XF_FN_SUPPORT)
-extern SI FIXXFSI PARAMS ((XF));
-#else
-#define FIXXFSI(x) ((SI) (XF) (x))
-#endif
-#if defined (XF_FN_SUPPORT) || defined (DI_FN_SUPPORT)
-extern DI FIXXFDI PARAMS ((XF));
-#else
-#define FIXXFDI(x) ((DI) (XF) (x))
-#endif
-#if defined (TF_FN_SUPPORT)
-extern BI FIXTFBI PARAMS ((TF));
-#else
-#define FIXTFBI(x) ((BI) (TF) (x))
-#endif
-#if defined (TF_FN_SUPPORT)
-extern QI FIXTFQI PARAMS ((TF));
-#else
-#define FIXTFQI(x) ((QI) (TF) (x))
-#endif
-#if defined (TF_FN_SUPPORT)
-extern HI FIXTFHI PARAMS ((TF));
-#else
-#define FIXTFHI(x) ((HI) (TF) (x))
-#endif
-#if defined (TF_FN_SUPPORT)
-extern SI FIXTFSI PARAMS ((TF));
-#else
-#define FIXTFSI(x) ((SI) (TF) (x))
-#endif
-#if defined (TF_FN_SUPPORT) || defined (DI_FN_SUPPORT)
-extern DI FIXTFDI PARAMS ((TF));
-#else
-#define FIXTFDI(x) ((DI) (TF) (x))
-#endif
-#if defined (SF_FN_SUPPORT)
-extern QI UFIXSFQI PARAMS ((SF));
-#else
-#define UFIXSFQI(x) ((UQI) (SF) (x))
-#endif
-#if defined (SF_FN_SUPPORT)
-extern HI UFIXSFHI PARAMS ((SF));
-#else
-#define UFIXSFHI(x) ((UHI) (SF) (x))
-#endif
-#if defined (SF_FN_SUPPORT)
-extern SI UFIXSFSI PARAMS ((SF));
-#else
-#define UFIXSFSI(x) ((USI) (SF) (x))
-#endif
-#if defined (SF_FN_SUPPORT) || defined (DI_FN_SUPPORT)
-extern DI UFIXSFDI PARAMS ((SF));
-#else
-#define UFIXSFDI(x) ((UDI) (SF) (x))
-#endif
-#if defined (DF_FN_SUPPORT)
-extern QI UFIXDFQI PARAMS ((DF));
-#else
-#define UFIXDFQI(x) ((UQI) (DF) (x))
-#endif
-#if defined (DF_FN_SUPPORT)
-extern HI UFIXDFHI PARAMS ((DF));
-#else
-#define UFIXDFHI(x) ((UHI) (DF) (x))
-#endif
-#if defined (DF_FN_SUPPORT)
-extern SI UFIXDFSI PARAMS ((DF));
-#else
-#define UFIXDFSI(x) ((USI) (DF) (x))
-#endif
-#if defined (DF_FN_SUPPORT) || defined (DI_FN_SUPPORT)
-extern DI UFIXDFDI PARAMS ((DF));
-#else
-#define UFIXDFDI(x) ((UDI) (DF) (x))
-#endif
-#if defined (XF_FN_SUPPORT)
-extern QI UFIXXFQI PARAMS ((XF));
-#else
-#define UFIXXFQI(x) ((UQI) (XF) (x))
-#endif
-#if defined (XF_FN_SUPPORT)
-extern HI UFIXXFHI PARAMS ((XF));
-#else
-#define UFIXXFHI(x) ((UHI) (XF) (x))
-#endif
-#if defined (XF_FN_SUPPORT)
-extern SI UFIXXFSI PARAMS ((XF));
-#else
-#define UFIXXFSI(x) ((USI) (XF) (x))
-#endif
-#if defined (XF_FN_SUPPORT) || defined (DI_FN_SUPPORT)
-extern DI UFIXXFDI PARAMS ((XF));
-#else
-#define UFIXXFDI(x) ((UDI) (XF) (x))
-#endif
-#if defined (TF_FN_SUPPORT)
-extern QI UFIXTFQI PARAMS ((TF));
-#else
-#define UFIXTFQI(x) ((UQI) (TF) (x))
-#endif
-#if defined (TF_FN_SUPPORT)
-extern HI UFIXTFHI PARAMS ((TF));
-#else
-#define UFIXTFHI(x) ((UHI) (TF) (x))
-#endif
-#if defined (TF_FN_SUPPORT)
-extern SI UFIXTFSI PARAMS ((TF));
-#else
-#define UFIXTFSI(x) ((USI) (TF) (x))
-#endif
-#if defined (TF_FN_SUPPORT) || defined (DI_FN_SUPPORT)
-extern DI UFIXTFDI PARAMS ((TF));
-#else
-#define UFIXTFDI(x) ((UDI) (TF) (x))
-#endif
+
+/* Composing/decomposing the various types.
+   Word ordering is endian-independent.  Words are specified most to least
+   significant and word number 0 is the most significant word.
+   ??? May also wish an endian-dependent version.  Later.  */
+
+#ifdef SEMOPS_DEFINE_INLINE
+
+SEMOPS_INLINE SF
+SUBWORDSISF (SI in)
+{
+  union { SI in; SF out; } x;
+  x.in = in;
+  return x.out;
+}
+
+SEMOPS_INLINE SI
+SUBWORDSFSI (SF in)
+{
+  union { SF in; SI out; } x;
+  x.in = in;
+  return x.out;
+}
+
+SEMOPS_INLINE SI
+SUBWORDDISI (DI in, int word)
+{
+  if (word == 0)
+    return (UDI) in >> 32;
+  else
+    return in;
+}
+
+SEMOPS_INLINE SI
+SUBWORDDFSI (DF in, int word)
+{
+  /* Note: typedef UDI DF; */
+  if (word == 0)
+    return (UDI) in >> 32;
+  else
+    return in;
+}
+
+SEMOPS_INLINE SI
+SUBWORDXFSI (XF in, int word)
+{
+  /* Note: typedef struct { SI parts[3]; } XF; */
+  union { XF in; SI out[3]; } x;
+  x.in = in;
+  return x.out[word];
+}
+
+SEMOPS_INLINE SI
+SUBWORDTFSI (TF in, int word)
+{
+  /* Note: typedef struct { SI parts[4]; } TF; */
+  union { TF in; SI out[4]; } x;
+  x.in = in;
+  return x.out[word];
+}
+
+SEMOPS_INLINE DI
+JOINSIDI (SI x0, SI x1)
+{
+  if (CURRENT_TARGET_BYTE_ORDER == BIG_ENDIAN)
+    return MAKEDI (x0, x1);
+  else
+    return MAKEDI (x1, x0);
+}
+
+SEMOPS_INLINE DF
+JOINSIDF (SI x0, SI x1)
+{
+  union { SI in[2]; DF out; } x;
+  if (CURRENT_TARGET_BYTE_ORDER == BIG_ENDIAN)
+    x.in[0] = x0, x.in[1] = x1;
+  else
+    x.in[1] = x0, x.in[0] = x1;
+  return x.out;
+}
+
+SEMOPS_INLINE XF
+JOINSIXF (SI x0, SI x1, SI x2)
+{
+  union { SI in[3]; XF out; } x;
+  if (CURRENT_TARGET_BYTE_ORDER == BIG_ENDIAN)
+    x.in[0] = x0, x.in[1] = x1, x.in[2] = x2;
+  else
+    x.in[2] = x0, x.in[1] = x1, x.in[0] = x2;
+  return x.out;
+}
+
+SEMOPS_INLINE TF
+JOINSITF (SI x0, SI x1, SI x2, SI x3)
+{
+  union { SI in[4]; TF out; } x;
+  if (CURRENT_TARGET_BYTE_ORDER == BIG_ENDIAN)
+    x.in[0] = x0, x.in[1] = x1, x.in[2] = x2, x.in[3] = x3;
+  else
+    x.in[3] = x0, x.in[2] = x1, x.in[1] = x2, x.in[0] = x3;
+  return x.out;
+}
+
+#else
+
+SF SUBWORDSISF (SI);
+SI SUBWORDSFSI (SF);
+SI SUBWORDDISI (DI, int);
+SI SUBWORDDFSI (DF, int);
+SI SUBWORDXFSI (XF, int);
+SI SUBWORDTFSI (TF, int);
+
+DI JOINSIDI (SI, SI);
+DF JOINSIDF (SI, SI);
+XF JOINSIXF (SI, SI, SI);
+TF JOINSITF (SI, SI, SI, SI);
+
+#endif /* SUBWORD,JOIN */
 
 /* Semantic support utilities.  */
 
-#ifdef __GNUC__
-
 #ifdef SEMOPS_DEFINE_INLINE
-#define SEMOPS_INLINE
-#else
-#define SEMOPS_INLINE extern inline
-#endif
 
 SEMOPS_INLINE SI
 ADDCSI (SI a, SI b, BI c)
@@ -867,6 +462,53 @@ SUBOFSI (SI a, SI b, BI c)
   return res;
 }
 
+SEMOPS_INLINE HI
+ADDCHI (HI a, HI b, BI c)
+{
+  HI res = ADDHI (a, ADDHI (b, c));
+  return res;
+}
+
+SEMOPS_INLINE BI
+ADDCFHI (HI a, HI b, BI c)
+{
+  HI tmp = ADDHI (a, ADDHI (b, c));
+  BI res = ((UHI) tmp < (UHI) a) || (c && tmp == a);
+  return res;
+}
+
+SEMOPS_INLINE BI
+ADDOFHI (HI a, HI b, BI c)
+{
+  HI tmp = ADDHI (a, ADDHI (b, c));
+  BI res = (((a < 0) == (b < 0))
+	    && ((a < 0) != (tmp < 0)));
+  return res;
+}
+
+SEMOPS_INLINE HI
+SUBCHI (HI a, HI b, BI c)
+{
+  HI res = SUBHI (a, ADDHI (b, c));
+  return res;
+}
+
+SEMOPS_INLINE BI
+SUBCFHI (HI a, HI b, BI c)
+{
+  BI res = ((UHI) a < (UHI) b) || (c && a == b);
+  return res;
+}
+
+SEMOPS_INLINE BI
+SUBOFHI (HI a, HI b, BI c)
+{
+  HI tmp = SUBHI (a, ADDHI (b, c));
+  BI res = (((a < 0) != (b < 0))
+	    && ((a < 0) != (tmp < 0)));
+  return res;
+}
+
 #else
 
 SI ADDCSI (SI, SI, BI);
@@ -875,23 +517,13 @@ UBI ADDOFSI (SI, SI, BI);
 SI SUBCSI (SI, SI, BI);
 UBI SUBCFSI (SI, SI, BI);
 UBI SUBOFSI (SI, SI, BI);
+HI ADDCHI (HI, HI, BI);
+UBI ADDCFHI (HI, HI, BI);
+UBI ADDOFHI (HI, HI, BI);
+HI SUBCHI (HI, HI, BI);
+UBI SUBCFHI (HI, HI, BI);
+UBI SUBOFHI (HI, HI, BI);
 
 #endif
-
-/* DI mode support if "long long" doesn't exist.
-   At one point CGEN supported K&R C compilers, and ANSI C compilers without
-   "long long".  One can argue the various merits of keeping this in or
-   throwing it out.  I went to the trouble of adding it so for the time being
-   I'm leaving it in.  */
-
-#ifdef DI_FN_SUPPORT
-
-DI make_struct_di (SI, SI);
-/* FIXME: needed? */
-DI CONVHIDI (HI);
-DI CONVSIDI (SI);
-SI CONVDISI (DI);
-
-#endif /* DI_FN_SUPPORT */
 
 #endif /* CGEN_SEM_OPS_H */

@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: lseek03.c,v 1.2 2003/01/24 01:09:39 cgf Exp $ */
+/* $Id: lseek03.c,v 1.3 2003/02/20 11:22:17 corinna Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -137,7 +137,7 @@ main(int ac, char **av)
     int lc;		/* loop counter */
     const char *msg;		/* message returned from parse_opts */
 
-    int ind;
+    unsigned ind;
     int whence;
 
     TST_TOTAL=sizeof(Whences)/sizeof(int);

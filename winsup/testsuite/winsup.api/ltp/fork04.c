@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: fork04.c,v 1.3 2003/01/24 01:09:39 cgf Exp $ */
+/* $Id: fork04.c,v 1.4 2003/02/20 11:22:17 corinna Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -129,7 +129,7 @@ extern int Tst_count;		/* Test Case counter for tst_* routines */
 
 /* list of environment variables to test */
 const char *environ_list[] = {"TERM","NoTSetzWq","TESTPROG"};
-#define NUMBER_OF_ENVIRON sizeof(environ_list)/sizeof(char *)
+#define NUMBER_OF_ENVIRON (int)(sizeof(environ_list)/sizeof(char *))
 int TST_TOTAL=NUMBER_OF_ENVIRON;		/* Total number of test cases. */
 
 /***************************************************************

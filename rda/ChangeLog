@@ -1,3 +1,9 @@
+2002-11-04  Kevin Buettner  <kevinb@redhat.com>
+
+	* Makefile.in, aclocal.m4, configure, lib/Makefile.in, qe/Makefile.in,
+	samples/Makefile.in, unix/configure: Regenerate configury using
+	aclocal 1.6.3, automake 1.6.3, and autoconf 2.53.
+
 2002-08-22  Kevin Buettner  <kevinb@redhat.com>
 
 	* lib/Makefile.am (INCLUDES): Remove references to bfd.

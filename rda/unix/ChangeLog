@@ -1,3 +1,10 @@
+2003-09-10  Kevin Buettner  <kevinb@redhat.com>
+
+	From Jimi Xenidis  <jimix@watson.ibm.com>:
+	* linux-target.c (reginfo): The MQ register is for IBM POWER
+	(pre-PowerPC) architecture, and is undefined in PPC GNU/Linux
+	environment.
+
 2003-05-09  Kevin Buettner  <kevinb@redhat.com>
 
 	* linux-target.c (mips_singlestep): Don't any consider cop0 or cop1x

@@ -1,3 +1,7 @@
+2002-11-25  DJ Delorie  <dj@redhat.com>
+
+	* xstormy16.cpu (sdiv, divlh, sdivlh): Fix sdivlh/divlh encodings.
+
 2002-11-21  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* cpu/iq10.cpu: New file.

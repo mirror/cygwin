@@ -941,9 +941,9 @@ set cpu-gdb enable-Z-packet? $enable_z_packet
 set cpu-gdb operating-mode? false
 ";
       }
-    elsif ($opt_board =~ /pid7t/)
+    else
       {
-	$second_section .= "# cpu-gdb w/ pid7t
+	$second_section .= "# gdb w/o gloss
 connect-pin cpu trap <-> cpu-gdb trap
 connect-pin cpu trap-code -> cpu-gdb trap-code
 ";

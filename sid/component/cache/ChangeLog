@@ -1,3 +1,12 @@
+2004-07-20  Dave Brolley  <brolley@redhat.com>
+
+	* cacheutil.cxx (find): Make sure cache line is valid before returning
+	it.
+	* cache.cxx (write_any): Move call to addr_to_tag to a later point when
+	the result is actually needed. Make sure cache line is valid before
+	flushing it.
+	(read_any): Make sure cache line is valid before flushing it.
+
 2004-07-01  Dave Brolley  <brolley@redhat.com>
 
 	* cache.cxx (write_any): Allow misaligned access. Return

@@ -180,7 +180,6 @@ cache_component::write_any (host_int_4 addr, DataType data)
   if (LIKELY (collect_p))
     stats.writes++;
 
-  cache_tag tag = acache.addr_to_tag (addr);
   if (UNLIKELY (addr % sizeof (data) != 0))
     {
       if (LIKELY (collect_p))
@@ -191,6 +190,7 @@ cache_component::write_any (host_int_4 addr, DataType data)
   if (UNLIKELY (addr % line_size + sizeof (data) > line_size))
     return bus::misaligned;
 
+  cache_tag tag = acache.addr_to_tag (addr);
   cache_line* line = acache.find (tag);
   if (LIKELY (line))
     {
@@ -215,7 +215,7 @@ cache_component::write_any (host_int_4 addr, DataType data)
 
 	  if (! write_through_p)
 	    {
-	      if (expelled_line->dirty_p ())
+	      if (expelled_line->valid_p () && expelled_line->dirty_p ())
 		{
 		  // flush a dirty line being replaced
 		  if ((st = write_line (*expelled_line)) != bus::ok)
@@ -291,7 +291,7 @@ cache_component::read_any (host_int_4 addr, DataType& data)
 	  
 	  cache_line *expelled_line = acache.expell_line (tag);
 	  assert (expelled_line);
-	  if (expelled_line->dirty_p ())
+	  if (expelled_line->valid_p () && expelled_line->dirty_p ())
 	    {
 	      // flush a dirty line being replaced
 	      if ((st = write_line (*expelled_line)) != bus::ok)

@@ -1,5 +1,8 @@
 2004-08-08  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* Makefile.tpl: Remove rule to regenerate configure.
+	* Makefile.in: Regenerate.
+
 	* configure.in: Update to autoconf 2.59, rename to...
 	* configure.ac: ...this.  Rename abs_* variables for accuracy.
 	* Makefile.tpl: Rename abs_srcdir for accuracy.

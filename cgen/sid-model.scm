@@ -337,7 +337,7 @@ const MACH " (gen-sym mach) "_mach =
 
   (string-write
    (gen-copyright "Simulator model support for @prefix@."
-		  copyright-red-hat package-cygnus-simulators)
+		  copyright-red-hat package-red-hat-simulators)
    "\
 
 #include \"@arch@-main.h\"

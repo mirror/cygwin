@@ -1185,7 +1185,7 @@ This file is part of the GNU Binutils and/or GDB, the GNU debugger.
 This file is part of the GNU simulators.
 ")
 
-(define package-cygnus-simulators "\
+(define package-red-hat-simulators "\
 This file is part of the Red Hat simulators.
 ")
 

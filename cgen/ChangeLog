@@ -1,5 +1,22 @@
 2002-01-07  Ben Elliston  <bje@redhat.com>
 
+	* utils.scm (package-cygnus-simulators): Rename from this ..
+	(package-red-hat-simulators): .. to this.
+	* opcodes.scm (option-set!): Use package-red-hat-simulators.
+	* sid-cpu.scm (cgen-desc.h): Likewise.
+	(cgen-cpu.h): Likewise.
+	(cgen-defs.h): Likewise.
+	(cgen-write.cxx): Likewise.
+	(cgen-semantics.cxx): Likewise.
+	(cgen-sem-switch.cxx): Likewise.	
+	* sid-decode.scm (cgen-decode.h): Likewise.
+	(cgen-decode.cxx): Likewise.
+	* sid-model.scm (cgen-model.cxx): Likewise.
+	* sid.scm (option-set!): Likewise.
+	* sim.scm (option-set!): Likewise.
+
+2002-01-07  Ben Elliston  <bje@redhat.com>
+
 	* utils.scm (copyright-fsf): Add 2002.
 	(copyright-cygnus): Rename to copyright-red-hat.
 	(copyright-red-hat): Add 2002.

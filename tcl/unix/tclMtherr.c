@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclMtherr.c,v 1.8 1999/01/26 03:53:39 jingham Exp $
+ * RCS: @(#) $Id: tclMtherr.c,v 1.6.8.1 2000/04/06 22:38:39 spolk Exp $
  */
 
 #include "tclInt.h"
@@ -27,15 +27,6 @@ extern int errno;			/* Use errno from tclExecute.c. */
 #define EDOM 33
 #define ERANGE 34
 #endif
-
-/*
- * The following variable is secretly shared with Tcl so we can
- * tell if expression evaluation is in progress.  If not, matherr
- * just emulates the default behavior, which includes printing
- * a message.
- */
-
-extern int tcl_MathInProgress;
 
 /*
  * The following definitions allow matherr to compile on systems
@@ -74,7 +65,7 @@ int
 matherr(xPtr)
     struct exception *xPtr;	/* Describes error that occurred. */
 {
-    if (!tcl_MathInProgress) {
+    if (TclMathInProgress()) {
 	return 0;
     }
     if ((xPtr->type == DOMAIN) || (xPtr->type == SING)) {
@@ -84,3 +75,4 @@ matherr(xPtr)
     }
     return 1;
 }
+

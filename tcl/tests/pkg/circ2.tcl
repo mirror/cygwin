@@ -6,7 +6,7 @@
 # Copyright (c) 1998 by Scriptics Corporation.
 # All rights reserved.
 # 
-# RCS: @(#) $Id: circ2.tcl,v 1.2 1999/01/26 03:53:35 jingham Exp $
+# RCS: @(#) $Id: circ2.tcl,v 1.3 1999/08/25 18:28:00 spolk Exp $
 
 package require circ3 1.0
 

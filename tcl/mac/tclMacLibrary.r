@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclMacLibrary.r,v 1.8 1999/01/26 03:53:23 jingham Exp $
+ * RCS: @(#) $Id: tclMacLibrary.r,v 1.6.8.1 2000/04/06 22:38:30 spolk Exp $
  */
 
 #include <Types.r>
@@ -42,14 +42,14 @@ resource 'vers' (1) {
 	TCL_MAJOR_VERSION, MINOR_VERSION,
 	RELEASE_LEVEL, 0x00, verUS,
 	TCL_PATCH_LEVEL,
-	TCL_PATCH_LEVEL ", by Ray Johnson © Sun Microsystems"
+	TCL_PATCH_LEVEL ", by Ray Johnson & Jim Ingham © Scriptics Inc."
 };
 
 resource 'vers' (2) {
 	TCL_MAJOR_VERSION, MINOR_VERSION,
 	RELEASE_LEVEL, 0x00, verUS,
 	TCL_PATCH_LEVEL,
-	"Tcl Library " TCL_PATCH_LEVEL " © 1996"
+	"Tcl Library " TCL_PATCH_LEVEL " © 1996-1997 Sun Microsystems, 1998-1999 Scriptics Inc."
 };
 
 /*
@@ -96,7 +96,7 @@ resource 'FREF' (TCL_LIBRARY_RESOURCES, purgeable)
 
 type TCL_CREATOR as 'STR ';
 resource TCL_CREATOR (0, purgeable) {
-	"Tcl Library " TCL_PATCH_LEVEL " © 1996"
+	"Tcl Library " TCL_PATCH_LEVEL " © 1996-1999"
 };
 
 /*
@@ -141,9 +141,7 @@ resource 'STR ' (-16397, purgeable) {
  * will load the TEXT resource named "Init".
  */
 
-read 'TEXT' (TCL_LIBRARY_RESOURCES, "Init", purgeable) "::library:init.tcl";
-read 'TEXT' (TCL_LIBRARY_RESOURCES + 1, "History", purgeable) "::library:history.tcl";
-read 'TEXT' (TCL_LIBRARY_RESOURCES + 2, "Word", purgeable,preload) "::library:word.tcl";
+#include "tclMacTclCode.r"
 
 /*
  * The following are icons for the shared library.

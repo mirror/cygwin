@@ -5,7 +5,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" RCS: @(#) $Id: LinkVar.3,v 1.12 1999/01/26 03:52:58 jingham Exp $
+'\" RCS: @(#) $Id: LinkVar.3,v 1.6.8.2 2000/09/15 16:54:18 spolk Exp $
 '\" 
 .so man.macros
 .TH Tcl_LinkVar 3 7.5 Tcl "Tcl Library Procedures"
@@ -48,7 +48,7 @@ be returned, and whenever the Tcl variable is written the C
 variable will be updated to have the same value.
 \fBTcl_LinkVar\fR normally returns TCL_OK;  if an error occurs
 while setting up the link (e.g. because \fIvarName\fR is the
-name of array) then TCL_ERROR is returned and \fIinterp->result\fR
+name of array) then TCL_ERROR is returned and the interpreter's result
 contains an error message.
 .PP
 The \fItype\fR argument specifies the type of the C variable,
@@ -113,3 +113,4 @@ variable are invoked.
 
 .SH KEYWORDS
 boolean, integer, link, read-only, real, string, traces, variable
+

@@ -11,7 +11,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclMacCommonPch.h,v 1.2 1999/01/26 03:53:22 jingham Exp $
+ * RCS: @(#) $Id: tclMacCommonPch.h,v 1.3 1999/08/25 18:27:57 spolk Exp $
  */
 
 #if !__option(enumsalwaysint)

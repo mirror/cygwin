@@ -9,21 +9,12 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclWinMtherr.c,v 1.7 1999/01/26 03:53:43 jingham Exp $
+ * RCS: @(#) $Id: tclWinMtherr.c,v 1.6.8.1 2000/04/06 22:38:39 spolk Exp $
  */
 
-#include "tclInt.h"
-#include "tclPort.h"
+#include "tclWinInt.h"
 #include <math.h>
 
-/*
- * The following variable is secretly shared with Tcl so we can
- * tell if expression evaluation is in progress.  If not, matherr
- * just emulates the default behavior, which includes printing
- * a message.
- */
-
-extern int tcl_MathInProgress;
 
 /*
  *----------------------------------------------------------------------
@@ -49,7 +40,7 @@ int
 _matherr(xPtr)
     struct exception *xPtr;	/* Describes error that occurred. */
 {
-    if (!tcl_MathInProgress) {
+    if (!TclMathInProgress()) {
 	return 0;
     }
     if ((xPtr->type == DOMAIN) || (xPtr->type == SING)) {
@@ -59,3 +50,5 @@ _matherr(xPtr)
     }
     return 1;
 }
+
+

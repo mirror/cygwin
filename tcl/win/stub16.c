@@ -9,13 +9,14 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: stub16.c,v 1.8 1999/01/26 03:53:41 jingham Exp $
+ * RCS: @(#) $Id: stub16.c,v 1.6.8.1 2000/04/06 22:38:39 spolk Exp $
  */
 
 #define STRICT
 
 #include <windows.h>
 #include <stdio.h>
+#include <string.h>
 
 static HANDLE		CreateTempFile(void);
 
@@ -132,9 +133,9 @@ main()
 
     WaitForInputIdle(pi.hProcess, 5000);
     WaitForSingleObject(pi.hProcess, INFINITE);
+    GetExitCodeProcess(pi.hProcess, &result);
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
-    result = 0;
 
     if (hFileOutput != INVALID_HANDLE_VALUE) {
 	SetFilePointer(hFileOutput, 0, 0, FILE_BEGIN);
@@ -196,3 +197,5 @@ CreateTempFile()
 	    CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE,
 	    NULL);
 }
+
+

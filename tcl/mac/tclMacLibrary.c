@@ -2,7 +2,7 @@
  * tclMacLibrary.c --
  *
  *	This file should be included in Tcl extensions that want to 
- *	automatically oepn their resource forks when the code is linked. 
+ *	automatically open their resource forks when the code is linked. 
  *	These routines should not be exported but should be compiled 
  *	locally by each fragment.  Many thanks to Jay Lieske
  *	<lieske@princeton.edu> who provide an initial version of this
@@ -13,14 +13,12 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclMacLibrary.c,v 1.7 1999/01/26 03:53:23 jingham Exp $
+ * RCS: @(#) $Id: tclMacLibrary.c,v 1.6.8.1 2000/04/06 22:38:30 spolk Exp $
  */
 
 /*
  * Here is another place that we are using the old routine names...
  */
- 
-#define OLDROUTINENAMES 1
 
 #include <CodeFragments.h>
 #include <Errors.h>
@@ -171,9 +169,9 @@ OpenLibraryResource(
     OSErr err = noErr;
     
 
-    if (realInitBlkPtr->fragLocator.where == kOnDiskFlat) {
+    if (realInitBlkPtr->fragLocator.where == kDataForkCFragLocator) {
     	fileSpec = realInitBlkPtr->fragLocator.u.onDisk.fileSpec;
-    } else if (realInitBlkPtr->fragLocator.where == kOnDiskSegmented) {
+    } else if (realInitBlkPtr->fragLocator.where == kResourceCFragLocator) {
     	fileSpec = realInitBlkPtr->fragLocator.u.inSegs.fileSpec;
     } else {
     	err = resFNotFound;

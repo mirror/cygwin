@@ -196,36 +196,7 @@ namespace @arch@ {
 (define (-gen-hardware-types)
   (string-list
    "// CPU state information.\n\n"
-   (if (with-multiple-isa?)
-       (let ((keep-isas (current-keep-isa-name-list))
-	     (candidates (find hw-need-storage? (current-hw-list))))
-	 (string-list
-	  ; First emit a struct that contains all the common elements.
-	  ; A common element is one supported by more than isa.
-	  (-gen-hardware-struct #f
-				(find (lambda (hw)
-					(> (count-common
-					    keep-isas
-					    (bitset-attr->list
-					     (obj-attr-value hw 'ISA)))
-					   1))
-				      candidates))
-	  ; Now emit structs for each isa.  These contain entries for elements
-	  ; supported by exactly one isa.
-	  (string-list-map (lambda (isa)
-			     (-gen-hardware-struct
-			      isa
-			      (find (lambda (hw)
-				      (= (count-common
-					  keep-isas
-					  (bitset-attr->list
-					   (obj-attr-value hw 'ISA)))
-					 1))
-				    candidates)))
-			   keep-isas)
-	  ))
-       (-gen-hardware-struct #f (find hw-need-storage? (current-hw-list))))
-   )
+   (-gen-hardware-struct #f (find hw-need-storage? (current-hw-list))))
 )
 
 ; Generate <cpu>-cpu.h

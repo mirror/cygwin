@@ -634,12 +634,14 @@ static void
     ; Compute INITIAL-BITNUMS if not supplied.
     ; 0 is passed for the start bit (it is independent of lsb0?)
     (if (null? initial-bitnums)
-	(set! initial-bitnums (decode-get-best-bits insn-list nil
-						    0 ; startbit
-						    8 ; max
-						    decode-bitsize
-						    lsb0?)))
-
+	(set! initial-bitnums
+	      (if (= 0 (length insn-list)) (list 0) ; dummy value
+		  (decode-get-best-bits insn-list nil
+					0 ; startbit
+					8 ; max
+					decode-bitsize
+					lsb0?))))
+	
     ; All set.  gen-decoder does the hard part, we just print out the result. 
     (let ((decode-code (gen-decoder insn-list initial-bitnums
 				    decode-bitsize

@@ -1,3 +1,8 @@
+2000-10-26  Doug Evans  <dje@casey.transmeta.com>
+
+	* insn.scm (-parse-insn-format-symbol): Fix spelling error,
+	op-ifld -> op-ifield.
+
 2000-10-23  Frank Ch. Eigler  <fche@redhat.com>
 
 	* thumb.scm (cc-tests): Add (ISA thumb) attribute.

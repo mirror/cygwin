@@ -1,11 +1,11 @@
 ; Decoder generation.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Names of various global vars.
 
 ; Name of insn descriptor table var.
-(define IDESC-TABLE-VAR "@cpu@_insn_data")
+(define IDESC-TABLE-VAR "@prefix@_insn_data")
 
 ; Return decode entries for each insn.
 ; ??? At one point we generated one variable per instruction rather than one
@@ -32,12 +32,12 @@
    teensy bit of cpu in the decoder.  Moving it to malloc space is trivial
    but won't be done until necessary (we don't currently support the runtime
    addition of instructions nor an SMP machine with different cpus).  */
-static IDESC " IDESC-TABLE-VAR "[@CPU@_INSN_MAX];
+static IDESC " IDESC-TABLE-VAR "[@PREFIX@_INSN_MAX];
 
 /* Commas between elements are contained in the macros.
    Some of these are conditionally compiled out.  */
 
-static const struct insn_sem @cpu@_insn_sem[] =
+static const struct insn_sem @prefix@_insn_sem[] =
 {\n"
 
    (string-list-map
@@ -50,17 +50,17 @@ static const struct insn_sem @cpu@_insn_sem[] =
 	 (if virtual?
 	     (string-append "VIRTUAL_INSN_" (string-upcase name) ", ")
 	     (string-append "@ARCH@_INSN_" (string-upcase name) ", "))
-	 "@CPU@_INSN_" (string-upcase name) ", "
-	 "@CPU@_" (-gen-fmt-enum (insn-sfmt insn))
+         (string-append "@PREFIX@_INSN_" (string-upcase name) ", ")
+	 "@PREFIX@_" (-gen-fmt-enum (insn-sfmt insn))
 	 (if (and (with-parallel?) (not (with-parallel-only?)))
 	     (string-list
 	      (if (insn-parallel? insn)
-		  (string-append ", @CPU@_INSN_PAR_"
+		  (string-append ", @PREFIX@_INSN_PAR_"
 				 (string-upcase name)
 				 ", "
 				 (if (with-parallel-read?)
-				     "@CPU@_INSN_READ_"
-				     "@CPU@_INSN_WRITE_")
+				     "@PREFIX@_INSN_READ_"
+				     "@PREFIX@_INSN_WRITE_")
 				 (string-upcase name))
 		  ", NOPAR, NOPAR "))
 	     "")
@@ -70,8 +70,8 @@ static const struct insn_sem @cpu@_insn_sem[] =
    "\
 };
 
-static const struct insn_sem @cpu@_insn_sem_invalid = {
-  VIRTUAL_INSN_X_INVALID, @CPU@_INSN_X_INVALID, @CPU@_SFMT_EMPTY"
+static const struct insn_sem @prefix@_insn_sem_invalid = {
+  VIRTUAL_INSN_X_INVALID, @PREFIX@_INSN_X_INVALID, @PREFIX@_SFMT_EMPTY"
    (if (and (with-parallel?) (not (with-parallel-only?)))
        ", NOPAR, NOPAR"
        "")
@@ -91,21 +91,21 @@ static const struct insn_sem @cpu@_insn_sem_invalid = {
 
 (define (-gen-idesc-decls)
   (string-append "\
-extern const IDESC *@cpu@_decode (SIM_CPU *, IADDR,
+extern const IDESC *@prefix@_decode (SIM_CPU *, IADDR,
                                   CGEN_INSN_INT,"
   (if (adata-integral-insn? CURRENT-ARCH)
       " CGEN_INSN_INT,\n"
       "\n")
   "\
                                   ARGBUF *);
-extern void @cpu@_init_idesc_table (SIM_CPU *);
-extern void @cpu@_sem_init_idesc_table (SIM_CPU *);
-extern void @cpu@_semf_init_idesc_table (SIM_CPU *);
+extern void @prefix@_init_idesc_table (SIM_CPU *);
+extern void @prefix@_sem_init_idesc_table (SIM_CPU *);
+extern void @prefix@_semf_init_idesc_table (SIM_CPU *);
 \n")
 )
 
 ; Return definition of C function to initialize the IDESC table.
-; @cpu@_init_idesc_table is defined here as it depends on with-parallel?
+; @prefix@_init_idesc_table is defined here as it depends on with-parallel?
 ; and thus can't be defined in sim/common.
 
 (define (-gen-idesc-init-fn)
@@ -141,22 +141,22 @@ init_idesc (SIM_CPU *cpu, IDESC *id, const struct insn_sem *t)
 /* Initialize the instruction descriptor table.  */
 
 void
-@cpu@_init_idesc_table (SIM_CPU *cpu)
+@prefix@_init_idesc_table (SIM_CPU *cpu)
 {
   IDESC *id,*tabend;
   const struct insn_sem *t,*tend;
-  int tabsize = @CPU@_INSN_MAX;
+  int tabsize = @PREFIX@_INSN_MAX;
   IDESC *table = " IDESC-TABLE-VAR ";
 
   memset (table, 0, tabsize * sizeof (IDESC));
 
   /* First set all entries to the `invalid insn'.  */
-  t = & @cpu@_insn_sem_invalid;
+  t = & @prefix@_insn_sem_invalid;
   for (id = table, tabend = table + tabsize; id < tabend; ++id)
     init_idesc (cpu, id, t);
 
   /* Now fill in the values for the chosen cpu.  */
-  for (t = @cpu@_insn_sem, tend = t + sizeof (@cpu@_insn_sem) / sizeof (*t);
+  for (t = @prefix@_insn_sem, tend = t + sizeof (@prefix@_insn_sem) / sizeof (*t);
        t != tend; ++t)
     {
       init_idesc (cpu, & table[t->index], t);\n"
@@ -473,7 +473,7 @@ void
 (define (-gen-decode-fn insn-list initial-bitnums lsb0?)
 
   ; Compute the initial DECODE-BITSIZE as the minimum of all insn lengths.
-  ; The caller of @cpu@_decode must fetch and pass exactly this number of bits
+  ; The caller of @prefix@_decode must fetch and pass exactly this number of bits
   ; of the instruction.
   ; ??? Make this a parameter later but only if necessary.
 
@@ -500,7 +500,7 @@ void
 /* Given an instruction, return a pointer to its IDESC entry.  */
 
 const IDESC *
-@cpu@_decode (SIM_CPU *current_cpu, IADDR pc,
+@prefix@_decode (SIM_CPU *current_cpu, IADDR pc,
               CGEN_INSN_INT base_insn,"
        (if (adata-integral-insn? CURRENT-ARCH)
 	   " CGEN_INSN_INT entire_insn,\n"
@@ -509,7 +509,7 @@ const IDESC *
               ARGBUF *abuf)
 {
   /* Result of decoder.  */
-  @CPU@_INSN_TYPE itype;
+  @PREFIX@_INSN_TYPE itype;
 
   {
     CGEN_INSN_INT insn = base_insn;
@@ -548,11 +548,11 @@ const IDESC *
   (set-with-parallel?! (state-parallel-exec?))
 
   (string-write
-   (gen-copyright "Decode header for @cpu@."
+   (gen-copyright "Decode header for @prefix@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
-#ifndef @CPU@_DECODE_H
-#define @CPU@_DECODE_H
+#ifndef @PREFIX@_DECODE_H
+#define @PREFIX@_DECODE_H
 
 "
    -gen-idesc-decls
@@ -560,7 +560,7 @@ const IDESC *
 				      (non-multi-insns (non-alias-insns (current-insn-list)))))
    (lambda () (gen-sfmt-enum-decl (current-sfmt-list)))
    gen-model-fn-decls
-   "#endif /* @CPU@_DECODE_H */\n"
+   "#endif /* @PREFIX@_DECODE_H */\n"
    )
 )
 
@@ -578,7 +578,7 @@ const IDESC *
   (rtl-c-config! #:rtl-cover-fns? #t)
 
   (string-write
-   (gen-copyright "Simulator instruction decoder for @cpu@."
+   (gen-copyright "Simulator instruction decoder for @prefix@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #define WANT_CPU @cpu@

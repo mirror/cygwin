@@ -275,7 +275,7 @@ test wm-10.1 {icon windows} {
     toplevel .icon -width 50 -height 50 -bg red
     wm iconwindow .t .icon
     list [catch {wm iconify .icon} msg] $msg
-} {1 {can't iconify .icon: it is an icon for .icon}}
+} {1 {can't iconify .icon: it is an icon for .t}}
 test wm-10.2 {icon windows} {
     catch {destroy .t}
     catch {destroy .icon}
@@ -284,7 +284,7 @@ test wm-10.2 {icon windows} {
     toplevel .icon -width 50 -height 50 -bg red
     wm iconwindow .t .icon
     list [catch {wm deiconify .icon} msg] $msg
-} {1 {can't deiconify .icon: it is an icon for .icon}}
+} {1 {can't deiconify .icon: it is an icon for .t}}
 test wm-10.3 {icon windows} {
     catch {destroy .t}
     catch {destroy .icon}

@@ -139,15 +139,10 @@ static Tk_ConfigSpec configSpecs[] = {
     {TK_CONFIG_STRING, "-yscrollcommand", "yScrollCommand", "ScrollCommand",
 	DEF_TEXT_YSCROLL_COMMAND, Tk_Offset(TkText, yScrollCmd),
 	TK_CONFIG_NULL_OK},
-	
-    {TK_CONFIG_STRING, "-synccommand", "syncCommand", "SyncCommand",
-	DEF_TEXT_YSCROLL_COMMAND, Tk_Offset(TkText, SyncCmd),
-	TK_CONFIG_NULL_OK},
-	
-	
+    /* Red Hat Local */
     {TK_CONFIG_INT, "-tabsize", "tabSize", "TabSize",
 	DEF_TEXT_TAB_SIZE, Tk_Offset(TkText, tabsize), 0},
-	
+    /* End Red Hat Local */
     {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
 	(char *) NULL, 0, 0}
 };
@@ -438,7 +433,6 @@ Tk_TextCmd(clientData, interp, argc, argv)
     
     /*
      * KHAMIS */
-    textPtr->SyncCmd = NULL;
     textPtr->flags = 0;
 
     /*
@@ -471,54 +465,6 @@ Tk_TextCmd(clientData, interp, argc, argv)
     Tcl_SetResult(interp, Tk_PathName(textPtr->tkwin), TCL_STATIC);
 
     return TCL_OK;
-}
-
-/*
- *--------------------------------------------------------------
- *
- * TextWidgetCmd --
- *
- *	This procedure is invoked to process the Tcl command
- *	that corresponds to a text widget.  See the user
- *	documentation for details on what it does.
- *
- * Results:
- *	A standard Tcl result.
- *
- * Side effects:
- *	See the user documentation.
- *
- *--------------------------------------------------------------
- */
-static int 
-ExecSyncCmd (interp, textPtr, argc, argv)
-     Tcl_Interp *interp;
-     TkText *textPtr;
-     int argc;
-     char *argv[];
-{
-    static int ExecSyncCmdActive=0;
-    int i, ret;
-    Tcl_DString cmd;
-    
-    if (ExecSyncCmdActive)
-    {
-    	return TCL_OK;
-    }
-    ExecSyncCmdActive = 1;
-    
-    Tcl_DStringInit (&cmd);
-    Tcl_DStringAppend (&cmd, textPtr->SyncCmd, -1);
-    for (i=1;i<argc;i++) {
-	Tcl_DStringAppendElement (&cmd, argv[i]);
-    }
-
-    ret = Tcl_Eval (interp, Tcl_DStringValue(&cmd));
-    Tcl_DStringFree (&cmd);
-    
-    ExecSyncCmdActive = 0;
-    
-    return ret;
 }
 
 static void

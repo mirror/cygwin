@@ -1,3 +1,18 @@
+2002-07-31  Keith Seitz  <keiths@redhat.com>
+
+	From Mo DeJong  <supermo@bayarea.net>
+	* generic/tkText.c (ExecSyncCmd):
+	Remove -synccommand option from Tk text widget.
+	This local modification was used by an very old
+	version of Source-Navigator, but is no longer
+	needed. Remove ExecSyncCmd function.
+	* generic/tkText.h (TkText): Remove SyncCmd member.
+	* library/msgbox.tcl (tkMessageBox): Remove unused
+	-modal option. This was a local mod to tk.
+	* tests/text.test: Add default value for -tabsize.
+	This is a local mod to tk.
+	* tests/wm.test: Fixup iconwindow error messages.
+
 2002-01-24  DJ Delorie  <dj@redhat.com>
 
 	* xlib/X11/Xutil.h (XEmptyRegion): Returns Bool.

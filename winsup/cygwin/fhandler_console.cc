@@ -1,6 +1,6 @@
 /* fhandler_console.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -89,6 +89,8 @@ static console_state NO_COPY *shared_console_info;
 
 dev_console NO_COPY *fhandler_console::dev_state;
 
+int NO_COPY fhandler_console::open_fhs;
+
 /* Allocate and initialize the shared record for the current console.
    Returns a pointer to shared_console_info. */
 tty_min *
@@ -164,6 +166,7 @@ set_console_state_for_spawn ()
 			 &sec_none_nih, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
 			 NULL);
 
+  debug_printf ("h %p", h);
   if (h == INVALID_HANDLE_VALUE)
     return 0;
 
@@ -215,6 +218,8 @@ fhandler_console::send_winch_maybe ()
   if (y != dev_state->info.dwWinSize.Y || x != dev_state->info.dwWinSize.X)
     {
       extern fhandler_tty_master *tty_master;
+      dev_state->scroll_region.Top = 0;
+      dev_state->scroll_region.Bottom = -1;
       if (tty_master)
 	tty_master->set_winsize (true);
       else
@@ -628,6 +633,8 @@ fhandler_console::open (path_conv *, int flags, mode_t)
 
   TTYCLEARF (RSTCONS);
   set_open_status ();
+  open_fhs++;
+  debug_printf ("incremented open_fhs, now %d", open_fhs);
   debug_printf ("opened conin$ %p, conout$ %p",
 		get_io_handle (), get_output_handle ());
 
@@ -641,6 +648,14 @@ fhandler_console::close (void)
   CloseHandle (get_output_handle ());
   set_io_handle (NULL);
   set_output_handle (NULL);
+  if (!cygheap->fdtab.in_vfork_cleanup () && --open_fhs <= 0
+      && myself->ctty != TTY_CONSOLE)
+    {
+      syscall_printf ("open_fhs %d, freeing console %p",
+		      fhandler_console::open_fhs, myself->ctty);
+      FreeConsole ();
+    }
+  debug_printf ("decremented open_fhs, now %d", open_fhs);
   return 0;
 }
 
@@ -842,7 +857,7 @@ fhandler_console::tcgetattr (struct termios *t)
 }
 
 fhandler_console::fhandler_console () :
-  fhandler_termios ()
+  fhandler_termios (FH_CONSOLE, -1)
 {
 }
 
@@ -1404,7 +1419,7 @@ fhandler_console::write_normal (const unsigned char *src,
       switch (base_chars[*src])
 	{
 	case BEL:
-	  Beep (412, 100);
+	  MessageBeep (0xFFFFFFFF);
 	  break;
 	case ESC:
 	  dev_state->state_ = gotesc;
@@ -1675,7 +1690,7 @@ fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
   if (f != INVALID_HANDLE_VALUE)
     CloseHandle (f);	/* Reopened by open */
 
-  this->tcsetattr (0, &tc->ti);
+  tcsetattr (0, &tc->ti);
 }
 
 int
@@ -1687,7 +1702,7 @@ fhandler_console::igncr_enabled (void)
 void
 fhandler_console::set_close_on_exec (int val)
 {
-  this->fhandler_base::set_close_on_exec (val);
+  fhandler_base::set_close_on_exec (val);
   set_inheritance (output_handle, val);
 }
 

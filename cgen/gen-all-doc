@@ -49,6 +49,9 @@ export cgendir=`pwd`
       make html ARCH=$a MACHS="fr500" INSN_FILE_NAME=frv-2-insn.html
       mv frv.html frv-2.html
       mv frv-insn.html frv-2-insn.html
+      make html ARCH=$a MACHS="fr550" INSN_FILE_NAME=frv-3-insn.html
+      mv frv.html frv-3.html
+      mv frv-insn.html frv-3-insn.html
       ;;
     *)
       make html ARCH=$a

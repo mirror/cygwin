@@ -81,10 +81,10 @@ template<class bus_size> class IntController:
 {
 public:
 
-  IntController<bus_size>(host_int_4 num_irq = 0,
-			  host_int_4 num_fiq = 0,
-			  host_int_4 ctrlr_features = 0);
-  virtual ~IntController<bus_size>() throw () { }
+  IntController (host_int_4 num_irq = 0,
+		 host_int_4 num_fiq = 0,
+		 host_int_4 ctrlr_features = 0);
+  virtual ~IntController() throw () { }
   
 private:
   class interrupt_bus: public word_bus<bus_size>

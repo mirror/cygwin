@@ -1,5 +1,15 @@
 2003-09-09  Andrew Cagney  <cagney@redhat.com>
 
+	* rs6000-tdep.c (rs6000_gdbarch_init): Do not set the deprecated
+	methods "max_register_raw_size", "max_register_virtual_size" or
+	"register_virtual_size".
+
+2003-09-09  Ian Lance Taylor  <ian@wasabisystems.com>
+
+	* MAINTAINERS: Update my e-mail address.
+
+2003-09-09  Andrew Cagney  <cagney@redhat.com>
+
 	* rs6000-tdep.c (rs6000_store_struct_return): Delete function.
 	(rs6000_push_dummy_call): Store the struct return address.
 	* ppc-sysv-tdep.c (ppc_sysv_abi_push_dummy_call): Ditto.

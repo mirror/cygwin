@@ -62,7 +62,7 @@ namespace sid {
   bytereverse(host_int_2 value)
   {
     // This is a 386 instruction.
-#if defined(__i386__) && defined(__GNUC__)
+#if defined(__GNUC__) && (defined(__i386__) || defined (__x86_64__))
     __asm__("xchgb %b0,%h0" : "=q" (value) :  "0" (value));
 #else
       value = ( ((value & 0xff00U) >> 8) 
@@ -74,7 +74,7 @@ namespace sid {
   inline host_int_4
   bytereverse(host_int_4 value)
   {
-#if defined(__GNUC__) && (defined(__i486__) || defined(__i586__) || defined(__i686__))
+#if defined(__GNUC__) && (defined(__i486__) || defined(__i586__) || defined(__i686__) || defined (__x86_64__))
     // This is a 486+ instruction
       __asm__ ("bswap %0" : "=r" (value) : "0" (value));
 #else
@@ -89,11 +89,16 @@ namespace sid {
   inline host_int_8
   bytereverse(host_int_8 value)
   {
+#if defined (__GNUC__) && defined (__x86_64__)
+    // This is an x86_64 instruction.
+    __asm__ ("bswap %0" : "=r" (value) : "0" (value));
+#else
     host_int_4 upper = (value & 0xffffffff00000000ULL) >> 32;
     host_int_4 lower = (value & 0x00000000ffffffffULL);
     upper = bytereverse(upper);
     lower = bytereverse(lower);
     value = ((host_int_8)lower) << 32 | (host_int_8)upper;
+#endif
     return value;
   }
 

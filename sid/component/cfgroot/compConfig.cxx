@@ -1,7 +1,7 @@
 // compConfig.cxx - The cfgroot component: configuration parsing, root
 // of component creation and management.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -94,6 +94,7 @@ public:
 protected:
   host_int_8 activity_count;
   bool running;
+  host_int_4 stop_code;
   void run (host_int_4); // run top-level simulation loop
   void stop (host_int_4); // stop top-level simulation loop
 
@@ -556,6 +557,7 @@ cfgroot_component::configure_line(const std::string& line)
 cfgroot_component::cfgroot_component():
   recursion_limited ("running", 1),
   running (false),
+  stop_code (0),
   config_file ("<none>"),
   line_num(1),
   run_pin(this, & cfgroot_component::run),
@@ -599,6 +601,7 @@ cfgroot_component::cfgroot_component():
 
   add_attribute_ro ("running", & this->running, "register");
   add_attribute_ro ("activity-count", & this->activity_count, "register");
+  add_attribute_ro ("stop-code", & this->stop_code, "register");
 
   add_pin("stop!", & this->stop_pin);
   add_attribute("stop!", & this->stop_pin, "pin");
@@ -661,9 +664,10 @@ cfgroot_component::~cfgroot_component() throw()
 
 
 void
-cfgroot_component::stop(host_int_4)
+cfgroot_component::stop (host_int_4 code)
 {
   this->running = false;
+  this->stop_code = code;
 }
 
 
@@ -695,6 +699,7 @@ cfgroot_component::run(host_int_4)
       // Set this flag first, so that if someone during
       // starting_pin.drive() clears it, it has effect.
       this->running = true;
+      this->stop_code = 0;
       this->starting_pin.drive (1);
       while (LIKELY(this->running))
 	{

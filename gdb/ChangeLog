@@ -1,3 +1,9 @@
+2005-03-17  Jim Blandy  <jimb@redhat.com>
+
+	* gdbtypes.c (build_builtin_type_vec64): Include a 'double' member
+	in the union, too, since these registers can hold 64-bit floating
+	point types.
+
 2004-09-27  Jim Blandy  <jimb@redhat.com>
 
 	* dwarf2-frame.c (dwarf2_frame_cache): Properly retrieve a frame's

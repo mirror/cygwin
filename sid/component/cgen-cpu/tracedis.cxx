@@ -119,7 +119,7 @@ bfd_getl32 (register const bfd_byte *addr)
 }
 
 void
-bfd_put_bits (bfd_vma data, bfd_byte* addr, int bits, boolean big_p)
+bfd_put_bits (bfd_vma data, bfd_byte* addr, int bits, int big_p)
 {
   int i;
   int bytes;
@@ -139,7 +139,7 @@ bfd_put_bits (bfd_vma data, bfd_byte* addr, int bits, boolean big_p)
 
 /* Stolen from libbfd.  */
 bfd_vma
-bfd_get_bits (bfd_byte* addr, int bits, boolean big_p)
+bfd_get_bits (bfd_byte* addr, int bits, int big_p)
 {
   bfd_vma data;
   int i;

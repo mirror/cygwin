@@ -1,3 +1,8 @@
+2003-01-09  Frank Ch. Eigler  <fche@redhat.com>
+
+	* tracedis.cxx (bfd_{get,put}_bits): Use int, not obsolete bfd
+	boolean type.
+
 2003-01-08  Ben Elliston  <bje@redhat.com>
 
 	* fp.h (sidutil::fp): Fully quality std::ostream.

@@ -222,7 +222,11 @@
    " = "
    (if (ifld-beyond-base? f base-length total-length)
        (-gen-ifld-extract-beyond f base-length total-length var-list)
-       (-gen-ifld-extract-base f (min base-length total-length) base-value))
+       (-gen-ifld-extract-base f 
+			       (if (adata-integral-insn? CURRENT-ARCH)
+				   total-length
+				   (min base-length total-length))
+			       base-value))
    ";"
    (if macro? " \\\n" "\n")
    )

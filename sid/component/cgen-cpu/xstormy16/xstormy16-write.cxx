@@ -1328,6 +1328,26 @@ xstormy16_write_sfmt_rrcgrimm4 (xstormy16_cpu* current_cpu, xstormy16_scache* se
 
 
 sem_status
+xstormy16_write_sfmt_shrgrgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem, xstormy16_parexec* par_exec)
+{
+#define FLD(f) abuf->fields.sfmt_bccgrgr.f
+#define OPRND(f) par_exec->operands.sfmt_shrgrgr.f
+  xstormy16_scache* abuf = sem;
+  unsigned long long written = abuf->written;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = 0; // dummy value for branches
+  sem_status status = SEM_STATUS_NORMAL; // ditto
+
+  current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rd_idx), OPRND (h_gr_HI_index_of__DFLT_Rd));
+  current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
+
+  return status;
+#undef OPRND
+#undef FLD
+}
+
+
+sem_status
 xstormy16_write_sfmt_shrgrimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem, xstormy16_parexec* par_exec)
 {
 #define FLD(f) abuf->fields.sfmt_bngrimm4.f
@@ -1372,6 +1392,26 @@ xstormy16_write_sfmt_asrgrimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem
 {
 #define FLD(f) abuf->fields.sfmt_bngrimm4.f
 #define OPRND(f) par_exec->operands.sfmt_asrgrimm.f
+  xstormy16_scache* abuf = sem;
+  unsigned long long written = abuf->written;
+  PCADDR pc = abuf->addr;
+  PCADDR npc = 0; // dummy value for branches
+  sem_status status = SEM_STATUS_NORMAL; // ditto
+
+  current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rd_idx), OPRND (h_gr_HI_index_of__DFLT_Rd));
+  current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
+
+  return status;
+#undef OPRND
+#undef FLD
+}
+
+
+sem_status
+xstormy16_write_sfmt_set1grimm (xstormy16_cpu* current_cpu, xstormy16_scache* sem, xstormy16_parexec* par_exec)
+{
+#define FLD(f) abuf->fields.sfmt_bngrimm4.f
+#define OPRND(f) par_exec->operands.sfmt_set1grimm.f
   xstormy16_scache* abuf = sem;
   unsigned long long written = abuf->written;
   PCADDR pc = abuf->addr;
@@ -1939,10 +1979,10 @@ xstormy16_write_sfmt_sdivlh (xstormy16_cpu* current_cpu, xstormy16_scache* sem, 
 
 
 sem_status
-xstormy16_write_sfmt_nop (xstormy16_cpu* current_cpu, xstormy16_scache* sem, xstormy16_parexec* par_exec)
+xstormy16_write_sfmt_reset (xstormy16_cpu* current_cpu, xstormy16_scache* sem, xstormy16_parexec* par_exec)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
-#define OPRND(f) par_exec->operands.sfmt_nop.f
+#define OPRND(f) par_exec->operands.sfmt_reset.f
   xstormy16_scache* abuf = sem;
   unsigned long long written = abuf->written;
   PCADDR pc = abuf->addr;

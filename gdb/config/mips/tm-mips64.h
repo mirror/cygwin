@@ -2,21 +2,22 @@
    Copyright 1994, 1996 Free Software Foundation, Inc.
    Contributed by Ian Lance Taylor (ian@cygnus.com)
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #define GDB_TARGET_IS_MIPS64 1
 
@@ -31,24 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 	 : builtin_type_long_long)
 
 /* Load double words in CALL_DUMMY.  */
-#define OP_LDFPR 065	/* ldc1 */
-#define OP_LDGPR 067	/* ld */
-
-#if defined(MIPS_EABI) && (MIPS_EABI != 0)
-/* Define sizes for 64-bit data types, allow specific targets to override
-   these values.  Doing so may violate the strict EABI, but it's necessary
-   for some MIPS III and MIPS IV machines that want 64bit longs, but 32bit
-   pointers.  */
-#ifndef TARGET_LONG_BIT
-#define TARGET_LONG_BIT      64
-#endif
-#ifndef TARGET_LONG_LONG_BIT
-#define TARGET_LONG_LONG_BIT 64
-#endif
-#ifndef TARGET_PTR_BIT
-#define TARGET_PTR_BIT       64
-#endif
-#endif /* MIPS_EABI */
+#define OP_LDFPR 065		/* ldc1 */
+#define OP_LDGPR 067		/* ld */
 
 /* Get the basic MIPS definitions.  */
 #include "tm-mips.h"

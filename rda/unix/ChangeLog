@@ -1,5 +1,12 @@
 2004-04-20  Kevin Buettner  <kevinb@redhat.com>
 
+	* thread-db.c (lookup_sym): New function.
+	(thread_db_open): Print diagnostic message for failed dlopen()
+	call.  Call lookup_sym() which will print diagnostic for failed
+	dlsym() call.
+
+2004-04-20  Kevin Buettner  <kevinb@redhat.com>
+
 	* server.c (main): Ignore realtime signals.
 
 2004-04-05  Kevin Buettner  <kevinb@redhat.com>

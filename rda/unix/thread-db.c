@@ -740,6 +740,23 @@ thread_db_setgregs (const td_thrhandle_t *th, const GREGSET_T gregset)
   return thread_db_set_regset (&gregset_cache, th, gregset);
 }
 
+/* Call dlsym() to find the address of a symbol.  If symbol lookup fails,
+   print the reason to stderr.  */
+
+static void *
+lookup_sym (void *dlhandle, char *symbol)
+{
+  void *addr;
+
+  addr = dlsym (dlhandle, symbol);
+
+  if (addr == NULL)
+    fprintf (stderr, "Symbol lookup of %s failed: %s\n",
+	     symbol, dlerror ());
+
+  return addr;
+}
+
 /* Function: thread_db_dlopen
    Attach to the libthread_db library.  
    This function does all the dynamic library stuff (dlopen, dlsym).
@@ -755,45 +772,49 @@ thread_db_dlopen (void)
 #endif
 
   if ((dlhandle = dlopen (LIBTHREAD_DB_SO, RTLD_NOW)) == NULL)
-    return -1;		/* fail */
+    {
+      fprintf (stderr, "Unable to open %s: %s\n",
+               LIBTHREAD_DB_SO, dlerror ());
+      return -1;		/* fail */
+    }
 
   /* Initialize pointers to the dynamic library functions we will use.
    */
 
-  if ((td_init_p = dlsym (dlhandle, "td_init")) == NULL)
+  if ((td_init_p = lookup_sym (dlhandle, "td_init")) == NULL)
     return -1;		/* fail */
 
-  if ((td_ta_new_p = dlsym (dlhandle, "td_ta_new")) == NULL)
+  if ((td_ta_new_p = lookup_sym (dlhandle, "td_ta_new")) == NULL)
     return -1;		/* fail */
 
-  if ((td_ta_delete_p = dlsym (dlhandle, "td_ta_delete")) == NULL)
+  if ((td_ta_delete_p = lookup_sym (dlhandle, "td_ta_delete")) == NULL)
     return -1;		/* fail */
 
-  if ((td_ta_map_id2thr_p = dlsym (dlhandle, "td_ta_map_id2thr")) == NULL)
+  if ((td_ta_map_id2thr_p = lookup_sym (dlhandle, "td_ta_map_id2thr")) == NULL)
     return -1;		/* fail */
 
-  if ((td_ta_map_lwp2thr_p = dlsym (dlhandle, "td_ta_map_lwp2thr")) == NULL)
+  if ((td_ta_map_lwp2thr_p = lookup_sym (dlhandle, "td_ta_map_lwp2thr")) == NULL)
     return -1;		/* fail */
 
-  if ((td_ta_thr_iter_p = dlsym (dlhandle, "td_ta_thr_iter")) == NULL)
+  if ((td_ta_thr_iter_p = lookup_sym (dlhandle, "td_ta_thr_iter")) == NULL)
     return -1;		/* fail */
 
-  if ((td_thr_validate_p = dlsym (dlhandle, "td_thr_validate")) == NULL)
+  if ((td_thr_validate_p = lookup_sym (dlhandle, "td_thr_validate")) == NULL)
     return -1;		/* fail */
 
-  if ((td_thr_get_info_p = dlsym (dlhandle, "td_thr_get_info")) == NULL)
+  if ((td_thr_get_info_p = lookup_sym (dlhandle, "td_thr_get_info")) == NULL)
     return -1;		/* fail */
 
-  if ((td_thr_getfpregs_p = dlsym (dlhandle, "td_thr_getfpregs")) == NULL)
+  if ((td_thr_getfpregs_p = lookup_sym (dlhandle, "td_thr_getfpregs")) == NULL)
     return -1;		/* fail */
 
-  if ((td_thr_getgregs_p = dlsym (dlhandle, "td_thr_getgregs")) == NULL)
+  if ((td_thr_getgregs_p = lookup_sym (dlhandle, "td_thr_getgregs")) == NULL)
     return -1;		/* fail */
 
-  if ((td_thr_setfpregs_p = dlsym (dlhandle, "td_thr_setfpregs")) == NULL)
+  if ((td_thr_setfpregs_p = lookup_sym (dlhandle, "td_thr_setfpregs")) == NULL)
     return -1;		/* fail */
 
-  if ((td_thr_setgregs_p = dlsym (dlhandle, "td_thr_setgregs")) == NULL)
+  if ((td_thr_setgregs_p = lookup_sym (dlhandle, "td_thr_setgregs")) == NULL)
     return -1;		/* fail */
 
   /* These are not essential.  */

@@ -16,6 +16,7 @@
 (load "fixup.scm")
 
 (define srcdir ".")
+(set! %load-path (cons srcdir %load-path))
 
 ; Utility to enable/disable compiled-in C code.
 

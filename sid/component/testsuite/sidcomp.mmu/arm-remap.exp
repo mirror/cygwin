@@ -183,7 +183,7 @@ if {$r1 == "ok" && $r2 == "ok"} then { pass $test } else { fail $test }
 # Test writes around the mapped region.
 
 set okay 1
-sid_cmd "set hook_written(h4,l4,$outbus) {}"
+sid_cmd "set hook_written(h4,l4,$outbus) { return {ok 0} }"
 set bus [sid_cmd "sid::component::find_bus $victim access-port"]
 for {set addr 0x10000} {$addr < 0x20000} {set addr [expr $addr + 4]} {
     set test "remap for address [format %x $addr]"
@@ -338,7 +338,7 @@ if {$result == "no"} { pass $test } else { fail "$test -- got $result" }
 
 # Test writes with the normal mapping.
 
-sid_cmd "set hook_written(h4,l4,$outbus) {}"
+sid_cmd "set hook_written(h4,l4,$outbus) { return {ok 0} }"
 set bus [sid_cmd "sid::component::find_bus $victim access-port"]
 set okay 1
 

@@ -100,13 +100,13 @@ set test "get control word"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 set val [sid_cmd "sid::bus::read_h4_l4 $bus 0x08"]
 # XXX: assert also the current value of the control word?
-if {[string match "ok*" $val]} then {pass $test} else {fail $test}
+if [sid_bus_ok_p $val] then { pass $test } else { fail $test }
 
 set test "turn timer on"
 set bus [sid_cmd "sid::component::find_bus $victim registers"]
 set val [sid_cmd "sid::bus::write_h4_l4 $bus 0x08 0xC4"]
 # C4: enabled | periodic | prescale=01 (divide-by-16)
-if {$val == "ok"} then {pass $test} else {fail $test}
+if {[lindex $val 0] == "ok"} then {pass $test} else {fail $test}
 
 set test "tick presence of clock pin"
 set clock_pin [sid_cmd "sid::component::find_pin $victim clock"]

@@ -116,7 +116,7 @@ foreach hex_addr {0x0 0x100 0x1E0 0x20F 0x222 0x29A 0x4BC 0x551 0x555 0x6B0 0x10
     }
 
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $hex_addr $hex_data"]
-    if {$result != "ok"} { 
+    if ![sid_bus_ok_p $result] {
 	fail "$test (bus error)"
     } else {
 	set result [sid_cmd "sid::bus::read_h4_l1 $bus $hex_addr"]
@@ -135,7 +135,7 @@ foreach pair {{0xAA 0x5555} {0x55 0xAAAA} {0xA0 0x5555}} {
     set hex_data [lindex $pair 0]
     set hex_addr [lindex $pair 1]
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $hex_addr $hex_data"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	set okay 0
 	break
     }
@@ -149,7 +149,7 @@ set sector_size [sid_cmd "sid::component::attribute_value $victim sector-size"]
 set okay 1
 for {set addr 0} {$addr < $sector_size} {incr addr} {
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $addr 0x66"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	set okay 0
 	break
     }
@@ -175,7 +175,7 @@ set sector_size [sid_cmd "sid::component::attribute_value $victim sector-size"]
 set okay 1
 for {set addr $sector_size} {$addr < [expr $sector_size + 16]} {incr addr} {
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $addr 0x66"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	set okay 0
 	break
     }
@@ -201,7 +201,7 @@ foreach pair {{0xAA 0x5555} {0x55 0xAAAA} {0xA0 0x5555}} {
     set hex_data [lindex $pair 0]
     set hex_addr [lindex $pair 1]
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $hex_addr $hex_data"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	set okay 0
 	break
     }
@@ -216,7 +216,7 @@ set okay 1
 for {set addr 0} {$addr < $sector_size} {incr addr} {
     set addr [expr [expr 2 * $sector_size] + $addr]
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $addr 0x66"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	set okay 0
 	break
     }
@@ -248,7 +248,7 @@ foreach pair {{0xAA 0x5555} {0x55 0xAAAA} {0x90 0x5555}} {
     set hex_data [lindex $pair 0]
     set hex_addr [lindex $pair 1]
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $hex_addr $hex_data"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	set okay 0
 	break
     }
@@ -282,7 +282,7 @@ foreach pair {{0xAA 0x5555} {0x55 0xAAAA} {0xF0 0x5555}} {
     set hex_data [lindex $pair 0]
     set hex_addr [lindex $pair 1]
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $hex_addr $hex_data"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	set okay 0
 	break
     }

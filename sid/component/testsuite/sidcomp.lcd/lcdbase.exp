@@ -34,7 +34,7 @@ sid_cmd "sid::component::connect_pin $victim row_col $row_col_pin"
 set test "correct AC value after DR write"
 # The 32 is in HEX, but somebody is not grok-ing the 0x prefix
 set result [sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) 0x32"]
-if {$result != "ok"} { 
+if ![sid_bus_ok_p $result] {
     fail $test
 } else {
     set result [sid_cmd "sid::bus::read_h4_l1 $bus $LCD(AC)"]
@@ -48,7 +48,7 @@ if {$result != "ok"} {
 set test "correct AC value after 2nd DR write"
 # The 23 is in HEX, but somebody is not grok-ing the 0x prefix
 set result [sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) 0x23"]
-if {$result != "ok"} {
+if ![sid_bus_ok_p $result] {
     fail $test
 } else {
     set result [sid_cmd "sid::bus::read_h4_l1 $bus $LCD(AC)"]
@@ -90,7 +90,7 @@ set okay 1
 foreach char [split "Hi Alex!" ""] {
     scan $char %c code
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) $code"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	set okay 0
 	break
     }
@@ -102,7 +102,7 @@ sid_cmd "sid::bus::write_h4_l1 $bus $LCD(IR) 0x43"
 set okay 1
 foreach byte {3 4 9 0xA 0xA 0xA 0xA 9 4 3 0 0 0 0 0 0 4 0x13 0xB 0 0 0xA 0x13 4 0x18} {
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) $byte"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	set okay 0
 	break
     }
@@ -118,7 +118,7 @@ set okay 1
 foreach char [split "Cygnus" ""] {
     scan $char %c byte
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) $code"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	set okay 0
 	break
     }
@@ -131,7 +131,7 @@ sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) 3"
 foreach char [split "rules!" ""] {
     scan $char %c byte
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) $code"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	set okay 0
 	break
     }

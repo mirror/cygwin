@@ -171,8 +171,8 @@ sid_cmd "if {[info exists hook_written]} { unset hook_written }"
 sid_cmd "if {[info exists hook_read]} { unset hook_read }"
 foreach endian {l b} {
     foreach width {1 2 4 8} {
-	sid_cmd "set hook_read(h4,${endian}${width},$buses_array(1)) {return {ok 0}}"
-	sid_cmd "set hook_written(h4,${endian}${width},$buses_array(1)) {return ok}"
+	sid_cmd "set hook_read(h4,${endian}${width},$buses_array(1)) {return {{ok 0} 0}}"
+	sid_cmd "set hook_written(h4,${endian}${width},$buses_array(1)) {return {ok 0}}"
     }
 }
 
@@ -214,7 +214,7 @@ foreach width {1 2 4 8} {
 	    if {rand() < 0.25} then { set lb [list l b] } else { set lb [list] }
 	    foreach endian $lb {
 		set result [sid_cmd "sid::bus::write_h4_${endian}${width} $mbus $addr 0xFF"]
-		if {$result != "ok" || \
+		if {![sid_bus_ok_p $result] || \
 			[sid_cmd "set written_addr"] != $expected_index || \
 			[string index [sid_cmd "set written_endian"] 0] != $endian || \
 			[sid_cmd "set written_width"] != $width} {
@@ -269,7 +269,7 @@ foreach width {1 2 4 8} {
 		if {rand() < 0.05} then { set lb [list l b] } else { set lb [list] }
 		foreach endian $lb {
 		    set result [sid_cmd "sid::bus::write_h4_${endian}${accwidth} $mbus $addr 0xFF"]
-		    if {$expresult == "ok" || $result != $expresult} {
+		    if {$expresult == "ok" || [lindex $result 0] != $expresult} {
 			set desired [list $expected_index $endian $width]
 			set actual [list \
 					[sid_cmd "set written_addr"] \
@@ -282,7 +282,7 @@ foreach width {1 2 4 8} {
 		    }
 
 		    set result [sid_cmd "sid::bus::read_h4_${endian}${accwidth} $mbus $addr"]
-		    if {$expresult == "ok" || [lindex $result 0] != $expresult} {
+		    if {$expresult == "ok" || [lindex [lindex $result 0] 0] != $expresult} {
 			set desired [list $expected_index $endian $width]
 			set actual [list \
 					[sid_cmd "set read_addr"] \

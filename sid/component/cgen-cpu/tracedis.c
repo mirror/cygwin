@@ -20,21 +20,20 @@ cgen_disassemble(bfd_vma pc,
 		 enum bfd_flavour flavour,
 		 enum bfd_architecture arch,
 		 enum bfd_endian endian,
-		 const char *name)
+		 const char *name,
+		 unsigned long isa_mask)
 {
-  if (info->read_memory_func != read_mem_func)
-    {
-      register_name(arch, name);
-      INIT_DISASSEMBLE_INFO(*info, stdout, fprintf);
-      info->application_data = this;
-      info->flavour = flavour;
-      info->arch = arch;
-      info->endian = endian;
-      info->read_memory_func = read_mem_func;
-      info->memory_error_func = memory_error_func;
-      info->print_address_func = print_addr_func;
-      info->symbol_at_address_func = sym_at_addr_func;
-    }
+  register_name(arch, name);
+  INIT_DISASSEMBLE_INFO(*info, stdout, fprintf);
+  info->application_data = this;
+  info->flavour = flavour;
+  info->insn_sets = isa_mask; /* may be 0 */
+  info->arch = arch;
+  info->endian = endian;
+  info->read_memory_func = read_mem_func;
+  info->memory_error_func = memory_error_func;
+  info->print_address_func = print_addr_func;
+  info->symbol_at_address_func = sym_at_addr_func;
 
   printf("0x%08x\t", (unsigned int)pc);
   (void) (*fp) (pc, info);

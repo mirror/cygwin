@@ -1,3 +1,7 @@
+2001-07-16  Andrew Cagney  <ac131313@redhat.com>
+
+	* config.guess: Duplicate ../config.guess.
+
 2001-04-18  Elena Zannoni  <ezannoni@redhat.com>
 
 	* baseboards/sh-hms.exp: Enable inferior function calls testing.

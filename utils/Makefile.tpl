@@ -98,9 +98,6 @@ $(srcdir)/Makefile.in: $(srcdir)/Makefile.tpl $(srcdir)/Makefile.def
 config.status: $(srcdir)/configure
 	./config.status --recheck
 
-$(srcdir)/configure: $(srcdir)/configure.in
-	cd $(srcdir) && autoconf
-
 # Miscellaneous variable setting
 AR_FLAGS = qv
 FLAGS_TO_PASS = \

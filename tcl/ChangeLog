@@ -1,3 +1,20 @@
+2002-07-31  Keith Seitz  <keiths@redhat.com>
+
+	* generic/tclIntDecls.h (TclIntStubs): Do not include definitions
+	for tclpAlloc, tclpFree, or pRealloc on cygwin.
+
+	* win/tcl.hpj.in: Copied here from tools/tcl.hpj.in.
+	
+	* win/tcl.m4 (SC_CONFIG_CFLAGS): Add TCL_DLL_BASE, DDE_DLL_BASE,
+	and REG_DLL_BASE variables to define DLL image bases on cygwin.
+	Do not link with "-e _WinMain@16" on cygwin.
+	* win/configure.in (TCL_DLL_BASE): Substitute into makefile.
+	(DDE_DLL_BASE): Likewise.
+	(REG_DLL_BASE): Likewise.
+	* win/configure: Regenerated.
+	* win/Makefile.in: Use TCL_DLL_BASE, DDE_DLL_BASE, and
+	REG_DLL_BASE to build DLLs.
+
 2002-07-30  Keith Seitz  <keiths@redhat.com>
 
 	From Mo DeJong  <supermo@bayarea.net>

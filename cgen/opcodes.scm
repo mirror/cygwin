@@ -516,7 +516,8 @@
    (lambda (ops)
      ; OPS is a list of operands with the same name that for whatever reason
      ; were defined separately.
-     (logit 3 (concat "Processing " (obj:str-name (car ops)) " " what " ...\n"))
+     (logit 3 (string/symbol-append
+	       "Processing " (obj:str-name (car ops)) " " what " ...\n"))
      (if (= (length ops) 1)
 	 (gen-obj-sanitize
 	  (car ops)

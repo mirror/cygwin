@@ -77,7 +77,6 @@ static const char *name PARAMS ((CGEN_CPU_DESC, const char **, int, long *))
 
 PARSE_FUNC_DECL (parse_fr);
 PARSE_FUNC_DECL (parse_addr16);
-PARSE_FUNC_DECL (parse_addr16_p);
 PARSE_FUNC_DECL (parse_addr16_cjp);
 PARSE_FUNC_DECL (parse_lit8);
 PARSE_FUNC_DECL (parse_bit3);
@@ -318,31 +317,6 @@ parse_addr16 (cd, strp, opindex, valuep)
 
 
 static const char *
-parse_addr16_p (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     long *valuep;
-{
-  const char *errmsg;
-  enum cgen_parse_operand_result result_type;
-  bfd_reloc_code_real_type code = BFD_RELOC_IP2K_PAGE3;
-  bfd_vma value;
- 
-  errmsg = cgen_parse_address (cd, strp, opindex, code,
-			       & result_type, & value);
-  if (errmsg == NULL)
-    {
-      if ( result_type == CGEN_PARSE_OPERAND_RESULT_NUMBER )
-	*valuep = (value >> 13) & 0x7;
-      else if ( result_type == CGEN_PARSE_OPERAND_RESULT_QUEUED )
-	*valuep = value;
-    }
-  return errmsg; 
-}
-
-
-static const char *
 parse_addr16_cjp (cd, strp, opindex, valuep)
      CGEN_CPU_DESC cd;
      const char **strp;
@@ -532,7 +506,6 @@ static void name PARAMS ((CGEN_CPU_DESC, PTR, long, unsigned int, bfd_vma, int))
 PRINT_FUNC_DECL (print_fr);
 PRINT_FUNC_DECL (print_dollarhex);
 PRINT_FUNC_DECL (print_dollarhex8);
-PRINT_FUNC_DECL (print_dollarhex16);
 PRINT_FUNC_DECL (print_dollarhex_addr16h);
 PRINT_FUNC_DECL (print_dollarhex_addr16l);
 PRINT_FUNC_DECL (print_dollarhex_p);
@@ -621,20 +594,6 @@ print_dollarhex8 (cd, dis_info, value, attrs, pc, length)
   disassemble_info *info = (disassemble_info *) dis_info;
 
   (*info->fprintf_func) (info->stream, "$%02x", value);
-}
-
-static void
-print_dollarhex16 (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
-{
-  disassemble_info *info = (disassemble_info *) dis_info;
-
-  (*info->fprintf_func) (info->stream, "$%04x", value);
 }
 
 static void

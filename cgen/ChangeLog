@@ -1,3 +1,13 @@
+2005-02-15  Nick Clifton  <nickc@redhat.com>
+
+	* opc-itab.scm (-gen-ifmt-table-1): Add an ATTRIBUTE_UNUSED to
+	prevent compile time warning messages.
+	* opc-opinst.scm (-gen-operand-instance-table): Likewise.
+	* utils-gen.scm (attr-int-gen-defn): Likewise.
+	(attr-gen-defn): Likewise.
+	* cpu/ip2k.opc (parse_addr16_p): Remove unused function.
+	(print_dollarhex16): Remove unused function.
+
 2005-02-15  Jim Blandy  <jimb@redhat.com>
 
 	* guile.scm (cgen-call-with-debugging): Doc fix.

@@ -202,7 +202,7 @@
   (gen-obj-sanitize
    (ifmt-eg-insn ifmt) ; sanitize based on the example insn
    (string-list
-    "static const CGEN_IFMT " (gen-sym ifmt) " = {\n"
+    "static const CGEN_IFMT " (gen-sym ifmt) " ATTRIBUTE_UNUSED = {\n"
     "  "
     (number->string (ifmt-mask-length ifmt)) ", "
     (number->string (ifmt-length ifmt)) ", "

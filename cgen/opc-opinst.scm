@@ -49,7 +49,7 @@
      (sfmt-eg-insn sfmt) ; sanitize based on the example insn
      (string-append
       "static const CGEN_OPINST "
-      (gen-sym sfmt) "_ops[] = {\n"
+      (gen-sym sfmt) "_ops[] ATTRIBUTE_UNUSED = {\n"
       (string-map (lambda (op) (-gen-operand-instance op "INPUT"))
 		  ins)
       (string-map (lambda (op)  (-gen-operand-instance op "OUTPUT"))

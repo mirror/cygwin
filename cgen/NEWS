@@ -1,3 +1,5 @@
+Support for the Ubicom IP2K processor contributed by Red Hat and Ubicom, Inc.
+
 Support for the Fujitsu FRV architecture added by Red Hat. Models for FR400 and
 FR500 included.
 

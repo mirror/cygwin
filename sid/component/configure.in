@@ -25,9 +25,9 @@ dnl For lcd component only.
 dnl Check if we can link curses programs without libtermcap.
 dnl If not, add it in.
 lcd_libs=
-AC_CHECK_LIB(curses, refresh, lcd_libs="-lcurses $lcd_libs",
-             AC_CHECK_LIB(curses, refresh,
-		lcd_libs="-lcurses -ltermcap", ,-ltermcap)) 
+AC_CHECK_LIB(curses, refresh, lcd_libs="-lcurses",
+   AC_CHECK_LIB(curses, refresh, lcd_libs="-lcurses -ltermcap", 
+      AC_CHECK_LIB(ncurses, refresh, lcd_libs="-lncurses"), -ltermcap))
 AC_SUBST(lcd_libs)
 
 dnl For socket-related components only.

@@ -1,3 +1,9 @@
+2001-07-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	From Corinna Vinschen <vinschen@redhat.com>
+	* configure.in (lcd_libs): Look for -lncurses too, if -lcurses
+	is not found.
+
 2001-07-23  Frank Ch. Eigler  <fche@redhat.com>
 
 	* siddoc.in (listfiles): Adapt to new XML-origin .txt files.

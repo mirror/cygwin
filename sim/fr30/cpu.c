@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
+Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 
 This file is part of the GNU Simulators.
 
@@ -26,6 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define WANT_CPU_FR30BF
 
 #include "sim-main.h"
+#include "cgen-ops.h"
 
 /* Get the value of h-pc.  */
 

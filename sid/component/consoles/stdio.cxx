@@ -1,7 +1,7 @@
 // stdio.cxx - A simple console that uses standard I/O for
 // enunciation.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2003 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -49,7 +49,7 @@ stdioConsole::read(host_int_4)
     }
 
   // Restore flags.
-  fcntl(0, F_SETFL, flags & ~O_NONBLOCK);
+  fcntl(0, F_SETFL, flags);
 }
 
 

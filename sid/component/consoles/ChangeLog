@@ -1,3 +1,7 @@
+2003-07-14  Dave Brolley  <brolley@redhat.com>
+
+	* stdio.cxx (read): Restore flags to their original state.
+
 2003-06-10  Dave Brolley  <brolley@redhat.com>
 
 	* components.h (fileioConsole): New class.

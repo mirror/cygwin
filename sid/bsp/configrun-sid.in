@@ -112,7 +112,11 @@ $load_mapper_data = "cpu-mapper access-port";
 	    "wrap=s@" => ["wrap=COMPONENT", "Turn on SID API tracing for named component", "none"],
 	    "load=s%" => ["load PROCESSOR=NAME", "Specify an executable to be loaded into", "",
 	                  "a specific processor. May be specified more",
-                          "than once to load multiple processors.  [cpu=exec]"]
+                          "than once to load multiple processors.  [cpu=exec]"],
+	    "icache=s" => ["icache=TYPE", "Add an instruction cache.", "none"],
+	    "dcache=s" => ["dcache=TYPE", "Add a data cache.", "none",
+			  "refer to any existing \"hw-cache-TYPE\" component type",
+			  "e.g., direct/64kb/32, 4way/256kb/64/lru"],
 	   );
 
 @options = keys (%options);
@@ -405,10 +409,31 @@ connect-pin target-sched 0-event -> cpu step!
 connect-pin target-sched 0-control <- cpu step-cycles
 connect-pin yield-net output-0 -> cpu yield
 connect-pin yield-net output-0 -> host-sched yield
-# bus connections
-connect-bus cpu insn-memory $bus_upstream
-connect-bus cpu data-memory $bus_upstream
 ";
+
+if ($opt_icache) {
+  $first_section .= &sidconf_new("hw-cache-$opt_icache", "icache") . "\n";
+  $second_section .= "connect-bus cpu insn-memory icache upstream
+connect-bus icache downstream $bus_upstream
+set icache report-heading \"icache profile report\"
+connect-pin init-sequence output-1 -> icache invalidate-all
+connect-pin deinit-sequence output-6 -> icache report!\n";
+  # $bus_upstream = "icache upstream";
+} else {
+  $second_section .= "connect-bus cpu insn-memory $bus_upstream\n";
+}
+
+if ($opt_dcache) {
+  $first_section .= &sidconf_new("hw-cache-$opt_dcache", "dcache") . "\n";
+  $second_section .= "connect-bus cpu data-memory dcache upstream
+connect-bus dcache downstream $bus_upstream
+set dcache report-heading \"dcache profile report\"
+connect-pin init-sequence output-1 -> dcache invalidate-all
+connect-pin deinit-sequence output-6 -> dcache report!\n";
+  $bus_upstream = "dcache upstream";
+} else {
+  $second_section .= "connect-bus cpu data-memory $bus_upstream\n";
+}
 
 if ($opt_gprof)
   {

@@ -1,3 +1,11 @@
+2004-12-09  Jim Blandy  <jimb@redhat.com>
+
+	* configure.in: Clean up junk whitespace.  Don't call
+	AC_CONFIG_SUBDIRS on variables' values; invoke it on a constant
+	value, at each place we add a directory to targ_subdirs, as
+	recommended by the autoconf manual.
+	* aclocal.m4, configure: Regenerated.
+
 2004-10-07  Jim Blandy  <jimb@redhat.com>
 
 	* lib/gdbserv-state.c (do_get_registers_p_packet): Don't produce a

@@ -28,10 +28,6 @@ case "$target" in
     ;;
 esac
 
-if test -f /usr/include/foo.h; then
-  AC_DEFINE(HAVE_AC_DEFINE, 1, [define if have AC_DEFINE])
-fi
-
 dnl Outputs
 AC_OUTPUT(Makefile)
 

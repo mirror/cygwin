@@ -47,6 +47,7 @@ hw-disk-ide             IDE hard drive model (controller + drives)
 hw-glue-bus-mux         Bus multiplexer
 hw-glue-probe-bus       Bus traffic tracer
 hw-glue-sequence        Sequential pin event dispatcher
+hw-input-keyboard	PC keyboard model
 hw-interrupt-arm/ref    ARM7 reference peripheral: interrupt controller
 hw-interrupt-cogent/cma222      Interrupt controller: Cogent CMA222 ARM CPU board
 hw-lcd-hd44780u         HD44780U LCD controller

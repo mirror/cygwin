@@ -1,3 +1,7 @@
+2002-01-29  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* CATALOG: Add hw-input-keyboard.
+
 2002-01-23  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* CATALOG: Add hw-video-vga, sid-io-vga-x.

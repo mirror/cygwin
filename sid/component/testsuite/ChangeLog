@@ -1,3 +1,11 @@
+2001-09-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* lib/monkey.exp (do_one_test): Set a short timeout.
+	(monkey_start): Don't use sid_find_file to look for victim's
+	component library.
+	* config/default.exp (sid_cmd): Use "\r" (not "\n") as send EOL.
+	* sidcomp.mapper/busif.exp (sid_read_write): Ditto.
+
 2001-09-21  Frank Ch. Eigler  <fche@redhat.com>
 
 	* lib/monkey.exp (monkey_test_state_restore): Undo this change.

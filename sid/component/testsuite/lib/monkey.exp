@@ -130,9 +130,13 @@ proc monkey_test {type sym lib {iterations 30s}} {
 
 # Do one monkey testing round
 proc do_one_test {} {
-    global num_state_snapshots
+    global num_state_snapshots timeout
+
+    set prev_timeout $timeout
+    set timeout 2
 
     set value [random 100]
+
     # skew distribution toward effective tests
     if {$value < 30} then { 
 	set result [monkey_test_pin]
@@ -145,6 +149,8 @@ proc do_one_test {} {
     } else {
 	set result [monkey_test_state_restore]
     }
+
+    set timeout $prev_timeout
     return [expr ![string match "eof" $result]]
 }
 
@@ -159,7 +165,7 @@ proc monkey_start {type sym lib} {
     global state_snapshot_attrs state_snapshot_bad_attrs
     
     sid_config_component_test_with_tracing \
-	    "monkey.conf" "load [sid_find_file $lib] $sym" $type
+	    "monkey.conf" "load $lib $sym" $type
 	    
     sid_start "monkey.conf"
     if {$victim == ""} then { fail "$test - sid startup"; return -1 }

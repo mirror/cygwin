@@ -60,11 +60,11 @@ proc sid_read_write { cmd } {
     for {set i 0} {$i < $iterations} {incr i} {
 	set first [expr $i * 64]
 	set last [expr $first + 63]
-	send "[string range $encoded $first $last]+\n"
+	send "[string range $encoded $first $last]+\r"
     }
     set first [expr $i * 64]
     set read_write ""
-    send "[string range $encoded $first end]\n"
+    send "[string range $encoded $first end]\r"
 
     expect {
 	timeout { fail "$test - timeout after [prettyprint $cmd]" ; return "" }

@@ -1150,6 +1150,8 @@ The syntax for defining instruction fields is:
   (name field-name)
   (comment "description")
   (attrs attribute-list)
+  (word-offset word-offset-in-bits)
+  (word-length word-length-in-bits)
   (start starting-bit-number)
   (length number-of-bits)
   (follows ifield-name)
@@ -1165,7 +1167,9 @@ current *need* to provided them.  However, providing the ability as an
 option may simplify other tools CGEN is used to generate.  This
 simplification would come in the form of giving known names to the formats
 which CPU reference manuals often do.  Pre-specified instruction formats
-may also simplify expression of more complicated instruction sets.)
+may also simplify expression of more complicated instruction sets.
+Providing instruction formats may also simplify the support of really
+complex ISAs like i386 and m68k).
 
 (*note: Positional specification simplifies instruction description somewhat
 in that there is no required order of fields, and a disjunct set of fields can
@@ -1205,10 +1209,29 @@ is used to simplify semantic or assembler descriptions where a fields
 value is based on other values.  Multi-ifields are always virtual.
 @end table
 
+@subsection word-offset
+The offset in bits from the start of the instruction to the word containing
+the field.
+
+NOTE: Either both of @samp{word-offset} and @samp{word-length} must be
+specified or neither of them must be specified.  The presence of
+@samp{word-offset} means the long form of specifying the field's position is
+being used.  If absent then the short form is being used and the value for
+@samp{word-offset} is encoded in @samp{start}.
+
+@subsection word-length
+The length in bits of the word containing the field.
+
 @subsection start
 The bit number of the field's most significant bit in the instruction.
 Bit numbering is determined by the @code{insn-lsb0?} field of
 @code{define-arch}.
+
+NOTE: If using the long form of specifying the field's position
+(@samp{word-offset} is present) then this value is the value within
+the containing word.  If using the short form then this value includes
+the word offset.  See the Porting document for more info
+(@pxref{Writing define-ifield}).
 
 @subsection length
 The number of bits in the field.  The field must be contiguous.  For

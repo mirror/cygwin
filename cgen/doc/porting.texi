@@ -266,11 +266,118 @@ modify its behaviour (in the get/set specs).
 Writing instruction field entries involves analyzing the instruction set
 and creating an entry for each field.  If a field has multiple purposes,
 one can create separate entries for each intended purpose.  The names
-should generally follow the names used by the architecture reference
-manual.
+should generally follow the names used by the architecture reference manual.
 
 By convention, all instruction field names are prefaced with @samp{f-}.  This
 convention must be followed.
+
+CGEN tries to allow the use of the bit numbering as found in the architecture
+reference manual.  This minimizes transcription errors both when writing the
+@samp{.cpu} file and later when communicating field info to people.
+
+There are two key pieces of data that CGEN uses to organize field
+specification: the default insn word size (in bits), and whether bit number
+0 is the LSB (least significant bit) or the MSB (most significant bit).
+
+In the general case, fields are described with 4 numbers: word-offset,
+word-length, start, and length.
+All instruction fields (*) live in exactly one word and must be contiguous.
+Non-contiguous fields are specified with ``multi-ifields'' which are fields
+built up out of several smaller typically disjoint fields.
+The size of the word depends on the context.  @samp{word-offset} specifies
+the offset in bits from the start of the insn to the word containing the field.
+@samp{word-length} specifies the size in bits of the word containing the field.
+@samp{start} specifies the position of the MSB of the field in the word.
+@samp{length} specifies the size in bits of the field.
+
+Example.
+
+Suppose an ISA has instructions that are normally 16 bits,
+but has instructions that may take an additional 32 bit immediate
+and optionally an additional 16 bit immediate after that.
+Also suppose the ISA numbers the bits starting from the LSB.
+
+default-insn-word-bitsize = 16, lsb0? = #t
+
+An instruction with four 4 bit fields and one 32 bit immediate might be:
+
+@example
+
+  +-----+-----+----+----+--------+--------+
+  | op1 | op2 | r1 | r2 | simm32 | simm16 |
+  +-----+-----+----+----+--------+--------+
+
+            word-offset  word-length  start  length
+f-op1:           0            16        15      4
+f-op2:           0            16        11      4
+f-r1:            0            16         7      4
+f-r2:            0            16         3      4
+f-simm32:       16            32        31     32
+f-simm16:       48            16        15     16
+
+@end example
+
+If lsb0? = #f, then the example becomes:
+
+@example
+
+            word-offset  word-length  start  length
+f-op1:           0            16         0      4
+f-op2:           0            16         4      4
+f-r1:            0            16         8      4
+f-r2:            0            16        12      4
+f-simm32:       16            32         0     32
+f-simm16:       48            16         0     16
+
+@end example
+
+Endianness for the purposes of this example is irrelevant.
+In the word containing op1,op2,r1,r2, op1 is in the most significant nibble
+and r2 is in the least significant nibble.
+
+For a large number of cases specifying all 4 numbers is excessive.
+With careful redefinition of the starting bit number, one can get away with
+only specifying start,length.
+Imagine several words of the default insn word size laid out from the start of
+the insn.  On top of that lay the field.  Now pick the minimal set of words
+that are required to contain the field.  That is the ``word'' we use.
+The @samp{start} value is basically computed by adding the offset of the first
+containing word to the starting bit of the field in the word.  It's slightly
+more complicated than that because lsb0? and the word's size must be taken
+into account.  This is best illustrated by rewriting the above example:
+
+@example
+
+lsb0? = #t
+
+            start  length
+f-op1:        15      4
+f-op2:        11      4
+f-r1:          7      4
+f-r2:          3      4
+f-simm32:     47     32
+f-simm16:     63     16
+
+lsb0? = #f
+
+            start  length
+f-op1:         0      4
+f-op2:         4      4
+f-r1:          8      4
+f-r2:         12      4
+f-simm32:     16     32
+f-simm16:     48     16
+
+@end example
+
+Note: This simpler definition doesn't work in all cases.  Where it doesn't
+the full-blown definition must be used.
+
+There are currently no shorthand macros for specifying the full-blown
+definition.  It is recommended that if you have to use one that you write
+a macro to reduce typing.
+
+(*) This doesn't include fields like multi-ifields.
 
 @node Writing define-normal-insn-enum
 @subsection Writing define-normal-insn-enum

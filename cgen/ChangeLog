@@ -1,3 +1,9 @@
+2003-10-21  Dave Brolley  <brolley@redhat.com>
+
+	* sid-model.scm (-gen-model-class-decls): Generate MAX_UNITS as
+	a static const int.
+	* decode.scm (-opcode-slots): Correct typo in logit call.
+
 2003-10-09  Jim Blandy  <jimb@redhat.com>
 
 	* desc-cpu.scm (gen-hw-table-decls): Emit an 'extern' declaration

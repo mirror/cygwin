@@ -451,7 +451,7 @@
 	   (opcode-mask (compute (insn-base-mask insn) insn-len decode-len bitnums))
 	   (indices (missing-bit-indices opcode-mask (- (integer-expt 2 decode-len) 1))))
       (logit 3 "insn =" (obj:name insn)
-	     " insn-base-value=" (insn-base-value insn)
+	     " insn-value=" (insn-value insn)
 	     " insn-base-mask=" (insn-base-mask insn)
 	     " insn-len=" insn-len
 	     " decode-len=" decode-len

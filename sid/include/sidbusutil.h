@@ -795,12 +795,18 @@ private:
   public:
     fixed_control_register(control_register_bank<DataType>* b,
 			   sid::host_int_4 o,
+			   DataType m):
+      value_control_register<DataType>(b,o,m,true,true,0)
+    {}
+    
+    fixed_control_register(control_register_bank<DataType>* b,
+			   sid::host_int_4 o,
 			   DataType m,
 			   bool r,
 			   bool w,
 			   DataType v): 
       value_control_register<DataType>(b,o,m,r,w,v)
-      {}
+    {}
 
   protected:
     void set (DataType set_value, DataType set_mask)

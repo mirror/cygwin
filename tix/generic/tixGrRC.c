@@ -15,6 +15,11 @@
 #include <tixDef.h>
 #include <tixGrid.h>
 
+#ifdef BUILD_tix
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLEXPORT
+#endif
+
 static TIX_DECLARE_SUBCMD(Tix_GrRCSize);
 EXTERN TIX_DECLARE_SUBCMD(Tix_GrSetSize);
 

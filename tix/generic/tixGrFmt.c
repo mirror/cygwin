@@ -45,6 +45,11 @@ typedef struct GridFmtStruct {
     int filled;
 } GridFmtStruct;
 
+#ifdef BUILD_tix
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLEXPORT
+#endif
+
 static TIX_DECLARE_SUBCMD(Tix_GrFormatBorder);
 static TIX_DECLARE_SUBCMD(Tix_GrFormatGrid);
 EXTERN TIX_DECLARE_SUBCMD(Tix_GrFormat);

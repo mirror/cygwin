@@ -1,10 +1,9 @@
 /* 
- * samAppInit.c --
+ * tixAppInit.c --
  *
  *	Provides a default version of the Tcl_AppInit procedure for
- *	use in stand-alone Tcl, Tk or Tix applications.
+ *	use in wish and similar Tk-based applications.
  *
- * Copyright (c) 1996, Expert Interface Technologies
  * Copyright (c) 1995 Ioi K Lam
  * Copyright (c) 1993 The Regents of the University of California.
  * Copyright (c) 1994 Sun Microsystems, Inc.
@@ -13,38 +12,8 @@
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
-#include <tcl.h>
-
-#ifdef USE_TIX
-#  ifndef USE_TK
-#  define USE_TK
-#  endif
-#endif
-
-#ifdef USE_TK
 #include <tk.h>
-#endif
-
-#ifdef USE_TIX
-#  include <tix.h>
-#else
-#  if (TCL_MAJOR_VERSION > 7)
-#    define TCL_7_5_OR_LATER
-#  else
-#    if ((TCL_MAJOR_VERSION == 7) && (TCL_MINOR_VERSION >= 5))
-#      define TCL_7_5_OR_LATER
-#    endif
-#  endif
-#endif
-
-#ifdef BUILD_tix
-# undef TCL_STORAGE_CLASS
-# define TCL_STORAGE_CLASS DLLEXPORT
-#endif
-
-EXTERN int		Tclsam_Init _ANSI_ARGS_((Tcl_Interp *interp));
-EXTERN int		Tksam_Init _ANSI_ARGS_((Tcl_Interp *interp));
-EXTERN int		Tixsam_Init _ANSI_ARGS_((Tcl_Interp *interp));
+#include <tix.h>
 
 /*
  * The following variable is a special hack that is needed in order for
@@ -76,12 +45,7 @@ main(argc, argv)
     int argc;			/* Number of command-line arguments. */
     char **argv;		/* Values of command-line arguments. */
 {
-#ifdef USE_TK
     Tk_Main(argc, argv, Tcl_AppInit);
-#else
-    Tcl_Main(argc, argv, Tcl_AppInit);
-#endif
-
     return 0;			/* Needed only to prevent compiler warning. */
 }
 
@@ -108,32 +72,17 @@ int
 Tcl_AppInit(interp)
     Tcl_Interp *interp;		/* Interpreter for application. */
 {
-    if (Tclsam_Init(interp) == TCL_ERROR) {
+    if (Tcl_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
-#ifdef USE_TK
-    if (Tksam_Init(interp) == TCL_ERROR) {
+    if (Tk_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
-#endif
-
-#ifdef USE_TIX
-    if (Tixsam_Init(interp) == TCL_ERROR) {
+    Tcl_StaticPackage(interp, "Tk",  Tk_Init,  (Tcl_PackageInitProc *) NULL);
+    if (Tix_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
-#endif
-
-#ifdef TCL_7_5_OR_LATER
-    Tcl_StaticPackage(interp, "Tclsam", Tclsam_Init, NULL);
-#ifdef USE_TK
-    Tcl_StaticPackage(interp, "Tk",     Tk_Init,     NULL);
-    Tcl_StaticPackage(interp, "Tksam",  Tksam_Init,  NULL);
-#endif
-#ifdef USE_TIX
-    Tcl_StaticPackage(interp, "Tix",    Tix_Init,    NULL);
-    Tcl_StaticPackage(interp, "Tixsam", Tixsam_Init, NULL);
-#endif
-#endif
+    Tcl_StaticPackage(interp, "Tix", Tix_Init, (Tcl_PackageInitProc *) NULL);
 
     /*
      * Call the init procedures for included packages.  Each call should
@@ -157,26 +106,7 @@ Tcl_AppInit(interp)
      * where "app" is the name of the application.  If this line is deleted
      * then no user-specific startup file will be run under any conditions.
      */
-#if defined(USE_TIX)
-#  define RC_FILENAME "~/.tixwishrc"
-#else
-#  if defined(USE_TK)
-#    define RC_FILENAME "~/.wishrc"
-#  else
-#    define RC_FILENAME "~/.tclshrc"
-#  endif
-#endif
-
-#ifdef TCL_7_5_OR_LATER
-    /*
-     * Starting from TCL 7.5, the symbol tcl_rcFileName is no longer
-     * exported by libtcl.a. Instead, this variable must be set using
-     * a TCL global variable
-     */
-    Tcl_SetVar(interp, "tcl_rcFileName", RC_FILENAME, TCL_GLOBAL_ONLY);
-#else
-    tcl_RcFileName = RC_FILENAME;
-#endif
+    Tix_SetRcFileName(interp, "~/.tixwishrc");
 
     return TCL_OK;
 }

@@ -45,6 +45,10 @@ typedef struct SpringList {
     int num;
 } SpringList;
 
+#ifdef BUILD_tix
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLEXPORT
+#endif
 
 /*
  * SubCommands of the tixForm command.

@@ -114,6 +114,11 @@ TixItclRestoreGlobalNameSp(nameSpPtr, interp)
  * with no code and symbols.
  */
 
+#ifdef BUILD_tix
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLEXPORT
+#endif
+
 EXTERN void TixItclDummy _ANSI_ARGS_((void));
 
 

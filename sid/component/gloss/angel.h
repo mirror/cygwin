@@ -1,7 +1,7 @@
 // angel.h - A limited emulation component for the Angel ROM monitor
 // that features onthe ARM PID7T development board.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999-2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -38,28 +38,28 @@ public:
 
 private:
 
-  enum syscalls
+  enum syscalls /* See also: newlib/libc/sys/arm/swi.h AngelSWI_Reason_* */
   {
-    syscall_open = 1,
-    syscall_close,
-    syscall_writec,
-    syscall_write0,
-    syscall_write,
-    syscall_readc,
-    syscall_read,
+    syscall_open = 0x1,
+    syscall_close = 0x2,
+    syscall_writec = 0x3,
+    syscall_write0 = 0x4,
+    syscall_write = 0x5,
+    syscall_read = 0x6,
+    syscall_readc = 0x7,
     syscall_iserror,
-    syscall_istty,
+    syscall_istty = 0x9,
     syscall_seek = 0xA,
     syscall_flen = 0xC,
-    syscall_tmpnam,
-    syscall_remove,
-    syscall_rename,
-    syscall_clock,
-    syscall_time,
-    syscall_system,
-    syscall_errno,
+    syscall_tmpnam = 0xD,
+    syscall_remove = 0xE,
+    syscall_rename = 0xF,
+    syscall_clock = 0x10,
+    syscall_time = 0x11,
+    syscall_system = 0x12,
+    syscall_errno = 0x13,
     syscall_get_cmdline = 0x15,
-    syscall_heapinfo,
+    syscall_heapinfo = 0x16,
     syscall_report_exception = 0x18
   };
 

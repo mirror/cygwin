@@ -58,7 +58,7 @@ if {[string compare [lindex $accessors 0] $accname] == 0} { pass $test } else { 
 # Try out some bad accessor names.  They should be rejected as bad values.
 
 foreach bad_accessor \
-    {abc [foo] [bar [0,abc] [zog] [0-foo] [0--foo] [0x100-0x200,3,1] [0x100-0x200,1,3]} {
+    {abc [foo] [bar [0,abc] [zog] [0-foo] [0--foo] [0x100-0x200,3,1] [0x100-0x200,1,3] [0x100]{a} [1-2]{} } {
 	set test "connect an accessor with an invalid name: $bad_accessor"
 	set result \
 	    [sid_cmd "sid::component::connect_accessor $victim [list $bad_accessor] $buses_array(1)"]
@@ -72,17 +72,17 @@ set accessors [sid_cmd "sid::component::accessor_names $victim"]
 if {[string compare [lindex $accessors 0] $accname] == 0} { pass $test } else { fail $test }
 
 set test "connect test bus #2 to the mapper"
-set accname {[0x300-0x600,4,1]}
+set accname {bar:[0x300-0x600,4,1]{0}}
 set result [sid_cmd "sid::component::connect_accessor $victim [list $accname] $buses_array(2)"]
 if {$result != "ok"} { fail "$test -- got $result" } else { pass $test }
 
 set test "connect test bus #3 to the mapper"
-set accname {[8*0x300-0x600]}
+set accname {foo:[8*0x300-0x600]:bar}
 set result [sid_cmd "sid::component::connect_accessor $victim [list $accname] $buses_array(3)"]
 if {$result != "ok"} { fail "$test -- got $result" } else { pass $test }
 
 set test "connect test bus #4 to the mapper"
-set accname {[1*0xff00-0xff01,4,1]}
+set accname {[1*0xff00-0xff01,4,1]{1,2,3,4}}
 set result [sid_cmd "sid::component::connect_accessor $victim [list $accname] $buses_array(4)"]
 if {$result != "ok"} { fail "$test -- got $result" } else { pass $test }
 
@@ -90,7 +90,7 @@ if {$result != "ok"} { fail "$test -- got $result" } else { pass $test }
 set test "four accessors are now registered"
 set okay 1
 set accessors [sid_cmd "sid::component::accessor_names $victim"]
-set expected {[0x100,0x200,1,1] [0x300-0x600,4,1] [8*0x300-0x600] [1*0xff00-0xff01,4,1]}
+set expected {[0x100,0x200,1,1] bar:[0x300-0x600,4,1]{0} foo:[8*0x300-0x600]:bar [1*0xff00-0xff01,4,1]{1,2,3,4}}
 
 if {[llength $accessors] != 4} {
     fail $test

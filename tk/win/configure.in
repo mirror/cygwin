@@ -41,7 +41,7 @@ AC_PROG_MAKE_SET
 
 AC_CYGWIN
 
-case "${target}" in
+case "${host}" in
 *-*-cygwin*)
         touch ac$$.c
         if ${CC} -c -mwin32 ac$$.c >/dev/null 2>&1; then

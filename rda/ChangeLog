@@ -1,3 +1,9 @@
+2004-10-07  Jim Blandy  <jimb@redhat.com>
+
+	* samples/async.c: #define _GNU_SOURCE before #including any
+	files, to get prototypes for GNU-specific functions like
+	strsignal.
+
 2004-09-24  Jim Blandy  <jimb@redhat.com>
 
 	* lib/gdbserv-output.c, samples/demo-target.c, samples/main.c,

@@ -1,3 +1,8 @@
+2002-12-19  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin/configure.in: Set TCL_BUILD_LIB_SPEC.
+	* cygwin/configure: Regenerate.
+
 2002-10-05  Christopher Faylor  <cgf@redhat.com>
 
 	* win/tclWin32Dll.c (tclWinTCharEncoding): Remove 'static' since it is

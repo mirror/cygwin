@@ -1,6 +1,769 @@
+2002-12-28  Christopher Faylor  <cgf@redhat.com>
+
+	Introduce device class to cygwin throughout.  Rename FH_DISK to FH_FS
+	throughout.
+	* dcrt0.cc (dll_crt0_1): Initialize device globals via device::init.
+	* dtable.cc (dtable::init_std_file_from_handle): Use device numbers
+	rather than names when they are known.  Should speed up process startup
+	slightly.
+	(dtable::build_fhandler_from_name): Pass path_conv device to
+	build_fhandler.
+	(dtable::build_fhandler): Accept device argument rather than separate
+	device/unit arguments.
+	(dtable::build_fhandler): Ditto.  Separate switch statement by devices
+	which take units and those which don't.  Build unix/win32 names from
+	device if required.
+	(dtable::dup_worker): Reflect changes to build_fhandler arguments.
+	* dtable.h (dtable::build_fhandler): Ditto.
+	* fhandler.cc (fhandler_base::set_name): Eliminate unit argument.  Use
+	get_unit to derive unit.
+	* fhandler.h: Separate FH device defines into devices.h include.
+	Define is_slow as appropriate for each fhandler_class.
+	(fhandler_base::dev): New element.
+	(fhandler_base::fhandler_base): Eliminate unit argument.
+	(fhandler_base::get_device): Return device number.
+	(fhandler_base::get_major): Return device major number.
+	(fhandler_base::get_minor): Return device minor number.
+	(fhandler_base::get_unit): Ditto.
+	(fhandler_base::get_native_name): Return device format field.
+	(fhandler_fifo): New class.
+	(select_stuff::device_specific): Remove array.
+	(select_stuff::device_specific_pipe): New class element.
+	(select_stuff::device_specific_socket): New class element.
+	(select_stuff::device_specific_serial): New class element.
+	(select_stuff::select_stuff): Initialize new elements.
+	* fhandler_disk_file.cc (fhandler_cygdrive::fhandler_cygdrive): Remove
+	unit initialization.
+	* fhandler_tty.cc (fhandler_tty_master::init_console): Use
+	"console_dev" global to initialize captive console used by tty master.
+	* mmap.cc (mmap_record::devtype_): Remove.
+	(mmap_record::dev): New.
+	(mmap_record::mmap_record): Use dev.
+	(mmap_record::get_device): Implement via dev.
+	* net.cc (fdsock): Use socket_dev global to initialize socket fhandler.
+	* path.cc (path_conv::check): Accommodate new path_conv::dev element.
+	(get_devn): Eliminate.
+	(get_raw_device_number): Ditto.
+	(get_device_number): Ditto.
+	(win32_device_name): Accept dev argument.  Use it.  Use device::parse
+	to derive potential device name.
+	(mount_info::conv_to_win32_path): Accept dev argument.  Use it.
+	* path.h (path_conv::devn): Eliminate.
+	(path_conv::unit): Ditto.
+	(path_conv::dev): Declare.
+	(path_conv::path_conv): Don't initialize deleted members.
+	(path_conv::is_device): Implement via dev element.
+	(path_conv::get_devn): Ditto.
+	(path_conv::get_unitn): Ditto.
+	* pipe.cc (make_pipe): Use pipe[rw]_dev in fhandler construction.
+	* select.cc: Use new device_specific_* select class elements
+	* shared_info.h (CURR_MOUNT_MAGIC): Update.
+	(mount_info::conv_to_win32_path): Reflect new arguments.
+	* syscalls.cc (fstat64): Just use get_device() without interpretation
+	for st_dev element.
+	(stat_worker): Ditto.
+	* tty.cc (create_tty_master): Use ttym_dev in fhandler constructor.
+	(tty::common_init): Check for tty major device number rather than
+	FH_TTYM.
+
+2002-12-28  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_termios.cc (fhandler_termios::line_edit): Perform echo
+	before input is accepted or suffer a "race".
+
+2002-12-27  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_tty_master::set_winsize): Declare new function.
+	* fhandler_console.cc (fhandler_console::send_winch_maybe): If
+	appropriate, call tty master function to handle screen size change.
+	* fhandler_tty.cc (fhandler_tty_master::set_winsize): New function.
+	(fhandler_tty_master::init): Call set_winsize to set initial screen
+	size.
+
+2002-12-26  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_tty_master::init): Set initial size of tty
+	to that of console in which tty is operating.
+	(process_input): Semi-revert previous change.  Need to just use current
+	terminfo settings since this function is running in a thread, blocked
+	when the terminfo changes.
+
+2002-12-26  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_termios::line_edit): Replace third argument with
+	passed-in termios struct.
+	* fhandler_console.cc (fhandler_console::read): Prior to loop, make a
+	copy of current termios for passing to line_edit prior so that all
+	characters are processed consistently.
+	* fhandler_tty.cc (fhandler_pty_master::write): Ditto.
+	(process_input): Make a copy of curent termios prior to read for use in
+	subsequent line_edit.
+	* fhandler_termios.cc (fhandler_termios::line_edit): Replace third
+	parameter with passed-in termios struct and use it throughout rather
+	than the data from the current fhandler_termios class.
+
+2002-12-25  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-12-25  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (events_init): Initialize critical section to control
+	exiting via signal.
+	(signal_exit): Enter critical section early to avoid exit races with
+	main thread.
+	* dcrt0.cc (do_exit): Use exit_lock critical section to avoid races.
+
+2002-12-25  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::detach): Set errno with set_sig_errno so
+	that EINTR is properly restored after signal.
+
+2002-12-21  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Default fhandler objects to -fomit-frame-pointer.
+	Eliminate redundant CFLAGS settings.
+
+2002-12-20  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (line_edit_status): Reorganize so that tests for error
+	condition can be < or >.
+	* fhandler_tty.cc (fhandler_pty_master::write): Don't return after
+	sending a signal.
+
+	* fhandler_termios.cc (fhandler_termios::line_edit): Trivial change to
+	use built-in bool types.
+
+2002-12-19  Pierre Humblet <pierre.humblet@ieee.org>
+
+        * localtime.cc (tzsetwall): Set lcl_is_set and lcl_TZname
+        in the Cygwin specific part of the routine.
+
+2002-12-19  Pierre Humblet <pierre.humblet@ieee.org>
+
+        * fhandler.cc (fhandler_base::open): Use "flags" rather than "mode"
+	in Win9X directory code.
+
+2002-12-19  Steve Osborn  <bub@io.com>
+
+	* fhandler.h (line_edit_status): Add a new element.
+	* fhandler_termios.cc (fhandler_termios::line_edit): After
+	accept_input, handle both potential error condition and pipe full
+	conditions.
+	* fhandler_tty.cc (fhandler_pty_master::accept_input): Return -1 on
+	error.
+	(fhandler_pty_master::write): Handle pipe full condition.
+
+2002-12-16  Steve Osborn  <bub@io.com>
+	    Christopher Faylor <cgf@redhat.com>
+
+	* fhandler_termios.cc (fhandler_termios::line_edit): Return
+	line_edit_error and remove last char from readahead buffer if
+	accept_input() fails.
+	* fhandler_tty.cc (fhandler_pty_master::accept_input): Return 0 and
+	restore readahead buffer when tty slave pipe is full.
+
+2002-12-16  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.cc (_pinfo::cmdline): Allocate sufficient space for myself
+	command line args.
+
+2002-12-14  Steve Osborn  <bub@io.com>
+
+	* fhandler_termios.cc (fhandler_termios::line_edit): Call
+	accept_input() in character processing loop.  Set return value
+	independently of input_done.
+
+2002-12-14  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::read): Signal event, if necessary, and
+	raw_read hasn't done so.
+
+2002-12-14  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::raw_read): Reset priorities to minimize
+	window where thread termination may cause data loss.
+	(fhandler_base::read): Always return at end of function.  Just set len
+	to copied_chars when len is zero.  Return immediately after raw_read if
+	len <= 0.  Remove in_len setting and just check end instead.  Fix CRLF
+	handling at end of buffer.
+
+2002-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (dll_crt0_1): Call well known SID initializer function.
+	* security.h (cygsid::init): Declare new static method.
+	* sec_helper.cc (cygsid::init): New method for initializing well
+	known SIDs.
+
+2002-12-14  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* security.h: Declare well_known_creator_group_sid.
+	* sec_helper.cc: Define and initialize well_known_creator_group_sid.
+
+2002-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* netdb.cc: Remove strtok_r comment.
+
+2002-12-14  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* security.cc (get_user_local_groups): Use LookupAccountSid to find the
+	local equivalent of BUILTIN.
+
+2002-12-14  Christopher Faylor  <cgf@redhat.com>
+
+	* pipe.cc (make_pipe): Set fork fixup flag for read pipe.
+
+2002-12-14  Christopher Faylor  <cgf@redhat.com>
+
+	* winbase.h: Turn on inline versions of Interlocked* by default.
+
+2002-12-14  Gary R. Van Sickle <g.r.vansickle@worldnet.att.net>
+
+	* winbase.h: Fixup inline asm functions.  Add ilockcmpexch.
+
+2002-12-13  Christopher Faylor  <cgf@redhat.com>
+
+	Throughout, change fhandler_*::read and fhandler_*::raw_read to void
+	functions whose second arguments are both the length and the return
+	value.
+	* fhandler.cc (fhandler_base::read): Rework slightly to use second
+	argument as input/output.  Tweak CRLF stuff.
+	(fhandler_base::readv): Accommodate fhandler_*::read changes.
+	* cygthread.h (cygthread::detach): Declare as taking optional handle
+	argument.
+	(cygthread::detach): When given a handle argument, wait for the handle
+	to be signalled before waiting for thread to detach.  Return true when
+	signal detected.
+
+2002-12-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Add MINGW_LDFLAGS when linking cygrun.exe.
+
+2002-12-10  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.h (cygthread::stack_ptr): New element.
+	(cygthread::detach): Accept a "wait_for_signal" argument.
+	(cygthread::terminate_thread): New function.
+	* cygthread.cc (cygthread::stub): Set stack pointer argument.
+	(cygthread::terminate_thread): New function.  Forcibly terminate
+	thread.
+	(cygthread::detach): Optionally wait for signals and kill thread when
+	signal arrives.
+	* exceptions.cc (signal_exit): Set signal_arrived prior to exiting to
+	wake up anything blocking on signals.
+	* fhandler.h (fhandler_base::set_r_no_interrupt): Change to accept bool
+	argument.
+	(fhandler_pipe::ready_for_read): Declare.
+	* pipe.cc (pipeargs): New structure.
+	(read_pipe): New thread stub wrapper for normal pipe read.
+	(fhandler_pipe::read): Modify to call reader in a cygthread,
+	terminating on signal, as appropriate.
+	* select.cc (fhandler_pipe::ready_for_read): Define new function.
+
+2002-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (free_protoent_ptr): Add missing free() for base structure.
+	(free_servent_pt): Ditto.
+	(free_hostent_pt): Ditto.
+
+2002-12-10 Craig McGeachie <slapdau@yahoo.com.au>
+
+	* netdb.cc (parse_alias_list): Change strtok calls to strtok_r.
+	(parse_services_line): Ditto.
+	(parse_protocol_line): Ditto.
+
+2002-12-10  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* pwdgrp.h (pwdgrp_check::pwdgrp_state): Replace by
+	pwdgrp_check::isinitializing ().
+	(pwdgrp_check::isinitializing): Create.
+	* passwd.cc (grab_int): Change type to unsigned, use strtoul and set
+	the pointer content to 0 if the field is invalid.
+	(parse_pwd): Move validity test after getting pw_gid.
+	(read_etc_passwd): Replace "passwd_state <= " by
+	passwd_state::isinitializing ().
+	(internal_getpwuid): Ditto.
+	(internal_getpwnam): Ditto.
+	(getpwent): Ditto.
+	(getpass): Ditto.
+	* grp.cc (parse_grp): Use strtoul for gr_gid and verify the validity.
+	(read_etc_group): Replace "group_state <= " by
+	group_state::isinitializing ().
+	(internal_getgrgid): Ditto.
+	(getgrent32): Ditto.
+	(internal_getgrent): Ditto.
+
+2002-12-10  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.h: Move declarations of internal_getgrent,
+	internal_getpwsid and internal_getgrsid to pwdgrp.h.
+	* pwdgrp.h: Declare internal_getpwsid, internal_getpwnam,
+	internal_getpwuid, internal_getgrsid, internal_getgrgid,
+	internal_getgrnam, internal_getgrent and internal_getgroups.
+	Delete "emulated" from enum pwdgrp_state.
+	(pwdgrp_check::isuninitialized): Create.
+	(pwdgrp_check::pwdgrp_state): Change state to initializing
+	rather than to uninitialized.
+	(pwdgrp_read::gets): Remove trailing CRs.
+	* passwd.cc (grab_string): Don't look for NLs.
+	(grab_int): Ditto.
+	(parse_pwd): Don't look for CRs. Return 0 if entry is too short.
+	(search_for): Delete.
+	(read_etc_passwd): Simplify tests to actually read the file.
+	Set state to loaded before making internal_getpwXX calls.
+	Replace search_for calls by equivalent internal_pwgetXX calls.
+	(internal_getpwsid): Use passwd_state.isuninitialized to decide
+	to call read_etc_passwd.
+	(internal_getpwuid): Create.
+	(internal_getpwnam): Create.
+	(getpwuid32): Simply call internal_getpwuid.
+	(getpwuid_r32): Call internal_getpwuid.
+	(getpwnam): Simply call internal_getpwnam.
+	(getpwnam_r): Call internal_getpwnam.
+	* grp.cc (parse_grp): Don't look for CRs. Adjust blank space.
+	(add_grp_line): Adjust blank space.
+	(class group_lock): Ditto.
+	(read_etc_group): Simplify tests to actually read the file.
+	Set state to loaded before making internal_getgrXX calls.
+	Replace getgrXX calls by equivalent internal calls.
+	(internal_getgrsid): Use group_state.isuninitialized to decide
+	to call read_etc_group.
+	(internal_getgrgid): Create.
+	(internal_getgrnam): Create.
+	(getgroups32): Simply call internal_getgrgid.
+	(getgrnam32): Simply call internal_getgrnam.
+	(internal_getgrent): Call group_state.isuninitialized.
+	(internal_getgroups): Create from the former getgroups32, using
+	two of the four arguments. Set gid to myself->gid and username
+	to cygheap->user.name ().
+	(getgroups32): Simply call internal_getgroup.
+	(getgroups): Call internal_getgroup instead of getgroups32.
+	(setgroups32): Call internal versions of get{pw,gr}XX.
+	* sec_helper.cc: Include pwdgrp.h.
+	(is_grp_member): Call internal versions of get{pw,gr}XX.
+	* security.cc: Include pwdgrp.h.
+	(alloc_sd): Call internal versions of get{pw,gr}XX.
+	* syscalls.cc: Include pwdgrp.h.
+	(seteuid32): Call internal versions of get{pw,gr}XX.
+	(setegid32): Ditto.
+	* uinfo.cc: Include pwdgrp.h.
+	(internal_getlogin): Call internal versions of get{pw,gr}XX.
+	(cygheap_user::ontherange): Ditto.
+	* sec_acl.cc: Include pwdgrp.h.
+	(setacl): Call internal versions of get{pw,gr}XX.
+	(acl_access): Ditto and simplify logic.
+	(aclfromtext): Ditto.
+
+2002-12-09  2002-12-02  Egor Duda <deo@logos-m.ru>
+
+	* lib/pseudo-reloc.c: New file.
+	* lib/_cygwin_crt0_common.cc: Perform pseudo-relocs during
+	initialization of cygwin binary (.exe or .dll).
+
+2002-12-06  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Reflect name change from strtodf to strtof.  Export
+	strtof.
+	* include/cygwin/version.h: Bump API minor number.
+
+2002-12-04  Steve Osborn  <bub@io.com>
+
+	* fhandler.h (fhandler_termios::line_edit): Change return from an int
+	to an enum to allow the function to return an error.
+	* fhandler_console.cc (fhandler_console::read): Update the line_edit
+	call to use the new enum.
+	* fhandler_termios.cc (fhandler_termios::line_edit): Change return from
+	an int to an enum to allow the function to return an error.  Put
+	put_readahead call before doecho for future patch.
+	* fhandler_tty.cc (fhandler_pty_master::write): Change to call
+	line_edit one character at a time, and stop if an error occurs.
+
+2002-12-04  Craig McGeachie  <slapdau@yahoo.com.au>
+
+	* netdb.cc: New file.
+	* Makeile.in (DLL_OFILES): Add reference to the new netdb.cc file.
+	* cygwin.din : Add new aliased exports for service and protocol
+	enumerations in netdb.cc.
+
+2002-12-04  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* cxx.cc: New file. Implement new, new[], delete and delete[]
+	operators and  __cxa_pure_virtual if compiled by gcc >=3.
+	* Makefile.in (DLL_OFILES): Add cxx.o.
+	Remove libstdc++.a from cygwin1.dll link step.
+
+2002-11-29  Steve Osborn  <bub@io.com>
+
+	* fhandler_tty.cc (fhandler_pty_master::accept_input): Move
+	read_retval assignment to prevent race condition.  Remove read_retval
+	from return statement.
+
+2002-11-29  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.h (winpids::set): Renamed from init.
+	(winpids::init): New declaration.
+	(winpids::cs): Ditto.
+	(winpids::winpids): Use set rather than init.
+	* external.cc (fillout_pinfo): Ditto.
+	* dcrt0.cc (dll_crt0_1): Call winpids::init.
+	* pinfo.cc (winpids::set): Renamed from init.  Wrap calls in critical
+	section.
+	(winpids::init): New function.
+	(winpids::cs): Define.
+
+2002-11-28  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (sig_dispatch_pending): Remove assertion.
+
+2002-11-27  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-11-27  Mikael Ylikoski  <my@post.utfors.se>
+
+	* fhandler_socket.cc (fhandler_socket::sendto): Fix potential
+	unitialized value return.
+
+2002-11-27  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Export pthread_getsequence_np.
+	* include/cygwin/version.h: Bump API minor version.
+
+2002-11-26  Jason Tishler  <jason@tishler.net>
+
+	* cygwin.din: Export nl_langinfo().
+	* include/cygwin/version.h: Bump API minor version.
+
+2002-11-26  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_pty_master::accept_input): Just use a
+	normal Sleep or suffer amazing pauses when other tty apps are running.
+	(fhandler_pty_master::process_slave_output): Ditto.
+
+2002-11-25  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* passwd.cc (read_etc_passwd): Never add an entry when starting
+	on Win95/98/ME if a default entry is present.
+	* uinfo.cc (internal_getlogin): Look for the default uid if needed.
+	Always call user.set_name ().
+
+2002-11-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc (getacl): Set errno to ENOSPC if command is GETACL and
+	nentries is less than the number of entries in the file's ACL.
+
+2002-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc: Fix some formatting.  Only set and check `other' bits in
+	a_perm throughout.  Use ILLEGAL_GID id for all entries having no id.
+	(setacl): Fix inheritance condition.
+	(getacl): Set all permission bits in CLASS_OBJ and DEF_CLASS_OBJ
+	entries.  Remove DENY bits before returning to calling function.
+	(acltomode): Fix usage of searchace().  If available, use CLASS_OBJ
+	to mask GROUP_OBJ permissions.
+	(aclfrommode): Fix usage of searchace().  If available, set CLASS_OBJ
+	permissions to same value as GROUP_OBJ permissions.
+
+2002-11-24  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* sec_acl.cc (getace): Fix the behavior when allow and
+	deny entries are present in arbitrary order.
+	(getacl): Report the actual number of entries when
+	aclbufp is NULL, even if nentries is zero. Fix the mask
+	reporting, handle the case where the owner and group sids
+	are equal and streamline the code.
+	(acl_worker): Take allow_ntsec into account.
+
+2002-11-05  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* dcrt0.cc (dll_crt0_1): Add call to pthread::initMainThread to
+	initialize mainthread when it is safe to call new.
+	* init.cc (dll_entry): Change call to store reents in tls key.
+	* thread.cc (_reent_clib) : Change call to get reents from tls
+	key.
+	(_reent_winsup): Ditto.
+	(MTinterface::Init): Key handling changed. Remove initialization
+	of member variables.
+	(MTinterface::fixup_after_fork): Reinitialize mainthread object
+	after fork. Reset threadount to 1.
+	(pthread::initMainThread): Create mainthread object dynamically.
+	and initialize with valid handles.
+	(pthread::self): Remove calls to create thread objects.
+	(pthread::setTlsSelfPointer): Change call to store thread self
+	handle in tls key.
+	(pthread::getTlsSelfPointer): New static method.
+	(pthread::exit): Remove setTlsSelfPointer call.
+	(pthread::initCurrentThread): New method.
+	(pthread::thread_init_wrapper): Change call to store thread self
+	handle in tls key.
+	(pthread::join): Check for a valid joiner.
+	(pthreadNull::pthreadNull): Mark Null object as detached.
+	(pthreadNull::exit): Terminate thread via ExitThread.
+	* thread.h (pthread::initMainThread): Change parameter in function
+	call.
+	(pthread::getTlsSelfPointer): New static method.
+	(pthread::initCurrentThread): New method.
+	(MTinterface::reent_key): Remove.
+	(MTinterface::thread_self_dwTlsIndex): Ditto..
+	(MTinterface::indexallocated): Ditto.
+	(MTinterface::mainthread): Ditto.
+	(MTinterface::reent_key): New member.
+	(MTinterface::thread_self_key): Ditto.
+	(MTinterface::MTinterface): Initialize all members.
+
+2002-11-23  Christopher Faylor  <cgf@redhat.com>
+
+	* wait.cc (wait4): Force pending signal delivery before waiting for
+	process completion.
+
+2002-11-23  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-11-22  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (handle_sigsuspend): Force pending signal delivery
+	before waiting for signals to happen.
+	* signal.cc (sleep): Force pending signal delivery before sleeping.
+	(usleep): Ditto.
+	(signal): Force pending signal delivery before manipulating signal
+	stuff.
+	(sigprocmask): Ditto.
+	(kill_worker): Ditto.
+	(abort): Ditto.
+	(sigaction): Ditto.
+	* syscalls.cc (readv): Force pending signal delivery before I/O.
+	(writev): Ditto.
+	(open): Ditto.
+	* net.cc: Ditto, throughout.
+	* sigproc.cc (sig_dispatch_pending): Deliver any pending signals prior
+	to returning.
+
+	* tty.cc (tty::make_pipes): Increase pipe buffer size.
+
+2002-11-22  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Fix comment.
+
+2002-11-21  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* external.cc (cygwin_internal): Fix va_arg references.
+
+2002-11-21  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sigthread::get_winapi_lock): Just do standard 'give up
+	timeslice' wait.
+	(setup_handler): Revamp YA to attempt to deliver signal multiple times
+	on failure rather than punting to wait_sig.
+	* miscfuncs.cc (low_priority_sleep): Accept INFINITE sleep to mean
+	"don't reset the priority after setting it to idle".  Return previous
+	priority.
+	* winsup.h (SLEEP_0_STAY_LOW): Define.
+	(low_priority_sleep): Return an int.
+	* sigproc.h: Define WAIT_SIG_PRIORITY here.
+	* sigproc.cc: Remove WAIT_SIG_PRIORITY definition.
+
+2002-11-20  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.h: Declare internal_getpwsid and internal_getgrsid.
+	Undeclare internal_getpwent.  Define DEFAULT_UID_NT.  Change
+	DEFAULT_GID.
+	* passwd.cc (internal_getpwsid): New function.
+	(internal_getpwent): Suppress.
+	(read_etc_passwd): Make static.  Rewrite the code for the completion
+	line.  Set curr_lines to 0.
+	(parse_pwd): Change type to static int.  Return 0 for short lines.
+	(add_pwd_line): Pay attention to the value of parse_pwd.
+	(search_for): Do not look for nor return the DEFAULT_UID.
+	* grp.cc (read_etc_group): Make static.  Free gr_mem and set
+	curr_lines to 0.  Always call add_pwd_line.  Rewrite the code for the
+	completion line.
+	(internal_getgrsid): New function.
+	(parse_grp): If grp.gr_mem is empty, set it to &null_ptr.
+	Never NULL gr_passwd.
+	(getgrgid32): Only return the default if ntsec is off and the gid is
+	ILLEGAL_GID.
+	* sec_helper.cc (cygsid::get_id): Use getpwsid and getgrsid.
+	(cygsid_getfrompw): Clean up last line.
+	(cygsid_getfromgr): Ditto.
+	(is_grp_member): Use getpwuid32 and getgrgid32.
+	* uinfo.cc (internal_getlogin): Set DEFAULT_GID at start.
+	Use getpwsid. Move the read of /etc/group after the second access
+	to /etc/passwd.  Change some debug_printf.
+
+2002-11-20  Steven O'Brien  <steven.obrien2@ntlworld.com>
+
+	* poll.cc (poll): ...but set POLLIN instead.
+
+2002-11-20  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.cc (get_attribute_from_acl): Always test "anti",
+	just in case an access_denied ACE follows an access_allowed.
+	Handle the case owner_sid == group_sid, with a FIXME.
+	Remove unnecessary tests for non-NULL PSIDs.
+	(alloc_sd): Use existing owner and group sids if {ug}id == -1.
+	Handle case where owner_sid == group_sid.
+	Do not call is_grp_member. Try to preserve canonical ACE order.
+	Remove unnecessary tests for non-NULL PSIDs. Reorganize
+	debug_printf's.
+	(get_initgroups_sidlist): Put well_known_system_sid on left
+	side of ==.
+	(add_access_denied_ace): Only call GetAce if inherit != 0.
+	(add_access_allowed_ace): Ditto. Use appropriate sizeof.
+	* syscalls.cc (chown_worker): Pass {ug}id equal to -1 to
+	alloc_sd, which removes the need to obtain old_{ug}id.
+	(chmod): Remove call to get_file_attribute (), simply pass
+	{ug}id equal to -1 to alloc_sd.
+
+2002-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* poll.cc (poll): Don't set POLLERR if a listening socket has a
+	pending connect.  Don't use errno value from call to
+	fhandler_socket::recvfrom().
+
+2002-11-19  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc: Sprinkle sigframes throughout.
+
+2002-11-16  Christopher Faylor  <cgf@redhat.com>
+
+	* tty.cc (tty::make_pipes): Make pipe buffer larger.
+
+2002-11-15  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* grp.cc (getgroups32): Protect against closing cygheap->user.token.
+
+2002-11-15  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump API_MINOR to accommodate below
+	changes.
+
+002-11-14  Sergey Okhapkin  <sos@prospect.com.ru>
+
+	* cygwin.din (siginterrupt): New export.
+	* signal.cc (siginterrupt): New.
+
+2002-11-15  Sergey Okhapkin  <sos@prospect.com.ru>
+
+	* select.cc (peek_serial): Don't call PurgeComm() to avoid characters
+	loss.
+
+2002-11-14  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (setup_handler): Add debugging output.  Set thread
+	priority to idle if pending signals to allow other threads to get into
+	interruptible state.
+	* miscfuncs.cc (sys_mbstowcs): Save current thread in variable to avoid
+	an OS call.
+	* wait.cc (wait_sig): Reset thread priority each time through loop
+	since the priority may have been set down to deal with pending signals.
+
+2002-11-14  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_serial.cc (fhandler_serial::tcgetattr): Don't take any
+	special action when vmin_ == 0.
+
+2002-11-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (getgroups32): Revert previous patch.  Use impersonation
+	token if process is in impersonated state.
+	* sec_helper.cc (is_grp_member): Rewrite.  Call getgroups32 only
+	for current user.  Scan passwd and group info otherwise.
+
+2002-11-14  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_console.cc (fhandler_console::write): Allow characters >=
+	0177 to be displayed in the title bar.
+
+2002-11-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (getgroups32): Don't use access token of current user when
+	retrieving group info for another user.
+
+2002-11-13  Christopher Faylor  <cgf@redhat.com>
+
+	* dll_init.cc (dll_list::detach): Eliminate reliance on passed in dll
+	address.  Infer from module of caller instead.
+	(cygwin_detach_dll): Ignore dll_index argument.
+	* dll_init.h (dll_list::detach): Reflect argument change above.
+
+2002-11-13  Christopher Faylor  <cgf@redhat.com>
+
+	* ioctl.cc (ioctl): Always print ioctl results, even when it's a tty.
+
+2002-11-13  Christopher Faylor  <cgf@redhat.com>
+
+	* winsup.h (low_priority_sleep): Declare.
+
+2002-11-13  Christopher Faylor  <cgf@redhat.com>
+
+	* miscfuncs.cc (low_priority_sleep): New function.  Use throughout
+	where code is supposed to be giving up time slice.
+
+	* fhandler_console.cc (fhandler_console::read): Switch button 2/3
+	output escape sequences to be consistent with xterm.
+
+2002-11-12  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* syscalls.cc (chmod): Simplify conditional.
+	* sec_helper (cygsid::getfromstr): Reorganize to remove
+	calls to strcpy and strtok_r.
+	(cygsid::getfromgr): Change type to __uid32_t instead of int.
+	Keep only the allow_ntsec branch. Never call LookupAccountSid
+	which calls PDCs, simply return -1 in case of failure.
+	Use cygsid == instead of calling EqualSid and remove test
+	for NULL psid.
+	* security.h: Declare cygsid::getfromgr as __uid32_t.
+
+2002-11-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc: Run indent.
+
+2002-11-10  Alexander Gottwald <Alexander.Gottwald@s1999.tu-chemnitz.de>
+
+	* autoload.cc (GetIfEntry): Add symbol.
+	* net.cc (get_2k_ifconf): Get the interface entries with the GetIfEntry
+	call intead of the GetIfTable call. Clean-up multiple IP address naming.
+
+2002-11-09  Sergey Okhapkin  <sos@prospect.com.ru>
+
+	* fhandler.h (class fhandler_pipe): New ioctl() method.
+	* pipe.cc (fhandler_pipe::ioctl): New.
+
 2002-11-07  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_serial.cc (fhandler_serial::ioctl): Fix typo.
+
+2002-11-07  Christopher January  <chris@atomice.net>
+
+	* include/cygwin/fs.h: New file.
+	* include/cygwin/hdreg.h: New file.
+	* fhandler_floppy.cc (fhandler_floppy::ioctl): Add implementation for
+	HDIO_GETGEO, BLKGETSIZE, BLKGETSIZE64, BLKRRPART and BLKSSZGET ioctls.
+
+2002-11-07  Gilles Courcoux  <Gilles.Courcoux@col.bsf.alcatel.fr>
+
+	* fhandler_socket.cc (fhandler_socket::ioctl): Return correct flags
+	for loopback interface when name is given on input instead of address.
+
+2002-11-07  Jason Tishler  <jason@tishler.net>
+
+	* cygwin.din: Export fseeko() and ftello().
+	* include/cygwin/version.h: Bump API minor version.
+
+2002-11-06  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_console.cc (keytable[]): Revert previous change.  It would
+	break too many things.
+
+2002-11-06  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_console.cc (keytable[]): Redefine F1 - F5 to something a
+	little more sensical.
+
+2002-11-06  Sergey Okhapkin  <sos@prospect.com.ru>
+
+	* syscalls.cc (getutid): Use UT_IDLEN where appropriate.
 
 2002-11-06  Christopher Faylor  <cgf@redhat.com>
 
@@ -17,9 +780,11 @@
 	(pututline): New.
 	* tty.cc (create_tty_master): Set ut_pid to current pid.
 
-2002-11-06  Christopher Faylor  <cgf@redhat.com>
+2002-11-05  Christopher Faylor  <cgf@redhat.com>
 
-	* fhandler.h (fhandler_serial::vmin_): Declare as size_t.
+	* fhandler_serial.cc (fhandler_serial::ioctl): Don't try to figure out
+	if OS has the capability to retrieve RTS/CTS.  Just set default values
+	if DeviceIoControl fails.  (suggested by Sergey Okhapkin)
 
 2002-11-05  Sergey Okhapkin  <sos@prospect.com.ru>
 
@@ -33,6 +798,38 @@
 
 	* fhandler_socket.cc (fhandler_socket::recvmsg): Call if from == NULL
 	WSARecvFrom with fromlen = NULL.
+
+2002-11-04  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.cc (_pinfo::commune_send): Fix thinko in previous checkin.
+
+2002-11-04  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.cc (_pinfo::commune_send): Set priority low when sleeping,
+	waiting for commune completion so that we don't spin waiting for lower
+	priority processes.
+
+2002-11-04  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (WAIT_SIG_PRIORITY): Bump to THREAD_PRIORITY_TIME_CRITICAL.
+
+2002-11-04  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.cc (_pinfo::commune_send): Initialize buffer or suffer random
+	crashes.
+
+2002-11-04  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_process.cc (fhandler_process::fill_filebuf): Deal with error
+	condition from cmdline retrieval.
+
+2002-11-04  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (WAIT_SIG_PRIORITY): Bump to highest priority.
+
+2002-11-04  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
 
 2002-11-03  Christopher Faylor  <cgf@redhat.com>
 
@@ -55,6 +852,47 @@
 2002-10-30  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-10-30  Christopher Faylor  <cgf@redhat.com>
+
+	* external.cc (cygwin_internal): Implement CW_CMDLINE.
+	* pinfo.h (SIGCOMMUNE): New signal type.
+	(commune_result): New structure for commune functions.
+	(picom): New enum for commune functions.
+	(_pinfo::hello_pid): New.  Pid who's communicating with me.
+	(_pinfo::tothem): New.  Handle of communicating pipe.
+	(_pinfo::fromthem): Ditto.
+	(_pinfo::commune_recv): Declare.
+	(_pinfo::commune_send): Declare.
+	(_pinfo::alive): Declare.
+	(_pinfo::cmdline): Declare.
+	(_pinfo::lock): Declare.
+	* pinfo.cc (set_myself): Initialize new _pinfo lock.
+	(_pinfo::alive): Define. Determines if process still exists.
+	(_pinfo::commune_recv): Define.  Receive info from another cooperating process.
+	(_pinfo::commune_send): Define.  Send info to another cooperating process.
+	(_pinfo::cmdline): Define.  Determine command line of a given process.
+	* include/sys/cygwin.h (CW_CMDLINE): Define.
+
+	*sigproc.cc (talktome): Communicate with any processes who want to talk
+	to me.
+	(wait_sig): Honor __SIGCOMMUNE.
+
+	* fhandler.cc (fhandler_virtual::fixup_after_exec): Declare.
+	* fhandler_proc.cc: Use malloc/free/realloc throughout rather than
+	cmalloc since buffers don't need to be propagated to subprocesses.
+	* fhandler_registry.cc: Ditto.
+	* fhandler_virtual.cc: Ditto.
+	(fhandler_virtual::fixup_after_exec): Define.
+	* fhandler_process.cc: Ditto for malloc/free/realloc.
+	(process_listin): Add "cmdline".
+	(fhandler_process::fill_filebuf): Implement PROCESS_CMDLINE.
+
+	* miscfuncs.cc (isalpha_array): New array populated with xor values for
+	alpha characters to switch from one case to another.
+	* string.h (cygwin_strcasematch): New asm implementation of case match.
+	* string.h (cygwin_nstrcasematch): New asm implementation of counted
+	case match.
 
 2002-10-24  Pierre Humblet <pierre.humblet@ieee.org>
 

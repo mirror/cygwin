@@ -45,6 +45,7 @@ details. */
 #define NEED_VFORK
 #include <setjmp.h>
 #include "perthread.h"
+#include "pwdgrp.h"
 
 #undef _close
 #undef _lseek
@@ -339,7 +340,7 @@ getsid (pid_t pid)
 extern "C" ssize_t
 read (int fd, void *ptr, size_t len)
 {
-  const struct iovec iov =
+  const iovec iov =
     {
       iov_base: ptr,
       iov_len: len
@@ -384,6 +385,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 
   while (1)
     {
+      sig_dispatch_pending (0);
       sigframe thisframe (mainthread);
 
       cygheap_fdget cfd (fd);
@@ -455,6 +457,7 @@ extern "C" ssize_t
 writev (const int fd, const struct iovec *const iov, const int iovcnt)
 {
   int res = -1;
+  sig_dispatch_pending (0);
   const ssize_t tot = check_iovec_for_write (iov, iovcnt);
 
   sigframe thisframe (mainthread);
@@ -510,6 +513,7 @@ open (const char *unix_path, int flags, ...)
   int res = -1;
   va_list ap;
   mode_t mode = 0;
+  sig_dispatch_pending (0);
   sigframe thisframe (mainthread);
 
   syscall_printf ("open (%s, %p)", unix_path, flags);
@@ -773,8 +777,6 @@ static int
 chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 {
   int res;
-  __uid32_t old_uid;
-  __gid32_t old_gid;
 
   if (check_null_empty_str_errno (name))
     return -1;
@@ -806,20 +808,10 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 	attrib |= S_IFDIR;
       res = get_file_attribute (win32_path.has_acls (),
 				win32_path.get_win32 (),
-				(int *) &attrib,
-				&old_uid,
-				&old_gid);
+				(int *) &attrib);
       if (!res)
-	{
-	  if (uid == ILLEGAL_UID)
-	    uid = old_uid;
-	  if (gid == ILLEGAL_GID)
-	    gid = old_gid;
-	  if (win32_path.isdir ())
-	    attrib |= S_IFDIR;
-	  res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
-				    gid, attrib);
-	}
+         res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
+				   gid, attrib);
       if (res != 0 && (!win32_path.has_acls () || !allow_ntsec))
 	{
 	  /* fake - if not supported, pretend we're like win95
@@ -936,19 +928,10 @@ chmod (const char *path, mode_t mode)
       /* temporary erase read only bit, to be able to set file security */
       SetFileAttributes (win32_path, (DWORD) win32_path & ~FILE_ATTRIBUTE_READONLY);
 
-      __uid32_t uid;
-      __gid32_t gid;
-
       if (win32_path.isdir ())
 	mode |= S_IFDIR;
-      get_file_attribute (win32_path.has_acls (),
-			  win32_path.get_win32 (),
-			  NULL, &uid, &gid);
-      /* FIXME: Do we really need this to be specified twice? */
-      if (win32_path.isdir ())
-	mode |= S_IFDIR;
-      if (!set_file_attribute (win32_path.has_acls (), win32_path, uid, gid,
-				mode)
+      if (!set_file_attribute (win32_path.has_acls (), win32_path,
+			       ILLEGAL_UID, ILLEGAL_GID, mode)
 	  && allow_ntsec)
 	res = 0;
 
@@ -964,12 +947,9 @@ chmod (const char *path, mode_t mode)
 
       if (!SetFileAttributes (win32_path, win32_path))
 	__seterrno ();
-      else
-	{
-	  /* Correct NTFS security attributes have higher priority */
-	  if (res == 0 || !allow_ntsec)
-	    res = 0;
-	}
+      else if (!allow_ntsec)
+	/* Correct NTFS security attributes have higher priority */
+	res = 0;
     }
 
 done:
@@ -1041,7 +1021,7 @@ fstat64 (int fd, struct __stat64 *buf)
 	  if (!buf->st_ino)
 	    buf->st_ino = hash_path_name (0, cfd->get_win32_name ());
 	  if (!buf->st_dev)
-	    buf->st_dev = (cfd->get_device () << 16) | cfd->get_unit ();
+	    buf->st_dev = cfd->get_device ();
 	  if (!buf->st_rdev)
 	    buf->st_rdev = buf->st_dev;
 	}
@@ -1131,7 +1111,7 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
 	  if (!buf->st_ino)
 	    buf->st_ino = hash_path_name (0, fh->get_win32_name ());
 	  if (!buf->st_dev)
-	    buf->st_dev = (fh->get_device () << 16) | fh->get_unit ();
+	    buf->st_dev = fh->get_device ();
 	  if (!buf->st_rdev)
 	    buf->st_rdev = buf->st_dev;
 	}
@@ -1525,7 +1505,7 @@ fpathconf (int fd, int v)
 	}
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
-      if (cfd->get_device () == FH_DISK)
+      if (cfd->get_device () == FH_FS)
 	return check_posix_perm (cfd->get_win32_name (), v);
       set_errno (EINVAL);
       return -1;
@@ -1622,7 +1602,7 @@ _cygwin_istext_for_stdio (int fd)
       return 0;
     }
 
-  if (cfd->get_device () != FH_DISK)
+  if (cfd->get_device () != FH_FS)
     {
       syscall_printf (" _cifs: fd not disk file");
       return 0;
@@ -1991,7 +1971,7 @@ seteuid32 (__uid32_t uid)
   struct passwd * pw_new;
   PSID origpsid, psid2 = NO_SID;
 
-  pw_new = getpwuid32 (uid);
+  pw_new = internal_getpwuid (uid);
   if (!usersid.getfrompw (pw_new))
     {
       set_errno (EINVAL);
@@ -2167,7 +2147,7 @@ setegid32 (__gid32_t gid)
   cygsid gsid;
   HANDLE ptok;
 
-  struct __group32 * gr = getgrgid32 (gid);
+  struct __group32 * gr = internal_getgrgid (gid);
   if (!gr || gr->gr_gid != gid || !gsid.getfromgr (gr))
     {
       set_errno (EINVAL);

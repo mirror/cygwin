@@ -73,8 +73,10 @@ tty_init (void)
 void __stdcall
 create_tty_master (int ttynum)
 {
+  device ttym = *ttym_dev;
+  ttym.setunit (ttynum); /* CGF FIXME device */
   tty_master = (fhandler_tty_master *)
-    cygheap->fdtab.build_fhandler (-1, FH_TTYM, "/dev/ttym", NULL, ttynum);
+    cygheap->fdtab.build_fhandler (-1, ttym, "/dev/ttym", NULL);
   if (tty_master->init (ttynum))
     api_fatal ("Can't create master tty");
   else
@@ -138,7 +140,7 @@ tty_list::terminate (void)
 	      i = 0;
 	    }
 
-	  Sleep (200);
+	  low_priority_sleep (200);
 	}
 
       termios_printf ("tty %d master about to finish", ttynum);
@@ -358,7 +360,7 @@ tty::make_pipes (fhandler_pty_master *ptym)
   /* Create communication pipes */
 
   /* FIXME: should this be sec_none_nih? */
-  if (CreatePipe (&from_master, &to_slave, &sec_all, 0) == FALSE)
+  if (CreatePipe (&from_master, &to_slave, &sec_all, 128 * 1024) == FALSE)
     {
       termios_printf ("can't create input pipe");
       set_errno (ENOENT);
@@ -366,7 +368,7 @@ tty::make_pipes (fhandler_pty_master *ptym)
     }
 
   // ProtectHandle1INH (to_slave, to_pty);
-  if (CreatePipe (&from_slave, &to_master, &sec_all, 0) == FALSE)
+  if (CreatePipe (&from_slave, &to_master, &sec_all, 128 * 1024) == FALSE)
     {
       termios_printf ("can't create output pipe");
       set_errno (ENOENT);
@@ -417,7 +419,7 @@ tty::common_init (fhandler_pty_master *ptym)
 
   /* Create synchronisation events */
 
-  if (ptym->get_device () != FH_TTYM)
+  if (ptym->get_major () != DEV_TTYM_MAJOR)
     {
       ptym->output_done_event = ptym->ioctl_done_event =
       ptym->ioctl_request_event = NULL;

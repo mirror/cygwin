@@ -1,6 +1,6 @@
-/* hinfo.cc: file descriptor support.
+/* dtable.cc: file descriptor support.
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -10,40 +10,63 @@ details. */
 
 #define  __INSIDE_CYGWIN_NET__
 
+#include "winsup.h"
 #include <errno.h>
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <ctype.h>
 #include <unistd.h>
-#include <fcntl.h>
+#include <sys/cygwin.h>
+#include <assert.h>
+#include <ntdef.h>
+#include <winnls.h>
 
-#define Win32_Winsock
-#include "winsup.h"
+#define USE_SYS_TYPES_FD_SET
+#include <winsock.h>
+#include "pinfo.h"
+#include "cygerrno.h"
+#include "perprocess.h"
+#include "security.h"
+#include "fhandler.h"
+#include "path.h"
+#include "dtable.h"
+#include "cygheap.h"
+#include "ntdll.h"
 
-hinfo dtable;
+static const NO_COPY DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
+					   STD_ERROR_HANDLE};
+
+static const char *handle_to_fn (HANDLE, char *);
+
+static const char NO_COPY unknown_file[] = "some disk file";
 
 /* Set aside space for the table of fds */
 void
 dtable_init (void)
 {
-  if (!dtable.size)
-    dtable.extend(NOFILE_INCR);
+  if (!cygheap->fdtab.size)
+    cygheap->fdtab.extend (NOFILE_INCR);
 }
 
 void __stdcall
 set_std_handle (int fd)
 {
   if (fd == 0)
-    SetStdHandle (STD_INPUT_HANDLE, dtable[fd]->get_handle ());
-  else if (fd == 1)
-    SetStdHandle (STD_OUTPUT_HANDLE, dtable[fd]->get_output_handle ());
-  else if (fd == 2)
-    SetStdHandle (STD_ERROR_HANDLE, dtable[fd]->get_output_handle ());
+    SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_handle ());
+  else if (fd <= 2)
+    SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_output_handle ());
+}
+
+void
+dtable::dec_console_fds ()
+{
+  if (console_fds > 0 && !--console_fds &&
+      myself->ctty != TTY_CONSOLE && !check_pty_fds())
+    FreeConsole ();
 }
 
 int
-hinfo::extend (int howmuch)
+dtable::extend (int howmuch)
 {
   int new_size = size + howmuch;
   fhandler_base **newfds;
@@ -51,12 +74,10 @@ hinfo::extend (int howmuch)
   if (howmuch <= 0)
     return 0;
 
-  /* Try to allocate more space for fd table. We can't call realloc()
+  /* Try to allocate more space for fd table. We can't call realloc ()
      here to preserve old table if memory allocation fails */
 
-debug_printf ("here size %d", size);
-
-  if (!(newfds = (fhandler_base **) calloc (new_size, sizeof newfds[0])))
+  if (!(newfds = (fhandler_base **) ccalloc (HEAP_ARGV, new_size, sizeof newfds[0])))
     {
       debug_printf ("calloc failed");
       return 0;
@@ -64,75 +85,95 @@ debug_printf ("here size %d", size);
   if (fds)
     {
       memcpy (newfds, fds, size * sizeof (fds[0]));
-      free (fds);
+      cfree (fds);
     }
 
   size = new_size;
   fds = newfds;
-  debug_printf ("size %d, fds %d", size, fds);
+  debug_printf ("size %d, fds %p", size, fds);
   return 1;
 }
 
+void
+dtable::get_debugger_info ()
+{
+  if (being_debugged ())
+    {
+      char std[3][sizeof ("/dev/ttyNNNN")];
+      std[0][0] = std[1][0] = std [2][0] = '\0';
+      char buf[sizeof ("cYgstd %x") + 32];
+      sprintf (buf, "cYgstd %x %x %x", (unsigned) &std, sizeof (std[0]), 3);
+      OutputDebugString (buf);
+      for (int i = 0; i < 3; i++)
+	if (std[i][0])
+	  {
+	    path_conv pc;
+	    HANDLE h = GetStdHandle (std_consts[i]);
+	    fhandler_base *fh = build_fhandler_from_name (i, std[i], NULL, pc);
+	    if (!fh)
+	      continue;
+	    if (!fh->open (&pc, (i ? O_WRONLY : O_RDONLY) | O_BINARY, 0777))
+	      release (i);
+	    else
+	      CloseHandle (h);
+	  }
+    }
+}
+
 /* Initialize the file descriptor/handle mapping table.
-   We only initialize the parent table here.  The child table is
-   initialized at each fork () call.  */
+   This function should only be called when a cygwin function is invoked
+   by a non-cygwin function, i.e., it should only happen very rarely. */
 
 void
-hinfo_init (void)
+dtable::stdio_init ()
 {
+  extern void set_console_ctty ();
   /* Set these before trying to output anything from strace.
      Also, always set them even if we're to pick up our parent's fds
      in case they're missed.  */
 
-  if (!parent_alive && NOTSTATE(myself, PID_CYGPARENT))
+  if (myself->ppid_handle || ISSTATE (myself, PID_CYGPARENT))
+    return;
+
+  HANDLE in = GetStdHandle (STD_INPUT_HANDLE);
+  HANDLE out = GetStdHandle (STD_OUTPUT_HANDLE);
+  HANDLE err = GetStdHandle (STD_ERROR_HANDLE);
+
+  init_std_file_from_handle (0, in);
+
+  /* STD_ERROR_HANDLE has been observed to be the same as
+     STD_OUTPUT_HANDLE.  We need separate handles (e.g. using pipes
+     to pass data from child to parent).  */
+  if (out == err)
     {
-      HANDLE in = GetStdHandle (STD_INPUT_HANDLE);
-      HANDLE out = GetStdHandle (STD_OUTPUT_HANDLE);
-      HANDLE err = GetStdHandle (STD_ERROR_HANDLE);
-
-      dtable.init_std_file_from_handle (0, in, GENERIC_READ, "{stdin}");
-
-      /* STD_ERROR_HANDLE has been observed to be the same as
-	 STD_OUTPUT_HANDLE.  We need separate handles (e.g. using pipes
-	 to pass data from child to parent).  */
-      if (out == err)
+      /* Since this code is not invoked for forked tasks, we don't have
+	 to worry about the close-on-exec flag here.  */
+      if (!DuplicateHandle (hMainProc, out, hMainProc, &err, 0,
+			     1, DUPLICATE_SAME_ACCESS))
 	{
-	  /* Since this code is not invoked for forked tasks, we don't have
-	     to worry about the close-on-exec flag here.  */
-	  if (!DuplicateHandle (hMainProc, out, hMainProc, &err, 0,
-				 1, DUPLICATE_SAME_ACCESS))
-	    {
-	      /* If that fails, do this as a fall back.  */
-	      err = out;
-	      system_printf ("couldn't make stderr distinct from stdout");
-	    }
+	  /* If that fails, do this as a fall back.  */
+	  err = out;
+	  system_printf ("couldn't make stderr distinct from stdout");
 	}
-
-      dtable.init_std_file_from_handle (1, out, GENERIC_WRITE, "{stdout}");
-      dtable.init_std_file_from_handle (2, err, GENERIC_WRITE, "{stderr}");
     }
+
+  init_std_file_from_handle (1, out);
+  init_std_file_from_handle (2, err);
+  /* Assign the console as the controlling tty for this process if we actually
+     have a console and no other controlling tty has been assigned. */
+  if (myself->ctty < 0 && GetConsoleCP () > 0)
+    set_console_ctty ();
 }
 
 int
-hinfo::not_open (int fd)
+dtable::find_unused_handle (int start)
 {
-  SetResourceLock(LOCK_FD_LIST,READ_LOCK," not_open");
-
-  int res = fd < 0 || fd >= (int)size || fds[fd] == NULL;
-
-  ReleaseResourceLock(LOCK_FD_LIST,READ_LOCK," not open");
-  return res;
-}
-
-int
-hinfo::find_unused_handle (int start)
-{
-  AssertResourceOwner(LOCK_FD_LIST,READ_LOCK);
-
+  AssertResourceOwner (LOCK_FD_LIST, READ_LOCK);
   do
     {
-      for (int i = start; i < (int) size; i++)
-	if (not_open (i))
+      for (size_t i = start; i < size; i++)
+	/* See if open -- no need for overhead of not_open */
+	if (fds[i] == NULL)
 	  return i;
     }
   while (extend (NOFILE_INCR));
@@ -140,191 +181,312 @@ hinfo::find_unused_handle (int start)
 }
 
 void
-hinfo::release (int fd)
+dtable::release (int fd)
 {
   if (!not_open (fd))
     {
-MALLOC_CHECK;
-      delete (fds[fd]);
-MALLOC_CHECK;
+      switch (fds[fd]->get_device ())
+	{
+	case FH_SOCKET:
+	  dec_need_fixup_before ();
+	  break;
+	case FH_CONSOLE:
+	  dec_console_fds ();
+	  break;
+	}
+      delete fds[fd];
       fds[fd] = NULL;
     }
 }
 
-void
-hinfo::init_std_file_from_handle (int fd, HANDLE handle,
-				  DWORD myaccess, const char *name)
-{
-  int bin = __fmode;
-  /* Check to see if we're being redirected - if not then
-     we open then as consoles */
-  if (fd == 0 || fd == 1 || fd == 2)
-    {
-      first_fd_for_open = 0;
-      /* See if we can consoleify it  - if it is a console,
-       don't open it in binary.  That will screw up our crlfs*/
-      CONSOLE_SCREEN_BUFFER_INFO buf;
-      if (GetConsoleScreenBufferInfo (handle, &buf))
-	{
-	  bin = 0;
-	  if (ISSTATE (myself, PID_USETTY))
-	    name = "/dev/tty";
-	  else
-	    name = "/dev/conout";
-	}
-      else if (FlushConsoleInputBuffer (handle))
-	{
-	  bin = 0;
-	  if (ISSTATE (myself, PID_USETTY))
-	    name = "/dev/tty";
-	  else
-	    name = "/dev/conin";
-	}
-    }
-
-  build_fhandler (fd, name, handle)->init (handle, myaccess, bin);
-  set_std_handle (fd);
-  paranoid_printf ("fd %d, handle %p", fd, handle);
-}
-
-extern "C"
-int
+extern "C" int
 cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
-			      DWORD myaccess)
+			    DWORD myaccess)
 {
   if (fd == -1)
-    fd = dtable.find_unused_handle();
-  fhandler_base *res = dtable.build_fhandler (fd, name, handle);
-  res->init (handle, myaccess, bin);
+    fd = cygheap->fdtab.find_unused_handle ();
+  path_conv pc;
+  fhandler_base *res = cygheap->fdtab.build_fhandler_from_name (fd, name, handle,
+								pc);
+  res->init (handle, myaccess, bin ?: pc.binmode ());
   return fd;
 }
 
-fhandler_base *
-hinfo::build_fhandler (int fd, const char *name, HANDLE handle)
+void
+dtable::init_std_file_from_handle (int fd, HANDLE handle)
 {
-  int unit;
-  DWORD devn;
+  const char *name = NULL;
+  CONSOLE_SCREEN_BUFFER_INFO buf;
+  struct sockaddr sa;
+  int sal = sizeof (sa);
+  DCB dcb;
+  unsigned bin = O_BINARY;
+  device dev;
 
-  if ((devn = get_device_number (name, unit)) == FH_BAD)
+  dev.devn = 0;		/* FIXME: device */
+  first_fd_for_open = 0;
+
+  if (!not_open (fd))
+    return;
+
+  SetLastError (0);
+  DWORD ft = GetFileType (handle);
+  if (ft != FILE_TYPE_UNKNOWN || GetLastError () != ERROR_INVALID_HANDLE)
     {
-      struct sockaddr sa;
-      int sal = sizeof (sa);
-      CONSOLE_SCREEN_BUFFER_INFO cinfo;
-      DCB dcb;
-
-      if (handle == NULL)
-	devn = FH_DISK;
-      else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &cinfo))
-	devn = FH_CONIN;
-      else if (GetConsoleScreenBufferInfo (handle, &cinfo))
-	devn= FH_CONOUT;
-      else if (wsock32_handle && getpeername ((SOCKET) handle, &sa, &sal))
-	devn = FH_SOCKET;
-      else if (GetFileType (handle) == FILE_TYPE_PIPE)
-	devn = FH_PIPE;
+      /* See if we can consoleify it */
+      if (GetConsoleScreenBufferInfo (handle, &buf))
+	{
+	  if (ISSTATE (myself, PID_USETTY))
+	    dev.parse ("/dev/tty");
+	  else
+	    dev = *console_dev;
+	}
+      else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
+	{
+	  if (ISSTATE (myself, PID_USETTY))
+	    dev.parse ("/dev/tty");
+	  else
+	    dev = *console_dev;
+	}
+      else if (ft == FILE_TYPE_PIPE)
+	{
+	  if (fd == 0)
+	    dev = *piper_dev;
+	  else
+	    dev = *pipew_dev;
+	}
+      else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
+	dev = *socket_dev;
       else if (GetCommState (handle, &dcb))
-	devn = FH_SERIAL;
+	dev.parse ("/dev/ttyS0");
       else
-	devn = FH_DISK;
+	{
+	  name = handle_to_fn (handle, (char *) alloca (MAX_PATH + 100));
+	  bin = 0;
+	}
     }
 
-  return build_fhandler (fd, devn, name, unit);
+  if (!name && !dev)
+    fds[fd] = NULL;
+  else
+    {
+      path_conv pc;
+      fhandler_base *fh;
+
+      if (dev)
+	fh = build_fhandler (fd, dev);
+      else
+	fh = build_fhandler_from_name (fd, name, handle, pc);
+
+      if (!bin)
+	{
+	  bin = fh->get_default_fmode (O_RDWR);
+	  if (bin)
+	    /* nothing */;
+	  else if (dev)
+	    bin = O_BINARY;
+	  else if (name != unknown_file)
+	    bin = pc.binmode ();
+	}
+
+      fh->init (handle, GENERIC_READ | GENERIC_WRITE, bin);
+      set_std_handle (fd);
+      paranoid_printf ("fd %d, handle %p", fd, handle);
+    }
 }
 
 fhandler_base *
-hinfo::build_fhandler (int fd, DWORD dev, const char *name, int unit)
+dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
+				  path_conv& pc, unsigned opt, suffix_info *si)
 {
-  fhandler_base *fh;
-  void *buf = calloc (1, sizeof (fhandler_union) + 100);
-
-  switch (dev & FH_DEVMASK)
+  pc.check (name, opt | PC_NULLEMPTY | PC_FULL | PC_POSIX, si);
+  if (pc.error)
     {
-      case FH_TTYM:
-	fh = new (buf) fhandler_tty_master (name, unit);
+      set_errno (pc.error);
+      return NULL;
+    }
+
+  if (!pc.exists () && handle)
+    pc.fillin (handle);
+
+  fhandler_base *fh = build_fhandler (fd, pc.dev,
+				      pc.return_and_clear_normalized_path (),
+				      pc);
+  return fh;
+}
+
+fhandler_base *
+dtable::build_fhandler (int fd, const device& dev, const char *unix_name,
+			const char *win32_name)
+{
+  return build_fhandler (fd, dev, cstrdup (unix_name), win32_name);
+}
+
+#define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
+fhandler_base *
+dtable::build_fhandler (int fd, const device& dev, char *unix_name,
+			const char *win32_name)
+{
+  fhandler_base *fh = NULL;
+
+  if (dev.upper)
+    switch (dev.major)
+      {
+      case DEV_TTYS_MAJOR:
+	fh = cnew (fhandler_tty_slave) (dev.minor);
 	break;
+      case DEV_TTYM_MAJOR:
+	fh = cnew (fhandler_tty_master) (dev.minor);
+	break;
+      case DEV_CYGDRIVE_MAJOR:
+	fh = cnew (fhandler_cygdrive) (dev.minor);
+	break;
+      case DEV_FLOPPY_MAJOR:
+      case DEV_CDROM_MAJOR:
+      case DEV_SD_MAJOR:
+      case DEV_RAWDRIVE_MAJOR:
+	fh = cnew (fhandler_dev_floppy) (dev.minor);
+	break;
+      case DEV_TAPE_MAJOR:
+	fh = cnew (fhandler_dev_tape) (dev.minor);
+	break;
+      }
+  else
+    switch (dev)
+      {
       case FH_CONSOLE:
       case FH_CONIN:
       case FH_CONOUT:
-	fh = new (buf) fhandler_console (name);
+	if ((fh = cnew (fhandler_console) ()))
+	  inc_console_fds ();
 	break;
       case FH_PTYM:
-	fh = new (buf) fhandler_pty_master (name);
-	break;
-      case FH_TTYS:
-	if (unit < 0)
-	  fh = new (buf) fhandler_tty_slave (name);
-	else
-	  fh = new (buf) fhandler_tty_slave (unit, name);
+	fh = cnew (fhandler_pty_master) ();
 	break;
       case FH_WINDOWS:
-	fh = new (buf) fhandler_windows (name);
+	fh = cnew (fhandler_windows) ();
 	break;
       case FH_SERIAL:
-	fh = new (buf) fhandler_serial (name, FH_SERIAL, unit);
+	fh = cnew (fhandler_serial) (dev.minor);
 	break;
       case FH_PIPE:
       case FH_PIPER:
       case FH_PIPEW:
-	fh = new (buf) fhandler_pipe (name);
+	fh = cnew (fhandler_pipe) (dev);
 	break;
       case FH_SOCKET:
-	fh = new (buf) fhandler_socket (name);
+	if ((fh = cnew (fhandler_socket) ()))
+	  inc_need_fixup_before ();
 	break;
-      case FH_DISK:
-	fh = new (buf) fhandler_disk_file (NULL);
-	break;
-      case FH_FLOPPY:
-	fh = new (buf) fhandler_dev_floppy (name, unit);
-	break;
-      case FH_TAPE:
-	fh = new (buf) fhandler_dev_tape (name, unit);
+      case FH_FS:
+	fh = cnew (fhandler_disk_file) ();
 	break;
       case FH_NULL:
-	fh = new (buf) fhandler_dev_null (name);
+	fh = cnew (fhandler_dev_null) ();
 	break;
       case FH_ZERO:
-	fh = new (buf) fhandler_dev_zero (name);
+	fh = cnew (fhandler_dev_zero) ();
 	break;
-      default:
-	/* FIXME - this could recurse forever */
-	return build_fhandler (fd, name, NULL);
+      case FH_RANDOM:
+      case FH_URANDOM:
+	fh = cnew (fhandler_dev_random) (dev.minor);
+	break;
+      case FH_MEM:
+      case FH_PORT:
+	fh = cnew (fhandler_dev_mem) (dev.minor);
+	break;
+      case FH_CLIPBOARD:
+	fh = cnew (fhandler_dev_clipboard) ();
+	break;
+      case FH_OSS_DSP:
+	fh = cnew (fhandler_dev_dsp) ();
+	break;
+      case FH_PROC:
+	fh = cnew (fhandler_proc) ();
+	break;
+      case FH_REGISTRY:
+	fh = cnew (fhandler_registry) ();
+	break;
+      case FH_PROCESS:
+	fh = cnew (fhandler_process) ();
+	break;
     }
 
-  debug_printf ("%s - cb %d, fd %d, fh %p", fh->get_name () ?: "", fh->cb,
-		fd, fh);
+  if (!fh)
+    api_fatal ("internal error -- unknown device - %p, '%s'", (int) dev, dev.name);
+
+  char w32buf[MAX_PATH + 1];
+  if (!unix_name)
+    {
+      if (!win32_name && dev.fmt && *dev.fmt)
+	{
+	  sprintf (w32buf, dev.fmt, dev.minor);
+	  win32_name = w32buf;
+	}
+      if (win32_name)
+	{
+	  unix_name = cstrdup (w32buf);
+	  for (char *p = strchr (unix_name, '\\'); p; p = strchr (p + 1, '\\'))
+	    *p = '/';
+	}
+    }
+
+  fh->dev = dev;
+  if (unix_name)
+    {
+      if (!win32_name)
+	{
+	  /* FIXME: ? Should we call win32_device_name here?
+	     It seems like overkill, but... */
+	  win32_name = strcpy (w32buf, unix_name);
+	  for (char *p = w32buf; (p = strchr (p, '/')); p++)
+	    *p = '\\';
+	}
+      fh->set_name (unix_name, win32_name);
+    }
+  debug_printf ("fd %d, fh %p", fd, fh);
   return fd >= 0 ? (fds[fd] = fh) : fh;
 }
 
 fhandler_base *
-hinfo::dup_worker (fhandler_base *oldfh)
+dtable::dup_worker (fhandler_base *oldfh)
 {
-  fhandler_base *newfh = build_fhandler (-1, oldfh->get_device (), NULL);
+  fhandler_base *newfh = build_fhandler (-1, oldfh->dev);
   *newfh = *oldfh;
   newfh->set_io_handle (NULL);
   if (oldfh->dup (newfh))
     {
-      free (newfh);
+      cfree (newfh);
       newfh = NULL;
       return NULL;
     }
 
   newfh->set_close_on_exec_flag (0);
   MALLOC_CHECK;
+  debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (), oldfh->get_io_handle (), newfh->get_io_handle ());
   return newfh;
 }
 
 int
-hinfo::dup2 (int oldfd, int newfd)
+dtable::dup2 (int oldfd, int newfd)
 {
   int res = -1;
   fhandler_base *newfh = NULL;	// = NULL to avoid an incorrect warning
 
   MALLOC_CHECK;
   debug_printf ("dup2 (%d, %d)", oldfd, newfd);
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
 
   if (not_open (oldfd))
     {
-      syscall_printf("dup2: fd %d not open", oldfd);
+      syscall_printf ("fd %d not open", oldfd);
+      set_errno (EBADF);
+      goto done;
+    }
+
+  if (newfd < 0)
+    {
+      syscall_printf ("new fd out of bounds: %d", newfd);
       set_errno (EBADF);
       goto done;
     }
@@ -341,32 +503,42 @@ hinfo::dup2 (int oldfd, int newfd)
       goto done;
     }
 
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  debug_printf ("newfh->io_handle %p, oldfh->io_handle %p",
+		newfh->get_io_handle (), fds[oldfd]->get_io_handle ());
+
   if (!not_open (newfd))
-    _close (newfd);
+    close (newfd);
+  else if ((size_t) newfd < size)
+    /* nothing to do */;
+  else if (find_unused_handle (newfd) < 0)
+    {
+      newfh->close ();
+      res = -1;
+      goto done;
+    }
+
   fds[newfd] = newfh;
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
-  MALLOC_CHECK;
 
   if ((res = newfd) <= 2)
     set_std_handle (res);
 
-  MALLOC_CHECK;
 done:
+  MALLOC_CHECK;
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
   syscall_printf ("%d = dup2 (%d, %d)", res, oldfd, newfd);
 
   return res;
 }
 
 select_record *
-hinfo::select_read (int fd, select_record *s)
+dtable::select_read (int fd, select_record *s)
 {
-  if (dtable.not_open (fd))
+  if (not_open (fd))
     {
       set_errno (EBADF);
       return NULL;
     }
-  fhandler_base *fh = dtable[fd];
+  fhandler_base *fh = fds[fd];
   s = fh->select_read (s);
   s->fd = fd;
   s->fh = fh;
@@ -376,14 +548,14 @@ hinfo::select_read (int fd, select_record *s)
 }
 
 select_record *
-hinfo::select_write (int fd, select_record *s)
+dtable::select_write (int fd, select_record *s)
 {
-  if (dtable.not_open (fd))
+  if (not_open (fd))
     {
       set_errno (EBADF);
       return NULL;
     }
-  fhandler_base *fh = dtable[fd];
+  fhandler_base *fh = fds[fd];
   s = fh->select_write (s);
   s->fd = fd;
   s->fh = fh;
@@ -393,14 +565,14 @@ hinfo::select_write (int fd, select_record *s)
 }
 
 select_record *
-hinfo::select_except (int fd, select_record *s)
+dtable::select_except (int fd, select_record *s)
 {
-  if (dtable.not_open (fd))
+  if (not_open (fd))
     {
       set_errno (EBADF);
       return NULL;
     }
-  fhandler_base *fh = dtable[fd];
+  fhandler_base *fh = fds[fd];
   s = fh->select_except (s);
   s->fd = fd;
   s->fh = fh;
@@ -409,195 +581,265 @@ hinfo::select_except (int fd, select_record *s)
   return s;
 }
 
-/*
- * Function to take an existant hinfo array
- * and linearize it into a memory buffer.
- * If memory buffer is NULL, it returns the size
- * of memory buffer needed to do the linearization.
- * On error returns -1.
- */
-
-int
-hinfo::linearize_fd_array (unsigned char *in_buf, int buflen)
+/* Function to walk the fd table after an exec and perform
+   per-fhandler type fixups. */
+void
+dtable::fixup_before_fork (DWORD target_proc_id)
 {
-  /* If buf == NULL, just precalculate length */
-  if (in_buf == NULL)
-    {
-      buflen = sizeof (size_t);
-      for (int i = 0, max_used_fd = -1; i < (int)size; i++)
-	if (!not_open (i) && !fds[i]->get_close_on_exec ())
-	  {
-	    buflen += i - (max_used_fd + 1);
-	    buflen += fds[i]->cb + strlen (fds[i]->get_name ()) + 1
-				 + strlen (fds[i]->get_win32_name ()) + 1;
-	    max_used_fd = i;
-	  }
-      debug_printf ("needed buflen %d", buflen);
-      return buflen;
-    }
-
-  debug_printf ("in_buf = %x, buflen = %d", in_buf, buflen);
-
-  /*
-   * Now linearize each open fd (write a 0xff byte for a closed fd).
-   * Write the name of the open fd first (null terminated). This
-   * allows the de_linearizeing code to determine what kind of fhandler_xxx
-   * to create.
-   */
-
-  size_t i;
-  int len, total_size;
-
-  total_size = sizeof (size_t);
-  if (total_size > buflen)
-    {
-      system_printf ("FATAL: linearize_fd_array exceeded buffer size");
-      return -1;
-    }
-
-  unsigned char *buf = in_buf;
-  buf += sizeof (size_t);	/* skip over length which is added later */
-
-  for (i = 0, total_size = sizeof (size_t); total_size < buflen; i++)
-    {
-      if (not_open (i) || fds[i]->get_close_on_exec ())
-	{
-	  debug_printf ("linearizing closed fd %d",i);
-	  *buf = 0xff;		/* place holder */
-	  len = 1;
-	}
-      else
-	{
-	  len = fds[i]->linearize (buf);
-	  debug_printf ("fd %d, len %d, name %s, device %p", i, len, buf,
-			fds[i]->get_device ());
-	}
-
-      total_size += len;
-      buf += len;
-    }
-
-  i--;
-  memcpy (in_buf, &i, sizeof (size_t));
-  if (total_size != buflen)
-    system_printf ("out of sync %d != %d", total_size, buflen);
-  return total_size;
-}
-
-/*
- * Function to take a linearized hinfo array in a memory buffer and
- * re-create the original hinfo array.
- */
-
-LPBYTE
-hinfo::de_linearize_fd_array (LPBYTE buf)
-{
-  int len;
-  size_t max_used_fd, inc_size;
-
-  debug_printf ("buf %x", buf);
-
-  /* First get the number of fd's - use this to set the dtablesize.
-     NB. This is the only place in the code this should be done !!
-  */
-
-  memcpy ((char *) &max_used_fd, buf, sizeof (int));
-  buf += sizeof (size_t);
-
-  inc_size = NOFILE_INCR * ((max_used_fd + NOFILE_INCR - 1) / NOFILE_INCR) -
-	     size;
-  debug_printf ("max_used_fd %d, inc size %d", max_used_fd, inc_size);
-  if (inc_size > 0 && !extend (inc_size))
-    {
-      system_printf ("out of memory");
-      return NULL;
-    }
-
-  for (size_t i = 0; i <= max_used_fd; i++)
-    {
-      /* 0xFF means closed */
-      if (*buf == 0xff)
-	{
-	  fds[i] = NULL;
-	  buf++;
-	  debug_printf ("closed fd %d", i);
-	  continue;
-	}
-      /* fd was open - de_linearize it */
-      /* Get the null-terminated name.  It is followed by an image of
-	 the actual fhandler_* structure.  Use the status field from
-	 this to build a new fhandler type. */
-
-      DWORD status;
-      LPBYTE obuf = buf;
-      char *win32;
-      win32 = strchr ((char *)obuf, '\0') + 1;
-      buf = (LPBYTE)strchr ((char *)win32, '\0') + 1;
-      memcpy ((char *)&status, buf + FHSTATOFF, sizeof(DWORD));
-      debug_printf ("fd %d, name %s, win32 name %s, status %p",
-		    i, obuf, win32, status);
-      len = build_fhandler (i, status, (const char *) NULL)->
-	    de_linearize ((char *) buf, (char *) obuf, win32);
-      set_std_handle (i);
-      buf += len;
-      debug_printf ("len %d", buf - obuf);
-    }
-  first_fd_for_open = 0;
-  return buf;
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_fork");
+  fhandler_base *fh;
+  for (size_t i = 0; i < size; i++)
+    if ((fh = fds[i]) != NULL)
+      {
+	debug_printf ("fd %d (%s)", i, fh->get_name ());
+	fh->fixup_before_fork_exec (target_proc_id);
+      }
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_fork");
 }
 
 void
-hinfo::fixup_after_fork (HANDLE parent)
+dtable::fixup_before_exec (DWORD target_proc_id)
 {
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_exec");
+  fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
-    if (!not_open (i))
+    if ((fh = fds[i]) != NULL && !fh->get_close_on_exec ())
       {
-	fhandler_base *fh = fds[i];
-	if (fh->get_close_on_exec () || fh->get_need_fork_fixup ())
+	debug_printf ("fd %d (%s)", i, fh->get_name ());
+	fh->fixup_before_fork_exec (target_proc_id);
+      }
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_exec");
+}
+
+void
+dtable::set_file_pointers_for_exec ()
+{
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "set_file_pointers_for_exec");
+  fhandler_base *fh;
+  for (size_t i = 0; i < size; i++)
+    if ((fh = fds[i]) != NULL && fh->get_flags () & O_APPEND)
+      SetFilePointer (fh->get_handle (), 0, 0, FILE_END);
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_exec");
+}
+
+void
+dtable::fixup_after_exec (HANDLE parent)
+{
+  first_fd_for_open = 0;
+  fhandler_base *fh;
+  for (size_t i = 0; i < size; i++)
+    if ((fh = fds[i]) != NULL)
+      {
+	fh->clear_readahead ();
+	if (fh->get_close_on_exec ())
+	  release (i);
+	else
 	  {
-	    debug_printf ("fd %d(%s)", i, fh->get_name ());
-	    fh->fixup_after_fork (parent);
+	    fh->fixup_after_exec (parent);
+	    if (i == 0)
+	      SetStdHandle (std_consts[i], fh->get_io_handle ());
+	    else if (i <= 2)
+	      SetStdHandle (std_consts[i], fh->get_output_handle ());
 	  }
       }
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+}
+
+void
+dtable::fixup_after_fork (HANDLE parent)
+{
+  fhandler_base *fh;
+  for (size_t i = 0; i < size; i++)
+    if ((fh = fds[i]) != NULL)
+      {
+	if (fh->get_close_on_exec () || fh->get_need_fork_fixup ())
+	  {
+	    debug_printf ("fd %d (%s)", i, fh->get_name ());
+	    fh->fixup_after_fork (parent);
+	  }
+	if (i == 0)
+	  SetStdHandle (std_consts[i], fh->get_io_handle ());
+	else if (i <= 2)
+	  SetStdHandle (std_consts[i], fh->get_output_handle ());
+      }
 }
 
 int
-hinfo::vfork_child_dup ()
+dtable::vfork_child_dup ()
 {
   fhandler_base **newtable;
-  newtable = (fhandler_base **) calloc (size, sizeof(fds[0]));
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
+  newtable = (fhandler_base **) ccalloc (HEAP_ARGV, size, sizeof (fds[0]));
   int res = 1;
 
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  /* Remove impersonation */
+  if (cygheap->user.issetuid ())
+    RevertToSelf ();
+
   for (size_t i = 0; i < size; i++)
     if (not_open (i))
       continue;
-    else if ((newtable[i] = dup_worker (fds[i])) == NULL)
+    else if ((newtable[i] = dup_worker (fds[i])) != NULL)
+      newtable[i]->set_close_on_exec (fds[i]->get_close_on_exec ());
+    else
       {
 	res = 0;
 	set_errno (EBADF);
 	goto out;
       }
+
   fds_on_hold = fds;
   fds = newtable;
+
 out:
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  /* Restore impersonation */
+  if (cygheap->user.issetuid ())
+    ImpersonateLoggedOnUser (cygheap->user.token);
+
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
   return 1;
 }
 
 void
-hinfo::vfork_parent_restore ()
+dtable::vfork_parent_restore ()
 {
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "restore");
 
   close_all_files ();
   fhandler_base **deleteme = fds;
+  assert (fds_on_hold != NULL);
   fds = fds_on_hold;
   fds_on_hold = NULL;
-  free (deleteme);
+  cfree (deleteme);
 
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "restore");
   return;
+}
+
+void
+dtable::vfork_child_fixup ()
+{
+  if (!fds_on_hold)
+    return;
+  debug_printf ("here");
+  fhandler_base **saveme = fds;
+  fds = fds_on_hold;
+
+  fhandler_base *fh;
+  for (int i = 0; i < (int) cygheap->fdtab.size; i++)
+    if ((fh = cygheap->fdtab[i]) != NULL)
+      {
+	fh->clear_readahead ();
+	if (fh->get_close_on_exec ())
+	  release (i);
+	else
+	  {
+	    fh->close ();
+	    cygheap->fdtab.release (i);
+	  }
+      }
+
+  fds = saveme;
+  cfree (fds_on_hold);
+  fds_on_hold = NULL;
+
+  return;
+}
+
+#define DEVICE_PREFIX "\\device\\"
+#define DEVICE_PREFIX_LEN sizeof (DEVICE_PREFIX) - 1
+#define REMOTE "\\Device\\LanmanRedirector\\"
+#define REMOTE_LEN sizeof (REMOTE) - 1
+
+static const char *
+handle_to_fn (HANDLE h, char *posix_fn)
+{
+  OBJECT_NAME_INFORMATION *ntfn;
+  char fnbuf[32768];
+
+  memset (fnbuf, 0, sizeof (fnbuf));
+  ntfn = (OBJECT_NAME_INFORMATION *) fnbuf;
+  ntfn->Name.MaximumLength = sizeof (fnbuf) - sizeof (*ntfn);
+  ntfn->Name.Buffer = (WCHAR *) (ntfn + 1);
+
+  DWORD res = NtQueryObject (h, ObjectNameInformation, ntfn, sizeof (fnbuf), NULL);
+
+  if (res)
+    {
+      strcpy (posix_fn, unknown_file);
+      debug_printf ("NtQueryObject failed");
+      return unknown_file;
+    }
+
+  // NT seems to do this on an unopened file
+  if (!ntfn->Name.Buffer)
+    {
+      debug_printf ("nt->Name.Buffer == NULL");
+      return NULL;
+    }
+
+  ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = 0;
+
+  char win32_fn[MAX_PATH + 100];
+  sys_wcstombs (win32_fn, ntfn->Name.Buffer, ntfn->Name.Length);
+  debug_printf ("nt name '%s'", win32_fn);
+  if (!strncasematch (win32_fn, DEVICE_PREFIX, DEVICE_PREFIX_LEN)
+      || !QueryDosDevice (NULL, fnbuf, sizeof (fnbuf)))
+    return strcpy (posix_fn, win32_fn);
+
+  char *p = strchr (win32_fn + DEVICE_PREFIX_LEN, '\\');
+  if (!p)
+    p = strchr (win32_fn + DEVICE_PREFIX_LEN, '\0');
+
+  int n = p - win32_fn;
+  int maxmatchlen = 0;
+  char *maxmatchdos = NULL;
+  for (char *s = fnbuf; *s; s = strchr (s, '\0') + 1)
+    {
+      char device[MAX_PATH + 10];
+      device[MAX_PATH + 9] = '\0';
+      if (strchr (s, ':') == NULL)
+	continue;
+      if (!QueryDosDevice (s, device, sizeof (device) - 1))
+	continue;
+      char *q = strrchr (device, ';');
+      if (q)
+	{
+	  char *r = strchr (q, '\\');
+	  if (r)
+	    strcpy (q, r + 1);
+	}
+      int devlen = strlen (device);
+      if (device[devlen - 1] == '\\')
+	device[--devlen] = '\0';
+      if (devlen < maxmatchlen)
+	continue;
+      if (!strncasematch (device, win32_fn, devlen) ||
+	  (win32_fn[devlen] != '\0' && win32_fn[devlen] != '\\'))
+	continue;
+      maxmatchlen = devlen;
+      maxmatchdos = s;
+      debug_printf ("current match '%s'", device);
+    }
+
+  char *w32 = win32_fn;
+  if (maxmatchlen)
+    {
+      n = strlen (maxmatchdos);
+      if (maxmatchdos[n - 1] == '\\')
+	n--;
+      w32 += maxmatchlen - n;
+      memcpy (w32, maxmatchdos, n);
+      w32[n] = '\\';
+    }
+  else if (strncasematch (w32, REMOTE, REMOTE_LEN))
+    {
+      w32 += REMOTE_LEN - 2;
+      *w32 = '\\';
+      debug_printf ("remote drive");
+    }
+
+
+  debug_printf ("derived path '%s'", w32);
+  cygwin_conv_to_full_posix_path (w32, posix_fn);
+  return posix_fn;
 }

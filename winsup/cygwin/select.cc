@@ -1,6 +1,6 @@
 /* select.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Christopher Faylor of Cygnus Solutions
    cgf@cygnus.com
@@ -39,10 +39,10 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "perthread.h"
 #include "tty.h"
+#include "cygthread.h"
 
 /*
  * All these defines below should be in sys/types.h
@@ -71,7 +71,7 @@ typedef long fd_mask;
 
 #define NULL_fd_set ((fd_set *) NULL)
 #define sizeof_fd_set(n) \
-  ((unsigned) (NULL_fd_set->fds_bits + unix_howmany((n), UNIX_NFDBITS)))
+  ((unsigned) (NULL_fd_set->fds_bits + unix_howmany ((n), UNIX_NFDBITS)))
 #define UNIX_FD_SET(n, p) \
   ((p)->fds_bits[(n)/UNIX_NFDBITS] |= (1L << ((n) % UNIX_NFDBITS)))
 #define UNIX_FD_CLR(n, p) \
@@ -89,7 +89,7 @@ typedef long fd_mask;
   if (cygheap->fdtab.not_open ((s)->fd)) \
     { \
       (s)->saw_error = true; \
-      set_errno (EBADF); \
+      set_sig_errno (EBADF); \
       return -1; \
     } \
 
@@ -238,7 +238,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
     {
       if (m > MAXIMUM_WAIT_OBJECTS)
 	{
-	  set_errno (EINVAL);
+	  set_sig_errno (EINVAL);
 	  return -1;
 	}
       if (!s->startup (s, this))
@@ -337,11 +337,20 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
   if (me->write_selected && me->write_ready)
     {
       UNIX_FD_SET (me->fd, writefds);
+      if (me->except_on_write && me->fh->get_device () == FH_SOCKET)
+	((fhandler_socket *) me->fh)->set_connect_state (CONNECTED);
       ready++;
     }
-  if (me->except_ready && me->except_ready)
+  if ((me->except_selected || me->except_on_write) && me->except_ready)
     {
-      UNIX_FD_SET (me->fd, exceptfds);
+      if (me->except_on_write) /* Only on sockets */
+	{
+	  UNIX_FD_SET (me->fd, writefds);
+	  if (me->fh->get_device () == FH_SOCKET)
+	    ((fhandler_socket *) me->fh)->set_connect_state (CONNECTED);
+	}
+      if (me->except_selected)
+	UNIX_FD_SET (me->fd, exceptfds);
       ready++;
     }
   select_printf ("ready %d", ready);
@@ -422,7 +431,7 @@ peek_pipe (select_record *s, bool from_select)
 	{
 	case FH_PTYM:
 	case FH_TTYM:
-	  if (((fhandler_pty_master *)fh)->need_nl)
+	  if (((fhandler_pty_master *) fh)->need_nl)
 	    {
 	      gotone = s->read_ready = true;
 	      goto out;
@@ -452,7 +461,7 @@ peek_pipe (select_record *s, bool from_select)
       n = -1;
     }
   else if (!n || !guard_mutex)
-    /* no guard mutex or nothing to read fromt he pipe. */;
+    /* no guard mutex or nothing to read from the pipe. */;
   else if (WaitForSingleObject (guard_mutex, 0) != WAIT_OBJECT_0)
     {
       select_printf ("%s, couldn't get mutex %p, %E", fh->get_name (),
@@ -504,7 +513,7 @@ static int start_thread_pipe (select_record *me, select_stuff *stuff);
 
 struct pipeinf
   {
-    HANDLE thread;
+    cygthread *thread;
     BOOL stop_thread_pipe;
     select_record *start;
   };
@@ -512,7 +521,7 @@ struct pipeinf
 static DWORD WINAPI
 thread_pipe (void *arg)
 {
-  pipeinf *pi = (pipeinf *)arg;
+  pipeinf *pi = (pipeinf *) arg;
   BOOL gotone = FALSE;
 
   for (;;)
@@ -546,33 +555,43 @@ out:
 static int
 start_thread_pipe (select_record *me, select_stuff *stuff)
 {
-  if (stuff->device_specific[FHDEVN(FH_PIPE)])
+  if (stuff->device_specific_pipe)
     {
-      me->h = ((pipeinf *) stuff->device_specific[FHDEVN(FH_PIPE)])->thread;
+      me->h = *((pipeinf *) stuff->device_specific_pipe)->thread;
       return 1;
     }
   pipeinf *pi = new pipeinf;
   pi->start = &stuff->start;
   pi->stop_thread_pipe = FALSE;
-  pi->thread = me->h = makethread (thread_pipe, (LPVOID)pi, 0, "select_pipe");
+  pi->thread = new cygthread (thread_pipe, (LPVOID) pi, "select_pipe");
+  me->h = *pi->thread;
   if (!me->h)
     return 0;
-  stuff->device_specific[FHDEVN(FH_PIPE)] = (void *)pi;
+  stuff->device_specific_pipe = (void *) pi;
   return 1;
 }
 
 static void
 pipe_cleanup (select_record *, select_stuff *stuff)
 {
-  pipeinf *pi = (pipeinf *)stuff->device_specific[FHDEVN(FH_PIPE)];
+  pipeinf *pi = (pipeinf *) stuff->device_specific_pipe;
   if (pi && pi->thread)
     {
       pi->stop_thread_pipe = true;
-      WaitForSingleObject (pi->thread, INFINITE);
-      CloseHandle (pi->thread);
+      pi->thread->detach ();
       delete pi;
-      stuff->device_specific[FHDEVN(FH_PIPE)] = NULL;
+      stuff->device_specific_pipe = NULL;
     }
+}
+
+int
+fhandler_pipe::ready_for_read (int fd, DWORD howlong)
+{
+  if (!howlong)
+    return this->fhandler_base::ready_for_read (fd, howlong);
+
+  get_guard ();
+  return true;
 }
 
 select_record *
@@ -622,7 +641,7 @@ static int
 peek_console (select_record *me, bool)
 {
   extern const char * get_nonascii_key (INPUT_RECORD& input_rec, char *);
-  fhandler_console *fh = (fhandler_console *)me->fh;
+  fhandler_console *fh = (fhandler_console *) me->fh;
 
   if (!me->read_selected)
     return me->write_ready;
@@ -652,18 +671,22 @@ peek_console (select_record *me, bool)
       break;
     else
       {
-	if (irec.EventType == WINDOW_BUFFER_SIZE_EVENT)
-	  kill_pgrp (fh->tc->getpgid (), SIGWINCH);
-	else if (irec.EventType == MOUSE_EVENT &&
-		 (irec.Event.MouseEvent.dwEventFlags == 0 ||
-		  irec.Event.MouseEvent.dwEventFlags == DOUBLE_CLICK))
+	if (irec.EventType == KEY_EVENT)
 	  {
-	    if (fh->mouse_aware ())
+	    if (irec.Event.KeyEvent.bKeyDown
+		&& (irec.Event.KeyEvent.uChar.AsciiChar
+		    || get_nonascii_key (irec, tmpbuf)))
 	      return me->read_ready = true;
 	  }
-	else if (irec.EventType == KEY_EVENT && irec.Event.KeyEvent.bKeyDown == true &&
-		 (irec.Event.KeyEvent.uChar.AsciiChar || get_nonascii_key (irec, tmpbuf)))
-	  return me->read_ready = true;
+	else
+	  {
+	    fh->send_winch_maybe ();
+	    if (irec.EventType == MOUSE_EVENT
+		&& fh->mouse_aware ()
+		&& (irec.Event.MouseEvent.dwEventFlags == 0
+		    || irec.Event.MouseEvent.dwEventFlags == DOUBLE_CLICK))
+		return me->read_ready = true;
+	  }
 
 	/* Read and discard the event */
 	ReadConsoleInput (h, &irec, 1, &events_read);
@@ -735,19 +758,19 @@ fhandler_console::select_except (select_record *s)
 select_record *
 fhandler_tty_common::select_read (select_record *s)
 {
-  return ((fhandler_pipe*)this)->fhandler_pipe::select_read (s);
+  return ((fhandler_pipe *) this)->fhandler_pipe::select_read (s);
 }
 
 select_record *
 fhandler_tty_common::select_write (select_record *s)
 {
-  return ((fhandler_pipe *)this)->fhandler_pipe::select_write (s);
+  return ((fhandler_pipe *) this)->fhandler_pipe::select_write (s);
 }
 
 select_record *
 fhandler_tty_common::select_except (select_record *s)
 {
-  return ((fhandler_pipe *)this)->fhandler_pipe::select_except (s);
+  return ((fhandler_pipe *) this)->fhandler_pipe::select_except (s);
 }
 
 static int
@@ -772,40 +795,6 @@ fhandler_tty_slave::select_read (select_record *s)
   s->read_ready = false;
   s->cleanup = NULL;
   return s;
-}
-
-int
-fhandler_tty_slave::ready_for_read (int fd, DWORD howlong)
-{
-  HANDLE w4[2];
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return 1;
-    }
-  if (get_readahead_valid ())
-    {
-      select_printf ("readahead");
-      return 1;
-    }
-  w4[0] = signal_arrived;
-  w4[1] = input_available_event;
-  switch (WaitForMultipleObjects (2, w4, FALSE, howlong))
-    {
-    case WAIT_OBJECT_0:
-      set_errno (EINTR);
-      return 0;
-    case WAIT_OBJECT_0 + 1:
-      return 1;
-    case WAIT_FAILED:
-      select_printf ("wait failed %E");
-      set_errno (EINVAL); /* FIXME: correct errno? */
-      return 0;
-    default:
-      if (!howlong)
-	set_errno (EAGAIN);
-      return 0;
-    }
 }
 
 select_record *
@@ -857,7 +846,7 @@ static int start_thread_serial (select_record *me, select_stuff *stuff);
 
 struct serialinf
   {
-    HANDLE thread;
+    cygthread *thread;
     BOOL stop_thread_serial;
     select_record *start;
   };
@@ -865,10 +854,9 @@ struct serialinf
 static int
 peek_serial (select_record *s, bool)
 {
-  DWORD ev;
   COMSTAT st;
 
-  fhandler_serial *fh = (fhandler_serial *)s->fh;
+  fhandler_serial *fh = (fhandler_serial *) s->fh;
 
   if (fh->get_readahead_valid () || fh->overlapped_armed < 0)
     return s->read_ready = true;
@@ -890,19 +878,18 @@ peek_serial (select_record *s, bool)
 
   if (!fh->overlapped_armed)
     {
-      DWORD ev;
       COMSTAT st;
 
       ResetEvent (fh->io_status.hEvent);
 
-      if (!ClearCommError (h, &ev, &st))
+      if (!ClearCommError (h, &fh->ev, &st))
 	{
 	  debug_printf ("ClearCommError");
 	  goto err;
 	}
       else if (st.cbInQue)
 	return s->read_ready = true;
-      else if (WaitCommEvent (h, &ev, &fh->io_status))
+      else if (WaitCommEvent (h, &fh->ev, &fh->io_status))
 	return s->read_ready = true;
       else if (GetLastError () == ERROR_IO_PENDING)
 	fh->overlapped_armed = 1;
@@ -923,7 +910,7 @@ peek_serial (select_record *s, bool)
   switch (WaitForMultipleObjects (2, w4, FALSE, to))
     {
     case WAIT_OBJECT_0:
-      if (!ClearCommError (h, &ev, &st))
+      if (!ClearCommError (h, &fh->ev, &st))
 	{
 	  debug_printf ("ClearCommError");
 	  goto err;
@@ -935,19 +922,15 @@ peek_serial (select_record *s, bool)
 	  return s->read_ready = true;
 	  select_printf ("got something");
 	}
-      PurgeComm (h, PURGE_TXABORT | PURGE_RXABORT);
       break;
     case WAIT_OBJECT_0 + 1:
-      PurgeComm (h, PURGE_TXABORT | PURGE_RXABORT);
       select_printf ("interrupt");
       set_sig_errno (EINTR);
       ready = -1;
       break;
     case WAIT_TIMEOUT:
-      PurgeComm (h, PURGE_TXABORT | PURGE_RXABORT);
       break;
     default:
-      PurgeComm (h, PURGE_TXABORT | PURGE_RXABORT);
       debug_printf ("WaitForMultipleObjects");
       goto err;
     }
@@ -971,7 +954,7 @@ err:
 static DWORD WINAPI
 thread_serial (void *arg)
 {
-  serialinf *si = (serialinf *)arg;
+  serialinf *si = (serialinf *) arg;
   BOOL gotone= FALSE;
 
   for (;;)
@@ -999,32 +982,30 @@ thread_serial (void *arg)
 static int
 start_thread_serial (select_record *me, select_stuff *stuff)
 {
-  if (stuff->device_specific[FHDEVN(FH_SERIAL)])
+  if (stuff->device_specific_serial)
     {
-      me->h = ((pipeinf *) stuff->device_specific[FHDEVN(FH_SERIAL)])->thread;
+      me->h = *((serialinf *) stuff->device_specific_serial)->thread;
       return 1;
     }
   serialinf *si = new serialinf;
   si->start = &stuff->start;
   si->stop_thread_serial = FALSE;
-  si->thread = me->h = makethread (thread_serial, (LPVOID)si, 0, "select_serial");
-  if (!me->h)
-    return 0;
-  stuff->device_specific[FHDEVN(FH_SERIAL)] = (void *)si;
+  si->thread = new cygthread (thread_serial, (LPVOID) si, "select_serial");
+  me->h = *si->thread;
+  stuff->device_specific_serial = (void *) si;
   return 1;
 }
 
 static void
 serial_cleanup (select_record *, select_stuff *stuff)
 {
-  serialinf *si = (serialinf *)stuff->device_specific[FHDEVN(FH_SERIAL)];
+  serialinf *si = (serialinf *) stuff->device_specific_serial;
   if (si && si->thread)
     {
       si->stop_thread_serial = true;
-      WaitForSingleObject (si->thread, INFINITE);
-      CloseHandle (si->thread);
+      si->thread->detach ();
       delete si;
-      stuff->device_specific[FHDEVN(FH_SERIAL)] = NULL;
+      stuff->device_specific_serial = NULL;
     }
 }
 
@@ -1089,7 +1070,7 @@ fhandler_base::ready_for_read (int fd, DWORD howlong)
 
       if (fd >= 0 && cygheap->fdtab.not_open (fd))
 	{
-	  set_errno (EBADF);
+	  set_sig_errno (EBADF);
 	  avail = 0;
 	  break;
 	}
@@ -1097,13 +1078,13 @@ fhandler_base::ready_for_read (int fd, DWORD howlong)
       if (howlong != INFINITE)
 	{
 	  if (!avail)
-	    set_errno (EAGAIN);
+	    set_sig_errno (EAGAIN);
 	  break;
 	}
 
       if (WaitForSingleObject (signal_arrived, avail ? 0 : 10) == WAIT_OBJECT_0)
 	{
-	  set_errno (EINTR);
+	  set_sig_errno (EINTR);
 	  avail = 0;
 	  break;
 	}
@@ -1163,7 +1144,7 @@ fhandler_base::select_except (select_record *s)
 
 struct socketinf
   {
-    HANDLE thread;
+    cygthread *thread;
     winsock_fd_set readfds, writefds, exceptfds;
     SOCKET exitsock;
     struct sockaddr_in sin;
@@ -1183,39 +1164,44 @@ peek_socket (select_record *me, bool)
   set_handle_or_return_if_not_open (h, me);
   select_printf ("considering handle %p", h);
 
-  if (me->read_selected)
+  if (me->read_selected && !me->read_ready)
     {
       select_printf ("adding read fd_set %s, fd %d", me->fh->get_name (),
 		     me->fd);
       WINSOCK_FD_SET (h, &ws_readfds);
     }
-  if (me->write_selected)
+  if (me->write_selected && !me->write_ready)
     {
       select_printf ("adding write fd_set %s, fd %d", me->fh->get_name (),
 		     me->fd);
       WINSOCK_FD_SET (h, &ws_writefds);
     }
-  if (me->except_selected)
+  if ((me->except_selected || me->except_on_write) && !me->except_ready)
     {
       select_printf ("adding except fd_set %s, fd %d", me->fh->get_name (),
 		     me->fd);
       WINSOCK_FD_SET (h, &ws_exceptfds);
     }
-  int r = WINSOCK_SELECT (0, &ws_readfds, &ws_writefds, &ws_exceptfds, &tv);
-  select_printf ("WINSOCK_SELECT returned %d", r);
-  if (r == -1)
+  int r;
+  if ((me->read_selected && !me->read_ready)
+      || (me->write_selected && !me->write_ready)
+      || ((me->except_selected || me->except_on_write) && !me->except_ready))
     {
-      select_printf ("error %d", WSAGetLastError ());
-      set_winsock_errno ();
-      return 0;
+      r = WINSOCK_SELECT (0, &ws_readfds, &ws_writefds, &ws_exceptfds, &tv);
+      select_printf ("WINSOCK_SELECT returned %d", r);
+      if (r == -1)
+	{
+	  select_printf ("error %d", WSAGetLastError ());
+	  set_winsock_errno ();
+	  return 0;
+	}
+      if (WINSOCK_FD_ISSET (h, &ws_readfds) || (me->read_selected && me->read_ready))
+	me->read_ready = true;
+      if (WINSOCK_FD_ISSET (h, &ws_writefds) || (me->write_selected && me->write_ready))
+	me->write_ready = true;
+      if (WINSOCK_FD_ISSET (h, &ws_exceptfds) || ((me->except_selected || me->except_on_write) && me->except_ready))
+	me->except_ready = true;
     }
-
-  if (WINSOCK_FD_ISSET (h, &ws_readfds) || (me->read_selected && me->read_ready))
-    me->read_ready = true;
-  if (WINSOCK_FD_ISSET (h, &ws_writefds) || (me->write_selected && me->write_ready))
-    me->write_ready = true;
-  if (WINSOCK_FD_ISSET (h, &ws_exceptfds) || (me->except_selected && me->except_ready))
-    me->except_ready = true;
   return me->read_ready || me->write_ready || me->except_ready;
 }
 
@@ -1224,7 +1210,7 @@ static int start_thread_socket (select_record *, select_stuff *);
 static DWORD WINAPI
 thread_socket (void *arg)
 {
-  socketinf *si = (socketinf *)arg;
+  socketinf *si = (socketinf *) arg;
 
   select_printf ("stuff_start %p", &si->start);
   int r = WINSOCK_SELECT (0, &si->readfds, &si->writefds, &si->exceptfds, NULL);
@@ -1267,9 +1253,9 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 {
   socketinf *si;
 
-  if ((si = (socketinf *)stuff->device_specific[FHDEVN(FH_SOCKET)]))
+  if ((si = (socketinf *) stuff->device_specific_socket))
     {
-      me->h = si->thread;
+      me->h = *si->thread;
       return 1;
     }
 
@@ -1283,17 +1269,17 @@ start_thread_socket (select_record *me, select_stuff *stuff)
       {
 	HANDLE h = s->fh->get_handle ();
 	select_printf ("Handle %p", h);
-	if (s->read_selected)
+	if (s->read_selected && !s->read_ready)
 	  {
 	    WINSOCK_FD_SET (h, &si->readfds);
 	    select_printf ("Added to readfds");
 	  }
-	if (s->write_selected)
+	if (s->write_selected && !s->write_ready)
 	  {
 	    WINSOCK_FD_SET (h, &si->writefds);
 	    select_printf ("Added to writefds");
 	  }
-	if (s->except_selected)
+	if ((s->except_selected || s->except_on_write) && !s->except_ready)
 	  {
 	    WINSOCK_FD_SET (h, &si->exceptfds);
 	    select_printf ("Added to exceptfds");
@@ -1310,7 +1296,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
   int tmp = 1;
   (void) setsockopt (si->exitsock, SOL_SOCKET, SO_REUSEADDR, (char *) &tmp, sizeof (tmp));
 
-  int sin_len = sizeof(si->sin);
+  int sin_len = sizeof (si->sin);
   memset (&si->sin, 0, sizeof (si->sin));
   si->sin.sin_family = AF_INET;
   si->sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
@@ -1335,12 +1321,12 @@ start_thread_socket (select_record *me, select_stuff *stuff)
   select_printf ("exitsock %p", si->exitsock);
   WINSOCK_FD_SET ((HANDLE) si->exitsock, &si->readfds);
   WINSOCK_FD_SET ((HANDLE) si->exitsock, &si->exceptfds);
-  stuff->device_specific[FHDEVN(FH_SOCKET)] = (void *) si;
+  stuff->device_specific_socket = (void *) si;
   si->start = &stuff->start;
   select_printf ("stuff_start %p", &stuff->start);
-  si->thread = me->h = makethread (thread_socket, (LPVOID)si, 0,
-				  "select_socket");
-  return !!me->h;
+  si->thread = new cygthread (thread_socket, (LPVOID) si, "select_socket");
+  me->h = *si->thread;
+  return 1;
 
 err:
   set_winsock_errno ();
@@ -1351,7 +1337,7 @@ err:
 void
 socket_cleanup (select_record *, select_stuff *stuff)
 {
-  socketinf *si = (socketinf *)stuff->device_specific[FHDEVN(FH_SOCKET)];
+  socketinf *si = (socketinf *) stuff->device_specific_socket;
   select_printf ("si %p si->thread %p", si, si ? si->thread : NULL);
   if (si && si->thread)
     {
@@ -1360,8 +1346,8 @@ socket_cleanup (select_record *, select_stuff *stuff)
 
       /* Set LINGER with 0 timeout for hard close */
       struct linger tmp = {1, 0}; /* On, 0 delay */
-      (void) setsockopt (s, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof(tmp));
-      (void) setsockopt (si->exitsock, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof(tmp));
+      (void) setsockopt (s, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof (tmp));
+      (void) setsockopt (si->exitsock, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof (tmp));
 
       /* Connecting to si->exitsock will cause any executing select to wake
 	 up.  When this happens then the exitsock condition will cause the
@@ -1376,11 +1362,10 @@ socket_cleanup (select_record *, select_stuff *stuff)
       closesocket (s);
 
       /* Wait for thread to go away */
-      WaitForSingleObject (si->thread, INFINITE);
+      si->thread->detach ();
       shutdown (si->exitsock, SD_BOTH);
       closesocket (si->exitsock);
-      CloseHandle (si->thread);
-      stuff->device_specific[FHDEVN(FH_SOCKET)] = NULL;
+      stuff->device_specific_socket = NULL;
       delete si;
     }
   select_printf ("returning");
@@ -1413,8 +1398,13 @@ fhandler_socket::select_write (select_record *s)
       s->cleanup = socket_cleanup;
     }
   s->peek = peek_socket;
-  s->write_ready = saw_shutdown_write ();
+  s->write_ready = saw_shutdown_write () || is_unconnected ();
   s->write_selected = true;
+  if (is_connect_pending ())
+    {
+      s->except_ready = saw_shutdown_write () || saw_shutdown_read ();
+      s->except_on_write = true;
+    }
   return s;
 }
 

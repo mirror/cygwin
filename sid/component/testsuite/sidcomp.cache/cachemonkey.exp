@@ -2,10 +2,15 @@
 
 load_lib "monkey.exp"
 
-proc state_safe_p {} { return 0 }
-monkey_test hw-cache-basic cache_component_library libcache.la
-monkey_test hw-cache-4way/8kb/64/lru cache_component_library libcache.la
-monkey_test hw-cache-2way/256kb/16/fifo cache_component_library libcache.la
-monkey_test hw-cache-full/64kb/32/random cache_component_library libcache.la
-monkey_test hw-cache-direct/16kb/128 cache_component_library libcache.la
+set types [list \
+	       2way/256kb/16/fifo \
+	       basic 4way/8kb/64/lru \
+	       full/64kb/32/random \
+	       direct/16kb/128 ]
 
+foreach type $types {
+    proc state_safe_p {} { return 0 }
+    proc attr_safe_p {attr} { return [expr ![string match $attr dump!]] }
+
+    monkey_test hw-cache-$type cache_component_library libcache.la
+}

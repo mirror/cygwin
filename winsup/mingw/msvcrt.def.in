@@ -1,14 +1,16 @@
 ;
-; msvcrt20.def
+; __FILENAME__ 
+;    created from msvcrt.def.in
 ;
-; Exports from msvcrt20.dll. I am hoping that msvcrt20.dll will be reasonably
-; common on user systems (if not ubiquitous) so that, effectively, it can
-; be considered part of the OS. Apparently it was included with the Windows 95
-; distribution, so it should be present there at least.
+; Exports from msvcrt.dll. Msvcrt.dll appears to be distributed with
+; Internet Explorer 4.0, and may be more common in the future, but
+; right now it seems like a risky choice. There are differences, although
+; they seem to be minor overall, between the exports from msvcrt and msvcrt20.
+; However, for most purposes the two sets are interchangable.
 ;
 ; NOTE: All exports, except for what appeared to be C++ mangled names,
 ;       are included. Not all functions have prototypes in the headers
-;       (and some aren't functions at all).
+;       (and some are not functions at all).
 ;
 ; Contributors:
 ;  Created by Colin Peters <colin@bird.fu.is.saga-u.ac.jp>
@@ -23,9 +25,9 @@
 ;  DISCLAMED. This includes but is not limited to warrenties of
 ;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ;
-; $Revision: 1.4 $
-; $Author: cgf $
-; $Date: 2000/02/05 04:04:46 $
+; $Revision: 1.1 $
+; $Author: earnie $
+; $Date: 2003/02/21 21:12:29 $
 ;
 EXPORTS
 _CIacos
@@ -45,23 +47,37 @@ _CIsqrt
 _CItan
 _CItanh
 _CxxThrowException
-_HUGE
+_EH_prolog
+_Getdays
+_Getmonths
+_Gettnames
+_HUGE DATA
+_Strftime
 _XcptFilter
 __CxxFrameHandler
 __CxxLongjmpUnwind
+__RTCastToVoid
+__RTDynamicCast
+__RTtypeid
 __STRINGTOLD
-__argc
-__argv
+__argc DATA
+__argv DATA
+__badioinfo
+__crtCompareStringA
+__crtGetLocaleInfoW
+__crtLCMapStringA
 __dllonexit
 __doserrno
 __fpecode
 __getmainargs
-__initenv
+__initenv DATA
 __isascii
 __iscsym
 __iscsymf
+__lc_codepage
+__lc_handle
 __lconv_init
-__mb_cur_max
+__mb_cur_max DATA
 __p___argc
 __p___argv
 __p___initenv
@@ -72,7 +88,9 @@ __p__acmdln
 __p__amblksiz
 __p__commode
 __p__daylight
+__p__dstbias
 __p__environ
+__p__fileinfo
 __p__fmode
 __p__iob
 __p__mbctype
@@ -88,16 +106,22 @@ __p__winmajor
 __p__winminor
 __p__winver
 __p__wpgmptr
+__pioinfo
 __pxcptinfoptrs
+__set_app_type
+__setlc_active
+__setusermatherr
 __threadhandle
 __threadid
 __toascii
-__wargv
+__unDName
+__unguarded_readlc_active
+__wargv DATA
 __wgetmainargs
-__winitenv
+__winitenv DATA
 _abnormal_termination
 _access
-_acmdln
+_acmdln DATA
 _adj_fdiv_m16i
 _adj_fdiv_m32
 _adj_fdiv_m32i
@@ -111,17 +135,19 @@ _adj_fpatan
 _adj_fprem
 _adj_fprem1
 _adj_fptan
-_adjust_fdiv
-_aexit_rtn
+_adjust_fdiv DATA
+_aexit_rtn DATA
 _amsg_exit
 _assert
 _atodbl
+_atoi64
 _atoldbl
 _beep
 _beginthread
 _beginthreadex
 _c_exit
 _cabs
+_callnewh
 _cexit
 _cgets
 _chdir
@@ -132,7 +158,7 @@ _chsize
 _clearfp
 _close
 _commit
-_commode
+_commode DATA
 _control87
 _controlfp
 _copysign
@@ -140,15 +166,16 @@ _cprintf
 _cputs
 _creat
 _cscanf
-_ctype
+_ctype DATA
 _cwait
-_daylight
+_daylight DATA
+_dstbias
 _dup
 _dup2
 _ecvt
 _endthread
 _endthreadex
-_environ
+_environ DATA
 _eof
 _errno
 _except_handler2
@@ -169,16 +196,19 @@ _fdopen
 _fgetchar
 _fgetwchar
 _filbuf
-_fileinfo
+_fileinfo DATA
 _filelength
+_filelengthi64
 _fileno
 _findclose
 _findfirst
+_findfirsti64
 _findnext
+_findnexti64
 _finite
 _flsbuf
 _flushall
-_fmode
+_fmode DATA
 _fpclass
 _fpieee_flt
 _fpreset DATA
@@ -186,12 +216,14 @@ _fputchar
 _fputwchar
 _fsopen
 _fstat
+_fstati64
 _ftime
 _ftol
 _fullpath
 _futime
 _gcvt
 _get_osfhandle
+_get_sbh_threshold
 _getch
 _getche
 _getcwd
@@ -200,6 +232,7 @@ _getdiskfree
 _getdllprocaddr
 _getdrive
 _getdrives
+_getmaxstdio
 _getmbcp
 _getpid
 _getsystime
@@ -213,8 +246,13 @@ _heapset
 _heapused
 _heapwalk
 _hypot
+_i64toa
+_i64tow
 _initterm
-_iob
+_inp
+_inpd
+_inpw
+_iob DATA
 _isatty
 _isctype
 _ismbbalnum
@@ -256,6 +294,7 @@ _kbhit
 _lfind
 _loaddll
 _local_unwind2
+_lock
 _locking
 _logb
 _longjmpex
@@ -263,10 +302,10 @@ _lrotl
 _lrotr
 _lsearch
 _lseek
+_lseeki64
 _ltoa
 _ltow
 _makepath
-_matherr
 _mbbtombc
 _mbbtype
 _mbccpy
@@ -278,7 +317,7 @@ _mbctokata
 _mbctolower
 _mbctombb
 _mbctoupper
-_mbctype
+_mbctype DATA
 _mbsbtype
 _mbscat
 _mbschr
@@ -326,16 +365,17 @@ _memicmp
 _mkdir
 _mktemp
 _msize
-_mtlock
-_mtunlock
 _nextafter
 _onexit DATA
 _open
 _open_osfhandle
-_osver
+_osver DATA
+_outp
+_outpd
+_outpw
 _pclose
-_pctype
-_pgmptr
+_pctype DATA
+_pgmptr DATA
 _pipe
 _popen
 _purecall
@@ -343,7 +383,7 @@ _putch
 _putenv
 _putw
 _putws
-_pwctype
+_pwctype DATA
 _read
 _rmdir
 _rmtmp
@@ -355,10 +395,13 @@ _safe_fprem
 _safe_fprem1
 _scalb
 _searchenv
-__seh_longjmp_unwind@4
+_seh_longjmp_unwind
+_set_error_mode
+_set_sbh_threshold
 _seterrormode
 _setjmp
 _setjmp3
+_setmaxstdio
 _setmbcp
 _setmode
 _setsystime
@@ -376,6 +419,7 @@ _spawnvp
 _spawnvpe
 _splitpath
 _stat
+_stati64
 _statusfp
 _strcmpi
 _strdate
@@ -393,54 +437,25 @@ _strset
 _strtime
 _strupr
 _swab
-_sys_errlist
-_sys_nerr
-_tccpy
-_tclen
-_tcschr
-_tcsclen
-_tcscmp
-_tcscspn
-_tcsdec
-_tcsicmp
-_tcsinc
-_tcslwr
-_tcsnbcnt
-_tcsncat
-_tcsnccat
-_tcsnccmp
-_tcsnccnt
-_tcsnccpy
-_tcsncicmp
-_tcsncmp
-_tcsncpy
-_tcsncset
-_tcsnextc
-_tcsnicmp
-_tcsninc
-_tcsnset
-_tcspbrk
-_tcsrchr
-_tcsrev
-_tcsset
-_tcsspn
-_tcsspnp
-_tcsstr
-_tcstok
-_tcsupr
+_sys_errlist DATA
+_sys_nerr DATA
 _tell
+_telli64
 _tempnam
-_timezone
+_timezone DATA
 _tolower
 _toupper
-_tzname
+_tzname DATA
 _tzset
+_ui64toa
+_ui64tow
 _ultoa
 _ultow
 _umask
 _ungetch
 _unlink
 _unloaddll
+_unlock
 _utime
 _vsnprintf
 _vsnwprintf
@@ -448,7 +463,7 @@ _waccess
 _wasctime
 _wchdir
 _wchmod
-_wcmdln
+_wcmdln DATA
 _wcreat
 _wcsdup
 _wcsicmp
@@ -462,7 +477,7 @@ _wcsrev
 _wcsset
 _wcsupr
 _wctime
-_wenviron
+_wenviron DATA
 _wexecl
 _wexecle
 _wexeclp
@@ -473,7 +488,9 @@ _wexecvp
 _wexecvpe
 _wfdopen
 _wfindfirst
+_wfindfirsti64
 _wfindnext
+_wfindnexti64
 _wfopen
 _wfreopen
 _wfsopen
@@ -481,15 +498,15 @@ _wfullpath
 _wgetcwd
 _wgetdcwd
 _wgetenv
-_winmajor
-_winminor
-_winver
+_winmajor DATA
+_winminor DATA
+_winver DATA
 _wmakepath
 _wmkdir
 _wmktemp
 _wopen
 _wperror
-_wpgmptr
+_wpgmptr DATA
 _wpopen
 _wputenv
 _wremove
@@ -509,12 +526,14 @@ _wspawnvp
 _wspawnvpe
 _wsplitpath
 _wstat
+_wstati64
 _wstrdate
 _wstrtime
 _wsystem
 _wtempnam
 _wtmpnam
 _wtoi
+_wtoi64
 _wtol
 _wunlink
 _wutime

@@ -59,7 +59,14 @@ proc initialize_paths {} {\n\
     lappend guidirs $env(CYGNUS_GUI_LIBRARY)\n\
   }\n\
   set here [pwd]\n\
-  cd [file dirname [info nameofexecutable]]\n\
+  set exec_name [info nameofexecutable]\n\
+  if {[string compare [file type $exec_name] \"link\"] == 0} {\n\
+    set exec_name [file readlink $exec_name]\n\
+    if {[string compare [file pathtype $exec_name] \"relative\"] == 0} {\n\
+        set exec_name [file join [pwd] $exec_name]\n\
+    }\n\
+  }\n\
+  cd [file dirname $exec_name]\n\
   # Handle build with --exec-prefix and build without.\n\
   set d [file join [file dirname [pwd]] share]\n\
   lappend prefdirs $d\n\
@@ -165,7 +172,14 @@ proc initialize_paths {} {\n\
   rename initialize_paths {}\n\
   set guidirs {}\n\
   set here [pwd]\n\
-  cd [file dirname [info nameofexecutable]]\n\
+  set exec_name [info nameofexecutable]\n\
+  if {[string compare [file type $exec_name] \"link\"] == 0} {\n\
+    set exec_name [file readlink $exec_name]\n\
+    if {[string compare [file pathtype $exec_name] \"relative\"] == 0} {\n\
+      set execName [file join [pwd] $exec_name]\n\
+    }\n\
+  }\n\
+  cd [file dirname $exe_name]\n\
   set d [file join [file dirname [pwd]] share]\n\
   lappend guidirs [file join $d cygnus gui]\n\
   set d [file join [file dirname [file dirname [pwd]]] share]\n\

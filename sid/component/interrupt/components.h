@@ -1,6 +1,6 @@
 // components.h - description.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -87,14 +87,9 @@ public:
   virtual ~IntController<bus_size>() { }
   
 private:
-
-  //
-  // IntController::interrupt_bus
-  //
   class interrupt_bus: public word_bus<bus_size>
   {
   public:
-  
     interrupt_bus (IntController<bus_size> *who,
       sid::bus::status (IntController<bus_size>::*rd)
         (host_int_4, bus_size, bus_size&),
@@ -113,7 +108,6 @@ private:
 	{ return (host->*read)(addr, mask, data); }
   
   private:
-  
     IntController<bus_size> *host;
   
     sid::bus::status (IntController<bus_size>::*read)
@@ -123,9 +117,6 @@ private:
   };
   friend class interrupt_bus;
 
-  //
-  // IntController::interrupt_lines
-  //
   class interrupt_lines: public input_pin
   {
   public:
@@ -146,7 +137,6 @@ private:
       }
   
   private:
-  
     IntController<bus_size> *host;
     host_int_4 bit_num;
   
@@ -230,7 +220,6 @@ private:
 
 // functions in template class
 
-// constructor
 template<class bus_size>
 IntController<bus_size>::IntController<bus_size>
   (host_int_4 num_irq,
@@ -246,7 +235,6 @@ IntController<bus_size>::IntController<bus_size>
 	features(ctrlr_features),
 	triggerpoint_manager(this)
 {
-
   if (features & RSTPIN)
     {
       add_pin("reset", &reset_pin);
@@ -254,16 +242,16 @@ IntController<bus_size>::IntController<bus_size>
       triggerpoint_manager.add_watchable_attribute("reset");
       categorize("reset", "watchable");
     }
-
+  
   add_bus("irq-registers", &irq_bus);
   if (features & FIQBUS)
     add_bus("fiq-registers", &fiq_bus);
-
+  
   add_pin("interrupt", &irq_pin);
   add_attribute("interrupt", &irq_pin, "pin");
   triggerpoint_manager.add_watchable_attribute("interrupt");
   categorize("interrupt", "watchable");
-
+  
   if (features & FIQREGS)
     {
       add_pin("fast-interrupt", &fiq_pin);
@@ -271,10 +259,10 @@ IntController<bus_size>::IntController<bus_size>
       triggerpoint_manager.add_watchable_attribute("fast-interrupt");
       categorize("fast-interrupt", "watchable");
     }
-
+  
   interrupt_lines* tmpline = NULL;
   string tmpstr = "";
-
+  
   for (int i = 0; i < num_irq; ++i)
     {
       tmpline = new interrupt_lines (i, this,

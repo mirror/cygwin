@@ -1,7 +1,7 @@
 // arm.cxx - An implementation of the interrupt controller from the
 // ARM PID7T development board.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -23,7 +23,6 @@ armIntController::irq_src_driven(host_int_4 val, host_int_4 bit_num)
     irq_pending |= 1 << bit_num;
   else
     irq_pending &= ~(1 << bit_num);
-
   drive_irq_interrupts();
 }
 
@@ -31,7 +30,6 @@ void
 armIntController::fiq_src_driven(host_int_4 val, host_int_4 bit_num)
 {
   fiq_pending = (val > 0) ? 1 : 0;
-
   drive_fiq_interrupts();
 }
 
@@ -42,25 +40,27 @@ armIntController::irq_read_word(host_int_4 addr,
 {
   host_int_4 data;
 
-  switch (addr) {
-  case 0:
-    // IRQStatus.
-    data = irq_pending & irq_enabled;
-    break;
-  case 1:
-    // IRQRawStatus.
-    data = irq_pending;
-    break;
-  case 2:
-    // IRQEnable.
-    data = irq_enabled;
-    break;
-  case 3:	// Reserved.
-  case 4:
-    return bus::unpermitted;
-  default:
-    return bus::unmapped;
-  } 
+  switch (addr)
+    {
+    case 0:
+      // IRQStatus.
+      data = irq_pending & irq_enabled;
+      break;
+    case 1:
+      // IRQRawStatus.
+      data = irq_pending;
+      break;
+    case 2:
+      // IRQEnable.
+      data = irq_enabled;
+      break;
+    case 3:
+      // Reserved.
+    case 4:
+      return bus::unpermitted;
+    default:
+      return bus::unmapped;
+    } 
   le_data = data;
   return bus::ok;
 }
@@ -72,24 +72,26 @@ armIntController::fiq_read_word(host_int_4 addr,
 {
   host_int_4 data;
 
-  switch (addr) {
-  case 0:
-    // FIQStatus.
-    data = fiq_pending && fiq_enabled;
-    break;
-  case 1:
-    // FIQRawStatus.
-    data = fiq_pending;
-    break;
-  case 2:
-    // FIQEnable.
-    data = fiq_enabled;
-    break;
-  case 3:	// Reserved.
-    return bus::unpermitted;
-  default:
-    return bus::unmapped;
-  } 
+  switch (addr)
+    {
+    case 0:
+      // FIQStatus.
+      data = fiq_pending && fiq_enabled;
+      break;
+    case 1:
+      // FIQRawStatus.
+      data = fiq_pending;
+      break;
+    case 2:
+      // FIQEnable.
+      data = fiq_enabled;
+      break;
+    case 3:
+      // Reserved.
+      return bus::unpermitted;
+    default:
+      return bus::unmapped;
+    } 
   le_data = data;
   return bus::ok;
 }

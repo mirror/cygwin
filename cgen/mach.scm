@@ -1086,7 +1086,7 @@
 	  (insn-endian #f)
 	  (data-endian #f)
 	  (float-endian #f)
-	  (word-bitsize nil)
+	  (word-bitsize #f)
 	  (insn-chunk-bitsize 0)
 	  (file-transform "")
 	  ; FIXME: Hobbit computes the wrong symbol for `parallel-insns'
@@ -1128,7 +1128,11 @@
   (lambda arg-list
     (let ((c (apply -cpu-read arg-list)))
       (if c
-	  (current-cpu-add! c))
+	  (begin
+	    (current-cpu-add! c)
+	    (mode-set-word-modes! (cpu-word-bitsize c))
+	    (hw-update-word-modes!)
+	    ))
       c))
 )
 
@@ -1253,12 +1257,17 @@
 
 ; Size of a word in bits.
 ; All selected cpu families must have same value or error.
-; FIXME: Only user is opcodes.scm and we don't want this restriction there.
+; Ergo, don't use this if multiple word-bitsize values are expected.
+; E.g. opcodes support for architectures with both 32 and 64 variants.
 
 (define (state-word-bitsize)
-  (let ((wb (map cpu-word-bitsize (current-cpu-list))))
-    ; FIXME: ensure all have same value.
-    (car wb))
+  (let* ((wb-list (map cpu-word-bitsize (current-cpu-list)))
+	 (result (car wb-list)))
+    (for-each (lambda (wb)
+		(if (!= result wb)
+		    (error "multiple word-bitsize values" wb-list)))
+	      wb-list)
+    result)
 )
 
 ; Return maximum word bitsize.
@@ -1373,6 +1382,9 @@
 ; Simulator style apps don't want to include the alias insns.
 
 (define (arch-analyze-insns! arch include-aliases? analyze-semantics?)
+  ; Catch apps that haven't set word sizes yet.
+  (mode-ensure-word-sizes-defined)
+
   (if (or (not (arch-insns-analyzed? arch))
 	  (not (eq? analyze-semantics? (arch-semantics-analyzed? arch)))
 	  (not (eq? include-aliases? (arch-aliases-analyzed? arch))))

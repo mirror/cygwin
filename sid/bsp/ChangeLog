@@ -1,3 +1,7 @@
+2001-08-06  Ben Elliston  <bje@redhat.com>
+	
+	* configrun-sid.in (%component_libs): Add "cache" key/value.
+
 2001-08-01  Dave Brolley  <brolley@redhat.com>
 
 	* configrun-sid.in (opt_load): New option.

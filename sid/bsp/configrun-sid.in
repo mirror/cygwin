@@ -292,6 +292,7 @@ if ($opt_gdb)
 # complete component library list
 %component_libs=(
 		 "audio" => "audio_component_library",
+		 "cache" => "cache_component_library",
 		 "cgencpu" => "cgen_component_library",
 		 "consoles" => "console_component_library",
 		 "gdb" => "gdb_component_library",

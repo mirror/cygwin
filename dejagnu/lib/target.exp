@@ -587,7 +587,14 @@ proc default_target_compile {source destfile type options} {
 	}
     }
 
-    set opts "$sources $add_flags"
+    # This is obscure: we put SOURCES at the end when building an
+    # object, because otherwise, in some situations, libtool will
+    # become confused about the name of the actual source file.
+    if {$type == "object"} {
+        set opts "$add_flags $sources"
+    } else {
+        set opts "$sources $add_flags"
+    }
 
     if [is_remote host] {
 	if [host_info exists use_at] {

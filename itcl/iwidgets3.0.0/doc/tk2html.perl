@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 # Lightly modified man2html to make html equivs of tk/tcl man pages
 # probably a dead end soln since works on output after troff processing
 

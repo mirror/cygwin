@@ -1,5 +1,5 @@
 /* M32R opcode support.  -*- C -*-
-   Copyright (C) 2000, 2001 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2004 Red Hat, Inc.
    This file is part of CGEN.  */
 
 /* This file is an addendum to m32r.cpu.  Heavy use of C code isn't
@@ -15,8 +15,7 @@
    <arch>-opc.c additions use: "-- opc.c"
    <arch>-asm.c additions use: "-- asm.c"
    <arch>-dis.c additions use: "-- dis.c"
-   <arch>-ibd.h additions use: "-- ibd.h"
-*/
+   <arch>-ibd.h additions use: "-- ibd.h"  */
 
 /* -- opc.h */
 
@@ -128,7 +127,10 @@ parse_hi16 (cd, strp, opindex, valuep)
       ++*strp;
       if (errmsg == NULL
 	  && result_type == CGEN_PARSE_OPERAND_RESULT_NUMBER)
-	value = (value >> 16) + (value & 0x8000 ? 1 : 0);
+        {
+          value = value + (value & 0x8000 ? 0x10000 : 0);
+          value >>= 16;
+        }
       *valuep = value;
       return errmsg;
     }

@@ -1,3 +1,10 @@
+2003-05-21  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* cpu/sh.cpu: Amend comments to refer to SuperH.
+	* cpu/sh64-compact.cpu: Change comment to refer to SuperH.
+	* cpu/sh64-media.cpu: Likewise.
+	(Saturation): Update manual reference.
+
 2003-05-15  Doug Evans  <dje@sebabeach.org>
 
 	* Makefile.am (srcroot): New var.

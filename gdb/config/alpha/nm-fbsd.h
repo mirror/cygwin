@@ -1,5 +1,6 @@
-/* Macro definitions for GDB on an Intel i386 running Solaris 2.
-   Copyright 1998, 1999, 2000 Free Software Foundation, Inc.
+/* Native-dependent definitions for FreeBSD/Alpha.
+   Copyright 1986, 1987, 1989, 1992, 1996, 2000
+   Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -18,19 +19,27 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#ifndef TM_I386SOL2_H
-#define TM_I386SOL2_H 1
+#ifndef NM_FBSD_H
+#define NM_FBSD_H
 
-#include "i386/tm-i386.h"
+/* Type of the third argument to the `ptrace' system call.  */
+#define PTRACE_ARG3_TYPE caddr_t
 
-/* The SunPRO compiler puts out 0 instead of the address in N_SO symbols,
-   and for SunPRO 3.0, N_FUN symbols too.  */
-#define SOFUN_ADDRESS_MAYBE_MISSING
+/* Override copies of {fetch,store}_inferior_registers in `infptrace.c'.  */
+#define FETCH_INFERIOR_REGISTERS
 
-extern char *sunpro_static_transform_name (char *);
-#define STATIC_TRANSFORM_NAME(x) sunpro_static_transform_name (x)
-#define IS_STATIC_TRANSFORM_NAME(name) ((name)[0] == '.')
+/* We can attach and detach.  */
+#define ATTACH_DETACH
 
-#define FAULTED_USE_SIGINFO
+/* The Alpha does not step over a breakpoint.  */
+#define CANNOT_STEP_BREAKPOINT 1
+
 
-#endif /* ifndef TM_I386SOL2_H */
+/* Shared library support.  */
+
+#define SVR4_SHARED_LIBS
+
+#include "solib.h"		/* Support for shared libraries. */
+#include "elf/common.h"		/* Additional ELF shared library info. */
+
+#endif /* NM_FBSD_H */

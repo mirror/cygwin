@@ -1,5 +1,5 @@
-/* Macro definitions for GDB on an Intel i386 running Solaris 2.
-   Copyright 1998, 1999, 2000 Free Software Foundation, Inc.
+/* Native definitions for alpha running OSF/1.
+   Copyright 1993, 1994, 1995, 1998, 2000 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -18,19 +18,26 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#ifndef TM_I386SOL2_H
-#define TM_I386SOL2_H 1
+/* ptrace register ``addresses'' are absolute.  */
 
-#include "i386/tm-i386.h"
+#define U_REGS_OFFSET 0
 
-/* The SunPRO compiler puts out 0 instead of the address in N_SO symbols,
-   and for SunPRO 3.0, N_FUN symbols too.  */
-#define SOFUN_ADDRESS_MAYBE_MISSING
+/* FIXME: Shouldn't the default definition in inferior.h be int* ? */
 
-extern char *sunpro_static_transform_name (char *);
-#define STATIC_TRANSFORM_NAME(x) sunpro_static_transform_name (x)
-#define IS_STATIC_TRANSFORM_NAME(name) ((name)[0] == '.')
+#define PTRACE_ARG3_TYPE int*
 
-#define FAULTED_USE_SIGINFO
+/* ptrace transfers longs, the ptrace man page is lying.  */
 
-#endif /* ifndef TM_I386SOL2_H */
+#define PTRACE_XFER_TYPE long
+
+/* The alpha does not step over a breakpoint, the manpage is lying again.  */
+
+#define CANNOT_STEP_BREAKPOINT 1
+
+/* Support for shared libraries.  */
+
+#include "solib.h"
+
+/* Given a pointer to either a gregset_t or fpregset_t, return a
+   pointer to the first register.  */
+#define ALPHA_REGSET_BASE(regsetp)     ((regsetp)->regs)

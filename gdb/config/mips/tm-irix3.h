@@ -1,6 +1,6 @@
-/* Target machine description for SGI Iris under Irix 6.x, for GDB.
-
-   Copyright 2001, 2002 Free Software Foundation, Inc.
+/* Target machine description for SGI Iris under Irix, for GDB.
+   Copyright 1990, 1991, 1992, 1993, 1995, 1999
+   Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -19,8 +19,7 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#include "mips/tm-bigmips64.h"
-#include "solib.h"
+#include "mips/tm-bigmips.h"
 
 /* Redefine register numbers for SGI. */
 
@@ -44,9 +43,9 @@
 
 #define MIPS_REGISTER_NAMES 	\
     {	"zero",	"at",	"v0",	"v1",	"a0",	"a1",	"a2",	"a3", \
-	"a4",	"a5",	"a6",	"a7",	"t0",	"t1",	"t2",	"t3", \
+	"t0",	"t1",	"t2",	"t3",	"t4",	"t5",	"t6",	"t7", \
 	"s0",	"s1",	"s2",	"s3",	"s4",	"s5",	"s6",	"s7", \
-	"t8",	"t9",	"k0",	"k1",	"gp",	"sp",	"s8",	"ra", \
+	"t8",	"t9",	"k0",	"k1",	"gp",	"sp",	"fp",	"ra", \
 	"f0",   "f1",   "f2",   "f3",   "f4",   "f5",   "f6",   "f7", \
 	"f8",   "f9",   "f10",  "f11",  "f12",  "f13",  "f14",  "f15", \
 	"f16",  "f17",  "f18",  "f19",  "f20",  "f21",  "f22",  "f23",\
@@ -70,44 +69,9 @@
 #define FCRCS_REGNUM 69		/* FP control/status */
 #define FCRIR_REGNUM 70		/* FP implementation/revision */
 
-
-#undef  REGISTER_BYTES
-#define REGISTER_BYTES (MIPS_NUMREGS * 8 + (NUM_REGS - MIPS_NUMREGS) * MIPS_REGSIZE)
-
-#undef  REGISTER_BYTE
-#define REGISTER_BYTE(N) \
-     (((N) < FP0_REGNUM) ? (N) * MIPS_REGSIZE : \
-      ((N) < FP0_REGNUM + 32) ?     \
-      FP0_REGNUM * MIPS_REGSIZE + \
-      ((N) - FP0_REGNUM) * sizeof(double) : \
-      32 * sizeof(double) + ((N) - 32) * MIPS_REGSIZE)
-
-/* The signal handler trampoline is called _sigtramp.  */
-#undef IN_SIGTRAMP
-#define IN_SIGTRAMP(pc, name) ((name) && STREQ ("_sigtramp", name))
-
 /* Offsets for register values in _sigtramp frame.
    sigcontext is immediately above the _sigtramp frame on Irix.  */
-#undef SIGFRAME_BASE
-#define SIGFRAME_BASE		0
-
-/* Irix 5 saves a full 64 bits for each register.  We skip 2 * 4 to
-   get to the saved PC (the register mask and status register are both
-   32 bits) and then another 4 to get to the lower 32 bits.  We skip
-   the same 4 bytes, plus the 8 bytes for the PC to get to the
-   registers, and add another 4 to get to the lower 32 bits.  We skip
-   8 bytes per register.  */
-#undef SIGFRAME_PC_OFF
-#define SIGFRAME_PC_OFF		(SIGFRAME_BASE + 2 * 4 + 4)
-#undef SIGFRAME_REGSAVE_OFF
-#define SIGFRAME_REGSAVE_OFF	(SIGFRAME_BASE + 2 * 4 + 8 + 4)
-#undef SIGFRAME_FPREGSAVE_OFF
-#define SIGFRAME_FPREGSAVE_OFF	(SIGFRAME_BASE + 2 * 4 + 8 + 32 * 8 + 4)
-#define SIGFRAME_REG_SIZE	8
-
-/* Select the disassembler */
-#undef TM_PRINT_INSN_MACH
-#define TM_PRINT_INSN_MACH bfd_mach_mips8000
-
-/* Undefine those methods which have been multiarched.  */
-#undef REGISTER_VIRTUAL_TYPE
+#define SIGFRAME_BASE		0x0
+#define SIGFRAME_PC_OFF		(SIGFRAME_BASE + 2 * 4)
+#define SIGFRAME_REGSAVE_OFF	(SIGFRAME_BASE + 3 * 4)
+#define SIGFRAME_FPREGSAVE_OFF	(SIGFRAME_BASE + 3 * 4 + 32 * 4 + 4)

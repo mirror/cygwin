@@ -1,5 +1,6 @@
-/* Macro definitions for GDB on an Intel i386 running Solaris 2.
-   Copyright 1998, 1999, 2000 Free Software Foundation, Inc.
+/* Native-dependent definitions for Alpha running NetBSD, for GDB.
+   Copyright 2002 Free Software Foundation, Inc.
+   Contributed by Wasabi Systems, Inc.
 
    This file is part of GDB.
 
@@ -18,19 +19,13 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#ifndef TM_I386SOL2_H
-#define TM_I386SOL2_H 1
+#ifndef NM_NBSD_H
+#define NM_NBSD_H
 
-#include "i386/tm-i386.h"
+/* Get generic NetBSD native definitions.  */
+#include "config/nm-nbsd.h"
 
-/* The SunPRO compiler puts out 0 instead of the address in N_SO symbols,
-   and for SunPRO 3.0, N_FUN symbols too.  */
-#define SOFUN_ADDRESS_MAYBE_MISSING
+/* The Alpha does not step over a breakpoint.  */
+#define CANNOT_STEP_BREAKPOINT 1
 
-extern char *sunpro_static_transform_name (char *);
-#define STATIC_TRANSFORM_NAME(x) sunpro_static_transform_name (x)
-#define IS_STATIC_TRANSFORM_NAME(name) ((name)[0] == '.')
-
-#define FAULTED_USE_SIGINFO
-
-#endif /* ifndef TM_I386SOL2_H */
+#endif /* NM_NBSD_H */

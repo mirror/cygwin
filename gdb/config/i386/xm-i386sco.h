@@ -1,5 +1,5 @@
-/* Macro definitions for GDB on an Intel i386 running Solaris 2.
-   Copyright 1998, 1999, 2000 Free Software Foundation, Inc.
+/* Macro defintions for i386, running SCO Unix System V/386 3.2.
+   Copyright 1989, 1993, 1995 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -18,19 +18,18 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#ifndef TM_I386SOL2_H
-#define TM_I386SOL2_H 1
+/* In 3.2v4 <sys/user.h> requires on <sys/dir.h>.  */
+#include <sys/types.h>
+#include <sys/dir.h>
 
-#include "i386/tm-i386.h"
+#include "i386/xm-i386v.h"
 
-/* The SunPRO compiler puts out 0 instead of the address in N_SO symbols,
-   and for SunPRO 3.0, N_FUN symbols too.  */
-#define SOFUN_ADDRESS_MAYBE_MISSING
+/* Apparently there is inconsistency among various System V's about what
+   the name of this field is.  */
+#define U_FPSTATE(u) u.u_fps.u_fpstate
 
-extern char *sunpro_static_transform_name (char *);
-#define STATIC_TRANSFORM_NAME(x) sunpro_static_transform_name (x)
-#define IS_STATIC_TRANSFORM_NAME(name) ((name)[0] == '.')
-
-#define FAULTED_USE_SIGINFO
-
-#endif /* ifndef TM_I386SOL2_H */
+/* SCO 3.2v2 and later have job control.  */
+/* SCO 3.2v4 I know has termios; I'm not sure about earlier versions.
+   GDB does not currently support the termio/job control combination.  */
+#undef HAVE_TERMIO
+#define HAVE_TERMIOS

@@ -1,6 +1,7 @@
-/* Definitions for native support of irix5.
+/* Definitions for native support of irix4.
 
-   Copyright 1993, 1996, 1998, 1999, 2000 Free Software Foundation, Inc.
+   Copyright 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1999, 2000
+   Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -19,21 +20,38 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#include "config/nm-sysv4.h"
-#undef IN_SOLIB_DYNSYM_RESOLVE_CODE
+/*
+ * Let's use /debug instead of all this dangerous mucking about
+ * with ptrace(), which seems *extremely* fragile, anyway.
+ */
+#define USE_PROC_FS
+#define CTL_PROC_NAME_FMT "/debug/%d"
+#define AS_PROC_NAME_FMT "/debug/%d"
+#define MAP_PROC_NAME_FMT "/debug/%d"
+#define STATUS_PROC_NAME_FMT "/debug/%d"
+
+/* Don't need special routines for the SGI -- we can use infptrace.c */
+#undef FETCH_INFERIOR_REGISTERS
+
+#define U_REGS_OFFSET 0
+
+/* Is this really true or is this just a leftover from a DECstation
+   config file?  */
+
+#define	ONE_PROCESS_WRITETEXT
 
 #define TARGET_HAS_HARDWARE_WATCHPOINTS
 
-/* TARGET_CAN_USE_HARDWARE_WATCHPOINT is now defined to go through
-   the target vector.  For Irix5, procfs_can_use_hw_watchpoint()
-   should be invoked.  */
+/* Temporary new watchpoint stuff */
+#define TARGET_CAN_USE_HARDWARE_WATCHPOINT(type, cnt, ot) \
+	((type) == bp_hardware_watchpoint)
 
 /* When a hardware watchpoint fires off the PC will be left at the
    instruction which caused the watchpoint.  It will be necessary for
    GDB to step over the watchpoint. */
 
 #define STOPPED_BY_WATCHPOINT(W) \
-     procfs_stopped_by_watchpoint(inferior_ptid)
+  procfs_stopped_by_watchpoint(inferior_ptid)
 extern int procfs_stopped_by_watchpoint (ptid_t);
 
 #define HAVE_NONSTEPPABLE_WATCHPOINT 1

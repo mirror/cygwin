@@ -1,3 +1,7 @@
+2002-07-01  Hans-Peter Nilsson  <hp@axis.com>
+
+	* utils-gen.scm (-gen-extract-word): Handle lsb0?.
+
 2002-06-25  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* cpu/sh64-compact.cpu (movw5): Use Correct operand field for reg.

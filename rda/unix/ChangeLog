@@ -1,5 +1,8 @@
 2004-12-02  Jim Blandy  <jimb@redhat.com>
 
+	* thread-db.c (thread_db_check_child_state): No need to call
+	lwp_pool_stop_all twice; update_thread_list stops any new threads.
+
 	* thread-db.c (thread_db_attach): Always preload the symbol list
 	with the names of the symbols RDA uses itself.
 

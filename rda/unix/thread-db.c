@@ -2204,10 +2204,7 @@ thread_db_check_child_state (struct child_process *process)
 		return 0;	/* Just a thread exit, don't tell GDB. */
 	    }
 
-	  /* It doesn't hurt to call this twice.  But if there are a
-	     lot of other threads running, then RDA is competing with
-	     them for time slices and it can take a long time for the
-	     thread list update to complete.  */
+	  /* Stop all the threads we know about.  */
 	  lwp_pool_stop_all ();
 
 	  if (thread_db_noisy)
@@ -2218,16 +2215,14 @@ thread_db_check_child_state (struct child_process *process)
 		     process->stop_signal,
 		     (unsigned long) debug_get_pc (process->serv, process->pid));
 
-	  /* Update the thread list. */
+	  /* Update the thread list, and attach to (and thereby stop)
+             any new threads we find.  */
 	  update_thread_list (process);
 
 	  process->event_thread = thread_list_lookup_by_lid (process->pid);
 
 	  /* For now, call get_thread_signals from here (FIXME:) */
 	  get_thread_signals ();
-
-	  /* Stop any new threads we've recognized.  */
-	  lwp_pool_stop_all ();
 
 	  /* If we're using the thread_db event interface, and this is
 	     a thread_db event, then just handle it silently and

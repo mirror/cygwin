@@ -1334,7 +1334,7 @@ static BOOL WINAPI (*DebugSetProcessKillOnExit)(BOOL);
 static BOOL WINAPI (*DebugActiveProcessStop)(DWORD);
 
 static int
-has_detach_ability ()
+has_detach_ability (void)
 {
   static HMODULE kernel32 = NULL;
 
@@ -1815,7 +1815,7 @@ init_child_ops (void)
 }
 
 void
-_initialize_inftarg (void)
+_initialize_win32_nat (void)
 {
   struct cmd_list_element *c;
 
@@ -1823,7 +1823,7 @@ _initialize_inftarg (void)
 
   c = add_com ("dll-symbols", class_files, dll_symbol_command,
 	       "Load dll library symbols from FILE.");
-  c->completer = filename_completer;
+  set_cmd_completer (c, filename_completer);
 
   add_com_alias ("sharedlibrary", "dll-symbols", class_alias, 1);
 

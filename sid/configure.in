@@ -39,6 +39,7 @@ else
   enable_shared=yes
 fi
 AC_SUBST(enable_shared)
+AC_SUBST(target)
 
 AC_CONFIG_SUBDIRS(include component main bsp samples demos)
 AC_OUTPUT(Makefile config/info.tcl)

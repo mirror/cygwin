@@ -3,6 +3,7 @@
 global prefix
 set prefix "@prefix@"
 set enable_shared "@enable_shared@"
+set target_alias "@target@"
 
 # pull out "--enable-targets"/"--target" settings
 global sidtarget

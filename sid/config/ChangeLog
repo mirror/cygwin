@@ -1,3 +1,11 @@
+2001-01-31  Frank Ch. Eigler  <fche@redhat.com>
+
+	* info.tcl.in (target_alias): Initialize from @target@.
+	* unix.exp: Always include info.tcl ...
+	(sidcomp_start): ... not just here.
+	(sid_find_gas,sid_find_ld,sid_find_gcc): Look for tools in sibling
+	build tree, if it's configured for a matching target.
+
 2000-12-20  Frank Ch. Eigler  <fche@redhat.com>
 
 	* libstdc++.m4 (CY_LIBSTDCXX_CHECK): Check for cygwin host, not target.

@@ -1394,7 +1394,7 @@
 							 (atlist-attrs (obj-atlist i))))))
 					  (parallel-insns insn-list)))
 			      nil)
-			  (list '(max))))
+			  (list '(-max))))
 )
 
 ; Return the enum of INSN in cpu family CPU.

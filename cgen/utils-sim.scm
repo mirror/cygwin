@@ -604,8 +604,8 @@
 		     (if (with-scache?)
 			 (if fn?
 			     (string-append " @prefix@_extract_" fmt-name " (this, current_cpu, pc, base_insn, entire_insn); goto done;\n")
-			     (string-append "goto extract_" fmt-name ";\n"))
-			 "goto done;\n")))))
+			     (string-append " goto extract_" fmt-name ";\n"))
+			 " goto done;\n")))))
 )
 
 ; Subroutine of -decode-expr-ifield-tracking.

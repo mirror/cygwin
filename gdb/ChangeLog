@@ -1,3 +1,7 @@
+2004-09-22  Jim Blandy  <jimb@redhat.com>
+
+	* dwarf2loc.c (dwarf2_evaluate_loc_desc): Fix misapplied patch.
+
 2004-09-07  Jim Blandy  <jimb@redhat.com>
 
 	* rs6000-tdep.c: #include "dwarf2expr.h".

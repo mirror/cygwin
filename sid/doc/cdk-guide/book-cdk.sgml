@@ -5,7 +5,7 @@
 <BOOK><!-- Copyright 2001 by Red Hat, Inc. --><!-- Process this file through "make normalize" before CVS operations (diff/commit). -->
 <BOOKINFO>
 <TITLE>SID Simulator Component Developer's Guide</TITLE>
-<DATE>$Date: 2001/10/15 21:01:43 $</DATE>
+<DATE>$Date: 2001/10/16 16:25:20 $</DATE>
 <PUBLISHER>
 <PUBLISHERNAME>Red Hat, Inc.</PUBLISHERNAME>
 <ADDRESS><EMAIL>sid@sources.redhat.com</EMAIL></ADDRESS>
@@ -14,10 +14,10 @@
 <YEAR>2001</YEAR>
 <HOLDER>Red Hat, Inc.</HOLDER>
 </COPYRIGHT>
-<DATE>$Date: 2001/10/15 21:01:43 $</DATE>
+<DATE>$Date: 2001/10/16 16:25:20 $</DATE>
 <LEGALNOTICE>
 <PARA><![ %HTMLONLY; [HTML edition]]> <![ %PRINTONLY; [Print edition]]>
-<LITERAL>$Date: 2001/10/15 21:01:43 $</LITERAL></PARA>
+<LITERAL>$Date: 2001/10/16 16:25:20 $</LITERAL></PARA>
 <PARA>This material may be distributed only
     subject to the terms and conditions set forth in the Open Publication
     License, V1.0 or later (the latest version is presently available at <ULINK URL="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</ULINK>).
@@ -256,7 +256,7 @@
           has a bus named "data-bus" through which it expects to
           receive read/write requests. The scenario is depicted blow.
         </PARA>
-<GRAPHIC FILEREF="images/accessor-bus.jpg"></GRAPHIC>
+<GRAPHIC FILEREF="images/accessor-bus.png" SCALE="55"></GRAPHIC>
 <PARA>    Recall that the accessor is the <EMPHASIS>sending</EMPHASIS>
           end of the connection we wish to make, and that the bus is
           the <EMPHASIS>receiving</EMPHASIS> end. Some people find the
@@ -581,7 +581,7 @@
       <FUNCTION>list_component_types</FUNCTION> must return a vector
       containing the string names of each type of component found in
       this library. These names are the same names used in the
-      configuration command language, for example: <GRAPHIC FILEREF="images/name-structure.jpg" SCALE="75"></GRAPHIC>
+      configuration command language, for example: <GRAPHIC FILEREF="images/name-structure.png" SCALE="75"></GRAPHIC>
     </PARA>
 <PARA>      The function pointed to by <FUNCTION>create_component</FUNCTION>
       takes such a component name, and should construct a component of

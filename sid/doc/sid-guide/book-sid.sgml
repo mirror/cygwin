@@ -5,7 +5,7 @@
 <BOOK><!-- Copyright 2001 by Red Hat, Inc. --><!-- Process this file through "make normalize" before CVS operations (diff/commit). -->
 <BOOKINFO>
 <TITLE>SID Simulator User's Guide</TITLE>
-<DATE>$Date: 2001/10/15 21:01:43 $</DATE>
+<DATE>$Date: 2001/10/16 16:25:21 $</DATE>
 <PUBLISHER>
 <PUBLISHERNAME>Red Hat, Inc.</PUBLISHERNAME>
 <ADDRESS><EMAIL>sid@sources.redhat.com</EMAIL></ADDRESS>
@@ -16,7 +16,7 @@
 </COPYRIGHT>
 <LEGALNOTICE>
 <PARA><![ %HTMLONLY; [HTML edition]]> <![ %PRINTONLY; [Print edition]]>
-<LITERAL>$Date: 2001/10/15 21:01:43 $</LITERAL></PARA>
+<LITERAL>$Date: 2001/10/16 16:25:21 $</LITERAL></PARA>
 <PARA>This material may be distributed only
     subject to the terms and conditions set forth in the Open Publication
     License, V1.0 or later (the latest version is presently available at <ULINK URL="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</ULINK>).
@@ -588,7 +588,7 @@
     contain a collection of related <PRODUCTNAME> SID</PRODUCTNAME>
     component types. Each component type has a unique structured name
     that describes its type of functionality. Names are typically
-    structured to describe the component's role. For example: <GRAPHIC FILEREF="images/name-structure.jpg" SCALE="75"></GRAPHIC>
+    structured to describe the component's role. For example: <GRAPHIC FILEREF="images/name-structure.png" SCALE="75"></GRAPHIC>
     </PARA>
 </LISTITEM>
 <LISTITEM>
@@ -1822,7 +1822,7 @@
     and in elf file format. The default is big-endian. Once the code is
     loaded on SID, the execution and debugging proceed in the usual
     manner.</PARA>
-<GRAPHIC FILEREF="images/sid-diagram.jpg" SCALE="55"></GRAPHIC>
+<GRAPHIC FILEREF="images/sid-diagram.png" SCALE="55"></GRAPHIC>
 <PARA></PARA>
 </SECT1>
 <SECT1>

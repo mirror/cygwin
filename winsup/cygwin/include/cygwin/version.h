@@ -1,6 +1,6 @@
 /* version.h -- Cygwin version numbers and accompanying documentation.
 
-   Copyright 1996, 1997, 1998, 1999 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -41,10 +41,10 @@ details. */
 	 the Cygwin library".  This version is used to track important
 	 changes to the DLL and is mainly informative in nature. */
 
-  /* The current cygwin version is 1.1.0 */
+  /* The current cygwin version is 1.3.6 */
 
-#define CYGWIN_VERSION_DLL_MAJOR 1001
-#define CYGWIN_VERSION_DLL_MINOR 4
+#define CYGWIN_VERSION_DLL_MAJOR 1003
+#define CYGWIN_VERSION_DLL_MINOR 5
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -58,7 +58,7 @@ details. */
 
 #define CYGWIN_VERSION_DLL_MAKE_COMBINED(maj, min) (((maj) * 1000) + min)
 #define CYGWIN_VERSION_DLL_COMBINED \
-  CYGWIN_VERSION_DLL_MAKE_COMBINED (CYGWIN_DLL_VERSION_MAJOR, CYGWIN_DLL_VERSION_MINOR)
+  CYGWIN_VERSION_DLL_MAKE_COMBINED (CYGWIN_VERSION_DLL_MAJOR, CYGWIN_VERSION_DLL_MINOR)
 
      /* Every version of cygwin <= this uses an old, incorrect method
 	to determine signal masks. */
@@ -72,13 +72,20 @@ details. */
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
   CYGWIN_VERSION_DLL_OLD_TERMIOS)
 
+#define CYGWIN_VERSION_DLL_MALLOC_ENV		28
      /* Old APIs had getc/putc macros that conflict with new CR/LF
 	handling in the stdio buffers */
 #define CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING \
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
   20)
 
+#define CYGWIN_VERSION_CHECK_FOR_S_IEXEC \
+  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) >= \
+  36)
 
+#define CYGWIN_VERSION_CHECK_FOR_OLD_O_NONBLOCK \
+  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
+  28)
      /* We used to use the DLL major/minor to track
 	non-backward-compatible interface changes to the API.  Now we
 	use an API major/minor number for this purpose. */
@@ -86,12 +93,12 @@ details. */
      /* API_MAJOR 0.0: Initial version.  API_MINOR changes:
 	1: Export cygwin32_ calls as cygwin_ as well.
 	2: Export j1, jn, y1, yn.
-        3: Export dll_noncygwin_dllcrt0.
-        4: New socket ioctls, revamped ifconf support.
-        5: Thread support/exports.
-        6: Change in termios handling.
-        7: Export scandir and alphasort.
-        8: Export _ctype_, _sys_errlist, _sys_nerr.
+	3: Export dll_noncygwin_dllcrt0.
+	4: New socket ioctls, revamped ifconf support.
+	5: Thread support/exports.
+	6: Change in termios handling.
+	7: Export scandir and alphasort.
+	8: Export _ctype_, _sys_errlist, _sys_nerr.
 	9: Mount-related changes, new cygwin_umount export.
 	   Raw device support (tape, floppies).
        10: Fast math routine support added.
@@ -107,19 +114,41 @@ details. */
        20: regsub, inet_network
        21: incompatible change to stdio cr/lf and buffering
        22: Export cygwin_logon_user, cygwin_set_impersonation_token.
-           geteuid, getegid return effective uid/gid.
-           getuid, getgid return real uid/gid.
-           seteuid, setegid set only effective uid/gid.
-           setuid, setgid set effective and real uid/gid.
+	   geteuid, getegid return effective uid/gid.
+	   getuid, getgid return real uid/gid.
+	   seteuid, setegid set only effective uid/gid.
+	   setuid, setgid set effective and real uid/gid.
        23: Export new dll_crt0 interface and cygwin_user_data for use
 	   with crt0 startup code.
        24: Export poll and _poll.
        25: Export getmode and _getmode.
        26: CW_GET_CYGDRIVE_PREFIXES addition to external.cc
+       27: CW_GETPINFO_FULL addition to external.cc
+       28: Accidentally bumped by cgf
+       29: Export hstrerror
+       30: CW_GET_CYGDRIVE_INFO addition to external.cc
+       31: Export inet_aton
+       32: Export getrlimit/setrlimit
+       33: Export setlogmask
+       34: Separated out mount table
+       35: Export drand48, erand48, jrand48, lcong48, lrand48,
+	   mrand48, nrand48, seed48, and srand48.
+       36: Added _cygwin_S_IEXEC, et al
+       37: [f]pathconv support _PC_POSIX_PERMISSIONS and _PC_POSIX_SECURITY
+       38: vscanf, vscanf_r, and random pthread functions
+       39: asctime_r, ctime_r, gmtime_r, localtime_r
+       40: fchdir
+       41: __signgam
+       42: sys_errlist, sys_nerr
+       43: sigsetjmp, siglongjmp fixed
+       44: Export dirfd
+       45: perprocess change, gamma_r, gammaf_r, lgamma_r, lgammaf_r
+       46: Remove cygwin_getshared
+       47: Report EOTWarningZoneSize in struct mtget.
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 26
+#define CYGWIN_VERSION_API_MINOR 47
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
@@ -153,6 +182,9 @@ details. */
 #define CYGWIN_INFO_CYGWIN_REGISTRY_NAME "Cygwin"
 #define CYGWIN_INFO_PROGRAM_OPTIONS_NAME "Program Options"
 #define CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME "mounts v2"
+#define CYGWIN_INFO_CYGDRIVE_FLAGS "cygdrive flags"
+#define CYGWIN_INFO_CYGDRIVE_PREFIX "cygdrive prefix"
+#define CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX "/cygdrive"
 
      /* In addition to the above version number strings, the build
 	process adds some strings that may be useful in

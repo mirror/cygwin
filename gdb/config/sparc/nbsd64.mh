@@ -1,0 +1,4 @@
+# Host: NetBSD/sparc64
+NATDEPFILES= sparc-nat.o sparc64nbsd-nat.o \
+	fork-child.o infptrace.o inftarg.o
+NAT_FILE= nm-nbsd.h

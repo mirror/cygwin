@@ -674,6 +674,8 @@ body iwidgets::Fileselectionbox::_setSelection {} {
 	    } else {
 		set selection [file join $_pwd ..]
 	    }
+	} else {
+	    set selection [file join $_pwd $selection]
 	}
 
 	#
@@ -683,6 +685,7 @@ body iwidgets::Fileselectionbox::_setSelection {} {
             regsub {^/(tmp_mnt|export)} $selection {} selection;
         }
 
+	$itk_component(selection) delete 0 end
         $itk_component(selection) insert 0 $selection
     }
 

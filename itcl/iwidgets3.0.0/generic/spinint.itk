@@ -163,33 +163,14 @@ body iwidgets::Spinint::up {} {
 	#
 	if {$val >= $min_range && $val < $max_range} {
 	    incr val $itk_option(-step)
-	    
-	    #
-	    # Re-check boundaries.
-	    #
-	    if {$val >= $min_range && $val <= $max_range} {
-		$itk_component(entry) delete 0 end
-		$itk_component(entry) insert 0 $val
-	    } else {
-		
-		#
-		# This is wrap when -step > 1.
-		#
-		if {$itk_option(-wrap)} {
-		    if {$val > $max_range} {
-			$itk_component(entry) delete 0 end
-			$itk_component(entry) insert 0 $min_range
-		    } else {
-			uplevel #0 $itk_option(-invalid)
-		    }
-		} else {
-		    uplevel #0 $itk_option(-invalid)
-		}
-	    }
-	    
+	    $itk_component(entry) delete 0 end
+	    $itk_component(entry) insert 0 $val
 	} else {
 	    if {$itk_option(-wrap)} {
-		if {$val == $max_range} {
+		if {$val >= $max_range} {
+		    $itk_component(entry) delete 0 end
+		    $itk_component(entry) insert 0 $min_range 
+		} elseif {$val < $min_range} {
 		    $itk_component(entry) delete 0 end
 		    $itk_component(entry) insert 0 $min_range 
 		} else {
@@ -227,33 +208,14 @@ body iwidgets::Spinint::down {} {
 	#
 	if {$val > $min_range && $val <= $max_range} {
 	    incr val -$itk_option(-step)
-	    
-	    #
-	    # Re-check boundaries.
-	    #
-	    if {$val >= $min_range && $val <= $max_range} {
-		$itk_component(entry) delete 0 end
-		$itk_component(entry) insert 0 $val
-	    } else {
-		
-		#
-		# This is wrap when -step > 1.
-		#
-		if {$itk_option(-wrap)} {
-		    if {$val < $min_range} {
-			$itk_component(entry) delete 0 end
-			$itk_component(entry) insert 0 $max_range
-		    } else {
-			uplevel #0 $itk_option(-invalid)
-		    }
-		} else {
-		    uplevel #0 $itk_option(-invalid)
-		}
-	    }
-	    
+	    $itk_component(entry) delete 0 end
+	    $itk_component(entry) insert 0 $val
 	} else {
 	    if {$itk_option(-wrap)} {
-		if {$val == $min_range} {
+		if {$val <= $min_range} {
+		    $itk_component(entry) delete 0 end
+		    $itk_component(entry) insert 0 $max_range
+		} elseif {$val > $max_range} {
 		    $itk_component(entry) delete 0 end
 		    $itk_component(entry) insert 0 $max_range
 		} else {

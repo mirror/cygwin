@@ -14,6 +14,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -43,7 +46,7 @@ incr c
 #
 test Messagedialog-2.$o {configuration option} {
     llength [.md configure]
-} {24}
+} {26}
 
 incr o
 
@@ -145,3 +148,6 @@ test Messagedialog-1.$c {Messagedialog construction} {
     destroy .md
     update
 } {}
+
+::tcltest::cleanupTests
+exit

@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -166,3 +169,6 @@ test Datefield-1.$c {Datefield destruction} {
     destroy .df
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

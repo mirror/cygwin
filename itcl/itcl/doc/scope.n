@@ -7,7 +7,7 @@
 '\" RCS: $Id$
 '\"
 .so man.macros
-.TH scope n "" Tcl "[incr\ Tcl]"
+.TH scope n "" itcl "[incr\ Tcl]"
 .BS
 '\" Note:  do not modify the .SH NAME line immediately below!
 .SH NAME

@@ -79,6 +79,7 @@ class iwidgets::Scrolledlistbox {
     public method sort {{mode ascending}} 
     public method xview {args} 
     public method yview {args} 
+    public method itemconfigure {args}
 
     protected method _makeSelection {} 
     protected method _dblclick {} 
@@ -154,6 +155,9 @@ body iwidgets::Scrolledlistbox::constructor {args} {
 	usual
 
 	keep -borderwidth -exportselection -relief -selectmode
+
+	# This option was added in Tk 8.3
+	catch {keep -listvariable}
 	
 	rename -font -textfont textFont Font
 	rename -background -textbackground textBackground Background
@@ -697,6 +701,16 @@ body iwidgets::Scrolledlistbox::xview {args} {
 # ------------------------------------------------------------------
 body iwidgets::Scrolledlistbox::yview {args} {
     return [eval $itk_component(listbox) yview $args]
+}
+
+# ------------------------------------------------------------------
+# METHOD: itemconfigure args
+#
+# This is a wrapper method around the new tk8.3 itemconfigure command
+# for the listbox.
+# ------------------------------------------------------------------
+body iwidgets::Scrolledlistbox::itemconfigure {args} {
+    return [eval $itk_component(listbox) itemconfigure $args]
 }
 
 # ------------------------------------------------------------------

@@ -53,6 +53,7 @@ class iwidgets::Radiobox {
 	disabledForeground DisabledForeground {}
     itk_option define -selectcolor selectColor Background {}
     itk_option define -command command Command {}
+    itk_option define -orient orient Orient vertical
 
     public {
       method add {tag args}
@@ -117,6 +118,22 @@ body iwidgets::Radiobox::constructor {args} {
 # Specifies a command to be evaluated upon change in the radiobox
 # ------------------------------------------------------------------
 configbody iwidgets::Radiobox::command {}
+
+# ------------------------------------------------------------------
+# OPTION: -orient
+#
+# Allows the user to orient the radiobuttons either horizontally
+# or vertically.
+# ------------------------------------------------------------------
+configbody iwidgets::Radiobox::orient {
+  if {$itk_option(-orient) == "horizontal" ||
+      $itk_option(-orient) == "vertical"} {
+    _rearrange
+  } else {
+    error "Bad orientation: $itk_option(-orient).  Should be\
+      \"horizontal\" or \"vertical\"."
+  }
+}
 
 # ------------------------------------------------------------------
 #                            METHODS
@@ -216,20 +233,29 @@ body iwidgets::Radiobox::insert {index tag args} {
 # ------------------------------------------------------------------
 # METHOD: _rearrange
 #
-# Rearrange the buttons in the childsite frame using
-# the grid geometry manager.
+# Rearrange the buttons in the childsite frame using the grid
+# geometry manager.  This method was modified by Chad Smith on 3/9/00
+# to take into consideration the newly added -orient config option.
 # ------------------------------------------------------------------
 body iwidgets::Radiobox::_rearrange {} {
-    set index 0
-    set master $itk_component(childsite)
-    
     if {[set count [llength $_buttons]] > 0} {
-	foreach tag $_buttons {
-	    grid configure $itk_component($tag) -row $index -sticky nw
-	    grid rowconfigure $master $index -weight 0
-	    incr index
+	if {$itk_option(-orient) == "vertical"} {
+            set row 0
+	    foreach tag $_buttons {
+	        grid configure $itk_component($tag) -col 0 -row $row -sticky nw
+	        grid rowconfigure $itk_component(childsite) $row -weight 0
+	        incr row
+	    }
+	    grid rowconfigure $itk_component(childsite) [expr $count-1] \
+	      -weight 1
+	} else {
+            set col 0
+	    foreach tag $_buttons {
+		grid configure $itk_component($tag) -col $col -row 0 -sticky nw
+	        grid columnconfigure $itk_component(childsite) $col -weight 1
+		incr col
+	    }
 	}
-	grid rowconfigure $master [expr $count-1] -weight 1
     }
 }
 

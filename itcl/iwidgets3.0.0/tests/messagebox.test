@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -177,3 +180,6 @@ test Messagebox-1.$c {Messagebox destruction} {
     destroy .mb
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

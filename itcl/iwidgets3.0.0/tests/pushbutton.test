@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -134,3 +137,6 @@ test Pushbutton-1.$c {Pushbutton destruction} {
     destroy .pb
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

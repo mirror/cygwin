@@ -80,12 +80,17 @@ class iwidgets::Hierarchy {
 
     itk_option define -alwaysquery alwaysQuery AlwaysQuery 0
     itk_option define -closedicon closedIcon Icon {}
+    itk_option define -dblclickcommand dblClickCommand Command {}
     itk_option define -expanded expanded Expanded 0 
     itk_option define -filter filter Filter 0 
     itk_option define -font font Font \
 	-*-Courier-Medium-R-Normal--*-120-*-*-*-*-*-* 
     itk_option define -height height Height 0
     itk_option define -iconcommand iconCommand Command {}
+    itk_option define -icondblcommand iconDblCommand Command {}
+    itk_option define -imagecommand imageCommand Command {}
+    itk_option define -imagedblcommand imageDblCommand Command {}
+    itk_option define -imagemenuloadcommand imageMenuLoadCommand Command {}
     itk_option define -markbackground markBackground Foreground #a0a0a0 
     itk_option define -markforeground markForeground Background Black 
     itk_option define -nodeicon nodeIcon Icon {}
@@ -94,63 +99,77 @@ class iwidgets::Hierarchy {
     itk_option define -selectcommand selectCommand Command {}
     itk_option define -selectbackground selectBackground Foreground #c3c3c3 
     itk_option define -selectforeground selectForeground Background Black 
+    itk_option define -textmenuloadcommand textMenuLoadCommand Command {}
     itk_option define -visibleitems visibleItems VisibleItems 80x24
     itk_option define -width width Width 0
 
-    public method clear {}
-    public method collapse {node}
-    public method current {}
-    public method draw {{when -now}}
-    public method expand {node}
-    public method mark {op args}
-    public method prune {node}
-    public method refresh {node}
-    public method selection {op args}
-    public method toggle {node}
+    public {
+	method clear {}
+	method collapse {node}
+	method current {}
+	method draw {{when -now}}
+	method expand {node}
+	method expanded {node}
+	method expState { }
+	method mark {op args}
+	method prune {node}
+	method refresh {node}
+	method selection {op args}
+	method toggle {node}
+	
+	method bbox {index} 
+	method compare {index1 op index2} 
+	method debug {args} {eval $args}
+	method delete {first {last {}}} 
+	method dlineinfo {index} 
+	method dump {args}
+	method get {index1 {index2 {}}} 
+	method index {index} 
+	method insert {args} 
+	method scan {option args} 
+	method search {args} 
+	method see {index} 
+	method tag {op args} 
+	method window {option args} 
+	method xview {args}
+	method yview {args}
+    }
 
-    public method bbox {index} 
-    public method compare {index1 op index2} 
-    public method debug {args} {eval $args}
-    public method delete {first {last {}}} 
-    public method dlineinfo {index} 
-    public method dump {args}
-    public method get {index1 {index2 {}}} 
-    public method index {index} 
-    public method insert {args} 
-    public method scan {option args} 
-    public method search {args} 
-    public method see {index} 
-    public method tag {op args} 
-    public method window {option args} 
-    public method xview {args}
-    public method yview {args}
-
-    protected method _contents {uid}
-    protected method _iconSelect {node icon}
-    protected method _post {x y}
-    protected method _drawLevel {node indent}
-    protected method _select {x y}
-    protected method _deselectSubNodes {uid}
-    protected method _deleteNodeInfo {uid}
-    protected method _getParent {uid}
-    protected method _getHeritage {uid}
-    protected method _isInternalTag {tag}
-
-    private variable _filterCode ""  ;# Compact view flag.
-    private variable _hcounter 0     ;# Counter for hierarchy icons
-    private variable _icons          ;# Array of user icons by uid
-    private variable _images         ;# Array of our icons by uid
-    private variable _indents        ;# Array of indentation by uid
-    private variable _marked         ;# Array of marked nodes by uid
-    private variable _markers ""     ;# List of markers for level being drawn
-    private variable _nodes          ;# List of subnodes by uid
-    private variable _pending ""     ;# Pending draw flag
-    private variable _posted ""      ;# List of tags at posted menu position
-    private variable _selected       ;# Array of selected nodes by uid
-    private variable _tags           ;# Array of user tags by uid
-    private variable _text           ;# Array of displayed text by uid
-    private variable _states         ;# Array of selection state by uid
-    private variable _ucounter 0     ;# Counter for user icons
+    protected {
+	method _contents {uid}
+	method _post {x y}
+	method _drawLevel {node indent}
+	method _select {x y}
+	method _deselectSubNodes {uid}
+	method _deleteNodeInfo {uid}
+	method _getParent {uid}
+	method _getHeritage {uid}
+	method _isInternalTag {tag}
+	method _iconSelect {node icon}
+	method _iconDblSelect {node icon}
+	method _imageSelect {node}
+	method _imageDblClick {node}
+	method _imagePost {node image type x y}
+	method _double {x y}
+    }
+    
+    private {
+	variable _filterCode ""  ;# Compact view flag.
+	variable _hcounter 0     ;# Counter for hierarchy icons
+	variable _icons          ;# Array of user icons by uid
+	variable _images         ;# Array of our icons by uid
+	variable _indents        ;# Array of indentation by uid
+	variable _marked         ;# Array of marked nodes by uid
+	variable _markers ""     ;# List of markers for level being drawn
+	variable _nodes          ;# List of subnodes by uid
+	variable _pending ""     ;# Pending draw flag
+	variable _posted ""      ;# List of tags at posted menu position
+	variable _selected       ;# Array of selected nodes by uid
+	variable _tags           ;# Array of user tags by uid
+	variable _text           ;# Array of displayed text by uid
+	variable _states         ;# Array of selection state by uid
+	variable _ucounter 0     ;# Counter for user icons
+    }
 }
 
 #
@@ -274,6 +293,9 @@ body iwidgets::Hierarchy::constructor {args} {
     
     bind $itk_component(list) <ButtonPress-1> \
             [code $this _select %x %y]
+
+    bind $itk_component(list) <Double-1> \
+            [code $this _double %x %y]
 
     bind $itk_component(list) <ButtonPress-3> \
             [code $this _post %x %y]
@@ -407,6 +429,20 @@ configbody iwidgets::Hierarchy::selectcommand {
 }
 
 # ------------------------------------------------------------------
+# OPTION: -dblclickcommand
+#
+# Command executed to double click an item in the list.  If this command
+# contains "%n", it is replaced with the name of the selected node.  
+# If it contains a "%s", it is replaced with a boolean indicator of 
+# the node's current selection status, where a value of 1 denotes
+# that the node is currently selected and 0 that it is not.
+#
+# Douglas R. Howard, Jr.
+# ------------------------------------------------------------------
+configbody iwidgets::Hierarchy::dblclickcommand {
+}
+
+# ------------------------------------------------------------------
 # OPTION: -iconcommand
 #
 # Command executed upon selection of user icons.  If this command 
@@ -415,6 +451,44 @@ configbody iwidgets::Hierarchy::selectcommand {
 # substituted.
 # ------------------------------------------------------------------
 configbody iwidgets::Hierarchy::iconcommand {
+}
+
+# ------------------------------------------------------------------
+# OPTION: -icondblcommand
+#
+# Command executed upon double selection of user icons.  If this command 
+# contains "%n", it is replaced with the name of the node the icon
+# belongs to.  Should it contain "%i" then the icon name is 
+# substituted.
+#
+# Douglas R. Howard, Jr.
+# ------------------------------------------------------------------
+configbody iwidgets::Hierarchy::icondblcommand {
+}
+
+# ------------------------------------------------------------------
+# OPTION: -imagecommand
+#
+# Command executed upon selection of image icons.  If this command 
+# contains "%n", it is replaced with the name of the node the icon
+# belongs to.  Should it contain "%i" then the icon name is 
+# substituted.
+#
+# Douglas R. Howard, Jr.
+# ------------------------------------------------------------------
+configbody iwidgets::Hierarchy::imagecommand {
+}
+
+# ------------------------------------------------------------------
+# OPTION: -imagedblcommand
+#
+# Command executed upon double selection of user icons.  If this command 
+# contains "%n", it is replaced with the name of the node the icon
+# belongs to.
+#
+# Douglas R. Howard, Jr.
+# ------------------------------------------------------------------
+configbody iwidgets::Hierarchy::imagedblcommand {
 }
 
 # ------------------------------------------------------------------
@@ -524,10 +598,8 @@ configbody iwidgets::Hierarchy::openicon {
 			0xff, 0x1f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 		}
 	    }
-
-	    set itk_option(-openicon) openFolder
 	}
-
+	set itk_option(-openicon) openFolder
     } else {
 	if {[lsearch [image names] $itk_option(-openicon)] == -1} {
 	    error "bad openicon option \"$itk_option(-openicon)\":\
@@ -582,10 +654,8 @@ configbody iwidgets::Hierarchy::closedicon {
 			0xfe, 0x7f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 		}
 	    }
-
-	    set itk_option(-closedicon) closedFolder
 	}
-
+	set itk_option(-closedicon) closedFolder
     } else {
 	if {[lsearch [image names] $itk_option(-closedicon)] == -1} {
 	    error "bad closedicon option \"$itk_option(-closedicon)\":\
@@ -640,10 +710,8 @@ configbody iwidgets::Hierarchy::nodeicon {
 			0xfe, 0x7f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 		}
 	    }
-
-	    set itk_option(-nodeicon) nodeFolder
 	}
-
+	set itk_option(-nodeicon) nodeFolder
     } else {
 	if {[lsearch [image names] $itk_option(-nodeicon)] == -1} {
 	    error "bad nodeicon option \"$itk_option(-nodeicon)\":\
@@ -759,6 +827,25 @@ configbody iwidgets::Hierarchy::visibleitems {
 		widthxheight"
     }
 }
+
+# ------------------------------------------------------------------
+# OPTION: -textmenuloadcommand
+#
+# Dynamically loads the popup menu based on what was selected.
+#
+# Douglas R. Howard, Jr.
+# ------------------------------------------------------------------
+configbody iwidgets::Hierarchy::textmenuloadcommand {}
+
+# ------------------------------------------------------------------
+# OPTION: -imagemenuloadcommand
+#
+# Dynamically loads the popup menu based on what was selected.
+#
+# Douglas R. Howard, Jr.
+# ------------------------------------------------------------------
+configbody iwidgets::Hierarchy::imagemenuloadcommand {}
+
 
 # ------------------------------------------------------------------
 #                         PUBLIC METHODS
@@ -1255,6 +1342,47 @@ body iwidgets::Hierarchy::yview {args} {
     return [eval $itk_component(list) yview $args]
 }
 
+# ----------------------------------------------------------------------
+# PUBLIC METHOD: expanded node
+#
+# Tells if a node is expanded or collapsed
+#
+# Douglas R. Howard, Jr.
+# ----------------------------------------------------------------------
+body iwidgets::Hierarchy::expanded {node} {
+    if {! [info exists _states($node)]} {
+	error "bad collapse node argument: \"$node\", the node doesn't exist"
+    }
+    
+    return $_states($node)
+}
+
+# ----------------------------------------------------------------------
+# PUBLIC METHOD: expState
+#
+# Returns a list of all expanded nodes
+#
+# Douglas R. Howard, Jr.
+# ----------------------------------------------------------------------
+body iwidgets::Hierarchy::expState {} {
+    set nodes [_contents ""]
+    set open ""
+    set i 0
+    while {1} {
+	if {[info exists _states([lindex $nodes $i])] &&
+	$_states([lindex $nodes $i])} {
+	    lappend open [lindex $nodes $i]
+	    foreach child [_contents [lindex $nodes $i]] {
+		lappend nodes $child
+	    }
+	}
+	incr i
+	if {$i >= [llength $nodes]} {break}
+    }
+    
+    return $open
+}
+
 # ------------------------------------------------------------------
 #                       PROTECTED METHODS
 # ------------------------------------------------------------------
@@ -1331,7 +1459,13 @@ body iwidgets::Hierarchy::_drawLevel {node indent} {
 	    # its expanded/collapsed state.
 	    #
 	    label $_images($child) -image $icon -background $bg 
-	    bind $_images($child) <ButtonPress-1> [code $this toggle $child]
+	    # DRH - enhanced and added features that handle image clicking,
+	    # double clicking, and right clicking behavior
+	    bind $_images($child) <ButtonPress-1> \
+	      "[code $this toggle $child]; [code $this _imageSelect $child]"
+	    bind $_images($child) <Double-1> [code $this _imageDblClick $child]
+	    bind $_images($child) <ButtonPress-3> \
+	      [code $this _imagePost $child $_images($child) $type %x %y]
 	    $itk_component(list) window create insert -window $_images($child)
 
 	    #
@@ -1351,8 +1485,14 @@ body iwidgets::Hierarchy::_drawLevel {node indent} {
 			label $wid -image $image -background $bg 
 		    }
 
+		    # DRH - this will bind events to the icons to allow
+		    # clicking, double clicking, and right clicking actions.
 		    bind $wid <ButtonPress-1> \
-			[code $this _iconSelect $child $image]
+			    [code $this _iconSelect $child $image]
+		    bind $wid <Double-1> \
+			    [code $this _iconDblSelect $child $image]
+		    bind $wid <ButtonPress-3> \
+			    [code $this _imagePost $child $wid $type %x %y]
 		    $itk_component(list) window create insert -window $wid
 		}
 	    }
@@ -1508,10 +1648,48 @@ body iwidgets::Hierarchy::_post {x y} {
     # If we have tags then do the popup at this position.
     #
     if {$_posted != {}} {
+	# DRH - here is where the user's function for dynamic popup
+	# menu loading is done, if the user has specified to do so with the
+	# "-textmenuloadcommand"
+	if {$itk_option(-textmenuloadcommand) != {}} {
+	    eval $itk_option(-textmenuloadcommand)
+	}
 	tk_popup $itk_component(itemMenu) $rx $ry
     } else {
 	tk_popup $itk_component(bgMenu) $rx $ry
     }
+}
+
+# ----------------------------------------------------------------------
+# PROTECTED METHOD: _imagePost node image type x y
+#
+# Used internally to post the popup menu at the coordinate (x,y)
+# relative to the widget.  If (x,y) is on an image, then the itemMenu
+# component is posted.
+#
+# Douglas R. Howard, Jr.
+# ----------------------------------------------------------------------
+body iwidgets::Hierarchy::_imagePost {node image type x y} {
+    set rx [expr [winfo rootx $image]+$x]
+    set ry [expr [winfo rooty $image]+$y]
+
+    #
+    # The posted variable will hold the list of tags which exist at
+    # this x,y position that will be passed back to the user.  They
+    # don't need to know about our internal tags, info, hilite, and
+    # lowlite, so remove them from the list.
+    # 
+    set _posted {}
+
+    lappend _posted $node $type
+
+    #
+    # If we have tags then do the popup at this position.
+    #
+    if {$itk_option(-imagemenuloadcommand) != {}} {
+	eval $itk_option(-imagemenuloadcommand)
+    }
+    tk_popup $itk_component(itemMenu) $rx $ry
 }
 
 # ----------------------------------------------------------------------
@@ -1551,10 +1729,50 @@ body iwidgets::Hierarchy::_select {x y} {
 }
 
 # ----------------------------------------------------------------------
+# PROTECTED METHOD: _double x y
+#
+# Used internally to double click an item at the coordinate (x,y) relative 
+# to the widget.  The command associated with the -dblclickcommand
+# option is execute following % character substitutions.  If %n
+# appears in the command, the selected node is substituted.  If %s
+# appears, a boolean value representing the current selection state
+# will be substituted.
+#
+# Douglas R. Howard, Jr.
+# ----------------------------------------------------------------------
+body iwidgets::Hierarchy::_double {x y} {
+    if {$itk_option(-dblclickcommand) != {}} {
+	if {[set seltags [$itk_component(list) tag names @$x,$y]] != {}} {
+	    foreach tag $seltags {
+		if {![_isInternalTag $tag]} {
+		    lappend node $tag
+		}
+	    }
+
+	    if {[lsearch $seltags "hilite"] == -1} {
+		set selectstatus 0
+	    } else {
+		set selectstatus 1
+	    }
+
+	    set cmd $itk_option(-dblclickcommand)
+	    regsub -all {%n} $cmd [list $node] cmd
+	    regsub -all {%s} $cmd [list $selectstatus] cmd
+
+	    uplevel #0 $cmd
+	}
+    }
+
+    return
+}
+
+# ----------------------------------------------------------------------
 # PROTECTED METHOD: _iconSelect node icon
 #
 # Used internally to upon selection of user icons.  The -iconcommand
 # is executed after substitution of the node for %n and icon for %i.
+#
+# Douglas R. Howard, Jr.
 # ----------------------------------------------------------------------
 body iwidgets::Hierarchy::_iconSelect {node icon} {
     set cmd $itk_option(-iconcommand)
@@ -1563,6 +1781,62 @@ body iwidgets::Hierarchy::_iconSelect {node icon} {
 
     uplevel \#0 $cmd
 
+    return {}
+}
+
+# ----------------------------------------------------------------------
+# PROTECTED METHOD: _iconDblSelect node icon
+#
+# Used internally to upon double selection of user icons.  The 
+# -icondblcommand is executed after substitution of the node for %n and 
+# icon for %i.
+#
+# Douglas R. Howard, Jr.
+# ----------------------------------------------------------------------
+body iwidgets::Hierarchy::_iconDblSelect {node icon} {
+    if {$itk_option(-icondblcommand) != {}} {
+	set cmd $itk_option(-icondblcommand)
+	regsub -all {%n} $cmd [list $node] cmd
+	regsub -all {%i} $cmd [list $icon] cmd
+	
+	uplevel \#0 $cmd
+    }
+    return {}
+}
+
+# ----------------------------------------------------------------------
+# PROTECTED METHOD: _imageSelect node icon
+#
+# Used internally to upon selection of user icons.  The -imagecommand
+# is executed after substitution of the node for %n.
+#
+# Douglas R. Howard, Jr.
+# ----------------------------------------------------------------------
+body iwidgets::Hierarchy::_imageSelect {node} {
+    if {$itk_option(-imagecommand) != {}} {
+	set cmd $itk_option(-imagecommand)
+	regsub -all {%n} $cmd [list $node] cmd
+	
+	uplevel \#0 $cmd
+    }
+    return {}
+}
+
+# ----------------------------------------------------------------------
+# PROTECTED METHOD: _imageDblClick node
+#
+# Used internally to upon double selection of images.  The 
+# -imagedblcommand is executed.
+#
+# Douglas R. Howard, Jr.
+# ----------------------------------------------------------------------
+body iwidgets::Hierarchy::_imageDblClick {node} {
+    if {$itk_option(-imagedblcommand) != {}} {
+	set cmd $itk_option(-imagedblcommand)
+	regsub -all {%n} $cmd [list $node] cmd
+	
+	uplevel \#0 $cmd
+    }
     return {}
 }
 

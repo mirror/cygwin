@@ -261,9 +261,8 @@ configbody iwidgets::Hyperhelp::title {
 # Set location of help files
 # ------------------------------------------------------------------
 configbody iwidgets::Hyperhelp::helpdir {
-    if {[string index [file dirname $itk_option(-helpdir)] 0] != "/" && \
-        [string index [file dirname $itk_option(-helpdir)] 0] != "~"} {
-      configure -helpdir [pwd]/$itk_option(-helpdir)
+    if {[file pathtype $itk_option(-helpdir)] == "relative"} {
+      configure -helpdir [file join [pwd] $itk_option(-helpdir)]
     } else {
       set _history {}
       set _history_len 0

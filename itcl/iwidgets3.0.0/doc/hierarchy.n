@@ -78,6 +78,17 @@ provided, then a folder icon will be generated, pixmap if possible,
 bitmap otherwise.
 .LP
 .nf
+Name:	\fBdblClickCommand\fR
+Class:	\fBCommand\fR
+Command-Line Switch:	\fB-dblclickcommand\fR
+.fi
+.IP
+Specifies a command to be executed upon user double clicking via mouse button
+one of the text label of an entry. If this command contains "%n", it is
+replaced with the name of the selected node. Should it contain "%s" then a
+boolean indicator of the node's current selection status is substituted.
+.LP
+.nf
 Name:	\fBexpanded\fR
 Class:	\fBExpanded\fR
 Command-Line Switch:	\fB-expanded\fR
@@ -122,6 +133,48 @@ one of any additional icons given in the values returned by the command
 associated with the -querycommand option.  If this command contains "%n", 
 it is replaced with the name of the node the icon belongs to.  Should it 
 contain "%i" then the icon name is  substituted.
+.LP
+.nf
+Name:	\fBiconDblCommand\fR
+Class:	\fBCommand\fR
+Command-Line Switch:	\fB-icondblcommand\fR
+.fi
+.IP
+Specifies a command to be executed upon user double clicking via mouse button
+one of the icon of an entry. If this command contains "%n", it is replaced
+with the name of the node the icon belongs to. Should it contain "%i" then
+the icon name is substituted.
+.LP
+.nf
+Name:	\fBimageCommand\fR
+Class:	\fBCommand\fR
+Command-Line Switch:	\fB-imagecommand\fR
+.fi
+.IP
+Specifies a command to be executed upon user selecting an image of an entry.
+If this command contains "%n", it is replaced with the name of the selected
+node. Should it contain "%s" then a boolean indicator of the node's current
+selection status is substituted.
+.LP
+.nf
+Name:	\fBimageDblCommand\fR
+Class:	\fBCommand\fR
+Command-Line Switch:	\fB-imagedblcommand\fR
+.fi
+.IP
+Specifies a command to be executed upon user double clicking via mouse button
+one of the image of an entry. If this command contains "%n", it is replaced
+with the name of the node the icon belongs to. Should it contain "%i" then
+the icon name is substituted.
+.LP
+.nf
+Name:	\fBimageMenuLoadCommand\fR
+Class:	\fBCommand\fR
+Command-Line Switch:	\fB-imagemenuloadcommand\fR
+.fi
+.IP
+Specifies a command to be executed upon user selection via mouse button three,
+on the image or icon, that will dynamically load the itemMenu for the widget.
 .LP
 .nf
 Name:	\fBmarkBackground\fR
@@ -263,6 +316,15 @@ Command-Line Switch:	\fB-textfont\fR
 Specifies the font to be used in the text portion of the hierarchy.
 .LP
 .nf
+Name:	\fBtextMenuLoadCommand\fR
+Class:	\fBCommand\fR
+Command-Line Switch:	\fB-textmenuloadcommand\fR
+.fi
+.IP
+Specifies a command to be executed upon user selection via mouse button three,
+that will dynamically load the itemMenu for the widget.
+.LP
+.nf
 Name:	\fBvisibleitems\fR
 Class:	\fBVisibleItems\fR
 Command-Line Switch:	\fB-visibleitems\fR
@@ -308,6 +370,8 @@ the height causes the value given for the visibleitems option
 to be applied which administers geometry constraints in a different
 manner.  The default width is zero.
 .LP
+
+
 .BE
 
 .SH DESCRIPTION
@@ -395,6 +459,13 @@ or -eventually where the latter means the draw can be performed after idle.
 Expands the hierarchy beneath the node with the specified unique id by
 one level.  Since this can take a moment for large hierarchies, the cursor 
 will be changed to a watch during the expansion.
+.TP
+\fIpathName \fBexpanded\fR \fIuid\fR
+Returns the current state of expansion for the node with the specified unique
+id.
+.TP
+\fIpathName \fBexpState\fR
+Returns a list of all expanded nodes in the tree.
 .TP
 \fIpathName \fBmark\fR \fIoption ?arg arg ...?\fR
 This command is used to manipulate marks which is quite similar to 

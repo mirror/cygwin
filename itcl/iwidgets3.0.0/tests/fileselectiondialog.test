@@ -14,6 +14,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -201,3 +204,6 @@ test Fileselectiondialog-1.$o {Fileselectiondialog -childsitepos} {
     update
     destroy .fsd
 } {}
+
+::tcltest::cleanupTests
+exit

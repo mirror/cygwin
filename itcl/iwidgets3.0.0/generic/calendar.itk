@@ -378,7 +378,7 @@ configbody iwidgets::Calendar::buttonforeground {
 		    -foreground $itk_option(-buttonforeground)
 	    }
 	} else {
-	    $itk_option(-forwardimage) configure \
+	    $itk_component(forward) configure \
 		    -foreground $itk_option(-buttonforeground)
 	}
 	
@@ -388,7 +388,7 @@ configbody iwidgets::Calendar::buttonforeground {
 		    -foreground $itk_option(-buttonforeground)
 	    }
 	} else {
-	    $itk_option(-backwardimage) configure \
+	    $itk_component(-backward) configure \
 		    -foreground $itk_option(-buttonforeground)
 	}
     }
@@ -890,7 +890,7 @@ body iwidgets::Calendar::_select {date_} {
 	    -width $itk_option(-selectthickness)
         $itk_component(page) raise $date-sensor
     } else {
-        set $_time $time
+        set _time $time
         _redraw 
     }
 }

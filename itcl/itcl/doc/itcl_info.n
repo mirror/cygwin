@@ -22,7 +22,7 @@ itcl_info \- query info regarding classes and objects (obsolete)
 .PP
 This command is considered obsolete, but is retained for
 backward-compatibility with earlier versions of \fB[incr\ Tcl]\fR.
-It has been replaced by the "\fBinfo classes\fR" and "\fBinfo objects\fR"
+It has been replaced by the "\fBfind classes\fR" and "\fBfind objects\fR"
 commands, which should be used for any new development.
 
 .PP

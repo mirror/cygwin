@@ -578,6 +578,9 @@ body iwidgets::Toolbar::_resetBalloonTimer {} {
 #
 # -------------------------------------------------------------
 body iwidgets::Toolbar::_startBalloonDelay {window} {
+    if {$_balloonAfterID != 0} {
+	after cancel $_balloonAfterID
+    }
     set _balloonAfterID [after $_balloonTimer [code $this showBalloon $window]]
 }
 

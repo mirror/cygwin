@@ -81,6 +81,7 @@ class iwidgets::Scrolledtext {
     public method delete {first {last {}}} 
     public method dlineinfo {index} 
     public method get {index1 {index2 {}}} 
+    public method image {option args}
     public method index {index} 
     public method insert {args} 
     public method mark {option args} 
@@ -392,6 +393,17 @@ body iwidgets::Scrolledtext::get {index1 {index2 {}}} {
 }
 
 # ------------------------------------------------------------------
+# METHOD image option ?arg arg ...?
+#
+# Manipulate images dependent on options.
+#
+# ------------------------------------------------------------------
+body iwidgets::Scrolledtext::image {option args} {
+  return [eval $itk_component(text) image $option $args]
+}
+
+
+# ------------------------------------------------------------------
 # METHOD index index
 #
 # Return position corresponding to index.
@@ -433,7 +445,14 @@ body iwidgets::Scrolledtext::scan {option args} {
 # Searches the text for characters matching a pattern.
 # ------------------------------------------------------------------
 body iwidgets::Scrolledtext::search {args} {
-    return [eval $itk_component(text) search $args]
+    #-----------------------------------------------------------
+    # BUG FIX: csmith (Chad Smith: csmith@adc.com), 11/18/99
+    #-----------------------------------------------------------
+    # Need to run this command up one level on the stack since
+    # the text widget may modify one of the arguments, which is
+    # the case when -count is specified.
+    #-----------------------------------------------------------
+    return [uplevel eval $itk_component(text) search $args]
 }
 
 # ------------------------------------------------------------------

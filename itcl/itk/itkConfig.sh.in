@@ -27,6 +27,23 @@ ITK_BUILD_LIB_SPEC='@ITK_BUILD_LIB_SPEC@'
 # installed directory.
 ITK_LIB_SPEC='@ITK_LIB_SPEC@'
 
+# Path to the library name. Used for dependencies.
+ITK_LIB_FULL_PATH='@ITK_LIB_FULL_PATH@'
+
+# The name of the Itk stub library
+ITK_STUB_LIB_FILE=@ITK_STUB_LIB_FILE@
+
+# String to pass to linker to pick up the Itcl stub library from its
+# build directory.
+ITK_BUILD_STUB_LIB_SPEC='@ITK_BUILD_STUB_LIB_SPEC@'
+
+# String to pass to linker to pick up the Itcl stub library from its
+# installed directory.
+ITK_STUB_LIB_SPEC='@ITK_STUB_LIB_SPEC@'
+
+# Full path to itcl library for dependency checking.
+ITK_STUB_LIB_FULL_PATH='@ITK_STUB_LIB_FULL_PATH@'
+
 # Location of the top-level source directories from which [incr Tk]
 # was built.  This is the directory that contains a README file as well
 # as subdirectories such as generic, unix, etc.  If [incr Tk] was
@@ -34,6 +51,3 @@ ITK_LIB_SPEC='@ITK_LIB_SPEC@'
 # files, this points to the location of the sources, not the location
 # where [incr Tk] was compiled.
 ITK_SRC_DIR='@ITK_SRC_DIR@'
-
-# Path to the library name. Used for dependencies.
-ITK_LIB_FULL_PATH='@ITK_LIB_FULL_PATH@'

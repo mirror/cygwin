@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -78,7 +81,7 @@ incr c
 #
 test Hierarchy-2.$o {configuration option} {
     llength [.h configure]
-} {51}
+} {57}
 
 incr o
 
@@ -279,3 +282,6 @@ test Hierarchy-1.$c {Hierarchy destruction} {
 } {}
 
 cd $cdir
+
+::tcltest::cleanupTests
+exit

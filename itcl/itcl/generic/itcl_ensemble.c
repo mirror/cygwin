@@ -1690,19 +1690,19 @@ Itcl_EnsembleCmd(clientData, interp, objc, objv)
 
     if (objc == 3) {
       /* CYGNUS LOCAL - fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0
-        status = Tcl_EvalObj(ensInfo->parser, objv[2]);
-#else
+#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
         status = Tcl_EvalObj(ensInfo->parser, objv[2], 0);
+#else
+        status = Tcl_EvalObj(ensInfo->parser, objv[2]);
 #endif
     }
     else if (objc > 3) {
         objPtr = Tcl_NewListObj(objc-2, objv+2);
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0
-        status = Tcl_EvalObj(ensInfo->parser, objPtr);
-#else
-	Tcl_IncrRefCount(objPtr);
+        Tcl_IncrRefCount(objPtr);  /* stop Eval trashing it */
+#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
         status = Tcl_EvalObj(ensInfo->parser, objPtr, 0);
+#else
+        status = Tcl_EvalObj(ensInfo->parser, objPtr);
 #endif
 	/* END CYGNUS LOCAL */
         Tcl_DecrRefCount(objPtr);  /* we're done with the object */
@@ -2114,6 +2114,7 @@ DupEnsInvocInternalRep(srcPtr, copyPtr)
 
     if (prevArgObj) {
         objPtr = Tcl_DuplicateObj(prevArgObj);
+        Tcl_IncrRefCount(objPtr);
         copyPtr->internalRep.twoPtrValue.ptr2 = (VOID *) objPtr;
     }
 }
@@ -2165,7 +2166,7 @@ SetEnsInvocFromAny(interp, objPtr)
      *  keep the string around as if it were the command line
      *  invocation.
      */
-    argObj = Tcl_NewStringObj(name, -1);
+    argObj = Tcl_NewStringObj(name, length);
 
     /*
      *  Free the old representation and install a new one.

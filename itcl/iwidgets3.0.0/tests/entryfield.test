@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -43,7 +46,7 @@ incr c
 #
 test Entryfield-2.$o {configuration option} {
     llength [.ef configure]
-} {38}
+} {39}
 
 incr o
 
@@ -85,6 +88,7 @@ foreach test {
     {-labelpos s s} 
     {-labelpos sw sw} 
     {-labeltext Label Label} 
+    {-pasting 1 1} 
     {-relief raised raised} 
     {-relief sunken sunken} 
     {-state disabled disabled} 
@@ -170,3 +174,6 @@ test Entryfield-1.$c {Entryfield destruction} {
     destroy .ef
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

@@ -45,10 +45,42 @@ namespace eval ::itk {\n\
         variable library\n\
         variable version\n\
         rename _find_init {}\n\
-        tcl_findLibrary itk 3.0 {} itk.tcl ITK_LIBRARY ::itk::library {} {} itcl\n\
-   }\n\
+        if {[info exists library]} {\n\
+            lappend dirs $library\n\
+        } else {\n\
+            if {[catch {uplevel #0 source -rsrc itk}] == 0} {\n\
+                return\n\
+            }\n\
+            set dirs {}\n\
+            if {[info exists env(ITK_LIBRARY)]} {\n\
+                lappend dirs $env(ITK_LIBRARY)\n\
+            }\n\
+            lappend dirs [file join [file dirname $tcl_library] itk$version]\n\
+            set bindir [file dirname [info nameofexecutable]]\n\
+            lappend dirs [file join $bindir .. lib itk$version]\n\
+            lappend dirs [file join $bindir .. library]\n\
+            lappend dirs [file join $bindir .. .. library]\n\
+            lappend dirs [file join $bindir .. .. itk library]\n\
+        }\n\
+        foreach i $dirs {\n\
+            set library $i\n\
+            set itkfile [file join $i itk.tcl]\n\
+            if {![catch {uplevel #0 [list source $itkfile]} msg]} {\n\
+                return\n\
+            }\n\
+        }\n\
+        set msg \"Can't find a usable itk.tcl in the following directories:\n\"\n\
+        append msg \"    $dirs\n\"\n\
+        append msg \"This probably means that Itcl/Itk weren't installed properly.\n\"\n\
+        append msg \"If you know where the Itk library directory was installed,\n\"\n\
+        append msg \"you can set the environment variable ITK_LIBRARY to point\n\"\n\
+        append msg \"to the library directory.\n\"\n\
+        error $msg\n\
+    }\n\
     _find_init\n\
 }";
+
+extern ItkStubs itkStubs;
 
 
 /*
@@ -71,23 +103,16 @@ Initialize(interp)
     Tcl_Namespace *itkNs, *parserNs;
     ClientData parserInfo;
 
-    if (Tcl_PkgRequire(interp, "Tk", TK_VERSION, 0) == NULL) {
+    if (Tcl_InitStubs(interp, "8.1", 0) == NULL) {
 	return TCL_ERROR;
-    }
-    if (Tcl_PkgRequire(interp, "Itcl", ITCL_VERSION, 0) == NULL) {
+    };
+    if (Tk_InitStubs(interp, "8.1", 0) == NULL) {
+	return TCL_ERROR;
+    };
+    if (Itcl_InitStubs(interp, ITCL_VERSION, 0) == NULL) {
 	return TCL_ERROR;
     }
 
-    /*
-     *  Install [incr Tk] facilities if not already installed.
-     */
-    itkNs = Tcl_FindNamespace(interp, "::itk", (Tcl_Namespace*)NULL,
-        /* flags */ 0);
-
-    if (itkNs) {
-        Tcl_SetResult(interp, "already installed: [incr Tk]", TCL_STATIC);
-        return TCL_ERROR;
-    }
 
     /*
      *  Add the "itk_option" ensemble to the itcl class definition parser.
@@ -130,12 +155,20 @@ Initialize(interp)
     }
 
     /*
-     *  Create the "itk" namespace.  Export all the commands in
-     *  the namespace so that they can be imported by a command
-     *  such as "namespace import itk::*"
+     *  Install [incr Tk] facilities if not already installed.
      */
-    itkNs = Tcl_CreateNamespace(interp, "::itk",
-        (ClientData)NULL, (Tcl_NamespaceDeleteProc*)NULL);
+    itkNs = Tcl_FindNamespace(interp, "::itk", (Tcl_Namespace*)NULL,
+        /* flags */ 0);
+
+    if (itkNs == NULL) {
+	/*
+	 *  Create the "itk" namespace.  Export all the commands in
+	 *  the namespace so that they can be imported by a command
+	 *  such as "namespace import itk::*"
+	 */
+	itkNs = Tcl_CreateNamespace(interp, "::itk",
+	    (ClientData)NULL, (Tcl_NamespaceDeleteProc*)NULL);
+    }
 
     if (!itkNs ||
         Tcl_Export(interp, itkNs, "*", /* resetListFirst */ 1) != TCL_OK) {
@@ -162,7 +195,8 @@ Initialize(interp)
     /*
      *  Signal that the package has been loaded.
      */
-    if (Tcl_PkgProvide(interp, "Itk", ITCL_VERSION) != TCL_OK) {
+    if (Tcl_PkgProvideEx(interp, "Itk", ITCL_VERSION,
+            (ClientData) &itkStubs) != TCL_OK) {
 	return TCL_ERROR;
     }
     return TCL_OK;

@@ -251,7 +251,7 @@ body ::iwidgets::Finddialog::clear {} {
     }
 
     if {$itk_option(-clearcommand) != {}} {
-	$itk_option(-clearcommand)
+	eval $itk_option(-clearcommand)
     }
 }
 
@@ -423,7 +423,7 @@ body ::iwidgets::Finddialog::find {} {
     # If a match command is defined, then call it with the match point.
     #
     if {$itk_option(-matchcommand) != {}} {
-	$itk_option(-matchcommand) $matchPoint
+	[subst $itk_option(-matchcommand)] $matchPoint
     }
 
     #

@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -43,7 +46,7 @@ incr c
 #
 test Scrolledlistbox-2.$o {configuration option} {
     llength [.slb configure]
-} {38}
+} {39}
 
 incr o
 
@@ -198,3 +201,6 @@ test Scrolledlistbox-1.$c {Scrolledlistbox destruction} {
     destroy .slb
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

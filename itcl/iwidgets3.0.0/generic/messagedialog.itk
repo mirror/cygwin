@@ -39,6 +39,7 @@
 #
 itk::usual Messagedialog {
     keep -background -cursor -font -foreground -modality
+    keep -wraplength -justify
 }
 
 # ------------------------------------------------------------------
@@ -88,6 +89,7 @@ body iwidgets::Messagedialog::constructor {args} {
 	label $itk_interior.message
     } {
 	keep -background -cursor -font -foreground -text 
+	keep -wraplength -justify
 
 	rename -padx -textpadx textPadX Pad
 	rename -pady -textpady textPadY Pad

@@ -109,8 +109,6 @@ class iwidgets::Menubar {
 	method path { args } { }
 	method type { path } { }
 	method yposition { entryPath } { }
-
-	method _helpHandler { menuPath } { }
     }
 
     private {
@@ -121,6 +119,7 @@ class iwidgets::Menubar {
 	method radiobutton { radName args } { }
 	method separator { sepName args } { }
 	method cascade { casName args } { }
+	method _helpHandler { menuPath } { }
 	method _addMenuButton { buttonName args} { }
 	method _insertMenuButton { beforeMenuPath buttonName args} { }
 	method _makeMenuButton {buttonName args} { }
@@ -2114,7 +2113,7 @@ body iwidgets::Menubar::_getSymbolicPath { parent segment } {
 
 # -------------------------------------------------------------
 # 
-# PROTECTED METHOD: _helpHandler
+# PRIVATE METHOD: _helpHandler
 #
 # Bound to the <Motion> event on a menu pane. This puts the
 # help string associated with the menu entry into the 
@@ -2207,7 +2206,12 @@ body iwidgets::Menubar::_getCallerLevel { } {
 # in frames.  Since our menubuttons are within the Menubar class, the
 # default proc won't find them during menu traversal.  This proc
 # redefines the default proc to remedy the problem.
-#
+#-----------------------------------------------------------
+# BUG FIX: csmith (Chad Smith: csmith@adc.com), 3/30/99
+#-----------------------------------------------------------
+# The line, "set qchild ..." below had a typo.  It should be
+# "info command $child" instead of "winfo command $child".
+#-----------------------------------------------------------
 proc tkMenuFind {w char} {
     global tkPriv
     set char [string tolower $char]
@@ -2215,7 +2219,7 @@ proc tkMenuFind {w char} {
     foreach child [winfo child $w] {
 	switch [winfo class $child] {
 	    Menubutton {
-		set qchild [winfo command $child]
+		set qchild [info command $child]
 		set char2 [string index [$qchild cget -text] \
 			[$qchild cget -underline]]
 		if {([string compare $char [string tolower $char2]] == 0)

@@ -151,7 +151,7 @@ configbody iwidgets::Panedwindow::orient {
     if {$_initialized} {
 	switch $itk_option(-orient) {
 	    vertical {
-		for {set i 1} {$i < [llength $_panes]} {incr i} {
+		for {set i 1} {$i < [llength $_activePanes]} {incr i} {
 		    bind $itk_component(sash$i) <Button-1> \
 			    [code $this _startGrip %x $i]
 		    bind $itk_component(sash$i) <B1-Motion> \
@@ -168,7 +168,7 @@ configbody iwidgets::Panedwindow::orient {
 	    }
 	    
 	    horizontal {
-		for {set i 1} {$i < [llength $_panes]} {incr i} {
+		for {set i 1} {$i < [llength $_activePanes]} {incr i} {
 		    bind $itk_component(sash$i) <Button-1> \
 			    [code $this _startGrip %y $i]
 		    bind $itk_component(sash$i) <B1-Motion> \
@@ -204,7 +204,7 @@ configbody iwidgets::Panedwindow::sashborderwidth {
     set itk_option(-sashborderwidth) $pixels
     
     if {$_initialized} {
-	for {set i 1} {$i < [llength $_panes]} {incr i} {
+	for {set i 1} {$i < [llength $_activePanes]} {incr i} {
 	    $itk_component(sash$i) configure \
 		    -borderwidth $itk_option(-sashborderwidth)
 	}
@@ -218,9 +218,8 @@ configbody iwidgets::Panedwindow::sashborderwidth {
 # ------------------------------------------------------------------
 configbody iwidgets::Panedwindow::sashcursor {
     if {$_initialized} {
-	for {set i 1} {$i < [llength $_panes]} {incr i} {
-	    $itk_component(sash$i) configure \
-		    -cursor $itk_option(-sashcursor)
+	for {set i 1} {$i < [llength $_activePanes]} {incr i} {
+	    $itk_component(sash$i) configure -cursor $itk_option(-sashcursor)
 	}
     }
 }
@@ -236,7 +235,7 @@ configbody iwidgets::Panedwindow::sashwidth {
     set itk_option(-sashwidth) $pixels
     
     if {$_initialized} {
-	for {set i 1} {$i < [llength $_panes]} {incr i} {
+	for {set i 1} {$i < [llength $_activePanes]} {incr i} {
 	    $itk_component(sash$i) configure \
 		    -width $itk_option(-sashwidth)
 	}
@@ -254,7 +253,7 @@ configbody iwidgets::Panedwindow::sashheight {
     set itk_option(-sashheight) $pixels
     
     if {$_initialized} {
-	for {set i 1} {$i < [llength $_panes]} {incr i} {
+	for {set i 1} {$i < [llength $_activePanes]} {incr i} {
 	    $itk_component(sash$i) configure \
 		    -height $itk_option(-sashheight)
 	}
@@ -274,7 +273,7 @@ configbody iwidgets::Panedwindow::thickness {
     set itk_option(-thickness) $pixels
     
     if {$_initialized} {
-	for {set i 1} {$i < [llength $_panes]} {incr i} {
+	for {set i 1} {$i < [llength $_activePanes]} {incr i} {
 	    $itk_component(separator$i) configure \
 		    -height $itk_option(-thickness)
 	    $itk_component(separator$i) configure \
@@ -283,7 +282,7 @@ configbody iwidgets::Panedwindow::thickness {
 		    -borderwidth [expr $itk_option(-thickness) / 2]
 	}
 	
-	for {set i 1} {$i < [llength $_panes]} {incr i} {
+	for {set i 1} {$i < [llength $_activePanes]} {incr i} {
 	    _placeSash $i
 	}
     }
@@ -304,7 +303,7 @@ configbody iwidgets::Panedwindow::sashindent {
     set itk_option(-sashindent) $pixels
     
     if {$_initialized} {
-	for {set i 1} {$i < [llength $_panes]} {incr i} {
+	for {set i 1} {$i < [llength $_activePanes]} {incr i} {
 	    _placeSash $i
 	}
     }

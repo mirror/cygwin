@@ -841,6 +841,10 @@ Itcl_BiInfoClassCmd(dummy, interp, objc, objv)
      */
     if (contextObj) {
         contextNs = contextObj->classDefn->namesp;
+    } else {
+      assert(contextClass != NULL);
+      assert(contextClass->namesp != NULL);
+      contextNs = contextClass->namesp;
     }
 
     if (contextNs->parentPtr == activeNs) {

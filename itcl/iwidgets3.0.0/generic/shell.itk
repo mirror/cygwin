@@ -240,8 +240,8 @@ body iwidgets::Shell::activate {} {
     } 
 
     set _wait($this) 0
-    wm deiconify $itk_component(hull)
     raise $itk_component(hull)
+    wm deiconify $itk_component(hull)
     tkwait visibility $itk_component(hull)
     
     if {$itk_option(-modality) == "application"} {

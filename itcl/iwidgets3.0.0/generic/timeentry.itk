@@ -394,6 +394,5 @@ body iwidgets::Timeentry::_releaseGrab {} {
     grab release $itk_component(popup)
     $itk_component(iconbutton) configure -relief raised
     destroy $itk_component(popup) 
-    unset itk_component(popup)
     bind $itk_component(iconbutton) <Button-1> [code $this _popup]
 }

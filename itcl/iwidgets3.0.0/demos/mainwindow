@@ -9,6 +9,7 @@ package require Iwidgets 3.0
 #
 # Demo script for the Mainwindow class
 #
+wm withdraw .
 iwidgets::mainwindow .mw
 
 set imagedir [file join ${iwidgets::library} demos images]
@@ -33,7 +34,7 @@ set imagedir [file join ${iwidgets::library} demos images]
 	       -helpstr "Close the file"
 	   separator sep2
 	   command exit -label "Exit" -underline 1 \
-	       -helpstr "Exit this application" -command ::exit
+	       -helpstr "Exit this application" 
     }
 
 #
@@ -78,39 +79,39 @@ set imagedir [file join ${iwidgets::library} demos images]
 .mw toolbar add frame filler1 -width 108 -relief raised -borderwidth 2
 
 .mw toolbar add button new \
-    -image [image create photo new-img -file [file join $imagedir new.gif]] \
+    -image [image create photo -file [file join $imagedir new.gif]] \
     -helpstr "Create a new file" \
     -balloonstr "New"
 
 .mw toolbar add button open \
-    -image [image create photo open-img -file [file join $imagedir open.gif]] \
+    -image [image create photo -file [file join $imagedir open.gif]] \
     -helpstr "Open an existing file" \
     -balloonstr "Open"
 
 .mw toolbar add button close \
-    -image [image create photo close-img -file [file join $imagedir close.gif]] \
+    -image [image create photo -file [file join $imagedir close.gif]] \
     -helpstr "Close the file" \
     -balloonstr "Close"
 
 .mw toolbar add frame filler2 -width 20 -relief raised -borderwidth 2
 
 .mw toolbar add button cut \
-    -image [image create photo cut-img -file [file join $imagedir cut.gif]] \
+    -image [image create photo -file [file join $imagedir cut.gif]] \
     -helpstr "Cut the selection into the cut buffer" \
     -balloonstr "Cut"
 
 .mw toolbar add button copy \
-    -image [image create photo copy-img -file [file join $imagedir copy.gif]] \
+    -image [image create photo -file [file join $imagedir copy.gif]] \
     -helpstr "Copy the selection to the cut buffer" \
     -balloonstr "Copy"
 
 .mw toolbar add button paste \
-    -image [image create photo paste-img -file [file join $imagedir paste.gif]] \
+    -image [image create photo -file [file join $imagedir paste.gif]] \
     -helpstr "Paste the cut buffer to the current point" \
     -balloonstr "Paste"
 
 .mw toolbar add button clear \
-    -image [image create photo clear-img -file [file join $imagedir clear.gif]] \
+    -image [image create photo -file [file join $imagedir clear.gif]] \
     -helpstr "Clear the selection" \
     -balloonstr "Clear"
 
@@ -120,28 +121,28 @@ set imagedir [file join ${iwidgets::library} demos images]
 # Add items to the menubar.
 #
 .mw mousebar add button save \
-    -image [image create photo save-img -file [file join $imagedir save.gif]] \
+    -image [image create photo -file [file join $imagedir save.gif]] \
     -helpstr "Save the current file"
 
 .mw mousebar add button print \
-    -image [image create photo print-img -file [file join $imagedir print.gif]] \
+    -image [image create photo -file [file join $imagedir print.gif]] \
     -helpstr "Print the file"
 
 .mw mousebar add button find \
-    -image [image create photo find-img -file [file join $imagedir find.gif]] \
+    -image [image create photo -file [file join $imagedir find.gif]] \
     -helpstr "Search the text"
 
 .mw mousebar add frame filler1 -height 20 -relief raised -borderwidth 2
 
 .mw mousebar add button help \
-    -image [image create photo help-img -file [file join $imagedir help.gif]] \
+    -image [image create photo -file [file join $imagedir help.gif]] \
     -helpstr "Obtain help for this window"
 
 .mw mousebar add frame filler2 -relief raised -borderwidth 2
 
 .mw mousebar add button exit \
-    -image [image create photo exit-img -file [file join $imagedir exit.gif]] \
-    -helpstr "Exit this application" -command ::exit
+    -image [image create photo -file [file join $imagedir exit.gif]] \
+    -helpstr "Exit this application"
 
 .mw mousebar add frame filler3 -height 5
 
@@ -163,3 +164,6 @@ pack [.mw childsite].st -fill both -expand yes
 # Activate the main window.
 #
 .mw activate
+
+
+

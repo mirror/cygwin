@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -170,3 +173,6 @@ test Regexpfield-1.$c {Regexpfield destruction} {
     destroy .ef
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

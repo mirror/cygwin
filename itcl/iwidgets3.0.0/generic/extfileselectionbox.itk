@@ -81,20 +81,17 @@ class iwidgets::Extfileselectionbox {
 	method filter {}
     }
 
-    public {
-	method _selectDir {}
-	method _dblSelectDir {}
-	method _selectFile {}
-	method _selectSelection {}
-	method _selectFilter {}
-    }
-
     protected {
 	method _packComponents {{when later}}
 	method _updateLists {{when later}}
     }
 
     private {
+	method _selectDir {}
+	method _dblSelectDir {}
+	method _selectFile {}
+	method _selectSelection {}
+	method _selectFilter {}
 	method _setFilter {}
 	method _setSelection {}
 	method _setDirList {}
@@ -716,6 +713,8 @@ body iwidgets::Extfileselectionbox::_setSelection {} {
 	    } else {
 		set selection [file join $_pwd ..]
 	    }
+	} else {
+	    set selection [file join $_pwd $selection]
 	}
 
 	#

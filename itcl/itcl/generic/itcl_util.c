@@ -80,7 +80,6 @@ typedef struct InterpState {
  *  message and abruptly exits.
  * ------------------------------------------------------------------------
  */
-#ifndef NDEBUG
 
 void
 Itcl_Assert(testExpr, fileName, lineNumber)
@@ -88,12 +87,13 @@ Itcl_Assert(testExpr, fileName, lineNumber)
     char *fileName;   /* file name containing this call */
     int lineNumber;   /* line number containing this call */
 {
+#ifndef NDEBUG
     fprintf(stderr, "Assertion failed: \"%s\" (line %d of %s)",
         testExpr, lineNumber, fileName);
     abort();
+#endif
 }
 
-#endif
 
 
 /*

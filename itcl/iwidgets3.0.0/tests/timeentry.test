@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -42,7 +45,7 @@ incr c
 #
 test Timeentry-2.$o {configuration option} {
     llength [.te configure]
-} {43}
+} {45}
 
 incr o
 
@@ -176,3 +179,6 @@ test Timeentry-1.$c {Timeentry destruction} {
     destroy .te
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

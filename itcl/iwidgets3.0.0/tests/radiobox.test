@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -42,7 +45,7 @@ incr c
 #
 test Radiobox-2.$o {configuration option} {
     llength [.rb configure]
-} {18}
+} {19}
 
 incr o
 
@@ -135,3 +138,6 @@ test Radiobox-1.$c {Radiobox destruction} {
     destroy .rb
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

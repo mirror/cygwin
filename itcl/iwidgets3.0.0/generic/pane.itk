@@ -97,7 +97,7 @@ configbody iwidgets::Pane::minimum {
     set pixels \
 	    [winfo pixels $itk_component(hull) $itk_option(-minimum)]
     
-    set $itk_option(-minimum) $pixels
+    set itk_option(-minimum) $pixels
 }
 
 # ------------------------------------------------------------------

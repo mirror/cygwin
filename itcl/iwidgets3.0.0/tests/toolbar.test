@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -187,9 +190,15 @@ foreach test {
 	} {
 	set method [lindex [lindex $test 0] 1]
 	set method_invoke [lindex $test 0]
-	test_pattern Toolbar-4.$m "\[$method_invoke\]" {
-	    list [catch {eval [lindex $test 0]} msg] $msg
-	} [list 0 [lindex $test 1]]
+
+	set testContents "set msg {}\n"
+	append testContents \
+	    "set result \[catch \{[lindex $test 0]\} msg\]\n"
+	append testContents \
+	    "lappend result \[regexp -- \{[lindex $test 1]\} \$msg\] \n"
+	append testContents "set result\n"
+	test Toolbar-4.$m "\[$method_invoke\]" $testContents \
+		[list 0 1]
 	update 
 	incr m
 }
@@ -198,36 +207,43 @@ foreach test {
 # Method tests which fail and produce errors
 #
 foreach test {
-		{{.tb delete 0 end} {}}
-		{{.tb add button item1} {}}
-		{{.tb delete 0} {}}
-		{{.tb delete 0} {can't delete widget, no widgets in the Toolbar}}
-		{{.tb add button item1} {}}
-		{{.tb delete 1} {bad Toolbar widget index in delete method}}
-		{{.tb delete 0} {}}
-		{{.tb add button item1} {}}
-		{{.tb delete 0 1} {bad Toolbar widget index2 in delete method}}
-		{{.tb delete 1 4} {bad Toolbar widget index1 in delete method}}
-		{{.tb add button item2} {}}
-		{{.tb delete 1 0} {bad Toolbar widget index1 in delete method}}
-		{{.tb delete 0 1} {}}
-		{{.tb add button item1} {}}
-		{{.tb delete 0 1 4 5 6} {wrong # args}}
-		{{.tb delete} {wrong # args}}
-		{{.tb delete 0} {}}
-		{{.tb delete 0} {can't delete widget, no widgets in the Toolbar}}
-		{{.tb insert 0 button itemA} {}}
-		{{.tb add button item1} {}}
-		{{.tb add button item2} {}}
-		{{.tb insert 0 button itemAA} {}}
-		{{.tb insert -1 button bogus} {bad toolbar entry index -1}}
-		{{.tb delete 0 end} {}}
+		{1 {.tb delete 0 end} {}}
+		{0 {.tb add button item1} {}}
+		{0 {.tb delete 0} {}}
+		{1 {.tb delete 0} {can't delete widget, no widgets in the Toolbar}}
+		{0 {.tb add button item1} {}}
+		{1 {.tb delete 1} {bad Toolbar widget index in delete method}}
+		{0 {.tb delete 0} {}}
+		{0 {.tb add button item1} {}}
+		{1 {.tb delete 0 1} {bad Toolbar widget index2 in delete method}}
+		{1 {.tb delete 1 4} {bad Toolbar widget index1 in delete method}}
+		{0 {.tb add button item2} {}}
+		{1 {.tb delete 1 0} {bad Toolbar widget index1 in delete method}}
+		{0 {.tb delete 0 1} {}}
+		{0 {.tb add button item1} {}}
+		{1 {.tb delete 0 1 4 5 6} {wrong # args}}
+		{1 {.tb delete} {wrong # args}}
+		{0 {.tb delete 0} {}}
+		{1 {.tb delete 0} {can't delete widget, no widgets in the Toolbar}}
+		{1 {.tb insert 0 button itemA} {}}
+		{0 {.tb add button item1} {}}
+		{0 {.tb add button item2} {}}
+		{0 {.tb insert 0 button itemAA} {}}
+		{1 {.tb insert -1 button bogus} {bad toolbar entry index -1}}
+		{0 {.tb delete 0 end} {}}
 	} {
-		set method [lindex [lindex $test 0] 1]
-		set method_invoke [lindex $test 0]
-		test_pattern Toolbar-5.$m "\[$method_invoke\]" {
-			list [catch {eval [lindex $test 0]} msg] $msg
-		} [list 1 [lindex $test 1]]
+		set method_status [lindex $test 0]
+		set method_invoke [lindex $test 1]
+		set method [lindex $method_invoke 1]
+
+		set testContents "set msg {}\n"
+		append testContents \
+		    "set result \[catch \{$method_invoke\} msg\]\n"
+		append testContents \
+		    "lappend result \[regexp -- \{[lindex $test 2]\} \$msg\] \n"
+		append testContents "set result\n"
+		test Toolbar-5.$m "\[$method_invoke\]" $testContents \
+			[list $method_status 1]
 	incr m
 	}
 
@@ -259,3 +275,6 @@ test Toolbar-1.$c {Toolbar destruction} {
 	destroy .tb
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

@@ -764,7 +764,7 @@ body iwidgets::Notebook::_deletePages { fromPage toPage } {
     
     # If we deleted a selected page set our selection to none
     if { $_currPage >= $fromPage && $_currPage <= $toPage } {
-	set $_currPage -1
+	set _currPage -1
     }
     
     # make sure _currPage stays in sync with new numbering...

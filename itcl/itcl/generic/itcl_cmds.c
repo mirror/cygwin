@@ -52,11 +52,39 @@ namespace eval ::itcl {\n\
         variable library\n\
         variable version\n\
         rename _find_init {}\n\
-        if {[catch {uplevel #0 source -rsrc itcl}] == 0} {\n\
-            return\n\
+        if {[info exists library]} {\n\
+            lappend dirs $library\n\
+        } else {\n\
+            if {[catch {uplevel #0 source -rsrc itcl}] == 0} {\n\
+                return\n\
+            }\n\
+            set dirs {}\n\
+            if {[info exists env(ITCL_LIBRARY)]} {\n\
+                lappend dirs $env(ITCL_LIBRARY)\n\
+            }\n\
+            lappend dirs [file join [file dirname $tcl_library] itcl$version]\n\
+            set bindir [file dirname [info nameofexecutable]]\n\
+            lappend dirs [file join $bindir .. lib itcl$version]\n\
+            lappend dirs [file join $bindir .. library]\n\
+            lappend dirs [file join $bindir .. .. library]\n\
+            lappend dirs [file join $bindir .. .. itcl library]\n\
+            lappend dirs [file join $bindir .. .. .. itcl library]\n\
         }\n\
-        tcl_findLibrary itcl 3.0 {} itcl.tcl ITCL_LIBRARY ::itcl::library {} {} itcl\n\
-   }\n\
+        foreach i $dirs {\n\
+            set library $i\n\
+            set itclfile [file join $i itcl.tcl]\n\
+            if {![catch {uplevel #0 [list source $itclfile]} msg]} {\n\
+                return\n\
+            }\n\
+        }\n\
+        set msg \"Can't find a usable itcl.tcl in the following directories:\n\"\n\
+        append msg \"    $dirs\n\"\n\
+        append msg \"This probably means that Itcl/Tcl weren't installed properly.\n\"\n\
+        append msg \"If you know where the Itcl library directory was installed,\n\"\n\
+        append msg \"you can set the environment variable ITCL_LIBRARY to point\n\"\n\
+        append msg \"to the library directory.\n\"\n\
+        error $msg\n\
+    }\n\
     _find_init\n\
 }";
 
@@ -66,12 +94,14 @@ namespace eval ::itcl {\n\
 
 static char safeInitScript[] =
 "proc ::itcl::local {class name args} {\n\
-    set ptr [uplevel eval [list $class $name] $args]\n\
+    set ptr [uplevel [list $class $name] $args]\n\
     uplevel [list set itcl-local-$ptr $ptr]\n\
     set cmd [uplevel namespace which -command $ptr]\n\
     uplevel [list trace variable itcl-local-$ptr u \"::itcl::delete object $cmd; list\"]\n\
     return $ptr\n\
 }";
+
+extern ItclStubs itclStubs;
 
 
 /*
@@ -97,9 +127,9 @@ Initialize(interp)
     Tcl_Namespace *itclNs;
     ItclObjectInfo *info;
 
-    if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 1) == NULL) {
+    if (Tcl_InitStubs(interp, "8.1", 0) == NULL) {
 	return TCL_ERROR;
-    }
+    };
 
     /*
      *  See if [incr Tcl] is already installed.
@@ -276,7 +306,8 @@ Initialize(interp)
     /*
      *  Package is now loaded.
      */
-    if (Tcl_PkgProvide(interp, "Itcl", ITCL_VERSION) != TCL_OK) {
+    if (Tcl_PkgProvideEx(interp, "Itcl", ITCL_VERSION,
+            (ClientData) &itclStubs) != TCL_OK) {
 	return TCL_ERROR;
     }
     return TCL_OK;
@@ -385,11 +416,11 @@ ItclDelObjectInfo(cdata)
  * ------------------------------------------------------------------------
  *  Itcl_FindClassesCmd()
  *
- *  Part of the "::info" ensemble.  Invoked by Tcl whenever the user
- *  issues an "info classes" command to query the list of classes
- *  in the current namespace.  Handles the following syntax:
+ *  Invoked by Tcl whenever the user issues an "itcl::find classes"
+ *  command to query the list of known classes.  Handles the following
+ *  syntax:
  *
- *    info classes ?<pattern>?
+ *    find classes ?<pattern>?
  *
  *  Returns TCL_OK/TCL_ERROR to indicate success/failure.
  * ------------------------------------------------------------------------
@@ -408,11 +439,11 @@ Itcl_FindClassesCmd(clientData, interp, objc, objv)
 
     char *pattern;
     char *name;
-    int i, nsearch, newEntry;
+    int i, newEntry, handledActiveNs;
     Tcl_HashTable unique;
     Tcl_HashEntry *entry;
     Tcl_HashSearch place;
-    Tcl_Namespace *search[2];
+    Itcl_Stack search;
     Tcl_Command cmd, originalCmd;
     Namespace *nsPtr;
     Tcl_Obj *listPtr, *objPtr;
@@ -430,22 +461,25 @@ Itcl_FindClassesCmd(clientData, interp, objc, objv)
     }
 
     /*
-     *  Search through all commands in the current namespace and
-     *  in the global namespace.  If we find any commands that
+     *  Search through all commands in the current namespace first,
+     *  in the global namespace next, then in all child namespaces
+     *  in this interpreter.  If we find any commands that
      *  represent classes, report them.
      */
     listPtr = Tcl_NewListObj(0, (Tcl_Obj* CONST*)NULL);
 
-    nsearch = 0;
-    search[nsearch++] = activeNs;
-    if (activeNs != globalNs) {
-        search[nsearch++] = globalNs;
-    }
+    Itcl_InitStack(&search);
+    Itcl_PushStack((ClientData)globalNs, &search);
+    Itcl_PushStack((ClientData)activeNs, &search);  /* last in, first out! */
 
     Tcl_InitHashTable(&unique, TCL_ONE_WORD_KEYS);
 
-    for (i=0; i < nsearch; i++) {
-        nsPtr = (Namespace*)search[i];
+    handledActiveNs = 0;
+    while (Itcl_GetStackSize(&search) > 0) {
+        nsPtr = (Namespace*)Itcl_PopStack(&search);
+        if (nsPtr == (Namespace*)activeNs && handledActiveNs) {
+            continue;
+        }
 
         entry = Tcl_FirstHashEntry(&nsPtr->cmdTable, &place);
         while (entry) {
@@ -485,8 +519,20 @@ Itcl_FindClassesCmd(clientData, interp, objc, objv)
             }
             entry = Tcl_NextHashEntry(&place);
         }
+        handledActiveNs = 1;  /* don't process the active namespace twice */
+
+        /*
+         *  Push any child namespaces onto the stack and continue
+         *  the search in those namespaces.
+         */
+        entry = Tcl_FirstHashEntry(&nsPtr->childTable, &place);
+        while (entry != NULL) {
+            Itcl_PushStack(Tcl_GetHashValue(entry), &search);
+            entry = Tcl_NextHashEntry(&place);
+        }
     }
     Tcl_DeleteHashTable(&unique);
+    Itcl_DeleteStack(&search);
 
     Tcl_SetObjResult(interp, listPtr);
     return TCL_OK;
@@ -497,11 +543,11 @@ Itcl_FindClassesCmd(clientData, interp, objc, objv)
  * ------------------------------------------------------------------------
  *  Itcl_FindObjectsCmd()
  *
- *  Part of the "::info" ensemble.  Invoked by Tcl whenever the user
- *  issues an "info objects" command to query the list of known objects.
- *  Handles the following syntax:
+ *  Invoked by Tcl whenever the user issues an "itcl::find objects"
+ *  command to query the list of known objects.  Handles the following
+ *  syntax:
  *
- *    info objects ?-class <className>? ?-isa <className>? ?<pattern>?
+ *    find objects ?-class <className>? ?-isa <className>? ?<pattern>?
  *
  *  Returns TCL_OK/TCL_ERROR to indicate success/failure.
  * ------------------------------------------------------------------------
@@ -522,12 +568,12 @@ Itcl_FindObjectsCmd(clientData, interp, objc, objv)
     ItclClass *isaDefn = NULL;
 
     char *name, *token;
-    int i, pos, nsearch, newEntry, match;
+    int i, pos, newEntry, match, handledActiveNs;
     ItclObject *contextObj;
     Tcl_HashTable unique;
     Tcl_HashEntry *entry;
     Tcl_HashSearch place;
-    Tcl_Namespace *search[2];
+    Itcl_Stack search;
     Tcl_Command cmd, originalCmd;
     Namespace *nsPtr;
     Command *cmdPtr;
@@ -564,6 +610,16 @@ Itcl_FindObjectsCmd(clientData, interp, objc, objv)
             }
             pos++;
         }
+
+        /*
+         * Last token? Take it as the pattern, even if it starts
+         * with a "-".  This allows us to match object names that
+         * start with "-".
+         */
+        else if (pos == objc-1 && !pattern) {
+            pattern = token;
+            forceFullNames = (strstr(pattern, "::") != NULL);
+        }
         else {
             break;
         }
@@ -576,22 +632,25 @@ Itcl_FindObjectsCmd(clientData, interp, objc, objv)
     }
 
     /*
-     *  Search through all commands in the current namespace and
-     *  in the global namespace.  If we find any commands that
+     *  Search through all commands in the current namespace first,
+     *  in the global namespace next, then in all child namespaces
+     *  in this interpreter.  If we find any commands that
      *  represent objects, report them.
      */
     listPtr = Tcl_NewListObj(0, (Tcl_Obj* CONST*)NULL);
 
-    nsearch = 0;
-    search[nsearch++] = activeNs;
-    if (activeNs != globalNs) {
-        search[nsearch++] = globalNs;
-    }
+    Itcl_InitStack(&search);
+    Itcl_PushStack((ClientData)globalNs, &search);
+    Itcl_PushStack((ClientData)activeNs, &search);  /* last in, first out! */
 
     Tcl_InitHashTable(&unique, TCL_ONE_WORD_KEYS);
 
-    for (i=0; i < nsearch; i++) {
-        nsPtr = (Namespace*)search[i];
+    handledActiveNs = 0;
+    while (Itcl_GetStackSize(&search) > 0) {
+        nsPtr = (Namespace*)Itcl_PopStack(&search);
+        if (nsPtr == (Namespace*)activeNs && handledActiveNs) {
+            continue;
+        }
 
         entry = Tcl_FirstHashEntry(&nsPtr->cmdTable, &place);
         while (entry) {
@@ -653,8 +712,20 @@ Itcl_FindObjectsCmd(clientData, interp, objc, objv)
             }
             entry = Tcl_NextHashEntry(&place);
         }
+        handledActiveNs = 1;  /* don't process the active namespace twice */
+
+        /*
+         *  Push any child namespaces onto the stack and continue
+         *  the search in those namespaces.
+         */
+        entry = Tcl_FirstHashEntry(&nsPtr->childTable, &place);
+        while (entry != NULL) {
+            Itcl_PushStack(Tcl_GetHashValue(entry), &search);
+            entry = Tcl_NextHashEntry(&place);
+        }
     }
     Tcl_DeleteHashTable(&unique);
+    Itcl_DeleteStack(&search);
 
     Tcl_SetObjResult(interp, listPtr);
     return TCL_OK;
@@ -702,10 +773,10 @@ Itcl_ProtectionCmd(clientData, interp, objc, objv)
 
     if (objc == 2) {
       /* CYGNUS LOCAL - Fix for 8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0
-        result = Tcl_EvalObj(interp, objv[1]);
-#else
+#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
         result = Tcl_EvalObj(interp, objv[1], 0);
+#else
+        result = Tcl_EvalObj(interp, objv[1]);
 #endif
 	/* END CYGNUS LOCAL */
     } else {

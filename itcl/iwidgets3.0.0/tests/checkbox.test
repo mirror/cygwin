@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -42,7 +45,7 @@ incr c
 #
 test Checkbox-2.$o {configuration option} {
     llength [.cb configure]
-} {18}
+} {16}
 
 incr o
 
@@ -143,3 +146,6 @@ test Checkbox-1.$c {Checkbox destruction} {
     destroy .cb
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

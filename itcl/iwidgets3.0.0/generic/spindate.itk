@@ -572,14 +572,6 @@ body iwidgets::Spindate::_packDate {{when later}} {
 	grid columnconfigure $_interior $i -minsize 0
     }
 
-    #
-    # Get some boolean 1/0 values for the -monthon and -dayon options.
-    # We need this later so that Tcl doesn't complain about operands
-    # of || being strings.
-    #
-    set monthon [expr {$itk_option(-monthon) == "1"}]
-    set dayon [expr {$itk_option(-dayon) == "1"}]
-
     set _repack ""
 
     #
@@ -610,7 +602,7 @@ body iwidgets::Spindate::_packDate {{when later}} {
 	    }
 	    
 	    if {$itk_option(-yearon)} {
-		if {$monthon || $dayon} {
+		if {$itk_option(-monthon) || $itk_option(-dayon)} {
 		    grid rowconfigure $_interior [incr row] \
 			-minsize $itk_option(-datemargin)
 		}
@@ -650,7 +642,7 @@ body iwidgets::Spindate::_packDate {{when later}} {
 	    }
 	    
 	    if {$itk_option(-yearon)} {
-		if {$monthon || $dayon} {
+		if {$itk_option(-monthon) || $itk_option(-dayon)} {
 		    grid columnconfigure $_interior [incr column] \
 			-minsize $itk_option(-datemargin)
 		}

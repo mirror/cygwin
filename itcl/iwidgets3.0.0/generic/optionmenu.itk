@@ -123,7 +123,7 @@ body iwidgets::Optionmenu::constructor {args} {
     component hull configure -highlightthickness 0
 
     itk_component add menuBtn {
-	menubutton $itk_interior.menuBtn -relief raised -indicator on \
+	menubutton $itk_interior.menuBtn -relief raised -indicatoron on \
             -textvariable [scope _currentItem] -takefocus 1 \
             -menu $itk_interior.menuBtn.menu
     } {
@@ -411,6 +411,9 @@ body iwidgets::Optionmenu::insert {index string args} {
 # ------------------------------------------------------------------
 body iwidgets::Optionmenu::select {index} {
     set index [index $index]
+    if {$index > [expr $_numitems - 1]} {
+      incr index -1 
+    }
     _setItem [lindex $_items $index]
 }
 
@@ -601,7 +604,24 @@ body iwidgets::Optionmenu::_setitems {items_} {
     #
     if {$first != ""} {
         set i [lsearch -exact $_items $savedCurrentItem]
-        select [expr {$i != -1 ? $savedCurrentItem : $first}]
+	#-------------------------------------------------------------
+	# BEGIN BUG FIX: csmith (Chad Smith: csmith@adc.com), 11/18/99
+	#-------------------------------------------------------------
+	# The previous code fragment:
+	#   <select [expr {$i != -1 ? $savedCurrentItem : $first}]>
+	# is faulty because of exponential numbers.  For example,
+	# 2e-4 is numerically equal to 2e-04, but the string representation
+	# is of course different.  As a result, the select invocation
+	# fails, and an error message is printed.
+	#-------------------------------------------------------------
+	if {$i != -1} {
+	  select $savedCurrentItem
+	} else {
+	  select $first
+	}
+	#-------------------------------------------------------------
+	# END BUG FIX
+	#-------------------------------------------------------------
     } else {
 	_setItem ""
     }

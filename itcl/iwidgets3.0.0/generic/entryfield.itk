@@ -56,6 +56,7 @@ class iwidgets::Entryfield {
     itk_option define -fixed fixed Fixed 0
     itk_option define -focuscommand focusCommand Command {}
     itk_option define -invalid invalid Command {bell}
+    itk_option define -pasting pasting Behavior 1
     itk_option define -validate validate Command {}
     
     public {
@@ -190,6 +191,40 @@ configbody iwidgets::Entryfield::validate {
 # be proven invalid.
 # ------------------------------------------------------------------
 configbody iwidgets::Entryfield::invalid {}
+
+# ------------------------------------------------------------------
+# OPTION: -pasting
+#
+# Allows the developer to enable and disable pasting into the entry
+# component of the entryfield.  This is done to avoid potential stack
+# dumps when using the -validate configuration option.  Plus, it's just
+# a good idea to have complete control over what you allow the user
+# to enter into the entryfield.
+# ------------------------------------------------------------------
+configbody iwidgets::Entryfield::pasting {
+  set oldtags [bindtags $itk_component(entry)]
+  set firsttag [lindex $oldtags 0]
+
+  if ($itk_option(-pasting)) {
+    if {$firsttag == "pastetag"} {
+      bindtags $itk_component(entry) [lreplace $oldtags 0 0]
+    }
+
+  } else {
+    if {$firsttag == "pastetag"} {
+      # Ignore this if it's already set.
+      return
+    }
+    bindtags $itk_component(entry) [linsert $oldtags 0 pastetag] 
+    bind pastetag <ButtonRelease-2> {break}
+    bind pastetag <KeyPress> {
+      # Disable function keys > F9 and the 'Insert' key.
+      if {[regexp {^F[1,2][0-9]+$} "%K"] || "%K" == "Insert"} {
+	break
+      }
+    }
+  }
+}
 
 # ------------------------------------------------------------------
 # OPTION: -fixed
@@ -475,10 +510,31 @@ body iwidgets::Entryfield::_keyPress {char sym state} {
     # means a modifier was used such as a control, meta key, or control
     # or meta key with numlock down.
     #
-    if {($char == "") || \
-	    ($state == 4) || ($state == 8) || \
-	    ($state == 36) || ($state == 40)} {
-	return -code continue 1
+    #-----------------------------------------------------------
+    # BUG FIX: csmith (Chad Smith: csmith@adc.com), 3/15/99
+    #-----------------------------------------------------------
+    # The following conditional used to hardcode specific state values, such
+    # as "4" and "8".  These values are used to detect <Ctrl>, <Shift>, etc.
+    # key combinations.  On the windows platform, the <Alt> key is state
+    # 16, and on the unix platform, the <Alt> key is state 8.  All <Ctrl>
+    # and <Alt> combinations should be masked out, regardless of the
+    # <NumLock> or <CapsLock> status, and regardless of platform.
+    #-----------------------------------------------------------
+    set CTRL 4
+    global tcl_platform
+    if {$tcl_platform(platform) == "unix"} {
+      set ALT 8
+    } elseif {$tcl_platform(platform) == "windows"} {
+      set ALT 16
+    } else {
+      # This is something other than UNIX or WINDOWS.  Default to the
+      # old behavior (UNIX).
+      set ALT 8
+    }
+    # Thanks to Rolf Schroedter for the following elegant conditional.  This
+    # masks out all <Ctrl> and <Alt> key combinations.
+    if {($char == "") || ($state & ($CTRL | $ALT))} {
+      return -code continue 1
     }
 
     #

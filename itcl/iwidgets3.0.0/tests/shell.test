@@ -14,6 +14,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -194,3 +197,6 @@ test Shell-1.$c {Shell destruction} {
     destroy .sh
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -221,9 +224,9 @@ foreach test {
 		{}}
 	{{.mb configure -menubuttons {
 		menubutton file -text File -menu {
-			options -tearoff $tearoff
-			command ok -label $okLabel
-			command quit -label $quitLabel
+			options -tearoff on
+			command ok -label "OK"
+			command quit -label "Quit"
 			}
 		}}
 		{}}
@@ -305,9 +308,15 @@ foreach test {
 	} {
 	set method [lindex [lindex $test 0] 1]
 	set method_invoke [lindex $test 0]
-	test_pattern Menubar-4.$m "\[$method_invoke\]" {
-	    list [catch {eval [lindex $test 0]} msg] $msg
-	} [list 0 [lindex $test 1]]
+
+	set testContents "set msg {}\n"
+	append testContents \
+	    "set result \[catch \{[lindex $test 0]\} msg\]\n"
+	append testContents \
+	    "lappend result \[regexp -- \{[lindex $test 1]\} \$msg\] \n"
+	append testContents "set result\n"
+	test Menubar-4.$m "\[$method_invoke\]" $testContents \
+		[list 0 1]
 	update 
 	incr m
 }
@@ -317,74 +326,81 @@ foreach test {
 # Specifically, deals with method invocation on empty menubar.
 #
 foreach test {
-		{{.mb delete .0 .last} 
+		{1 {.mb delete .0 .last} 
 			{bad path:}}
-		{{.mb index .0} 
+		{0 {.mb index .0} 
 			{-1}}
-		{{.mb index .end} 
+		{0 {.mb index .end} 
 			{-1}}
-		{{.mb index .last} 
+		{0 {.mb index .last} 
 			{-1}}
-		{{.mb index .help} 
+		{0 {.mb index .help} 
 			{-1}}
-		{{.mb delete .0} 
+		{1 {.mb delete .0} 
 			{bad path:}}
-		{{.mb delete .end} 
+		{1 {.mb delete .end} 
 			{bad path:}}
-		{{.mb delete .last} 
+		{1 {.mb delete .last} 
 			{bad path:}}
-		{{.mb delete .help} 
+		{1 {.mb delete .help} 
 			{bad path:}}
-		{{.mb insert .0 menubutton file -text File} 
+		{1 {.mb insert .0 menubutton file -text File} 
 			{bad path:}}
-		{{.mb insert .end menubutton file -text File} 
+		{1 {.mb insert .end menubutton file -text File} 
 			{bad path:}}
-		{{.mb insert .last menubutton file -text File} 
+		{1 {.mb insert .last menubutton file -text File} 
 			{bad path:}}
-		{{.mb insert .help menubutton file -text File} 
+		{1 {.mb insert .help menubutton file -text File} 
 			{bad path:}}
-		{{.mb invoke .0.0} 
+		{1 {.mb invoke .0.0} 
 			{bad path:}}
-		{{.mb invoke .end.0} 
+		{1 {.mb invoke .end.0} 
 			{bad path:}}
-		{{.mb invoke .last.0} 
+		{1 {.mb invoke .last.0} 
 			{bad path:}}
-		{{.mb invoke .help.0} 
+		{1 {.mb invoke .help.0} 
 			{bad path:}}
-		{{.mb menucget .0 -text} 
+		{1 {.mb menucget .0 -text} 
 			{bad path:}}
-		{{.mb menucget .end -text} 
+		{1 {.mb menucget .end -text} 
 			{bad path:}}
-		{{.mb menucget .last -text} 
+		{1 {.mb menucget .last -text} 
 			{bad path:}}
-		{{.mb menucget .help -text} 
+		{1 {.mb menucget .help -text} 
 			{bad path:}}
-		{{.mb menuconfigure .0 -text} 
+		{1 {.mb menuconfigure .0 -text} 
 			{bad path:}}
-		{{.mb menuconfigure .end -text} 
+		{1 {.mb menuconfigure .end -text} 
 			{bad path:}}
-		{{.mb menuconfigure .last -text} 
+		{1 {.mb menuconfigure .last -text} 
 			{bad path:}}
-		{{.mb menuconfigure .help -text} 
+		{1 {.mb menuconfigure .help -text} 
 			{bad path:}}
-		{{.mb path *quit} 
+		{0 {.mb path *quit} 
 			{}}
-		{{.mb type .0.0} 
+		{1 {.mb type .0.0} 
 			{bad path:}}
-		{{.mb type .0.end} 
+		{1 {.mb type .0.end} 
 			{bad path:}}
-		{{.mb type .0.last} 
+		{1 {.mb type .0.last} 
 			{bad path:}}
-		{{.mb type .0.new} 
+		{1 {.mb type .0.new} 
 			{bad path:}}
-		{{.mb yposition .0.new} 
+		{1 {.mb yposition .0.new} 
 			{bad path:}}
 	} {
-		set method [lindex [lindex $test 0] 1]
-		set method_invoke [lindex $test 0]
-		test_pattern Menubar-5.$m "\[$method_invoke\]" {
-			list [catch {eval [lindex $test 0]} msg] $msg
-		} [list 1 [lindex $test 1]]
+		set method_status [lindex $test 0]
+		set method_invoke [lindex $test 1]
+		set method [lindex $method_invoke 1]
+
+		set testContents "set msg {}\n"
+		append testContents \
+		    "set result \[catch \{$method_invoke\} msg\]\n"
+		append testContents \
+		    "lappend result \[regexp -- \{[lindex $test 2]\} \$msg\] \n"
+		append testContents "set result\n"
+		test Menubar-5.$m "\[$method_invoke\]" $testContents \
+			[list $method_status 1]
 	incr m
 	}
 
@@ -392,7 +408,7 @@ foreach test {
 # Method tests which fail and produce errors or results
 # On a non-empty menubar...
 foreach test {
-		{{.mb configure -menubuttons {
+		{0 {.mb configure -menubuttons {
 			menubutton file -text File -menu {
 				options -tearoff no
 				command ok -label "Ok"
@@ -400,70 +416,77 @@ foreach test {
 			}
 		}}
 			{}}
-		{{.mb delete .file.hello} 
+		{1 {.mb delete .file.hello} 
 			{bad path}}
-		{{.mb index .0.hello} 
+		{0 {.mb index .0.hello} 
 			{-1}}
-		{{.mb index .0.quit} 
+		{0 {.mb index .0.quit} 
 			{1}}
-		{{.mb index 0.end} 
+		{0 {.mb index 0.end} 
 			{1}}
-		{{.mb index .file.last} 
+		{0 {.mb index .file.last} 
 			{1}}
-		{{.mb index .file.ok} 
+		{0 {.mb index .file.ok} 
 			{0}}
-		{{.mb delete .view .file}
+		{1 {.mb delete .view .file}
 			{bad path:}}
-		{{.mb delete .file .help}
+		{1 {.mb delete .file .help}
 			{bad path:}}
-		{{.mb add command .file.menu}
+		{1 {.mb add command .file.menu}
 			{bad name}}
-		{{.mb add command .file.last}
+		{1 {.mb add command .file.last}
 			{bad name}}
-		{{.mb add command .file.end}
+		{1 {.mb add command .file.end}
 			{bad name}}
-		{{.mb add command .file.2}
+		{1 {.mb add command .file.2}
 			{bad name}}
-		{{.mb insert .0 menu view -text View} 
+		{1 {.mb insert .0 menu view -text View} 
 			{bad type}}
-		{{.mb insert .file command view -text View} 
+		{1 {.mb insert .file command view -text View} 
 			{bad entry path}}
-		{{.mb insert .file menubutton view -text View} 
+		{0 {.mb insert .file menubutton view -text View} 
 			{[.]mb[.]menubar[.]view}}
-		{{.mb invoke .0.quit} 
+		{1 {.mb invoke .0.quit} 
 			{bad path}}
-		{{.mb menucget .0 -text} 
+		{0 {.mb menucget .0 -text} 
 			{View}}
-		{{.mb menucget .end -text} 
+		{0 {.mb menucget .end -text} 
 			{File}}
-		{{.mb menucget .last -text} 
+		{0 {.mb menucget .last -text} 
 			{File}}
-		{{.mb menucget .help -text} 
+		{1 {.mb menucget .help -text} 
 			{bad path}}
-		{{.mb menuconfigure .0 -text} 
+		{0 {.mb menuconfigure .0 -text} 
 			{-text text Text {} View}}
-		{{.mb menuconfigure .end.last -label} 
+		{0 {.mb menuconfigure .end.last -label} 
 			{-label {} {} {} Quit}}
-		{{.mb menuconfigure .last -text} 
+		{0 {.mb menuconfigure .last -text} 
 			{-text text Text {} File}}
-		{{.mb menuconfigure .help -text} 
+		{1 {.mb menuconfigure .help -text} 
 			{bad path}}
-		{{.mb path *quit} 
+		{0 {.mb path *quit} 
 			{[.]file[.]quit}}
-		{{.mb type .end.0} 
+		{0 {.mb type .end.0} 
 			{command}}
-		{{.mb type .end.end} 
+		{0 {.mb type .end.end} 
 			{command}}
-		{{.mb type .end.last} 
+		{0 {.mb type .end.last} 
 			{command}}
-		{{.mb type .0.new} 
+		{1 {.mb type .0.new} 
 			{bad path}}
 	} {
-		set method [lindex [lindex $test 0] 1]
-		set method_invoke [lindex $test 0]
-		test_pattern Menubar-5.$m "\[$method_invoke\]" {
-			list [catch {eval [lindex $test 0]} msg] $msg
-		} [list 1 [lindex $test 1]]
+		set method_status [lindex $test 0]
+		set method_invoke [lindex $test 1]
+		set method [lindex $method_invoke 1]
+
+		set testContents "set msg {}\n"
+		append testContents \
+		    "set result \[catch \{$method_invoke\} msg\]\n"
+		append testContents \
+		    "lappend result \[regexp -- \{[lindex $test 2]\} \$msg\] \n"
+		append testContents "set result\n"
+		test Menubar-5.$m "\[$method_invoke\]" $testContents \
+			[list $method_status 1]
 	incr m
 	}
 
@@ -522,3 +545,6 @@ test Menubar-1.$c {Menubar destruction} {
 	destroy .mb
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -163,3 +166,6 @@ test Scrolledtext-1.$c {Scrolledtext destruction} {
     destroy .st
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

@@ -33,29 +33,6 @@
 #include "itclInt.h"
 #include "tclCompile.h"
 
-/* CYGNUS LOCAL */
-/* FIXME - it looks like Michael removed the dependance on these... */
-#if 0
-#ifdef __CYGWIN32__
-
-/* On cygwin32, this is how we import these variables from the Tcl DLL.  */
-
-extern int 		*_imp__tclTraceCompile;
-
-#define tclTraceCompile (*_imp__tclTraceCompile)
-
-extern int 		*_imp__tclTraceExec;
-
-#define tclTraceExec (*_imp__tclTraceExec)
-
-extern Tcl_ObjType	*_imp__tclByteCodeType;
-
-#define tclByteCodeType (*_imp__tclByteCodeType)
-
-#endif
-#endif
-/* END CYGNUS LOCAL */
-
 /*
  *  FORWARD DECLARATIONS
  */
@@ -1025,10 +1002,10 @@ Itcl_EvalMemberCode(interp, mfunc, member, contextObj, objc, objv)
     }
     else if ((mcode->flags & ITCL_IMPLEMENT_TCL) != 0) {
       /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0
-      result = Tcl_EvalObj(interp, mcode->procPtr->bodyPtr);
-#else
+#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
       result = Tcl_EvalObj(interp, mcode->procPtr->bodyPtr, 0);
+#else
+      result = Tcl_EvalObj(interp, mcode->procPtr->bodyPtr);
 #endif
       /* END CYGNUS LOCAL */
     }
@@ -2326,10 +2303,10 @@ Itcl_ConstructBase(interp, contextObj, contextClass)
      */
     if (contextClass->initCode) {
       /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0
-      if (Tcl_EvalObj(interp, contextClass->initCode) != TCL_OK) {
+#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
+      if (Tcl_EvalObj(interp, contextClass->initCode, 0) != TCL_OK) {
 #else
-	if (Tcl_EvalObj(interp, contextClass->initCode, 0) != TCL_OK) {
+	if (Tcl_EvalObj(interp, contextClass->initCode) != TCL_OK) {
 #endif
 	  /* END CYGNUS LOCAL */
 	  return TCL_ERROR;

@@ -3,64 +3,57 @@
 #
 
 # This is the main Visual C++ makefile for the Windows distribution
-# of [incr Tcl] version 2.2.  To compile the distribution using Visual
+# of [incr Tcl] version 3.0.  To compile the distribution using Visual
 # C++, copy "makefile.vc" to "makefile".  Then set the macros for the
-# location of the source tree, the target directory, and the Microsoft
-# Compilers.  You may then "make dist" to build the distribution, and
-# "make dist-install" to install it to the target directory you specify
-# below.
+# location of the source directory, installation directory, and the
+# Microsoft Compilers.  You may then "make dist" to build the distribution,
+# and "make dist-install" to install it to the target directory you specify
+# below, and "make dist-clean" to clean up.
 
 #
-# There are three primary targets for the distribution:
+# Project directories
 #
-# dist: build the entire distribution: Tcl, Tk, Itcl, Itk
+# ROOT    = top of source tree
 #
-# dist-install: moves built files to target directory
-#
-# dist-clean: erases built files in source tree
-
+# TMPDIR  = location where .obj files should be stored during build
 #
 # TOOLS32 = location of VC++ 32-bit development tools. Note that the
 #	    VC++ 2.0 header files are broken, so you need to use the
 #	    ones that come with the developer network CD's, or later
 #	    versions of VC++.
 #
-# TOOLS16 = location of VC++ 1.5 16-bit tools, needed to build thunking
-#	    library.  This information is optional; if the 16-bit compiler
-#	    is not available, then the 16-bit code will not be built.
-#	    Tcl will still run without the 16-bit code, but...
-#		A. Under Windows 3.X you will any calls to the exec command
-#	           will return an error.
-#		B. A 16-bit program to test the behavior of the exec
-#		   command under NT and 95 will not be built.
-#
-# TARGET_ROOT -- Target Directory for installation
-#
-# SOURCE_ROOT -- Path to root of source tree
+# INSTALLDIR = where the install- targets should copy the binaries and
+#	    support files
 #
 
-TOOLS32		= c:\msdev
-TOOLS16		= c:\msvc
-TARGET_ROOT	= c:\Program files\Itcl2.2
-SOURCE_ROOT	= c:\itcl2.2
+TOOLS32		= c:\progra~1\devstudio\vc
+TOOLS32_rc	= c:\progra~1\devstudio\sharedide
+
+SOURCE_ROOT = \ws\incrTcl
+INSTALLDIR	= c:\progra~1\Tcl
+TCLDIR          = \ws\tcl8.1
+TKDIR           = \ws\tk8.1
+TCLSH           = $(TCLDIR)\win\Release\tclsh81.exe
+
+# Set this to the appropriate value of /MACHINE: for your platform
+MACHINE	= IX86
+
+# Set NODEBUG to 0 to compile with symbols
+NODEBUG = 1
+
+# uncomment one of the following lines to compile with TCL_MEM_DEBUG, 
+# TCL_MEM_DEBUG, or TCL_COMPILE_DEBUG
+#DEBUGDEFINES	= -DTCL_MEM_DEBUG
+#DEBUGDEFINES	= -DTCL_MEM_DEBUG -DTCL_COMPILE_DEBUG
+#DEBUGDEFINES	= -DTCL_MEM_DEBUG -DTCL_COMPILE_STATS
+#DEBUGDEFINES	= -DTCL_MEM_DEBUG -DTCL_COMPILE_DEBUG -DTCL_COMPILE_STATS
+
 
 #
 # You should not have to modify anything further in this makefile
 #
 
-#
-# Borland C++ tools
-#
 
-cc32		= $(TOOLS32)\bin\cl.exe 
-link32		= $(TOOLS32)\bin\link.exe
-rc32		= $(TOOLS32)\bin\rc.exe
-include32	= -I$(TOOLS32)\include
-
-cc16		= $(TOOLS16)\bin\cl.exe
-link16		= $(TOOLS16)\bin\link.exe
-rc16		= $(TOOLS16)\bin\rc.exe
-include16	= -I$(TOOLS16)\include
 MAKE 	  	= $(TOOLS32)\bin\nmake -fmakefile.vc
 
 #
@@ -74,73 +67,28 @@ MKDIR   		= -mkdir
 #
 # Source and Build Paths
 #
-
-TCLDIR 		= $(SOURCE_ROOT)\Tcl7.6
-TKDIR 		= $(SOURCE_ROOT)\Tk4.2
 ITCLDIR		= $(SOURCE_ROOT)\Itcl
 ITKDIR		= $(SOURCE_ROOT)\Itk
-IWIDGETSDIR	= $(SOURCE_ROOT)\Iwidgets2.2.0
-
-#
-# Target Paths
-#
-
-TARGET_BIN  	= $(TARGET_ROOT)\Bin
-TARGET_LIB_ROOT = $(TARGET_ROOT)\Lib
-TARGET_LIB  	= $(TARGET_LIB_ROOT)\Itcl
-TARGET_INCLUDE_ROOT = $(TARGET_ROOT)\Include
-TARGET_INCLUDE	= $(TARGET_INCLUDE_ROOT)\Itcl
-TARGET_DOC 	= $(TARGET_ROOT)\Html
-
-#
-# Shared Target Files:
-#
-
-TCLLIB		= Tcl76i.lib
-TCLDLL		= Tcl76i.dll
-TKLIB		= Tk42i.lib
-TKDLL		= Tk42i.dll
-ITCLLIB		= Itcl22.lib
-ITCLDLL		= Itcl22.dll
-ITKLIB		= Itk22.lib
-ITKDLL		= Itk22.dll
-
-#
-# Paths to Build locations of libraries
-#
-TCLLIBDIR	= $(TCLDIR)\Win
-TKLIBDIR	= $(TKDIR)\Win
-ITCLLIBDIR	= $(ITCLDIR)\Win
-ITKLIBDIR	= $(ITKDIR)\Win
-
+IWIDGETS2DIR	= $(SOURCE_ROOT)\Iwidgets2.2.0
+IWIDGETS3DIR	= $(SOURCE_ROOT)\Iwidgets3.0.0
 
 dist:
-   cd $(TCLDIR)\Win
-   $(MAKE) all
-   cd $(TKDIR)\Win
-   $(MAKE) all
    cd $(ITCLDIR)\Win
    $(MAKE) all
    cd $(ITKDIR)\Win
    $(MAKE) all
 
 dist-install:
-   cd $(TCLDIR)\Win
-   $(MAKE) install
-   cd $(TKDIR)\Win
-   $(MAKE) install
    cd $(ITCLDIR)\Win
    $(MAKE) install
    cd $(ITKDIR)\Win
    $(MAKE) install
-   cd $(IWIDGETSDIR)\Win
+   cd $(IWIDGETS2DIR)\Win
+   $(MAKE) install
+   cd $(IWIDGETS3DIR)\Win
    $(MAKE) install
 
 dist-clean:
-   cd $(TCLDIR)\Win
-   $(MAKE) clean
-   cd $(TKDIR)\Win
-   $(MAKE) clean
    cd $(ITCLDIR)\Win
    $(MAKE) clean
    cd $(ITKDIR)\Win

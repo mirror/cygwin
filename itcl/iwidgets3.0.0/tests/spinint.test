@@ -13,6 +13,9 @@
 #
 # @(#) $Id$
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -42,7 +45,7 @@ incr c
 #
 test Spinint-2.$o {configuration option} {
     llength [.spi configure]
-} {46}
+} {47}
 
 incr o
 
@@ -164,3 +167,6 @@ test Spinint-1.$c {Spinint destruction} {
     destroy .spi 
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

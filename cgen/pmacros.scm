@@ -229,11 +229,11 @@
 			((and (list? exp) (not (null? exp))) (scan-list exp))
 			; Not a symbol or expression, return unchanged.
 			(else exp))))
-      ; ??? We use to re-examine `result' to see if it was another pmacro
-      ; invocation.  This allowed doing things like ((.sym a b c) arg1 arg2)
-      ; where `abc' is a pmacro.  Scheme doesn't work this way, so it was
-      ; removed.  It can be put back should it ever be warranted.
-      result))
+      ; Re-examining `result' to see if it is another pmacro invocation
+      ; allows doing things like ((.sym a b c) arg1 arg2)
+      ; where `abc' is a pmacro.  Scheme doesn't work this way, but then
+      ; this is CGEN.
+      (if (symbol? result) (scan-symbol result) result)))
 
   (if -pmacro-trace?
       (begin

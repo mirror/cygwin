@@ -1,5 +1,35 @@
 2005-03-10  Jim Blandy  <jimb@redhat.com>
 
+	Compile with no warnings.
+	* Makefile.am (AM_CFLAGS): Compile with -Wall.
+	* Makefile.in: Regenerated.
+	* gdbserv-thread-db.h (stop_lwp, handle_waitstatus, ps_pdread,
+	ps_pdwrite): Add declarations for these functions to
+	gdbserv-thread-db.h.
+	* linux-target.c: #include <string.h>, <sys/types.h>, and
+	<sys/wait.h> to get declarations for system functions used in this
+	file.
+	(linux_get_reg): When register REGNO doesn't exist, provide zeros
+	for its value; don't use an uninitialized pointer.
+	(linux_set_reg): Delete unused variables.
+	(decr_pc_after_break): Fix printf format directive to match
+	arguments.
+	* ptrace-target.c (ptrace_read_user, ptrace_check_child_state,
+	ptrace_attach): Delete unused variables.
+	(ptrace_singlestep_program, ptrace_continue_program): Fix printf
+	format directive to match arguments.
+	* server.c (invalid_speed): Same.
+	(main): Initialize infd, outfd, and speed.
+	(tty_raw): Use proper name for speed_t "zero baud" value.
+	* thread-db.c: #include <string.h> and "gdbserv-utils.h", to get
+	declarations for functions used in this file.
+	(thread_db_open, wait_all_threads) 
+	(thread_db_check_child_state, thread_db_get_thread_reg) 
+	(thread_db_set_thread_reg): Fix printf format directive to match
+	arguments.
+	(continue_thread, thread_db_get_thread_reg, continue_all_threads,
+	thread_db_attach): Delete unused variables.
+
 	* Makefile.in, aclocal.m4: Regenerated with automake 1.9.4.
 
 	Make config.in generated automatically again.

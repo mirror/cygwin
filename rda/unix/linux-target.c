@@ -27,6 +27,9 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #if !defined(_MIPSEL) && !defined(_MIPSEB)
 #include <stdint.h>
 #else
@@ -1821,7 +1824,13 @@ linux_get_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
     }
   else if (reginfo[regno].whichregs == NOREGS)
     {
-      /* Do nothing.  */
+      /* A buffer initialized to zeros we can refer to.  */
+      static struct gdbserv_reg zeros;
+
+      /* Make sure we're not going to try to copy out more than we have.  */
+      assert (reginfo[regno].ptrace_size <= sizeof (zeros.buf));
+
+      buf = (char *) zeros.buf;
     }
   else
     {
@@ -1850,7 +1859,6 @@ linux_set_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
   elf_fpregset_t fpregs;
   void *fpxregs = NULL;
   char *buf;
-  char tmp_buf[MAX_REG_SIZE];
 
   if (regno < 0 || regno >= NUM_REGS)
     {
@@ -2779,7 +2787,7 @@ decr_pc_after_break (struct gdbserv *serv, pid_t pid)
 
   pc -= 1;
   if (thread_db_noisy)
-    fprintf (stderr, "<decr_pc_after_break: pid %d, addr 0x%08x>\n", pid, pc);
+    fprintf (stderr, "<decr_pc_after_break: pid %d, addr 0x%08lx>\n", pid, pc);
   status = write_reg_as_ulong (serv, pid, PC_REGNUM, pc);
   return status;
 }

@@ -102,3 +102,22 @@ extern unsigned long debug_get_pc (struct gdbserv *serv, pid_t pid);
 
 /* Adjust PC value after trap has been hit.  */
 extern int decr_pc_after_break (struct gdbserv *serv, pid_t pid);
+
+/* Send SIGSTOP to an LWP.  */
+extern int stop_lwp (lwpid_t lwpid);
+
+struct child_process;
+extern int handle_waitstatus (struct child_process *process, union wait w);
+
+
+/* read from data segment */
+ps_err_e ps_pdread (gdb_ps_prochandle_t ph,
+		    paddr_t             addr,
+		    gdb_ps_read_buf_t   buf,
+		    gdb_ps_size_t       size);
+
+/* write to data segment */
+ps_err_e ps_pdwrite (gdb_ps_prochandle_t ph,
+		     paddr_t             addr,
+		     gdb_ps_write_buf_t  buf,
+		     gdb_ps_size_t       size);

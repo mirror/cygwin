@@ -1,6 +1,6 @@
 // m32r.cxx - Implementation of the M32R libgloss specifics.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -101,9 +101,9 @@ m32r_libgloss::syscall_trap()
 	  cerr << "*** exit(" << value << ")" << endl;
 
 	if (value == 0)
-	  process_signal_pin.drive(newlib::sigQuit);
+	  process_signal_pin.drive((value << 8) | newlib::sigQuit);
 	else
-	  process_signal_pin.drive(newlib::sigAbrt);
+	  process_signal_pin.drive((value << 8) | newlib::sigAbrt);
       }
       break;
 

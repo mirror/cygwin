@@ -412,6 +412,11 @@
 	* rtx-funcs.scm (subword): Mode of argument can be different
 	than mode of result, so don't use OP0 to specify argument's mode.
 
+2000-11-02  Ben Elliston  <bje@redhat.com>
+
+	* doc/porting.texi (Building a GAS test suite): Document my change
+	to gas-build.sh.
+
 2000-11-01  Ben Elliston  <bje@redhat.com>
 
 	* sim-test.scm (cgen-build.sh): Include "-*- Asm -*-" in test cases.
@@ -435,6 +440,7 @@
 
 	* utils-cgen.scm (get-ifetch): Move from here ...
 	* sim.scm (get-ifetch): ... to here.
+	* sid.scm (get-ifetch): Copy and port to c++.
 
 2000-10-06  Dave Brolley  <brolley@redhat.com>
 
@@ -602,6 +608,14 @@
 	* mach.scm (arch-analyze-insns!): Exclude multi-insns.
 	* sem-frags.scm (sim-sfrag-analyze-insns!): Ditto.
 	(-frag-test-data): Ditto.
+	* sid-cpu.scm (cgen-write.cxx,-gen-sem-switch): Ditto.
+	(-gen-sem-switch-engine); Ditto.
+	* sid-model.scm (-gen-model-insn-fns, -gen-model-timing-table): Ditto.
+	* sid-decode.scm (cgen-decode.h, cgen-decode.cxx): Ditto.
+	(-gen-record-args): Tolerate unbound op-ifield.
+	* sid.scm (<derived-operand> cxmake-get): New sketch implementation.
+	(-gen-arch-model-decls, scache-engine-insns, pbb-engine-insns):
+	Exclude multi-insns.
 	* sim-decode.scm (cgen-decode.h, cgen-decode.cxx): Ditto.
 	* utils-sim.scm (op-extract?): Handle derived operands.
 	
@@ -685,6 +699,10 @@
 	* opcodes.scm (multi-ifield gen-extract): Correct spacing in generated
 	code.
 
+2000-05-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sid.scm (with-any-profile?): New function clone.
+
 2000-05-19  Frank Ch. Eigler  <fche@redhat.com>
 
 	* utils-gen.scm (gen-multi-ifld-extract): Fix decode hook for sim.
@@ -763,6 +781,10 @@
 	(-operand-parse-setter): Ditto.
 	* utils-sim.scm (needed-iflds): Store ifield (index) in argbuf, even
 	for CACHE-ADDR operands.
+	* sid-decode.scm (-gen-record-args): Remove newly duplicated extract
+	trace entries.  Widen byte-wide values for printing.
+	* sid.scm (-op-gen-set-trace): Enhance result trace with op indices.
+	Widen byte-wide values for printing.  Hexify memory addresses.
 
 
 2000-04-23  matthew green  <mrg@redhat.com>
@@ -869,6 +891,16 @@ Fri Apr 21 22:18:48 2000  Jim Wilson  <wilson@cygnus.com>
 	* doc/internals.texi (Conventions): Do not mention Hobbit.
 	* doc/porting.texi (Supported Guile versions): Likewise.
 
+2000-03-16  Frank Ch. Eigler  <fche@redhat.com>
+	
+	* sid-cpu.scm (-gen-sem-switch-engine): Adjust calling &
+	callback convention to new sid sidutil::basic_cpu code.
+	(-gen-sfrag-engine-fn): Ditto.
+	* sid.scm (-create-virtual-insns!): Ditto.
+	(-hw-gen-set-quiet-pc): Mark delay slot execution specially in pbb
+	mode.
+	(cxmake-skip): Implement properly for pbb mode.
+	
 2000-03-03  Ben Elliston  <bje@redhat.com>
 
 	* doc/internals.texi: New file.
@@ -912,7 +944,8 @@ Thu Feb 24 14:09:01 2000  Doug Evans  <devans@seba.cygnus.com>
 	* sem-frags.scm (-frag-hash-compute!): Add appstuff arg for traversal.
 	(-frag-cost-compute!): Ditto.
 	* utils.scm (copyright-cygnus): Add Y2K.
-
+	* sid-cpu.scm (@prefix@_pbb_run): Add unsigned& argument.
+	
 2000-01-25  Nick Clifton  <nickc@cygnus.com>
 
 	* desc-cpu.scm (@arch@_cgen_cpu_open): Add code to initialise
@@ -1122,6 +1155,36 @@ Wed Sep 29 14:39:39 1999  Dave Brolley  <brolley@cygnus.com>
 	* thumb.cpu (*): arm_compute_operand2_foo renamed to
 	compute_operand2_foo.
 
+	* cgen-sid.scm (sim_arguments): Add support for building defs.h.
+	* sid.scm (-hw-gen-set-quiet-pc): Handle #:delay modifier.
+	Call delayed_branch/branch methods instead of assigning to `vpc'.
+	(<hw-pc>,cxmake-skip): Call skip method.
+	(-gen-hw-selector): Call rtl-c++ instead of rtl-c.
+	(<pc>,cxmake-skip): Ditto.
+	(-create-virtual-insns!): Ditto.
+	(op:read): Call estate-make-for-normal-c++ instead of estate-...-c.
+	(op:write): Ditto.
+	(op:record-profile): Specify #:output-language "c++".
+	* sid-cpu.scm (-gen-insn-attr-decls): Rename @cpu@_insn_attr to
+	@arch@_insn_attr.
+	(cgen-desc.h): Use @arch@ namespace instead of @cpu@.
+	Define enums here.
+	(-gen-reg-access-defns): Use rtl-c++ instead of rtl-c.
+	(gen-semantic-code): Ditto.
+	(-gen-sem-case,-gen-sfrag-code): Ditto.
+	(-gen-hardware-types): Delete class @cpu@_cpu_base.
+	(cgen-cpu.h): File is now #included by main cpu class, rather than
+	subclassing.
+	(cgen-defs.h): New proc.
+	(-gen-scache-semantic-fn): Change result type to sem_status.
+	New local `status'.  Call done_cti_insn/done_insn method at end.
+	(cgen-semantics.cxx): Include @cpu@.h instead of @arch@-main.h,
+	cgen-ops.h.
+	(cgen-sem-switch.cxx): Ditto.
+	* sid-decode.scm (-gen-idesc-decls): Update return type of
+	@prefix@_sem_fn.
+	(cgen-decode.h): Add using namespace @arch@.
+	(cgen-decode.cxx): Include @cpu@.h instead of @arch@-main.h.
 	
 	* rtl-c.scm (<rtl-c-eval-state>): New member output-language.
 	(estate-output-language-c?,estate-output-language-c++?): New procs.
@@ -1154,6 +1217,8 @@ Tue Sep 21 17:12:55 1999  Dave Brolley  <brolley@cygnus.com>
 
 1999-09-05  Doug Evans  <devans@casey.cygnus.com>
 
+	* sid.scm (<hw-pc>,cxmake-skip): New method.
+	(<pc>,cxmake-skip): New method.
 	
 	* decode.scm (decode-build-table): Delete args startbit,index-list.
 	All callers updated.
@@ -1161,6 +1226,7 @@ Tue Sep 21 17:12:55 1999  Dave Brolley  <brolley@cygnus.com>
 	All callers updated.
 	* sim-decode.scm (-gen-decode-fn): Always pass 0 for startbit
 	to decode-get-best-bits.
+	* sid-decode.scm (-gen-decode-fn): Ditto.
 	
 	* hardware.scm (hw-bits): New proc.
 	(-hw-parse): New arg layout.  All callers updated.
@@ -1196,6 +1262,7 @@ Tue Sep 21 17:12:55 1999  Dave Brolley  <brolley@cygnus.com>
 1999-09-01  Doug Evans  <devans@casey.cygnus.com>
 
 	* sim-decode.scm (-gen-decoder+supporting cast): Move to utils-sim.scm.
+	* sid-decode.scm (-gen-decoder+supporting cast): Ditto.
 	* utils-sim.scm: Decoder generator support moved here.
 	(-decode-equiv-entries?,-decode-sort-entries): New procs.
 	(-gen-decoder-switch): Sort entries for more fall-throughs.
@@ -1311,6 +1378,18 @@ Sun Aug 29 11:11:15 1999  Doug Evans  <devans@canuck.cygnus.com>
 	* utils-gen.scm (-gen-ifld-extract-base): Update.
 	(-gen-ifld-extract-beyond): Update.
 	(gen-multi-ifld-extract): Update.
+	* sid-decode.scm (-decode-expr-ifield-values-used): Update.
+	* sid.scm (<hw-pc>,gen-write): Update.
+	(-gen-decode-insn-globals): Update.
+	(-hw-cxmake-get): Update.
+	(<hw-register>,cxmake-get-raw): Update.
+	(<hw-memory>,cxmake-get,gen-set-quiet,gen-write): Update.
+	(<hw-index>,cxmake-get): Update.
+	(<operand>,gen-type,gen-read,cxmake-get): Update.
+	(<operand>,gen-set-quiet,gen-set-trace): Update.
+	(<pc>,cxmake-get): Update.
+	(-create-virtual-insns!): Update.
+	(-decode-split-build-assertion): Update.
 	* *.cpu: Update.
 	* simplify.inc: Update.
 
@@ -1401,11 +1480,14 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 	(-gen-idesc-init-fn): Update.  Don't initialize pointers to semantic
 	handlers here.
 	(cgen-decode.h): Print sfmt enum.
+	* sid-decode.scm (-gen-semf-fn-name): Delete.
 	* utils-gen.scm (gen-sfmt-enum-decl): New proc.
 
 	* iformat.scm (sfmt-build): Rename sformats from fmt-foo to sfmt-foo.
 	(ifmt-compute!): Ditto.
 	* sim-decode.scm (-gen-decoder-switch): Ditto.
+	* sid-decode.scm (-gen-decode-expr-entry): Ditto.
+	(-gen-decoder-switch): Ditto.
 	
 	* insn.scm (insn-virtual?): New proc.
 
@@ -1437,6 +1519,8 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 
 	* utils-sim.scm: New file.
 	* dev.scm (load-sim): Load it.
+	(load-sid): Load it.
+	* cgen-sid.scm: Load it.
 	* cgen-sim.scm: Load it.
 	* iformat.scm (<sformat>): New member sbuf, not initialized by
 	default make.
@@ -1473,6 +1557,30 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 	gen-sfmt-argvars-foo and rewrite.
 	(-gen-record-args): Rewrite.
 	(-gen-extract-case): Tweak.
+	* sid.scm (gen-profile-index-type): Delete.
+	(ifield argbuf support): Move to utils-sim.scm.
+	(-gen-ifld-decoded-val): Delete, use gen-extracted-ifld-value instead.
+	(hardware argbuf support): Move to utils-sim.scm and sid-decode.scm.
+	(operand argbuf support): Move to utils-sim.scm and sid-decode.scm.
+	(-sim-sformat-argbuf-list): New global.
+	(sim-init!): Initialize it.
+	(sim-analyze-insns!): Set it.
+	(current-sbuf-list): New proc.
+	* sid-decode.scm (-gen-argbuf-elm): Rewrite.
+	(-gen-argbuf-hw-elm): Delete.
+	(-gen-argbuf-fields-union): Generate structs for each sbuf instead
+	of each sfmt.
+	(-gen-record-argbuf-ifld,-gen-trace-argbuf-ifld): New procs.
+	(-gen-extract-decls): Delete.
+	(<hardware-base>,gen-extract,gen-trace-extract): Move here from
+	sid.scm.
+	(<hw-register,gen-extract,gen-trace-extract): Ditto.
+	(<hw-address,gen-extract,gen-trace-extract): Ditto.
+	(-gen-op-extract,-gen-op-trace-extract): New procs.
+	(gen-sfmt-op-argbuf-defns,gen-sfmt-op-argbuf-assigns): Rename from
+	gen-sfmt-argvars-foo and rewrite.
+	(-gen-record-args): Rewrite.
+	(-gen-extract-case): Tweak.
 	
 	* cgen-gh.c (gh_putc,gh_puts): New functions.
 	* cgen-gh.h (gh_putc,gh_puts): Declare them.
@@ -1486,9 +1594,14 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 
 	* dev.scm (load-opc): Use load instead of maybe-load.
 	(load-gtest,load-sim,load-stest): Ditto.
-
+	(load-sid): Ditto.
+	
 1999-07-23  Doug Evans  <devans@casey.cygnus.com>
 
+	* sid-cpu.scm (-gen-sem-switch-engine): Move definition of `count'
+	up to avoid g++ 'goto crosses initialization' warning.
+	(-gen-sfrag-engine-fn): Delete vpc arg to NEXT_FRAG.
+	(-gen-sfrag-case): Update use of NEXT_FRAG.
 	
 1999-07-22  Doug Evans  <devans@casey.cygnus.com>
 
@@ -1496,6 +1609,23 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 
 	* read.scm: Load sem-frags.scm.
 	* sem-frags.scm (*): Lots rewritten.
+	* sid.scm (-with-sem-frags?): New global
+	(with-sem-frags?): New proc.
+	(option-init!): Initialize -with-sem-frags?.
+	(option-set!): Recognize with-sem-frags.
+	(sim-init!): Call sim-sfrag-init! if with-sem-frags.
+	* sid-cpu.scm (cgen-sem-switch.cxx): Generate semantic frag version
+	if asked to.
+	(-gen-sfrag-engine-decls): New proc.
+	(-gen-sfrag-code,-gen-sfrag-case,-gen-sfrag-enum-decl): New procs.
+	(-gen-sfrag-engine-frag-table,-gen-sfrag-engine-fn): New procs.
+	(-gen-sfrag-engine): New proc.
+	(-gen-sem-case): Emit setup-semantics if specified.
+	(-gen-sem-switch-engine): Update init/use of computed goto label.
+	* sid-decode.scm (-gen-decode-expr-entry): Fetch ifield values
+	from local vars.
+	(-gen-idesc-decls): Replace sem_address with cgoto.
+	(-gen-scache-decls): Rewrite definition of `execute' member.
 	* arm.cpu (arm isa): Enable decode-splits.
 	* arm7.cpu (multiply insns): Rename result to mul-result.
 
@@ -1503,6 +1633,7 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 	* decode.scm (*): Update.
 	* insn.scm (*): Update.
 	* mach.scm (*): Update.
+	* sid.scm (*): Update.
 	
 1999-07-19  Doug Evans  <devans@casey.cygnus.com>
 
@@ -1524,11 +1655,6 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 	* cos.c (_make_x_symbol): New static global.
 	(object_make): Use it.
 	(cos_init): Initialize it.
-
-1999-07-16  Doug Evans  <devans@casey.cygnus.com>
-
-	* frv.opc (CGEN_DIS_HASH_SIZE): Change to 128.
-	(CGEN_DIS_HASH): Hash on f-op ifield value.
 
 1999-07-15  Doug Evans  <devans@casey.cygnus.com>
 
@@ -1559,6 +1685,7 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 	* cgen-sim.scm (cgen): Ditto.
 	* cgen-gas.scm (cgen): Ditto.
 	* cgen-stest.scm (cgen): Ditto.
+	* cgen-sid.scm (cgen): Ditto.
 	
 1999-07-05  Doug Evans  <devans@casey.cygnus.com>
 
@@ -1578,6 +1705,8 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 	(<operand>,gen-fset): Ditto.
 
 	* sim.scm (-gen-hw-index-raw): Handle scalar indices.
+	(-gen-hw-index): Ditto.
+	* sid.scm (-gen-hw-index-raw): Handle scalar indices.
 	(-gen-hw-index): Ditto.
 	
 	* sem-frags.scm: New file.
@@ -1651,6 +1780,7 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 	* operand.scm (op-iflds-used): New proc.
 	* utils-gen.scm (gen-ifld-type): Move here from sim.scm
 	and sim-cpu.scm.
+	And from sid.scm,sid-cpu.scm as well.
 	(gen-ifld-extract-decl,-gen-ifld-extract-base): Ditto.
 	(-gen-extract-word,-gen-ifld-extract-beyond): Ditto.
 	(gen-ifld-extract,gen-multi-ifld-extract): Ditto.
@@ -1675,9 +1805,22 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 	* sim-model.scm (-gen-model-insn-fn): Replace calls to
 	gen-define-ifields with gen-define-ifmt-ifields.  Ditto for
 	gen-extract-foo.
+	* sid.scm (gen-ifld-argbuf-defn): Use gen-ifld-type.
+	(gen-record-argbuf-ifld): Rename from gen-ifld-extract.
+	(gen-record-argvar-ifld): Rename from gen-ifld-extract-argvar.
+	* sid-decode.scm (-gen-decode-expr-entry): Update calls to
+	gen-define-ifields, gen-extract-ifields.
+	(-gen-record-args): Update.
+	(gen-sfmt-argvars-assigns): Update.
+	(-gen-extract-case): Replace calls to gen-define-ifmt-ifields
+	with gen-define-ifields.  Ditto for gen-extract-foo.
+	(-gen-decode-fn): Use gen-ifld-extract-decl/gen-ifld-extract
+	procs rather than method calls.
 	
 1999-06-18  Doug Evans  <devans@casey.cygnus.com>
 
+	* sid.scm (-create-virtual-insns!): New local `context', pass it
+	to insn-read.
 	
 	* rtl.scm (-rtx-traverse): Output symbol shortcuts in source form,
 	(operand name) not (operand object), (local name) not (local object).
@@ -1725,6 +1868,7 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 	(ifmt-compute!): Ditto.
 	* sim.scm (sim-finish!): Update.
 	* simplify.inc: (define-normal-insn): Update.
+	* sid-cpu.scm (gen-semantic-code): Update.
 	
 	* iformat.scm (-ifmt-lookup-ifmt!): Use insn-set-ifmt!.
 	(-ifmt-lookup-sfmt!): Use insn-set-sfmt!.
@@ -1785,6 +1929,10 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 
 	* arm.sim (h-tbit): Replace FUN-ACCESS with FUN-SET.
 	(h-mbits): Ditto.
+	* sid.scm (-hw-cxmake-get): s/FUN-ACCESS/FUN-GET/.
+	(-hw-gen-set-quiet): s/FUN-ACCESS/FUN-SET/.
+	(<operand>,cxmake-get): Tweak.
+	(sim-finish!): Delete FUN-ACCESS attribute.  Create FUN-GET,FUN_SET.
 	
 1999-06-07  Doug Evans  <devans@casey.cygnus.com>
 
@@ -1802,6 +1950,46 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 	(-isa-parse): New arg setup-semantics.
 	(-isa-read): Recognize setup-semantics.
 
+	* sid-cpu.scm (gen-extract-fields): Split into two:
+	gen-extract-ifields, gen-extract-ifmt-ifields.
+	(-gen-scache-semantic-fn): Delete `taken_p'.  Delete
+	tracing begin/end messages (done by caller now).
+	(-gen-sem-case): Delete `taken_p'.  Add npc,br_status.  Delete
+	tracing begin/end messages (done by x-before,x-after virtual insns).
+	(-gen-sem-switch-engine): Redo vpc initialization.  Save vpc at
+	end so don't have to look it up again next time.
+	* sid-decode.scm (-decode-expr-ifield-values): New proc.
+	(-decode-expr-ifield-tracking-key): New proc.
+	(-decode-expr-ifield-tracking): New proc.
+	(-decode-expr-ifield-values-used): New proc.
+	(-decode-expr-ifield-mark-used!): New proc.
+	(-gen-decode-expr-set-itype): New proc.
+	(-gen-decode-expr-entry): Rewrite.
+	(-gen-decode-table-entry): New proc.
+	(-gen-decoder-switch): Use it.
+	(-gen-virtual-insn-finder): New proc.
+	(-gen-argbuf-elm): Move here from sid.scm.
+	(-gen-argbuf-hw-elm): Ditto.
+	(-gen-argbuf-fields-union): Add entries for chain,before insns.
+	(-gen-scache-decls): Add `cond' member to @prefix@_scache for
+	conditional-execution isas.
+	(-gen-decode-fn): Record conditional-exec ifield.
+	* sid.scm (-current-pbb-engine?): New global.
+	(current-pbb-engine?,set-current-pbb-engine?!): New procs.
+	(<ifield>,gen-ifld-extract): New arg `indent'.
+	(<multi-ifield>,gen-ifld-extract): Ditto.
+	(-hw-gen-set-quiet-pc): Add pbb support.  Delete `taken_p'.
+	(-op-gen-set-trace): Don't print tracing messages for pbb engine.
+	(-gen-arch-model-decls): Only scan real insns.
+	(scache-engine-insns,pbb-engine-insns): New procs.
+	(-create-virtual-insns!): New proc.
+	(sim-finish!): Call it.
+	(-decode-specialize-insn?): New proc.
+	(-decode-specialize-build-assertion): New proc.
+	(-decode-specialize-insn-1): New proc.
+	(-decode-specialize-insn): New proc.
+	(-fill-sim-insn-list!): New proc.
+	(sim-analyze!): Create copies of insns to be specialized.
 	* utils-cgen.scm (obj-set-name!): New proc.
 
 	* attr.scm (-attr-eval): Rewrite calls to rtx-simplify/rtx-compile.
@@ -1890,9 +2078,28 @@ Thu Jun  3 16:00:40 1999  Doug Evans  <devans@canuck.cygnus.com>
 	(hw-shape,hw-num-elms): New procs.
 	* sim.scm (<hw-register>,gen-profile-index-type): Use "unsigned short"
 	if there's more than 255 registers.
+	* sid.scm (<hw-register>,gen-profile-index-type): Ditto.
 	
 	* hardware.scm (-hw-parse): Flag as error CACHE-ADDR specified
 	with get/set specs.
+
+1999-05-21  Doug Evans  <devans@casey.cygnus.com>
+
+	* cgen-sid.scm (sim-arguments): Add -X.
+	* sid-cpu.scm (-gen-hardware-types): Comment out scache vars.
+	(-gen-all-semantic-fns): Don't include PBB support virtual insns.
+	(-gen-sem-case): Use CASE/NEXT macros again.  Tweak indenting.
+	Simplify by supporting pbb engine only.
+	(-gen-sem-switch-init): New proc.
+	(-gen-sem-switch-engine): Rename from -gen-sem-switch-fn.
+	(cgen-sem-switch.cxx): New proc.
+	* sid-decode.scm (-gen-decode-insn-globals): Replace with-sem-switch?
+	with with-pbb?.  Support dual scache/pbb engines.
+	(-gen-idesc-decls): Replace with-sem-switch? with with-pbb?.
+	Support dual scache/pbb engines.
+	(cgen-decode.h): Generate semantic fn decls if with-scache?.
+	* sid.scm (*) with-pbb? replaces with-sem-switch?.
+	(sim-finish!): Create pbb support virtual insns if with-pbb?.
 
 1999-05-10  Ben Elliston  <bje@cygnus.com>
 
@@ -1907,6 +2114,8 @@ Thu Jun  3 16:00:40 1999  Doug Evans  <devans@canuck.cygnus.com>
 
 1999-05-08  Doug Evans  <devans@casey.cygnus.com>
 
+	* sid.scm (<hw-memory>,cxmake-get): Call GETMEM method, not function.
+	(<hw-memory>,gen-set-quiet): Call SETMEM method, not function.
 	
 	* utils-cgen.scm (keyword-list->arg-list): Fix call to substring,
 	hobbit can't handle optional third arg.
@@ -1918,17 +2127,24 @@ Thu Jun  3 16:00:40 1999  Doug Evans  <devans@canuck.cygnus.com>
 	* arm.sim: New file.
 	* hardware.scm (modify-hardware): New proc.
 	(hardware-init!): Add modify-hardware command.
+	* sid.scm (-hw-cxmake-get): Use method call if FUN-ACCESS specified.
+	(-hw-gen-set-quiet): Ditto.
+	(sim-finish!): Call invalid_insn method.  Define FUN-ACCESS builtin
+	hardware attribute.  Load $arch.sim file if present.
 	* utils-cgen.scm (keyword-list?): New proc.
 	(keyword-list->arg-list,arg-list-validate-name): New procs.
 	(arg-list-check-no-args,arg-list-symbol-arg): New procs.
 
 	* arm7.cpu (eval-cond): Pass pc to @cpu@_eval_cond handler.
 
+	* sid-cpu.scm (-gen-hardware-types): Rename @cpu@_cpu to
+	@cpu@_cpu_cgen.
 	
 	* attr.scm (obj-prepend-atlist!): New proc.
 
 	* opc-opinst.scm (cgen-opinst.c): Analyze instructions if necessary.
 
+	* sid.scm (<operand>,profilable?): Use op:type.
 	* sim.scm (<operand>,profilable?): Use op:type.
 
 1999-05-04  Doug Evans  <devans@casey.cygnus.com>
@@ -1949,6 +2165,11 @@ Thu Jun  3 16:00:40 1999  Doug Evans  <devans@canuck.cygnus.com>
 	* read.scm: Load slib/pp.scm, slib/genwrite.scm.
 	(-reader-process-expanded-1): Pretty print logging output.
 
+	* sid-cpu.scm (-gen-reg-access-defns): Make getters `const'.
+	(cgen-cpu.h): Print enums before hardware elements.
+	(cgen-semantics.cxx): @arch@-cgen.h renamed to @arch@-main.h.
+	* sid-decode.scm (cgen-decode.cxx): Ditto.
+	* sid-model.scm (cgen-model.cxx): Ditto.
 	
 	* utils-cgen.scm (context-error): Accept variable number of
 	trailing args.
@@ -2056,6 +2277,9 @@ Thu Jun  3 16:00:40 1999  Doug Evans  <devans@canuck.cygnus.com>
 	(arch-analyze-insns!): New proc.
 	* opcodes.scm (opcodes-analyze!): Call arch-analyze-insns! instead
 	of calling ifmt-compute! directly.
+	* sid.scm (-sim-insns-analyzed?): Delete.
+	(sim-analyze!): Call arch-analyze-insns! instead of calling
+	ifmt-compute! directly.
 	* sim.scm (-sim-insns-analyzed?): Delete.
 	(sim-analyze!): Call arch-analyze-insns! instead of calling
 	ifmt-compute! directly.
@@ -2121,6 +2345,11 @@ Mon Apr 26 10:30:18 1999  Doug Evans  <devans@canuck.cygnus.com>
 1999-04-25  Doug Evans  <devans@casey.cygnus.com>
 
 	* utils.scm (bits->bools): New proc.
+
+1999-04-23  Doug Evans  <devans@casey.cygnus.com>
+
+	* sid.scm (<multi-ifield>,gen-ifld-extract-decl): Fix call to
+	subfield's gen-ifld-extract-decl method.
 
 1999-04-23  Ben Elliston  <bje@cygnus.com>
 
@@ -2258,6 +2487,67 @@ Mon Apr 26 10:30:18 1999  Doug Evans  <devans@canuck.cygnus.com>
 	(-attr-sort): Split result into two lists, bools and non-bools.
 	(current-attr-list-for): Update.
 
+	* cgen-sid.scm (sim-arguments): Add -H -> build desc.h file.
+	* sid-cpu.scm (-gen-attr-decls): New proc.
+	(-gen-insn-attr-decls): New proc.
+	(cgen-desc.h): New proc.
+	(cgen-cpu.h): Put everything in @cpu@ namespace.
+	(gen-parallel-exec-type): Change prefix of parexec struct from
+	@cpu@ to @prefix@.
+	(-gen-trace-record-type): Ditto for trace_record struct.
+	(-gen-write-case): Update.
+	(-gen-scache-semantic-fn): Change function prefix from @cpu@ to
+	@prefix@.  Update scache struct references.
+	(-gen-sem-case): Update scache struct references.
+	(-gen-sem-switch-fn): Update idesc struct reference.
+	Update insn_type enum reference.
+	(cgen-write.cxx): Update scache,argbuf references.
+	(cgen-semantics.cxx): Simplify namespace choice (always @cpu@).
+	* sid-decode.scm (IDESC-TABLE-VAR): Change prefix of insn_data
+	from @cpu@ to @prefix@.
+	(-gen-decode-insn-entry): Use gen-cpu-insn-enum.
+	(-gen-decode-expr-entry): Ditto.  Change prefix of INSN_X_INVALID
+	from @CPU@ to @PREFIX@.
+	(-gen-decoder-switch): Change prefix of INSN_X_INVALID
+	from @CPU@ to @PREFIX@.
+	(-gen-decode-insn-globals): Generate insn attributes.
+	(-gen-sem-fn-name): Change function prefix from @cpu@ to @prefix@.
+	(-gen-sem-fn-decls): Use -gen-sem-fn-name.  Add `using' for
+	semantic fn typedef.
+	(-gen-idesc-decls): Simplify cpu class name (always @cpu@_cpu).
+	Change prefix of scache struct from @cpu@ to @prefix@.
+	Change prefix of semantic fn typedef from @cpu@ to @prefix@.
+	Change prefix of idesc struct from @cpu@ to @prefix@.
+	Change prefix of insn_type enum from @cpu@ to @prefix@.
+	(-gen-argbuf-fields-union): Change prefix of sem_fields union
+	from @cpu@ to @prefix@.
+	(-gen-scache-decls): Change prefix of scache struct from
+	@cpu@ to @prefix@.  Update idesc struct name.
+	Update decode,execute methods.
+	(-gen-extract-case): Update to type name changes.
+	(-gen-decode-fn): Ditto.
+	(cgen-decode.h): Put everything in @cpu@ namespace (except
+	semantic fn decls).  Change prefix of insn_word from @cpu@ to @prefix@.
+	(cgen-decode.cxx): Add using namespace @cpu@.
+	* sid-model.scm (-gen-hw-profile-decls): Change prefix of
+	model_mark_get/set from @cpu@ to @prefix@.
+	(gen-model-unit-fn-name): Change function prefix from @cpu@ to
+	@prefix@.
+	(gen-model-fn-decls): Update idesc struct name.  Change prefix
+	of model_insn_before/after from @cpu@ to @prefix@.
+	(-gen-model-insn-fn): Update scache/idesc/argbuf struct names.
+	Update insn_word type name.
+	(-gen-model-timing-table): Update INSN_TIMING struct name.
+	(-gen-model-init-fn): Update MODEL_DATA struct name.
+	(-gen-mach-defns): Update name of init_idesc_table fn.
+	(cgen-model.cxx): Add using namespace @cpu@.
+	* sid.scm (gen-cpu-class): Delete.
+	(gen-attr-type): New proc.
+	(gen-obj-attr-sid-defn): New proc.
+	(<operand>,gen-profile-code): Update name of model_mark_get/set fn.
+	(gen-cpu-insn-enum-decl): Change prefix of insn_type enum from
+	@CPU@ to @PREFIX@.
+	(gen-cpu-insn-enum): Update name of insn enum.
 	* thumb.cpu (bx-rs): Rename @cpu@_do_bx to @prefix@_do_bx.
 	(bx-hs): Ditto.
 	(swi): Rename @cpu@_swi to @prefix@_swi.
@@ -2290,6 +2580,8 @@ Mon Apr 26 10:30:18 1999  Doug Evans  <devans@canuck.cygnus.com>
 	(semantic-attrs): Ditto.
 	* sim.scm (sim-finish!): Update calls to define-full-insn.
 	* simplify.inc (define-normal-insn): Update call to define-full-insn.
+	* sid-cpu.scm (gen-semantic-code): Handle insn-condition.
+	* sid.scm (sim-finish!): Update call to define-full-insn.
 	
 Tue Apr 13 17:04:34 1999  Doug Evans  <devans@canuck.cygnus.com>
 
@@ -2337,6 +2629,27 @@ Sun Apr 11 00:37:56 1999  Jim Wilson  <wilson@cygnus.com>
 	rtl-c-with-alist.
 	(<ifield>,gen-extract): Ditto.
 	(<multi-ifield>,gen-insert,gen-extract): Ditto.
+	* sid-cpu.scm (-gen-reg-access-defns): Ditto.
+	(gen-define-ifmt-ifields): New proc.
+	(gen-semantic-code): Rewrite.
+	* sid-decode.scm (-gen-decode-expr-entry): New proc.
+	(-gen-decoder-switch): Handle expression tables.
+	(-gen-extract-case): Call gen-define-ifmt-ifields instead of
+	gen-define-fields.
+	* sid-model.scm (-gen-model-insn-fn): Call gen-define-ifmt-ifields
+	instead of gen-define-fields.
+	* sid.scm (<ifield>,gen-ifld-extract-decl): New arg `indent', all
+	callers updated.
+	(<multi-ifield,gen-ifld-extract-decl): Ditto.
+	(-gen-ifld-extract-base): Call rtl-c instead of rtl-c-with-alist.
+	(-gen-ifld-extract-beyond): Ditto.
+	(<multi-ifield>,gen-ifld-extract): Ditto.
+	(<*>,cxmake-get,gen-set-quiet,gen-set-trace,gen-write): Update to new
+	rtl evaluation code.
+	(op:read): Build an <eval-state> to pass to gen-read.
+	(op:write): Build an <eval-state> to pass to gen-write.
+	(op:record-profile): Build an <eval-state> to pass to
+	gen-record-profile.
 	* sim-cpu.scm (gen-semantic-code): Rewrite.
 	* sim.scm (-gen-ifld-extract-base): Call rtl-c instead of
 	rtl-c-with-alist.
@@ -2431,6 +2744,29 @@ Fri Apr  9 19:26:28 1999  Jim Wilson  <wilson@cygnus.com>
 	(s-parallel): Replace do {...} while (0) with {...}.
 	(s-sequence): Ditto.
 
+	* sid-cpu.scm (gen-parallel-exec-type): Make type of `written'
+	consistent.
+	(-gen-write-case,-gen-sem-case): Ditto.
+	(-gen-sem-case): Only specify `written' if profiling or
+	parallel-write-back.
+	(-gen-scache-semantic-fn,-gen-all-semantic-fns): Put procs back in.
+	(-gen-sem-switch-fn): New proc.
+	(cgen-semantics.cxx): Emit either semantic fns or semantic switch
+	based on with-sem-switch option.
+	* sid-decode.scm (-gen-decode-insn-globals): Only define
+	idesc_table_initialized_p if with-sem-switch.  Record semantic fn
+	addresses in idesc_table if !with-sem-switch.
+	(-gen-sem-fn-decls): Rewrite.
+	(-gen-idesc-decls): Define @cpu@_sem_fn type.  Define `execute'
+	member based on with-sem-switch.  Only define
+	`idesc_table_initialized_p' member if with-sem-switch.
+	(cgen-decode.h): If !with-sem-switch, declare semantic fns.
+	* sid.scm (-with-sem-switch?): New variable.
+	(option-init!): Initialize it.
+	(option-set!): Set it.
+	(with-sem-switch?): New proc.
+	(-op-gen-set-trace): Only emit `written' reference if profiling.
+	(sim-finish!): Use h_pc_set to set pc.
 	
 1999-03-30  Doug Evans  <devans@casey.cygnus.com>
 
@@ -2438,6 +2774,9 @@ Fri Apr  9 19:26:28 1999  Jim Wilson  <wilson@cygnus.com>
 	All callers updated.
 	(arith-carry-cc-binop): New arg set-flags.  All callers updated.
 
+	* sid.scm (gen-argbuf-type): Delete.
+	(-gen-argbuf-fields-union): Move to ...
+	* sid-decode.scm: ... here.
 	
 	* read.scm (-reader-process-expanded-1): New proc.
 	(-reader-process-expanded): Call it to catch nested begin's.
@@ -2465,6 +2804,10 @@ Fri Apr  9 19:26:28 1999  Jim Wilson  <wilson@cygnus.com>
 	(-fill-slot!): Simplify.
 	(-build-slots): Simplify.
 
+	* dev.scm (load-sid): Don't load sid-arch.scm.
+
+	* sid-decode.scm: Replace computed goto decoder/extractor with plain
+	switch's.
 	* sim-decode.scm: Replace computed goto decoder/extractor with plain
 	switch's.
 
@@ -2472,6 +2815,7 @@ Fri Apr  9 19:26:28 1999  Jim Wilson  <wilson@cygnus.com>
 
 	* sim-decode.scm: Clean up pass.  Move decoder computation into ...
 	* decode.scm: ... here.  New file.
+	* sid-decode.scm: Use decoder computation code in decode.scm.
 	* read.scm: Load decode.scm.
 
 	* arm.cpu (arm710 model): Add u-exec function unit.
@@ -2498,6 +2842,9 @@ Fri Apr  9 19:26:28 1999  Jim Wilson  <wilson@cygnus.com>
 
 	* attr.scm (<bitset-attribute>,parse-value): Recognize strings.
 
+	* cgen-sid.scm: Don't load sid-arch.scm.
+	(sim-arguments): Delete unused entries.
+	* sid-arch.scm: Delete.
 	
 	* insn.scm (<insn>,iflds): Renamed from flds.  All uses updated.
 	(<insn>,ifld-assertions): New member.
@@ -2532,6 +2879,37 @@ Fri Apr  9 19:26:28 1999  Jim Wilson  <wilson@cygnus.com>
 	(keep-mach-atlist?): New proc.
 	(keep-isa-multiple?,current-keep-isa-name-list): New proc.
 	(reader-install-builtin!): Renamed from -install-builtin!.
+	* sid-cpu.scm (-gen-reg-access-defns): Renamed from
+	-gen-cpu-reg-access-defns.  Rewrite.
+	(gen-reg-access-defn): Delete.
+	(-gen-hardware-struct): New proc.
+	(-gen-hardware-types): Simplify.  Add multiple-isa support.
+	(gen-semantic-fn,-gen-all-semantics): Delete.
+	(-gen-read-args,-gen-read-case,-gen-read-switch): Delete.
+	(cgen-cpu.c,cgen-read.c,cgen-sem-switch.c,cgen-mainloop.in): Delete.
+	(cgen-write.cxx,cgen-semantics.cxx,cgen-decode.cxx): Renamed from *.c.
+	Call sem-analyze-insns!.
+	(cgen-semantics.cxx): Add multiple-isa support.
+	* sid-decode.c (-gen-idesc-decls): Add multiple-isa support.
+	(-gen-scache-decls,-gen-decode-fn): Ditto.
+	(cgen-decode.h): Call sem-analyze-insns!.
+	* sid-model.scm (cgen-model.cxx): Renamed from cgen-model.c.
+	* sid.scm (-with-multiple-isa?): New variable.
+	(option-init!): Initialize it.
+	(option-set!): Set it.
+	(with-multiple-isa?): New proc.
+	(gen-cpu-ref): New arg isas.  All callers updated.
+	(gen-cpu-class): New proc.
+	(*-get-macro,*-set-macro): Delete.
+	(gen-reg-get-fun-name,gen-reg-set-fun-name): New procs.
+	(-hw-gen-fun-get): Call gen-reg-get-fun-name.
+	(-hw-gen-fun-set): Call gen-reg-set-fun-name.
+	(-gen-hw-index): Call rtx-c instead of rtx-c-with-temps for rtxs.
+	(-sim-insns-analyzed): New global variable.
+	(sim-init!): Reset it.
+	(sim-analyze-insns!): New proc.
+	(sim-analyze!): Don't do instruction analysis here.
+	(sim-finish!): Specify isa of x-invalid insn.
 	* sim.scm (sim-finish!): Specify isa of added x-* virtual insns.
 
 1999-03-22  Doug Evans  <devans@casey.cygnus.com>
@@ -2547,6 +2925,14 @@ Fri Apr  9 19:26:28 1999  Jim Wilson  <wilson@cygnus.com>
 	(define-setters): Ditto.
 	(sanitize): Recognize isa elements.
 
+	* sid-cpu.scm (*): Replace cpu:parallel-exec? call with
+	state-parallel-exec?.
+	* sid-model.scm (*): Ditto.
+	* sid-decode.scm (*): Ditto.  Replace cpu:decode-assist with
+	state-decode-assist.
+
+	* sid-decode.scm (decode-bits): Replace list-reverse! with reverse!.
+	(-gen-decode-switch): Rewrite to not generate deeply nested lists.
 	* sim-decode.scm (-gen-decode-switch): Ditto.
 
 	* sim-arch.scm (-regs-for-access-fns): Delete.
@@ -2649,6 +3035,11 @@ Fri Apr  9 19:26:28 1999  Jim Wilson  <wilson@cygnus.com>
 	* Makefile.in: Rebuild.
 	* doc/Makefile.in: Rebuild.
 
+	* sid-cpu.scm (-extract-chunk-specs): New proc.
+	(gen-define-fields): Use it.
+	(-extract-chunk): New proc.
+	(-gen-extract-beyond-var-list): Use it.
+	(gen-extract-fields): Simplify.
 	
 1999-03-22  Ben Elliston  <bje@cygnus.com>
 
@@ -2716,6 +3107,7 @@ Tue Mar 16 13:22:01 1999  Doug Evans  <devans@canuck.cygnus.com>
 	(f-imm12,f-offset24,swi,undef): Fix thinko, add `const'.
 	* thumb.cpu (h-gr-t,h-lr-t,h-sp-t,dnti,h-hiregs): s/MACH/ISA/.
 
+	* sid-decode.scm (cgen-decode.c): Call rtl-gen-init!.
 	
 1999-03-11  Doug Evans  <devans@casey.cygnus.com>
 
@@ -2785,6 +3177,33 @@ Tue Mar 16 13:22:01 1999  Doug Evans  <devans@canuck.cygnus.com>
 	(fp-ld-op): New arg `dest', all callers updated.
 	(*): Replace `make-di' with `join'.
 
+	* sid-cpu.scm (-gen-cpu-reg-access-defns): Use get/set specs if
+	present.
+	(gen-semantic-code): Save/restore rtl generator state.
+	(cgen-cpu.h): Call rtl-gen-init!.
+	* sid.scm (-gen-ifld-extract-base): Update call to rtx-c-with-alist.
+	(-gen-ifld-extract-beyond): Ditto.
+	(<multi-ifield>,gen-ifld-extract): Ditto.
+	(all gen-read,gen-write,cxmake-get,gen-set-* methods): New arg
+	`gstate'.
+	(-hw-gen-set-quiet-pc): Ditto.
+	(<hw-pc>,gen-write): Ditto.
+	(-hw-cxmake-get): Ditto.  Call getter function if present.
+	(<hw-register>,cxmake-get-raw): New method.
+	(<hw-register>,gen-set-quiet-raw): New method.
+	(-hw-gen-set-quiet): New arg `gstate'.
+	(hw-fun-access?): Delete.
+	(gen-reg-access-defn): Output function contents.
+	(-gen-hw-index-raw): Update call to rtx-c.  Update cxmake-get
+	invocation.
+	(-gen-hw-index): Ditto.
+	(op:read): Update gen-read invocation.
+	(op:write): Update gen-write invocation.
+	(<operand>,cxmake-get,gen-set-quiet,gen-set-trace): Handle raw-reg
+	operands.
+	(-op-gen-set-quiet,-op-gen-set-quiet-parallel): New arg `gstate'.
+	(-op-gen-set-trace,-op-gen-set-trace-parallel): Ditto.
+	(<unit>,gen-profile-code): Update to sim.scm version.
 	
 	* sim-arch.scm (-regs-for-access-fns): New proc.
 	(-biggest-reg-mode): New proc.
@@ -2978,6 +3397,17 @@ Tue Mar 16 13:22:01 1999  Doug Evans  <devans@canuck.cygnus.com>
 
 	* utils.scm (alist-remove-duplicates): Delete.
 
+	* sid.scm (sim-init!): Delete private debugging code.
+	
+1999-03-10  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* cgen-sid.scm: New file for C++ simulator application.
+	* sid-arch.scm: Ditto.
+	* sid-cpu.scm: Ditto.
+	* sid-decode.scm: Ditto.
+	* sid-model.scm: Ditto.
+	* sid.scm: Ditto.
+	* utils-cgen.scm (gen-mach-sid-name): Remove this accident.
 	
 1999-03-05  Ben Elliston  <bje@cygnus.com>
 
@@ -3613,6 +4043,7 @@ Tue Feb 23 12:10:29 1999  Doug Evans  <devans@canuck.cygnus.com>
 	valid C.
 	(<{integer,enum}-attribute>,gen-value-for-defn): Ditto.
 
+	* dev.scm: Add sid support.
 	
 	* Makefile.am (opcodes,sim-arch,sim-cpu): New targets.
 	(CLEANFILES): Add tmp-*.

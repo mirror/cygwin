@@ -9,3 +9,12 @@
 /* Version number of package */
 #undef VERSION
 
+/* Define to 1 if we found this declaration otherwise define to 0. */
+#undef HAVE_DECL_VASPRINTF
+
+/* Define to 1 if we found this declaration otherwise define to 0. */
+#undef HAVE_DECL_ASPRINTF
+
+/* Define to 1 if we found this declaration otherwise define to 0. */
+#undef HAVE_DECL_BASENAME
+

@@ -59,5 +59,10 @@ AC_CHECK_PROGS(GUILE, guile, false)
 dnl building docs
 RH_DOCBUILD_CHECK
 
+gcc_AC_CHECK_DECLS([vasprintf asprintf basename], [], [], [
+#include <stdio.h>
+#include <string.h>
+])
+
 dnl Outputs
 AC_OUTPUT(Makefile CGEN.sh)

@@ -2485,7 +2485,6 @@ thread_db_get_thread_reg (struct gdbserv *serv,
 {
   struct child_process *process = gdbserv_target_data (serv);
   td_thrhandle_t thread_handle;
-  td_thrinfo_t   ti;
   FPREGSET_T fpregset;
   GREGSET_T gregset;
   td_err_e ret;

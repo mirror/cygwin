@@ -1,6 +1,5 @@
-/* Target-dependent definitions for 64-bit GNU/Linux MIPS.
-
-   Copyright 2002 Free Software Foundation, Inc.
+/* Macro definitions for ARM running under NetBSD.
+   Copyright 2003 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -19,10 +18,9 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#ifndef TM_MIPS64LINUX_H
-#define TM_MIPS64LINUX_H
+#ifndef TM_NBSD_H
+#define TM_NBSD_H
 
-#include "mips/tm-mips64.h"
-#include "mips/tm-linux.h"
+#include "solib.h"
 
-#endif /* TM_MIPS64LINUX_H */
+#endif /* TM_NBSD_H */

@@ -1,3 +1,8 @@
+2003-11-17  Andrew Cagney  <cagney@redhat.com>
+
+	* lib/framework.exp (clone_output): Write KFAIL messages to the
+	screen.
+
 2003-11-10  Corinna Vinschen  <vinschen@redhat.com>
 
 	* Makefile.am: Add empty install-info and uninstall-info rules.

@@ -1,6 +1,5 @@
-/* Target machine parameters for MIPS r4000
-   Copyright 1994, 1996, 1997, 1998, 2000 Free Software Foundation, Inc.
-   Contributed by Ian Lance Taylor (ian@cygnus.com)
+/* Common target dependent code for GDB on MIPS systems running NetBSD.
+   Copyright 2002 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -19,19 +18,16 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-/* Use eight byte registers.  */
-#define MIPS_REGSIZE 8
+#ifndef MIPSNBSD_TDEP_H
+#define MIPSNBSD_TDEP_H
 
-/* define 8 byte register type */
-#define MIPS_REGISTER_TYPE(N) \
-        (((N) >= FP0_REGNUM && (N) < FP0_REGNUM+32) ? builtin_type_double \
-	 : ((N) == 32 /*SR*/) ? builtin_type_uint32 \
-	 : ((N) >= 70 && (N) <= 89) ? builtin_type_uint32 \
-	 : builtin_type_long_long)
+void mipsnbsd_supply_reg (char *, int);
+void mipsnbsd_fill_reg (char *, int);
 
-/* Load double words in CALL_DUMMY.  */
-#define OP_LDFPR 065		/* ldc1 */
-#define OP_LDGPR 067		/* ld */
+void mipsnbsd_supply_fpreg (char *, int);
+void mipsnbsd_fill_fpreg (char *, int);
 
-/* Get the basic MIPS definitions.  */
-#include "mips/tm-mips.h"
+#define SIZEOF_STRUCT_REG	(38 * mips_regsize (current_gdbarch))
+#define SIZEOF_STRUCT_FPREG	(33 * mips_regsize (current_gdbarch))
+
+#endif /* MIPSNBSD_TDEP_H */

@@ -1374,6 +1374,9 @@ thread_db_open (struct gdbserv *serv, int pid)
       return -1;		/* failure */
     }
 
+  if (thread_db_noisy)
+    fprintf (stderr, "< -- succeeded, thread_agent = %p>\n", thread_agent);
+
   /* All LinuxThreads versions support the signal-based debugging
      interface.  Newer versions of LinuxThreads also provide the
      event-based debugging interface.  NPTL has only ever supported
@@ -1381,10 +1384,20 @@ thread_db_open (struct gdbserv *serv, int pid)
      interface to the event-based interface, to leave behavior on
      older systems unchanged.  */
   if (get_thread_signals () == 0)
-    return 0;
+    {
+      if (thread_db_noisy)
+        fprintf (stderr,
+                 "(using thread signals cancel=%d, restart=%d, debug=%d)\n",
+                 cancel_signal, restart_signal, debug_signal);
+      return 0;
+    }
 
-  if (request_thread_db_events (serv) == -1)
-    return 0;
+  if (request_thread_db_events (serv) == 0)
+    {
+      if (thread_db_noisy)
+        fprintf (stderr, "(using thread_db events)\n");
+      return 0;
+    }
 
   return -1;
 }

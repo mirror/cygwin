@@ -1,5 +1,7 @@
 2004-12-02  Jim Blandy  <jimb@redhat.com>
 
+	* thread-db.c (thread_db_open): Produce debugging output.
+
 	* thread-db.c (thread_db_thread_info): Produce output that more
 	closely resembles GDB's native thread output, to mollify the GDB
 	test suite.

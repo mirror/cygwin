@@ -7,6 +7,29 @@
 
 	* Makefile.am (check-local): Rename target from "checkme".
 
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* *.xml: Add <?xml ... ?> prefix.
+
+2001-07-04  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add maintainer-mode doc building configury.
+	* configure: Regenerate.
+	* Makefile.am: Add maintainer-mode doc building.
+	* Makefile.in: Regenerate.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* hw-visual-clock.txt: Generate.
+	* hw-rtc-sid.txt: Likewise.
+	* hw-rtc-ds1x42.txt: Likewise.
+
+2001-06-27  graydon hoare  <graydon@redhat.com>
+
+	* hw-visual-clock.xml: Add.
+	* hw-rtc-sid.xml: Add.
+	* hw-rtc-ds1x42.xml: Add.
+
 2001-04-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidrtc.cxx (get_{hours,minutes,seconds}_attribute): New getter fns
@@ -16,6 +39,10 @@
 	* components.h: Corresponding changes.
 	* hw-rtc-sid.txt: Document gui-compatibility.
 	* hw-rtc-ds1x42.txt: Similar tweak.
+
+2001-03-23  John Healy  <jhealy@redhat.com>
+
+	* Makefile.in: Regenerated.
 
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 

@@ -928,4 +928,4 @@ AC_PATH_PROG(TAR, tar)
 dnl Perform --target/--enable-targets processing.
 CY_SIDTARGET_CHECK
 
-AC_OUTPUT(Makefile vga/Makefile gui/Makefile cpu/Makefile memory/Makefile fpu/Makefile)
+AC_OUTPUT(Makefile vga/Makefile gui/Makefile keyboard/Makefile cpu/Makefile memory/Makefile fpu/Makefile)

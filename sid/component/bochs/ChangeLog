@@ -1,3 +1,43 @@
+2002-01-29  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* Makefile.am (SUBDIRLIST): Add keyboard.
+	(SUBLIBLIST): Add keyboard/libkeyboard.la.
+	(INCLUDES): Add keyboard directory.
+	* bochs.h [BX_SUPPORT_SID] (BX_SET_ENABLE_A20): Change expansion
+	to nil.
+	[BX_SUPPORT_SID] (BX_GET_ENABLE_A20): Change expansion to 0.
+	Make declaration of bx_dbg unconditional.
+	Include keyboard/keyboard.h.
+	* components.cxx: Add type hw-input-keyboard.
+	* config.h.in (BX_SUPPORT_PAGING): Set to 1.
+	(BX_USE_TLB): Likewise.
+	(BX_USE_KEY_SMF): Set to 0.
+	* configure.in: Add keyboard/Makefile to AC_OUTPUT.
+
+	* cpu/exception.cc: Remove BX_DEBUGGER ifdefs from around bx_dbg
+	references.
+	* cpu/proc_ctrl.cc: Likewise.
+	* cpu/protect_ctrl_pro.cc: Likewise.
+
+	* gui/x-gui.h: Add generate_scancode_pin output_pin.
+	* gui/x-gui.cc:	Add ascii_to_key_event array.
+	(x_gui): Add generate-scancode pin.
+	(handle_events): Add checks for KeyPress and KeyRelease events.
+	(xkeypress): New function.
+
+	* keyboard/Makefile.am: New file.
+	* keyboard/Makefile.in: Likewise.
+	* keyboard/keyboard.cc: Likewise.
+	* keyboard/keyboard.h: Likewise.
+	* keyboard/keysymbols.h: Likewise.
+	* keyboard/sid-keyboard-wrapper.cc: Likewise.
+	* keyboard/sid-keyboard-wrapper.h: Likewise.
+	* keyboard/tests: Likewise.
+	* keyboard/tests/kbd-test.c: Likewise.
+
+	* vga/sid-vga-wrapper.cc (vga): Change port pin names.
+	* vga/sid-vga-wrapper.h: Change VGA_SID_WRAPPER_DEF_H to SID_VGA_WRAPPER_DEF_H.
+
 2002-01-21  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* Makefile.am (SUBDIRLIST): Add vga, gui.

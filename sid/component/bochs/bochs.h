@@ -177,10 +177,13 @@ class sid_mem_c;
 #define BX_CPU(x)                   (bx_cpu_array[x])
 #define BX_MEM(x)                   (bx_mem_array[x])
 #endif
-
+#if BX_SUPPORT_SID
+#define BX_SET_ENABLE_A20(enabled)  
+#define BX_GET_ENABLE_A20()         0
+#else
 #define BX_SET_ENABLE_A20(enabled)  bx_pc_system.set_enable_a20(enabled)
 #define BX_GET_ENABLE_A20()         bx_pc_system.get_enable_a20()
-
+#endif
 #endif
 
 // you can't use static member functions on the CPU, if there are going
@@ -517,9 +520,9 @@ typedef struct {
 #define BX_ASSERT(x) do {if (!(x)) BX_PANIC(("failed assertion \"%s\" at %s:%s\n", #x, __FILE__, __LINE__));} while (0)
 void bx_signal_handler (int signum);
 void bx_atexit(void);
-#if BX_DEBUGGER
+
 extern bx_debug_t bx_dbg;
-#endif
+
 
 
 #define BX_FLOPPY_NONE   10 // floppy not present
@@ -544,6 +547,7 @@ enum PCS_OP { PCS_CLEAR, PCS_SET, PCS_TOGGLE };
 
 #if BX_SUPPORT_SID
 #include "vga/vga.h"
+#include "keyboard/keyboard.h"
 #else
 #include "pc_system.h"
 

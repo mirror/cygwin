@@ -124,8 +124,8 @@
 //   When there are collisions, the old entry is overwritten with
 //   one for the newest access.
 
-#define BX_SUPPORT_PAGING    0 
-#define BX_USE_TLB 0 
+#define BX_SUPPORT_PAGING   1
+#define BX_USE_TLB          1
 
 #define BX_TLB_SIZE 1024
 #define BX_TLB_INDEX_OF(lpf) (((lpf) & 0x003ff000) >> 12)
@@ -202,7 +202,7 @@
 #define BX_USE_CMOS_SMF 1  // CMOS
 #define BX_USE_DMA_SMF  1  // DMA
 #define BX_USE_FD_SMF   1  // Floppy
-#define BX_USE_KEY_SMF  1  // Keyboard
+#define BX_USE_KEY_SMF  0  // Keyboard
 #define BX_USE_PAR_SMF  1  // Parallel
 #define BX_USE_PIC_SMF  1  // PIC
 #define BX_USE_PIT_SMF  1  // PIT

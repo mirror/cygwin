@@ -180,11 +180,9 @@ BX_CPU_C::MOV_DdRd(BxInstruction_t *i)
     }
 
   val_32 = BX_READ_32BIT_REG(i->rm);
-#if BX_DEBUGGER
   if (bx_dbg.dreg)
     BX_INFO(("MOV_DdRd: DR[%u]=%08xh unhandled\n",
       (unsigned) i->nnn, (unsigned) val_32));
-#endif
 
   switch (i->nnn) {
     case 0: // DR0
@@ -307,11 +305,9 @@ BX_CPU_C::MOV_RdDd(BxInstruction_t *i)
     return;
     }
 
-#if BX_DEBUGGER
   if (bx_dbg.dreg)
     BX_INFO(("MOV_RdDd: DR%u not implemented yet\n", i->nnn));
-#endif
-  
+
   switch (i->nnn) {
     case 0: // DR0
       val_32 = BX_CPU_THIS_PTR dr0;
@@ -492,17 +488,13 @@ BX_CPU_C::MOV_CdRd(BxInstruction_t *i)
       break;
     case 2: /* CR2 */
       BX_INFO(("MOV_CdRd: CR2 not implemented yet\n"));
-#if BX_DEBUGGER
       if (bx_dbg.creg)
         BX_INFO(("MOV_CdRd: CR2 = reg\n"));
-#endif
       BX_CPU_THIS_PTR cr2 = val_32;
       break;
     case 3: // CR3
-#if BX_DEBUGGER
       if (bx_dbg.creg)
         BX_INFO(("MOV_CdRd:CR3 = %08x\n", (unsigned) val_32));
-#endif
       // Reserved bits take on value of MOV instruction
       CR3_change(val_32);
       BX_INSTR_TLB_CNTRL(BX_INSTR_MOV_CR3, val_32);
@@ -579,17 +571,13 @@ BX_CPU_C::MOV_RdCd(BxInstruction_t *i)
       val_32 = 0;
       break;
     case 2: /* CR2 */
-#if BX_DEBUGGER
       if (bx_dbg.creg)
         BX_INFO(("MOV_RdCd: CR2\n"));
-#endif
       val_32 = BX_CPU_THIS_PTR cr2;
       break;
     case 3: // CR3
-#if BX_DEBUGGER
       if (bx_dbg.creg)
         BX_INFO(("MOV_RdCd: reading CR3\n"));
-#endif
       val_32 = BX_CPU_THIS_PTR cr3;
       break;
     case 4: // CR4
@@ -1139,6 +1127,9 @@ BX_CPU_C::RSM(BxInstruction_t *i)
   void
 BX_CPU_C::RDTSC(BxInstruction_t *i)
 {
+  // RDTSC -- Read Time-Stamp Counter
+  // We need a clock-cycle counter to support this.
+  // 
 #if 0
 #if BX_CPU_LEVEL >= 5
   Boolean tsd = (BX_CPU_THIS_PTR cr4 & 4)? 1 : 0;

@@ -28,11 +28,11 @@ vga::vga ()
 
   add_pin("palette-change-index", & this->palette_change_index_pin);
 
-  add_bus("ports-3b4-3b5-bus", & this->ports_3b4_3b5_bus);
-  add_bus("ports-3ba-bus", & this->ports_3ba_bus);
-  add_bus("ports-3c0-3cf-bus", & this->ports_3c0_3cf_bus);
-  add_bus("ports-3d4-3d5-bus", & this->ports_3d4_3d5_bus);
-  add_bus("ports-3da-bus", & this->ports_3da_bus);
+  add_bus("ports-0x3b4-0x3b5", & this->ports_3b4_3b5_bus);
+  add_bus("port-0x3ba", & this->ports_3ba_bus);
+  add_bus("ports-0x3c0-0x3cf", & this->ports_3c0_3cf_bus);
+  add_bus("ports-0x3d4-0x3d5", & this->ports_3d4_3d5_bus);
+  add_bus("port-0x3da", & this->ports_3da_bus);
 
   add_bus("framebuffer", & this->framebuffer_bus);
 }

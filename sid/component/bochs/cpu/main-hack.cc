@@ -73,7 +73,7 @@ bx_options_t bx_options = {
   { NULL, NULL, NULL, 0, 0, 0, 0 },     // SB16
   "a",                                  // boot drive
   300000,                               // vga update interval
-  20000,  // default keyboard serial path delay (usec)
+  20,  // default keyboard serial path delay (usec in bochs, msec in sid)
   50000,  // default floppy command delay (usec)
   500000,  // default ips (instructions-per-second)
   0,       // default mouse_enabled

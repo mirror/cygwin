@@ -1,0 +1,42 @@
+# test the elf32/elf64 loader.  note that the address map corresponds to the
+# addresses used by the 2 test binaries.
+set test "sid configuration"
+sid_config_component_etc_test "loader.conf" \
+    "load [sid_find_file libloader.la] loader_component_library" \
+    "sw-load-elf" \
+    "load [sid_find_file libmemory.la] mem_component_library
+load [sid_find_file libmapper.la] mapper_component_library
+new hw-memory-ram/rom-basic gloss-insn
+new hw-memory-ram/rom-basic gloss-data
+new hw-mapper-basic mapper
+set gloss-insn size 0x10000
+set gloss-data size 0x10000
+connect-bus real-victim load-accessor-data mapper access-port
+connect-bus real-victim load-accessor-insn mapper access-port
+connect-bus mapper insn\[0x20000000,0x2000ffff\] gloss-insn read-write-port
+connect-bus mapper data\[0x00100000,0x0010ffff\] gloss-data read-write-port"
+pass $test
+
+set test "sid startup"
+if [sid_start "loader.conf"] then { pass $test } else { fail $test ; return }
+
+set test "attribute list"
+sid_assert_includes_all "sid::component::attribute_names $victim" "file verbose? state-snapshot"
+
+foreach file {x32.x x64.x} {
+  set test "set file = $file"
+  sid_assert_success "sid::component::set_attribute_value $victim file [sid_find_file $file]"
+
+  set test "load $file"
+  set pin [sid_cmd "sid::component::find_pin $victim load!"]
+  set result [sid_cmd "sid::pin::driven_h4 $pin 0"]
+  if {$result != ""} { fail $test } { pass $test }
+}
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "loader.conf" }

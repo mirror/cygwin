@@ -1,3 +1,9 @@
+2001-01-14  matthew green  <mrg@redhat.com>
+
+	* sidcomp.loader/loader.exp: New test.
+	* sidcomp.loader/x32.x: Elf32 test file.
+	* sidcomp.loader/x64.x: Elf64 test file.
+
 2001-01-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* sidcomp.glue/gluemonkey.exp: Add test for hw-glue-bus-mux.

@@ -1,3 +1,8 @@
+2001-01-11  Nicholas Duffek  <nsd@redhat.com>
+
+	* configrun-sid.in ($enable_z_packet): New variable.
+	($opt_gdb != 0): Use $enable_z_packet.
+
 2001-01-03  Jeff Johnston  <jjohnstn@redhat.com>
 
         * configrun-sid.in: Imply --persistent if --gdb=xxxx specified.

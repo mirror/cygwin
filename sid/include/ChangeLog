@@ -1,3 +1,13 @@
+2002-03-14  Ben Elliston  <bje@redhat.com>
+
+	* sidcpuutil.h (class basic_cpu): Add trace_filename member and a
+	new cpu_trace_stream inner class, derived from an ofstream.
+	(basic_cpu::trace_stream): Use a cpu_trace_stream.
+	(basic_cpu::update_trace_destination): New method.
+	(basic_cpu ctor): Initialise trace_stream and trace_filename. Add
+	attribute "trace-filename" that notifies update_trace_destination.
+	(operator <<): Add global function for cpu_trace_stream insertion.
+
 2002-03-01  Benjamin Kosnik  <bkoz@redhat.com>
 
 	* sidbusutil.h: Make typename usage explicit.

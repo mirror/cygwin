@@ -1,6 +1,6 @@
 // sidcpuutil.h - Elements common to CPU models.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -208,6 +208,34 @@ namespace sidutil
     output_pin step_cycles_pin;
     output_pin cg_caller_pin;
     output_pin cg_callee_pin;
+   
+    // tracing
+  private:
+    string trace_filename;
+    class cpu_trace_stream: public std::ofstream
+    {
+    public:
+      cpu_trace_stream ()
+	:cout_p (true) {}
+      cpu_trace_stream (const std::string& filename)
+	:std::ofstream (filename.c_str ()), cout_p (false) {}
+      void divert_to_file () { cout_p = false; }
+      void divert_to_cout () { cout_p = true; }
+      void open (const std::string& filename)
+      {
+	std::ofstream::open (filename.c_str ());
+	cout_p = false;
+      }
+    private:
+      bool cout_p;
+
+      template <typename T> friend
+      basic_cpu::cpu_trace_stream& operator<< (basic_cpu::cpu_trace_stream& s, T t);
+    };
+
+    template <typename T> friend
+    cpu_trace_stream& operator<< (cpu_trace_stream& s, T t);
+
   public:
     bool trace_extract_p;
     bool trace_result_p;
@@ -215,7 +243,7 @@ namespace sidutil
     bool trace_semantics_p;
     bool trace_counter_p;
     bool enable_step_trap_p;
-    std::ostream& trace_stream;
+    cpu_trace_stream trace_stream;
 
     void step_pin_handler (sid::host_int_4)
       {
@@ -302,6 +330,22 @@ namespace sidutil
 	    return false;
 	  }
       }
+
+    void
+    update_trace_destination ()
+    {
+      if (trace_filename == "-")
+	trace_stream.divert_to_cout ();
+      else
+	{
+	  trace_stream.close ();
+	  trace_stream.open (trace_filename);
+	  if (trace_stream.good ())
+	    trace_stream.divert_to_file ();
+	  else
+	    trace_filename = "io-error!";
+	}
+    }
 
     // Infer a change to trace_result_p after one of the other general 
     // trace flags are changed.
@@ -472,12 +516,13 @@ public:
       triggerpoint_manager (this),
       step_pin (this, & basic_cpu::step_pin_handler),
       yield_pin (this, & basic_cpu::yield_pin_handler),
-      trace_stream (std::cout),
       reset_pin (this, & basic_cpu::reset_pin_handler),
       flush_icache_pin (this, & basic_cpu::flush_icache_pin_handler),
       pc_set_pin (this, & basic_cpu::pc_set_pin_handler),
       endian_set_pin (this, & basic_cpu::endian_set_pin_handler),
-      debugger_bus (& this->data_bus)
+      debugger_bus (& this->data_bus),
+      trace_stream (),
+      trace_filename ("-") // standard output
       {
 	// buses
 	this->data_bus = 0;
@@ -510,6 +555,9 @@ public:
 	add_attribute_virtual ("state-snapshot", this,
 			       & basic_cpu::save_state,
 			       & basic_cpu::restore_state);
+	add_attribute_notify ("trace-filename", & this->trace_filename, this,
+			      & basic_cpu::update_trace_destination,
+			      "setting");
 	this->trace_extract_p = false;
 	add_attribute ("trace-extract?", & trace_extract_p, "setting");
 	this->trace_semantics_p = false;
@@ -541,6 +589,16 @@ public:
     return i;
   }
 
+    template <typename T>
+    basic_cpu::cpu_trace_stream& operator<< (basic_cpu::cpu_trace_stream& s, T t)
+    {
+      if (LIKELY (s.cout_p))
+	cout << t;
+      else
+	dynamic_cast <ofstream&> (s) << t;
+      return s;
+    }
+  
     template <typename BigOrLittleInt>
     BigOrLittleInt basic_cpu::read_insn_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt) const
       {

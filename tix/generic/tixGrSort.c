@@ -44,6 +44,11 @@ static int sortCode;			/* Anything other than TCL_OK means a
  * Forward declarations for procedures defined in this file:
  */
 
+#ifdef BUILD_tix
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLEXPORT
+#endif
+
 EXTERN TIX_DECLARE_SUBCMD(Tix_GrSort);
 
 static int		SortCompareProc _ANSI_ARGS_((CONST VOID *first,

@@ -37,6 +37,11 @@
 #  endif
 #endif
 
+#ifdef BUILD_tix
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLEXPORT
+#endif
+
 EXTERN int		Tclsam_Init _ANSI_ARGS_((Tcl_Interp *interp));
 EXTERN int		Tksam_Init _ANSI_ARGS_((Tcl_Interp *interp));
 EXTERN int		Tixsam_Init _ANSI_ARGS_((Tcl_Interp *interp));

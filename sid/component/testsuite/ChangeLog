@@ -1,5 +1,8 @@
 2001-06-18  Ben Elliston  <bje@redhat.com>
 
+	* sidcomp.interrupt/interruptmonkey.exp: Only monkey test ARM
+	interrupt peripherals if they have been built.
+
 	* lib/monkey.exp (monkey_test): Only notify the user of the test
 	completion time if the test is going to take more than 60 seconds
 	to run.

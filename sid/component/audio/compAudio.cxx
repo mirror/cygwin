@@ -561,7 +561,7 @@ cygwin_audio::cygwin_audio()
 }
 
 
-cygwin_audio::~cygwin_audio () 
+cygwin_audio::~cygwin_audio () throw ()
 {
 }
 

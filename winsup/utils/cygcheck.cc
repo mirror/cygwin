@@ -42,7 +42,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.54 $";
+static const char version[] = "$Revision: 1.55 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1160,10 +1160,11 @@ dump_sysinfo ()
   SetErrorMode (prev_mode);
   if (givehelp)
     {
-      printf ("fd=floppy, hd=hard drive, cd=CD-ROM, net=Network Share\n");
-      printf ("CP=Case Preserving, CS=Case Sensitive, UN=Unicode\n");
-      printf
-	("PA=Persistent ACLS, FC=File Compression, VC=Volume Compression\n");
+      puts (
+	  "fd = floppy,          hd = hard drive,       cd = CD-ROM\n"
+	  "net= Network Share,   ram= RAM drive,        unk= Unknown\n"
+	  "CP = Case Preserving, CS = Case Sensitive,   UN = Unicode\n"
+	  "PA = Persistent ACLS, FC = File Compression, VC = Volume Compression");
     }
   printf ("\n");
 

@@ -1,5 +1,9 @@
 2002-01-28  Hans-Peter Nilsson  <hp@axis.com>
 
+	* doc/porting.texi: When referring to *.opc, mention they are in
+	the cpu subdir.  Call top-level directory toplevel, not devo.
+	Close string in define-normal-insn example.
+
 	* doc/pmacros.texi: Fix .substr typo to .substring.
 	Mention that .sym expansions are not further expanded.
 

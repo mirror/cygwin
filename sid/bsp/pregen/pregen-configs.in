@@ -24,6 +24,7 @@ mvic() {
 	exit 1
     elif [ ! -f $srcdir/$2 ]; then
 	mv -f $1 $srcdir/$2
+        echo "$2 created."
     else
 	sum1=`cat $1 | grep -v "^#" | sum`
 	sum2=`cat $srcdir/$2 | grep -v "^#" | sum`
@@ -34,6 +35,7 @@ mvic() {
 	    echo "$2 effectively unchanged."
 	fi
     fi
+    rm -f $1
 }
 
 

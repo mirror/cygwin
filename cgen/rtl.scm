@@ -2029,7 +2029,9 @@
       (if (not (hw-mode-ok? hw (obj:name mode) (elm-xget result 'index)))
 	  (parse-error "hw" "invalid mode for hardware" mode-name))
 
+      (elm-xset! result 'hw-name hw-name)
       (elm-xset! result 'type hw)
+      (elm-xset! result 'mode-name mode-name)
       (elm-xset! result 'mode mode)
 
       (op:set-pretty-sem-name! result hw-name)

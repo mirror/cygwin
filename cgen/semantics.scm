@@ -260,7 +260,7 @@
     (else #f))
 )
 
-; Simplify an rtl expresion.
+; Simplify an rtl expression.
 ; EXPR must be in source form.
 ; The result is a possibly simplified EXPR, still in source form.
 ;

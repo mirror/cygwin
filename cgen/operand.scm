@@ -261,6 +261,7 @@
 ; Mode support.
 
 ; Create a copy of operand OP in mode NEW-MODE-NAME.
+; NOTE: Even if the mode isn't changing this creates a copy.
 ; If OP has been subclassed the result must contain the complete class
 ; (e.g. the behaviour of `object-copy-top').
 
@@ -282,6 +283,7 @@
 	      (if (not new-mode)
 		  (error "op:new-mode: internal error, bad mode"
 			 new-mode-name))
+	      (elm-xset! result 'mode-name new-mode-name)
 	      (elm-xset! result 'mode new-mode)
 	      result)
 	    (parse-error "op:new-mode"
@@ -289,6 +291,13 @@
 					(obj:name op)
 					"'")
 			 new-mode-name))))
+)
+
+; Return #t if operand OP references its h/w element in its natural mode.
+
+(define (op-natural-mode? op)
+  (or (eq? (op:mode-name op) 'DFLT)
+      (mode-compatible? 'samesize (op:mode op) (hw-default-mode (op:type op))))
 )
 
 ; Ifield support.

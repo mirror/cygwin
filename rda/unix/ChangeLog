@@ -1,3 +1,87 @@
+2004-11-23  Jim Blandy  <jimb@redhat.com>
+
+	Separate management of kernel-level LWPs from that of libpthread /
+	libthread_db-level threads.
+	* lwp-pool.c, lwp-pool.h: New files.
+	* thread-db.c: #include "lwp-ctrl.h" and "lwp-pool.h".
+	(struct gdbserv_thread): Delete members 'attached', 'stopped',
+	'waited', and 'stepping'.  This structure is now just a
+	'td_thrinfo_t' and a list link.  Describe some quirks in the
+	meanings of certain 'ti' fields.
+	(thread_list_lookup_by_lid): Move later in file, so we can use
+	information directly from our proc handle.  Be skeptical of ZOMBIE
+	or UNKNOWN threads whose LWP ID is equal to the PID in the proc
+	handle.
+	(thread_debug_name): Move later in file, so we can use
+	thread_db_state_str.
+	(attach_thread): Use lwp pool functions to attach.  Attach to
+	zombies.  When using signal-based communication, send the thread
+	the restart signal immediately.
+	(find_new_threads_callback): Go ahead and attach to all threads.
+	The LWP pool functions tolerate attaching to a given LWP more than
+	once.
+	(update_thread_list): Take the process as an argument.  If the
+	focus thread has disappeared, set process->focus_thread to NULL.
+	(thread_db_thread_next): Pass the process to update_thread_list.
+	(stop_thread, stop_all_threads, add_pending_event,
+	delete_pending_event, select_pending_event, send_pending_signals,
+	wait_all_threads, continue_all_threads): Deleted.
+	(handle_thread_db_event): Renamed from handle_thread_db_events.
+	Take the process structure as an argument, and check only for a
+	thread-db event notification from process->event_thread.  Use LWP
+	pool functions.
+	(continue_thread, singlestep_thread): Use LWP pool functions.
+	(thread_db_continue_program, thread_db_singlestep_program,
+	thread_db_continue_thread, thread_db_singlestep_thread): Use LWP
+	pool functions, and update process->focus_thread appropriately.
+	(thread_db_check_child_state): Use the LWP pool functions.  Rather
+	than stopping all LWP's, choosing the most interesting events, and
+	then arranging to re-create all the other wait statuses we got,
+	just pick the first event we get from lwp_pool_waitpid (either on
+	the focus thread, if there is one, or on any thread) and report
+	that.  Use the new handle_thread_db_event function.
+	(struct event_list, pending_events, pending_events_listsize,
+	pending_events_top): Deleted; replaced by LWP pool code.
+	(thread_db_attach): Tell the LWP pool about the PID we're
+	attaching to.  Clear the focus thread.
+	* server.h (struct process): New member: 'focus_thread'.
+	* gdbserv-thread-db.h (continue_lwp, singlestep_lwp, attach_lwp,
+	stop_lwp): Move declarations from here...
+	* lwp-ctrl.h: ... to here.  New file.
+	(kill_lwp): Renamed from stop_lwp; allow caller to specify any
+	signal.
+	* ptrace-target.c: #include "lwp-ctrl.h".
+	(continue_lwp, singlestep_lwp, attach_lwp, stop_lwp): Move
+	function comments to lwp-ctrl.h, and expand.
+	* configure.in: Whenever we select 'thread-db.o', select
+	'lwp-pool.o' as well.
+	* configure: Regenerated.
+
+	* thread-db.c (thread_db_check_child_state): Remove extraneous
+	call to handle_waitstatus.  Remove extra check for exited main
+	thread.
+	
+	* thread-db.c (thread_db_thread_info): List the type and state
+	before the PID, and mention whether the LWP's PID is equal to that
+	of the main thread, since ZOMBIE and UNKNOWN threads whose LWP's
+	PID is equal are probably actually exited threads.
+ 	
+	* thread-db.c (add_thread_to_list): Zero out entire structure.
+
+	* thread-db.c (thread_db_state_str, thread_db_type_str): Remove
+	spaces from names; we don't always want them, and the caller can
+	use printf formatting directives to arrange things as they please.
+
+	* ptrace-target.c (continue_lwp, singlestep_lwp, attach_lwp,
+	stop_lwp): Change arguments from 'lwpid_t' to 'pid_t'.  lwpid_t is
+	strictly a thread-db type; these are functions that use system
+	calls, which all expect pid_t.  Rename arguments from 'lwpid' to
+	'pid'.
+
+	* ptrace-target.c: #define _GNU_SOURCE to get declaration for
+	strsignal.
+	(kill_lwp): Enhance error reporting.
+
 2004-11-01  Jim Blandy  <jimb@redhat.com>
 
 	* thread-db.c (delete_pending_event): Fix bounds-check assertion.

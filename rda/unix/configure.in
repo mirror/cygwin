@@ -28,7 +28,7 @@ AC_CHECK_HEADERS(errno.h ptrace.h signal.h string.h strings.h sys/procfs.h \
 
 case "$target" in
   mips64*linux*)
-    TARGET_MODULES="linux-target.o thread-db.o ptrace-target.o" 
+    TARGET_MODULES="linux-target.o thread-db.o lwp-pool.o ptrace-target.o" 
     AC_DEFINE(LINUX_TARGET)
     AC_DEFINE(GREGSET_T,  prgregset_t)
     AC_DEFINE(FPREGSET_T, prfpregset_t)
@@ -42,7 +42,7 @@ case "$target" in
   arm*linux* | \
   mips*linux* | \
   frv*linux*)
-    TARGET_MODULES="linux-target.o thread-db.o ptrace-target.o" 
+    TARGET_MODULES="linux-target.o thread-db.o lwp-pool.o ptrace-target.o" 
     AC_DEFINE(LINUX_TARGET)
     AC_DEFINE(GREGSET_T,  prgregset_t)
     AC_DEFINE(FPREGSET_T, prfpregset_t)

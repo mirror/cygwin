@@ -83,28 +83,16 @@ extern int reg_from_xregset (struct gdbserv *serv,
 		             int regno, 
 		             const void *xregset);
 
-/* Resume a stopped LWP. */
-extern int continue_lwp (lwpid_t lid, int signal);
-
-/* Step a stopped LWP. */
-extern int singlestep_lwp (struct gdbserv *serv, lwpid_t lid, int signal);
-
 /* Software singlestep for mips.  */
 #if defined (MIPS_LINUX_TARGET) || defined (MIPS64_LINUX_TARGET)
 extern int mips_singlestep (struct gdbserv *serv, pid_t pid, int sig);
 #endif
-
-/* Attach an LWP. */
-extern int attach_lwp (lwpid_t lid);
 
 /* Fetch the value of PC for debugging purposes.  */
 extern unsigned long debug_get_pc (struct gdbserv *serv, pid_t pid);
 
 /* Adjust PC value after trap has been hit.  */
 extern int decr_pc_after_break (struct gdbserv *serv, pid_t pid);
-
-/* Send SIGSTOP to an LWP.  */
-extern int stop_lwp (lwpid_t lwpid);
 
 struct child_process;
 extern int handle_waitstatus (struct child_process *process, union wait w);

@@ -51,7 +51,14 @@ struct child_process {
   char *executable;
   char **argv;
   int  pid;
+
+  /* The last thread we reported an event for.  */
   struct gdbserv_thread *event_thread;
+
+  /* If the client continues or single-steps a single thread, leaving
+     the rest of the program stopped, this is that thread.  */
+  struct gdbserv_thread *focus_thread;
+
   int  stop_status;
   int  stop_signal;
   long signal_to_send;

@@ -38,6 +38,11 @@ typedef struct _TixItclNameSp {
     TixItclNameSp x; \
     x.iPtr = (Interp*)(i);
 
+#ifdef BUILD_tix
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLEXPORT
+#endif
+
 EXTERN int		TixItclSetGlobalNameSp _ANSI_ARGS_((
 			    TixItclNameSp * nameSpPtr, Tcl_Interp * interp));
 EXTERN void		TixItclRestoreGlobalNameSp _ANSI_ARGS_((
@@ -63,6 +68,11 @@ typedef struct _TixItclNameSp {
     x.iPtr = (Interp*)(i); \
     x.nsToken = NULL;
 
+#ifdef BUILD_tix
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLEXPORT
+#endif
+
 EXTERN int		TixItclSetGlobalNameSp _ANSI_ARGS_((
 			    TixItclNameSp * nameSpPtr, Tcl_Interp * interp));
 EXTERN void		TixItclRestoreGlobalNameSp _ANSI_ARGS_((
@@ -76,3 +86,6 @@ EXTERN void		TixItclRestoreGlobalNameSp _ANSI_ARGS_((
 
 #endif /* ITCL_2 */
 #endif /* TK_8_0_OR_LATER */
+
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLIMPORT

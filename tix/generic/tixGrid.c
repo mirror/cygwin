@@ -250,6 +250,11 @@ static void		RecalScrollRegion _ANSI_ARGS_((WidgetPtr wPtr,
 			    Tix_GridScrollInfo *scrollInfo));
 static void		Tix_GrResetRenderBlocks _ANSI_ARGS_((WidgetPtr wPtr));
 
+#ifdef BUILD_tix
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLEXPORT
+#endif
+
 static TIX_DECLARE_SUBCMD(Tix_GrBdType);
 static TIX_DECLARE_SUBCMD(Tix_GrCGet);
 static TIX_DECLARE_SUBCMD(Tix_GrConfig);

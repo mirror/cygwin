@@ -475,6 +475,11 @@ static int Tix_CallMethodByContext(interp, context, widRec, method, argc, argv)
 
 #else
 
+#ifdef BUILD_tix
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLEXPORT
+#endif
+
 EXTERN int		Tix_GlobalEvalArgv _ANSI_ARGS_((Tcl_Interp * interp,
 			    Tcl_CmdInfo * cmdInfoPtr, int argc));
 

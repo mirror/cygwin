@@ -324,8 +324,8 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
    (if (all-true? (map isa-integral-insn? (current-isa-list))) "1" "0")
    "\n"
    "\n"
-   "/* Maximum nymber of syntax bytes in an instruction.  */\n"
-   "#define CGEN_ACTUAL_MAX_SYNTAX_BYTES "
+   "/* Maximum number of syntax elements in an instruction.  */\n"
+   "#define CGEN_ACTUAL_MAX_SYNTAX_ELEMENTS "
    ; The +2 account for the leading "MNEM" and trailing 0.
    (number->string (+ 2 (apply max (map (lambda (insn) 
 					  (length (syntax-break-out (insn-syntax insn))))

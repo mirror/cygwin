@@ -8,7 +8,7 @@
   Pins: start-pc-set! endian-set!  reset!  nreset trap trap-code step!
         nm tbit nfiq nirq yield flush-icache step-cycles
   Accessors: data-memory insn-memory
-  Attributes: debug-exec? trace-extract?  trace-result?  engine-type
+  Attributes: enable-warnings? trace-extract?  trace-result?  engine-type
         insn-count step-insn-count enable-step-trap?  endian r0 r1 r2 r3 r4 r5 r6 r7 r8 r9
 	r10 r11 r12 r13 r14 r15  pc cpsr cpsr-flags
         gdb-register-N gdb-num-registers gdb-exp-registers
@@ -195,7 +195,7 @@
 
   * attributes
 
-  debug-exec? | setting | boolean | false | initialization
+  enable-warnings? | setting | boolean | false | initialization
   trace-extract? | setting | boolean | false | initialization
   trace-result? | setting | boolean | false | initialization
   engine-type | setting | scache or pbb | pbb | execution

@@ -827,14 +827,6 @@ arm7f_cpu::memory_trap (const cpu_memory_fault& t)
   this->h_gr_set (H_GR_PC, t.pc);
   this->h_pc_set (t.pc);
 
-  if (this->debug_exec_p)
-    cerr << "MEMORY TRAP "
-	 << " operation=" << t.operation
-	 << " pc=0x" << hex << t.pc << dec
-	 << " address=0x" << hex << t.address << dec
-	 << " status=" << (int) t.status 
-	 << endl;
-  
   cpu_trap_disposition whatnext = this->signal_trap (cpu_trap_memory_fault, t.address);
 
   switch (whatnext)
@@ -1033,7 +1025,7 @@ arm7f_cpu::arm_tbit_set (BI newval)
 
   this->hardware.h_tbit = newval;
 
-  if (this->debug_exec_p)
+  if (this->warnings_enabled)
     {
       if (newval)
 	this->trace_stream << " <switching to thumb mode> ";

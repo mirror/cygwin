@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -89,7 +89,7 @@ TEXINFO_TEX = $(top_srcdir)/../texinfo/texinfo.tex
 INFO_DEPS = cgen.info
 DVIS = cgen.dvi
 TEXINFOS = cgen.texi
-DIST_COMMON =  Makefile.am Makefile.in stamp-vti version.texi
+DIST_COMMON =  Makefile.am Makefile.in mdate-sh stamp-vti version.texi
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)

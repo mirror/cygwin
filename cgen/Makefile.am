@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 SUBDIRS = doc
 
-GUILE = `if test -f ../guile/libguile/guile ; then echo ../guile/libguile/guile; else echo guile ; fi`
+GUILE = "`if test -f ../guile/libguile/guile ; then echo ../guile/libguile/guile; else echo guile ; fi` -l guile -s"
 CGENFLAGS = -v
 ARCH = @arch@
 ARCHFILE = $(srcroot)/../cpu/$(ARCH).cpu
@@ -46,7 +46,7 @@ stamp-cgen: $(CGENFILES)
 # FIXME: needs more dependencies
 desc: desc.scm
 	rm -f tmp-desc.h tmp-desc.c tmp-opinst.c
-	$(GUILE) -s $(srcdir)/cgen-opc.scm \
+	$(GUILE) $(srcdir)/cgen-opc.scm \
 		-s $(srcdir) \
 		$(CGENFLAGS) \
 		-f "$(OPTIONS)" \
@@ -60,7 +60,7 @@ desc: desc.scm
 .PHONY: html
 html: desc.scm html.scm cgen-doc.scm
 	rm -f tmp-doc.html
-	$(GUILE) -s $(srcdir)/cgen-doc.scm \
+	$(GUILE) $(srcdir)/cgen-doc.scm \
 		-s $(srcdir) \
 		$(CGENFLAGS) \
 		-f "$(OPTIONS)" \
@@ -82,7 +82,7 @@ html: desc.scm html.scm cgen-doc.scm
 opcodes: opcodes.scm
 	rm -f tmp-opc.h tmp-itab.c
 	rm -f tmp-asm.in tmp-dis.in tmp-ibld.h tmp-ibld.in
-	$(GUILE) -s $(srcdir)/cgen-opc.scm \
+	$(GUILE) $(srcdir)/cgen-opc.scm \
 		-s $(srcdir) \
 		$(CGENFLAGS) \
 		-f "$(OPTIONS) opinst" \
@@ -103,7 +103,7 @@ opcodes: opcodes.scm
 # FIXME: needs more dependencies
 sim-arch: sim.scm
 	rm -f tmp-arch.h tmp-arch.c tmp-cpuall.h
-	$(GUILE) -s $(srcdir)/cgen-sim.scm \
+	$(GUILE) $(srcdir)/cgen-sim.scm \
 		-s $(srcdir) \
 		$(CGENFLAGS) \
 		-f "$(OPTIONS)" \
@@ -114,7 +114,7 @@ sim-arch: sim.scm
 sim-cpu: sim.scm
 	rm -f tmp-cpu.h tmp-cpu.c tmp-decode.h tmp-decode.c
 	rm -f tmp-model.c tmp-sem.c tmp-sem-switch.c
-	$(GUILE) -s $(srcdir)/cgen-sim.scm \
+	$(GUILE) $(srcdir)/cgen-sim.scm \
 		-s $(srcdir) \
 		$(CGENFLAGS) \
 		-f "$(OPTIONS)" \
@@ -135,7 +135,7 @@ gas-test: gas-test.scm cgen-gas.scm
 	  echo "ISAS not specified!" ;\
 	  exit 1 ;\
 	fi
-	$(GUILE) -s $(srcdir)/cgen-gas.scm \
+	$(GUILE) $(srcdir)/cgen-gas.scm \
 		-s $(srcdir) \
 		$(CGENFLAGS) \
 		-a $(ARCHFILE) \
@@ -153,7 +153,7 @@ sim-test: sim-test.scm cgen-stest.scm
 	  echo "ISAS not specified!" ;\
 	  exit 1 ;\
 	fi
-	$(GUILE) -s $(srcdir)/cgen-stest.scm \
+	$(GUILE) $(srcdir)/cgen-stest.scm \
 		-s $(srcdir) \
 		$(CGENFLAGS) \
 		-a $(ARCHFILE) \

@@ -12,9 +12,9 @@
 ; (load-sid)
 ; (cload #:arch arch #:machs "mach-list" #:isas "isa-list" #:options "options")
 
-; First load fixup.scm to coerce guile into something we've been using.
+; First load guile.scm to coerce guile into something we've been using.
 ; Guile is always in flux.
-(load "fixup.scm")
+(load "guile.scm")
 
 (define srcdir ".")
 (set! %load-path (cons srcdir %load-path))

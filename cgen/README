@@ -166,8 +166,8 @@ misc. support scripts
 ---------------------
 
 dev.scm - top level script for doing interactive development
-fixup.scm - munges the Scheme environment to make it suit us
-	[Guile is/was still in flux]
+guile.scm - Guile-specific definitions, and adaptations to specific
+	    versions of Guile
 cos.scm - OOP implementation
 pmacros.scm - preprocessor-style macro package
 profile.scm - Guile profiling tool [eventually wish to move this to

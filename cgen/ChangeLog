@@ -1,3 +1,32 @@
+2005-02-15  Jim Blandy  <jimb@redhat.com>
+
+	Make backtraces work more reliably.
+	* guile.scm: Set up debugging parameters, and enable debugging and
+	source positions while loading.
+	(cgen-call-with-debugging, cgen-debugging-stack-start): New
+	functions.
+	* read.scm: Don't set debugging parameters here.
+	(catch-with-backtrace): Function deleted.
+	(-cgen): Simply note the presence or absence of the -b option.
+	Pass the flag to cgen-call-with-debugging, so debugging is turned
+	off here if the user didn't request it, for faster computation.
+	(cgen): Call cgen-debugging-stack-start here, instead of
+	catch-with-backtrace.
+
+	* Makefile.am (GUILE): Explicitly load guile.scm here, and leave a
+	trailing -s.
+	(desc, html, opcodes, sim-arch, sim-cpu, gas-test, sim-test):
+	Don't write out the trailing -s here.
+	* Makefile.in: Regenerated.
+	* cgen-doc.scm, cgen-gas.scm, cgen-stest.scm): Don't load
+	fixup.scm here; let the caller decide which Scheme's customization
+	file to preload.
+	* dev.scm: Load guile.scm, not fixup.scm.
+	* fixup.scm: Deleted; contents have all moved to guile.scm.
+	* README: Doc fix.
+
+	* guile.scm (debug-write): New function.
+
 2005-02-14  Jim Blandy  <jimb@redhat.com>
 
 	* pmacros.scm (pmacros-init!): For .eval macros, use eval1 as the

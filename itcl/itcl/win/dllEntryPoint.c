@@ -7,58 +7,17 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-/* CYGNUS LOCAL */
-#include <tcl.h>
-
-#ifdef __CYGWIN32__
-/*
- * The following declaration is for the VC++ DLL entry point.
- */
-
-BOOL APIENTRY		DllMain _ANSI_ARGS_((HINSTANCE hInst,
-			    DWORD reason, LPVOID reserved));
-
-/* cygwin32 requires an impure pointer variable, which must be
-   explicitly initialized when the DLL starts up.  */
-struct _reent *_impure_ptr;
-extern struct _reent *_imp__reent_data;
-
-/*
- *----------------------------------------------------------------------
- *
- * DllMain --
- *
- *	DLL entry point.
- *
- * Results:
- *	TRUE on sucess, FALSE on failure.
- *
- * Side effects:
- *	None.
- *
- *----------------------------------------------------------------------
- */
-
-BOOL APIENTRY
-DllMain(hInstance, reason, reserved)
-    HINSTANCE hInstance;
-    DWORD reason;
-    LPVOID reserved;
-{
-    /* CYGNUS LOCAL */
-    /* cygwin32 requires the impure data pointer to be initialized
-       when the DLL starts up.  */
-    _impure_ptr = _imp__reent_data;
-    /* END CYGNUS LOCAL */
-    
-    return(TRUE);
-}
-
-/* END CYGNUS LOCAL */
-#else /* __CYGWIN32__ */
-
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
+    /* Only do this when MSVC++ is compiling us. */
 #   define DllEntryPoint DllMain
+#   if defined(USE_TCL_STUBS) && (!defined(_MT) || !defined(_DLL) || defined(_DEBUG))
+	/*
+	 * This fixes a bug with how the Stubs library was compiled.
+	 * The requirement for msvcrt.lib from tclstubXX.lib should
+	 * be removed.
+	 */
+#	pragma comment(linker, "-nodefaultlib:msvcrt.lib")
+#   endif
 #endif
 
 /*
@@ -78,6 +37,8 @@ DllMain(hInstance, reason, reserved)
  *
  *----------------------------------------------------------------------
  */
+
+#ifndef STATIC_BUILD
 
 BOOL APIENTRY
 DllEntryPoint(hInst, reason, reserved)

@@ -12,13 +12,13 @@ ac_help=
 ac_default_prefix=/usr/local
 # Any additions from configure.in:
 ac_help="$ac_help
+  --enable-gcc            allow use of gcc if available [--disable-gcc]"
+ac_help="$ac_help
   --with-tcl              directory containing tcl configuration (tclConfig.sh)"
 ac_help="$ac_help
   --with-tk               directory containing tk configuration (tkConfig.sh)"
 ac_help="$ac_help
   --with-itclinclude=DIR          use Itcl headers from DIR"
-ac_help="$ac_help
-  --with-itclconfig           directory containing itcl configuration (itclConfig.sh)"
 ac_help="$ac_help
   --enable-threads        build with threads"
 ac_help="$ac_help
@@ -42,7 +42,6 @@ program_suffix=NONE
 program_transform_name=s,x,x,
 silent=
 site=
-sitefile=
 srcdir=
 target=NONE
 verbose=
@@ -157,7 +156,6 @@ Configuration:
   --help                  print this message
   --no-create             do not create output files
   --quiet, --silent       do not print \`checking...' messages
-  --site-file=FILE        use FILE as the site file
   --version               print the version of autoconf that created configure
 Directory and file names:
   --prefix=PREFIX         install architecture-independent files in PREFIX
@@ -328,11 +326,6 @@ EOF
   -site=* | --site=* | --sit=*)
     site="$ac_optarg" ;;
 
-  -site-file | --site-file | --site-fil | --site-fi | --site-f)
-    ac_prev=sitefile ;;
-  -site-file=* | --site-file=* | --site-fil=* | --site-fi=* | --site-f=*)
-    sitefile="$ac_optarg" ;;
-
   -srcdir | --srcdir | --srcdi | --srcd | --src | --sr)
     ac_prev=srcdir ;;
   -srcdir=* | --srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=*)
@@ -498,16 +491,12 @@ fi
 srcdir=`echo "${srcdir}" | sed 's%\([^/]\)/*$%\1%'`
 
 # Prefer explicitly selected file to automatically selected ones.
-if test -z "$sitefile"; then
-  if test -z "$CONFIG_SITE"; then
-    if test "x$prefix" != xNONE; then
-      CONFIG_SITE="$prefix/share/config.site $prefix/etc/config.site"
-    else
-      CONFIG_SITE="$ac_default_prefix/share/config.site $ac_default_prefix/etc/config.site"
-    fi
+if test -z "$CONFIG_SITE"; then
+  if test "x$prefix" != xNONE; then
+    CONFIG_SITE="$prefix/share/config.site $prefix/etc/config.site"
+  else
+    CONFIG_SITE="$ac_default_prefix/share/config.site $ac_default_prefix/etc/config.site"
   fi
-else
-  CONFIG_SITE="$sitefile"
 fi
 for ac_site_file in $CONFIG_SITE; do
   if test -r "$ac_site_file"; then
@@ -546,9 +535,8 @@ else
 fi
 
 
-# CYGNUS LOCAL
 ac_aux_dir=
-for ac_dir in ../.. $srcdir/../..; do
+for ac_dir in ../config $srcdir/../config; do
   if test -f $ac_dir/install-sh; then
     ac_aux_dir=$ac_dir
     ac_install_sh="$ac_aux_dir/install-sh -c"
@@ -560,13 +548,12 @@ for ac_dir in ../.. $srcdir/../..; do
   fi
 done
 if test -z "$ac_aux_dir"; then
-  { echo "configure: error: can not find install-sh or install.sh in ../.. $srcdir/../.." 1>&2; exit 1; }
+  { echo "configure: error: can not find install-sh or install.sh in ../config $srcdir/../config" 1>&2; exit 1; }
 fi
 ac_config_guess=$ac_aux_dir/config.guess
 ac_config_sub=$ac_aux_dir/config.sub
 ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
 
-# END CYGNUS LOCAL
 
 #--------------------------------------------------------------------
 # __CHANGE__
@@ -580,7 +567,7 @@ PACKAGE=itk
 
 MAJOR_VERSION=3
 MINOR_VERSION=2
-PATCHLEVEL=.0
+PATCHLEVEL=.1
 
 VERSION=${MAJOR_VERSION}.${MINOR_VERSION}
 NODOT_VERSION=${MAJOR_VERSION}${MINOR_VERSION}
@@ -618,11 +605,31 @@ fi
 # was not used.
 #--------------------------------------------------------------------
 
-# CYGNUS LOCAL
-# Extract the first word of "gcc", so it can be a program name with args.
+
+    # Check whether --enable-gcc or --disable-gcc was given.
+if test "${enable_gcc+set}" = set; then
+  enableval="$enable_gcc"
+  ok=$enableval
+else
+  ok=no
+fi
+
+    if test "$ok" = "yes"; then
+	CC=gcc
+    else
+	case "`uname -s`" in
+	    *win32* | *WIN32* | *CYGWIN_NT* | *CYGWIN_98* | *CYGWIN_95*)
+		CC=cl
+	    ;;
+	    *)
+		CC=${CC-cc}
+	    ;;
+	esac
+    fi
+    # Extract the first word of "gcc", so it can be a program name with args.
 set dummy gcc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:626: checking for $ac_word" >&5
+echo "configure:633: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -652,7 +659,7 @@ if test -z "$CC"; then
   # Extract the first word of "cc", so it can be a program name with args.
 set dummy cc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:656: checking for $ac_word" >&5
+echo "configure:663: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -703,7 +710,7 @@ fi
       # Extract the first word of "cl", so it can be a program name with args.
 set dummy cl; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:707: checking for $ac_word" >&5
+echo "configure:714: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -735,7 +742,7 @@ fi
 fi
 
 echo $ac_n "checking whether the C compiler ($CC $CFLAGS $LDFLAGS) works""... $ac_c" 1>&6
-echo "configure:739: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) works" >&5
+echo "configure:746: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) works" >&5
 
 ac_ext=c
 # CFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
@@ -746,12 +753,12 @@ cross_compiling=$ac_cv_prog_cc_cross
 
 cat > conftest.$ac_ext << EOF
 
-#line 750 "configure"
+#line 757 "configure"
 #include "confdefs.h"
 
 main(){return(0);}
 EOF
-if { (eval echo configure:755: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:762: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   ac_cv_prog_cc_works=yes
   # If we can't run a trivial program, we are probably using a cross compiler.
   if (./conftest; exit) 2>/dev/null; then
@@ -777,12 +784,12 @@ if test $ac_cv_prog_cc_works = no; then
   { echo "configure: error: installation or configuration problem: C compiler cannot create executables." 1>&2; exit 1; }
 fi
 echo $ac_n "checking whether the C compiler ($CC $CFLAGS $LDFLAGS) is a cross-compiler""... $ac_c" 1>&6
-echo "configure:781: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) is a cross-compiler" >&5
+echo "configure:788: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) is a cross-compiler" >&5
 echo "$ac_t""$ac_cv_prog_cc_cross" 1>&6
 cross_compiling=$ac_cv_prog_cc_cross
 
 echo $ac_n "checking whether we are using GNU C""... $ac_c" 1>&6
-echo "configure:786: checking whether we are using GNU C" >&5
+echo "configure:793: checking whether we are using GNU C" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_gcc'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -791,7 +798,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:795: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:802: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gcc=yes
 else
   ac_cv_prog_gcc=no
@@ -810,7 +817,7 @@ ac_test_CFLAGS="${CFLAGS+set}"
 ac_save_CFLAGS="$CFLAGS"
 CFLAGS=
 echo $ac_n "checking whether ${CC-cc} accepts -g""... $ac_c" 1>&6
-echo "configure:814: checking whether ${CC-cc} accepts -g" >&5
+echo "configure:821: checking whether ${CC-cc} accepts -g" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_cc_g'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -841,7 +848,7 @@ else
   fi
 fi
 
-# END CYGNUS LOCAL
+
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
 # incompatible versions:
@@ -854,7 +861,7 @@ fi
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:858: checking for a BSD compatible install" >&5
+echo "configure:865: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -912,7 +919,7 @@ test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 #--------------------------------------------------------------------
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:916: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:923: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -946,7 +953,7 @@ fi
 # Extract the first word of "ranlib", so it can be a program name with args.
 set dummy ranlib; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:950: checking for $ac_word" >&5
+echo "configure:957: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_RANLIB'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -979,12 +986,12 @@ fi
 #--------------------------------------------------------------------
 
 echo $ac_n "checking for Cygwin environment""... $ac_c" 1>&6
-echo "configure:983: checking for Cygwin environment" >&5
+echo "configure:990: checking for Cygwin environment" >&5
 if eval "test \"`echo '$''{'ac_cv_cygwin'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 988 "configure"
+#line 995 "configure"
 #include "confdefs.h"
 
 int main() {
@@ -995,7 +1002,7 @@ int main() {
 return __CYGWIN__;
 ; return 0; }
 EOF
-if { (eval echo configure:999: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1006: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_cygwin=yes
 else
@@ -1017,13 +1024,13 @@ test "$ac_cv_cygwin" = yes && CYGWIN=yes
 #--------------------------------------------------------------------
 
 echo $ac_n "checking for object suffix""... $ac_c" 1>&6
-echo "configure:1021: checking for object suffix" >&5
+echo "configure:1028: checking for object suffix" >&5
 if eval "test \"`echo '$''{'ac_cv_objext'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   rm -f conftest*
 echo 'int i = 1;' > conftest.$ac_ext
-if { (eval echo configure:1027: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1034: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   for ac_file in conftest.*; do
     case $ac_file in
     *.c) ;;
@@ -1041,19 +1048,19 @@ OBJEXT=$ac_cv_objext
 ac_objext=$ac_cv_objext
 
 echo $ac_n "checking for mingw32 environment""... $ac_c" 1>&6
-echo "configure:1045: checking for mingw32 environment" >&5
+echo "configure:1052: checking for mingw32 environment" >&5
 if eval "test \"`echo '$''{'ac_cv_mingw32'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1050 "configure"
+#line 1057 "configure"
 #include "confdefs.h"
 
 int main() {
 return __MINGW32__;
 ; return 0; }
 EOF
-if { (eval echo configure:1057: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1064: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_mingw32=yes
 else
@@ -1072,7 +1079,7 @@ test "$ac_cv_mingw32" = yes && MINGW32=yes
 
 
 echo $ac_n "checking for executable suffix""... $ac_c" 1>&6
-echo "configure:1076: checking for executable suffix" >&5
+echo "configure:1083: checking for executable suffix" >&5
 if eval "test \"`echo '$''{'ac_cv_exeext'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1082,10 +1089,10 @@ else
   rm -f conftest*
   echo 'int main () { return 0; }' > conftest.$ac_ext
   ac_cv_exeext=
-  if { (eval echo configure:1086: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+  if { (eval echo configure:1093: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
     for file in conftest.*; do
       case $file in
-      *.c | *.o | *.obj | *.ilk | *.pdb) ;;
+      *.c | *.o | *.obj) ;;
       *) ac_cv_exeext=`echo $file | sed -e s/conftest//` ;;
       esac
     done
@@ -1116,38 +1123,9 @@ ac_exeext=$EXEEXT
 # This must be done before calling SC_PUBLIC_TCL_HEADERS
 #--------------------------------------------------------------------
 
-case "${host}" in
-    *mingw32* | *windows32*)
-	# Extract the first word of "cygpath", so it can be a program name with args.
-set dummy cygpath; ac_word=$2
-echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1125: checking for $ac_word" >&5
-if eval "test \"`echo '$''{'ac_cv_prog_CYGPATH'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-  if test -n "$CYGPATH"; then
-  ac_cv_prog_CYGPATH="$CYGPATH" # Let the user override the test.
-else
-  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS=":"
-  ac_dummy="$PATH"
-  for ac_dir in $ac_dummy; do
-    test -z "$ac_dir" && ac_dir=.
-    if test -f $ac_dir/$ac_word; then
-      ac_cv_prog_CYGPATH="cygpath -w"
-      break
-    fi
-  done
-  IFS="$ac_save_ifs"
-  test -z "$ac_cv_prog_CYGPATH" && ac_cv_prog_CYGPATH="echo"
-fi
-fi
-CYGPATH="$ac_cv_prog_CYGPATH"
-if test -n "$CYGPATH"; then
-  echo "$ac_t""$CYGPATH" 1>&6
-else
-  echo "$ac_t""no" 1>&6
-fi
-
+case "`uname -s`" in
+    *win32* | *WIN32* | *CYGWIN_NT*|*CYGWIN_98*|*CYGWIN_95*)
+	CYGPATH="cygpath -w"
 	RELPATH=".. .. bin"
     ;;
     *)
@@ -1163,16 +1141,12 @@ esac
 # Includes for this package
 #--------------------------------------------------------------------
 
-# CYGNUS LOCAL
-srcdir=`cd ${srcdir} ; pwd`
-ITK_SRC_DIR_NATIVE=`${CYGPATH} ${srcdir}`
-# END CYGNUS LOCAL
 ITK_GENERIC_DIR_NATIVE=`${CYGPATH} ${srcdir}/generic`
 ITK_WIN_DIR_NATIVE=`${CYGPATH} ${srcdir}/win`
 ITK_UNIX_DIR_NATIVE=`${CYGPATH} ${srcdir}/unix`
 
-case "${host}" in
-    *cygwin* | *mingw32* | *windows32*)
+case "`uname -s`" in
+    *win32* | *WIN32* | *CYGWIN_NT*|*CYGWIN_98*|*CYGWIN_95*)
 	ITK_PLATFORM_DIR_NATIVE=${ITK_WIN_DIR_NATIVE}
     ;;
     *)
@@ -1208,7 +1182,7 @@ if test "${with_tcl+set}" = set; then
 fi
 
 	echo $ac_n "checking for Tcl configuration""... $ac_c" 1>&6
-echo "configure:1212: checking for Tcl configuration" >&5
+echo "configure:1186: checking for Tcl configuration" >&5
 	if eval "test \"`echo '$''{'ac_cv_c_tclconfig'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1236,10 +1210,6 @@ else
 			ac_cv_c_tclconfig=`(cd $i/unix; pwd)`
 			break
 		    fi
-		    if test -f "$i/win/tclConfig.sh" ; then
-			ac_cv_c_tclconfig=`(cd $i/win; pwd)`
-			break
-		    fi
 		done
 	    fi
 
@@ -1262,11 +1232,7 @@ else
 		    if test -f "$i/unix/tclConfig.sh" ; then
 		    ac_cv_c_tclconfig=`(cd $i/unix; pwd)`
 		    break
-		    fi
-		    if test -f "$i/win/tclConfig.sh" ; then
-		    ac_cv_c_tclconfig=`(cd $i/win; pwd)`
-		    break
-		    fi
+		fi
 		done
 	    fi
 	
@@ -1275,7 +1241,7 @@ fi
 
 	if test x"${ac_cv_c_tclconfig}" = x ; then
 	    TCL_BIN_DIR="# no Tcl configs found"
-	    { echo "configure: error: Can't find Tcl configuration definitions" 1>&2; exit 1; }
+	    echo "configure: warning: Can't find Tcl configuration definitions" 1>&2
 	    exit 0
 	else
 	    no_tcl=
@@ -1286,7 +1252,7 @@ fi
 
 
     echo $ac_n "checking for existence of $TCL_BIN_DIR/tclConfig.sh""... $ac_c" 1>&6
-echo "configure:1290: checking for existence of $TCL_BIN_DIR/tclConfig.sh" >&5
+echo "configure:1256: checking for existence of $TCL_BIN_DIR/tclConfig.sh" >&5
 
     if test -f "$TCL_BIN_DIR/tclConfig.sh" ; then
         echo "$ac_t""loading" 1>&6
@@ -1341,7 +1307,7 @@ if test "${with_tk+set}" = set; then
 fi
 
 	echo $ac_n "checking for Tk configuration""... $ac_c" 1>&6
-echo "configure:1345: checking for Tk configuration" >&5
+echo "configure:1311: checking for Tk configuration" >&5
 	if eval "test \"`echo '$''{'ac_cv_c_tkconfig'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1369,10 +1335,6 @@ else
 			ac_cv_c_tkconfig=`(cd $i/unix; pwd)`
 			break
 		    fi
-		    if test -f "$i/win/tkConfig.sh" ; then
-			ac_cv_c_tkconfig=`(cd $i/win; pwd)`
-			break
-		    fi
 		done
 	    fi
 	    # check in a few common install locations
@@ -1394,10 +1356,6 @@ else
 			ac_cv_c_tkconfig=`(cd $i/unix; pwd)`
 			break
 		    fi
-		    if test -f "$i/win/tkConfig.sh" ; then
-			ac_cv_c_tkconfig=`(cd $i/win; pwd)`
-			break
-		    fi
 		done
 	    fi
 	
@@ -1405,7 +1363,7 @@ fi
 
 	if test x"${ac_cv_c_tkconfig}" = x ; then
 	    TK_BIN_DIR="# no Tk configs found"
-	    { echo "configure: error: Can't find Tk configuration definitions" 1>&2; exit 1; }
+	    echo "configure: warning: Can't find Tk configuration definitions" 1>&2
 	    exit 0
 	else
 	    no_tk=
@@ -1417,7 +1375,7 @@ fi
 
 
     echo $ac_n "checking for existence of $TK_BIN_DIR/tkConfig.sh""... $ac_c" 1>&6
-echo "configure:1421: checking for existence of $TK_BIN_DIR/tkConfig.sh" >&5
+echo "configure:1379: checking for existence of $TK_BIN_DIR/tkConfig.sh" >&5
 
     if test -f "$TK_BIN_DIR/tkConfig.sh" ; then
         echo "$ac_t""loading" 1>&6
@@ -1448,106 +1406,146 @@ fi
 ITCL_INCLUDES=-I\"`${CYGPATH} ${ITCL_LIB_DIR}/generic`\"
 
 
-# CYGNUS LOCAL
+#--------------------------------------------------------------------
+# The value for this should have been cached during the Itcl configuration.
+# Make sure the cache-ID that appears here is the same as the one that
+# appears in the Itcl configure script.
+#--------------------------------------------------------------------
 
-#
-# Ok, lets find the itcl configuration
-# First, look for one uninstalled.  
-# the alternative search directory is invoked by --with-itclconfig
-#
-
-if test x"${no_itcl}" = x ; then
-  # we reset no_itcl in case something fails here
-  no_itcl=true
-  # Check whether --with-itclconfig or --without-itclconfig was given.
-if test "${with_itclconfig+set}" = set; then
-  withval="$with_itclconfig"
-  with_itclconfig=${withval}
-fi
-
-  echo $ac_n "checking for Itcl configuration""... $ac_c" 1>&6
-echo "configure:1470: checking for Itcl configuration" >&5
-  if eval "test \"`echo '$''{'ac_cv_c_itclconfig'+set}'`\" = set"; then
+echo $ac_n "checking for name if Itcl stub library""... $ac_c" 1>&6
+echo "configure:1417: checking for name if Itcl stub library" >&5
+if eval "test \"`echo '$''{'ac_cv_itclstub_LIB_FILE'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
-  
+  ac_cv_itclstub_LIB_FILE="NONE"
+fi
 
-  # First check to see if --with-itclconfig was specified.
-  if test x"${with_itclconfig}" != x ; then
-    if test -f "${with_itclconfig}/itclConfig.sh" ; then
-      ac_cv_c_itclconfig=`(cd ${with_itclconfig}; pwd)`
+if test x"${ac_cv_itclstub_LIB_FILE}" = x"NONE" ; then
+    { echo "configure: error: Can't find name of Itcl stub library.  How did this happen?" 1>&2; exit 1; }
+else
+    echo "$ac_t""${ac_cv_itclstub_LIB_FILE}" 1>&6
+fi
+itclstub_LIB_FILE=${ac_cv_itclstub_LIB_FILE}
+
+
+
+    echo $ac_n "checking for tkstub library""... $ac_c" 1>&6
+echo "configure:1434: checking for tkstub library" >&5
+
+    # Look in exec-prefix and prefix for the library.  If neither of
+    # these were specified, look in libdir.  It doesn't matter if libdir
+    # wasn't specified since a search in the unspecified directory will
+    # fail (NONE/lib)
+
+    if test x"${exec_prefix}" != x"NONE" ; then
+	sc_lib_name_dir="${exec_prefix}/lib"
+    elif test x"${prefix}" != "NONE" ; then
+	sc_lib_name_dir="${prefix}/lib"
     else
-      { echo "configure: error: ${with_itclconfig} directory doesn't contain itclConfig.sh" 1>&2; exit 1; }
-    fi
-  fi
-
-  # then check for a private itcl library
-  if test x"${ac_cv_c_itclconfig}" = x ; then
-    for i in \
-		../itcl/itcl \
-		`ls -dr ../itcl/itcl[3]* 2>/dev/null` \
-		../../itcl/itcl \
-		`ls -dr ../../itcl/itcl[3]* 2>/dev/null` \
-		../../../itcl/itcl \
-		`ls -dr ../../../itcl/itcl[3]* 2>/dev/null` ; do
-      if test -f "$i/itclConfig.sh" ; then
-        ac_cv_c_itclconfig=`(cd $i; pwd)`
-	break
-      fi
-    done
-  fi
-  # check in a few common install locations
-  if test x"${ac_cv_c_itclconfig}" = x ; then
-    for i in `ls -d ${prefix}/lib /usr/local/lib 2>/dev/null` ; do
-      if test -f "$i/itclConfig.sh" ; then
-        ac_cv_c_itclconfig=`(cd $i; pwd)`
-	break
-      fi
-    done
-  fi
-  # check in a few other private locations
-  if test x"${ac_cv_c_itclconfig}" = x ; then
-    for i in \
-		${srcdir}/../itcl/itcl \
-		`ls -dr ${srcdir}/../itcl/itcl[3]* 2>/dev/null` ; do
-      if test -f "$i/itcl/itclConfig.sh" ; then
-        ac_cv_c_itclconfig=`(cd $i; pwd)`
-	break
-      fi
-    done
-  fi
-  
-fi
-
-  if test x"${ac_cv_c_itclconfig}" = x ; then
-    ITCLCONFIG="# no itcl configs found"
-    { echo "configure: error: Can't find itcl configuration definitions" 1>&2; exit 1; }
-  else
-    no_itcl=
-    ITCLCONFIG=${ac_cv_c_itclconfig}/itclConfig.sh
-    echo "$ac_t""found $ITCLCONFIG" 1>&6
-  fi
-fi
-
-
-
-    if test -f "$ITCLCONFIG" ; then
-      . $ITCLCONFIG
+	eval "sc_lib_name_dir=${libdir}"
     fi
 
-    
-    
-    
-    
+    if test x"${TK_BIN_DIR}" != x ; then
+	sc_extra_lib_dir=${TK_BIN_DIR}
+    else
+	sc_extra_lib_dir=NONE
+    fi
+
+    for i in \
+	    `ls -dr ${sc_extra_lib_dir}/tkstub[0-9]*.lib 2>/dev/null ` \
+	    `ls -dr ${sc_extra_lib_dir}/libtkstub[0-9]* 2>/dev/null ` \
+	    `ls -dr ${sc_lib_name_dir}/tkstub[0-9]*.lib 2>/dev/null ` \
+	    `ls -dr ${sc_lib_name_dir}/libtkstub[0-9]* 2>/dev/null ` \
+	    `ls -dr /usr/lib/tkstub[0-9]*.lib 2>/dev/null ` \
+	    `ls -dr /usr/lib/libtkstub[0-9]* 2>/dev/null ` \
+	    `ls -dr /usr/local/lib/tkstub[0-9]*.lib 2>/dev/null ` \
+	    `ls -dr /usr/local/lib/libtkstub[0-9]* 2>/dev/null ` ; do
+	if test -f "$i" ; then
+
+	    sc_lib_name_dir=`dirname $i`
+	    tkstub_LIB_NAME=`basename $i`
+	    tkstub_LIB_PATH_NAME=$i
+	    break
+	fi
+    done
+
+    case "`uname -s`" in
+	*win32* | *WIN32* | *CYGWIN_NT* |*CYGWIN_98*|*CYGWIN_95*)
+	    tkstub_LIB_SPEC=\"`${CYGPATH} ${tkstub_LIB_PATH_NAME}`\"
+	    ;;
+	*)
+	    # Strip off the leading "lib" and trailing ".a" or ".so"
+
+	    sc_lib_name_lib=`echo ${tkstub_LIB_NAME}|sed -e 's/^lib//' -e 's/\.[^.]*$//'`
+	    tkstub_LIB_SPEC="-L${sc_lib_name_dir} -l${sc_lib_name_lib}"
+	    ;;
+    esac
+    if test "xtkstub_LIB_NAME" = x ; then
+	{ echo "configure: error: not found" 1>&2; exit 1; }
+    else
+	echo "$ac_t""${tkstub_LIB_SPEC}" 1>&6
+    fi
 
 
 
-itclstub_LIB_FILE=${ITCL_STUB_LIB_FILE}
 
+    echo $ac_n "checking for itclstub library""... $ac_c" 1>&6
+echo "configure:1494: checking for itclstub library" >&5
 
-tkstub_LIB_SPEC=${TK_STUB_LIB_SPEC}
+    # Look in exec-prefix and prefix for the library.  If neither of
+    # these were specified, look in libdir.  It doesn't matter if libdir
+    # wasn't specified since a search in the unspecified directory will
+    # fail (NONE/lib)
 
-# END CYGNUS LOCAL
+    if test x"${exec_prefix}" != x"NONE" ; then
+	sc_lib_name_dir="${exec_prefix}/lib"
+    elif test x"${prefix}" != "NONE" ; then
+	sc_lib_name_dir="${prefix}/lib"
+    else
+	eval "sc_lib_name_dir=${libdir}"
+    fi
+
+    if test x"../itcl" != x ; then
+	sc_extra_lib_dir=../itcl
+    else
+	sc_extra_lib_dir=NONE
+    fi
+
+    for i in \
+	    `ls -dr ${sc_extra_lib_dir}/itclstub[0-9]*.lib 2>/dev/null ` \
+	    `ls -dr ${sc_extra_lib_dir}/libitclstub[0-9]* 2>/dev/null ` \
+	    `ls -dr ${sc_lib_name_dir}/itclstub[0-9]*.lib 2>/dev/null ` \
+	    `ls -dr ${sc_lib_name_dir}/libitclstub[0-9]* 2>/dev/null ` \
+	    `ls -dr /usr/lib/itclstub[0-9]*.lib 2>/dev/null ` \
+	    `ls -dr /usr/lib/libitclstub[0-9]* 2>/dev/null ` \
+	    `ls -dr /usr/local/lib/itclstub[0-9]*.lib 2>/dev/null ` \
+	    `ls -dr /usr/local/lib/libitclstub[0-9]* 2>/dev/null ` ; do
+	if test -f "$i" ; then
+
+	    sc_lib_name_dir=`dirname $i`
+	    itclstub_LIB_NAME=`basename $i`
+	    itclstub_LIB_PATH_NAME=$i
+	    break
+	fi
+    done
+
+    case "`uname -s`" in
+	*win32* | *WIN32* | *CYGWIN_NT* |*CYGWIN_98*|*CYGWIN_95*)
+	    itclstub_LIB_SPEC=\"`${CYGPATH} ${itclstub_LIB_PATH_NAME}`\"
+	    ;;
+	*)
+	    # Strip off the leading "lib" and trailing ".a" or ".so"
+
+	    sc_lib_name_lib=`echo ${itclstub_LIB_NAME}|sed -e 's/^lib//' -e 's/\.[^.]*$//'`
+	    itclstub_LIB_SPEC="-L${sc_lib_name_dir} -l${sc_lib_name_lib}"
+	    ;;
+    esac
+    if test "xitclstub_LIB_NAME" = x ; then
+	{ echo "configure: error: not found" 1>&2; exit 1; }
+    else
+	echo "$ac_t""${itclstub_LIB_SPEC}" 1>&6
+    fi
+
 
 #--------------------------------------------------------------------
 # __CHANGE__
@@ -1563,10 +1561,10 @@ tkstub_LIB_SPEC=${TK_STUB_LIB_SPEC}
 #SC_PUBLIC_TCL_HEADERS
 
     echo $ac_n "checking for Tcl private include files""... $ac_c" 1>&6
-echo "configure:1567: checking for Tcl private include files" >&5
+echo "configure:1565: checking for Tcl private include files" >&5
 
-    case "${host}" in
-	*mingw32* | *windows32*)
+    case "`uname -s`" in
+	*win32* | *WIN32* | *CYGWIN_NT* |*CYGWIN_98*|*CYGWIN_95*)
 	    TCL_TOP_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}`\"
 	    TCL_GENERIC_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/generic`\"
 	    TCL_UNIX_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/unix`\"
@@ -1604,10 +1602,10 @@ echo "configure:1567: checking for Tcl private include files" >&5
 #SC_PUBLIC_TK_HEADERS
 
     echo $ac_n "checking for Tk private include files""... $ac_c" 1>&6
-echo "configure:1608: checking for Tk private include files" >&5
+echo "configure:1606: checking for Tk private include files" >&5
 
-    case "${host}" in
-	*mingw32* | *windows32*)
+    case "`uname -s`" in
+	*win32* | *WIN32* | *CYGWIN_NT* |*CYGWIN_98*|*CYGWIN_95*)
 	    TK_UNIX_DIR_NATIVE=\"`${CYGPATH} ${TK_SRC_DIR}/unix`\"
 	    TK_WIN_DIR_NATIVE=\"`${CYGPATH} ${TK_SRC_DIR}/win`\"
 	    TK_GENERIC_DIR_NATIVE=\"`${CYGPATH} ${TK_SRC_DIR}/generic`\"
@@ -1653,8 +1651,8 @@ echo "configure:1608: checking for Tk private include files" >&5
 # your system.
 #--------------------------------------------------------------------
 
-case "${host}" in
-    *cygwin* | *mingw32* | *windows32*)
+case "`uname -s`" in
+    *win32* | *WIN32* | *CYGWIN_NT*|*CYGWIN_98*|*CYGWIN_95*)
 	cat >> confdefs.h <<EOF
 #define BUILD_${PACKAGE} 1
 EOF
@@ -1684,7 +1682,7 @@ esac
 
 
     echo $ac_n "checking for building with threads""... $ac_c" 1>&6
-echo "configure:1688: checking for building with threads" >&5
+echo "configure:1686: checking for building with threads" >&5
     # Check whether --enable-threads or --disable-threads was given.
 if test "${enable_threads+set}" = set; then
   enableval="$enable_threads"
@@ -1705,13 +1703,13 @@ EOF
 EOF
 
 
-	case "${host}" in
-	    *mingw32* | *windows32*)
+	case "`uname -s`" in
+	    *win32* | *WIN32* | *CYGWIN_NT* | *CYGWIN_98* | *CYGWIN_95*)
 		    echo "$ac_t""yes" 1>&6
 		;;
 	    *)
 		echo $ac_n "checking for pthread_mutex_init in -lpthread""... $ac_c" 1>&6
-echo "configure:1715: checking for pthread_mutex_init in -lpthread" >&5
+echo "configure:1713: checking for pthread_mutex_init in -lpthread" >&5
 ac_lib_var=`echo pthread'_'pthread_mutex_init | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1719,7 +1717,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lpthread  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1723 "configure"
+#line 1721 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1730,7 +1728,7 @@ int main() {
 pthread_mutex_init()
 ; return 0; }
 EOF
-if { (eval echo configure:1734: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1732: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1776,26 +1774,22 @@ fi
 
 
     echo $ac_n "checking how to build libraries""... $ac_c" 1>&6
-echo "configure:1780: checking how to build libraries" >&5
+echo "configure:1778: checking how to build libraries" >&5
     # Check whether --enable-shared or --disable-shared was given.
 if test "${enable_shared+set}" = set; then
   enableval="$enable_shared"
   tcl_ok=$enableval
 else
-  tcl_ok=no
+  tcl_ok=yes
 fi
 
 
-# CYGNUS LOCAL
-    case "${host}" in
-        *mingw32* | *windows32*)
-            # Default to shared build for Windows
-            if test "${enable_shared+set}" != set; then
-                tcl_ok=yes
-            fi
-        ;;
-    esac
-# END CYGNUS LOCAL
+    if test "${enable_shared+set}" = set; then
+	enableval="$enable_shared"
+	tcl_ok=$enableval
+    else
+	tcl_ok=yes
+    fi
 
     if test "$tcl_ok" = "yes" ; then
 	echo "$ac_t""shared" 1>&6
@@ -1837,8 +1831,8 @@ SHLIB_CFLAGS=${TCL_SHLIB_CFLAGS}
 #--------------------------------------------------------------------
 
 
-    case "${host}" in
-	*mingw32* | *windows32*)
+    case "`uname -s`" in
+	*win32* | *WIN32* | *CYGWIN_NT* | *CYGWIN_98* | *CYGWIN_95*)
 	    tcl_dbgx=d
 	;;
 	*)
@@ -1847,7 +1841,7 @@ SHLIB_CFLAGS=${TCL_SHLIB_CFLAGS}
     esac
 
     echo $ac_n "checking for build with symbols""... $ac_c" 1>&6
-echo "configure:1851: checking for build with symbols" >&5
+echo "configure:1845: checking for build with symbols" >&5
     # Check whether --enable-symbols or --disable-symbols was given.
 if test "${enable_symbols+set}" = set; then
   enableval="$enable_symbols"
@@ -1910,20 +1904,15 @@ fi
 #--------------------------------------------------------------------
 
 
-    case "${host}" in
-	*mingw32* | *windows32*)
-	    if test "${CC}" = "cl"; then
+    case "`uname -s`" in
+	*win32* | *WIN32* | *CYGWIN_NT* |*CYGWIN_98*|*CYGWIN_95*)
+	    if test "${CC-cc}" = "cl"; then
 		MAKE_STATIC_LIB="\${STLIB_LD} -out:\$@ \$(\$@_OBJECTS) "
 		MAKE_SHARED_LIB="\${SHLIB_LD} \${SHLIB_LDFLAGS} \${SHLIB_LD_LIBS} \$(LDFLAGS) -out:\$@ \$(\$@_OBJECTS) "
-	    else
-		MAKE_STATIC_LIB="\${STLIB_LD} \$@ \$(\$@_OBJECTS) "
-		POST_MAKE_STATIC_LIB="\${RANLIB} \$@"
-		MAKE_SHARED_LIB="\${SHLIB_LD} -o \$@ \$(\$@_OBJECTS) \${SHLIB_LDFLAGS} \$(LDFLAGS) \${SHLIB_LD_LIBS} -Wl,--out-implib,\$(patsubst %.dll,lib%.a,\$@)"
 	    fi
 	    ;;
 	*)
 	    MAKE_STATIC_LIB="\${STLIB_LD} \$@ \$(\$@_OBJECTS)"
-	    POST_MAKE_STATIC_LIB="\${RANLIB} \$@"
 	    MAKE_SHARED_LIB="\${SHLIB_LD} -o \$@ \$(\$@_OBJECTS) \${SHLIB_LDFLAGS} \${SHLIB_LD_LIBS}"
 	    ;;
     esac
@@ -1932,11 +1921,8 @@ fi
 	MAKE_LIB=${MAKE_SHARED_LIB}
     else
 	MAKE_LIB=${MAKE_STATIC_LIB}
-	POST_MAKE_LIB=${POST_MAKE_STATIC_LIB}
     fi
 
-    
-    
     
     
     
@@ -1953,564 +1939,28 @@ eval "UNSHARED_LIB_SUFFIX=${TCL_UNSHARED_LIB_SUFFIX}"
 # Shared libraries and static libraries have different names.
 #--------------------------------------------------------------------
 
-# CYGNUS LOCAL
-
-if test "${SHARED_BUILD}" = "1" ; then
-  # FIXME: Need to devise a TCL_TOOL macro to deal with this!
-  case "${host}" in
-    *mingw32* | *windows32*)
-        SHLIB_LD_LIBS="${TCL_BUILD_STUB_LIB_SPEC} ${TCL_SHLIB_LD_LIBS} \
-            ${ITCL_BUILD_STUB_LIB_SPEC} ${TK_BUILD_STUB_LIB_SPEC}"
-        # Need to link to the .a or .lib not the .dll!
-        
-  libname=${PACKAGE}
-  suffix=${SHARED_LIB_SUFFIX}
-
-  case "${host}" in
-    *windows32* | *mingw32* | *cygwin*)
-      eval "long_libname=\"${TCL_VENDOR_PREFIX}${libname}${suffix}\""
-    ;;
+case "`uname -s`" in
+    *win32* | *WIN32* | *CYGWIN_NT*|*CYGWIN_98*|*CYGWIN_95*)
+	if test "${SHARED_BUILD}" = "1" ; then
+	    SHLIB_LD_LIBS="\"`cygpath -w ${TCL_BIN_DIR}/${TCL_STUB_LIB_FILE}`\" ${TCL_SHLIB_LD_LIBS} \"`${CYGPATH} ../itcl/${itclstub_LIB_FILE}`\" ${tkstub_LIB_SPEC} "
+	    eval "${PACKAGE}_LIB_FILE=${PACKAGE}${SHARED_LIB_SUFFIX}"
+	    RANLIB=:
+	else
+	    eval "${PACKAGE}_LIB_FILE=${PACKAGE}${UNSHARED_LIB_SUFFIX}"
+	fi
+	eval "${PACKAGE}stub_LIB_FILE=${PACKAGE}stub${UNSHARED_LIB_SUFFIX}"
+	;;
     *)
-      eval "long_libname=\"lib${TCL_VENDOR_PREFIX}${libname}${suffix}\""
-    ;;
-  esac
-
-  eval "long_libname=${long_libname}"
-
-  # Trick to replace DBGX with TCL_DBGX
-  DBGX='${TCL_DBGX}'
-  eval "long_libname=${long_libname}"
-
-  ITK_SHLIB_FILE=$long_libname
-
-        
-  libname=${PACKAGE}
-  suffix=${UNSHARED_LIB_SUFFIX}
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "$GCC" != yes; then
-        eval "long_libname=\"${TCL_VENDOR_PREFIX}${libname}${suffix}\""
-      else
-        eval "long_libname=\"lib${TCL_VENDOR_PREFIX}${libname}${suffix}\""
-      fi
-    ;;
-    *)
-      eval "long_libname=\"lib${TCL_VENDOR_PREFIX}${libname}${suffix}\""
-    ;;
-  esac
-
-  eval "long_libname=${long_libname}"
-
-  # Trick to replace DBGX with TCL_DBGX
-  DBGX='${TCL_DBGX}'
-  eval "long_libname=${long_libname}"
-
-  ITK_LIB_FILE=$long_libname
-
-        ITK_TARGET_FILE=${ITK_SHLIB_FILE}
-     ;;
-    *)
-        SHLIB_LD_LIBS="${TK_BUILD_STUB_LIB_SPEC} ${TCL_BUILD_STUB_LIB_SPEC} \
-            ${ITCL_BUILD_STUB_LIB_SPEC}"
-        
-  libname=${PACKAGE}
-  suffix=${SHARED_LIB_SUFFIX}
-
-  case "${host}" in
-    *windows32* | *mingw32* | *cygwin*)
-      eval "long_libname=\"${TCL_VENDOR_PREFIX}${libname}${suffix}\""
-    ;;
-    *)
-      eval "long_libname=\"lib${TCL_VENDOR_PREFIX}${libname}${suffix}\""
-    ;;
-  esac
-
-  eval "long_libname=${long_libname}"
-
-  # Trick to replace DBGX with TCL_DBGX
-  DBGX='${TCL_DBGX}'
-  eval "long_libname=${long_libname}"
-
-  ITK_LIB_FILE=$long_libname
-
-        ITK_TARGET_FILE=${ITK_LIB_FILE}
-     ;;
-  esac
-else
-  
-  libname=${PACKAGE}
-  suffix=${UNSHARED_LIB_SUFFIX}
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "$GCC" != yes; then
-        eval "long_libname=\"${TCL_VENDOR_PREFIX}${libname}${suffix}\""
-      else
-        eval "long_libname=\"lib${TCL_VENDOR_PREFIX}${libname}${suffix}\""
-      fi
-    ;;
-    *)
-      eval "long_libname=\"lib${TCL_VENDOR_PREFIX}${libname}${suffix}\""
-    ;;
-  esac
-
-  eval "long_libname=${long_libname}"
-
-  # Trick to replace DBGX with TCL_DBGX
-  DBGX='${TCL_DBGX}'
-  eval "long_libname=${long_libname}"
-
-  ITK_LIB_FILE=$long_libname
-
-  ITK_TARGET_FILE=${ITK_LIB_FILE}
-fi
-
-
-  libname=${PACKAGE}stub
-  suffix=${UNSHARED_LIB_SUFFIX}
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "$GCC" != yes; then
-        eval "long_libname=\"${TCL_VENDOR_PREFIX}${libname}${suffix}\""
-      else
-        eval "long_libname=\"lib${TCL_VENDOR_PREFIX}${libname}${suffix}\""
-      fi
-    ;;
-    *)
-      eval "long_libname=\"lib${TCL_VENDOR_PREFIX}${libname}${suffix}\""
-    ;;
-  esac
-
-  eval "long_libname=${long_libname}"
-
-  # Trick to replace DBGX with TCL_DBGX
-  DBGX='${TCL_DBGX}'
-  eval "long_libname=${long_libname}"
-
-  ITK_STUB_LIB_FILE=$long_libname
-
-
-
-
-
-
-  libname=${PACKAGE}
-  version=${VERSION}
-
-  if test "$TCL_LIB_SUFFIX" = "" ; then
-    { echo "configure: error: The TCL_LIB_SUFFIX variable is not defined" 1>&2; exit 1; }
-  fi
-
-  # If the . character is not allowed in lib name, remove it from version
-  if test "${TCL_LIB_VERSIONS_OK}" != "ok"; then
-        version=`echo $version | tr -d .`
-  fi
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "$GCC" != yes; then
-        eval "short_libname=\"${TCL_VENDOR_PREFIX}${libname}${version}${TCL_LIB_SUFFIX}\""
-      else
-        short_libname="-l${TCL_VENDOR_PREFIX}${libname}${version}${TCL_DBGX}"
-      fi
-    ;;
-    *)
-      short_libname="-l${TCL_VENDOR_PREFIX}${libname}${version}\${TCL_DBGX}"
-    ;;
-  esac
-
-  ITK_LIB_FLAG=$short_libname
-
-
-  libname=${PACKAGE}stub
-  version=${VERSION}
-
-  if test "$TCL_LIB_SUFFIX" = "" ; then
-    { echo "configure: error: The TCL_LIB_SUFFIX variable is not defined" 1>&2; exit 1; }
-  fi
-
-  # If the . character is not allowed in lib name, remove it from version
-  if test "${TCL_LIB_VERSIONS_OK}" != "ok"; then
-        version=`echo $version | tr -d .`
-  fi
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "$GCC" != yes; then
-        eval "short_libname=\"${TCL_VENDOR_PREFIX}${libname}${version}${TCL_LIB_SUFFIX}\""
-      else
-        short_libname="-l${TCL_VENDOR_PREFIX}${libname}${version}${TCL_DBGX}"
-      fi
-    ;;
-    *)
-      short_libname="-l${TCL_VENDOR_PREFIX}${libname}${version}\${TCL_DBGX}"
-    ;;
-  esac
-
-  ITK_STUB_LIB_FLAG=$short_libname
-
-
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "$GCC" != yes; then
-        
-  val="`pwd`/${ITK_LIB_FLAG}"
-
-  if test "$val" = "" ; then
-    { echo "configure: error: Empty value for variable ITK_BUILD_LIB_SPEC" 1>&2; exit 1; }
-  fi
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "${CYGPATH}" = ""; then
-        { echo "configure: error: CYGPATH variable is not defined." 1>&2; exit 1; }
-      elif test "${CYGPATH}" = "echo"; then
-        # No cygpath when cross compiling
-        ITK_BUILD_LIB_SPEC=$val
-      else
-        # store literal argument text in a variable
-        val=$val
-        # Convert Cygwin to Windows path (/tmp/foo -> C:\Tmp\foo)
-        val="`${CYGPATH} $val`"
-        # Convert path like C:\Tmp\foo to C:/Tmp/foo
-        ITK_BUILD_LIB_SPEC="`echo $val | sed -e s#\\\\\\\\#/#g`"
-      fi
-    ;;
-    *)
-      # Default to a no-op under Unix or Cygwin gcc
-      ITK_BUILD_LIB_SPEC=$val
-    ;;
-  esac
-
-      else
-        
-  val=`pwd`
-
-  if test "$val" = "" ; then
-    { echo "configure: error: Empty value for variable dirname" 1>&2; exit 1; }
-  fi
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "${CYGPATH}" = ""; then
-        { echo "configure: error: CYGPATH variable is not defined." 1>&2; exit 1; }
-      elif test "${CYGPATH}" = "echo"; then
-        # No cygpath when cross compiling
-        dirname=$val
-      else
-        # store literal argument text in a variable
-        val=$val
-        # Convert Cygwin to Windows path (/tmp/foo -> C:\Tmp\foo)
-        val="`${CYGPATH} $val`"
-        # Convert path like C:\Tmp\foo to C:/Tmp/foo
-        dirname="`echo $val | sed -e s#\\\\\\\\#/#g`"
-      fi
-    ;;
-    *)
-      # Default to a no-op under Unix or Cygwin gcc
-      dirname=$val
-    ;;
-  esac
-
-        ITK_BUILD_LIB_SPEC="-L${dirname} ${ITK_LIB_FLAG}"
-      fi
-    ;;
-    *)
-      ITK_BUILD_LIB_SPEC="-L`pwd` ${ITK_LIB_FLAG}"
-    ;;
-  esac
-
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "$GCC" != yes; then
-        
-  val="`pwd`/${ITK_STUB_LIB_FLAG}"
-
-  if test "$val" = "" ; then
-    { echo "configure: error: Empty value for variable ITK_BUILD_STUB_LIB_SPEC" 1>&2; exit 1; }
-  fi
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "${CYGPATH}" = ""; then
-        { echo "configure: error: CYGPATH variable is not defined." 1>&2; exit 1; }
-      elif test "${CYGPATH}" = "echo"; then
-        # No cygpath when cross compiling
-        ITK_BUILD_STUB_LIB_SPEC=$val
-      else
-        # store literal argument text in a variable
-        val=$val
-        # Convert Cygwin to Windows path (/tmp/foo -> C:\Tmp\foo)
-        val="`${CYGPATH} $val`"
-        # Convert path like C:\Tmp\foo to C:/Tmp/foo
-        ITK_BUILD_STUB_LIB_SPEC="`echo $val | sed -e s#\\\\\\\\#/#g`"
-      fi
-    ;;
-    *)
-      # Default to a no-op under Unix or Cygwin gcc
-      ITK_BUILD_STUB_LIB_SPEC=$val
-    ;;
-  esac
-
-      else
-        
-  val=`pwd`
-
-  if test "$val" = "" ; then
-    { echo "configure: error: Empty value for variable dirname" 1>&2; exit 1; }
-  fi
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "${CYGPATH}" = ""; then
-        { echo "configure: error: CYGPATH variable is not defined." 1>&2; exit 1; }
-      elif test "${CYGPATH}" = "echo"; then
-        # No cygpath when cross compiling
-        dirname=$val
-      else
-        # store literal argument text in a variable
-        val=$val
-        # Convert Cygwin to Windows path (/tmp/foo -> C:\Tmp\foo)
-        val="`${CYGPATH} $val`"
-        # Convert path like C:\Tmp\foo to C:/Tmp/foo
-        dirname="`echo $val | sed -e s#\\\\\\\\#/#g`"
-      fi
-    ;;
-    *)
-      # Default to a no-op under Unix or Cygwin gcc
-      dirname=$val
-    ;;
-  esac
-
-        ITK_BUILD_STUB_LIB_SPEC="-L${dirname} ${ITK_STUB_LIB_FLAG}"
-      fi
-    ;;
-    *)
-      ITK_BUILD_STUB_LIB_SPEC="-L`pwd` ${ITK_STUB_LIB_FLAG}"
-    ;;
-  esac
-
-
-
-
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "$GCC" != yes; then
-        
-  val="${exec_prefix}/lib/${ITK_LIB_FLAG}"
-
-  if test "$val" = "" ; then
-    { echo "configure: error: Empty value for variable ITK_LIB_SPEC" 1>&2; exit 1; }
-  fi
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "${CYGPATH}" = ""; then
-        { echo "configure: error: CYGPATH variable is not defined." 1>&2; exit 1; }
-      elif test "${CYGPATH}" = "echo"; then
-        # No cygpath when cross compiling
-        ITK_LIB_SPEC=$val
-      else
-        # store literal argument text in a variable
-        val=$val
-        # Convert Cygwin to Windows path (/tmp/foo -> C:\Tmp\foo)
-        val="`${CYGPATH} $val`"
-        # Convert path like C:\Tmp\foo to C:/Tmp/foo
-        ITK_LIB_SPEC="`echo $val | sed -e s#\\\\\\\\#/#g`"
-      fi
-    ;;
-    *)
-      # Default to a no-op under Unix or Cygwin gcc
-      ITK_LIB_SPEC=$val
-    ;;
-  esac
-
-      else
-        
-  val=${exec_prefix}/lib
-
-  if test "$val" = "" ; then
-    { echo "configure: error: Empty value for variable dirname" 1>&2; exit 1; }
-  fi
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "${CYGPATH}" = ""; then
-        { echo "configure: error: CYGPATH variable is not defined." 1>&2; exit 1; }
-      elif test "${CYGPATH}" = "echo"; then
-        # No cygpath when cross compiling
-        dirname=$val
-      else
-        # store literal argument text in a variable
-        val=$val
-        # Convert Cygwin to Windows path (/tmp/foo -> C:\Tmp\foo)
-        val="`${CYGPATH} $val`"
-        # Convert path like C:\Tmp\foo to C:/Tmp/foo
-        dirname="`echo $val | sed -e s#\\\\\\\\#/#g`"
-      fi
-    ;;
-    *)
-      # Default to a no-op under Unix or Cygwin gcc
-      dirname=$val
-    ;;
-  esac
-
-        ITK_LIB_SPEC="-L${dirname} ${ITK_LIB_FLAG}"
-      fi
-    ;;
-    *)
-      ITK_LIB_SPEC="-L${exec_prefix}/lib ${ITK_LIB_FLAG}"
-    ;;
-  esac
-
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "$GCC" != yes; then
-        
-  val="${exec_prefix}/lib/${ITK_STUB_LIB_FLAG}"
-
-  if test "$val" = "" ; then
-    { echo "configure: error: Empty value for variable ITK_STUB_LIB_SPEC" 1>&2; exit 1; }
-  fi
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "${CYGPATH}" = ""; then
-        { echo "configure: error: CYGPATH variable is not defined." 1>&2; exit 1; }
-      elif test "${CYGPATH}" = "echo"; then
-        # No cygpath when cross compiling
-        ITK_STUB_LIB_SPEC=$val
-      else
-        # store literal argument text in a variable
-        val=$val
-        # Convert Cygwin to Windows path (/tmp/foo -> C:\Tmp\foo)
-        val="`${CYGPATH} $val`"
-        # Convert path like C:\Tmp\foo to C:/Tmp/foo
-        ITK_STUB_LIB_SPEC="`echo $val | sed -e s#\\\\\\\\#/#g`"
-      fi
-    ;;
-    *)
-      # Default to a no-op under Unix or Cygwin gcc
-      ITK_STUB_LIB_SPEC=$val
-    ;;
-  esac
-
-      else
-        
-  val=${exec_prefix}/lib
-
-  if test "$val" = "" ; then
-    { echo "configure: error: Empty value for variable dirname" 1>&2; exit 1; }
-  fi
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "${CYGPATH}" = ""; then
-        { echo "configure: error: CYGPATH variable is not defined." 1>&2; exit 1; }
-      elif test "${CYGPATH}" = "echo"; then
-        # No cygpath when cross compiling
-        dirname=$val
-      else
-        # store literal argument text in a variable
-        val=$val
-        # Convert Cygwin to Windows path (/tmp/foo -> C:\Tmp\foo)
-        val="`${CYGPATH} $val`"
-        # Convert path like C:\Tmp\foo to C:/Tmp/foo
-        dirname="`echo $val | sed -e s#\\\\\\\\#/#g`"
-      fi
-    ;;
-    *)
-      # Default to a no-op under Unix or Cygwin gcc
-      dirname=$val
-    ;;
-  esac
-
-        ITK_STUB_LIB_SPEC="-L${dirname} ${ITK_STUB_LIB_FLAG}"
-      fi
-    ;;
-    *)
-      ITK_STUB_LIB_SPEC="-L${exec_prefix}/lib ${ITK_STUB_LIB_FLAG}"
-    ;;
-  esac
-
-
-
-
-
-  
-  val="`pwd`/${ITK_LIB_FILE}"
-
-  if test "$val" = "" ; then
-    { echo "configure: error: Empty value for variable ITK_LIB_FULL_PATH" 1>&2; exit 1; }
-  fi
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "${CYGPATH}" = ""; then
-        { echo "configure: error: CYGPATH variable is not defined." 1>&2; exit 1; }
-      elif test "${CYGPATH}" = "echo"; then
-        # No cygpath when cross compiling
-        ITK_LIB_FULL_PATH=$val
-      else
-        # store literal argument text in a variable
-        val=$val
-        # Convert Cygwin to Windows path (/tmp/foo -> C:\Tmp\foo)
-        val="`${CYGPATH} $val`"
-        # Convert path like C:\Tmp\foo to C:/Tmp/foo
-        ITK_LIB_FULL_PATH="`echo $val | sed -e s#\\\\\\\\#/#g`"
-      fi
-    ;;
-    *)
-      # Default to a no-op under Unix or Cygwin gcc
-      ITK_LIB_FULL_PATH=$val
-    ;;
-  esac
-
-
-
-  
-  val="`pwd`/${ITK_STUB_LIB_FILE}"
-
-  if test "$val" = "" ; then
-    { echo "configure: error: Empty value for variable ITK_STUB_LIB_FULL_PATH" 1>&2; exit 1; }
-  fi
-
-  case "${host}" in
-    *windows32* | *mingw32*)
-      if test "${CYGPATH}" = ""; then
-        { echo "configure: error: CYGPATH variable is not defined." 1>&2; exit 1; }
-      elif test "${CYGPATH}" = "echo"; then
-        # No cygpath when cross compiling
-        ITK_STUB_LIB_FULL_PATH=$val
-      else
-        # store literal argument text in a variable
-        val=$val
-        # Convert Cygwin to Windows path (/tmp/foo -> C:\Tmp\foo)
-        val="`${CYGPATH} $val`"
-        # Convert path like C:\Tmp\foo to C:/Tmp/foo
-        ITK_STUB_LIB_FULL_PATH="`echo $val | sed -e s#\\\\\\\\#/#g`"
-      fi
-    ;;
-    *)
-      # Default to a no-op under Unix or Cygwin gcc
-      ITK_STUB_LIB_FULL_PATH=$val
-    ;;
-  esac
-
-
-
-
-
-itkstub_LIB_FILE=${ITK_STUB_LIB_FILE}
-itk_LIB_FILE=${ITK_TARGET_FILE}
-
-# END CYGNUS LOCAL
+	if test "${SHARED_BUILD}" = "1" ; then
+	    SHLIB_LD_LIBS="${tkstub_LIB_SPEC} ${TCL_BUILD_STUB_LIB_SPEC} ../itcl/${itclstub_LIB_FILE}"
+	    eval "${PACKAGE}_LIB_FILE=lib${PACKAGE}${SHARED_LIB_SUFFIX}"
+	    RANLIB=:
+	else
+	    eval "${PACKAGE}_LIB_FILE=lib${PACKAGE}${UNSHARED_LIB_SUFFIX}"
+	fi
+	eval "${PACKAGE}stub_LIB_FILE=lib${PACKAGE}stub${UNSHARED_LIB_SUFFIX}"
+	;;
+esac
 
 #--------------------------------------------------------------------
 # __CHANGE__
@@ -2531,42 +1981,79 @@ itk_LIB_FILE=${ITK_TARGET_FILE}
 # versions have bugs in the pkg_mkIndex routine.
 #--------------------------------------------------------------------
 
-# CYGNUS LOCAL
-# A Tcl shell is not available when bootstrapping!
-# END CYGNUS LOCAL
+
+    echo $ac_n "checking for tclsh""... $ac_c" 1>&6
+echo "configure:1987: checking for tclsh" >&5
+
+    if eval "test \"`echo '$''{'ac_cv_path_tclsh'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  
+	search_path=`echo ${exec_prefix}/bin:${prefix}/bin:${TCL_BIN_DIR}:${TCL_BIN_DIR}/../bin:${PATH} | sed -e 's/:/ /g'`
+	for dir in $search_path ; do
+	    for j in `ls -r $dir/tclsh[8-9]*${EXEEXT} 2> /dev/null` \
+		    `ls -r $dir/tclsh*${EXEEXT} 2> /dev/null` ; do
+		if test x"$ac_cv_path_tclsh" = x ; then
+		    if test -f "$j" ; then
+			ac_cv_path_tclsh=$j
+			break
+		    fi
+		fi
+	    done
+	done
+    
+fi
+
+
+    if test -f "$ac_cv_path_tclsh" ; then
+	TCLSH_PROG=$ac_cv_path_tclsh
+	echo "$ac_t""$TCLSH_PROG" 1>&6
+    else
+	{ echo "configure: error: No tclsh found in PATH:  $search_path" 1>&2; exit 1; }
+    fi
+    
+
 
 #--------------------------------------------------------------------
 # A wish shell is needed to run the test suite.
 #--------------------------------------------------------------------
 
-# CYGNUS LOCAL
-# A Wish shell is not available when bootstrapping!
-# END CYGNUS LOCAL
+
+    echo $ac_n "checking for wish""... $ac_c" 1>&6
+echo "configure:2024: checking for wish" >&5
+
+    if eval "test \"`echo '$''{'ac_cv_path_wish'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  
+	search_path=`echo ${exec_prefix}/bin:${prefix}/bin:${TCL_BIN_DIR}:${TCL_BIN_DIR}/../bin:${PATH} | sed -e 's/:/ /g'`
+	for dir in $search_path ; do
+	    for j in `ls -r $dir/wish[8-9]*${EXEEXT} 2> /dev/null` \
+		    `ls -r $dir/wish*${EXEEXT} 2> /dev/null` ; do
+		if test x"$ac_cv_path_wish" = x ; then
+		    if test -f "$j" ; then
+			ac_cv_path_wish=$j
+			break
+		    fi
+		fi
+	    done
+	done
+    
+fi
+
+
+    if test -f "$ac_cv_path_wish" ; then
+	WISH_PROG=$ac_cv_path_wish
+	echo "$ac_t""$WISH_PROG" 1>&6
+    else
+	{ echo "configure: error: No wish found in PATH:  $search_path" 1>&2; exit 1; }
+    fi
+    
+
 
 #--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.
 #--------------------------------------------------------------------
-
-# CYGNUS LOCAL
-
-# Note: The itkConfig.sh file below is not included in the net release.
-# We subst these variables to retain compatibility with the previous
-# version of itkConfig.sh.
-
-ITCL_VERSION=${VERSION}
-
-
-ITCL_MAJOR_VERSION=${MAJOR_VERSION}
-
-
-ITCL_MINOR_VERSION=${MINOR_VERSION}
-
-
-ITCL_RELEASE_LEVEL=${PATCHLEVEL}
-
-
-ITK_SRC_DIR=${ITK_SRC_DIR_NATIVE}
-
 
 trap '' 1 2 15
 cat > confcache <<\EOF
@@ -2682,8 +2169,7 @@ ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
 trap 'rm -fr `echo "Makefile \
-	itkConfig.sh \
-	pkgIndex.tcl" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+	pkgIndex.tcl itkConfig.sh" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -2750,10 +2236,6 @@ s%@TK_SRC_DIR@%$TK_SRC_DIR%g
 s%@TK_LIB_FILE@%$TK_LIB_FILE%g
 s%@TK_XINCLUDES@%$TK_XINCLUDES%g
 s%@ITCL_INCLUDES@%$ITCL_INCLUDES%g
-s%@ITCL_BUILD_LIB_SPEC@%$ITCL_BUILD_LIB_SPEC%g
-s%@ITCL_SH@%$ITCL_SH%g
-s%@ITCL_LIB_FILE@%$ITCL_LIB_FILE%g
-s%@ITCL_LIB_FULL_PATH@%$ITCL_LIB_FULL_PATH%g
 s%@itclstub_LIB_FILE@%$itclstub_LIB_FILE%g
 s%@tkstub_LIB_SPEC@%$tkstub_LIB_SPEC%g
 s%@TCL_TOP_DIR_NATIVE@%$TCL_TOP_DIR_NATIVE%g
@@ -2785,24 +2267,11 @@ s%@LDFLAGS_DEFAULT@%$LDFLAGS_DEFAULT%g
 s%@MAKE_LIB@%$MAKE_LIB%g
 s%@MAKE_SHARED_LIB@%$MAKE_SHARED_LIB%g
 s%@MAKE_STATIC_LIB@%$MAKE_STATIC_LIB%g
-s%@POST_MAKE_LIB@%$POST_MAKE_LIB%g
-s%@POST_MAKE_STATIC_LIB@%$POST_MAKE_STATIC_LIB%g
-s%@ITK_LIB_FILE@%$ITK_LIB_FILE%g
-s%@ITK_STUB_LIB_FILE@%$ITK_STUB_LIB_FILE%g
-s%@ITK_BUILD_LIB_SPEC@%$ITK_BUILD_LIB_SPEC%g
-s%@ITK_BUILD_STUB_LIB_SPEC@%$ITK_BUILD_STUB_LIB_SPEC%g
-s%@ITK_LIB_SPEC@%$ITK_LIB_SPEC%g
-s%@ITK_STUB_LIB_SPEC@%$ITK_STUB_LIB_SPEC%g
-s%@ITK_LIB_FULL_PATH@%$ITK_LIB_FULL_PATH%g
-s%@ITK_STUB_LIB_FULL_PATH@%$ITK_STUB_LIB_FULL_PATH%g
 s%@itkstub_LIB_FILE@%$itkstub_LIB_FILE%g
 s%@itk_LIB_FILE@%$itk_LIB_FILE%g
 s%@SHLIB_LD_LIBS@%$SHLIB_LD_LIBS%g
-s%@ITCL_VERSION@%$ITCL_VERSION%g
-s%@ITCL_MAJOR_VERSION@%$ITCL_MAJOR_VERSION%g
-s%@ITCL_MINOR_VERSION@%$ITCL_MINOR_VERSION%g
-s%@ITCL_RELEASE_LEVEL@%$ITCL_RELEASE_LEVEL%g
-s%@ITK_SRC_DIR@%$ITK_SRC_DIR%g
+s%@TCLSH_PROG@%$TCLSH_PROG%g
+s%@WISH_PROG@%$WISH_PROG%g
 
 CEOF
 EOF
@@ -2845,8 +2314,7 @@ EOF
 cat >> $CONFIG_STATUS <<EOF
 
 CONFIG_FILES=\${CONFIG_FILES-"Makefile \
-	itkConfig.sh \
-	pkgIndex.tcl"}
+	pkgIndex.tcl itkConfig.sh"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then
@@ -2917,5 +2385,3 @@ chmod +x $CONFIG_STATUS
 rm -fr confdefs* $ac_clean_files
 test "$no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
 
-
-# END CYGNUS LOCAL

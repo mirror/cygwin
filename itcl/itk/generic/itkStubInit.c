@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: $Id: itkStubInit.c,v 1.2.4.1 2001/05/18 02:21:45 mdejong Exp $
+ * RCS: $Id: itkStubInit.c,v 1.3 2001/06/22 04:38:54 davygrvy Exp $
  */
 
 #include "itk.h"
@@ -29,7 +29,7 @@ ItkStubs itkStubs = {
     TCL_STUB_MAGIC,
     NULL,
     Itk_Init, /* 0 */
-    NULL, /* 1 */
+    Itk_SafeInit, /* 1 */
     Itk_ConfigBodyCmd, /* 2 */
     Itk_UsualCmd, /* 3 */
     Itk_ClassOptionDefineCmd, /* 4 */

@@ -42,7 +42,7 @@
  *       modified for Stubs 5/20/1999 by 
  *           David Gravereaux <davygrvy@bigfoot.com>
  *
- *     RCS:  $Id: itcl.h,v 1.3.150.1 2001/05/18 02:21:42 mdejong Exp $
+ *     RCS:  $Id: itcl.h,v 1.15 2001/05/25 00:12:29 davygrvy Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -66,10 +66,10 @@
 #endif
 
 #define ITCL_VERSION "3.2"
-#define ITCL_PATCH_LEVEL "3.2.0"
+#define ITCL_PATCH_LEVEL "3.2.1"
 #define ITCL_MAJOR_VERSION 3
 #define ITCL_MINOR_VERSION 2
-#define ITCL_RELEASE_LEVEL 0
+#define ITCL_RELEASE_LEVEL 1
 
 /* 
  * A special definition used to allow this header file to be included 
@@ -78,7 +78,7 @@
  * and procedure declarations, that occur below.
  */
 
-#ifndef RESOURCE_INCLUDED
+#ifndef RC_INVOKED
 
 /*
  * Protection levels:
@@ -152,7 +152,10 @@ typedef struct Itcl_InterpState_ *Itcl_InterpState;
 
 #ifdef USE_ITCL_STUBS
 
-char *	Itcl_InitStubs _ANSI_ARGS_((Tcl_Interp *interp,
+#ifdef __cplusplus
+extern "C"
+#endif
+CONST char *	Itcl_InitStubs _ANSI_ARGS_((Tcl_Interp *interp,
 			    char *version, int exact));
 #else
 #define Itcl_InitStubs(interp, version, exact) \
@@ -164,7 +167,7 @@ char *	Itcl_InitStubs _ANSI_ARGS_((Tcl_Interp *interp,
  */
 
 
-#endif /* RESOURCE_INCLUDED */
+#endif /* RC_INVOKED */
 
 #undef TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLIMPORT

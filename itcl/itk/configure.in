@@ -13,9 +13,7 @@
 #--------------------------------------------------------------------
 
 AC_INIT(generic/itk.h)
-# CYGNUS LOCAL
-AC_CONFIG_AUX_DIR(../..)
-# END CYGNUS LOCAL
+AC_CONFIG_AUX_DIR(../config)
 
 #--------------------------------------------------------------------
 # __CHANGE__
@@ -29,7 +27,7 @@ PACKAGE=itk
 
 MAJOR_VERSION=3
 MINOR_VERSION=2
-PATCHLEVEL=.0
+PATCHLEVEL=.1
 
 VERSION=${MAJOR_VERSION}.${MINOR_VERSION}
 NODOT_VERSION=${MAJOR_VERSION}${MINOR_VERSION}
@@ -64,10 +62,7 @@ fi
 # was not used.
 #--------------------------------------------------------------------
 
-# CYGNUS LOCAL
-dnl SC_ENABLE_GCC
-AC_PROG_CC
-# END CYGNUS LOCAL
+SC_ENABLE_GCC
 AC_PROG_INSTALL
 
 #--------------------------------------------------------------------
@@ -108,8 +103,9 @@ AC_EXEEXT
 # This must be done before calling SC_PUBLIC_TCL_HEADERS
 #--------------------------------------------------------------------
 
-case "${host}" in
-    *mingw32* | *windows32*)
+case "`uname -s`" in
+    *win32* | *WIN32* | *CYGWIN_NT*|*CYGWIN_98*|*CYGWIN_95*)
+	CYGPATH="cygpath -w"
 	AC_CHECK_PROG(CYGPATH, cygpath, cygpath -w, echo)
 	RELPATH=".. .. bin"
     ;;
@@ -126,16 +122,12 @@ AC_SUBST(RELPATH)
 # Includes for this package
 #--------------------------------------------------------------------
 
-# CYGNUS LOCAL
-srcdir=`cd ${srcdir} ; pwd`
-ITK_SRC_DIR_NATIVE=`${CYGPATH} ${srcdir}`
-# END CYGNUS LOCAL
 ITK_GENERIC_DIR_NATIVE=`${CYGPATH} ${srcdir}/generic`
 ITK_WIN_DIR_NATIVE=`${CYGPATH} ${srcdir}/win`
 ITK_UNIX_DIR_NATIVE=`${CYGPATH} ${srcdir}/unix`
 
-case "${host}" in
-    *cygwin* | *mingw32* | *windows32*)
+case "`uname -s`" in
+    *win32* | *WIN32* | *CYGWIN_NT*|*CYGWIN_98*|*CYGWIN_95*)
 	ITK_PLATFORM_DIR_NATIVE=${ITK_WIN_DIR_NATIVE}
     ;;
     *)
@@ -174,16 +166,26 @@ fi
 ITCL_INCLUDES=-I\"`${CYGPATH} ${ITCL_LIB_DIR}/generic`\"
 AC_SUBST(ITCL_INCLUDES)
 
-# CYGNUS LOCAL
-CYG_AC_PATH_ITCLCONFIG
-CYG_AC_LOAD_ITCLCONFIG
+#--------------------------------------------------------------------
+# The value for this should have been cached during the Itcl configuration.
+# Make sure the cache-ID that appears here is the same as the one that
+# appears in the Itcl configure script.
+#--------------------------------------------------------------------
 
-itclstub_LIB_FILE=${ITCL_STUB_LIB_FILE}
+AC_MSG_CHECKING(for name if Itcl stub library)
+AC_CACHE_VAL(ac_cv_itclstub_LIB_FILE, ac_cv_itclstub_LIB_FILE="NONE")
+if test x"${ac_cv_itclstub_LIB_FILE}" = x"NONE" ; then
+    AC_MSG_ERROR(Can't find name of Itcl stub library.  How did this happen?)
+else
+    AC_MSG_RESULT(${ac_cv_itclstub_LIB_FILE})
+fi
+itclstub_LIB_FILE=${ac_cv_itclstub_LIB_FILE}
 AC_SUBST(itclstub_LIB_FILE)
 
-tkstub_LIB_SPEC=${TK_STUB_LIB_SPEC}
+SC_LIB_SPEC(tkstub, ${TK_BIN_DIR})
 AC_SUBST(tkstub_LIB_SPEC)
-# END CYGNUS LOCAL
+
+SC_LIB_SPEC(itclstub, ../itcl)
 
 #--------------------------------------------------------------------
 # __CHANGE__
@@ -219,8 +221,8 @@ SC_PRIVATE_TK_HEADERS
 # your system.
 #--------------------------------------------------------------------
 
-case "${host}" in
-    *cygwin* | *mingw32* | *windows32*)
+case "`uname -s`" in
+    *win32* | *WIN32* | *CYGWIN_NT*|*CYGWIN_98*|*CYGWIN_95*)
 	AC_DEFINE_UNQUOTED(BUILD_${PACKAGE})
 	CLEANFILES="*.lib *.dll *.exp *.ilk *.pdb vc50.pch"
 	PLATFORM_SOURCES='$(WIN_SOURCES)'
@@ -320,58 +322,28 @@ eval "UNSHARED_LIB_SUFFIX=${TCL_UNSHARED_LIB_SUFFIX}"
 # Shared libraries and static libraries have different names.
 #--------------------------------------------------------------------
 
-# CYGNUS LOCAL
-
-if test "${SHARED_BUILD}" = "1" ; then
-  # FIXME: Need to devise a TCL_TOOL macro to deal with this!
-  case "${host}" in
-    *mingw32* | *windows32*)
-        SHLIB_LD_LIBS="${TCL_BUILD_STUB_LIB_SPEC} ${TCL_SHLIB_LD_LIBS} \
-            ${ITCL_BUILD_STUB_LIB_SPEC} ${TK_BUILD_STUB_LIB_SPEC}"
-        # Need to link to the .a or .lib not the .dll!
-        TCL_TOOL_SHARED_LIB_LONGNAME(ITK_SHLIB_FILE, ${PACKAGE}, ${SHARED_LIB_SUFFIX})
-        TCL_TOOL_STATIC_LIB_LONGNAME(ITK_LIB_FILE, ${PACKAGE}, ${UNSHARED_LIB_SUFFIX})
-        ITK_TARGET_FILE=${ITK_SHLIB_FILE}
-     ;;
+case "`uname -s`" in
+    *win32* | *WIN32* | *CYGWIN_NT*|*CYGWIN_98*|*CYGWIN_95*)
+	if test "${SHARED_BUILD}" = "1" ; then
+	    SHLIB_LD_LIBS="\"`cygpath -w ${TCL_BIN_DIR}/${TCL_STUB_LIB_FILE}`\" ${TCL_SHLIB_LD_LIBS} \"`${CYGPATH} ../itcl/${itclstub_LIB_FILE}`\" ${tkstub_LIB_SPEC} "
+	    eval "${PACKAGE}_LIB_FILE=${PACKAGE}${SHARED_LIB_SUFFIX}"
+	    RANLIB=:
+	else
+	    eval "${PACKAGE}_LIB_FILE=${PACKAGE}${UNSHARED_LIB_SUFFIX}"
+	fi
+	eval "${PACKAGE}stub_LIB_FILE=${PACKAGE}stub${UNSHARED_LIB_SUFFIX}"
+	;;
     *)
-        SHLIB_LD_LIBS="${TK_BUILD_STUB_LIB_SPEC} ${TCL_BUILD_STUB_LIB_SPEC} \
-            ${ITCL_BUILD_STUB_LIB_SPEC}"
-        TCL_TOOL_SHARED_LIB_LONGNAME(ITK_LIB_FILE, ${PACKAGE}, ${SHARED_LIB_SUFFIX})
-        ITK_TARGET_FILE=${ITK_LIB_FILE}
-     ;;
-  esac
-else
-  TCL_TOOL_STATIC_LIB_LONGNAME(ITK_LIB_FILE, ${PACKAGE}, ${UNSHARED_LIB_SUFFIX})
-  ITK_TARGET_FILE=${ITK_LIB_FILE}
-fi
-
-TCL_TOOL_STATIC_LIB_LONGNAME(ITK_STUB_LIB_FILE, ${PACKAGE}stub, ${UNSHARED_LIB_SUFFIX})
-
-AC_SUBST(ITK_LIB_FILE)
-AC_SUBST(ITK_STUB_LIB_FILE)
-
-TCL_TOOL_LIB_SHORTNAME(ITK_LIB_FLAG, ${PACKAGE}, ${VERSION})
-TCL_TOOL_LIB_SHORTNAME(ITK_STUB_LIB_FLAG, ${PACKAGE}stub, ${VERSION})
-
-TCL_TOOL_LIB_SPEC(ITK_BUILD_LIB_SPEC, `pwd`, ${ITK_LIB_FLAG})
-TCL_TOOL_LIB_SPEC(ITK_BUILD_STUB_LIB_SPEC, `pwd`, ${ITK_STUB_LIB_FLAG})
-AC_SUBST(ITK_BUILD_LIB_SPEC)
-AC_SUBST(ITK_BUILD_STUB_LIB_SPEC)
-
-TCL_TOOL_LIB_SPEC(ITK_LIB_SPEC, ${exec_prefix}/lib, ${ITK_LIB_FLAG})
-TCL_TOOL_LIB_SPEC(ITK_STUB_LIB_SPEC, ${exec_prefix}/lib, ${ITK_STUB_LIB_FLAG})
-AC_SUBST(ITK_LIB_SPEC)
-AC_SUBST(ITK_STUB_LIB_SPEC)
-
-TCL_TOOL_LIB_PATH(ITK_LIB_FULL_PATH, `pwd`, ${ITK_LIB_FILE})
-TCL_TOOL_LIB_PATH(ITK_STUB_LIB_FULL_PATH, `pwd`, ${ITK_STUB_LIB_FILE})
-AC_SUBST(ITK_LIB_FULL_PATH)
-AC_SUBST(ITK_STUB_LIB_FULL_PATH)
-
-itkstub_LIB_FILE=${ITK_STUB_LIB_FILE}
-itk_LIB_FILE=${ITK_TARGET_FILE}
-
-# END CYGNUS LOCAL
+	if test "${SHARED_BUILD}" = "1" ; then
+	    SHLIB_LD_LIBS="${tkstub_LIB_SPEC} ${TCL_BUILD_STUB_LIB_SPEC} ../itcl/${itclstub_LIB_FILE}"
+	    eval "${PACKAGE}_LIB_FILE=lib${PACKAGE}${SHARED_LIB_SUFFIX}"
+	    RANLIB=:
+	else
+	    eval "${PACKAGE}_LIB_FILE=lib${PACKAGE}${UNSHARED_LIB_SUFFIX}"
+	fi
+	eval "${PACKAGE}stub_LIB_FILE=lib${PACKAGE}stub${UNSHARED_LIB_SUFFIX}"
+	;;
+esac
 
 #--------------------------------------------------------------------
 # __CHANGE__
@@ -392,47 +364,17 @@ AC_SUBST(SHLIB_LD_LIBS)
 # versions have bugs in the pkg_mkIndex routine.
 #--------------------------------------------------------------------
 
-# CYGNUS LOCAL
-# A Tcl shell is not available when bootstrapping!
-dnl SC_PROG_TCLSH
-# END CYGNUS LOCAL
+SC_PROG_TCLSH
 
 #--------------------------------------------------------------------
 # A wish shell is needed to run the test suite.
 #--------------------------------------------------------------------
 
-# CYGNUS LOCAL
-# A Wish shell is not available when bootstrapping!
-dnl SC_PROG_WISH
-# END CYGNUS LOCAL
+SC_PROG_WISH
 
 #--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.
 #--------------------------------------------------------------------
 
-# CYGNUS LOCAL
-
-# Note: The itkConfig.sh file below is not included in the net release.
-# We subst these variables to retain compatibility with the previous
-# version of itkConfig.sh.
-
-ITCL_VERSION=${VERSION}
-AC_SUBST(ITCL_VERSION)
-
-ITCL_MAJOR_VERSION=${MAJOR_VERSION}
-AC_SUBST(ITCL_MAJOR_VERSION)
-
-ITCL_MINOR_VERSION=${MINOR_VERSION}
-AC_SUBST(ITCL_MINOR_VERSION)
-
-ITCL_RELEASE_LEVEL=${PATCHLEVEL}
-AC_SUBST(ITCL_RELEASE_LEVEL)
-
-ITK_SRC_DIR=${ITK_SRC_DIR_NATIVE}
-AC_SUBST(ITK_SRC_DIR)
-
 AC_OUTPUT([Makefile \
-	itkConfig.sh \
-	pkgIndex.tcl])
-
-# END CYGNUS LOCAL
+	pkgIndex.tcl itkConfig.sh])

@@ -4,7 +4,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\"
-'\" RCS: $Id: find.n,v 1.2.172.1 2001/05/18 02:21:42 mdejong Exp $
+'\" RCS: $Id: find.n,v 1.2 2000/04/19 06:51:04 mmc Exp $
 '\"
 .so man.macros
 .TH find n 3.0 itcl "[incr\ Tcl]"

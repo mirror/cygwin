@@ -11,7 +11,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: Makefile.in,v 1.2.4.4 2001/07/13 00:57:11 mdejong Exp $
+# RCS: @(#) $Id: Makefile.in,v 1.15 2001/05/29 15:51:16 andreas_kupries Exp $
 
 #========================================================================
 # Edit the following few lines when writing a new extension
@@ -115,9 +115,7 @@ GENERIC_HDRS= \
 
 SAMPLE_NEW_VAR=@SAMPLE_NEW_VAR@
 
-# CYGNUS LOCAL
-ITCL_LIBRARY = @datadir@/itcl$(VERSION)
-# END CYGNUS LOCAL
+ITCL_LIBRARY = $(prefix)/lib/itcl$(VERSION)
 
 ITCL_GENERIC_DIR_NATIVE = @ITCL_GENERIC_DIR_NATIVE@
 ITCL_UNIX_DIR_NATIVE = @ITCL_UNIX_DIR_NATIVE@
@@ -157,9 +155,8 @@ pkgincludedir = $(includedir)/@PACKAGE@@VERSION@
 
 top_builddir = .
 
-# CYGNUS LOCAL
-INSTALL = @INSTALL@
-# END CYGNUS LOCAL
+#INSTALL = $(top_srcdir)/../config/install-sh -c
+INSTALL = $(TCLSH_PROG) `@CYGPATH@ $(srcdir)/../config/installFile.tcl` -c
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -295,6 +292,7 @@ install-doc: doc
 	@for i in $(srcdir)/doc/*.n; \
 	    do \
 	    echo "Installing $$i"; \
+	    rm -f $(mandir)/mann/`basename $$i`; \
 	    $(INSTALL_DATA) $$i $(mandir)/mann ; \
 	    done
 
@@ -321,12 +319,12 @@ depend:
 $(itcl_LIB_FILE): $(itcl_OBJECTS)
 	-rm -f $(itcl_LIB_FILE)
 	@MAKE_LIB@
-	@POST_MAKE_LIB@
+	$(RANLIB) $(itcl_LIB_FILE)
 
 $(itclstub_LIB_FILE): $(itclstub_OBJECTS)
 	-rm -f $(itclstub_LIB_FILE)
 	@MAKE_STATIC_LIB@
-	@POST_MAKE_STATIC_LIB@
+	$(RANLIB) $(itclstub_LIB_FILE)
 
 #========================================================================
 # We need to enumerate the list of .c to .o lines here.

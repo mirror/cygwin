@@ -12,7 +12,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id: itcl_migrate.c,v 1.2.172.1 2001/05/18 02:21:43 mdejong Exp $
+ *     RCS:  $Id: itcl_migrate.c,v 1.1 1998/07/27 18:41:47 stanton Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------

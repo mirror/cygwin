@@ -9,12 +9,16 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id: itcl.tcl,v 1.2.172.1 2001/05/18 02:21:43 mdejong Exp $
+#      RCS:  $Id: itcl.tcl,v 1.4 2001/04/14 21:35:54 davygrvy Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
 # See the file "license.terms" for information on usage and
 # redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+
+proc ::itcl::delete_helper { name args } {
+    ::itcl::delete object $name
+}
 
 # ----------------------------------------------------------------------
 #  USAGE:  local <className> <objName> ?<arg> <arg>...?
@@ -31,7 +35,7 @@ proc ::itcl::local {class name args} {
     uplevel [list set itcl-local-$ptr $ptr]
     set cmd [uplevel namespace which -command $ptr]
     uplevel [list trace variable itcl-local-$ptr u \
-        "itcl::delete object $cmd; list"]
+        "::itcl::delete_helper $cmd"]
     return $ptr
 }
 
@@ -109,15 +113,6 @@ foreach cmd {public protected private} {
     }
 }
 
-# CYGNUS LOCAL
-# This version of auto_import does not work, because it relies
-# WHOLLY on the tclIndex files, but the tclIndex files have no
-# notion of what the export list for a namespace is.  So at the 
-# time you do "namespace import" the export list is empty, and
-# so nothing is imported.
-# Until that is fixed, it is best just to go back to the original
-# Tcl version of auto_import...
-
 # ----------------------------------------------------------------------
 # auto_import
 # ----------------------------------------------------------------------
@@ -131,19 +126,19 @@ foreach cmd {public protected private} {
 # pattern	The pattern of commands being imported (like "foo::*")
 #               a canonical namespace as returned by [namespace current]
 
-#proc auto_import {pattern} {
-#    global auto_index
+proc auto_import {pattern} {
+    global auto_index
 
-#     set ns [uplevel namespace current]
-#     set patternList [auto_qualify $pattern $ns]
+    set ns [uplevel namespace current]
+    set patternList [auto_qualify $pattern $ns]
 
-#     auto_load_index
+    auto_load_index
 
-#     foreach pattern $patternList {
-#         foreach name [array names auto_index $pattern] {
-#             if {"" == [info commands $name]} {
-#                 ::itcl::import::stub create $name
-#             }
-#         }
-#     }
-# }
+    foreach pattern $patternList {
+        foreach name [array names auto_index $pattern] {
+            if {"" == [info commands $name]} {
+                ::itcl::import::stub create $name
+            }
+        }
+    }
+}

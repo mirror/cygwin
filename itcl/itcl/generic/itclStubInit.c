@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: $Id: itclStubInit.c,v 1.2.4.1 2001/05/18 02:21:42 mdejong Exp $
+ * RCS: $Id: itclStubInit.c,v 1.2 2000/08/04 22:11:50 davidg Exp $
  */
 
 #include "itclInt.h"

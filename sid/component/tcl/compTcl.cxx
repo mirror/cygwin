@@ -2060,7 +2060,18 @@ scan_files (const string& dotless_extension)
   file_map_t files;
   string extension = string(".") + dotless_extension;
 
-  vector<string> search_directories = sid_file_search_path ();
+  vector<string> basic_search_directories = sid_file_search_path ();
+  vector<string> search_directories;
+
+  // Add both a ".../sidcomp" and a non-.../sidcomp item to the
+  // list, in case we're looking in the source/build trees.
+  // An alternative would be to plop the .tk/.tcl/.blt component
+  // sources into a new subdirectory component/tcl/sidcomp.
+  for (unsigned i=0; i<basic_search_directories.size(); i++)
+    {
+      search_directories.push_back (basic_search_directories[i] + "/sidcomp");
+      search_directories.push_back (basic_search_directories[i]);
+    }
 
 #ifndef HAVE_OPENDIR
 #error "Need opendir!"
@@ -2068,7 +2079,7 @@ scan_files (const string& dotless_extension)
 
   for (unsigned i=0; i<search_directories.size(); i++)
     {
-      string search_dir = search_directories[i] + "/sidcomp";
+      string search_dir = search_directories[i];
       const char* dname = search_dir.c_str();
       // cout << "Searching directory `" << dname << "'" << endl;
 

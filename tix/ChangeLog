@@ -1,3 +1,7 @@
+2001-09-09  Ian Roxborough  <irox@redhat.com>
+
+	* win/configure: regenerated.
+	
 2001-08-11  Mo DeJong  <mdejong@cygnus.com>
 
 	* win/Makefile.in: Don't generate a def file by

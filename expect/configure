@@ -6087,7 +6087,7 @@ if test $ac_cv_sys_long_file_names = no; then
 fi
 
 EXP_BUILD_LIB_SPEC="-L`pwd` -lexpect${EXP_LIB_VERSION}"
-EXP_LIB_SPEC="-L\${exec_prefix}/lib -lexpect${EXP_LIB_VERSION}"
+EXP_LIB_SPEC="-L\${libdir} -lexpect${EXP_LIB_VERSION}"
 EXP_UNSHARED_LIB_FILE=libexpect${EXP_LIB_VERSION}.a
 EXP_BUILD_LIB_SPEC=${EXP_UNSHARED_LIB_FILE}
 

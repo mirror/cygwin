@@ -1,3 +1,16 @@
+2003-11-10  Corinna Vinschen  <vinschen@redhat.com>
+
+	* Makefile.am: Add empty install-info and uninstall-info rules.
+	* Makefile.in: Regenerate.
+
+2003-10-14  Corinna Vinschen  <vinschen@redhat.com>
+
+	* baseboards/sh-sim.exp: Add copyright header.
+
+2003-10-13  Corinna Vinschen  <vinschen@redhat.com>
+
+	* baseboards/sh-sim.exp: New file.
+
 2003-06-14  H.J. Lu <hongjiu.lu@intel.com>
  
 	* config.guess: Update to 2003-06-12 version.

@@ -453,6 +453,30 @@ proc get_multilibs { args } {
 	set comp_base_dir [file dirname [file dirname [file dirname [file dirname [file dirname [exec $compiler --print-prog-name=cc1]]]]]];
     }
 
+    # search for the top level multilib directory
+    set multitop [lookfor_file "${comp_base_dir}" "${target_alias}"]
+    if { $multitop == "" } {
+	set multitop [lookfor_file "${comp_base_dir}" "libraries"]
+	if { $multitop == "" } {
+	    set multitop "[lookfor_file ${comp_base_dir} gcc/xgcc]"
+	    if { $multitop != "" } {
+		set multitop [file dirname [file dirname $multitop]];
+	    } else {
+		return ""
+	    }
+	}
+    }
+
+    set gccpath [eval exec "$compiler" --print-multi-directory $mopts];
+    set gccpath [lindex $gccpath 0];
+    if { $gccpath != "" } {
+	verbose "GCC path is $gccpath";
+	if { [llength $args] == 0 } {
+	    set board_info($target_board,multitop) "$multitop/$gccpath"
+	}
+	return "$multitop/$gccpath";
+    }
+
     # set output [exec $objdump_name --file-headers objfmtst.o ]
     set default_multilib [exec $compiler --print-multi-lib]
     set default_multilib [lindex $default_multilib 0];
@@ -506,20 +530,6 @@ proc get_multilibs { args } {
 	    }
 	}
 	verbose "options after multimatches: $moptions" 3
-    }
-
-    # search for the top level multilib directory
-    set multitop [lookfor_file "${comp_base_dir}" "${target_alias}"]
-    if { $multitop == "" } {
-	set multitop [lookfor_file "${comp_base_dir}" "libraries"]
-	if { $multitop == "" } {
-	    set multitop "[lookfor_file ${comp_base_dir} gcc/xgcc]"
-	    if { $multitop != "" } {
-		set multitop [file dirname [file dirname $multitop]];
-	    } else {
-		return ""
-	    }
-	}
     }
 
     # make a list of -m<foo> options from the various compiler config variables

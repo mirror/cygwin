@@ -196,7 +196,14 @@ TclpInitLibraryPath(path)
      */
 
     /* CYGNUS LOCAL */
+    /* Due to cygwin standard practice, the tcl binary will be
+       installed in /bin rather than /usr/bin.  This means that, without
+       this change, tcl will search in x:\share rather than x:\usr\share. */
+#ifdef __CYGWIN__
+    sprintf(installLib, "usr/share/tcl%s", TCL_VERSION);
+#else
     sprintf(installLib, "share/tcl%s", TCL_VERSION);
+#endif
     /* END CYGNUS LOCAL */
     sprintf(developLib, "../tcl%s/library",
 	    ((TCL_RELEASE_LEVEL < 2) ? TCL_PATCH_LEVEL : TCL_VERSION));

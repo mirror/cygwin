@@ -1,5 +1,10 @@
 2002-12-19  Christopher Faylor  <cgf@redhat.com>
 
+	* win/tclWinInit.c (TclpInitLibraryPath): Default to correct location
+	for installLib on cygwin.
+
+2002-12-19  Christopher Faylor  <cgf@redhat.com>
+
 	* cygwin/configure.in: Set TCL_BUILD_LIB_SPEC.
 	* cygwin/configure: Regenerate.
 

@@ -123,7 +123,7 @@ usage ()
   cout << "--ulog-level=LEVEL    Set the logging level for the current board" << endl;
   cout << "--ulog-mode=less|match|equal" << endl
        << "                      Set the logging mode for the current board" << endl;
-  cout << "--ulog-file=*|FILE    Set the log file name" << endl;
+  cout << "--ulog-file=-|FILE    Set the log file name" << endl;
   cout << endl
        << " note: most board-specific options can be used in board-neutral position " << endl
        << " where they are interpreted as session-specific or default settings. " << endl;
@@ -226,7 +226,7 @@ void try_load_file (const string memspec,
   if (map)
     {
       loader->set_target (map, "access-port");
-      sess->add_child (loader);
+      sess->set_loader (loader);
     }
   else
     {
@@ -234,7 +234,7 @@ void try_load_file (const string memspec,
 	{
 	  assert (board->main_mapper);
 	  loader->set_target (board->main_mapper, "access-port");
-	  board->add_child (loader);
+	  board->set_loader (loader);
 	}
       else
 	{
@@ -376,7 +376,6 @@ void try_add_memory (const string memspec,
 	}
     } 
 
-  assert (map);
   assert (mem);
   string port ( read_only_p ? "read-only-port" : "read-write-port");
 

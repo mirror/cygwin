@@ -1,4 +1,4 @@
-# Copyright (C) 1992, 93, 94, 95, 96, 97, 98, 1999, 2000, 2002
+# Copyright (C) 1992, 93, 94, 95, 96, 97, 98, 1999, 2000, 2002, 2003
 # Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
@@ -422,13 +422,50 @@ proc get_multilibs { args } {
 	    break;
 	}
     }
-    if { [llength $args] > 0 } {
-	set mopts [lindex $args 0];
+
+    regexp "/.* " $compiler compiler
+    set compiler [string trimright $compiler " "]
+    verbose "compiler is $compiler"
+
+    if { [which $compiler] == 0 } {
+	return "";
+    }
+
+    if { [board_info $target_board exists multilib_flags] } {
+	set mopts [board_info $target_board multilib_flags];
     } else {
-	if { [board_info $target_board exists multilib_flags] } {
-	    set mopts [board_info $target_board multilib_flags];
-	} else {
-	    set mopts ""
+	set mopts ""
+    }
+
+    set default_multilib [exec $compiler --print-multi-lib]
+    set default_multilib [lindex $default_multilib 0];
+    set extra [string trimleft $default_multilib ".;@@"]
+
+    # extract the options and their directory names as know by gcc
+    foreach i "[exec $compiler --print-multi-lib]" {
+    	if {$extra != ""} {
+          # string trimright would do the wrong thing if we included
+          # the leading @@ in $extra
+ 	  set i [string trimright $i $extra]
+          set i [string trimright $i "@@"]
+	}
+	set opts ""
+	set dir ""
+	regexp -- "\[a-z0-9=/\.-\]*;" $i dir
+	set dir [string trimright $dir "\;@"]
+	regexp -- "\;@*\[\@a-zA-Z0-9=/\.-\]*" $i opts
+	set opts [split [string trimleft $opts "\;@@"] "@@"]
+	lappend multilibs "$dir {$opts }"
+
+	# If args contains arguments don't use the first one as
+	# multilib option unless it qualifies as a multilib option.
+	if { [llength $args] > 0 } {
+	    set override_opt [lindex $args 0]
+	    foreach j $opts {
+	        if {$j == $override_opt} {
+	    	    set mopts $override_opt
+	        }
+	    }
 	}
     }
 
@@ -439,14 +476,6 @@ proc get_multilibs { args } {
 	if { $x != "" && [lsearch -exact $moptions $x] < 0 } {
 	    lappend moptions $x
 	}
-    }
-
-    regexp "/.* " $compiler compiler
-    set compiler [string trimright $compiler " "]
-    verbose "compiler is $compiler"
-
-    if { [which $compiler] == 0 } {
-	return "";
     }
 
     if ![info exists comp_base_dir] {
@@ -475,28 +504,6 @@ proc get_multilibs { args } {
 	    set board_info($target_board,multitop) "$multitop/$gccpath"
 	}
 	return "$multitop/$gccpath";
-    }
-
-    # set output [exec $objdump_name --file-headers objfmtst.o ]
-    set default_multilib [exec $compiler --print-multi-lib]
-    set default_multilib [lindex $default_multilib 0];
-    set extra [string trimleft $default_multilib ".;@@"]
-
-    # extract the options and their directory names as know by gcc
-    foreach i "[exec $compiler --print-multi-lib]" {
-    	if {$extra != ""} {
-          # string trimright would do the wrong thing if we included
-          # the leading @@ in $extra
- 	  set i [string trimright $i $extra"]
-          set i [string trimright $i "@@"]
-	}
-	set opts ""
-	set dir ""
-	regexp -- "\[a-z0-9=/\.-\]*;" $i dir
-	set dir [string trimright $dir "\;@"]
-	regexp -- "\;@*\[\@a-zA-Z0-9=/\.-\]*" $i opts
-	set opts [split [string trimleft $opts "\;@@"] "@@"]
-	lappend multilibs "$dir {$opts }"
     }
 
     # extract the MULTILIB_MATCHES from dumpspecs

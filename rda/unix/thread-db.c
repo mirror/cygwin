@@ -2117,6 +2117,10 @@ thread_db_set_thread_reg (struct gdbserv *serv,
   GREGSET_T gregset;
   td_err_e ret;
 
+  /* Initialize reg to 0 in the event that we return early due to a
+     register being unsupported.  */
+  gdbserv_ulonglong_to_reg (serv, 0LL, reg);
+
   if (thread == NULL)
     thread = process->event_thread;	/* Default to the event thread. */
 

@@ -73,6 +73,9 @@
 
   ; Base insturction length.  The insns is always 32 bits wide.
   (base-insn-bitsize 32)
+
+  ; Address of insn in delay slot
+  (setup-semantics (set-quiet (reg h-delay-insn) (add pc (attr (current-insn) 4))))
 )
 
 
@@ -257,6 +260,7 @@
 (dnh h-lo16 "low 16 bits"  () (immediate (INT 16)) () () ())
 
 (dsh h-cbit "condition bit" () (register BI))
+(dsh h-delay-insn "delay insn addr" () (register SI))
 
 
 ; Instruction operands.
@@ -328,9 +332,9 @@
      (+ OP1_0 OP2_1 abs-26)
 
      ; We execute the delay slot before doin' the real branch
-     ; Set LR to (pc + 4)
+     ; Set LR to (delay insn addr + 4)
      (sequence ()
-               (set (reg h-gr 11) (add pc 4))
+               (set (reg h-gr 11) (add (reg h-delay-insn) 4))
                (delay 1 (set pc abs-26)))
      ()
 )
@@ -361,7 +365,7 @@
      ; We execute the delay slot before doin' the real branch
      (sequence ((WI tmp-slot))
                (set tmp-slot rA)
-               (set (reg h-gr 11) (add pc 4))
+               (set (reg h-gr 11) (add (reg h-delay-insn) 4))
                (delay 1 (set pc tmp-slot)))
      ()
 )
@@ -374,9 +378,9 @@
      (+ OP1_0 OP2_2 disp-26)
 
      ; We execute the delay slot before doin' the real branch
-     ; Set LR to (pc + 4)
+     ; Set LR to (delay insn addr + 4)
      (sequence ()
-               (set (reg h-gr 11) (add pc 4))
+               (set (reg h-gr 11) (add (reg h-delay-insn) 4))
                (delay 1 (set pc disp-26)))
      ()
 )

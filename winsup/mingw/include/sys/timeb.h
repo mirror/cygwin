@@ -1,7 +1,7 @@
 /*
- * utime.h
+ * timeb.h
  *
- * Support for the utime function.
+ * Support for the UNIX System V ftime system call.
  *
  * This file is part of the Mingw32 package.
  *
@@ -26,55 +26,48 @@
 
 #ifndef	__STRICT_ANSI__
 
-#ifndef	_UTIME_H_
-#define	_UTIME_H_
+#ifndef	_TIMEB_H_
+#define	_TIMEB_H_
 
 /* All the headers include this file. */
 #include <_mingw.h>
 
-#define __need_wchar_t
-#define __need_size_t
-#ifndef RC_INVOKED
-#include <stddef.h>
-#endif	/* Not RC_INVOKED */
-#include <sys/types.h>
-
 #ifndef	RC_INVOKED
 
 /*
- * Structure used by _utime function.
+ * TODO: Structure not tested.
  */
-struct _utimbuf
+struct _timeb
 {
-	__CSTD time_t	actime;		/* Access time */
-	__CSTD time_t	modtime;	/* Modification time */
+	long	time;
+	short	millitm;
+	short	timezone;
+	short	dstflag;
 };
-
 
 #ifndef	_NO_OLDNAMES
-/* NOTE: Must be the same as _utimbuf above. */
-struct utimbuf
+/*
+ * TODO: Structure not tested.
+ */
+struct timeb
 {
-	__CSTD time_t	actime;
-	__CSTD time_t	modtime;
+	long	time;
+	short	millitm;
+	short	timezone;
+	short	dstflag;
 };
-#endif	/* Not _NO_OLDNAMES */
+#endif
 
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-_CRTIMP int __cdecl	_utime (const char*, struct _utimbuf*);
-_CRTIMP int __cdecl	_futime (int, struct _utimbuf*);
+/* TODO: Not tested. */
+_CRTIMP void __cdecl	_ftime (struct _timeb*);
 
-/* The wide character version, only available for MSVCRT versions of the
- * C runtime library. */
-#ifdef __MSVCRT__
-_CRTIMP int __cdecl	_wutime (const wchar_t*, struct _utimbuf*);
-#endif /* MSVCRT runtime */
 #ifndef	_NO_OLDNAMES
-_CRTIMP int __cdecl	utime (const char*, struct utimbuf*);
+_CRTIMP void __cdecl	ftime (struct timeb*);
 #endif	/* Not _NO_OLDNAMES */
 
 #ifdef	__cplusplus
@@ -83,7 +76,7 @@ _CRTIMP int __cdecl	utime (const char*, struct utimbuf*);
 
 #endif	/* Not RC_INVOKED */
 
-#endif	/* Not _UTIME_H_ */
+#endif	/* Not _TIMEB_H_ */
 
 #endif	/* Not __STRICT_ANSI__ */
 

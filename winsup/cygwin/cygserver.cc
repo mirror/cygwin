@@ -43,7 +43,7 @@ GENERIC_MAPPING access_mapping;
 DWORD request_count = 0;
 
 // Version string.
-static const char version[] = "$Revision: 1.1.2.19 $";
+static const char version[] = "$Revision: 1.1.2.20 $";
 
 /*
  * Support function for the XXX_printf() macros in "woutsup.h".
@@ -650,9 +650,9 @@ main (const int argc, char *argv[])
 
   assert (transport);
 
+  print_version (pgm);
   setbuf (stdout, NULL);
   printf ("daemon starting up");
-  print_version (pgm);
   if (signal (SIGQUIT, handle_signal) == SIG_ERR)
     {
       system_printf ("could not install signal handler (%d)- aborting startup",

@@ -21,10 +21,11 @@
 
 #if 0
 #ifndef lint
-static char *rcsid = "$Id: regsub.c,v 1.2 1998/09/15 23:31:37 cgf Exp $";
+static char *rcsid = "$Id: v8_regsub.c,v 1.1 2001/12/20 02:55:11 cgf Exp $";
 #endif /* not lint */
 #endif
 
+#include "winsup.h"
 #include "regexp.h"
 #include <stdio.h>
 #include <string.h>
@@ -39,7 +40,7 @@ static char *rcsid = "$Id: regsub.c,v 1.2 1998/09/15 23:31:37 cgf Exp $";
 /*
  - regsub - perform substitutions after a regexp match
  */
-void
+void __declspec(dllexport)
 regsub(prog, source, dest)
 const regexp *prog;
 const char *source;

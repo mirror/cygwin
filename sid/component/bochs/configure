@@ -5465,6 +5465,57 @@ fi
 rm -f conftest*
 fi
 
+for ac_hdr in X11/Xos.h
+do
+ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
+echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
+echo "configure:5473: checking for $ac_hdr" >&5
+if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  cat > conftest.$ac_ext <<EOF
+#line 5478 "configure"
+#include "confdefs.h"
+#include <$ac_hdr>
+EOF
+ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
+{ (eval echo configure:5483: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
+if test -z "$ac_err"; then
+  rm -rf conftest*
+  eval "ac_cv_header_$ac_safe=yes"
+else
+  echo "$ac_err" >&5
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  eval "ac_cv_header_$ac_safe=no"
+fi
+rm -f conftest*
+fi
+if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
+  echo "$ac_t""yes" 1>&6
+    ac_tr_hdr=HAVE_`echo $ac_hdr | sed 'y%abcdefghijklmnopqrstuvwxyz./-%ABCDEFGHIJKLMNOPQRSTUVWXYZ___%'`
+  cat >> confdefs.h <<EOF
+#define $ac_tr_hdr 1
+EOF
+ have_xos_header=true
+else
+  echo "$ac_t""no" 1>&6
+have_xos_header=false
+fi
+done
+
+
+
+if test x$have_xos_header = xtrue; then
+  HAVE_XOS_HEADER_TRUE=
+  HAVE_XOS_HEADER_FALSE='#'
+else
+  HAVE_XOS_HEADER_TRUE='#'
+  HAVE_XOS_HEADER_FALSE=
+fi
+
 
 
 
@@ -5486,7 +5537,7 @@ fi
 # Extract the first word of "gzip", so it can be a program name with args.
 set dummy gzip; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:5490: checking for $ac_word" >&5
+echo "configure:5541: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_GZIP'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -5521,7 +5572,7 @@ fi
 # Extract the first word of "tar", so it can be a program name with args.
 set dummy tar; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:5525: checking for $ac_word" >&5
+echo "configure:5576: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_TAR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -5622,7 +5673,7 @@ esac
 
 
 echo $ac_n "checking ARM family support""... $ac_c" 1>&6
-echo "configure:5626: checking ARM family support" >&5
+echo "configure:5677: checking ARM family support" >&5
 
 
 
@@ -5636,7 +5687,7 @@ fi
 echo "$ac_t""$sidtarget_arm" 1>&6
 
 echo $ac_n "checking X86 family support""... $ac_c" 1>&6
-echo "configure:5640: checking X86 family support" >&5
+echo "configure:5691: checking X86 family support" >&5
 
 
 
@@ -5650,7 +5701,7 @@ fi
 echo "$ac_t""$sidtarget_x86" 1>&6
 
 echo $ac_n "checking MIPS family support""... $ac_c" 1>&6
-echo "configure:5654: checking MIPS family support" >&5
+echo "configure:5705: checking MIPS family support" >&5
 
 
 
@@ -5664,7 +5715,7 @@ fi
 echo "$ac_t""$sidtarget_mips" 1>&6
 
 echo $ac_n "checking M32R family support""... $ac_c" 1>&6
-echo "configure:5668: checking M32R family support" >&5
+echo "configure:5719: checking M32R family support" >&5
 
 
 
@@ -5678,7 +5729,7 @@ fi
 echo "$ac_t""$sidtarget_m32r" 1>&6
 
 echo $ac_n "checking M68K family support""... $ac_c" 1>&6
-echo "configure:5682: checking M68K family support" >&5
+echo "configure:5733: checking M68K family support" >&5
 
 
 
@@ -5692,7 +5743,7 @@ fi
 echo "$ac_t""$sidtarget_m68k" 1>&6
 
 echo $ac_n "checking PPC family support""... $ac_c" 1>&6
-echo "configure:5696: checking PPC family support" >&5
+echo "configure:5747: checking PPC family support" >&5
 
 
 
@@ -5706,7 +5757,7 @@ fi
 echo "$ac_t""$sidtarget_ppc" 1>&6
 
 echo $ac_n "checking Sanyo Xstormy16 family support""... $ac_c" 1>&6
-echo "configure:5710: checking Sanyo Xstormy16 family support" >&5
+echo "configure:5761: checking Sanyo Xstormy16 family support" >&5
 
 
 
@@ -5822,7 +5873,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile cpu/Makefile memory/Makefile fpu/Makefile config.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile vga/Makefile gui/Makefile cpu/Makefile memory/Makefile fpu/Makefile config.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -5917,6 +5968,8 @@ s%@IODEV_LIB_VAR@%$IODEV_LIB_VAR%g
 s%@NONINLINE_VAR@%$NONINLINE_VAR%g
 s%@INLINE_VAR@%$INLINE_VAR%g
 s%@EXTERNAL_DEPENDENCY@%$EXTERNAL_DEPENDENCY%g
+s%@HAVE_XOS_HEADER_TRUE@%$HAVE_XOS_HEADER_TRUE%g
+s%@HAVE_XOS_HEADER_FALSE@%$HAVE_XOS_HEADER_FALSE%g
 s%@RFB_LIBS@%$RFB_LIBS%g
 s%@GUI_OBJS@%$GUI_OBJS%g
 s%@GUI_LINK_OPTS@%$GUI_LINK_OPTS%g
@@ -5998,7 +6051,7 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile cpu/Makefile memory/Makefile fpu/Makefile"}
+CONFIG_FILES=\${CONFIG_FILES-"Makefile vga/Makefile gui/Makefile cpu/Makefile memory/Makefile fpu/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then

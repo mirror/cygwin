@@ -208,7 +208,7 @@
 #define BX_USE_PIT_SMF  1  // PIT
 #define BX_USE_SER_SMF  1  // Serial
 #define BX_USE_UM_SMF   1  // Unmapped
-#define BX_USE_VGA_SMF  1  // VGA
+#define BX_USE_VGA_SMF  0  // VGA
 #define BX_USE_SB16_SMF 1  // Sound (SB 16)
 #define BX_USE_DEV_SMF  1  // System Devices (port92)
 #define BX_USE_PCI_SMF  1  // PCI
@@ -530,5 +530,7 @@ typedef unsigned int Boolean;
 
 // NE2K network emulation
 #define BX_NE2K_SUPPORT 0
+
+#define HAVE_X11_XOS_H 0
 
 #endif  // _BX_CONFIG_H

@@ -14,6 +14,10 @@
 #include <string>
 
 #include "x86.h"
+#include "sid-vga-wrapper.h"
+#if HAVE_X11_XOS_H
+#include "x-gui.h"
+#endif
 
 using std::vector;
 using std::string;
@@ -36,6 +40,10 @@ compX86ListTypes()
 
 #if SIDTARGET_X86
   types.push_back("hw-cpu-x86");
+  types.push_back("hw-video-vga");
+#if HAVE_X11_XOS_H
+  types.push_back("sid-io-vga-x");
+#endif
 #endif
 
   return types;
@@ -49,10 +57,14 @@ compX86Create(const string& typeName)
 #if SIDTARGET_X86
     try {
         
-        if(typeName == "hw-cpu-x86")
-        {
+        if (typeName == "hw-cpu-x86")
             return new x86_cpu();
-        }
+        else if (typeName == "hw-video-vga")
+            return new vga();
+#if HAVE_X11_XOS_H
+        else if (typeName == "sid-io-vga-x")
+            return new x_gui();
+#endif
     }
     catch (...) { }
 #endif
@@ -65,7 +77,26 @@ void
 compX86Delete(component* c)
 {
 #if SIDTARGET_X86
-    delete dynamic_cast<sidutil::basic_cpu*>(c);
+  x86_cpu *d1 = dynamic_cast<x86_cpu *>(c);
+  if (d1)
+    {
+      delete d1;
+      return;
+    }
+  vga *d2 = dynamic_cast<vga *>(c);
+  if (d2)
+    {
+      delete d2;
+      return;
+    }
+#if HAVE_X11_XOS_H
+  x_gui *d3 = dynamic_cast<x_gui *>(c);
+  if (d3)
+    {
+      delete d3;
+      return;
+    }
+#endif
 #endif
 }
 

@@ -1,3 +1,10 @@
+2001-07-24  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (ALLFAMLIBS*): New macros for family-specific
+	component libraries.
+	* configure.in: Call CY_SIDTARGET_CHECK.
+	* Makefile.in, aclocal.m4, configure: Regenerated.
+
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
         * Makefile.am (ACLOCAL_AMFLAGS): Refer to $srcdir.

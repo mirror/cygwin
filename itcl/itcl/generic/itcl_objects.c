@@ -22,7 +22,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id: itcl_objects.c,v 1.2 1999/01/27 18:56:07 jingham Exp $
+ *     RCS:  $Id: itcl_objects.c,v 1.2.172.1 2001/05/18 02:21:43 mdejong Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -98,9 +98,13 @@ Itcl_CreateObject(interp, name, cdefn, objc, objv, roPtr)
 
     /*
      *  If installing an object access command will clobber another
-     *  command, signal an error.
+     *  command, signal an error.  Be careful to look for the object
+     *  only in the current namespace context.  Otherwise, we might
+     *  find a global command, but that wouldn't be clobbered!
      */
-    cmd = Tcl_FindCommand(interp, name, (Tcl_Namespace*)NULL, /* flags */ 0);
+    cmd = Tcl_FindCommand(interp, name, (Tcl_Namespace*)NULL,
+        TCL_NAMESPACE_ONLY);
+
     if (cmd != NULL && !Itcl_IsStub(cmd)) {
         Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
             "command \"", name, "\" already exists in namespace \"",
@@ -233,10 +237,10 @@ Itcl_CreateObject(interp, name, cdefn, objc, objv, roPtr)
      */
     if (result != TCL_OK) {
         istate = Itcl_SaveInterpState(interp, result);
-	if (newObj->accessCmd != NULL) {
-	    Tcl_DeleteCommandFromToken(interp, newObj->accessCmd);
-	    newObj->accessCmd = NULL;
-	}
+
+        Tcl_DeleteCommandFromToken(interp, newObj->accessCmd);
+        newObj->accessCmd = NULL;
+
         result = Itcl_RestoreInterpState(interp, istate);
     }
 

@@ -1,5 +1,16 @@
 2002-07-31  Keith Seitz  <keiths@redhat.com>
 
+	* win/winMain.c (main): Ifdef out for cygwin.
+
+	* win/tcl.m4 (SC_CONFIG_CFLAGS): Add TK_DLL_BASE variable
+	to define DLL image bases on cygwin.
+	Do not link with "-e _WinMain@16" on cygwin.
+	* win/configure.in (TK_DLL_BASE): Substitute into makefile.
+	* win/configure: Regenerated.
+	* win/Makefile.in: Use TK_DLL_BASE to build DLLs.
+
+2002-07-31  Keith Seitz  <keiths@redhat.com>
+
 	From Mo DeJong  <supermo@bayarea.net>
 	* generic/tkText.c (ExecSyncCmd):
 	Remove -synccommand option from Tk text widget.

@@ -409,6 +409,7 @@ AC_DEFUN(SC_CONFIG_CFLAGS, [
 	    # Add SHLIB_LD_LIBS to the Make rule, not here.
 	    MAKE_DLL="\${SHLIB_LD} \$(LDFLAGS) -o \[$]@ ${extra_ldflags} \
 	        -Wl,--out-implib,\$(patsubst %.dll,lib%.a,\[$]@)"
+	    TK_DLL_BASE="-Wl,--image-base=0x66300000"
 
 	    LIBSUFFIX="\${DBGX}.a"
 	    DLLSUFFIX="\${DBGX}.dll"
@@ -428,15 +429,8 @@ AC_DEFUN(SC_CONFIG_CFLAGS, [
 
 	# Specify linker flags depending on the type of app being 
 	# built -- Console vs. Window.
-	#
-	# We need to pass -e _WinMain@16 so that ld will use
-	# WinMain() instead of main() as the entry point. We can't
-	# use autoconf to check for this case since it would need
-	# to run an executable and that does not work when
-	# cross compiling. Remove this -e workaround once we
-	# require a gcc that does not have this bug.
 	LDFLAGS_CONSOLE="-mconsole ${extra_ldflags}"
-	LDFLAGS_WINDOW="-mwindows -e _WinMain@16 ${extra_ldflags}"
+	LDFLAGS_WINDOW="-mwindows ${extra_ldflags}"
     else
 	# CYGNUS LOCAL
 	VENDORPREFIX="sn"

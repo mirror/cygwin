@@ -529,15 +529,26 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 ; Return C code to perform the semantics of INSN.
 
 (define (gen-semantic-code insn)
-  ; Indicate generating code for INSN.
-  ; Use the compiled form if available.
-  ; The case when they're not available is for virtual insns.
-  (let ((sem (insn-compiled-semantics insn)))
-    (if sem
-	(rtl-c-parsed VOID sem nil
-		      #:rtl-cover-fns? #t #:owner insn)
-	(rtl-c VOID (insn-semantics insn) nil
-	       #:rtl-cover-fns? #t #:owner insn)))
+  (string-append
+   (if (and (insn-real? insn)
+	    (isa-setup-semantics (current-isa)))
+       (string-append
+	"  "
+	(rtl-c VOID (isa-setup-semantics (current-isa)) nil
+	       #:rtl-cover-fns? #t
+	       #:owner insn)
+	"\n")
+       "")
+
+   ; Indicate generating code for INSN.
+   ; Use the compiled form if available.
+   ; The case when they're not available is for virtual insns.
+   (let ((sem (insn-compiled-semantics insn)))
+     (if sem
+	 (rtl-c-parsed VOID sem nil
+		       #:rtl-cover-fns? #t #:owner insn)
+	 (rtl-c VOID (insn-semantics insn) nil
+		#:rtl-cover-fns? #t #:owner insn))))
 )
 
 ; Return definition of C function to perform INSN.

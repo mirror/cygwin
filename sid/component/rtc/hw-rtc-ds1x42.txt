@@ -64,6 +64,7 @@
 	- "epoch-time"		Canonical internal representation of time.
 	- "oscillating"		The oscillator is connected.
 	- "write-mode"		The device is in write mode, for updates.
+    * It supports component GUIs.
 
 * Environment
   - Related components

@@ -1,5 +1,7 @@
 2005-03-10  Jim Blandy  <jimb@redhat.com>
 
+	* Makefile.in, aclocal.m4: Regenerated with automake 1.9.4.
+
 	Make config.in generated automatically again.
 	* configure.in: Provide descriptions for all the preprocessor
 	symbols we define.

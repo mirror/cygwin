@@ -2041,10 +2041,19 @@ Unsigned versions of QI,HI,SI,DI.
 
 These modes do not appear in semantic RTL.  Instead, the RTL function
 specifies the signedness of its operands where necessary.
+To a cpu, a 32 bit register is a 32 bit register.
+Ditto for when the 32 bit quantity lives in memory.
+It's only in how it is subsequently used or interpreted that
+signedness might come into play.
+When signedness comes into play on the chip, it's explicitly
+specified in the operation, _not_ in the data.
+Ergo from this perspective Umodes don't belong in .cpu files.
+This is the perspective to use when writing .cpu files.
 
 ??? I'm not entirely sure these unsigned modes are needed.
 They are useful in removing any ambiguity in how to sign extend constants
 which has been a source of problems in GCC.
+OTOH, maybe adding uconst akin to const is the way to go?
 
 ??? Some existing ports use these modes.
 

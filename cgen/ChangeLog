@@ -1,3 +1,10 @@
+2003-02-11  Dave Brolley  <brolley@redhat.com>
+
+	* desc-cpu.scm (gen-ifld-defns): Add all ifields to the
+	@arch@_cgen-ifld_table.
+	(gen-maybe-multi-ifld): Use the ifield enumerators to index the
+	@arch@_cgen-ifld_table.
+
 2003-02-03  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sid-cpu.scm (-gen-sfrag-engine-fn): Generate more hygienic C++.

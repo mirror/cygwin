@@ -1,0 +1,107 @@
+<?xml version="1.0" ?>
+
+<!-- this is the SID component documentation format.              -->
+<!-- it's indended for translation to docbook, and also           -->
+<!-- for interpretation by SID configuration systems.             -->
+
+
+<!-- basic "human consumption" inline content                     -->
+<!ENTITY % inline "name|title|em|tt|a|complib|component|pin|bus|attribute|accessor">
+
+<!-- convenience hyperlink + formatting tags -->
+<!ELEMENT bus (#PCDATA)>
+<!ELEMENT pin (#PCDATA)>
+<!ELEMENT attribute (#PCDATA)>
+<!ELEMENT accessor (#PCDATA)>
+<!ELEMENT component (#PCDATA)>
+<!ELEMENT complib (#PCDATA)>
+
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT title (%inline;)*>
+<!ELEMENT em (%inline;)*>
+<!ELEMENT tt (%inline;)*>
+<!ELEMENT code (#PCDATA)*>
+
+<!-- hyperlinking is very important for this stuff, so we extend  -->
+<!-- the HTML linking model slightly with typed external links.   -->
+
+<!ELEMENT a (%inline;)*>
+<!ATTLIST a type (url|techdoc) "url">
+<!ATTLIST a href CDATA #REQUIRED>
+
+
+
+<!-- basic "human consumption" structural content                 -->
+<!ENTITY % block "title?,(%inline;|p|ul|ol|table|code)*">
+<!ELEMENT p (%block;)>
+<!ELEMENT ul (title?,li*)>
+<!ELEMENT ol (title?,li*)>
+<!ELEMENT li (%block;)>
+<!ELEMENT table (tr*)>
+<!ELEMENT tr (th|td)*>
+<!ELEMENT th (%inline;)*>
+<!ELEMENT td (%inline;)*>
+
+
+<!-- the main structure of the document is as such                -->
+<!ELEMENT defcomplib (defcomponent,synop,func,env,refs?)>
+<!ATTLIST defcomplib lib CDATA #REQUIRED>
+<!ATTLIST defcomplib dlsym CDATA #REQUIRED>
+
+<!ELEMENT synop (%block;)>
+<!ELEMENT env (%block;)>
+<!ELEMENT refs (%block;)>
+
+<!-- the functionality section includes some machine-indexable    -->
+<!-- material, such as names of behaviors and conventions        -->
+<!-- but there's plenty of room for human annotation              -->
+
+<!ELEMENT func (modelling,behavior*,convention*)>
+<!ELEMENT modelling (%block;)>
+
+<!-- conventions and behaviors must be named for purposes of     -->
+<!-- indexing & xref, but may have comments (a block) inside      -->
+
+<!ELEMENT behavior (%block;)>
+<!ATTLIST behavior name CDATA #REQUIRED>
+
+<!ELEMENT convention (%block;)>
+<!ATTLIST convention name CDATA #REQUIRED>
+<!ATTLIST convention supported (true|false) "true">
+
+
+
+<!-- the parts of the document which may be interesting to a      -->
+<!-- SID configuration processor                                  -->
+
+<!ELEMENT defcomponent ((defpin|defbus|defattribute|defaccessor)*,variants?)>
+<!ATTLIST defcomponent name CDATA #REQUIRED>
+<!ATTLIST defcomponent type (abstract|concrete) "concrete">
+
+<!ELEMENT variants (defcomponent+)>
+
+<!ELEMENT defpin EMPTY>
+<!ATTLIST defpin name CDATA #REQUIRED>
+<!ATTLIST defpin direction (in|out|inout) #REQUIRED>
+<!ATTLIST defpin legalvalues CDATA #IMPLIED>
+<!ATTLIST defpin behaviors CDATA #REQUIRED>
+
+<!ELEMENT defbus EMPTY>
+<!ATTLIST defbus name CDATA #REQUIRED>
+<!ATTLIST defbus addresses CDATA #IMPLIED>
+<!ATTLIST defbus accesses CDATA #IMPLIED>
+<!ATTLIST defbus behaviors CDATA #REQUIRED>
+
+<!ELEMENT defattribute EMPTY>
+<!ATTLIST defattribute name CDATA #REQUIRED>
+<!ATTLIST defattribute category CDATA #IMPLIED>
+<!ATTLIST defattribute legalvalues CDATA #REQUIRED>
+<!ATTLIST defattribute defaultvalue CDATA #IMPLIED>
+<!ATTLIST defattribute behaviors CDATA #REQUIRED>
+
+<!ELEMENT defaccessor EMPTY>
+<!ATTLIST defaccessor name CDATA #REQUIRED>
+<!ATTLIST defaccessor accesses CDATA #IMPLIED>
+<!ATTLIST defaccessor behaviors CDATA #REQUIRED>
+
+

@@ -42,10 +42,10 @@ gdbsid_target_attach_hook (struct gdbserv *gdbserv, void *globalstate)
 }
 
 extern "C" void
-process_get_gen_hook (struct gdbserv *gdbserv)
+process_rcmd_hook (struct gdbserv *gdbserv, const char* cmd, int sizeof_cmd)
 {
   gdb* g = static_cast<gdb*> (gdbserv_target_data (gdbserv));
-  return g->process_get_gen ();
+  g->process_rcmd (cmd, sizeof_cmd);
 }
 
 extern "C" void
@@ -53,6 +53,13 @@ process_set_gen_hook (struct gdbserv *gdbserv)
 {
   gdb* g = static_cast<gdb*> (gdbserv_target_data (gdbserv));
   return g->process_set_gen ();
+}
+
+extern "C" void
+process_get_gen_hook (struct gdbserv *gdbserv)
+{
+  gdb* g = static_cast<gdb*> (gdbserv_target_data (gdbserv));
+  return g->process_get_gen ();
 }
 
 extern "C" void
@@ -217,6 +224,8 @@ process_detach_hook (struct gdbserv *gdbserv)
 }
 
 
+
+
 // ----------------------------------------------------------------------------
 // Implementations for base class.
 
@@ -237,6 +246,7 @@ gdb::gdbsid_target_attach (struct gdbserv *gdbserv)
       assert (gdbtarget != 0);
       memset (gdbtarget, 0, sizeof (*gdbtarget)); // XXX: needed?
 
+      gdbtarget->process_rcmd = process_rcmd_hook;
       gdbtarget->process_get_gen = process_get_gen_hook;
       gdbtarget->process_set_gen = process_set_gen_hook;
       gdbtarget->process_set_args = process_set_args_hook;
@@ -283,6 +293,33 @@ gdb::gdbsid_target_attach (struct gdbserv *gdbserv)
       cerr << "Error: Cannot attach again to gdb." << endl;
       return 0;
     }
+}
+
+
+void
+gdb::process_rcmd (const char *cmd, int sizeof_cmd)
+{
+  string command = string (cmd, sizeof_cmd);
+  vector<string> tokens = sidutil::tokenize (command, " ");
+
+  if (trace_gdbsid)
+    cerr << "process_rcmd " << command << endl;
+
+  if (tokens.size() >= 1 &&
+      tokens[0] == "set" &&
+      this->cfgroot != 0)
+    {
+      // pass command string straight through to cfgroot
+      component::status s = this->cfgroot->set_attribute_value ("config-line!", command);
+      if (s != component::ok)
+	gdbserv_output_string (gdbserv, "E02");
+      else
+	gdbserv_output_string (gdbserv, "OK");
+
+      return;
+    }
+
+  gdbserv_output_string (gdbserv, "E01");
 }
 
 
@@ -1179,6 +1216,8 @@ gdb::gdb ():
 
   cpu = 0;
   gloss = 0;
+  cfgroot = 0;
+  add_uni_relation ("cfgroot", & cfgroot);
   add_uni_relation ("cpu", & cpu);
   add_uni_relation ("gloss", & gloss);
   add_multi_relation ("target-schedulers", & target_schedulers);

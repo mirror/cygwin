@@ -96,6 +96,7 @@ private:
   output_pin remote_tx_pin;
 
   // cpu/gloss<->gdb connections
+  component* cfgroot;
   component* cpu;
   component* gloss;
   input_pin cpu_trap_code_pin;
@@ -155,6 +156,7 @@ public:
   void gdbsid_client_write (const unsigned char* ch, unsigned len);
   // gdbserv<->gdb callback hooks
   struct gdbserv_target* gdbsid_target_attach (struct gdbserv *gdbserv);
+  void process_rcmd (const char *cmd, int sizeof_cmd);
   void process_get_gen ();
   void process_set_gen ();
   void process_set_args ();

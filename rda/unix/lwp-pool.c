@@ -949,10 +949,14 @@ check_stop_pending (struct lwp *l)
       return 0;
 
     case lwp_state_stopped_stop_pending_interesting:
-    case lwp_state_stopped_interesting:
     case lwp_state_dead_interesting:
       return 1;
 
+    case lwp_state_stopped_interesting:
+      /* This state shouldn't happen: since there was a pending stop,
+         a single waitpid on that LWP should have either gotten the
+         SIGSTOP, yielding 'lwp_state_stopped', or something interesting,
+         yielding 'lwp_state_stopped_stop_pending_interesting'.  */
     default:
       fprintf (stderr,
 	       "ERROR: checking lwp %d for pending stop yielded "

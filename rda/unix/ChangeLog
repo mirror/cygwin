@@ -1,5 +1,8 @@
 2004-12-02  Jim Blandy  <jimb@redhat.com>
 
+	* lwp-pool.c (check_stop_pending): lwp_state_stopped_interesting
+	is not a legitimate state for the LWP to be in.
+
 	Introduce a new STOPPED, STOP PENDING state to the LWP pool model.
 	* lwp-pool.c: Many doc fixes.
 	(enum lwp_state): Add new value, lwp_state_stopped_stop_pending.

@@ -1,6 +1,6 @@
 2005-02-16  Dave Brolley  <brolley@redhat.com>
 
-	* cgen-ops.h (RUNCBIBI): New macro.
+	* cgen-ops.h (TRUNCBIBI): New macro.
 	(ADDOFQI): New function.
 	(SUBOFQI): New function.
 

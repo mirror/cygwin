@@ -16,6 +16,7 @@
     <!-- accessors -->
     <defaccessor name="data-memory" accesses="any" behaviors="execution" />
     <defaccessor name="insn-memory" accesses="typically 4-byte accesses" behaviors="execution" />
+    <defaccessor name="disassembler-memory" accesses="any" behaviors="execution" />
 
 
     <!-- buses -->

@@ -32,9 +32,12 @@
       <p>Each instruction is first fetched from memory via the
       <accessor>insn-memory</accessor> accessor, and its decoding
       traced if the <attribute>trace-extract?</attribute> attribute is
-      set to a true value.  The decoded form may be cached
-      indefinitely afterwards, although this cache is flushed when the
-      <pin>flush-icache</pin> pin is driven.</p>
+      set to a true value.  To prevent unwanted cache side effects,
+      the <accessor>disassembler-memory</accessor> accessor can be
+      used and connected directly to main memory, bypassing any memory
+      caches.  The decoded form may be cached indefinitely afterwards,
+      although this cache is flushed when the <pin>flush-icache</pin>
+      pin is driven.</p>
 
       <p>The <attribute>engine-type</attribute> attribute specifies
       whether the "scache" ("semantic cache") or "pbb" ("pseudo basic

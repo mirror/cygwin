@@ -178,10 +178,6 @@ cgen_bi_endian_cpu::cgen_read_memory(bfd_vma memaddr, bfd_byte *myaddr,
 {
   cgen_bi_endian_cpu *thisp = static_cast<cgen_bi_endian_cpu *>(info->application_data);
 
-  // We don't want to penalize the disassembler with memory latency counts, so we
-  // store it away here ...
-  host_int_8 prev_latency = thisp->total_latency;
-
   switch (length) {
 #if 0 // XXX not sure if this has byte order dependancies or not
   case 1:
@@ -198,13 +194,19 @@ cgen_bi_endian_cpu::cgen_read_memory(bfd_vma memaddr, bfd_byte *myaddr,
     break;
 #endif
   default:
-    for (int i = 0; i < length; i++)
-      *(myaddr + i) = thisp->read_insn_memory_1(0, memaddr + i);
+    {
+      big_int_1 value;
+      for (int i = 0; i < length; i++)
+	{
+	  sid::bus* bus;
+	  bus = (thisp->disassembler_bus) ? thisp->disassembler_bus : thisp->insn_bus;
+	  if (UNLIKELY (bus->read (memaddr + i, value) != sid::bus::ok))
+	    return 1;
+	  else
+	    *(myaddr + i) = value;
+	}
+    }
   }
-
-  // ... and restore it here.
-  thisp->total_latency = prev_latency;
-
   return 0;
 }
 

@@ -92,7 +92,7 @@ would appreciate credit if this program or parts of it are used.
 # endif
 #endif
 
-#include "tclRegexp.h"
+#include "tcl_regexp.h"
 
 /* clean up the mess */
 #ifdef EXP_AVOID_INCLUDING_TCL_H

@@ -333,8 +333,12 @@ int devtty;		/* if true, redirect to /dev/tty */
 	/* case, I only only want to see if Tcl resets it to non-NONE, */
 	/* and I don't know any other way of doing it */
 	Tcl_SetVar(interp,"errorCode","NONE",0);
-	rc = Tcl_ExecCmd((ClientData)0,interp,argc+1+devtty,new_argv);
 
+#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 3)
+	rc = Tcl_ExecCmd((ClientData)0,interp,argc+1+devtty,new_argv);
+#else
+	rc = Tcl_ExecObjCmd((ClientData)0,interp,argc+1+devtty,Tcl_NewStringObj(new_argv,-1));
+#endif
 	ckfree((char *)new_argv);
 
 	/* if stty-reads-stdout, stty will fail since Exec */

@@ -1,3 +1,22 @@
+2001-07-09  Ian Roxborough  <irox@redhat.com>
+
+	* tclParse-compat.c: New file.
+	* tcl_regexp.c:
+	* tcl_regexp.h: New file.  Contains Tcl8.0's regexp.
+	* Makefile.in: Added new files to be compiled and linked.
+	* exp_clib.c (exp_expectl, exp_fexpectl):
+	* exp_inter.c (in_keymap, Exp_InteractCmd ):
+	* exp_regexp.c (regtry, regdump, regprop):
+	* expect.c (parse_expect_args, eval_case_string,
+	  exp_background_filehandler, Exp_ExpectCmd):
+	* expect.h:
+	* expect_comm.h:
+	* Dbg.c (breakpoint_test, cmdBreak): Use newly built in
+	  regexp, not external Tcl regexp.
+	* exp_tty.c (exec_stty):
+	* exp_command.c (Exp_CloseCmd, Tcl_CloseCmd): Handle Tcl API
+	  changes in Tcl8.3.
+
 2001-05-11  Andrew Cagney  <ac131313@redhat.com>
 
 	From 2001-04-24 Rodney Brown <RDBrown@mira.net>:

@@ -45,11 +45,11 @@ would appreciate credit if this program or parts of it are used.
 #include "exp_log.h"
 #include "exp_tstamp.h"	/* remove when timestamp stuff is gone */
 
-#include "tclRegexp.h"
+#include "tcl_regexp.h"
 #include "exp_regexp.h"
 
 extern char *TclGetRegError();
-extern void TclRegError();
+extern void Expect_TclRegError();
 
 #define INTER_OUT "interact_out"
 
@@ -86,7 +86,7 @@ struct action {
 
 struct keymap {
 	char *keys;	/* original pattern provided by user */
-	regexp *re;
+	Expect_regexp *re;
 	int null;	/* true if looking to match 0 byte */
 	int case_sensitive;
 	int echo;	/* if keystrokes should be echoed */
@@ -229,7 +229,7 @@ int rm_nulls;			/* skip nulls if true */
 	    } else {
 		/* regexp */
 		int r;	/* regtry status */
-		regexp *prog = km->re;
+		Expect_regexp *prog = km->re;
 
 		/* if anchored, but we're not at beginning, skip pattern */
 		if (prog->reganch) {
@@ -907,8 +907,8 @@ char **argv;
 		km->null = FALSE;
 		km->re = 0;
 		if (next_re) {
-			TclRegError((char *)0);
-			if (0 == (km->re = TclRegComp(*argv))) {
+			Expect_TclRegError((char *)0);
+			if (0 == (km->re = Expect_TclRegComp(*argv))) {
 				exp_error(interp,"bad regular expression: %s",
 								TclGetRegError());
 				return(TCL_ERROR);
@@ -1243,7 +1243,7 @@ char **argv;
 		    Tcl_SetVar2(interp,INTER_OUT,var,val,0);
 
 			char name[20], value[20];
-			regexp *re = km->re;
+			Expect_regexp *re = km->re;
 			char match_char;/* place to hold char temporarily */
 					/* uprooted by a NULL */
 

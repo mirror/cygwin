@@ -22,3 +22,6 @@ pkgdata_DATA = hw-visual-lcd.tk hw-visual-lcd.txt hw-lcd-t6963c.txt hw-lcd-hd447
 DEJAGNUTESTS=lcdbase.exp lcdmonkey.exp lcd1val.exp lcd1inv.exp
 check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs

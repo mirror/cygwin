@@ -1,0 +1,930 @@
+2002-08-23  Kevin Buettner  <kevinb@redhat.com>
+
+	* linux-target.c (linux_get_reg, linux_set_reg): Print an
+	error message for out of bound registers.
+
+2002-08-23  Kevin Buettner  <kevinb@redhat.com>
+
+	* linux-target.c (NUM_REGS) [X86_LINUX_TARGET]: Bump to 42.
+	(getregs_setregs_reginfo) [X86_LINUX_TARGET]: Add entry for
+	register ``orig_eax''.
+	(linux_get_reg, linux_set_reg): Make sure ``regno'' value is valid.
+	(linux_detach, linux_attach, decr_pc_after_break): Call fprintf()
+	instead of printf().
+	(linux_detach, linux_attach): Don't always print informational
+	messages.
+	* ptrace-target.c (handle_waitstatus, ptrace_detach, ptrace_attach):
+	Don't always print informational messages.  Use fprintf() instead
+	of printf().
+	(noop_get_trap_number, noop_compute_signal, noop_exit_program)
+	(noop_signlestep_program, noop_break_program): Delete.
+	(ptrace_flush_i_cache): Renamed from noop_flush_i_cache.  Update
+	reference in ptrace_attach().
+	(continue_lwp, singlestep_lwp, attach_lwp, stop_lwp, ps_pstop)
+	(ps_continue, ps_lstop): Use fprintf() instead of printf().
+	* server.c (errno.h): Include.
+	(usage): New function.
+	(main): Add option processing code.
+	* server.h (struct child_process): Add new field,
+	``debug_informational''.
+	* thread-db.c (ps_plog, select_pending_event, send_pending_signals)
+	(wait_all_threads, thread_db_check_child_state): Use fprintf()
+	instead of printf().
+	(thread_db_detach): Conditionally print informational messages.
+	Use fprintf() instead of printf().
+
+2002-08-21  Kevin Buettner  <kevinb@redhat.com>
+
+	* Makefile.am, configure.in, dummy-target.c, linux-target.c,
+	ptrace-target.c, ptrace-target.h, server.h, solaris-target.c,
+	thread-db.c: Change ``libremote'' references into ``RDA''
+	references.
+	* Makefile.in, configure: Regenerate.
+
+2002-08-15  Kevin Buettner  <kevinb@redhat.com>
+
+	* dummy-target.c, gdb_proc_service.h, gdbserv-thread-db.h,
+	linux-target.c, no-threads.c, ptrace-target.c,
+	ptrace-target.h, server.c, server.h, solaris-target.c,
+	thread-db.c: Update copyright notices.
+
+2002-05-16  Kevin Buettner  <kevinb@redhat.com>
+
+	* config.in (GREGSET_T): Renamed from GDB_GREGSET_T.
+	(FPREGSET_T): Renamed from GDB_FPREGSET_T.
+	* configure.in: Likewise.
+	* gdbserv-thread-db.h: Likewise.
+	* linux-target.c: Likewise.
+	* thread-db.c: Likewise.
+	* gdb_proc_service.h: Remove everything that's not absolutely
+	needed.
+
+2002-02-01  Kevin Buettner  <kevinb@redhat.com>
+
+	* configure.in (arm32): Change to ``yes''.
+	* configure: Regenerate.
+
+2002-01-30  Kevin Buettner  <kevinb@redhat.com>
+
+	* linux-target.c (linux_get_reg) [GETREGS_SETREGS_REGINFO]: Add
+	NOREGS support.
+	(linux_set_reg) [GETREGS_SETREGS_REGINFO]: Likewise.
+
+2002-01-28  Kevin Buettner  <kevinb@redhat.com>
+
+	* linux-target.c (write_reg_bytes): Print return status in
+	ptrace failure message.
+	* ptrace-target.c (ptrace_write_user): Enable existing 
+	Linux/MIPS related kernel bug workaround when MIPS_LINUX_TARGET
+	is defined (which is in addition to _MIPSEL).
+
+2002-01-28  Kevin Buettner  <kevinb@redhat.com>
+
+	* thread-db.c (struct regset_cache): New struct declaration.
+	(thread_db_map_id2thr_cache_valid, fpregset_cache, gregset_cache):
+	New static globals.
+	(thread_db_map_id2thr, thread_db_invalidate_map_id2thr_cache)
+	(initialize_regset_cache, initialize_regset_caches)
+	(thread_db_flush_regset_cache, thread_db_flush_regset_caches)
+	(thread_db_get_regset, thread_db_set_regset)
+	(thread_db_invalidate_regset_cache, thread_db_invalidate_regset_caches)
+	(thread_db_invalidate_caches, thread_db_getfpregs)
+	(thread_db_set_fpregs, thread_db_getgregs, thread_db_setgregs)
+	(td_thr_getfpregs_wrapper, td_thr_getgregs_wrapper)
+	(td_thr_setfpregs_wrapper, td_thr_setgregs_wrapper):
+	New functions.
+	(update_thread_list, thread_db_get_thread_reg)
+	(thread_db_set_thread_reg): Call thread_db_map_id2thr() instead of
+	td_ta_map_id2thr_p().
+	(thread_db_get_thread_reg): Call thread_db_getfpregs() instead
+	of td_thr_getfpregs_p().  Call thread_db_getgregs() instead of
+	td_thr_getgregs_p().
+	(thread_db_set_thread_reg): Likewise.  Also, call
+	thread_db_setfpregs() instead of td_thr_setfpregs_p() and
+	call thread_db_setgregs() instead of td_thr_setgregs_p().
+	(continue_thread, thread_db_continue_program)
+	(thread_db_singlestep_program, thread_db_continue_thread)
+	(singlestep_thread): Call thread_db_flush_regset_caches() at
+	beginning of function and thread_db_invalidate_caches() at
+	end of function.
+	(thread_db_attach): Initialize regset caches.
+
+2002-01-15  Kevin Buettner  <kevinb@redhat.com>
+
+	* config.in (Generated automatically comment): Revise to note
+	that this file was generated automatically at one time, but is
+	no longer.
+	(LINUX_TARGET, SOLARIS_TARGET): Fix comments.
+	(MIPS_LINUX_TARGET): Add.
+	* configure.in (i?86*linux*, powerpc*linux*, arm*linux*, mips*linux*):
+	Eliminate unnecessary duplication.
+	(mips*linux*): Target is MIPS_LINUX_TARGET, not SH_LINUX_TARGET.
+	* gdbserv-thread-db.h (is_gp_reg): New function.
+	(is_fp_reg, is_extended_reg): Revise comments.
+	* linux-target.c (enum regset): Add new constant NOREGS.
+	(is_gp_reg): New function.
+	(PEEKUSER_POKEUSER_REGINFO) [MIPS_LINUX_TARGET]: Define.
+	(SIZEOF_REGMAP, SIZEOF_MAPPEDREG) [MIPS_LINUX_TARGET]: Delete.
+	(NUM_REGS) [MIPS_LINUX_TARGET]: Change from 38 to 70 to account
+	for addition of floating point support.
+	(regmap) [MIPS_LINUX_TARGET]: Delete this array.
+	(is_fp_reg, is_extended_reg) [MIPS_LINUX_TARGET]: Delete.
+	(reginfo) [MIPS_LINUX_TARGET]: Define.
+	(DEBUG): Delete this macro definition.
+	(disp_gdb_mesg, ptrace_get_mem, ptrace_set_mem): Delete function
+	declarations.
+	(linux_get_reg, linux_set_reg) [PEEKUSER_POKEUSER_REGINFO]: Add
+	NOREGS support.
+	(put_regset) [PEEKUSER_POKEUSER_REGINFO]: Add missing return
+	statement.
+	(mips_get_reg): Use read_reg_bytes() to fetch the register.
+	(mips_singlestep_program): Eliminate unused variables ``u_regs_base'',
+	``temp_reg''.  Fix fprintf related format warning.
+	* ptrace-target.h (ptrace_check_child_state): Declare.
+	* thread-db.c (thread_db_get_thread_reg, thread_db_set_thread_reg):
+	Handle case of target not supporting one or more registers.
+
+2001-10-15  Kevin Buettner  <kevinb@redhat.com>
+
+	* gdbserv-thread-db.h (is_extended_reg, reg_to_xregset)
+	(reg_from_xregset): New functions.
+	(debug_get_pc, decr_pc_after_break): Add declaration.
+	* linux-target.c (sys/procfs.h): Include.
+	(MAX_REG_SIZE): New anonymous enum constant.
+	(enum regset): New enum.
+	(getregs_setregs_reginfo, peekuser_pokeuser_reginfo): New structs.
+	(offsetof, fieldsize): New macros.
+	(ARM_LINUX_TARGET, X86_LINUX_TARGET, PPC_LINUX_TARGET): Deleted
+	old data structures defining register maps for these registers.
+	Replaced with new tables using either getregs_setregs_reginfo
+	or peekuser_pokeuser_reginfo structs.  Other architectures
+	remain the same, though reoranized somewhat.
+	(linux_next_gg_reg, linux_gg_reg_nr): Revise comments.  Use
+	NUM_REGS instead of NUM_G_PACKET_REGS.
+	(get_xregsetsize): New function.
+	(linux_reg_format, linux_sizeof_reg, is_fp_reg, is_extended_reg)
+	[PEEKUSER_POKEUSER_REGINFO, GETREGS_SETREGS_REGINFO]: New functions.
+	(read_reg_bytes, write_reg_bytes, debug_get_reg, debug_get_pc)
+	(linux_get_reg, linux_set_reg, reg_from_regset, reg_to_regset)
+	(reg_from_gregset, reg_to_gregset, reg_from_fpregset, reg_to_fpregset)
+	(reg_from_xregset, reg_to_xregset, get_regset, put_regset, get_gregset)
+	(put_gregset, get_fpregset, put_fpregset, get_xregset, put_xregset)
+	[PEEKUSER_POKEUSER_REGINFO]: New functions.
+	(read_reg_as_ulong, write_reg_as_ulong, debug_get_reg, debug_get_pc)
+	(linux_get_reg, linux_set_reg, regs_from_gregset, regs_to_gregset)
+	(reg_from_fpregset, reg_to_fpregset, reg_from_xregset, reg_to_xregset)
+	(get_gregset, put_gregset, get_fpregset, put_fpregset, get_xregset)
+	(put_xregset) [GETREGS_SETREGS_REGINFO]: New functions.
+	(linux_process_get_regs, linux_process_get_reg, linux_process_set_reg)
+	(linux_process_set_regs, ppc_linux_process_set_reg)
+	(ppc_linux_process_get_reg, ppc_linux_process_set_regs)
+	(ppc_linux_process_get_regs): Deleted.
+	(linux_attach): Reorganize initializations.
+	(generic_linux_set_reg): Renamed to linux_set_reg.
+	(generic_linux_get_reg): Renamed to linux_get_reg.
+	(generic_linux_sizeof_reg): Renamed to linux_sizeof_reg.
+	(generic_linux_gg_reg_nr): Renamed to linux_gg_reg_nr.
+	(generic_linux_next_gg_reg): Renamed to linux_next_gg_reg.
+	(generic_linux_reg_format): Renamed to linux_reg_format.
+	(decr_pc_after_break): Consolidated versions of this function
+	down to two; one for x86 and one for everything else.  Also,
+	add ``serv'' parameter and fix all callers.
+	(debug_get_pc, debug_get_reg): Now only three versions of
+	this function, one for PEEKUSER_POKEUSER_REGINFO code,
+	one for GETREGS_SETREGS_REGINFO code, and one for legacy
+	code.  Also, debug_get_pc() now takes a ``serv'' parameter.
+	Fixed all callers.
+	(ps_lgetregs): Use new get_gregset() interface.
+	(ps_lsetregs): Use new put_gregset() interface.
+	(ps_lgetfpregs, ps_lsetfpregs, ps_lgetxregsize, ps_lgetxregs)
+	(ps_lsetxregs): Implement.
+	* ptrace-target.c (ptrace_read_user, ptrace_write_user): Make
+	``buff'' argument of type ``void *'' instead of ``char *''.
+	(ptrace_get_gregs): Add new parameter ``alt_pid''.
+	(ptrace_set_gregs): Likewise.
+	(ptrace_get_fpregs): Add new parameter alt_pid.  Also fix call
+	to ptrace() so parameters are in correct order.
+	(ptrace_set_fpregs): Likewise.
+	(ptrace_get_fpxregs, ptrace_set_fpxregs): New functions.
+	* ptrace-target.h (ptrace_write_user, ptrace_read_user)
+	(ptrace_get_gregs, ptrace_set_gregs, ptrace_get_fpregs)
+	(ptrace_set_fpregs, ptrace_get_fpxregs, ptrace_set_fpxregs):
+	Declare.
+	* thread-db.c (td_thr_getxregsize_p, td_thr_getxregs_p)
+	(td_thr_setxregs_p): New function pointers.
+	(thread_db_dlopen): Initialize new function pointers.
+	(send_pending_signals): Add ``process'' parameter so that
+	decr_pc_after_break() can get the ``serv'' argument.  Fix all
+	callers.
+	(thread_db_get_thread_reg, thread_db_set_thread_reg): Add xregset
+	support.
+
+2001-10-14  Kevin Buettner  <kevinb@redhat.com>
+
+	* ptrace-target.c (unistd.h): Include.
+	(close_open_files): New function.
+	(ptrace_create_child):  In newly forked child process, call
+	close_open_files() before invoking execv().
+
+2001-10-13  Kevin Buettner  <kevinb@redhat.com>
+
+	* server.c (signal.h): Include.
+	(chld_handler): New function.
+	(main): Establish chld_handler as the SIGCHLD signal handler.
+	Also, wait 1 second instead of 0 seconds to avoid busy waiting.
+
+2001-09-26  Louis Hamilton  <hamilton@redhat.com>
+
+	* configure.in: Use thread-db.c for ARM.
+	* configure: Regenerated.
+	* linux-target.c (ARM_R11, ARM_R12): Added to regmap[].
+	(ARM_FP, ARM_CPSR): Revised mappings of these ARM registers.
+	(debug_get_reg, debug_get_pc, decr_pc_after_break) [ARM_LINUX_TARGET]:
+	New functions.
+	
+2001-09-20  Kevin Buettner  <kevinb@redhat.com>
+
+	* configure.in: Use thread-db.c for Linux/PPC too.
+	* configure: Regenerated.
+	* linux-target.c (linux_read_reg): Add forward declaration.
+	(debug_get_reg, debug_get_pc, decr_pc_after_break) [PPC_LINUX_TARGET]:
+	New functions.
+
+2001-09-20  Kevin Buettner  <kevinb@redhat.com>
+
+	* linux-target.c (SIZEOF_MAPPEDREG) [PPC_LINUX_TARGET]: Add comment.
+	(PC_REGNUM) [PPC_LINUX_TARGET]: Remove FIXME comment.
+	(is_fp_reg) [PPC_LINUX_TARGET]: Revise upper bound on floating
+	point register numbers.
+	(ppc_linux_getset_reg): Rewritten to use regmap[] to fetch
+	ptrace() offsets.  This'll handle the (previously unsupported)
+	floating point registers, cr, lr, ctr, and xer.
+	(ppc_linux_process_set_regs, ppc_linux_process_get_regs): Don't
+	hardcode loop upper bound.
+	(ppc_linux_process_get_regs): Revise declarator to match
+	process_get_regs member in struct gdbserv_target.
+
+2001-09-18  Andrew Haley  <aph@cambridge.redhat.com>
+
+        * server.c (main): Work around SIGCHLD problem.
+
+2001-08-05  Michael Chastain  <chastain@redhat.com>
+
+	* ptrace-target.c (ptrace_write_user): Ignore ESRCH on MIPS,
+	because mips linux kernel 2.4 has a bug where PTRACE_POKEUSER
+	returns -ESRCH even when it succeeds.
+
+2001-08-03  Michael Keezer  <mkeezer@redhat.com>
+
+        * configure.in: Add am33_2.0 & mn10300.
+        * config.in: Add AM33_LINUX_TARGET & AM33_2_0_LINUX_TARGET.
+        * linux-target.c: am33_2.0 & mn10300 support.
+
+2001-07-23  David Howells  <dhowells@redhat.com>
+
+	* ptrace-target.c: Added big-endian MIPS support.
+	* linux-target.c: ditto.
+	* server.h: ditto.
+
+2001-06-25  Michael Snyder  <msnyder@redhat.com>
+
+	* ptrace-target.c (ptrace_compute_signal): Implement conversion 
+	from native signals to GDB's signal numbering.
+	(ptrace_process_signal): Implement conversion from GDB's signal
+	numbering to native signals.
+	(stop_lwp): Comment out debugging output of SIGSTOP signals.
+	* linix-target.c (linux_fromtarget_break): Call compute_signal.
+	(linux_fromtarget_terminate): Ditto.
+	* thread-db.c (thread_db_check_child_state): Don't do any conversion
+	when passing a signal directly back to the inferior; just copy from
+	stop_signal to signal_to_send.
+	(thread_db_fromtarget_thread_break): Convert signal from native
+	numbering to GDB's numbering.
+
+2001-06-18  Michael Snyder  <msnyder@redhat.com>
+
+	* linux-target.c (generic_linux_set_reg): Fix typo.
+	(decr_pc_after_break): Mute the debugging output.
+
+2001-06-15  Michael Snyder  <msnyder@redhat.com>
+
+	* thread_db.c: Disable noisy debugging output.
+	(select_pending_event): Add new selection criterion, giving
+	preference to a thread that is being single-stepped.  This 
+	avoids the problem of deciding whether to decrement the pc if
+	we don't know whether a SIGTRAP was caused by stepping or by
+	hitting a breakpoint.
+
+2001-06-14  Michael Snyder  <msnyder@redhat.com>
+
+	* thread-db.c (thread_db_set_gen, thread_db_get_gen): Rewrite
+	syntax for qSymbol messages.
+	* gdb_proc_service.h: New file.
+	* Makefile.am (INCLUDES): Remove $(srcdir)/../../include.
+	* Makefile.in: Regenerate.
+
+2001-05-31  Michael Snyder  <msnyder@redhat.com>
+
+	* thread-db.c (add_thread_to_list): Return explicit value!
+
+2001-05-23  Jackie Smith Cashion <jsmith@redhat.com>
+
+	* linux-target.c: Change MIPS SIZEOF_MAPPEDREG from 1 to 4.
+	(linux_register_offset): For MIPS return regmap[regnum] instead of
+	SIZEOF_MAPPEDREG * regmap[regnum].
+	(mips_get_reg): Pass pid as argument to ptrace_read_user instead of
+	gdbserv pointer.
+	
+2001-05-22  Michael Snyder  <msnyder@redhat.com>
+
+	* no-threads.c: New file.
+	* configure.in: Use thread-db.c only for specified architectures, 
+	(including x86); otherwise default to using no-threads.c.
+	* configure: Regenerate.
+	
+2001-05-10  Martin M. Hunt  <hunt@redhat.com>	
+
+	* linux-target.c (is_fp_reg): New function for mips. 
+	FP not implemented.
+	
+	Merged changes from symbol branch with appropriate modifications.
+
+Mon Mar 26 08:54:41 PST 2001  Brendan Conoboy <blc@redhat.com>
+ 
+	* configure.in: Added mipsvr4181el* target
+	* configure: regenerate
+ 
+2001-01-26  Rudy Folden <rfolden@redhat.com>
+ 	
+	* server.c: Changed name from gdbgeneral_xxx to gdbconnect_xx.
+ 
+2001-01-24  Rudy Folden <rfolden@redhat.com>
+ 
+	* configure: Added mipsel* target.
+	* linux-target.c: Add support for MIPS processor, including single-
+	stepping which doesn't exist in mips ptrace.
+	* ptrace-target.c (ptrace_handle_waitstatus): Added single-stepping
+	instruction restore for mips.
+	(ptrace_attach): Added single stepping initialization code.
+	* server (main): Added generic interfaces, gdbgeneral_startup/shutdown
+	for serial or tcp/ip selection. Also added server_quit_p to X and W 
+	for serial support (no socket shutdown).
+	* server.h (child_process): Added mips instruction save area for
+	single-step support.
+
+	2001-01-10  Rudy Folden <rfolden@redhat.com>
+	* ptrace-target.c (enum): Added U_REGS_OFFSET to processor
+	dependent enums.
+
+2001-04-26  Michael Snyder  <msnyder@redhat.com>
+
+	* linux-target.c (is_fp_reg): New function.
+	(reg_from_fpregset, reg_to_fpregset): New functions.
+	Support for thread_db_get_thread_reg floating point regs.
+	* thread-db.c (thread_db_get_thread_reg, thread_db_set_thread_reg):
+	Infrastructure for support of floating point regs.
+	(Attach_thread): New function, abstracted from below.
+	(find_new_threads_callback): Call attach_thread.
+	(stop_thread): New function, abstracted from stop_all_threads.
+	(stop_all_threads): Call stop_thread.
+	(continue_thread): Test for lwp == 0 before calling continue_lwp.
+	* ptrace-target.c (stop_lwp): New function.
+	* gdbserv-thread-db.h (reg_to_regnum, reg_from_regnu): Declare.
+
+2001-04-25  Michael Snyder  <msnyder@redhat.com>
+
+	Move all ptrace references out of thread-db.c.
+	* gdbserv-thread-db.h: New file.
+	* thread-db.c (struct ps_prochandle): Move to gdbserv-thread-db.h.
+	(gdb_ps_prochandle_t): Ditto.
+	(gdb_ps_read_buf_t, gdb_ps_write_buf_t, gdb_ps_size_t): Ditto.
+	(ps_pstop, ps_pcontinue): Move to ptrace-target.c.
+	(ps_lstop, ps_lcontinue): Ditto.
+	(ps_pdread, ps_pdwrite, ps_ptread, ps_ptwrite): Ditto.
+	(ps_lgetxregsize): Move to linux-target.c.
+	(ps_lgetxregs, ps_lsetxregs, ps_getpid): Ditto.
+	(ps_lgetregs, ps_lsetregs, ps_lgetfpregs, ps_lsetfpregs): Ditto.
+	(find_new_threads_callback): Abstract attach bits into new function
+	attach_lwp, and move that to ptrace-target.c.
+	(wait_all_threads): Call continue_lwp instead of ptrace.
+	(continue_pid): Rename as continue_lwp, move into ptrace-target.c.
+	(singlestep_pid): Rename as continue_lwp, move into ptrace-target.c.
+	(struct symbol_cache): Change value to a paddr_t.
+	(add_symbol_to_list, lookup_cached_symbol): Ditto.
+	* linux-target.c (ps_lgetregs, ps_lsetregs, ps_lgetfpregs, 
+	ps_lsetfpregs, ps_lgetxregsize, ps_lgetxregs, ps_lsetxregs,
+	ps_getpid): Moved to here from thread-db.c.
+	* ptrace-target.c (continue_lwp, singlestep_lwp, attach_lwp,
+	(ps_pstop, ps_pcontinue, ps_lstop, ps_lcontinue, ps_pdread,
+	ps_pdwrite, ps_ptread, ps_ptwrite): Moved here from thread-db.c.
+	(ptrace_handle_waitstatus): Renamed as handle_waitstatus.
+	(ps_lcontinue): Implement (untested).
+	* server.c (main): Check server_quit_p after calling gdbloop_poll.
+
+
+2001-04-24  Michael Snyder  <msnyder@redhat.com>
+
+	* thread-db.c (continue_pid, continue_thread): New functions.
+	(singlestep_pid, singlestep_thread): New functions.
+	(continue_all_threads): Use new function continue_thread.
+	(thread_db_continue_program): Ditto.
+	(thread_db_singlestep_program): Ditto.
+	(thread_db_continue_thread): Ditto.
+	(thread_db_singlestep_thread): Ditto.
+	
+	* thread-db.c: Remove some debugging printfs.
+	Add activation and handling of the thread debug signal.
+	(get_thread_signals): Get the debug signal as well as the others.
+	Set target flag to activate the debug signal.
+	(set_target_int_by_name): New function.
+	(struct gdbserv_thread): Rename "sigstopped" flag to just "stopped".
+	(stop_all_threads): Mark the event thread "stopped".
+	(wait_all_threads): Mark the event thread "waited".
+	Don't stash the debug signal (throw it away).
+	(continue_all_threads): Always send the restart signal to any
+	thread that has just been attached.
+	(thread_db_check_child_state): Make two calls to waitpid (one with
+	WCLONE, one without) instead of alternating every other time.
+	Add debug_signal to the list of events to ignore.
+	(thread_db_attach): Add "__pthread_threads_debug" to list of symbols.
+
+2001-04-20  Michael Snyder  <msnyder@redhat.com>
+
+	* thread-db.c (thread_db_check_child_state): Add SIGCHLD to the
+	list of signals to ignore.  When a thread exits, make sure that
+	the other threads get restarted.
+
+2001-04-19  Michael Snyder  <msnyder@redhat.com>
+
+	* thread-db.c (wait_all_threads): Save exit and term events.
+	Save SIGINT like any other signal event.  
+	(send_pending_signals): Don't send SIGINT.
+	(select_pending_event): Give preference to SIGINT.
+	(thread_db_check_child_state): Move special handling of 
+	cancel and restart signals to after the stop_all_threads
+	and wait_all_threads calls, so we can catch these signals
+	even if they aren't the first signal we get notification of.
+
+2001-04-19  Michael Snyder  <msnyder@redhat.com>
+
+	Major change to select an event so as to avoid starvation.
+	* thread-db.c (select_pending_event): New function.  Choose an
+	event from the list of pending events, and make its thread the
+	event thread.
+	(stop_all_threads): Don't mark the event thread.  That will now
+	be done by select_pending_event.
+	(struct signal_list): Rename to event_list.  Save the thread and
+	the entire wait status, so that all events (not just signals)
+	can be saved.
+	(add_pending_signal): Rename to add_pending_event.
+	(send_pending_signals): Ignore non-signal events.
+	Ignore the selected event (which will be returned to the debugger).
+	Push back breakpoint events (moved here from wait_all_threads).
+	(wait_all_threads): Remove special handling for SIGTRAP (moved
+	into send_pending_signals).  Call select_pending_event.
+	(thread_db_check_child_status): Add initial event to event list.
+
+2001-04-16  Michael Snyder  <msnyder@redhat.com>
+	* thread-db.c (thread_db_continue_thread): Handle the signal param.
+	(thread_db_singlestep_thread): Ditto.
+	(thread_db_check_child_state): Handle exit and termination separately.
+
+2001-04-13  Michael Snyder  <msnyder@redhat.com>
+
+	* thread-db.c (find_new_threads_callback): Account for dead threads.
+	(update_thread_list): Keep zombie threads in thread list, but
+	delete them if they've been joined or detached.
+	(stop_all_threads): Don't stop dead threads.
+	(continue_all_threads): Don't continue if not waited.
+	(thread_db_check_child_state): Move handling of terminate and
+	exit earlier.  Handle termination or exit of children specially.
+	(thread_db_get_thread_reg): Test for defunct threads.
+	(thread_db_set_thread_reg): Ditto.
+	* ptrace-target.c (ptrace_xfer_mem): Don't be noisy about ptrace
+	errors caused by illegal memory accesses.
+
+2001-04-12  Andrew Cagney  <ac131313@redhat.com>
+
+	* server.c: Include "gdbloop.h".  Replace gdbsocket_poll with
+	gdbloop_poll.
+	* ptrace-target.c, linux-target.c, solaris-target.c: 
+	* dummy-target.c: Update comments.
+
+2001-04-11  Michael Snyder  <msnyder@redhat.com>
+
+	* thread-db.c (struct gdbserv_thread): Add new flag 'stepping'.
+	(stop_all_threads): Add parameter 'process'.
+	Set the process->event_thread here, instead of in check_child_state.
+	(wait_all_threads): Accept process as a parameter instead of eventpid.
+	Handle SIGTRAP differently if the thread was singlestepping.
+	(thread_db_singlestep_program): Clear flags for event thread.
+	(thread_db_singlestep_thread): Ditto.
+	(thread_db_continue_program): Ditto.
+	(thread_db_continue_thread): Ditto.
+	(thread_db_check_child_state): Cancel the stepping flag.
+	Don't set the event thread, this is now done in stop_all_threads.
+	* linux-target.c (debug_get_reg, debug_get_pc): New functions.
+	Purely for debugging output.  Architecture dependent.
+
+2001-04-09  Michael Snyder  <msnyder@redhat.com>
+
+	* thread_db.c (thread_db_continue_thread): Continue the actual
+	thread given, not necessarily the event thread.
+	(thread_db_singlestep_thread): Step the actual thread given, 
+	not necessarily the event thread.
+
+2001-04-09  Michael Snyder  <msnyder@redhat.com>
+
+	* thread-db.c (stop_all_threads): Do not send SIGSTOP to a thread
+	if it has already been sigstopped.
+	(thread_db_continue_thread): New function.  Continue a single thread.
+	(thread_db_singlestep_thread): New function.  Step a single thread.
+	(thread_db_attach): Set up continue_thread, singlestep_thread methods.
+	
+2001-04-09  Michael Snyder  <msnyder@redhat.com>
+
+	* linux-target.c (PC_REGNUM): New enum, define.
+	(decr_pc_after_break): New function.  Architecture dependent.
+	This version will probably serve for all targets for which
+	DECR_PC_AFTER_BREAK is one.  Those for which it is zero will
+	want to define a no-op version of this function.
+	* thread-db.c (first_thread_in_list): New function.
+	(update_thread_list, stop_all_threads, wait_all_threads, 
+	continue_all_threads): Use first_thread_in_list in for loops.
+	(wait_all_threads): Handle SIGINT and SIGTRAP specially.
+	Throw away SIGINT for all threads but the event thread.
+	For SIGTRAP in other than the event thread, call decr_pc_after_break
+	(giving the thread a chance to hit the trap again later).
+	(thread_db_continue_program, thread_db_singlestep_program):
+	Continue the event thread before all the others.
+
+2001-04-05  Michael Snyder  <msnyder@redhat.com>
+
+	* thread-db.c (add_pending_signal, send_pending_signals):
+	New functions.  Allow wait_all_threads to collect any signals
+	other than SIGSTOP from the threads and defer them.
+	(wait_all_threads): Loop on each thread and call waitpid until
+	we get SIGSTOP.  Any other signals are pended by throwing them
+	into a list, and then sending them back to the threads using kill.
+	(thread_db_get_thread_reg): Remove temporary hack for libthread_db
+	bug.  (thread_db_set_thread_reg): Ditto.
+
+2001-04-04  Michael Snyder  <msnyder@redhat.com>
+
+	* server.h (struct child_process): Add a 'running' flag.
+	* thread_db.c (continue_all_threads): Take gdbserv as argument.
+	Use it to find the current thread, and don't continue that one
+	(leave it up to the parent method to continue the event thread.)
+	(thread_db_continue_program): Child is running -- set a flag.
+	(thread_db_singlestep_program): Ditto.
+	(thread_db_check_child_state): Return immediately unles the child
+	is running.  Because this is a polling routine, we don't want to
+	return any new events unles the child is officially running.
+	Call waitpid with -1 instead of the process->pid, so that we
+	can get events from the threads.  Alternately use __WCLONE.
+	(thread_db_get_thread_reg): If thread is not specified, use
+	the event thread (if possible).  Temporarily hack around a
+	bug in the thread_db library.
+	(thread_db_set_thread_reg): Ditto.
+	
+2001-04-04  Michael Snyder  <msnyder@redhat.com>
+
+	* thread-db.c (continue_all_threads): Zero the attached, stopped,
+	and waited flags only if thread is successfully continued.
+	* linux-target.c: Fix broken endif directive.
+	* configure.in: Test for sys/procfs.h.
+	* config.in: Define HAVE_SYS_PROCFS_H.
+	* configure: Regenerate.
+	* thread-db.c (thread_list_lookup_by_pid): New function.
+	(thread_db_check_child_state): Cache the event thread.
+	(thread_db_fromtarget_thread_break): New function.  Call
+	gdbserv_fromtarget_thread_break with the event thread.
+	(thread_db_attach): Take over the fromtarget_break vector.
+	* server.h (struct child_process): Add event_thread field.
+
+2001-04-02  Michael Snyder  <msnyder@redhat.com>
+
+	* thread-db.c: include errno.h for error reporting.
+	(struct gdbserv_thread): Add flag 'waited'.
+	(thread_db_type_str): New function for thread_extra_info.
+	(find_new_threads_callback): Use errno for error reporting.
+	(thread_db_thread_info): New function, for thread_extra_info.
+	(wait_all_threads): New function.  Call waitpid on all threads
+	that have been attached or sigstopped.  Incomplete -- needs to
+	push back any signals other than SIGSTOP.
+	(continue_all_threads): Send PTRACE_CONT only to threads that
+	have been attached or sigstopped.
+	(check_child_state): Call wait_all_threads.
+	(thread_db_attach): Activate thread_info vector.
+
+2001-03-30  Michael Snyder  <msnyder@redhat.com>
+
+	* linux-target.c (linux_read_reg, linux_write_reg): New functions.
+	Abstract out the code to actually read a register value, so that 
+	it can be shared by several methods.
+	(get_gregset): Use sizeof (GREGSET_T).
+	(generic_linux_gg_reg_nr): New function.  Support new reg methods.
+	(generic_linux_next_gg_reg): Ditto.
+	(generic_linux_sizeof_reg): Ditto.
+	(generic_linux_reg_format): Ditto.
+	(generic_linux_get_reg): New function.  Newer register method,
+	non-thread-aware version.
+	(linux_attach): Use new register method in target vector.
+	* thread-db.c: Remove some developmental ifdef code.
+	(thread_db_get_thread_reg): Fall back on parentvec.get_reg
+	if no thread or no thread_agent available.
+	(thread_db_attach): Replace get_reg vector with get_thread_reg.
+
+	* ptrace-target.c (ptrace_write_user): For X86 target, skip
+	write-protected location in user/context address space.
+	* linux-target.c (linux_process_get_reg): Use linux_read_reg.
+	(linux_process_set_reg): Use linux_write_reg.
+	(put_gregset): New function.  Write child's gregset.
+	(generic_linux_get_reg): Use SIZEOF_MAPPEDREG.
+	(generic_linux_set_reg): New function.  Newer register method.
+	(linux_attach): Add set_reg to target vector, not process_set_reg.
+	* thread-db.c (ps_lsetregs): Implement by calling put_gregset.
+	(thread_db_set_thread_reg): New function.  Implement set_thread_reg.
+	(thread_db_attach): Add set_thread_reg to target vector.
+
+2001-03-29  Michael Snyder  <msnyder@redhat.com>
+
+	* ptrace-target.c (ptrace_read_user, ptrace_write_user):
+	Accept an explicit pid instead of a struct gdbserv.
+	* linux-target.c: Include gdb_proc_service.h for gregset_t
+	(FIXME: better place to get it from?)
+	(linux_register_offset): Return signed long to facilitate 
+	test for -1 error return value.
+	(ppc_linux_xfer_reg, linux_process_get_reg, linux_process_set_reg):
+	Calls to ptrace_read_user and ptrace_write_user now need a pid
+	argument instead of a struct gdbserv.
+	(reg_from_gregset): New function.
+	(reg_to_gregset): New function.
+	(get_gregset): New function.  Read child's gregset.
+	* thread-db.c (ps_lgetregs): Implement by calling get_gregset.
+	(thread_db_dlopen, thread_db_open, thread_db_attach): Change 
+	sense of return: -1 now means failure, 0 means success.
+	(thread_db_get_thread_reg): Call reg_from_gregset.
+
+2001-03-29  Michael Snyder  <msnyder@redhat.com>
+
+	* thread-db.c: Include signal.h, sys/ptrace.h (FIXME ptrace).
+	(struct symbol_cache): Make value (address) unsigned.
+	(add_symbol_to_list, lookup_cached_symbol): Ditto.
+	(struct gdbserv_thread): Add attached, stopped flags to thread.
+	(add_thread_to_list): Return pointer to new thread in list.
+	(delete_thread_from_list): New function.
+	(ps_pglobal_lookup, ps_pdread, ps_pdwrite, ps_ptread, ps_ptwrite):
+	Muffle debugging output.
+	(find_new_threads_callback): Muffle debugging output.
+	Add thread to list only if it isn't already there.
+	Use ptrace to attach to new threads.  (FIXME explicit ptrace).
+	(update_thread_list): New function.  Only place where td_ta_thr_iter
+	is called.  Builds up the thread list, prunes it of any dead threads.
+	(thread_db_thread_next): Call update_thread_list.
+	(get_thread_signals): Read the values of the cancel and restart
+	signals from the target using hardcoded symbol names.
+	(stop_all_threads): New function.  First cut.  Deliver SIGSTOP
+	to all threads except the event thread and any new threads that
+	have just been attached.
+	(continue_all_threads): New function.  First cut.  Deliver
+	PTRACE_CONT to all threads except the main thread.  Needs work.
+	(thread_db_continue_program): New function.  
+	(thread_db_singlestep_program): New function.
+	(thread_db_get_thread_reg): New function, incomplete.
+	(thread_db_attach): Take over continue_program, singlestep_program.
+	Muffle some debugging output.
+
+2001-03-26  Michael Snyder  <msnyder@redhat.com>
+
+	* thread-db.c: New file.  Linux thread debugging layer.
+	* linux-target.c (linux_attach): Call thread_db_attach.
+	* ptrace-target.c: Export ptrace_handle_waitstatus for
+	thread-db.c (FIXME).
+	* configure.in: Add thread-db.c to linux target modules.
+	(GREGSET_T, FPREGSET_T, HAVE_LWPID_T, HAVE_PSADDR_T,
+	HAVE_PRGREGSET_T, HAVE_PRFPREGSET_T, LINUX_TARGET): Define.
+	* config.in (GREGSET_T, FPREGSET_T, HAVE_LWPID_T, 
+	HAVE_PSADDR_T, HAVE_PRGREGSET_T, HAVE_PRFPREGSET_T, LINUX_TARGET): 
+	Default undefine.
+	* configure: Regenerate.
+	* Makefile.am (INCLUDES): Add $(srcdir)/../../include
+	(devo/include), so that header files can be shared with gdb.
+	(server_LDFLAGS): Add -ldl -rdynamic (FIXME configure).
+	* Makefile.in: Regenerate.
+
+2001-03-22  Andrew Cagney  <ac131313@redhat.com>
+
+	* server.c (main): Pass gdbserver.attach and process to
+	gdbserver_startup instead of gdbserver_poll.
+
+2001-03-16  Michael Snyder  <msnyder@redhat.com>
+
+	* linux-target.c (linux_detach): Pass new parameter to ptrace_detach.
+	Fix file header comment typo.  Update copyright.
+
+2001-03-16  Elena Zannoni  <ezannoni@cygnus.com>
+
+        * dummy-target.c (dummy_detach): Add new parameter.
+        * linux-target.c (linux_detach): Ditto.
+        * ptrace-target.c (ptrace_detach): Ditto.
+        * solaris-target.c (solaris_detach): Ditto.
+
+2001-03-14  Andrew Cagney  <ac131313@redhat.com>
+
+	* ChangeLog: Move to here from ../native.
+	* Makefile.am: Ditto.
+	* aclocal.m4: Ditto.
+	* configure.in: Ditto.
+	* dummy-target.c: Ditto.
+	* linux-target.c: Ditto.
+	* ptrace-target.c: Ditto.
+	* ptrace-target.h: Ditto.
+	* server.c: Ditto.
+	* server.h: Ditto.
+	* solaris-target.c: Ditto.
+	* Makefile.in: Regenerate.
+	* config.in: Ditto.
+	* configure: Ditto.
+
+2001-03-14  Andrew Cagney  <ac131313@redhat.com>
+
+	* Makefile.am (INCLUDES): Update. Headers moved to ../include.
+	* Makefile.in: Regenerate.
+
+2000-11-27  Michael Snyder  <msnyder@happy.cygnus.com>
+
+	* ptrace-target.c (ptrace_xfer_mem): Return -1 on error.
+
+2000-11-21  Michael Snyder  <msnyder@cleaver.cygnus.com>
+
+	* ptrace-target.c (noop_flush_i_cache): Comment out superfluous
+	debugging output.
+	* linux-target.c (linux_process_get_reg): Return value of 
+	linux_register_offset is unsigned (can't be less than zero).
+	(linux_process_rcmd): Just use '1' and '0' to control debug output.
+
+2000-11-06  Michael Snyder  <msnyder@cleaver.cygnus.com>
+
+	* dummy-target.c (dummy_attach): Fix order of memset args.
+	* linux-target.c (linux_attach): Ditto.
+	* ptrace-target.c (ptrace_attach): Ditto.
+	* solaris-target.c (solaris_attach): Ditto.
+
+2000-10-19  Belinda Brazelle <brazelle@redhat.com>
+
+	* linux-target.c: Add support for Arm processor.
+
+2000-10-12  Michael Snyder  <msnyder@cleaver.cygnus.com>
+
+	* ptrace-target.c (ptrace_handle_waitstatus): Save exitstatus
+	in process->stop_signal.
+
+2000-09-14  Michael Snyder  <msnyder@michael.wirespeed.com>
+
+	* linux-target.c: Define regmap etc. for SH target.
+	* configure.in: Add defines for SH target.
+	* configure: Rebuild.
+
+2000-09-13  Michael Snyder  <msnyder@michael.wirespeed.com>
+
+	* server.h (fromtarget_terminate): New field.  Also fix up 
+	some overlooked function prototypes in the existing fields.
+	(struct client_process): Rename to struct child_process.
+	* linux-target.c (linux_fromtarget_terminate): New function.
+	Called from main when child terminates abnormally.
+	(linux_process_rcmd): New function.  Catches "qRcmd" requests, 
+	which are currently used just to turn on debug output.
+	* ptrace-target.c (ptrace_handle_waitstatus): Set stop_signal
+	for the WIFSTOPPED case.  (ptrace_process_signal): Return zero
+	instead of the signal number, to let libremote know that we have
+	handled the signal.  (ptrace_xfer_memory): Fix off-by-one error.
+	* solaris-target.c (solaris_fromtarget_terminate): New function.
+	* server.c (main): Call fromtarget_terminate for the 'T' case.
+	Do not request a one-second delay from gdbsocket_poll.
+
+2000-09-08  Michael Snyder  <msnyder@cleaver.cygnus.com>
+
+	* solaris-target.c: New file.  Just a prototype, doesn't actually
+	work.  Used to confirm configurability to multiple targets.
+	* dummy-target.c: New file.  Dummy back-end for implementing new
+	targets such as solaris-target.c (above), before actually having
+	a working back-end.  The dummy target works just like the sample
+	target in the samples directory.
+	* configure.in: Add AC_SUBST(TARGET_MODULES) to add the 
+	appropriate target modules to the Makefile.  Add solaris target.
+	* configure: Regenerate.
+	* Makefile.am: Move *-target.c into EXTRA_server_SOURCES.
+	Add TARGET_MODULES to server_LDADD.  Define server_DEPENDENCIES.
+	* Makefile.in: Regenerate.
+	* ptrace-target.h: New file.  Defines needed only by ptrace.
+	* server.h: Remove ptrace-specific defines to ptrace-target.h.
+	(struct server_vector): New, for target entry points.
+	(struct nativeserver): Rename to struct client_process.
+	* server.c: Use client_process for entry points, and server_vector.
+	* linux-target.c: Include ptrace-target.h.  
+	(ppc_linux_get_reg): Rename to ppc_linux_process_get_reg.
+	(ppc_linux_set_reg): Rename to ppc_linux_process_set_reg.
+	(ppc_linux_get_regs): Rename to ppc_linux_process_get_regs.
+	(ppc_linux_set_regs): Rename to ppc_linux_process_set_regs.
+	(linux_get_reg): Rename to linux_process_get_reg.
+	(linux_set_reg): Rename to linux_process_set_reg.
+	(linux_get_regs): Rename to linux_process_get_regs.
+	(linux_set_regs): Rename to linux_process_set_regs.
+	(gdbserver_check_child_state): Rename to linux_check_child_state.
+	(gdbserver_fromtarget_break): Rename to linux_fromtarget_break.
+	(gdbserver_fromtarget_exit): Rename to linux_fromtarget_exit.
+	(struct server_vector gdbserver): New, defines entry points.
+	* ptrace-target.c: Include ptrace-target.h.
+	* aclocal.m4: New file.
+
+2000-09-08  Michael Snyder  <msnyder@cleaver.cygnus.com>
+
+	* linux-target.c (linux_get_reg, linux_set_reg): Remove direct
+	calls to ptrace; instead use service call into ptrace-target.c.
+	(linux_get_regs, linux_set_regs): Remove ifdef PPC; instead use
+	an ifdef in linux_attach to set up the target vector pointers.
+	(linux_attach): If PPC_LINUX_TARGET, use PPC versions of register
+	functions instead of generic ones.  Define process_set_reg, so
+	that the "P" command is now handled.
+
+2000-09-07  Michael Snyder  <msnyder@cleaver.cygnus.com>
+
+	* ptrace-target.c (ptrace_read_user, ptrace_write_user): New 
+	functions.  Exported so that linux-target does not have to 
+	call ptrace directly.  (ptrace_get_gregs, ptrace_set_gregs, 
+	ptrace_get_fpregs, ptrace_set_fpregs): New functions.
+	Exported for use by targets that use these methods.
+	(ptrace_xfer_mem): Use ptrace_arg3_type instead of long.
+	Add address to error messages.  
+	* linux-target.c: Start using config macros, port to alpha and ppc.
+	(ppc_linux_xfer_reg, ppc_linux_getset_reg, ppc_linux_get_reg,
+	ppc_linux_set_reg, ppc_linux_get_regs, ppc_linux_set_regs):
+	New functions.  Explicit knowledge of ppc linux register layout.
+	(linux_get_reg): Catch undefined regmap offsets.
+	(linux_set_reg): Ditto.
+	(linux_get_regs): Conditionally call ppc_linux_get_regs.
+	(linux_set_regs): Ditto.
+	* configure.in: Add PPC target, and export target defines.
+	* configure: Regenerate.
+	* config.in: Add new target defines.
+
+2000-09-06  Michael Snyder  <msnyder@cleaver.cygnus.com>
+
+	* Makefile.am: Define CC and CFLAGS.
+	* Makefile.in: Regenerate.
+	* configure.in: New file.  Detect all manner of things.
+	* config.in: New file.  Input file for config.h.
+	* configure: Generate.
+	* ptrace-target.c (ptrace_xfer_type): Move def'n into server.h.
+	(PTRACE_XFER_SIZE): Ditto.
+	* linux-target.c (ptrace_xfer_type): Move def'n into server.h.
+	(ptrace_arg3_type): Ditto.
+	* server.h: Use config macros to determine definitions of 
+	ptrace_xfer_type, ptrace_arg1_type, ptrace_arg2_type, 
+	ptrace_arg3_type, ptrace_arg4_type.
+
+2000-09-05  Michael Snyder  <msnyder@cleaver.cygnus.com>
+
+	* server.c (main): Detect exit status, and call fromtarget_exit
+	instead of fromtarget_break.
+	* linux-target.c (gdbserver_fromtarget_exit): New function.
+	* ptrace-target.c (ptrace_kill_program, ptrace_sigkill_program):
+	New functions.  Send signals to the child.
+	(ptrace_exit_program): New function.
+
+2000-09-05  Michael Snyder  <msnyder@cleaver.cygnus.com>
+
+	* linux-target.c (linux_attach): Activate process_signal vector.
+	(gdbserver_check_child_state): Send real received signal, instead
+	of faking SIGTRAP.
+	* ptrace-target.c (ptrace_break_program): New function.  Implement
+	control-c interrupt from host.
+	(ptrace_process_signal): Implement continuation signal.
+	(ptrace_singlestep_program): Ditto.
+	(ptrace_continue_program): Ditto.
+	(ptrace_get_trap_number): New function.  Return signal to libremote.
+	(ptrace_compute_signal): Ditto.
+	(ptrace_attach): Activate break_program, process_signal, compute_signal
+	and get_trap_number vectors.
+	server.h (struct nativeserver): add signal_to_send field.
+	Rename stop_sig to stop_signal.
+
+2000-09-05  Michael Snyder  <msnyder@cleaver.cygnus.com>
+
+	* ptrace-target.c (ptrace_singlestep_program): Make ptrace args long.
+	FIXME: needs to be configurable.
+	* linux-target.c (linux_get_reg, linux_set_reg): Make regaddr and
+	regval configurable types.  FIXME needs real configury.
+
+2000-09-01  Michael Snyder  <msnyder@cleaver.cygnus.com>
+	New directory "native" for native gdbserver in libremote.
+	* server.c: New file.  Entry point and main event loop.
+	* server.h: New file.  Shared declarations.
+	* linux-target.c: New file.  Linux version of libremote native stub.
+	* ptrace-target.c: New file.  Ptrace operations for libremote stub.
+	* Makefile.am: New file.  Automake source.
+	* Makefile.in: New file.  Automake-generated makefile source.
+	Note: this work is incomplete and only partially working.
+	
+

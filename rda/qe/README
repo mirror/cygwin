@@ -1,0 +1,5 @@
+This directory contains simple Quality Engineering tests for RDA, the
+Red Hat Debug Agent and library.
+
+	inc-* check that the headers can be included independently.
+

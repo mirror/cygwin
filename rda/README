@@ -1,0 +1,16 @@
+This directory contains an implementation of a server for the gdb remote
+protocol, built as a host library.  It is suitable for applications that
+are to be remote targets of a debugger, such as simulators, interfaces to ICE
+hardware, etc.
+
+Roadmap:
+
+	lib/		contains the remote protocol stub implementation
+			is not meant to be installed
+			builds into librda.a and librda.la
+			includes headers
+
+	samples/	contains a sample application of the library
+
+Note: remember to use autoconf and automake to configure, unlike some of the other
+tools.

@@ -1,0 +1,38 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(server.h)
+AC_CANONICAL_SYSTEM
+AM_INIT_AUTOMAKE(rda,0.1)
+AM_CONFIG_HEADER(config.h:config.in)
+
+dnl automake support
+AM_MAINTAINER_MODE
+AM_PROG_LIBTOOL
+AC_EXEEXT
+AC_LANG_CPLUSPLUS
+AC_PROG_CXX
+
+dnl headers
+AC_CHECK_HEADERS(errno.h string.h strings.h windows.h sys/cygwin.h sys/wait.h )
+
+AC_FUNC_ALLOCA
+
+case "$target" in
+  *cygwin*) TARGET_MODULES="win32-target.o win32-strace.o child_process.o" ;;
+esac
+AC_SUBST(TARGET_MODULES)
+
+case "$target" in
+  *cygwin*)
+    dnl FIXME: differentiate between flavors of Solaris!
+    AC_DEFINE(WIN32_TARGET)
+    ;;
+esac
+
+if test -f /usr/include/foo.h; then
+  AC_DEFINE(HAVE_AC_DEFINE, 1, [define if have AC_DEFINE])
+fi
+
+dnl Outputs
+AC_OUTPUT(Makefile)
+
+

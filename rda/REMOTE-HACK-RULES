@@ -1,0 +1,37 @@
+RDA hack rules:
+
+The RDA package is used by several programs, so it is important to
+keep the external interface of the lib part as stable as possible.  
+
+Since some programs that depend on RDA are kept in separate source
+trees, it is not easy to test whether changes to the lib/ directory will
+regress them.  Each proposed change to devo/remote/lib should be tested
+by building:
+	remote/samples
+	sid/component/gdb
+and running gdb against the code.  Submit patches to the MAINTAINERS.  
+
+You are welcome to create new subdirectories for applications that use
+this library.
+
+Discussion of this package is held at
+	gdb@sourceware.cygnus.com
+
+
+TODO:
+
+New sample server programs for remote/samples.
+
+Convert RDA into an optionally installable library,
+with tidied-up headers.
+
+MAN pages.
+
+Test suite.
+
+Ports to more hosts.
+
+
+
+add --enable-build-warnings.
+See bfd for how to have it work with automake.

@@ -7,14 +7,15 @@ would appreciate credit if you use this file or parts of it.
 
 */
 
+/* Must be first, so that _XOPEN_SOURCE works.  */
+#include "expect_cf.h"
+
 #include <stdio.h>
 #include <signal.h>
 
 #if defined(SIGCLD) && !defined(SIGCHLD)
 #define SIGCHLD SIGCLD
 #endif
-
-#include "expect_cf.h"
 
 /*
    The following functions are linked from the Tcl library.  They

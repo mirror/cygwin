@@ -1,3 +1,8 @@
+2003-06-20  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidattrutil.h (fixed_attribute_map_with_logging_component):
+	Add throw() decoration to dtor.
+
 2003-06-10  Dave Brolley  <brolley@redhat.com>
 
 	* sidattrutil.h (sidpinutil.h): #include it.

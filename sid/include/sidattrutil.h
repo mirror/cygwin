@@ -1041,7 +1041,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	buffer = new char[buffer_size];
 #endif
       }
-    ~fixed_attribute_map_with_logging_component () /* throw() */
+    ~fixed_attribute_map_with_logging_component () throw()
       {
 	// Output any saved messages.
 	output_saved_messages ();

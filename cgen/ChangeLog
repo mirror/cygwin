@@ -1,3 +1,10 @@
+2005-03-18  Nick Clifton  <nickc@redhat.com>
+
+	* cpu/ip2k.opc (parse_lit8): Change wording of error message to
+	"percent-operand" from "%operand" as the latter confuses xgettext
+	into thinking that it is a C printf formating directive, which
+	prevents proper translation.
+
 2005-02-23  Nick Clifton  <nickc@redhat.com>
 
 	* opcodes.scm (gen-parse-number): Add a cast to the desired

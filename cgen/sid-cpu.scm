@@ -1096,7 +1096,7 @@ void
       static void** frag_label_table;
       int max_insns = @PREFIX@_INSN_" (-last-insn) " + 1;
       int tabsize = max_insns * 4;
-      frag_label_table = new (void*) [tabsize];
+      frag_label_table = new void* [tabsize];
       memset (frag_label_table, 0, sizeof (void*) * tabsize);
       int i;
       void** v;

@@ -6,6 +6,25 @@
 
 	* Makefile.am (check-local): Rename target from "checkme".
 
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* hw-cpu-m32r_d.xml: Add <?xml ... ?> prefix.
+
+2001-07-04  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add maintainer-mode doc building configury.
+	* configure: Regenerate.
+	* Makefile.am: Add maintainer-mode doc building.
+	* Makefile.in: Regenerate.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* hw-cpu-m32r_d.txt: Generate.
+
+2001-06-29  graydon hoare  <graydon@redhat.com>
+
+	* hw-cpu-m32r_d.xml: Add.
+
 2001-06-28  Jeff Johnston  <jjohnstn@redhat.com>
 
         * hw-cpu-m32r.txt: Remove debug-exec? setting references.
@@ -20,6 +39,12 @@
 2001-06-22  Ben Elliston  <bje@redhat.com>
 
 	* m32rbf.cxx (m32rbf_cpu::memory_trap): Ignore bus::delayed.
+
+2001-06-21  matthew green  <mrg@redhat.com>
+
+	* Makefile.am (BFDINCLUDES): New define.
+	(INCLUDES): Add $(BFDINCLUDES)
+	* Makefile.in: Regenerate.
 
 2001-03-21  Ben Elliston  <bje@redhat.com>
 

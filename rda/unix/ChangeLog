@@ -1,5 +1,12 @@
 2004-03-10  Kevin Buettner  <kevinb@redhat.com>
 
+	* configure.in: Add "frv*linux*" to list of targets with thread
+	support.
+	* configure: Regenerate.
+	* Makefile.in: Regenerate using "automake --cygnus --ignore-deps".
+
+2004-03-10  Kevin Buettner  <kevinb@redhat.com>
+
 	* ptrace-target.c (ptrace_create_child): Use vfork() instead of
 	fork().  Use PTRACE_ATTACH to attach to an existing process.
 	* server.c (usage): Update to include text about "-a".

@@ -4,7 +4,7 @@
 .
    This file is part of GDB.
 
-   [$Id: ada-tasks.c,v 1.1.4.3 2002/08/30 22:52:42 kseitz Exp $]
+   [$Id: ada-tasks.c,v 1.1.4.4 2002/10/01 00:46:01 kseitz Exp $]
    Authors: Roch-Alexandre Nomine Beguin, Arnaud Charlet <charlet@gnat.com>
 
    This program is free software; you can redistribute it and/or modify
@@ -270,7 +270,7 @@ get_self_id (void)
 }
 
 int
-get_current_task ()
+get_current_task (void)
 {
   int result;
 

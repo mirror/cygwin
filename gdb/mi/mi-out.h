@@ -1,5 +1,6 @@
-/* Macro definitions for i386 running under NetBSD.
-   Copyright 2000, 2002 Free Software Foundation, Inc.
+/* MI Command Set - MI output generating routines for GDB.
+   Copyright 2000 Free Software Foundation, Inc.
+   Contributed by Cygnus Solutions (a Red Hat company).
 
    This file is part of GDB.
 
@@ -18,9 +19,18 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#ifndef TM_NBSDAOUT_H
-#define TM_NBSDAOUT_H
+#ifndef MI_OUT_H
+#define MI_OUT_H 1
 
-#include "i386/tm-nbsd.h"
+struct ui_out;
+struct ui_file;
 
-#endif /* TM_NBSDAOUT_H */
+extern struct ui_out *mi_out_new (int mi_version);
+extern void mi_out_put (struct ui_out *uiout, struct ui_file *stream);
+extern void mi_out_rewind (struct ui_out *uiout);
+extern void mi_out_buffered (struct ui_out *uiout, char *string);
+
+/* Return the version number of the current MI.  */
+extern int mi_version (struct ui_out *uiout);
+
+#endif /* MI_OUT_H */

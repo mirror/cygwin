@@ -1,3 +1,14 @@
+2002-09-26  Richard Earnshaw  <rearnsha@arm.com>
+
+	* lib/libgloss.exp (build_wrapper): Use a tool-specific filename on
+	the host for the testglue.
+
+2002-08-30  Nick Clifton  <nickc@redhat.com>
+
+        * acinclude.m4: Provide alternative definition of AC_PROG_CXX
+        which does not call AC_PROG_CXX_WORKS.  This allows dejagnu to
+        be configured and built without a working C++ compiler.
+
 2002-08-28  Catherine Moore  <clm@redhat.com>
 
 	* baseboards/v850-sim.exp (target_install): Add v850e-elf.
@@ -30,6 +41,33 @@
 	* baseboards/frv-sim.exp: New board description.
 	* baseboards/frv-tiger.exp: New board description.
 	* baseboards/frv-tomcat.exp: New board description.
+
+2002-05-02  Fernando Nasser  <fnasser@localhost.localdomain>
+
+	* runtest.exp: Add kfail_flag and kfail_prms variable
+	initializations.
+	* lib/framework.exp (setup_kfail): New proc. Like setup_xfail, but  
+	for known tool bugs already registered in a bug database.
+	(kfail): New proc. Record that a test has failed due to a known bug.
+	(kpass): New proc. Record that a test for a known bug has passed
+	unexpectedly.
+	(clear_kfail): Like clear_xfail, but for known bugs.
+	(record_test): Handle KFAIL and KPASS.
+	(pass, fail): Test for known failures.
+	(clone_output): Add KFAIL to list of message types to be cloned.
+	og_summary): Add summary for KFAIL and KPASS.
+	(unknown): Update comment.
+	* doc/dejagnu.texi: Document the above.
+	* testsuite/lib/libsup.exp: Add counters for KFAIL and KPASS.
+	* testsuite/runtest.all/stats-sub.exp: Test kfail and kpass.
+	* testsuite/runtest.all/stats.exp: Ditto.
+
+2002-04-25    <Matthew Bemis <bemis@iol.unh.edu>
+
+	* lib/framework.exp: new procs check_xml{}, insertdtd{}, xml_output{},
+	plus a few hooks to xml_output in the other logging procs to produce
+	XML output.
+	* runtest.exp: Add support for the --x option for XML output.
 
 2002-04-25  Nick Clifton  <nickc@cambridge.redhat.com>
 

@@ -8,8 +8,7 @@ static char *rcsid = "$Id: regerror.c,v 1.2 1998/09/15 23:31:37 cgf Exp $";
 #include <stdio.h>
 
 void
-regerror(s)
-const char *s;
+regerror(const char *s __attribute__ ((unused)))
 {
 #ifdef ERRAVAIL
 	error("regexp: %s", s);

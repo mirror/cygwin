@@ -1,3 +1,8 @@
+2001-03-28  Ben Elliston  <bje@redhat.com>
+
+	* doc/version.texi (UPDATED, EDITION): Update.
+	* doc/stamp-vti: Likewise.
+
 2001-03-26  Ben Elliston  <bje@redhat.com>
 
 	* doc/credits.texi (Credits): Update.

@@ -861,6 +861,7 @@ foreach $processor (keys %opt_gdbport)
       &sidconf_new("sid-io-socket-server", "${processor}-gdb-socket") . "\n";
     $second_section .= "# ${processor}-gdb
 relate ${processor}-gdb cpu $processor
+relate ${processor}-gdb cfgroot main
 relate ${processor}-gdb target-schedulers target-sched
 relate ${processor}-gdb host-schedulers host-sched
 connect-pin ${processor}-gdb process-signal -> main stop!

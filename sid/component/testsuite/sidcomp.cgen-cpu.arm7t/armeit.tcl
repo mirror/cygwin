@@ -65,7 +65,7 @@ proc write_h4_l1 {this-bus addr data} {
 	    puts "ERROR: can't write to cpu's nirq pin: $rc\n"
 	}
     }
-    return ok
+    return [list ok 0]
 }
 
 proc write_h4_b1 {this-bus addr data} {

@@ -1,10 +1,12 @@
 // mainDynamic.cxx - One possible mainline.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999-2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
 #include "config.h"
+
+#include "../../version.h"
 
 #include <sidcomp.h>
 #include <sidso.h>
@@ -35,11 +37,21 @@ static void sid_post_run () {}
 
 
 void
+version ()
+{
+  cout << "sid " << SID_RELEASE << endl;
+  cout << "Copyright 1999-2001 Red Hat, Inc." << endl;
+  cout << "sid is free software, covered by the GNU General Public License," << endl;
+  cout << "as interpreted by the COPYING.SID terms." << endl;
+}
+
+void
 usage ()
 {
   cout << "Usage: sid OPTIONS [FILE] ..." << endl;
   cout << "OPTIONS:" << endl;
   cout << "-h        print this help" << endl;
+  cout << "-v        print version" << endl;
   cout << "-n        load/check configuration but do not run simulation" << endl;
   cout << "-f FILE   also read configuration FILE" << endl;
   cout << "-e LINE   also do configuration LINE" << endl;
@@ -59,13 +71,15 @@ main(int argc, char* argv[])
 
   if (argc == 1)
     {
-      usage();
+      version ();
+      cout << endl;
+      usage ();
       return 1;
     }
 
   while (true)
     {
-      int c = getopt (argc, argv, "hne:f:");
+      int c = getopt (argc, argv, "hvne:f:");
       if (c == EOF)
 	break;
 
@@ -73,6 +87,10 @@ main(int argc, char* argv[])
 	{
 	case 'h':
 	  usage ();
+	  return 0;
+
+	case 'v':
+	  version ();
 	  return 0;
 	  
 	case 'n':

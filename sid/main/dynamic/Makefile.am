@@ -78,4 +78,4 @@ endif
 
 sid_SOURCES = mainDynamic.cxx
 sid_LDFLAGS = -export-dynamic -static -export-symbols-regex '[a-zA-Z0-9]*_library$$' $(NEARBY_LIBS)
-sid_DEPENDENCIES = $(NEARBY_DEPS_LIBS)
+sid_DEPENDENCIES = $(NEARBY_DEPS_LIBS) ../../version.h

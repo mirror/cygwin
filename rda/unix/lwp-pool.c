@@ -720,7 +720,10 @@ wait_flags_str (int flags)
   if (flags)
     sprintf (buf + strlen (buf), "0x%x", (unsigned) flags);
 
-  return buf;
+  if (buf[0] == '\0')
+    return "0";
+  else
+    return buf;
 }
 
 

@@ -1,3 +1,8 @@
+2004-11-29  Jim Blandy  <jimb@redhat.com>
+
+	* lwp-pool.c (wait_flags_str): Return "0" when FLAGS == 0, not the
+	empty string.
+
 2004-11-23  Jim Blandy  <jimb@redhat.com>
 
 	Separate management of kernel-level LWPs from that of libpthread /

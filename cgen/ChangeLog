@@ -1,3 +1,26 @@
+2003-06-04  Doug Evans  <dje@sebabeach.org>
+
+	Better handling of 64 bit and mixed 32/64 bit architectures.
+	* hardware.scm (hw-update-word-modes!): New fn.
+	* mach.scm (define-cpu)): Call mode-set-word-modes!,
+	hw-update-word-modes!.
+	(state-word-bitsize): Replace FIXME with requested check.
+	(arch-analyze-insns!): Call mode-ensure-word-sizes-defined.
+	* mode.scm (mode-find): Ignore INT,UINT.
+	(-mode-word-sizes-kind): New global.
+	(mode-set-word-modes!,mode-set-identical-word-bitsizes!,
+	mode-set-biggest-word-bitsizes!,mode-ensure-word-sizes-defined): New fns.
+	(mode-init!): Initialize -mode-word-sizes-kind.  Move initialization
+	of mode-list to ...
+	(mode-builtin!): ... here.  Initialize WI/UWI/AI/IAI to something
+	unusable, correct values set later.
+	(mode-finish!): Remove cruft.
+	* html.scm (doc-init!): Call mode-set-biggest-word-bitsizes!.
+	* opcodes.scm (opcodes-init!): Ditto.
+	* rtx-funcs.scm (annul): Fix mode of pc.
+	* cpu/ia64.cpu: Remove cruft that sets word modes.
+	* cpu/xstormy16.cpu (define-cpu): Set word-bitsize.
+
 2003-06-03  Nick Clifton  <nickc@redhat.com>
 
 	* cpu/frv.cpu (media-dual-word-rotate-r-r): Use a signed 6-bit

@@ -303,7 +303,8 @@ help_display_file_command (ClientData cd, Tcl_Interp *interp, int argc, char **a
 {
   struct help_command_data *hdata = (struct help_command_data *) cd;
   FILE *e;
-  DWORD   topic_id = 0; /* default topic id is 0 which brings up the find dialog */
+  int id = 0;
+  DWORD   topic_id; /* default topic id is 0 which brings up the find dialog */
 
   /* We call Help initialize just to make sure the window handle is setup */
   /* We don't care about the finding the main help file and checking the */
@@ -324,10 +325,11 @@ help_display_file_command (ClientData cd, Tcl_Interp *interp, int argc, char **a
   fclose (e);
   if (argc > 3)
   {
-      if ( Tcl_GetInt (interp, argv[3], &topic_id) != TCL_OK )
+      if ( Tcl_GetInt (interp, argv[3], &id) != TCL_OK )
         return TCL_ERROR;
   }
 
+  topic_id = (DWORD) id;
   if (! WinHelp (hdata->window, argv[2], HELP_CONTEXT, topic_id))
   {
       char buf[200];

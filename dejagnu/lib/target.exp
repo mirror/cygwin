@@ -279,7 +279,10 @@ proc prune_warnings { text } {
     regsub -all "(^|\n)\[^\n\]*: warning:   as it has already been specified\[^\n\]*" $text "" text
 
     # Cygwin cc1 warns about -fpic and -fPIC
-    regsub -all ".*: warning: -f(pic|PIC) ignored for target .*" $text "" text
+    regsub -all "(^|\n)\[^\n\]*: warning: -f(pic|PIC) ignored for target \[^\n\]*" $text "" text
+
+    # Ignore linker warning when searching 64bit libraries in /lib.
+    regsub -all "(^|\n)\[^\n\]*: skipping incompatible \[^\n\]* when searching for \[^\n\]*" $text "" text
 
     # It might be tempting to get carried away and delete blank lines, etc.
     # Just delete *exactly* what we're ask to, and that's it.

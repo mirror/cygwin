@@ -16,28 +16,28 @@ proc mask {value mask} {
 proc start_write {} {
     global bus
     set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7F8 0x80"]
-    if {$result == "ok"} { return 1 } else { return 0 }
+    return [sid_bus_ok_p $result]
 }    
 
 # Leave write mode.
 proc end_write {} {
     global bus
     set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7F8 0x0"]
-    if {$result == "ok"} { return 1 } else { return 0 }
+    return [sid_bus_ok_p $result]
 }
 
 # Enter read mode.
 proc start_read {} {
     global bus
     set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7F8 0x40"]
-    if {$result == "ok"} { return 1 } else { return 0 }
+    return [sid_bus_ok_p $result]
 }
 
 # Leave read mode.
 proc end_read {} {
     global bus
     set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7F8 0x0"]
-    if {$result == "ok"} { return 1 } else { return 0 }
+    return [sid_bus_ok_p $result]
 }
 
 
@@ -234,7 +234,7 @@ if {$bus == ""} {
     for {set addr 0} {$addr < [expr $size - 8]} {incr addr} {
 	if {$addr % 2} { set data 0x55 } else { set data 0xAA }
 	set result [sid_cmd "sid::bus::write_h4_l1 $bus $addr $data"]
-	if {$result != "ok"} { set okay 0; break }
+	if ![sid_bus_ok_p $result] { set okay 0; break }
     }
     if {$okay} { pass $test } else { fail $test }
 }
@@ -265,7 +265,7 @@ if {$bus == ""} {
     fail $test
 } else {
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $size 0"]
-    if {$result != "unmapped"} { fail $test } else { pass $test }
+    if {[lindex $result 0] != "unmapped"} { fail $test } else { pass $test }
 }
 
 
@@ -414,7 +414,7 @@ if {[start_read]} {
 set test "disconnect the oscillator"
 set origin [get_epoch]
 set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7F9 0x80"]
-if {$result == "ok"} { pass $test } else { fail $test }
+if [sid_bus_ok_p $result] { pass $test } else { fail $test }
 
 set clock_pin [sid_cmd "sid::component::find_pin $victim clock"]
 for {set i 0} {$i < 5} {incr i} {
@@ -496,7 +496,7 @@ if {[sid_bus_ok_p $result] && $sec == $secs} {
 
 set test "reconnect the oscillator"
 set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7F9 0"]
-if {$result == "ok"} { pass $test } else { fail $test }
+if [sid_bus_ok_p $result] { pass $test } else { fail $test }
 
 set clock_pin [sid_cmd "sid::component::find_pin $victim clock"]
 for {set i 0} {$i < 5} {incr i} {
@@ -517,7 +517,7 @@ set origin [get_epoch]
 set year 05
 start_write
 set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7FF $year"]
-if {$result != "ok"} {
+if ![sid_bus_ok_p $result] {
     fail $test
 } else {
     end_write
@@ -538,7 +538,7 @@ if ![sid_bus_ok_p $result] {
     if {$month > 12} { set month 1 }
     start_write
     set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7FE $month"]
-    if {$result != "ok"} { 
+    if ![sid_bus_ok_p $result] {
 	fail $test
     } else {
 	end_write
@@ -561,7 +561,7 @@ if ![sid_bus_ok_p $result] {
     if {$date > 28} { set date 1 }
     start_write
     set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7FD $date"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	fail $test
     } else {
 	end_write
@@ -572,7 +572,7 @@ if ![sid_bus_ok_p $result] {
 
 set test "modify the day register with an invalid value"
 set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7FC 0"]
-if {$result == "ok"} { pass $test } else { fail $test }
+if [sid_bus_ok_p $result] { pass $test } else { fail $test }
 
 
 set test "modify the day register"
@@ -590,7 +590,7 @@ if ![sid_bus_ok_p $result] {
     set day [expr $data | $day]
     start_write
     set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7FC $day"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] { 
 	fail $test
     } else {
 	end_write
@@ -612,7 +612,7 @@ if ![sid_bus_ok_p $result] {
     if {$hour > 23} { set hour 0 }
     start_write
     set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7FB $hour"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	fail $test
     } else {
 	end_write
@@ -634,7 +634,7 @@ if ![sid_bus_ok_p $result] {
     if {$minute > 59} { set minute 0 }
     start_write
     set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7FA $minute"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	fail $test
     } else {
 	end_write
@@ -656,7 +656,7 @@ if ![sid_bus_ok_p $result] {
     if {$seconds > 59} { set seconds 0 }
     start_write
     set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x7F9 $seconds"]
-    if {$result != "ok"} {
+    if ![sid_bus_ok_p $result] {
 	fail $test
     } else {
 	end_write
@@ -675,7 +675,7 @@ foreach pair {{0x7FE 0xE0} {0x7FD 0xC0} {0x7FC 0x38} {0x7FB 0xC0} {0x7FA 0x80}} 
 
     set test "store data in free bits at $hex_addr"
     set result [sid_cmd "sid::bus::write_h4_l1 $bus $hex_addr 0xFF"]
-    if {$result == "ok"} {
+    if [sid_bus_ok_p $result] {
 	set result [sid_cmd "sid::bus::read_h4_l1 $bus $hex_addr"]
 	if {[sid_bus_ok_p $result] && \
 		[mask [lindex $result 1] $hex_mask] == $hex_mask} {

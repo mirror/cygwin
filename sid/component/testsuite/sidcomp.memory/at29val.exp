@@ -145,7 +145,7 @@ set data 5
 for {set addr 4096} {$addr < 8192} {incr addr} {
    set data [expr {(($data * 17) + 23) % 256}]
    set result [sid_cmd "sid::bus::write_h4_l1 $rwp $addr $data"]
-   if {$result != "ok"} then { puts $result; break }
+   if ![sid_bus_ok_p $result] then { break }
 }
 set res [sid_cmd "sid::component::set_attribute_value $victim image-file test.dat1"]
 set pin [sid_cmd "sid::component::find_pin $victim image-load"]
@@ -180,7 +180,7 @@ proc unlock_sector {} {
 	set hex_data [lindex $pair 0]
 	set hex_addr [lindex $pair 1]
 	set result [sid_cmd "sid::bus::write_h4_l1 $rwp $hex_addr $hex_data"]
-	if {$result != "ok"} {
+        if ![sid_bus_ok_p $result] {
 	    return 0
 	}
     }
@@ -200,7 +200,7 @@ if {[expr $num_bytes % $sector_size] != 0} {
 	}
 	set data [expr ($i - 4096) % 256]
 	set result [sid_cmd "sid::bus::write_h4_l1 $rwp $addr $data"]
-	if {$result != "ok"} then { fail "$test - $result @ $addr "; break }
+	if ![sid_bus_ok_p $result] { fail "$test - $result @ $addr "; break }
 	set result [sid_cmd "sid::bus::read_h4_l1 $rwp $addr"]
         if {![sid_bus_ok_p $result] || [lindex $result 1] != $data} {
 	    warning "$test -- validating data @ $addr, got $result"
@@ -231,7 +231,7 @@ for {set i 0} {$i < $size} {incr i} {
     }
     set data [expr 2*$i%256]
     set result [sid_cmd "sid::bus::write_h4_l1 $rwp $i $data"]
-    if {$result != "ok"} { fail "$test - bad"; break }
+    if ![sid_bus_ok_p $result] { fail $test; break }
 }
 if { $i == $size } then { pass $test }
 
@@ -262,7 +262,7 @@ if {$size == 8192 && $i == $size && $pin != ""} then { pass $test ; file delete 
 
 set test "find image-store pin"
 set p [sid_cmd "sid::component::find_pin $victim image-store"]
-if {$p != ""} then { pass $test } else { puts $status; fail $test }
+if {$p != ""} then { pass $test } else { fail $test }
 
 set test "sid stop"
 if [sid_stop] then { pass $test } else { fail $test ; return }

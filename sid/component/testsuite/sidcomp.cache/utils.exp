@@ -40,8 +40,8 @@ proc instrument_bus {bus} {
     sid_cmd "if {[info exists hook_read]} { unset hook_read }"
     foreach endian {l b} {
 	foreach width {1 2 4 8} {
-	    sid_cmd "set hook_read(h4,${endian}${width},$bus) { set thru 1 ; return {ok 0}}"
-	    sid_cmd "set hook_written(h4,${endian}${width},$bus) { set thru 1 ; return ok}"
+	    sid_cmd "set hook_read(h4,${endian}${width},$bus) { set thru 1 ; return {{ok 0} 0} }"
+	    sid_cmd "set hook_written(h4,${endian}${width},$bus) { set thru 1 ; return {ok 0} }"
 	}
     }
 }

@@ -128,7 +128,7 @@ proc write_sector { size } {
 	} else {
 	    set result [sid_cmd "sid::bus::write_h4_b2 $commandbus 0x00 $value"]
 	}
-	if {$result != "ok"} then { 
+	if ![sid_bus_ok_p $result] then {
 	    fail "$test - write sector - write status $result" 
 	    return "gack"
 	}
@@ -141,17 +141,17 @@ proc prepare_sector_transfer { drive cylinder head sector lba } {
     global commandbus
     verbose -log "transfer drive=$drive cylinder=$cylinder head=$head sector=$sector lba=$lba"
     # one sector
-    set oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x02 0x01"]
+    set oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x02 0x01"] 0]
     # sector number
-    lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x03 $sector"]
+    lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x03 $sector"] 0]
     # cylinder low/high
     set cyllow [expr {$cylinder & 0xff}]
     set cylhigh [expr {($cylinder >> 8) & 0xff}]
-    lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x04 $cyllow"]
-    lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x05 $cylhigh"]
+    lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x04 $cyllow"] 0]
+    lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x05 $cylhigh"] 0]
     # drive/head
     set drivhead [expr {($drive ? 0x10 : 0x00) | ($head & 0xf) | ($lba ? 0x40 : 0x00)}]
-    lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x06 $drivhead"]
+    lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x06 $drivhead"] 0]
     if {$oks == "ok ok ok ok ok"} then { return "ok" } else { return "nope" }
 }
 
@@ -189,8 +189,8 @@ if {$oks == "ok ok ok ok ok"} then { pass $test } else { fail $test }
 
 set test "read identification for drive 0"
 set oks [wait_drdy]
-lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x06 0x00"]
-lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0xEC"]
+lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x06 0x00"] 0]
+lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0xEC"] 0]
 lappend oks [wait_drq]
 lappend oks [read_sector 1]
 verbose -log "serial: [sector_substring 20 20]"
@@ -205,8 +205,8 @@ if {$oks == "ok ok ok ok ok"
 
 set test "read identification for nonexistent drive 1"
 set oks [wait_drdy]
-lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x06 0x10"]
-lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0xEC"]
+lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x06 0x10"] 0]
+lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0xEC"] 0]
 lappend oks [wait_error]
 if {$oks == "ok ok ok ok" } then { pass $test } else { fail $test }
 
@@ -216,7 +216,7 @@ set test "write first sector of drive 0"
 set_sector "<-- Super duper rubber dingy oh sector data 0123456789ABCDEF -->"
 set oks [wait_drdy]
 lappend oks [prepare_sector_transfer 0 0 0 0 0]
-lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x30"]
+lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x30"] 0]
 lappend oks [wait_drq]
 lappend oks [write_sector 1]
 lappend oks [wait_noerror]
@@ -228,7 +228,7 @@ set test "write second sector of drive 0 using shorts"
 set_sector "<- oh one two three four five six seven eight nine ten eleven ->"
 set oks [wait_drdy]
 lappend oks [prepare_sector_transfer 0 0 0 1 0]
-lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x30"]
+lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x30"] 0]
 lappend oks [wait_drq]
 lappend oks [write_sector 2b]
 lappend oks [wait_noerror]
@@ -250,22 +250,22 @@ if {$oks == "ok ok ok ok ok"} then { pass $test } else { fail $test }
 set test "copy CHS sectors 0,1 on drive 0 TO LBA sectors 1,0 on drive 1"
 set oks [wait_drdy]
 lappend oks [prepare_sector_transfer 0 0 0 0 0]
-lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x20"]
+lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x20"] 0]
 lappend oks [wait_drq]
 lappend oks [read_sector 2l]
 lappend oks [wait_noerror]
 lappend oks [prepare_sector_transfer 1 0 0 1 1]
-lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x30"]
+lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x30"] 0]
 lappend oks [wait_drq]
 lappend oks [write_sector 2b]
 lappend oks [wait_noerror]
 lappend oks [prepare_sector_transfer 0 0 0 1 0]
-lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x20"]
+lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x20"] 0]
 lappend oks [wait_drq]
 lappend oks [read_sector 1]
 lappend oks [wait_noerror]
 lappend oks [prepare_sector_transfer 1 0 0 0 1]
-lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x30"]
+lappend oks [lindex [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x30"] 0]
 lappend oks [wait_drq]
 lappend oks [write_sector 1]
 lappend oks [wait_noerror]

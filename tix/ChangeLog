@@ -1,7 +1,9 @@
-2001-09-12  Keith Seitz  <keiths@redhat.com>
+2001-09-12  Ian Roxborough  <irox@redhat.com>
 
-	* win/configure: Regenerated. Appears to have some stray
-	conflict markers in it.
+	* win/Makefile.in: Remove hardcoded
+	version postfix from directory paths.
+	* configure: Regenerated.
+	* win/configure: Regenerated.
 
 2001-09-09  Ian Roxborough  <irox@redhat.com>
 

@@ -250,6 +250,10 @@ parse_speed (char *str)
 static void
 usage (char *progname)
 {
+  /* Remove any leading slashes from the executable name.  */
+  if (strrchr (progname, '/'))
+    progname = strrchr (progname, '/') + 1;
+
   fprintf (stderr,
     "Usage: %s [-v] tcp-port-num executable-file [arguments ...]\n"
     "   or: %s -a [-v] tcp-port-num process-id\n"

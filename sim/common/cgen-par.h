@@ -23,17 +23,27 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 /* Kinds of writes stored on the write queue.  */
 enum cgen_write_queue_kind {
-  CGEN_QI_WRITE, CGEN_SI_WRITE, CGEN_SF_WRITE,
+  CGEN_BI_WRITE, CGEN_QI_WRITE, CGEN_SI_WRITE, CGEN_SF_WRITE,
   CGEN_PC_WRITE,
-  CGEN_FN_SI_WRITE, CGEN_FN_DI_WRITE, CGEN_FN_DF_WRITE,
-  CGEN_MEM_QI_WRITE, CGEN_MEM_HI_WRITE, CGEN_MEM_SI_WRITE,
+  CGEN_FN_HI_WRITE, CGEN_FN_SI_WRITE, CGEN_FN_SF_WRITE,
+  CGEN_FN_DI_WRITE, CGEN_FN_DF_WRITE,
+  CGEN_FN_XI_WRITE, CGEN_FN_PC_WRITE,
+  CGEN_MEM_QI_WRITE, CGEN_MEM_HI_WRITE, CGEN_MEM_SI_WRITE, CGEN_MEM_DI_WRITE,
+  CGEN_MEM_DF_WRITE, CGEN_MEM_XI_WRITE,
+  CGEN_FN_MEM_QI_WRITE, CGEN_FN_MEM_HI_WRITE, CGEN_FN_MEM_SI_WRITE,
+  CGEN_FN_MEM_DI_WRITE, CGEN_FN_MEM_DF_WRITE, CGEN_FN_MEM_XI_WRITE,
   CGEN_NUM_WRITE_KINDS
 };
 
 /* Element of the write queue.  */
 typedef struct {
   enum cgen_write_queue_kind kind; /* Used to select union member below.  */
+  IADDR insn_address;       /* Address of the insn performing the write.  */
   union {
+    struct {
+      BI  *target;
+      BI   value;
+    } bi_write;
     struct {
       UQI *target;
       QI   value;
@@ -51,9 +61,19 @@ typedef struct {
     } pc_write;
     struct {
       UINT regno;
+      UHI   value;
+      void (*function)(SIM_CPU *, UINT, UHI);
+    } fn_hi_write;
+    struct {
+      UINT regno;
       SI   value;
       void (*function)(SIM_CPU *, UINT, USI);
     } fn_si_write;
+    struct {
+      UINT regno;
+      SF   value;
+      void (*function)(SIM_CPU *, UINT, SF);
+    } fn_sf_write;
     struct {
       UINT regno;
       DI   value;
@@ -61,9 +81,18 @@ typedef struct {
     } fn_di_write;
     struct {
       UINT regno;
-      DI   value;
-      void (*function)(SIM_CPU *, UINT, DI);
+      DF   value;
+      void (*function)(SIM_CPU *, UINT, DF);
     } fn_df_write;
+    struct {
+      UINT regno;
+      SI   value[4];
+      void (*function)(SIM_CPU *, UINT, SI *);
+    } fn_xi_write;
+    struct {
+      USI  value;
+      void (*function)(SIM_CPU *, USI);
+    } fn_pc_write;
     struct {
       SI   address;
       QI   value;
@@ -76,10 +105,53 @@ typedef struct {
       SI   address;
       SI   value;
     } mem_si_write;
+    struct {
+      SI   address;
+      DI   value;
+    } mem_di_write;
+    struct {
+      SI   address;
+      DF   value;
+    } mem_df_write;
+    struct {
+      SI   address;
+      SI   value[4];
+    } mem_xi_write;
+    struct {
+      SI   address;
+      QI   value;
+      void (*function)(SIM_CPU *, IADDR, SI, QI);
+    } fn_mem_qi_write;
+    struct {
+      SI   address;
+      HI   value;
+      void (*function)(SIM_CPU *, IADDR, SI, HI);
+    } fn_mem_hi_write;
+    struct {
+      SI   address;
+      SI   value;
+      void (*function)(SIM_CPU *, IADDR, SI, SI);
+    } fn_mem_si_write;
+    struct {
+      SI   address;
+      DI   value;
+      void (*function)(SIM_CPU *, IADDR, SI, DI);
+    } fn_mem_di_write;
+    struct {
+      SI   address;
+      DF   value;
+      void (*function)(SIM_CPU *, IADDR, SI, DF);
+    } fn_mem_df_write;
+    struct {
+      SI   address;
+      SI   value[4];
+      void (*function)(SIM_CPU *, IADDR, SI, SI *);
+    } fn_mem_xi_write;
   } kinds;
 } CGEN_WRITE_QUEUE_ELEMENT;
 
 #define CGEN_WRITE_QUEUE_ELEMENT_KIND(element) ((element)->kind)
+#define CGEN_WRITE_QUEUE_ELEMENT_IADDR(element) ((element)->insn_address)
 
 extern void cgen_write_queue_element_execute (
   SIM_CPU *, CGEN_WRITE_QUEUE_ELEMENT *
@@ -87,7 +159,7 @@ extern void cgen_write_queue_element_execute (
 
 /* Instance of the queue for parallel write-after support.  */
 /* FIXME: Should be dynamic?  */
-#define CGEN_WRITE_QUEUE_SIZE (4 * 4) /* 4 writes x 4 insns -- for now.  */
+#define CGEN_WRITE_QUEUE_SIZE (64 * 4) /* 64 writes x 4 insns -- for now.  */
 
 typedef struct {
   int index;
@@ -107,18 +179,33 @@ typedef struct {
 extern CGEN_WRITE_QUEUE_ELEMENT *cgen_write_queue_overflow (CGEN_WRITE_QUEUE *);
 
 /* Functions for queuing writes.  Used by semantic code.  */
+extern void sim_queue_bi_write (SIM_CPU *, BI *, BI);
 extern void sim_queue_qi_write (SIM_CPU *, UQI *, UQI);
 extern void sim_queue_si_write (SIM_CPU *, SI *, SI);
 extern void sim_queue_sf_write (SIM_CPU *, SI *, SF);
 
 extern void sim_queue_pc_write (SIM_CPU *, USI);
 
-extern void sim_queue_fn_si_write (SIM_CPU *, void (*)(SIM_CPU *, UINT, USI), UINT, SI);
+extern void sim_queue_fn_hi_write (SIM_CPU *, void (*)(SIM_CPU *, UINT, UHI), UINT, UHI);
+extern void sim_queue_fn_si_write (SIM_CPU *, void (*)(SIM_CPU *, UINT, USI), UINT, USI);
+extern void sim_queue_fn_sf_write (SIM_CPU *, void (*)(SIM_CPU *, UINT, SF), UINT, SF);
 extern void sim_queue_fn_di_write (SIM_CPU *, void (*)(SIM_CPU *, UINT, DI), UINT, DI);
-extern void sim_queue_fn_df_write (SIM_CPU *, void (*)(SIM_CPU *, UINT, DI), UINT, DF);
+extern void sim_queue_fn_df_write (SIM_CPU *, void (*)(SIM_CPU *, UINT, DF), UINT, DF);
+extern void sim_queue_fn_xi_write (SIM_CPU *, void (*)(SIM_CPU *, UINT, SI *), UINT, SI *);
+extern void sim_queue_fn_pc_write (SIM_CPU *, void (*)(SIM_CPU *, USI), USI);
 
 extern void sim_queue_mem_qi_write (SIM_CPU *, SI, QI);
 extern void sim_queue_mem_hi_write (SIM_CPU *, SI, HI);
 extern void sim_queue_mem_si_write (SIM_CPU *, SI, SI);
+extern void sim_queue_mem_di_write (SIM_CPU *, SI, DI);
+extern void sim_queue_mem_df_write (SIM_CPU *, SI, DF);
+extern void sim_queue_mem_xi_write (SIM_CPU *, SI, SI *);
+
+extern void sim_queue_fn_mem_qi_write (SIM_CPU *, void (*)(SIM_CPU *, IADDR, SI, QI), SI, QI);
+extern void sim_queue_fn_mem_hi_write (SIM_CPU *, void (*)(SIM_CPU *, IADDR, SI, HI), SI, HI);
+extern void sim_queue_fn_mem_si_write (SIM_CPU *, void (*)(SIM_CPU *, IADDR, SI, SI), SI, SI);
+extern void sim_queue_fn_mem_di_write (SIM_CPU *, void (*)(SIM_CPU *, IADDR, SI, DI), SI, DI);
+extern void sim_queue_fn_mem_df_write (SIM_CPU *, void (*)(SIM_CPU *, IADDR, SI, DF), SI, DF);
+extern void sim_queue_fn_mem_xi_write (SIM_CPU *, void (*)(SIM_CPU *, IADDR, SI, SI *), SI, SI *);
 
 #endif /* CGEN_PAR_H */

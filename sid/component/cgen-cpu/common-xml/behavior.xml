@@ -1,0 +1,95 @@
+
+<!-- this is the set of "standard CPU behaviors", to be included in a hw-cpu-*.xml file -->
+
+
+    <behavior name="initialization">
+
+      <p>The CPU performs a power-on-reset style of operation when the
+      <pin>reset!</pin>  pin is driven.</p>  
+
+      <p>Other mode settings may be controlled by pins and/or
+      attributes: <pin>endian-set!</pin>/<attribute>endian</attribute>
+      to set endianness, <pin>start-pc-set!</pin> to set the PC.
+      These are useful if the standard powerup state of the CPU needs
+      to be changed for running a program that expects an initialized
+      environment.</p>
+    </behavior>
+
+    <behavior name="execution">
+
+      <p>The component executes zero or more instructions when the
+      <pin>step!</pin> pin is driven.  You can specify the maximum
+      number of instructions to be executed via the
+      <attribute>step-insn-count</attribute> attribute.  If the
+      <pin>yield</pin> pin is driven in a reentrant fashion while the
+      instruction loop is active, the loop will be exited at the next
+      opportunity.  At the end of the loop, the <pin>step-cycles</pin>
+      output pin is driven with the number of instructions actually
+      executed, though this value is clamped to be at least 1.  The
+      <attribute>insn-count</attribute> attribute accumulates the
+      total number of instructions executed since reset.</p>
+
+      <p>Each instruction is first fetched from memory via the
+      <accessor>insn-memory</accessor> accessor, and its decoding
+      traced if the <attribute>trace-extract?</attribute> attribute is
+      set to a true value.  The decoded form may be cached
+      indefinitely afterwards, although this cache is flushed when the
+      <pin>flush-icache</pin> pin is driven.</p>
+
+      <p>The <attribute>engine-type</attribute> attribute specifies
+      whether the "scache" ("semantic cache") or "pbb" ("pseudo basic
+      block") dispatching mechanism is used during execution.  The
+      "scache" mode executes each instruction in isolation and checks
+      all triggerpoints after each.  If the
+      <attribute>enable-step-trap?</attribute> attribute is set, after
+      each instruction, a single-stepping trap is signalled as
+      described in the <tt>exceptions/traps</tt> behavior below.</p>
+
+      <p>The "pbb" mode executes a series of sequential instructions
+      in one uninterruptible sequence, and is thus faster.  However,
+      it cannot handle triggerpoints or single-stepping, nor can it
+      respond to icache flushing as quickly.  The "pbb" mode is
+      temporarily and transparently downgraded to the "scache" mode
+      when needed.</p>
+
+      <p>During the execution of an instruction, this component may
+      make accesses using the <accessor>data-memory</accessor>
+      accessor, may update its simulated registers, and may trigger an
+      exception/trap.</p>
+    </behavior>
+
+    <behavior name="exceptions/traps">
+
+      <p>When encountering exception/trap conditions such as memory
+      access errors or software interrupts, this component signals the
+      event using the <pin>trap</pin> pin.  (For some traps, the
+      <pin>trap-code</pin> pin is driven with extra information just
+      beforehand.)  An external component may interpret the values in
+      the table below, and declare a disposition for the condition.
+      In the absence of input, the condition will be treated as the
+      hardware would, that is by dispatching to exception vectors,
+      switching processor modes, etc.</p>
+
+      <p>The trap codes sent on the <pin>trap</pin> output pin are:</p>
+
+      <table>
+	<tr>      <td><pin>trap</pin></td>    <td>cause</td>                   <td><pin>trap-code</pin></td></tr>
+	<tr>      <td>1</td>         <td>software trap</td>           <td>instruction bitmap</td></tr>
+	<tr>      <td>2</td>         <td>breakpoint</td>              <td>bkpt number</td></tr>
+	<tr>      <td>3</td>         <td>system call</td>             <td>syscall number</td></tr>
+	<tr>      <td>4</td>         <td>invalid instruction</td>     <td>n/a</td></tr>
+	<tr>      <td>5</td>         <td>memory fault</td>            <td>faulting address</td></tr>
+	<tr>      <td>6</td>         <td>arithmetic overflow</td>     <td>faulting address</td></tr>
+	<tr>      <td>7</td>         <td>stepped</td>                 <td>n/a</td></tr>
+      </table>
+      
+      <p>The disposition codes returned on the <pin>trap</pin> input pin are:</p>
+      <table>
+	<tr>      <th><pin>trap</pin></th>    <th>effect</th></tr>
+	<tr>      <td>0 or n/a</td>  <td>dispatch as hardware would</td></tr>
+	<tr>      <td>1</td>         <td>handled; continue</td></tr>
+	<tr>      <td>2</td>         <td>reissue</td></tr>
+	<tr>      <td>3</td>         <td>handled; skip instruction and continue</td></tr>
+      </table>      </behavior>
+
+

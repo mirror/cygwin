@@ -1,3 +1,13 @@
+2002-07-30  Keith Seitz  <keiths@redhat.com>
+
+	From Mo DeJong  <supermo@bayarea.net>
+	* cygwin/configure: Regenerated.
+	* cygwin/configure.in: Emit a tclConfig.sh file
+	so that expect can load it at configure time.
+	* win/configure: Regenerated.
+	* win/configure.in: Don't emit a ../unix/tclConfig.sh
+	file, this was a hack to get expect to build.
+
 2002-04-09  Keith Seitz  <keiths@redhat.com>
 
 	* test/iOUtil.test: Removed. Conflicted with real ioUtil.test

@@ -88,4 +88,19 @@ cross_cache=${srcdir}/cygwin-cache
 AC_SUBST(TCL_PACKAGE_PATH)
 AC_SUBST(TCL_LIBRARY)
 
-AC_OUTPUT([Makefile])
+# These variables are needed to get expect working with
+# the tclConfig.sh script in the cygwin directory.
+LD_FLAGS=""
+AC_SUBST(LD_FLAGS)
+TCL_LD_SEARCH_FLAGS=""
+AC_SUBST(TCL_LD_SEARCH_FLAGS)
+DL_LIBS=""
+AC_SUBST(DL_LIBS)
+MATH_LIBS=""
+AC_SUBST(MATH_LIBS)
+SHLIB_LD='${CC} -shared ${CFLAGS}'
+AC_SUBST(SHLIB_LD)
+
+
+AC_OUTPUT([Makefile tclConfig.sh])
+

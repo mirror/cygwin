@@ -251,13 +251,13 @@
 
 (define (insn-handlers insn)
   (string-append
-   (number->string (lookup-index 'insn-normal opc-parse-handlers 0))
+   (number->string (assq-lookup-index 'insn-normal opc-parse-handlers 0))
    ", "
-   (number->string (lookup-index 'insn-normal opc-insert-handlers 0))
+   (number->string (assq-lookup-index 'insn-normal opc-insert-handlers 0))
    ", "
-   (number->string (lookup-index 'insn-normal opc-extract-handlers 0))
+   (number->string (assq-lookup-index 'insn-normal opc-extract-handlers 0))
    ", "
-   (number->string (lookup-index 'insn-normal opc-print-handlers 0))
+   (number->string (assq-lookup-index 'insn-normal opc-print-handlers 0))
    )
 )
 

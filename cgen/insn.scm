@@ -40,7 +40,6 @@
 		sfmt
 
 		; Temp slot for use by applications.
-		; ??? Will go away in time.
 		tmp
 
 		; Instruction semantics.
@@ -94,7 +93,7 @@
 )
 
 (define-setters <insn> insn
-  (fmt-desc ifmt sfmt ifield-assertion compiled-semantics)
+  (fmt-desc ifmt sfmt tmp ifield-assertion compiled-semantics)
 )
 
 ; Return a boolean indicating if X is an <insn>.
@@ -961,7 +960,9 @@ Define an instruction, all arguments specified.
   ; them together.
   ; FIXME: This is a case where we need one attribute with several values.
   ; Presently each RELAX_FOO will use up a bit.
-  (define-attr '(for insn) '(type boolean) '(name RELAXABLE) '(comment "insn is relaxable"))
+  ; NOTE: Defined in operand.scm because we can't define it twice.
+  ;(define-attr '(for insn) '(type boolean) '(name RELAXABLE)
+  ;  '(comment "insn is relaxable"))
 
   ; RELAX: Large relaxable variant.  Avoided by assembler in first pass.
   ; FIXME: Rename this to RELAXED.

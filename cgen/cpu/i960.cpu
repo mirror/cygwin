@@ -280,6 +280,24 @@
 
 ; Instruction definitions.
 
+; IDOC attribute for instruction documentation.
+
+(define-attr
+  (for insn)
+  (type enum)
+  (name IDOC)
+  (comment "insn kind for documentation")
+  (attrs META)
+  (values
+   (MEM - () "Memory")
+   (ALU - () "ALU")
+   (FPU - () "FPU")
+   (BR - () "Branch")
+   (PRIV - () "Priviledged")
+   (MISC - () "Miscellaneous")
+  )
+)
+
 ; ??? Maybe I should just reverse the operands in the alu-op macro.
 
 (define-pmacro (divo-expr expr1 expr2) (udiv expr2 expr1))

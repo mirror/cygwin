@@ -22,6 +22,7 @@
 ; Attributes.
 
 ; An attribute to describe which pipeline an insn runs in.
+
 (define-attr
   (for insn)
   (type enum)
@@ -29,9 +30,11 @@
   (comment "parallel execution pipeline selection")
   (values NONE O S OS)
 )
+
 ; A derived attribute that says which insns can be executed in parallel
 ; with others.  This is a required attribute for architectures with
 ; parallel execution.
+
 (define-attr
   (for insn)
   (type enum)
@@ -623,7 +626,7 @@
 (define-operand
   (name disp8)
   (comment "8 bit displacement")
-  (attrs RELAX)
+  (attrs RELAXABLE)
   (type h-iaddr)
   (index f-disp8)
   ; ??? Early experiments had insert/extract fields here.
@@ -631,8 +634,8 @@
   ; fields here to handle more complicated cases.
 )
 
-(dnop disp16 "16 bit displacement" ()      h-iaddr f-disp16)
-(dnop disp24 "24 bit displacement" (RELAX) h-iaddr f-disp24)
+(dnop disp16 "16 bit displacement" () h-iaddr f-disp16)
+(dnop disp24 "24 bit displacement" (RELAXABLE) h-iaddr f-disp24)
 
 ; These hardware elements are refered to frequently.
 
@@ -673,11 +676,29 @@
   (comment "non-public m32rx insn")
 )
 
+; IDOC attribute for instruction documentation.
+
+(define-attr
+  (for insn)
+  (type enum)
+  (name IDOC)
+  (comment "insn kind for documentation")
+  (attrs META)
+  (values
+   (MEM - () "Memory")
+   (ALU - () "ALU")
+   (BR - () "Branch")
+   (ACCUM - () "Accumulator")
+   (MAC - () "Multiply/Accumulate")
+   (MISC - () "Miscellaneous")
+  )
+)
+
 (define-pmacro (bin-op mnemonic op2-op sem-op imm-prefix imm)
   (begin
      (dni mnemonic
 	  (.str mnemonic " reg/reg")
-	  ((PIPE OS))
+	  ((PIPE OS) (IDOC ALU))
 	  (.str mnemonic " $dr,$sr")
 	  (+ OP1_0 op2-op dr sr)
 	  (set dr (sem-op dr sr))
@@ -685,7 +706,7 @@
      )
      (dni (.sym mnemonic "3")
 	  (.str mnemonic " reg/" imm)
-	  ()
+	  ((IDOC ALU))
 	  (.str mnemonic "3 $dr,$sr," imm-prefix "$" imm)
 	  (+ OP1_8 op2-op dr sr imm)
 	  (set dr (sem-op sr imm))
@@ -700,7 +721,7 @@
 (bin-op xor OP2_13 xor "" uimm16)
 
 (dni addi "addi"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC ALU))
      ; #.: experiment
      #.(string-append "addi " "$dr,$simm8")
      (+ OP1_4 dr simm8)
@@ -710,7 +731,7 @@
 )
 
 (dni addv "addv"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC ALU))
      "addv $dr,$sr"
      (+ OP1_0 OP2_8 dr sr)
      (parallel ()
@@ -720,7 +741,7 @@
 )
 
 (dni addv3 "addv3"
-     ()
+     ((IDOC ALU))
      "addv3 $dr,$sr,$simm16"
      (+ OP1_8 OP2_8 dr sr simm16)
      (parallel ()
@@ -730,7 +751,7 @@
 )
 
 (dni addx "addx"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC ALU))
      "addx $dr,$sr"
      (+ OP1_0 OP2_9 dr sr)
      (parallel ()
@@ -740,7 +761,7 @@
 )
 
 (dni bc8 "bc with 8 bit displacement"
-     (COND-CTI (PIPE O))
+     (COND-CTI (PIPE O) (IDOC BR))
      "bc.s $disp8"
      (+ OP1_7 (f-r1 12) disp8)
      (if condbit (set pc disp8))
@@ -749,13 +770,13 @@
 )
 
 (dnmi bc8r "relaxable bc8"
-     (COND-CTI RELAXABLE (PIPE O))
+     (COND-CTI RELAXABLE (PIPE O) (IDOC BR))
      "bc $disp8"
      (emit bc8 disp8)
 )
 
 (dni bc24 "bc with 24 bit displacement"
-     (COND-CTI)
+     (COND-CTI (IDOC BR))
      "bc.l $disp24"
      (+ OP1_15 (f-r1 12) disp24)
      (if condbit (set pc disp24))
@@ -764,13 +785,13 @@
 )
 
 (dnmi bc24r "relaxable bc24"
-     (COND-CTI RELAX)
+     (COND-CTI RELAX (IDOC BR))
      "bc $disp24"
      (emit bc24 disp24)
 )
 
 (dni beq "beq"
-     (COND-CTI)
+     (COND-CTI (IDOC BR))
      "beq $src1,$src2,$disp16"
      (+ OP1_11 OP2_0 src1 src2 disp16)
      (if (eq src1 src2) (set pc disp16))
@@ -779,7 +800,7 @@
 )
 
 (define-pmacro (cbranch sym comment op2-op comp-op)
-  (dni sym comment (COND-CTI)
+  (dni sym comment (COND-CTI (IDOC BR))
 	(.str sym " $src2,$disp16")
 	(+ OP1_11 op2-op (f-r1 0) src2 disp16)
 	(if (comp-op src2 (const WI 0)) (set pc disp16))
@@ -795,7 +816,7 @@
 (cbranch bnez "bnez" OP2_9 ne)
 
 (dni bl8 "bl with 8 bit displacement"
-     (UNCOND-CTI FILL-SLOT (PIPE O))
+     (UNCOND-CTI FILL-SLOT (PIPE O) (IDOC BR))
      "bl.s $disp8"
      (+ OP1_7 (f-r1 14) disp8)
      (sequence ()
@@ -807,13 +828,13 @@
 )
 
 (dnmi bl8r "relaxable bl8"
-     (UNCOND-CTI FILL-SLOT RELAXABLE (PIPE O))
+     (UNCOND-CTI FILL-SLOT RELAXABLE (PIPE O) (IDOC BR))
      "bl $disp8"
      (emit bl8 disp8)
 )
 
 (dni bl24 "bl with 24 bit displacement"
-     (UNCOND-CTI)
+     (UNCOND-CTI (IDOC BR))
      "bl.l $disp24"
      (+ OP1_15 (f-r1 14) disp24)
      (sequence ()
@@ -824,13 +845,13 @@
 )
 
 (dnmi bl24r "relaxable bl24"
-     (UNCOND-CTI RELAX)
+     (UNCOND-CTI RELAX (IDOC BR))
      "bl $disp24"
      (emit bl24 disp24)
 )
 
 (dni bcl8 "bcl with 8 bit displacement"
-     (COND-CTI FILL-SLOT (MACH m32rx) (PIPE O))
+     (COND-CTI FILL-SLOT (MACH m32rx) (PIPE O) (IDOC BR))
      "bcl.s $disp8"
      (+ OP1_7 (f-r1 8) disp8)
      (if condbit
@@ -843,13 +864,13 @@
 )
 
 (dnmi bcl8r "relaxable bcl8"
-     (COND-CTI FILL-SLOT (MACH m32rx) (PIPE O) RELAXABLE)
+     (COND-CTI FILL-SLOT (MACH m32rx) (PIPE O) RELAXABLE (IDOC BR))
      "bcl $disp8"
      (emit bcl8 disp8)
 )
 
 (dni bcl24 "bcl with 24 bit displacement"
-     (COND-CTI (MACH m32rx))
+     (COND-CTI (MACH m32rx) (IDOC BR))
      "bcl.l $disp24"
      (+ OP1_15 (f-r1 8) disp24)
      (if condbit
@@ -860,13 +881,13 @@
 )
 
 (dnmi bcl24r "relaxable bcl24"
-     (COND-CTI (MACH m32rx) RELAX)
+     (COND-CTI (MACH m32rx) RELAX (IDOC BR))
      "bcl $disp24"
      (emit bcl24 disp24)
 )
 
 (dni bnc8 "bnc with 8 bit displacement"
-     (COND-CTI (PIPE O))
+     (COND-CTI (PIPE O) (IDOC BR))
      "bnc.s $disp8"
      (+ OP1_7 (f-r1 13) disp8)
      (if (not condbit) (set pc disp8))
@@ -875,13 +896,13 @@
 )
 
 (dnmi bnc8r "relaxable bnc8"
-     (COND-CTI RELAXABLE (PIPE O))
+     (COND-CTI RELAXABLE (PIPE O) (IDOC BR))
      "bnc $disp8"
      (emit bnc8 disp8)
 )
 
 (dni bnc24 "bnc with 24 bit displacement"
-     (COND-CTI)
+     (COND-CTI (IDOC BR))
      "bnc.l $disp24"
      (+ OP1_15 (f-r1 13) disp24)
      (if (not condbit) (set pc disp24))
@@ -890,13 +911,13 @@
 )
 
 (dnmi bnc24r "relaxable bnc24"
-     (COND-CTI RELAX)
+     (COND-CTI RELAX (IDOC BR))
      "bnc $disp24"
      (emit bnc24 disp24)
 )
 
 (dni bne "bne"
-     (COND-CTI)
+     (COND-CTI (IDOC BR))
      "bne $src1,$src2,$disp16"
      (+ OP1_11 OP2_1 src1 src2 disp16)
      (if (ne src1 src2) (set pc disp16))
@@ -905,7 +926,7 @@
 )
 
 (dni bra8 "bra with 8 bit displacement"
-     (UNCOND-CTI FILL-SLOT (PIPE O))
+     (UNCOND-CTI FILL-SLOT (PIPE O) (IDOC BR))
      "bra.s $disp8"
      (+ OP1_7 (f-r1 15) disp8)
      (set pc disp8)
@@ -914,13 +935,13 @@
 )
 
 (dnmi bra8r "relaxable bra8"
-     (UNCOND-CTI FILL-SLOT RELAXABLE (PIPE O))
+     (UNCOND-CTI FILL-SLOT RELAXABLE (PIPE O) (IDOC BR))
      "bra $disp8"
      (emit bra8 disp8)
 )
 
 (dni bra24 "bra with 24 displacement"
-     (UNCOND-CTI)
+     (UNCOND-CTI (IDOC BR))
      "bra.l $disp24"
      (+ OP1_15 (f-r1 15) disp24)
      (set pc disp24)
@@ -929,13 +950,13 @@
 )
 
 (dnmi bra24r "relaxable bra24"
-     (UNCOND-CTI RELAX)
+     (UNCOND-CTI RELAX (IDOC BR))
      "bra $disp24"
      (emit bra24 disp24)
 )
 
 (dni bncl8 "bncl with 8 bit displacement"
-     (COND-CTI FILL-SLOT (MACH m32rx) (PIPE O))
+     (COND-CTI FILL-SLOT (MACH m32rx) (PIPE O) (IDOC BR))
      "bncl.s $disp8"
      (+ OP1_7 (f-r1 9) disp8)
      (if (not condbit) 
@@ -948,13 +969,13 @@
 )
 
 (dnmi bncl8r "relaxable bncl8"
-     (COND-CTI FILL-SLOT (MACH m32rx) (PIPE O) RELAXABLE)
+     (COND-CTI FILL-SLOT (MACH m32rx) (PIPE O) RELAXABLE (IDOC BR))
      "bncl $disp8"
      (emit bncl8 disp8)
 )
 
 (dni bncl24 "bncl with 24 bit displacement"
-     (COND-CTI (MACH m32rx))
+     (COND-CTI (MACH m32rx) (IDOC BR))
      "bncl.l $disp24"
      (+ OP1_15 (f-r1 9) disp24)
      (if (not condbit)
@@ -965,13 +986,13 @@
 )
 
 (dnmi bncl24r "relaxable bncl24"
-     (COND-CTI (MACH m32rx) RELAX)
+     (COND-CTI (MACH m32rx) RELAX (IDOC BR))
      "bncl $disp24"
      (emit bncl24 disp24)
 )
 
 (dni cmp "cmp"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC ALU))
      "cmp $src1,$src2"
      (+ OP1_0 OP2_4 src1 src2)
      (set condbit (lt src1 src2))
@@ -980,7 +1001,7 @@
 )
 
 (dni cmpi "cmpi"
-     ()
+     ((IDOC ALU))
      "cmpi $src2,$simm16"
      (+ OP1_8 (f-r1 0) OP2_4 src2 simm16)
      (set condbit (lt src2 simm16))
@@ -989,7 +1010,7 @@
 )
 
 (dni cmpu "cmpu"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC ALU))
      "cmpu $src1,$src2"
      (+ OP1_0 OP2_5 src1 src2)
      (set condbit (ltu src1 src2))
@@ -998,7 +1019,7 @@
 )
 
 (dni cmpui "cmpui"
-     ()
+     ((IDOC ALU))
      "cmpui $src2,$simm16"
      (+ OP1_8 (f-r1 0) OP2_5 src2 simm16)
      (set condbit (ltu src2 simm16))
@@ -1007,7 +1028,7 @@
 )
 
 (dni cmpeq "cmpeq"
-     ((MACH m32rx) (PIPE OS))
+     ((MACH m32rx) (PIPE OS) (IDOC ALU))
      "cmpeq $src1,$src2"
      (+ OP1_0 OP2_6 src1 src2)
      (set condbit (eq src1 src2))
@@ -1015,7 +1036,7 @@
 )
 
 (dni cmpz "cmpz"
-     ((MACH m32rx) (PIPE OS))
+     ((MACH m32rx) (PIPE OS) (IDOC ALU))
      "cmpz $src2"
      (+ OP1_0 OP2_7 (f-r1 0) src2)
      (set condbit (eq src2 (const 0)))
@@ -1023,7 +1044,7 @@
 )
 
 (dni div "div"
-     ()
+     ((IDOC ALU))
      "div $dr,$sr"
      (+ OP1_9 OP2_0 dr sr (f-simm16 0))
      (if (ne sr (const 0)) (set dr (div dr sr)))
@@ -1032,7 +1053,7 @@
 )
 
 (dni divu "divu"
-     ()
+     ((IDOC ALU))
      "divu $dr,$sr"
      (+ OP1_9 OP2_1 dr sr (f-simm16 0))
      (if (ne sr (const 0)) (set dr (udiv dr sr)))
@@ -1041,7 +1062,7 @@
 )
 
 (dni rem "rem"
-     ()
+     ((IDOC ALU))
      "rem $dr,$sr"
      (+ OP1_9 OP2_2 dr sr (f-simm16 0))
      ; FIXME: Check rounding direction.
@@ -1051,7 +1072,7 @@
 )
 
 (dni remu "remu"
-     ()
+     ((IDOC ALU))
      "remu $dr,$sr"
      (+ OP1_9 OP2_3 dr sr (f-simm16 0))
      ; FIXME: Check rounding direction.
@@ -1061,7 +1082,7 @@
 )
 
 (dni divh "divh"
-     ((MACH m32rx))
+     ((MACH m32rx) (IDOC ALU))
      "divh $dr,$sr"
      (+ OP1_9 OP2_0 dr sr (f-simm16 #x10))
      (if (ne sr (const 0)) (set dr (div (ext WI (trunc HI dr)) sr)))
@@ -1069,7 +1090,7 @@
 )
 
 (dni jc "jc"
-     (COND-CTI (MACH m32rx) (PIPE O) SPECIAL)
+     (COND-CTI (MACH m32rx) (PIPE O) SPECIAL (IDOC BR))
      "jc $sr"
      (+ OP1_1 (f-r1 12) OP2_12 sr)
      (if condbit (set pc (and sr (const -4))))
@@ -1077,7 +1098,7 @@
 )
 
 (dni jnc "jnc"
-     (COND-CTI (MACH m32rx) (PIPE O) SPECIAL)
+     (COND-CTI (MACH m32rx) (PIPE O) SPECIAL (IDOC BR))
      "jnc $sr"
      (+ OP1_1 (f-r1 13) OP2_12 sr)
      (if (not condbit) (set pc (and sr (const -4))))
@@ -1085,7 +1106,7 @@
 )
 
 (dni jl "jl"
-     (UNCOND-CTI FILL-SLOT (PIPE O))
+     (UNCOND-CTI FILL-SLOT (PIPE O) (IDOC BR))
      "jl $sr"
      (+ OP1_1 (f-r1 14) OP2_12 sr)
      (parallel ()
@@ -1097,7 +1118,7 @@
 )
 
 (dni jmp "jmp"
-     (UNCOND-CTI (PIPE O))
+     (UNCOND-CTI (PIPE O) (IDOC BR))
      "jmp $sr"
      (+ OP1_1 (f-r1 15) OP2_12 sr)
      (set pc (and sr (const -4)))
@@ -1125,7 +1146,7 @@
 (define-pmacro (load-op suffix op2-op mode ext-op)
   (begin
     (dni (.sym ld suffix) (.str "ld" suffix)
-	 ((PIPE O))
+	 ((PIPE O) (IDOC MEM))
 	 (.str "ld" suffix " $dr,@$sr")
 	 (+ OP1_2 op2-op dr sr)
 	 (set dr (ext-op WI (mem mode sr)))
@@ -1133,11 +1154,11 @@
 	  (m32rx (unit u-load)))
 	 )
     (dnmi (.sym ld suffix "-2") (.str "ld" suffix "-2")
-	  (NO-DIS (PIPE O))
+	  (NO-DIS (PIPE O) (IDOC MEM))
 	  (.str "ld" suffix " $dr,@($sr)")
 	  (emit (.sym ld suffix) dr sr))
     (dni (.sym ld suffix -d) (.str "ld" suffix "-d")
-	 ()
+	 ((IDOC MEM))
 	 (.str "ld" suffix " $dr,@($slo16,$sr)")
 	 (+ OP1_10 op2-op dr sr slo16)
 	 (set dr (ext-op WI (mem mode (add sr slo16))))
@@ -1145,7 +1166,7 @@
 	  (m32rx (unit u-load (cycles 2))))
 	 )
     (dnmi (.sym ld suffix -d2) (.str "ld" suffix "-d2")
-	  (NO-DIS)
+	  (NO-DIS (IDOC MEM))
 	  (.str "ld" suffix " $dr,@($sr,$slo16)")
 	  (emit (.sym ld suffix -d) dr sr slo16))
     )
@@ -1157,7 +1178,7 @@
 (load-op uh OP2_11 HI zext-expr)
 
 (dni ld-plus "ld+"
-     ((PIPE O))
+     ((PIPE O) (IDOC MEM))
      "ld $dr,@$sr+"
      (+ OP1_2 dr OP2_14 sr)
      (parallel ()
@@ -1182,13 +1203,13 @@
 )
 
 (dnmi pop "pop"
-      ()
+      ((IDOC MEM))
       "pop $dr"
       (emit ld-plus dr (sr 15)) ; "ld %0,@sp+"
 )
 
 (dni ld24 "ld24"
-     ()
+     ((IDOC MEM))
      "ld24 $dr,$uimm24"
      (+ OP1_14 dr uimm24)
      (set dr uimm24)
@@ -1198,7 +1219,7 @@
 ; ldi8 appears before ldi16 so we try the shorter version first
 
 (dni ldi8 "ldi8"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC ALU))
      "ldi8 $dr,$simm8"
      (+ OP1_6 dr simm8)
      (set dr simm8)
@@ -1206,13 +1227,13 @@
 )
 
 (dnmi ldi8a "ldi8 alias"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC ALU))
      "ldi $dr,$simm8"
      (emit ldi8 dr simm8)
 )
 
 (dni ldi16 "ldi16"
-     ()
+     ((IDOC ALU))
      "ldi16 $dr,$hash$slo16"
      (+ OP1_9 OP2_15 (f-r2 0) dr slo16)
      (set dr slo16)
@@ -1220,13 +1241,13 @@
 )
 
 (dnmi ldi16a "ldi16 alias"
-     ()
+     ((IDOC ALU))
      "ldi $dr,$hash$slo16"
      (emit ldi16 dr slo16)
 )
 
 (dni lock "lock"
-     ((PIPE O))
+     ((PIPE O) (IDOC MISC))
      "lock $dr,@$sr"
      (+ OP1_2 OP2_13 dr sr)
      (sequence ()
@@ -1240,7 +1261,7 @@
      (
       ; (MACH m32r) is a temporary hack.  This insn collides with machi-a
       ; in the simulator so disable it for m32rx.
-      (MACH m32r) (PIPE S)
+      (MACH m32r) (PIPE S) (IDOC MAC)
      )
      "machi $src1,$src2"
      (+ OP1_3 OP2_4 src1 src2)
@@ -1260,7 +1281,7 @@
 )
 
 (dni machi-a "machi-a"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC MAC))
      "machi $src1,$src2,$acc"
      (+ OP1_3 src1 acc (f-op23 4) src2)
      (set acc
@@ -1277,7 +1298,7 @@
 )
 
 (dni maclo "maclo"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC MAC))
      "maclo $src1,$src2"
      (+ OP1_3 OP2_5 src1 src2)
      (set accum
@@ -1294,7 +1315,7 @@
 )
 
 (dni maclo-a "maclo-a"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC MAC))
      "maclo $src1,$src2,$acc"
      (+ OP1_3 src1 acc (f-op23 5) src2)
      (set acc
@@ -1311,7 +1332,7 @@
 )
 
 (dni macwhi "macwhi"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC MAC))
      "macwhi $src1,$src2"
      (+ OP1_3 OP2_6 src1 src2)
      (set accum
@@ -1328,7 +1349,7 @@
 )
 
 (dni macwhi-a "macwhi-a"
-     ((MACH m32rx) (PIPE S) SPECIAL)
+     ((MACH m32rx) (PIPE S) SPECIAL (IDOC MAC))
      "macwhi $src1,$src2,$acc"
      (+ OP1_3 src1 acc (f-op23 6) src2)
      ; Note that this doesn't do the sign extension, which is correct.
@@ -1340,7 +1361,7 @@
 )
 
 (dni macwlo "macwlo"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC MAC))
      "macwlo $src1,$src2"
      (+ OP1_3 OP2_7 src1 src2)
      (set accum
@@ -1357,7 +1378,7 @@
 )
 
 (dni macwlo-a "macwlo-a"
-     ((MACH m32rx) (PIPE S) SPECIAL)
+     ((MACH m32rx) (PIPE S) SPECIAL (IDOC MAC))
      "macwlo $src1,$src2,$acc"
      (+ OP1_3 src1 acc (f-op23 7) src2)
      ; Note that this doesn't do the sign extension, which is correct.
@@ -1369,7 +1390,7 @@
 )
 
 (dni mul "mul"
-     ((PIPE S))
+     ((PIPE S) (IDOC ALU))
      "mul $dr,$sr"
      (+ OP1_1 OP2_6 dr sr)
      (set dr (mul dr sr))
@@ -1378,7 +1399,7 @@
 )
 
 (dni mulhi "mulhi"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC ACCUM))
      "mulhi $src1,$src2"
      (+ OP1_3 OP2_0 src1 src2)
      (set accum
@@ -1393,7 +1414,7 @@
 )
 
 (dni mulhi-a "mulhi-a"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC ACCUM))
      "mulhi $src1,$src2,$acc"
      (+ OP1_3 (f-op23 0) src1 acc src2)
      (set acc
@@ -1408,7 +1429,7 @@
 )
 
 (dni mullo "mullo"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC ACCUM))
      "mullo $src1,$src2"
      (+ OP1_3 OP2_1 src1 src2)
      (set accum
@@ -1423,7 +1444,7 @@
 )
 
 (dni mullo-a "mullo-a"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC ACCUM))
      "mullo $src1,$src2,$acc"
      (+ OP1_3 src1 acc (f-op23 1) src2)
      (set acc
@@ -1438,7 +1459,7 @@
 )
 
 (dni mulwhi "mulwhi"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC ACCUM))
      "mulwhi $src1,$src2"
      (+ OP1_3 OP2_2 src1 src2)
      (set accum
@@ -1453,7 +1474,7 @@
 )
 
 (dni mulwhi-a "mulwhi-a"
-     ((MACH m32rx) (PIPE S) SPECIAL)
+     ((MACH m32rx) (PIPE S) SPECIAL (IDOC ACCUM))
      "mulwhi $src1,$src2,$acc"
      (+ OP1_3 src1 acc (f-op23 2) src2)
      ; Note that this doesn't do the sign extension, which is correct.
@@ -1464,7 +1485,7 @@
 )
 
 (dni mulwlo "mulwlo"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC ACCUM))
      "mulwlo $src1,$src2"
      (+ OP1_3 OP2_3 src1 src2)
      (set accum
@@ -1479,7 +1500,7 @@
 )
 
 (dni mulwlo-a "mulwlo-a"
-     ((MACH m32rx) (PIPE S) SPECIAL)
+     ((MACH m32rx) (PIPE S) SPECIAL (IDOC ACCUM))
      "mulwlo $src1,$src2,$acc"
      (+ OP1_3 src1 acc (f-op23 3) src2)
      ; Note that this doesn't do the sign extension, which is correct.
@@ -1490,7 +1511,7 @@
 )
 
 (dni mv "mv"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC ALU))
      "mv $dr,$sr"
      (+ OP1_1 OP2_8 dr sr)
      (set dr sr)
@@ -1498,7 +1519,7 @@
 )
 
 (dni mvfachi "mvfachi"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC ACCUM))
      "mvfachi $dr"
      (+ OP1_5 OP2_15 (f-r2 0) dr)
      (set dr (trunc WI (sra DI accum (const 32))))
@@ -1506,7 +1527,7 @@
 )
 
 (dni mvfachi-a "mvfachi-a"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC ACCUM))
      "mvfachi $dr,$accs"
      (+ OP1_5 dr OP2_15 accs (f-op3 0))
      (set dr (trunc WI (sra DI accs (const 32))))
@@ -1514,7 +1535,7 @@
 )
 
 (dni mvfaclo "mvfaclo"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC ACCUM))
      "mvfaclo $dr"
      (+ OP1_5 OP2_15 (f-r2 1) dr)
      (set dr (trunc WI accum))
@@ -1522,7 +1543,7 @@
 )
 
 (dni mvfaclo-a "mvfaclo-a"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC ACCUM))
      "mvfaclo $dr,$accs"
      (+ OP1_5 dr OP2_15 accs (f-op3 1))
      (set dr (trunc WI accs))
@@ -1530,7 +1551,7 @@
 )
 
 (dni mvfacmi "mvfacmi"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC ACCUM))
      "mvfacmi $dr"
      (+ OP1_5 OP2_15 (f-r2 2) dr)
      (set dr (trunc WI (sra DI accum (const 16))))
@@ -1538,7 +1559,7 @@
 )
 
 (dni mvfacmi-a "mvfacmi-a"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC ACCUM))
      "mvfacmi $dr,$accs"
      (+ OP1_5 dr OP2_15 accs (f-op3 2))
      (set dr (trunc WI (sra DI accs (const 16))))
@@ -1546,7 +1567,7 @@
 )
 
 (dni mvfc "mvfc"
-     ((PIPE O))
+     ((PIPE O) (IDOC MISC))
      "mvfc $dr,$scr"
      (+ OP1_1 OP2_9 dr scr)
      (set dr scr)
@@ -1554,7 +1575,7 @@
 )
 
 (dni mvtachi "mvtachi"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC ACCUM))
      "mvtachi $src1"
      (+ OP1_5 OP2_7 (f-r2 0) src1)
      (set accum
@@ -1565,7 +1586,7 @@
 )
 
 (dni mvtachi-a "mvtachi-a"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC ACCUM))
      "mvtachi $src1,$accs"
      (+ OP1_5 src1 OP2_7 accs (f-op3 0))
      (set accs
@@ -1576,7 +1597,7 @@
 )
 
 (dni mvtaclo "mvtaclo"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC ACCUM))
      "mvtaclo $src1"
      (+ OP1_5 OP2_7 (f-r2 1) src1)
      (set accum
@@ -1587,7 +1608,7 @@
 )
 
 (dni mvtaclo-a "mvtaclo-a"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC ACCUM))
      "mvtaclo $src1,$accs"
      (+ OP1_5 src1 OP2_7 accs (f-op3 1))
      (set accs
@@ -1598,7 +1619,7 @@
 )
 
 (dni mvtc "mvtc"
-     ((PIPE O))
+     ((PIPE O) (IDOC MISC))
      "mvtc $sr,$dcr"
      (+ OP1_1 OP2_10 dcr sr)
      (set dcr sr)
@@ -1606,7 +1627,7 @@
 )
 
 (dni neg "neg"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC ALU))
      "neg $dr,$sr"
      (+ OP1_0 OP2_3 dr sr)
      (set dr (neg sr))
@@ -1614,7 +1635,7 @@
 )
 
 (dni nop "nop"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC MISC))
      "nop"
      (+ OP1_7 OP2_0 (f-r1 0) (f-r2 0))
      (c-code VOID "PROFILE_COUNT_FILLNOPS (current_cpu, abuf->addr);\n")
@@ -1625,7 +1646,7 @@
 )
 
 (dni not "not"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC ALU))
      "not $dr,$sr"
      (+ OP1_0 OP2_11 dr sr)
      (set dr (inv sr))
@@ -1633,7 +1654,7 @@
 )
 
 (dni rac "rac"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC MAC))
      "rac"
      (+ OP1_5 OP2_9 (f-r1 0) (f-r2 0))
      (sequence ((DI tmp1))
@@ -1651,7 +1672,7 @@
 )
 
 (dni rac-dsi "rac-dsi"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC MAC))
      "rac $accd,$accs,$imm1"
      (+ OP1_5 accd (f-bits67 0) OP2_9 accs (f-bit14 0) imm1)
      (sequence ((DI tmp1))
@@ -1669,20 +1690,20 @@
 )
 
 (dnmi rac-d "rac-d"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC MAC))
      "rac $accd"
      (emit rac-dsi accd (f-accs 0) (f-imm1 0))
 )
 
 (dnmi rac-ds "rac-ds"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC MAC))
      "rac $accd,$accs"
      (emit rac-dsi accd accs (f-imm1 0))
 )
 
 
 (dni rach "rach"
-     ((MACH m32r) (PIPE S))
+     ((MACH m32r) (PIPE S) (IDOC MAC))
      "rach"
      (+ OP1_5 OP2_8 (f-r1 0) (f-r2 0))
      (sequence ((DI tmp1))
@@ -1709,7 +1730,7 @@
 )
 
 (dni rach-dsi "rach-dsi"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC MAC))
      "rach $accd,$accs,$imm1"
      (+ OP1_5 accd (f-bits67 0) OP2_8 accs (f-bit14 0) imm1)
      (sequence ((DI tmp1))
@@ -1727,19 +1748,19 @@
 )
 
 (dnmi rach-d "rach-d"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC MAC))
      "rach $accd"
      (emit rach-dsi accd (f-accs 0) (f-imm1 0))
 )
 
 (dnmi rach-ds "rach-ds"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC MAC))
      "rach $accd,$accs"
      (emit rach-dsi accd accs (f-imm1 0))
 )
 
 (dni rte "rte"
-     (UNCOND-CTI (PIPE O))
+     (UNCOND-CTI (PIPE O) (IDOC BR))
      "rte"
      (+ OP1_1 OP2_13 (f-r1 0) (f-r2 6))
      (sequence ()
@@ -1756,7 +1777,7 @@
 )
 
 (dni seth "seth"
-     ()
+     ((IDOC ALU))
      "seth $dr,$hash$hi16"
      (+ OP1_13 OP2_12 dr (f-r2 0) hi16)
      (set dr (sll WI hi16 (const 16)))
@@ -1765,19 +1786,19 @@
 
 (define-pmacro (shift-op sym op2-r-op op2-3-op op2-i-op sem-op)
   (begin
-     (dni sym sym ((PIPE O))
+     (dni sym sym ((PIPE O) (IDOC ALU))
 	  (.str sym " $dr,$sr")
 	  (+ OP1_1 op2-r-op dr sr)
 	  (set dr (sem-op dr (and sr (const 31))))
 	  ()
      )
-     (dni (.sym sym "3") sym ()
+     (dni (.sym sym "3") sym ((IDOC ALU))
 	  (.str sym "3 $dr,$sr,$simm16")
 	  (+ OP1_9 op2-3-op dr sr simm16)
 	  (set dr (sem-op sr (and WI simm16 (const 31))))
 	  ()
      )
-     (dni (.sym sym "i") sym ((PIPE O))
+     (dni (.sym sym "i") sym ((PIPE O) (IDOC ALU))
 	  (.str sym "i $dr,$uimm5")
 	  (+ OP1_5 (f-shift-op2 op2-i-op) dr uimm5)
 	  (set dr (sem-op dr uimm5))
@@ -1792,7 +1813,7 @@
 (define-pmacro (store-op suffix op2-op mode)
   (begin
     (dni (.sym st suffix) (.str "st" suffix)
-	 ((PIPE O))
+	 ((PIPE O) (IDOC MEM))
 	 (.str "st" suffix " $src1,@$src2")
 	 (+ OP1_2 op2-op src1 src2)
 	 (set mode (mem mode src2) src1)
@@ -1800,11 +1821,11 @@
 	  (m32rx (unit u-store (cycles 1))))
 	 )
     (dnmi (.sym st suffix "-2") (.str "st" suffix "-2")
-	  (NO-DIS (PIPE O))
+	  (NO-DIS (PIPE O) (IDOC MEM))
 	  (.str "st" suffix " $src1,@($src2)")
 	  (emit (.sym st suffix) src1 src2))
     (dni (.sym st suffix -d) (.str "st" suffix "-d")
-	 ()
+	 ((IDOC MEM))
 	 (.str "st" suffix " $src1,@($slo16,$src2)")
 	 (+ OP1_10 op2-op src1 src2 slo16)
 	 (set mode (mem mode (add src2 slo16)) src1)
@@ -1812,7 +1833,7 @@
 	  (m32rx (unit u-store (cycles 2))))
 	 )
     (dnmi (.sym st suffix -d2) (.str "st" suffix "-d2")
-	  (NO-DIS)
+	  (NO-DIS (IDOC MEM))
 	  (.str "st" suffix " $src1,@($src2,$slo16)")
 	  (emit (.sym st suffix -d) src1 src2 slo16))
     )
@@ -1822,7 +1843,7 @@
 (store-op h OP2_2 HI)
 
 (dni st-plus "st+"
-     ((PIPE O))
+     ((PIPE O) (IDOC MEM))
      "st $src1,@+$src2"
      (+ OP1_2 OP2_6 src1 src2)
      ; This has to be coded carefully to avoid an "earlyclobber" of src2.
@@ -1838,7 +1859,7 @@
 )
 
 (dni st-minus "st-"
-     ((PIPE O))
+     ((PIPE O) (IDOC MEM))
      "st $src1,@-$src2"
      (+ OP1_2 OP2_7 src1 src2)
      ; This is the original way.  It doesn't work for parallel execution
@@ -1857,13 +1878,13 @@
       )
 )
 
-(dnmi push "push" ()
+(dnmi push "push" ((IDOC MEM))
   "push $src1"
   (emit st-minus src1 (src2 15)) ; "st %0,@-sp"
 )
 
 (dni sub "sub"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC ALU))
      "sub $dr,$sr"
      (+ OP1_0 OP2_2 dr sr)
      (set dr (sub dr sr))
@@ -1871,7 +1892,7 @@
 )
 
 (dni subv "sub:rv"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC ALU))
      "subv $dr,$sr"
      (+ OP1_0 OP2_0 dr sr)
      (parallel ()
@@ -1881,7 +1902,7 @@
 )
 
 (dni subx "sub:rx"
-     ((PIPE OS))
+     ((PIPE OS) (IDOC ALU))
      "subx $dr,$sr"
      (+ OP1_0 OP2_1 dr sr)
      (parallel ()
@@ -1891,7 +1912,7 @@
 )
 
 (dni trap "trap"
-     (UNCOND-CTI FILL-SLOT (PIPE O))
+     (UNCOND-CTI FILL-SLOT (PIPE O) (IDOC MISC))
      "trap $uimm4"
      (+ OP1_1 OP2_15 (f-r1 0) uimm4)
      (sequence ()
@@ -1914,7 +1935,7 @@
 )
 
 (dni unlock "unlock"
-     ((PIPE O))
+     ((PIPE O) (IDOC MISC))
      "unlock $src1,@$src2"
      (+ OP1_2 OP2_5 src1 src2)
      (sequence ()
@@ -1927,7 +1948,7 @@
 
 ; Saturate into byte.
 (dni satb "satb"
-     ((MACH m32rx))
+     ((MACH m32rx) (IDOC ALU))
      "satb $dr,$sr"
      (+ OP1_8 dr OP2_6 sr (f-uimm16 #x0300))
      (set dr
@@ -1941,7 +1962,7 @@
 
 ; Saturate into half word.
 (dni sath "sath"
-     ((MACH m32rx))
+     ((MACH m32rx) (IDOC ALU))
      "sath $dr,$sr"
      (+ OP1_8 dr OP2_6 sr (f-uimm16 #x0200))
      (set dr
@@ -1954,7 +1975,7 @@
 
 ; Saturate word.
 (dni sat "sat"
-     ((MACH m32rx) SPECIAL)
+     ((MACH m32rx) SPECIAL (IDOC ALU))
      "sat $dr,$sr"
      (+ OP1_8 dr OP2_6 sr (f-uimm16 0))
      (set dr
@@ -1969,7 +1990,7 @@
 ; Parallel compare byte zeros.
 ; Set C bit in condition register if any byte in source register is zero.
 (dni pcmpbz "pcmpbz"
-     ((MACH m32rx) (PIPE OS) SPECIAL)
+     ((MACH m32rx) (PIPE OS) SPECIAL (IDOC ALU))
      "pcmpbz $src2"
      (+ OP1_0 (f-r1 3) OP2_7 src2)
      (set condbit
@@ -1984,7 +2005,7 @@
 
 ; Add accumulators
 (dni sadd "sadd"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC ACCUM))
      "sadd"
      (+ OP1_5 (f-r1 0) OP2_14 (f-r2 4))
      (set (reg h-accums 0)
@@ -1995,7 +2016,7 @@
 
 ; Multiply and add into accumulator 1
 (dni macwu1 "macwu1"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC MAC))
      "macwu1 $src1,$src2"
      (+ OP1_5 src1 OP2_11 src2)
      (set (reg h-accums 1)
@@ -2013,7 +2034,7 @@
 
 ; Multiply and subtract from accumulator 0
 (dni msblo "msblo"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC MAC))
      "msblo $src1,$src2"
      (+ OP1_5 src1 OP2_13 src2)
      (set accum
@@ -2034,7 +2055,7 @@
 
 ; Multiply into accumulator 1
 (dni mulwu1 "mulwu1"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC MAC))
      "mulwu1 $src1,$src2"
      (+ OP1_5 src1 OP2_10 src2)
      (set (reg h-accums 1)
@@ -2050,7 +2071,7 @@
 
 ; Multiply and add into accumulator 1
 (dni maclh1 "maclh1"
-     ((MACH m32rx) (PIPE S))
+     ((MACH m32rx) (PIPE S) (IDOC MAC))
      "maclh1 $src1,$src2"
      (+ OP1_5 src1 OP2_12 src2)
      (set (reg h-accums 1)
@@ -2071,7 +2092,7 @@
 
 ; skip instruction if C
 (dni sc "sc"
-     ((MACH m32rx) (PIPE O) SPECIAL)
+     ((MACH m32rx) (PIPE O) SPECIAL (IDOC BR))
      "sc"
      (+ OP1_7 (f-r1 4) OP2_0 (f-r2 1))
      (skip (zext INT condbit))
@@ -2080,7 +2101,7 @@
 
 ; skip instruction if not C
 (dni snc "snc"
-     ((MACH m32rx) (PIPE O) SPECIAL)
+     ((MACH m32rx) (PIPE O) SPECIAL (IDOC BR))
      "snc"
      (+ OP1_7 (f-r1 5) OP2_0 (f-r2 1))
      (skip (zext INT (not condbit)))

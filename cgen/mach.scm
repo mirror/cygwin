@@ -58,6 +58,7 @@
    insns-analyzed? semantics-analyzed? aliases-analyzed?
    )
 )
+
 (define-setters <arch> arch 
   (data
    attr-list enum-list kw-list
@@ -138,7 +139,13 @@
 ; Could use a hash table except that there currently aren't that many.
 
 (define (current-attr-list) (car (arch-attr-list CURRENT-ARCH)))
+
 (define (current-attr-add! a)
+  ; NOTE: While putting this test in define-attr feels better, having it here
+  ; is more robust, internal calls get checked too.  Thus it's here.
+  ; Ditto for all the other such tests in this file.
+  (if (current-attr-lookup (obj:name a))
+      (parse-error "define-attr" "attribute already defined" (obj:name a)))
   (let ((adata (arch-attr-list CURRENT-ARCH)))
     ; Build list in normal order so we don't have to reverse it at the end
     ; (since our format is non-trivial).
@@ -151,6 +158,7 @@
 	  (append! (cdr adata) (acons (obj:name a) a nil)))))
   *UNSPECIFIED*
 )
+
 (define (current-attr-lookup attr-name)
   (assq-ref (cdr (arch-attr-list CURRENT-ARCH)) attr-name)
 )
@@ -158,9 +166,14 @@
 ; Enums.
 
 (define (current-enum-list) (arch-enum-list CURRENT-ARCH))
+
 (define (current-enum-add! e)
+  (if (current-enum-lookup (obj:name e))
+      (parse-error "define-enum" "enum already defined" (obj:name e)))
   (arch-set-enum-list! CURRENT-ARCH (cons e (arch-enum-list CURRENT-ARCH)))
+  *UNSPECIFIED*
 )
+
 (define (current-enum-lookup enum-name)
   (object-assq enum-name (current-enum-list))
 )
@@ -168,9 +181,14 @@
 ; Keywords.
 
 (define (current-kw-list) (arch-kw-list CURRENT-ARCH))
+
 (define (current-kw-add! kw)
+  (if (current-kw-lookup (obj:name kw))
+      (parse-error "define-keyword" "keyword already defined" (obj:name kw)))
   (arch-set-kw-list! CURRENT-ARCH (cons kw (arch-kw-list CURRENT-ARCH)))
+  *UNSPECIFIED*
 )
+
 (define (current-kw-lookup kw-name)
   (object-assq kw-name (current-kw-list))
 )
@@ -178,9 +196,14 @@
 ; Instruction sets.
 
 (define (current-isa-list) (arch-isa-list CURRENT-ARCH))
+
 (define (current-isa-add! i)
+  (if (current-isa-lookup (obj:name i))
+      (parse-error "define-isa" "isa already defined" (obj:name i)))
   (arch-set-isa-list! CURRENT-ARCH (cons i (arch-isa-list CURRENT-ARCH)))
+  *UNSPECIFIED*
 )
+
 (define (current-isa-lookup isa-name)
   (object-assq isa-name (current-isa-list))
 )
@@ -188,9 +211,14 @@
 ; Cpu families.
 
 (define (current-cpu-list) (arch-cpu-list CURRENT-ARCH))
+
 (define (current-cpu-add! c)
+  (if (current-cpu-lookup (obj:name c))
+      (parse-error "define-cpu" "cpu already defined" (obj:name c)))
   (arch-set-cpu-list! CURRENT-ARCH (cons c (arch-cpu-list CURRENT-ARCH)))
+  *UNSPECIFIED*
 )
+
 (define (current-cpu-lookup cpu-name)
   (object-assq cpu-name (current-cpu-list))
 )
@@ -198,9 +226,14 @@
 ; Machines.
 
 (define (current-mach-list) (arch-mach-list CURRENT-ARCH))
+
 (define (current-mach-add! m)
+  (if (current-mach-lookup (obj:name m))
+      (parse-error "define-mach" "mach already defined" (obj:name m)))
   (arch-set-mach-list! CURRENT-ARCH (cons m (arch-mach-list CURRENT-ARCH)))
+  *UNSPECIFIED*
 )
+
 (define (current-mach-lookup mach-name)
   (object-assq mach-name (current-mach-list))
 )
@@ -208,9 +241,14 @@
 ; Models.
 
 (define (current-model-list) (arch-model-list CURRENT-ARCH))
+
 (define (current-model-add! m)
+  (if (current-model-lookup (obj:name m))
+      (parse-error "define-model" "model already defined" (obj:name m)))
   (arch-set-model-list! CURRENT-ARCH (cons m (arch-model-list CURRENT-ARCH)))
+  *UNSPECIFIED*
 )
+
 (define (current-model-lookup model-name)
   (object-assq model-name (current-model-list))
 )
@@ -218,9 +256,14 @@
 ; Hardware elements.
 
 (define (current-hw-list) (arch-hw-list CURRENT-ARCH))
+
 (define (current-hw-add! hw)
+  (if (current-hw-lookup (obj:name hw))
+      (parse-error "define-hardware" "hardware already defined" (obj:name hw)))
   (arch-set-hw-list! CURRENT-ARCH (cons hw (arch-hw-list CURRENT-ARCH)))
+  *UNSPECIFIED*
 )
+
 (define (current-hw-lookup hw)
   (if (object? hw)
       hw
@@ -233,10 +276,15 @@
 ; Instruction fields.
 
 (define (current-ifld-list) (map cdr (arch-ifld-list CURRENT-ARCH)))
+
 (define (current-ifld-add! f)
+  (if (current-ifld-lookup (obj:name f))
+      (parse-error "define-ifield" "ifield already defined" (obj:name f)))
   (arch-set-ifld-list! CURRENT-ARCH
 		       (acons (obj:name f) f (arch-ifld-list CURRENT-ARCH)))
+  *UNSPECIFIED*
 )
+
 (define (current-ifld-lookup x)
   (if (ifield? x)
       x
@@ -246,10 +294,15 @@
 ; Operands.
 
 (define (current-op-list) (map cdr (arch-op-list CURRENT-ARCH)))
+
 (define (current-op-add! op)
+  (if (current-op-lookup (obj:name op))
+      (parse-error "define-operand" "operand already defined" (obj:name op)))
   (arch-set-op-list! CURRENT-ARCH
 		     (acons (obj:name op) op (arch-op-list CURRENT-ARCH)))
+  *UNSPECIFIED*
 )
+
 (define (current-op-lookup name)
   (assq-ref (arch-op-list CURRENT-ARCH) name)
 )
@@ -266,11 +319,17 @@
 ; Instructions.
 
 (define (current-raw-insn-list) (arch-insn-list CURRENT-ARCH))
+
 (define (current-insn-list) (map cdr (arch-insn-list CURRENT-ARCH)))
+
 (define (current-insn-add! i)
+  (if (current-insn-lookup (obj:name i))
+      (parse-error "define-insn" "insn already defined" (obj:name i)))
   (arch-set-insn-list! CURRENT-ARCH
 		       (acons (obj:name i) i (arch-insn-list CURRENT-ARCH)))
+  *UNSPECIFIED*
 )
+
 (define (current-insn-lookup name)
   (assq-ref (arch-insn-list CURRENT-ARCH) name)
 )
@@ -292,10 +351,15 @@
 ; Macro instructions.
 
 (define (current-minsn-list) (map cdr (arch-minsn-list CURRENT-ARCH)))
+
 (define (current-minsn-add! m)
+  (if (current-minsn-lookup (obj:name m))
+      (parse-error "define-minsn" "macro-insn already defined" (obj:name m)))
   (arch-set-minsn-list! CURRENT-ARCH
 			(acons (obj:name m) m (arch-minsn-list CURRENT-ARCH)))
+  *UNSPECIFIED*
 )
+
 (define (current-minsn-lookup name)
   (assq-ref (arch-minsn-list CURRENT-ARCH) name)
 )
@@ -303,10 +367,15 @@
 ; rtx subroutines.
 
 (define (current-subr-list) (map cdr (arch-subr-list CURRENT-ARCH)))
-(define (current-subr-add! m)
+
+(define (current-subr-add! s)
+  (if (current-subr-lookup (obj:name s))
+      (parse-error "define-subr" "subroutine already defined" (obj:name s)))
   (arch-set-subr-list! CURRENT-ARCH
-		       (acons (obj:name m) m (arch-subr-list CURRENT-ARCH)))
+		       (acons (obj:name s) s (arch-subr-list CURRENT-ARCH)))
+  *UNSPECIFIED*
 )
+
 (define (current-subr-lookup name)
   (assq-ref (arch-subr-list CURRENT-ARCH) name)
 )

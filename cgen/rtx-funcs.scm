@@ -496,7 +496,7 @@
 ; Set/get/miscellaneous
 
 (drn (nop &options &mode)
-     (OPTIONS VOIDFLTODE) (NA NA)
+     (OPTIONS VOIDMODE) (NA NA)
      MISC
      #f
 )
@@ -980,7 +980,7 @@
 ; ??? There's no real need for mode either.
 
 (drsn (parallel &options &mode ignore expr . exprs)
-      (OPTIONS VOIDFLTODE LOCALS RTX . RTX) (NA NA NA VOID . VOID)
+      (OPTIONS VOIDMODE LOCALS RTX . RTX) (NA NA NA VOID . VOID)
       SEQUENCE
       #f
 )

@@ -8,6 +8,13 @@ GUILE = `if test -f ../guile/libguile/guile ; then echo ../guile/libguile/guile;
 CGENFLAGS = -v
 ARCH = @arch@
 
+# for various utility rules
+MACHS = all
+ISAS = all
+
+# for the html rule
+INSN_FILE_NAME = $(ARCH)-insn.html
+
 srcroot = $(srcdir)/..
 
 # Applications depend on stamp-cgen to tell them when .scm files have
@@ -39,7 +46,9 @@ desc: desc.scm
 		-s $(srcdir) \
 		$(CGENFLAGS) \
 		-f "$(OPTIONS)" \
-		-m all -a $(ARCH) \
+		-a $(ARCH) \
+		-i "$(ISAS)" \
+		-m "$(MACHS)" \
 		-H tmp-desc.h -C tmp-desc.c
 
 .PHONY: html
@@ -49,9 +58,14 @@ html: desc.scm html.scm cgen-doc.scm
 		-s $(srcdir) \
 		$(CGENFLAGS) \
 		-f "$(OPTIONS)" \
-		-m all -a $(ARCH) \
-		-H tmp-doc.html
-	$(SHELL) $(srcroot)/move-if-change tmp-doc.html $(ARCH)-doc.html
+		-a $(ARCH) \
+		-i "$(ISAS)" \
+		-m "$(MACHS)" \
+		-N $(INSN_FILE_NAME) \
+		-H tmp.html \
+		-I tmp-insn.html
+	$(SHELL) $(srcroot)/move-if-change tmp.html $(ARCH).html
+	$(SHELL) $(srcroot)/move-if-change tmp-insn.html $(ARCH)-insn.html
 
 # Build the opcodes files.
 # We just stuff them in tmp-* files.
@@ -66,7 +80,9 @@ opcodes: opcodes.scm
 		-s $(srcdir) \
 		$(CGENFLAGS) \
 		-f "$(OPTIONS) opinst" \
-		-m all -a $(ARCH) \
+		-a $(ARCH) \
+		-i "$(ISAS)" \
+		-m "$(MACHS)" \
 		-O tmp-opc.h -P tmp-opc.c -Q tmp-opinst.c \
 		-B tmp-ibld.h -L tmp-ibld.in \
 		-A tmp-asm.in -D tmp-dis.in
@@ -74,7 +90,7 @@ opcodes: opcodes.scm
 # Build the simulator files.
 # We just stuff them in tmp-* files.
 # Usage: make sim-arch ARCH=<arch> OPTIONS="<option list>"
-#        make sim-cpu ARCH=<arch> ISA="<isa>" MACHS="<mach list>" \
+#        make sim-cpu ARCH=<arch> ISAS="<isa>" MACHS="<mach list>" \
 #          OPTIONS="<option list>"
 
 .PHONY: sim-arch sim-cpu
@@ -85,7 +101,9 @@ sim-arch: sim.scm
 		-s $(srcdir) \
 		$(CGENFLAGS) \
 		-f "$(OPTIONS)" \
-		-m all -a $(ARCH) \
+		-a $(ARCH) \
+		-i "$(ISAS)" \
+		-m "$(MACHS)" \
 		-A tmp-arch.h -B tmp-arch.c -N tmp-cpuall.h
 sim-cpu: sim.scm
 	rm -f tmp-cpu.h tmp-cpu.c tmp-decode.h tmp-decode.c
@@ -94,7 +112,9 @@ sim-cpu: sim.scm
 		-s $(srcdir) \
 		$(CGENFLAGS) \
 		-f "$(OPTIONS)" \
-		-i "$(ISA)" -m "$(MACHS)" -a $(ARCH) \
+		-a $(ARCH) \
+		-i "$(ISAS)" \
+		-m "$(MACHS)" \
 		-C tmp-cpu.h -U tmp-cpu.c \
 		-T tmp-decode.h -D tmp-decode.c \
 		-M tmp-model.c \
@@ -104,16 +124,16 @@ sim-cpu: sim.scm
 
 .PHONY: gas-test
 gas-test: gas-test.scm cgen-gas.scm
-	@if test -z "$(ISA)" ; then \
-	  echo "ISA not specified!" ;\
+	@if test -z "$(ISAS)" ; then \
+	  echo "ISAS not specified!" ;\
 	  exit 1 ;\
 	fi
 	$(GUILE) -s $(srcdir)/cgen-gas.scm \
 		-s $(srcdir) \
 		$(CGENFLAGS) \
-		-m all \
-		-i $(ISA) \
 		-a $(ARCH) \
+		-i "$(ISAS)" \
+		-m "$(MACHS)" \
 		-B gas-build.sh \
 		-E gas-allinsn.exp
 
@@ -121,16 +141,16 @@ gas-test: gas-test.scm cgen-gas.scm
 
 .PHONY: sim-test
 sim-test: sim-test.scm cgen-stest.scm
-	@if test -z "$(ISA)" ; then \
-	  echo "ISA not specified!" ;\
+	@if test -z "$(ISAS)" ; then \
+	  echo "ISAS not specified!" ;\
 	  exit 1 ;\
 	fi
 	$(GUILE) -s $(srcdir)/cgen-stest.scm \
 		-s $(srcdir) \
 		$(CGENFLAGS) \
-		-m all \
-		-i $(ISA) \
 		-a $(ARCH) \
+		-i "$(ISAS)" \
+		-m "$(MACHS)" \
 		-B sim-build.sh \
 		-E sim-allinsn.exp
 

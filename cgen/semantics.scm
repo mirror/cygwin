@@ -575,7 +575,7 @@
 ; Build the tstate known value list for INSN.
 ; This built from the ifield-assertion list.
 
-(define (-build-known-values insn)
+(define (insn-build-known-values insn)
   (let ((expr (insn-ifield-assertion insn)))
     (if expr
 	(case (rtx-name expr)
@@ -638,6 +638,9 @@
 ; ??? This calls rtx-simplify which calls rtx-traverse as it's simpler to
 ; simplify EXPR first, and then compile it.  On the other hand it's slower
 ; (two calls to rtx-traverse!).
+;
+; FIXME: There's no need for sem-code-list to be a list.
+; The caller always passes (list (insn-semantics insn)).
 
 (define (semantic-compile context insn sem-code-list)
   (for-each (lambda (rtx) (assert (rtx? rtx)))
@@ -755,7 +758,7 @@
 			       context
 			       insn
 			       (rtx-simplify context insn expr
-					     (-build-known-values insn))
+					     (insn-build-known-values insn))
 			       process-expr!
 			       #f))
 			    sem-code-list))
@@ -823,6 +826,9 @@
 ;
 ; CONTEXT is a <context> object or #f if there is none.
 ; INSN is the <insn> object.
+;
+; FIXME: There's no need for sem-code-list to be a list.
+; The caller always passes (list (insn-semantics insn)).
 
 (define (semantic-attrs context insn sem-code-list)
   (for-each (lambda (rtx) (assert (rtx? rtx)))
@@ -866,7 +872,7 @@
 				context
 				insn
 				(rtx-simplify context insn expr
-					      (-build-known-values insn))
+					      (insn-build-known-values insn))
 				process-expr!
 				#f))
 			     sem-code-list))

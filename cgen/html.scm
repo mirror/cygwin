@@ -19,9 +19,6 @@
 ; - for insn formats, consider printing them better,
 ;   e.g. maybe generate image and include that instead
 ; - need ability to specify more prose for each architecture
-; - frv-doc.html is massive, default plan is to split it up by machine
-;   but is that the way to go here?
-;   --> split up output into several files anyway (for all archs)
 ; - assembler support
 ; - need to add docs to website that can be linked to here, rather than
 ;   including generic cgen documentation here
@@ -87,9 +84,10 @@ See the input .cpu file(s) for copyright information.
 		 "\n>\n\n")
 )
 
+; KIND is one of "Architecture" or "Instruction".
 ; TODO: Add author arg so all replies for this arch go to right person.
 
-(define (gen-html-header)
+(define (gen-html-header kind)
   (let ((arch (current-arch-name))
 	(ARCH (string-upcase (current-arch-name))))
     (string-list
@@ -97,11 +95,11 @@ See the input .cpu file(s) for copyright information.
      "<html>\n"
      "<head>\n"
      "  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n"
-     "  <meta name=\"description\" content=\"" ARCH " Architecture Documentation\">\n"
+     "  <meta name=\"description\" content=\"" ARCH " " kind " Documentation\">\n"
      "  <meta name=\"language\" content=\"en-us\">\n"
      "  <meta name=\"owner\" content=\"dje@sebabeach.org (Doug Evans)\">\n"
      "  <meta name=\"reply-to\" content=\"dje@sebabeach.org (Doug Evans)\">\n"
-     "  <title>" ARCH " Architecture Documentation</title>\n"
+     "  <title>" ARCH " " kind " Documentation</title>\n"
      "</head>\n"
      "<body bgcolor=\"#F0F0F0\" TEXT=\"#003333\" LINK=\"#FF0000\" VLINK=\"#444444\" alink=\"#000000\">\n"
      )
@@ -121,7 +119,9 @@ See the input .cpu file(s) for copyright information.
    )
 )
 
-(define (gen-table-of-contents)
+; INSN-FILE is the name of the .html file containing instruction definitions.
+
+(define (gen-table-of-contents insn-file)
   (let ((ARCH (string-upcase (current-arch-name))))
     (string-list
      "<h1>\n"
@@ -139,8 +139,8 @@ See the input .cpu file(s) for copyright information.
      "<li><a href=\"#machines\">Machine variants</a></li>\n"
      "<li><a href=\"#models\">Model variants</a></li>\n"
      "<li><a href=\"#registers\">Registers</a></li>\n"
-     "<li><a href=\"#insns\">Instructions</a></li>\n"
-     "<li><a href=\"#macro-insns\">Macro instructions</a></li>\n"
+     "<li><a href=\"" insn-file "#insns\">Instructions</a></li>\n"
+     "<li><a href=\"" insn-file "#macro-insns\">Macro instructions</a></li>\n"
      "<li><a href=\"#assembler\">Assembler supplemental</a></li>\n"
      "</ul>\n"
      "<br>\n"
@@ -158,33 +158,46 @@ See the input .cpu file(s) for copyright information.
       ))
 )
 
-; Utility to print a list entry for object O of kind KIND
-; which is a link to the description of O.
+; Utility to print a list entry for NAME/COMMENT, kind KIND
+; which is a link to the entry's description.
 ; KIND is one of "mach", "model", etc.
 
-(define (gen-obj-list-entry o kind)
+(define (gen-list-entry name comment kind)
   (string-append "<li>"
-		 "<a href=\"#" kind "-" (obj:name o) "\">"
-		 (obj:name o)
+		 "<a href=\"#" kind "-" name "\">"
+		 name
 		 " - "
-		 (obj:comment o)
+		 comment
 		 "</a>\n"
 		 "</li>\n")
 )
 
-; Utility to print the header for the description of object O of kind KIND.
+; Cover-fn to gen-list-entry for use with objects.
+
+(define (gen-obj-list-entry o kind)
+  (gen-list-entry (obj:name o) (obj:comment o) kind)
+)
+
+; Utility to print the header for the description of TEXT.
+
+(define (gen-doc-header text anchor-name)
+  (string-list
+   "<a name=\"" anchor-name "\"></a>\n"
+   "<h3>" text "</h3>\n"
+   )
+)
+
+; Cover-fn to gen-doc-header for use with objects.
 ; KIND is one of "mach", "model", etc.
 
 (define (gen-obj-doc-header o kind)
-  (string-list
-   "<a name=\"" kind "-" (obj:name o) "\"></a>\n"
-   "<h3>" (obj:name o) " - " (obj:comment o) "</h3>\n"
-   )
+  (gen-doc-header (string-append (obj:name o) " - " (obj:comment o))
+		  (string-append kind "-" (obj:name o)))
 )
 
 ; Architecture page.
 
-(define (-gen-cpu-intro cpu)
+(define (gen-cpu-intro cpu)
   (string-list
    "<li>\n"
    (obj:name cpu) " - " (obj:comment cpu) "\n"
@@ -192,7 +205,7 @@ See the input .cpu file(s) for copyright information.
    "<br>\n"
    "Machines:\n"
    "<ul>\n"
-   (string-list-map -gen-mach-intro
+   (string-list-map gen-mach-intro
 		    (alpha-sort-obj-list (machs-for-cpu cpu)))
    "</ul>\n"
    "</li>\n"
@@ -200,7 +213,7 @@ See the input .cpu file(s) for copyright information.
    )
 )
 
-(define (-gen-mach-intro mach)
+(define (gen-mach-intro mach)
   (string-list
    "<li>\n"
    (obj:name mach) " - " (obj:comment mach) "\n"
@@ -208,7 +221,7 @@ See the input .cpu file(s) for copyright information.
    "<br>\n"
    "Models:\n"
    "<ul>\n"
-   (string-list-map -gen-model-intro
+   (string-list-map gen-model-intro
 		    (alpha-sort-obj-list (models-for-mach mach)))
    "</ul>\n"
    "</li>\n"
@@ -216,7 +229,7 @@ See the input .cpu file(s) for copyright information.
    )
 )
 
-(define (-gen-model-intro model)
+(define (gen-model-intro model)
   (string-list
    "<li>\n"
    (obj:name model) " - " (obj:comment model) "\n"
@@ -225,7 +238,7 @@ See the input .cpu file(s) for copyright information.
    )
 )
 
-(define (-gen-isa-intro isa)
+(define (gen-isa-intro isa)
   (string-list
    "<li>\n"
    (obj:name isa) " - " (obj:comment isa) "\n"
@@ -327,13 +340,13 @@ See the input .cpu file(s) for copyright information.
      ; a list is excessive.  Later.
      "<p>\n"
      "<ul>\n"
-     (string-list-map -gen-isa-intro
+     (string-list-map gen-isa-intro
 		      (alpha-sort-obj-list isas))
      "</ul>\n"
      "<p>\n"
      "<h3>CPU Families</h3>\n"
      "<ul>\n"
-     (string-list-map -gen-cpu-intro
+     (string-list-map gen-cpu-intro
 		      (alpha-sort-obj-list cpus))
      "</ul>\n"
      ))
@@ -541,30 +554,19 @@ See the input .cpu file(s) for copyright information.
 		(list-drop (car widths) bitnums)))))
 )
 
-; Return ordered list of operands for each field in NAMES.
-; The result is an acceptable arg to gen-iformat-table-1.
-
-(define (get-operands insn)
-  (let ((ifields (ifmt-ifields (insn-ifmt insn))))
-    (map (lambda (f)
-	   (if (ifld-constant? f)
-	       (ifld-get-value f)
-	       (obj:name (ifld-get-value f))))
-	 ifields))
-)
-
 ; Generate a diagram typically used to display instruction fields.
-; NAMES is a list of field names,
-; WIDTHS is a list of their widths.
 
 (define (gen-iformat-table insn)
-  (let* ((widths (map ifld-length
-		      (ifmt-ifields (insn-ifmt insn))))
-	 (names (map obj:name
-		     (ifmt-ifields (insn-ifmt insn))))
-	 (operands (get-operands insn))
-	 (lsb0? (current-arch-insn-lsb0?)))
-    (gen-iformat-table-1 (get-ifield-bitnums widths lsb0?) names operands))
+  (let* ((lsb0? (current-arch-insn-lsb0?))
+	 (sorted-iflds (sort-ifield-list (insn-iflds insn) (not lsb0?))))
+    (let ((widths (map ifld-length sorted-iflds))
+	  (names (map obj:name sorted-iflds))
+	  (operands (map (lambda (f)
+			   (if (ifld-constant? f)
+			       (ifld-get-value f)
+			       (obj:name (ifld-get-value f))))
+			 sorted-iflds)))
+      (gen-iformat-table-1 (get-ifield-bitnums widths lsb0?) names operands)))
 )
 
 (define (gen-insn-doc-1 insn)
@@ -609,7 +611,8 @@ See the input .cpu file(s) for copyright information.
    "<plaintext>" ; no trailing newline here on purpose
    (with-output-to-string
      (lambda ()
-       (pretty-print (insn-semantics insn))))
+       ; Print the const-folded semantics, computed in `tmp'.
+       (pretty-print (rtx-trim-for-doc (insn-tmp insn)))))
    "</plaintext></font>\n"
    "</li>\n"
    ; "<br>\n" ; not present on purpose
@@ -630,7 +633,9 @@ See the input .cpu file(s) for copyright information.
 						  (timing:units (cdr t)))
 				      "\n"
 				      "</li>\n"))
-		     (insn-timing insn))
+		     ; ignore timings for discarded
+		     (find (lambda (t) (not (null? (cdr t))))
+			   (insn-timing insn)))
 		    "</ul>\n"
 		    "</li>\n"
 		    "<br>\n")
@@ -639,23 +644,205 @@ See the input .cpu file(s) for copyright information.
    )
 )
 
-(define (gen-insn-doc-list mach)
-  (let ((insns (find (lambda (insn)
-		       (mach-supports? mach insn))
-		     (current-insn-list))))
-    (string-list
-     (gen-obj-doc-header mach "mach-insns")
-     "<ul>\n"
-     (string-map (lambda (o)
-		   (gen-obj-list-entry o "insn"))
-		 insns)
-     "</ul>\n"
-     ))
+(define (gen-insn-doc-list mach name comment insns)
+  (string-list
+   "<hr>\n"
+   (gen-doc-header (string-append (obj:name mach)
+				  " "
+				  name
+				  (if (string=? comment "")
+				      ""
+				      (string-append " - " comment)))
+		   (string-append "mach-insns-"
+				  (obj:name mach)
+				  "-"
+				  name))
+   "<ul>\n"
+   (string-list-map (lambda (o)
+		      (gen-obj-list-entry o "insn"))
+		    insns)
+   "</ul>\n"
+   )
 )
 
+; Return boolean indicating if INSN sets the pc.
+
+(define (insn-sets-pc? insn)
+  (or (obj-has-attr? insn 'COND-CTI)
+      (obj-has-attr? insn 'UNCOND-CTI)
+      (obj-has-attr? insn 'SKIP-CTI))
+)
+
+; Traverse the semantics of INSN and return a list of symbols
+; indicating various interesting properties we find.
+; This is taken from `semantic-attrs' which does the same thing to find the
+; CTI attributes.
+; The result is list of properties computed from the semantics.
+; The possibilities are: MEM, FPU.
+
+(define (get-insn-properties insn)
+  (let*
+      ((context #f) ; ??? do we need a better context?
+
+       ; String for error messages.
+       (errtxt "semantic attribute computation for html")
+
+       ; List of attributes computed from SEM-CODE-LIST.
+       ; The first element is just a dummy so that append! always works.
+       (sem-attrs (list #f))
+
+       ; Called for expressions encountered in SEM-CODE-LIST.
+       (process-expr!
+	(lambda (rtx-obj expr mode parent-expr op-pos tstate appstuff)
+	  (case (car expr)
+
+	    ((operand) (if (memory? (op:type (rtx-operand-obj expr)))
+			   ; Don't change to '(MEM), since we use append!.
+			   (append! sem-attrs (list 'MEM)))
+		       (if (mode-float? (op:mode (rtx-operand-obj expr)))
+			   ; Don't change to '(FPU), since we use append!.
+			   (append! sem-attrs (list 'FPU)))
+		       )
+
+	    ((mem) (append! sem-attrs (list 'MEM)))
+
+	    ; If this is a syntax expression, the operands won't have been
+	    ; processed, so tell our caller we want it to by returning #f.
+	    ; We do the same for non-syntax expressions to keep things
+	    ; simple.  This requires collaboration with the traversal
+	    ; handlers which are defined to do what we want if we return #f.
+	    (else #f))))
+       )
+
+    ; Traverse the expression recording the attributes.
+    ; We just want the side-effects of computing various properties
+    ; so we discard the result.
+
+    (rtx-traverse context
+		  insn
+		  ; Simplified semantics recorded in the `tmp' field.
+		  (insn-tmp insn)
+		  process-expr!
+		  #f)
+
+    ; Drop dummy first arg and remove duplicates.
+    (nub (cdr sem-attrs) identity))
+)
+
+; Return boolean indicating if PROPS indicates INSN references memory.
+
+(define (insn-refs-mem? insn props)
+  (->bool (memq 'MEM props))
+)
+
+; Return boolean indicating if PROPS indicates INSN uses the fpu.
+
+(define (insn-uses-fpu? insn props)
+  (->bool (memq 'FPU props))
+)
+
+; Ensure INSN has attribute IDOC.
+; If not specified, guess(?).
+
+(define (guess-insn-idoc-attr! insn)
+  (if (not (obj-attr-present? insn 'IDOC))
+    (let ((attr #f)
+	  (props (get-insn-properties insn)))
+      ; Try various heuristics.
+      (if (and (not attr)
+	       (insn-sets-pc? insn))
+	  (set! attr 'BR))
+      (if (and (not attr)
+	       (insn-refs-mem? insn props))
+	  (set! attr 'MEM))
+      (if (and (not attr)
+	       (insn-uses-fpu? insn props))
+	  (set! attr 'FPU))
+      ; If nothing else works, assume ALU.
+      (if (not attr)
+	  (set! attr 'ALU))
+      (obj-cons-attr! insn (enum-attr-make 'IDOC attr))))
+  *UNSPECIFIED*
+)
+
+; Return subset of insns in IDOC category CAT-NAME.
+
+(define (get-insns-for-category insns cat-name)
+  (find (lambda (insn)
+	  (obj-has-attr-value-no-default? insn 'IDOC cat-name))
+	insns)
+)
+
+; CATEGORIES is a list of "enum value" elements for each category.
+; See <enum-attribute> for the definition.
+; INSNS is already alphabetically sorted and selected for just MACH.
+
+(define (gen-categories-insn-lists mach categories insns)
+  (string-list
+   ; generate a table of insns for each category
+   (string-list-map (lambda (c)
+		      (let ((cat-insns (get-insns-for-category insns (enum-val-name c)))
+			    (comment (enum-val-comment c)))
+			(if (null? cat-insns)
+			    ""
+			    (gen-insn-doc-list mach (enum-val-name c) comment cat-insns))))
+		    categories)
+   ; lastly, the alphabetical list
+   (gen-insn-doc-list mach (obj:name mach) (obj:comment mach) insns)
+   )
+)
+
+; CATEGORIES is a list of "enum value" elements for each category.
+; See <enum-attribute> for the definition.
+; INSNS is already alphabetically sorted and selected for just MACH.
+
+(define (gen-insn-categories mach categories insns)
+  (string-list
+   "<ul>\n"
+   (string-list-map (lambda (c)
+		      (let ((cat-insns (get-insns-for-category insns (enum-val-name c)))
+			    (comment (enum-val-comment c)))
+			(if (null? cat-insns)
+			    ""
+			    (string-list
+			     "<li><a href=\"#mach-insns-"
+			     (obj:name mach)
+			     "-"
+			     (enum-val-name c)
+			     "\">"
+			     (enum-val-name c)
+			     (if (string=? comment "")
+				 ""
+				 (string-append " - " comment))
+			     "</a></li>\n"
+			     ))))
+		    categories)
+   "<li><a href=\"#mach-insns-"
+   (obj:name mach)
+   "-"
+   (obj:name mach)
+   "\">alphabetically</a></li>\n"
+   "</ul>\n"
+   )
+)
+
+; ??? There's an inefficiency here, we compute insns for each mach for each
+; category twice.  Left for later if warranted.
+
 (define (gen-insn-docs)
+  ; First simplify the semantics, e.g. do constant folding.
+  ; For insns built up from macros, often this will remove a lot of clutter.
+  (for-each (lambda (insn)
+	      (insn-set-tmp! insn (rtx-simplify #f insn
+						(insn-semantics insn)
+						(insn-build-known-values insn))))
+	    (current-insn-list))
+
   (let ((machs (current-mach-list))
-	(insns (alpha-sort-obj-list (current-insn-list))))
+	(insns (alpha-sort-obj-list (current-insn-list)))
+	(categories (attr-values (current-attr-lookup 'IDOC))))
+    ; First, install IDOC attributes for insns that don't specify one.
+    (for-each guess-insn-idoc-attr! insns)
     (string-list
      "\n"
      "<hr>\n"
@@ -663,12 +850,32 @@ See the input .cpu file(s) for copyright information.
      "<h2>Instructions</h2>\n"
      "Instructions for each machine:\n"
      "<ul>\n"
-     (string-map (lambda (o)
-		   (gen-obj-list-entry o "mach-insns"))
-		 machs)
+;     (string-map (lambda (o)
+;		   (gen-obj-list-entry o "mach-insns"))
+;		 machs)
+     (string-list-map (lambda (m)
+			(let ((mach-insns (find (lambda (insn)
+						  (mach-supports? m insn))
+						insns)))
+			  (string-list "<li>"
+				       (obj:name m)
+				       " - "
+				       (obj:comment m)
+				       "</li>\n"
+				       (gen-insn-categories m categories mach-insns)
+			   )))
+		      machs)
      "</ul>\n"
-     (string-list-map gen-insn-doc-list machs)
-     "<p>\n"
+;     (string-list-map (lambda (m)
+;			(gen-insn-doc-list m insns))
+;		      machs)
+     (string-list-map (lambda (m)
+			(let ((mach-insns (find (lambda (insn)
+						  (mach-supports? m insn))
+						insns)))
+			  (gen-categories-insn-lists m categories mach-insns)))
+		      machs)
+     "<hr>\n"
      "<h2>Individual instructions descriptions</h2>\n"
      "<br>\n"
      (string-list-map gen-insn-doc-1 insns)
@@ -789,34 +996,47 @@ See the input .cpu file(s) for copyright information.
 )
 
 ; Top level C code generators
-;
-; TODO: Will eventually want to split .html output into several files to
-; speed up loading into browsers.
 
-(define (cgen-doc.html)
-  (logit 1 "Generating " (current-arch-name) "-doc.html ...\n")
+; Set by the -N argument.
+(define *insn-html-file-name* "unspecified.html")
+
+(define (cgen.html)
+  (logit 1 "Generating " (current-arch-name) ".html ...\n")
   (string-write
    (gen-html-copyright (string-append "Architecture documentation for "
 				      (current-arch-name)
 				      ".")
 		       CURRENT-COPYRIGHT CURRENT-PACKAGE)
-   gen-html-header
-   gen-table-of-contents
+   (gen-html-header "Architecture")
+   (gen-table-of-contents *insn-html-file-name*)
    gen-arch-intro
    gen-machine-docs
    gen-model-docs
    gen-register-docs
-   gen-insn-docs
-   gen-macro-insn-docs
    gen-asm-docs
    gen-html-trailer
    )
 )
-
+
+(define (cgen-insn.html)
+  (logit 1 "Generating " (current-arch-name) "-insn.html ...\n")
+  (string-write
+   (gen-html-copyright (string-append "Instruction documentation for "
+				      (current-arch-name)
+				      ".")
+		       CURRENT-COPYRIGHT CURRENT-PACKAGE)
+   (gen-html-header "Instruction")
+   gen-insn-docs
+   gen-macro-insn-docs
+   gen-html-trailer
+   )
+)
+
 ; For debugging.
 
 (define (cgen-all)
   (string-write
-   cgen-doc.html
+   cgen.html
+   cgen-insn.html
    )
 )

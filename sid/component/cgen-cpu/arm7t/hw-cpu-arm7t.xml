@@ -56,7 +56,9 @@
       <pin>step!</pin> pin is next invoked.  Note that this may not be
       the next instruction if the
       <attribute>step-insn-count</attribute> attribute is greater than
-      one.</p>
+      one. Also note that these pins are level sensitive, so interrupts
+      will occur repeatedly until the pin is driven non-zero. They are
+      'pulled' to one (high) at processor invocation and reset.</p>
     </behavior>
 
 

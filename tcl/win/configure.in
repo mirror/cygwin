@@ -1,12 +1,16 @@
-dnl	The file is CYGNUS LOCAL.  It is used for cygwin.
-
-dnl	This file is an input file used by the GNU "autoconf" program to
-dnl	generate the file "configure", which is run during Tcl installation
-dnl	to configure the system for the local environment.
-
-AC_PREREQ(2.5)
+# This file is an input file used by the GNU "autoconf" program to
+# generate the file "configure", which is run during Tcl installation
+# to configure the system for the local environment.
+#
+# RCS: @(#) $Id: configure.in,v 1.10.8.19 2001/08/06 22:29:25 mdejong Exp $
 
 AC_INIT(../generic/tcl.h)
+
+TCL_VERSION=8.3
+TCL_MAJOR_VERSION=8
+TCL_MINOR_VERSION=3
+TCL_PATCH_LEVEL=".2"
+VER=$TCL_MAJOR_VERSION$TCL_MINOR_VERSION
 
 if test "${prefix}" = "NONE"; then
     prefix=/usr/local
@@ -15,92 +19,216 @@ if test "${exec_prefix}" = "NONE"; then
     exec_prefix=$prefix
 fi
 
-AC_CANONICAL_HOST
+#------------------------------------------------------------------------
+# Standard compiler checks
+#------------------------------------------------------------------------
 
 AC_PROG_CC
+
+AC_CHECK_TOOL(AR, ar, :)
+AC_CHECK_TOOL(RANLIB, ranlib, :)
+AC_CHECK_TOOL(RC, windres, :)
+
+#--------------------------------------------------------------------
+# Checks to see if the make progeam sets the $MAKE variable.
+#--------------------------------------------------------------------
+
+AC_PROG_MAKE_SET
+
+#--------------------------------------------------------------------
+# These two macros perform additinal compiler test.
+#--------------------------------------------------------------------
+
+AC_CYGWIN
+
+#--------------------------------------------------------------------
+# Determines the correct binary file extension (.o, .obj, .exe etc.)
+#--------------------------------------------------------------------
+
 AC_OBJEXT
-AC_CHECK_TOOL(NM, nm, nm)
-AC_SUBST(NM)
-AC_CHECK_TOOL(AS, as, as)
-AC_SUBST(AS)
-AC_CHECK_TOOL(LD, ld, ld)
-AC_SUBST(LD)
-AC_PROG_RANLIB
-AC_CHECK_TOOL(DLLTOOL, dlltool, dlltool)
-AC_SUBST(DLLTOOL)
-AC_CHECK_TOOL(WINDRES, windres, windres)
-AC_SUBST(WINDRES)
-AC_PROG_INSTALL
+AC_EXEEXT
 
-# needed for the subtle differences between cygwin and mingw32
-case "${host}" in
-*-*-cygwin*)
-	TCL_ALLOC_OBJ=
-	DLL_LDLIBS=-lcygwin
-	DLL_LDFLAGS='-nostartfiles -Wl,--dll'
-	;;
-*-*-mingw32*)
-	TCL_ALLOC_OBJ='$(TMPDIR)/tclAlloc.o'
-	DLL_LDLIBS=
-	DLL_LDFLAGS='-mdll'
-	;;
-esac
+#--------------------------------------------------------------------
+# Check whether --enable-threads or --disable-threads was given.
+#--------------------------------------------------------------------
 
-AC_SUBST(TCL_ALLOC_OBJ)
-AC_SUBST(DLL_LDFLAGS)
-AC_SUBST(DLL_LDLIBS)
+SC_ENABLE_THREADS
 
-# The following variables are just for tclConfig.sh, not for Makefile. 
-LIBOBJS=
-AC_SUBST(LIBOBJS)
-TCL_VERSION=8.0
-TCL_MAJOR_VERSION=8
-TCL_MINOR_VERSION=0
-TCL_PATCH_LEVEL=p2
-VERSION=${TCL_VERSION}
-DL_LIBS=
-MATH_LIBS=-lm
-SHLIB_CFLAGS=
-SHLIB_LD=
-SHLIB_LD_LIBS=
-SHLIB_SUFFIX=
-LD_FLAGS=
-TCL_LD_SEARCH_FLAGS=
-TCL_BUILD_LIB_SPEC="-L`pwd` -ltcl`echo ${VERSION} | tr -d .`"
-TCL_LIB_SPEC="-L${exec_prefix}/lib -ltcl`echo ${VERSION} | tr -d .`"
-TCL_LIB_VERSIONS_OK=nodots
-TCL_SHARED_LIB_SUFFIX=
-TCL_UNSHARED_LIB_SUFFIX="`echo ${VERSION} | tr -d .`.a"
-eval "TCL_LIB_FILE=libtcl${TCL_UNSHARED_LIB_SUFFIX}"
-TCL_SRC_DIR=`cd $srcdir/..; pwd`
-if test "$prefix" != "$exec_prefix"; then
-    TCL_PACKAGE_PATH="${exec_prefix}/lib ${prefix}/lib"
+#--------------------------------------------------------------------
+# The statements below define a collection of symbols related to
+# building libtcl as a shared library instead of a static library.
+#--------------------------------------------------------------------
+
+SC_ENABLE_SHARED
+
+#--------------------------------------------------------------------
+# The statements below define a collection of compile flags.  This 
+# macro depends on the value of SHARED_BUILD, and should be called
+# after SC_ENABLE_SHARED checks the configure switches.
+#--------------------------------------------------------------------
+
+SC_CONFIG_CFLAGS
+
+#--------------------------------------------------------------------
+# Set the default compiler switches based on the --enable-symbols 
+# option.  This macro depends on C flags, and should be called
+# after SC_CONFIG_CFLAGS macro is called.
+#--------------------------------------------------------------------
+
+SC_ENABLE_SYMBOLS
+
+#------------------------------------------------------------------------------
+#       Find out all about time handling differences.
+#------------------------------------------------------------------------------
+
+SC_TIME_HANDLER
+
+TCL_DBGX=${DBGX}
+
+#--------------------------------------------------------------------
+# man2tcl needs this so that it can use errno.h
+#--------------------------------------------------------------------
+
+AC_CHECK_HEADER(errno.h, , MAN2TCLFLAGS="-DNO_ERRNO_H")
+AC_SUBST(MAN2TCLFLAGS)
+
+#------------------------------------------------------------------------
+# tclConfig.sh refers to this by a different name
+#------------------------------------------------------------------------
+
+TCL_SHARED_BUILD=${SHARED_BUILD}
+
+#--------------------------------------------------------------------
+# Perform final evaluations of variables with possible substitutions.
+#--------------------------------------------------------------------
+
+NODOT_VERSION=${VER}
+
+TCL_SHARED_LIB_SUFFIX="\${NODOT_VERSION}${DLLSUFFIX}"
+TCL_UNSHARED_LIB_SUFFIX="\${NODOT_VERSION}${LIBSUFFIX}"
+TCL_EXPORT_FILE_SUFFIX="\${NODOT_VERSION}${LIBSUFFIX}"
+
+TCL_TOOL_PATH(TCL_SRC_DIR, "`cd $srcdir/..; pwd`")
+
+dnl CYGNUS LOCAL - Can't conflict with installed tcl package
+
+TCL_TOOL_STATIC_LIB_LONGNAME(TCL_LIB_FILE, tcl, ${TCL_UNSHARED_LIB_SUFFIX})
+TCL_TOOL_SHARED_LIB_LONGNAME(TCL_DLL_FILE, tcl, ${TCL_SHARED_LIB_SUFFIX})
+
+if test "$GCC" = "yes"; then
+    GNU_TCL_LIB_FILE=${TCL_LIB_FILE}
+    MSVC_TCL_LIB_FILE=
 else
-    TCL_PACKAGE_PATH="${prefix}/lib"
+    GNU_TCL_LIB_FILE=
+    MSVC_TCL_LIB_FILE=${TCL_LIB_FILE}
 fi
 TCL_BIN_DIR=`pwd`
 
-AC_SUBST(DL_LIBS)
-AC_SUBST(LD_FLAGS)
-AC_SUBST(MATH_LIBS)
-AC_SUBST(SHLIB_CFLAGS)
-AC_SUBST(SHLIB_LD)
-AC_SUBST(SHLIB_LD_LIBS)
-AC_SUBST(SHLIB_SUFFIX)
-AC_SUBST(TCL_BUILD_LIB_SPEC)
-AC_SUBST(TCL_LD_SEARCH_FLAGS)
-AC_SUBST(TCL_LIB_FILE)
-AC_SUBST(TCL_LIB_SPEC)
-AC_SUBST(TCL_LIB_VERSIONS_OK)
+
+TCL_TOOL_LIB_SHORTNAME(TCL_LIB_FLAG, tcl, $TCL_VERSION)
+TCL_TOOL_LIB_SPEC(TCL_BUILD_LIB_SPEC, `pwd`, ${TCL_LIB_FLAG})
+TCL_TOOL_LIB_SPEC(TCL_LIB_SPEC, ${exec_prefix}/lib, ${TCL_LIB_FLAG})
+TCL_TOOL_LIB_PATH(TCL_LIB_FULL_PATH, `pwd`, ${TCL_LIB_FILE})
+
+
+TCL_TOOL_STATIC_LIB_LONGNAME(TCL_STUB_LIB_FILE, tclstub, ${TCL_UNSHARED_LIB_SUFFIX})
+TCL_TOOL_LIB_SHORTNAME(TCL_STUB_LIB_FLAG, tclstub, $TCL_VERSION)
+TCL_TOOL_LIB_SPEC(TCL_BUILD_STUB_LIB_SPEC, `pwd`, ${TCL_STUB_LIB_FLAG})
+TCL_TOOL_LIB_SPEC(TCL_STUB_LIB_SPEC, ${exec_prefix}/lib, ${TCL_STUB_LIB_FLAG})
+TCL_TOOL_LIB_PATH(TCL_BUILD_STUB_LIB_PATH, `pwd`, ${TCL_STUB_LIB_FILE})
+TCL_TOOL_LIB_PATH(TCL_STUB_LIB_PATH, ${exec_prefix}/lib, ${TCL_STUB_LIB_FILE})
+
+
+TCL_TOOL_SHARED_LIB_LONGNAME(DDE_DLL_FILE, tcldde, ${TCL_SHARED_LIB_SUFFIX})
+TCL_TOOL_STATIC_LIB_LONGNAME(DDE_LIB_FILE, tcldde, ${TCL_UNSHARED_LIB_SUFFIX})
+
+TCL_TOOL_SHARED_LIB_LONGNAME(REG_DLL_FILE, tclreg, ${TCL_SHARED_LIB_SUFFIX})
+TCL_TOOL_STATIC_LIB_LONGNAME(REG_LIB_FILE, tclreg, ${TCL_UNSHARED_LIB_SUFFIX})
+
+TCL_TOOL_SHARED_LIB_LONGNAME(PIPE_DLL_FILE, tclpip, ${TCL_SHARED_LIB_SUFFIX})
+
+
+eval "DLLSUFFIX=${DLLSUFFIX}"
+eval "LIBPREFIX=${LIBPREFIX}"
+eval "LIBSUFFIX=${LIBSUFFIX}"
+eval "EXESUFFIX=${EXESUFFIX}"
+
+CFG_TCL_SHARED_LIB_SUFFIX=${TCL_SHARED_LIB_SUFFIX}
+CFG_TCL_UNSHARED_LIB_SUFFIX=${TCL_UNSHARED_LIB_SUFFIX}
+CFG_TCL_EXPORT_FILE_SUFFIX=${TCL_EXPORT_FILE_SUFFIX}
+
+AC_SUBST(TCL_VERSION)
 AC_SUBST(TCL_MAJOR_VERSION)
 AC_SUBST(TCL_MINOR_VERSION)
-AC_SUBST(TCL_PACKAGE_PATH)
+AC_SUBST(TCL_LIB_VERSIONS_OK)
 AC_SUBST(TCL_PATCH_LEVEL)
-AC_SUBST(TCL_SHARED_LIB_SUFFIX)
-AC_SUBST(TCL_SHLIB_CFLAGS)
-AC_SUBST(TCL_SRC_DIR)
-AC_SUBST(TCL_UNSHARED_LIB_SUFFIX)
-AC_SUBST(TCL_VERSION)
-AC_SUBST(TCL_BIN_DIR)
+AC_SUBST(TCL_LIB_FILE)
+AC_SUBST(GNU_TCL_LIB_FILE)
+AC_SUBST(MSVC_TCL_LIB_FILE)
+AC_SUBST(TCL_DLL_FILE)
+AC_SUBST(TCL_LIB_FLAG)
+AC_SUBST(TCL_BUILD_LIB_SPEC)
+AC_SUBST(TCL_LIB_SPEC)
+AC_SUBST(TCL_LIB_FULL_PATH)
+AC_SUBST(TCL_STUB_LIB_FILE)
+AC_SUBST(TCL_STUB_LIB_FLAG)
+AC_SUBST(TCL_BUILD_STUB_LIB_SPEC)
+AC_SUBST(TCL_STUB_LIB_SPEC)
+AC_SUBST(TCL_BUILD_STUB_LIB_PATH)
+AC_SUBST(TCL_STUB_LIB_PATH)
 
-AC_OUTPUT(Makefile ../unix/tclConfig.sh)
+AC_SUBST(DDE_DLL_FILE)
+AC_SUBST(DDE_LIB_FILE)
+AC_SUBST(REG_DLL_FILE)
+AC_SUBST(REG_LIB_FILE)
+AC_SUBST(PIPE_DLL_FILE)
+
+AC_SUBST(TCL_SRC_DIR)
+AC_SUBST(TCL_BIN_DIR)
+AC_SUBST(TCL_DBGX)
+AC_SUBST(CFG_TCL_SHARED_LIB_SUFFIX)
+AC_SUBST(CFG_TCL_UNSHARED_LIB_SUFFIX)
+AC_SUBST(CFG_TCL_EXPORT_FILE_SUFFIX)
+AC_SUBST(TCL_SHARED_BUILD)
+
+AC_SUBST(CYGPATH)
+AC_SUBST(DEPARG)
+AC_SUBST(CFLAGS_DEFAULT)
+AC_SUBST(CFLAGS_DEBUG)
+AC_SUBST(CFLAGS_OPTIMIZE)
+AC_SUBST(CFLAGS_WARNING)
+AC_SUBST(EXTRA_CFLAGS)
+AC_SUBST(STLIB_LD)
+AC_SUBST(SHLIB_LD)
+AC_SUBST(SHLIB_LD_LIBS)
+AC_SUBST(SHLIB_CFLAGS)
+AC_SUBST(CC_OBJNAME)
+AC_SUBST(CC_EXENAME)
+AC_SUBST(TCL_LD_SEARCH_FLAGS)
+AC_SUBST(LDFLAGS_DEFAULT)
+AC_SUBST(LDFLAGS_DEBUG)
+AC_SUBST(LDFLAGS_OPTIMIZE)
+AC_SUBST(LDFLAGS_CONSOLE)
+AC_SUBST(LDFLAGS_WINDOW)
+AC_SUBST(AR)
+AC_SUBST(RANLIB)
+AC_SUBST(RC)
+AC_SUBST(RC_OUT)
+AC_SUBST(RC_TYPE)
+AC_SUBST(RC_INCLUDE)
+AC_SUBST(RES)
+AC_SUBST(LIBS)
+AC_SUBST(LIBS_GUI)
+AC_SUBST(DLLSUFFIX)
+AC_SUBST(VENDORPREFIX)
+AC_SUBST(LIBPREFIX)
+AC_SUBST(LIBSUFFIX)
+AC_SUBST(EXESUFFIX)
+AC_SUBST(LIBRARIES)
+AC_SUBST(MAKE_LIB)
+AC_SUBST(POST_MAKE_LIB)
+AC_SUBST(MAKE_DLL)
+AC_SUBST(MAKE_EXE)
+
+AC_OUTPUT(Makefile tclConfig.sh tcl.hpj)
+

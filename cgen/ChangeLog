@@ -1,3 +1,23 @@
+2003-02-18  DJ Delorie  <dj@redhat.com>
+
+	* xstormy16.cpu (set-mem-alignfix-psw): Remove.
+	(movlmemimm): Just mask the address.
+	(movhmemimm): Likewise.
+	(movlmemgr): Likewise.
+	(movhmemgr): Likewise.
+	(set-psw): Always set the psw last.
+	(set-psw-carry): Likewise.
+	(set-psw-add): Likewise.
+	(set-psw-sub): Likewise.
+
+	* xstormy16.cpu (set-psw-rrotate17): New.  Choose the correct set
+	of 16 patterns from the set-psw-rotate17 function.
+	(movgrigr, movgripostincgr, movgripredecgr, movgriigr,
+	movgriipostincgr, movgriipredecgr): Set psw correctly.
+	(movfgrigr, movfgripostincgr, movfgripredecgr, movfgriigr,
+	movfgriipostincgr, movfgriipredecgr): Fix semantics.
+	(rrcgrgr, rrcgrimm4): Use new set-psw-rrotate17 function.
+
 2003-02-11  Dave Brolley  <brolley@redhat.com>
 
 	* desc-cpu.scm (gen-ifld-defns): Add all ifields to the

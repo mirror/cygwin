@@ -1,3 +1,8 @@
+2002-10-05  Christopher Faylor  <cgf@redhat.com>
+
+	* win/tclWin32Dll.c (tclWinTCharEncoding): Remove 'static' since it is
+	declared in header as exportable extern.
+
 2002-09-13  Keith Seitz  <keiths@redhat.com>
 
 	From Mo Dejong  <supermo@bayarea.net>:

@@ -1,3 +1,7 @@
+2001-06-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* config/default.exp: New file, moved from ../../config/unix.exp.
+
 2001-06-22  Ben Elliston  <bje@redhat.com>
 
 	* lib/monkey.exp (monkey_test): If an individual monkey test

@@ -11,5 +11,5 @@ EXTRA_rda_SOURCES = linux-target.c solaris-target.c \
 	ptrace-target.c dummy-target.c
 TARGET_MODULES = @TARGET_MODULES@
 rda_LDADD = $(TARGET_MODULES) ../lib/librda.la
-rda_DEPENDENCIES = $(server_OBJECTS) $(TARGET_MODULES)
+rda_DEPENDENCIES = $(server_OBJECTS) $(TARGET_MODULES) ../lib/librda.la
 rda_LDFLAGS = -ldl -rdynamic

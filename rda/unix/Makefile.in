@@ -104,7 +104,7 @@ EXTRA_rda_SOURCES = linux-target.c solaris-target.c \
 	ptrace-target.c dummy-target.c
 
 rda_LDADD = $(TARGET_MODULES) ../lib/librda.la
-rda_DEPENDENCIES = $(server_OBJECTS) $(TARGET_MODULES)
+rda_DEPENDENCIES = $(server_OBJECTS) $(TARGET_MODULES) ../lib/librda.la
 rda_LDFLAGS = -ldl -rdynamic
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4

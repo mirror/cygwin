@@ -1,3 +1,15 @@
+2002-03-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compMapper.cxx (overlaps_p, selected_p, bank_changed): New/modified
+	helper functions for banking.
+	(bank_pin_handler, connect_accessor, disconnect_accessor): Ditto.
+	(locate): Ditto.
+	(make_name_mapping): Ditto; reorganize, tighten.  Change syntax of
+	word-multiplier construct.
+	(generic_mapper): Add new fields for bank tracking.
+	* hw-mapper-basic.xml: Document banking system and syntax.
+	* hw-mapper-basic.txt: Regenerated.
+
 2001-10-10  Frank Ch. Eigler  <fche@redhat.com>
 
 	* compMapper.cxx (generic_mapper_bus): New field low_multiplier.

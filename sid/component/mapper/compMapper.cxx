@@ -1,6 +1,6 @@
 // compMapper.cxx - a bus mapper component.  -*- C++ -*-
 
-// Copyright (C) 1999-2001 Red Hat.
+// Copyright (C) 1999-2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -54,6 +54,7 @@ using sidutil::fixed_bus_map_component;
 using sidutil::make_numeric_attribute;
 using sidutil::parse_attribute;
 using sidutil::tokenize;
+using sidutil::callback_pin;
 using sidutil::attribute_coder_virtual_parameterized;
 
 
@@ -81,12 +82,23 @@ struct mapping_record
   host_int_2 width_shift;       // log2(width)
 
   string spec;                  // user-given specification string
+
+  vector<host_int_4> banks;     // sorted list of bank #s in which this record is active
 };
 
 
 bool 
 overlaps_p (const mapping_record& a, const mapping_record& b)
 {
+  // Reject disjoint banks
+  vector<host_int_4> intersection (a.banks.size());
+  vector<host_int_4>::iterator r = 
+    set_intersection (a.banks.begin(), a.banks.end(),
+		      b.banks.begin(), b.banks.end(),
+		      intersection.begin());
+  if (r == intersection.begin()) // empty intersection?
+    return false;
+
   // I always rederive this little formula from first principles. 
   host_int_4 max_first = max(a.low, b.low);
   host_int_4 min_last = min(a.high, b.high);
@@ -94,22 +106,53 @@ overlaps_p (const mapping_record& a, const mapping_record& b)
 }
 
 
-class mr_cmp: public std::binary_function<mapping_record, mapping_record, bool>
+bool 
+selected_p (const mapping_record& a, host_int_4 bank)
+{
+#if 0
+  // This doesn't have to be fast, but since banks<> is kept sorted, might as well
+  // use binary search.
+
+  vector<host_int_4>::const_iterator where = 
+    lower_bound (a.banks.begin (), a.banks.end (), bank);
+
+  return (where != a.banks.end ());
+#endif
+
+  for (int i=0; i<a.banks.size(); i++)
+    {
+      if (a.banks[i] == bank) return true;
+    }
+  return false;
+}
+
+
+
+class mr_value_cmp: public std::binary_function<mapping_record, mapping_record, bool>
 {
 public:
   bool operator () (const mapping_record& a, const mapping_record& b) const
     {
       return (a.low < b.low); 
     }
-  
-  bool operator () (const mapping_record& a, host_int_4 addr) const
+};
+
+class mr_ptr_cmp: public std::binary_function<mapping_record*, mapping_record*, bool>
+{
+public:
+  bool operator () (const mapping_record* a, const mapping_record* b) const
     {
-      return (a.high < addr); 
+      return (a->low < b->low); 
     }
   
-  bool operator () (host_int_4 addr, const mapping_record& b) const
+  bool operator () (const mapping_record* a, host_int_4 addr) const
     {
-      return (addr < b.low);
+      return (a->high < addr); 
+    }
+  
+  bool operator () (host_int_4 addr, const mapping_record* b) const
+    {
+      return (addr < b->low);
     }
 };
 
@@ -124,8 +167,7 @@ class generic_mapper_bus: public bus
 public:
   generic_mapper_bus (generic_mapper* target, bool transparent_p): target (target)
     {
-      this->tlb1 = 0;
-      this->tlb2 = 0;
+      this->tlb1 = this->tlb2 = 0;
       this->low_multiplier = (transparent_p ? 0 : 1);
     }
 
@@ -246,6 +288,9 @@ private:
   mutable struct mapping_record* tlb1;
   mutable struct mapping_record* tlb2;
   unsigned low_multiplier;
+
+public:
+  void clear_tlb () { tlb1 = tlb2 = 0; }
 };
 
 generic_mapper_bus::~generic_mapper_bus () throw () {
@@ -276,8 +321,15 @@ public:
 protected:
   friend class generic_mapper_bus;
 
-  vector<mapping_record> accessors;
+  vector<mapping_record> accessors; // All records
   generic_mapper_bus my_bus;
+
+  // banking
+  vector<mapping_record*> selected_accessors; // All records in current bank
+  host_int_4 bank;
+  callback_pin<generic_mapper> bank_pin;
+  void bank_pin_handler (host_int_4);
+  void bank_changed ();
 
   // stats
   host_int_4 access_count;
@@ -296,19 +348,60 @@ private:
 
 generic_mapper::generic_mapper (bool transparent_p)
   :my_bus (this, transparent_p),
+   bank (0),
+   bank_pin (this, & generic_mapper::bank_pin_handler),
    latency (0)
 {
   add_bus ("access-port", &this->my_bus);
   add_attribute_virtual ("state-snapshot", this,
 			 & generic_mapper::save_state,
 			 & generic_mapper::restore_state);
-
-  add_attribute ("latency", &latency, "setting");
+  
+  add_attribute ("latency", & this->latency, "setting");
+  add_attribute_notify ("bank", & this->bank,
+			this, & generic_mapper::bank_changed,
+			"register");
+  add_pin ("bank", & this->bank_pin);
 
   this->access_count = 0;
   add_attribute ("access-count", & this->access_count, "register");
   this->cache_hit_count = 0;
   add_attribute ("cache-hit-count", & this->cache_hit_count, "register");
+}
+
+
+
+void
+generic_mapper::bank_pin_handler (host_int_4 new_bank)
+{
+  this->bank = new_bank;
+  this->bank_changed ();
+}
+
+
+// Regenerate the selected-accessors sorted vector after the bank number
+// or overall accessor list have changed.
+void
+generic_mapper::bank_changed ()
+{
+  this->selected_accessors.clear ();
+
+  for (vector<mapping_record>::iterator it = this->accessors.begin();
+       it != this->accessors.end();
+       it++)
+     {
+       if (selected_p (*it, this->bank))
+	 {
+	   // cout << "mapper bank " << this->bank << " sel: " << it->spec << endl;
+	   this->selected_accessors.push_back (it);
+	 }
+     }
+
+  sort (this->selected_accessors.begin(),
+	this->selected_accessors.end(),
+	mr_ptr_cmp ());
+
+  this->my_bus.clear_tlb ();
 }
 
 
@@ -347,7 +440,9 @@ generic_mapper::connect_accessor (const string& name, bus* bus) throw()
 	}
 
     this->accessors.push_back (*r);
-    sort(this->accessors.begin(),this->accessors.end(),mr_cmp());
+    // sort for aesthetic reasons
+    sort (this->accessors.begin(), this->accessors.end(), mr_value_cmp ());
+    this->bank_changed (); // recalculate selected_accessors
 
     add_attribute_virtual_parameterized (name + "-hits", 
 					 name,
@@ -373,7 +468,9 @@ generic_mapper::disconnect_accessor (const string& name, bus* bus) throw()
 	   {
 	     remove_attribute (name + "-hits");
 	     this->accessors.erase (it);
-	     sort(this->accessors.begin(),this->accessors.end(),mr_cmp());
+	     // sort for aesthetic reasons
+	     sort (this->accessors.begin(), this->accessors.end(), mr_value_cmp ());
+	     this->bank_changed (); // recalculate selected_accessors
 	     return component::ok;
 	   }
        }
@@ -488,10 +585,21 @@ generic_mapper_bus::read_any (host_int_4 address, Data& data) throw ()
 // Return 0 on parse or validity-checking error.
 //
 // Accept the following forms:
-// [LOW-HIGH]                              (4 tokens)
-// [LOW-HIGH,STRIDE,WIDTH]                 (6 tokens)
-// [BYTES_PER_WORD,LOW-HIGH]               (5 tokens)
-// [BYTES_PER_WORD,LOW-HIGH,STRIDE,WIDTH]  (7 tokens)
+//
+// GARBAGE1[SPEC]GARBAGE2
+//
+// where SPEC ::=
+// LOW-HIGH                              (2 tokens)
+// LOW-HIGH,STRIDE,WIDTH                 (3 tokens)
+// BYTES_PER_WORD*LOW-HIGH               (4 tokens)
+// BYTES_PER_WORD*LOW-HIGH,STRIDE,WIDTH  (5 tokens)
+//
+// and GARBAGE2 ::=
+// {BANKS}GARBAGE3
+// or GARBAGE3
+//
+// where BANKS ::=  specifies mapping banks
+// BANK1,BANK2,BANK3,...                 (0- tokens)
 //
 // Each number may be specified in any format that parse_attribute()
 // understands.
@@ -502,36 +610,93 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
   // Fill in this struct in stack; may return copy if all goes well
   mapping_record record;
 
-  vector<string> fields = tokenize (str, "[-,]");
-
-  // Must have between 4 and 7 tokens (including empties
-  // before/after "[" and "]")
-  if (fields.size() < 4 || fields.size() > 7)
+  vector<string> fields_outer = tokenize (str, "[]");
+  if (fields_outer.size() != 3)
     {
-      cerr << "mapper error: parse error (bad number of fields) in " << str << endl;
+      cerr << "mapper error: parse error (missing [SPEC]) in " << str << endl;
+      return 0;
+    }
+
+  string garbage1 = fields_outer[0];
+  string spec = fields_outer[1];
+  string garbage2 = fields_outer[2];
+
+  // Process bank numbers spec
+  vector<string> bankspec = tokenize (garbage2, "{}");
+
+  // cout << "suffix=" << garbage2 << endl;
+  // for (int j=0; j<bankspec.size(); j++)
+  //  cout << "bank[" << j << "] = `" << bankspec[j] << "'" << endl;
+
+  if (bankspec.size() == 3)
+    {
+      // Process each number
+      vector<string> banks = tokenize (bankspec[1], ",");
+      for (unsigned i=0; i<banks.size(); i++)
+	{
+	  string bankstr = banks[i];
+	  // accept & bypass empty strings
+	  if (bankstr.length () == 0)
+	    continue;
+
+	  host_int_4 bank;
+	  component::status stat = parse_attribute(bankstr, bank);
+	  if (stat != component::ok) 
+	    {
+	      cerr << "mapper error: parse error (bank#) in " << str << endl;
+	      return 0;
+	    }
+
+	  record.banks.push_back (bank);
+	  // cout << "added bank=" << bank << endl;
+	}
+    }
+  else if (bankspec.size() == 0) // no "{" nor "}" appears
+    {
+      // No bank number specification: default 0
+      record.banks.push_back (0);
+      // cout << "set bank=" << 0 << endl;
+    }
+  else
+    {
+      cerr << "mapper error: parse error (bad {bank} block) in " << str << endl;
+      return 0;
+    }
+
+  // XXX: equivocate */-/, separators
+  vector<string> fields = tokenize (spec, "*-,");  
+  
+  // Must have between 2 and 5 tokens (including empties
+  // before/after "[" and "]"
+  if (fields.size() < 2 || fields.size() > 5)
+    {
+      cerr << "mapper error: parse error (bad number of [SPEC] fields) in "
+	   << str << endl;
       return 0;
     }
 
   // strip the word width off the front of the descriptor array
   record.bytes_per_word = 1;
-  if (fields.size() == 5 || fields.size() == 7) 
+  if (fields.size() == 3 || fields.size() == 5) 
     {
-      component::status stat = parse_attribute(fields [fields.size () - 2], record.bytes_per_word);
+      component::status stat = parse_attribute(fields [0], record.bytes_per_word);
       if (stat != component::ok) 
 	{
 	  cerr << "mapper error: parse error (bytes_per_word) in " << str << endl;
 	  return 0;
 	}
-      fields.pop_back ();
+      fields.erase (fields.begin ());
     }
+
+  assert (fields.size() == 2 || fields.size() == 4);
   
-  record.use_strideoffset_p = (fields.size() == 6);
+  record.use_strideoffset_p = (fields.size() == 4);
   record.spec = str;
   record.hit_count = 0;
 
   // parse two or four fields
-  component::status s1 = parse_attribute(fields[1], record.low);
-  component::status s2 = parse_attribute(fields[2], record.high);
+  component::status s1 = parse_attribute(fields[0], record.low);
+  component::status s2 = parse_attribute(fields[1], record.high);
   if (s1 != component::ok || s2 != component::ok)
     {
       cerr << "mapper error: parse error (low-high) in " << str << endl;
@@ -539,8 +704,8 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
     }
   if (record.use_strideoffset_p)
     {
-      component::status s3 = parse_attribute(fields[3], record.stride);
-      component::status s4 = parse_attribute(fields[4], record.width);
+      component::status s3 = parse_attribute(fields[2], record.stride);
+      component::status s4 = parse_attribute(fields[3], record.width);
       if (s3 != component::ok || s4 != component::ok)
 	{
 	  cerr << "mapper error: parse error (stride,width) in " << str << endl;
@@ -660,17 +825,15 @@ generic_mapper_bus::locate (host_int_4 address) const
     }
 
   // binary search in one statement!
-  vector<mapping_record>::iterator where = 
-    lower_bound (this->target->accessors.begin (),
-		this->target->accessors.end (),
-		address,
-		mr_cmp ());
+  vector<mapping_record*>::iterator where = 
+    lower_bound (this->target->selected_accessors.begin (),
+		 this->target->selected_accessors.end (),
+		 address,
+		 mr_ptr_cmp ());
 
-  // XXX: other optimizations
-
-  while (where != this->target->accessors.end ())
+  while (where != this->target->selected_accessors.end ())
     {
-      mapping_record* found = & * where;
+      mapping_record* found = *where;
       // cout << " [found: " << found.first << "-" << found.last << "]" << endl;
 
       // Incoming address is smaller than the first map entry?

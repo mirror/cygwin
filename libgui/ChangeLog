@@ -1,5 +1,14 @@
 2001-08-02  Mo DeJong  <mdejong@redhat.com>
 
+	* config.h.in: Regen.
+	* configure: Regen.
+	* configure.in: Don't check for strdup since it
+	is no longer used in libgui.
+	* src/tclhelp.c (help_initialize_command): Replace
+	use of strdup with calls to malloc and strcpy.
+
+2001-08-02  Mo DeJong  <mdejong@redhat.com>
+
 	* src/tclhelp.c (help_command_deleted): Free the
 	help_command_data->help_dir member allocated in
 	help_initialize_command.

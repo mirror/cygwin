@@ -1,3 +1,8 @@
+2001-03-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* lib/monkey.exp (monkey_test): Disabled this class of tests
+	temporarily.
+
 2001-01-14  matthew green  <mrg@redhat.com>
 
 	* sidcomp.loader/loader.exp: New test.

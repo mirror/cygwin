@@ -191,7 +191,7 @@ cd tmpdir
 		  (string-append
 		   "cat <<EOF > " (gen-file-name (obj:name insn)) ".cgs\n"
 		   ; FIXME: Need to record assembler line comment char in .cpu.
-		   "# " (current-arch-name) " testcase for " (backslash "$" (insn-syntax insn)) "\n"
+		   "# " (current-arch-name) " testcase for " (backslash "$" (insn-syntax insn)) " -*- Asm -*-\n"
 		   "# mach: "
 		   (let ((machs (insn-machs insn)))
 		     (if (null? machs)

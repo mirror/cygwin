@@ -1,3 +1,8 @@
+2001-03-26  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (basic_cpu::stepped): Make it virtual and public so
+	it can be overridden.
+
 2001-03-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidmiscutil.h (sid_file_search_path): New function for returning

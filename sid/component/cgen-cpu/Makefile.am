@@ -22,8 +22,8 @@ LIBIBERTY = -L../../../libiberty -liberty
 
 libcgencpu_la_SOURCES = compCGEN.cxx fp.h fp.cxx tracedis.cxx
 libcgencpu_la_LDFLAGS = -module -no-undefined
-libcgencpu_la_LIBADD = @cpu_libs@ $(INTLLIBS) $(LIBIBERTY) cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo
-libcgencpu_la_DEPENDENCIES = @cpu_libs@ cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo
+libcgencpu_la_LIBADD = @cpu_libs@ $(INTLLIBS) $(LIBIBERTY) cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo dis-init.lo
+libcgencpu_la_DEPENDENCIES = @cpu_libs@ cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo dis-init.lo
 
 OPCODES_COMPILE_FLAGS = -DHAVE_CONFIG_H \
 	-I../../../opcodes \
@@ -45,6 +45,9 @@ cgen-opc.lo: ../../../opcodes/cgen-opc.c
 	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
 
 dis-buf.lo: ../../../opcodes/dis-buf.c
+	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
+
+dis-init.lo: ../../../opcodes/dis-init.c
 	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
 
 DEJAGNUTESTS = cpumonkey.exp dhrystone.exp

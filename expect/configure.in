@@ -491,6 +491,8 @@ LIBS=$EXP_LIBS
 # openpty, but it doesn't work correctly.
 case "${host}" in
 *-*-linux*) ;;
+*-*-cygwin*)
+  EXP_AND_TCL_LIBS="$EXP_AND_TCL_LIBS -luser32" ;;
 *)
   unset ac_cv_func_openpty
   AC_CHECK_FUNC(openpty, openpty=1 , openpty=0)
@@ -531,11 +533,6 @@ case "${host}" in
   # save Tk results and reset for Expect
   EXP_AND_TK_LIBS=$LIBS
   LIBS=$EXP_LIBS
-
-  # CYGNUS LOCAL: Link against luser32 on Cygwin.
-  case "${host}" in
-    *-*-cygwin*) EXP_AND_TCL_LIBS="$EXP_AND_TCL_LIBS -luser32" ;;
-  esac
 ;;
 esac
 

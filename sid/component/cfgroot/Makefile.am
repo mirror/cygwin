@@ -12,6 +12,7 @@ INCLUDES = -I. -I../../include -I$(srcdir)/../../include -I$(srcdir)/libltdl
 libconfig_la_SOURCES = compConfig.cxx
 libconfig_la_LDFLAGS = -module -no-undefined
 libconfig_la_LIBADD = @LIBLTDL@
+libconfig_la_DEPENDENCIES = @LIBLTDL@
 
 pkgdata_DATA = sid-control-cfgroot.txt
 

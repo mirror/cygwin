@@ -1,3 +1,10 @@
+2004-04-29  Dave Brolley  <brolley@redhat.com>
+
+	* compConfig.cxx (register_dso): Check dl_handle before attempting to
+	open ".a".
+	* Makefile.am (libconfig_la_DEPENDENCIES): Add @LIBLTDL@.
+	* Makefile.in: Regenerated.
+
 2002-05-30  Frank Ch. Eigler  <fche@redhat.com>
 
 	* compConfig.cxx (stop): Store incoming code in new "stop-code"

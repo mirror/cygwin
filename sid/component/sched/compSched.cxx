@@ -1,6 +1,6 @@
 // compSched.cxx - the scheduler component.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2002 Red Hat.
+// Copyright (C) 1999-2003 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -102,6 +102,20 @@ namespace scheduler_component
   using std::ios;
   using std::endl;
   using std::cerr;
+
+
+  // some forward declarations
+  template <unsigned> class apprx_host_time_keeper;
+  template <unsigned d> ostream& operator << (ostream& o, const apprx_host_time_keeper<d>& it);
+  template <unsigned d> istream& operator >> (istream& i, apprx_host_time_keeper<d>& it);
+
+  template <class T> class generic_scheduler;
+  template <class T> ostream& operator << (ostream& o, const generic_scheduler<T>& it);
+  template <class T> istream& operator >> (istream& i, generic_scheduler<T>& it);
+
+  template <class T> class scheduler_component;
+  template <class T> ostream& operator << (ostream& o, const scheduler_component<T>& it);
+  template <class T> istream& operator >> (istream& i, scheduler_component<T>& it);
 
 
 
@@ -332,8 +346,8 @@ void host_time_keeper_base::system_now (tick_t& out) const
   template <unsigned dilution>
   class apprx_host_time_keeper: public host_time_keeper_base
   {
-    friend ostream& operator << <> (ostream& o, const apprx_host_time_keeper<dilution>& it);
-    friend istream& operator >> <> (istream& i, apprx_host_time_keeper<dilution>& it);
+    friend ostream& operator << <> (ostream& o, const apprx_host_time_keeper& it);
+    friend istream& operator >> <> (istream& i, apprx_host_time_keeper& it);
 
     mutable tick_t prev_now;                   // previous system_now() value
     mutable host_int_4 iterations;         // now() invocation counter
@@ -454,9 +468,9 @@ apprx_host_time_keeper<dilution>::get_now(tick_t& out) const
   // Still close to the same host time?  Too few iterations!
   if (new_now <= this->prev_now + dilution/2)
     {
-      // We should not come near overflowing even 63 bits of
-      // this 64-bit counter!
-      assert (this->iterations_per_dms < ((tick_t)1 << (sizeof(tick_t)*8-1)));
+      // We should not come near overflowing even 31 bits of
+      // this 32-bit counter!
+      assert (this->iterations_per_dms < 2147483647L); // LONG_MAX
 
       // Increase no. of iterations by 10% + 1
       // XXX: confirm that this heuristic behaves well
@@ -866,8 +880,8 @@ operator >> (istream& i, exact_host_time_keeper& it)
 	this->pin_state_map.add (s, p);
       }
 
-  friend ostream& operator << <> (ostream& o, const generic_scheduler<Timekeeper>& it);
-  friend istream& operator >> <> (istream& i, generic_scheduler<Timekeeper>& it);
+  friend ostream& operator << <> (ostream& o, const generic_scheduler& it);
+  friend istream& operator >> <> (istream& i, generic_scheduler& it);
   };
 
 
@@ -1329,8 +1343,9 @@ class scheduler_component: public scheduler_component_base
 public:
 
 private:
-  friend ostream& operator << <> (ostream& o, const scheduler_component<Scheduler>& it);
-  friend istream& operator >> <> (istream& i, scheduler_component<Scheduler>& it);
+  friend ostream& operator << <> (ostream& o, const scheduler_component& it);
+  friend istream& operator >> <> (istream& i, scheduler_component& it);
+
   string save_state() { return make_attribute(*this); }
   sid::component::status restore_state(const string& state)
     { return parse_attribute(state, *this); }

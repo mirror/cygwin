@@ -1,3 +1,7 @@
+2001-04-03  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compLoader.cxx (load_it): Emit verbose message for starting_pc.
+
 2001-01-13  matthew green  <mrg@redhat.com>
 
 	* compLoader.cxx (load_accessor): Delete member.

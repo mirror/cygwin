@@ -175,7 +175,7 @@ class elf_loader: public generic_loader
 
       if (this->verbose_p)
 	{
-	  cout << "loader: Reading program " << this->load_file << endl;
+	  cout << "loader: reading program " << this->load_file << endl;
 	}
 
       assert(elf_loader::freeloader == 0);
@@ -202,6 +202,13 @@ class elf_loader: public generic_loader
 	    this->endian_pin.drive(sidutil::endian_little);
 	  else
 	    this->endian_pin.drive(sidutil::endian_big);
+
+	  if (this->verbose_p)
+	    cout << "loader: starting "
+		 << (little_endian_p ? "little-" : "big-") << "endian"
+		 << " program at pc=" 
+		 << make_numeric_attribute (entry_point, ios::hex | ios::showbase)
+		 << endl;
 	}
       else
 	{

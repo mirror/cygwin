@@ -1,3 +1,8 @@
+2002-02-04  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh.cpu, cpu/sh.opc: New files.
+	* cpu/sh64-comact.cpu, cpu/sh64-media.cpu: Likewise.
+
 2002-01-29  Hans-Peter Nilsson  <hp@axis.com>
 
 	* doc/rtl.texi: Fix typo: define-attr, not define-attribute.
@@ -395,15 +400,6 @@
 2000-12-12  Ben Elliston  <bje@redhat.com>
 
 	* doc/rtl.texi (Expressions): Document the (delay ..) rtx.
-
-2000-12-08  Ben Elliston  <bje@redhat.com>
-
-	* dev.scm (load-sid): New function.
-	* cgen-sid.scm: New file.
-	* sid-cpu.scm: Likeiwse.
-	* sid-decode.scm: Likewise.
-	* sid-model.scm: Likewise.
-	* sid.scm: Likewise.
 
 2000-12-07  Ben Elliston  <bje@redhat.com>
 

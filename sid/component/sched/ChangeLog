@@ -1,3 +1,11 @@
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Graydon Hoare  <graydon@redhat.com>
+	* sid-visual-sched.tk (toggle_subscription): Do not alter the
+	enabled? flag of the scheduler when updating subscriptions.
+	(set_sub): Alter the subscription in an order that respects
+	whether time is zero or not.
+
 2003-08-29  Dave Brolley  <brolley@redhat.com>
 
 	* compSched.cxx (operator <<): Stream active_pin.

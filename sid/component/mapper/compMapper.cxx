@@ -1,6 +1,6 @@
 // compMapper.cxx - a bus mapper component.  -*- C++ -*-
 
-// Copyright (C) 1999-2002 Red Hat.
+// Copyright (C) 1999-2003 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -774,7 +774,7 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
   // scale all values by the word width
   record.mapped_base *= record.bytes_per_word;
   record.low    *= record.bytes_per_word;
-  record.high   *= record.bytes_per_word;
+  record.high   = (record.high + 1) * record.bytes_per_word - 1;
   record.stride *= record.bytes_per_word;
   record.width  *= record.bytes_per_word;
 

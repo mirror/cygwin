@@ -2,12 +2,6 @@
 
 	* configrun-sid.in: Make cpu<->sched pin connections for time queries.
 
-2001-12-17  matthew green  <mrg@redhat.com>
-
-	* Makefile.am (FAM10SCRIPTS): Add Xstormy16 support.
-	* configrun-sid.in: Likewise. 
-	* xstormy16-elf-sid: New Xstormy16 frontend.
-
 2001-12-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configrun-sid.in (opt_EB, opt_EL): Delay error checking until

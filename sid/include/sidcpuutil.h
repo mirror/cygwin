@@ -233,13 +233,13 @@ namespace sidutil
       {
 	this->yield ();
       }
-
-  protected:
-    virtual void step_insns () = 0;
-    void stepped (sid::host_int_4 n)
+    virtual void stepped (sid::host_int_4 n)
       {
 	this->step_cycles_pin.drive (n);
       }
+
+  protected:
+    virtual void step_insns () = 0;
     bool stop_after_insns_p (sid::host_int_4 num)
       {
 	this->current_step_insn_count += num;

@@ -2147,6 +2147,7 @@ sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
 sidtarget_ppc=$sidtarget_default
+sidtarget_xstormy16=$sidtarget_default
 
 for targ in $all_targets
 do
@@ -2159,6 +2160,7 @@ do
       m68k*)  sidtarget_m68k=1 ;;
       powerpc*) sidtarget_ppc=1 ;;
       ppc*)   sidtarget_ppc=1 ;;
+      xstormy16*) sidtarget_xstormy16=1 ;;
       *)      echo "configure: warning: "Unknown target $targ"" 1>&2 ;;
    esac
 done
@@ -2170,6 +2172,7 @@ case 1 in
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
   ${sidtarget_ppc}) ;;
+  ${sidtarget_xstormy16}) ;;
   *) echo "configure: warning: No selected sid targets: use --enable-targets or --target" 1>&2
 	;;
 esac
@@ -2258,6 +2261,20 @@ else
   SIDTARGET_PPC_FALSE=
 fi
 echo "$ac_t""$sidtarget_ppc" 1>&6
+
+echo $ac_n "checking Sanyo Xstormy16 family support""... $ac_c" 1>&6
+echo "configure:2433: checking Sanyo Xstormy16 family support" >&5
+
+
+
+if test "x$sidtarget_xstormy16" = x1; then
+  SIDTARGET_XSTORMY16_TRUE=
+  SIDTARGET_XSTORMY16_FALSE='#'
+else
+  SIDTARGET_XSTORMY16_TRUE='#'
+  SIDTARGET_XSTORMY16_FALSE=
+fi
+echo "$ac_t""$sidtarget_xstormy16" 1>&6
 
 
 
@@ -2456,6 +2473,9 @@ s%@SIDTARGET_M68K_FALSE@%$SIDTARGET_M68K_FALSE%g
 s%@sidtarget_ppc@%$sidtarget_ppc%g
 s%@SIDTARGET_PPC_TRUE@%$SIDTARGET_PPC_TRUE%g
 s%@SIDTARGET_PPC_FALSE@%$SIDTARGET_PPC_FALSE%g
+s%@sidtarget_xstormy16@%$sidtarget_xstormy16%g
+s%@SIDTARGET_XSTORMY16_TRUE@%$SIDTARGET_XSTORMY16_TRUE%g
+s%@SIDTARGET_XSTORMY16_FALSE@%$SIDTARGET_XSTORMY16_FALSE%g
 s%@SID_STATIC_TRUE@%$SID_STATIC_TRUE%g
 s%@SID_STATIC_FALSE@%$SID_STATIC_FALSE%g
 

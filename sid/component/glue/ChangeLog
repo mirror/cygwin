@@ -1,3 +1,14 @@
+2001-01-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* glue.cxx (bus_mux): New bus multiplex component accepting
+	one input bus and having two output accessors.
+	(list_types): List it under type "hw-glue-bus-mux".
+	(create): Ditto.
+	(do_delete): Ditto.
+	* hw-glue-bus-mux.txt: New documentation for bus_mux.
+	* Makefile.am: Add reference to new documentation.
+	* Makefile.in: Regenerated.
+
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.in: Regenerated.

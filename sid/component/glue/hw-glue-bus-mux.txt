@@ -1,0 +1,70 @@
+* Name
+  hw-glue-bus-mux
+
+* Synopsis
+  This component provides switchable access from one bus to two separate
+  accessors.
+
+  Buses: upstream
+  Accessors: downstream1, downstream2
+  Attributes: switch
+  Pins: switch
+  Shared library: libglue.la
+  Symbol: glue_component_library
+
+* Functionality
+ 
+  - Modelling
+    * This component is a bus multiplexer with one input bus, two
+      output accessors, and a switch to alternate between them.
+
+  - Behaviors
+    * Initialization
+      At start-up, the single input bus: "upstream" is tied by default
+      to "downstream1".
+
+    * Switching
+      When the "switch" pin is driven high, the output accessor will
+      be switched from the current output accessor to the one not in use.
+      The "switch" pin can be driven any number of times, each time
+      causing the output to be switched.
+
+    * Bus traffic
+      Input to the "upstream" bus is passed on to the current
+      output accessor: either "downstream1" or "downstream2".
+
+  - SID conventions
+    * This is a functional component.
+    * It presents one attribute in the "pin" category.
+
+* Environment
+  - Related components
+    * This component may be used as to implement a multiplexer by
+      combining two bus-mux components with the same accessors in the
+      opposite order.  For example:
+
+	new hw-glue-bus-mux bus-mux1
+	new hw-glue-bus-mux bus-mux2
+        connect-bus cpu data-memory-x bus-mux1 upstream
+        connect-bus coprocessor data-memory-x bus-mux2 upstream
+        connect-bus bus-mux1 downstream1 data-memory-x1 read-write-port
+        connect-bus bus-mux1 downstream2 data-memory-x2 read-write-port
+        connect-bus bus-mux2 downstream1 data-memory-x2 read-write-port
+        connect-bus bus-mux2 downstream2 data-memory-x1 read-write-port
+	connect-pin cpu memory-x-ctl bus-mux1 switch
+        connect-pin cpu memory-x-ctl bus-mux2 switch
+
+* SID interface reference
+  - low level:
+    * buses
+      - upstream | unrestricted | unrestricted | bus traffic
+
+    * accessors
+      - downstream1 | unrestricted | unrestricted | bus traffic
+      - downstream2 | unrestricted | unrestricted | bus traffic
+
+    * pins
+      - switch | input | 0 or non-zero | switching
+
+    * attributes
+      - switch | pin | n/a | n/a | switching

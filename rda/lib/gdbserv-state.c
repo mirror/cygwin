@@ -237,7 +237,7 @@ do_status_packet (struct gdbserv *gdbserv)
 	  if (sizeof_reg > 0)
 	    gdbserv->target->get_reg (gdbserv, reg_nr, &reg);
 	  else
-	    memset (&reg, sizeof (reg), 0);
+	    memset (&reg, 0, sizeof (reg));
 	  gdbserv->target->output_reg (gdbserv, &reg, len);
 	  gdbserv_output_char (gdbserv, ';');
 	}
@@ -747,9 +747,14 @@ gdbserv_data_packet (struct gdbserv *gdbserv)
 	      long sizeof_reg = gdbserv->target->sizeof_reg (gdbserv, reg_nr);
 	      long len = (sizeof_reg < 0 ? -sizeof_reg : sizeof_reg);
 	      if (sizeof_reg > 0)
-		gdbserv->target->get_reg (gdbserv, reg_nr, &reg);
+		{
+		  int status;
+		  status = gdbserv->target->get_reg (gdbserv, reg_nr, &reg);
+		  if (status < 0)
+		    memset (&reg, 0, sizeof (reg));
+		}
 	      else
-		memset (&reg, sizeof (reg), 0);
+		memset (&reg, 0, sizeof (reg));
 	      gdbserv->target->output_reg (gdbserv, &reg, len);
 	    }
 	}

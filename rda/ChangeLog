@@ -1,3 +1,9 @@
+2003-01-16  Kevin Buettner  <kevinb@redhat.com>
+
+	* lib/gdbserv-state.c (do_status_packet, gdbserv_data_packet): Fix
+	memset() calls - the arguments were in the wrong order.
+	(gdbserv_data_packet): Check return value from get_reg() call.
+
 2002-12-02  Kevin Buettner  <kevinb@redhat.com>
 
 	* include/gdbserv-utils.h, lib/gdbserv-utils.c

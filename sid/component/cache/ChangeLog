@@ -1,3 +1,7 @@
+2003-01-31  Frank Ch. Eigler  <fche@redhat.com>
+
+	* log2.h: #undef log2, in case a macro collides with the function.
+
 2002-07-16  Dave Brolley  <brolley@redhat.com>
 
 	* cache.h (cache): Add flush_and_invalidate_set_pin and

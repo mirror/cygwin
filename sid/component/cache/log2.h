@@ -25,6 +25,9 @@ bool power_of_two_p (const V& v1)
 
 // Compute log2 (V).
 
+// Zap a possible math.h macro by this name
+#undef log2
+
 template <typename V>
 unsigned log2 (const V& v1)
 {

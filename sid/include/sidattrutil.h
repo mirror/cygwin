@@ -403,7 +403,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
   public:
     virtual std::string make_attribute() const = 0;
     virtual sid::component::status parse_attribute(const std::string& str) = 0;
-    virtual ~attribute_coder_base() {}
+    virtual ~attribute_coder_base() throw() {}
   };
 
 
@@ -435,7 +435,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
     parse_attribute (const std::string& str)
       { return (receiver->*setter) (str); }
 
-    ~attribute_coder_virtual() { }
+    ~attribute_coder_virtual() throw() { }
   };
 
 
@@ -459,7 +459,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
     parse_attribute (const std::string& str)
       { return receiver->set_attribute_value (name, str); }
 
-    ~attribute_coder_alias() { }
+    ~attribute_coder_alias() throw() { }
   };
 
 
@@ -502,7 +502,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	return (receiver->*setter) (parameter, str);
       }
 
-   ~attribute_coder_virtual_parameterized() { }
+   ~attribute_coder_virtual_parameterized() throw() { }
 
   };
 
@@ -527,7 +527,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	return sidutil::parse_attribute (str, *ptr);
       }
 
-    ~attribute_coder() { }
+    ~attribute_coder() throw() { }
   };
 
 
@@ -547,7 +547,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	return sid::component::bad_value;
       }
     
-    ~attribute_coder_ro() { }
+    ~attribute_coder_ro() throw() { }
   };
 
 
@@ -572,7 +572,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	return sid::component::bad_value; 
       }
     
-    ~attribute_coder_ro_value() { }
+    ~attribute_coder_ro_value() throw() { }
  
   };
 
@@ -636,7 +636,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	else return sid::component::bad_value;
       }
     
-    ~attribute_coder_bus_rw() { }
+    ~attribute_coder_bus_rw() throw() { }
   };
 
 
@@ -679,7 +679,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	return s;
       }
 
-   ~attribute_coder_bus_wo() { }
+   ~attribute_coder_bus_wo() throw() { }
 
   private:
     std::string last_written_attribute;
@@ -723,7 +723,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
     // the compiler working set blew up.
     
   protected:
-    ~fixed_attribute_map_component () { /* XXX: delete coder objects */ }
+    ~fixed_attribute_map_component () throw() { /* XXX: delete coder objects */ }
 
     // Add or remove an attribute <-> category association.  The named
     // attribute must already exist.

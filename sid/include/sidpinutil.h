@@ -50,17 +50,17 @@ namespace sidutil
 
   inline std::ostream& 
   operator << (std::ostream& o, const input_pin& p)
-{
-  o << p.value;
-  return o;
-}
+    {
+      o << p.value;
+      return o;
+    }
 
   inline std::istream& 
   operator >> (std::istream& i, input_pin& p)
-{
-  i >> p.value;
-  return i;
-}
+    {
+      i >> p.value;
+      return i;
+    }
   
 
 
@@ -81,8 +81,10 @@ namespace sidutil
     {
     typedef std::vector<sid::pin*> pin_list_t;
     pin_list_t neighbours;
-    
+
     public:
+      ~list_output() throw() {}
+
       // Propagate value to list of outputs.
       void
       driven (sid::host_int_4 v) throw()
@@ -167,7 +169,7 @@ namespace sidutil
 	this->value = 0;
       }
       
-    ~output_pin ()
+    virtual ~output_pin () throw()
       {
 	if (this->num_outputs == 0)
 	  {
@@ -257,17 +259,17 @@ namespace sidutil
 
   inline std::ostream& 
   operator << (std::ostream& o, const output_pin& p)
-{
-  o << p.value;
-  return o;
-}
+    {
+      o << p.value;
+      return o;
+    }
 
   inline std::istream& 
   operator >> (std::istream& i, output_pin& p)
-{
-  i >> p.value;
-  return i;
-}
+    {
+      i >> p.value;
+      return i;
+    }
 
 
 
@@ -290,17 +292,17 @@ namespace sidutil
 
   inline std::ostream& 
   operator << (std::ostream& o, const inputoutput_pin& p)
-{
-  o << *p.output() << " " << *p.input();
-  return o;
-}
+    {
+      o << *p.output() << " " << *p.input();
+      return o;
+    }
 
   inline std::istream& 
   operator >> (std::istream& i, inputoutput_pin& p)
-{
-  i >> *p.output() >> *p.input();
-  return i;
-}
+    {
+      i >> *p.output() >> *p.input();
+      return i;
+    }
 
 
 
@@ -373,6 +375,8 @@ namespace sidutil
 	}
       
     public:
+      ~fixed_pin_map_component() throw() {}
+
       // Return the names of all known pins (input & output)
       std::vector<std::string>
       pin_names () throw ()

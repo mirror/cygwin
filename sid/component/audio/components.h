@@ -97,7 +97,7 @@ class basic_codec: public virtual component,
 {
 public:
   basic_codec ();
-  ~basic_codec () {}
+  ~basic_codec () throw() {}
 
 private:
   friend class callback_word_bus<basic_codec,big_int_4>;
@@ -159,7 +159,7 @@ class generic_audio: public virtual component,
 {
 public:
   generic_audio ();
-  ~generic_audio () {}
+  ~generic_audio () throw() {}
 
 protected:
   virtual bool begin_tx (const audio_config&) = 0;
@@ -215,7 +215,7 @@ class nop_audio: public generic_audio
 {
 public:
   nop_audio () {}
-  ~nop_audio () {}
+  ~nop_audio () throw() {}
 
 private:
   // The inherited virtual functions 
@@ -235,7 +235,7 @@ class fd_audio: public generic_audio
 {
 public:
   fd_audio ();
-  ~fd_audio ();
+  ~fd_audio () throw() ;
 
 protected:
   virtual bool set_audio_config (int, const audio_config&) = 0;
@@ -260,7 +260,7 @@ class linux_audio: public fd_audio
   // XXX
 public:
   linux_audio () {}
-  ~linux_audio () {}
+  ~linux_audio () throw() {}
 
 protected:
   bool set_audio_config (int, const audio_config&) { return true; }
@@ -270,7 +270,7 @@ class solaris_audio: public fd_audio
 {
 public:
   solaris_audio () {}
-  ~solaris_audio () {}
+  ~solaris_audio () throw() {}
 
   // XXX
   bool set_audio_config (int, const audio_config&) { return true; }

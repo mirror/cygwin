@@ -1,3 +1,7 @@
+2004-02-08  Daniel Jacobowitz  <drow@mvista.com>
+
+	* baseboards/basic-sim.exp: Set gdb,do_reload_on_run.
+
 2003-11-17  Andrew Cagney  <cagney@redhat.com>
 
 	* lib/framework.exp (clone_output): Write KFAIL messages to the

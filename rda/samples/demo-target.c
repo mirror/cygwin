@@ -136,7 +136,7 @@ static struct gdbserv* sole_connection = NULL;
 struct gdbserv_target *
 demo_target (struct gdbserv *serv, void *context)
 {
-  struct gdbserv_target *target;
+  static struct gdbserv_target *target = NULL;
 
   if (sole_connection != NULL)
     {
@@ -147,7 +147,8 @@ demo_target (struct gdbserv *serv, void *context)
   fprintf (stderr, "Accepted gdb connection.\n");
   sole_connection = serv;
 
-  target = malloc (sizeof (struct gdbserv_target));
+  if (target == NULL)
+    target = malloc (sizeof (struct gdbserv_target));
   memset (target, sizeof (*target), 0);
 
   /* Callback structure for function pointers that handle processed
@@ -384,6 +385,9 @@ demo_get_mem (struct gdbserv* serv,
   return n;
 }
 
+#define ALLOC_UNIT  0x1000
+#define alloc_roundup(LEN) ((((LEN)+ALLOC_UNIT-1) / ALLOC_UNIT) * ALLOC_UNIT)
+  
 
 static long
 demo_set_thread_mem (struct gdbserv *serv, 
@@ -397,23 +401,27 @@ demo_set_thread_mem (struct gdbserv *serv,
   gdbserv_reg_to_ulong (serv, addr, &request_base);
   if (target_mem.len == 0)
     {
-      target_mem.buf  = malloc (len);
-      target_mem.len  = len;
-      gdbserv_reg_to_ulong (serv, addr, &target_mem.base);
+      target_mem.len  = alloc_roundup (len);
+      target_mem.buf  = malloc (target_mem.len);
+      target_mem.base = request_base;
     }
   else
     {
       if (request_base < target_mem.base)
 	{
-	  target_mem.len += target_mem.base - request_base;
+	  unsigned long oldlen = target_mem.len;
+	  unsigned long movlen = target_mem.base - request_base;
+
+	  target_mem.len += alloc_roundup (target_mem.base - request_base);
 	  target_mem.base = request_base;
 	  target_mem.buf  = realloc (target_mem.buf, target_mem.len);
+	  memmove (target_mem.buf + movlen, target_mem.buf, oldlen);
 	}
       if (request_base + len > 
 	  target_mem.base + target_mem.len)
 	{
-	  target_mem.len += 
-	    (request_base + len) - (target_mem.base + target_mem.len);
+	  target_mem.len += alloc_roundup ((request_base + len) - 
+					   (target_mem.base + target_mem.len));
 	  target_mem.buf  = realloc (target_mem.buf, target_mem.len);
 	}
     }

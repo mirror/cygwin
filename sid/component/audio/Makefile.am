@@ -16,5 +16,5 @@ libaudio_la_LDFLAGS = -module -no-undefined
 
 
 DEJAGNUTESTS = linusraw.exp linuscodec.exp aumonkey.exp
-checkme: all
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )

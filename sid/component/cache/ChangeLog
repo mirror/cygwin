@@ -1,4 +1,8 @@
-2001-07-13    <brolley@redhat.com>
+2001-07-13  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (check-local): Rename target from "checkme".
+
+2001-07-13  Dave Brolley  <brolley@redhat.com>
 
 	* cache.h (cache:bus::DEFN_METHOD): Generate function prototypes only.
 	(::DEFN_METHOD): Generate actual inline function bodies after

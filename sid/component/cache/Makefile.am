@@ -14,5 +14,5 @@ DEJAGNUTESTS=cache.exp cachemonkey.exp cachedocs.exp coherency.exp \
 	fifo.exp flush.exp lock.exp lru.exp misaligned.exp \
 	prefetch.exp random.exp writealloc.exp writethru.exp
 
-checkme: all
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)")

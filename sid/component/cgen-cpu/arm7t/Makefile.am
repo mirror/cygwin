@@ -16,8 +16,7 @@ libarm7t_la_SOURCES = arm7f.cxx arm-decode.cxx arm-sem.cxx arm-semsw.cxx \
 libarm7t_la_LDFLAGS =
 
 DEJAGNUTESTS = armconf.exp armmisc.exp armbsp.exp
-.PHONY: checkme
-checkme:
+check-local: all
 	(cd ../../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
 
 

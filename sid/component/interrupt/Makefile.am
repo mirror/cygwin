@@ -12,5 +12,5 @@ libinterrupt_la_LDFLAGS = -module -no-undefined
 pkgdata_DATA = hw-interrupt-arm_ref.txt hw-interrupt-cogent_cma222.txt
 
 DEJAGNUTESTS=arm-interrupt.exp cma222-interrupt.exp interruptdocs.exp interruptmonkey.exp
-checkme: all
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )

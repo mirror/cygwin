@@ -1,3 +1,7 @@
+2001-07-13  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (check-local): Rename target from "checkme".
+
 2001-06-28  Jeff Johnston  <jjohnstn@redhat.com>
 
         * arm7f.cxx (arm7f_cpu::memory_trap): Remove code under now

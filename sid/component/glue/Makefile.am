@@ -14,6 +14,6 @@ seqvalid.exp gluemonkey.exp traffic.exp
 
 pkgdata_DATA = hw-glue-sequence.txt hw-glue-probe-bus.txt sw-glue-attribbank.txt hw-glue-bus-mux.txt
 
-checkme:
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
 

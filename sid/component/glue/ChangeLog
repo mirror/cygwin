@@ -1,3 +1,7 @@
+2001-07-13  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (check-local): Rename target from "checkme".
+
 2001-06-23  Frank Ch. Eigler  <fche@redhat.com>
 
 	* glue.cxx (probing_bus::traceAccess): Print non-zero latency.

@@ -32,17 +32,20 @@ stdioConsole::write(host_int_4 value)
 void
 stdioConsole::read(host_int_4)
 {
-  unsigned char c;
+  unsigned char buf[1000];
+  int len;
   host_int_4 value;
 
   // Switch to non-blocking input.
   long flags = fcntl(0, F_GETFL);
   fcntl(0, F_SETFL, flags | O_NONBLOCK);
 
-  if (::read(0, &c, 1) > 0)
+  if ((len = ::read(0, buf, 1000)) > 0)
     {
-      value = c;
-      stdin_pin.drive(value);
+      for (int i = 0; i < len; ++i)
+	{
+	  stdin_pin.drive(buf[i]);
+	}
     }
 
   // Restore flags.

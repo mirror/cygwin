@@ -1,3 +1,8 @@
+2001-05-18  Keith Seitz  <keiths@cygnus.com>
+
+	* library/center.tcl (center_window): Allow centering
+	the toplevel on a window, too.
+
 2001-05-03  Keith Seitz  <keiths@cygnus.com>
 
 	* src/tkWarpPointer.c (WarpPointer): Implement for windows.

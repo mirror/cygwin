@@ -39,15 +39,14 @@ newLoadArea (int index)
     }
 }
 
-/* The section table is kept for the duration of the simulation.
-   It is divided into sub tables, one for each loader in the system.  */
-static int textSectionCount = 0;
-static struct TextSection *textSections = 0;
+/* A new section table is created for each loader in the system.  */
+static struct TextSection *textSections;
+static int textSectionCount;
+static int textSectionNum;
 
 static void
 newTextSection (int index)
 {
-  static textSectionNum = 0;
   if (index >= textSectionNum)
     {
       textSectionNum = index + 10;
@@ -204,8 +203,10 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian, const struc
 
   /* Look in the section table in order to determine which sections contain
      code and which contain data.  */
+  textSections = 0;
+  textSectionNum = 0;
+  textSectionCount = 0;
   newTextSection (textSectionCount);
-  *section_table = textSections + textSectionCount;
   if (sixtyfourbit) 
     {
       secOffset = fetchQuad (fileHeader+40, littleEndian);
@@ -256,9 +257,10 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian, const struc
   /* Terminate this portion of the section table.  */
   textSections[textSectionCount].lbound = 0;
   textSections[textSectionCount].hbound = 0;
-  textSectionCount++;
 
   *entry_point = entryPoint;
   *little_endian = littleEndian;
+  *section_table = textSections;
+
   return 1;
 }

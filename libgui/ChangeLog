@@ -1,3 +1,86 @@
+2001-08-12  Mo DeJong  <mdejong@redhat.com>
+
+	* src/tkCanvEdge.c: Work around Windows gcc problem
+	initializing a static member with a dll imported
+	symbol by assigning the function pointer at runtime.
+	Static initialization works just fine in VC++ but
+	fails when compiling with the Windows version of gcc.
+
+2001-08-03  Mo DeJong  <mdejong@redhat.com>
+
+	* src/tclhelp.c (help_display_file_command): Pass int
+	address to Tcl_GetInt instead of an unsigned long to
+	avoid compiler warning.
+
+2001-08-03  Mo DeJong  <mdejong@redhat.com>
+
+	* src/subcommand.c:
+	* src/tclgetdir.c:
+	* src/tclhelp.c:
+	* src/tclmain.c:
+	* src/tclmsgbox.c:
+	* src/tclsizebox.c:
+	* src/tclwinmode.c:
+	* src/tclwinpath.c:
+	* src/tclwinprint.c:
+	* src/tkWinPrintCanvas.c:
+	* src/tkWinPrintText.c:
+	Use ckalloc/ckfree instead of Tcl_Alloc/Tcl_Free
+	or malloc/free so that allocations will
+	be marked with file positions when Tcl mem
+	debug is activated.
+
+2001-08-02  Mo DeJong  <mdejong@redhat.com>
+
+	* src/tkWinPrintCanvas.c (PrintCanvasCmd):
+	* src/tkWinPrintText.c (PrintTextCmd): Plug
+	memory leak by calling free on memory allocated
+	in PrintCanvasCmd and PrintTextCmd method. Make
+	sure error cases branch to the cleanup code at
+	the end of the method instead of just returning.
+
+2001-08-02  Mo DeJong  <mdejong@redhat.com>
+
+	* src/tkWinPrintText.c (DisplayDLineToDrawable): Fix
+	compiler warning by adding missing static modifier
+	to funciton declaration.
+
+2001-08-02  Mo DeJong  <mdejong@redhat.com>
+
+	* config.h.in: Regen.
+	* configure: Regen.
+	* configure.in: Don't check for strdup since it
+	is no longer used in libgui.
+	* src/tclhelp.c (help_initialize_command): Replace
+	use of strdup with calls to malloc and strcpy.
+
+2001-08-02  Mo DeJong  <mdejong@redhat.com>
+
+	* src/tclhelp.c (help_command_deleted): Free the
+	help_command_data->help_dir member allocated in
+	help_initialize_command.
+
+2001-08-02  Mo DeJong  <mdejong@redhat.com>
+
+	* src/tkGraphCanvas.c (GetEdgeNodes): Use ckalloc
+	and strcpy instead of calling strdup() since this
+	memory is deallocated with ckfree() later on.
+
+2001-08-02  Mo DeJong  <mdejong@redhat.com>
+
+	* Makefile.in: Regen.
+	* configure: Regen.
+	* configure.in: Check for cross AR using the
+	AC_CHECK_TOOL macro to fix cross compile. Use
+	AC_CHECK_TOOL instead of AC_PROG_RANLIB for
+	ranlib. The ranlib change is not required
+	but it is more correct. Move the call to
+	AC_CANONICAL_HOST up in the file. Don't
+	set or subst ITCL_DIR since it is not used
+	and depends on pre Itcl 3.1 paths.
+	* library/Makefile.in: Regen.
+	* src/Makefile.in: Regen.
+
 Fri Sep 17 19:14:15 1999  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* src/guitcl.h (cyg_create_warp_pointer_command): Add declaration.

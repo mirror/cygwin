@@ -4,6 +4,7 @@ AC_INIT(src/subcommand.h)
 AM_INIT_AUTOMAKE(libgui, 0.0)
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
+AC_CANONICAL_HOST
 AC_PROG_CC
 AC_EXEEXT
 AC_OBJEXT
@@ -11,13 +12,14 @@ AC_ARG_ENABLE(install-libgui, \
   [  --enable-install-libgui Install libgui.a and library header files])
 AM_CONDITIONAL(CROSS_COMPILING, test x$cross_compiling = xyes)
 AM_CONDITIONAL(INSTALL_LIBGUI, test x$enable_install_libgui = xyes)
-AC_PROG_RANLIB
+AC_CHECK_TOOL(RANLIB, ranlib, :)
+AC_CHECK_TOOL(AR, ar, :)
 AC_CHECK_PROG(ITCL_SH, itcl_sh, itcl_sh,
 	[\$\$here/\$(top_builddir)/../itcl/itcl/unix/itcl_sh\$(EXEEXT)])
 
 AC_FUNC_ALLOCA
 AC_HAVE_HEADERS(stddef.h stdlib.h getopt.h unistd.h fcntl.h sys/file.h sys/wait.h string.h strings.h)
-AC_CHECK_FUNCS(raise strdup)
+AC_CHECK_FUNCS(raise)
 
 AC_ARG_ENABLE(ide, [  --enable-ide            Enable IDE support],
 [case "${enableval}" in
@@ -99,13 +101,6 @@ CYG_AC_PATH_TCLH
 # FIXME: consider only doing this if --with-x given.
 CYG_AC_PATH_TKH
 
-dnl what is the path to itclsh?
-AC_CANONICAL_HOST
-case ${host} in
-*cygwin*)	ITCL_DIR=itcl/itcl/win  ;;
-*)		ITCL_DIR=itcl/itcl/unix ;;
-esac
-
 AC_SUBST(TCL_DEFS)
 AC_SUBST(TK_DEFS)
 AC_SUBST(TCLHDIR)
@@ -115,7 +110,6 @@ AC_SUBST(TCL_LIBS)
 AC_SUBST(TK_BUILD_LIB_SPEC)
 AC_SUBST(TCL_BUILD_LIB_SPEC)
 AC_SUBST(TK_LIBS)
-AC_SUBST(ITCL_DIR)
 
 AM_CONDITIONAL(TCL_SHARED, test x$TCL_SHARED_BUILD = x1)
 

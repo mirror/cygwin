@@ -1,3 +1,8 @@
+2002-11-29  Ben Elliston  <bje@redhat.com>
+ 
+	* common-xml/interface.xml (print-insn-summary!): New pin.
+	* common-xml/behavior.xml (tracing): Mention print-insn-summary!.
+
 2002-10-03  Dave Brolley  <brolley@redhat.com>
        From Ben Elliston  <bje@redhat.com>
 

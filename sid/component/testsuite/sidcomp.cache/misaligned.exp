@@ -54,3 +54,9 @@ assert_variant misaligned-writes $prior(misaligned-writes)
 assert_invariant read-accesses $prior(reads)
 assert_invariant misaligned-reads $prior(misaligned-reads)
 
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test; return }
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "cache.conf" }

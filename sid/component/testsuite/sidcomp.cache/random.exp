@@ -45,3 +45,10 @@ set test "read byte from 0x10100"
 clear_miss_flag
 set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x10100"]
 assert_miss
+
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test; return }
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "cache.conf" }

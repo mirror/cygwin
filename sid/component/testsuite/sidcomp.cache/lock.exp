@@ -99,3 +99,10 @@ assert_hit
 set test "replacements stat equals 2"
 set value [get_attr replacements]
 if {$value == 2} { pass $test } else { fail "$test ($value)" }
+
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test; return }
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "cache.conf" }

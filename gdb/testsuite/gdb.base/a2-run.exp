@@ -26,8 +26,8 @@ if [target_info exists noargs] then {
     return
 }
 
-if [target_info exists gdb,noinferiorio] {
-    verbose "Skipping a2-run.exp because of noinferiorio."
+# Can't do this test without stdio support.
+if [gdb_skip_stdio_test "a2run.exp"] {
     return
 }
 
@@ -109,7 +109,7 @@ if [istarget "*-*-vxworks*"] then {
     verbose "Timeout is now $timeout seconds" 2
     gdb_expect -re "$gdb_prompt $" {}
 } else {
-	setup_xfail "mips-idt-*" "arm-*-coff"
+	setup_xfail "mips-idt-*" "arm-*-coff strongarm-*-coff"
 	gdb_run_cmd 5
 	gdb_expect {
 	    -re ".*120.*$gdb_prompt $"\
@@ -137,7 +137,7 @@ if [istarget "*-*-vxworks*"] then {
     verbose "Timeout is now $timeout seconds" 2
     gdb_expect -re "$gdb_prompt $" {}
 } else {
-    setup_xfail "arm-*-coff"
+    setup_xfail "arm-*-coff strongarm-*-coff"
     gdb_expect {
 	    -re ".*120.*$gdb_prompt $"\
 				{ pass "run \"$testfile\" again with same args" }
@@ -215,7 +215,7 @@ if [istarget "*-*-vxworks*"] then {
     verbose "Timeout is now $timeout seconds" 2
     gdb_expect -re "$gdb_prompt $" {}
 } else {
-    setup_xfail "arm-*-coff"
+    setup_xfail "arm-*-coff strongarm-*-coff"
     gdb_expect {
 	    -re ".*720.*$gdb_prompt $" {
 		pass "run \"$testfile\" again after setting args"

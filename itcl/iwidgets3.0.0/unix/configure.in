@@ -45,7 +45,7 @@ AC_ARG_WITH(tcl, [  --with-tcl=DIR          use Tcl 8.0 binaries from DIR],
         itcl_search=$withval, itcl_search=`cd ../../..; ls -d \`pwd\`/tcl*/unix`)
 
 TCL_LIB_DIR=""
-for dir in $exec_prefix/lib $itcl_search ; do
+for dir in $itcl_search $exec_prefix/lib ; do
     if test -r $dir/tclConfig.sh; then
         TCL_LIB_DIR=$dir
         break
@@ -67,7 +67,7 @@ AC_ARG_WITH(tk, [  --with-tk=DIR           use Tk 8.0 binaries from DIR],
         itcl_search=$withval, itcl_search=`cd ../../..; ls -d \`pwd\`/tk*/unix`)
 
 TK_LIB_DIR=""
-for dir in $exec_prefix/lib $TCL_LIB_DIR $itcl_search ; do
+for dir in $itcl_search $TCL_LIB_DIR $exec_prefix/lib ; do
     if test -r $dir/tkConfig.sh; then
         TK_LIB_DIR=$dir
         break
@@ -88,7 +88,7 @@ AC_ARG_WITH(itcl, [  --with-itcl=DIR         use Itcl 3.0 binaries from DIR],
         itcl_search=$withval, itcl_search=`cd ${BUILD_DIR}/../../itcl; pwd`)
 
 ITCL_LIB_DIR=""
-for dir in $exec_prefix/lib $TCL_LIB_DIR $itcl_search ; do
+for dir in $itcl_search $TCL_LIB_DIR $exec_prefix/lib ; do
     if test -r $dir/itclConfig.sh; then
         ITCL_LIB_DIR=$dir
         break
@@ -109,7 +109,7 @@ AC_ARG_WITH(itk, [  --with-itk=DIR          use Itk 3.0 binaries from DIR],
         itcl_search=$withval, itcl_search=`cd ${BUILD_DIR}/../../itk; pwd`)
 
 ITK_LIB_DIR=""
-for dir in $exec_prefix/lib $TCL_LIB_DIR $itcl_search ; do
+for dir in $itcl_search $TCL_LIB_DIR $exec_prefix/lib ; do
     if test -r $dir/itkConfig.sh; then
         ITK_LIB_DIR=$dir
         break

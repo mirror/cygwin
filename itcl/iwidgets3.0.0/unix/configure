@@ -729,7 +729,7 @@ fi
 
 
 TCL_LIB_DIR=""
-for dir in $exec_prefix/lib $itcl_search ; do
+for dir in $itcl_search $exec_prefix/lib ; do
     if test -r $dir/tclConfig.sh; then
         TCL_LIB_DIR=$dir
         break
@@ -757,7 +757,7 @@ fi
 
 
 TK_LIB_DIR=""
-for dir in $exec_prefix/lib $TCL_LIB_DIR $itcl_search ; do
+for dir in $itcl_search $TCL_LIB_DIR $exec_prefix/lib ; do
     if test -r $dir/tkConfig.sh; then
         TK_LIB_DIR=$dir
         break
@@ -784,7 +784,7 @@ fi
 
 
 ITCL_LIB_DIR=""
-for dir in $exec_prefix/lib $TCL_LIB_DIR $itcl_search ; do
+for dir in $itcl_search $TCL_LIB_DIR $exec_prefix/lib ; do
     if test -r $dir/itclConfig.sh; then
         ITCL_LIB_DIR=$dir
         break
@@ -811,7 +811,7 @@ fi
 
 
 ITK_LIB_DIR=""
-for dir in $exec_prefix/lib $TCL_LIB_DIR $itcl_search ; do
+for dir in $itcl_search $TCL_LIB_DIR $exec_prefix/lib ; do
     if test -r $dir/itkConfig.sh; then
         ITK_LIB_DIR=$dir
         break

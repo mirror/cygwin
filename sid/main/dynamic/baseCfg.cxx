@@ -378,7 +378,7 @@ const ResolvedName AggregateCfg::resolve(const role r, const string name)
 
 Connection::Connection (ComponentCfg *src, const string srcport, 
 			ComponentCfg *dst, const string dstport,
-			bool virt = true) :
+			bool virt) :
   my_src (src), my_srcport (srcport), 
   my_dst (dst), my_dstport (dstport),
   my_virt (virt)
@@ -390,8 +390,8 @@ Connection::Connection (ComponentCfg *src, const string srcport,
 
 PinConnection::PinConnection (ComponentCfg *src, const string srcport, 
 			      ComponentCfg *dst, const string dstport, 
-			      const direction dir = src_to_dst,
-			      bool virt = true) :
+			      const direction dir,
+			      bool virt) :
   Connection (src, srcport, dst, dstport, virt),
   my_dir (dir)
 {
@@ -457,7 +457,7 @@ void PinConnection::write_to (Writer &w)
 
 BusConnection::BusConnection (ComponentCfg *src, const string srcport,
 			      ComponentCfg *dst, const string dstport,
-			      bool virt = true) :
+			      bool virt) :
   Connection (src, srcport, dst, dstport, virt)
 {
   assert (src);
@@ -484,7 +484,7 @@ void BusConnection::write_to (Writer &w)
 }
 
 Setting::Setting (ComponentCfg *targ, const string attr, 
-		  const string val, bool virt = true) :
+		  const string val, bool virt) :
   my_targ (targ), 
   my_attr (attr),
   my_val (val),
@@ -510,7 +510,7 @@ void Setting::write_to (Writer &w)
 }
 
 Relation::Relation (ComponentCfg *relater, const string relationship, 
-		    ComponentCfg *related, bool virt = true) :
+		    ComponentCfg *related, bool virt) :
   my_relater (relater), 
   my_relationship (relationship),
   my_related (related),

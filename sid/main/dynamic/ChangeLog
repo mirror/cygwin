@@ -1,3 +1,7 @@
+2003-01-31  Frank Ch. Eigler  <fche@redhat.com>
+
+	* baseCfg.cxx, commonCfg.cxx: More of the same.
+
 2003-01-30  Frank Ch. Eigler  <fche@redhat.com>
 
 	* baseCfg.cxx: Remove some erroneous default parameters in fn decls.

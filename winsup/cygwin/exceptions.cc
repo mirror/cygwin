@@ -1,6 +1,6 @@
 /* exceptions.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -8,16 +8,22 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#include <stdio.h>
-#include <errno.h>
-
-#define Win32_Winsock
 #include "winsup.h"
-#include "exceptions.h"
-#undef DECLSPEC_IMPORT
-#define DECLSPEC_IMPORT
 #include <imagehlp.h>
-#include "autoload.h"
+#include <errno.h>
+#include <stdlib.h>
+
+#include "exceptions.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
+#include "cygerrno.h"
+#include "perthread.h"
+#include "shared_info.h"
+#include "perprocess.h"
+#include "security.h"
+
+#define CALL_HANDLER_RETRY 20
 
 char debugger_command[2 * MAX_PATH + 20];
 
@@ -25,25 +31,33 @@ extern "C" {
 static int handle_exceptions (EXCEPTION_RECORD *, void *, CONTEXT *, void *);
 extern void sigreturn ();
 extern void sigdelayed ();
+extern void sigdelayed0 ();
 extern void siglast ();
-extern DWORD __sigfirst, __siglast;
+extern DWORD __no_sig_start, __no_sig_end;
 };
 
+extern DWORD sigtid;
+
+extern HANDLE hExeced;
+extern DWORD dwExeced;
+
 static BOOL WINAPI ctrl_c_handler (DWORD);
-static void really_exit (int);
+static void signal_exit (int) __attribute__ ((noreturn));
+static char windows_system_directory[1024];
+static size_t windows_system_directory_length;
 
 /* This is set to indicate that we have already exited.  */
 
 static NO_COPY int exit_already = 0;
 static NO_COPY muto *mask_sync = NULL;
 
-HANDLE NO_COPY console_handler_thread_waiter = NULL;
+HMODULE NO_COPY cygwin_hmodule;
 
-static const struct
+NO_COPY static struct
 {
   unsigned int code;
   const char *name;
-} status_info[] NO_COPY =
+} status_info[] =
 {
 #define X(s) s, #s
   { X (STATUS_ABANDONED_WAIT_0) },
@@ -99,13 +113,15 @@ init_exception_handler (exception_list *el)
   el->prev = _except_list;
   _except_list = el;
 }
-
-#define INIT_EXCEPTION_HANDLER(el) init_exception_handler (el)
 #endif
 
 void
-set_console_handler ()
+early_stuff_init ()
 {
+  (void) SetConsoleCtrlHandler (ctrl_c_handler, FALSE);
+  if (!SetConsoleCtrlHandler (ctrl_c_handler, TRUE))
+    system_printf ("SetConsoleCtrlHandler failed, %E");
+
   /* Initialize global security attribute stuff */
 
   sec_none.nLength = sec_none_nih.nLength =
@@ -115,22 +131,12 @@ set_console_handler ()
   sec_none.lpSecurityDescriptor = sec_none_nih.lpSecurityDescriptor = NULL;
   sec_all.lpSecurityDescriptor = sec_all_nih.lpSecurityDescriptor =
     get_null_sd ();
-
-  /* Allocate the event needed for ctrl_c_handler synchronization with
-     wait_sig. */
-  if (!console_handler_thread_waiter)
-    CreateEvent (&sec_none_nih, TRUE, TRUE, NULL);
-  (void) SetConsoleCtrlHandler (ctrl_c_handler, FALSE);
-  if (!SetConsoleCtrlHandler (ctrl_c_handler, TRUE))
-    system_printf ("SetConsoleCtrlHandler failed, %E");
 }
 
 extern "C" void
 init_exceptions (exception_list *el)
 {
-#ifdef INIT_EXCEPTION_HANDLER
-  INIT_EXCEPTION_HANDLER (el);
-#endif
+  init_exception_handler (el);
 }
 
 extern "C" void
@@ -142,11 +148,41 @@ error_start_init (const char *buf)
       return;
     }
 
-  char myself_posix_name[MAX_PATH];
+  char pgm[MAX_PATH + 1];
+  if (!GetModuleFileName (NULL, pgm, MAX_PATH))
+    strcpy (pgm, "cygwin1.dll");
+  for (char *p = strchr (pgm, '\\'); p; p = strchr (p, '\\'))
+    *p = '/';
 
-  /* FIXME: gdb cannot use win32 paths, but what if debugger isn't gdb? */
-  cygwin_conv_to_posix_path (myself->progname, myself_posix_name);
-  __small_sprintf (debugger_command, "%s %s", buf, myself_posix_name);
+  __small_sprintf (debugger_command, "%s %s", buf, pgm);
+}
+
+static void
+open_stackdumpfile ()
+{
+  if (myself->progname[0])
+    {
+      const char *p;
+      /* write to progname.stackdump if possible */
+      if (!myself->progname[0])
+	p = "unknown";
+      else if ((p = strrchr (myself->progname, '\\')))
+	p++;
+      else
+	p = myself->progname;
+      char corefile[strlen (p) + sizeof (".stackdump")];
+      __small_sprintf (corefile, "%s.stackdump", p);
+      HANDLE h = CreateFile (corefile, GENERIC_WRITE, 0, &sec_none_nih,
+			     CREATE_ALWAYS, 0, 0);
+      if (h != INVALID_HANDLE_VALUE)
+	{
+	  if (!myself->ppid_handle)
+	    system_printf ("Dumping stack trace to %s", corefile);
+	  else
+	    debug_printf ("Dumping stack trace to %s", corefile);
+	  SetStdHandle (STD_ERROR_HANDLE, h);
+	}
+    }
 }
 
 /* Utilities for dumping the stack, etc.  */
@@ -154,7 +190,7 @@ error_start_init (const char *buf)
 static void
 exception (EXCEPTION_RECORD *e,  CONTEXT *in)
 {
-  const char *exception_name = 0;
+  const char *exception_name = NULL;
 
   if (e)
     {
@@ -187,153 +223,99 @@ exception (EXCEPTION_RECORD *e,  CONTEXT *in)
 #endif
 }
 
-extern "C" {
-static LPVOID __stdcall
-sfta(HANDLE, DWORD)
-{
-  return NULL;
-}
-
-static DWORD __stdcall
-sgmb(HANDLE, DWORD)
-{
-  return 4;
-}
-
 #ifdef __i386__
 /* Print a stack backtrace. */
 
 #define HAVE_STACK_TRACE
 
-/* Set from CYGWIN environment variable if want to use old method. */
-BOOL NO_COPY oldstack = 0;
-
-/* The function used to load the imagehlp DLL.  Returns TRUE if the
-   DLL was found. */
-static LoadDLLinitfunc (imagehlp)
-{
-  imagehlp_handle = LoadLibrary ("imagehlp.dll");
-  return !!imagehlp_handle;
-}
-
-LoadDLLinit (imagehlp)	/* Set up storage for imagehlp.dll autoload */
-LoadDLLfunc (StackWalk, StackWalk@36, imagehlp)
-
 /* A class for manipulating the stack. */
 class stack_info
 {
-  int first_time;		/* True if just starting to iterate. */
-  HANDLE hproc;			/* Handle of process to inspect. */
-  HANDLE hthread;		/* Handle of thread to inspect. */
-  int (stack_info::*get) (HANDLE, HANDLE); /* Gets the next stack frame */
+  int walk ();			/* Uses the "old" method */
+  char *next_offset () {return *((char **) sf.AddrFrame.Offset);}
+  bool needargs;
+  DWORD dummy_frame;
 public:
-  STACKFRAME sf;		/* For storing the stack information */
-  int walk (HANDLE, HANDLE);	/* Uses the StackWalk function */
-  int brute_force (HANDLE, HANDLE); /* Uses the "old" method */
-  void init (CONTEXT *);	/* Called the first time that stack info is needed */
+  STACKFRAME sf;		 /* For storing the stack information */
+  void init (DWORD, bool, bool); /* Called the first time that stack info is needed */
 
-  /* The constructor remembers hproc and hthread and determines which stack walking
-     method to use */
-  stack_info (int use_old_stack, HANDLE hp, HANDLE ht): hproc(hp), hthread(ht)
-  {
-    if (!use_old_stack && LoadDLLinitnow (imagehlp))
-      get = &stack_info::walk;
-    else
-      get = &stack_info::brute_force;
-  }
   /* Postfix ++ iterates over the stack, returning zero when nothing is left. */
-  int operator ++(int) { return (this->*get) (hproc, hthread); }
+  int operator ++(int) { return this->walk (); }
 };
 
 /* The number of parameters used in STACKFRAME */
-#define NPARAMS (sizeof(thestack->sf.Params) / sizeof(thestack->sf.Params[0]))
+#define NPARAMS (sizeof (thestack.sf.Params) / sizeof (thestack.sf.Params[0]))
 
 /* This is the main stack frame info for this process. */
-static stack_info *thestack = NULL;
+static NO_COPY stack_info thestack;
 static signal_dispatch sigsave;
 
 /* Initialize everything needed to start iterating. */
 void
-stack_info::init (CONTEXT *cx)
+stack_info::init (DWORD ebp, bool wantargs, bool goodframe)
 {
-  first_time = 1;
-  memset (&sf, 0, sizeof(sf));
-  sf.AddrPC.Offset = cx->Eip;
-  sf.AddrPC.Mode = AddrModeFlat;
-  sf.AddrStack.Offset = cx->Esp;
-  sf.AddrStack.Mode = AddrModeFlat;
-  sf.AddrFrame.Offset = cx->Ebp;
+# define debp ((DWORD *) ebp)
+  memset (&sf, 0, sizeof (sf));
+  if (!goodframe)
+    sf.AddrFrame.Offset = ebp;
+  else
+    {
+      dummy_frame = ebp;
+      sf.AddrFrame.Offset = (DWORD) &dummy_frame;
+    }
+  sf.AddrReturn.Offset = debp[1];
   sf.AddrFrame.Mode = AddrModeFlat;
+  needargs = wantargs;
+# undef debp
 }
 
 /* Walk the stack by looking at successive stored 'bp' frames.
    This is not foolproof. */
 int
-stack_info::brute_force (HANDLE, HANDLE)
+stack_info::walk ()
 {
   char **ebp;
-  if (first_time)
-    /* Everything is filled out already */
-    ebp = (char **) sf.AddrFrame.Offset;
-  else if ((ebp = (char **) *(char **) sf.AddrFrame.Offset) != NULL)
-    {
-      sf.AddrFrame.Offset = (DWORD) ebp;
-      sf.AddrPC.Offset = sf.AddrReturn.Offset;
-    }
-  else
+  if ((ebp = (char **) next_offset ()) == NULL)
     return 0;
 
-  first_time = 0;
+  sf.AddrFrame.Offset = (DWORD) ebp;
+  sf.AddrPC.Offset = sf.AddrReturn.Offset;
+
   if (!sf.AddrPC.Offset)
     return 0;		/* stack frames are exhausted */
 
   /* The return address always follows the stack pointer */
   sf.AddrReturn.Offset = (DWORD) *++ebp;
 
-  /* The arguments follow the return address */
-  for (unsigned i = 0; i < NPARAMS; i++)
-    sf.Params[i] = (DWORD) *++ebp;
+  if (needargs)
+    /* The arguments follow the return address */
+    for (unsigned i = 0; i < NPARAMS; i++)
+      sf.Params[i] = (DWORD) *++ebp;
+
   return 1;
 }
 
-/* Use Win32 StackWalk() API to display the stack.  This is theoretically
-   more foolproof than the brute force method above. */
-int
-stack_info::walk (HANDLE hproc, HANDLE hthread)
+static void
+stackdump (DWORD ebp, int open_file, bool isexception)
 {
-#ifdef SOMEDAY
-  /* It would be nice to get more information (like DLL symbols and module name)
-     for each stack frame but in order to do that we have to call SymInitialize.
-     It doesn't seem to be possible to do this inside of an excaption handler for
-     some reason. */
-  static int initialized = 0;
-  if (!initialized && !SymInitialize(hproc, NULL, TRUE))
-    small_printf("SymInitialize error, %E\n");
-  initialized = 1;
-#endif
+  extern unsigned long rlim_core;
 
-  return StackWalk (IMAGE_FILE_MACHINE_I386, hproc, hthread, &sf, NULL, NULL,
-		    sfta, sgmb, NULL) && !!sf.AddrFrame.Offset;
-}
+  if (rlim_core == 0UL)
+    return;
 
-/* Dump the stack using either the old method or the new Win32 API method */
-void
-stack (HANDLE hproc, HANDLE hthread, CONTEXT *cx)
-{
+  if (open_file)
+    open_stackdumpfile ();
+
   int i;
 
-  /* Set this up if it's the first time. */
-  if (!thestack)
-    thestack = new stack_info (oldstack, hproc, hthread);
-
-  thestack->init (cx);	/* Initialize from the input CONTEXT */
+  thestack.init (ebp, 1, !isexception);	/* Initialize from the input CONTEXT */
   small_printf ("Stack trace:\r\nFrame     Function  Args\r\n");
-  for (i = 0; i < 16 && (*thestack)++ ; i++)
+  for (i = 0; i < 16 && thestack++; i++)
     {
-      small_printf ("%08x  %08x ", thestack->sf.AddrFrame.Offset,
-		    thestack->sf.AddrPC.Offset);
+      small_printf ("%08x  %08x ", thestack.sf.AddrFrame.Offset,
+		    thestack.sf.AddrPC.Offset);
       for (unsigned j = 0; j < NPARAMS; j++)
-	small_printf ("%s%08x", j == 0 ? " (" : ", ", thestack->sf.Params[j]);
+	small_printf ("%s%08x", j == 0 ? " (" : ", ", thestack.sf.Params[j]);
       small_printf (")\r\n");
     }
   small_printf ("End of stack trace%s",
@@ -342,32 +324,29 @@ stack (HANDLE hproc, HANDLE hthread, CONTEXT *cx)
 
 /* Temporary (?) function for external callers to get a stack dump */
 extern "C" void
-cygwin_stackdump()
+cygwin_stackdump ()
 {
   CONTEXT c;
   c.ContextFlags = CONTEXT_FULL;
-  HANDLE h1 = GetCurrentProcess ();
-  HANDLE h2 = GetCurrentThread ();
-  GetThreadContext (h2, &c);
-  stack(h1, h2, &c);
+  GetThreadContext (GetCurrentThread (), &c);
+  stackdump (c.Ebp, 0, 0);
 }
 
-static int NO_COPY keep_looping = 0;
+#define TIME_TO_WAIT_FOR_DEBUGGER 10000
 
 extern "C" int
-try_to_debug ()
+try_to_debug (bool waitloop)
 {
-  debug_printf ("debugger_command %s", debugger_command);
-  if (*debugger_command == '\0')
+  debug_printf ("debugger_command '%s'", debugger_command);
+  if (*debugger_command == '\0' || being_debugged ())
     return 0;
 
   __small_sprintf (strchr (debugger_command, '\0'), " %u", GetCurrentProcessId ());
 
-  BOOL dbg;
+  SetThreadPriority (hMainThread, THREAD_PRIORITY_HIGHEST);
+  PROCESS_INFORMATION pi = {NULL, 0, 0, 0};
 
-  PROCESS_INFORMATION pi = {0};
-
-  STARTUPINFO si = {0};
+  STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
   si.lpReserved = NULL;
   si.lpDesktop = NULL;
   si.dwFlags = 0;
@@ -380,9 +359,23 @@ try_to_debug ()
   /* if any of these mutexes is owned, we will fail to start any cygwin app
      until trapped app exits */
 
-  ReleaseMutex (pinfo_mutex);
   ReleaseMutex (title_mutex);
 
+  /* prevent recursive exception handling */
+  char* rawenv = GetEnvironmentStrings () ;
+  for (char* p = rawenv; *p != '\0'; p = strchr (p, '\0') + 1)
+    {
+      if (strncmp (p, "CYGWIN=", sizeof ("CYGWIN=") - 1) == 0)
+	{
+	  char* q = strstr (p, "error_start") ;
+	  /* replace 'error_start=...' with '_rror_start=...' */
+	  if (q) *q = '_' ;
+	  SetEnvironmentVariable ("CYGWIN", p + sizeof ("CYGWIN=")) ;
+	  break ;
+	}
+    }
+
+  BOOL dbg;
   dbg = CreateProcess (NULL,
 		       debugger_command,
 		       NULL,
@@ -393,55 +386,40 @@ try_to_debug ()
 		       NULL,
 		       &si,
 		       &pi);
+
   if (!dbg)
-    {
-      system_printf ("Failed to start debugger: %E");
-      /* FIXME: need to know handles of all running threads to
-        resume_all_threads_except (current_thread_id);
-      */
-    }
+    system_printf ("Failed to start debugger: %E");
   else
     {
-      keep_looping = 1;
-      while (keep_looping)
-	Sleep (10000);
+      SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
+      if (!waitloop)
+	return 1;
+      while (!being_debugged ())
+	/* spin */;
+      Sleep (4000);
+      small_printf ("*** continuing from debugger call\n");
     }
 
+  /* FIXME: need to know handles of all running threads to
+    resume_all_threads_except (current_thread_id);
+  */
   return 0;
-}
-
-void
-stackdump (HANDLE hproc, HANDLE hthread, EXCEPTION_RECORD *e, CONTEXT *in)
-{
-  char *p;
-  if (myself->progname[0])
-    {
-      /* write to progname.stackdump if possible */
-      if ((p = strrchr (myself->progname, '\\')))
-	p++;
-      else
-	p = myself->progname;
-      char corefile[strlen(p) + sizeof(".stackdump")];
-      __small_sprintf (corefile, "%s.stackdump", p);
-      HANDLE h = CreateFile (corefile, GENERIC_WRITE, 0, &sec_none_nih,
-			     CREATE_ALWAYS, 0, 0);
-      if (h != INVALID_HANDLE_VALUE)
-	{
-	  system_printf ("Dumping stack trace to %s", corefile);
-	  SetStdHandle (STD_ERROR_HANDLE, h);
-	}
-    }
-  if (e)
-    exception (e, in);
-  stack (hproc, hthread, in);
 }
 
 /* Main exception handler. */
 
 static int
-handle_exceptions (EXCEPTION_RECORD *e, void *arg, CONTEXT *in, void *x)
+handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
 {
   int sig;
+  static int NO_COPY debugging = 0;
+  static int NO_COPY recursed = 0;
+
+  if (debugging && ++debugging < 500000)
+    {
+      SetThreadPriority (hMainThread, THREAD_PRIORITY_NORMAL);
+      return 0;
+    }
 
   /* If we've already exited, don't do anything here.  Returning 1
      tells Windows to keep looking for an exception handler.  */
@@ -506,16 +484,26 @@ handle_exceptions (EXCEPTION_RECORD *e, void *arg, CONTEXT *in, void *x)
   debug_printf ("In cygwin_except_handler exc %p at %p sp %p", e->ExceptionCode, in->Eip, in->Esp);
   debug_printf ("In cygwin_except_handler sig = %d at %p", sig, in->Eip);
 
-  if (myself->getsig(sig).sa_mask & SIGTOMASK (sig))
-    syscall_printf ("signal %d, masked %p", sig, myself->getsig(sig).sa_mask);
+  if (myself->getsig (sig).sa_mask & SIGTOMASK (sig))
+    syscall_printf ("signal %d, masked %p", sig, myself->getsig (sig).sa_mask);
+
+  debug_printf ("In cygwin_except_handler calling %p",
+		 myself->getsig (sig).sa_handler);
+
+  DWORD *ebp = (DWORD *)in->Esp;
+  for (DWORD *bpend = (DWORD *) __builtin_frame_address (0); ebp > bpend; ebp--)
+    if (*ebp == in->SegCs && ebp[-1] == in->Eip)
+      {
+	ebp -= 2;
+	break;
+      }
 
   if (!myself->progname[0]
-      || (void *) myself->getsig(sig).sa_handler == (void *) SIG_DFL
-      || (void *) myself->getsig(sig).sa_handler == (void *) SIG_IGN
-      || (void *) myself->getsig(sig).sa_handler == (void *) SIG_ERR)
+      || GetCurrentThreadId () == sigtid
+      || (void *) myself->getsig (sig).sa_handler == (void *) SIG_DFL
+      || (void *) myself->getsig (sig).sa_handler == (void *) SIG_IGN
+      || (void *) myself->getsig (sig).sa_handler == (void *) SIG_ERR)
     {
-      static NO_COPY int traced = 0;
-
       /* Print the exception to the console */
       if (e)
 	{
@@ -523,7 +511,8 @@ handle_exceptions (EXCEPTION_RECORD *e, void *arg, CONTEXT *in, void *x)
 	    {
 	      if (status_info[i].code == e->ExceptionCode)
 		{
-		  system_printf ("Exception: %s", status_info[i].name);
+		  if (!myself->ppid_handle)
+		    system_printf ("Exception: %s", status_info[i].name);
 		  break;
 		}
 	    }
@@ -531,34 +520,25 @@ handle_exceptions (EXCEPTION_RECORD *e, void *arg, CONTEXT *in, void *x)
 
       /* Another exception could happen while tracing or while exiting.
 	 Only do this once.  */
-      if (traced++)
-        system_printf ("Error while dumping state (probably corrupted stack)");
+      if (recursed++)
+	system_printf ("Error while dumping state (probably corrupted stack)");
       else
 	{
-	  HANDLE hthread;
-	  DuplicateHandle (hMainProc, GetCurrentThread (),
-			   hMainProc, &hthread, 0, FALSE, DUPLICATE_SAME_ACCESS);
-	  stackdump (hMainProc, hthread, e, in);
+	  if (try_to_debug (0))
+	    {
+	      debugging = 1;
+	      return 0;
+	    }
+
+	  open_stackdumpfile ();
+	  exception (e, in);
+	  stackdump ((DWORD) ebp, 0, 1);
 	}
-      try_to_debug ();
-      really_exit (EXIT_SIGNAL | sig);
+
+      signal_exit (0x80 | sig);	// Flag signal + core dump
     }
 
-  debug_printf ("In cygwin_except_handler calling %p",
-		 myself->getsig(sig).sa_handler);
-
-  DWORD *bp = (DWORD *)in->Esp;
-  for (DWORD *bpend = bp - 8; bp > bpend; bp--)
-    if (*bp == in->SegCs && bp[-1] == in->Eip)
-      {
-	bp -= 2;
-	break;
-      }
-  
-  in->Ebp = (DWORD) bp;
-  sigsave.cx = in;
-  sig_send (NULL, sig);		// Signal myself
-  sigsave.cx = NULL;
+  sig_send (NULL, sig, (DWORD) ebp, 1);		// Signal myself
   return 0;
 }
 #endif /* __i386__ */
@@ -570,11 +550,10 @@ stack (void)
   system_printf ("Stack trace not yet supported on this machine.");
 }
 #endif
-}
 
 /* Utilities to call a user supplied exception handler.  */
 
-#define SIG_NONMASKABLE	(SIGTOMASK (SIGCONT) | SIGTOMASK (SIGKILL) | SIGTOMASK (SIGSTOP))
+#define SIG_NONMASKABLE	(SIGTOMASK (SIGKILL) | SIGTOMASK (SIGSTOP))
 
 #ifdef __i386__
 #define HAVE_CALL_HANDLER
@@ -589,13 +568,14 @@ stack (void)
 int __stdcall
 handle_sigsuspend (sigset_t tempmask)
 {
+  sig_dispatch_pending (0);
+  sigframe thisframe (mainthread);
   sigset_t oldmask = myself->getsigmask ();	// Remember for restoration
 
   set_process_mask (tempmask & ~SIG_NONMASKABLE);// Let signals we're
 				//  interested in through.
   sigproc_printf ("old mask %x, new mask %x", oldmask, tempmask);
 
-  sig_dispatch_pending (0);
   WaitForSingleObject (signal_arrived, INFINITE);
 
   set_sig_errno (EINTR);	// Per POSIX
@@ -611,71 +591,183 @@ handle_sigsuspend (sigset_t tempmask)
 extern DWORD exec_exit;		// Possible exit value for exec
 extern int pending_signals;
 
-extern __inline int
-interruptible (DWORD pc)
+extern "C" {
+static void
+sig_handle_tty_stop (int sig)
 {
-  DWORD pchigh = pc & 0xf0000000;
-  return ((pc >= (DWORD) &__sigfirst) && (pc <= (DWORD) &__siglast)) ||
-	 !(pchigh == 0xb0000000 || pchigh == 0x70000000 || pchigh == 0x60000000);
+  /* Silently ignore attempts to suspend if there is no accomodating
+     cygwin parent to deal with this behavior. */
+  if (!myself->ppid_handle)
+    {
+      myself->process_state &= ~PID_STOPPED;
+      return;
+    }
+
+  myself->stopsig = sig;
+  /* See if we have a living parent.  If so, send it a special signal.
+   * It will figure out exactly which pid has stopped by scanning
+   * its list of subprocesses.
+   */
+  if (my_parent_is_alive ())
+    {
+      pinfo parent (myself->ppid);
+      if (!(parent->getsig (SIGCHLD).sa_flags & SA_NOCLDSTOP))
+	sig_send (parent, SIGCHLD);
+    }
+  sigproc_printf ("process %d stopped by signal %d, myself->ppid_handle %p",
+		  myself->pid, sig, myself->ppid_handle);
+  if (WaitForSingleObject (sigCONT, INFINITE) != WAIT_OBJECT_0)
+    api_fatal ("WaitSingleObject failed, %E");
+  (void) ResetEvent (sigCONT);
+  return;
 }
-
-void
-interrupt_now (CONTEXT *ctx, int sig, struct sigaction& siga, void *handler)
-{
-  DWORD oldmask = myself->getsigmask ();
-  set_process_mask (myself->getsigmask () | siga.sa_mask | SIGTOMASK (sig));
-
-  DWORD *sp = (DWORD *) ctx->Esp;
-  *(--sp) = ctx->Eip; /*  ctxinal IP where program was suspended */
-  *(--sp) = ctx->EFlags;
-  *(--sp) = ctx->Esi;
-  *(--sp) = ctx->Edi;
-  *(--sp) = ctx->Edx;
-  *(--sp) = ctx->Ecx;
-  *(--sp) = ctx->Ebx;
-  *(--sp) = ctx->Eax;
-  *(--sp) = (DWORD)-1;	/* no saved errno. */
-  *(--sp) = oldmask;
-  *(--sp) = sig;
-  *(--sp) = (DWORD) sigreturn;
-
-  ctx->Esp = (DWORD) sp;
-  ctx->Eip = (DWORD) handler;
-
-  SetThreadContext (myself->getthread2signal(), ctx); /* Restart the thread */
 }
 
 int
-interrupt_on_return (CONTEXT *ctx, int sig, struct sigaction& siga, void *handler)
+interruptible (DWORD pc, int testvalid = 0)
+{
+  int res;
+  MEMORY_BASIC_INFORMATION m;
+
+  memset (&m, 0, sizeof m);
+  if (!VirtualQuery ((LPCVOID) pc, &m, sizeof m))
+    sigproc_printf ("couldn't get memory info, pc %p, %E", pc);
+
+  char *checkdir = (char *) alloca (windows_system_directory_length + 4);
+  memset (checkdir, 0, sizeof (checkdir));
+
+# define h ((HMODULE) m.AllocationBase)
+  /* Apparently Windows 95 can sometimes return bogus addresses from
+     GetThreadContext.  These resolve to a strange allocation base.
+     These should *never* be treated as interruptible. */
+  if (!h || m.State != MEM_COMMIT)
+    res = 0;
+  else if (testvalid)
+    res = 1;	/* All we wanted to know was if this was a valid module. */
+  else if (h == user_data->hmodule)
+    res = 1;
+  else if (h == cygwin_hmodule)
+    res = 0;
+  else if (!GetModuleFileName (h, checkdir, windows_system_directory_length + 2))
+    res = 0;
+  else
+    res = !strncasematch (windows_system_directory, checkdir,
+			  windows_system_directory_length);
+  sigproc_printf ("pc %p, h %p, interruptible %d, testvalid %d", pc, h, res, testvalid);
+# undef h
+  return res;
+}
+
+bool
+sigthread::get_winapi_lock (int test)
+{
+  if (test)
+    return !InterlockedExchange (&winapi_lock, 1);
+
+  /* Need to do a busy loop because we can't block or a potential SuspendThread
+     will hang. */
+  while (InterlockedExchange (&winapi_lock, 1))
+    low_priority_sleep (0);
+  return 1;
+}
+
+void
+sigthread::release_winapi_lock ()
+{
+  /* Assumes that we have the lock. */
+  InterlockedExchange (&winapi_lock, 0);
+}
+
+static void __stdcall interrupt_setup (int sig, void *handler, DWORD retaddr,
+				       DWORD *retaddr_on_stack,
+				       struct sigaction& siga)
+		      __attribute__((regparm(3)));
+static void __stdcall
+interrupt_setup (int sig, void *handler, DWORD retaddr, DWORD *retaddr_on_stack,
+		 struct sigaction& siga)
+{
+  sigsave.retaddr = retaddr;
+  sigsave.retaddr_on_stack = retaddr_on_stack;
+  /* FIXME: Not multi-thread aware */
+  sigsave.oldmask = myself->getsigmask ();
+  sigsave.newmask = sigsave.oldmask | siga.sa_mask | SIGTOMASK (sig);
+  sigsave.sa_flags = siga.sa_flags;
+  sigsave.func = (void (*)(int)) handler;
+  sigsave.sig = sig;
+  sigsave.saved_errno = -1;		// Flag: no errno to save
+  if (handler == sig_handle_tty_stop)
+    {
+      myself->stopsig = 0;
+      myself->process_state |= PID_STOPPED;
+    }
+  /* Clear any waiting threads prior to dispatching to handler function */
+  proc_subproc (PROC_CLEARWAIT, 1);
+  int res = SetEvent (signal_arrived);	// For an EINTR case
+  sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
+}
+
+static bool interrupt_now (CONTEXT *, int, void *, struct sigaction&) __attribute__((regparm(3)));
+static bool
+interrupt_now (CONTEXT *ctx, int sig, void *handler, struct sigaction& siga)
+{
+  interrupt_setup (sig, handler, ctx->Eip, 0, siga);
+  ctx->Eip = (DWORD) sigdelayed;
+  SetThreadContext (myself->getthread2signal (), ctx); /* Restart the thread in a new location */
+  return 1;
+}
+
+void __stdcall
+signal_fixup_after_fork ()
+{
+  if (sigsave.sig)
+    {
+      sigsave.sig = 0;
+      if (sigsave.retaddr_on_stack)
+	{
+	  *sigsave.retaddr_on_stack = sigsave.retaddr;
+	  set_process_mask (sigsave.oldmask);
+	}
+    }
+  sigproc_init ();
+}
+
+void __stdcall
+signal_fixup_after_exec (bool isspawn)
+{
+  /* Set up child's signal handlers */
+  for (int i = 0; i < NSIG; i++)
+    {
+      myself->getsig (i).sa_mask = 0;
+      if (myself->getsig (i).sa_handler != SIG_IGN || isspawn)
+	myself->getsig (i).sa_handler = SIG_DFL;
+    }
+}
+
+static int interrupt_on_return (sigthread *, int, void *, struct sigaction&) __attribute__((regparm(3)));
+static int
+interrupt_on_return (sigthread *th, int sig, void *handler, struct sigaction& siga)
 {
   int i;
+  DWORD ebp = th->frame;
 
-  if (sigsave.sig)
-    return 0;	/* Already have a signal stacked up */
+  if (!ebp)
+    return 0;
 
-  /* Set this up if it's the first time. */
-  /* FIXME: Eventually augment to handle more than one thread */
-  if (!thestack)
-    thestack = new stack_info (oldstack, hMainProc, hMainThread);
-
-  thestack->init (ctx);  /* Initialize from the input CONTEXT */
-  for (i = 0; i < 32 && (*thestack)++ ; i++)
-    if (interruptible (thestack->sf.AddrReturn.Offset))
+  thestack.init (ebp, 0, 1);  /* Initialize from the input CONTEXT */
+  for (i = 0; i < 32 && thestack++ ; i++)
+    if (th->exception || interruptible (thestack.sf.AddrReturn.Offset))
       {
-	DWORD *addr_retaddr = ((DWORD *)thestack->sf.AddrFrame.Offset) + 1;
-	if (*addr_retaddr  != thestack->sf.AddrReturn.Offset)
-	  break;
-	sigsave.retaddr = *addr_retaddr;
-	*addr_retaddr = (DWORD) sigdelayed;
-	sigsave.oldmask = myself->getsigmask ();	// Remember for restoration
-	set_process_mask (myself->getsigmask () | siga.sa_mask | SIGTOMASK (sig));
-	sigsave.func = (void (*)(int)) handler;
-	sigsave.sig = sig;
-	sigsave.saved_errno = -1;		// Flag: no errno to save
-	break;
+	DWORD *addr_retaddr = ((DWORD *)thestack.sf.AddrFrame.Offset) + 1;
+	if (*addr_retaddr  == thestack.sf.AddrReturn.Offset)
+	  {
+	    interrupt_setup (sig, handler, *addr_retaddr, addr_retaddr, siga);
+	    *addr_retaddr = (DWORD) sigdelayed;
+	  }
+	return 1;
       }
 
-  return 1;
+  sigproc_printf ("couldn't find a stack frame, i %d", i);
+  return 0;
 }
 
 extern "C" void __stdcall
@@ -683,73 +775,146 @@ set_sig_errno (int e)
 {
   set_errno (e);
   sigsave.saved_errno = e;
+  // sigproc_printf ("errno %d", e);
 }
 
+static int setup_handler (int, void *, struct sigaction&) __attribute__((regparm(3)));
 static int
-call_handler (int sig, struct sigaction& siga, void *handler)
+setup_handler (int sig, void *handler, struct sigaction& siga)
 {
-  CONTEXT *cx, orig;
-  int res;
+  CONTEXT cx;
+  bool interrupted = false;
+  sigthread *th = NULL;		// Initialization needed to shut up gcc
+  int prio = INFINITE;
 
-  if (hExeced != NULL && hExeced != INVALID_HANDLE_VALUE)
+  if (sigsave.sig)
+    goto set_pending;
+
+  for (int i = 0; i < CALL_HANDLER_RETRY; i++)
     {
-      SetEvent (signal_arrived);	// For an EINTR case
-      sigproc_printf ("armed signal_arrived");
-      exec_exit = sig;			// Maybe we'll exit with this value
-      return 1;
+      DWORD res;
+      HANDLE hth;
+
+      EnterCriticalSection (&mainthread.lock);
+      if (mainthread.frame)
+	{
+	  hth = NULL;
+	  th = &mainthread;
+	}
+      else
+	{
+	  LeaveCriticalSection (&mainthread.lock);
+
+	  if (!mainthread.get_winapi_lock (1))
+	    continue;
+
+	  hth = myself->getthread2signal ();
+	  th = NULL;
+
+	  /* Suspend the thread which will receive the signal.  But first ensure that
+	     this thread doesn't have any mutos.  (FIXME: Someday we should just grab
+	     all of the mutos rather than checking for them)
+	     For Windows 95, we also have to ensure that the addresses returned by GetThreadContext
+	     are valid.
+	     If one of these conditions is not true we loop for a fixed number of times
+	     since we don't want to stall the signal handler.  FIXME: Will this result in
+	     noticeable delays?
+	     If the thread is already suspended (which can occur when a program has called
+	     SuspendThread on itself then just queue the signal. */
+
+	  EnterCriticalSection (&mainthread.lock);
+	  sigproc_printf ("suspending mainthread");
+	  res = SuspendThread (hth);
+	  /* Just release the lock now since we hav suspended the main thread and it
+	     definitely can't be grabbing it now.  This will have to change, of course,
+	     if/when we can send signals to other than the main thread. */
+	  LeaveCriticalSection (&mainthread.lock);
+
+	  /* Just set pending if thread is already suspended */
+	  if (res)
+	    {
+	      (void) ResumeThread (hth);
+	      break;
+	    }
+
+	  mainthread.release_winapi_lock ();
+	  if (mainthread.frame)
+	    goto resume_thread;	/* We just got the frame.  What are the odds?
+				   Just loop and we'll hopefully pick it up on
+				   the next pass through. */
+
+	  muto *m;
+	  /* FIXME: Make multi-thread aware */
+	  for (m = muto_start.next;  m != NULL; m = m->next)
+	    if (m->unstable () || m->owner () == mainthread.id)
+	      {
+		sigproc_printf ("suspended thread owns a muto (%s)", m->name);
+		goto resume_thread;
+	      }
+
+	  if (mainthread.frame)
+	    th = &mainthread;
+	  else
+	    {
+	      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+	      if (!GetThreadContext (hth, &cx))
+		{
+		  system_printf ("couldn't get context of main thread, %E");
+		  goto resume_thread;
+		}
+	    }
+	}
+
+      if ((DWORD) prio != INFINITE)
+	{
+	  /* Reset the priority so we can finish this off quickly. */
+	  SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
+	  prio = INFINITE;
+	}
+
+      if (th)
+	{
+	  interrupted = interrupt_on_return (th, sig, handler, siga);
+	  LeaveCriticalSection (&th->lock);
+	}
+      else if (interruptible (cx.Eip))
+	interrupted = interrupt_now (&cx, sig, handler, siga);
+
+    resume_thread:
+      if (hth)
+	res = ResumeThread (hth);
+
+      if (interrupted)
+	break;
+
+      if ((DWORD) prio != INFINITE && !mainthread.frame)
+	prio = low_priority_sleep (SLEEP_0_STAY_LOW);
+      sigproc_printf ("couldn't interrupt.  trying again.");
     }
 
-  /* Suspend the running thread, grab its context somewhere safe
-     and run the exception handler in the context of the thread -
-     we have to do that since sometimes they don't return - and if
-     this thread doesn't return, you won't ever get another exception. */
-
-  sigproc_printf ("Suspending %p (mainthread)", myself->getthread2signal());
-  HANDLE hth = myself->getthread2signal ();
-  res = SuspendThread (hth);
-  sigproc_printf ("suspend said %d, %E", res);
-
-  /* Clear any waiting threads prior to dispatching to handler function */
-  proc_subproc(PROC_CLEARWAIT, 0);
-
-  if (sigsave.cx)
+ set_pending:
+  if (interrupted)
     {
-      cx = sigsave.cx;
-      sigsave.cx = NULL;
+      if ((DWORD) prio != INFINITE)
+	SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
+      sigproc_printf ("signal successfully delivered");
     }
   else
     {
-      cx = &orig;
-      /* FIXME - this does not preserve FPU state */
-      orig.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-      if (!GetThreadContext (hth, cx))
-	{
-	  system_printf ("couldn't get context of main thread, %E");
-	  ResumeThread (hth);
-	  goto out;
-	}
-    }
-
-  if (cx == &orig && interruptible (cx->Eip))
-    interrupt_now (cx, sig, siga, handler);
-  else if (!interrupt_on_return (cx, sig, siga, handler))
-    {
       pending_signals = 1;	/* FIXME: Probably need to be more tricky here */
       sig_set_pending (sig);
+      sig_dispatch_pending (1);
+      low_priority_sleep (SLEEP_0_STAY_LOW);	/* Hopefully, other process will be waking up soon. */
+      sigproc_printf ("couldn't send signal %d", sig);
     }
 
-  (void) ResumeThread (hth);
-  (void) SetEvent (signal_arrived);	// For an EINTR case
-  sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
-
-out:
-  sigproc_printf ("returning");
-  return 1;
+  sigproc_printf ("returning %d", interrupted);
+  return interrupted;
 }
 #endif /* i386 */
 
 #ifndef HAVE_CALL_HANDLER
-#error "Need to supply machine dependent call_handler"
+#error "Need to supply machine dependent setup_handler"
 #endif
 
 /* Keyboard interrupt handler.  */
@@ -759,26 +924,35 @@ ctrl_c_handler (DWORD type)
   if (type == CTRL_LOGOFF_EVENT)
     return TRUE;
 
-  /* Wait for sigproc_init to tell us that it's safe to send something.
-     This event will always be in a signalled state when wait_sig is
-     ready to process signals. */
-  (void) WaitForSingleObject (console_handler_thread_waiter, 5000);
-
-  if ((type == CTRL_CLOSE_EVENT) || (type == CTRL_SHUTDOWN_EVENT))
-    /* Return FALSE to prevent an "End task" dialog box from appearing
-       for each Cygwin process window that's open when the computer
-       is shut down or console window is closed. */
+  /* Return FALSE to prevent an "End task" dialog box from appearing
+     for each Cygwin process window that's open when the computer
+     is shut down or console window is closed. */
+  if (type == CTRL_SHUTDOWN_EVENT)
+    {
+      sig_send (NULL, SIGTERM);
+      return FALSE;
+    }
+  if (type == CTRL_CLOSE_EVENT)
     {
       sig_send (NULL, SIGHUP);
       return FALSE;
     }
-  tty_min *t = cygwin_shared->tty.get_tty(myself->ctty);
-  /* Ignore this if we're not the process group lead since it should be handled
-     *by* the process group leader. */
-  if (t->getpgid () != myself->pid ||
-      (GetTickCount () - t->last_ctrl_c) < MIN_CTRL_C_SLOP)
+
+  /* If we are a stub and the new process has a pinfo structure, let it
+     handle this signal. */
+  if (dwExeced && pinfo (dwExeced))
     return TRUE;
-  else
+
+  /* We're only the process group leader when we have a valid pinfo structure.
+     If we don't have one, then the parent "stub" will handle the signal. */
+  if (!pinfo (cygwin_pid (GetCurrentProcessId ())))
+    return TRUE;
+
+  tty_min *t = cygwin_shared->tty.get_tty (myself->ctty);
+  /* Ignore this if we're not the process group leader since it should be handled
+     *by* the process group leader. */
+  if (myself->ctty != -1 && t->getpgid () == myself->pid &&
+       (GetTickCount () - t->last_ctrl_c) >= MIN_CTRL_C_SLOP)
     /* Otherwise we just send a SIGINT to the process group and return TRUE (to indicate
        that we have handled the signal).  At this point, type should be
        a CTRL_C_EVENT or CTRL_BREAK_EVENT. */
@@ -788,64 +962,38 @@ ctrl_c_handler (DWORD type)
       t->last_ctrl_c = GetTickCount ();
       return TRUE;
     }
+
+  return TRUE;
 }
 
 /* Set the signal mask for this process.
- * Note that some signals are unmaskable, as in UNIX.
- */
+   Note that some signals are unmaskable, as in UNIX.  */
 extern "C" void __stdcall
 set_process_mask (sigset_t newmask)
 {
+  sigframe thisframe (mainthread);
   mask_sync->acquire (INFINITE);
+  sigset_t oldmask = myself->getsigmask ();
   newmask &= ~SIG_NONMASKABLE;
   sigproc_printf ("old mask = %x, new mask = %x", myself->getsigmask (), newmask);
   myself->setsigmask (newmask);	// Set a new mask
   mask_sync->release ();
+  if (oldmask != newmask && GetCurrentThreadId () != sigtid)
+    sig_dispatch_pending ();
+  else
+    sigproc_printf ("not calling sig_dispatch_pending.  sigtid %p current %p",
+		    sigtid, GetCurrentThreadId ());
   return;
-}
-
-extern "C" {
-static void
-sig_handle_tty_stop (int sig)
-{
-#if 0
-  HANDLE waitbuf[2];
-
-  /* Be sure that process's main thread isn't an owner of vital
-     mutex to prevent cygwin subsystem lockups */
-  waitbuf[0] = pinfo_mutex;
-  waitbuf[1] = title_mutex;
-  WaitForMultipleObjects (2, waitbuf, TRUE, INFINITE);
-  ReleaseMutex (pinfo_mutex);
-  ReleaseMutex (title_mutex);
-#endif
-  myself->stopsig = sig;
-  myself->process_state |= PID_STOPPED;
-  /* See if we have a living parent.  If so, send it a special signal.
-   * It will figure out exactly which pid has stopped by scanning
-   * its list of subprocesses.
-   */
-  if (my_parent_is_alive ())
-    {
-      pinfo *parent = procinfo(myself->ppid);
-      sig_send (parent, __SIGCHILDSTOPPED);
-    }
-  sigproc_printf ("process %d stopped by signal %d, parent_alive %p",
-		  myself->pid, sig, parent_alive);
-  /* There is a small race here with the above two mutexes */
-  SuspendThread (hMainThread);
-  return;
-}
 }
 
 int __stdcall
-sig_handle (int sig)
+sig_handle (int sig, bool thisproc)
 {
   int rc = 0;
 
   sigproc_printf ("signal %d", sig);
 
-  struct sigaction thissig = myself->getsig(sig);
+  struct sigaction thissig = myself->getsig (sig);
   void *handler = (void *) thissig.sa_handler;
 
   myself->rusage_self.ru_nsignals++;
@@ -863,6 +1011,7 @@ sig_handle (int sig)
   /* FIXME: Should we still do this if SIGCONT has a handler? */
   if (sig == SIGCONT)
     {
+      DWORD stopped = myself->process_state & PID_STOPPED;
       myself->stopsig = 0;
       myself->process_state &= ~PID_STOPPED;
       /* Clear pending stop signals */
@@ -870,12 +1019,10 @@ sig_handle (int sig)
       sig_clear (SIGTSTP);
       sig_clear (SIGTTIN);
       sig_clear (SIGTTOU);
-      /* Windows 95 hangs on resuming non-suspended thread */
-      SuspendThread (hMainThread);
-      while (ResumeThread (hMainThread) > 1)
-	;
+      if (stopped)
+	SetEvent (sigCONT);
       /* process pending signals */
-      sig_dispatch_pending ();
+      sig_dispatch_pending (1);
     }
 
 #if 0
@@ -886,7 +1033,8 @@ sig_handle (int sig)
 
   if (handler == (void *) SIG_DFL)
     {
-      if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH)
+      if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH
+	  || sig == SIGURG || (thisproc && hExeced && sig == SIGINT))
 	{
 	  sigproc_printf ("default signal %d ignored", sig);
 	  goto done;
@@ -907,160 +1055,221 @@ sig_handle (int sig)
   if (handler == (void *) SIG_ERR)
     goto exit_sig;
 
-  if ((sig == SIGCHLD) && (thissig.sa_flags & SA_NOCLDSTOP))
-    goto done;
-
   goto dosig;
 
-stop:
+ stop:
+  /* Eat multiple attempts to STOP */
+  if (ISSTATE (myself, PID_STOPPED))
+    goto done;
   handler = (void *) sig_handle_tty_stop;
+  thissig = myself->getsig (SIGSTOP);
 
-dosig:
+ dosig:
   /* Dispatch to the appropriate function. */
-  sigproc_printf ("signal %d, about to call %p", sig, thissig.sa_handler);
-  rc = call_handler (sig, thissig, handler);
+  sigproc_printf ("signal %d, about to call %p", sig, handler);
+  rc = setup_handler (sig, handler, thissig);
 
-done:
+ done:
   sigproc_printf ("returning %d", rc);
   return rc;
 
-exit_sig:
+ exit_sig:
   if (sig == SIGQUIT || sig == SIGABRT)
     {
-      stackdump (NULL, NULL, NULL, NULL);
-      try_to_debug ();
+      CONTEXT c;
+      c.ContextFlags = CONTEXT_FULL;
+      GetThreadContext (hMainThread, &c);
+      if (!try_to_debug ())
+	stackdump (c.Ebp, 1, 1);
+      sig |= 0x80;
     }
   sigproc_printf ("signal %d, about to call do_exit", sig);
-  TerminateThread (hMainThread, 0);
-  /* FIXME: This just works around the problem so that we don't attempt to
-     use a resource lock when exiting.  */
-  user_data->resourcelocks->Delete();
-  user_data->resourcelocks->Init();
-  do_exit (EXIT_SIGNAL | (sig << 8));
+  signal_exit (sig);
   /* Never returns */
 }
 
+CRITICAL_SECTION NO_COPY exit_lock;
+
 /* Cover function to `do_exit' to handle exiting even in presence of more
-   exceptions.  We use to call exit, but a SIGSEGV shouldn't cause atexit
+   exceptions.  We used to call exit, but a SIGSEGV shouldn't cause atexit
    routines to run.  */
-
 static void
-really_exit (int rc)
+signal_exit (int rc)
 {
-  /* If the exception handler gets a trap, we could recurse awhile.
-     If this is non-zero, skip the cleaning up and exit NOW.  */
-
+  EnterCriticalSection (&exit_lock);
+  rc = EXIT_SIGNAL | (rc << 8);
   if (exit_already++)
-    {
-      /* We are going down - reset our process_state without locking. */
-      myself->record_death (FALSE);
-      ExitProcess (rc);
-    }
+    myself->exit (rc);
 
+  /* We'd like to stop the main thread from executing but when we do that it
+     causes random, inexplicable hangs.  So, instead, we set up the priority
+     of this thread really high so that it should do its thing and then exit. */
+  (void) SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
+  (void) SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+
+  /* Unlock any main thread mutos since we're executing with prejudice. */
+  muto *m;
+  for (m = muto_start.next;  m != NULL; m = m->next)
+    if (m->unstable () || m->owner () == mainthread.id)
+      m->reset ();
+
+  user_data->resourcelocks->Delete ();
+  user_data->resourcelocks->Init ();
+
+  if (hExeced)
+    TerminateProcess (hExeced, rc);
+
+  sigproc_printf ("about to call do_exit (%x)", rc);
+  (void) SetEvent (signal_arrived);
   do_exit (rc);
 }
 
-HANDLE NO_COPY pinfo_mutex = NULL;
 HANDLE NO_COPY title_mutex = NULL;
 
 void
 events_init (void)
 {
-  /* pinfo_mutex protects access to process table */
-
-  if (!(pinfo_mutex = CreateMutex (&sec_all_nih, FALSE,
-				   shared_name ("pinfo_mutex", 0))))
-    api_fatal ("catastrophic failure - unable to create pinfo_mutex, %E");
-
-  ProtectHandle (pinfo_mutex);
-
+  char *name;
   /* title_mutex protects modification of console title. It's neccessary
      while finding console window handle */
 
   if (!(title_mutex = CreateMutex (&sec_all_nih, FALSE,
-				   shared_name ("title_mutex", 0))))
-    api_fatal ("can't create title mutex, %E");
+				   name = shared_name ("title_mutex", 0))))
+    api_fatal ("can't create title mutex '%s', %E", name);
 
   ProtectHandle (title_mutex);
-  mask_sync = new_muto (FALSE, NULL);
+  new_muto (mask_sync);
+  windows_system_directory[0] = '\0';
+  (void) GetSystemDirectory (windows_system_directory, sizeof (windows_system_directory) - 2);
+  char *end = strchr (windows_system_directory, '\0');
+  if (end == windows_system_directory)
+    api_fatal ("can't find windows system directory");
+  if (end[-1] != '\\')
+    {
+      *end++ = '\\';
+      *end = '\0';
+    }
+  windows_system_directory_length = end - windows_system_directory;
+  debug_printf ("windows_system_directory '%s', windows_system_directory_length %d",
+		windows_system_directory, windows_system_directory_length);
+  debug_printf ("cygwin_hmodule %p", cygwin_hmodule);
+  InitializeCriticalSection (&exit_lock);
 }
 
 void
 events_terminate (void)
 {
-//CloseHandle (pinfo_mutex);	// Use implicit close on exit to avoid race
-  ForceCloseHandle (title_mutex);
   exit_already = 1;
 }
 
-#define pid_offset (unsigned)(((pinfo *)NULL)->pid)
 extern "C" {
-void unused_sig_wrapper()
+static int __stdcall
+call_signal_handler_now ()
+{
+  if (!sigsave.sig)
+    {
+      sigproc_printf ("call_signal_handler_now called when no signal active");
+      return 0;
+    }
+
+  int sa_flags = sigsave.sa_flags;
+  sigproc_printf ("sa_flags %p", sa_flags);
+  *sigsave.retaddr_on_stack = sigsave.retaddr;
+  sigdelayed0 ();
+  return sa_flags & SA_RESTART;
+}
+/* This kludge seems to keep a copy of call_signal_handler_now around
+   even when compiling with -finline-functions. */
+static int __stdcall call_signal_handler_now_dummy ()
+  __attribute__((alias ("call_signal_handler_now")));
+};
+
+int
+sigframe::call_signal_handler ()
+{
+  return unregister () ? call_signal_handler_now () : 0;
+}
+
+#define pid_offset (unsigned)(((_pinfo *)NULL)->pid)
+extern "C" {
+void __stdcall
+reset_signal_arrived ()
+{
+  (void) ResetEvent (signal_arrived);
+  sigproc_printf ("reset signal_arrived");
+}
+
+static void unused_sig_wrapper () __attribute__((const, unused));
+
+#undef errno
+#define errno ((DWORD volatile) _impure_ptr) + (((char *) &_impure_ptr->_errno) - ((char *) _impure_ptr))
+
+static void
+unused_sig_wrapper ()
 {
 /* Signal cleanup stuff.  Cleans up stack (too bad that we didn't
    prototype signal handlers as __stdcall), calls _set_process_mask
-   to restore any mask, restores any potentially clobbered registered
-   and returns to orignal caller. */
-__asm__ volatile ("
-	.text
-___sigfirst:
-	.globl	__raise
-__raise:
-	pushl	%%ebp
-	movl	%%esp,%%ebp
-	movl	8(%%ebp),%%eax
-	pushl	%%eax
-	movl	$_myself,%%eax
-	pushl	%6(%%eax)
-	call	__kill
-	mov	%%ebp,%%esp
-	popl	%%ebp
-	ret
-
-_sigreturn:
-	addl	$4,%%esp
-	call	_set_process_mask@4
-	popl	%%eax		# saved errno
-	testl	%%eax,%%eax	# lt 0
-	jl	1f		# yup.  ignore it
-	movl	%1,%%ebx
-	movl	%%eax,(%%ebx)
-1:	popl	%%eax
-	popl	%%ebx
-	popl	%%ecx
-	popl	%%edx
-	popl	%%edi
-	popl	%%esi
-	popf
-	ret
-
-_sigdelayed:
-	# addl	4,%%esp
-	cmpl	$0,_pending_signals
-	je	2f
-	pushl	$0
-	call	_sig_dispatch_pending@4
-2:	pushl	%2	# original return address
-	pushf
-	pushl	%%esi
-	pushl	%%edi
-	pushl	%%edx
-	pushl	%%ecx
-	pushl	%%ebx
-	pushl	%%eax
-	pushl	%7	# saved errno
-	pushl	%3	# oldmask
-	pushl	%4	# signal argument
-	pushl	$_sigreturn
-	movl	$0,%0
-	pushl	$_signal_arrived
-	call	_ResetEvent@4
-	jmp	*%5
-
-___siglast:
-" : "=m" (sigsave.sig) : "m" (&_impure_ptr->_errno),
+   to restore any mask, restores any potentially clobbered registers
+   and returns to original caller. */
+__asm__ volatile ("\n\
+	.text								\n\
+_sigreturn:								\n\
+	addl	$4,%%esp	# Remove argument			\n\
+	movl	%%esp,%%ebp						\n\
+	addl	$36,%%ebp						\n\
+	call	_set_process_mask@4					\n\
+									\n\
+	cmpl	$0,%4		# Did a signal come in?			\n\
+	jz	1f		# No, if zero				\n\
+	call	_call_signal_handler_now@0 # yes handle the signal	\n\
+									\n\
+1:	popl	%%eax		# saved errno				\n\
+	testl	%%eax,%%eax	# Is it < 0				\n\
+	jl	2f		# yup.  ignore it			\n\
+	movl	%1,%%ebx						\n\
+	movl	%%eax,(%%ebx)						\n\
+2:	popl	%%eax							\n\
+	popl	%%ebx							\n\
+	popl	%%ecx							\n\
+	popl	%%edx							\n\
+	popl	%%edi							\n\
+	popl	%%esi							\n\
+	popf								\n\
+	popl	%%ebp							\n\
+	ret								\n\
+									\n\
+__no_sig_start:								\n\
+_sigdelayed:								\n\
+	pushl	%2			# original return address	\n\
+_sigdelayed0:								\n\
+	pushl	%%ebp							\n\
+	movl	%%esp,%%ebp						\n\
+	pushf								\n\
+	pushl	%%esi							\n\
+	pushl	%%edi							\n\
+	pushl	%%edx							\n\
+	pushl	%%ecx							\n\
+	pushl	%%ebx							\n\
+	pushl	%%eax							\n\
+	pushl	%6			# saved errno			\n\
+	pushl	%3			# oldmask			\n\
+	pushl	%4			# signal argument		\n\
+	pushl	$_sigreturn						\n\
+									\n\
+	call	_reset_signal_arrived@0					\n\
+	pushl	%5			# signal number			\n\
+	pushl	%7			# newmask			\n\
+	movl	$0,%0			# zero the signal number as a	\n\
+					# flag to the signal handler thread\n\
+					# that it is ok to set up sigsave\n\
+									\n\
+	call	_set_process_mask@4					\n\
+	popl	%%eax							\n\
+	jmp	*%%eax							\n\
+__no_sig_end:								\n\
+" : "=m" (sigsave.sig):  "X" ((char *) &_impure_ptr->_errno),
   "g" (sigsave.retaddr), "g" (sigsave.oldmask), "g" (sigsave.sig),
-    "g" (sigsave.func), "o" (pid_offset), "g" (sigsave.saved_errno)
-  );
+    "g" (sigsave.func), "g" (sigsave.saved_errno), "g" (sigsave.newmask)
+);
 }
 }

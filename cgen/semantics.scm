@@ -798,11 +798,11 @@
 		  sorted-outs out-op-nums)
 
 	(let ((dump (lambda (op)
-		      (string-append "  "
-				     (obj:name op)
-				     " "
-				     (number->string (op:num op))
-				     "\n"))))
+		      (concat "  "
+			      (obj:name op)
+			      " "
+			      (number->string (op:num op))
+			      "\n"))))
 	  (logit 4
 		 "Input operands:\n"
 		 (map dump sorted-ins)

@@ -1,3 +1,8 @@
+Fri Jun  9 09:10:48 2000  Catherine Moore  <clm@cygnus.com>
+
+	* lib/libgloss.exp (proc_get_multilibs):  Handle multilib
+        pathnames for ports that have defined MULTILIB_EXTRA_OPTS.
+
 Sun Jun  4 12:59:06 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* lib/target.exp (reboot_target): Don't reboot target twice.

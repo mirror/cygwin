@@ -64,7 +64,7 @@
 	instantiation time, the following parameters are specified:
 
 	<ul>
-	  <li>cache size in KB (4, 8, 16, 32, 64, 128, 256, 512)</li>
+	  <li>cache size in KB (1, 2, 4, 8, 16, 32, 64, 128, 256, 512)</li>
 	  <li>line size in bytes (16, 32, 64, 128)</li>
 	  <li>associativity (<tt>direct</tt>, <tt>full</tt>,
 	    <tt>2way</tt>, <tt>4way</tt>)</li>

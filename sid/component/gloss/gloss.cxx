@@ -176,7 +176,7 @@ gloss32::reset()
 
 // streaming/destreaming of gloss32
 void
-gloss32::stream_state (ostream& o) const
+gloss32::stream_state (std::ostream& o) const
 {
   o << " gloss32";
   /* FIXME: the fds eventually should be saved and restored in some manner. */
@@ -185,7 +185,7 @@ gloss32::stream_state (ostream& o) const
 }
 
 void
-gloss32::destream_state (istream& i)
+gloss32::destream_state (std::istream& i)
 {
   string key;
   int new_max_fds;
@@ -1665,15 +1665,15 @@ gloss32::isatty (int fd, bool& result, int& errcode)
   return true;
 }
 
-ostream& 
-operator << (ostream& out, const gloss32& it)
+std::ostream& 
+operator << (std::ostream& out, const gloss32& it)
 {
   it.stream_state(out);
   return out;
 }
 
-istream& 
-operator >> (istream& in, gloss32& it)
+std::istream& 
+operator >> (std::istream& in, gloss32& it)
 {
   it.destream_state(in);
   return in;

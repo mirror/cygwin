@@ -1,3 +1,8 @@
+2002-09-05  Ben Elliston  <bje@redhat.com>
+
+	* gloss.h: Specify std:: namespace where necessary.
+	* gloss.cxx: Likewise.
+
 2002-06-03  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* gloss.cxx (gloss32::gloss32): Add "state-snapshot" attribute.

@@ -1,5 +1,7 @@
 2004-12-02  Jim Blandy  <jimb@redhat.com>
 
+	* ptrace-target.c (kill_lwp): Produce debugging output.
+
 	* lwp-pool.c (check_stop_pending): lwp_state_stopped_interesting
 	is not a legitimate state for the LWP to be in.
 

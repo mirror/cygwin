@@ -1341,6 +1341,9 @@ kill_lwp (pid_t lwp, int signal)
 {
   int result;
 
+  if (thread_db_noisy)
+    fprintf (stderr, "kill_lwp (%d, %d)\n", (int) lwp, signal);
+
   /* Under NPTL, signals sent via kill get delivered to whatever
      thread in the group can handle them; they don't necessarily go to
      the thread whose PID you passed.  This makes kill useless for

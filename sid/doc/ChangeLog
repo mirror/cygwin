@@ -1,0 +1,15 @@
+2001-10-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cdk-guide/Makefile (normalize): Rewrite.
+	(pdf, html): Add "-i" sgml flags for print/html entity marks.
+	* sid-guide/Makefile: Ditto.
+	* cdk-guide/book-cdk.sgml: Add date & rendering marks.
+	* sid-guide/book-sid.sgml: Ditto.
+
+2001-08-02  graydon hoare  <graydon@redhat.com>
+
+	* cdk-guide/api-reference.sgml: Rewrite.
+	* cdk-guide/images/accessor-bus.jpg: Add.
+	* cdk-guide/images/name-structure.jpg: Add.
+	* cdk-guide/cdktutorial.sgml: Minor cleanups.
+	* cdk-guide/introduction.sgml: Ditto.

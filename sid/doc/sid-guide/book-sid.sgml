@@ -1,4 +1,7 @@
-<!DOCTYPE BOOK PUBLIC "-//Davenport//DTD DocBook V3.0//EN">
+<!DOCTYPE BOOK PUBLIC "-//Davenport//DTD DocBook V3.0//EN" [
+<!ENTITY % PRINTONLY "IGNORE">
+<!ENTITY % HTMLONLY "IGNORE">
+]>
 <BOOK><!-- Copyright 2001 by Red Hat, Inc. --><!-- Process this file through "make normalize" before CVS operations (diff/commit). -->
 <BOOKINFO>
 <TITLE>SID Simulator User's Guide</TITLE>
@@ -11,8 +14,9 @@
 <YEAR>2001</YEAR>
 <HOLDER>Red Hat, Inc.</HOLDER>
 </COPYRIGHT>
-<DATE>$Date$</DATE>
 <LEGALNOTICE>
+<PARA><![ %HTMLONLY; [HTML edition]]> <![ %PRINTONLY; [Print edition]]>
+<LITERAL>$Date$</LITERAL></PARA>
 <PARA>This material may be distributed only
     subject to the terms and conditions set forth in the Open Publication
     License, V1.0 or later (the latest version is presently available at <ULINK URL="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</ULINK>).

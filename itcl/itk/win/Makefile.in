@@ -372,7 +372,7 @@ install-headers:
 	    $(INSTALL_DATA) $$i $(INSTALL_INCLUDE_DIR); \
 	    done;
 
-install-libraries:
+install-libraries: install-shared-libraries
 	@for i in $(prefix)/lib $(ITK_LIBRARY); \
 	    do \
 	    if [ ! -d $$i ] ; then \
@@ -393,6 +393,10 @@ install-libraries:
 
 	@echo "Installing tclIndex"
 	@$(INSTALL_DATA) $(SRC_LIB_DIR)/tclIndex $(ITK_LIBRARY)
+
+install-shared-libraries:
+	@echo "Installing $(ITKDLL) as $(INSTALL_BIN_DIR)/$(ITKDLL)"
+	@$(INSTALL_PROGRAM) $(ITKDLL) $(INSTALL_BIN_DIR)/$(ITKDLL)
 
 install-man:
 	@for i in $(INSTALL_MAN_DIR) $(INSTALL_MAN1_DIR) \

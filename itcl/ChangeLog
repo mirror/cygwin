@@ -1,3 +1,7 @@
+2000-10-27  Syd Polk  <spolk@redhat.com>
+
+	* itk/win/Makefile.in: Install itk dll when installing libraries.
+
 2000-10-13  Mo DeJong  <mdejong@redhat.com>
 
 	* itcl/generic/itcl_objects.c (Itcl_CreateObject):

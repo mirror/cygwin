@@ -1,3 +1,9 @@
+2001-10-12  Christopher Faylor  <cgf@redhat.com>
+
+	* win/configure.in: Add detection for -mwin32 option requirement under
+	cygwin.
+	* win/configure: Regenerate.
+
 2001-10-10  Ian Roxborough  <irox@redhat.com>
 
        * library/looknfeel.tcl (standard_look_and_feel):

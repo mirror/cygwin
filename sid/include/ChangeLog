@@ -1,3 +1,8 @@
+2001-06-22  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.h (API_MAJOR_VERSION): Bump to 4.
+	(bus::status_t): Remove "delayed" enumerator.
+
 2001-06-21  Ben Elliston  <bje@redhat.com>
 
 	* sidcomp.h (API_MAJOR_VERSION): Bump to 3.

@@ -1,3 +1,8 @@
+2001-06-22  Ben Elliston  <bje@redhat.com>
+
+	* lib/monkey.exp (monkey_test): Correct logic thinko when deciding
+	whether or not to output the finishing time.
+
 2001-06-21  Ben Elliston  <bje@redhat.com>
 
 	* sidcomp.cache/cache.exp: Test for the existence of "hit-latency"

@@ -1,5 +1,10 @@
 2001-10-28  Christopher Faylor  <cgf@redhat.com>
 
+	* cygwin/configure.in: Check for cygwin host rather than cygwin target.
+	* cygwin/configure: Regenerate.
+
+2001-10-28  Christopher Faylor  <cgf@redhat.com>
+
 	* win/configure.in: Modify 2001-10-05 change to check for cygwin host
 	rather than cygwin target.
 	* win/configure: Regenerate.

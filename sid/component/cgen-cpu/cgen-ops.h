@@ -148,11 +148,14 @@ namespace cgen {
 #define RORSI(x, y) (SRLSI((x), (y)) | SLLSI((x), 32-(y)))
 #define ROLSI(x, y) (SLLSI((x), (y)) | SRLSI((x), 32-(y)))
 #define JOINSIDI(x, y)  (MAKEDI(x, y))
+#define JOINUQIUHI(x, y)  (((x) << 8) | (y))
 // XXX: endianness issues undecided
 #define SUBWORDDISI(x, y) ((y) == 0 ? GETHIDI(x) : GETLODI(x))
 #define SUBWORDSISI(x) ((SI) (x))
 #define SUBWORDHIQI(x, y) ((y) == 0 ? ((x) >> 8) : ((QI) (x)))
 #define SUBWORDHIHI(x) ((HI) (x))
+#define SUBWORDHIUHI(x) ((HI) (x))
+#define SUBWORDUHIUQI(x, y) (SUBWORDHIQI((x), (y)))
 #define SUBWORDBIHI(x) ((x) ? true : false)
 
 // Floating point.

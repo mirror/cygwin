@@ -1,5 +1,17 @@
 2004-03-10  Kevin Buettner  <kevinb@redhat.com>
 
+	* linux-target.c (enum regset): Add constant OTHERREGS.
+	(struct peekuser_pokeuser_reginfo): Add new field,
+	alternate_register_read_write_method.  Adjust all initializers
+	accordingly.
+	(frv_fdpic_loadmap_addresses): New function.
+	(PTRACE_GETFDPIC, PTRACE_GETFDPIC_EXEC, PTRACE_GETFDPIC_INTERP):
+	Define.
+	(reginfo) [FRV_LINUX_TARGET]: Use slots 132 and 133 for the
+	loadmap registers.
+	
+2004-03-10  Kevin Buettner  <kevinb@redhat.com>
+
 	* configure.in: Add "frv*linux*" to list of targets with thread
 	support.
 	* configure: Regenerate.

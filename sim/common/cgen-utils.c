@@ -32,7 +32,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define min(a,b) ((a) < (b) ? (a) : (b))
 
 const char *mode_names[] = {
-  "VM",
+  "VOID",
   "BI",
   "QI",
   "HI",
@@ -59,28 +59,22 @@ const char *mode_names[] = {
 static const CGEN_IBASE virtual_insn_entries[] =
 {
   {
-    VIRTUAL_INSN_X_INVALID, "--invalid--", NULL, 0,
-    { CGEN_INSN_NBOOL_ATTRS, V, { 0 } }
+    VIRTUAL_INSN_X_INVALID, "--invalid--", NULL, 0, { V, { 0 } }
   },
   {
-    VIRTUAL_INSN_X_BEFORE, "--before--", NULL, 0,
-    { CGEN_INSN_NBOOL_ATTRS, V, { 0 } }
+    VIRTUAL_INSN_X_BEFORE, "--before--", NULL, 0, { V, { 0 } }
   },
   {
-    VIRTUAL_INSN_X_AFTER, "--after--", NULL, 0,
-    { CGEN_INSN_NBOOL_ATTRS, V, { 0 } }
+    VIRTUAL_INSN_X_AFTER, "--after--", NULL, 0, { V, { 0 } }
   },
   {
-    VIRTUAL_INSN_X_BEGIN, "--begin--", NULL, 0,
-    { CGEN_INSN_NBOOL_ATTRS, V, { 0 } }
+    VIRTUAL_INSN_X_BEGIN, "--begin--", NULL, 0, { V, { 0 } }
   },
   {
-    VIRTUAL_INSN_X_CHAIN, "--chain--", NULL, 0,
-    { CGEN_INSN_NBOOL_ATTRS, V, { 0 } }
+    VIRTUAL_INSN_X_CHAIN, "--chain--", NULL, 0, { V, { 0 } }
   },
   {
-    VIRTUAL_INSN_X_CTI_CHAIN, "--cti-chain--", NULL, 0,
-    { CGEN_INSN_NBOOL_ATTRS, V, { 0 } }
+    VIRTUAL_INSN_X_CTI_CHAIN, "--cti-chain--", NULL, 0, { V, { 0 } }
   }
 };
 
@@ -326,3 +320,106 @@ CONVDISI (val)
 }
 
 #endif /* DI_FN_SUPPORT */
+
+QI
+RORQI (val, shift)
+     QI  val;
+     int shift;
+{
+  if (shift != 0)
+    {
+      int remain = 8 - shift;
+      int mask = (1 << shift) - 1;
+      QI result = (val & mask) << remain;
+      mask = (1 << remain) - 1;
+      result |= (val >> shift) & mask;
+      return result;
+    }
+  return val;
+}
+
+QI
+ROLQI (val, shift)
+     QI  val;
+     int shift;
+{
+  if (shift != 0)
+    {
+      int remain = 8 - shift;
+      int mask = (1 << remain) - 1;
+      QI result = (val & mask) << shift;
+      mask = (1 << shift) - 1;
+      result |= (val >> remain) & mask;
+      return result;
+    }
+  return val;
+}
+
+HI
+RORHI (val, shift)
+     HI  val;
+     int shift;
+{
+  if (shift != 0)
+    {
+      int remain = 16 - shift;
+      int mask = (1 << shift) - 1;
+      HI result = (val & mask) << remain;
+      mask = (1 << remain) - 1;
+      result |= (val >> shift) & mask;
+      return result;
+    }
+  return val;
+}
+
+HI
+ROLHI (val, shift)
+     HI  val;
+     int shift;
+{
+  if (shift != 0)
+    {
+      int remain = 16 - shift;
+      int mask = (1 << remain) - 1;
+      HI result = (val & mask) << shift;
+      mask = (1 << shift) - 1;
+      result |= (val >> remain) & mask;
+      return result;
+    }
+  return val;
+}
+
+SI
+RORSI (val, shift)
+     SI  val;
+     int shift;
+{
+  if (shift != 0)
+    {
+      int remain = 32 - shift;
+      int mask = (1 << shift) - 1;
+      SI result = (val & mask) << remain;
+      mask = (1 << remain) - 1;
+      result |= (val >> shift) & mask;
+      return result;
+    }
+  return val;
+}
+
+SI
+ROLSI (val, shift)
+     SI  val;
+     int shift;
+{
+  if (shift != 0)
+    {
+      int remain = 32 - shift;
+      int mask = (1 << remain) - 1;
+      SI result = (val & mask) << shift;
+      mask = (1 << shift) - 1;
+      result |= (val >> remain) & mask;
+      return result;
+    }
+
+  return val;
+}

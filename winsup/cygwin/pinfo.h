@@ -197,7 +197,6 @@ class winpids
   DWORD *pidlist;
   DWORD npidlist;
   pinfo *pinfolist;
-  DWORD pinfo_access;		// access type for pinfo open
   DWORD (winpids::* enum_processes) (bool winpid);
   DWORD enum_init (bool winpid);
   DWORD enumNT (bool winpid);
@@ -208,14 +207,9 @@ public:
   DWORD npids;
   inline void reset () { npids = 0; release (); }
   void set (bool winpid);
-  winpids (int): pinfo_access (0), enum_processes (&winpids::enum_init)
-    { reset (); }
-  winpids (DWORD acc = 0): pidlist (NULL), npidlist (0), pinfolist (NULL),
-  			   enum_processes (&winpids::enum_init), npids (0)
-  {
-    pinfo_access = acc;
-    set (0);
-  }
+  winpids (int): enum_processes (&winpids::enum_init) { reset (); }
+  winpids (): pidlist (NULL), npidlist (0), pinfolist (NULL),
+	      enum_processes (&winpids::enum_init), npids (0) { set (0); }
   inline DWORD& winpid (int i) const {return pidlist[i];}
   inline _pinfo *operator [] (int i) const {return (_pinfo *) pinfolist[i];}
   ~winpids ();
@@ -234,6 +228,8 @@ void __stdcall set_myself (pid_t pid, HANDLE h = NULL);
 extern pinfo myself;
 
 #define _P_VFORK 0
+#define _P_SYSTEM 512
+
 extern void __stdcall pinfo_fixup_after_fork ();
 extern HANDLE hexec_proc;
 

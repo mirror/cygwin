@@ -1,3 +1,8 @@
+2001-07-23  graydon hoare  <graydon@redhat.com>
+
+	* compMapper.cxx (make_name_mapping): Support mapping
+	names with word size included as constant multiplier.
+
 2001-07-13  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (check-local): Rename target from "checkme".

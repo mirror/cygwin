@@ -66,6 +66,12 @@ struct mapping_record
   host_int_4 hit_count;         // number of accesses via this record
   bus* accessor;                // target bus
 
+  host_int_2 bytes_per_word;    // how many bytes make up an address word. usually 1.
+                                // multiply low, high, stride, width by this amount.
+                                // note however that all bus communication still takes
+                                // place in byte addresses. this just simplifies writing
+                                // the mapping spec ([4,0x1010-0x1015] vs. [0x4040-0x4054])
+
   bool use_strideoffset_p;      // following fields valid?
   host_int_2 stride;	        // stride
   host_int_2 stride_shift;	// log2(stride)
@@ -478,8 +484,10 @@ generic_mapper_bus::read_any (host_int_4 address, Data& data) throw ()
 // Return 0 on parse or validity-checking error.
 //
 // Accept the following forms:
-// [LOW-HIGH]
-// [LOW-HIGH,STRIDE,WIDTH]
+// [LOW-HIGH]                              (4 tokens)
+// [LOW-HIGH,STRIDE,WIDTH]                 (6 tokens)
+// [LOW-HIGH,BYTES_PER_WORD]               (5 tokens)
+// [LOW-HIGH,STRIDE,WIDTH,BYTES_PER_WORD]  (7 tokens)
 //
 // Each number may be specified in any format that parse_attribute()
 // understands.
@@ -492,14 +500,27 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
 
   vector<string> fields = tokenize (str, "[-,]");
 
-  // Must have either four or six tokens (including empties
+  // Must have between 4 and 7 tokens (including empties
   // before/after "[" and "]")
-  if (fields.size() != 4 && fields.size() != 6)
+  if (fields.size() < 4 || fields.size() > 7)
     {
       cerr << "mapper error: parse error (bad number of fields) in " << str << endl;
       return 0;
     }
 
+  // strip the word width off the front of the descriptor array
+  record.bytes_per_word = 1;
+  if (fields.size() == 5 || fields.size() == 7) 
+    {
+      component::status stat = parse_attribute(fields [fields.size () - 2], record.bytes_per_word);
+      if (stat != component::ok) 
+	{
+	  cerr << "mapper error: parse error (bytes_per_word) in " << str << endl;
+	  return 0;
+	}
+      fields.pop_back ();
+    }
+  
   record.use_strideoffset_p = (fields.size() == 6);
   record.spec = str;
   record.hit_count = 0;
@@ -529,6 +550,12 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
       cerr << "mapper error: illegal low-high in " << str << endl;
       return 0;
     }
+
+  // scale all values by the word width
+  record.low    *= record.bytes_per_word;
+  record.high   *= record.bytes_per_word;
+  record.stride *= record.bytes_per_word;
+  record.width  *= record.bytes_per_word;
 
   // check further
   if (record.use_strideoffset_p)

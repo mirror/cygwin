@@ -67,10 +67,15 @@ typedef float *TCHAR;
 
 #include <winsock2.h>
 
+
 #define WIN32_LEAN_AND_MEAN
 #define __USE_W32_SOCKETS
 #include <windows.h>
 #undef WIN32_LEAN_AND_MEAN
+
+#ifdef _MSC_VER
+#define PASCAL
+#endif
 
 #ifdef BUILD_tcl
 # undef TCL_STORAGE_CLASS
@@ -97,21 +102,6 @@ typedef float *TCHAR;
  * The following defines redefine the Windows Socket errors as
  * BSD errors so Tcl_PosixError can do the right thing.
  */
-
-/* On cygwin, we just use the supplied malloc and free, rather than
-   using tclAlloc.c.  The cygwin32 malloc is derived from the same
-   sources as tclAlloc.c, anyhow.  */
-#ifdef __CYGWIN__
-#define TclpAlloc(size)		malloc(size)
-#define TclpFree(ptr)		free(ptr)
-#define TclpRealloc(ptr, size)	realloc(ptr, size)
-#else
-#define TclpSysAlloc(size, isBin)	((void*)HeapAlloc(GetProcessHeap(), \
-					    (DWORD)0, (DWORD)size))
-#define TclpSysFree(ptr)		(HeapFree(GetProcessHeap(), \
-					    (DWORD)0, (HGLOBAL)ptr))
-#define TclpSysRealloc(ptr, size)	((void*)HeapReAlloc(GetProcessHeap(), \
-					    (DWORD)0, (LPVOID)ptr, (DWORD)size))
 
 #ifndef EWOULDBLOCK
 #define EWOULDBLOCK             EAGAIN
@@ -214,6 +204,22 @@ typedef float *TCHAR;
 #endif
 #ifndef EREMOTE
 #define EREMOTE		66	/* The object is remote */
+#endif
+
+/* On cygwin, we just use the supplied malloc and free, rather than
+   using tclAlloc.c.  The cygwin32 malloc is derived from the same
+   sources as tclAlloc.c, anyhow.  */
+#if defined(__CYGWIN__) && !defined(__MWIN32__)
+#define TclpAlloc(size)		malloc(size)
+#define TclpFree(ptr)		free(ptr)
+#define TclpRealloc(ptr, size)	realloc(ptr, size)
+#else
+#define TclpSysAlloc(size, isBin)	((void*)HeapAlloc(GetProcessHeap(), \
+					    (DWORD)0, (DWORD)size))
+#define TclpSysFree(ptr)		(HeapFree(GetProcessHeap(), \
+					    (DWORD)0, (HGLOBAL)ptr))
+#define TclpSysRealloc(ptr, size)	((void*)HeapReAlloc(GetProcessHeap(), \
+					    (DWORD)0, (LPVOID)ptr, (DWORD)size))
 #endif
 
 /*
@@ -377,21 +383,11 @@ extern int chdir (const char*);
  *---------------------------------------------------------------------------
  */
 
-
-#ifdef __MINGW32__
-     extern char *** __imp__environ_dll;
-#    define environ (*__imp__environ_dll)
-#    define hypot _hypot
-#    define exception _exception
-#    undef EDEADLOCK
-#endif /* __MINGW32__ */
-
 /*
  * The default platform eol translation on Windows is TCL_TRANSLATE_CRLF:
  */
 
 #define	TCL_PLATFORM_TRANSLATION	TCL_TRANSLATE_CRLF
-
 
 /*
  * Declare dynamic loading extension macro.

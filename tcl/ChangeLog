@@ -1,3 +1,32 @@
+2001-09-12  Ian Roxborough  <irox@redhat.com>
+
+	* Makefile.in: Add 'cygwin' subdirectory to 'make all'
+	target.
+	* configure.in: Configure 'cygwin' and 'win' directory
+	for a cygwin host.
+	* configure: Regenerated.
+	* cygwin/configure.in: Change version number to 8.3.
+	* cygwin/configure: Regenerated.
+	* cygwin/Makefile.am: Added/removed files to be build
+	for Tcl8.3.
+	* cygwin/Makefile.in: Regenerated.
+	* generic/tcl.h: Don't define __WIN32__ for cygwin or
+	mwing32 builds.  Don't define USE_TCLALLOC when building
+	for cygwin.  Don't use __declspec unless building Tcl or
+	tk or build with USE_TCL_STUBS.
+	* generic/tclAlloc.c: For cygwin hosts, don't using
+	anything in this file unless build with __TCL_UNIX_VARIANT.
+	* generic/tclClock.c: Declare 'timezone' as an int, if it
+	hasn't been #defined.
+	* generic/tclStubInit.c: Don't export any tclAlloc function
+	when build for a cygwin host.
+	* win/configure.in: Set DL_LIBS and MATH_LIBS.  Create
+	unix/tclConfig.sh.
+	* win/configure: Regenerated.
+	* win/tclWinPort.h: Added missing #endif.
+	* win/tclWinFile.c (TclpChdir): Don't invert change
+	directory results on cygwin.
+	
 2001-08-08  Mo DeJong  <mdejong@redhat.com>
 
 	* cygtcl.m4 (TCL_TOOL_PATH, TCL_TOOL_SHARED_LIB_LONGNAME):

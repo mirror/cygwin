@@ -1,3 +1,8 @@
+2001-06-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* rtl.scm (hw): Encode hw access mode into <operand> name, since this
+	is required for multi-mode hw types (memory).
+
 2001-05-11  Ben Elliston  <bje@redhat.com>
 
 	* gas-test.scm (cgen-build.sh, gentest): Escape $ with a backslash

@@ -106,6 +106,8 @@ proc ::combobox::build {w args } {
 	variable options
 	variable oldValue
 	variable ignoreTrace
+	variable grablist
+	variable grabstatus
 	variable this
 
 	array set widgets {}
@@ -677,6 +679,8 @@ proc ::combobox::doInternalWidgetCommand {w subwidget command args} {
 proc ::combobox::widgetProc {w command args} {
     upvar ::combobox::${w}::widgets widgets
     upvar ::combobox::${w}::options options
+    upvar ::combobox::${w}::grablist grablist
+    upvar ::combobox::${w}::grabstatus grabstatus
 
     # this is just shorthand notation...
     set doWidgetCommand \
@@ -787,6 +791,10 @@ proc ::combobox::widgetProc {w command args} {
 
 	    # *gasp* do a global grab!!! Mom always told not to
 	    # do things like this... :-)
+	    set grablist [grab current]
+	    foreach grabitem $grablist {
+		lappend grabstatus [grab status $grabitem]
+	    }
 	    grab -global $widgets(this)
 
 	    # fake the listbox into thinking it has focus
@@ -802,6 +810,15 @@ proc ::combobox::widgetProc {w command args} {
 	    }
 	    # hides the listbox
 	    grab release $widgets(this)
+	    foreach grabitem $grablist itemstatus $grabstatus {
+		if {$itemstatus == "global"} {
+	           grab set -global $grabitem
+		} else {
+	           grab set $grabitem
+		}
+	    }
+	    set grablist {}
+	    set grabstatus {}
 	    $widgets(button) configure -relief raised
 	    wm withdraw $widgets(popup) 
 

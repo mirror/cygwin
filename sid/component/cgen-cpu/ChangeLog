@@ -1,6 +1,6 @@
 2001-12-17  Dave Brolley  <brolley@redhat.com>
 
-	* cgen-ops.h: Correct return type of ADDCHI.
+	* cgen-ops.h (ADDCHI): Correct return type.
 
 2001-12-17  matthew green  <mrg@redhat.com>
 

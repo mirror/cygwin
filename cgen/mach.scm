@@ -278,7 +278,7 @@
 (define (current-ifld-list) (map cdr (arch-ifld-list CURRENT-ARCH)))
 
 (define (current-ifld-add! f)
-  (if (current-ifld-lookup (obj:name f))
+  (if (-ifld-already-defined? f)
       (parse-error "define-ifield" "ifield already defined" (obj:name f)))
   (arch-set-ifld-list! CURRENT-ARCH
 		       (acons (obj:name f) f (arch-ifld-list CURRENT-ARCH)))
@@ -291,12 +291,30 @@
       (assq-ref (arch-ifld-list CURRENT-ARCH) x))
 )
 
+; Return a boolean indicating if <ifield> F is currently defined.
+; This is slightly complicated because multiple isas can have different
+; ifields with the same name.
+
+(define (-ifld-already-defined? f)
+  (let ((iflds (find (lambda (ff) (eq? (obj:name f) (car ff)))
+		     (arch-ifld-list CURRENT-ARCH))))
+    ; We've got all the ifields with the same name,
+    ; now see if any have the same ISA as F.
+    (let ((result #f)
+	  (f-isas (obj-isa-list f)))
+      (for-each (lambda (ff)
+		  (if (not (null? (intersection f-isas (obj-isa-list (cdr ff)))))
+		      (set! result #t)))
+		iflds)
+      result))
+)
+
 ; Operands.
 
 (define (current-op-list) (map cdr (arch-op-list CURRENT-ARCH)))
 
 (define (current-op-add! op)
-  (if (current-op-lookup (obj:name op))
+  (if (-op-already-defined? op)
       (parse-error "define-operand" "operand already defined" (obj:name op)))
   (arch-set-op-list! CURRENT-ARCH
 		     (acons (obj:name op) op (arch-op-list CURRENT-ARCH)))
@@ -305,6 +323,24 @@
 
 (define (current-op-lookup name)
   (assq-ref (arch-op-list CURRENT-ARCH) name)
+)
+
+; Return a boolean indicating if <operand> OP is currently defined.
+; This is slightly complicated because multiple isas can have different
+; operands with the same name.
+
+(define (-op-already-defined? op)
+  (let ((ops (find (lambda (o) (eq? (obj:name op) (car o)))
+		     (arch-op-list CURRENT-ARCH))))
+    ; We've got all the operands with the same name,
+    ; now see if any have the same ISA as OP.
+    (let ((result #f)
+	  (op-isas (obj-isa-list op)))
+      (for-each (lambda (o)
+		  (if (not (null? (intersection op-isas (obj-isa-list (cdr o)))))
+		      (set! result #t)))
+		ops)
+      result))
 )
 
 ; Instruction field formats.
@@ -323,7 +359,7 @@
 (define (current-insn-list) (map cdr (arch-insn-list CURRENT-ARCH)))
 
 (define (current-insn-add! i)
-  (if (current-insn-lookup (obj:name i))
+  (if (-insn-already-defined? i)
       (parse-error "define-insn" "insn already defined" (obj:name i)))
   (arch-set-insn-list! CURRENT-ARCH
 		       (acons (obj:name i) i (arch-insn-list CURRENT-ARCH)))
@@ -332,6 +368,24 @@
 
 (define (current-insn-lookup name)
   (assq-ref (arch-insn-list CURRENT-ARCH) name)
+)
+
+; Return a boolean indicating if <insn> INSN is currently defined.
+; This is slightly complicated because multiple isas can have different
+; insns with the same name.
+
+(define (-insn-already-defined? insn)
+  (let ((insns (find (lambda (i) (eq? (obj:name insn) (car i)))
+		     (arch-insn-list CURRENT-ARCH))))
+    ; We've got all the insns with the same name,
+    ; now see if any have the same ISA as INSN.
+    (let ((result #f)
+	  (insn-isas (obj-isa-list insn)))
+      (for-each (lambda (i)
+		  (if (not (null? (intersection insn-isas (obj-isa-list (cdr i)))))
+		      (set! result #t)))
+		insns)
+      result))
 )
 
 ; Return the insn in the `car' position of INSN-LIST.
@@ -353,7 +407,7 @@
 (define (current-minsn-list) (map cdr (arch-minsn-list CURRENT-ARCH)))
 
 (define (current-minsn-add! m)
-  (if (current-minsn-lookup (obj:name m))
+  (if (-minsn-already-defined? m)
       (parse-error "define-minsn" "macro-insn already defined" (obj:name m)))
   (arch-set-minsn-list! CURRENT-ARCH
 			(acons (obj:name m) m (arch-minsn-list CURRENT-ARCH)))
@@ -362,6 +416,24 @@
 
 (define (current-minsn-lookup name)
   (assq-ref (arch-minsn-list CURRENT-ARCH) name)
+)
+
+; Return a boolean indicating if <macro-insn> MINSN is currently defined.
+; This is slightly complicated because multiple isas can have different
+; macro-insns with the same name.
+
+(define (-minsn-already-defined? m)
+  (let ((minsns (find (lambda (mm) (eq? (obj:name m) (car mm)))
+		      (arch-minsn-list CURRENT-ARCH))))
+    ; We've got all the macro-insns with the same name,
+    ; now see if any have the same ISA as M.
+    (let ((result #f)
+	  (m-isas (obj-isa-list m)))
+      (for-each (lambda (mm)
+		  (if (not (null? (intersection m-isas (obj-isa-list (cdr mm)))))
+		      (set! result #t)))
+		minsns)
+      result))
 )
 
 ; rtx subroutines.
@@ -577,11 +649,17 @@
   *UNSPECIFIED*
 )
 
+; Return list of ISA names specified by OBJ.
+
+(define (obj-isa-list obj)
+  (bitset-attr->list (obj-attr-value obj 'ISA))
+)
+
 ; Return #t if <isa> ISA is supported by OBJ.
 ; This is done by looking for the ISA attribute in OBJ.
 
 (define (isa-supports? isa obj)
-  (let ((isas (bitset-attr->list (obj-attr-value obj 'ISA)))
+  (let ((isas (obj-isa-list obj))
 	(name (obj:name isa)))
     (->bool (memq name isas)))
 )

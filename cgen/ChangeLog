@@ -1,3 +1,16 @@
+2003-06-19  Doug Evans  <dje@sebabeach.org>
+
+	* mach.scm (-ifld-already-defined?): New proc.
+	(current-ifld-add!): Use it.
+	(-op-already-defined?): New proc.
+	(current-op-add!): Use it.
+	(-insn-already-defined?): New proc.
+	(current-insn-add!): Use it.
+	(-minsn-already-defined?): New proc.
+	(current-minsn-add!): Use it.
+	(obj-isa-list): New proc.
+	(isa-supports?): Use it.
+
 2003-06-10  Doug Evans  <dje@sebabeach.org>
 
 	* insn.scm (insn-builtin!): RELAX renamed to RELAXABLE.

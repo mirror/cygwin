@@ -37,12 +37,6 @@ ide_initialize_paths (Tcl_Interp *, char *ide_appname);
 extern int
 ide_run_app_script (Tcl_Interp *);
 
-/* This adds the new Tk widget `treetable' to the interpreter
-   IDE_INTERP.
-   Returns a standard Tcl result.  */
-extern int
-create_treetable_command (Tcl_Interp *ide_interp);
-
 /* This adds the new graph command for manipulating graphs to the
    interpreter IDE_INTERP.  
    Returns a standard Tcl result.  */

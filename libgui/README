@@ -130,11 +130,6 @@ library/
       to the toplevel to avoid the problems associated with putting
       bindings directly on toplevels.
 
-  treetable.tcl
-    Code that is useful when using the treetable widget.
-    Applications should run "multix_treetable_bindings TreeTable"
-    at startup.
-
   ulset.tcl
     Attempt to make setting the -underline option easier.  This is
     particular good when using gettext.  Unfortunately the interface
@@ -189,14 +184,3 @@ src/
   tkCanvEdge.c, tkCanvLayout.c, tkCanvLayout.h, tkCanvas.c, tkCanvas.h
     Patched versions (ugh) of the corresponding Tk files, and some new
     files.  These files implement graph layout for canvases.
-
-  tkTreeTable.c tkTreeTable.c
-    The treetable widget.  This is essentially a hierarchical listbox
-    widget.  As far as I know, there is no documentation.  At some
-    point, maybe I'll write some up.  This widget came from S-N (but
-    they got it from somewhere else), but I've changed it somewhat.
-
-    We'll be merging our version with S-N at some point.
-
-    Your package should run create_treetable_command to make the
-    treetable widget.  Only do this after running Tk_Init.

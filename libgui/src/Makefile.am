@@ -47,7 +47,7 @@ $(TKHDIR)/../unix $(TKHDIR)/../win \
 -DTCL_RUNTIME=\"tkTable.tcl\"
 
 libgui_a_SOURCES = guitcl.h paths.c subcommand.c subcommand.h \
-tkTreeTable.c tkTreeTable.h xpmlib.c tclmain.c tkGraphCanvas.c \
+xpmlib.c tclmain.c tkGraphCanvas.c \
 tkCanvEdge.c tkCanvLayout.c tkCanvLayout.h tclhelp.c tclgetdir.c \
 tclwinprint.c tclsizebox.c tclshellexe.c tclmapi.c tclwinfont.c	\
 tclwingrab.c tclwinmode.c tclwinpath.c tclmsgbox.c tclcursor.c \
@@ -61,7 +61,6 @@ subcommand.$(OBJEXT): subcommand.c subcommand.h
 tkCanvEdge.$(OBJEXT): tkCanvEdge.c ../config.h
 tkCanvLayout.$(OBJEXT): tkCanvLayout.c ../config.h tkCanvLayout.h
 tkGraphCanvas.$(OBJEXT): tkGraphCanvas.c tkCanvLayout.h
-tkTreeTable.$(OBJEXT): tkTreeTable.c tkTreeTable.h
 xpmlib.$(OBJEXT): xpmlib.c guitcl.h
 assertions.$(OBJEXT): assertions.c ../config.h assertions.h
 tclcursor.$(OBJEXT): tclcursor.c ../config.h guitcl.h subcommand.h

@@ -1,8 +1,11 @@
-2003-01-09  Ben Elliston  <bje@redhat.com>
+2003-01-09  Graydon Hoare  <graydon@redhat.com>
 
-        From Graydon Hoare <graydon@redhat.com>:
 	* utils-sim.scm (-gen-decoder-switch): Fix edge condition for
 	empty ISAs.
+
+2003-01-07  Graydon Hoare  <graydon@redhat.com>
+
+	* utils-gen.scm (attr-int-gen-defn): Define.
 
 2002-12-21  Doug Evans  <dje@sebabeach.org>
 

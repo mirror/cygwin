@@ -589,7 +589,7 @@ m32rbf_sem_bl8 (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = ADDSI (ANDSI (pc, -4), 4);
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-14" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = FLD (i_disp8);
@@ -620,7 +620,7 @@ m32rbf_sem_bl24 (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = ADDSI (pc, 4);
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-14" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = FLD (i_disp24);
@@ -967,7 +967,7 @@ m32rbf_sem_jl (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     SI opval = temp0;
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-14" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = temp1;
@@ -1911,7 +1911,7 @@ m32rbf_sem_rte (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     USI opval = current_cpu->h_cr_get (((UINT) 14));
     current_cpu->h_cr_set (((UINT) 6), opval);
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "cr-6" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "cr" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     UQI opval = current_cpu->hardware.h_bpsw;
@@ -2473,13 +2473,13 @@ m32rbf_sem_trap (m32rbf_cpu* current_cpu, m32rbf_scache* sem)
     USI opval = current_cpu->h_cr_get (((UINT) 6));
     current_cpu->h_cr_set (((UINT) 14), opval);
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "cr-14" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "cr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = ADDSI (pc, 4);
     current_cpu->h_cr_set (((UINT) 6), opval);
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "cr-6" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "cr" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     UQI opval = current_cpu->hardware.h_bpsw;

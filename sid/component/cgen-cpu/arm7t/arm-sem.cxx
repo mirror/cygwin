@@ -78,7 +78,7 @@ arm_sem_bl (arm7f_cpu* current_cpu, arm_scache* sem)
     SI opval = ANDSI (ADDSI (pc, 4), -4);
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-14" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = FLD (i_offset24);
@@ -8481,7 +8481,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-14" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8492,7 +8492,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 13)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-13" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8503,7 +8503,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 12)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-12" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8514,7 +8514,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 11)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-11" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8525,7 +8525,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 10)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-10" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8536,7 +8536,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 9)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-9" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8547,7 +8547,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 8)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-8" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8558,7 +8558,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 7)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-7" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8569,7 +8569,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 6)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-6" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8580,7 +8580,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 5)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-5" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8591,7 +8591,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 4)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-4" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8602,7 +8602,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 3)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-3" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8613,7 +8613,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 2)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-2" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8624,7 +8624,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 1)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-1" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8635,7 +8635,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 0)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-0" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8678,7 +8678,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-14" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8689,7 +8689,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 13)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-13" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8700,7 +8700,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 12)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-12" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8711,7 +8711,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 11)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-11" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8722,7 +8722,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 10)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-10" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8733,7 +8733,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 9)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-9" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8744,7 +8744,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 8)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-8" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8755,7 +8755,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 7)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-7" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8766,7 +8766,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 6)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-6" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8777,7 +8777,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 5)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-5" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8788,7 +8788,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 4)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-4" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8799,7 +8799,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 3)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-3" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8810,7 +8810,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 2)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-2" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8821,7 +8821,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 1)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-1" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8832,7 +8832,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 0)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-0" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = SUBSI (tmp_addr, 4);
 }
@@ -8871,7 +8871,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 0)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-0" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -8882,7 +8882,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 1)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-1" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -8893,7 +8893,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 2)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-2" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -8904,7 +8904,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 3)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-3" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -8915,7 +8915,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 4)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-4" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -8926,7 +8926,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 5)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-5" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -8937,7 +8937,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 6)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-6" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -8948,7 +8948,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 7)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-7" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -8959,7 +8959,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 8)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-8" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -8970,7 +8970,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 9)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-9" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -8981,7 +8981,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 10)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-10" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -8992,7 +8992,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 11)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-11" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9003,7 +9003,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 12)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-12" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9014,7 +9014,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 13)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-13" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9025,7 +9025,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-14" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9068,7 +9068,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 0)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-0" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9079,7 +9079,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 1)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-1" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9090,7 +9090,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 2)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-2" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9101,7 +9101,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 3)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-3" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9112,7 +9112,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 4)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-4" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9123,7 +9123,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 5)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-5" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9134,7 +9134,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 6)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-6" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9145,7 +9145,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 7)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-7" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9156,7 +9156,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 8)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-8" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9167,7 +9167,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 9)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-9" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9178,7 +9178,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 10)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-10" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9189,7 +9189,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 11)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-11" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9200,7 +9200,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 12)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-12" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9211,7 +9211,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 13)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-13" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9222,7 +9222,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-14" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9270,7 +9270,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 0)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-0" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9281,7 +9281,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 1)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-1" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9292,7 +9292,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 2)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-2" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9303,7 +9303,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 3)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-3" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9314,7 +9314,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 4)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-4" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9325,7 +9325,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 5)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-5" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9336,7 +9336,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 6)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-6" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9347,7 +9347,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 7)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-7" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9358,7 +9358,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 8)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-8" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9369,7 +9369,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 9)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-9" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9380,7 +9380,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 10)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-10" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9391,7 +9391,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 11)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-11" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9402,7 +9402,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 12)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-12" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9413,7 +9413,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 13)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-13" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9424,7 +9424,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-14" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9467,7 +9467,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 0)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-0" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9478,7 +9478,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 1)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-1" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9489,7 +9489,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 2)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-2" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9500,7 +9500,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 3)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-3" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9511,7 +9511,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 4)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-4" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9522,7 +9522,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 5)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-5" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9533,7 +9533,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 6)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-6" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9544,7 +9544,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 7)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-7" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9555,7 +9555,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 8)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-8" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9566,7 +9566,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 9)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-9" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9577,7 +9577,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 10)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-10" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9588,7 +9588,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 11)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-11" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9599,7 +9599,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 12)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-12" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9610,7 +9610,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 13)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-13" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9621,7 +9621,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-14" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   tmp_addr = ADDSI (tmp_addr, 4);
 }
@@ -9682,7 +9682,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-14" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9693,7 +9693,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 13)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-13" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9704,7 +9704,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 12)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-12" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9715,7 +9715,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 11)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-11" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9726,7 +9726,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 10)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-10" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9737,7 +9737,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 9)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-9" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9748,7 +9748,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 8)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-8" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9759,7 +9759,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 7)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-7" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9770,7 +9770,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 6)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-6" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9781,7 +9781,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 5)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-5" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9792,7 +9792,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 4)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-4" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9803,7 +9803,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 3)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-3" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9814,7 +9814,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 2)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-2" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9825,7 +9825,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 1)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-1" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9836,7 +9836,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 0)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-0" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9879,7 +9879,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 14))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 14)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-14" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 14) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9890,7 +9890,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 13))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 13)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-13" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 13) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9901,7 +9901,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 12))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 12)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-12" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 12) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9912,7 +9912,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 11))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 11)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-11" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 11) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9923,7 +9923,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 10))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 10)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-10" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 10) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9934,7 +9934,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 9))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 9)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-9" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 9) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9945,7 +9945,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 8))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 8)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-8" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 8) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9956,7 +9956,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 7))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 7)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-7" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 7) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9967,7 +9967,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 6))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 6)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-6" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 6) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9978,7 +9978,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 5))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 5)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-5" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 5) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -9989,7 +9989,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 4))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 4)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-4" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 4) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -10000,7 +10000,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 3))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 3)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-3" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 3) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -10011,7 +10011,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 2))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 2)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-2" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 2) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -10022,7 +10022,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 1))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 1)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-1" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 1) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }
@@ -10033,7 +10033,7 @@ if (ANDSI (FLD (f_reg_list), SLLSI (1, 0))) {
     SI opval = current_cpu->GETMEMSI (pc, tmp_addr);
     current_cpu->hardware.h_gr[((UINT) 0)] = opval;
     if (current_cpu->trace_result_p)
-      current_cpu->trace_stream << "gr-0" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "gr" << '[' << ((UINT) 0) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 }
 }

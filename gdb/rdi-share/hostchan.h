@@ -23,6 +23,13 @@
 #endif
 #endif
 
+/* A temporary sop to older compilers */
+#if defined (__NetBSD__) || defined (unix)
+#  ifndef __unix              /* (good for long-term portability?)  */
+#    define __unix    1
+#  endif
+#endif
+
 /* struct timeval */
 #if defined(__unix) || defined(__CYGWIN32__)
 #  include <sys/time.h>
@@ -90,6 +97,13 @@ extern void Adp_addToQueue(Packet **head, Packet *newpkt);
  */
 
 extern Packet *Adp_removeFromQueue(Packet **head);
+
+/*
+ * Set log file and Enable/disable logging of ADP packets to file.
+ */
+
+void Adp_SetLogfile(const char *filename);
+void Adp_SetLogEnable(int logEnableFlag);
 
 /*
  *  Function: Adp_OpenDevice

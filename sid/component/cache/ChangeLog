@@ -1,3 +1,15 @@
+2002-07-16  Dave Brolley  <brolley@redhat.com>
+
+	* cache.h (cache): Add flush_and_invalidate_set_pin and
+	flush_and_invalidate_pin.
+	* cache.cxx (cache_component): Initialize flush_and_invalidate_set_pin
+	and flush_and_invalidate_pin. Add flush-and-invalidate and
+	flush-and-invalidate-set pins.
+	(flush_set): Don't flush an invalid line.
+	(flush_and_invalidate_set): New method.
+	(flush_and_invalidate_line): New method.
+	* hw-cache.xml, hw-cache.txt: Modified accordingly.
+
 2002-06-08  Ben Elliston  <bje@redhat.com>
 
 	* cacheutil.h (cache_set::expunge): New method.

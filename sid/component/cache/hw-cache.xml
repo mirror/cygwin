@@ -18,6 +18,8 @@
     <defpin name="invalidate" direction="in" legalvalues="32-bit address" behaviors="invalidating" />
     <defpin name="invalidate-all" direction="in" legalvalues="any" behaviors="invalidating" />
     <defpin name="invalidate-set" direction="in" legalvalues="set index" behaviors="invalidating" />
+    <defpin name="flush-and-invalidate" direction="in" legalvalues="32-bit address" behaviors="flushing, invalidating" />
+    <defpin name="fluish-and-invalidate-set" direction="in" legalvalues="set index" behaviors="flushing, invalidating" />
     <defpin name="prefetch" direction="in" legalvalues="32-bit address" behaviors="prefetching" />
     <defpin name="lock" direction="in" legalvalues="32-bit address" behaviors="line locking" />
     <defpin name="unlock" direction="in" legalvalues="32-bit address" behaviors="line locking" />
@@ -160,7 +162,9 @@
 	a line to memory.  For this purpose, the component provides
 	<pin>flush</pin> which can be driven with an address.  If the
 	address falls on a line that is present and dirty, it will be
-	flushed to memory and marked as not dirty.  The entire cache
+	flushed to memory and marked as not dirty.  A line can be
+	flushed and invalidated in one atomic operation by driving the
+	<pin>flush-and-invalidate</pin> pin.  The entire cache
         can be flushed by driving <pin>flush-all</pin>.</p>
     </behavior>
 
@@ -174,7 +178,9 @@
 	with an address.  If the address falls on a line that is
 	present, it will be invalidated.  No consideration is made for
 	dirty lines, so a line should be flushed before being
-	invalidated.  The entire cache can be invalidated by driving
+	invalidated.  A line can be flushed and invalidated in one
+	atomic operation by driving the <pin>flush-and-invalidate</pin>
+	pin.  The entire cache can be invalidated by driving
 	<pin>invalidate-all</pin>.</p>
     </behavior>
 

@@ -1,6 +1,6 @@
 /* Header for simple ELF loader
  *
- * Copyright (c) 1998 Red Hat
+ * Copyright (c) 1998, 2004 Red Hat
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -18,13 +18,19 @@
 #define BYTE(X,offset) (((X)[offset]) & 255)
 #define fetchShortLittle(addr) (BYTE((addr),1)*256+BYTE((addr),0))
 #define fetchWordLittle(addr) (fetchShortLittle (addr) + fetchShortLittle((addr) + 2) * 65536)
-#define fetchQuadLittle(addr) (fetchWordLittle ((addr)) + ((host_int_8)fetchWordLittle((addr) + 4) << 32))
+#define fetchQuadLittle(addr) (fetchWordLittle ((addr)) + ((unsigned long long)fetchWordLittle((addr) + 4) << 32))
 #define fetchShortBig(addr) (BYTE((addr),0)*256+BYTE((addr),1))
 #define fetchWordBig(addr) (fetchShortBig (addr) * 65536 + fetchShortBig((addr) + 2))
-#define fetchQuadBig(addr) (((host_int_8)fetchWordBig ((addr)) << 32) + fetchWordBig((addr) + 4))
+#define fetchQuadBig(addr) (((unsigned long long)fetchWordBig ((addr)) << 32) + fetchWordBig((addr) + 4))
 #define fetchShort(ADDR,LITTLE) ((LITTLE) ? fetchShortLittle((ADDR)) : fetchShortBig((ADDR)))
 #define fetchWord(ADDR,LITTLE) ((LITTLE) ? fetchWordLittle((ADDR)) : fetchWordBig((ADDR)))
 #define fetchQuad(ADDR,LITTLE) ((LITTLE) ? fetchQuadLittle((ADDR)) : fetchQuadBig((ADDR)))
+
+struct TextSection
+{
+  unsigned long long lbound;
+  unsigned long long hbound;
+};
 
 /* 
    PFLOAD represents a function that will read file data. 
@@ -37,14 +43,12 @@
    If OFFSET and AMOUNT are both negative, then the file should be
    closed (any remaining bytes are to be ignored). */
 
-typedef unsigned long long host_int_8;	/* XXX */
-
-typedef int (*PFLOAD)(host_int_8 dest, char *dest2, host_int_8 offset, host_int_8 amount, int insn_space);
+typedef int (*PFLOAD)(unsigned long long dest, char *dest2, unsigned long long offset, unsigned long long amount, int insn_space);
 /* Is address in the text segment? */
-extern int textSegmentAddress(int);
+extern int textSectionAddress(unsigned long long, const struct TextSection *);
 /* Load an ELF executable into memory. FUNC is used to actually read the
    file. */
-extern int readElfFile(PFLOAD func, unsigned*, int*);
+extern int readElfFile(PFLOAD func, unsigned*, int*, const struct TextSection **);
 
 #define EI_CLASS 4
 #define ELFCLASS64  2 /* 64 bit */
@@ -55,5 +59,8 @@ extern int readElfFile(PFLOAD func, unsigned*, int*);
 /* Elf program header flags */
 #define PF_X	0x01	/* executable */
 #define PF_R	0x04	/* readable */
+
+/* ELF section header flags */
+#define SHF_EXECINSTR	(1 << 2)	/* Executable machine instructions */
 
 #endif

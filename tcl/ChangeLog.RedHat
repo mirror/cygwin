@@ -1,0 +1,105 @@
+2002-09-25  Keith Seitz  <keiths@redhat.com>
+
+	* Import Tcl8.4.0. All changes from standard tcl8.4.0.
+
+	* generic/tcl.h [__WIN32__]: Define on cygwin, too.
+	* generic/tclClock.c (FormatClock): Don't use savedTimeZone
+	on cygwin.
+	* generic/tclPort.h: Include "../win/tclWinPort.h" on
+	cygwin.
+	* generic/tclCmdAH.c (Tcl_FileObjCmd): Don't use getuid on
+	cygwin.
+	* generic/tclIOUtil.c: Include "../win/tclWinInt.h" on cygwin.
+	(NativeCreateNativeRep): Convert to TChar, just like windows.
+	(TclpNativeToNormalized): Likewise.
+	* generic/tclLoad.c (TclFinalizeLoad): Treat cygwin same as
+	windwos.
+	* generic/tclNotify.c (Tcl_SetNotifier): Don't initialize
+	CreateFileHandler or DeleteFileHandler on cygwin.
+	* generic/tclTest.c (TestgetplatformCmd): Use TclWinGetPlatform
+	on cygwin.
+	(TestsetplatformCmd): Likewise.
+	* generic/tclThreadAlloc.c: Include "tclWinInt.h" on cygwin.
+	(TclFreeAllocCache): Use TlsFree on cygwin.
+	* generic/tclThreadJoin.c: Use on cygwin.
+	* generic/tcl.decls: Add cygwin everywhere win is used.
+	* generic/tclInt.decls: Likewise.
+
+	* tools/genStubs.tcl (genStubs::declare): Add "cygwin" to
+	comment.
+	(genStubs::addPlatformGuard): Add cygwin guard.
+	Cygwin is not unix or x11, either.
+	(genStubs::forAllStubs): Output cygwin declarations.
+	* generic/tclIntDecls.h: Regenerated.
+	* generic/tclDecls.h: Regenerated.
+	* generic/tclStubInit.c: Regenerated.
+	* generic/tclPlatDecls.h: Include "windows.h" when
+	_TCHAR_DEFINED is not defined on cygwin.
+	Regenerated.
+	* generic/tclIntPlatDecls.h: Regenerated.
+
+	* win/tclWin32Dll.c: Add declaration for _impure_ptr on cygwin.
+	Don't build DllMain or DllEntryPoint on cygwin if STATIC_BUILD
+	defined.
+	(DllMain): Initialize _impure_ptr on cygwin.
+	(TclpCheckStackSpace): Don't do any sort of exception handling
+	on cygwin.
+	(_except_checkstackspace_handler): Ifdef out on cygwin.
+	* tclWinFCmd.c (DoRenameFile): Don't do any sort of exception
+	handling on cygwin.
+	(_except_dorenamefile_handler): Ifdef out on cygwin.
+	(DoCopyFile): Don't do any sort of exception handling on cygwin.
+	(_except_docopyfile_handler): Ifdef out on cygwin.
+	* win/tclWinChan.c (Tcl_MakeFileChannel): Don't do any sort of
+	exception handling on cygwin.
+	(_except_makefilechannel_handler): Ifdef out on cygwin.
+	
+	* win/tcl.m4: Check for cygpath on mingw only.
+	Do not define extra_cflags or extra_ldflags for cygwin.
+	Add "-e _WinMain@16" for mingw builds only.
+	* win/configure.in: Don't bail if building for cygwin.
+	* win/configure: Regenerated.
+
+2002-07-30  Keith Seitz  <keiths@redhat.com>
+
+	From Mo DeJong  <supermo@bayarea.net>
+	* cygwin/configure: Regenerated.
+	* cygwin/configure.in: Emit a tclConfig.sh file
+	so that expect can load it at configure time.
+
+2001-10-28  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin/configure.in: Check for cygwin host rather than cygwin target.
+	* cygwin/configure: Regenerate.
+
+2001-09-12  Ian Roxborough  <irox@redhat.com>
+
+	* configure.in: Configure 'cygwin' and 'win' directory
+	for a cygwin host.
+	* configure: Regenerated.
+	* cygwin/configure.in: Change version number to 8.3.
+	* cygwin/configure: Regenerated.
+	* cygwin/Makefile.am: Added/removed files to be build
+	for Tcl8.3.
+	* cygwin/Makefile.in: Regenerated.
+	* generic/tcl.h: Don't define __WIN32__ for cygwin or
+	mwing32 builds.  Don't define USE_TCLALLOC when building
+	for cygwin.  Don't use __declspec unless building Tcl or
+	tk or build with USE_TCL_STUBS.
+
+2001-04-06  Christopher Faylor <cgf@redhat.com>
+
+	* cygwin/configure.in: When targeting cygwin, detect if C compiler
+	supports -mno-win32 flag and use it if so.
+	* cygwin/Makefile.in (EXTRA_CFLAGS): New variable.  Holds results of
+	-mno-win32 test.
+	(COMPILE): Add EXTRA_CFLAGS variable to options.
+
+1999-10-26  DJ Delorie  <dj@cygnus.com>
+
+	* cygwin/*: new; replicate unix/* setup (other modules look
+	in unix/* for "local" builds; we don't want them to find the
+	cygwin version)
+	* unix/Makefile.in: undo
+	* configure.in: For cygwin, build win and cygwin
+	* Makefile.in: re-enable multi-dir support

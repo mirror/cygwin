@@ -1,0 +1,23 @@
+Last updated: 26 Sep 2002 by keiths@redhat.com
+
+Are these needed?
+R unix/dltest/configure
+R unix/dltest/configure.in
+R win/mkd.bat
+R win/rmd.bat
+
+Problems:
+
+Unix
+----
+1. Installed tcl library into INSTALLDIR/lib/tcl8.4 instead of
+   INSTALLDIR/share/tcl8.4.
+
+Win
+---
+1. Installed tcl library into INSTALLDIR/lib/tcl8.4 instead of
+   INSTALLDIR/share/tcl8.4.
+2. Test failures.
+3. Use cygwin's: malloc? setenv? filenames? sockets? pipes?
+4. "fd_set and associated macros have been defined in sys/types."
+5. CONFIGDIR2=cygwin doesn't build

@@ -1,3 +1,42 @@
+Tue Apr 18 15:32:15 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* Makefile.in (distclean, maintainer-clean, realclean,
+ 	mostlyclean): New targets.
+
+Tue Feb  1 00:17:12 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* tui-file.c, tui-file.h, tuiDisassem.c, tuiIO.c, tuiIO.h,
+ 	tuiRegs.c: Update to reflect rename of gdb-file / GDB_FILE to
+ 	ui-file / ``struct ui_file''.
+
+Mon Jan 31 18:12:43 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* tui-file.c (enum streamtype, struct tui_stream, tui_file_new,
+ 	tui_file_delete, tui_fileopen, tui_sfileopen, tui_file_isatty,
+ 	tui_file_rewind, tui_file_put, tui_file_fputs,
+ 	tui_file_get_strbuf, tui_file_adjust_strbuf, tui_file_flush,
+ 	fputs_unfiltered_hook): Move to here from ../utils.c
+
+	* tui-file.h, tui-file.c: New files.
+
+Mon Nov  8 17:47:37 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* tuiRegs.c (_tuiRegisterFormat), tuiDisassem.c
+	(tuiSetDisassemContent): Replace gdb_file_init_astring with
+ 	tui_sfileopen.  Replace gdb_file_get_strbuf with
+ 	tui_file_get_strbuf.
+	
+Mon Nov  8 16:54:51 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* tuiRegs.c (_tuiRegisterFormat), tuiDisassem.c
+ 	(tuiSetDisassemContent): Repace gdb_file_deallocate with
+ 	gdb_file_delete. Replace gdb_file_init_astring with tui_sfileopen.
+
+Fri Sep 17 19:34:38 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* tuiSource.c: Include "source.h".
+ 	(open_source_file, find_source_lines): Delete declarations.
+
 1999-01-26  Jason Molenda  (jsm@bugshack.cygnus.com)
 
 	* tui.h: Include stdarg.h instead of varargs.h if we're on an ISO Cish

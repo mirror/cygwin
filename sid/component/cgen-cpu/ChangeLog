@@ -3,7 +3,7 @@
 	* fp.h (sidutil::fp): Fully quality std::ostream.
 	* fp.cxx (print_bits): Likewise.
 	(operator<<): Likewise.
-	(fp::round_32): Don't specify a default argument at defintion.
+	(fp::round_32): Don't specify a default argument at definition.
 	(fp::round_64): Likewise.
 	
 2002-11-29  Ben Elliston  <bje@redhat.com>

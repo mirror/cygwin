@@ -466,7 +466,7 @@ cgen-arm:
 cgen-arm7f:
 	$(SHELL) ../CGEN.sh cpu-decode $(srcdir) $(cgendir) "$(CGENFLAGS)" \
 	arm "with-multiple-isa with-scache" arm "arm,thumb" arm7tdmi arm "arm-" \
-	"cpu.h defs.h"
+	"cpu.h"
 
 # ARM7 files for ARM ISA side.
 cgen-arm7f-arm:

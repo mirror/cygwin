@@ -1,0 +1,98 @@
+This file describes some of the required procedures for contributors working
+on SID.  Please read and understand this before checking anything in.  Post
+proposed diffs to this file on sid@sources.redhat.com, the project's public
+mailing list.
+
+
+* Special headers
+
+Several files in sid/include/ define the SID low-level API, contained
+in the sid:: C++ namespace.  By extension, this also defines the ABI
+for compiled component modules.  Because of this, any functional change
+to the headers causes instant incompatibility with far-reaching effects.
+Therefore, the files that define the low-level API are special and change
+extremely rarely.  The special header files are:
+
+   sidcomp.h
+   sidso.h
+   sidtypes.h
+
+You should NOT check in ANY functional changes to these files without
+prior discussion on the project mailing list.  It would be most polite
+to post proposed reasonably formatted diffs, and have convincing arguments
+ready to justify them.  Sadist <fche> likes to try to veto anything
+nonessential.
+
+Whenever the low level API is changed in any way, the
+API_MINOR_VERSION and/or API_MAJOR_VERSION values in sidcomp.h must be
+changed.  This allows previously compiled component binaries to be
+recognized as incompatible at load-attempt time.
+
+
+* Utility headers
+
+A growing number of header files define optional utility classes and
+functions for SID component classes.  These definitions all go into
+the sidutil:: C++ namespace.  They are used pervasively in existing
+SID component code for convenience only.  These headers are never
+installed via "make install".
+
+Feel free to add reasonably formatted new classes/functions at will
+into existing files, or new ones.  Convention suggests that any new
+utility files be named sid*util.h.  Changes to existing classes may be
+made, but only if all affected component sources continue to work.
+
+The utility classes are used by components by a mere #include.  There
+is no "sidutil" library for them to link in.  This means that these
+headers define template classes/functions or non-template classes with
+inline functions only.  One negative side-effect of this arrangement
+is that of compiler memory bloat, so this may be changed sometime.
+
+
+* Components
+
+New components are absolutely welcome.  Here are a few steps that form
+an informal checklist:
+
+- Read up on SID architectural theory and practice.  Design
+  it to be a nice self-contained portable component.  Avoid
+  anti-component practices (custom APIs, global variables, etc.).
+- Announce your intentions on the mailing list.  Good advice is
+  available at no charge.
+- Extend an existing component source directory, if your component is most
+  conveniently derived from another.  Use a new source directory otherwise.
+- Pick an appropriate component type string and shared library name.
+- Record them in sid/component/CATALOG.  Name yourself as maintainer.
+- Code it up.  Integrate it into the existing autoconf based build system.
+- Avoid constructs that are not reliable in the context of a complex
+  C++ program located in shared libraries / DLLs.
+- Use a reasonable coding style.  However, in each component's directory,
+  follow the style already present.  If there appears to be more than one,
+  pick one, but don't introduce new ones.
+- Document it using the standard XML DTD format in the source directory,
+  to be installed into $pkgdata along with the generated .txt form.
+- Build and automate some tests.  Choosing to not use dejagnu requires a
+  good reason.
+
+Improvements to existing components are welcome.  Please contact each's
+maintainer for advice and perhaps approval.
+
+
+* Mainlines
+
+New mainlines (sid/main) or sid front-end scripts (sid/bsp) are absolutely
+welcome, though are usually less necessary than new components.  Discuss
+your intentions on the mailing list as you proceed.
+
+
+* Check-in checklist
+
+- Confirm that your code runs on both big- and little-endian hosts.
+  We use mainly Solaris, Linux, Cygwin hosts.  Consider using several
+  compilers.
+- Add standard ChangeLog entries for source files.  Incidentally
+  regenerated files need not have ChangeLog entries.
+- By default, insert a copy of the new ChangeLog entries in the CVS
+  check-in comments.
+- For large systemic changes, make CVS tags before and after the checkin.
+

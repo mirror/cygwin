@@ -8,9 +8,9 @@
  *  This source code is offered for use in the public domain. You may
  *  use, modify or distribute it freely.
  *
- * $Revision: 1.2 $
- * $Author: noer $
- * $Date: 1998/10/10 00:59:34 $
+ * $Revision: 1.3 $
+ * $Author: infidel $
+ * $Date: 2002/05/26 10:05:59 $
  *
  */
 

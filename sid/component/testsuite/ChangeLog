@@ -1,3 +1,9 @@
+2001-07-13  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.audio/linuxraw.exp: Add polling loop test after tx-sample
+	drive sequence.
+	(deassert tx): Unxfail.
+
 2001-07-13  Ben Elliston  <bje@redhat.com>
 
 	* sidcomp.audio/linusraw.exp (deassert tx): Mark test as XFAIL.

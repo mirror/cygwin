@@ -67,8 +67,10 @@ typedef long ptrace_arg4_type;
 typedef long long ptrace_arg4_type;
 #endif
 
-int ptrace_write_user (int, ptrace_arg3_type, int, const void *);
-int ptrace_read_user (int, ptrace_arg3_type, int, void *);
+int ptrace_write_user (struct gdbserv *serv, int pid, ptrace_arg3_type addr,
+                       int len, const void *buff);
+int ptrace_read_user (struct gdbserv *serv, int pid, ptrace_arg3_type addr,
+                      int len, void *buff);
 int ptrace_get_gregs (struct gdbserv *serv, int alt_pid, void *buff);
 int ptrace_set_gregs (struct gdbserv *serv, int alt_pid, const void *buff);
 int ptrace_get_fpregs (struct gdbserv *serv, int alt_pid, void *buff);

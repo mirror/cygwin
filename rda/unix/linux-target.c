@@ -982,7 +982,7 @@ is_extended_reg (int regnum)
    Returns 0 for success, -1 for failure.  */
 
 static int
-read_reg_bytes (int pid, int regno, void *reg_bytes)
+read_reg_bytes (struct gdbserv *serv, int pid, int regno, void *reg_bytes)
 {
   ptrace_arg3_type regaddr;
   int regsize;
@@ -993,7 +993,7 @@ read_reg_bytes (int pid, int regno, void *reg_bytes)
 
   regaddr = reginfo[regno].ptrace_offset;
   regsize = reginfo[regno].ptrace_size;
-  status = ptrace_read_user (pid, regaddr, regsize, reg_bytes);
+  status = ptrace_read_user (serv, pid, regaddr, regsize, reg_bytes);
 
   /* A non-zero status is the errno value from the ptrace call */
   if (status != 0)
@@ -1011,7 +1011,8 @@ read_reg_bytes (int pid, int regno, void *reg_bytes)
    Returns 0 for success, -1 for failure.  */
 
 static int
-write_reg_bytes (int pid, int regno, const void *reg_bytes)
+write_reg_bytes (struct gdbserv *serv, int pid, int regno,
+                 const void *reg_bytes)
 {
   ptrace_arg3_type regaddr;
   int regsize;
@@ -1022,7 +1023,7 @@ write_reg_bytes (int pid, int regno, const void *reg_bytes)
 
   regaddr = reginfo[regno].ptrace_offset;
   regsize = reginfo[regno].ptrace_size;
-  status = ptrace_write_user (pid, regaddr, regsize, reg_bytes);
+  status = ptrace_write_user (serv, pid, regaddr, regsize, reg_bytes);
 
   /* A non-zero status is the errno value from the ptrace call */
   if (status != 0)
@@ -1038,11 +1039,11 @@ write_reg_bytes (int pid, int regno, const void *reg_bytes)
 /* Fetch and return the value of register REGNO.  Helper function for
    debug_get_pc().  This is the PEEKUSER_POKEUSER_REGINFO version.  */
 static unsigned long
-debug_get_reg (pid_t pid, int regno)
+debug_get_reg (struct gdbserv *serv, pid_t pid, int regno)
 {
   ptrace_xfer_type value;
 
-  if (read_reg_bytes (pid, regno, &value) < 0)
+  if (read_reg_bytes (serv, pid, regno, &value) < 0)
     return 0;
   else
     return (unsigned long) value;
@@ -1052,7 +1053,7 @@ debug_get_reg (pid_t pid, int regno)
 unsigned long
 debug_get_pc (struct gdbserv *serv, pid_t pid)
 {
-  return debug_get_reg (pid, PC_REGNUM);
+  return debug_get_reg (serv, pid, PC_REGNUM);
 }
 
 /* Function: get_reg
@@ -1076,7 +1077,7 @@ linux_get_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
   if (reginfo[regno].whichregs != NOREGS)
     {
       /* Get the register value. */
-      status = read_reg_bytes (process->pid, regno, tmp_buf);
+      status = read_reg_bytes (serv, process->pid, regno, tmp_buf);
       if (status < 0)
 	return -1;	/* fail */
     }
@@ -1116,7 +1117,7 @@ linux_set_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
                                    reg, sign_extend);
 
       /* Write the child's register. */
-      status = write_reg_bytes (process->pid, regno, tmp_buf);
+      status = write_reg_bytes (serv, process->pid, regno, tmp_buf);
       if (status < 0)
 	return -1;	/* Fail */
     }
@@ -1273,7 +1274,7 @@ get_regset (struct gdbserv *serv, int pid, void *regset,
 	  int status;
 
 	  /* Get the register value. */
-	  status = read_reg_bytes (pid, regno, tmp_buf);
+	  status = read_reg_bytes (serv, pid, regno, tmp_buf);
 	  if (status < 0)
 	    return -1;	/* fail */
 
@@ -1318,7 +1319,7 @@ put_regset (struct gdbserv *serv,
 				       sign_extend);
 
 	  /* Write the child's register. */
-	  status = write_reg_bytes (pid, regno, tmp_buf);
+	  status = write_reg_bytes (serv, pid, regno, tmp_buf);
 	  if (status < 0)
 	    return -1;	/* Fail */
 	}
@@ -1899,7 +1900,8 @@ enum { U_REGS_OFFSET = 0 };	/* FIXME??? */
    Return -1 for failure, zero for success. */
 
 static int
-linux_read_reg (int pid, int regno, ptrace_xfer_type *regval)
+linux_read_reg (struct gdbserv *serv, int pid, int regno,
+                ptrace_xfer_type *regval)
 {
   unsigned long u_regs_base = U_REGS_OFFSET;
   ptrace_arg3_type regaddr;
@@ -1909,7 +1911,7 @@ linux_read_reg (int pid, int regno, ptrace_xfer_type *regval)
 
   regaddr += U_REGS_OFFSET;
   errno = 0;
-  ptrace_read_user (pid, regaddr, sizeof (*regval), regval);
+  ptrace_read_user (serv, pid, regaddr, sizeof (*regval), regval);
 
   if (errno)
     {
@@ -1925,17 +1927,18 @@ linux_read_reg (int pid, int regno, ptrace_xfer_type *regval)
    Return -1 for failure, zero for success. */
 
 static int
-linux_write_reg (int pid, int regno, ptrace_xfer_type regval)
+linux_write_reg (struct gdbserv *serv, int regno, ptrace_xfer_type regval)
 {
   unsigned long u_regs_base = U_REGS_OFFSET;
   ptrace_arg3_type regaddr;
+  struct child_process *process = gdbserv_target_data (serv);
 
   if ((regaddr = linux_register_offset (regno)) < 0)
     return -1;	/* fail */
 
   regaddr += U_REGS_OFFSET;
   errno = 0;
-  ptrace_write_user (pid, regaddr, sizeof (regval), &regval);
+  ptrace_write_user (serv, process->pid, regaddr, sizeof (regval), &regval);
   if (errno)
     {
       fprintf (stderr, "PT_WRITE_U 0x%08lx from 0x%08lx in process %d\n",
@@ -1949,11 +1952,11 @@ linux_write_reg (int pid, int regno, ptrace_xfer_type regval)
 /* Helper function for debug_get_pc().  It fetches and returns the
    value of REGNO.  */
 static unsigned long
-debug_get_reg (pid_t pid, int regno)
+debug_get_reg (struct gdbserv *serv, pid_t pid, int regno)
 {
   ptrace_xfer_type value;
 
-  if (linux_read_reg (pid, regno, &value) < 0)
+  if (linux_read_reg (serv, pid, regno, &value) < 0)
     return 0;
   else
     return (unsigned long) value;
@@ -1963,7 +1966,7 @@ debug_get_reg (pid_t pid, int regno)
 unsigned long
 debug_get_pc (struct gdbserv *serv, pid_t pid)
 {
-  return debug_get_reg (pid, PC_REGNUM);
+  return debug_get_reg (serv, pid, PC_REGNUM);
 }
 
 /* Function: reg_format
@@ -2013,7 +2016,7 @@ linux_get_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
   ptrace_xfer_type regval;
 
   /* Get the register value. */
-  if (linux_read_reg (process->pid, regno, &regval) < 0)
+  if (linux_read_reg (serv, process->pid, regno, &regval) < 0)
     {
       fprintf (stderr, "Error: linux_get_reg: Register %d out of bounds.\n", regno);
       return -1;
@@ -2039,7 +2042,6 @@ linux_get_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
 static int
 linux_set_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
 {
-  struct child_process *process = gdbserv_target_data (serv);
   ptrace_xfer_type regval;
 
   if (regno < 0 || regno >= NUM_REGS)
@@ -2055,7 +2057,7 @@ linux_set_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
     gdbserv_reg_to_ulonglong (serv, reg, (unsigned long long *) &regval);
 
   /* Write the child's register. */
-  if (linux_write_reg (process->pid, regno, regval) < 0)
+  if (linux_write_reg (serv, regno, regval) < 0)
     return -1;	/* Fail */
 
   return 0;	/* success */
@@ -2187,7 +2189,8 @@ reg_to_xregset (struct gdbserv *serv,
 static int
 get_gregset (struct gdbserv *serv, int pid, GREGSET_T gregset)
 {
-  if (ptrace_read_user (pid, 0, sizeof (GREGSET_T), (char *) gregset) != 0)
+  if (ptrace_read_user (serv, pid, 0, sizeof (GREGSET_T), (char *) gregset)
+      != 0)
     return -1;
   return 0;
 }
@@ -2199,7 +2202,7 @@ get_gregset (struct gdbserv *serv, int pid, GREGSET_T gregset)
 static int
 put_gregset (struct gdbserv *serv, int pid, const GREGSET_T gregset)
 {
-  if (ptrace_write_user (pid, 0, sizeof (GREGSET_T), 
+  if (ptrace_write_user (serv, pid, 0, sizeof (GREGSET_T), 
 			 (char *) gregset) != 0)
     return -1;
   return 0;
@@ -2495,7 +2498,7 @@ mips_get_reg(struct gdbserv *serv, int regno)
   struct child_process *process = gdbserv_target_data (serv);
   pid_t pid = process->pid;
 
-  if (read_reg_bytes (pid, regno, &value) < 0)
+  if (read_reg_bytes (serv, pid, regno, &value) < 0)
     return 0;
   else
     return value;

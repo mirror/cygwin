@@ -6,14 +6,35 @@
 
 	* Makefile.am (check-local): Rename target from "checkme".
 
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* hw-cpu-arm7t.xml: Add <?xml ... ?> prefix.
+
+2001-07-04  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add maintainer-mode doc building configury.
+	* configure: Regenerate.
+	* Makefile.am: Add maintainer-mode doc building.
+	* Makefile.in: Regenerate.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* hw-cpu-arm7t.txt: Generate.
+
+2001-06-29  graydon hoare  <graydon@redhat.com>
+
+	* hw-cpu-arm7t.xml: Add.
+
 2001-06-28  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * arm7f.cxx (arm7f_cpu::memory_trap): Remove code under now
-        non-existent debug_exec_p flag.
-        (arm7f_cpu::arm_tbit_set): Change reference to debug_exec_p to 
-	use new warnings_enabled flag.
-        * hw-cpu-arm7t.txt: Change all debug-exec? references to
-	enable-warnings?.
+	* arm7f.cxx (arm7f_cpu::arm_tbit_set): Change reference to
+	debug_exec_p to use new warnings_enabled flag.
+
+2001-06-28  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* arm7f.cxx (arm7f_cpu::memory_trap): Remove code under now
+	non-existent debug_exec_p flag.
+	* hw-cpu-arm7t.txt: Remove all debug-exec? references.
 
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -23,6 +44,17 @@
 2001-06-22  Ben Elliston  <bje@redhat.com>
 
 	* arm7f.cxx (arm7f_cpu::memory_trap): Ignore bus::delayed.
+
+2001-06-21  matthew green  <mrg@redhat.com>
+	
+	* Makefile.am: Formatting consistency.
+	* Makefile.in: Regenerate.
+
+2001-06-21  matthew green  <mrg@redhat.com>
+
+	* Makefile.am (BFDINCLUDES): New define.
+	(INCLUDES): Add $(BFDINCLUDES)
+	* Makefile.in: Regenerate.
 
 2001-03-21  Ben Elliston  <bje@redhat.com>
 

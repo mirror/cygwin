@@ -1,5 +1,8 @@
 2001-06-21  Ben Elliston  <bje@redhat.com>
 
+	* sidcomp.cache/cache.exp: Test for the existence of "hit-latency"
+	and "miss-latency" attributes.
+
 	* sidcomp.mapper/basicmapper.exp: Test for the existence of a
 	"latency" attribute.
 	* sidcomp.memory/genericmemory.exp: Test for the existence of

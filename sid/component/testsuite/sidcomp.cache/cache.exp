@@ -24,7 +24,8 @@ sid_assert_includes_all "sid::component::attribute_names $victim" \
 	 write-allocate? hash-bit-mask hash-shift-amount \
 	 flushes replacements read-hit-rate write-hit-rate \
 	 read-accesses write-accesses misaligned-reads \
-	 misaligned-writes collect-statistics? report-heading dump!}
+	 misaligned-writes collect-statistics? report-heading \
+	 hit-latency miss-latency dump!}
 
 set test "upstream bus is present"
 sid_assert_includes_all "sid::component::bus_names $victim" upstream

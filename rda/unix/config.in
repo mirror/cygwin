@@ -1,0 +1,120 @@
+/* config.in.  At one time this was generated automatically from
+  configure.in by autoheader.  It is now being maintained by hand.  */
+
+/* Name of package */
+#undef PACKAGE
+
+/* Version number of package */
+#undef VERSION
+
+/* Define if system has <errno.h> */
+#undef HAVE_ERRNO_H
+
+/* Define if system has <ptrace.h> */
+#undef HAVE_PTRACE_H
+
+/* Define if system has <signal.h> */
+#undef HAVE_SIGNAL_H
+
+/* Define if system has <string.h> */
+#undef HAVE_STRING_H
+
+/* Define if system has <strings.h> */
+#undef HAVE_STRINGS_H
+
+/* Define if system has <sys/procfs.h> */
+#undef HAVE_SYS_PROCFS_H
+
+/* Define if system has <asm/reg.h> */
+#undef HAVE_ASM_REG_H
+
+/* Define if system has <sys/ptrace.h> */
+#undef HAVE_SYS_PTRACE_H
+
+/* Define if system has <sys/reg.h> */
+#undef HAVE_SYS_REG_H
+
+/* Define if system has <sys/user.h> */
+#undef HAVE_SYS_USER_H
+
+/* Define if system has <sys/wait.h> */
+#undef HAVE_SYS_WAIT_H
+
+/* Define for ptrace systems, to the size of a ptrace word. */
+#undef PTRACE_XFER_SIZE
+
+/* Define if ptrace transfer type is long or unsigned long. */
+#undef PTRACE_XFER_TYPE_LONG
+
+/* Define if ptrace transfer type is long long or unsigned long long. */
+#undef PTRACE_XFER_TYPE_LONG_LONG
+
+/* Define if ptrace arg1 type is long or unsigned long. */
+#undef PTRACE_ARG1_TYPE_LONG
+
+/* Define if ptrace arg1 type is long long or unsigned long long. */
+#undef PTRACE_ARG1_TYPE_LONG_LONG
+
+/* Define if ptrace arg2 type is long or unsigned long. */
+#undef PTRACE_ARG2_TYPE_LONG
+
+/* Define if ptrace arg2 type is long long or unsigned long long. */
+#undef PTRACE_ARG2_TYPE_LONG_LONG
+
+/* Define if ptrace arg3 type is long or unsigned long. */
+#undef PTRACE_ARG3_TYPE_LONG
+
+/* Define if ptrace arg3 type is long long or unsigned long long. */
+#undef PTRACE_ARG3_TYPE_LONG_LONG
+
+/* Define if ptrace arg4 type is long or unsigned long. */
+#undef PTRACE_ARG4_TYPE_LONG
+
+/* Define if ptrace arg4 type is long long or unsigned long long. */
+#undef PTRACE_ARG4_TYPE_LONG_LONG
+
+
+/* Define if target is x86 Linux */
+#undef X86_LINUX_TARGET
+
+/* Define if target is powerpc Linux */
+#undef PPC_LINUX_TARGET
+
+/* Define if target is m68k Linux */
+#undef M68K_LINUX_TARGET
+
+/* Define if target is alpha Linux */
+#undef ALPHA_LINUX_TARGET
+
+/* Define if target is arm Linux */
+#undef ARM_LINUX_TARGET
+
+/* Define if target is SH (3? 4?) Linux */
+#undef SH_LINUX_TARGET
+
+/* Define if target is MIPS Linux */
+#undef MIPS_LINUX_TARGET
+
+/* Define if target is any Linux */
+#undef LINUX_TARGET
+
+/* Define if target is any Solaris */
+#undef SOLARIS_TARGET
+
+/* Define the type name of a gregset */
+#undef GREGSET_T
+
+/* Define the type name of an fpregset */
+#undef FPREGSET_T
+
+/* Define if system headers will define lwpid_t */
+#undef HAVE_LWPID_T
+
+/* Define if system headers will define psaddr_t */
+#undef HAVE_PSADDR_T
+
+/* Define if system headers will define prgregset_t */
+#undef HAVE_PRGREGSET_T
+
+/* Define if system headers will define prfpregset_t */
+#undef HAVE_PRFPREGSET_T

@@ -1,0 +1,107 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(README)
+AC_CANONICAL_SYSTEM
+AM_INIT_AUTOMAKE(rda, 0.1)
+AM_CONFIG_HEADER(config.h:config.in)
+
+dnl automake support
+AM_MAINTAINER_MODE
+dnl AC_LIBTOOL_WIN32_DLL
+AM_PROG_LIBTOOL
+AC_EXEEXT
+AC_LANG_C
+
+dnl Check for types
+AC_CHECK_HEADERS(sys/time.h)
+AC_HEADER_TIME
+
+dnl Check for host characteristics
+AC_C_BIGENDIAN
+
+dnl Check for socket libs
+AC_CHECK_LIB(socket, connect)
+AC_CHECK_LIB(nsl, gethostbyname)
+AC_CHECK_LIB(resolv, gethostbyname)
+AC_CHECK_HEADERS(sys/socket.h netinet/in.h netinet/tcp.h arpa/inet.h)
+
+# NOTE: Don't add -Wall or -Wunused, they both include
+# -Wunused-parameter which reports bogus warnings.
+build_warnings="-Wimplicit -Wreturn-type -Wcomment -Wtrigraphs \
+-Wformat -Wparentheses -Wpointer-arith"
+# Up for debate: -Wswitch -Wcomment -trigraphs -Wtrigraphs
+# -Wunused-function -Wunused-label -Wunused-variable -Wunused-value
+# -Wchar-subscripts -Wuninitialized -Wtraditional -Wshadow -Wcast-qual
+# -Wcast-align -Wwrite-strings -Wconversion -Wstrict-prototypes
+# -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls
+# -Woverloaded-virtual -Winline -Werror"
+AC_ARG_ENABLE(build-warnings,
+[  --enable-build-warnings Enable build-time compiler warnings if gcc is used],
+[case "${enableval}" in
+  yes)	;;
+  no)	build_warnings="-w";;
+  ,*)   t=`echo "${enableval}" | sed -e "s/,/ /g"`
+        build_warnings="${build_warnings} ${t}";;
+  *,)   t=`echo "${enableval}" | sed -e "s/,/ /g"`
+        build_warnings="${t} ${build_warnings}";;
+  *)    build_warnings=`echo "${enableval}" | sed -e "s/,/ /g"`;;
+esac
+if test x"$silent" != x"yes" && test x"$build_warnings" != x""; then
+  echo "Setting compiler warning flags = $build_warnings" 6>&1
+fi])dnl
+AC_ARG_ENABLE(rda-build-warnings,
+[  --enable-rda-build-warnings Enable RDA specific build-time compiler warnings if gcc is used],
+[case "${enableval}" in
+  yes)	;;
+  no)	build_warnings="-w";;
+  ,*)   t=`echo "${enableval}" | sed -e "s/,/ /g"`
+        build_warnings="${build_warnings} ${t}";;
+  *,)   t=`echo "${enableval}" | sed -e "s/,/ /g"`
+        build_warnings="${t} ${build_warnings}";;
+  *)    build_warnings=`echo "${enableval}" | sed -e "s/,/ /g"`;;
+esac
+if test x"$silent" != x"yes" && test x"$build_warnings" != x""; then
+  echo "Setting LIBREMOTE specific compiler warning flags = $build_warnings" 6>&1
+fi])dnl
+WARN_CFLAGS=""
+WERROR_CFLAGS=""
+if test "x${build_warnings}" != x -a "x$GCC" = xyes
+then
+    AC_MSG_CHECKING(compiler warning flags)
+    # Separate out the -Werror flag as some files just cannot be
+    # compiled with it enabled.
+    for w in ${build_warnings}; do
+	case $w in
+	-Werr*) WERROR_CFLAGS=-Werror ;;
+	*) # Check that GCC accepts it
+	    if $CC $w 2>&1 | grep 'unrecognized option' > /dev/null; then
+		:
+	    else
+		WARN_CFLAGS="${WARN_CFLAGS} $w"
+	    fi
+	esac
+    done
+    AC_MSG_RESULT(${WARN_CFLAGS}${WERROR_CFLAGS})
+fi
+AC_SUBST(WARN_CFLAGS)
+AC_SUBST(WERROR_CFLAGS)
+
+# Add target dependent subdirectories here
+targ_subdirs=
+
+
+case "$target" in
+   *linux*) targ_subdirs="$targ_subdirs unix" ;;
+esac
+
+
+
+
+
+dnl $targ_subdirs is expanded at configure run time
+AC_CONFIG_SUBDIRS($targ_subdirs)
+AC_SUBST(targ_subdirs)
+
+CY_WITH_NLS
+
+dnl Outputs
+AC_OUTPUT(Makefile lib/Makefile samples/Makefile qe/Makefile)

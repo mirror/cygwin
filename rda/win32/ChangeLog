@@ -1,0 +1,155 @@
+2002-08-21  Kevin Buettner  <kevinb@redhat.com>
+
+	* Makefile.am, configure.in, server.cc, win32-target.cc: Change
+	``libremote'' references into ``RDA'' references.
+	* Makefile.in, configure: Regenerate.
+
+2002-08-15  Kevin Buettner  <kevinb@redhat.com>
+
+	* child_process.cc, server.cc, server.h, win32-strace.cc,
+	win32-target.cc:  Update copyright notices.
+
+2001-11-14  Corinna Vinschen  <vinschen@redhat.com>
+
+	* configure.in: Check AC_FUNC_ALLOCA.
+	* configure: Regenerate from configure.in.
+	* config.in: Add HAVE_ALLOCA_H stuff.
+	* server.h: Add alloca check as in gdb's defs.h.
+
+2001-11-12  Corinna Vinschen  <vinschen@redhat.com>
+
+	* win32-target.cc (win32_process_set_pc):  Declare 2nd parameter
+	`const' to avoid errors with some compilers.
+
+2001-04-12  Andrew Cagney  <ac131313@redhat.com>
+
+	* server.cc (main): Replace gdbsocket_poll with gdbloop_poll.
+	* win32-target.cc: Update comments.
+	* server.h: Include "gdbloop.h".
+
+2001-03-22  Andrew Cagney  <ac131313@redhat.com>
+
+	* server.cc (main): Pass win32_attach and process to
+	gdbsocket_startup instead of gdbsocket_poll.
+
+2001-03-14  Andrew Cagney  <ac131313@redhat.com>
+
+	* Makefile.am (INCLUDES): Update. Headers moved to ../include.
+	* Makefile.in: Regenerate.
+
+2000-12-06  Corinna Vinschen  <vinschen@cygnus.com>
+
+	* child_process.cc (check_state): new method.
+	(fromtarget_break): Ditto.
+	(fromtarget_exit): Ditto.
+	(fromtarget_terminate): Ditto.
+	* server.cc (main): Change tabbing. Use new child_process methods.
+	* server.h (struct server_vector): Eliminated.
+	* (class child_process): Add new methods `check_state',
+	`fromtarget_break', `fromtarget_exit' and `fromtarget_terminate'.
+	* win32-target.cc (win32_check_child_state): Eliminated. Functionality
+	moved to class child_process.
+	(win32_fromtarget_break): Ditto.
+	(win32_fromtarget_exit): Ditto.
+	(win32_fromtarget_terminate): Ditto.
+
+2000-11-24  Corinna Vinschen  <vinschen@cygnus.com>
+
+	* Makefile.am: Add child_process.cc dependency.
+	* Makefile.in: Regenerated.
+	* configure.in: Add child_process.o dependency.
+	* configure: Regenerated.
+	* child_process.cc: New file. Contains methods of class child_process.
+	* server.cc: Move global `server_quit_p' to class child_process.
+	(main): Use new child_process methods.
+	* server.h: Move gdb specific includes to here. Move define
+	FLAG_TRACE_BIT to here.
+	(enum proc_state): New type.
+	(class child_process): Change access of `stop_status' and `stop_signal'
+	to private. Add private member `server_quit_p'.
+	(child_process::set_running): New method.
+	(child_process::set_break): Ditto.
+	(child_process::set_exit): Ditto.
+	(child_process::set_term): Ditto.
+	(child_process::status): Ditto.
+	(child_process::stop_signal): Ditto.
+	(child_process::term_signal): Ditto.
+	(child_process::exit_code): Ditto.
+	(child_process::quit_server): Ditto.
+	(child_process::handle_exception): Add declaration for new method.
+	(child_process::fetch_regs): Ditto.
+	(child_process::store_regs): Ditto.
+	(child_process::resume_program): Ditto.
+	(child_process::load_dll_event): Ditto.
+	(child_process::create_child): Ditto.
+	* win32-strace.cc: Slight cleanup.
+	(win32_output_debug_string): Use new child_process methods.
+	* win32-target.cc: Slight cleanups. Use new child_process methods
+	throughout.
+	(child_process::debug): Moved to child_process.cc.
+	(win32_fetch_regs): Changed to method child_process::fetch_regs and
+	moved to child_process.cc.
+	(win32_store_regs): Changed to method child_process::store_regs and
+	moved to child_process.cc.
+	(win32_get_process): Change to inline function.
+	(win32_process_set_pc): New function.
+	(win32_resume_program): Changed to method child_process::resume_program
+	and moved to child_process.cc.
+	(win32_process_signal): Changed storage class to `extern "C"'.
+	(win32_create_child): Changed to method child_process::create_child
+	and moved to child_process.cc.
+	(struct sigmap): Moved to child_process.cc.
+	(win32_handle_waitstatus): Changed to method
+	child_process::handle_exception and moved to child_process.cc.
+	(win32_load_dll_event): Changed to method child_process::load_dll_event
+	and moved to child_process.cc.
+
+2000-11-24  Corinna Vinschen  <vinschen@cygnus.com>
+
+	* Makefile.am: Add win32-strace.cc dependency.
+	* Makefile.in: Regenerated.
+	* configure.in: Add win32-strace.o dependency.
+	* configure: Regenerated.
+	* server.h: Add classes `breakpoint' and `bp_array'.
+	Add various new members to class `child_process'.
+	* server.cc (usage): Clean up output.
+	(main): Add handling for some more flags.
+	* win32-strace.cc: New file.
+	* win32-target.cc: Several cleanups. Additional debug output.
+	Move `win32_handle_debug_output' to win32-strace.cc.
+	(child_process::debug): New method.
+	(win32_process_rcmd): Add handling for [no]trace  and [no]debug_child
+	commands.
+	(win32_remove_breakpoint): New function.
+	(win32_set_breakpoint): Ditto.
+	(win32_process_signal): Ditto.
+	(win32_load_dll_event): Ditto.
+	(win32_check_child_state): Return always 1 when signal condition
+	is raised.
+
+2000-11-22  Corinna Vinschen  <vinschen@cygnus.com>
+
+	* Makefile.am: Drop CXX variable.
+	* Makefile.in: Regenerated.
+	* configure.in: Add the `AC_PROG_CXX' macro.
+	* configure: Regenerated.
+	* server.h: Move `debug_backend' to private. Add methods `set_debug'
+	and `debug'.
+	* server.cc (main): Add debug option `-d'. Fix `-p' option.
+	Slight format changes. Use new debug methods.
+	* win32-target.cc: Use new debug methods. Various cleanups.
+	(win32_process_signal): New function.
+
+2000-11-21  Corinna Vinschen  <vinschen@cygnus.com>
+
+	New directory "win32" for Cygwin win32 gdbserver in libremote
+	* server.cc: New file. Entry point and main event loop.
+	* server.h: New file. Shared declarations.
+	* win32-target.cc: New file. Win32 version of libremote stub.
+	* config.in: New file. config.h source file.
+	* configure.in: New file. Autoconf source.
+	* configure: New file. Autoconf generated from configure.in.
+	* Makefile.am: New file. Automake source.
+	* Makefile.in: New file. Automake-generated makefile source.
+	* aclocal.m4: New file. Copied from ../native.
+	Note: this work is incomplete and only partially working.

@@ -1,0 +1,192 @@
+Architecture:
+
+	(GDB)CLIENT <--> SERVER <--> TARGET
+
+Where:
+
+	CLIENT
+
+		Provides the raw interface between
+		GDBSERVER and the internal server
+		mechanism.
+
+		The client passes any data relevant
+		to the server on.  The SERVER presents
+		CLIENT with raw output to be returned
+		to GDB.
+
+	SERVER
+		Implements true state-machine that
+		is capable of decoding / processing
+		various GDB remote protocol requests.
+
+	TARGET
+		The embedded system proper.  SERVER
+		passes decoded requests onto the TARGET
+		while TARGET notifies the SERVER of any
+		target state changes.
+
+
+Looking at SERVER in more detail, that component consists of three sub
+components INPUT, OUTPUT and STATE.  Visually:
+
+          			     .------------ fromtarget_*
+			            \|/
+	fromclient_*   -> INPUT -> STATE (M/C) -> target->*
+	                   /|\         |
+                            |
+	                   \|/         |
+	client->write  <- OUTPUT <----'
+
+where:
+
+	INPUT
+		Filters the raw input stream from the client
+		breaking it up into complete packets and
+		passing them onto STATE.
+
+		This component co-operates with OUTPUT for
+		the ACK/NAK of input packets.
+
+	OUTPUT
+		Wraps up and then passes onto the client
+		raw output packets ready for transmition
+		on the output stream.
+
+		This component  co-operates with INPUT for
+		the ACK/NAK of output packets.
+
+	STATE
+		The state machine proper.
+
+
+
+SENARIOS:
+
+
+ATTACH: Creating a connection into the server/target.
+
+Client receives a conect request from the remote GDB.  A socket
+interface would see this as an attach.  For Cygmon this is the
+``transfer'' command.
+
+The client creates an output object (struct gdbserv_client) and passes
+that and the target side attach function onto GDBSERV.  SERVER will
+then initialize itsself and call ``to_target_attach'' for final
+approval of the request.
+
+	struct gdbserv_client *client;
+	...
+	client->write = client_write_to_output_port;
+	client->data = ... local state ...
+	server = gdbserv_fromclient_attach (client, to_target_attach,
+					    target_data);
+
+The target_attach() function is expected to either create and return a
+gdbserv_target object or return NULL.  The latter indicates that the
+connection request is rejected.
+
+Finally gdbserv_fromclient_attach() returns a SERVER state object that
+should be passed to all client->server calls.
+
+
+DATA-IN: Data being sent to the client from the remote GDB
+
+The client passes the data vis:
+
+	len = read (fd, buf, sizeof (buf));
+	gdbserv_fromclient_data (server, buf, len);
+
+
+BREAK-IN: Request to stop sent to the client from the remote GDB
+
+The client passes the request to SERVER:
+
+	server.c:
+
+	volatile
+	break_handler ()
+	{
+ 	  gdbserv_fromclient_break (server);
+	}
+
+If the target is currently running, the server will in turn pass the
+request onto the TARGET:
+
+	->target->break_program (server);
+
+and the target will record the break request and then return control
+back to the SERVER.  The server returning control to the client.
+
+Later, once the target has halted, the SERVER is notified of the state
+change vis:
+
+	target.c:
+
+	  gdbserv_fromtarget_break (server);
+
+
+NB: Often ``break'' is sent across the stream interface as a special
+character sequence.
+
+FIXME: gdbserv-input.c should be able to parse such character
+sequences.
+
+
+DATA-OUT: Data for the remote GDB from SERVER
+
+The ``write'' function specified in the ``struct gdbserv_client''
+object is called.
+
+
+DETACH: Remote GDB dissconnects from the SERVER
+
+The CLIENT notifies SERVER via the gdbserv_fromclient_detach() call.
+
+
+HARD-RESET:  A hard reset is performed on a serial board.
+
+Assuming a standalone system, the client/target side sequences would
+be performed:
+
+	/* create the server */
+	server = gdbserv_fromclient_attach (...);
+	/* notify the server that the target was just reset */
+	gdbserv_fromtarget_reset (server);
+
+
+WRITE-MEMORY: GDB sends the server a write-memory packet.
+
+Eventually SERVER passes the request onto the TARGET with the call:
+
+	->target->process_set_mem (server, addr, len);
+
+where ADDR and LEN contain the uninterpreted address/length of the
+data to follow.  target_process_set_mem() might be implemented as:
+
+	long long addr;
+	long int;
+	gdbserv_reg_to_ulonglong (server, reg_addr, &addr);
+  	gdbserv_reg_to_ulong (server, reg_len, &len);
+	/* just blat local memory */
+	len = gdbserv_input_bytes (server, addr, len);
+	
+
+READ-MEMORY: GDB requests memory from the target.
+
+Eventually target_process_get_mem() function is called.  An
+implementation may look like:
+
+	gdbserv_reg_to_ulonglong (gdbserv, reg_addr, &addr);
+  	gdbserv_reg_to_ulong (gdbserv, reg_len, &len);
+	/* assume we're reading raw memory from the local mc */
+  	gdbserv_output_bytes (gdbserv, addr, len);
+
+
+TARGET-RESUME: GDB requests that the target resume execution.
+
+Eventually ->target->continue_program() is called.  That function
+should record the request and then wait for SERVER to exit before
+actually continuing the target.
+
+--

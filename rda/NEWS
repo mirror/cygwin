@@ -1,0 +1,6 @@
+
+2000-04-06
+
+	The RDA package is created by factoring out
+	a gdb remote-stub implementation by Andrew Cagney.
+

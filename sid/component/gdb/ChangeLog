@@ -1,3 +1,9 @@
+2001-07-30  Frank Ch. Eigler  <fche@redhat.com>
+
+	* gdb.h (gdb::hw_breakpoint_pc_mask): New member variable.
+	* gdb.cxx (gdb ctor): Expose it as `Z-packet-pc-mask' attribute.
+	(remove_hw_breakpoint, add_hw_breakpoint): Respect it.
+
 2001-07-20  Frank Ch. Eigler  <fche@redhat.com>
 
 	* gdb.cxx (process_set_reg): Make optional trace more informative.

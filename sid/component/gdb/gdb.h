@@ -121,6 +121,7 @@ private:
   // hw breakpoint tracking
   typedef map<host_int_8,int> hw_breakpoints_t;
   hw_breakpoints_t hw_breakpoints; // address -> insertion-count
+  host_int_8 hw_breakpoint_pc_mask; // 0=disabled
   bool add_hw_breakpoint (host_int_8);
   bool remove_hw_breakpoint (host_int_8);
   bool remove_all_hw_breakpoints ();

@@ -15,7 +15,7 @@ AC_PROG_RANLIB
 
 AC_FUNC_ALLOCA
 AC_HAVE_HEADERS(stddef.h stdlib.h getopt.h unistd.h fcntl.h sys/file.h sys/wait.h string.h strings.h)
-AC_CHECK_FUNCS(raise strdup)
+AC_CHECK_FUNCS(raise)
 
 AC_ARG_ENABLE(ide, [  --enable-ide            Enable IDE support],
 [case "${enableval}" in

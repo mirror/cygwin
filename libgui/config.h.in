@@ -40,9 +40,6 @@
 /* Define if you have the random function.  */
 #undef HAVE_RANDOM
 
-/* Define if you have the strdup function.  */
-#undef HAVE_STRDUP
-
 /* Define if you have the <fcntl.h> header file.  */
 #undef HAVE_FCNTL_H
 

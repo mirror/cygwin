@@ -223,8 +223,10 @@ help_initialize_command (ClientData cd, Tcl_Interp *interp, int argc,
 {
   struct help_command_data *hdata = (struct help_command_data *) cd;
 
-  hdata->filename = strdup (argv[2]);
-  hdata->header_filename = strdup (argv[3]);
+  hdata->filename = malloc (strlen (argv[2]) + 1);
+  strcpy (hdata->filename, argv[2]);
+  hdata->header_filename = malloc (strlen (argv[3]) + 1);
+  strcpy (hdata->header_filename, argv[3]);
   return TCL_OK;
 }
 
@@ -407,9 +409,12 @@ help_initialize_command (ClientData cd, Tcl_Interp *interp, int argc,
 {
   struct help_command_data *hdata = (struct help_command_data *) cd;
 
-  hdata->filename = strdup (argv[2]);
-  hdata->header_filename = strdup (argv[3]);
-  hdata->help_dir = strdup (argv[4]);
+  hdata->filename = malloc (strlen (argv[2]) + 1);
+  strcpy (hdata->filename, argv[2]);
+  hdata->header_filename = malloc (strlen (argv[3]) + 1);
+  strcpy (hdata->header_filename, argv[3]);
+  hdata->help_dir = malloc (strlen (argv[4]) + 1);
+  strcpy (hdata->help_dir, argv[4]);
   return TCL_OK;
 }
 

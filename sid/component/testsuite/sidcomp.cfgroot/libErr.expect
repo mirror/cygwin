@@ -1,4 +1,4 @@
-libErr.badconf:8: dlopen of component library dso -nonstatic- failed: *
-libErr.badconf:9: dlopen of component library dso gloss_component_library failed: *
-libErr.badconf:10: dlopen of component library dso libgloss failed: *
+libErr.badconf:8: dlsym of console_component_library in component library dso -nonstatic- failed: *
+libErr.badconf:9: dlsym of gloss_component_library in component library dso gloss_component_library failed: *
+libErr.badconf:10: dlsym of gloss_component_library in component library dso libgloss failed: *
 Configuration error.  Aborting.

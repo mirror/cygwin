@@ -1,3 +1,22 @@
+2003-03-21  DJ Delorie  <dj@redhat.com>
+
+	* cpu/xstormy16.cpu (basic-psw): New argument ws (wordsize),
+	which indicates if the sign flag is set from bit 15 or 7.
+	Adjust all callers.
+	(set-psw): New argument ws, propogate it.
+	(set-psw-nowrite): Likewise.
+	(set-mem-psw): Likewise.
+	(set-psw-carry): Likewise.  Use temporaries to prevent
+	prematurely overwriting needed inputs.
+	(set-psw-rrotate17): Fix logic.
+	(shrgrgr): Preserve carry for zero-bit shifts.
+	(shrgrimm): Likewise.
+	(shlgrgr): Likewise.
+	(shlgrimm): Likewise.
+	(asrgrgr): Likewise.
+	(asrgrimm): Likewise.
+	(reset): New.
+
 2003-03-12  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sid.scm: Set APPLICATION to SID-SIMULATOR.

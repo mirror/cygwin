@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -103,11 +103,11 @@ xstormy16_write_sfmt_movlgrmem (xstormy16_cpu* current_cpu, xstormy16_scache* se
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  if (written & (1ULL << 7))
+  if (written & (1ULL << 6))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rm_idx), OPRND (h_gr_HI_index_of__DFLT_Rm));
     }
-  if (written & (1ULL << 8))
+  if (written & (1ULL << 7))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -129,11 +129,11 @@ xstormy16_write_sfmt_movhgrmem (xstormy16_cpu* current_cpu, xstormy16_scache* se
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  if (written & (1ULL << 7))
+  if (written & (1ULL << 6))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rm_idx), OPRND (h_gr_HI_index_of__DFLT_Rm));
     }
-  if (written & (1ULL << 8))
+  if (written & (1ULL << 7))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -185,11 +185,11 @@ xstormy16_write_sfmt_movgrgri (xstormy16_cpu* current_cpu, xstormy16_scache* sem
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  if (written & (1ULL << 7))
+  if (written & (1ULL << 6))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rdm_idx), OPRND (h_gr_HI_index_of__DFLT_Rdm));
     }
-  if (written & (1ULL << 8))
+  if (written & (1ULL << 7))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -212,11 +212,11 @@ xstormy16_write_sfmt_movgrgripostinc (xstormy16_cpu* current_cpu, xstormy16_scac
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
-  if (written & (1ULL << 8))
+  if (written & (1ULL << 7))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rdm_idx), OPRND (h_gr_HI_index_of__DFLT_Rdm));
     }
-  if (written & (1ULL << 9))
+  if (written & (1ULL << 8))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -239,11 +239,11 @@ xstormy16_write_sfmt_movgrgripredec (xstormy16_cpu* current_cpu, xstormy16_scach
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
-  if (written & (1ULL << 8))
+  if (written & (1ULL << 7))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rdm_idx), OPRND (h_gr_HI_index_of__DFLT_Rdm));
     }
-  if (written & (1ULL << 9))
+  if (written & (1ULL << 8))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -267,7 +267,7 @@ xstormy16_write_sfmt_movgrigr (xstormy16_cpu* current_cpu, xstormy16_scache* sem
 
   if (written & (1ULL << 5))
     {
-      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_Rs_65534_idx), OPRND (h_memory_HI_and__DFLT_Rs_65534));
     }
   if (written & (1ULL << 6))
     {
@@ -295,7 +295,7 @@ xstormy16_write_sfmt_movgripostincgr (xstormy16_cpu* current_cpu, xstormy16_scac
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
   if (written & (1ULL << 6))
     {
-      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_Rs_65534_idx), OPRND (h_memory_HI_and__DFLT_Rs_65534));
     }
   if (written & (1ULL << 7))
     {
@@ -323,7 +323,7 @@ xstormy16_write_sfmt_movgripredecgr (xstormy16_cpu* current_cpu, xstormy16_scach
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
   if (written & (1ULL << 6))
     {
-      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_Rs_65534_idx), OPRND (h_memory_HI_and__DFLT_Rs_65534));
     }
   if (written & (1ULL << 7))
     {
@@ -348,11 +348,11 @@ xstormy16_write_sfmt_movgrgrii (xstormy16_cpu* current_cpu, xstormy16_scache* se
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  if (written & (1ULL << 8))
+  if (written & (1ULL << 7))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rdm_idx), OPRND (h_gr_HI_index_of__DFLT_Rdm));
     }
-  if (written & (1ULL << 9))
+  if (written & (1ULL << 8))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -375,11 +375,11 @@ xstormy16_write_sfmt_movgrgriipostinc (xstormy16_cpu* current_cpu, xstormy16_sca
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
-  if (written & (1ULL << 9))
+  if (written & (1ULL << 8))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rdm_idx), OPRND (h_gr_HI_index_of__DFLT_Rdm));
     }
-  if (written & (1ULL << 10))
+  if (written & (1ULL << 9))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -402,11 +402,11 @@ xstormy16_write_sfmt_movgrgriipredec (xstormy16_cpu* current_cpu, xstormy16_scac
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
-  if (written & (1ULL << 9))
+  if (written & (1ULL << 8))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rdm_idx), OPRND (h_gr_HI_index_of__DFLT_Rdm));
     }
-  if (written & (1ULL << 10))
+  if (written & (1ULL << 9))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -430,7 +430,7 @@ xstormy16_write_sfmt_movgriigr (xstormy16_cpu* current_cpu, xstormy16_scache* se
 
   if (written & (1ULL << 6))
     {
-      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_add__DFLT_Rs_imm12_65534_idx), OPRND (h_memory_HI_and__DFLT_add__DFLT_Rs_imm12_65534));
     }
   if (written & (1ULL << 7))
     {
@@ -458,7 +458,7 @@ xstormy16_write_sfmt_movgriipostincgr (xstormy16_cpu* current_cpu, xstormy16_sca
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
   if (written & (1ULL << 7))
     {
-      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_add__DFLT_Rs_imm12_65534_idx), OPRND (h_memory_HI_and__DFLT_add__DFLT_Rs_imm12_65534));
     }
   if (written & (1ULL << 8))
     {
@@ -486,7 +486,7 @@ xstormy16_write_sfmt_movgriipredecgr (xstormy16_cpu* current_cpu, xstormy16_scac
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
   if (written & (1ULL << 7))
     {
-      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_add__DFLT_Rs_imm12_65534_idx), OPRND (h_memory_HI_and__DFLT_add__DFLT_Rs_imm12_65534));
     }
   if (written & (1ULL << 8))
     {
@@ -611,11 +611,11 @@ xstormy16_write_sfmt_movfgrgri (xstormy16_cpu* current_cpu, xstormy16_scache* se
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  if (written & (1ULL << 8))
+  if (written & (1ULL << 7))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rdm_idx), OPRND (h_gr_HI_index_of__DFLT_Rdm));
     }
-  if (written & (1ULL << 9))
+  if (written & (1ULL << 8))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -638,11 +638,11 @@ xstormy16_write_sfmt_movfgrgripostinc (xstormy16_cpu* current_cpu, xstormy16_sca
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
-  if (written & (1ULL << 9))
+  if (written & (1ULL << 8))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rdm_idx), OPRND (h_gr_HI_index_of__DFLT_Rdm));
     }
-  if (written & (1ULL << 10))
+  if (written & (1ULL << 9))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -665,11 +665,11 @@ xstormy16_write_sfmt_movfgrgripredec (xstormy16_cpu* current_cpu, xstormy16_scac
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
-  if (written & (1ULL << 9))
+  if (written & (1ULL << 8))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rdm_idx), OPRND (h_gr_HI_index_of__DFLT_Rdm));
     }
-  if (written & (1ULL << 10))
+  if (written & (1ULL << 9))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -693,7 +693,7 @@ xstormy16_write_sfmt_movfgrigr (xstormy16_cpu* current_cpu, xstormy16_scache* se
 
   if (written & (1ULL << 6))
     {
-      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_join__SI_HI_R8_Rs_65534_idx), OPRND (h_memory_HI_and__DFLT_join__SI_HI_R8_Rs_65534));
     }
   if (written & (1ULL << 7))
     {
@@ -721,7 +721,7 @@ xstormy16_write_sfmt_movfgripostincgr (xstormy16_cpu* current_cpu, xstormy16_sca
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
   if (written & (1ULL << 7))
     {
-      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_join__SI_HI_R8_Rs_65534_idx), OPRND (h_memory_HI_and__DFLT_join__SI_HI_R8_Rs_65534));
     }
   if (written & (1ULL << 8))
     {
@@ -749,7 +749,7 @@ xstormy16_write_sfmt_movfgripredecgr (xstormy16_cpu* current_cpu, xstormy16_scac
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
   if (written & (1ULL << 7))
     {
-      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_nwhere_idx), OPRND (h_memory_HI_nwhere));
+      current_cpu->SETMEMHI (pc, OPRND (h_memory_HI_and__DFLT_join__SI_HI_R8_Rs_65534_idx), OPRND (h_memory_HI_and__DFLT_join__SI_HI_R8_Rs_65534));
     }
   if (written & (1ULL << 8))
     {
@@ -774,11 +774,11 @@ xstormy16_write_sfmt_movfgrgrii (xstormy16_cpu* current_cpu, xstormy16_scache* s
   PCADDR npc = 0; // dummy value for branches
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
-  if (written & (1ULL << 9))
+  if (written & (1ULL << 8))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rdm_idx), OPRND (h_gr_HI_index_of__DFLT_Rdm));
     }
-  if (written & (1ULL << 10))
+  if (written & (1ULL << 9))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -801,11 +801,11 @@ xstormy16_write_sfmt_movfgrgriipostinc (xstormy16_cpu* current_cpu, xstormy16_sc
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
-  if (written & (1ULL << 10))
+  if (written & (1ULL << 9))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rdm_idx), OPRND (h_gr_HI_index_of__DFLT_Rdm));
     }
-  if (written & (1ULL << 11))
+  if (written & (1ULL << 10))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }
@@ -828,11 +828,11 @@ xstormy16_write_sfmt_movfgrgriipredec (xstormy16_cpu* current_cpu, xstormy16_sca
   sem_status status = SEM_STATUS_NORMAL; // ditto
 
   current_cpu->h_gr_set (FLD (f_Rs), OPRND (Rs));
-  if (written & (1ULL << 10))
+  if (written & (1ULL << 9))
     {
       current_cpu->h_gr_set (OPRND (h_gr_HI_index_of__DFLT_Rdm_idx), OPRND (h_gr_HI_index_of__DFLT_Rdm));
     }
-  if (written & (1ULL << 11))
+  if (written & (1ULL << 10))
     {
       current_cpu->h_gr_set (((UINT) 14), OPRND (psw));
     }

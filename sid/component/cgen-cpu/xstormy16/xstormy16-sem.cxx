@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -157,7 +157,7 @@ xstormy16_sem_movlgrmem (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (FLD (f_lmem8), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (FLD (f_lmem8), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, FLD (f_lmem8)), 255))) : (current_cpu->GETMEMHI (pc, FLD (f_lmem8))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (FLD (f_lmem8), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rm), opval);
@@ -209,7 +209,7 @@ xstormy16_sem_movhgrmem (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (FLD (f_hmem8), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (FLD (f_hmem8), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, FLD (f_hmem8)), 255))) : (current_cpu->GETMEMHI (pc, FLD (f_hmem8))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (FLD (f_hmem8), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rm), opval);
@@ -365,7 +365,7 @@ xstormy16_sem_movgrgri (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (current_cpu->h_gr_get (FLD (f_Rs)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, current_cpu->h_gr_get (FLD (f_Rs))), 255))) : (current_cpu->GETMEMHI (pc, current_cpu->h_gr_get (FLD (f_Rs)))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
@@ -418,7 +418,7 @@ xstormy16_sem_movgrgripostinc (xstormy16_cpu* current_cpu, xstormy16_scache* sem
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (current_cpu->h_gr_get (FLD (f_Rs)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, current_cpu->h_gr_get (FLD (f_Rs))), 255))) : (current_cpu->GETMEMHI (pc, current_cpu->h_gr_get (FLD (f_Rs)))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
@@ -484,7 +484,7 @@ xstormy16_sem_movgrgripredec (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (current_cpu->h_gr_get (FLD (f_Rs)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, current_cpu->h_gr_get (FLD (f_Rs))), 255))) : (current_cpu->GETMEMHI (pc, current_cpu->h_gr_get (FLD (f_Rs)))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
@@ -536,25 +536,12 @@ xstormy16_sem_movgrigr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 
 {
 if (FLD (f_op2m)) {
-{
-  SI tmp_nwhere;
-  HI tmp_nwhat;
-  tmp_nwhere = current_cpu->h_gr_get (FLD (f_Rs));
-if (ANDSI (tmp_nwhere, 1)) {
-{
-  tmp_nwhat = ORHI (ANDSI (SLLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 65280), ANDSI (SRLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 255));
-  tmp_nwhere = SUBSI (tmp_nwhere, 1);
-}
-} else {
-  tmp_nwhat = current_cpu->h_gr_get (FLD (f_Rdm));
-}
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
+    current_cpu->SETMEMHI (pc, ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 65534), opval);
     if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 65534) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
-}
 } else {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
@@ -593,25 +580,12 @@ xstormy16_sem_movgripostincgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem
 
 {
 if (FLD (f_op2m)) {
-{
-  SI tmp_nwhere;
-  HI tmp_nwhat;
-  tmp_nwhere = current_cpu->h_gr_get (FLD (f_Rs));
-if (ANDSI (tmp_nwhere, 1)) {
-{
-  tmp_nwhat = ORHI (ANDSI (SLLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 65280), ANDSI (SRLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 255));
-  tmp_nwhere = SUBSI (tmp_nwhere, 1);
-}
-} else {
-  tmp_nwhat = current_cpu->h_gr_get (FLD (f_Rdm));
-}
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
+    current_cpu->SETMEMHI (pc, ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 65534), opval);
     if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 65534) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
-}
 } else {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
@@ -672,25 +646,12 @@ xstormy16_sem_movgripredecgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
   }
 }
 if (FLD (f_op2m)) {
-{
-  SI tmp_nwhere;
-  HI tmp_nwhat;
-  tmp_nwhere = current_cpu->h_gr_get (FLD (f_Rs));
-if (ANDSI (tmp_nwhere, 1)) {
-{
-  tmp_nwhat = ORHI (ANDSI (SLLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 65280), ANDSI (SRLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 255));
-  tmp_nwhere = SUBSI (tmp_nwhere, 1);
-}
-} else {
-  tmp_nwhat = current_cpu->h_gr_get (FLD (f_Rdm));
-}
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
+    current_cpu->SETMEMHI (pc, ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 65534), opval);
     if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (current_cpu->h_gr_get (FLD (f_Rs)), 65534) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
-}
 } else {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
@@ -720,7 +681,7 @@ xstormy16_sem_movgrgrii (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12))), 255))) : (current_cpu->GETMEMHI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
@@ -773,7 +734,7 @@ xstormy16_sem_movgrgriipostinc (xstormy16_cpu* current_cpu, xstormy16_scache* se
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12))), 255))) : (current_cpu->GETMEMHI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
@@ -839,7 +800,7 @@ xstormy16_sem_movgrgriipredec (xstormy16_cpu* current_cpu, xstormy16_scache* sem
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12))), 255))) : (current_cpu->GETMEMHI (pc, ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
@@ -891,25 +852,12 @@ xstormy16_sem_movgriigr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 
 {
 if (FLD (f_op2m)) {
-{
-  SI tmp_nwhere;
-  HI tmp_nwhat;
-  tmp_nwhere = ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12));
-if (ANDSI (tmp_nwhere, 1)) {
-{
-  tmp_nwhat = ORHI (ANDSI (SLLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 65280), ANDSI (SRLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 255));
-  tmp_nwhere = SUBSI (tmp_nwhere, 1);
-}
-} else {
-  tmp_nwhat = current_cpu->h_gr_get (FLD (f_Rdm));
-}
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
+    current_cpu->SETMEMHI (pc, ANDSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 65534), opval);
     if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 65534) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
-}
 } else {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
@@ -948,25 +896,12 @@ xstormy16_sem_movgriipostincgr (xstormy16_cpu* current_cpu, xstormy16_scache* se
 
 {
 if (FLD (f_op2m)) {
-{
-  SI tmp_nwhere;
-  HI tmp_nwhat;
-  tmp_nwhere = ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12));
-if (ANDSI (tmp_nwhere, 1)) {
-{
-  tmp_nwhat = ORHI (ANDSI (SLLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 65280), ANDSI (SRLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 255));
-  tmp_nwhere = SUBSI (tmp_nwhere, 1);
-}
-} else {
-  tmp_nwhat = current_cpu->h_gr_get (FLD (f_Rdm));
-}
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
+    current_cpu->SETMEMHI (pc, ANDSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 65534), opval);
     if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 65534) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
-}
 } else {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
@@ -1027,25 +962,12 @@ xstormy16_sem_movgriipredecgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem
   }
 }
 if (FLD (f_op2m)) {
-{
-  SI tmp_nwhere;
-  HI tmp_nwhat;
-  tmp_nwhere = ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12));
-if (ANDSI (tmp_nwhere, 1)) {
-{
-  tmp_nwhat = ORHI (ANDSI (SLLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 65280), ANDSI (SRLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 255));
-  tmp_nwhere = SUBSI (tmp_nwhere, 1);
-}
-} else {
-  tmp_nwhat = current_cpu->h_gr_get (FLD (f_Rdm));
-}
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
+    current_cpu->SETMEMHI (pc, ANDSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 65534), opval);
     if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (ADDSI (current_cpu->h_gr_get (FLD (f_Rs)), FLD (f_imm12)), 65534) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
-}
 } else {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
@@ -1273,7 +1195,7 @@ xstormy16_sem_movfgrgri (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (ORSI (SLLSI (current_cpu->h_gr_get (((UINT) 8)), 16), current_cpu->h_gr_get (FLD (f_Rs))), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (ORSI (SLLSI (current_cpu->h_gr_get (((UINT) 8)), 16), current_cpu->h_gr_get (FLD (f_Rs))), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, ORSI (SLLSI (current_cpu->h_gr_get (((UINT) 8)), 16), current_cpu->h_gr_get (FLD (f_Rs)))), 255))) : (current_cpu->GETMEMHI (pc, ORSI (SLLSI (current_cpu->h_gr_get (((UINT) 8)), 16), current_cpu->h_gr_get (FLD (f_Rs))))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (ORSI (SLLSI (current_cpu->h_gr_get (((UINT) 8)), 16), current_cpu->h_gr_get (FLD (f_Rs))), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
@@ -1326,7 +1248,7 @@ xstormy16_sem_movfgrgripostinc (xstormy16_cpu* current_cpu, xstormy16_scache* se
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs)))), 255))) : (current_cpu->GETMEMHI (pc, JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
@@ -1392,7 +1314,7 @@ xstormy16_sem_movfgrgripredec (xstormy16_cpu* current_cpu, xstormy16_scache* sem
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs)))), 255))) : (current_cpu->GETMEMHI (pc, JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
@@ -1444,25 +1366,12 @@ xstormy16_sem_movfgrigr (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 
 {
 if (FLD (f_op2m)) {
-{
-  SI tmp_nwhere;
-  HI tmp_nwhat;
-  tmp_nwhere = JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs)));
-if (ANDSI (tmp_nwhere, 1)) {
-{
-  tmp_nwhat = ORHI (ANDSI (SLLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 65280), ANDSI (SRLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 255));
-  tmp_nwhere = SUBSI (tmp_nwhere, 1);
-}
-} else {
-  tmp_nwhat = current_cpu->h_gr_get (FLD (f_Rdm));
-}
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
+    current_cpu->SETMEMHI (pc, ANDSI (JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))), 65534), opval);
     if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))), 65534) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
-}
 } else {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
@@ -1501,25 +1410,12 @@ xstormy16_sem_movfgripostincgr (xstormy16_cpu* current_cpu, xstormy16_scache* se
 
 {
 if (FLD (f_op2m)) {
-{
-  SI tmp_nwhere;
-  HI tmp_nwhat;
-  tmp_nwhere = JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs)));
-if (ANDSI (tmp_nwhere, 1)) {
-{
-  tmp_nwhat = ORHI (ANDSI (SLLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 65280), ANDSI (SRLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 255));
-  tmp_nwhere = SUBSI (tmp_nwhere, 1);
-}
-} else {
-  tmp_nwhat = current_cpu->h_gr_get (FLD (f_Rdm));
-}
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
+    current_cpu->SETMEMHI (pc, ANDSI (JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))), 65534), opval);
     if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))), 65534) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
-}
 } else {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
@@ -1580,25 +1476,12 @@ xstormy16_sem_movfgripredecgr (xstormy16_cpu* current_cpu, xstormy16_scache* sem
       current_cpu->trace_stream << "gr" << '[' << FLD (f_Rs) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
 if (FLD (f_op2m)) {
-{
-  SI tmp_nwhere;
-  HI tmp_nwhat;
-  tmp_nwhere = JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs)));
-if (ANDSI (tmp_nwhere, 1)) {
-{
-  tmp_nwhat = ORHI (ANDSI (SLLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 65280), ANDSI (SRLSI (current_cpu->h_gr_get (FLD (f_Rdm)), 8), 255));
-  tmp_nwhere = SUBSI (tmp_nwhere, 1);
-}
-} else {
-  tmp_nwhat = current_cpu->h_gr_get (FLD (f_Rdm));
-}
   {
     HI opval = current_cpu->h_gr_get (FLD (f_Rdm));
-    current_cpu->SETMEMHI (pc, tmp_nwhere, opval);
+    current_cpu->SETMEMHI (pc, ANDSI (JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))), 65534), opval);
     if (UNLIKELY(current_cpu->trace_result_p))
-      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) tmp_nwhere << dec << ']' << ":=0x" << hex << opval << dec << "  ";
+      current_cpu->trace_stream << "memory" << '[' <<  "0x" << hex << (UDI) ANDSI (JOINHISI (current_cpu->h_gr_get (((UINT) 8)), current_cpu->h_gr_get (FLD (f_Rs))), 65534) << dec << ']' << ":=0x" << hex << opval << dec << "  ";
   }
-}
 } else {
   {
     QI opval = current_cpu->h_gr_get (FLD (f_Rdm));
@@ -1628,7 +1511,7 @@ xstormy16_sem_movfgrgrii (xstormy16_cpu* current_cpu, xstormy16_scache* sem)
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))), 255))) : (current_cpu->GETMEMHI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
@@ -1681,7 +1564,7 @@ xstormy16_sem_movfgrgriipostinc (xstormy16_cpu* current_cpu, xstormy16_scache* s
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))), 255))) : (current_cpu->GETMEMHI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);
@@ -1747,7 +1630,7 @@ xstormy16_sem_movfgrgriipredec (xstormy16_cpu* current_cpu, xstormy16_scache* se
 if (FLD (f_op2m)) {
 {
   HI tmp_nvalue;
-  tmp_nvalue = ((ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)) ? (ORHI (ANDQI (SLLQI (current_cpu->GETMEMQI (pc, SUBSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 1)), 8), 65280), ANDQI (current_cpu->GETMEMQI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12))), 255))) : (current_cpu->GETMEMHI (pc, ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)))));
+  tmp_nvalue = current_cpu->GETMEMHI (pc, ANDSI (ADDSI (JOINHISI (current_cpu->h_Rb_get (FLD (f_Rb)), current_cpu->h_gr_get (FLD (f_Rs))), FLD (f_imm12)), 65534));
   {
     HI opval = tmp_nvalue;
     current_cpu->h_gr_set (FLD (f_Rdm), opval);

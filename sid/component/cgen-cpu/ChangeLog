@@ -1,3 +1,18 @@
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* cgen-model.h (class cgen_model): step_cycles and step_latency
+	now public.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* cgen-model.h (sidtypes.h): #include it.
+	(model_insn_before): Call step_latency. Initialize vliw_cycles.
+	(model_insn_after): Call step_cycles. Update vliw_cycles.
+	(step_cycles): New method.
+	(step_latency): New method.
+	(vliw_cycles): New member of cgen_model.
+	* cgen-engine.h (enum sem_status): Add SEM_STATUS_STALLED.
+
 2003-09-08  Doug Evans  <dje@casey.transmeta.com>
 
 	* CGEN.sh.h: New arg arch-file.

@@ -1,6 +1,6 @@
 // cgen-engine.h - CGEN engine support.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2003 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -15,7 +15,8 @@ enum sem_status
 {
   SEM_STATUS_NORMAL,
   SEM_STATUS_BRANCH_TAKEN,
-  SEM_STATUS_DELAYED_BRANCH_TAKEN
+  SEM_STATUS_DELAYED_BRANCH_TAKEN,
+  SEM_STATUS_STALLED
 };
 
 // Exceptions used to exit the cpu's "main loop".

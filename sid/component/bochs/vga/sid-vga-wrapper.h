@@ -4,8 +4,8 @@
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
-#ifndef VGA_SID_WRAPPER_DEF_H
-#define VGA_SID_WRAPPER_DEF_H	1
+#ifndef SID_VGA_WRAPPER_DEF_H
+#define SID_VGA_WRAPPER_DEF_H	1
 
 #include <sidtypes.h>
 #include <sidcomp.h>
@@ -87,4 +87,4 @@ protected:
 
   bx_vga_c bx_vga;
 };
-#endif // VGA_SID_WRAPPER_DEF_H
+#endif // SID_VGA_WRAPPER_DEF_H

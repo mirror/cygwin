@@ -48,6 +48,7 @@ class x_gui : public generic_memory,
 {
 public:
   x_gui();
+  ~x_gui() throw() {};
 
   void init(host_int_4);
   void handle_events(host_int_4);
@@ -62,6 +63,8 @@ public:
   };
 
 protected:
+
+  output_pin generate_scancode_pin;
 
   callback_pin<x_gui> init_pin;
   callback_pin<x_gui> handle_events_pin;
@@ -85,6 +88,7 @@ protected:
   rgb_data *palette_memory;
 private:
   void redraw_area(unsigned x0, unsigned y0, unsigned width, unsigned height);
+  void xkeypress(KeySym keysym, int press_release);
 
   void load_font(void);
   std::string font_name;

@@ -164,7 +164,7 @@ namespace sidutil
       template <typename T> void unpack (const T& t);
       template <typename T> void pack_any (T& t) const;
 
-      friend ostream& operator<< (ostream& out, const fp& f);
+      friend std::ostream& operator<< (std::ostream& out, const fp& f);
       friend fp operator+ (const fp& l, const fp& r);
       friend fp operator- (const fp& l, const fp& r);
       friend fp operator* (const fp& l, const fp& r);
@@ -183,7 +183,7 @@ namespace sidutil
   bool operator>= (const fp& l, const fp& r);
   bool operator>  (const fp& l, const fp& r);
 
-  ostream& operator<< (ostream& op, const fp& f);
+  std::ostream& operator<< (std::ostream& op, const fp& f);
   
   // A number of useful constants.
   extern const fp constant_zero;

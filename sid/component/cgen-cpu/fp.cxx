@@ -168,7 +168,7 @@ host_int_8 SIGNBIT (bool double_p)
 }
 
 static void
-print_bits (ostream& out, host_int_8 x, int msbit, int digits)
+print_bits (std::ostream& out, host_int_8 x, int msbit, int digits)
 {
   host_int_8 bit = LSBIT64 (msbit);
   int i = 4;
@@ -854,13 +854,13 @@ namespace sidutil
   }
 
   void
-  fp::round_32 (round_mode_t round = round_default, denorm_t denorm = denorm_default)
+  fp::round_32 (round_mode_t round, denorm_t denorm)
   {
     do_round (false, round, denorm);
   }
 
   void
-  fp::round_64 (round_mode_t round = round_default, denorm_t denorm = denorm_default)
+  fp::round_64 (round_mode_t round, denorm_t denorm)
   {
     do_round (true, round, denorm);
   }
@@ -906,7 +906,7 @@ namespace sidutil
     fp_to_int (i, mode);
   }
 
-  ostream& operator<< (ostream& out, const fp& f)
+  std::ostream& operator<< (std::ostream& out, const fp& f)
   {
     out << ((f.sign) ? "-" : "+");
     

@@ -12,7 +12,7 @@
 
 #include "cgen-cpu.h"
 #include "arm-desc.h"
-#include "arm-defs.h"
+// #include "arm-defs.h"
 #include "arm-decode.h"
 #include "thumb-decode.h"
 

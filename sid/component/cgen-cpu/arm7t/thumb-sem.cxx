@@ -13,6 +13,7 @@ This file is part of the Red Hat simulators.
 #include "arm7f.h"
 
 using namespace arm7f; // FIXME: namespace organization still wip
+using namespace thumb; // FIXME: namespace organization still wip
 
 #define GET_ATTR(name) GET_ATTR_##name ()
 

@@ -12,6 +12,11 @@ This file is part of the Red Hat simulators.
 #ifndef THUMB_DECODE_H
 #define THUMB_DECODE_H
 
+namespace thumb {
+// forward declaration of struct in -defs.h
+struct write_stacks;
+}
+
 namespace arm7f {
 
 using namespace cgen;
@@ -180,8 +185,6 @@ struct thumb_scache {
 
   // argument buffer
   thumb_sem_fields fields;
-
-
 
   // decode given instruction
   void decode (arm7f_cpu* current_cpu, PCADDR pc, thumb_insn_word base_insn, thumb_insn_word entire_insn);

@@ -1,3 +1,7 @@
+2001-10-03  Frank Ch. Eigler  <fche@redhat.com>
+
+	* (*.conf): Regenerated with gdb cfgroot relationship.
+
 2001-08-06  Frank Ch. Eigler  <fche@redhat.com>
 
 	* (*.conf): Regenerated without dud loader in gdb configurations.

@@ -963,8 +963,6 @@ Tcl_TranslateFileName(interp, name, bufferPtr)
      * some system interfaces don't accept forward slashes.
      */
 
-#ifndef __CYGWIN__
-    cygwin_conv_to_win32_path (Tcl_DStringValue(bufferPtr)
     if (tclPlatform == TCL_PLATFORM_WINDOWS) {
 	for (p = Tcl_DStringValue(bufferPtr); *p != '\0'; p++) {
 	    if (*p == '/') {
@@ -972,7 +970,6 @@ Tcl_TranslateFileName(interp, name, bufferPtr)
 	    }
 	}
     }
-#endif
     return Tcl_DStringValue(bufferPtr);
 }
 

@@ -1,3 +1,8 @@
+2003-12-12  Michael Chastain  <mec.gnu@mindspring.com>
+
+	Fix for PR gdb/1480.
+	* configure: Touch, no change.
+
 2002-11-22  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* configure.in: Pass 'srcdir' to subconfigures correctly.

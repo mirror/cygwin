@@ -629,11 +629,10 @@ namespace sidutil
 				sid::host_int_4 address);
     ~control_register_bank () throw () { }
     
-  private:
+  protected:
     typedef std::vector<control_register<DataType>*> reg_vector;
     typedef std::map<sid::host_int_4, reg_vector> reg_map;
 
-  protected:
     // read- and write- mappings for control registers
     reg_map read_map, write_map;
   };
@@ -951,14 +950,16 @@ namespace sidutil
 				DataType mask,
 				DataType data)
       {
-	typename reg_map::iterator i = write_map.find(addr);
-	if (i == write_map.end())
+	typename control_register_bus<DataType>::reg_map::iterator i = 
+		 this->write_map.find(addr);
+	if (i == this->write_map.end())
 	  return sid::bus::unmapped; // XXX: or unpermitted?
 	
 	DataType unmatched_mask = mask;
 
 	// scan through all registers at this address
-	for(typename reg_vector::iterator it = i->second.begin();
+	for(typename control_register_bus<DataType>::reg_vector::iterator it =
+		       i->second.begin();
 	    it != i->second.end();
 	    it++)
 	  {
@@ -986,15 +987,17 @@ namespace sidutil
 			       DataType mask,
 			       DataType& data_out)
       {
-	typename reg_map::iterator i = read_map.find(addr);
-	if (i == read_map.end())
+	typename control_register_bus<DataType>::reg_map::iterator i =
+		 this->read_map.find(addr);
+	if (i == this->read_map.end())
 	  return sid::bus::unmapped; // XXX: or unpermitted?
 
 	DataType data = 0;
 	DataType unmatched_mask = mask;
 
 	// scan through all registers at this address
-	for(typename reg_vector::iterator it = i->second.begin();
+	for(typename control_register_bus<DataType>::reg_vector::iterator it =
+			i->second.begin();
 	    it != i->second.end();
 	    it++)
 	  {

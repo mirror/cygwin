@@ -467,7 +467,7 @@ x86_bp_hit_p (struct gdbserv_thread *thread,
 static struct arch *
 x86_make_arch (void)
 {
-  struct arch *a = malloc (sizeof (*a));
+  struct arch *a = allocate_empty_arch ();
 
   a->closure = 0;		/* No closure needed at the moment.  */
   a->make_bp_table = x86_make_bp_table;

@@ -29,6 +29,8 @@ switch $STATS_TEST {
     fail { fail "fail test" }
     xpass { xpass "xpass test" }
     xfail { xfail "xfail test" }
+    kpass { kpass "somebug" "kpass test" }
+    kfail { kfail "somebug" "kfail test" }
     untested { untested "untested test" }
     unresolved { unresolved "unresolved test" }
     unsupported { unsupported "unsupported test" }

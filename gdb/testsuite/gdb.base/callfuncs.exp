@@ -31,14 +31,8 @@ set testfile "callfuncs"
 set srcfile ${testfile}.c
 set binfile ${objdir}/${subdir}/${testfile}
 
-set prototypes 1
 if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {debug}] != "" } {
-    set prototypes 0;
-    # built the second test case since we can't use prototypes
-    warning "Prototypes not supported, rebuilding with -DNO_PROTOTYPES"
-    if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {debug additional_flags=-DNO_PROTOTYPES}] != "" } {
      gdb_suppress_entire_file "Testcase compile failed, so all tests in this file will automatically fail."
-    }
 }
 
 # Create and source the file that provides information about the compiler
@@ -46,6 +40,12 @@ if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {deb
 
 if [get_compiler_info ${binfile}] {
     return -1;
+}
+
+if {$hp_aCC_compiler} {
+    set prototypes 1
+} else {
+    set prototypes 0
 }
 
 # The a29k can't call functions, so don't even bother with this test.
@@ -94,6 +94,8 @@ proc set_lang_c {} {
 proc do_function_calls {} {
     global prototypes
     global gcc_compiled
+    global gdb_prompt
+
     # We need to up this because this can be really slow on some boards.
     set timeout 60;
 
@@ -144,7 +146,7 @@ proc do_function_calls {} {
 	# Although PR 5318 mentions SunOS specifically, this seems
 	# to be a generic problem on quite a few platforms.
 	if $prototypes then {
-	    setup_xfail "hppa*-*-*" "sparc-*-*" "mips*-*-*" 5318
+	    setup_xfail "sparc-*-*" "mips*-*-*" 5318
 	    if {!$gcc_compiled} then {
 		setup_xfail "alpha-dec-osf2*" "i*86-*-sysv4*" 5318
 	    }
@@ -185,29 +187,22 @@ proc do_function_calls {} {
     # the RS6000.
     setup_xfail "rs6000*-*-*"
     setup_xfail "powerpc*-*-*"
-    if {!$gcc_compiled && [istarget hppa*-*-hpux*]} then {
-	gdb_test "p t_func_values(add,func_val2)" "You cannot.*ignored.*"
-    } else {
+    if {![istarget hppa*-*-hpux*]} then {
 	gdb_test "p t_func_values(add,func_val2)" " = 1"
     }
 
     setup_xfail "rs6000*-*-*"
     setup_xfail "powerpc*-*-*"
-    if {!$gcc_compiled && [istarget hppa*-*-hpux*]} then {
-	gdb_test "p t_func_values(func_val1,doubleit)" "You cannot.*ignored.*"
-    } else {
+    if {![istarget hppa*-*-hpux*]} then {
 	gdb_test "p t_func_values(func_val1,doubleit)" " = 1"
     }
 
-    gdb_test "p t_call_add(func_val1,3,4)" " = 7"
-
     setup_xfail "rs6000*-*-*"
     setup_xfail "powerpc*-*-*"
-    if {!$gcc_compiled && [istarget hppa*-*-hpux*]} then {
-	gdb_test "p t_call_add(add,3,4)" "You cannot.*ignored.*"
-    } else {
+    if {![istarget hppa*-*-hpux*]} then {
 	gdb_test "p t_call_add(add,3,4)" " = 7"
     }
+    gdb_test "p t_call_add(func_val1,3,4)" " = 7"
 
     gdb_test "p t_enum_value1(enumval1)" " = 1"
     gdb_test "p t_enum_value1(enum_val1)" " = 1"
@@ -234,14 +229,30 @@ proc do_function_calls {} {
 	"call inferior func with struct - returns int"
     gdb_test "p t_structs_l(struct_val1)" "= 51" \
 	"call inferior func with struct - returns long"
-    setup_xfail "i*86-*-*"
     gdb_test "p t_structs_f(struct_val1)" "= 2.12.*" \
        	"call inferior func with struct - returns float"
-    setup_xfail "i*86-*-*"
     gdb_test "p t_structs_d(struct_val1)" "= 9.87.*" \
     	"call inferior func with struct - returns double"
     gdb_test "p t_structs_a(struct_val1)" "= (.unsigned char .. )?\"foo\"" \
     	"call inferior func with struct - returns char *"
+}
+
+# Procedure to get current content of all registers.
+global all_registers_content
+set all_registers_content ""
+proc do_get_all_registers { } {
+    global gdb_prompt
+    global expect_out
+    global all_registers_content
+
+    set all_registers_content ""
+    send_gdb "info all-registers\n"
+    gdb_expect {
+	-re "info all-registers\r\n(.*)$gdb_prompt $" {
+	    set all_registers_content $expect_out(1,string)
+	}
+	default {}
+    }
 }
 
 # Start with a fresh gdb.
@@ -255,15 +266,103 @@ gdb_test "set print sevenbit-strings" ""
 gdb_test "set print address off" ""
 gdb_test "set width 0" ""
 
-if { ![set_lang_c] } {
-    gdb_suppress_tests;
-} else {
+if { $hp_aCC_compiler } {
+    # Do not set language explicitly to 'C'.  This will cause aCC
+    # tests to fail because promotion rules are different.  Just let
+    # the language be set to the default.
+
     if { ![runto_main] } {
 	gdb_suppress_tests;
     }
+
+    # However, turn off overload-resolution for aCC.  Having it on causes
+    # a lot of failures.
+
+    gdb_test "set overload-resolution 0" ".*"
+} else {
+    if { ![set_lang_c] } {
+	gdb_suppress_tests;
+    } else {
+	if { ![runto_main] } {
+	    gdb_suppress_tests;
+	}
+    }
 }
 
-gdb_test "next" ".*"
+# Make sure that malloc gets called and that the floating point unit
+# is initialized via a call to t_double_values.
+gdb_test "next" "t_double_values\\(double_val1, double_val2\\);.*"
+gdb_test "next" "t_structs_c\\(struct_val1\\);.*"
+
+# Save all register contents.
+do_get_all_registers
+set old_reg_content $all_registers_content
+
+# Perform function calls.
 do_function_calls
+
+# Check if all registers still have the same value.
+do_get_all_registers
+set new_reg_content $all_registers_content
+if ![string compare $old_reg_content $new_reg_content] then {
+    pass "gdb function calls preserve register contents"
+} else {
+    set old_reg_content $all_registers_content
+    fail "gdb function calls preserve register contents"
+}
+
+# Set breakpoint at a function we will call from gdb.
+gdb_breakpoint add
+
+# Call function (causing a breakpoint hit in the call dummy) and do a continue,
+# make sure we are back at main and still have the same register contents.
+gdb_test "print add(4,5)" "The program being debugged stopped while.*" ""
+gdb_test "continue" "Continuing.*" "continue from call dummy breakpoint"
+if ![gdb_test "bt 2" \
+	      "#0  main.*" \
+	      "bt after continuing from call dummy breakpoint"] then {
+    do_get_all_registers
+    set new_reg_content $all_registers_content
+    if ![string compare $old_reg_content $new_reg_content] then {
+	pass "continue after stop in call dummy preserves register contents"
+    } else {
+	fail "continue after stop in call dummy preserves register contents"
+    }
+}
+
+# Call function (causing a breakpoint hit in the call dummy) and do a finish,
+# make sure we are back at main and still have the same register contents.
+gdb_test "print add(4,5)" "The program being debugged stopped while.*" ""
+gdb_test "finish" \
+	 "Value returned is.* = 9" \
+	 "finish from call dummy breakpoint returns correct value"
+if ![gdb_test "bt 2" \
+	      "#0  main.*" \
+	      "bt after finishing from call dummy breakpoint"] then {
+    do_get_all_registers
+    set new_reg_content $all_registers_content
+    if ![string compare $old_reg_content $new_reg_content] then {
+	pass "finish after stop in call dummy preserves register contents"
+    } else {
+	fail "finish after stop in call dummy preserves register contents"
+    }
+}
+
+# Call function (causing a breakpoint hit in the call dummy) and do a return
+# with a value, make sure we are back at main with the same register contents.
+gdb_test "print add(4,5)" "The program being debugged stopped while.*" ""
+if ![gdb_test "return 7" \
+	      "#0  main.*" \
+	      "back at main after return from call dummy breakpoint" \
+	      "Make add return now. .y or n.*" \
+	      "y"] then {
+    do_get_all_registers
+    set new_reg_content $all_registers_content
+    if ![string compare $old_reg_content $new_reg_content] then {
+	pass "return after stop in call dummy preserves register contents"
+    } else {
+	fail "return after stop in call dummy preserves register contents"
+    }
+}
 
 return 0

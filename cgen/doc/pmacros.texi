@@ -177,6 +177,7 @@ Example:
 
 @node Convert a number to a hex
 @section Convert a number to a hex
+@cindex .hex
 
 Convert a number to a lowercase hex string with @code{.hex}.  If
 @code{width} is present, the result is that many characters beginning
@@ -194,6 +195,7 @@ Examples:
 
 @node Convert a string to uppercase
 @section Convert a string to uppercase
+@cindex .upcase
 
 Convert a string to uppercase with @code{.upcase}.
 
@@ -220,6 +222,7 @@ Example:
 
 @node Getting part of a string
 @section Getting part of a string
+@cindex .substr
 
 Extract a part of a string with @code{.substr}.
 
@@ -361,6 +364,7 @@ Example:
 
 @node Applying a macro to a list
 @section Applying a macro to a list
+@cindex .apply
 
 Invoke a macro with each argument coming from an element of a list,
 with @code{.apply}.
@@ -391,6 +395,7 @@ which is wrong.
 
 @node Defining a macro inline
 @section Defining a macro inline
+@cindex .pmacro
 
 Define a macro inline with @code{.pmacro}.
 This is only supported when passing macros as arguments to other macros.

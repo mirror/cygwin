@@ -232,7 +232,7 @@ $(TMPDIR)/$(CYGITCLSHRES):: $(ROOT)/win/itclsh.rc
 	--define VS_VERSION_INFO=1 $(srcdir)/itclsh.rc $(TMPDIR)/$(CYGITCLSHRES)
 
 $(TMPDIR)/$(CYGITCLRES):: $(ROOT)/win/itcl.rc
-	$(WINDRES) --include  $(TCDIR)/generic --include $(srcdir)/../generic \
+	$(WINDRES) --include  $(TCLDIR)/generic --include $(srcdir)/../generic \
 	--define VS_VERSION_INFO=1 $(srcdir)/itcl.rc $(TMPDIR)/$(CYGITCLRES)
 
 # Visual C++ specific targets

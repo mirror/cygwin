@@ -18,11 +18,12 @@ short s;
 unsigned short us;
 int a,b,c,d;
 int max_val;
+long long ll;
 float fa,fb,fc,fd;
 double da,db,dc,dd;
 double dmax_val;
 
-main() {
+int main() {
   c = -1;
   uc = 1;
   s = -2;
@@ -43,6 +44,8 @@ main() {
   dd = 2.0;
   dmax_val = find_max_double(3, 1.0, 4.0, 2.0);
   dmax_val = find_max_double(a, db, dc, dd);
+  
+  return 0;
 }
 
 /* Integer varargs, 1 declared arg */
@@ -96,7 +99,7 @@ double find_max_double(int num_vals, double first_val, ...) {
   va_start(argp, first_val);
   x = first_val;
   if (max_val < x) max_val = x;
-  printf("find_max(%f, %f", num_vals, first_val);
+  printf("find_max(%d, %f", num_vals, first_val);
   for (i = 1; i < num_vals; i++) {
     x = va_arg(argp, double);
     if (max_val < x) max_val = x;

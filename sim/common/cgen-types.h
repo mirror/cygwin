@@ -48,7 +48,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 /* Common mode types.  */
 /* ??? Target specific modes.  */
 typedef enum mode_type {
-  MODE_VM, MODE_BI,
+  MODE_VOID, MODE_BI,
   MODE_QI, MODE_HI, MODE_SI, MODE_DI,
   MODE_UQI, MODE_UHI, MODE_USI, MODE_UDI,
   MODE_SF, MODE_DF, MODE_XF, MODE_TF,
@@ -64,6 +64,7 @@ typedef enum mode_type {
 extern const char *mode_names[];
 #define MODE_NAME(m) (mode_names[m])
 
+typedef void VOID;
 typedef unsigned char BI;
 typedef signed8 QI;
 typedef signed16 HI;
@@ -98,13 +99,6 @@ extern DI make_struct_di (SI, SI);
 #define MAKEDI(hi, lo) (make_struct_di ((hi), (lo)))
 #endif
 
-/* FIXME: Need to provide libraries if these aren't appropriate for target,
-   or user's needs.  */
-typedef float SF;
-typedef double DF;
-typedef double XF; /* FIXME: configure, provide library */
-typedef double TF; /* FIXME: configure, provide library */
-
 /* These are used to record extracted raw data from an instruction, among other
    things.  It must be a host data type, and not a target one.  */
 typedef int INT;
@@ -112,5 +106,7 @@ typedef unsigned int UINT;
 
 typedef unsigned_address ADDR;  /* FIXME: wip*/
 typedef unsigned_address IADDR; /* FIXME: wip*/
+
+/* fp types are in cgen-fpu.h */
 
 #endif /* CGEN_TYPES_H */

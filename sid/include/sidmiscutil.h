@@ -313,7 +313,7 @@ namespace sidutil
   inline std::vector<std::string>
   sid_file_search_path ()
   {
-    vector<string> search_directories;
+    std::vector<std::string> search_directories;
 
     char* slp = getenv ("SID_LIBRARY_PATH"); // run-time configuration
     if (slp)
@@ -337,10 +337,10 @@ namespace sidutil
     if (!sep) sep = SID_EXEC_PREFIX; // build-time configuration
     // We really just want to get to pkgdatadir, which is $prefix/share
     // Guess exec-prefix == prefix
-    string pkglibdir1 = string(sep) + string("/share");
+    std::string pkglibdir1 = std::string(sep) + std::string("/share");
     search_directories.push_back (pkglibdir1);
     // Guess exec-prefix == prefix/H-HOST
-    string pkglibdir2 = string(sep) + string("/../share");
+    std::string pkglibdir2 = std::string(sep) + std::string("/../share");
     search_directories.push_back (pkglibdir2);
 
     return search_directories;
@@ -355,9 +355,9 @@ namespace sidutil
     std::vector<std::string> file_path = sid_file_search_path ();
     std::vector<std::string> path;
 
-    path.push_back (string("")); // no prefix
+    path.push_back (std::string("")); // no prefix
     for (unsigned i=0; i<file_path.size(); i++)
-      path.push_back (file_path[i] + string("/sid/"));
+      path.push_back (file_path[i] + std::string("/sid/"));
 
     for (unsigned i=0; i<path.size(); i++)
       {

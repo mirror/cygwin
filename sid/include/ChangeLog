@@ -1,3 +1,7 @@
+2001-04-14  Harri Porten  <porten@kde.org>
+
+	* sidmiscutil.h (sidutil): added std:: prefixes for C++ ISO compliance.
+
 2001-03-28  Dave Brolley  <brolley@redhat.com>
 
 	* sidbusutil.h (mux_passthrough_bus::select_bus): New function.

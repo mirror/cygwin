@@ -1,5 +1,13 @@
 2004-07-09  Michael Snyder  <msnyder@redhat.com>
 
+	* samples/demo-target.c (demo_set_thread_mem): Allocate new 
+	simulated memory in hunks, rather than one byte at a time.
+	If target_mem.base moves down, copy contents up.
+
+
+	* samples/demo-target.c (demo_target): Call malloc only once,
+	so that gdb can detach and re-attach repeatedly.
+
 	* lib/gdbserv-target.c (gdbserv_fromtarget_terminate): Rename
 	parameter from exitval to sigval (it's a signal number).
 	* lib/gdbserv-target.c (gdbserv_totarget): Comment spelling fix.

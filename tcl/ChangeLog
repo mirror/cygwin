@@ -1,3 +1,8 @@
+Tue Jun  6 22:09:02 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* win/Makefile.in: Set up and use autoconf variables throughout to
+	allow overriding variables from the make command line.
+
 Tue Jun  6 12:17:46 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* generic/tclFilename.c (Tcl_TranslateFileName): Reinstate Mon Jun 5

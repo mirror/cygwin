@@ -12,6 +12,11 @@ prefix = @prefix@
 exec_prefix = @exec_prefix@
 VPATH = @srcdir@:@srcdir@/../generic:@srcdir@/../unix
 srcdir = @srcdir@
+libdir=@libdir@
+bindir=@bindir@
+includedir=@includedir@
+mandir=@mandir@
+datadir=@datadir@
 
 CC = @CC@
 CFLAGS = @CFLAGS@
@@ -82,21 +87,21 @@ ITCLSHRES	= @ITCLSHRES@
 # Directory in which to install the library of Itcl scripts and demos
 # (note: you can set the ITCL_LIBRARY environment variable at run-time to
 # override the compiled-in location):
-ITCL_LIBRARY =	$(prefix)/share/itcl$(ITCL_VERSION)
+ITCL_LIBRARY =	$(datadir)/itcl$(ITCL_VERSION)
 
-# CYGNUS LOCAL: dj - use @dir@ form
+# CYGNUS LOCAL: cgf - use autoconf variables
 
 # Directory in which to install the archive libitcl.a:
-INSTALL_LIB_DIR =	@libdir@
+INSTALL_LIB_DIR =	$(libdir)
 
 # Directory in which to install the program itclsh:
-INSTALL_BIN_DIR =	@bindir@
+INSTALL_BIN_DIR =	$(bindir)
 
 # Directory in which to install the include file itcl.h:
-INSTALL_INCLUDE_DIR =	@includedir@
+INSTALL_INCLUDE_DIR =	$(includedir)
 
 # Top-level directory for manual entries:
-INSTALL_MAN_DIR =	@mandir@
+INSTALL_MAN_DIR =	$(mandir)
 
 # Directory in which to install manual entry for itclsh:
 INSTALL_MAN1_DIR =	$(INSTALL_MAN_DIR)/man1

@@ -1,3 +1,7 @@
+2003-10-26  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.cxx (BoardCfg): Initialize 'gprof'.
+
 2003-10-24  Dave Brolley  <brolley@redhat.com>
 
 	* configure.in: Set program_transform_name to s,x,x, to avoid

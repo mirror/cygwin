@@ -162,6 +162,8 @@
 						  (substring syn 2 n)))
 						"), ")))))
 		 (let ((n (id-len (string-drop1 syn))))
+		   (if (= n 0)
+		       (parse-error context "empty or invalid operand name" syntax))
 		   (loop (string-drop (1+ n) syn)
 			 (string-append result op-macro " ("
 					(string-upcase

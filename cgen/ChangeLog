@@ -1,3 +1,8 @@
+2001-03-21  Ben Elliston  <bje@redhat.com>
+
+	* opc-itab.scm (compute-syntax): Emit a parse error if an operand
+	name is empty or invalid -- eg. "$(rs)" instead of "($rs)".
+
 2001-03-20  Patrick Macdonald  <patrickm@redhat.com>
 
         * desc-cpu.scm (@arch@_cgen_cpu_open): Correct machine calculation for

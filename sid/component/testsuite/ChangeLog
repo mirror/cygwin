@@ -1,5 +1,17 @@
 2001-06-28  Ben Elliston  <bje@redhat.com>
 
+	* sidcomp.cfgroot/CBinvaName.badconf: Remove ARM-specific parts.
+	* sidcomp.cfgroot/CBinvaComp.badconf: Likewise.
+	* sidcomp.cfgroot/CPinvaPin.badconf: Likewise.
+	* sidcomp.cfgroot/multiCB.badconf: Likewise.
+	* sidcomp.cfgroot/multiCP.badconf: Likewise.
+	* sidcomp.cfgroot/CBinvaName.expect: Update to reflect new errors.
+	* sidcomp.cfgroot/CBinvaComp.expect: Likewise.
+	* sidcomp.cfgroot/CPinvaPin.expect: Likewise.
+	* sidcomp.cfgroot/multiCB.expect: Likewise.
+	* sidcomp.cfgroot/multiCP.expect: Likewise.
+
+	* sidcomp.cfgroot/setInvAtt.badconf: Remove ARM-specific parts.
 	* sidcomp.cfgroot/setInvAtt.badconf: Remove ARM-specific parts.
 	* sidcomp.cfgroot/setInvAttV.badconf: Likewise.
 	* sidcomp.cfgroot/setInvComp.badconf: Likewise.

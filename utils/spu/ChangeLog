@@ -1,3 +1,26 @@
+2000-07-21  Stan Shebs  <shebs@shebs.cnchost.com>
+
+	Add the generation of C++ classes.
+	* spu.c (version_string): Bump to 0.5.
+	(DEFAULT_NUM_CLASSES, DEFAULT_NUM_LIB_CLASSES,
+	DEFAULT_NUM_METHODS): New macros.
+	(enum decl_types): Add d_class.
+	(struct class_desc): New struct.
+	(struct function_desc): Add class field.
+	(num_classes, num_lib_classes, num_methods, classes, lib_classes):
+	New globals.
+	(main): Add --classes and --methods options.
+	(display_usage): Mention them.
+	(add_decl_to_table): Add d_class and default cases.
+	(create_classes, create_class, write_class): New functions.
+	(write_header_file, write_lib_header_file): Write classes.
+	(write_function): Format class methods differently.
+
+	(lang_names): New global.
+	(main): Use c++ instead of cpp in --language.
+	(write_description_block): Write out all parameter settings.
+	* README: Update version number.
+
 2000-07-24  Stan Shebs  <shebs@shebs.cnchost.com>
 
 	* spu.c: Bump to version 0.4; add random ordering of definitions

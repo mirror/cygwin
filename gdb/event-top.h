@@ -1,5 +1,5 @@
 /* Definitions used by GDB event-top.c.
-   Copyright 1999 Free Software Foundation, Inc.
+   Copyright 1999, 2001 Free Software Foundation, Inc.
    Written by Elena Zannoni <ezannoni@cygnus.com> of Cygnus Solutions.
 
    This file is part of GDB.
@@ -78,6 +78,7 @@ extern void set_async_prompt (char *args, int from_tty, struct cmd_list_element 
 
 /* Signal to catch ^Z typed while reading a command: SIGTSTP or SIGCONT.  */
 #ifndef STOP_SIGNAL
+#include <signal.h>
 #ifdef SIGTSTP
 #define STOP_SIGNAL SIGTSTP
 extern void handle_stop_sig (int sig);
@@ -86,10 +87,12 @@ extern void handle_stop_sig (int sig);
 extern void handle_sigint (int sig);
 extern void pop_prompt (void);
 extern void push_prompt (char *prefix, char *prompt, char *suffix);
-extern void gdb_readline2 (gdb_client_data client_data);
-extern void mark_async_signal_handler_wrapper (PTR token);
-extern void async_request_quit (gdb_client_data arg);
-extern void stdin_event_handler (int error, int fd, gdb_client_data client_data);
+extern void gdb_readline2 (void *client_data);
+extern void mark_async_signal_handler_wrapper (void *token);
+extern void async_request_quit (void *arg);
+extern void stdin_event_handler (int error, void *client_data);
+extern void async_disable_stdin (void);
+extern void async_enable_stdin (void *dummy);
 
 /* Exported variables from event-top.c.
    FIXME: these should really go into top.h. */
@@ -99,6 +102,6 @@ extern int exec_done_display_p;
 extern char *async_annotation_suffix;
 extern char *new_async_prompt;
 extern struct prompts the_prompts;
-extern void (*call_readline) (gdb_client_data);
+extern void (*call_readline) (void *);
 extern void (*input_handler) (char *);
 extern int input_fd;

@@ -1,3 +1,8 @@
+2004-12-09  Jim Blandy  <jimb@redhat.com>
+
+	* configure.in: Remove nonsense test.
+	* aclocal.m4, configure: Regenerated.
+
 2002-08-21  Kevin Buettner  <kevinb@redhat.com>
 
 	* Makefile.am, configure.in, server.cc, win32-target.cc: Change

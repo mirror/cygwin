@@ -87,18 +87,14 @@ AC_SUBST(WERROR_CFLAGS)
 
 # Add target dependent subdirectories here
 targ_subdirs=
-
-
 case "$target" in
-   *linux*) targ_subdirs="$targ_subdirs unix" ;;
+   *linux*)
+      targ_subdirs="$targ_subdirs unix"
+      AC_CONFIG_SUBDIRS(unix)
+   ;;
 esac
 
-
-
-
-
 dnl $targ_subdirs is expanded at configure run time
-AC_CONFIG_SUBDIRS($targ_subdirs)
 AC_SUBST(targ_subdirs)
 
 CY_WITH_NLS

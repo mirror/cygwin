@@ -426,14 +426,19 @@
 
 ; GCC's subreg.
 ; Called subword 'cus it's not exactly subreg.
-; Word numbering is from most signficant (word 0) to least (word N-1).
+; Word numbering is from most significant (word 0) to least (word N-1).
 ; ??? May also want an endian dependent word ordering.  That can be
 ; implemented on top of or beside this.
 ; ??? GCC plans to switch to SUBREG_BYTE.  Keep an eye out for the switch
 ; (which is extensive so probably won't happen anytime soon).
+;
+; The mode spec of operand0 use to be OP0, but subword is not a normal rtx.
+; The mode of operand0 is not necessarily the same as the mode of the result,
+; and code which analyzes it would otherwise use the result mode (specified by
+; `&mode') for the mode of operand0.
 
 (drn (subword &options &mode value word-num)
-     (OPTIONS NUMMODE RTX RTX) (NA NA OP0 INT)
+     (OPTIONS NUMMODE RTX RTX) (NA NA ANY INT)
      ARG
      #f
 )

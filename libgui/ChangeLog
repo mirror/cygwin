@@ -1,5 +1,13 @@
 2001-08-06  Mo DeJong  <mdejong@redhat.com>
 
+	* Makefile.in: Regen.
+	* configure: Regen.
+	* configure.in: Remove unused ITCL_DIR variable.
+	* library/Makefile.in: Regen.
+	* src/Makefile.in: Regen.
+
+2001-08-06  Mo DeJong  <mdejong@redhat.com>
+
 	* Makefile.in:
 	* library/Makefile.in:
 	* src/Makefile.in:

@@ -2440,7 +2440,6 @@ fi
 
 case ${host} in
 *cygwin*)
-	ITCL_DIR=itcl/itcl/win
         touch ac$$.c
         if ${CC} -c -mwin32 ac$$.c >/dev/null 2>&1; then
             case "$LIBGUI_CFLAGS" in
@@ -2450,11 +2449,11 @@ case ${host} in
         fi
         rm -f ac$$.o ac$$.c
 	;;
-*)		ITCL_DIR=itcl/itcl/unix ;;
+*)
+	;;
 esac
 
  
-
 
 
 
@@ -2681,7 +2680,6 @@ s%@ITCL_SH@%$ITCL_SH%g
 s%@ITCL_LIB_FILE@%$ITCL_LIB_FILE%g
 s%@ITCL_LIB_FULL_PATH@%$ITCL_LIB_FULL_PATH%g
 s%@LIBGUI_CFLAGS@%$LIBGUI_CFLAGS%g
-s%@ITCL_DIR@%$ITCL_DIR%g
 s%@TCL_SHARED_TRUE@%$TCL_SHARED_TRUE%g
 s%@TCL_SHARED_FALSE@%$TCL_SHARED_FALSE%g
 s%@RPATH_ENVVAR@%$RPATH_ENVVAR%g

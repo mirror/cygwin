@@ -1961,7 +1961,7 @@ setpgid (pid_t pid, pid_t pgid)
     }
   else
     {
-      pinfo p (pid, PID_MAP_RW);
+      pinfo p (pid);
       if (!p)
 	{
 	  set_errno (ESRCH);
@@ -2076,6 +2076,7 @@ seteuid32 (__uid32_t uid)
   user_groups &groups = cygheap->user.groups;
   HANDLE ptok, new_token = INVALID_HANDLE_VALUE;
   struct passwd * pw_new;
+  cygpsid origpsid, psid2 (NO_SID);
   BOOL token_is_internal, issamesid;
   
   pw_new = internal_getpwuid (uid);
@@ -2120,7 +2121,9 @@ seteuid32 (__uid32_t uid)
   if (cygheap->user.current_token != new_token)
     {
       char dacl_buf[MAX_DACL_LEN (5)];
-      if (sec_acl ((PACL) dacl_buf, true, false, usersid))
+      if (usersid != (origpsid = cygheap->user.orig_sid ()))
+	psid2 = usersid;
+      if (sec_acl ((PACL) dacl_buf, FALSE, origpsid, psid2))
 	{
 	  TOKEN_DEFAULT_DACL tdacl;
 	  tdacl.DefaultDacl = (PACL) dacl_buf;
@@ -2168,7 +2171,7 @@ seteuid32 (__uid32_t uid)
     }
 
   CloseHandle (ptok);
-  issamesid = (usersid == cygheap->user.sid ()); 
+  issamesid = (usersid == (psid2 = cygheap->user.sid ())); 
   cygheap->user.set_sid (usersid);
   cygheap->user.current_token = new_token == ptok ? INVALID_HANDLE_VALUE
                                                   : new_token;

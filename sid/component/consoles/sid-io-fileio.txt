@@ -1,0 +1,75 @@
+          sid-io-fileio (libconsoles.la :: console_component_library)
+
+Synopsis:
+
+   This component performs input/output on the standard input/output.
+
+     ----------------------------------------------------------------------
+
+Functionality:
+
+  Modelling:
+
+   This component acts as an interface between the host system's file system
+   and pins in the simulated system.
+
+   +-------------------------------------------------+
+   |                    Behaviors                    |
+   |-------------------------------------------------|
+   | output | When the write input pin is driven     |
+   |        | with a value between 0 and 255, the    |
+   |        | value is immediately written to the    |
+   |        | stream associated with this component. |
+   |        | Setting the filename attribute         |
+   |        | associates a file with the output      |
+   |        | stream. Setting this attribute with    |
+   |        | the value "-" associates the output    |
+   |        | stream with cout. By default, the      |
+   |        | output stream is associated with cout. |
+   +-------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |   functional | supported | -                    |
+   |--------------+-----------+----------------------|
+   | save/restore | supported | null state           |
+   |              |           | save/restore.        |
+   +-------------------------------------------------+
+
+     ----------------------------------------------------------------------
+
+Environment:
+
+   Related components
+
+   See sid-io-stdio for input and output from stdin/stdout.
+
+     ----------------------------------------------------------------------
+
+Component Reference:
+
+  Component: sid-io-fileio
+
+   +-------------------------------------------------+
+   |                      pins                       |
+   |-------------------------------------------------|
+   | name  | direction |   legalvalues   | behaviors |
+   |-------+-----------+-----------------+-----------|
+   | write | in        | any character   | output    |
+   |       |           | code            |           |
+   +-------------------------------------------------+
+
+   +----------------------------------------------------+
+   |                     attributes                     |
+   |----------------------------------------------------|
+   |     name     |category|legal |default| behaviors  ||
+   |              |        |values| value |            ||
+   |--------------+--------+------+-------+------------||
+   |              |        |valid |       |            ||
+   |filename      |-       |file  |-      |            ||
+   |              |        |name  |       |            ||
+   |--------------+--------+------+-------+------------||
+   |state-snapshot|-       |opaque|-      |state       ||
+   |              |        |string|       |save/restore||
+   +----------------------------------------------------+

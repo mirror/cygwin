@@ -1,3 +1,7 @@
+2001-01-12  Richard Earnshaw  <rearnsha@arm.com>
+
+	* target.exp (prune_warnings): Prune warnings from NetBSD linker.
+
 2000-11-29  Drew Moseley  <dmoseley@redhat.com>
 
 	* baseboards/xscale-cygmon.exp: New file for xscale board testing.

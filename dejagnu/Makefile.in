@@ -64,11 +64,11 @@ EXEEXT = @EXEEXT@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
-VERSION = 19991108@VERSION@
+VERSION = @VERSION@
 
 AUTOMAKE_OPTIONS = cygnus
 
-SUBDIRS = doc testsuite
+SUBDIRS = doc testsuite example
 
 # driver script goes in /usr/local/bin
 bin_SCRIPTS = runtest
@@ -286,7 +286,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = cygnus
 
-SUBDIRS = doc testsuite
+SUBDIRS = doc testsuite example
 
 # driver script goes in /usr/local/bin
 bin_SCRIPTS = runtest

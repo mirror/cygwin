@@ -1,3 +1,8 @@
+2005-02-02  Jim Blandy  <jimb@redhat.com>
+
+	* CGEN.sh.in: Request on the command line that cgen/guile.scm be
+	loaded before cgen-sid.scm; cgen-sid.scm no longer loads fixup.scm.
+
 2004-06-25  Dave Brolley  <brolley@redhat.com>
 
 	* tracedis.cxx (register_name): Add parameter for the cgen MACH. Save

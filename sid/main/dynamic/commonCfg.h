@@ -182,6 +182,7 @@ struct UlogCfg
 
 // you should really only make one of these, with an empty name,
 // unless you want some crazy multi-session support.
+class BoardCfg;
 class LoaderCfg;
 
 struct SessionCfg :
@@ -214,6 +215,12 @@ struct SessionCfg :
   bool use_stdio;
   void add_ulog_file (const string filename);
   map<const string, AtomicCfg *> ulog_map;
+  void add_gdb () { ++gdb_count; }
+  void add_board (ComponentCfg *b) { ++board_count; add_child (b); }
+  virtual void write_config (Writer &w);
+private:
+  sid::host_int_4 board_count;
+  sid::host_int_4 gdb_count;
 };
 
 class CpuCfg :
@@ -277,7 +284,6 @@ public:
   virtual ~GprofCfg ();
 };
 
-class BoardCfg;
 class GdbCfg :
   virtual public AggregateCfg
 {

@@ -1,3 +1,7 @@
+2003-12-17  Dave Brolley  <brolley@redhat.com>
+
+	* sidmiscutil.h (delete_saved_messages): Use 'clear' method.
+
 2003-10-07  Dave Brolley  <brolley@redhat.com>
 
 	* sidbusutil.h (passthrough_bus::target): Now 'protected'.

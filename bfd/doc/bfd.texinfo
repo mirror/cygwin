@@ -64,7 +64,7 @@ notice identical to this one except for the removal of this paragraph
 
 @tex
 \def\$#1${{#1}}  % Kluge: collect RCS revision info without $...$
-\xdef\manvers{\$Revision: 1.4 $}  % For use in headers, footers too
+\xdef\manvers{\$Revision: 1.5 $}  % For use in headers, footers too
 {\parskip=0pt
 \hfill Free Software Foundation\par
 \hfill sac\@www.gnu.org\par
@@ -298,6 +298,7 @@ structures.
 * aout ::	a.out backends
 * coff ::	coff backends
 * elf  ::	elf backends
+* mmo  ::	mmo backend
 @ignore
 * oasys ::	oasys backends
 * ieee ::	ieee backend
@@ -313,10 +314,13 @@ All of BFD lives in one directory.
 @node coff, elf, aout, BFD back ends
 @include  coffcode.texi
 
-@node elf,  , coff, BFD back ends
+@node elf, mmo, coff, BFD back ends
 @include  elf.texi
 @c Leave this out until the file has some actual contents...
 @c @include  elfcode.texi
+
+@node mmo,  , elf, BFD back ends
+@include  mmo.texi
 
 @node GNU Free Documentation License, Index, BFD back ends, Top
 @chapter GNU Free Documentation License

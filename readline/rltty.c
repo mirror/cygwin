@@ -37,9 +37,9 @@
 
 #include "rldefs.h"
 
-#if !defined (SHELL) && defined (GWINSZ_IN_SYS_IOCTL)
+#if defined (GWINSZ_IN_SYS_IOCTL)
 #  include <sys/ioctl.h>
-#endif /* !SHELL && GWINSZ_IN_SYS_IOCTL */
+#endif /* GWINSZ_IN_SYS_IOCTL */
 
 #include "rltty.h"
 #include "readline.h"
@@ -57,7 +57,9 @@ extern void _rl_control_keypad ();
 
 #if defined (__GO32__)
 #  include <pc.h>
-#  undef HANDLE_SIGNALS
+#  if !defined (__DJGPP__)
+#    undef HANDLE_SIGNALS
+#  endif /* !__DJGPP__ */
 #endif /* __GO32__ */
 
 /* Indirect functions to allow apps control over terminal management. */
@@ -144,7 +146,7 @@ static int terminal_prepped;
 static int ksrflow;
 #endif
 
-#if !defined (SHELL) && defined (TIOCGWINSZ)
+#if defined (TIOCGWINSZ)
 /* Dummy call to force a backgrounded readline to stop before it tries
    to get the tty settings. */
 static void
@@ -156,9 +158,7 @@ set_winsize (tty)
   if (ioctl (tty, TIOCGWINSZ, &w) == 0)
       (void) ioctl (tty, TIOCSWINSZ, &w);
 }
-#else /* SHELL || !TIOCGWINSZ */
-#  define set_winsize(tty)
-#endif /* SHELL || !TIOCGWINSZ */
+#endif /* TIOCGWINSZ */
 
 #if defined (NEW_TTY_DRIVER)
 
@@ -191,7 +191,9 @@ get_tty_settings (tty, tiop)
      int tty;
      TIOTYPE *tiop;
 {
+#if defined (TIOCGWINSZ)
   set_winsize (tty);
+#endif
 
   tiop->flags = tiop->lflag = 0;
 
@@ -260,7 +262,7 @@ prepare_terminal_settings (meta_flag, otio, tiop)
      int meta_flag;
      TIOTYPE otio, *tiop;
 {
-#if !defined (__GO32__)
+#if !defined (__GO32__) || defined (HAVE_TERMIOS_H)
   readline_echoing_p = (otio.sgttyb.sg_flags & ECHO);
 
   /* Copy the original settings to the structure we're going to use for
@@ -326,7 +328,7 @@ prepare_terminal_settings (meta_flag, otio, tiop)
   tiop->ltchars.t_dsuspc = -1;	/* C-y */
   tiop->ltchars.t_lnextc = -1;	/* C-v */
 #endif /* TIOCGLTC */
-#endif /* !__GO32__ */
+#endif /* !__GO32__ || HAVE_TERMIOS_H */
 }
 
 #else  /* !defined (NEW_TTY_DRIVER) */
@@ -389,7 +391,10 @@ get_tty_settings (tty, tiop)
      TIOTYPE *tiop;
 {
   int ioctl_ret;
+
+#if defined (TIOCGWINSZ)
   set_winsize (tty);
+#endif
 
   while (1)
     {
@@ -521,7 +526,7 @@ void
 rl_prep_terminal (meta_flag)
      int meta_flag;
 {
-#if !defined (__GO32__)
+#if !defined (__GO32__) || defined (HAVE_TERMIOS_H)
   int tty;
   TIOTYPE tio;
 
@@ -556,14 +561,14 @@ rl_prep_terminal (meta_flag)
   terminal_prepped = 1;
 
   release_sigint ();
-#endif /* !__GO32__ */
+#endif /* !__GO32__ || HAVE_TERMIOS_H */
 }
 
 /* Restore the terminal's normal settings and modes. */
 void
 rl_deprep_terminal ()
 {
-#if !defined (__GO32__)
+#if !defined (__GO32__) || defined (HAVE_TERMIOS_H)
   int tty;
 
   if (!terminal_prepped)
@@ -588,7 +593,7 @@ rl_deprep_terminal ()
   terminal_prepped = 0;
 
   release_sigint ();
-#endif /* !__GO32__ */
+#endif /* !__GO32__ || HAVE_TERMIOS_H */
 }
 
 /* **************************************************************** */

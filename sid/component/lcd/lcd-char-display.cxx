@@ -51,7 +51,7 @@ private:
   void new_frame( host_int_4 val );
   void init( host_int_4 );
 
-#ifdef HAVE_CURSES_H
+#if HAVE_CURSES_H && HAVE_CURSES_LIBRARY
   WINDOW *w;
 #endif
 
@@ -106,21 +106,21 @@ lcd_char_display :: lcd_char_display() :
 			 & lcd_char_display::save_state,
 			 & lcd_char_display::restore_state);
   
-#ifdef HAVE_CURSES_H
+#if HAVE_CURSES_H && HAVE_CURSES_LIBRARY
   initscr();
   w = 0;
 #endif
 }
 
 lcd_char_display :: ~lcd_char_display() throw () { 
-#ifdef HAVE_CURSES_H
+#if HAVE_CURSES_H && HAVE_CURSES_LIBRARY
   endwin(); 
 #endif
 }
 
 void 
 lcd_char_display :: init( host_int_4 ) {
-#ifdef HAVE_CURSES_H
+#if HAVE_CURSES_H && HAVE_CURSES_LIBRARY
   if( !w ) {
     w = newwin( height, width, 0, 0 );
     box( w, 0, 0 );
@@ -138,12 +138,12 @@ lcd_char_display::set_pixel (host_int_4 val)
   int row = i >> 16;
   int col = i & 0x0ffff;
 
-#ifndef HAVE_CURSES_H
-  cout << '[' << row << ',' << col << ']';
-#else
+#if HAVE_CURSES_H && HAVE_CURSES_LIBRARY
   if (!w)
     return;
   mvwaddch( w, row, col, '*' );
+#else
+  cout << '[' << row << ',' << col << ']';
 #endif // HAVE_CURSES_H
 
   trigger_mgr.check_and_dispatch();
@@ -152,7 +152,7 @@ lcd_char_display::set_pixel (host_int_4 val)
 void
 lcd_char_display::new_frame (host_int_4 val)
 {
-#ifdef HAVE_CURSES_H
+#if HAVE_CURSES_H && HAVE_CURSES_LIBRARY
   if (!w)
     return;
 

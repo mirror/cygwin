@@ -1,3 +1,9 @@
+2001-09-24  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in (lcd_libs): Set HAVE_CURSES_LIBRARY if found some
+	usable curses library.  
+	* config.in, configure: Regenerated.
+
 2001-07-25  Frank Ch. Eigler  <fche@redhat.com>
 
 	From Corinna Vinschen <vinschen@redhat.com>

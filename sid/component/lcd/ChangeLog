@@ -1,3 +1,7 @@
+2001-09-24  Frank Ch. Eigler  <fche@redhat.com>
+
+	* lcd-char-display.cxx: Be sensitive to ! HAVE_CURSES_LIBRARY.
+
 2001-08-03  matthew green  <mrg@redhat.com>
 
 	* HD44780U.cxx (ctor): Remove unnecessary parens GCC 3.0 is

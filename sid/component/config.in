@@ -78,6 +78,9 @@
 /* Version number of package */
 #undef VERSION
 
+/* Define if curses library is usable */
+#undef HAVE_CURSES_LIBRARY
+
 /* Define if ftime(3) is declared via sys/timeb.h */
 #undef HAVE_FTIME_DECL
 

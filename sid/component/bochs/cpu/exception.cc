@@ -72,11 +72,10 @@ BX_CPU_C::interrupt(Bit8u vector, Boolean is_INT, Boolean is_error_code,
 #if BX_CPU_LEVEL >= 2
 //  unsigned prev_errno;
 
-#if BX_DEBUGGER
   if (bx_dbg.interrupts)
     BX_INFO(("interrupt(): vector = %u, INT = %u, EXT = %u\n",
       (unsigned) vector, (unsigned) is_INT, (unsigned) BX_CPU_THIS_PTR EXT));
-#endif
+
 BX_CPU_THIS_PTR save_cs  = BX_CPU_THIS_PTR sregs[BX_SEG_REG_CS];
 BX_CPU_THIS_PTR save_ss  = BX_CPU_THIS_PTR sregs[BX_SEG_REG_SS];
 BX_CPU_THIS_PTR save_eip = EIP;
@@ -100,7 +99,6 @@ BX_CPU_THIS_PTR save_esp = ESP;
     // interrupt vector must be within IDT table limits,
     // else #GP(vector number*8 + 2 + EXT)
     if ( (vector*8 + 7) > BX_CPU_THIS_PTR idtr.limit) {
-#if BX_DEBUGGER
       if (bx_dbg.interrupts) {
         BX_INFO(("IDT.limit = %04x\n", (unsigned) BX_CPU_THIS_PTR idtr.limit));
         BX_INFO(("IDT.base  = %06x\n", (unsigned) BX_CPU_THIS_PTR idtr.base));
@@ -108,7 +106,7 @@ BX_CPU_THIS_PTR save_esp = ESP;
         BX_INFO(("bailing\n"));
         }
       BX_INFO(("interrupt(): vector > idtr.limit\n"));
-#endif
+
       exception(BX_GP_EXCEPTION, vector*8 + 2, 0);
       }
 
@@ -272,10 +270,10 @@ BX_CPU_THIS_PTR save_esp = ESP;
           bx_descriptor_t ss_descriptor;
           bx_selector_t   ss_selector;
           int bytes;
-#if BX_DEBUGGER
+
           if (bx_dbg.interrupts)
             BX_INFO(("interrupt(): INTERRUPT TO INNER PRIVILEGE\n"));
-#endif
+
           // check selector and descriptor for new stack in current TSS
           get_SS_ESP_from_TSS(cs_descriptor.dpl,
                               &SS_for_cpl_x, &ESP_for_cpl_x);
@@ -454,10 +452,10 @@ BX_CPU_THIS_PTR save_esp = ESP;
             temp_ESP = ESP;
           else
             temp_ESP = SP;
-#if BX_DEBUGGER
+
           if (bx_dbg.interrupts)
             BX_INFO(("int_trap_gate286(): INTERRUPT TO SAME PRIVILEGE\n"));
-#endif
+
           // Current stack limits must allow pushing 6|8 bytes, else #SS(0)
           if (gate_descriptor.type >= 14) { // 386 gate
             if ( is_error_code )
@@ -581,10 +579,10 @@ BX_CPU_C::exception(unsigned vector, Bit16u error_code, Boolean is_INT)
   invalidate_prefetch_q();
 
   UNUSED(is_INT);
-#if BX_DEBUGGER
+
   if (bx_dbg.exceptions)
     BX_INFO(("exception(%02x h)\n", (unsigned) vector));
-#endif
+
   // if not initial error, restore previous register values from
   // previous attempt to handle exception
   if (BX_CPU_THIS_PTR errorno) {

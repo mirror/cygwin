@@ -130,14 +130,14 @@ AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I ../../config
 
 pkglib_LTLIBRARIES = libx86.la
-@SIDTARGET_X86_TRUE@SUBDIRLIST = @SIDTARGET_X86_TRUE@vga gui fpu cpu memory .
+@SIDTARGET_X86_TRUE@SUBDIRLIST = @SIDTARGET_X86_TRUE@vga gui keyboard fpu cpu memory .
 @SIDTARGET_X86_FALSE@SUBDIRLIST = 
-@SIDTARGET_X86_TRUE@SUBLIBLIST = @SIDTARGET_X86_TRUE@vga/libvga.la gui/libgui.la fpu/libfpu.la cpu/libcpu.la memory/libmemory.la 
+@SIDTARGET_X86_TRUE@SUBLIBLIST = @SIDTARGET_X86_TRUE@vga/libvga.la gui/libgui.la keyboard/libkeyboard.la fpu/libfpu.la cpu/libcpu.la memory/libmemory.la 
 @SIDTARGET_X86_FALSE@SUBLIBLIST = 
 
 SUBDIRS = $(SUBDIRLIST)
 
-INCLUDES = -I$(top_builddir)/.. -I$(top_builddir)/../../include -I$(srcdir)/../../include -I$(srcdir)/vga -I$(srcdir)/gui -I$(srcdir)/cpu -I$(srcdir)/memory -I$(srcdir)/../memory
+INCLUDES = -I$(top_builddir)/.. -I$(top_builddir)/../../include -I$(srcdir)/../../include -I$(srcdir)/vga -I$(srcdir)/gui -I$(srcdir)/keyboard -I$(srcdir)/cpu -I$(srcdir)/memory -I$(srcdir)/../memory
 
 libx86_la_SOURCES = components.cxx
 libx86_la_LDFLAGS = -module -no-undefined
@@ -174,7 +174,7 @@ install-sh ltconfig ltmain.sh missing mkinstalldirs
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 GZIP_ENV = --best
-DIST_SUBDIRS =  vga gui fpu cpu memory .
+DIST_SUBDIRS =  vga gui keyboard fpu cpu memory .
 DEP_FILES =  .deps/components.P
 SOURCES = $(libx86_la_SOURCES)
 OBJECTS = $(libx86_la_OBJECTS)

@@ -18,6 +18,7 @@
 #if HAVE_X11_XOS_H
 #include "x-gui.h"
 #endif
+#include "sid-keyboard-wrapper.h"
 
 using std::vector;
 using std::string;
@@ -37,13 +38,13 @@ compX86ListTypes()
 {
   vector<string> types;
 
-
 #if SIDTARGET_X86
   types.push_back("hw-cpu-x86");
   types.push_back("hw-video-vga");
 #if HAVE_X11_XOS_H
   types.push_back("sid-io-vga-x");
 #endif
+  types.push_back("hw-input-keyboard");
 #endif
 
   return types;
@@ -55,20 +56,23 @@ component*
 compX86Create(const string& typeName)
 {
 #if SIDTARGET_X86
-    try {
-        
-        if (typeName == "hw-cpu-x86")
-            return new x86_cpu();
-        else if (typeName == "hw-video-vga")
-            return new vga();
+  try
+    {
+      
+      if(typeName == "hw-cpu-x86")
+        return new x86_cpu();
+      else if(typeName == "hw-video-vga")
+        return new vga();
 #if HAVE_X11_XOS_H
-        else if (typeName == "sid-io-vga-x")
-            return new x_gui();
+      else if(typeName == "sid-io-vga-x")
+        return new x_gui();
 #endif
+      else if(typeName == "hw-input-keyboard")
+        return new keyboard();
     }
-    catch (...) { }
+  catch (...) { }
 #endif
-    return 0;
+  return 0;
 }
 
 
@@ -78,25 +82,31 @@ compX86Delete(component* c)
 {
 #if SIDTARGET_X86
   x86_cpu *d1 = dynamic_cast<x86_cpu *>(c);
-  if (d1)
+  if(d1)
     {
       delete d1;
       return;
     }
   vga *d2 = dynamic_cast<vga *>(c);
-  if (d2)
+  if(d2)
     {
       delete d2;
       return;
     }
 #if HAVE_X11_XOS_H
   x_gui *d3 = dynamic_cast<x_gui *>(c);
-  if (d3)
+  if(d3)
     {
       delete d3;
       return;
     }
 #endif
+  keyboard *d4 = dynamic_cast<keyboard *>(c);
+  if(d4)
+    {
+      delete d4;
+      return;
+    }
 #endif
 }
 

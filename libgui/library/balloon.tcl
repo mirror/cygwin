@@ -1,5 +1,5 @@
 # balloon.tcl - Balloon help.
-# Copyright (C) 1997, 1998 Cygnus Solutions.
+# Copyright (C) 1997, 1998, 2000 Cygnus Solutions.
 # Written by Tom Tromey <tromey@cygnus.com>.
 
 # KNOWN BUGS:
@@ -523,6 +523,9 @@ proc BALLOON_command_variable {window args} {
 #    balloon help is on.  If NAME is specified but empty,
 #    no variable is set.  If NAME not specified, then the
 #    current variable name is returned.
+#  balloon withdraw WINDOW
+#    Withdraw the balloon window associated with WINDOW.  This should
+#    be used sparingly.
 proc balloon {key args} {
   if {[info commands BALLOON_command_$key] == "" } then {
     error "unrecognized key \"$key\""

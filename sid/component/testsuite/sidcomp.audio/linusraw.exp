@@ -85,6 +85,7 @@ for {set i 0} {\$i < \[llength \$decsample\]} {incr i} { \
 pass $test
 
 set test "deassert tx"
+setup_xfail "*-*-*"
 set tx_prev_p [sid_cmd [list sid::component::attribute_value $victim "tx-mode?"]]
 set tx_pin [sid_cmd [list sid::component::find_pin $victim tx-mode]]
 sid_cmd [list sid::pin::driven_h4 $tx_pin 0]

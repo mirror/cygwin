@@ -118,7 +118,8 @@
 			   unsigned? lsb0?)
   ; ??? lsb0?
   (let ((word-end (+ word-start word-length))
-	(end (+ start length)))
+	(end (+ start length))
+	(base (if (< start word-start) word-start start)))
     (string-append "("
 		   "EXTRACT_"
 		   (if (current-arch-insn-lsb0?) "LSB0" "MSB0")
@@ -137,8 +138,8 @@
 				       (- start word-start)))
 		   ", "
 		   (number->string (if (< end word-end)
-				       (- word-end end)
-				       word-length))
+				       (- end base)
+				       (- word-end base)))
 		   ") << "
 		   (number->string (if (> end word-end)
 				       (- end word-end)

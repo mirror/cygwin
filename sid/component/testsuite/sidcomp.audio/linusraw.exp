@@ -1,6 +1,6 @@
 set test "sid configuration"
 sid_config_component_test "linusraw.conf" \
-    "load [sid_find_file libaudio.la] audio_component_library" \
+    "load libaudio.la audio_component_library" \
     "sid-io-audio"
 pass $test
 
@@ -84,8 +84,18 @@ for {set i 0} {\$i < \[llength \$decsample\]} {incr i} { \
 }
 pass $test
 
+set test "poll until tx buf drained"
+set poll_pin [sid_cmd [list sid::component::find_pin $victim "poll"]]
+set iters 0
+while {$iters < 100} {
+    sid_cmd [list sid::pin::driven_h4 $poll_pin 0]
+    set tx_pending [sid_cmd [list sid::component::attribute_value $victim "tx-pending"]]
+    if {$tx_pending == 0} then { break }
+    incr iters
+}
+if {$iters < 100 && $poll_pin != ""} then { pass $test } else { fail $test }
+
 set test "deassert tx"
-setup_xfail "*-*-*"
 set tx_prev_p [sid_cmd [list sid::component::attribute_value $victim "tx-mode?"]]
 set tx_pin [sid_cmd [list sid::component::find_pin $victim tx-mode]]
 sid_cmd [list sid::pin::driven_h4 $tx_pin 0]

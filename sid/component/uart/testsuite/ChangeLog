@@ -2,6 +2,10 @@
 
 	* Devices.h (~DeviceDriver): Add throw() specifier.
 
+2001-03-23  John Healy  <jhealy@redhat.com>
+
+	* Makefile.in: Regenerated.
+
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.in: Regenerated.

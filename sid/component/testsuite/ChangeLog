@@ -1,5 +1,9 @@
 2001-06-18  Ben Elliston  <bje@redhat.com>
 
+	* lib/monkey.exp (monkey_test): Only notify the user of the test
+	completion time if the test is going to take more than 60 seconds
+	to run.
+
 	* sidcomp.cfgroot/badconf.exp: Improve messages.
 	(sid_check_err): Make detailed fault analysis a verbose message.
 

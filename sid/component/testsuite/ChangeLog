@@ -1,3 +1,8 @@
+2002-11-26  Ben Elliston  <bje@redhat.com>
+ 
+	* lib/cpudefs.exp (run-sid-tests-raw): Process all configline
+	directives (not just the last), appending to conf-line.
+
 2002-05-17  Ben Elliston  <bje@redhat.com>
 
 	* sidcomp.cache/refill.exp: New test.

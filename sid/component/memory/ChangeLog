@@ -7,6 +7,42 @@
 
 	* Makefile.am (check-local): Rename target from "checkme".
 
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* *.xml: Add <?xml ... ?> prefix.
+
+2001-07-04  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add maintainer-mode doc building configury.
+	* configure: Regenerate.
+	* Makefile.am: Add maintainer-mode doc building.
+	* Makefile.in: Regenerate.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* hw-memory-ram_rom-basic.txt: Generate.
+	* hw-memory-flash.txt: Likewise.
+	* hw-memory-flash-am29.txt: Remove.
+	* hw-memory-flash-at29.txt: Remove.
+	* Makefile.am (pkgdata_DATA): Incorporate aforementioned changes.
+	* Makefile.in: Regenerate.
+
+2001-07-02  Ben Elliston  <bje@redhat.com>
+
+	* hw-memory-flash.xml: Document memory latency modelling.
+
+2001-06-29  Ben Elliston  <bje@redhat.com>
+
+	* generic.cxx (stream_state): Include read-latency, write-latency.
+	(destream_state): Ditto.
+
+	* hw-memory-ram_rom-basic.xml: Merge in changes since 2001-06-01.
+
+2001-06-27  graydon hoare  <graydon@redhat.com>
+
+	* hw-memory-flash.xml: Add.
+	* hw-memory-ram_rom-basic.xml: Add.
+
 2001-06-22  Ben Elliston  <bje@redhat.com>
 
 	* am29.cxx (am29_bus::write): Never return bus::delayed.
@@ -29,6 +65,10 @@
 
 	* generic.cxx (image{load,store,mmap}_handler): Locate image-file
 	using find_sid_data_file.
+
+2001-03-23  John Healy  <jhealy@redhat.com>
+
+	* Makefile.in: Regenerated.
 
 2001-03-16  Frank Ch. Eigler  <fche@redhat.com>
 

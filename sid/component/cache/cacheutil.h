@@ -27,7 +27,7 @@ class cache_line
 public:
   cache_line (unsigned line_size);
   cache_line (unsigned line_size, cache_tag tag);
-  cache_line (unsigned line_size, cache_tag tag, vector <byte> intial_data);
+  cache_line (unsigned line_size, cache_tag tag, std::vector <byte> intial_data);
   cache_line (const cache_line&);
   cache_line& operator= (const cache_line&);
   ~cache_line ();
@@ -151,9 +151,9 @@ public:
 
 private:
   cache_replacement_algorithm& replacer;
-  vector <cache_line*> lines;
-  typedef vector <cache_line*>::iterator iterator_t;
-  typedef vector <cache_line*>::const_iterator const_iterator_t;
+  std::vector <cache_line*> lines;
+  typedef std::vector <cache_line*>::iterator iterator_t;
+  typedef std::vector <cache_line*>::const_iterator const_iterator_t;
 };
 
 
@@ -217,9 +217,9 @@ private:
   // The number of non-tag bits in an address.
   unsigned num_non_tag_bits;
 
-  vector <cache_set*> sets;
-  typedef vector <cache_set*>::iterator iterator_t;
-  typedef vector <cache_set*>::const_iterator const_iterator_t;
+  std::vector <cache_set*> sets;
+  typedef std::vector <cache_set*>::iterator iterator_t;
+  typedef std::vector <cache_set*>::const_iterator const_iterator_t;
 };
 
 #endif // CACHEUTIL_H

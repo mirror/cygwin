@@ -47,7 +47,7 @@ ide_main (int argc, char *argv[], Tcl_AppInitProc *appInitProc)
 
   args = Tcl_Merge (argc - 1, argv + 1);
   Tcl_SetVar (interp, "argv", args, TCL_GLOBAL_ONLY);
-  Tcl_Free (args);
+  ckfree (args);
 
   sprintf (buf, "%d", argc-1);
   Tcl_SetVar (interp, "argc", buf, TCL_GLOBAL_ONLY);

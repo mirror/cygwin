@@ -237,7 +237,7 @@ get_directory_command (ClientData cd, Tcl_Interp *interp, int argc,
      re-eval.  This is a lot less efficient, but it doesn't really
      matter.  */
 
-  new_args = (char **) Tcl_Alloc ((argc + 2) * sizeof (char *));
+  new_args = (char **) ckalloc ((argc + 2) * sizeof (char *));
 
   new_args[0] = "tk_getOpenFile";
   new_args[1] = "-choosedir";
@@ -249,8 +249,8 @@ get_directory_command (ClientData cd, Tcl_Interp *interp, int argc,
   merge = Tcl_Merge (argc + 2, new_args);
   result = Tcl_GlobalEval (interp, merge);
 
-  Tcl_Free (merge);
-  Tcl_Free ((char *) new_args);
+  ckfree (merge);
+  ckfree ((char *) new_args);
 
   return result;
 }

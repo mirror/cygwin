@@ -52,7 +52,7 @@ PrintCanvasCmd(clientData, interp, argc, argv)
     int tiles_wide,tiles_high;
     int tile_y, tile_x;
     int screenX1, screenX2, screenY1, screenY2, width, height;
-    DOCINFO *lpdi = malloc(sizeof(DOCINFO));
+    DOCINFO *lpdi = (DOCINFO *) ckalloc(sizeof(DOCINFO));
 
     if (argc < 2) {
 	Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -74,7 +74,7 @@ PrintCanvasCmd(clientData, interp, argc, argv)
 
     memset(lpdi,0,sizeof(DOCINFO));
     lpdi->cbSize=sizeof(DOCINFO);
-    lpdi->lpszDocName=malloc(255);
+    lpdi->lpszDocName= (LPCSTR) ckalloc(255);
     sprintf((char*)lpdi->lpszDocName,"SN - Printing\0");
     lpdi->lpszOutput=NULL;
 
@@ -164,12 +164,12 @@ PrintCanvasCmd(clientData, interp, argc, argv)
     EndDoc(pd.hDC);
 
 done:
-    free ((char*) lpdi->lpszDocName);
-    free (lpdi);
+    ckfree ((char*) lpdi->lpszDocName);
+    ckfree ((char*) lpdi);
     return TCL_OK;
 error:
-    free ((char*) lpdi->lpszDocName);
-    free (lpdi);
+    ckfree ((char*) lpdi->lpszDocName);
+    ckfree ((char*) lpdi);
     return TCL_ERROR;
 }
 

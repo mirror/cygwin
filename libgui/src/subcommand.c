@@ -26,7 +26,7 @@ subcommand_deleted (ClientData cd)
 
   if (data->delete)
     (*data->delete) (data->subdata);
-  Tcl_Free ((char *) data);
+  ckfree ((char *) data);
 }
 
 /* This function implements any Tcl command registered as having
@@ -113,7 +113,7 @@ ide_create_command_with_subcommands (Tcl_Interp *interp, char *name,
 	}
     }
 
-  data = (struct subcommand_clientdata *) Tcl_Alloc (sizeof *data);
+  data = (struct subcommand_clientdata *) ckalloc (sizeof *data);
   data->commands = table;
   data->subdata = subdata;
   data->delete = delete;

@@ -109,12 +109,12 @@ help_command_deleted (ClientData cd)
   Tcl_DeleteExitHandler (help_command_atexit, cd);
 
   if (hdata->filename != NULL)
-    free (hdata->filename);
+    ckfree (hdata->filename);
   if (hdata->header_filename != NULL)
-    free (hdata->header_filename);
+    ckfree (hdata->header_filename);
   if (hdata->hash_initialized)
     Tcl_DeleteHashTable (&hdata->topic_hash);
-  Tcl_Free ((char *) hdata);
+  ckfree ((char *) hdata);
 }
 
 /* Initialize the help system: choose a window, and set up the topic
@@ -223,9 +223,9 @@ help_initialize_command (ClientData cd, Tcl_Interp *interp, int argc,
 {
   struct help_command_data *hdata = (struct help_command_data *) cd;
 
-  hdata->filename = malloc (strlen (argv[2]) + 1);
+  hdata->filename = ckalloc (strlen (argv[2]) + 1);
   strcpy (hdata->filename, argv[2]);
-  hdata->header_filename = malloc (strlen (argv[3]) + 1);
+  hdata->header_filename = ckalloc (strlen (argv[3]) + 1);
   strcpy (hdata->header_filename, argv[3]);
   return TCL_OK;
 }
@@ -348,7 +348,7 @@ hdata_initialize ()
 {
   struct help_command_data *hdata;
 
-  hdata = (struct help_command_data *) Tcl_Alloc (sizeof *hdata);
+  hdata = (struct help_command_data *) ckalloc (sizeof *hdata);
 
   hdata->filename = NULL;
   hdata->header_filename = NULL;
@@ -389,16 +389,16 @@ help_command_deleted (ClientData cd)
   struct help_command_data *hdata = (struct help_command_data *) cd;
 
   if (hdata->filename != NULL)
-    free (hdata->filename);
+    ckfree (hdata->filename);
   if (hdata->header_filename != NULL)
-    free (hdata->header_filename);
+    ckfree (hdata->header_filename);
   if (hdata->help_dir != NULL)
-    free (hdata->help_dir);
+    ckfree (hdata->help_dir);
   if (hdata->hash_initialized)
     Tcl_DeleteHashTable (&hdata->topic_hash);
   if (hdata->memory_block != NULL)
-    free (hdata->memory_block);
-  Tcl_Free ((char *) hdata);
+    ckfree (hdata->memory_block);
+  ckfree ((char *) hdata);
 }
 
 /* Implement the ide_help initialize command.  */
@@ -409,11 +409,11 @@ help_initialize_command (ClientData cd, Tcl_Interp *interp, int argc,
 {
   struct help_command_data *hdata = (struct help_command_data *) cd;
 
-  hdata->filename = malloc (strlen (argv[2]) + 1);
+  hdata->filename = ckalloc (strlen (argv[2]) + 1);
   strcpy (hdata->filename, argv[2]);
-  hdata->header_filename = malloc (strlen (argv[3]) + 1);
+  hdata->header_filename = ckalloc (strlen (argv[3]) + 1);
   strcpy (hdata->header_filename, argv[3]);
-  hdata->help_dir = malloc (strlen (argv[4]) + 1);
+  hdata->help_dir = ckalloc (strlen (argv[4]) + 1);
   strcpy (hdata->help_dir, argv[4]);
   return TCL_OK;
 }
@@ -434,7 +434,7 @@ help_initialize (Tcl_Interp *interp, struct help_command_data *hdata)
       FILE *e;
       char buf[200], *block_start;
 
-      block_start = hdata->memory_block = malloc(6000);
+      block_start = hdata->memory_block = ckalloc(6000);
 
       e = fopen (hdata->header_filename, "r");
       if (e == NULL)
@@ -567,7 +567,7 @@ hdata_initialize ()
 {
   struct help_command_data *hdata;
 
-  hdata = (struct help_command_data *) Tcl_Alloc (sizeof *hdata);
+  hdata = (struct help_command_data *) ckalloc (sizeof *hdata);
 
   hdata->filename = NULL;
   hdata->help_dir = NULL;

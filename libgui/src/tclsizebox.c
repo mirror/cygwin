@@ -112,7 +112,7 @@ sizebox_event_proc (ClientData cd, XEvent *event_ptr)
       su = (struct sizebox_userdata *) GetWindowLong (hwnd, GWL_USERDATA);
       SetWindowLong (hwnd, GWL_USERDATA, 0);
       SetWindowLong (hwnd, GWL_WNDPROC, (LONG) su->wndproc);
-      Tcl_Free ((char *) su);
+      ckfree ((char *) su);
       DestroyWindow (hwnd);
     }
 }
@@ -149,7 +149,7 @@ sizebox_create (Tk_Window tkwin, Window parent, ClientData cd)
 		       pt.x, pt.y, Tk_Width (tkwin), Tk_Height (tkwin),
 		       parhwnd, NULL, Tk_GetHINSTANCE (), NULL);
 
-  su = (struct sizebox_userdata *) Tcl_Alloc (sizeof *su);
+  su = (struct sizebox_userdata *) ckalloc (sizeof *su);
   su->tkwin = tkwin;
   su->wndproc = (WNDPROC) GetWindowLong (hwnd, GWL_WNDPROC);
   SetWindowLong (hwnd, GWL_USERDATA, (LONG) su);

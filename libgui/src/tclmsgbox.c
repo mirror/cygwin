@@ -155,7 +155,7 @@ msgbox_wndproc (HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
     return DefWindowProc (hwnd, message, wparam, lparam);
 
   /* Queue up a Tcl event.  */
-  me = (struct msgbox_event *) Tcl_Alloc (sizeof *me);
+  me = (struct msgbox_event *) ckalloc (sizeof *me);
   me->header.proc = msgbox_eventproc;
   me->md = (struct msgbox_data *) lparam;
   Tcl_QueueEvent ((Tcl_Event *) me, TCL_QUEUE_TAIL);
@@ -202,10 +202,10 @@ msgbox_eventproc (Tcl_Event *event, int flags)
 
   /* We are now done with the msgbox_data structure, so we can free
      the fields and the structure itself.  */
-  Tcl_Free (me->md->code);
-  Tcl_Free (me->md->message);
-  Tcl_Free (me->md->title);
-  Tcl_Free ((char *) me->md);
+  ckfree (me->md->code);
+  ckfree (me->md->message);
+  ckfree (me->md->title);
+  ckfree ((char *) me->md);
 
   if (ret != TCL_OK)
     Tcl_BackgroundError (me->md->interp);
@@ -401,15 +401,15 @@ msgbox_internal (ClientData clientData, Tcl_Interp *interp, int argc,
 
       msgbox_init ();
 
-      md = (struct msgbox_data *) Tcl_Alloc (sizeof *md);
+      md = (struct msgbox_data *) ckalloc (sizeof *md);
       md->interp = interp;
-      md->code = Tcl_Alloc (strlen (code) + 1);
+      md->code = ckalloc (strlen (code) + 1);
       strcpy (md->code, code);
       md->hidden_hwnd = hidden_hwnd;
       md->hwnd = hWnd;
-      md->message = Tcl_Alloc (strlen (message) + 1);
+      md->message = ckalloc (strlen (message) + 1);
       strcpy (md->message, message);
-      md->title = Tcl_Alloc (strlen (title) + 1);
+      md->title = ckalloc (strlen (title) + 1);
       strcpy (md->title, title);
       md->flags = flags | modal;
 

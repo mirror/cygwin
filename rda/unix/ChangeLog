@@ -1,5 +1,10 @@
 2004-10-29  Jim Blandy  <jimb@redhat.com>
 
+	* linux-target.c (linux_set_reg): Delete unused variables.
+	* ptrace-target.c (ptrace_read_user, ptrace_check_child_state):
+	Same.
+	* thread-db.c (continue_all_threads, thread_db_attach): Same.
+
 	* linux-target.c (x86_make_arch): Use allocate_empty_arch.
 
 	* linux-target.c: #include <string.h>, <sys/types.h>, and

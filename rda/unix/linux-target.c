@@ -1987,7 +1987,6 @@ linux_set_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
   elf_fpregset_t fpregs;
   void *fpxregs = NULL;
   char *buf;
-  char tmp_buf[MAX_REG_SIZE];
 
   if (regno < 0 || regno >= NUM_REGS)
     {

@@ -1,3 +1,14 @@
+2003-01-22  Kevin Buettner  <kevinb@redhat.com>
+
+	* linux-target.c (struct peekuser_pokeuser_reginfo)
+	[MIPS64_LINUX_TARGET, MIPS_LINUX_TARGET]: Disable registers ``cause''
+	and ``bad'' since they are not writable via ptrace().
+
+2003-01-19  Alexandre Oliva  <aoliva@redhat.com>
+
+	* linux-target.c: Don't assume asm-mips/ is available, use just
+	asm instead.
+
 2003-01-17  Kevin Buettner  <kevinb@redhat.com>
 
 	* configure.in (mips64*linux*n64, mips64*linux*n32, mips64*linux*o32):

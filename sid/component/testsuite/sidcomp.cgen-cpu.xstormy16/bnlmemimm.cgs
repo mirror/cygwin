@@ -1,0 +1,16 @@
+# xstormy16 testcase for bn $lmem8,#$imm3b,$rel12 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global bnlmemimm
+bnlmemimm:
+	mov 0x80, #0xfffb
+	bn 0x80, #2, okay
+
+wrong:
+	fail
+okay:
+	pass

@@ -1,0 +1,28 @@
+# xstormy16 testcase for icallf $abs24 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	mov sp, #0x4000
+
+	.global icallfimm
+icallfimm:
+	mov r1, #5
+	mov r2, #4
+	set1 r14, #7
+	icallf func
+	bnz r1, #9, wrong
+	bn r14, #7, wrong
+	br okay
+
+func:
+	add r1, r2
+	clr1 r14, #7
+	iret
+
+wrong:
+	fail
+okay:
+	pass

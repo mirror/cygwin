@@ -16,12 +16,14 @@ require 5.004;
 		 "thumb" => "hw-cpu-arm7t",
 		 "x86" => "hw-cpu-x86",
 	         # INSERT NEW ENTRIES HERE
-		 "m32r" => "hw-cpu-m32r/d"
+		 "m32r" => "hw-cpu-m32r/d",
+		 "xstormy16" => "hw-cpu-xstormy16",
 		 );
 
 %cpu_defaultendian = (
 		      "x86" => "-EL",
-		      "m32r" => "-EB"
+		      "m32r" => "-EB",
+		      "xstormy16" => "-EL",
 		      );
 
 %gloss_comptype = (
@@ -29,7 +31,8 @@ require 5.004;
 		   "thumb" => "sw-gloss-arm/angel",
 		   "x86" => "sw-gloss-generic/libgloss",
 	           # INSERT NEW ENTRIES HERE
-		   "m32r" => "sw-gloss-m32r/libgloss"
+		   "m32r" => "sw-gloss-m32r/libgloss",
+		   "xstormy16" => "sw-gloss-generic/libgloss",
 		   );
 
 %gloss_memspecs = (
@@ -37,7 +40,8 @@ require 5.004;
 		   "thumb" => "0x00000000,0x00800000",
 		   "x86" => "0x00000,0x500000",
 	           # INSERT NEW ENTRIES HERE
-		   "m32r" => "0x00000000,0x00800000"
+		   "m32r" => "0x00000000,0x00800000",
+		   "xstormy16" => "0x00000000,0x00800000",
 		  );
 
 
@@ -880,6 +884,10 @@ if ($opt_cpu eq "arm")
     $enable_z_packet = "true";
   }
 
+if ($opt_cpu eq "xstormy16")
+  {
+    $enable_z_packet = "true";
+  }
 
 
 # --engine

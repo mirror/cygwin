@@ -1,0 +1,23 @@
+# xstormy16 testcase for or Rx,#$imm8 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global orimm8
+orimm8:
+	mov r1, #0xc
+	or Rx, #1
+	assert r1, 0xd
+
+	mov r1, #0xd
+	or Rx, #1
+	assert r1, 0xd
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

@@ -1,0 +1,23 @@
+# xstormy16 testcase for sbc Rx,#$imm8 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global sbcgrimm8
+sbcgrimm8:
+	mov r1, #55
+	set1 r14, #2
+	sbc r1, #30
+	bz  r1, #24, okay
+
+	mov r2, #0xfffe
+	add r2, #55
+	sbc Rx, #3
+	bz r2, #51, okay
+
+wrong:
+	fail
+okay:
+	pass

@@ -1,0 +1,26 @@
+# xstormy16 testcase for set1 $lmem8,#$imm3 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.data
+junk:
+	.byte
+
+	.text
+
+	.global set1lmemimm
+set1lmemimm:
+	mov.b junk, #0x7f
+	set1 junk, #0x7
+	mov r0, junk
+	assert r0, 0xff
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

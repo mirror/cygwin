@@ -1,0 +1,19 @@
+# xstormy16 testcase for asr $Rd,$Rs -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global asrgrgr
+asrgrgr:
+	mov r1, #0xdead
+	mov r2, #8
+	mov r3, #0xffde
+	asr r1, r2
+	bz r1, r3, okay
+
+wrong:
+	fail
+okay:
+	pass

@@ -1,0 +1,25 @@
+# xstormy16 testcase for callf $abs24 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	mov sp, #0x4000
+
+	.global callfimm
+callfimm:
+	mov r1, #5
+	mov r2, #4
+	callf func
+	bnz r1, #9, wrong
+	br okay
+
+func:
+	add r1, r2
+	ret
+
+wrong:
+	fail
+okay:
+	pass

@@ -1,0 +1,20 @@
+# xstormy16 testcase for mask $Rd,#$imm16 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global maskgrimm16
+maskgrimm16:
+	mov r1, #0x0506
+	mov r3, #0x1234
+	mask r1, #0xf0f0
+	assert r1, 0x1536
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

@@ -1,0 +1,24 @@
+# xstormy16 testcase for sub $Rd,$Rs -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global subgrgr
+subgrgr:
+	mov r1, #3
+	mov r2, #5
+	sub r2, r1
+	bnz r2, #2, wrong
+
+	mov r1, #3
+	mov r2, r1
+	sub r2, r1
+	bz okay
+	br wrong
+
+wrong:
+	fail
+okay:
+	pass

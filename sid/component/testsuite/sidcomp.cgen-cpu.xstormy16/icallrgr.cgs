@@ -1,0 +1,30 @@
+# xstormy16 testcase for icallr $Rd -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	mov sp, #0x4000
+
+	.global icallrgr
+icallrgr:
+	mov r0, #0x8
+	mov r2, #4
+	mov r3, #5
+	set1 r14, #7
+	icallr r0
+	bnz r1, #9, wrong
+	bn r14, #7, wrong
+	br okay
+
+func:
+	mov r1, r2
+	add r1, r3
+	clr1 r14, #7
+	iret
+
+wrong:
+	fail
+okay:
+	pass

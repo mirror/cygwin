@@ -1,0 +1,43 @@
+2001-12-17  matthew green  <mrg@redhat.com>
+
+	* callgr.cgs: Fix test.
+	* icallgr.cgs: Likewise.
+	* jmp.cgs: Likewise.
+
+2001-08-19  matthew green  <mrg@redhat.com>
+
+	* asrgrgr.cgs: Fix test.
+	* asrgrimm.cgs: Likewise.
+	* callgr.cgs: Likewise.
+	* callrimm.cgs: Likewise.
+	* decgrimm2.cgs: Likewise.
+	* incgrimm2.cgs: Likewise.
+	* jmp.cgs: Likewise.
+	* rrcgrgr.cgs: Likewise.
+	* rrcgrimm4.cgs: Likewise.
+	* set1lmemimm.cgs: Likewise.
+
+2001-07-23  matthew green  <mrg@redhat.com>
+
+	* movgriigr.cgs: New test.
+	* movgriipostincgr.cgs: Likewise.
+	* movgriipredecgr.cgs: Likewise.
+	* movgripostincgr.cgs: Likewise.
+	* movgripredecgr.cgs: Likewise.
+	* movhgrmem.cgs: Likewise.
+	* movhighgr.cgs: Likewise.
+	* movlgrmem.cgs: Likewise.
+	* movlmemgr.cgs: Likewise.
+	* movlmemimm.cgs: Likewise.
+	* movlowgr.cgs: Likewise.
+
+2001-07-22  matthew green  <mrg@redhat.com>
+	
+	* bnhmemimm.cgs: New test.
+	* bphmemimm.cgs: Likewise.
+	* clr1hmemimm.cgs: Likewise.
+	* set1hmemimm.cgs: Likewise.
+
+2001-07-22  matthew green  <mrg@redhat.com>
+
+	* New testsuite for xstormy16-elf-sid.

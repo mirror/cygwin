@@ -1,0 +1,44 @@
+# xstormy16 testcase for swap (swpn, swpb, swpw) -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global swap
+swap:
+	mov r1, #0xed
+	swpn r1
+	assert r1, 0xde
+
+	mov r1, #0xb1
+	swpn r1
+	assert r1, 0x1b
+
+	mov r1, #0xabcd
+	swpb r1
+	assert r1, 0xcdab
+
+	mov r1, #0xf1d2
+	swpb r1
+	assert r1, 0xd2f1
+
+	mov r1, #0x1f3d
+	mov r2, #0x82ae
+	swpw r1, r2
+	assert r1, 0x82ae
+	assert r2, 0x1f3d
+
+	mov r1, #0x7654
+	mov r2, #0x1032
+	swpw r1, r2
+	assert r1, 0x1032
+	assert r2, 0x7654
+
+	br okay
+
+
+wrong:
+	fail
+okay:
+	pass

@@ -26,6 +26,9 @@ extern "C" {
 #if SIDTARGET_M32R
 #include "m32rbf.h"
 #endif
+#if SIDTARGET_XSTORMY16
+#include "xstormy16.h"
+#endif
 
 using namespace std;
 using namespace sid;
@@ -262,6 +265,9 @@ compCGENListTypes ()
 #if SIDTARGET_ARM
   types.push_back ("hw-cpu-arm7t");
 #endif
+#if SIDTARGET_XSTORMY16
+  types.push_back ("hw-cpu-xstormy16");
+#endif
   return types;
 }
 
@@ -277,6 +283,10 @@ compCGENCreate (const string& typeName)
 #if SIDTARGET_ARM
   if (typeName == "hw-cpu-arm7t")
     return new arm7f::arm7f_cpu ();
+#endif
+#if SIDTARGET_XSTORMY16
+  if (typeName == "hw-cpu-xstormy16")
+    return new xstormy16::xstormy16_cpu ();
 #endif
 
 

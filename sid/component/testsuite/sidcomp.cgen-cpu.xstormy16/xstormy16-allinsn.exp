@@ -1,0 +1,14 @@
+# Sanyo Xstormy16 testsuite.
+
+if {! $sidtarget(xstormy16)} { untested "hw-cpu-xstormy16 not available"; return }
+
+# load support procs (none yet)
+load_lib "cpudefs.exp"
+
+# all machines
+set all_machs "xstormy16"
+
+# The .cgs suffix is for "cgen .s".
+set gas_debug_flags ""
+
+run-sid-bsp-tests xstormy16-elf xstormy16 $srcdir/sidcomp.cgen-cpu.xstormy16 "*.cgs" $gas_debug_flags "" {--cpu=xstormy16} x

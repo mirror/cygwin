@@ -1,0 +1,17 @@
+# xstormy16 testcase for bn $Rd,#$imm4,$rel12 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global bngrimm4
+bngrimm4:
+	mov r3, #0xffff
+	clr1 r3, #2
+	bn r3, #2, okay
+
+wrong:
+	fail
+okay:
+	pass

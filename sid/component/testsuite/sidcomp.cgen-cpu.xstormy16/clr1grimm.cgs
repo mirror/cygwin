@@ -1,0 +1,23 @@
+# xstormy16 testcase for clr1 $Rd,#$imm4 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global clr1grimm
+clr1grimm:
+	mov r0, #0xffff
+	clr1 r0, #0x7
+	assert r0, 0xff7f
+
+	mov r0, #0x1111
+	clr1 r0, #0x8
+	assert r0, 0x1011
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

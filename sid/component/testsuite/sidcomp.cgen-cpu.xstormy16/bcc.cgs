@@ -1,0 +1,98 @@
+# xstormy16 testcase for b$bcond2 ${rel8-2} -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global bge
+bge:
+	mov r1, #1
+	mov r2, #2
+	sub r1, r2
+	bge wrong
+	mov r1, #1
+	mov r2, #1
+	sub r1, r2
+	bge 1f
+	br wrong
+1:
+
+	.global bnc
+bnc:
+	mov r1, #0x8000
+	add r1, r1
+	bnc wrong
+
+	.global blt
+blt:
+	mov r1, #1
+	mov r2, #2
+	sub r2, r1
+	blt wrong
+
+	.global bc
+bc:
+	mov r1, #0x7fff
+	mov r2, #0x8000
+	add r1, r2
+	bc wrong
+
+	.global bgt
+bgt:
+	mov r1, #1
+	mov r2, #2
+	sub r1, r2
+	bgt wrong
+	mov r1, #1
+	mov r2, #1
+	sub r2, r1
+	bgt wrong
+	mov r1, #1
+	mov r2, #2
+	sub r2, r1
+	bgt bhi
+	br wrong
+
+# XXX finish me.
+
+	.global bhi
+bhi:
+
+	.global ble
+ble:
+
+	.global bls
+bls:
+
+	.global bpl
+bpl:
+
+	.global bnv
+bnv:
+
+	.global bmi
+bmi:
+
+	.global bv
+bv:
+
+	.global bnz.b
+bnz.b:
+
+	.global bnz
+bnz:
+
+	.global bz.b
+bz.b:
+
+	.global bz
+bz:
+
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

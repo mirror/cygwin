@@ -72,3 +72,14 @@ mvic a.out.conf i386-gloss.conf
 crs --cpu=x86 --no-run --gdb=5000
 mvic sid.conf i386-gdb.conf
 
+crs --cpu=xstormy16 --no-run a.out
+mvic a.out.conf xstormy16-gloss.conf
+
+crs --cpu=xstormy16 --no-run --gdb=5000
+mvic sid.conf xstormy16-gdb.conf
+
+crs --cpu=xstormy16 --no-run --gdb=5000 --board=gloss-tty
+mvic sid.conf xstormy16-gloss-gdb.conf
+
+crs --cpu=xstormy16 --no-run --gdb=5000 --tksm
+mvic sid.conf xstormy16-gloss-gdb-tksm.conf

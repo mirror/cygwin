@@ -1,3 +1,8 @@
+2001-12-17  matthew green  <mrg@redhat.com>
+
+	* CATALOG: Add hw-cpu-xstormy16.
+	* tconfig.in: Add SIDTARGET_XSTORMY16.
+
 2001-11-13  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* CATALOG: Document the x86_component_library.  Add

@@ -1,0 +1,25 @@
+# xstormy16 testcase for mov$ws2 $Rdm,($Rs) -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.data
+data:	.byte 0xfa,0xce
+	.text
+
+	.global movgrgri
+movgrgri:
+	mov r1, #data
+	mov.b r2, (r1)
+	assert r2, 0xfa
+	mov.w r2, (r1)
+	assert r2, 0xcefa
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

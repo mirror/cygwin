@@ -1,0 +1,21 @@
+# xstormy16 testcase for jmpf $abs24 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global jmpf
+jmpf:
+	mov r2, #5
+	jmpf jmpf_point
+	inc r2, #1
+jmpf_point:
+	assert r2, 5
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

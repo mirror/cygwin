@@ -1,0 +1,18 @@
+# xstormy16 testcase for sbc $Rd,#$imm16 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global sbcgrimm16
+sbcgrimm16:
+	mov r1, #55
+	set1 r14, #2
+	sbc r1, #30
+	bz  r1, #24, okay
+
+wrong:
+	fail
+okay:
+	pass

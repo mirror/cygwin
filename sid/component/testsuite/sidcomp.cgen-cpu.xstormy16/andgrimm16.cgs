@@ -1,0 +1,17 @@
+# xstormy16 testcase for and $Rd,#$imm16 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global andgrimm16
+andgrimm16:
+	mov r2, #0xc
+	add r2, #0x1
+	bz  r2, #0xd, okay
+
+wrong:
+	fail
+okay:
+	pass

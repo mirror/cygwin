@@ -1,0 +1,18 @@
+# xstormy16 testcase for b$bcond5 $Rm,#$imm8,$rel12 -*- Asm -*-
+# mach: all
+# this just tests a simple "bge"; the "bcc.cgs" tests all the
+# 16 combos of this instruction.
+
+	.include "testutils.inc"
+
+	start
+
+	.global bccgrimm8
+bccgrimm8:
+	mov r2, #2
+	bge r2, #1, okay
+
+wrong:
+	fail
+okay:
+	pass

@@ -35,7 +35,7 @@ typedef __int64 longlong;
 
 void dump_setup (int, char **, bool);
 
-static const char version[] = "$Revision: 1.32 $";
+static const char version[] = "$Revision: 1.33 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -950,7 +950,11 @@ dump_sysinfo ()
 
   fflush (stdout);
 
-  char *cygwin = getenv ("CYGWIN") ?: const_cast <char *> ("CYGWIN=");
+  char *cygwin = getenv ("CYGWIN");
+  if (cygwin)
+    cygwin -= strlen ("CYGWIN=");
+  else
+    cygwin = const_cast <char *> ("CYGWIN=");
   size_t cyglen = strlen (cygwin);
   cygwin = strcpy ((char *) malloc (cyglen + sizeof (" nontsec")), cygwin);
   pretty_id ("nontsec", cygwin, cyglen);

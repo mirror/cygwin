@@ -116,7 +116,7 @@
     ((package) (cond ((equal?  value '("gnusim"))
 		      (set! CURRENT-PACKAGE package-gnu-simulators))
 		     ((equal? value '("cygsim"))
-		      (set! CURRENT-PACKAGE package-cygnus-simulators))
+		      (set! CURRENT-PACKAGE package-red-hat-simulators))
 		     (else (error "invalid package value" value))))
     (else (error "unknown option" name))
     )

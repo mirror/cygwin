@@ -711,7 +711,7 @@ void
 
   (string-write
    (gen-copyright "Decode header for @prefix@."
-		  copyright-red-hat package-cygnus-simulators)
+		  copyright-red-hat package-red-hat-simulators)
    "\
 #ifndef @PREFIX@_DECODE_H
 #define @PREFIX@_DECODE_H
@@ -763,7 +763,7 @@ typedef UINT @prefix@_insn_word;
 
   (string-write
    (gen-copyright "Simulator instruction decoder for @prefix@."
-		  copyright-red-hat package-cygnus-simulators)
+		  copyright-red-hat package-red-hat-simulators)
    "\
 
 #include \"@cpu@.h\"

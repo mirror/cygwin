@@ -1,3 +1,8 @@
+2001-01-23  Johan Rydberg  <jrydberg@opencores.org>
+
+	* doc/rtl.texi (Expressions): Document the (index-of ...) and
+	(regno ...) rtx.
+
 2001-01-08  Frank Ch. Eigler  <fche@redhat.com>
 
 	* rtl.scm (hw): Copy hw-name to new operand's sem-name, to simplify

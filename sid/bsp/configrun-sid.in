@@ -231,6 +231,11 @@ if ($opt_no_run && (! $opt_save_temps))
     $opt_save_temps = 1;
   }
 
+# infer --persistent from --gdb=xxxx
+if ($opt_gdb)
+  {
+    $opt_persistent = 1;
+  }
 
 # complete component library list
 %component_libs=(
@@ -265,7 +270,7 @@ $whoami=qx{whoami}; chop ($whoami);
 $hostname=qx{hostname}; chop ($hostname);
 $date=qx{date}; chop ($date);
 $uname=qx{uname}; chop ($uname);
-$version=q$Id: configrun-sid.in,v 1.2 2000/12/15 21:14:57 fche Exp $;
+$version=q$Id: configrun-sid.in,v 1.3 2001/01/04 00:59:47 jjohnstn Exp $;
 $zeroth_section = "# sid configuration file
 # created by $version
 # run by $whoami @ $hostname ($uname) at $date
@@ -770,6 +775,8 @@ connect-pin init-sequence output-3 -> gdb init
 connect-pin deinit-sequence output-5 -> gdb deinit
 connect-pin gdb yield -> yield-net input
 connect-pin gdb flush-icache -> cpu flush-icache
+connect-pin gdb restart -> hw-reset-net input
+set gdb exit-on-detach? 1
 set gdb trace-gdbsid? $opt_verbose
 set gdb trace-gdbserv? $opt_verbose
 # gdb-socket

@@ -436,7 +436,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           {
           case 0 : itype = XSTORMY16_INSN_DIV; xstormy16_extract_sfmt_mul (this, current_cpu, pc, base_insn, entire_insn); goto done;
           case 1 : itype = XSTORMY16_INSN_MUL; xstormy16_extract_sfmt_mul (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 2 : itype = XSTORMY16_INSN_SDIVLH; xstormy16_extract_sfmt_sdivlh (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 : itype = XSTORMY16_INSN_DIVLH; xstormy16_extract_sfmt_sdivlh (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
           }
         }
@@ -446,7 +446,7 @@ xstormy16_scache::decode (xstormy16_cpu* current_cpu, PCADDR pc, xstormy16_insn_
           switch (val)
           {
           case 0 : itype = XSTORMY16_INSN_SDIV; xstormy16_extract_sfmt_sdiv (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = XSTORMY16_INSN_DIVLH; xstormy16_extract_sfmt_sdivlh (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 : itype = XSTORMY16_INSN_SDIVLH; xstormy16_extract_sfmt_sdivlh (this, current_cpu, pc, base_insn, entire_insn); goto done;
           default : itype = XSTORMY16_INSN_X_INVALID; xstormy16_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
           }
         }

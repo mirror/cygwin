@@ -22,7 +22,7 @@ details. */
 #include <ctype.h>
 #include <errno.h>
 
-static const char version[] = "$Revision: 1.37 $";
+static const char version[] = "$Revision: 1.38 $";
 
 static char *prog_name;
 static char *file_arg;
@@ -89,7 +89,7 @@ System information:\n\
   -P, --smprograms	output Start Menu `Programs' directory and exit\n\
   -S, --sysdir		output system directory and exit\n\
   -W, --windir		output `Windows' directory and exit\n\
-", prog_name, prog_name);
+", prog_name, prog_name, prog_name);
   if (ignore_flag)
     /* nothing to do */;
   else if (stream != stdout)

@@ -135,7 +135,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 #if defined(LIBC_SCCS) && !defined(lint)
 /*static char *sccsid = "from: @(#)vfprintf.c	5.50 (Berkeley) 12/16/92";*/
-static char *rcsid = "$Id: vfprintf.c,v 1.3 2002/05/13 19:52:16 jjohnstn Exp $";
+static char *rcsid = "$Id: vfprintf.c,v 1.4 2002/05/13 20:59:40 jjohnstn Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 /*
@@ -615,7 +615,13 @@ reswitch:	switch (ch) {
 			goto reswitch;
 #ifdef FLOATING_POINT
 		case 'L':
-			flags &= ~VECTOR;
+#ifdef __ALTIVEC__
+		        if (flags & VECTOR) 
+			  {
+			    fmt = format_anchor;
+			    continue;
+			  }
+#endif /* __ALTIVEC__ */
 			flags |= LONGDBL;
 			goto rflag;
 #endif
@@ -676,12 +682,12 @@ reswitch:	switch (ch) {
 			if (flags & VECTOR)
 			  {
 			    int k;
+			    vec_16_byte_union tmp;
 		            if (flags & (SHORTINT | LONGINT))
 		              {
 		                fmt = format_anchor;
 		                continue;
 		              }
-			    vec_16_byte_union tmp;
 			    tmp.v = va_arg(ap, vector int);
 			    cp = buf;
 			    for (k = 0; k < 15; ++k)
@@ -858,8 +864,14 @@ reswitch:	switch (ch) {
 			break;
 #endif /* FLOATING_POINT */
 		case 'n':
+#ifdef __ALTIVEC__
+		        if (flags & VECTOR)
+			  {
+			    fmt = format_anchor;
+			    continue;
+			  }
+#endif /* __ALTIVEC__ */
 #ifndef _NO_LONGLONG
-			flags &= ~VECTOR;
 			if (flags & QUADINT)
 				*va_arg(ap, quad_t *) = ret;
 			else 

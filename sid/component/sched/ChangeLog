@@ -1,10 +1,28 @@
 2002-03-04  Frank Ch. Eigler  <fche@redhat.com>
 
+        * compSched.cxx: Slight code movement for compiler bug tolerance.
+
+2002-03-04  Frank Ch. Eigler  <fche@redhat.com>
+
 	* compSched.cxx (host_time_keeper_base ctor): On Cygwin, call
 	timeBeginPeriod to shrink scheduling granularity.  Keep more 
 	statistics.  Initialize more variables.
 	(yield): Rewrite.
 	(operator <<): Print extra stats.
+
+2002-02-24  Graydon Hoare  <graydon@redhat.com>
+
+        * compSched.cxx: Remove N-name attribute when number of
+        subscribers shrinks.
+
+2002-01-09  Graydon Hoare  <graydon@redhat.com>
+
+        * compSched.cxx (scheduler_client): New member "name".
+        (client_num_update): Hook up "N-name" attribute to client->name.
+        * sid-visual-sched.tk (relate): Load subscription names into GUI,
+        ghost subscriptions which have no output pins connected.
+        * sid-sched.xml: Document new N-name attributes.
+        * sid-sched.txt: Regenerate.
 
 2001-10-17  Dave Brolley  <brolley@redhat.com>
 

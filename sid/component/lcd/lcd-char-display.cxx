@@ -147,7 +147,7 @@ lcd_char_display::set_pixel (host_int_4 val)
     return;
   mvwaddch( w, row, col, '*' );
 #else
-  cout << '[' << row << ',' << col << ']';
+  std::cout << '[' << row << ',' << col << ']';
 #endif // HAVE_CURSES_H
 
   trigger_mgr.check_and_dispatch();
@@ -165,7 +165,7 @@ lcd_char_display::new_frame (host_int_4 val)
   else
     wrefresh (w);
 #else
-  cout << endl;
+  std::cout << std::endl;
 #endif
 
   trigger_mgr.check_and_dispatch();

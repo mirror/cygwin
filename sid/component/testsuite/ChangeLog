@@ -1,5 +1,9 @@
 2001-07-19  Ben Elliston  <bje@redhat.com>
 
+	* lcd1val.exp: Initialise component by driving its "init" pin.
+
+2001-07-19  Ben Elliston  <bje@redhat.com>
+
 	* sidcomp.cache/cache.exp: Call sid_stop at test completion.
 	* sidcomp.cache/coherency.exp: Likewise.
 	* sidcomp.cache/fifo.exp: Likewise.

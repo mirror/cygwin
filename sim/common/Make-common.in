@@ -94,8 +94,11 @@ SIM_RESERVED_BITS = @sim_reserved_bits@
 SIM_SCACHE = @sim_scache@
 SIM_SMP = @sim_smp@
 SIM_STDCALL = @sim_stdcall@
-SIM_WARNINGS = @build_warnings@
 SIM_XOR_ENDIAN = @sim_xor_endian@
+WARN_CFLAGS = @WARN_CFLAGS@
+WERROR_CFLAGS = @WERROR_CFLAGS@
+SIM_WARN_CFLAGS = $(WARN_CFLAGS)
+SIM_WERROR_CFLAGS = $(WERROR_CFLAGS)
 
 HDEFINES = @HDEFINES@
 TDEFINES =
@@ -214,7 +217,8 @@ CONFIG_CFLAGS = \
 	$(SIM_SCACHE) \
 	$(SIM_SMP) \
 	$(SIM_STDCALL) \
-	$(SIM_WARNINGS) \
+	$(SIM_WARN_CFLAGS) \
+	$(SIM_WERROR_CFLAGS) \
 	$(SIM_XOR_ENDIAN) \
 	$(SIM_HARDWARE) \
 	$(SIM_EXTRA_CFLAGS) \
@@ -395,7 +399,6 @@ sim-fpu.o: $(srccom)/sim-fpu.c $(sim-fpu_h) \
 	  $(SIM_EXTRA_DEPS)
 	$(CC) -c $(srccom)/sim-fpu.c $(ALL_CFLAGS)
 
-
 sim-hload.o: $(srccom)/sim-hload.c $(sim-assert_h) \
 	  $(srcroot)/include/remote-sim.h \
 	  $(SIM_EXTRA_DEPS)
@@ -556,7 +559,9 @@ CGEN_MAIN_CPU_DEPS = \
 	$(SIM_MAIN_DEPS) \
 	$(CGEN_INCLUDE_DEPS) \
 	$(srccom)/cgen-ops.h \
-	$(srccom)/cgen-mem.h
+	$(srccom)/cgen-mem.h \
+	$(srccom)/cgen-par.h \
+	$(srccom)/cgen-fpu.h
 
 cgen-run.o: $(srccom)/cgen-run.c $(sim_main_headers)
 	$(CC) -c $(srccom)/cgen-run.c $(ALL_CFLAGS)
@@ -567,9 +572,19 @@ cgen-scache.o: $(srccom)/cgen-scache.c $(sim_main_headers)
 cgen-trace.o: $(srccom)/cgen-trace.c $(sim_main_headers)
 	$(CC) -c $(srccom)/cgen-trace.c $(ALL_CFLAGS)
 
+cgen-fpu.o: $(srccom)/cgen-fpu.c $(sim_main_headers) $(sim-fpu_h)
+	$(CC) -c $(srccom)/cgen-fpu.c $(ALL_CFLAGS)
+
+cgen-accfp.o: $(srccom)/cgen-accfp.c $(sim_main_headers) $(sim-fpu_h)
+	$(CC) -c $(srccom)/cgen-accfp.c $(ALL_CFLAGS)
+
 cgen-utils.o: $(srccom)/cgen-utils.c $(sim_main_headers) \
 	  $(srccom)/cgen-mem.h $(srccom)/cgen-ops.h $(srccom)/cgen-engine.h
 	$(CC) -c $(srccom)/cgen-utils.c $(ALL_CFLAGS)
+
+cgen-par.o: $(srccom)/cgen-par.c $(sim_main_headers) \
+	  $(srccom)/cgen-mem.h $(srccom)/cgen-par.h
+	$(CC) -c $(srccom)/cgen-par.c $(ALL_CFLAGS)
 
 # Support targets.
 
@@ -638,5 +653,57 @@ stamp-h: config.in config.status
 .gdbinit: # config.status $(srccom)/gdbinit.in
 	CONFIG_FILES=$@:../common/gdbinit.in CONFIG_HEADERS= $(SHELL) ./config.status
 
+
+# CGEN support
+
+CGENDIR = @cgendir@
+CGEN = `if [ -f ../../guile/libguile/guile ]; then echo ../../guile/libguile/guile; else echo guile ; fi`
+CGENFLAGS = -v
+srccgen = $(CGENDIR)
+
+CGEN_READ_SCM = ../../cgen/stamp-cgen $(srccgen)/sim.scm
+CGEN_ARCH_SCM = $(srccgen)/sim-arch.scm
+CGEN_CPU_SCM = $(srccgen)/sim-cpu.scm $(srccgen)/sim-model.scm
+CGEN_DECODE_SCM = $(srccgen)/sim-decode.scm
+CGEN_DESC_SCM = $(srccgen)/desc.scm $(srccgen)/desc-cpu.scm
+
+# Various choices for which cpu specific files to generate.
+CGEN_CPU_EXTR = -E tmp-ext.c1
+CGEN_CPU_READ = -R tmp-read.c1
+CGEN_CPU_WRITE = -W tmp-write.c1
+CGEN_CPU_SEM = -S tmp-sem.c1
+CGEN_CPU_SEMSW = -X tmp-semsw.c1
+
+CGEN_FLAGS_TO_PASS = \
+	CGEN=$(CGEN) \
+	CGENFLAGS="$(CGENFLAGS)"
+
+# We store the generated files in the source directory until we decide to
+# ship a Scheme interpreter with gdb/binutils.  Maybe we never will.
+
+cgen-arch: force
+	$(SHELL) $(srccom)/cgen.sh arch $(srcdir) \
+		$(CGEN) $(CGENDIR) "$(CGENFLAGS)" \
+		$(arch) "$(FLAGS)" ignored $(mach) ignored ignored
+
+cgen-cpu: force
+	$(SHELL) $(srccom)/cgen.sh cpu $(srcdir) \
+		$(CGEN) $(CGENDIR) "$(CGENFLAGS)" \
+		$(arch) "$(FLAGS)" $(cpu) $(mach) "$(SUFFIX)" "$(EXTRAFILES)"
+
+cgen-decode: force
+	$(SHELL) $(srccom)/cgen.sh decode $(srcdir) \
+		$(CGEN) $(CGENDIR) "$(CGENFLAGS)" \
+		$(arch) "$(FLAGS)" $(cpu) $(mach) "$(SUFFIX)" ignored
+
+cgen-cpu-decode: force
+	$(SHELL) $(srccom)/cgen.sh cpu-decode $(srcdir) \
+		$(CGEN) $(CGENDIR) "$(CGENFLAGS)" \
+		$(arch) "$(FLAGS)" $(cpu) $(mach) "$(SUFFIX)" "$(EXTRAFILES)"
+
+cgen-desc: force
+	$(SHELL) $(srccom)/cgen.sh desc $(srcdir) \
+		$(CGEN) $(CGENDIR) "$(CGENFLAGS)" \
+		$(arch) "$(FLAGS)" $(cpu) $(mach) "$(SUFFIX)" ignored
 
 ## End COMMON_POST_CONFIG_FRAG

@@ -1730,16 +1730,7 @@ foreach current_target $target_list {
 		    # value (for example in MULTIPASS) and the test
 		    # directory matches that directory.
 		    if {[info exists dir_to_run] && $dir_to_run != ""} {
-			# JYG: dir_to_run might be a space delimited list
-			# of directories.  Look for match on each item.
-			set found 0
-			foreach directory $dir_to_run {
-			    if [string match "*${directory}*" $dir] {
-				set found 1
-				break
-			    }
-			}
-			if {!$found} {
+			if ![string match "*${dir_to_run}*" $dir] {
 			    continue
 			}
 		    }
@@ -1749,30 +1740,12 @@ foreach current_target $target_list {
 		    # directory matches that directory
 		    if {[info exists cmdline_dir_to_run] \
 			    && $cmdline_dir_to_run != ""} {
-			# JYG: cmdline_dir_to_run might be a space delimited
-			# list of directories.  Look for match on each item.
-			set found 0
-			foreach directory $cmdline_dir_to_run {
-			    if [string match "*${directory}*" $dir] {
-				set found 1
-				break
-			    }
-			}
-			if {!$found} {
+			if ![string match "*${cmdline_dir_to_run}*" $dir] {
 			    continue
 			}
 		    }
 
-		    # JYG: Limit find to one directory level to treat
-		    # each test directory as a base directory.
-		    # test_top_dirs includes all subdirectory paths,
-		    # e.g. for gdb.hp/gdb.base-hp/, test_top_dirs
-		    # has two entries: gdb.hp/, and gdb.base-hp/.
-		    # If we just use '[find ${dir} *.exp]', all
-		    # *.exp files in gdb.hp/gdb.base-hp/ would be
-		    # picked up twice and tested twice, which is
-		    # what we don't need.
-		    foreach test_name [lsort [find -maxdepth 1 ${dir} *.exp]] {
+		    foreach test_name [lsort [find ${dir} *.exp]] {
 			if { ${test_name} == "" } {
 			    continue
 			}

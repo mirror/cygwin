@@ -31,8 +31,8 @@ using namespace cgen;
 cgen_bi_endian_cpu::cgen_bi_endian_cpu ():
   trace_stream (cout)
 {
-  debug_exec_p = false;
-  add_attribute ("debug-exec?", & debug_exec_p, "setting");
+  warnings_enabled = false;
+  add_attribute ("enable-warnings?", & warnings_enabled, "setting");
   this->engine_type = ENGINE_UNKNOWN;
   add_attribute_virtual ("engine-type", this, 
 			 & cgen_bi_endian_cpu::set_engine_type,
@@ -78,7 +78,7 @@ cgen_cpu::stream_state (ostream& o) const
     << trace_result_p << " " 
     << trace_extract_p << " "
     << step_insn_count << " "
-    << debug_exec_p << " "
+    << warnings_enabled << " "
     << static_cast<int>(engine_type) << " "
     << step_cycles;
 }
@@ -99,7 +99,7 @@ cgen_cpu::destream_state (istream& i)
   i >> trace_result_p
     >> trace_extract_p
     >> step_insn_count
-    >> debug_exec_p;
+    >> warnings_enabled;
   int et;
   i >> et;
   engine_type = static_cast<enum engine_type>(et);

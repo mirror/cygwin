@@ -48,9 +48,9 @@ protected:
   virtual component::status set_engine_type (const string& s);
 
 public:
-  // true -> print execution debugging messages
+  // true -> print execution warning messages
   // [what it is is at the programmer's whim]
-  bool debug_exec_p;
+  bool warnings_enabled;
 
   // Print messages here.  
   // XXX: Should be a pointer or somesuch, so it can be changed during a run.

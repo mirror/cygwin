@@ -1,3 +1,13 @@
+2001-06-28  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * compCGEN.cxx (cgen_cpu::stream_state): Change reference to
+        debug_exec_p to use new warnings_enabled flag.
+        (cgen_cpu::destream_state): Ditto.
+        (cgen_bi_endian_cpu::cgen_bi_endian_cpu): Remove
+        debug_exec_p setting and add warnings_enabled flag which is tied                to new enable-warnings? setting.
+        * cgen-cpu.h (cgen_bi_endian_cpu::debug_exec_p): Removed.
+        (cgen_bi_endian_cpu::warnings_enabled): New member.
+
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am (ACLOCAL_AMFLAGS): Refer to $srcdir.

@@ -346,23 +346,26 @@
 ; Define an insn enum, all arguments specified.
 
 (define (define-full-insn-enum name comment attrs prefix fld vals)
-  (let ((errtxt "define-full-insn-enum")
-	(fld-obj (current-ifld-lookup fld)))
+  (let* ((errtxt "define-full-insn-enum")
+	 (atlist (atlist-parse attrs "insn_enum" errtxt))
+	 (fld-obj (current-ifld-lookup fld)))
 
-    (if (not fld-obj)
-	(parse-error errtxt "unknown insn field" fld))
-
-    ; Create enum object and add it to the list of enums.
-    (let ((e (make <insn-enum>
-	       (parse-name name errtxt)
-	       (parse-comment comment errtxt)
-	       (atlist-parse attrs "insn-enum" errtxt)
-	       (-enum-parse-prefix errtxt prefix)
-	       fld-obj
-	       (parse-enum-vals prefix vals))))
-      (current-enum-add! e)
-      e))
-)
+    (if (keep-isa-atlist? atlist #f)
+	(begin
+	  (if (not fld-obj)
+	      (parse-error errtxt "unknown insn field" fld))
+	  
+					; Create enum object and add it to the list of enums.
+	  (let ((e (make <insn-enum>
+		     (parse-name name errtxt)
+		     (parse-comment comment errtxt)
+		     (atlist-parse attrs "insn-enum" errtxt)
+		     (-enum-parse-prefix errtxt prefix)
+		     fld-obj
+		     (parse-enum-vals prefix vals))))
+	    (current-enum-add! e)
+	    e))))
+  )
 
 (define (enum-init!)
 

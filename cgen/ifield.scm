@@ -460,9 +460,9 @@
 	 (atlist (atlist-parse attrs "cgen_ifld" errtxt))
 	 (isas (bitset-attr->list (atlist-attr-value atlist 'ISA #f))))
 
-    ; Ensure only one isa specified.
-    (if (!= (length isas) 1)
-	(parse-error errtxt "can only specify 1 isa" attrs))
+    ; No longer ensure only one isa specified.
+    ;(if (!= (length isas) 1)
+    ;	(parse-error errtxt "can only specify 1 isa" attrs))
 
     (if (not (eq? (->bool word-offset)
 		  (->bool word-length)))
@@ -857,34 +857,44 @@ Define an instruction multi-field, all arguments specified.
 (define (-multi-ifield-parse errtxt name comment attrs mode subfields insert extract encode decode)
   (logit 2 "Processing multi-ifield element " name " ...\n")
 
-  (let ((name (parse-name name errtxt))
-	(result (new <multi-ifield>))
-	(subfields (map (lambda (subfld)
-			  (let ((f (current-ifld-lookup subfld)))
-			    (if (not f)
-				(parse-error errtxt "unknown ifield" subfld))
-			    f))
-			subfields)))
-
-    (elm-xset! result 'name name)
-    (elm-xset! result 'comment (parse-comment comment errtxt))
-    ; multi-ifields are always VIRTUAL
-    (elm-xset! result 'attrs
-	       (atlist-parse (cons 'VIRTUAL attrs) "multi-ifield" errtxt))
-    (elm-xset! result 'mode (parse-mode-name mode errtxt))
-    (elm-xset! result 'encode (-ifld-parse-encode errtxt encode))
-    (elm-xset! result 'decode (-ifld-parse-encode errtxt decode))
-    (if insert
-	(elm-xset! result 'insert insert)
-	(elm-xset! result 'insert
-		   (-multi-ifield-make-default-insert name subfields)))
-    (if extract
-	(elm-xset! result 'extract extract)
-	(elm-xset! result 'extract
-		   (-multi-ifield-make-default-extract name subfields)))
-    (elm-xset! result 'subfields subfields)
-
-    result)
+  (let* ((name (parse-name name errtxt))
+	 (atlist (atlist-parse attrs "cgen_ifld" errtxt))
+	 (isas (bitset-attr->list (atlist-attr-value atlist 'ISA #f))))
+    
+    ; No longer ensure only one isa specified.
+    ; (if (!= (length isas) 1) 
+    ;     (parse-error errtxt "can only specify 1 isa" attrs))
+    
+    (if (keep-isa-atlist? atlist #f)
+	(begin
+	  (let ((result (new <multi-ifield>))
+		(subfields (map (lambda (subfld)
+				  (let ((f (current-ifld-lookup subfld)))
+				    (if (not f)
+					(parse-error errtxt "unknown ifield" subfld))
+				    f))
+				subfields)))
+	    
+	    (elm-xset! result 'name name)
+	    (elm-xset! result 'comment (parse-comment comment errtxt))
+					; multi-ifields are always VIRTUAL
+	    (elm-xset! result 'attrs
+		       (atlist-parse (cons 'VIRTUAL attrs) "multi-ifield" errtxt))
+	    (elm-xset! result 'mode (parse-mode-name mode errtxt))
+	    (elm-xset! result 'encode (-ifld-parse-encode errtxt encode))
+	    (elm-xset! result 'decode (-ifld-parse-encode errtxt decode))
+	    (if insert
+		(elm-xset! result 'insert insert)
+		(elm-xset! result 'insert
+			   (-multi-ifield-make-default-insert name subfields)))
+	    (if extract
+		(elm-xset! result 'extract extract)
+		(elm-xset! result 'extract
+			   (-multi-ifield-make-default-extract name subfields)))
+	    (elm-xset! result 'subfields subfields)
+	    result))
+	; else don't keep isa
+	#f))
 )
 
 ; Read an instruction multi-ifield.
@@ -929,7 +939,8 @@ Define an instruction multi-field, all arguments specified.
 (define define-multi-ifield
   (lambda arg-list
     (let ((f (apply -multi-ifield-read (cons "define-multi-ifield" arg-list))))
-      (current-ifld-add! f)
+      (if f
+	  (current-ifld-add! f))
       f))
 )
 

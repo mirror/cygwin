@@ -1,3 +1,8 @@
+2003-06-07  Doug Evans  <dje@sebabeach.org>
+
+	* gen-all-sid: New file.
+	* gen-all-opcodes: New file.
+
 2003-06-05  Nick Clifton  <nickc@redhat.com>
 
 	* cpu/frv.cpu (FRintieven): New operand.  An even-numbered only

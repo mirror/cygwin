@@ -572,7 +572,7 @@
 
 (define (-rtx-option? x)
   (and (symbol? x)
-       (char=? (string-ref x 0) #\:))
+       (char=? (string-ref (symbol->string x) 0) #\:))
 )
 
 ; Subroutine of -rtx-munge-mode&options.
@@ -776,7 +776,7 @@
    #f #f expr
    (lambda (rtx-obj expr mode parent-expr op-pos tstate appstuff)
      (display "-expr:    ")
-     (display (string-append "rtx=" (obj:name rtx-obj)))
+     (display (string-append "rtx=" (obj:str-name rtx-obj)))
      (display " expr=")
      (display expr)
      (display " mode=")

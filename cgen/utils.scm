@@ -93,7 +93,6 @@
 
 (define (collect fn . args) (apply append (apply map (cons fn args))))
 
-
 ; Map over value entries in an alist.
 ; 'twould be nice if this were a primitive.
 
@@ -126,7 +125,8 @@
 		 (fn l))))))
 )
 
-; Turn STR into a proper C symbol.
+; Turn string or symbol STR into a proper C symbol.
+; The result is a string.
 ; We assume STR has no leading digits.
 ; All invalid characters are turned into '_'.
 ; FIXME: Turn trailing "?" into "_p".
@@ -134,16 +134,19 @@
 (define (gen-c-symbol str)
   (if (not (or (string? str) (symbol? str)))
       (error "gen-c-symbol: not symbol or string:" str))
-  (map-over-string (lambda (c) (if (id-char? c) c #\_)) str)
+  (map-over-string (lambda (c) (if (id-char? c) c #\_))
+		   (->string str))
 )
 
-; Turn STR into a proper file name, which is defined to be the same
-; as gen-c-symbol except use -'s instead of _'s.
+; Turn string or symbol STR into a proper file name, which is
+; defined to be the same as gen-c-symbol except use -'s instead of _'s.
+; The result is a string.
 
 (define (gen-file-name str)
   (if (not (or (string? str) (symbol? str)))
       (error "gen-file-name: not symbol or string:" str))
-  (map-over-string (lambda (c) (if (id-char? c) c #\-)) str)
+  (map-over-string (lambda (c) (if (id-char? c) c #\-))
+		   (->string str))
 )
 
 ; Turn STR into lowercase.
@@ -156,6 +159,24 @@
 
 (define (string-upcase str)
   (map-over-string (lambda (c) (char-upcase c)) str)
+)
+
+; Turn SYM into lowercase.
+
+(define (symbol-downcase sym)
+  (string->symbol (string-downcase (symbol->string sym)))
+)
+
+; Turn SYM into uppercase.
+
+(define (symbol-upcase sym)
+  (string->symbol (string-upcase (symbol->string sym)))
+)
+
+; Symbol sorter.
+
+(define (symbol<? a b)
+  (string<? (symbol->string a) (symbol->string b))
 )
 
 ; Drop N chars from string S.
@@ -244,6 +265,42 @@
 				       (stringize elm delim)))
 		      l)))
 	(else (error "stringize: can't handle:" l)))
+)
+
+; Same as string-append, but accepts symbols too.
+; PERF: This implementation may be unacceptably slow.  Revisit.
+
+(define stringsym-append
+  (lambda args
+    (apply string-append
+	   (map (lambda (s)
+		  (if (symbol? s)
+		      (symbol->string s)
+		      s))
+		args)))
+)
+
+; Same as symbol-append, but accepts strings too.
+
+(define symbolstr-append
+  (lambda args
+    (string->symbol (apply stringsym-append args)))
+)
+
+; Given a symbol or a string, return the string form.
+
+(define (->string s)
+  (if (symbol? s)
+      (symbol->string s)
+      s)
+)
+
+; Given a symbol or a string, return the symbol form.
+
+(define (->symbol s)
+  (if (string? s)
+      (string->symbol s)
+      s)
 )
 
 ; Output routines.
@@ -815,7 +872,7 @@
 
 ; Return #t if each element of bools is #t.  Since Scheme considers any
 ; non-#f value as #t we do too.
-; (all-true? ()) is #t since that is the identity element.
+; (all-true? '()) is #t since that is the identity element.
 
 (define (all-true? bools)
   (cond ((null? bools) #t)
@@ -1133,8 +1190,8 @@
   (if (number? x)
       x
       ; A symbol bound to a number?
-      (if (and (symbol? x) (symbol-bound? #f x) (number? (eval x)))
-	  (eval x)
+      (if (and (symbol? x) (symbol-bound? #f x) (number? (eval1 x)))
+	  (eval1 x)
 	  ; An enum value that has a known numeric value?
 	  (let ((e (enum-lookup-val x)))
 	    (if (number? (car e))

@@ -86,8 +86,8 @@ See the input .cpu file(s) for copyright information.
 ; TODO: Add author arg so all replies for this arch go to right person.
 
 (define (gen-html-header kind)
-  (let ((arch (current-arch-name))
-	(ARCH (string-upcase (current-arch-name))))
+  (let* ((arch (symbol->string (current-arch-name)))
+	 (ARCH (string-upcase arch)))
     (string-list
      "<!doctype html public \"-//w3c//dtd html 4.0 transitional//en\">\n"
      "<html>\n"
@@ -120,7 +120,7 @@ See the input .cpu file(s) for copyright information.
 ; INSN-FILE is the name of the .html file containing instruction definitions.
 
 (define (gen-table-of-contents insn-file)
-  (let ((ARCH (string-upcase (current-arch-name))))
+  (let ((ARCH (string-upcase (symbol->string (current-arch-name)))))
     (string-list
      "<h1>\n"
      (string-append ARCH " Architecture Documentation")
@@ -162,8 +162,8 @@ See the input .cpu file(s) for copyright information.
 
 (define (gen-list-entry name comment kind)
   (string-append "<li>"
-		 "<a href=\"#" kind "-" name "\">"
-		 name
+		 "<a href=\"#" kind "-" (->string name) "\">"
+		 (->string name)
 		 " - "
 		 comment
 		 "</a>\n"
@@ -189,8 +189,8 @@ See the input .cpu file(s) for copyright information.
 ; KIND is one of "mach", "model", etc.
 
 (define (gen-obj-doc-header o kind)
-  (gen-doc-header (string-append (obj:name o) " - " (obj:comment o))
-		  (string-append kind "-" (obj:name o)))
+  (gen-doc-header (string-append (obj:str-name o) " - " (obj:comment o))
+		  (string-append kind "-" (obj:str-name o)))
 )
 
 ; Architecture page.
@@ -198,7 +198,7 @@ See the input .cpu file(s) for copyright information.
 (define (gen-cpu-intro cpu)
   (string-list
    "<li>\n"
-   (obj:name cpu) " - " (obj:comment cpu) "\n"
+   (obj:str-name cpu) " - " (obj:comment cpu) "\n"
    "<br>\n"
    "<br>\n"
    "Machines:\n"
@@ -214,7 +214,7 @@ See the input .cpu file(s) for copyright information.
 (define (gen-mach-intro mach)
   (string-list
    "<li>\n"
-   (obj:name mach) " - " (obj:comment mach) "\n"
+   (obj:str-name mach) " - " (obj:comment mach) "\n"
    "<br>\n"
    "<br>\n"
    "Models:\n"
@@ -230,7 +230,7 @@ See the input .cpu file(s) for copyright information.
 (define (gen-model-intro model)
   (string-list
    "<li>\n"
-   (obj:name model) " - " (obj:comment model) "\n"
+   (obj:str-name model) " - " (obj:comment model) "\n"
    "<br>\n"
    "</li>\n"
    )
@@ -239,7 +239,7 @@ See the input .cpu file(s) for copyright information.
 (define (gen-isa-intro isa)
   (string-list
    "<li>\n"
-   (obj:name isa) " - " (obj:comment isa) "\n"
+   (obj:str-name isa) " - " (obj:comment isa) "\n"
    "<br>\n"
    ; FIXME: wip
    ; I'd like to include the .cpu file tag here, but using English text
@@ -284,7 +284,7 @@ See the input .cpu file(s) for copyright information.
        "")
    (if (isa-condition isa)
        (string-append "<li>condition-field: "
-		      (car (isa-condition isa))
+		      (symbol->string (car (isa-condition isa)))
 		      "</li>\n"
 		      "<br>\n"
 		      "<li>condition:\n"
@@ -315,7 +315,7 @@ See the input .cpu file(s) for copyright information.
 
 (define (gen-arch-intro)
   ; NOTE: This includes cpu families.
-  (let ((ARCH (string-upcase (current-arch-name)))
+  (let ((ARCH (string-upcase (symbol->string (current-arch-name))))
 	(isas (current-isa-list))
 	(cpus (current-cpu-list))
 	)
@@ -364,7 +364,7 @@ See the input .cpu file(s) for copyright information.
    "<li>\n"
    "isas: "
    (string-map (lambda (isa)
-		 (string-append " " (obj:name isa)))
+		 (string-append " " (obj:str-name isa)))
 	       (mach-isas mach))
    "\n"
    "</li>\n"
@@ -455,7 +455,7 @@ See the input .cpu file(s) for copyright information.
    "<li>\n"
    "machines: "
    (string-map (lambda (mach)
-		 (string-append " " mach))
+		 (string-append " " (symbol->string mach)))
 	       (bitset-attr->list (obj-attr-value reg 'MACH)))
    "\n"
    "</li>\n"
@@ -574,7 +574,7 @@ See the input .cpu file(s) for copyright information.
    "<li>\n"
    "machines: "
    (string-map (lambda (mach)
-		 (string-append " " mach))
+		 (string-append " " (symbol->string mach)))
 	       (bitset-attr->list (obj-attr-value insn 'MACH)))
    "\n"
    "</li>\n"
@@ -623,11 +623,11 @@ See the input .cpu file(s) for copyright information.
 		    (string-list-map
 		     (lambda (t)
 		       (string-append "<li>\n"
-				      (car t)
+				      (->string (car t))
 				      ": "
 				      (string-map (lambda (u)
 						    (string-append " "
-								   (obj:name (iunit:unit u))))
+								   (obj:str-name (iunit:unit u))))
 						  (timing:units (cdr t)))
 				      "\n"
 				      "</li>\n"))
@@ -645,16 +645,16 @@ See the input .cpu file(s) for copyright information.
 (define (gen-insn-doc-list mach name comment insns)
   (string-list
    "<hr>\n"
-   (gen-doc-header (string-append (obj:name mach)
+   (gen-doc-header (string-append (obj:str-name mach)
 				  " "
-				  name
+				  (->string name)
 				  (if (string=? comment "")
 				      ""
 				      (string-append " - " comment)))
 		   (string-append "mach-insns-"
-				  (obj:name mach)
+				  (obj:str-name mach)
 				  "-"
-				  name))
+				  (->string name)))
    "<ul>\n"
    (string-list-map (lambda (o)
 		      (gen-obj-list-entry o "insn"))
@@ -804,11 +804,11 @@ See the input .cpu file(s) for copyright information.
 			    ""
 			    (string-list
 			     "<li><a href=\"#mach-insns-"
-			     (obj:name mach)
+			     (obj:str-name mach)
 			     "-"
-			     (enum-val-name c)
+			     (->string (enum-val-name c))
 			     "\">"
-			     (enum-val-name c)
+			     (->string (enum-val-name c))
 			     (if (string=? comment "")
 				 ""
 				 (string-append " - " comment))
@@ -816,9 +816,9 @@ See the input .cpu file(s) for copyright information.
 			     ))))
 		    categories)
    "<li><a href=\"#mach-insns-"
-   (obj:name mach)
+   (obj:str-name mach)
    "-"
-   (obj:name mach)
+   (obj:str-name mach)
    "\">alphabetically</a></li>\n"
    "</ul>\n"
    )
@@ -856,7 +856,7 @@ See the input .cpu file(s) for copyright information.
 						  (mach-supports? m insn))
 						insns)))
 			  (string-list "<li>"
-				       (obj:name m)
+				       (obj:str-name m)
 				       " - "
 				       (obj:comment m)
 				       "</li>\n"
@@ -1002,7 +1002,7 @@ See the input .cpu file(s) for copyright information.
   (logit 1 "Generating " (current-arch-name) ".html ...\n")
   (string-write
    (gen-html-copyright (string-append "Architecture documentation for "
-				      (current-arch-name)
+				      (symbol->string (current-arch-name))
 				      ".")
 		       CURRENT-COPYRIGHT CURRENT-PACKAGE)
    (gen-html-header "Architecture")
@@ -1020,7 +1020,7 @@ See the input .cpu file(s) for copyright information.
   (logit 1 "Generating " (current-arch-name) "-insn.html ...\n")
   (string-write
    (gen-html-copyright (string-append "Instruction documentation for "
-				      (current-arch-name)
+				      (symbol->string (current-arch-name))
 				      ".")
 		       CURRENT-COPYRIGHT CURRENT-PACKAGE)
    (gen-html-header "Instruction")

@@ -19,7 +19,7 @@
 (define (attr-gen-decl attr)
   (gen-enum-decl (symbol-append (obj:name attr) '-attr)
 		 (obj:comment attr)
-		 (string-append (obj:name attr) "_")
+		 (string-append (obj:str-name attr) "_")
 		 (attr-values attr))
 )
 
@@ -384,7 +384,7 @@
 	(string-list indent macro-name
 		     " /*"
 		     (string-list-map (lambda (fld)
-					(string-append " " (obj:name fld)))
+					(string-append " " (obj:str-name fld)))
 				      ifields)
 		     " */\n")
 	(let ((indent (if macro? (string-append indent "  ") indent)))

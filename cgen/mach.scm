@@ -1201,7 +1201,7 @@
   (logit 2 "Processing cpu family " name " ...\n")
   ; Pick out name first 'cus we need it as a string(/symbol).
   (let* ((name (parse-name name "cpu"))
-	 (errtxt (string-append "cpu " name)))
+	 (errtxt (stringsym-append "cpu " name)))
     (if (keep-cpu? name)
 	(make <cpu>
 	      name

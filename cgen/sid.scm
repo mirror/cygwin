@@ -649,7 +649,7 @@
 		   mode))
 	 (default-selector? (hw-selector-default? selector)))
      (cx:make mode
-	      (string-append "current_cpu->GETMEM" (obj:name mode)
+	      (string-append "current_cpu->GETMEM" (obj:str-name mode)
 			     (if default-selector? "" "ASI")
 			     " ("
 			     "pc, "
@@ -668,7 +668,7 @@
 		   (hw-mode self)
 		   mode))
 	 (default-selector? (hw-selector-default? selector)))
-     (string-append "current_cpu->SETMEM" (obj:name mode)
+     (string-append "current_cpu->SETMEM" (obj:str-name mode)
 		    (if default-selector? "" "ASI")
 		    " ("
 		    "pc, "
@@ -1618,7 +1618,7 @@
   (string-append
    "const char *mode_names[] = {\n"
    (string-map (lambda (m)
-		 (string-append "  \"" (string-upcase (obj:name m)) "\",\n"))
+		 (string-append "  \"" (string-upcase (obj:str-name m)) "\",\n"))
 	       ; We don't treat aliases as being different from the real
 	       ; mode here, so ignore them.
 	       (mode-list-non-alias-values))
@@ -1946,7 +1946,9 @@
     '(comment "write hardware elements via cover functions/methods"))
 
   ; If there is a .sim file, load it.
-  (let ((sim-file (string-append srcdir "/cpu/" (current-arch-name) ".sim")))
+  (let ((sim-file (string-append srcdir "/cpu/"
+				 (symbol->string (current-arch-name))
+				 ".sim")))
     (if (file-exists? sim-file)
 	(begin
 	  (display (string-append "Loading sim file " sim-file " ...\n"))

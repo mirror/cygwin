@@ -473,7 +473,8 @@ namespace @cpu@ {
 
   (string-write
    (gen-c-copyright (string-append "Simulator instruction operand writer for "
-				(current-arch-name) ".")
+				   (symbol->string (current-arch-name))
+				   ".")
 		 copyright-red-hat package-red-hat-simulators)
    "\
 
@@ -942,7 +943,7 @@ struct @prefix@_pbb_label {
 	 "used by:")
      (string-drop1
       (string-map (lambda (user)
-		    (string-append ", " (obj:name user)))
+		    (string-append ", " (obj:str-name user)))
 		  (sfrag-users frag)))
      "
 

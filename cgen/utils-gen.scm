@@ -364,7 +364,7 @@
 					  "UINT word_"
 					  (number->string chunk-num)
 					  (if macro? "; \\\n" ";\n")))
-			   (iota 1 (length chunk-specs))))
+			   (iota (length chunk-specs) 1)))
 	 "")))
 )
 
@@ -424,7 +424,7 @@
 	       (list (string-append var-prefix (number->string chunk-num))
 		     (car chunk-spec)
 		     (cdr chunk-spec)))
-	     (iota 1 (length chunk-specs))
+	     (iota (length chunk-specs) 1)
 	     chunk-specs))
 )
 
@@ -475,7 +475,7 @@
 					       (number->string chunk-num))
 					      macro?))
 			    chunk-specs
-			    (iota 1 (length chunk-specs))))
+			    (iota (length chunk-specs) 1)))
 	 "")
      (string-list-map
       (lambda (f)

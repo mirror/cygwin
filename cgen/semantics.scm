@@ -789,7 +789,7 @@
 	  (sem-attrs (cdr sem-attrs)))
 
       (let ((in-op-nums (iota (length sorted-ins)))
-	    (out-op-nums (iota (length sorted-ins) (length sorted-outs))))
+	    (out-op-nums (iota (length sorted-outs) (length sorted-ins))))
 
 	(for-each (lambda (op num) (op:set-num! op num))
 		  sorted-ins in-op-nums)

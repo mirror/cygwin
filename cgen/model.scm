@@ -98,6 +98,13 @@
 (define (model:enum m)
   (gen-c-symbol (string-append "MODEL_" (string-upcase (obj:name m))))
 )
+
+(define (models-for-mach mach)
+  (let ((mach-name (obj:name mach)))
+    (find (lambda (model)
+	    (eq? (obj:name (model:mach model)) mach-name))
+	  (current-model-list)))
+)
 
 ; Parse a `prefetch' spec.
 

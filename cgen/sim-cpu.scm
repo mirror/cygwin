@@ -813,7 +813,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
   (rtl-c-config! #:rtl-cover-fns? #f)
 
   (string-write
-   (gen-copyright "CPU family header for @cpu@."
+   (gen-c-copyright "CPU family header for @cpu@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #ifndef CPU_@CPU@_H
@@ -853,7 +853,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
   (rtl-c-config! #:rtl-cover-fns? #f)
 
   (string-write
-   (gen-copyright (string-append
+   (gen-c-copyright (string-append
                   "ISA definitions header for "
                   (obj:name (current-isa))
                   ".")
@@ -885,7 +885,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
   (rtl-c-config! #:rtl-cover-fns? #t)
 
   (string-write
-   (gen-copyright "Misc. support for CPU family @cpu@."
+   (gen-c-copyright "Misc. support for CPU family @cpu@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #define WANT_CPU @cpu@
@@ -914,7 +914,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
   (rtl-c-config! #:rtl-cover-fns? #t)
 
   (string-write
-   (gen-copyright (string-append "Simulator instruction operand reader for "
+   (gen-c-copyright (string-append "Simulator instruction operand reader for "
 				 (current-arch-name) ".")
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
@@ -992,7 +992,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
   (rtl-c-config! #:rtl-cover-fns? #t)
 
   (string-write
-   (gen-copyright (string-append "Simulator instruction operand writer for "
+   (gen-c-copyright (string-append "Simulator instruction operand writer for "
 				 (current-arch-name) ".")
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
@@ -1044,7 +1044,7 @@ void
   (rtl-c-config! #:rtl-cover-fns? #t)
 
   (string-write
-   (gen-copyright "Simulator instruction semantics for @cpu@."
+   (gen-c-copyright "Simulator instruction semantics for @cpu@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #define WANT_CPU @cpu@
@@ -1094,7 +1094,7 @@ CGEN_ATTR_VALUE (NULL, abuf->idesc->attrs, CGEN_INSN_" "attr)")
   (rtl-c-config! #:rtl-cover-fns? #t)
 
   (string-write
-   (gen-copyright "Simulator instruction semantics for @cpu@."
+   (gen-c-copyright "Simulator instruction semantics for @cpu@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
 
    "\
@@ -1225,7 +1225,7 @@ SWITCH (sem, SEM_ARGBUF (vpc) -> semantic.sem_case)
 
   (string-write
    "cat <<EOF >/dev/null\n"
-   (gen-copyright "Simulator main loop for @arch@."
+   (gen-c-copyright "Simulator main loop for @arch@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "EOF\n"
    "\

@@ -1157,6 +1157,13 @@
 
 (define (mach-number obj) (mach-enum obj))
 
+(define (machs-for-cpu cpu)
+  (let ((cpu-name (obj:name cpu)))
+    (find (lambda (mach)
+	    (eq? (obj:name (mach-cpu mach)) cpu-name))
+	  (current-mach-list)))
+)
+
 ; Parse a machine entry.
 ; The result is a <mach> object or #f if the mach isn't to be kept.
 ; All arguments are in raw (non-evaluated) form.

@@ -375,7 +375,7 @@ const MACH " (gen-sym mach) "_mach =
   (set-with-parallel?! (state-parallel-exec?))
 
   (string-write
-   (gen-copyright "Simulator model support for @cpu@."
+   (gen-c-copyright "Simulator model support for @cpu@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #define WANT_CPU @cpu@

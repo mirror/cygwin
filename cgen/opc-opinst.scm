@@ -154,7 +154,7 @@ void
 	))
 
   (string-write
-   (gen-copyright "Semantic operand instances for @arch@."
+   (gen-c-copyright "Semantic operand instances for @arch@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #include \"sysdep.h\"

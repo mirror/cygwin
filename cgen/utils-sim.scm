@@ -637,7 +637,7 @@
 	 (bits (ifld-length ifld)))
     (if (mode-unsigned? (ifld-mode ifld))
 	(iota (logsll 1 bits))
-	(iota (- (logsll 1 (- bits 1))) (logsll 1 bits))))
+	(iota (logsll 1 bits) (- (logsll 1 (- bits 1))))))
 )
 
 ; Subroutine of -decode-expr-ifield-tracking,-decode-expr-ifield-mark-used.

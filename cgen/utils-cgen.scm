@@ -623,7 +623,16 @@
    (backslash "\n" expr)
    ";} while (0)\n")
 )
+
+; Misc. object utilities.
 
+; Sort a list of <ident> objects alphabetically.
+
+(define (alpha-sort-obj-list l)
+  (sort l
+	(lambda (o1 o2)
+	  (string<? (obj:name o1) (obj:name o2))))
+)
 
 ; Called before loading the .cpu file to initialize.
 

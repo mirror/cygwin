@@ -2263,7 +2263,7 @@ then
 echo "configure:2264: checking tcl in build tree" >&5
   if test -d ../../../tcl; then
      with_tcl_include="-I$srcdir/../../../tcl/generic"
-     with_tcl_lib="-L../../../tcl/$tcl_hostdir -ltcl8${tcl_libdot}3"
+     with_tcl_lib="-L../../../tcl/$tcl_hostdir -ltcl8${tcl_libdot}4"
   fi
   echo "$ac_t""$with_tcl_lib" 1>&6
 fi
@@ -2274,7 +2274,7 @@ then
 echo "configure:2275: checking tk in build tree" >&5
   if test -d ../../../tk; then
     with_tk_include="-I$srcdir/../../../tk/generic -I$srcdir/../../../tk/xlib"
-    with_tk_lib="-L../../../tk/$tcl_hostdir -ltk8${tcl_libdot}3"
+    with_tk_lib="-L../../../tk/$tcl_hostdir -ltk8${tcl_libdot}4"
   fi
   echo "$ac_t""$with_tk_lib" 1>&6
 fi
@@ -3629,14 +3629,14 @@ esac
 LIBS="$with_tcl_lib $with_tk_lib $with_blt_lib $LIBS"
 
 if test -z "$with_tcl_lib"; then
-   echo $ac_n "checking for Tcl_Init in -ltcl8${tcl_libdot}3""... $ac_c" 1>&6
-echo "configure:3634: checking for Tcl_Init in -ltcl8${tcl_libdot}3" >&5
-ac_lib_var=`echo tcl8${tcl_libdot}3'_'Tcl_Init | sed 'y%./+-%__p_%'`
+   echo $ac_n "checking for Tcl_Init in -ltcl8${tcl_libdot}4""... $ac_c" 1>&6
+echo "configure:3634: checking for Tcl_Init in -ltcl8${tcl_libdot}4" >&5
+ac_lib_var=`echo tcl8${tcl_libdot}4'_'Tcl_Init | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   ac_save_LIBS="$LIBS"
-LIBS="-ltcl8${tcl_libdot}3  $LIBS"
+LIBS="-ltcl8${tcl_libdot}4  $LIBS"
 cat > conftest.$ac_ext <<EOF
 #line 3642 "configure"
 #include "confdefs.h"
@@ -3667,13 +3667,13 @@ LIBS="$ac_save_LIBS"
 fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
-    ac_tr_lib=HAVE_LIB`echo tcl8${tcl_libdot}3 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
+    ac_tr_lib=HAVE_LIB`echo tcl8${tcl_libdot}4 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
     -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
   cat >> confdefs.h <<EOF
 #define $ac_tr_lib 1
 EOF
 
-  LIBS="-ltcl8${tcl_libdot}3 $LIBS"
+  LIBS="-ltcl8${tcl_libdot}4 $LIBS"
 
 else
   echo "$ac_t""no" 1>&6
@@ -3732,14 +3732,14 @@ fi
 
 fi
 if test -z "$with_tk_lib"; then
-   echo $ac_n "checking for Tk_Init in -ltk8${tcl_libdot}3""... $ac_c" 1>&6
-echo "configure:3737: checking for Tk_Init in -ltk8${tcl_libdot}3" >&5
-ac_lib_var=`echo tk8${tcl_libdot}3'_'Tk_Init | sed 'y%./+-%__p_%'`
+   echo $ac_n "checking for Tk_Init in -ltk8${tcl_libdot}4""... $ac_c" 1>&6
+echo "configure:3737: checking for Tk_Init in -ltk8${tcl_libdot}4" >&5
+ac_lib_var=`echo tk8${tcl_libdot}4'_'Tk_Init | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   ac_save_LIBS="$LIBS"
-LIBS="-ltk8${tcl_libdot}3  $LIBS"
+LIBS="-ltk8${tcl_libdot}4  $LIBS"
 cat > conftest.$ac_ext <<EOF
 #line 3745 "configure"
 #include "confdefs.h"
@@ -3770,13 +3770,13 @@ LIBS="$ac_save_LIBS"
 fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
-    ac_tr_lib=HAVE_LIB`echo tk8${tcl_libdot}3 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
+    ac_tr_lib=HAVE_LIB`echo tk8${tcl_libdot}4 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
     -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
   cat >> confdefs.h <<EOF
 #define $ac_tr_lib 1
 EOF
 
-  LIBS="-ltk8${tcl_libdot}3 $LIBS"
+  LIBS="-ltk8${tcl_libdot}4 $LIBS"
 
 else
   echo "$ac_t""no" 1>&6

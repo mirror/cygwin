@@ -5,6 +5,7 @@ connect-bus rtc_1742 memory-bus rtcmem read-write-port
 #
 load libt6963c.la t6963c_component_library
 new hw-lcd-t6963c-0101 lcd
+load libtclapi.la tcl_bridge_library
 new bridge-tk panel
 set panel load! @srcdir@/lcd.tcl
 set panel load! @srcdir@/voice-pager.tcl
@@ -34,5 +35,5 @@ set host-sched 9-regular? 1
 set host-sched 9-time 1000
 connect-pin host-sched 9-event -> rtc_1742 clock
 # Memory map
-connect-bus mapper rtc_1742:[0xa00000-0xa01000,1,1] rtc_1742 read-write-port
-connect-bus mapper lcd:[0xa01200-0xa01201,1,1] lcd bus
+connect-bus cpu-mapper rtc_1742:[0xa00000-0xa01000,1,1] rtc_1742 read-write-port
+connect-bus cpu-mapper lcd:[0xa01200-0xa01201,1,1] lcd bus

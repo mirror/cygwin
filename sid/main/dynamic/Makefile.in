@@ -85,6 +85,7 @@ INCLUDES = -I. -I../../include -I$(srcdir)/../../include
 bin_PROGRAMS = sid
 @SID_STATIC_TRUE@NEARBY_LIBS = @SID_STATIC_TRUE@\
 @SID_STATIC_TRUE@	-dlpreopen ../../component/audio/libaudio.la \
+@SID_STATIC_TRUE@	-dlpreopen ../../component/cache/libcache.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/cfgroot/libconfig.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/cgen-cpu/libcgencpu.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/consoles/libconsoles.la \
@@ -107,13 +108,38 @@ bin_PROGRAMS = sid
 @SID_STATIC_TRUE@	-dlpreopen ../../component/tcl/libtclapi.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/timers/libtimers.la \
 @SID_STATIC_TRUE@	-dlpreopen ../../component/uart/libuart.la
-@SID_STATIC_FALSE@NEARBY_LIBS = 
+@SID_STATIC_FALSE@NEARBY_LIBS = @SID_STATIC_FALSE@../../component/cfgroot/libconfig.la
+@SID_STATIC_TRUE@NEARBY_DEPS_LIBS = @SID_STATIC_TRUE@\
+@SID_STATIC_TRUE@	../../component/audio/libaudio.la \
+@SID_STATIC_TRUE@	../../component/cfgroot/libconfig.la \
+@SID_STATIC_TRUE@	../../component/cgen-cpu/libcgencpu.la \
+@SID_STATIC_TRUE@	../../component/consoles/libconsoles.la \
+@SID_STATIC_TRUE@	../../component/gdb/libgdb.la \
+@SID_STATIC_TRUE@	../../component/gloss/libgloss.la \
+@SID_STATIC_TRUE@	../../component/glue/libglue.la \
+@SID_STATIC_TRUE@	../../component/ide/libide.la \
+@SID_STATIC_TRUE@	../../component/interrupt/libinterrupt.la \
+@SID_STATIC_TRUE@	../../component/lcd/libhd44780u.la \
+@SID_STATIC_TRUE@	../../component/lcd/liblcd-char-display.la \
+@SID_STATIC_TRUE@	../../component/lcd/libt6963c.la \
+@SID_STATIC_TRUE@	../../component/loader/libloader.la \
+@SID_STATIC_TRUE@	../../component/mapper/libmapper.la \
+@SID_STATIC_TRUE@	../../component/memory/libmemory.la \
+@SID_STATIC_TRUE@	../../component/mmu/libmmu.la \
+@SID_STATIC_TRUE@	../../component/parport/libparport.la \
+@SID_STATIC_TRUE@	../../component/profiling/libprof.la \
+@SID_STATIC_TRUE@	../../component/rtc/librtc.la \
+@SID_STATIC_TRUE@	../../component/sched/libsched.la \
+@SID_STATIC_TRUE@	../../component/tcl/libtclapi.la \
+@SID_STATIC_TRUE@	../../component/timers/libtimers.la \
+@SID_STATIC_TRUE@	../../component/uart/libuart.la
+@SID_STATIC_FALSE@NEARBY_DEPS_LIBS = @SID_STATIC_FALSE@$(NEARBY_LIBS)
 @SID_STATIC_TRUE@AM_CXXFLAGS = @SID_STATIC_TRUE@-DSID_STATIC
 @SID_STATIC_FALSE@AM_CXXFLAGS = 
 
 sid_SOURCES = mainDynamic.cxx
 sid_LDFLAGS = -export-dynamic -static -export-symbols-regex '[a-zA-Z0-9]*_library$$' $(NEARBY_LIBS)
-sid_LDADD = ../../component/cfgroot/libconfig.la
+sid_DEPENDENCIES = $(NEARBY_DEPS_LIBS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../config/mkinstalldirs
 CONFIG_HEADER = config.h
@@ -127,7 +153,7 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 sid_OBJECTS =  mainDynamic.o
-sid_DEPENDENCIES =  ../../component/cfgroot/libconfig.la
+sid_LDADD = $(LDADD)
 CXXFLAGS = @CXXFLAGS@
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)

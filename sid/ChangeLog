@@ -60,7 +60,7 @@
 
 	* aclocal.m4, configure: Regenerated.
 
-2000-11-19  Frank Ch. Eigler <fche@redhat.com>
+2000-11-19  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am (install-info): Add dummy target.
 	* Makefile.in: Regenerated.

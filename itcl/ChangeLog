@@ -1,6 +1,13 @@
 2002-08-06  Keith Seitz  <keiths@redhat.com>
 
 	From Mo Dejong  <supermo@bayarea.net>:
+	* iwidgets3.0.0/Makefile.in: Don't create a symlink
+	from $(SCRIPT_INSTALL_DIR) to $(LIB_INSTALL_DIR)/iwidgets.
+	Remove LN_S and LIB_INSTALL_DIR variables.
+
+2002-08-06  Keith Seitz  <keiths@redhat.com>
+
+	From Mo Dejong  <supermo@bayarea.net>:
 	* configure.in: Don't configure iwidgets when building
 	Source-Navigator.
 	* configure: Regenerated.

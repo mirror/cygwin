@@ -1,5 +1,9 @@
 // Test various -*- C++ -*- things.
 
+// ====================== basic C++ types  =======================
+bool            v_bool;
+bool            v_bool_array[2];
+
 typedef struct fleep fleep;
 struct fleep { int a; } s;
 
@@ -211,6 +215,16 @@ void inheritance1 (void)
 
   // ????? = 11;  (g_D.A::a = 11; is ambiguous)
   // ????? = 12;  (g_D.A::x = 12; is ambiguous)
+/* djb 6-3-2000
+
+	This should take care of it. Rather than try to initialize using an ambiguous
+	construct, use 2 unambiguous ones for each. Since the ambiguous a/x member is
+	coming from C, and B, initialize D's C::a, and B::a, and D's C::x and B::x.
+ */
+  g_D.C::a = 15;
+  g_D.C::x = 12;
+  g_D.B::a = 11;
+  g_D.B::x = 12;
   g_D.B::b = 13;
   g_D.B::x = 14;
   // ????? = 15;
@@ -477,6 +491,14 @@ register_class ()
   return v.x + 5;
 }
 
+void dummy()
+{
+  v_bool = true;
+  v_bool_array[0] = false;
+  v_bool_array[1] = v_bool;
+}
+
+
 int
 main()
 {
@@ -484,6 +506,7 @@ main()
   set_debug_traps();
   breakpoint();
 #endif
+  dummy();
   inheritance1 ();
   inheritance3 ();
   register_class ();
@@ -498,6 +521,8 @@ main()
 
   /* Class with enumeration inside it */ 
   ClassWithEnum obj_with_enum;
+  obj_with_enum.priv_enum = ClassWithEnum::red;
+  obj_with_enum.x = 0;
   obj_with_enum.priv_enum = ClassWithEnum::green;
 
   return foo.*pmi;

@@ -71,7 +71,10 @@
       to specify the name of a file where trace output will be
       collected.  A special filename of "-" is used to represent
       standard output.  Trace output files are not appended, but
-      overwritten each time they are opened.</p>
+      overwritten each time they are opened.  The
+      <pin>print-insn-summary!</pin> pin can be driven to print a
+      summary of instruction and cycle counts, usually at the end of
+      the simulation.</p>
     </behavior>
 
     <behavior name="exceptions/traps">

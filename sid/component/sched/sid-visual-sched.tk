@@ -42,29 +42,47 @@ proc toggle_subscription {sched n} {
 
 proc make_toggle {sched n caption} {
     global saved_subs
+    global labels
+    set labels($n) $caption
     set saved_subs($sched,$n) {0 no}
-    checkbutton .rc.toggle-$n -text $caption -command [list toggle_subscription $sched $n]
-    grid .rc.toggle-$n -sticky w
+    checkbutton .rc.toggle-$n -textvariable labels($n) -command [list toggle_subscription $sched $n]
+    grid .rc.toggle-$n -column 0 -row $n -sticky w
 }
 
-
-proc relate {rel comp} {
-    global names
-    set n [sid::component::attribute_value $comp num-clients]
-    for {set i 0} {$i < $n} {incr i} {
-	if {[array get names $i] == {}} {
-	    make_toggle $comp $i "pause subscription $i"
+proc refresh {sched} {
+    global labels
+    set n [sid::component::attribute_value $sched num-clients]
+    for {set i 0} {$i < $n} {incr i} {	
+	set name [sid::component::attribute_value $sched "$i-name"]
+	if { $name != [array get labels $i] } {
+	    if { $name != {} } {
+		set labels($i) "pause $name"
+	    }
+	}
+	
+	if { [sid::component::connected_pins $sched "$i-event"] == {} } {
+	    .rc.toggle-$i configure -state "disabled"
 	} else {
-	    make_toggle $comp $i "pause $names($i)"
+	    .rc.toggle-$i configure -state "normal"
 	}
     }
+    after 500 [list refresh $sched]
+}
+
+proc relate {rel comp} {
+    global labels
+    set n [sid::component::attribute_value $comp num-clients]
+    for {set i 0} {$i < $n} {incr i} {
+	make_toggle $comp $i "pause subscription $i"
+    }
+    refresh $comp
     return ok
 }
 
 proc set_attribute_value {name value} {
-    global names
+    global labels
     if {[regexp {^([0-9]+)-name$} $name zz num] != 0} {
-	set names($num) $value
+	set labels($num) $value
 	return ok
     } else {
 	return bad_value 
@@ -89,4 +107,5 @@ proc relationship_names {} { return "" }
 frame .rc
 pack .rc
 wm title . "scheduler controls"
+wm positionfrom . user
 update

@@ -1,3 +1,7 @@
+2003-07-14  Dave Brolley  <brolley@redhat.com>
+
+	* CATALOG: Add sid-io-fileio.
+
 2003-06-10  Dave Brolley  <brolley@redhat.com>
 
 	* configure.in: Call AC_CHECK_FUNCS for vsnprintf and vasprintf.

@@ -151,7 +151,7 @@ noinst_LIBRARIES = libgui.a
 @INSTALL_LIBGUI_TRUE@	guitcl.h subcommand.h
 
 datadir = @datadir@
-guidir = $(datadir)/cygnus/gui
+guidir = $(datadir)/redhat/gui
 
 TBL_MAJOR_VERSION = 2
 TBL_MINOR_VERSION = 7

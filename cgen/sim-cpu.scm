@@ -339,17 +339,13 @@ void
    "    CASE (read, READ_" (string-upcase (gen-sym sfmt)) ") : "
    "/* " (obj:comment sfmt) " */\n"
    "    {\n"
-   (if (with-scache?)
-       (gen-define-field-macro sfmt)
-       "")
+   (gen-define-field-macro (if (with-scache?) sfmt #f))
    (gen-define-parallel-operand-macro sfmt)
    (gen-define-ifields (sfmt-iflds sfmt) (sfmt-length sfmt) "      " #f)
    (gen-extract-ifields (sfmt-iflds sfmt) (sfmt-length sfmt) "      " #f)
    (-gen-read-args sfmt)
    (gen-undef-parallel-operand-macro sfmt)
-   (if (with-scache?)
-       (gen-undef-field-macro sfmt)
-       "")
+   (gen-undef-field-macro sfmt)
    "    }\n"
    "    BREAK (read);\n\n"
    )
@@ -412,9 +408,7 @@ void
 	/indent
 	"    const ARGBUF *abuf = SEM_ARGBUF (sem_arg)->fields.write.abuf;\n")
        "")
-   (if (with-scache?)
-       (gen-define-field-macro sfmt)
-       "")
+   (gen-define-field-macro (if (with-scache?) sfmt #f))
    (gen-define-parallel-operand-macro sfmt)
    /indent
    "    int UNUSED written = abuf->written;\n"
@@ -439,9 +433,7 @@ void
        (string-list /indent "  SEM_BRANCH_FINI (vpc);\n")
        "")
    (gen-undef-parallel-operand-macro sfmt)
-   (if (with-scache?)
-       (gen-undef-field-macro sfmt)
-       "")
+   (gen-undef-field-macro sfmt)
    /indent "  }\n"
    (if insn
        (string-list /indent "  NEXT (vpc);\n")
@@ -629,6 +621,7 @@ SEM_FN_NAME (@cpu@,init_idesc_table) (SIM_CPU *current_cpu)
 	 "")
      "  SEM_STATUS status = 0;\n" ; ??? wip
      "  ARGBUF *abuf = SEM_ARGBUF (sem_arg);\n"
+     (gen-define-field-macro (if (with-scache?) (insn-sfmt insn) #f))
      ; Unconditionally written operands are not recorded here.
      "  int UNUSED written = 0;\n"
      "  IADDR UNUSED pc = GET_H_PC ();\n"
@@ -659,6 +652,7 @@ SEM_FN_NAME (@cpu@,init_idesc_table) (SIM_CPU *current_cpu)
 	  (gen-bool-attrs (obj-atlist insn) gen-attr-mask)
 	  ");\n")
 	 "")
+     (gen-undef-field-macro (insn-sfmt insn))
      "  return status;\n"
      (if (and parallel? (not (with-generic-write?)))
 	 (gen-undef-parallel-operand-macro (insn-sfmt insn))
@@ -714,9 +708,7 @@ SEM_FN_NAME (@cpu@,init_idesc_table) (SIM_CPU *current_cpu)
      "{\n"
      "  SEM_ARG sem_arg = SEM_SEM_ARG (vpc, sc);\n"
      "  ARGBUF *abuf = SEM_ARGBUF (sem_arg);\n"
-     (if (with-scache?)
-	 (gen-define-field-macro (insn-sfmt insn))
-	 "")
+     (gen-define-field-macro (if (with-scache?) (insn-sfmt insn) #f))
      (if (and parallel? (not (with-generic-write?)))
 	 (gen-define-parallel-operand-macro (insn-sfmt insn))
 	 "")
@@ -750,9 +742,7 @@ SEM_FN_NAME (@cpu@,init_idesc_table) (SIM_CPU *current_cpu)
      (if (and parallel? (not (with-generic-write?)))
 	 (gen-undef-parallel-operand-macro (insn-sfmt insn))
 	 "")
-     (if (with-scache?)
-	 (gen-undef-field-macro (insn-sfmt insn))
-	 "")
+     (gen-undef-field-macro (insn-sfmt insn))
      "}\n"
      "  NEXT (vpc);\n\n"
      ))

@@ -431,11 +431,18 @@
 ; Name of macro to access fields in ARGBUF.
 (define c-argbuf-macro "FLD")
 
+; NB: If sfmt is #f, then define the macro to pass through the argument
+; symbol.  This is appropriate for "simple" (non-scache) simulators
+; that have no abuf/scache in the sem.c routines, but rather plain
+; local variables.
 (define (gen-define-argbuf-macro sfmt)
   (string-append "#define " c-argbuf-macro "(f) "
-		 "abuf->fields."
-		 (gen-sym (sfmt-sbuf sfmt))
-		 ".f\n")
+		 (if sfmt
+		     (string-append
+		      "abuf->fields."
+		      (gen-sym (sfmt-sbuf sfmt))
+		      ".f\n")
+		     "f\n"))
 )
 
 (define (gen-undef-argbuf-macro sfmt)

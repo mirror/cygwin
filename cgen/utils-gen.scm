@@ -14,7 +14,7 @@
 (define (attr-int-gen-defn attr) 
   (string-append
    "static const CGEN_ATTR_ENTRY " (gen-sym attr)
-   "_attr [] = \n{\n  {\"integer\", " (number->string (attr-default attr)) "},\n  { 0, 0 }\n};\n\n" ))
+   "_attr [] ATTRIBUTE_UNUSED = \n{\n  {\"integer\", " (number->string (attr-default attr)) "},\n  { 0, 0 }\n};\n\n" ))
 
 (define (attr-gen-decl attr)
   (gen-enum-decl (symbol-append (obj:name attr) '-attr)
@@ -27,7 +27,7 @@
   (string-append
    "static const CGEN_ATTR_ENTRY "
    (gen-sym attr) "_attr"
-   "[] =\n{\n"
+   "[] ATTRIBUTE_UNUSED =\n{\n"
    (string-map (lambda (elm)
 		 (let* ((san (and (pair? elm) (pair? (cdr elm))
 				  (attr-value (cddr elm) 'sanitize #f))))

@@ -74,6 +74,23 @@
 	* sidcpuutil.h (step_pin_handler): Check for triggerpoints due right
 	now, before instruction evaluation loop.
 
+2001-05-29  matthew green  <mrg@redhat.com>
+
+	* sidcpuutil.h (trace_disass_p, trace_semantics_p, trace_counter_p):
+	New bools controlling disassembly tracing, semantic tracing (what
+	was trace_result_p), and counter tracing, respectively.
+	(set_trace_sem, get_trace_sem, set_trace_disasm, get_trace_disasm,
+	set_trace_count, get_trace_count, get_trace_result): New methods,
+	mostly for compatibility with old CPU components that use
+	trace_result_p for what is now trace_semantics_p.  Remove later.
+	(stream_state, destream_state): Handle trace_disass_p,
+	trace_semantics_p and trace_counter_p.
+	(basic_cpu ctor): New virtual attributes `trace-semantics?',
+	`trace-disassemble?', `trace-counter?'. `trace-result?' is now
+	virtual, and acts as if `trace-semantics?' was set.
+	Much of the above can be undone when all CPU ports are converted to
+	use trace_result_p in the new method.
+
 2001-05-25  Will Cohen  <wcohen@redhat.com>
 
 	* sidmiscutil.h: Added #include <sys/cygwin.h> for cygwin builds.
@@ -112,7 +129,7 @@
 
 2001-03-05  Frank Ch. Eigler  <fche@redhat.com>
 
-        On advice from Momchil Velikov <velco@fadata.bg>:
+	On advice from Momchil Velikov <velco@fadata.bg>:
 	* configure.in: Test for compiler support of __builtin_expect.
 	* sidconfig.h: Define LIKELY/UNLIKEY depending on this test.
 	* configure, sidconfutil.in: Regenerated.
@@ -128,6 +145,11 @@
 	* sidpinutil.h (callback_pin::driven): Remove unnecessary assert
 	from critical path.
 	(callback_pin ctor, set_callback): Put them here instead.
+
+2001-11-17  Jeff Johnston <jjohnstn@redhat.com>
+
+        * sidbusutil.h (passthrough_word_bus): Changed do_direct_passthrough
+        to use reference parameter so address can be modified by routine.
 
 2001-01-12  Jeff Johnston  <jjohnstn@redhat.com>
 

@@ -203,6 +203,9 @@ namespace sidutil
   public:
     bool trace_extract_p;
     bool trace_result_p;
+    bool trace_disass_p;
+    bool trace_semantics_p;
+    bool trace_counter_p;
     bool enable_step_trap_p;
 
     void step_pin_handler (sid::host_int_4)
@@ -274,6 +277,68 @@ namespace sidutil
 	  }
       }
 
+    component::status
+    set_trace_sem (const string &s)
+    {
+      if (s == "1")
+        trace_semantics_p = true;
+      else if (s == "0")
+        trace_semantics_p = false;
+      else
+	return sid::component::bad_value;
+      trace_result_p = (trace_semantics_p || trace_disass_p);
+      return sid::component::ok;
+    }
+
+    string
+    get_trace_sem ()
+    {
+      return trace_semantics_p ? "1" : "0";
+    }
+
+    component::status
+    set_trace_disasm (const string& s)
+    {
+      if (s == "1")
+        trace_disass_p = true;
+      else if (s == "0")
+        trace_disass_p = false;
+      else
+	return sid::component::bad_value;
+      trace_result_p = (trace_semantics_p || trace_disass_p);
+      return sid::component::ok;
+    }
+
+    string
+    get_trace_disasm ()
+    {
+      return trace_disass_p ? "1" : "0";
+    }
+
+    component::status
+    set_trace_count (const string& s)
+    {
+      if (s == "1")
+        trace_counter_p = true;
+      else if (s == "0")
+        trace_counter_p = false;
+      else
+	return sid::component::bad_value;
+      return sid::component::ok;
+    }
+
+    string
+    get_trace_count ()
+    {
+      return trace_counter_p ? "1" : "0";
+    }
+
+    string
+    get_trace_result ()
+    {
+      return trace_result_p ? "1" : "0";
+    }
+
 
     // Reset the processor model to power-up state.
   private:
@@ -328,6 +393,9 @@ namespace sidutil
 	  << " " << this->total_latency
 	  << " " << this->trace_extract_p
 	  << " " << this->trace_result_p
+	  << " " << this->trace_disass_p
+	  << " " << this->trace_semantics_p
+	  << " " << this->trace_counter_p
 	  // pins
 	  << " " << this->step_cycles_pin
 	  << " " << this->trap_type_pin
@@ -349,6 +417,9 @@ namespace sidutil
 	  >> this->total_latency
 	  >> this->trace_extract_p
 	  >> this->trace_result_p
+	  >> this->trace_disass_p
+	  >> this->trace_semantics_p
+	  >> this->trace_counter_p
 	  // pins
 	  >> this->step_cycles_pin
 	  >> this->trap_type_pin
@@ -461,10 +532,27 @@ public:
 			       & basic_cpu::save_state,
 			       & basic_cpu::restore_state);
 	add_attribute ("trace-extract?", & trace_extract_p, "setting");
-	add_attribute ("trace-result?", & trace_result_p, "setting");
+	add_attribute_virtual ("trace-semantics?", this,
+			       & basic_cpu::set_trace_sem, 
+			       & basic_cpu::get_trace_sem, 
+			       "setting");
+	// `trace-result?' should go away after all simulators are updated to
+	// use `trace-semantics?'.
+	add_attribute_virtual ("trace-result?", this,
+			       & basic_cpu::set_trace_sem, 
+			       & basic_cpu::get_trace_sem, 
+			       "setting");
+	add_attribute_virtual ("trace-disassemble?", this,
+			       & basic_cpu::set_trace_disasm, 
+			       & basic_cpu::get_trace_disasm, 
+			       "setting");
+	add_attribute_virtual ("trace-counter?", this,
+			       & basic_cpu::set_trace_count, 
+			       & basic_cpu::get_trace_count, 
+			       "setting");
       }
 
-    virtual ~basic_cpu() throw() {} 
+    virtual ~basic_cpu() throw() {}
   };
 
 

@@ -1,3 +1,16 @@
+2002-09-05  Keith Seitz  <keiths@redhat.com>
+
+	* itk/Makefile.in (distclean): Remove pkgIndex.tcl and
+	itkConfig.sh
+	* itcl/Makefile.in (distclean): Remove pkgIndex.tcl and
+	itclConfig.sh
+	* iwidgets3.0.0/Makefile.in (distclean): Remove pkgIndex.tcl and
+	iwidgets.tcl.
+	* configure.in (subdirs): New variable. Don't put AC_CONFIG_SUBDIRS
+	macro into configure.in twice: it confuses autoconf. Instead use
+	the variable to hold the subdirs to be configured.
+	* configure: Regenerated.
+
 2002-09-04 Keith Seitz  <keiths@redhat.com> 
 
 	From Chris Drexler  <ckolumbus@users.sourceforge.net>:

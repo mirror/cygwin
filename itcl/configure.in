@@ -25,11 +25,14 @@ AC_PREFIX_DEFAULT(/usr/local)
 AC_PREFIX_PROGRAM(itclsh)
 
 # Source-Navigator does not use the iwidgets packag
+subdirs=
+
 if test -d ${srcdir}/../snavigator && test ! -d ${srcdir}/../gdb/gdbtk ; then
-    AC_CONFIG_SUBDIRS(itcl itk)
+    subdirs="itcl itk"
 else
-    AC_CONFIG_SUBDIRS(itcl itk iwidgets3.0.0)
+    subdirs="itcl itk iwidgets3.0.0"
 fi
+AC_CONFIG_SUBDIRS($subdirs)
 
 AC_OUTPUT(Makefile,
 	chmod +x ${srcdir}/config/install-sh ${srcdir}/config/mkinstalldirs)

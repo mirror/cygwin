@@ -681,13 +681,15 @@ fi
 
 
 # Source-Navigator does not use the iwidgets packag
+subdirs=
+
 if test -d ${srcdir}/../snavigator && test ! -d ${srcdir}/../gdb/gdbtk ; then
     subdirs="itcl itk"
-
 else
-    subdirs="itcl itk itcl itk iwidgets3.0.0"
-
+    subdirs="itcl itk iwidgets3.0.0"
 fi
+subdirs="$subdirs"
+
 
 trap '' 1 2 15
 cat > confcache <<\EOF
@@ -973,7 +975,7 @@ if test "$no_recursion" != yes; then
     esac
   done
 
-  for ac_config_dir in itcl itk itcl itk iwidgets3.0.0; do
+  for ac_config_dir in $subdirs; do
 
     # Do not complain, so a configure script can configure whichever
     # parts of a large source tree are present.

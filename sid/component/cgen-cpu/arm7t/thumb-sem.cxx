@@ -2,9 +2,9 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 
-This file is part of the Cygnus Simulators.
+This file is part of the Red Hat simulators.
 
 
 */

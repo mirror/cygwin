@@ -2,9 +2,9 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
 
-This file is part of the Cygnus Simulators.
+This file is part of the Red Hat simulators.
 
 
 */
@@ -133,7 +133,7 @@ arm7f_cpu::thumb_pbb_run ()
 	thumb_idesc::idesc_table[labels[i].insn].cgoto.label = labels[i].label; 
 
       // confirm that table is all filled up
-      for (int i=0; i<THUMB_INSN_MAX; i++)
+      for (int i = 0; i <= THUMB_INSN_BL_LO; i++)
         assert (thumb_idesc::idesc_table[i].cgoto.label != 0);
 
       // Initialize the compiler virtual insn.

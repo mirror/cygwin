@@ -63,7 +63,7 @@ public:
   sid::host_int_4 get_size () const { return my_size; }
   sid::host_int_4 get_line_size () const {return my_line_size; }
  protected:
-  void compute_comptype ();
+  virtual void compute_comptype ();
   string my_assoc;
   sid::host_int_4 my_size;
   sid::host_int_4 my_line_size;
@@ -209,6 +209,7 @@ struct SessionCfg :
   void use_tcl_bridge();
   void use_no_stdio ();
   virtual void set_loader (LoaderCfg *l);
+  LoaderCfg *get_loader () const { return loader; }
   AtomicCfg *audio;
   AtomicCfg *tksched;
   AtomicCfg *tksm;

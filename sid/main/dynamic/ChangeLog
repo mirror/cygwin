@@ -1,3 +1,8 @@
+2004-04-27  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.h (CacheCfg::compute_comptype): Now virtual.
+	(SessionCfg::get_loader): New method.
+
 2004-04-01  Dave Brolley  <brolley@redhat.com>
 
 	* commonCfg.h (get_size): New method of CacheCfg.

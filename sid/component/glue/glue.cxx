@@ -540,10 +540,7 @@ public:
 
   void handle_switch_pin (host_int_4 value)
     {
-      if (value != 0)
-        {
-          upstream.switch_bus();
-        }
+      upstream.select_bus (value);
     }
 };
 

@@ -1719,7 +1719,7 @@ delete_pending_event (int i)
 {
   /* You shouldn't ask to delete an event that's not actually in the
      list.  */
-  assert (i <= i && i < pending_events_top);
+  assert (0 <= i && i < pending_events_top);
 
   /* Copy the last element down into this element's position, unless
      this is the last element itself.  */

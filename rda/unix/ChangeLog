@@ -1,5 +1,7 @@
 2004-11-01  Jim Blandy  <jimb@redhat.com>
 
+	* thread-db.c (delete_pending_event): Fix bounds-check assertion.
+
 	* ptrace-target.c (stop_lwp): Use tkill when possible; otherwise,
 	fall back gracefully to using kill.
 

@@ -18,6 +18,9 @@
 /* Define if you have the inet_aton function.  */
 #undef HAVE_INET_ATON
 
+/* Define if you have the sched_yield function.  */
+#undef HAVE_SCHED_YIELD
+
 /* Define if you have the select function.  */
 #undef HAVE_SELECT
 
@@ -42,11 +45,17 @@
 /* Define if you have the <curses.h> header file.  */
 #undef HAVE_CURSES_H
 
+/* Define if you have the <mmsystem.h> header file.  */
+#undef HAVE_MMSYSTEM_H
+
 /* Define if you have the <netinet/in.h> header file.  */
 #undef HAVE_NETINET_IN_H
 
 /* Define if you have the <netinet/tcp.h> header file.  */
 #undef HAVE_NETINET_TCP_H
+
+/* Define if you have the <sched.h> header file.  */
+#undef HAVE_SCHED_H
 
 /* Define if you have the <sys/socket.h> header file.  */
 #undef HAVE_SYS_SOCKET_H
@@ -66,11 +75,20 @@
 /* Define if you have the <unistd.h> header file.  */
 #undef HAVE_UNISTD_H
 
+/* Define if you have the <windows.h> header file.  */
+#undef HAVE_WINDOWS_H
+
+/* Define if you have the kernel32 library (-lkernel32).  */
+#undef HAVE_LIBKERNEL32
+
 /* Define if you have the m library (-lm).  */
 #undef HAVE_LIBM
 
 /* Define if you have the stdc++ library (-lstdc++).  */
 #undef HAVE_LIBSTDC__
+
+/* Define if you have the winmm library (-lwinmm).  */
+#undef HAVE_LIBWINMM
 
 /* Name of package */
 #undef PACKAGE

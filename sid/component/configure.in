@@ -20,6 +20,8 @@ AC_HEADER_TIME
 
 AC_CHECK_LIB(stdc++, main)
 AC_CHECK_LIB(m, main)
+AC_CHECK_LIB(winmm, main)
+AC_CHECK_LIB(kernel32, main)
 
 dnl For lcd component only.
 dnl Check if we can link curses programs without libtermcap.
@@ -41,7 +43,7 @@ AC_CHECK_LIB(nsl, gethostbyname, socket_libs="$socket_libs -lnsl",
 		socket_libs="$socket_libs -lresolv"))
 AC_SUBST(socket_libs)
 
-AC_CHECK_FUNCS(ftime times gettimeofday usleep strtoul strtoull select)
+AC_CHECK_FUNCS(ftime times gettimeofday usleep strtoul strtoull select sched_yield)
 
 old_libs="$LIBS"
 LIBS="$LIBS $socket_libs"
@@ -49,8 +51,9 @@ AC_CHECK_FUNCS(inet_aton inet_addr)
 LIBS="$old_libs"
 
 AC_CHECK_HEADERS(curses.h time.h unistd.h)
-AC_CHECK_HEADERS(sys/time.h sys/timeb.h sys/types.h )
+AC_CHECK_HEADERS(sys/time.h sys/timeb.h sys/types.h sched.h)
 AC_CHECK_HEADERS(sys/socket.h netinet/in.h netinet/tcp.h arpa/inet.h)
+AC_CHECK_HEADERS(mmsystem.h windows.h)
 
 dnl XXX: for Solaris?
 AC_CHECK_HEADERS(../ucbinclude/sys/ioctl.h)

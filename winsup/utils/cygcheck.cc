@@ -11,12 +11,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <ctype.h>
 #include <windows.h>
 #include "cygwin/include/sys/cygwin.h"
 #include "cygwin/include/mntent.h"
 #include "cygwin/include/getopt.h"
-#include "time.h"
-#include "ctype.h"
 
 int verbose = 0;
 int registry = 0;
@@ -33,7 +33,7 @@ typedef __int64 longlong;
 
 void dump_setup (int, char **, bool);
 
-static const char version[] = "$Revision: 1.27 $";
+static const char version[] = "$Revision: 1.28 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",

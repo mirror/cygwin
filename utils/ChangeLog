@@ -2,6 +2,8 @@
 
 	* configure.in: Pass 'srcdir' to subconfigures correctly.
 	* configure: Regenerate.
+	* Makefile.tpl: Pass 'srcdir' to subconfigures correctly.
+	* Makefile.in: Regenerate.
 
 2002-05-28  Nick Clifton  <nickc@cambridge.redhat.com>
 

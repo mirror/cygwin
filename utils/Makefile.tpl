@@ -126,6 +126,6 @@ FLAGS_TO_PASS = \
 configure-[+subdir+]: [+subdir+]/Makefile
 [+subdir+]/Makefile: config.status
 	test -d [+subdir+] || mkdir [+subdir+] ; \
-	cd [+subdir+] && $(abs_srcdir)/[+subdir+]/configure $(subconfigure_args)
+	cd [+subdir+] && $(abs_srcdir)/[+subdir+]/configure $(subconfigure_args)/[+subdir+]
 .PHONY: configure-[+subdir+]
 [+ ENDFOR subdirs +]

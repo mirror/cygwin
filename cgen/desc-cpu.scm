@@ -1,5 +1,5 @@
 ; Generate .c/.h versions of main elements of cpu description file.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; ISA support code.
@@ -938,8 +938,8 @@ init_tables ()
 #include \"ansidecl.h\"
 #include \"bfd.h\"
 #include \"symcat.h\"
-#include \"@prefix@-desc.h\"
-#include \"@prefix@-opc.h\"
+#include \"@arch@-desc.h\"
+#include \"@arch@-opc.h\"
 #include \"opintl.h\"
 #include \"libiberty.h\"
 \n"

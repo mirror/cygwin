@@ -1,3 +1,24 @@
+2001-01-06  Ben Elliston  <bje@redhat.com>
+
+	* utils-gen.scm (gen-sfmt-enum-decl): Use @prefix@ and @PREFIX@
+	instead of @cpu@ and @CPU@ to generically prefix symbol names.
+	* sim-cpu.scm (-gen-sem-fn-table-entry): Likewise.
+	(-gen-semantic-fn-table): Likewise.
+	(-gen-scache-semantic-fn): Likewise.
+	(-gen-no-scache-semantic-fn): Likewise.
+	(cgen-read.c): Likewise.
+	(cgen-sem-switch.c): Likewise.
+	* desc-cpu.scm (cgen-desc.c): Use @arch@, not @prefix@, since this
+	is a filename prefix.
+	* sim-decode.scm (IDESC-TABLE-VAR): Use @prefix@, et al.
+	(-gen-decode-insn-globals): Likewise.
+	(-gen-idesc-decls): Likewise.
+	(cgen-decode.h): Likewise.
+	(cgen-decode.c): Likewise.
+	* sim.scm (gen-cpu-insn-enum-decl): Likewise.
+	(gen-cpu-insn-enum): Likewise.
+	(sim-finish!): Likewise.
+
 2001-01-05  Johan Rydberg  <jrydberg@opencores.org>
 
 	* openrisc.cpu: New file.

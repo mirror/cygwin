@@ -1,5 +1,5 @@
 ; Simulator generator support routines.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; One goal of this file is to provide cover functions for all methods.
@@ -1374,9 +1374,9 @@
 ; Return the declaration of the cpu/insn enum.
 
 (define (gen-cpu-insn-enum-decl cpu insn-list)
-  (gen-enum-decl "@cpu@_insn_type"
+  (gen-enum-decl "@prefix@_insn_type"
 		 "instructions in cpu family @cpu@"
-		 "@CPU@_INSN_"
+		 "@PREFIX@_INSN_"
 		 (append! (map (lambda (i)
 				 (cons (obj:name i)
 				       (cons '-
@@ -1403,7 +1403,7 @@
 ; cache efficiently (since the IDESC table is similarily collapsed).
 
 (define (gen-cpu-insn-enum cpu insn)
-  (string-upcase (string-append "@CPU@_INSN_" (gen-sym insn)))
+  (string-upcase (string-append "@PREFIX@_INSN_" (gen-sym insn)))
 )
 
 ; Return C code to declare the machine data.
@@ -1899,7 +1899,7 @@ struct scache {
 
 (define (sim-finish!)
   ; Add begin,chain,before,after,invalid handlers if not provided.
-  ; The code generators should first look for x-foo-@cpu@, then for x-foo.
+  ; The code generators should first look for x-foo-@prefix@, then for x-foo.
   ; ??? This is good enough for the first pass.  Will eventually need to use
   ; less C and more RTL.
 
@@ -1909,16 +1909,16 @@ struct scache {
       `(VIRTUAL PBB (ISA ,all))
       "--begin--" () () '(c-code VOID "\
   {
-#if WITH_SCACHE_PBB_@CPU@
+#if WITH_SCACHE_PBB_@PREFIX@
 #if defined DEFINE_SWITCH || defined FAST_P
     /* In the switch case FAST_P is a constant, allowing several optimizations
        in any called inline functions.  */
-    vpc = @cpu@_pbb_begin (current_cpu, FAST_P);
+    vpc = @prefix@_pbb_begin (current_cpu, FAST_P);
 #else
 #if 0 /* cgen engine can't handle dynamic fast/full switching yet.  */
-    vpc = @cpu@_pbb_begin (current_cpu, STATE_RUN_FAST_P (CPU_STATE (current_cpu)));
+    vpc = @prefix@_pbb_begin (current_cpu, STATE_RUN_FAST_P (CPU_STATE (current_cpu)));
 #else
-    vpc = @cpu@_pbb_begin (current_cpu, 0);
+    vpc = @prefix@_pbb_begin (current_cpu, 0);
 #endif
 #endif
 #endif
@@ -1929,8 +1929,8 @@ struct scache {
       `(VIRTUAL PBB (ISA ,all))
       "--chain--" () () '(c-code VOID "\
   {
-#if WITH_SCACHE_PBB_@CPU@
-    vpc = @cpu@_pbb_chain (current_cpu, sem_arg);
+#if WITH_SCACHE_PBB_@PREFIX@
+    vpc = @prefix@_pbb_chain (current_cpu, sem_arg);
 #ifdef DEFINE_SWITCH
     BREAK (sem);
 #endif
@@ -1942,14 +1942,14 @@ struct scache {
       `(VIRTUAL PBB (ISA ,all))
       "--cti-chain--" () () '(c-code VOID "\
   {
-#if WITH_SCACHE_PBB_@CPU@
+#if WITH_SCACHE_PBB_@PREFIX@
 #ifdef DEFINE_SWITCH
-    vpc = @cpu@_pbb_cti_chain (current_cpu, sem_arg,
+    vpc = @prefix@_pbb_cti_chain (current_cpu, sem_arg,
 			       pbb_br_type, pbb_br_npc);
     BREAK (sem);
 #else
     /* FIXME: Allow provision of explicit ifmt spec in insn spec.  */
-    vpc = @cpu@_pbb_cti_chain (current_cpu, sem_arg,
+    vpc = @prefix@_pbb_cti_chain (current_cpu, sem_arg,
 			       CPU_PBB_BR_TYPE (current_cpu),
 			       CPU_PBB_BR_NPC (current_cpu));
 #endif
@@ -1961,8 +1961,8 @@ struct scache {
       `(VIRTUAL PBB (ISA ,all))
       "--before--" () () '(c-code VOID "\
   {
-#if WITH_SCACHE_PBB_@CPU@
-    @cpu@_pbb_before (current_cpu, sem_arg);
+#if WITH_SCACHE_PBB_@PREFIX@
+    @prefix@_pbb_before (current_cpu, sem_arg);
 #endif
   }
 ") nil)
@@ -1971,8 +1971,8 @@ struct scache {
       `(VIRTUAL PBB (ISA ,all))
       "--after--" () () '(c-code VOID "\
   {
-#if WITH_SCACHE_PBB_@CPU@
-    @cpu@_pbb_after (current_cpu, sem_arg);
+#if WITH_SCACHE_PBB_@PREFIX@
+    @prefix@_pbb_after (current_cpu, sem_arg);
 #endif
   }
 ") nil)

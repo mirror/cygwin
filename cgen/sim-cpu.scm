@@ -1,5 +1,5 @@
 ; CPU family related simulator generator, excluding decoding and model support.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Notes:
@@ -469,10 +469,10 @@ void
 (define (-gen-sem-fn-table-entry insn)
   (string-list
    "  { "
-   "@CPU@_INSN_"
+   "@PREFIX@_INSN_"
    (string-upcase (gen-sym insn))
    ", "
-   "SEM_FN_NAME (@cpu@," (-gen-sem-fn-name insn) ")"
+   "SEM_FN_NAME (@prefix@," (-gen-sem-fn-name insn) ")"
    " },\n"
    )
 )
@@ -498,7 +498,7 @@ static const struct sem_fn_desc sem_fns[] = {\n"
 /* Add the semantic fns to IDESC_TABLE.  */
 
 void
-SEM_FN_NAME (@cpu@,init_idesc_table) (SIM_CPU *current_cpu)
+SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 {
   IDESC *idesc_table = CPU_IDESC (current_cpu);
   const struct sem_fn_desc *sf;
@@ -513,12 +513,12 @@ SEM_FN_NAME (@cpu@,init_idesc_table) (SIM_CPU *current_cpu)
       if (valid_p)
 	idesc_table[sf->index].sem_fast = sf->fn;
       else
-	idesc_table[sf->index].sem_fast = SEM_FN_NAME (@cpu@,x_invalid);
+	idesc_table[sf->index].sem_fast = SEM_FN_NAME (@prefix@,x_invalid);
 #else
       if (valid_p)
 	idesc_table[sf->index].sem_full = sf->fn;
       else
-	idesc_table[sf->index].sem_full = SEM_FN_NAME (@cpu@,x_invalid);
+	idesc_table[sf->index].sem_full = SEM_FN_NAME (@prefix@,x_invalid);
 #endif
     }
 }
@@ -554,7 +554,7 @@ SEM_FN_NAME (@cpu@,init_idesc_table) (SIM_CPU *current_cpu)
     (string-list
      "/* " (obj:name insn) ": " (insn-syntax insn) " */\n\n"
      "static SEM_PC\n"
-     "SEM_FN_NAME (@cpu@," (gen-sym insn) ")"
+     "SEM_FN_NAME (@prefix@," (gen-sym insn) ")"
      (if (and parallel? (not (with-generic-write?)))
 	 " (SIM_CPU *current_cpu, SEM_ARG sem_arg, PAREXEC *par_exec)\n"
 	 " (SIM_CPU *current_cpu, SEM_ARG sem_arg)\n")
@@ -611,7 +611,7 @@ SEM_FN_NAME (@cpu@,init_idesc_table) (SIM_CPU *current_cpu)
     (string-list
      "/* " (obj:name insn) ": " (insn-syntax insn) " */\n\n"
      "static SEM_STATUS\n"
-     "SEM_FN_NAME (@cpu@," (gen-sym insn) ")"
+     "SEM_FN_NAME (@prefix@," (gen-sym insn) ")"
      (if (and parallel? (not (with-generic-write?)))
 	 " (SIM_CPU *current_cpu, SEM_ARG sem_arg, PAREXEC *par_exec, CGEN_INSN_INT insn)\n"
 	 " (SIM_CPU *current_cpu, SEM_ARG sem_arg, CGEN_INSN_INT insn)\n")
@@ -921,7 +921,7 @@ SEM_FN_NAME (@cpu@,init_idesc_table) (SIM_CPU *current_cpu)
    (lambda ()
      (string-write-map (lambda (insn)
 			 (string-append "    { "
-					"@CPU@_INSN_"
+					"@PREFIX@_INSN_"
 					(string-upcase (gen-sym insn))
 					", && case_read_READ_"
 					(string-upcase (gen-sym (insn-sfmt insn)))
@@ -1101,7 +1101,7 @@ CGEN_ATTR_VALUE (NULL, abuf->idesc->attrs, CGEN_INSN_" "attr)")
    (lambda ()
      (string-write-map (lambda (insn)
 			 (string-append "    { "
-					"@CPU@_INSN_"
+					"@PREFIX@_INSN_"
 					(string-upcase (gen-sym insn))
 					", && case_sem_INSN_"
 					(string-upcase (gen-sym insn))

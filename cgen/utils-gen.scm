@@ -1,5 +1,5 @@
 ; Application independent utilities for C/C++ code generation.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -514,9 +514,9 @@
 ; Instruction format utilities.
 
 (define (gen-sfmt-enum-decl sfmt-list)
-  (gen-enum-decl "@cpu@_sfmt_type"
+  (gen-enum-decl "@prefix@_sfmt_type"
 		 "semantic formats in cpu family @cpu@"
-		 "@CPU@_"
+		 "@PREFIX@_"
 		 (map (lambda (sfmt) (cons (obj:name sfmt) nil))
 		      sfmt-list))
 )

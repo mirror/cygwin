@@ -1,3 +1,8 @@
+2002-03-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.mapper/basicmapper.exp: Update for new word-multiplier
+	syntax.
+
 2002-01-22  Ben Elliston  <bje@redhat.com>
 
 	* sidcomp.ide/idebase.exp: Delete "D:\\drive0" on completion.

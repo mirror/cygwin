@@ -1,7 +1,7 @@
 # -*- Tcl -*-
 # basicmapper.exp
 #
-# Copyright (C) 1999 Red Hat
+# Copyright (C) 1999, 2002 Red Hat
 #
 # Description:
 # A testsuite for the generic mapper component (hw-mapper-basic).
@@ -77,20 +77,20 @@ set result [sid_cmd "sid::component::connect_accessor $victim [list $accname] $b
 if {$result != "ok"} { fail "$test -- got $result" } else { pass $test }
 
 set test "connect test bus #3 to the mapper"
-set accname {[0x300-0x600,8]}
+set accname {[8*0x300-0x600]}
 set result [sid_cmd "sid::component::connect_accessor $victim [list $accname] $buses_array(3)"]
 if {$result != "ok"} { fail "$test -- got $result" } else { pass $test }
 
 set test "connect test bus #4 to the mapper"
-set accname {[0xff00-0xff01,4,1,4]}
+set accname {[1*0xff00-0xff01,4,1]}
 set result [sid_cmd "sid::component::connect_accessor $victim [list $accname] $buses_array(4)"]
 if {$result != "ok"} { fail "$test -- got $result" } else { pass $test }
 
 
-set test "three accessors are now registered"
+set test "four accessors are now registered"
 set okay 1
 set accessors [sid_cmd "sid::component::accessor_names $victim"]
-set expected {[0x100,0x200,1,1] [0x300-0x600,4,1] [0x300-0x600,8] [0xff00-0xff01,4,1,4]}
+set expected {[0x100,0x200,1,1] [0x300-0x600,4,1] [8*0x300-0x600] [1*0xff00-0xff01,4,1]}
 
 if {[llength $accessors] != 4} {
     fail $test

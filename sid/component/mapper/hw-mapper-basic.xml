@@ -33,18 +33,20 @@
 	  This component distributes bus accesses to one of a number of
 	  configured bus accessors, depending on the address of the
 	  incoming memory access.</p>  
+
 	<p>
-	  A mapper defines an address space.  The address space is
-	  decomposed into non-overlapping regions by configuring a dynamic
-	  collection of accessors.  Each accessor is connected to a single
-	  slave bus.  To configure the address mapping, you must name each 
-	  accessor according to one of these forms:
+	  A mapper defines a group of address spaces.  Each group is
+	  known as a <b>bank</b>.  Each address space is decomposed
+	  into non-overlapping regions by configuring a dynamic
+	  collection of accessors.  Each accessor is connected to a
+	  single slave bus.  To configure the address mapping, you
+	  must name each accessor according to one of these forms:
 	  
 	  <ul>
 	    <li><tt>[&lt;low&gt;-&lt;high&gt;]</tt></li>
-	    <li><tt>[&lt;low&gt;-&lt;high&gt;,&lt;wordsize&gt;]</tt></li>
+	    <li><tt>[&lt;wordsize&gt;*&lt;low&gt;-&lt;high&gt;]</tt></li>
 	    <li><tt>[&lt;low&gt;-&lt;high&gt;,&lt;stride&gt;,&lt;width&gt;]</tt></li>
-	    <li><tt>[&lt;low&gt;-&lt;high&gt;,&lt;stride&gt;,&lt;width&gt;,&lt;wordsize&gt;]</tt></li>
+	    <li><tt>[&lt;wordsize&gt;*&lt;low&gt;-&lt;high&gt;,&lt;stride&gt;,&lt;width&gt;]</tt></li>
 	  </ul>
 
 	  where:
@@ -65,9 +67,17 @@
 	</p>
 	
 	<p>
-	  In addition, any text may appear outside the "[" and "]" brackets,
-	  as long as that text does not include any of the separator
-	  characters "[" "]" "-" ",".</p>
+          To the right of the "]" closing bracket, an optional specification block
+          may list the numbers of mapping banks for this record.  This block is
+          formatted as a comma-separated list of numbers, given between "{" and "}" 
+          brackets.  The default is to reside in bank 0 only.</p>
+
+	<p>
+	  In addition, any text may appear to the left of the "[" and
+	  "]" brackets, as long as that text does not include any of
+	  the characters "[" "]".  Likewise, text may appear to the
+	  right, but it must exclude the "[", "]", "{", and "}"
+	  bracket characters.</p>
 	
 	<p>
 	  Each number may be specified in decimal, hexadecimal, octal, and
@@ -104,14 +114,25 @@
 	  an existing entry, or inconsistent ranges or stride/width
 	  values.</p></p>
     </behavior>
+    <behavior name="banking">
+      <p>
+        <p>
+          When the <attribute>bank</attribute> attribute is set with a
+          numeric value, or the <pin>bank</pin> pin is driven with a
+          number, the mapping group or bank number is instantly
+          changed.  Subsequent mapping activities will see only those
+          mapping entries that include the new bank number.
+        </p>
+      </p>
+    </behavior>
     <behavior name="mapping">
       <p>
 	<p>
 	  When an incoming access on the <bus>access-port</bus> bus is
 	  received, its base address is compared to all the registered
-	  outgoing accessors.  If one is found that contains the
-	  address, the current address is transformed according to the
-	  following rules:
+	  outgoing accessors in the current bank.  If one is found
+	  that contains the address, the current address is
+	  transformed according to the following rules:
 
 	  <ul>
 	    <li>

@@ -12,10 +12,10 @@
 template <typename V>
 bool power_of_two_p (const V& v1)
 {
-  int count = 0;
+  unsigned count = 0;
   V v2(1);
 
-  for (int i = 0; i < 8 * sizeof (V); i++)
+  for (unsigned i = 0; i < 8 * sizeof (V); i++)
     if (v1 & (v2 << i))
       count++;
 
@@ -26,12 +26,12 @@ bool power_of_two_p (const V& v1)
 // Compute log2 (V).
 
 template <typename V>
-int log2 (const V& v1)
+unsigned log2 (const V& v1)
 {
   assert (power_of_two_p (v1));
 
   V v2(1);
-  for (int i = 0; i < 8 * sizeof (V); i++)
+  for (unsigned i = 0; i < 8 * sizeof (V); i++)
     if (v1 & (v2 << i))
       return i;
 }

@@ -77,7 +77,7 @@ public:
   void update (cache_set& cset, cache_line& selected);
 
 private:
-  vector <int> lru;
+  vector <unsigned> lru;
 };
 
 // Random replacement algorithm
@@ -124,6 +124,9 @@ private:
 
   callback_pin<cache_component> report_pin;
   void emit_report (host_int_4 ignore);
+
+  callback_pin<cache_component> flush_all_pin;
+  void flush_all_lines (host_int_4 ignore);
 
   callback_pin<cache_component> flush_pin;
   void flush_line (host_int_4 addr);

@@ -32,7 +32,7 @@ public:
   cache_line (unsigned line_size, cache_tag tag, std::vector <byte> intial_data);
   cache_line (const cache_line&);
   cache_line& operator= (const cache_line&);
-  ~cache_line ();
+  virtual ~cache_line ();
 
   // Get the line's tag.
   cache_tag tag () const;
@@ -100,6 +100,8 @@ class cache_set;
 class cache_replacement_algorithm
 {
 public:
+  virtual ~cache_replacement_algorithm () {}
+
   // Place new_line in a cache slot. Point old_line to the existing line.
   // Return true if successful, false otherwise.
   virtual void replace (cache_set& cset, cache_line& old_line, cache_line new_line) = 0;
@@ -117,12 +119,16 @@ class cache_set
 public:
   cache_set (unsigned line_size, unsigned nlines,
 	     cache_replacement_algorithm& alg);
-  ~cache_set ();
+  virtual ~cache_set ();
  
   // Try to find a line in the cache with a matching tag. 
   // If found, set "hit" to true and return a ref to the line.
   // Otherwise, set "hit" to false.
   virtual cache_line& find (const cache_tag& tag, bool& hit);
+
+  // Find any dirty cache line.  If found, set hit to true and return it.
+  // Otherwise, set hit to false.
+  virtual cache_line* find_any_dirty ();
 
   // Invalidate the entire set.
   void invalidate (); 
@@ -171,7 +177,7 @@ class cache
 public:
   cache (unsigned cache_size, unsigned line_size,
 	 unsigned assoc, cache_replacement_algorithm& replacer);
-  ~cache ();
+  virtual ~cache ();
 
   // Calculate a tag.
   cache_tag addr_to_tag (const sid::host_int_4& addr) const;
@@ -182,6 +188,10 @@ public:
   // Find a line, given a tag.  If found, set hit to true and return it.
   // Otherwise, set hit to false.
   cache_line& find (cache_tag tag, bool& hit);
+
+  // Find any dirty cache line.  If found, set hit to true and return it.
+  // Otherwise, set hit to false.
+  cache_line* find_any_dirty ();
 
   // Remove a line from the cache.
   void expunge (cache_line& line);
@@ -198,7 +208,7 @@ public:
   void invalidate ();
 
   // The number of sets in the cache.
-  int num_sets ();
+  unsigned num_sets ();
 
   // Dump the entire cache's state.
   void dump () const;

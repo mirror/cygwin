@@ -1,13 +1,15 @@
-This directory contains version 0.1 of the Software Productivity Unit
-(SPU, pronounced ``spew''), which is a random program generator.
+This directory contains version 0.2 of the Software Productivity Unit
+(SPU, pronounced ``spew''), which is a random program generator for C
+and C++.
 
 To configure, say `./configure'.
 
 To build, say `make'.
 
-To run, say `spu'.  This will produce a set of .h and .c files, plus a .mk
-file which is a Makefile.  All the generated files share a prefix, which
-defaults to "file", and can be set with the `--prefix' option.
+To run, say `spu'.  This will produce a set of .h and .c files, plus a
+.mk file which is a Makefile.  All the generated files share a base
+name, which defaults to "file", and can be set with the `--basename'
+option.
 
 To compile the generated program, you can say either
 
@@ -36,4 +38,3 @@ Add more kinds of macro generation.
 Make the output code look more normal.
 
 Generate runnable programs.
-

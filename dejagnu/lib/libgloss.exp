@@ -480,19 +480,22 @@ proc get_multilibs { args } {
     # set output [exec $objdump_name --file-headers objfmtst.o ]
     set default_multilib [exec $compiler --print-multi-lib]
     set default_multilib [lindex $default_multilib 0];
-    set extra [string trimleft $default_multilib "."]
+    set extra [string trimleft $default_multilib ".;@@"]
 
     # extract the options and their directory names as know by gcc
     foreach i "[exec $compiler --print-multi-lib]" {
     	if {$extra != ""} {
-	  set i [string trimright $i $extra"]
+          # string trimright would do the wrong thing if we included
+          # the leading @@ in $extra
+ 	  set i [string trimright $i $extra"]
+          set i [string trimright $i "@@"]
 	}
 	set opts ""
 	set dir ""
 	regexp -- "\[a-z0-9=/\.-\]*;" $i dir
 	set dir [string trimright $dir "\;@"]
 	regexp -- "\;@*\[\@a-zA-Z0-9=/\.-\]*" $i opts
-	set opts [split [string trimleft $opts "\;@"] "@"]
+	set opts [split [string trimleft $opts "\;@@"] "@@"]
 	lappend multilibs "$dir {$opts }"
     }
 

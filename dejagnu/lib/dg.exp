@@ -1,5 +1,5 @@
 # `dg' general purpose testcase driver.
-# Copyright (C) 94, 95, 96, 97, 98, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994 - 2001 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 # Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 # Please email any bugs, comments, and/or additions to this file to:
-# dje@cygnus.com.
+# bug-dejagnu@gnu.org
 
 # This file was written by Doug Evans (dje@cygnus.com).
 
@@ -587,9 +587,9 @@ proc dg-runtest { testcases flags default-extra-flags } {
 }
 
 # dg-trim-dirname -- rip DIR_NAME out of FILE_NAME
-# 
+#
 # Syntax: dg-trim-dirname dir_name file_name
-# We need to go through this contortion in order to properly support
+# We need to go through this contorsion in order to properly support
 # directory-names which might have embedded regexp special characters.
 
 proc dg-trim-dirname { dir_name file_name } {
@@ -612,7 +612,7 @@ proc dg-test { args } {
     global dg-do-what-default dg-interpreter-batch-mode dg-linenum-format
     global errorCode errorInfo
     global tool
-    global srcdir		;# eg: /calvin/dje/devo/gcc/./testsuite/
+    global srcdir		;# eg: /calvin/dje/build/gcc/./testsuite/
     global host_triplet target_triplet
 
     set keep 0

@@ -57,6 +57,10 @@
 #  include <sys/ioctl.h>
 #endif /* GWINSZ_IN_SYS_IOCTL && !TIOCGWINSZ */
 
+#if defined (__GO32__)
+#  include <pc.h>
+#endif
+
 #include "rltty.h"
 #include "tcap.h"
 
@@ -77,19 +81,24 @@ extern void _rl_bind_if_unbound ();
 extern void set_lines_and_columns ();
 extern char *get_env_value ();
 
+/* Functions imported from display.c */
+extern void _rl_redisplay_after_sigwinch ();
+
 /* **************************************************************** */
 /*								    */
 /*			Terminal and Termcap			    */
 /*								    */
 /* **************************************************************** */
 
+#ifndef __DJGPP__
 static char *term_buffer = (char *)NULL;
 static char *term_string_buffer = (char *)NULL;
 
-static int tcap_initialized;
-
 /* Non-zero means this terminal can't really do anything. */
 static int dumb_term;
+#endif
+
+static int tcap_initialized;
 
 #if !defined (__linux__)
 #  if defined (__EMX__) || defined (NEED_EXTERN_PC)
@@ -186,8 +195,14 @@ _rl_get_screen_size (tty, ignore_env)
       if (ignore_env == 0 && (ss = get_env_value ("COLUMNS")))
 	screenwidth = atoi (ss);
 
+#if defined(__DJGPP__)
+      tty = tty;
+      if (screenwidth <= 0)
+	screenwidth = ScreenCols ();
+#else
       if (screenwidth <= 0 && term_string_buffer)
 	screenwidth = tgetnum ("co");
+#endif
     }
 
   /* Environment variable LINES overrides setting of "li" if IGNORE_ENV
@@ -197,8 +212,13 @@ _rl_get_screen_size (tty, ignore_env)
       if (ignore_env == 0 && (ss = get_env_value ("LINES")))
 	screenheight = atoi (ss);
 
+#if defined(__DJGPP__)
+      if (screenheight <= 0)
+	screenheight = ScreenRows ();
+#else
       if (screenheight <= 0 && term_string_buffer)
 	screenheight = tgetnum ("li");
+#endif
     }
 
   /* If all else fails, default to 80x24 terminal. */
@@ -230,6 +250,16 @@ _rl_set_screen_size (rows, cols)
     screenwidth--;
 
   screenchars = screenwidth * screenheight;
+}
+
+void
+rl_resize_terminal ()
+{
+  if (readline_echoing_p)
+    {
+      _rl_get_screen_size (fileno (rl_instream), 1);
+      _rl_redisplay_after_sigwinch ();
+    }
 }
 
 struct _tc_string {
@@ -277,10 +307,14 @@ static void
 get_term_capabilities (bp)
      char **bp;
 {
+#if defined(__DJGPP__)
+  bp = bp;
+#else
   register int i;
 
   for (i = 0; i < NUM_TC_STRINGS; i++)
     *(tc_strings[i].tc_value) = tgetstr (tc_strings[i].tc_var, bp);
+#endif
   tcap_initialized = 1;
 }
 
@@ -289,9 +323,10 @@ _rl_init_terminal_io (terminal_name)
      char *terminal_name;
 {
 #if defined (__GO32__)
-  screenwidth = ScreenCols ();
-  screenheight = ScreenRows ();
-  screenchars = screenwidth * screenheight;
+  terminal_name = terminal_name;
+  screenwidth = screenheight = 0;
+  _rl_get_screen_size (rl_instream ? fileno (rl_instream) : 0, 0);
+
   term_cr = "\r";
   term_im = term_ei = term_ic = term_IC = (char *)NULL;
   term_up = term_dc = term_DC = visible_bell = (char *)NULL;
@@ -307,7 +342,7 @@ _rl_init_terminal_io (terminal_name)
   term_forward_char = (char *)NULL;
 #endif /* HACK_TERMCAP_MOTION */
   terminal_can_insert = _rl_term_autowrap = 0;
-  return;
+  return 0;
 #else /* !__GO32__ */
 
   char *term, *buffer;
@@ -494,28 +529,28 @@ ding ()
 {
   if (readline_echoing_p)
     {
-#if !defined (__GO32__)
       switch (_rl_bell_preference)
         {
 	case NO_BELL:
 	default:
 	  break;
 	case VISIBLE_BELL:
+#if defined (__GO32__)
+	  ScreenVisualBell ();
+	  break;
+#else
 	  if (visible_bell)
 	    {
 	      tputs (visible_bell, 1, _rl_output_character_function);
 	      break;
 	    }
+#endif
 	  /* FALLTHROUGH */
 	case AUDIBLE_BELL:
 	  fprintf (stderr, "\007");
 	  fflush (stderr);
 	  break;
         }
-#else /* __GO32__ */
-      fprintf (stderr, "\007");
-      fflush (stderr);
-#endif /* __GO32__ */
       return (0);
     }
   return (-1);
@@ -530,16 +565,22 @@ ding ()
 void
 _rl_enable_meta_key ()
 {
+#if !defined(__DJGPP__)
   if (term_has_meta && term_mm)
     tputs (term_mm, 1, _rl_output_character_function);
+#endif
 }
 
 void
 _rl_control_keypad (on)
      int on;
 {
+#if defined(__DJGPP__)
+  on = on;
+#else
   if (on && term_ks)
     tputs (term_ks, 1, _rl_output_character_function);
   else if (!on && term_ke)
     tputs (term_ke, 1, _rl_output_character_function);
+#endif
 }

@@ -1,3 +1,8 @@
+2001-10-29  Johan Rydberg  <johan@rydberg.com> 
+
+	* doc/rtl.texi (Expressions): Document the (error ..), (sqrt ..),
+	(cos ...) and (sin ..) rtx.
+
 2001-10-13  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* desc-cpu.scm: Do not include ctype.h in generated desc

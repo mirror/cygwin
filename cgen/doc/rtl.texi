@@ -2184,6 +2184,10 @@ Perform a comparison. @samp{cmpop} is one of @code{eq}, @code{ne},
 @code{lt}, @code{le}, @code{gt}, @code{ge}, @code{ltu}, @code{leu},
 @code{gtu}, @code{geu}.
 
+@item (mathop mode operand)
+Perform a mathematical operation. @samp {mathop} is one of @code{sqrt},
+@code{cos}, @code{sin}.
+
 @item (if mode condition then [else])
 Standard @code{if} statement.
 
@@ -2257,6 +2261,9 @@ Return the index of @samp{operand}. For registers this is the register number.
 
 @item (regno operand)
 Same as @code{index-of}, but improves readability for registers
+
+@item (error mode message)
+Emit an error message from CGEN RTL. Error message is specified by @samp{message}.
 
 @item (nop)
 A no-op.

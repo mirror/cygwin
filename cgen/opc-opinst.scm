@@ -54,7 +54,7 @@
 		  ins)
       (string-map (lambda (op)  (-gen-operand-instance op "OUTPUT"))
 		  outs)
-      "  { END }\n};\n\n")))
+      "  { END, (const char *)0, (enum cgen_hw_type)0, (enum cgen_mode)0, (enum cgen_operand_type)0, 0, 0 }\n};\n\n")))
 )
 
 (define (-gen-operand-instance-tables)

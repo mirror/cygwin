@@ -239,6 +239,9 @@
 )
 
 ; Return a boolean indicating if two bitranges overlap.
+;
+; lsb0? = #t: 31 ...  0
+; lsb0? = #f: 0  ... 31
 
 (define (bitrange-overlap? start1 length1 start2 length2 lsb0?)
   (if lsb0?

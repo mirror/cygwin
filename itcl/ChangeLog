@@ -1,3 +1,7 @@
+2000-12-20  Syd Polk  <spolk@redhat.com>
+
+	* itcl/itcl/itclConfig.sh.in: Added new line at end of file.
+
 2000-10-27  Syd Polk  <spolk@redhat.com>
 
 	* itk/win/Makefile.in: Install itk dll when installing libraries.

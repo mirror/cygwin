@@ -358,8 +358,8 @@ xstormy16_cpu::parity (int reg)
 {
   int tmp;
   tmp = reg ^ (reg >> 8);
-  tmp ^= reg >> 4;
-  tmp ^= reg >> 2;
-  tmp ^= reg >> 1;
+  tmp ^= tmp >> 4;
+  tmp ^= tmp >> 2;
+  tmp ^= tmp >> 1;
   return tmp & 1;
 }

@@ -70,8 +70,7 @@ extern "C" {
  */
 
 #ifndef __WIN32__
-#   if defined(_WIN32) || defined(WIN32) || \
-       defined(__CYGWIN__) || defined(__MINGW32__)
+#   if defined(_WIN32) || defined(WIN32)
 #	define __WIN32__
 #   endif
 #endif
@@ -95,9 +94,11 @@ extern "C" {
  * C run-time library issues.
  */
 
-#   ifndef USE_TCLALLOC
-#	define USE_TCLALLOC 1
-#   endif
+#   ifndef __CYGWIN__
+#       ifndef USE_TCLALLOC
+#	    define USE_TCLALLOC 1
+#       endif 
+#   endif /* __CYGWIN__ */
 #endif /* __WIN32__ */
 
 /*
@@ -226,7 +227,7 @@ extern "C" {
 # define DLLIMPORT
 # define DLLEXPORT
 #else
-# if defined(__WIN32__) && (defined(_MSC_VER) || (defined(__GNUC__) && defined(__declspec)))
+# if defined(__WIN32__) && (defined(_MSC_VER) || ((defined(BUILD_tcl) || defined(BUILD_tk) || defined(USE_TCL_STUBS)) && defined(__declspec)))
 #   define DLLIMPORT __declspec(dllimport)
 #   define DLLEXPORT __declspec(dllexport)
 # else

@@ -667,11 +667,6 @@ TclpChdir(path)
     result = (*tclWinProcs->setCurrentDirectoryProc)(nativePath);
     Tcl_DStringFree(&ds);
 
-#ifdef __CYGWIN__
-    /* We use chdir on Cygwin which follows POSIX return code. */
-    result = !result;
-#endif
-
     if (result == 0) {
 	TclWinConvertError(GetLastError());
 	return -1;

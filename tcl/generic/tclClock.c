@@ -266,6 +266,9 @@ FormatClock(interp, clockVal, useGMT, format)
 #ifndef HAVE_TM_ZONE
     int savedTimeZone = 0;	/* lint. */
     char *savedTZEnv = NULL;	/* lint. */
+#  ifndef timezone
+    int timezone=0;
+#  endif
 #endif
 
 #ifdef HAVE_TZSET

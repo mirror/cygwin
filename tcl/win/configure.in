@@ -98,6 +98,11 @@ AC_SUBST(MAN2TCLFLAGS)
 
 TCL_SHARED_BUILD=${SHARED_BUILD}
 
+DL_LIBS=
+MATH_LIBS=-lm
+AC_SUBST(DL_LIBS)
+AC_SUBST(MATH_LIBS)
+
 #--------------------------------------------------------------------
 # Perform final evaluations of variables with possible substitutions.
 #--------------------------------------------------------------------
@@ -230,5 +235,5 @@ AC_SUBST(POST_MAKE_LIB)
 AC_SUBST(MAKE_DLL)
 AC_SUBST(MAKE_EXE)
 
-AC_OUTPUT(Makefile tclConfig.sh tcl.hpj)
+AC_OUTPUT(Makefile tclConfig.sh tcl.hpj ../unix/tclConfig.sh)
 

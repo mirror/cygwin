@@ -67,6 +67,7 @@ AR = @AR@
 CC = @CC@
 CPP = @CPP@
 EXEEXT = @EXEEXT@
+EXTRA_CFLAGS = @EXTRA_CFLAGS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
@@ -79,7 +80,7 @@ updir = $(srcdir)/..
 
 noinst_LIBRARIES = libtcl_cygwin.a
 
-libtcl_cygwin_a_SOURCES =  	panic.c 	regexp.c 	tclAsync.c 	tclBasic.c 	tclBinary.c 	tclCkalloc.c 	tclClock.c 	tclCmdAH.c 	tclCmdIL.c 	tclCmdMZ.c 	tclCompExpr.c 	tclCompile.c 	tclDate.c 	tclEnv.c 	tclEvent.c 	tclExecute.c 	tclFCmd.c 	tclFileName.c 	tclGet.c 	tclHash.c 	tclHistory.c 	tclIndexObj.c 	tclInterp.c 	tclIO.c 	tclIOCmd.c 	tclIOSock.c 	tclIOUtil.c 	tclLink.c 	tclListObj.c 	tclLoad.c 	tclLoadNone.c 	tclMain.c 	tclNamesp.c 	tclNotify.c 	tclObj.c         tclParse.c 	tclPipe.c 	tclPkg.c 	tclPosixStr.c 	tclPreserve.c 	tclProc.c         tclTestProcBodyObj.c 	tclResolve.c 	tclStringObj.c 	tclTest.c 	tclTestObj.c 	tclTimer.c 	tclUtil.c 	tclVar.c 	tclAppInit.c 	tclMtherr.c 	tclUnixChan.c 	tclUnixEvent.c 	tclUnixFCmd.c 	tclUnixFile.c 	tclUnixNotfy.c 	tclUnixPipe.c 	tclUnixSock.c 	tclUnixTest.c 	tclUnixTime.c 	tclUnixInit.c
+libtcl_cygwin_a_SOURCES =  	regcomp.c 	regexec.c         regfree.c         regerror.c 	tclAlloc.c 	tclAsync.c 	tclBasic.c 	tclBinary.c 	tclCkalloc.c 	tclClock.c 	tclCmdAH.c 	tclCmdIL.c 	tclCmdMZ.c         tclCompCmds.c 	tclCompExpr.c 	tclCompile.c 	tclDate.c         tclEncoding.c 	tclEnv.c 	tclEvent.c 	tclExecute.c 	tclFCmd.c 	tclFileName.c 	tclGet.c 	tclHash.c 	tclHistory.c 	tclIndexObj.c 	tclInterp.c 	tclIO.c 	tclIOCmd.c         tclIOGT.c 	tclIOSock.c 	tclIOUtil.c 	tclLink.c 	tclListObj.c 	tclLiteral.c 	tclLoad.c 	tclLoadNone.c 	tclMain.c 	tclNamesp.c 	tclNotify.c 	tclObj.c         tclParse.c 	tclPanic.c 	tclParseExpr.c 	tclPipe.c 	tclPkg.c 	tclPosixStr.c 	tclPreserve.c 	tclProc.c 	tclRegexp.c 	tclTestProcBodyObj.c 	tclResolve.c 	tclResolve.c         tclResult.c 	tclScan.c 	tclStringObj.c         tclStubInit.c         tclStubLib.c         tclThread.c 	tclTimer.c 	tclUtf.c 	tclUtil.c 	tclVar.c 	tclAppInit.c 	tclUnixChan.c 	tclUnixEvent.c 	tclUnixFCmd.c 	tclUnixFile.c 	tclUnixNotfy.c 	tclUnixPipe.c 	tclUnixSock.c 	tclUnixTest.c         tclUnixThrd.c 	tclUnixTime.c 	tclUnixInit.c
 
 
 # tooldir = $(exec_prefix)/$(host_alias)
@@ -100,19 +101,21 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libtcl_cygwin_a_LIBADD = 
-libtcl_cygwin_a_OBJECTS =  panic.o regexp.o tclAsync.o tclBasic.o \
-tclBinary.o tclCkalloc.o tclClock.o tclCmdAH.o tclCmdIL.o tclCmdMZ.o \
-tclCompExpr.o tclCompile.o tclDate.o tclEnv.o tclEvent.o tclExecute.o \
+libtcl_cygwin_a_OBJECTS =  regcomp.o regexec.o regfree.o regerror.o \
+tclAlloc.o tclAsync.o tclBasic.o tclBinary.o tclCkalloc.o tclClock.o \
+tclCmdAH.o tclCmdIL.o tclCmdMZ.o tclCompCmds.o tclCompExpr.o \
+tclCompile.o tclDate.o tclEncoding.o tclEnv.o tclEvent.o tclExecute.o \
 tclFCmd.o tclFileName.o tclGet.o tclHash.o tclHistory.o tclIndexObj.o \
-tclInterp.o tclIO.o tclIOCmd.o tclIOSock.o tclIOUtil.o tclLink.o \
-tclListObj.o tclLoad.o tclLoadNone.o tclMain.o tclNamesp.o tclNotify.o \
-tclObj.o tclParse.o tclPipe.o tclPkg.o tclPosixStr.o tclPreserve.o \
-tclProc.o tclTestProcBodyObj.o tclResolve.o tclStringObj.o tclTest.o \
-tclTestObj.o tclTimer.o tclUtil.o tclVar.o tclAppInit.o tclMtherr.o \
-tclUnixChan.o tclUnixEvent.o tclUnixFCmd.o tclUnixFile.o tclUnixNotfy.o \
-tclUnixPipe.o tclUnixSock.o tclUnixTest.o tclUnixTime.o tclUnixInit.o
+tclInterp.o tclIO.o tclIOCmd.o tclIOGT.o tclIOSock.o tclIOUtil.o \
+tclLink.o tclListObj.o tclLiteral.o tclLoad.o tclLoadNone.o tclMain.o \
+tclNamesp.o tclNotify.o tclObj.o tclParse.o tclPanic.o tclParseExpr.o \
+tclPipe.o tclPkg.o tclPosixStr.o tclPreserve.o tclProc.o tclRegexp.o \
+tclTestProcBodyObj.o tclResolve.o tclResolve.o tclResult.o tclScan.o \
+tclStringObj.o tclStubInit.o tclStubLib.o tclThread.o tclTimer.o \
+tclUtf.o tclUtil.o tclVar.o tclAppInit.o tclUnixChan.o tclUnixEvent.o \
+tclUnixFCmd.o tclUnixFile.o tclUnixNotfy.o tclUnixPipe.o tclUnixSock.o \
+tclUnixTest.o tclUnixThrd.o tclUnixTime.o tclUnixInit.o
 CFLAGS = @CFLAGS@
-EXTRA_CFLAGS = @EXTRA_CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $(EXTRA_CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
@@ -247,7 +250,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

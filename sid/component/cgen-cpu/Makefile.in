@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -89,6 +89,7 @@ sidtarget_m68k = @sidtarget_m68k@
 sidtarget_mips = @sidtarget_mips@
 sidtarget_ppc = @sidtarget_ppc@
 sidtarget_x86 = @sidtarget_x86@
+sidtarget_xstormy16 = @sidtarget_xstormy16@
 
 INTLLIBS = @INTLLIBS@
 
@@ -110,7 +111,7 @@ MAKEOVERRIDES =
 LIBIBERTY = -L../../../libiberty -liberty
 TRACEDIS = tracedis.c
 
-libcgencpu_la_SOURCES = compCGEN.cxx $(TRACEDIS)
+libcgencpu_la_SOURCES = compCGEN.cxx fp.h fp.cxx $(TRACEDIS)
 libcgencpu_la_LDFLAGS = -module -no-undefined
 libcgencpu_la_LIBADD = @cpu_libs@ $(INTLLIBS) $(LIBIBERTY) cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo
 libcgencpu_la_DEPENDENCIES = @cpu_libs@ cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo
@@ -138,7 +139,7 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I.
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libcgencpu_la_OBJECTS =  compCGEN.lo tracedis.lo
+libcgencpu_la_OBJECTS =  compCGEN.lo fp.lo tracedis.lo
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -156,7 +157,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/compCGEN.P .deps/tracedis.P
+DEP_FILES =  .deps/compCGEN.P .deps/fp.P .deps/tracedis.P
 SOURCES = $(libcgencpu_la_SOURCES)
 OBJECTS = $(libcgencpu_la_OBJECTS)
 
@@ -308,7 +309,7 @@ maintainer-clean-recursive:
 	dot_seen=no; \
 	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
 	  rev="$$subdir $$rev"; \
-	  test "$$subdir" = "." && dot_seen=yes; \
+	  test "$$subdir" != "." || dot_seen=yes; \
 	done; \
 	test "$$dot_seen" = "no" && rev=". $$rev"; \
 	target=`echo $@ | sed s/-recursive//`; \

@@ -1,25 +1,26 @@
 /* Target-dependent code for Hitachi Super-H, for GDB.
    Copyright 1993, 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /*
- Contributed by Steve Chamberlain
-                sac@cygnus.com
+   Contributed by Steve Chamberlain
+   sac@cygnus.com
  */
 
 #include "defs.h"
@@ -37,7 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* A set of original names, to be used when restoring back to generic
    registers from a specific set.  */
-
+/* *INDENT-OFF* */
 static char *sh_generic_reg_names[] = {
   "r0",   "r1",   "r2",   "r3",   "r4",   "r5",   "r6",   "r7",
   "r8",   "r9",   "r10",  "r11",  "r12",  "r13",  "r14",  "r15",
@@ -85,26 +86,42 @@ static char *sh3e_reg_names[] = {
   "r0b0", "r1b0", "r2b0", "r3b0", "r4b0", "r5b0", "r6b0", "r7b0",
   "r0b1", "r1b1", "r2b1", "r3b1", "r4b1", "r5b1", "r6b1", "r7b1",
 };
+/* *INDENT-ON* */
+
+
 
 char **sh_register_names = sh_generic_reg_names;
 
-
-struct {
-  char **regnames;
-  int mach;
-} sh_processor_type_table[] = {
-  { sh_reg_names, bfd_mach_sh },
-  { sh3_reg_names, bfd_mach_sh3 },
-  { sh3e_reg_names, bfd_mach_sh3e },
-  { NULL, 0 }
+struct
+  {
+    char **regnames;
+    int mach;
+  }
+sh_processor_type_table[] =
+{
+  {
+    sh_reg_names, bfd_mach_sh
+  }
+  ,
+  {
+    sh3_reg_names, bfd_mach_sh3
+  }
+  ,
+  {
+    sh3e_reg_names, bfd_mach_sh3e
+  }
+  ,
+  {
+    NULL, 0
+  }
 };
 
 /* Prologue looks like
-   [mov.l	<regs>,@-r15]...
-   [sts.l	pr,@-r15]
-   [mov.l	r14,@-r15]
-   [mov		r15,r14]
-*/
+   [mov.l       <regs>,@-r15]...
+   [sts.l       pr,@-r15]
+   [mov.l       r14,@-r15]
+   [mov         r15,r14]
+ */
 
 #define IS_STS(x)  		((x) == 0x4f22)
 #define IS_PUSH(x) 		(((x) & 0xff0f) == 0x2f06)
@@ -201,14 +218,14 @@ sh_find_callers_reg (fi, regnum)
   for (; fi; fi = fi->next)
     if (PC_IN_CALL_DUMMY (fi->pc, fi->frame, fi->frame))
       /* When the caller requests PR from the dummy frame, we return PC because
-	 that's where the previous routine appears to have done a call from. */
+         that's where the previous routine appears to have done a call from. */
       return generic_read_register_dummy (fi->pc, fi->frame, regnum);
-    else 
+    else
       {
-	FRAME_FIND_SAVED_REGS(fi, fsr);
+	FRAME_FIND_SAVED_REGS (fi, fsr);
 	if (fsr.regs[regnum] != 0)
-	  return read_memory_integer (fsr.regs[regnum], 
-				      REGISTER_RAW_SIZE(regnum));
+	  return read_memory_integer (fsr.regs[regnum],
+				      REGISTER_RAW_SIZE (regnum));
       }
   return read_register (regnum);
 }
@@ -232,14 +249,14 @@ sh_frame_find_saved_regs (fi, fsr)
   int opc;
   int insn;
   int r3_val = 0;
-  char * dummy_regs = generic_find_dummy_frame (fi->pc, fi->frame);
+  char *dummy_regs = generic_find_dummy_frame (fi->pc, fi->frame);
 
   if (dummy_regs)
     {
       /* DANGER!  This is ONLY going to work if the char buffer format of
-	 the saved registers is byte-for-byte identical to the 
-	 CORE_ADDR regs[NUM_REGS] format used by struct frame_saved_regs! */
-      memcpy (&fsr->regs, dummy_regs, sizeof(fsr));
+         the saved registers is byte-for-byte identical to the 
+         CORE_ADDR regs[NUM_REGS] format used by struct frame_saved_regs! */
+      memcpy (&fsr->regs, dummy_regs, sizeof (fsr));
       return;
     }
 
@@ -366,10 +383,10 @@ sh_init_extra_frame_info (fromleaf, fi)
   if (PC_IN_CALL_DUMMY (fi->pc, fi->frame, fi->frame))
     {
       /* We need to setup fi->frame here because run_stack_dummy gets it wrong
-	 by assuming it's always FP.  */
-      fi->frame     = generic_read_register_dummy (fi->pc, fi->frame, 
-						   SP_REGNUM);
-      fi->return_pc = generic_read_register_dummy (fi->pc, fi->frame, 
+         by assuming it's always FP.  */
+      fi->frame = generic_read_register_dummy (fi->pc, fi->frame,
+					       SP_REGNUM);
+      fi->return_pc = generic_read_register_dummy (fi->pc, fi->frame,
 						   PC_REGNUM);
       fi->f_offset = -(CALL_DUMMY_LENGTH + 4);
       fi->leaf_function = 0;
@@ -396,18 +413,18 @@ sh_pop_frame ()
   if (PC_IN_CALL_DUMMY (frame->pc, frame->frame, frame->frame))
     generic_pop_dummy_frame ();
   else
-  {
-    fp = FRAME_FP (frame);
-    get_frame_saved_regs (frame, &fsr);
+    {
+      fp = FRAME_FP (frame);
+      get_frame_saved_regs (frame, &fsr);
 
-    /* Copy regs from where they were saved in the frame */
-    for (regnum = 0; regnum < NUM_REGS; regnum++)
-      if (fsr.regs[regnum])
-	write_register (regnum, read_memory_integer (fsr.regs[regnum], 4));
+      /* Copy regs from where they were saved in the frame */
+      for (regnum = 0; regnum < NUM_REGS; regnum++)
+	if (fsr.regs[regnum])
+	  write_register (regnum, read_memory_integer (fsr.regs[regnum], 4));
 
-    write_register (PC_REGNUM, frame->return_pc);
-    write_register (SP_REGNUM, fp + 4);
-  }
+      write_register (PC_REGNUM, frame->return_pc);
+      write_register (SP_REGNUM, fp + 4);
+    }
   flush_cached_frames ();
 }
 
@@ -444,7 +461,7 @@ sh_pop_frame ()
    bug.  Arguments of these odd sizes are left-justified within the 
    word (as opposed to arguments smaller than 4 bytes, which are 
    right-justified).
- 
+
 
    If the function is to return an aggregate type such as a struct, it 
    is either returned in the normal return value register R0 (if its 
@@ -479,13 +496,13 @@ sh_push_arguments (nargs, args, sp, struct_return, struct_addr)
   /* The "struct return pointer" pseudo-argument has its own dedicated 
      register */
   if (struct_return)
-      write_register (STRUCT_RETURN_REGNUM, struct_addr);
+    write_register (STRUCT_RETURN_REGNUM, struct_addr);
 
   /* Now make sure there's space on the stack */
   for (argnum = 0, stack_alloc = 0;
        argnum < nargs; argnum++)
-    stack_alloc += ((TYPE_LENGTH(VALUE_TYPE(args[argnum])) + 3) & ~3);
-  sp -= stack_alloc;    /* make room on stack for args */
+    stack_alloc += ((TYPE_LENGTH (VALUE_TYPE (args[argnum])) + 3) & ~3);
+  sp -= stack_alloc;		/* make room on stack for args */
 
 
   /* Now load as many as possible of the first arguments into
@@ -496,25 +513,25 @@ sh_push_arguments (nargs, args, sp, struct_return, struct_addr)
   for (argnum = 0, stack_offset = 0; argnum < nargs; argnum++)
     {
       type = VALUE_TYPE (args[argnum]);
-      len  = TYPE_LENGTH (type);
-      memset(valbuf, 0, sizeof(valbuf));
+      len = TYPE_LENGTH (type);
+      memset (valbuf, 0, sizeof (valbuf));
       if (len < 4)
-        { /* value gets right-justified in the register or stack word */
-          memcpy(valbuf + (4 - len), 
-		 (char *) VALUE_CONTENTS (args[argnum]), len);
-          val = valbuf;
-        }
+	{			/* value gets right-justified in the register or stack word */
+	  memcpy (valbuf + (4 - len),
+		  (char *) VALUE_CONTENTS (args[argnum]), len);
+	  val = valbuf;
+	}
       else
-        val = (char *) VALUE_CONTENTS (args[argnum]);
+	val = (char *) VALUE_CONTENTS (args[argnum]);
 
       if (len > 4 && (len & 3) != 0)
-	odd_sized_struct = 1;		/* such structs go entirely on stack */
-      else 
+	odd_sized_struct = 1;	/* such structs go entirely on stack */
+      else
 	odd_sized_struct = 0;
       while (len > 0)
 	{
 	  if (argreg > ARGLAST_REGNUM || odd_sized_struct)
-	    {				/* must go on the stack */
+	    {			/* must go on the stack */
 	      write_memory (sp + stack_offset, val, 4);
 	      stack_offset += 4;
 	    }
@@ -522,15 +539,15 @@ sh_push_arguments (nargs, args, sp, struct_return, struct_addr)
 	     That's because some *&^%$ things get passed on the stack
 	     AND in the registers!   */
 	  if (argreg <= ARGLAST_REGNUM)
-	    {				/* there's room in a register */
-	      regval = extract_address (val, REGISTER_RAW_SIZE(argreg));
+	    {			/* there's room in a register */
+	      regval = extract_address (val, REGISTER_RAW_SIZE (argreg));
 	      write_register (argreg++, regval);
 	    }
 	  /* Store the value 4 bytes at a time.  This means that things
 	     larger than 4 bytes may go partly in registers and partly
 	     on the stack.  */
-	  len -= REGISTER_RAW_SIZE(argreg);
-	  val += REGISTER_RAW_SIZE(argreg);
+	  len -= REGISTER_RAW_SIZE (argreg);
+	  val += REGISTER_RAW_SIZE (argreg);
 	}
     }
   return sp;
@@ -556,12 +573,12 @@ sh_push_return_address (pc, sp)
    it into a register using PC-relative addressing.  This function
    expects the CALL_DUMMY to look like this:
 
-        mov.w @(2,PC), R8
-        jsr   @R8
-        nop
-        trap
-        <destination>
-  */
+   mov.w @(2,PC), R8
+   jsr   @R8
+   nop
+   trap
+   <destination>
+ */
 
 #if 0
 void
@@ -577,22 +594,6 @@ sh_fix_call_dummy (dummy, pc, fun, nargs, args, type, gcc_p)
   *(unsigned long *) (dummy + 8) = fun;
 }
 #endif
-
-/* Function: get_saved_register
-   Just call the generic_get_saved_register function.  */
-
-void
-get_saved_register (raw_buffer, optimized, addrp, frame, regnum, lval)
-     char *raw_buffer;
-     int *optimized;
-     CORE_ADDR *addrp;
-     struct frame_info *frame;
-     int regnum;
-     enum lval_type *lval;
-{
-  generic_get_saved_register (raw_buffer, optimized, addrp, 
-			      frame, regnum, lval);
-}
 
 
 /* Modify the actual processor type. */
@@ -615,7 +616,7 @@ sh_target_architecture_hook (ap)
 	}
     }
 
-  fatal ("Architecture `%s' unreconized", ap->printable_name);
+  internal_error ("Architecture `%s' unreconized", ap->printable_name);
 }
 
 /* Print the registers in a form similar to the E7000 */
@@ -631,67 +632,67 @@ sh_show_regs (args, from_tty)
   else
     cpu = 0;
 
-  printf_filtered ("PC=%08x SR=%08x PR=%08x MACH=%08x MACHL=%08x\n",
-		   read_register (PC_REGNUM),
-		   read_register (SR_REGNUM),
-		   read_register (PR_REGNUM),
-		   read_register (MACH_REGNUM),
-		   read_register (MACL_REGNUM));
+  printf_filtered ("PC=%s SR=%08lx PR=%08lx MACH=%08lx MACHL=%08lx\n",
+		   paddr (read_register (PC_REGNUM)),
+		   (long) read_register (SR_REGNUM),
+		   (long) read_register (PR_REGNUM),
+		   (long) read_register (MACH_REGNUM),
+		   (long) read_register (MACL_REGNUM));
 
-  printf_filtered ("GBR=%08x VBR=%08x",
-                   read_register (GBR_REGNUM),
-                   read_register (VBR_REGNUM));
+  printf_filtered ("GBR=%08lx VBR=%08lx",
+		   (long) read_register (GBR_REGNUM),
+		   (long) read_register (VBR_REGNUM));
   if (cpu == bfd_mach_sh3 || cpu == bfd_mach_sh3e)
     {
-      printf_filtered (" SSR=%08x SPC=%08x",
-                       read_register (SSR_REGNUM),
-                       read_register (SPC_REGNUM));
+      printf_filtered (" SSR=%08lx SPC=%08lx",
+		       (long) read_register (SSR_REGNUM),
+		       (long) read_register (SPC_REGNUM));
       if (cpu == bfd_mach_sh3e)
-        {
-          printf_filtered (" FPUL=%08x FPSCR=%08x",
-                           read_register (FPUL_REGNUM),
-                           read_register (FPSCR_REGNUM));
-        }
+	{
+	  printf_filtered (" FPUL=%08lx FPSCR=%08lx",
+			   (long) read_register (FPUL_REGNUM),
+			   (long) read_register (FPSCR_REGNUM));
+	}
     }
 
-  printf_filtered ("\nR0-R7  %08x %08x %08x %08x %08x %08x %08x %08x\n",
-		   read_register (0),
-		   read_register (1),
-		   read_register (2),
-		   read_register (3),
-		   read_register (4),
-		   read_register (5),
-		   read_register (6),
-		   read_register (7));
-  printf_filtered ("R8-R15 %08x %08x %08x %08x %08x %08x %08x %08x\n",
-		   read_register (8),
-		   read_register (9),
-		   read_register (10),
-		   read_register (11),
-		   read_register (12),
-		   read_register (13),
-		   read_register (14),
-		   read_register (15));
+  printf_filtered ("\nR0-R7  %08lx %08lx %08lx %08lx %08lx %08lx %08lx %08lx\n",
+		   (long) read_register (0),
+		   (long) read_register (1),
+		   (long) read_register (2),
+		   (long) read_register (3),
+		   (long) read_register (4),
+		   (long) read_register (5),
+		   (long) read_register (6),
+		   (long) read_register (7));
+  printf_filtered ("R8-R15 %08lx %08lx %08lx %08lx %08lx %08lx %08lx %08lx\n",
+		   (long) read_register (8),
+		   (long) read_register (9),
+		   (long) read_register (10),
+		   (long) read_register (11),
+		   (long) read_register (12),
+		   (long) read_register (13),
+		   (long) read_register (14),
+		   (long) read_register (15));
   if (cpu == bfd_mach_sh3e)
     {
-      printf_filtered ("FP0-FP7  %08x %08x %08x %08x %08x %08x %08x %08x\n",
-                       read_register (FP0_REGNUM + 0),
-                       read_register (FP0_REGNUM + 1),
-                       read_register (FP0_REGNUM + 2),
-                       read_register (FP0_REGNUM + 3),
-                       read_register (FP0_REGNUM + 4),
-                       read_register (FP0_REGNUM + 5),
-                       read_register (FP0_REGNUM + 6),
-                       read_register (FP0_REGNUM + 7));
-      printf_filtered ("FP8-FP15 %08x %08x %08x %08x %08x %08x %08x %08x\n",
-                       read_register (FP0_REGNUM + 8),
-                       read_register (FP0_REGNUM + 9),
-                       read_register (FP0_REGNUM + 10),
-                       read_register (FP0_REGNUM + 11),
-                       read_register (FP0_REGNUM + 12),
-                       read_register (FP0_REGNUM + 13),
-                       read_register (FP0_REGNUM + 14),
-                       read_register (FP0_REGNUM + 15));
+      printf_filtered ("FP0-FP7  %08lx %08lx %08lx %08lx %08lx %08lx %08lx %08lx\n",
+		       (long) read_register (FP0_REGNUM + 0),
+		       (long) read_register (FP0_REGNUM + 1),
+		       (long) read_register (FP0_REGNUM + 2),
+		       (long) read_register (FP0_REGNUM + 3),
+		       (long) read_register (FP0_REGNUM + 4),
+		       (long) read_register (FP0_REGNUM + 5),
+		       (long) read_register (FP0_REGNUM + 6),
+		       (long) read_register (FP0_REGNUM + 7));
+      printf_filtered ("FP8-FP15 %08lx %08lx %08lx %08lx %08lx %08lx %08lx %08lx\n",
+		       (long) read_register (FP0_REGNUM + 8),
+		       (long) read_register (FP0_REGNUM + 9),
+		       (long) read_register (FP0_REGNUM + 10),
+		       (long) read_register (FP0_REGNUM + 11),
+		       (long) read_register (FP0_REGNUM + 12),
+		       (long) read_register (FP0_REGNUM + 13),
+		       (long) read_register (FP0_REGNUM + 14),
+		       (long) read_register (FP0_REGNUM + 15));
     }
 }
 
@@ -705,7 +706,7 @@ sh_extract_return_value (type, regbuf, valbuf)
      void *regbuf;
      void *valbuf;
 {
-  int len = TYPE_LENGTH(type);
+  int len = TYPE_LENGTH (type);
 
   if (len <= 4)
     memcpy (valbuf, ((char *) regbuf) + 4 - len, len);

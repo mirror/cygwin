@@ -1,3 +1,7 @@
+2001-03-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* socketio.cxx (asyncificate): Correct fd typo.
+
 2001-03-14  Frank Ch. Eigler  <fche@redhat.com>
 
 	* socketio.cxx (asyncificate): Set TCP_NODELAY and SO_KEEPALIVE options.

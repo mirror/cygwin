@@ -227,6 +227,13 @@ namespace sidutil
 	std::ofstream::open (filename.c_str (), std::ios::app);
 	cout_p = false;
       }
+      void end_line ()
+      {
+	if (LIKELY (cout_p))
+	  std::cout << std::endl;
+	else
+	  *this << std::endl;
+      }
       bool cout_p;
     };
 
@@ -611,7 +618,7 @@ public:
       if (LIKELY (s.cout_p))
 	std::cout << t;
       else
-	dynamic_cast <std::ofstream&> (s) << t;
+	static_cast <std::ofstream&> (s) << t;
       return s;
     }
   

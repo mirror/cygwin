@@ -57,6 +57,13 @@
         * testsuite/runtest.all/stats-sub.exp: Test kfail and kpass.
         * testsuite/runtest.all/stats.exp: Ditto.
 
+2002-04-25    <Matthew Bemis <bemis@iol.unh.edu>
+
+	* lib/framework.exp: new procs check_xml{}, insertdtd{}, xml_output{},
+	plus a few hooks to xml_output in the other logging procs to produce
+	XML output.
+	* runtest.exp: Add support for the --x option for XML output.
+
 2002-04-25  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* example/calc/configure.in (AM_MAINTAINER_MODE): Add invocation.

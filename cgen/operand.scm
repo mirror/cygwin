@@ -1,5 +1,5 @@
 ; Operands
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -26,6 +26,10 @@
 		; A more important reason is to help match semantic operands
 		; with function unit input/output arguments.
 		sem-name
+
+		; Pretty name as used in tracing code.
+		; Generally this is the same as the hardware element's name.
+		pretty-sem-name
 
 		; Semantic name of hardware element refered to by this operand.
 		hw-name
@@ -97,6 +101,7 @@
  (lambda (self name comment attrs hw-name mode-name index handlers getter setter)
    (elm-set! self 'name name)
    (elm-set! self 'sem-name name)
+   (elm-set! self 'pretty-sem-name hw-name)
    (elm-set! self 'comment comment)
    (elm-set! self 'attrs attrs)
    (elm-set! self 'hw-name hw-name)
@@ -117,6 +122,7 @@
 
 (define op:sem-name (elm-make-getter <operand> 'sem-name))
 (define op:set-sem-name! (elm-make-setter <operand> 'sem-name))
+(define op:set-pretty-sem-name! (elm-make-setter <operand> 'pretty-sem-name))
 (define op:hw-name (elm-make-getter <operand> 'hw-name))
 (define op:mode-name (elm-make-getter <operand> 'mode-name))
 (define op:selector (elm-make-getter <operand> 'selector))
@@ -215,7 +221,9 @@
 (method-make!
  <operand> 'gen-pretty-name
  (lambda (self mode)
-   (let* ((name (if (elm-bound? self 'sem-name) (elm-get self 'sem-name) (obj:name self)))
+   (let* ((name (if (elm-bound? self 'pretty-sem-name) (elm-get self 'pretty-sem-name) 
+		    (if (elm-bound? self 'sem-name) (elm-get self 'sem-name)
+			(obj:name self))))
 	  (pname (cond ((string=? "h-memory" (string-take 8 name)) "memory")
 		       ((string=? "h-" (string-take 2 name)) (string-drop 2 name))
 		       (else name))))

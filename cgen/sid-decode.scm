@@ -298,10 +298,14 @@ struct @prefix@_scache {
   // argument buffer
   @prefix@_sem_fields fields;
 
+" (if (or (with-profile?) (with-parallel-write?))
+      (string-append "
   // writeback flags
   // Only used if profiling or parallel execution support enabled during
   // file generation.
-  unsigned written;
+  unsigned long long written;
+")
+      "") "
 
   // decode given instruction
   void decode (@cpu@_cpu* current_cpu, PCADDR pc, @prefix@_insn_word base_insn, @prefix@_insn_word entire_insn);

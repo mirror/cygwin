@@ -991,7 +991,7 @@
      ; all the tests can be collapsed together.  Not sure that's a big
      ; enough win yet.
      (if (op:cond? self)
-	 (string-append "  if (written & (1 << "
+	 (string-append "  if (written & (1ULL << "
 			(number->string (op:num self))
 			"))\n"
 			"    {\n"
@@ -1081,7 +1081,7 @@
 		(cx:make-with-atlist mode "opval" (cx:atlist newval))))
    (if (and (with-profile?)
 	    (op:cond? op))
-       (string-append "    written |= (1 << "
+       (string-append "    written |= (1ULL << "
 		      (number->string (op:num op))
 		      ");\n")
        "")
@@ -1133,7 +1133,7 @@
    "    " -par-operand-macro " (" (gen-sym op) ")"
    " = opval;\n"
    (if (op:cond? op)
-       (string-append "    written |= (1 << "
+       (string-append "    written |= (1ULL << "
 		      (number->string (op:num op))
 		      ");\n")
        "")
@@ -1540,7 +1540,7 @@
      (string-append
       "  {\n"
       "    int referenced = 0;\n"
-      "    int UNUSED insn_referenced = abuf->written;\n"
+      "    unsigned long long UNUSED insn_referenced = abuf->written;\n"
       ; Declare variables to hold unit arguments.
       (string-map (lambda (arg) (gen-arg-decl arg #f))
 		  inputs)

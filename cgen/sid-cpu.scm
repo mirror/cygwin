@@ -366,7 +366,7 @@ struct @prefix@_parexec {
    "\
   } operands;
   /* For conditionally written operands, bitmask of which ones were.  */
-  unsigned written;
+  unsigned long long written;
 };\n\n"
    )
 )
@@ -448,7 +448,7 @@ namespace @cpu@ {
        "")
    (gen-define-parallel-operand-macro sfmt)
    "  @prefix@_scache* abuf = sem;\n"
-   "  unsigned written = abuf->written;\n"
+   "  unsigned long long written = abuf->written;\n"
    "  PCADDR pc = abuf->addr;\n"
    "  PCADDR npc = 0; // dummy value for branches\n"
    "  sem_status status = SEM_STATUS_NORMAL; // ditto\n"
@@ -545,7 +545,7 @@ using namespace @cpu@;
      "  @prefix@_scache* abuf = sem;\n"
      ; Unconditionally written operands are not recorded here.
      (if (or (with-profile?) (with-parallel-write?))
-	 "  unsigned written = 0;\n"
+	 "  unsigned long long written = 0;\n"
 	 "")
      ; The address of this insn, needed by extraction and semantic code.
      ; Note that the address recorded in the cpu state struct is not used.
@@ -673,7 +673,7 @@ using namespace @cpu@; // FIXME: namespace organization still wip
 	 "")
      ; Unconditionally written operands are not recorded here.
      (if (or (with-profile?) (with-parallel-write?))
-	 "      unsigned written = 0;\n"
+	 "      unsigned long long written = 0;\n"
 	 "")
      ; The address of this insn, needed by extraction and semantic code.
      ; Note that the address recorded in the cpu state struct is not used.
@@ -968,7 +968,7 @@ struct @prefix@_pbb_label {
 	 "")
      ; Unconditionally written operands are not recorded here.
      (if (or (with-profile?) (with-parallel-write?))
-	 "      unsigned written = 0;\n"
+	 "      unsigned long long written = 0;\n"
 	 "")
      ; The address of this insn, needed by extraction and semantic code.
      ; Note that the address recorded in the cpu state struct is not used.

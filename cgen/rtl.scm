@@ -1,5 +1,5 @@
 ; Basic RTL support.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -2031,11 +2031,13 @@
       (elm-xset! result 'type hw)
       (elm-xset! result 'mode mode)
 
+      (op:set-pretty-sem-name! result hw-name)
+
       ; The name of the operand must include the index so that multiple copies
       ; of a hardware object (e.g. h-gr[0], h-gr[14]) can be distinguished.
       (let ((name (-rtx-hw-name hw hw-name index-arg)))
 	(send result 'set-name! name)
-	(op:set-sem-name! result hw-name))
+	(op:set-sem-name! result name))
 
       ; Empty comment and attribute.
       ; ??? Stick the arguments in the comment for debugging purposes?

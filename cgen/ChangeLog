@@ -1022,7 +1022,6 @@
 	(syntax-make-elements): Ditto.
 	* opc-itab.scm (compute-syntax): Ditto.
 
-
 2000-05-17  Ben Elliston  <bje@redhat.com>
 
 	* gas-test.scm (cgen-build.sh): Log the correct script filename.
@@ -1036,7 +1035,6 @@
 
 	* desc-cpu.scm (-gen-hash-defines): Define CGEN_ACTUAL_MAX values for
 	IFMT_OPERANDS and SYNTAX_BYTES.
-
 
 2000-05-15  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -1086,7 +1084,6 @@
 	trace entries.  Widen byte-wide values for printing.
 	* sid.scm (-op-gen-set-trace): Enhance result trace with op indices.
 	Widen byte-wide values for printing.  Hexify memory addresses.
-
 
 2000-04-23  matthew green  <mrg@redhat.com>
 
@@ -1440,7 +1437,7 @@ Wed Sep 29 14:39:39 1999  Dave Brolley  <brolley@cygnus.com>
 1999-09-28  Doug Evans  <devans@casey.cygnus.com>
 
 	* ia32.cpu: New file.
-	
+
 1999-09-25  Doug Evans  <devans@casey.cygnus.com>
 
 	* utils.scm (bit-set?): Fix off by one error.

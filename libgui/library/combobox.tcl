@@ -834,7 +834,7 @@ proc ::combobox::widgetProc {w command args} {
 
 	    # magic tcl stuff (see tk.tcl in the distribution 
 	    # lib directory)
-	    tkCancelRepeat
+	    tk::CancelRepeat
 
 	    return 1
 	}

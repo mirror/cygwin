@@ -1,3 +1,7 @@
+2002-03-15  Chris Demetriou  <cgd@broadcom.com>
+
+	* baseboards/mips-sim-idt32.exp: New file.
+
 2002-02-28  Jason Merrill  <jason@redhat.com>
 
 	* example/calc/Makefile.in (check): Add ./ to CALC value to avoid

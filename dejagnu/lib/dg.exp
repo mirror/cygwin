@@ -586,6 +586,19 @@ proc dg-runtest { testcases flags default-extra-flags } {
     }
 }
 
+# dg-trim-dirname -- rip DIR_NAME out of FILE_NAME
+# 
+# Syntax: dg-trim-dirname dir_name file_name
+# We need to go through this contorsion in order to properly support
+# directory-names which might have embedded regexp special characters.
+
+proc dg-trim-dirname { dir_name file_name } {
+    set special_character "\[\?\+\-\.\(\)\$\|\]"
+    regsub -all $special_character $dir_name "\\\\&" dir_name
+    regsub "^$dir_name/?" $file_name "" file_name
+    return $file_name
+}
+
 # dg-test -- runs a new style DejaGnu test
 #
 # Syntax: dg-test [-keep-output] prog tool_flags default_extra_tool_flags
@@ -631,7 +644,7 @@ proc dg-test { args } {
 
     set text "\[- A-Za-z0-9\.\;\"\_\:\'\`\(\)\!\#\=\+\?\&\*]*"
 
-    regsub "^$srcdir/?" $prog "" name
+    set name [dg-trim-dirname $srcdir $prog]
     # If we couldn't rip $srcdir out of `prog' then just do the best we can.
     # The point is to reduce the unnecessary noise in the logs.  Don't strip
     # out too much because different testcases with the same name can confuse

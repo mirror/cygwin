@@ -164,8 +164,6 @@ gloss32::get_string(address32 address, string& value, unsigned length)
 	  bus::status s = this->cpu_memory_bus->read(address, byte);
 	  if (s == bus::ok) 
 	    break;
-	  else if (s == bus::delayed) 
-	    continue;
 	  else 
 	    {
 	      if (verbose_p)
@@ -215,8 +213,6 @@ gloss32::set_string(address32 address, const string& value)
 	  bus::status s = this->cpu_memory_bus->write(address, byte);
 	  if (s == bus::ok) 
 	    break;
-	  else if (s == bus::delayed) 
-	    continue;
 	  else 
 	    {
 	      if (verbose_p)
@@ -272,8 +268,6 @@ gloss32::get_word(address32 address, int32& value)
 
       if (s == bus::ok)
 	break;
-      else if (s == bus::delayed)
-	continue;
       else
 	{
 	  if (verbose_p)
@@ -321,8 +315,6 @@ gloss32::set_word(address32 address, int32 value)
 
       if (s == bus::ok)
 	break;
-      else if (s == bus::delayed)
-	continue;
       else
 	{
 	  if (verbose_p)

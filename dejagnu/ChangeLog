@@ -1,3 +1,11 @@
+2002-06-18  Dave Brolley  <brolley@redhat.com>
+
+	From Catherine Moore, Michael Meissner, Mark Salter, Jim Blandy:
+	* baseboards/frv-elf.exp: New board description.
+	* baseboards/frv-sim.exp: New board description.
+	* baseboards/frv-tiger.exp: New board description.
+	* baseboards/frv-tomcat.exp: New board description.
+
 2002-04-25  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* example/calc/configure.in (AM_MAINTAINER_MODE): Add invocation.

@@ -1,0 +1,20 @@
+# xstormy16 testcase for mov.b $Rd,RxL -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global movlowgr
+movlowgr:
+	mov r0, #0x1234
+	mov r1, #0x56
+	mov.b r0, RxL
+	assert r0, 0x1256
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

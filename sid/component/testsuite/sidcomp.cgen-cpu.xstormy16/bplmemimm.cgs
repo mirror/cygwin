@@ -1,0 +1,20 @@
+# xstormy16 testcase for bp $lmem8,#$imm3b,$rel12 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.data
+data:
+	.byte 6
+	.text
+
+	.global bplmemimm
+bplmemimm:
+	bp data, #2, okay
+
+wrong:
+	fail
+okay:
+	pass

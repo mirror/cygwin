@@ -1,0 +1,22 @@
+# xstormy16 testcase for mov$ws2 $Rm,$lmem8 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.data
+data:	.byte 0x7a
+	.text
+
+	.global movlgrmem
+movlgrmem:
+	mov.b r0, data
+	assert r0, 0x7a
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

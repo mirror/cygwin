@@ -7,3 +7,4 @@
 #define SIDTARGET_M32R @sidtarget_m32r@
 #define SIDTARGET_M68K @sidtarget_m68k@
 #define SIDTARGET_PPC @sidtarget_ppc@
+#define SIDTARGET_XSTORMY16 @sidtarget_xstormy16@

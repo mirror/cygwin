@@ -1,3 +1,7 @@
+2001-12-17  matthew green  <mrg@redhat.com>
+
+	* sid.spec: Add /usr/bin/xstormy16-elf-sid.
+
 2001-12-12  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* sid.spec: New file.

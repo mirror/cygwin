@@ -1,3 +1,11 @@
+2001-12-17  matthew green  <mrg@redhat.com>
+
+	* pregen-configs.in: Add support for Xstormy16.
+	* xstormy16-gloss.conf: New file.
+	* xstormy16-gdb.conf: Likewise.
+	* xstormy16-gloss-gdb.conf: Likewise.
+	* xstormy16-gloss-gdb-tksm.conf: Likewise.
+
 2001-12-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* ALL.conf: Regenerated with endianness-setting tweak.

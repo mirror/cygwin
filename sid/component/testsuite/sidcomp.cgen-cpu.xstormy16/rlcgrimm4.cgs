@@ -1,0 +1,21 @@
+# xstormy16 testcase for rlc $Rd,#$imm4 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global rlcgrimm4
+rlcgrimm4:
+	mov r1, #0x84
+	mov r3, #0xffff
+	add r3, #1
+	rlc r1, #2
+	assert r1, 0x212
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

@@ -1,0 +1,21 @@
+# xstormy16 testcase for dec $Rd,#$imm2 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global decgrimm2
+decgrimm2:
+	mov r9, #10
+	dec r9, #3
+	assert r9, 6
+	dec r9, #2
+	assert r9, 3
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

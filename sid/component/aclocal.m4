@@ -671,6 +671,7 @@ sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
 sidtarget_ppc=$sidtarget_default
+sidtarget_xstormy16=$sidtarget_default
 
 dnl Iterate over all listed targets
 for targ in $all_targets
@@ -684,6 +685,7 @@ do
       m68k*)  sidtarget_m68k=1 ;;
       powerpc*) sidtarget_ppc=1 ;;
       ppc*)   sidtarget_ppc=1 ;;
+      xstormy16*) sidtarget_xstormy16=1 ;;
       *)      AC_MSG_WARN("Unknown target $targ") ;;
    esac
 done
@@ -696,6 +698,7 @@ case 1 in
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
   ${sidtarget_ppc}) ;;
+  ${sidtarget_xstormy16}) ;;
   *) AC_MSG_WARN([No selected sid targets: use --enable-targets or --target])
 	;;
 esac
@@ -733,6 +736,11 @@ AC_MSG_CHECKING(PPC family support)
 AC_SUBST(sidtarget_ppc)
 AM_CONDITIONAL(SIDTARGET_PPC,[test "x$sidtarget_ppc" = x1])
 AC_MSG_RESULT($sidtarget_ppc)
+
+AC_MSG_CHECKING(Sanyo Xstormy16 family support)
+AC_SUBST(sidtarget_xstormy16)
+AM_CONDITIONAL(SIDTARGET_XSTORMY16,[test "x$sidtarget_xstormy16" = x1])
+AC_MSG_RESULT($sidtarget_xstormy16)
 
 ])
 

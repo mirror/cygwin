@@ -1,0 +1,21 @@
+# xstormy16 testcase for mul -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global mul
+mul:
+	mov r0, #10
+	mov r2, #50
+	mul
+	assert r1, 0
+	assert r0, 500
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

@@ -1,0 +1,23 @@
+# xstormy16 testcase for or $Rd,#$imm16 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global orgrimm16
+orgrimm16:
+	mov r1, #0xc
+	or r1, #1
+	assert r1, 0xd
+
+	mov r1, #0xd
+	or r1, #1
+	assert r1, 0xd
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

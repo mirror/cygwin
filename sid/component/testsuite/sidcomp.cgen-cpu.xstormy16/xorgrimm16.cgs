@@ -1,0 +1,23 @@
+# xstormy16 testcase for xor $Rd,#$imm16 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global xorgrimm16
+xorgrimm16:
+	mov r1, #0xc
+	xor r1, #1
+	assert r1, 0xd
+
+	mov r1, #0xd
+	xor r1, #1
+	assert r1, 0xc
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

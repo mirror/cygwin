@@ -20,6 +20,10 @@ if SIDTARGET_M68K
 FAM3SCRIPTS = m68k-elf-sid
 endif
 
+if SIDTARGET_XSTORMY16
+FAM10SCRIPTS = xstormy16-elf-sid
+endif
+
 if SIDTARGET_X86
 FAM11SCRIPTS = i386-elf-sid
 endif

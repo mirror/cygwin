@@ -1,0 +1,17 @@
+# xstormy16 testcase for add Rx,#$imm8 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global addimm8
+addimm8:
+	mov r2, #2
+	add Rx, #55
+	bz r2, #57, okay
+
+wrong:
+	fail
+okay:
+	pass

@@ -1,0 +1,22 @@
+# xstormy16 testcase for sub $Rd,#$imm4 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global subgrimm4
+subgrimm4:
+	mov r2, #5
+	sub r2, #3
+	bnz r2, #2, wrong
+
+	mov r2, #3
+	sub r2, #3
+	bz okay
+	br wrong
+
+wrong:
+	fail
+okay:
+	pass

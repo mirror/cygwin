@@ -1,0 +1,18 @@
+# xstormy16 testcase for b$bcond2 Rx,#$imm16,${rel8-4} -*- Asm -*-
+# mach: all
+# this just tests a simple "bge"; the "bcc.cgs" tests all the
+# 16 combos of this instruction.
+
+	.include "testutils.inc"
+
+	start
+
+	.global bccimm16
+bccimm16:
+	mov r2, #2
+	bge Rx, #1, okay
+
+wrong:
+	fail
+okay:
+	pass

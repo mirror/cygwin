@@ -1,0 +1,19 @@
+# xstormy16 testcase for shr $Rd,#$imm4 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global shrgrimm
+shrgrimm:
+	mov r1, #0x84
+	shr r1, #2
+	assert r1, 0x21
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

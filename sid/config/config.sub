@@ -229,7 +229,7 @@ case $basic_machine in
 		| mips64vr4300 | mips64vr4300el | mips64vr4100 | mips64vr4100el \
 		| mips64vr5000 | miprs64vr5000el | mcore \
 		| sparc | sparclet | sparclite | sparc64 | sparcv9 | v850 | c4x \
-		| thumb | d10v | d30v | fr30 | avr)
+		| thumb | d10v | d30v | fr30 | avr | xstormy16 )
 		basic_machine=$basic_machine-unknown
 		;;
        	# CYGNUS LOCAL config names
@@ -293,7 +293,7 @@ case $basic_machine in
 	      | f301-* | armv*-* | s390-* | sv1-* | t3e-* \
 	      | m88110-* | m680[01234]0-* | m683?2-* | m68360-* | z8k-* | d10v-* \
 	      | thumb-* | v850-* | d30v-* | tic30-* | c30-* | fr30-* \
-	      | bs2000-* | tic54x-* | c54x-*)
+	      | bs2000-* | tic54x-* | c54x-* | xstormy16-* )
 		;;
         # CYGNUS LOCAL config names
 	d30v-* | tic80-* | mcore-* | strongarm-* | v850e-* | v850ea-* \

@@ -1,0 +1,36 @@
+# xstormy16 testcase for pop/push $Rd -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	mov sp, #0x4000
+
+	.global pushpop
+pushpop:
+	mov r0, #0x1234
+	mov r1, #0x5678
+	mov r2, #0x9abc
+	mov r3, #0xdef0
+
+	push r0
+	push r1
+	push r2
+	push r3
+
+	pop r4
+	assert r4, 0xdef0
+	pop r5
+	assert r5, 0x9abc
+	pop r6
+	assert r6, 0x5678
+	pop r7
+	assert r7, 0x1234
+
+	br okay
+
+wrong:
+	fail
+okay:
+	pass

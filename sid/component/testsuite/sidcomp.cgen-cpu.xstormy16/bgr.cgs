@@ -1,0 +1,19 @@
+# xstormy16 testcase for br $Rd -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global bgr
+bgr:
+	mov r3, #6
+	br r3
+	nop	; +2
+	nop	; +2
+	nop	; +2
+
+okay:
+	pass
+wrong:
+	fail

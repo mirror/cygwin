@@ -92,6 +92,15 @@ typedef SCACHE *SEM_PC;
 #else
 typedef IADDR SEM_PC;
 #endif
+
+/* Kinds of branches.  */
+typedef enum {
+  SEM_BRANCH_UNTAKEN,
+  /* Branch to an uncacheable address (e.g. j reg).  */
+  SEM_BRANCH_UNCACHEABLE,
+  /* Branch to a cacheable (fixed) address.  */
+  SEM_BRANCH_CACHEABLE
+} SEM_BRANCH_TYPE;
 
 /* Virtual insn support.  */
 
@@ -106,7 +115,7 @@ typedef enum {
   VIRTUAL_INSN_X_CHAIN= -4, VIRTUAL_INSN_X_CTI_CHAIN = -5
 } CGEN_INSN_VIRTUAL_TYPE;
 
-/* Return non-zero if OPCODE is a virtual insn.  */
+/* Return non-zero if CGEN_INSN* INSN is a virtual insn.  */
 #define CGEN_INSN_VIRTUAL_P(insn) \
   CGEN_INSN_ATTR_VALUE ((insn), CGEN_INSN_VIRTUAL)
 
@@ -121,7 +130,7 @@ typedef enum {
 #define CASE(N, X) case_##N##_##X
 #define BREAK(N) goto end_switch_##N
 #define DEFAULT(N) default_##N
-#define ENDSWITCH(N) end_switch_##N:
+#define ENDSWITCH(N) end_switch_##N:;
 #else
 #define SWITCH(N, X) switch (X)
 #define CASE(N, X) case X /* FIXME: old sem-switch had (@arch@_,X) here */
@@ -168,7 +177,7 @@ extern CPU_INSN_NAME_FN cgen_insn_name;
    language [or suggest a better way].  */
 extern int cgen_cpu_max_extra_bytes (void);
 
-/* Called to process an invalid instruction.  */
-extern void sim_engine_invalid_insn (SIM_CPU *, IADDR);
+/* Target supplied routine to process an invalid instruction.  */
+extern SEM_PC sim_engine_invalid_insn (SIM_CPU *, IADDR, SEM_PC);
 
 #endif /* CGEN_DEFS_H */

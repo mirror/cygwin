@@ -84,7 +84,7 @@
       system.  When advancing, there may be no scheduled events due,
       even though there may be scheduled events.  In such a case, if
       the <attribute>yield-host-time?</attribute>  attribute is set to <tt>a value greater than or
-      equalt to yield-host-time-threshold</tt>, a host-time
+      equal to yield-host-time-threshold</tt>, a host-time
       scheduler will yield some amount of time to the host operating
       system using a function like usleep().
       </p>

@@ -60,7 +60,7 @@ Functionality:
    |               | events. In such a case, if the  |
    |               | yield-host-time? attribute is   |
    |               | set to a value greater than or  |
-   |               | equalt to                       |
+   |               | equal to                        |
    |               | yield-host-time-threshold, a    |
    |               | host-time scheduler will yield  |
    |               | some amount of time to the host |

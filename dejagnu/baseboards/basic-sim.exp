@@ -49,3 +49,6 @@ proc setup_sim { subdir_name } {
 }
 
 set_board_info is_simulator 1;
+
+# Most simulators need the image reloaded and reinitialized to rerun.
+set_board_info gdb,do_reload_on_run 1

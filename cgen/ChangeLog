@@ -1,3 +1,12 @@
+2002-01-22  Graydon Hoare  <graydon@redhat.com>
+
+	* desc-cpu.scm (ifld-number-cache): Add.
+	(ifld-number): Add.
+	(gen-maybe-multi-ifld-of-op): Add.
+	(gen-maybe-multi-ifld): Add.
+	(gen-multi-ifield-nodes): Add.
+	(cgen-desc.c): Add call to gen-multi-ifield-nodes.
+
 2002-01-10  matthew green  <mrg@redhat.com>
 
 	* cpu/xstormy16.cpu (gr-Rbj-names): Rename this ...

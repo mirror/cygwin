@@ -378,6 +378,60 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
 
 ; Generate C code to define the operand table.
 
+(define ifld-number-cache #f)
+(define (ifld-number f)
+  (if (not ifld-number-cache)
+      (let* ((ls (find (lambda (f) (not (has-attr? f 'VIRTUAL)))
+		       (non-derived-ifields (current-ifld-list))))
+	     (numls (iota (length ls))))
+	(set! ifld-number-cache 
+	      (map (lambda (elt num) (cons (obj:name elt) num)) 
+		   ls numls))))
+  (number->string (cdr (assoc (obj:name f) ifld-number-cache))))
+
+(define (gen-maybe-multi-ifld-of-op op)
+  (let* ((idx (op:index op))
+	 (ty (hw-index:type idx))
+	 (fld (hw-index:value idx)))
+    (gen-maybe-multi-ifld ty fld)))
+
+(define (gen-maybe-multi-ifld ty fld)
+  (let* ((field-ref "0")
+	 (field-count "0"))
+    (if (equal? ty 'ifield)
+	(if (multi-ifield? fld) 
+	    (begin
+	      (set! field-ref (string-append "&(" (ifld-enum fld) "_MULTI_IFIELD[0])"))
+	      (set! field-count (number->string (length (elm-get fld 'subfields)))))
+	    ; else	    
+	      (set! field-ref (string-append "&(@arch@_cgen_ifld_table[" (ifld-number fld) "])"))))    
+    (string-append "{ " field-count ", " field-ref " }"))) 
+
+(define (gen-multi-ifield-nodes)
+  (let ((multis (find multi-ifield? (current-ifld-list))))
+    (apply string-append
+	   (append 
+	    
+	    '("\n\n/* multi ifield declarations */\n\n")
+	    (map   
+	     (lambda (ifld) 
+	       (string-append 
+		"const CGEN_MAYBE_MULTI_IFLD " 
+		(ifld-enum ifld) "_MULTI_IFIELD [];\n"))
+	     multis)
+
+	    '("\n\n/* multi ifield definitions */\n\n")
+	    (map   
+	     (lambda (ifld)
+	       (string-append
+		"const CGEN_MAYBE_MULTI_IFLD " 
+		(ifld-enum ifld) "_MULTI_IFIELD [] =\n{"
+		(apply string-append 
+		       (map (lambda (x) (string-append "\n    " (gen-maybe-multi-ifld 'ifield x) ",")) 
+			    (elm-get ifld 'subfields)))
+		"\n    {0,0}\n};\n"))
+	     multis)))))
+
 (define (gen-operand-table)
   (logit 2 "Generating operand table ...\n")
   (let* ((all-attrs (current-op-attr-list))
@@ -408,6 +462,8 @@ const CGEN_OPERAND @arch@_cgen_operand_table[] =
 			         (hw-enum (op:hw-name op)) ", "
 			         (number->string (op:start op)) ", "
 			         (number->string (op:length op)) ",\n"
+			         "    "
+                                 (gen-maybe-multi-ifld-of-op op) ", \n"
 			         "    "
 			         (gen-obj-attr-defn 'operand op all-attrs
 				       	            num-non-bools gen-A-attr-mask)
@@ -661,8 +717,8 @@ static void
       {
 	const CGEN_ISA *isa = & @arch@_cgen_isa_table[i];
 
-	/* Default insn sizes of all selected isas must be equal or we set
-	   the result to 0, meaning \"unknown\".  */
+	/* Default insn sizes of all selected isas must be
+	   equal or we set the result to 0, meaning \"unknown\".  */
 	if (cd->default_insn_bitsize == UNSET)
 	  cd->default_insn_bitsize = isa->default_insn_bitsize;
 	else if (isa->default_insn_bitsize == cd->default_insn_bitsize)
@@ -670,8 +726,8 @@ static void
 	else
 	  cd->default_insn_bitsize = CGEN_SIZE_UNKNOWN;
 
-	/* Base insn sizes of all selected isas must be equal or we set
-	   the result to 0, meaning \"unknown\".  */
+	/* Base insn sizes of all selected isas must be equal
+	   or we set the result to 0, meaning \"unknown\".  */
 	if (cd->base_insn_bitsize == UNSET)
 	  cd->base_insn_bitsize = isa->base_insn_bitsize;
 	else if (isa->base_insn_bitsize == cd->base_insn_bitsize)
@@ -962,6 +1018,7 @@ init_tables ()
    -gen-mach-table-defns
    gen-hw-table-defns
    gen-ifld-defns
+   gen-multi-ifield-nodes
    gen-operand-table
    gen-insn-table
    gen-init-fns

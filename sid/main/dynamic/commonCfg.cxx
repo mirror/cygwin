@@ -1004,6 +1004,7 @@ void BoardCfg::final_insn_count ()
   assert (cpu);
   assert (sess->shutdown_seq);
   sess->shutdown_seq->add_output (0, cpu, "print-insn-summary!");
+  cpu->set (cpu, "final-insn-count?", "true");
 }
 
 void BoardCfg::trace_counter ()

@@ -1,3 +1,8 @@
+2002-02-06  Ben Elliston  <bje@redhat.com>
+
+	* angel.cxx (arm_angel): Initialise command_line correctly.
+	(do_get_cmdline): Use get_command_line().
+
 2002-01-25  Ben Elliston  <bje@redhat.com>
 
 	* libgloss.h (libgloss::SYS_argc): New enumerator.

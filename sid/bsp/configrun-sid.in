@@ -270,14 +270,14 @@ $whoami=qx{whoami}; chop ($whoami);
 $hostname=qx{hostname}; chop ($hostname);
 $date=qx{date}; chop ($date);
 $uname=qx{uname}; chop ($uname);
-$version=q$Id: configrun-sid.in,v 1.5 2001/01/13 14:26:05 mrg Exp $;
+$version=q$Id: configrun-sid.in,v 1.6 2001/01/15 19:14:42 fche Exp $;
 $zeroth_section = "# sid configuration file
 # created by $version
 # run by $whoami @ $hostname ($uname) at $date
-# args: @ARGV_COPY
-set main verbose? $opt_verbose
-set main persistent? $opt_persistent
-";
+# args: @ARGV_COPY\n";
+
+if ($opt_verbose) { $zeroth_section .= "set main verbose? true\n"; }
+if ($opt_persistent) { $zeroth_section .= "set main persistent? true\n"; }
 
 
 $cpu_component_type = $cpu_comptype{$opt_cpu} || die "Unknown cpu $opt_cpu for cpu component type\n";

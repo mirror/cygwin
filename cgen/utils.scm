@@ -34,11 +34,9 @@
   (list proc arg1 arg2 arg3 arg4 arg5 arg6 arg7)
 )
 
-; ??? value doesn't matter too much here, just check if portable
-; Name was `UNSPECIFIED' but that conflicts with hobbit.
+; Value doesn't matter too much here, just ensure it's portable.
 (define *UNSPECIFIED* (if #f 1))
 
-; Define as global to avoid multiple copies in hobbit generated code.
 (define assert-fail-msg "assertion failure:")
 
 (defmacro assert (expr)
@@ -71,8 +69,6 @@
 ; Print a message if the verbosity level calls for it.
 ; This is a macro as a bit of cpu may be spent computing args,
 ; and we only want to spend it if the result will be printed.
-; Macro's can't be used in hobbit-compiled code, so instead there use:
-; (if (verbose? level) (message ...)).
 
 (defmacro logit (level . args)
   `(if (>= verbose-level ,level) (message ,@args))
@@ -937,14 +933,6 @@
 
 ; Compute the list of all indices from bits missing in MASK.
 ; e.g. (missing-bit-indices #xff00 #xffff) -> (0 1 2 3 ... 255)
-;
-; Hobbit emits two functions named `missing_bit_indices_fn31' for this.
-;(define (missing-bit-indices mask full-mask)
-;  (let* ((bitvals (bit-vals (logxor mask full-mask)))
-;	 (selectors (bit-patterns (length bitvals))))
-;    (map (lambda (sel) (apply + (map * sel bitvals))) selectors))
-;)
-; So it's rewritten to this ...
 
 (define (missing-bit-indices mask full-mask)
   (let* ((bitvals (bit-vals (logxor mask full-mask)))
@@ -1178,7 +1166,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   (cons "\
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000 Red Hat, Inc.
+Copyright (C) 2000, 2001 Red Hat, Inc.
 "
 	"\
 "))
@@ -1194,11 +1182,11 @@ This file is part of the GNU Binutils and/or GDB, the GNU debugger.
 ")
 
 (define package-gnu-simulators "\
-This file is part of the GNU Simulators.
+This file is part of the GNU simulators.
 ")
 
 (define package-cygnus-simulators "\
-This file is part of the Cygnus Simulators.
+This file is part of the Red Hat simulators.
 ")
 
 ; Return COPYRIGHT, with FILE-DESC as the first line

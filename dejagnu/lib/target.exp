@@ -289,7 +289,6 @@ proc target_compile {source destfile type options} {
 proc default_target_compile {source destfile type options} {
     global target_triplet
     global tool_root_dir
-    global env
     global CFLAGS_FOR_TARGET
     global compiler_flags
 
@@ -306,11 +305,6 @@ proc default_target_compile {source destfile type options} {
 
     if [info exists CFLAGS_FOR_TARGET] {
 	append add_flags " $CFLAGS_FOR_TARGET"
-# The top level Makefile sets (and exports) a *FLAGS_FOR_TARGET
-# that may not be applicable to testsuite runs.  This conflict
-# needs to be resolved.
-#    } elseif [info exists env(CFLAGS_FOR_TARGET)] {
-#	append add_flags " $env(CFLAGS_FOR_TARGET)"
     }
 
     if [info exists target_info(host,name)] {
@@ -404,43 +398,18 @@ proc default_target_compile {source destfile type options} {
 	if { $compiler == "" } {
 	    set compiler $CC_FOR_TARGET
 	}
-# When started from a mid-level directory (eg gdb)
-# the Makefile may export a *_FOR_TARGET that isn't
-# applicable.
-#    } elseif [info exists env(CC_FOR_TARGET)] {
-#	if { $compiler == "" } {
-#	    set compiler $env(CC_FOR_TARGET)
-#	}
-    } elseif { [info exists env(CC_FOR_TARGET)] && $env(CC_FOR_TARGET) != "" } {
-	if { $compiler == "" } {
-	    set compiler $env(CC_FOR_TARGET)
-	}
     }
 
     if [info exists CXX_FOR_TARGET] {
 	if { $compiler_type == "c++" } {
 	    set compiler $CXX_FOR_TARGET
 	}
-# When started from a mid-level directory (eg gdb)
-# the Makefile may export a *_FOR_TARGET that isn't
-# applicable.
-#    } elseif [info exists env(CXX_FOR_TARGET)] {
-#	if { $compiler_type == "c++" } {
-#	    set compiler $env(CXX_FOR_TARGET)
-#	}
     }
 
     if [info exists F77_FOR_TARGET] {
 	if { $compiler_type == "f77" } {
 	    set compiler $F77_FOR_TARGET
 	}
-# When started from a mid-level directory (eg gdb)
-# the Makefile may export a *_FOR_TARGET that isn't
-# applicable.
-#    } elseif [info exists env(F77_FOR_TARGET)] {
-#	if { $compiler_type == "f77" } {
-#	    set compiler $env(F77_FOR_TARGET)
-#	}
     }
 
     if { $compiler == "" } {
@@ -655,14 +624,11 @@ proc target_assemble { source destfile flags } {
 }
 
 proc default_target_assemble { source destfile flags } {
-    global env
-    global AS_FOR_TARGET;
-    global ASFLAGS_FOR_TARGET;
+    global AS_FOR_TARGET
+    global ASFLAGS_FOR_TARGET
 
     if [info exists AS_FOR_TARGET] {
 	set AS "$AS_FOR_TARGET";
-    } elseif [info exists env(AS_FOR_TARGET)] {
-	set AS $env(AS_FOR_TARGET)
     } else {
 	if ![board_info target exists assembler] {
 	    set AS [find_gas];
@@ -673,11 +639,6 @@ proc default_target_assemble { source destfile flags } {
 
     if [info exists ASFLAGS_FOR_TARGET] {
 	append flags " $ASFLAGS_FOR_TARGET";
-# The top level Makefile sets (and exports) a *FLAGS_FOR_TARGET
-# that may not be applicable to testsuite runs.  This conflict
-# needs to be resolved.
-#    } elseif [info exists env(ASFLAGS_FOR_TARGET)] {
-#	append flags " $env(ASFLAGS_FOR_TARGET)"
     }
 
     if [is_remote host] {
@@ -711,9 +672,8 @@ proc target_link { objects destfile flags } {
 }
 
 proc default_link { board objects destfile flags } {
-    global env
-    global LD_FOR_TARGET;
-    global LDFLAGS_FOR_TARGET;
+    global LD_FOR_TARGET
+    global LDFLAGS_FOR_TARGET
 
     # return -L's in ldflags
     proc only--Ls { ldflags } {
@@ -742,8 +702,6 @@ proc default_link { board objects destfile flags } {
 
     if [info exists LD_FOR_TARGET] {
 	set LD "$LD_FOR_TARGET";
-    } elseif [info exists env(LD_FOR_TARGET)] {
-	set LD $env(LD_FOR_TARGET)
     } else {
 	if ![board_info target exists linker] {
 	    set LD [find_ld];
@@ -754,11 +712,6 @@ proc default_link { board objects destfile flags } {
 
     if [info exists LDFLAGS_FOR_TARGET] {
 	append flags " $LDFLAGS_FOR_TARGET";
-# The top level Makefile sets (and exports) a *FLAGS_FOR_TARGET
-# that may not be applicable to testsuite runs.  This conflict
-# needs to be resolved.
-#    } elseif [info exists env(LDFLAGS_FOR_TARGET)] {
-#	append flags " $env(LDFLAGS_FOR_TARGET)"
     }
 
     # `ldflags' consists of arguments to gcc (that are then

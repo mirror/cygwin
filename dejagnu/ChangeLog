@@ -1,3 +1,7 @@
+2003-10-13  Corinna Vinschen  <vinschen@redhat.com>
+
+	* baseboards/sh-sim.exp: New file.
+
 2003-06-14  H.J. Lu <hongjiu.lu@intel.com>
  
 	* config.guess: Update to 2003-06-12 version.

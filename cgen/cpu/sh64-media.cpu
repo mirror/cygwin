@@ -1120,10 +1120,10 @@
 	 (.str "mextr" n " $rm, $rn, $rd")
 	 (+ (f-op op) rm (f-ext extop) rn rd (f-rsvd 0))
 	 (sequence ((QI count) (DI mask) (DI rhs))
-		   (set count (mul QI 8 (sub QI 8 n)))
+		   (set count (mul QI 8 n))
 		   (set mask (sll DI (inv 0) count))
 		   (set rhs (srl (and rm mask) count))
-		   (set count (mul QI 8 n))
+		   (set count (mul QI 8 (sub QI 8 n)))
 		   (set mask (srl DI (inv 0) count))
 		   (set rd (or DI rhs (sll DI (and rn mask) count))))))
 

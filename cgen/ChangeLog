@@ -1,3 +1,8 @@
+2003-08-29  Dave Brolley  <brolley@redhat.com>
+
+	* cpu/frv.cpu: Removed.
+	* cpu/frv.opc: Removed.
+
 2003-08-21  Nick Clifton  <nickc@redhat.com>
 
 	* cpu/frv.cpu (mbtoh): Replace input parameter to

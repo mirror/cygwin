@@ -1,6 +1,6 @@
 // lcd-driver.cxx - description.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -19,11 +19,13 @@ lcd_driver::check_status( unsigned char what )
 
   byte = *STATUS_REG; 
 
-  if( (byte & what) != what ) {
-    cerr << "check_status: bad status - got " <<
-      hex << (unsigned) byte << " != " << (unsigned) what << dec << endl;
-    return false;
-  }
+  if ((byte & what) != what)
+    {
+      std::cerr << "check_status: bad status - got "
+		<< std::hex << (unsigned) byte << " != " << (unsigned) what
+		<< std::dec << std::endl;
+      return false;
+    }
   return true;
  }
 

@@ -1,11 +1,15 @@
 // page-lcd.cxx - description.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
 #include "page-lcd.h"
-#include <stdio.h>
+#include <iostream>
+
+using std::cerr;
+using std::cout;
+using std::endl;
 
 PagerUI :: PagerUI(lcd_driver& lcd)
   :lcd_drobj(lcd)

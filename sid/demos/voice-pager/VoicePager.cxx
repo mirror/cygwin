@@ -1,13 +1,12 @@
 // VoicePager.cxx - description.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
 // This is the main controller will send msgs to rtc, lcd, and snack.
 // Gets input from  parallel port and also has look up table.
 
-#include <stdio.h>
 #include "VoicePager.h"
 
 static const int TIME_DIFFHRS = 7;	// CA time(-3) and no light sav. (-4)
@@ -137,7 +136,7 @@ VoicePager::poll_input()
 	    break;
 
 	  default:
-	    cerr << " current value of command is  "	<< curr_cmd << "\n";
+	    std::cerr << " current value of command is  "	<< curr_cmd << std::endl;
 	    break;
 	  }
 	}
@@ -247,9 +246,8 @@ VoicePager::stop_recmsg()
   if ( inuse_idnum > 0)
     {
       //      stop_snd (inuse_idnum);
-      //      cout << "entered stop \n";
       if ((record_process) && (play_process))
-        cerr << " ERROR record & play both in process?? \n";
+        std::cerr << " ERROR record & play both in process?" << std::endl;
 
       else 
 	{
@@ -257,7 +255,6 @@ VoicePager::stop_recmsg()
 	    {
 	      get_adcdata (inuse_idnum); // also call stop snd 
 	      clear_hardrectime();
-	      //              cout << " stop draw screen \n";
 	      lcdpager_ptr -> draw_screen(); // RON brought this
 	    }
 
@@ -273,7 +270,6 @@ VoicePager::stop_recmsg()
     {
       display_msg ("No message to Stop");
     }
-  //  cout << "Exiting stop \n";
 }
 
 string
@@ -410,7 +406,7 @@ VoicePager::crossed_reclimit()
 	  rec_curtime += diff_secs - 59 - 1;
 	  /*   if ( rec_curtime < 0)
 	       {
-               cerr << " ERROR rec time < 0 \n";
+               std::cerr << " ERROR rec time < 0 " << std::endl;
 	       rec_time = 0;
 	       }*/
 	}
@@ -430,7 +426,7 @@ VoicePager::increase_reccounter(unsigned char incr_secs)
     }
   else 
     {
-      cerr << " ERROR increment time is < 0\n ";
+      std::cerr << " ERROR increment time is < 0" << std::endl;
       return true; // lets disconnect this recording 
     }
 }

@@ -2698,10 +2698,14 @@ Tcl_Obj *CONST argv[];	/* Argument objects. */
 	argc--; argv++;
 
 #if TCL_MAJOR_VERSION < 8
-#define STARARGV *argv
+  #define STARARGV *argv
 #else
-#define STARARGV Tcl_GetStringFromObj(*argv,(int *)0)
-#endif
+  #if TCL_MINOR_VERSION < 3
+    #define STARARGV Tcl_GetStringFromObj(*argv,(int *)0)
+  #else
+    #define STARARGV Tcl_GetString(*argv)
+  #endif
+#endif 
 
 	for (;argc>0;argc--,argv++) {
 		if (streq("-i",STARARGV)) {
@@ -3688,10 +3692,11 @@ Tcl_CloseCmd(stuff, interp, argc, argv)
      * FAILS IF OBJECT RESULT'S STRING REPRESENTATION CONTAINS NULL BYTES.
      */
 
-    Tcl_SetResult(interp,
-            TclGetStringFromObj(Tcl_GetObjResult(interp), (int *) NULL),
-            TCL_VOLATILE);
-    
+#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 3)
+    Tcl_SetResult(interp, TclGetStringFromObj(Tcl_GetObjResult(interp), (int *) NULL), TCL_VOLATILE);
+#else
+    Tcl_SetResult(interp, TclGetString(Tcl_GetObjResult(interp)), TCL_VOLATILE);
+#endif
     /*
      * Decrement the ref counts for the argument objects created above,
      * then free the objv array if malloc'ed storage was used.

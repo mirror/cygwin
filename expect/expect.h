@@ -25,7 +25,7 @@ enum exp_type {
 
 struct exp_case {		/* case for expect command */
 	char *pattern;
-	regexp *re;
+	Expect_regexp *re;
 	enum exp_type type;
 	int value;		/* value to be returned upon match */
 };

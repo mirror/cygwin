@@ -23,6 +23,7 @@ would appreciate credit if this program or parts of it are used.
 
 
 #include "tclInt.h"
+#include "tcl_regexp.h"
 /*#include <varargs.h>		tclInt.h drags in varargs.h.  Since Pyramid */
 /*				objects to including varargs.h twice, just */
 /*				omit this one. */
@@ -91,7 +92,7 @@ struct breakpoint {
 	char *file;	/* file where breakpoint is */
 	int line;	/* line where breakpoint is */
 	char *pat;	/* pattern defining where breakpoint can be */
-	regexp *re;	/* regular expression to trigger breakpoint */
+	Expect_regexp *re;	/* regular expression to trigger breakpoint */
 	char *expr;	/* expr to trigger breakpoint */
 	char *cmd;	/* cmd to eval at breakpoint */
 	struct breakpoint *next, *previous;
@@ -149,7 +150,7 @@ struct breakpoint *b;
 static void
 save_re_matches(interp,re)
 Tcl_Interp *interp;
-regexp *re;
+Expect_regexp *re;
 {
 	int i;
 	char name[20];
@@ -178,7 +179,7 @@ char *cmd;		/* command about to be executed */
 struct breakpoint *bp;	/* breakpoint to test */
 {
 	if (bp->re) {
-		if (0 == TclRegExec(bp->re,cmd,cmd)) return 0;
+		if (0 == Expect_TclRegExec(bp->re,cmd,cmd)) return 0;
 		save_re_matches(interp,bp->re);
 	} else if (bp->pat) {
 		if (0 == Tcl_StringMatch(cmd,bp->pat)) return 0;
@@ -860,7 +861,7 @@ char **argv;
 
 	if (flageq("-regexp",argv[0],2)) {
 		argc--; argv++;
-		if ((argc > 0) && (b->re = TclRegComp(argv[0]))) {
+		if ((argc > 0) && (b->re = Expect_TclRegComp(argv[0]))) {
 			savestr(&b->pat,argv[0]);
 			argc--; argv++;
 		} else {

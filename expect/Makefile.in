@@ -246,12 +246,14 @@ CFILES = exp_command.c expect.c $(PTY).c \
 	exp_printify.c exp_trap.c exp_strf.c \
 	exp_console.c exp_glob.c exp_win.c Dbg.c exp_clib.c \
 	exp_closetcl.c exp_memmove.c exp_tty_comm.c \
-	exp_$(EVENT_TYPE).c exp_$(EVENT_ABLE).c
+	exp_$(EVENT_TYPE).c exp_$(EVENT_ABLE).c \
+        tcl_regexp.c tclParse-compat.c
 OFILES = exp_command.o expect.o $(PTY).o exp_inter.o exp_regexp.o exp_tty.o \
 	exp_log.o exp_main_sub.o exp_pty.o exp_printify.o exp_trap.o \
 	exp_console.o exp_strf.o exp_glob.o exp_win.o Dbg.o exp_clib.o \
 	exp_closetcl.o exp_memmove.o exp_tty_comm.o \
-	exp_$(EVENT_TYPE).o exp_$(EVENT_ABLE).o
+	exp_$(EVENT_TYPE).o exp_$(EVENT_ABLE).o \
+        tcl_regexp.o tclParse-compat.o
 SHARED_OFILES = shared/exp_command.o shared/expect.o shared/$(PTY).o \
         shared/exp_inter.o shared/exp_regexp.o shared/exp_tty.o \
         shared/exp_log.o shared/exp_main_sub.o shared/exp_pty.o \

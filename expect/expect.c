@@ -32,7 +32,7 @@ would appreciate credit if this program or parts of it are used.
 
 #include "string.h"
 
-#include "tclRegexp.h"
+#include "tcl_regexp.h"
 #include "exp_rename.h"
 #include "exp_prog.h"
 #include "exp_command.h"
@@ -92,7 +92,7 @@ struct ecase {	/* case for expect command */
 #define CASE_NORM	1
 #define CASE_LOWER	2
 	int Case;	/* convert case before doing match? */
-	regexp *re;	/* if this is 0, then pattern match via glob */
+	Expect_regexp *re;	/* if this is 0, then pattern match via glob */
 };
 
 /* descriptions of the pattern types, used for debugging */
@@ -505,8 +505,8 @@ char **argv;
 			} else if (exp_flageq("regexp",arg,2)) {
 				i++;
 				ec.use = PAT_RE;
-				TclRegError((char *)0);
-				if (!(ec.re = TclRegComp(argv[i]))) {
+				Expect_TclRegError((char *)0);
+				if (!(ec.re = Expect_TclRegComp(argv[i]))) {
 					exp_error(interp,"bad regular expression: %s",
 								TclGetRegError());
 					goto error;
@@ -686,8 +686,8 @@ char *suffix;
 
 	if (e->use == PAT_RE) {
 		debuglog("\"%s\"? ",dprintify(e->pat));
-		TclRegError((char *)0);
-		if (buffer && TclRegExec(e->re,buffer,buffer)) {
+		Expect_TclRegError((char *)0);
+		if (buffer && Expect_TclRegExec(e->re,buffer,buffer)) {
 			o->e = e;
 			o->match = e->re->endp[0]-buffer;
 			o->buffer = buffer;
@@ -2035,7 +2035,7 @@ do_more_data:
 			char name[20], value[20];
 
 			if (e && e->use == PAT_RE) {
-				regexp *re = e->re;
+				Expect_regexp *re = e->re;
 
 				for (i=0;i<NSUBEXP;i++) {
 					int offset;
@@ -2421,7 +2421,7 @@ error:
 			char name[20], value[20];
 
 			if (e && e->use == PAT_RE) {
-				regexp *re = e->re;
+				Expect_regexp *re = e->re;
 
 				for (i=0;i<NSUBEXP;i++) {
 					int offset;

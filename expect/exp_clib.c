@@ -1034,7 +1034,7 @@ exp_expectl TCL_VARARGS_DEF(int,arg1)
 
 		va_arg(args,char *);		/* COMPUTED BUT NOT USED */
 		if (type == exp_compiled) {
-			va_arg(args,regexp *);	/* COMPUTED BUT NOT USED */
+			va_arg(args,Expect_regexp *);	/* COMPUTED BUT NOT USED */
 		}
 		va_arg(args,int);		/* COMPUTED BUT NOT USED*/
 	}
@@ -1053,7 +1053,7 @@ exp_expectl TCL_VARARGS_DEF(int,arg1)
 		if (ec->type == exp_end) break;
 		ec->pattern = va_arg(args,char *);
 		if (ec->type == exp_compiled) {
-			ec->re = va_arg(args,regexp *);
+			ec->re = va_arg(args,Expect_regexp *);
 		} else {
 			ec->re = 0;
 		}
@@ -1099,7 +1099,7 @@ exp_fexpectl TCL_VARARGS_DEF(FILE *,arg1)
 
 		va_arg(args,char *);		/* COMPUTED BUT NOT USED */
 		if (type == exp_compiled) {
-			va_arg(args,regexp *);	/* COMPUTED BUT NOT USED */
+			va_arg(args,Expect_regexp *);	/* COMPUTED BUT NOT USED */
 		}
 		va_arg(args,int);		/* COMPUTED BUT NOT USED*/
 	}
@@ -1120,7 +1120,7 @@ exp_fexpectl TCL_VARARGS_DEF(FILE *,arg1)
 		if (ec->type == exp_end) break;
 		ec->pattern = va_arg(args,char *);
 		if (ec->type == exp_compiled) {
-			ec->re = va_arg(args,regexp *);
+			ec->re = va_arg(args,Expect_regexp *);
 		} else {
 			ec->re = 0;
 		}

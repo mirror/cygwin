@@ -16,5 +16,5 @@ libconfig_la_LIBADD = @LIBLTDL@
 pkgdata_DATA = sid-control-cfgroot.txt
 
 DEJAGNUTESTS=badconf.exp
-checkme: all
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )

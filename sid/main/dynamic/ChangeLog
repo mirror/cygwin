@@ -1,3 +1,11 @@
+2001-10-05  Frank Ch. Eigler  <fche@redhat.com>
+
+        * mainDynamic.cxx (version): New function.  Use SID_VERSION from
+        new version.h file.
+        (main): Support "-v" option to print this information.
+        * Makefile.am (sid_DEPENDENCIES): List version.h.
+        * configure, Makefile.in: Regenerated.
+
 2001-07-24  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am (ALLFAMLIBS*): New macros for family-specific

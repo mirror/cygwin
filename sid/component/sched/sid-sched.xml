@@ -137,8 +137,8 @@
 
     <behavior name="advancing">
       <p> When you have disabled the scheduler by setting the
-      <attribute>enabled?</attribute> attribute to a value less than enable-threshold,
-      advancing as described below, does not occur.
+      <attribute>enabled?</attribute> attribute to a value less than the <attribute>enable-threshold</attribute>
+      attribute, advancing as described below, does not occur.
       </p>
 
       <p> Whenever the <pin>advance</pin> input pin is driven, the scheduler

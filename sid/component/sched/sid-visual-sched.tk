@@ -20,23 +20,23 @@ proc get_sub {sched n} {
 proc set_sub {sched n pair} {
     set time [lindex $pair 0]
     set regular [lindex $pair 1]
-    set time [sid::component::set_attribute_value $sched $n-time $time]
-    set regular [sid::component::set_attribute_value $sched $n-regular? $regular]
-}
-
-
-proc set_enable {sched flag} {
-    sid::component::set_attribute_value $sched enabled? $flag
+    if {$time} {
+	# time is nonzero, so set regular *first* and then time
+	set regular [sid::component::set_attribute_value $sched $n-regular? $regular]
+	set time [sid::component::set_attribute_value $sched $n-time $time]
+    } else {
+	# time is zero, so disable time *first* and then set regular
+	set time [sid::component::set_attribute_value $sched $n-time $time]
+	set regular [sid::component::set_attribute_value $sched $n-regular? $regular]
+    }
 }
 
 
 proc toggle_subscription {sched n} {
     global saved_subs
-    set_enable $sched 0
     set new_sub $saved_subs($sched,$n)
     set saved_subs($sched,$n) [get_sub $sched $n]
     set_sub $sched $n $new_sub
-    set_enable $sched 1
 }
 
 

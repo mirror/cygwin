@@ -51,27 +51,27 @@
 
     (case APPLICATION
       ((UNKNOWN) (error "application not loaded"))
-      ((DESC) (cpu-load (string-append arch ".cpu")
+      ((DESC) (cpu-load (string-append "./cpu/" arch ".cpu")
 			keep-mach keep-isa options
 			desc-init!
 			desc-finish!
 			desc-analyze!))
-      ((OPCODES) (cpu-load (string-append arch ".cpu")
+      ((OPCODES) (cpu-load (string-append "./cpu/" arch ".cpu")
 			   keep-mach keep-isa options
 			   opcodes-init!
 			   opcodes-finish!
 			   opcodes-analyze!))
-      ((GAS-TEST) (cpu-load (string-append arch ".cpu")
+      ((GAS-TEST) (cpu-load (string-append "./cpu/" arch ".cpu")
 			    keep-mach keep-isa options
 			    gas-test-init!
 			    gas-test-finish!
 			    gas-test-analyze!))
-      ((SIMULATOR) (cpu-load (string-append arch ".cpu")
+      ((SIMULATOR) (cpu-load (string-append "./cpu/" arch ".cpu")
 			     keep-mach keep-isa options
 			     sim-init!
 			     sim-finish!
 			     sim-analyze!))
-      ((SIM-TEST) (cpu-load (string-append arch ".cpu")
+      ((SIM-TEST) (cpu-load (string-append "./cpu/" arch ".cpu")
 			    keep-mach keep-isa options
 			    sim-test-init!
 			    sim-test-finish!

@@ -1,3 +1,17 @@
+2002-04-14  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* lib/libgloss.exp (build_wrapper): Wrap _exit too, unless
+	wrap_m68k_aout, uses_underscores or is_vxworks are defined in
+	target_info.
+
+	* testglue.c [!VXWORKS && !UNDERSCORES && !WRAP_M68K_AOUT]
+	(REAL__EXIT): Define.
+	[!UNDERSCORES && !WRAP_M68K_AOUT] (ORIG__EXIT): Define.
+	[REAL__EXIT] (REAL__EXIT): Prototype.
+	[ORIG__EXIT] (ORIG__EXIT): New function wrapper.
+	(done_exit_message): New static variable.
+	(ORIG_EXIT): Set done_exit_message.
+
 2002-03-15  Chris Demetriou  <cgd@broadcom.com>
 
 	* baseboards/mips-sim-idt32.exp: New file.

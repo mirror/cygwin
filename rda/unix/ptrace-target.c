@@ -668,7 +668,7 @@ ptrace_singlestep_program (struct gdbserv *serv)
 
   /* FIXME: handle signals! */
   if (process->debug_backend)
-    fprintf (stderr, "PTRACE_SINGLESTEP %d signal %d\n", 
+    fprintf (stderr, "PTRACE_SINGLESTEP %d signal %ld\n", 
 	     process->pid, process->signal_to_send);
   process->stop_signal = 0;
   process->stop_status = 0;
@@ -692,7 +692,7 @@ ptrace_continue_program (struct gdbserv *serv)
 
   /* FIXME: handle signals! */
   if (process->debug_backend)
-    fprintf (stderr, "PTRACE_CONT %d signal %d\n", 
+    fprintf (stderr, "PTRACE_CONT %d signal %ld\n", 
 	     process->pid, process->signal_to_send);
   process->stop_signal = 0;
   process->stop_status = 0;

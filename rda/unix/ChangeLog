@@ -1,5 +1,14 @@
 2004-10-31  Jim Blandy  <jimb@redhat.com>
 
+	* linux-target.c (decr_pc_after_break): Fix printf format
+	directive to match arguments.
+	* ptrace-target.c (ptrace_singlestep_program): Same.
+	(ptrace_continue_program): Same.
+	* server.c (invalid_speed): Same.
+	* thread-db.c (thread_db_open, wait_all_threads) 
+	(thread_db_check_child_state, thread_db_get_thread_reg) 
+	(thread_db_set_thread_reg): Same.
+
 	* linux-target.c (linux_get_reg): When register REGNO doesn't exist, 
 	provide zeros for its value; don't use an uninitialized pointer.
 

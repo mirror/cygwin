@@ -2941,7 +2941,7 @@ decr_pc_after_break (struct gdbserv *serv, pid_t pid)
 
   pc -= 1;
   if (thread_db_noisy)
-    fprintf (stderr, "<decr_pc_after_break: pid %d, addr 0x%08x>\n", pid, pc);
+    fprintf (stderr, "<decr_pc_after_break: pid %d, addr 0x%08lx>\n", pid, pc);
   status = write_reg_as_ulong (serv, pid, PC_REGNUM, pc);
   return status;
 }

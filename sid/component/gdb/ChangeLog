@@ -1,3 +1,8 @@
+2004-03-22  Dave Brolley  <brolley@redhat.com>
+
+	* gdb.cxx (deinit_handler): Call target_power and
+	gdbserv_fromtarget_exit.
+
 2002-05-07  Frank Ch. Eigler  <fche@redhat.com>
 
 	* gdb.cxx (add_sw_breakpoint, remove_sw_breakpoint): New functions

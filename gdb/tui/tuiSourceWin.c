@@ -1,8 +1,23 @@
-/*
-** tuiSourceWin.c
-**         This module contains functions for displaying source or assembly in the "source" window.
-*        The "source" window may be the assembly or the source windows.
-*/
+/* TUI display source/assembly window.
+   Copyright 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+   Contributed by Hewlett-Packard Company.
+
+   This file is part of GDB.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #include "defs.h"
 #include <ctype.h>
@@ -47,8 +62,8 @@ extern struct symtab *current_source_symtab;
 *********************************/
 
 /*
-** tuiSrcWinIsDisplayed().
-*/
+   ** tuiSrcWinIsDisplayed().
+ */
 int
 #ifdef __STDC__
 tuiSrcWinIsDisplayed (void)
@@ -61,8 +76,8 @@ tuiSrcWinIsDisplayed ()
 
 
 /*
-** tuiAsmWinIsDisplayed().
-*/
+   ** tuiAsmWinIsDisplayed().
+ */
 int
 #ifdef __STDC__
 tuiAsmWinIsDisplayed (void)
@@ -75,9 +90,9 @@ tuiAsmWinIsDisplayed ()
 
 
 /*
-** tuiDisplayMainFunction().
-**        Function to display the "main" routine"
-*/
+   ** tuiDisplayMainFunction().
+   **        Function to display the "main" routine"
+ */
 void
 #ifdef __STDC__
 tuiDisplayMainFunction (void)
@@ -108,10 +123,10 @@ tuiDisplayMainFunction ()
 
 
 /*
-** tuiUpdateSourceWindow().
-**    Function to display source in the source window.  This function
-**    initializes the horizontal scroll to 0.
-*/
+   ** tuiUpdateSourceWindow().
+   **    Function to display source in the source window.  This function
+   **    initializes the horizontal scroll to 0.
+ */
 void
 #ifdef __STDC__
 tuiUpdateSourceWindow (
@@ -135,10 +150,10 @@ tuiUpdateSourceWindow (winInfo, s, lineOrAddr, noerror)
 
 
 /*
-** tuiUpdateSourceWindowAsIs().
-**        Function to display source in the source/asm window.  This
-**        function shows the source as specified by the horizontal offset.
-*/
+   ** tuiUpdateSourceWindowAsIs().
+   **        Function to display source in the source/asm window.  This
+   **        function shows the source as specified by the horizontal offset.
+ */
 void
 #ifdef __STDC__
 tuiUpdateSourceWindowAsIs (
@@ -177,9 +192,9 @@ tuiUpdateSourceWindowAsIs (winInfo, s, lineOrAddr, noerror)
 	    (winInfo->generic.contentSize - 2);
 	  current_source_symtab = s;
 	  /*
-            ** If the focus was in the asm win, put it in the src
-            ** win if we don't have a split layout
-            */
+	     ** If the focus was in the asm win, put it in the src
+	     ** win if we don't have a split layout
+	   */
 	  if (tuiWinWithFocus () == disassemWin &&
 	      currentLayout () != SRC_DISASSEM_COMMAND)
 	    tuiSetWinFocusTo (srcWin);
@@ -192,10 +207,10 @@ tuiUpdateSourceWindowAsIs (winInfo, s, lineOrAddr, noerror)
 
 
 /*
-** tuiUpdateSourceWindowsWithAddr().
-**        Function to ensure that the source and/or disassemly windows
-**        reflect the input address.
-*/
+   ** tuiUpdateSourceWindowsWithAddr().
+   **        Function to ensure that the source and/or disassemly windows
+   **        reflect the input address.
+ */
 void
 #ifdef __STDC__
 tuiUpdateSourceWindowsWithAddr (
@@ -244,9 +259,9 @@ tuiUpdateSourceWindowsWithAddr (addr)
 
 
 /*
-** tui_vUpdateSourceWindowsWithAddr()
-**        Update the source window with the address in a va_list
-*/
+   ** tui_vUpdateSourceWindowsWithAddr()
+   **        Update the source window with the address in a va_list
+ */
 void
 #ifdef __STDC__
 tui_vUpdateSourceWindowsWithAddr (
@@ -265,10 +280,10 @@ tui_vUpdateSourceWindowsWithAddr (args)
 
 
 /*
-** tuiUpdateSourceWindowsWithLine().
-**        Function to ensure that the source and/or disassemly windows
-**        reflect the input address.
-*/
+   ** tuiUpdateSourceWindowsWithLine().
+   **        Function to ensure that the source and/or disassemly windows
+   **        reflect the input address.
+ */
 void
 #ifdef __STDC__
 tuiUpdateSourceWindowsWithLine (
@@ -298,9 +313,9 @@ tuiUpdateSourceWindowsWithLine (s, line)
 
 
 /*
-** tui_vUpdateSourceWindowsWithLine()
-**        Update the source window with the line number in a va_list
-*/
+   ** tui_vUpdateSourceWindowsWithLine()
+   **        Update the source window with the line number in a va_list
+ */
 void
 #ifdef __STDC__
 tui_vUpdateSourceWindowsWithLine (
@@ -320,8 +335,8 @@ tui_vUpdateSourceWindowsWithLine (args)
 
 
 /*
-** tuiClearSourceContent().
-*/
+   ** tuiClearSourceContent().
+ */
 void
 #ifdef __STDC__
 tuiClearSourceContent (
@@ -353,8 +368,8 @@ tuiClearSourceContent (winInfo, displayPrompt)
 
 
 /*
-** tuiClearAllSourceWinsContent().
-*/
+   ** tuiClearAllSourceWinsContent().
+ */
 void
 #ifdef __STDC__
 tuiClearAllSourceWinsContent (
@@ -375,8 +390,8 @@ tuiClearAllSourceWinsContent (displayPrompt)
 
 
 /*
-** tuiEraseSourceContent().
-*/
+   ** tuiEraseSourceContent().
+ */
 void
 #ifdef __STDC__
 tuiEraseSourceContent (
@@ -413,9 +428,9 @@ tuiEraseSourceContent (winInfo, displayPrompt)
 		     noSrcStr);
 
 	  /* elz: added this function call to set the real contents of
-                   the window to what is on the  screen, so that later calls
-                   to refresh, do display
-                   the correct stuff, and not the old image */
+	     the window to what is on the  screen, so that later calls
+	     to refresh, do display
+	     the correct stuff, and not the old image */
 
 	  tuiSetSourceContentNil (winInfo, noSrcStr);
 	}
@@ -426,8 +441,8 @@ tuiEraseSourceContent (winInfo, displayPrompt)
 
 
 /*
-** tuiEraseAllSourceContent().
-*/
+   ** tuiEraseAllSourceContent().
+ */
 void
 #ifdef __STDC__
 tuiEraseAllSourceWinsContent (
@@ -448,8 +463,8 @@ tuiEraseAllSourceWinsContent (displayPrompt)
 
 
 /*
-** tuiShowSourceContent().
-*/
+   ** tuiShowSourceContent().
+ */
 void
 #ifdef __STDC__
 tuiShowSourceContent (
@@ -483,8 +498,8 @@ tuiShowSourceContent (winInfo)
 
 
 /*
-** tuiShowAllSourceWinsContent()
-*/
+   ** tuiShowAllSourceWinsContent()
+ */
 void
 #ifdef __STDC__
 tuiShowAllSourceWinsContent (void)
@@ -502,9 +517,9 @@ tuiShowAllSourceWinsContent ()
 
 
 /*
-** tuiHorizontalSourceScroll().
-**      Scroll the source forward or backward horizontally
-*/
+   ** tuiHorizontalSourceScroll().
+   **      Scroll the source forward or backward horizontally
+ */
 void
 #ifdef __STDC__
 tuiHorizontalSourceScroll (
@@ -553,9 +568,9 @@ tuiHorizontalSourceScroll (winInfo, direction, numToScroll)
 
 
 /*
-** tuiSetHasExecPointAt().
-**        Set or clear the hasBreak flag in the line whose line is lineNo.
-*/
+   ** tuiSetHasExecPointAt().
+   **        Set or clear the hasBreak flag in the line whose line is lineNo.
+ */
 void
 #ifdef __STDC__
 tuiSetIsExecPointAt (
@@ -585,9 +600,9 @@ tuiSetIsExecPointAt (lineOrAddr, winInfo)
 
 
 /*
-** tuiSetHasBreakAt().
-**        Set or clear the hasBreak flag in the line whose line is lineNo.
-*/
+   ** tuiSetHasBreakAt().
+   **        Set or clear the hasBreak flag in the line whose line is lineNo.
+ */
 void
 #ifdef __STDC__
 tuiSetHasBreakAt (
@@ -643,9 +658,9 @@ tuiSetHasBreakAt (bp, winInfo, hasBreak)
 
 
 /*
-** tuiAllSetHasBreakAt().
-**        Set or clear the hasBreak flag in all displayed source windows.
-*/
+   ** tuiAllSetHasBreakAt().
+   **        Set or clear the hasBreak flag in all displayed source windows.
+ */
 void
 #ifdef __STDC__
 tuiAllSetHasBreakAt (
@@ -668,10 +683,10 @@ tuiAllSetHasBreakAt (bp, hasBreak)
 
 
 /*
-** tui_vAllSetHasBreakAt()
-**        Set or clear the hasBreak flag in all displayed source windows,
-**        with params in a va_list
-*/
+   ** tui_vAllSetHasBreakAt()
+   **        Set or clear the hasBreak flag in all displayed source windows,
+   **        with params in a va_list
+ */
 void
 #ifdef __STDC__
 tui_vAllSetHasBreakAt (
@@ -696,11 +711,11 @@ tui_vAllSetHasBreakAt (args)
 *********************************/
 
 /*
-** tuiSetExecInfoContent().
-**      Function to initialize the content of the execution info window,
-**      based upon the input window which is either the source or
-**      disassembly window.
-*/
+   ** tuiSetExecInfoContent().
+   **      Function to initialize the content of the execution info window,
+   **      based upon the input window which is either the source or
+   **      disassembly window.
+ */
 TuiStatus
 #ifdef __STDC__
 tuiSetExecInfoContent (
@@ -732,10 +747,10 @@ tuiSetExecInfoContent (winInfo)
 	      element = (TuiWinElementPtr) execInfoPtr->content[i];
 	      srcElement = (TuiWinElementPtr) winInfo->generic.content[i];
 	      /*
-                ** First check to see if we have a breakpoint that is
-                ** temporary.  If so, and this is our current execution point,
-                ** then clear the break indicator.
-                */
+	         ** First check to see if we have a breakpoint that is
+	         ** temporary.  If so, and this is our current execution point,
+	         ** then clear the break indicator.
+	       */
 	      if (srcElement->whichElement.source.hasBreak &&
 		  srcElement->whichElement.source.isExecPoint)
 		{
@@ -762,9 +777,9 @@ tuiSetExecInfoContent (winInfo)
 		    srcElement->whichElement.source.hasBreak = FALSE;
 		}
 	      /*
-                ** Now update the exec info content based upon the state
-                ** of each line as indicated by the source content.
-                */
+	         ** Now update the exec info content based upon the state
+	         ** of each line as indicated by the source content.
+	       */
 	      if (srcElement->whichElement.source.hasBreak &&
 		  srcElement->whichElement.source.isExecPoint)
 		element->whichElement.simpleString = breakLocationStr ();
@@ -786,8 +801,8 @@ tuiSetExecInfoContent (winInfo)
 
 
 /*
-** tuiShowExecInfoContent().
-*/
+   ** tuiShowExecInfoContent().
+ */
 void
 #ifdef __STDC__
 tuiShowExecInfoContent (
@@ -816,8 +831,8 @@ tuiShowExecInfoContent (winInfo)
 
 
 /*
-** tuiShowAllExecInfosContent()
-*/
+   ** tuiShowAllExecInfosContent()
+ */
 void
 #ifdef __STDC__
 tuiShowAllExecInfosContent (void)
@@ -835,8 +850,8 @@ tuiShowAllExecInfosContent ()
 
 
 /*
-** tuiEraseExecInfoContent().
-*/
+   ** tuiEraseExecInfoContent().
+ */
 void
 #ifdef __STDC__
 tuiEraseExecInfoContent (
@@ -856,8 +871,8 @@ tuiEraseExecInfoContent (winInfo)
 
 
 /*
-** tuiEraseAllExecInfosContent()
-*/
+   ** tuiEraseAllExecInfosContent()
+ */
 void
 #ifdef __STDC__
 tuiEraseAllExecInfosContent (void)
@@ -875,8 +890,8 @@ tuiEraseAllExecInfosContent ()
 
 
 /*
-** tuiClearExecInfoContent().
-*/
+   ** tuiClearExecInfoContent().
+ */
 void
 #ifdef __STDC__
 tuiClearExecInfoContent (
@@ -894,8 +909,8 @@ tuiClearExecInfoContent (winInfo)
 
 
 /*
-** tuiClearAllExecInfosContent()
-*/
+   ** tuiClearAllExecInfosContent()
+ */
 void
 #ifdef __STDC__
 tuiClearAllExecInfosContent (void)
@@ -913,9 +928,9 @@ tuiClearAllExecInfosContent ()
 
 
 /*
-** tuiUpdateExecInfo().
-**        Function to update the execution info window
-*/
+   ** tuiUpdateExecInfo().
+   **        Function to update the execution info window
+ */
 void
 #ifdef __STDC__
 tuiUpdateExecInfo (
@@ -930,9 +945,9 @@ tuiUpdateExecInfo (winInfo)
 }				/* tuiUpdateExecInfo
 
 
-/*
-** tuiUpdateAllExecInfos()
-*/
+				   /*
+				   ** tuiUpdateAllExecInfos()
+				 */
 void
 #ifdef __STDC__
 tuiUpdateAllExecInfos (void)
@@ -946,16 +961,16 @@ tuiUpdateAllExecInfos ()
     tuiUpdateExecInfo ((TuiWinInfoPtr) (sourceWindows ())->list[i]);
 
   return;
-}				/* tuiUpdateAllExecInfos*/
+}				/* tuiUpdateAllExecInfos */
 
 
 
 /* tuiUpdateOnEnd()
-**       elz: This function clears the execution info from the source windows
-**       and resets the locator to display no line info, procedure info, pc
-**       info.  It is called by stack_publish_stopped_with_no_frame, which
-**       is called then the target terminates execution
-*/
+   **       elz: This function clears the execution info from the source windows
+   **       and resets the locator to display no line info, procedure info, pc
+   **       info.  It is called by stack_publish_stopped_with_no_frame, which
+   **       is called then the target terminates execution
+ */
 void
 #ifdef __STDC__
 tuiUpdateOnEnd (void)
@@ -977,11 +992,11 @@ tuiUpdateOnEnd ()
 
       tuiSetIsExecPointAt ((Opaque) - 1, winInfo);	/* the target is'n running */
       /* -1 should not match any line number or pc */
-      tuiSetExecInfoContent (winInfo);	/*set winInfo so that > is'n displayed*/
-      tuiShowExecInfoContent (winInfo);	/* display the new contents */
+      tuiSetExecInfoContent (winInfo);	/*set winInfo so that > is'n displayed */
+      tuiShowExecInfoContent (winInfo);		/* display the new contents */
     }
 
-  /*now update the locator*/
+  /*now update the locator */
   tuiClearLocatorDisplay ();
   tuiGetLocatorFilename (locator, &filename);
   tuiSetLocatorInfo (
@@ -1013,10 +1028,10 @@ tuiAllocSourceBuffer (winInfo)
   maxLines = winInfo->generic.height;	/* less the highlight box */
   lineWidth = winInfo->generic.width - 1;
   /*
-    ** Allocate the buffer for the source lines.  Do this only once since they
-    ** will be re-used for all source displays.  The only other time this will
-    ** be done is when a window's size changes.
-    */
+     ** Allocate the buffer for the source lines.  Do this only once since they
+     ** will be re-used for all source displays.  The only other time this will
+     ** be done is when a window's size changes.
+   */
   if (winInfo->generic.content == (OpaquePtr) NULL)
     {
       srcLineBuf = (char *) xmalloc ((maxLines * lineWidth) * sizeof (char));
@@ -1051,10 +1066,10 @@ tuiAllocSourceBuffer (winInfo)
 
 
 /*
-** tuiLineIsDisplayed().
-**      Answer whether the a particular line number or address is displayed
-**      in the current source window.
-*/
+   ** tuiLineIsDisplayed().
+   **      Answer whether the a particular line number or address is displayed
+   **      in the current source window.
+ */
 int
 #ifdef __STDC__
 tuiLineIsDisplayed (

@@ -40,7 +40,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.38 $";
+static const char version[] = "$Revision: 1.39 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -780,10 +780,7 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
     *p = '\\';
 
   if (access (id, X_OK))
-    {
-      fprintf (stderr, "`id' program not found\n");
-      exit (1);
-    }
+    fprintf (stderr, "`id' program not found\n");
 
   FILE *f = popen (id, "rt");
 

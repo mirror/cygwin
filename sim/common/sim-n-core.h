@@ -1,22 +1,25 @@
-/*  This file is part of the program psim.
+/* The common simulator framework for GDB, the GNU Debugger.
 
-    Copyright (C) 1994-1997, Andrew Cagney <cagney@highland.com.au>
+   Copyright 2002 Free Software Foundation, Inc.
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+   Contributed by Andrew Cagney and Red Hat.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
- 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- 
-    */
+   This file is part of GDB.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 
 #ifndef N
@@ -167,7 +170,7 @@ sim_core_read_aligned_N(sim_cpu *cpu,
       if (WITH_CALLBACK_MEMORY && mapping->device != NULL)
 	{
 	  unsigned_M data;
-	  if (device_io_read_buffer (mapping->device, &data, mapping->space, addr, N, cpu, cia) != N)
+	  if (device_io_read_buffer (mapping->device, &data, mapping->space, addr, N, CPU_STATE (cpu), cpu, cia) != N)
 	    device_error (mapping->device, "internal error - %s - io_read_buffer should not fail",
 			  XSTRING (sim_core_read_aligned_N));
 	  val = T2H_M (data);
@@ -298,7 +301,7 @@ sim_core_write_aligned_N(sim_cpu *cpu,
       if (WITH_CALLBACK_MEMORY && mapping->device != NULL)
 	{
 	  unsigned_M data = H2T_M (val);
-	  if (device_io_write_buffer (mapping->device, &data, mapping->space, addr, N, cpu, cia) != N)
+	  if (device_io_write_buffer (mapping->device, &data, mapping->space, addr, N, CPU_STATE (cpu), cpu, cia) != N)
 	    device_error (mapping->device, "internal error - %s - io_write_buffer should not fail",
 			  XSTRING (sim_core_write_aligned_N));
 	  break;

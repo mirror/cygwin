@@ -3,21 +3,21 @@
 
    Contributed by Cygnus Solutions.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* Work in progress */
 
@@ -67,8 +67,8 @@ struct gdb_events
 
 
 /* Interface into events functions.
-   Where a *_p() predicate is present, it must called before calling
-   the hook proper. */
+   Where a *_p() predicate is present, it must be called before
+   calling the hook proper. */
 extern void breakpoint_create_event (int b);
 extern void breakpoint_delete_event (int b);
 extern void breakpoint_modify_event (int b);
@@ -83,7 +83,7 @@ extern void breakpoint_modify_event (int b);
 #endif
 
 /* Install custom gdb-events hooks. */
-extern void set_gdb_event_hooks (struct gdb_events *vector);
+extern struct gdb_events *set_gdb_event_hooks (struct gdb_events *vector);
 
 /* Deliver any pending events. */
 extern void gdb_events_deliver (struct gdb_events *vector);

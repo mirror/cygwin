@@ -1,6 +1,6 @@
 // generic.h - Header for the generic_memory class.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999-2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -53,6 +53,7 @@ using sidutil::no_relation_component;
 using sidutil::fixed_bus_map_component;
 using sidutil::std_error_string;
 using sidutil::callback_pin;
+using sidutil::output_pin;
 
 
 // ----------------------------------------------------------------------------
@@ -75,6 +76,7 @@ protected:
   friend class generic_read_write_bus;
   host_int_1* buffer;
   host_int_4 buffer_length;
+  bool mmapping_p;
 
   // state control
   virtual string save_state() { return make_attribute(*this); }
@@ -100,6 +102,11 @@ private:
   void imageload_handler (host_int_4);
   callback_pin<generic_memory> imagestore_pin;
   void imagestore_handler (host_int_4);
+  output_pin error_pin;
+  callback_pin<generic_memory> imagemmap_pin;
+  void imagemmap_handler (host_int_4);
+  callback_pin<generic_memory> imagemsync_pin;
+  void imagemsync_handler (host_int_4);
 };
 
 

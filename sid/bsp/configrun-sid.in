@@ -1,6 +1,4 @@
 :
-# -*- perl -*-
-#
 # Emulate a standalone simulator.  Construct a sid configuration file
 # and run it.
 
@@ -68,9 +66,11 @@ $opt_sidcodec="";
 
 $any_tcl = 0;
 
+# by default the loader data mapper connects to the mapper access-port
+$load_mapper_data = "mapper access-port";
 
 # (see perldoc Getopt::Long)
-@options = (	   
+@options = (
 	    "cpu=s",
 	    "help!",
 	    "verbose!",
@@ -108,6 +108,11 @@ Options:
  --trace-semantics          Turn on CPU insn execute tracing.             [no]
  --trace-core               Turn on bus access tracing.                   [no]
  --memory-region=BASE,SIZE  Add RAM region from BASE to BASE+SIZE-1.      [no]
+                            other options:
+                               read-only      Make memory read-only
+                               alias=BASE2    Add an alias at BASE2
+                               file=FILENAME  Load/save memory image from file
+                               mmap           Memory map given file
  --gdb=PORT                 Add a gdb/debugger interface on TCP port.   [none]
  --board=BOARD              Model given board or system.               [gloss]
  --engine=scache|pbb        Set given cgen CPU engine.                   [pbb]
@@ -139,7 +144,7 @@ sub configure_gloss
     $gloss_component_type = $gloss_comptype{$opt_cpu} || die "Unknown cpu $opt_cpu for gloss component type\n";
     $first_section .= "# gloss\n" .
       &sidconf_new("$gloss_component_type", "gloss") . "\n";
-    
+
     $second_section .= "# gloss
 relate gloss cpu cpu
 connect-pin init-sequence output-2 -> gloss reset
@@ -159,7 +164,7 @@ set gloss command-line \"$exec @exec_args\"
     if ($board =~ /tty/)
       {
         $any_tcl = 1;
-  
+
         $first_section .= "# gloss <-> tty\n" .
 	    &sidconf_new("hw-visual-tty", "tty") . "\n";
 	    $third_section .= "# gloss <-> tty
@@ -169,8 +174,8 @@ relate tty \"$gloss_component_type gloss\" gloss
 
     # check if gdb option is not specified
     if ($opt_gdb == 0)
-      { 
-	# gloss-stdio only allowed if gdb not specified 
+      {
+	# gloss-stdio only allowed if gdb not specified
         if ($board =~ /stdio/)
           {
   	    $first_section .= "# gloss <-> stdio\n" .
@@ -208,7 +213,7 @@ foreach $arg (@ARGV) {
   # The double quotemeta() call is intended to allow arguments containing
   # weird characters to go through both the cfgroot parser AND the run-time
   # target libgloss parser.
-  push @exec_args, quotemeta(quotemeta($arg)); 
+  push @exec_args, quotemeta(quotemeta($arg));
 }
 
 #if (!$exec && !$opt_gdb)
@@ -222,7 +227,7 @@ if ($exec)
   }
 
 # infer --save-temps from --no-run
-if ($opt_no_run && (! $opt_save_temps)) 
+if ($opt_no_run && (! $opt_save_temps))
   {
     $opt_save_temps = 1;
   }
@@ -235,8 +240,8 @@ if ($opt_gdb)
 
 # complete component library list
 %component_libs=(
-		 "audio" => "audio_component_library", 
-		 "cgencpu" => "cgen_component_library", 
+		 "audio" => "audio_component_library",
+		 "cgencpu" => "cgen_component_library",
 		 "consoles" => "console_component_library",
 		 "gdb" => "gdb_component_library",
 		 "gloss" => "gloss_component_library",
@@ -296,7 +301,7 @@ $first_section = "# first section\n" .
   &sidconf_new("sid-sched-sim", "target-sched") . "\n" .
   "";
 
-if ($opt_trace_core || $opt_trace_core_visual) 
+if ($opt_trace_core || $opt_trace_core_visual)
   {
     $first_section .= "# core tracing\n" .
       &sidconf_new("hw-glue-probe-bus", "bus-probe") . "\n";
@@ -309,15 +314,15 @@ else
 
 if ($opt_insn_count)
   {
-    $cpu_insn_count = $opt_insn_count; 
-  } 
+    $cpu_insn_count = $opt_insn_count;
+  }
 else
   {
     $cpu_insn_count = 10000;
   }
 
 if ($opt_gprof)
-  { 
+  {
     $first_section .= "# gprof\n" .
       &sidconf_new("sw-profile-gprof", "gprof") . "\n";
   }
@@ -367,18 +372,18 @@ connect-bus bus-probe downstream mapper access-port
 
 if ($opt_trace_core)
   {
-    $second_section .= "set bus-probe trace? 1\n";  
+    $second_section .= "set bus-probe trace? 1\n";
   }
 
 $third_section = "";
 if ($opt_EB && $opt_EL) { die "Both -EB and -EL specified\n"; }
-if (!$opt_EB && !$opt_EL && $opt_gdb != 0) 
+if (!$opt_EB && !$opt_EL && $opt_gdb != 0)
   {
     if ($cpu_defaultendian{$opt_cpu} eq "-EB") { $opt_EB = 1; }
     elsif ($cpu_defaultendian{$opt_cpu} eq "-EL") { $opt_EL = 1; }
     else { warn "Should specify endianness"; &usage; }
   }
-elsif (!$opt_EB && !$opt_EL && !$exec) 
+elsif (!$opt_EB && !$opt_EL && !$exec)
   {
     warn "Should specify executable"; &usage;
   }
@@ -399,11 +404,7 @@ if ($opt_board eq "none")
 	push @opt_memory_region, $region;
       }
   }
-elsif ($opt_board =~ /gloss/)
-  {
-    configure_gloss($opt_board);
-  }
-elsif ($opt_board =~ /pid7t/) 
+elsif ($opt_board =~ /pid7t/)
   {
     # XXX: incorrect!
     # XXX: what about SRAM, SSRAM memory regions???
@@ -494,7 +495,7 @@ set remapper remapping? no
       # pull in this configuration.
        configure_uart1_uart2();
   }
-elsif ($opt_board =~ /^cma110/) 
+elsif ($opt_board =~ /^cma110/)
   {
     # missing:
     # PS/2 kbd/ms, PCI, flash, gloss
@@ -577,6 +578,10 @@ set uart2 sio-framing? 0
     # pull in this configuration.
     configure_uart1_uart2();
 
+  }
+elsif ($opt_board =~ /gloss/)
+  {
+    configure_gloss($opt_board);
   }
 else
   {
@@ -688,14 +693,14 @@ connect-pin uart2 Sin <- uart2-console rx
 ";
       }
 
-    if ($opt_board =~ /uart1:gdb/ && $opt_gdb != 0) 
+    if ($opt_board =~ /uart1:gdb/ && $opt_gdb != 0)
       {
 	$third_section .= "# uart1 <-> gdb also
 connect-pin uart1 Sout -> gdb target-tx
 ";
       }
 
-    if ($opt_board =~ /uart2:gdb/ && $opt_gdb != 0) 
+    if ($opt_board =~ /uart2:gdb/ && $opt_gdb != 0)
       {
 	$third_section .= "# uart2 <-> gdb also
 connect-pin uart2 Sout -> gdb target-tx
@@ -742,7 +747,7 @@ disconnect-bus gloss target-memory $bus_upstream
 connect-bus gloss target-memory data-mapper access-port
 ";
       }
-   
+
   }
 
 
@@ -753,7 +758,7 @@ if ($opt_engine eq "pbb")
   {
     $second_section .= "set cpu engine-type pbb\n";
   }
-elsif ($opt_engine eq "scache") 
+elsif ($opt_engine eq "scache")
   {
     $second_section .= "set cpu engine-type scache\n";
   }
@@ -825,7 +830,7 @@ if ($exec)
     $second_section .= "# loader
 set loader file \"$exec\"
 set loader verbose? $opt_verbose
-connect-bus loader load-accessor-data mapper access-port # don't trace loading
+connect-bus loader load-accessor-data $load_mapper_data # don't trace loading
 connect-bus loader load-accessor-insn mapper access-port # don't trace loading
 connect-pin init-sequence output-1 -> loader load!
 connect-pin loader start-pc-set -> cpu start-pc-set!
@@ -860,7 +865,7 @@ if ($opt_tksm != 0)
   {
     $any_tcl = 1;
 
-    $first_section .= "# tk system monitor\n" . 
+    $first_section .= "# tk system monitor\n" .
       &sidconf_new("sid-control-tksm", "tksm") . "\n";
 
     $second_section .= "# tk system monitor
@@ -892,11 +897,12 @@ while ($#opt_memory_region >= 0)
     #         [,read-only]
     #         [,alias=BASE2]
     #         [,file=NAME]
-    #         [,relate=COMPONENT/RELATION]  (depracated)
+    #         [,mmap]
+    #         [,relate=COMPONENT/RELATION]  (deprecated)
     @spec = split /,/, $spec;
 
     die "Cannot parse memory region specification `$spec'.\n" if ($#spec < 1);
-    
+
     $base = shift @spec;
     $base = oct($base) if ($base =~ /^0/);
     $size = shift @spec;
@@ -907,6 +913,7 @@ while ($#opt_memory_region >= 0)
     $last = $base + $size - 1;
     $membus = "read-write-port"; # default read-write
     $memfile = ""; # default no file
+    $mmap = 0; # default no mmap
     @aliases = ();
     @relates = ();
 
@@ -916,10 +923,11 @@ while ($#opt_memory_region >= 0)
 	"set mem$mems size $size\n";
 
     # consume other options
-    while ($#spec >= 0) 
+    while ($#spec >= 0)
       {
 	$opt = shift @spec;
 	if ($opt eq "read-only") { $membus = "read-only-port"; }
+	elsif ($opt eq "mmap") { $mmap = 1; }
 	elsif ($opt =~ /file=(.*)/) { $memfile = $1; }
 	elsif ($opt =~ /alias=(.*)/) { push @aliases, $1 }
 	elsif ($opt =~ /relate=(.*)/) { push @relates, $1 }
@@ -936,23 +944,26 @@ while ($#opt_memory_region >= 0)
 	$third_section .= "connect-bus mapper mem$mems:[$alias,$aliasend] mem$mems $membus\n";
       }
 
-    foreach $relate (@relates)
-      {
-	$relate =~ /(.*)\/(.*)/;
-	$third_section .= "relate $1 $2 mem$mems\n";
-      }
+    foreach $relate (@relates) {
+      $relate =~ /(.*)\/(.*)/;
+      $third_section .= "relate $1 $2 mem$mems\n";
+    }
 
     # process file backing store
-    if ($memfile) 
+    if ($memfile)
       {
-	$third_section .= "set mem$mems image-file \"$memfile\"
-connect-pin init-sequence output-1 -> mem$mems image-load
-";
-	# save only if memory was writeable
-	if ($membus eq "read-write-port")
-	  {
-	    $third_section .= "connect-pin deinit-sequence output-6 -> mem$mems image-store\n";
-	  }
+	$third_section .= "set mem$mems image-file \"$memfile\"\n";
+
+	if ($mmap) {
+	  $third_section .= "connect-pin init-sequence output-1 -> mem$mems image-mmap\n";
+	} else {
+	  $third_section .= "connect-pin init-sequence output-1 -> mem$mems image-load\n";
+	}
+
+	# save only if memory was writeable and not memory-mapped
+	if ($membus eq "read-write-port" && !$mmap) {
+	  $third_section .= "connect-pin deinit-sequence output-6 -> mem$mems image-store\n";
+	}
       }
   }
 
@@ -964,7 +975,7 @@ connect-pin init-sequence output-1 -> mem$mems image-load
 if ($opt_sidrtc)
   {
     $addr = $opt_sidrtc;
-    $addr = oct($addr) if ($addr =~ /^0/);    
+    $addr = oct($addr) if ($addr =~ /^0/);
     $addrend = $addr + 7;
 
     $first_section .= "# special rtc\n" .
@@ -980,7 +991,7 @@ connect-bus mapper sidrtc:[$addr,$addrend] sidrtc registers
 if ($opt_sidcodec)
   {
     $addr = $opt_sidcodec;
-    $addr = oct($addr) if ($addr =~ /^0/);    
+    $addr = oct($addr) if ($addr =~ /^0/);
     $addrend = $addr + 19;
 
     $first_section .= "# special codec & host audio\n" .
@@ -1071,13 +1082,13 @@ push @args, ($tfile);
 system @args;
 $exit_value = $?;
 
-# Process the exit code. 
+# Process the exit code.
 if (($exit_value & 0xff00) == 0xff00) # catch old perls' fork rc bugs
  {
    print "\nCannot run `@args': $!\n";
  }
 
-if (! $opt_save_temps) 
+if (! $opt_save_temps)
   {
     unlink $tfile;
   }
@@ -1111,3 +1122,7 @@ relate ${compname} victim ${compname}-traced";
     }
 }
 
+
+# Local Variables:
+# mode: perl
+# End:

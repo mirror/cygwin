@@ -1,8 +1,10 @@
 // generic.cxx - a class of generic memories.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999-2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
+
+#define _POSIX_C_SOURCE 199506L
 
 #include "config.h"
 #include "generic.h"
@@ -16,6 +18,9 @@
 #include <ctime>
 #include <unistd.h>
 #include <fstream>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/types.h>
 
 using std::vector;
 using std::string;
@@ -46,11 +51,15 @@ using sidutil::stream2string;
 
 generic_memory::generic_memory() throw (bad_alloc):
   imageload_pin (this, & generic_memory::imageload_handler),
-  imagestore_pin (this, & generic_memory::imagestore_handler)
+  imagestore_pin (this, & generic_memory::imagestore_handler),
+  imagemmap_pin (this, & generic_memory::imagemmap_handler),
+  imagemsync_pin (this, & generic_memory::imagemsync_handler)
 {
   this->max_buffer_length = 32UL * 1024UL * 1024UL;
   this->buffer = 0;
   this->buffer_length = 0;
+  this->mmapping_p = false;
+
   bool ok = this->attempt_resize (1024);
   if (! ok) throw bad_alloc ();
   
@@ -64,6 +73,10 @@ generic_memory::generic_memory() throw (bad_alloc):
   add_attribute ("image-load", & this->imageload_pin, "pin");
   add_pin ("image-store", & this->imagestore_pin);
   add_attribute ("image-store", & this->imagestore_pin, "pin");
+  add_pin ("image-mmap", & this->imagemmap_pin);
+  add_attribute ("image-mmap", & this->imagemmap_pin, "pin");
+  add_pin ("image-msync", & this->imagemsync_pin);
+  add_attribute ("image-msync", & this->imagemsync_pin, "pin");
 
   add_attribute_virtual ("state-snapshot", this,
 			 & generic_memory::save_state,
@@ -74,7 +87,10 @@ generic_memory::generic_memory() throw (bad_alloc):
 generic_memory::~generic_memory ()
 {
   assert (this->buffer);
-  delete [] this->buffer;
+  if (this->mmapping_p)
+    munmap (reinterpret_cast<char*>(this->buffer), this->buffer_length);
+  else
+    delete [] this->buffer;
 }
 
 
@@ -88,11 +104,18 @@ generic_memory::attempt_resize (host_int_4 new_length) throw()
   if (new_buffer == 0)
     {
       cerr << "memory: error allocating memory buffer: " << std_error_string() << endl;
+      this->error_pin.drive (0);
       return false;
     }
 
-  if (this->buffer)
+  if (this->mmapping_p)
+    {
+      munmap (reinterpret_cast<char*>(this->buffer), this->buffer_length);
+      this->mmapping_p = false;
+    }
+  else
     delete [] this->buffer;
+
   this->buffer = new_buffer;
   this->buffer_length = new_length;
   memset(this->buffer, 0, this->buffer_length);
@@ -110,6 +133,7 @@ generic_memory::imageload_handler (host_int_4)
   if (this->image_file_name == "")
     {
       cerr << "memory: no image-file set for image-load" << endl;
+      this->error_pin.drive (0);
       return;
     }
 
@@ -118,6 +142,7 @@ generic_memory::imageload_handler (host_int_4)
     {
       cerr << "memory: error opening " << this->image_file_name << ": "
 	   << std_error_string() << endl;
+      this->error_pin.drive (0);
       return;
     }
 
@@ -137,6 +162,7 @@ generic_memory::imagestore_handler (host_int_4)
   if (this->image_file_name == "")
     {
       cerr << "memory: no image-file set for image-store" << endl;
+      this->error_pin.drive (0);
       return;
     }
 
@@ -145,6 +171,7 @@ generic_memory::imagestore_handler (host_int_4)
     {
       cerr << "memory: error opening " << this->image_file_name << ": "
 	<< std_error_string() << endl;
+      this->error_pin.drive (0);
       return;
     }
 
@@ -152,6 +179,70 @@ generic_memory::imagestore_handler (host_int_4)
   f.write (reinterpret_cast<const char*>(& this->buffer[0]), this->buffer_length);
   // if (! f.good())
   //  cerr << "memory: short write to " << this->image_file_name << endl;
+}
+
+
+
+
+void
+generic_memory::imagemsync_handler (host_int_4)
+{
+  assert (this->buffer);
+  if (this->mmapping_p)
+    {
+      int rc = msync (reinterpret_cast<char*>(this->buffer),
+		      this->buffer_length, MS_SYNC|MS_INVALIDATE);
+      if (rc < 0) 
+	cerr << "memory: failed in mmap:" << std_error_string() << endl;
+    }
+}
+
+
+
+void
+generic_memory::imagemmap_handler (host_int_4)
+{
+  assert (this->buffer);
+
+  // Do nothing if file name was empty.
+  if (this->image_file_name == "")
+    {
+      cerr << "memory: no image-file set for image-mmap" << endl;
+      this->error_pin.drive (0);
+      return;
+    }
+
+  int fd = open (this->image_file_name.c_str(), O_RDWR);
+  if (fd < 0)
+    {
+      cerr << "memory: cannot open image-file during image-mmap:" << std_error_string() << endl;
+      this->error_pin.drive (0);
+      return;
+    }
+
+  char* new_buffer = reinterpret_cast<char*>(mmap (0, this->buffer_length, 
+						   PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0));
+#ifndef MAP_FAILED
+#define MAP_FAILED ((char*)-1)
+#endif
+  if (new_buffer == 0 || new_buffer == MAP_FAILED)
+    {
+      cerr << "memory: failed in mmap:" << std_error_string() << endl;
+      close (fd);
+      this->error_pin.drive (0);
+      return;
+    }
+
+  if (this->mmapping_p)
+    {
+      // Unmap previous block first
+      munmap (reinterpret_cast<char*>(this->buffer), this->buffer_length);
+      this->mmapping_p = false;
+    }
+
+  this->buffer = reinterpret_cast<host_int_1*>(new_buffer);
+  close (fd);
+  this->mmapping_p = true;
 }
 
 
@@ -255,6 +346,8 @@ generic_memory::destream_state (istream& in)
     {
       host_int_4 new_length;
       in >> new_length;
+      // Do the attempt_resize() bit even if new_length == size, 
+      // since we want to clear/reset the memory.
       bool ok = this->attempt_resize(new_length);
       if (! ok)
 	{

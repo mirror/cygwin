@@ -1,3 +1,14 @@
+2001-03-13  Frank Ch. Eigler  <fche@redhat.com>
+
+	Adding support for memory-mapped files and pin-based error signalling.
+	* generic.cxx (generic_memory ctor): Add three new pins.
+	(generic_memory dtor): munmap if mapping.
+	(attempt_resize): Drive error pin when needed.  munmap if mapping.
+	(imageload_handler, imagestore_handler): Drive error pin when needed.
+	(imagemsync_handler, imagemmap_handler): New functions.
+	* generic.h: Corresponding changes.
+	* hw-memory-ram_rom-basic.txt: Document extensions.
+
 2001-03-01  Frank Ch. Eigler  <fche@redhat.com>
 
 	* generic.h (write_any, read_any): Added b.p. hints.

@@ -1,4 +1,11 @@
 
+# This test requires libraries not usually linked into static sid
+if {$enable_shared == "no"} then {
+    untested "busif component not available for static tests"
+    return 
+}
+
+
 proc build-config { file target } {
     set f [open $file "w"]
     puts $f "load [sid_find_file libtclapi.la] tcl_bridge_library"

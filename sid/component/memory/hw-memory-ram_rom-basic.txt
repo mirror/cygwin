@@ -7,7 +7,7 @@
   memory may be altered at any time.
 
   Buses: read-only-port read-write-port
-  Pins: image-load image-store
+  Pins: image-load image-store image-mmap image-msync error
   Attributes: size size-max image-file image-load image-store
               state-snapshot
   Library: libmemory.la
@@ -30,7 +30,7 @@
       attempt to allocate.  (Larger memory banks may be modelled by
       using multiple instances of this component.)
 
-    * Image save/load
+    * Image save/load/mmap
 
       When the "image-load" pin is driven, this component will open
       and attempt to load the contents of the file given by the
@@ -41,6 +41,28 @@
       Similarly, when the "image-store" pin is driven, the component
       will write to the "image-file" file a byte-for-byte dump of the
       entire memory image.
+
+    * Image mmap
+
+      As an alternative to the batch image load/store function, when the
+      "image-mmap" pin is driven, the component will map into memory 
+      the first "size" bytes of "image-file".  It is mapped in MAP_SHARED,
+      PROT_READ|PROT_WRITE mode.  Additionally, when the "image-msync"
+      pin is driven, the msync system call is invoked to force a
+      synchronization between the physical file and the memory image.
+
+      The file will be unmapped when the component is deleted, or when
+      the "size" attribute is written to.  State save/restore stores
+      the content of the mapped memory buffer, not the mapped-ness.
+
+    * Error indication
+
+      When operating system errors prevent some configuration-related 
+      action from succeeding, the "error" output pin is driven.  Reasons
+      may include attempting to access nonexistent files, out-of-memory
+      conditions, permission problems, and so on.  It is advantageous to
+      configure the connection from this pin to some system-wide recepient
+      before failure-prone component configuration occurs.
 
     * Reading/writing
 
@@ -72,12 +94,14 @@
 	new hw-mapper-basic bus
 	new hw-cpu-arm7t cpu
 	new hw-memory-ram/rom-basic mem
+	# error indication
+	connect-pin mem error -> main stop!
 	set mem size 65536
 	connect-bus cpu insn-memory bus access-port
 	connect-bus cpu data-memory bus access-port
 	connect bus [0-65535] mem read-write-port
 	# a read-only shadow in high memory
-	connect bus [400000,465535] mem read-only-port
+	connect-bus [400000,465535] mem read-only-port
 
   - Host system
 
@@ -87,6 +111,9 @@
     for simulations running on machines with low memory or on busy
     multiuser systems.  Similarly, when a memory image is written to
     disk, the same amount of space may be used there.
+
+    When using memory mapped files, the host's virtual memory system
+    may reduce physical RAM requirements considerably.
 
 * SID interface reference
 
@@ -107,3 +134,7 @@
     * pins
     - image-load | input | any | image save/load
     - image-store | input | any | image save/load
+    - image-mmap | input | any | image mmap
+    - image-msync | input | any | image mmap
+    - error | output | any | error indication
+

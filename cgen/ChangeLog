@@ -1,3 +1,8 @@
+2004-02-10  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.dot.com>
+
+	* cpu/m32r.opc (my_print_insn): Fixed incorrect output when
+	disassembling codes for 0x*2 addresses.
+
 2004-01-29  Dave Brolley  <brolley@redhat.com>
 
 	* decode.scm (-opcode-slots): For short insns, generate 'opcode' with

@@ -60,7 +60,11 @@
 
 	* cgen-cpu.h (cgen_bi_endian_cpu): Make trace_count a host_int_8.
 	* compCGEN.cxx (cgen_read_memory): Don't distort memory latency
-
+	counter with disassembly traffic.
+	(trace_counter): Print also the current scheduler time.  Flush
+	scaches to avoid distorting memory latency counts.
+	* tracedis.c (cgen_disassemble): Defeat initialization bypass cache.
+	
 2001-12-18  Dave Brolley  <brolley@redhat.com>
 
 	* cgen-ops.h (ROLHI): New macro.
@@ -128,6 +132,8 @@
 
 2001-07-10  matthew green  <mrg@redhat.com>
 
+	* configure.in: Add xstormy16 support.
+	* compCGEN.cxx: Add xstormy16 support.
 	* Makefile.in: Regenerate.
 	* aclocal.m4: Regenerate.
 	* configure: Regenerate.

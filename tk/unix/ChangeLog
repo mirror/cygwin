@@ -1,5 +1,8 @@
 2001-09-18  Ian Roxborough  <irox@redhat.com>
 
+	* Makefile.in: Fixed bad merge when installing
+	../doc/*.n man files.
+
 	* Makefile.in: Added TK_CFLAGS for flags that
 	shouldn't be supressed by the top level Makefile's
 	CFLAGS settings.

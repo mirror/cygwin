@@ -26,6 +26,8 @@ details. */
 #include <sys/time.h>
 
 #include "winsup.h"
+#include <wingdi.h>
+#include <winuser.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -110,6 +112,7 @@ cygwin_select (int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   fd_set *dummy_readfds = allocfd_set (n);
   fd_set *dummy_writefds = allocfd_set (n);
   fd_set *dummy_exceptfds = allocfd_set (n);
+  sigframe thisframe (mainthread, 0);
 
 #if 0
   if (n > FD_SETSIZE)
@@ -121,7 +124,6 @@ cygwin_select (int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 
   select_printf ("%d, %p, %p, %p, %p", n, readfds, writefds, exceptfds, to);
 
-  memset (&sel, 0, sizeof (sel));
   if (!readfds)
     {
       UNIX_FD_ZERO (dummy_readfds, n);
@@ -155,10 +157,10 @@ cygwin_select (int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   else
     select_printf ("to NULL, ms %x", ms);
 
-  select_printf ("sel.total %d, sel.always_ready %d", sel.total, sel.always_ready);
+  select_printf ("sel.always_ready %d", sel.always_ready);
 
   /* Degenerate case.  No fds to wait for.  Just wait. */
-  if (sel.total == 0)
+  if (sel.start.next == NULL)
     {
       if (WaitForSingleObject (signal_arrived, ms) == WAIT_OBJECT_0)
 	{
@@ -226,7 +228,6 @@ select_stuff::test_and_set (int i, fd_set *readfds, fd_set *writefds,
 
   s->next = start.next;
   start.next = s;
-  total++;
   return 1;
 }
 
@@ -248,7 +249,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 		    DWORD ms)
 {
   int wait_ret;
-  HANDLE w4[total + 1];
+  HANDLE w4[MAXIMUM_WAIT_OBJECTS];
   select_record *s = &start;
   int m = 0;
 
@@ -371,8 +372,7 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
 }
 
 static int
-verify_true (select_record *me, fd_set *readfds, fd_set *writefds,
-	   fd_set *exceptfds)
+verify_true (select_record *, fd_set *, fd_set *, fd_set *)
 {
   return 1;
 }
@@ -385,7 +385,7 @@ verify_ok (select_record *me, fd_set *readfds, fd_set *writefds,
 }
 
 static int
-no_startup (select_record *me, select_stuff *stuff)
+no_startup (select_record *, select_stuff *)
 {
   return 1;
 }
@@ -410,20 +410,31 @@ peek_pipe (select_record *s, int ignra)
   if (!s->read_selected && !s->except_selected)
     goto out;
 
-  if (s->read_selected && fh->bg_check (SIGTTIN) <= 0)
+  if (s->read_selected)
     {
-      gotone = s->read_ready = 1;
-      goto out;
+      if (s->read_ready)
+	{
+	  select_printf ("already ready");
+	  gotone = 1;
+	  goto out;
+	}
+      if (fh->bg_check (SIGTTIN) <= 0)
+	{
+	  gotone = s->read_ready = 1;
+	  goto out;
+	}
+
+      if (!ignra && fh->get_device () != FH_PTYM && fh->get_device () != FH_TTYM &&
+	  fh->get_readahead_valid ())
+	{
+	  select_printf ("readahead");
+	  gotone = s->read_ready = 1;
+	  goto out;
+	}
     }
 
-  if (!ignra && fh->get_readahead_valid ())
-    {
-      select_printf ("readahead");
-      gotone = s->read_ready = 1;
-      goto out;
-    }
-
-  else if (!PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
+  if (fh->get_device() != FH_PIPEW &&
+      !PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
     {
       select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
       n = -1;
@@ -449,6 +460,7 @@ peek_pipe (select_record *s, int ignra)
 	gotone = s->except_ready = TRUE;
       if (s->read_selected)
 	gotone += s->read_ready = TRUE;
+      select_printf ("saw eof on '%s'", fh->get_name ());
     }
 
 out:
@@ -495,6 +507,12 @@ thread_pipe (void *arg)
 		goto out;
 	      }
 	  }
+      /* Paranoid check */
+      if (pi->stop_thread_pipe)
+	{
+	  select_printf ("stopping from outer loop");
+	  break;
+	}
       if (gotone)
 	break;
       Sleep (10);
@@ -522,7 +540,7 @@ start_thread_pipe (select_record *me, select_stuff *stuff)
 }
 
 static void
-pipe_cleanup (select_record *me, select_stuff *stuff)
+pipe_cleanup (select_record *, select_stuff *stuff)
 {
   pipeinf *pi = (pipeinf *)stuff->device_specific[FHDEVN(FH_PIPE)];
   if (pi && pi->thread)
@@ -579,7 +597,7 @@ fhandler_pipe::select_except (select_record *s)
 static int
 peek_console (select_record *me, int ignra)
 {
-  extern const char * get_nonascii_key (INPUT_RECORD& input_rec);
+  extern const char * get_nonascii_key (INPUT_RECORD& input_rec, char *);
   fhandler_console *fh = (fhandler_console *)me->fh;
 
   if (!me->read_selected)
@@ -591,9 +609,16 @@ peek_console (select_record *me, int ignra)
       return me->read_ready = 1;
     }
 
+  if (me->read_ready)
+    {
+      select_printf ("already ready");
+      return 1;
+    }
+
   INPUT_RECORD irec;
   DWORD events_read;
   HANDLE h;
+  char tmpbuf[17];
   set_handle_or_return_if_not_open (h, me);
 
   for (;;)
@@ -606,7 +631,7 @@ peek_console (select_record *me, int ignra)
 	if (irec.EventType == WINDOW_BUFFER_SIZE_EVENT)
 	  kill_pgrp (fh->tc->getpgid (), SIGWINCH);
 	else if (irec.EventType == KEY_EVENT && irec.Event.KeyEvent.bKeyDown == TRUE &&
-		 (irec.Event.KeyEvent.uChar.AsciiChar || get_nonascii_key (irec)))
+		 (irec.Event.KeyEvent.uChar.AsciiChar || get_nonascii_key (irec, tmpbuf)))
 	  return me->read_ready = 1;
 
 	/* Read and discard the event */
@@ -774,6 +799,14 @@ peek_serial (select_record *s, int)
   HANDLE h;
   set_handle_or_return_if_not_open (h, s);
   int ready = 0;
+
+  if (s->read_selected && s->read_ready || (s->write_selected && s->write_ready))
+    {
+      select_printf ("already ready");
+      ready = 1;
+      goto out;
+    }
+
   (void) SetCommMask (h, EV_RXCHAR);
 
   if (!fh->overlapped_armed)
@@ -840,6 +873,7 @@ peek_serial (select_record *s, int)
       goto err;
     }
 
+out:
   return ready;
 
 err:
@@ -902,7 +936,7 @@ start_thread_serial (select_record *me, select_stuff *stuff)
 }
 
 static void
-serial_cleanup (select_record *me, select_stuff *stuff)
+serial_cleanup (select_record *, select_stuff *stuff)
 {
   serialinf *si = (serialinf *)stuff->device_specific[FHDEVN(FH_SERIAL)];
   if (si && si->thread)
@@ -1039,7 +1073,7 @@ static int
 peek_socket (select_record *me, int)
 {
   winsock_fd_set ws_readfds, ws_writefds, ws_exceptfds;
-  struct timeval tv = {0};
+  struct timeval tv = {0, 0};
   WINSOCK_FD_ZERO (&ws_readfds);
   WINSOCK_FD_ZERO (&ws_writefds);
   WINSOCK_FD_ZERO (&ws_exceptfds);
@@ -1075,11 +1109,11 @@ peek_socket (select_record *me, int)
       return 0;
     }
 
-  if (WINSOCK_FD_ISSET (h, &ws_readfds))
+  if (WINSOCK_FD_ISSET (h, &ws_readfds) || (me->read_selected && me->read_ready))
     gotone = me->read_ready = TRUE;
-  if (WINSOCK_FD_ISSET (h, &ws_writefds))
+  if (WINSOCK_FD_ISSET (h, &ws_writefds) || (me->write_selected && me->write_ready))
     gotone = me->write_ready = TRUE;
-  if (WINSOCK_FD_ISSET (h, &ws_exceptfds))
+  if (WINSOCK_FD_ISSET (h, &ws_exceptfds) || (me->except_selected && me->except_ready))
     gotone = me->except_ready = TRUE;
   return gotone;
 }
@@ -1225,7 +1259,7 @@ err:
 }
 
 void
-socket_cleanup (select_record *me, select_stuff *stuff)
+socket_cleanup (select_record *, select_stuff *stuff)
 {
   socketinf *si = (socketinf *)stuff->device_specific[FHDEVN(FH_SOCKET)];
   select_printf ("si %p si->thread %p", si, si ? si->thread : NULL);
@@ -1242,10 +1276,12 @@ socket_cleanup (select_record *me, select_stuff *stuff)
 	  select_printf ("connect failed");
 	  /* FIXME: now what? */
 	}
+      shutdown (s, 2);
       closesocket (s);
 
       /* Wait for thread to go away */
       WaitForSingleObject (si->thread, INFINITE);
+      shutdown (si->exitsock, 2);
       closesocket (si->exitsock);
       CloseHandle (si->thread);
       stuff->device_specific[FHDEVN(FH_SOCKET)] = NULL;
@@ -1305,6 +1341,10 @@ peek_windows (select_record *me, int)
   MSG m;
   HANDLE h;
   set_handle_or_return_if_not_open (h, me);
+
+  if (me->read_selected && me->read_ready)
+    return 1;
+
   if (PeekMessage (&m, (HWND) h, 0, 0, PM_NOREMOVE))
     {
       me->read_ready = TRUE;

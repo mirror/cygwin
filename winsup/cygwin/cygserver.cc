@@ -28,23 +28,19 @@ details. */
 
 #include <ostream.h>
 
-#include "cygwin_version.h"
 #include "cygerrno.h"
+#include "cygwin_version.h"
 
-#include "cygserver_shm.h"
 #include "cygwin/cygserver.h"
 #include "cygwin/cygserver_process.h"
 #include "cygwin/cygserver_transport.h"
-#include "cygwin/cygserver_transport_pipes.h"
-#include "cygwin/cygserver_transport_sockets.h"
-#include "threaded_queue.h"
 
 GENERIC_MAPPING access_mapping;
 
 DWORD request_count = 0;
 
 // Version string.
-static const char version[] = "$Revision: 1.1.2.22 $";
+static const char version[] = "$Revision: 1.1.2.23 $";
 
 /*
  * Support function for the XXX_printf() macros in "woutsup.h".

@@ -1,7 +1,7 @@
 // sidcomp.h - Define the external interface of a SID component, that
 // is, the SID component API expressed in -*- C++ -*-.
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -22,8 +22,8 @@ namespace sid
   // COMPONENT_LIBRARY_MAGIC mechanism in sidso.h, and prevents
   // interopration attempts with obsolete component objects.
 
-  const unsigned API_MAJOR_VERSION = 2;
-  const unsigned API_MINOR_VERSION = 2;
+  const unsigned API_MAJOR_VERSION = 3;
+  const unsigned API_MINOR_VERSION = 0;
 
   // PART 1: Buses
   //
@@ -39,7 +39,7 @@ namespace sid
   {
   public:
     // status values from read/write calls.
-    enum status
+    enum status_t
     {
       ok           = 0x00, // done, no problems
       misaligned   = 0x01, // address misaligned
@@ -47,7 +47,21 @@ namespace sid
       unpermitted  = 0x04, // may not read or may not write at address
       delayed      = 0x10, // data not yet available - try again after yielding
     };
-    
+
+    struct status
+    {
+      status ()
+	:code (ok), latency (0) {}
+      status (enum status_t c)
+	:code (c), latency (0) {}
+      status (enum status_t c, host_int_2 lat)
+	   :code (c), latency (lat) {}
+      operator int() const { return static_cast<int>(code); }
+
+      enum status_t code;
+      host_int_2 latency;
+    };
+
 
     // These member functions enumerate the Cartesian product of all
     // possible access requests to a bus:

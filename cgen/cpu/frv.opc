@@ -1,6 +1,26 @@
-/* FRV opcode support.  -*- C -*-
-   Copyright (C) 2000, 2001 Red Hat, Inc.
-   This file is part of CGEN.  */
+/* Fujitsu FRV opcode support, for GNU Binutils.  -*- C -*-
+
+   Copyright 2003 Free Software Foundation, Inc.
+
+   Contributed by Red Hat Inc; developed under contract from Fujitsu.
+
+   This file is part of the GNU Binutils.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+*/
 
 /* This file is an addendum to frv.cpu.  Heavy use of C code isn't
    appropriate in .cpu files, so it resides here.  This especially applies
@@ -20,10 +40,13 @@
 
 /* -- opc.h */
 
-#undef CGEN_DIS_HASH_SIZE
+#undef  CGEN_DIS_HASH_SIZE
 #define CGEN_DIS_HASH_SIZE 128
-#undef CGEN_DIS_HASH
+#undef  CGEN_DIS_HASH
 #define CGEN_DIS_HASH(buffer, value) (((value) >> 18) & 127)
+
+/* Allows reason codes to be output when assembler errors occur.  */
+#define CGEN_VERBOSE_ASSEMBLER_ERRORS
 
 /* Vliw support.  */
 #define FRV_VLIW_SIZE 4 /* fr500 has largest vliw size of 4.  */
@@ -581,6 +604,8 @@ static const char * parse_s12
   PARAMS ((CGEN_CPU_DESC, const char **, int, long *));
 static const char * parse_u12
   PARAMS ((CGEN_CPU_DESC, const char **, int, long *));
+static const char * parse_even_register
+  PARAMS ((CGEN_CPU_DESC, const char **, CGEN_KEYWORD *, long *));
 
 static const char *
 parse_ulo16 (cd, strp, opindex, valuep)
@@ -863,6 +888,26 @@ parse_u12 (cd, strp, opindex, valuep)
     }
 }
 
+static const char *
+parse_even_register (cd, strP, tableP, valueP)
+     CGEN_CPU_DESC  cd;
+     const char **  strP;
+     CGEN_KEYWORD * tableP;
+     long *         valueP;
+{
+  const char * errmsg;
+  const char * saved_star_strP = * strP;
+
+  errmsg = cgen_parse_keyword (cd, strP, tableP, valueP);
+
+  if (errmsg == NULL && ((* valueP) & 1))
+    {
+      errmsg = _("register number must be even");
+      * strP = saved_star_strP;
+    }
+
+  return errmsg;
+}
 /* -- */
 
 /* -- dis.c */

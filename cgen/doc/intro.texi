@@ -130,7 +130,7 @@ CGEN is a very ambitious project, as future projects can be:
 * ABI description::
 * Machine generated architecture reference material::
 * Tools like what NJMCT provides::
-* Input to a compiler's backend::
+* Input to a compiler backend::
 * Hardware/software codesign::
 @end menu
 
@@ -284,8 +284,8 @@ NJMCT is the New Jersey Machine Code Toolkit.
 It focuses exclusively on the encoding and decoding of instructions.
 [FIXME: wip, need to say more].
 
-@node Input to a compiler's backend
-@subsubsection Input to a compiler's backend
+@node Input to a compiler backend
+@subsubsection Input to a compiler backend
 
 One can define a GCC port to include these four things:
 
@@ -313,13 +313,13 @@ this makes even more sense.
 The planned rewrite of model support in CGEN will support whatever the
 compiler needs for the implementation description.
 
-Compiler's also need to know the target's ABI, which isn't relevant
-for an architecture description.  On the other hand, more than just
-the compiler needs knowledge of the ABI.  Thus it makes sense to think
-about how many tools there are that need this knowledge and whether one
-can come up with a unifying description of the ABI.  Hence one future
-project is to add the ABI description to CGEN.  This would encompass
-in essence most of what is contained in the System V ABI documentation.
+Compilers also need to know the target's ABI, which isn't relevant for
+an architecture description.  On the other hand, more than just the
+compiler needs knowledge of the ABI.  Thus it makes sense to think about
+how many tools there are that need this knowledge and whether one can
+come up with a unifying description of the ABI.  Hence one future
+project is to add the ABI description to CGEN.  This would encompass in
+essence most of what is contained in the System V ABI documentation.
 
 That leaves the "miscellaneous" part.  Essentially this is a catchall
 for whatever else is needed.  This would include things like

@@ -191,6 +191,12 @@ proc sid_cmd { cmd } {
     return $decoded
 }
 
+# assert a general predicate.
+# pass or fail the DejaGnu test based on the result.
+proc sid_assert {predicate} {
+    global test
+    if $predicate { pass $test } else { fail $test }
+}
 
 # call a command; ignore result (but assert that it's not an ERROR.)
 proc sid_assert_success {cmd} {

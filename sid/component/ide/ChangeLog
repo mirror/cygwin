@@ -1,3 +1,9 @@
+2002-02-27  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* compIDE.cxx (command_set): Add implementation of 0x91
+	command.
+	(ide_controller): Change controlbus offsets to 0x0 and 0x1.
+
 2001-08-03  matthew green  <mrg@redhat.com>
 
 	* compIDE.cxx (~ide_hooking_register_bus): Add prototype.

@@ -3,7 +3,7 @@
 <defcomplib lib="libide.la" dlsym="ide_component_library">
   <defcomponent name="hw-disk-ide">
     <defpin name="interrupt" direction="out" legalvalues="0..1" behaviors="command execution"/>
-    <defbus name="control-block-bus" addresses="0x6..0x7" accesses="read/write" behaviors="register access"/>
+    <defbus name="control-block-bus" addresses="0x0..0x1" accesses="read/write" behaviors="register access"/>
     <defbus name="command-block-bus" addresses="0x0..0x7" accesses="read/write" behaviors="register access, command execution"/>
     <defattribute name="state-snapshot" legalvalues="opaque string" behaviors="state save/restore"/>
     <defattribute name="driveN-present?" category="setting" legalvalues="boolean" defaultvalue="no" behaviors="initialization"/>
@@ -135,13 +135,13 @@
 	new hw-disk-ide ide0
 	# ... assume memory mapper named "mapper"
 	# ... assume PC standard IDE channel 0 addresses
-	connect-bus mapper [0x3F0-0x3F7] ide0 control-block-bus
+	connect-bus mapper [0x3F6-0x3F7] ide0 control-block-bus
 	connect-bus mapper [0x1F0-0x1F7] ide0 command-block-bus
 	# ... assume some fictional interrupt controller
 	connect-pin ide0 interrupt -> fic irq14
 	#
 	# (For PC standard IDE channel 1,
-	#  use base addresses 0x370 and 0x170,
+	#  use base addresses 0x376 and 0x170,
 	#  and irq15 respectively.)
 	#
 	# ... configure drive 0 (master): 128*10*32 sectors = 20 MB capacity

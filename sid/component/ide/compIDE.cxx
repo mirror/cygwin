@@ -423,14 +423,14 @@ public:
     controlbus(this),
     commandbus(this),
     // ctrl registers            bank         offset mask  read?  write?  (extra)
-    altstatus_reg_drdy          (&controlbus, 0x06, 0x40, true,  false),
-    altstatus_reg_drq           (&controlbus, 0x06, 0x08, true,  false),
-    altstatus_reg_error         (&controlbus, 0x06, 0x01, true,  false),
-    altstatus_reg_rest          (&controlbus, 0x06, 0xb6, true,  false, 0x12), // DSC | INDEX
-    device_control_reg_srst     (&controlbus, 0x06, 0x04, false, true, this, & ide_controller::device_control_srst),
-    device_control_reg_nien     (&controlbus, 0x06, 0x02, false, true),
-    device_control_reg_rest     (&controlbus, 0x06, 0xf9, false, true,  0x08), // bit 3 always set
-    drive_address_reg           (&controlbus, 0x07, 0xff, true,  false, 0xff), // fake disks as idle
+    altstatus_reg_drdy          (&controlbus, 0x00, 0x40, true,  false),
+    altstatus_reg_drq           (&controlbus, 0x00, 0x08, true,  false),
+    altstatus_reg_error         (&controlbus, 0x00, 0x01, true,  false),
+    altstatus_reg_rest          (&controlbus, 0x00, 0xb6, true,  false, 0x12), // DSC | INDEX
+    device_control_reg_srst     (&controlbus, 0x00, 0x04, false, true, this, & ide_controller::device_control_srst),
+    device_control_reg_nien     (&controlbus, 0x00, 0x02, false, true),
+    device_control_reg_rest     (&controlbus, 0x00, 0xf9, false, true,  0x08), // bit 3 always set
+    drive_address_reg           (&controlbus, 0x01, 0xff, true,  false, 0xff), // fake disks as idle
     // cmd registers
     data_port_reg               (&commandbus, 0x00, 0xff, true,  true, this, & ide_controller::data_port_set, & ide_controller::data_port_get),
     error_reg_abrt              (&commandbus, 0x01, 0x04, true,  false),
@@ -738,6 +738,13 @@ ide_controller::command_set(little_int_1 value, little_int_1 mask)
 	  this->interrupt (1); // command aborted
 	}
 
+      break;
+
+    case 0x91: // initialize drive parameters
+      this->altstatus_reg_drdy = 1;
+      this->altstatus_reg_drq = 0;
+      this->altstatus_reg_error = 0;
+      this->interrupt (1);
       break;
 
     case 0xe4: // READ BUFFER

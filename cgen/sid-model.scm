@@ -249,7 +249,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
    "  };\n\n"
 
    ; FIXME: revisit MAX_UNITS
-  "  #define MAX_UNITS ("
+  "  static const int MAX_UNITS = "
   (number->string
    (let ((insn-list (non-multi-insns (real-insns (current-insn-list)))))
      (if (null? insn-list)
@@ -264,7 +264,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 					 (length (timing:units (cdr insn-timing))))
 				       timing))))
 			  insn-list))))))
-   ")\n"
+   ";\n"
   )
 )
 

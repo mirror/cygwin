@@ -13,3 +13,6 @@ pkgdata_DATA = sid-sched.txt
 DEJAGNUTESTS=schedbase.exp schedhost.exp schedhost2.exp schedmonkey.exp
 check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs

@@ -29,6 +29,9 @@ AC_CHECK_LIB(curses, refresh, lcd_libs="-lcurses",
    AC_CHECK_LIB(curses, refresh, lcd_libs="-lcurses -ltermcap", 
       AC_CHECK_LIB(ncurses, refresh, lcd_libs="-lncurses"), -ltermcap))
 AC_SUBST(lcd_libs)
+if test "x$lcd_libs" != "x"; then
+  AC_DEFINE(HAVE_CURSES_LIBRARY, 1, [Define if curses library is usable])
+fi
 
 dnl For socket-related components only.
 socket_libs=

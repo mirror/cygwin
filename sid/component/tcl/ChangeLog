@@ -1,3 +1,8 @@
+2002-03-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sid-control-tksm.tk (open_component_window): Make value entry
+	widget auto-sizing.
+
 2001-10-03  Ian Roxborough  <irox@redhat.com>
 
 	From Per Bothner:

@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #include "defs.h"
 #include "gdb_string.h"
+#include "kod.h"
 
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
@@ -43,9 +44,8 @@ static void (*gdb_kod_query) (char *, char *, int *);
    displaying output (presumably to the user) and the other for
    querying the target.  */
 char *
-cisco_kod_open (char *arg,
-		void (*display_func) (char *),
-		void (*query_func) (char *, char *, int *))
+cisco_kod_open (kod_display_callback_ftype *display_func,
+		kod_query_callback_ftype *query_func)
 {
   char buffer[PBUFSIZ];
   int bufsiz = PBUFSIZ;
@@ -85,18 +85,18 @@ cisco_kod_open (char *arg,
 
   /* Return name, version, and description.  I hope we have enough
      space.  */
-  return (strdup ("gdbkodcisco v0.0.0 - Cisco Kernel Object Display"));
+  return (xstrdup ("gdbkodcisco v0.0.0 - Cisco Kernel Object Display"));
 }
 
 /* Close the connection.  */
 void
-cisco_kod_close ()
+cisco_kod_close (void)
 {
 }
 
 /* Print a "bad packet" message.  */
 static void
-bad_packet ()
+bad_packet (void)
 {
   (*gdb_kod_display) ("Remote target returned malformed packet.\n");
 }

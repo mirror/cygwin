@@ -1,21 +1,22 @@
 /* Low level interface to ptrace, for the remote server for GDB.
    Copyright (C) 1995 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #include "defs.h"
 #include <sys/wait.h>
@@ -33,7 +34,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /***************Begin MY defs*********************/
 int quit_flag = 0;
-char registers[REGISTER_BYTES];
+static char my_registers[REGISTER_BYTES];
+char *registers = my_registers;
 
 /* Index within `registers' of the first byte of the space for
    register N.  */
@@ -56,9 +58,7 @@ int query ();
    ENV is the environment vector to pass.  */
 
 int
-create_inferior (program, allargs)
-     char *program;
-     char **allargs;
+create_inferior (char *program, char **allargs)
 {
   int pid;
 
@@ -84,19 +84,18 @@ create_inferior (program, allargs)
 /* Kill the inferior process.  Make us have no inferior.  */
 
 void
-kill_inferior ()
+kill_inferior (void)
 {
   if (inferior_pid == 0)
     return;
   ptrace (8, inferior_pid, 0, 0, 0);
   wait (0);
-  /*************inferior_died ();****VK**************/
+/*************inferior_died ();****VK**************/
 }
 
 /* Return nonzero if the given thread is still alive.  */
 int
-mythread_alive (pid)
-     int pid;
+mythread_alive (int pid)
 {
   return 1;
 }
@@ -104,8 +103,7 @@ mythread_alive (pid)
 /* Wait for process, returns status */
 
 unsigned char
-mywait (status)
-     char *status;
+mywait (char *status)
 {
   int pid;
   union wait w;
@@ -138,9 +136,7 @@ mywait (status)
    If SIGNAL is nonzero, give it that signal.  */
 
 void
-myresume (step, signal)
-     int step;
-     int signal;
+myresume (int step, int signal)
 {
   errno = 0;
   ptrace (step ? PT_STEP : PT_CONTINUE, inferior_pid, 1, signal, 0);
@@ -162,9 +158,7 @@ myresume (step, signal)
 #endif
 
 CORE_ADDR
-register_addr (regno, blockend)
-     int regno;
-     CORE_ADDR blockend;
+register_addr (int regno, CORE_ADDR blockend)
 {
   CORE_ADDR addr;
 
@@ -179,8 +173,7 @@ register_addr (regno, blockend)
 /* Fetch one register.  */
 
 static void
-fetch_register (regno)
-     int regno;
+fetch_register (int regno)
 {
   register unsigned int regaddr;
   char buf[MAX_REGISTER_RAW_SIZE];
@@ -195,8 +188,8 @@ fetch_register (regno)
   for (i = 0; i < REGISTER_RAW_SIZE (regno); i += sizeof (int))
     {
       errno = 0;
-      *(int *) &registers[ regno * 4 + i] = ptrace (PT_RUREGS, inferior_pid,
-				 (PTRACE_ARG3_TYPE) regaddr, 0, 0);
+      *(int *) &registers[regno * 4 + i] = ptrace (PT_RUREGS, inferior_pid,
+					  (PTRACE_ARG3_TYPE) regaddr, 0, 0);
       regaddr += sizeof (int);
       if (errno != 0)
 	{
@@ -209,14 +202,13 @@ fetch_register (regno)
 	  goto error_exit;
 	}
     }
- error_exit:;
+error_exit:;
 }
 
 /* Fetch all registers, or just one, from the child process.  */
 
 void
-fetch_inferior_registers (regno)
-     int regno;
+fetch_inferior_registers (int regno)
 {
   if (regno == -1 || regno == 0)
     for (regno = 0; regno < NUM_REGS; regno++)
@@ -230,8 +222,7 @@ fetch_inferior_registers (regno)
    Otherwise, REGNO specifies which register (so we can save time).  */
 
 void
-store_inferior_registers (regno)
-     int regno;
+store_inferior_registers (int regno)
 {
   register unsigned int regaddr;
   char buf[80];
@@ -247,20 +238,20 @@ store_inferior_registers (regno)
       regaddr = register_addr (regno, offset);
       errno = 0;
       if (regno == PCOQ_HEAD_REGNUM || regno == PCOQ_TAIL_REGNUM)
-        {
-          scratch = *(int *) &registers[REGISTER_BYTE (regno)] | 0x3;
-          ptrace (PT_WUREGS, inferior_pid, (PTRACE_ARG3_TYPE) regaddr,
-                  scratch, 0);
-          if (errno != 0)
-            {
+	{
+	  scratch = *(int *) &registers[REGISTER_BYTE (regno)] | 0x3;
+	  ptrace (PT_WUREGS, inferior_pid, (PTRACE_ARG3_TYPE) regaddr,
+		  scratch, 0);
+	  if (errno != 0)
+	    {
 	      /* Error, even if attached.  Failing to write these two
-		 registers is pretty serious.  */
-              sprintf (buf, "writing register number %d", regno);
-              perror_with_name (buf);
-            }
-        }
+	         registers is pretty serious.  */
+	      sprintf (buf, "writing register number %d", regno);
+	      perror_with_name (buf);
+	    }
+	}
       else
-	for (i = 0; i < REGISTER_RAW_SIZE (regno); i += sizeof(int))
+	for (i = 0; i < REGISTER_RAW_SIZE (regno); i += sizeof (int))
 	  {
 	    errno = 0;
 	    ptrace (PT_WUREGS, inferior_pid, (PTRACE_ARG3_TYPE) regaddr,
@@ -276,7 +267,7 @@ store_inferior_registers (regno)
 		error (msg);
 		return;
 	      }
-	    regaddr += sizeof(int);
+	    regaddr += sizeof (int);
 	  }
     }
   else
@@ -293,10 +284,7 @@ store_inferior_registers (regno)
 /* Copy LEN bytes from inferior's memory starting at MEMADDR
    to debugger memory starting at MYADDR.  */
 
-read_inferior_memory (memaddr, myaddr, len)
-     CORE_ADDR memaddr;
-     char *myaddr;
-     int len;
+read_inferior_memory (CORE_ADDR memaddr, char *myaddr, int len)
 {
   register int i;
   /* Round starting address down to longword boundary.  */
@@ -323,10 +311,7 @@ read_inferior_memory (memaddr, myaddr, len)
    returns the value of errno.  */
 
 int
-write_inferior_memory (memaddr, myaddr, len)
-     CORE_ADDR memaddr;
-     char *myaddr;
-     int len;
+write_inferior_memory (CORE_ADDR memaddr, char *myaddr, int len)
 {
   register int i;
   /* Round starting address down to longword boundary.  */
@@ -367,13 +352,6 @@ write_inferior_memory (memaddr, myaddr, len)
 }
 
 void
-initialize ()
+initialize_low (void)
 {
-  inferior_pid = 0;
-}
-
-int
-have_inferior_p ()
-{
-  return inferior_pid != 0;
 }

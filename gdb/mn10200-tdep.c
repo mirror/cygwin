@@ -1,21 +1,22 @@
 /* Target-dependent code for the Matsushita MN10200 for GDB, the GNU debugger.
    Copyright 1997 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #include "defs.h"
 #include "frame.h"
@@ -28,18 +29,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "gdbcore.h"
 #include "symfile.h"
 
-  	
+
 /* Should call_function allocate stack space for a struct return?  */
 int
-mn10200_use_struct_convention (gcc_p, type)
-     int gcc_p;
-     struct type *type;
+mn10200_use_struct_convention (int gcc_p, struct type *type)
 {
   return (TYPE_NFIELDS (type) > 1 || TYPE_LENGTH (type) > 8);
 }
-
-
-
+/* *INDENT-OFF* */
 /* The main purpose of this file is dealing with prologues to extract
    information about stack frames and saved registers.
 
@@ -102,16 +99,18 @@ mn10200_use_struct_convention (gcc_p, type)
       NO_MORE_FRAMES: Set this if the current frame is "start" or
       if the first instruction looks like mov <imm>,sp.  This tells
       frame chain to not bother trying to unwind past this frame.  */
+/* *INDENT-ON* */
+
+
+
 
 #define MY_FRAME_IN_SP 0x1
 #define MY_FRAME_IN_FP 0x2
 #define CALLER_A2_IN_A0 0x4
 #define NO_MORE_FRAMES 0x8
- 
+
 static CORE_ADDR
-mn10200_analyze_prologue (fi, pc)
-    struct frame_info *fi;
-    CORE_ADDR pc;
+mn10200_analyze_prologue (struct frame_info *fi, CORE_ADDR pc)
 {
   CORE_ADDR func_addr, func_end, addr, stop;
   CORE_ADDR stack_size;
@@ -136,7 +135,7 @@ mn10200_analyze_prologue (fi, pc)
   if (strcmp (name, "start") == 0)
     {
       if (fi)
-        fi->status = NO_MORE_FRAMES;
+	fi->status = NO_MORE_FRAMES;
       return pc;
     }
 
@@ -203,14 +202,14 @@ mn10200_analyze_prologue (fi, pc)
     }
 
   /* Now see if we have a frame pointer.
-       
+
      Search for mov a2,a0 (0xf278)
-        then	mov a3,a2 (0xf27e).  */
+     then       mov a3,a2 (0xf27e).  */
 
   if (buf[0] == 0xf2 && buf[1] == 0x78)
     {
       /* Our caller's $a2 will be found in $a0 now.  Note it for
-	 our callers.  */
+         our callers.  */
       if (fi)
 	fi->status |= CALLER_A2_IN_A0;
       addr += 2;
@@ -252,11 +251,11 @@ mn10200_analyze_prologue (fi, pc)
     }
 
   /* Next we should allocate the local frame.
-       
+
      Search for add imm8,a3 (0xd3XX)
-        or	add imm16,a3 (0xf70bXXXX)
-        or	add imm24,a3 (0xf467XXXXXX).
-       
+     or add imm16,a3 (0xf70bXXXX)
+     or add imm24,a3 (0xf467XXXXXX).
+
      If none of the above was found, then this prologue has
      no stack, and therefore can't have any register saves,
      so quit now.  */
@@ -334,11 +333,11 @@ mn10200_analyze_prologue (fi, pc)
       status = target_read_memory (addr + 1, buf, 2);
       if (status != 0)
 	{
-  	  if (fi && fi->next == NULL && (fi->status & MY_FRAME_IN_SP))
-    	    fi->frame = read_sp ();
+	  if (fi && fi->next == NULL && (fi->status & MY_FRAME_IN_SP))
+	    fi->frame = read_sp ();
 	  return addr;
 	}
-      
+
       /* Get the PC this instruction will branch to.  */
       temp = (extract_signed_integer (buf, 2) + addr + 3) & 0xffffff;
 
@@ -346,8 +345,8 @@ mn10200_analyze_prologue (fi, pc)
       status = find_pc_partial_function (temp, &name, NULL, NULL);
       if (status == 0)
 	{
-  	  if (fi && fi->next == NULL && (fi->status & MY_FRAME_IN_SP))
-    	    fi->frame = read_sp ();
+	  if (fi && fi->next == NULL && (fi->status & MY_FRAME_IN_SP))
+	    fi->frame = read_sp ();
 	  return addr;
 	}
 
@@ -375,11 +374,11 @@ mn10200_analyze_prologue (fi, pc)
       status = target_read_memory (addr + 2, buf, 3);
       if (status != 0)
 	{
-  	  if (fi && fi->next == NULL && (fi->status & MY_FRAME_IN_SP))
-    	    fi->frame = read_sp ();
+	  if (fi && fi->next == NULL && (fi->status & MY_FRAME_IN_SP))
+	    fi->frame = read_sp ();
 	  return addr;
 	}
-      
+
       /* Get the PC this instruction will branch to.  */
       temp = (extract_signed_integer (buf, 3) + addr + 5) & 0xffffff;
 
@@ -387,8 +386,8 @@ mn10200_analyze_prologue (fi, pc)
       status = find_pc_partial_function (temp, &name, NULL, NULL);
       if (status == 0)
 	{
-  	  if (fi && fi->next == NULL && (fi->status & MY_FRAME_IN_SP))
-    	    fi->frame = read_sp ();
+	  if (fi && fi->next == NULL && (fi->status & MY_FRAME_IN_SP))
+	    fi->frame = read_sp ();
 	  return addr;
 	}
 
@@ -416,7 +415,7 @@ mn10200_analyze_prologue (fi, pc)
       int outgoing_args_size = 0;
 
       /* First adjust the stack size for this function.  The out of
-	 line prologue saves 4 registers (16bytes of data).  */
+         line prologue saves 4 registers (16bytes of data).  */
       if (fi)
 	fi->stack_size -= 16;
 
@@ -425,12 +424,12 @@ mn10200_analyze_prologue (fi, pc)
 	fi->frame = read_sp () - fi->stack_size;
 
       /* After the out of line prologue, there may be another
-	 stack adjustment for the outgoing arguments.
+         stack adjustment for the outgoing arguments.
 
-	 Search for add imm8,a3 (0xd3XX)
-	    or	add imm16,a3 (0xf70bXXXX)
-	    or	add imm24,a3 (0xf467XXXXXX).  */
-       
+         Search for add imm8,a3 (0xd3XX)
+         or     add imm16,a3 (0xf70bXXXX)
+         or     add imm24,a3 (0xf467XXXXXX).  */
+
       status = target_read_memory (addr, buf, 2);
       if (status != 0)
 	{
@@ -487,12 +486,12 @@ mn10200_analyze_prologue (fi, pc)
 	outgoing_args_size = 0;
 
       /* Now that we know the size of the outgoing arguments, fix
-	 fi->frame again if this is the innermost frame.  */
+         fi->frame again if this is the innermost frame.  */
       if (fi && fi->next == NULL)
 	fi->frame -= outgoing_args_size;
 
       /* Note the register save information and update the stack
-	 size for this frame too.  */
+         size for this frame too.  */
       if (fi)
 	{
 	  fi->fsr.regs[2] = fi->frame + fi->stack_size + 4;
@@ -518,12 +517,12 @@ mn10200_analyze_prologue (fi, pc)
      and thus the number of different instructions we need to
      check is greatly reduced because we know the displacements
      will be small.
-       
+
      Search for movx d2,(X,a3) (0xf55eXX)
-        then	movx d3,(X,a3) (0xf55fXX)
-        then	mov  a1,(X,a3) (0x5dXX)	   No frame pointer case
-        then	mov  a2,(X,a3) (0x5eXX)	   No frame pointer case
-        or  mov  a0,(X,a3) (0x5cXX)	   Frame pointer case.  */
+     then       movx d3,(X,a3) (0xf55fXX)
+     then       mov  a1,(X,a3) (0x5dXX)    No frame pointer case
+     then       mov  a2,(X,a3) (0x5eXX)    No frame pointer case
+     or  mov  a0,(X,a3) (0x5cXX)           Frame pointer case.  */
 
   status = target_read_memory (addr, buf, 2);
   if (status != 0)
@@ -597,7 +596,7 @@ mn10200_analyze_prologue (fi, pc)
     }
   return addr;
 }
-  
+
 /* Function: frame_chain
    Figure out and return the caller's frame pointer given current
    frame_info struct.
@@ -606,15 +605,14 @@ mn10200_analyze_prologue (fi, pc)
    stack pointer that was in use at the time the function call was made?  */
 
 CORE_ADDR
-mn10200_frame_chain (fi)
-     struct frame_info *fi;
+mn10200_frame_chain (struct frame_info *fi)
 {
   struct frame_info dummy_frame;
 
   /* Walk through the prologue to determine the stack size,
      location of saved registers, end of the prologue, etc.  */
   if (fi->status == 0)
-    mn10200_analyze_prologue (fi, (CORE_ADDR)0);
+    mn10200_analyze_prologue (fi, (CORE_ADDR) 0);
 
   /* Quit now if mn10200_analyze_prologue set NO_MORE_FRAMES.  */
   if (fi->status & NO_MORE_FRAMES)
@@ -623,19 +621,19 @@ mn10200_frame_chain (fi)
   /* Now that we've analyzed our prologue, determine the frame
      pointer for our caller.
 
-       If our caller has a frame pointer, then we need to
-       find the entry value of $a2 to our function.
+     If our caller has a frame pointer, then we need to
+     find the entry value of $a2 to our function.
 
-	 If CALLER_A2_IN_A0, then the chain is in $a0.
+     If CALLER_A2_IN_A0, then the chain is in $a0.
 
-	 If fsr.regs[6] is nonzero, then it's at the memory
-	 location pointed to by fsr.regs[6].
+     If fsr.regs[6] is nonzero, then it's at the memory
+     location pointed to by fsr.regs[6].
 
-	 Else it's still in $a2.
+     Else it's still in $a2.
 
-       If our caller does not have a frame pointer, then his
-       frame base is fi->frame + -caller's stack size + 4.  */
-       
+     If our caller does not have a frame pointer, then his
+     frame base is fi->frame + -caller's stack size + 4.  */
+
   /* The easiest way to get that info is to analyze our caller's frame.
 
      So we set up a dummy frame and call mn10200_analyze_prologue to
@@ -650,7 +648,7 @@ mn10200_frame_chain (fi)
   if (dummy_frame.status & MY_FRAME_IN_FP)
     {
       /* Our caller has a frame pointer.  So find the frame in $a2, $a0,
-	 or in the stack.  */
+         or in the stack.  */
       if (fi->fsr.regs[6])
 	return (read_memory_integer (fi->fsr.regs[FP_REGNUM], REGISTER_SIZE)
 		& 0xffffff);
@@ -662,7 +660,7 @@ mn10200_frame_chain (fi)
   else
     {
       /* Our caller does not have a frame pointer.  So his frame starts
-	 at the base of our frame (fi->frame) + <his size> + 4 (saved pc).  */
+         at the base of our frame (fi->frame) + <his size> + 4 (saved pc).  */
       return fi->frame + -dummy_frame.stack_size + 4;
     }
 }
@@ -671,8 +669,7 @@ mn10200_frame_chain (fi)
    Return the address of the first inst past the prologue of the function.  */
 
 CORE_ADDR
-mn10200_skip_prologue (pc)
-     CORE_ADDR pc;
+mn10200_skip_prologue (CORE_ADDR pc)
 {
   /* We used to check the debug symbols, but that can lose if
      we have a null prologue.  */
@@ -684,12 +681,11 @@ mn10200_skip_prologue (pc)
    command, or the call dummy breakpoint gets hit.  */
 
 void
-mn10200_pop_frame (frame)
-     struct frame_info *frame;
+mn10200_pop_frame (struct frame_info *frame)
 {
   int regnum;
 
-  if (PC_IN_CALL_DUMMY(frame->pc, frame->frame, frame->frame))
+  if (PC_IN_CALL_DUMMY (frame->pc, frame->frame, frame->frame))
     generic_pop_dummy_frame ();
   else
     {
@@ -702,7 +698,7 @@ mn10200_pop_frame (frame)
 	    ULONGEST value;
 
 	    value = read_memory_unsigned_integer (frame->fsr.regs[regnum],
-						  REGISTER_RAW_SIZE (regnum));
+						REGISTER_RAW_SIZE (regnum));
 	    write_register (regnum, value);
 	  }
 
@@ -721,12 +717,8 @@ mn10200_pop_frame (frame)
    order on the stack.  */
 
 CORE_ADDR
-mn10200_push_arguments (nargs, args, sp, struct_return, struct_addr)
-     int nargs;
-     value_ptr *args;
-     CORE_ADDR sp;
-     unsigned char struct_return;
-     CORE_ADDR struct_addr;
+mn10200_push_arguments (int nargs, value_ptr *args, CORE_ADDR sp,
+			unsigned char struct_return, CORE_ADDR struct_addr)
 {
   int argnum = 0;
   int len = 0;
@@ -746,16 +738,16 @@ mn10200_push_arguments (nargs, args, sp, struct_return, struct_addr)
       int arg_length = (TYPE_LENGTH (VALUE_TYPE (args[argnum])) + 1) & ~1;
 
       /* If we've used all argument registers, then this argument is
-	 pushed.  */
+         pushed.  */
       if (regsused >= 2 || arg_length > 4)
 	{
 	  regsused = 2;
 	  len += arg_length;
 	}
       /* We know we've got some arg register space left.  If this argument
-	 will fit entirely in regs, then put it there.  */
+         will fit entirely in regs, then put it there.  */
       else if (arg_length <= 2
-	       || TYPE_CODE (VALUE_TYPE (args[argnum])) == TYPE_CODE_PTR) 
+	       || TYPE_CODE (VALUE_TYPE (args[argnum])) == TYPE_CODE_PTR)
 	{
 	  regsused++;
 	}
@@ -785,13 +777,13 @@ mn10200_push_arguments (nargs, args, sp, struct_return, struct_addr)
 	  && TYPE_LENGTH (VALUE_TYPE (*args)) > 8)
 	{
 	  /* XXX Wrong, we want a pointer to this argument.  */
-          len = TYPE_LENGTH (VALUE_TYPE (*args));
-          val = (char *)VALUE_CONTENTS (*args);
+	  len = TYPE_LENGTH (VALUE_TYPE (*args));
+	  val = (char *) VALUE_CONTENTS (*args);
 	}
       else
 	{
 	  len = TYPE_LENGTH (VALUE_TYPE (*args));
-	  val = (char *)VALUE_CONTENTS (*args);
+	  val = (char *) VALUE_CONTENTS (*args);
 	}
 
       if (regsused < 2
@@ -828,11 +820,9 @@ mn10200_push_arguments (nargs, args, sp, struct_return, struct_addr)
 /* Function: push_return_address (pc)
    Set up the return address for the inferior function call.
    Needed for targets where we don't actually execute a JSR/BSR instruction */
- 
+
 CORE_ADDR
-mn10200_push_return_address (pc, sp)
-     CORE_ADDR pc;
-     CORE_ADDR sp;
+mn10200_push_return_address (CORE_ADDR pc, CORE_ADDR sp)
 {
   unsigned char buf[4];
 
@@ -844,17 +834,15 @@ mn10200_push_return_address (pc, sp)
 /* Function: store_struct_return (addr,sp)
    Store the structure value return address for an inferior function
    call.  */
- 
+
 CORE_ADDR
-mn10200_store_struct_return (addr, sp)
-     CORE_ADDR addr;
-     CORE_ADDR sp;
+mn10200_store_struct_return (CORE_ADDR addr, CORE_ADDR sp)
 {
   /* The structure return address is passed as the first argument.  */
   write_register (0, addr);
   return sp;
 }
- 
+
 /* Function: frame_saved_pc 
    Find the caller of this frame.  We do this by seeing if RP_REGNUM
    is saved in the stack anywhere, otherwise we get it from the
@@ -863,24 +851,10 @@ mn10200_store_struct_return (addr, sp)
    will be found.  */
 
 CORE_ADDR
-mn10200_frame_saved_pc (fi)
-     struct frame_info *fi;
+mn10200_frame_saved_pc (struct frame_info *fi)
 {
   /* The saved PC will always be at the base of the current frame.  */
   return (read_memory_integer (fi->frame, REGISTER_SIZE) & 0xffffff);
-}
-
-void
-get_saved_register (raw_buffer, optimized, addrp, frame, regnum, lval)
-     char *raw_buffer;
-     int *optimized;
-     CORE_ADDR *addrp;
-     struct frame_info *frame;
-     int regnum;
-     enum lval_type *lval;
-{
-  generic_get_saved_register (raw_buffer, optimized, addrp, 
-			      frame, regnum, lval);
 }
 
 /* Function: init_extra_frame_info
@@ -898,8 +872,7 @@ get_saved_register (raw_buffer, optimized, addrp, frame, regnum, lval)
    pointer just prior to calling the target function (see run_stack_dummy).  */
 
 void
-mn10200_init_extra_frame_info (fi)
-     struct frame_info *fi;
+mn10200_init_extra_frame_info (struct frame_info *fi)
 {
   if (fi->next)
     fi->pc = FRAME_SAVED_PC (fi->next);
@@ -912,8 +885,7 @@ mn10200_init_extra_frame_info (fi)
 }
 
 void
-_initialize_mn10200_tdep ()
+_initialize_mn10200_tdep (void)
 {
   tm_print_insn = print_insn_mn10200;
 }
-

@@ -1,21 +1,22 @@
 /* XMODEM support for GDB, the GNU debugger.
    Copyright 1995 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #include "defs.h"
 #include "serial.h"
@@ -35,16 +36,14 @@ static int blknum;		/* XMODEM block number */
 static int crcflag;		/* Sez we are using CRC's instead of cksums */
 
 static int
-readchar (desc, timeout)
-     serial_t desc;
-     int timeout;
+readchar (serial_t desc, int timeout)
 {
   int c;
 
   c = SERIAL_READCHAR (desc, timeout);
 
   if (remote_debug > 0)
-    fputc_unfiltered (c, gdb_stderr);
+    fputc_unfiltered (c, gdb_stdlog);
 
   if (c >= 0)
     return c;
@@ -62,7 +61,7 @@ static unsigned short *crctab;
 /* Call this to init the fast CRC-16 calculation table.  */
 
 static void
-crcinit ()
+crcinit (void)
 {
   static int crctab_inited = 0;
   int val;
@@ -87,7 +86,7 @@ crcinit ()
 	    crc ^= CRC16;
 	}
 
-      crctab [val] = crc;
+      crctab[val] = crc;
     }
 
   crctab_inited = 1;
@@ -96,14 +95,12 @@ crcinit ()
 /* Calculate a CRC-16 for the LEN byte message pointed at by P.  */
 
 static unsigned short
-docrc (p, len)
-     unsigned char *p;
-     int len;
+docrc (unsigned char *p, int len)
 {
   unsigned short crc = 0;
 
   while (len-- > 0)
-    crc = (crc << 8) ^ crctab [(crc >> 8) ^ *p++];
+    crc = (crc << 8) ^ crctab[(crc >> 8) ^ *p++];
 
   return crc;
 }
@@ -112,8 +109,7 @@ docrc (p, len)
    send NAK or CRC request.  */
 
 int
-xmodem_init_xfer (desc)
-     serial_t desc;
+xmodem_init_xfer (serial_t desc)
 {
   int c;
   int i;
@@ -144,17 +140,17 @@ xmodem_init_xfer (desc)
 }
 
 /* Take 128 bytes of data and make a packet out of it.
- *
- *	Each packet looks like this:
- *	+-----+-------+-------+------+-----+
- *	| SOH | Seq1. | Seq2. | data | SUM |
- *	+-----+-------+-------+------+-----+
- *	SOH  = 0x01
- *	Seq1 = The sequence number.
- *	Seq2 = The complement of the sequence number.
- *	Data = A 128 bytes of data.
- *	SUM  = Add the contents of the 128 bytes and use the low-order
- *	       8 bits of the result.
+
+ *      Each packet looks like this:
+ *      +-----+-------+-------+------+-----+
+ *      | SOH | Seq1. | Seq2. | data | SUM |
+ *      +-----+-------+-------+------+-----+
+ *      SOH  = 0x01
+ *      Seq1 = The sequence number.
+ *      Seq2 = The complement of the sequence number.
+ *      Data = A 128 bytes of data.
+ *      SUM  = Add the contents of the 128 bytes and use the low-order
+ *             8 bits of the result.
  *
  * send_xmodem_packet fills in the XMODEM fields of PACKET and sends it to the
  * remote system.  PACKET must be XMODEM_PACKETSIZE bytes long.  The data must
@@ -164,24 +160,20 @@ xmodem_init_xfer (desc)
  */
 
 void
-xmodem_send_packet (desc, packet, len, hashmark)
-     serial_t desc;
-     unsigned char *packet;
-     int len;
-     int hashmark;
+xmodem_send_packet (serial_t desc, unsigned char *packet, int len, int hashmark)
 {
   int i;
   int retries;
   int pktlen;
   int datasize;
-  
+
   /* build the packet header */
 
   packet[1] = blknum;
   packet[2] = ~blknum;
 
   blknum++;
-  
+
   if (len <= XMODEM_DATASIZE)
     {
       packet[0] = SOH;
@@ -217,7 +209,7 @@ xmodem_send_packet (desc, packet, len, hashmark)
       for (i = 3; i < datasize + 3; i++)
 	sum += packet[i];
 
-      packet[3 + datasize] = sum; /* add the checksum */
+      packet[3 + datasize] = sum;	/* add the checksum */
       pktlen = datasize + 4;
     }
 
@@ -246,7 +238,7 @@ xmodem_send_packet (desc, packet, len, hashmark)
 	}
     }
 
-  SERIAL_WRITE (desc, "\004", 1); /* Send an EOT */
+  SERIAL_WRITE (desc, "\004", 1);	/* Send an EOT */
 
   error ("xmodem_send_packet:  Excessive retries.");
 }
@@ -254,8 +246,7 @@ xmodem_send_packet (desc, packet, len, hashmark)
 /* Finish off the transfer.  Send out the EOT, and wait for an ACK.  */
 
 void
-xmodem_finish_xfer (desc)
-     serial_t desc;
+xmodem_finish_xfer (serial_t desc)
 {
   int retries;
 
@@ -263,7 +254,7 @@ xmodem_finish_xfer (desc)
     {
       int c;
 
-      SERIAL_WRITE (desc, "\004", 1); /* Send an EOT */
+      SERIAL_WRITE (desc, "\004", 1);	/* Send an EOT */
 
       c = readchar (desc, 3);
       switch (c)

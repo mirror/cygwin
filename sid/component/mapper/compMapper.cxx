@@ -152,7 +152,10 @@ public:
 	ds.write_byte (i, data.read_byte (i + slave_offset - master_offset));
 
       host_int_4 mapped_address = (address - r->low) >> (r->stride_shift - r->width_shift);
-      return r->accessor->write (mapped_address, ds);
+      
+      bus::status st = r->accessor->write (mapped_address, ds);
+      st.latency += target->latency;
+      return st;
     }
 
 
@@ -184,6 +187,8 @@ public:
       for (unsigned i=0; i<slave_size; i++)
 	data.write_byte (i, ds.read_byte (i + slave_offset - master_offset));
 
+      // Add on latency
+      s.latency += target->latency;
       return s;
     }
 
@@ -201,7 +206,9 @@ public:
 	  if (LIKELY(! r->use_strideoffset_p))
 	    {
 	      host_int_4 mapped_address = address - r->low;
-	      return r->accessor->write (mapped_address, data);
+	      bus::status st = r->accessor->write (mapped_address, data);
+	      st.latency += target->latency;
+	      return st;
 	    }
 
 	  // Order these alternatives by guess of frequency of use
@@ -245,7 +252,9 @@ public:
 	  if (LIKELY(! r->use_strideoffset_p))
 	    {
 	      host_int_4 mapped_address = address - r->low;
-	      return r->accessor->read (mapped_address, data);
+	      bus::status st = r->accessor->read (mapped_address, data);
+	      st.latency += target->latency;
+	      return st;
 	    }
 
 	  // Order these alternatives by guess of frequency of use
@@ -354,16 +363,21 @@ private:
 
   string get_hits (std::string entry);
   component::status set_hits (std::string entry, const std::string& value);
+
+  host_int_2 latency;
 };
 
 
 generic_mapper::generic_mapper ()
-  :my_bus (this)
+  :my_bus (this),
+   latency (0)
 {
   add_bus ("access-port", &this->my_bus);
   add_attribute_virtual ("state-snapshot", this,
 			 & generic_mapper::save_state,
 			 & generic_mapper::restore_state);
+
+  add_attribute ("latency", &latency, "setting");
 
   this->access_count = 0;
   add_attribute ("access-count", & this->access_count, "register");

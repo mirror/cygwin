@@ -1,5 +1,5 @@
 ; Application independent decoder support.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2004 Red Hat, Inc.
 ; This file is part of CGEN.
 ;
 ; This file provides utilities for building instruction set decoders.
@@ -433,30 +433,30 @@
   (letrec ((opcode (insn-value insn))
 	   (insn-len (insn-base-mask-length insn))
 	   (decode-len (length bitnums))
-	   (compute (lambda (val insn-len decode-len bl)
+	   (compute (lambda (val insn-len decode-len bl default)
 		      ;(display (list val insn-len decode-len bl)) (newline)
 		      ; Oh My God.  This isn't tail recursive.
 		      (if (null? bl)
 			  0
-			  (+ (if (> (car bl) insn-len)
-				 0
-				 (if (bit-set? val
-					       (if lsb0?
-						   (car bl)
-						   (- insn-len (car bl) 1)))
-				     (integer-expt 2 (- (length bl) 1))
-				     0))
-			     (compute val insn-len decode-len (cdr bl)))))))
-    (let* ((opcode (compute (insn-value insn) insn-len decode-len bitnums))
-	   (opcode-mask (compute (insn-base-mask insn) insn-len decode-len bitnums))
+			  (+ (if (or (and (>= (car bl) insn-len) (= default 1))
+				     (and (< (car bl) insn-len)
+					  (bit-set? val
+						    (if lsb0?
+							(car bl)
+							(- insn-len (car bl) 1)))))
+				 (integer-expt 2 (- (length bl) 1))
+				 0)
+			     (compute val insn-len decode-len (cdr bl) default))))))
+    (let* ((opcode (compute (insn-value insn) insn-len decode-len bitnums 0))
+	   (opcode-mask (compute (insn-base-mask insn) insn-len decode-len bitnums 1))
 	   (indices (missing-bit-indices opcode-mask (- (integer-expt 2 decode-len) 1))))
       (logit 3 "insn =" (obj:name insn)
-	     " insn-value=" (insn-value insn)
-	     " insn-base-mask=" (insn-base-mask insn)
+	     " insn-value=" (number->hex (insn-value insn))
+	     " insn-base-mask=" (number->hex (insn-base-mask insn))
 	     " insn-len=" insn-len
 	     " decode-len=" decode-len
-	     " opcode=" opcode
-	     " opcode-mask=" opcode-mask
+	     " opcode=" (number->hex opcode)
+	     " opcode-mask=" (number->hex opcode-mask)
 	     " indices=" indices "\n")
       (map (lambda (index) (+ opcode index)) indices)))
 )

@@ -527,6 +527,14 @@ static const CGEN_IBASE @arch@_cgen_insn_table[MAX_INSNS] =
 (define (-gen-cpu-open)
   (string-append
    "\
+static const CGEN_MACH * lookup_mach_via_bfd_name
+  PARAMS ((const CGEN_MACH *, const char *));
+static void build_hw_table  PARAMS ((CGEN_CPU_TABLE *));
+static void build_ifield_table  PARAMS ((CGEN_CPU_TABLE *));
+static void build_operand_table PARAMS ((CGEN_CPU_TABLE *));
+static void build_insn_table    PARAMS ((CGEN_CPU_TABLE *));
+static void @arch@_cgen_rebuild_tables PARAMS ((CGEN_CPU_TABLE *));
+
 /* Subroutine of @arch@_cgen_cpu_open to look up a mach via its bfd name.  */
 
 static const CGEN_MACH *
@@ -864,6 +872,7 @@ void
   (string-append
    "\
 /* Initialize anything needed to be done once, before any cpu_open call.  */
+static void init_tables PARAMS ((void));
 
 static void
 init_tables ()

@@ -1,5 +1,5 @@
 ; Assembler/disassembler support generator.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Assembler support.
@@ -8,6 +8,9 @@
   (logit 2 "Generating parse switch ...\n")
   (string-list
    "\
+const char * @arch@_cgen_parse_operand
+  PARAMS ((CGEN_CPU_DESC, int, const char **, CGEN_FIELDS *));
+
 /* Main entry point for operand parsing.
 
    This function is basically just a big switch statement.  Earlier versions
@@ -31,7 +34,7 @@ const char *
 {
   const char * errmsg = NULL;
   /* Used by scalar operands that still need to be parsed.  */
-  " (gen-ifield-default-type) " junk;
+  " (gen-ifield-default-type) " junk ATTRIBUTE_UNUSED;
 
   switch (opindex)
     {
@@ -97,6 +100,10 @@ void
   (logit 2 "Generating print switch ...\n")
   (string-list
    "\
+void @arch@_cgen_print_operand
+  PARAMS ((CGEN_CPU_DESC, int, PTR, CGEN_FIELDS *,
+           void const *, bfd_vma, int));
+
 /* Main entry point for printing operands.
    XINFO is a `void *' and not a `disassemble_info *' to not put a requirement
    of dis-asm.h on cgen.h.
@@ -119,7 +126,7 @@ void
      int opindex;
      PTR xinfo;
      CGEN_FIELDS *fields;
-     void const *attrs;
+     void const *attrs ATTRIBUTE_UNUSED;
      bfd_vma pc;
      int length;
 {

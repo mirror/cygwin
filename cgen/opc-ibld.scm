@@ -1,5 +1,5 @@
 ; Instruction builder support.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Instruction field support.
@@ -8,6 +8,11 @@
   (logit 2 "Generating field get switch ...\n")
   (string-list
    "\
+int @arch@_cgen_get_int_operand
+  PARAMS ((CGEN_CPU_DESC, int, const CGEN_FIELDS *));
+bfd_vma @arch@_cgen_get_vma_operand
+  PARAMS ((CGEN_CPU_DESC, int, const CGEN_FIELDS *));
+
 /* Getting values from cgen_fields is handled by a collection of functions.
    They are distinguished by the type of the VALUE argument they return.
    TODO: floating point, inlining support, remove cases where result type
@@ -15,7 +20,7 @@
 
 int
 @arch@_cgen_get_int_operand (cd, opindex, fields)
-     CGEN_CPU_DESC cd;
+     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
      int opindex;
      const CGEN_FIELDS * fields;
 {
@@ -38,7 +43,7 @@ int
 
 bfd_vma
 @arch@_cgen_get_vma_operand (cd, opindex, fields)
-     CGEN_CPU_DESC cd;
+     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
      int opindex;
      const CGEN_FIELDS * fields;
 {
@@ -65,6 +70,11 @@ bfd_vma
   (logit 2 "Generating field set switch ...\n")
   (string-list
    "\
+void @arch@_cgen_set_int_operand
+  PARAMS ((CGEN_CPU_DESC, int, CGEN_FIELDS *, int));
+void @arch@_cgen_set_vma_operand
+  PARAMS ((CGEN_CPU_DESC, int, CGEN_FIELDS *, bfd_vma));
+
 /* Stuffing values in cgen_fields is handled by a collection of functions.
    They are distinguished by the type of the VALUE argument they accept.
    TODO: floating point, inlining support, remove cases where argument type
@@ -72,7 +82,7 @@ bfd_vma
 
 void
 @arch@_cgen_set_int_operand (cd, opindex, fields, value)
-     CGEN_CPU_DESC cd;
+     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
      int opindex;
      CGEN_FIELDS * fields;
      int value;
@@ -92,7 +102,7 @@ void
 
 void
 @arch@_cgen_set_vma_operand (cd, opindex, fields, value)
-     CGEN_CPU_DESC cd;
+     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
      int opindex;
      CGEN_FIELDS * fields;
      bfd_vma value;
@@ -161,6 +171,9 @@ void
   (logit 2 "Generating insert switch ...\n")
   (string-list
    "\
+const char * @arch@_cgen_insert_operand
+  PARAMS ((CGEN_CPU_DESC, int, CGEN_FIELDS *, CGEN_INSN_BYTES_PTR, bfd_vma));
+
 /* Main entry point for operand insertion.
 
    This function is basically just a big switch statement.  Earlier versions
@@ -182,7 +195,7 @@ const char *
      int opindex;
      CGEN_FIELDS * fields;
      CGEN_INSN_BYTES_PTR buffer;
-     bfd_vma pc;
+     bfd_vma pc ATTRIBUTE_UNUSED;
 {
   const char * errmsg = NULL;
   unsigned int total_length = CGEN_FIELDS_BITSIZE (fields);
@@ -207,6 +220,10 @@ const char *
   (logit 2 "Generating extract switch ...\n")
   (string-list
    "\
+int @arch@_cgen_extract_operand
+  PARAMS ((CGEN_CPU_DESC, int, CGEN_EXTRACT_INFO *, CGEN_INSN_INT,
+           CGEN_FIELDS *, bfd_vma));
+
 /* Main entry point for operand extraction.
    The result is <= 0 for error, >0 for success.
    ??? Actual values aren't well defined right now.

@@ -10,6 +10,9 @@ This file is part of the Red Hat simulators.
 */
 
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "xstormy16.h"
 
 using namespace xstormy16; // FIXME: namespace organization still wip

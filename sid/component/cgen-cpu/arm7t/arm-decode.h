@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -11,11 +11,6 @@ This file is part of the Red Hat simulators.
 
 #ifndef ARM_DECODE_H
 #define ARM_DECODE_H
-
-namespace arm {
-// forward declaration of struct in -defs.h
-struct write_stacks;
-}
 
 namespace arm7f {
 
@@ -242,6 +237,8 @@ struct arm_scache {
 
   // argument buffer
   arm_sem_fields fields;
+
+
 
   // decode given instruction
   void decode (arm7f_cpu* current_cpu, PCADDR pc, arm_insn_word base_insn, arm_insn_word entire_insn);

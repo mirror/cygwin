@@ -1,3 +1,12 @@
+2003-07-05  Doug Evans  <dje@sebabeach.org>
+
+	* xstormy16-cpu.h: Regenerate.
+	* xstormy16-decode.cxx: Regenerate.
+	* xstormy16-decode.h: Regenerate.
+	* xstormy16-defs.h: Regenerate.
+	* xstormy16-desc.h: Regenerate.
+	* xstormy16-sem.cxx: Regenerate.
+
 2003-05-01  DJ Delorie  <dj@redhat.com>
 
 	* xstormy16-sem.cxx: Regenerate.

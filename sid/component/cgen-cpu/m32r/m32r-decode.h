@@ -2,9 +2,9 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
 
-This file is part of the Cygnus Simulators.
+This file is part of the Red Hat simulators.
 
 
 */
@@ -46,7 +46,6 @@ typedef enum m32rbf_insn_type {
  , M32RBF_INSN_ST_D, M32RBF_INSN_STB, M32RBF_INSN_STB_D, M32RBF_INSN_STH
  , M32RBF_INSN_STH_D, M32RBF_INSN_ST_PLUS, M32RBF_INSN_ST_MINUS, M32RBF_INSN_SUB
  , M32RBF_INSN_SUBV, M32RBF_INSN_SUBX, M32RBF_INSN_TRAP, M32RBF_INSN_UNLOCK
- , M32RBF_INSN_MAX
 } M32RBF_INSN_TYPE;
 
 

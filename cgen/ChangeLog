@@ -1,5 +1,143 @@
 2003-07-15  Doug Evans  <dje@sebabeach.org>
 
+	Add guile 1.6.4 support.
+	- empty list must be quoted
+	- string functions have stricter type checking
+	- eval now takes a second argument
+	- symbol-bound? is deprecated
+	* attr.scm (-attr-parse): Use stringsym-append to build errtxt.
+	(bitset-attr->list): Ensure arg to string-cut is a string.
+	(attr-parse): Ensure args to string-ref and string-drop1 are strings.
+	(<enum-attribute>,gen-value-for-defn): Fetch string name of self.
+	* cos.scm (-class-list): Must quote empty list.
+	(-class-parent-classes,-class-compute-class-desc): Ditto.
+	(class-make,make,object-reset!): Ditto.
+	(method-make-make!): Call eval1 instead of eval.
+	(method-make-forward!,method-make-virtual-forward!): Ditto.
+	* decode.scm (subdtable-add): Use stringsym-append instead of
+	string-append.
+	(-gen-exprtable-name): Fetch string name of exprtable-entry-insn.
+	(-build-decode-table-entry): Fetch string name of insn.
+	* desc-cpu.scm (-gen-isa-table-defns): Fetch string name of isa.
+	(-gen-mach-table-defns): Ditto for mach.
+	(gen-ifld-defns): Ditto for ifld.
+	(gen-hw-table-defns): Ditto for hw.
+	(gen-operand-table): Ditto for op.
+	(gen-insn-table-entry): Ditto for insn.
+	* desc.scm (gen-attr-table-defn): Ditto for attr.
+	(<keyword>,gen-defn): Don't pass symbols to string-append.
+	* enum.scm (parse-enum-vals): Use symbolstr-append instead of
+	symbol-append.
+	(enum-vals-upcase): Use symbol-upcase to build result.
+	(-enum-parse): Use stringsym-append to build errtxt.
+	* fixup.scm (*guile-major-version*,*guile-minor-version*): New globals.
+	(eval1): New function.
+	(symbol-bound?): Provide own version if >= guile 1.6.
+	* hardware.scm (define-keyword): Use string-append instead of
+	symbol-append.
+	* html.scm (gen-html-header,gen-table-of-contents,gen-arch-intro,
+	cgen.html,cgen-insn.html): Convert current-arch-name to a string
+	before using.
+	(gen-list-entry): Handle either symbol or string `name' arg.
+	(gen-obj-doc-header): Fetch string name of `o' arg.
+	(define-cpu-intro): Ditto for cpu.
+	(gen-mach-intro): Ditto for mach.
+	(gen-model-intro): Ditto for model.
+	(gen-isa-intro): Ditto for isa.
+	(gen-machine-doc-1): Ditto for isa.
+	(gen-reg-doc-1): Convert mach to string first.
+	(gen-insn-doc-1): Ditto.  Convert model/unit names to strings first.
+	(gen-insn-doc-list): Fetch string name of mach.  Convert insn name
+	to string first.
+	(gen-insn-categories): Fetch string name of mach.  Convert
+	enum-val-name to string first.
+	(gen-insn-docs): Fetch string name of mach.
+	* ifield.scm (ifld-ilk): Result is a string.
+	* iformat.scm (-ifmt-search-key): Convert attr value to string first.
+	Fetch string name of ifld.
+	(-sfmt-search-key): Similarily for ifld and op.
+	* insn.scm (syntax-make): Fetch string name of syntax element.
+	* mach.scm (-cpu-parse): Use stringsym-append to build errtxt.
+	* minsn.scm (minsn-make-alias): Fetch string name of minsn.
+	* mode.scm (mode:c-type): Result is a string.
+	(mode:enum): Fetch string name of mode.
+	(-mode-parse): Use stringsym-append to build errtxt.
+	* model.scm (model:enum): Fetch string name of model.
+	(-model-parse): Use stringsym-append to build errtxt.
+	(parse-insn-timing): Must quote empty list.
+	* opc-itab.scm (-gen-minsn-table-entry): Fetch string name of minsn.
+	(-gen-minsn-opcode-entry): Ditto.
+	* opcodes.scm (<operand>,gen-function-name): `what' arg is a symbol,
+	convert to string.
+	(read-cpu.opc): Convert current-arch-name to a string before using.
+	* operand.scm (<operand>,gen-pretty-name): Ensure `name' is a string.
+	(<derived-operand>): Must quote empty list.
+	(op-sort): Simplify, call alpha-sort-obj-list to do sort.
+	* pgmr-tools.scm (pgmr-pretty-print-insn-value): Fetch string name
+	of ifld.
+	* pmacros.scm (-pmacro-build-lambda): Use eval1 instead of eval.
+	(-pmacro-sym): Must convert symbols to strings before passing to
+	string-append.
+	(-pmacro-str): Ditto.
+	(pmacros-init!): Use eval1 instead of eval.
+	* read.scm (keep-mach-atlist?): Simplify, use bitset-attr->list.
+	(keep-isa-atlist?): Ditto.
+	(cmd-if): Use eval1 instead of eval.
+	* rtl-c.scm (<c-expr>,get-name): Fetch string name of self.
+	(-rtl-c-get): Fetch string name of src.
+	(s-unop): Ditto for mode.
+	(s-binop,s-binop-with-bit,s-shop,s-convop,s-cmpop): Ditto.
+	(-gen-par-temp-defns,subword): Ditto.
+	(join): Use stringsym-append instead of string-append.
+	* rtl-traverse.scm (rtx-option?): Convert option to string first.
+	(rtx-traverse-debug): Fetch string name of rtx-obj.
+	* rtl.scm (def-rtx-node): Use eval1 instead of eval.
+	(def-rtx-syntax-node,def-rtx-operand-node,def-rtx-macro-node): Ditto.
+	(rtx-pretty-name): Result is a string.
+	(-rtx-hw-name): Use symbolstr-append instead of symbol-append.
+	* semantics.scm (semantic-compile): Simplify, use alpha-sort-obj-list.
+	* sid-cpu.scm (cgen-write.cxx): Convert current-arch-name to a string
+	before using.
+	(-gen-sfrag-case): Fetch string name of user.
+	* sid-model.scm (unit:enum): Fetch string name of unit.
+	* sid.scm (<hw-memory>,cxmake-get): Fetch string name of mode.
+	(<hw-memory>,gen-set-quiet): Ditto.
+	(gen-mode-defs): Ditto.
+	(sim-finish!): Convert current-arch-name to a string before using.
+	* sim-cpu.scm (-gen-scache-semantic-fn): Fetch string name of insn.
+	(-gen-no-scache-semantic-fn): Ditto.
+	(cgen-defs.h): Fetch string name of isa.
+	(cgen-read.c): Convert current-arch-name to a string before using.
+	(cgen-write.c): Ditto.
+	* sim-model.scm (unit:enum): Fetch string name of unit.
+	(gen-model-fn-decls): Use stringsym-append instead of string-append.
+	(-gen-model-timing-table): Fetch string name of model.
+	(-gen-mach-model-table): Ditto.
+	(-gen-mach-defns): Fetch string name of mach.
+	* sim.scm (gen-reg-access-defn): Fetch string name of hw.
+	(<hw-memory>,cxmake-get): Fetch string name of mode.
+	(<hw-memory>,gen-set-quiet): Ditto.
+	(gen-mode-defs): Ditto.
+	(sim-finish!): Must quote empty list.
+	* utils-cgen.scm (<ident>): Must quote empty list.
+	(obj:str-name): New fn.
+	(parse-comment): Result is a string.
+	(parse-symbol): Result is a symbol.
+	(parse-string): Result is a string.
+	(keyword-list?): Convert arg to string before calling string-ref.
+	(keyword-list->arg-list): Ditto.
+	(gen-attr-name): Convert attr-name to string first.
+	(alpha-sort-obj-list): Use symbol<? instead of string<?.
+	* utils-gen.scm (attr-gen-decl): Fetch string name of attr.
+	(gen-define-ifmt-ifields): Ditto for fld.
+	* utils.scm (gen-c-symbol): Ensure str is a string before calling
+	map-over-string.
+	(gen-file-name): Ditto.
+	(symbol-downcase,symbol-upcase,symbol<?): New fns.
+	(stringsym-append,symbolstr-append,->string,->symbol): New fns.
+	(reduce): Call eval1 instead of eval.
+	* cpu/m32r.cpu (addi): Don't use `#.'.
+
 	* gen-all-sim: Fix some typos.
 
 2003-07-08  Doug Evans  <dje@sebabeach.org>

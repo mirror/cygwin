@@ -751,6 +751,10 @@ connect-bus gloss target-memory data-mapper access-port
   }
 
 
+if ($opt_cpu eq "arm")
+  {
+    $enable_z_packet = "true";
+  }
 
 
 # --engine

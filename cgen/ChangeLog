@@ -36,6 +36,10 @@
 	(Rb): Use h-Rb.
 	(holdx): New instruction.
 
+2002-01-09  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh64-compact.cpu (ldcl): Correct encoding for f-sub8 field.
+
 2002-01-07  Ben Elliston  <bje@redhat.com>
 
 	* utils.scm (package-cygnus-simulators): Rename from this ..
@@ -333,6 +337,31 @@
 	* doc/rtl.texi (Expressions): Document the (index-of ...) and
 	(regno ...) rtx.
 
+2001-01-11  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh64-media.cpu (fldp, fldxp): Fix semantics for loading
+	pairs.
+	(fstp, fstxp): Likewise for storing pairs.
+	
+	* cpu/sh.cpu (h-grc): Zero extend mask.
+	* cpu/sh64-media.cpu (f-uimm6): New field.
+	(uimm6): New operand.
+	(shari, sharil): Use it.
+	(shlli, shllil): Likewise.
+	(shlri, shlril): Likeiwse.
+
+2001-01-08  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh.cpu (h-pc): Define get and set methods. Set h-ism to the
+	least significant bit of the pc whenever the pc is altered.
+	(h-endian): Prohibit setting, via (error ..) in the set method.
+	(h-ism): Define get and set methods (prohibit setting).
+	* cpu/sh64-compact.cpu (bf): Do not set `ism' directly or mask the
+	least significant bit of the pc; just set the pc directly.
+	(bfs, bra, braf, bsr, bsrf, bt, bts, jmp, jsr, rts): Likewise.
+	* cpu/sh64-media.cpu (beq, beqi, bge, bgeu, bgt, bgtu): Likewise.
+	(blink, bne, bnei): Likewise.
+
 2001-01-08  Frank Ch. Eigler  <fche@redhat.com>
 
 	* operand.scm (<operand> pretty-sem-name): New field.
@@ -353,6 +382,12 @@
 2001-01-08  Frank Ch. Eigler  <fche@redhat.com>
 
 	* doc/rtl.texi: Deprecate and depreciate the decode-assist construct.
+
+2001-01-06  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh64-media.cpu (addl, addil): Infer mode from operand modes.
+	* cpu/sh.cpu (h-dr, get): Zero extend partial result.
+	(h-dr, set): Re-work.
 
 2001-01-06  Johan Rydberg  <jrydberg@opencores.org>
 
@@ -392,18 +427,99 @@
 	* openrisc.cpu: New file.
 	* openrisc.opc: Likewise.
 
+2001-01-04  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh64-compact.cpu (fcmpgt): Reverse order of operands.
+
+2001-01-03  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh64-compact.cpu (fmov5): Test transfer size in frm, not
+	frn.
+	(bf): Handle instruction set mode switches based on the pc.
+	(bfs, bra, braf, brk, bsrf, bt, bts, jmp, jsr, rts): Likewise.
+
+	* cpu/sh.cpu (h-cr): CR0 is an alias for the status register h-sr.
+
+2000-12-26  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh64-media.cpu (beq): Set instruction set mode (ism) based
+	on the least significant bit of the target address.
+	(beqi, bge, bgeu, bgt, bgtu, blink, bne, bnei): Likewise.
+	(ldxub): Use UQI mode for memory read.
+	(ldxuw): Likewise, use UHI mode.
+	(stxl): Use SI mode for (subword ..), not QI!
+
+2000-12-19  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh64-media.cpu (fldp): Remove unused local symbol.
+	(fldxp): Likewise.
+	(subl): Sign extend to DI, not SI.
+
+2000-12-15  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh64-compact.cpu (trapa): Call sh64_compact_trapa.
+
+	* cpu/sh64-media.cpu: Do not redundantly include "simplify.inc".
+	(f-8-2): Rename from f-8. Update throughout.
+	(f-imm6, f-imm10, f-imm16): Make fields signed.
+	(f-disp6, f-disp10): Likewise.
+	(f-uimm16): New field.
+	(f-disp16): Don't add/subtract 1 when computing value.
+	(uimm16): New operand.
+	(addl): Use correct subword index.
+	(addil): Likewise.
+	(addzl): Likewise. Zero extend result to 64 bits.
+	(-byterev-step): Enclose expressions in a sequence.
+	(fiprs): Rewrite semantics.
+	(fldp, fldxp): Likewise.
+	(fmovdq, fmovls, fmovqd, fmovsl): Implement semantics.
+	(ldl): Use disp10x4 operand.
+	(ldq): Use disp10x8 operand.
+	(ldw, lduw): Use disp10x2 operand.
+	(ldxl): Read an SI from memory, not HI.
+	(ldxuw, ldxw): Read an HI from memory, not SI.
+	(slice-byte): Use correct subword indices.
+	(slice-word, slice-word-unop): Likewise.
+	(slice-long, slice-long-unop): Likewise.
+	(all multimedia insns): Use (-join ..).
+	(make-mextr): Rename from erroneously named `make-mextrn'.
+	Simplify pmacro defintion.
+	(mpermw): Correct semantics.
+	(mulsl, mulul): Use correct subword indices.
+	(pta): Add one to target address.
+	(shardl, sharil): Use correct subword index.
+	(shlldl, shllil): Likewise.
+	(shlrdl, shlril): Likewise.
+	(shori): Use uimm16 operand.
+	(stb): Mask bottom 8 bits instead of using (subword ..).
+	(stl): Likewise for 32 bits.
+	(stw): Likewise for 16 bits.
+	(-sthi-byte): New pmacro.
+	(sthil): New instruction.
+	(sthiq): Likewise.
+	(stxb, stxl, stxw): Use correct register indices.
+	(subl): Likewise.
+
 2000-12-12  Ben Elliston  <bje@redhat.com>
 
 	* doc/rtl.texi (Expressions): Document the (delay ..) rtx.
 
+2000-12-11  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh.cpu (-slice-hi, -slice-si): Remove.
+	* cpu/sh64-compact.cpu: Apply changes for -join-si.
+
+2000-12-09  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh.cpu (-slice-hi): New pmacro.
+	(-slice-si): Likewise.
+	(-join-si): Rename from -join2.
+	(-join-hi): Rename from -join4.
+	(-join-qi): Rename from -join8.
+
 2000-12-08  Ben Elliston  <bje@redhat.com>
 
-	* dev.scm (load-sid): New function.
-	* cgen-sid.scm: New file.
-	* sid-cpu.scm: Likeiwse.
-	* sid-decode.scm: Likewise.
-	* sid-model.scm: Likewise.
-	* sid.scm: Likewise.
+	* cpu/sh.cpu (h-cr): Make non-virtual.
 
 2000-12-07  Ben Elliston  <bje@redhat.com>
 
@@ -423,9 +539,34 @@
 	* desc-cpu.scm (cgen-desc.h): Clarify generated filenames.
 	(cgen-desc.c): Likewise.
 
+2000-12-03  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh64-compact.cpu (braf, bsrf): Sign extend register value
+	for address computation.
+	(fcmpeq, fcmpgt): Helper C functions return BI.
+
 2000-12-01  Greg McGary  <greg@mcgary.org>
 
 	* desc.scm (<keyword>,gen-defn): Prepend prefix to keyword names.
+
+2000-12-01  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh64-compact.cpu (fvc-names): Remove.
+	(h-fvc): Name registers inline.
+	(h-macl, set): Use (-join2 ..), not (subword ..).
+	(h-mach, set): Likewise.
+	(f-8-1): Rename from f-8. Update all users.
+	(f-4, f-disp4): Remove.
+	(xdm, xdn): Likewise.
+	(dshci): Append "-compact" to instruction names.
+	(xd): New pmacro.
+	(cmpstr): Fix semantics.
+	(div1): Rewrite semantics.
+	(extd): New pmacro.
+	(fmov1 to fmov7): Rewrite semantics.
+	(negc): Fix semantics.
+	(rotl, rotr, rotcl, rotcr): Likewise.
+	(subc, subv): Likewise.
 
 2000-12-01  Ben Elliston  <bje@redhat.com>
 
@@ -433,6 +574,36 @@
 	definitions if run without with-multipla-isa?.
 	(cgen-defs.h): New function. Emit an ISA-specific defs file.
 	* cgen-sim.scm (sim-arguments): Accept -G option to generate defs.
+
+2000-11-29  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh.cpu (arch sh, machs): Add sh2, sh3, sh3e and sh4.
+	(mach sh2, mach sh3, mach sh3e, mach sh4): Define.
+	(mach sh5, bfd-name): Remove.
+	(h-gr): Avoid endian-sensitive `subword' rtx.
+	(h-dr): Clean up getter and setter expressions.
+	(h-endian): Make virtual. Define getter/setter expressions.
+	(-join2, -join4, -join8): New private pmacros.
+
+2000-11-24  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh.cpu (sh5 mach): Specify bfd-name.
+	(gr-names, dr-names): Remove. Specify in-line.
+	(-build-greg-name): New pmacro.
+	(h-gr): Use it.
+	(h-grc): Likewise.
+	(-build-creg-name): New pmacro.
+	(h-cr): Use it.
+	(-build-freg-name): New pmacro.
+	(h-fr): Use it.
+	(-build-fpair-name): New pmacro.
+	(h-fp): New hardware element.
+	(-build-fvec-name): New pmacro.
+	(h-fv): Use it.
+	(h-fmtx): Provide keyword names.
+	(-build-dreg-name): New pmacro.
+	(h-dr): Use it.
+	(h-tr): Provide keyword names.
 
 2000-11-24  Ben Elliston  <bje@redhat.com>
 
@@ -446,6 +617,23 @@
 	(option-init!): Initialise -with-multiple-isa?.
 	(option-set!): Handle with-multiple-isa option.
 
+2000-11-22  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh64-compact.cpu: Don't redundantly include "simplify.inc".
+	
+	* cpu/sh64-media.cpu (fpf): New operand.
+	(fldp, fldxp, fstp, fstxp): Fix semantics.
+	(ldloq, trapa): Fix typos in assembly syntax strings.
+
+2000-11-21  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh.cpu (h-dr): Fix getter and setter.
+	(ism): New operand.
+	(keep-isa?): Keep media.
+	* cpu/sh64-media.cpu (blink): Improve semantics.
+	(fstx): Eliminate use of (join ..).
+	* cpu/sh64-compact.cpu: Many semantic bug fixes.
+
 2000-11-21  Ben Elliston  <bje@redhat.com>
 
 	* utils.scm (copyright-fsf): Add the year 2000.
@@ -454,6 +642,15 @@
 
 	* opc-itab.scm (-gen-ifmt-table, -gen-macro-insn-table: Remove 
 	unneeded "\n\n" from F() macro definition.
+
+2000-11-16  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh-compact.cpu: Rename from this ..
+	* cpu/sh64-compact.cpu: .. to this.
+	* cpu/sh-media.cpu: Rename from this ..
+	* cpu/sh64-media.cpu: .. to this.
+	* cpu/sh.opc: New file.
+	* cpu/sh.cpu: Factor out some common hardware.
 
 2000-11-15  Greg McGary  <greg@mcgary.org>
 
@@ -622,6 +819,12 @@
 	(rtl-c-expr-parsed,rtl-c-expr): New fns.
 	(-rtl-c-get): Rename from rtl-c-get.
 	(rtl-c-get): New fn for getter logging.
+
+2000-08-09  Ben Elliston  <bje@redhat.com>
+
+	* cpu/sh.cpu: New file.
+	* cpu/sh-media.cpu: Likewise.
+	* cpu/sh-compact.cpu: Likewise.
 
 2000-07-28  Ben Elliston  <bje@redhat.com>
 

@@ -179,7 +179,7 @@ extern void breakpoint(void);
 
 static int  computeSignal(int);
 static void putpacket(unsigned char *);
-static void getpacket(unsigned char *);
+static unsigned char *getpacket(void);
 
 static unsigned char *mem2hex(unsigned char *, unsigned char *, int, int);
 static unsigned char *hex2mem(unsigned char *, unsigned char *, int, int);
@@ -189,6 +189,7 @@ static void stash_registers(void);
 static void restore_registers(void);
 static int  prepare_to_step(int);
 static int  finish_from_step(void);
+static unsigned long crc32 (unsigned char *, int, unsigned long);
 
 static void gdb_error(char *, char *);
 static int  gdb_putchar(int), gdb_puts(char *), gdb_write(char *, int);
@@ -203,7 +204,7 @@ static int   strlen (const unsigned char *);
 void 
 handle_exception(int exceptionVector)
 {
-  int    sigval;
+  int    sigval, stepping;
   int    addr, length, i;
   unsigned char * ptr;
   unsigned char   buf[16];
@@ -305,15 +306,16 @@ handle_exception(int exceptionVector)
 
   putpacket(remcomOutBuffer);
 
+  stepping = 0;
+
   while (1==1) {
     remcomOutBuffer[0] = 0;
-    getpacket(remcomInBuffer);
+    ptr = getpacket();
     binary = 0;
-    switch (remcomInBuffer[0]) {
+    switch (*ptr++) {
       default:	/* Unknown code.  Return an empty reply message. */
 	break;
       case 'R':
-	ptr = &remcomInBuffer[1];
 	if (hexToInt (&ptr, &addr))
 	  registers[PC] = addr;
 	strcpy(remcomOutBuffer, "OK");
@@ -326,7 +328,6 @@ handle_exception(int exceptionVector)
     case 'M': /* MAA..AA,LLLL: Write LLLL bytes at address AA.AA return OK */
       /* TRY TO READ '%x,%x:'.  IF SUCCEED, SET PTR = 0 */
       {
-        ptr = &remcomInBuffer[1];
         if (hexToInt(&ptr,&addr))
           if (*(ptr++) == ',')
             if (hexToInt(&ptr,&length))
@@ -348,14 +349,11 @@ handle_exception(int exceptionVector)
         if (ptr)
           {
             strcpy(remcomOutBuffer,"E02");
-            gdb_error("malformed write memory command: %s",
-                      remcomInBuffer);
           }
       }
 	break;
       case 'm': /* mAA..AA,LLLL  Read LLLL bytes at address AA..AA */
 		/* TRY TO READ %x,%x.  IF SUCCEED, SET PTR = 0 */
-	ptr = &remcomInBuffer[1];
 	if (hexToInt(&ptr,&addr))
 	  if (*(ptr++) == ',')
 	    if (hexToInt(&ptr,&length))
@@ -371,8 +369,6 @@ handle_exception(int exceptionVector)
 	if (ptr)
 	  {
 	    strcpy(remcomOutBuffer,"E01");
-	    gdb_error("malformed read memory command: %s",
-			remcomInBuffer);
 	  }
 	break;
       case '?': 
@@ -391,7 +387,6 @@ handle_exception(int exceptionVector)
 	{
 	  int regno;
 
-	  ptr = &remcomInBuffer[1];
 	  if (hexToInt (&ptr, &regno) && *ptr++ == '=')
 	    if (regno >= 0 && regno < NUMREGS)
 	      {
@@ -430,21 +425,21 @@ handle_exception(int exceptionVector)
 		strcpy (remcomOutBuffer, "OK");
 		break;
 	      }
-	  strcpy (remcomOutBuffer, "P01");
+	  strcpy (remcomOutBuffer, "E01");
 	  break;
 	}
       case 'G': /* set the value of the CPU registers - return OK */
-	hex2mem(&remcomInBuffer[1], (unsigned char*) registers, NUMREGBYTES, 0);
+	hex2mem(ptr, (unsigned char*) registers, NUMREGBYTES, 0);
 	strcpy(remcomOutBuffer,"OK");
 	break;
       case 's': /* sAA..AA	Step one instruction from AA..AA(optional) */
+	stepping = 1;
       case 'c': /* cAA..AA	Continue from address AA..AA(optional) */
 		/* try to read optional parameter, pc unchanged if no parm */
-	ptr = &remcomInBuffer[1];
 	if (hexToInt(&ptr,&addr))
 	  registers[ PC ] = addr;
 	
-	if (remcomInBuffer[0] == 's')	/* single-stepping */
+	if (stepping)	/* single-stepping */
 	  {
 	    if (!prepare_to_step(0))	/* set up for single-step */
 	      {
@@ -486,9 +481,11 @@ handle_exception(int exceptionVector)
 	    if ((registers[PC] & 2) != 0)
 	      prepare_to_step(1);
 	  }
+
 	return;
 
       case 'D':	/* Detach */
+#if 0
 	/* I am interpreting this to mean, release the board from control 
 	   by the remote stub.  To do this, I am restoring the original
 	   (or at least previous) exception vectors.
@@ -497,6 +494,31 @@ handle_exception(int exceptionVector)
 	  exceptionHandler (i, save_vectors[i]);
 	putpacket ("OK");
 	return;		/* continue the inferior */
+#else
+	strcpy(remcomOutBuffer,"OK");
+	break;
+#endif
+    case 'q':
+      if (*ptr++ == 'C' &&
+	  *ptr++ == 'R' &&
+	  *ptr++ == 'C' &&
+	  *ptr++ == ':')
+	{
+	  unsigned long start, len, our_crc;
+
+	  if (hexToInt (&ptr, (int *) &start) &&
+	      *ptr++ == ','                   &&
+	      hexToInt (&ptr, (int *) &len))
+	    {
+	      remcomOutBuffer[0] = 'C';
+	      our_crc = crc32 ((unsigned char *) start, len, 0xffffffff);
+	      mem2hex ((char *) &our_crc, 
+		       &remcomOutBuffer[1], 
+		       sizeof (long), 
+		       0); 
+	    } /* else do nothing */
+	} /* else do nothing */
+      break;
 
       case 'k': /* kill the program */
 	continue;
@@ -505,6 +527,39 @@ handle_exception(int exceptionVector)
     /* reply to the request */
     putpacket(remcomOutBuffer);
   }
+}
+
+/* qCRC support */
+
+/* Table used by the crc32 function to calcuate the checksum. */
+static unsigned long crc32_table[256] = {0, 0};
+
+static unsigned long
+crc32 (buf, len, crc)
+     unsigned char *buf;
+     int len;
+     unsigned long crc;
+{
+  if (! crc32_table[1])
+    {
+      /* Initialize the CRC table and the decoding table. */
+      int i, j;
+      unsigned long c;
+
+      for (i = 0; i < 256; i++)
+	{
+	  for (c = i << 24, j = 8; j > 0; --j)
+	    c = c & 0x80000000 ? (c << 1) ^ 0x04c11db7 : (c << 1);
+	  crc32_table[i] = c;
+	}
+    }
+
+  while (len--)
+    {
+      crc = (crc << 8) ^ crc32_table[((crc >> 24) ^ *buf) & 255];
+      buf++;
+    }
+  return crc;
 }
 
 static int 
@@ -519,65 +574,78 @@ hex(ch)
 
 /* scan for the sequence $<data>#<checksum>     */
 
-static void 
-getpacket(buffer)
-     unsigned char * buffer;
+unsigned char *
+getpacket ()
 {
+  unsigned char *buffer = &remcomInBuffer[0];
   unsigned char checksum;
   unsigned char xmitcsum;
-  int  i;
-  int  count;
-  unsigned char ch;
+  int count;
+  char ch;
 
-  do {
-    /* wait around for the start character, ignore all other characters */
-    while ((ch = getDebugChar()) != '$');
-    checksum = 0;
-    xmitcsum = -1;
+  while (1)
+    {
+      /* wait around for the start character, ignore all other characters */
+      while ((ch = getDebugChar ()) != '$')
+	;
 
-    count = 0;
+retry:
+      checksum = 0;
+      xmitcsum = -1;
+      count = 0;
 
-    /* now, read until a # or end of buffer is found */
-    while (count < BUFMAX) {
-      ch = getDebugChar();
-      
-      if (ch == '#' && (count == 0 || buffer[count-1] != 0x7d))
-        break;
-
-      checksum = checksum + ch;
-      buffer[count] = ch;
-      count = count + 1;
-      }
-    buffer[count] = 0;
-
-    if (ch == '#') {
-      xmitcsum = hex(getDebugChar()) << 4;
-      xmitcsum += hex(getDebugChar());
-      if (checksum != xmitcsum) {
-        if (remote_debug) {
-          unsigned char buf[16];
-
-          mem2hex((unsigned char *) &checksum, buf, 4, 0);
-          gdb_error("Bad checksum: my count = %s, ", buf);
-          mem2hex((unsigned char *) &xmitcsum, buf, 4, 0);
-          gdb_error("sent count = %s\n", buf);
-          gdb_error(" -- Bad buffer: \"%s\"\n", buffer); 
-        }
-
-        putDebugChar('-');  /* failed checksum */
-      } else {
-	putDebugChar('+');  /* successful transfer */
-	/* if a sequence char is present, reply the sequence ID */
-	if (buffer[2] == ':') {
-	  putDebugChar( buffer[0] );
-	  putDebugChar( buffer[1] );
-	  /* remove sequence chars from buffer */
-	  count = strlen(buffer);
-	  for (i=3; i <= count; i++) buffer[i-3] = buffer[i];
+      /* now, read until a # or end of buffer is found */
+      while (count < BUFMAX)
+	{
+	  ch = getDebugChar ();
+          if (ch == '$')
+	    goto retry;
+	  if (ch == '#')
+	    break;
+	  checksum = checksum + ch;
+	  buffer[count] = ch;
+	  count = count + 1;
 	}
-      }
+      buffer[count] = 0;
+
+      if (ch == '#')
+	{
+	  ch = getDebugChar ();
+	  xmitcsum = hex (ch) << 4;
+	  ch = getDebugChar ();
+	  xmitcsum += hex (ch);
+
+	  if (checksum != xmitcsum)
+	    {
+	      if (remote_debug)
+		{
+		  unsigned char buf[16];
+
+		  mem2hex((unsigned char *) &checksum, buf, 4, 0);
+		  gdb_error("Bad checksum: my count = %s, ", buf);
+		  mem2hex((unsigned char *) &xmitcsum, buf, 4, 0);
+		  gdb_error("sent count = %s\n", buf);
+		  gdb_error(" -- Bad buffer: \"%s\"\n", buffer); 
+		}
+	      putDebugChar ('-');	/* failed checksum */
+	    }
+	  else
+	    {
+	      putDebugChar ('+');	/* successful transfer */
+
+	      /* if a sequence char is present, reply the sequence ID */
+	      if (buffer[2] == ':')
+		{
+		  putDebugChar (buffer[0]);
+		  putDebugChar (buffer[1]);
+
+		  return &buffer[3];
+		}
+
+	      return &buffer[0];
+	    }
+	}
     }
-  } while (checksum != xmitcsum);
 }
 
 /* send the packet in buffer.  */
@@ -756,7 +824,7 @@ bin2mem (buf, mem, count, may_fault)
             case 0x4:  /* $ */
             case 0x5d: /* escape char */
               buf++;
-              *buf += 0x20;
+              *buf |= 0x20;
               break;
             default:
               /* nothing */
@@ -985,13 +1053,13 @@ branchDestination(instr, branchCode)
   case 2: 					/* JL or JMP */ 
     return registers[instr[1] & 0x0F] & ~3;	/* jump thru a register */ 
   case 3: 		/* BC, BNC, BL, BRA (short, 8-bit relative offset) */ 
-    return (((int) instr) & ~3) + ((unsigned char) instr[1] << 2);
+    return (((int) instr) & ~3) + ((char) instr[1] << 2);
   case 4: 		/* BC, BNC, BL, BRA (long, 24-bit relative offset) */ 
     return ((int) instr + 
-	    ((((unsigned char) instr[1] << 16) | (instr[2] << 8) | (instr[3])) << 2)); 
+	    ((((char) instr[1] << 16) | (instr[2] << 8) | (instr[3])) << 2)); 
   case 5: 		/* BNE, BEQ (16-bit relative offset) */ 
   case 6: 		/* BNEZ, BLTZ, BLEZ, BGTZ, BGEZ ,BEQZ (ditto) */ 
-    return ((int) instr + ((((unsigned char) instr[2] << 8) | (instr[3])) << 2)); 
+    return ((int) instr + ((((char) instr[2] << 8) | (instr[3])) << 2)); 
   }
 
   /* An explanatory note: in the last three return expressions, I have
@@ -1513,10 +1581,6 @@ set_debug_traps()
   exceptionHandler (15, _catchException15);
   exceptionHandler (16, _catchException16);
   /*  exceptionHandler (17, _catchException17); */
-
-  /* In case GDB is started before us, ack any packets (presumably
-     "$?#xx") sitting there.  */
-  putDebugChar ('+');
 
   initialized = 1;
 }

@@ -76,10 +76,21 @@ static char initScript[] = "if {[info proc tclInit]==\"\"} {\n\
 	if {[info exists env(TCL_LIBRARY)]} {\n\
 	    lappend dirs $env(TCL_LIBRARY)\n\
 	}\n\
-        # CYGNUS LOCAL: I've changed this alot.  Basically we only care about two cases,\n\
+        # CYGNUS LOCAL: I've changed this alot.  \n\
+        # Basically we only care about two cases,\n\
         # if we are installed, and if we are in the devo tree...\n\
         # The next few are for if we are installed:\n\
-	set parentDir [file dirname [file dirname [info nameofexecutable]]]\n\
+        # NB. We also want this to work if the user is actually\n\
+        # running a link and not the actual program.  So look for a\n\
+        # link and chase it down to its source.\n\
+        set execName [info nameofexecutable]\n\
+        if {[string compare [file type $execName] \"link\"] == 0} {\n\
+            set execName [file readlink $execName]\n\
+            if {[string compare [file pathtype $execName] \"relative\"] == 0} {\n\
+              set execName [file join [pwd] $execName]\n\
+            }\n\
+        }\n\
+	set parentDir [file dirname [file dirname $execName]]\n\
         lappend dirs [file join $parentDir share tcl$tcl_version]\n\
 	lappend dirs [file join [file dirname $parentDir] share tcl$tcl_version]\n\
         # NOW, let's try to find it in the build tree...\n\
@@ -92,7 +103,7 @@ static char initScript[] = "if {[info proc tclInit]==\"\"} {\n\
         lappend configDirs [file join [file dirname $parentDir] tcl$tcl_version $tcl_platform(platform)]\n\
         lappend configDirs [file join [file dirname $parentDir] tcl             $tcl_platform(platform)]\n\
         # This one gets tclsh...\n\
-        lappend configDirs [info nameofexecutable]\n\
+        lappend configDirs $execName \n\
         # This one is for gdb, and any other app which has its executible in the top directory.\n\
         lappend configDirs [file join $parentDir tcl$tcl_version $tcl_platform(platform)]\n\
         lappend configDirs [file join $parentDir tcl             $tcl_platform(platform)]\n\

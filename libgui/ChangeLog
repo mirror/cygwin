@@ -1,3 +1,7 @@
+2000-11-27  Tom Tromey  <tromey@cygnus.com>
+
+	* library/debug.tcl (logfile): Also recognize stderr.
+
 2000-07-12  Syd Polk  <spolk@redhat.com>
 
 	* library/Makefile.am: Only regenerate tclIndex and pkgIndex.tcl

@@ -40,13 +40,13 @@ namespace eval ::debug {
 
   proc logfile {file} {
     variable logfile
-    if {$logfile != "" && $logfile != "stdout"} {
+    if {$logfile != "" && $logfile != "stdout" && $logfile != "stderr"} {
       catch {close $logfile}
     }
     
     if {$file == ""} {
       set logfile ""
-    } elseif {$file == "stdout"} {
+    } elseif {$file == "stdout" || $file == "stderr"} {
       set logfile $file
     } else {
       set logfile [open $file w+]

@@ -12,6 +12,12 @@
 	* Makefile.docs: Support xsltproc; prefer it to sabcmd.
 	* docbuild.m4: Look for xsltproc.
 
+2001-07-10  matthew green  <mrg@redhat.com>
+	
+	* config.sub: Add xstormy16 support.
+	* info.tcl.in: Add xstormy16 support.
+	* sidtargets.m4: Add xstormy16 support.
+
 2001-07-05  graydon hoare  <graydon@redhat.com>
 
 	* Makefile.docs: Add.

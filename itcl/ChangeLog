@@ -1,3 +1,10 @@
+2002-09-04 Keith Seitz  <keiths@redhat.com> 
+
+	From Chris Drexler  <ckolumbus@users.sourceforge.net>:
+	* iwidgets3.0.0/doc/tk2html.perl:
+	Change hard coded path name of perl so that
+	rpm will not complain at install time.
+
 2002-08-06  Keith Seitz  <keiths@redhat.com>
 
 	From Mo Dejong  <supermo@bayarea.net>:

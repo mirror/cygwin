@@ -1,3 +1,9 @@
+2002-04-23  Ben Elliston  <bje@redhat.com>
+
+	* sidcpuutil.h (basic_cpu::update_trace_destination): Open trace
+	file in append mode.  Prefix trace session data with "start of
+	trace" text.
+
 2002-03-14  Ben Elliston  <bje@redhat.com>
 
 	* sidcpuutil.h (class basic_cpu): Add trace_filename member and a

@@ -1,3 +1,39 @@
+2002-12-03  Alan Modra  <amodra@bigpond.net.au>
+
+	* desc-cpu.scm (gen-maybe-multi-ifld): Remove superfluous parens.
+	Add braces and cast for union field.
+	(gen-multi-ifield-nodes): Add braces and cast for union field.
+	(cgen_operand_table): Similarly fix sentinel.
+	(cgen_cpu_close): Constify "insns".  Formatting.
+	(cgen-desc.c): Include xregex.h.
+	* cpu/ip2k.opc (ip2k_cgen_insn_supported): Move to opc.c section.
+	Prototype.
+	<opc.c>: Include safe-ctype.h.
+	(ip2k_asm_hash): Use ISSPACE and TOLOWER.
+	(PARSE_FUNC_DECL): Declare.  Use to prototype parse_fr, parse_addr16,
+	parse_addr16_p, parse_addr16_cjp, parse_lit8 and parse_bit3.
+	(parse_fr): Constify "old_strp".  Correct type of "tempvalue".
+	Don't test it for >= 0.  Use ISSPACE rather than isspace.  Formatting.
+	(parse_addr16): Correct type of "value".  Formatting.
+	(parse_addr16_p): Likewise.
+	(parse_addr16_cjp): Likewise.
+	(parse_lit8): Likewise.
+	(parse_bit3): Formatting.
+	(PRINT_FUNC_DECL): Define.  Use to prototype print_fr, print_dollarhex,
+	print_dollarhex8, print_dollarhex16, print_dollarhex_addr16h,
+	print_dollarhex_addr16l, print_dollarhex_p, print_dollarhex_cj and
+	print_decimal.
+	(print_fr): Add ATTRIBUTE_UNUSED on unused args.  Formatting.
+	(print_dollarhex): Add ATTRIBUTE_UNUSED on unused args.
+	(print_dollarhex8): Likewise.
+	(print_dollarhex16): Likewise.
+	(print_dollarhex_addr16h): Likewise.
+	(print_dollarhex_addr16l): Likewise.
+	(print_dollarhex_p): Likewise.
+	(print_dollarhex_cj): Likewise.
+	(print_decimal): Likewise.
+	* cpu/xstormy16.opc (parse_mem8): Use ISALNUM rather than isalnum.
+
 2002-11-30  Hans-Peter Nilsson  <hp@axis.com>
 
 	* doc/rtl.texi (Model variants): Mention current limitations for

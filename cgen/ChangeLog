@@ -1,3 +1,8 @@
+2005-04-04  Nick Clifton  <nickc@redhat.com>
+
+	* opcodes.scm (-gen-parse-address): Initialise value to zero to
+	avoid a compile time warning.
+
 2005-03-18  Nick Clifton  <nickc@redhat.com>
 
 	* cpu/ip2k.opc (parse_lit8): Change wording of error message to

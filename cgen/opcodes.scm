@@ -355,7 +355,7 @@
 (define (-gen-parse-address parse-fn op-enum result-var-name)
   (string-append
    "      {\n"
-   "        bfd_vma value;\n"
+   "        bfd_vma value = 0;\n"
    "        errmsg = "
    ; Use operand's special parse function if there is one.
    (or parse-fn

@@ -268,7 +268,14 @@
 (dnop imm12 "12 bit signed immediate" () h-sint f-imm12)
 
 (dnf f-imm16 "16 bit" (SIGN-OPT) 16 16)
-(dnop imm16 "16 bit immediate" () h-uint f-imm16)
+(define-operand
+  (name imm16)
+  (comment "16 bit immediate")
+  (attrs)
+  (type h-uint)
+  (index f-imm16) 
+  (handlers (parse "immediate16"))
+)
 
 (dnf f-lmem8  "8 bit unsigned low memory" (ABS-ADDR) 8 8)
 (define-operand 

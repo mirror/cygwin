@@ -1,3 +1,8 @@
+2003-02-06  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compSched.cxx (operator <<,>>): Clean up decls of these templates.
+	(apprx_host_time_keeper get_now): Warning cleanup.
+
 2002-03-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* compSched.cxx: Slight code movement for compiler bug tolerance.

@@ -6,11 +6,34 @@
 
 	* Makefile.am (check-local): Rename target from "checkme".
 
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sw-profile-gprof.xml: Add <?xml ... ?> prefix.
+
+2001-07-04  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add maintainer-mode doc building configury.
+	* configure: Regenerate.
+	* Makefile.am: Add maintainer-mode doc building.
+	* Makefile.in: Regenerate.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* sw-profile-gprof.txt: Generate.
+
+2001-06-27  graydon hoare  <graydon@redhat.com>
+
+	* sw-profile-gprof.xml: Add.
+
 2001-04-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* gprof.cxx (limit_min, limit_max): New variables/attributes.
 	(accumulate): Respect them.
 	* sw-profile-gprof.txt: Document them.
+
+2001-03-23  John Healy  <jhealy@redhat.com>
+
+	* Makefile.in: Regenerated.
 
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 

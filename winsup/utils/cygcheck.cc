@@ -33,7 +33,7 @@ typedef __int64 longlong;
 
 void dump_setup (int, char **, bool);
 
-static const char version[] = "$Revision: 1.24 $";
+static const char version[] = "$Revision: 1.25 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1240,7 +1240,7 @@ struct option longopts[] = {
   {"verbose", no_argument, NULL, 'v'},
   {"keycheck", no_argument, NULL, 'k'},
   {"help", no_argument, NULL, 'h'},
-  {"version", no_argument, 0, 'z'},
+  {"version", no_argument, 0, 'V'},
   {0, no_argument, NULL, 0}
 };
 

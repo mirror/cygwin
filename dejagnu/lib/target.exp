@@ -128,13 +128,9 @@ proc pop_host { } {
 proc prune_warnings { text } {
     global host_triplet;
 
-    # Remove the \r part of "\r\n" so we don't break all the patterns
+    # remove the \r part of "\r\n" so we don't break all the patterns
     # we want to match.
     regsub -all -- "\r" $text "" text
-
-    # Remove all location tags.
-    regsub -all "(^|\n)\[^\n\]*: In (function|member|method|constructor|instantiation|program|subroutine|block-data) \[^\n\]*" $text "" text
-    regsub -all "(^|\n)\[^\n\]*: At (top level|global scope):\[^\n\]*" $text "" text
 
     # This is from sun4's.  Do it for all machines for now.
     # The "\\1" is to try to preserve a "\n" but only if necessary.
@@ -270,9 +266,11 @@ proc prune_warnings { text } {
     regsub -all "(^|\n)(\[^\n\]*: warning: reference to compatibility glob\[^\n\]*\n?)" $text "\\1" text
 
     # GNU ld warns about functions marked as dangerous in GNU libc.
+    regsub -all "(^|\n)\[^\n\]*: In function\[^\n\]*\n\[^\n\]\[^\n\]*is dangerous\[^\n\]*" $text "" text
     regsub -all "(^|\n)\[^\n\]*is dangerous\[^\n\]*" $text "" text
 
     # Libgloss libnosys defines functions that warn when linked in
+    regsub -all "(^|\n)\[^\n\]*: In function\[^\n\]*\n\[^\n\]\[^\n\]*is not implemented and will always fail\[^\n\]*" $text "" text
     regsub -all "(^|\n)\[^\n\]*is not implemented and will always fail\[^\n\]*" $text "" text
 
     # libstdc++-v3 tests can emit cpplib warnings due to duplicate -isystem / -I flags

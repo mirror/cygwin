@@ -1,3 +1,8 @@
+1999-11-09  DJ Delorie  <dj@cygnus.com>
+
+	* cygwin/*: redone with automake for cygwin-specific info (from cgf)
+	to support cross-host builds
+
 1999-10-26  DJ Delorie  <dj@cygnus.com>
 
 	* cygwin/*: new; replicate unix/* setup (other modules look

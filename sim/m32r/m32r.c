@@ -39,6 +39,7 @@ m32r_decode_gdb_ctrl_regnum (int gdb_regnum)
       case BPC_REGNUM : return H_CR_BPC;
       case BBPSW_REGNUM : return H_CR_BBPSW;
       case BBPC_REGNUM : return H_CR_BBPC;
+      case EVB_REGNUM : return H_CR_CR5;
     }
   abort ();
 }
@@ -48,6 +49,8 @@ m32r_decode_gdb_ctrl_regnum (int gdb_regnum)
 int
 m32rbf_fetch_register (SIM_CPU *current_cpu, int rn, unsigned char *buf, int len)
 {
+  int mach = MACH_NUM (CPU_MACH (current_cpu));
+
   if (rn < 16)
     SETTWI (buf, a_m32r_h_gr_get (current_cpu, rn));
   else
@@ -60,17 +63,33 @@ m32rbf_fetch_register (SIM_CPU *current_cpu, int rn, unsigned char *buf, int len
       case BPC_REGNUM :
       case BBPSW_REGNUM :
       case BBPC_REGNUM :
+      case EVB_REGNUM :
 	SETTWI (buf, a_m32r_h_cr_get (current_cpu,
 				      m32r_decode_gdb_ctrl_regnum (rn)));
 	break;
       case PC_REGNUM :
-	SETTWI (buf, a_m32r_h_pc_get (current_cpu));
+	if (mach == MACH_M32R)
+	  SETTWI (buf, m32rbf_h_pc_get (current_cpu));
+	else if (mach == MACH_M32RX)
+	  SETTWI (buf, m32rxf_h_pc_get (current_cpu));
+	else
+	  SETTWI (buf, m32r2f_h_pc_get (current_cpu));
 	break;
       case ACCL_REGNUM :
-	SETTWI (buf, GETLODI (a_m32r_h_accum_get (current_cpu)));
+	if (mach == MACH_M32R)
+	  SETTWI (buf, GETLODI (m32rbf_h_accum_get (current_cpu)));
+	else if (mach == MACH_M32RX)
+	  SETTWI (buf, GETLODI (m32rxf_h_accum_get (current_cpu)));
+	else
+	  SETTWI (buf, GETLODI (m32r2f_h_accum_get (current_cpu)));
 	break;
       case ACCH_REGNUM :
-	SETTWI (buf, GETHIDI (a_m32r_h_accum_get (current_cpu)));
+	if (mach == MACH_M32R)
+	  SETTWI (buf, GETHIDI (m32rbf_h_accum_get (current_cpu)));
+	else if (mach == MACH_M32RX)
+	  SETTWI (buf, GETHIDI (m32rxf_h_accum_get (current_cpu)));
+	else
+	  SETTWI (buf, GETHIDI (m32r2f_h_accum_get (current_cpu)));
 	break;
       default :
 	return 0;
@@ -84,6 +103,8 @@ m32rbf_fetch_register (SIM_CPU *current_cpu, int rn, unsigned char *buf, int len
 int
 m32rbf_store_register (SIM_CPU *current_cpu, int rn, unsigned char *buf, int len)
 {
+  int mach = MACH_NUM (CPU_MACH (current_cpu));
+
   if (rn < 16)
     a_m32r_h_gr_set (current_cpu, rn, GETTWI (buf));
   else
@@ -96,25 +117,53 @@ m32rbf_store_register (SIM_CPU *current_cpu, int rn, unsigned char *buf, int len
       case BPC_REGNUM :
       case BBPSW_REGNUM :
       case BBPC_REGNUM :
+      case EVB_REGNUM :
 	a_m32r_h_cr_set (current_cpu,
 			 m32r_decode_gdb_ctrl_regnum (rn),
 			 GETTWI (buf));
 	break;
       case PC_REGNUM :
-	a_m32r_h_pc_set (current_cpu, GETTWI (buf));
+	if (mach == MACH_M32R)
+	  m32rbf_h_pc_set (current_cpu, GETTWI (buf));
+	else if (mach == MACH_M32RX)
+	  m32rxf_h_pc_set (current_cpu, GETTWI (buf));
+	else
+	  m32r2f_h_pc_set (current_cpu, GETTWI (buf));
 	break;
       case ACCL_REGNUM :
 	{
-	  DI val = a_m32r_h_accum_get (current_cpu);
+	  DI val;
+	  if (mach == MACH_M32R)
+	    val = m32rbf_h_accum_get (current_cpu);
+	  else if (mach == MACH_M32RX)
+	    val = m32rxf_h_accum_get (current_cpu);
+	  else
+	    val = m32r2f_h_accum_get (current_cpu);
 	  SETLODI (val, GETTWI (buf));
-	  a_m32r_h_accum_set (current_cpu, val);
+	  if (mach == MACH_M32R)
+	    m32rbf_h_accum_set (current_cpu, val);
+	  else if (mach == MACH_M32RX)
+	    m32rxf_h_accum_set (current_cpu, val);
+	  else
+	    m32r2f_h_accum_set (current_cpu, val);
 	  break;
 	}
       case ACCH_REGNUM :
 	{
-	  DI val = a_m32r_h_accum_get (current_cpu);
+	  DI val;
+	  if (mach == MACH_M32R)
+	    val = m32rbf_h_accum_get (current_cpu);
+	  else if (mach == MACH_M32RX)
+	    val = m32rxf_h_accum_get (current_cpu);
+	  else
+	    val = m32r2f_h_accum_get (current_cpu);
 	  SETHIDI (val, GETTWI (buf));
-	  a_m32r_h_accum_set (current_cpu, val);
+	  if (mach == MACH_M32R)
+	    m32rbf_h_accum_set (current_cpu, val);
+	  else if (mach == MACH_M32RX)
+	    m32rxf_h_accum_set (current_cpu, val);
+	  else
+	    m32r2f_h_accum_set (current_cpu, val);
 	  break;
 	}
       default :
@@ -122,6 +171,102 @@ m32rbf_store_register (SIM_CPU *current_cpu, int rn, unsigned char *buf, int len
       }
 
   return -1; /*FIXME*/
+}
+
+/* Cover fns for mach independent register accesses.  */
+
+SI
+a_m32r_h_gr_get (SIM_CPU *current_cpu, UINT regno)
+{
+  switch (MACH_NUM (CPU_MACH (current_cpu)))
+    {
+#ifdef HAVE_CPU_M32RBF
+    case MACH_M32R : 
+      return m32rbf_h_gr_get (current_cpu, regno);
+#endif
+#ifdef HAVE_CPU_M32RXF
+    case MACH_M32RX : 
+      return m32rxf_h_gr_get (current_cpu, regno);
+#endif
+#ifdef HAVE_CPU_M32R2F
+    case MACH_M32R2 : 
+      return m32r2f_h_gr_get (current_cpu, regno);
+#endif
+    default :
+      abort ();
+    }
+}
+
+void
+a_m32r_h_gr_set (SIM_CPU *current_cpu, UINT regno, SI newval)
+{
+  switch (MACH_NUM (CPU_MACH (current_cpu)))
+    {
+#ifdef HAVE_CPU_M32RBF
+    case MACH_M32R : 
+      m32rbf_h_gr_set (current_cpu, regno, newval);
+      break;
+#endif
+#ifdef HAVE_CPU_M32RXF
+    case MACH_M32RX : 
+      m32rxf_h_gr_set (current_cpu, regno, newval);
+      break;
+#endif
+#ifdef HAVE_CPU_M32RXF
+    case MACH_M32R2 : 
+      m32r2f_h_gr_set (current_cpu, regno, newval);
+      break;
+#endif
+    default :
+      abort ();
+    }
+}
+
+USI
+a_m32r_h_cr_get (SIM_CPU *current_cpu, UINT regno)
+{
+  switch (MACH_NUM (CPU_MACH (current_cpu)))
+    {
+#ifdef HAVE_CPU_M32RBF
+    case MACH_M32R : 
+      return m32rbf_h_cr_get (current_cpu, regno);
+#endif
+#ifdef HAVE_CPU_M32RXF
+    case MACH_M32RX : 
+      return m32rxf_h_cr_get (current_cpu, regno);
+#endif
+#ifdef HAVE_CPU_M32R2F
+    case MACH_M32R2 : 
+      return m32r2f_h_cr_get (current_cpu, regno);
+#endif
+    default :
+      abort ();
+    }
+}
+
+void
+a_m32r_h_cr_set (SIM_CPU *current_cpu, UINT regno, USI newval)
+{
+  switch (MACH_NUM (CPU_MACH (current_cpu)))
+    {
+#ifdef HAVE_CPU_M32RBF
+    case MACH_M32R : 
+      m32rbf_h_cr_set (current_cpu, regno, newval);
+      break;
+#endif
+#ifdef HAVE_CPU_M32RXF
+    case MACH_M32RX : 
+      m32rxf_h_cr_set (current_cpu, regno, newval);
+      break;
+#endif
+#ifdef HAVE_CPU_M32RXF
+    case MACH_M32R2 : 
+      m32r2f_h_cr_set (current_cpu, regno, newval);
+      break;
+#endif
+    default :
+      abort ();
+    }
 }
 
 USI

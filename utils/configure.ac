@@ -1,7 +1,9 @@
-AC_INIT([Makefile.in])
+AC_INIT
+AC_PREREQ([2.59])
+AC_CONFIG_SRCDIR([Makefile.in])
 
 AC_PROG_INSTALL
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 
 if test -d ${srcdir}/spu ; then
   configdirs="spu"
@@ -40,25 +42,26 @@ AC_SUBST([maintainer_clean_subdirs])
 
 case "${srcdir}" in
   [[\\/]]* | ?:[[\\/]]* ) # Absolute
-    abs_srcdir=${srcdir}
+    this_srcdir=${srcdir}
     ;;
   *) 
-    abs_srcdir="../${srcdir}"
+    this_srcdir="../${srcdir}"
     ;;
 esac
-AC_SUBST([abs_srcdir])
+AC_SUBST([this_srcdir])
 
 case "${cache_file}" in
   [[\\/]]* | ?:[[\\/]]* ) # Absolute
-    abs_cache_file=${cache_file}
+    this_cache_file=${cache_file}
     ;;
   *) 
-    abs_cache_file="../${cache_file}"
+    this_cache_file="../${cache_file}"
     ;;
 esac
 subconfigure_args=${ac_configure_args}
-subconfigure_args="${subconfigure_args} --cache-file=${abs_cache_file} --srcdir=${abs_srcdir}"
+subconfigure_args="${subconfigure_args} --cache-file=${this_cache_file} --srcdir=${this_srcdir}"
 AC_SUBST([subconfigure_args])
 
-AC_OUTPUT([Makefile])
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
 

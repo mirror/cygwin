@@ -30,7 +30,7 @@ mandir = @mandir@
 infodir = @infodir@
 includedir = @includedir@
 srcdir = @srcdir@
-abs_srcdir = @abs_srcdir@
+this_srcdir = @this_srcdir@
 
 man1dir = $(mandir)/man1
 man2dir = $(mandir)/man2
@@ -167,12 +167,12 @@ maintainer-clean-wince: configure-wince
 configure-spu: spu/Makefile
 spu/Makefile: config.status
 	test -d spu || mkdir spu ; \
-	cd spu && $(abs_srcdir)/spu/configure $(subconfigure_args)/spu
+	cd spu && $(this_srcdir)/spu/configure $(subconfigure_args)/spu
 .PHONY: configure-spu
 
 configure-wince: wince/Makefile
 wince/Makefile: config.status
 	test -d wince || mkdir wince ; \
-	cd wince && $(abs_srcdir)/wince/configure $(subconfigure_args)/wince
+	cd wince && $(this_srcdir)/wince/configure $(subconfigure_args)/wince
 .PHONY: configure-wince
 

@@ -1,3 +1,10 @@
+2004-08-08  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Update to autoconf 2.59, rename to...
+	* configure.ac: ...this.  Rename abs_* variables for accuracy.
+	* Makefile.tpl: Rename abs_srcdir for accuracy.
+	* Makefile.in, configure: Regenerate.
+
 2004-08-05  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* Remove misc/doschk -- users should get it from upstream at

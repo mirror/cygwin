@@ -83,7 +83,10 @@ enum regset
   FPREGS,
 
   /* Extended floating point register.  (Probably MMX, SSE, or Altivec...) */
-  FPXREGS
+  FPXREGS,
+
+  /* Other; not part of a regset.  Must be fetched by other means.  */
+  OTHERREGS
 };
 
 /* struct getregs_setregs_reginfo is used to construct register tables
@@ -135,6 +138,13 @@ struct peekuser_pokeuser_reginfo
 
   /* Size of field as required by gdb's remote protocol.  */
   int proto_size;
+
+  /* Some targets require the use of a different mechanism for fetching
+     the registers.   If this field is non-zero, that different method will
+     be used.  */
+  int (*alternate_register_read_write_method) (struct gdbserv *, int pid,
+                                               int regno, void *read_buf,
+					       const void *write_buf);
 };
 
 /* Obtain the offset of MEMBER from a struct of type TYPE.  */
@@ -429,41 +439,41 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
      gregset_t is used by the thread library in its interfaces.  Since
      we're concerned about the latter, we'll use the gregset_t offsets
      in the table below.  */
-  { 0,             4, GREGS,  0 * 4,  4, PROTO_SIZE },      /* zero */
-  { 1,             4, GREGS,  1 * 4,  4, PROTO_SIZE },      /* at */
-  { 2,             4, GREGS,  2 * 4,  4, PROTO_SIZE },      /* v0 */
-  { 3,             4, GREGS,  3 * 4,  4, PROTO_SIZE },      /* v1 */
-  { 4,             4, GREGS,  4 * 4,  4, PROTO_SIZE },      /* a0 */
-  { 5,             4, GREGS,  5 * 4,  4, PROTO_SIZE },      /* a1 */
-  { 6,             4, GREGS,  6 * 4,  4, PROTO_SIZE },      /* a2 */
-  { 7,             4, GREGS,  7 * 4,  4, PROTO_SIZE },      /* a3 */
-  { 8,             4, GREGS,  8 * 4,  4, PROTO_SIZE },      /* t0 */
-  { 9,             4, GREGS,  9 * 4,  4, PROTO_SIZE },      /* t1 */
-  { 10,            4, GREGS,  10 * 4, 4, PROTO_SIZE },      /* t2 */
-  { 11,            4, GREGS,  11 * 4, 4, PROTO_SIZE },      /* t3 */
-  { 12,            4, GREGS,  12 * 4, 4, PROTO_SIZE },      /* t4 */
-  { 13,            4, GREGS,  13 * 4, 4, PROTO_SIZE },      /* t5 */
-  { 14,            4, GREGS,  14 * 4, 4, PROTO_SIZE },      /* t6 */
-  { 15,            4, GREGS,  15 * 4, 4, PROTO_SIZE },      /* t7 */
-  { 16,            4, GREGS,  16 * 4, 4, PROTO_SIZE },      /* s0 */
-  { 17,            4, GREGS,  17 * 4, 4, PROTO_SIZE },      /* s1 */
-  { 18,            4, GREGS,  18 * 4, 4, PROTO_SIZE },      /* s2 */
-  { 19,            4, GREGS,  19 * 4, 4, PROTO_SIZE },      /* s3 */
-  { 20,            4, GREGS,  20 * 4, 4, PROTO_SIZE },      /* s4 */
-  { 21,            4, GREGS,  21 * 4, 4, PROTO_SIZE },      /* s5 */
-  { 22,            4, GREGS,  22 * 4, 4, PROTO_SIZE },      /* s6 */
-  { 23,            4, GREGS,  23 * 4, 4, PROTO_SIZE },      /* s7 */
-  { 24,            4, GREGS,  24 * 4, 4, PROTO_SIZE },      /* t8 */
-  { 25,            4, GREGS,  25 * 4, 4, PROTO_SIZE },      /* t9 */
-  { 26,            4, GREGS,  26 * 4, 4, PROTO_SIZE },      /* k0 */
-  { 27,            4, GREGS,  27 * 4, 4, PROTO_SIZE },      /* k1 */
-  { 28,            4, GREGS,  28 * 4, 4, PROTO_SIZE },      /* gp */
-  { 29,            4, GREGS,  29 * 4, 4, PROTO_SIZE },      /* sp */
-  { 30,            4, GREGS,  30 * 4, 4, PROTO_SIZE },      /* s8/fp */
-  { 31,            4, GREGS,  31 * 4, 4, PROTO_SIZE },      /* ra */
-  { 0,             4, NOREGS, 0,      4, PROTO_SIZE },      /* sr */
-  { MMLO,          4, GREGS,  33 * 4, 4, PROTO_SIZE },      /* lo */
-  { MMHI,          4, GREGS,  32 * 4, 4, PROTO_SIZE },      /* hi */
+  { 0,             4, GREGS,  0 * 4,  4, PROTO_SIZE, 0 },      /* zero */
+  { 1,             4, GREGS,  1 * 4,  4, PROTO_SIZE, 0 },      /* at */
+  { 2,             4, GREGS,  2 * 4,  4, PROTO_SIZE, 0 },      /* v0 */
+  { 3,             4, GREGS,  3 * 4,  4, PROTO_SIZE, 0 },      /* v1 */
+  { 4,             4, GREGS,  4 * 4,  4, PROTO_SIZE, 0 },      /* a0 */
+  { 5,             4, GREGS,  5 * 4,  4, PROTO_SIZE, 0 },      /* a1 */
+  { 6,             4, GREGS,  6 * 4,  4, PROTO_SIZE, 0 },      /* a2 */
+  { 7,             4, GREGS,  7 * 4,  4, PROTO_SIZE, 0 },      /* a3 */
+  { 8,             4, GREGS,  8 * 4,  4, PROTO_SIZE, 0 },      /* t0 */
+  { 9,             4, GREGS,  9 * 4,  4, PROTO_SIZE, 0 },      /* t1 */
+  { 10,            4, GREGS,  10 * 4, 4, PROTO_SIZE, 0 },      /* t2 */
+  { 11,            4, GREGS,  11 * 4, 4, PROTO_SIZE, 0 },      /* t3 */
+  { 12,            4, GREGS,  12 * 4, 4, PROTO_SIZE, 0 },      /* t4 */
+  { 13,            4, GREGS,  13 * 4, 4, PROTO_SIZE, 0 },      /* t5 */
+  { 14,            4, GREGS,  14 * 4, 4, PROTO_SIZE, 0 },      /* t6 */
+  { 15,            4, GREGS,  15 * 4, 4, PROTO_SIZE, 0 },      /* t7 */
+  { 16,            4, GREGS,  16 * 4, 4, PROTO_SIZE, 0 },      /* s0 */
+  { 17,            4, GREGS,  17 * 4, 4, PROTO_SIZE, 0 },      /* s1 */
+  { 18,            4, GREGS,  18 * 4, 4, PROTO_SIZE, 0 },      /* s2 */
+  { 19,            4, GREGS,  19 * 4, 4, PROTO_SIZE, 0 },      /* s3 */
+  { 20,            4, GREGS,  20 * 4, 4, PROTO_SIZE, 0 },      /* s4 */
+  { 21,            4, GREGS,  21 * 4, 4, PROTO_SIZE, 0 },      /* s5 */
+  { 22,            4, GREGS,  22 * 4, 4, PROTO_SIZE, 0 },      /* s6 */
+  { 23,            4, GREGS,  23 * 4, 4, PROTO_SIZE, 0 },      /* s7 */
+  { 24,            4, GREGS,  24 * 4, 4, PROTO_SIZE, 0 },      /* t8 */
+  { 25,            4, GREGS,  25 * 4, 4, PROTO_SIZE, 0 },      /* t9 */
+  { 26,            4, GREGS,  26 * 4, 4, PROTO_SIZE, 0 },      /* k0 */
+  { 27,            4, GREGS,  27 * 4, 4, PROTO_SIZE, 0 },      /* k1 */
+  { 28,            4, GREGS,  28 * 4, 4, PROTO_SIZE, 0 },      /* gp */
+  { 29,            4, GREGS,  29 * 4, 4, PROTO_SIZE, 0 },      /* sp */
+  { 30,            4, GREGS,  30 * 4, 4, PROTO_SIZE, 0 },      /* s8/fp */
+  { 31,            4, GREGS,  31 * 4, 4, PROTO_SIZE, 0 },      /* ra */
+  { 0,             4, NOREGS, 0,      4, PROTO_SIZE, 0 },      /* sr */
+  { MMLO,          4, GREGS,  33 * 4, 4, PROTO_SIZE, 0 },      /* lo */
+  { MMHI,          4, GREGS,  32 * 4, 4, PROTO_SIZE, 0 },      /* hi */
 
   /* glibc's ucontext.h doesn't specify the order of the following
      three registerss.  But there is space allocated for them.  (Well,
@@ -475,13 +485,13 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
 
 #if 0
   /* CAUSE and BADVADDR are readable via ptrace, but they're not writable.  */
-  { BADVADDR,      4, GREGS,  35 * 4, 4, PROTO_SIZE },      /* bad */
-  { CAUSE,         4, GREGS,  36 * 4, 4, PROTO_SIZE },      /* cause */
+  { BADVADDR,      4, GREGS,  35 * 4, 4, PROTO_SIZE, 0 },      /* bad */
+  { CAUSE,         4, GREGS,  36 * 4, 4, PROTO_SIZE, 0 },      /* cause */
 #else
-  { 0,             8, NOREGS, 0,      8, PROTO_SIZE },      /* bad */
-  { 0,             8, NOREGS, 0,      8, PROTO_SIZE },      /* cause */
+  { 0,             8, NOREGS, 0,      8, PROTO_SIZE, 0 },      /* bad */
+  { 0,             8, NOREGS, 0,      8, PROTO_SIZE, 0 },      /* cause */
 #endif
-  { PC,            4, GREGS,  34 * 4, 4, PROTO_SIZE },      /* pc */
+  { PC,            4, GREGS,  34 * 4, 4, PROTO_SIZE, 0 },      /* pc */
 
   /* Linux/MIPS floating point is a bit of a mess.  On the one hand,
      the elf_fpregset_t contains space for 32 doubles plus the control
@@ -490,42 +500,42 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
      16 double precision floats via ptrace().  It also means that only
      slightly more than half of elf_fpregset_t is unused.  */
 
-  { FPR_BASE + 0,  4, FPREGS, 0 * 4,  4, PROTO_SIZE },      /* $f0 */
-  { FPR_BASE + 1,  4, FPREGS, 1 * 4,  4, PROTO_SIZE },      /* $f1 */
-  { FPR_BASE + 2,  4, FPREGS, 2 * 4,  4, PROTO_SIZE },      /* $f2 */
-  { FPR_BASE + 3,  4, FPREGS, 3 * 4,  4, PROTO_SIZE },      /* $f3 */
-  { FPR_BASE + 4,  4, FPREGS, 4 * 4,  4, PROTO_SIZE },      /* $f4 */
-  { FPR_BASE + 5,  4, FPREGS, 5 * 4,  4, PROTO_SIZE },      /* $f5 */
-  { FPR_BASE + 6,  4, FPREGS, 6 * 4,  4, PROTO_SIZE },      /* $f6 */
-  { FPR_BASE + 7,  4, FPREGS, 7 * 4,  4, PROTO_SIZE },      /* $f7 */
-  { FPR_BASE + 8,  4, FPREGS, 8 * 4,  4, PROTO_SIZE },      /* $f8 */
-  { FPR_BASE + 9,  4, FPREGS, 9 * 4,  4, PROTO_SIZE },      /* $f9 */
-  { FPR_BASE + 10, 4, FPREGS, 10 * 4, 4, PROTO_SIZE },      /* $f10 */
-  { FPR_BASE + 11, 4, FPREGS, 11 * 4, 4, PROTO_SIZE },      /* $f11 */
-  { FPR_BASE + 12, 4, FPREGS, 12 * 4, 4, PROTO_SIZE },      /* $f12 */
-  { FPR_BASE + 13, 4, FPREGS, 13 * 4, 4, PROTO_SIZE },      /* $f13 */
-  { FPR_BASE + 14, 4, FPREGS, 14 * 4, 4, PROTO_SIZE },      /* $f14 */
-  { FPR_BASE + 15, 4, FPREGS, 15 * 4, 4, PROTO_SIZE },      /* $f15 */
-  { FPR_BASE + 16, 4, FPREGS, 16 * 4, 4, PROTO_SIZE },      /* $f16 */
-  { FPR_BASE + 17, 4, FPREGS, 17 * 4, 4, PROTO_SIZE },      /* $f17 */
-  { FPR_BASE + 18, 4, FPREGS, 18 * 4, 4, PROTO_SIZE },      /* $f18 */
-  { FPR_BASE + 19, 4, FPREGS, 19 * 4, 4, PROTO_SIZE },      /* $f19 */
-  { FPR_BASE + 20, 4, FPREGS, 20 * 4, 4, PROTO_SIZE },      /* $f20 */
-  { FPR_BASE + 21, 4, FPREGS, 21 * 4, 4, PROTO_SIZE },      /* $f21 */
-  { FPR_BASE + 22, 4, FPREGS, 22 * 4, 4, PROTO_SIZE },      /* $f22 */
-  { FPR_BASE + 23, 4, FPREGS, 23 * 4, 4, PROTO_SIZE },      /* $f23 */
-  { FPR_BASE + 24, 4, FPREGS, 24 * 4, 4, PROTO_SIZE },      /* $f24 */
-  { FPR_BASE + 25, 4, FPREGS, 25 * 4, 4, PROTO_SIZE },      /* $f25 */
-  { FPR_BASE + 26, 4, FPREGS, 26 * 4, 4, PROTO_SIZE },      /* $f26 */
-  { FPR_BASE + 27, 4, FPREGS, 27 * 4, 4, PROTO_SIZE },      /* $f27 */
-  { FPR_BASE + 28, 4, FPREGS, 28 * 4, 4, PROTO_SIZE },      /* $f28 */
-  { FPR_BASE + 29, 4, FPREGS, 29 * 4, 4, PROTO_SIZE },      /* $f29 */
-  { FPR_BASE + 30, 4, FPREGS, 30 * 4, 4, PROTO_SIZE },      /* $f30 */
-  { FPR_BASE + 31, 4, FPREGS, 31 * 4, 4, PROTO_SIZE },      /* $f31 */
-  { FPC_CSR,       4, FPREGS, 64 * 4, 4, PROTO_SIZE },      /* fsr */
+  { FPR_BASE + 0,  4, FPREGS, 0 * 4,  4, PROTO_SIZE, 0 },      /* $f0 */
+  { FPR_BASE + 1,  4, FPREGS, 1 * 4,  4, PROTO_SIZE, 0 },      /* $f1 */
+  { FPR_BASE + 2,  4, FPREGS, 2 * 4,  4, PROTO_SIZE, 0 },      /* $f2 */
+  { FPR_BASE + 3,  4, FPREGS, 3 * 4,  4, PROTO_SIZE, 0 },      /* $f3 */
+  { FPR_BASE + 4,  4, FPREGS, 4 * 4,  4, PROTO_SIZE, 0 },      /* $f4 */
+  { FPR_BASE + 5,  4, FPREGS, 5 * 4,  4, PROTO_SIZE, 0 },      /* $f5 */
+  { FPR_BASE + 6,  4, FPREGS, 6 * 4,  4, PROTO_SIZE, 0 },      /* $f6 */
+  { FPR_BASE + 7,  4, FPREGS, 7 * 4,  4, PROTO_SIZE, 0 },      /* $f7 */
+  { FPR_BASE + 8,  4, FPREGS, 8 * 4,  4, PROTO_SIZE, 0 },      /* $f8 */
+  { FPR_BASE + 9,  4, FPREGS, 9 * 4,  4, PROTO_SIZE, 0 },      /* $f9 */
+  { FPR_BASE + 10, 4, FPREGS, 10 * 4, 4, PROTO_SIZE, 0 },      /* $f10 */
+  { FPR_BASE + 11, 4, FPREGS, 11 * 4, 4, PROTO_SIZE, 0 },      /* $f11 */
+  { FPR_BASE + 12, 4, FPREGS, 12 * 4, 4, PROTO_SIZE, 0 },      /* $f12 */
+  { FPR_BASE + 13, 4, FPREGS, 13 * 4, 4, PROTO_SIZE, 0 },      /* $f13 */
+  { FPR_BASE + 14, 4, FPREGS, 14 * 4, 4, PROTO_SIZE, 0 },      /* $f14 */
+  { FPR_BASE + 15, 4, FPREGS, 15 * 4, 4, PROTO_SIZE, 0 },      /* $f15 */
+  { FPR_BASE + 16, 4, FPREGS, 16 * 4, 4, PROTO_SIZE, 0 },      /* $f16 */
+  { FPR_BASE + 17, 4, FPREGS, 17 * 4, 4, PROTO_SIZE, 0 },      /* $f17 */
+  { FPR_BASE + 18, 4, FPREGS, 18 * 4, 4, PROTO_SIZE, 0 },      /* $f18 */
+  { FPR_BASE + 19, 4, FPREGS, 19 * 4, 4, PROTO_SIZE, 0 },      /* $f19 */
+  { FPR_BASE + 20, 4, FPREGS, 20 * 4, 4, PROTO_SIZE, 0 },      /* $f20 */
+  { FPR_BASE + 21, 4, FPREGS, 21 * 4, 4, PROTO_SIZE, 0 },      /* $f21 */
+  { FPR_BASE + 22, 4, FPREGS, 22 * 4, 4, PROTO_SIZE, 0 },      /* $f22 */
+  { FPR_BASE + 23, 4, FPREGS, 23 * 4, 4, PROTO_SIZE, 0 },      /* $f23 */
+  { FPR_BASE + 24, 4, FPREGS, 24 * 4, 4, PROTO_SIZE, 0 },      /* $f24 */
+  { FPR_BASE + 25, 4, FPREGS, 25 * 4, 4, PROTO_SIZE, 0 },      /* $f25 */
+  { FPR_BASE + 26, 4, FPREGS, 26 * 4, 4, PROTO_SIZE, 0 },      /* $f26 */
+  { FPR_BASE + 27, 4, FPREGS, 27 * 4, 4, PROTO_SIZE, 0 },      /* $f27 */
+  { FPR_BASE + 28, 4, FPREGS, 28 * 4, 4, PROTO_SIZE, 0 },      /* $f28 */
+  { FPR_BASE + 29, 4, FPREGS, 29 * 4, 4, PROTO_SIZE, 0 },      /* $f29 */
+  { FPR_BASE + 30, 4, FPREGS, 30 * 4, 4, PROTO_SIZE, 0 },      /* $f30 */
+  { FPR_BASE + 31, 4, FPREGS, 31 * 4, 4, PROTO_SIZE, 0 },      /* $f31 */
+  { FPC_CSR,       4, FPREGS, 64 * 4, 4, PROTO_SIZE, 0 },      /* fsr */
   /* The "fir" value actually ends up occupying fp_pad in the fpregset
      struct.  */
-  { FPC_EIR,       4, FPREGS, 65 * 4, 4, PROTO_SIZE }       /* fir */
+  { FPC_EIR,       4, FPREGS, 65 * 4, 4, PROTO_SIZE, 0 }       /* fir */
 };
 
 static void mips_singlestep_program (struct gdbserv *serv);
@@ -552,41 +562,41 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
      gregset_t is used by the thread library in its interfaces.  Since
      we're concerned about the latter, we'll use the gregset_t offsets
      in the table below.  */
-  { 0,             8, GREGS,  0 * 8,  8, 8 },      /* zero */
-  { 1,             8, GREGS,  1 * 8,  8, 8 },      /* at */
-  { 2,             8, GREGS,  2 * 8,  8, 8 },      /* v0 */
-  { 3,             8, GREGS,  3 * 8,  8, 8 },      /* v1 */
-  { 4,             8, GREGS,  4 * 8,  8, 8 },      /* a0 */
-  { 5,             8, GREGS,  5 * 8,  8, 8 },      /* a1 */
-  { 6,             8, GREGS,  6 * 8,  8, 8 },      /* a2 */
-  { 7,             8, GREGS,  7 * 8,  8, 8 },      /* a3 */
-  { 8,             8, GREGS,  8 * 8,  8, 8 },      /* t0 */
-  { 9,             8, GREGS,  9 * 8,  8, 8 },      /* t1 */
-  { 10,            8, GREGS,  10 * 8, 8, 8 },      /* t2 */
-  { 11,            8, GREGS,  11 * 8, 8, 8 },      /* t3 */
-  { 12,            8, GREGS,  12 * 8, 8, 8 },      /* t4 */
-  { 13,            8, GREGS,  13 * 8, 8, 8 },      /* t5 */
-  { 14,            8, GREGS,  14 * 8, 8, 8 },      /* t6 */
-  { 15,            8, GREGS,  15 * 8, 8, 8 },      /* t7 */
-  { 16,            8, GREGS,  16 * 8, 8, 8 },      /* s0 */
-  { 17,            8, GREGS,  17 * 8, 8, 8 },      /* s1 */
-  { 18,            8, GREGS,  18 * 8, 8, 8 },      /* s2 */
-  { 19,            8, GREGS,  19 * 8, 8, 8 },      /* s3 */
-  { 20,            8, GREGS,  20 * 8, 8, 8 },      /* s4 */
-  { 21,            8, GREGS,  21 * 8, 8, 8 },      /* s5 */
-  { 22,            8, GREGS,  22 * 8, 8, 8 },      /* s6 */
-  { 23,            8, GREGS,  23 * 8, 8, 8 },      /* s7 */
-  { 24,            8, GREGS,  24 * 8, 8, 8 },      /* t8 */
-  { 25,            8, GREGS,  25 * 8, 8, 8 },      /* t9 */
-  { 26,            8, GREGS,  26 * 8, 8, 8 },      /* k0 */
-  { 27,            8, GREGS,  27 * 8, 8, 8 },      /* k1 */
-  { 28,            8, GREGS,  28 * 8, 8, 8 },      /* gp */
-  { 29,            8, GREGS,  29 * 8, 8, 8 },      /* sp */
-  { 30,            8, GREGS,  30 * 8, 8, 8 },      /* s8/fp */
-  { 31,            8, GREGS,  31 * 8, 8, 8 },      /* ra */
-  { 0,             8, NOREGS, 0,      8, 8 },      /* sr */
-  { 68,            8, GREGS,  33 * 8, 8, 8 },      /* lo */
-  { 67,            8, GREGS,  32 * 8, 8, 8 },      /* hi */
+  { 0,             8, GREGS,  0 * 8,  8, 8, 0 },      /* zero */
+  { 1,             8, GREGS,  1 * 8,  8, 8, 0 },      /* at */
+  { 2,             8, GREGS,  2 * 8,  8, 8, 0 },      /* v0 */
+  { 3,             8, GREGS,  3 * 8,  8, 8, 0 },      /* v1 */
+  { 4,             8, GREGS,  4 * 8,  8, 8, 0 },      /* a0 */
+  { 5,             8, GREGS,  5 * 8,  8, 8, 0 },      /* a1 */
+  { 6,             8, GREGS,  6 * 8,  8, 8, 0 },      /* a2 */
+  { 7,             8, GREGS,  7 * 8,  8, 8, 0 },      /* a3 */
+  { 8,             8, GREGS,  8 * 8,  8, 8, 0 },      /* t0 */
+  { 9,             8, GREGS,  9 * 8,  8, 8, 0 },      /* t1 */
+  { 10,            8, GREGS,  10 * 8, 8, 8, 0 },      /* t2 */
+  { 11,            8, GREGS,  11 * 8, 8, 8, 0 },      /* t3 */
+  { 12,            8, GREGS,  12 * 8, 8, 8, 0 },      /* t4 */
+  { 13,            8, GREGS,  13 * 8, 8, 8, 0 },      /* t5 */
+  { 14,            8, GREGS,  14 * 8, 8, 8, 0 },      /* t6 */
+  { 15,            8, GREGS,  15 * 8, 8, 8, 0 },      /* t7 */
+  { 16,            8, GREGS,  16 * 8, 8, 8, 0 },      /* s0 */
+  { 17,            8, GREGS,  17 * 8, 8, 8, 0 },      /* s1 */
+  { 18,            8, GREGS,  18 * 8, 8, 8, 0 },      /* s2 */
+  { 19,            8, GREGS,  19 * 8, 8, 8, 0 },      /* s3 */
+  { 20,            8, GREGS,  20 * 8, 8, 8, 0 },      /* s4 */
+  { 21,            8, GREGS,  21 * 8, 8, 8, 0 },      /* s5 */
+  { 22,            8, GREGS,  22 * 8, 8, 8, 0 },      /* s6 */
+  { 23,            8, GREGS,  23 * 8, 8, 8, 0 },      /* s7 */
+  { 24,            8, GREGS,  24 * 8, 8, 8, 0 },      /* t8 */
+  { 25,            8, GREGS,  25 * 8, 8, 8, 0 },      /* t9 */
+  { 26,            8, GREGS,  26 * 8, 8, 8, 0 },      /* k0 */
+  { 27,            8, GREGS,  27 * 8, 8, 8, 0 },      /* k1 */
+  { 28,            8, GREGS,  28 * 8, 8, 8, 0 },      /* gp */
+  { 29,            8, GREGS,  29 * 8, 8, 8, 0 },      /* sp */
+  { 30,            8, GREGS,  30 * 8, 8, 8, 0 },      /* s8/fp */
+  { 31,            8, GREGS,  31 * 8, 8, 8, 0 },      /* ra */
+  { 0,             8, NOREGS, 0,      8, 8, 0 },      /* sr */
+  { 68,            8, GREGS,  33 * 8, 8, 8, 0 },      /* lo */
+  { 67,            8, GREGS,  32 * 8, 8, 8, 0 },      /* hi */
 
   /* glibc's ucontext.h doesn't specify the order of the following
      three registerss.  But there is space allocated for them.  (Well,
@@ -598,13 +608,13 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
 
 #if 0
   /* CAUSE and BADVADDR are readable via ptrace, but they're not writable.  */
-  { 66,            8, GREGS,  35 * 8, 8, 8 },      /* bad */
-  { 65,            8, GREGS,  36 * 8, 8, 8 },      /* cause */
+  { 66,            8, GREGS,  35 * 8, 8, 8, 0 },      /* bad */
+  { 65,            8, GREGS,  36 * 8, 8, 8, 0 },      /* cause */
 #else
-  { 0,             8, NOREGS, 0,      8, 8 },      /* bad */
-  { 0,             8, NOREGS, 0,      8, 8 },      /* cause */
+  { 0,             8, NOREGS, 0,      8, 8, 0 },      /* bad */
+  { 0,             8, NOREGS, 0,      8, 8, 0 },      /* cause */
 #endif
-  { 64,            8, GREGS,  34 * 8, 8, 8 },      /* pc */
+  { 64,            8, GREGS,  34 * 8, 8, 8, 0 },      /* pc */
 
   /* Linux/MIPS floating point is a bit of a mess.  On the one hand,
      the elf_fpregset_t contains space for 32 doubles plus the control
@@ -613,42 +623,42 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
      16 double precision floats via ptrace().  It also means that only
      slightly more than half of elf_fpregset_t is unused.  */
 
-  { 32       + 0,  8, FPREGS, 0 * 8,  8, 8 },      /* $f0 */
-  { 32       + 1,  8, FPREGS, 1 * 8,  8, 8 },      /* $f1 */
-  { 32       + 2,  8, FPREGS, 2 * 8,  8, 8 },      /* $f2 */
-  { 32       + 3,  8, FPREGS, 3 * 8,  8, 8 },      /* $f3 */
-  { 32       + 4,  8, FPREGS, 4 * 8,  8, 8 },      /* $f4 */
-  { 32       + 5,  8, FPREGS, 5 * 8,  8, 8 },      /* $f5 */
-  { 32       + 6,  8, FPREGS, 6 * 8,  8, 8 },      /* $f6 */
-  { 32       + 7,  8, FPREGS, 7 * 8,  8, 8 },      /* $f7 */
-  { 32       + 8,  8, FPREGS, 8 * 8,  8, 8 },      /* $f8 */
-  { 32       + 9,  8, FPREGS, 9 * 8,  8, 8 },      /* $f9 */
-  { 32       + 10, 8, FPREGS, 10 * 8, 8, 8 },      /* $f10 */
-  { 32       + 11, 8, FPREGS, 11 * 8, 8, 8 },      /* $f11 */
-  { 32       + 12, 8, FPREGS, 12 * 8, 8, 8 },      /* $f12 */
-  { 32       + 13, 8, FPREGS, 13 * 8, 8, 8 },      /* $f13 */
-  { 32       + 14, 8, FPREGS, 14 * 8, 8, 8 },      /* $f14 */
-  { 32       + 15, 8, FPREGS, 15 * 8, 8, 8 },      /* $f15 */
-  { 32       + 16, 8, FPREGS, 16 * 8, 8, 8 },      /* $f16 */
-  { 32       + 17, 8, FPREGS, 17 * 8, 8, 8 },      /* $f17 */
-  { 32       + 18, 8, FPREGS, 18 * 8, 8, 8 },      /* $f18 */
-  { 32       + 19, 8, FPREGS, 19 * 8, 8, 8 },      /* $f19 */
-  { 32       + 20, 8, FPREGS, 20 * 8, 8, 8 },      /* $f20 */
-  { 32       + 21, 8, FPREGS, 21 * 8, 8, 8 },      /* $f21 */
-  { 32       + 22, 8, FPREGS, 22 * 8, 8, 8 },      /* $f22 */
-  { 32       + 23, 8, FPREGS, 23 * 8, 8, 8 },      /* $f23 */
-  { 32       + 24, 8, FPREGS, 24 * 8, 8, 8 },      /* $f24 */
-  { 32       + 25, 8, FPREGS, 25 * 8, 8, 8 },      /* $f25 */
-  { 32       + 26, 8, FPREGS, 26 * 8, 8, 8 },      /* $f26 */
-  { 32       + 27, 8, FPREGS, 27 * 8, 8, 8 },      /* $f27 */
-  { 32       + 28, 8, FPREGS, 28 * 8, 8, 8 },      /* $f28 */
-  { 32       + 29, 8, FPREGS, 29 * 8, 8, 8 },      /* $f29 */
-  { 32       + 30, 8, FPREGS, 30 * 8, 8, 8 },      /* $f30 */
-  { 32       + 31, 8, FPREGS, 31 * 8, 8, 8 },      /* $f31 */
-  { 69,            8, FPREGS, 32 * 8, 4, 8 },      /* fsr */
+  { 32       + 0,  8, FPREGS, 0 * 8,  8, 8, 0 },      /* $f0 */
+  { 32       + 1,  8, FPREGS, 1 * 8,  8, 8, 0 },      /* $f1 */
+  { 32       + 2,  8, FPREGS, 2 * 8,  8, 8, 0 },      /* $f2 */
+  { 32       + 3,  8, FPREGS, 3 * 8,  8, 8, 0 },      /* $f3 */
+  { 32       + 4,  8, FPREGS, 4 * 8,  8, 8, 0 },      /* $f4 */
+  { 32       + 5,  8, FPREGS, 5 * 8,  8, 8, 0 },      /* $f5 */
+  { 32       + 6,  8, FPREGS, 6 * 8,  8, 8, 0 },      /* $f6 */
+  { 32       + 7,  8, FPREGS, 7 * 8,  8, 8, 0 },      /* $f7 */
+  { 32       + 8,  8, FPREGS, 8 * 8,  8, 8, 0 },      /* $f8 */
+  { 32       + 9,  8, FPREGS, 9 * 8,  8, 8, 0 },      /* $f9 */
+  { 32       + 10, 8, FPREGS, 10 * 8, 8, 8, 0 },      /* $f10 */
+  { 32       + 11, 8, FPREGS, 11 * 8, 8, 8, 0 },      /* $f11 */
+  { 32       + 12, 8, FPREGS, 12 * 8, 8, 8, 0 },      /* $f12 */
+  { 32       + 13, 8, FPREGS, 13 * 8, 8, 8, 0 },      /* $f13 */
+  { 32       + 14, 8, FPREGS, 14 * 8, 8, 8, 0 },      /* $f14 */
+  { 32       + 15, 8, FPREGS, 15 * 8, 8, 8, 0 },      /* $f15 */
+  { 32       + 16, 8, FPREGS, 16 * 8, 8, 8, 0 },      /* $f16 */
+  { 32       + 17, 8, FPREGS, 17 * 8, 8, 8, 0 },      /* $f17 */
+  { 32       + 18, 8, FPREGS, 18 * 8, 8, 8, 0 },      /* $f18 */
+  { 32       + 19, 8, FPREGS, 19 * 8, 8, 8, 0 },      /* $f19 */
+  { 32       + 20, 8, FPREGS, 20 * 8, 8, 8, 0 },      /* $f20 */
+  { 32       + 21, 8, FPREGS, 21 * 8, 8, 8, 0 },      /* $f21 */
+  { 32       + 22, 8, FPREGS, 22 * 8, 8, 8, 0 },      /* $f22 */
+  { 32       + 23, 8, FPREGS, 23 * 8, 8, 8, 0 },      /* $f23 */
+  { 32       + 24, 8, FPREGS, 24 * 8, 8, 8, 0 },      /* $f24 */
+  { 32       + 25, 8, FPREGS, 25 * 8, 8, 8, 0 },      /* $f25 */
+  { 32       + 26, 8, FPREGS, 26 * 8, 8, 8, 0 },      /* $f26 */
+  { 32       + 27, 8, FPREGS, 27 * 8, 8, 8, 0 },      /* $f27 */
+  { 32       + 28, 8, FPREGS, 28 * 8, 8, 8, 0 },      /* $f28 */
+  { 32       + 29, 8, FPREGS, 29 * 8, 8, 8, 0 },      /* $f29 */
+  { 32       + 30, 8, FPREGS, 30 * 8, 8, 8, 0 },      /* $f30 */
+  { 32       + 31, 8, FPREGS, 31 * 8, 8, 8, 0 },      /* $f31 */
+  { 69,            8, FPREGS, 32 * 8, 4, 8, 0 },      /* fsr */
   /* The "fir" value actually ends up occupying fp_pad in the fpregset
      struct.  */
-  { 70,            8, FPREGS, 33 * 8 + 4, 4, 8}    /* fir */
+  { 70,            8, FPREGS, 33 * 8 + 4, 4, 8, 0 }    /* fir */
 };
 
 static void mips_singlestep_program (struct gdbserv *serv);
@@ -730,78 +740,78 @@ enum
 
 static struct peekuser_pokeuser_reginfo reginfo[] =
 {
-  { PT_R0 * 4,          4, GREGS,  PT_R0 * 4,  4, 4 },
-  { PT_R1 * 4,          4, GREGS,  PT_R1 * 4,  4, 4 },
-  { PT_R2 * 4,          4, GREGS,  PT_R2 * 4,  4, 4 },
-  { PT_R3 * 4,          4, GREGS,  PT_R3 * 4,  4, 4 },
-  { PT_R4 * 4,          4, GREGS,  PT_R4 * 4,  4, 4 },
-  { PT_R5 * 4,          4, GREGS,  PT_R5 * 4,  4, 4 },
-  { PT_R6 * 4,          4, GREGS,  PT_R6 * 4,  4, 4 },
-  { PT_R7 * 4,          4, GREGS,  PT_R7 * 4,  4, 4 },
-  { PT_R8 * 4,          4, GREGS,  PT_R8 * 4,  4, 4 },
-  { PT_R9 * 4,          4, GREGS,  PT_R9 * 4,  4, 4 },
-  { PT_R10 * 4,         4, GREGS,  PT_R10 * 4, 4, 4 },
-  { PT_R11 * 4,         4, GREGS,  PT_R11 * 4, 4, 4 },
-  { PT_R12 * 4,         4, GREGS,  PT_R12 * 4, 4, 4 },
-  { PT_R13 * 4,         4, GREGS,  PT_R13 * 4, 4, 4 },
-  { PT_R14 * 4,         4, GREGS,  PT_R14 * 4, 4, 4 },
-  { PT_R15 * 4,         4, GREGS,  PT_R15 * 4, 4, 4 },
-  { PT_R16 * 4,         4, GREGS,  PT_R16 * 4, 4, 4 },
-  { PT_R17 * 4,         4, GREGS,  PT_R17 * 4, 4, 4 },
-  { PT_R18 * 4,         4, GREGS,  PT_R18 * 4, 4, 4 },
-  { PT_R19 * 4,         4, GREGS,  PT_R19 * 4, 4, 4 },
-  { PT_R20 * 4,         4, GREGS,  PT_R20 * 4, 4, 4 },
-  { PT_R21 * 4,         4, GREGS,  PT_R21 * 4, 4, 4 },
-  { PT_R22 * 4,         4, GREGS,  PT_R22 * 4, 4, 4 },
-  { PT_R23 * 4,         4, GREGS,  PT_R23 * 4, 4, 4 },
-  { PT_R24 * 4,         4, GREGS,  PT_R24 * 4, 4, 4 },
-  { PT_R25 * 4,         4, GREGS,  PT_R25 * 4, 4, 4 },
-  { PT_R26 * 4,         4, GREGS,  PT_R26 * 4, 4, 4 },
-  { PT_R27 * 4,         4, GREGS,  PT_R27 * 4, 4, 4 },
-  { PT_R28 * 4,         4, GREGS,  PT_R28 * 4, 4, 4 },
-  { PT_R29 * 4,         4, GREGS,  PT_R29 * 4, 4, 4 },
-  { PT_R30 * 4,         4, GREGS,  PT_R30 * 4, 4, 4 },
-  { PT_R31 * 4,         4, GREGS,  PT_R31 * 4, 4, 4 },
-  { (PT_FPR0 + 0) * 4,  8, FPREGS, 0 * 4,      8, 8 },
-  { (PT_FPR0 + 2) * 4,  8, FPREGS, 2 * 4,      8, 8 },
-  { (PT_FPR0 + 4) * 4,  8, FPREGS, 4 * 4,      8, 8 },
-  { (PT_FPR0 + 6) * 4,  8, FPREGS, 6 * 4,      8, 8 },
-  { (PT_FPR0 + 8) * 4,  8, FPREGS, 8 * 4,      8, 8 },
-  { (PT_FPR0 + 10) * 4, 8, FPREGS, 10 * 4,     8, 8 },
-  { (PT_FPR0 + 12) * 4, 8, FPREGS, 12 * 4,     8, 8 },
-  { (PT_FPR0 + 14) * 4, 8, FPREGS, 14 * 4,     8, 8 },
-  { (PT_FPR0 + 16) * 4, 8, FPREGS, 16 * 4,     8, 8 },
-  { (PT_FPR0 + 18) * 4, 8, FPREGS, 18 * 4,     8, 8 },
-  { (PT_FPR0 + 20) * 4, 8, FPREGS, 20 * 4,     8, 8 },
-  { (PT_FPR0 + 22) * 4, 8, FPREGS, 22 * 4,     8, 8 },
-  { (PT_FPR0 + 24) * 4, 8, FPREGS, 24 * 4,     8, 8 },
-  { (PT_FPR0 + 26) * 4, 8, FPREGS, 26 * 4,     8, 8 },
-  { (PT_FPR0 + 28) * 4, 8, FPREGS, 28 * 4,     8, 8 },
-  { (PT_FPR0 + 30) * 4, 8, FPREGS, 30 * 4,     8, 8 },
-  { (PT_FPR0 + 32) * 4, 8, FPREGS, 32 * 4,     8, 8 },
-  { (PT_FPR0 + 34) * 4, 8, FPREGS, 34 * 4,     8, 8 },
-  { (PT_FPR0 + 36) * 4, 8, FPREGS, 36 * 4,     8, 8 },
-  { (PT_FPR0 + 38) * 4, 8, FPREGS, 38 * 4,     8, 8 },
-  { (PT_FPR0 + 40) * 4, 8, FPREGS, 40 * 4,     8, 8 },
-  { (PT_FPR0 + 42) * 4, 8, FPREGS, 42 * 4,     8, 8 },
-  { (PT_FPR0 + 44) * 4, 8, FPREGS, 44 * 4,     8, 8 },
-  { (PT_FPR0 + 46) * 4, 8, FPREGS, 46 * 4,     8, 8 },
-  { (PT_FPR0 + 48) * 4, 8, FPREGS, 48 * 4,     8, 8 },
-  { (PT_FPR0 + 50) * 4, 8, FPREGS, 50 * 4,     8, 8 },
-  { (PT_FPR0 + 52) * 4, 8, FPREGS, 52 * 4,     8, 8 },
-  { (PT_FPR0 + 54) * 4, 8, FPREGS, 54 * 4,     8, 8 },
-  { (PT_FPR0 + 56) * 4, 8, FPREGS, 56 * 4,     8, 8 },
-  { (PT_FPR0 + 58) * 4, 8, FPREGS, 58 * 4,     8, 8 },
-  { (PT_FPR0 + 60) * 4, 8, FPREGS, 60 * 4,     8, 8 },
-  { (PT_FPR0 + 62) * 4, 8, FPREGS, 62 * 4,     8, 8 },
-  { PT_NIP * 4,         4, GREGS,  PT_NIP * 4, 4, 4 },
-  { PT_MSR * 4,         4, GREGS,  PT_MSR * 4, 4, 4 },
-  { PT_CCR * 4,         4, GREGS,  PT_CCR * 4, 4, 4 },
-  { PT_LNK * 4,         4, GREGS,  PT_LNK * 4, 4, 4 },
-  { PT_CTR * 4,         4, GREGS,  PT_CTR * 4, 4, 4 },
-  { PT_XER * 4,         4, GREGS,  PT_XER * 4, 4, 4 }
+  { PT_R0 * 4,          4, GREGS,  PT_R0 * 4,  4, 4, 0 },
+  { PT_R1 * 4,          4, GREGS,  PT_R1 * 4,  4, 4, 0 },
+  { PT_R2 * 4,          4, GREGS,  PT_R2 * 4,  4, 4, 0 },
+  { PT_R3 * 4,          4, GREGS,  PT_R3 * 4,  4, 4, 0 },
+  { PT_R4 * 4,          4, GREGS,  PT_R4 * 4,  4, 4, 0 },
+  { PT_R5 * 4,          4, GREGS,  PT_R5 * 4,  4, 4, 0 },
+  { PT_R6 * 4,          4, GREGS,  PT_R6 * 4,  4, 4, 0 },
+  { PT_R7 * 4,          4, GREGS,  PT_R7 * 4,  4, 4, 0 },
+  { PT_R8 * 4,          4, GREGS,  PT_R8 * 4,  4, 4, 0 },
+  { PT_R9 * 4,          4, GREGS,  PT_R9 * 4,  4, 4, 0 },
+  { PT_R10 * 4,         4, GREGS,  PT_R10 * 4, 4, 4, 0 },
+  { PT_R11 * 4,         4, GREGS,  PT_R11 * 4, 4, 4, 0 },
+  { PT_R12 * 4,         4, GREGS,  PT_R12 * 4, 4, 4, 0 },
+  { PT_R13 * 4,         4, GREGS,  PT_R13 * 4, 4, 4, 0 },
+  { PT_R14 * 4,         4, GREGS,  PT_R14 * 4, 4, 4, 0 },
+  { PT_R15 * 4,         4, GREGS,  PT_R15 * 4, 4, 4, 0 },
+  { PT_R16 * 4,         4, GREGS,  PT_R16 * 4, 4, 4, 0 },
+  { PT_R17 * 4,         4, GREGS,  PT_R17 * 4, 4, 4, 0 },
+  { PT_R18 * 4,         4, GREGS,  PT_R18 * 4, 4, 4, 0 },
+  { PT_R19 * 4,         4, GREGS,  PT_R19 * 4, 4, 4, 0 },
+  { PT_R20 * 4,         4, GREGS,  PT_R20 * 4, 4, 4, 0 },
+  { PT_R21 * 4,         4, GREGS,  PT_R21 * 4, 4, 4, 0 },
+  { PT_R22 * 4,         4, GREGS,  PT_R22 * 4, 4, 4, 0 },
+  { PT_R23 * 4,         4, GREGS,  PT_R23 * 4, 4, 4, 0 },
+  { PT_R24 * 4,         4, GREGS,  PT_R24 * 4, 4, 4, 0 },
+  { PT_R25 * 4,         4, GREGS,  PT_R25 * 4, 4, 4, 0 },
+  { PT_R26 * 4,         4, GREGS,  PT_R26 * 4, 4, 4, 0 },
+  { PT_R27 * 4,         4, GREGS,  PT_R27 * 4, 4, 4, 0 },
+  { PT_R28 * 4,         4, GREGS,  PT_R28 * 4, 4, 4, 0 },
+  { PT_R29 * 4,         4, GREGS,  PT_R29 * 4, 4, 4, 0 },
+  { PT_R30 * 4,         4, GREGS,  PT_R30 * 4, 4, 4, 0 },
+  { PT_R31 * 4,         4, GREGS,  PT_R31 * 4, 4, 4, 0 },
+  { (PT_FPR0 + 0) * 4,  8, FPREGS, 0 * 4,      8, 8, 0 },
+  { (PT_FPR0 + 2) * 4,  8, FPREGS, 2 * 4,      8, 8, 0 },
+  { (PT_FPR0 + 4) * 4,  8, FPREGS, 4 * 4,      8, 8, 0 },
+  { (PT_FPR0 + 6) * 4,  8, FPREGS, 6 * 4,      8, 8, 0 },
+  { (PT_FPR0 + 8) * 4,  8, FPREGS, 8 * 4,      8, 8, 0 },
+  { (PT_FPR0 + 10) * 4, 8, FPREGS, 10 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 12) * 4, 8, FPREGS, 12 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 14) * 4, 8, FPREGS, 14 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 16) * 4, 8, FPREGS, 16 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 18) * 4, 8, FPREGS, 18 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 20) * 4, 8, FPREGS, 20 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 22) * 4, 8, FPREGS, 22 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 24) * 4, 8, FPREGS, 24 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 26) * 4, 8, FPREGS, 26 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 28) * 4, 8, FPREGS, 28 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 30) * 4, 8, FPREGS, 30 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 32) * 4, 8, FPREGS, 32 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 34) * 4, 8, FPREGS, 34 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 36) * 4, 8, FPREGS, 36 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 38) * 4, 8, FPREGS, 38 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 40) * 4, 8, FPREGS, 40 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 42) * 4, 8, FPREGS, 42 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 44) * 4, 8, FPREGS, 44 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 46) * 4, 8, FPREGS, 46 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 48) * 4, 8, FPREGS, 48 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 50) * 4, 8, FPREGS, 50 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 52) * 4, 8, FPREGS, 52 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 54) * 4, 8, FPREGS, 54 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 56) * 4, 8, FPREGS, 56 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 58) * 4, 8, FPREGS, 58 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 60) * 4, 8, FPREGS, 60 * 4,     8, 8, 0 },
+  { (PT_FPR0 + 62) * 4, 8, FPREGS, 62 * 4,     8, 8, 0 },
+  { PT_NIP * 4,         4, GREGS,  PT_NIP * 4, 4, 4, 0 },
+  { PT_MSR * 4,         4, GREGS,  PT_MSR * 4, 4, 4, 0 },
+  { PT_CCR * 4,         4, GREGS,  PT_CCR * 4, 4, 4, 0 },
+  { PT_LNK * 4,         4, GREGS,  PT_LNK * 4, 4, 4, 0 },
+  { PT_CTR * 4,         4, GREGS,  PT_CTR * 4, 4, 4, 0 },
+  { PT_XER * 4,         4, GREGS,  PT_XER * 4, 4, 4, 0 }
 #ifdef PT_MQ
-, { PT_MQ * 4,          4, GREGS,  PT_MQ * 4,  4, 4 }
+, { PT_MQ * 4,          4, GREGS,  PT_MQ * 4,  4, 4, 0 }
 #endif
 };
 
@@ -874,176 +884,214 @@ enum
 #define fpreg_offset_and_size(FIELD) FPREGS, offsetof (struct user_fpmedia_regs, FIELD), fieldsize (struct user_fpmedia_regs, FIELD)
 #define noreg_offset_and_size(FIELD) NOREGS, 0, 0
 
+static int frv_fdpic_loadmap_addresses (struct gdbserv *, int, int, void *,
+                                        const void *);
+
 static struct peekuser_pokeuser_reginfo reginfo[] =
 {
-  { PT_GR(0) * 4,   4, greg_offset_and_size (gr[0]),   4 },
-  { PT_GR(1) * 4,   4, greg_offset_and_size (gr[1]),   4 },
-  { PT_GR(2) * 4,   4, greg_offset_and_size (gr[2]),   4 },
-  { PT_GR(3) * 4,   4, greg_offset_and_size (gr[3]),   4 },
-  { PT_GR(4) * 4,   4, greg_offset_and_size (gr[4]),   4 },
-  { PT_GR(5) * 4,   4, greg_offset_and_size (gr[5]),   4 },
-  { PT_GR(6) * 4,   4, greg_offset_and_size (gr[6]),   4 },
-  { PT_GR(7) * 4,   4, greg_offset_and_size (gr[7]),   4 },
-  { PT_GR(8) * 4,   4, greg_offset_and_size (gr[8]),   4 },
-  { PT_GR(9) * 4,   4, greg_offset_and_size (gr[9]),   4 },
-  { PT_GR(10) * 4,  4, greg_offset_and_size (gr[10]),  4 },
-  { PT_GR(11) * 4,  4, greg_offset_and_size (gr[11]),  4 },
-  { PT_GR(12) * 4,  4, greg_offset_and_size (gr[12]),  4 },
-  { PT_GR(13) * 4,  4, greg_offset_and_size (gr[13]),  4 },
-  { PT_GR(14) * 4,  4, greg_offset_and_size (gr[14]),  4 },
-  { PT_GR(15) * 4,  4, greg_offset_and_size (gr[15]),  4 },
-  { PT_GR(16) * 4,  4, greg_offset_and_size (gr[16]),  4 },
-  { PT_GR(17) * 4,  4, greg_offset_and_size (gr[17]),  4 },
-  { PT_GR(18) * 4,  4, greg_offset_and_size (gr[18]),  4 },
-  { PT_GR(19) * 4,  4, greg_offset_and_size (gr[19]),  4 },
-  { PT_GR(20) * 4,  4, greg_offset_and_size (gr[20]),  4 },
-  { PT_GR(21) * 4,  4, greg_offset_and_size (gr[21]),  4 },
-  { PT_GR(22) * 4,  4, greg_offset_and_size (gr[22]),  4 },
-  { PT_GR(23) * 4,  4, greg_offset_and_size (gr[23]),  4 },
-  { PT_GR(24) * 4,  4, greg_offset_and_size (gr[24]),  4 },
-  { PT_GR(25) * 4,  4, greg_offset_and_size (gr[25]),  4 },
-  { PT_GR(26) * 4,  4, greg_offset_and_size (gr[26]),  4 },
-  { PT_GR(27) * 4,  4, greg_offset_and_size (gr[27]),  4 },
-  { PT_GR(28) * 4,  4, greg_offset_and_size (gr[28]),  4 },
-  { PT_GR(29) * 4,  4, greg_offset_and_size (gr[29]),  4 },
-  { PT_GR(30) * 4,  4, greg_offset_and_size (gr[30]),  4 },
-  { PT_GR(31) * 4,  4, greg_offset_and_size (gr[31]),  4 },
-  { PT_GR(32) * 4,  4, greg_offset_and_size (gr[32]),  4 },
-  { PT_GR(33) * 4,  4, greg_offset_and_size (gr[33]),  4 },
-  { PT_GR(34) * 4,  4, greg_offset_and_size (gr[34]),  4 },
-  { PT_GR(35) * 4,  4, greg_offset_and_size (gr[35]),  4 },
-  { PT_GR(36) * 4,  4, greg_offset_and_size (gr[36]),  4 },
-  { PT_GR(37) * 4,  4, greg_offset_and_size (gr[37]),  4 },
-  { PT_GR(38) * 4,  4, greg_offset_and_size (gr[38]),  4 },
-  { PT_GR(39) * 4,  4, greg_offset_and_size (gr[39]),  4 },
-  { PT_GR(40) * 4,  4, greg_offset_and_size (gr[40]),  4 },
-  { PT_GR(41) * 4,  4, greg_offset_and_size (gr[41]),  4 },
-  { PT_GR(42) * 4,  4, greg_offset_and_size (gr[42]),  4 },
-  { PT_GR(43) * 4,  4, greg_offset_and_size (gr[43]),  4 },
-  { PT_GR(44) * 4,  4, greg_offset_and_size (gr[44]),  4 },
-  { PT_GR(45) * 4,  4, greg_offset_and_size (gr[45]),  4 },
-  { PT_GR(46) * 4,  4, greg_offset_and_size (gr[46]),  4 },
-  { PT_GR(47) * 4,  4, greg_offset_and_size (gr[47]),  4 },
-  { PT_GR(48) * 4,  4, greg_offset_and_size (gr[48]),  4 },
-  { PT_GR(49) * 4,  4, greg_offset_and_size (gr[49]),  4 },
-  { PT_GR(50) * 4,  4, greg_offset_and_size (gr[50]),  4 },
-  { PT_GR(51) * 4,  4, greg_offset_and_size (gr[51]),  4 },
-  { PT_GR(52) * 4,  4, greg_offset_and_size (gr[52]),  4 },
-  { PT_GR(53) * 4,  4, greg_offset_and_size (gr[53]),  4 },
-  { PT_GR(54) * 4,  4, greg_offset_and_size (gr[54]),  4 },
-  { PT_GR(55) * 4,  4, greg_offset_and_size (gr[55]),  4 },
-  { PT_GR(56) * 4,  4, greg_offset_and_size (gr[56]),  4 },
-  { PT_GR(57) * 4,  4, greg_offset_and_size (gr[57]),  4 },
-  { PT_GR(58) * 4,  4, greg_offset_and_size (gr[58]),  4 },
-  { PT_GR(59) * 4,  4, greg_offset_and_size (gr[59]),  4 },
-  { PT_GR(60) * 4,  4, greg_offset_and_size (gr[60]),  4 },
-  { PT_GR(61) * 4,  4, greg_offset_and_size (gr[61]),  4 },
-  { PT_GR(62) * 4,  4, greg_offset_and_size (gr[62]),  4 },
-  { PT_GR(63) * 4,  4, greg_offset_and_size (gr[63]),  4 },
+  { PT_GR(0) * 4,   4, greg_offset_and_size (gr[0]),   4, 0 },
+  { PT_GR(1) * 4,   4, greg_offset_and_size (gr[1]),   4, 0 },
+  { PT_GR(2) * 4,   4, greg_offset_and_size (gr[2]),   4, 0 },
+  { PT_GR(3) * 4,   4, greg_offset_and_size (gr[3]),   4, 0 },
+  { PT_GR(4) * 4,   4, greg_offset_and_size (gr[4]),   4, 0 },
+  { PT_GR(5) * 4,   4, greg_offset_and_size (gr[5]),   4, 0 },
+  { PT_GR(6) * 4,   4, greg_offset_and_size (gr[6]),   4, 0 },
+  { PT_GR(7) * 4,   4, greg_offset_and_size (gr[7]),   4, 0 },
+  { PT_GR(8) * 4,   4, greg_offset_and_size (gr[8]),   4, 0 },
+  { PT_GR(9) * 4,   4, greg_offset_and_size (gr[9]),   4, 0 },
+  { PT_GR(10) * 4,  4, greg_offset_and_size (gr[10]),  4, 0 },
+  { PT_GR(11) * 4,  4, greg_offset_and_size (gr[11]),  4, 0 },
+  { PT_GR(12) * 4,  4, greg_offset_and_size (gr[12]),  4, 0 },
+  { PT_GR(13) * 4,  4, greg_offset_and_size (gr[13]),  4, 0 },
+  { PT_GR(14) * 4,  4, greg_offset_and_size (gr[14]),  4, 0 },
+  { PT_GR(15) * 4,  4, greg_offset_and_size (gr[15]),  4, 0 },
+  { PT_GR(16) * 4,  4, greg_offset_and_size (gr[16]),  4, 0 },
+  { PT_GR(17) * 4,  4, greg_offset_and_size (gr[17]),  4, 0 },
+  { PT_GR(18) * 4,  4, greg_offset_and_size (gr[18]),  4, 0 },
+  { PT_GR(19) * 4,  4, greg_offset_and_size (gr[19]),  4, 0 },
+  { PT_GR(20) * 4,  4, greg_offset_and_size (gr[20]),  4, 0 },
+  { PT_GR(21) * 4,  4, greg_offset_and_size (gr[21]),  4, 0 },
+  { PT_GR(22) * 4,  4, greg_offset_and_size (gr[22]),  4, 0 },
+  { PT_GR(23) * 4,  4, greg_offset_and_size (gr[23]),  4, 0 },
+  { PT_GR(24) * 4,  4, greg_offset_and_size (gr[24]),  4, 0 },
+  { PT_GR(25) * 4,  4, greg_offset_and_size (gr[25]),  4, 0 },
+  { PT_GR(26) * 4,  4, greg_offset_and_size (gr[26]),  4, 0 },
+  { PT_GR(27) * 4,  4, greg_offset_and_size (gr[27]),  4, 0 },
+  { PT_GR(28) * 4,  4, greg_offset_and_size (gr[28]),  4, 0 },
+  { PT_GR(29) * 4,  4, greg_offset_and_size (gr[29]),  4, 0 },
+  { PT_GR(30) * 4,  4, greg_offset_and_size (gr[30]),  4, 0 },
+  { PT_GR(31) * 4,  4, greg_offset_and_size (gr[31]),  4, 0 },
+  { PT_GR(32) * 4,  4, greg_offset_and_size (gr[32]),  4, 0 },
+  { PT_GR(33) * 4,  4, greg_offset_and_size (gr[33]),  4, 0 },
+  { PT_GR(34) * 4,  4, greg_offset_and_size (gr[34]),  4, 0 },
+  { PT_GR(35) * 4,  4, greg_offset_and_size (gr[35]),  4, 0 },
+  { PT_GR(36) * 4,  4, greg_offset_and_size (gr[36]),  4, 0 },
+  { PT_GR(37) * 4,  4, greg_offset_and_size (gr[37]),  4, 0 },
+  { PT_GR(38) * 4,  4, greg_offset_and_size (gr[38]),  4, 0 },
+  { PT_GR(39) * 4,  4, greg_offset_and_size (gr[39]),  4, 0 },
+  { PT_GR(40) * 4,  4, greg_offset_and_size (gr[40]),  4, 0 },
+  { PT_GR(41) * 4,  4, greg_offset_and_size (gr[41]),  4, 0 },
+  { PT_GR(42) * 4,  4, greg_offset_and_size (gr[42]),  4, 0 },
+  { PT_GR(43) * 4,  4, greg_offset_and_size (gr[43]),  4, 0 },
+  { PT_GR(44) * 4,  4, greg_offset_and_size (gr[44]),  4, 0 },
+  { PT_GR(45) * 4,  4, greg_offset_and_size (gr[45]),  4, 0 },
+  { PT_GR(46) * 4,  4, greg_offset_and_size (gr[46]),  4, 0 },
+  { PT_GR(47) * 4,  4, greg_offset_and_size (gr[47]),  4, 0 },
+  { PT_GR(48) * 4,  4, greg_offset_and_size (gr[48]),  4, 0 },
+  { PT_GR(49) * 4,  4, greg_offset_and_size (gr[49]),  4, 0 },
+  { PT_GR(50) * 4,  4, greg_offset_and_size (gr[50]),  4, 0 },
+  { PT_GR(51) * 4,  4, greg_offset_and_size (gr[51]),  4, 0 },
+  { PT_GR(52) * 4,  4, greg_offset_and_size (gr[52]),  4, 0 },
+  { PT_GR(53) * 4,  4, greg_offset_and_size (gr[53]),  4, 0 },
+  { PT_GR(54) * 4,  4, greg_offset_and_size (gr[54]),  4, 0 },
+  { PT_GR(55) * 4,  4, greg_offset_and_size (gr[55]),  4, 0 },
+  { PT_GR(56) * 4,  4, greg_offset_and_size (gr[56]),  4, 0 },
+  { PT_GR(57) * 4,  4, greg_offset_and_size (gr[57]),  4, 0 },
+  { PT_GR(58) * 4,  4, greg_offset_and_size (gr[58]),  4, 0 },
+  { PT_GR(59) * 4,  4, greg_offset_and_size (gr[59]),  4, 0 },
+  { PT_GR(60) * 4,  4, greg_offset_and_size (gr[60]),  4, 0 },
+  { PT_GR(61) * 4,  4, greg_offset_and_size (gr[61]),  4, 0 },
+  { PT_GR(62) * 4,  4, greg_offset_and_size (gr[62]),  4, 0 },
+  { PT_GR(63) * 4,  4, greg_offset_and_size (gr[63]),  4, 0 },
 
 
-  { PT_FR(0) * 4,   4, fpreg_offset_and_size (fr[0]), 4 },
-  { PT_FR(1) * 4,   4, fpreg_offset_and_size (fr[1]),  4 },
-  { PT_FR(2) * 4,   4, fpreg_offset_and_size (fr[2]),  4 },
-  { PT_FR(3) * 4,   4, fpreg_offset_and_size (fr[3]),  4 },
-  { PT_FR(4) * 4,   4, fpreg_offset_and_size (fr[4]),  4 },
-  { PT_FR(5) * 4,   4, fpreg_offset_and_size (fr[5]),  4 },
-  { PT_FR(6) * 4,   4, fpreg_offset_and_size (fr[6]),  4 },
-  { PT_FR(7) * 4,   4, fpreg_offset_and_size (fr[7]),  4 },
-  { PT_FR(8) * 4,   4, fpreg_offset_and_size (fr[8]),  4 },
-  { PT_FR(9) * 4,   4, fpreg_offset_and_size (fr[9]),  4 },
-  { PT_FR(10) * 4,  4, fpreg_offset_and_size (fr[10]), 4 },
-  { PT_FR(11) * 4,  4, fpreg_offset_and_size (fr[11]), 4 },
-  { PT_FR(12) * 4,  4, fpreg_offset_and_size (fr[12]), 4 },
-  { PT_FR(13) * 4,  4, fpreg_offset_and_size (fr[13]), 4 },
-  { PT_FR(14) * 4,  4, fpreg_offset_and_size (fr[14]), 4 },
-  { PT_FR(15) * 4,  4, fpreg_offset_and_size (fr[15]), 4 },
-  { PT_FR(16) * 4,  4, fpreg_offset_and_size (fr[16]), 4 },
-  { PT_FR(17) * 4,  4, fpreg_offset_and_size (fr[17]), 4 },
-  { PT_FR(18) * 4,  4, fpreg_offset_and_size (fr[18]), 4 },
-  { PT_FR(19) * 4,  4, fpreg_offset_and_size (fr[19]), 4 },
-  { PT_FR(20) * 4,  4, fpreg_offset_and_size (fr[20]), 4 },
-  { PT_FR(21) * 4,  4, fpreg_offset_and_size (fr[21]), 4 },
-  { PT_FR(22) * 4,  4, fpreg_offset_and_size (fr[22]), 4 },
-  { PT_FR(23) * 4,  4, fpreg_offset_and_size (fr[23]), 4 },
-  { PT_FR(24) * 4,  4, fpreg_offset_and_size (fr[24]), 4 },
-  { PT_FR(25) * 4,  4, fpreg_offset_and_size (fr[25]), 4 },
-  { PT_FR(26) * 4,  4, fpreg_offset_and_size (fr[26]), 4 },
-  { PT_FR(27) * 4,  4, fpreg_offset_and_size (fr[27]), 4 },
-  { PT_FR(28) * 4,  4, fpreg_offset_and_size (fr[28]), 4 },
-  { PT_FR(29) * 4,  4, fpreg_offset_and_size (fr[29]), 4 },
-  { PT_FR(30) * 4,  4, fpreg_offset_and_size (fr[30]), 4 },
-  { PT_FR(31) * 4,  4, fpreg_offset_and_size (fr[31]), 4 },
-  { PT_FR(32) * 4,  4, fpreg_offset_and_size (fr[32]), 4 },
-  { PT_FR(33) * 4,  4, fpreg_offset_and_size (fr[33]), 4 },
-  { PT_FR(34) * 4,  4, fpreg_offset_and_size (fr[34]), 4 },
-  { PT_FR(35) * 4,  4, fpreg_offset_and_size (fr[35]), 4 },
-  { PT_FR(36) * 4,  4, fpreg_offset_and_size (fr[36]), 4 },
-  { PT_FR(37) * 4,  4, fpreg_offset_and_size (fr[37]), 4 },
-  { PT_FR(38) * 4,  4, fpreg_offset_and_size (fr[38]), 4 },
-  { PT_FR(39) * 4,  4, fpreg_offset_and_size (fr[39]), 4 },
-  { PT_FR(40) * 4,  4, fpreg_offset_and_size (fr[40]), 4 },
-  { PT_FR(41) * 4,  4, fpreg_offset_and_size (fr[41]), 4 },
-  { PT_FR(42) * 4,  4, fpreg_offset_and_size (fr[42]), 4 },
-  { PT_FR(43) * 4,  4, fpreg_offset_and_size (fr[43]), 4 },
-  { PT_FR(44) * 4,  4, fpreg_offset_and_size (fr[44]), 4 },
-  { PT_FR(45) * 4,  4, fpreg_offset_and_size (fr[45]), 4 },
-  { PT_FR(46) * 4,  4, fpreg_offset_and_size (fr[46]), 4 },
-  { PT_FR(47) * 4,  4, fpreg_offset_and_size (fr[47]), 4 },
-  { PT_FR(48) * 4,  4, fpreg_offset_and_size (fr[48]), 4 },
-  { PT_FR(49) * 4,  4, fpreg_offset_and_size (fr[49]), 4 },
-  { PT_FR(50) * 4,  4, fpreg_offset_and_size (fr[50]), 4 },
-  { PT_FR(51) * 4,  4, fpreg_offset_and_size (fr[51]), 4 },
-  { PT_FR(52) * 4,  4, fpreg_offset_and_size (fr[52]), 4 },
-  { PT_FR(53) * 4,  4, fpreg_offset_and_size (fr[53]), 4 },
-  { PT_FR(54) * 4,  4, fpreg_offset_and_size (fr[54]), 4 },
-  { PT_FR(55) * 4,  4, fpreg_offset_and_size (fr[55]), 4 },
-  { PT_FR(56) * 4,  4, fpreg_offset_and_size (fr[56]), 4 },
-  { PT_FR(57) * 4,  4, fpreg_offset_and_size (fr[57]), 4 },
-  { PT_FR(58) * 4,  4, fpreg_offset_and_size (fr[58]), 4 },
-  { PT_FR(59) * 4,  4, fpreg_offset_and_size (fr[59]), 4 },
-  { PT_FR(60) * 4,  4, fpreg_offset_and_size (fr[60]), 4 },
-  { PT_FR(61) * 4,  4, fpreg_offset_and_size (fr[61]), 4 },
-  { PT_FR(62) * 4,  4, fpreg_offset_and_size (fr[62]), 4 },
-  { PT_FR(63) * 4,  4, fpreg_offset_and_size (fr[63]), 4 },
+  { PT_FR(0) * 4,   4, fpreg_offset_and_size (fr[0]), 4, 0 },
+  { PT_FR(1) * 4,   4, fpreg_offset_and_size (fr[1]),  4, 0 },
+  { PT_FR(2) * 4,   4, fpreg_offset_and_size (fr[2]),  4, 0 },
+  { PT_FR(3) * 4,   4, fpreg_offset_and_size (fr[3]),  4, 0 },
+  { PT_FR(4) * 4,   4, fpreg_offset_and_size (fr[4]),  4, 0 },
+  { PT_FR(5) * 4,   4, fpreg_offset_and_size (fr[5]),  4, 0 },
+  { PT_FR(6) * 4,   4, fpreg_offset_and_size (fr[6]),  4, 0 },
+  { PT_FR(7) * 4,   4, fpreg_offset_and_size (fr[7]),  4, 0 },
+  { PT_FR(8) * 4,   4, fpreg_offset_and_size (fr[8]),  4, 0 },
+  { PT_FR(9) * 4,   4, fpreg_offset_and_size (fr[9]),  4, 0 },
+  { PT_FR(10) * 4,  4, fpreg_offset_and_size (fr[10]), 4, 0 },
+  { PT_FR(11) * 4,  4, fpreg_offset_and_size (fr[11]), 4, 0 },
+  { PT_FR(12) * 4,  4, fpreg_offset_and_size (fr[12]), 4, 0 },
+  { PT_FR(13) * 4,  4, fpreg_offset_and_size (fr[13]), 4, 0 },
+  { PT_FR(14) * 4,  4, fpreg_offset_and_size (fr[14]), 4, 0 },
+  { PT_FR(15) * 4,  4, fpreg_offset_and_size (fr[15]), 4, 0 },
+  { PT_FR(16) * 4,  4, fpreg_offset_and_size (fr[16]), 4, 0 },
+  { PT_FR(17) * 4,  4, fpreg_offset_and_size (fr[17]), 4, 0 },
+  { PT_FR(18) * 4,  4, fpreg_offset_and_size (fr[18]), 4, 0 },
+  { PT_FR(19) * 4,  4, fpreg_offset_and_size (fr[19]), 4, 0 },
+  { PT_FR(20) * 4,  4, fpreg_offset_and_size (fr[20]), 4, 0 },
+  { PT_FR(21) * 4,  4, fpreg_offset_and_size (fr[21]), 4, 0 },
+  { PT_FR(22) * 4,  4, fpreg_offset_and_size (fr[22]), 4, 0 },
+  { PT_FR(23) * 4,  4, fpreg_offset_and_size (fr[23]), 4, 0 },
+  { PT_FR(24) * 4,  4, fpreg_offset_and_size (fr[24]), 4, 0 },
+  { PT_FR(25) * 4,  4, fpreg_offset_and_size (fr[25]), 4, 0 },
+  { PT_FR(26) * 4,  4, fpreg_offset_and_size (fr[26]), 4, 0 },
+  { PT_FR(27) * 4,  4, fpreg_offset_and_size (fr[27]), 4, 0 },
+  { PT_FR(28) * 4,  4, fpreg_offset_and_size (fr[28]), 4, 0 },
+  { PT_FR(29) * 4,  4, fpreg_offset_and_size (fr[29]), 4, 0 },
+  { PT_FR(30) * 4,  4, fpreg_offset_and_size (fr[30]), 4, 0 },
+  { PT_FR(31) * 4,  4, fpreg_offset_and_size (fr[31]), 4, 0 },
+  { PT_FR(32) * 4,  4, fpreg_offset_and_size (fr[32]), 4, 0 },
+  { PT_FR(33) * 4,  4, fpreg_offset_and_size (fr[33]), 4, 0 },
+  { PT_FR(34) * 4,  4, fpreg_offset_and_size (fr[34]), 4, 0 },
+  { PT_FR(35) * 4,  4, fpreg_offset_and_size (fr[35]), 4, 0 },
+  { PT_FR(36) * 4,  4, fpreg_offset_and_size (fr[36]), 4, 0 },
+  { PT_FR(37) * 4,  4, fpreg_offset_and_size (fr[37]), 4, 0 },
+  { PT_FR(38) * 4,  4, fpreg_offset_and_size (fr[38]), 4, 0 },
+  { PT_FR(39) * 4,  4, fpreg_offset_and_size (fr[39]), 4, 0 },
+  { PT_FR(40) * 4,  4, fpreg_offset_and_size (fr[40]), 4, 0 },
+  { PT_FR(41) * 4,  4, fpreg_offset_and_size (fr[41]), 4, 0 },
+  { PT_FR(42) * 4,  4, fpreg_offset_and_size (fr[42]), 4, 0 },
+  { PT_FR(43) * 4,  4, fpreg_offset_and_size (fr[43]), 4, 0 },
+  { PT_FR(44) * 4,  4, fpreg_offset_and_size (fr[44]), 4, 0 },
+  { PT_FR(45) * 4,  4, fpreg_offset_and_size (fr[45]), 4, 0 },
+  { PT_FR(46) * 4,  4, fpreg_offset_and_size (fr[46]), 4, 0 },
+  { PT_FR(47) * 4,  4, fpreg_offset_and_size (fr[47]), 4, 0 },
+  { PT_FR(48) * 4,  4, fpreg_offset_and_size (fr[48]), 4, 0 },
+  { PT_FR(49) * 4,  4, fpreg_offset_and_size (fr[49]), 4, 0 },
+  { PT_FR(50) * 4,  4, fpreg_offset_and_size (fr[50]), 4, 0 },
+  { PT_FR(51) * 4,  4, fpreg_offset_and_size (fr[51]), 4, 0 },
+  { PT_FR(52) * 4,  4, fpreg_offset_and_size (fr[52]), 4, 0 },
+  { PT_FR(53) * 4,  4, fpreg_offset_and_size (fr[53]), 4, 0 },
+  { PT_FR(54) * 4,  4, fpreg_offset_and_size (fr[54]), 4, 0 },
+  { PT_FR(55) * 4,  4, fpreg_offset_and_size (fr[55]), 4, 0 },
+  { PT_FR(56) * 4,  4, fpreg_offset_and_size (fr[56]), 4, 0 },
+  { PT_FR(57) * 4,  4, fpreg_offset_and_size (fr[57]), 4, 0 },
+  { PT_FR(58) * 4,  4, fpreg_offset_and_size (fr[58]), 4, 0 },
+  { PT_FR(59) * 4,  4, fpreg_offset_and_size (fr[59]), 4, 0 },
+  { PT_FR(60) * 4,  4, fpreg_offset_and_size (fr[60]), 4, 0 },
+  { PT_FR(61) * 4,  4, fpreg_offset_and_size (fr[61]), 4, 0 },
+  { PT_FR(62) * 4,  4, fpreg_offset_and_size (fr[62]), 4, 0 },
+  { PT_FR(63) * 4,  4, fpreg_offset_and_size (fr[63]), 4, 0 },
 
-  { PT_PC * 4,      4, greg_offset_and_size (pc),      4 },
-  { PT_PSR * 4,     4, greg_offset_and_size (psr),     4 },
-  { PT_CCR * 4,     4, greg_offset_and_size (ccr),     4 },
-  { PT_CCCR * 4,    4, greg_offset_and_size (cccr),    4 },
+  { PT_PC * 4,      4, greg_offset_and_size (pc),      4, 0 },
+  { PT_PSR * 4,     4, greg_offset_and_size (psr),     4, 0 },
+  { PT_CCR * 4,     4, greg_offset_and_size (ccr),     4, 0 },
+  { PT_CCCR * 4,    4, greg_offset_and_size (cccr),    4, 0 },
 
-  /* 132 - 134 are unspecified.  */
-  { 0,              0, noreg_offset_and_size (132),    4 },
-  { 0,              0, noreg_offset_and_size (133),    4 },
-  { 0,              0, noreg_offset_and_size (134),    4 },
+  /* FDPIC "fake" registers for obtaining loadmap addresses:
+     FDPIC_INTERP and FDPIC_EXEC...  */
+#define PTRACE_GETFDPIC		31
+#define PTRACE_GETFDPIC_EXEC	0
+#define PTRACE_GETFDPIC_INTERP	1
+  { PTRACE_GETFDPIC_EXEC, 4, OTHERREGS, 0, 0, 4, frv_fdpic_loadmap_addresses },
+  { PTRACE_GETFDPIC_INTERP, 4, OTHERREGS, 0, 0, 4, frv_fdpic_loadmap_addresses },
+
+  /* 134 is unspecified.  */
+  { 0,              0, noreg_offset_and_size (134),    4, 0 },
 
   /* tbr */
-  { 0,              0, noreg_offset_and_size (135),    4 },
+  { 0,              0, noreg_offset_and_size (135),    4, 0 },
 
   /* brr */
-  { 0,              0, noreg_offset_and_size (136),    4 },
+  { 0,              0, noreg_offset_and_size (136),    4, 0 },
 
   /* dbar0 - dbar3 */
-  { 0,              0, noreg_offset_and_size (137),    4 },
-  { 0,              0, noreg_offset_and_size (138),    4 },
-  { 0,              0, noreg_offset_and_size (139),    4 },
-  { 0,              0, noreg_offset_and_size (140),    4 },
+  { 0,              0, noreg_offset_and_size (137),    4, 0 },
+  { 0,              0, noreg_offset_and_size (138),    4, 0 },
+  { 0,              0, noreg_offset_and_size (139),    4, 0 },
+  { 0,              0, noreg_offset_and_size (140),    4, 0 },
 
   /* 141 - 144 are unspecified.  */
-  { 0,              0, noreg_offset_and_size (141),    4 },
-  { 0,              0, noreg_offset_and_size (142),    4 },
-  { 0,              0, noreg_offset_and_size (143),    4 },
-  { 0,              0, noreg_offset_and_size (144),    4 },
+  { 0,              0, noreg_offset_and_size (141),    4, 0 },
+  { 0,              0, noreg_offset_and_size (142),    4, 0 },
+  { 0,              0, noreg_offset_and_size (143),    4, 0 },
+  { 0,              0, noreg_offset_and_size (144),    4, 0 },
 
-  { PT_LR * 4,      4, greg_offset_and_size (lr),      4 },
-  { PT_LCR * 4,     4, greg_offset_and_size (lcr),     4 },
+  { PT_LR * 4,      4, greg_offset_and_size (lr),      4, 0 },
+  { PT_LCR * 4,     4, greg_offset_and_size (lcr),     4, 0 },
 
   /* Can't use greg_offset_and_size for iacc0h and iacc0l because the iacc
      field is 64-bits wide.  We need to provide access to the individual
      32-bit halves. */
-  { PT_IACC0H * 4,  4, GREGS, offsetof (struct user_int_regs, iacc[0]), 4, 4 },
-  { PT_IACC0L * 4,  4, GREGS, offsetof (struct user_int_regs, iacc[0]) + 4, 4, 4 }
+  { PT_IACC0H * 4,  4, GREGS, offsetof (struct user_int_regs, iacc[0]), 4, 4, 0 },
+  { PT_IACC0L * 4,  4, GREGS, offsetof (struct user_int_regs, iacc[0]) + 4, 4, 4, 0 },
+
 };
+
+int
+frv_fdpic_loadmap_addresses (struct gdbserv *serv, int pid, int regno,
+                             void *read_buf, const void *write_buf)
+{
+  /* We can only read the load map addresses; writing them is not supported.  */
+  if (read_buf != NULL)
+    {
+      unsigned long val;
+      long status;
+      struct child_process *process = gdbserv_target_data (serv);
+
+      status = ptrace (PTRACE_GETFDPIC, pid,
+                      (void *)reginfo[regno].ptrace_offset,
+		      &val);
+      if (process->debug_backend)
+	fprintf (stderr, "PTRACE_GETFDPIC pid=%d offset=%d val=%x\n",
+	         pid,reginfo[regno].ptrace_offset,val);
+      if (status < 0)
+	return errno;
+      else
+	{
+	  memcpy (read_buf, &val, sizeof val);
+	  return 0;
+	}
+    }
+  return 0;
+}
 
 /* End of FRV_LINUX_TARGET */
 #else
@@ -1198,23 +1246,37 @@ read_reg_bytes (struct gdbserv *serv, int pid, int regno, void *reg_bytes)
   if (regno < 0 || regno >= NUM_REGS)
     return -1;
 
-  regaddr = reginfo[regno].ptrace_offset;
-  regsize = reginfo[regno].ptrace_size;
-  status = ptrace_read_user (serv, pid, regaddr, regsize, reg_bytes);
-
-  /* A non-zero status is the errno value from the ptrace call */
-  if (status != 0)
+  if (reginfo[regno].alternate_register_read_write_method == NULL)
     {
-      fprintf (stderr, "Error: PT_READ_U at 0x%08lx in process %d\n",
-	       (long) regaddr, pid);
-      return -1;
+      regaddr = reginfo[regno].ptrace_offset;
+      regsize = reginfo[regno].ptrace_size;
+      status = ptrace_read_user (serv, pid, regaddr, regsize, reg_bytes);
+      /* A non-zero status is the errno value from the ptrace call.  */
+      if (status != 0)
+	{
+	  fprintf (stderr, "Error: PT_READ_U at 0x%08lx in process %d\n",
+		   (long) regaddr, pid);
+	  return -1;
+	}
     }
+  else
+    {
+      /* Use alternate reader.  */
+      status = reginfo[regno].alternate_register_read_write_method
+	         (serv, pid, regno, reg_bytes, 0);
+      if (status != 0)
+	{
+	  fprintf (stderr,
+	           "read_reg_bytes: Error: Couldn't read register using alternate method, regno=%d, status=%d\n",
+		   regno, status);
+	  return -1;
+	}
+    }
+
   return 0;
 }
 
-/* Fetch the register indicated by REGNO into the buffer REG_BYTES.
-   The caller must ensure that a sufficiently large buffer has been
-   allocated.
+/* Store the buffer REG_BYTES to the register indicated by REGNO.
    Returns 0 for success, -1 for failure.  */
 
 static int
@@ -1228,16 +1290,32 @@ write_reg_bytes (struct gdbserv *serv, int pid, int regno,
   if (regno < 0 || regno >= NUM_REGS)
     return -1;
 
-  regaddr = reginfo[regno].ptrace_offset;
-  regsize = reginfo[regno].ptrace_size;
-  status = ptrace_write_user (serv, pid, regaddr, regsize, reg_bytes);
-
-  /* A non-zero status is the errno value from the ptrace call */
-  if (status != 0)
+  if (reginfo[regno].alternate_register_read_write_method == NULL)
     {
-      fprintf (stderr, "Error: PT_WRITE_U status=%d at 0x%08lx in process %d\n",
-	       status, (long) regaddr, pid);
-      return -1;
+      regaddr = reginfo[regno].ptrace_offset;
+      regsize = reginfo[regno].ptrace_size;
+      status = ptrace_write_user (serv, pid, regaddr, regsize, reg_bytes);
+
+      /* A non-zero status is the errno value from the ptrace call */
+      if (status != 0)
+	{
+	  fprintf (stderr, "Error: PT_WRITE_U status=%d at 0x%08lx in process %d\n",
+		   status, (long) regaddr, pid);
+	  return -1;
+	}
+    }
+  else
+    {
+      /* Use alternate writer.  */
+      status = reginfo[regno].alternate_register_read_write_method
+	         (serv, pid, regno, 0, reg_bytes);
+      if (status != 0)
+	{
+	  fprintf (stderr,
+	           "write_reg_bytes: Error: Couldn't write register using alternate method, regno=%d, status=%d",
+		   regno, status);
+	  return -1;
+	}
     }
   return 0;
 }

@@ -26,6 +26,7 @@
     <defattribute name="data-low" category="pin" legalvalues="numeric" behaviors="bus traffic sampling" />
     <defattribute name="status" category="pin" legalvalues="numeric" behaviors="bus traffic sampling" />
     <defattribute name="type" category="pin" legalvalues="numeric" behaviors="bus traffic sampling" />
+    <defattribute name="label" category="setting" legalvalues="any string" behaviors="bus traffic sampling" />
   </defcomponent>
   <synop>
     <p>
@@ -82,8 +83,9 @@
 	One line per transaction is shown in a format resembling the common gdb simulators'
 	<tt>--trace-core</tt> output:</p>
 	<tt>
-	MODE:ADDRESS ARROW DATA [LATENCY] [STATUS]</tt>
+	[LABEL:] MODE:ADDRESS ARROW DATA [LATENCY] [STATUS]</tt>
 	where
+        <tt>LABEL</tt> is an optional label identifying the probe component.
 	<tt>MODE</tt> is an encoding of the access type:
 	<tt>zzz</tt>
 	where <tt>le</tt> and <tt>be</tt> represent little- or big-endianness,

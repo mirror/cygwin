@@ -236,14 +236,9 @@ proc g++_include_flags { args } {
 
     set dir [lookfor_file ${gccpath} libstdc++-v3]
     if { ${dir} != "" } {
-	append flags " -I${dir}/include/${target_alias}"
+	append flags " -I${dir}/include -I${dir}/include/${target_alias}"
     }
 
-    set dir [lookfor_file ${srcdir} libstdc++-v3]
-    if { ${dir} != "" } {
-	append flags " -I${dir}/include -I${dir}/include/std"
-    }
-    
     set dir [lookfor_file ${srcdir} libstdc++]
     if { ${dir} != "" } {
 	append flags " -I${dir} -I${dir}/stl"
@@ -329,7 +324,7 @@ proc libstdc++_include_flags { args } {
 
     set dir [lookfor_file ${gccpath} libstdc++-v3]
     if { ${dir} != "" } {
-	append flags " -I${dir}/include/${target_alias}"
+	append flags " -I${dir}/include -I${dir}/include/${target_alias}"
     }
 
     set dir [lookfor_file ${srcdir} libstdc++]

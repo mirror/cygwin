@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: mknod01.c,v 1.3 2003/01/24 01:09:39 cgf Exp $ */
+/* $Id: mknod01.c,v 1.4 2004/03/07 04:51:29 cgf Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -238,9 +238,11 @@ setup()
     /* make a temp dir and cd to it */
     tst_tmpdir();
 
+#ifndef __CYGWIN__
     /* Check that user is root */
     if ( geteuid() != 0 )
 	tst_brkm(TBROK, cleanup, "Must be root for this test!");
+#endif
 
     /* build a temp node name to bre created my mknod */
     sprintf(Path, "./tnode_%d", getpid());

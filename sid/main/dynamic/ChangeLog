@@ -1,3 +1,7 @@
+2001-03-21  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.in: Regenerate.
+
 2001-03-13  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configure.in (AC_LIBTOOL_DLOPEN): Define option.

@@ -580,6 +580,9 @@
 		  c-args))
 	    ; If the mode is VOID, this is a statement.
 	    ; Otherwise it's an expression.
+	    ; ??? Bad assumption!  VOID expressions may be used
+	    ; within sequences without local vars, which are translated
+	    ; to comma-expressions.
 	    (if (or (mode:eq? 'DFLT mode)
 		    (mode:eq? 'VOID mode))
 		");\n"
@@ -602,6 +605,9 @@
 				     args))
 	    ; If the mode is VOID, this is a statement.
 	    ; Otherwise it's an expression.
+	    ; ??? Bad assumption!  VOID expressions may be used
+	    ; within sequences without local vars, which are translated
+	    ; to comma-expressions.
 	    (if (or (mode:eq? 'DFLT mode)
 		    (mode:eq? 'VOID mode))
 		");\n"
@@ -1208,8 +1214,15 @@
 			       (string-map
 				(lambda (e)
 				  (string-append
-				   ", "
-				   (rtl-c-with-estate estate DFLT e)))
+				   (if (rtx-env-empty? env) ", " "; ")
+				   ; Strip off gratuitous ";\n" at end of expressions that
+				   ; misguessed themselves to be in statement context.
+				   ; See s-c-call, s-c-call-raw above.
+				   (let ((substmt (rtl-c-with-estate estate DFLT e)))
+				     (if (and (rtx-env-empty? env)
+					      (string=? (string-take -2 substmt) ";\n"))
+					 (string-drop -2 substmt)
+					 substmt))))
 				exprs))
 		  (if (rtx-env-empty? env) ")" "; })")))))
 )

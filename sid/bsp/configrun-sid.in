@@ -83,7 +83,7 @@ if ($ENV{'SID'}) {
   $sid .= "/sid";
 }
 
-$version=q$Id: configrun-sid.in,v 1.31 2001/11/27 22:58:59 fitzsim Exp $;
+$version=q$Id: configrun-sid.in,v 1.32 2001/12/04 22:40:52 fche Exp $;
 
 # by default the loader data mapper connects to the cpu-mapper access-port
 $load_mapper_data = "cpu-mapper access-port";
@@ -496,19 +496,6 @@ if ($opt_trace_core)
   }
 
 $third_section = "";
-if ($opt_EB && $opt_EL) { die "Both -EB and -EL specified\n"; }
-if (!$opt_EB && !$opt_EL && $opt_gdb != 0)
-  {
-    if ($cpu_defaultendian{$opt_cpu} eq "-EB") { $opt_EB = 1; }
-    elsif ($cpu_defaultendian{$opt_cpu} eq "-EL") { $opt_EL = 1; }
-    else { warn "Should specify endianness"; &usage; }
-  }
-elsif (!$opt_EB && !$opt_EL && !$exec)
-  {
-    warn "Should specify executable"; &usage;
-  }
-if ($opt_EB) { $third_section .= "set cpu endian big\n"; }
-if ($opt_EL) { $third_section .= "set cpu endian little\n"; }
 
 
 # ----------------------------------------------------------------------------
@@ -704,7 +691,29 @@ else
     die "Unknown board `$opt_board'\n";
   }
 
-#
+
+
+# ------------------------------------------------------------------------
+# Handle endianness
+
+if ($opt_EB && $opt_EL) { die "Both -EB and -EL specified\n"; }
+if (!$opt_EB && !$opt_EL && $opt_gdb != 0)
+  {
+    if ($cpu_defaultendian{$opt_cpu} eq "-EB") { $opt_EB = 1; }
+    elsif ($cpu_defaultendian{$opt_cpu} eq "-EL") { $opt_EL = 1; }
+    else { warn "Should specify endianness"; &usage; }
+  }
+elsif (!$opt_EB && !$opt_EL && !$exec)
+  {
+    warn "Should specify executable"; &usage;
+  }
+if ($opt_EB) { $third_section .= "set cpu endian big\n"; }
+if ($opt_EL) { $third_section .= "set cpu endian little\n"; }
+
+
+# ----------------------------------------------------------------------------
+# Misc. logic
+
 # this is used by both the arm710t and cogent cma110 boards.
 sub configure_uart1_uart2
   {
@@ -825,9 +834,6 @@ connect-pin uart2 Sout -> cpu-gdb target-tx
   }
 
 
-# ----------------------------------------------------------------------------
-# Misc. logic
-
 sub configure_harvard_bus
   {
     my $cpu = $_[0];
@@ -865,6 +871,8 @@ connect-bus gloss target-memory data-mapper access-port
       }
 
   }
+
+
 
 
 if ($opt_cpu eq "arm")
@@ -1062,6 +1070,7 @@ while ($#opt_memory_region >= 0)
     #         [,relate=COMPONENT/RELATION]  (deprecated)
     @spec = split /,/, $spec;
 
+    # print STDERR "spec=$spec\n";
     die "Cannot parse memory region specification `$spec'.\n" if ($#spec < 1);
 
     $base = shift @spec;

@@ -87,7 +87,7 @@
 	connect-pin reset-manager output-1 -&gt; loader load!
         connect-bus loader load-accessor-insn bus access-port
         connect-bus loader load-accessor-data bus access-port
-	set loader file "/foo/bar.x"
+	set cpu-loader file "/foo/bar.x"
         set loader verbose? 1
 	connect-pin loader start-pc-set -&gt; cpu start-pc-set!
 	connect-pin loader endian-set -&gt; cpu endian-set!

@@ -1,3 +1,8 @@
+2001-09-12  Keith Seitz  <keiths@redhat.com>
+
+	* win/configure: Regenerated. Appears to have some stray
+	conflict markers in it.
+
 2001-09-09  Ian Roxborough  <irox@redhat.com>
 
 	* win/configure: regenerated.

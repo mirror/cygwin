@@ -2,21 +2,22 @@
    also used by the Alpha/Netware and Alpha/Linux targets.
    Copyright 1993, 1994, 1995, 1996 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #ifndef TM_ALPHA_H
 #define TM_ALPHA_H
@@ -25,12 +26,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "coff/sym.h"		/* Needed for PDR below.  */
 #include "coff/symconst.h"
 
-#ifdef __STDC__
 struct frame_info;
 struct type;
 struct value;
 struct symbol;
-#endif
 
 #if !defined (TARGET_BYTE_ORDER)
 #define TARGET_BYTE_ORDER LITTLE_ENDIAN
@@ -59,7 +58,7 @@ struct symbol;
 /* Advance PC across any function entry prologue instructions
    to reach some "real" code.  */
 
-#define SKIP_PROLOGUE(pc)	pc = alpha_skip_prologue(pc, 0)
+#define SKIP_PROLOGUE(pc)	(alpha_skip_prologue(pc, 0))
 extern CORE_ADDR alpha_skip_prologue PARAMS ((CORE_ADDR addr, int lenient));
 
 /* Immediately after a function call, return the saved pc.
@@ -69,7 +68,7 @@ extern CORE_ADDR alpha_skip_prologue PARAMS ((CORE_ADDR addr, int lenient));
 
 #define SAVED_PC_AFTER_CALL(frame)	alpha_saved_pc_after_call(frame)
 extern CORE_ADDR
-alpha_saved_pc_after_call PARAMS ((struct frame_info *));
+  alpha_saved_pc_after_call PARAMS ((struct frame_info *));
 
 /* Are we currently handling a signal ?  */
 
@@ -79,7 +78,7 @@ alpha_saved_pc_after_call PARAMS ((struct frame_info *));
 
 #define INNER_THAN(lhs,rhs) ((lhs) < (rhs))
 
-#define BREAKPOINT {0x80, 0, 0, 0} /* call_pal bpt */
+#define BREAKPOINT {0x80, 0, 0, 0}	/* call_pal bpt */
 
 /* Amount PC must be decremented by after a breakpoint.
    This is often the number of bytes in BREAKPOINT
@@ -110,7 +109,7 @@ alpha_saved_pc_after_call PARAMS ((struct frame_info *));
 	"f0",   "f1",   "f2",   "f3",   "f4",   "f5",   "f6",   "f7", \
 	"f8",   "f9",   "f10",  "f11",  "f12",  "f13",  "f14",  "f15", \
 	"f16",  "f17",  "f18",  "f19",  "f20",  "f21",  "f22",  "f23",\
-	"f24",  "f25",  "f26",  "f27",  "f28",  "f29",  "f30",  "f31",\
+	"f24",  "f25",  "f26",  "f27",  "f28",  "f29",  "f30",  "fpcr",\
 	"pc",	"vfp",						\
     }
 
@@ -130,8 +129,9 @@ alpha_saved_pc_after_call PARAMS ((struct frame_info *));
 #define SP_REGNUM 30		/* Contains address of top of stack */
 #define RA_REGNUM 26		/* Contains return address value */
 #define ZERO_REGNUM 31		/* Read-only register, always 0 */
-#define FP0_REGNUM 32           /* Floating point register 0 */
-#define FPA0_REGNUM 48          /* First float arg during a subr call */
+#define FP0_REGNUM 32		/* Floating point register 0 */
+#define FPA0_REGNUM 48		/* First float arg during a subr call */
+#define FPCR_REGNUM 63		/* Floating point control register */
 #define PC_REGNUM 64		/* Contains program counter */
 #define FP_REGNUM 65		/* Virtual frame pointer */
 
@@ -171,12 +171,12 @@ alpha_saved_pc_after_call PARAMS ((struct frame_info *));
    from raw format to virtual format.
    The alpha needs a conversion between register and memory format if
    the register is a floating point register and
-      memory format is float, as the register format must be double
+   memory format is float, as the register format must be double
    or
-      memory format is an integer with 4 bytes or less, as the representation
-      of integers in floating point registers is different. */
+   memory format is an integer with 4 bytes or less, as the representation
+   of integers in floating point registers is different. */
 
-#define REGISTER_CONVERTIBLE(N) ((N) >= FP0_REGNUM && (N) < FP0_REGNUM + 32)
+#define REGISTER_CONVERTIBLE(N) ((N) >= FP0_REGNUM && (N) < FP0_REGNUM + 31)
 
 /* Convert data from raw format for register REGNUM in buffer FROM
    to virtual format with type TYPE in buffer TO.  */
@@ -198,13 +198,14 @@ alpha_register_convert_to_raw PARAMS ((struct type *, int, char *, char *));
    of data in register N.  */
 
 #define REGISTER_VIRTUAL_TYPE(N) \
-	(((N) >= FP0_REGNUM && (N) < FP0_REGNUM+32)  \
+	(((N) >= FP0_REGNUM && (N) < FP0_REGNUM+31)  \
 	 ? builtin_type_double : builtin_type_long) \
 
 /* Store the address of the place in which to copy the structure the
    subroutine will return.  Handled by alpha_push_arguments.  */
 
-#define STORE_STRUCT_RETURN(addr, sp)	/**/
+#define STORE_STRUCT_RETURN(addr, sp)
+/**/
 
 /* Extract from an array REGBUF containing the (raw) register state
    a function return value of type TYPE, and copy that, in virtual format,
@@ -237,8 +238,8 @@ alpha_store_return_value PARAMS ((struct type *, char *));
 
 /* Structures are returned by ref in extra arg0 */
 #define USE_STRUCT_CONVENTION(gcc_p, type)	1
-
 
+
 /* Describe the pointer in each stack frame to the previous stack frame
    (its caller).  */
 
@@ -251,18 +252,17 @@ extern CORE_ADDR alpha_frame_chain PARAMS ((struct frame_info *));
 /* Define other aspects of the stack frame.  */
 
 
-/* A macro that tells us whether the function invocation represented
-   by FI does not have a frame on the stack associated with it.  If it
-   does not, FRAMELESS is set to 1, else 0.  */
+/* An expression that tells us whether the function invocation represented
+   by FI does not have a frame on the stack associated with it. */
 /* We handle this differently for alpha, and maybe we should not */
 
-#define FRAMELESS_FUNCTION_INVOCATION(FI, FRAMELESS)  {(FRAMELESS) = 0;}
+#define FRAMELESS_FUNCTION_INVOCATION(FI)  (0)
 
 /* Saved Pc.  */
 
 #define FRAME_SAVED_PC(FRAME)	(alpha_frame_saved_pc(FRAME))
 extern CORE_ADDR
-alpha_frame_saved_pc PARAMS ((struct frame_info *));
+  alpha_frame_saved_pc PARAMS ((struct frame_info *));
 
 /* The alpha has two different virtual pointers for arguments and locals.
 
@@ -286,7 +286,7 @@ alpha_frame_saved_pc PARAMS ((struct frame_info *));
 /* Return number of args passed to a frame.
    Can return -1, meaning no way to tell.  */
 
-#define FRAME_NUM_ARGS(num, fi)	((num) = -1)
+#define FRAME_NUM_ARGS(fi)	(-1)
 
 /* Return number of bytes at start of arglist that are not really args.  */
 
@@ -306,14 +306,14 @@ extern void alpha_find_saved_regs PARAMS ((struct frame_info *));
       alpha_find_saved_regs (frame_info); \
     (frame_info)->saved_regs[SP_REGNUM] = (frame_info)->frame; \
   } while (0)
-
 
+
 /* Things needed for making the inferior call functions.  */
 
 #define PUSH_ARGUMENTS(nargs, args, sp, struct_return, struct_addr) \
-    sp = alpha_push_arguments((nargs), (args), (sp), (struct_return), (struct_addr))
+  (alpha_push_arguments((nargs), (args), (sp), (struct_return), (struct_addr)))
 extern CORE_ADDR
-alpha_push_arguments PARAMS ((int, struct value **, CORE_ADDR, int, CORE_ADDR));
+  alpha_push_arguments PARAMS ((int, struct value **, CORE_ADDR, int, CORE_ADDR));
 
 /* Push an empty stack frame, to record the current PC, etc.  */
 
@@ -366,7 +366,7 @@ extern CORE_ADDR alpha_call_dummy_address PARAMS ((void));
 /* There's a mess in stack frame creation.  See comments in blockframe.c
    near reference to INIT_FRAME_PC_FIRST.  */
 
-#define	INIT_FRAME_PC(fromleaf, prev) /* nada */
+#define	INIT_FRAME_PC(fromleaf, prev)	/* nada */
 
 #define INIT_FRAME_PC_FIRST(fromleaf, prev) \
   (prev)->pc = ((fromleaf) ? SAVED_PC_AFTER_CALL ((prev)->next) : \
@@ -382,10 +382,12 @@ extern void ecoff_relocate_efi PARAMS ((struct symbol *, CORE_ADDR));
    This overlays the ALPHA's PDR records, 
    alpharead.c (ab)uses this to save memory */
 
-typedef struct alpha_extra_func_info {
-	long	numargs;	/* number of args to procedure (was iopt) */
-	PDR	pdr;		/* Procedure descriptor record */
-} *alpha_extra_func_info_t;
+typedef struct alpha_extra_func_info
+  {
+    long numargs;		/* number of args to procedure (was iopt) */
+    PDR pdr;			/* Procedure descriptor record */
+  }
+ *alpha_extra_func_info_t;
 
 /* Define the extra_func_info that mipsread.c needs.
    FIXME: We should define our own PDR interface, perhaps in a separate
@@ -406,7 +408,7 @@ init_extra_frame_info PARAMS ((struct frame_info *));
 #define	PRINT_EXTRA_FRAME_INFO(fi) \
   { \
     if (fi && fi->proc_desc && fi->proc_desc->pdr.framereg < NUM_REGS) \
-      printf_filtered (" frame pointer is at %s+%d\n", \
+      printf_filtered (" frame pointer is at %s+%ld\n", \
                        REGISTER_NAME (fi->proc_desc->pdr.framereg), \
                                  fi->proc_desc->pdr.frameoffset); \
   }
@@ -443,7 +445,7 @@ extern struct frame_info *setup_arbitrary_frame PARAMS ((int, CORE_ADDR *));
    values are always passed in as doubles.  Thus by setting this to 1, both
    types of calls will work. */
 
-#define COERCE_FLOAT_TO_DOUBLE 1
+#define COERCE_FLOAT_TO_DOUBLE(formal, actual) (1)
 
 /* Return TRUE if procedure descriptor PROC is a procedure descriptor
    that refers to a dynamically generated sigtramp function.

@@ -1,30 +1,29 @@
 /* Target-specific definition for a Hitachi Super-H.
    Copyright (C) 1993 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* Contributed by Steve Chamberlain sac@cygnus.com */
 
-#ifdef __STDC__
 struct frame_info;
 struct frame_saved_regs;
 struct value;
 struct type;
-#endif
 
 #define GDB_TARGET_IS_SH
 
@@ -43,15 +42,13 @@ struct type;
 /* Advance PC across any function entry prologue instructions
    to reach some "real" code.  */
 
-extern CORE_ADDR sh_skip_prologue ();
-#define SKIP_PROLOGUE(ip) \
-    {(ip) = sh_skip_prologue(ip);}
-
+extern CORE_ADDR sh_skip_prologue PARAMS ((CORE_ADDR));
+#define SKIP_PROLOGUE(ip) (sh_skip_prologue (ip))
 
 /* Immediately after a function call, return the saved pc.
    Can't always go through the frames for this because on some machines
    the new frame is not set up until the new function executes
-   some instructions. 
+   some instructions.
 
    The return address is the value saved in the PR register + 4  */
 
@@ -64,8 +61,8 @@ extern CORE_ADDR sh_skip_prologue ();
 /* Illegal instruction - used by the simulator for breakpoint
    detection */
 
-#define BREAKPOINT {0xc3, 0xc3}  /* 0xc3c3 is trapa #c3, and it works in big 
-				    and little endian modes  */
+#define BREAKPOINT {0xc3, 0xc3}	/* 0xc3c3 is trapa #c3, and it works in big
+				   and little endian modes  */
 
 #define BIG_REMOTE_BREAKPOINT    { 0xc3, 0x20 }
 #define LITTLE_REMOTE_BREAKPOINT { 0x20, 0xc3 }
@@ -78,7 +75,7 @@ extern CORE_ADDR sh_skip_prologue ();
 #define REGISTER_TYPE  long
 
 /* Say how much memory is needed to store a copy of the register set */
-#define REGISTER_BYTES    (NUM_REGS*4) 
+#define REGISTER_BYTES    (NUM_REGS*4)
 
 /* Index within `registers' of the first byte of the space for
    register N.  */
@@ -148,7 +145,7 @@ extern char **sh_register_names;
 #define NUM_REALREGS	59
 
 /* Store the address of the place in which to copy the structure the
-   subroutine will return.  This is called from call_function. 
+   subroutine will return.  This is called from call_function.
 
    We store structs through a pointer passed in R0 */
 
@@ -167,7 +164,7 @@ extern void sh_extract_return_value PARAMS ((struct type *, void *, void *));
 	sh_extract_return_value (TYPE, REGBUF, VALBUF)
 
 /* Write into appropriate registers a function return value
-   of type TYPE, given in virtual format.  
+   of type TYPE, given in virtual format.
 
    Things always get returned in R0/R1 */
 
@@ -182,25 +179,25 @@ extern void sh_extract_return_value PARAMS ((struct type *, void *, void *));
      extract_address (REGBUF, REGISTER_RAW_SIZE (0))
 
 
-/* Define other aspects of the stack frame. 
+/* Define other aspects of the stack frame.
    we keep a copy of the worked out return pc lying around, since it
    is a useful bit of info */
 
 #define EXTRA_FRAME_INFO \
     CORE_ADDR return_pc; \
     int leaf_function;   \
-    int f_offset;    
+    int f_offset;
 
 #define INIT_EXTRA_FRAME_INFO(fromleaf, fi) \
-    sh_init_extra_frame_info(fromleaf, fi) 
+    sh_init_extra_frame_info(fromleaf, fi)
 extern void sh_init_extra_frame_info PARAMS ((int, struct frame_info *));
 
 /* A macro that tells us whether the function invocation represented
    by FI does not have a frame on the stack associated with it.  If it
    does not, FRAMELESS is set to 1, else 0.  */
 
-#define FRAMELESS_FUNCTION_INVOCATION(FI, FRAMELESS) \
-  (FRAMELESS) = frameless_look_for_prologue(FI)
+#define FRAMELESS_FUNCTION_INVOCATION(FI) \
+  (frameless_look_for_prologue(FI))
 
 #define FRAME_SAVED_PC(FRAME)		((FRAME)->return_pc)
 #define FRAME_ARGS_ADDRESS(fi)   	((fi)->frame)
@@ -211,14 +208,14 @@ extern void sh_init_extra_frame_info PARAMS ((int, struct frame_info *));
 
 /* We can't tell how many args there are */
 
-#define FRAME_NUM_ARGS(val,fi) (val = -1)
+#define FRAME_NUM_ARGS(fi) (-1)
 
 /* Return number of bytes at start of arglist that are not really args.  */
 
 #define FRAME_ARGS_SKIP 0
 
-extern void sh_frame_find_saved_regs PARAMS ((struct frame_info *fi, 
-					      struct frame_saved_regs *fsr));
+extern void sh_frame_find_saved_regs PARAMS ((struct frame_info * fi,
+					    struct frame_saved_regs * fsr));
 
 /* Put here the code to store, into a struct frame_saved_regs,
    the addresses of the saved registers of frame described by FRAME_INFO.
@@ -229,39 +226,38 @@ extern void sh_frame_find_saved_regs PARAMS ((struct frame_info *fi,
 #define FRAME_FIND_SAVED_REGS(frame_info, frame_saved_regs)	    \
    sh_frame_find_saved_regs(frame_info, &(frame_saved_regs))
 
-#define NAMES_HAVE_UNDERSCORE
-
 typedef unsigned short INSN_WORD;
 
-extern CORE_ADDR sh_push_arguments PARAMS ((int nargs, 
-					    struct value **args, 
+extern CORE_ADDR sh_push_arguments PARAMS ((int nargs,
+					    struct value ** args,
 					    CORE_ADDR sp,
 					    unsigned char struct_return,
 					    CORE_ADDR struct_addr));
 
-#define USE_GENERIC_DUMMY_FRAMES
+#define USE_GENERIC_DUMMY_FRAMES 1
 #define CALL_DUMMY                   {0}
 #define CALL_DUMMY_LENGTH            (0)
 #define CALL_DUMMY_START_OFFSET      (0)
 #define CALL_DUMMY_BREAKPOINT_OFFSET (0)
-#define FIX_CALL_DUMMY(DUMMY, STARTADDR, FUNADDR, NARGS, ARGS, TYPE, GCCP) 
+#define FIX_CALL_DUMMY(DUMMY, STARTADDR, FUNADDR, NARGS, ARGS, TYPE, GCCP)
 #define CALL_DUMMY_LOCATION          AT_ENTRY_POINT
 #define CALL_DUMMY_ADDRESS()         entry_point_address ()
-extern CORE_ADDR sh_push_return_address   PARAMS ((CORE_ADDR, CORE_ADDR));
+extern CORE_ADDR sh_push_return_address PARAMS ((CORE_ADDR, CORE_ADDR));
 #define PUSH_RETURN_ADDRESS(PC, SP)  sh_push_return_address (PC, SP)
 
 
 extern CORE_ADDR sh_frame_chain PARAMS ((struct frame_info *));
 #define FRAME_CHAIN(FRAME)           sh_frame_chain(FRAME)
 #define PUSH_DUMMY_FRAME             generic_push_dummy_frame ()
-#define FRAME_CHAIN_VALID(FP, FRAME) generic_frame_chain_valid (FP, FRAME)
-#define PC_IN_CALL_DUMMY(PC, SP, FP) generic_pc_in_call_dummy (PC, SP)
+#define FRAME_CHAIN_VALID(FP, FRAME) generic_file_frame_chain_valid (FP, FRAME)
+#define PC_IN_CALL_DUMMY(PC, SP, FP) generic_pc_in_call_dummy (PC, SP, FP)
 #define PUSH_ARGUMENTS(NARGS, ARGS, SP, STRUCT_RETURN, STRUCT_ADDR) \
-    (SP) = sh_push_arguments (NARGS, ARGS, SP, STRUCT_RETURN, STRUCT_ADDR)
+    (sh_push_arguments (NARGS, ARGS, SP, STRUCT_RETURN, STRUCT_ADDR))
 
-/* override the standard get_saved_register function with 
+/* override the standard get_saved_register function with
    one that takes account of generic CALL_DUMMY frames */
-#define GET_SAVED_REGISTER
+#define GET_SAVED_REGISTER(raw_buffer, optimized, addrp, frame, regnum, lval) \
+     generic_get_saved_register (raw_buffer, optimized, addrp, frame, regnum, lval)
 
 /* Discard from the stack the innermost frame, restoring all saved
    registers.  */
@@ -273,7 +269,7 @@ extern void sh_pop_frame PARAMS ((void));
 
 #define REGISTER_SIZE 4
 
-#define COERCE_FLOAT_TO_DOUBLE 1
+#define COERCE_FLOAT_TO_DOUBLE(formal, actual) (1)
 
 #define BELIEVE_PCC_PROMOTION 1
 

@@ -1,21 +1,22 @@
 /* Parameters for execution on a Mitsubishi m32r processor.
    Copyright 1996, 1997 Free Software Foundation, Inc. 
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* Used by mswin.  */
 #define TARGET_M32R 1
@@ -88,12 +89,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* mvs_check  SAVED_PC_AFTER_CALL */
 #define SAVED_PC_AFTER_CALL(fi) read_register (RP_REGNUM)
 
-#ifdef __STDC__
 struct frame_info;
 struct frame_saved_regs;
 struct type;
 struct value;
-#endif
 
 /* Define other aspects of the stack frame. 
    We keep the offsets of all saved registers, 'cause we need 'em a lot!
@@ -108,15 +107,15 @@ struct value;
   int using_frame_pointer;
 
 
-extern void m32r_init_extra_frame_info PARAMS ((struct frame_info *fi));
+extern void m32r_init_extra_frame_info PARAMS ((struct frame_info * fi));
 /* mvs_check  INIT_EXTRA_FRAME_INFO */
 #define INIT_EXTRA_FRAME_INFO(fromleaf, fi) m32r_init_extra_frame_info (fi)
 /* mvs_no_check  INIT_FRAME_PC */
 #define INIT_FRAME_PC		/* Not necessary */
 
-extern void 
-m32r_frame_find_saved_regs PARAMS ((struct frame_info *fi, 
-				    struct frame_saved_regs *regaddr));
+extern void
+m32r_frame_find_saved_regs PARAMS ((struct frame_info * fi,
+				    struct frame_saved_regs * regaddr));
 
 /* Put here the code to store, into a struct frame_saved_regs,
    the addresses of the saved registers of frame described by FRAME_INFO.
@@ -128,15 +127,15 @@ m32r_frame_find_saved_regs PARAMS ((struct frame_info *fi,
 #define FRAME_FIND_SAVED_REGS(frame_info, frame_saved_regs)	    \
    m32r_frame_find_saved_regs(frame_info, &(frame_saved_regs))
 
-extern CORE_ADDR m32r_frame_chain PARAMS ((struct frame_info *fi));
+extern CORE_ADDR m32r_frame_chain PARAMS ((struct frame_info * fi));
 /* mvs_check  FRAME_CHAIN */
 #define FRAME_CHAIN(fi) 		m32r_frame_chain (fi)
 
-#define FRAME_CHAIN_VALID(fp, frame)	generic_frame_chain_valid (fp, frame)
+#define FRAME_CHAIN_VALID(fp, frame)	generic_file_frame_chain_valid (fp, frame)
 
-extern CORE_ADDR m32r_find_callers_reg PARAMS ((struct frame_info *fi, 
+extern CORE_ADDR m32r_find_callers_reg PARAMS ((struct frame_info * fi,
 						int regnum));
-extern CORE_ADDR m32r_frame_saved_pc PARAMS((struct frame_info *));
+extern CORE_ADDR m32r_frame_saved_pc PARAMS ((struct frame_info *));
 /* mvs_check  FRAME_SAVED_PC */
 #define FRAME_SAVED_PC(fi)		m32r_frame_saved_pc (fi)
 
@@ -155,7 +154,7 @@ extern CORE_ADDR m32r_frame_saved_pc PARAMS((struct frame_info *));
 
 extern CORE_ADDR m32r_skip_prologue PARAMS ((CORE_ADDR pc));
 /* mvs_check  SKIP_PROLOGUE */
-#define SKIP_PROLOGUE(pc) pc = m32r_skip_prologue (pc)
+#define SKIP_PROLOGUE(pc) (m32r_skip_prologue (pc))
 
 /* mvs_no_check  FRAME_ARGS_SKIP */
 #define FRAME_ARGS_SKIP 0
@@ -165,10 +164,11 @@ extern CORE_ADDR m32r_skip_prologue PARAMS ((CORE_ADDR pc));
 /* mvs_no_check  FRAME_LOCALS_ADDRESS */
 #define FRAME_LOCALS_ADDRESS(fi) ((fi)->frame)
 /* mvs_no_check  FRAME_NUM_ARGS */
-#define FRAME_NUM_ARGS(val, fi) ((val) = -1)
+#define FRAME_NUM_ARGS(fi) (-1)
 
-#define COERCE_FLOAT_TO_DOUBLE 1
+#define COERCE_FLOAT_TO_DOUBLE(formal, actual) (1)
 
+extern void m32r_write_sp (CORE_ADDR val);
 #define TARGET_WRITE_SP m32r_write_sp
 
 
@@ -193,12 +193,12 @@ extern use_struct_convention_fn m32r_use_struct_convention;
 /* generic dummy frame stuff */
 
 #define PUSH_DUMMY_FRAME             generic_push_dummy_frame ()
-#define PC_IN_CALL_DUMMY(PC, SP, FP) generic_pc_in_call_dummy (PC, SP)
+#define PC_IN_CALL_DUMMY(PC, SP, FP) generic_pc_in_call_dummy (PC, SP, FP)
 
 
 /* target-specific dummy_frame stuff */
 
-extern struct frame_info *m32r_pop_frame PARAMS ((struct frame_info *frame));
+extern struct frame_info *m32r_pop_frame PARAMS ((struct frame_info * frame));
 /* mvs_check  POP_FRAME */
 #define POP_FRAME m32r_pop_frame (get_current_frame ())
 
@@ -206,8 +206,8 @@ extern struct frame_info *m32r_pop_frame PARAMS ((struct frame_info *frame));
 /* #define STACK_ALIGN(x) ((x + 3) & ~3) */
 
 extern CORE_ADDR m32r_push_return_address PARAMS ((CORE_ADDR, CORE_ADDR));
-extern CORE_ADDR m32r_push_arguments PARAMS ((int nargs, 
-					      struct value **args, 
+extern CORE_ADDR m32r_push_arguments PARAMS ((int nargs,
+					      struct value ** args,
 					      CORE_ADDR sp,
 					      unsigned char struct_return,
 					      CORE_ADDR struct_addr));
@@ -216,15 +216,17 @@ extern CORE_ADDR m32r_push_arguments PARAMS ((int nargs,
 
 /* mvs_no_check  PUSH_ARGUMENTS */
 #define PUSH_ARGUMENTS(NARGS, ARGS, SP, STRUCT_RETURN, STRUCT_ADDR) \
-  (SP) = m32r_push_arguments (NARGS, ARGS, SP, STRUCT_RETURN, STRUCT_ADDR)
+  (m32r_push_arguments (NARGS, ARGS, SP, STRUCT_RETURN, STRUCT_ADDR))
 
 #define PUSH_RETURN_ADDRESS(PC, SP)      m32r_push_return_address (PC, SP)
 
 /* override the standard get_saved_register function with 
    one that takes account of generic CALL_DUMMY frames */
-#define GET_SAVED_REGISTER
+#define GET_SAVED_REGISTER(raw_buffer, optimized, addrp, frame, regnum, lval) \
+     generic_get_saved_register (raw_buffer, optimized, addrp, frame, regnum, lval)
 
-#define USE_GENERIC_DUMMY_FRAMES
+
+#define USE_GENERIC_DUMMY_FRAMES 1
 #define CALL_DUMMY                   {0}
 #define CALL_DUMMY_LENGTH            (0)
 #define CALL_DUMMY_START_OFFSET      (0)

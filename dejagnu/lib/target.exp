@@ -271,6 +271,10 @@ proc prune_warnings { text } {
     # Libgloss libnosys defines functions that warn when linked in
     regsub -all "(^|\n)\[^\n\]*: In function\[^\n\]*\n\[^\n\]\[^\n\]*is not implemented and will always fail\[^\n\]*" $text "" text
 
+    # libstdc++-v3 tests can emit cpplib warnings due to duplicate -isystem / -I flags
+    regsub -all "(^|\n)\[^\n\]*: warning: changing search order for system directory\[^\n\]*" $text "" text
+    regsub -all "(^|\n)\[^\n\]*: warning:   as it has already been specified\[^\n\]*" $text "" text
+
     # It might be tempting to get carried away and delete blank lines, etc.
     # Just delete *exactly* what we're ask to, and that's it.
     return $text

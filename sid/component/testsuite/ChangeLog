@@ -1,3 +1,21 @@
+2001-06-15  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.cache/cache.exp: New test case.
+	* sidcomp.cache/cachedocs.exp: Ditto.
+	* sidcomp.cache/cachemonkey.exp: Ditto.
+	* sidcomp.cache/coherency.exp: Ditto.
+	* sidcomp.cache/fifo.exp: Ditto.
+	* sidcomp.cache/flush.exp: Ditto.
+	* sidcomp.cache/lock.exp: Ditto.
+	* sidcomp.cache/lru.exp: Ditto.
+	* sidcomp.cache/misaligned.exp: Ditto.
+	* sidcomp.cache/prefetch.exp: Ditto.
+	* sidcomp.cache/random.exp: Ditto.
+	* sidcomp.cache/types.exp: Ditto.
+	* sidcomp.cache/utils.exp: Ditto.
+	* sidcomp.cache/writealloc.exp: Ditto.
+	* sidcomp.cache/writethru.exp: Ditto.
+
 2001-06-13  Ben Elliston  <bje@redhat.com>
 
 	* lib/docs.exp (doc_test): Pass $compname to doc_exists.

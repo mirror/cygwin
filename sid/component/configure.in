@@ -91,12 +91,13 @@ AC_CONFIG_SUBDIRS([cfgroot tcl audio cgen-cpu timers])
 
 dnl All other component subdirectories should be listed here, so "make"
 dnl can recursively descend there - see "Makefile.am".
-make_subdirs="consoles gdb gloss glue ide interrupt lcd loader mapper memory mmu parport profiling rtc sched uart testsuite"
+make_subdirs="cache consoles gdb gloss glue ide interrupt lcd loader mapper memory mmu parport profiling rtc sched uart testsuite"
 AC_SUBST(make_subdirs)
 
 dnl List all component subdirectory files not covered by AC_CONFIG_SUBDIRS
 dnl that need autoconf @substitution@.
 AC_OUTPUT([Makefile testsuite/Makefile tconfig.h:tconfig.in siddoc
+	cache/Makefile
 	consoles/Makefile
 	gdb/Makefile
 	gloss/Makefile

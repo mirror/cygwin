@@ -1,0 +1,85 @@
+# writealloc.exp -*- Tcl -*-
+# Test the write allocate strategy.
+#
+# Copyright (C) 2001 Red Hat, Inc.
+
+source $srcdir/$subdir/utils.exp
+
+set test "sid startup"
+sid_config_component_test_with_tracing "cache.conf" \
+        "load [sid_find_file libcache.la] cache_component_library" \
+        "hw-cache-basic"
+
+if {[sid_start "cache.conf"]} { pass $test } else { fail $test; return }
+
+set test "acquire upstream bus handle"
+set cache_bus [sid_cmd "sid::component::find_bus $victim upstream"]
+if {$cache_bus != ""} { pass $test } else { fail $test }
+
+set test "generate test bus for downstream"
+set mem_bus [sid_cmd "sid::bus::new"]
+if {$mem_bus == ""} { fail $test } else { pass $test }
+
+set test "connect test bus to cache"
+set result [sid_cmd "sid::component::connect_accessor $victim downstream $mem_bus"]
+if {$result == "ok"} { pass $test } else { fail $test }
+
+instrument_bus $mem_bus
+
+# Enable write allocate.
+
+set test "enable write allocate"
+set result [sid_cmd "sid::component::set_attribute_value $victim write-allocate? yes"]
+if {$result != "ok" } { fail $test; return }
+
+# Test write allocate by writing to a line which produces a miss.
+# Check to make sure that the line is then loaded.
+
+set test "write byte to 0x100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::write_h4_l1 $cache_bus 0x100 0x55"]
+if {[lindex $result 0] != "ok"} { fail $test; return }
+assert_miss
+
+set test "read byte from 0x100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x100"]
+if {[lindex $result 0] != "ok"} { fail $test; return }
+assert_hit
+
+set test "another write to 0x100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::write_h4_l1 $cache_bus 0x100 0x55"]
+if {[lindex $result 0] != "ok"} { fail $test; return }
+assert_hit
+
+set test "another read from 0x100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x100"]
+if {[lindex $result 0] != "ok"} { fail $test; return }
+assert_hit
+
+# Disable write allocate.  Now, writes that miss will go straight
+# through.  Thus, a subsequent read from the same address will "miss".
+
+set test "disable write allocate"
+set result [sid_cmd "sid::component::set_attribute_value $victim write-allocate? no"]
+if {$result != "ok" } { fail $test; return }
+
+set test "write byte to 0x500"
+clear_miss_flag
+set result [sid_cmd "sid::bus::write_h4_l1 $cache_bus 0x500 0x55"]
+if {[lindex $result 0] != "ok"} { fail $test; return }
+assert_miss
+
+set test "read byte from 0x500"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x500"]
+if {[lindex $result 0] != "ok"} { fail $test; return }
+assert_miss
+
+set test "read byte from 0x500 again"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l1 $cache_bus 0x500"]
+if {[lindex $result 0] != "ok"} { fail $test; return }
+assert_hit

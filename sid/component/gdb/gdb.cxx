@@ -747,9 +747,9 @@ gdb::process_set_pc (struct gdbserv_reg* val)
     cerr << pc;
 
   // Handle disharvardization
-  if (this->hw_breakpoint_pc_mask)
+  if (this->gdb_pc_mask)
     {
-      pc &= this->hw_breakpoint_pc_mask;
+      pc &= this->gdb_pc_mask;
       if (trace_gdbsid)
 	cerr << " =Z=> "
 	     << pc;
@@ -911,10 +911,10 @@ gdb::rangestep_program (struct gdbserv_reg* range_start, struct gdbserv_reg* ran
     cerr << "[" << this->step_range_start << "," << this->step_range_end << ")";
 
   // Handle disharvardization
-  if (this->hw_breakpoint_pc_mask)
+  if (this->gdb_pc_mask)
     {
-      this->step_range_start &= this->hw_breakpoint_pc_mask;
-      this->step_range_end &= this->hw_breakpoint_pc_mask;
+      this->step_range_start &= this->gdb_pc_mask;
+      this->step_range_end &= this->gdb_pc_mask;
       if (trace_gdbsid)
 	cerr << " =Z=> "
 	     << "[" << this->step_range_start << "," << this->step_range_end << ")";
@@ -968,16 +968,32 @@ gdb::continue_program ()
 int
 gdb::remove_breakpoint (unsigned long type, struct gdbserv_reg *addr, struct gdbserv_reg *len)
 {
-  if (trace_gdbsid)
-    cerr << "remove_breakpoint type " << type << endl;
-  if (! enable_Z_packet) return 1;
-
-  if (this->cpu == 0) return -1;
-
   host_int_8 watch_pc;
   gdbserv_reg_to_ulonglong (gdbserv, addr, &watch_pc);
 
-  bool ok = this->remove_hw_breakpoint (watch_pc);
+  unsigned long bp_length;
+  gdbserv_reg_to_ulong (gdbserv, len, &bp_length);
+
+  if (trace_gdbsid)
+    cerr << "remove_breakpoint"
+	 << " type " << type
+	 << " addr " << watch_pc
+	 << " length " << bp_length
+	 << endl;
+
+  if (! enable_Z_packet) return 1;
+  if (this->cpu == 0) return -1;
+
+  bool ok = false;
+
+  if ((type == GDBSERV_TARGET_BP_HARDWARE) || 
+      (type == GDBSERV_TARGET_BP_SOFTWARE && force_Z_sw_to_hw))
+    ok = this->remove_hw_breakpoint (watch_pc, bp_length);
+  else if ((type == GDBSERV_TARGET_BP_SOFTWARE) || 
+	   (type == GDBSERV_TARGET_BP_HARDWARE && force_Z_hw_to_sw))
+    ok = this->remove_sw_breakpoint (watch_pc, bp_length);
+  // Fail on uses of other breakpoint types (WRITE, READ, ACCESS, UNKNOWN)
+
   return ok ? 0 : -1;
 }
 
@@ -999,7 +1015,7 @@ gdb::remove_all_hw_breakpoints ()
 
       // decrement refcount
       host_int_8 address = it->first;
-      bool ok = this->remove_hw_breakpoint (address);
+      bool ok = this->remove_hw_breakpoint (address, 0);
       if (!ok) return ok;
     }
   return true;
@@ -1007,7 +1023,7 @@ gdb::remove_all_hw_breakpoints ()
 
 
 bool
-gdb::remove_hw_breakpoint (host_int_8 address)
+gdb::remove_hw_breakpoint (host_int_8 address, host_int_4 length)
 {  
   if (this->hw_breakpoints[address] <= 0)
     {
@@ -1016,13 +1032,13 @@ gdb::remove_hw_breakpoint (host_int_8 address)
     }
 
   string watcher_name;
-  if (this->hw_breakpoint_pc_mask)
+  if (this->gdb_pc_mask)
     {
       watcher_name =
 	string ("watch:") + 
 	map_watchable_name ("gdb-register-pc") + string (":") +
 	string ("mask/value:") + 
-	make_numeric_attribute (this->hw_breakpoint_pc_mask) + string (":") +
+	make_numeric_attribute (this->gdb_pc_mask) + string (":") +
 	make_numeric_attribute (address);
     }
   else
@@ -1046,34 +1062,113 @@ gdb::remove_hw_breakpoint (host_int_8 address)
 }
 
 
+bool
+gdb::remove_all_sw_breakpoints ()
+{
+  while (true)
+    {
+      sw_breakpoints_t::iterator it = this->sw_breakpoints.begin();
+      if (it == this->sw_breakpoints.end()) break;
+
+      host_int_8 address = it->first;
+      bool ok = this->remove_hw_breakpoint (address, 0 /* unknown length */);
+      if (!ok) return ok;
+    }
+  return true;
+}
+
+
+bool
+gdb::remove_sw_breakpoint (host_int_8 address, host_int_4 length)
+{
+  // see also ::add_sw_breakpoint()
+
+  // reject absent entry
+  if (this->sw_breakpoints.find(address) == this->sw_breakpoints.end())
+    return fallback_Z_sw_to_hw && this->remove_hw_breakpoint (address, length);
+
+  // Beyond this point, don't try to fall back to hw breakpoints.
+  // That's because only a successful add_sw_breakpoint would pass the
+  // previous test.  If it fails anything beyond this point, then a sw
+  // breakpoint is already in place, and cannot possibly be removed by
+  // using hw breakpoints.
+
+  sid::bus* memory = cpu->find_bus ("debugger-bus");
+  if (! memory)
+    return false;
+
+  string imem = this->sw_breakpoints [address];
+
+  if (length != 0 && (imem.length() != length))
+    return false;
+  // maybe we don't know the removal length any more; update length if so
+  if (length == 0)
+    length = imem.length();
+
+  // put back insn memory at given address
+  for (host_int_4 i=0; i<length; i++)
+    {
+      little_int_1 byte; // == big_int_1
+
+      // store back old image
+      byte = imem[i]; // range already checked above
+      bus::status s = memory->write (address + i, byte);
+      if (s != bus::ok)
+	return false;
+    }
+
+  // success!
+  this->sw_breakpoints.erase (address);
+  return true;
+}
+
+
 int
 gdb::set_breakpoint (unsigned long type, struct gdbserv_reg *addr, struct gdbserv_reg *len)
 {
-  if (trace_gdbsid)
-    cerr << "set_breakpoint type " << type << endl;
-  if (! enable_Z_packet) return 1;
-
-  if (this->cpu == 0) return -1;
-
   host_int_8 watch_pc;
   gdbserv_reg_to_ulonglong (gdbserv, addr, &watch_pc);
 
-  bool ok = this->add_hw_breakpoint (watch_pc);
+  unsigned long bp_length;
+  gdbserv_reg_to_ulong (gdbserv, len, &bp_length);
+
+  if (trace_gdbsid)
+    cerr << "add_breakpoint"
+	 << " type " << type
+	 << " addr " << watch_pc
+	 << " length " << bp_length
+	 << endl;
+
+
+  if (! enable_Z_packet) return 1;
+  if (this->cpu == 0) return -1;
+  bool ok = false;
+
+  if ((type == GDBSERV_TARGET_BP_HARDWARE) || 
+      (type == GDBSERV_TARGET_BP_SOFTWARE && force_Z_sw_to_hw))
+    ok = this->add_hw_breakpoint (watch_pc, bp_length);
+  else if ((type == GDBSERV_TARGET_BP_SOFTWARE) || 
+	   (type == GDBSERV_TARGET_BP_HARDWARE && force_Z_hw_to_sw))
+    ok = this->add_sw_breakpoint (watch_pc, bp_length);
+  // Fail on uses of other breakpoint types (WRITE, READ, ACCESS, UNKNOWN)
+
   return ok ? 0 : -1;
 }
 
 
 bool
-gdb::add_hw_breakpoint (host_int_8 address)
-{  
+gdb::add_hw_breakpoint (host_int_8 address, host_int_4 length)
+{
+  // XXX: be sensitive to length
+
   string watcher_name;
-  if (this->hw_breakpoint_pc_mask)
+  if (this->gdb_pc_mask)
     {
       watcher_name =
 	string ("watch:") + 
 	map_watchable_name ("gdb-register-pc") + string (":") +
 	string ("mask/value:") + 
-	make_numeric_attribute (this->hw_breakpoint_pc_mask) + string (":") +
+	make_numeric_attribute (this->gdb_pc_mask) + string (":") +
 	make_numeric_attribute (address);
     }
   else
@@ -1086,7 +1181,6 @@ gdb::add_hw_breakpoint (host_int_8 address)
     }
   // see also ::remove_hw_breakpoint()
 
-  
   this->hw_breakpoints[address] ++;
   if (this->hw_breakpoints[address] == 1)
     {
@@ -1098,6 +1192,56 @@ gdb::add_hw_breakpoint (host_int_8 address)
 }
 
 
+bool
+gdb::add_sw_breakpoint (host_int_8 address, host_int_4 length)
+{
+  // see also ::remove_sw_breakpoint()
+
+  // reject duplicate
+  if (this->sw_breakpoints.find(address) != this->sw_breakpoints.end())
+    return false;
+
+  sid::bus* memory = cpu->find_bus ("debugger-bus");
+  if (! memory)
+    return fallback_Z_sw_to_hw && this->add_hw_breakpoint (address, length);
+
+  // fetch cpu sw breakpoint image
+  endian e;
+  component::status s = 
+    parse_attribute (cpu->attribute_value ("endian"), e);
+  if (s != component::ok) assert (e == endian_unknown);
+  string bp_attr_name = string("gdb-sw-breakpoint") + 
+    (e == endian_little ? string ("-little") :
+     e == endian_big ? string ("-big") :
+     string ("")); // should not happen; will fail when used
+  string bp = cpu->attribute_value (bp_attr_name);
+  if (bp.length() != length)
+    return fallback_Z_sw_to_hw && this->add_hw_breakpoint (address, length);
+
+  // fetch insn memory at given address; replace it byte by byte
+  string imem;
+  for (host_int_4 i=0; i<length; i++)
+    {
+      little_int_1 byte; // == big_int_1
+
+      // fetch old image
+      bus::status s = memory->read (address + i, byte);
+      if (s != bus::ok)
+	return fallback_Z_sw_to_hw && this->add_hw_breakpoint (address, length);
+      imem += byte;
+
+      // store new image
+      byte = bp[i]; // range already checked above
+      s = memory->write (address + i, byte);
+      if (s != bus::ok)
+	return fallback_Z_sw_to_hw && this->add_hw_breakpoint (address, length);
+    }
+
+  // success!
+  this->sw_breakpoints [address] = imem;
+  return true;
+}
+
 
 void
 gdb::process_detach ()
@@ -1105,10 +1249,12 @@ gdb::process_detach ()
   if (trace_gdbsid)
     cerr << "process_detach " << endl;
 
-  bool ok = this->remove_all_hw_breakpoints ();
+  bool ok =
+    this->remove_all_hw_breakpoints () &&
+    this->remove_all_sw_breakpoints ();
   if (!ok)
     {
-      cerr << "sw-debug-gdb: cannot clean up hardware breakpoints" << endl;
+      cerr << "sw-debug-gdb: cannot clean up breakpoints" << endl;
     }
 
   // Decouple from gdbserv; caller will free it.
@@ -1353,9 +1499,12 @@ gdb::gdb ():
   trace_gdbsid = false;
   exit_on_detach = false;
   enable_Z_packet = true;
+  force_Z_sw_to_hw = false;
+  force_Z_hw_to_sw = false;
+  fallback_Z_sw_to_hw = true;
   enable_E_packet = true;
   operating_mode_p = true;
-  hw_breakpoint_pc_mask = 0;
+  gdb_pc_mask = 0;
   step_range_start = 0;
   step_range_end = 0;
 
@@ -1365,9 +1514,13 @@ gdb::gdb ():
 			this, & gdb::update_trace_flags, "setting");
   add_attribute ("exit-on-detach?", & exit_on_detach, "setting");
   add_attribute ("enable-Z-packet?", & enable_Z_packet, "setting");
+  add_attribute ("force-Z-hw-to-sw?", & force_Z_sw_to_hw, "setting");
+  add_attribute ("force-Z-sw-to-hw?", & force_Z_hw_to_sw, "setting");
+  add_attribute ("fallback-Z-sw-to-hw?", & fallback_Z_sw_to_hw, "setting");
   add_attribute ("enable-E-packet?", & enable_E_packet, "setting");
   add_attribute ("operating-mode?", & operating_mode_p, "setting");
-  add_attribute ("Z-packet-pc-mask", & hw_breakpoint_pc_mask, "setting");
+  add_attribute ("gdb-pc-mask", & gdb_pc_mask, "setting");
+  add_attribute_alias ("Z-packet-pc-mask", "gdb-pc-mask"); // backward compat.
 }
 
 
@@ -1558,8 +1711,8 @@ gdb::cpu_trap_handler (host_int_4 trap_type)
       else
 	{
 	  // Handle disharvardization
-	  if (this->hw_breakpoint_pc_mask)
-	    pc &= this->hw_breakpoint_pc_mask;
+	  if (this->gdb_pc_mask)
+	    pc &= this->gdb_pc_mask;
 
 	  // Note the [start, end) interpretation!
 	  if (pc >= this->step_range_start && pc < this->step_range_end)

@@ -1,6 +1,6 @@
 // gdb.h - description.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
+// Copyright (C) 1999-2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -32,9 +32,10 @@ using std::cout;
 
 using sid::component;
 using sid::bus;
-using sid::host_int_4;
 using sid::host_int_8;
+using sid::host_int_4;
 using sid::host_int_2;
+using sid::host_int_1;
 using sid::big_int_1;
 using sid::big_int_2;
 using sid::big_int_4;
@@ -121,13 +122,24 @@ private:
   output_pin restart_pin; // signal to hw-reset
   void target_power (bool on);
 
+  // This setting allows us to compensate for some Harvardized
+  // addressing schemes, where a PC value is annotated with
+  // address space identification bits.
+  host_int_8 gdb_pc_mask; // 0=disabled
+
   // hw breakpoint tracking
   typedef map<host_int_8,int> hw_breakpoints_t;
   hw_breakpoints_t hw_breakpoints; // address -> insertion-count
-  host_int_8 hw_breakpoint_pc_mask; // 0=disabled
-  bool add_hw_breakpoint (host_int_8);
-  bool remove_hw_breakpoint (host_int_8);
+  bool add_hw_breakpoint (host_int_8, host_int_4);
+  bool remove_hw_breakpoint (host_int_8, host_int_4);
   bool remove_all_hw_breakpoints ();
+
+  // sw breakpoint tracking
+  typedef map<host_int_8,string> sw_breakpoints_t;
+  sw_breakpoints_t sw_breakpoints; // address -> memory-image
+  bool add_sw_breakpoint (host_int_8, host_int_4);
+  bool remove_sw_breakpoint (host_int_8, host_int_4);
+  bool remove_all_sw_breakpoints ();
 
   // pending signal tracking
   typedef map<int,int> pending_signal_counts_t;
@@ -149,7 +161,10 @@ private:
   bool trace_gdbserv;
   bool trace_gdbsid;
   void update_trace_flags();
-  bool enable_Z_packet;
+  bool enable_Z_packet; // support z* at all
+  bool force_Z_sw_to_hw; // map z0 -> z1
+  bool force_Z_hw_to_sw; // map z1 -> z0
+  bool fallback_Z_sw_to_hw; // hw, if error during sw breakpoint add attempt
   bool enable_E_packet;
   bool operating_mode_p;
 

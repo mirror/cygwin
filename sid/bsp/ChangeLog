@@ -1,5 +1,9 @@
 2001-10-26  Frank Ch. Eigler  <fche@redhat.com>
 
+	* configrun-sid.in: Correct cache-flush-net -> i/dcache connections.
+
+2001-10-26  Frank Ch. Eigler  <fche@redhat.com>
+
 	* configrun-sid.in: Add "--version" option.  Add "bus=MAPPER"
 	memory-region option.  Avoid needless subprocess calls for
 	config file stamping.  Add cache-flush net between gdb and

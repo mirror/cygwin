@@ -89,7 +89,7 @@ $load_mapper_data = "cpu-mapper access-port";
 	    "help!" => ["help", "Print this help message."],
 	    "version!" => ["version", "Print wrapper / sid versions."],
 	    "cpu=s" => ["cpu=CPU   (REQUIRED)", "Select target processor.", "none"],
-	    "v|verbose!" => ["v|verbose", "Turn on various run-time verbosity settings.", "no"],
+	    "verbose|v!" => ["verbose|v", "Turn on various run-time verbosity settings.", "no"],
 	    "save-temps!" => ["save-temps", "Keep generated sid configuration file.", "no"],
 	    "trace-extract!" => ["trace-extract", "Turn on CPU insn decode tracing.", "no"],
 	    "trace-semantics!" => ["trace-semantics", "Turn on CPU insn execute tracing.", "no"],

@@ -1,3 +1,10 @@
+2004-12-13  Kevin Buettner  <kevinb@redhat.com>
+
+	* thread-db.c (thread_db_get_thread_reg): Don't allow a successful
+	return without first initializing ``reg''.
+	(thread_db_set_thread_reg): Remove code intended to for
+	thread_db_get_thread_reg().
+
 2004-12-09  Jim Blandy  <jimb@redhat.com>
 
 	* aclocal.m4, configure: Regenerated.

@@ -1,6 +1,6 @@
 /* window.cc: hidden windows for signals/itimer support
 
-   Copyright 1997, 1998, 2000 Cygnus Solutions.
+   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
 
    Written by Sergey Okhapkin <sos@prospect.com.ru>
 
@@ -10,10 +10,18 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <sys/time.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "winsup.h"
+#include <signal.h>
+#include <limits.h>
+#include <wingdi.h>
+#include <winuser.h>
+#include <unistd.h>
+#include "cygerrno.h"
+#include "perprocess.h"
+#include "security.h"
 
 static NO_COPY UINT timer_active = 0;
 static NO_COPY struct itimerval itv;
@@ -24,7 +32,7 @@ static LRESULT CALLBACK
 WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 #ifndef NOSTRACE
-  _strace_wm (uMsg, wParam, lParam);
+  strace.wm (uMsg, wParam, lParam);
 #endif
   switch (uMsg)
     {
@@ -49,7 +57,7 @@ WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	      start_time = GetTickCount ();
 	      itv.it_value = itv.it_interval;
 	    }
-	  raise(SIGALRM);
+	  raise (SIGALRM);
 	}
       return 0;
     case WM_ASYNCIO:
@@ -63,11 +71,11 @@ WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 static HANDLE window_started;
 
 static DWORD WINAPI
-Winmain (VOID *arg)
+Winmain (VOID *)
 {
   MSG msg;
   WNDCLASS wc;
-  static char classname[] = "CygwinWndClass";
+  static NO_COPY char classname[] = "CygwinWndClass";
 
   /* Register the window class for the main window. */
 
@@ -143,8 +151,7 @@ window_terminate ()
     SendMessage (ourhwnd, WM_DESTROY, 0, 0);
 }
 
-extern "C"
-int
+extern "C" int
 setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
 {
   UINT elapse;
@@ -154,9 +161,15 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
       set_errno (EINVAL);
       return -1;
     }
+  /* Check if we will wrap */
+  if (itv.it_value.tv_sec >= (long) (UINT_MAX / 1000))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   if (timer_active)
     {
-      KillTimer (gethwnd(), timer_active);
+      KillTimer (gethwnd (), timer_active);
       timer_active = 0;
     }
   if (oldvalue)
@@ -169,8 +182,11 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
   itv = *value;
   elapse = itv.it_value.tv_sec * 1000 + itv.it_value.tv_usec / 1000;
   if (elapse == 0)
-    return 0;
-  if (!(timer_active = SetTimer (gethwnd(), 1, elapse, NULL)))
+    if (itv.it_value.tv_usec)
+      elapse = 1;
+    else
+      return 0;
+  if (!(timer_active = SetTimer (gethwnd (), 1, elapse, NULL)))
     {
       __seterrno ();
       return -1;
@@ -179,8 +195,7 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 getitimer (int which, struct itimerval *value)
 {
   UINT elapse, val;
@@ -205,27 +220,41 @@ getitimer (int which, struct itimerval *value)
   elapse = GetTickCount () - start_time;
   val = itv.it_value.tv_sec * 1000 + itv.it_value.tv_usec / 1000;
   val -= elapse;
-  value->it_value.tv_sec = val/1000;
-  value->it_value.tv_usec = val%1000;
+  value->it_value.tv_sec = val / 1000;
+  value->it_value.tv_usec = val % 1000;
   return 0;
 }
 
-extern "C"
-unsigned int
+extern "C" unsigned int
 alarm (unsigned int seconds)
 {
   int ret;
   struct itimerval newt, oldt;
 
-  getitimer (ITIMER_REAL, &oldt);
-
   newt.it_value.tv_sec = seconds;
   newt.it_value.tv_usec = 0;
   newt.it_interval.tv_sec = 0;
   newt.it_interval.tv_usec = 0;
-  setitimer (ITIMER_REAL, &newt, NULL);
+  setitimer (ITIMER_REAL, &newt, &oldt);
   ret = oldt.it_value.tv_sec;
   if (ret == 0 && oldt.it_value.tv_usec)
     ret = 1;
   return ret;
 }
+
+extern "C" useconds_t
+ualarm (useconds_t value, useconds_t interval)
+{
+  struct itimerval timer, otimer;
+
+  timer.it_value.tv_sec = 0;
+  timer.it_value.tv_usec = value;
+  timer.it_interval.tv_sec = 0;
+  timer.it_interval.tv_usec = interval;
+
+  if (setitimer (ITIMER_REAL, &timer, &otimer) < 0)
+    return (u_int)-1;
+
+  return (otimer.it_value.tv_sec * 1000000) + otimer.it_value.tv_usec;
+}
+

@@ -36,12 +36,6 @@
  * regular-expression syntax might require a total rethink.
  */
 
-#if 0
-#ifndef lint
-static char *rcsid = "$Id: regexp.c,v 1.3 1998/11/03 02:42:07 cgf Exp $";
-#endif /* not lint */
-#endif
-
 #include "regexp.h"
 #include <stdio.h>
 #include <ctype.h>

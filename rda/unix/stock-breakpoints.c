@@ -85,6 +85,8 @@ stock_bp_make_table (struct gdbserv *serv,
   t->serv = serv;
   t->target = target;
   t->bp_insn_len = 0;
+
+  return t;
 }
 
 

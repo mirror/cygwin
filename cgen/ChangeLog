@@ -1,3 +1,12 @@
+2000-12-08  Ben Elliston  <bje@redhat.com>
+
+	* dev.scm (load-sid): New function.
+	* cgen-sid.scm: New file.
+	* sid-cpu.scm: Likeiwse.
+	* sid-decode.scm: Likewise.
+	* sid-model.scm: Likewise.
+	* sid.scm: Likewise.
+
 2000-12-07  Ben Elliston  <bje@redhat.com>
 
 	* sim-decode.scm (-gen-extract-case): Do not emit a definition for

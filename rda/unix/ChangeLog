@@ -40,7 +40,7 @@
 	Move libthread_db event-based thread death logic from lwp-pool.c
 	to thread-db.c, so the former can stay innocent of libthread_db's
 	details, and limit itself to kernel behavior.
-	* lwp-pool.h (lwp_pool_continue_and_drop): New declaration.
+	* lwp-pool.h (lwp_pool_continue_and_drop_lwp): New declaration.
 	(lwp_pool_thread_db_death_event,
 	lwp_pool_thread_db_death_notified): Declarations deleted.
 	* lwp-pool.c (enum death_state): Move to thread-db.c.

@@ -238,15 +238,23 @@
 
 (define (gen-multi-ifld-extract f indent base-length total-length base-value var-list macro?)
   ; The subfields must have already been extracted.
-  (let* ((extract (rtl-c VOID (multi-ifld-extract f) nil
-			 #:rtl-cover-fns? #f #:ifield-var? #t))
-	 (decode-proc (ifld-decode f))
-	 (decode (if decode-proc
-		     (rtl-c VOID (cadr decode-proc)
-			    (list (list (caar decode-proc) 'UINT extract)
-				  (list (cadar decode-proc) 'IAI "pc"))
-			    #:rtl-cover-fns? #f #:ifield-var? #t)
-		     extract)))
+  (let* ((decode-proc (ifld-decode f))
+	 (varname (gen-sym f))
+	 (decode (string-list
+		  ;; First, the block that extract the multi-ifield into the ifld variable
+		  (rtl-c VOID (multi-ifld-extract f) nil
+			 #:rtl-cover-fns? #f #:ifield-var? #t)
+		  ;; Next, the decode routine that modifies it
+		  (if decode-proc
+		      (string-append
+		       "  " varname " = "
+		       (rtl-c VOID (cadr decode-proc)
+			      (list (list (caar decode-proc) 'UINT varname)
+				    (list (cadar decode-proc) 'IAI "pc"))
+			      #:rtl-cover-fns? #f #:ifield-var? #t)
+		       ";\n")
+		      "")
+		 )))
     (if macro?
 	(backslash "\n" decode)
 	decode))

@@ -1,3 +1,7 @@
+2001-07-09  Ben Elliston  <bje@redhat.com>
+
+	* cache.cxx: Use std::cout and std::endl for C++ conformance.
+
 2001-06-24  Ben Elliston  <bje@redhat.com>
 
 	* cache.cxx (set_hash_mask): Validate parse_attribute result.

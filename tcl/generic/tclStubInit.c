@@ -128,14 +128,14 @@ TclIntStubs tclIntStubs = {
     TclOpenFileChannelDeleteProc, /* 66 */
     TclOpenFileChannelInsertProc, /* 67 */
     TclpAccess, /* 68 */
-#ifndef __CYGWIN__
+#if !defined(__CYGWIN__) || defined(__MINGW32__)
     TclpAlloc, /* 69 */
 #endif
     TclpCopyFile, /* 70 */
     TclpCopyDirectory, /* 71 */
     TclpCreateDirectory, /* 72 */
     TclpDeleteFile, /* 73 */
-#ifndef __CYGWIN__
+#if !defined(__CYGWIN__) || defined(__MINGW32__)
     TclpFree, /* 74 */
 #endif
     TclpGetClicks, /* 75 */
@@ -144,7 +144,7 @@ TclIntStubs tclIntStubs = {
     TclpGetTimeZone, /* 78 */
     TclpListVolumes, /* 79 */
     TclpOpenFileChannel, /* 80 */
-#ifndef __CYGWIN__
+#if !defined(__CYGWIN__) || defined(__MINGW32__)
     TclpRealloc, /* 81 */
 #endif
     TclpRemoveDirectory, /* 82 */

@@ -1,3 +1,13 @@
+2001-09-13  Ian Roxborough  <irox@redhat.com>
+
+	* generic/tclStubInit.tcl: Export tclAlloc functions
+	if __MINGW32__ is defined.
+	* generic/tclAlloc.c: Revert changes from 2001-09-12.
+	* generic/tcl.h: Use tclAlloc function if __WIN32__
+	is defined.
+	* win/tclWinPort.h: Fixed typer __MWIN32 should read
+	__WIN32__.
+
 2001-09-12  Ian Roxborough  <irox@redhat.com>
 
 	* Makefile.in: Add 'cygwin' subdirectory to 'make all'

@@ -21,8 +21,6 @@
 #include "tclInt.h"
 #include "tclPort.h"
 
-#if !defined(__CYGWIN__) || defined(__TCL_UNIX_VARIANT)
-
 #if USE_TCLALLOC
 
 #ifdef TCL_DEBUG
@@ -725,6 +723,4 @@ TclpRealloc(cp, nbytes)
 }
 
 #endif /* !USE_TCLALLOC */
-
-#endif /* !__CYGWIN__ OR __TCL_UNIX_VARIANT */
 

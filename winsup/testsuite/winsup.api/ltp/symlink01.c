@@ -29,7 +29,7 @@
  * 
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  */
-/* $Id: symlink01.c,v 1.5 2003/01/24 01:09:39 cgf Exp $ */
+/* $Id: symlink01.c,v 1.6 2004/08/24 09:34:04 corinna Exp $ */
 /**********************************************************
 * 
 *    OS Test - Silicon Graphics, Inc.
@@ -1670,8 +1670,8 @@ struct all_test_cases *tc_ptr;
 		}
 	    } else {
 		tst_resm(TFAIL, 
-		    "%sA lstat of %s (ino:%d) and of\n\t\t\
-%s (ino:%d), does not show them being the same ino.", Buffer,
+		    "%sA lstat of %s (ino:%llu) and of\n\t\t\
+%s (ino:%llu), does not show them being the same ino.", Buffer,
 		   tc_ptr->fn_arg[1], asymlink.st_ino, "nick", statter.st_ino);
 	    }
           }

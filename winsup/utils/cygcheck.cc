@@ -42,7 +42,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.63 $";
+static const char version[] = "$Revision: 1.64 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -97,6 +97,15 @@ static common_apps[] = {
 
 static int num_paths = 0, max_paths = 0;
 static char **paths = 0;
+
+void
+eprintf (const char *format, ...)
+{
+  va_list ap;
+  va_start (ap, format);
+  vfprintf (stderr, format, ap);
+  va_end (ap);
+}
 
 /*
  * display_error() is used to report failure modes

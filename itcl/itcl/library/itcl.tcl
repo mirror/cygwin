@@ -27,7 +27,7 @@
 #  alive until a procedure exits.
 # ----------------------------------------------------------------------
 proc ::itcl::local {class name args} {
-    set ptr [uplevel eval [list $class $name] $args]
+    set ptr [uplevel [list $class $name] $args]
     uplevel [list set itcl-local-$ptr $ptr]
     set cmd [uplevel namespace which -command $ptr]
     uplevel [list trace variable itcl-local-$ptr u \
@@ -42,11 +42,12 @@ proc ::itcl::local {class name args} {
 # parser in Tcl...
 #
 
+# RED HAT LOCAL: don't require namespace qualifier
 #
 # USAGE:  itcl::class name body
 # Adds an entry for the given class declaration.
 #
-foreach cmd {itcl::class itcl_class} {
+foreach cmd {itcl::class itcl_class class} {
     auto_mkindex_parser::command $cmd {name body} {
         variable index
         variable scriptFile
@@ -61,39 +62,50 @@ foreach cmd {itcl::class itcl_class} {
     }
 }
 
+# RED HAT LOCAL: don't require namespace qualifier
 #
 # USAGE:  itcl::body name arglist body
 # Adds an entry for the given method/proc body.
 #
-auto_mkindex_parser::command itcl::body {name arglist body} {
-    variable index
-    variable scriptFile
-    append index "set [list auto_index([fullname $name])]"
-    append index " \[list source \[file join \$dir [list $scriptFile]\]\]\n"
+foreach cmd {itcl::body body} {
+    auto_mkindex_parser::command $cmd {name arglist body} {
+        variable index
+        variable scriptFile
+        append index "set [list auto_index([fullname $name])]"
+        append index " \[list source \[file join \$dir [list $scriptFile]\]\]\n"
+    }
 }
 
+# RED HAT LOCAL: don't require namespace qualifier
 #
 # USAGE:  itcl::configbody name arglist body
 # Adds an entry for the given method/proc body.
 #
-auto_mkindex_parser::command itcl::configbody {name body} {
-    variable index
-    variable scriptFile
-    append index "set [list auto_index([fullname $name])]"
-    append index " \[list source \[file join \$dir [list $scriptFile]\]\]\n"
+foreach cmd {itcl::configbody configbody} {
+    auto_mkindex_parser::command $cmd {name body} {
+        variable index
+        variable scriptFile
+        append index "set [list auto_index([fullname $name])]"
+        append index " \[list source \[file join \$dir [list $scriptFile]\]\]\n"
+    }
 }
 
+# RED HAT LOCAL: don't require namespace qualifier
 #
 # USAGE:  ensemble name ?body?
 # Adds an entry to the auto index list for the given ensemble name.
 #
-auto_mkindex_parser::command itcl::ensemble {name {body ""}} {
-    variable index
-    variable scriptFile
-    append index "set [list auto_index([fullname $name])]"
-    append index " \[list source \[file join \$dir [list $scriptFile]\]\]\n"
+foreach cmd {itcl::ensemble ensemble} {
+    auto_mkindex_parser::command $cmd {name {body ""}} {
+        variable index
+        variable scriptFile
+        append index "set [list auto_index([fullname $name])]"
+        append index " \[list source \[file join \$dir [list $scriptFile]\]\]\n"
+    }
 }
 
+# RED HAT LOCAL: treat public differently, since we do care about
+#                public procs
 #
 # USAGE:  public arg ?arg arg...?
 #         protected arg ?arg arg...?
@@ -102,14 +114,28 @@ auto_mkindex_parser::command itcl::ensemble {name {body ""}} {
 # Evaluates the arguments as commands, so we can recognize proc
 # declarations within classes.
 #
-foreach cmd {public protected private} {
+foreach cmd {protected private} {
     auto_mkindex_parser::command $cmd {args} {
         variable parser
         $parser eval $args
     }
 }
 
-# CYGNUS LOCAL
+# RED HAT LOCAL: When the user has used "public {...}" (llength $args == 1),
+#                we must eval $args again into its component statements so
+#                that we look at every line in the "body". Otherwise,
+#                we'll be looking for the contents of the "{...}" as a
+#                command, which is funny business.
+auto_mkindex_parser::command public {args} {
+    variable parser
+    if {[llength $args] == 1} {
+        eval $parser eval $args
+    } else {
+        $parser eval $args
+    }
+}
+
+# RED HAT LOCAL
 # This version of auto_import does not work, because it relies
 # WHOLLY on the tclIndex files, but the tclIndex files have no
 # notion of what the export list for a namespace is.  So at the 

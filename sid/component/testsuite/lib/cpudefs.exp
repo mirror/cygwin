@@ -44,7 +44,7 @@ proc run-sid-tests-raw { toolchain-prefix all-machs testcase-srcdir pattern as-o
 
     set as [sid_find_gas ${toolchain-prefix}]
     set ld [sid_find_ld ${toolchain-prefix}]
-    set sid [find_rawsid]
+    set sid [sid_find_sid]
     set runner sid-run-conf
 
     foreach src [lsort [glob -nocomplain ${testcase-srcdir}/$pattern]] {

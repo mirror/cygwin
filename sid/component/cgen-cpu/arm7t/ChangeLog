@@ -1,3 +1,7 @@
+2003-02-06  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm-semsw.cxx: Sort of regenerated.
+
 2002-09-07  Frank Ch. Eigler  <fche@redhat.com>
 
         * arm-*, thumb-*: Regenerated files with Robert Cragie's new

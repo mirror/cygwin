@@ -1,3 +1,7 @@
+2003-03-27  Corinna Vinschen  <vinschen@redhat.com>
+
+	* config/sid.exp: Add gdb settings to use no hardware watchpoints.
+
 2003-03-06  Alexandre Oliva  <aoliva@redhat.com>
 
 	* lib/remote.exp (standard_download, standard_upload): Support

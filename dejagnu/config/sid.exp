@@ -50,6 +50,9 @@ set_board_info ldflags   "[libgloss_link_flags] [newlib_link_flags]"
 # No linker script needed.
 set_board_info ldscript ""
 
+# Used by a few gdb tests. SID doesn't allow hardware watchpoints.
+set_board_info gdb,no_hardware_watchpoints 1
+
 # Additional sid options
 # eg:
 #

@@ -1,3 +1,8 @@
+2002-02-09  Alexandre Oliva  <aoliva@redhat.com>
+
+	* lib/libgloss.exp [get_multilibs]: Compute multitop earlier, and
+	use --print-multi-directory if available.
+
 2002-02-05  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* lib/libgloss.exp (g++_include_flags): Add top level

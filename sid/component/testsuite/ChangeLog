@@ -1,3 +1,7 @@
+2003-10-28  Dave Brolley  <brolley@redhat.com>
+
+	* lib/cpudefs.exp (run-sid-tests-raw): Use sid_find_sid.
+
 2002-11-26  Ben Elliston  <bje@redhat.com>
  
 	* lib/cpudefs.exp (run-sid-tests-raw): Process all configline

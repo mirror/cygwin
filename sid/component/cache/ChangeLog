@@ -1,5 +1,11 @@
 2001-12-27  Frank Ch. Eigler  <fche@redhat.com>
 
+	* cache.cxx (CacheListTypes, CacheCreate): Support hw-cache-buffer-8
+	component type.
+	* hw-cache.xml, hw-cache.txt: Modified accordingly.
+
+2001-12-27  Frank Ch. Eigler  <fche@redhat.com>
+
 	* cache.cxx (cache_sizes): Add "1" and "2" kb support.
 	* hw-cache.xml, hw-cache.txt: Modified accordingly.
 

@@ -2,6 +2,7 @@
 // simulator.  -*- C++ -*-
 
 // Copyright (C) 1999, 2000 Red Hat.
+// Portions Copyright (C) 2004 Sirius Satellite Radio Inc.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -17,8 +18,6 @@ using namespace arm7f;
 arm7f_cpu::arm7f_cpu ():
   arm_engine (32768),   // XXX: tune size
   thumb_engine (32768), // XXX: tune size
-  nfiq_pin (this, & arm7f_cpu::do_nfiq_pin),
-  nirq_pin (this, & arm7f_cpu::do_nirq_pin),
   initialized_p (false)
 {
   // ??? One might want to quibble over the case of these pins (nFIQ?).
@@ -87,6 +86,10 @@ arm7f_cpu::arm7f_cpu ():
 
   // Add register access for debugger
   this->create_gdb_register_attrs (26, "7;11;13;14;15;25", & this->hardware.h_pc);
+
+  // These need to be 'pulled' high if they are not connected.
+  nirq_pin.driven(1);
+  nfiq_pin.driven(1);
 }
 
 string
@@ -168,6 +171,10 @@ arm7f_cpu::reset ()
   this->initialized_p = true;
 
   this->triggerpoint_manager.check_and_dispatch ();
+
+  // These need to be 'pulled' high if they are not connected.
+  nirq_pin.driven(1);
+  nfiq_pin.driven(1);
 }
 
 
@@ -181,6 +188,18 @@ arm7f_cpu::step_insns ()
       this->reset();
       return;
     }
+
+  // Check for currently asserted interrupt pins. Interrupts are only checked for at each
+  // step size block of instructions.
+  if(!this->h_fbit_get() && !nfiq_pin.sense())
+    queue_eit (EIT_FIQ);
+ 
+  if(!this->h_ibit_get() && !nirq_pin.sense())
+    queue_eit (EIT_IRQ);
+
+  // If an eit is queued, process it now.
+  if (this->pending_eit != EIT_NONE)
+    this->process_eit (this->pending_eit);
 
   if (this->engine_type == ENGINE_PBB)
     {
@@ -412,10 +431,6 @@ arm7f_cpu::step_arm ()
 {
   assert (! this->h_tbit_get ());
 
-  // If an eit is queued, process it now.
-  if (this->pending_eit != EIT_NONE)
-    this->process_eit (this->pending_eit);
-
   while (true)
     {
       // Fetch/decode the instruction  ------------------------------
@@ -481,10 +496,6 @@ void
 arm7f_cpu::step_thumb ()
 {
   assert (this->h_tbit_get ());
-
-  // If an eit is queued, process it now.
-  if (this->pending_eit != EIT_NONE)
-    this->process_eit (this->pending_eit);
 
   while (true)
     {
@@ -553,10 +564,6 @@ arm7f_cpu::step_arm_pbb ()
       || this->enable_step_trap_p)
     return this->step_arm ();
 
-  // If an eit is queued, process it now.
-  if (this->pending_eit != EIT_NONE)
-    this->process_eit (this->pending_eit);
-
   try
     {
       // This function takes care of step_insn_count.
@@ -582,10 +589,6 @@ arm7f_cpu::step_thumb_pbb ()
   if (this->triggerpoint_manager.checking_any_p ()
       || this->enable_step_trap_p)
     return this->step_thumb ();
-
-  // If an eit is queued, process it now.
-  if (this->pending_eit != EIT_NONE)
-    this->process_eit (this->pending_eit);
 
   try
     {
@@ -960,46 +963,6 @@ arm7f_cpu::step_reset (host_int_4)
 
 
 // EIT (exception, interrupt, and trap) pins.
-
-void
-arm7f_cpu::do_nfiq_pin (host_int_4 value)
-{
-  // FIXME: Should be able to catch high-low transition but can't do
-  // that with callback_pin.
-  //if (nfiq_pin.sense () == value)
-  //  return;
-  if (value)
-    return;
-
-  // nFIQ has been driven low.
-
-  // Are FIQ interrupts disabled?
-  if (this->h_fbit_get ())
-    return;
-
-  // Queue the interrupt.
-  this->queue_eit (EIT_FIQ);
-}
-
-void
-arm7f_cpu::do_nirq_pin (host_int_4 value)
-{
-  // FIXME: Should be able to catch high-low transition but can't do
-  // that with callback_pin.
-  //if (nirq_pin.sense () == value)
-  //  return;
-  if (value)
-    return;
-
-  // nIRQ has been driven low.
-
-  // Are IRQ interrupts disabled?
-  if (this->h_ibit_get ())
-    return;
-
-  // Queue the interrupt.
-  this->queue_eit (EIT_IRQ);
-}
 
 
 // Miscellaneous pins.

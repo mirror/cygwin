@@ -56,11 +56,15 @@ Functionality:
    |                |from memory via the insn-memory     |
    |                |accessor, and its decoding traced if|
    |                |the trace-extract? attribute is set |
-   |                |to a true value. The decoded form   |
-   |                |may be cached indefinitely          |
-   |                |afterwards, although this cache is  |
-   |                |flushed when the flush-icache pin is|
-   |                |driven.                             |
+   |                |to a true value. To prevent unwanted|
+   |                |cache side effects, the             |
+   |                |disassembler-memory accessor can be |
+   |                |used and connected directly to main |
+   |                |memory, bypassing any memory caches.|
+   |                |The decoded form may be cached      |
+   |                |indefinitely afterwards, although   |
+   |                |this cache is flushed when the      |
+   |                |flush-icache pin is driven.         |
    |                |                                    |
    |                |The engine-type attribute specifies |
    |                |whether the "scache" ("semantic     |
@@ -108,7 +112,15 @@ Functionality:
    |                |is used to represent standard       |
    |                |output. Trace output files are not  |
    |                |appended, but overwritten each time |
-   |                |they are opened.                    |
+   |                |they are opened. The                |
+   |                |print-insn-summary! pin can be      |
+   |                |driven to print a summary of        |
+   |                |instruction and cycle counts,       |
+   |                |usually at the end of the           |
+   |                |simulation. The trace pin can be    |
+   |                |driven with any value which will be |
+   |                |output as a character into the trace|
+   |                |stream.                             |
    |----------------+------------------------------------|
    |exceptions/traps|When encountering exception/trap    |
    |                |conditions such as memory access    |
@@ -177,7 +189,12 @@ Functionality:
    |                |step! pin is next invoked. Note that|
    |                |this may not be the next instruction|
    |                |if the step-insn-count attribute is |
-   |                |greater than one.                   |
+   |                |greater than one. Also note that    |
+   |                |these pins are level sensitive, so  |
+   |                |interrupts will occur repeatedly    |
+   |                |until the pin is driven non-zero.   |
+   |                |They are 'pulled' to one (high) at  |
+   |                |processor invocation and reset.     |
    |----------------+------------------------------------|
    | register access|All 16 general purpose registers are|
    |                |accessible as attribute r0 through  |
@@ -215,6 +232,13 @@ Functionality:
    |                |to the target program's address     |
    |                |space, and is used by gdb to access |
    |                |target memory.                      |
+   |                |                                    |
+   |                |The gdb-breakpoint-big and          |
+   |                |gdb-breakpoint-little attributes, if|
+   |                |present, are used as memory images  |
+   |                |of software breakpoint instructions |
+   |                |for the appropriate run-time        |
+   |                |endianness mode.                    |
    +-----------------------------------------------------+
 
    +-------------------------------------------------+
@@ -258,42 +282,46 @@ Component Reference:
 
   Component: hw-cpu-arm7t
 
-   +-----------------------------------------------------------+
-   |                           pins                            |
-   |-----------------------------------------------------------|
-   |    name     |direction|   legalvalues    |   behaviors    |
-   |-------------+---------+------------------+----------------|
-   |endian-set!  |in       |1 (big) / 2       |initialization  |
-   |             |         |(little)          |                |
-   |-------------+---------+------------------+----------------|
-   |start-pc-set!|in       |any value         |initialization  |
-   |-------------+---------+------------------+----------------|
-   |reset!       |in       |0 or 1            |initialization  |
-   |-------------+---------+------------------+----------------|
-   |trap         |inout    |enum values       |exceptions/traps|
-   |-------------+---------+------------------+----------------|
-   |trap-code    |out      |various values    |exceptions/traps|
-   |-------------+---------+------------------+----------------|
-   |step-cycles  |out      |1..step-insn-count|execution       |
-   |-------------+---------+------------------+----------------|
-   |step!        |in       |any value         |execution       |
-   |-------------+---------+------------------+----------------|
-   |yield        |in       |any               |execution       |
-   |-------------+---------+------------------+----------------|
-   |flush-icache |in       |any               |execution       |
-   |-------------+---------+------------------+----------------|
-   |nreset       |in       |0 or 1            |execution       |
-   |-------------+---------+------------------+----------------|
-   |nm           |out      |0 or 1            |register access |
-   |-------------+---------+------------------+----------------|
-   |tbit         |out      |0 or 1            |register access |
-   |-------------+---------+------------------+----------------|
-   |nfiq         |in       |0 or 1            |hardware        |
-   |             |         |                  |interrupts      |
-   |-------------+---------+------------------+----------------|
-   |nirq         |in       |0 or 1            |hardware        |
-   |             |         |                  |interrupts      |
-   +-----------------------------------------------------------+
+   +-----------------------------------------------------------------+
+   |                              pins                               |
+   |-----------------------------------------------------------------|
+   |       name        |direction|   legalvalues    |   behaviors    |
+   |-------------------+---------+------------------+----------------|
+   |endian-set!        |in       |1 (big) / 2       |initialization  |
+   |                   |         |(little)          |                |
+   |-------------------+---------+------------------+----------------|
+   |start-pc-set!      |in       |any value         |initialization  |
+   |-------------------+---------+------------------+----------------|
+   |reset!             |in       |0 or 1            |initialization  |
+   |-------------------+---------+------------------+----------------|
+   |trap               |inout    |enum values       |exceptions/traps|
+   |-------------------+---------+------------------+----------------|
+   |trap-code          |out      |various values    |exceptions/traps|
+   |-------------------+---------+------------------+----------------|
+   |step-cycles        |out      |1..step-insn-count|execution       |
+   |-------------------+---------+------------------+----------------|
+   |step!              |in       |any value         |execution       |
+   |-------------------+---------+------------------+----------------|
+   |yield              |in       |any               |execution       |
+   |-------------------+---------+------------------+----------------|
+   |flush-icache       |in       |any               |execution       |
+   |-------------------+---------+------------------+----------------|
+   |print-insn-summary!|in       |any               |tracing         |
+   |-------------------+---------+------------------+----------------|
+   |trace              |in       |any               |tracing         |
+   |-------------------+---------+------------------+----------------|
+   |nreset             |in       |0 or 1            |execution       |
+   |-------------------+---------+------------------+----------------|
+   |nm                 |out      |0 or 1            |register access |
+   |-------------------+---------+------------------+----------------|
+   |tbit               |out      |0 or 1            |register access |
+   |-------------------+---------+------------------+----------------|
+   |nfiq               |in       |0 or 1            |hardware        |
+   |                   |         |                  |interrupts      |
+   |-------------------+---------+------------------+----------------|
+   |nirq               |in       |0 or 1            |hardware        |
+   |                   |         |                  |interrupts      |
+   +-----------------------------------------------------------------+
 
    +-------------------------------------------------+
    |                      buses                      |
@@ -304,111 +332,122 @@ Component Reference:
    |              |           |          | access    |
    +-------------------------------------------------+
 
-   +---------------------------------------------------------------------------+
-   |                                attributes                                 |
-   |---------------------------------------------------------------------------|
-   |      name       |category |     legal values     |default|   behaviors   ||
-   |                 |         |                      | value |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |endian           |register |'1'/'big'/'2'/'little'|big    |initialization,||
-   |                 |         |                      |       |register access||
-   |-----------------+---------+----------------------+-------+---------------||
-   |trace-extract?   |setting  |boolean               |false  |tracing        ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |trace-filename   |setting  |string                |-      |tracing        ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |trace-result?    |setting  |boolean               |false  |tracing        ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |engine-type      |setting  |scache or pbb         |pbb    |execution      ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |insn-count       |watchable|number                |-      |execution      ||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |step-insn-count  |setting  |number                |1      |execution      ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |enable-step-trap?|setting  |boolean               |false  |execution      ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |rN               |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |pc               |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |gdb-register-N   |debugger |byte array            |-      |register access||
-   |-----------------+---------+----------------------+-------+---------------||
-   |gdb-num-registers|debugger |number                |-      |register access||
-   |-----------------+---------+----------------------+-------+---------------||
-   |gdb-exp-registers|debugger |number list           |-      |register access||
-   |-----------------+---------+----------------------+-------+---------------||
-   |state-snapshot   |-        |opaque string         |-      |state          ||
-   |                 |         |                      |       |save/restore   ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |step-cycles      |watchable|number                |-      |execution      ||
-   |                 |pin      |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |trap             |watchable|number                |-      |execution/traps||
-   |                 |pin      |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |trap-code        |watchable|number                |-      |execution/traps||
-   |                 |pin      |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |cpsr             |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |cpsr-flags       |register |string                |-      |register access||
-   |-----------------+---------+----------------------+-------+---------------||
-   |nm               |watchable|number                |-      |register access||
-   |                 |pin      |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |tbit             |watchable|number                |-      |register access||
-   |                 |pin      |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |nfiq             |watchable|number                |-      |hardware       ||
-   |                 |pin      |                      |       |interrupts     ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |nirq             |watchable|number                |-      |hardware       ||
-   |                 |pin      |                      |       |interrupts     ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |rN_fiq           |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |rN_svc           |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |rN_abt           |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |rN_irq           |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |rN_und           |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |spsr_fiq         |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |spsr_svc         |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |spsr_abt         |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |spsr_irq         |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |spsr_und         |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   +---------------------------------------------------------------------------+
++-------------------------------------------------------------------------------+
+|                                  attributes                                   |
+|-------------------------------------------------------------------------------|
+|        name         |category |     legal values     |default|   behaviors   ||
+|                     |         |                      | value |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|endian               |register |'1'/'big'/'2'/'little'|big    |initialization,||
+|                     |         |                      |       |register access||
+|---------------------+---------+----------------------+-------+---------------||
+|trace-extract?       |setting  |boolean               |false  |tracing        ||
+|---------------------+---------+----------------------+-------+---------------||
+|trace-filename       |setting  |string                |-      |tracing        ||
+|---------------------+---------+----------------------+-------+---------------||
+|trace-result?        |setting  |boolean               |false  |tracing        ||
+|---------------------+---------+----------------------+-------+---------------||
+|trace-counter?       |setting  |boolean               |false  |tracing        ||
+|---------------------+---------+----------------------+-------+---------------||
+|final-insn-count?    |setting  |boolean               |false  |tracing        ||
+|---------------------+---------+----------------------+-------+---------------||
+|engine-type          |setting  |scache or pbb         |pbb    |execution      ||
+|---------------------+---------+----------------------+-------+---------------||
+|insn-count           |watchable|number                |-      |execution      ||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|step-insn-count      |setting  |number                |1      |execution      ||
+|---------------------+---------+----------------------+-------+---------------||
+|enable-step-trap?    |setting  |boolean               |false  |execution      ||
+|---------------------+---------+----------------------+-------+---------------||
+|rN                   |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|pc                   |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|gdb-register-N       |debugger |byte array            |-      |register access||
+|---------------------+---------+----------------------+-------+---------------||
+|gdb-num-registers    |debugger |number                |-      |register access||
+|---------------------+---------+----------------------+-------+---------------||
+|gdb-exp-registers    |debugger |number list           |-      |register access||
+|---------------------+---------+----------------------+-------+---------------||
+|gdb-breakpoint-big   |debugger |byte array            |-      |register access||
+|---------------------+---------+----------------------+-------+---------------||
+|gdb-breakpoint-little|debugger |byte array            |-      |register access||
+|---------------------+---------+----------------------+-------+---------------||
+|state-snapshot       |-        |opaque string         |-      |state          ||
+|                     |         |                      |       |save/restore   ||
+|---------------------+---------+----------------------+-------+---------------||
+|step-cycles          |watchable|number                |-      |execution      ||
+|                     |pin      |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|trap                 |watchable|number                |-      |execution/traps||
+|                     |pin      |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|trap-code            |watchable|number                |-      |execution/traps||
+|                     |pin      |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|cpsr                 |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|cpsr-flags           |register |string                |-      |register access||
+|---------------------+---------+----------------------+-------+---------------||
+|nm                   |watchable|number                |-      |register access||
+|                     |pin      |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|tbit                 |watchable|number                |-      |register access||
+|                     |pin      |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|nfiq                 |watchable|number                |-      |hardware       ||
+|                     |pin      |                      |       |interrupts     ||
+|---------------------+---------+----------------------+-------+---------------||
+|nirq                 |watchable|number                |-      |hardware       ||
+|                     |pin      |                      |       |interrupts     ||
+|---------------------+---------+----------------------+-------+---------------||
+|rN_fiq               |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|rN_svc               |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|rN_abt               |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|rN_irq               |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|rN_und               |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|spsr_fiq             |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|spsr_svc             |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|spsr_abt             |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|spsr_irq             |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|spsr_und             |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
++-------------------------------------------------------------------------------+
 
    +-------------------------------------------------+
    |                    accessors                    |
    |-------------------------------------------------|
-   |    name     |       accesses        | behaviors |
-   |-------------+-----------------------+-----------|
-   | data-memory | any                   | execution |
-   |-------------+-----------------------+-----------|
-   | insn-memory | typically 4-byte      | execution |
-   |             | accesses              |           |
+   |        name         |   accesses    | behaviors |
+   |---------------------+---------------+-----------|
+   | data-memory         | any           | execution |
+   |---------------------+---------------+-----------|
+   |                     | typically     |           |
+   | insn-memory         | 4-byte        | execution |
+   |                     | accesses      |           |
+   |---------------------+---------------+-----------|
+   | disassembler-memory | any           | execution |
    +-------------------------------------------------+
 
      ----------------------------------------------------------------------

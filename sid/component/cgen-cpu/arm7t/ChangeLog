@@ -1,8 +1,20 @@
+2004-08-04  Robert Shideleff <bigbob@shideleff.com>
+
+	* arm7f.cxx (arm7f_cpu): Change nfiq_pin and nirq_pin to normal
+	input pins.  Remove handler callbacks.
+	(arm7f_cpu ctor, reset): Initialize them high.
+	(step_insns): Handle their proper level sensitivity.
+	(step_arm, step_thumb, step_arm_pbb, step_thumb_pbb): Remove
+	previous incorrect support.
+	* arm7f.h: Corresponding changes.
+	* hw-cpu-arm7t.xml: Note level sensitivity.
+	* hw-cpu-arm7t.txt: Regenerated.
+
 2003-09-08  Doug Evans  <dje@casey.transmeta.com>
 
-	* arm7t/Makefile.am (cgen-arm,cgen-arm7f,cgen-arm7f-arm): Update call
+	* Makefile.am (cgen-arm,cgen-arm7f,cgen-arm7f-arm): Update call
 	to CGEN.sh.
-	* arm7t/Makefile.in: Regenerate.
+	* Makefile.in: Regenerate.
 
 2003-07-05  Doug Evans  <dje@sebabeach.org>
 

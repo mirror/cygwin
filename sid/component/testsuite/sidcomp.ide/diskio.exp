@@ -302,3 +302,6 @@ if {$exit_status == "0"} then {
 	file delete $f
     }
 }
+
+# be polite to other ide tests that use $contents
+catch {unset contents}

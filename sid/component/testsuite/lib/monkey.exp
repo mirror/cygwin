@@ -75,15 +75,9 @@ proc state_saved_p {attr_name} { return 1 }
 #   (may be overridden by a SID_MONKEYS environment variable)
 
 proc monkey_test {type sym lib {iterations 30s}} {
-
-    # Disable this class of tests, until dejagnu/expect/tcl/sid
-    # misinteractions are analyzed.
-    return
-    
     global env
     global pins buses attributes
 
-    
     if [info exist env(SID_MONKEYS)] {
 	set iterations $env(SID_MONKEYS)
     }

@@ -75,7 +75,7 @@ proc doc_includes_component {component} {
     if {[regexp "\\* Name\n  .*${component}\.*n" $contents]} {
 	pass "Documentation file seems to document $component"
     } else {
-	pass "Documentation file does not seem to document $component"
+	fail "Documentation file does not seem to document $component"
     }
 }
 

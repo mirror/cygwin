@@ -1,3 +1,9 @@
+2001-05-31  Ben Elliston  <bje@redhat.com>
+
+	* lib/docs.exp (doc_includes_component): Fail on regexp misses.
+	* lib/monkey.exp (monkey_test): Re-enable tests.
+	* sidcomp.ide/diskio.exp: Unset $contents at completion.
+
 2001-05-17  Ben Elliston  <bje@redhat.com>
 
 	* sidcomp.cfgroot/dupName.badconf: Remove ARM-specific components.

@@ -1,3 +1,8 @@
+2002-02-28  Jason Merrill  <jason@redhat.com>
+
+	* example/calc/Makefile.in (check): Add ./ to CALC value to avoid
+	PATH issues.  Add missing ../.
+
 2002-02-23  Daniel Jacobowitz  <drow@mvista.com>
 
 	* config.guess: Import from master sources, rev 1.232.

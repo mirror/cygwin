@@ -339,7 +339,7 @@ $whoami=qx{whoami}; chop ($whoami);
 $hostname=qx{hostname}; chop ($hostname);
 $date=qx{date}; chop ($date);
 $uname=qx{uname}; chop ($uname);
-$version=q$Id: configrun-sid.in,v 1.21 2001/09/27 21:21:37 fche Exp $;
+$version=q$Id: configrun-sid.in,v 1.22 2001/10/03 17:24:17 fche Exp $;
 $zeroth_section = "# sid configuration file
 # created by $version
 # run by $whoami @ $hostname ($uname) at $date
@@ -861,6 +861,7 @@ foreach $processor (keys %opt_gdbport)
       &sidconf_new("sid-io-socket-server", "${processor}-gdb-socket") . "\n";
     $second_section .= "# ${processor}-gdb
 relate ${processor}-gdb cpu $processor
+relate ${processor}-gdb cfgroot main
 relate ${processor}-gdb target-schedulers target-sched
 relate ${processor}-gdb host-schedulers host-sched
 connect-pin ${processor}-gdb process-signal -> main stop!

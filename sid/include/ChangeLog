@@ -1,3 +1,10 @@
+2001-10-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcpuutil.h (update_trace_result_p): New function.
+	({get,set}_trace_{sem,disasm,count,result}): Removed functions.
+	(basic_cpu ctor): Use plain attributes or notify-attributes,
+	not general virtual ones for the various tracing flags.
+
 2001-09-20  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidbusutil.h (mux_passthrough_bus): Rework to clean up and

@@ -121,9 +121,12 @@ Functionality:
    |                 | on a line that is present and |
    |                 | dirty, it will be flushed to  |
    |                 | memory and marked as not      |
-   |                 | dirty. The entire cache can   |
-   |                 | be flushed by driving         |
-   |                 | flush-all.                    |
+   |                 | dirty. A line can be flushed  |
+   |                 | and invalidated in one atomic |
+   |                 | operation by driving the      |
+   |                 | flush-and-invalidate pin. The |
+   |                 | entire cache can be flushed   |
+   |                 | by driving flush-all.         |
    |-----------------+-------------------------------|
    |    invalidating | Lines in the cache that       |
    |                 | contain accurate contents are |
@@ -142,8 +145,13 @@ Functionality:
    |                 | consideration is made for     |
    |                 | dirty lines, so a line should |
    |                 | be flushed before being       |
-   |                 | invalidated. The entire cache |
-   |                 | can be invalidated by driving |
+   |                 | invalidated. A line can be    |
+   |                 | flushed and invalidated in    |
+   |                 | one atomic operation by       |
+   |                 | driving the                   |
+   |                 | flush-and-invalidate pin. The |
+   |                 | entire cache can be           |
+   |                 | invalidated by driving        |
    |                 | invalidate-all.               |
    |-----------------+-------------------------------|
    |    line locking | The component supports        |
@@ -233,37 +241,43 @@ Component Reference:
 
   Component: hw-cache-basic
 
-   +-------------------------------------------------+
-   |                      pins                       |
-   |-------------------------------------------------|
-   |     name     |direction|legalvalues| behaviors  |
-   |--------------+---------+-----------+------------|
-   |report!       |in       |-          |statistics  |
-   |              |         |           |reporting   |
-   |--------------+---------+-----------+------------|
-   |flush         |in       |32-bit     |flushing    |
-   |              |         |address    |            |
-   |--------------+---------+-----------+------------|
-   |flush-all     |in       |any        |flushing    |
-   |--------------+---------+-----------+------------|
-   |flush-set     |in       |set index  |flushing    |
-   |--------------+---------+-----------+------------|
-   |invalidate    |in       |32-bit     |invalidating|
-   |              |         |address    |            |
-   |--------------+---------+-----------+------------|
-   |invalidate-all|in       |any        |invalidating|
-   |--------------+---------+-----------+------------|
-   |invalidate-set|in       |set index  |invalidating|
-   |--------------+---------+-----------+------------|
-   |prefetch      |in       |32-bit     |prefetching |
-   |              |         |address    |            |
-   |--------------+---------+-----------+------------|
-   |lock          |in       |32-bit     |line locking|
-   |              |         |address    |            |
-   |--------------+---------+-----------+------------|
-   |unlock        |in       |32-bit     |line locking|
-   |              |         |address    |            |
-   +-------------------------------------------------+
+   +------------------------------------------------------------+
+   |                            pins                            |
+   |------------------------------------------------------------|
+   |          name           |direction|legalvalues| behaviors  |
+   |-------------------------+---------+-----------+------------|
+   |report!                  |in       |-          |statistics  |
+   |                         |         |           |reporting   |
+   |-------------------------+---------+-----------+------------|
+   |flush                    |in       |32-bit     |flushing    |
+   |                         |         |address    |            |
+   |-------------------------+---------+-----------+------------|
+   |flush-all                |in       |any        |flushing    |
+   |-------------------------+---------+-----------+------------|
+   |flush-set                |in       |set index  |flushing    |
+   |-------------------------+---------+-----------+------------|
+   |invalidate               |in       |32-bit     |invalidating|
+   |                         |         |address    |            |
+   |-------------------------+---------+-----------+------------|
+   |invalidate-all           |in       |any        |invalidating|
+   |-------------------------+---------+-----------+------------|
+   |invalidate-set           |in       |set index  |invalidating|
+   |-------------------------+---------+-----------+------------|
+   |flush-and-invalidate     |in       |32-bit     |flushing,   |
+   |                         |         |address    |invalidating|
+   |-------------------------+---------+-----------+------------|
+   |fluish-and-invalidate-set|in       |set index  |flushing,   |
+   |                         |         |           |invalidating|
+   |-------------------------+---------+-----------+------------|
+   |prefetch                 |in       |32-bit     |prefetching |
+   |                         |         |address    |            |
+   |-------------------------+---------+-----------+------------|
+   |lock                     |in       |32-bit     |line locking|
+   |                         |         |address    |            |
+   |-------------------------+---------+-----------+------------|
+   |unlock                   |in       |32-bit     |line locking|
+   |                         |         |address    |            |
+   +------------------------------------------------------------+
 
    +-------------------------------------------------+
    |                      buses                      |

@@ -55,9 +55,11 @@ cache_component::cache_component (unsigned assocy,
    flush_all_pin (this, &cache_component::flush_all_lines),
    flush_pin (this, &cache_component::flush_line),
    flush_set_pin (this, &cache_component::flush_set),
+   flush_and_invalidate_set_pin (this, &cache_component::flush_and_invalidate_set),
    invalidate_all_pin (this, &cache_component::invalidate_all_lines),
    invalidate_pin (this, &cache_component::invalidate_line),
    invalidate_set_pin (this, &cache_component::invalidate_set),
+   flush_and_invalidate_pin (this, &cache_component::flush_and_invalidate_line),
    prefetch_pin (this, &cache_component::prefetch_line),
    lock_pin (this, &cache_component::lock_line),
    unlock_pin (this, &cache_component::unlock_line),
@@ -83,7 +85,9 @@ cache_component::cache_component (unsigned assocy,
   add_pin ("flush", &flush_pin);
   add_pin ("invalidate-all", &invalidate_all_pin);
   add_pin ("invalidate-set", &invalidate_set_pin);
+  add_pin ("flush-and-invalidate-set", &flush_and_invalidate_set_pin);
   add_pin ("invalidate", &invalidate_pin);
+  add_pin ("flush-and-invalidate", &flush_and_invalidate_pin);
   add_pin ("prefetch", &prefetch_pin);
   add_pin ("lock", &lock_pin);  
   add_pin ("unlock", &unlock_pin);
@@ -391,8 +395,26 @@ cache_component::flush_set (host_int_4 index)
   for (unsigned i = 0; i < set.num_lines(); i++)
     {
       cache_line& line = set [i];
-      if (line.dirty_p ())
+      if (line.valid_p () && line.dirty_p ())
 	(void) write_line (line);
+    }
+}
+
+void
+cache_component::flush_and_invalidate_set (host_int_4 index)
+{
+  if (index >= acache.num_sets ())
+    return; // bad value
+
+  cache_set& set = acache [index];
+  for (unsigned i = 0; i < set.num_lines(); i++)
+    {
+      cache_line& line = set [i];
+      if (line.valid_p () && line.dirty_p ())
+	{
+	  (void) write_line (line);
+	  line.invalidate ();
+	}
     }
 }
 
@@ -409,6 +431,18 @@ cache_component::invalidate_line (host_int_4 addr)
   cache_line& line = acache.find (acache.addr_to_tag (addr), hit);
   if (hit)
     line.invalidate ();
+}
+
+void
+cache_component::flush_and_invalidate_line (host_int_4 addr)
+{
+  bool hit;
+  cache_line& line = acache.find (acache.addr_to_tag (addr), hit);
+  if (hit && line.dirty_p ())
+    {
+      (void) write_line (line);
+      line.invalidate ();
+    }
 }
 
 void

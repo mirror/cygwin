@@ -270,7 +270,7 @@ $whoami=qx{whoami}; chop ($whoami);
 $hostname=qx{hostname}; chop ($hostname);
 $date=qx{date}; chop ($date);
 $uname=qx{uname}; chop ($uname);
-$version=q$Id: configrun-sid.in,v 1.4 2001/01/11 16:32:30 nsd Exp $;
+$version=q$Id: configrun-sid.in,v 1.5 2001/01/13 14:26:05 mrg Exp $;
 $zeroth_section = "# sid configuration file
 # created by $version
 # run by $whoami @ $hostname ($uname) at $date
@@ -821,7 +821,8 @@ if ($exec)
     $second_section .= "# loader
 set loader file \"$exec\"
 set loader verbose? $opt_verbose
-connect-bus loader load-accessor mapper access-port # don't trace loading
+connect-bus loader load-accessor-data mapper access-port # don't trace loading
+connect-bus loader load-accessor-insn mapper access-port # don't trace loading
 connect-pin init-sequence output-1 -> loader load!
 connect-pin loader start-pc-set -> cpu start-pc-set!
 connect-pin loader endian-set -> cpu endian-set!

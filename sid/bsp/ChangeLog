@@ -1,3 +1,8 @@
+2001-01-13  matthew green  <mrg@redhat.com>
+	
+	* configrun-sid.in: `load-accessor' becomes Harvard architecture
+	friendly.  Split into `load-accessor-insn' and `load-accessor-data'.
+
 2001-01-11  Nicholas Duffek  <nsd@redhat.com>
 
 	* configrun-sid.in ($enable_z_packet): New variable.

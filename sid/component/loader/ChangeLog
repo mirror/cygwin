@@ -1,3 +1,23 @@
+2001-01-13  matthew green  <mrg@redhat.com>
+
+	* compLoader.cxx (load_accessor): Delete member.
+	(load_accessor_insn, load_accessor_data): New bus* members.
+	(ctor): Initialise load_accessor_insn and load_accessor_data.
+	Add `load-accessor-insn' and `load-accessor-data' accessors
+	and delete `load-accessor'.
+	(load_function): Extend to 64 bit addresses, and have an instruction
+	space identifier.
+	(load_it): Check both load_accessor_insn and load_accessor_data are set,
+	and use the appropriate one.  Extend messages to meantion instruction or
+	data loads.
+	* elfload.h (fetchQuadLittle, fetchQuadBig, fetchQuad): New macros.
+	(PFLOAD): Make 64-bit & Harvard address space friendly
+	(sw-load-elf.txt): Document `load-accessor-insn' and `load-accessor-data'
+	accessors.
+        * elfload.c (readElfFile): Support 64-bit ELF as well as 32-bit ELF.
+	* sw-load-elf.txt: Document `load-accessor-insn' and `load-accessor-data'
+	accessors.
+
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.in: Regenerated.

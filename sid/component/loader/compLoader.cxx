@@ -60,7 +60,6 @@ using sidutil::std_error_string;
 
 // ----------------------------------------------------------------------------
 
-
 class generic_loader: public virtual component,
 		      protected no_bus_component,
 		      protected fixed_attribute_map_component,
@@ -86,7 +85,8 @@ protected:
   string load_file;
 
   // accessors
-  bus* load_accessor;
+  bus* load_accessor_insn;
+  bus* load_accessor_data;
 
   // The load pin was triggered.
   virtual void load_it (host_int_4) = 0;
@@ -103,13 +103,15 @@ public:
     doit_pin(this, & generic_loader::load_it), 
     verbose_p(false),
     load_file("/dev/null"),
-    load_accessor(0)
+    load_accessor_insn(0),
+    load_accessor_data(0)
     {
       add_pin("load!", & this->doit_pin);
       add_pin("start-pc-set", & this->start_pc_pin);
       add_pin("endian-set", & this->endian_pin);
       add_pin("error", & this->error_pin);
-      add_accessor("load-accessor", & this->load_accessor);
+      add_accessor("load-accessor-insn", & this->load_accessor_insn);
+      add_accessor("load-accessor-data", & this->load_accessor_data);
       add_attribute("file", & this->load_file, "setting");
       add_attribute("verbose?", & this->verbose_p, "setting");
       add_attribute_virtual ("state-snapshot", this,
@@ -118,7 +120,6 @@ public:
     }
     
 };
-
 
 ostream& 
 operator << (ostream& out, const generic_loader& it)
@@ -149,10 +150,7 @@ operator >> (istream& in, generic_loader& it)
   return in;
 }
 
-
-
 // ----------------------------------------------------------------------------
-
 
 class elf_loader: public generic_loader
 {
@@ -160,16 +158,17 @@ class elf_loader: public generic_loader
   static elf_loader* freeloader;
 
   // callback function from C code in elfload.c
-  static int load_function(char* dest_addr, char* host_addr, int file_offset, int bytes);
+  static int load_function(host_int_8 dest_addr, char* host_addr, host_int_8 file_offset, host_int_8 bytes, int insn_space);
+  static int verbose_function(char* s);
 
   // stream for current file  
   ifstream* file;
 
   void load_it (host_int_4)
     {
-      if (this->load_accessor == 0)
+      if (this->load_accessor_insn == 0 || this->load_accessor_data == 0)
 	{
-	  cerr << "loader: error - target accessor not configured!" << endl;
+	  cerr << "loader: error - target accessors not configured!" << endl;
 	  this->error_pin.drive (0);
 	  return;
 	}
@@ -181,7 +180,7 @@ class elf_loader: public generic_loader
 
       assert(elf_loader::freeloader == 0);
       this->file = new ifstream(this->load_file.c_str(), ios::binary | ios::in);
-      if(! this->file->good())
+      if (! this->file->good())
 	{
 	  cerr << "loader: error opening " << load_file << ": "
 	       << std_error_string() << endl;
@@ -215,40 +214,46 @@ class elf_loader: public generic_loader
     }
 };
 
-
 // static variable
 elf_loader* elf_loader::freeloader = 0;
 
 // static function
 int
-elf_loader::load_function(char* dest_addr, char* host_addr, int file_offset, int bytes)
+elf_loader::load_function(host_int_8 dest_addr, char *host_addr, host_int_8 file_offset, host_int_8 bytes, int insn_space)
 {
-  if (elf_loader::freeloader->verbose_p)
+  elf_loader& l = * elf_loader::freeloader;
+  string who = insn_space ? "instruction" : "data";
+
+  if (l.verbose_p)
     {
-      if(host_addr == 0)
+      if (host_addr == 0)
 	cout << "loader: reading "
 	     << make_numeric_attribute (bytes, ios::hex | ios::showbase)
 	     << " bytes from file offset "
 	     << make_numeric_attribute (file_offset, ios::hex | ios::showbase)
-	     << " into target memory at "
+	     << " into target " << who << " memory at "
 	     << make_numeric_attribute ((void *)dest_addr, ios::hex | ios::showbase)
 	     << endl;
     }
 
-  elf_loader& l = * elf_loader::freeloader;
   ifstream& f = * l.file;
-  bus* b = l.load_accessor;
+  bus* b;
+
+  if (insn_space)
+    b = l.load_accessor_insn;
+  else
+    b = l.load_accessor_data;
   assert (b);
 
   // go to proper offset in file
   f.seekg(file_offset);
 
   // fetch lots of characters
-  for(int n=0; n<bytes; n++)
+  for (int n = 0; n < bytes; n++)
     {
       char c;
       f.get(c);
-      if(! f.good())
+      if (!f.good())
 	{
 	  cerr << "loader: error reading byte " << file_offset+n
 	       << " from file " << l.load_file << endl;
@@ -262,19 +267,20 @@ elf_loader::load_function(char* dest_addr, char* host_addr, int file_offset, int
 	}
       else // read into target memory
 	{
-	  host_int_4 a = (host_int_4)(dest_addr ++);
+	  host_int_8 a = dest_addr++;
 	  little_int_1 data = c;
 	  host_int_4 addr = a;
 
 	  bus::status s;
+
 	  do // loop while memory getting ready
 	    {
 	      s = b->write(addr, data);
-	    } while(s == bus::delayed);
+	    } while (s == bus::delayed);
 
-	  if(s != bus::ok) // abort on error
+	  if (s != bus::ok) // abort on error
 	    {
-	      cerr << "loader: write to accessor failed at address "
+	      cerr << "loader: write to " << who << " accessor failed at address "
 		   << make_numeric_attribute (addr, ios::hex | ios::showbase)
 		   << ", status "
 		   << (int) s << endl;
@@ -287,10 +293,7 @@ elf_loader::load_function(char* dest_addr, char* host_addr, int file_offset, int
   return bytes;
 }
 
-
-
 // ----------------------------------------------------------------------------
-
 
 static
 vector<string>
@@ -301,17 +304,15 @@ compLoaderListTypes()
   return types;
 }
 
-
 static
 component*
 compLoaderCreate(const string& typeName)
 {
-  if(typeName == "sw-load-elf")
+  if (typeName == "sw-load-elf")
     return new elf_loader();
   else
     return 0;
 }
-
 
 static
 void
@@ -319,7 +320,6 @@ compLoaderDelete(component* c)
 {
   delete dynamic_cast<elf_loader*>(c);
 }
-
 
 // static object
 extern const component_library loader_component_library;

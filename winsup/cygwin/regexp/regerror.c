@@ -1,9 +1,3 @@
-#if 0
-#ifndef lint
-static char *rcsid = "$Id: regerror.c,v 1.2 1998/09/15 23:31:37 cgf Exp $";
-#endif /* not lint */
-#endif
-
 #include "regexp.h"
 #include <stdio.h>
 

@@ -1,3 +1,8 @@
+2005-02-11  Nick Clifton  <nickc@redhat.com>
+
+	* cpu/iq2000.opc (parse_jtargq10): Change type of valuep argument
+	to 'bfd_vma *' in order avoid compile time warning message.
+
 2005-02-09  Jim Blandy  <jimb@redhat.com>
 
 	* cgen-sim.scm (load-files): Don't load fixup.scm.  (See

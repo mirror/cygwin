@@ -100,7 +100,8 @@ MATH_LIBS=""
 AC_SUBST(MATH_LIBS)
 SHLIB_LD='${CC} -shared ${CFLAGS}'
 AC_SUBST(SHLIB_LD)
+TCL_BUILD_LIB_SPEC=`pwd`/libtcl_cygwin.a
+AC_SUBST(TCL_BUILD_LIB_SPEC)
 
 
 AC_OUTPUT([Makefile tclConfig.sh])
-

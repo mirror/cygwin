@@ -1,5 +1,9 @@
 2001-06-20  Ben Elliston  <bje@redhat.com>
 
+	* unix.exp (sid_bus_ok_p): Rename sid_assert_bus_ok.
+
+2001-06-20  Ben Elliston  <bje@redhat.com>
+
 	* unix.exp (sid_assert_bus_ok): New proc.
 
 2001-04-17  Frank Ch. Eigler  <fche@redhat.com>

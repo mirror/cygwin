@@ -69,8 +69,7 @@ static int debug_lwp_pool = 1;
 
    - While a traced LWP is stopped, we can read and write its
      registers and memory.  We can also send it signals; they become
-     pending on the LWP, and are not delivered or accepted until it is
-     continued.
+     pending on the LWP, and will be reported by waitpid.
 
    - A stopped LWP can be set running again in one of two ways:
 
@@ -78,8 +77,11 @@ static int debug_lwp_pool = 1;
 
      + by sending it a SIGCONT.
 
-     The ptrace requests all let you specify a signal to be delivered to
-     the process.
+     The ptrace requests all let you specify a signal to be delivered
+     to the process.  This is the only way signals (other than
+     SIGKILL) ever get actually delivered: every other signal just
+     gets reported to the debugger via waitpid when delivery is
+     attempted.
 
      Sending a SIGCONT clears any pending SIGSTOPs; PTRACE_CONT and
      PTRACE_SINGLESTEP don't have that side effect.
@@ -112,12 +114,12 @@ static int debug_lwp_pool = 1;
    - A traced LWP goes back and forth from running to stopped, until
      eventually it goes from running to exited or killed.
 
-   - Running->stopped transitions are always signal deliveries, yielding
-     WIFSTOPPED wait statuses.
+   - Running->stopped transitions are always attempted signal
+     deliveries, yielding WIFSTOPPED wait statuses.
 
    - Stopping->running transitions are generally due to ptrace
-     requests by the debugger.  (The debugger could send signals, but
-     that's messy.)
+     requests by the debugger.  (The debugger could use kill to send
+     SIGCONT, but that's messy.)
 
    - Running->exited transitions are due to, duh, the LWP exiting.
 
@@ -201,15 +203,6 @@ static int debug_lwp_pool = 1;
      This never applies to DEAD LWPs; the wait status that announces a
      LWP's death is always the last for that LWP.
 
-     There's nothing wrong with having STOPPED, un-INTERESTING, and
-     STOP PENDING LWP's, but it turns out that we can always just
-     continue the thread and wait immediately for it, making such a
-     combination unnecessary.
-
-     We could do something similar and eliminate the RUNNING, STOP
-     PENDING state, but that state turns out to be handy for error
-     checking.
-
    We could certainly represent these with independent bits or
    bitfields, but not all combinations are possible.  So instead, we
    assign each possible combination a distinct enum value, to make it
@@ -254,12 +247,55 @@ enum lwp_state {
      internal-use state.  */
   lwp_state_running_stop_pending,
 
+  /* STOPPED, STOP PENDING.  This LWP is stopped, and has no
+     interesting status to report, but still has a boring status on
+     the way.  After we report the status for a STOPPED, STOP PENDING,
+     and INTERESTING thread, this is the state it enters.
+
+     See the note below on why this state is not avoidable.  */
+  lwp_state_stopped_stop_pending,
+
   /* STOPPED, STOP PENDING, and INTERESTING.  This LWP has stopped with
      an interesting wait status.  We're also expecting a boring wait
      status from it.  */
   lwp_state_stopped_stop_pending_interesting,
 
 };
+
+
+/* Why we need lwp_state_stopped_stop_pending:
+
+   I originally thought we could avoid having this state at all by
+   simply always continuing STOPPED, STOP PENDING, INTERESTING threads
+   in lwp_pool_waitpid as soon as we reported their wait status, and
+   then waiting for them immediately, making them either STOPPED and
+   un-INTERESTING, or STOPPED, STOP PENDING, and INTERESTING again.
+
+   But the user has the right to call lwp_pool_continue_lwp on any LWP
+   they've just gotten a wait status for --- and this simplification
+   interferes with that.  First, note that you mustn't call
+   continue_lwp on an interesting LWP: you might get yet another
+   interesting wait status, and we don't want to queue up multiple
+   interesting wait statuses per LWP --- the job is complex enough
+   already.  Then, note that the proposed simplification means that
+   lwp_pool_waitpid could return a status for some LWP, and have that
+   LWP still be interesting.  If that happens, then you've got an LWP
+   the user has the right to continue, but that can't actually be
+   continued.
+
+   I first tried to deal with this by having lwp_pool_continue_lwp
+   simply do nothing if the user continues an interesting LWP.  After
+   all, it's already in the interesting queue, so lwp_pool_waitpid
+   will report it, and the user will be none the wiser.  But that's
+   wrong: the user can specify a signal to deliver when they continue
+   the LWP, and the only way signals are ever delivered to traced LWPs
+   is via ptrace continue and single-step requests.  You can't use
+   kill: that *generates* a signal, it doesn't *deliver* it.  You'd
+   just get the signal back again via waitpid.  So if we don't
+   actually continue the LWP with the user's signal, we've lost our
+   only chance to deliver it.
+
+   Clear as mud, no doubt.  I did my best.  */
 
 
 struct lwp
@@ -721,6 +757,8 @@ lwp_state_str (enum lwp_state state)
       return "dead_interesting";
     case lwp_state_running_stop_pending:
       return "running_stop_pending";
+    case lwp_state_stopped_stop_pending:
+      return "stopped_stop_pending";
     case lwp_state_stopped_stop_pending_interesting:
       return "stopped_stop_pending_interesting";
     default:
@@ -893,9 +931,6 @@ wait_and_handle (struct lwp *l, int flags)
      up multiple statuses per LWP (which we'd rather not implement if
      we can avoid it).
 
-   By always waiting immediately, we avoid the need for a state like
-   lwp_state_stopped_stop_pending.
-
    So, this function takes a thread in lwp_state_running_stop_pending,
    and puts that thread in either lwp_state_stopped (no stop pending)
    or some INTERESTING state.  It's really just
@@ -997,6 +1032,7 @@ lwp_pool_waitpid (pid_t pid, int *stat_loc, int options)
     case lwp_state_uninitialized:
     case lwp_state_running:
     case lwp_state_stopped:
+    case lwp_state_stopped_stop_pending:
     case lwp_state_running_stop_pending:
       /* These are uninteresting states.  The waiting code above
 	 should never have chosen an LWP in one of these states.  */
@@ -1027,23 +1063,10 @@ lwp_pool_waitpid (pid_t pid, int *stat_loc, int options)
 
     case lwp_state_stopped_stop_pending_interesting:
       /* We're about to report this LWP's status, making it
-	 uninteresting, but it's still got a stop pending.  So a state
-	 like lwp_state_stopped_stop_pending would seem reasonable.
-
-	 However, this is the only place such a state would occur.  By
-	 removing the LWP from the interesting queue and continuing
-	 it, we can go directly from
-	 lwp_state_stopped_stop_pending_interesting to
-	 lwp_state_running_stop_pending.
-
-	 Since SIGSTOP cannot be blocked, caught, or ignored, we know
-	 continuing the LWP won't actually allow it to run anywhere;
-	 it just allows it to report another status.  */
+	 uninteresting, but it's still got a stop pending.  */
       queue_delete (l);
-      continue_lwp (l->pid, 0);
-      l->state = lwp_state_running_stop_pending;
+      l->state = lwp_state_stopped_stop_pending;
       debug_report_state_change (l->pid, old_state, l->state);
-      check_stop_pending (l);
       break;
 
     default:
@@ -1103,6 +1126,7 @@ lwp_pool_stop_all (void)
 	      break;
 
 	    case lwp_state_stopped:
+            case lwp_state_stopped_stop_pending:
 	    case lwp_state_stopped_interesting:
 	    case lwp_state_dead_interesting:
 	    case lwp_state_stopped_stop_pending_interesting:
@@ -1154,6 +1178,7 @@ lwp_pool_stop_all (void)
 	    break;
 
 	  case lwp_state_stopped:
+          case lwp_state_stopped_stop_pending:
 	  case lwp_state_stopped_interesting:
 	  case lwp_state_dead_interesting:
 	  case lwp_state_stopped_stop_pending_interesting:
@@ -1219,6 +1244,22 @@ lwp_pool_continue_all (void)
 	      assert (l->state != lwp_state_running_stop_pending);
 	      break;
 
+            case lwp_state_stopped_stop_pending:
+              /* Continue it, and then wait for the pending stop.
+                 Since SIGSTOP cannot be blocked, caught, or ignored,
+                 the wait will always return immediately; the LWP
+                 won't run amok.  */
+              if (continue_lwp (l->pid, 0) == 0)
+                {
+                  l->state = lwp_state_running_stop_pending;
+                  if (check_stop_pending (l) == 0)
+                    {
+                      if (continue_lwp (l->pid, 0) == 0)
+                        l->state = lwp_state_running;
+                    }
+                }
+              break;
+
 	    default:
 	      fprintf (stderr, "ERROR: lwp %d in bad state: %s\n", 
 		       (int) l->pid, lwp_state_str (l->state));
@@ -1237,19 +1278,64 @@ lwp_pool_continue_lwp (pid_t pid, int signal)
 {
   struct lwp *l = hash_find_known (pid);
   enum lwp_state old_state = l->state;
-  int result;
+  int result = 0;
 
   if (debug_lwp_pool)
     fprintf (stderr, "lwp_pool_continue_lwp (%d, %d)\n",
 	     (int) pid, signal);
 
-  /* We should only be continuing stopped threads, with no interesting
-     status to report.  And we should have cleaned up any pending
-     stops as soon as we created them.  */
-  assert (l->state == lwp_state_stopped);
-  result = continue_lwp (l->pid, signal);
-  if (result == 0)
-    l->state = lwp_state_running;
+  switch (l->state)
+    {
+    case lwp_state_uninitialized:
+      assert (l->state != lwp_state_uninitialized);
+      break;
+
+      /* We should only be continuing LWPs that have reported a
+         WIFSTOPPED status via lwp_pool_waitpid and have not been
+         continued or singlestepped since.  */
+    case lwp_state_running:
+    case lwp_state_stopped_interesting:
+    case lwp_state_dead_interesting:
+    case lwp_state_running_stop_pending:
+    case lwp_state_stopped_stop_pending_interesting:
+      fprintf (stderr, "ERROR: continuing LWP %d in unwaited state: %s\n",
+               (int) l->pid, lwp_state_str (l->state));
+      break;
+
+    case lwp_state_stopped:
+      result = continue_lwp (l->pid, signal);
+      if (result == 0)
+        l->state = lwp_state_running;
+      break;
+
+    case lwp_state_stopped_stop_pending:
+      /* Continue it, delivering the given signal, and then wait for
+         the pending stop.  Since SIGSTOP cannot be blocked, caught,
+         or ignored, the wait will always return immediately; the LWP
+         won't run amok.
+
+         We must deliver the signal with the first continue_lwp call;
+         if check_stop_pending says the LWP has a new interesting
+         status, then we'll never reach the second continue_lwp, and
+         we'll lose our chance to deliver the signal.  */
+      if (continue_lwp (l->pid, signal) == 0)
+        {
+          l->state = lwp_state_running_stop_pending;
+          if (check_stop_pending (l) == 0)
+            {
+              if (continue_lwp (l->pid, 0) == 0)
+                l->state = lwp_state_running;
+            }
+        }
+      break;
+
+    default:
+      fprintf (stderr, "ERROR: lwp %d in bad state: %s\n", 
+               (int) l->pid, lwp_state_str (l->state));
+      abort ();
+      break;
+    }
+
   debug_report_state_change (l->pid, old_state, l->state);
 
   return result;
@@ -1260,51 +1346,95 @@ int
 lwp_pool_continue_and_drop_lwp (pid_t pid, int signal)
 {
   struct lwp *l = hash_find_known (pid);
-  int result;
+  int result = 0;
 
   if (debug_lwp_pool)
     fprintf (stderr, "lwp_pool_continue_and_drop_lwp (%d, %d)\n",
 	     (int) pid, signal);
 
-  /* We should only be continuing stopped threads, with no interesting
-     status to report.  And we should have cleaned up any pending
-     stops as soon as we created them.  */
-  assert (l->state == lwp_state_stopped);
-  result = continue_lwp (l->pid, signal);
+  result = lwp_pool_continue_lwp (l->pid, signal);
   if (result == 0)
     {
       hash_delete (l);
-      assert (! l->next && ! l->prev);
+      if (l->next)
+        queue_delete (l);
       free (l);
 
       if (debug_lwp_pool)
-	fprintf (stderr, "                         stopped -- %d --> freed\n",
-		 (int) pid);
+        fprintf (stderr,
+                 "                         stopped -- %d --> freed\n",
+                 (int) pid);
     }
 
   return result;
 }
-
+  
 
 int
 lwp_pool_singlestep_lwp (struct gdbserv *serv, pid_t lwp, int signal)
 {
   struct lwp *l = hash_find_known (lwp);
   enum lwp_state old_state = l->state;
-  int result;
+  int result = 0;
 
   if (debug_lwp_pool)
     fprintf (stderr, "lwp_pool_singlestep_lwp (%p, %d, %d)\n",
 	     serv, (int) lwp, signal);
 
-  /* We should only be single-stepping known, stopped threads, with no
-     interesting status to report.  And we should have cleaned up any
-     pending stops as soon as we created them.  */
-  assert (l->state == lwp_state_stopped);
-  result = singlestep_lwp (serv, l->pid, signal);
-  if (result == 0)
-    l->state = lwp_state_running;
+  switch (l->state)
+    {
+    case lwp_state_uninitialized:
+      assert (l->state != lwp_state_uninitialized);
+      break;
+
+      /* We should only be stepping LWPs that have reported a
+         WIFSTOPPED status via lwp_pool_waitpid and have not been
+         continued or singlestepped since.  */
+    case lwp_state_running:
+    case lwp_state_stopped_interesting:
+    case lwp_state_dead_interesting:
+    case lwp_state_running_stop_pending:
+    case lwp_state_stopped_stop_pending_interesting:
+      fprintf (stderr, "ERROR: stepping LWP %d in unwaited state: %s\n",
+               (int) l->pid, lwp_state_str (l->state));
+      break;
+
+    case lwp_state_stopped:
+      result = singlestep_lwp (serv, l->pid, signal);
+      if (result == 0)
+        l->state = lwp_state_running;
+      break;
+
+    case lwp_state_stopped_stop_pending:
+      /* Continue it, delivering the given signal, and then wait for
+         the pending stop.  Since SIGSTOP cannot be blocked, caught,
+         or ignored, the wait will always return immediately; the LWP
+         won't run amok.
+
+         We must deliver the signal with the continue_lwp call; if
+         check_stop_pending says the LWP has a new interesting status,
+         then we'll never reach the singlestep_lwp, and we'll lose our
+         chance to deliver the signal at all.  */
+      if (continue_lwp (l->pid, signal) == 0)
+        {
+          l->state = lwp_state_running_stop_pending;
+          if (check_stop_pending (l) == 0)
+            {
+              if (singlestep_lwp (serv, l->pid, 0) == 0)
+                l->state = lwp_state_running;
+            }
+        }
+      break;
+
+    default:
+      fprintf (stderr, "ERROR: lwp %d in bad state: %s\n", 
+               (int) l->pid, lwp_state_str (l->state));
+      abort ();
+      break;
+    }
+
   debug_report_state_change (l->pid, old_state, l->state);
+
   return result;
 }
 

@@ -1,3 +1,20 @@
+2004-12-02  Jim Blandy  <jimb@redhat.com>
+
+	Introduce a new STOPPED, STOP PENDING state to the LWP pool model.
+	* lwp-pool.c: Many doc fixes.
+	(enum lwp_state): Add new value, lwp_state_stopped_stop_pending.
+	(lwp_state_str): Provide a name for it.
+	(lwp_pool_waitpid): Reject it as an initial state for an LWP whose
+	status we'll report.  Produce it when we report the status of a
+	STOPPED, STOP PENDING, INTERESTING LWP, rather than continuing
+	the LWP and waiting for it again.
+	(lwp_pool_stop_all): Recognize it as a stopped state.
+	(lwp_pool_continue_all, lwp_pool_continue_lwp,
+	lwp_pool_singlestep_lwp): Continue and check for the boring status
+	here, instead of in lwp_pool_waitpid.
+	(lwp_pool_continue_and_drop_lwp): Just call lwp_pool_continue_lwp,
+	instead of writing out its contents again here.
+
 2004-11-29  Jim Blandy  <jimb@redhat.com>
 
 	Move libthread_db event-based thread death logic from lwp-pool.c

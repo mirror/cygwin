@@ -6,9 +6,10 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <tcl.h>
 
 /* CYGNUS LOCAL */
+#include <tcl.h>
+
 #ifdef __CYGWIN32__
 /*
  * The following declaration is for the VC++ DLL entry point.

@@ -21,18 +21,12 @@ load libconsoles1.la console_component_library1	# error
 
 # Components
 
-new hw-cpu-arm7t cpu
 new sw-load-elf loader
 new sid-io-stdio stdio
-new sw-gloss-arm/angel angel
-new hw-interrupt-arm/ref intctrl
 new hw-mapper-basic bus
-new hw-remap/pause-arm/ref remapper
 new sid-sched-host host-sched
 new sid-sched-sim target-sched
 new hw-memory-ram/rom-basic mem
-new hw-timer-arm/ref-sched timer1
-new hw-timer-arm/ref-sched timer2
 
 load libinterrupt.la interrupt_component_library	# duplicate
 # Scheduler
@@ -45,59 +39,25 @@ set host-sched num-clients 1
 set host-sched 0-regular? 1
 set host-sched 0-time 50
 
-connect-pin target-sched 0-control <- timer1 divided-clock-control
-connect-pin target-sched 1-control <- timer2 divided-clock-control
-connect-pin target-sched 0-event -> timer1 divided-clock-event
-connect-pin target-sched 1-event -> timer2 divided-clock-event
 connect-pin host-sched 0-event -> stdio poll
-
-# Component relationships
-relate angel cpu cpu
 
 # Main pin connections
 connect-pin main perform-activity -> host-sched advance
 connect-pin main perform-activity -> target-sched advance
 connect-pin main starting -> loader load!
-connect-pin main perform-activity -> cpu step!
 
 # ELF loader
-connect-pin loader start-pc-set -> cpu start-pc-set!
-connect-pin loader endian-set -> cpu endian-set!
 connect-bus loader load-accessor-data bus access-port
 
-# Gloss support
-connect-pin cpu trap <-> angel trap
-connect-pin cpu trap-code -> angel trap-code
-connect-pin angel process-signal -> main stop!
-connect-pin angel debug-tx -> stdio stdout
-connect-pin angel debug-rx <- stdio stdin
-
 load libinterrupt.la interrupt_component_library	# duplicate
-
-# Interrupts from reference peripherals
-connect-pin timer1 interrupt -> intctrl interrupt-source-4
-connect-pin timer2 interrupt -> intctrl interrupt-source-5
-connect-pin intctrl interrupt -> cpu nirq
-connect-pin intctrl fast-interrupt -> cpu nfiq
 
 # Alter this attribute to get more available system RAM.
 set mem size 8388608
 
 # Attributes
 set loader file hello
-set cpu engine-type scache
-set cpu step-insn-count 1000
 
 # Bus connections
-connect-bus remapper all bus access-port
-connect-bus cpu insn-memory remapper access-port
-connect-bus cpu data-memory remapper access-port
-connect-bus angel target-memory remapper access-port
 connect-bus bus [0,0x7fffff] mem read-write-port
-connect-bus bus [0xA000000,0xA000013] intctrl irq-registers
-connect-bus bus [0xA000100,0xA00010F] intctrl fiq-registers
-connect-bus bus [0xA800000,0xA80000F] timer1 registers
-connect-bus bus [0xA800020,0xA80002F] timer2 registers
-connect-bus bus [0xB000000,0xB000037] remapper registers
 
 load libinterrupt.la interrupt_component_library	# duplicate

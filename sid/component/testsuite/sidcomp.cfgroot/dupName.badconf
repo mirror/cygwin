@@ -19,8 +19,8 @@ load libtimers.la timer_component_library
 
 # Components
 
-new hw-cpu-arm7t cpu
-new hw-cpu-arm7t cpu			# same component, same name
+new hw-mapper-basic mapper
+new hw-mapper-basic mapper		# same component, same name
 new sw-load-elf loader
 new sid-io-stdio stdio
 new sid-io-stdio loader			# different component, same name

@@ -1,12 +1,12 @@
-CBinvaComp.badconf:61: unknown command connect-BUS
-CBinvaComp.badconf:61: unknown command loader
-CBinvaComp.badconf:61: unknown command load-accessor-data
-CBinvaComp.badconf:61: unknown command bus
-CBinvaComp.badconf:61: unknown command access-port
-CBinvaComp.badconf:85: component hw-remap/pause-arm/ref not found
-CBinvaComp.badconf:86: component remappers not found
-CBinvaComp.badconf:87: component   not found
-CBinvaComp.badconf:88: component set not found
-CBinvaComp.badconf:89: component bus1 not found
-CBinvaComp.badconf:90: component BUS not found
+CBinvaComp.badconf:45: unknown command connect-BUS
+CBinvaComp.badconf:45: unknown command loader
+CBinvaComp.badconf:45: unknown command load-accessor-data
+CBinvaComp.badconf:45: unknown command bus
+CBinvaComp.badconf:45: unknown command access-port
+CBinvaComp.badconf:54: component hw-remap/pause-arm/ref not found
+CBinvaComp.badconf:55: component remappers not found
+CBinvaComp.badconf:56: component   not found
+CBinvaComp.badconf:57: component set not found
+CBinvaComp.badconf:58: component bus1 not found
+CBinvaComp.badconf:59: component BUS not found
 Configuration error.  Aborting.

@@ -17,7 +17,7 @@ set sid_run_repetitions 1
 #
 # 1. As an option in the call to run-sid-tests-raw. 
 #
-# 2. In the "# confgfile():" option at the top of a given testcase source
+# 2. In the "# configfile():" option at the top of a given testcase source
 #    file.
 #
 # If both are specified, the file specified using the "# configfile():" option
@@ -33,7 +33,11 @@ set sid_run_repetitions 1
 #
 # A config file must be specified.  If one is not present either as a
 # parameter in the call or in the #configfile() option, an error is returned.
- 
+#
+# In addition, a configuration line may be added:
+# #configline(): TEXT
+# This is translated to a subsequent "-e TEXT" command line option.
+# 
 proc run-sid-tests-raw { toolchain-prefix all-machs testcase-srcdir pattern as-opts ld-opts sid-opts cfile exe-suffix } {
         global runtests
         global srcdir
@@ -65,8 +69,10 @@ proc run-sid-tests-raw { toolchain-prefix all-machs testcase-srcdir pattern as-o
 
        # Process the configfile option.  We may need to handle multiple machs.
        set opts(configfile) {}
+       set opts(configline) {}
        foreach i $opt_array {
-           if ![string compare [lindex $i 0] "configfile"] {
+           if {![string compare [lindex $i 0] "configfile"]  ||
+	       ![string compare [lindex $i 0] "configline"]} then {
               set opt_name [lindex $i 0]
               set opt_machs [lindex $i 1]
               set opt_val [lindex $i 2]
@@ -98,6 +104,13 @@ proc run-sid-tests-raw { toolchain-prefix all-machs testcase-srcdir pattern as-o
           set {conf-file} $cfile
        }
 
+       # Look for configuration line specified using # configline() in a testcase
+       if { $opts(configline) != "" } {
+	   set {conf-line} "-e \"$opts(configline)\""
+       } else {
+	   set {conf-line} ""
+       }
+
        # Look for the configuration file in the pregen directory first and
        # if it's not there, then assume it's in the testcase source directory.
        set try [lookfor_file ${srcdir} sid/bsp/pregen/${conf-file}]
@@ -113,7 +126,7 @@ proc run-sid-tests-raw { toolchain-prefix all-machs testcase-srcdir pattern as-o
        set exe-name ${name}.${exe-suffix}
 
        # Set sid-opts and run the test.
-       set sid-opts "${conf-file} -e \"set cpu-loader file ${exe-name}\""
+       set sid-opts "${conf-file} -e \"set cpu-loader file ${exe-name}\" ${conf-line}"
        run-one-sid-test \
                $as ${as-opts} \
                $ld ${ld-opts} \
@@ -271,6 +284,7 @@ proc run-one-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-mach
     set opts(mach) {}
     set opts(timeout) {}
     set opts(configfile) {}
+    set opts(configline) {}
     set opts(xerror) "no"
 
     foreach i $opt_array {

@@ -1,3 +1,18 @@
+2002-09-13  Keith Seitz  <keiths@redhat.com>
+
+	From Mo Dejong  <supermo@bayarea.net>:
+	* win/tkWinWm.c (Tk_WmCmd): Check the WM_NEVER_MAPPED
+	flag while processing the wm deiconify command.
+	The WM_UPDATE_PENDING flag should never be set when
+	WM_NEVER_MAPPED is set, but double check so that
+	the implementation is more explicit and matches
+	the comment just above.
+	Return without invoking TkWmRestackToplevel or
+	TkSetFocusWin on a toplevel that has never been
+	mapped. This fixes a bug where a toplevel is mapped
+	with the wrong size and is then resized by the
+	idle call to MapFrame.
+
 2002-07-31  Keith Seitz  <keiths@redhat.com>
 
 	* win/winMain.c (main): Ifdef out for cygwin.

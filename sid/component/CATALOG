@@ -43,6 +43,7 @@ hw-cpu-arm7t            ARM7 / ARM7T CPU model
 hw-cpu-x86		X86 CPU model
 hw-cpu-m32r/d           M32R/D CPU model
 hw-cpu-xstormy16        Sanyo Xstormy16 CPU model
+hw-disk-harddrive	Newer IDE hard drive model (controller + drives)
 hw-disk-ide             IDE hard drive model (controller + drives)
 hw-glue-bus-mux         Bus multiplexer
 hw-glue-probe-bus       Bus traffic tracer

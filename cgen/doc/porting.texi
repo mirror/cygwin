@@ -647,10 +647,13 @@ save the enormous amount of initial typing that is required.
 @item @code{make gas-test}
 
 At this point two files have been created in the CGEN build directory:
-@file{gas-allinsn.exp} and @file{gas-build.sh}.
+@file{gas-allinsn.exp} and @file{gas-build.sh}.  The @file{gas-build.sh}
+script normally requires one command line argument: the location of your
+@file{gas} build directory.  If this argument is omitted, the script
+searches in @file{../gas} automatically.
 
 @item Copy @file{gas-allinsn.exp} to @file{devo/gas/testsuite/gas/<arch>/allinsn.exp}.
-@item @code{sh gas-build.sh $build/gas}
+@item @code{sh gas-build.sh}
 
 At this point directory tmpdir contains two files: @file{allinsn.s} and
 @file{allinsn.d}.  File @file{allinsn.d} usually needs a bit of massaging.

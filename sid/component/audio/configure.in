@@ -38,6 +38,8 @@ case "$host" in
 	;;
 esac
 
+dnl building docs
+RH_DOCBUILD_CHECK
 
 dnl Outputs
 AC_OUTPUT(Makefile)

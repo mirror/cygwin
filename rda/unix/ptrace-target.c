@@ -208,7 +208,6 @@ ptrace_read_user (struct gdbserv *serv,
 		  int len, 
 		  void *buff)
 {
-  struct child_process *process = gdbserv_target_data (serv);
   int i;
 
   /* Require: addr is on the proper boundary, and 
@@ -1250,7 +1249,6 @@ ptrace_attach (struct gdbserv *serv, void *data)
 int
 ptrace_check_child_state (struct child_process *process)
 {
-  struct gdbserv *serv = process->serv;
   int ret;
   union wait w;
 

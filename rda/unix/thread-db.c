@@ -2126,9 +2126,7 @@ continue_thread (struct gdbserv_thread *thread, int signal)
 static void
 continue_all_threads (struct gdbserv *serv)
 {
-  struct child_process *process = gdbserv_target_data (serv);
   struct gdbserv_thread *thread;
-  int signal;
 
   for (thread = first_thread_in_list ();
        thread;
@@ -2780,7 +2778,6 @@ thread_db_attach (struct gdbserv *serv, struct gdbserv_target *target)
   td_err_e ret;
   struct child_process *process = target->data;
   extern struct server_vector gdbserver;
-  paddr_t dummy;
 
   if ((thread_db_dlopen ()) < 0)
     return -1;			/* fail */

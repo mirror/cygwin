@@ -160,7 +160,7 @@ namespace sidutil
   void add_watchable_register (const std::string& name, ValueType* value)
     {
       this->add_attribute (name, value, "register");
-      this->triggerpoint_manager.add_watchable_attribute (name);
+      this->triggerpoint_manager.add_watchable_value (name, value);
       this->categorize (name, "watchable");
     }
 
@@ -422,7 +422,7 @@ namespace sidutil
 				    const std::string& expedited_regno_list, 
 				    PC* pc)
       {
-	this->triggerpoint_manager.add_watchable_value ("gdb-register-pc", pc);
+	this->add_watchable_register ("gdb-register-pc", pc);
 	this->add_attribute_ro_value ("gdb-num-registers", count, "debugger");
 
 	// The "expedited" register list string is the semi-colon-delimited list of

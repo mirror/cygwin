@@ -1,3 +1,18 @@
+2002-02-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* gdb.cxx (rangestep_program_hook, rangestep_program): New functions.
+	(process_set_pc): Implement.
+	(gdb ctor): Support new attribute "enable-E-packet?", default true.
+	(cpu_trap_handler): When rangestepping, keep CPU going as needed.
+	(exit_program, break_program, singlestep_program): Clear
+	range-stepping variables.
+	(continue_program, stop_handler, trapstop_handler): Ditto.
+	* gdb.h: Corresponding changes.
+	* gdbserv-state.c (gdbserv_data_packet): Implement support for
+	'E'/'e' packets through new rangestep_program target hook.
+	(gdbserv_fromtarget_break): Discard pending output packet.
+	* gdbserv-state.h: Corresponding changes.
+
 2001-10-17  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* sw-debug-gdb.xml: New file.

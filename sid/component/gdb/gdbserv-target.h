@@ -1,7 +1,7 @@
 /*
  * gdbserv-target.h -- part of GDB remote server.
  *
- * Copyright (C) 2000 Red Hat.
+ * Copyright (C) 2000, 2002 Red Hat.
  * This file is part of SID and is licensed under the GPL.
  * See the file COPYING.SID for conditions for redistribution.
  */
@@ -119,6 +119,9 @@ struct gdbserv_target {
   int (*reset_program) (struct gdbserv *);
   void (*restart_program) (struct gdbserv *);
   int (*singlestep_program) (struct gdbserv *);
+  int (*rangestep_program) (struct gdbserv *, 
+			    struct gdbserv_reg *range_start, 
+			    struct gdbserv_reg *range_end);
   void (*cyclestep_program) (struct gdbserv *);
   void (*sigkill_program) (struct gdbserv *);
   int (*continue_program) (struct gdbserv *);

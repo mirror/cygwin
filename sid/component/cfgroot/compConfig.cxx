@@ -1,7 +1,7 @@
 // compConfig.cxx - The cfgroot component: configuration parsing, root
 // of component creation and management.  -*- C++ -*-
 
-// Copyright (C) 1999-2001 Red Hat.
+// Copyright (C) 1999, 2000, 2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -107,6 +107,7 @@ protected:
   unsigned line_num;
   bool parse(istream&);
   string current_token;
+  int num_invalid_chars;
   void consume_token(istream&);
   string next_token(istream&);
   bool parse_command(istream&);
@@ -153,9 +154,15 @@ private:
   bool autoprint_p;
   bool persistent_p;
 
+  // max number of invalid chars which may be in a config file
+  enum { max_invalid_chars = 12 };
+
   // a general purpose method for emitting error messages
   // FIXME: i18n
   void emit_error(const string& msg);
+
+  // emit an error for invalid character codes found in the input
+  void emit_invalid_char_error (const char ch);
 
   // track component name -> component object pointer
   typedef map<string,component*> component_map_t;
@@ -182,6 +189,16 @@ void
 cfgroot_component::emit_error(const string& msg)
 {
   cerr << config_file << ":" << line_num << ": " << msg << endl;
+}
+
+void
+cfgroot_component::emit_invalid_char_error (const char ch)
+{
+  if (++num_invalid_chars < max_invalid_chars)
+    emit_error(string("invalid character [") + 
+	       make_numeric_attribute(host_int_2((unsigned char) ch),
+				      ios::hex|ios::showbase) +
+	       string("] ignored."));
 }
 
 void
@@ -254,12 +271,7 @@ cfgroot_component::consume_token(istream& input) // lexer
 	  do
 	    {
 	      if (!isprint(ch))
-		{
-		  emit_error(string("invalid character [") + 
-			     make_numeric_attribute(host_int_2((unsigned char) ch),
-						    ios::hex|ios::showbase) +
-			     string("] ignored."));
-		}
+		emit_invalid_char_error (ch);
 	      else
 		buf += ch;
 
@@ -272,11 +284,8 @@ cfgroot_component::consume_token(istream& input) // lexer
 	  break; // end of token
 	}
       else // control code
-	{	
-	  emit_error(string("invalid character [") + 
-		     make_numeric_attribute(host_int_2((unsigned char) ch),
-					    ios::hex|ios::showbase) +
-		     string("] ignored."));
+	{
+	  emit_invalid_char_error (ch);
 	  continue;
 	}
     }
@@ -461,6 +470,13 @@ cfgroot_component::parse(istream& cfile)
     {
       bool this_ok = this->parse_command(cfile);
       cumulative_ok = cumulative_ok && this_ok;
+
+      if (num_invalid_chars >= max_invalid_chars)
+	{
+	  emit_error ("too many invalid characters--possibly a binary file?");
+	  cumulative_ok = false;
+	  break;
+	}
     }
   return cumulative_ok;
 }
@@ -483,6 +499,7 @@ cfgroot_component::configure(const std::string& name)
   this->config_file_history += this->config_file;
   unsigned last_line_num = this->line_num;
   this->line_num = 1;
+  num_invalid_chars = 0;
 
   ifstream cfile(find_sid_data_file(this->config_file).c_str());
   if(! cfile.good())

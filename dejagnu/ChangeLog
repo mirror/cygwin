@@ -1,3 +1,10 @@
+2004-10-05  Nick Clifton  <nickc@redhat.com>
+
+	* Import this patch from Savannah repository:
+
+	2003-02-19  DJ Delorie  <dj@redhat.com>
+        * config/sim.exp: Support both sid and rawsid protocols.
+
 2004-06-08  Alexandre Oliva  <aoliva@redhat.com>
 
 	* baseboards/mn10300-sim.exp: Set needs_status_wrapper and

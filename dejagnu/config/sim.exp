@@ -82,13 +82,21 @@ proc sim_load { dest prog args } {
 
     set output "";
 
+    if { [board_info target sim,protocol] == "sid" } {
+	set cmd "-e \"set cpu-loader file [list $prog]\""
+    } elseif { [board_info target sim,protocol] == "rawsid" } {
+	set cmd "--load=$prog"
+    } else {
+	set cmd $prog
+    }
+
     # Run the program with a limited amount of real time. While
     # this isn't as nice as limiting the amount of CPU time, it
     # will have to do.
     if { $inpfile != "" } {
-	set res [remote_spawn target "${prog} < $inpfile" "readonly"];
+	set res [remote_spawn target "${cmd} < $inpfile" "readonly"];
     } else {
-	set res [remote_spawn target "${prog}"];
+	set res [remote_spawn target "${cmd}"];
     }
 
     if { $res <= 0 } {

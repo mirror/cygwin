@@ -1,3 +1,11 @@
+2001-09-05  Frank Ch. Eigler  <fche@redhat.com>
+
+	* lib/cpudefs.exp (run-sid-tests-raw): Don't emit duplicate unresolved
+	indication on slurp_options failure.  Emit unresolved/untested instead
+	of perror.
+	(run-one-sid-test): Ditto.  Emit iteration count in test string.
+	(slurp_options): Emit untested, not perror.
+
 2001-08-23  Frank Ch. Eigler  <fche@redhat.com>
 
 	* lib/monkey.exp (monkey_stop): New routine.

@@ -29,7 +29,7 @@
 #include "ardi.h"
 #include "buffers.h"
 #include "channels.h"        /* Channel interface. */
-#include "endian.h"
+#include "angel_endian.h"
 #include "logging.h"         /* Angel support functions. */
 #include "msgbuild.h"
 #include "sys.h"    
@@ -125,8 +125,10 @@ static void DebugCheckNullTermString(char *prefix, bool nl,
     }
 }
 
+#ifdef NEED_SYSERRLIST
 extern int sys_nerr;
 extern char *sys_errlist[];
+#endif
 
 static char *DebugStrError(int last_errno)
 {

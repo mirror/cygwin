@@ -36,6 +36,11 @@
 #include <sys/types.h>
 #include <sys/time.h>
 
+#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || defined (bsdi)
+#undef BSD
+#include <sys/ioctl.h>
+#endif
+
 #ifdef sun
 # include <sys/ioccom.h>
 # ifdef __svr4__
@@ -68,6 +73,7 @@
 #define PP_TIMEOUT      1              /* seconds */
 
 #ifdef sun
+#define SERIAL_PREFIX "/dev/tty"
 #define SERPORT1   "/dev/ttya"
 #define SERPORT2   "/dev/ttyb"
 #define PARPORT1   "/dev/bpp0"
@@ -75,6 +81,7 @@
 #endif
 
 #ifdef __hpux
+#define SERIAL_PREFIX "/dev/tty"
 #define SERPORT1   "/dev/tty00"
 #define SERPORT2   "/dev/tty01"
 #define PARPORT1   "/dev/ptr_parallel"
@@ -82,13 +89,15 @@
 #endif
 
 #ifdef __linux__
-#define SERPORT1   "/dev/cua0"
-#define SERPORT2   "/dev/cua1"
+#define SERIAL_PREFIX "/dev/ttyS"
+#define SERPORT1   "/dev/ttyS0"
+#define SERPORT2   "/dev/ttyS1"
 #define PARPORT1   "/dev/par0"
 #define PARPORT2   "/dev/par1"
 #endif
 
 #if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || defined (bsdi)
+#define SERIAL_PREFIX "/dev/cuaa"
 #define SERPORT1   "/dev/cuaa0"
 #define SERPORT2   "/dev/cuaa1"
 #define PARPORT1   "/dev/lpt0"
@@ -96,14 +105,12 @@
 #endif
 
 
-#define SERIAL_PREFIX "/dev/tty"
 #if defined(_WIN32) || defined (__CYGWIN32__) 
+#define SERIAL_PREFIX "com"
 #define SERPORT1   "com1"
 #define SERPORT2   "com2"
 #define PARPORT1   "lpt1"
 #define PARPORT2   "lpt2"
-#undef SERIAL_PREFIX
-#define SERIAL_PREFIX "com"
 #endif
 
 
@@ -251,6 +258,13 @@ extern int Unix_OpenSerial(const char *name)
         perror("open");
         return -1;
     }
+#ifdef TIOCEXCL
+    if (ioctl(serpfd, TIOCEXCL) < 0) {
+	close(serpfd);
+        perror("ioctl: TIOCEXCL");
+        return -1;
+    }
+#endif
 
     return 0;
 }
@@ -287,7 +301,14 @@ extern int Unix_ReadSerial(unsigned char *buf, int n, bool block)
         return -1;
     }
     else if (err > 0 && FD_ISSET(serpfd, &fdset))
-        return read(serpfd, buf, n);
+      {
+	int s;
+
+	s = read(serpfd, buf, n);
+	if (s < 0)
+	  perror("read:");
+	return s;
+      }
     else /* err == 0 || FD_CLR(serpfd, &fdset) */
     {
         errno = ERRNO_FOR_BLOCKED_IO;
@@ -305,15 +326,6 @@ extern void Unix_ResetSerial(void)
     struct termios terminfo;
 
     tcgetattr(serpfd, &terminfo);
-#ifdef __CYGWIN32__
-    /* Expedient, but it works.  */
-    terminfo.c_iflag = 0;
-    terminfo.c_oflag = 0;
-    terminfo.c_cflag = 48;
-    terminfo.c_lflag = 0;
-    terminfo.c_cc[VMIN] = 0;
-    terminfo.c_cc[VTIME] = 1;
-#else
     terminfo.c_lflag &= ~(ICANON | ISIG | ECHO | IEXTEN);
     terminfo.c_iflag &= ~(IGNCR | INPCK | ISTRIP | ICRNL | BRKINT);
     terminfo.c_iflag |= (IXON | IXOFF | IGNBRK);
@@ -322,7 +334,6 @@ extern void Unix_ResetSerial(void)
     terminfo.c_cc[VMIN] = 1;
     terminfo.c_cc[VTIME] = 0;
     terminfo.c_oflag &= ~OPOST;
-#endif
     tcsetattr(serpfd, TCSAFLUSH, &terminfo);
 }
 

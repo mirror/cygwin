@@ -1,4 +1,4 @@
-# Copyright (C) 1992, 93, 94, 95, 96, 97, 98, 1999, 2000, 2002, 2003
+# Copyright (C) 1992, 93, 94, 95, 96, 97, 98, 1999, 2000, 2002, 2003, 2004
 # Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
@@ -120,7 +120,7 @@ proc newlib_link_flags { args } {
 	return ""
     }
 
-    set ld_script_path [lookfor_file ${tool_root_dir} "ld/ldscripts"];
+    set ld_script_path [lookfor_file ${tool_root_dir} "ld/ldscripts"]
     if { $ld_script_path != "" } {
 	set result "-L[file dirname $ld_script_path]"
     } else {
@@ -182,21 +182,21 @@ proc libio_include_flags { args } {
     set gccpath "[get_multilibs]"
 
     if { $gccpath == "" } {
-	set gccpath "$tool_root_dir";
+	set gccpath "$tool_root_dir"
     }
 
-    set libio_bin_dir [lookfor_file ${gccpath} libio/_G_config.h];
+    set libio_bin_dir [lookfor_file ${gccpath} libio/_G_config.h]
 
     # linux doesn't build _G_config.h and the test above fails, so
     # we search for iostream.list too.
     if { $libio_bin_dir == "" } {
-	set libio_bin_dir [lookfor_file ${gccpath} libio/iostream.list];
+	set libio_bin_dir [lookfor_file ${gccpath} libio/iostream.list]
     }
 
     set libio_src_dir [lookfor_file ${srcdir} libio/Makefile.in]
     if { $libio_bin_dir != "" && $libio_src_dir != "" } {
 	set libio_src_dir [file dirname ${libio_src_dir}]
-	set libio_bin_dir [file dirname ${libio_bin_dir}];
+	set libio_bin_dir [file dirname ${libio_bin_dir}]
 	# Note - unlike the newlib_include_flags proc above we use the -I
 	# switch to specify the include paths.  This is because these headers
 	# are not system headers, and if -isystem were to be used GCC would
@@ -238,7 +238,7 @@ proc g++_include_flags { args } {
     set dir [lookfor_file ${srcdir} libg++]
     if { ${dir} != "" } {
 	# See comment in libio_include_flags about using -I.
-	append flags " -I${dir} I${dir}/src"
+	append flags " -I${dir} -I${dir}/src"
     }
 
     set dir [lookfor_file ${srcdir} libstdc++-v3]
@@ -263,7 +263,7 @@ proc g++_link_flags { args } {
     global srcdir
     global ld_library_path
 
-    set gccpath [get_multilibs];
+    set gccpath [get_multilibs]
     set libio_dir ""
     set flags ""
     set ld_library_path "."
@@ -291,25 +291,25 @@ proc g++_link_flags { args } {
 	    append flags "-L${gccpath}/librx "
 	}
     } else {
-	global tool_root_dir;
+	global tool_root_dir
 
-	set libgpp [lookfor_file ${tool_root_dir} libg++];
+	set libgpp [lookfor_file ${tool_root_dir} libg++]
 	if { $libgpp != "" } {
-	    append flags "-L${libgpp} ";
+	    append flags "-L${libgpp} "
 	    append ld_library_path ":${libgpp}"
 	}
-	set libstdcpp [lookfor_file ${tool_root_dir} libstdc++];
+	set libstdcpp [lookfor_file ${tool_root_dir} libstdc++]
 	if { $libstdcpp != "" } {
-	    append flags "-L${libstdcpp} ";
+	    append flags "-L${libstdcpp} "
 	    append ld_library_path ":${libstdcpp}"
 	}
-	set libiberty [lookfor_file ${tool_root_dir} libiberty];
+	set libiberty [lookfor_file ${tool_root_dir} libiberty]
 	if { $libiberty != "" } {
-	    append flags "-L${libiberty} ";
+	    append flags "-L${libiberty} "
 	}
-	set librx [lookfor_file ${tool_root_dir} librx];
+	set librx [lookfor_file ${tool_root_dir} librx]
 	if { $librx != "" } {
-	    append flags "-L${librx} ";
+	    append flags "-L${librx} "
 	}
     }
     return "$flags"
@@ -352,7 +352,7 @@ proc libstdc++_link_flags { args } {
     global srcdir
     global ld_library_path
 
-    set gccpath [get_multilibs];
+    set gccpath [get_multilibs]
     set libio_dir ""
     set flags ""
 
@@ -368,20 +368,20 @@ proc libstdc++_link_flags { args } {
 	    append flags "-L${gccpath}/librx "
 	}
     } else {
-	global tool_root_dir;
+	global tool_root_dir
 
-	set libstdcpp [lookfor_file ${tool_root_dir} libstdc++];
+	set libstdcpp [lookfor_file ${tool_root_dir} libstdc++]
 	if { $libstdcpp != "" } {
-	    append flags "-L${libstdcpp} ";
+	    append flags "-L${libstdcpp} "
 	    append ld_library_path ":${libstdcpp}"
 	}
-	set libiberty [lookfor_file ${tool_root_dir} libiberty];
+	set libiberty [lookfor_file ${tool_root_dir} libiberty]
 	if { $libiberty != "" } {
-	    append flags "-L${libiberty} ";
+	    append flags "-L${libiberty} "
 	}
-	set librx [lookfor_file ${tool_root_dir} librx];
+	set librx [lookfor_file ${tool_root_dir} librx]
 	if { $librx != "" } {
-	    append flags "-L${librx} ";
+	    append flags "-L${librx} "
 	}
     }
     return "$flags"
@@ -405,34 +405,34 @@ proc get_multilibs { args } {
     }
 
     if [info exists board] {
-	set target_board $board;
+	set target_board $board
     } else {
-	set target_board [target_info name];
+	set target_board [target_info name]
     }
 
     if { [llength $args] == 0 } {
 	if [board_info $target_board exists multitop] {
-	    return "[board_info $target_board multitop]";
+	    return "[board_info $target_board multitop]"
 	}
 
 	set board_info($target_board,multitop) ""
     }
 
     if { [board_info $target_board exists compiler] } {
-	set compiler [board_info $target_board compiler];
+	set compiler [board_info $target_board compiler]
     } else {
-	set compiler [find_gcc];
+	set compiler [find_gcc]
     }
 
     if { $compiler == "" } {
-	return "";
+	return ""
     }
 
     foreach x "$compiler" {
 	if [regexp "^-B" "$x"] {
-	    regsub "^-B" "$x" "" comp_base_dir;
-	    set comp_base_dir [file dirname $comp_base_dir];
-	    break;
+	    regsub "^-B" "$x" "" comp_base_dir
+	    set comp_base_dir [file dirname $comp_base_dir]
+	    break
 	}
     }
 
@@ -441,17 +441,17 @@ proc get_multilibs { args } {
     verbose "compiler is $compiler"
 
     if { [which $compiler] == 0 } {
-	return "";
+	return ""
     }
 
     if { [board_info $target_board exists multilib_flags] } {
-	set mopts [board_info $target_board multilib_flags];
+	set mopts [board_info $target_board multilib_flags]
     } else {
 	set mopts ""
     }
 
     set default_multilib [exec $compiler --print-multi-lib]
-    set default_multilib [lindex $default_multilib 0];
+    set default_multilib [lindex $default_multilib 0]
     set extra [string trimleft $default_multilib ".;@@"]
 
     # extract the options and their directory names as know by gcc
@@ -492,7 +492,7 @@ proc get_multilibs { args } {
     }
 
     if ![info exists comp_base_dir] {
-	set comp_base_dir [file dirname [file dirname [file dirname [file dirname [file dirname [exec $compiler --print-prog-name=cc1]]]]]];
+	set comp_base_dir [file dirname [file dirname [file dirname [file dirname [file dirname [exec $compiler --print-prog-name=cc1]]]]]]
     }
 
     # search for the top level multilib directory
@@ -502,26 +502,26 @@ proc get_multilibs { args } {
 	if { $multitop == "" } {
 	    set multitop "[lookfor_file ${comp_base_dir} gcc/xgcc]"
 	    if { $multitop != "" } {
-		set multitop [file dirname [file dirname $multitop]];
+		set multitop [file dirname [file dirname $multitop]]
 	    } else {
 		return ""
 	    }
 	}
     }
 
-    set gccpath [eval exec "$compiler" --print-multi-directory $mopts];
-    set gccpath [lindex $gccpath 0];
+    set gccpath [eval exec "$compiler" --print-multi-directory $mopts]
+    set gccpath [lindex $gccpath 0]
     if { $gccpath != "" } {
-	verbose "GCC path is $gccpath";
+	verbose "GCC path is $gccpath"
 	if { [llength $args] == 0 } {
 	    set board_info($target_board,multitop) "$multitop/$gccpath"
 	}
-	return "$multitop/$gccpath";
+	return "$multitop/$gccpath"
     }
 
     # extract the MULTILIB_MATCHES from dumpspecs
     set multimatches ""
-    set lines [split [exec $compiler -dumpspecs] "\n"]  
+    set lines [split [exec $compiler -dumpspecs] "\n"] 
     for {set i 0} {$i <= [llength $lines] - 1} {incr i 1} {
 	if {"*multilib_matches:" == "[lindex $lines $i]"} {
 	    set multimatches [lindex $lines [expr $i + 1]]

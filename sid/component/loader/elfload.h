@@ -48,7 +48,7 @@ typedef int (*PFLOAD)(unsigned long long dest, char *dest2, unsigned long long o
 extern int textSectionAddress(unsigned long long, const struct TextSection *);
 /* Load an ELF executable into memory. FUNC is used to actually read the
    file. */
-extern int readElfFile(PFLOAD func, unsigned*, int*, const struct TextSection **);
+extern int readElfFile(PFLOAD func, unsigned*, int*, unsigned*, const struct TextSection **);
 
 #define EI_CLASS 4
 #define ELFCLASS64  2 /* 64 bit */

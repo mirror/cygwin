@@ -121,6 +121,8 @@ protected:
   // endianness as specified in ELF header.
   // The value is one of sidutil::endian_*.
   output_pin endian_pin;
+  // eflags as specified in ELF header.
+  output_pin eflags_pin;
 
   // Provide address of write attempt to code section
   output_pin write_to_code_address_pin;
@@ -164,6 +166,7 @@ public:
       add_pin("load!", & this->doit_pin);
       add_pin("start-pc-set", & this->start_pc_pin);
       add_pin("endian-set", & this->endian_pin);
+      add_pin("eflags-set", &this->eflags_pin);
       add_pin("error", & this->error_pin);
       add_pin("write-to-code-address", & this->write_to_code_address_pin);
       add_accessor("load-accessor-insn", & this->load_accessor_insn);
@@ -249,10 +252,12 @@ class elf_loader: public generic_loader
       elf_loader::freeloader = this;
       unsigned entry_point;
       int little_endian_p;
+      unsigned eflags;
+
       const struct TextSection *section_table;
       int success_p = readElfFile(& elf_loader::load_function,
 				  & entry_point, & little_endian_p,
-				  & section_table);
+				  & eflags, & section_table);
       probe_upstream.set_section_table (section_table);
       elf_loader::freeloader = 0;
 
@@ -264,6 +269,7 @@ class elf_loader: public generic_loader
 	    this->endian_pin.drive(sidutil::endian_little);
 	  else
 	    this->endian_pin.drive(sidutil::endian_big);
+	  this->eflags_pin.drive((host_int_4) eflags);
 
 	  if (this->verbose_p)
 	    cout << "loader: starting "

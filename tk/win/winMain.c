@@ -372,6 +372,7 @@ setargv(argcPtr, argvPtr)
 }
 
 
+#ifndef __CYGWIN__
 /*
  *----------------------------------------------------------------------
  *
@@ -420,6 +421,4 @@ int main(int argc, char **argv)
     Tk_Main(argc, argv, Tcl_AppInit);
     return 0;
 }
-
-
-
+#endif /* !__CYGWIN__ */

@@ -36,6 +36,7 @@
 
 #define SECRET_EVENT_NAME "cygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x"
 #define ENTROPY_SOURCE_NAME "/dev/urandom"
+#define ENTROPY_SOURCE_DEV_UNIT 9
 
 extern fhandler_socket *fdsock (int& fd, const char *name, SOCKET soc);
 extern "C" {
@@ -60,14 +61,34 @@ get_inet_addr (const struct sockaddr *in, int inlen,
     }
   else if (in->sa_family == AF_LOCAL)
     {
-      int fd = open (in->sa_data, O_RDONLY);
-      if (fd == -1)
-	return 0;
-
+      path_conv pc (in->sa_data, PC_SYM_FOLLOW);
+      if (pc.error)
+	{
+	  set_errno (pc.error);
+	  return 0;
+	}
+      if (!pc.exists ())
+	{
+	  set_errno (ENOENT);
+	  return 0;
+	}
+      if (!pc.issocket ())
+	{
+	  set_errno (EBADF);
+	  return 0;
+	}
+      HANDLE fh = CreateFile (pc, GENERIC_READ, wincap.shared (), &sec_none,
+			      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+      if (fh == INVALID_HANDLE_VALUE)
+	{
+	  __seterrno ();
+	  return 0;
+	}
       int ret = 0;
+      DWORD len = 0;
       char buf[128];
       memset (buf, 0, sizeof buf);
-      if (read (fd, buf, sizeof buf) != -1)
+      if (ReadFile (fh, buf, 128, &len, 0))
 	{
 	  sockaddr_in sin;
 	  sin.sin_family = AF_INET;
@@ -80,7 +101,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	  *outlen = sizeof sin;
 	  ret = 1;
 	}
-      close (fd);
+      CloseHandle (fh);
       return ret;
     }
   else
@@ -90,11 +111,78 @@ get_inet_addr (const struct sockaddr *in, int inlen,
     }
 }
 
+class sock_event
+{
+  WSAEVENT ev[2];
+  SOCKET evt_sock;
+  int evt_type_bit;
+
+public:
+  sock_event ()
+    {
+      ev[0] = WSA_INVALID_EVENT;
+      ev[1] = signal_arrived;
+    }
+  bool load (SOCKET sock, int type_bit)
+    {
+      if ((ev[0] = WSACreateEvent ()) == WSA_INVALID_EVENT)
+	return false;
+      evt_sock = sock;
+      evt_type_bit = type_bit;
+      if (WSAEventSelect (evt_sock, ev[0], 1 << evt_type_bit))
+	{
+	  WSACloseEvent (ev[0]);
+	  ev[0] = WSA_INVALID_EVENT;
+	  return false;
+	}
+      return true;
+    }
+  int wait ()
+    {
+      WSANETWORKEVENTS sock_event;
+      int wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
+						  FALSE);
+      if (wait_result == WSA_WAIT_EVENT_0)
+	WSAEnumNetworkEvents (evt_sock, ev[0], &sock_event);
+
+      /* Cleanup,  Revert to blocking. */
+      WSAEventSelect (evt_sock, ev[0], 0);
+      WSACloseEvent (ev[0]);
+      unsigned long nonblocking = 0;
+      ioctlsocket (evt_sock, FIONBIO, &nonblocking);
+
+      switch (wait_result)
+	{
+	  case WSA_WAIT_EVENT_0:
+	    if ((sock_event.lNetworkEvents & (1 << evt_type_bit))
+		&& sock_event.iErrorCode[evt_type_bit])
+	      {
+		WSASetLastError (sock_event.iErrorCode[evt_type_bit]);
+		set_winsock_errno ();
+		return -1;
+	      }
+	    break;
+
+	  case WSA_WAIT_EVENT_0 + 1:
+	    debug_printf ("signal received");
+	    set_errno (EINTR);
+	    return 1;
+
+	  case WSA_WAIT_FAILED:
+	  default:
+	    WSASetLastError (WSAEFAULT);
+	    set_winsock_errno ();
+	    return -1;
+	}
+      return 0;
+    }
+};
+
 /**********************************************************************/
 /* fhandler_socket */
 
-fhandler_socket::fhandler_socket ()
-  : fhandler_base (), sun_path (NULL)
+fhandler_socket::fhandler_socket (int nunit)
+  : fhandler_base (FH_SOCKET), sun_path (NULL), unit (nunit)
 {
   set_need_fork_fixup ();
   prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF,
@@ -115,8 +203,7 @@ fhandler_socket::set_connect_secret ()
   if (!entropy_source)
     {
       void *buf = malloc (sizeof (fhandler_dev_random));
-      entropy_source = new (buf) fhandler_dev_random ();
-      entropy_source->dev = *urandom_dev;
+      entropy_source = new (buf) fhandler_dev_random (ENTROPY_SOURCE_DEV_UNIT);
     }
   if (entropy_source &&
       !entropy_source->open (NULL, O_RDONLY))
@@ -257,6 +344,7 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
 				   prot_info_ptr, 0, 0)) == INVALID_SOCKET)
     {
       debug_printf ("WSASocket error");
+      set_io_handle ((HANDLE)INVALID_SOCKET);
       set_winsock_errno ();
     }
   else if (!new_sock && !winsock2_active)
@@ -296,25 +384,77 @@ fhandler_socket::dup (fhandler_base *child)
   fhs->set_io_handle (get_io_handle ());
   if (get_addr_family () == AF_LOCAL)
     fhs->set_sun_path (get_sun_path ());
+  fhs->set_socket_type (get_socket_type ());
 
-  fhs->fixup_before_fork_exec (GetCurrentProcessId ());
-  if (winsock2_active)
+  /* Using WinSock2 methods for dup'ing sockets seem to collide
+     with user context switches under... some... conditions.  So we
+     drop this for NT systems at all and return to the good ol'
+     DuplicateHandle way of life.  This worked fine all the time on
+     NT anyway and it's even a bit faster. */
+  if (!wincap.has_security ())
     {
-      fhs->fixup_after_fork (hMainProc);
-      return 0;
+      fhs->fixup_before_fork_exec (GetCurrentProcessId ());
+      if (winsock2_active)
+	{
+	  fhs->fixup_after_fork (hMainProc);
+	  return get_io_handle () == (HANDLE) INVALID_SOCKET;
+	}
     }
-  return fhandler_base::dup (child);
+  /* We don't call fhandler_base::dup here since that requires to
+     have winsock called from fhandler_base and it creates only
+     inheritable sockets which is wrong for winsock2. */
+  HANDLE nh;
+  if (!DuplicateHandle (hMainProc, get_io_handle (), hMainProc, &nh, 0,
+			!winsock2_active, DUPLICATE_SAME_ACCESS))
+    {
+      system_printf ("dup(%s) failed, handle %x, %E",
+		     get_name (), get_io_handle ());
+      __seterrno ();
+      return -1;
+    }
+  child->set_io_handle (nh);
+  return 0;
 }
 
 int __stdcall
 fhandler_socket::fstat (struct __stat64 *buf, path_conv *pc)
 {
-  int res = fhandler_base::fstat (buf, pc);
+  int res;
+  if (get_addr_family () == AF_LOCAL && get_sun_path () && !get_socket_type ())
+    {
+      path_conv spc (get_sun_path (),
+		     PC_SYM_NOFOLLOW | PC_NULLEMPTY | PC_FULL | PC_POSIX,
+		     NULL);
+      fhandler_base *fh = cygheap->fdtab.build_fhandler (-1, FH_DISK,
+							 get_sun_path (),
+							 spc, 0);
+      if (fh)
+	{
+	  res = fh->fstat (buf, &spc);
+	  buf->st_rdev = buf->st_size = buf->st_blocks = 0;
+	  return res;
+	}
+    }
+
+  res = fhandler_base::fstat (buf, pc);
   if (!res)
     {
-      buf->st_mode &= ~_IFMT;
-      buf->st_mode |= _IFSOCK;
-      buf->st_ino = (ino_t) get_handle ();
+      if (get_socket_type ()) /* fstat */
+	{
+	  buf->st_dev = 0;
+	  buf->st_ino = (ino_t) get_handle ();
+	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
+	  buf->st_uid = geteuid32 ();
+	  buf->st_gid = getegid32 ();
+	}
+      else
+	{
+	  path_conv spc ("/dev", PC_SYM_NOFOLLOW | PC_NULLEMPTY, NULL);
+	  buf->st_dev = spc.volser ();
+	  buf->st_ino = (ino_t) get_namehash ();
+	  buf->st_mode &= ~S_IRWXO;
+	  buf->st_rdev = (get_device () << 16) | get_unit ();
+	}
     }
   return res;
 }
@@ -329,7 +469,6 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 #define un_addr ((struct sockaddr_un *) name)
       struct sockaddr_in sin;
       int len = sizeof sin;
-      int fd;
 
       if (strlen (un_addr->sun_path) >= UNIX_PATH_LEN)
 	{
@@ -355,14 +494,31 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       sin.sin_port = ntohs (sin.sin_port);
       debug_printf ("AF_LOCAL: socket bound to port %u", sin.sin_port);
 
-      /* bind must fail if file system socket object already exists
-	 so _open () is called with O_EXCL flag. */
-      fd = ::open (un_addr->sun_path, O_WRONLY | O_CREAT | O_EXCL | O_BINARY, 0);
-      if (fd < 0)
+      path_conv pc (un_addr->sun_path, PC_SYM_FOLLOW);
+      if (pc.error)
 	{
-	  if (get_errno () == EEXIST)
-	    set_errno (EADDRINUSE);
+	  set_errno (pc.error);
 	  goto out;
+	}
+      if (pc.exists ())
+	{
+	  set_errno (EADDRINUSE);
+	  goto out;
+	}
+      mode_t mode = (S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask;
+      DWORD attr = FILE_ATTRIBUTE_SYSTEM;
+      if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
+	attr |= FILE_ATTRIBUTE_READONLY;
+      SECURITY_ATTRIBUTES sa = sec_none;
+      if (allow_ntsec && pc.has_acls ())
+	set_security_attribute (mode, &sa, alloca (4096), 4096);
+      HANDLE fh = CreateFile (pc, GENERIC_WRITE, 0, &sa, CREATE_NEW, attr, 0);
+      if (fh == INVALID_HANDLE_VALUE)
+	{
+	  if (GetLastError () == ERROR_ALREADY_EXISTS)
+	    set_errno (EADDRINUSE);
+	  else
+	    __seterrno ();
 	}
 
       set_connect_secret ();
@@ -370,20 +526,16 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       char buf[sizeof (SOCKET_COOKIE) + 80];
       __small_sprintf (buf, "%s%u ", SOCKET_COOKIE, sin.sin_port);
       get_connect_secret (strchr (buf, '\0'));
-      len = strlen (buf) + 1;
-
-      /* Note that the terminating nul is written.  */
-      if (::write (fd, buf, len) != len)
+      DWORD blen = strlen (buf) + 1;
+      if (!WriteFile (fh, buf, blen, &blen, 0))
 	{
-	  save_errno here;
-	  ::close (fd);
-	  unlink (un_addr->sun_path);
+	  __seterrno ();
+	  CloseHandle (fh);
+	  DeleteFile (pc);
 	}
       else
 	{
-	  ::close (fd);
-	  chmod (un_addr->sun_path,
-		 (S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask);
+	  CloseHandle (fh);
 	  set_sun_path (un_addr->sun_path);
 	  res = 0;
 	}
@@ -401,6 +553,8 @@ out:
 int
 fhandler_socket::connect (const struct sockaddr *name, int namelen)
 {
+  sock_event evt;
+  BOOL interrupted = FALSE;
   int res = -1;
   BOOL secret_check_failed = FALSE;
   BOOL in_progress = FALSE;
@@ -410,12 +564,36 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
     return -1;
 
+  if (!is_nonblocking () && !is_connect_pending ())
+    if (!evt.load (get_socket (), FD_CONNECT_BIT))
+      {
+	set_winsock_errno ();
+	return -1;
+      }
+
   res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
+
+  if (res && !is_nonblocking () && !is_connect_pending () &&
+      WSAGetLastError () == WSAEWOULDBLOCK)
+    switch (evt.wait ())
+      {
+	case 1: /* Signal */
+	  WSASetLastError (WSAEINPROGRESS);
+	  interrupted = TRUE;
+	  break;
+	case 0:
+	  res = 0;
+	  break;
+	default:
+	  res = -1;
+	  break;
+      }
+
   if (res)
     {
       /* Special handling for connect to return the correct error code
 	 when called on a non-blocking socket. */
-      if (is_nonblocking ())
+      if (is_nonblocking () || is_connect_pending ())
 	{
 	  DWORD err = WSAGetLastError ();
 	  if (err == WSAEWOULDBLOCK || err == WSAEALREADY)
@@ -463,6 +641,10 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
     set_connect_state (CONNECT_PENDING);
   else
     set_connect_state (CONNECTED);
+
+  if (interrupted)
+    set_errno (EINTR);
+
   return res;
 }
 
@@ -481,7 +663,6 @@ int
 fhandler_socket::accept (struct sockaddr *peer, int *len)
 {
   int res = -1;
-  WSAEVENT ev[2] = { WSA_INVALID_EVENT, signal_arrived };
   BOOL secret_check_failed = FALSE;
   BOOL in_progress = FALSE;
 
@@ -505,65 +686,31 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 
   if (!is_nonblocking ())
     {
-      ev[0] = WSACreateEvent ();
-
-      if (ev[0] != WSA_INVALID_EVENT &&
-	  !WSAEventSelect (get_socket (), ev[0], FD_ACCEPT))
+      sock_event evt;
+      if (!evt.load (get_socket (), FD_ACCEPT_BIT))
 	{
-	  WSANETWORKEVENTS sock_event;
-	  int wait_result;
-
-	  wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
-						  FALSE);
-	  if (wait_result == WSA_WAIT_EVENT_0)
-	    WSAEnumNetworkEvents (get_socket (), ev[0], &sock_event);
-
-	  /* Unset events for listening socket and
-	     switch back to blocking mode */
-	  WSAEventSelect (get_socket (), ev[0], 0);
-	  unsigned long nonblocking = 0;
-	  ioctlsocket (get_socket (), FIONBIO, &nonblocking);
-
-	  switch (wait_result)
-	    {
-	    case WSA_WAIT_EVENT_0:
-	      if (sock_event.lNetworkEvents & FD_ACCEPT)
-		{
-		  if (sock_event.iErrorCode[FD_ACCEPT_BIT])
-		    {
-		      WSASetLastError (sock_event.iErrorCode[FD_ACCEPT_BIT]);
-		      set_winsock_errno ();
-		      res = -1;
-		      goto done;
-		    }
-		}
-	      /* else; : Should never happen since FD_ACCEPT is the only event
-		 that has been selected */
-	      break;
-	    case WSA_WAIT_EVENT_0 + 1:
-	      debug_printf ("signal received during accept");
-	      set_errno (EINTR);
-	      res = -1;
-	      goto done;
-	    case WSA_WAIT_FAILED:
-	    default: /* Should never happen */
-	      WSASetLastError (WSAEFAULT);
-	      set_winsock_errno ();
-	      res = -1;
-	      goto done;
-	    }
+	  set_winsock_errno ();
+	  return -1;
+	}
+      switch (evt.wait ())
+	{
+	  case 1: /* Signal */
+	    return -1;
+	  case 0:
+	    break;
+	  case -1:
+	    return -1;
 	}
     }
 
   res = ::accept (get_socket (), peer, len);
 
-  if ((SOCKET) res == (SOCKET) INVALID_SOCKET &&
-      WSAGetLastError () == WSAEWOULDBLOCK)
+  if ((SOCKET) res == INVALID_SOCKET && WSAGetLastError () == WSAEWOULDBLOCK)
     in_progress = TRUE;
 
   if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
     {
-      if ((SOCKET) res != (SOCKET) INVALID_SOCKET || in_progress)
+      if ((SOCKET) res != INVALID_SOCKET || in_progress)
 	{
 	  if (!create_secret_event ())
 	    secret_check_failed = TRUE;
@@ -572,7 +719,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	}
 
       if (!secret_check_failed &&
-	  (SOCKET) res != (SOCKET) INVALID_SOCKET)
+	  (SOCKET) res != INVALID_SOCKET)
 	{
 	  if (!check_peer_secret_event ((struct sockaddr_in*) peer))
 	    {
@@ -584,34 +731,36 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
       if (secret_check_failed)
 	{
 	  close_secret_event ();
-	  if ((SOCKET) res != (SOCKET) INVALID_SOCKET)
+	  if ((SOCKET) res != INVALID_SOCKET)
 	    closesocket (res);
 	  set_errno (ECONNABORTED);
-	  res = -1;
-	  goto done;
+	  return -1;
 	}
     }
 
-  {
-    cygheap_fdnew res_fd;
-    if (res_fd < 0)
-      /* FIXME: what is correct errno? */;
-    else if ((SOCKET) res == (SOCKET) INVALID_SOCKET)
-      set_winsock_errno ();
-    else
-      {
-	fhandler_socket* res_fh = fdsock (res_fd, get_name (), res);
-	if (get_addr_family () == AF_LOCAL)
-	  res_fh->set_sun_path (get_sun_path ());
-	res_fh->set_addr_family (get_addr_family ());
-	res_fh->set_socket_type (get_socket_type ());
-	res = res_fd;
-      }
-  }
-
-done:
-  if (ev[0] != WSA_INVALID_EVENT)
-    WSACloseEvent (ev[0]);
+  if ((SOCKET) res == INVALID_SOCKET)
+    set_winsock_errno ();
+  else
+    {
+      cygheap_fdnew res_fd;
+      fhandler_socket* res_fh = NULL;
+      if (res_fd >= 0)
+	  res_fh = fdsock (res_fd, get_name (), res);
+      if (res_fh)
+	{
+	  if (get_addr_family () == AF_LOCAL)
+	    res_fh->set_sun_path (get_sun_path ());
+	  res_fh->set_addr_family (get_addr_family ());
+	  res_fh->set_socket_type (get_socket_type ());
+	  res_fh->set_connect_state (CONNECTED);
+	  res = res_fd;
+	}
+      else
+	{
+	  closesocket (res);
+	  res = -1;
+	}
+    }
 
   return res;
 }
@@ -712,6 +861,11 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 
   if (res == SOCKET_ERROR)
     {
+      /* According to SUSv3, errno isn't set in that case and no error
+	 condition is returned. */
+      if (WSAGetLastError () == WSAEMSGSIZE)
+	return len;
+
       res = -1;
       set_winsock_errno ();
     }
@@ -790,6 +944,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
   else
     {
       WSABUF wsabuf[iovcnt];
+      unsigned long len = 0L;
 
       {
 	const struct iovec *iovptr = iov + iovcnt;
@@ -798,7 +953,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	  {
 	    iovptr -= 1;
 	    wsaptr -= 1;
-	    wsaptr->len = iovptr->iov_len;
+	    len += wsaptr->len = iovptr->iov_len;
 	    wsaptr->buf = (char *) iovptr->iov_base;
 	  }
 	while (wsaptr != wsabuf);
@@ -825,6 +980,11 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 
       if (res == SOCKET_ERROR)
 	{
+	  /* According to SUSv3, errno isn't set in that case and no error
+	     condition is returned. */
+	  if (WSAGetLastError () == WSAEMSGSIZE)
+	    return len;
+
 	  res = -1;
 	  set_winsock_errno ();
 	}
@@ -1115,7 +1275,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	}
       ifr->ifr_flags = IFF_NOTRAILERS | IFF_UP | IFF_RUNNING;
       if (!strncmp(ifr->ifr_name, "lo", 2)
-          || ntohl (((struct sockaddr_in *) &ifr->ifr_addr)->sin_addr.s_addr)
+	  || ntohl (((struct sockaddr_in *) &ifr->ifr_addr)->sin_addr.s_addr)
 	  == INADDR_LOOPBACK)
 	ifr->ifr_flags |= IFF_LOOPBACK;
       else

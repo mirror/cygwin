@@ -19,12 +19,16 @@
 
 #include <cstdlib>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <ctime>
 
 
 // Some usings not mentioned in gloss.h.
 using sid::little_int_1;
+using sid::little_int_2;
 using sid::little_int_4;
+using sid::big_int_2;
 using sid::big_int_4;
 
 using sidutil::parse_attribute;
@@ -232,6 +236,104 @@ gloss32::set_string(address32 address, const string& value)
 
   return true;
 }
+
+bool
+gloss32::get_halfword (address32 addr, sid::host_int_2& value)
+{
+  if (! cpu_memory_bus)
+    {
+      if (verbose_p)
+	cerr << "*** CPU memory bus not configure!" << endl;
+      return false;
+    }
+
+  if (verbose_p)
+    {
+      cerr << "Reading word from target memory at "
+	   << make_numeric_attribute (addr, ios::hex | ios::showbase)
+	   << ":";
+    }
+
+  while (true)
+    {
+      bus::status s;
+
+      if (endian == sidutil::endian_big)
+	{
+	  big_int_2 word;
+	  s = cpu_memory_bus->read (addr, word);
+	  value = word;
+	}
+      else
+	{
+	  little_int_2 word;
+	  s = cpu_memory_bus->read (addr, word);
+	  value = word;
+	}
+
+      if (s == bus::ok)
+	break;
+      else
+	{
+	  if (verbose_p)
+	    cerr << "failed" << endl;
+	  return false;
+	}
+    }
+  if (verbose_p)
+    cerr << make_numeric_attribute (value, ios::hex | ios::showbase) << endl;
+
+  return true;
+}
+
+bool
+gloss32::set_halfword(address32 addr, sid::host_int_2 value)
+{
+  if (! cpu_memory_bus)
+    {
+      if (verbose_p)
+	cerr << "*** Target memory bus not configured!" << endl;
+      return false;
+    }
+
+  if (verbose_p)
+    {
+      cerr << "Write word " << make_numeric_attribute (value, ios::hex | ios::showbase)
+	   << " to target memory at "
+	   << make_numeric_attribute (addr, ios::hex | ios::showbase);
+    }
+
+  while (true)
+    {
+      bus::status s;
+
+      if (this->endian == sidutil::endian_big)
+	{
+	  big_int_2 word = value;
+	  s = this->cpu_memory_bus->write(addr, word);
+	}
+      else
+	{
+	  little_int_2 word = value;
+	  s = this->cpu_memory_bus->write(addr, word);
+	}
+
+      if (s == bus::ok)
+	break;
+      else
+	{
+	  if (verbose_p)
+	    cerr << ": failed" << endl;
+	  return false;
+	}
+    }
+
+  if (verbose_p)
+    cerr << endl;
+
+  return true;
+}
+
 
 bool
 gloss32::get_word(address32 address, int32& value)
@@ -560,6 +662,9 @@ gloss32::syscall_trap()
     case libgloss::SYS_lseek:
       do_sys_lseek();
       break;
+    case libgloss::SYS_fstat:
+      do_sys_fstat();
+      break;
     case libgloss::SYS_close:
       do_sys_close();
       break;
@@ -704,6 +809,52 @@ gloss32::do_sys_lseek()
       return;
     }
   set_int_result(0);
+}
+
+void
+gloss32::do_sys_fstat()
+{
+  struct stat st;
+  int32 handle, ptr;
+
+  get_int_argument (1, handle);
+  get_int_argument (2, ptr);
+
+  if (verbose_p)
+    cerr << "*** fstat (" << handle << "," << ptr << ")" << endl;
+
+  int fd = lookup_fd (handle);
+  if (fd < 0)
+    {
+      set_host_error_result (EBADF);
+      set_int_result (-1);
+    }
+
+  int rc = ::fstat (fd, &st);
+  if (rc < 0)
+    {
+      set_host_error_result (errno);
+      set_int_result (-1);
+    }
+
+  set_int_result (::fstat (handle, &st));
+
+  // Populate struct stat in target memory.
+  set_halfword (ptr, st.st_dev);
+  ptr += 2;
+  set_halfword (ptr, st.st_ino);
+  ptr += 2;
+  set_word (ptr, st.st_mode);
+  ptr += 4;
+  set_halfword (ptr, st.st_nlink);
+  ptr += 2;
+  set_halfword (ptr, st.st_uid);
+  ptr += 2;
+  set_halfword (ptr, st.st_gid);
+  ptr += 2;
+  set_halfword (ptr, st.st_rdev);
+  ptr += 2;
+  set_word (ptr, st.st_size);
 }
 
 void

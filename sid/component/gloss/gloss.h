@@ -110,6 +110,9 @@ protected:
   virtual bool set_error_result(int32 target_errno);
   bool set_host_error_result (int32 host_errno);
 
+  bool get_halfword(address32 address, sid::host_int_2& value);
+  bool set_halfword(address32 address, sid::host_int_2 value);
+
   // Get/set a word in memory, taking into account the cpu's endianness.
   bool get_word(address32 address, int32& value);
   bool set_word(address32 address, int32 value);
@@ -140,6 +143,7 @@ protected:
   void do_sys_open();
   void do_sys_close();
   void do_sys_lseek();
+  void do_sys_fstat();
   void do_sys_time();
   void do_sys_gettimeofday();
   void do_sys_times();

@@ -1,3 +1,8 @@
+2004-03-22  Dave Brolley  <brolley@redhat.com>
+
+	* common-xml/interface.xml: Document "trace" pin.
+	* common-xml/behavior.xml: Document "trace" pin.
+
 2003-10-07  Dave Brolley  <brolley@redhat.com>
 
 	* cgen-model.h (class cgen_model): step_cycles and step_latency

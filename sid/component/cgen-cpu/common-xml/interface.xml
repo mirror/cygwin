@@ -12,6 +12,7 @@
     <defpin name="yield" direction="in" legalvalues="any" behaviors="execution" />
     <defpin name="flush-icache" direction="in" legalvalues="any" behaviors="execution" />
     <defpin name="print-insn-summary!" direction="in" legalvalues="any" behaviors="tracing" />
+    <defpin name="trace" direction="in" legalvalues="any" behaviors="tracing" />
 
     <!-- accessors -->
     <defaccessor name="data-memory" accesses="any" behaviors="execution" />

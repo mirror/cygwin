@@ -1,6 +1,261 @@
+2001-12-03  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc (cygwin_getsockopt): Allow NULL optval.
+
+	* path.cc (mount_info::read_cygdrive_info_from_registry): Don't write
+	cygdrive to registry if it doesn't exist.
+
+2001-12-03  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (mount_info::conv_to_win32_path): Avoid returning error if
+	cygdrive == '/'.
+	(mount_info::cygdrive_win32_path): Return 0 if invalid cygdrive path.
+
+2001-11-30  Christopher Faylor  <cgf@redhat.com>
+
+	* debug.cc (makethread): Eliminate unneeded function call.
+	* miscfuncs.cc (tls_ix): Predefine.
+	* perthread.h (set_reent): Eliminate.
+	(get_reent): Ditto.
+	* winbase.h (my_tlsalloc): Use global stack base pointer.  Set newly
+	allocated location to NULL.
+	(my_tlssetvalue): Use global stack base pointer.
+	(my_tlsgetvalue): Ditto.
+
+2001-11-27  Christopher Faylor  <cgf@redhat.com>
+
+	* winsup.h: Reorganize to avoid use of experimental stuff.
+	* shortcut.cc: Move winsup.h first in include order.
+
+2001-11-27  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din (ualarm): New export.
+	* dcrt0.cc (_dll_crt0): Add experimental tls storage declaration.
+	(dll_crt0): Ditto.
+	* debug.cc (thread_stub): Ditto.
+	* thread.cc: Minor cleanup.
+	(__pthread_create): Add experimental tls storage declaration.
+	* miscfuncs.cc: Define tls index.
+	* winsup.h: Declare experimental tls storage.
+
+	* window.cc (alarm): Use old timer return from setitimer.
+	(ualarm): New function.  From Alexandr V. Shutko.
+
+2001-11-26  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (libcygwin.a): Use ar commands to build libcygwin.a since
+	adding an archive doesn't work the way we want it to.
+
+2001-11-24  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_disk_file.cc (fhandler_cygdrive::readdir): Avoid reporting
+	inaccessible drives.
+
+2001-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_hstrerror): Allow s == NULL.
+	(cygwin_rcmd): Add parameter checking.
+	(cygwin_rexec): Ditto.
+
+2001-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_inet_ntoa): Add parameter checking.
+	(cygwin_inet_network): Return INADDR_NONE instead of 0 in case of
+	EFAULT.
+	(cygwin_hstrerror): Add parameter checking.
+	(cygwin_rresvport): Ditto.
+	(socketpair): Ditto.
+	* winsup.h (check_null_str): Add extern declaration.
+
+2001-11-24  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (path_conv::check): Tighten FH_CYGDRIVE check to avoid
+	matching trailing component, like other devices.
+
+2001-11-24  Christopher Faylor  <cgf@redhat.com>
+
+	* autoload.cc (IsDebuggerPresent): Make conditional load since it is
+	not available everywhere.
+
+	* path.cc (mount_info::conv_to_win32_path): Only consider /cygdrive to
+	be FH_CYGDRIVE, not /cygdrive/x.
+
+2001-11-24  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc (inet_makeaddr): Revert previous change.
+
+2001-11-23  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (chdir): Allow 'cd /cygdrive'.
+
+2001-11-23  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::vfork_parent_restore): Add debugging statement.
+
+	* exceptions.cc (try_to_debug): Spin only as long as we don't have a
+	debugger attached.
+
+	* fhandler.h (fhandler_base::set_nohandle): New method.
+	(fhandler_base::get_nohandle): New method.
+	* fhandler.cc (fhandler_base::dup): Avoid duplicating handle if there
+	is no handle.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Set nohandle
+	flag on dummy fd.
+
+2001-11-23  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Make intermediate library for eventual inclusion in
+	libcygwin.a
+
+	* fhandler.h (fhandler_pipe::fhandler_pipe): Remove default argument
+	setting since it is no longer used.
+
+	* miscfuncs.cc (check_null_str): New function.
+	(check_null_str_errno): Ditto.
+	* net.cc: Add defensive buffer checking throughout.
+	(cygwin_sendto): Protect against invalid fd.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_getpeername): Ditto.
+	(cygwin_recv): Ditto.
+	(cygwin_send): Ditto.
+	* winsup.h: Declare a new function.
+
+2001-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* select.cc (set_bits): Fix conditional for setting fd in exceptfds.
+	* dtable.cc (dtable::build_fhandler): Create fhandler_pipe using
+	correct device type.
+	* path.cc (get_devn): Set correct pipe device type from device name.
+
+2001-11-22  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (conv_path_list): Fix wild indexing into path due to
+	conflicting methods for setting src pointer.
+
+	* dir.cc (opendir): Only pass path_conv argument to opendir, since name
+	is already part of the fhandler.
+	* dtable.cc (dtable::build_fhandler): Accomodate new FH_CYGDRIVE type.
+	* fhandler.cc (fhandler_base::opendir): Nuke name argument.
+	* fhandler.h: Add FH_CYGDRIVE to "device" enum.
+	(fhandler_base::opendir): Nuke name argument.
+	(fhandler_disk_file::opendir): Ditto.
+	(fhandler_disk_file::fhandler_disk_file): Declare new method which
+	passes devtype through.
+	(fhandler_cygdrive): Add elements for tracking drives.
+	(fhandler_cygdrive::set_drives): Declare new method.
+	(fhandler_cygdrive::iscygdrive_root): Declare new method.
+	(fhandler_cygdrive::opendir): Declare new method.
+	(fhandler_cygdrive::readdir): Declare new method.
+	(fhandler_cygdrive::telldir): Declare new method.
+	(fhandler_cygdrive::seekdir): Declare new method.
+	(fhandler_cygdrive::rewinddir): Declare new method.
+	(fhandler_cygdrive::closedir): Declare new method.
+	(fhandler_cygdrive::fstat): Declare new method.
+	* fhandler_disk_file.cc (fhandler_disk_file::fhandler_disk_file):
+	Define new method which passes devtype through.
+	(fhandler_disk_file::open): Tweak debug output.
+	(fhandler_disk_file::opendir): Nuke first argument.  Use info from
+	path_conv and class rather than calling fstat.
+	(fhandler_cygdrive::set_drives): New method.
+	(fhandler_cygdrive::iscygdrive_root): New method.
+	(fhandler_cygdrive::opendir): New method.
+	(fhandler_cygdrive::readdir): New method.
+	(fhandler_cygdrive::telldir): New method.
+	(fhandler_cygdrive::seekdir): New method.
+	(fhandler_cygdrive::rewinddir): New method.
+	(fhandler_cygdrive::closedir): New method.
+	(fhandler_cygdrive::fstat): New method.
+	* path.cc (iscygdrive_device): Assume cygdriveness is already verified.
+	(path_conv::check): Treat FH_CYGDRIVE "method" as a special case,
+	setting file attributes as needed.
+	(mount_info::conv_to_win32_path): Allow stand-alone /cygdrive, meaning
+	"the directory which contains all of the drives on the system".
+	(fillout_mntent): Use cyg_tolower for conversions.
+	(mount_info::cygdrive_win32_path): Replace unused argument with unit
+	number.
+	* shared_info.h (mount_info::cygdrive_win32_path): Reflect argument
+	change.
+
+2001-11-21  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (DLL_OFILES): Add fhandler_disk_file.o.
+	* cygheap.h (cygheap_fdnew::operator =): New operator.
+	* dir.cc: Add invalid struct checking throughout.  Use methods for all
+	directory manipulation throughout.
+	* fhandler.cc: Move fhandler_disk_file stuff to own file.
+	(fhandler_base::opendir): New method.
+	(fhandler_base::readdir): New method.
+	(fhandler_base::telldir): New method.
+	(fhandler_base::seekdir): New method.
+	(fhandler_base::rewinddir): New method.
+	(fhandler_base::closedir): New method.
+	* fhandler_disk_file.cc: New file.
+	* fhandler.h (fhandler_base): Declare new virtual methods.
+	(fhandler_disk_file): Ditto.
+	(fhandler_cygdrive): New class.
+
+	* path.cc (conv_path_list): Use strccpy to break apart path.
+
+2001-11-17  Nick Duffek  <nick@duffek.com>
+
+	* path.cc (conv_path_list): Copy source paths before modifying them.
+
+2001-11-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_raw.cc (fhandler_dev_raw::clear): Don't reset unit.
+	* fhandler_tape.cc (fhandler_dev_tape::fhandler_dev_tape): Add debug
+	output.
+
+2001-11-15  Egor Duda  <deo@logos-m.ru>
+
+	* include/pthread.h (PTHREAD_COND_INITIALIZER): Define.
+	* thread.cc (__pthread_cond_destroy): Add support for
+	PTHREAD_COND_INITIALIZER.
+	(__pthread_cond_init): Ditto.
+	(__pthread_cond_broadcast): Ditto.
+	(__pthread_cond_signal): Ditto.
+	(__pthread_cond_dowait): Ditto.
+	(__pthread_mutex_init): Handle PTHREAD_MUTEX_INITIALIZER correctly,
+	don't return error when it's passed as parameter.
+	* winsup.h (check_null_invalid_struct): Call correct function.
+
+2001-11-14  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc: Add stdlib.h include for alloca declaration.
+	* poll.cc: Ditto.
+	* termios.cc: Ditto.
+
+2001-11-14  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (_write): Only allow zero length when fd is valid.
+
+2001-11-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_disk_file::fstat): Add setting access time
+	and creation time to last modification time for files on filesystems
+	not supporting multiple timestamps.
+	(fhandler_disk_file::fstat_helper): Set access time and creation
+	time in incoming Windows structure instead of in stat buf to avoid
+	incorrectly overwriting Epoch timestamp.
+
+2001-11-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.h: Remove alloca definition since it's now defined through
+	inclusion of stdlib.h.
+	* lib/cygwin_crt0.c: Ditto.
+
 2001-11-13  Christopher Faylor  <cgf@redhat.com>
 
 	* syscalls.cc (_write): Allow zero length as per SUSv2.
+
+2001-11-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (mkdir): Add HIDDEN file attribute if file has leading dot
+	and HIDDEN_DOT_FILES is defined.
+	* fhandler.cc (fhandler_base::open): Ditto.
+	* path.cc (symlink): Ditto.
+	* syscalls.cc (_rename): Ditto and remove HIDDEN file attribute if
+	new filename does not begin with a dot.
 
 2001-11-12  Christopher Faylor  <cgf@redhat.com>
 

@@ -1,3 +1,8 @@
+2002-11-21  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am: New file.
+	* sid.1: Likewise.
+
 2001-11-15  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* sid-guide/book-sid.sgml: Add example to Using GDB section.

@@ -1,0 +1,177 @@
+.\" Copyright 2002 Red Hat, Inc.
+.\"
+.TH SID 1 "November 2002" SID "Red Hat"
+.SH NAME
+sid - SID simulator driver
+.SH SYNOPSIS
+.B sid OPTIONS [EXECUTABLE]
+.SH DESCRIPTION
+Run an executable in a simulated hardware environment.  Command line
+options allow details of the environment to be specified, such as CPU
+type(s), memory layout and monitor support.
+.SH OPTIONS
+.TP
+.BR "-h" ", " "--help"
+Show usage
+.TP
+.BR "-v" ", " "--version"
+Print simulator version
+.TP
+.BR "-n" ", " "--no-run"
+Load/run simulation but do not run simulation
+.TP
+.BR "-f" " FILE"
+Also read configuration FILE
+.TP
+.BR "-e" " LINE"
+Also perform configuration LINE
+.TP
+.B "--persistent"
+Run top-level loop indefinitely
+.TP
+.BR "--save-temps" "=FILE"
+Write configuration to FILE; use ``-'' for standard output
+.TP
+.BR "--wrap" "=COMPONENT"
+Turn on SID API tracing for COMPONENT
+.TP
+.B "--verbose"
+Turn on run-time verbosity settings
+.TP
+.B "--tksm"
+Add an experimental Tk system monitor
+.TP
+.B "--tksched"
+Add a simple Tk sim-scheduler controller
+.TP
+.BR "--board" "=BOARD"
+Instantiate built-in BOARD; remaining options apply to the most recently instantiated BOARD.  BOARD may be any of:
+.RS 7
+.TP
+.B basic
+basic CPU and memory board
+.TP
+.SH "BOARD-SPECIFIC OPTIONS"
+.TP
+.BR "--cpu" "=CPU"
+Change board to use CPU
+.TP
+.BR "--load" "=EXECUTABLE"
+Load EXECUTABLE into board's memory.  Comma-separated sub-options are:
+.RS 7
+.TP
+\fBbus\fR=MAPPER
+Load file into bus MAPPER
+.TP
+\fBcpu\fR=CPU
+Set pc of cpu CPU on load
+.TP
+.B all-cpus
+Shortcut for using all CPUs
+.RE
+.TP
+.BR "--gloss"
+Add gloss (operating system) support.
+.TP
+.BR "--gdb" "=PORT"
+Add a GDB stub on TCP port PORT.
+.TP
+.BR "--engine" "=(scache|pbb)"
+Set board's engine type to scache or pbb.
+.TP
+.BR "--sidrtc" "=ADDR"
+Add a real-time clock at address ADDR.
+.TP
+.BR "--sidcodec" "=ADDR"
+Add an audio codec at address ADDR.
+.TP
+.BR "--insn-count" "=COUNT"
+Set block of uninterrupted ticks for instructions.
+.TP
+.B "--enable-warnings"
+Enable CPU execution warnings.
+.TP
+.BR "--trace-extract"
+Enable CPU instruction decoder tracing.
+.TP
+.B "--trace-semantics"
+Enable CPU execution tracing.
+.TP
+.B "--trace-disassemble"
+Enable CPU execute disassembly.
+.TP
+.B "--trace-counter"
+Enable CPU instruction counting.
+.TP
+.B "--trace-core"
+Enable bus access tracing.
+.TP
+.BR "--icache" "=TYPE"
+Add an instruction cache hw-cache-TYPE to board.
+.TP
+.BR "--dcache" "=TYPE"
+Add a data cache hw-cache-TYPE to board.
+.br
+eg., direct/64kb/32, 4way/256kb/64/lru
+.TP
+.BR "--EB" ", " "--EL"
+Set power-up CPU mode to big/little endian.
+.TP
+.BR "--gprof" "=FILE"
+Turn on GPROF profiling; collect every insn-count ticks.
+.TP
+.BR "--memory-region" "=BASE,SIZE"
+Add RAM from region from BASE to BASE+SIZE-1.  Comma-separated sub-options are:
+.RS 7
+.TP
+\fBbus\fR=MAPPER
+Attach memory to bus MAPPER.
+.TP
+.B "read-only"
+Make memory read-only.
+.TP
+\fBalias\fR=BASE2
+Add an alias at BASE2.
+.TP
+\fBfile\fR=NAME
+Load/save memory from file.
+.TP
+.B mmap
+Memory map given file.
+.TP
+\fBlatency\fR=r:w
+Set read, write latencies [0:0]
+.TP
+\fBlatency\fR=value
+Set both read and write latencies [0]
+.RE
+
+Most board-specific options can be used in board-neutral position \
+where they are interpreted as session-specific or default settings. \
+All
+.B "-b"
+options are performed first, in sequence.  All
+.B "-f"
+and
+.B "-e"
+options are performed after
+.B "-b"
+options, in sequence.
+.B "FILE"
+names supplied without
+.B "-f"
+are processed last, in sequence.
+.SH "DIAGNOSTICS"
+Normally, exit status is 0 if the simulation terminates successfully.
+Command line or configuration errors result in a non-zero exit status
+with an error message displayed on standard error.
+.SH "SEE ALSO"
+gdb(1).
+.SH "REPORTING BUGS"
+Report bugs to <sid@sources.redhat.com>.
+.SH COPYING
+Copyright \(co 2002 Red Hat, Inc.
+.br
+This is free software; see the file COPYING.SID in the source for copying conditions.
+.SH AUTHORS
+Red Hat, Inc.

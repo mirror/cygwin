@@ -1029,7 +1029,7 @@ gloss32::read (int fd, address32 addr, size32 len,
 
 	  if (rx_buffer.size() > 0)
 	    {
-	      count_read = std::min (len, rx_buffer.size());
+	      count_read = std::min (size_t(len), rx_buffer.size());
 	      for (int i = 0; i < count_read; ++i)
 		{
 		  c = rx_buffer.front();

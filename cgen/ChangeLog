@@ -1,3 +1,7 @@
+2003-12-15  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
+
+	* cpu/m32r.cpu: Add PIPE_O attribute to "pop" instruction.
+
 2003-12-04  Alan Modra  <amodra@bigpond.net.au>
 
 	* cpu/openrisc.opc (openrisc_sign_extend_16bit): Don't rely on

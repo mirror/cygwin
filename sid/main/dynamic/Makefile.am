@@ -3,13 +3,17 @@
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
 
-INCLUDES = -I. -I../../include -I$(srcdir)/../../include
+INCLUDES = -I. -I../../include -I$(srcdir)/../../include -I$(srcdir)/../../../include
+LIBIBERTY = ../../../libiberty/libiberty.a
 
 bin_PROGRAMS = sid
+TARGETCFGS = ""
+TARGETDEFINES =
 
 # If sid is being compiled without shared library support, arrange to
 # statically link in a bunch of component libraries using libtool's
 # '-dlpreopen' flag.
+
 
 ALLFAMLIBS = $(FAM9LIB)
 ALLFAMLIBS2 = $(FAM9LIB2)
@@ -69,13 +73,14 @@ NEARBY_DEPS_LIBS = \
 	../../component/tcl/libtclapi.la \
 	../../component/timers/libtimers.la \
 	../../component/uart/libuart.la
-AM_CXXFLAGS = -DSID_STATIC
+AM_CXXFLAGS = -DSID_STATIC $(TARGETDEFINES)
 else
 NEARBY_LIBS = ../../component/cfgroot/libconfig.la
 NEARBY_DEPS_LIBS = $(NEARBY_LIBS)
-AM_CXXFLAGS = 
+AM_CXXFLAGS = $(TARGETDEFINES)
 endif
 
-sid_SOURCES = mainDynamic.cxx
+sid_SOURCES = mainDynamic.cxx baseCfg.cxx commonCfg.cxx $(TARGETCFGS)
 sid_LDFLAGS = -export-dynamic -static -export-symbols-regex '[a-zA-Z0-9]*_library$$' $(NEARBY_LIBS)
-sid_DEPENDENCIES = $(NEARBY_DEPS_LIBS) ../../version.h
+sid_DEPENDENCIES = $(NEARBY_DEPS_LIBS) ../../version.h $(LIBIBERTY)
+sid_LDADD = $(LIBIBERTY)

@@ -1,3 +1,68 @@
+2002-05-30  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mainDynamic.cxx (main): Add new "--rc" option to control passing
+	cfgroot stop-code as sid process exit rc.
+
+2002-04-29  Graydon Hoare  <graydon@redhat.com>
+
+	* mainDynamic.cxx: Make step_insn_count a string.
+
+2002-04-29  Graydon Hoare  <graydon@redhat.com>
+
+	* commonCfg.h (Mapping): New class.
+	* commonCfg.cxx (MapperCfg): Update to use Mapping objects.
+	* mainDynamic.cxx (try_add_memory): Use Mapping objects.
+	(Defs): Make step_insn_count a defaultable option.
+
+2002-04-23  Graydon Hoare  <graydon@redhat.com>
+
+	* mainDynamic.cxx (try_add_memory): Force mappings to base address
+	0 in extra memory region, to ignore transparent / basic mapper
+	distinction in board-specific code.
+
+2002-04-15  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.cxx (struct MemCfg_impl): New struct.
+	(MemCfg_impl::get_by_name): New function.
+	(MemCfg::MemCfg): Add 'this' to name_map.
+	* commonCfg.h (MemCfg_impl::get_by_name): New function.
+
+2002-04-09  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.cxx (add_mapping): New variant.
+	* commonCfg.h (add_mapping): New variant.
+
+2002-03-25  Graydon Hoare  <graydon@redhat.com>
+
+	* mainDynamic.cxx (try_load_file): Support "all-cpu" sub-option
+	to --load option.
+	* commonCfg.h (CpuCfg::get_all): Likewise.
+	* commonCfg.cxx (CpuCfg::get_all): Likewise.
+
+2002-03-11  Graydon Hoare  <graydon@redhat.com>
+
+	* mainDynamic.cxx (main): Add opt_gloss.
+	* commonCfg.cxx (BoardCfg::use_gloss): Define.
+	* commonCfg.h: Likewise.
+
+2002-02-22  Graydon Hoare  <graydon@redhat.com>
+
+	* Makefile.am (INCLUDE): Add -I$(srcdir)/../../../include.
+	* Makefile.in: Regenerate.
+	* mainDynamic.cxx: Un-guard #include <getopt.h>, getting it
+	from libiberty now.
+
+2002-02-08  Graydon Hoare  <graydon@redhat.com>
+
+	* baseCfg.cxx: New file.
+	* baseCfg.h: New file.
+	* commonCfg.cxx: New file.
+	* commonCfg.h: New file.
+	* mainDynamic.cxx: Complete rewrite, incorporate contents of
+	configrun-sid.in perl script.
+	* Makefile.am (sid): Add new files to target.
+	* Makefile.in: Regenerate.
+
 2001-10-05  Frank Ch. Eigler  <fche@redhat.com>
 
 	* mainDynamic.cxx (version): New function.  Use SID_VERSION from

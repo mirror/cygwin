@@ -275,9 +275,10 @@ cache::cache (unsigned cache_size, unsigned line_size, unsigned assoc,
   
   num_non_tag_bits = log2 (line_size);
 
-  // suitable defaults
-  hash_params.mask = 0x3fe0;
-  hash_params.shift = 5;
+  // Pick a default hash function: the next few bits above the intra-line address bits
+  unsigned cache_set_bits = log2 (sets.size());
+  hash_params.mask = ((1U << cache_set_bits) - 1) << num_non_tag_bits;
+  hash_params.shift = num_non_tag_bits;
 }
 
 cache::~cache ()

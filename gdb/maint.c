@@ -2,27 +2,25 @@
    Copyright 1992, 1993, 1994 Free Software Foundation, Inc.
    Written by Fred Fish at Cygnus Support.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 
 #include "defs.h"
-
-#if MAINTENANCE_CMDS	/* Entire rest of file goes away if not including maint cmds */
-
 #include <ctype.h>
 #include <signal.h>
 #include "command.h"
@@ -31,19 +29,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "gdbtypes.h"
 #include "demangle.h"
 #include "gdbcore.h"
-#include "expression.h" /* For language.h */
+#include "expression.h"		/* For language.h */
 #include "language.h"
 #include "symfile.h"
 #include "objfiles.h"
 #include "value.h"
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
+extern void _initialize_maint_cmds PARAMS ((void));
 
 static void maintenance_command PARAMS ((char *, int));
 
 static void maintenance_dump_me PARAMS ((char *, int));
+
+static void maintenance_internal_error PARAMS ((char *args, int from_tty));
 
 static void maintenance_demangle PARAMS ((char *, int));
 
@@ -69,17 +67,17 @@ int watchdog = 0;
 
 /*
 
-LOCAL FUNCTION
+   LOCAL FUNCTION
 
-	maintenance_command -- access the maintenance subcommands
+   maintenance_command -- access the maintenance subcommands
 
-SYNOPSIS
+   SYNOPSIS
 
-	void maintenance_command (char *args, int from_tty)
+   void maintenance_command (char *args, int from_tty)
 
-DESCRIPTION
+   DESCRIPTION
 
-*/
+ */
 
 static void
 maintenance_command (args, from_tty)
@@ -99,19 +97,36 @@ maintenance_dump_me (args, from_tty)
 {
   if (query ("Should GDB dump core? "))
     {
+#ifdef __DJGPP__
+      /* SIGQUIT by default is ignored, so use SIGABRT instead.  */
+      signal (SIGABRT, SIG_DFL);
+      kill (getpid (), SIGABRT);
+#else
       signal (SIGQUIT, SIG_DFL);
       kill (getpid (), SIGQUIT);
+#endif
     }
 }
 #endif
 
+/* Stimulate the internal error mechanism that GDB uses when an
+   internal problem is detected.  Allows testing of the mechanism.
+   Also useful when the user wants to drop a core file but not exit
+   GDB. */
+
+static void
+maintenance_internal_error (char *args, int from_tty)
+{
+  internal_error ("internal maintenance");
+}
+
 /*  Someday we should allow demangling for things other than just
-    explicit strings.  For example, we might want to be able to
-    specify the address of a string in either GDB's process space
-    or the debuggee's process space, and have gdb fetch and demangle
-    that string.  If we have a char* pointer "ptr" that points to
-    a string, we might want to be able to given just the name and
-    have GDB demangle and print what it points to, etc.  (FIXME) */
+   explicit strings.  For example, we might want to be able to
+   specify the address of a string in either GDB's process space
+   or the debuggee's process space, and have gdb fetch and demangle
+   that string.  If we have a char* pointer "ptr" that points to
+   a string, we might want to be able to given just the name and
+   have GDB demangle and print what it points to, etc.  (FIXME) */
 
 static void
 maintenance_demangle (args, from_tty)
@@ -192,15 +207,15 @@ print_section_table (abfd, asect, ignore)
   /* FIXME-32x64: Need print_address_numeric with field width.  */
   printf_filtered ("    %s",
 		   local_hex_string_custom
-		     ((unsigned long) bfd_section_vma (abfd, asect), "08l"));
+		   ((unsigned long) bfd_section_vma (abfd, asect), "08l"));
   printf_filtered ("->%s",
 		   local_hex_string_custom
-		     ((unsigned long) (bfd_section_vma (abfd, asect)
-				       + bfd_section_size (abfd, asect)),
-		      "08l"));
+		   ((unsigned long) (bfd_section_vma (abfd, asect)
+				     + bfd_section_size (abfd, asect)),
+		    "08l"));
   printf_filtered (" at %s",
 		   local_hex_string_custom
-		     ((unsigned long) asect->filepos, "08l"));
+		   ((unsigned long) asect->filepos, "08l"));
   printf_filtered (": %s", bfd_section_name (abfd, asect));
 
   if (flags & SEC_ALLOC)
@@ -240,19 +255,19 @@ maintenance_info_sections (arg, from_tty)
   if (exec_bfd)
     {
       printf_filtered ("Exec file:\n");
-      printf_filtered ("    `%s', ", bfd_get_filename(exec_bfd));
+      printf_filtered ("    `%s', ", bfd_get_filename (exec_bfd));
       wrap_here ("        ");
-      printf_filtered ("file type %s.\n", bfd_get_target(exec_bfd));
-      bfd_map_over_sections(exec_bfd, print_section_table, 0);
+      printf_filtered ("file type %s.\n", bfd_get_target (exec_bfd));
+      bfd_map_over_sections (exec_bfd, print_section_table, 0);
     }
 
   if (core_bfd)
     {
       printf_filtered ("Core file:\n");
-      printf_filtered ("    `%s', ", bfd_get_filename(core_bfd));
+      printf_filtered ("    `%s', ", bfd_get_filename (core_bfd));
       wrap_here ("        ");
-      printf_filtered ("file type %s.\n", bfd_get_target(core_bfd));
-      bfd_map_over_sections(core_bfd, print_section_table, 0);
+      printf_filtered ("file type %s.\n", bfd_get_target (core_bfd));
+      bfd_map_over_sections (core_bfd, print_section_table, 0);
     }
 }
 
@@ -282,9 +297,9 @@ maintenance_print_command (arg, from_tty)
 
 /* The "maintenance translate-address" command converts a section and address
    to a symbol.  This can be called in two ways:
-		maintenance translate-address <secname> <addr>
-	or	maintenance translate-address <addr>
-*/
+   maintenance translate-address <secname> <addr>
+   or   maintenance translate-address <addr>
+ */
 
 static void
 maintenance_translate_address (arg, from_tty)
@@ -305,19 +320,20 @@ maintenance_translate_address (arg, from_tty)
 
   if (!isdigit (*p))
     {				/* See if we have a valid section name */
-      while (*p && !isspace (*p)) /* Find end of section name */
+      while (*p && !isspace (*p))	/* Find end of section name */
 	p++;
       if (*p == '\000')		/* End of command? */
 	error ("Need to specify <section-name> and <address>");
       *p++ = '\000';
-      while (isspace (*p)) p++;	/* Skip whitespace */
+      while (isspace (*p))
+	p++;			/* Skip whitespace */
 
       ALL_OBJFILES (objfile)
-	{
-	  sect = bfd_get_section_by_name (objfile->obfd, arg);
-	  if (sect != NULL)
-	    break;
-	}
+      {
+	sect = bfd_get_section_by_name (objfile->obfd, arg);
+	if (sect != NULL)
+	  break;
+      }
 
       if (!sect)
 	error ("Unknown section %s.", arg);
@@ -331,23 +347,133 @@ maintenance_translate_address (arg, from_tty)
     sym = lookup_minimal_symbol_by_pc (address);
 
   if (sym)
-    printf_filtered ("%s+%u\n", 
-		     SYMBOL_SOURCE_NAME (sym), 
-		     address - SYMBOL_VALUE_ADDRESS (sym));
+    printf_filtered ("%s+%s\n",
+		     SYMBOL_SOURCE_NAME (sym),
+		     paddr_u (address - SYMBOL_VALUE_ADDRESS (sym)));
   else if (sect)
-    printf_filtered ("no symbol at %s:0x%08x\n", sect->name, address);
+    printf_filtered ("no symbol at %s:0x%s\n", sect->name, paddr (address));
   else
-    printf_filtered ("no symbol at 0x%08x\n", address);
+    printf_filtered ("no symbol at 0x%s\n", paddr (address));
 
   return;
 }
 
-#endif	/* MAINTENANCE_CMDS */
+
+/* When a comamnd is deprecated the user will be warned the first time
+   the command is used.  If possible, a replacement will be offered. */
+
+static void
+maintenance_deprecate (char *args, int from_tty)
+{
+  if (args == NULL || *args == '\0')
+    {
+      printf_unfiltered ("\"maintenance deprecate\" takes an argument, \n\
+the command you want to deprecate, and optionally the replacement command \n\
+enclosed in quotes.\n");
+    }
+  
+  maintenance_do_deprecate (args, 1);
+
+}
+
+
+static void
+maintenance_undeprecate (char *args, int from_tty)
+{
+  if (args == NULL || *args == '\0')
+    {
+      printf_unfiltered ("\"maintenance undeprecate\" takes an argument, \n\
+the command you want to undeprecate.\n");
+    }
+  
+  maintenance_do_deprecate (args, 0);
+  
+}
+
+/*  
+    You really shouldn't be using this. It is just for the testsuite.
+    Rather, you should use deprecate_cmd() when the command is created
+    in _initialize_blah().
+  
+    This function deprecates a command and optionally assigns it a 
+    replacement.
+*/
+
+static void maintenance_do_deprecate(char *text, int deprecate){
+
+  struct cmd_list_element *alias=NULL; 
+  struct cmd_list_element *prefix_cmd=NULL; 
+  struct cmd_list_element *cmd=NULL;
+  
+  char *start_ptr=NULL; 
+  char *end_ptr=NULL;
+  int len;
+  char *replacement=NULL;
+
+
+  if (!lookup_cmd_composition (text, &alias, &prefix_cmd, &cmd)){
+    printf_filtered ("Can't find command '%s' to deprecate.\n", text);
+    return;
+  }
+  
+  if (deprecate)
+    {
+      /* look for a replacement command */
+      if (start_ptr = strchr (text, '\"'))
+      {
+        start_ptr++;
+        if(end_ptr = strrchr (start_ptr, '\"'))
+          {
+            len = end_ptr-start_ptr;
+            start_ptr[len]='\0';
+            replacement = xstrdup (start_ptr);
+          }
+      }
+    }
+  
+  if (!start_ptr || !end_ptr)
+    replacement = NULL;
+  
+    
+  /* If they used an alias, we only want to deprecate the alias.
+     
+     Note the MALLOCED_REPLACEMENT test.  If the command's replacement
+     string was allocated at compile time we don't want to free the
+     memory.  
+  */
+  if (alias)
+    {
+      
+      if (alias->flags & MALLOCED_REPLACEMENT)
+      free (alias->replacement);
+      
+      if (deprecate)
+      alias->flags |= (DEPRECATED_WARN_USER | CMD_DEPRECATED);
+      else
+      alias->flags &= ~(DEPRECATED_WARN_USER | CMD_DEPRECATED);
+      alias->replacement=replacement;
+      alias->flags |= MALLOCED_REPLACEMENT;
+      return;
+    }
+  else if (cmd)
+    {
+      if (cmd->flags & MALLOCED_REPLACEMENT)
+      free (cmd->replacement);
+
+      if (deprecate)
+      cmd->flags |= (DEPRECATED_WARN_USER | CMD_DEPRECATED);
+      else
+      cmd->flags &= ~(DEPRECATED_WARN_USER | CMD_DEPRECATED);
+      cmd->replacement=replacement;
+      cmd->flags |= MALLOCED_REPLACEMENT;
+      return;
+    }
+}
+
 
 void
 _initialize_maint_cmds ()
 {
-#if MAINTENANCE_CMDS	/* Entire file goes away if not including maint cmds */
   add_prefix_cmd ("maintenance", class_maintenance, maintenance_command,
 		  "Commands for use by GDB maintainers.\n\
 Includes commands to dump specific internal GDB structures in\n\
@@ -359,7 +485,7 @@ to test internal functions such as the C++ demangler, etc.",
   add_com_alias ("mt", "maintenance", class_maintenance, 1);
 
   add_prefix_cmd ("info", class_maintenance, maintenance_info_command,
-		  "Commands for showing internal info about the program being debugged.",
+     "Commands for showing internal info about the program being debugged.",
 		  &maintenanceinfolist, "maintenance info ", 0,
 		  &maintenancelist);
 
@@ -379,6 +505,11 @@ GDB sets it's handling of SIGQUIT back to SIG_DFL and then sends\n\
 itself a SIGQUIT signal.",
 	   &maintenancelist);
 #endif
+
+  add_cmd ("internal-error", class_maintenance, maintenance_internal_error,
+	   "Give GDB an internal error.\n\
+Cause GDB to behave as if an internal error was detected.",
+	   &maintenancelist);
 
   add_cmd ("demangle", class_maintenance, maintenance_demangle,
 	   "Demangle a C++ mangled name.\n\
@@ -438,12 +569,24 @@ If a SOURCE file is specified, dump only that file's partial symbols.",
 	   "Translate a section name and address to a symbol.",
 	   &maintenancelist);
 
+  add_cmd ("deprecate", class_maintenance, maintenance_deprecate,
+         "Deprecate a command.  Note that this is just in here so the \n\
+testsuite can check the comamnd deprecator. You probably shouldn't use this,\n\
+rather you should use the C function deprecate_cmd().  If you decide you \n\
+want to use it: maintenance deprecate 'commandname' \"replacement\". The \n\ 
+replacement is optional.", &maintenancelist);
+
+  add_cmd ("undeprecate", class_maintenance, maintenance_undeprecate,
+         "Undeprecate a command.  Note that this is just in here so the \n\
+testsuite can check the comamnd deprecator. You probably shouldn't use this,\n\
+If you decide you want to use it: maintenance undeprecate 'commandname'", 
+         &maintenancelist);
+
   add_show_from_set (
-    add_set_cmd ("watchdog", class_maintenance, var_zinteger, (char *)&watchdog,
-		 "Set watchdog timer.\n\
+		      add_set_cmd ("watchdog", class_maintenance, var_zinteger, (char *) &watchdog,
+				   "Set watchdog timer.\n\
 When non-zero, this timeout is used instead of waiting forever for a target to\n\
 finish a low-level step or continue operation.  If the specified amount of time\n\
 passes without a response from the target, an error occurs.", &setlist),
-		     &showlist);
-#endif	/* MAINTENANCE_CMDS */
+		      &showlist);
 }

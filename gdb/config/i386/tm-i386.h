@@ -1,30 +1,30 @@
 /* Macro definitions for GDB on an Intel i[345]86.
    Copyright (C) 1995, 1996 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #ifndef TM_I386_H
 #define TM_I386_H 1
 
-#ifdef __STDC__		/* Forward decl's for prototypes */
+/* Forward decl's for prototypes */
 struct frame_info;
 struct frame_saved_regs;
 struct type;
-#endif
 
 #define TARGET_BYTE_ORDER LITTLE_ENDIAN
 
@@ -47,7 +47,7 @@ struct type;
 /* Advance PC across any function entry prologue instructions to reach some
    "real" code.  */
 
-#define SKIP_PROLOGUE(frompc)   {(frompc) = i386_skip_prologue((frompc));}
+#define SKIP_PROLOGUE(frompc)   (i386_skip_prologue (frompc))
 
 extern int i386_skip_prologue PARAMS ((int));
 
@@ -76,10 +76,40 @@ extern int i386_skip_prologue PARAMS ((int));
 
 #define REGISTER_SIZE 4
 
-/* Number of machine registers */
+/* This register file is parameterized by two macros:
+   HAVE_I387_REGS --- register file should include i387 registers
+   HAVE_SSE_REGS  --- register file should include SSE registers
+   If HAVE_SSE_REGS is #defined, then HAVE_I387_REGS must also be #defined.
+   
+   However, GDB code should not test those macros with #ifdef, since
+   that makes code which is annoying to multi-arch.  Instead, GDB code
+   should check the values of NUM_GREGS, NUM_FREGS, and NUM_SSE_REGS,
+   which will eventually get mapped onto architecture vector entries.
 
-#define NUM_FREGS 0 /*8*/		/* Number of FP regs */
-#define NUM_REGS (16 + NUM_FREGS)	/* Basic i*86 regs + FP regs */
+   It's okay to use the macros in tm-*.h files, though, since those
+   files will get completely replaced when we multi-arch anyway.  */
+
+/* Number of general registers, present on every 32-bit x86 variant.  */
+#define NUM_GREGS (16)
+
+/* Number of floating-point unit registers.  */
+#ifdef HAVE_I387_REGS
+#define NUM_FREGS (16)
+#else
+#define NUM_FREGS (0)
+#endif
+
+/* Number of SSE registers.  */
+#ifdef HAVE_SSE_REGS
+#define NUM_SSE_REGS (9)
+#else
+#define NUM_SSE_REGS (0)
+#endif
+
+#define NUM_REGS (NUM_GREGS + NUM_FREGS + NUM_SSE_REGS)
+
+/* Largest number of registers we could have in any configuration.  */
+#define MAX_NUM_REGS (16 + 16 + 9)
 
 /* Initializer for an array of names of registers.  There should be at least
    NUM_REGS strings in this initializer.  Any excess ones are simply ignored.
@@ -87,13 +117,18 @@ extern int i386_skip_prologue PARAMS ((int));
    scheme (which is the same as the 386 scheme) and also regmap in the various
    *-nat.c files. */
 
-#define REGISTER_NAMES { "eax",   "ecx",    "edx",   "ebx", \
-			 "esp",   "ebp",    "esi",   "edi", \
-			 "eip",   "eflags", "cs",    "ss", \
-			 "ds",    "es",     "fs",    "gs", \
-			 "st0",   "st1",    "st2",   "st3", \
-			 "st4",   "st5",    "st6",   "st7", \
-			 }
+#define REGISTER_NAMES { "eax",   "ecx",    "edx",   "ebx",	\
+			 "esp",   "ebp",    "esi",   "edi",	\
+			 "eip",   "eflags", "cs",    "ss",	\
+			 "ds",    "es",     "fs",    "gs",	\
+			 "st0",   "st1",    "st2",   "st3",	\
+			 "st4",   "st5",    "st6",   "st7",	\
+			 "fctrl", "fstat",  "ftag",  "fiseg",	\
+                         "fioff", "foseg",  "fooff", "fop",	\
+			 "xmm0",  "xmm1",   "xmm2",  "xmm3",	\
+			 "xmm4",  "xmm5",   "xmm6",  "xmm7",	\
+                         "mxcsr"				\
+		       }
 
 /* Register numbers of various important registers.
    Note that some of these values are "real" register numbers,
@@ -102,54 +137,135 @@ extern int i386_skip_prologue PARAMS ((int));
    to be actual register numbers as far as the user is concerned
    but do serve to get the desired values when passed to read_register.  */
 
-#define FP_REGNUM 5	/* (ebp) Contains address of executing stack frame */
-#define SP_REGNUM 4	/* (usp) Contains address of top of stack */
-#define PC_REGNUM 8	/* (eip) Contains program counter */
-#define PS_REGNUM 9	/* (ps)  Contains processor status */
+#define FP_REGNUM 5		/* (ebp) Contains address of executing stack
+				   frame */
+#define SP_REGNUM 4		/* (usp) Contains address of top of stack */
+#define PC_REGNUM 8		/* (eip) Contains program counter */
+#define PS_REGNUM 9		/* (ps)  Contains processor status */
 
-#define FP0_REGNUM 16   /* (st0) 387 register */
-#define FPC_REGNUM 25	/* 80387 control register */
+/* These registers are present only if HAVE_I387_REGS is #defined.
+   We promise that FP0 .. FP7 will always be consecutive register numbers.  */
+#define FP0_REGNUM   16		/* first FPU floating-point register */
+#define FP7_REGNUM   23		/* last  FPU floating-point register */
+
+/* All of these control registers (except for FCOFF and FDOFF) are
+   sixteen bits long (at most) in the FPU, but are zero-extended to
+   thirty-two bits in GDB's register file.  This makes it easier to
+   compute the size of the control register file, and somewhat easier
+   to convert to and from the FSAVE instruction's 32-bit format.  */
+#define FIRST_FPU_CTRL_REGNUM 24
+#define FCTRL_REGNUM 24	        /* FPU control word */
+#define FPC_REGNUM   24		/* old name for FCTRL_REGNUM */
+#define FSTAT_REGNUM 25		/* FPU status word */
+#define FTAG_REGNUM  26		/* FPU register tag word */
+#define FCS_REGNUM   27		/* FPU instruction's code segment selector
+				   16 bits, called "FPU Instruction Pointer
+				   Selector" in the x86 manuals  */
+#define FCOFF_REGNUM 28		/* FPU instruction's offset within segment
+				   ("Fpu Code OFFset") */
+#define FDS_REGNUM   29		/* FPU operand's data segment */
+#define FDOFF_REGNUM 30		/* FPU operand's offset within segment */
+#define FOP_REGNUM   31		/* FPU opcode, bottom eleven bits */
+#define LAST_FPU_CTRL_REGNUM 31
+
+/* These registers are present only if HAVE_SSE_REGS is #defined.
+   We promise that XMM0 .. XMM7 will always have consecutive reg numbers. */
+#define XMM0_REGNUM  32		/* first SSE data register */
+#define XMM7_REGNUM  39		/* last  SSE data register */
+#define MXCSR_REGNUM 40		/* Streaming SIMD Extension control/status */
+
+#define IS_FP_REGNUM(n) (FP0_REGNUM <= (n) && (n) <= FP7_REGNUM)
+#define IS_SSE_REGNUM(n) (XMM0_REGNUM <= (n) && (n) <= XMM7_REGNUM)
+
+#define FPU_REG_RAW_SIZE (10)
+
+/* Sizes of individual register sets.  These cover the entire register
+   file, so summing up the sizes of those portions actually present
+   yields REGISTER_BYTES.  */
+#define SIZEOF_GREGS (NUM_GREGS * 4)
+#define SIZEOF_FPU_REGS (8 * FPU_REG_RAW_SIZE)
+#define SIZEOF_FPU_CTRL_REGS \
+  ((LAST_FPU_CTRL_REGNUM - FIRST_FPU_CTRL_REGNUM + 1) * 4)
+#define SIZEOF_SSE_REGS (8 * 16 + 4)
+
 
 /* Total amount of space needed to store our copies of the machine's register
    state, the array `registers'. */
-
-#define REGISTER_BYTES ((NUM_REGS - NUM_FREGS)*4 + NUM_FREGS*10)
+#ifdef HAVE_SSE_REGS
+#define REGISTER_BYTES \
+  (SIZEOF_GREGS + SIZEOF_FPU_REGS + SIZEOF_FPU_CTRL_REGS + SIZEOF_SSE_REGS)
+#else
+#ifdef HAVE_I387_REGS
+#define REGISTER_BYTES (SIZEOF_GREGS + SIZEOF_FPU_REGS + SIZEOF_FPU_CTRL_REGS)
+#else
+#define REGISTER_BYTES (SIZEOF_GREGS)
+#endif
+#endif
 
 /* Index within `registers' of the first byte of the space for register N. */
+#define REGISTER_BYTE(n) (i386_register_byte[(n)])
+extern int i386_register_byte[];
 
-#define REGISTER_BYTE(N) \
-  (((N) < FP0_REGNUM) ? ((N) * 4) : ((((N) - FP0_REGNUM) * 10) + 64))
- 
 /* Number of bytes of storage in the actual machine representation for
-   register N.  All registers are 4 bytes, except 387 st(0) - st(7),
-   which are 80 bits each. */
-
-#define REGISTER_RAW_SIZE(N) (((N) < FP0_REGNUM) ? 4 : 10)
+   register N.  */
+#define REGISTER_RAW_SIZE(n) (i386_register_raw_size[(n)])
+extern int i386_register_raw_size[];
 
 /* Largest value REGISTER_RAW_SIZE can have.  */
-
-#define MAX_REGISTER_RAW_SIZE 10
+#define MAX_REGISTER_RAW_SIZE 16
 
 /* Number of bytes of storage in the program's representation
    for register N. */
-
-#define REGISTER_VIRTUAL_SIZE(N) (((N) < FP0_REGNUM) ? 4 : 8)
+#define REGISTER_VIRTUAL_SIZE(n) (i386_register_virtual_size[(n)])
+extern int i386_register_virtual_size[];
 
 /* Largest value REGISTER_VIRTUAL_SIZE can have.  */
-
-#define MAX_REGISTER_VIRTUAL_SIZE 8
+#define MAX_REGISTER_VIRTUAL_SIZE 16
 
 /* Return the GDB type object for the "standard" data type of data in 
    register N.  Perhaps si and di should go here, but potentially they
    could be used for things other than address.  */
 
-#define REGISTER_VIRTUAL_TYPE(N) \
-  (((N) == PC_REGNUM || (N) == FP_REGNUM || (N) == SP_REGNUM) \
-   ? lookup_pointer_type (builtin_type_void) \
-   : (((N) < FP0_REGNUM) \
-      ? builtin_type_int \
-      : builtin_type_double))
+#define REGISTER_VIRTUAL_TYPE(N)				\
+  (((N) == PC_REGNUM || (N) == FP_REGNUM || (N) == SP_REGNUM)	\
+   ? lookup_pointer_type (builtin_type_void)			\
+   : IS_FP_REGNUM(N) ? builtin_type_double			\
+   : IS_SSE_REGNUM(N) ? builtin_type_v4sf			\
+   : builtin_type_int)
 
+/* REGISTER_CONVERTIBLE(N) is true iff register N's virtual format is
+   different from its raw format.  Note that this definition assumes
+   that the host supports IEEE 32-bit floats, since it doesn't say
+   that SSE registers need conversion.  Even if we can't find a
+   counterexample, this is still sloppy.  */
+#define REGISTER_CONVERTIBLE(n) (IS_FP_REGNUM (n))
+
+/* Convert data from raw format for register REGNUM in buffer FROM
+   to virtual format with type TYPE in buffer TO.  */
+extern void i387_to_double (char *, char *);
+
+#define REGISTER_CONVERT_TO_VIRTUAL(REGNUM,TYPE,FROM,TO)	\
+{								\
+  double val;							\
+  i387_to_double ((FROM), (char *)&val);			\
+  store_floating ((TO), TYPE_LENGTH (TYPE), val);		\
+}
+
+extern void double_to_i387 (char *, char *);
+
+#define REGISTER_CONVERT_TO_RAW(TYPE,REGNUM,FROM,TO)		\
+{								\
+  double val = extract_floating ((FROM), TYPE_LENGTH (TYPE));	\
+  double_to_i387((char *)&val, (TO));				\
+}
+
+/* Print out the i387 floating point state.  */
+#ifdef HAVE_I387_REGS
+extern void i387_float_info (void);
+#define FLOAT_INFO { i387_float_info (); }
+#endif
+
+
 /* Store the address of the place in which to copy the structure the
    subroutine will return.  This is called from call_function. */
 
@@ -166,7 +282,7 @@ extern int i386_skip_prologue PARAMS ((int));
 #define EXTRACT_RETURN_VALUE(TYPE,REGBUF,VALBUF) \
    i386_extract_return_value ((TYPE),(REGBUF),(VALBUF))
 
-extern void i386_extract_return_value PARAMS ((struct type *, char [], char *));
+extern void i386_extract_return_value PARAMS ((struct type *, char[], char *));
 
 /* Write into appropriate registers a function return value of type TYPE, given
    in virtual format.  */
@@ -207,13 +323,8 @@ extern void i386_extract_return_value PARAMS ((struct type *, char [], char *));
    by FI does not have a frame on the stack associated with it.  If it
    does not, FRAMELESS is set to 1, else 0.  */
 
-#define FRAMELESS_FUNCTION_INVOCATION(FI, FRAMELESS) \
-  do { \
-    if ((FI)->signal_handler_caller) \
-      (FRAMELESS) = 0; \
-    else \
-      (FRAMELESS) = frameless_look_for_prologue(FI); \
-  } while (0)
+#define FRAMELESS_FUNCTION_INVOCATION(FI) \
+     (((FI)->signal_handler_caller) ? 0 : frameless_look_for_prologue(FI))
 
 /* Saved Pc.  Get it from sigcontext if within sigtramp.  */
 
@@ -232,7 +343,7 @@ extern CORE_ADDR sigtramp_saved_pc PARAMS ((struct frame_info *));
 /* Return number of args passed to a frame.  Can return -1, meaning no way
    to tell, which is typical now that the C compiler delays popping them.  */
 
-#define FRAME_NUM_ARGS(numargs, fi) (numargs) = i386_frame_num_args(fi)
+#define FRAME_NUM_ARGS(fi) (i386_frame_num_args(fi))
 
 extern int i386_frame_num_args PARAMS ((struct frame_info *));
 
@@ -246,14 +357,17 @@ extern int i386_frame_num_args PARAMS ((struct frame_info *));
    ways in the stack frame.  sp is even more special:
    the address we return for it IS the sp for the next frame.  */
 
-#define FRAME_FIND_SAVED_REGS(frame_info, frame_saved_regs) \
-{ i386_frame_find_saved_regs ((frame_info), &(frame_saved_regs)); }
-
-extern void i386_frame_find_saved_regs PARAMS ((struct frame_info *,
-						struct frame_saved_regs *));
+extern void i386_frame_init_saved_regs PARAMS ((struct frame_info *));
+#define FRAME_INIT_SAVED_REGS(FI) i386_frame_init_saved_regs (FI)
 
 
+
 /* Things needed for making the inferior call functions.  */
+
+/* "An argument's size is increased, if necessary, to make it a
+   multiple of [32 bit] words.  This may require tail padding,
+   depending on the size of the argument" - from the x86 ABI.  */
+#define PARM_BOUNDARY 32
 
 /* Push an empty stack frame, to record the current PC, etc.  */
 
@@ -266,8 +380,8 @@ extern void i386_push_dummy_frame PARAMS ((void));
 #define POP_FRAME  { i386_pop_frame (); }
 
 extern void i386_pop_frame PARAMS ((void));
-
 
+
 /* this is 
  *   call 11223344 (32 bit relative)
  *   int3
@@ -277,7 +391,7 @@ extern void i386_pop_frame PARAMS ((void));
 
 #define CALL_DUMMY_LENGTH 8
 
-#define CALL_DUMMY_START_OFFSET 0  /* Start execution at beginning of dummy */
+#define CALL_DUMMY_START_OFFSET 0	/* Start execution at beginning of dummy */
 
 #define CALL_DUMMY_BREAKPOINT_OFFSET 5
 

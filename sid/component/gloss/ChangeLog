@@ -1,3 +1,10 @@
+2001-01-08  matthew green  <mrg@redhat.com>
+
+	* gloss.cxx (do_sys_times): Set error value as well as return value
+	if times() does not exist on the host.
+	(do_sys_gettimeofday): Set error value as well as return value
+	if gettimeofday() does not exist on the host.
+
 2001-01-06  matthew green  <mrg@redhat.com>
 
 	* gloss.cxx (gloss32::target_to_host_open_flags): Properly check for

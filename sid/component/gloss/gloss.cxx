@@ -632,6 +632,7 @@ gloss32::do_sys_gettimeofday()
   set_int_result(rv);
 #else
   set_int_result(-1);
+  set_error_result(newlib::eNoSys);
 #endif
 }
 
@@ -663,6 +664,7 @@ gloss32::do_sys_times()
   set_int_result(rv);
 #else
   set_int_result(-1);
+  set_error_result(newlib::eNoSys);
 #endif
 }
 

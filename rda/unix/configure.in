@@ -40,7 +40,8 @@ case "$target" in
   i?86*linux* | \
   powerpc*linux* | \
   arm*linux* | \
-  mips*linux*)
+  mips*linux* | \
+  frv*linux*)
     TARGET_MODULES="linux-target.o thread-db.o ptrace-target.o" 
     AC_DEFINE(LINUX_TARGET)
     AC_DEFINE(GREGSET_T,  prgregset_t)

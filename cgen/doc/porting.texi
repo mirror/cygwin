@@ -56,7 +56,7 @@ code and tables for each CPU that is ported.
 
 For opcodes, several files are generated.  No additional code need be
 written in the opcodes directory although as an escape hatch the user
-can add target specific code to file <arch>.opc in the CGEN source
+can add target specific code to file <arch>.opc in the CGEN cpu source
 directory.  These functions will be included in the relevant generated
 files.  An example of when you need to create an <arch>.opc file is when
 there are special pseudo-ops that need to be parsed, for example the
@@ -65,7 +65,7 @@ high/shigh pseudo-ops of the M32R.
 
 For GAS, no files are generated (except test cases!) so the port is done
 more or less like the other GAS ports except that the assembler uses the
-CGEN-built opcode table plus @file{devo/gas/cgen.[ch]}.
+CGEN-built opcode table plus @file{toplevel/gas/cgen.[ch]}.
 
 For the simulator, several files are built, and other support files need
 to be written.  @xref{Doing a simulator port}.
@@ -88,8 +88,8 @@ of Guile.  I ran into this on Solaris 2.6.
 
 When doing porting or maintenance activity with CGEN, the build tree
 must be configured with the @code{--enable-cgen-maint} option.  This
-adds the necessary dependencies to the @file{devo/opcodes} and
-@file{devo/sim} directories.
+adds the necessary dependencies to the @file{toplevel/opcodes} and
+@file{toplevel/sim} directories.
 
 CGEN uses Guile so it must be installed.  At present the CGEN configury
 requires that if Guile isn't installed in @file{/usr/local} then the 
@@ -316,7 +316,7 @@ indicated so with the `MACH' attribute.  Example:
 
 @example
 (define-normal-insn
-  add "add instruction
+  add "add instruction"
   ((MACH mach1)) ; or (MACH mach1,mach2,...) for multiple variants
   ...
 )
@@ -496,12 +496,12 @@ that is similar to the new port) and use it as a template.
 @item @code{(load "dev.scm")}. This loads in a set of interactive
 development routines.
 @item @code{(load-opc)}. Load the opcodes support.
-@item Edit your @file{<arch>.cpu} and @file{<arch>.opc} files.
+@item Edit your @file{cpu/<arch>.cpu} and @file{cpu/<arch>.opc} files.
         @itemize @bullet
         @item The @file{.cpu} file is the main description file.
 	@item The @file{.opc} file provides additional C support code.
         @end itemize
-@item @code{(cload #:arch "<arch>")}
+@item @code{(cload #:arch "cpu/<arch>")}
 @item Run each of:
         @itemize @bullet
         @item @code{(cgen-desc.h)}
@@ -652,13 +652,13 @@ script normally requires one command line argument: the location of your
 @file{gas} build directory.  If this argument is omitted, the script
 searches in @file{../gas} automatically.
 
-@item Copy @file{gas-allinsn.exp} to @file{devo/gas/testsuite/gas/<arch>/allinsn.exp}.
+@item Copy @file{gas-allinsn.exp} to @file{toplevel/gas/testsuite/gas/<arch>/allinsn.exp}.
 @item @code{sh gas-build.sh}
 
 At this point directory tmpdir contains two files: @file{allinsn.s} and
 @file{allinsn.d}.  File @file{allinsn.d} usually needs a bit of massaging.
 
-@item Copy @file{tmpdir/allinsn.[sd]} to @file{devo/gas/testsuite/gas/<arch>}
+@item Copy @file{tmpdir/allinsn.[sd]} to @file{toplevel/gas/testsuite/gas/<arch>}
 @item Run @code{make check} in the @file{gas} build directory and
 massage things until you're satisfied the files are correct.
 @item Check files into CVS.
@@ -675,8 +675,8 @@ The same basic procedure for opcodes porting applies here.
 @item Run @code{guile}.
 @item @code{(load "dev.scm")}
 @item @code{(load-sim)}
-@item Edit your @file{<arch>.cpu} file.
-@item @code{(cload #:arch "<arch>")}
+@item Edit your @file{cpu/<arch>.cpu} file.
+@item @code{(cload #:arch "cpu/<arch>")}
 @item Run each of:
         @itemize @bullet
 	@item @code{(cgen-arch.h)}
@@ -684,8 +684,8 @@ The same basic procedure for opcodes porting applies here.
 	@item @code{(cgen-cpuall.h)}
         @end itemize
 @item Repeat steps 4,5,6 until the output looks reasonable.
-@item Edit your <arch>.cpu file.
-@item @code{(cload #:arch "<arch>" #:machs "mach1[,mach2[,...]]")}
+@item Edit your cpu/<arch>.cpu file.
+@item @code{(cload #:arch "cpu/<arch>" #:machs "mach1[,mach2[,...]]")}
 @item Run each of:
         @itemize @bullet
 	@item @code{(cgen-cpu.h)}
@@ -839,25 +839,25 @@ initial typing that is required.
 
 @enumerate 1
 @item @code{cd} to the CGEN build directory
-@item @code{make sim-test}
+@item @code{make sim-test ISA=<arch>}
 
 At this point two files have been created in the CGEN build directory:
 @file{sim-allinsn.exp} and @file{sim-build.sh}.
 
 @item Copy @file{sim-allinsn.exp} to
-@file{devo/sim/testsuite/sim/<arch>/allinsn.exp}.
+@file{toplevel/sim/testsuite/sim/<arch>/allinsn.exp}.
 @item @code{sh sim-build.sh}
 
 At this point a new subdirectory called @file{tmpdir} will be created
 and will contain one test case for each instruction.  The framework has
 been filled in but not the actual test case.  It's handy to write an
 ``include file'' containing assembler macros that simplify writing test
-cases.  See @file{devo/sim/testsuite/sim/m32r/testutils.inc} for an
+cases.  See @file{toplevel/sim/testsuite/sim/m32r/testutils.inc} for an
 example.
 
 @item write testutils.inc
 @item finish each test case
-@item copy @file{tmpdir/*.cgs} to @file{devo/sim/testsuite/sim/<arch>}
+@item copy @file{tmpdir/*.cgs} to @file{toplevel/sim/testsuite/sim/<arch>}
 @item run @code{make check} in the sim build directory and massage things until you're satisfied the files are correct
 @item Check files into CVS.
 @end enumerate

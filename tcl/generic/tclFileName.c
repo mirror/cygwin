@@ -963,6 +963,8 @@ Tcl_TranslateFileName(interp, name, bufferPtr)
      * some system interfaces don't accept forward slashes.
      */
 
+#ifndef __CYGWIN__
+    cygwin_conv_to_win32_path (Tcl_DStringValue(bufferPtr)
     if (tclPlatform == TCL_PLATFORM_WINDOWS) {
 	for (p = Tcl_DStringValue(bufferPtr); *p != '\0'; p++) {
 	    if (*p == '/') {
@@ -970,6 +972,7 @@ Tcl_TranslateFileName(interp, name, bufferPtr)
 	    }
 	}
     }
+#endif
     return Tcl_DStringValue(bufferPtr);
 }
 
@@ -1568,6 +1571,7 @@ TclDoGlob(interp, separators, headPtr, tail)
 	    break;
 	case TCL_PLATFORM_WINDOWS: {
 	    int exists;
+#ifndef __CYGWIN__
 	    /*
 	     * We need to convert slashes to backslashes before checking
 	     * for the existence of the file.  Once we are done, we need
@@ -1588,6 +1592,7 @@ TclDoGlob(interp, separators, headPtr, tail)
 		    }
 		}
 	    }
+#endif
 	    name = Tcl_DStringValue(headPtr);
 	    exists = (TclAccess(name, F_OK) == 0);
 	    for (p = name; *p != '\0'; p++) {

@@ -87,18 +87,34 @@ proc getdirs { args } {
 
 #
 # Finds all the files recursively
-#     rootdir - this is the directory to start the search
-#   	  from. This is and all subdirectories are search for
-#   	  filenames. Directory names are not included in the
-#   	  list, but the filenames have path information. 
-#     pattern - this is the pattern to match. Patterns are csh style
-#   	  globbing rules.
-#     returns: a list or a NULL.
+# Args:
+#     [-maxdepth <n>]
+#         limit recursive find depth to <n> level;
+#         default is to recursively find in all subdirectories
+#     rootdir
+#         the directory to start the search from. This is and all
+#         subdirectories are searched for filenames. Directory names
+#         are not included in the list, but the filenames have path
+#         information. 
+#     pattern
+#         the pattern to match. Patterns are csh style globbing rules.
+# Returns:
+#     a list or a NULL.
 #
-proc find { rootdir pattern } {
+proc find { args } {
+    if { [lindex $args 0] == "-maxdepth" } {
+        set maxdepth [lindex $args 1]
+	set args [lrange $args 2 end]
+    } else {
+	set maxdepth 0
+    }
+    set rootdir [lindex $args 0]
+    set pattern [lindex $args 1]
+
     # first find all the directories
     set dirs "$rootdir "
-    while 1 {
+    set depth 1
+    while { $maxdepth == 0 || $depth < $maxdepth } {
 	set tmp $rootdir
 	set rootdir ""
 	if [string match "" $tmp] {
@@ -115,6 +131,7 @@ proc find { rootdir pattern } {
 	    }
 	}
 	set tmp ""
+        set depth [expr $depth + 1]
     }
     
     # find all the files that match the pattern

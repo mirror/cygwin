@@ -118,5 +118,8 @@ AC_CHECK_HEADERS(tk.h)
 AC_CHECK_HEADERS(dirent.h)
 AC_CHECK_FUNCS(opendir)
 
+dnl building docs
+RH_DOCBUILD_CHECK
+
 dnl Outputs
 AC_OUTPUT(Makefile)

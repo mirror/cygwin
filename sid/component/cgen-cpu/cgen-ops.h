@@ -389,6 +389,14 @@ ADDCFSI (SI a, SI b, BI c)
 }
 
 inline BI
+ADDCFDI (DI a, DI b, BI c)
+{
+  DI tmp = ADDDI (a, ADDDI (b, c));
+  BI res = ((UDI) tmp < (UDI) a) || (c && tmp == a);
+  return res;
+}
+
+inline BI
 ADDOFHI (HI a, HI b, BI c)
 {
   HI tmp = ADDHI (a, ADDHI (b, c));

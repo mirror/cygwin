@@ -1,6 +1,6 @@
 // compMapper.cxx - a bus mapper component.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999-2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -124,7 +124,8 @@ class generic_mapper_bus: public bus
 public:
   generic_mapper_bus (generic_mapper* target): target (target)
     {
-      this->tlb = 0;
+      this->tlb1 = 0;
+      this->tlb2 = 0;
     }
 
 
@@ -241,7 +242,8 @@ public:
 
 private:
   generic_mapper* target;
-  mutable struct mapping_record* tlb;
+  mutable struct mapping_record* tlb1;
+  mutable struct mapping_record* tlb2;
 };
 
 generic_mapper_bus::~generic_mapper_bus () throw () {
@@ -486,8 +488,8 @@ generic_mapper_bus::read_any (host_int_4 address, Data& data) throw ()
 // Accept the following forms:
 // [LOW-HIGH]                              (4 tokens)
 // [LOW-HIGH,STRIDE,WIDTH]                 (6 tokens)
-// [LOW-HIGH,BYTES_PER_WORD]               (5 tokens)
-// [LOW-HIGH,STRIDE,WIDTH,BYTES_PER_WORD]  (7 tokens)
+// [BYTES_PER_WORD,LOW-HIGH]               (5 tokens)
+// [BYTES_PER_WORD,LOW-HIGH,STRIDE,WIDTH]  (7 tokens)
 //
 // Each number may be specified in any format that parse_attribute()
 // understands.
@@ -639,8 +641,15 @@ generic_mapper_bus::locate (host_int_4 address) const
 {
   this->target->access_count ++;
 
-  // check last-used entry first 
-  mapping_record* cache = this->tlb; // one-entry tlb
+  // check last-used entries first 
+  mapping_record* cache = this->tlb1;
+  if (LIKELY(cache && address <= cache->high && address >= cache->low))
+    {
+      this->target->cache_hit_count ++;
+      cache->hit_count ++;
+      return cache;
+    }
+  cache = this->tlb2;
   if (LIKELY(cache && address <= cache->high && address >= cache->low))
     {
       this->target->cache_hit_count ++;
@@ -670,7 +679,8 @@ generic_mapper_bus::locate (host_int_4 address) const
       if (LIKELY(address <= found->high))
 	{
 	  found->hit_count ++;
-	  this->tlb = found;
+	  this->tlb2 = this->tlb1;
+	  this->tlb1 = found;
 	  return found;
 	}
 

@@ -8,7 +8,7 @@
 This chapter describes the internals of the assembler.  It is incomplete, but
 it may help a bit.
 
-This chapter was last modified on $Date: 2000/04/04 20:39:36 $.  It is not updated regularly, and it
+This chapter was last modified on $Date: 2000/05/21 18:26:10 $.  It is not updated regularly, and it
 may be out of date.
 
 @menu
@@ -1406,8 +1406,8 @@ generate a @code{.file} symbol if none was generated previously.
 
 @item SEPARATE_STAB_SECTIONS
 @cindex SEPARATE_STAB_SECTIONS
-You may define this macro to indicate that stabs should be placed in separate
-sections, as in ELF.
+You may define this macro to a nonzero value to indicate that stabs should be
+placed in separate sections, as in ELF.
 
 @item INIT_STAB_SECTION
 @cindex INIT_STAB_SECTION

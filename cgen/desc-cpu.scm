@@ -946,7 +946,6 @@ init_tables ()
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #include \"sysdep.h\"
-#include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include \"ansidecl.h\"

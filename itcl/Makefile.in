@@ -30,7 +30,7 @@ all:
 
 test check:
 	for dir in $(subdirs) ; do \
-		if (echo "Making in $$dir"; cd $$dir && $(MAKE) $@); \
+		if (echo "Making in $$dir"; cd $$dir && $(MAKE) test); \
 		then true; else exit 1; fi \
 	done;
 

@@ -799,8 +799,10 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
   { PT_CCR * 4,         4, GREGS,  PT_CCR * 4, 4, 4 },
   { PT_LNK * 4,         4, GREGS,  PT_LNK * 4, 4, 4 },
   { PT_CTR * 4,         4, GREGS,  PT_CTR * 4, 4, 4 },
-  { PT_XER * 4,         4, GREGS,  PT_XER * 4, 4, 4 },
-  { PT_MQ * 4,          4, GREGS,  PT_MQ * 4,  4, 4 }
+  { PT_XER * 4,         4, GREGS,  PT_XER * 4, 4, 4 }
+#ifdef PT_MQ
+, { PT_MQ * 4,          4, GREGS,  PT_MQ * 4,  4, 4 }
+#endif
 };
 
 /* End of PPC_LINUX_TARGET */

@@ -159,6 +159,10 @@ proc sid_cmd { cmd } {
     # encode string
     binary scan $cmd H* encoded
 
+    # bump up buffer size, big time
+    set desired_match_max [expr 10 * [string length $encoded]]
+    if {[match_max] < $desired_match_max} then { match_max $desired_match_max }
+
     set iterations [expr [string length $encoded] / 64]
     for {set i 0} {$i < $iterations} {incr i} {
 	set first [expr $i * 64]

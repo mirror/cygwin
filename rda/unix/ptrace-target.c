@@ -417,7 +417,9 @@ static void
 ptrace_exit_program (struct gdbserv *serv)
 {
   ptrace_sigkill_program (serv);
-  gdbserv_fromtarget_exit (serv, GDBSERV_SIGQUIT);
+  gdbserv_fromtarget_exit (serv, GDBSERV_SIGKILL);
+  /* Quit out of main loop.  */
+  server_quit_p = 1;
 }
 
 /* break program vector

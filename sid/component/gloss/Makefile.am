@@ -40,5 +40,5 @@ libgloss_la_LDFLAGS = -module -no-undefined
 pkgdata_DATA = $(ARMDATA) $(MIPSDATA) $(M32RDATA)
 
 DEJAGNUTESTS=angel.exp
-checkme:
+check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )

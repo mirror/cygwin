@@ -690,8 +690,24 @@ dwarf2_frame_cache (struct frame_info *next_frame, void **this_cache)
       {
 	if (cache->reg[regnum].how == DWARF2_FRAME_REG_RA)
 	  {
-	    struct dwarf2_frame_state_reg *retaddr_reg =
-	      &fs->regs.reg[fs->retaddr_column];
+	    struct dwarf2_frame_state_reg *retaddr_reg;
+            int retaddr_regno = DWARF2_REG_TO_REGNUM (fs->retaddr_column);
+
+            /* One some systems, DWARF2_REG_TO_REGNUM is many-to-one:
+               there are multiple numbers for the same register.  GCC
+               may use one number in the CIE, and a different number
+               in the FDE's.  If we merge entries properly when
+               populating cache->reg above (preferring entries with
+               information over those with no information, like
+               DWARF2_FRAME_REG_UNSPECIFIED), and then use cache->reg
+               as the basis, we can ensure we'll find the information,
+               no matter what register number was used to record it.  */
+            if (0 <= retaddr_regno && retaddr_regno < num_regs)
+              retaddr_reg = &cache->reg[retaddr_regno];
+            else
+              /* If retaddr_column doesn't have any corresponding GDB
+                 register number, then just refer to the column.  */
+              retaddr_reg = &fs->regs.reg[fs->retaddr_column];
 
 	    /* It seems rather bizarre to specify an "empty" column as
                the return adress column.  However, this is exactly

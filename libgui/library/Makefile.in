@@ -160,8 +160,8 @@ gui_DATA = tclIndex pkgIndex.tcl $(TCL) $(PACKAGES)
 @TCL_SHARED_FALSE@SET_LIB_PATH = 
 
 WISH = wish
-@CROSS_COMPILING_TRUE@ITCL_SH = @CROSS_COMPILING_TRUE@itclsh
-@CROSS_COMPILING_FALSE@ITCL_SH = @CROSS_COMPILING_FALSE@$$here/../../itcl/itcl/@ITCL_DIR@/itclsh$(EXEEXT)
+@CROSS_COMPILING_TRUE@ITCL_SH = @CROSS_COMPILING_TRUE@itclsh3.0
+@CROSS_COMPILING_FALSE@ITCL_SH = @CROSS_COMPILING_FALSE@@ITCL_SH@
 
 ETAGS_ARGS = --lang=none --regex='/[ \t]*\(proc\|method\|itcl_class\)[ \t]+\([^ \t]+\)/\1/' $(TCL) --lang=auto
 mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
@@ -315,18 +315,21 @@ installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
-tclIndex: $(TCL)
-	TCL_LIBRARY=$(srcdir)/../../tcl/library; export TCL_LIBRARY; \
-	here=`pwd`; \
-	$(SET_LIB_PATH) \
-	cd $(srcdir) && \
-	  echo "auto_mkindex $(LIBGUI_LIBRARY_DIR) $(TCL)" | @ITCL_SH@
+@MAINTAINER_MODE_TRUE@tclIndex: $(TCL)
+@MAINTAINER_MODE_TRUE@	TCL_LIBRARY=$(srcdir)/../../tcl/library; export TCL_LIBRARY; \
+@MAINTAINER_MODE_TRUE@	here=`pwd`; \
+@MAINTAINER_MODE_TRUE@	$(SET_LIB_PATH) \
+@MAINTAINER_MODE_TRUE@	cd $(srcdir) && \
+@MAINTAINER_MODE_TRUE@	  echo "auto_mkindex $(LIBGUI_LIBRARY_DIR) $(TCL)" | $(ITCL_SH)
 
-pkgIndex.tcl: @MAINT@ $(PACKAGES)
-	here=`pwd`;	 \
-	$(SET_LIB_PATH) \
-	cd $(srcdir) && \
-	echo "pkg_mkIndex . $(PACKAGES); exit" | @ITCL_SH@
+@MAINTAINER_MODE_TRUE@pkgIndex.tcl: @MAINT@ $(PACKAGES)
+@MAINTAINER_MODE_TRUE@	here=`pwd`;	 \
+@MAINTAINER_MODE_TRUE@	$(SET_LIB_PATH) \
+@MAINTAINER_MODE_TRUE@	cd $(srcdir) && \
+@MAINTAINER_MODE_TRUE@	echo "pkg_mkIndex . $(PACKAGES); exit" | $(ITCL_SH)
+@MAINTAINER_MODE_FALSE@tclIndex:
+
+@MAINTAINER_MODE_FALSE@pkgIndex.tcl:
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

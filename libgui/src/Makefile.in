@@ -189,14 +189,14 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libgui_a_LIBADD = 
 libgui_a_OBJECTS =  paths.$(OBJEXT) subcommand.$(OBJEXT) \
-xpmlib.$(OBJEXT) tclmain.$(OBJEXT) \
-tkGraphCanvas.$(OBJEXT) tkCanvEdge.$(OBJEXT) tkCanvLayout.$(OBJEXT) \
-tclhelp.$(OBJEXT) tclgetdir.$(OBJEXT) tclwinprint.$(OBJEXT) \
-tclsizebox.$(OBJEXT) tclshellexe.$(OBJEXT) tclmapi.$(OBJEXT) \
-tclwinfont.$(OBJEXT) tclwingrab.$(OBJEXT) tclwinmode.$(OBJEXT) \
-tclwinpath.$(OBJEXT) tclmsgbox.$(OBJEXT) tclcursor.$(OBJEXT) \
-tkTable.$(OBJEXT) tkTableCmd.$(OBJEXT) tkTableCell.$(OBJEXT) \
-tkTableTag.$(OBJEXT) tkTableWin.$(OBJEXT) tkWinPrintText.$(OBJEXT) \
+xpmlib.$(OBJEXT) tclmain.$(OBJEXT) tkGraphCanvas.$(OBJEXT) \
+tkCanvEdge.$(OBJEXT) tkCanvLayout.$(OBJEXT) tclhelp.$(OBJEXT) \
+tclgetdir.$(OBJEXT) tclwinprint.$(OBJEXT) tclsizebox.$(OBJEXT) \
+tclshellexe.$(OBJEXT) tclmapi.$(OBJEXT) tclwinfont.$(OBJEXT) \
+tclwingrab.$(OBJEXT) tclwinmode.$(OBJEXT) tclwinpath.$(OBJEXT) \
+tclmsgbox.$(OBJEXT) tclcursor.$(OBJEXT) tkTable.$(OBJEXT) \
+tkTableCmd.$(OBJEXT) tkTableCell.$(OBJEXT) tkTableTag.$(OBJEXT) \
+tkTableWin.$(OBJEXT) tkWinPrintText.$(OBJEXT) \
 tkWinPrintCanvas.$(OBJEXT) tkWarpPointer.$(OBJEXT)
 AR = ar
 CFLAGS = @CFLAGS@

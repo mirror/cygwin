@@ -1062,7 +1062,30 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
      32-bit halves. */
   { PT_IACC0H * 4,  4, GREGS, offsetof (struct user_int_regs, iacc[0]), 4, 4, 0 },
   { PT_IACC0L * 4,  4, GREGS, offsetof (struct user_int_regs, iacc[0]) + 4, 4, 4, 0 },
+  { PT_FSR(0) * 4,  4, fpreg_offset_and_size (fsr[0]), 4, 0 },
+  { PT_ACC(0) * 4,  4, fpreg_offset_and_size (acc[0]), 4, 0 },
+  { PT_ACC(1) * 4,  4, fpreg_offset_and_size (acc[1]), 4, 0 },
+  { PT_ACC(2) * 4,  4, fpreg_offset_and_size (acc[2]), 4, 0 },
+  { PT_ACC(3) * 4,  4, fpreg_offset_and_size (acc[3]), 4, 0 },
+  { PT_ACC(4) * 4,  4, fpreg_offset_and_size (acc[4]), 4, 0 },
+  { PT_ACC(5) * 4,  4, fpreg_offset_and_size (acc[5]), 4, 0 },
+  { PT_ACC(6) * 4,  4, fpreg_offset_and_size (acc[6]), 4, 0 },
+  { PT_ACC(7) * 4,  4, fpreg_offset_and_size (acc[7]), 4, 0 },
 
+  /* For the one-byte ACCG regs, ptrace() fetches four regs at a time,
+     but the user_fpmedia_regs struct breaks the regs out into an array
+     of bytes.  Thus, we can't use the fpreg_offset_and_size macro.  */
+  { PT_ACCG(0) * 4, 4, FPREGS, offsetof (struct user_fpmedia_regs, acc[0]), 4, 4, 0 },
+  { PT_ACCG(1) * 4, 4, FPREGS, offsetof (struct user_fpmedia_regs, acc[4]), 4, 4, 0 },
+
+  { PT_MSR(0) * 4,  4, fpreg_offset_and_size (msr[0]), 4, 0 },
+  { PT_MSR(1) * 4,  4, fpreg_offset_and_size (msr[0]), 4, 0 },
+  
+  { PT_GNER0 * 4,   4, greg_offset_and_size (gner[0]), 4, 0 },
+  { PT_GNER1 * 4,   4, greg_offset_and_size (gner[1]), 4, 0 },
+
+  { PT_FNER(0) * 4, 4, fpreg_offset_and_size (fner[0]), 4, 0 },
+  { PT_FNER(1) * 4, 4, fpreg_offset_and_size (fner[1]), 4, 0 },
 };
 
 int

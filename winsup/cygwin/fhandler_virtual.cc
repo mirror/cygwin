@@ -25,8 +25,8 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-fhandler_virtual::fhandler_virtual (DWORD devtype):
-  fhandler_base (devtype), filebuf (NULL), bufalloc ((size_t) -1),
+fhandler_virtual::fhandler_virtual ():
+  fhandler_base (), filebuf (NULL), bufalloc ((size_t) -1),
   fileid (-1)
 {
 }
@@ -34,8 +34,15 @@ fhandler_virtual::fhandler_virtual (DWORD devtype):
 fhandler_virtual::~fhandler_virtual ()
 {
   if (filebuf)
-    cfree (filebuf);
+    free (filebuf);
   filebuf = NULL;
+}
+
+void
+fhandler_virtual::fixup_after_exec (HANDLE)
+{
+  if (filebuf)
+    filebuf = NULL;
 }
 
 DIR *
@@ -143,7 +150,7 @@ fhandler_virtual::dup (fhandler_base * child)
   if (!ret)
     {
       fhandler_virtual *fhproc_child = (fhandler_virtual *) child;
-      fhproc_child->filebuf = (char *) cmalloc (HEAP_BUF, filesize);
+      fhproc_child->filebuf = (char *) malloc (filesize);
       fhproc_child->bufalloc = fhproc_child->filesize = filesize;
       fhproc_child->position = position;
       memcpy (fhproc_child->filebuf, filebuf, filesize);
@@ -156,34 +163,36 @@ int
 fhandler_virtual::close ()
 {
   if (filebuf)
-    cfree (filebuf);
+    free (filebuf);
   filebuf = NULL;
   bufalloc = (size_t) -1;
   cygwin_shared->delqueue.process_queue ();
   return 0;
 }
 
-int
-fhandler_virtual::read (void *ptr, size_t len)
+void
+fhandler_virtual::read (void *ptr, size_t& len)
 {
   if (len == 0)
-    return 0;
+    return;
   if (openflags & O_DIROPEN)
     {
       set_errno (EISDIR);
-      return -1;
+      (ssize_t) len = -1;
+      return;
     }
   if (!filebuf)
-    return 0;
-  int read = len;
-  if (read > filesize - position)
-    read = filesize - position;
-  if (read < 0)
-    read = 0;
+    {
+      (ssize_t) len = 0;
+      return;
+    }
+  if ((ssize_t) len > filesize - position)
+    (ssize_t) len = filesize - position;
+  if ((ssize_t) len < 0)
+    (ssize_t) len = 0;
   else
-    memcpy (ptr, filebuf + position, read);
-  position += read;
-  return read;
+    memcpy (ptr, filebuf + position, len);
+  position += len;
 }
 
 int

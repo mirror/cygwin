@@ -1,6 +1,6 @@
 /* fhandler_windows.cc: code to access windows message queues.
 
-   Copyright 1998 Cygnus Solutions.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Sergey S. Okhapkin (sos@prospect.com.ru).
    Feedback and testing by Andy Piper (andyp@parallax.co.uk).
@@ -11,8 +11,13 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#include <errno.h>
 #include "winsup.h"
+#include <errno.h>
+#include <wingdi.h>
+#include <winuser.h>
+#include "cygerrno.h"
+#include "security.h"
+#include "fhandler.h"
 
 /*
 The following unix-style calls are supported:
@@ -41,19 +46,17 @@ The following unix-style calls are supported:
 	select () call marks read fd when any message posted to queue.
 */
 
-fhandler_windows::fhandler_windows (const char *name) :
-	fhandler_base (FH_WINDOWS, name)
+fhandler_windows::fhandler_windows ()
+  : fhandler_base (), hWnd_ (NULL), method_ (WINDOWS_POST)
 {
-  set_cb (sizeof *this);
-  hWnd_ = NULL;
-  method_ = WINDOWS_POST;
 }
 
 int
-fhandler_windows::open (const char *, int flags, mode_t)
+fhandler_windows::open (path_conv *, int flags, mode_t)
 {
-  set_flags (flags);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_close_on_exec_flag (1);
+  set_open_status ();
   return 1;
 }
 
@@ -76,26 +79,25 @@ fhandler_windows::write (const void *buf, size_t)
     return SendMessage (ptr->hwnd, ptr->message, ptr->wParam, ptr->lParam);
 }
 
-int
-fhandler_windows::read (void *buf, size_t len)
+void __stdcall
+fhandler_windows::read (void *buf, size_t& len)
 {
   MSG *ptr = (MSG *) buf;
-  int ret;
 
   if (len < sizeof (MSG))
     {
       set_errno (EINVAL);
-      return -1;
+      (ssize_t) len = -1;
+      return;
     }
 
-  ret = GetMessage (ptr, hWnd_, 0, 0);
+  (ssize_t) len = GetMessage (ptr, hWnd_, 0, 0);
 
-  if (ret == -1)
-    {
-      __seterrno ();
-    }
-  set_errno (0);
-  return ret;
+  if ((ssize_t) len == -1)
+    __seterrno ();
+  else
+    set_errno (0);
+  return;
 }
 
 int

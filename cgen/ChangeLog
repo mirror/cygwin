@@ -1,3 +1,7 @@
+2003-07-15  Doug Evans  <dje@sebabeach.org>
+
+	* gen-all-sim: Fix some typos.
+
 2003-07-08  Doug Evans  <dje@sebabeach.org>
 
 	* gen-all-doc: Ensure run from cgen src dir.

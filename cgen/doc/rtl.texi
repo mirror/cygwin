@@ -1532,7 +1532,7 @@ several predefined operand attributes:
 The operand contains negative values (not used yet so definition is
 still nebulous.
 
-@item RELAX
+@item RELAXABLE
 This operand contains the changeable field (usually a branch address) of
 a relaxable instruction.
 

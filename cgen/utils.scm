@@ -487,6 +487,7 @@
 
 ; Remove duplicate elements from sorted list L.
 ; Currently supported elements are symbols (a b c) and lists ((a) (b) (c)).
+; NOTE: Uses equal? for comparisons.
 
 (define (remove-duplicates l)
   (let loop ((l l) (result nil))
@@ -515,6 +516,8 @@
 ; This is not intended to be applied to large lists with an expected large
 ; result (where sorting the list first would be faster), though one could
 ; add such support later.
+;
+; ??? Rename to follow memq/memv/member naming convention.
 
 (define (nub l key-generator)
   (let loop ((l l) (keys (map key-generator l)) (result nil))
@@ -1058,23 +1061,34 @@
 	(else (find-apply fn pred (cdr l))))
 )
 
-; Given a list of lists L such that the first element in each list names the
-; entry, look up symbol S in that and return its index.  If not found,
-; return #f.
-; Eg: (lookup 'element2 '((element1 1) (element2 2)))
-; Granted, linear searching isn't efficient.  If it ever becomes a problem we
-; can do something about it then.
+; Given a list L, look up element ELM and return its index.
+; If not found, return #f.
 ; I is added to the result.
+; (Yes, in one sense I is present to simplify the implementation.  Sue me.)
 
-(define (lookup-index s l i)
+(define (eqv-lookup-index elm l i)
+  (cond ((null? l) #f)
+	((eqv? elm (car l)) i)
+	(else (eqv-lookup-index elm (cdr l) (1+ i))))
+)
+
+; Given an associative list L, look up entry for symbol S and return its index.
+; If not found, return #f.
+; Eg: (lookup 'element2 '((element1 1) (element2 2)))
+; I is added to the result.
+; (Yes, in one sense I is present to simplify the implementation.  Sue me.)
+; NOTE: Uses eq? for comparisons.
+
+(define (assq-lookup-index s l i)
   (cond ((null? l) #f)
 	((eqv? s (caar l)) i)
-	(else (lookup-index s (cdr l) (1+ i))))
+	(else (assq-lookup-index s (cdr l) (1+ i))))
 )
 
 ; Return the index of element ELM in list L or #f if not found.
 ; If found, I is added to the result.
 ; (Yes, in one sense I is present to simplify the implementation.  Sue me.)
+; NOTE: Uses equal? for comparisons.
 
 (define (element-lookup-index elm l i)
   (cond ((null? l) #f)
@@ -1083,6 +1097,7 @@
 )
 
 ; Return #t if ELM is in ELM-LIST.
+; NOTE: Uses equal? for comparisons (via `member').
 
 (define (element? elm elm-list)
   (->bool (member elm elm-list))

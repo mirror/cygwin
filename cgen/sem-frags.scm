@@ -977,7 +977,7 @@
      (map (lambda (insn)
 	    ; Must pass canonicalized and macro-expanded rtl.
 	    (rtx-simplify #f insn (insn-semantics insn)
-			  (-build-known-values insn)))
+			  (insn-build-known-values insn)))
 	  insn-list))
    insn-list)
 )
@@ -1210,7 +1210,7 @@
    (map (lambda (insn)
 	  ; Must pass canonicalized and macro-expanded rtl.
 	  (rtx-simplify #f insn (insn-semantics insn)
-			(-build-known-values insn)))
+			(insn-build-known-values insn)))
 	(non-multi-insns (non-alias-insns (current-insn-list))))
    (non-multi-insns (non-alias-insns (current-insn-list))))
 )

@@ -25,6 +25,26 @@ export cgendir=`pwd`
 
   for a in $archs
   do
-    make html ARCH=$a
+    case $a in
+    arm)
+      make html ARCH=$a ISAS=arm INSN_FILE_NAME=arm-arm-insn.html
+      mv arm.html arm-arm.html
+      mv arm-insn.html arm-arm-insn.html
+      make html ARCH=$a ISAS=thumb INSN_FILE_NAME=arm-thumb-insn.html
+      mv arm.html arm-thumb.html
+      mv arm-insn.html arm-thumb-insn.html
+      ;;
+    frv)
+      make html ARCH=$a MACHS="frv,simple,tomcat,fr400" INSN_FILE_NAME=frv-1-insn.html
+      mv frv.html frv-1.html
+      mv frv-insn.html frv-1-insn.html
+      make html ARCH=$a MACHS="fr500" INSN_FILE_NAME=frv-2-insn.html
+      mv frv.html frv-2.html
+      mv frv-insn.html frv-2-insn.html
+      ;;
+    *)
+      make html ARCH=$a
+      ;;
+    esac
   done
 )

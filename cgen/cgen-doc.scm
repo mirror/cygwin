@@ -1,5 +1,5 @@
 ; CPU description file generator for CGEN cpu documentation
-; This is invoked to build: $arch-doc.html.
+; This is invoked to build: $arch.html.
 ; Copyright (C) 2003 Doug Evans
 ; This file is part of CGEN.
 ;
@@ -20,8 +20,13 @@
 
 (define doc-arguments
   (list
-   (list '-H "file" "generate $arch-doc.html in <file>"
-	 (lambda (arg) (file-write arg cgen-doc.html)))
+   (list '-H "file" "generate $arch.html in <file>"
+	 (lambda (arg) (file-write arg cgen.html)))
+   ; can't use '-I because that gets interpreted as a complex number
+   (list (string->symbol "-I") "file" "generate $arch-insn.html in <file>"
+	 (lambda (arg) (file-write arg cgen-insn.html)))
+   (list '-N "file" "specify name of insn.html file"
+	 (lambda (arg) (set! *insn-html-file-name* arg)))
    )
 )
 

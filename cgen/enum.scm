@@ -38,13 +38,15 @@
 ; Parse a list of enum name/value entries.
 ; PREFIX is prepended to each name.
 ; Elements are any of: symbol, (symbol), (symbol value)
-; (symbol - attrs), (symbol value attrs).
-; The `-' means use the next value.
+; (symbol - attrs), (symbol value attrs), (symbol - attrs comment),
+; (symbol value attrs comment).
+; The - or #f means "use the next value".
+; SYMBOL may be - which means "skip this value".
 ; The result is the same list, except values are filled in where missing,
 ; and each symbol is prepended with `prefix'.
 
-(define (parse-enum-vals prefix vals)
-  ; Scan the value list, building up RES-VALS as we go.
+(define (parse-enum-vals errtxt prefix vals)
+  ; Scan the value list, building up RESULT as we go.
   ; Each element's value is 1+ the previous, unless there's an explicit value.
   (let loop ((result nil) (last -1) (remaining vals))
     (if (null? remaining)
@@ -59,20 +61,32 @@
 		      (+ last 1))))
 	  (if (eq? (car remaining) '-)
 	      (loop result val (cdr remaining))
-	      (loop (cons (cons (symbol-append prefix
-					       (if (pair? (car remaining))
-						   (caar remaining)
-						   (car remaining)))
-				(cons val
-				      ; Pass any attributes through unchanged.
-				      (if (and (pair? (car remaining))
-					       (pair? (cdar remaining)))
-					  (cddar remaining)
-					  nil)))
-			  result)
-		    val
-		    (cdr remaining))))))
+	      (let ((name (symbol-append prefix
+					 (if (pair? (car remaining))
+					     (caar remaining)
+					     (car remaining))))
+		    (attrs (if (and (pair? (car remaining))
+				    (pair? (cdar remaining))
+				    (pair? (cddar remaining)))
+			       (caddar remaining)
+			       nil))
+		    (comment (if (and (pair? (car remaining))
+				      (pair? (cdar remaining))
+				      (pair? (cddar remaining))
+				      (pair? (cdddar remaining)))
+				 (car (cdddar remaining))
+				 "")))
+		(loop (cons (list name val attrs comment) result)
+		      val
+		      (cdr remaining)))))))
 )
+
+; Accessors for the various elements of an enum val.
+
+(define (enum-val-name ev) (list-ref ev 0))
+(define (enum-val-value ev) (list-ref ev 1))
+(define (enum-val-attrs ev) (list-ref ev 2))
+(define (enum-val-comment ev) (list-ref ev 3))
 
 ; Convert the names in the result of parse-enum-vals to uppercase.
 
@@ -100,7 +114,7 @@
   prefix
 )
 
-; This is the main routine for building an ifield object from a
+; This is the main routine for building an enum object from a
 ; description in the .cpu file.
 ; All arguments are in raw (non-evaluated) form.
 
@@ -115,7 +129,7 @@
 	  (parse-comment comment errtxt)
 	  (atlist-parse attrs "enum" errtxt)
 	  (-enum-parse-prefix errtxt prefix)
-	  (parse-enum-vals prefix vals)))
+	  (parse-enum-vals errtxt prefix vals)))
 )
 
 ; Read an enum description
@@ -191,7 +205,7 @@
 ; Enums support code.
 
 ; Return #t if VALS is a sequential list of enum values.
-; VALS is a list of enums.  e.g. ((sym1) (sym2 3) (sym3 '- attr1 (attr2 4)))
+; VALS is a list of enums.  e.g. ((sym1) (sym2 3) (sym3 - attr1 (attr2 4)))
 ; FIXME: Doesn't handle gaps in specified values.
 ; e.g. (sym1 val1) sym2 (sym3 val3)
 
@@ -270,7 +284,9 @@
 		     ", ")
 		 (gen-c-symbol prefix)
 		 (gen-c-symbol (car e))
-		 (if (or sequential? (null? (cdr e)) (eq? '- (cadr e)))
+		 (if (or sequential?
+			 (null? (cdr e))
+			 (eq? '- (cadr e)))
 		     ""
 		     (string-append " = "
 				    (if (number? (cadr e))
@@ -362,7 +378,7 @@
 		     (atlist-parse attrs "insn-enum" errtxt)
 		     (-enum-parse-prefix errtxt prefix)
 		     fld-obj
-		     (parse-enum-vals prefix vals))))
+		     (parse-enum-vals errtxt prefix vals))))
 	    (current-enum-add! e)
 	    e))))
   )

@@ -53,6 +53,24 @@
   (comment "insn can't go in delay slot")
 )
 
+; IDOC attribute for instruction documentation.
+
+(define-attr
+  (for insn)
+  (type enum)
+  (name IDOC)
+  (comment "insn kind for documentation")
+  (attrs META)
+  (values
+   (MEM - () "Memory")
+   (ALU - () "ALU")
+   (FPU - () "FPU")
+   (BR - () "Branch")
+   (PRIV - () "Priviledged")
+   (MISC - () "Miscellaneous")
+  )
+)
+
 ; Enum for exception vectors.
 (define-enum
   (name e-exception)

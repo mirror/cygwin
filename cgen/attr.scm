@@ -90,10 +90,15 @@
 	      nil)
 )
 
-; For bitset attributes, VALUES is a list of symbols, one for each bit.
+; For bitset attributes VALUES is a list of
+; (symbol bit-number-or-#f attr-list comment-or-#f),
+; one for each bit.
+; If bit-number is #f (unspecified), cgen will choose.
 ; Int's are used to record the bitset in the generated code so there's a limit
 ; of 32 elements, though there's nothing inherent in the description language
 ; that precludes removing the limit.
+; NOTE: While one might want to record each element as an object, there's
+; currently no need for the added complexity.
 
 (define <bitset-attribute>
   (class-make '<bitset-attribute>
@@ -102,8 +107,10 @@
 	      nil)
 )
 
-; For integer attributes, VALUES is a list of ints, one for each possible
-; value, or the empty list of all values are permissible.
+; For integer attributes VALUES is a list of (int),
+; one for each possible value,
+; or the empty list of all values are permissible.
+; Note that each element is itself a list.  This is for consistency.
 
 (define <integer-attribute>
   (class-make '<integer-attribute>
@@ -112,8 +119,13 @@
 	      nil)
 )
 
-; For enum attributes, VALUES is a list of symbols, one for each possible
-; value.
+; For enum attributes VALUES is a list of
+; (symbol enum-value-or-#f attr-list comment-or-#f),
+; one for each possible.
+; If enum-value is #f (unspecified) cgen will apply the standard rule for
+; assigning enum values.
+; NOTE: While one might want to record each element as an object, there's
+; currently no need for the added complexity.
 
 (define <enum-attribute>
   (class-make '<enum-attribute>
@@ -160,6 +172,7 @@
 
 ; VALUES must be a comma separated list of symbols
 ; (e.g. val1,val2 not (val1 val2)).
+; FIXME: require values to be a string (i.e. "val1,val2")
 
 (define (bitset-attr-make name values) (cons name values))
 
@@ -248,15 +261,22 @@
 (method-make!
  <bitset-attribute> 'parse-value-def
  (lambda (self errtxt values)
-   (parse-enum-vals "" values))
+   (parse-enum-vals errtxt "" values))
 )
 
 ; Parse an integer attribute's value definition.
-; FIXME: Unfinished.
+; VALUES may be #f which means any value is ok.
 
 (method-make!
  <integer-attribute> 'parse-value-def
- (lambda (self errtxt values) values)
+ (lambda (self errtxt values)
+   (if values
+       (for-each (lambda (val)
+		   (if (or (not (list? val))
+			   (not (number? (car val))))
+		       (parse-error errtxt "invalid element in integer attribute list" val)))
+		 values))
+   values)
 )
 
 ; Parse an enum attribute's value definition.
@@ -265,7 +285,7 @@
 (method-make!
  <enum-attribute> 'parse-value-def
  (lambda (self errtxt values)
-   (parse-enum-vals "" values))
+   (parse-enum-vals errtxt "" values))
 )
 
 ; Make an attribute list object from a list of name/value pairs.
@@ -327,8 +347,8 @@
 	(comment "")
 	(attrs nil)
 	(for #f) ; assume for everything
-	(default #f) ; assume boolean
-	(values '(#f #t)) ; assume boolean
+	(default #f) ; indicates "not set"
+	(values #f) ; indicates "not set"
 	)
     ; Loop over each element in ARG-LIST, recording what's found.
     (let loop ((arg-list arg-list))
@@ -354,12 +374,38 @@
 	      ((values) (set! values (cdr arg)))
 	      (else (parse-error errtxt "invalid attribute arg" arg)))
 	    (loop (cdr arg-list)))))
+    ; Must have type now.
+    (if (eq? type-class 'not-set)
+	(parse-error errtxt "type not specified"))
+    ; Establish proper defaults now that we know the type.
+    (case (class-name type-class)
+      ((<boolean-attribute>)
+       (if (eq? default #f)
+	   (set! default #f)) ; really a nop, but for consistency
+       (if (eq? values #f)
+	   (set! values '(#f #t))))
+      ((bitset-attribute>)
+       (if (eq? default #f)
+	   (parse-error errtxt "bitset-attribute default not specified"))
+       (if (eq? values #f)
+	   (parse-error errtxt "bitset-attribute values not specified")))
+      ((integer-attribute>)
+       (if (eq? default #f)
+	   (set! default 0))
+       (if (eq? values #f)
+	   (set! values #f))) ; really a nop, but for consistency
+      ((enum-attribute>)
+       (if (eq? default #f)
+	   (parse-error errtxt "enum-attribute default not specified"))
+       (if (eq? values #f)
+	   (parse-error errtxt "bitset-attribute values not specified")))
+      )
     ; Now that we've identified the elements, build the object.
     (-attr-parse errtxt type-class name comment attrs for default values)
     )
 )
 
-; Main routine for defining attributes in .cpu files.
+; Main routines for defining attributes in .cpu files.
 
 (define define-attr
   (lambda arg-list
@@ -381,19 +427,30 @@
 ; attribute alist ALIST.
 ; Note that if the attribute isn't present, it is defined to be #f.
 
-(define (attr-has-attr? alist attr)
-  (let ((a (assq attr alist)))
-    (cond ((not a) a)
-	  ((boolean? (cdr a)) (cdr a))
-	  (else (error "Not a boolean attribute:" attr))))
-)
-
-(method-make! <attr-list> 'has-attr?
-	      (lambda (self attr) (attr-has-attr? (elm-get self 'attrs) attr))
+(method-make!
+ <attr-list> 'has-attr?
+ (lambda (self attr)
+   (let ((a (assq attr (elm-get self 'attrs))))
+     (cond ((not a) a)
+	   ((boolean? (cdr a)) (cdr a))
+	   (else (error "Not a boolean attribute:" attr)))))
 )
 
 (define (atlist-has-attr? atlist attr)
   (send atlist 'has-attr? attr)
+)
+
+; Return a boolean indicating if attribute ATTR is present in
+; attribute alist ALIST.
+
+(method-make!
+ <attr-list> 'attr-present?
+ (lambda (self attr)
+   (->bool (assq attr (elm-get self 'attrs))))
+)
+
+(define (atlist-attr-present? atlist attr)
+  (send atlist 'attr-present? attr)
 )
 
 ; Expand attribute value ATVAL, which is an rtx expression.
@@ -482,6 +539,7 @@
 	atlist-empty
 	result))
 )
+
 (define (obj-set-atlist! obj attrs) (send obj 'set-atlist! attrs))
 
 ; Add attribute ATTR to OBJ.
@@ -503,7 +561,7 @@
 )
 
 ; Return boolean of whether OBJ has boolean attribute ATTR or not.
-; OBJ is any object.
+; OBJ is any object that supports attributes.
 
 (define (obj-has-attr? obj attr)
   (atlist-has-attr? (obj-atlist obj) attr)
@@ -512,6 +570,12 @@
 ; FIXME: for backward compatibility.  Delete in time.
 (define has-attr? obj-has-attr?)
 
+; Return a boolean indicating if attribute ATTR is present in OBJ.
+
+(define (obj-attr-present? obj attr)
+  (atlist-attr-present? (obj-atlist obj) attr)
+)
+
 ; Return value of attribute ATTR in OBJ.
 ; If the attribute isn't present, the default is returned.
 ; OBJ is any object that supports the get-atlist method.
@@ -519,6 +583,26 @@
 (define (obj-attr-value obj attr)
   (let ((atlist (obj-atlist obj)))
     (atlist-attr-value atlist attr obj))
+)
+
+; Return boolean of whether OBJ has attribute ATTR value VALUE or not.
+; OBJ is any object that supports attributes.
+; NOTE: The default value of the attribute IS considered.
+
+(define (obj-has-attr-value? obj attr value)
+  (let ((a (obj-attr-value obj attr)))
+    (eq? a value))
+)
+
+; Return boolean of whether OBJ explicitly has attribute ATTR value VALUE
+; or not.
+; OBJ is any object that supports attributes.
+; NOTE: The default value of the attribute IS NOT considered.
+
+(define (obj-has-attr-value-no-default? obj attr value)
+  (let* ((atlist (obj-atlist obj))
+	 (objs-value (atlist-attr-value-no-default atlist attr obj)))
+    (and (not (null? objs-value)) (eq? value objs-value)))
 )
 
 ; Utilities.

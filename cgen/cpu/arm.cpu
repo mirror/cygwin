@@ -92,6 +92,25 @@
 	1 1 ; issue done
 	() () () ())
 )
+
+; IDOC attribute for instruction documentation.
+; FIXME: Categorization is a bit tricky when alu ops can set the pc.
+
+(define-attr
+  (for insn)
+  (type enum)
+  (name IDOC)
+  (comment "insn kind for documentation")
+  (attrs META)
+  (values
+   (MEM - () "Memory")
+   (ALU - () "ALU")
+   (FPU - () "FPU")
+   (BR - () "Branch")
+   (PRIV - () "Priviledged")
+   (MISC - () "Miscellaneous")
+  )
+)
 
 ; Hardware.
 

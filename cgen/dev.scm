@@ -97,6 +97,11 @@
   (load "desc")
   (load "desc-cpu")
   (load "html")
+  ; ??? Necessary for the following case, dunno why.
+  ; bash$ guile -l dev.scm
+  ; guile> (load-doc)
+  ; guile> (cload #:arch "m32r")
+  (set! APPLICATION 'DOC)
 )
 
 (define (load-opc)

@@ -118,7 +118,7 @@ static TclWinProcs unicodeProcs = {
 };
 
 TclWinProcs *tclWinProcs;
-static Tcl_Encoding tclWinTCharEncoding;
+Tcl_Encoding tclWinTCharEncoding;
 
 /*
  * The following declaration is for the VC++ DLL entry point.

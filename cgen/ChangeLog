@@ -1,5 +1,9 @@
 2004-12-16  Jim Blandy  <jimb@redhat.com>
 
+	* utils-cgen.scm (parse-name): Don't assume that string-map can be
+	applied to symbols.  Process everything as strings, and then
+	convert to a symbol at the end.
+
 	* read.scm (debug-repl): Temporarily redirect input and output to
 	/dev/tty while we debug, so we don't interfere with whatever CGEN
 	is reading or writing.

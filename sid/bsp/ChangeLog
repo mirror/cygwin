@@ -1,3 +1,8 @@
+2001-08-06  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configrun-sid.in (opt_load): Don't load if empty $exec.
+	Always create mappers, separately from opt_load logic.
+
 2001-08-06  Ben Elliston  <bje@redhat.com>
 	
 	* configrun-sid.in (%component_libs): Add "cache" key/value.

@@ -920,12 +920,8 @@ proc ::combobox::configure {w action {option ""} {newValue ""}} {
 		if {$newValue} {
 		    # it's editable...
 		    $widgets(entry) configure -state normal
-		    $widgets(entry) configure -bg white
 		} else {
-		    global tcl_platform
-
 		    $widgets(entry) configure -state disabled
-		    $widgets(entry) configure -bg white
 		}
 	    }
 

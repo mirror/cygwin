@@ -12,8 +12,6 @@ AC_ARG_ENABLE(install-libgui, \
 AM_CONDITIONAL(CROSS_COMPILING, test x$cross_compiling = xyes)
 AM_CONDITIONAL(INSTALL_LIBGUI, test x$enable_install_libgui = xyes)
 AC_PROG_RANLIB
-AC_CHECK_PROG(ITCL_SH, itcl_sh, itcl_sh,
-	[\$\$here/\$(top_builddir)/../itcl/itcl/unix/itcl_sh\$(EXEEXT)])
 
 AC_FUNC_ALLOCA
 AC_HAVE_HEADERS(stddef.h stdlib.h getopt.h unistd.h fcntl.h sys/file.h sys/wait.h string.h strings.h)
@@ -98,6 +96,8 @@ CYG_AC_LOAD_TKCONFIG
 CYG_AC_PATH_TCLH
 # FIXME: consider only doing this if --with-x given.
 CYG_AC_PATH_TKH
+CYG_AC_PATH_ITCLCONFIG
+CYG_AC_LOAD_ITCLCONFIG
 
 dnl what is the path to itclsh?
 AC_CANONICAL_HOST

@@ -116,15 +116,13 @@ itcl_class Tree {
 	    ::set $thisTail-filter $filter
 	    $entry icursor 0
 
-	    ::bind $entry <Return> "watch y; $this fill; watch n"
+	    ::bind $entry <Return> "$this fill"
 	
 	    #make binding ctrl-u/l/r for filtering
 	    ::bind $tree <Control-u> "
-			 watch y
 			 $this config -filter \"*\"
 			 $this fill
 			 focus %W
-			 watch n
 			 break
 		    "
 	    ::bind $tree <Control-l> [::bind $tree <Control-u>]
@@ -170,7 +168,11 @@ itcl_class Tree {
 	
 	#propagate
 	if {! $propagate} {
-	    after idle "update idletasks; pack propagate [winfo toplevel $tree] $propagate"
+#FIXME: what is the following code doing?
+# I am currently seeing an error in this callback because the toplevel window does not exist.
+#	    after idle "update idletasks; pack propagate $top $propagate"
+set top [winfo toplevel $tree]
+after idle "update idletasks ; if \[winfo exists $top\] \{pack propagate $top\}"
 	}
     }
 
@@ -334,9 +336,7 @@ itcl_class Tree {
 	
 	calculate_column_filter
 	
-	watch y $this
-	fill
-	watch n $this
+	fillg
 	
 	resize_widget $tree
 	
@@ -392,10 +392,8 @@ itcl_class Tree {
 	calculate_column_filter
 	
 	if {$col_filter != $old_col_filter} {
-	    watch y $this
 	    fill
 	    resize_widget $tree
-	    watch n $this
 	}
     }
 	
@@ -859,7 +857,7 @@ itcl_class Tree {
 		-text $lbl \
 		-anchor $anchor \
 		-relief raised \
-		-command "watch y; $this resort $i; watch n"
+		-command "$this resort $i"
 	    ::bind $lframe.size.btn$i <B3-ButtonRelease> \
 		"$this edit_column_filter %W $i %X %Y"
 	

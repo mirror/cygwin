@@ -1,3 +1,23 @@
+2000-06-22  Mo DeJong  <mdejong@redhat.com>
+
+	* library/tree.tcl: Remove use of watch
+	command. Add check to see if toplevel
+	exists to avoid error.
+
+2000-06-22  Mo DeJong  <mdejong@redhat.com>
+
+	* src/tkGraphCanvas.c (GetEdgeNodes): Fixed
+	crash in ckfree caused by call to strdup that
+	was later freed using ckfree.
+
+2000-06-19  Syd Polk  <spolk@redhat.com>
+
+	* configure.in: Use CYG_AC_PATH_ITCLCONFIG and CYG_AC_LOAD_ITCLCONFIG
+	instead of using exising itclsh.
+	* aclocal.m4: Regenerated with new ../config/acinclude.m4.
+	* configure: Regenerate.
+	* Makefile.in library/Makefile.in src/Makefile.in: Regenerate.
+
 Fri Jun  9 20:43:40 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* src/paths.c (initialize_paths): Look in /usr/share for stuff.

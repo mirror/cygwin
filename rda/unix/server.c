@@ -389,7 +389,12 @@ main (int argc, char **argv)
 
   if (portno != 0)
     {
-      gdbsocket_startup (portno, gdbserver.attach, process);
+      if (gdbsocket_startup (portno, gdbserver.attach, process) < 0)
+        {
+          fprintf (stderr, "Error listening on port %d: %s\n",
+                   portno, strerror (errno));
+          return 2;
+        }
       if (process->debug_informational)
 	fprintf (stderr, "Started listening socket on port %d.\n", portno);
     }

@@ -24,9 +24,11 @@
 *	
 *
 * ---------------------------------------------------------------------------*/
-#ifndef _WIN32
-
 #include "tk.h"
+#ifdef _WIN32
+#include <windows.h>
+#include <winuser.h>
+#endif
 
 int
 WarpPointer (clientData, interp, objc, objv)
@@ -36,12 +38,11 @@ WarpPointer (clientData, interp, objc, objv)
     Tcl_Obj *CONST objv[];
 {
     Tk_Window tkwin;
-    Window win;
     int x, y;
     char *str;
 
     if (objc != 4) {
-      Tcl_WrongNumArgs(interp, 1, objv, "x y widgetId");
+      Tcl_WrongNumArgs(interp, 1, objv, "widgetId x y");
       return TCL_ERROR;
     }
 
@@ -54,8 +55,17 @@ WarpPointer (clientData, interp, objc, objv)
     if (tkwin == NULL) 
       return TCL_ERROR;
 
-    win = Tk_WindowId(tkwin);
-    XWarpPointer(Tk_Display(tkwin), None, win, 0, 0, 0, 0, x, y); 
+    {
+#ifdef _WIN32
+      int wx, wy;
+      Tk_GetRootCoords (tkwin, &wx, &wy);
+      SetCursorPos (wx + x, wy + y);
+#else
+      Window win = Tk_WindowId(tkwin);
+      XWarpPointer(Tk_Display(tkwin), None, win, 0, 0, 0, 0, x, y); 
+#endif
+    }
+
     return TCL_OK;
 }
 
@@ -66,5 +76,3 @@ cyg_create_warp_pointer_command (Tcl_Interp *interp)
     return TCL_ERROR;
   return TCL_OK;
 }
-
-#endif /* !_WIN32 */

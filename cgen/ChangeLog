@@ -1,3 +1,8 @@
+2001-03-05  Dave Brolley  <brolley@redhat.com>
+
+	* sim-decode.scm (-gen-extract-case): Generate declaration of "insn"
+	if the number of ifields is greater than zero.
+
 2001-03-01  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sid.cpu (-op-gen-set-trace[-parallel], -create-virtual-insns!):

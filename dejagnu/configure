@@ -1578,65 +1578,6 @@ TCLSH="${ac_cv_path_tclsh}"
 
 
 
-
-echo $ac_n "checking for STL versions""... $ac_c" 1>&6
-echo "configure:1584: checking for STL versions" >&5
-if eval "test \"`echo '$''{'ac_cv_stl'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-  
-  ac_ext=C
-# CXXFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='${CXX-g++} -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext 1>&5'
-ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
-cross_compiling=$ac_cv_prog_cxx_cross
-
-  cat > conftest.$ac_ext <<EOF
-#line 1597 "configure"
-#include "confdefs.h"
-#include <iostream>
-int main() {
-
-  using namespace std;
-  char bbuuff[5120];
-  cout.rdbuf()->pubsetbuf(bbuuff, 5120); 
-; return 0; }
-EOF
-if { (eval echo configure:1607: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
-  rm -rf conftest*
-  ac_cv_stl=v3
-  
-else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  rm -rf conftest*
-  ac_cv_stl=v2
-  
-fi
-rm -f conftest*,
-
-fi
-
-
-ac_ext=c
-# CFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='${CC-cc} -c $CFLAGS $CPPFLAGS conftest.$ac_ext 1>&5'
-ac_link='${CC-cc} -o conftest${ac_exeext} $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
-cross_compiling=$ac_cv_prog_cc_cross
-
-if test x"${ac_cv_stl}" != x"v2" ; then  
-  echo "$ac_t""v3" 1>&6
-  cat >> confdefs.h <<\EOF
-#define HAVE_STL3 1
-EOF
-
-else
-  echo "$ac_t""v2" 1>&6
-fi
-
-
 BOARDS='$(boards)'
 
 CONFIG='$(config)'

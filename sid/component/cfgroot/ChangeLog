@@ -1,5 +1,16 @@
 2001-05-22  Ben Elliston  <bje@redhat.com>
 
+	* compConfig.cxx (cfgroot_component::num_invalid_chars): New.
+	(cfgroot_component::configure): Initialise it.
+	(cfgroot_component::max_invalid_chars): New enumerator.
+	(cfgroot_component::emit_invalid_char_error): New method.
+	(cfgroot_component::consume_token): Factor out common error
+	handling code into cfgroot_component::emit_invalid_char_error.
+	(cfgroot_component::parse): Stop parsing if too many invalid
+	character codes are encountered and emit an error message.
+
+2001-05-22  Ben Elliston  <bje@redhat.com>
+
 	* compConfig.cxx (cfgroot_component::run): Remove timebomb logic.
 	* configure.in (--enable-timebomb): Remove.
 	* configure: Regenerate.

@@ -65,7 +65,7 @@ else
     TCL_PACKAGE_PATH="${prefix}/lib"
 fi
 
-TCL_LIBRARY =   @datadir@/tcl$(VERSION)
+TCL_LIBRARY=@datadir@/tcl${VERSION}
 
 cross_cache=${srcdir}/cygwin-cache
 . ${cross_cache}

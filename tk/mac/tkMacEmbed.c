@@ -8,7 +8,7 @@
  *	Currently only Toplevel embedding within the same Tk application is
  *      allowed on the Macintosh.
  *
- * Copyright (c) 1996-97 Sun Microsystems, Inc.
+ * Copyright (c) 1996-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -217,7 +217,7 @@ TkpMakeWindow(
  * Results:
  *	The return value is normally TCL_OK.  If an error occurs (such
  *	as string not being a valid window spec), then the return value
- *	is TCL_ERROR and an error message is left in interp->result if
+ *	is TCL_ERROR and an error message is left in the interp's result if
  *	interp is non-NULL.
  *
  * Side effects:
@@ -1190,3 +1190,4 @@ EmbedWindowDeleted(winPtr)
     }
 }
 
+

@@ -2,28 +2,14 @@
 # of Tk.  It is (almost) organized in the standard fashion for Tcl tests.
 #
 # Copyright (c) 1996 Sun Microsystems, Inc.
-#
-# See the file "license.terms" for information on usage and redistribution
-# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
 #
 # RCS: @(#) $Id$
 
-if {[string compare test [info procs test]] == 1} then \
-  {source ../tests/defs}
-
-# Test Arguments:
-# name -                Name of test, in the form foo-1.2.
-# description -         Short textual description of the test, to
-#                       help humans understand what it does.
-# constraints -         A list of one or more keywords, each of
-#                       which must be the name of an element in
-#                       the array "testConfig".  If any of these
-#                       elements is zero, the test is skipped.
-#                       This argument may be omitted.
-# script -              Script to run to carry out the test.  It must
-#                       return a result that can be checked for
-#                       correctness.
-# answer -              Expected result from script.
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    source [file join [pwd] [file dirname [info script]] defs.tcl]
+}
 
 # helper routine to return "." to a sane state after a test
 # The variable GRID_VERBOSE can be used to "look" at the result
@@ -310,18 +296,18 @@ test grid-6.7 {location (y)} {
 grid_reset 6.7
 
 test grid-6.8 {location (weights)} {
-    frame .f -width 200 -height 100 -highlightthickness 0 -bg red
+    frame .f -width 300 -height 100 -highlightthickness 0 -bg red
     frame .a
     grid .a
     grid .f -in .a
     grid rowconfigure .f 0 -weight 1
     grid columnconfigure .f 0 -weight 1
     grid propagate .a 0
-    .a configure -width 110 -height 15
+    .a configure -width 200 -height 15
     update
     set got ""
     set result ""
-    for {set y -10} { $y < 120} { incr y} {
+    for {set y -10} { $y < 210} { incr y} {
 	set a [grid location . $y $y]
 	if {$a != $got} {
 	    lappend result $y->$a
@@ -329,10 +315,10 @@ test grid-6.8 {location (weights)} {
 	}
     }
     set result
-} {{-10->-1 -1} {0->0 0} {16->0 1} {111->1 1}}
+} {{-10->-1 -1} {0->0 0} {16->0 1} {201->1 1}}
 grid_reset 6.8
 
-test grid-6.9 {location: check updates pending} {
+test grid-6.9 {location: check updates pending} {nonPortable} {
 	set a ""
 	foreach i {0 1 2} {
 	    frame .$i -width 120 -height 75 -bg red
@@ -384,7 +370,16 @@ test grid-7.6 {propagate} {
     set a
 } {100x100 100x100 75x85}
 grid_reset 7.6
-
+test grid-7.7 {propagate} {
+    grid propagate . 1
+    set res [list [grid propagate .]]
+    grid propagate . 0
+    lappend res [grid propagate .]
+    grid propagate . 0
+    lappend res [grid propagate .]
+    set res
+} [list 1 0 0]
+grid_reset 7.7
 
 test grid-8.1 {size} {
     list [catch {grid size . foo} msg] $msg
@@ -798,6 +793,22 @@ test grid-11.14 {default widget placement} {
 } {{0,25  50,50} {50,0  50,50} {50,50  50,50}}
 grid_reset 11.14
 
+test grid-11.15 {^ ^ test with multiple windows} {
+    foreach i {1 2 3 4} {
+	frame .f$i -width 50 -height 50 -bd 1 -relief solid
+    }
+    grid .f1 .f2 .f3 -sticky ns
+    grid .f4 ^ ^
+    update
+    set a ""
+    foreach i {1 2 3 4} {
+	lappend a "[winfo x .f$i],[winfo y .f$i]\
+		[winfo width .f$i],[winfo height .f$i]"
+    }
+    set a
+} {{0,0 50,50} {50,0 50,100} {100,0 50,100} {0,50 50,50}}
+grid_reset 11.15
+
 test grid-12.1 {-sticky} {
     catch {unset data}
     frame .f -width 200 -height 100 -highlightthickness 0 -bg red
@@ -1002,23 +1013,26 @@ test grid-14.2 {structure notify} {
 } {{0 0 200 100,0 0 200 100} {0 0 240 140,20 20 200 100}}
 grid_reset 14.2
 
-test grid-14.3 {map notify} {
-	global A
-	catch {unset A}
-	bind . <Configure> {incr A(%W)}
-	set A(.) 0
-	foreach i {0 1 2} {
-		frame .$i -width 100 -height 75
-		set A(.$i) 0
-	}
-	grid .0 .1 .2
-	update
-	bind <Configure> .1 {destroy .0}
-	.2 configure -bd 10
-	update
-	bind . <Configure> {}
-	array get A
-} {.2 2 .0 1 . 1 .1 1}
+test grid-14.3 {map notify: bug 1648} {nonPortable} {
+    # This test is nonPortable because the number of times
+    # A(.) will be incremented is unspecified--the behavior
+    # is different accross window managers.
+    global A
+    catch {unset A}
+    bind . <Configure> {incr A(%W)}
+    set A(.) 0
+    foreach i {0 1 2} {
+	frame .$i -width 100 -height 75
+	set A(.$i) 0
+    }
+    grid .0 .1 .2
+    update
+    bind <Configure> .1 {destroy .0}
+    .2 configure -bd 10
+    update
+    bind . <Configure> {}
+    array get A
+} {.2 2 .0 1 . 2 .1 1}
 grid_reset 14.3
 
 test grid-15.1 {lost slave} {
@@ -1203,3 +1217,44 @@ test grid-16.8 {layout internal constraints} {
     }
     set a
 } {0 30 70 250 280 , 0 30 130 230 260 , 0 30 113 197 280 , 0 30 60 90 120 }
+
+test grid-17.1 {forget and pending idle handlers} {
+    # This test is intended to detect a crash caused by a failure to remove
+    # pending idle handlers when grid forget is invoked.
+
+    toplevel .t
+    wm geometry .t +0+0
+    frame .t.f
+    label .t.f.l -text foobar
+    grid .t.f.l
+    grid .t.f
+    update
+    grid forget .t.f.l
+    grid forget .t.f
+    destroy .t
+
+    toplevel .t
+    frame .t.f
+    label .t.f.l -text foobar
+    grid .t.f.l
+    destroy .t
+    set result ok
+} ok
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+
+

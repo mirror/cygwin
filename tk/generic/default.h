@@ -16,7 +16,8 @@
 #ifndef _DEFAULT
 #define _DEFAULT
 
-#if defined(__WIN32__) || defined(_WIN32)
+#if defined(__WIN32__) || defined(_WIN32) || \
+    defined(__CYGWIN__) || defined(__MINGW32__)
 #   include "tkWinDefault.h"
 #else
 #   if defined(MAC_TCL)
@@ -27,3 +28,4 @@
 #endif
 
 #endif /* _DEFAULT */
+

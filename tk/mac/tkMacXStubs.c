@@ -28,6 +28,7 @@
 #include <ToolUtils.h>
 #include <Sound.h>
 #include "tkMacInt.h"
+#include "tkPort.h"
 
 /*
  * Because this file is still under major development Debugger statements are
@@ -462,6 +463,67 @@ XSendEvent(
     return 0;
 }
 
+void
+XClearWindow(
+    Display* display,
+    Window w)
+{
+}
+
+/*
+void
+XDrawPoint(
+    Display* display,
+    Drawable d,
+    GC gc,
+    int x,
+    int y)
+{
+}
+
+void
+XDrawPoints(
+    Display* display,
+    Drawable d,
+    GC gc,
+    XPoint* points,
+    int npoints,
+    int mode)
+{
+}
+*/
+
+void
+XWarpPointer(
+    Display* display,
+    Window src_w,
+    Window dest_w,
+    int src_x,
+    int src_y,
+    unsigned int src_width,
+    unsigned int src_height,
+    int dest_x,
+    int dest_y)
+{
+}
+
+void
+XQueryColor(
+    Display* display,
+    Colormap colormap,
+    XColor* def_in_out)
+{
+}
+
+void
+XQueryColors(
+    Display* display,
+    Colormap colormap,
+    XColor* defs_in_out,
+    int ncolors)
+{
+}
+
 int
 XGetWindowProperty(
     Display *display,
@@ -515,6 +577,14 @@ XForceScreenSaver(
      */
     display->request++;
 }
+
+void
+Tk_FreeXId (
+    Display *display,
+    XID xid)
+{
+    /* no-op function needed for stubs implementation. */
+}
 
 /*
  *----------------------------------------------------------------------
@@ -541,7 +611,8 @@ TkGetServerInfo(
     Tk_Window tkwin)		/* Token for window;  this selects a
 				 * particular display and server. */
 {
-    char buffer[50], buffer2[50];
+    char buffer[8 + TCL_INTEGER_SPACE * 2];
+    char buffer2[TCL_INTEGER_SPACE];
 
     sprintf(buffer, "X%dR%d ", ProtocolVersion(Tk_Display(tkwin)),
 	    ProtocolRevision(Tk_Display(tkwin)));
@@ -680,6 +751,31 @@ XSetWindowColormap(
     Debugger();
 }
 
+Status		
+XStringListToTextProperty(
+    char** list, 
+    int count, 
+    XTextProperty* text_prop_return)
+{
+    Debugger();
+    return (Status) 0;
+}
+void		
+XSetWMClientMachine(
+    Display* display, 
+    Window w, 
+    XTextProperty* text_prop)
+{
+    Debugger();
+}
+XIC		
+XCreateIC(
+    void)
+{
+    Debugger();
+    return (XIC) 0;
+}
+
 /*
  *----------------------------------------------------------------------
  *
@@ -707,3 +803,4 @@ TkGetDefaultScreenName(
     }
     return screenName;
 }
+

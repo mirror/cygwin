@@ -16,17 +16,15 @@
 #ifndef _TKUNIXINT
 #define _TKUNIXINT
 
+#ifndef _TKINT
+#include "tkInt.h"
+#endif
+
 /*
  * Prototypes for procedures that are referenced in files other
  * than the ones they're defined in.
  */
-
-EXTERN void		TkCreateXEventSource _ANSI_ARGS_((void));
-EXTERN TkWindow *	TkpGetContainer _ANSI_ARGS_((TkWindow *embeddedPtr));
-EXTERN TkWindow *	TkpGetWrapperWindow _ANSI_ARGS_((TkWindow *winPtr));
-EXTERN Window		TkUnixContainerId _ANSI_ARGS_((TkWindow *winPtr));
-EXTERN int		TkUnixDoOneXEvent _ANSI_ARGS_((Tcl_Time *timePtr));
-EXTERN void		TkUnixSetMenubar _ANSI_ARGS_((Tk_Window tkwin,
-				Tk_Window menubar));
+#include "tkIntPlatDecls.h"
 
 #endif /* _TKUNIXINT */
+

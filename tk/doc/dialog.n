@@ -63,3 +63,4 @@ in any way except to invoke the dialog box.
 
 .SH KEYWORDS
 bitmap, dialog, modal
+

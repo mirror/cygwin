@@ -67,8 +67,18 @@ control panel on the Mac allows the end user to override the
 application default directory.
 .TP
 \fB\-initialfile\fR \fIfilename\fR
-Specifies a filename to be displayed in the dialog when it pops
-up. This option is ignored by the \fBtk_getOpenFile\fR command.
+Specifies a filename to be displayed in the dialog when it pops up.  This
+option is ignored on the Macintosh platform.
+.TP
+\fB\-multiple\fR
+Allows the user to choose multiple files from the Open dialog.
+This is only available on the Macintosh, and only when Navigation
+Services are installed.
+.TP
+\fB\-message\fR
+Specifies a message to include in the client area of the dialog.
+This is only available on the Macintosh, and only when Navigation
+Services are installed.
 .TP
 \fB\-parent\fR \fIwindow\fR
 Makes \fIwindow\fR the logical parent of the file dialog. The file
@@ -76,8 +86,7 @@ dialog is displayed on top of its parent window.
 .TP
 \fB\-title\fR \fItitleString\fR
 Specifies a string to display as the title of the dialog box. If this
-option is not specified, then a default title is displayed. This
-option is ignored on the Macintosh platform.
+option is not specified, then a default title is displayed. 
 .PP
 If the user selects a file, both \fBtk_getOpenFile\fR and
 \fBtk_getSaveFile\fR return the full pathname of this file. If the
@@ -152,6 +161,9 @@ if {$filename != ""} {
     # Open the file ...
 }
 .CE
+
+.SH "SEE ALSO"
+tk_chooseDirectory
 
 .SH KEYWORDS
 file selection dialog

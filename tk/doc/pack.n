@@ -264,3 +264,4 @@ the stacking order of either the master or the slave.
 
 .SH KEYWORDS
 geometry manager, location, packer, parcel, propagation, size
+

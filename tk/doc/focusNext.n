@@ -58,3 +58,4 @@ to write a script that deletes the bindings created by
 
 .SH KEYWORDS
 focus, keyboard traversal, top-level
+

@@ -474,3 +474,4 @@ TkpScrollbarPosition(scrollPtr, x, y)
     }
     return BOTTOM_GAP;
 }
+

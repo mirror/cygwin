@@ -69,3 +69,16 @@ $c create bitmap 5.5i 5.5i \
     -bitmap @[file join $tk_library demos/images/flagup.bmp] \
     -background {} -foreground black -anchor se
 $c create rect 5.47i 5.47i 5.53i 5.53i -fill {} -outline black
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -25,6 +25,9 @@ TK_DEFS='@DEFS@'
 # Flag, 1: we built a shared lib, 0 we didn't
 TK_SHARED_BUILD=@TK_SHARED_BUILD@
 
+# This indicates if Tk was build with debugging symbols
+TK_DBGX=@TK_DBGX@
+
 # The name of the Tk library (may be either a .a file or a shared library):
 TK_LIB_FILE='@TK_LIB_FILE@'
 
@@ -54,6 +57,9 @@ TK_XINCLUDES='@XINCLUDES@'
 # Linker switch(es) to use to link with the X11 library archive.
 TK_XLIBSW='@XLIBSW@'
 
+# -l flag to pass to the linker to pick up the Tcl library
+TK_LIB_FLAG='@TK_LIB_FLAG@'
+
 # String to pass to linker to pick up the Tk library from its
 # build directory.
 TK_BUILD_LIB_SPEC='@TK_BUILD_LIB_SPEC@'
@@ -74,4 +80,24 @@ TK_SRC_DIR='@TK_SRC_DIR@'
 # containing tk objects or link a different wish.
 TK_CC_SEARCH_FLAGS='@TK_CC_SEARCH_FLAGS@'
 TK_LD_SEARCH_FLAGS='@TK_LD_SEARCH_FLAGS@'
+
+# The name of the Tk stub library (.a):
+TK_STUB_LIB_FILE='@TK_STUB_LIB_FILE@'
+
+# -l flag to pass to the linker to pick up the Tk stub library
+TK_STUB_LIB_FLAG='@TK_STUB_LIB_FLAG@'
+
+# String to pass to linker to pick up the Tk stub library from its
+# build directory.
+TK_BUILD_STUB_LIB_SPEC='@TK_BUILD_STUB_LIB_SPEC@'
+
+# String to pass to linker to pick up the Tk stub library from its
+# installed directory.
+TK_STUB_LIB_SPEC='@TK_STUB_LIB_SPEC@'
+
+# Path to the Tk stub library in the build directory.
+TK_BUILD_STUB_LIB_PATH='@TK_BUILD_STUB_LIB_PATH@'
+
+# Path to the Tk stub library in the install directory.
+TK_STUB_LIB_PATH='@TK_STUB_LIB_PATH@'
 

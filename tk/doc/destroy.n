@@ -32,3 +32,4 @@ No error is returned if \fIwindow\fR does not exist.
 
 .SH KEYWORDS
 application, destroy, window
+

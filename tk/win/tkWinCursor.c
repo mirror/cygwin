@@ -109,7 +109,36 @@ TkGetCursorByName(interp, tkwin, string)
 	cursorPtr->winCursor = LoadCursor(Tk_GetHINSTANCE(), string);
 	cursorPtr->system = 0;
     }
+    if (string[0] == '@') {
+	int argc;
+	char **argv = NULL;
+	if (Tcl_SplitList(interp, string, &argc, &argv) != TCL_OK) {
+	    return NULL;
+	}
+	/*
+	 * Check for system cursor of type @<filename>, where only
+	 * the name is allowed.  This accepts either:
+	 *	-cursor @/winnt/cursors/globe.ani
+	 *	-cursor @C:/Winnt/cursors/E_arrow.cur
+	 *	-cursor {@C:/Program\ Files/Cursors/bart.ani}
+	 */
+	if ((argc != 1) || (argv[0][0] != '@')) {
+	    ckfree((char *) argv);
+	    goto badCursorSpec;
+	}
+	if (Tcl_IsSafe(interp)) {
+	    Tcl_AppendResult(interp, "can't get cursor from a file in",
+		    " a safe interpreter", (char *) NULL);
+	    ckfree((char *) argv);
+	    ckfree((char *)cursorPtr);
+	    return NULL;
+	}
+	cursorPtr->winCursor = LoadCursorFromFile(&(argv[0][1]));
+	cursorPtr->system = 0;
+	ckfree((char *) argv);
+    }
     if (cursorPtr->winCursor == NULL) {
+	badCursorSpec:
 	ckfree((char *)cursorPtr);
 	Tcl_AppendResult(interp, "bad cursor spec \"", string, "\"",
 		(char *) NULL);
@@ -152,7 +181,7 @@ TkCreateCursorFromData(tkwin, source, mask, width, height, xHot, yHot,
 /*
  *----------------------------------------------------------------------
  *
- * TkFreeCursor --
+ * TkpFreeCursor --
  *
  *	This procedure is called to release a cursor allocated by
  *	TkGetCursorByName.
@@ -167,11 +196,10 @@ TkCreateCursorFromData(tkwin, source, mask, width, height, xHot, yHot,
  */
 
 void
-TkFreeCursor(cursorPtr)
+TkpFreeCursor(cursorPtr)
     TkCursor *cursorPtr;
 {
     TkWinCursor *winCursorPtr = (TkWinCursor *) cursorPtr;
-    ckfree((char *) winCursorPtr);
 }
 
 /*
@@ -208,3 +236,4 @@ TkpSetCursor(cursor)
 	SetCursor(hcursor);
     }
 }
+

@@ -14,9 +14,6 @@
  */
 
 #include "tkPort.h"
-#include "tk.h"
-
-/* CYGNUS LOCAL, for TkRegisterColorGC.  */
 #include "tkInt.h"
 
 /*
@@ -32,46 +29,20 @@ typedef struct {
     int refCount;		/* Number of active uses of gc. */
     Tcl_HashEntry *valueHashPtr;/* Entry in valueTable (needed when deleting
 				 * this structure). */
-    /* CYGNUS LOCAL.  */
-    XColor *foreground;		/* Foreground color.  */
-    XColor *background;		/* Background color.  */
 } TkGC;
 
-/*
- * Hash table to map from a GC's values to a TkGC structure describing
- * a GC with those values (used by Tk_GetGC).
- */
-
-static Tcl_HashTable valueTable;
 typedef struct {
     XGCValues values;		/* Desired values for GC. */
     Display *display;		/* Display for which GC is valid. */
     int screenNum;		/* screen number of display */
     int depth;			/* and depth for which GC is valid. */
-    /* CYGNUS LOCAL.  */
-    XColor *foreground;		/* Foreground color.  */
-    XColor *background;		/* Background color.  */
 } ValueKey;
-
-/*
- * Hash table for <display + GC> -> TkGC mapping. This table is used by
- * Tk_FreeGC.
- */
-
-static Tcl_HashTable idTable;
-typedef struct {
-    Display *display;		/* Display for which GC was allocated. */
-    GC gc;			/* X's identifier for GC. */
-} IdKey;
-
-static int initialized = 0;	/* 0 means static structures haven't been
-				 * initialized yet. */
 
 /*
  * Forward declarations for procedures defined in this file:
  */
 
-static void		GCInit _ANSI_ARGS_((void));
+static void		GCInit _ANSI_ARGS_((TkDisplay *dispPtr));
 
 /*
  *----------------------------------------------------------------------
@@ -95,11 +66,8 @@ static void		GCInit _ANSI_ARGS_((void));
  *----------------------------------------------------------------------
  */
 
-/* CYGNUS LOCAL: Rename this to Tk_GetGCColor.  The new Tk_GetGC is
-   below.  */
-
 GC
-Tk_GetGCColor(tkwin, valueMask, valuePtr, foreground, background)
+Tk_GetGC(tkwin, valueMask, valuePtr)
     Tk_Window tkwin;		/* Window in which GC will be used. */
     register unsigned long valueMask;
 				/* 1 bits correspond to values specified
@@ -108,30 +76,17 @@ Tk_GetGCColor(tkwin, valueMask, valuePtr, foreground, background)
     register XGCValues *valuePtr;
 				/* Values are specified here for bits set
 				 * in valueMask. */
-    /* CYGNUS LOCAL.  */
-    XColor *foreground;		/* Foreground color. */
-    XColor *background;		/* Background color. */
 {
     ValueKey valueKey;
-    IdKey idKey;
     Tcl_HashEntry *valueHashPtr, *idHashPtr;
     register TkGC *gcPtr;
     int new;
     Drawable d, freeDrawable;
+    TkDisplay *dispPtr = ((TkWindow *) tkwin)->dispPtr;
 
-    if (!initialized) {
-	GCInit();
+    if (!dispPtr->gcInit) {
+	GCInit(dispPtr);
     }
-
-#if !defined(__WIN32__) && !defined(_WIN32)
-    /* CYGNUS LOCAL.  We only care about special foreground and
-       background colors on Windows.  If we are on some other
-       platform, just ignore them.  If we don't do this, we may
-       allocate an unnecessary GC if we have two colors with different
-       names but the same pixel value.  */
-    foreground = NULL;
-    background = NULL;
-#endif
 
     /*
      * Must zero valueKey at start to clear out pad bytes that may be
@@ -263,12 +218,8 @@ Tk_GetGCColor(tkwin, valueMask, valuePtr, foreground, background)
     valueKey.display = Tk_Display(tkwin);
     valueKey.screenNum = Tk_ScreenNumber(tkwin);
     valueKey.depth = Tk_Depth(tkwin);
-
-    /* CYGNUS LOCAL.  Set colors.  */
-    valueKey.foreground = foreground;
-    valueKey.background = background;
-
-    valueHashPtr = Tcl_CreateHashEntry(&valueTable, (char *) &valueKey, &new);
+    valueHashPtr = Tcl_CreateHashEntry(&dispPtr->gcValueTable, 
+            (char *) &valueKey, &new);
     if (!new) {
 	gcPtr = (TkGC *) Tcl_GetHashValue(valueHashPtr);
 	gcPtr->refCount++;
@@ -305,9 +256,8 @@ Tk_GetGCColor(tkwin, valueMask, valuePtr, foreground, background)
     gcPtr->display = valueKey.display;
     gcPtr->refCount = 1;
     gcPtr->valueHashPtr = valueHashPtr;
-    idKey.display = valueKey.display;
-    idKey.gc = gcPtr->gc;
-    idHashPtr = Tcl_CreateHashEntry(&idTable, (char *) &idKey, &new);
+    idHashPtr = Tcl_CreateHashEntry(&dispPtr->gcIdTable, 
+            (char *) gcPtr->gc, &new);
     if (!new) {
 	panic("GC already registered in Tk_GetGC");
     }
@@ -317,35 +267,7 @@ Tk_GetGCColor(tkwin, valueMask, valuePtr, foreground, background)
 	Tk_FreePixmap(valueKey.display, freeDrawable);
     }
 
-    /* CYGNUS LOCAL.  Record and register the colors.  */
-    gcPtr->foreground = foreground;
-    gcPtr->background = background;
-    if (foreground != NULL) {
-	TkRegisterColorGC(foreground, valueKey.display, gcPtr->gc,
-			  GCForeground);
-    }
-    if (background != NULL) {
-	TkRegisterColorGC(background, valueKey.display, gcPtr->gc,
-			  GCBackground);
-    }
-
     return gcPtr->gc;
-}
-
-/* CYGNUS LOCAL.  Tk_GetGC now just calls Tk_GetGCColor.  */
-
-GC
-Tk_GetGC(tkwin, valueMask, valuePtr)
-    Tk_Window tkwin;		/* Window in which GC will be used. */
-    register unsigned long valueMask;
-				/* 1 bits correspond to values specified
-				 * in *valuesPtr;  other values are set
-				 * from defaults. */
-    register XGCValues *valuePtr;
-				/* Values are specified here for bits set
-				 * in valueMask. */
-{
-    return Tk_GetGCColor(tkwin, valueMask, valuePtr, NULL, NULL);
 }
 
 /*
@@ -371,33 +293,21 @@ Tk_FreeGC(display, gc)
     Display *display;		/* Display for which gc was allocated. */
     GC gc;			/* Graphics context to be released. */
 {
-    IdKey idKey;
     Tcl_HashEntry *idHashPtr;
     register TkGC *gcPtr;
+    TkDisplay *dispPtr = TkGetDisplay(display);
 
-    if (!initialized) {
+    if (!dispPtr->gcInit) {
 	panic("Tk_FreeGC called before Tk_GetGC");
     }
 
-    idKey.display = display;
-    idKey.gc = gc;
-    idHashPtr = Tcl_FindHashEntry(&idTable, (char *) &idKey);
+    idHashPtr = Tcl_FindHashEntry(&dispPtr->gcIdTable, (char *) gc);
     if (idHashPtr == NULL) {
 	panic("Tk_FreeGC received unknown gc argument");
     }
     gcPtr = (TkGC *) Tcl_GetHashValue(idHashPtr);
     gcPtr->refCount--;
     if (gcPtr->refCount == 0) {
-	/* CYGNUS LOCAL: Deregister the colors.  */
-	if (gcPtr->foreground != NULL) {
-	    TkDeregisterColorGC(gcPtr->foreground, gcPtr->gc,
-				GCForeground);
-	}
-	if (gcPtr->background != NULL) {
-	    TkDeregisterColorGC(gcPtr->background, gcPtr->gc,
-				GCBackground);
-	}
-
 	Tk_FreeXId(gcPtr->display, (XID) XGContextFromGC(gcPtr->gc));
 	XFreeGC(gcPtr->display, gcPtr->gc);
 	Tcl_DeleteHashEntry(gcPtr->valueHashPtr);
@@ -423,9 +333,10 @@ Tk_FreeGC(display, gc)
  */
 
 static void
-GCInit()
+GCInit(dispPtr)
+    TkDisplay *dispPtr;
 {
-    initialized = 1;
-    Tcl_InitHashTable(&valueTable, sizeof(ValueKey)/sizeof(int));
-    Tcl_InitHashTable(&idTable, sizeof(IdKey)/sizeof(int));
+    dispPtr->gcInit = 1;
+    Tcl_InitHashTable(&dispPtr->gcValueTable, sizeof(ValueKey)/sizeof(int));
+    Tcl_InitHashTable(&dispPtr->gcIdTable, TCL_ONE_WORD_KEYS);
 }

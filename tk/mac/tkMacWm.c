@@ -205,6 +205,8 @@ typedef struct TkWmInfo {
      * Macintosh information.
      */
     int style;			/* Native window style. */
+    int macClass;
+    int attributes;
     TkWindow *scrollWinPtr;	/* Ptr to scrollbar handling grow widget. */
 } WmInfo;
 
@@ -402,7 +404,13 @@ TkWmNewWindow(
     wmPtr->cmdArgv = NULL;
     wmPtr->clientMachine = NULL;
     wmPtr->flags = WM_NEVER_MAPPED;
-    wmPtr->style = zoomDocProc;
+    if (TkMacHaveAppearance() >= 0x110) {
+        wmPtr->style = -1;
+    } else {
+        wmPtr->style = documentProc;
+    }
+    wmPtr->macClass = kDocumentWindowClass;
+    wmPtr->attributes = kWindowStandardDocumentAttributes;
     wmPtr->scrollWinPtr = NULL;
     winPtr->wmInfoPtr = wmPtr;
 
@@ -709,7 +717,7 @@ Tk_WmCmd(
 	    return TCL_ERROR;
 	}
 	if (argc == 2) {
-	    interp->result = (wmTracing) ? "on" : "off";
+	    Tcl_SetResult(interp, ((wmTracing) ? "on" : "off"), TCL_STATIC);
 	    return TCL_OK;
 	}
 	return Tcl_GetBoolean(interp, argv[2], &wmTracing);
@@ -739,9 +747,12 @@ Tk_WmCmd(
 	}
 	if (argc == 3) {
 	    if (wmPtr->sizeHintsFlags & PAspect) {
-		sprintf(interp->result, "%d %d %d %d", wmPtr->minAspect.x,
+		char buf[TCL_INTEGER_SPACE * 4];
+
+		sprintf(buf, "%d %d %d %d", wmPtr->minAspect.x,
 			wmPtr->minAspect.y, wmPtr->maxAspect.x,
 			wmPtr->maxAspect.y);
+		Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    }
 	    return TCL_OK;
 	}
@@ -756,7 +767,8 @@ Tk_WmCmd(
 	    }
 	    if ((numer1 <= 0) || (denom1 <= 0) || (numer2 <= 0) ||
 		    (denom2 <= 0)) {
-		interp->result = "aspect number can't be <= 0";
+		Tcl_SetResult(interp, "aspect number can't be <= 0",
+			TCL_STATIC);
 		return TCL_ERROR;
 	    }
 	    wmPtr->minAspect.x = numer1;
@@ -777,7 +789,7 @@ Tk_WmCmd(
 	}
 	if (argc == 3) {
 	    if (wmPtr->clientMachine != NULL) {
-		interp->result = wmPtr->clientMachine;
+		Tcl_SetResult(interp, wmPtr->clientMachine, TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -798,7 +810,7 @@ Tk_WmCmd(
 	    && (length >= 3)) {
 	TkWindow **cmapList;
 	TkWindow *winPtr2;
-	int i, windowArgc, gotToplevel;
+	int i, windowArgc, gotToplevel = 0;
 	char **windowArgv;
 
 	if ((argc != 3) && (argc != 4)) {
@@ -875,8 +887,9 @@ Tk_WmCmd(
 	}
 	if (argc == 3) {
 	    if (wmPtr->cmdArgv != NULL) {
-		interp->result = Tcl_Merge(wmPtr->cmdArgc, wmPtr->cmdArgv);
-		interp->freeProc = (Tcl_FreeProc *) free;
+		Tcl_SetResult(interp,
+			Tcl_Merge(wmPtr->cmdArgc, wmPtr->cmdArgv),
+			TCL_DYNAMIC);
 	    }
 	    return TCL_OK;
 	}
@@ -926,7 +939,8 @@ Tk_WmCmd(
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
-	    interp->result = wmPtr->hints.input ? "passive" : "active";
+	    Tcl_SetResult(interp, (wmPtr->hints.input ? "passive" : "active"),
+		    TCL_STATIC);
 	    return TCL_OK;
 	}
 	c = argv[3][0];
@@ -943,6 +957,7 @@ Tk_WmCmd(
     } else if ((c == 'f') && (strncmp(argv[1], "frame", length) == 0)
 	    && (length >= 2)) {
 	Window window;
+	char buf[TCL_INTEGER_SPACE];
 
 	if (argc != 3) {
 	    Tcl_AppendResult(interp, "wrong # arguments: must be \"",
@@ -953,7 +968,8 @@ Tk_WmCmd(
 	if (window == None) {
 	    window = Tk_WindowId((Tk_Window) winPtr);
 	}
-	sprintf(interp->result, "0x%x", (unsigned int) window);
+	sprintf(buf, "0x%x", (unsigned int) window);
+	Tcl_SetResult(interp, buf, TCL_VOLATILE);
     } else if ((c == 'g') && (strncmp(argv[1], "geometry", length) == 0)
 	    && (length >= 2)) {
 	char xSign, ySign;
@@ -966,6 +982,8 @@ Tk_WmCmd(
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
+	    char buf[16 + TCL_INTEGER_SPACE * 4];
+
 	    xSign = (wmPtr->flags & WM_NEGATIVE_X) ? '-' : '+';
 	    ySign = (wmPtr->flags & WM_NEGATIVE_Y) ? '-' : '+';
 	    if (wmPtr->gridWin != NULL) {
@@ -977,8 +995,9 @@ Tk_WmCmd(
 		width = winPtr->changes.width;
 		height = winPtr->changes.height;
 	    }
-	    sprintf(interp->result, "%dx%d%c%d%c%d", width, height,
-		    xSign, wmPtr->x, ySign, wmPtr->y);
+	    sprintf(buf, "%dx%d%c%d%c%d", width, height, xSign, wmPtr->x,
+		    ySign, wmPtr->y);
+	    Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    return TCL_OK;
 	}
 	if (*argv[3] == '\0') {
@@ -999,9 +1018,12 @@ Tk_WmCmd(
 	}
 	if (argc == 3) {
 	    if (wmPtr->sizeHintsFlags & PBaseSize) {
-		sprintf(interp->result, "%d %d %d %d", wmPtr->reqGridWidth,
+		char buf[TCL_INTEGER_SPACE * 4];
+
+		sprintf(buf, "%d %d %d %d", wmPtr->reqGridWidth,
 			wmPtr->reqGridHeight, wmPtr->widthInc,
 			wmPtr->heightInc);
+		Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    }
 	    return TCL_OK;
 	}
@@ -1028,19 +1050,19 @@ Tk_WmCmd(
 		return TCL_ERROR;
 	    }
 	    if (reqWidth < 0) {
-		interp->result = "baseWidth can't be < 0";
+		Tcl_SetResult(interp, "baseWidth can't be < 0", TCL_STATIC);
 		return TCL_ERROR;
 	    }
 	    if (reqHeight < 0) {
-		interp->result = "baseHeight can't be < 0";
+		Tcl_SetResult(interp, "baseHeight can't be < 0", TCL_STATIC);
 		return TCL_ERROR;
 	    }
 	    if (widthInc < 0) {
-		interp->result = "widthInc can't be < 0";
+		Tcl_SetResult(interp, "widthInc can't be < 0", TCL_STATIC);
 		return TCL_ERROR;
 	    }
 	    if (heightInc < 0) {
-		interp->result = "heightInc can't be < 0";
+		Tcl_SetResult(interp, "heightInc can't be < 0", TCL_STATIC);
 		return TCL_ERROR;
 	    }
 	    Tk_SetGrid((Tk_Window) winPtr, reqWidth, reqHeight, widthInc,
@@ -1060,7 +1082,7 @@ Tk_WmCmd(
 	}
 	if (argc == 3) {
 	    if (wmPtr->hints.flags & WindowGroupHint) {
-		interp->result = wmPtr->leaderName;
+		Tcl_SetResult(interp, wmPtr->leaderName, TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1093,8 +1115,9 @@ Tk_WmCmd(
 	}
 	if (argc == 3) {
 	    if (wmPtr->hints.flags & IconPixmapHint) {
-		interp->result = Tk_NameOfBitmap(winPtr->display,
-			wmPtr->hints.icon_pixmap);
+		Tcl_SetResult(interp,
+			Tk_NameOfBitmap(winPtr->display, wmPtr->hints.icon_pixmap),
+			TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1153,8 +1176,9 @@ Tk_WmCmd(
 	}
 	if (argc == 3) {
 	    if (wmPtr->hints.flags & IconMaskHint) {
-		interp->result = Tk_NameOfBitmap(winPtr->display,
-			wmPtr->hints.icon_mask);
+		Tcl_SetResult(interp,
+			Tk_NameOfBitmap(winPtr->display, wmPtr->hints.icon_mask),
+			TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1179,7 +1203,9 @@ Tk_WmCmd(
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
-	    interp->result = (wmPtr->iconName != NULL) ? wmPtr->iconName : "";
+	    Tcl_SetResult(interp,
+		    ((wmPtr->iconName != NULL) ? wmPtr->iconName : ""),
+		    TCL_STATIC);
 	    return TCL_OK;
 	} else {
 	    wmPtr->iconName = Tk_GetUid(argv[3]);
@@ -1199,8 +1225,11 @@ Tk_WmCmd(
 	}
 	if (argc == 3) {
 	    if (wmPtr->hints.flags & IconPositionHint) {
-		sprintf(interp->result, "%d %d", wmPtr->hints.icon_x,
+		char buf[TCL_INTEGER_SPACE * 2];
+		
+		sprintf(buf, "%d %d", wmPtr->hints.icon_x,
 			wmPtr->hints.icon_y);
+		Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    }
 	    return TCL_OK;
 	}
@@ -1228,7 +1257,7 @@ Tk_WmCmd(
 	}
 	if (argc == 3) {
 	    if (wmPtr->icon != NULL) {
-		interp->result = Tk_PathName(wmPtr->icon);
+		Tcl_SetResult(interp, Tk_PathName(wmPtr->icon), TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1282,8 +1311,10 @@ Tk_WmCmd(
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
-	    sprintf(interp->result, "%d %d", wmPtr->maxWidth,
-		    wmPtr->maxHeight);
+	    char buf[TCL_INTEGER_SPACE * 2];
+	    
+	    sprintf(buf, "%d %d", wmPtr->maxWidth, wmPtr->maxHeight);
+	    Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    return TCL_OK;
 	}
 	if ((Tcl_GetInt(interp, argv[3], &width) != TCL_OK)
@@ -1303,8 +1334,10 @@ Tk_WmCmd(
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
-	    sprintf(interp->result, "%d %d", wmPtr->minWidth,
-		    wmPtr->minHeight);
+	    char buf[TCL_INTEGER_SPACE * 2];
+	    
+	    sprintf(buf, "%d %d", wmPtr->minWidth, wmPtr->minHeight);
+	    Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    return TCL_OK;
 	}
 	if ((Tcl_GetInt(interp, argv[3], &width) != TCL_OK)
@@ -1328,19 +1361,19 @@ Tk_WmCmd(
 	}
 	if (argc == 3) {
 	    if (Tk_Attributes((Tk_Window) winPtr)->override_redirect) {
-		interp->result = "1";
+		Tcl_SetResult(interp, "1", TCL_STATIC);
 	    } else {
-		interp->result = "0";
+		Tcl_SetResult(interp, "0", TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
 	if (Tcl_GetBoolean(interp, argv[3], &boolean) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	atts.override_redirect = (boolean) ? True : False;
-	Tk_ChangeWindowAttributes((Tk_Window) winPtr, CWOverrideRedirect,
-		&atts);
-	wmPtr->style = (boolean) ? plainDBox : documentProc;
+	    atts.override_redirect = (boolean) ? True : False;
+	    Tk_ChangeWindowAttributes((Tk_Window) winPtr, CWOverrideRedirect,
+		    &atts);
+	    wmPtr->style = (boolean) ? plainDBox : documentProc;
     } else if ((c == 'p') && (strncmp(argv[1], "positionfrom", length) == 0)
 	    && (length >= 2)) {
 	if ((argc != 3) && (argc != 4)) {
@@ -1351,9 +1384,9 @@ Tk_WmCmd(
 	}
 	if (argc == 3) {
 	    if (wmPtr->sizeHintsFlags & USPosition) {
-		interp->result = "user";
+		Tcl_SetResult(interp, "user", TCL_STATIC);
 	    } else if (wmPtr->sizeHintsFlags & PPosition) {
-		interp->result = "program";
+		Tcl_SetResult(interp, "program", TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1408,7 +1441,7 @@ Tk_WmCmd(
 	    for (protPtr = wmPtr->protPtr; protPtr != NULL;
 					   protPtr = protPtr->nextPtr) {
 		if (protPtr->protocol == protocol) {
-		    interp->result = protPtr->command;
+		    Tcl_SetResult(interp, protPtr->command, TCL_STATIC);
 		    return TCL_OK;
 		}
 	    }
@@ -1452,9 +1485,12 @@ Tk_WmCmd(
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
-	    sprintf(interp->result, "%d %d",
+	    char buf[TCL_INTEGER_SPACE * 2];
+
+	    sprintf(buf, "%d %d",
 		    (wmPtr->flags  & WM_WIDTH_NOT_RESIZABLE) ? 0 : 1,
 		    (wmPtr->flags  & WM_HEIGHT_NOT_RESIZABLE) ? 0 : 1);
+	    Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    return TCL_OK;
 	}
 	if ((Tcl_GetBoolean(interp, argv[3], &width) != TCL_OK)
@@ -1487,9 +1523,9 @@ Tk_WmCmd(
 	}
 	if (argc == 3) {
 	    if (wmPtr->sizeHintsFlags & USSize) {
-		interp->result = "user";
+		Tcl_SetResult(interp, "user", TCL_STATIC);
 	    } else if (wmPtr->sizeHintsFlags & PSize) {
-		interp->result = "program";
+		Tcl_SetResult(interp, "program", TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1515,27 +1551,80 @@ Tk_WmCmd(
 	goto updateGeom;
     } else if ((c == 's') && (strncmp(argv[1], "state", length) == 0)
 	    && (length >= 2)) {
-	if (argc != 3) {
+	if ((argc < 3) || (argc > 4)) {
 	    Tcl_AppendResult(interp, "wrong # arguments: must be \"",
-		    argv[0], " state window\"", (char *) NULL);
+		    argv[0], " state window ?state?\"", (char *) NULL);
 	    return TCL_ERROR;
 	}
-	if (wmPtr->iconFor != NULL) {
-	    interp->result = "icon";
+	if (argc == 4) {
+	    if (wmPtr->iconFor != NULL) {
+		Tcl_AppendResult(interp, "can't change state of ", argv[2],
+			": it is an icon for ", Tk_PathName(wmPtr->iconFor),
+			(char *) NULL);
+		return TCL_ERROR;
+	    }
+	    if (winPtr->flags & TK_EMBEDDED) {
+		Tcl_AppendResult(interp, "can't change state of ",
+			winPtr->pathName, ": it is an embedded window",
+			(char *) NULL);
+		return TCL_ERROR;
+	    }
+
+	    c = argv[3][0];
+	    length = strlen(argv[3]);
+
+	    if ((c == 'n') && (strncmp(argv[3], "normal", length) == 0)) {
+		TkpWmSetState(winPtr, NormalState);
+		/*
+		 * This varies from 'wm deiconify' because it does not
+		 * force the window to be raised and receive focus
+		 */
+	    } else if ((c == 'i')
+		    && (strncmp(argv[3], "iconic", length) == 0)) {
+		if (Tk_Attributes((Tk_Window) winPtr)->override_redirect) {
+		    Tcl_AppendResult(interp, "can't iconify \"",
+			    winPtr->pathName,
+			    "\": override-redirect flag is set",
+			    (char *) NULL);
+		    return TCL_ERROR;
+		}
+		if (wmPtr->master != NULL) {
+		    Tcl_AppendResult(interp, "can't iconify \"",
+			    winPtr->pathName,
+			    "\": it is a transient", (char *) NULL);
+		    return TCL_ERROR;
+		}
+		TkpWmSetState(winPtr, IconicState);
+	    } else if ((c == 'w')
+		    && (strncmp(argv[3], "withdrawn", length) == 0)) {
+		TkpWmSetState(winPtr, WithdrawnState);
+	    } else if ((c == 'z')
+		    && (strncmp(argv[3], "zoomed", length) == 0)) {
+		TkpWmSetState(winPtr, ZoomState);
+	    } else {
+		Tcl_AppendResult(interp, "bad argument \"", argv[3],
+			"\": must be normal, iconic, withdrawn or zoomed",
+			(char *) NULL);
+		return TCL_ERROR;
+	    }
 	} else {
-	    switch (wmPtr->hints.initial_state) {
-		case NormalState:
-		    interp->result = "normal";
-		    break;
-		case IconicState:
-		    interp->result = "iconic";
-		    break;
-		case WithdrawnState:
-		    interp->result = "withdrawn";
-		    break;
-		case ZoomState:
-		    interp->result = "zoomed";
-		    break;
+	    if (wmPtr->iconFor != NULL) {
+		Tcl_SetResult(interp, "icon", TCL_STATIC);
+	    } else {
+		switch (wmPtr->hints.initial_state) {
+		    case NormalState:
+			Tcl_SetResult(interp, "normal", TCL_STATIC);
+			break;
+		    case IconicState:
+			Tcl_SetResult(interp, "iconic", TCL_STATIC);
+			break;
+		    case WithdrawnState:
+			Tcl_SetResult(interp, "withdrawn", TCL_STATIC);
+			break;
+		    case ZoomState:
+			Tcl_SetResult(interp, "zoomed", TCL_STATIC);
+			break;
+		}
 	    }
 	}
     } else if ((c == 't') && (strncmp(argv[1], "title", length) == 0)
@@ -1546,8 +1635,9 @@ Tk_WmCmd(
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
-	    interp->result = (wmPtr->titleUid != NULL) ? wmPtr->titleUid
-		: winPtr->nameUid;
+	    Tcl_SetResult(interp,
+		    ((wmPtr->titleUid != NULL) ? wmPtr->titleUid : winPtr->nameUid),
+		    TCL_STATIC);
 	    return TCL_OK;
 	} else {
 	    wmPtr->titleUid = Tk_GetUid(argv[3]);
@@ -1566,7 +1656,7 @@ Tk_WmCmd(
 	}
 	if (argc == 3) {
 	    if (wmPtr->master != None) {
-		interp->result = wmPtr->masterWindowName;
+		Tcl_SetResult(interp, wmPtr->masterWindowName, TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -2146,7 +2236,7 @@ UpdateSizeHints(
  *
  * Results:
  *	A standard Tcl return value, plus an error message in
- *	interp->result if an error occurs.
+ *	the interp's result if an error occurs.
  *
  * Side effects:
  *	The size and/or location of winPtr may change.
@@ -2399,6 +2489,7 @@ Tk_CoordsToWindow(
 				 * far that contains point. */
     int x, y;			/* Coordinates in winPtr. */
     int tmpx, tmpy, bd;
+    TkDisplay *dispPtr;
 
     /*
      * Step 1: find the top-level window that contains the desired point.
@@ -2411,7 +2502,8 @@ Tk_CoordsToWindow(
 	return NULL;
     }
     rootChild = TkMacGetXWindow(whichWin);
-    winPtr = (TkWindow *) Tk_IdToWindow(tkDisplayList->display, rootChild);
+    dispPtr = TkGetDisplayList();
+    winPtr = (TkWindow *) Tk_IdToWindow(dispPtr->display, rootChild);
     if (winPtr == NULL) {
         return NULL;
     }
@@ -2895,7 +2987,12 @@ TkWmRestackToplevel(
 	otherMacWindow = NULL;
     }
 	
+    if (TkMacHaveAppearance() >= 0x110) {
+        frontWindow = (WindowPeek) FrontNonFloatingWindow();
+    } else {	
     frontWindow = (WindowPeek) FrontWindow();
+    }
+    
     if (aboveBelow == Above) {
 	if (macWindow == frontWindow) {
 	    /* 
@@ -3255,6 +3352,7 @@ TkMacGrowToplevel(
     Point start)
 {
     Point where = start;
+    TkDisplay *dispPtr;
 
     GlobalToLocal(&where);
     if (where.h > (whichWindow->portRect.right - 16) &&
@@ -3267,7 +3365,8 @@ TkMacGrowToplevel(
 	long growResult;
 
 	window = TkMacGetXWindow(whichWindow);
-	winPtr = (TkWindow *) Tk_IdToWindow(tkDisplayList->display, window);
+	dispPtr = TkGetDisplayList();
+	winPtr = (TkWindow *) Tk_IdToWindow(dispPtr->display, window);
 	wmPtr = winPtr->wmInfoPtr;
 	
 	/* TODO: handle grid size options. */
@@ -3330,15 +3429,19 @@ TkSetWMName(
 {
     Str255  pTitle;
     GWorldPtr macWin;
+    int destWrote;
     
     if (Tk_IsEmbedded(winPtr)) {
         return;
     }
+    Tcl_UtfToExternal(NULL, NULL, titleUid,
+	    strlen(titleUid), 0, NULL, 
+	    (char *) &pTitle[1],
+	    255, NULL, &destWrote, NULL); /* Internalize native */
+    pTitle[0] = destWrote;
     
-     macWin = TkMacGetDrawablePort(winPtr->window);
-	
-    strcpy((char *) pTitle + 1, titleUid);
-    pTitle[0] = strlen(titleUid);
+    macWin = TkMacGetDrawablePort(winPtr->window);
+
     SetWTitle((WindowPtr) macWin, pTitle);
 }
 
@@ -3583,6 +3686,7 @@ TkMacZoomToplevel(
     Point location = {0, 0};
     int xOffset, yOffset;
     WmInfo *wmPtr;
+    TkDisplay *dispPtr;
 
     SetPort(whichWindow);
     if (!TrackBox(whichWindow, where, zoomPart)) {
@@ -3595,7 +3699,8 @@ TkMacZoomToplevel(
      * has changed.
      */
     window = TkMacGetXWindow(whichWindow);
-    tkwin = Tk_IdToWindow(tkDisplayList->display, window);
+    dispPtr = TkGetDisplayList();
+    tkwin = Tk_IdToWindow(dispPtr->display, window);
     if (tkwin == NULL) {
 	return false;
     }
@@ -3687,58 +3792,147 @@ TkUnsupported1Cmd(
     c = argv[1][0];
     length = strlen(argv[1]);
     if ((c == 's')  && (strncmp(argv[1], "style", length) == 0)) {
-	if ((argc != 3) && (argc != 4)) {
-	    Tcl_AppendResult(interp, "wrong # arguments: must be \"",
-		    argv[0], " style window ?windowStyle?\"",
-		    (char *) NULL);
-	    return TCL_ERROR;
+        if (TkMacHaveAppearance() >= 0x110) {
+	    if ((argc < 3) || (argc > 5)) {
+	        Tcl_AppendResult(interp, "wrong # arguments: must be \"",
+		        argv[0], " style window ?windowStyle?\"",
+		        " or \"", argv[0], "style window ?class attributes?\"",
+		        (char *) NULL);
+	        return TCL_ERROR;
+	    }
+	} else {
+	    if ((argc != 3) && (argc != 4)) {
+	        Tcl_AppendResult(interp, "wrong # arguments: must be \"",
+		        argv[0], " style window ?windowStyle?\"",
+		        (char *) NULL);
+	        return TCL_ERROR;
+	    }
 	}
+	
 	if (argc == 3) {
+	    int appearanceSpec = 0;
+	    
 	    switch (wmPtr->style) {
+	        case -1:
+	            appearanceSpec = 1;
+	            break;
 		case noGrowDocProc:
 		case documentProc:
-		    interp->result = "documentProc";
+		    Tcl_SetResult(interp, "documentProc", TCL_STATIC);
 		    break;
 		case dBoxProc:
-		    interp->result = "dBoxProc";
+		    Tcl_SetResult(interp, "dBoxProc", TCL_STATIC);
 		    break;
 		case plainDBox:
-		    interp->result = "plainDBox";
+		    Tcl_SetResult(interp, "plainDBox", TCL_STATIC);
 		    break;
 		case altDBoxProc:
-		    interp->result = "altDBoxProc";
+		    Tcl_SetResult(interp, "altDBoxProc", TCL_STATIC);
 		    break;
 		case movableDBoxProc:
-		    interp->result = "movableDBoxProc";
+		    Tcl_SetResult(interp, "movableDBoxProc", TCL_STATIC);
 		    break;
 		case zoomDocProc:
 		case zoomNoGrow:
-		    interp->result = "zoomDocProc";
+		    Tcl_SetResult(interp, "zoomDocProc", TCL_STATIC);
 		    break;
 		case rDocProc:
-		    interp->result = "rDocProc";
+		    Tcl_SetResult(interp, "rDocProc", TCL_STATIC);
 		    break;
 		case floatProc:
 		case floatGrowProc:
-		    interp->result = "floatProc";
+		    Tcl_SetResult(interp, "floatProc", TCL_STATIC);
 		    break;
 		case floatZoomProc:
 		case floatZoomGrowProc:
-		    interp->result = "floatZoomProc";
+		    Tcl_SetResult(interp, "floatZoomProc", TCL_STATIC);
 		    break;
 		case floatSideProc:
 		case floatSideGrowProc:
-		    interp->result = "floatSideProc";
+		    Tcl_SetResult(interp, "floatSideProc", TCL_STATIC);
 		    break;
 		case floatSideZoomProc:
 		case floatSideZoomGrowProc:
-		    interp->result = "floatSideZoomProc";
+		    Tcl_SetResult(interp, "floatSideZoomProc", TCL_STATIC);
 		    break;
 		default:
 		   panic("invalid style");
 	    }
+	    if (appearanceSpec) {
+	        Tcl_Obj *attributeList, *newResult;
+	        
+	        switch (wmPtr->macClass) {
+	            case kAlertWindowClass:
+	                newResult = Tcl_NewStringObj("alert", -1);
+	                break;
+	            case kMovableAlertWindowClass:
+	                newResult = Tcl_NewStringObj("moveableAlert", -1);
+	                break;
+	            case kModalWindowClass:
+	                newResult = Tcl_NewStringObj("modal", -1);
+	                break;
+	            case kMovableModalWindowClass:
+	                newResult = Tcl_NewStringObj("moveableModal", -1);
+	                break;
+	            case kFloatingWindowClass:
+	                newResult = Tcl_NewStringObj("floating", -1);
+	                break;
+	            case kDocumentWindowClass:
+	                newResult = Tcl_NewStringObj("document", -1);
+	                break;
+                    default:
+                        panic("invalid class");
+                }
+
+ 	        attributeList = Tcl_NewListObj(0, NULL);
+                if (wmPtr->attributes == kWindowNoAttributes) {
+                    Tcl_ListObjAppendElement(interp, attributeList, 
+                            Tcl_NewStringObj("none", -1));
+                } else if (wmPtr->attributes == kWindowStandardDocumentAttributes) {
+                     Tcl_ListObjAppendElement(interp, attributeList, 
+                            Tcl_NewStringObj("standardDocument", -1));
+                } else if (wmPtr->attributes == kWindowStandardFloatingAttributes) {
+                     Tcl_ListObjAppendElement(interp, attributeList, 
+                            Tcl_NewStringObj("standardFloating", -1));                  
+                } else {
+                    if (wmPtr->attributes & kWindowCloseBoxAttribute) {
+                        Tcl_ListObjAppendElement(interp, attributeList, 
+                                Tcl_NewStringObj("closeBox", -1));
+                    }
+                    if (wmPtr->attributes & kWindowHorizontalZoomAttribute) {
+                        Tcl_ListObjAppendElement(interp, attributeList, 
+                                Tcl_NewStringObj("horizontalZoom", -1));
+                    }
+                    if (wmPtr->attributes & kWindowVerticalZoomAttribute) {
+                        Tcl_ListObjAppendElement(interp, attributeList, 
+                                Tcl_NewStringObj("verticalZoom", -1));
+                    }
+                    if (wmPtr->attributes & kWindowCollapseBoxAttribute) {
+                        Tcl_ListObjAppendElement(interp, attributeList, 
+                                Tcl_NewStringObj("collapseBox", -1));
+                    }
+                    if (wmPtr->attributes & kWindowResizableAttribute) {
+                        Tcl_ListObjAppendElement(interp, attributeList, 
+                                Tcl_NewStringObj("resizable", -1));
+                    }
+                    if (wmPtr->attributes & kWindowSideTitlebarAttribute) {
+                        Tcl_ListObjAppendElement(interp, attributeList, 
+                                Tcl_NewStringObj("sideTitlebar", -1));
+                    }
+                    if (wmPtr->attributes & kWindowNoUpdatesAttribute) {
+                        Tcl_ListObjAppendElement(interp, attributeList, 
+                                Tcl_NewStringObj("noUpdates", -1));
+                    }
+                    if (wmPtr->attributes & kWindowNoActivatesAttribute) {
+                        Tcl_ListObjAppendElement(interp, attributeList, 
+                                Tcl_NewStringObj("noActivates", -1));
+                    }
+                }
+                Tcl_ListObjAppendElement(interp, newResult, attributeList);
+                Tcl_SetObjResult(interp, newResult);       
+	    }
 	    return TCL_OK;
-	}
+        } else if (argc == 4) {
 	if (strcmp(argv[3], "documentProc") == 0) {
 	    wmPtr->style = documentProc;
 	} else if (strcmp(argv[3], "noGrowDocProc") == 0) {
@@ -3780,6 +3974,102 @@ TkUnsupported1Cmd(
 		    "floatSideProc, or floatSideZoomProc",
 		    (char *) NULL);
 	    return TCL_ERROR;
+	}
+	} else if (argc == 5) {
+	    int oldClass = wmPtr->macClass;
+	    int oldAttributes = wmPtr->attributes;
+	    
+	    if (strcmp(argv[3], "alert") == 0) {
+	        wmPtr->macClass = kAlertWindowClass;
+	    } else if (strcmp(argv[3], "moveableAlert") == 0) {
+	        wmPtr->macClass = kMovableAlertWindowClass;
+	    } else if (strcmp(argv[3], "modal") == 0) {
+	        wmPtr->macClass = kModalWindowClass;
+	    } else if (strcmp(argv[3], "moveableModal") == 0) {
+	        wmPtr->macClass = kMovableModalWindowClass;
+	    } else if (strcmp(argv[3], "floating") == 0) {
+	        wmPtr->macClass = kFloatingWindowClass;
+	    } else if (strcmp(argv[3], "document") == 0) {
+	        wmPtr->macClass = kDocumentWindowClass;
+	    } else {
+	        wmPtr->macClass = oldClass;
+	        Tcl_AppendResult(interp, "bad class: should be alert, ",
+	    	        "moveableAlert, modal, moveableModal, floating, ",
+	    	        "or document",
+		        (char *) NULL);
+	        return TCL_ERROR;
+	    }
+	    
+	    if (strcmp(argv[4], "none") == 0) {
+	        wmPtr->attributes = kWindowNoAttributes;
+	    } else if (strcmp(argv[4], "standardDocument") == 0) {
+	        wmPtr->attributes = kWindowStandardDocumentAttributes;
+	    } else if (strcmp(argv[4], "standardFloating") == 0) {
+	        wmPtr->attributes = kWindowStandardFloatingAttributes;
+	    } else {
+	        int foundOne = 0;
+	        int attrArgc, i;
+	        char **attrArgv = NULL;
+	        
+	        if (Tcl_SplitList(interp, argv[4], &attrArgc, &attrArgv) != TCL_OK) {
+	            wmPtr->macClass = oldClass;
+	            Tcl_AppendResult(interp, "Ill-formed attributes list: \"",
+	                argv[4], "\".", (char *) NULL);
+	            return TCL_ERROR;
+	        }
+	        	        
+	        wmPtr->attributes = kWindowNoAttributes;
+	        
+	        for (i = 0; i < attrArgc; i++) {
+	            if ((*attrArgv[i] == 'c') 
+	                    && (strcmp(attrArgv[i], "closeBox")  == 0)) {
+	                wmPtr->attributes |= kWindowCloseBoxAttribute;
+	                foundOne = 1;
+	            } else if ((*attrArgv[i] == 'h') 
+	                    && (strcmp(attrArgv[i], "horizontalZoom")  == 0)) {
+	                wmPtr->attributes |= kWindowHorizontalZoomAttribute;
+	                foundOne = 1;
+	            } else if ((*attrArgv[i] == 'v') 
+	                    && (strcmp(attrArgv[i], "verticalZoom")  == 0)) {
+	                wmPtr->attributes |= kWindowVerticalZoomAttribute;
+	                foundOne = 1;
+	            } else if ((*attrArgv[i] == 'c') 
+	                    && (strcmp(attrArgv[i], "collapseBox")  == 0)) {
+	                wmPtr->attributes |= kWindowCollapseBoxAttribute;
+	                foundOne = 1;
+	            } else if ((*attrArgv[i] == 'r') 
+	                    && (strcmp(attrArgv[i], "resizable")  == 0)) {
+	                wmPtr->attributes |= kWindowResizableAttribute;
+	                foundOne = 1;
+	            } else if ((*attrArgv[i] == 's') 
+	                    && (strcmp(attrArgv[i], "sideTitlebar")  == 0)) {
+	                wmPtr->attributes |= kWindowSideTitlebarAttribute;
+	                foundOne = 1;
+	            } else {
+	                foundOne = 0;
+	                break;
+	            }
+	        }
+	        
+	        if (attrArgv != NULL) {
+	            ckfree ((char *) attrArgv);
+	        }
+	        
+	        if (foundOne != 1) {
+	            wmPtr->macClass = oldClass;
+	            wmPtr->attributes = oldAttributes;
+	            
+	            Tcl_AppendResult(interp, "bad attribute: \"", argv[4], 
+	                    "\", should be standardDocument, ",
+	    	            "standardFloating, or some combination of ",
+	    	            "closeBox, horizontalZoom, verticalZoom, ",
+	    	            "collapseBox, resizable, or sideTitlebar.",
+		            (char *) NULL);
+	            return TCL_ERROR;
+	        }
+	    }
+	    
+	    wmPtr->style = -1;
 	}
     } else {
 	Tcl_AppendResult(interp, "unknown or ambiguous option \"", argv[1],
@@ -3849,7 +4139,7 @@ TkMacMakeRealWindowExist(
     WmInfo *wmPtr = winPtr->wmInfoPtr;
     WindowRef newWindow = NULL;
     MacDrawable *macWin;
-    Rect geometry;
+    Rect geometry = {0,0,0,0};
     Tcl_HashEntry *valueHashPtr;
     int new;
     TkMacWindowList *listPtr;
@@ -3892,8 +4182,29 @@ TkMacMakeRealWindowExist(
     
     InitialWindowBounds(winPtr, &geometry);
 	
+    if (TkMacHaveAppearance() >= 0x110 && wmPtr->style == -1) {
+        OSStatus err;        
+        /*
+         * There seems to be a bug in CreateNewWindow: If I set the
+         * window geometry to be the too small for the structure region,
+         * then the whole window is positioned incorrectly.
+         * Adding this here makes the positioning work, and the size will
+         * get overwritten when you actually map the contents of the window.
+         */
+         
+        geometry.right += 64;
+        geometry.bottom += 24;
+        err = CreateNewWindow(wmPtr->macClass, wmPtr->attributes, 
+                &geometry, &newWindow);
+        if (err != noErr) {
+            newWindow = NULL;
+        }
+        
+    } else {
     newWindow = NewCWindow(NULL, &geometry, "\ptemp", false, 
 	    (short) wmPtr->style, (WindowRef) -1, true, 0);
+    }
+    
     if (newWindow == NULL) {
 	panic("couldn't allocate new Mac window");
     }
@@ -4225,9 +4536,11 @@ TkMacHaveAppearance()
 	}
 	err = Gestalt(gestaltAppearanceVersion, &response);
 	if (err == noErr) {
-	    TkMacHaveAppearance = 2;
+	    TkMacHaveAppearance = (int) response;
 	}
     }
 
     return TkMacHaveAppearance;
 }
+
+

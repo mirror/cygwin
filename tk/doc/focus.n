@@ -111,3 +111,4 @@ you use C code to query the X server directly.
 
 .SH KEYWORDS
 events, focus, keyboard, top-level, window manager
+

@@ -3,15 +3,13 @@
 # standard fashion for Tcl tests.
 #
 # Copyright (c) 1995-1996 Sun Microsystems, Inc.
-# Copyright (c) 1998 by Scriptics Corporation.
-#
-# See the file "license.terms" for information on usage and redistribution
-# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+# Copyright (c) 1998-2000 Ajuba Solutions.
+# All rights reserved.
 #
 # RCS: @(#) $Id$
 
-if {[info procs test] != "test"} {
-    source defs
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    source [file join [pwd] [file dirname [info script]] defs.tcl]
 }
 
 foreach i [winfo children .] {
@@ -69,13 +67,29 @@ foreach test {
     incr i
 }
 
+test canvas-1.40 {configure throws error on bad option} {
+    set res [list [catch {.c configure -gorp foo}]]
+    .c create rect 10 10 100 100
+    lappend res [catch {.c configure -gorp foo}]
+    set res
+} [list 1 1]
+
 
 catch {destroy .c}
 canvas .c -width 60 -height 40 -scrollregion {0 0 200 150} -bd 0 \
 	-highlightthickness 0
 pack .c
 update
-test canvas-2.1 {CanvasWidgetCmd, xview option} {
+
+test canvas-2.1 {CanvasWidgetCmd, bind option} {
+    set i [.c create rect 10 10 100 100]
+    list [catch {.c bind $i <a>} msg] $msg
+} {0 {}}
+test canvas-2.2 {CanvasWidgetCmd, bind option} {
+    set i [.c create rect 10 10 100 100]
+    list [catch {.c bind $i <} msg] $msg
+} {1 {no event type or button # or keysym}}
+test canvas-2.3 {CanvasWidgetCmd, xview option} {
     .c configure -xscrollincrement 40 -yscrollincrement 5
     .c xview moveto 0
     update
@@ -84,7 +98,7 @@ test canvas-2.1 {CanvasWidgetCmd, xview option} {
     update
     lappend x [.c xview]
 } {{0 0.3} {0.4 0.7}}
-test canvas-2.2 {CanvasWidgetCmd, xview option} {nonPortable} {
+test canvas-2.4 {CanvasWidgetCmd, xview option} {nonPortable} {
     # This test gives slightly different results on platforms such
     # as NetBSD.  I don't know why...
     .c configure -xscrollincrement 0 -yscrollincrement 5
@@ -236,3 +250,124 @@ test canvas-9.1 {canvas id creation and deletion} {
 	
     set x ""
 } {}
+test canvas-10.1 {find items using tag expressions} {
+      catch {destroy .c}
+      canvas .c
+      .c create oval 20 20 40 40 -fill red -tag [list a b c d]
+      .c create oval 20 60 40 80 -fill yellow -tag [list b a]
+      .c create oval 20 100 40 120 -fill green -tag [list c b]
+      .c create oval 20 140 40 160 -fill blue -tag [list b]
+      .c create oval 20 180 40 200 -fill bisque -tag [list a d e]
+      .c create oval 20 220 40 240 -fill bisque -tag b
+      .c create oval 20 260 40 280 -fill bisque -tag [list d "tag with spaces"]
+      set res {}
+      lappend res [.c find withtag {!a}]
+      lappend res [.c find withtag {b&&c}]
+      lappend res [.c find withtag {b||c}]
+      lappend res [.c find withtag {a&&!b}]
+      lappend res [.c find withtag {!b&&!c}]
+      lappend res [.c find withtag {d&&a&&c&&b}]
+      lappend res [.c find withtag {b^a}]
+      lappend res [.c find withtag {(a&&!b)||(!a&&b)}]
+      lappend res [.c find withtag { ( a && ! b ) || ( ! a && b ) }]
+      lappend res [.c find withtag {a&&!(c||d)}]
+      lappend res [.c find withtag {d&&"tag with spaces"}]
+      lappend res [.c find withtag "tag with spaces"]
+} {{3 4 6 7} {1 3} {1 2 3 4 6} 5 {5 7} 1 {3 4 5 6} {3 4 5 6} {3 4 5 6} 2 7 7}
+test canvas-10.2 {check errors from tag expressions} {
+      catch {destroy .c}
+      canvas .c
+      .c create oval 20 20 40 40 -fill red -tag [list a b c d]
+      .c create oval 20 260 40 280 -fill bisque -tag [list d "tag with spaces"]
+      catch {.c find withtag {&&c}} err
+      set err
+} {Unexpected operator in tag search expression}
+test canvas-10.3 {check errors from tag expressions} {
+      catch {destroy .c}
+      canvas .c
+      .c create oval 20 20 40 40 -fill red -tag [list a b c d]
+      .c create oval 20 260 40 280 -fill bisque -tag [list d "tag with spaces"]
+      catch {.c find withtag {!!c}} err
+      set err
+} {Too many '!' in tag search expression}
+test canvas-10.4 {check errors from tag expressions} {
+      catch {destroy .c}
+      canvas .c
+      .c create oval 20 20 40 40 -fill red -tag [list a b c d]
+      .c create oval 20 260 40 280 -fill bisque -tag [list d "tag with spaces"]
+      catch {.c find withtag {b||}} err
+      set err
+} {Missing tag in tag search expression}
+test canvas-10.5 {check errors from tag expressions} {
+      catch {destroy .c}
+      canvas .c
+      .c create oval 20 20 40 40 -fill red -tag [list a b c d]
+      .c create oval 20 260 40 280 -fill bisque -tag [list d "tag with spaces"]
+      catch {.c find withtag {b&&(c||)}} err
+      set err
+} {Unexpected operator in tag search expression}
+test canvas-10.6 {check errors from tag expressions} {
+      catch {destroy .c}
+      canvas .c
+      .c create oval 20 20 40 40 -fill red -tag [list a b c d]
+      .c create oval 20 260 40 280 -fill bisque -tag [list d "tag with spaces"]
+      catch {.c find withtag {d&&""}} err
+      set err
+} {Null quoted tag string in tag search expression}
+test canvas-10.7 {check errors from tag expressions} {
+      catch {destroy .c}
+      canvas .c
+      .c create oval 20 20 40 40 -fill red -tag [list a b c d]
+      .c create oval 20 260 40 280 -fill bisque -tag [list d "tag with spaces"]
+      catch {.c find withtag "d&&\"tag with spaces"} err
+      set err
+} {Missing endquote in tag search expression}
+test canvas-10.8 {check errors from tag expressions} {
+      catch {destroy .c}
+      canvas .c
+      .c create oval 20 20 40 40 -fill red -tag [list a b c d]
+      .c create oval 20 260 40 280 -fill bisque -tag [list d "tag with spaces"]
+      catch {.c find withtag {a&&"tag with spaces"z}} err
+      set err
+} {Invalid boolean operator in tag search expression}
+test canvas-10.9 {check errors from tag expressions} {
+      catch {destroy .c}
+      canvas .c
+      .c create oval 20 20 40 40 -fill red -tag [list a b c d]
+      .c create oval 20 260 40 280 -fill bisque -tag [list d "tag with spaces"]
+      catch {.c find withtag {a&&b&c}} err
+      set err
+} {Singleton '&' in tag search expression}
+test canvas-10.10 {check errors from tag expressions} {
+      catch {destroy .c}
+      canvas .c
+      .c create oval 20 20 40 40 -fill red -tag [list a b c d]
+      .c create oval 20 260 40 280 -fill bisque -tag [list d "tag with spaces"]
+      catch {.c find withtag {a||b|c}} err
+      set err
+} {Singleton '|' in tag search expression}
+test canvas-10.11 {backward compatility - strange tags that are not expressions} {
+      catch {destroy .c}
+      canvas .c
+      .c create oval 20 20 40 40 -fill red -tag [list { strange tag(xxx&yyy|zzz) " && \" || ! ^ " }]
+      .c find withtag { strange tag(xxx&yyy|zzz) " && \" || ! ^ " }
+} {1}
+test canvas-10.12 {multple events bound to same tag expr} {
+      catch {destroy .c}
+      canvas .c
+      .c bind {a && b} <Enter> {puts Enter}
+      .c bind {a && b} <Leave> {puts Leave}
+} {}
+
+test canvas-11.1 {canvas poly fill check, bug 5783} {
+    # This would crash in 8.3.0 and 8.3.1
+    destroy .c
+    pack [canvas .c]
+    .c create polygon 0 0 100 100 200 50 \
+	    -fill {} -stipple gray50 -outline black
+} 1
+
+# cleanup
+::tcltest::cleanupTests
+return
+

@@ -13,6 +13,7 @@
  */
 
 #include <Types.h>
+#include <tcl.h>
 
 /*
  * Forward declarations of procedures defined later in this file:
@@ -79,3 +80,4 @@ DebuggerCmd(
     Debugger();
     return TCL_OK;
 }
+

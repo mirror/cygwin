@@ -177,3 +177,4 @@ TkRectInRegion(r, x, y, width, height)
     rect.right = x+width;
     return RectInRegion((HRGN)r, &rect) ? RectanglePart : RectangleOut;
 }
+

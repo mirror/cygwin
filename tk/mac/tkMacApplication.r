@@ -13,6 +13,8 @@
 
 #include <Types.r>
 #include <SysTypes.r>
+#include <Balloons.r>
+#include <BalloonTypes.r>
 #include <AEUserTermTypes.r>
 
 /*
@@ -43,14 +45,14 @@ resource 'vers' (1) {
 	TK_MAJOR_VERSION, MINOR_VERSION,
 	RELEASE_LEVEL, 0x00, verUS,
 	TK_PATCH_LEVEL,
-	TK_PATCH_LEVEL ", by Ray Johnson © 1993-1996" "\n" "Sun Microsystems Labratories"
+	TK_PATCH_LEVEL ", by Ray Johnson & Jim Ingham" "\n" "© 1993-1997 Sun Microsystems" "\n" "1998-2000 Scriptics Inc."
 };
 
 resource 'vers' (2) {
 	TK_MAJOR_VERSION, MINOR_VERSION,
 	RELEASE_LEVEL, 0x00, verUS,
 	TK_PATCH_LEVEL,
-	"Wish " TK_PATCH_LEVEL " © 1993-1996"
+	"Wish " TK_PATCH_LEVEL " © 1993-1999"
 };
 
 #define TK_APP_RESOURCES 128
@@ -108,6 +110,17 @@ resource 'kind' (TK_APP_RESOURCES, "Tcl kind", purgeable) {
 		'APPL', "Wish",
 		'TEXT', "Tcl/Tk Script"
 	}
+};
+
+#define kIconHelpString 256
+
+resource 'hfdr' (-5696, purgeable) {
+   HelpMgrVersion, hmDefaultOptions, 0, 0,
+   {HMSTRResItem {kIconHelpString}}
+};
+resource 'STR ' (kIconHelpString, purgeable) {
+   "This is the interpreter for Tcl & Tk scripts"
+   " running on Macintosh computers."
 };
 
 /*
@@ -263,5 +276,6 @@ data 'ics4' (TK_APP_RESOURCES, "Tk App", purgeable) {
 	$"0000 0FCC CCCF 0000 0000 00FC CCF0 0000"
 	$"0000 000F CF00 0000 0000 0000 F000 0000"
 };
+
 
 

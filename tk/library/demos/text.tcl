@@ -3,7 +3,7 @@
 # This demonstration script creates a text widget that describes
 # the basic editing functions.
 #
-# SCCS: @(#) text.tcl 1.6 97/03/02 16:28:12
+# RCS: @(#) $Id$
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -74,3 +74,4 @@ even number of characters high and wide.  Also, if you make the window
 narrow you can see that long lines automatically wrap around onto
 additional lines so that all the information is always visible.}
 $w.text mark set insert 0.0
+

@@ -43,6 +43,12 @@ int
 TkpInit(interp)
     Tcl_Interp *interp;
 {
+    /*
+     * This is necessary for static initialization, and is ok
+     * otherwise because TkWinXInit flips a static bit to do
+     * its work just once.
+     */
+    TkWinXInit(GetModuleHandle(NULL));
     return Tcl_Eval(interp, initScript);
 }
 
@@ -116,6 +122,19 @@ TkpDisplayWarning(msg, title)
     char *msg;			/* Message to be displayed. */
     char *title;		/* Title of warning. */
 {
-    MessageBox(NULL, msg, title, MB_OK | MB_ICONEXCLAMATION | MB_SYSTEMMODAL
-	    | MB_SETFOREGROUND | MB_TOPMOST);
+    int l;
+
+    if ( GetStdHandle(STD_ERROR_HANDLE)  != INVALID_HANDLE_VALUE &&
+         GetFileType(GetStdHandle(STD_ERROR_HANDLE)) != FILE_TYPE_UNKNOWN ) {
+        WriteFile(GetStdHandle(STD_ERROR_HANDLE), title, strlen(title), &l, NULL);
+        WriteFile(GetStdHandle(STD_ERROR_HANDLE), ": " , 2            , &l, NULL);
+        WriteFile(GetStdHandle(STD_ERROR_HANDLE), msg  , strlen(msg)  , &l, NULL);
+        WriteFile(GetStdHandle(STD_ERROR_HANDLE), "\n" , 1            , &l, NULL);
+        FlushFileBuffers(GetStdHandle(STD_ERROR_HANDLE));
+    } else {
+        MessageBox(NULL, msg, title, MB_OK | MB_ICONEXCLAMATION | MB_SYSTEMMODAL
+		    | MB_SETFOREGROUND | MB_TOPMOST);
+    }
 }
+
+

@@ -10,7 +10,6 @@
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
  * RCS: @(#) $Id$
- *
  */
 
 #include "tkInt.h"
@@ -484,3 +483,4 @@ FreeMacFileTypes(clausePtr)
     }
     clausePtr->macTypes = NULL;
 }
+

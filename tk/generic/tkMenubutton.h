@@ -25,6 +25,23 @@
 #endif
 
 /*
+ * Legal values for the "orient" field of TkMenubutton records.
+ */
+
+enum direction {
+    DIRECTION_ABOVE, DIRECTION_BELOW, DIRECTION_FLUSH, 
+    DIRECTION_LEFT, DIRECTION_RIGHT
+};
+
+/*
+ * Legal values for the "state" field of TkMenubutton records.
+ */
+
+enum state {
+    STATE_ACTIVE, STATE_DISABLED, STATE_NORMAL
+};
+
+/*
  * A data structure of the following type is kept for each
  * widget managed by this file:
  */
@@ -39,6 +56,8 @@ typedef struct {
 				 * freed up even after tkwin has gone away. */
     Tcl_Interp *interp;		/* Interpreter associated with menubutton. */
     Tcl_Command widgetCmd;	/* Token for menubutton's widget command. */
+    Tk_OptionTable optionTable;	/* Table that defines configuration options
+				 * available for this widget. */
     char *menuName;		/* Name of menu associated with widget.
 				 * Malloc-ed. */
 
@@ -65,7 +84,7 @@ typedef struct {
      * Information used when displaying widget:
      */
 
-    Tk_Uid state;		/* State of button for display purposes:
+    enum state state;          	/* State of button for display purposes:
 				 * normal, active, or disabled. */
     Tk_3DBorder normalBorder;	/* Structure used to draw 3-D
 				 * border and background when window
@@ -143,7 +162,7 @@ typedef struct {
      * Miscellaneous information:
      */
 
-    Tk_Uid direction;		/* Direction for where to pop the menu.
+    enum direction direction;	/* Direction for where to pop the menu.
     				 * Valid directions are "above", "below",
     				 * "left", "right", and "flush". "flush"
     				 * means that the upper left corner of the
@@ -213,3 +232,4 @@ EXTERN void		TkMenuButtonWorldChanged _ANSI_ARGS_((
 # define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif /* _TKMENUBUTTON */
+

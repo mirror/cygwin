@@ -2,7 +2,7 @@
 #
 # This demonstration script shows an example with a horizontal scale.
 #
-# SCCS: @(#) hscale.tcl 1.4 97/03/02 16:24:01
+# RCS: @(#) $Id$
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -45,3 +45,4 @@ proc setWidth {w width} {
     $w coords poly 20 15 20 35 $x2 35 $x2 45 $width 25 $x2 5 $x2 15 20 15
     $w coords line 20 15 20 35 $x2 35 $x2 45 $width 25 $x2 5 $x2 15 20 15
 }
+

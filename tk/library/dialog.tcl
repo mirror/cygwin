@@ -3,7 +3,7 @@
 # This file defines the procedure tk_dialog, which creates a dialog
 # box containing a bitmap, a message, and one or more buttons.
 #
-# SCCS: @(#) dialog.tcl 1.33 97/06/06 11:20:04
+# RCS: @(#) $Id$
 #
 # Copyright (c) 1992-1993 The Regents of the University of California.
 # Copyright (c) 1994-1997 Sun Microsystems, Inc.
@@ -32,6 +32,18 @@
 proc tk_dialog {w title text bitmap default args} {
     global tkPriv tcl_platform
 
+    # Check that $default was properly given
+    if {[string is int $default]} {
+	if {$default >= [llength $args]} {
+	    return -code error "default button index greater than number of\
+		    buttons specified for tk_dialog"
+	}
+    } elseif {[string equal {} $default]} {
+	set default -1
+    } else {
+	set default [lsearch -exact $args $default]
+    }
+
     # 1. Create the top-level window and divide it into top
     # and bottom parts.
 
@@ -41,19 +53,24 @@ proc tk_dialog {w title text bitmap default args} {
     wm iconname $w Dialog
     wm protocol $w WM_DELETE_WINDOW {set tkPriv(button) -1} 
 
-    # The following command means that the dialog won't be posted if
-    # [winfo parent $w] is iconified, but it's really needed;  otherwise
-    # the dialog can become obscured by other windows in the application,
-    # even though its grab keeps the rest of the application from being used.
+    # Dialog boxes should be transient with respect to their parent,
+    # so that they will always stay on top of their parent window.  However,
+    # some window managers will create the window as withdrawn if the parent
+    # window is withdrawn or iconified.  Combined with the grab we put on the
+    # window, this can hang the entire application.  Therefore we only make
+    # the dialog transient if the parent is viewable.
+    #
+    if { [winfo viewable [winfo toplevel [winfo parent $w]]] } {
+	wm transient $w [winfo toplevel [winfo parent $w]]
+    }    
 
-    wm transient $w [winfo toplevel [winfo parent $w]]
-    if {$tcl_platform(platform) == "macintosh"} {
+    if {[string equal $tcl_platform(platform) "macintosh"]} {
 	unsupported1 style $w dBoxProc
     }
 
     frame $w.bot
     frame $w.top
-    if {$tcl_platform(platform) == "unix"} {
+    if {[string equal $tcl_platform(platform) "unix"]} {
 	$w.bot configure -relief raised -bd 1
 	$w.top configure -relief raised -bd 1
     }
@@ -61,19 +78,21 @@ proc tk_dialog {w title text bitmap default args} {
     pack $w.top -side top -fill both -expand 1
 
     # 2. Fill the top part with bitmap and message (use the option
-    # database for -wraplength so that it can be overridden by
-    # the caller).
+    # database for -wraplength and -font so that they can be
+    # overridden by the caller).
 
     option add *Dialog.msg.wrapLength 3i widgetDefault
-    label $w.msg -justify left -text $text
-    if {$tcl_platform(platform) == "macintosh"} {
-	$w.msg configure -font system
+    if {[string equal $tcl_platform(platform) "macintosh"]} {
+	option add *Dialog.msg.font system widgetDefault
     } else {
-	$w.msg configure -font {Times 18}
+	option add *Dialog.msg.font {Times 12} widgetDefault
     }
+
+    label $w.msg -justify left -text $text
     pack $w.msg -in $w.top -side right -expand 1 -fill both -padx 3m -pady 3m
-    if {$bitmap != ""} {
-	if {($tcl_platform(platform) == "macintosh") && ($bitmap == "error")} {
+    if {[string compare $bitmap ""]} {
+	if {[string equal $tcl_platform(platform) "macintosh"] && \
+		[string equal $bitmap "error"]} {
 	    set bitmap "stop"
 	}
 	label $w.bitmap -bitmap $bitmap
@@ -84,7 +103,7 @@ proc tk_dialog {w title text bitmap default args} {
 
     set i 0
     foreach but $args {
-	button $w.button$i -text $but -command "set tkPriv(button) $i"
+	button $w.button$i -text $but -command [list set tkPriv(button) $i]
 	if {$i == $default} {
 	    $w.button$i configure -default active
 	} else {
@@ -93,10 +112,10 @@ proc tk_dialog {w title text bitmap default args} {
 	grid $w.button$i -in $w.bot -column $i -row 0 -sticky ew -padx 10
 	grid columnconfigure $w.bot $i
 	# We boost the size of some Mac buttons for l&f
-	if {$tcl_platform(platform) == "macintosh"} {
+	if {[string equal $tcl_platform(platform) "macintosh"]} {
 	    set tmp [string tolower $but]
-	    if {($tmp == "ok") || ($tmp == "cancel")} {
-		grid columnconfigure $w.bot $i -minsize [expr 59 + 20]
+	    if {[string equal $tmp "ok"] || [string equal $tmp "cancel"]} {
+		grid columnconfigure $w.bot $i -minsize [expr {59 + 20}]
 	    }
 	}
 	incr i
@@ -107,10 +126,10 @@ proc tk_dialog {w title text bitmap default args} {
 
     if {$default >= 0} {
 	bind $w <Return> "
-	    $w.button$default configure -state active -relief sunken
-	    update idletasks
-	    after 100
-	    set tkPriv(button) $default
+	[list $w.button$default] configure -state active -relief sunken
+	update idletasks
+	after 100
+	set tkPriv(button) $default
 	"
     }
 
@@ -138,7 +157,7 @@ proc tk_dialog {w title text bitmap default args} {
 
     set oldFocus [focus]
     set oldGrab [grab current $w]
-    if {$oldGrab != ""} {
+    if {[string compare $oldGrab ""]} {
 	set grabStatus [grab status $oldGrab]
     }
     grab $w
@@ -164,12 +183,14 @@ proc tk_dialog {w title text bitmap default args} {
 	bind $w <Destroy> {}
 	destroy $w
     }
-    if {$oldGrab != ""} {
-	if {$grabStatus == "global"} {
-	    grab -global $oldGrab
-	} else {
+    if {[string compare $oldGrab ""]} {
+      if {[string compare $grabStatus "global"]} {
 	    grab $oldGrab
+      } else {
+          grab -global $oldGrab
 	}
     }
     return $tkPriv(button)
 }
+
+

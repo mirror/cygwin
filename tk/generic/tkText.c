@@ -9,6 +9,7 @@
  *
  * Copyright (c) 1992-1994 The Regents of the University of California.
  * Copyright (c) 1994-1996 Sun Microsystems, Inc.
+ * Copyright (c) 1999 by Scriptics Corporation.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -26,6 +27,15 @@
 #endif
 
 #include "tkText.h"
+
+/*
+ * Custom options for handling "-state"
+ */
+
+static Tk_CustomOption stateOption = {
+    (Tk_OptionParseProc *) TkStateParseProc,
+    TkStatePrintProc, (ClientData) NULL /* only "normal" and "disabled" */
+};
 
 /*
  * Information used to parse text configuration options:
@@ -112,8 +122,8 @@ static Tk_ConfigSpec configSpecs[] = {
     {TK_CONFIG_PIXELS, "-spacing3", "spacing3", "Spacing",
 	DEF_TEXT_SPACING3, Tk_Offset(TkText, spacing3),
 	TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_UID, "-state", "state", "State",
-	DEF_TEXT_STATE, Tk_Offset(TkText, state), 0},
+    {TK_CONFIG_CUSTOM, "-state", "state", "State",
+	DEF_TEXT_STATE, Tk_Offset(TkText, state), 0, &stateOption},
     {TK_CONFIG_STRING, "-tabs", "tabs", "Tabs",
 	DEF_TEXT_TABS, Tk_Offset(TkText, tabOptionString), TK_CONFIG_NULL_OK},
     {TK_CONFIG_STRING, "-takefocus", "takeFocus", "TakeFocus",
@@ -121,8 +131,8 @@ static Tk_ConfigSpec configSpecs[] = {
 	TK_CONFIG_NULL_OK},
     {TK_CONFIG_INT, "-width", "width", "Width",
 	DEF_TEXT_WIDTH, Tk_Offset(TkText, width), 0},
-    {TK_CONFIG_UID, "-wrap", "wrap", "Wrap",
-	DEF_TEXT_WRAP, Tk_Offset(TkText, wrapMode), 0},
+    {TK_CONFIG_CUSTOM, "-wrap", "wrap", "Wrap",
+	DEF_TEXT_WRAP, Tk_Offset(TkText, wrapMode), 0, &textWrapModeOption},
     {TK_CONFIG_STRING, "-xscrollcommand", "xScrollCommand", "ScrollCommand",
 	DEF_TEXT_XSCROLL_COMMAND, Tk_Offset(TkText, xScrollCmd),
 	TK_CONFIG_NULL_OK},
@@ -143,21 +153,133 @@ static Tk_ConfigSpec configSpecs[] = {
 };
 
 /*
- * Tk_Uid's used to represent text states:
- */
-
-Tk_Uid tkTextCharUid = NULL;
-Tk_Uid tkTextDisabledUid = NULL;
-Tk_Uid tkTextNoneUid = NULL;
-Tk_Uid tkTextNormalUid = NULL;
-Tk_Uid tkTextWordUid = NULL;
-
-/*
  * Boolean variable indicating whether or not special debugging code
  * should be executed.
  */
 
 int tkTextDebug = 0;
+
+/*
+ * Custom options for handling "-wrap":
+ */
+
+static int		WrapModeParseProc _ANSI_ARGS_((ClientData clientData,
+			    Tcl_Interp *interp, Tk_Window tkwin, char *value,
+			    char *widgRec, int offset));
+static char *		WrapModePrintProc _ANSI_ARGS_((ClientData clientData,
+			    Tk_Window tkwin, char *widgRec, int offset,
+			    Tcl_FreeProc **freeProcPtr));
+
+Tk_CustomOption textWrapModeOption = {
+    WrapModeParseProc,
+    WrapModePrintProc,
+    (ClientData) NULL
+};
+
+/*
+ *--------------------------------------------------------------
+ *
+ * WrapModeParseProc --
+ *
+ *	This procedure is invoked during option processing to handle
+ *	"-wrap" options for text widgets.
+ *
+ * Results:
+ *	A standard Tcl return value.
+ *
+ * Side effects:
+ *	The wrap mode for a given item gets replaced by the wrap mode
+ *	indicated in the value argument.
+ *
+ *--------------------------------------------------------------
+ */
+
+static int
+WrapModeParseProc(clientData, interp, tkwin, value, widgRec, offset)
+    ClientData clientData;		/* some flags.*/
+    Tcl_Interp *interp;			/* Used for reporting errors. */
+    Tk_Window tkwin;			/* Window containing canvas widget. */
+    char *value;			/* Value of option (list of tag
+					 * names). */
+    char *widgRec;			/* Pointer to record for item. */
+    int offset;				/* Offset into item. */
+{
+    int c;
+    size_t length;
+
+    register TkWrapMode *wrapPtr = (TkWrapMode *) (widgRec + offset);
+
+    if(value == NULL || *value == 0) {
+	*wrapPtr = TEXT_WRAPMODE_NULL;
+	return TCL_OK;
+    }
+
+    c = value[0];
+    length = strlen(value);
+
+    if ((c == 'c') && (strncmp(value, "char", length) == 0)) {
+	*wrapPtr = TEXT_WRAPMODE_CHAR;
+	return TCL_OK;
+    }
+    if ((c == 'n') && (strncmp(value, "none", length) == 0)) {
+	*wrapPtr = TEXT_WRAPMODE_NONE;
+	return TCL_OK;
+    }
+    if ((c == 'w') && (strncmp(value, "word", length) == 0)) {
+	*wrapPtr = TEXT_WRAPMODE_WORD;
+	return TCL_OK;
+    }
+    Tcl_AppendResult(interp, "bad wrap mode \"", value,
+	    "\": must be char, none, or word",
+	    (char *) NULL);
+    *wrapPtr = TEXT_WRAPMODE_CHAR;
+    return TCL_ERROR;
+}
+
+/*
+ *--------------------------------------------------------------
+ *
+ * WrapModePrintProc --
+ *
+ *	This procedure is invoked by the Tk configuration code
+ *	to produce a printable string for the "-wrap" configuration
+ *	option for canvas items.
+ *
+ * Results:
+ *	The return value is a string describing the state for
+ *	the item referred to by "widgRec".  In addition, *freeProcPtr
+ *	is filled in with the address of a procedure to call to free
+ *	the result string when it's no longer needed (or NULL to
+ *	indicate that the string doesn't need to be freed).
+ *
+ * Side effects:
+ *	None.
+ *
+ *--------------------------------------------------------------
+ */
+
+static char *
+WrapModePrintProc(clientData, tkwin, widgRec, offset, freeProcPtr)
+    ClientData clientData;		/* Ignored. */
+    Tk_Window tkwin;			/* Window containing canvas widget. */
+    char *widgRec;			/* Pointer to record for item. */
+    int offset;				/* Ignored. */
+    Tcl_FreeProc **freeProcPtr;		/* Pointer to variable to fill in with
+					 * information about how to reclaim
+					 * storage for return string. */
+{
+    register TkWrapMode *wrapPtr = (TkWrapMode *) (widgRec + offset);
+
+    if (*wrapPtr==TEXT_WRAPMODE_CHAR) {
+	return "char";
+    } else if (*wrapPtr==TEXT_WRAPMODE_NONE) {
+	return "none";
+    } else if (*wrapPtr==TEXT_WRAPMODE_WORD) {
+	return "word";
+    } else {
+	return "";
+    }
+}
 
 /*
  * Forward declarations for procedures defined later in this file:
@@ -189,7 +311,7 @@ static void		DumpLine _ANSI_ARGS_((Tcl_Interp *interp,
 			    TkText *textPtr, int what, TkTextLine *linePtr,
 			    int start, int end, int lineno, char *command));
 static int		DumpSegment _ANSI_ARGS_((Tcl_Interp *interp, char *key,
-			    char *value, char * command, int lineno, int offset,
+			    char *value, char * command, TkTextIndex *index,
 			    int what));
 
 /*
@@ -241,18 +363,6 @@ Tk_TextCmd(clientData, interp, argc, argv)
     }
 
     /*
-     * Perform once-only initialization:
-     */
-
-    if (tkTextNormalUid == NULL) {
-	tkTextCharUid = Tk_GetUid("char");
-	tkTextDisabledUid = Tk_GetUid("disabled");
-	tkTextNoneUid = Tk_GetUid("none");
-	tkTextNormalUid = Tk_GetUid("normal");
-	tkTextWordUid = Tk_GetUid("word");
-    }
-
-    /*
      * Create the window.
      */
 
@@ -274,7 +384,7 @@ Tk_TextCmd(clientData, interp, argc, argv)
     Tcl_InitHashTable(&textPtr->markTable, TCL_STRING_KEYS);
     Tcl_InitHashTable(&textPtr->windowTable, TCL_STRING_KEYS);
     Tcl_InitHashTable(&textPtr->imageTable, TCL_STRING_KEYS);
-    textPtr->state = tkTextNormalUid;
+    textPtr->state = TK_STATE_NORMAL;
     textPtr->border = NULL;
     textPtr->borderWidth = 0;
     textPtr->padX = 0;
@@ -293,14 +403,14 @@ Tk_TextCmd(clientData, interp, argc, argv)
     textPtr->tabOptionString = NULL;
     textPtr->tabsize = 8;
     textPtr->tabArrayPtr = NULL;
-    textPtr->wrapMode = tkTextCharUid;
+    textPtr->wrapMode = TEXT_WRAPMODE_CHAR;
     textPtr->width = 0;
     textPtr->height = 0;
     textPtr->setGrid = 0;
     textPtr->prevWidth = Tk_Width(new);
     textPtr->prevHeight = Tk_Height(new);
     TkTextCreateDInfo(textPtr);
-    TkTextMakeIndex(textPtr->tree, 0, 0, &startIndex);
+    TkTextMakeByteIndex(textPtr->tree, 0, 0, &startIndex);
     TkTextSetYView(textPtr, &startIndex, 0);
     textPtr->selTagPtr = NULL;
     textPtr->selBorder = NULL;
@@ -336,7 +446,8 @@ Tk_TextCmd(clientData, interp, argc, argv)
      */
 
     textPtr->selTagPtr = TkTextCreateTag(textPtr, "sel");
-    textPtr->selTagPtr->reliefString = (char *) ckalloc(7);
+    textPtr->selTagPtr->reliefString =
+	    (char *) ckalloc(sizeof(DEF_TEXT_SELECT_RELIEF));
     strcpy(textPtr->selTagPtr->reliefString, DEF_TEXT_SELECT_RELIEF);
     textPtr->selTagPtr->relief = TK_RELIEF_RAISED;
     textPtr->currentMarkPtr = TkTextSetMark(textPtr, "current", &startIndex);
@@ -357,7 +468,7 @@ Tk_TextCmd(clientData, interp, argc, argv)
 	Tk_DestroyWindow(textPtr->tkwin);
 	return TCL_ERROR;
     }
-    interp->result = Tk_PathName(textPtr->tkwin);
+    Tcl_SetResult(interp, Tk_PathName(textPtr->tkwin), TCL_STATIC);
 
     return TCL_OK;
 }
@@ -474,7 +585,10 @@ TextWidgetCmd(clientData, interp, argc, argv)
 	    goto done;
 	}
 	if (TkTextCharBbox(textPtr, &index1, &x, &y, &width, &height) == 0) {
-	    sprintf(interp->result, "%d %d %d %d", x, y, width, height);
+	    char buf[TCL_INTEGER_SPACE * 4];
+	    
+	    sprintf(buf, "%d %d %d %d", x, y, width, height);
+	    Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	}
     } else if ((c == 'c') && (strncmp(argv[1], "cget", length) == 0)
 	    && (length >= 2)) {
@@ -532,7 +646,7 @@ TextWidgetCmd(clientData, interp, argc, argv)
 	} else {
 	    goto compareError;
 	}
-	interp->result = (value) ? "1" : "0";
+	Tcl_SetResult(interp, ((value) ? "1" : "0"), TCL_STATIC);
     } else if ((c == 'c') && (strncmp(argv[1], "configure", length) == 0)
 	    && (length >= 3)) {
 	if (argc == 2) {
@@ -554,7 +668,7 @@ TextWidgetCmd(clientData, interp, argc, argv)
 	    goto done;
 	}
 	if (argc == 2) {
-	    interp->result = (tkBTreeDebug) ? "1" : "0";
+	    Tcl_SetResult(interp, ((tkBTreeDebug) ? "1" : "0"), TCL_STATIC);
 	} else {
 	    if (Tcl_GetBoolean(interp, argv[2], &tkBTreeDebug) != TCL_OK) {
 		result = TCL_ERROR;
@@ -573,18 +687,7 @@ TextWidgetCmd(clientData, interp, argc, argv)
 	    result = TCL_ERROR;
 	    goto done;
 	}
-	if (textPtr->state == tkTextNormalUid) {
-	    /*
-	     * KHAMIS
-	     * Call synchronize command
-	     * BEFORE INSERTING INTO THE EDITOR
-	     ***********************************/
-	    if (textPtr->SyncCmd && *textPtr->SyncCmd) {
-	    	result = ExecSyncCmd (interp, textPtr, argc, argv);
-		if (result == TCL_ERROR) {
-		    goto done;
-		}
-	    }
+	if (textPtr->state == TK_STATE_NORMAL) {
 	    result = DeleteChars(textPtr, argv[2],
 		    (argc == 4) ? argv[3] : (char *) NULL);
 	}
@@ -604,8 +707,10 @@ TextWidgetCmd(clientData, interp, argc, argv)
 	}
 	if (TkTextDLineInfo(textPtr, &index1, &x, &y, &width, &height, &base)
 		== 0) {
-	    sprintf(interp->result, "%d %d %d %d %d", x, y, width,
-		    height, base);
+	    char buf[TCL_INTEGER_SPACE * 5];
+	    
+	    sprintf(buf, "%d %d %d %d %d", x, y, width, height, base);
+	    Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	}
     } else if ((c == 'g') && (strncmp(argv[1], "get", length) == 0)) {
 	if ((argc != 3) && (argc != 4)) {
@@ -638,10 +743,10 @@ TextWidgetCmd(clientData, interp, argc, argv)
 	    if (index1.linePtr == index2.linePtr) {
 		int last2;
 
-		if (index2.charIndex == index1.charIndex) {
+		if (index2.byteIndex == index1.byteIndex) {
 		    break;
 		}
-		last2 = index2.charIndex - index1.charIndex + offset;
+		last2 = index2.byteIndex - index1.byteIndex + offset;
 		if (last2 < last) {
 		    last = last2;
 		}
@@ -653,10 +758,12 @@ TextWidgetCmd(clientData, interp, argc, argv)
 			(char *) NULL);
 		segPtr->body.chars[last] = savedChar;
 	    }
-	    TkTextIndexForwChars(&index1, last-offset, &index1);
+	    TkTextIndexForwBytes(&index1, last-offset, &index1);
 	}
     } else if ((c == 'i') && (strncmp(argv[1], "index", length) == 0)
 	    && (length >= 3)) {
+	char buf[200];
+
 	if (argc != 3) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"",
 		    argv[0], " index index\"",
@@ -668,7 +775,8 @@ TextWidgetCmd(clientData, interp, argc, argv)
 	    result = TCL_ERROR;
 	    goto done;
 	}
-	TkTextPrintIndex(&index1, interp->result);
+	TkTextPrintIndex(&index1, buf);
+	Tcl_SetResult(interp, buf, TCL_VOLATILE);
     } else if ((c == 'i') && (strncmp(argv[1], "insert", length) == 0)
 	    && (length >= 3)) {
 	int i, j, numTags;
@@ -689,22 +797,11 @@ TextWidgetCmd(clientData, interp, argc, argv)
 	    result = TCL_ERROR;
 	    goto done;
 	}
-	if (textPtr->state == tkTextNormalUid) {
-	    /*
-	     * KHAMIS
-	     * Call synchronize command
-	     * BEFORE INSERTING INTO THE EDITOR
-	     ***********************************/
-	    if (textPtr->SyncCmd && *textPtr->SyncCmd) {
-	    	result = ExecSyncCmd (interp, textPtr, argc, argv);
-		if (result == TCL_ERROR) {
-		    goto done;
-		}
-	    }
+	if (textPtr->state == TK_STATE_NORMAL) {
 	    for (j = 3;  j < argc; j += 2) {
 		InsertChars(textPtr, &index1, argv[j]);
 		if (argc > (j+1)) {
-		    TkTextIndexForwChars(&index1, (int) strlen(argv[j]),
+		    TkTextIndexForwBytes(&index1, (int) strlen(argv[j]),
 			    &index2);
 		    oldTagArrayPtr = TkBTreeGetTags(&index1, &numTags);
 		    if (oldTagArrayPtr != NULL) {
@@ -752,8 +849,8 @@ TextWidgetCmd(clientData, interp, argc, argv)
     } else {
 	Tcl_AppendResult(interp, "bad option \"", argv[1],
 		"\": must be bbox, cget, compare, configure, debug, delete, ",
-		"dlineinfo, get, image, index, insert, mark, scan, search, see, ",
-		"tag, window, xview, or yview",
+		"dlineinfo, dump, get, image, index, insert, mark, scan, ",
+		"search, see, tag, window, xview, or yview",
 		(char *) NULL);
 	result = TCL_ERROR;
     }
@@ -845,7 +942,7 @@ DestroyText(memPtr)
  *
  * Results:
  *	The return value is a standard Tcl result.  If TCL_ERROR is
- *	returned, then interp->result contains an error message.
+ *	returned, then the interp's result contains an error message.
  *
  * Side effects:
  *	Configuration information, such as text string, colors, font,
@@ -875,23 +972,6 @@ ConfigureText(interp, textPtr, argc, argv, flags)
      * A few other options also need special processing, such as parsing
      * the geometry and setting the background from a 3-D border.
      */
-
-    if ((textPtr->state != tkTextNormalUid)
-	    && (textPtr->state != tkTextDisabledUid)) {
-	Tcl_AppendResult(interp, "bad state value \"", textPtr->state,
-		"\": must be normal or disabled", (char *) NULL);
-	textPtr->state = tkTextNormalUid;
-	return TCL_ERROR;
-    }
-
-    if ((textPtr->wrapMode != tkTextCharUid)
-	    && (textPtr->wrapMode != tkTextNoneUid)
-	    && (textPtr->wrapMode != tkTextWordUid)) {
-	Tcl_AppendResult(interp, "bad wrap mode \"", textPtr->wrapMode,
-		"\": must be char, none, or word", (char *) NULL);
-	textPtr->wrapMode = tkTextCharUid;
-	return TCL_ERROR;
-    }
 
     Tk_SetBackgroundFromBorder(textPtr->tkwin, textPtr->border);
 
@@ -967,7 +1047,8 @@ ConfigureText(interp, textPtr, argc, argv, flags)
 	    || (textPtr->selTagPtr->spacing3String != NULL)
 	    || (textPtr->selTagPtr->tabString != NULL)
 	    || (textPtr->selTagPtr->underlineString != NULL)
-	    || (textPtr->selTagPtr->wrapMode != NULL)) {
+	    || (textPtr->selTagPtr->elideString != NULL)
+	    || (textPtr->selTagPtr->wrapMode != TEXT_WRAPMODE_NULL)) {
 	textPtr->selTagPtr->affectsDisplay = 1;
     }
     TkTextRedrawTag(textPtr, (TkTextIndex *) NULL, (TkTextIndex *) NULL,
@@ -982,8 +1063,8 @@ ConfigureText(interp, textPtr, argc, argv, flags)
 	TkTextSearch search;
 	TkTextIndex first, last;
 
-	TkTextMakeIndex(textPtr->tree, 0, 0, &first);
-	TkTextMakeIndex(textPtr->tree,
+	TkTextMakeByteIndex(textPtr->tree, 0, 0, &first);
+	TkTextMakeByteIndex(textPtr->tree,
 		TkBTreeNumLines(textPtr->tree), 0, &last);
 	TkBTreeStartSearch(&first, &last, textPtr->selTagPtr, &search);
 	if (TkBTreeCharTagged(&first, textPtr->selTagPtr)
@@ -1214,7 +1295,7 @@ InsertChars(textPtr, indexPtr, string)
     lineIndex = TkBTreeLineIndex(indexPtr->linePtr);
     if (lineIndex == TkBTreeNumLines(textPtr->tree)) {
 	lineIndex--;
-	TkTextMakeIndex(textPtr->tree, lineIndex, 1000000, indexPtr);
+	TkTextMakeByteIndex(textPtr->tree, lineIndex, 1000000, indexPtr);
     }
 
     /*
@@ -1227,16 +1308,16 @@ InsertChars(textPtr, indexPtr, string)
     resetView = offset = 0;
     if (indexPtr->linePtr == textPtr->topIndex.linePtr) {
 	resetView = 1;
-	offset = textPtr->topIndex.charIndex;
-	if (offset > indexPtr->charIndex) {
+	offset = textPtr->topIndex.byteIndex;
+	if (offset > indexPtr->byteIndex) {
 	    offset += strlen(string);
 	}
     }
     TkTextChanged(textPtr, indexPtr, indexPtr);
     TkBTreeInsertChars(indexPtr, string);
     if (resetView) {
-	TkTextMakeIndex(textPtr->tree, lineIndex, 0, &newTop);
-	TkTextIndexForwChars(&newTop, offset, &newTop);
+	TkTextMakeByteIndex(textPtr->tree, lineIndex, 0, &newTop);
+	TkTextIndexForwBytes(&newTop, offset, &newTop);
 	TkTextSetYView(textPtr, &newTop, 0);
     }
 
@@ -1275,7 +1356,7 @@ DeleteChars(textPtr, index1String, index2String)
 				 * delete the one character given by
 				 * index1String. */
 {
-    int line1, line2, line, charIndex, resetView;
+    int line1, line2, line, byteIndex, resetView;
     TkTextIndex index1, index2;
 
     /*
@@ -1326,7 +1407,7 @@ DeleteChars(textPtr, index1String, index2String)
 	oldIndex2 = index2;
 	TkTextIndexBackChars(&oldIndex2, 1, &index2);
 	line2--;
-	if ((index1.charIndex == 0) && (line1 != 0)) {
+	if ((index1.byteIndex == 0) && (line1 != 0)) {
 	    TkTextIndexBackChars(&index1, 1, &index1);
 	    line1--;
 	}
@@ -1349,7 +1430,9 @@ DeleteChars(textPtr, index1String, index2String)
      */
 
     TkTextChanged(textPtr, &index1, &index2);
-    resetView = line = charIndex = 0;
+    resetView = 0;
+    line = 0;
+    byteIndex = 0;
     if (TkTextIndexCmp(&index2, &textPtr->topIndex) >= 0) {
 	if (TkTextIndexCmp(&index1, &textPtr->topIndex) <= 0) {
 	    /*
@@ -1359,7 +1442,7 @@ DeleteChars(textPtr, index1String, index2String)
 
 	    resetView = 1;
 	    line = line1;
-	    charIndex = index1.charIndex;
+	    byteIndex = index1.byteIndex;
 	} else if (index1.linePtr == textPtr->topIndex.linePtr) {
 	    /*
 	     * Deletion range starts on top line but after topIndex.
@@ -1368,7 +1451,7 @@ DeleteChars(textPtr, index1String, index2String)
 
 	    resetView = 1;
 	    line = line1;
-	    charIndex = textPtr->topIndex.charIndex;
+	    byteIndex = textPtr->topIndex.byteIndex;
 	}
     } else if (index2.linePtr == textPtr->topIndex.linePtr) {
 	/*
@@ -1379,16 +1462,16 @@ DeleteChars(textPtr, index1String, index2String)
 
 	resetView = 1;
 	line = line2;
-	charIndex = textPtr->topIndex.charIndex;
+	byteIndex = textPtr->topIndex.byteIndex;
 	if (index1.linePtr != index2.linePtr) {
-	    charIndex -= index2.charIndex;
+	    byteIndex -= index2.byteIndex;
 	} else {
-	    charIndex -= (index2.charIndex - index1.charIndex);
+	    byteIndex -= (index2.byteIndex - index1.byteIndex);
 	}
     }
     TkBTreeDeleteChars(&index1, &index2);
     if (resetView) {
-	TkTextMakeIndex(textPtr->tree, line, charIndex, &index1);
+	TkTextMakeByteIndex(textPtr->tree, line, byteIndex, &index1);
 	TkTextSetYView(textPtr, &index1, 0);
     }
 
@@ -1452,12 +1535,12 @@ TextFetchSelection(clientData, offset, buffer, maxBytes)
      */
 
     if (offset == 0) {
-	TkTextMakeIndex(textPtr->tree, 0, 0, &textPtr->selIndex);
+	TkTextMakeByteIndex(textPtr->tree, 0, 0, &textPtr->selIndex);
 	textPtr->abortSelections = 0;
     } else if (textPtr->abortSelections) {
 	return 0;
     }
-    TkTextMakeIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree), 0, &eof);
+    TkTextMakeByteIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree), 0, &eof);
     TkBTreeStartSearch(&textPtr->selIndex, &eof, textPtr->selTagPtr, &search);
     if (!TkBTreeCharTagged(&textPtr->selIndex, textPtr->selTagPtr)) {
 	if (!TkBTreeNextTag(&search)) {
@@ -1504,8 +1587,8 @@ TextFetchSelection(clientData, offset, buffer, maxBytes)
 	    if (textPtr->selIndex.linePtr == search.curIndex.linePtr) {
 		int leftInRange;
 
-		leftInRange = search.curIndex.charIndex
-			- textPtr->selIndex.charIndex;
+		leftInRange = search.curIndex.byteIndex
+			- textPtr->selIndex.byteIndex;
 		if (leftInRange < chunkSize) {
 		    chunkSize = leftInRange;
 		    if (chunkSize <= 0) {
@@ -1513,14 +1596,15 @@ TextFetchSelection(clientData, offset, buffer, maxBytes)
 		    }
 		}
 	    }
-	    if (segPtr->typePtr == &tkTextCharType) {
+	    if ((segPtr->typePtr == &tkTextCharType)
+		    && !TkTextIsElided(textPtr, &textPtr->selIndex)) {
 		memcpy((VOID *) buffer, (VOID *) (segPtr->body.chars
 			+ offsetInSeg), (size_t) chunkSize);
 		buffer += chunkSize;
 		maxBytes -= chunkSize;
 		count += chunkSize;
 	    }
-	    TkTextIndexForwChars(&textPtr->selIndex, chunkSize,
+	    TkTextIndexForwBytes(&textPtr->selIndex, chunkSize,
 		    &textPtr->selIndex);
 	}
 
@@ -1577,8 +1661,8 @@ TkTextLostSelection(clientData)
      * just remove the "sel" tag from everything in the widget.
      */
 
-    TkTextMakeIndex(textPtr->tree, 0, 0, &start);
-    TkTextMakeIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree), 0, &end);
+    TkTextMakeByteIndex(textPtr->tree, 0, 0, &start);
+    TkTextMakeByteIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree), 0, &end);
     TkTextRedrawTag(textPtr, &start, &end, textPtr->selTagPtr, 1);
     TkBTreeTag(&start, &end, textPtr->selTagPtr, 0);
 #endif
@@ -1611,7 +1695,8 @@ TextBlinkProc(clientData)
     TkTextIndex index;
     int x, y, w, h;
 
-    if (!(textPtr->flags & GOT_FOCUS) || (textPtr->insertOffTime == 0)) {
+    if ((textPtr->state == TK_STATE_DISABLED) ||
+	    !(textPtr->flags & GOT_FOCUS) || (textPtr->insertOffTime == 0)) {
 	return;
     }
     if (textPtr->flags & INSERT_ON) {
@@ -1654,10 +1739,10 @@ TextSearchCmd(textPtr, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    int backwards, exact, c, i, argsLeft, noCase, leftToScan;
+    int backwards, exact, searchElide, c, i, argsLeft, noCase, leftToScan;
     size_t length;
-    int numLines, startingLine, startingChar, lineNum, firstChar, lastChar;
-    int code, matchLength, matchChar, passes, stopLine, searchWholeText;
+    int numLines, startingLine, startingByte, lineNum, firstByte, lastByte;
+    int code, matchLength, matchByte, passes, stopLine, searchWholeText;
     int patLength;
     char *arg, *pattern, *varName, *p, *startOfLine;
     char buffer[20];
@@ -1665,6 +1750,8 @@ TextSearchCmd(textPtr, interp, argc, argv)
     Tcl_DString line, patDString;
     TkTextSegment *segPtr;
     TkTextLine *linePtr;
+    TkTextIndex curIndex;
+    Tcl_Obj *patObj = NULL;
     Tcl_RegExp regexp = NULL;		/* Initialization needed only to
 					 * prevent compiler warning. */
 
@@ -1673,6 +1760,8 @@ TextSearchCmd(textPtr, interp, argc, argv)
      */
 
     exact = 1;
+    searchElide = 0;
+    curIndex.tree = textPtr->tree;
     backwards = 0;
     noCase = 0;
     varName = NULL;
@@ -1685,8 +1774,8 @@ TextSearchCmd(textPtr, interp, argc, argv)
 	if (length < 2) {
 	    badSwitch:
 	    Tcl_AppendResult(interp, "bad switch \"", arg,
-		    "\": must be -forward, -backward, -exact, -regexp, ",
-		    "-nocase, -count, or --", (char *) NULL);
+		    "\": must be --, -backward, -count, -elide, -exact, ",
+		    "-forward, -nocase, or -regexp", (char *) NULL);
 	    return TCL_ERROR;
 	}
 	c = arg[1];
@@ -1694,13 +1783,24 @@ TextSearchCmd(textPtr, interp, argc, argv)
 	    backwards = 1;
 	} else if ((c == 'c') && (strncmp(argv[i], "-count", length) == 0)) {
 	    if (i >= (argc-1)) {
-		interp->result = "no value given for \"-count\" option";
+		Tcl_SetResult(interp, "no value given for \"-count\" option",
+			TCL_STATIC);
 		return TCL_ERROR;
 	    }
 	    i++;
 	    varName = argv[i];
-	} else if ((c == 'e') && (strncmp(argv[i], "-exact", length) == 0)) {
+	} else if ((c == 'e') && (length > 2)
+		&& (strncmp(argv[i], "-exact", length) == 0)) {
 	    exact = 1;
+	} else if ((c == 'e') && (length > 2)
+		&& (strncmp(argv[i], "-elide", length) == 0)) {
+	    searchElide = 1;
+	} else if ((c == 'h') && (strncmp(argv[i], "-hidden", length) == 0)) {
+	    /*
+	     * -hidden is kept around for backwards compatibility with
+	     * the dash patch, but -elide is the official option
+	     */
+	    searchElide = 1;
 	} else if ((c == 'f') && (strncmp(argv[i], "-forwards", length) == 0)) {
 	    backwards = 0;
 	} else if ((c == 'n') && (strncmp(argv[i], "-nocase", length) == 0)) {
@@ -1717,7 +1817,7 @@ TextSearchCmd(textPtr, interp, argc, argv)
     argsLeft = argc - (i+2);
     if ((argsLeft != 0) && (argsLeft != 1)) {
 	Tcl_AppendResult(interp, "wrong # args: should be \"",
-		argv[0], " search ?switches? pattern index ?stopIndex?",
+		argv[0], " search ?switches? pattern index ?stopIndex?\"",
 		(char *) NULL);
 	return TCL_ERROR;
     }
@@ -1727,36 +1827,35 @@ TextSearchCmd(textPtr, interp, argc, argv)
      * Convert the pattern to lower-case if we're supposed to ignore case.
      */
 
-    if (noCase) {
+    if (noCase && exact) {
 	Tcl_DStringInit(&patDString);
 	Tcl_DStringAppend(&patDString, pattern, -1);
 	pattern = Tcl_DStringValue(&patDString);
-	for (p = pattern; *p != 0; p++) {
-	    if (isupper(UCHAR(*p))) {
-		*p = tolower(UCHAR(*p));
-	    }
-	}
+	Tcl_UtfToLower(pattern);
     }
 
+    Tcl_DStringInit(&line);
     if (TkTextGetIndex(interp, textPtr, argv[i+1], &index) != TCL_OK) {
-	return TCL_ERROR;
+	code = TCL_ERROR;
+	goto done;
     }
     numLines = TkBTreeNumLines(textPtr->tree);
     startingLine = TkBTreeLineIndex(index.linePtr);
-    startingChar = index.charIndex;
+    startingByte = index.byteIndex;
     if (startingLine >= numLines) {
 	if (backwards) {
 	    startingLine = TkBTreeNumLines(textPtr->tree) - 1;
-	    startingChar = TkBTreeCharsInLine(TkBTreeFindLine(textPtr->tree,
+	    startingByte = TkBTreeBytesInLine(TkBTreeFindLine(textPtr->tree,
 		    startingLine));
 	} else {
 	    startingLine = 0;
-	    startingChar = 0;
+	    startingByte = 0;
 	}
     }
     if (argsLeft == 1) {
 	if (TkTextGetIndex(interp, textPtr, argv[i+2], &stopIndex) != TCL_OK) {
-	    return TCL_ERROR;
+	    code = TCL_ERROR;
+	    goto done;
 	}
 	stopLine = TkBTreeLineIndex(stopIndex.linePtr);
 	if (!backwards && (stopLine == numLines)) {
@@ -1778,14 +1877,17 @@ TextSearchCmd(textPtr, interp, argc, argv)
     if (exact) {
 	patLength = strlen(pattern);
     } else {
-	regexp = Tcl_RegExpCompile(interp, pattern);
+	patObj = Tcl_NewStringObj(pattern, -1);
+	Tcl_IncrRefCount(patObj);
+	regexp = Tcl_GetRegExpFromObj(interp, patObj,
+		(noCase ? TCL_REG_NOCASE : 0) | TCL_REG_ADVANCED);
 	if (regexp == NULL) {
-	    return TCL_ERROR;
+	    code = TCL_ERROR;
+	    goto done;
 	}
     }
     lineNum = startingLine;
     code = TCL_OK;
-    Tcl_DStringInit(&line);
     for (passes = 0; passes < 2; ) {
 	if (lineNum >= numLines) {
 	    /*
@@ -1802,9 +1904,11 @@ TextSearchCmd(textPtr, interp, argc, argv)
 	 */
 
 	linePtr = TkBTreeFindLine(textPtr->tree, lineNum);
+	curIndex.linePtr = linePtr; curIndex.byteIndex = 0;
 	for (segPtr = linePtr->segPtr; segPtr != NULL;
-		segPtr = segPtr->nextPtr) {
-	    if (segPtr->typePtr != &tkTextCharType) {
+		curIndex.byteIndex += segPtr->size, segPtr = segPtr->nextPtr) {
+	    if ((segPtr->typePtr != &tkTextCharType)
+		    || (!searchElide && TkTextIsElided(textPtr, &curIndex))) {
 		continue;
 	    }
 	    Tcl_DStringAppend(&line, segPtr->body.chars, segPtr->size);
@@ -1819,22 +1923,20 @@ TextSearchCmd(textPtr, interp, argc, argv)
 	 */
 
 	if (noCase) {
-	    for (p = Tcl_DStringValue(&line); *p != 0; p++) {
-		if (isupper(UCHAR(*p))) {
-		    *p = tolower(UCHAR(*p));
-		}
-	    }
+	    Tcl_DStringSetLength(&line,
+		    Tcl_UtfToLower(Tcl_DStringValue(&line)));
 	}
 
 	/*
 	 * Check for matches within the current line.  If so, and if we're
 	 * searching backwards, repeat the search to find the last match
-	 * in the line.
+	 * in the line.  (Note: The lastByte should include the NULL char
+	 * so we can handle searching for end of line easier.)
 	 */
 
-	matchChar = -1;
-	firstChar = 0;
-	lastChar = INT_MAX;
+	matchByte = -1;
+	firstByte = 0;
+	lastByte = Tcl_DStringLength(&line) + 1;
 	if (lineNum == startingLine) {
 	    int indexInDString;
 
@@ -1848,8 +1950,8 @@ TextSearchCmd(textPtr, interp, argc, argv)
 	     * character.
 	     */
 
-	    indexInDString = startingChar;
-	    for (segPtr = linePtr->segPtr, leftToScan = startingChar;
+	    indexInDString = startingByte;
+	    for (segPtr = linePtr->segPtr, leftToScan = startingByte;
 		    leftToScan > 0; segPtr = segPtr->nextPtr) {
 		if (segPtr->typePtr != &tkTextCharType) {
 		    indexInDString -= segPtr->size;
@@ -1863,8 +1965,9 @@ TextSearchCmd(textPtr, interp, argc, argv)
 		 * Only use the last part of the line.
 		 */
 
-		firstChar = indexInDString;
-		if (firstChar >= Tcl_DStringLength(&line)) {
+		firstByte = indexInDString;
+		if ((firstByte >= Tcl_DStringLength(&line))
+			&& !((Tcl_DStringLength(&line) == 0) && !exact)) {
 		    goto nextLine;
 		}
 	    } else {
@@ -1872,13 +1975,16 @@ TextSearchCmd(textPtr, interp, argc, argv)
 		 * Use only the first part of the line.
 		 */
 
-		lastChar = indexInDString;
+		lastByte = indexInDString;
 	    }
 	}
 	do {
 	    int thisLength;
+	    Tcl_UniChar ch;
+
 	    if (exact) {
-		p = strstr(startOfLine + firstChar, pattern);
+		p = strstr(startOfLine + firstByte,	/* INTL: Native. */
+			pattern); 
 		if (p == NULL) {
 		    break;
 		}
@@ -1889,7 +1995,7 @@ TextSearchCmd(textPtr, interp, argc, argv)
 		int match;
 
 		match = Tcl_RegExpExec(interp, regexp,
-			startOfLine + firstChar, startOfLine);
+			startOfLine + firstByte, startOfLine);
 		if (match < 0) {
 		    code = TCL_ERROR;
 		    goto done;
@@ -1901,12 +2007,12 @@ TextSearchCmd(textPtr, interp, argc, argv)
 		i = start - startOfLine;
 		thisLength = end - start;
 	    }
-	    if (i >= lastChar) {
+	    if (i >= lastByte) {
 		break;
 	    }
-	    matchChar = i;
+	    matchByte = i;
 	    matchLength = thisLength;
-	    firstChar = matchChar+1;
+	    firstByte = i + Tcl_UtfToUniChar(startOfLine + matchByte, &ch);
 	} while (backwards);
 
 	/*
@@ -1915,32 +2021,49 @@ TextSearchCmd(textPtr, interp, argc, argv)
 	 * specified.
 	 */
 
-	if (matchChar >= 0) {
+	if (matchByte >= 0) {
+	    int numChars;
+
+	    /*
+	     * Convert the byte length to a character count.
+	     */
+
+	    numChars = Tcl_NumUtfChars(startOfLine + matchByte,
+		    matchLength);
+
 	    /*
 	     * The index information returned by the regular expression
 	     * parser only considers textual information:  it doesn't
-	     * account for embedded windows or any other non-textual info.
+	     * account for embedded windows, elided text (when we are not
+	     * searching elided text) or any other non-textual info.
 	     * Scan through the line's segments again to adjust both
 	     * matchChar and matchCount.
+	     *
+	     * We will walk through the segments of this line until we have
+	     * either reached the end of the match or we have reached the end
+	     * of the line.
 	     */
 
-	    for (segPtr = linePtr->segPtr, leftToScan = matchChar;
-		    leftToScan >= 0; segPtr = segPtr->nextPtr) {
-		if (segPtr->typePtr != &tkTextCharType) {
-		    matchChar += segPtr->size;
-		    continue;
+	    curIndex.linePtr = linePtr; curIndex.byteIndex = 0;
+	    for (segPtr = linePtr->segPtr, leftToScan = matchByte;
+		    leftToScan >= 0 && segPtr; segPtr = segPtr->nextPtr) {
+		if (segPtr->typePtr != &tkTextCharType || \
+			(!searchElide && TkTextIsElided(textPtr, &curIndex))) {
+		    matchByte += segPtr->size;
+		} else {
+		    leftToScan -= segPtr->size;
 		}
-		leftToScan -= segPtr->size;
+		curIndex.byteIndex += segPtr->size;
 	    }
 	    for (leftToScan += matchLength; leftToScan > 0;
 		    segPtr = segPtr->nextPtr) {
 		if (segPtr->typePtr != &tkTextCharType) {
-		    matchLength += segPtr->size;
+		    numChars += segPtr->size;
 		    continue;
 		}
 		leftToScan -= segPtr->size;
 	    }
-	    TkTextMakeIndex(textPtr->tree, lineNum, matchChar, &index);
+	    TkTextMakeByteIndex(textPtr->tree, lineNum, matchByte, &index);
 	    if (!searchWholeText) {
 		if (!backwards && (TkTextIndexCmp(&index, &stopIndex) >= 0)) {
 		    goto done;
@@ -1950,14 +2073,15 @@ TextSearchCmd(textPtr, interp, argc, argv)
 		}
 	    }
 	    if (varName != NULL) {
-		sprintf(buffer, "%d", matchLength);
+		sprintf(buffer, "%d", numChars);
 		if (Tcl_SetVar(interp, varName, buffer, TCL_LEAVE_ERR_MSG)
 			== NULL) {
 		    code = TCL_ERROR;
 		    goto done;
 		}
 	    }
-	    TkTextPrintIndex(&index, interp->result);
+	    TkTextPrintIndex(&index, buffer);
+	    Tcl_SetResult(interp, buffer, TCL_VOLATILE);
 	    goto done;
 	}
 
@@ -1989,8 +2113,11 @@ TextSearchCmd(textPtr, interp, argc, argv)
     }
     done:
     Tcl_DStringFree(&line);
-    if (noCase) {
+    if (noCase && exact) {
 	Tcl_DStringFree(&patDString);
+    }
+    if (patObj != NULL) {
+	Tcl_DecrRefCount(patObj);
     }
     return code;
 }
@@ -2006,7 +2133,7 @@ TextSearchCmd(textPtr, interp, argc, argv)
  *	The return value is a pointer to a malloc'ed structure holding
  *	parsed information about the tab stops.  If an error occurred
  *	then the return value is NULL and an error message is left in
- *	interp->result.
+ *	the interp's result.
  *
  * Side effects:
  *	Memory is allocated for the structure that is returned.  It is
@@ -2028,6 +2155,7 @@ TkTextGetTabs(interp, tkwin, string)
     char **argv;
     TkTextTabArray *tabArrayPtr;
     TkTextTab *tabPtr;
+    Tcl_UniChar ch;
 
     if (Tcl_SplitList(interp, string, &argc, &argv) != TCL_OK) {
 	return NULL;
@@ -2070,11 +2198,12 @@ TkTextGetTabs(interp, tkwin, string)
 	if ((i+1) == argc) {
 	    continue;
 	}
-	c = UCHAR(argv[i+1][0]);
-	if (!isalpha(c)) {
+	Tcl_UtfToUniChar(argv[i+1], &ch);
+	if (!Tcl_UniCharIsAlpha(ch)) {
 	    continue;
 	}
 	i += 1;
+	c = argv[i][0];
 	if ((c == 'l') && (strncmp(argv[i], "left",
 		strlen(argv[i])) == 0)) {
 	    tabPtr->alignment = LEFT;
@@ -2186,7 +2315,7 @@ TextDumpCmd(textPtr, interp, argc, argv)
     if (TkTextGetIndex(interp, textPtr, argv[arg], &index1) != TCL_OK) {
 	return TCL_ERROR;
     }
-    lineno = TkBTreeLineIndex(index1.linePtr) + 1;
+    lineno = TkBTreeLineIndex(index1.linePtr);
     arg++;
     atEnd = 0;
     if (argc == arg) {
@@ -2204,10 +2333,10 @@ TextDumpCmd(textPtr, interp, argc, argv)
     }
     if (index1.linePtr == index2.linePtr) {
 	DumpLine(interp, textPtr, what, index1.linePtr,
-	    index1.charIndex, index2.charIndex, lineno, command);
+	    index1.byteIndex, index2.byteIndex, lineno, command);
     } else {
 	DumpLine(interp, textPtr, what, index1.linePtr,
-		index1.charIndex, 32000000, lineno, command);
+		index1.byteIndex, 32000000, lineno, command);
 	linePtr = index1.linePtr;
 	while ((linePtr = TkBTreeNextLine(linePtr)) != (TkTextLine *)NULL) {
 	    lineno++;
@@ -2218,14 +2347,14 @@ TextDumpCmd(textPtr, interp, argc, argv)
 		    lineno, command);
 	}
 	DumpLine(interp, textPtr, what, index2.linePtr, 0,
-		index2.charIndex, lineno, command);
+		index2.byteIndex, lineno, command);
     }
     /*
      * Special case to get the leftovers hiding at the end mark.
      */
     if (atEnd) {
 	DumpLine(interp, textPtr, what & ~TK_DUMP_TEXT, index2.linePtr,
-		0, 1, lineno, command);
+		0, 1, lineno, command);			    
 
     }
     return TCL_OK;
@@ -2243,17 +2372,18 @@ TextDumpCmd(textPtr, interp, argc, argv)
  *	None, but see DumpSegment.
  */
 static void
-DumpLine(interp, textPtr, what, linePtr, start, end, lineno, command)
+DumpLine(interp, textPtr, what, linePtr, startByte, endByte, lineno, command)
     Tcl_Interp *interp;
     TkText *textPtr;
     int what;			/* bit flags to select segment types */
     TkTextLine *linePtr;	/* The current line */
-    int start, end;		/* Character range to dump */
+    int startByte, endByte;	/* Byte range to dump */
     int lineno;			/* Line number for indices dump */
     char *command;		/* Script to apply to the segment */
 {
     int offset;
     TkTextSegment *segPtr;
+    TkTextIndex index;
     /*
      * Must loop through line looking at its segments.
      * character
@@ -2262,47 +2392,54 @@ DumpLine(interp, textPtr, what, linePtr, start, end, lineno, command)
      * image
      * window
      */
+
     for (offset = 0, segPtr = linePtr->segPtr ;
-	    (offset < end) && (segPtr != (TkTextSegment *)NULL) ;
+	    (offset < endByte) && (segPtr != (TkTextSegment *)NULL) ;
 	    offset += segPtr->size, segPtr = segPtr->nextPtr) {
 	if ((what & TK_DUMP_TEXT) && (segPtr->typePtr == &tkTextCharType) &&
-		(offset + segPtr->size > start)) {
+		(offset + segPtr->size > startByte)) {
 	    char savedChar;			/* Last char used in the seg */
 	    int last = segPtr->size;		/* Index of savedChar */
 	    int first = 0;			/* Index of first char in seg */
-	    if (offset + segPtr->size > end) {
-		last = end - offset;
+	    if (offset + segPtr->size > endByte) {
+		last = endByte - offset;
 	    }
-	    if (start > offset) {
-		first = start - offset;
+	    if (startByte > offset) {
+		first = startByte - offset;
 	    }
 	    savedChar = segPtr->body.chars[last];
 	    segPtr->body.chars[last] = '\0';
+	    
+	    TkTextMakeByteIndex(textPtr->tree, lineno, offset + first, &index);
 	    DumpSegment(interp, "text", segPtr->body.chars + first,
-		    command, lineno, offset + first, what);
+		    command, &index, what);
 	    segPtr->body.chars[last] = savedChar;
-	} else if ((offset >= start)) {
+	} else if ((offset >= startByte)) {
 	    if ((what & TK_DUMP_MARK) && (segPtr->typePtr->name[0] == 'm')) {
 		TkTextMark *markPtr = (TkTextMark *)&segPtr->body;
 		char *name = Tcl_GetHashKey(&textPtr->markTable, markPtr->hPtr);
-		DumpSegment(interp, "mark", name,
-			command, lineno, offset, what);
+
+		TkTextMakeByteIndex(textPtr->tree, lineno, offset, &index);
+		DumpSegment(interp, "mark", name, command, &index, what);
 	    } else if ((what & TK_DUMP_TAG) &&
 			(segPtr->typePtr == &tkTextToggleOnType)) {
+		TkTextMakeByteIndex(textPtr->tree, lineno, offset, &index);
 		DumpSegment(interp, "tagon",
 			segPtr->body.toggle.tagPtr->name,
-			command, lineno, offset, what);
+			command, &index, what);
 	    } else if ((what & TK_DUMP_TAG) && 
 			(segPtr->typePtr == &tkTextToggleOffType)) {
+		TkTextMakeByteIndex(textPtr->tree, lineno, offset, &index);
 		DumpSegment(interp, "tagoff",
 			segPtr->body.toggle.tagPtr->name,
-			command, lineno, offset, what);
+			command, &index, what);
 	    } else if ((what & TK_DUMP_IMG) && 
 			(segPtr->typePtr->name[0] == 'i')) {
 		TkTextEmbImage *eiPtr = (TkTextEmbImage *)&segPtr->body;
 		char *name = (eiPtr->name ==  NULL) ? "" : eiPtr->name;
+		TkTextMakeByteIndex(textPtr->tree, lineno, offset, &index);
 		DumpSegment(interp, "image", name,
-			command, lineno, offset, what);
+			command, &index, what);
 	    } else if ((what & TK_DUMP_WIN) && 
 			(segPtr->typePtr->name[0] == 'w')) {
 		TkTextEmbWindow *ewPtr = (TkTextEmbWindow *)&segPtr->body;
@@ -2312,8 +2449,9 @@ DumpLine(interp, textPtr, what, linePtr, start, end, lineno, command)
 		} else {
 		    pathname = Tk_PathName(ewPtr->tkwin);
 		}
+		TkTextMakeByteIndex(textPtr->tree, lineno, offset, &index);
 		DumpSegment(interp, "window", pathname,
-			command, lineno, offset, what);
+			command, &index, what);
 	    }
 	}
     }
@@ -2331,17 +2469,16 @@ DumpLine(interp, textPtr, what, linePtr, start, end, lineno, command)
  *	Either evals the callback or appends elements to the result string.
  */
 static int
-DumpSegment(interp, key, value, command, lineno, offset, what)
+DumpSegment(interp, key, value, command, index, what)
     Tcl_Interp *interp;
     char *key;			/* Segment type key */
     char *value;		/* Segment value */
     char *command;		/* Script callback */
-    int lineno;			/* Line number for indices dump */
-    int offset;			/* Character position */
+    TkTextIndex *index;         /* index with line/byte position info */
     int what;			/* Look for TK_DUMP_INDEX bit */
 {
-    char buffer[30];
-    sprintf(buffer, "%d.%d", lineno, offset);
+    char buffer[TCL_INTEGER_SPACE*2];
+    TkTextPrintIndex(index, buffer);
     if (command == (char *) NULL) {
 	Tcl_AppendElement(interp, key);
 	Tcl_AppendElement(interp, value);
@@ -2361,4 +2498,6 @@ DumpSegment(interp, key, value, command, lineno, offset, what)
 	return result;
     }
 }
+
+
 

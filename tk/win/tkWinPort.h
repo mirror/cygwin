@@ -6,7 +6,6 @@
  *	file that contains #ifdefs to handle different flavors of OS.
  *
  * Copyright (c) 1995-1996 Sun Microsystems, Inc.
- * Copyright (c) 1998 by Scriptics Corporation.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -32,19 +31,29 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <io.h>
+
+/*
+ * Need to block out this include for building extensions with MetroWerks
+ * compiler for Win32.
+ */
+
+#ifndef __MWERKS__
 #include <sys/stat.h>
+#endif
+
 #include <time.h>
+
+#ifdef _MSC_VER
+#include <tchar.h>
+#endif
 
 #ifdef _MSC_VER
 #    define hypot _hypot
 #endif /* _MSC_VER */
 
-#ifdef __CYGWIN32__
-#define strnicmp strncasecmp
-#define stricmp strcasecmp
-#else
-#define strncasecmp strnicmp
-#define strcasecmp stricmp
+#ifndef __GNUC__
+#    define strncasecmp strnicmp
+#    define strcasecmp stricmp
 #endif
 
 #define NBBY 8
@@ -123,13 +132,11 @@ struct timezone {
     int tz_dsttime;
 };
 
+#endif
 
-struct timeval;
-
-extern int gettimeofday(struct timeval *, struct timezone *);
-
-#endif /* ! __MINGW32__ */
-
-EXTERN void		panic _ANSI_ARGS_(TCL_VARARGS(char *,format));
+#ifndef _TCLINT
+#include <tclInt.h>
+#endif
 
 #endif /* _WINPORT */
+

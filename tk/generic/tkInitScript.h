@@ -12,6 +12,8 @@
  * RCS: @(#) $Id$
  */
 
+
+
 /*
  * In order to find tk.tcl during initialization, the following script
  * is invoked by Tk_Init().  It looks in several different directories:
@@ -46,11 +48,12 @@
  */
 
 static char initScript[] = "if {[info proc tkInit]==\"\"} {\n\
-  proc tkInit {} {\n\
-    global tk_library tk_version tk_patchLevel\n\
-    rename tkInit {}\n\
-    tcl_findLibrary tk $tk_version $tk_patchLevel tk.tcl TK_LIBRARY tk_library\n\
-  }\n\
+    proc tkInit {} {\n\
+        global tk_library tk_version tk_patchLevel\n\
+        rename tkInit {}\n\
+        tcl_findLibrary tk $tk_version $tk_patchLevel tk.tcl TK_LIBRARY tk_library\n\
+}\n\
 }\n\
 tkInit";
+
 

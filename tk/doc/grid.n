@@ -335,3 +335,4 @@ geometry manager written by Doug. Stein, and the \fBblt_table\fR geometry
 manager, written by George Howlett.
 .SH KEYWORDS
 geometry manager, location, grid, cell, propagation, size, pack
+

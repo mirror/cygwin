@@ -4,6 +4,7 @@
  *	Windows specific mouse tracking code.
  *
  * Copyright (c) 1995-1997 Sun Microsystems, Inc.
+ * Copyright (c) 1998-1999 by Scriptics Corporation.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -62,7 +63,7 @@ TkWinGetModifierState()
 	state |= ControlMask;
     }
     if (GetKeyState(VK_MENU) & 0x8000) {
-	state |= Mod2Mask;
+	state |= ALT_MASK;
     }
     if (GetKeyState(VK_CAPITAL) & 0x0001) {
 	state |= LockMask;
@@ -237,8 +238,22 @@ MouseTimerProc(clientData)
     GetCursorPos(&pos);
     Tk_PointerEvent(NULL, pos.x, pos.y);
 }
-
-/* CYGNUS LOCAL: Cancel any current mouse timer.  */
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkWinCancelMouseTimer --
+ *
+ *    If the mouse timer is set, cancel it.
+ *
+ * Results:
+ *    None.
+ *
+ * Side effects:
+ *    May cancel the mouse timer.
+ *
+ *----------------------------------------------------------------------
+ */
 
 void
 TkWinCancelMouseTimer()
@@ -315,6 +330,42 @@ XQueryPointer(display, w, root_return, child_return, root_x_return,
     TkGetPointerCoords(NULL, root_x_return, root_y_return);
     *mask_return = TkWinGetModifierState();
     return True;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * XWarpPointer --
+ *
+ *	Move pointer to new location.  This is not a complete
+ *	implementation of this function.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Mouse pointer changes position on screen.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+XWarpPointer(display, src_w, dest_w, src_x, src_y, src_width,
+	src_height, dest_x, dest_y)
+    Display* display;
+    Window src_w;
+    Window dest_w;
+    int src_x;
+    int src_y;
+    unsigned int src_width;
+    unsigned int src_height;
+    int dest_x;
+    int dest_y;
+{
+    RECT r;
+
+    GetWindowRect(Tk_GetHWND(dest_w), &r);
+    SetCursorPos(r.left+dest_x, r.top+dest_y);    
 }
 
 /*
@@ -427,7 +478,7 @@ TkpChangeFocus(winPtr, force)
      */
 
     if (force) {
-	SetForegroundWindow(Tk_GetHWND(winPtr->window));
+	TkWinSetForegroundWindow(winPtr);
     }
     XSetInputFocus(dispPtr->display, winPtr->window, RevertToParent,
 	    CurrentTime);

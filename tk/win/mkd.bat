@@ -19,3 +19,4 @@ echo TAG >%1\tag.txt
 echo created directory %1
 
 :end
+

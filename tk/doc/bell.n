@@ -32,3 +32,4 @@ screen becomes visible again.
 
 .SH KEYWORDS
 beep, bell, ring
+

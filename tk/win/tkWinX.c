@@ -5,7 +5,7 @@
  *
  * Copyright (c) 1995-1996 Sun Microsystems, Inc.
  * Copyright (c) 1994 Software Research Associates, Inc.
- * Copyright (c) 1998 by Scriptics Corporation.
+ * Copyright (c) 1998-2000 by Scriptics Corporation.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -13,50 +13,37 @@
  * RCS: @(#) $Id$
  */
 
-#include "tkInt.h"
 #include "tkWinInt.h"
 
-#if defined (__CYGWIN32__) || defined (__MINGW32__)
-/* GCC ports that use Windows32api headers don't provide
-   GetCurrentTime, and the function is obsolete anyhow.  */
-#define GetCurrentTime GetTickCount
-#endif
-
-/*
- * CYGNUS LOCAL:
- * We don't have a zmouse.h, AND as of gnupro 98r2, the WM_MOUSEWHEEL
- * message is not added to any of the Cygwin defines.  So we include
- * it here.
- * FIXME -- remove the define when it gets into the Cygwin header files
- */
-
-#ifdef __CYGWIN32__
-#define WM_MOUSEWHEEL 0x020A
-#else
 /*
  * The zmouse.h file includes the definition for WM_MOUSEWHEEL.
  */
 
 #include <zmouse.h>
-#endif
-
-/*
- * Definitions of extern variables supplied by this file.
- */
-
-int tkpIsWin32s = -1;
 
 /*
  * Declarations of static variables used in this file.
  */
 
-static HINSTANCE tkInstance = (HINSTANCE) NULL;
-				/* Global application instance handle. */
-static TkDisplay *winDisplay;	/* Display that represents Windows screen. */
-static char winScreenName[] = ":0";
-				/* Default name of windows display. */
-static WNDCLASS childClass;	/* Window class for child windows. */
-static childClassInitialized = 0; /* Registered child class? */
+static char winScreenName[] = ":0"; /* Default name of windows display. */
+static HINSTANCE tkInstance;        /* Application instance handle. */
+static int childClassInitialized;   /* Registered child class? */
+static WNDCLASS childClass;	    /* Window class for child windows. */
+static int tkPlatformId;	    /* version of Windows platform */
+
+TCL_DECLARE_MUTEX(winXMutex)
+
+/*
+ * Thread local storage.  Notice that now each thread must have its
+ * own TkDisplay structure, since this structure contains most of
+ * the thread-specific date for threads.
+ */
+typedef struct ThreadSpecificData {
+    TkDisplay *winDisplay;       /* TkDisplay structure that *
+				  *  represents Windows screen. */
+    int updatingClipboard;	/* If 1, we are updating the clipboard */
+} ThreadSpecificData;
+static Tcl_ThreadDataKey dataKey;
 
 /*
  * Forward declarations of procedures used in this file.
@@ -93,16 +80,14 @@ TkGetServerInfo(interp, tkwin)
     Tk_Window tkwin;		/* Token for window;  this selects a
 				 * particular display and server. */
 {
-    char buffer[50];
-    OSVERSIONINFO info;
+    char buffer[60];
+    OSVERSIONINFO os;
 
-    info.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    GetVersionEx(&info);
-    sprintf(buffer, "Windows %d.%d %d ", info.dwMajorVersion,
-	    info.dwMinorVersion, info.dwBuildNumber);
-    Tcl_AppendResult(interp, buffer,
-	    (info.dwPlatformId == VER_PLATFORM_WIN32s) ? "Win32s" : "Win32",
-	    (char *) NULL);
+    os.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&os);
+    sprintf(buffer, "Windows %d.%d %d Win32", os.dwMajorVersion,
+	    os.dwMinorVersion, os.dwBuildNumber);
+    Tcl_SetResult(interp, buffer, TCL_VOLATILE);
 }
 
 /*
@@ -147,11 +132,7 @@ void
 TkWinXInit(hInstance)
     HINSTANCE hInstance;
 {
-    OSVERSIONINFO info;
-
-    info.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    GetVersionEx(&info);
-    tkpIsWin32s = (info.dwPlatformId == VER_PLATFORM_WIN32s);
+    OSVERSIONINFO os;
 
     if (childClassInitialized != 0) {
 	return;
@@ -160,7 +141,25 @@ TkWinXInit(hInstance)
 
     tkInstance = hInstance;
 
+    os.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&os);
+    tkPlatformId = os.dwPlatformId;
+
+    /*
+     * When threads are enabled, we cannot use CLASSDC because
+     * threads will then write into the same device context.
+     * 
+     * This is a hack; we should add a subsystem that manages
+     * device context on a per-thread basis.  See also tkWinWm.c,
+     * which also initializes a WNDCLASS structure.
+     */
+
+#ifdef TCL_THREADS
+    childClass.style = CS_HREDRAW | CS_VREDRAW;
+#else
     childClass.style = CS_HREDRAW | CS_VREDRAW | CS_CLASSDC;
+#endif
+
     childClass.cbClsExtra = 0;
     childClass.cbWndExtra = 0;
     childClass.hInstance = hInstance;
@@ -220,6 +219,32 @@ TkWinXCleanup(hInstance)
 /*
  *----------------------------------------------------------------------
  *
+ * TkWinGetPlatformId --
+ *
+ *	Determines whether running under NT, 95, or Win32s, to allow 
+ *	runtime conditional code.
+ *
+ * Results:
+ *	The return value is one of:
+ *	    VER_PLATFORM_WIN32s		Win32s on Windows 3.1. 
+ *	    VER_PLATFORM_WIN32_WINDOWS	Win32 on Windows 95.
+ *	    VER_PLATFORM_WIN32_NT	Win32 on Windows NT
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int		
+TkWinGetPlatformId()
+{
+    return tkPlatformId;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
  * TkGetDefaultScreenName --
  *
  *	Returns the name of the screen that Tk should use during
@@ -254,10 +279,10 @@ TkGetDefaultScreenName(interp, screenName)
  *	specific information.
  *
  * Results:
- *	Returns a Display structure on success or NULL on failure.
+ *	Returns a TkDisplay structure on success or NULL on failure.
  *
  * Side effects:
- *	Allocates a new Display structure.
+ *	Allocates a new TkDisplay structure.
  *
  *----------------------------------------------------------------------
  */
@@ -270,10 +295,13 @@ TkpOpenDisplay(display_name)
     HDC dc;
     TkWinDrawable *twdPtr;
     Display *display;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+	    Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
-    if (winDisplay != NULL) {
-	if (strcmp(winDisplay->display->display_name, display_name) == 0) {
-	    return winDisplay;
+    if (tsdPtr->winDisplay != NULL) {
+	if (strcmp(tsdPtr->winDisplay->display->display_name, display_name) 
+                == 0) {
+	    return tsdPtr->winDisplay;
 	} else {
 	    return NULL;
 	}
@@ -370,14 +398,15 @@ TkpOpenDisplay(display_name)
     screen->white_pixel = RGB(255, 255, 255);
     screen->black_pixel = RGB(0, 0, 0);
 
-    display->screens = screen;
-    display->nscreens = 1;
-    display->default_screen = 0;
+    display->screens		= screen;
+    display->nscreens		= 1;
+    display->default_screen	= 0;
     screen->cmap = XCreateColormap(display, None, screen->root_visual,
 	    AllocNone);
-    winDisplay = (TkDisplay *) ckalloc(sizeof(TkDisplay));
-    winDisplay->display = display;
-    return winDisplay;
+    tsdPtr->winDisplay = (TkDisplay *) ckalloc(sizeof(TkDisplay));
+    tsdPtr->winDisplay->display = display;
+    tsdPtr->updatingClipboard = FALSE;
+    return tsdPtr->winDisplay;
 }
 
 /*
@@ -403,8 +432,10 @@ TkpCloseDisplay(dispPtr)
 {
     Display *display = dispPtr->display;
     HWND hwnd;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+	    Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
-    if (dispPtr != winDisplay) {
+    if (dispPtr != tsdPtr->winDisplay) {
         panic("TkpCloseDisplay: tried to call TkpCloseDisplay on another display");
         return;
     }
@@ -423,7 +454,7 @@ TkpCloseDisplay(dispPtr)
 	}
     }
 
-    winDisplay = NULL;
+    tsdPtr->winDisplay = NULL;
 
     if (display->display_name != (char *) NULL) {
         ckfree(display->display_name);
@@ -506,7 +537,6 @@ TkWinChildProc(hwnd, message, wParam, lParam)
 
 	case WM_CREATE:
 	case WM_ERASEBKGND:
-	case WM_WINDOWPOSCHANGED:
 	    result = 0;
 	    break;
 
@@ -654,6 +684,8 @@ GenerateXEvent(hwnd, message, wParam, lParam)
 {
     XEvent event;
     TkWindow *winPtr = (TkWindow *)Tk_HWNDToWindow(hwnd);
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+	    Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
     if (!winPtr || winPtr->window == None) {
 	return;
@@ -718,14 +750,19 @@ GenerateXEvent(hwnd, message, wParam, lParam)
 	}
 
 	case WM_DESTROYCLIPBOARD:
+	    if (tsdPtr->updatingClipboard == TRUE) {
+		/*
+		 * We want to avoid this event if we are the ones that caused
+		 * this event.
+		 */
+		return;
+	    }
 	    event.type = SelectionClear;
 	    event.xselectionclear.selection =
 		Tk_InternAtom((Tk_Window)winPtr, "CLIPBOARD");
 	    event.xselectionclear.time = TkpGetMS();
 	    break;
 	    
-	    /* CYGNUS LOCAL: Handle WM_MENUCHAR.  */
-	case WM_MENUCHAR:
 	case WM_MOUSEWHEEL:
 	    /*
 	     * The mouse wheel event is closer to a key event than a
@@ -815,26 +852,61 @@ GenerateXEvent(hwnd, message, wParam, lParam)
 		     */
 		    event.type = KeyRelease;
 		    event.xkey.keycode = wParam;
-		    event.xkey.nchars = 0;
+		    event.xkey.nbytes = 0;
 		    break;
-
-		    /* CYGNUS LOCAL: Handle WM_MENUCHAR.  */
-		case WM_MENUCHAR:
-		    /* For a WM_MENUCHAR message, the character code is
-		       only the low word.  */
-		    wParam = LOWORD (wParam);
-		    /* Fall through.  */
 
 		case WM_CHAR:
 		    /*
 		     * Synthesize both a KeyPress and a KeyRelease.
+		     * Strings generated by Input Method Editor are handled
+		     * in the following manner:
+		     * 1. A series of WM_KEYDOWN & WM_KEYUP messages that 
+		     *    cause GetTranslatedKey() to be called and return
+		     *    immediately because the WM_KEYDOWNs have no 
+		     *	  associated WM_CHAR messages -- the IME window is 
+		     *	  accumulating the characters and translating them 
+		     *    itself.  In the "bind" command, you get an event
+		     *	  with a mystery keysym and %A == "" for each 
+		     *	  WM_KEYDOWN that actually was meant for the IME.
+		     * 2. A WM_KEYDOWN corresponding to the "confirm typing"
+		     *    character.  This causes GetTranslatedKey() to be 
+		     *	  called.
+		     * 3. A WM_IME_NOTIFY message saying that the IME is 
+		     *	  done.  A side effect of this message is that 
+		     *    GetTranslatedKey() thinks this means that there
+		     *	  are no WM_CHAR messages and returns immediately.
+		     *    In the "bind" command, you get an another event
+		     *	  with a mystery keysym and %A == "".
+		     * 4. A sequence of WM_CHAR messages that correspond to 
+		     *	  the characters in the IME window.  A bunch of 
+		     *    simulated KeyPress/KeyRelease events will be 
+		     *    generated, one for each character.  Adjacent 
+		     *    WM_CHAR messages may actually specify the high
+		     *	  and low bytes of a multi-byte character -- in that
+		     *    case the two WM_CHAR messages will be combined into
+		     *	  one event.  It is the event-consumer's 
+		     *	  responsibility to convert the string returned from
+		     *	  XLookupString from system encoding to UTF-8.
+		     * 5. And finally we get the WM_KEYUP for the "confirm
+		     *    typing" character.
 		     */
 
 		    event.type = KeyPress;
 		    event.xany.send_event = -1;
 		    event.xkey.keycode = 0;
-		    event.xkey.nchars = 1;
+		    event.xkey.nbytes = 1;
 		    event.xkey.trans_chars[0] = (char) wParam;
+
+		    if (IsDBCSLeadByte((BYTE) wParam)) {
+			MSG msg;
+
+			if ((PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE) != 0)
+				&& (msg.message == WM_CHAR)) {
+			    GetMessage(&msg, NULL, 0, 0);
+			    event.xkey.nbytes = 2;
+			    event.xkey.trans_chars[1] = (char) msg.wParam;
+			}
+		    }
 		    Tk_QueueWindowEvent(&event, TCL_QUEUE_TAIL);
 		    event.type = KeyRelease;
 		    break;
@@ -893,7 +965,7 @@ GetState(message, wParam, lParam)
 		mask = ControlMask;
 		break;
 	    case VK_MENU:
-		mask = Mod2Mask;
+		mask = ALT_MASK;
 		break;
 	    case VK_CAPITAL:
 		if (message == WM_SYSKEYDOWN || message == WM_KEYDOWN) {
@@ -933,7 +1005,7 @@ GetState(message, wParam, lParam)
  *	given KeyPress event.
  *
  * Results:
- *	Sets the trans_chars and nchars member of the key event.
+ *	Sets the trans_chars and nbytes member of the key event.
  *
  * Side effects:
  *	Removes any WM_CHAR messages waiting on the top of the system
@@ -947,14 +1019,13 @@ GetTranslatedKey(xkey)
     XKeyEvent *xkey;
 {
     MSG msg;
+    char buf[XMaxTransChars];
     
-    xkey->nchars = 0;
+    xkey->nbytes = 0;
 
-    while (xkey->nchars < XMaxTransChars
+    while ((xkey->nbytes < XMaxTransChars)
 	    && PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) {
 	if ((msg.message == WM_CHAR) || (msg.message == WM_SYSCHAR)) {
-	    xkey->trans_chars[xkey->nchars] = (char) msg.wParam;
-	    xkey->nchars++;
 	    GetMessage(&msg, NULL, 0, 0);
 
 	    /*
@@ -968,6 +1039,9 @@ GetTranslatedKey(xkey)
 	    if ((msg.message == WM_CHAR) && (msg.lParam & 0x20000000)) {
 		xkey->state = 0;
 	    }
+	    buf[xkey->nbytes] = (char) msg.wParam;
+	    xkey->trans_chars[xkey->nbytes] = (char) msg.wParam;
+	    xkey->nbytes++;
 	} else {
 	    break;
 	}
@@ -1084,5 +1158,29 @@ TkWinResendEvent(wndproc, hwnd, eventPtr)
 unsigned long
 TkpGetMS()
 {
-    return GetCurrentTime();
+    return GetTickCount();
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkWinUpdatingClipboard --
+ *
+ *
+ * Results:
+ *	Number of milliseconds.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TkWinUpdatingClipboard(int mode)
+{
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+	    Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+
+    tsdPtr->updatingClipboard = mode;
 }

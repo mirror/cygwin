@@ -3,7 +3,7 @@
 # This file defines the default bindings for Tk entry widgets and provides
 # procedures that help in implementing those bindings.
 #
-# SCCS: @(#) entry.tcl 1.49 97/09/17 19:08:48
+# RCS: @(#) $Id$
 #
 # Copyright (c) 1992-1994 The Regents of the University of California.
 # Copyright (c) 1994-1997 Sun Microsystems, Inc.
@@ -26,30 +26,31 @@
 #			char, word, or line.
 # x, y -		Last known mouse coordinates for scanning
 #			and auto-scanning.
+# data -		Used for Cut and Copy
 #-------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------
 # The code below creates the default class bindings for entries.
 #-------------------------------------------------------------------------
 bind Entry <<Cut>> {
-    if {![catch {set data [string range [%W get] [%W index sel.first]\
-	    [expr {[%W index sel.last] - 1}]]}]} {
+    if {![catch {tkEntryGetSelection %W} tkPriv(data)]} {
 	clipboard clear -displayof %W
-	clipboard append -displayof %W $data
+	clipboard append -displayof %W $tkPriv(data)
 	%W delete sel.first sel.last
+	unset tkPriv(data)
     }
 }
 bind Entry <<Copy>> {
-    if {![catch {set data [string range [%W get] [%W index sel.first]\
-	    [expr {[%W index sel.last] - 1}]]}]} {
+    if {![catch {tkEntryGetSelection %W} tkPriv(data)]} {
 	clipboard clear -displayof %W
-	clipboard append -displayof %W $data
+	clipboard append -displayof %W $tkPriv(data)
+	unset tkPriv(data)
     }
 }
 bind Entry <<Paste>> {
     global tcl_platform
     catch {
-	if {"$tcl_platform(platform)" != "unix"} {
+	if {[string compare $tcl_platform(platform) "unix"]} {
 	    catch {
 		%W delete sel.first sel.last
 	    }
@@ -201,13 +202,13 @@ bind Entry <Escape> {# nothing}
 bind Entry <Return> {# nothing}
 bind Entry <KP_Enter> {# nothing}
 bind Entry <Tab> {# nothing}
-if {$tcl_platform(platform) == "macintosh"} {
+if {[string equal $tcl_platform(platform) "macintosh"]} {
 	bind Entry <Command-KeyPress> {# nothing}
 }
 
 # On Windows, paste is done using Shift-Insert.  Shift-Insert already
 # generates the <<Paste>> event, so we don't need to do anything here.
-if {$tcl_platform(platform) != "windows"} {
+if {[string compare $tcl_platform(platform) "windows"]} {
     bind Entry <Insert> {
 	catch {tkEntryInsert %W [selection get -displayof %W]}
     }
@@ -335,7 +336,7 @@ proc tkEntryButton1 {w x} {
     set tkPriv(pressX) $x
     $w icursor [tkEntryClosestGap $w $x]
     $w selection from insert
-    if {[lindex [$w configure -state] 4] == "normal"} {focus $w}
+    if {[string equal [$w cget -state] "normal"]} {focus $w}
 }
 
 # tkEntryMouseSelect --
@@ -405,7 +406,7 @@ proc tkEntryPaste {w x} {
 
     $w icursor [tkEntryClosestGap $w $x]
     catch {$w insert insert [selection get -displayof $w]}
-    if {[lindex [$w configure -state] 4] == "normal"} {focus $w}
+    if {[string equal [$w cget -state] "normal"]} {focus $w}
 }
 
 # tkEntryAutoScan --
@@ -429,7 +430,7 @@ proc tkEntryAutoScan {w} {
 	$w xview scroll -2 units
 	tkEntryMouseSelect $w $x
     }
-    set tkPriv(afterId) [after 50 tkEntryAutoScan $w]
+    set tkPriv(afterId) [after 50 [list tkEntryAutoScan $w]]
 }
 
 # tkEntryKeySelect --
@@ -462,7 +463,7 @@ proc tkEntryKeySelect {w new} {
 # s -		The string to insert (usually just a single character)
 
 proc tkEntryInsert {w s} {
-    if {$s == ""} {
+    if {[string equal $s ""]} {
 	return
     }
     catch {
@@ -508,15 +509,8 @@ proc tkEntryBackspace w {
 
 proc tkEntrySeeInsert w {
     set c [$w index insert]
-    set left [$w index @0]
-    if {$left > $c} {
+    if {($c < [$w index @0]) || ($c > [$w index @[winfo width $w]])} {
 	$w xview $c
-	return
-    }
-    set x [winfo width $w]
-    while {([$w index @$x] <= $c) && ($left < $c)} {
-	incr left
-	$w xview $left
     }
 }
 
@@ -570,7 +564,7 @@ proc tkEntryTranspose w {
 # w -		The entry window in which the cursor is to move.
 # start -	Position at which to start search.
 
-if {$tcl_platform(platform) == "windows"}  {
+if {[string equal $tcl_platform(platform) "windows"]}  {
     proc tkEntryNextWord {w start} {
 	set pos [tcl_endOfWord [$w get] [$w index $start]]
 	if {$pos >= 0} {
@@ -606,5 +600,20 @@ proc tkEntryPreviousWord {w start} {
 	return 0
     }
     return $pos
+}
+# tkEntryGetSelection --
+#
+# Returns the selected text of the entry with respect to the -show option.
+#
+# Arguments:
+# w -         The entry window from which the text to get
+
+proc tkEntryGetSelection {w} {
+    set entryString [string range [$w get] [$w index sel.first] \
+	    [expr {[$w index sel.last] - 1}]]
+    if {[string compare [$w cget -show] ""]} {
+	regsub -all . $entryString [string index [$w cget -show] 0] entryString
+    }
+    return $entryString
 }
 

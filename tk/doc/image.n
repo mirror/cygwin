@@ -88,3 +88,4 @@ See the \fBphoto\fR manual entry for more information.
 
 .SH KEYWORDS
 height, image, types of images, width
+

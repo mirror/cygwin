@@ -338,3 +338,4 @@ The End key adjusts the view to the bottom (right edge) of the document.
 
 .SH KEYWORDS
 scrollbar, widget
+

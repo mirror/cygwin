@@ -4,7 +4,7 @@
 # posts a dialog box with the error message and gives the user a chance
 # to see a more detailed stack trace.
 #
-# SCCS: @(#) bgerror.tcl 1.16 97/08/06 09:19:50
+# RCS: @(#) $Id$
 #
 # Copyright (c) 1992-1994 The Regents of the University of California.
 # Copyright (c) 1994-1996 Sun Microsystems, Inc.
@@ -23,7 +23,7 @@
 
 proc bgerror err {
     global errorInfo tcl_platform
-
+    
     # save errorInfo which would be erased in the catch below otherwise.
     set info $errorInfo ;
 
@@ -35,7 +35,8 @@ proc bgerror err {
     #  code from the tkerror trial, other ret codes are passed back
     #  to our caller (tcl background error handler) so the called "tkerror"
     #  can still use  return -code break, to skip remaining messages
-    #  in the error queue for instance)  -- dl
+    #  in the error queue for instance)
+
     set ret [catch {tkerror $err} msg];
     if {$ret != 1} {return -code $ret $msg}
 
@@ -61,7 +62,7 @@ proc bgerror err {
     wm title $w "Stack Trace for Error"
     wm iconname $w "Stack Trace"
     button $w.ok -text OK -command "destroy $w" -default active
-    if {$tcl_platform(platform) == "macintosh"} {
+    if {![string compare $tcl_platform(platform) "macintosh"]} {
       text $w.text -relief flat -bd 2 -highlightthickness 0 -setgrid true \
 	    -yscrollcommand "$w.scroll set" -width 60 -height 20
     } else {
@@ -93,7 +94,9 @@ proc bgerror err {
     # screen, since they could make it impossible for the user
     # to interact with the stack trace.
 
-    if {[grab current .] != ""} {
+    if {[string compare [grab current .] ""]} {
 	grab release [grab current .]
     }
 }
+
+

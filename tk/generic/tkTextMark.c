@@ -39,7 +39,7 @@ static void		MarkCheckProc _ANSI_ARGS_((TkTextSegment *segPtr,
 static int		MarkLayoutProc _ANSI_ARGS_((TkText *textPtr,
 			    TkTextIndex *indexPtr, TkTextSegment *segPtr,
 			    int offset, int maxX, int maxChars,
-			    int noCharsYet, Tk_Uid wrapMode,
+			    int noCharsYet, TkWrapMode wrapMode,
 			    TkTextDispChunk *chunkPtr));
 static int		MarkFindNext _ANSI_ARGS_((Tcl_Interp *interp,
 			    TkText *textPtr, char *markName));
@@ -134,9 +134,9 @@ TkTextMarkCmd(textPtr, interp, argc, argv)
 	markPtr = (TkTextSegment *) Tcl_GetHashValue(hPtr);
 	if (argc == 4) {
 	    if (markPtr->typePtr == &tkTextRightMarkType) {
-		interp->result = "right";
+		Tcl_SetResult(interp, "right", TCL_STATIC);
 	    } else {
-		interp->result = "left";
+		Tcl_SetResult(interp, "left", TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -319,10 +319,10 @@ TkTextMarkSegToIndex(textPtr, markPtr, indexPtr)
 
     indexPtr->tree = textPtr->tree;
     indexPtr->linePtr = markPtr->body.mark.linePtr;
-    indexPtr->charIndex = 0;
+    indexPtr->byteIndex = 0;
     for (segPtr = indexPtr->linePtr->segPtr; segPtr != markPtr;
 	    segPtr = segPtr->nextPtr) {
-	indexPtr->charIndex += segPtr->size;
+	indexPtr->byteIndex += segPtr->size;
     }
 }
 
@@ -454,7 +454,7 @@ MarkLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
 				 * many characters. */
     int noCharsYet;		/* Non-zero means no characters have been
 				 * assigned to this line yet. */
-    Tk_Uid wrapMode;		/* Not used. */
+    TkWrapMode wrapMode;	/* Not used. */
     register TkTextDispChunk *chunkPtr;
 				/* Structure to fill in with information
 				 * about this chunk.  The x field has already
@@ -468,7 +468,7 @@ MarkLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
     chunkPtr->undisplayProc = InsertUndisplayProc;
     chunkPtr->measureProc = (Tk_ChunkMeasureProc *) NULL;
     chunkPtr->bboxProc = (Tk_ChunkBboxProc *) NULL;
-    chunkPtr->numChars = 0;
+    chunkPtr->numBytes = 0;
     chunkPtr->minAscent = 0;
     chunkPtr->minDescent = 0;
     chunkPtr->minHeight = 0;
@@ -669,7 +669,7 @@ MarkFindNext(interp, textPtr, string)
 	    return TCL_ERROR;
 	}
 	for (offset = 0, segPtr = index.linePtr->segPtr; 
-		segPtr != NULL && offset < index.charIndex;
+		segPtr != NULL && offset < index.byteIndex;
 		offset += segPtr->size,	segPtr = segPtr->nextPtr) {
 	    /* Empty loop body */ ;
 	}
@@ -692,7 +692,7 @@ MarkFindNext(interp, textPtr, string)
 	if (index.linePtr == (TkTextLine *) NULL) {
 	    return TCL_OK;
 	}
-	index.charIndex = 0;
+	index.byteIndex = 0;
 	segPtr = index.linePtr->segPtr;
     }
 }
@@ -742,7 +742,7 @@ MarkFindPrev(interp, textPtr, string)
 	    return TCL_ERROR;
 	}
 	for (offset = 0, segPtr = index.linePtr->segPtr; 
-		segPtr != NULL && offset < index.charIndex;
+		segPtr != NULL && offset < index.byteIndex;
 		offset += segPtr->size, segPtr = segPtr->nextPtr) {
 	    /* Empty loop body */ ;
 	}
@@ -773,3 +773,4 @@ MarkFindPrev(interp, textPtr, string)
 	segPtr = NULL;
     }
 }
+

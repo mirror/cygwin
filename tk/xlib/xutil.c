@@ -114,3 +114,4 @@ XGetVisualInfo(display, vinfo_mask, vinfo_template, nitems_return)
     *nitems_return = 1;
     return info;
 }
+

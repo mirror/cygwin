@@ -6,7 +6,7 @@
  *	related to tags.
  *
  * Copyright (c) 1992-1994 The Regents of the University of California.
- * Copyright (c) 1994-1995 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -16,12 +16,8 @@
 
 #include "default.h"
 #include "tkPort.h"
-#include "tk.h"
+#include "tkInt.h"
 #include "tkText.h"
-
-/*
- * Information used for parsing tag configuration information:
- */
 
 static Tk_ConfigSpec tagConfigSpecs[] = {
     {TK_CONFIG_BORDER, "-background", (char *) NULL, (char *) NULL,
@@ -30,7 +26,10 @@ static Tk_ConfigSpec tagConfigSpecs[] = {
 	(char *) NULL, Tk_Offset(TkTextTag, bgStipple), TK_CONFIG_NULL_OK},
     {TK_CONFIG_STRING, "-borderwidth", (char *) NULL, (char *) NULL,
 	"0", Tk_Offset(TkTextTag, bdString),
-		TK_CONFIG_DONT_SET_DEFAULT|TK_CONFIG_NULL_OK},
+	TK_CONFIG_DONT_SET_DEFAULT|TK_CONFIG_NULL_OK},
+    {TK_CONFIG_STRING, "-elide", (char *) NULL, (char *) NULL,
+	"0", Tk_Offset(TkTextTag, elideString),
+	TK_CONFIG_DONT_SET_DEFAULT|TK_CONFIG_NULL_OK},
     {TK_CONFIG_BITMAP, "-fgstipple", (char *) NULL, (char *) NULL,
 	(char *) NULL, Tk_Offset(TkTextTag, fgStipple), TK_CONFIG_NULL_OK},
     {TK_CONFIG_FONT, "-font", (char *) NULL, (char *) NULL,
@@ -63,9 +62,9 @@ static Tk_ConfigSpec tagConfigSpecs[] = {
     {TK_CONFIG_STRING, "-underline", (char *) NULL, (char *) NULL,
 	(char *) NULL, Tk_Offset(TkTextTag, underlineString),
 	TK_CONFIG_NULL_OK},
-    {TK_CONFIG_UID, "-wrap", (char *) NULL, (char *) NULL,
+    {TK_CONFIG_CUSTOM, "-wrap", (char *) NULL, (char *) NULL,
 	(char *) NULL, Tk_Offset(TkTextTag, wrapMode),
-	TK_CONFIG_NULL_OK},
+	TK_CONFIG_NULL_OK, &textWrapModeOption},
     {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
 	(char *) NULL, 0, 0}
 };
@@ -235,9 +234,22 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 	    command = Tk_GetBinding(interp, textPtr->bindingTable,
 		    (ClientData) tagPtr, argv[4]);
 	    if (command == NULL) {
-		return TCL_ERROR;
+		char *string = Tcl_GetStringResult(interp); 
+
+		/*
+		 * Ignore missing binding errors.  This is a special hack
+		 * that relies on the error message returned by FindSequence
+		 * in tkBind.c.
+		 */
+
+		if (string[0] != '\0') {
+		    return TCL_ERROR;
+		} else {
+		    Tcl_ResetResult(interp);
+		}
+	    } else {
+		Tcl_SetResult(interp, command, TCL_STATIC);
 	    }
-	    interp->result = command;
 	} else {
 	    Tk_GetAllBindings(interp, textPtr->bindingTable,
 		    (ClientData) tagPtr);
@@ -378,14 +390,11 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 		    return TCL_ERROR;
 		}
 	    }
-	    if ((tagPtr->wrapMode != NULL)
-		    && (tagPtr->wrapMode != tkTextCharUid)
-		    && (tagPtr->wrapMode != tkTextNoneUid)
-		    && (tagPtr->wrapMode != tkTextWordUid)) {
-		Tcl_AppendResult(interp, "bad wrap mode \"", tagPtr->wrapMode,
-			"\": must be char, none, or word", (char *) NULL);
-		tagPtr->wrapMode = NULL;
-		return TCL_ERROR;
+	    if (tagPtr->elideString != NULL) {
+		if (Tcl_GetBoolean(interp, tagPtr->elideString,
+			&tagPtr->elide) != TCL_OK) {
+		    return TCL_ERROR;
+		}
 	    }
 
 	    /*
@@ -419,7 +428,8 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 		    || (tagPtr->spacing3String != NULL)
 		    || (tagPtr->tabString != NULL)
 		    || (tagPtr->underlineString != NULL)
-		    || (tagPtr->wrapMode != NULL)) {
+		    || (tagPtr->elideString != NULL)
+		    || (tagPtr->wrapMode != TEXT_WRAPMODE_NULL)) {
 		tagPtr->affectsDisplay = 1;
 	    }
 	    TkTextRedrawTag(textPtr, (TkTextIndex *) NULL,
@@ -448,10 +458,10 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 		TkTextRedrawTag(textPtr, (TkTextIndex *) NULL,
 			(TkTextIndex *) NULL, tagPtr, 1);
 	    }
-	    TkBTreeTag(TkTextMakeIndex(textPtr->tree, 0, 0, &first),
-		    TkTextMakeIndex(textPtr->tree,
-			    TkBTreeNumLines(textPtr->tree), 0, &last),
-		    tagPtr, 0);
+	    TkTextMakeByteIndex(textPtr->tree, 0, 0, &first);
+	    TkTextMakeByteIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree),
+		    0, &last),
+	    TkBTreeTag(&first, &last, tagPtr, 0);
 	    Tcl_DeleteHashEntry(hPtr);
 	    if (textPtr->bindingTable != NULL) {
 		Tk_DeleteAllBindings(textPtr->bindingTable,
@@ -552,7 +562,7 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 	if (TkTextGetIndex(interp, textPtr, argv[4], &index1) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	TkTextMakeIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree),
+	TkTextMakeByteIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree),
 		0, &last);
 	if (argc == 5) {
 	    index2 = last;
@@ -582,7 +592,7 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 	     * skip to the end of this tagged range.
 	     */
 
-	    for (segPtr = index1.linePtr->segPtr, offset = index1.charIndex; 
+	    for (segPtr = index1.linePtr->segPtr, offset = index1.byteIndex; 
 		    offset >= 0;
 		    offset -= segPtr->size, segPtr = segPtr->nextPtr) {
 		if ((offset == 0) && (segPtr->typePtr == &tkTextToggleOnType)
@@ -631,7 +641,7 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 	    return TCL_ERROR;
 	}
 	if (argc == 5) {
-	    TkTextMakeIndex(textPtr->tree, 0, 0, &index2);
+	    TkTextMakeByteIndex(textPtr->tree, 0, 0, &index2);
 	} else if (TkTextGetIndex(interp, textPtr, argv[5], &index2)
 		!= TCL_OK) {
 	    return TCL_ERROR;
@@ -651,7 +661,7 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 	}
 	if (tSearch.segPtr->typePtr == &tkTextToggleOnType) {
 	    TkTextPrintIndex(&tSearch.curIndex, position1);
-	    TkTextMakeIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree),
+	    TkTextMakeByteIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree),
 		    0, &last);
 	    TkBTreeStartSearch(&tSearch.curIndex, &last, tagPtr, &tSearch);
 	    TkBTreeNextTag(&tSearch);
@@ -711,8 +721,8 @@ TkTextTagCmd(textPtr, interp, argc, argv)
 	if (tagPtr == NULL) {
 	    return TCL_OK;
 	}
-	TkTextMakeIndex(textPtr->tree, 0, 0, &first);
-	TkTextMakeIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree),
+	TkTextMakeByteIndex(textPtr->tree, 0, 0, &first);
+	TkTextMakeByteIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree),
 		0, &last);
 	TkBTreeStartSearch(&first, &last, tagPtr, &tSearch);
 	if (TkBTreeCharTagged(&first, tagPtr)) {
@@ -811,7 +821,9 @@ TkTextCreateTag(textPtr, tagName)
     tagPtr->tabArrayPtr = NULL;
     tagPtr->underlineString = NULL;
     tagPtr->underline = 0;
-    tagPtr->wrapMode = NULL;
+    tagPtr->elideString = NULL;
+    tagPtr->elide = 0;
+    tagPtr->wrapMode = TEXT_WRAPMODE_NULL;
     tagPtr->affectsDisplay = 0;
     textPtr->numTags++;
     Tcl_SetHashValue(hPtr, tagPtr);
@@ -828,7 +840,7 @@ TkTextCreateTag(textPtr, tagName)
  * Results:
  *	If tagName is defined in textPtr, a pointer to its TkTextTag
  *	structure is returned.  Otherwise NULL is returned and an
- *	error message is recorded in interp->result unless interp
+ *	error message is recorded in the interp's result unless interp
  *	is NULL.
  *
  * Side effects:
@@ -1374,3 +1386,4 @@ TkTextPickCurrent(textPtr, eventPtr)
 	ckfree((char *) copyArrayPtr);
     }
 }
+

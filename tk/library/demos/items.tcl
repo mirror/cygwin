@@ -3,7 +3,7 @@
 # This demonstration script creates a canvas that displays the
 # canvas item types.
 #
-# SCCS: @(#) items.tcl 1.16 97/03/02 16:25:05
+# RCS: @(#) $Id$
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -283,3 +283,4 @@ proc butPress {w color} {
     set i [$w create text 25c 18.1c -text "Ouch!!" -fill $color -anchor n]
     after 500 "$w delete $i"
 }
+

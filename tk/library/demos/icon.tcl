@@ -3,7 +3,7 @@
 # This demonstration script creates a toplevel window containing
 # buttons that display bitmaps instead of text.
 #
-# SCCS: @(#) icon.tcl 1.8 97/03/02 16:24:19
+# RCS: @(#) $Id$
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -50,3 +50,4 @@ radiobutton $w.frame.left.b4 \
 	-bitmap @[file join $tk_library demos images noletter.bmp] \
 	-variable letters -value empty
 pack $w.frame.left.b3 $w.frame.left.b4 -side top -expand yes
+

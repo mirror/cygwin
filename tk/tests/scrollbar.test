@@ -4,14 +4,22 @@
 #
 # Copyright (c) 1994 The Regents of the University of California.
 # Copyright (c) 1994-1997 Sun Microsystems, Inc.
-#
-# See the file "license.terms" for information on usage and redistribution
-# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
 #
 # RCS: @(#) $Id$
 
-if {[info procs test] != "test"} {
-    source defs
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    source [file join [pwd] [file dirname [info script]] defs.tcl]
+}
+
+## testmetrics is a win/mac only test command
+##
+if {[string compare unix $tcl_platform(platform)] && \
+	[string equal {} [info commands testmetrics]]} {
+    puts "\"testmetrics\" isn't defined, skipping scrollbar tests"
+    ::tcltest::cleanupTests
+    return
 }
 
 foreach i [winfo children .] {
@@ -37,14 +45,14 @@ proc getTroughSize {w} {
     } else {
 	if [string match v* [$w cget -orient]] {
 	    return [expr [winfo height $w] \
-			- ([winfo width $w] \
-			       - [$w cget -highlightthickness] \
-			       - [$w cget -bd] + 1)*2]
+		    - ([winfo width $w] \
+			- [$w cget -highlightthickness] \
+			- [$w cget -bd] + 1)*2]
 	} else {
 	    return [expr [winfo width $w] \
-			- ([winfo height $w] \
-			       - [$w cget -highlightthickness] \
-			       - [$w cget -bd] + 1)*2]
+		    - ([winfo height $w] \
+			- [$w cget -highlightthickness] \
+			- [$w cget -bd] + 1)*2]
 	}
     }
 }
@@ -90,7 +98,7 @@ foreach test {
     {-repeatdelay 140 140 129.3 {expected integer but got "129.3"}}
     {-repeatinterval 140 140 129.3 {expected integer but got "129.3"}}
     {-takefocus "any string" "any string" {} {}}
-    {-trough #432 #432 lousy {unknown color name "lousy"}}
+    {-troughcolor #432 #432 lousy {unknown color name "lousy"}}
     {-width 32 32 badValue {bad screen distance "badValue"}}
 } {
     set name [lindex $test 0]
@@ -170,16 +178,16 @@ test scrollbar-3.10 {ScrollbarWidgetCmd procedure, "cget" option} {
     list [catch {.s cget -orient} msg] $msg
 } {0 vertical}
 scrollbar .s2
-test scrollbar-3.11 {ScrollbarWidgetCmd procedure, "cget" option} {pc} {
+test scrollbar-3.11 {ScrollbarWidgetCmd procedure, "cget" option} {pcOnly} {
     list [catch {.s2 cget -bd} msg] $msg
 } {0 0}
-test scrollbar-3.12 {ScrollbarWidgetCmd procedure, "cget" option} {!pc} {
+test scrollbar-3.12 {ScrollbarWidgetCmd procedure, "cget" option} {macOrUnix} {
     list [catch {.s2 cget -bd} msg] $msg
 } {0 2}
-test scrollbar-3.13 {ScrollbarWidgetCmd procedure, "cget" option} {pc} {
+test scrollbar-3.13 {ScrollbarWidgetCmd procedure, "cget" option} {pcOnly} {
     list [catch {.s2 cget -highlightthickness} msg] $msg
 } {0 0}
-test scrollbar-3.14 {ScrollbarWidgetCmd procedure, "cget" option} {!pc} {
+test scrollbar-3.14 {ScrollbarWidgetCmd procedure, "cget" option} {macOrUnix} {
     list [catch {.s2 cget -highlightthickness} msg] $msg
 } {0 1}
 destroy .s2
@@ -626,6 +634,7 @@ test scrollbar-8.1 {TkScrollbarEventProc: recursive deletion} {
     update
     set result [winfo exists .t.f.s]
     event generate .t.f.s <ButtonPress> -button 1 -x [expr [winfo width .t.f.s] / 2] -y 5
+    event generate .t <ButtonRelease> -button 1
     update
     lappend result [winfo exists .t.f.s] [winfo exists .t.f]
     rename bgerror {}
@@ -643,6 +652,7 @@ test scrollbar-8.2 {TkScrollbarEventProc: recursive deletion} {
     update
     set result [winfo exists .t.f.s]
     event generate .t.f.s <ButtonPress> -button 1 -x [expr [winfo width .t.f.s] / 2] -y 5
+    event generate .t.f <ButtonRelease> -button 1
     update
     lappend result [winfo exists .t.f.s] [winfo exists .t.f]
     rename bgerror {}
@@ -662,4 +672,20 @@ test scrollbar-9.1 {scrollbar widget vs hidden commands} {
 
 catch {destroy .s}
 catch {destroy .t}
-concat {}
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+

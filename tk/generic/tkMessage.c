@@ -6,7 +6,7 @@
  *	in a window according to a particular aspect ratio.
  *
  * Copyright (c) 1990-1994 The Regents of the University of California.
- * Copyright (c) 1994-1995 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -40,7 +40,7 @@ typedef struct {
 
     char *string;		/* String displayed in message. */
     int numChars;		/* Number of characters in string, not
-				 * including terminating NULL character. */
+				 * including terminating NULL. */
     char *textVarName;		/* Name of variable (malloc'ed) or NULL.
 				 * If non-NULL, message displays the contents
 				 * of this variable. */
@@ -274,7 +274,7 @@ Tk_MessageCmd(clientData, interp, argc, argv)
 	goto error;
     }
 
-    interp->result = Tk_PathName(msgPtr->tkwin);
+    Tcl_SetResult(interp, Tk_PathName(msgPtr->tkwin), TCL_STATIC);
     return TCL_OK;
 
     error:
@@ -401,7 +401,7 @@ DestroyMessage(memPtr)
  *
  * Results:
  *	The return value is a standard Tcl result.  If TCL_ERROR is
- *	returned, then interp->result contains an error message.
+ *	returned, then the interp's result contains an error message.
  *
  * Side effects:
  *	Configuration information, such as text string, colors, font,
@@ -465,9 +465,7 @@ ConfigureMessage(interp, msgPtr, argc, argv, flags)
      * that couldn't be specified to Tk_ConfigureWidget.
      */
 
-    msgPtr->numChars = strlen(msgPtr->string);
-
-    Tk_SetBackgroundFromBorder(msgPtr->tkwin, msgPtr->border);
+    msgPtr->numChars = Tcl_NumUtfChars(msgPtr->string, -1);
 
     if (msgPtr->highlightWidth < 0) {
 	msgPtr->highlightWidth = 0;
@@ -500,16 +498,19 @@ MessageWorldChanged(instanceData)
     ClientData instanceData;	/* Information about widget. */
 {
     XGCValues gcValues;
-    GC gc;
+    GC gc = None;
     Tk_FontMetrics fm;
     Message *msgPtr;
 
     msgPtr = (Message *) instanceData;
 
+    if (msgPtr->border != NULL) {
+	Tk_SetBackgroundFromBorder(msgPtr->tkwin, msgPtr->border);
+    }
+
     gcValues.font = Tk_FontId(msgPtr->tkfont);
     gcValues.foreground = msgPtr->fgColorPtr->pixel;
-    gc = Tk_GetGCColor(msgPtr->tkwin, GCForeground | GCFont, &gcValues,
-		       msgPtr->fgColorPtr, NULL);
+    gc = Tk_GetGC(msgPtr->tkwin, GCForeground | GCFont, &gcValues);
     if (msgPtr->textGC != None) {
 	Tk_FreeGC(msgPtr->display, msgPtr->textGC);
     }
@@ -645,13 +646,23 @@ DisplayMessage(clientData)
     register Message *msgPtr = (Message *) clientData;
     register Tk_Window tkwin = msgPtr->tkwin;
     int x, y;
+    int borderWidth = msgPtr->highlightWidth;
 
     msgPtr->flags &= ~REDRAW_PENDING;
     if ((msgPtr->tkwin == NULL) || !Tk_IsMapped(tkwin)) {
 	return;
     }
-    Tk_Fill3DRectangle(tkwin, Tk_WindowId(tkwin), msgPtr->border, 0, 0,
-	    Tk_Width(tkwin), Tk_Height(tkwin), 0, TK_RELIEF_FLAT);
+    if (msgPtr->border != NULL) {
+	borderWidth += msgPtr->borderWidth;
+    }
+    if (msgPtr->relief == TK_RELIEF_FLAT) {
+	borderWidth = msgPtr->highlightWidth;
+    }
+    Tk_Fill3DRectangle(tkwin, Tk_WindowId(tkwin), msgPtr->border,
+	    borderWidth, borderWidth,
+	    Tk_Width(tkwin) - 2 * borderWidth,
+	    Tk_Height(tkwin) - 2 * borderWidth,
+	    0, TK_RELIEF_FLAT);
 
     /*
      * Compute starting y-location for message based on message size
@@ -663,7 +674,7 @@ DisplayMessage(clientData)
     Tk_DrawTextLayout(Tk_Display(tkwin), Tk_WindowId(tkwin), msgPtr->textGC,
 	    msgPtr->textLayout, x, y, 0, -1);
 
-    if (msgPtr->relief != TK_RELIEF_FLAT) {
+    if (borderWidth > msgPtr->highlightWidth) {
 	Tk_Draw3DRectangle(tkwin, Tk_WindowId(tkwin), msgPtr->border,
 		msgPtr->highlightWidth, msgPtr->highlightWidth,
 		Tk_Width(tkwin) - 2*msgPtr->highlightWidth,
@@ -671,15 +682,17 @@ DisplayMessage(clientData)
 		msgPtr->borderWidth, msgPtr->relief);
     }
     if (msgPtr->highlightWidth != 0) {
-	GC gc;
+	GC fgGC, bgGC;
 
+	bgGC = Tk_GCForColor(msgPtr->highlightBgColorPtr, Tk_WindowId(tkwin));
 	if (msgPtr->flags & GOT_FOCUS) {
-	    gc = Tk_GCForColor(msgPtr->highlightColorPtr, Tk_WindowId(tkwin));
+	    fgGC = Tk_GCForColor(msgPtr->highlightColorPtr, Tk_WindowId(tkwin));
+	    TkpDrawHighlightBorder(tkwin, fgGC, bgGC, msgPtr->highlightWidth,
+		    Tk_WindowId(tkwin));
 	} else {
-	    gc = Tk_GCForColor(msgPtr->highlightBgColorPtr, Tk_WindowId(tkwin));
+	    TkpDrawHighlightBorder(tkwin, bgGC, bgGC, msgPtr->highlightWidth,
+		    Tk_WindowId(tkwin));
 	}
-	Tk_DrawFocusHighlight(tkwin, gc, msgPtr->highlightWidth,
-		Tk_WindowId(tkwin));
     }
 }
 
@@ -835,8 +848,8 @@ MessageTextVarProc(clientData, interp, name1, name2, flags)
     if (msgPtr->string != NULL) {
 	ckfree(msgPtr->string);
     }
-    msgPtr->numChars = strlen(value);
-    msgPtr->string = (char *) ckalloc((unsigned) (msgPtr->numChars + 1));
+    msgPtr->numChars = Tcl_NumUtfChars(value, -1);
+    msgPtr->string = (char *) ckalloc((unsigned) (strlen(value) + 1));
     strcpy(msgPtr->string, value);
     ComputeMessageGeometry(msgPtr);
 
@@ -847,3 +860,4 @@ MessageTextVarProc(clientData, interp, name1, name2, flags)
     }
     return (char *) NULL;
 }
+

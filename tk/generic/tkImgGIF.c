@@ -2,8 +2,8 @@
  * tkImgGIF.c --
  *
  *	A photo image file handler for GIF files. Reads 87a and 89a GIF
- *	files. At present there is no write function.  GIF images may be
- *	read using the -data option of the photo image.  The data may be
+ *	files. At present, there only is a file write function. GIF images
+ *	may be read using the -data option of the photo image.  The data may be
  *	given as a binary string in a Tcl_Obj or by representing
  *	the data as BASE64 encoded ascii.  Derived from the giftoppm code
  *	found in the pbmplus package and tkImgFmtPPM.c in the tk4.0b2
@@ -63,29 +63,67 @@ typedef struct mFile {
 #include "tkPort.h"
 
 /*
+ * Non-ASCII encoding support:
+ * Most data in a GIF image is binary and is treated as such.  However,
+ * a few key bits are stashed in ASCII.  If we try to compare those pieces
+ * to the char they represent, it will fail on any non-ASCII (eg, EBCDIC)
+ * system.  To accomodate these systems, we test against the numeric value
+ * of the ASCII characters instead of the characters themselves.  This is
+ * encoding independant.
+ */
+
+static CONST char GIF87a[] =
+	{ 0x47, 0x49, 0x46, 0x38, 0x37, 0x61, 0x00 }; /* ASCII GIF87a */
+static CONST char GIF89a[] =
+	{ 0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x00 }; /* ASCII GIF89a */
+#  define GIF_TERMINATOR 0x3b                         /* ASCII ; */
+#  define GIF_EXTENSION  0x21                         /* ASCII ! */
+#  define GIF_START      0x2c                         /* ASCII , */
+
+/*
+ * 			 HACK ALERT!!  HACK ALERT!!  HACK ALERT!!
+ * This code is hard-wired for reading from files.  In order to read
+ * from a data stream, we'll trick fread so we can reuse the same code.
+ * 0==from file; 1==from base64 encoded data; 2==from binary data
+ */
+
+typedef struct ThreadSpecificData {
+    int fromData;
+} ThreadSpecificData;
+static Tcl_ThreadDataKey dataKey;
+
+/*
  * The format record for the GIF file format:
  */
 
-static int      FileMatchGIF _ANSI_ARGS_((Tcl_Channel chan, char *fileName,
-		    char *formatString, int *widthPtr, int *heightPtr));
+static int      FileMatchGIF _ANSI_ARGS_((Tcl_Channel chan, CONST char *fileName,
+		    Tcl_Obj *format, int *widthPtr, int *heightPtr,
+		    Tcl_Interp *interp));
 static int      FileReadGIF  _ANSI_ARGS_((Tcl_Interp *interp,
-		    Tcl_Channel chan, char *fileName, char *formatString,
+		    Tcl_Channel chan, CONST char *fileName, Tcl_Obj *format,
 		    Tk_PhotoHandle imageHandle, int destX, int destY,
 		    int width, int height, int srcX, int srcY));
 static int	StringMatchGIF _ANSI_ARGS_(( Tcl_Obj *dataObj,
-		    char *formatString, int *widthPtr, int *heightPtr));
+		    Tcl_Obj *format, int *widthPtr, int *heightPtr,
+		    Tcl_Interp *interp));
 static int	StringReadGIF _ANSI_ARGS_((Tcl_Interp *interp, Tcl_Obj *dataObj,
-		    char *formatString, Tk_PhotoHandle imageHandle,
+		    Tcl_Obj *format, Tk_PhotoHandle imageHandle,
 		    int destX, int destY, int width, int height,
 		    int srcX, int srcY));
+static int 	FileWriteGIF _ANSI_ARGS_((Tcl_Interp *interp,  
+		    CONST char *filename, Tcl_Obj *format,
+		    Tk_PhotoImageBlock *blockPtr));
+static int	CommonWriteGIF _ANSI_ARGS_((Tcl_Interp *interp,
+		    Tcl_Channel handle, Tcl_Obj *format,
+		    Tk_PhotoImageBlock *blockPtr));
 
 Tk_PhotoImageFormat tkImgFmtGIF = {
-	"GIF",			/* name */
+	"gif",			/* name */
 	FileMatchGIF,   /* fileMatchProc */
 	StringMatchGIF, /* stringMatchProc */
 	FileReadGIF,    /* fileReadProc */
 	StringReadGIF,  /* stringReadProc */
-	NULL,           /* fileWriteProc */
+	FileWriteGIF,   /* fileWriteProc */
 	NULL,           /* stringWriteProc */
 };
 
@@ -102,15 +140,6 @@ Tk_PhotoImageFormat tkImgFmtGIF = {
 #define ReadOK(file,buffer,len)	(Fread(buffer, len, 1, file) != 0)
 
 /*
- * 			 HACK ALERT!!  HACK ALERT!!  HACK ALERT!!
- * This code is hard-wired for reading from files.  In order to read
- * from a data stream, we'll trick fread so we can reuse the same code.
- * 0==from file; 1==from base64 encoded data; 2==from binary data
- */
- 
-static int fromData=0;
-
-/*
  * Prototypes for local procedures defined in this file:
  */
 
@@ -120,8 +149,6 @@ static int		GetCode _ANSI_ARGS_((Tcl_Channel chan, int code_size,
 			    int flag));
 static int		GetDataBlock _ANSI_ARGS_((Tcl_Channel chan,
 			    unsigned char *buf));
-static int		LWZReadByte _ANSI_ARGS_((Tcl_Channel chan, int flag,
-			    int input_code_size));
 static int		ReadColorMap _ANSI_ARGS_((Tcl_Channel chan, int number,
 			    unsigned char buffer[MAXCOLORMAPSIZE][4]));
 static int		ReadGIFHeader _ANSI_ARGS_((Tcl_Channel chan,
@@ -145,6 +172,7 @@ static int		Mgetc _ANSI_ARGS_((MFile *handle));
 static int		char64 _ANSI_ARGS_((int c));
 static void		mInit _ANSI_ARGS_((unsigned char *string,
 			    MFile *handle));
+
 
 /*
  *----------------------------------------------------------------------
@@ -165,13 +193,14 @@ static void		mInit _ANSI_ARGS_((unsigned char *string,
  */
 
 static int
-FileMatchGIF(chan, fileName, formatString, widthPtr, heightPtr)
+FileMatchGIF(chan, fileName, format, widthPtr, heightPtr, interp)
     Tcl_Channel chan;		/* The image file, open for reading. */
-    char *fileName;		/* The name of the image file. */
-    char *formatString;		/* User-specified format string, or NULL. */
+    CONST char *fileName;	/* The name of the image file. */
+    Tcl_Obj *format;		/* User-specified format object, or NULL. */
     int *widthPtr, *heightPtr;	/* The dimensions of the image are
 				 * returned here if the file is a valid
 				 * raw GIF file. */
+    Tcl_Interp *interp;		/* not used */
 {
 	return ReadGIFHeader(chan, widthPtr, heightPtr);
 }
@@ -197,12 +226,12 @@ FileMatchGIF(chan, fileName, formatString, widthPtr, heightPtr)
  */
 
 static int
-FileReadGIF(interp, chan, fileName, formatString, imageHandle, destX, destY,
+FileReadGIF(interp, chan, fileName, format, imageHandle, destX, destY,
 	width, height, srcX, srcY)
     Tcl_Interp *interp;		/* Interpreter to use for reporting errors. */
     Tcl_Channel chan;		/* The image file, open for reading. */
-    char *fileName;		/* The name of the image file. */
-    char *formatString;		/* User-specified format string, or NULL. */
+    CONST char *fileName;	/* The name of the image file. */
+    Tcl_Obj *format;		/* User-specified format object, or NULL. */
     Tk_PhotoHandle imageHandle;	/* The photo image to write into. */
     int destX, destY;		/* Coordinates of top-left pixel in
 				 * photo image to be written to. */
@@ -212,15 +241,39 @@ FileReadGIF(interp, chan, fileName, formatString, imageHandle, destX, destY,
 				 * in image being read. */
 {
     int fileWidth, fileHeight;
-    int nBytes;
+    int nBytes, index = 0, argc = 0, i;
+    Tcl_Obj **objv;
     Tk_PhotoImageBlock block;
     unsigned char buf[100];
+    unsigned char *trashBuffer = NULL;
     int bitPixel;
     unsigned char colorMap[MAXCOLORMAPSIZE][4];
     int transparent = -1;
+    static char *optionStrings[] = {
+	"-index",	NULL
+    };
 
+    if (format && Tcl_ListObjGetElements(interp, format,
+	    &argc, &objv) != TCL_OK) {
+	return TCL_ERROR;
+    }
+    for (i = 1; i < argc; i++) {
+	if (Tcl_GetIndexFromObj(interp, objv[i], optionStrings, "option name", 0,
+		&nBytes) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+	if (i == (argc-1)) {
+	    Tcl_AppendResult(interp, "no value given for \"",
+		    Tcl_GetStringFromObj(objv[i], NULL),
+		    "\" option", (char *) NULL);
+	    return TCL_ERROR;
+	}
+	if (Tcl_GetIntFromObj(interp, objv[++i], &index) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+    }
     if (!ReadGIFHeader(chan, &fileWidth, &fileHeight)) {
-	Tcl_AppendResult(interp, "couldn't read GIF header from file \"",
+    	Tcl_AppendResult(interp, "couldn't read GIF header from file \"",
 		fileName, "\"", NULL);
 	return TCL_ERROR;
     }
@@ -263,8 +316,8 @@ FileReadGIF(interp, chan, fileName, formatString, imageHandle, destX, destY,
     block.offset[0] = 0;
     block.offset[1] = 1;
     block.offset[2] = 2;
-    nBytes = height * block.pitch;
-    block.pixelPtr = (unsigned char *) ckalloc((unsigned) nBytes);
+    block.offset[3] = 3;
+    block.pixelPtr = NULL;
 
     while (1) {
 	if (Fread(buf, 1, 1, chan) != 1) {
@@ -276,15 +329,17 @@ FileReadGIF(interp, chan, fileName, formatString, imageHandle, destX, destY,
 	    break;
 	}
 
-	if (buf[0] == ';') {
+	if (buf[0] == GIF_TERMINATOR) {
 	    /*
 	     * GIF terminator.
 	     */
 
-	    break;
+	    Tcl_AppendResult(interp,"no image data for this index",
+		    (char *) NULL);
+	    goto error;
 	}
 
-	if (buf[0] == '!') {
+	if (buf[0] == GIF_EXTENSION) {
 	    /*
 	     * This is a GIF extension.
 	     */
@@ -301,7 +356,7 @@ FileReadGIF(interp, chan, fileName, formatString, imageHandle, destX, destY,
 	    continue;
 	}
 
-	if (buf[0] != ',') {
+	if (buf[0] != GIF_START) {
 	    /*
 	     * Not a valid start character; ignore it.
 	     */
@@ -313,8 +368,55 @@ FileReadGIF(interp, chan, fileName, formatString, imageHandle, destX, destY,
 	    goto error;
 	}
 
+	fileWidth = LM_to_uint(buf[4],buf[5]);
+	fileHeight = LM_to_uint(buf[6],buf[7]);
+
 	bitPixel = 1<<((buf[8]&0x07)+1);
 
+	if (index--) {
+	    /* this is not the image we want to read: skip it. */
+	    if (BitSet(buf[8], LOCALCOLORMAP)) {
+		if (!ReadColorMap(chan, bitPixel, colorMap)) {
+		    Tcl_AppendResult(interp,
+			    "error reading color map", (char *) NULL);
+		    goto error;
+		}
+	    }
+
+	    /* If we've not yet allocated a trash buffer, do so now */
+	    if (trashBuffer == NULL) {
+		nBytes = fileWidth * fileHeight * 3;
+		trashBuffer =
+		    (unsigned char *) ckalloc((unsigned int) nBytes);
+	    }
+
+	    /*
+	     * Slurp!  Process the data for this image and stuff it in a
+	     * trash buffer.
+	     *
+	     * Yes, it might be more efficient here to *not* store the data
+	     * (we're just going to throw it away later).  However, I elected
+	     * to implement it this way for good reasons.  First, I wanted to
+	     * avoid duplicating the (fairly complex) LWZ decoder in ReadImage.
+	     * Fine, you say, why didn't you just modify it to allow the use of
+	     * a NULL specifier for the output buffer?  I tried that, but it
+	     * negatively impacted the performance of what I think will be the
+	     * common case:  reading the first image in the file.  Rather than
+	     * marginally improve the speed of the less frequent case, I chose
+	     * to maintain high performance for the common case.
+	     */
+	    if (ReadImage(interp, (char *) trashBuffer, chan, fileWidth,
+			  fileHeight, colorMap, 0, 0, 0, 0, 0, -1) != TCL_OK) {
+	      goto error;
+	    }
+	    continue;
+	}
+
+	/* If a trash buffer has been allocated, free it now */
+	if (trashBuffer != NULL) {
+	    ckfree((char *)trashBuffer);
+	    trashBuffer = NULL;
+	}
 	if (BitSet(buf[8], LOCALCOLORMAP)) {
 	    if (!ReadColorMap(chan, bitPixel, colorMap)) {
 		    Tcl_AppendResult(interp, "error reading color map", 
@@ -322,50 +424,62 @@ FileReadGIF(interp, chan, fileName, formatString, imageHandle, destX, destY,
 		    goto error;
 	    }
 	}
+
+	index = LM_to_uint(buf[0],buf[1]);
+	srcX -= index;
+	if (srcX<0) {
+	    destX -= srcX; width += srcX;
+	    srcX = 0;
+	}
+
+	if (width > fileWidth) {
+	    width = fileWidth;
+	}
+
+	index = LM_to_uint(buf[2],buf[3]);
+	srcY -= index;
+	if (index > srcY) {
+	    destY -= srcY; height += srcY;
+	    srcY = 0;
+	}
+	if (height > fileHeight) {
+	    height = fileHeight;
+	}
+
+	if ((width <= 0) || (height <= 0)) {
+	    block.pixelPtr = 0;
+	    goto noerror;
+	}
+
+	block.width = width;
+	block.height = height;
+	block.pixelSize = (transparent>=0) ? 4 : 3;
+	block.offset[3] = (transparent>=0) ? 3 : 0;
+	block.pitch = block.pixelSize * width;
+	nBytes = block.pitch * height;
+	block.pixelPtr = (unsigned char *) ckalloc((unsigned) nBytes);
+
 	if (ReadImage(interp, (char *) block.pixelPtr, chan, width,
 		height, colorMap, fileWidth, fileHeight, srcX, srcY,
 		BitSet(buf[8], INTERLACE), transparent) != TCL_OK) {
 	    goto error;
 	}
 	break;
-   }
-
-    if (transparent == -1) {
-	Tk_PhotoPutBlock(imageHandle, &block, destX, destY, width, height);
-    } else {
-	int x, y, end;
-	unsigned char *imagePtr, *rowPtr, *pixelPtr;
-
-	imagePtr = rowPtr = block.pixelPtr;
-	for (y = 0; y < height; y++) {
-	    x = 0;
-	    pixelPtr = rowPtr;
-	    while(x < width) {
-		/* search for first non-transparent pixel */
-		while ((x < width) && !(pixelPtr[CM_ALPHA])) {
-		    x++; pixelPtr += 4;
-		}
-		end = x;
-		/* search for first transparent pixel */
-		while ((end < width) && pixelPtr[CM_ALPHA]) {
-		    end++; pixelPtr += 4;
-		}
-		if (end > x) {
-		    block.pixelPtr = rowPtr + 4 * x;
-		    Tk_PhotoPutBlock(imageHandle, &block, destX+x,
-			    destY+y, end-x, 1);
-		}
-		x = end;
-	    }
-	    rowPtr += block.pitch;
-	}
-	block.pixelPtr = imagePtr;
     }
-    ckfree((char *) block.pixelPtr);
+
+    Tk_PhotoPutBlock(imageHandle, &block, destX, destY, width, height);
+
+    noerror:
+    if (block.pixelPtr) {
+	ckfree((char *) block.pixelPtr);
+    }
+    Tcl_AppendResult(interp, tkImgFmtGIF.name, (char *) NULL);
     return TCL_OK;
 
     error:
-    ckfree((char *) block.pixelPtr);
+    if (block.pixelPtr) {
+	ckfree((char *) block.pixelPtr);
+    }
     return TCL_ERROR;
 
 }
@@ -389,17 +503,18 @@ FileReadGIF(interp, chan, fileName, formatString, imageHandle, destX, destY,
  */
 
 static int
-StringMatchGIF(dataObj, formatString, widthPtr, heightPtr)
+StringMatchGIF(dataObj, format, widthPtr, heightPtr, interp)
     Tcl_Obj *dataObj;		/* the object containing the image data */
-    char *formatString;		/* the image format string */
+    Tcl_Obj *format;		/* the image format object, or NULL */
     int *widthPtr;		/* where to put the string width */
     int *heightPtr;		/* where to put the string height */
+    Tcl_Interp *interp;		/* not used */
 {
     unsigned char *data, header[10];
     int got, length;
     MFile handle;
 
-    data = Tcl_GetStringFromObj(dataObj, &length);
+    data = Tcl_GetByteArrayFromObj(dataObj, &length);
 
     /* Header is a minimum of 10 bytes */
     if (length < 10) {
@@ -408,14 +523,14 @@ StringMatchGIF(dataObj, formatString, widthPtr, heightPtr)
 
     /* Check whether the data is Base64 encoded */
 
-    if ((strncmp("GIF87a", data, 6) != 0) && 
-	(strncmp("GIF89a", data, 6) != 0)) {
+    if ((strncmp(GIF87a, (char *) data, 6) != 0) && 
+	(strncmp(GIF89a, (char *) data, 6) != 0)) {
       /* Try interpreting the data as Base64 encoded */
       mInit((unsigned char *) data, &handle);
       got = Mread(header, 10, 1, &handle);
       if (got != 10
-	      || ((strncmp("GIF87a", (char *) header, 6) != 0)
-	      && (strncmp("GIF89a", (char *) header, 6) != 0))) {
+	      || ((strncmp(GIF87a, (char *) header, 6) != 0)
+	      && (strncmp(GIF89a, (char *) header, 6) != 0))) {
 	  return 0;
       }
     } else {
@@ -448,37 +563,41 @@ StringMatchGIF(dataObj, formatString, widthPtr, heightPtr)
  */
 
 static int
-StringReadGIF(interp,dataObj,formatString,imageHandle,
+StringReadGIF(interp, dataObj, format, imageHandle,
 	destX, destY, width, height, srcX, srcY)
     Tcl_Interp *interp;		/* interpreter for reporting errors in */
     Tcl_Obj *dataObj;		/* object containing the image */
-    char *formatString;		/* format string if any */
+    Tcl_Obj *format;		/* format object, or NULL */
     Tk_PhotoHandle imageHandle;	/* the image to write this data into */
     int destX, destY;		/* The rectangular region of the  */
     int  width, height;		/*   image to copy */
     int srcX, srcY;
 {
-	int result;
-	MFile handle;
-	Tcl_Channel dataSrc;
-	char *data;
-	/* Check whether the data is Base64 encoded */
-	data = Tcl_GetStringFromObj(dataObj, NULL);
-	if ((strncmp("GIF87a", data, 6) != 0) && 
-	    (strncmp("GIF89a", data, 6) != 0)) {
-	  mInit((unsigned char *)data,&handle);
-	  fromData = 1;
-	  dataSrc = (Tcl_Channel) &handle;
-	} else {
-	  fromData = 2;
-	  mInit((unsigned char *)data,&handle);
-	  dataSrc = (Tcl_Channel) &handle;
-	}
-	result = FileReadGIF(interp, dataSrc, "inline data",
-		formatString, imageHandle, destX, destY, width, height,
-		srcX, srcY);
-	fromData = 0;
-	return(result);
+    int result;
+    MFile handle;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+    Tcl_Channel dataSrc;
+    char *data;
+
+    /*
+     * Check whether the data is Base64 encoded
+     */
+    data = (char *) Tcl_GetByteArrayFromObj(dataObj, NULL);
+    if ((strncmp(GIF87a, data, 6) != 0) && 
+	    (strncmp(GIF89a, data, 6) != 0)) {
+	mInit((unsigned char *)data, &handle);
+	tsdPtr->fromData = 1;
+	dataSrc = (Tcl_Channel) &handle;
+    } else {
+	tsdPtr->fromData = 2;
+	mInit((unsigned char *)data, &handle);
+	dataSrc = (Tcl_Channel) &handle;
+    }
+    result = FileReadGIF(interp, dataSrc, "inline data",
+	    format, imageHandle, destX, destY, width, height, srcX, srcY);
+    tsdPtr->fromData = 0;
+    return(result);
 }
 
 /*
@@ -510,8 +629,8 @@ ReadGIFHeader(chan, widthPtr, heightPtr)
     unsigned char buf[7];
 
     if ((Fread(buf, 1, 6, chan) != 6)
-	    || ((strncmp("GIF87a", (char *) buf, 6) != 0)
-	    && (strncmp("GIF89a", (char *) buf, 6) != 0))) {
+	    || ((strncmp(GIF87a, (char *) buf, 6) != 0)
+	    && (strncmp(GIF89a, (char *) buf, 6) != 0))) {
 	return 0;
     }
 
@@ -545,10 +664,12 @@ ReadColorMap(chan, number, buffer)
 		return 0;
 	    }
 	    
-	    buffer[i][CM_RED] = rgb[0] ;
-	    buffer[i][CM_GREEN] = rgb[1] ;
-	    buffer[i][CM_BLUE] = rgb[2] ;
-	    buffer[i][CM_ALPHA] = 255 ;
+	    if (buffer) {
+		buffer[i][CM_RED] = rgb[0] ;
+		buffer[i][CM_GREEN] = rgb[1] ;
+		buffer[i][CM_BLUE] = rgb[2] ;
+		buffer[i][CM_ALPHA] = 255 ;
+	    }
 	}
 	return 1;
 }
@@ -621,6 +742,34 @@ GetDataBlock(chan, buf)
 }
 
 
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ReadImage --
+ *
+ *	Process a GIF image from a given source, with a given height,
+ *      width, transparency, etc.
+ *
+ *      This code is based on the code found in the ImageMagick GIF decoder,
+ *      which is (c) 2000 ImageMagick Studio.
+ *
+ *      Some thoughts on our implementation:
+ *      It sure would be nice if ReadImage didn't take 11 parameters!  I think
+ *      that if we were smarter, we could avoid doing that.
+ *
+ *      Possible further optimizations:  we could pull the GetCode function
+ *      directly into ReadImage, which would improve our speed.
+ *
+ * Results:
+ *	Processes a GIF image and loads the pixel data into a memory array.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
 static int
 ReadImage(interp, imagePtr, chan, len, rows, cmap,
 	width, height, srcX, srcY, interlace, transparent)
@@ -634,26 +783,27 @@ ReadImage(interp, imagePtr, chan, len, rows, cmap,
      int interlace;
      int transparent;
 {
-    unsigned char c;
+    unsigned char initialCodeSize;
     int v;
-    int xpos = 0, ypos = 0, pass = 0;
-    char *pixelPtr;
-
-
+    int xpos = 0, ypos = 0, pass = 0, i;
+    register char *pixelPtr;
+    CONST static int interlaceStep[] = { 8, 8, 4, 2 };
+    CONST static int interlaceStart[] = { 0, 4, 2, 1 };
+    unsigned short prefix[(1 << MAX_LWZ_BITS)];
+    unsigned char  append[(1 << MAX_LWZ_BITS)];
+    unsigned char  stack[(1 << MAX_LWZ_BITS)*2];
+    register unsigned char *top;
+    int codeSize, clearCode, inCode, endCode, oldCode, maxCode,
+	code, firstCode;
+    
     /*
-     *  Initialize the Compression routines
+     *  Initialize the decoder
      */
-    if (! ReadOK(chan, &c, 1))  {
+    if (! ReadOK(chan, &initialCodeSize, 1))  {
 	Tcl_AppendResult(interp, "error reading GIF image: ",
 		Tcl_PosixError(interp), (char *) NULL);
 	return TCL_ERROR;
     }
-
-    if (LWZReadByte(chan, 1, c) < 0) {
-	interp->result = "format error in GIF image";
-	return TCL_ERROR;
-    }
-
     if (transparent!=-1) {
 	cmap[transparent][CM_RED] = 0;
 	cmap[transparent][CM_GREEN] = 0;
@@ -662,180 +812,194 @@ ReadImage(interp, imagePtr, chan, len, rows, cmap,
     }
 
     pixelPtr = imagePtr;
-    while ((v = LWZReadByte(chan, 0, c)) >= 0 ) {
 
-	if ((xpos>=srcX) && (xpos<srcX+len) &&
-		(ypos>=srcY) && (ypos<srcY+rows)) {
+    /* Initialize the decoder */
+    /* Set values for "special" numbers:
+     * clear code	reset the decoder
+     * end code		stop decoding
+     * code size	size of the next code to retrieve
+     * max code		next available table position
+     */
+    clearCode   = 1 << (int) initialCodeSize;
+    endCode     = clearCode + 1;
+    codeSize    = (int) initialCodeSize + 1;
+    maxCode     = clearCode + 2;
+    oldCode     = -1;
+    firstCode   = -1;
+    
+    memset((void *)prefix, 0, (1 << MAX_LWZ_BITS) * sizeof(short));
+    memset((void *)append, 0, (1 << MAX_LWZ_BITS) * sizeof(char));
+    for (i = 0; i < clearCode; i++) {
+	append[i] = i;
+    }
+    top = stack;
+
+    GetCode(chan, 0, 1);
+
+    /* Read until we finish the image */
+    for (i = 0, ypos = 0; i < rows; i++) {
+	for (xpos = 0; xpos < len; ) {
+
+	    if (top == stack) {
+		/* Bummer -- our stack is empty.  Now we have to work! */
+		code = GetCode(chan, codeSize, 0);
+		if (code < 0) {
+		    return TCL_OK;
+		}
+
+		if (code > maxCode || code == endCode) {
+		    /*
+		     * If we're doing things right, we should never
+		     * receive a code that is greater than our current
+		     * maximum code.  If we do, bail, because our decoder
+		     * does not yet have that code set up.
+		     *
+		     * If the code is the magic endCode value, quit.
+		     */
+		    return TCL_OK;
+		}
+
+		if (code == clearCode) {
+		    /* Reset the decoder */
+		    codeSize    = initialCodeSize + 1;
+		    maxCode     = clearCode + 2;
+		    oldCode     = -1;
+		    continue;
+		}
+		
+		if (oldCode == -1) {
+		    /*
+		     * Last pass reset the decoder, so the first code we
+		     * see must be a singleton.  Seed the stack with it,
+		     * and set up the old/first code pointers for
+		     * insertion into the string table.  We can't just
+		     * roll this into the clearCode test above, because
+		     * at that point we have not yet read the next code.
+		     */
+		    *top++=append[code];
+		    oldCode = code;
+		    firstCode = code;
+		    continue;
+		}
+		
+		inCode = code;
+
+		if (code == maxCode) {
+		    /*
+		     * maxCode is always one bigger than our highest assigned
+		     * code.  If the code we see is equal to maxCode, then
+		     * we are about to add a new string to the table. ???
+		     */
+		    *top++ = firstCode;
+		    code = oldCode;
+		}
+
+		while (code > clearCode) {
+		    /*
+		     * Populate the stack by tracing the string in the
+		     * string table from its tail to its head
+		     */
+		    *top++ = append[code];
+		    code = prefix[code];
+		}
+		firstCode = append[code];
+
+		/*
+		 * If there's no more room in our string table, quit.
+		 * Otherwise, add a new string to the table
+		 */
+		if (maxCode >= (1 << MAX_LWZ_BITS)) {
+		    return TCL_OK;
+		}
+
+		/* Push the head of the string onto the stack */
+		*top++ = firstCode;
+
+		/* Add a new string to the string table */
+		prefix[maxCode] = oldCode;
+		append[maxCode] = firstCode;
+		maxCode++;
+
+		/* maxCode tells us the maximum code value we can accept.
+		 * If we see that we need more bits to represent it than
+		 * we are requesting from the unpacker, we need to increase
+		 * the number we ask for.
+		 */
+		if ((maxCode >= (1 << codeSize))
+			&& (maxCode < (1<<MAX_LWZ_BITS))) {
+		    codeSize++;
+		}
+		oldCode = inCode;
+	    }
+
+	    /* Pop the next color index off the stack */
+	    v = *(--top);
+	    if (v < 0) {
+		return TCL_OK;
+	    }
+
+	    /* 
+	     * If pixelPtr is null, we're skipping this image (presumably
+	     * there are more in the file and we will be called to read 
+	     * one of them later)
+	     */
 	    *pixelPtr++ = cmap[v][CM_RED];
 	    *pixelPtr++ = cmap[v][CM_GREEN];
 	    *pixelPtr++ = cmap[v][CM_BLUE];
-	    *pixelPtr++ = cmap[v][CM_ALPHA];
+	    if (transparent >= 0) {
+		*pixelPtr++ = cmap[v][CM_ALPHA];
+	    }
+	    xpos++;
+
 	}
 
-	++xpos;
-	if (xpos == width) {
-	    xpos = 0;
-	    if (interlace) {
-		switch (pass) {
-		    case 0:
-		    case 1:
-			ypos += 8; break;
-		    case 2:
-			ypos += 4; break;
-		    case 3:
-			ypos += 2; break;
+	/* If interlacing, the next ypos is not just +1 */
+	if (interlace) {
+	    ypos += interlaceStep[pass];
+	    while (ypos >= height) {
+		pass++;
+		if (pass > 3) {
+		    return TCL_OK;
 		}
-		
-		while (ypos >= height) {
-		    ++pass;
-		    switch (pass) {
-			case 1:
-			    ypos = 4; break;
-			case 2:
-			    ypos = 2; break;
-			case 3:
-			    ypos = 1; break;
-			default:
-			    return TCL_OK;
-		    }
-		}
-	    } else {
-		++ypos;
+		ypos = interlaceStart[pass];
 	    }
-	    pixelPtr = imagePtr + (ypos-srcY) * len * 4;
+	} else {
+	    ypos++;
 	}
-	if (ypos >= height)
-	    break;
+	pixelPtr = imagePtr + (ypos) * len * ((transparent>=0)?4:3);
     }
     return TCL_OK;
 }
 
-static int
-LWZReadByte(chan, flag, input_code_size)
-     Tcl_Channel chan;
-     int flag;
-     int input_code_size;
-{
-    static int  fresh = 0;
-    int code, incode;
-    static int code_size, set_code_size;
-    static int max_code, max_code_size;
-    static int firstcode, oldcode;
-    static int clear_code, end_code;
-    static int table[2][(1<< MAX_LWZ_BITS)];
-    static int stack[(1<<(MAX_LWZ_BITS))*2], *sp;
-    register int    i;
-
-    if (flag) {
-	set_code_size = input_code_size;
-	code_size = set_code_size+1;
-	clear_code = 1 << set_code_size ;
-	end_code = clear_code + 1;
-	max_code_size = 2*clear_code;
-	max_code = clear_code+2;
-
-	GetCode(chan, 0, 1);
-
-	fresh = 1;
-
-	for (i = 0; i < clear_code; ++i) {
-	    table[0][i] = 0;
-	    table[1][i] = i;
-	}
-	for (; i < (1<<MAX_LWZ_BITS); ++i) {
-	    table[0][i] = table[1][0] = 0;
-	}
-
-	sp = stack;
-
-	return 0;
-    } else if (fresh) {
-	fresh = 0;
-	do {
-	    firstcode = oldcode = GetCode(chan, code_size, 0);
-	} while (firstcode == clear_code);
-	return firstcode;
-    }
-
-    if (sp > stack) {
-	return *--sp;
-    }
-
-    while ((code = GetCode(chan, code_size, 0)) >= 0) {
-	if (code == clear_code) {
-	    for (i = 0; i < clear_code; ++i) {
-		table[0][i] = 0;
-		table[1][i] = i;
-	    }
-	    
-	    for (; i < (1<<MAX_LWZ_BITS); ++i) {
-		table[0][i] = table[1][i] = 0;
-	    }
-
-	    code_size = set_code_size+1;
-	    max_code_size = 2*clear_code;
-	    max_code = clear_code+2;
-	    sp = stack;
-	    firstcode = oldcode = GetCode(chan, code_size, 0);
-	    return firstcode;
-
-	} else if (code == end_code) {
-	    int count;
-	    unsigned char buf[260];
-
-	    if (ZeroDataBlock) {
-		return -2;
-	    }
-	    
-	    while ((count = GetDataBlock(chan, buf)) > 0)
-		/* Empty body */;
-
-	    if (count != 0) {
-		return -2;
-	    }
-	}
-
-	incode = code;
-
-	if (code >= max_code) {
-	    *sp++ = firstcode;
-	    code = oldcode;
-	}
-
-	while (code >= clear_code) {
-	    *sp++ = table[1][code];
-	    if (code == table[0][code]) {
-		return -2;
-
-		/*
-		 * Used to be this instead, Steve Ball suggested
-		 * the change to just return.
-		 printf("circular table entry BIG ERROR\n");
-		 */
-	    }
-	    code = table[0][code];
-	}
-
-	*sp++ = firstcode = table[1][code];
-
-	if ((code = max_code) <(1<<MAX_LWZ_BITS)) {
-	    table[0][code] = oldcode;
-	    table[1][code] = firstcode;
-	    ++max_code;
-	    if ((max_code>=max_code_size) && (max_code_size < (1<<MAX_LWZ_BITS))) {
-		max_code_size *= 2;
-		++code_size;
-	    }
-	}
-
-	oldcode = incode;
-
-	if (sp > stack)
-	    return *--sp;
-	}
-	return code;
-}
-
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * GetCode --
+ *
+ *      Extract the next compression code from the file.  In GIF's, the
+ *      compression codes are between 3 and 12 bits long and are then
+ *      packed into 8 bit bytes, left to right, for example:
+ *                 bbbaaaaa
+ *                 dcccccbb
+ *                 eeeedddd
+ *                 ...
+ *      We use a byte buffer read from the file and a sliding window
+ *      to unpack the bytes.  Thanks to ImageMagick for the sliding window
+ *      idea.
+ *      args:  chan         the channel to read from
+ *             code_size    size of the code to extract
+ *             flag         boolean indicating whether the extractor
+ *                          should be reset or not
+ *
+ * Results:
+ *	code                the next compression code
+ *
+ * Side effects:
+ *	May consume more input from chan.
+ *
+ *----------------------------------------------------------------------
+ */
 
 static int
 GetCode(chan, code_size, flag)
@@ -844,46 +1008,50 @@ GetCode(chan, code_size, flag)
      int flag;
 {
     static unsigned char buf[280];
-    static int curbit, lastbit, done, last_byte;
-    int i, j, ret;
-    unsigned char count;
+    static int bytes = 0, done;
+    static unsigned char *c;
 
+    static unsigned int window;
+    static int bitsInWindow = 0;
+    int ret;
+    
     if (flag) {
-	curbit = 0;
-	lastbit = 0;
+	/* Initialize the decoder */
+	bitsInWindow = 0;
+	bytes = 0;
+	window = 0;
 	done = 0;
+	c = NULL;
 	return 0;
     }
 
-
-    if ( (curbit+code_size) >= lastbit) {
+    while (bitsInWindow < code_size) {
+	/* Not enough bits in our window to cover the request */
 	if (done) {
-	    /* ran off the end of my bits */
 	    return -1;
 	}
-	if (last_byte >= 2) {
-	    buf[0] = buf[last_byte-2];
+	if (bytes == 0) {
+	    /* Not enough bytes in our buffer to add to the window */
+	    bytes = GetDataBlock(chan, buf);
+	    c = buf;
+	    if (bytes <= 0) {
+		done = 1;
+		break;
+	    }
 	}
-	if (last_byte >= 1) {
-	    buf[1] = buf[last_byte-1];
-	}
-
-	if ((count = GetDataBlock(chan, &buf[2])) == 0) {
-	    done = 1;
-	}
-
-	last_byte = 2 + count;
-	curbit = (curbit - lastbit) + 16;
-	lastbit = (2+count)*8 ;
+	/* Tack another byte onto the window, see if that's enough */
+	window += (*c) << bitsInWindow;
+	c++;
+	bitsInWindow += 8;
+	bytes--;
     }
 
-    ret = 0;
-    for (i = curbit, j = 0; j < code_size; ++i, ++j) {
-	ret |= ((buf[ i / 8 ] & (1 << (i % 8))) != 0) << j;
-    }
-
-    curbit += code_size;
-
+    /* The next code will always be the last code_size bits of the window */
+    ret = window & ((1 << code_size) - 1);
+    
+    /* Shift data in the window to put the next code at the end */
+    window >>= code_size;
+    bitsInWindow -= code_size;
     return ret;
 }
 
@@ -1083,16 +1251,761 @@ Fread(dst, hunk, count, chan)
     size_t hunk,count;		/* how many */
     Tcl_Channel chan;
 {
-  MFile *handle;
-    switch (fromData) {
-      case 0:
-	return Tcl_Read(chan, (char *) dst, (int) (hunk * count));
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+    MFile *handle;
+
+    switch (tsdPtr->fromData) {
       case 1:
 	return(Mread(dst, hunk, count, (MFile *) chan));
       case 2:
 	handle = (MFile *) chan;
-	memcpy((VOID *)dst, (VOID *) handle->data, (int) (hunk * count));
+	memcpy((VOID *)dst, (VOID *) handle->data, (size_t) (hunk * count));
 	handle->data += hunk * count;
 	return((int) (hunk * count));
+      default:
+	return Tcl_Read(chan, (char *) dst, (int) (hunk * count));
     }
 }
+
+
+/*
+ * ChanWriteGIF - writes a image in GIF format.
+ *-------------------------------------------------------------------------
+ * Author:          		Lolo
+ *                              Engeneering Projects Area 
+ *	            		Department of Mining 
+ *                  		University of Oviedo
+ * e-mail			zz11425958@zeus.etsimo.uniovi.es
+ *                  		lolo@pcsig22.etsimo.uniovi.es
+ * Date:            		Fri September 20 1996
+ *
+ * Modified for transparency handling (gif89a) and miGIF compression
+ * by Jan Nijtmans <j.nijtmans@chello.nl>
+ *
+ *----------------------------------------------------------------------
+ * FileWriteGIF-
+ *
+ *    This procedure is called by the photo image type to write
+ *    GIF format data from a photo image into a given file 
+ *
+ * Results:
+ *	A standard TCL completion code.  If TCL_ERROR is returned
+ *	then an error message is left in interp->result.
+ *
+ *----------------------------------------------------------------------
+ */
+
+ /*
+  *  Types, defines and variables needed to write and compress a GIF.
+  */
+
+typedef int (* ifunptr) _ANSI_ARGS_((void));	
+
+#define LSB(a)                  ((unsigned char) (((short)(a)) & 0x00FF))
+#define MSB(a)                  ((unsigned char) (((short)(a)) >> 8))
+
+#define GIFBITS 12
+#define HSIZE  5003            /* 80% occupancy */
+
+static int ssize;
+static int csize;
+static int rsize;
+static unsigned char *pixelo;
+static int pixelSize;
+static int pixelPitch;
+static int greenOffset;
+static int blueOffset;
+static int alphaOffset;
+static int num;
+static unsigned char mapa[MAXCOLORMAPSIZE][3];
+
+/*
+ *	Definition of new functions to write GIFs
+ */
+
+static int color _ANSI_ARGS_((int red,int green, int blue,
+		unsigned char mapa[MAXCOLORMAPSIZE][3]));
+static void compress _ANSI_ARGS_((int init_bits, Tcl_Channel handle,
+		ifunptr readValue));
+static int nuevo _ANSI_ARGS_((int red, int green ,int blue,
+		unsigned char mapa[MAXCOLORMAPSIZE][3]));
+static void savemap _ANSI_ARGS_((Tk_PhotoImageBlock *blockPtr,
+		unsigned char mapa[MAXCOLORMAPSIZE][3]));
+static int ReadValue _ANSI_ARGS_((void));
+
+static int
+FileWriteGIF (interp, filename, format, blockPtr)
+    Tcl_Interp *interp;		/* Interpreter to use for reporting errors. */
+    CONST char	*filename;
+    Tcl_Obj	*format;
+    Tk_PhotoImageBlock *blockPtr;
+{
+    Tcl_Channel chan = NULL;
+    int result;
+
+    chan = Tcl_OpenFileChannel(interp, (char *) filename, "w", 0644);
+    if (!chan) {
+	return TCL_ERROR;
+    }
+    if (Tcl_SetChannelOption(interp, chan, "-translation", "binary") != TCL_OK) {
+	return TCL_ERROR;
+    }
+
+    result = CommonWriteGIF(interp, chan, format, blockPtr);
+    if (Tcl_Close(interp, chan) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+    return result;
+}
+
+#define Mputc(c,handle) Tcl_Write(handle,(char *) &c,1)
+
+static int
+CommonWriteGIF(interp, handle, format, blockPtr)
+    Tcl_Interp *interp;
+    Tcl_Channel handle;
+    Tcl_Obj *format;
+    Tk_PhotoImageBlock *blockPtr;
+{
+    int  resolution;
+
+    long  width,height,x;
+    unsigned char c;
+    unsigned int top,left;
+
+    top = 0;
+    left = 0;
+
+    pixelSize=blockPtr->pixelSize;
+    greenOffset=blockPtr->offset[1]-blockPtr->offset[0];
+    blueOffset=blockPtr->offset[2]-blockPtr->offset[0];
+    alphaOffset = blockPtr->offset[0];
+    if (alphaOffset < blockPtr->offset[2]) {
+	alphaOffset = blockPtr->offset[2];
+    }
+    if (++alphaOffset < pixelSize) {
+	alphaOffset -= blockPtr->offset[0];
+    } else {
+	alphaOffset = 0;
+    }
+
+    Tcl_Write(handle, (char *) (alphaOffset ? GIF89a : GIF87a), 6);
+
+    for (x=0;x<MAXCOLORMAPSIZE;x++) {
+	mapa[x][CM_RED] = 255;
+	mapa[x][CM_GREEN] = 255;
+	mapa[x][CM_BLUE] = 255;
+    }
+
+
+    width=blockPtr->width;
+    height=blockPtr->height;
+    pixelo=blockPtr->pixelPtr + blockPtr->offset[0];
+    pixelPitch=blockPtr->pitch;
+    savemap(blockPtr,mapa);
+    if (num>=MAXCOLORMAPSIZE) {
+	Tcl_AppendResult(interp, "too many colors", (char *) NULL);
+	return TCL_ERROR;
+    }
+    if (num<2) num=2;
+    c=LSB(width);
+    Mputc(c,handle);
+    c=MSB(width);
+    Mputc(c,handle);
+    c=LSB(height);
+    Mputc(c,handle);
+    c=MSB(height);
+    Mputc(c,handle);
+
+    resolution = 0;
+    while (num >> resolution) {
+	resolution++;
+    }
+    c = 111 + resolution * 17;
+    Mputc(c,handle);
+
+    num = 1 << resolution;
+
+    /*  background color */
+
+    c = 0;
+    Mputc(c,handle);
+
+    /*  zero for future expansion  */
+
+    Mputc(c,handle);
+
+    for (x=0; x<num ;x++) {
+	c = mapa[x][CM_RED];
+	Mputc(c,handle);
+	c = mapa[x][CM_GREEN];
+	Mputc(c,handle);
+	c = mapa[x][CM_BLUE];
+	Mputc(c,handle);
+    }
+
+    /*
+     * Write out extension for transparent colour index, if necessary.
+     */
+
+    if (alphaOffset) {
+	c = GIF_EXTENSION;
+	Mputc(c, handle);
+	Tcl_Write(handle, "\371\4\1\0\0\0", 7);
+    }
+
+    c = GIF_START;
+    Mputc(c,handle);
+    c=LSB(top);
+    Mputc(c,handle);
+    c=MSB(top);
+    Mputc(c,handle);
+    c=LSB(left);
+    Mputc(c,handle);
+    c=MSB(left);
+    Mputc(c,handle);
+
+    c=LSB(width);
+    Mputc(c,handle);
+    c=MSB(width);
+    Mputc(c,handle);
+
+    c=LSB(height);
+    Mputc(c,handle);
+    c=MSB(height);
+    Mputc(c,handle);
+
+    c=0;
+    Mputc(c,handle);
+    c=resolution;
+    Mputc(c,handle);
+
+    ssize = rsize = blockPtr->width;
+    csize = blockPtr->height;
+    compress(resolution+1, handle, ReadValue);
+
+    c = 0; 
+    Mputc(c,handle);
+    c = GIF_TERMINATOR;
+    Mputc(c,handle);
+
+    return TCL_OK;	
+}
+
+static int
+color(red, green, blue, mapa)
+    int red;
+    int green;
+    int blue;
+    unsigned char mapa[MAXCOLORMAPSIZE][3];
+{
+    int x;
+    for (x=(alphaOffset != 0);x<=MAXCOLORMAPSIZE;x++) {
+	if ((mapa[x][CM_RED]==red) && (mapa[x][CM_GREEN]==green) &&
+		(mapa[x][CM_BLUE]==blue)) {
+	    return x;
+	}
+    }
+    return -1;
+}
+
+
+static int
+nuevo(red, green, blue, mapa)
+    int red,green,blue;
+    unsigned char mapa[MAXCOLORMAPSIZE][3];
+{
+    int x;
+    for (x=(alphaOffset != 0);x<=num;x++) {
+	if ((mapa[x][CM_RED]==red) && (mapa[x][CM_GREEN]==green) &&
+		(mapa[x][CM_BLUE]==blue)) {
+	    return 0;
+	}
+    }
+    return 1;
+}
+
+static void
+savemap(blockPtr,mapa)
+    Tk_PhotoImageBlock *blockPtr;
+    unsigned char mapa[MAXCOLORMAPSIZE][3];
+{
+    unsigned char  *colores;
+    int x,y;
+    unsigned char  red,green,blue;
+
+    if (alphaOffset) {
+	num = 0;
+	mapa[0][CM_RED] = 0xd9;
+	mapa[0][CM_GREEN] = 0xd9;
+	mapa[0][CM_BLUE] = 0xd9;
+    } else {
+	num = -1;
+    }
+
+    for(y=0;y<blockPtr->height;y++) {
+	colores=blockPtr->pixelPtr + blockPtr->offset[0]
+		+ y * blockPtr->pitch;
+	for(x=0;x<blockPtr->width;x++) {
+	    if (!alphaOffset || (colores[alphaOffset] != 0)) {
+		red = colores[0];
+		green = colores[greenOffset];
+		blue = colores[blueOffset];
+		if (nuevo(red,green,blue,mapa)) {
+		    num++;
+		    if (num>=MAXCOLORMAPSIZE) {
+			return;
+		    }
+		    mapa[num][CM_RED]=red;
+		    mapa[num][CM_GREEN]=green;
+		    mapa[num][CM_BLUE]=blue;
+		}
+	    }
+	    colores += pixelSize;
+	}
+    }
+    return;
+}
+
+static int
+ReadValue()
+{
+    unsigned int col;
+
+    if (csize == 0) {
+	return EOF;
+    }
+    if (alphaOffset && (pixelo[alphaOffset]==0)) {
+	col = 0;
+    } else {
+	col = color(pixelo[0],pixelo[greenOffset],pixelo[blueOffset], mapa);
+    }
+    pixelo += pixelSize;
+    if (--ssize <= 0) {
+	ssize = rsize;
+	csize--;
+	pixelo += pixelPitch - (rsize * pixelSize);
+    }
+
+    return col;
+}
+
+
+
+/*-----------------------------------------------------------------------
+ *
+ * miGIF Compression - mouse and ivo's GIF-compatible compression
+ *
+ *          -run length encoding compression routines-
+ *
+ * Copyright (C) 1998 Hutchison Avenue Software Corporation
+ *               http://www.hasc.com
+ *               info@hasc.com
+ *
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation for any purpose and without fee is hereby granted, provided
+ * that the above copyright notice appear in all copies and that both that
+ * copyright notice and this permission notice appear in supporting
+ * documentation.  This software is provided "AS IS." The Hutchison Avenue 
+ * Software Corporation disclaims all warranties, either express or implied, 
+ * including but not limited to implied warranties of merchantability and 
+ * fitness for a particular purpose, with respect to this code and accompanying
+ * documentation. 
+ * 
+ * The miGIF compression routines do not, strictly speaking, generate files 
+ * conforming to the GIF spec, since the image data is not LZW-compressed 
+ * (this is the point: in order to avoid transgression of the Unisys patent 
+ * on the LZW algorithm.)  However, miGIF generates data streams that any 
+ * reasonably sane LZW decompresser will decompress to what we want.
+ *
+ * miGIF compression uses run length encoding. It compresses horizontal runs 
+ * of pixels of the same color. This type of compression gives good results
+ * on images with many runs, for example images with lines, text and solid 
+ * shapes on a solid-colored background. It gives little or no compression 
+ * on images with few runs, for example digital or scanned photos.
+ *
+ *                               der Mouse
+ *                      mouse@rodents.montreal.qc.ca
+ *            7D C8 61 52 5D E7 2D 39  4E F1 31 3E E8 B3 27 4B
+ *
+ *                             ivo@hasc.com
+ *
+ * The Graphics Interchange Format(c) is the Copyright property of
+ * CompuServe Incorporated.  GIF(sm) is a Service Mark property of
+ * CompuServe Incorporated.
+ *
+ */
+
+static int rl_pixel;
+static int rl_basecode;
+static int rl_count;
+static int rl_table_pixel;
+static int rl_table_max;
+static int just_cleared;
+static int out_bits;
+static int out_bits_init;
+static int out_count;
+static int out_bump;
+static int out_bump_init;
+static int out_clear;
+static int out_clear_init;
+static int max_ocodes;
+static int code_clear;
+static int code_eof;
+static unsigned int obuf;
+static int obits;
+static Tcl_Channel ofile;
+static unsigned char oblock[256];
+static int oblen;
+
+/* Used only when debugging GIF compression code */
+/* #define DEBUGGING_ENVARS */
+
+#ifdef DEBUGGING_ENVARS
+
+static int verbose_set = 0;
+static int verbose;
+#define VERBOSE (verbose_set?verbose:set_verbose())
+
+static int set_verbose(void)
+{
+ verbose = !!getenv("GIF_VERBOSE");
+ verbose_set = 1;
+ return(verbose);
+}
+
+#else
+
+#define VERBOSE 0
+
+#endif
+
+
+static CONST char *
+binformat(v, nbits)
+    unsigned int v;
+    int nbits;
+{
+ static char bufs[8][64];
+ static int bhand = 0;
+ unsigned int bit;
+ int bno;
+ char *bp;
+
+ bhand --;
+ if (bhand < 0) bhand = (sizeof(bufs)/sizeof(bufs[0]))-1;
+ bp = &bufs[bhand][0];
+ for (bno=nbits-1,bit=((unsigned int)1)<<bno;bno>=0;bno--,bit>>=1)
+  { *bp++ = (v & bit) ? '1' : '0';
+    if (((bno&3) == 0) && (bno != 0)) *bp++ = '.';
+  }
+ *bp = '\0';
+ return(&bufs[bhand][0]);
+}
+
+static void write_block()
+{
+ int i;
+ unsigned char c;
+
+ if (VERBOSE)
+  { printf("write_block %d:",oblen);
+    for (i=0;i<oblen;i++) printf(" %02x",oblock[i]);
+    printf("\n");
+  }
+ c = oblen;
+ Tcl_Write(ofile, (char *) &c, 1);
+ Tcl_Write(ofile, (char *) &oblock[0], oblen);
+ oblen = 0;
+}
+
+static void
+block_out(c)
+    unsigned char c;
+{
+ if (VERBOSE) printf("block_out %s\n",binformat(c,8));
+ oblock[oblen++] = c;
+ if (oblen >= 255) write_block();
+}
+
+static void block_flush()
+{
+ if (VERBOSE) printf("block_flush\n");
+ if (oblen > 0) write_block();
+}
+
+static void output(val)
+    int val;
+{
+ if (VERBOSE) printf("output %s [%s %d %d]\n",binformat(val,out_bits),binformat(obuf,obits),obits,out_bits);
+ obuf |= val << obits;
+ obits += out_bits;
+ while (obits >= 8)
+  { block_out(obuf&0xff);
+    obuf >>= 8;
+    obits -= 8;
+  }
+ if (VERBOSE) printf("output leaving [%s %d]\n",binformat(obuf,obits),obits);
+}
+
+static void output_flush()
+{
+ if (VERBOSE) printf("output_flush\n");
+ if (obits > 0) block_out(obuf);
+ block_flush();
+}
+
+static void did_clear()
+{
+ if (VERBOSE) printf("did_clear\n");
+ out_bits = out_bits_init;
+ out_bump = out_bump_init;
+ out_clear = out_clear_init;
+ out_count = 0;
+ rl_table_max = 0;
+ just_cleared = 1;
+}
+
+static void
+output_plain(c)
+    int c;
+{
+ if (VERBOSE) printf("output_plain %s\n",binformat(c,out_bits));
+ just_cleared = 0;
+ output(c);
+ out_count ++;
+ if (out_count >= out_bump)
+  { out_bits ++;
+    out_bump += 1 << (out_bits - 1);
+  }
+ if (out_count >= out_clear)
+  { output(code_clear);
+    did_clear();
+  }
+}
+
+static unsigned int isqrt(x)
+    unsigned int x;
+{
+ unsigned int r;
+ unsigned int v;
+
+ if (x < 2) return(x);
+ for (v=x,r=1;v;v>>=2,r<<=1) ;
+ while (1)
+  { v = ((x / r) + r) / 2;
+    if ((v == r) || (v == r+1)) return(r);
+    r = v;
+  }
+}
+
+static unsigned int
+compute_triangle_count(count, nrepcodes)
+    unsigned int count;
+    unsigned int nrepcodes;
+{
+ unsigned int perrep;
+ unsigned int cost;
+
+ cost = 0;
+ perrep = (nrepcodes * (nrepcodes+1)) / 2;
+ while (count >= perrep)
+  { cost += nrepcodes;
+    count -= perrep;
+  }
+ if (count > 0)
+  { unsigned int n;
+    n = isqrt(count);
+    while ((n*(n+1)) >= 2*count) n --;
+    while ((n*(n+1)) < 2*count) n ++;
+    cost += n;
+  }
+ return(cost);
+}
+
+static void max_out_clear()
+{
+ out_clear = max_ocodes;
+}
+
+static void reset_out_clear()
+{
+ out_clear = out_clear_init;
+ if (out_count >= out_clear)
+  { output(code_clear);
+    did_clear();
+  }
+}
+
+static void
+rl_flush_fromclear(count)
+    int count;
+{
+ int n;
+
+ if (VERBOSE) printf("rl_flush_fromclear %d\n",count);
+ max_out_clear();
+ rl_table_pixel = rl_pixel;
+ n = 1;
+ while (count > 0)
+  { if (n == 1)
+     { rl_table_max = 1;
+       output_plain(rl_pixel);
+       count --;
+     }
+    else if (count >= n)
+     { rl_table_max = n;
+       output_plain(rl_basecode+n-2);
+       count -= n;
+     }
+    else if (count == 1)
+     { rl_table_max ++;
+       output_plain(rl_pixel);
+       count = 0;
+     }
+    else
+     { rl_table_max ++;
+       output_plain(rl_basecode+count-2);
+       count = 0;
+     }
+    if (out_count == 0) n = 1; else n ++;
+  }
+ reset_out_clear();
+ if (VERBOSE) printf("rl_flush_fromclear leaving table_max=%d\n",rl_table_max);
+}
+
+static void rl_flush_clearorrep(count)
+    int count;
+{
+ int withclr;
+
+ if (VERBOSE) printf("rl_flush_clearorrep %d\n",count);
+ withclr = 1 + compute_triangle_count(count,max_ocodes);
+ if (withclr < count)
+  { output(code_clear);
+    did_clear();
+    rl_flush_fromclear(count);
+  }
+ else
+  { for (;count>0;count--) output_plain(rl_pixel);
+  }
+}
+
+static void rl_flush_withtable(count)
+    int count;
+{
+ int repmax;
+ int repleft;
+ int leftover;
+
+ if (VERBOSE) printf("rl_flush_withtable %d\n",count);
+ repmax = count / rl_table_max;
+ leftover = count % rl_table_max;
+ repleft = (leftover ? 1 : 0);
+ if (out_count+repmax+repleft > max_ocodes)
+  { repmax = max_ocodes - out_count;
+    leftover = count - (repmax * rl_table_max);
+    repleft = 1 + compute_triangle_count(leftover,max_ocodes);
+  }
+ if (VERBOSE) printf("rl_flush_withtable repmax=%d leftover=%d repleft=%d\n",repmax,leftover,repleft);
+ if (1+(int)compute_triangle_count(count,max_ocodes) < repmax+repleft)
+  { output(code_clear);
+    did_clear();
+    rl_flush_fromclear(count);
+    return;
+  }
+ max_out_clear();
+ for (;repmax>0;repmax--) output_plain(rl_basecode+rl_table_max-2);
+ if (leftover)
+  { if (just_cleared)
+     { rl_flush_fromclear(leftover);
+     }
+    else if (leftover == 1)
+     { output_plain(rl_pixel);
+     }
+    else
+     { output_plain(rl_basecode+leftover-2);
+     }
+  }
+ reset_out_clear();
+}
+
+static void rl_flush()
+{
+ if (VERBOSE) printf("rl_flush [ %d %d\n",rl_count,rl_pixel);
+ if (rl_count == 1)
+  { output_plain(rl_pixel);
+    rl_count = 0;
+    if (VERBOSE) printf("rl_flush ]\n");
+    return;
+  }
+ if (just_cleared)
+  { rl_flush_fromclear(rl_count);
+  }
+ else if ((rl_table_max < 2) || (rl_table_pixel != rl_pixel))
+  { rl_flush_clearorrep(rl_count);
+  }
+ else
+  { rl_flush_withtable(rl_count);
+  }
+ if (VERBOSE) printf("rl_flush ]\n");
+ rl_count = 0;
+}
+
+
+static void compress( init_bits, handle, readValue )
+    int init_bits;
+    Tcl_Channel handle;
+    ifunptr readValue;
+{
+ int c;
+
+ ofile = handle;
+ obuf = 0;
+ obits = 0;
+ oblen = 0;
+ code_clear = 1 << (init_bits - 1);
+ code_eof = code_clear + 1;
+ rl_basecode = code_eof + 1;
+ out_bump_init = (1 << (init_bits - 1)) - 1;
+ /* for images with a lot of runs, making out_clear_init larger will
+    give better compression. */ 
+ out_clear_init = (init_bits <= 3) ? 9 : (out_bump_init-1);
+#ifdef DEBUGGING_ENVARS
+  { const char *ocienv;
+    ocienv = getenv("GIF_OUT_CLEAR_INIT");
+    if (ocienv)
+     { out_clear_init = atoi(ocienv);
+       if (VERBOSE) printf("[overriding out_clear_init to %d]\n",out_clear_init);
+     }
+  }
+#endif
+ out_bits_init = init_bits;
+ max_ocodes = (1 << GIFBITS) - ((1 << (out_bits_init - 1)) + 3);
+ did_clear();
+ output(code_clear);
+ rl_count = 0;
+ while (1)
+  { c = readValue();
+    if ((rl_count > 0) && (c != rl_pixel)) rl_flush();
+    if (c == EOF) break;
+    if (rl_pixel == c)
+     { rl_count ++;
+     }
+    else
+     { rl_pixel = c;
+       rl_count = 1;
+     }
+  }
+ output(code_eof);
+ output_flush();
+}
+
+/*-----------------------------------------------------------------------
+ *
+ * End of miGIF section  - See copyright notice at start of section.
+ *
+ *-----------------------------------------------------------------------*/
+
+

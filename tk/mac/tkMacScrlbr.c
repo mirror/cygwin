@@ -210,17 +210,20 @@ TkpDisplayScrollbar(
      * Draw the focus or any 3D relief we may have.
      */
     if (scrollPtr->highlightWidth != 0) {
-	GC gc;
+	GC fgGC, bgGC;
+
+	bgGC = Tk_GCForColor(scrollPtr->highlightBgColorPtr,
+		Tk_WindowId(tkwin));
 
 	if (scrollPtr->flags & GOT_FOCUS) {
-	    gc = Tk_GCForColor(scrollPtr->highlightColorPtr,
+	    fgGC = Tk_GCForColor(scrollPtr->highlightColorPtr,
 		    Tk_WindowId(tkwin));
-	} else {
-	    gc = Tk_GCForColor(scrollPtr->highlightBgColorPtr,
-		    Tk_WindowId(tkwin));
-	}
-	Tk_DrawFocusHighlight(tkwin, gc, scrollPtr->highlightWidth,
+	    TkpDrawHighlightBorder(tkwin, fgGC, bgGC, scrollPtr->highlightWidth,
 		Tk_WindowId(tkwin));
+	} else {
+	    TkpDrawHighlightBorder(tkwin, bgGC, bgGC, scrollPtr->highlightWidth,
+		Tk_WindowId(tkwin));
+	}
     }
     Tk_Draw3DRectangle(tkwin, Tk_WindowId(tkwin), scrollPtr->bgBorder,
 	    scrollPtr->highlightWidth, scrollPtr->highlightWidth,
@@ -239,6 +242,7 @@ TkpDisplayScrollbar(
 
     if (macScrollPtr->sbHandle == NULL) {
         Rect r;
+        WindowRef frontNonFloating;
         
         r.left = r.top = 0;
         r.right = r.bottom = 1;
@@ -249,7 +253,14 @@ TkpDisplayScrollbar(
 	/*
 	 * If we are foremost than make us active.
 	 */
-	if ((WindowPtr) destPort == FrontWindow()) {
+	
+	if (TkMacHaveAppearance() >= 0x110) {
+	    frontNonFloating = FrontNonFloatingWindow();
+	} else {
+	    frontNonFloating = FrontWindow();
+	}
+	
+	if ((WindowPtr) destPort == FrontWindow() || TkpIsWindowFloating((WindowPtr) destPort)) {
 	    macScrollPtr->macFlags |= ACTIVE;
 	}
     }
@@ -1055,3 +1066,4 @@ UpdateControlValues(
 	(**macScrollPtr->sbHandle).contrlVis = 255;
     }
 }
+

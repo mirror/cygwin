@@ -16,7 +16,6 @@
 #include "tkPort.h"
 #include "tkUnixInt.h"
 
-extern int tclFocusDebug;
 
 /*
  *----------------------------------------------------------------------
@@ -147,3 +146,4 @@ TkpChangeFocus(winPtr, force)
     XFlush(dispPtr->display);
     return serial;
 }
+

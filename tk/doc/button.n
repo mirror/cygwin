@@ -174,3 +174,4 @@ individual widgets or by redefining the class bindings.
 
 .SH KEYWORDS
 button, widget
+

@@ -79,3 +79,4 @@ with a \fB\-\fR.
 
 .SH KEYWORDS
 clear, format, clipboard, append, selection, type
+

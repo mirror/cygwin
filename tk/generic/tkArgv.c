@@ -5,7 +5,7 @@
  *	argv-argc parsing.
  *
  * Copyright (c) 1990-1994 The Regents of the University of California.
- * Copyright (c) 1994 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -24,8 +24,8 @@
 static Tk_ArgvInfo defaultTable[] = {
     {"-help",	TK_ARGV_HELP,	(char *) NULL,	(char *) NULL,
 	"Print summary of command-line options and abort"},
-    {"-version",	TK_ARGV_VERSION,	(char *) NULL,	(char *) NULL,
-	"Print version number and abort"},
+    {"-version", TK_ARGV_VERSION, (char *) NULL, (char *) NULL,
+        "Print version number and abort"},
     {NULL,	TK_ARGV_END,	(char *) NULL,	(char *) NULL,
 	(char *) NULL}
 };
@@ -47,7 +47,7 @@ static void	PrintUsage _ANSI_ARGS_((Tcl_Interp *interp,
  *
  * Results:
  *	The return value is a standard Tcl return value.  If an
- *	error occurs then an error message is left in interp->result.
+ *	error occurs then an error message is left in the interp's result.
  *	Under normal conditions, both *argcPtr and *argv are modified
  *	to return the arguments that couldn't be processed here (they
  *	didn't match the option table, or followed an TK_ARGV_REST
@@ -294,13 +294,17 @@ Tk_ParseArgv(interp, tkwin, argcPtr, argv, argTable, flags)
 		argc -= 2;
 		break;
 	    case TK_ARGV_VERSION:
-	        Tcl_AppendResult(interp, "Tk version ", TK_VERSION, "-foundry-971110",
+	        Tcl_AppendResult(interp, "Tk version ", TK_VERSION, "-snavigator-99r1",
 			(char *) NULL);
 		return TCL_ERROR;
-	    default:
-		sprintf(interp->result, "bad argument type %d in Tk_ArgvInfo",
+	    default: {
+		char buf[64 + TCL_INTEGER_SPACE];
+		
+		sprintf(buf, "bad argument type %d in Tk_ArgvInfo",
 			infoPtr->type);
+		Tcl_SetResult(interp, buf, TCL_VOLATILE);
 		return TCL_ERROR;
+	    }
 	}
     }
 
@@ -334,7 +338,7 @@ Tk_ParseArgv(interp, tkwin, argcPtr, argv, argTable, flags)
  *	Generate a help string describing command-line options.
  *
  * Results:
- *	Interp->result will be modified to hold a help string
+ *	The interp's result will be modified to hold a help string
  *	describing all the options in argTable, plus all those
  *	in the default table unless TK_ARGV_NO_DEFAULTS is
  *	specified in flags.
@@ -359,7 +363,7 @@ PrintUsage(interp, argTable, flags)
     int width, i, numSpaces;
 #define NUM_SPACES 20
     static char spaces[] = "                    ";
-    char tmp[30];
+    char tmp[TCL_DOUBLE_SPACE];
 
     /*
      * First, compute the width of the widest option key, so that we
@@ -437,3 +441,4 @@ PrintUsage(interp, argTable, flags)
 		(char *) NULL);
     }
 }
+

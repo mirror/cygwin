@@ -12,6 +12,7 @@
  */
 
 #include "tkInt.h"
+#include "tkMacInt.h"
 #include "X.h"
 #include "Xlib.h"
 
@@ -215,3 +216,4 @@ TkClipBox(
     rect_return->width = (**rgn).rgnBBox.right - (**rgn).rgnBBox.left;
     rect_return->height = (**rgn).rgnBBox.bottom - (**rgn).rgnBBox.top;
 }
+

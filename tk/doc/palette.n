@@ -71,3 +71,4 @@ color scheme used in Tk 3.6 and earlier versions.
 
 .SH KEYWORDS
 bisque, color, palette
+

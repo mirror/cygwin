@@ -35,7 +35,7 @@ static int		PutPixel _ANSI_ARGS_((XImage *image, int x, int y,
  *----------------------------------------------------------------------
  */
 
-int
+static int
 DestroyImage(imagePtr)
      XImage *imagePtr;		/* image to free */
 {
@@ -64,7 +64,7 @@ DestroyImage(imagePtr)
  *----------------------------------------------------------------------
  */
 
-unsigned long
+static unsigned long
 ImageGetPixel(image, x, y)
     XImage *image;
     int x, y;
@@ -327,3 +327,4 @@ XGetImage(display, d, x, y, width, height, plane_mask, format)
 
     return imagePtr;
 }
+

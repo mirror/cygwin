@@ -3,7 +3,7 @@
 # This demonstration script creates a toplevel window that displays
 # all of Tk's built-in bitmaps.
 #
-# SCCS: @(#) bitmap.tcl 1.6 97/03/02 16:19:20
+# RCS: @(#) $Id$
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -53,3 +53,4 @@ frame $w.frame
 bitmapRow $w.frame.0 error gray12 gray25 gray50 gray75
 bitmapRow $w.frame.1 hourglass info question questhead warning
 pack $w.frame -side top -expand yes -fill both
+

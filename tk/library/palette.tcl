@@ -3,7 +3,7 @@
 # This file contains procedures that change the color palette used
 # by Tk.
 #
-# SCCS: @(#) palette.tcl 1.11 97/06/23 20:35:44
+# RCS: @(#) $Id$
 #
 # Copyright (c) 1995-1997 Sun Microsystems, Inc.
 #
@@ -24,6 +24,11 @@
 # for the option database, such as activeForeground, not -activeforeground.
 
 proc tk_setPalette {args} {
+    if {[winfo depth .] == 1} {
+	# Just return on monochrome displays, otherwise errors will occur
+	return
+    }
+
     global tkPalette
 
     # Create an array that has the complete new palette.  If some colors
@@ -95,8 +100,8 @@ proc tk_setPalette {args} {
     # defaults are currently for this platform.
     toplevel .___tk_set_palette
     wm withdraw .___tk_set_palette
-    foreach q {button canvas checkbutton entry frame label listbox menubutton menu message \
-		 radiobutton scale scrollbar text} {
+    foreach q {button canvas checkbutton entry frame label listbox \
+	    menubutton menu message radiobutton scale scrollbar text} {
 	$q .___tk_set_palette.$q
     }
 
@@ -189,23 +194,22 @@ proc tkRecolorTree {w colors} {
 #		by 10%.
 
 proc tkDarken {color percent} {
-    set l [winfo rgb . $color]
-    set red [expr {[lindex $l 0]/256}]
-    set green [expr {[lindex $l 1]/256}]
-    set blue [expr {[lindex $l 2]/256}]
-    set red [expr {($red*$percent)/100}]
+    foreach {red green blue} [winfo rgb . $color] {
+	set red [expr {($red/256)*$percent/100}]
+	set green [expr {($green/256)*$percent/100}]
+	set blue [expr {($blue/256)*$percent/100}]
+	break
+    }
     if {$red > 255} {
 	set red 255
     }
-    set green [expr {($green*$percent)/100}]
     if {$green > 255} {
 	set green 255
     }
-    set blue [expr {($blue*$percent)/100}]
     if {$blue > 255} {
 	set blue 255
     }
-    format #%02x%02x%02x $red $green $blue
+    return [format "#%02x%02x%02x" $red $green $blue]
 }
 
 # tk_bisque --
@@ -222,3 +226,4 @@ proc tk_bisque {} {
 	    selectBackground #e6ceb1 selectForeground black \
 	    troughColor #cdb79e
 }
+

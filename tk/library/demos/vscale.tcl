@@ -2,7 +2,7 @@
 #
 # This demonstration script shows an example with a vertical scale.
 #
-# SCCS: @(#) vscale.tcl 1.4 97/03/02 16:28:34
+# RCS: @(#) $Id$
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -46,3 +46,4 @@ proc setHeight {w height} {
     $w coords poly 15 20 35 20 35 $y2 45 $y2 25 $height 5 $y2 15 $y2 15 20
     $w coords line 15 20 35 20 35 $y2 45 $y2 25 $height 5 $y2 15 $y2 15 20
 }
+

@@ -4010,19 +4010,19 @@ virtual events now go to the correct (focus) window. (RJ)
 
 9/19/97 (bug fix) Made Macintosh tearoff menus non-resizable. (RJ)
 
+10/9/97 (bug fix) Default font for new canvas text items was hardcoded to
+"Helvetica 12" instead of using DEF_CANVTEXT_FONT defined in
+tk{platform}Default.h like all the other widget settings.  (CCS)
+
 10/9/97 (bug fix) Image code could cause crashes during "exit" under
 some conditions (such as an image named "place").  (JO)
 
 10/9/97 (bug fix) Fixed bug that sometimes prevented listboxes from
 scrolling far enough horizontally to see the rightmost character.  (JO)
 
-10/9/97 (bug fix) Default font for new canvas text items was hardcoded to
-"Helvetica 12" instead of using DEF_CANVTEXT_FONT defined in
-tk{platform}Default.h like all the other widget settings.  (CCS)
-
-10/10/97 (bug fix) In canvas text items, if the text ended with a \n, it
-was not counted in the bbox height, as it did in tk4.2.  This caused
-"hello\n" to be the same height as "hello" and you couldn't see the
+10/10/97 (bug fix) In canvas text items, if the text ended with a \n, it 
+was not counted in the bbox height, as it did in tk4.2.  This caused 
+"hello\n" to be the same height as "hello" and you couldn't see the 
 cursor positioned on the next line. (CCS)
 
 10/10/97 (bug fix) The grid geometry manager didn't always properly
@@ -4278,7 +4278,651 @@ format.  If you have extensions built with the o32 abi's you will need
 to update them to n32 for them to work with Tcl.  (RJ)
 *** POTENTIAL INCOMPATIBILITY ***
 
-11/10/98 (feature change) The Macintosh menus will use the Appearance Theme 
-backgrounds, separators and menu shape, if Appearance version 1.0.1 or 
-greater is installed.  The version of Appearance that shipped with MacOS 8.0 
-so it will not work with a straight 8.0, but it will with MacOS 8.1 or later. (JI)
+11/10/98 (feature change) The Macintosh menus will use the Appearance
+Theme backgrounds, separators and menu shape, if Appearance version
+1.0.1 or greater is installed.  The version of Appearance that shipped
+with MacOS 8.0 so it will not work with a straight 8.0, but it will
+with MacOS 8.1 or later. (JI)
+
+----------------- Released 8.0.4, 11/20/98 -----------------------
+
+11/24/98 (bug fix) On some X servers, XQueryLoadFont will always
+return a font, even if the name is meaningless.  This prevents Tk from
+parsing the font name, so now we perform a quick sanity check on the
+name before letting X have it. (stanton)
+
+12/30/98 (bug fix) Fixed bug in "grid forget" that failed to cancel
+pending idle handlers, resulting in a crash in a few odd cases. (stanton)
+
+1/28/99 (configure change) Now support -pipe option on gcc.  (RJ)
+
+2/4/99 (bug fix) Changed so color tables in photo images are freed
+immediately instead of being delayed.  This ensures that color tables
+are properly disposed at process exit. (stanton)
+
+2/4/99 (bug fix) Changed postscript template to	include a European
+character with an umlaut when determining font height. (stanton)
+
+2/4/99 (bug fix) If an image bitmap mask changed but ended up with the
+same XID, the GC failed to be updated and so the new mask was
+not used. (stanton)
+
+2/4/99 (bug fix) Changed so focus window is always set if -force is
+specified.  This fixes the problem on Windows where Tk does not
+activate the window if it already has focus. (stanton)
+
+2/4/99 (bug fix) Fixed so errors in console eval are reported
+properly.  Eliminated duplicate result messages. (stanton)
+
+2/4/99 (bug fix) Under Windows, changed so toplevels that aren't
+resizable don't have resize handles and the zoom box is disabled. (stanton)
+
+2/4/99 (bug fix) Changed to cancel the mouse timer when a user
+initiated move/resize loop begins on Windows. (stanton)
+
+2/4/99 (configure change) TK_LD_SEARCH_FLAGS was set incorrectly if
+SHLIB_LD_LIBS='${LIBS}', and shared linking is performed through the C
+compiler. Systems affected are Linux, MP-RAS and NEXTSTEP, but also
+with gcc on many more systems.
+
+2/4/99 (bug fix) Changed some EXTERN declarations to extern since they
+are not defining exported interfaces.  This avoids generating useless
+declspec() attributes and makes the Windows makefile simpler. (stanton)
+
+2/4/99 (bug fix) Changed so keyboard shortcuts will only be found in
+the current toplevel.  Previously, they might be found in menus
+attached to other toplevels that might not even be mapped. (stanton)
+*** POTENTIAL INCOMPATIBILITY ***
+
+2/4/99 (bug fix) Changed to treat zero width lines in the canvas like
+they have width 1 for purposes of selection. (stanton)
+
+2/4/99 (bug fix) Added a workaround for a bug in GetTextExtentExPoint
+on Win NT 4.0/Japanese that cause a crash in some cases. (stanton)
+
+2/4/99 (bug fix) Fixed uninitialized memory access bug in Unix send
+code. (stanton)
+
+----------------------------------------------------------
+Changes for Tk 8.0 go above this line.
+Changes for Tk 8.1 go below this line.
+----------------------------------------------------------
+
+1/16/98 (new feature) Tk now supports international characters sets:
+    - Font display mechanism overhauled to display Unicode strings
+      containing full set of international characters.  You do not need
+      Unicode fonts on your system in order to use tk or see international
+      characters.  For those familiar with the Japanese or Chinese patches,
+      there is no "-kanjifont" option.  Characters from any available fonts
+      will automatically be used if the widget's originally selected font is
+      not capable of displaying a given character.  
+    - Textual widgets are international aware.  For instance, cursor
+      positioning commands would now move the cursor forwards/back by 1
+      international character, not by 1 byte.  
+    - Input Method Editors (IMEs) work on Mac and Windows.  Unix is still in
+      progress.
+
+7/7/97 (new feature) The send command now works for Microsoft
+Windows. It is implemented using Dynamic Data Exchange, and a new
+command, dde, allows Tk to send more generic DDE commands to other
+applications. (SRP)
+
+11/3/97 (new feature) Major overhaul of code that manages configuration
+options to use Tcl_Obj structures instead of strings:
+    - There is a new set of procedures including Tk_CreateOptionTable,
+      Tk_InitOptions, and Tk_SetOptions, which replace Tk_ConfigureWidget
+      and related procedures.  The old procedures are still available.
+      The new procedures use a new format for configuration tables.
+      See SetOptions.3 for more information.
+    - There are new procedures Tk_AllocColorFromObj, Tk_GetColorFromObj,
+      and Tk_FreeColorFromObj to manage colors using objects to hold the
+      name of the color and cache the corresponding XColor pointer.
+      There are similar procedures Tk_Alloc3DBorderFromObj,
+      Tk_AllocBitmapFromObj, Tk_AllocCursorFromObj, Tk_AllocFontFromObj,
+      and so on to manage borders, bitmaps, cursors, and fonts.
+    - The old-style procedures such as Tk_GetColor and Tk_GetBitmap no
+      longer take Tk_Uids for arguments; they just take strings.
+    - Menus, labels, buttons, checkbuttons, and radiobuttons have been
+      converted to use the new object-based configuration library.
+      (SRP & JO)
+
+11/7/97 (improvement) Changed code referring to "interp->result" to call
+accessor functions like Tcl_SetResult().
+
+12/23/97 (fix) Fixed transparency and web optimized the palette of
+the images/ Tcl powered logos. (DL)
+
+12/16/97 (bug fix) Canvas and text "bind" subcommands generated an
+error with no message if called to fetch a binding that didn't exist.
+They now silently return without an error like the "bind" command. (SS)
+
+1/13/98 (bug fix) Keysyms for international characters were not being
+reported properly under Windows. (SS)
+
+----------------- Released 8.1a1, 1/22/98 -----------------------
+
+2/4/98 (bug fix) Calling XFreeFontNames() twice if couldn't allocate
+font. (CCS)
+
+2/10/98 (bug fix) Inlined prolog.ps in tkCanvPs.c to make it accessible
+from safe interpreters: canvas postscript now works in safe interps
+(like in tk8.0plugin). (DL)
+
+2/11/98 (bug fix) Windows "send" to a remote interp wasn't propagating
+$errorInfo correctly from the remote interp to the local invoking interp.
+(CCS)
+
+2/11/98 (bug fix) Windows "send" should have accepted "--" to mean "no more
+arguments". (CCS)
+
+2/11/98 (bug fix) Windows "send" was concatenating its arguments
+incorrectly (not consistent with "eval", "uplevel", or Unix "send"). (CCS)
+
+2/18/98 (bug fix) Macintosh radiobuttons and checkbuttons now color
+their backgrounds correctly under Appearance.  The controls gadgets themselves
+however, remain the Theme colors. (JI)
+
+2/18/98 (improvement) The corner pixels that peek through around the
+rounded corners of the Mac button widget are now controlled by the
+-highlightbackground, rather than the -background option. (JI)
+
+2/18/98 (improvement) Implemented the intra-application Send on the
+Mac (RJ)
+
+2/18/98 (bug fix) Under X, a problem mapping from a fontStructPtr to an
+XLFD (no XA_FONT attribute) would lead to dereferencing NULL. (CCS)
+
+----------------- Released 8.1a2, Feb 20 1998 -----------------------
+
+10/21/98 (bug fix) Tk_UnderlineChars did not handle UTF strings properly
+so underline indices were in bytes instead of characters. (stanton)
+
+11/19/98 (bug fix) Fixed menus and titles so they properly display
+Unicode characters under Windows. [Bug: 819] (stanton)
+
+11/24/98 (bug fix) Fixed a bunch of memory leaks in the Windows menu
+code. [Bug: 620] (stanton)
+
+11/25/98 (bug fix) Various small bug fixes: (stanton)
+	- hidemargin option was not honored properly in menus [Bug: 859]
+	- disabled menu entries were getting reenabled whenever the
+	mouse passed over the entry [Bug: 860]
+	- fixed deletion order bug where a crash would result if a
+	binding deleted "."
+
+11/30/98 (bug fix) The error result was getting lost when restoring
+configuration options in buttons. [Bug: 619] (stanton)
+
+12/8/98 (bug fix) The Windows clipboard was not correctly traslating
+multibyte characters. [Bug: 935] (stanton)
+
+----------------- Released 8.1b1, Dec 11 1998 -----------------------
+
+1/29/99 (bug fix) Fixed bug in "grid forget" that failed to cancel
+pending idle handlers, resulting in a crash in a few odd
+cases. (stanton)
+
+2/4/99 (bug fix): Fixed uninitialized memory access in
+Tk_SetAppName. [Bug: 919] (stanton)
+
+2/4/99 (bug fix): Added a workaround for a bug in GetTextExtentExPoint
+on Win NT 4.0/Japanese. [Bug: 1006] (stanton)
+
+2/4/99 (bug fix): Changed so keyboard shortcuts for menus will only be
+found in the current toplevel.  Previously, they might be found in
+menus attached to other toplevels that might not even be mapped.
+[Bug: 924] (stanton)
+
+2/4/99 (bug fix): Changed to treat zero width lines in the canvas like
+they have width 1 for purposes of selection. [Bug: 925] (stanton)
+
+2/4/99 (bug fix): TK_LD_SEARCH_FLAGS was set incorrectly if
+SHLIB_LD_LIBS='${LIBS}', and shared linking is performed through the C
+compiler. Systems affected are Linux, MP-RAS and NEXTSTEP, but also
+with gcc on many more systems. [Bug: 908] (stanton)
+
+2/4/99 (feature enhancement): Changed so windows that aren't resizable
+don't have resize handles and the zoom box is disabled on
+Windows. (stanton)
+
+2/4/99 (bug fix): Fixed so errors in console eval are reported
+properly.  Eliminated duplicate result messages. [Bug: 973] (stanton)
+
+2/4/99 (bug fix): Changed so focus window is always set if -force is
+specified.  This fixes the problem on Windows where Tk does not
+activate the window if it already has focus. (stanton)
+
+2/4/99 (bug fix): If an image mask changed but ended up with the same
+XID, the GC failed to be updated and so the new mask was not
+used. [Bug: 970] (stanton)
+
+2/12/99 (new feature): Tk is now thread safe.  You enable this by
+configuring with --enable-threads.  Tcl must also be compiled with
+--enable-threads.  See Tcl for more information about the threading
+interfaces. (lfb)
+
+2/25/99 (bug fix) Under Windows, wish can now inherit pipe handles on
+stdio so it is possible to use the wish executable in a command
+pipeline to capture the output of puts or read from the pipe with
+gets.  (redman)
+
+3/1/99 (bug fix) Under Windows, Tk was not properly handling focus and
+activation changes in some cases. (redman)
+
+3/10/99 (new feature) Tk now uses the new stub library feature in Tcl.
+The Tk library now contains no direct references to any symbols in
+Tcl.  In addition, there is a new Tk_MainEx() function that takes an
+interpreter as an argument.  See the Tcl documentation for more
+information about the stubs mechanism. (redman)
+
+3/14/99 (feature change) Test suite now uses "test" namespace to
+define the test procedure and other auxiliary procedures as well as
+global variables.
+    - Global array testConfige is now called ::test::testConfig.
+    - Global variable VERBOSE is now called ::test::verbose, and
+      ::test::verbose no longer works with numerical values.  We've
+      switched to a bitwise character string.  You can set
+      ::test::verbose by using the -verbose option on the Tk command
+      line.
+    - Global variable TESTS is now called ::test::matchingTests, and
+      can be set on the Tk command line via the -match option.
+    - There is now a ::test::skipTests variable (works similarly to
+      ::test::matchTests) that can be set on the Tk command line via
+      the -match option.
+    - The test suite can now be run in any working directory.  When
+      you run "make test", the working directory is nolonger switched
+      to ../tests.
+(hirschl)
+*** POTENTIAL INCOMPATIBILITY ***
+
+----------------- Released 8.1b2, March 16, 1999 ---------------------
+
+3/23/99 (feature change) Test suite now uses "tcltest" namespace to
+define the test procedure and other auxiliary procedures as well as
+global variables.  The previously chosen "test" namespace was thought
+to be too generic and likely to create conflits.
+(hirschl)
+*** POTENTIAL INCOMPATIBILITY ***
+
+3/26/99 [bug fix]  Fixed bug reported by Bryan Oakley in the
+menubutton bindings.  There was a false assumption that there was
+always a menu attached to the button.  [Bug 1116] (surles)
+
+3/26/99 (feature change) Removed --enable-tcl-stub from the configure
+script. Linking Tk to Tcl stubs is causing too many problems when
+linking executables like wish.  Until the Tk is a fully loadable
+extension, linking against the Tcl stubs is not supported in Tk.
+(redman)
+
+3/26/99 (feature change) --nameble-shared is now the default and builds
+Tk as a shared library; specify --disable-shared to build a static Tk
+library and shell.
+*** POTENTIAL INCOMPATIBILITY ***
+
+3/29/99 (api change) Standardized text layout and font interfaces
+so they are consistent with respect to byte versus character
+oriented indices.  The layout functions all manipulate character
+oriented values while the lower level measurement functions all
+operate on byte oriented values. (stanton)
+
+4/1/99 (bug fix) Image handlers are finalized before the font subsystem
+to fix crashes during finalization of complex widgets. (stanton)
+
+4/1/99 (feature change) Removed the send command on Windows.  Moved
+the DDE basis of that command out to its own extension.  The send
+implementation on top of DDE was causing Tk to lock up in some cases.
+(redman)
+
+4/5/99 (bug fix) Fixed handling of Unicode in text searches.  The
+-count option was returning byte counts instead of character counts.
+
+4/5/99 (feature change) Cut and paste to an entry widget returns the
+selection instead of the widget contents, which can be different if the
+-show option is used to hide the display. (stanton)
+
+--------------- Released 8.1b3, April 6, 1999 ----------------------
+
+4/20/99 (compiler fix) changed definition of Status type to use a
+typedef instead of a #define to avoid conflicting with the cygwin win32
+headers. (redman)
+
+4/22/99 (bug fix) Set the -translation and -encoding options to binary
+for image files. (redman)
+
+4/27/99 (bug fix) Changed to avoid the need for forward declarations in
+stub initializers.  Added extern "C" blocks around stub table pointer
+declarations so the stubs can be used from C++ code. (stanton)
+
+--------------- Released 8.1 final, April 29, 1999 ----------------------
+
+5/7/99 (bug fix) Fixed bug wheretk_popup fails when called too
+quickly. [Bug: 2009] (stanton)
+
+5/18/99 (bug fix) Fixed clipboard code so it handles Unicode data
+properly on Windows NT and 95. [Bug: 1791] (stanton)
+
+5/19/99 (bug fix) Add extern "C" block around entire header file for
+C++ compilers to fix linkage issues.  Submitted by Don Porter and Paul
+Duffin. (redman)
+
+--------------- Released 8.1.1, May 25, 1999 ----------------------
+
+5/21/99 (bug fix) Fixed clipboard code to handle lack of CF_LOCALE
+information (from command.com).  (stanton)
+
+6/1/99  (bug fix) Improved I18N selection support.  COMPOUND_TEXT
+is converted to/from iso2022, and STRING is converted to/from
+iso8859-1.  More work is needed.  (stanton)
+
+6/3/99  (bug fix) Fixed selection code to handle Unicode data in
+COMPOUND_TEXT and STRING selections.  [Bug: 1791] (stanton)
+
+6/16/99 (new feature) Changes to makefiles and configure scripts to
+support TEA specification.  (wart)
+
+6/30/99 (bug fix) Removed deprecated functions, patch from Jan
+Nijtmans. [Bug 2080] (redman)
+
+6/30/99 (bug fix) Applied patch to allow Img extension to work with
+8.2, patch from Jan Nijtmans.  [Bug 2068] (redman)
+
+6/30/99 (bug fix) Applied patch from Don Porter to prevent the Windows
+shutdown code from calling Tcl functions when the stub table has not
+been initialized in TkWinWmCleanup. [Bug: 2269] (redman)
+
+7/8/99  (bug fix) Changed TkWinChildProc to pass WM_WINDOWSPOSCHANGED
+through to DefWindowProc to make OpenGL sub-windows happpy.  This
+allows Windows to generate the WM_SIZE and WM_MOVE messages. (stanton)
+
+--------------- Released 8.2b1, July 14, 1999 ----------------------
+
+7/16/99 (bug fix) Copy prolog.ps from the generic directory for
+install-libraries make target. (redman)
+
+7/22/99 (bug fix) Applied patch from Jeff Hobbs to fix
+library/menu.tcl. [Bug: 2425] (redman)
+
+7/22/99 (bug fix) Make install-sh have executable permissions before
+calling from the Makefile. [Bug: 2413] (redman)
+
+7/22/99 (bug fix) Block out sys/stat.h include with #if to allow
+extension writers to use the MetroWerks compiler on Windows. 
+[Bug: 2385] (redman)
+
+7/29/99 (bug fix) Allow tcl to opn CON and NUL on Windows, moved check
+to Tk Console code instead.  [Bug: 2393 2392 2209 2458] (redman)
+
+7/30/99 (bug fix) corrected the Windows build of threaded Tk from both
+sets of makefiles (nmake and gmake). (redman)
+
+7/30/99 (bug fix) Added XFillRectangle to stub table, patch from Jan
+Njitmans.  [Bug: 2446] (hobbs)
+
+8/1/99  (bug fix) Wrapped #define of panic() inside #ifndef blocks to
+avoid compiler errors on Macintosh.  Patch from Vince Darley.  
+[Bug: 2389] (hobbs)
+
+--------------- Released 8.2b2, August 5, 1999 ----------------------
+
+8/13/99 (Mac) Rearranged the projects in the tkMacProjects.sea.hqx so
+that the build directory is separate from the sources.  Fixed bug in
+Tk_DrawChars(). (Jim Ingham)
+
+--------------- Released 8.2.0, August 17, 1999 ----------------------
+
+9/21/99 (bug fix) fixed 'wm deiconify' quirks on Windows. (hobbs)
+
+9/21/99 (bug fix) fix fg<>bg GC swap bug for canvas. [Bug: 2676] (hobbs)
+
+9/21/99 (config fix) fixed AIX config issues for Tk. (hobbs)
+
+9/24/99 (feature change) tk_dialog now uses {Times 12} by default. (hobbs)
+
+--- Released 8.2.1, October 04, 1999 --- See ChangeLog for details ---
+
+10/30/99 (bug fix) fixed XKeysymToKeycode to handle mapping of symbolic
+keysyms (Left, Home, ...) with event generate (hobbs)
+
+10/30/99 (bug fix) change tkEntrySeeInsert to avoid the use of a while loop
+that could eat CPU tremendously.  Behavior of moving the cursor at the
+right edge changes slightly. [Bug: 3195] (hobbs)
+
+10/30/99 (bug fix) changed tkScrollButtonUp to check for existence of
+tkPriv(relief) in order to avoid spurious release events (hobbs)
+
+--- Released 8.2.2, November 04, 1999 --- See ChangeLog for details ---
+
+11/19/99 (bug fix) fixed expression error that could cause
+'malformed bucket chain' error in tkEntry.c. (hobbs)
+
+11/19/99 (bug fix) fixed Tk_NameOfColor (hobbs)
+
+--- Released 8.2.3, December 16, 1999 --- See ChangeLog for details ---
+
+1999-09-01 (feature enhancement) rewrote runtime libraries to use new
+Tcl functions where appropriate
+
+1999-10-28 (feature enhancement) added Img patch from Jan Nijtmans that
+makes the image command Tcl_Obj-based, adds support for binary -data args,
+adds alpha channel to images, adds GIF write capability (RLE).  Binary
+compatability is maintained, and source level compatibility is retained
+with -DUSE_OLD_IMAGE. (nijtmans)
+
+1999-11-16 (feature enhancement) made listbox Tcl_Obj based, added
+-listvariable option and itemconfigure command to allow coloring
+individual items. (melski)
+
+1999-11-23 (feature enhancement) added TK_OPTION_DONT_SET_DEFAULT as an
+equivalent to TK_CONFIG_DONT_SET_DEFAULT (hobbs)
+
+1999-11-24 (feature enhancement) updated dialogs to use color icons on
+Unix, center properly over -parent. (hipp, hobbs)
+
+1999-12-01 (feature enhancement) added hooks into main() code to support
+"big" shells more easily. (redman)
+
+1999-12-02 (feature enhancement) converted Tk_DestroyCmd, Tk_LowerCmd and
+Tk_RaiseCmd to their ObjCmd equivalent.
+
+1999-12-12 (bug fix) fixed bug in TextSearchCmd for multibyte chars
+
+1999-12-13 (feature enhancement) added support for pointer warping via the
+event -warp option, added some items from Dash patch: canvas widget now
+Tcl_Obj-based, added Tk_CreateSmoothMethod, added support for <Quadruple>
+clicks, entry widget validation routines, new -state hidden in text
+widgets, new -state -active* -disabled* -offset options to canvas items
+(see man page for full docs).  New features include dashed line support on
+the canvas, -elide support for TkMan, postscript printing of images and
+windows from the canvas.  Binary compatibility is maintained with 8.2, and
+source level compatibility is kept by using -DUSE_OLD_CANVAS.
+(hobbs, nijtmans, et al)
+
+1999-12-16 (feature enhancement) added "bitstream cyberbit" to list of
+font fallbacks. (hobbs)
+
+1999-12-16 (feature enhancement) added new 'tk useinputmethods ...' command
+to provide support for disabling/enabling the use of XIM on X.  This was
+previously all done at compile time, and always on.  Now it is turned off
+by default, even when available, and the user must turn it on to use XIM
+(per display).
+	*** POTENTIAL INCOMPATIBILITY ***
+user must add 'tk useinputmethods 1' to retain old style. (hobbs)
+
+1999-12-16 (feature enhancement) added proper support for -initialfile
+to tk_get*File, and made Unix version better match Windows file box
+that it was emulating. (hobbs)
+
+1999-12-16 (bug fix) removed necessity of 'update idle' before 'wm
+deiconify' on Windows. (mao)
+
+1999-12-16 (feature enhancement) added support for Windows system cursors
+to TkGetCursorByName (use -cursor @filename)
+
+1999-12-21 (bug fix) fixed lack of refresh for thin frames (darley)
+
+1999-12-21 (bug fix) fixed panic in Tk_CoordsToWindow to print error
+to stderr instead (for Tix) (hobbs)
+
+1999-12-21 (bug fix) fixed segv with scale widget when using -cursor (hobbs)
+
+--- Released 8.3b1, December 22, 1999 --- See ChangeLog for details ---
+
+2000-01-05 (bug fix) Applied fixes for unprotected arg passing through eval
+and after in Tk runtime code [Bug: 3943] (hobbs)
+
+2000-01-05 (bug fix) Applied fix for i18n problems with Mac clipboard
+[Bug: 3544] (hobbs)
+
+2000-01-05 (feature change) removed the 8.3b1 introduced -state option
+for text tags, and documented -elide (-state hidden == -elide true) (hobbs)
+
+2000-01-12 (bug fix) fix Windows 'wm deiconify' to zoomed state [Bug: 2077]
+and fixed possible flashing of unmapped toplevel in deiconify [Bug: 3338]
+and fixed unwanted mapping of transient window [Bug: 572] (hobbs)
+
+2000-01-12 (feature enhancement) extended 'wm state' to accept a state
+to set for the toplevel, and added support for zoomed (maximized) state
+on Windows (hobbs)
+
+2000-01-12 (bug fix) Applied fix for cursor to not blink when entry or
+text widget was disabled [Bug: 1807] (hobbs)
+
+--- Released 8.3b2, January 13, 2000 --- See ChangeLog for details ---
+
+2000-01-20 (bug fix) fixed interpretation of consecutive ^ characters in
+grid command (melski)
+
+2000-01-20 (bug fix) fixed -select(bg|fg) class names in listbox (hobbs)
+
+2000-01-20 (bug fix) fixed handling of too few coords for line item type in
+canvas (hobbs)
+
+2000-01-20 (bug fix) fixed dialog's association with parent (melski)
+
+2000-01-26 (bug fix) fixed handling of binary data for -data option to
+image create (melski)
+
+2000-01-26 (feature enhancement) improved GIF decoding speed by ~60%
+(melski)
+
+2000-01-26 (feature enhancement) added tk_chooseDirectory implementation
+for Unix and Mac (nelson, melski)
+
+2000-02-01 (bug fix) fixed resolution rounding problem in scale (porter)
+and fixed potential Unix seg fault due to use of ckfree instead of
+Tcl_EventuallyFree (hobbs)
+
+2000-02-01 (bug fix) fixed handling of negative dash values for canvas
+items (nijtmans)
+
+2000-02-01 (bug fix) fixed dialog lockup on Windows where once the native
+dialog disappeared, the parent window could end up locked up (hobbs)
+
+2000-02-03 (bug fix) fixed text dump to use char indices instead of byte
+indices (melski)
+
+2000-02-07 (bug fix) fixed handling of default extension in unix file
+dialogs (dejong)
+
+2000-02-08 (bug fix) corrected windows symbol font use to restrict itself
+to 8-bit chars (kenny)
+
+2000-02-08 (feature enhancement) improved support for moving from the old
+style image C API to the new obj'ified one with new Tk_InitImageArgs
+command and stub'ing of image code.  See docs for how to make the
+transition. (nijtmans)
+
+2000-02-08 (bug fix) fixed incorrect handling of CapsLock on Win9* and the
+use of dead keys on international keyboards (spjuth)
+
+2000-02-10 (bug fix) brought Mac back to building state, added support
+for Appearance Manager (ingham)
+
+2000-02-10 (feature enhancement) added support for buttons 4 && 5 as
+mousewheel style scrolling in listbox and text widget for Unix.
+
+--- Released 8.3.0, February 10, 2000 --- See ChangeLog for details ---
+
+2000-03-02 (bug fix) fixed crash in listbox when cursor was configure and
+then widget was destroyed (hobbs)
+
+2000-03-02 (feature enhancement) added %V substitution to entry widget
+validation to clarify type of validation occuring (hobbs)
+
+2000-03-29 (config enhancement) improved build support for gcc/mingw on
+Windows (nijtmans, hobbs) and added RPM target (melski)
+
+2000-03-24 (bug fixes) numerous corrections for more correct Unix dialog
+behaviors (melski)
+
+2000-03-27 (bug fix) fixed mem leak in wm commands (hu)
+
+2000-03-31 (bug fix) correct initialization of Windows static builds and
+added Unicode aware open/save file dialogs on Windows (hobbs)
+
+2000-03 (bug fix) canvas: corrected support for transparency in dashed
+lines on Windows (nijtmans); added support for postscript generation of
+images on Windows, also fixing transparency printing (biancardi); corrected
+handling of configure options in non-empty canvas (melski)
+
+2000-04-07 (bug fix) correct font name length restriction that prevented
+the use of long named (>16 char) fonts on NT/2000 (hobbs)
+
+2000-04-07 (bug fix) fixed safe Tk to work in base cases (hobbs)
+
+2000-04-10 (bug fix) corrected Alt-Key event generation and handling of
+Alt-sequence Windows special char generation and (Control|Shift|Alt)_L/_R
+determination (melski)
+
+2000-04-10 (bug fix) correctly check state of parent when popping up
+bgerror dialog. (melski)
+
+2000-04-11 (feature enhancement) msgcat now searches up the namespace chain
+for a match instead of just in the local namespace (hershey)
+
+2000-04-12 (bug fix) corrected handling of Windows clipboard to allow for
+use of user-defined types within the Tk app (hobbs)
+
+2000-04-13 (feature enhancement) improved handling of shadow determination
+for 3D borders in very light/dark cases (hipp, melski)
+
+2000-04-13 (bug fix) correctly color separator bg in menus on Windows
+(melski)
+
+2000-04-14 (bug fix) improved handling of scale widget, reduced number of
+redraws (hobbs)
+
+2000-04-17 (feature enhancement) made shift-selection more Windows-like
+(intuitive) in text widget (melski)
+
+2000-04-22 (bug fix) mac bug fixes, nav services handling (ingham)
+
+2000-04 more docs for public APIs (melski)
+
+--- Released 8.3.1, April 26, 2000 --- See ChangeLog for details ---
+
+2000-05-15 (bug fix) changed wm deiconify from using idle callback to
+calling restack and focus code immediately. (hobbs)
+
+2000-07 (build cleanup) cleanup of defines in tkConfig.sh, and cleanup
+in make and configure files to better handle .rc files across
+builds. (welch)
+
+2000-07 (build improvements) cleanup of the makefiles and configure scripts
+to correct support for building under gcc for Windows. (dejong)
+
+2000-08 (feature enhancements) for Windows, corrected drawing of separator
+menu entries, disable menu entries and the height for separator
+bars. (melski)
+
+2000-08 (bug fix) fixed calling of takeFocus proc with arg bearing
+functions. (nemethi)
+
+2000-08 (bug fix) For text widgets, added a test for a NULL segment pointer
+when doing backwards searches for "", correct searching over elided chars,
+and corrected search combining -regexp and -nocase. (melski)
+
+2000-08 (bug fix) Corrected code for using 'place', cursors, colors and 3D
+borders on multiple screens simultaneously. (hobbs, hipp)
+
+--- Released 8.3.2, August 9, 2000 --- See ChangeLog for details ---

@@ -69,3 +69,4 @@ XCreateBitmapFromData(display, d, data, width, height)
     XFreeGC(display, gc);
     return pix;
 }
+

@@ -59,3 +59,16 @@ pack .t2.quit -side bottom -pady 3 -ipadx 4 -ipady 2
 frame .t2.f -height 320 -width 320
 pack .t2.f -side bottom
 colors .t2.f 0 0 4
+
+
+
+
+
+
+
+
+
+
+
+
+

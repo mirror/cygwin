@@ -37,7 +37,7 @@ option is not specified, there won't be any default button.
 \fB\-icon\fR \fIiconImage\fR
 Specifies an icon to display. \fIIconImage\fR must be one of the
 following: \fBerror\fR, \fBinfo\fR, \fBquestion\fR or
-\fBwarning\fR. If this option is not specified, then no icon will be
+\fBwarning\fR. If this option is not specified, then the info icon will be
 displayed.
 .TP
 \fB\-message\fR \fIstring\fR
@@ -80,7 +80,7 @@ and \fBcancel\fR.
 .SH EXAMPLE
 .CS
 set answer [tk_messageBox \-message "Really quit?" \-type yesno \-icon question]
-case $answer {
+switch -- $answer {
     yes exit
     no {tk_messageBox \-message "I know you like this application!" \-type ok}
 }
@@ -88,3 +88,4 @@ case $answer {
 
 .SH KEYWORDS
 message box
+

@@ -72,7 +72,7 @@ Most of the procedures take a \fIcanvas\fR argument, which
 refers to a canvas widget for which Postscript is being
 generated.
 .PP
-\fBTk_CanvasY\fR takes as argument a y-coordinate in the space of
+\fBTk_CanvasPsY\fR takes as argument a y-coordinate in the space of
 a canvas and returns the value that should be used for that point
 in the Postscript currently being generated for \fIcanvas\fR.
 Y coordinates require transformation because Postscript uses an
@@ -120,3 +120,4 @@ returned, unless an error occurs, in which case TCL_ERROR is returned and
 
 .SH KEYWORDS
 bitmap, canvas, color, font, path, Postscript, stipple
+

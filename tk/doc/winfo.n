@@ -328,3 +328,4 @@ has no border).
 .SH KEYWORDS
 atom, children, class, geometry, height, identifier, information, interpreters,
 mapped, parent, path name, screen, virtual root, width, window
+

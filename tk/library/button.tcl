@@ -4,7 +4,7 @@
 # checkbutton, and radiobutton widgets and provides procedures
 # that help in implementing those bindings.
 #
-# SCCS: @(#) button.tcl 1.22 96/11/14 14:49:11
+# RCS: @(#) $Id$
 #
 # Copyright (c) 1992-1994 The Regents of the University of California.
 # Copyright (c) 1994-1996 Sun Microsystems, Inc.
@@ -17,7 +17,7 @@
 # The code below creates the default class bindings for buttons.
 #-------------------------------------------------------------------------
 
-if {$tcl_platform(platform) == "macintosh"} {
+if {[string match "macintosh" $tcl_platform(platform)]} {
     bind Radiobutton <Enter> {
 	tkButtonEnter %W
     }
@@ -37,16 +37,7 @@ if {$tcl_platform(platform) == "macintosh"} {
 	tkButtonUp %W
     }
 }
-if {$tcl_platform(platform) == "windows"} {
-    bind Button <Return> {
-	tkButtonInvoke %W
-    }
-    bind Checkbutton <Return> {
-	tkCheckRadioInvoke %W
-    }
-    bind Radiobutton <Return> {
-	tkCheckRadioInvoke %W
-    }
+if {[string match "windows" $tcl_platform(platform)]} {
     bind Checkbutton <equal> {
 	tkCheckRadioInvoke %W select
     }
@@ -76,7 +67,7 @@ if {$tcl_platform(platform) == "windows"} {
 	tkCheckRadioEnter %W
     }
 }
-if {$tcl_platform(platform) == "unix"} {
+if {[string match "unix" $tcl_platform(platform)]} {
     bind Checkbutton <Return> {
 	if {!$tk_strictMotif} {
 	    tkCheckRadioInvoke %W
@@ -135,7 +126,7 @@ bind Radiobutton <Leave> {
     tkButtonLeave %W
 }
 
-if {$tcl_platform(platform) == "windows"} {
+if {[string match "windows" $tcl_platform(platform)]} {
 
 #########################
 # Windows implementation 
@@ -151,10 +142,9 @@ if {$tcl_platform(platform) == "windows"} {
 
 proc tkButtonEnter w {
     global tkPriv
-    if {[$w cget -state] != "disabled"} {
-	if {$tkPriv(buttonWindow) == $w} {
-	    $w configure -state active -relief sunken
-	}
+    if {[string compare [$w cget -state] "disabled"] \
+	    && [string equal $tkPriv(buttonWindow) $w]} {
+	$w configure -state active -relief sunken
     }
     set tkPriv(window) $w
 }
@@ -171,10 +161,10 @@ proc tkButtonEnter w {
 
 proc tkButtonLeave w {
     global tkPriv
-    if {[$w cget -state] != "disabled"} {
-	$w config -state normal
+    if {[string compare [$w cget -state] "disabled"]} {
+	$w configure -state normal
     }
-    if {$w == $tkPriv(buttonWindow)} {
+    if {[string equal $tkPriv(buttonWindow) $w]} {
 	$w configure -relief $tkPriv(relief)
     }
     set tkPriv(window) ""
@@ -191,10 +181,9 @@ proc tkButtonLeave w {
 
 proc tkCheckRadioEnter w {
     global tkPriv
-    if {[$w cget -state] != "disabled"} {
-	if {$tkPriv(buttonWindow) == $w} {
-	    $w configure -state active
-	}
+    if {[string compare [$w cget -state] "disabled"] \
+	    && [string equal $tkPriv(buttonWindow) $w]} {
+	$w configure -state active
     }
     set tkPriv(window) $w
 }
@@ -210,10 +199,10 @@ proc tkCheckRadioEnter w {
 
 proc tkButtonDown w {
     global tkPriv
-    set tkPriv(relief) [lindex [$w conf -relief] 4]
-    if {[$w cget -state] != "disabled"} {
+    set tkPriv(relief) [$w cget -relief]
+    if {[string compare [$w cget -state] "disabled"]} {
 	set tkPriv(buttonWindow) $w
-	$w config -relief sunken -state active
+	$w configure -relief sunken -state active
     }
 }
 
@@ -228,10 +217,10 @@ proc tkButtonDown w {
 
 proc tkCheckRadioDown w {
     global tkPriv
-    set tkPriv(relief) [lindex [$w conf -relief] 4]
-    if {[$w cget -state] != "disabled"} {
+    set tkPriv(relief) [$w cget -relief]
+    if {[string compare [$w cget -state] "disabled"]} {
 	set tkPriv(buttonWindow) $w
-	$w config -state active
+	$w configure -state active
     }
 }
 
@@ -245,11 +234,12 @@ proc tkCheckRadioDown w {
 
 proc tkButtonUp w {
     global tkPriv
-    if {$w == $tkPriv(buttonWindow)} {
+    if {[string equal $tkPriv(buttonWindow) $w]} {
 	set tkPriv(buttonWindow) ""
-	if {($w == $tkPriv(window))
-		&& ([$w cget -state] != "disabled")} {
-	    $w config -relief $tkPriv(relief) -state normal
+	$w configure -relief $tkPriv(relief)
+	if {[string equal $tkPriv(window) $w]
+              && [string compare [$w cget -state] "disabled"]} {
+	    $w configure -state normal
 	    uplevel #0 [list $w invoke]
 	}
     }
@@ -257,7 +247,7 @@ proc tkButtonUp w {
 
 }
 
-if {$tcl_platform(platform) == "unix"} {
+if {[string match "unix" $tcl_platform(platform)]} {
 
 #####################
 # Unix implementation
@@ -273,9 +263,9 @@ if {$tcl_platform(platform) == "unix"} {
 
 proc tkButtonEnter {w} {
     global tkPriv
-    if {[$w cget -state] != "disabled"} {
-	$w config -state active
-	if {$tkPriv(buttonWindow) == $w} {
+    if {[string compare [$w cget -state] "disabled"]} {
+	$w configure -state active
+	if {[string equal $tkPriv(buttonWindow) $w]} {
 	    $w configure -state active -relief sunken
 	}
     }
@@ -294,10 +284,10 @@ proc tkButtonEnter {w} {
 
 proc tkButtonLeave w {
     global tkPriv
-    if {[$w cget -state] != "disabled"} {
-	$w config -state normal
+    if {[string compare [$w cget -state] "disabled"]} {
+	$w configure -state normal
     }
-    if {$w == $tkPriv(buttonWindow)} {
+    if {[string equal $tkPriv(buttonWindow) $w]} {
 	$w configure -relief $tkPriv(relief)
     }
     set tkPriv(window) ""
@@ -314,10 +304,10 @@ proc tkButtonLeave w {
 
 proc tkButtonDown w {
     global tkPriv
-    set tkPriv(relief) [lindex [$w config -relief] 4]
-    if {[$w cget -state] != "disabled"} {
+    set tkPriv(relief) [$w cget -relief]
+    if {[string compare [$w cget -state] "disabled"]} {
 	set tkPriv(buttonWindow) $w
-	$w config -relief sunken
+	$w configure -relief sunken
     }
 }
 
@@ -331,11 +321,11 @@ proc tkButtonDown w {
 
 proc tkButtonUp w {
     global tkPriv
-    if {$w == $tkPriv(buttonWindow)} {
+    if {[string equal $w $tkPriv(buttonWindow)]} {
 	set tkPriv(buttonWindow) ""
-	$w config -relief $tkPriv(relief)
-	if {($w == $tkPriv(window))
-		&& ([$w cget -state] != "disabled")} {
+	$w configure -relief $tkPriv(relief)
+	if {[string equal $w $tkPriv(window)] \
+		&& [string compare [$w cget -state] "disabled"]} {
 	    uplevel #0 [list $w invoke]
 	}
     }
@@ -343,7 +333,7 @@ proc tkButtonUp w {
 
 }
 
-if {$tcl_platform(platform) == "macintosh"} {
+if {[string match "macintosh" $tcl_platform(platform)]} {
 
 ####################
 # Mac implementation
@@ -359,8 +349,8 @@ if {$tcl_platform(platform) == "macintosh"} {
 
 proc tkButtonEnter {w} {
     global tkPriv
-    if {[$w cget -state] != "disabled"} {
-	if {$tkPriv(buttonWindow) == $w} {
+    if {[string compare [$w cget -state] "disabled"]} {
+      if {[string equal $w $tkPriv(buttonWindow)]} {
 	    $w configure -state active
 	}
     }
@@ -379,7 +369,7 @@ proc tkButtonEnter {w} {
 
 proc tkButtonLeave w {
     global tkPriv
-    if {$w == $tkPriv(buttonWindow)} {
+    if {[string equal $w $tkPriv(buttonWindow)]} {
 	$w configure -state normal
     }
     set tkPriv(window) ""
@@ -396,9 +386,9 @@ proc tkButtonLeave w {
 
 proc tkButtonDown w {
     global tkPriv
-    if {[$w cget -state] != "disabled"} {
+    if {[string compare [$w cget -state] "disabled"]} {
 	set tkPriv(buttonWindow) $w
-	$w config -state active
+	$w configure -state active
     }
 }
 
@@ -412,11 +402,11 @@ proc tkButtonDown w {
 
 proc tkButtonUp w {
     global tkPriv
-    if {$w == $tkPriv(buttonWindow)} {
-	$w config -state normal
+    if {[string equal $w $tkPriv(buttonWindow)]} {
+	$w configure -state normal
 	set tkPriv(buttonWindow) ""
-	if {($w == $tkPriv(window))
-		&& ([$w cget -state] != "disabled")} {
+	if {[string equal $w $tkPriv(window)]
+              && [string compare [$w cget -state] "disabled"]} {
 	    uplevel #0 [list $w invoke]
 	}
     }
@@ -436,7 +426,7 @@ proc tkButtonUp w {
 # w -		The name of the widget.
 
 proc tkButtonInvoke w {
-    if {[$w cget -state] != "disabled"} {
+    if {[string compare [$w cget -state] "disabled"]} {
 	set oldRelief [$w cget -relief]
 	set oldState [$w cget -state]
 	$w configure -state active -relief sunken
@@ -458,8 +448,9 @@ proc tkButtonInvoke w {
 # cmd -		The subcommand to invoke (one of invoke, select, or deselect).
 
 proc tkCheckRadioInvoke {w {cmd invoke}} {
-    if {[$w cget -state] != "disabled"} {
+    if {[string compare [$w cget -state] "disabled"]} {
 	uplevel #0 [list $w $cmd]
     }
 }
+
 

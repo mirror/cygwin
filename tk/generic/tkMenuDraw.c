@@ -31,7 +31,7 @@ static void		DisplayMenu _ANSI_ARGS_((ClientData clientData));
  * TkMenuInitializeDrawingFields --
  *
  *	Fills in drawing fields of a new menu. Called when new menu is
- *	created by Tk_MenuCmd.
+ *	created by MenuCmd.
  *
  * Results:
  *	None.
@@ -188,6 +188,9 @@ TkMenuConfigureDrawOptions(menuPtr)
     XGCValues gcValues;
     GC newGC;
     unsigned long mask;
+    Tk_3DBorder border, activeBorder;
+    Tk_Font tkfont;
+    XColor *fg, *activeFg, *indicatorFg;
     XColor *foreground, *background;
  
     /*
@@ -196,33 +199,40 @@ TkMenuConfigureDrawOptions(menuPtr)
      * defaults that couldn't be specified to Tk_ConfigureWidget.
      */
 
-    Tk_SetBackgroundFromBorder(menuPtr->tkwin, menuPtr->border);
+    border = Tk_Get3DBorderFromObj(menuPtr->tkwin, menuPtr->borderPtr);
+    Tk_SetBackgroundFromBorder(menuPtr->tkwin, border);
 
-    gcValues.font = Tk_FontId(menuPtr->tkfont);
-    gcValues.foreground = menuPtr->fg->pixel;
-    gcValues.background = Tk_3DBorderColor(menuPtr->border)->pixel;
-    newGC = Tk_GetGCColor(menuPtr->tkwin, GCForeground|GCBackground|GCFont,
-	    &gcValues, menuPtr->fg, Tk_3DBorderColor(menuPtr->border));
+    tkfont = Tk_GetFontFromObj(menuPtr->tkwin, menuPtr->fontPtr);
+    gcValues.font = Tk_FontId(tkfont);
+    fg = Tk_GetColorFromObj(menuPtr->tkwin, menuPtr->fgPtr);
+    gcValues.foreground = fg->pixel;
+    gcValues.background = Tk_3DBorderColor(border)->pixel;
+    newGC = Tk_GetGC(menuPtr->tkwin, GCForeground|GCBackground|GCFont,
+	    &gcValues);
     if (menuPtr->textGC != None) {
 	Tk_FreeGC(menuPtr->display, menuPtr->textGC);
     }
     menuPtr->textGC = newGC;
 
-    gcValues.font = Tk_FontId(menuPtr->tkfont);
-    background = Tk_3DBorderColor(menuPtr->border);
+    gcValues.font = Tk_FontId(tkfont);
+    background = Tk_3DBorderColor(border);
     gcValues.background = background->pixel;
-    if (menuPtr->disabledFg != NULL) {
-	foreground = menuPtr->disabledFg;
+    if (menuPtr->disabledFgPtr != NULL) {
+	XColor *disabledFg;
+
+	disabledFg = Tk_GetColorFromObj(menuPtr->tkwin, 
+		menuPtr->disabledFgPtr);
+	foreground = disabledFg;
 	gcValues.foreground = foreground->pixel;
 	mask = GCForeground|GCBackground|GCFont;
     } else {
-	foreground = background;
+        foreground = background;
 	background = NULL;
 	gcValues.foreground = gcValues.background;
 	mask = GCForeground;
 	if (menuPtr->gray == None) {
 	    menuPtr->gray = Tk_GetBitmap(menuPtr->interp, menuPtr->tkwin,
-		    Tk_GetUid("gray50"));
+		    "gray50");
 	}
 	if (menuPtr->gray != None) {
 	    gcValues.fill_style = FillStippled;
@@ -230,47 +240,47 @@ TkMenuConfigureDrawOptions(menuPtr)
 	    mask = GCForeground|GCFillStyle|GCStipple;
 	}
     }
-    newGC = Tk_GetGCColor(menuPtr->tkwin, mask, &gcValues, foreground,
-			  background);
+    newGC = Tk_GetGC(menuPtr->tkwin, mask, &gcValues);
     if (menuPtr->disabledGC != None) {
 	Tk_FreeGC(menuPtr->display, menuPtr->disabledGC);
     }
     menuPtr->disabledGC = newGC;
 
-    gcValues.foreground = Tk_3DBorderColor(menuPtr->border)->pixel;
+    gcValues.foreground = Tk_3DBorderColor(border)->pixel;
     if (menuPtr->gray == None) {
 	menuPtr->gray = Tk_GetBitmap(menuPtr->interp, menuPtr->tkwin,
-		Tk_GetUid("gray50"));
+		"gray50");
     }
     if (menuPtr->gray != None) {
 	gcValues.fill_style = FillStippled;
 	gcValues.stipple = menuPtr->gray;
-	newGC = Tk_GetGCColor(menuPtr->tkwin, 
-	    GCForeground|GCFillStyle|GCStipple, &gcValues,
-	    Tk_3DBorderColor(menuPtr->border), NULL);
+	newGC = Tk_GetGC(menuPtr->tkwin, 
+	    GCForeground|GCFillStyle|GCStipple, &gcValues);
     }
     if (menuPtr->disabledImageGC != None) {
 	Tk_FreeGC(menuPtr->display, menuPtr->disabledImageGC);
     }
     menuPtr->disabledImageGC = newGC;
 
-    gcValues.font = Tk_FontId(menuPtr->tkfont);
-    gcValues.foreground = menuPtr->activeFg->pixel;
-    gcValues.background =
-	    Tk_3DBorderColor(menuPtr->activeBorder)->pixel;
-    newGC = Tk_GetGCColor(menuPtr->tkwin, GCForeground|GCBackground|GCFont,
-	    &gcValues, menuPtr->activeFg,
-	    Tk_3DBorderColor(menuPtr->activeBorder));
+    gcValues.font = Tk_FontId(tkfont);
+    activeFg = Tk_GetColorFromObj(menuPtr->tkwin, menuPtr->activeFgPtr);
+    gcValues.foreground = activeFg->pixel;
+    activeBorder = Tk_Get3DBorderFromObj(menuPtr->tkwin, 
+	    menuPtr->activeBorderPtr);
+    gcValues.background = Tk_3DBorderColor(activeBorder)->pixel;
+    newGC = Tk_GetGC(menuPtr->tkwin, GCForeground|GCBackground|GCFont,
+	    &gcValues);
     if (menuPtr->activeGC != None) {
 	Tk_FreeGC(menuPtr->display, menuPtr->activeGC);
     }
     menuPtr->activeGC = newGC;
 
-    gcValues.foreground = menuPtr->indicatorFg->pixel;
-    gcValues.background = Tk_3DBorderColor(menuPtr->border)->pixel;
-    newGC = Tk_GetGCColor(menuPtr->tkwin, GCForeground|GCBackground|GCFont,
-	    &gcValues, menuPtr->indicatorFg,
-	    Tk_3DBorderColor(menuPtr->border));
+    indicatorFg = Tk_GetColorFromObj(menuPtr->tkwin, 
+	    menuPtr->indicatorFgPtr);
+    gcValues.foreground = indicatorFg->pixel;
+    gcValues.background = Tk_3DBorderColor(border)->pixel;
+    newGC = Tk_GetGC(menuPtr->tkwin, GCForeground|GCBackground|GCFont,
+	    &gcValues);
     if (menuPtr->indicatorGC != None) {
 	Tk_FreeGC(menuPtr->display, menuPtr->indicatorGC);
     }
@@ -306,9 +316,10 @@ TkMenuConfigureEntryDrawOptions(mePtr, index)
     Tk_Font tkfont;
     TkMenu *menuPtr = mePtr->menuPtr;
 
-    tkfont = (mePtr->tkfont == NULL) ? menuPtr->tkfont : mePtr->tkfont;
+    tkfont = Tk_GetFontFromObj(menuPtr->tkwin,
+	    (mePtr->fontPtr != NULL) ? mePtr->fontPtr : menuPtr->fontPtr);
     
-    if (mePtr->state == tkActiveUid) {
+    if (mePtr->state == ENTRY_ACTIVE) {
 	if (index != menuPtr->active) {
 	    TkActivateMenuEntry(menuPtr, index);
 	}
@@ -316,34 +327,26 @@ TkMenuConfigureEntryDrawOptions(mePtr, index)
 	if (index == menuPtr->active) {
 	    TkActivateMenuEntry(menuPtr, -1);
 	}
-	if ((mePtr->state != tkNormalUid)
-		&& (mePtr->state != tkDisabledUid)) {
-	    Tcl_AppendResult(menuPtr->interp, "bad state value \"",
-		    mePtr->state,
-		    "\": must be normal, active, or disabled", (char *) NULL);
-	    mePtr->state = tkNormalUid;
-	    return TCL_ERROR;
-	}
     }
 
-    if ((mePtr->tkfont != NULL)
-	    || (mePtr->border != NULL)
-	    || (mePtr->fg != NULL)
-	    || (mePtr->activeBorder != NULL)
-	    || (mePtr->activeFg != NULL)
-	    || (mePtr->indicatorFg != NULL)) {
-	XColor *foreground, *background;
+    if ((mePtr->fontPtr != NULL)
+	    || (mePtr->borderPtr != NULL)
+	    || (mePtr->fgPtr != NULL)
+	    || (mePtr->activeBorderPtr != NULL)
+	    || (mePtr->activeFgPtr != NULL)
+	    || (mePtr->indicatorFgPtr != NULL)) {
+	XColor *fg, *bg, *indicatorFg, *activeFg;
+	Tk_3DBorder border, activeBorder;
+    
+	fg = Tk_GetColorFromObj(menuPtr->tkwin, (mePtr->fgPtr != NULL)
+		? mePtr->fgPtr : menuPtr->fgPtr);
 
-	background = Tk_3DBorderColor(
-		(mePtr->border != NULL)
-		? mePtr->border
-		: menuPtr->border);
-	foreground = (mePtr->fg != NULL)
-	        ? mePtr->fg
-		: menuPtr->fg;
-
-	gcValues.foreground = foreground->pixel;
-	gcValues.background = background->pixel;
+	gcValues.foreground = fg->pixel;
+	border = Tk_Get3DBorderFromObj(menuPtr->tkwin, 
+		(mePtr->borderPtr != NULL) ? mePtr->borderPtr 
+		: menuPtr->borderPtr);
+	bg = Tk_3DBorderColor(border);
+	gcValues.background = bg->pixel;
 
 	gcValues.font = Tk_FontId(tkfont);
 
@@ -354,48 +357,43 @@ TkMenuConfigureEntryDrawOptions(mePtr, index)
 	 */
 
 	gcValues.graphics_exposures = False;
-	newGC = Tk_GetGCColor(menuPtr->tkwin,
+	newGC = Tk_GetGC(menuPtr->tkwin,
 		GCForeground|GCBackground|GCFont|GCGraphicsExposures,
-		&gcValues, foreground, background);
-
-	if (mePtr->indicatorFg != NULL) {
-	    foreground = mePtr->indicatorFg;
-	    gcValues.foreground = foreground->pixel;
-	} else if (menuPtr->indicatorFg != NULL) {
-	    foreground = menuPtr->indicatorFg;
-	    gcValues.foreground = foreground->pixel;
-	}
-	newIndicatorGC = Tk_GetGCColor(menuPtr->tkwin,
+		&gcValues);
+	indicatorFg = Tk_GetColorFromObj(menuPtr->tkwin, 
+		(mePtr->indicatorFgPtr != NULL) ? mePtr->indicatorFgPtr
+		: menuPtr->indicatorFgPtr);
+	gcValues.foreground = indicatorFg->pixel;
+	newIndicatorGC = Tk_GetGC(menuPtr->tkwin,
 		GCForeground|GCBackground|GCGraphicsExposures,
-		&gcValues, foreground, background);
-
-	if ((menuPtr->disabledFg != NULL) || (mePtr->image != NULL)) {
-	    foreground = menuPtr->disabledFg;
-	    gcValues.foreground = foreground->pixel;
+		&gcValues);
+	if ((menuPtr->disabledFgPtr != NULL) || (mePtr->image != NULL)) {
+	    fg = Tk_GetColorFromObj(menuPtr->tkwin, 
+		    menuPtr->disabledFgPtr);
+	    gcValues.foreground = fg->pixel;
 	    mask = GCForeground|GCBackground|GCFont|GCGraphicsExposures;
 	} else {
-	    foreground = background;
-	    background = NULL;
+	    fg = bg;
 	    gcValues.foreground = gcValues.background;
 	    gcValues.fill_style = FillStippled;
 	    gcValues.stipple = menuPtr->gray;
 	    mask = GCForeground|GCFillStyle|GCStipple;
 	}
-	newDisabledGC = Tk_GetGCColor(menuPtr->tkwin, mask, &gcValues,
-		foreground, background);
+	newDisabledGC = Tk_GetGC(menuPtr->tkwin, mask, &gcValues);
 
-	foreground = (mePtr->activeFg != NULL)
-		? mePtr->activeFg
-	        : menuPtr->activeFg;
-	gcValues.foreground = foreground->pixel;
-	background = Tk_3DBorderColor(
-		(mePtr->activeBorder != NULL)
-		? mePtr->activeBorder
-		: menuPtr->activeBorder);
-	gcValues.background = background->pixel;
-	newActiveGC = Tk_GetGCColor(menuPtr->tkwin,
+	activeFg = Tk_GetColorFromObj(menuPtr->tkwin, 
+		(mePtr->activeFgPtr != NULL) ? mePtr->activeFgPtr
+		: menuPtr->activeFgPtr);
+	activeBorder = Tk_Get3DBorderFromObj(menuPtr->tkwin, 
+		(mePtr->activeBorderPtr != NULL) ? mePtr->activeBorderPtr 
+		: menuPtr->activeBorderPtr);
+		
+	gcValues.foreground = activeFg->pixel;
+	bg = Tk_3DBorderColor(activeBorder);
+	gcValues.background = bg->pixel;
+	newActiveGC = Tk_GetGC(menuPtr->tkwin,
 		GCForeground|GCBackground|GCFont|GCGraphicsExposures,
-		&gcValues, foreground, background);
+		&gcValues);
     } else {
 	newGC = None;
 	newActiveGC = None;
@@ -496,7 +494,7 @@ TkRecomputeMenu(menuPtr)
 void
 TkEventuallyRedrawMenu(menuPtr, mePtr)
     register TkMenu *menuPtr;	/* Information about menu to redraw. */
-    register TkMenuEntry *mePtr;	/* Entry to redraw.  NULL means redraw
+    register TkMenuEntry *mePtr;/* Entry to redraw.  NULL means redraw
 				 * all the entries in the menu. */
 {
     int i;
@@ -637,21 +635,30 @@ DisplayMenu(clientData)
     register TkMenuEntry *mePtr;
     register Tk_Window tkwin = menuPtr->tkwin;
     int index, strictMotif;
-    Tk_Font tkfont = menuPtr->tkfont;
+    Tk_Font tkfont;
     Tk_FontMetrics menuMetrics;
     int width;
+    int borderWidth;
+    Tk_3DBorder border;
+    int activeBorderWidth;
+    int relief;
+
 
     menuPtr->menuFlags &= ~REDRAW_PENDING;
     if ((menuPtr->tkwin == NULL) || !Tk_IsMapped(tkwin)) {
 	return;
     }
 
+    Tk_GetPixelsFromObj(NULL, menuPtr->tkwin, menuPtr->borderWidthPtr,
+	    &borderWidth);
+    border = Tk_Get3DBorderFromObj(menuPtr->tkwin, menuPtr->borderPtr);
+    Tk_GetPixelsFromObj(NULL, menuPtr->tkwin,
+	    menuPtr->activeBorderWidthPtr, &activeBorderWidth);
+
     if (menuPtr->menuType == MENUBAR) {
-	Tk_Fill3DRectangle(tkwin, Tk_WindowId(tkwin), menuPtr->border,
-		menuPtr->borderWidth, menuPtr->borderWidth,
-		Tk_Width(tkwin) - 2 * menuPtr->borderWidth,
-		Tk_Height(tkwin) - 2 * menuPtr->borderWidth, 0,
-		TK_RELIEF_FLAT);
+	Tk_Fill3DRectangle(tkwin, Tk_WindowId(tkwin), border, borderWidth, 
+		borderWidth, Tk_Width(tkwin) - 2 * borderWidth,	
+		Tk_Height(tkwin) - 2 * borderWidth, 0, TK_RELIEF_FLAT);
     }
 
     strictMotif = Tk_StrictMotif(menuPtr->tkwin);
@@ -661,7 +668,8 @@ DisplayMenu(clientData)
      * all of the time.
      */
 
-    Tk_GetFontMetrics(menuPtr->tkfont, &menuMetrics);
+    tkfont = Tk_GetFontFromObj(menuPtr->tkwin, menuPtr->fontPtr);
+    Tk_GetFontMetrics(tkfont, &menuMetrics);
 
     /*
      * Loop through all of the entries, drawing them one at a time.
@@ -681,22 +689,22 @@ DisplayMenu(clientData)
 	} else {
 	    if (mePtr->entryFlags & ENTRY_LAST_COLUMN) {
 		width = Tk_Width(menuPtr->tkwin) - mePtr->x
-			- menuPtr->activeBorderWidth;
+			- activeBorderWidth;
 	    } else {
-		width = mePtr->width + menuPtr->borderWidth;
+		width = mePtr->width + borderWidth;
 	    }
 	}
 	TkpDrawMenuEntry(mePtr, Tk_WindowId(menuPtr->tkwin), tkfont,
 		&menuMetrics, mePtr->x, mePtr->y, width, 
 		mePtr->height, strictMotif, 1);
-	if ((index > 0) && (menuPtr->menuType != MENUBAR) 
+	if ((index > 0) && (menuPtr->menuType != MENUBAR)
 		&& mePtr->columnBreak) {
 	    mePtr = menuPtr->entries[index - 1];
-	    Tk_Fill3DRectangle(tkwin, Tk_WindowId(tkwin), menuPtr->border,
+	    Tk_Fill3DRectangle(tkwin, Tk_WindowId(tkwin), border,
 		mePtr->x, mePtr->y + mePtr->height, 
 		mePtr->width,
-		Tk_Height(tkwin) - mePtr->y - mePtr->height 
-		- menuPtr->activeBorderWidth, 0,
+		Tk_Height(tkwin) - mePtr->y - mePtr->height - 
+		activeBorderWidth, 0,
 		TK_RELIEF_FLAT);
 	}
     }
@@ -705,28 +713,29 @@ DisplayMenu(clientData)
 	int x, y, height;
 
 	if (menuPtr->numEntries == 0) {
-	    x = y = menuPtr->borderWidth;
-	    width = Tk_Width(tkwin) - 2 * menuPtr->activeBorderWidth;
-	    height = Tk_Height(tkwin) - 2 * menuPtr->activeBorderWidth;
+	    x = y = borderWidth;
+	    width = Tk_Width(tkwin) - 2 * activeBorderWidth;
+	    height = Tk_Height(tkwin) - 2 * activeBorderWidth;
 	} else {
 	    mePtr = menuPtr->entries[menuPtr->numEntries - 1];
 	    Tk_Fill3DRectangle(tkwin, Tk_WindowId(tkwin),
-		menuPtr->border, mePtr->x, mePtr->y + mePtr->height,
-		mePtr->width, Tk_Height(tkwin) - mePtr->y - mePtr->height
-		- menuPtr->activeBorderWidth, 0,
+		border, mePtr->x, mePtr->y + mePtr->height, mePtr->width, 
+		Tk_Height(tkwin) - mePtr->y - mePtr->height
+		- activeBorderWidth, 0,
 		TK_RELIEF_FLAT);
 	    x = mePtr->x + mePtr->width;
 	    y = mePtr->y + mePtr->height;
-	    width = Tk_Width(tkwin) - x - menuPtr->activeBorderWidth;
-	    height = Tk_Height(tkwin) - y - menuPtr->activeBorderWidth;
+	    width = Tk_Width(tkwin) - x - activeBorderWidth;
+	    height = Tk_Height(tkwin) - y - activeBorderWidth;
 	}
-	Tk_Fill3DRectangle(tkwin, Tk_WindowId(tkwin), menuPtr->border, x, y, 
+	Tk_Fill3DRectangle(tkwin, Tk_WindowId(tkwin), border, x, y, 
 		width, height, 0, TK_RELIEF_FLAT);
     }
 
+    Tk_GetReliefFromObj(NULL, menuPtr->reliefPtr, &relief);
     Tk_Draw3DRectangle(menuPtr->tkwin, Tk_WindowId(tkwin),
-	    menuPtr->border, 0, 0, Tk_Width(tkwin), Tk_Height(tkwin),
-	    menuPtr->borderWidth, menuPtr->relief);
+	    border, 0, 0, Tk_Width(tkwin), Tk_Height(tkwin), borderWidth, 
+	    relief);
 }
 
 /*
@@ -760,11 +769,12 @@ TkMenuEventProc(clientData, eventPtr)
 	TkEventuallyRecomputeMenu(menuPtr);
 	TkEventuallyRedrawMenu(menuPtr, (TkMenuEntry *) NULL);
     } else if (eventPtr->type == ActivateNotify) {
-    	if (menuPtr->menuType == TEAROFF_MENU) {
-    	    TkpSetMainMenubar(menuPtr->interp, menuPtr->tkwin, NULL);
-    	}
+	if (menuPtr->menuType == TEAROFF_MENU) {
+	    TkpSetMainMenubar(menuPtr->interp, menuPtr->tkwin, NULL);
+	}
     } else if (eventPtr->type == DestroyNotify) {
 	if (menuPtr->tkwin != NULL) {
+	    TkDestroyMenu(menuPtr);
 	    menuPtr->tkwin = NULL;
 	    Tcl_DeleteCommandFromToken(menuPtr->interp, menuPtr->widgetCmd);
 	}
@@ -774,7 +784,7 @@ TkMenuEventProc(clientData, eventPtr)
 	if (menuPtr->menuFlags & RESIZE_PENDING) {
 	    Tcl_CancelIdleCall(ComputeMenuGeometry, (ClientData) menuPtr);
 	}
-	TkDestroyMenu(menuPtr);
+	Tcl_EventuallyFree((ClientData) menuPtr, TCL_DYNAMIC);
     }
 }
 
@@ -942,7 +952,6 @@ TkPostSubmenu(interp, menuPtr, mePtr)
 				 * posted.  NULL means make sure that
 				 * no submenu is posted. */
 {
-    char string[30];
     int result, x, y;
 
     if (mePtr == menuPtr->postedCascade) {
@@ -950,6 +959,8 @@ TkPostSubmenu(interp, menuPtr, mePtr)
     }
 
     if (menuPtr->postedCascade != NULL) {
+	char *name = Tcl_GetStringFromObj(menuPtr->postedCascade->namePtr,
+		NULL);
 
 	/*
 	 * Note: when unposting a submenu, we have to redraw the entire
@@ -969,17 +980,15 @@ TkPostSubmenu(interp, menuPtr, mePtr)
 	 */
 
 	TkEventuallyRedrawMenu(menuPtr, (TkMenuEntry *) NULL);
-	result = Tcl_VarEval(interp, menuPtr->postedCascade->name,
-		" unpost", (char *) NULL);
+	result = Tcl_VarEval(interp, name, " unpost", (char *) NULL);
 	menuPtr->postedCascade = NULL;
 	if (result != TCL_OK) {
 	    return result;
 	}
     }
 
-    if ((mePtr != NULL) && (mePtr->name != NULL)
+    if ((mePtr != NULL) && (mePtr->namePtr != NULL)
 	    && Tk_IsMapped(menuPtr->tkwin)) {
-
 	/*
 	 * Position the cascade with its upper left corner slightly
 	 * below and to the left of the upper right corner of the
@@ -988,10 +997,13 @@ TkPostSubmenu(interp, menuPtr, mePtr)
 	 * The menu has to redrawn so that the entry can change relief.
 	 */
 
+	char string[TCL_INTEGER_SPACE * 2];
+	char *name;
+
+	name = Tcl_GetStringFromObj(mePtr->namePtr, NULL);
 	Tk_GetRootCoords(menuPtr->tkwin, &x, &y);
 	AdjustMenuCoords(menuPtr, mePtr, &x, &y, string);
-	result = Tcl_VarEval(interp, mePtr->name, " post ", string,
-		(char *) NULL);
+	result = Tcl_VarEval(interp, name, " post ", string, (char *) NULL);
 	if (result != TCL_OK) {
 	    return result;
 	}
@@ -1030,10 +1042,16 @@ AdjustMenuCoords(menuPtr, mePtr, xPtr, yPtr, string)
 	*xPtr += mePtr->x;
 	*yPtr += mePtr->y + mePtr->height;
     } else {
-	*xPtr += Tk_Width(menuPtr->tkwin) - menuPtr->borderWidth
-		- menuPtr->activeBorderWidth - 2;
-	*yPtr += mePtr->y
-	        + menuPtr->activeBorderWidth + 2;
+	int borderWidth, activeBorderWidth;
+
+	Tk_GetPixelsFromObj(NULL, menuPtr->tkwin, menuPtr->borderWidthPtr,
+		&borderWidth);
+	Tk_GetPixelsFromObj(NULL, menuPtr->tkwin, 
+		menuPtr->activeBorderWidthPtr, &activeBorderWidth);
+	*xPtr += Tk_Width(menuPtr->tkwin) - borderWidth	- activeBorderWidth 
+		- 2;
+	*yPtr += mePtr->y + activeBorderWidth + 2;
     }
     sprintf(string, "%d %d", *xPtr, *yPtr);
 }
+

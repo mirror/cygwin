@@ -235,3 +235,4 @@ frames and canvases that provide configuration options for this purpose.
 
 .SH KEYWORDS
 geometry manager, height, location, master, place, rubber sheet, slave, width
+

@@ -11,9 +11,9 @@
 #	files by clicking on the file icons or by entering a filename
 #	in the "Filename:" entry.
 #
-# SCCS: @(#) tkfbox.tcl 1.13 97/10/01 14:51:01
+# RCS: @(#) $Id$
 #
-# Copyright (c) 1994-1996 Sun Microsystems, Inc.
+# Copyright (c) 1994-1998 Sun Microsystems, Inc.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -52,7 +52,6 @@ proc tkIconList_Config {w argList} {
     set specs {
 	{-browsecmd "" "" ""}
 	{-command "" "" ""}
-	{-multiple "" "" "0"}
     }
 
     # 2: parse the arguments
@@ -77,8 +76,8 @@ proc tkIconList_Create {w} {
     pack $data(sbar) -side bottom -fill x -padx 2
     pack $data(canvas) -expand yes -fill both
 
-    $data(sbar) config -command "$data(canvas) xview"
-    $data(canvas) config -xscrollcommand "$data(sbar) set"
+    $data(sbar) config -command [list $data(canvas) xview]
+    $data(canvas) config -xscrollcommand [list $data(sbar) set]
 
     # Initializes the max icon/text width and height and other variables
     #
@@ -92,26 +91,26 @@ proc tkIconList_Create {w} {
 
     # Creates the event bindings.
     #
-    bind $data(canvas) <Configure> "tkIconList_Arrange $w"
+    bind $data(canvas) <Configure>	[list tkIconList_Arrange $w]
 
-    bind $data(canvas) <1>         "tkIconList_Btn1 $w %x %y"
-    bind $data(canvas) <B1-Motion> "tkIconList_Motion1 $w %x %y"
-    bind $data(canvas) <Shift-1>   "tkIconList_ShiftBtn1 $w %x %y"
-    bind $data(canvas) <Double-1>  "tkIconList_Double1 $w %x %y"
-    bind $data(canvas) <ButtonRelease-1> "tkCancelRepeat"
-    bind $data(canvas) <B1-Leave>  "tkIconList_Leave1 $w %x %y"
-    bind $data(canvas) <B1-Enter>  "tkCancelRepeat"
+    bind $data(canvas) <1>		[list tkIconList_Btn1 $w %x %y]
+    bind $data(canvas) <B1-Motion>	[list tkIconList_Motion1 $w %x %y]
+    bind $data(canvas) <B1-Leave>	[list tkIconList_Leave1 $w %x %y]
+    bind $data(canvas) <B1-Enter>	[list tkCancelRepeat]
+    bind $data(canvas) <ButtonRelease-1> [list tkCancelRepeat]
+    bind $data(canvas) <Double-ButtonRelease-1> \
+	    [list tkIconList_Double1 $w %x %y]
 
-    bind $data(canvas) <Up>        "tkIconList_UpDown $w -1"
-    bind $data(canvas) <Down>      "tkIconList_UpDown $w  1"
-    bind $data(canvas) <Left>      "tkIconList_LeftRight $w -1"
-    bind $data(canvas) <Right>     "tkIconList_LeftRight $w  1"
-    bind $data(canvas) <Return>    "tkIconList_ReturnKey $w"
-    bind $data(canvas) <KeyPress>  "tkIconList_KeyPress $w %A"
+    bind $data(canvas) <Up>		[list tkIconList_UpDown $w -1]
+    bind $data(canvas) <Down>		[list tkIconList_UpDown $w  1]
+    bind $data(canvas) <Left>		[list tkIconList_LeftRight $w -1]
+    bind $data(canvas) <Right>		[list tkIconList_LeftRight $w  1]
+    bind $data(canvas) <Return>		[list tkIconList_ReturnKey $w]
+    bind $data(canvas) <KeyPress>	[list tkIconList_KeyPress $w %A]
     bind $data(canvas) <Control-KeyPress> ";"
-    bind $data(canvas) <Alt-KeyPress>  ";"
+    bind $data(canvas) <Alt-KeyPress>	";"
 
-    bind $data(canvas) <FocusIn>   "tkIconList_FocusIn $w"
+    bind $data(canvas) <FocusIn>	[list tkIconList_FocusIn $w]
 
     return $w
 }
@@ -151,7 +150,7 @@ proc tkIconList_AutoScan {w} {
     }
 
     tkIconList_Motion1 $w $x $y
-    set tkPriv(afterId) [after 50 tkIconList_AutoScan $w]
+    set tkPriv(afterId) [after 50 [list tkIconList_AutoScan $w]]
 }
 
 # Deletes all the items inside the canvas subwidget and reset the IconList's
@@ -284,13 +283,13 @@ proc tkIconList_Arrange {w} {
     }
 
     if {$sW < $W} {
-	$data(canvas) config -scrollregion "$pad $pad $sW $H"
+	$data(canvas) config -scrollregion [list $pad $pad $sW $H]
 	$data(sbar) config -command ""
 	$data(canvas) xview moveto 0
 	set data(noScroll) 1
     } else {
-	$data(canvas) config -scrollregion "$pad $pad $sW $H"
-	$data(sbar) config -command "$data(canvas) xview"
+	$data(canvas) config -scrollregion [list $pad $pad $sW $H]
+	$data(sbar) config -command [list $data(canvas) xview]
 	set data(noScroll) 0
     }
 
@@ -299,7 +298,7 @@ proc tkIconList_Arrange {w} {
 	set data(itemsPerColumn) 1
     }
 
-    if {$data(curItem) != {}} {
+    if {$data(curItem) != ""} {
 	tkIconList_Select $w [lindex [lindex $data(list) $data(curItem)] 2] 0
     }
 }
@@ -310,8 +309,8 @@ proc tkIconList_Arrange {w} {
 proc tkIconList_Invoke {w} {
     upvar #0 $w data
 
-    if {[string compare $data(-command) ""] && [info exists data(selected)]} {
-	eval $data(-command) [list $data(selected)]
+    if {$data(-command) != "" && [info exists data(selected)]} {
+	uplevel #0 $data(-command)
     }
 }
 
@@ -327,7 +326,7 @@ proc tkIconList_See {w rTag} {
 	return
     }
     set sRegion [$data(canvas) cget -scrollregion]
-    if {![string compare $sRegion {}]} {
+    if {[string equal $sRegion {}]} {
 	return
     }
 
@@ -372,19 +371,7 @@ proc tkIconList_SelectAtXY {w x y} {
     upvar #0 $w data
 
     tkIconList_Select $w [$data(canvas) find closest \
-	[$data(canvas) canvasx $x] [$data(canvas) canvasy $y]]
-}
-
-proc tkIconList_AddSelectAtXY {w x y {no_delete 0}} {
-    upvar #0 $w data
-
-    if {$data(-multiple) && [info exists data(selected)]} {
-	tkIconList_AddSelect $w [$data(canvas) find closest \
-		[$data(canvas) canvasx $x] [$data(canvas) canvasy $y]] \
-		1 $no_delete
-	return
-    }
-    tkIconList_SelectAtXY $w $x $y
+	    [$data(canvas) canvasx $x] [$data(canvas) canvasy $y]]
 }
 
 proc tkIconList_Select {w rTag {callBrowse 1}} {
@@ -399,115 +386,33 @@ proc tkIconList_Select {w rTag {callBrowse 1}} {
     set text   [lindex $itemList($rTag) 2]
     set serial [lindex $itemList($rTag) 3]
 
-    if {$data(-multiple) && [info exists data(rect)]} {
-	foreach r $data(rect) {
-	    $data(canvas) delete $r
-	}
-	unset data(rect)
-    }
-    if ![info exists data(rect)] {
-
+    if {![info exists data(rect)]} {
         set data(rect) [$data(canvas) create rect 0 0 0 0 \
-	    -fill #a0a0ff -outline #a0a0ff]
+		-fill #a0a0ff -outline #a0a0ff]
     }
     $data(canvas) lower $data(rect)
     set bbox [$data(canvas) bbox $tTag]
-    eval $data(canvas) coords $data(rect) $bbox
+    eval [list $data(canvas) coords $data(rect)] $bbox
 
     set data(curItem) $serial
-    
-    #we can't set the text to data(selected) as text, this is bugy,
-    #when the path contains blanks
-    if {$data(-multiple)} {
-	catch {unset data(selected)}
-	lappend data(selected) $text
-    } else {
-    	set data(selected) $text
-    }
-    
-    if {$callBrowse} {
-	if [string compare $data(-browsecmd) ""] {
-	    eval $data(-browsecmd) [list $data(selected)]
-	}
-    }
-}
+    set data(selected) $text
 
-proc tkIconList_AddSelect {w rTag {callBrowse 1} {no_delete 0}} {
-    upvar #0 $w data
-    upvar #0 $w:itemList itemList
-
-    if ![info exists itemList($rTag)] {
-	return
-    }
-    set iTag   [lindex $itemList($rTag) 0]
-    set tTag   [lindex $itemList($rTag) 1]
-    set text   [lindex $itemList($rTag) 2]
-    set serial [lindex $itemList($rTag) 3]
-
-    if {[lsearch -exact $data(selected) $text] != -1} {
-	if {$no_delete} {
-	    return
-	}
-	 
-	# we've clicked on an existing item, so we need to remove it
-	set i [lsearch -exact $data(selected) $text]
-	set data(selected) [lreplace $data(selected) $i $i]
-	
-	# find the appropriate coordinates and remove the
-	# corresponding rectangle.
-	set tmpbbox [$data(canvas) bbox $tTag]
-	for {set i 0} {$i<[llength $data(rect)]} {incr i} {
-	    set rectTag [lindex $data(rect) $i]
-	    set testbbox [$data(canvas) coords $rectTag]
-	    # test first two coordinates; if they're the same the
-	    # entire box should match
-	    if {[lindex $testbbox 0]==[lindex $tmpbbox 0] && \
-		    [lindex $testbbox 1]==[lindex $tmpbbox 1]} {
-		$data(canvas) delete $rectTag
-		set data(rect) [lreplace $data(rect) $i $i]
-		break
-	    }
-	}
-
-	if {$callBrowse} {
-	    if [string compare $data(-browsecmd) ""] {
-		eval $data(-browsecmd) [list $data(selected)]
-	    }
-	}
-	return
-    }
-
-    set tmprect [$data(canvas) create rect 0 0 0 0 \
-	    -fill #a0a0ff -outline #a0a0ff]
-    lappend data(rect) $tmprect
-
-    $data(canvas) lower $tmprect
-    set bbox [$data(canvas) bbox $tTag]
-    eval $data(canvas) coords $tmprect $bbox
-
-    set data(curItem) $serial
-    lappend data(selected) $text
-    
-    if {$callBrowse} {
-	if [string compare $data(-browsecmd) ""] {
-	    eval $data(-browsecmd) [list $data(selected)]
-	}
+    if {$callBrowse && $data(-browsecmd) != ""} {
+	eval $data(-browsecmd) [list $text]
     }
 }
 
 proc tkIconList_Unselect {w} {
     upvar #0 $w data
 
-    if [info exists data(rect)] {
-	foreach r $data(rect) {
-	    $data(canvas) delete $r
-	}
+    if {[info exists data(rect)]} {
+	$data(canvas) delete $data(rect)
 	unset data(rect)
     }
     if {[info exists data(selected)]} {
 	unset data(selected)
     }
-    set data(curItem)  {}
+    #set data(curItem)  {}
 }
 
 # Returns the selected item
@@ -530,13 +435,6 @@ proc tkIconList_Btn1 {w x y} {
     tkIconList_SelectAtXY $w $x $y
 }
 
-proc tkIconList_ShiftBtn1 {w x y} {
-    upvar #0 $w data
-
-    focus $data(canvas)
-    tkIconList_AddSelectAtXY $w $x $y
-}
-
 # Gets called on button-1 motions
 #
 proc tkIconList_Motion1 {w x y} {
@@ -544,13 +442,13 @@ proc tkIconList_Motion1 {w x y} {
     set tkPriv(x) $x
     set tkPriv(y) $y
 
-    tkIconList_AddSelectAtXY $w $x $y 1
+    tkIconList_SelectAtXY $w $x $y
 }
 
 proc tkIconList_Double1 {w x y} {
     upvar #0 $w data
 
-    if {$data(curItem) != {}} {
+    if {[string compare $data(curItem) {}]} {
 	tkIconList_Invoke $w
     }
 }
@@ -574,9 +472,8 @@ proc tkIconList_FocusIn {w} {
 	return
     }
 
-    if {$data(curItem) == {}} {
-	set rTag [lindex [lindex $data(list) 0] 2]
-	tkIconList_Select $w $rTag
+    if {[string compare $data(curItem) {}]} {
+	tkIconList_Select $w [lindex [lindex $data(list) $data(curItem)] 2] 1
     }
 }
 
@@ -595,12 +492,12 @@ proc tkIconList_UpDown {w amount} {
 	return
     }
 
-    if {$data(curItem) == {}} {
+    if {[string equal $data(curItem) {}]} {
 	set rTag [lindex [lindex $data(list) 0] 2]
     } else {
 	set oldRTag [lindex [lindex $data(list) $data(curItem)] 2]
 	set rTag [lindex [lindex $data(list) [expr {$data(curItem)+$amount}]] 2]
-	if {![string compare $rTag ""]} {
+	if {[string equal $rTag ""]} {
 	    set rTag $oldRTag
 	}
     }
@@ -625,13 +522,13 @@ proc tkIconList_LeftRight {w amount} {
     if {![info exists data(list)]} {
 	return
     }
-    if {$data(curItem) == {}} {
+    if {[string equal $data(curItem) {}]} {
 	set rTag [lindex [lindex $data(list) 0] 2]
     } else {
 	set oldRTag [lindex [lindex $data(list) $data(curItem)] 2]
 	set newItem [expr {$data(curItem)+($amount*$data(itemsPerColumn))}]
 	set rTag [lindex [lindex $data(list) $newItem] 2]
-	if {![string compare $rTag ""]} {
+	if {[string equal $rTag ""]} {
 	    set rTag $oldRTag
 	}
     }
@@ -658,7 +555,7 @@ proc tkIconList_KeyPress {w key} {
     catch {
 	after cancel $tkPriv(ILAccel,$w,afterId)
     }
-    set tkPriv(ILAccel,$w,afterId) [after 500 tkIconList_Reset $w]
+    set tkPriv(ILAccel,$w,afterId) [after 500 [list tkIconList_Reset $w]]
 }
 
 proc tkIconList_Goto {w text} {
@@ -670,11 +567,11 @@ proc tkIconList_Goto {w text} {
 	return
     }
 
-    if {[string length $text] == 0} {
+    if {[string equal {} $text]} {
 	return
     }
 
-    if {$data(curItem) == {} || $data(curItem) == 0} {
+    if {$data(curItem) == "" || $data(curItem) == 0} {
 	set start  0
     } else {
 	set start  $data(curItem)
@@ -689,9 +586,9 @@ proc tkIconList_Goto {w text} {
 
     # Search forward until we find a filename whose prefix is an exact match
     # with $text
-    while 1 {
+    while {1} {
 	set sub [string range $textList($i) 0 $len0]
-	if {[string compare $text $sub] == 0} {
+	if {[string equal $text $sub]} {
 	    set theIndex $i
 	    break
 	}
@@ -706,7 +603,7 @@ proc tkIconList_Goto {w text} {
 
     if {$theIndex > -1} {
 	set rTag [lindex [lindex $data(list) $theIndex] 2]
-	tkIconList_Select $w $rTag 0
+	tkIconList_Select $w $rTag
 	tkIconList_See $w $rTag
     }
 }
@@ -723,54 +620,40 @@ proc tkIconList_Reset {w} {
 #
 #----------------------------------------------------------------------
 
-# tkFDialog --
+namespace eval ::tk::dialog {}
+namespace eval ::tk::dialog::file {}
+
+# ::tk::dialog::file::tkFDialog --
 #
 #	Implements the TK file selection dialog. This dialog is used when
 #	the tk_strictMotif flag is set to false. This procedure shouldn't
 #	be called directly. Call tk_getOpenFile or tk_getSaveFile instead.
 #
-proc tkFDialog {args} {
+# Arguments:
+#	type		"open" or "save"
+#	args		Options parsed by the procedure.
+#
+
+proc ::tk::dialog::file::tkFDialog {type args} {
     global tkPriv
-    global __old_dialog
-    global __old_multiple
-    set w __tk_filedialog
-    upvar #0 $w data
+    set dataName __tk_filedialog
+    upvar ::tk::dialog::file::$dataName data
 
-    if {![string compare [lindex [info level 0] 0] tk_getOpenFile]} {
-	set type open
+    ::tk::dialog::file::Config $dataName $type $args
+
+    if {[string equal $data(-parent) .]} {
+        set w .$dataName
     } else {
-	set type save
+        set w $data(-parent).$dataName
     }
-
-    tkFDialog_Config $w $type $args
-
-    if {![string compare $data(-parent) .]} {
-        set w .$w
-    } else {
-        set w $data(-parent).$w
-    }
-
-    #because tk doesn't use window-path dependent array, it is
-    #impossible to use more than one dialog box at the same time,
-    #so we have to recreate the dialog!
-    if {[info exists __old_dialog] \
-	&& ($__old_dialog != $w || $__old_multiple != $data(-multiple))} {
-    	catch {destroy $w}
-	catch {destroy $__old_dialog}
-    }
-    set __old_dialog $w
-    set __old_multiple $data(-multiple)
 
     # (re)create the dialog box if necessary
     #
-    set new_dialog 0
     if {![winfo exists $w]} {
-	tkFDialog_Create $w
-	set new_dialog 1
+	::tk::dialog::file::Create $w TkFDialog
     } elseif {[string compare [winfo class $w] TkFDialog]} {
 	destroy $w
-	tkFDialog_Create $w
-	set new_dialog 1
+	::tk::dialog::file::Create $w TkFDialog
     } else {
 	set data(dirMenuBtn) $w.f1.menu
 	set data(dirMenu) $w.f1.menu.menu
@@ -784,20 +667,25 @@ proc tkFDialog {args} {
 	set data(cancelBtn) $w.f3.cancel
     }
     wm transient $w $data(-parent)
-    #trace variable
-    trace variable data(selectPath) w "tkFDialog_SetPath $w"
 
-    # 5. Initialize the file types menu
+    # Add traces on the selectPath variable
     #
-    if {$data(-filetypes) != {}} {
+
+    trace variable data(selectPath) w "::tk::dialog::file::SetPath $w"
+    $data(dirMenuBtn) configure \
+	    -textvariable ::tk::dialog::file::${dataName}(selectPath)
+
+    # Initialize the file types menu
+    #
+    if {[llength $data(-filetypes)]} {
 	$data(typeMenu) delete 0 end
 	foreach type $data(-filetypes) {
 	    set title  [lindex $type 0]
 	    set filter [lindex $type 1]
 	    $data(typeMenu) add command -label $title \
-		-command [list tkFDialog_SetFilter $w $type]
+		-command [list ::tk::dialog::file::SetFilter $w $type]
 	}
-	tkFDialog_SetFilter $w [lindex $data(-filetypes) 0]
+	::tk::dialog::file::SetFilter $w [lindex $data(-filetypes) 0]
 	$data(typeMenuBtn) config -state normal
 	$data(typeMenuLab) config -state normal
     } else {
@@ -805,72 +693,60 @@ proc tkFDialog {args} {
 	$data(typeMenuBtn) config -state disabled -takefocus 0
 	$data(typeMenuLab) config -state disabled
     }
+    ::tk::dialog::file::UpdateWhenIdle $w
 
-    tkFDialog_UpdateWhenIdle $w
-
-    # 6. Withdraw the window, then update all the geometry information
+    # Withdraw the window, then update all the geometry information
     # so we know how big it wants to be, then center the window in the
     # display and de-iconify it.
 
-    if {$new_dialog} {
-    	#center dialog, when it has been new created
-	wm withdraw $w
-	update idletasks
-	set x [expr {[winfo screenwidth $w]/2 - [winfo reqwidth $w]/2 \
-		       - [winfo vrootx [winfo parent $w]]}]
-	set y [expr {[winfo screenheight $w]/2 - [winfo reqheight $w]/2 \
-	    - [winfo vrooty [winfo parent $w]]}]
-	wm geom $w [winfo reqwidth $w]x[winfo reqheight $w]+$x+$y
-    }
+    ::tk::PlaceWindow $w widget $data(-parent)
     wm title $w $data(-title)
-    wm deiconify $w
 
-    # 7. Set a grab and claim the focus too.
+    # Set a grab and claim the focus too.
 
-    set oldFocus [focus]
-    set oldGrab [grab current $w]
-    if {$oldGrab != ""} {
-	set grabStatus [grab status $oldGrab]
-    }
-    grab $w
-    focus $data(ent)
+    ::tk::SetFocusGrab $w $data(ent)
     $data(ent) delete 0 end
     $data(ent) insert 0 $data(selectFile)
-    $data(ent) select from 0
-    $data(ent) select to   end
+    $data(ent) selection range 0 end
     $data(ent) icursor end
 
-    # 8. Wait for the user to respond, then restore the focus and
+    # Wait for the user to respond, then restore the focus and
     # return the index of the selected button.  Restore the focus
     # before deleting the window, since otherwise the window manager
     # may take the focus away so we can't redirect it.  Finally,
     # restore any grab that was in effect.
 
     tkwait variable tkPriv(selectFilePath)
-    catch {focus $oldFocus}
-    grab release $w
-    wm withdraw $w
-    if {$oldGrab != ""} {
-	if {$grabStatus == "global"} {
-	    grab -global $oldGrab
-	} else {
-	    grab $oldGrab
-	}
+
+    ::tk::RestoreFocusGrab $w $data(ent) withdraw
+
+    # Cleanup traces on selectPath variable
+    #
+
+    foreach trace [trace vinfo data(selectPath)] {
+	trace vdelete data(selectPath) [lindex $trace 0] [lindex $trace 1]
     }
-    #delete the tracer, because this conflicts with multiple
-    #used dialogs
-    trace vdelete data(selectPath) w "tkFDialog_SetPath $w"
+    $data(dirMenuBtn) configure -textvariable {}
+
     return $tkPriv(selectFilePath)
 }
 
-# tkFDialog_Config --
+# ::tk::dialog::file::Config --
 #
 #	Configures the TK filedialog according to the argument list
 #
-proc tkFDialog_Config {w type argList} {
-    upvar #0 $w data
+proc ::tk::dialog::file::Config {dataName type argList} {
+    upvar ::tk::dialog::file::$dataName data
 
     set data(type) $type
+
+    # 0: Delete all variable that were set on data(selectPath) the
+    # last time the file dialog is used. The traces may cause troubles
+    # if the dialog is now used with a different -parent option.
+
+    foreach trace [trace vinfo data(selectPath)] {
+	trace vdelete data(selectPath) [lindex $trace 0] [lindex $trace 1]
+    }
 
     # 1: the configuration specs
     #
@@ -881,15 +757,6 @@ proc tkFDialog_Config {w type argList} {
 	{-initialfile "" "" ""}
 	{-parent "" "" "."}
 	{-title "" "" ""}
-    }
-    if ![string compare $type open] {
-        # CYGNUS LOCAL: Handle -choosedir.
-        # Note: the -choosedir option is a Cygnus extension.  It is not
-        # documented since it only works on Unix -- it is an
-        # implementation detail of the directory-choosing code in
-        # in libgui.
-	lappend specs {-multiple "" "" "0"} {-choosedir "" "" "0"}
-	# END CYGNUS LOCAL
     }
 
     # 2: default values depending on the type of the dialog
@@ -902,10 +769,10 @@ proc tkFDialog_Config {w type argList} {
 
     # 3: parse the arguments
     #
-    tclParseConfigSpec $w $specs "" $argList
+    tclParseConfigSpec ::tk::dialog::file::$dataName $specs "" $argList
 
-    if {![string compare $data(-title) ""]} {
-	if {![string compare $type "open"]} {
+    if {$data(-title) == ""} {
+	if {[string equal $type "open"]} {
 	    set data(-title) "Open"
 	} else {
 	    set data(-title) "Save As"
@@ -915,24 +782,16 @@ proc tkFDialog_Config {w type argList} {
     # 4: set the default directory and selection according to the -initial
     #    settings
     #
-    # Khamis 16-04-98
-    # When the path contains blanks, glob returns an item in a list, but
-    # data(selectPath) must be an item and not a list of items, so we
-    # must extract the item from the returned list.
-    if {[string compare $data(-initialdir) ""]} {
-        if {[file isdirectory $data(-initialdir)]} {
-	    #khamis: Join result of glob to an item
-	    set data(selectPath) [lindex [glob $data(-initialdir)] 0]
+    if {$data(-initialdir) != ""} {
+	# Ensure that initialdir is an absolute path name.
+	if {[file isdirectory $data(-initialdir)]} {
+	    set old [pwd]
+	    cd $data(-initialdir)
+	    set data(selectPath) [pwd]
+	    cd $old
 	} else {
 	    set data(selectPath) [pwd]
 	}
-
-	# Convert the initialdir to an absolute path name.
-
-	set old [pwd]
-	cd $data(selectPath)
-	set data(selectPath) [pwd]
-	cd $old
     }
     set data(selectFile) $data(-initialfile)
 
@@ -943,35 +802,21 @@ proc tkFDialog_Config {w type argList} {
     if {![winfo exists $data(-parent)]} {
 	error "bad window path name \"$data(-parent)\""
     }
-
-    # Set -multiple to a one or zero value (not other boolean types
-    # like "yes") so we can use it in tests easier.
-    if {![string compare $type save]} {
-	set data(-multiple) 0
-        # CYGNUS LOCAL: choosedir
-        # Handle -choosedir here as well.
-        set data(-choosedir) 0
-        # END CYGNUS LOCAL
-    } else {
-	if {$data(-multiple)} { 
-	    set data(-multiple) 1 
-	}
-    }
 }
 
-proc tkFDialog_Create {w} {
+proc ::tk::dialog::file::Create {w class} {
     set dataName [lindex [split $w .] end]
-    upvar #0 $dataName data
-    global tk_library
+    upvar ::tk::dialog::file::$dataName data
+    global tk_library tkPriv
 
-    toplevel $w -class TkFDialog
+    toplevel $w -class $class
 
     # f1: the frame with the directory option menu
     #
     set f1 [frame $w.f1]
     label $f1.lab -text "Directory:" -under 0
     set data(dirMenuBtn) $f1.menu
-    set data(dirMenu) [tk_optionMenu $f1.menu [format %s(selectPath) $dataName] ""]
+    set data(dirMenu) [tk_optionMenu $f1.menu [format %s(selectPath) ::tk::dialog::file::$dataName] ""]
     set data(upBtn) [button $f1.up]
     if {![info exists tkPriv(updirImage)]} {
 	set tkPriv(updirImage) [image create bitmap -data {
@@ -995,18 +840,24 @@ static char updir_bits[] = {
 
     # data(icons): the IconList that list the files and directories.
     #
+    if { [string equal $class TkFDialog] } {
+	set fNameCaption "File name:"
+	set fNameUnder 5
+	set iconListCommand [list ::tk::dialog::file::OkCmd $w]
+    } else {
+	set fNameCaption "Selection:"
+	set fNameUnder 0
+	set iconListCommand [list ::tk::dialog::file::chooseDir::DblClick $w]
+    }
     set data(icons) [tkIconList $w.icons \
-	-browsecmd "tkFDialog_ListBrowse $w" \
-	-command   "tkFDialog_ListInvoke $w" \
-	-multiple  "$data(-multiple)"]
+	-browsecmd [list ::tk::dialog::file::ListBrowse $w] \
+	-command   $iconListCommand]
 
     # f2: the frame with the OK button and the "file name" field
     #
     set f2 [frame $w.f2 -bd 0]
-    label $f2.lab -text "File name:" -anchor e -width 14 -under 5 -pady 0
-    if {$data(-multiple)} {
-	$f2.lab config -text "File names:"
-    }
+    label $f2.lab -text $fNameCaption -anchor e -width 14 \
+	    -under $fNameUnder -pady 0
     set data(ent) [entry $f2.ent]
 
     # The font to use for the icons. The default Canvas font on Unix
@@ -1018,26 +869,30 @@ static char updir_bits[] = {
     #
     set f3 [frame $w.f3 -bd 0]
 
-    # The "File of types:" label needs to be grayed-out when
-    # -filetypes are not specified. The label widget does not support
-    # grayed-out text on monochrome displays. Therefore, we have to
-    # use a button widget to emulate a label widget (by setting its
-    # bindtags)
-
-    set data(typeMenuLab) [button $f3.lab -text "Files of type:" \
-	-anchor e -width 14 -under 9 \
-	-bd [$f2.lab cget -bd] \
-	-highlightthickness [$f2.lab cget -highlightthickness] \
-	-relief [$f2.lab cget -relief] \
-	-padx [$f2.lab cget -padx] \
-	-pady [$f2.lab cget -pady]]
-    bindtags $data(typeMenuLab) [list $data(typeMenuLab) Label \
-	    [winfo toplevel $data(typeMenuLab)] all]
-
-    set data(typeMenuBtn) [menubutton $f3.menu -indicatoron 1 -menu $f3.menu.m]
-    set data(typeMenu) [menu $data(typeMenuBtn).m -tearoff 0]
-    $data(typeMenuBtn) config -takefocus 1 -highlightthickness 2 \
-	-relief raised -bd 2 -anchor w
+    # Make the file types bits only if this is a File Dialog
+    if { [string equal $class TkFDialog] } {
+	# The "File of types:" label needs to be grayed-out when
+	# -filetypes are not specified. The label widget does not support
+	# grayed-out text on monochrome displays. Therefore, we have to
+	# use a button widget to emulate a label widget (by setting its
+	# bindtags)
+	
+	set data(typeMenuLab) [button $f3.lab -text "Files of type:" \
+		-anchor e -width 14 -under 9 \
+		-bd [$f2.lab cget -bd] \
+		-highlightthickness [$f2.lab cget -highlightthickness] \
+		-relief [$f2.lab cget -relief] \
+		-padx [$f2.lab cget -padx] \
+		-pady [$f2.lab cget -pady]]
+	bindtags $data(typeMenuLab) [list $data(typeMenuLab) Label \
+		[winfo toplevel $data(typeMenuLab)] all]
+	
+	set data(typeMenuBtn) [menubutton $f3.menu -indicatoron 1 \
+		-menu $f3.menu.m]
+	set data(typeMenu) [menu $data(typeMenuBtn).m -tearoff 0]
+	$data(typeMenuBtn) config -takefocus 1 -highlightthickness 2 \
+		-relief raised -bd 2 -anchor w
+    }
 
     # the okBtn is created after the typeMenu so that the keyboard traversal
     # is in the right order
@@ -1053,8 +908,10 @@ static char updir_bits[] = {
     pack $f2.ent -expand yes -fill x -padx 2 -pady 0
     
     pack $data(cancelBtn) -side right -padx 4 -anchor w
-    pack $data(typeMenuLab) -side left -padx 4
-    pack $data(typeMenuBtn) -expand yes -fill x -side right
+    if { [string equal $class TkFDialog] } {
+	pack $data(typeMenuLab) -side left -padx 4
+	pack $data(typeMenuBtn) -expand yes -fill x -side right
+    }
 
     # Pack all the frames together. We are done with widget construction.
     #
@@ -1063,70 +920,83 @@ static char updir_bits[] = {
     pack $f2 -side bottom -fill x
     pack $data(icons) -expand yes -fill both -padx 4 -pady 1
 
-    # Set up the event handlers
+    # Set up the event handlers that are common to Directory and File Dialogs
     #
-    bind $data(ent) <Return>  "tkFDialog_ActivateEnt $w"
-    
-    $data(upBtn)     config -command "tkFDialog_UpDirCmd $w"
-    $data(okBtn)     config -command "tkFDialog_OkCmd $w"
-    $data(cancelBtn) config -command "tkFDialog_CancelCmd $w"
 
-    #trace variable data(selectPath) w "tkFDialog_SetPath $w"
+    wm protocol $w WM_DELETE_WINDOW [list ::tk::dialog::file::CancelCmd $w]
+    $data(upBtn)     config -command [list ::tk::dialog::file::UpDirCmd $w]
+    $data(cancelBtn) config -command [list ::tk::dialog::file::CancelCmd $w]
+    bind $w <KeyPress-Escape> [list tkButtonInvoke $data(cancelBtn)]
+    bind $w <Alt-c> [list tkButtonInvoke $data(cancelBtn)]
+    bind $w <Alt-d> [list focus $data(dirMenuBtn)]
 
-    bind $w <Alt-d> "focus $data(dirMenuBtn)"
-    bind $w <Alt-t> [format {
-	if {"[%s cget -state]" == "normal"} {
-	    focus %s
-	}
-    } $data(typeMenuBtn) $data(typeMenuBtn)]
-    bind $w <Alt-n> "focus $data(ent)"
-    bind $w <KeyPress-Escape> "tkButtonInvoke $data(cancelBtn)"
-    bind $w <Alt-c> "tkButtonInvoke $data(cancelBtn)"
-    bind $w <Alt-o> "tkFDialog_InvokeBtn $w Open"
-    bind $w <Alt-s> "tkFDialog_InvokeBtn $w Save"
+    # Set up event handlers specific to File or Directory Dialogs
+    #
 
-    wm protocol $w WM_DELETE_WINDOW "tkFDialog_CancelCmd $w"
+    if { [string equal $class TkFDialog] } {
+	bind $data(ent) <Return> [list ::tk::dialog::file::ActivateEnt $w]
+	$data(okBtn)     config -command [list ::tk::dialog::file::OkCmd $w]
+	bind $w <Alt-t> [format {
+	    if {[string equal [%s cget -state] "normal"]} {
+		focus %s
+	    }
+	} $data(typeMenuBtn) $data(typeMenuBtn)]
+	bind $w <Alt-n> [list focus $data(ent)]
+	bind $w <Alt-o> [list ::tk::dialog::file::InvokeBtn $w Open]
+	bind $w <Alt-s> [list ::tk::dialog::file::InvokeBtn $w Save]
+    } else {
+	set okCmd [list ::tk::dialog::file::chooseDir::OkCmd $w]
+	bind $data(ent) <Return> $okCmd
+	$data(okBtn) config -command $okCmd
+	bind $w <Alt-s> [list focus $data(ent)]
+	bind $w <Alt-o> [list tkButtonInvoke $data(okBtn)]
+    }
 
     # Build the focus group for all the entries
     #
     tkFocusGroup_Create $w
-    tkFocusGroup_BindIn $w  $data(ent) "tkFDialog_EntFocusIn $w"
-    tkFocusGroup_BindOut $w $data(ent) "tkFDialog_EntFocusOut $w"
+    tkFocusGroup_BindIn $w  $data(ent) [list ::tk::dialog::file::EntFocusIn $w]
+    tkFocusGroup_BindOut $w $data(ent) [list ::tk::dialog::file::EntFocusOut $w]
 }
 
-# tkFDialog_UpdateWhenIdle --
+# ::tk::dialog::file::UpdateWhenIdle --
 #
 #	Creates an idle event handler which updates the dialog in idle
 #	time. This is important because loading the directory may take a long
 #	time and we don't want to load the same directory for multiple times
 #	due to multiple concurrent events.
 #
-proc tkFDialog_UpdateWhenIdle {w} {
-    upvar #0 [winfo name $w] data
+proc ::tk::dialog::file::UpdateWhenIdle {w} {
+    upvar ::tk::dialog::file::[winfo name $w] data
 
     if {[info exists data(updateId)]} {
 	return
     } else {
-	set data(updateId) [after idle tkFDialog_Update $w]
+	set data(updateId) [after idle [list ::tk::dialog::file::Update $w]]
     }
 }
 
-# tkFDialog_Update --
+# ::tk::dialog::file::Update --
 #
 #	Loads the files and directories into the IconList widget. Also
 #	sets up the directory option menu for quick access to parent
 #	directories.
 #
-proc tkFDialog_Update {w} {
+proc ::tk::dialog::file::Update {w} {
 
     # This proc may be called within an idle handler. Make sure that the
     # window has not been destroyed before this proc is called
-    if {![winfo exists $w] || [string compare [winfo class $w] TkFDialog]} {
+    if {![winfo exists $w]} {
+	return
+    }
+    set class [winfo class $w]
+    if { [string compare $class TkFDialog] && \
+	    [string compare $class TkChooseDir] } {
 	return
     }
 
     set dataName [winfo name $w]
-    upvar #0 $dataName data
+    upvar ::tk::dialog::file::$dataName data
     global tk_library tkPriv
     catch {unset data(updateId)}
 
@@ -1146,10 +1016,10 @@ rSASvJTGhnhcV3EJlo3kh53ltF5nAhQAOw==}]
 	cd $data(selectPath)
     }]} {
 	# We cannot change directory to $data(selectPath). $data(selectPath)
-	# should have been checked before tkFDialog_Update is called, so
+	# should have been checked before ::tk::dialog::file::Update is called, so
 	# we normally won't come to here. Anyways, give an error and abort
 	# action.
-	tk_messageBox -type ok -parent $data(-parent) -message \
+	tk_messageBox -type ok -parent $w -message \
 	    "Cannot change to the directory \"$data(selectPath)\".\nPermission denied."\
 	    -icon warning
 	cd $appPWD
@@ -1170,10 +1040,10 @@ rSASvJTGhnhcV3EJlo3kh53ltF5nAhQAOw==}]
     # Make the dir list
     #
     foreach f [lsort -dictionary [glob -nocomplain .* *]] {
-	if {![string compare $f .]} {
+	if {[string equal $f .]} {
 	    continue
 	}
-	if {![string compare $f ..]} {
+	if {[string equal $f ..]} {
 	    continue
 	}
 	if {[file isdir ./$f]} {
@@ -1183,22 +1053,23 @@ rSASvJTGhnhcV3EJlo3kh53ltF5nAhQAOw==}]
 	    }
 	}
     }
-    # Make the file list
-    #
-    if {![string compare $data(filter) *]} {
-	set files [lsort -dictionary \
-	    [glob -nocomplain .* *]]
-    } else {
-	set files [lsort -dictionary \
-	    [eval glob -nocomplain $data(filter)]]
-    }
-
-    set top 0
-    foreach f $files {
-	if {![file isdir ./$f]} {
-	    if {![info exists hasDoneFile($f)]} {
-		tkIconList_Add $data(icons) $file $f
-		set hasDoneFile($f) 1
+    if { [string equal $class TkFDialog] } {
+	# Make the file list if this is a File Dialog
+	#
+	if {[string equal $data(filter) *]} {
+	    set files [lsort -dictionary \
+		    [glob -nocomplain .* *]]
+	} else {
+	    set files [lsort -dictionary \
+		    [eval glob -nocomplain $data(filter)]]
+	}
+	
+	foreach f $files {
+	    if {![file isdir ./$f]} {
+		if {![info exists hasDoneFile($f)]} {
+		    tkIconList_Add $data(icons) $file $f
+		    set hasDoneFile($f) 1
+		}
 	    }
 	}
     }
@@ -1215,7 +1086,7 @@ rSASvJTGhnhcV3EJlo3kh53ltF5nAhQAOw==}]
     }
 
     $data(dirMenu) delete 0 end
-    set var [format %s(selectPath) $dataName]
+    set var [format %s(selectPath) ::tk::dialog::file::$dataName]
     foreach path $list {
 	$data(dirMenu) add command -label $path -command [list set $var $path]
     }
@@ -1224,38 +1095,53 @@ rSASvJTGhnhcV3EJlo3kh53ltF5nAhQAOw==}]
     #
     cd $appPWD
 
+    if { [string equal $class TkFDialog] } {
+	# Restore the Open/Save Button if this is a File Dialog
+	#
+	if {[string equal $data(type) open]} {
+	    $data(okBtn) config -text "Open"
+	} else {
+	    $data(okBtn) config -text "Save"
+	}
+    }
+
     # turn off the busy cursor.
     #
     $data(ent) config -cursor $entCursor
     $w         config -cursor $dlgCursor
 }
 
-# tkFDialog_SetPathSilently --
+# ::tk::dialog::file::SetPathSilently --
 #
 # 	Sets data(selectPath) without invoking the trace procedure
 #
-proc tkFDialog_SetPathSilently {w path} {
-    upvar #0 [winfo name $w] data
+proc ::tk::dialog::file::SetPathSilently {w path} {
+    upvar ::tk::dialog::file::[winfo name $w] data
     
-    trace vdelete  data(selectPath) w "tkFDialog_SetPath $w"
+    trace vdelete  data(selectPath) w [list ::tk::dialog::file::SetPath $w]
     set data(selectPath) $path
-    trace variable data(selectPath) w "tkFDialog_SetPath $w"
+    trace variable data(selectPath) w [list ::tk::dialog::file::SetPath $w]
 }
 
 
 # This proc gets called whenever data(selectPath) is set
 #
-proc tkFDialog_SetPath {w name1 name2 op} {
+proc ::tk::dialog::file::SetPath {w name1 name2 op} {
     if {[winfo exists $w]} {
-	upvar #0 [winfo name $w] data
-	tkFDialog_UpdateWhenIdle $w
+	upvar ::tk::dialog::file::[winfo name $w] data
+	::tk::dialog::file::UpdateWhenIdle $w
+	# On directory dialogs, we keep the entry in sync with the currentdir.
+	if { [string equal [winfo class $w] TkChooseDir] } {
+	    $data(ent) delete 0 end
+	    $data(ent) insert end $data(selectPath)
+	}
     }
 }
 
 # This proc gets called whenever data(filter) is set
 #
-proc tkFDialog_SetFilter {w type} {
-    upvar #0 [winfo name $w] data
+proc ::tk::dialog::file::SetFilter {w type} {
+    upvar ::tk::dialog::file::[winfo name $w] data
     upvar \#0 $data(icons) icons
 
     set data(filter) [lindex $type 1]
@@ -1263,10 +1149,10 @@ proc tkFDialog_SetFilter {w type} {
 
     $icons(sbar) set 0.0 0.0
     
-    tkFDialog_UpdateWhenIdle $w
+    ::tk::dialog::file::UpdateWhenIdle $w
 }
 
-# tkFDialogResolveFile --
+# tk::dialog::file::ResolveFile --
 #
 #	Interpret the user's text input in a file selection dialog.
 #	Performs:
@@ -1298,13 +1184,16 @@ proc tkFDialog_SetFilter {w type} {
 #	directory may not be the same as context, because text may contain
 #	a subdirectory name
 #
-proc tkFDialogResolveFile {context text defaultext} {
+proc ::tk::dialog::file::ResolveFile {context text defaultext} {
 
     set appPWD [pwd]
 
-    set path [tkFDialog_JoinFile $context $text]
+    set path [::tk::dialog::file::JoinFile $context $text]
 
-    if {[file ext $path] == ""} {
+    # If the file has no extension, append the default.  Be careful not
+    # to do this for directories, otherwise typing a dirname in the box
+    # will give back "dirname.extension" instead of trying to change dir.
+    if {![file isdirectory $path] && [string equal [file ext $path] ""]} {
 	set path "$path$defaultext"
     }
 
@@ -1320,9 +1209,7 @@ proc tkFDialogResolveFile {context text defaultext} {
 
     if {[file exists $path]} {
 	if {[file isdirectory $path]} {
-	    if {[catch {
-		cd $path
-	    }]} {
+	    if {[catch {cd $path}]} {
 		return [list CHDIR $path ""]
 	    }
 	    set directory [pwd]
@@ -1330,9 +1217,7 @@ proc tkFDialogResolveFile {context text defaultext} {
 	    set flag OK
 	    cd $appPWD
 	} else {
-	    if {[catch {
-		cd [file dirname $path]
-	    }]} {
+	    if {[catch {cd [file dirname $path]}]} {
 		return [list CHDIR [file dirname $path] ""]
 	    }
 	    set directory [pwd]
@@ -1343,9 +1228,7 @@ proc tkFDialogResolveFile {context text defaultext} {
     } else {
 	set dirname [file dirname $path]
 	if {[file exists $dirname]} {
-	    if {[catch {
-		cd $dirname
-	    }]} {
+	    if {[catch {cd $dirname}]} {
 		return [list CHDIR $dirname ""]
 	    }
 	    set directory [pwd]
@@ -1371,12 +1254,11 @@ proc tkFDialogResolveFile {context text defaultext} {
 # from the icon list . This way the user can be certain that the input in the 
 # entry box is the selection.
 #
-proc tkFDialog_EntFocusIn {w} {
-    upvar #0 [winfo name $w] data
+proc ::tk::dialog::file::EntFocusIn {w} {
+    upvar ::tk::dialog::file::[winfo name $w] data
 
     if {[string compare [$data(ent) get] ""]} {
-	$data(ent) selection from 0
-	$data(ent) selection to   end
+	$data(ent) selection range 0 end
 	$data(ent) icursor end
     } else {
 	$data(ent) selection clear
@@ -1384,55 +1266,45 @@ proc tkFDialog_EntFocusIn {w} {
 
     tkIconList_Unselect $data(icons)
 
-    if {![string compare $data(type) open]} {
-	$data(okBtn) config -text "Open"
-    } else {
-	$data(okBtn) config -text "Save"
+    if { [string equal [winfo class $w] TkFDialog] } {
+	# If this is a File Dialog, make sure the buttons are labeled right.
+	if {[string equal $data(type) open]} {
+	    $data(okBtn) config -text "Open"
+	} else {
+	    $data(okBtn) config -text "Save"
+	}
     }
 }
 
-proc tkFDialog_EntFocusOut {w} {
-    upvar #0 [winfo name $w] data
+proc ::tk::dialog::file::EntFocusOut {w} {
+    upvar ::tk::dialog::file::[winfo name $w] data
 
     $data(ent) selection clear
 }
 
 
-# Verification procedure
-proc tkFDialog_VerifyFileName { w fname } {
-    upvar #0 [winfo name $w] data
+# Gets called when user presses Return in the "File name" entry.
+#
+proc ::tk::dialog::file::ActivateEnt {w} {
+    upvar ::tk::dialog::file::[winfo name $w] data
 
-    set list [tkFDialogResolveFile $data(selectPath) $fname \
+    set text [string trim [$data(ent) get]]
+    set list [::tk::dialog::file::ResolveFile $data(selectPath) $text \
 		  $data(-defaultextension)]
     set flag [lindex $list 0]
     set path [lindex $list 1]
     set file [lindex $list 2]
 
-    case $flag {
+    switch -- $flag {
 	OK {
-	    if {![string compare $file ""]} {
-	        tkFDialog_SetPathSilently $w [file dirname $path]
-	        # CYGNUS LOCAL: handle choosedir
-	        if {$data(-choosedir)} {
-		    if {$data(-multiple)} {
-		        lappend data(selectFile) [file tail $path]
-		    } else {
-		        set data(selectFile) [file tail $path]
-		    }
-		  tkFDialog_Done $w
-		} else {
-		    # user has entered an existing (sub)directory
-		    set data(selectPath) $path
-		    $data(ent) delete 0 end
-		}
+	    if {[string equal $file ""]} {
+		# user has entered an existing (sub)directory
+		set data(selectPath) $path
+		$data(ent) delete 0 end
 	    } else {
-		tkFDialog_SetPathSilently $w $path
-		if {$data(-multiple)} {
-		    lappend data(selectFile) $file
-		} else {
-		    set data(selectFile) $file
-		}
-		tkFDialog_Done $w
+		::tk::dialog::file::SetPathSilently $w $path
+		set data(selectFile) $file
+		::tk::dialog::file::Done $w
 	    }
 	}
 	PATTERN {
@@ -1440,79 +1312,54 @@ proc tkFDialog_VerifyFileName { w fname } {
 	    set data(filter) $file
 	}
 	FILE {
-	    if {![string compare $data(type) open]} {
-		tk_messageBox -icon warning -type ok -parent $data(-parent) \
+	    if {[string equal $data(type) open]} {
+		tk_messageBox -icon warning -type ok -parent $w \
 		    -message "File \"[file join $path $file]\" does not exist."
-		$data(ent) select from 0
-		$data(ent) select to   end
+		$data(ent) selection range 0 end
 		$data(ent) icursor end
 	    } else {
-		tkFDialog_SetPathSilently $w $path
-		if {$data(-multiple)} {
-		    lappend data(selectFile) $file
-		} else {
-		    set data(selectFile) $file
-		}
-		tkFDialog_Done $w
+		::tk::dialog::file::SetPathSilently $w $path
+		set data(selectFile) $file
+		::tk::dialog::file::Done $w
 	    }
 	}
 	PATH {
-	    tk_messageBox -icon warning -type ok -parent $data(-parent) \
+	    tk_messageBox -icon warning -type ok -parent $w \
 		-message "Directory \"$path\" does not exist."
-	    $data(ent) select from 0
-	    $data(ent) select to   end
+	    $data(ent) selection range 0 end
 	    $data(ent) icursor end
 	}
 	CHDIR {
-	    tk_messageBox -type ok -parent $data(-parent) -message \
+	    tk_messageBox -type ok -parent $w -message \
 	       "Cannot change to the directory \"$path\".\nPermission denied."\
 		-icon warning
-	    $data(ent) select from 0
-	    $data(ent) select to   end
+	    $data(ent) selection range 0 end
 	    $data(ent) icursor end
 	}
 	ERROR {
-	    tk_messageBox -type ok -parent $data(-parent) -message \
+	    tk_messageBox -type ok -parent $w -message \
 	       "Invalid file name \"$path\"."\
 		-icon warning
-	    $data(ent) select from 0
-	    $data(ent) select to   end
+	    $data(ent) selection range 0 end
 	    $data(ent) icursor end
 	}
-    }
-}
-
-# Gets called when user presses Return in the "File name" entry.
-#
-proc tkFDialog_ActivateEnt {w} {
-    upvar #0 [winfo name $w] data
-
-    #set text [string trim [$data(ent) get]]
-    set text [$data(ent) get]
-    if {$data(-multiple)} {
-	set data(selectFile) ""
-	foreach fname $text {
-	    tkFDialog_VerifyFileName $w $fname
-	}
-    } else {
-	tkFDialog_VerifyFileName $w $text
     }
 }
 
 # Gets called when user presses the Alt-s or Alt-o keys.
 #
-proc tkFDialog_InvokeBtn {w key} {
-    upvar #0 [winfo name $w] data
+proc ::tk::dialog::file::InvokeBtn {w key} {
+    upvar ::tk::dialog::file::[winfo name $w] data
 
-    if {![string compare [$data(okBtn) cget -text] $key]} {
+    if {[string equal [$data(okBtn) cget -text] $key]} {
 	tkButtonInvoke $data(okBtn)
     }
 }
 
 # Gets called when user presses the "parent directory" button
 #
-proc tkFDialog_UpDirCmd {w} {
-    upvar #0 [winfo name $w] data
+proc ::tk::dialog::file::UpDirCmd {w} {
+    upvar ::tk::dialog::file::[winfo name $w] data
 
     if {[string compare $data(selectPath) "/"]} {
 	set data(selectPath) [file dirname $data(selectPath)]
@@ -1522,7 +1369,7 @@ proc tkFDialog_UpDirCmd {w} {
 # Join a file name to a path name. The "file join" command will break
 # if the filename begins with ~
 #
-proc tkFDialog_JoinFile {path file} {
+proc ::tk::dialog::file::JoinFile {path file} {
     if {[string match {~*} $file] && [file exists $path/$file]} {
 	return [file join $path ./$file]
     } else {
@@ -1534,28 +1381,25 @@ proc tkFDialog_JoinFile {path file} {
 
 # Gets called when user presses the "OK" button
 #
-proc tkFDialog_OkCmd {w} {
-    upvar #0 [winfo name $w] data
+proc ::tk::dialog::file::OkCmd {w} {
+    upvar ::tk::dialog::file::[winfo name $w] data
 
     set text [tkIconList_Get $data(icons)]
     if {[string compare $text ""]} {
-	if {!$data(-multiple)} {
-	    set file [tkFDialog_JoinFile $data(selectPath) $text]
-	    # CYGNUS LOCAL: handle choosedir
-	    if {!$data(-choosedir) && [file isdirectory $file]} {
-		tkFDialog_ListInvoke $w $text
-		return
-	    }
+	set file [::tk::dialog::file::JoinFile $data(selectPath) $text]
+	if {[file isdirectory $file]} {
+	    ::tk::dialog::file::ListInvoke $w $text
+	    return
 	}
     }
 
-    tkFDialog_ActivateEnt $w
+    ::tk::dialog::file::ActivateEnt $w
 }
 
 # Gets called when user presses the "Cancel" button
 #
-proc tkFDialog_CancelCmd {w} {
-    upvar #0 [winfo name $w] data
+proc ::tk::dialog::file::CancelCmd {w} {
+    upvar ::tk::dialog::file::[winfo name $w] data
     global tkPriv
 
     set tkPriv(selectFilePath) ""
@@ -1564,49 +1408,48 @@ proc tkFDialog_CancelCmd {w} {
 # Gets called when user browses the IconList widget (dragging mouse, arrow
 # keys, etc)
 #
-proc tkFDialog_ListBrowse {w text} {
-    upvar #0 [winfo name $w] data
+proc ::tk::dialog::file::ListBrowse {w text} {
+    upvar ::tk::dialog::file::[winfo name $w] data
 
-    if {$text == ""} {
+    if {[string equal $text ""]} {
 	return
     }
 
-    set file [tkFDialog_JoinFile $data(selectPath) $text]
-    # CYGNUS LOCAL: handle choosedir
-    if {$data(-choosedir) || ![file isdirectory $file]} {
+    set file [::tk::dialog::file::JoinFile $data(selectPath) $text]
+    if {![file isdirectory $file]} {
 	$data(ent) delete 0 end
 	$data(ent) insert 0 $text
 
-	if {![string compare $data(type) open]} {
-	    $data(okBtn) config -text "Open"
-	} else {
-	    $data(okBtn) config -text "Save"
+	if { [string equal [winfo class $w] TkFDialog] } {
+	    if {[string equal $data(type) open]} {
+		$data(okBtn) config -text "Open"
+	    } else {
+		$data(okBtn) config -text "Save"
+	    }
 	}
     } else {
-	$data(okBtn) config -text "Open"
+	if { [string equal [winfo class $w] TkFDialog] } {
+	    $data(okBtn) config -text "Open"
+	}
     }
 }
 
 # Gets called when user invokes the IconList widget (double-click, 
 # Return key, etc)
 #
-proc tkFDialog_ListInvoke {w text} {
-    upvar #0 [winfo name $w] data
+proc ::tk::dialog::file::ListInvoke {w text} {
+    upvar ::tk::dialog::file::[winfo name $w] data
 
-    if {$text == ""} {
+    if {[string equal $text ""]} {
 	return
     }
 
-    if {$data(-multiple)} {
-	set file [tkFDialog_JoinFile $data(selectPath) [lindex $text 0]]
-    } else {
-	set file [tkFDialog_JoinFile $data(selectPath) $text]
-    }
-
-    if {[file isdirectory $file]} {
+    set file [::tk::dialog::file::JoinFile $data(selectPath) $text]
+    set class [winfo class $w]
+    if {[string equal $class TkChooseDir] || [file isdirectory $file]} {
 	set appPWD [pwd]
 	if {[catch {cd $file}]} {
-	    tk_messageBox -type ok -parent $data(-parent) -message \
+	    tk_messageBox -type ok -parent $w -message \
 	       "Cannot change to the directory \"$file\".\nPermission denied."\
 		-icon warning
 	} else {
@@ -1614,16 +1457,12 @@ proc tkFDialog_ListInvoke {w text} {
 	    set data(selectPath) $file
 	}
     } else {
-    	if {$data(-multiple)} {
-	    set data(selectFile) [list $file]
-	} else {
-	    set data(selectFile) $file
-	}
-	tkFDialog_Done $w
+	set data(selectFile) $file
+	::tk::dialog::file::Done $w
     }
 }
 
-# tkFDialog_Done --
+# ::tk::dialog::file::Done --
 #
 #	Gets called when user has input a valid filename.  Pops up a
 #	dialog box to confirm selection when necessary. Sets the
@@ -1631,33 +1470,24 @@ proc tkFDialog_ListInvoke {w text} {
 #	loop in tkFDialog and return the selected filename to the
 #	script that calls tk_getOpenFile or tk_getSaveFile
 #
-proc tkFDialog_Done {w {selectFilePath ""}} {
-    upvar #0 [winfo name $w] data
+proc ::tk::dialog::file::Done {w {selectFilePath ""}} {
+    upvar ::tk::dialog::file::[winfo name $w] data
     global tkPriv
 
-    if {![string compare $selectFilePath ""]} {
-	if {$data(-multiple)} {
-	    set selectFilePath {}
-	    foreach f $data(selectFile) {
-		lappend selectFilePath [file join $data(selectPath) $f]
-	    }
-	} else {
-	    set selectFilePath [tkFDialog_JoinFile $data(selectPath) \
-		    $data(selectFile)]
-	}
+    if {[string equal $selectFilePath ""]} {
+	set selectFilePath [::tk::dialog::file::JoinFile $data(selectPath) \
+		$data(selectFile)]
 	set tkPriv(selectFile)     $data(selectFile)
 	set tkPriv(selectPath)     $data(selectPath)
 
-	if {[file exists $selectFilePath] && 
-	    ![string compare $data(type) save]} {
-
-		set reply [tk_messageBox -icon warning -type yesno\
-			-parent $data(-parent) -message "File\
-			\"$selectFilePath\" already exists.\nDo\
-			you want to overwrite it?"]
-		if {![string compare $reply "no"]} {
-		    return
-		}
+	if {[file exists $selectFilePath] && [string equal $data(type) save]} {
+	    set reply [tk_messageBox -icon warning -type yesno\
+		    -parent $w -message "File\
+		    \"$selectFilePath\" already exists.\nDo\
+		    you want to overwrite it?"]
+	    if {[string equal $reply "no"]} {
+		return
+	    }
 	}
     }
     set tkPriv(selectFilePath) $selectFilePath

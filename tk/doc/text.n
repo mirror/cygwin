@@ -324,6 +324,11 @@ option to give a 3-D appearance to the background for characters;
 it is ignored unless the \fB\-background\fR option
 has been set for the tag.
 .TP
+\fB\-elide \fIboolean\fR
+\fIElide\fR specifies whether the data should be elided.
+Elided data is not displayed and takes no space on screen, but further
+on behaves just as normal data.
+.TP
 \fB\-fgstipple \fIbitmap\fR
 \fIBitmap\fR specifies a bitmap that is used as a stipple pattern
 when drawing text and other foreground information such as
@@ -501,8 +506,8 @@ If a mark has left gravity, then the mark is treated as if it
 were attached to the character on its left, so the mark will
 remain to the left of any text inserted at the mark position.
 If the mark has right gravity, new text inserted at the mark
-position will appear to the right of the mark.  The gravity
-for a mark defaults to \fBright\fR.
+position will appear to the left of the mark (so that the mark
+remains rightmost).  The gravity for a mark defaults to \fBright\fR.
 .PP
 The name space for marks is different from that for tags:  the
 same name may be used for both a mark and a tag, but they will refer
@@ -820,7 +825,7 @@ One or more of the following switches (or abbreviations thereof)
 may be specified to control the dump:
 .TP
 \fB\-all\fR
-Return information about all elements: text, marks, tags, and windows.
+Return information about all elements: text, marks, tags, images and windows.
 This is the default.
 .TP
 \fB\-command \fIcommand\fR
@@ -829,13 +834,16 @@ invoke the \fIcommand\fR on each element of the text widget within the range.
 The command has three arguments appended to it before it is evaluated:
 the \fIkey\fP, \fIvalue\fP, and \fIindex\fP.
 .TP
+\fB\-image\fR
+Include information about images in the dump results.
+.TP
 \fB\-mark\fR
 Include information about marks in the dump results.
 .TP
 \fB\-tag\fR
-Include information about tag transitions in the dump results. Tag information is
-returned as \fBtagon\fP and \fBtagoff\fP elements that indicate the
-begin and end of each range of each tag, respectively.
+Include information about tag transitions in the dump results. Tag
+information is returned as \fBtagon\fP and \fBtagoff\fP elements that
+indicate the begin and end of each range of each tag, respectively.
 .TP
 \fB\-text\fR
 Include information about text in the dump results.  The value is the
@@ -1052,8 +1060,15 @@ Ignore case differences between the pattern and the text.
 .TP
 \fB\-count\fI varName\fR
 The argument following \fB\-count\fR gives the name of a variable;
-if a match is found, the number of characters in the matching
-range will be stored in the variable.
+if a match is found, the number of index positions between beginning and
+end of the matching range will be stored in the variable.  If there are no
+embedded images or windows in the matching range, this is equivalent to the
+number of characters matched.  In either case, the range \fImatchIdx\fR to
+\fImatchIdx + $count chars\fR will return the entire matched text.
+.TP
+\fB\-elide\fR
+Find elidden (hidden) text as well. By default only displayed text is
+searched.
 .TP
 \fB\-\|\-\fR
 This switch has no effect except to terminate the list of switches:
@@ -1430,9 +1445,8 @@ This command used to be used for scrolling, but now it is obsolete.
 .PP
 Tk automatically creates class bindings for texts that give them
 the following default behavior.
-In the descriptions below, ``word'' refers to a contiguous group
-of letters, digits, or ``_'' characters, or any single character
-other than these.
+In the descriptions below, ``word'' is dependent on the value of
+the \fBtcl_wordchars\fR variable.  See tclvars(n).
 .IP [1]
 Clicking mouse button 1 positions the insertion cursor
 just before the character underneath the mouse cursor, sets the
@@ -1619,3 +1633,4 @@ cursor blinks, which causes a steady stream of graphics traffic.
 Set the \fBinsertOffTime\fP attribute to 0 avoid this.
 .SH KEYWORDS
 text, widget
+

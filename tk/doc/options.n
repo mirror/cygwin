@@ -278,7 +278,8 @@ particular widget and may be determined by other options, such as
 \fBanchor\fR or \fBjustify\fR.
 .OP \-troughcolor troughColor Background
 Specifies the color to use for the rectangular trough areas
-in widgets such as scrollbars and scales.
+in widgets such as scrollbars and scales.  This option is ignored for
+scrollbars on Windows (native widget doesn't recognize this option).
 .OP \-underline underline Underline
 Specifies the integer index of a character to underline in the widget.
 This option is used by the default bindings to implement keyboard
@@ -326,3 +327,4 @@ on how this option is used.
 
 .SH KEYWORDS
 class, name, standard option, switch
+

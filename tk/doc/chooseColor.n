@@ -47,3 +47,4 @@ button .b \-fg [tk_chooseColor \-initialcolor gray \-title "Choose color"]
 
 .SH KEYWORDS
 color selection dialog
+

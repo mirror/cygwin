@@ -8,7 +8,7 @@
  *	files.
  *
  * Copyright (c) 1991-1994 The Regents of the University of California.
- * Copyright (c) 1994-1995 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1997 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -20,12 +20,64 @@
 #include "tkPort.h"
 
 /*
- * The hash table below is used to keep track of all the Tk_Uids created
- * so far.
+ * One of these structures is created per thread to store 
+ * thread-specific data.  In this case, it is used to house the 
+ * Tk_Uid structs used by each thread.  The "dataKey" below is 
+ * used to locate the ThreadSpecificData for the current thread.
  */
 
-static Tcl_HashTable uidTable;
-static int initialized = 0;
+typedef struct ThreadSpecificData {
+    int initialized;
+    Tcl_HashTable uidTable;
+} ThreadSpecificData;
+static Tcl_ThreadDataKey dataKey;
+
+/*
+ * The following tables defines the string values for reliefs, which are
+ * used by Tk_GetAnchorFromObj and Tk_GetJustifyFromObj.
+ */
+
+static char *anchorStrings[] = {"n", "ne", "e", "se", "s", "sw", "w", "nw",
+	"center", (char *) NULL};
+static char *justifyStrings[] = {"left", "right", "center", (char *) NULL};
+
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Tk_GetAnchorFromObj --
+ *
+ *	Return a Tk_Anchor value based on the value of the objPtr.
+ *
+ * Results:
+ *	The return value is a standard Tcl result. If an error occurs during
+ *	conversion, an error message is left in the interpreter's result
+ *	unless "interp" is NULL.
+ *
+ * Side effects:
+ *	The object gets converted by Tcl_GetIndexFromObj.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+Tk_GetAnchorFromObj(interp, objPtr, anchorPtr)
+    Tcl_Interp *interp;		/* Used for error reporting. */
+    Tcl_Obj *objPtr;		/* The object we are trying to get the 
+				 * value from. */
+    Tk_Anchor *anchorPtr;	/* Where to place the Tk_Anchor that
+				 * corresponds to the string value of
+				 * objPtr. */
+{
+    int index, code;
+
+    code = Tcl_GetIndexFromObj(interp, objPtr, anchorStrings, "anchor", 0, 
+	    &index);
+    if (code == TCL_OK) {
+	*anchorPtr = (Tk_Anchor) index;
+    }
+    return code;
+}
 
 /*
  *--------------------------------------------------------------
@@ -39,7 +91,7 @@ static int initialized = 0;
  *	TCL_OK is returned, then everything went well and the
  *	position is stored at *anchorPtr;  otherwise TCL_ERROR
  *	is returned and an error message is left in
- *	interp->result.
+ *	the interp's result.
  *
  * Side effects:
  *	None.
@@ -148,14 +200,14 @@ Tk_NameOfAnchor(anchor)
  *
  * Tk_GetJoinStyle --
  *
- *	Given a string, return the corresponding Tk_JoinStyle.
+ *	Given a string, return the corresponding Tk JoinStyle.
  *
  * Results:
  *	The return value is a standard Tcl return result.  If
  *	TCL_OK is returned, then everything went well and the
  *	justification is stored at *joinPtr;  otherwise
  *	TCL_ERROR is returned and an error message is left in
- *	interp->result.
+ *	the interp's result.
  *
  * Side effects:
  *	None.
@@ -200,7 +252,7 @@ Tk_GetJoinStyle(interp, string, joinPtr)
  *
  * Tk_NameOfJoinStyle --
  *
- *	Given a Tk_JoinStyle, return the string that corresponds
+ *	Given a Tk JoinStyle, return the string that corresponds
  *	to it.
  *
  * Results:
@@ -230,14 +282,14 @@ Tk_NameOfJoinStyle(join)
  *
  * Tk_GetCapStyle --
  *
- *	Given a string, return the corresponding Tk_CapStyle.
+ *	Given a string, return the corresponding Tk CapStyle.
  *
  * Results:
  *	The return value is a standard Tcl return result.  If
  *	TCL_OK is returned, then everything went well and the
  *	justification is stored at *capPtr;  otherwise
  *	TCL_ERROR is returned and an error message is left in
- *	interp->result.
+ *	the interp's result.
  *
  * Side effects:
  *	None.
@@ -282,7 +334,7 @@ Tk_GetCapStyle(interp, string, capPtr)
  *
  * Tk_NameOfCapStyle --
  *
- *	Given a Tk_CapStyle, return the string that corresponds
+ *	Given a Tk CapStyle, return the string that corresponds
  *	to it.
  *
  * Results:
@@ -308,6 +360,43 @@ Tk_NameOfCapStyle(cap)
 }
 
 /*
+ *----------------------------------------------------------------------
+ *
+ * Tk_GetJustifyFromObj --
+ *
+ *	Return a Tk_Justify value based on the value of the objPtr.
+ *
+ * Results:
+ *	The return value is a standard Tcl result. If an error occurs during
+ *	conversion, an error message is left in the interpreter's result
+ *	unless "interp" is NULL.
+ *
+ * Side effects:
+ *	The object gets converted by Tcl_GetIndexFromObj.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+Tk_GetJustifyFromObj(interp, objPtr, justifyPtr)
+    Tcl_Interp *interp;		/* Used for error reporting. */
+    Tcl_Obj *objPtr;		/* The object we are trying to get the 
+				 * value from. */
+    Tk_Justify *justifyPtr;	/* Where to place the Tk_Justify that
+				 * corresponds to the string value of
+				 * objPtr. */
+{
+    int index, code;
+
+    code = Tcl_GetIndexFromObj(interp, objPtr, justifyStrings,
+	    "justification", 0, &index);
+    if (code == TCL_OK) {
+	*justifyPtr = (Tk_Justify) index;
+    }
+    return code;
+}
+
+/*
  *--------------------------------------------------------------
  *
  * Tk_GetJustify --
@@ -319,7 +408,7 @@ Tk_NameOfCapStyle(cap)
  *	TCL_OK is returned, then everything went well and the
  *	justification is stored at *justifyPtr;  otherwise
  *	TCL_ERROR is returned and an error message is left in
- *	interp->result.
+ *	the interp's result.
  *
  * Side effects:
  *	None.
@@ -417,13 +506,16 @@ Tk_GetUid(string)
     CONST char *string;		/* String to convert. */
 {
     int dummy;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+    Tcl_HashTable *tablePtr = &tsdPtr->uidTable;
 
-    if (!initialized) {
-	Tcl_InitHashTable(&uidTable, TCL_STRING_KEYS);
-	initialized = 1;
+    if (!tsdPtr->initialized) {
+	Tcl_InitHashTable(tablePtr, TCL_STRING_KEYS);
+	tsdPtr->initialized = 1;
     }
-    return (Tk_Uid) Tcl_GetHashKey(&uidTable,
-	    Tcl_CreateHashEntry(&uidTable, string, &dummy));
+    return (Tk_Uid) Tcl_GetHashKey(tablePtr,
+	    Tcl_CreateHashEntry(tablePtr, string, &dummy));
 }
 
 /*
@@ -439,7 +531,7 @@ Tk_GetUid(string)
  *	TCL_OK is returned, then everything went well and the
  *	screen distance is stored at *doublePtr;  otherwise
  *	TCL_ERROR is returned and an error message is left in
- *	interp->result.
+ *	the interp's result.
  *
  * Side effects:
  *	None.
@@ -515,7 +607,7 @@ Tk_GetScreenMM(interp, tkwin, string, doublePtr)
  *	TCL_OK is returned, then everything went well and the
  *	rounded pixel distance is stored at *intPtr;  otherwise
  *	TCL_ERROR is returned and an error message is left in
- *	interp->result.
+ *	the interp's result.
  *
  * Side effects:
  *	None.
@@ -529,13 +621,56 @@ Tk_GetPixels(interp, tkwin, string, intPtr)
     Tk_Window tkwin;		/* Window whose screen determines conversion
 				 * from centimeters and other absolute
 				 * units. */
-    char *string;		/* String describing a justification style. */
+    char *string;		/* String describing a number of pixels. */
     int *intPtr;		/* Place to store converted result. */
+{
+    double d;
+
+    if (TkGetDoublePixels(interp, tkwin, string, &d) != TCL_OK) {
+	return TCL_ERROR;
+    }
+
+    if (d < 0) {
+	*intPtr = (int) (d - 0.5);
+    } else {
+	*intPtr = (int) (d + 0.5);
+    }
+    return TCL_OK;
+}
+/*
+ *--------------------------------------------------------------
+ *
+ * TkGetDoublePixels --
+ *
+ *	Given a string, returns the number of pixels corresponding
+ *	to that string.
+ *
+ * Results:
+ *	The return value is a standard Tcl return result.  If
+ *	TCL_OK is returned, then everything went well and the
+ *	pixel distance is stored at *doublePtr;  otherwise
+ *	TCL_ERROR is returned and an error message is left in
+ *	interp->result.
+ *
+ * Side effects:
+ *	None.
+ *
+ *--------------------------------------------------------------
+ */
+
+int
+TkGetDoublePixels(interp, tkwin, string, doublePtr)
+    Tcl_Interp *interp;		/* Use this for error reporting. */
+    Tk_Window tkwin;		/* Window whose screen determines conversion
+				 * from centimeters and other absolute
+				 * units. */
+    CONST char *string;		/* String describing a number of pixels. */
+    double *doublePtr;		/* Place to store converted result. */
 {
     char *end;
     double d;
 
-    d = strtod(string, &end);
+    d = strtod((char *) string, &end);
     if (end == string) {
 	error:
 	Tcl_AppendResult(interp, "bad screen distance \"", string,
@@ -577,10 +712,9 @@ Tk_GetPixels(interp, tkwin, string, intPtr)
     if (*end != 0) {
 	goto error;
     }
-    if (d < 0) {
-	*intPtr = (int) (d - 0.5);
-    } else {
-	*intPtr = (int) (d + 0.5);
-    }
+    *doublePtr = d;
     return TCL_OK;
 }
+
+
+

@@ -7,7 +7,7 @@
  *	to the window manager.
  *
  * Copyright (c) 1995-1997 Sun Microsystems, Inc.
- * Copyright (c) 1998 by Scriptics Corporation.
+ * Copyright (c) 1998-2000 by Scriptics Corporation.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -164,6 +164,7 @@ typedef struct TkWmInfo {
     char *clientMachine;	/* String to store in WM_CLIENT_MACHINE
 				 * property, or NULL. */
     int flags;			/* Miscellaneous flags, defined below. */
+    int numTransients;		/* number of transients on this window */
     struct TkWmInfo *nextPtr;	/* Next in list of all top-level windows. */
 } WmInfo;
 
@@ -183,7 +184,7 @@ typedef struct TkWmInfo {
  *				pixels up from bottom of screen, rather than
  *				down from top.
  * WM_UPDATE_SIZE_HINTS -	non-zero means that new size hints need to be
- *				propagated to window manager.
+ *				propagated to window manager. Not used on Win.
  * WM_SYNC_PENDING -		set to non-zero while waiting for the window
  *				manager to respond to some state change.
  * WM_MOVE_PENDING -		non-zero means the application has requested
@@ -223,33 +224,8 @@ typedef struct TkWmInfo {
 
 #define WM_TRANSIENT_STYLE \
 		(WS_POPUP|WS_CAPTION|WS_SYSMENU|WS_CLIPSIBLINGS|CS_DBLCLKS)
-/* CYGNUS LOCAL: We don't want WS_EX_TOOLWINDOW for most of our
-   transient windows.  If necessary, we can add some option to set
-   this.
-   #define EX_TRANSIENT_STYLE (WS_EX_TOOLWINDOW | WS_EX_DLGMODALFRAME)
-   We also don't use WS_EX_DLGMODALFRAME.  Using this doesn't give any
-   obvious benefit.  However, it does have a drawback: if the window
-   is marked as not resizable, then use of WS_EX_DLGMODALFRAME will
-   cause the resize items on the window's system menu to remain
-   active.  No, I don't understand.
-   */
-#define EX_TRANSIENT_STYLE (0)
-
-/*
- * This module keeps a list of all top-level windows.
- */
-
-static WmInfo *firstWmPtr = NULL;	/* Points to first top-level window. */
-static WmInfo *foregroundWmPtr = NULL; /* Points to the foreground window. */
-
-/*
- * The variable below is used to enable or disable tracing in this
- * module.  If tracing is enabled, then information is printed on
- * standard output about interesting interactions with the window
- * manager.
- */
-
-static int wmTracing = 0;
+#define EX_TRANSIENT_STYLE \
+		(WS_EX_TOOLWINDOW|WS_EX_DLGMODALFRAME)
 
 /*
  * The following structure is the official type record for geometry
@@ -264,41 +240,36 @@ static Tk_GeomMgr wmMgrType = {
     (Tk_GeomLostSlaveProc *) NULL,	/* lostSlaveProc */
 };
 
-/*
- * Global system palette.  This value always refers to the currently
- * installed foreground logical palette.
- */
-
-static HPALETTE systemPalette = NULL;
-
-/*
- * Window that is being constructed.  This value is set immediately
- * before a call to CreateWindowEx, and is used by SetLimits.
- * This is a gross hack needed to work around Windows brain damage
- * where it sends the WM_GETMINMAXINFO message before the WM_CREATE
- * window.
- */
-
-static TkWindow *createWindow = NULL;
-
-/*
- * Flag indicating whether this module has been initialized yet.
- */
-
-static int initialized = 0;
+typedef struct ThreadSpecificData {
+    HPALETTE systemPalette;      /* System palette; refers to the 
+				  * currently installed foreground logical
+				  * palette. */
+    TkWindow *createWindow;      /* Window that is being constructed.  This
+				  * value is set immediately before a
+				  * call to CreateWindowEx, and is used
+				  * by SetLimits.  This is a gross hack
+				  * needed to work around Windows brain
+				  * damage where it sends the
+				  * WM_GETMINMAXINFO message before the
+				  * WM_CREATE window. */
+    int initialized;             /* Flag indicating whether thread-
+				  * specific elements of module have 
+				  * been initialized. */
+    int firstWindow;             /* Flag, cleared when the first window
+				  * is mapped in a non-iconic state. */
+} ThreadSpecificData;
+static Tcl_ThreadDataKey dataKey;
 
 /*
- * Class for toplevel windows.
+ * The following variables cannot be placed in thread local storage
+ * because they must be shared across threads.
  */
 
-static WNDCLASS toplevelClass;
+static WNDCLASS toplevelClass; /* Class for toplevel windows. */
+static int initialized;        /* Flag indicating whether module has
+				* been initialized. */
+TCL_DECLARE_MUTEX(winWmMutex)
 
-/*
- * This flag is cleared when the first window is mapped in a non-iconic
- * state.
- */
-
-static int firstWindow = 1;
 
 /*
  * Forward declarations for procedures defined in this file:
@@ -323,7 +294,8 @@ static void		InvalidateSubTree _ANSI_ARGS_((TkWindow *winPtr,
 			    Colormap colormap));
 static int		ParseGeometry _ANSI_ARGS_((Tcl_Interp *interp,
 			    char *string, TkWindow *winPtr));
-static void		RefreshColormap _ANSI_ARGS_((Colormap colormap));
+static void		RefreshColormap _ANSI_ARGS_((Colormap colormap,
+	                    TkDisplay *dispPtr));
 static void		SetLimits _ANSI_ARGS_((HWND hwnd, MINMAXINFO *info));
 static LRESULT CALLBACK	TopLevelProc _ANSI_ARGS_((HWND hwnd, UINT message,
 			    WPARAM wParam, LPARAM lParam));
@@ -336,6 +308,8 @@ static void		UpdateGeometryInfo _ANSI_ARGS_((
 static void		UpdateWrapper _ANSI_ARGS_((TkWindow *winPtr));
 static LRESULT CALLBACK	WmProc _ANSI_ARGS_((HWND hwnd, UINT message,
 			    WPARAM wParam, LPARAM lParam));
+static void		WmWaitVisibilityProc _ANSI_ARGS_((
+			    ClientData clientData, XEvent *eventPtr));
 
 /*
  *----------------------------------------------------------------------
@@ -356,28 +330,49 @@ static LRESULT CALLBACK	WmProc _ANSI_ARGS_((HWND hwnd, UINT message,
 static void
 InitWm(void)
 {
-    if (initialized) {
-        return;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+    WNDCLASS * classPtr;
+
+    if (! tsdPtr->initialized) {
+	tsdPtr->initialized = 1;
+	tsdPtr->firstWindow = 1;
     }
-    initialized = 1;
+    if (! initialized) {
+	Tcl_MutexLock(&winWmMutex);
+	if (! initialized) {
+	    initialized = 1;
+	    classPtr = &toplevelClass;
 
-    toplevelClass.style = CS_HREDRAW | CS_VREDRAW | CS_CLASSDC;
-    toplevelClass.cbClsExtra = 0;
-    toplevelClass.cbWndExtra = 0;
-    toplevelClass.hInstance = Tk_GetHINSTANCE();
-    toplevelClass.hbrBackground = NULL;
-    toplevelClass.lpszMenuName = NULL;
-    toplevelClass.lpszClassName = TK_WIN_TOPLEVEL_CLASS_NAME;
-    toplevelClass.lpfnWndProc = WmProc;
-    /* CYGNUS LOCAL: First try the application's resource file.  If
-       that fails, then try the Tk DLL.  */
-    toplevelClass.hIcon = LoadIcon (GetModuleHandle (NULL), "tk");
-    if (toplevelClass.hIcon == NULL)
-	toplevelClass.hIcon = LoadIcon(Tk_GetHINSTANCE(), "tk");
-    toplevelClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    /*
+     * When threads are enabled, we cannot use CLASSDC because
+     * threads will then write into the same device context.
+     * 
+     * This is a hack; we should add a subsystem that manages
+     * device context on a per-thread basis.  See also tkWinX.c,
+     * which also initializes a WNDCLASS structure.
+     */
 
-    if (!RegisterClass(&toplevelClass)) {
-	panic("Unable to register TkTopLevel class");
+#ifdef TCL_THREADS
+	    classPtr->style = CS_HREDRAW | CS_VREDRAW;
+#else
+	    classPtr->style = CS_HREDRAW | CS_VREDRAW | CS_CLASSDC;
+#endif
+	    classPtr->cbClsExtra = 0;
+	    classPtr->cbWndExtra = 0;
+	    classPtr->hInstance = Tk_GetHINSTANCE();
+	    classPtr->hbrBackground = NULL;
+	    classPtr->lpszMenuName = NULL;
+	    classPtr->lpszClassName = TK_WIN_TOPLEVEL_CLASS_NAME;
+	    classPtr->lpfnWndProc = WmProc;
+	    classPtr->hIcon = LoadIcon(Tk_GetHINSTANCE(), "tk");
+	    classPtr->hCursor = LoadCursor(NULL, IDC_ARROW);
+
+	    if (!RegisterClass(classPtr)) {
+		panic("Unable to register TkTopLevel class");
+	    }
+	}
+	Tcl_MutexUnlock(&winWmMutex);
     }
 }
 
@@ -402,14 +397,17 @@ static TkWindow *
 GetTopLevel(hwnd)
     HWND hwnd;
 {
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+
     /*
      * If this function is called before the CreateWindowEx call
      * has completed, then the user data slot will not have been
      * set yet, so we use the global createWindow variable.
      */
 
-    if (createWindow) {
-	return createWindow;
+    if (tsdPtr->createWindow) {
+	return tsdPtr->createWindow;
     }
     return (TkWindow *) GetWindowLong(hwnd, GWL_USERDATA);
 }
@@ -523,10 +521,26 @@ void
 TkWinWmCleanup(hInstance)
     HINSTANCE hInstance;
 {
-    if (!initialized) {
+    ThreadSpecificData *tsdPtr;
+
+    /*
+     * If we're using stubs to access the Tcl library, and they
+     * haven't been initialized, we can't call Tcl_GetThreadData.
+     */
+
+#ifdef USE_TCL_STUBS
+    if (tclStubsPtr == NULL) {
         return;
     }
-    initialized = 0;
+#endif
+
+    tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+
+    if (!tsdPtr->initialized) {
+        return;
+    }
+    tsdPtr->initialized = 0;
     
     UnregisterClass(TK_WIN_TOPLEVEL_CLASS_NAME, hInstance);
 }
@@ -602,6 +616,7 @@ TkWmNewWindow(winPtr)
     
     wmPtr->cmapList = NULL;
     wmPtr->cmapCount = 0;
+    wmPtr->numTransients = 0;
 
     wmPtr->configWidth = -1;
     wmPtr->configHeight = -1;
@@ -609,8 +624,8 @@ TkWmNewWindow(winPtr)
     wmPtr->cmdArgv = NULL;
     wmPtr->clientMachine = NULL;
     wmPtr->flags = WM_NEVER_MAPPED;
-    wmPtr->nextPtr = firstWmPtr;
-    firstWmPtr = wmPtr;
+    wmPtr->nextPtr = winPtr->dispPtr->firstWmPtr;
+    winPtr->dispPtr->firstWmPtr = wmPtr;
 
     /*
      * Tk must monitor structure events for top-level windows, in order
@@ -657,9 +672,13 @@ UpdateWrapper(winPtr)
     HWND child = TkWinGetHWND(winPtr->window);
     int x, y, width, height, state;
     WINDOWPLACEMENT place;
+    Tcl_DString titleString;
+    int *childStateInfo = NULL;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
     parentHWND = NULL;
-    child = TkWinGetHWND(winPtr->window); 
+    child = TkWinGetHWND(winPtr->window);
 
     if (winPtr->flags & TK_EMBEDDED) {
 	wmPtr->wrapper = (HWND) winPtr->privatePtr;
@@ -675,11 +694,11 @@ UpdateWrapper(winPtr)
 	 * Pick the decorative frame style.  Override redirect windows get
 	 * created as undecorated popups.  Transient windows get a modal
 	 * dialog frame.  Neither override, nor transient windows appear in
-	 * the Win95 taskbar.  Note that a transient window does not resize
+	 * the Windows taskbar.  Note that a transient window does not resize
 	 * by default, so we need to explicitly add the WS_THICKFRAME style
 	 * if we want it to be resizeable.
 	 */
-	
+
 	if (winPtr->atts.override_redirect) {
 	    wmPtr->style = WM_OVERRIDE_STYLE;
 	    wmPtr->exStyle = EX_OVERRIDE_STYLE;
@@ -696,10 +715,8 @@ UpdateWrapper(winPtr)
 	    wmPtr->exStyle = EX_TOPLEVEL_STYLE;
 	}
 
-	/* CYGNUS LOCAL: nonresizable windows have no maximize box,
-	   and no "sizebox".  */
 	if ((wmPtr->flags & WM_WIDTH_NOT_RESIZABLE)
-	    && (wmPtr->flags & WM_HEIGHT_NOT_RESIZABLE)) {
+		&& (wmPtr->flags & WM_HEIGHT_NOT_RESIZABLE)) {
 	    wmPtr->style &= ~ (WS_MAXIMIZEBOX | WS_SIZEBOX);
 	}
 
@@ -720,7 +737,6 @@ UpdateWrapper(winPtr)
 	 * pick a location.
 	 */
 
-   
 	if (!(wmPtr->sizeHintsFlags & (USPosition | PPosition))
 		&& (wmPtr->flags & WM_NEVER_MAPPED)) {
 	    x = CW_USEDEFAULT;
@@ -735,13 +751,15 @@ UpdateWrapper(winPtr)
 	 * to the TkWindow.
 	 */
 
-	createWindow = winPtr;
+	tsdPtr->createWindow = winPtr;
+	Tcl_UtfToExternalDString(NULL, wmPtr->titleUid, -1, &titleString);
 	wmPtr->wrapper = CreateWindowEx(wmPtr->exStyle,
 		TK_WIN_TOPLEVEL_CLASS_NAME,
-		wmPtr->titleUid, wmPtr->style, x, y, width, height,
-		parentHWND, NULL, Tk_GetHINSTANCE(), NULL);
+		Tcl_DStringValue(&titleString), wmPtr->style, x, y, width, 
+		height, parentHWND, NULL, Tk_GetHINSTANCE(), NULL);
+	Tcl_DStringFree(&titleString);
 	SetWindowLong(wmPtr->wrapper, GWL_USERDATA, (LONG) winPtr);
-	createWindow = NULL;
+	tsdPtr->createWindow = NULL;
 
 	place.length = sizeof(WINDOWPLACEMENT);
 	GetWindowPlacement(wmPtr->wrapper, &place);
@@ -767,6 +785,26 @@ UpdateWrapper(winPtr)
 	    && (oldWrapper != GetDesktopWindow())) {
 	SetWindowLong(oldWrapper, GWL_USERDATA, (LONG) NULL);
 
+	if (wmPtr->numTransients > 0) {
+	    /*
+	     * Unset the current wrapper as the parent for all transient
+	     * children for whom this is the master
+	     */
+	    WmInfo *wmPtr2;
+
+	    childStateInfo = (int *)ckalloc((unsigned) wmPtr->numTransients
+		* sizeof(int));
+	    state = 0;
+	    for (wmPtr2 = winPtr->dispPtr->firstWmPtr; wmPtr2 != NULL;
+		 wmPtr2 = wmPtr2->nextPtr) {
+		if (wmPtr2->masterPtr == winPtr) {
+		    if (!(wmPtr2->flags & WM_NEVER_MAPPED)) {
+			childStateInfo[state++] = wmPtr2->hints.initial_state;
+			SetParent(TkWinGetHWND(wmPtr2->winPtr->window), NULL);
+		    }
+		}
+	    }
+	}
 	/*
 	 * Remove the menubar before destroying the window so the menubar
 	 * isn't destroyed.
@@ -775,6 +813,7 @@ UpdateWrapper(winPtr)
 	SetMenu(oldWrapper, NULL);
 	DestroyWindow(oldWrapper);
     }
+
     wmPtr->flags &= ~WM_NEVER_MAPPED;
     SendMessage(wmPtr->wrapper, TK_ATTACHWINDOW, (WPARAM) child, 0);
 
@@ -810,13 +849,35 @@ UpdateWrapper(winPtr)
 	wmPtr->flags &= ~WM_SYNC_PENDING;
     }
 
+    if (childStateInfo) {
+	if (wmPtr->numTransients > 0) {
+	    /*
+	     * Reset all transient children for whom this is the master
+	     */
+	    WmInfo *wmPtr2;
+
+	    state = 0;
+	    for (wmPtr2 = winPtr->dispPtr->firstWmPtr; wmPtr2 != NULL;
+		 wmPtr2 = wmPtr2->nextPtr) {
+		if (wmPtr2->masterPtr == winPtr) {
+		    if (!(wmPtr2->flags & WM_NEVER_MAPPED)) {
+			UpdateWrapper(wmPtr2->winPtr);
+			TkpWmSetState(wmPtr2->winPtr, childStateInfo[state++]);
+		    }
+		}
+	    }
+	}
+
+	ckfree((char *) childStateInfo);
+    }
+
     /*
      * If this is the first window created by the application, then
      * we should activate the initial window.
      */
 
-    if (firstWindow) {
-	firstWindow = 0;
+    if (tsdPtr->firstWindow) {
+	tsdPtr->firstWindow = 0;
 	SetActiveWindow(wmPtr->wrapper);
     }
 }
@@ -850,8 +911,10 @@ TkWmMapWindow(winPtr)
 				 * be mapped. */
 {
     register WmInfo *wmPtr = winPtr->wmInfoPtr;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 
-    if (!initialized) {
+    if (!tsdPtr->initialized) {
 	InitWm();
     }
 
@@ -931,8 +994,9 @@ TkpWmSetState(winPtr, state)
 {
     WmInfo *wmPtr = winPtr->wmInfoPtr;
     int cmd;
-    
-    if (wmPtr->flags & WM_NEVER_MAPPED) {
+
+    if ((wmPtr->flags & WM_NEVER_MAPPED) ||
+	    (wmPtr->masterPtr && !Tk_IsMapped(wmPtr->masterPtr))) {
 	wmPtr->hints.initial_state = state;
 	return;
     }
@@ -947,6 +1011,7 @@ TkpWmSetState(winPtr, state)
     } else if (state == ZoomState) {
 	cmd = SW_SHOWMAXIMIZED;
     }
+
     ShowWindow(wmPtr->wrapper, cmd);
     wmPtr->flags &= ~WM_SYNC_PENDING;
 }
@@ -984,11 +1049,12 @@ TkWmDeadWindow(winPtr)
      * Clean up event related window info.
      */
 
-    if (firstWmPtr == wmPtr) {
-	firstWmPtr = wmPtr->nextPtr;
+    if (winPtr->dispPtr->firstWmPtr == wmPtr) {
+	winPtr->dispPtr->firstWmPtr = wmPtr->nextPtr;
     } else {
 	register WmInfo *prevPtr;
-	for (prevPtr = firstWmPtr; ; prevPtr = prevPtr->nextPtr) {
+	for (prevPtr = winPtr->dispPtr->firstWmPtr; ;
+	     prevPtr = prevPtr->nextPtr) {
 	    if (prevPtr == NULL) {
 		panic("couldn't unlink window in TkWmDeadWindow");
 	    }
@@ -1003,7 +1069,8 @@ TkWmDeadWindow(winPtr)
      * Reset all transient windows whose master is the dead window.
      */
 
-    for (wmPtr2 = firstWmPtr; wmPtr2 != NULL; wmPtr2 = wmPtr2->nextPtr) {
+    for (wmPtr2 = winPtr->dispPtr->firstWmPtr; wmPtr2 != NULL;
+	 wmPtr2 = wmPtr2->nextPtr) {
 	if (wmPtr2->masterPtr == winPtr) {
 	    wmPtr2->masterPtr = NULL;
 	    if ((wmPtr2->wrapper != None)
@@ -1046,6 +1113,20 @@ TkWmDeadWindow(winPtr)
     }
     if (wmPtr->flags & WM_UPDATE_PENDING) {
 	Tcl_CancelIdleCall(UpdateGeometryInfo, (ClientData) winPtr);
+    }
+    if (wmPtr->masterPtr != NULL) {
+	wmPtr2 = wmPtr->masterPtr->wmInfoPtr;
+	/*
+	 * If we had a master, tell them that we aren't tied
+	 * to them anymore
+	 */
+	if (wmPtr2 != NULL) {
+	    wmPtr2->numTransients--;
+	}
+	Tk_DeleteEventHandler((Tk_Window) wmPtr->masterPtr,
+		VisibilityChangeMask,
+		WmWaitVisibilityProc, (ClientData) winPtr);
+	wmPtr->masterPtr = NULL;
     }
 
     /*
@@ -1117,10 +1198,11 @@ Tk_WmCmd(clientData, interp, argc, argv)
     char **argv;		/* Argument strings. */
 {
     Tk_Window tkwin = (Tk_Window) clientData;
-    TkWindow *winPtr;
+    TkWindow *winPtr = NULL;
     register WmInfo *wmPtr;
     int c;
     size_t length;
+    TkDisplay *dispPtr = ((TkWindow *) tkwin)->dispPtr;
 
     if (argc < 2) {
 	wrongNumArgs:
@@ -1138,10 +1220,11 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    return TCL_ERROR;
 	}
 	if (argc == 2) {
-	    interp->result = (wmTracing) ? "on" : "off";
+	    Tcl_SetResult(interp, ((dispPtr->wmTracing) ? "on" : "off"),
+		    TCL_STATIC);
 	    return TCL_OK;
 	}
-	return Tcl_GetBoolean(interp, argv[2], &wmTracing);
+	return Tcl_GetBoolean(interp, argv[2], &dispPtr->wmTracing);
     }
 
     if (argc < 3) {
@@ -1168,9 +1251,12 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	}
 	if (argc == 3) {
 	    if (wmPtr->sizeHintsFlags & PAspect) {
-		sprintf(interp->result, "%d %d %d %d", wmPtr->minAspect.x,
+		char buf[TCL_INTEGER_SPACE * 4];
+		
+		sprintf(buf, "%d %d %d %d", wmPtr->minAspect.x,
 			wmPtr->minAspect.y, wmPtr->maxAspect.x,
 			wmPtr->maxAspect.y);
+		Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    }
 	    return TCL_OK;
 	}
@@ -1185,7 +1271,8 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    }
 	    if ((numer1 <= 0) || (denom1 <= 0) || (numer2 <= 0) ||
 		    (denom2 <= 0)) {
-		interp->result = "aspect number can't be <= 0";
+		Tcl_SetResult(interp, "aspect number can't be <= 0",
+			TCL_STATIC);
 		return TCL_ERROR;
 	    }
 	    wmPtr->minAspect.x = numer1;
@@ -1205,7 +1292,7 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	}
 	if (argc == 3) {
 	    if (wmPtr->clientMachine != NULL) {
-		interp->result = wmPtr->clientMachine;
+		Tcl_SetResult(interp, wmPtr->clientMachine, TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1301,7 +1388,7 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	 * Now we need to force the updated colormaps to be installed.
 	 */
 
-	if (wmPtr == foregroundWmPtr) {
+	if (wmPtr == winPtr->dispPtr->foregroundWmPtr) {
 	    InstallColormaps(wmPtr->wrapper, WM_QUERYNEWPALETTE, 1);
 	} else {
 	    InstallColormaps(wmPtr->wrapper, WM_PALETTECHANGED, 0);
@@ -1320,8 +1407,9 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	}
 	if (argc == 3) {
 	    if (wmPtr->cmdArgv != NULL) {
-		interp->result = Tcl_Merge(wmPtr->cmdArgc, wmPtr->cmdArgv);
-		interp->freeProc = TCL_DYNAMIC;
+		Tcl_SetResult(interp,
+			Tcl_Merge(wmPtr->cmdArgc, wmPtr->cmdArgv),
+			TCL_DYNAMIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1363,7 +1451,34 @@ Tk_WmCmd(clientData, interp, argc, argv)
                     ": it is an embedded window", (char *) NULL);
             return TCL_ERROR;
         }
-	TkpWmSetState(winPtr, NormalState);
+	/*
+	 * If WM_UPDATE_PENDING is true, a pending UpdateGeometryInfo may
+	 * need to be called first to update a withdrew toplevel's geometry
+	 * before it is deiconified by TkpWmSetState.
+	 * Don't bother if we've never been mapped.
+	 */
+	if (wmPtr->flags & WM_UPDATE_PENDING) {
+	    Tcl_CancelIdleCall(UpdateGeometryInfo, (ClientData) winPtr);
+	    UpdateGeometryInfo((ClientData) winPtr);
+	}
+
+	/*
+	 * If we were in the ZoomState (maximized), 'wm deiconify'
+	 * should not cause the window to shrink
+	 */
+	if (wmPtr->hints.initial_state == ZoomState) {
+	    TkpWmSetState(winPtr, ZoomState);
+	} else {
+	    TkpWmSetState(winPtr, NormalState);
+	}
+
+	/*
+	 * Follow Windows-like style here, raising the window to the top.
+	 */
+	TkWmRestackToplevel(winPtr, Above, NULL);
+	if (!(Tk_Attributes((Tk_Window) winPtr)->override_redirect)) {
+	    TkSetFocusWin(winPtr, 1);
+	}
     } else if ((c == 'f') && (strncmp(argv[1], "focusmodel", length) == 0)
 	    && (length >= 2)) {
 	if ((argc != 3) && (argc != 4)) {
@@ -1373,7 +1488,8 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
-	    interp->result = wmPtr->hints.input ? "passive" : "active";
+	    Tcl_SetResult(interp, (wmPtr->hints.input ? "passive" : "active"),
+		    TCL_STATIC);
 	    return TCL_OK;
 	}
 	c = argv[3][0];
@@ -1390,6 +1506,7 @@ Tk_WmCmd(clientData, interp, argc, argv)
     } else if ((c == 'f') && (strncmp(argv[1], "frame", length) == 0)
 	    && (length >= 2)) {
 	HWND hwnd;
+	char buf[TCL_INTEGER_SPACE];
 
 	if (argc != 3) {
 	    Tcl_AppendResult(interp, "wrong # arguments: must be \"",
@@ -1403,7 +1520,8 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	if (hwnd == NULL) {
 	    hwnd = Tk_GetHWND(Tk_WindowId((Tk_Window) winPtr));
 	}
-	sprintf(interp->result, "0x%x", (unsigned int) hwnd);
+	sprintf(buf, "0x%x", (unsigned int) hwnd);
+	Tcl_SetResult(interp, buf, TCL_VOLATILE);
     } else if ((c == 'g') && (strncmp(argv[1], "geometry", length) == 0)
 	    && (length >= 2)) {
 	char xSign, ySign;
@@ -1416,6 +1534,8 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
+	    char buf[16 + TCL_INTEGER_SPACE * 4];
+	    
 	    xSign = (wmPtr->flags & WM_NEGATIVE_X) ? '-' : '+';
 	    ySign = (wmPtr->flags & WM_NEGATIVE_Y) ? '-' : '+';
 	    if (wmPtr->gridWin != NULL) {
@@ -1427,8 +1547,9 @@ Tk_WmCmd(clientData, interp, argc, argv)
 		width = winPtr->changes.width;
 		height = winPtr->changes.height;
 	    }
-	    sprintf(interp->result, "%dx%d%c%d%c%d", width, height,
-		    xSign, wmPtr->x, ySign, wmPtr->y);
+	    sprintf(buf, "%dx%d%c%d%c%d", width, height, xSign, wmPtr->x,
+		    ySign, wmPtr->y);
+	    Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    return TCL_OK;
 	}
 	if (*argv[3] == '\0') {
@@ -1449,9 +1570,12 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	}
 	if (argc == 3) {
 	    if (wmPtr->sizeHintsFlags & PBaseSize) {
-		sprintf(interp->result, "%d %d %d %d", wmPtr->reqGridWidth,
+		char buf[TCL_INTEGER_SPACE * 4];
+		
+		sprintf(buf, "%d %d %d %d", wmPtr->reqGridWidth,
 			wmPtr->reqGridHeight, wmPtr->widthInc,
 			wmPtr->heightInc);
+		Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    }
 	    return TCL_OK;
 	}
@@ -1478,19 +1602,19 @@ Tk_WmCmd(clientData, interp, argc, argv)
 		return TCL_ERROR;
 	    }
 	    if (reqWidth < 0) {
-		interp->result = "baseWidth can't be < 0";
+		Tcl_SetResult(interp, "baseWidth can't be < 0", TCL_STATIC);
 		return TCL_ERROR;
 	    }
 	    if (reqHeight < 0) {
-		interp->result = "baseHeight can't be < 0";
+		Tcl_SetResult(interp, "baseHeight can't be < 0", TCL_STATIC);
 		return TCL_ERROR;
 	    }
 	    if (widthInc < 0) {
-		interp->result = "widthInc can't be < 0";
+		Tcl_SetResult(interp, "widthInc can't be < 0", TCL_STATIC);
 		return TCL_ERROR;
 	    }
 	    if (heightInc < 0) {
-		interp->result = "heightInc can't be < 0";
+		Tcl_SetResult(interp, "heightInc can't be < 0", TCL_STATIC);
 		return TCL_ERROR;
 	    }
 	    Tk_SetGrid((Tk_Window) winPtr, reqWidth, reqHeight, widthInc,
@@ -1509,7 +1633,7 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	}
 	if (argc == 3) {
 	    if (wmPtr->hints.flags & WindowGroupHint) {
-		interp->result = wmPtr->leaderName;
+		Tcl_SetResult(interp, wmPtr->leaderName, TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1542,8 +1666,9 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	}
 	if (argc == 3) {
 	    if (wmPtr->hints.flags & IconPixmapHint) {
-		interp->result = Tk_NameOfBitmap(winPtr->display,
-			wmPtr->hints.icon_pixmap);
+		Tcl_SetResult(interp,
+			Tk_NameOfBitmap(winPtr->display,
+				wmPtr->hints.icon_pixmap), TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1601,8 +1726,9 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	}
 	if (argc == 3) {
 	    if (wmPtr->hints.flags & IconMaskHint) {
-		interp->result = Tk_NameOfBitmap(winPtr->display,
-			wmPtr->hints.icon_mask);
+		Tcl_SetResult(interp,
+			Tk_NameOfBitmap(winPtr->display, wmPtr->hints.icon_mask),
+			TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1627,7 +1753,9 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
-	    interp->result = (wmPtr->iconName != NULL) ? wmPtr->iconName : "";
+	    Tcl_SetResult(interp,
+		    ((wmPtr->iconName != NULL) ? wmPtr->iconName : ""),
+		    TCL_STATIC);
 	    return TCL_OK;
 	} else {
 	    wmPtr->iconName = Tk_GetUid(argv[3]);
@@ -1647,8 +1775,11 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	}
 	if (argc == 3) {
 	    if (wmPtr->hints.flags & IconPositionHint) {
-		sprintf(interp->result, "%d %d", wmPtr->hints.icon_x,
+		char buf[TCL_INTEGER_SPACE * 2];
+		
+		sprintf(buf, "%d %d", wmPtr->hints.icon_x,
 			wmPtr->hints.icon_y);
+		Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    }
 	    return TCL_OK;
 	}
@@ -1677,7 +1808,7 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	}
 	if (argc == 3) {
 	    if (wmPtr->icon != NULL) {
-		interp->result = Tk_PathName(wmPtr->icon);
+		Tcl_SetResult(interp, Tk_PathName(wmPtr->icon), TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1744,8 +1875,9 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    if (!(wmPtr2->flags & WM_NEVER_MAPPED)) {
 		if (XWithdrawWindow(Tk_Display(tkwin2), Tk_WindowId(tkwin2),
 			Tk_ScreenNumber(tkwin2)) == 0) {
-		    interp->result =
-			    "couldn't send withdraw message to window manager";
+		    Tcl_SetResult(interp,
+			    "couldn't send withdraw message to window manager",
+			    TCL_STATIC);
 		    return TCL_ERROR;
 		}
 	    }
@@ -1760,8 +1892,11 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
+	    char buf[TCL_INTEGER_SPACE * 2];
+	    
 	    GetMaxSize(wmPtr, &width, &height);
-	    sprintf(interp->result, "%d %d", width, height);
+	    sprintf(buf, "%d %d", width, height);
+    	    Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    return TCL_OK;
 	}
 	if ((Tcl_GetInt(interp, argv[3], &width) != TCL_OK)
@@ -1781,8 +1916,11 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
+	    char buf[TCL_INTEGER_SPACE * 2];
+	    
 	    GetMinSize(wmPtr, &width, &height);
-	    sprintf(interp->result, "%d %d", width, height);
+	    sprintf(buf, "%d %d", width, height);
+	    Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    return TCL_OK;
 	}
 	if ((Tcl_GetInt(interp, argv[3], &width) != TCL_OK)
@@ -1794,7 +1932,7 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	goto updateGeom;
     } else if ((c == 'o')
 	    && (strncmp(argv[1], "overrideredirect", length) == 0)) {
-	int boolean;
+	int boolean, curValue;
 	XSetWindowAttributes atts;
 
 	if ((argc != 3) && (argc != 4)) {
@@ -1803,23 +1941,26 @@ Tk_WmCmd(clientData, interp, argc, argv)
 		    (char *) NULL);
 	    return TCL_ERROR;
 	}
+	curValue = Tk_Attributes((Tk_Window) winPtr)->override_redirect;
 	if (argc == 3) {
-	    if (Tk_Attributes((Tk_Window) winPtr)->override_redirect) {
-		interp->result = "1";
-	    } else {
-		interp->result = "0";
-	    }
+	    Tcl_SetBooleanObj(Tcl_GetObjResult(interp), curValue);
 	    return TCL_OK;
 	}
 	if (Tcl_GetBoolean(interp, argv[3], &boolean) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	atts.override_redirect = (boolean) ? True : False;
-	Tk_ChangeWindowAttributes((Tk_Window) winPtr, CWOverrideRedirect,
-		&atts);
-	if (!(wmPtr->flags & (WM_NEVER_MAPPED)
-		&& !(winPtr->flags & TK_EMBEDDED))) {
-	    UpdateWrapper(winPtr);
+	if (curValue != boolean) {
+	    /*
+	     * Only do this if we are really changing value, because it
+	     * causes some funky stuff to occur
+	     */
+	    atts.override_redirect = (boolean) ? True : False;
+	    Tk_ChangeWindowAttributes((Tk_Window) winPtr, CWOverrideRedirect,
+		    &atts);
+	    if (!(wmPtr->flags & (WM_NEVER_MAPPED)
+		    && !(winPtr->flags & TK_EMBEDDED))) {
+		UpdateWrapper(winPtr);
+	    }
 	}
     } else if ((c == 'p') && (strncmp(argv[1], "positionfrom", length) == 0)
 	    && (length >= 2)) {
@@ -1831,9 +1972,9 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	}
 	if (argc == 3) {
 	    if (wmPtr->sizeHintsFlags & USPosition) {
-		interp->result = "user";
+		Tcl_SetResult(interp, "user", TCL_STATIC);
 	    } else if (wmPtr->sizeHintsFlags & PPosition) {
-		interp->result = "program";
+		Tcl_SetResult(interp, "program", TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1887,7 +2028,7 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    for (protPtr = wmPtr->protPtr; protPtr != NULL;
 		    protPtr = protPtr->nextPtr) {
 		if (protPtr->protocol == protocol) {
-		    interp->result = protPtr->command;
+		    Tcl_SetResult(interp, protPtr->command, TCL_STATIC);
 		    return TCL_OK;
 		}
 	    }
@@ -1931,9 +2072,12 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
-	    sprintf(interp->result, "%d %d",
+	    char buf[TCL_INTEGER_SPACE * 2];
+	    
+	    sprintf(buf, "%d %d",
 		    (wmPtr->flags  & WM_WIDTH_NOT_RESIZABLE) ? 0 : 1,
 		    (wmPtr->flags  & WM_HEIGHT_NOT_RESIZABLE) ? 0 : 1);
+	    Tcl_SetResult(interp, buf, TCL_VOLATILE);
 	    return TCL_OK;
 	}
 	if ((Tcl_GetBoolean(interp, argv[3], &width) != TCL_OK)
@@ -1950,7 +2094,10 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	} else {
 	    wmPtr->flags |= WM_HEIGHT_NOT_RESIZABLE;
 	}
-	wmPtr->flags |= WM_UPDATE_SIZE_HINTS;
+	if (!((wmPtr->flags & WM_NEVER_MAPPED)
+		&& !(winPtr->flags & TK_EMBEDDED))) {
+	    UpdateWrapper(winPtr);
+	}
 	goto updateGeom;
     } else if ((c == 's') && (strncmp(argv[1], "sizefrom", length) == 0)
 	    && (length >= 2)) {
@@ -1962,9 +2109,9 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	}
 	if (argc == 3) {
 	    if (wmPtr->sizeHintsFlags & USSize) {
-		interp->result = "user";
+		Tcl_SetResult(interp, "user", TCL_STATIC);
 	    } else if (wmPtr->sizeHintsFlags & PSize) {
-		interp->result = "program";
+		Tcl_SetResult(interp, "program", TCL_STATIC);
 	    }
 	    return TCL_OK;
 	}
@@ -1989,27 +2136,80 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	goto updateGeom;
     } else if ((c == 's') && (strncmp(argv[1], "state", length) == 0)
 	    && (length >= 2)) {
-	if (argc != 3) {
+	if ((argc < 3) || (argc > 4)) {
 	    Tcl_AppendResult(interp, "wrong # arguments: must be \"",
-		    argv[0], " state window\"", (char *) NULL);
+		    argv[0], " state window ?state?\"", (char *) NULL);
 	    return TCL_ERROR;
 	}
-	if (wmPtr->iconFor != NULL) {
-	    interp->result = "icon";
+	if (argc == 4) {
+	    if (wmPtr->iconFor != NULL) {
+		Tcl_AppendResult(interp, "can't change state of ", argv[2],
+			": it is an icon for ", Tk_PathName(wmPtr->iconFor),
+			(char *) NULL);
+		return TCL_ERROR;
+	    }
+	    if (winPtr->flags & TK_EMBEDDED) {
+		Tcl_AppendResult(interp, "can't change state of ",
+			winPtr->pathName, ": it is an embedded window",
+			(char *) NULL);
+		return TCL_ERROR;
+	    }
+
+	    c = argv[3][0];
+	    length = strlen(argv[3]);
+
+	    if ((c == 'n') && (strncmp(argv[3], "normal", length) == 0)) {
+		TkpWmSetState(winPtr, NormalState);
+		/*
+		 * This varies from 'wm deiconify' because it does not
+		 * force the window to be raised and receive focus
+		 */
+	    } else if ((c == 'i')
+		    && (strncmp(argv[3], "iconic", length) == 0)) {
+		if (Tk_Attributes((Tk_Window) winPtr)->override_redirect) {
+		    Tcl_AppendResult(interp, "can't iconify \"",
+			    winPtr->pathName,
+			    "\": override-redirect flag is set",
+			    (char *) NULL);
+		    return TCL_ERROR;
+		}
+		if (wmPtr->masterPtr != NULL) {
+		    Tcl_AppendResult(interp, "can't iconify \"",
+			    winPtr->pathName,
+			    "\": it is a transient", (char *) NULL);
+		    return TCL_ERROR;
+		}
+		TkpWmSetState(winPtr, IconicState);
+	    } else if ((c == 'w')
+		    && (strncmp(argv[3], "withdrawn", length) == 0)) {
+		TkpWmSetState(winPtr, WithdrawnState);
+	    } else if ((c == 'z')
+		    && (strncmp(argv[3], "zoomed", length) == 0)) {
+		TkpWmSetState(winPtr, ZoomState);
+	    } else {
+		Tcl_AppendResult(interp, "bad argument \"", argv[3],
+			"\": must be normal, iconic, withdrawn or zoomed",
+			(char *) NULL);
+		return TCL_ERROR;
+	    }
 	} else {
-	    switch (wmPtr->hints.initial_state) {
-		case NormalState:
-		    interp->result = "normal";
-		    break;
-		case IconicState:
-		    interp->result = "iconic";
-		    break;
-		case WithdrawnState:
-		    interp->result = "withdrawn";
-		    break;
-		case ZoomState:
-		    interp->result = "zoomed";
-		    break;
+	    if (wmPtr->iconFor != NULL) {
+		Tcl_SetResult(interp, "icon", TCL_STATIC);
+	    } else {
+		switch (wmPtr->hints.initial_state) {
+		    case NormalState:
+			Tcl_SetResult(interp, "normal", TCL_STATIC);
+			break;
+		    case IconicState:
+			Tcl_SetResult(interp, "iconic", TCL_STATIC);
+			break;
+		    case WithdrawnState:
+			Tcl_SetResult(interp, "withdrawn", TCL_STATIC);
+			break;
+		    case ZoomState:
+			Tcl_SetResult(interp, "zoomed", TCL_STATIC);
+			break;
+		}
 	    }
 	}
     } else if ((c == 't') && (strncmp(argv[1], "title", length) == 0)
@@ -2020,18 +2220,22 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
-	    interp->result = (wmPtr->titleUid != NULL) ? wmPtr->titleUid
-		    : winPtr->nameUid;
+	    Tcl_SetResult(interp, ((wmPtr->titleUid != NULL) ?
+		    wmPtr->titleUid : winPtr->nameUid), TCL_STATIC);
 	    return TCL_OK;
 	} else {
 	    wmPtr->titleUid = Tk_GetUid(argv[3]);
 	    if (!(wmPtr->flags & WM_NEVER_MAPPED) && wmPtr->wrapper != NULL) {
-		SetWindowText(wmPtr->wrapper, wmPtr->titleUid);
+		Tcl_DString titleString;
+		Tcl_UtfToExternalDString(NULL, wmPtr->titleUid, -1, 
+			&titleString);
+		SetWindowText(wmPtr->wrapper, Tcl_DStringValue(&titleString));
+		Tcl_DStringFree(&titleString);
 	    }
 	}
     } else if ((c == 't') && (strncmp(argv[1], "transient", length) == 0)
 	    && (length >= 3)) {
-	TkWindow *masterPtr;
+	TkWindow *masterPtr = wmPtr->masterPtr;
 
 	if ((argc != 3) && (argc != 4)) {
 	    Tcl_AppendResult(interp, "wrong # arguments: must be \"",
@@ -2039,11 +2243,20 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    return TCL_ERROR;
 	}
 	if (argc == 3) {
-	    if (wmPtr->masterPtr != NULL) {
-		Tcl_SetResult(interp, Tk_PathName(wmPtr->masterPtr),
-			TCL_STATIC);
+	    if (masterPtr != NULL) {
+		Tcl_SetResult(interp, Tk_PathName(masterPtr), TCL_STATIC);
 	    }
 	    return TCL_OK;
+	}
+	if (masterPtr != NULL) {
+	    /*
+	     * If we had a master, tell them that we aren't tied
+	     * to them anymore
+	     */
+	    masterPtr->wmInfoPtr->numTransients--;
+	    Tk_DeleteEventHandler((Tk_Window) masterPtr,
+		    VisibilityChangeMask,
+		    WmWaitVisibilityProc, (ClientData) winPtr);
 	}
 	if (argv[3][0] == '\0') {
 	    wmPtr->masterPtr = NULL;
@@ -2054,7 +2267,7 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    }
 	    if (masterPtr == winPtr) {
 		wmPtr->masterPtr = NULL;
-	    } else {
+	    } else if (masterPtr != wmPtr->masterPtr) {
 		Tk_MakeWindowExist((Tk_Window)masterPtr);
 
 		/*
@@ -2065,16 +2278,20 @@ Tk_WmCmd(clientData, interp, argc, argv)
 		    masterPtr = masterPtr->parentPtr;
 		}
 		wmPtr->masterPtr = masterPtr;
+		masterPtr->wmInfoPtr->numTransients++;
 
 		/*
-		 * Ensure that the transient window is either mapped or 
-		 * unmapped like its master.
+		 * Bind a visibility event handler to the master window,
+		 * to ensure that when it is mapped, the children will
+		 * have their state set properly.
 		 */
 
-		TkpWmSetState(winPtr, NormalState);
+		Tk_CreateEventHandler((Tk_Window) masterPtr,
+			VisibilityChangeMask,
+			WmWaitVisibilityProc, (ClientData) winPtr);
 	    }
 	}
-	if (!(wmPtr->flags & (WM_NEVER_MAPPED)
+	if (!((wmPtr->flags & WM_NEVER_MAPPED)
 		&& !(winPtr->flags & TK_EMBEDDED))) {
 	    UpdateWrapper(winPtr);
 	}
@@ -2110,6 +2327,26 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	wmPtr->flags |= WM_UPDATE_PENDING;
     }
     return TCL_OK;
+}
+	/*ARGSUSED*/
+static void
+WmWaitVisibilityProc(clientData, eventPtr)
+    ClientData clientData;	/* Pointer to window. */
+    XEvent *eventPtr;		/* Information about event. */
+{
+    TkWindow *winPtr = (TkWindow *) clientData;
+    TkWindow *masterPtr = winPtr->wmInfoPtr->masterPtr;
+
+    if ((eventPtr->type == VisibilityNotify) && (masterPtr != NULL)) {
+	int state = masterPtr->wmInfoPtr->hints.initial_state;
+
+	if ((state == NormalState) || (state == ZoomState)) {
+	    state = winPtr->wmInfoPtr->hints.initial_state;
+	    if ((state == NormalState) || (state == ZoomState)) {
+		UpdateWrapper(winPtr);
+	    }
+	}
+    }
 }
 
 /*
@@ -2621,7 +2858,7 @@ UpdateGeometryInfo(clientData)
  *
  * Results:
  *	A standard Tcl return value, plus an error message in
- *	interp->result if an error occurs.
+ *	the interp's result if an error occurs.
  *
  * Side effects:
  *	The size and/or location of winPtr may change.
@@ -2968,14 +3205,19 @@ TkWmProtocolEventProc(winPtr, eventPtr)
     for (protPtr = wmPtr->protPtr; protPtr != NULL;
 	    protPtr = protPtr->nextPtr) {
 	if (protocol == protPtr->protocol) {
+	    /*
+	     * Cache atom name, as we might destroy the window as a
+	     * result of the eval.
+	     */
+	    char *name = Tk_GetAtomName((Tk_Window) winPtr, protocol);
+
 	    Tcl_Preserve((ClientData) protPtr);
             interp = protPtr->interp;
             Tcl_Preserve((ClientData) interp);
 	    result = Tcl_GlobalEval(interp, protPtr->command);
 	    if (result != TCL_OK) {
 		Tcl_AddErrorInfo(interp, "\n    (command for \"");
-		Tcl_AddErrorInfo(interp,
-			Tk_GetAtomName((Tk_Window) winPtr, protocol));
+		Tcl_AddErrorInfo(interp, name);
 		Tcl_AddErrorInfo(interp, "\" window manager protocol)");
 		Tcl_BackgroundError(interp);
 	    }
@@ -3038,7 +3280,6 @@ TkWmRestackToplevel(winPtr, aboveBelow, otherPtr)
     hwnd = (winPtr->wmInfoPtr->wrapper != NULL)
 	? winPtr->wmInfoPtr->wrapper : Tk_GetHWND(winPtr->window);
 
-    
     if (otherPtr != NULL) {
 	if (otherPtr->window == None) {
 	    Tk_MakeWindowExist((Tk_Window) otherPtr);
@@ -3146,7 +3387,7 @@ TkWmAddToColormapWindows(winPtr)
      * Now we need to force the updated colormaps to be installed.
      */
 
-    if (topPtr->wmInfoPtr == foregroundWmPtr) {
+    if (topPtr->wmInfoPtr == winPtr->dispPtr->foregroundWmPtr) {
 	InstallColormaps(topPtr->wmInfoPtr->wrapper, WM_QUERYNEWPALETTE, 1);
     } else {
 	InstallColormaps(topPtr->wmInfoPtr->wrapper, WM_PALETTECHANGED, 0);
@@ -3344,8 +3585,7 @@ ConfigureTopLevel(pos)
 		 */
 
 		if (!(wmPtr->flags & WM_UPDATE_PENDING)) {
-		    Tcl_DoWhenIdle(UpdateGeometryInfo,
-			    (ClientData) winPtr);
+		    Tcl_DoWhenIdle(UpdateGeometryInfo, (ClientData) winPtr);
 		    wmPtr->flags |= WM_UPDATE_PENDING;
 		}
 		/* fall through */
@@ -3544,6 +3784,8 @@ InstallColormaps(hwnd, message, isForemost)
     HPALETTE oldPalette;
     TkWindow *winPtr = GetTopLevel(hwnd);
     WmInfo *wmPtr;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
 	    
     if (winPtr == NULL) {
 	return 0;
@@ -3560,17 +3802,17 @@ InstallColormaps(hwnd, message, isForemost)
 	 * secondary palettes are installed properly.
 	 */
 
-	foregroundWmPtr = wmPtr;
+	winPtr->dispPtr->foregroundWmPtr = wmPtr;
 
 	if (wmPtr->cmapCount > 0) {
 	    winPtr = wmPtr->cmapList[0];
 	}
 
-	systemPalette = TkWinGetPalette(winPtr->atts.colormap);
+	tsdPtr->systemPalette = TkWinGetPalette(winPtr->atts.colormap);
 	dc = GetDC(hwnd);
-	oldPalette = SelectPalette(dc, systemPalette, FALSE);
+	oldPalette = SelectPalette(dc, tsdPtr->systemPalette, FALSE);
 	if (RealizePalette(dc)) {
-	    RefreshColormap(winPtr->atts.colormap);
+	    RefreshColormap(winPtr->atts.colormap, winPtr->dispPtr);
 	} else if (wmPtr->cmapCount > 1) {
 	    SelectPalette(dc, oldPalette, TRUE);
 	    RealizePalette(dc);
@@ -3606,13 +3848,13 @@ InstallColormaps(hwnd, message, isForemost)
 	oldPalette = SelectPalette(dc,
 		TkWinGetPalette(winPtr->atts.colormap), TRUE);
 	if (RealizePalette(dc)) {
-	    RefreshColormap(winPtr->atts.colormap);
+	    RefreshColormap(winPtr->atts.colormap, winPtr->dispPtr);
 	}
 	for (; i < wmPtr->cmapCount; i++) {
 	    winPtr = wmPtr->cmapList[i];
 	    SelectPalette(dc, TkWinGetPalette(winPtr->atts.colormap), TRUE);
 	    if (RealizePalette(dc)) {
-		RefreshColormap(winPtr->atts.colormap);
+		RefreshColormap(winPtr->atts.colormap, winPtr->dispPtr);
 	    }
 	}
     }
@@ -3644,13 +3886,14 @@ InstallColormaps(hwnd, message, isForemost)
  */
 
 static void
-RefreshColormap(colormap)
+RefreshColormap(colormap, dispPtr)
     Colormap colormap;
+    TkDisplay *dispPtr;
 {
     WmInfo *wmPtr;
     int i;
 
-    for (wmPtr = firstWmPtr; wmPtr != NULL; wmPtr = wmPtr->nextPtr) {
+    for (wmPtr = dispPtr->firstWmPtr; wmPtr != NULL; wmPtr = wmPtr->nextPtr) {
 	if (wmPtr->cmapCount > 0) {
 	    for (i = 0; i < wmPtr->cmapCount; i++) {
 		if ((wmPtr->cmapList[i]->atts.colormap == colormap)
@@ -3732,7 +3975,10 @@ InvalidateSubTree(winPtr, colormap)
 HPALETTE
 TkWinGetSystemPalette()
 {
-    return systemPalette;
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *) 
+            Tcl_GetThreadData(&dataKey, sizeof(ThreadSpecificData));
+
+    return tsdPtr->systemPalette;
 }
 
 /*
@@ -3960,8 +4206,8 @@ WmProc(hwnd, message, wParam, lParam)
 			 * leaving move/size mode.  Note that this mechanism
 			 * assumes move/size is only one level deep. */
     LRESULT result;
-    TkWindow *winPtr;
-	
+    TkWindow *winPtr = NULL;
+
     if (TkWinHandleMenuEvent(&hwnd, &message, &wParam, &lParam, &result)) {
 	goto done;
     }
@@ -3975,10 +4221,12 @@ WmProc(hwnd, message, wParam, lParam)
 	case WM_ENTERSIZEMOVE:
 	    inMoveSize = 1;
 
-	    /* CYGNUS LOCAL: Cancel any current mouse timer before we
-	       start looking for events.  If the mouse timer fires, it
-	       will release the size/move mouse capture, which is
-	       wrong.  */
+	    /*
+	     * Cancel any current mouse timer.  If the mouse timer
+	     * fires during the size/move mouse capture, it will
+	     * release the capture, which is wrong.
+	     */
+
 	    TkWinCancelMouseTimer();
 
 	    oldMode = Tcl_SetServiceMode(TCL_SERVICE_ALL);
@@ -4032,9 +4280,18 @@ WmProc(hwnd, message, wParam, lParam)
 	    ActivateEvent *eventPtr;
 	    winPtr = GetTopLevel((HWND) wParam);
 
+	    if (winPtr && (TkGrabState(winPtr) != TK_GRAB_EXCLUDED)) {
+		/*
+		 * This allows us to pass the message onto the
+		 * native menus [Bug: 2272]
+		 */
+		result = DefWindowProc(hwnd, message, wParam, lParam);
+		goto done;
+	    }
+
 	    /*
-	     * Don't activate the window yet since there may be grabs
-	     * that should take precedence.  Instead we need to queue
+	     * Don't activate the window yet since there is a grab
+	     * that takes precedence.  Instead we need to queue
 	     * an event so we can check the grab state right before we
 	     * handle the mouse event.
 	     */
@@ -4048,21 +4305,6 @@ WmProc(hwnd, message, wParam, lParam)
 	    result = MA_NOACTIVATE;
 	    goto done;
 	}
-
-	/* CYGNUS LOCAL.  */
-	case WM_SETTINGCHANGE:
-	    if (wParam == SPI_SETNONCLIENTMETRICS) {
-		winPtr = GetTopLevel(hwnd);
-		if (winPtr != NULL) {
-		    TkWinNCMetricsChanged((Tk_Window) winPtr);
-		}
-	    }
-	    break;
-
-	/* CYGNUS LOCAL.  */
-	case WM_SYSCOLORCHANGE:
-	    TkWinSysColorChange();
-	    break;
 
 	default:
 	    break;
@@ -4099,7 +4341,7 @@ WmProc(hwnd, message, wParam, lParam)
  *	None.
  *
  * Side effects:
- *	Changes the style bit used to create a new Mac toplevel.
+ *	Changes the style bit used to create a new toplevel.
  *
  *----------------------------------------------------------------------
  */
@@ -4257,4 +4499,36 @@ ActivateWindow(
     }
     
     return 1;
+}
+
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkWinSetForegroundWindow --
+ *
+ *	This function is a wrapper for SetForegroundWindow, calling
+ *      it on the wrapper window because it has no affect on child
+ *      windows.
+ *
+ * Results:
+ *	none
+ *
+ * Side effects:
+ *	May activate the toplevel window.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TkWinSetForegroundWindow(winPtr)
+    TkWindow *winPtr;
+{
+    register WmInfo *wmPtr = winPtr->wmInfoPtr;
+    
+    if (wmPtr->wrapper != NULL) {
+	SetForegroundWindow(wmPtr->wrapper);
+    } else {
+	SetForegroundWindow(Tk_GetHWND(winPtr->window));
+    }
 }

@@ -112,3 +112,4 @@ this case the command returns an empty string.
 
 .SH KEYWORDS
 bitmap, image
+

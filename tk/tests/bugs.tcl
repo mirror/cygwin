@@ -28,3 +28,16 @@ test crash-1.1 {color} {
     . configure -bg rgb:345
     set foo ""
 } {}
+
+
+
+
+
+
+
+
+
+
+
+
+

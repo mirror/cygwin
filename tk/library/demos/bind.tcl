@@ -3,7 +3,7 @@
 # This demonstration script creates a text widget with bindings set
 # up for hypertext-like effects.
 #
-# SCCS: @(#) bind.tcl 1.6 97/03/02 16:19:01
+# RCS: @(#) $Id$
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."
@@ -77,3 +77,4 @@ $w.text tag bind d6 <1> {source [file join $tk_library demos cscroll.tcl]}
 
 $w.text mark set insert 0.0
 $w.text configure -state disabled
+

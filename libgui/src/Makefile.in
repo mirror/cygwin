@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -125,6 +125,9 @@ TCL_LIB_SPEC = @TCL_LIB_SPEC@
 TCL_RANLIB = @TCL_RANLIB@
 TCL_SHLIB_CFLAGS = @TCL_SHLIB_CFLAGS@
 TCL_SHLIB_LD = @TCL_SHLIB_LD@
+TIXHDIR = @TIXHDIR@
+TIX_BUILD_LIB_SPEC = @TIX_BUILD_LIB_SPEC@
+TIX_LIB_FULL_PATH = @TIX_LIB_FULL_PATH@
 TKCONFIG = @TKCONFIG@
 TKHDIR = @TKHDIR@
 TK_BUILD_INCLUDES = @TK_BUILD_INCLUDES@
@@ -180,7 +183,7 @@ tkTableCmds.c tkTableEdit.c tkTableTag.c tkTableWin.c tkTableUtil.c
 libgui_a_SOURCES = guitcl.h paths.c subcommand.c subcommand.h \
 xpmlib.c tclmain.c tkGraphCanvas.c \
 tkCanvEdge.c tkCanvLayout.c tkCanvLayout.h tclhelp.c tclgetdir.c \
-tclwinprint.c tclsizebox.c tclshellexe.c tclmapi.c tclwinfont.c	\
+tclwinprint.c tclshellexe.c tclmapi.c tclwinfont.c	\
 tclwingrab.c tclwinmode.c tclwinpath.c tclmsgbox.c tclcursor.c \
 tkWinPrintText.c tkWinPrintCanvas.c tkWarpPointer.c $(TKTABLE_SOURCES)
 
@@ -198,14 +201,13 @@ libgui_a_LIBADD =
 libgui_a_OBJECTS =  paths.$(OBJEXT) subcommand.$(OBJEXT) \
 xpmlib.$(OBJEXT) tclmain.$(OBJEXT) tkGraphCanvas.$(OBJEXT) \
 tkCanvEdge.$(OBJEXT) tkCanvLayout.$(OBJEXT) tclhelp.$(OBJEXT) \
-tclgetdir.$(OBJEXT) tclwinprint.$(OBJEXT) tclsizebox.$(OBJEXT) \
-tclshellexe.$(OBJEXT) tclmapi.$(OBJEXT) tclwinfont.$(OBJEXT) \
-tclwingrab.$(OBJEXT) tclwinmode.$(OBJEXT) tclwinpath.$(OBJEXT) \
-tclmsgbox.$(OBJEXT) tclcursor.$(OBJEXT) tkWinPrintText.$(OBJEXT) \
-tkWinPrintCanvas.$(OBJEXT) tkWarpPointer.$(OBJEXT) tkTable.$(OBJEXT) \
-tkTableCell.$(OBJEXT) tkTableCellSort.$(OBJEXT) tkTableCmds.$(OBJEXT) \
-tkTableEdit.$(OBJEXT) tkTableTag.$(OBJEXT) tkTableWin.$(OBJEXT) \
-tkTableUtil.$(OBJEXT)
+tclgetdir.$(OBJEXT) tclwinprint.$(OBJEXT) tclshellexe.$(OBJEXT) \
+tclmapi.$(OBJEXT) tclwinfont.$(OBJEXT) tclwingrab.$(OBJEXT) \
+tclwinmode.$(OBJEXT) tclwinpath.$(OBJEXT) tclmsgbox.$(OBJEXT) \
+tclcursor.$(OBJEXT) tkWinPrintText.$(OBJEXT) tkWinPrintCanvas.$(OBJEXT) \
+tkWarpPointer.$(OBJEXT) tkTable.$(OBJEXT) tkTableCell.$(OBJEXT) \
+tkTableCellSort.$(OBJEXT) tkTableCmds.$(OBJEXT) tkTableEdit.$(OBJEXT) \
+tkTableTag.$(OBJEXT) tkTableWin.$(OBJEXT) tkTableUtil.$(OBJEXT)
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)

@@ -1,25 +1,43 @@
 /* Macro definitions for GDB for a Fujitsu SPARClite.
    Copyright 1993 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
-#define TARGET_SPARCLITE 1
+#define TARGET_SPARCLITE 1	/* Still needed for non-multi-arch case */
 
 #include "sparc/tm-sparc.h"
+
+/* Note: we are not defining GDB_MULTI_ARCH for the sparclet target
+   at this time, because we have not figured out how to detect the
+   sparclet target from the bfd structure.  */
+
+/* Sparclite regs, for debugging purposes */
+
+enum {
+  DIA1_REGNUM = 72,		/* debug instr address register 1 */
+  DIA2_REGNUM = 73,		/* debug instr address register 2 */
+  DDA1_REGNUM = 74,		/* debug data address register 1 */
+  DDA2_REGNUM = 75,		/* debug data address register 2 */
+  DDV1_REGNUM = 76,		/* debug data value register 1 */
+  DDV2_REGNUM = 77,		/* debug data value register 2 */
+  DCR_REGNUM  = 78,		/* debug control register */
+  DSR_REGNUM  = 79		/* debug status regsiter */
+};
 
 /* overrides of tm-sparc.h */
 
@@ -38,10 +56,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #define DECR_PC_AFTER_HW_BREAK 4
 
-#define FRAME_CHAIN_VALID(fp,fi) alternate_frame_chain_valid (fp, fi)
+#if !defined (GDB_MULTI_ARCH) || (GDB_MULTI_ARCH == 0)
+/*
+ * The following defines must go away for MULTI_ARCH.
+ */
 
-#undef NUM_REGS 
-#define NUM_REGS 80 
+#undef  FRAME_CHAIN_VALID
+#define FRAME_CHAIN_VALID(FP,FI) func_frame_chain_valid (FP, FI)
+
+#undef NUM_REGS
+#define NUM_REGS 80
 
 #undef REGISTER_BYTES
 #define REGISTER_BYTES (32*4+32*4+8*4+8*4)
@@ -61,14 +85,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
   "y", "psr", "wim", "tbr", "pc", "npc", "fpsr", "cpsr",        \
   "dia1", "dia2", "dda1", "dda2", "ddv1", "ddv2", "dcr", "dsr" }
 
-#define DIA1_REGNUM 72          /* debug instr address register 1 */
-#define DIA2_REGNUM 73          /* debug instr address register 2 */
-#define DDA1_REGNUM 74          /* debug data address register 1 */
-#define DDA2_REGNUM 75          /* debug data address register 2 */
-#define DDV1_REGNUM 76          /* debug data value register 1 */
-#define DDV2_REGNUM 77          /* debug data value register 2 */
-#define DCR_REGNUM 78           /* debug control register */
-#define DSR_REGNUM 79           /* debug status regsiter */
+#define DIA1_REGNUM 72		/* debug instr address register 1 */
+#define DIA2_REGNUM 73		/* debug instr address register 2 */
+#define DDA1_REGNUM 74		/* debug data address register 1 */
+#define DDA2_REGNUM 75		/* debug data address register 2 */
+#define DDV1_REGNUM 76		/* debug data value register 1 */
+#define DDV2_REGNUM 77		/* debug data value register 2 */
+#define DCR_REGNUM 78		/* debug control register */
+#define DSR_REGNUM 79		/* debug status regsiter */
+
+#endif /* GDB_MULTI_ARCH */
 
 #define TARGET_HW_BREAK_LIMIT 2
 #define TARGET_HW_WATCH_LIMIT 2
@@ -84,11 +110,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    instruction which caused the watchpoint.  It will be necessary for
    GDB to step over the watchpoint. ***
 
-#define STOPPED_BY_WATCHPOINT(W) \
-  ((W).kind == TARGET_WAITKIND_STOPPED \
+   #define STOPPED_BY_WATCHPOINT(W) \
+   ((W).kind == TARGET_WAITKIND_STOPPED \
    && (W).value.sig == TARGET_SIGNAL_TRAP \
    && ((int) read_register (IPSW_REGNUM) & 0x00100000))
-*/
+ */
 
 /* Use these macros for watchpoint insertion/deletion.  */
 #define target_insert_watchpoint(addr, len, type) sparclite_insert_watchpoint (addr, len, type)

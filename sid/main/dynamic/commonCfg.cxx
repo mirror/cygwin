@@ -530,7 +530,9 @@ SessionCfg::SessionCfg (const string name)
     tcl_bridge (NULL),
     loader (NULL),
     verbose (false),
-    use_stdio (true)
+    use_stdio (true),
+    board_count (0),
+    gdb_count (0)
 {
   add_child (host_sched);
   add_child (sim_sched);
@@ -657,6 +659,26 @@ void SessionCfg::use_tcl_bridge ()
   init_seq->add_output (7, tcl_bridge, "!event");
 }
 
+void SessionCfg::write_config (Writer &w)
+{
+  AggregateCfg::write_config (w);
+
+  // Stop the host scheduler if all of the GDB stubs are stopped
+  if (gdb_count)
+    {
+      assert (host_sched);
+      Setting (host_sched, "yield-host-time-threshold",
+	       sidutil::make_attribute (gdb_count)).write_to (w);
+      Setting (host_sched, "yield-host-time?", "0").write_to (w);
+    }
+
+  // Stop the sim scheduler if any of the GDB stubs are stopped
+  assert (sim_sched);
+  Setting (sim_sched, "enable-threshold",
+	   sidutil::make_attribute (board_count)).write_to (w);
+  Setting (sim_sched, "enabled?",
+	   sidutil::make_attribute (board_count)).write_to (w);
+}
 
 // LoaderCfg 
 LoaderCfg::~LoaderCfg () {}
@@ -920,6 +942,7 @@ void BoardCfg::set_gdb (const string port)
   gdb = new GdbCfg ("gdb", port, cpu, this, sess);
   add_child (gdb);
   sess->use_no_stdio ();
+  sess->add_gdb ();
 }
 
 

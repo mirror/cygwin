@@ -1,6 +1,6 @@
 // mainDynamic.cxx - high-tech mainline.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002, 2003 Red Hat.
+// Copyright (C) 1999-2004 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -617,7 +617,7 @@ main(int argc, char* argv[])
 	      {
 		need_sess (sess);
 		if (curr_board)
-		  sess->add_child (curr_board);
+		  sess->add_board (curr_board);
 		curr_board = NULL;
 		string new_board_type = optstring();
 		string new_board_name (new_board_type + "-" + 
@@ -878,7 +878,7 @@ main(int argc, char* argv[])
     }
 
   if (sess && curr_board)
-    sess->add_child (curr_board);
+    sess->add_board (curr_board);
 
   if (persistent_p)
     config_items.push_back (make_pair (false, string("set main persistent? true")));

@@ -1,3 +1,15 @@
+2004-03-22  Dave Brolley  <brolley@redhat.com>
+
+	* mainDynamic.cxx (main): Call add_board in place of add_child.
+	* commonCfg.h (add_gdb): New method of SessionCfg.
+	(add_board): Ditto.
+	(write_config): Ditto.
+	(board_count): New member of SessionCfg.
+	(gdb_count): Ditto.
+	* commonCfg.cxx (SessionCfg): Initialize board_count and gdb_count.
+	(SessionCfg::write_config): New method.
+	(set_gdb): Call sess->add_gdb.
+
 2003-10-26  Dave Brolley  <brolley@redhat.com>
 
 	* commonCfg.cxx (BoardCfg): Initialize 'gprof'.

@@ -1,5 +1,5 @@
 ; Decoder generation.
-; Copyright (C) 2000, 2002 Red Hat, Inc.
+; Copyright (C) 2000, 2002, 2003 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Return decode entries for each insn.
@@ -300,7 +300,7 @@ struct @prefix@_scache {
   // argument buffer
   @prefix@_sem_fields fields;
 
-" (if (or (with-profile?) (with-parallel-write?))
+" (if (or (with-any-profile?) (with-parallel-write?))
       (string-append "
   // writeback flags
   // Only used if profiling or parallel execution support enabled during

@@ -2,7 +2,12 @@
 
 Synopsis:
 
-   This component models a variety of memory cache designs.
+   This component models a variety of memory cache designs. Many common
+   parameter groups (size, associativity, line-size, etc.) are exposed as
+   individual component types in this family, e.g.,
+   hw-cache-2way/16kb/32/random, hw-cache-direct/1kb/16. The
+   hw-cache-buffer-8 type is a special case containing just one 8-byte cache
+   line.
 
      ----------------------------------------------------------------------
 
@@ -331,6 +336,10 @@ Component Reference:
    |---------------+-----------------+---------------|
    | downstream    | unrestricted    | bus traffic   |
    +-------------------------------------------------+
+
+  Variant: hw-cache-buffer-8
+
+   Same as hw-cache-basic
 
      ----------------------------------------------------------------------
 

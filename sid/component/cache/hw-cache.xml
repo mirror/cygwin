@@ -42,11 +42,21 @@
     <defattribute name="miss-latency" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="memory latency" />
     <defattribute name="dump!" category="setting" legalvalues="empty string" defaultvalue="empty" behaviors="internal diagnostics" />
 
+    <variants>
+      <defcomponent name="hw-cache-buffer-8" type="concrete" />
+    </variants>
   </defcomponent>
 
   <synop>
     <p>
-      This component models a variety of memory cache designs.</p>
+      This component models a variety of memory cache designs.
+      Many common parameter groups (size, associativity, line-size, etc.)
+      are exposed as individual component types in this family, e.g., 
+      <component>hw-cache-2way/16kb/32/random</component>,
+      <component>hw-cache-direct/1kb/16</component>.
+      The <component>hw-cache-buffer-8</component> type is a special case
+      containing just one 8-byte cache line.
+    </p>
   </synop>
 
   <func>

@@ -654,6 +654,7 @@ CacheListTypes ()
   vector<string> types;
 
   types.push_back ("hw-cache-basic");
+  types.push_back ("hw-cache-buffer-8");
 
   for (unsigned i = 0; i < (sizeof (assocs) / sizeof (string)); i++)
     for (unsigned j = 0; j < (sizeof (cache_sizes) / sizeof (string)); j++)
@@ -689,6 +690,9 @@ CacheCreate (const string& typeName)
 
   if (typeName == "hw-cache-basic")
     return new cache_component (1, 16384, 32, null_replacement);
+
+  if (typeName == "hw-cache-buffer-8")
+    return new cache_component (0, 8, 8, null_replacement);
   
   vector<string> parts = sidutil::tokenize (typeName, "-/");
 

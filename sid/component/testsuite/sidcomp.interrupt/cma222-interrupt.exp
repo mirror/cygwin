@@ -2,9 +2,9 @@
 # This testsuite tries to exercise just about every aspect of this
 # component simulation.
 #
-# Copyright (C) 2000 Red Hat
+# Copyright (C) 2000, 2001 Red Hat
 
-if {! $sidtarget(arm)} then { untested "hw-interrupt-arm/ref not available"; return }
+if {! $sidtarget(arm)} then { untested "hw-interrupt-cogen/cma222 not available"; return }
 
 # The number of available regular interrupt lines.
 set numLines 8

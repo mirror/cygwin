@@ -1,3 +1,7 @@
+2004-10-28  Nick Clifton  <nickc@redhat.com>
+
+	* baseboards/iq2000-sim.exp: New file.
+
 2004-10-05  Nick Clifton  <nickc@redhat.com>
 
 	* Import this patch from Savannah repository:

@@ -500,7 +500,7 @@
 				 (-fmt-desc-cti? fmt-desc)
 				 (-fmt-desc-in-ops fmt-desc)
 				 (-fmt-desc-out-ops fmt-desc)
-				 (-fmt-desc-used-iflds fmt-desc))))
+				 (ifields-base-ifields (-fmt-desc-used-iflds fmt-desc)))))
 	  (logit 3 "Creating sformat " (number->string sfmt-index) ".\n")
 	  (insn-set-sfmt! insn sfmt)
 	  (append! sfmt-list (list sfmt))

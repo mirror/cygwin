@@ -1,3 +1,10 @@
+2002-05-30  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compConfig.cxx (stop): Store incoming code in new "stop-code"
+	attribute.
+	* sid-control-cfgroot.xml: Document this.
+	* sid-control-cfgroot.txt: Regenerated.
+
 2001-08-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libltdl/ltdl.c (lt_dlinit): Initialize loaders to 0.

@@ -23,6 +23,7 @@
     <defattribute name="starting" category="pin" behaviors="main loop" />
     <defattribute name="running" category="register" default="boolean" behaviors="main loop" />
     <defattribute name="activity-count" category="register" default="number" behaviors="main loop" />
+    <defattribute name="stop-code" category="register" default="number" behaviors="main loop" />
     <defattribute name="perform-activity" category="pin" behaviors="main loop" />
     <defattribute name="stop!" category="pin" behaviors="main loop" />
     <defattribute name="stopping" category="pin" behaviors="main loop" />
@@ -270,8 +271,9 @@ rel-name ::= string
       driven.  This loop runs until the <pin>stop!</pin> input pin is
       driven.  (This could happen during the initial
       <pin>starting</pin> signal, in which case this inner loop will
-      not be entered at all.)  After the inner loop exits, the
-      <pin>stopping</pin> output pin is driven.
+      not be entered at all.)  The value driven on the <pin>stop!</pin>
+      is stored in the <attribute>stop-code</attribute> attribute.
+      After the inner loop exits, the <pin>stopping</pin> output pin is driven.
     </behavior>
 
     <convention name="supervisory" supported="true"/>

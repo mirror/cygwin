@@ -234,9 +234,11 @@ Functionality:
    |               | during the initial starting     |
    |               | signal, in which case this      |
    |               | inner loop will not be entered  |
-   |               | at all.) After the inner loop   |
-   |               | exits, the stopping output pin  |
-   |               | is driven.                      |
+   |               | at all.) The value driven on    |
+   |               | the stop! is stored in the      |
+   |               | stop-code attribute. After the  |
+   |               | inner loop exits, the stopping  |
+   |               | output pin is driven.           |
    +-------------------------------------------------+
 
    +-------------------------------------------------+
@@ -307,6 +309,8 @@ Component Reference:
    |running            |register|-     |-      |main loop     ||
    |-------------------+--------+------+-------+--------------||
    |activity-count     |register|-     |-      |main loop     ||
+   |-------------------+--------+------+-------+--------------||
+   |stop-code          |register|-     |-      |main loop     ||
    |-------------------+--------+------+-------+--------------||
    |perform-activity   |pin     |-     |-      |main loop     ||
    |-------------------+--------+------+-------+--------------||

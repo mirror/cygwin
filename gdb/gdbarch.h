@@ -49,6 +49,7 @@ struct regset;
 struct disassemble_info;
 struct target_ops;
 struct obstack;
+struct dwarf_expr_piece;
 
 extern struct gdbarch *current_gdbarch;
 
@@ -435,6 +436,32 @@ extern void set_gdbarch_dwarf2_reg_to_regnum (struct gdbarch *gdbarch, gdbarch_d
 #if !defined (DWARF2_REG_TO_REGNUM)
 #define DWARF2_REG_TO_REGNUM(dwarf2_regnr) (gdbarch_dwarf2_reg_to_regnum (current_gdbarch, dwarf2_regnr))
 #endif
+
+/* On some architectures, GDB has registers that Dwarf treats as the
+   concatenation of two separate registers.  For example, PowerPC
+   variants implementing the SPE APU have 64-bit general-purpose
+   registers.  GDB refers to the lower 32 bits of each register as 'r0'
+   -- 'r31', and the full 64-bit registers as 'ev0' -- 'ev31'.
+   However, the Dwarf register numbering treats the upper halves as
+   separate registers.
+  
+   Dwarf location expressions describe variables allocated to such
+   registers using a series of DW_OP_piece operations.  In the case
+   above, the expressions would have the form:
+  
+     <upper half> DW_OP_piece 4 <lower half> DW_OP_piece 4.
+  
+   However, since GDB does have a register that corresponds to the
+   entire variable, it can simply say the variable lives in that
+   register; it needn't use a complicated location description.
+  
+   Given an array of NUM_PIECES pieces PIECES, return the number of the
+   register that is equivalent to those pieces, or -1 if there is no
+   such register. */
+
+typedef int (gdbarch_dwarf_simplify_register_pieces_ftype) (struct gdbarch *gdbarch, int num_pieces, struct dwarf_expr_piece *pieces);
+extern int gdbarch_dwarf_simplify_register_pieces (struct gdbarch *gdbarch, int num_pieces, struct dwarf_expr_piece *pieces);
+extern void set_gdbarch_dwarf_simplify_register_pieces (struct gdbarch *gdbarch, gdbarch_dwarf_simplify_register_pieces_ftype *dwarf_simplify_register_pieces);
 
 typedef const char * (gdbarch_register_name_ftype) (int regnr);
 extern const char * gdbarch_register_name (struct gdbarch *gdbarch, int regnr);

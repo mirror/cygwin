@@ -143,6 +143,7 @@ struct gdbarch
   gdbarch_dwarf_reg_to_regnum_ftype *dwarf_reg_to_regnum;
   gdbarch_sdb_reg_to_regnum_ftype *sdb_reg_to_regnum;
   gdbarch_dwarf2_reg_to_regnum_ftype *dwarf2_reg_to_regnum;
+  gdbarch_dwarf_simplify_register_pieces_ftype *dwarf_simplify_register_pieces;
   gdbarch_register_name_ftype *register_name;
   gdbarch_register_type_ftype *register_type;
   gdbarch_deprecated_register_virtual_type_ftype *deprecated_register_virtual_type;
@@ -292,6 +293,7 @@ struct gdbarch startup_gdbarch =
   0,  /* dwarf_reg_to_regnum */
   0,  /* sdb_reg_to_regnum */
   0,  /* dwarf2_reg_to_regnum */
+  dwarf_never_simplify_pieces,  /* dwarf_simplify_register_pieces */
   0,  /* register_name */
   0,  /* register_type */
   0,  /* deprecated_register_virtual_type */
@@ -451,6 +453,7 @@ gdbarch_alloc (const struct gdbarch_info *info,
   current_gdbarch->dwarf_reg_to_regnum = no_op_reg_to_regnum;
   current_gdbarch->sdb_reg_to_regnum = no_op_reg_to_regnum;
   current_gdbarch->dwarf2_reg_to_regnum = no_op_reg_to_regnum;
+  current_gdbarch->dwarf_simplify_register_pieces = dwarf_never_simplify_pieces;
   current_gdbarch->deprecated_register_byte = generic_register_byte;
   current_gdbarch->deprecated_register_raw_size = generic_register_size;
   current_gdbarch->deprecated_register_virtual_size = generic_register_size;
@@ -576,6 +579,9 @@ verify_gdbarch (struct gdbarch *current_gdbarch)
   /* Skip verify of dwarf_reg_to_regnum, invalid_p == 0 */
   /* Skip verify of sdb_reg_to_regnum, invalid_p == 0 */
   /* Skip verify of dwarf2_reg_to_regnum, invalid_p == 0 */
+  if ((GDB_MULTI_ARCH > GDB_MULTI_ARCH_PARTIAL)
+      && (current_gdbarch->dwarf_simplify_register_pieces == dwarf_never_simplify_pieces))
+    fprintf_unfiltered (log, "\n\tdwarf_simplify_register_pieces");
   /* Skip verify of register_type, has predicate */
   /* Skip verify of deprecated_register_virtual_type, has predicate */
   /* Skip verify of deprecated_register_byte, has predicate */
@@ -1437,6 +1443,9 @@ gdbarch_dump (struct gdbarch *current_gdbarch, struct ui_file *file)
   fprintf_unfiltered (file,
                       "gdbarch_dump: dwarf_reg_to_regnum = <0x%lx>\n",
                       (long) current_gdbarch->dwarf_reg_to_regnum);
+  fprintf_unfiltered (file,
+                      "gdbarch_dump: dwarf_simplify_register_pieces = <0x%lx>\n",
+                      (long) current_gdbarch->dwarf_simplify_register_pieces);
 #ifdef ECOFF_REG_TO_REGNUM
   fprintf_unfiltered (file,
                       "gdbarch_dump: %s # %s\n",
@@ -2604,6 +2613,23 @@ set_gdbarch_dwarf2_reg_to_regnum (struct gdbarch *gdbarch,
                                   gdbarch_dwarf2_reg_to_regnum_ftype dwarf2_reg_to_regnum)
 {
   gdbarch->dwarf2_reg_to_regnum = dwarf2_reg_to_regnum;
+}
+
+int
+gdbarch_dwarf_simplify_register_pieces (struct gdbarch *gdbarch, int num_pieces, struct dwarf_expr_piece *pieces)
+{
+  gdb_assert (gdbarch != NULL);
+  gdb_assert (gdbarch->dwarf_simplify_register_pieces != NULL);
+  if (gdbarch_debug >= 2)
+    fprintf_unfiltered (gdb_stdlog, "gdbarch_dwarf_simplify_register_pieces called\n");
+  return gdbarch->dwarf_simplify_register_pieces (gdbarch, num_pieces, pieces);
+}
+
+void
+set_gdbarch_dwarf_simplify_register_pieces (struct gdbarch *gdbarch,
+                                            gdbarch_dwarf_simplify_register_pieces_ftype dwarf_simplify_register_pieces)
+{
+  gdbarch->dwarf_simplify_register_pieces = dwarf_simplify_register_pieces;
 }
 
 const char *

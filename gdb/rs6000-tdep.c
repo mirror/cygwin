@@ -40,6 +40,7 @@
 #include "sim-regno.h"
 #include "gdb/sim-ppc.h"
 #include "reggroups.h"
+#include "dwarf2expr.h"
 #include "dwarf2-frame.h"
 
 #include "libbfd.h"		/* for bfd_default_set_arch_mach */
@@ -2006,6 +2007,84 @@ e500_register_reggroup_p (struct gdbarch *gdbarch,
   return default_register_reggroup_p (gdbarch, regnum, group);
 }
 
+/* Return true if PIECE is a SPE upper-half register for ARCH.
+   Remember that pieces use the Dwarf register numbering.  */
+static int
+dwarf_piece_is_ev_upper_reg (struct gdbarch *arch,
+                       struct dwarf_expr_piece *piece)
+{
+  struct gdbarch_tdep *tdep = gdbarch_tdep (arch);
+
+  return (piece->in_reg
+          && 1200 <= piece->value
+          && piece->value < 1200 + ppc_num_gprs
+          && piece->size == register_size (arch, 
+                                           (piece->value - 1200
+                                            + tdep->ppc_ev0_upper_regnum)));
+}
+
+/* Return true if PIECE is a full GPR in ARCH.
+   Remember that pieces use the Dwarf register numbering.  */
+static int
+dwarf_piece_is_gpr (struct gdbarch *arch,
+                       struct dwarf_expr_piece *piece)
+{
+  struct gdbarch_tdep *tdep = gdbarch_tdep (arch);
+
+  return (piece->in_reg
+          && 0 <= piece->value
+          && piece->value < ppc_num_gprs
+          && (piece->size
+              == register_size (arch, piece->value + tdep->ppc_gp0_regnum)));
+}
+
+static int
+e500_dwarf_simplify_register_pieces (struct gdbarch *gdbarch,
+                                     int num_pieces,
+                                     struct dwarf_expr_piece *pieces)
+{
+  struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
+
+  if (num_pieces == 2)
+    {
+      int low, high;
+
+      /* Pieces are listed in order of increasing addresses, so the
+         endianness affects the order of the most- and least-
+         significant halves.  */
+      if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
+        high = 0, low = 1;
+      else if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_LITTLE)
+        low = 0, high = 1;
+      else
+        internal_error (__FILE__, __LINE__,
+                        "fetch_register: unexpected byte order: %d",
+                        gdbarch_byte_order (gdbarch));
+
+      /* An SPE vector register is the concatenation of an "upper
+         half" register with a GPR, each four bytes long.  */
+      if (dwarf_piece_is_ev_upper_reg (gdbarch, &pieces[high])
+          && dwarf_piece_is_gpr (gdbarch, &pieces[low])
+          && (pieces[high].value - 1200 == pieces[low].value))
+        /* Return the corresponding 64-bit 'ev' pseudo-register.  */
+        return tdep->ppc_ev0_regnum + pieces[low].value;
+      
+      /* long long values are sometimes placed in pairs of consecutive
+         registers.  The lower-addressed end of the value is always
+         assigned the lower-numbered register, so we don't need to
+         worry about endianness here.  */
+      else if (dwarf_piece_is_gpr (gdbarch, &pieces[0])
+               && dwarf_piece_is_gpr (gdbarch, &pieces[1])
+               && pieces[0].value + 1 == pieces[1].value)
+        return tdep->ppc_gp0_regnum + pieces[0].value;
+
+      else
+        return -1;
+    }
+  else
+    return -1;
+}
+
 /* Convert a DBX STABS register number to a GDB register number.  */
 static int
 rs6000_stab_reg_to_regnum (int num)
@@ -3177,6 +3256,8 @@ rs6000_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
         set_gdbarch_pseudo_register_read (gdbarch, e500_pseudo_register_read);
         set_gdbarch_pseudo_register_write (gdbarch, e500_pseudo_register_write);
         set_gdbarch_register_reggroup_p (gdbarch, e500_register_reggroup_p);
+        set_gdbarch_dwarf_simplify_register_pieces
+          (gdbarch, e500_dwarf_simplify_register_pieces);
 	break;
 
       case bfd_mach_ppc64:

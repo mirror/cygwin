@@ -457,6 +457,30 @@ f:=:int:dwarf_reg_to_regnum:int dwarf_regnr:dwarf_regnr:::no_op_reg_to_regnum::0
 # Convert from an sdb register number to an internal gdb register number.
 f:=:int:sdb_reg_to_regnum:int sdb_regnr:sdb_regnr:::no_op_reg_to_regnum::0
 f:=:int:dwarf2_reg_to_regnum:int dwarf2_regnr:dwarf2_regnr:::no_op_reg_to_regnum::0
+
+# On some architectures, GDB has registers that Dwarf treats as the
+# concatenation of two separate registers.  For example, PowerPC
+# variants implementing the SPE APU have 64-bit general-purpose
+# registers.  GDB refers to the lower 32 bits of each register as 'r0'
+# -- 'r31', and the full 64-bit registers as 'ev0' -- 'ev31'.
+# However, the Dwarf register numbering treats the upper halves as
+# separate registers.
+#
+# Dwarf location expressions describe variables allocated to such
+# registers using a series of DW_OP_piece operations.  In the case
+# above, the expressions would have the form:
+#
+#   <upper half> DW_OP_piece 4 <lower half> DW_OP_piece 4.
+#
+# However, since GDB does have a register that corresponds to the
+# entire variable, it can simply say the variable lives in that
+# register; it needn't use a complicated location description.
+#
+# Given an array of NUM_PIECES pieces PIECES, return the number of the
+# register that is equivalent to those pieces, or -1 if there is no
+# such register.
+m::int:dwarf_simplify_register_pieces:int num_pieces, struct dwarf_expr_piece *pieces:num_pieces, pieces:::dwarf_never_simplify_pieces
+
 f:=:const char *:register_name:int regnr:regnr
 
 # REGISTER_TYPE is a direct replacement for DEPRECATED_REGISTER_VIRTUAL_TYPE.
@@ -858,6 +882,7 @@ struct regset;
 struct disassemble_info;
 struct target_ops;
 struct obstack;
+struct dwarf_expr_piece;
 
 extern struct gdbarch *current_gdbarch;
 

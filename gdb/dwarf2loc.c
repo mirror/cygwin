@@ -231,11 +231,18 @@ dwarf2_evaluate_loc_desc (struct symbol *var, struct frame_info *frame,
 
   if (ctx->num_pieces > 0)
     {
-      /* We haven't implemented splicing together pieces from
-         arbitrary sources yet.  */
-      error ("The value of variable '%s' is distributed across several\n"
-             "locations, and GDB cannot access its value.\n",
-             SYMBOL_NATURAL_NAME (var));
+      CORE_ADDR simplified
+        = gdbarch_dwarf_simplify_register_pieces (arch, ctx->num_pieces,
+                                                  ctx->pieces);
+      if (simplified >= 0)
+        retval = value_from_register (SYMBOL_TYPE (var), simplified, frame);
+
+      /* We haven't implemented the more complex case of splicing
+         together pieces from arbitrary sources yet.  */
+      else
+        error ("The value of variable '%s' is distributed across several\n"
+               "locations, and GDB cannot access its value.\n",
+               SYMBOL_NATURAL_NAME (var));
     }
   else if (ctx->in_reg)
       CORE_ADDR dwarf_regnum = dwarf_expr_fetch (ctx, 0);

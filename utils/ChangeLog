@@ -1,3 +1,8 @@
+2002-11-22  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Pass 'srcdir' to subconfigures correctly.
+	* configure: Regenerate.
+
 2002-05-28  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* Remove amd-udi subdirectory - it is obsolete.

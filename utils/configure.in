@@ -62,7 +62,7 @@ case "${cache_file}" in
     ;;
 esac
 subconfigure_args=${ac_configure_args}
-subconfigure_args="${subconfigure_args} --cache-file=${abs_cache_file}"
+subconfigure_args="${subconfigure_args} --cache-file=${abs_cache_file} --srcdir=${abs_srcdir}"
 AC_SUBST([subconfigure_args])
 
 AC_OUTPUT([Makefile])

@@ -177,12 +177,14 @@ protected:
     (host_int_4 addr, bus_size mask, bus_size data) = 0;
 
   virtual sid::bus::status fiq_read_word
-    (host_int_4 addr, bus_size mask, bus_size& data) { }
+    (host_int_4 addr, bus_size mask, bus_size& data) 
+      { return sid::bus::unmapped; }
   virtual sid::bus::status fiq_write_word
-    (host_int_4 addr, bus_size mask, bus_size data) { }
+    (host_int_4 addr, bus_size mask, bus_size data)
+      { return sid::bus::unmapped; }
 
   virtual void irq_src_driven (host_int_4 driven_val, host_int_4 bit_num) = 0;
-  virtual void fiq_src_driven (host_int_4 driven_val, host_int_4 bit_num) { }
+  virtual void fiq_src_driven (host_int_4 driven_val, host_int_4 bit_num) {}
 
   enum { INTR_INACTIVE = 1, INTR_ACTIVE = 0 };
 

@@ -265,7 +265,7 @@ IntController<bus_size>::IntController<bus_size>
   interrupt_lines* tmpline = NULL;
   string tmpstr = "";
   
-  for (int i = 0; i < num_irq; ++i)
+  for (unsigned i = 0; i < num_irq; ++i)
     {
       tmpline = new interrupt_lines (i, this,
 	&IntController<bus_size>::irq_src_driven);
@@ -283,7 +283,7 @@ IntController<bus_size>::IntController<bus_size>
       tmpstr = "";
     }
 
-  for (int i = 0; i < num_fiq; ++i)
+  for (unsigned i = 0; i < num_fiq; ++i)
     {
       tmpline = new interrupt_lines (i, this,
 	&IntController<bus_size>::fiq_src_driven);
@@ -371,5 +371,83 @@ IntController<bus_size>::reset(host_int_4 reset_val)
 }
 
 
+template<class bus_size>
+ostream& operator<< (ostream& op, const IntController<bus_size>& copy_obj)
+{
+  op << "IRQEnable " << copy_obj.irq_enabled << " ";
+  op << "IRQPend "   << copy_obj.irq_pending;
+  op << " FIQEnable " << copy_obj.fiq_enabled;
+  op << " FIQPend "   << copy_obj.fiq_pending;
+  op << endl;
+  
+  op << "Pins ";
+  op << copy_obj.reset_pin << " ";
+  op << copy_obj.irq_pin;
+  op << " " << copy_obj.fiq_pin;
+  
+  for (unsigned i = 0; i < copy_obj.irq_lines.size(); i++)
+    op << " " << *static_cast<input_pin*>(copy_obj.irq_lines[i]);
+  for (unsigned i = 0; i < copy_obj.fiq_lines.size(); i++)
+    op << " " << *static_cast<input_pin*>(copy_obj.fiq_lines[i]);
+  
+  // NB: no whitespace at end!
+  
+  return op;
+}
+
+template <class bus_size>
+istream& operator>> (istream& ip, IntController<bus_size>& ovwrite_obj)
+{
+  string coding;
+  
+  ip >> coding;
+  if (coding != "IRQEnable")
+    {
+      ip.setstate(ios::badbit);
+      return ip;
+    }
+  ip >> ovwrite_obj.irq_enabled;
+  
+  ip >> coding;
+  if (coding != "IRQPend")
+    {
+      ip.setstate(ios::badbit);
+      return ip;
+    }
+  ip >> ovwrite_obj.irq_pending;	    
+  
+  ip >> coding;
+  if ( coding != "FIQEnable")
+    {
+      ip.setstate(ios::badbit);
+      return ip;
+    }
+  ip >> ovwrite_obj.fiq_enabled;
+  
+  ip >> coding;
+  if ( coding != "FIQPend")
+    {
+      ip.setstate(ios::badbit);
+      return ip;
+    }
+  ip >> ovwrite_obj.fiq_pending;
+  
+  ip >> coding;
+  if (coding != "Pins" )
+    {
+      ip.setstate (ios::badbit);
+      return ip;
+    }
+  ip >> ovwrite_obj.reset_pin;
+  ip >> ovwrite_obj.irq_pin;
+  ip >> ovwrite_obj.fiq_pin;
+  
+  for (unsigned i = 0; i < ovwrite_obj.irq_lines.size(); i++)
+    ip >> *static_cast<input_pin*>(ovwrite_obj.irq_lines[i]);
+  for (unsigned i = 0; i < ovwrite_obj.fiq_lines.size(); i++)
+    ip >> *static_cast<input_pin*>(ovwrite_obj.fiq_lines[i]);
+  
+  return ip;
+}
 
 #endif // COMPONENTS_H

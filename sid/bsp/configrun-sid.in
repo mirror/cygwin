@@ -345,10 +345,6 @@ $zeroth_section = "# sid configuration file
 # run by $whoami @ $hostname ($uname) at $date
 # args: @ARGV_COPY\n";
 
-if ($opt_verbose) { $zeroth_section .= "set main verbose? true\n"; }
-if ($opt_persistent) { $zeroth_section .= "set main persistent? true\n"; }
-
-
 $cpu_component_type = $cpu_comptype{$opt_cpu} || die "Unknown cpu $opt_cpu for cpu component type\n";
 $first_section = "# first section\n" .
   &sidconf_new("$cpu_component_type", "cpu") . "\n" .
@@ -854,6 +850,7 @@ else
 
 # --gdb
 # Generate a gdb component for each processor requested.
+$non_cpu_gdbs=0;
 foreach $processor (keys %opt_gdbport)
   {
     $first_section .= "# $processor gdb\n" .
@@ -882,6 +879,25 @@ connect-pin host-sched 6-event -> ${processor}-gdb-socket poll-event
 connect-pin host-sched 6-control <- ${processor}-gdb-socket poll-control
 set ${processor}-gdb-socket sockaddr-local 0.0.0.0:$opt_gdbport{$processor}\n" .
 ($opt_verbose ? "set ${processor}-gdb-socket verbose? $opt_verbose\n" : "");
+    if ($processor ne "cpu")
+      {
+	$non_cpu_gdbs ++;
+      }
+  }
+
+# Update the enable thresholds of the shedulers to account for GDB components
+# attached to processors other than the cpu.
+if ($non_cpu_gdbs != 0)
+  {
+    $opt_persistent = 1;
+    $sched_threshold = $non_cpu_gdbs + 1;
+    $third_section .= "
+# We want the target scheduler to come up enabled, so update the enabled?
+# attribute to match the threshold. The GDB components will take care of
+# disabling it when necessary.
+set target-sched enable-threshold $sched_threshold
+set target-sched enabled? $sched_threshold
+";
   }
 
 # Additional settings for main cpu gdb.
@@ -1149,7 +1165,8 @@ foreach $lib (sort keys %component_libs)
 
 
 # ----------------------------------------------------------------------------
-
+if ($opt_verbose) { $zeroth_section .= "set main verbose? true\n"; }
+if ($opt_persistent) { $zeroth_section .= "set main persistent? true\n"; }
 
 # Build config file
 $tmpdir = $ENV{'TMPDIR'} ? $ENV{'TMPDIR'} : "/tmp";

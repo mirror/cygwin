@@ -1,3 +1,10 @@
+2001-10-17  Dave Brolley  <brolley@redhat.com>
+
+	* configrun-sid.in: Move check of $opt_persistent and $opt_verbose to
+	just before output.
+	Check for gdb components attached to processors other than the main
+	cpu. Adjust the enable-threshold of target-sched accordingly.
+
 2001-10-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configrun-sid.in: Throughout, set boolean attributes only to

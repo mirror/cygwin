@@ -173,7 +173,7 @@ cache_set::find (const cache_tag& tag)
   // order of associativity will be small.
 
   for (const_iterator_t it = lines.begin (); it != lines.end (); it++)
-    if (tag == *(*it))
+    if (tag == *(*it) && (*it)->valid_p ())
       {
 	replacer.update (*this, *(*it));
 	return *it;

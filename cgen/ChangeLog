@@ -1,3 +1,10 @@
+2005-01-20  Jim Blandy  <jimb@redhat.com>
+
+	* utils.scm (concat): New function.
+	* insn.scm (-sub-insn-make!): Use concat instead of string-map.
+	* rtl.scm (rtx-dump): Same.
+	* semantics.scm (semantic-compile): Same.
+
 2004-12-16  Jim Blandy  <jimb@redhat.com>
 
 	* utils-cgen.scm (parse-name): Don't assume that string-map can be

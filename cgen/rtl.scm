@@ -786,11 +786,11 @@
 
 (define (rtx-dump rtx)
   (cond ((list? rtx) (map rtx-dump rtx))
-	((object? rtx) (string-append "#<object "
-				      (object-class-name rtx)
-				      " "
-				      (obj:name rtx)
-				      ">"))
+	((object? rtx) (concat "#<object "
+			       (object-class-name rtx)
+			       " "
+			       (obj:name rtx)
+			       ">"))
 	(else rtx))
 )
 

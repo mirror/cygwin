@@ -271,10 +271,10 @@
 	 (obj:name insn)
 	 ":"
 	 (string-map (lambda (op newval)
-		       (string-append " "
-				      (obj:name op)
-				      "="
-				      (obj:name newval)))
+		       (concat " "
+			       (obj:name op)
+			       "="
+			       (obj:name newval)))
 		     anyof-operands new-values)
 	 " ...\n")
 

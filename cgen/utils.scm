@@ -85,6 +85,12 @@
     (write (spaces n) port))
 )
 
+; Concatenate all the arguments and make a string.  Symbols are
+; converted to strings.
+(define (concat . sequences)
+  (define (sequence->string o) (if (symbol? o) (symbol->string o) o))
+  (apply string-append (map sequence->string sequences)))
+
 ; Often used idiom.
 
 (define (string-map fn . args) (apply string-append (apply map (cons fn args))))

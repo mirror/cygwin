@@ -1,3 +1,9 @@
+2001-03-14  Frank Ch. Eigler  <fche@redhat.com>
+
+	* socketio.cxx (asyncificate): Set TCP_NODELAY and SO_KEEPALIVE options.
+	(init_handler): Don't bother with SO_KEEPALIVE here.
+	* components.h: #include <netinet/tcp.h>.
+
 2001-01-17  Jeff Johnston  <jjohnstn@redhat.com>
 
         * stdio.cxx (stdioConsole::read): Change to read a reasonable size of

@@ -188,8 +188,6 @@ socketio::socketio(bool s):
   int on = 1;
   on = 1;
   setsockopt (this->fd, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof (on));
-  on = 1;
-  setsockopt (this->fd, SOL_SOCKET, SO_KEEPALIVE, (char*)&on, sizeof (on));
 
   // bind; even if INADDR_ANY & port 0
   this->sock_name.sin_family = AF_INET;
@@ -258,13 +256,24 @@ socketio::socketio(bool s):
   void 
   socketio::asyncificate (int fd)
 {
+  // Disable transmit coalescing
+  int on = 1;
+  int rc = setsockopt (this->fd, IPPROTO_TCP, TCP_NODELAY, (char*)&on, sizeof (on));
+  if (rc)
+    cerr << "setsockopt TCP_NODELAY error: " << std_error_string() << endl;
+
+  on = 1;
+  rc = setsockopt (this->fd, SOL_SOCKET, SO_KEEPALIVE, (char *)&on, sizeof (on));
+  if (rc)
+    cerr << "setsockopt SO_KEEPALIVE error: " << std_error_string() << endl;
+
   // Make this file descriptor nonblocking.
   // Don't make it O_ASYNC though - we don't care about SIGIO.
 
   // POSIX way
   int flags = fcntl (fd, F_GETFL, 0);
   flags |= O_NONBLOCK;
-  int rc = fcntl (fd, F_SETFL, flags);
+  rc = fcntl (fd, F_SETFL, flags);
 
   if (rc == -1)
     cerr << "fcntl error: " << std_error_string() << endl;

@@ -1,8 +1,15 @@
 2000-08-02  Jimmy Guo  <guo@hpcleara.cup.hp.com>
 
+	* lib/utils.exp: Add support for a -maxdepth <n>
+        option to limit find to <n> directories deep.
+
 	* runtest.exp: Cleanup reference to $env(MULTIPASS) and
         $env(PASS).  These were added by HP but unused since.
-
+	Handle multiple directories in TCL variables
+        dir_to_run and cmdline_dir_to_run; limit *.exp find to
+        one directory level to avoid foo/bar/baz.exp getting tested
+        twice (when ${dir} is 'foo', and when ${dir} is 'foo/bar').
+	
 	* lib/framework.exp (pass): make compiler_conditional_xfail_data
 	a global, corresponding to a recent change to 'proc fail'.
 	

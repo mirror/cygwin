@@ -19,7 +19,7 @@ This document describes some BFD internal information which may be
 helpful when working on BFD.  It is very incomplete.
 
 This document is not updated regularly, and may be out of date.  It was
-last modified on $Date: 1999/05/03 07:28:58 $.
+last modified on $Date: 2000/04/17 07:54:12 $.
 
 The initial version of this document was written by Ian Lance Taylor
 @email{ian@@cygnus.com}.
@@ -447,7 +447,7 @@ For example, the @samp{BFD_JUMP_TABLE_RELOCS} macro defines three
 functions: @samp{_get_reloc_upper_bound}, @samp{_canonicalize_reloc},
 and @samp{_bfd_reloc_type_lookup}.  A reference like
 @samp{BFD_JUMP_TABLE_RELOCS (foo)} will expand into three functions
-prefixed with @samp{foo}: @samp{foo_get_reloc_upper_found}, etc.  The
+prefixed with @samp{foo}: @samp{foo_get_reloc_upper_bound}, etc.  The
 @samp{BFD_JUMP_TABLE_RELOCS} macro will be placed such that those three
 functions initialize the appropriate fields in the BFD target vector.
 

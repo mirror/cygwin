@@ -1,6 +1,5 @@
-/* Native-dependent definitions for Sparc running NetBSD, for GDB.
-   Copyright 1986, 1987, 1989, 1992, 1994, 1996, 1999, 2000, 2002
-   Free Software Foundation, Inc.
+/* Macro definitions for UltraSPARC running under NetBSD.
+   Copyright 1994, 2002 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -19,17 +18,10 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#ifndef NM_NBSD_H
-#define NM_NBSD_H
+#ifndef TM_NBSD64_H
+#define TM_NBSD64_H
 
-#include "regcache.h"
+#include "sparc/tm-sp64.h" /* sets GDB_MULTI_ARCH */
+#include "solib.h"
 
-/* Get generic NetBSD native definitions. */
-
-#include "config/nm-nbsd.h"
-
-/* Before storing, we need to read all the registers.  */
-
-#define CHILD_PREPARE_TO_STORE() read_register_bytes (0, NULL, REGISTER_BYTES)
-
-#endif /* NM_NBSD_H */
+#endif /* TM_NBSD64_H */

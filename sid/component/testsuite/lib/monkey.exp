@@ -265,7 +265,7 @@ proc monkey_test_attribute {} {
     if {! [attr_safe_p $attr]} then { return }
 
     set garbage [random_string]
-    set result [sid_cmd [list sid::component::set_attribute_value $victim $attr $garbage]]
+    set result [sid_cmd [list sid::component::set_attribute_value $victim $attr [list $garbage]]]
     if [string match "" $result] then { return "eof" }
 }
 
@@ -322,7 +322,7 @@ proc monkey_test_state_restore {} {
     set pick [expr [random $num_state_snapshots] + 1]
 
     set state $state_snapshots($pick)
-    set result [sid_cmd [list sid::component::set_attribute_value $victim state-snapshot $state]]
+    set result [sid_cmd [list sid::component::set_attribute_value $victim state-snapshot [list $state]]]
     if {$result != "ok"} then {
 	# don't warn over and over again - dummy attribute
 	set attrname "state-snapshot"

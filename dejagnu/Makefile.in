@@ -513,6 +513,10 @@ dist-hook: rpmspec overview.html overview.ps overview.pdf
 	-cp -fr doc/overview.ps $(distdir)/doc/
 	-cp -fr doc/overview.pdf $(distdir)/doc/
 
+install-info:
+
+uninstall-info:
+
 install-data-local:
 	$(mkinstalldirs) $(lib_dest) $(includedir)
 	for f in $(lib_files); do \

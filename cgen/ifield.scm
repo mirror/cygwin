@@ -1,5 +1,5 @@
 ; Instruction fields.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000,2002 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -454,34 +454,30 @@
 	      )
 
 	  ; Calculate the <bitrange> object.
-	  ; FIXME: word-offset/word-length computation needs work.
-	  ; Move positional info to format?
+	  ; ??? Move positional info to format?
 	  (let ((bitrange
 		 (if word-offset
-		     ; CISC
+
+		     ; CISC-like. Easy. Everything must be specified.
 		     (make <bitrange>
 		       word-offset start flength word-length lsb0?)
-		     ; RISC
-		     (let* ((default-insn-word-bitsize
-			      (isa-default-insn-word-bitsize isa))
-			    (word-offset
-			     (- start
-				(remainder start
-					   default-insn-word-bitsize)))
-			    (start (remainder start default-insn-word-bitsize)))
+
+		     ; RISC-like. Hard. Have to make best choice of start,
+		     ; flength. This doesn't have to be perfect, just easily
+		     ; explainable.  Cases this doesn't handle can explicitly
+		     ; specify word-offset,word-length.
+		     ; One can certainly argue the choice of the term
+		     ; "RISC-like" is inaccurate.  Perhaps.
+		     (let* ((diwb (isa-default-insn-word-bitsize isa))
+			    (word-offset (-get-ifld-word-offset start flength diwb lsb0?))
+			    (word-length (-get-ifld-word-length start flength diwb lsb0?))
+			    (start (- start word-offset))
+			    )
 		       (make <bitrange>
 			 word-offset
 			 start
 			 flength
-			 (if lsb0?
-			     (* (quotient (+ start 1
-					     (- default-insn-word-bitsize 1))
-					  default-insn-word-bitsize)
-				default-insn-word-bitsize)
-			     (* (quotient (+ start flength
-					     (- default-insn-word-bitsize 1))
-					  default-insn-word-bitsize)
-				default-insn-word-bitsize))
+			 word-length
 			 lsb0?))))
 		 )
 
@@ -502,6 +498,40 @@
 	(begin
 	  (logit 2 "Ignoring " name ".\n")
 	  #f)))
+)
+
+; Subroutine of -ifield-parse to simplify it.
+; Given START,FLENGTH, return the "best" choice for the offset to the word
+; containing the ifield.
+; This is easy to visualize, hard to put into words.
+; Imagine several words of size DIWB laid out from the start of the insn.
+; On top of that lay the ifield.
+; Now pick the set of words that are required to contain the ifield.
+; That's what we want.
+; No claim is made that this is always the correct choice for any
+; particular architecture.  For those where this isn't correct, the ifield
+; must be fully specified.
+
+(define (-get-ifld-word-offset start flength diwb lsb0?)
+  (if lsb0?
+      ; Convert to non-lsb0 case, then it's easy.
+      (set! start (+ (- start flength) 1)))
+  (- start (remainder start diwb))
+)
+
+; Subroutine of -ifield-parse to simplify it.
+; Given START,FLENGTH, return the "best" choice for the length of the word
+; containing the ifield.
+; DIWB = default insn word bitsize
+; See -get-ifld-word-offset for more info.
+
+(define (-get-ifld-word-length start flength diwb lsb0?)
+  (if lsb0?
+      ; Convert to non-lsb0 case, then it's easy.
+      (set! start (+ (- start flength) 1)))
+  (* (quotient (+ (remainder start diwb) flength (- diwb 1))
+	       diwb)
+     diwb)
 )
 
 ; Read an instruction field description.

@@ -1,3 +1,7 @@
+2001-11-28  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* Makefile.am (libinterrupt_la_SOURCES): Fix 'cma22.h' typo.
+
 2001-07-13  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (check-local): Rename target from "checkme".

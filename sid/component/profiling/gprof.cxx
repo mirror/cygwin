@@ -269,7 +269,8 @@ namespace profiling_components
 	    return;
 	  }
 
-	ofstream of (this->output_file.c_str ());
+	ofstream of (this->output_file.c_str (),
+                     ios::out | ios::trunc | ios::binary);
 	if (! of.good())
 	  {
 	    cerr << "sw-profile-gprof: Error opening "

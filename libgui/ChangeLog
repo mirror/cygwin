@@ -1,3 +1,18 @@
+2000-07-11  Mo DeJong  <mdejong@redhat.com>
+
+	* README:
+	* library/Makefile.am:
+	* library/Makefile.in:
+	* library/tclIndex:
+	* library/tree.tcl:
+	* library/treetable.tcl:
+	* src/Makefile.am:
+	* src/Makefile.in:
+	* src/guitcl.h:
+	* src/tkTreeTable.c:
+	* src/tkTreeTable.h: Moved implementation of
+	"treetable" command out back into snavigator.
+
 2000-07-06  Mo DeJong  <mdejong@redhat.com>
 
 	* library/debug.tcl (logfile): Use non-blocking IO.

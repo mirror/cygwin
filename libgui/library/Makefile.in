@@ -148,8 +148,8 @@ canvas.tcl cframe.tcl center.tcl debug.tcl def.tcl internet.tcl	\
 font.tcl gensym.tcl gettext.tcl hooks.tcl lframe.tcl list.tcl \
 looknfeel.tcl menu.tcl mono.tcl multibox.tcl parse_args.tcl path.tcl \
 postghost.tcl prefs.tcl print.tcl sendpr.tcl topbind.tcl toolbar.tcl \
-treetable.tcl ulset.tcl wframe.tcl wingrab.tcl ventry.tcl combobox.tcl \
-pane.tcl panedwindow.tcl tree.tcl
+ulset.tcl wframe.tcl wingrab.tcl ventry.tcl combobox.tcl \
+pane.tcl panedwindow.tcl
 
 
 PACKAGES = combobox.tcl

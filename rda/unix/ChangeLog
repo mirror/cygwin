@@ -28,7 +28,7 @@
 	* server.h (struct ss_save): Add field ``in_use''.  Change
 	type of field ``ss_addr'' to struct ``gdbserv_reg''.
 	* thread-db.c (wait_all_threads): Revise diagnostic message to
-	print signal number for SIGDEBUG symbol.
+	print signal number for SIGDEBUG signal.
 	(singlestep_thread): Add ``struct gdbserv *'' argument.  Adjust
 	all callers.
 

@@ -1,3 +1,8 @@
+2002-04-09  Keith Seitz  <keiths@redhat.com>
+
+	* test/iOUtil.test: Removed. Conflicted with real ioUtil.test
+	file.
+
 2001-10-28  Christopher Faylor  <cgf@redhat.com>
 
 	* cygwin/configure.in: Check for cygwin host rather than cygwin target.

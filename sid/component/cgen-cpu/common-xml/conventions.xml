@@ -1,0 +1,11 @@
+<!-- this is the set of "standard CPU conventions", to be included in a hw-cpu-*.xml file -->
+
+
+    <convention name="functional" supported="true" />
+    <convention name="save/restore" supported="true" />
+    <convention name="triggerpoints" supported="true">
+      <p>Triggerpoints are supported for CPU registers.</p>
+    </convention>
+    <convention name="inhibit-recursion" supported="true">
+      <p>It prevents harmful recursion from the <pin>step!</pin> input pin.</p>
+    </convention>

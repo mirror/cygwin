@@ -1,0 +1,15 @@
+<!-- this is the "standard CPU environment block", to be included in a hw-cpu-*.xml file -->
+
+  <title>Related components:</title>
+
+    <p>CPUs connect to many components: memory to store data and
+    instructions, a scheduler to provide <pin>step!</pin> signals, software
+    trap emulators, debugger interfaces.  The <pin>step-cycles</pin> output pin
+    may be used as a N-event-control input for a target scheduler to
+    track an estimate of consumed target time.</p>
+
+  <title>Host system:</title>
+
+    <p>Some error conditions are signalled by messages to standard error.
+    These include some illegal CPU states caused by the simulated
+    program.</p>

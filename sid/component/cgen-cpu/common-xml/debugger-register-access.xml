@@ -1,0 +1,13 @@
+<!-- this is a common portion of the register-access behavior, to be included in a hw-cpu-*.xml file -->
+
+      <p>This component exports a number of attributes for use by the
+      sw-debug-gdb component.  These are the <attribute>gdb-*</attribute> attributes, in
+      the "debugger" category.  The <attribute>gdb-register-N</attribute> group access all
+      registers in gdb's indexing scheme, in raw target byte order.
+      The <attribute>gdb-register-pc</attribute> is a special watchable value with no 
+      associated attribute.  The <attribute>gdb-num-registers</attribute> attribute provides 
+      the limit for N.  The <attribute>gdb-exp-registers</attribute> attribute provides a
+      semicolon-separated list of "expedited" register numbers.</p>
+
+      <p>The <bus>debugger-bus</bus> bus provides access to the target program's
+      address space, and is used by gdb to access target memory.</p>

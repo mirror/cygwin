@@ -1,0 +1,41 @@
+
+<!-- this is the "standard CPU interface", to be included in a hw-cpu-*.xml file -->
+
+    <!-- pins -->
+    <defpin name="endian-set!" direction="in" legalvalues="1 (big) / 2 (little)" behaviors="initialization" />
+    <defpin name="start-pc-set!" direction="in" legalvalues="any value" behaviors="initialization" />
+    <defpin name="reset!" direction="in" legalvalues="0 or 1" behaviors="initialization" />
+    <defpin name="trap" direction="inout" legalvalues="enum values" behaviors="exceptions/traps" />
+    <defpin name="trap-code" direction="out" legalvalues="various values" behaviors="exceptions/traps" />
+    <defpin name="step-cycles" direction="out" legalvalues="1..step-insn-count" behaviors="execution" />
+    <defpin name="step!" direction="in" legalvalues="any value" behaviors="execution" />
+    <defpin name="yield" direction="in" legalvalues="any" behaviors="execution" />
+    <defpin name="flush-icache" direction="in" legalvalues="any" behaviors="execution" />
+
+
+    <!-- accessors -->
+    <defaccessor name="data-memory" accesses="any" behaviors="execution" />
+    <defaccessor name="insn-memory" accesses="typically 4-byte accesses" behaviors="execution" />
+
+
+    <!-- buses -->
+    <defbus name="debugger-bus" addresses="any" accesses="any" behaviors="debugger access" />
+
+
+    <!-- attributes -->
+    <defattribute name="endian" category="register" legalvalues="'1'/'big'/'2'/'little'" defaultvalue="big" behaviors="initialization, register access" />
+    <defattribute name="trace-extract?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="initialization" />
+    <defattribute name="trace-result?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="initialization" />
+    <defattribute name="engine-type" category="setting" legalvalues="scache or pbb" defaultvalue="pbb" behaviors="execution" />
+    <defattribute name="insn-count" category="watchable register" legalvalues="number" behaviors="execution" />
+    <defattribute name="step-insn-count" category="setting" legalvalues="number" defaultvalue="1" behaviors="execution" />
+    <defattribute name="enable-step-trap?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="execution" />
+    <defattribute name="rN" category="watchable register" legalvalues="number" behaviors="register access" />
+    <defattribute name="pc" category="watchable register" legalvalues="number" behaviors="register access" />
+    <defattribute name="gdb-register-N" category="debugger" legalvalues="byte array" behaviors="register access" />
+    <defattribute name="gdb-num-registers" category="debugger" legalvalues="number" behaviors="register access" />
+    <defattribute name="gdb-exp-registers" category="debugger" legalvalues="number list" behaviors="register access" />
+    <defattribute name="state-snapshot" legalvalues="opaque string" behaviors="state save/restore" />
+    <defattribute name="step-cycles" category="watchable pin" legalvalues="number" behaviors="execution" />
+    <defattribute name="trap" category="watchable pin" legalvalues="number" behaviors="execution/traps" />
+    <defattribute name="trap-code" category="watchable pin" legalvalues="number" behaviors="execution/traps" />

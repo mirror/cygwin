@@ -98,10 +98,10 @@ $load_mapper_data = "mapper access-port";
 
 sub usage {
   print STDERR "
-Usage: $0 [option ..] [--] [exec args ..]
+Usage: $0 --cpu=CPU [option ..] [--] [exec args ..]
 Options:
  --help                     Print this help message.
- --cpu=CPU                  Select target processor                     [none]
+ --cpu=CPU   (REQUIRED)     Select target processor                     [none]
  --verbose                  Turn on various run-time verbosity settings.  [no]
  --save-temps               Keep generated sid configuration file.        [no]
  --trace-extract            Turn on CPU insn decode tracing.              [no]
@@ -202,7 +202,7 @@ my @ARGV_COPY = @ARGV;
 &GetOptions(@options);
 
 # handle help
-if ($opt_help) {
+if ($opt_help || $opt_cpu eq "") {
   &usage;
 }
 
@@ -279,7 +279,7 @@ $whoami=qx{whoami}; chop ($whoami);
 $hostname=qx{hostname}; chop ($hostname);
 $date=qx{date}; chop ($date);
 $uname=qx{uname}; chop ($uname);
-$version=q$Id: configrun-sid.in,v 1.11 2001/03/13 21:39:20 fche Exp $;
+$version=q$Id: configrun-sid.in,v 1.12 2001/03/13 21:44:22 fche Exp $;
 $zeroth_section = "# sid configuration file
 # created by $version
 # run by $whoami @ $hostname ($uname) at $date

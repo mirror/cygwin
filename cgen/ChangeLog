@@ -1,3 +1,8 @@
+2001-11-26  Geoffrey Keating  <geoffk@redhat.com>
+
+	* cpu/xstormy16.cpu: New file.
+	* cpu/xstormy16.opc: New file.
+
 2001-11-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* doc/sim.texi, rtl.texi, porting.texi: Correct texinfo markup typos.

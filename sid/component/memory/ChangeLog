@@ -1,3 +1,7 @@
+2001-03-16  Frank Ch. Eigler  <fche@redhat.com>
+
+	* generic.cxx (imagemmap_handler): Enforce minimum mmap file size.
+
 2001-03-13  Frank Ch. Eigler  <fche@redhat.com>
 
 	Adding support for memory-mapped files and pin-based error signalling.

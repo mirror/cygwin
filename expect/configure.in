@@ -65,9 +65,10 @@ case "${host}" in
 *-*-cygwin*)
   if test -d $srcdir/../tcl/cygwin/.
   then
-    TCL_BUILD_LIB_SPEC="../tcl/cygwin/libtcl8.0.a"
+    TCL_BUILD_LIB_SPEC="../tcl/cygwin/libtcl_cygwin.a"
     # Use the same static lib for installed_expect
-    TCL_LIB_SPEC="../tcl/cygwin/libtcl8.0.a"
+    TCL_LIB_SPEC="../tcl/cygwin/libtcl_cygwin.a"
+    EXP_CYGWIN_ALTTCL='-DCYGWIN_ALTTCL'
   fi
   ;;
 esac
@@ -136,6 +137,7 @@ dnl case "${host}" in
 dnl   i[[3456]]86-*-linux*)	EXP_CFLAGS="" ;;
 dnl esac
 dnl END CYGNUS LOCAL
+EXP_CFLAGS="$EXP_CFLAGS $EXP_CYGWIN_ALTTCL"
 
 AC_MSG_CHECKING([if running Mach])
 mach=0
@@ -848,6 +850,12 @@ if test -r /dev/ptmx -a "x$svr4_ptys_broken" = x -a "$cross_compiling" != "yes" 
   # I've never seen Tcl or Tk include -lpt so don't bother with explicit test
   AC_CHECK_FUNC(ptsname, , EXP_AND_TCL_LIBS="${EXP_AND_TCL_LIBS} -lpt")
   AC_CHECK_FUNC(ptsname, , EXP_AND_TK_LIBS="${EXP_AND_TK_LIBS} -lpt")
+  # CYGNUS LOCAL: IA-64
+  # On some systems (e.g., IA-64 Linux), we need to define _XOPEN_SOURCE
+  # in order to get a declaration for ptsname.  It is safe to simply
+  # define that whenever we are using ptsname.
+  AC_DEFINE(_XOPEN_SOURCE)
+  # END CYGNUS LOCAL
 else
   AC_MSG_RESULT(no)
 fi

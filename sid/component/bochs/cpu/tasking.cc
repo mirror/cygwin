@@ -975,5 +975,4 @@ BX_CPU_C::get_SS_ESP_from_TSS(unsigned pl, Bit16u *ss, Bit32u *esp)
 }
 #endif
 
-
 #endif // BX_SUPPORT_TASKING

@@ -31,13 +31,15 @@
 #define LOG_THIS BX_CPU_THIS_PTR
 
 
+#if BX_SUPPORT_SID
+#include "sid-x86-cpu-wrapper.h"
+#endif
 
 
 
   void
 BX_CPU_C::INSB_YbDX(BxInstruction_t *i)
 {
-#if 0
   Bit8u value8=0;
 
   if (BX_CPU_THIS_PTR cr0.pe && (BX_CPU_THIS_PTR eflags.vm || (CPL>IOPL))) {
@@ -80,14 +82,12 @@ BX_CPU_C::INSB_YbDX(BxInstruction_t *i)
       DI = DI + 1;
       }
     }
-#endif
 }
 
   void
 BX_CPU_C::INSW_YvDX(BxInstruction_t *i)
   // input word/doubleword from port to string
 {
-#if 0
   Bit32u edi;
   unsigned int incr;
 
@@ -147,13 +147,11 @@ BX_CPU_C::INSW_YvDX(BxInstruction_t *i)
     else
       DI = DI + incr;
     }
-#endif
 }
 
   void
 BX_CPU_C::OUTSB_DXXb(BxInstruction_t *i)
 {
-#if 0
   unsigned seg;
   Bit8u value8;
   Bit32u esi;
@@ -192,14 +190,12 @@ BX_CPU_C::OUTSB_DXXb(BxInstruction_t *i)
     else
       SI += 1;
     }
-#endif
 }
 
   void
 BX_CPU_C::OUTSW_DXXv(BxInstruction_t *i)
   // output word/doubleword string to port
 {
-#if 0
   unsigned seg;
   Bit32u esi;
   unsigned int incr;
@@ -257,7 +253,6 @@ BX_CPU_C::OUTSW_DXXv(BxInstruction_t *i)
     else
       SI = SI + incr;
     }
-#endif
 }
 
 

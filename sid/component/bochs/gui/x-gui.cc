@@ -217,17 +217,17 @@ x_gui::init(host_int_4)
   int x, y;   /* window position */
   unsigned int border_width = 4;  /* four pixels */
 #if BX_CPU_LEVEL < 2
-  char *window_name = "Bochs 8086 emulator, http://bochs.sourceforge.net/";
+  char *window_name = "SID Import of the Bochs 8086 Emulator";
 #elif BX_CPU_LEVEL == 2
-  char *window_name = "Bochs 80286 emulator, http://bochs.sourceforge.net/";
+  char *window_name = "SID Import of the Bochs 80286 Emulator";
 #elif BX_CPU_LEVEL == 3
-  char *window_name = "Bochs 80386 emulator, http://bochs.sourceforge.net/";
+  char *window_name = "SID Import of the Bochs 80386 Emulator";
 #elif BX_CPU_LEVEL == 4
-  char *window_name = "Bochs 80486 emulator, http://bochs.sourceforge.net/";
+  char *window_name = "SID Import of the Bochs 80486 Emulator";
 #else
-  char *window_name = "Bochs Pentium emulator, http://bochs.sourceforge.net/";
+  char *window_name = "SID Import of the Bochs Pentium Emulator";
 #endif
-  char *icon_name = "Bochs";
+  char *icon_name = "SID Bochs";
   Pixmap icon_pixmap;
   XSizeHints size_hints;
   char *display_name = NULL;
@@ -571,7 +571,6 @@ x_gui::update_display(host_int_4)
           dimension_x = x;
           dimension_y = y;
         }
-      XFlush(bx_x_display);
       dimensions_updated_pin.driven(0);
     }
 
@@ -659,7 +658,6 @@ x_gui::update_display(host_int_4)
                            (char *) string,
                            1);
         }
-      XFlush(bx_x_display);
       text_memory_updated_pin.driven(0);
     }
 }

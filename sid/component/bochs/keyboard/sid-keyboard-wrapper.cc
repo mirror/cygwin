@@ -11,21 +11,44 @@ keyboard::keyboard ()
       generate_scancode_pin(this, & keyboard::generate_scancode),
       update_keyboard_pin(this, & keyboard::update_keyboard),
       port_0x60_bus(this, & keyboard::read_port_0x60, & keyboard::write_port_0x60),
-      port_0x64_bus(this, & keyboard::read_port_0x64, & keyboard::write_port_0x64)
+      port_0x64_bus(this, & keyboard::read_port_0x64, & keyboard::write_port_0x64),
+      cmos_registers_bus(0), timer_delta(100), keyboard_irq_number(1), have_mouse(false)
 {
+  add_pin("trigger-irq", & this->trigger_irq_pin);
+  add_pin("enable-a20", & this->enable_a20_pin);
+  add_pin("a20-enabled", & this->a20_enabled_pin);
+
   add_pin("init", & this->init_pin);
   add_pin("generate-scancode", & this->generate_scancode_pin);
   add_pin("update-keyboard", & this->update_keyboard_pin);
-  add_pin("serial-delay", & this->serial_delay_pin);
 
   add_bus("port-0x60", & this->port_0x60_bus);
   add_bus("port-0x64", & this->port_0x64_bus);
+
+  add_attribute("timer-delta", & this->timer_delta, "setting");
+  add_attribute("keyboard-irq-number", & this->keyboard_irq_number, "setting");
+  add_attribute("have-mouse?", & this->have_mouse, "setting");
+
+  add_accessor("cmos-registers", & this->cmos_registers_bus);
 }
 
 void
 keyboard::init(host_int_4)
 {
   bx_keyboard.init(this);
+  if (have_mouse)
+    {
+      // mouse port installed on system board
+      if (cmos_registers_bus)
+        {
+          little_int_1 old_register_value;
+          little_int_1 new_register_value;
+
+          cmos_registers_bus->read(host_int_4(0x14), old_register_value);
+          new_register_value = old_register_value | 0x04;
+          cmos_registers_bus->write(host_int_4(0x14), new_register_value);
+        }
+    }
 }
 
 void
@@ -37,21 +60,22 @@ keyboard::generate_scancode(host_int_4 code)
 void
 keyboard::update_keyboard(host_int_4)
 {
-  bx_keyboard.periodic(0);
+  unsigned val = bx_keyboard.periodic(timer_delta);
+
+  if((val & 0x01))
+    trigger_irq_pin.drive(keyboard_irq_number);
 }
 
 void
-keyboard::drive_serial_delay_pin(host_int_4 delay)
+keyboard::drive_enable_a20_pin(host_int_4 value)
 {
-  // The serial-delay pin is intended to be connected to
-  // a sid-sched component's N-control pin, and the
-  // update-keyboard pin is intended to be connected to
-  // the corresponding N-event pin.  Since update-keyboard
-  // should be driven regularly, we must ensure that the
-  // the top bit (the regular? flag) of the code driven on
-  // the serial-delay pin is 1.
-  host_int_4 code = delay | 0x80000000;
-  serial_delay_pin.drive(code);
+  enable_a20_pin.drive(value);
+}
+
+host_int_4
+keyboard::sense_a20_enabled_pin(void)
+{
+  return a20_enabled_pin.sense();
 }
 
 bus::status

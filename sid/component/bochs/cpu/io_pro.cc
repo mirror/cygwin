@@ -30,13 +30,15 @@
 #include "bochs.h"
 #define LOG_THIS BX_CPU_THIS_PTR
 
+#if BX_SUPPORT_SID
+#include "sid-x86-cpu-wrapper.h"
+#endif
 
 
 
   Bit16u
 BX_CPU_C::inp16(Bit16u addr)
 {
-#if 0
   Bit16u ret16;
 
   if (BX_CPU_THIS_PTR cr0.pe && (BX_CPU_THIS_PTR eflags.vm || (CPL>IOPL))) {
@@ -49,14 +51,11 @@ BX_CPU_C::inp16(Bit16u addr)
 
   ret16 = BX_INP(addr, 2);
   return( ret16 );
-#endif
-  return 0;
 }
 
   void
 BX_CPU_C::outp16(Bit16u addr, Bit16u value)
 {
-#if 0
   /* If CPL <= IOPL, then all IO addresses are accessible.
    * Otherwise, must check the IO permission map on >286.
    * On the 286, there is no IO permissions map */
@@ -70,13 +69,11 @@ BX_CPU_C::outp16(Bit16u addr, Bit16u value)
     }
 
   BX_OUTP(addr, value, 2);
-#endif
 }
 
   Bit32u
 BX_CPU_C::inp32(Bit16u addr)
 {
-#if 0
   Bit32u ret32;
 
   if (BX_CPU_THIS_PTR cr0.pe && (BX_CPU_THIS_PTR eflags.vm || (CPL>IOPL))) {
@@ -89,14 +86,11 @@ BX_CPU_C::inp32(Bit16u addr)
 
   ret32 = BX_INP(addr, 4);
   return( ret32 );
-#endif
-  return 0;
 }
 
   void
 BX_CPU_C::outp32(Bit16u addr, Bit32u value)
 {
-#if 0
   /* If CPL <= IOPL, then all IO addresses are accessible.
    * Otherwise, must check the IO permission map on >286.
    * On the 286, there is no IO permissions map */
@@ -110,13 +104,11 @@ BX_CPU_C::outp32(Bit16u addr, Bit32u value)
     }
 
   BX_OUTP(addr, value, 4);
-#endif 
 }
 
   Bit8u
 BX_CPU_C::inp8(Bit16u addr)
 {
-#if 0
   Bit8u ret8;
 
   if (BX_CPU_THIS_PTR cr0.pe && (BX_CPU_THIS_PTR eflags.vm || (CPL>IOPL))) {
@@ -129,15 +121,12 @@ BX_CPU_C::inp8(Bit16u addr)
 
   ret8 = BX_INP(addr, 1);
   return( ret8 );
-#endif
-  return 0;
 }
 
 
   void
 BX_CPU_C::outp8(Bit16u addr, Bit8u value)
 {
-#if 0
   /* If CPL <= IOPL, then all IO addresses are accessible.
    * Otherwise, must check the IO permission map on >286.
    * On the 286, there is no IO permissions map */
@@ -151,14 +140,12 @@ BX_CPU_C::outp8(Bit16u addr, Bit8u value)
     }
 
   BX_OUTP(addr, value, 1);
-#endif
 }
 
 
   Boolean
 BX_CPU_C::allow_io(Bit16u addr, unsigned len)
 {
-#if 0
   Bit16u io_base, permission16;
   unsigned bit_index, i;
 
@@ -198,7 +185,6 @@ BX_INFO(("len is %u\n", len));
       return(0);
     permission16 >>= 1;
     }
-#endif
 
   return(1);
 }

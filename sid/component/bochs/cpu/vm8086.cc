@@ -284,7 +284,7 @@ BX_CPU_C::stack_return_to_v86(Bit32u new_eip, Bit32u raw_cs_selector, Bit32u fla
 }
 
   void
-BX_CPU_C::stack_return_from_v86(BxInstruction_t *i)
+BX_CPU_C::stack_return_from_v86(void)
 {
   BX_INFO(("stack_return_from_v86:\n"));
   v8086_message();

@@ -28,9 +28,12 @@ using sid::little_int_1;
 using sidutil::callback_word_bus;
 using sidutil::callback_pin;
 using sidutil::output_pin;
+using sidutil::input_pin;
+using sidutil::word_bus;
+using sidutil::control_register_bus;
 
 class keyboard : public sidutil::fixed_pin_map_component,
-                 public sidutil::no_accessor_component,
+                 public sidutil::fixed_accessor_map_component,
                  public sidutil::fixed_attribute_map_component,
                  public sidutil::no_relation_component,
                  public sidutil::fixed_bus_map_component
@@ -42,16 +45,17 @@ public:
   void init(host_int_4);
   void generate_scancode(host_int_4 code);
   void update_keyboard(host_int_4);
-
-  void drive_serial_delay_pin(host_int_4 delay);
-  
+  void drive_enable_a20_pin(host_int_4 value);
+  host_int_4 sense_a20_enabled_pin(void);
 protected:
 
+  output_pin trigger_irq_pin;
+  output_pin enable_a20_pin;
+  input_pin a20_enabled_pin;
+  
   callback_pin<keyboard> init_pin;
   callback_pin<keyboard> generate_scancode_pin;
   callback_pin<keyboard> update_keyboard_pin;
-
-  output_pin serial_delay_pin;
 
   bus::status read_port_0x60 (host_int_4 addr, little_int_1 mask, little_int_1 & data);
   bus::status write_port_0x60 (host_int_4 addr, little_int_1 mask, little_int_1 data);
@@ -61,6 +65,12 @@ protected:
 
   callback_word_bus<keyboard, little_int_1> port_0x60_bus;
   callback_word_bus<keyboard, little_int_1> port_0x64_bus;
+
+  bus *cmos_registers_bus;
+
+  host_int_4 timer_delta;
+  host_int_4 keyboard_irq_number;
+  bool have_mouse;
 
   bx_keyb_c bx_keyboard;
 };

@@ -953,6 +953,7 @@ BX_CPU_C::access_linear(Bit32u laddress, unsigned length, unsigned pl,
   BX_PANIC(("access_linear: paging not supported\n"));
 }
 
+
   void
 BX_CPU_C::INVLPG(BxInstruction_t* i)
 {}

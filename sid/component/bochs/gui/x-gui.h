@@ -95,4 +95,5 @@ private:
 
   bool private_colormap;
 };
-#endif X_GUI_DEF_H
+#endif // X_GUI_DEF_H
+

@@ -383,7 +383,7 @@ typedef struct {
 typedef void * (*BxVoidFPtr_t)(void);
 class BX_CPU_C;
 #if BX_SUPPORT_SID
-class sid_cpu_c;
+class x86_cpu;
 #endif
 
 typedef struct BxInstruction_tag {
@@ -419,9 +419,6 @@ typedef struct BxInstruction_tag {
 #else
   void (BX_CPU_C::*ResolveModrm)(BxInstruction_tag *);
   void (BX_CPU_C::*execute)(BxInstruction_tag *);
-#if BX_SUPPORT_SID
-  void (sid_cpu_c::*execute_sid)(BxInstruction_tag *);
-#endif
 #endif
 
 #if BX_DYNAMIC_TRANSLATION
@@ -649,7 +646,7 @@ extern bx_generic_apic_c *apic_index[APIC_MAX_ID];
 typedef void (*BxDTShim_t)(void);
 
 #if BX_SUPPORT_SID
-class sid_mem_c;
+class sid_bx_mem_c;
 #else
 class BX_MEM_C;
 #endif
@@ -752,12 +749,13 @@ public: // for now...
 #endif
 
 #if BX_SUPPORT_SID
-  sid_mem_c *mem;
+  x86_cpu *x86_cpu_component;
+  sid_bx_mem_c *mem;
 #else
   // pointer to the address space that this processor uses.
   BX_MEM_C *mem;
 #endif
-  
+
   Boolean EXT; /* 1 if processing external interrupt or exception
                 * or if not related to current instruction,
                 * 0 if current CS:IP caused exception */
@@ -767,6 +765,9 @@ public: // for now...
   volatile Boolean async_event;
   volatile Boolean INTR;
 
+#if BX_SUPPORT_SID
+  Boolean BX_HRQ;
+#endif
   // for accessing registers by index number
   Bit16u *_16bit_base_reg[8];
   Bit16u *_16bit_index_reg[8];
@@ -840,7 +841,7 @@ public: // for now...
   BX_CPU_C();
   ~BX_CPU_C(void);
 #if BX_SUPPORT_SID
-  void init (sid_mem_c *addrspace);
+  void init (x86_cpu *x86_cpu_comp, sid_bx_mem_c *addrspace);
 #else
   void init (BX_MEM_C *addrspace);
 #endif
@@ -1355,6 +1356,11 @@ public: // for now...
 
   BX_SMF void REP(void (*)(void));
   BX_SMF void REP_ZF(void (*)(void), unsigned rep_prefix);
+#if BX_SUPPORT_SID
+  BX_SMF Boolean  dbg_set_reg(unsigned reg, Bit32u val);
+  BX_SMF Bit32u   dbg_get_reg(unsigned reg);
+  BX_SMF Bit32u   dbg_get_eflags(void);
+#else
 #if BX_DEBUGGER
   BX_SMF void     dbg_take_irq(void);
   BX_SMF void     dbg_force_interrupt(unsigned vector);
@@ -1372,6 +1378,7 @@ public: // for now...
                                             Bit32u is_32);
   BX_SMF Boolean  dbg_is_end_instr_bpoint(Bit32u cs, Bit32u eip,
                                           Bit32u laddr, Bit32u is_32);
+#endif
 #endif
 #if BX_DEBUGGER || BX_DISASM || BX_INSTRUMENTATION
   BX_SMF void     dbg_xlate_linear2phy(Bit32u linear, Bit32u *phy, Boolean *valid);
@@ -1413,6 +1420,9 @@ public: // for now...
   BX_SMF void TLB_clear(void);
   BX_SMF void TLB_init(void);
   BX_SMF void set_INTR(Boolean value);
+#if BX_SUPPORT_SID
+  void set_HRQ(Boolean value);
+#endif
   BX_SMF char *strseg(bx_segment_reg_t *seg);
   BX_SMF void interrupt(Bit8u vector, Boolean is_INT, Boolean is_error_code,
                  Bit16u error_code);
@@ -1539,8 +1549,8 @@ public: // for now...
 #define BX_HWDebugMemRW         0x03
 #endif
 
-#if BX_SUPPORT_SID
-#else
+
+#if BX_SUPPORT_SID==0
 #if BX_SMP_PROCESSORS==1
 // single processor simulation, so there's one of everything
 extern BX_CPU_C       bx_cpu;

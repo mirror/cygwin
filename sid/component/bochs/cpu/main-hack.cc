@@ -73,8 +73,8 @@ bx_options_t bx_options = {
   { NULL, NULL, NULL, 0, 0, 0, 0 },     // SB16
   "a",                                  // boot drive
   300000,                               // vga update interval
-  20,  // default keyboard serial path delay (usec in bochs, msec in sid)
-  50000,  // default floppy command delay (usec)
+  250,  // default keyboard serial path delay (usec)
+  500,  // default floppy command delay (usec)
   500000,  // default ips (instructions-per-second)
   0,       // default mouse_enabled
   0,       // default private_colormap
@@ -528,11 +528,13 @@ bx_bochs_init(int argc, char *argv[])
 #endif
 
 #if BX_SMP_PROCESSORS==1
+#if BX_SUPPORT_SID==0
   BX_MEM(0)->init_memory(bx_options.memory.megs * 1024*1024);
   BX_MEM(0)->load_ROM(bx_options.rom.path, bx_options.rom.address);
   BX_MEM(0)->load_ROM(bx_options.vgarom.path, 0xc0000);
   BX_CPU(0)->init (BX_MEM(0));
   BX_CPU(0)->reset(BX_RESET_HARDWARE);
+#endif
 #else
   // SMP initialization
   bx_mem_array[0] = new BX_MEM_C ();
@@ -580,7 +582,7 @@ bx_bochs_init(int argc, char *argv[])
   void
 bx_init_debug(void)
 {
-  bx_dbg.floppy = 0;
+  bx_dbg.floppy = 1;
   bx_dbg.keyboard = 0;
   bx_dbg.video = 0;
   bx_dbg.disk = 0;
@@ -621,12 +623,12 @@ bx_atexit(void)
     bx_pc_system.exit();
     }
 #endif
-
+#if BX_SUPPORT_SID==0
 #if BX_DEBUGGER == 0
   for (int cpu=0; cpu<BX_SMP_PROCESSORS; cpu++)
     if (BX_CPU(cpu)) BX_CPU(cpu)->atexit();
 #endif
-
+#endif
 #if BX_PCI_SUPPORT
     if (bx_options.i440FXSupport) {
       bx_devices.pci->print_i440fx_state();

@@ -23,8 +23,11 @@
 
 #ifndef _PCKEY_H
 #define _PCKEY_H
+#if BX_SUPPORT_SID
 #include "keysymbols.h"
 class keyboard;
+#endif
+
 #define BX_KBD_ELEMENTS 16
 #define BX_MOUSE_BUFF_SIZE 48
 
@@ -35,7 +38,9 @@ class keyboard;
 #  define BX_KEY_SMF
 #  define BX_KEY_THIS this->
 #endif
-
+#if BX_SUPPORT_SID==0
+extern bx_keyb_c bx_keyboard;
+#endif
 class bx_keyb_c : public logfunctions {
 public:
   bx_keyb_c(void);
@@ -136,7 +141,13 @@ private:
 	  case 8:
 	    ret = 3;
 	    break;
-	  };
+#if BX_SUPPORT_SID==0
+          default:
+#define LOG_THIS bx_keyboard.
+	    BX_PANIC(("mouse: invalid resolution_cpmm"));
+#undef LOG_THIS
+#endif
+          };
 	  return ret;
 	}
 
@@ -165,10 +176,10 @@ private:
     unsigned controller_Qsize;
     unsigned controller_Qsource; // 0=keyboard, 1=mouse
     } s; // State information for saving/loading
-#if BX_SUPPORT_SID==0
-  bx_devices_c *devices;
-#else
+#if BX_SUPPORT_SID
   keyboard *kbd_component;
+#else
+  bx_devices_c *devices;
 #endif
   BX_KEY_SMF void     resetinternals(Boolean powerup);
   BX_KEY_SMF void     set_kbd_clock_enable(Bit8u   value);

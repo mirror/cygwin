@@ -1344,7 +1344,10 @@ BX_VGA_THIS s.vga_tile_updated[x_tileno][y_tileno] = 1;
     }
   else {
     BX_VGA_THIS s.vga_memory[addr - 0xa0000] = value;
-    vga_component->drive_text_memory_updated_pin();
+    // only update on odd address writes,
+    // so that color values go through
+    if (addr % 2)
+      vga_component->drive_text_memory_updated_pin();
     BX_VGA_THIS s.vga_mem_updated = 1;
     }
 }
@@ -1443,7 +1446,11 @@ bx_vga_c::update_dimension_pins(bool schedule_update)
           MSL = BX_VGA_THIS s.CRTC.reg[9] & 0x1f;
           rows = (VDE + 1) / (MSL + 1);
           if (rows > BX_MAX_TEXT_LINES)
+#if BX_SUPPORT_SID
+            rows = BX_MAX_TEXT_LINES;
+#else
             BX_PANIC(("text rows>50\n"));
+#endif
           
           piHeight = rows;
         }

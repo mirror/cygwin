@@ -28,7 +28,9 @@
 #include "bochs.h"
 #define LOG_THIS BX_CPU_THIS_PTR
 
-#if BX_USE_CPU_SMF
+
+
+#if 0
 static Bit16u *aaa[8] = {
   & BX,
   & BX,
@@ -50,7 +52,8 @@ static Bit16u *bbb[8] = {
   (Bit16u *) & BX_CPU_THIS_PTR empty_register,
   (Bit16u *) & BX_CPU_THIS_PTR empty_register
   };
-#endif  // BX_USE_CPU_SMF
+#endif
+
 
 
 

@@ -5,7 +5,6 @@
 	(h-Rb): New hardware peice.
 	(h-Rbj): Use gr-Rb-names.
 	(Rb): Use h-Rb.
-
 	(holdx): New instruction.
 
 2002-01-07  Ben Elliston  <bje@redhat.com>

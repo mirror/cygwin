@@ -1,0 +1,151 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libglue.la" dlsym="glue_component_library">
+  <defcomponent name="hw-glue-probe-bus" type="concrete">
+
+    <!-- buses -->
+    <defbus name="upstream" addresses="unrestricted" accesses="unrestricted" behaviors="bus traffic passthrough/etc." />
+
+    <!-- accessors -->
+    <defaccessor name="downstream" accesses="unrestricted" behaviors="bus traffic passthrough" />
+
+    <!-- pins -->
+    <defpin name="address" direction="out" legalvalues="any" behaviors="bus traffic sampling" />
+    <defpin name="data-high" direction="out" legalvalues="any" behaviors="bus traffic sampling" />
+    <defpin name="data-low" direction="out" legalvalues="any" behaviors="bus traffic sampling" />
+    <defpin name="status" direction="out" legalvalues="bus::status values" behaviors="bus traffic sampling" />
+    <defpin name="type" direction="out" legalvalues="enum values" behaviors="bus traffic sampling" />
+
+    <!-- attributes -->
+    <defattribute name="trace?" category="setting" legalvalues="boolean" defaultvalue="0" behaviors="bus traffic tracing" />
+    <defattribute name="sample-interval" category="setting" legalvalues="numeric" defaultvalue="1" behaviors="bus traffic sampling" />
+    <defattribute name="interval-counter" category="register" legalvalues="numeric" behaviors="bus traffic sampling" />
+    <defattribute name="address" category="pin" legalvalues="numeric" behaviors="bus traffic sampling" />
+    <defattribute name="data-high" category="pin" legalvalues="numeric" behaviors="bus traffic sampling" />
+    <defattribute name="data-low" category="pin" legalvalues="numeric" behaviors="bus traffic sampling" />
+    <defattribute name="status" category="pin" legalvalues="numeric" behaviors="bus traffic sampling" />
+    <defattribute name="type" category="pin" legalvalues="numeric" behaviors="bus traffic sampling" />
+  </defcomponent>
+  <synop>
+    <p>
+      This component samples and/or traces bus traffic.</p>
+  </synop>
+  <func>
+    <modelling>
+      <p>
+	This component resembles a probe that transparently monitors bus traffic.</p>
+    </modelling>
+    
+    <behavior name="bus traffic passthrough">
+      <p>
+	When the <accessor>downstream</accessor> accessor is
+	configured, all incoming bus API calls to the <bus>upstream</bus> bus are
+	passed through verbatim.  Without the <accessor>downstream</accessor> accessor
+	configured, the <bus>upstream</bus> bus will return bus::unmapped for all
+	calls.  Still, the sampling and tracing functions are still
+	active.</p></behavior>
+    <behavior name="bus traffic sampling">
+      <p>
+	<p>
+	  Every now and then (at an interval configured by the <attribute>sample-interval</attribute>
+	  attribute), a transaction is also reported via a collection of output
+	  pins.  In sequence, the following output pins are driven:</p>
+	<ul>
+	  <li>
+	    <name>address</name> - address parameter</li>
+	  <li>
+	    <name>data-high</name> - top 32 bits of bus data being read/written</li>
+	  <li>
+	    <name>data-low</name> - bottom 32 bits of same</li>
+	  <li>
+	    <name>status</name> - bus::status value returned from downstream</li>
+	  <li>
+	    <name>type</name> - an encoded value identifying the size, endianness, and
+	    direction of the data transfer.  Specifically, in C lingo,
+	    <code>	(type &amp; 0x00F): log2 of access size (0/1/2/3 for *_int_1/2/4/8)
+	(type &amp; 0x010): 0x10 (little-endian) or 0x00 (big-endian)
+	(type &amp; 0x100): 0x100 (read) or 0x00 (write)</code></li></ul>
+	<p>
+	  This sampling function is disabled if <attribute>sample-interval</attribute> is zero.  The
+	  read-only <attribute>interval-counter</attribute> attribute indicates the current value of
+	  the modular transaction counter.</p></p>
+    </behavior>
+    <behavior name="bus traffic tracing">
+      <p>
+	<p>
+	If the <attribute>trace?</attribute> attribute is set, sampled bus traffic is traced to stdout
+	in a compact format.  The sampling counter is shared with the traffic probing
+	behavior above.</p>
+
+	<p>
+	One line per transaction is shown in a format resembling the common gdb simulators'
+	<tt>--trace-core</tt> output:</p>
+	<tt>
+	MODE:ADDRESS ARROW DATA [LATENCY] [STATUS]</tt>
+	where
+	<tt>MODE</tt> is an encoding of the access type:
+	<tt>zzz</tt>
+	where <tt>le</tt> and <tt>be</tt> represent little- or big-endianness,
+           and 1-8 represent the number of bytes transferred.
+	<tt>ARROW</tt> is a redundant encoding of direction:
+	<tt>{-&gt;,&lt;-}</tt> for
+	<tt>{read,write}</tt>
+	<tt>ADDRESS</tt> and
+	<tt>DATA</tt> are hex-encoded host-endian values,
+	<tt>LATENCY</tt> is a string encoding of the bus access latency, though 0 is ommited
+	<tt>STATUS</tt> is a string encoding of the bus::status, though <tt>ok</tt> is omitted
+
+      Examples:
+	
+	<code>      write-be-2:0xa002001c &lt;- 0x3442
+      read-le-8:0x807fff30 -&gt; 0xffffffff807fff68 l:10
+      write-be-4:0xfeedface &lt;- 0xdeadbeef unmapped!</code></p>
+    </behavior>
+    <convention name="functional" supported="true">
+      <p>
+	This is a functional component.</p>
+    </convention>
+    <convention name="state save/restore" supported="false">
+      <p>
+	This component does not support state save/restore.</p>
+    </convention>
+    <convention name="watchpoints" supported="false">
+      <p>
+	This component does not support watchpoints.</p>
+    </convention>
+    <convention name="Reentrancy Control" supported="false">
+      <p>
+	Reentrancy is not controlled.</p>
+    </convention>
+    <convention name="presentation" supported="true">
+      <p>
+	This component presents attributes in the "pin", "setting", and "register" 
+	categories.</p>
+    </convention>
+  </func>
+  <env>
+    <p>
+      <title>Related components
+      </title>
+      <p>
+	<p>
+	  This component may be interjected between bus masters and a mapper to
+	  trace traffic.</p>
+	
+	<code>	new hw-glue-probe-bus bus-prober
+	new SOME_KIND_OF_CPU cpu
+        new SOME_KIND_OF_MAPPER mapper
+        connect-bus cpu insn-memory bus-prober upstream
+        connect-bus bus-prober downstream mapper access-port
+        set bus-prober trace? 1</code>
+	
+    	<p>
+	  A statistics-gathering component could attach to the sampling output
+	  pins to maintain a picture of a program's memory access patterns.</p>
+      </p>
+    </p>
+  </env>
+</defcomplib>
+
+

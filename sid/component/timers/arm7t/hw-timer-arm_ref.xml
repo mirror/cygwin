@@ -1,0 +1,151 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libtimers.la" dlsym="timer_component_library">
+  <defcomponent name="hw-timer-arm/ref" type="abstract">
+
+
+    <!-- pins -->
+    <defpin name="interrupt" direction="out" legalvalues="0 or non-zero" behaviors="interrupting" />
+    <defpin name="reset" direction="in" legalvalues="any" behaviors="resetting" />
+    <defpin name="clock" direction="in" legalvalues="any" behaviors="clocking" />
+    <defpin name="divided-clock-control" direction="out" legalvalues="positive value" behaviors="clocking" />
+    <defpin name="divided-clock-event" direction="in" legalvalues="any" behaviors="clocking" />
+
+
+    <!-- buses -->
+    <defbus name="registers" addresses="0x0 to 0x13" accesses="read/write" behaviors="register access" />
+
+
+    <!-- attributes -->
+    <defattribute name="counter" category="watchable register" legalvalues="number" defaultvalue="register access" />
+    <defattribute name="load-value" category="watchable register" legalvalues="number" defaultvalue="register access" />
+    <defattribute name="enabled" category="watchable register" legalvalues="true or false" defaultvalue="register access" />
+    <defattribute name="mode" category="watchable register" legalvalues="`periodic' or `free-running'" defaultvalue="register access" />
+    <defattribute name="prescale" category="watchable register" legalvalues="0..3" defaultvalue="register access" />
+    <defattribute name="ticks" category="watchable register" legalvalues="0..prescale-1" defaultvalue="clocking" />
+    
+    <variants>
+      <defcomponent name="hw-timer-arm/ref-sched" type="concrete" />
+      <defcomponent name="hw-timer-arm/ref-nosched" type="concrete" />
+    </variants>
+
+  </defcomponent>
+  <synop>
+  The timer peripheral on the ARM PID7T is a simple 16-bit down
+  counter.  It can be programmed with a number of modes and pre-scale
+  values.  For example, you can program the timer to raise an interrupt
+  when a specified interval has elapsed.  More details on the timer
+  can be found in the ARM documentation (see ``References'').
+  </synop>
+  <func>
+    <modelling>
+      <p>This component models the ARM reference timer found on the
+      ARM PID7T development board.  The ARM PID7T comes with two such
+      timers, which may or may not be implemented on the same piece of
+      silicon.  Instead of implementing a dual timer, you can
+      configure a functionally equivalent system by using two
+      instances of a single timer. This simplifies the implementation
+      and provides more design flexibility to system builders.</p>
+    </modelling>
+
+    <behavior name="resetting">
+      <p>Upon construction, or when the <pin>reset</pin> input pin is driven, the
+	timer is reset to a powerup state.  This includes deasserting the
+	interrupt line and disabling counting.</p>
+    </behavior>
+
+    <behavior name="clocking">
+      <p>The two variants of the ARM reference timer,
+      <component>hw-timer-arm/ref-sched</component> and
+      <component>hw-timer-arm/ref-nosched</component>, differ in the
+      way that they receive clocking signals.  The 'nosched' variant
+      relies on a <pin>clock</pin> pin, which is interpreted as the
+      regular "system clock".  The `sched' variant relies on an
+      external scheduler component to provide a pre-divided clock.
+      Its <pin>divided-clock-control</pin> and
+      <pin>divided-clock-event</pin> pins are used to signal to and
+      from the scheduler.
+      </p>
+    </behavior>
+
+    <behavior name="interrupting">    
+      <p>Whenever the counter underflows, an interrupt signal is
+	transmitted by driving the <pin>interrupt</pin> output pin to a nonzero
+	value.  When the interrupt is cleared, the pin is driven with a
+	zero value.</p>
+    </behavior>
+
+    <behavior name="register access">      
+      <p>The <bus>registers</bus> bus provides access to a bank of control
+	registers.  The memory map, described in detail in the reference
+	documentation, is as follows:</p>
+      
+      <table>
+	<tr>		<th>address</th>	<th>read</th>		<th>write</th></tr>
+	<tr>		<td>0</td>	<td>TimerLoad</td>	<td>TimerLoad</td></tr>
+	<tr>		<td>4</td>	<td>TimerValue</td>	<td>Reserved</td></tr>
+	<tr>		<td>8</td>	<td>TimerControl</td>	<td>TimerControl</td></tr>
+	<tr>		<td>12</td>	<td>Reserved</td>	<td>TimerClear</td></tr>
+	<tr>		<td>16</td>	<td>Reserved</td>	<td>Reserved</td></tr>
+      </table>
+    </behavior>
+
+    <convention name="functional" supported="true" />
+    <convention name="save/restore" supported="true" />
+    <convention name="triggerpoints" supported="true">
+      <p>The component supports triggerpoints set on any of the available
+      attributes.</p>
+    </convention>
+
+  </func>
+  
+  <env>
+    <title>Related components</title>
+    <ul>
+      <li><p>The timer's <pin>interrupt</pin> pin is usually connected to the
+	  interrupt pin of a CPU or a suitable interrupt controller.</p></li>
+
+      <li><p>This configuration file fragment illustrates how to
+      configure the 'sched'
+      variant of the timer:</p>
+
+	<code>
+	new hw-timer-arm/ref-sched timer
+	new sid-sched-sim sched
+	new hw-interrupt-arm/ref intcontrlr
+	set sched num-clients 1
+	set sched enabled? 1
+	connect-pin sched 0-control &lt;- timer divided-clock-control
+	connect-pin sched 0-event -&gt; timer divided-clock-event
+	connect-pin timer interrupt -&gt; intcontrlr interrupt-source-4
+	</code>
+      </li>
+      
+      <li> <p> This configuration file fragment illustrates how to
+      configure the 'nosched' variant of the timer:</p>
+	<code>
+	new hw-timer-arm/ref-nosched timer
+	new hw-interrupt-arm/ref intcontrlr
+	connect-pin main perform-activity timer clock
+	connect-pin timer interrupt intcontrlr interrupt-source-4
+	</code>
+      </li>
+    </ul>
+
+  <title>Host system</title> 
+    
+    <p>The <component>hw-timer-arm/ref-sched</component> variant of
+    the timer is more efficient as it does not rely on yielding
+    simulation time to the timer for every clock cycle; it should be
+    used in almost all circumstances.</p>
+
+  </env>
+
+  <refs>
+  ARM reference documentation can be found <a type="url"
+  href="http://www.arm.com/Documentation/UserMans/rps/#timer">on the
+  web</a>.
+  </refs>
+
+</defcomplib>

@@ -1,0 +1,299 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="internal" dlsym="config_component_library">
+  <defcomponent name="sid-control-cfgroot" type="concrete">
+
+    <!-- pins -->
+    <defpin name="run!" direction="in" values="any" behaviors="startup" />
+    <defpin name="starting" direction="out" values="void" behaviors="main loop" />
+    <defpin name="perform-activity" direction="out" values="void" behaviors="main loop" />
+    <defpin name="stop!" direction="in" values="any" behaviors="main loop" />
+    <defpin name="stopping" direction="out" values="void" behaviors="main loop" />
+    
+    
+    <!-- attributes -->
+    <defattribute name="config-file!" default="file name" behaviors="configuration" />
+    <defattribute name="config-line!" default="any string" behaviors="configuration" />
+    <defattribute name="config-file-history" category="register" default="file names" behaviors="configuration" />
+    <defattribute name="verbose?" category="setting" default="boolean" values="false" behaviors="configuration, main loop" />
+    <defattribute name="persistent?" category="setting" default="boolean" values="false" behaviors="main loop" />
+    <defattribute name="auto-print?" category="setting" default="boolean" values="true" behaviors="main loop" />
+    <defattribute name="state-snapshot" default="opaque string" behaviors="state save/restore" />
+    <defattribute name="starting" category="pin" behaviors="main loop" />
+    <defattribute name="running" category="register" default="boolean" behaviors="main loop" />
+    <defattribute name="activity-count" category="register" default="number" behaviors="main loop" />
+    <defattribute name="perform-activity" category="pin" behaviors="main loop" />
+    <defattribute name="stop!" category="pin" behaviors="main loop" />
+    <defattribute name="stopping" category="pin" behaviors="main loop" />
+    
+    
+    <!-- relationships -->
+    <defrelationship name="component-catalog-informees" behaviors="simulation startup" />
+    
+  </defcomponent>
+
+  <synop>This component configures and executes a simulation run.
+  </synop>
+
+  <func>
+    <modelling>
+      <p>
+      This component encapsulates the configuration file parser
+      and the simulation main loop.  It does not correspond to
+      hardware.</p>
+
+      <title>
+      configuration file format</title>
+
+      <p>The configuration file format is very simple, and the
+      parser/lexer are minimal.  Each command in the configuration
+      file maps to 1-3 <tt>sid::component</tt> API calls.  There is no
+      application- or component-dependent logic.</p>
+
+
+      <title>Grammar:</title>
+
+      <code>cfg-file ::= cfg-line | cfg-file cfg-line</code>
+
+      <code>cfg-line ::=
+  load-cmd | new-cmd | connect-pin-cmd | disconnect-pin-cmd |
+  connect-bus-cmd | disconnect-bus-cmd | set-cmd | relate-cmd | unrelate-cmd
+      </code>
+
+      <code>load-cmd ::= "load" file-name symbol-name
+file-name ::= string
+symbol-name ::= string
+      </code>
+
+      <p>Register a component library.  Load the shared library from
+      the file named by the first string, or fall back to the sid
+      mainline executable itself.  Look up a component_library symbol
+      named by the second string.  Add all component type names to the
+      catalog of types.  Its
+      <tt>sid::component_library::list_component_types</tt> hook is
+      called.  A compatibility magic value in the component library is
+      tested.  If a filename omits a directory specification, then the
+      installed location and a search path held in the
+      <tt>SID_LIBRARY_PATH</tt> environment variable is searched for
+      the library.  The library directory under that given by
+      <tt>SID_EXEC_PREFIX</tt> environment variable (optionally set at
+      sid installation time), or else the build-time
+      <tt>--exec-prefix</tt>, is also searched.</p>
+
+      <code>new-cmd ::= "new" type-name comp-name
+type-name ::= string
+comp-name ::= string
+      </code>
+
+      <p>Instantiate a new component.  The first string is the
+      component type, as registered in a prior load-cmd.  The second
+      string is the new component instance's nick-name.  The nicknames
+      must be unique among those built by cfgroot.  The lucky winner's
+      <tt>sid::component_library::create_component</tt> hook is
+      called.</p>
+
+      <code>connect-pin-cmd ::= "connect-pin" comp-name pin-name dir comp-name pin-name
+dir ::= "-&gt;" | "&lt;-" | "&lt;-&gt;"
+comp-name ::= string
+pin-name ::= string
+      </code>
+
+      <p> Establish a new pin-to-pin connection between two
+      components.  The component/pin to the left of the <tt>-&gt;</tt> or right
+      of the <tt>&lt;-</tt> operator receives
+      a<tt>sid::component::connect_pin</tt> call.  The other receives
+	a <tt>sid::component::find_pin</tt> call.  If the <tt>&lt;-&gt;</tt>
+      operator is specified, then establish two pin-to-pin links in
+      opposite directions.</p>
+
+      <code>
+disconnect-pin-cmd ::= "disconnect-pin" comp-name pin-name dir comp-name pin-name
+dir ::= "-&gt;" | "&lt;-" | "&lt;-&gt;"
+comp-name ::= string
+pin-name ::= string
+</code>
+
+      <p> Break an existing pin-to-pin connection between two
+      components.  The component/pin to the left of the <tt>-&gt;</tt>
+      or right of the <tt>&lt;-</tt> operator receives a
+      <tt>sid::component::disconnect_pin</tt> call.  The other
+      receives a <tt>sid::component::find_pin</tt> call.  If the
+      <tt>&lt;-&gt;</tt> operator is specified, then the connection
+      will be broken in both directions.</p>
+
+      <code>connect-bus-cmd ::= "connect-bus" comp-name acc-name comp-name bus-name
+comp-name ::= string
+acc-name ::= string
+bus-name ::= string
+</code>
+
+      <p>Establish a new accessor-to-bus connection between two
+      components.  The left component receives a
+      <tt>sid::component::connect_accessor</tt> call; the right
+      component receives a <tt>sid::component::find_bus</tt> call.</p>
+
+      <code>disconnect-bus-cmd ::= "disconnect-bus" comp-name acc-name comp-name bus-name
+comp-name ::= string
+acc-name ::= string
+bus-name ::= string
+</code>
+      <p>Break an existing accessor-to-bus connection between two
+      components.  The left component recevies a
+      <tt>sid::component::disconnect_accessor</tt> call; the right
+      component receives a <tt>sid::component::find_bus</tt> call.</p>
+
+      <code>set-cmd ::= "set" comp-name attr-name attr-value
+comp-name ::= string
+attr-name ::= string
+attr-value ::= string
+</code>
+
+      <p>Set the given attribute of the given component to the given
+      value.  The component receives a
+      <tt>sid::component::set_attribute_value</tt> call.</p>
+
+      <code>relate-cmd ::= "relate" comp-name rel-name comp-name
+comp-name ::= string
+rel-name ::= string
+</code>
+
+      <p>Add the second named component to the named component
+      relationship set for the first given component.  The first
+      component receives a <tt>sid::component::relate</tt> call.</p>
+
+      <code>unrelate-cmd ::= "unrelate" comp-name rel-name comp-name
+comp-name ::= string
+rel-name ::= string
+</code>
+
+      <p>Remove the second named component from the named component
+      relationship set for the first given component.  The first
+      component receives a <tt>sid::component::unrelate</tt> call.</p>
+
+
+      <title>Lexer issues:</title>
+
+      <p>A string is a white-space-separated sequence of printable (
+      <tt>isprint()</tt>) characters.  If started with double-quotes,
+      all characters between opening and closing quotes are included
+      in the string.  Embedded lexer control characters ('<tt>\</tt>'
+      and '<tt>"</tt>') may be escaped by a '<tt>\</tt>' prefix.
+      "<tt>\n</tt>" is interpreted as a C++ <tt>\n</tt>.  (What other
+      escape sequences are worth supporting?)</p>
+
+      <p>A "<tt>#</tt>" character found where a string is expected is
+      interpreted as a comment to end-of-line, and the search for the
+      next string found is returned instead.</p>
+
+
+
+    </modelling>
+
+    <behavior name="configuration">
+
+      <p>
+      When the 
+	<attribute>config-file!</attribute> attribute is written to, the value is
+      interpreted as a file name, and processed as a configuration
+      file.  The name of the file is appended to a history list,
+      which is accessible as the read-only attribute 
+	<attribute>config-file-history</attribute>.</p>
+
+      <p>
+      The format of the configuration file is described in the
+      APPENDIX below.  As each line is read, the appropriate component
+      API functions are called.  In case of any failure, a message is
+      printed to standard error, and a failure result code will be
+      returned from the <tt>set_attribute_value</tt> call.</p>
+
+      <p>
+      If the <attribute>auto-print?</attribute> attribute is set to a
+      true value, then as each component instance is created, all its
+      attributes in the <tt>auto-print</tt> category will be queried
+      and printed to standard output.</p>
+
+      <p>
+      The effects of multiple writes to the
+      <attribute>config-file!</attribute> attribute are cumulative.
+      The <tt>sid-control-cfgroot</tt> component is always implicitly
+      present with the component name <tt>main</tt>.  If the
+      <attribute>verbose?</attribute> attribute is set, some tracing
+      messages are printed during configuration.</p>
+
+      <p>
+      When the <attribute>config-line!</attribute> attribute is
+      written to, the supplied value is interpreted as a single
+      configuration command and executed, as if that value was written
+      to a file, and the file's name supplied to the
+      <attribute>config-file!</attribute> attribute.</p>
+
+    </behavior>
+
+    <behavior name="startup">
+
+      <p>
+      When the <pin>run!</pin> pin is driven, the simulation top level
+      loop begins. This process has several stages.  </p>
+
+      <p>
+      First, all components registered in the
+	<relationship>component-catalog-informees</relationship> relationship are given the
+      then-current list of components.  This is done by setting a
+      number of individual component relationships for every informee.
+      Each relationship contains a single instantiated component
+      pointer, and has the name constructed as "TYPE NAME", as
+      appropriate for that component.</p>
+
+      <p>
+      Immediately after this, the simulation main loop behavior takes
+      over.  Only after that main loop is finished will control return
+      to the function that sent the <pin>run!</pin> signal to this
+      component.</p>
+
+    </behavior>
+
+    <behavior name="main loop">
+      The main loop has two levels.  An infinite outer loop remains
+      active as long as the
+      <attribute>persistent?</attribute> attribute is set to a
+      boolean
+      <tt>true</tt> value.  
+
+      The body of this loop performs a sequence of steps.  First, it
+      drives the <pin>starting</pin> output pin.  Then, it enters the
+      inner main loop.  At the start of this loop, the
+      <attribute>running</attribute> attribute is set to boolean
+      <tt>true</tt>.  In the loop, the
+      <attribute>activity-count</attribute> attribute is incremented,
+      and the <pin> perform-activity</pin> output pin is repeatedly
+      driven.  This loop runs until the <pin>stop!</pin> input pin is
+      driven.  (This could happen during the initial
+      <pin>starting</pin> signal, in which case this inner loop will
+      not be entered at all.)  After the inner loop exits, the
+      <pin>stopping</pin> output pin is driven.
+    </behavior>
+
+    <convention name="supervisory" supported="true"/>
+    <convention name="save/restore" supported="true">state is minimal.</convention>
+    <convention name="triggerpoints" supported="false"/>
+
+    <convention name="recursion-inhibit" supported="true">It prevents
+      harmful recursion from the <pin>run!</pin> input pin.
+    </convention>
+
+    <convention name="categories" supported="true">
+      It presents attributes in the <tt>setting</tt>, <tt>pin</tt>,
+      and <tt>register</tt> categories.
+    </convention>
+
+
+  </func>
+  <env>
+  </env>
+
+  
+</defcomplib>
+    
+
+

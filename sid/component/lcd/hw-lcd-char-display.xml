@@ -1,0 +1,93 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib  SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="liblcd-char-display.la" dlsym="lcd_char_display_component_library">
+  <defcomponent name="hw-lcd-char-display">
+    <defpin name="FR" direction="in" legalvalues="binary" behaviors="display"/>
+    <defpin name="row-col" direction="in" legalvalues="2 shorts as a 32-bit value" behaviors="display"/>
+    <defattribute name="width" category="configuration" legalvalues="any positive value" defaultvalue="80" behaviors="configuration"/>
+    <defattribute name="height" category="configuration" legalvalues="any positive value" defaultvalue="24" behaviors="configuration"/>
+  </defcomponent>
+  <synop>
+    <p>
+      Simulates a dot matrix LCD display, using curses (a cursor control library) 
+      to manage the graphics inside a text window.</p>
+  </synop>
+  <func>
+    <modelling>
+      <p>
+	<p>
+	  The LCD display model is somewhat abstracted from the physical device:</p>
+	<ul>
+	  <li>
+	    <p>
+	      A real display typically has separate row and column pins that are cycled
+	      to select each pixel in the display. These are replaced by 2 pins
+	      in the model. The
+	      <pin>FR</pin> (frame) pin is driven to 1 to identify that a new
+	      frame is starting, and driven to 0 when the frame is finished. The
+	      <pin>row-col</pin> pin incorporates all the functionality of the row and column
+	      drivers on the real chip. This pin is driven once for each "on" pixel
+	      in the display, and the value on the pin is the [X,Y] co-ordinates of
+	      the pixel, encoded as two adjacent 16-bit values in the 32-bit pin value.</p>
+	    <p>
+	      With these two pins, a display refresh cycle starts when the FR pin is
+	      asserted; the [X,Y] co-ordinates of all the "on" pixels are then 
+	      transmitted on the
+	      <pin>row-col</pin> pin; and the
+	      <pin>FR</pin> pin is de-asserted to end 
+	      the refresh cycle.</p></li>
+	  <li>
+	    <p>
+	      The physical device must be refreshed periodically, but the model retains
+	      its last written values indefinitely.</p></li></ul></p>
+    </modelling>
+    <behavior name="configuration">
+      <p>
+	The width and height attributes set the display size in units of
+	characters. For example, the default values are 80 and 24 for width
+	and height, respectively. This is the size of a standard CRT window.</p>
+    </behavior>
+    <behavior name="display">
+      <p>
+	See discussion of the
+	<pin>FR</pin> and
+	<pin>row-col</pin> pins in Modeling section above.</p>
+    </behavior>
+    <convention name="functional component" supported="true">
+      <p>
+	This is a functional component.</p>
+    </convention>
+    <convention name="Save/restore" supported="true">
+      <p>
+	Save/restore is supported.</p>
+    </convention>
+    <convention name="Triggerpoint" supported="true">
+      <p>
+	Triggerpoint support is available on all three input pins.</p>
+    </convention>
+  </func>
+  <env>
+    <p>
+    <title>Related components</title>
+      <p>
+	The LCD display is typically connected to an LCD controller.
+	The following configuration file segment shows how the
+	<complib>hw-lcd-hd44780u</complib> LCD 
+	controller can be connected to the display:</p>
+
+      <code>      new hw-lcd-hd44780u-a00 lcd	# Standard Japanese font
+      new hw-lcd-char-display display
+      
+      # display size is in pixels - ie. font-width*display-height
+      set display width 40		# 8 chars X 5 pixels per char
+      set display height 8		# single line of 8 pixels
+
+      # connect the LCD to the display
+      connect-pin lcd row-col -> display row-col
+      connect-pin lcd FR -> display FR</code></p>
+  </env>
+</defcomplib>
+
+
+

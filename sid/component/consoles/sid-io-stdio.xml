@@ -1,0 +1,97 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libconsoles.la" dlsym="console_component_library">
+  <defcomponent name="sid-io-stdio" type="concrete">
+
+
+    <!-- pins -->
+    <defpin name="poll" direction="in" legalvalues="N/A" behaviors="input" />
+    <defpin name="stdin" direction="out" legalvalues="any character code" behaviors="input" />
+    <defpin name="stdout" direction="in" legalvalues="any character code" behaviors="output" />
+
+
+    <!-- attributes -->
+    <defattribute name="state-snapshot" legalvalues="opaque string" behaviors="state save/restore" />
+  </defcomponent>
+  <synop>
+  This component performs input/output on the standard input/output. 
+  </synop>
+  <func>
+    <modelling>
+
+<p>
+    This component acts as an interface between the host system's
+    stdio streams and pins in the simulated system.
+</p>
+
+<p>
+    This component uses non-blocking I/O on the host. It cannot use
+    blocking I/O because the entire simulation would block. As a
+    result, this component requires time slices from the simulator to
+    check for pending data that must be read from <tt>stdin</tt>.  To do this,
+    you can use a common scheduler component (<complib>sid-sched-*</complib>) to
+    efficiently yield time to the <component>sid-io-stdio</component>
+    component.  However, you should carefully consider the choice of
+    the time interval to be used by the scheduler.  We recommend
+    approximately 10 times per second.
+</p>
+    </modelling>
+
+    <behavior name="output">
+    When the <pin>stdout</pin> input pin is driven with a value between 0 and
+    255, the value is immediately written to stdout.
+    </behavior>
+
+    <behavior name="input">
+    When the <pin>poll</pin> pin is driven, the <tt>stdin</tt> stream is checked for
+    unread input, without blocking.  All available input is consumed,
+    and transmitted individually by driving the <pin>stdin</pin> pin with each
+    byte, in sequence.
+    </behavior>
+
+    <convention name="functional" supported="true"/>
+    <convention name="save/restore" supported="true">
+      <p>null state save/restore.</p>
+    </convention>
+  </func>
+  
+  
+
+  <env>
+    <title>Related components</title>
+
+<p>
+    You can connect a stdio console to a serial data transmission
+    component, such as a UART. You can also connect it to a 
+    ROM monitor/system call emulator, such as the <complib>sw-gloss-arm/angel</complib> 
+    which performs I/O across some sort of debug channel.
+    In order for a stdio console component to collect data from
+    standard input without blocking the entire simulation,
+    non-blocking I/O is used. It is necessary to give simulation time
+    to the component to collect any data from stdin and to buffer the data.
+    To do this, you can use the common scheduler component (see
+    Functionality, Modelling).
+</p>    
+
+<p>
+    The following is an example of how a stdio console might be 
+    configured to connect into a system:
+</p>
+
+<code>	new sid-sched-host sched
+	new sw-gloss-arm/angel angel
+	new sid-io-stdio stdio
+	set sched enabled? 1
+	set sched num-clients 1
+	set sched 0-regular? 1
+	set sched 0-time 50
+	connect-pin sched 0-event -&gt; stdio poll
+	connect-pin angel debug-tx -&gt; stdio stdout
+	connect-pin angel debug-rx &lt;- stdio stdin
+
+</code>
+  </env>
+</defcomplib>
+
+

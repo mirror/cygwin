@@ -1,0 +1,97 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libloader.la" dlsym="loader_component_library">
+  <defcomponent name="sw-load-elf" type="concrete">
+
+    <defpin name="load!" direction="in" legalvalues="any" behaviors="loading"/>
+    <defpin name="start-pc-set" direction="out" legalvalues="any" behaviors="loading"/>
+    <defpin name="endian-set" direction="out" legalvalues="0/1/2" behaviors="loading"/>
+    <defpin name="error" direction="out" legalvalues="any" behaviors="loading"/>
+
+    <defattribute name="state-snapshot" legalvalues="opaque string" behaviors="save/restore"/>
+    <defattribute name="file" category="setting" legalvalues="file name" defaultvalue='"/dev/null"' behaviors="configuration"/>
+    <defattribute name="verbose?" category="setting" legalvalues="1/0" defaultvalue="0" behaviors="configuration"/>
+    
+    <defaccessor name="load-accessor-insn" accesses="write little_int_1" behaviors="loading"/>
+    <defaccessor name="load-accessor-data" accesses="write little_int_1" behaviors="loading"/>
+
+  </defcomponent>
+
+  <synop>
+    This component loads ELF files from the host filesystem into
+    simulated memory.
+  </synop>
+
+  <func>
+    <modelling>
+      <p>
+      This component helps to simulate a process environment by
+      impersonating an OS loader.
+      </p>
+    </modelling>
+
+    <behavior name="configuration">
+      <p>
+      The "file" attribute stores the name of a file to attempt to load. 
+      The "verbose?" attribute, when set, encourages this component to provide 
+      informative messages to cout during loading.
+      </p>
+    </behavior>
+
+    <behavior name="loading">
+      <p>
+      When the <pin> load!</pin> pin is driven, this component will
+      attempt to load an ELF file from the host filesystem.  The
+      loadable parts of the file are sent one byte at a time through
+      an accessor.  During the process, the starting PC and the
+      program endianness are signalled by driving the values onto the
+      <pin>start-pc-set</pin> and <pin>endian-set</pin> output pins.
+      The endianness value is 0/1/2 for unknown/big/little.</p>
+
+      <p>
+      If the file cannot be found or if it has other errors, a message
+      is sent to <tt>cerr</tt> and the loading process is stopped.
+      The <pin>error</pin> output pin is driven in this case.</p>
+
+      <p>
+      Like operating system loaders,
+      <component>sw-load-elf</component> uses the ELF "program header"
+      to identify the bytes to load into memory.  It does not use the
+      "section header".  This means that it tends to load more bytes
+      than <tt>gdb</tt> would.</p>
+    </behavior>
+
+    <convention name="functional" supported="true" />
+    <convention name="save/restore" supported="true">state is minimal.</convention>
+    <convention name="triggerpoints" supported="false" />
+    <convention name="limit-recursion" supported="false" />
+    <convention name="settings" supported="true">
+      It presents attributes in the "setting" category.
+    </convention>
+  </func>
+  <env>
+ 
+   <title>Related components</title>
+
+    <p>This component can be used as an initialization sequencer in a
+    scenario with ordering dependencies.  See this configuration
+    fragment:</p>
+
+    <code>
+	new hw-glue-sequence-8 reset-manager
+	new CPU-OF-SOME-TYPE cpu
+	new sw-load-elf loader
+	new mapper bus
+	connect-pin reset-manager input &lt;- main starting
+	connect-pin reset-manager output-1 -&gt; loader load!
+        connect-bus loader load-accessor-insn bus access-port
+        connect-bus loader load-accessor-data bus access-port
+	set loader file "/foo/bar.x"
+        set loader verbose? 1
+	connect-pin loader start-pc-set -&gt; cpu start-pc-set!
+	connect-pin loader endian-set -&gt; cpu endian-set!
+        connect-pin loader error -&gt; main stop!</code>
+  </env>
+
+</defcomplib>

@@ -1,0 +1,168 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="librtc.la" dlsym="rtc_component_library">
+
+  <defcomponent name="hw-rtc-ds1x42" type="abstract">
+
+    <defpin name="clock" direction="in" behaviors="timekeeping"/>
+    <defpin name="clock-control" direction="out" legalvalues="positive number" behaviors="frequency testing" />
+    <defpin name="clock-event" direction="in" behaviors="frequency testing" />
+
+    <defbus name="read-write-port" addresses="0x0 - 0x7FF" accesses="read/write byte-wide" behaviors="register access"/>
+
+    <defattribute name="epoch-time" legalvalues="uint 32" behaviors="timekeeping"/>
+    <defattribute name="year" category="register" legalvalues="0..99" behaviors="register access"/>
+    <defattribute name="month" category="register" legalvalues="1..12" behaviors="register access"/>
+    <defattribute name="date" category="register" legalvalues="1..31" behaviors="register access"/>
+    <defattribute name="day-of-week" category="register" legalvalues="1..7" behaviors="register access"/>
+    <defattribute name="hour" category="register" legalvalues="0..23" behaviors="register access"/>
+    <defattribute name="minute" category="register" legalvalues="0..59" behaviors="register access"/>
+    <defattribute name="second" category="register" legalvalues="0..59" behaviors="register access"/>
+    <defattribute name="state-snapshot" legalvalues="opaque" behaviors="state save/restore"/>
+    <defattribute name="tk xclock clone" legalvalues='"hw-visual-clock"' behaviors="component gui"/>
+    
+    <defaccessor name="memory-bus" accesses="byte-wide" behaviors="register access"/>
+
+    <variants>
+      <defcomponent name="hw-rtc-ds1642" type="concrete" />
+      <defcomponent name="hw-rtc-ds1742" type="concrete" >
+	<defattribute name="century" category="register" legalvalues="19..25" behaviors="register access"/>
+      </defcomponent>
+    </variants>        
+
+  </defcomponent>
+
+  <synop>The Dallas DS1642 and DS1742 are time-keeping NVRAM devices.
+    The DS1742 is Y2K compliant as it maintains a century field in a
+    section of NVRAM that was previously reserved by Dallas in the
+    DS1642.
+  </synop>
+  <func>
+    <modelling>
+      <p>
+	The DS1x42 components model real time using a single pin that can be
+	driven at a simulated interval representing one second.  For
+	modelling time in the target domain, a target scheduler may be used.
+	For modelling real "wall-clock" time, the host scheduler may be
+	used.</p>
+  
+      <p>
+	The DS1x42 have a "frequency test" function that involves toggling
+	the least significant bit of the <name>seconds</name> register at an idealized
+	frequency of 512Hz.  When managed by a sid scheduler component, the
+	actual frequency is around 500Hz.</p>
+    </modelling>
+
+    <behavior name="timekeeping">
+      <p>Whenever the <pin>clock</pin> input is driven, it is
+      interpreted as a signal that one second has passed.  An internal
+      counter is incremented and all the time-related registers are
+      recomputed.  The counter is accessible by the
+      <attribute>epoch-time</attribute> attribute.</p></behavior>
+
+    <behavior name="frequency testing">
+      <p>When the
+	<pin>clock-control</pin> and
+	<pin>clock-event</pin> pin-pair is connected
+	to an external scheduler, the DS1642 standard <name>test bit</name> is
+	toggled at an approximate simulated frequency.
+      </p>
+    </behavior>
+
+    <behavior name="register access">
+      <p>
+	The DS1642/DS1742 control registers and 2048-byte NVRAM are
+	accessed across the
+	<bus>read-write-port</bus> bus for byte-wide
+	operations.  The control registers are also exposed as attributes.</p>
+
+      <p>
+	This family of parts includes 2KB of non-volatile RAM.  This
+	component does not explicitly model this memory.  Instead, it
+	interacts through the
+	<accessor>memory-bus</accessor> accessor with an external
+	memory like <complib>hw-memory-ram/rom-basic</complib>.</p>
+      
+    </behavior>
+
+    <convention name="functional" supported="true" />
+    <convention name="save/restore" supported="true" />
+    <convention name="triggerpoints" supported="true">
+      <p>
+      They support setting triggerpoints on the state of data with the following
+      names:</p>
+      <table>
+	<tr>
+	  <td>
+	    <name>epoch-time</name></td>
+	  <td>Canonical internal representation of time.</td></tr>
+	<tr>
+	  <td>
+	    <name>oscillating</name></td>
+	  <td>The oscillator is connected.</td></tr>
+	<tr>
+	  <td>
+	    <name>write-mode</name></td>
+	  <td>The device is in write mode, for updates.</td></tr></table>
+	  
+    </convention>
+
+  </func>
+  <env>
+    <ul>
+      <title>Related components</title>
+      <li>
+	<p>
+	  The 2KB of non-volatile memory included in these parts is not
+	  explicitly modeled by this component.  Instead, it uses the
+	  "memory-bus" accessor to interact with an external memory like
+	  <complib>hw-memory-ram/rom-basic</complib>:</p>
+	<code>
+	  new hw-memory-ram/rom-basic nvram
+	  set nvram size 2048
+	  connect-bus rtc memory-bus nvram read-write-port</code>
+      </li>
+      
+      <li>	
+	<p>
+	  In order to enable the "frequency test" function, you need to
+	  couple an external scheduler to this component. The following is
+	  an example of how to configure such a connection between a
+	  scheduler and the DS1742 component:</p>
+	<code>
+	  new sid-sched-host-accurate sched
+	  new hw-rtc-ds1742 rtc
+	  set sched num-clients 2
+	  set sched 0-regular? 1
+	  set sched 0-time 1000 # 1 sec
+	  connect-pin sched 0-event -&gt; rtc clock
+	  connect-pin rtc clock-control -&gt; sched 1-control
+	  connect-pin rtc clock-event &lt;- sched 1-event</code></li>      
+    
+      <li>
+	<p>
+	  The <complib>hw-visual-clock</complib> component is a candidate gui for this
+	  component.</p>
+	<code>
+	  new hw-rtc-ds1742 rtc
+	  new hw-visual-clock rtc-gui
+	  relate rtc-gui "your rtc friend" rtc</code></li>
+    </ul>
+    <ul>
+      <title>Host system</title>
+      <li>
+	<p>
+	  These components rely on the accuracy and integrity of UTC time
+	  maintained by the host, as the time and date are initialized
+	  when the component is instantiated. The UNIX time() system call
+	  is used to acquire the time.</p></li></ul>
+  </env>
+  <refs>  Dallas Semiconductor DS1642 data sheet, revision 031698; DS1742 data
+    sheet, revision 091498. Available
+    <a type="url" href="http://www.dalsemi.com/Prod_info/Time_Keep/index.html">online</a>,
+    or in our <a type="techdoc" href="ds1642">local archives</a>.
+  </refs>
+
+</defcomplib>
+

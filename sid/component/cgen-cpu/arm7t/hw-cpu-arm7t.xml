@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd" [
+<!ENTITY stdinterface SYSTEM "../common-xml/interface.xml">
+<!ENTITY stdbehavior SYSTEM "../common-xml/behavior.xml">
+<!ENTITY debugregisters SYSTEM "../common-xml/debugger-register-access.xml">
+<!ENTITY stdconventions SYSTEM "../common-xml/conventions.xml">
+<!ENTITY stdenvironment SYSTEM "../common-xml/environment.xml">
+]>
+
+<defcomplib lib="libcgencpu.la" dlsym="cgen_component_library">
+  <defcomponent name="hw-cpu-arm7t" type="concrete">
+
+    &stdinterface;
+
+    <!-- pins -->
+    <defpin name="nreset" direction="in" legalvalues="0 or 1" behaviors="execution" />
+    <defpin name="nm" direction="out" legalvalues="0 or 1" behaviors="register access" />
+    <defpin name="tbit" direction="out" legalvalues="0 or 1" behaviors="register access" />
+    <defpin name="nfiq" direction="in" legalvalues="0 or 1" behaviors="hardware interrupts" />
+    <defpin name="nirq" direction="in" legalvalues="0 or 1" behaviors="hardware interrupts" />
+
+    <!-- attributes -->
+    <defattribute name="cpsr" category="watchable register" legalvalues="number" behaviors="register access" />
+    <defattribute name="cpsr-flags" category="register" legalvalues="string" behaviors="register access" />
+    <defattribute name="nm" category="watchable pin" legalvalues="number" behaviors="register access" />
+    <defattribute name="tbit" category="watchable pin" legalvalues="number" behaviors="register access" />
+    <defattribute name="nfiq" category="watchable pin" legalvalues="number" behaviors="hardware interrupts" />
+    <defattribute name="nirq" category="watchable pin" legalvalues="number" behaviors="hardware interrupts" />
+    <defattribute name="rN_fiq" category="watchable register" legalvalues="number" behaviors="register access" />
+    <defattribute name="rN_svc" category="watchable register" legalvalues="number" behaviors="register access" />
+    <defattribute name="rN_abt" category="watchable register" legalvalues="number" behaviors="register access" />
+    <defattribute name="rN_irq" category="watchable register" legalvalues="number" behaviors="register access" />
+    <defattribute name="rN_und" category="watchable register" legalvalues="number" behaviors="register access" />
+    <defattribute name="spsr_fiq" category="watchable register" legalvalues="number" behaviors="register access" />
+    <defattribute name="spsr_svc" category="watchable register" legalvalues="number" behaviors="register access" />
+    <defattribute name="spsr_abt" category="watchable register" legalvalues="number" behaviors="register access" />
+    <defattribute name="spsr_irq" category="watchable register" legalvalues="number" behaviors="register access" />
+    <defattribute name="spsr_und" category="watchable register" legalvalues="number" behaviors="register access" />
+  </defcomponent>
+  <synop>
+    <p>This component models the ARM7 Thumb processor.</p>
+  </synop>
+  <func>
+    <modelling>
+	<p>This component models a simplified ARM7 Thumb processor.  </p>
+	<p>It does not model floating point instructions.</p>
+	<p>It models supervisory functions such as exceptions/traps in
+	  order to be able to run an operating system.</p>
+    </modelling>
+    &stdbehavior;
+
+    <behavior name="hardware interrupts">
+      <p>Hardware interrupts are signalled by driving the pins
+      <pin>nfiq</pin> or <pin>nirq</pin> with a zero value.  Incoming
+      interrupts are queued and are processed when the
+      <pin>step!</pin> pin is next invoked.  Note that this may not be
+      the next instruction if the
+      <attribute>step-insn-count</attribute> attribute is greater than
+      one.</p>
+    </behavior>
+
+
+    <behavior name="register access">
+      <p>All 16 general purpose registers are accessible as attribute
+      <attribute>r0</attribute> through <attribute>r15</attribute>.
+      <attribute>pc</attribute> is an alias of
+      <attribute>r15</attribute>.  The CPSR register is accessible as
+      <attribute>cpsr</attribute>, and also as
+      <attribute>cpsr-flags</attribute> for a decoded textual form.
+      The current endianness is available as attribute
+      <attribute>endian</attribute>.  The current cpsr mode is
+      available as attribute/pin <attribute>nm</attribute>.  The
+      current thumb/arm bit is available as attribute/pin
+      <attribute>tbit</attribute>.</p>
+
+      <p>Banked registers (e.g. <attribute>r14_svc</attribute>,
+      <attribute>spsr_und</attribute>) are also exposed as read/write
+      attributes.</p>
+
+    &debugregisters;
+    </behavior>
+
+  &stdconventions;
+  </func>
+  <env>
+  &stdenvironment;
+  </env>
+  <refs>
+  <p>ARM</p>
+  <p>Arm Architecture Reference Manual, ARM DDI 0100B</p>
+  </refs>
+
+</defcomplib>
+
+
+

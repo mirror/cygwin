@@ -1,0 +1,167 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libinterrupt.la" dlsym="interrupt_component_library">
+  <defcomponent name="hw-interrupt-cogent/cma222" type="concrete">
+
+    <!-- pins -->
+    <defpin name="interrupt-source-[0,7]" direction="in" legalvalues="any" behaviors="interrupt handling" />
+    <defpin name="interrupt" direction="out" legalvalues="0..1" behaviors="interrupt handling" />
+
+    <!-- buses -->
+    <defbus name="irq-registers" addresses="0x0..0x37F" accesses="read/write" behaviors="register access" />
+
+    <!-- attributes -->
+    <defattribute name="interrupt" category="pin watchable" legalvalues="numeric" behaviors="interrupt handling" />
+    <defattribute name="irq-raw-status" category="register watchable" legalvalues="numeric" behaviors="register access" />
+    <defattribute name="irq-enable-register" category="register watchable" legalvalues="numeric" behaviors="register access" />
+  </defcomponent>
+  <synop>
+    <p>
+      This component simulates the interrupt controller on the Cogent
+      CMA222 ARM710T CPU model.</p>
+  </synop>
+  <func>
+    <modelling>
+      <p>
+	The interrupt controller model features 8 interrupt sources
+	for the follow services: reset, serial port A, serial port B,
+	timer, motherboard ethernet (CMA101) or parallel port (CMA102
+	and CMA110), and 3 interrupt lines for motherboard slots.</p>
+    </modelling>
+    <behavior name="reset">
+      <p>
+	When the interrupt-source-0 input pin is driven, this component
+	is reset to the hardware's normal power-up state.</p>
+    </behavior>
+    <behavior name="register access">
+      <p>
+	<p>
+When the <bus>irq-registers</bus> bus is accessed, the appropriate 8-bit control
+      register is read or written.  Available registers are as follows:
+      ISR (Interrupt Source Register), Clear ISR, IMR (Interrupt Mask
+      Register), and 3 Interrupt Acknowledge slot registers.  These
+      registers are mapped at base address 0xF000000, and the following
+      offsets:</p>
+	
+	<table>
+	  <tr>
+	    <th>
+	      offset</th>
+	    <th>
+	      read</th>
+	    <th>
+	      write</th></tr>
+	  <tr>
+	    <td>
+	      0xF600000</td>
+	    <td>
+	      ISR</td>
+	    <td>
+	      (reserved)</td></tr>
+	  <tr>
+	    <td>
+	      0xF600008</td>
+	    <td>
+	      (reserved)</td>
+	    <td>
+	      Clear ISR</td></tr>
+	  <tr>
+	    <td>
+	      0xF600010</td>
+	    <td>
+	      IMR</td>
+	    <td>
+	      (reserved)</td></tr>
+	  <tr>
+	    <td>
+	      0xF600018</td>
+	    <td>
+	      (reserved)</td>
+	    <td>
+	      IMR</td></tr>	
+	  <tr>
+	    <td>
+	      0xF600020</td>
+	    <td>
+	      IRQAckSlot1</td>
+	    <td>
+	      (reserved)</td></tr>
+	  <tr>
+	    <td>
+	      0xF600028</td>
+	    <td>
+	      IRQAckSlot2</td>
+	    <td>
+	      (reserved)</td></tr>
+	  <tr>
+	    <td>
+	      0xF600030</td>
+	    <td>
+	      IRQAckSlot3</td>
+	    <td>
+	      (reserved)</td></tr></table>
+	
+	<p>
+	  Several registers are also available as watchable attributes.</p></p>
+    </behavior>
+    <behavior name="interrupt handling">
+      <p>
+	<p>
+	  When any interrupt source is signalled, or interrupt-enabled
+	  masks are modified, pending interrupts are processed.  There is
+	  only one interrupt source: the "interrupt-source-N" input pins.
+	  Subject to the then-current interrupt-enabling registers, the
+	  <pin>interrupt</pin> output pin may be driven.</p>
+	
+	<p>
+	  The polarity for the input interrupt source pins is positive,
+	  meaning that non-zero values are interpreted as "asserted".  On
+	  the other hand, the polarity for the output interrupt pins is
+	  negative, meaning that zero values are to be interpreted as
+	  "asserted". </p> 
+	
+	<p>
+	  Similarly named attributes may be used to generate/monitor pin
+	  traffic.</p></p>
+    </behavior>
+    <convention name="functional" supported="true">
+      <p>
+This is a functional component.</p>
+    </convention>
+    <convention name="state save/restore" supported="true">
+      <p>
+	This component supports state save/restore.</p>
+    </convention>
+    <convention name="triggerpoints" supported="true">
+      <p>
+	This component supports triggerpoints.</p>
+    </convention>
+  </func>
+  <env>
+    <p>
+      <title>
+	Related components</title>
+      <p>
+	The interrupt controller sits between the ARM710T CPU on the CMA222
+	CPU board, and the other components on this board or the CMA motherboard.
+	The following configuration file fragment shows all the onboard devices
+	of the CMA110 motherboard connected to the interrupt controller.</p>
+      
+      <code>	new hw-cpu-arm7t cpu
+	new hw-timer-arm/ref-nosched timer
+	new hw-interrupt-cogent/cma222 intcontrl
+	new hw-uart-ns16550 uart1
+	new hw-uart-ns16550 uart2
+	connect-pin uart2 INTR -> intctrl interrupt-source-1
+	connect-pin uart1 INTR -> intctrl interrupt-source-2
+        connect-pin timer interrupt -> intcontrl interrupt-source-3
+	connect-pin parport INTP -> intctrl interrupt-source-4
+	connect-pin intcontrl interrupt -> cpu nirq</code></p>
+  </env>
+  <refs>
+    <a type="url" href="http://www.cogcomp.com/data_sheets/">
+      Cogent Computer Systems, Inc. Data Sheets
+    </a>
+  </refs>
+</defcomplib>

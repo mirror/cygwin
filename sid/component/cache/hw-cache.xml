@@ -1,0 +1,248 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libcache.la" dlsym="cache_component_library">
+  <defcomponent name="hw-cache-basic" type="concrete">
+    
+    <!-- buses -->
+    <defbus name="upstream" addresses="unrestricted" accesses="unrestricted" behaviors="bus traffic" />
+
+    <!-- accessors -->
+    <defaccessor name="downstream" addresses="unrestricted" accesses="unrestricted" behaviors="bus traffic" />
+
+    <!-- pins -->
+    <defpin name="report!" direction="in" behaviors="statistics reporting" />
+    <defpin name="flush" direction="in" legalvalues="32-bit address" behaviors="flushing" />
+    <defpin name="invalidate" direction="in" legalvalues="32-bit address" behaviors="invalidating" />
+    <defpin name="invalidate-all" direction="in" legalvalues="any" behaviors="invalidating" />
+    <defpin name="prefetch" direction="in" legalvalues="32-bit address" behaviors="prefetching" />
+    <defpin name="lock" direction="in" legalvalues="32-bit address" behaviors="line locking" />
+    <defpin name="unlock" direction="in" legalvalues="32-bit address" behaviors="line locking" />
+    
+    <!-- attributes -->
+    <defattribute name="associativity" category="setting" legalvalues="string" behaviors="configuration" />
+    <defattribute name="cache-size" category="setting" legalvalues="numeric" behaviors="configuration" />
+    <defattribute name="line-size" category="setting" legalvalues="numeric" behaviors="configuration" />
+    <defattribute name="hash-bit-mask" category="setting" legalvalues="numeric" defaultvalue="0xf" behaviors="configuration" />
+    <defattribute name="hash-shift-amount" category="setting" legalvalues="0..31" defaultvalue="0" behaviors="configuration" />
+    <defattribute name="write-through?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="write strategy" />
+    <defattribute name="write-allocate?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="write strategy" />
+    <defattribute name="read-accesses" category="register" legalvalues="numeric" defaultvalue="0" behaviors="statistics gathering" />
+    <defattribute name="write-accesses" category="register" legalvalues="numeric" defaultvalue="0" behaviors="statistics gathering" />
+    <defattribute name="misaligned-reads" category="register" legalvalues="numeric" defaultvalue="0" behaviors="statistics gathering" />
+    <defattribute name="misaligned-writes" category="register" legalvalues="numeric" defaultvalue="0" behaviors="statistics gathering" />
+    <defattribute name="flushes" category="register" legalvalues="numeric" defaultvalue="0" behaviors="statistics gathering" />
+    <defattribute name="replacements" category="register" legalvalues="numeric" defaultvalue="0" behaviors="statistics gathering" />
+    <defattribute name="read-hit-rate" category="register" legalvalues="percentage string" defaultvalue="0%" behaviors="statistics gathering" />
+    <defattribute name="write-hit-rate" category="register" legalvalues="percentage string" defaultvalue="0%" behaviors="statistics gathering" />
+    <defattribute name="collect-statistics?" category="setting" legalvalues="boolean" defaultvalue="true" behaviors="statistics reporting" />
+    <defattribute name="report-heading" category="setting" legalvalues="string" defaultvalue="cache profile report" behaviors="statistics reporting" />
+    <defattribute name="hit-latency" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="memory latency" />
+    <defattribute name="miss-latency" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="memory latency" />
+    <defattribute name="dump!" category="setting" legalvalues="empty string" defaultvalue="empty" behaviors="internal diagnostics" />
+
+  </defcomponent>
+
+  <synop>
+    <p>
+      This component models a variety of memory cache designs.</p>
+  </synop>
+
+  <func>
+    <modelling>
+      <p>
+	This component models a memory cache suitable for use at
+	different levels of the memory hierarchy.  It provides a bus
+	interface and connects to another bus, providing a transparent
+	pass-through.  In this documentation, "CPU" and "main memory"
+	are synonymous for "upstream bus" and "downstream bus", as this
+	is the most common usage (but not the only possible).</p>
+
+      <p>
+	The parameters of the cache are a matter of configuration.  At
+	instantiation time, the following parameters are specified:
+
+	<ul>
+	  <li>cache size in KB (8, 16, 32, 64, 128, 256, 512)</li>
+	  <li>line size in bytes (16, 32, 64, 128)</li>
+	  <li>associativity (<tt>direct</tt>, <tt>full</tt>,
+	    <tt>2way</tt>, <tt>4way</tt>)</li>
+	  <li>replacement policy for N-way and fully associative
+	    caches (<tt>lru</tt>, <tt>fifo</tt>, <tt>random</tt>)</li>
+	</ul>
+
+	For a 16KB cache with a line size of 32 bytes, 2-way set
+	associativity and a "least recently used" (LRU) replacement
+	policy, the component name is
+	<tt>hw-cache-2way/16kb/32/lru</tt>.
+
+	For direct mapped caches, replacement policies are not
+	applicable and should be omitted from the component name, such
+	as <tt>hw-cache-direct/64kb/16</tt>. This particular 64KB
+	direct-mapped cache configuration is also known by the type
+	name of <tt>hw-cache-basic</tt>.</p>
+    </modelling>
+
+    <behavior name="tag calculation">
+      <p>
+	The size of a tag is dynamically computed based on the line
+	size.  Unlike physical caches which economise on the number of
+	tag bits to reduce hardware costs, the model uses a full
+	address, but discards the redundant bits that can be inferred
+	by a bytes position in the cache line.  For example, a 32
+	(2^5) byte line uses 27 bits for the tag.</p>
+    </behavior>
+
+    <behavior name="hash algorithm">
+      <p>
+	A simple hashing algorithm is used to select a set from a
+	target address.  The algorithm uses values from
+	<attribute>hash-bit-mask</attribute> and
+	<attribute>hash-shift-amount</attribute> to compute:
+	
+	These two values must be chosen carefully to ensure good cache
+	utilisation.  In particular, the "all-ones" value of <tt>mask
+	</tt> should not exceed the number of sets in the cache.</p>
+    </behavior>
+
+    <behavior name="misaligned accesses">
+      <p>
+	The component does not handle memory accesses that are not
+	aligned on the natural boundary of the data being referenced.
+	In such cases, the cache is bypassed and memory is accessed
+	directly.</p>
+    </behavior>
+
+    <behavior name="write strategy">
+      <p>
+	When a write is made to the cache, the
+	<attribute>write-through?</attribute> attribute determines if
+	the data will be simultaneously written to the memory.
+	Otherwise, writes will only be made to the cache and will not
+	be synchronised with main memory until the line is flushed due
+	to line replacement or an explicit flush (see Flushing).</p>
+	
+      <p>
+	In the case of a write miss, the
+	<attribute>write-allocate?</attribute> attribute specifies the
+	component's action.  If this attribute is set to <tt>yes</tt>,
+	then a miss will cause the missed line to be loaded into the
+	cache in anticipation of future references.</p>
+    </behavior>
+
+    <behavior name="prefetching">
+      <p>
+	The component supports prefetching of data into the cache by
+	driving <pin>prefetch</pin> with an address.  If, due to the
+	line replacement policy, the prefetch cannot be performed,
+	this operation has no effect.</p>
+    </behavior>
+
+    <behavior name="flushing">
+      <p>
+	If dirty lines are flushed from the cache, the component will
+	ensure that their contents are synchronized with main memory.
+	Some architectures provide a facility for explicitly flushing
+	a line to memory.  For this purpose, the component provides
+	<pin>flush</pin> which can be driven with an address.  If the
+	address falls on a line that is present and dirty, it will be
+	flushed to memory and marked as not dirty.</p>
+    </behavior>
+
+    <behavior name="invalidating">
+      <p>
+	Lines in the cache that contain accurate contents are marked
+	as valid.  Some architectures provide a facility for
+	explicitly marking a line as invalid so that future accesses
+	will cause a new memory access.  For this purpose, the
+	component provides <pin>invalidate</pin> that can be driven
+	with an address.  If the address falls on a line that is
+	present, it will be invalidated.  No consideration is made for
+	dirty lines, so a line should be flushed before being
+	invalidated.  The entire cache can be invalidated by driving
+	<pin>invalidate-all</pin>.</p>
+    </behavior>
+
+    <behavior name="line locking">
+      <p>
+	The component supports locking lines in the cache to prevent
+	them from being removed to accommodate more recently
+	referenced lines.  A line can be locked by driving
+	<pin>lock</pin> with any address that falls on the line.
+	Subsequently, a line can be unlocked by driving
+	<pin>unlock</pin>.</p>
+    </behavior>
+
+    <behavior name="memory latency">
+      <p>
+	The component models the effects of memory latency.  The
+	<attribute>hit-latency</attribute> and
+	<attribute>miss-latency</attribute> values specify the
+	cumulative latencies for hit and missed cache operations.  Any
+	misaligned accesses are penalised as if they are a miss.</p>
+    </behavior>
+
+    <behavior name="statistics gathering">
+      <p>
+	The component gathers statistics for a number of significant
+	events and records them in read-only attributes.  The
+	collection of statistics may be disabled using
+	<attribute>collect-statistics?</attribute>.</p>
+    </behavior>
+
+    <behavior name="statistics reporting">
+      <p>
+	The component will write a summary report of the statistics it
+	collects to standard error when <pin>report!</pin> is driven.
+	The <attribute>report-heading</attribute> value, prepended to
+	the report, allows reports from multiple caches to be
+	distinguished.</p>
+    </behavior>
+    
+    <convention name="functional" supported="true" />
+    <convention name="latency" supported="true" />
+
+  </func>
+  <env>
+    <title>Related components</title>
+    <ul>
+      <li>
+	<p>
+	  This component is typically used as a cache between a CPU
+	  and main memory. A sample configiruation fragment is:
+	  <code>
+        new hw-cpu-arm7t cpu
+        new hw-cache-basic cache
+        connect-bus cpu insn-memory cache upstream
+        connect-bus cpu data-memory cache upstream
+	connect-bus cache downstream mem read-write-port</code></p></li>
+      <li>
+	<p>
+	  More extensive modeling of the memory hierarchy could be
+	  achieved by daisy-chaining two cache component instances:
+	  <code>
+        new hw-cpu-arm7t cpu
+        new hw-cache-basic l1-cache
+        new hw-cache-basic l2-cache
+        connect-bus cpu insn-memory l1-cache upstream
+        connect-bus cpu data-memory l1-cache upstream
+	connect-bus l1-cache downstream l2-cache upstream
+	connect-bus l2-cache downstream mem read-write-port</code></p></li>
+      <li>
+	<p>
+          The cache can operate using virtual or physical addresses.
+	  This is determined by the location of the cache in the
+	  memory hierarchy.  The cache can manage physical addresses
+	  by placing it "downstream" from an MMU or bus mapper (see
+	  hw-mapper-basic).</p></li>
+    </ul>
+  </env>
+
+  <refs>
+    <ul>
+      <li><em>Computer Architecture: A Quantitative Approach</em>, Hennessy and Patterson.</li>
+      <li><em>Advanced Microprocessors</em>, D. Tabak.</li>
+      <li><em>UNIX Systems for Modern Architectures</em>, C. Schimmel.</li>
+    </ul>
+  </refs>
+</defcomplib>

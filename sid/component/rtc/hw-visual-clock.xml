@@ -1,0 +1,78 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libtclapi.la" dlsym="tcl_bridge_library">
+  <defcomponent name="hw-visual-clock" type="concrete">
+
+
+    <!-- attributes -->
+    <defattribute name="geometry" category="setting" legalvalues="XxY, where X, Y >= 100, X=Y" defaultvalue="150x150" behaviors="window layout" />
+    <defattribute name="title" category="setting" legalvalues="any string" defaultvalue="'hw-visual-clock'" behaviors="window layout" />
+    <defattribute name="(any name)" category="window layout, time display" />
+  </defcomponent>
+  <synop>
+  This is a graphical component for displaying the time given by a
+  related real-time clock, such as the <complib>hw-rtc-ds1x42</complib>.
+  </synop>
+  <func>
+    <modelling>
+      <p>This component uses a graphical clock face to represent the
+      time stored by a real-time clock.  This component will
+      inter-operate with many kinds of real time clocks, provided they
+      provide <attribute>hour</attribute>,
+      <attribute>minute</attribute> and <attribute>second</attribute>
+      attributes.</p>
+    </modelling>
+
+    <behavior name="window layout">
+      <p>The component supports resizing of its window.  Its geometry
+      may also be specified by another component, in which case the
+      window will be resized accordingly.  The minimum geometry is
+      150x150 and the aspect ratio must be 1 to 1 (that is, the window
+      must remain square, so that the clock face is circular).</p>
+
+      <p>The component also allows you to alter the window title via
+      the <attribute>title</attribute> attribute.  By default, the
+      window will be titled by the name of the relation through which
+      the target component was configured.</p>
+      </behavior>
+
+    <behavior name="time display">
+      <p>When a related real-time clock component is specified, this
+      component will periodically query that component's
+      <attribute>hour</attribute>, <attribute>minute</attribute> and
+      <attribute>second</attribute> attributes to obtain values for
+      the clock's known time.  This will be shown on the graphical
+      display.  If no related component is specified, the clock face
+      will be cleared.</p>
+    </behavior>
+
+    <convention name="supervisory" supported="true">
+      This is a supervisory gui component.
+    </convention>
+    <convention name="save/restore" supported="false"/>
+    <convention name="triggerpoints" supported="false"/>
+
+  </func>
+  <env>
+    <title>Related components</title>
+
+    <p>To use this component, relate it to a real-time clock component
+    instance that provides the necessary <attribute>hour</attribute>,
+    <attribute>minute</attribute> and <attribute>second</attribute>
+    attributes:</p>
+
+    <code>
+        new hw-rtc-ds1642 rtc
+	[...]
+        new hw-visual-clock clock-display
+	relate clock-display "rtc window" rtc
+
+    </code>
+
+    <p>Because this component is written in Tk, the bridge-tk event
+      handling pins must be connected for at least one Tcl/Tk/BLT
+      component.</p>
+
+  </env>
+</defcomplib>

@@ -1,0 +1,173 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libgloss.la" dlsym="gloss_component_library">
+  <defcomponent name="sw-gloss-arm/angel" type="concrete">
+
+
+    <!-- pins -->
+    <defpin name="reset" direction="in" legalvalues="any" behaviors="initialization" />
+    <defpin name="trap" direction="" legalvalues="trap type enum" behaviors="system call emulation" />
+    <defpin name="trap-code" direction="in" legalvalues="trap code value" behaviors="system call emulation" />
+    <defpin name="process-signal" direction="out" legalvalues="signal number" behaviors="system call emulation" />
+    <defpin name="debug-tx" direction="out" legalvalues="0-255" behaviors="stdio" />
+    <defpin name="debug-rx" direction="in" legalvalues="0-255" behaviors="stdio" />
+
+
+    <!-- accessors -->
+    <defaccessor name="target-memory" accesses="any" behaviors="system call emulation" />
+
+
+    <!-- attributes -->
+    <defattribute name="verbose?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="system call emulation" />
+    <defattribute name="heap-base" category="setting" legalvalues="number" defaultvalue="0x80000" behaviors="initialization" />
+    <defattribute name="heap-limit" category="setting" legalvalues="number" defaultvalue="1024" behaviors="initialization" />
+    <defattribute name="stack-base" category="setting" legalvalues="number" defaultvalue="0x200000" behaviors="initialization" />
+    <defattribute name="stack-limit" category="setting" legalvalues="number" defaultvalue="0x200000" behaviors="initialization" />
+    <defattribute name="command-line" category="setting" legalvalues="any" defaultvalue="''" behaviors="initialization" />
+    <defattribute name="max-fds" category="setting" legalvalues="number" defaultvalue="32" behaviors="initialization" />
+    <defattribute name="'tk tty'" category="gui" defaultvalue="'hw-visual-tty'" behaviors="component gui" />
+
+    <!-- relationships -->
+    <defrelationship name="cpu" behaviors="system call emulation" />
+  </defcomponent>
+  <synop>
+  This component emulates the Angel ROM monitor software.  
+  </synop>
+  <func>
+    <modelling>
+      This component emulates the ANGEL ROM monitor software by
+      intercepting the ARM CPU component model's software interrupt
+      (SWI).  It implements common system calls, such as read() and
+      write().
+    </modelling>
+
+    <behavior name="system call emulation">
+      <p>
+	When the <pin>trap</pin> input pin is driven, this component
+	will attempt to emulate the requested system call.  It checks
+	whether the current <pin>trap-code</pin> and <pin>trap</pin>
+	values correspond to a system call that can be emulated.
+      </p>
+      <p>
+	If this is indeed a valid ANGEL system call, the component
+	emulates the call by accessing the target processor's
+	registers (through the <relationship>cpu</relationship>
+	relation) and memory (through the
+	<accessor>target-memory</accessor> accessor).  In most cases,
+	it signals back a <pin>skip</pin> or <pin>reissue</pin>
+	indication through the <pin>trap</pin> output pin.
+      </p>
+      <p>
+	If the requested system call is not a valid ANGEL system call,
+	the trap signal is chained by driving the
+	<pin>trap-code-chain</pin> and <pin>trap-chain</pin> output
+	pins with the same values as received.  If an external
+	component is connected to these chain pins, and if that
+	external component signals a <pin>handled</pin> indication
+	back on the <pin>trap-chain</pin> input, then this component
+	will consider the trap as handled and will return.
+      </p>
+      <p>
+	If this is a trap condition that would kill an ordinary
+	process-model program, then the <pin>process-signal</pin>
+	output pin is driven with an exit code similar to that used by
+	UNIX <tt>wait(2)</tt>.  Such conditions include memory faults,
+	invalid instructions, etc.
+
+      </p>
+      <p> See the documentation of <complib>hw-cpu-arm7t</complib> for
+      the list of supported trap &amp; trap-code values.
+      </p>
+      <p>
+	If the <attribute>verbose?</attribute> attribute is set to a
+	true value, detailed tracing messages will be printed to
+	stderr during a system call emulation.
+      </p>
+    </behavior>
+
+    <behavior name="initialization">
+      <p> When the <pin>reset</pin> pin is driven, all open files are
+      closed and the simulated stdio file handles (0/1/2) are attached
+      to the host's same stdio file handles.
+      </p>
+      <p>
+	The <attribute>heap-base</attribute>,
+	<attribute>heap-limit</attribute>,
+	<attribute>stack-base</attribute>,
+	<attribute>stack-limit</attribute>, and
+	<attribute>command-line</attribute> attributes provide access
+	to values that are exposed to several ANGEL system calls.
+      </p>
+      <p>
+	The <attribute>max-fds</attribute> attribute specifies the
+	largest simulated file descriptor that will be made available
+	to the target program.
+      </p>
+    </behavior>
+
+    <behavior name="stdio">
+      <p>    Accesses to the special simulated file handles 0/1/2 are mapped to
+	pin I/O on the <pin>debug-tx</pin> and <pin>debug-rx</pin> pins.  Input from the
+	<pin>debug-rx</pin> pin is buffered for future reads.  Reads may block
+	until data is received.  Writes to stdout or stderr are modelled
+	by sending the supplied characters, one-at-a-time, out through the
+	<pin>debug-tx</pin> pin.
+      </p>
+    </behavior>
+
+    <convention name="supervisory" supported="true" />
+    <convention name="triggerpoints" supported="false" />
+    <convention name="save/restore" supported="true" />
+    <convention name="inhibit-recursion" supported="false" />
+
+  </func>
+  <env>
+   <title>Related components</title>
+
+     <p>The Angel component communicates closely with a CPU and main memory.  
+      It uses the CPU for retrieving system call arguments from
+      registers and placing results in a register.  It uses memory for 
+      accessing data when system call arguments are pointers into the
+      target memory.  An example of this is the char* argument to <tt>write()</tt>.
+      The coupling to the CPU and memory is quite relaxed: the only
+      requirement is that the endianness of the CPU be known via attribute
+      and that attributes for registers exist with names of the form
+      <tt>rN</tt>.</p>
+
+     <p>The configuration file fragment below shows how to connect an 
+      Angel component into a more complete system:</p>
+<code>
+	new hw-cpu-arm7t cpu
+	new hw-memory-ram/rom-basic mem
+	new sw-gloss-arm/angel angel
+	new sid-io-stdio stdio
+	relate angel cpu cpu
+	connect-pin cpu trap &lt;-&gt; angel trap
+	connect-pin cpu trap-code -&gt; angel trap-code
+	connect-pin angel process-signal -&gt; main stop!
+	connect-pin angel debug-tx -&gt; stdio stdout
+	connect-pin angel debug-rx &lt;- stdio stdin
+	connect-bus angel target-memory cpu debugger-port
+
+</code>
+  
+    <title>Host system</title>
+
+     <p>The component implements the Angel's semi-hosted system calls
+     such as <tt>open()</tt> and <tt>close()</tt>.  Use these calls
+     with caution: they can perform file I/O on the host, therefore it
+     is possible to write rogue target programs that delete or modify
+     files on the host.</p>
+
+  </env>
+
+  <refs>
+    <p>ARM Software Development Toolkit Reference Guide (version 2.11),
+      Document number: ARM DUI 0041B,
+      Chapter 8 (``Angel'')
+    </p>
+
+    <p>newlib source code is also useful for clarification.</p>
+  </refs>
+</defcomplib>

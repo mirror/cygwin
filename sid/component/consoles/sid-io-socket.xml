@@ -1,0 +1,213 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libconsoles.la" dlsym="console_component_library">
+  <defcomponent name="sid-io-socket" type="concrete">
+
+
+    <!-- pins -->
+    <defpin name="init" direction="in" legalvalues="N/A" behaviors="initialization" />
+    <defpin name="fini" direction="in" legalvalues="N/A" behaviors="initialization" />
+    <defpin name="tx" direction="in" legalvalues="byte or void" behaviors="pin i/o" />
+    <defpin name="rx" direction="out" legalvalues="byte or void" behaviors="pin i/o" />
+    <defpin name="poll-event" direction="in" legalvalues="any" behaviors="connection, socket i/o polling" />
+    <defpin name="poll-control" direction="out" legalvalues="limited value" behaviors="connection, socket i/o polling" />
+
+
+    <!-- attributes -->
+    <defattribute name="tx-count" category="register" legalvalues="numeric" behaviors="socket i/o polling" />
+    <defattribute name="tx-buffer" category="register" legalvalues="string" behaviors="pin i/o" />
+    <defattribute name="rx-count" category="register" legalvalues="numeric" behaviors="socket i/o polling" />
+    <defattribute name="poll-count" category="register" legalvalues="numeric" behaviors="socket i/o polling" />
+    <defattribute name="avg-tx-buffer-size" category="register" legalvalues="floating point string" behaviors="pin i/o" />
+    <defattribute name="server?" category="setting" legalvalues="boolean" defaultvalue="1/0" behaviors="initialization" />
+    <defattribute name="sockaddr-local" category="setting/register" legalvalues="ipaddress:port" defaultvalue="0.0.0.0:0" behaviors="connection" />
+    <defattribute name="sockaddr-peer" category="register/setting" legalvalues="ipaddress:port" defaultvalue="0.0.0.0:0" behaviors="connection" />
+    <defattribute name="verbose?" category="setting" legalvalues="boolean" defaultvalue="0" behaviors="connection" />
+    <defattribute name="trace-traffic?" category="setting" legalvalues="boolean" defaultvalue="0" behaviors="socket i/o polling" />
+    <defattribute name="buffer-while-disconnected?" category="setting" legalvalues="boolean" defaultvalue="yes" behaviors="pin i/o" />
+    <defattribute name="connected?" category="register" legalvalues="boolean" behaviors="connection" />
+    <defattribute name="max-poll-interval" category="setting" legalvalues="numeric" defaultvalue="250" behaviors="socket i/o polling" />
+    <defattribute name="poll-interval" category="register" legalvalues="numeric" behaviors="socket i/o polling" />
+    <defattribute name="init" category="pin" legalvalues="numeric" behaviors="initialization" />
+    <defattribute name="fini" category="pin" legalvalues="numeric" behaviors="initialization" />
+    <defattribute name="tx" category="pin" legalvalues="numeric" behaviors="pin i/o" />
+    <defattribute name="rx" category="pin" legalvalues="numeric" behaviors="pin i/o" />
+
+    <variants>
+      <defcomponent name="sid-io-socket-client" type="concrete" />
+      <defcomponent name="sid-io-socket-server" type="concrete" />
+    </variants>
+
+  </defcomponent>
+  <synop>
+    <p>
+      Members of this family of components perform I/O on a TCP socket and relay data
+      across a pair of pins to some other component.
+    </p>
+  </synop>
+  <func>
+    <modelling>
+      <p>
+	This simulated component uses non-blocking I/O on the host.
+	Therefore it must be regularly polled, for example by a host-time
+	scheduler.  This component is able to automatically regulate a
+	scheduler subscription to produce fast response/throughput during
+	high traffic times, or reduce CPU load in low traffic times.	
+      </p>    
+      <p>
+	The <component>sid-io-socket-server</component> component implements a TCP server, and
+	<component>sid-io-socket-client</component> implements a TCP client.  In other words,
+	one expects an incoming socket connection, the other uses an
+	outgoing socket connection.  The two components are otherwise
+	interchangeable and are treated below as one kind.	
+      </p>
+      <p>    
+	Multiple instances of these components coexist comfortably.
+      </p>
+    </modelling>
+    <behavior name="initialization">
+
+      <p> When the <pin>init</pin> pin is driven, the component creates and
+      binds a file descriptor to the IP address specified by the
+      <attribute>sockaddr-local</attribute> attribute.  The host operating system may
+      assign some available TCP port number if the attribute is not
+      set.  An actual TCP connection attempt is not made at this time.
+      </p>
+ 
+      <p> When the <pin>fini</pin> pin is driven, the component closes its file
+      descriptors, thus closing its connection (if any).
+      </p>
+    </behavior>
+
+
+    <behavior name="connection">
+      <p> When the <pin>poll-event</pin> pin is driven, but no connection
+      exists, a non-blocking TCP connect operation is attempted.  For
+      a server, this means an <tt>accept()</tt> call, and for a client, a
+      <tt>connect()</tt>.  The <attribute>server?</attribute> attribute will contain a boolean
+      true value for the former, false for the latter.
+      </p>
+
+      <p> If the connection is successful, the <attribute>connected?</attribute> attribute
+      is set to a true value, and the <attribute>sockaddr-peer</attribute> attribute is
+      filled in.  If connection is ever lost, <attribute>connected?</attribute> is reset,
+      and a new connection will be attempted at the next <pin>poll-event</pin>
+      signal.
+      </p>
+
+      <p> If the <attribute>verbose?</attribute> attribute is set, a trace message is
+      emitted whenever the connection status changes.
+      </p>
+    </behavior>
+
+    <behavior name="pin i/o">
+      <p> When the <pin>tx</pin> pin is driven with a value, the bottom 8 bits
+      are extracted and enqueued in a transmit buffer.  The
+      <attribute>tx-buffer</attribute> attribute provides a read-only view of the current
+      buffer, and the <attribute>avg-tx-buffer-size</attribute> provides a moving average
+      length of this buffer.  If a TCP connection does not exist, and
+      <attribute>buffer-while-disconnected?</attribute> is set to a boolean false value,
+      then bytes received on the <pin>tx</pin> pin are ignored instead of
+      buffered.
+      </p>
+      <p>
+	Whenever the <pin>tx</pin> pin is driven without value out of 0-255
+	range, it is interpreted as an "end-of-file" indication, which
+	causes the current socket connection, if any, to be shut down.
+	Similarly, if the disconnection is caused by the peer, the
+	<pin>rx</pin> pin is driven with an out-of-range value to signal an
+	"end-of-file" condition.
+      </p>
+
+      <p>
+	Whenever a character is received from the TCP socket, it is
+	immediately transmitted on the <pin>rx</pin> pin as an 8-bit value.
+	(This happens only during a poll.)  
+      </p> 
+
+    </behavior>
+
+    <behavior name="socket i/o polling">
+
+      <p> When the <pin>poll-event</pin> pin is driven, and a connection
+      exists, this component attempts to receive then transmit batches
+      of bytes, in a non-blocking manner.  If the <attribute>trace-traffic?</attribute>
+      attribute is set to a boolean true value, a tracing message is
+      written to standard out for each successful <tt>read()</tt> or
+      <tt>write()</tt> operation.
+      </p>
+
+      <p>
+	The <attribute>tx-count</attribute> and <attribute>rx-count</attribute> attributes accumulate the number
+	of bytes transmitted and received, respectively.  The
+	<attribute>poll-count</attribute> attribute accumulates the number of <pin>poll-event</pin>
+	events, including those made while disconnected.
+      </p>
+
+      <p> After all <pin>poll-event</pin> signals, the component drives the
+      <pin>poll-control</pin> pin with a value meant to set the interval to the
+      next polling event.  Each successful non-blocking socket I/O
+      operation tends to reduce the polling interval, and each
+      unsuccessful one gradually increases the interval.  This
+      adaptive process attempts to provide a good trade-off between
+      socket I/O performance (speed &amp; throughput) and host OS load
+      (polling frequency).  The <attribute>poll-interval</attribute> attribute contains the
+      last selected polling interval, and <attribute>max-poll-interval</attribute> sets a
+      maximum on the adaptive increase.  (The minimum is 0.)
+      </p>
+
+    </behavior>
+
+    <convention name="functional" supported="true" />
+    <convention name="save/restore" supported="false"/>
+    <convention name="triggerpoints" supported="false"/>
+    <convention name="inhibit-recursion" supported="true">
+      <p>      
+	It prevents harmful recursion on the <pin>poll-event</pin> input pin.
+      </p>
+    </convention>
+    
+  </func>
+  <env>
+  <title>Related components</title>
+
+    <p> The <pin>init</pin> and <pin>fini</pin> pins must be driven in the proper
+    sequence.</p>
+
+    <p>
+      Since this component family merely pumps data in and out of a
+      socket, some other component should serve as the source and sink
+      of the characters.
+    </p>
+
+    <p>
+      The adaptive polling control mechanism is designed to operate
+      best when connected to a host-time scheduler.  This mechanism
+      may be unused, as long as the <pin>poll-event</pin> pin is driven
+      regularly by some other source.
+    </p>
+
+    <p>
+      The following configuration file fragment shows a hypothetical
+      use of the socket components.
+    </p>
+
+    <code>
+        new SOMETYPE source
+        new SOMETYPE sink
+        new sid-sched-host-accurate sched
+        new sid-io-socket-server srv                    # be a server
+	set srv sockaddr-local 0.0.0.0:3420             # listen on port 3420
+	set sched num-clients 1
+	connect-pin main starting -&gt; srv init
+        connect-pin main stopping -&gt; srv fini
+        connect-pin sched 0-event -&gt; srv poll-event     # adaptive polling
+        connect-pin sched 0-control &lt;- srv poll-control # adaptive polling
+        set srv verbose? 1
+        connect-pin srv tx &lt;- source tx
+        connect-pin srv rx -&gt; sink rx
+    </code>
+  </env>
+</defcomplib>
+

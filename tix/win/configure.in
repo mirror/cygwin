@@ -1,0 +1,65 @@
+dnl This whole file is CYGNUS LOCAL
+
+AC_INIT(../generic/tixInit.c)
+
+AC_PROG_CC
+AC_OBJEXT
+NM=${NM-nm}
+AC_SUBST(NM)
+AS=${AS-as}
+AC_SUBST(AS)
+LD=${LD-ld}
+AC_SUBST(LD)
+DLLTOOL=${DLLTOOL-dlltool}
+AC_SUBST(DLLTOOL)
+WINDRES=${WINDRES-windres}
+AC_SUBST(WINDRES)
+AC_PROG_INSTALL
+
+# Check for Tcl and Tk.
+CYG_AC_PATH_TCLCONFIG
+CYG_AC_LOAD_TCLCONFIG
+CYG_AC_PATH_TKCONFIG
+CYG_AC_LOAD_TKCONFIG
+CYG_AC_PATH_TCLH
+# FIXME: consider only doing this if --with-x given.
+CYG_AC_PATH_TKH
+
+TCL_VER=${TCL_VERSION}
+AC_SUBST(TCL_VER)
+
+if test -d tcl${TCL_VERSION}; then
+  true
+else
+  mkdir tcl${TCL_VERSION}
+fi
+
+SRC_DIR=`cd ${srcdir}/..; pwd`
+AC_SUBST(SRC_DIR)
+
+TIX_VERSION=4.1
+AC_SUBST(TIX_VERSION)
+
+VERSION=${TIX_VERSION}.${TCL_VERSION}
+
+if test "$GCC" = yes; then
+    TIX_BUILD_LIB_SPEC="-L`pwd`/tcl${TCL_VERSION} -ltix`echo ${VERSION} | tr -d .`"
+    TIX_LIB_FULL_PATH="`pwd`/tcl${TCL_VERSION}/libtix`echo ${VERSION} | tr -d .`.a"
+    TIX_LIB_FILE="libtix`echo ${VERSION} | tr -d .`.a"
+    TIX_BUILD_LOCATION="`pwd`/tcl${TCL_VERSION}"
+else
+    tmp="`pwd`/libtix`echo ${VERSION} | tr -d .`.a"
+    TIX_LIB_FILE="libtix`echo ${VERSION} | tr -d .`.a"
+    tmp2="`cygpath --windows $tmp`"
+    TIX_BUILD_LIB_SPEC="`echo $tmp2 | sed -e s#\\\\\\\\#/#g`"
+    TIX_LIB_FULL_PATH=${TIX_BUILD_LIB_SPEC}
+    TIX_BUILD_LOCATION="`pwd`\\tcl${TCL_VERSION}"
+fi
+
+
+AC_SUBST(TIX_BUILD_LIB_SPEC)
+AC_SUBST(TIX_LIB_FILE)
+AC_SUBST(TIX_BUILD_LOCATION)
+AC_SUBST(TIX_LIB_FULL_PATH)
+
+AC_OUTPUT(Makefile ../tixConfig.sh)

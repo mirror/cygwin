@@ -1,0 +1,301 @@
+<HTML>
+<HEAD>
+<TITLE>iwidgets2.2.0 User Commands - spintime</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<H1>iwidgets2.2.0 User Commands - spintime</H1>
+<HR>
+<PRE>
+
+</PRE>
+<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
+
+
+</PRE>
+<H2>NAME</H2><PRE>
+     spintime - Create and manipulate time spinner widgets
+
+
+</PRE>
+<H2>SYNOPSIS</H2><PRE>
+     <STRONG>spintime</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
+
+
+</PRE>
+<H2>INHERITANCE</H2><PRE>
+     itk::Widget &lt;- Spintime
+
+
+
+</PRE>
+<H2>STANDARD OPTIONS</H2><PRE>
+     <STRONG>background</STRONG>      <STRONG>cursor</STRONG>         <STRONG>foreground</STRONG>      <STRONG>highlightColor</STRONG>
+     <STRONG>highlightThickness</STRONG>             <STRONG>relief</STRONG>          <STRONG>selectBackgroundselectBorderWidth</STRONG>
+     <STRONG>selectForeground</STRONG>
+
+     See the "options" manual entry for details on  the  standard
+     options.
+
+
+</PRE>
+<H2>ASSOCIATED OPTIONS</H2><PRE>
+     <STRONG>textBackground</STRONG>  <STRONG>textFont</STRONG>
+
+     See the "entryfield" manual entry for details on  the  above
+     associated options.
+
+     <STRONG>labelFont</STRONG>       <STRONG>labelMargin</STRONG>
+
+     See the "labeledwidget" manual  entry  for  details  on  the
+     above associated options.
+
+     <STRONG>step</STRONG>
+
+     See the "spinint" manual entry  for  details  on  the  above
+     associated options.
+
+     <STRONG>arrowOrient</STRONG>     <STRONG>repeatDelay</STRONG>    <STRONG>repeatInterval</STRONG>
+
+     See the "spinner" manual entry  for  details  on  the  above
+     associated options.
+
+
+
+</PRE>
+<H2>WIDGET-SPECIFIC OPTIONS</H2><PRE>
+     Name:           <STRONG>labelPos</STRONG>
+     Class:          <STRONG>Position</STRONG>
+     Command-Line Switch:           <STRONG>-labelpos</STRONG>
+
+          Specifies the position of the label along the sides  of
+          the various spinners: <STRONG>n</STRONG>, <STRONG>e</STRONG>, <STRONG>s</STRONG>, or <STRONG>w</STRONG>.  The default is w.
+
+     Name:           <STRONG>hourLabel</STRONG>
+     Class:          <STRONG>Text</STRONG>
+     Command-Line Switch:           <STRONG>-hourlabel</STRONG>
+
+          Specifies the text of the label for the  hour  spinner.
+          The default is "Hour".
+
+     Name:           <STRONG>hourOn</STRONG>
+     Class:          <STRONG>hourOn</STRONG>
+     Command-Line Switch:           <STRONG>-houron</STRONG>
+
+          Specifies whether or not to display the hour spinner in
+          any  of  the  forms  acceptable to <STRONG>Tcl_GetBoolean</STRONG>.  The
+          default is true.
+
+     Name:           <STRONG>hourWidth</STRONG>
+     Class:          <STRONG>Width</STRONG>
+     Command-Line Switch:           <STRONG>-hourwidth</STRONG>
+
+          Specifies the width of the hour spinner in any  of  the
+          forms  acceptable  to  <STRONG>Tcl_GetPixels</STRONG>.  The default is 3
+          pixels.
+
+     Name:           <STRONG>militaryOn</STRONG>
+     Class:          <STRONG>militaryOn</STRONG>
+     Command-Line Switch:           <STRONG>-militaryon</STRONG>
+
+          Specifies use of a 24 hour clock for  hour  display  in
+          any  of  the  forms  acceptable to <STRONG>Tcl_GetBoolean</STRONG>.  The
+          default is true.
+
+     Name:           <STRONG>minuteLabel</STRONG>
+     Class:          <STRONG>Text</STRONG>
+     Command-Line Switch:           <STRONG>-minutelabel</STRONG>
+
+          Specifies the text of the label for the minute spinner.
+          The default is "Minute".
+
+     Name:           <STRONG>minuteOn</STRONG>
+     Class:          <STRONG>minuteOn</STRONG>
+     Command-Line Switch:           <STRONG>-minuteon</STRONG>
+
+          Specifies whether or not to display the minute  spinner
+          in  any of the forms acceptable to <STRONG>Tcl_GetBoolean</STRONG>.  The
+          default is true.
+
+     Name:           <STRONG>minuteWidth</STRONG>
+     Class:          <STRONG>Width</STRONG>
+     Command-Line Switch:           <STRONG>-minutewidth</STRONG>
+
+          Specifies the width of the minute spinner in any of the
+          forms  acceptable  to  <STRONG>Tcl_GetPixels</STRONG>.  The default is 3
+          pixels.
+
+     Name:           <STRONG>orient</STRONG>
+     Class:          <STRONG>Orient</STRONG>
+     Command-Line Switch:           <STRONG>-orient</STRONG>
+
+          Specifies the orientation  of  the  hour,  minute,  and
+          second  spinners:  <STRONG>vertical</STRONG> or <STRONG>horizontal</STRONG>.  The default
+          is horizontal.
+
+     Name:           <STRONG>secondLabel</STRONG>
+     Class:          <STRONG>Text</STRONG>
+     Command-Line Switch:           <STRONG>-secondlabel</STRONG>
+
+          Specifies the text of the label for the second spinner.
+          The default is "Second"
+
+     Name:           <STRONG>secondOn</STRONG>
+     Class:          <STRONG>secondOn</STRONG>
+     Command-Line Switch:           <STRONG>-secondon</STRONG>
+
+          Specifies whether or not to display the second  spinner
+          in  any of the forms acceptable to <STRONG>Tcl_GetBoolean</STRONG>.  The
+          default is true.
+
+     Name:           <STRONG>secondWidth</STRONG>
+     Class:          <STRONG>Width</STRONG>
+     Command-Line Switch:           <STRONG>-secondwidth</STRONG>
+
+          Specifies the width of the second spinner in any of the
+          forms  acceptable  to  <STRONG>Tcl_GetPixels</STRONG>.  The default is 3
+          pixels.
+
+     Name:           <STRONG>timeMargin</STRONG>
+     Class:          <STRONG>Margin</STRONG>
+     Command-Line Switch:           <STRONG>-timemargin</STRONG>
+
+          Specifies the margin space between  the  hour,  minute,
+          and  second  spinners is any of the forms accpetable to
+          <STRONG>Tcl_GetPixels</STRONG>.  The default is 1 pixel.
+
+
+</PRE>
+<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
+
+
+
+</PRE>
+<H2>DESCRIPTION</H2><PRE>
+     The <STRONG>spintime</STRONG> command creates a set of spinners  for  use  in
+     time  value  entry.   The  set includes an hour, minute, and
+     second spinner widget.
+
+
+
+</PRE>
+<H2>METHODS</H2><PRE>
+     The <STRONG>spintime</STRONG> command creates a new Tcl command whose name is
+     <EM>pathName</EM>.  This command may be used to invoke various opera-
+     tions on the widget. It has the following general form:
+          <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
+
+     <EM>Option</EM> and the <EM>arg</EM>s determine the exact behavior of the com-
+     mand. The following commands are possible for spintime widg-
+     ets:
+
+
+
+</PRE>
+<H2>WIDGET-SPECIFIC METHODS</H2><PRE>
+     <EM>pathName</EM> <STRONG>cget</STRONG> <EM>option</EM>
+          Returns the current value of the  configuration  option
+          given  by  <EM>option</EM>.   <EM>Option</EM>  may have any of the values
+          accepted by the <STRONG>spintime</STRONG> command.
+
+     <EM>pathName</EM> <STRONG>clear</STRONG>
+          Delete the contents of all spinner components.
+
+     <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
+          Query  or  modify  the  configuration  options  of  the
+          widget.   If  no  <EM>option</EM>  is  specified, returns a list
+          describing all of the available  options  for  <EM>pathName</EM>
+          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of
+          this list).  If <EM>option</EM> is specified with no <EM>value</EM>, then
+          the  command  returns  a  list describing the one named
+          option (this list will be identical to the  correspond-
+          ing  sublist  of  the  value  returned  if no <EM>option</EM> is
+          specified).  If one or more  <EM>option</EM> - <EM>value</EM>  pairs  are
+          specified,  then  the command modifies the given widget
+          option(s) to have the given value(s);  in this case the
+          command  returns  an empty string.  <EM>Option</EM> may have any
+          of the values accepted by the <STRONG>spintime</STRONG> command.
+
+     <EM>pathName</EM> <STRONG>delete</STRONG> <EM>component</EM> <EM>first</EM> ?<EM>last</EM>?
+          Delete one or more characters  of  the  specified  <EM>com-</EM>
+          <EM>ponent</EM>, where <EM>component</EM> can be <STRONG>hour</STRONG>, <STRONG>minute</STRONG>, or <STRONG>second</STRONG>.
+          <EM>First</EM> is the index of the first  character  to  delete,
+          and  <EM>last</EM>  is the index of the character just after the
+          last one to delete.
+
+     <EM>pathName</EM> <STRONG>get</STRONG> ?<EM>component</EM>?
+          Get returns the  value  for  the  speicifed  component:
+          <STRONG>hour</STRONG>,  <STRONG>minute</STRONG>,  or <STRONG>second</STRONG>.  Without parameters the com-
+          mand returns the all three values as a list.
+
+     <EM>pathName</EM> <STRONG>insert</STRONG> <EM>component</EM> <EM>index</EM> <EM>string</EM>
+          Inserts the characters of <EM>string</EM> just before the  char-
+          acter  indicated  by <EM>index</EM> in the <EM>component</EM>, where <EM>com-</EM>
+          <EM>ponent</EM> can be <STRONG>hour</STRONG>, <STRONG>minute</STRONG>, or <STRONG>second</STRONG>.
+
+
+
+</PRE>
+<H2>COMPONENTS</H2><PRE>
+     Name:           <STRONG>hour</STRONG>
+     Class:          <STRONG>Spinint</STRONG>
+          The hour component is the  hour  spinner  of  the  time
+          spinner.   See  the  SpinInt  widget  manual  entry for
+          details on the hour component item.
+
+     Name:           <STRONG>minute</STRONG>
+     Class:          <STRONG>Spinint</STRONG>
+
+          The minute component is the minute spinner of the  time
+          spinner.   See  the  SpinInt  widget  manual  entry for
+          details on the minute component item.
+
+     Name:           <STRONG>second</STRONG>
+     Class:          <STRONG>Spinint</STRONG>
+
+          The second component is the second spinner of the  time
+          spinner.   See  the  SpinInt  widget  manual  entry for
+          details on the second component item.
+
+
+
+</PRE>
+<H2>EXAMPLE</H2><PRE>
+          spintime .st
+          pack .st -padx 10 -pady 10
+
+
+
+</PRE>
+<H2>AUTHOR</H2><PRE>
+     Sue Yockey
+
+     Mark L. Ulferts
+
+
+</PRE>
+<H2>KEYWORDS</H2><PRE>
+     spintime, spinint, spinner, entryfield, entry, widget
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

@@ -1,0 +1,26 @@
+#!/bin/sh
+# ----------------------------------------------------------------------
+#  DEMO: feedback in [incr Widgets]
+# ----------------------------------------------------------------------
+#\
+exec itkwish "$0" ${1+"$@"}
+package require Iwidgets 3.0
+
+# itkwish interprets the rest...
+# ----------------------------------------------------------------------
+
+frame .f -width 200 -height 100
+pack propagate .f no
+
+iwidgets::feedback .f.fb -labeltext "Status" -steps 22
+pack .f.fb -padx 4 -pady 4 -fill both -expand yes
+
+button .go -text "Go" -command {
+    .f.fb reset
+    for {set i 0} {$i < 22} {incr i} {
+        .f.fb step
+        after 100
+    }
+}
+pack .f
+pack .go -padx 4 -pady 4

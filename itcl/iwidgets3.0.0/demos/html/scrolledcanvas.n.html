@@ -1,0 +1,306 @@
+<HTML>
+<HEAD>
+<TITLE>iwidgets2.2.0 User Commands - scrolledcanvas</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<H1>iwidgets2.2.0 User Commands - scrolledcanvas</H1>
+<HR>
+<PRE>
+
+</PRE>
+<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
+
+
+</PRE>
+<H2>NAME</H2><PRE>
+     scrolledcanvas - Create and manipulate scrolled canvas widg-
+     ets
+
+
+</PRE>
+<H2>SYNOPSIS</H2><PRE>
+     <STRONG>scrolledcanvas</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
+
+
+</PRE>
+<H2>INHERITANCE</H2><PRE>
+     itk::Widget &lt;- Labeledwidget &lt;- scrolledcanvas
+
+
+</PRE>
+<H2>STANDARD OPTIONS</H2><PRE>
+     <STRONG>activeBackground</STRONG>               <STRONG>background</STRONG>      <STRONG>borderWidthcursor</STRONG>
+     <STRONG>exportSelection</STRONG> <STRONG>font</STRONG>           <STRONG>foreground</STRONG>      <STRONG>highlightColor</STRONG>
+     <STRONG>highlightThickness</STRONG>             <STRONG>insertBorderWidthinsertOffTimeinsertOnTime</STRONG>
+     <STRONG>insertWidth</STRONG>     <STRONG>relief</STRONG>         <STRONG>repeatDelay</STRONG>     <STRONG>repeatInterval</STRONG>
+     <STRONG>selectBackground</STRONG>               <STRONG>selectBorderWidthselectForeground</STRONG>
+
+     See the "options" manual entry for details on  the  standard
+     options.
+
+
+</PRE>
+<H2>ASSOCIATED OPTIONS</H2><PRE>
+     <STRONG>closeEnough</STRONG>     <STRONG>confine</STRONG>        <STRONG>scrollRegion</STRONG>    <STRONG>xScrollIncrement</STRONG>
+     <STRONG>yScrollIncrement</STRONG>
+
+     See the "canvas" widget manual  entry  for  details  on  the
+     above associated options.
+
+     <STRONG>activeRelief</STRONG>    <STRONG>elementBorderWidth</STRONG>             <STRONG>jumptroughColor</STRONG>
+
+     See the "scrollbar" widget manual entry for details  on  the
+     above associated options.
+
+
+</PRE>
+<H2>INHERITED OPTIONS</H2><PRE>
+     <STRONG>labelBitmap</STRONG>     <STRONG>labelFont</STRONG>      <STRONG>labelImage</STRONG>      <STRONG>labelMargin</STRONG>
+     <STRONG>labelPos</STRONG>        <STRONG>labelText</STRONG>      <STRONG>labelVariable</STRONG>
+
+     See the "labeledwidget" class manual entry  for  details  on
+     the inherited options.
+
+
+</PRE>
+<H2>WIDGET-SPECIFIC OPTIONS</H2><PRE>
+     Name:           <STRONG>autoMargin</STRONG>
+     Class:          <STRONG>AutoMargin</STRONG>
+     Command-Line Switch:           <STRONG>-automargin</STRONG>
+
+          Specifies the autoresize extra margin to reserve.  This
+          option  is  only  effective  with autoresize turned on.
+          The default is 10.
+
+     Name:           <STRONG>autoResize</STRONG>
+     Class:          <STRONG>AutoResize</STRONG>
+     Command-Line Switch:           <STRONG>-autoresize</STRONG>
+
+          Automatically adjusts the scrolled  region  to  be  the
+          bounding  box covering all the items in the canvas fol-
+          lowing the execution of any  method  which  creates  or
+          destroys  items.   Thus,  as  new  items are added, the
+          scrollbars adjust accordingly.
+
+     Name:           <STRONG>height</STRONG>
+     Class:          <STRONG>Height</STRONG>
+     Command-Line Switch:           <STRONG>-height</STRONG>
+
+          Specifies the height of the scrolled canvas  widget  in
+          any  of  the  forms  acceptable  to  <STRONG>Tk_GetPixels</STRONG>.  The
+          default height is 30 pixels.
+
+     Name:           <STRONG>hscrollMode</STRONG>
+     Class:          <STRONG>ScrollMode</STRONG>
+     Command-Line Switch:           <STRONG>-hscrollmode</STRONG>
+
+          Specifies the the display mode to be used for the  hor-
+          izontal scrollbar: <STRONG>static,</STRONG> <STRONG>dynamic,</STRONG> or <STRONG>none</STRONG>.  In static
+          mode,  the  scroll  bar  is  displayed  at  all  times.
+          Dynamic  mode  displays the scroll bar as required, and
+          none disables the scroll bar display.  The  default  is
+          static.
+
+     Name:           <STRONG>sbWidth</STRONG>
+     Class:          <STRONG>Width</STRONG>
+     Command-Line Switch:           <STRONG>-sbwidth</STRONG>
+
+          Specifies the width of the  scrollbar  in  any  of  the
+          forms acceptable to <STRONG>Tk_GetPixels</STRONG>.  The default width is
+          15 pixels..
+
+     Name:           <STRONG>scrollMargin</STRONG>
+     Class:          <STRONG>ScrollMargin</STRONG>
+     Command-Line Switch:           <STRONG>-scrollmargin</STRONG>
+
+          Specifies the distance between the canvas and scrollbar
+          in  any  of  the forms acceptable to <STRONG>Tk_GetPixels</STRONG>.  The
+          default is 3 pixels.
+
+     Name:           <STRONG>textBackground</STRONG>
+     Class:          <STRONG>Background</STRONG>
+     Command-Line Switch <STRONG>-textbackground</STRONG>
+
+          Specifies the background color for  the  canvas.   This
+          allows the background within the canvas to be different
+          from the normal background color.
+
+
+     Name:           <STRONG>vscrollMode</STRONG>
+     Class:          <STRONG>ScrollMode</STRONG>
+     Command-Line Switch:           <STRONG>-vscrollmode</STRONG>
+
+          Specifies the the display mode to be used for the vert-
+          ical  scrollbar:  <STRONG>static,</STRONG>  <STRONG>dynamic,</STRONG> or <STRONG>none</STRONG>.  In static
+          mode,  the  scroll  bar  is  displayed  at  all  times.
+          Dynamic  mode  displays the scroll bar as required, and
+          none disables the scroll bar display.  The  default  is
+          static.
+
+     Name:           <STRONG>width</STRONG>
+     Class:          <STRONG>Width</STRONG>
+     Command-Line Switch:           <STRONG>-width</STRONG>
+
+          Specifies the width of the scrolled  canvas  widget  in
+          any  of  the  forms  acceptable  to  <STRONG>Tk_GetPixels</STRONG>.  The
+          default height is 30 pixels.
+
+</PRE>
+<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
+
+
+
+</PRE>
+<H2>DESCRIPTION</H2><PRE>
+     The <STRONG>scrolledcanvas</STRONG> command creates a  scrolled  canvas  with
+     additional   options   to  manage  horizontal  and  vertical
+     scrollbars.   This  includes  options   to   control   which
+     scrollbars  are displayed and the method, i.e. statically or
+     dynamically.
+
+
+
+</PRE>
+<H2>METHODS</H2><PRE>
+     The <STRONG>scrolledcanvas</STRONG> command creates a new Tcl  command  whose
+     name  is <EM>pathName</EM>.  This command may be used to invoke vari-
+     ous operations on the widget.  It has the following  general
+     form:
+
+          <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
+
+     <EM>Option</EM> and the <EM>arg</EM>s determine the exact behavior of the com-
+     mand.   The following commands are possible for scrolledcan-
+     vas widgets:
+
+
+</PRE>
+<H2>ASSOCIATED METHODS</H2><PRE>
+     <STRONG>addtag</STRONG>          <STRONG>bbox</STRONG>           <STRONG>bind</STRONG>            <STRONG>canvasx</STRONG>
+     <STRONG>canvasy</STRONG>         <STRONG>coords</STRONG>         <STRONG>create</STRONG>          <STRONG>dchars</STRONG>
+     <STRONG>delete</STRONG>          <STRONG>dtag</STRONG>           <STRONG>find</STRONG>            <STRONG>focus</STRONG>
+     <STRONG>gettags</STRONG>         <STRONG>icursor</STRONG>        <STRONG>index</STRONG>           <STRONG>insert</STRONG>
+     <STRONG>itemconfigure</STRONG>   <STRONG>lower</STRONG>          <STRONG>move</STRONG>            <STRONG>postscript</STRONG>
+     <STRONG>raise</STRONG>           <STRONG>scale</STRONG>          <STRONG>scan</STRONG>            <STRONG>select</STRONG>
+     <STRONG>type</STRONG>            <STRONG>xview</STRONG>          <STRONG>yview</STRONG>
+
+     See the "canvas" manual entry for details on the  associated
+     methods.
+
+
+</PRE>
+<H2>WIDGET-SPECIFIC METHODS</H2><PRE>
+     <EM>pathName</EM> <STRONG>cget</STRONG> <EM>option</EM>
+          Returns the current value of the  configuration  option
+          given  by  <EM>option</EM>.   <EM>Option</EM>  may have any of the values
+          accepted by the <STRONG>scrolledcanvas</STRONG> command.
+
+     <EM>pathName</EM> <STRONG>childsite</STRONG>
+          Returns the child site widget path name.
+
+     <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
+          Query  or  modify  the  configuration  options  of  the
+          widget.   If  no  <EM>option</EM>  is  specified, returns a list
+          describing all of the available  options  for  <EM>pathName</EM>
+          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of
+          this list).  If <EM>option</EM> is specified with no <EM>value</EM>, then
+          the  command  returns  a  list describing the one named
+          option (this list will be identical to the  correspond-
+          ing  sublist  of  the  value  returned  if no <EM>option</EM> is
+          specified).  If one or more  <EM>option</EM> - <EM>value</EM>  pairs  are
+          specified,  then  the command modifies the given widget
+          option(s) to have the given value(s);  in this case the
+          command  returns  an empty string.  <EM>Option</EM> may have any
+          of the values accepted by the <STRONG>scrolledcanvas</STRONG> command.
+
+     <EM>pathName</EM> <STRONG>justify</STRONG> <EM>direction</EM>
+          Justifies the canvas contents via the  scroll  bars  in
+          one of four directions:  <STRONG>left</STRONG>, <STRONG>right</STRONG>, <STRONG>top</STRONG>, or <STRONG>bottom</STRONG>.
+
+
+
+</PRE>
+<H2>COMPONENTS</H2><PRE>
+     Name:           <STRONG>scrCanvas</STRONG>
+     Class:          <STRONG>Canvas</STRONG>
+
+          The scrCanvas component is the canvas widget.  See  the
+          "canvas" widget manual entry for details on the scrCan-
+          vas component item.
+
+     Name:           <STRONG>hSB</STRONG>
+     Class:          <STRONG>Scrollbar</STRONG>
+
+          The hSB component is the horizontal  scroll  bar.   See
+          the  "ScrollBar" widget manual entry for details on the
+          hSB component item.
+
+     Name:           <STRONG>vSB</STRONG>
+     Class:          <STRONG>Scrollbar</STRONG>
+
+          The vSB component is the vertical scroll bar.  See  the
+          "ScrollBar"  widget manual entry for details on the vSB
+          component item.
+
+
+
+</PRE>
+<H2>EXAMPLE</H2><PRE>
+            scrolledcanvas .sc
+
+            .sc create rectangle 100 100 400 400 -fill red
+            .sc create rectangle 300 300 600 600 -fill green
+            .sc create rectangle 200 200 500 500 -fill blue
+
+            pack .sc -padx 10 -pady 10 -fill both -expand yes
+
+
+
+</PRE>
+<H2>AUTHOR</H2><PRE>
+     Mark L. Ulferts
+
+
+</PRE>
+<H2>KEYWORDS</H2><PRE>
+     scrolledcanvas, canvas, widget
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

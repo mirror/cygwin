@@ -193,97 +193,13 @@ public:
     }
 
 
-
-  // Generic write()
+  // Generic write() & read()
   template <class Data>
   inline bus::status
-  write_any (host_int_4 address, Data data) throw ()
-    {
-      const mapping_record* r = this->locate (address);
-      if (LIKELY (r))
-	{
-	  // bypass stride/offset calculations?
-	  if (LIKELY(! r->use_strideoffset_p))
-	    {
-	      host_int_4 mapped_address = address - r->low;
-	      bus::status st = r->accessor->write (mapped_address, data);
-	      st.latency += target->latency;
-	      return st;
-	    }
-
-	  // Order these alternatives by guess of frequency of use
-	  if (r->width == 1)
-	    {
-	      typename Data::size_1_type s1data;
-	      return write_strideoffset_any (address, r, data, s1data);
-	    }
-	  else if (r->width == 4)
-	    {
-	      typename Data::size_4_type s4data;
-	      return write_strideoffset_any (address, r, data, s4data);
-	    }
-	  else if (r->width == 2)
-	    {
-	      typename Data::size_2_type s2data;
-	      return write_strideoffset_any (address, r, data, s2data);
-	    }
-	  else if (r->width == 8)
-	    {
-	      typename Data::size_8_type s8data;
-	      return write_strideoffset_any (address, r, data, s8data);
-	    }
-	  else
-	    assert (0);
-	}
-      else
-	return bus::unmapped;
-    }
-
-
-  // Generic read()
+  write_any (host_int_4 address, Data data) throw ();
   template <class Data>
   inline bus::status
-  read_any (host_int_4 address, Data& data) throw ()
-    {
-      const mapping_record* r = this->locate (address);
-      if (LIKELY (r))
-	{
-	  // bypass stride/offset calculations?
-	  if (LIKELY(! r->use_strideoffset_p))
-	    {
-	      host_int_4 mapped_address = address - r->low;
-	      bus::status st = r->accessor->read (mapped_address, data);
-	      st.latency += target->latency;
-	      return st;
-	    }
-
-	  // Order these alternatives by guess of frequency of use
-	  if (r->width == 1)
-	    {
-	      typename Data::size_1_type s1data;
-	      return read_strideoffset_any (address, r, data, s1data);
-	    }
-	  else if (r->width == 4)
-	    {
-	      typename Data::size_4_type s4data;
-	      return read_strideoffset_any (address, r, data, s4data);
-	    }
-	  else if (r->width == 2)
-	    {
-	      typename Data::size_2_type s2data;
-	      return read_strideoffset_any (address, r, data, s2data);
-	    }
-	  else if (r->width == 8)
-	    {
-	      typename Data::size_8_type s8data;
-	      return read_strideoffset_any (address, r, data, s8data);
-	    }
-	  else
-	    assert (0);
-	}
-      else
-	return bus::unmapped;
-    }
+  read_any (host_int_4 address, Data& data) throw ();
 
 
   // some macros to make manufacturing of the cartesian-product calls simpler
@@ -469,6 +385,93 @@ generic_mapper::connected_bus (const string& name) throw()
      return 0;
   }
 
+template <class Data>
+inline bus::status
+generic_mapper_bus::write_any (host_int_4 address, Data data) throw ()
+  {
+    const mapping_record* r = this->locate (address);
+    if (LIKELY (r))
+      {
+	// bypass stride/offset calculations?
+	if (LIKELY(! r->use_strideoffset_p))
+	  {
+	    host_int_4 mapped_address = address - r->low;
+	    bus::status st = r->accessor->write (mapped_address, data);
+	    st.latency += target->latency;
+	    return st;
+	  }
+
+	// Order these alternatives by guess of frequency of use
+	if (r->width == 1)
+	  {
+	    typename Data::size_1_type s1data;
+	    return write_strideoffset_any (address, r, data, s1data);
+	  }
+	else if (r->width == 4)
+	  {
+	    typename Data::size_4_type s4data;
+	    return write_strideoffset_any (address, r, data, s4data);
+	  }
+	else if (r->width == 2)
+	  {
+	    typename Data::size_2_type s2data;
+	    return write_strideoffset_any (address, r, data, s2data);
+	  }
+	else if (r->width == 8)
+	  {
+	    typename Data::size_8_type s8data;
+	    return write_strideoffset_any (address, r, data, s8data);
+	  }
+	else
+	  assert (0);
+      }
+    else
+      return bus::unmapped;
+  }
+
+template <class Data>
+inline bus::status
+generic_mapper_bus::read_any (host_int_4 address, Data& data) throw ()
+  {
+    const mapping_record* r = this->locate (address);
+    if (LIKELY (r))
+      {
+	// bypass stride/offset calculations?
+	if (LIKELY(! r->use_strideoffset_p))
+	  {
+	    host_int_4 mapped_address = address - r->low;
+	    bus::status st = r->accessor->read (mapped_address, data);
+	    st.latency += target->latency;
+	    return st;
+	  }
+
+	// Order these alternatives by guess of frequency of use
+	if (r->width == 1)
+	  {
+	    typename Data::size_1_type s1data;
+	    return read_strideoffset_any (address, r, data, s1data);
+	  }
+	else if (r->width == 4)
+	  {
+	    typename Data::size_4_type s4data;
+	    return read_strideoffset_any (address, r, data, s4data);
+	  }
+	else if (r->width == 2)
+	  {
+	    typename Data::size_2_type s2data;
+	    return read_strideoffset_any (address, r, data, s2data);
+	  }
+	else if (r->width == 8)
+	  {
+	    typename Data::size_8_type s8data;
+	    return read_strideoffset_any (address, r, data, s8data);
+	  }
+	else
+	  assert (0);
+      }
+    else
+      return bus::unmapped;
+  }
 
 
 // Parse a mapping specification and produce a mapping_record from it.

@@ -37,20 +37,14 @@ private:
   cache_component& cache;
 
   template <typename DataType>
-  bus::status write_any (host_int_4 addr, DataType data)
-  {
-    return cache.write_any (addr, data);
-  }
+  bus::status write_any (host_int_4 addr, DataType data);
   
   template <typename DataType>
-  bus::status read_any (host_int_4 addr, DataType& data)
-  {
-    return cache.read_any (addr, data);
-  }
+  bus::status read_any (host_int_4 addr, DataType& data);
 
 #define DEFN_METHOD(DataType) \
-  bus::status write(host_int_4 addr, DataType data) throw () { return this->write_any(addr, data); } \
-  bus::status read(host_int_4 addr, DataType& data) throw () { return this->read_any(addr, data); }
+  bus::status write(host_int_4 addr, DataType data) throw (); \
+  bus::status read(host_int_4 addr, DataType& data) throw ();
   
   DEFN_METHOD (sid::big_int_1)
   DEFN_METHOD (sid::big_int_2)
@@ -60,6 +54,7 @@ private:
   DEFN_METHOD (sid::little_int_2)
   DEFN_METHOD (sid::little_int_4)
   DEFN_METHOD (sid::little_int_8)
+#undef DEFN_METHOD
 };
 
 // FIFO cache replacement algorithm
@@ -186,5 +181,33 @@ private:
   host_int_2 hit_latency;
   host_int_2 miss_latency;
 };
+
+template <typename DataType>
+bus::status
+cache_bus::write_any (host_int_4 addr, DataType data)
+{
+  return cache.write_any (addr, data);
+}
+  
+template <typename DataType>
+bus::status
+cache_bus::read_any (host_int_4 addr, DataType& data)
+{
+  return cache.read_any (addr, data);
+}
+
+#define DEFN_METHOD(DataType) \
+  inline bus::status cache_bus::write(host_int_4 addr, DataType data) throw () { return this->write_any(addr, data); } \
+  inline bus::status cache_bus::read(host_int_4 addr, DataType& data) throw () { return this->read_any(addr, data); }
+  
+DEFN_METHOD (sid::big_int_1)
+DEFN_METHOD (sid::big_int_2)
+DEFN_METHOD (sid::big_int_4)
+DEFN_METHOD (sid::big_int_8)
+DEFN_METHOD (sid::little_int_1)
+DEFN_METHOD (sid::little_int_2)
+DEFN_METHOD (sid::little_int_4)
+DEFN_METHOD (sid::little_int_8)
+#undef DEFN_METHOD
 
 #endif // CACHE_H

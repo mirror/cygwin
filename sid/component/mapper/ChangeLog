@@ -1,3 +1,9 @@
+2001-07-13  matthew green  <mrg@redhat.com>
+
+	* compMapper.cxx (generic_mapper_bus::write_any,
+	generic_mapper_bus::read_any): Move function definition after
+	generic_mapper is defined.
+
 2001-06-21  Ben Elliston  <bje@redhat.com>
 
 	* compMapper.cxx (generic_mapper::latency): New member.

@@ -22,7 +22,7 @@
 #include <windows.h>
 #include <getopt.h>
 
-static const char version[] = "$Revision: 1.8 $";
+static const char version[] = "$Revision: 1.9 $";
 static char *prog_name;
 
 static struct option longopts[] =
@@ -801,7 +801,7 @@ usage (FILE * stream)
     "	ssp -v -s -l -d 0x61001000 0x61080000 hello.exe\n"
     "\n");
   if (stream == stderr)
-    fprintf (stream, "Try '%s --help' for more information.", prog_name);
+    fprintf (stream, "Try '%s --help' for more information.\n", prog_name);
   exit (stream == stderr ? 1 : 0);
 }
 

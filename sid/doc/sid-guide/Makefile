@@ -11,18 +11,22 @@ check:
 	sgmlnorm -e book-sid.sgml > /dev/null
 
 normalize:
-	mv -f book-sid.sgml book-sid.sgml.bak
-	sgmlnorm -d -n book-sid.sgml.bak > book-sid.sgml && rm -f book-sid.sgml.bak
+	(echo '<!DOCTYPE BOOK PUBLIC "-//Davenport//DTD DocBook V3.0//EN" ['; \
+	echo '<!ENTITY % PRINTONLY "IGNORE">'; \
+	echo '<!ENTITY % HTMLONLY "IGNORE">'; \
+	echo ']>'; \
+	sgmlnorm -m -n book-sid.sgml ) > book-sid.sgml.new
+	mv -f book-sid.sgml.new book-sid.sgml
 
 pdf:
 	rm -rf PDF
 	mkdir PDF
-	db2pdf book-sid.sgml
+	db2pdf -i PRINTONLY book-sid.sgml
 	mv book-sid.pdf PDF
 	rm -f book-sid.out
 
 html:
 	rm -rf HTML
 	mkdir HTML
-	db2html -o HTML book-sid.sgml
+	db2html -i HTMLONLY -o HTML book-sid.sgml
 	rm -rf book-sid

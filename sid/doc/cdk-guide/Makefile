@@ -11,18 +11,22 @@ check:
 	sgmlnorm -e book-cdk.sgml > /dev/null
 
 normalize:
-	mv -f book-cdk.sgml book-cdk.sgml.bak
-	sgmlnorm -d -n book-cdk.sgml.bak > book-cdk.sgml && rm -f book-cdk.sgml.bak
+	(echo '<!DOCTYPE BOOK PUBLIC "-//Davenport//DTD DocBook V3.0//EN" ['; \
+	echo '<!ENTITY % PRINTONLY "IGNORE">'; \
+	echo '<!ENTITY % HTMLONLY "IGNORE">'; \
+	echo ']>'; \
+	sgmlnorm -m -n book-cdk.sgml ) > book-cdk.sgml.new
+	mv -f book-cdk.sgml.new book-cdk.sgml
 
 pdf:
 	rm -rf PDF
 	mkdir PDF
-	db2pdf book-cdk.sgml
+	db2pdf -i PRINTONLY book-cdk.sgml
 	mv book-cdk.pdf PDF
 	rm -f book-cdk.out
 
 html:
 	rm -rf HTML
 	mkdir HTML
-	db2html -o HTML book-cdk.sgml
+	db2html -i HTMLONLY -o HTML book-cdk.sgml
 	rm -rf book-cdk

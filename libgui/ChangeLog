@@ -1,3 +1,8 @@
+2002-02-25  Ian Roxborough  <irox@redhat.com>
+
+	* src/library/looknfeel.tcl (standard_look_and_feel):
+	Hard code Windows menu font name to MS Sans Serif 8.
+
 2002-02-24  Mo DeJong  <supermo@bayarea.net>
 
         * src/Makefile.am: Add -DSTATIC_BUILD so

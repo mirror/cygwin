@@ -1,6 +1,6 @@
 // compLoader.cxx - object file loader component.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2003 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -44,7 +44,7 @@ using sid::host_int_4;
 using sid::component_library;
 using sid::COMPONENT_LIBRARY_MAGIC;
 
-using sidutil::no_bus_component;
+using sidutil::fixed_bus_map_component;
 using sidutil::fixed_attribute_map_component;
 using sidutil::fixed_pin_map_component;
 using sidutil::fixed_accessor_map_component;
@@ -60,8 +60,50 @@ using sidutil::std_error_string;
 
 // ----------------------------------------------------------------------------
 
+// A bus for allowing the loader to perform random checks against reads and writes
+// to memory. For example writing to a code area. Default implementation
+extern "C" int textSegmentAddress(int);
+
+class loader_probe_bus: public sidutil::passthrough_bus
+  {
+  public:
+    loader_probe_bus (sid::bus **t, output_pin *p) :
+      sidutil::passthrough_bus (t),
+      write_to_code_address_pin (p)
+    {
+      assert (t);
+    }
+    ~loader_probe_bus() throw() {}
+    
+    // Some macros to make manufacturing of the cartesian-product
+    // calls simpler.
+#define SID_GB_WRITE(dtype) \
+      sid::bus::status write(sid::host_int_4 addr, dtype data) throw ()\
+	  { if (LIKELY(*target)) \
+              { \
+                if (write_to_code_address_pin && textSegmentAddress (addr)) \
+                  write_to_code_address_pin->drive (addr); \
+                return (*target)->write(addr, data); \
+              } \
+            else return sid::bus::unpermitted; \
+          }
+
+    SID_GB_WRITE(sid::little_int_1)
+    SID_GB_WRITE(sid::big_int_1)
+    SID_GB_WRITE(sid::little_int_2)
+    SID_GB_WRITE(sid::big_int_2)
+    SID_GB_WRITE(sid::little_int_4)
+    SID_GB_WRITE(sid::big_int_4)
+    SID_GB_WRITE(sid::little_int_8)
+    SID_GB_WRITE(sid::big_int_8)
+
+#undef SID_GB_WRITE
+
+    output_pin *write_to_code_address_pin;
+  };
+
 class generic_loader: public virtual component,
-		      protected no_bus_component,
+		      protected fixed_bus_map_component,
 		      protected fixed_attribute_map_component,
 		      protected fixed_pin_map_component,
 		      protected fixed_accessor_map_component,
@@ -77,16 +119,24 @@ protected:
   // The value is one of sidutil::endian_*.
   output_pin endian_pin;
 
+  // Provide address of write attempt to code section
+  output_pin write_to_code_address_pin;
+
   // Signal this if something went wrong.
   output_pin error_pin;
 
-  // loadable file names
+  // Attribute settings
   bool verbose_p;
+
+  // loadable file names
   string load_file;
 
   // accessors
   bus* load_accessor_insn;
   bus* load_accessor_data;
+
+  loader_probe_bus probe_upstream;
+  bus           *probe_downstream;
 
   // The load pin was triggered.
   virtual void load_it (host_int_4) = 0;
@@ -104,15 +154,20 @@ public:
     verbose_p(false),
     load_file("/dev/null"),
     load_accessor_insn(0),
-    load_accessor_data(0)
+    load_accessor_data(0),
+    probe_upstream (& probe_downstream, & this->write_to_code_address_pin),
+    probe_downstream(0)
     {
       add_pin("load!", & this->doit_pin);
       add_pin("start-pc-set", & this->start_pc_pin);
       add_pin("endian-set", & this->endian_pin);
       add_pin("error", & this->error_pin);
+      add_pin("write-to-code-address", & this->write_to_code_address_pin);
       add_accessor("load-accessor-insn", & this->load_accessor_insn);
       add_accessor("load-accessor-data", & this->load_accessor_data);
       add_attribute("file", & this->load_file, "setting");
+      add_bus ("probe-upstream", & this->probe_upstream);
+      add_accessor ("probe-downstream", & this->probe_downstream);
       add_attribute("verbose?", & this->verbose_p, "setting");
       add_attribute_virtual ("state-snapshot", this,
 			     & generic_loader::save_state,

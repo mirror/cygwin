@@ -40,6 +40,8 @@
 typedef unsigned long long host_int_8;	/* XXX */
 
 typedef int (*PFLOAD)(host_int_8 dest, char *dest2, host_int_8 offset, host_int_8 amount, int insn_space);
+/* Is address in the text segment? */
+extern int textSegmentAddress(int);
 /* Load an ELF executable into memory. FUNC is used to actually read the
    file. */
 extern int readElfFile(PFLOAD func, unsigned*, int*);

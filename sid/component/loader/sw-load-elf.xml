@@ -8,13 +8,17 @@
     <defpin name="start-pc-set" direction="out" legalvalues="any" behaviors="loading"/>
     <defpin name="endian-set" direction="out" legalvalues="0/1/2" behaviors="loading"/>
     <defpin name="error" direction="out" legalvalues="any" behaviors="loading"/>
+    <defpin name="write-to-code-address" direction="out" legalvalues="any address" behaviors="error checking"/>
 
     <defattribute name="state-snapshot" legalvalues="opaque string" behaviors="save/restore"/>
     <defattribute name="file" category="setting" legalvalues="file name" defaultvalue='"/dev/null"' behaviors="configuration"/>
     <defattribute name="verbose?" category="setting" legalvalues="1/0" defaultvalue="0" behaviors="configuration"/>
     
+    <defbus name="probe-upstream" accesses="read/write" behaviors="error checking"/>
+
     <defaccessor name="load-accessor-insn" accesses="write little_int_1" behaviors="loading"/>
     <defaccessor name="load-accessor-data" accesses="write little_int_1" behaviors="loading"/>
+    <defaccessor name="probe-downstream" accesses="read/write" behaviors="error checking"/>
 
   </defcomponent>
 
@@ -60,6 +64,17 @@
       to identify the bytes to load into memory.  It does not use the
       "section header".  This means that it tends to load more bytes
       than <tt>gdb</tt> would.</p>
+    </behavior>
+
+    <behavior name="error checking">
+      <p>
+      All read requests coming in though the "probe-upstream" bus are
+      checked against known code segments and, for each attempt to write
+      to a code segment, the write-to-code-address pin is driven with the
+      address of the write attempt. All reads and writes
+      coming in through the probe-upstream bus are passed on to the
+      probe-downstream accessor.
+      </p>
     </behavior>
 
     <convention name="functional" supported="true" />

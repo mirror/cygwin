@@ -29,6 +29,29 @@ struct LoadAreas
   int loaded;
 } loadAreas[100]; // XXX: limit on number of loadable sections
 
+static struct TextSegment
+{
+  host_int_8 lbound;
+  host_int_8 hbound;
+} textSegments[100];
+static int textSegmentsCount = 0;
+enum {execute_flag = 1};
+
+
+int
+textSegmentAddress (int address)
+{
+  int i;
+  for (i = 0; i < textSegmentsCount ; i++)
+    {
+      if (textSegments[i].lbound <= address
+	  && address <= textSegments[i].hbound)
+	return 1;
+    }
+  return 0;
+}
+
+
 /* Read in an ELF file, using FUNC to read data from the stream.
    The result is a boolean indicating success.
    The entry point as specified in the ELF header is stored in *ENTRY_POINT.
@@ -100,6 +123,17 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian)
 							    littleEndian);
 	      loadAreas[loadAreaCount].flags = fetchWord(psymHdr+4, littleEndian);
 	      loadAreas[loadAreaCount].loaded = 0;
+	      
+	      if (loadAreas[loadAreaCount].flags & execute_flag)
+		{
+		  textSegments[textSegmentsCount].lbound = 
+		    loadAreas[loadAreaCount].loadAddr;
+		  textSegments[textSegmentsCount].hbound = 
+		    loadAreas[loadAreaCount].loadAddr
+		    + loadAreas[loadAreaCount].filesize;
+		  textSegmentsCount++;
+		}
+
 	      loadAreaCount++;
 	    }
         }
@@ -118,6 +152,17 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian)
 							    littleEndian);
 	      loadAreas[loadAreaCount].flags = fetchWord(psymHdr+24, littleEndian);
 	      loadAreas[loadAreaCount].loaded = 0;
+
+	      if (loadAreas[loadAreaCount].flags & execute_flag)
+		{
+		  textSegments[textSegmentsCount].lbound = 
+		    loadAreas[loadAreaCount].loadAddr;
+		  textSegments[textSegmentsCount].hbound = 
+		    loadAreas[loadAreaCount].loadAddr
+		    + loadAreas[loadAreaCount].filesize;
+		  textSegmentsCount++;
+		}
+
 	      loadAreaCount++;
 	    }
         }

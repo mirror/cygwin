@@ -557,7 +557,7 @@ sigpending (sigset_t *set)
 extern "C" int __stdcall
 sig_dispatch_pending ()
 {
-  if (!hwait_sig || GetCurrentThreadId () == sigtid)
+  if (exit_state || !hwait_sig || GetCurrentThreadId () == sigtid)
     return 0;
 
   sigframe thisframe (mainthread);
@@ -725,11 +725,6 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
   else if ((thiscatch = getevent (p, "sigcatch")))
     {
       todo = p->getsigtodo (sig);
-      if (IsBadWritePtr (todo, sizeof (*todo)))
-	{
-	  set_errno (EACCES);
-	  goto out;
-	}
       issem = false;
     }
   else
@@ -1056,11 +1051,10 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
 static void
 talktome ()
 {
-  winpids pids ((DWORD) PID_MAP_RW);
+  winpids pids;
   for (unsigned i = 0; i < pids.npids; i++)
     if (pids[i]->hello_pid == myself->pid)
-      if (!IsBadWritePtr (pids[i], sizeof (_pinfo)))
-	pids[i]->commune_recv ();
+      pids[i]->commune_recv ();
 }
 
 #define RC_MAIN 0

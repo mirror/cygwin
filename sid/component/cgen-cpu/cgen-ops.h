@@ -364,6 +364,13 @@ ADDCSI (SI a, SI b, BI c)
   return res;
 }
 
+inline DI
+ADDCDI (DI a, DI b, DI c)
+{
+  DI res = ADDDI (a, ADDDI (b, c));
+  return res;
+}
+
 inline BI
 ADDCFQI (QI a, QI b, BI c)
 {

@@ -55,6 +55,7 @@ namespace cgen {
 #define LEUQI(x, y) ((UQI) (x) <= (UQI) (y))
 #define GTUQI(x, y) ((UQI) (x) > (UQI) (y))
 #define GEUQI(x, y) ((UQI) (x) >= (UQI) (y))
+#define ABSQI(x)  ((x) > 0 ? (x) : -(x))
 
 #define ADDHI(x, y) ((x) + (y))
 #define SUBHI(x, y) ((x) - (y))
@@ -82,6 +83,7 @@ namespace cgen {
 #define LEUHI(x, y) ((UHI) (x) <= (UHI) (y))
 #define GTUHI(x, y) ((UHI) (x) > (UHI) (y))
 #define GEUHI(x, y) ((UHI) (x) >= (UHI) (y))
+#define ABSHI(x)  ((x) > 0 ? (x) : -(x))
 
 #define ADDSI(x, y) ((x) + (y))
 #define SUBSI(x, y) ((x) - (y))
@@ -109,6 +111,7 @@ namespace cgen {
 #define LEUSI(x, y) ((USI) (x) <= (USI) (y))
 #define GTUSI(x, y) ((USI) (x) > (USI) (y))
 #define GEUSI(x, y) ((USI) (x) >= (USI) (y))
+#define ABSSI(x)  ((x) > 0 ? (x) : -(x))
 
 #define ADDDI(x, y) ((x) + (y))
 #define SUBDI(x, y) ((x) - (y))
@@ -136,6 +139,7 @@ namespace cgen {
 #define LEUDI(x, y) ((UDI) (x) <= (UDI) (y))
 #define GTUDI(x, y) ((UDI) (x) > (UDI) (y))
 #define GEUDI(x, y) ((UDI) (x) >= (UDI) (y))
+#define ABSDI(x)  ((x) > 0 ? (x) : -(x))
 
 #define LTUINT(x, y) ((UINT) (x) < (UINT) (y))
 #define LEUINT(x, y) ((UINT) (x) <= (UINT) (y))

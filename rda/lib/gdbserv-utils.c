@@ -227,67 +227,143 @@ reverse_copy_bytes (void *dest, const void *src, int len)
 void
 gdbserv_be_bytes_to_reg (struct gdbserv *gdbserv,
 		         const void *buf,
-		         int len,
-		         struct gdbserv_reg *reg)
+		         int buflen,
+		         struct gdbserv_reg *reg,
+			 int reglen,
+			 int sign_extend)
 {
+  int bufoffset = 0;
+  int regoffset = 0;
+  int len = buflen;
+
   reg->negative_p = 0;
-  reg->len = len;
-  memcpy (reg->buf, buf, len);
+  reg->len = reglen;
+
+  if (reglen > buflen)
+    {
+      memset (reg->buf,
+              (sign_extend && (((char *) buf)[0] & 0x80)) ? 0xff : 0,
+	      reglen - buflen);
+      regoffset = reglen - buflen;
+    }
+
+  if (buflen > reglen)
+    {
+      bufoffset = buflen - reglen;
+      len = reglen;
+    }
+
+  memcpy (reg->buf + regoffset, (char *)buf + bufoffset, len);
 }
 
 void
 gdbserv_be_bytes_from_reg (struct gdbserv *gdbserv,
 		           void *buf,
-		           int *lenp,
-                           const struct gdbserv_reg *reg)
+		           int buflen,
+                           const struct gdbserv_reg *reg,
+			   int sign_extend)
 {
-  *lenp = reg->len;
-  memcpy (buf, reg->buf, reg->len);
+  int bufoffset = 0;
+  int regoffset = 0;
+  int len = reg->len;
+
+  if (reg->len > buflen)
+    {
+      regoffset = reg->len - buflen;
+      len = buflen;
+    }
+
+  if (buflen > reg->len)
+    {
+      memset (buf,
+              (sign_extend && (reg->buf[0] & 0x80)) ? 0xff : 0,
+	      buflen - reg->len);
+      bufoffset = buflen - reg->len;
+    }
+
+  memcpy ((char *)buf + bufoffset, reg->buf + regoffset, len);
 }
 
 void
 gdbserv_le_bytes_to_reg (struct gdbserv *gdbserv,
 		         const void *buf,
-		         int len,
-		         struct gdbserv_reg *reg)
+		         int buflen,
+		         struct gdbserv_reg *reg,
+			 int reglen,
+			 int sign_extend)
 {
+  int regoffset = 0;
+  int len = buflen;
+
   reg->negative_p = 0;
-  reg->len = len;
-  reverse_copy_bytes (reg->buf, buf, len);
+  reg->len = reglen;
+
+  if (reglen > buflen)
+    {
+      memset (reg->buf,
+              (sign_extend && (((char *) buf)[buflen - 1] & 0x80)) ? 0xff : 0,
+	      reglen - buflen);
+      regoffset = reglen - buflen;
+    }
+
+  if (buflen > reglen)
+      len = reglen;
+
+  reverse_copy_bytes (reg->buf + regoffset, buf, len);
 }
 
 void
 gdbserv_le_bytes_from_reg (struct gdbserv *gdbserv,
 		           void *buf,
-		           int *lenp,
-                           const struct gdbserv_reg *reg)
+		           int buflen,
+                           const struct gdbserv_reg *reg,
+			   int sign_extend)
 {
-  *lenp = reg->len;
-  reverse_copy_bytes (buf, reg->buf, reg->len);
+  int bufoffset = 0;
+  int regoffset = 0;
+  int len = reg->len;
+
+  if (reg->len > buflen)
+    {
+      regoffset = reg->len - buflen;
+      len = buflen;
+    }
+
+  if (buflen > reg->len)
+    {
+      memset ((char *)buf + reg->len,
+              (sign_extend && (reg->buf[reg->len - 1] & 0x80)) ? 0xff : 0,
+	      buflen - reg->len);
+    }
+
+  reverse_copy_bytes (buf, reg->buf + regoffset, reg->len);
 }
 
 void
 gdbserv_host_bytes_to_reg (struct gdbserv *gdbserv,
 		           const void *buf,
-		           int len,
-		           struct gdbserv_reg *reg)
+		           int buflen,
+		           struct gdbserv_reg *reg,
+			   int reglen,
+			   int sign_extend)
 {
 #ifdef WORDS_BIGENDIAN
-  gdbserv_be_bytes_to_reg (gdbserv, buf, len, reg);
+  gdbserv_be_bytes_to_reg (gdbserv, buf, buflen, reg, reglen, sign_extend);
 #else
-  gdbserv_le_bytes_to_reg (gdbserv, buf, len, reg);
+  gdbserv_le_bytes_to_reg (gdbserv, buf, buflen, reg, reglen, sign_extend);
 #endif
 }
 
 void
 gdbserv_host_bytes_from_reg (struct gdbserv *gdbserv,
 		             void *buf,
-		             int *lenp,
-                             const struct gdbserv_reg *reg)
+		             int buflen,
+                             const struct gdbserv_reg *reg,
+			     int sign_extend)
 {
 #ifdef WORDS_BIGENDIAN
-  gdbserv_be_bytes_from_reg (gdbserv, buf, lenp, reg);
+  gdbserv_be_bytes_from_reg (gdbserv, buf, buflen, reg, sign_extend);
 #else
-  gdbserv_le_bytes_from_reg (gdbserv, buf, lenp, reg);
+  gdbserv_le_bytes_from_reg (gdbserv, buf, buflen, reg, sign_extend);
 #endif
 }

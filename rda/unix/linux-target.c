@@ -205,7 +205,8 @@ struct peekuser_pokeuser_reginfo
 enum 
 { 
   PC_REGNUM = 15,
-  NUM_REGS = 26
+  NUM_REGS = 26,
+  sign_extend = 0
 };
 
 static struct getregs_setregs_reginfo reginfo[] =
@@ -261,7 +262,8 @@ static struct getregs_setregs_reginfo reginfo[] =
 enum 
 { 
   PC_REGNUM = 8,
-  NUM_REGS = 42
+  NUM_REGS = 42,
+  sign_extend = 0
 };
 
 
@@ -343,7 +345,8 @@ enum
   SIZEOF_REGMAP = 23,
   SIZEOF_MAPPEDREG = 4,
   NUM_REGS = 24,
-  PC_REGNUM = 16
+  PC_REGNUM = 16,
+  sign_extend = 0
 };
 
 static int regmap[SIZEOF_REGMAP] =
@@ -376,14 +379,159 @@ is_extended_reg (int regnum)
 
 /* End of SH_LINUX_TARGET */
 
-#elif defined(MIPS_LINUX_TARGET)
+#elif defined MIPS_LINUX_TARGET || (defined MIPS64_LINUX_TARGET && defined MIPS_ABI_O32)
 
 #define PEEKUSER_POKEUSER_REGINFO 1
 
 enum
 {
   NUM_REGS = 70,
-  PC_REGNUM = 37
+  PC_REGNUM = 37,
+  sign_extend = 1
+};
+
+#ifndef FPR_BASE
+#define FPR_BASE 32
+#endif
+#ifndef PC
+#define PC		64
+#endif
+#ifndef CAUSE
+#define CAUSE		65
+#endif
+#ifndef BADVADDR
+#define BADVADDR	66
+#endif
+#ifndef MMHI
+#define MMHI		67
+#endif
+#ifndef MMLO
+#define MMLO		68
+#endif
+#ifndef FPC_CSR
+#define FPC_CSR		69
+#endif
+#ifndef FPC_EIR
+#define FPC_EIR		70
+#endif
+
+#ifdef MIPS64_LINUX_TARGET
+#define PROTO_SIZE 8
+#else
+#define PROTO_SIZE 4
+#endif
+
+static struct peekuser_pokeuser_reginfo reginfo[] =
+{
+  /* MIPS has differing elf_gregset_t and gregset_t structs.  (The
+     former contains some leading padding that the latter does not.)
+     elf_gregset_t is used to access registers from a core file whereas
+     gregset_t is used by the thread library in its interfaces.  Since
+     we're concerned about the latter, we'll use the gregset_t offsets
+     in the table below.  */
+  { 0,             4, GREGS,  0 * 4,  4, PROTO_SIZE },      /* zero */
+  { 1,             4, GREGS,  1 * 4,  4, PROTO_SIZE },      /* at */
+  { 2,             4, GREGS,  2 * 4,  4, PROTO_SIZE },      /* v0 */
+  { 3,             4, GREGS,  3 * 4,  4, PROTO_SIZE },      /* v1 */
+  { 4,             4, GREGS,  4 * 4,  4, PROTO_SIZE },      /* a0 */
+  { 5,             4, GREGS,  5 * 4,  4, PROTO_SIZE },      /* a1 */
+  { 6,             4, GREGS,  6 * 4,  4, PROTO_SIZE },      /* a2 */
+  { 7,             4, GREGS,  7 * 4,  4, PROTO_SIZE },      /* a3 */
+  { 8,             4, GREGS,  8 * 4,  4, PROTO_SIZE },      /* t0 */
+  { 9,             4, GREGS,  9 * 4,  4, PROTO_SIZE },      /* t1 */
+  { 10,            4, GREGS,  10 * 4, 4, PROTO_SIZE },      /* t2 */
+  { 11,            4, GREGS,  11 * 4, 4, PROTO_SIZE },      /* t3 */
+  { 12,            4, GREGS,  12 * 4, 4, PROTO_SIZE },      /* t4 */
+  { 13,            4, GREGS,  13 * 4, 4, PROTO_SIZE },      /* t5 */
+  { 14,            4, GREGS,  14 * 4, 4, PROTO_SIZE },      /* t6 */
+  { 15,            4, GREGS,  15 * 4, 4, PROTO_SIZE },      /* t7 */
+  { 16,            4, GREGS,  16 * 4, 4, PROTO_SIZE },      /* s0 */
+  { 17,            4, GREGS,  17 * 4, 4, PROTO_SIZE },      /* s1 */
+  { 18,            4, GREGS,  18 * 4, 4, PROTO_SIZE },      /* s2 */
+  { 19,            4, GREGS,  19 * 4, 4, PROTO_SIZE },      /* s3 */
+  { 20,            4, GREGS,  20 * 4, 4, PROTO_SIZE },      /* s4 */
+  { 21,            4, GREGS,  21 * 4, 4, PROTO_SIZE },      /* s5 */
+  { 22,            4, GREGS,  22 * 4, 4, PROTO_SIZE },      /* s6 */
+  { 23,            4, GREGS,  23 * 4, 4, PROTO_SIZE },      /* s7 */
+  { 24,            4, GREGS,  24 * 4, 4, PROTO_SIZE },      /* t8 */
+  { 25,            4, GREGS,  25 * 4, 4, PROTO_SIZE },      /* t9 */
+  { 26,            4, GREGS,  26 * 4, 4, PROTO_SIZE },      /* k0 */
+  { 27,            4, GREGS,  27 * 4, 4, PROTO_SIZE },      /* k1 */
+  { 28,            4, GREGS,  28 * 4, 4, PROTO_SIZE },      /* gp */
+  { 29,            4, GREGS,  29 * 4, 4, PROTO_SIZE },      /* sp */
+  { 30,            4, GREGS,  30 * 4, 4, PROTO_SIZE },      /* s8/fp */
+  { 31,            4, GREGS,  31 * 4, 4, PROTO_SIZE },      /* ra */
+  { 0,             4, NOREGS, 0,      4, PROTO_SIZE },      /* sr */
+  { MMLO,          4, GREGS,  33 * 4, 4, PROTO_SIZE },      /* lo */
+  { MMHI,          4, GREGS,  32 * 4, 4, PROTO_SIZE },      /* hi */
+
+  /* glibc's ucontext.h doesn't specify the order of the following
+     three registerss.  But there is space allocated for them.  (Well,
+     for something, anyway - the g_pad[] array is has three elements.)
+     We use the same order for these fields as that specified in the
+     kernel header for elf_gregset_t; see the EF_ constants in
+     asm-mips/reg.h.  Note, however, that the kernel header sandwiches
+     the status register (sr, above) in between ``bad'' and ``cause''.  */
+
+  { BADVADDR,      4, GREGS,  35 * 4, 4, PROTO_SIZE },      /* bad */
+  { CAUSE,         4, GREGS,  36 * 4, 4, PROTO_SIZE },      /* cause */
+  { PC,            4, GREGS,  34 * 4, 4, PROTO_SIZE },      /* pc */
+
+  /* Linux/MIPS floating point is a bit of a mess.  On the one hand,
+     the elf_fpregset_t contains space for 32 doubles plus the control
+     word.  But on the other hand, the ptrace interface is only able to
+     fetch the 32 32-bit wide registers.  This means that we only get
+     16 double precision floats via ptrace().  It also means that only
+     slightly more than half of elf_fpregset_t is unused.  */
+
+  { FPR_BASE + 0,  4, FPREGS, 0 * 4,  4, PROTO_SIZE },      /* $f0 */
+  { FPR_BASE + 1,  4, FPREGS, 1 * 4,  4, PROTO_SIZE },      /* $f1 */
+  { FPR_BASE + 2,  4, FPREGS, 2 * 4,  4, PROTO_SIZE },      /* $f2 */
+  { FPR_BASE + 3,  4, FPREGS, 3 * 4,  4, PROTO_SIZE },      /* $f3 */
+  { FPR_BASE + 4,  4, FPREGS, 4 * 4,  4, PROTO_SIZE },      /* $f4 */
+  { FPR_BASE + 5,  4, FPREGS, 5 * 4,  4, PROTO_SIZE },      /* $f5 */
+  { FPR_BASE + 6,  4, FPREGS, 6 * 4,  4, PROTO_SIZE },      /* $f6 */
+  { FPR_BASE + 7,  4, FPREGS, 7 * 4,  4, PROTO_SIZE },      /* $f7 */
+  { FPR_BASE + 8,  4, FPREGS, 8 * 4,  4, PROTO_SIZE },      /* $f8 */
+  { FPR_BASE + 9,  4, FPREGS, 9 * 4,  4, PROTO_SIZE },      /* $f9 */
+  { FPR_BASE + 10, 4, FPREGS, 10 * 4, 4, PROTO_SIZE },      /* $f10 */
+  { FPR_BASE + 11, 4, FPREGS, 11 * 4, 4, PROTO_SIZE },      /* $f11 */
+  { FPR_BASE + 12, 4, FPREGS, 12 * 4, 4, PROTO_SIZE },      /* $f12 */
+  { FPR_BASE + 13, 4, FPREGS, 13 * 4, 4, PROTO_SIZE },      /* $f13 */
+  { FPR_BASE + 14, 4, FPREGS, 14 * 4, 4, PROTO_SIZE },      /* $f14 */
+  { FPR_BASE + 15, 4, FPREGS, 15 * 4, 4, PROTO_SIZE },      /* $f15 */
+  { FPR_BASE + 16, 4, FPREGS, 16 * 4, 4, PROTO_SIZE },      /* $f16 */
+  { FPR_BASE + 17, 4, FPREGS, 17 * 4, 4, PROTO_SIZE },      /* $f17 */
+  { FPR_BASE + 18, 4, FPREGS, 18 * 4, 4, PROTO_SIZE },      /* $f18 */
+  { FPR_BASE + 19, 4, FPREGS, 19 * 4, 4, PROTO_SIZE },      /* $f19 */
+  { FPR_BASE + 20, 4, FPREGS, 20 * 4, 4, PROTO_SIZE },      /* $f20 */
+  { FPR_BASE + 21, 4, FPREGS, 21 * 4, 4, PROTO_SIZE },      /* $f21 */
+  { FPR_BASE + 22, 4, FPREGS, 22 * 4, 4, PROTO_SIZE },      /* $f22 */
+  { FPR_BASE + 23, 4, FPREGS, 23 * 4, 4, PROTO_SIZE },      /* $f23 */
+  { FPR_BASE + 24, 4, FPREGS, 24 * 4, 4, PROTO_SIZE },      /* $f24 */
+  { FPR_BASE + 25, 4, FPREGS, 25 * 4, 4, PROTO_SIZE },      /* $f25 */
+  { FPR_BASE + 26, 4, FPREGS, 26 * 4, 4, PROTO_SIZE },      /* $f26 */
+  { FPR_BASE + 27, 4, FPREGS, 27 * 4, 4, PROTO_SIZE },      /* $f27 */
+  { FPR_BASE + 28, 4, FPREGS, 28 * 4, 4, PROTO_SIZE },      /* $f28 */
+  { FPR_BASE + 29, 4, FPREGS, 29 * 4, 4, PROTO_SIZE },      /* $f29 */
+  { FPR_BASE + 30, 4, FPREGS, 30 * 4, 4, PROTO_SIZE },      /* $f30 */
+  { FPR_BASE + 31, 4, FPREGS, 31 * 4, 4, PROTO_SIZE },      /* $f31 */
+  { FPC_CSR,       4, FPREGS, 64 * 4, 4, PROTO_SIZE }       /* fsr */
+};
+
+static void mips_singlestep_program (struct gdbserv *serv);
+
+/* End of MIPS_LINUX_TARGET */
+
+#elif defined(MIPS64_LINUX_TARGET)
+
+#define PEEKUSER_POKEUSER_REGINFO 1
+
+enum
+{
+  NUM_REGS = 70,
+  PC_REGNUM = 37,
+  sign_extend = 1
 };
 
 
@@ -395,41 +543,41 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
      gregset_t is used by the thread library in its interfaces.  Since
      we're concerned about the latter, we'll use the gregset_t offsets
      in the table below.  */
-  { 0,             4, GREGS,  0 * 4,  4, 4 },      /* zero */
-  { 1,             4, GREGS,  1 * 4,  4, 4 },      /* at */
-  { 2,             4, GREGS,  2 * 4,  4, 4 },      /* v0 */
-  { 3,             4, GREGS,  3 * 4,  4, 4 },      /* v1 */
-  { 4,             4, GREGS,  4 * 4,  4, 4 },      /* a0 */
-  { 5,             4, GREGS,  5 * 4,  4, 4 },      /* a1 */
-  { 6,             4, GREGS,  6 * 4,  4, 4 },      /* a2 */
-  { 7,             4, GREGS,  7 * 4,  4, 4 },      /* a3 */
-  { 8,             4, GREGS,  8 * 4,  4, 4 },      /* t0 */
-  { 9,             4, GREGS,  9 * 4,  4, 4 },      /* t1 */
-  { 10,            4, GREGS,  10 * 4, 4, 4 },      /* t2 */
-  { 11,            4, GREGS,  11 * 4, 4, 4 },      /* t3 */
-  { 12,            4, GREGS,  12 * 4, 4, 4 },      /* t4 */
-  { 13,            4, GREGS,  13 * 4, 4, 4 },      /* t5 */
-  { 14,            4, GREGS,  14 * 4, 4, 4 },      /* t6 */
-  { 15,            4, GREGS,  15 * 4, 4, 4 },      /* t7 */
-  { 16,            4, GREGS,  16 * 4, 4, 4 },      /* s0 */
-  { 17,            4, GREGS,  17 * 4, 4, 4 },      /* s1 */
-  { 18,            4, GREGS,  18 * 4, 4, 4 },      /* s2 */
-  { 19,            4, GREGS,  19 * 4, 4, 4 },      /* s3 */
-  { 20,            4, GREGS,  20 * 4, 4, 4 },      /* s4 */
-  { 21,            4, GREGS,  21 * 4, 4, 4 },      /* s5 */
-  { 22,            4, GREGS,  22 * 4, 4, 4 },      /* s6 */
-  { 23,            4, GREGS,  23 * 4, 4, 4 },      /* s7 */
-  { 24,            4, GREGS,  24 * 4, 4, 4 },      /* t8 */
-  { 25,            4, GREGS,  25 * 4, 4, 4 },      /* t9 */
-  { 26,            4, GREGS,  26 * 4, 4, 4 },      /* k0 */
-  { 27,            4, GREGS,  27 * 4, 4, 4 },      /* k1 */
-  { 28,            4, GREGS,  28 * 4, 4, 4 },      /* gp */
-  { 29,            4, GREGS,  29 * 4, 4, 4 },      /* sp */
-  { 30,            4, GREGS,  30 * 4, 4, 4 },      /* s8/fp */
-  { 31,            4, GREGS,  31 * 4, 4, 4 },      /* ra */
-  { 0,             4, NOREGS, 0,      4, 4 },      /* sr */
-  { MMLO,          4, GREGS,  33 * 4, 4, 4 },      /* lo */
-  { MMHI,          4, GREGS,  32 * 4, 4, 4 },      /* hi */
+  { 0,             8, GREGS,  0 * 8,  8, 8 },      /* zero */
+  { 1,             8, GREGS,  1 * 8,  8, 8 },      /* at */
+  { 2,             8, GREGS,  2 * 8,  8, 8 },      /* v0 */
+  { 3,             8, GREGS,  3 * 8,  8, 8 },      /* v1 */
+  { 4,             8, GREGS,  4 * 8,  8, 8 },      /* a0 */
+  { 5,             8, GREGS,  5 * 8,  8, 8 },      /* a1 */
+  { 6,             8, GREGS,  6 * 8,  8, 8 },      /* a2 */
+  { 7,             8, GREGS,  7 * 8,  8, 8 },      /* a3 */
+  { 8,             8, GREGS,  8 * 8,  8, 8 },      /* t0 */
+  { 9,             8, GREGS,  9 * 8,  8, 8 },      /* t1 */
+  { 10,            8, GREGS,  10 * 8, 8, 8 },      /* t2 */
+  { 11,            8, GREGS,  11 * 8, 8, 8 },      /* t3 */
+  { 12,            8, GREGS,  12 * 8, 8, 8 },      /* t4 */
+  { 13,            8, GREGS,  13 * 8, 8, 8 },      /* t5 */
+  { 14,            8, GREGS,  14 * 8, 8, 8 },      /* t6 */
+  { 15,            8, GREGS,  15 * 8, 8, 8 },      /* t7 */
+  { 16,            8, GREGS,  16 * 8, 8, 8 },      /* s0 */
+  { 17,            8, GREGS,  17 * 8, 8, 8 },      /* s1 */
+  { 18,            8, GREGS,  18 * 8, 8, 8 },      /* s2 */
+  { 19,            8, GREGS,  19 * 8, 8, 8 },      /* s3 */
+  { 20,            8, GREGS,  20 * 8, 8, 8 },      /* s4 */
+  { 21,            8, GREGS,  21 * 8, 8, 8 },      /* s5 */
+  { 22,            8, GREGS,  22 * 8, 8, 8 },      /* s6 */
+  { 23,            8, GREGS,  23 * 8, 8, 8 },      /* s7 */
+  { 24,            8, GREGS,  24 * 8, 8, 8 },      /* t8 */
+  { 25,            8, GREGS,  25 * 8, 8, 8 },      /* t9 */
+  { 26,            8, GREGS,  26 * 8, 8, 8 },      /* k0 */
+  { 27,            8, GREGS,  27 * 8, 8, 8 },      /* k1 */
+  { 28,            8, GREGS,  28 * 8, 8, 8 },      /* gp */
+  { 29,            8, GREGS,  29 * 8, 8, 8 },      /* sp */
+  { 30,            8, GREGS,  30 * 8, 8, 8 },      /* s8/fp */
+  { 31,            8, GREGS,  31 * 8, 8, 8 },      /* ra */
+  { 0,             8, NOREGS, 0,      8, 8 },      /* sr */
+  { 68,            8, GREGS,  33 * 4, 8, 8 },      /* lo */
+  { 67,            8, GREGS,  32 * 4, 8, 8 },      /* hi */
 
   /* glibc's ucontext.h doesn't specify the order of the following
      three registerss.  But there is space allocated for them.  (Well,
@@ -439,9 +587,9 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
      asm-mips/reg.h.  Note, however, that the kernel header sandwiches
      the status register (sr, above) in between ``bad'' and ``cause''.  */
 
-  { BADVADDR,      4, GREGS,  35 * 4, 4, 4 },      /* bad */
-  { CAUSE,         4, GREGS,  36 * 4, 4, 4 },      /* cause */
-  { PC,            4, GREGS,  34 * 4, 4, 4 },      /* pc */
+  { 66,            8, GREGS,  35 * 4, 8, 8 },      /* bad */
+  { 65,            8, GREGS,  36 * 4, 8, 8 },      /* cause */
+  { 64,            8, GREGS,  34 * 4, 8, 8 },      /* pc */
 
   /* Linux/MIPS floating point is a bit of a mess.  On the one hand,
      the elf_fpregset_t contains space for 32 doubles plus the control
@@ -450,44 +598,44 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
      16 double precision floats via ptrace().  It also means that only
      slightly more than half of elf_fpregset_t is unused.  */
 
-  { FPR_BASE + 0,  4, FPREGS, 0 * 4,  4, 4 },      /* $f0 */
-  { FPR_BASE + 1,  4, FPREGS, 1 * 4,  4, 4 },      /* $f1 */
-  { FPR_BASE + 2,  4, FPREGS, 2 * 4,  4, 4 },      /* $f2 */
-  { FPR_BASE + 3,  4, FPREGS, 3 * 4,  4, 4 },      /* $f3 */
-  { FPR_BASE + 4,  4, FPREGS, 4 * 4,  4, 4 },      /* $f4 */
-  { FPR_BASE + 5,  4, FPREGS, 5 * 4,  4, 4 },      /* $f5 */
-  { FPR_BASE + 6,  4, FPREGS, 6 * 4,  4, 4 },      /* $f6 */
-  { FPR_BASE + 7,  4, FPREGS, 7 * 4,  4, 4 },      /* $f7 */
-  { FPR_BASE + 8,  4, FPREGS, 8 * 4,  4, 4 },      /* $f8 */
-  { FPR_BASE + 9,  4, FPREGS, 9 * 4,  4, 4 },      /* $f9 */
-  { FPR_BASE + 10, 4, FPREGS, 10 * 4, 4, 4 },      /* $f10 */
-  { FPR_BASE + 11, 4, FPREGS, 11 * 4, 4, 4 },      /* $f11 */
-  { FPR_BASE + 12, 4, FPREGS, 12 * 4, 4, 4 },      /* $f12 */
-  { FPR_BASE + 13, 4, FPREGS, 13 * 4, 4, 4 },      /* $f13 */
-  { FPR_BASE + 14, 4, FPREGS, 14 * 4, 4, 4 },      /* $f14 */
-  { FPR_BASE + 15, 4, FPREGS, 15 * 4, 4, 4 },      /* $f15 */
-  { FPR_BASE + 16, 4, FPREGS, 16 * 4, 4, 4 },      /* $f16 */
-  { FPR_BASE + 17, 4, FPREGS, 17 * 4, 4, 4 },      /* $f17 */
-  { FPR_BASE + 18, 4, FPREGS, 18 * 4, 4, 4 },      /* $f18 */
-  { FPR_BASE + 19, 4, FPREGS, 19 * 4, 4, 4 },      /* $f19 */
-  { FPR_BASE + 20, 4, FPREGS, 20 * 4, 4, 4 },      /* $f20 */
-  { FPR_BASE + 21, 4, FPREGS, 21 * 4, 4, 4 },      /* $f21 */
-  { FPR_BASE + 22, 4, FPREGS, 22 * 4, 4, 4 },      /* $f22 */
-  { FPR_BASE + 23, 4, FPREGS, 23 * 4, 4, 4 },      /* $f23 */
-  { FPR_BASE + 24, 4, FPREGS, 24 * 4, 4, 4 },      /* $f24 */
-  { FPR_BASE + 25, 4, FPREGS, 25 * 4, 4, 4 },      /* $f25 */
-  { FPR_BASE + 26, 4, FPREGS, 26 * 4, 4, 4 },      /* $f26 */
-  { FPR_BASE + 27, 4, FPREGS, 27 * 4, 4, 4 },      /* $f27 */
-  { FPR_BASE + 28, 4, FPREGS, 28 * 4, 4, 4 },      /* $f28 */
-  { FPR_BASE + 29, 4, FPREGS, 29 * 4, 4, 4 },      /* $f29 */
-  { FPR_BASE + 30, 4, FPREGS, 30 * 4, 4, 4 },      /* $f30 */
-  { FPR_BASE + 31, 4, FPREGS, 31 * 4, 4, 4 },      /* $f31 */
-  { FPC_CSR,       4, FPREGS, 64 * 4, 4, 4 }       /* fsr */
+  { 32       + 0,  8, FPREGS, 0 * 4,  8, 8 },      /* $f0 */
+  { 32       + 1,  8, FPREGS, 1 * 4,  8, 8 },      /* $f1 */
+  { 32       + 2,  8, FPREGS, 2 * 4,  8, 8 },      /* $f2 */
+  { 32       + 3,  8, FPREGS, 3 * 4,  8, 8 },      /* $f3 */
+  { 32       + 4,  8, FPREGS, 4 * 4,  8, 8 },      /* $f4 */
+  { 32       + 5,  8, FPREGS, 5 * 4,  8, 8 },      /* $f5 */
+  { 32       + 6,  8, FPREGS, 6 * 4,  8, 8 },      /* $f6 */
+  { 32       + 7,  8, FPREGS, 7 * 4,  8, 8 },      /* $f7 */
+  { 32       + 8,  8, FPREGS, 8 * 4,  8, 8 },      /* $f8 */
+  { 32       + 9,  8, FPREGS, 9 * 4,  8, 8 },      /* $f9 */
+  { 32       + 10, 8, FPREGS, 10 * 4, 8, 8 },      /* $f10 */
+  { 32       + 11, 8, FPREGS, 11 * 4, 8, 8 },      /* $f11 */
+  { 32       + 12, 8, FPREGS, 12 * 4, 8, 8 },      /* $f12 */
+  { 32       + 13, 8, FPREGS, 13 * 4, 8, 8 },      /* $f13 */
+  { 32       + 14, 8, FPREGS, 14 * 4, 8, 8 },      /* $f14 */
+  { 32       + 15, 8, FPREGS, 15 * 4, 8, 8 },      /* $f15 */
+  { 32       + 16, 8, FPREGS, 16 * 4, 8, 8 },      /* $f16 */
+  { 32       + 17, 8, FPREGS, 17 * 4, 8, 8 },      /* $f17 */
+  { 32       + 18, 8, FPREGS, 18 * 4, 8, 8 },      /* $f18 */
+  { 32       + 19, 8, FPREGS, 19 * 4, 8, 8 },      /* $f19 */
+  { 32       + 20, 8, FPREGS, 20 * 4, 8, 8 },      /* $f20 */
+  { 32       + 21, 8, FPREGS, 21 * 4, 8, 8 },      /* $f21 */
+  { 32       + 22, 8, FPREGS, 22 * 4, 8, 8 },      /* $f22 */
+  { 32       + 23, 8, FPREGS, 23 * 4, 8, 8 },      /* $f23 */
+  { 32       + 24, 8, FPREGS, 24 * 4, 8, 8 },      /* $f24 */
+  { 32       + 25, 8, FPREGS, 25 * 4, 8, 8 },      /* $f25 */
+  { 32       + 26, 8, FPREGS, 26 * 4, 8, 8 },      /* $f26 */
+  { 32       + 27, 8, FPREGS, 27 * 4, 8, 8 },      /* $f27 */
+  { 32       + 28, 8, FPREGS, 28 * 4, 8, 8 },      /* $f28 */
+  { 32       + 29, 8, FPREGS, 29 * 4, 8, 8 },      /* $f29 */
+  { 32       + 30, 8, FPREGS, 30 * 4, 8, 8 },      /* $f30 */
+  { 32       + 31, 8, FPREGS, 31 * 4, 8, 8 },      /* $f31 */
+  { 69,            8, FPREGS, 64 * 4, 8, 8 }       /* fsr */
 };
 
 static void mips_singlestep_program (struct gdbserv *serv);
 
-/* End of MIPS_LINUX_TARGET */
+/* End of MIPS64_LINUX_TARGET */
 
 #elif M68K_LINUX_TARGET
 
@@ -500,7 +648,8 @@ enum
   SIZEOF_REGMAP = 29, 		/* with FP regs */
   SIZEOF_MAPPEDREG = 4,
   NUM_REGS = 29,
-  PC_REGNUM = 17
+  PC_REGNUM = 17,
+  sign_extend = 0
 };
 
 static int regmap[SIZEOF_REGMAP] =
@@ -557,7 +706,8 @@ is_extended_reg (int regnum)
 enum
 {
   NUM_REGS = 71,
-  PC_REGNUM = 64
+  PC_REGNUM = 64,
+  sign_extend = 0
 };
 
 static struct peekuser_pokeuser_reginfo reginfo[] =
@@ -646,7 +796,8 @@ enum
   SIZEOF_REGMAP = 66, 
   SIZEOF_MAPPEDREG = 8,
   NUM_REGS = 66,
-  PC_REGNUM = 64
+  PC_REGNUM = 64,
+  sign_extend = 0
 };
 
 static int regmap[SIZEOF_REGMAP] = 
@@ -922,8 +1073,6 @@ linux_get_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
       return -1;
     }
 
-  memset (tmp_buf, 0, reginfo[regno].proto_size);
-
   if (reginfo[regno].whichregs != NOREGS)
     {
       /* Get the register value. */
@@ -931,9 +1080,12 @@ linux_get_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
       if (status < 0)
 	return -1;	/* fail */
     }
+  else
+    memset (tmp_buf, 0, reginfo[regno].ptrace_size);
 
   /* Copy the bytes to the gdbserv_reg struct.  */
-  gdbserv_host_bytes_to_reg (serv, tmp_buf, reginfo[regno].proto_size, reg);
+  gdbserv_host_bytes_to_reg (serv, tmp_buf, reginfo[regno].ptrace_size,
+                             reg, reginfo[regno].proto_size, sign_extend);
 
   return 0;	/* success */
   
@@ -958,17 +1110,10 @@ linux_set_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
       struct child_process *process = gdbserv_target_data (serv);
       char tmp_buf[MAX_REG_SIZE];
       int status;
-      int len;
-
-      /* Clear out a temporary buffer into which to fetch the bytes that
-	 we'll be setting.  We do this in case ptrace_size != proto_size.  */
-      memset (tmp_buf, 0, reginfo[regno].ptrace_size);
 
       /* Copy the bytes from the gdbserv_reg struct to our temporary buffer.  */
-      gdbserv_host_bytes_from_reg (serv, tmp_buf, &len, reg);
-
-      if (len != reginfo[regno].proto_size)
-	return -1;
+      gdbserv_host_bytes_from_reg (serv, tmp_buf, reginfo[regno].ptrace_size,
+                                   reg, sign_extend);
 
       /* Write the child's register. */
       status = write_reg_bytes (process->pid, regno, tmp_buf);
@@ -990,7 +1135,6 @@ reg_from_regset (struct gdbserv *serv,
 		 const void *regset,
 		 enum regset whichregs)
 {
-  char tmp_buf[MAX_REG_SIZE];
   char *regbytes;
 
   if (regno < 0 || regno >= NUM_REGS 
@@ -1001,10 +1145,8 @@ reg_from_regset (struct gdbserv *serv,
 
   regbytes = ((char *) regset) + reginfo[regno].regset_field_offset;
 
-  memset (tmp_buf, 0, reginfo[regno].proto_size);
-  memcpy (tmp_buf, regbytes, reginfo[regno].regset_field_size);
-
-  gdbserv_host_bytes_to_reg (serv, tmp_buf, reginfo[regno].proto_size, reg);
+  gdbserv_host_bytes_to_reg (serv, regbytes, reginfo[regno].regset_field_size,
+                             reg, reginfo[regno].proto_size, sign_extend);
 
   return 0;
 }
@@ -1020,9 +1162,7 @@ reg_to_regset (struct gdbserv *serv,
 	       void *regset,
 	       enum regset whichregs)
 {
-  char tmp_buf[MAX_REG_SIZE];
   char *regbytes;
-  int len;
 
   if (regno < 0 || regno >= NUM_REGS 
       || reginfo[regno].whichregs != whichregs)
@@ -1030,15 +1170,10 @@ reg_to_regset (struct gdbserv *serv,
       return -1;
     }
 
-  memset (tmp_buf, 0, reginfo[regno].regset_field_size);
-  gdbserv_host_bytes_from_reg (serv, tmp_buf, &len, reg);
-
-  if (len != reginfo[regno].proto_size)
-    return -1;
-
   regbytes = ((char *) regset) + reginfo[regno].regset_field_offset;
 
-  memcpy (regbytes, tmp_buf, reginfo[regno].regset_field_size);
+  gdbserv_host_bytes_from_reg (serv, regbytes, reginfo[regno].regset_field_size,
+                               reg, sign_extend);
 
   return 0;
 }
@@ -1137,16 +1272,15 @@ get_regset (struct gdbserv *serv, int pid, void *regset,
 	  struct gdbserv_reg reg;
 	  int status;
 
-	  memset (tmp_buf, 0, reginfo[regno].proto_size);
-
 	  /* Get the register value. */
 	  status = read_reg_bytes (pid, regno, tmp_buf);
 	  if (status < 0)
 	    return -1;	/* fail */
 
 	  /* Copy the bytes to the gdbserv_reg struct.  */
-	  gdbserv_host_bytes_to_reg (serv, tmp_buf,
-	                             reginfo[regno].proto_size, &reg);
+	  gdbserv_host_bytes_to_reg (serv, tmp_buf, reginfo[regno].ptrace_size,
+	                             &reg, reginfo[regno].proto_size,
+				     sign_extend);
 
 	  /* Now insert them into the regset.  */
 	  reg_to_regset (serv, &reg, regno, regset, whichregs);
@@ -1173,20 +1307,15 @@ put_regset (struct gdbserv *serv,
 	{
 	  char tmp_buf[MAX_REG_SIZE];
 	  struct gdbserv_reg reg;
-	  int len;
 	  int status;
 
 	  /* Fetch the reg from the regset.  */
 	  reg_from_regset (serv, &reg, regno, regset, whichregs);
 
-	  /* Clear out a temporary buffer into which to put the bytes that
-	     we'll be setting.  We do this in case ptrace_size != proto_size.  */
-	  memset (tmp_buf, 0, reginfo[regno].ptrace_size);
-
 	  /* Copy the bytes from the gdbserv_reg struct to our temporary buffer.  */
-	  gdbserv_host_bytes_from_reg (serv, tmp_buf, &len, &reg);
-	  if (len != reginfo[regno].proto_size)
-	    return -1;
+	  gdbserv_host_bytes_from_reg (serv, tmp_buf,
+	                               reginfo[regno].ptrace_size, &reg,
+				       sign_extend);
 
 	  /* Write the child's register. */
 	  status = write_reg_bytes (pid, regno, tmp_buf);
@@ -1343,7 +1472,6 @@ linux_get_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
   elf_fpregset_t fpregs;
   void *fpxregs;
   char *buf;
-  char tmp_buf[MAX_REG_SIZE];
 
   if (regno < 0 || regno >= NUM_REGS)
     {
@@ -1394,14 +1522,9 @@ linux_get_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
   /* Adjust buf to point at the starting byte of the register.  */
   buf += reginfo[regno].offset;
 
-  /* We go through these memset / memcpy shenanigans in case
-     proto_size != ptrace_size.  */
-  memset (tmp_buf, 0, reginfo[regno].proto_size);
-  if (reginfo[regno].ptrace_size > 0)
-    memcpy (tmp_buf, buf, reginfo[regno].ptrace_size);
-
   /* Copy the bytes to the gdbserv_reg struct.  */
-  gdbserv_host_bytes_to_reg (serv, tmp_buf, reginfo[regno].proto_size, reg);
+  gdbserv_host_bytes_to_reg (serv, buf, reginfo[regno].ptrace_size,
+                             reg, reginfo[regno].proto_size, sign_extend);
 
   return 0;
 }
@@ -1419,7 +1542,6 @@ linux_set_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
   void *fpxregs = NULL;
   char *buf;
   char tmp_buf[MAX_REG_SIZE];
-  int len;
 
   if (regno < 0 || regno >= NUM_REGS)
     {
@@ -1468,18 +1590,9 @@ linux_set_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
   /* Adjust buf to point at the starting byte of the register.  */
   buf += reginfo[regno].offset;
 
-  /* Clear out a temporary buffer into which to fetch the bytes that
-     we'll be setting.  We do this in case ptrace_size != proto_size.  */
-  memset (tmp_buf, 0, reginfo[regno].ptrace_size);
-
   /* Copy the bytes from the gdbserv_reg struct to our temporary buffer.  */
-  gdbserv_host_bytes_from_reg (serv, tmp_buf, &len, reg);
-
-  if (len != reginfo[regno].proto_size)
-    return -1;
-
-  /* Copy the bytes to the appropriate position in the ptrace struct.  */
-  memcpy (buf, tmp_buf, reginfo[regno].ptrace_size);
+  gdbserv_host_bytes_from_reg (serv, buf, reginfo[regno].ptrace_size, reg,
+                               sign_extend);
 
   /* Write the register set to the process.  */
   if (reginfo[regno].whichregs == GREGS)
@@ -1521,7 +1634,6 @@ reg_from_gregset (struct gdbserv *serv,
 		  int regno, 
 		  const GREGSET_T gregset)
 {
-  char tmp_buf[MAX_REG_SIZE];
   char *regbytes;
 
   if (regno < 0 || regno >= NUM_REGS 
@@ -1532,10 +1644,8 @@ reg_from_gregset (struct gdbserv *serv,
 
   regbytes = ((char *) gregset) + reginfo[regno].offset;
 
-  memset (tmp_buf, 0, reginfo[regno].proto_size);
-  memcpy (tmp_buf, regbytes, reginfo[regno].ptrace_size);
-
-  gdbserv_host_bytes_to_reg (serv, tmp_buf, reginfo[regno].proto_size, reg);
+  gdbserv_host_bytes_to_reg (serv, regbytes, reginfo[regno].ptrace_size,
+                             reg, reginfo[regno].proto_size, sign_extend);
 
   return 0;
 }
@@ -1550,9 +1660,7 @@ reg_to_gregset (struct gdbserv *serv,
 		int regno, 
 		GREGSET_T gregset)
 {
-  char tmp_buf[MAX_REG_SIZE];
   char *regbytes;
-  int len;
 
   if (regno < 0 || regno >= NUM_REGS 
       || reginfo[regno].whichregs != GREGS)
@@ -1562,13 +1670,8 @@ reg_to_gregset (struct gdbserv *serv,
 
   regbytes = ((char *) gregset) + reginfo[regno].offset;
 
-  memset (tmp_buf, 0, reginfo[regno].ptrace_size);
-  gdbserv_host_bytes_from_reg (serv, tmp_buf, &len, reg);
-
-  if (len != reginfo[regno].proto_size)
-    return -1;
-
-  memcpy (regbytes, tmp_buf, reginfo[regno].ptrace_size);
+  gdbserv_host_bytes_from_reg (serv, regbytes, reginfo[regno].ptrace_size, reg,
+                               sign_extend);
 
   return 0;
 }
@@ -1583,7 +1686,6 @@ reg_from_fpregset (struct gdbserv *serv,
 		   int regno, 
 		   const FPREGSET_T *fpregset)
 {
-  char tmp_buf[MAX_REG_SIZE];
   char *regbytes;
 
   if (regno < 0 || regno >= NUM_REGS 
@@ -1594,10 +1696,8 @@ reg_from_fpregset (struct gdbserv *serv,
 
   regbytes = ((char *) fpregset) + reginfo[regno].offset;
 
-  memset (tmp_buf, 0, reginfo[regno].proto_size);
-  memcpy (tmp_buf, regbytes, reginfo[regno].ptrace_size);
-
-  gdbserv_host_bytes_to_reg (serv, tmp_buf, reginfo[regno].proto_size, reg);
+  gdbserv_host_bytes_to_reg (serv, regbytes, reginfo[regno].ptrace_size,
+                             reg, reginfo[regno].proto_size, sign_extend);
 
   return 0;
 }
@@ -1612,9 +1712,7 @@ reg_to_fpregset (struct gdbserv *serv,
 		 int regno, 
 		 FPREGSET_T *fpregset)
 {
-  char tmp_buf[MAX_REG_SIZE];
   char *regbytes;
-  int len;
 
   if (regno < 0 || regno >= NUM_REGS 
       || reginfo[regno].whichregs != FPREGS)
@@ -1624,13 +1722,8 @@ reg_to_fpregset (struct gdbserv *serv,
 
   regbytes = ((char *) fpregset) + reginfo[regno].offset;
 
-  memset (tmp_buf, 0, reginfo[regno].ptrace_size);
-  gdbserv_host_bytes_from_reg (serv, tmp_buf, &len, reg);
-
-  if (len != reginfo[regno].proto_size)
-    return -1;
-
-  memcpy (regbytes, tmp_buf, reginfo[regno].ptrace_size);
+  gdbserv_host_bytes_from_reg (serv, regbytes, reginfo[regno].ptrace_size, reg,
+                               sign_extend);
 
   return 0;
 }
@@ -1645,7 +1738,6 @@ reg_from_xregset (struct gdbserv *serv,
 		  int regno, 
 		  const void *xregset)
 {
-  char tmp_buf[MAX_REG_SIZE];
   char *regbytes;
 
   if (regno < 0 || regno >= NUM_REGS 
@@ -1656,10 +1748,8 @@ reg_from_xregset (struct gdbserv *serv,
 
   regbytes = ((char *) xregset) + reginfo[regno].offset;
 
-  memset (tmp_buf, 0, reginfo[regno].proto_size);
-  memcpy (tmp_buf, regbytes, reginfo[regno].ptrace_size);
-
-  gdbserv_host_bytes_to_reg (serv, tmp_buf, reginfo[regno].proto_size, reg);
+  gdbserv_host_bytes_to_reg (serv, regbytes, reginfo[regno].ptrace_size,
+                             reg, reginfo[regno].proto_size, sign_extend);
 
   return 0;
 }
@@ -1674,9 +1764,7 @@ reg_to_xregset (struct gdbserv *serv,
 		int regno, 
 		void *xregset)
 {
-  char tmp_buf[MAX_REG_SIZE];
   char *regbytes;
-  int len;
 
   if (regno < 0 || regno >= NUM_REGS 
       || reginfo[regno].whichregs != FPXREGS)
@@ -1686,13 +1774,8 @@ reg_to_xregset (struct gdbserv *serv,
 
   regbytes = ((char *) xregset) + reginfo[regno].offset;
 
-  memset (tmp_buf, 0, reginfo[regno].ptrace_size);
-  gdbserv_host_bytes_from_reg (serv, tmp_buf, &len, reg);
-
-  if (len != reginfo[regno].proto_size)
-    return -1;
-
-  memcpy (regbytes, tmp_buf, reginfo[regno].ptrace_size);
+  gdbserv_host_bytes_from_reg (serv, regbytes, reginfo[regno].ptrace_size, reg,
+                               sign_extend);
 
   return 0;
 }

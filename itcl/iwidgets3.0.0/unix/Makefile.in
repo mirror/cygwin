@@ -82,25 +82,25 @@ HTML_INSTALL_DIR = $(INSTALL_ROOT)$(prefix)/doc
 TCL_LIB_DIR = @TCL_LIB_DIR@
 
 # Directory containing Tcl source code (for library used during test):
-TCL_SRC_DIR = ${srcdir}/../../../../tcl
+TCL_SRC_DIR = @TCL_SRC_DIR@
 
 # Tk libraries can be found here:
 TK_LIB_DIR = @TK_LIB_DIR@
 
 # Directory containing Tk source code (for library used during test):
-TK_SRC_DIR = ${srcdir}/../../../tk
+TK_SRC_DIR = @TK_SRC_DIR@
 
 # Itcl libraries can be found here:
 ITCL_LIB_DIR = @ITCL_LIB_DIR@
 
 # Directory containing Itcl source code (for library used during test):
-ITCL_SRC_DIR = ${srcdir}/../../itcl
+ITCL_SRC_DIR = @ITCL_SRC_DIR@
 
 # Itk libraries can be found here:
 ITK_LIB_DIR = @ITK_LIB_DIR@
 
 # Directory containing Itk source code (for library used during test):
-ITK_SRC_DIR = ${srcdir}/../../itk
+ITK_SRC_DIR = @ITK_SRC_DIR@
 
 # [incr Tk] build directory containing the itkwish binary for 'make test'
 ITK_BIN_DIR = ../../itk/unix
@@ -156,7 +156,9 @@ standalone:
 
 plusplus:
 
-install: install-libraries install-demos install-man
+install: install-libraries install-demos install-man install-binaries
+
+install-binaries:
 
 install-libraries:
 	@$(MKINSTALLDIRS) $(SCRIPT_INSTALL_DIR) $(LIB_INSTALL_DIR)

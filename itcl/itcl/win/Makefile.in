@@ -224,7 +224,7 @@ $(CYGITCLTEST): $(ITCLTESTOBJS) $(CYGITCLLIB) $(TMPDIR)/$(CYGITCLSHRES)
 	$(CC) $(linkdebug) $(conlflags) -Wl,--stack=0x2300000 \
 		$(ITCL_CFLAGS) \
 		$(ITCLTESTOBJS) $(TMPDIR)/$(CYGITCLSHRES) \
-		$(CYGITCLLIB) $(TCLLIBDIR)/$(TCLLIB) $(conlibsdll) \ 
+		$(CYGITCLLIB) $(TCLLIBDIR)/$(TCLLIB) $(conlibsdll) \
 		-o $(CYGITCLTEST)
 
 $(TMPDIR)/$(CYGITCLSHRES):: $(ROOT)/win/itclsh.rc
@@ -311,7 +311,7 @@ config.status: $(srcdir)/configure
 install:: install-basic install-binaries
 	@echo done
 
-install-binaries::
+install-binaries:: install-shared-libraries
 	@for i in $(INSTALL_LIB_DIR) $(INSTALL_BIN_DIR) ; \
 	    do \
 	    if [ ! -d $$i ] ; then \
@@ -321,12 +321,10 @@ install-binaries::
 		else true; \
 		fi; \
 	    done;
-	@echo "Installing $(CYGITCLLIB) as $(INSTALL_LIB_DIR)/$(CYGITCLLIB)"
-	@$(INSTALL_DATA) $(CYGITCLLIB) $(INSTALL_LIB_DIR)/$(CYGITCLLIB)
-	@echo "Installing $(CYGITCLSH) as $(INSTALL_BIN_DIR)/$(CYGITCLSH)"
-	@$(INSTALL_PROGRAM) $(CYGITCLSH) $(INSTALL_BIN_DIR)/$(CYGITCLSH)
-	@echo "Installing $(CYGITCLDLL) as $(INSTALL_BIN_DIR)/$(CYGITCLDLL)"
-	@$(INSTALL_PROGRAM) $(CYGITCLDLL) $(INSTALL_BIN_DIR)/$(CYGITCLDLL)
+	@echo "Installing $(ITCLLIB) as $(INSTALL_LIB_DIR)/$(ITCLLIB)"
+	@$(INSTALL_DATA) $(ITCLLIB) $(INSTALL_LIB_DIR)/$(ITCLLIB)
+	@echo "Installing $(ITCLSH) as $(INSTALL_BIN_DIR)/$(ITCLSH)"
+	@$(INSTALL_PROGRAM) $(ITCLSH) $(INSTALL_BIN_DIR)/$(ITCLSH)
 
 #
 # Basic installtion
@@ -351,7 +349,7 @@ install-headers:
 	    $(INSTALL_DATA) $$i $(INSTALL_INCLUDE_DIR); \
 	    done;
 
-install-libraries:
+install-libraries: install-shared-libraries
 	@for i in $(prefix)/lib $(ITCL_LIBRARY); \
 	    do \
 	    if [ ! -d $$i ] ; then \
@@ -365,6 +363,9 @@ install-libraries:
 	@$(INSTALL_DATA) $(srcdir)/pkgIndex.tcl $(ITCL_LIBRARY)
 	@$(INSTALL_DATA) $(srcdir)/../library/itcl.tcl $(ITCL_LIBRARY)
 
+install-shared-libraries:
+	@echo "Installing $(ITCLDLL) as $(INSTALL_BIN_DIR)/$(ITCLDLL)"
+	@$(INSTALL_PROGRAM) $(ITCLDLL) $(INSTALL_BIN_DIR)/$(ITCLDLL)
 
 install-man:
 	@for i in $(INSTALL_MAN_DIR) $(INSTALL_MAN1_DIR) \

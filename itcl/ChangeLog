@@ -1,3 +1,17 @@
+2000-06-22  Syd Polk  <spolk@redhat.com>
+
+	* itcl/win/Makefile.in: Added target install-shared-libraries.
+	Make install-binaries and install-libraries both install it.
+	* itk/win/Makefile.in: Likewise.
+
+	* iwidgets3.0.0/unix/Makefile.in: Add dummy target 
+	install-binaries.
+	
+2000-06-19  Syd Polk  <spolk@redhat.com>
+
+	* itcl/win/Makefile.in: Install ITCLLIB instead of CYGITCLLIB
+	when installing the finished binaries.
+
 2000-06-15  Jonathan Larmour  <jlarmour@redhat.co.uk>
 
 	* iwidgets3.0.0/unix/configure.in: Use config scripts from build

@@ -339,7 +339,7 @@ $whoami=qx{whoami}; chop ($whoami);
 $hostname=qx{hostname}; chop ($hostname);
 $date=qx{date}; chop ($date);
 $uname=qx{uname}; chop ($uname);
-$version=q$Id: configrun-sid.in,v 1.22 2001/10/03 17:24:17 fche Exp $;
+$version=q$Id: configrun-sid.in,v 1.23 2001/10/04 17:33:48 fche Exp $;
 $zeroth_section = "# sid configuration file
 # created by $version
 # run by $whoami @ $hostname ($uname) at $date
@@ -390,13 +390,13 @@ if ($opt_gprof)
 $enable_z_packet = "false";
 $second_section = "# second section
 # settings
-set cpu step-insn-count $cpu_insn_count
-set cpu trace-semantics? $opt_trace_semantics
-set cpu trace-disassemble? $opt_trace_disassemble
-set cpu trace-counter? $opt_trace_counter
-set cpu trace-extract? $opt_trace_extract
-set cpu enable-warnings? $opt_enable_warnings
-set host-sched num-clients 10 # large enough?
+set cpu step-insn-count $cpu_insn_count\n" .
+($opt_trace_semantics ? "set cpu trace-semantics? $opt_trace_semantics\n" : "") .
+($opt_trace_disassemble ? "set cpu trace-disassemble? $opt_trace_disassemble\n" : "") .
+($opt_trace_counter ? "set cpu trace-counter? $opt_trace_counter\n" : "") .
+($opt_trace_extract ? "set cpu trace-extract? $opt_trace_extract\n" : "") .
+($opt_enable_warnings ? "set cpu enable-warnings? $opt_enable_warnings\n" : "") .
+"set host-sched num-clients 10 # large enough?
 set target-sched num-clients 10 # large enough?
 # pin connections
 connect-pin main perform-activity -> host-sched advance
@@ -870,19 +870,18 @@ connect-pin deinit-sequence output-5 -> ${processor}-gdb deinit
 connect-pin ${processor}-gdb yield -> yield-net input
 connect-pin ${processor}-gdb flush-icache -> $processor flush-icache
 connect-pin ${processor}-gdb restart -> hw-reset-net input
-set ${processor}-gdb exit-on-detach? 1
-set ${processor}-gdb trace-gdbsid? $opt_verbose
-set ${processor}-gdb trace-gdbserv? $opt_verbose
-# ${processor}-gdb-socket
+set ${processor}-gdb exit-on-detach? 1\n" .
+($opt_verbose ? "set ${processor}-gdb trace-gdbsid? $opt_verbose\n" : "") .
+($opt_verbose ? "set ${processor}-gdb trace-gdbserv? $opt_verbose\n" : "") .
+"# ${processor}-gdb-socket
 connect-pin init-sequence output-2 -> ${processor}-gdb-socket init
 connect-pin deinit-sequence output-6 -> ${processor}-gdb-socket fini
 connect-pin ${processor}-gdb-socket rx -> ${processor}-gdb remote-rx
 connect-pin ${processor}-gdb-socket tx <- ${processor}-gdb remote-tx
 connect-pin host-sched 6-event -> ${processor}-gdb-socket poll-event
 connect-pin host-sched 6-control <- ${processor}-gdb-socket poll-control
-set ${processor}-gdb-socket sockaddr-local 0.0.0.0:$opt_gdbport{$processor}
-set ${processor}-gdb-socket verbose? $opt_verbose
-";
+set ${processor}-gdb-socket sockaddr-local 0.0.0.0:$opt_gdbport{$processor}\n" .
+($opt_verbose ? "set ${processor}-gdb-socket verbose? $opt_verbose\n" : "");
   }
 
 # Additional settings for main cpu gdb.
@@ -915,9 +914,8 @@ foreach $processor (keys %opt_load)
     $first_section .= "# ${processor} loader\n" .
 	&sidconf_new("sw-load-elf", "${processor}-loader") . "\n";
     $second_section .= "# ${processor} loader
-set ${processor}-loader file \"$opt_load{$processor}\"
-set ${processor}-loader verbose? $opt_verbose
-";
+set ${processor}-loader file \"$opt_load{$processor}\" \n" .
+($opt_verbose ? "set ${processor}-loader verbose? $opt_verbose\n" : "");
 
     # Have the loader write data via $load_mapper_data for the "cpu" processor
     if ($processor eq "cpu")

@@ -1,3 +1,7 @@
+2001-10-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* (*.conf): Regenerated without superfluous bool attr settings.
+
 2001-10-03  Frank Ch. Eigler  <fche@redhat.com>
 
 	* (*.conf): Regenerated with gdb cfgroot relationship.

@@ -1039,7 +1039,7 @@ cfgroot_component::disconnect_bus(const string& c1, const string& a1,
     emit_error(string("component ") + c1 + string(" accessor ") + a1 
 	       + string(" not found "));
   else if (s == component::bad_value)
-    emit_error(string("could not unset componet ") + c1 + string(" accessor ") + a1);
+    emit_error(string("could not unset component ") + c1 + string(" accessor ") + a1);
   else if (s == component::ok && this->verbose_p)
     cout << "disconnected component " << c1 << " accessor " << a1
 	 << " from component " << c2 << " bus " << b2 << endl;

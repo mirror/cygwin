@@ -1,3 +1,7 @@
+2002-01-08  Ben Elliston  <bje@redhat.com>
+
+	* lib/monkey.exp (monkey_stop): Delete monkey.conf on success.
+
 2001-12-11  Ben Elliston  <bje@redhat.com>
 
 	* lib/cpudefs.exp (run-one-sid-test): Delete object code if the

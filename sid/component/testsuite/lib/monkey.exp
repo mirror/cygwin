@@ -183,7 +183,12 @@ proc monkey_start {type sym lib} {
 }
 
 proc monkey_stop {} {
+    global exit_status
+
     sid_stop
+    # zap temp file if tests were successful 
+    global exit_status
+    if {$exit_status == "0"} then { file delete "monkey.conf" }
 }
 
 

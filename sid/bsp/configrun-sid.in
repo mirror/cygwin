@@ -98,10 +98,10 @@ $load_mapper_data = "mapper access-port";
 
 sub usage {
   print STDERR "
-Usage: $0 [option ..] [--] [exec args ..]
+Usage: $0 --cpu=CPU [option ..] [--] [exec args ..]
 Options:
  --help                     Print this help message.
- --cpu=CPU                  Select target processor                     [none]
+ --cpu=CPU   (REQUIRED)     Select target processor                     [none]
  --verbose                  Turn on various run-time verbosity settings.  [no]
  --save-temps               Keep generated sid configuration file.        [no]
  --trace-extract            Turn on CPU insn decode tracing.              [no]
@@ -202,7 +202,7 @@ my @ARGV_COPY = @ARGV;
 &GetOptions(@options);
 
 # handle help
-if ($opt_help) {
+if ($opt_help || $opt_cpu eq "") {
   &usage;
 }
 

@@ -1,3 +1,11 @@
+2000-12-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* utils-sim.scm (gen-define-argbuf-macro): Handle sfmt=#f case, to be
+	used by simple/non-scache simulators.
+	* sim-cpu.scm (-gen-read-case): Call gen-define/undef-field-macro
+	regardless of with-scache?.
+	(-gen-write-case, -gen-no-scache-semantic-fn, -gen-sem-case): Ditto.
+
 2000-12-03  Ben Elliston  <bje@redhat.com>
 
 	* desc-cpu.scm (cgen-desc.h): Clarify generated filenames.

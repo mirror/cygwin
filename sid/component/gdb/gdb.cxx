@@ -1306,8 +1306,8 @@ gdb::gloss_signal_handler (host_int_4 value)
   else
     {
       // signal gdb
-      last_signal = value;  // XXX: is this an exit(value) rc?
-      gdbserv_fromtarget_exit (gdbserv, last_signal);
+      last_signal = value & 0xff;
+      gdbserv_fromtarget_exit (gdbserv, value >> 8);
     }
 }
 

@@ -697,7 +697,6 @@
 )
 
 ; Extra target specific code generation.
-; For now, such code lives in <arch>.opc.
 
 ; Pick out a section from the .opc file.
 ; The section is delimited with:
@@ -708,10 +707,8 @@
 ; FIXME: This is a pretty involved bit of code.  'twould be nice to split
 ; it up into manageable chunks.
 
-(define (read-cpu.opc srcdir cpu delim)
-  (let ((file (string-append srcdir "/cpu/"
-			     (symbol->string (current-arch-name))
-			     ".opc"))
+(define (read-cpu.opc opc-file delim)
+  (let ((file opc-file)
 	(start-delim (string-append "/* -- " delim))
 	(end-delim "/* -- "))
     (if (file-exists? file)
@@ -756,38 +753,37 @@
 	))
 )
 
-; FIXME: collapse into one?
-(define (gen-extra-cpu.h srcdir arch)
+(define (gen-extra-cpu.h opc-file arch)
   (logit 2 "Generating extra cpu.h stuff from " arch ".opc ...\n")
-  (read-cpu.opc srcdir arch "cpu.h")
+  (read-cpu.opc opc-file "cpu.h")
 )
-(define (gen-extra-cpu.c srcdir arch)
+(define (gen-extra-cpu.c opc-file arch)
   (logit 2 "Generating extra cpu.c stuff from " arch ".opc ...\n")
-  (read-cpu.opc srcdir arch "cpu.c")
+  (read-cpu.opc opc-file "cpu.c")
 )
-(define (gen-extra-opc.h srcdir arch)
+(define (gen-extra-opc.h opc-file arch)
   (logit 2 "Generating extra opc.h stuff from " arch ".opc ...\n")
-  (read-cpu.opc srcdir arch "opc.h")
+  (read-cpu.opc opc-file "opc.h")
 )
-(define (gen-extra-opc.c srcdir arch)
+(define (gen-extra-opc.c opc-file arch)
   (logit 2 "Generating extra opc.c stuff from " arch ".opc ...\n")
-  (read-cpu.opc srcdir arch "opc.c")
+  (read-cpu.opc opc-file "opc.c")
 )
-(define (gen-extra-asm.c srcdir arch)
+(define (gen-extra-asm.c opc-file arch)
   (logit 2 "Generating extra asm.c stuff from " arch ".opc ...\n")
-  (read-cpu.opc srcdir arch "asm.c")
+  (read-cpu.opc opc-file "asm.c")
 )
-(define (gen-extra-dis.c srcdir arch)
+(define (gen-extra-dis.c opc-file arch)
   (logit 2 "Generating extra dis.c stuff from " arch ".opc ...\n")
-  (read-cpu.opc srcdir arch "dis.c")
+  (read-cpu.opc opc-file "dis.c")
 )
-(define (gen-extra-ibld.h srcdir arch)
+(define (gen-extra-ibld.h opc-file arch)
   (logit 2 "Generating extra ibld.h stuff from " arch ".opc ...\n")
-  (read-cpu.opc srcdir arch "ibld.h")
+  (read-cpu.opc opc-file "ibld.h")
 )
-(define (gen-extra-ibld.c srcdir arch)
+(define (gen-extra-ibld.c opc-file arch)
   (logit 2 "Generating extra ibld.c stuff from " arch ".opc ...\n")
-  (read-cpu.opc srcdir arch "ibld.c")
+  (read-cpu.opc opc-file "ibld.c")
 )
 
 ; For debugging.

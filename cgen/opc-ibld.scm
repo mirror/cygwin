@@ -307,7 +307,7 @@ void
 #define @ARCH@_IBLD_H
 
 "
-   (lambda () (gen-extra-ibld.h srcdir (current-arch-name))) ; from <arch>.opc
+   (lambda () (gen-extra-ibld.h (opc-file-path) (current-arch-name)))
    "\n"
    gen-insn-builders
    "

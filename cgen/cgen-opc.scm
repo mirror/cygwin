@@ -23,25 +23,45 @@
   (load (string-append srcdir "/opc-opinst.scm"))
 )
 
+; Records the -OPC arg which specifies the path to the .opc file.
+(define -opc-file-path #f)
+(define (opc-file-path)
+  (if -opc-file-path
+      -opc-file-path
+      (error ".opc file unspecified, missing -OPC argument"))
+)
+
 (define opc-arguments
   (list
-   (list '-H "file" "generate $arch-desc.h in <file>"
+   (list "-OPC" "file" "specify path to .opc file"
+	 (lambda (arg) (set! -opc-file-path arg))
+	 #f)
+   (list "-H" "file" "generate $arch-desc.h in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-desc.h)))
-   (list '-C "file" "generate $arch-desc.c in <file>"
+   (list "-C" "file" "generate $arch-desc.c in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-desc.c)))
-   (list '-O "file" "generate $arch-opc.h in <file>"
+   (list "-O" "file" "generate $arch-opc.h in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-opc.h)))
-   (list '-P "file" "generate $arch-opc.c in <file>"
+   (list "-P" "file" "generate $arch-opc.c in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-opc.c)))
-   (list '-Q "file" "generate $arch-opinst.c in <file>"
+   (list "-Q" "file" "generate $arch-opinst.c in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-opinst.c)))
-   (list '-B "file" "generate $arch-ibld.h in <file>"
+   (list "-B" "file" "generate $arch-ibld.h in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-ibld.h)))
-   (list '-L "file" "generate $arch-ibld.in in <file>"
+   (list "-L" "file" "generate $arch-ibld.in in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-ibld.in)))
-   (list '-A "file" "generate $arch-asm.in in <file>"
+   (list "-A" "file" "generate $arch-asm.in in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-asm.in)))
-   (list '-D "file" "generate $arch-dis.in in <file>"
+   (list "-D" "file" "generate $arch-dis.in in <file>"
+	 #f
 	 (lambda (arg) (file-write arg cgen-dis.in)))
    )
 )

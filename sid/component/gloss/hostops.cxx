@@ -94,10 +94,14 @@ hostops::open (const char* filename, int flags, int mode, int& result_fd, int& e
 bool
 hostops::close (int fd, int& errcode)
 {
-  if (::close (fd) < 0)
-    {
-      errcode = errno;
-      return false;
+  /* don't close the host's stdin, stdout, and stderr */
+  if (fd > 2)
+    {	
+      if (::close (fd) < 0)
+        {
+          errcode = errno;
+          return false;
+        }
     }
   return true;
 }

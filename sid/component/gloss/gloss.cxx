@@ -95,9 +95,8 @@ gloss32::reset()
       for (int i = 0; i < max_fds; ++i)
 	{
 	  int errcode;
-	  if (fd_table[i] > 2)
-	    if (! host_ops->close (fd_table[i], errcode))
-	      cerr << "*** While resetting, close("
+	  if (! host_ops->close (fd_table[i], errcode))
+	    cerr << "*** While resetting, close("
 		   << fd_table[i]
 		   << ") unexpectedly failed." << endl;
 	}

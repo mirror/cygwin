@@ -1,3 +1,24 @@
+2002-06-25  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* cpu/sh64-compact.cpu (movw5): Use Correct operand field for reg.
+	* cpu/sh64-media.cpu (-ldhi-byte, -ldhi-word, -ldhi-long): New macros.
+	(-ldlo-byte, -ldlo-word, -ldlo-long): Likewise.
+	(-sthi-word, -sthi-long -stlo-byte, -stlo-word, -stlo-long): Likewise.
+	(ldhil, ldhiq, ldlol, ldloq, stlol, stloq): Implement.
+	(mshfhib, mshfhil, mshfhiw, mshflob, mshflol, mshflow): Fix indices.
+	(-sthi-byte): If there is a single byte to store, store it at
+	proper address.
+	(sthil, sthiq): Fix big-endian behaviour.
+	(mcnvslw, mcnvswb, mcnvswub, mmacfxwl, mmacnfx.wl): Fix indices.
+	(mmulfxl, mmulfxw, mmulfxrpw, mmulhiwl, mmullowl): Likewise.
+	(saturate): Use Dimode to check if saturation operation is required.
+	(usaturate): Likewise.
+	(mpermw): Fix mask.
+	(-maddsl, -maddsub): Compute to-be-saturated value in wider mode.
+	(-maddsw, mmacfxwl, mmacnfx.wl, -mshaldsl, -mshaldsw): Likewise.
+	(-mshardl, -mshardw, -msubsl, -msubsub, -msubsw): Likewise.
+	(msadubq): Fix subword index in second operand of first subtraction.
+
 2002-06-20  Hans-Peter Nilsson  <hp@axis.com>
 
 	* sim-cpu.scm (gen-semantic-code): Prepend with setup-semantics

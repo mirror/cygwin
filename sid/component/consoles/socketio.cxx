@@ -139,6 +139,12 @@ socketio::socketio(bool s):
 			 & socketio::restore_state);
 }
   
+
+// dummy dtor
+socketio::~socketio () throw ()
+{
+}
+
   
   // ----------------------------------------------------------------------------
 

@@ -130,6 +130,13 @@ cache_component::cache_component (unsigned assocy,
   // FIXME: state save/restore
 }
 
+
+// dummy dtor
+cache_component::~cache_component () throw ()
+{
+}
+
+
 unsigned
 cache_component::line_offset (const cache_line& line, const host_int_4& addr)
 {

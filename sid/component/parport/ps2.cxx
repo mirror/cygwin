@@ -135,6 +135,12 @@ ParPort::ParPort()
 }
 
 
+// dummy dtor
+ParPort::~ParPort() throw ()
+{
+}
+
+
 /* Following helper function adds bus, and pins to target
    view. Method returns no value.
 */

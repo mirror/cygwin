@@ -1,3 +1,7 @@
+2001-08-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cache.cxx (~cache_component): Define.
+
 2001-08-03  matthew green  <mrg@redhat.com>
 
 	* cache.h (~cache_component): Add prototype.

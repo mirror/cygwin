@@ -1,3 +1,7 @@
+2001-08-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* socketio.cxx (~socketio): Define.
+
 2001-08-03  matthew green  <mrg@redhat.com>
 	
 	* components.h (~socketio): Add prototype.

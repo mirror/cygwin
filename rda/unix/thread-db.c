@@ -2132,6 +2132,19 @@ thread_db_exit_program (struct gdbserv *serv)
   parentvec.exit_program (serv);
 }
 
+static void
+thread_db_break_program (struct gdbserv *serv)
+{
+  struct child_process *process = gdbserv_target_data (serv);
+
+  /* We always send the signal to the main thread.  It's not correct
+     to use process->pid; that's whatever thread last reported a
+     status, and it may well have been exiting.  */
+  if (process->debug_backend)
+    fprintf (stderr, " -- send SIGINT to child %d\n", proc_handle.pid);
+  kill (proc_handle.pid, SIGINT);
+}
+
 /* Function: check_child_state
 
    This function checks for signal events in the running child processes.
@@ -2634,6 +2647,8 @@ thread_db_attach (struct gdbserv *serv, struct gdbserv_target *target)
 
   target->continue_thread     = thread_db_continue_thread;
   target->singlestep_thread   = thread_db_singlestep_thread;
+
+  target->break_program       = thread_db_break_program;
 
   /* Take over get_reg / set_reg methods with threaded versions. */
   if (target->next_gg_reg != NULL &&

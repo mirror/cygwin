@@ -420,7 +420,7 @@ MapperCfg *MapperCfg::get_by_name (const string name)
 }
 
 MapperCfg::~MapperCfg () {}
-MapperCfg::MapperCfg (const string name, bool transparent = false) :
+MapperCfg::MapperCfg (const string name, bool transparent) :
   ComponentCfg (name),
   AtomicCfg (name, 
 	     "libmapper.la", 
@@ -825,9 +825,9 @@ BoardCfg::~BoardCfg () {}
 BoardCfg::BoardCfg (const string name, 
 		    const string default_cpu_variant,		    
 		    SessionCfg *s,
-		    bool with_default_gloss = true,
-		    bool with_z_packet = true,
-		    bool with_cpu_main_mem_connect = false) :
+		    bool with_default_gloss,
+		    bool with_z_packet,
+		    bool with_cpu_main_mem_connect) :
   ComponentCfg (name),
   AggregateCfg (name),
   cache_flush_net (NULL),

@@ -13,6 +13,7 @@ details. */
 #include <time.h>
 #include <errno.h>
 #include <limits.h>
+#include <stdarg.h>
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
@@ -28,6 +29,8 @@ details. */
 #include "ntdll.h"
 #include "cygthread.h"
 #include "shared_info.h"
+#include "cygheap.h"
+#include "fhandler.h"
 
 static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 
@@ -66,6 +69,7 @@ set_myself (pid_t pid, HANDLE h)
   (void) GetModuleFileName (NULL, myself->progname, sizeof (myself->progname));
   if (!strace.active)
     strace.hello ();
+  InitializeCriticalSection (&myself->lock);
   return;
 }
 
@@ -211,7 +215,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	   this way at some point.  */
       if (i < 9 && !created && createit && (procinfo->process_state & PID_EXITED))
 	{
-	  Sleep (5);
+	  low_priority_sleep (5);
 	  release ();
 	  continue;
 	}
@@ -228,6 +232,277 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
       break;
     }
   destroy = 1;
+}
+
+bool
+_pinfo::alive ()
+{
+  HANDLE h = OpenProcess (PROCESS_QUERY_INFORMATION, false, dwProcessId);
+  if (h)
+    CloseHandle (h);
+  return !!h;
+}
+
+extern char **__argv;
+
+void
+_pinfo::commune_recv ()
+{
+  DWORD nr;
+  DWORD code;
+  HANDLE hp;
+  HANDLE __fromthem = NULL;
+  HANDLE __tothem = NULL;
+
+  hp = OpenProcess (PROCESS_DUP_HANDLE, false, dwProcessId);
+  if (!hp)
+    {
+      sigproc_printf ("couldn't open handle for pid %d(%u)", pid, dwProcessId);
+      hello_pid = -1;
+      return;
+    }
+  if (!DuplicateHandle (hp, fromthem, hMainProc, &__fromthem, 0, false, DUPLICATE_SAME_ACCESS))
+    {
+      sigproc_printf ("couldn't duplicate fromthem, %E");
+      CloseHandle (hp);
+      hello_pid = -1;
+      return;
+    }
+
+  if (!DuplicateHandle (hp, tothem, hMainProc, &__tothem, 0, false, DUPLICATE_SAME_ACCESS))
+    {
+      sigproc_printf ("couldn't duplicate tothem, %E");
+      CloseHandle (__fromthem);
+      CloseHandle (hp);
+      hello_pid = -1;
+      return;
+    }
+
+  CloseHandle (hp);
+  hello_pid = 0;
+
+  if (!ReadFile (__fromthem, &code, sizeof code, &nr, NULL) || nr != sizeof code)
+    {
+      /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
+      goto out;
+    }
+
+  switch (code)
+    {
+    case PICOM_CMDLINE:
+      {
+	unsigned n = 1;
+	CloseHandle (__fromthem); __fromthem = NULL;
+	for (char **a = __argv; *a; a++)
+	  n += strlen (*a) + 1;
+	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+	  {
+	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
+	    sigproc_printf ("WriteFile sizeof argv failed, %E");
+	  }
+	else
+	  for (char **a = __argv; *a; a++)
+	    if (!WriteFile (__tothem, *a, strlen (*a) + 1, &nr, NULL))
+	      {
+		sigproc_printf ("WriteFile arg %d failed, %E", a - __argv);
+		break;
+	      }
+	if (!WriteFile (__tothem, "", 1, &nr, NULL))
+	  {
+	    sigproc_printf ("WriteFile null failed, %E");
+	    break;
+	  }
+	break;
+      }
+    case PICOM_FIFO:
+      {
+	int formic;
+	if (!ReadFile (__fromthem, &formic, sizeof formic, &nr, NULL)
+	    || nr != sizeof formic)
+	  {
+	    /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
+	    goto out;
+	  }
+	fhandler_fifo *fh = cygheap->fdtab.find_fifo ((ATOM) formic);
+	if (!WriteFile (__tothem, &(fh->get_handle ()), sizeof (HANDLE), &nr, NULL))
+	  {
+	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
+	    sigproc_printf ("WriteFile read handle failed, %E");
+	  }
+
+	if (!WriteFile (__tothem, &(fh->get_output_handle ()), sizeof (HANDLE), &nr, NULL))
+	  {
+	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
+	    sigproc_printf ("WriteFile write handle failed, %E");
+	  }
+	break;
+      }
+    }
+
+out:
+  if (__fromthem)
+    CloseHandle (__fromthem);
+  if (__tothem)
+    CloseHandle (__tothem);
+}
+
+#define PIPEBUFSIZE (16 * sizeof (DWORD))
+
+commune_result
+_pinfo::commune_send (DWORD code, ...)
+{
+  HANDLE fromthem = NULL, tome = NULL;
+  HANDLE fromme = NULL, tothem = NULL;
+  DWORD nr;
+  commune_result res;
+  va_list args;
+
+  va_start (args, code);
+
+  res.s = NULL;
+  res.n = 0;
+
+  if (!pid || !this)
+    {
+      set_errno (ESRCH);
+      goto err;
+    }
+  if (!CreatePipe (&fromthem, &tome, &sec_all_nih, PIPEBUFSIZE))
+    {
+      sigproc_printf ("first CreatePipe failed, %E");
+      __seterrno ();
+      goto err;
+    }
+  if (!CreatePipe (&fromme, &tothem, &sec_all_nih, PIPEBUFSIZE))
+    {
+      sigproc_printf ("first CreatePipe failed, %E");
+      __seterrno ();
+      goto err;
+    }
+  EnterCriticalSection (&myself->lock);
+  myself->tothem = tome;
+  myself->fromthem = fromme;
+  myself->hello_pid = pid;
+  if (!WriteFile (tothem, &code, sizeof code, &nr, NULL) || nr != sizeof code)
+    {
+      __seterrno ();
+      goto err;
+    }
+
+  switch (code)
+    {
+    case PICOM_FIFO:
+      {
+	int formic = va_arg (args, int);
+	if (WriteFile (tothem, &formic, sizeof formic, &nr, NULL) != sizeof formic)
+	  goto err;
+	break;
+      }
+    }
+
+  if (sig_send (this, __SIGCOMMUNE))
+    goto err;
+
+  /* FIXME: Need something better than an busy loop here */
+  bool isalive;
+  while ((isalive = alive ()))
+    if (myself->hello_pid <= 0)
+      break;
+    else
+      low_priority_sleep (0);
+
+  CloseHandle (tome);
+  tome = NULL;
+  CloseHandle (fromme);
+  fromme = NULL;
+
+  if (!isalive)
+    {
+      set_errno (ESRCH);
+      goto err;
+    }
+
+  if (myself->hello_pid < 0)
+    {
+      set_errno (ENOSYS);
+      goto err;
+    }
+
+  size_t n;
+  if (!ReadFile (fromthem, &n, sizeof n, &nr, NULL) || nr != sizeof n)
+    {
+      __seterrno ();
+      goto err;
+    }
+  switch (code)
+    {
+    case PICOM_CMDLINE:
+      res.s = (char *) malloc (n);
+      char *p;
+      for (p = res.s; ReadFile (fromthem, p, n, &nr, NULL); p += nr)
+	continue;
+      if ((unsigned) (p - res.s) != n)
+	{
+	  __seterrno ();
+	  goto err;
+	}
+      res.n = n;
+      break;
+    case PICOM_FIFO:
+      if (n != sizeof (res.handles)
+	  || !ReadFile (fromthem, res.handles, sizeof (res.handles), &nr, NULL)
+	  || nr != n)
+	goto err;
+      break;
+    }
+  CloseHandle (tothem);
+  CloseHandle (fromthem);
+  goto out;
+
+err:
+  if (tome)
+    CloseHandle (tome);
+  if (fromthem)
+    CloseHandle (fromthem);
+  if (tothem)
+    CloseHandle (tothem);
+  if (fromme)
+    CloseHandle (fromme);
+  memset (&res, 0, sizeof (res));
+
+out:
+  myself->hello_pid = 0;
+  LeaveCriticalSection (&lock);
+  return res;
+}
+
+char *
+_pinfo::cmdline (size_t& n)
+{
+  char *s;
+  if (!this || !pid)
+    return NULL;
+  if (pid != myself->pid)
+    {
+      commune_result cr = commune_send (PICOM_CMDLINE);
+      s = cr.s;
+      n = cr.n;
+    }
+  else
+    {
+      n = 1;
+      for (char **a = __argv; *a; a++)
+	n += strlen (*a) + 1;
+      char *p;
+      p = s = (char *) malloc (n);
+      for (char **a = __argv; *a; a++)
+	{
+	  strcpy (p, *a);
+	  p = strchr (p, '\0') + 1;
+	}
+      *p = '\0';
+    }
+  return s;
 }
 
 void
@@ -386,12 +661,22 @@ winpids::enum9x (bool winpid)
   return nelem;
 }
 
+NO_COPY CRITICAL_SECTION winpids::cs;
+
 void
-winpids::init (bool winpid)
+winpids::set (bool winpid)
 {
+  EnterCriticalSection (&cs);
   npids = (this->*enum_processes) (winpid);
   if (pidlist)
     pidlist[npids] = 0;
+  LeaveCriticalSection (&cs);
+}
+
+void
+winpids::init ()
+{
+  InitializeCriticalSection (&cs);
 }
 
 DWORD

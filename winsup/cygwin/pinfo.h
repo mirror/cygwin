@@ -16,7 +16,7 @@ enum
 {
   __SIGFLUSH	    = -2,
   __SIGSTRACE	    = -1,
-  __SIGUNUSED	    =  0,
+  __SIGCOMMUNE	    =  0,
   __SIGOFFSET	    =  2
 };
 
@@ -24,6 +24,19 @@ enum
 
 #include <sys/resource.h>
 #include "thread.h"
+
+struct commune_result
+{
+  char *s;
+  int n;
+  HANDLE handles[2];
+};
+
+enum picom
+{
+  PICOM_CMDLINE = 1,
+  PICOM_FIFO = 2
+};
 
 class _pinfo
 {
@@ -82,6 +95,11 @@ public:
   /* Non-zero if process was stopped by a signal. */
   char stopsig;
 
+  /* commune */
+  pid_t hello_pid;
+  HANDLE tothem;
+  HANDLE fromthem;
+
   void exit (UINT n, bool norecord = 0) __attribute__ ((noreturn, regparm(2)));
 
   inline void set_has_pgid_children ()
@@ -119,12 +137,19 @@ public:
   }
 
   inline void setthread2signal (void *thr) {thread2signal = (pthread *) thr;}
+  void commune_recv ();
+  commune_result commune_send (DWORD, ...);
+  bool alive ();
+  char *cmdline (size_t &);
+
+  friend void __stdcall set_myself (pid_t, HANDLE);
 
 private:
   struct sigaction sigs[NSIG];
   sigset_t sig_mask;		/* one set for everything to ignore. */
   LONG _sigtodo[NSIG + __SIGOFFSET];
-  pthread *thread2signal;  // NULL means means thread any other means a pthread
+  pthread *thread2signal;  // NULL means thread any other means a pthread
+  CRITICAL_SECTION lock;
 };
 
 class pinfo
@@ -180,17 +205,19 @@ class winpids
   DWORD enumNT (bool winpid);
   DWORD enum9x (bool winpid);
   void add (DWORD& nelem, bool, DWORD pid);
+  static CRITICAL_SECTION cs;
 public:
   DWORD npids;
   inline void reset () { npids = 0; release (); }
-  void init (bool winpid);
+  void set (bool winpid);
   winpids (int): enum_processes (&winpids::enum_init) { reset (); }
   winpids (): pidlist (NULL), npidlist (0), pinfolist (NULL),
-	      enum_processes (&winpids::enum_init), npids (0) { init (0); }
+	      enum_processes (&winpids::enum_init), npids (0) { set (0); }
   inline DWORD& winpid (int i) const {return pidlist[i];}
   inline _pinfo *operator [] (int i) const {return (_pinfo *) pinfolist[i];}
   ~winpids ();
   void release ();
+  static void init ();
 };
 
 extern __inline pid_t

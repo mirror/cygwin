@@ -1,6 +1,6 @@
 /* smallprint.c: small print routines for WIN32
 
-   Copyright 1996, 1998, 2000 Cygnus Solutions.
+   Copyright 1996, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -8,21 +8,22 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <stdarg.h>
-#include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-int __small_sprintf (char *dst, const char *fmt,...);
+int __small_sprintf (char *dst, const char *fmt, ...);
 int __small_vsprintf (char *dst, const char *fmt, va_list ap);
 
 static char *
-rn (char *dst, int base, int dosign, int val, int len, int pad)
+rn (char *dst, int base, int dosign, long long val, int len, int pad)
 {
-  /* longest number is 4294967295, 10 digits */
+  /* longest number is ULLONG_MAX, 18446744073709551615, 20 digits */
   unsigned uval;
-  char res[10];
+  char res[20];
   static const char str[16] = "0123456789ABCDEF";
   int l = 0;
 
@@ -107,7 +108,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  continue;
 		case 'c':
 		  {
-		    int c = va_arg (ap,int);
+		    int c = va_arg (ap, int);
 		    if (c > ' ' && c <= 127)
 		      *dst++ = c;
 		    else
@@ -125,8 +126,17 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		case 'd':
 		  dst = rn (dst, 10, addsign, va_arg (ap, int), len, pad);
 		  break;
+		case 'D':
+		  dst = rn (dst, 10, addsign, va_arg (ap, long long), len, pad);
+		  break;
 		case 'u':
 		  dst = rn (dst, 10, 0, va_arg (ap, int), len, pad);
+		  break;
+		case 'U':
+		  dst = rn (dst, 10, 0, va_arg (ap, long long), len, pad);
+		  break;
+		case 'o':
+		  dst = rn (dst, 8, 0, va_arg (ap, unsigned), len, pad);
 		  break;
 		case 'p':
 		  *dst++ = '0';
@@ -134,6 +144,9 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  /* fall through */
 		case 'x':
 		  dst = rn (dst, 16, 0, va_arg (ap, int), len, pad);
+		  break;
+		case 'X':
+		  dst = rn (dst, 16, 0, va_arg (ap, long long), len, pad);
 		  break;
 		case 'P':
 		  if (!GetModuleFileName (NULL, tmp, MAX_PATH))
@@ -153,32 +166,6 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  for (i = 0; *s && i < n; i++)
 		    *dst++ = *s++;
 		  break;
-		case 'F':
-		{
-		  const char *p, *pe;
-		  s = va_arg (ap, char *);
-		  for (p = s; (pe = strchr (p, '(')); p = pe + 1)
-		    if (isalnum ((int)pe[-1]) || pe[-1] == '_')
-		      break;
-		    else if (isspace((int)pe[-1]))
-		      {
-			pe--;
-			break;
-		      }
-		  if (!pe)
-		    pe = strchr (s, '\0');
-		  for (p = pe; p > s; p--)
-		    if (p != pe && *p == ' ')
-		      {
-			p++;
-			break;
-		      }
-		  if (*p == '*')
-		    p++;
-		  while (p < pe)
-		    *dst++ = *p++;
-		  break;
-		}
 		default:
 		  *dst++ = '?';
 		  *dst++ = fmt[-1];
@@ -193,7 +180,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 }
 
 int
-__small_sprintf (char *dst, const char *fmt,...)
+__small_sprintf (char *dst, const char *fmt, ...)
 {
   int r;
   va_list ap;
@@ -204,9 +191,9 @@ __small_sprintf (char *dst, const char *fmt,...)
 }
 
 void
-small_printf (const char *fmt,...)
+small_printf (const char *fmt, ...)
 {
-  char buf[2000];
+  char buf[16384];
   va_list ap;
   DWORD done;
   int count;
@@ -224,6 +211,33 @@ small_printf (const char *fmt,...)
   count = __small_vsprintf (buf, fmt, ap);
   va_end (ap);
 
-  WriteFile (GetStdHandle (STD_ERROR_HANDLE), buf, count, &done, 0);
+  WriteFile (GetStdHandle (STD_ERROR_HANDLE), buf, count, &done, NULL);
   FlushFileBuffers (GetStdHandle (STD_ERROR_HANDLE));
 }
+
+#ifdef DEBUGGING
+static HANDLE NO_COPY console_handle = NULL;
+void
+console_printf (const char *fmt, ...)
+{
+  char buf[16384];
+  va_list ap;
+  DWORD done;
+  int count;
+
+  if (!console_handle)
+    console_handle = CreateFileA ("CON", GENERIC_WRITE,
+				  FILE_SHARE_READ | FILE_SHARE_WRITE,
+				  NULL, OPEN_EXISTING, 0, 0);
+
+  if (console_handle == INVALID_HANDLE_VALUE)
+    console_handle = GetStdHandle (STD_ERROR_HANDLE);
+
+  va_start (ap, fmt);
+  count = __small_vsprintf (buf, fmt, ap);
+  va_end (ap);
+
+  WriteFile (console_handle, buf, count, &done, NULL);
+  FlushFileBuffers (console_handle);
+}
+#endif

@@ -574,8 +574,8 @@
      ("mov$ws2 $hmem8,$Rm")
      (+ OP1_B Rm ws2 hmem8)
      (if ws2 
-	 (set-mem-psw (mem HI (and lmem8 #xFFFE)) Rm ws2)
-	 (set-mem-psw (mem QI lmem8) Rm ws2))
+	 (set-mem-psw (mem HI (and hmem8 #xFFFE)) Rm ws2)
+	 (set-mem-psw (mem QI hmem8) Rm ws2))
      ()
 )
 

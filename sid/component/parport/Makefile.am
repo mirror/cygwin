@@ -13,3 +13,6 @@ libparport_la_LDFLAGS = -module -no-undefined
 DEJAGNUTESTS = parport.exp parportdocs.exp parmonkey.exp
 check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs

@@ -11,6 +11,15 @@
 # PARTICULAR PURPOSE.
 
 
+# Makefile.docs -*- Makefile -*-
+# Copyright (C) 2001 Red Hat.
+# This file is part of SID and is licensed under the GPL.
+# See the file COPYING.SID for conditions for redistribution.
+#
+# ... to be included in document-building Makefile.am's
+#
+
+
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -69,6 +78,7 @@ DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
 LD = @LD@
 LIBTOOL = @LIBTOOL@
+LINKS = @LINKS@
 LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -76,7 +86,9 @@ NM = @NM@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
+SABLOTRON = @SABLOTRON@
 VERSION = @VERSION@
+XSLTPROC = @XSLTPROC@
 lcd_libs = @lcd_libs@
 make_subdirs = @make_subdirs@
 sidtarget_arm = @sidtarget_arm@
@@ -97,6 +109,10 @@ libparport_la_SOURCES = ps2.h ps2.cxx
 libparport_la_LDFLAGS = -module -no-undefined
 
 DEJAGNUTESTS = parport.exp parportdocs.exp parmonkey.exp
+
+html_stylesheet = $(srcdir)/../component_html.xsl
+
+SUFFIXES = .xml .txt .html
 mkinstalldirs = $(SHELL) $(top_srcdir)/../config/mkinstalldirs
 CONFIG_HEADER = ../config.h
 CONFIG_CLEAN_FILES = 
@@ -133,8 +149,8 @@ OBJECTS = $(libparport_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .cxx .lo .o .s
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+.SUFFIXES: .S .c .cxx .html .lo .o .s .txt .xml
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../config/Makefile.docs
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus parport/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -357,6 +373,16 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
+
+@MAINTAINER_MODE_TRUE@@HAVE_XSLTPROC_TRUE@.xml.html:
+@MAINTAINER_MODE_TRUE@@HAVE_XSLTPROC_TRUE@	xsltproc --output $@ $(html_stylesheet) $<
+
+@MAINTAINER_MODE_TRUE@@HAVE_XSLTPROC_FALSE@@HAVE_SABLOTRON_TRUE@.xml.html:
+@MAINTAINER_MODE_TRUE@@HAVE_XSLTPROC_FALSE@@HAVE_SABLOTRON_TRUE@	sabcmd $(html_stylesheet) $< $@
+
+@MAINTAINER_MODE_TRUE@@HAVE_LINKS_TRUE@.html.txt:
+@MAINTAINER_MODE_TRUE@@HAVE_LINKS_TRUE@	links -dump $< > $@
+@MAINTAINER_MODE_TRUE@@HAVE_LINKS_TRUE@	cp $@ $(srcdir)/$@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -1,0 +1,236 @@
+# ------------------------------------------------------------------------
+# 	Makefile for static version of BLT library
+# ------------------------------------------------------------------------
+
+include ../win/makedefs
+
+TARGET        =	i386-mingw32-		# for cross-compilations.
+TARGET        =				# default is native build.
+rc32          =	$(TARGET)windres
+#DUMPEXTS      = $(TCLDIR)/win/dumpexts.exe
+
+# ------------------------------------------------------------------------
+# 	C Compiler options 
+# ------------------------------------------------------------------------
+
+DEFINES       =	-D_X86_=1 -DWIN32 -D_DLL -D_MT -DHAVE_JPEGLIB_H=1
+DEBUG_FLAGS   =	-g
+CFLAGS        =	-O2
+EXTRA_CFLAGS  = 
+CC            =	$(TARGET)gcc.exe 
+
+# ------------------------------------------------------------------------
+# 	Linker flags and options 
+# ------------------------------------------------------------------------
+LD            =	link.exe
+DLLENTRY      =	@12
+SHLIB_LD      =	$(DLLWRAP) $(DLLWRAP_FLAGS)
+SHLIB_LD_FLAGS = $(LDFLAGS) --dll
+#LDFLAGS      = -mwindows -no-cygwin --target=i386-mingw21
+LDFLAGS       =	-mwindows -no-cygwin
+
+NORMAL_LIBS   =	-ltk$(v2) -ltcl$(v2) \
+		-ljpeg \
+		-lwinspool
+
+# ------------------------------------------------------------------------
+# 	Source and target installation directories 
+# ------------------------------------------------------------------------
+
+srcdir        =	.
+instdirs      =	$(prefix) $(exec_prefix) $(bindir) $(libdir) \
+		$(includedir)
+instdirs      =	$(exec_prefix) $(prefix) $(libdir)
+
+# ------------------------------------------------------------------------
+# 	Directories containing Tcl and Tk include files and libraries
+# ------------------------------------------------------------------------
+
+JPEGDIR       =	$(srcdir)/../../jpeg-6b
+TCLDIR        =	$(srcdir)/../../tcl$(v3)
+TKDIR         =	$(srcdir)/../../tk$(v3)
+X11DIR        =	$(TKDIR)
+
+INCLUDES      =	-I. -I$(srcdir) \
+		-I$(TCLDIR)/generic \
+		-I$(TKDIR)/generic \
+		-I$(X11DIR)/xlib 
+
+SHLIB_LD_LIBS =	$(NORMAL_LIBS)
+LIBRARIES     =	$(libname).a $(NORMAL_LIBS) 
+
+#SHLIB_LD_LIBS = $(DEBUG_LIBS) $(JPEGDIR)/libjpeg.lib
+#LIBRARIES    =	$(libname).lib $(DEBUG_LIBS) 
+
+# ------------------------------------------------------------------------
+# 	You don't need to edit anything beyond this point
+# ------------------------------------------------------------------------
+
+N_OBJS =	bltTed.o
+V3_OBJS =	bltTri.o bltGrMt.o 
+
+TK_OBJS =	tkButton.o tkFrame.o tkScrollbar.o 
+
+GRAPH_OBJS =	bltGrAxis.o \
+		bltGrBar.o \
+		bltGrElem.o \
+		bltGrGrid.o \
+		bltGrHairs.o \
+		bltGrLegd.o \
+		bltGrLine.o \
+		bltGrMarker.o \
+		bltGrMisc.o \
+		bltGrPen.o \
+		bltGrPs.o \
+		bltGraph.o 
+
+TCL_ONLY_OBJS =	bltAlloc.o \
+		bltArrayObj.o \
+		bltBgexec.o \
+		bltChain.o \
+		bltDebug.o \
+		bltHash.o \
+		bltList.o \
+		bltNsUtil.o \
+		bltParse.o \
+		bltPool.o \
+		bltSpline.o \
+		bltSwitch.o \
+		bltTree.o \
+		bltTreeCmd.o \
+		bltWinPipe.o \
+		bltUtil.o \
+		bltVector.o \
+		bltVecMath.o \
+		bltVecCmd.o \
+		bltVecObjCmd.o \
+		bltWatch.o  
+
+OBJS =		$(GRAPH_OBJS) \
+		$(TCL_ONLY_OBJS) \
+		bltBeep.o \
+		bltBind.o \
+		bltBitmap.o \
+		bltBusy.o \
+		bltCanvEps.o \
+		bltColor.o \
+		bltConfig.o \
+		bltContainer.o \
+		bltCutbuffer.o \
+		bltDragdrop.o \
+		bltHierbox.o \
+		bltHiertable.o bltHtCmd.o bltHtColumn.o bltHtText.o \
+		bltHtext.o \
+		bltImage.o \
+		bltWinImage.o \
+		bltPs.o \
+		bltTable.o \
+		bltTabnotebook.o \
+		bltTabset.o \
+		bltText.o \
+		bltTile.o \
+		bltTreeView.o \
+		bltTreeViewCmd.o \
+		bltTreeViewEdit.o \
+		bltTreeViewColumn.o \
+		bltTreeViewStyle.o \
+		bltWindow.o \
+		bltObjConfig.o \
+		bltWinop.o \
+		$(TK_OBJS) $(N_OBJS) 
+
+# GNU Make-specific macro
+HEADERS       =	blt.h
+SRCS          =	$(patsubst %.o,$(srcdir)/%.c,$(OBJS)) 
+exec_name     = bltwish
+demo          =	$(exec_name).exe
+demo2         =	$(exec_name)$(version).exe
+libname       =	BLT$(version)
+version       =	$(BLT_MAJOR_VERSION)$(BLT_MINOR_VERSION)
+
+CC_SWITCHES   =	$(CFLAGS) $(EXTRA_CFLAGS) $(DEFINES) $(INCLUDES)
+AR            =	$(TARGET)ar.exe
+RANLIB        =	$(TARGET)ranlib.exe
+AS            =	$(TARGET)as.exe
+DLLTOOL       =	$(TARGET)dlltool
+DLLTOOL_FLAGS =	--as $(AS)
+DLLWRAP       =	$(TARGET)dllwrap
+DLLWRAP_FLAGS =	--driver-name $(CC) --as $(AS) \
+		--dlltool-name $(DLLTOOL)
+LIB           =	lib.exe
+LINT          =	lint.exe
+LINTFLAGS     =	-axhbns
+VPATH         =	$(srcdir)
+
+all: build-library build-dll build-demo
+
+build-demo: build-library $(demo)
+
+build-library: $(libname)_s.a $(libname).dll
+
+build-dll: $(libname)_s.a build-library 
+
+$(demo): build-library $(DEMO_OBJS)
+	$(RM) $(demo)
+	$(CC) -o $@ $(LDFLAGS) $(DEMO_OBJS) $(LIBRARIES)
+
+$(libname)_s.a: $(OBJS)
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ $(OBJS)
+	$(RANLIB) $@
+
+$(libname).def: $(OBJS)
+	$(DLLTOOL) $(DLLTOOL_FLAGS) --export-all --output-def $@ $(OBJS)
+
+$(libname).a: $(libname).def
+	$(DLLTOOL) $(DLLTOOL_FLAGS) --dllname $(libname).dll \
+		--def $(libname).def --output-lib $@
+
+$(libname).dll: $(libname).a
+	$(RM) $(libname).dll
+	$(DLLWRAP) $(DLLWRAP_FLAGS) -o $@ --def $(libname).def \
+		$(OBJS) $(SHLIB_LD_FLAGS) $(SHLIB_LD_LIBS)
+
+bltHash.h: bltHash.h.in
+	sed -e 's/@SIZEOF_VOID_P@/4/' \
+	    -e 's/@SIZEOF_INT@/4/' \
+	    -e 's/@SIZEOF_LONG@/4/' \
+	    -e 's/@SIZEOF_LONG_LONG@/8/' \
+	    -e 's/@HAVE_INTTYPES_H@/0/' \
+	    bltHash.h.in > bltHash.h
+
+install: install-dirs install-lib install-headers install-demo
+
+install-dirs:
+	@for i in $(instdirs) ; do \
+	    if test ! -d "$$i" ; then \
+		echo " mkdir $$i" ; \
+		mkdir "$$i" ; \
+	    fi ; \
+        done
+
+install-demo: 
+	$(INSTALL) $(demo) $(bindir)/$(demo)
+	$(INSTALL) $(demo) $(bindir)/$(demo2)
+
+install-lib: $(libname).dll install-dirs 
+	$(INSTALL_DATA) $(libname).dll $(bindir)
+
+install-headers:
+	for i in $(HEADERS) ; do \
+	    echo "installing $(includedir)/$$i..." ; \
+	    $(INSTALL_DATA) "$(srcdir)/$$i" $(includedir) ; \
+	done
+
+lint:
+	$(LINT) $(LINTFLAGS) $(DEFINES) $(INCLUDES) $(SRCS)
+
+clean:
+	$(RM) $(OBJS) $(DEMO_OBJS) $(libname)* $(exec_name)*
+	$(RM) $(srcdir)/*.bak $(srcdir)/*\~ $(srcdir)/"#"*  
+
+distclean: clean
+	$(RM) Makefile
+
+.c.o:
+	$(CC) -c $(CC_SWITCHES) -o $*.o $<

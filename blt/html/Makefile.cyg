@@ -1,0 +1,32 @@
+# ------------------------------------------------------------------------
+# 	Makefile for HTML files
+# ------------------------------------------------------------------------
+
+include ../win/makedefs
+
+INSTALL_DATA =	install -m 0644
+
+RM =		rm -f
+SHELL =		bash
+srcdir =	.
+
+instdirs =	$(prefix) $(libdir) $(scriptdir) $(scriptdir)/html 
+
+all: 
+
+install: install-dirs install-html
+
+install-dirs:
+	@for i in $(instdirs) ; do \
+	    if test -d "$$i" ; then : ; else mkdir "$$i" ; fi ; \
+        done
+
+install-html: install-dirs
+	for i in $(srcdir)/*.html ; do \
+	    $(INSTALL_DATA) $(srcdir)/$$i $(scriptdir)/html ; \
+	done 
+
+clean:
+	
+distclean: clean
+	$(RM) $(srcdir)/*.bak $(srcdir)/*\~ $(srcdir)/"#"* Makefile

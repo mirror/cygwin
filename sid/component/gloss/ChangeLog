@@ -1,3 +1,8 @@
+2001-10-10  Frank Ch. Eigler  <fche@redhat.com>
+
+	On advice of Keith Rautenbach <Keith.Rautenbach@insignia.com>:
+	* angel.h (syscalls): Correct read<->readc, elaborate.
+
 2001-09-26  Ben Elliston  <bje@redhat.com>
 
 	* gloss.h (gloss32::get_string): Give length parameter a default

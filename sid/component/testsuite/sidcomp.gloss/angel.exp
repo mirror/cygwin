@@ -109,8 +109,8 @@ set syscalls(close) 2
 set syscalls(writec) 3
 set syscalls(write0) 4
 set syscalls(write) 5
-set syscalls(readc) 6
-set syscalls(read) 7
+set syscalls(read) 6
+set syscalls(readc) 7
 set syscalls(iserror) 8
 set syscalls(istty) 9
 set syscalls(seek) 10

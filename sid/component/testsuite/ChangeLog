@@ -1,3 +1,7 @@
+2001-10-10  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.gloss/angel.exp (syscalls): Correct read<->readc numbers.
+
 2001-09-28  Frank Ch. Eigler  <fche@redhat.com>
 	
 	* lib/cpudefs.exp (run-sid-tests-raw, run-one-sid-tests):

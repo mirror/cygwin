@@ -57,13 +57,14 @@ newTextSection (int index)
 int
 textSectionAddress (unsigned long long address, const struct TextSection *section_table)
 {
+  int i;
+
   // Not a text section address if there is no table.
   if (! section_table)
     return 0;
 
   /* The table begins with the given pointer and is terminated by an entry with
      zeroes for both the high and low bounds.  */
-  int i;
   for (i = 0; section_table[i].lbound != 0 || section_table[i].hbound != 0; i++)
     {
       if (section_table[i].lbound <= address

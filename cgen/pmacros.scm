@@ -560,7 +560,7 @@
 
   ; doesn't work, Hobbit creates "eval" variable
   ;(-pmacro-set! '.eval (-pmacro-make '.eval '(expr) #f eval "eval"))
-  (-pmacro-set! '.eval (-pmacro-make '.eval '(expr) #f (eval1 'eval) "eval"))
+  (-pmacro-set! '.eval (-pmacro-make '.eval '(expr) #f (eval1 'eval1) "eval"))
 )
 
 ; Initialize so we're ready to use after loading.

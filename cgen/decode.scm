@@ -437,17 +437,19 @@
 		      ; Oh My God.  This isn't tail recursive.
 		      (if (null? bl)
 			  0
-			  (+ (if (bit-set? val
-					   (if lsb0?
-					       (car bl)
-					       (- insn-len (car bl) 1)))
-				 (integer-expt 2 (- (length bl) 1))
-				 0)
+			  (+ (if (> (car bl) insn-len)
+				 0
+				 (if (bit-set? val
+					       (if lsb0?
+						   (car bl)
+						   (- insn-len (car bl) 1)))
+				     (integer-expt 2 (- (length bl) 1))
+				     0))
 			     (compute val insn-len decode-len (cdr bl)))))))
     (let* ((opcode (compute (insn-value insn) insn-len decode-len bitnums))
 	   (opcode-mask (compute (insn-base-mask insn) insn-len decode-len bitnums))
 	   (indices (missing-bit-indices opcode-mask (- (integer-expt 2 decode-len) 1))))
-      (logit 3 "insn =" (obj:name insn) " opcode=" opcode " indices=" indices "\n")
+      (logit 3 "insn =" (obj:name insn) " insn-value=" (insn-value insn) " insn-base-mask=" (insn-base-mask insn) " insn-len=" insn-len " decode-len=" decode-len " opcode=" opcode " opcode-mask=" opcode-mask " indices=" indices "\n")
       (map (lambda (index) (+ opcode index)) indices)))
 )
 

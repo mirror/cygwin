@@ -147,7 +147,8 @@ AUTOMAKE_OPTIONS = cygnus
 
 noinst_LIBRARIES = libgui.a
 
-@INSTALL_LIBGUI_TRUE@include_HEADERS = 	guitcl.h subcommand.h
+@INSTALL_LIBGUI_TRUE@include_HEADERS = @INSTALL_LIBGUI_TRUE@\
+@INSTALL_LIBGUI_TRUE@	guitcl.h subcommand.h
 
 datadir = @datadir@
 guidir = $(datadir)/cygnus/gui
@@ -165,13 +166,25 @@ TBL_COMMAND = table
 
 LIBGUI_CFLAGS = @LIBGUI_CFLAGS@
 
-INCLUDES = $(LIBGUI_CFLAGS) $(TCLHDIR) $(TKHDIR) $(TK_XINCLUDES) $(TCL_DEFS) $(TK_DEFS) $(TKHDIR)/../unix $(TKHDIR)/../win -DTBL_VERSION=\"$(TBL_VERSION)\" -DTBL_COMMAND=\"$(TBL_COMMAND)\" -DTBL_RUNTIME=\"tkTable.tcl\" -DTBL_RUNTIME_DIR=\"$(guidir)\"
+INCLUDES = $(LIBGUI_CFLAGS) $(TCLHDIR) \
+$(TKHDIR) \
+$(TK_XINCLUDES) $(TCL_DEFS) $(TK_DEFS) \
+$(TKHDIR)/../unix $(TKHDIR)/../win \
+-DTBL_VERSION=\"$(TBL_VERSION)\"\
+-DTBL_COMMAND=\"$(TBL_COMMAND)\"\
+-DTBL_RUNTIME=\"tkTable.tcl\" -DTBL_RUNTIME_DIR=\"$(guidir)\"
 
 
-TKTABLE_SOURCES = tkTable.c tkTableCell.c tkTableCellSort.c tkTableCmds.c tkTableEdit.c tkTableTag.c tkTableWin.c tkTableUtil.c
+TKTABLE_SOURCES = tkTable.c tkTableCell.c tkTableCellSort.c \
+tkTableCmds.c tkTableEdit.c tkTableTag.c tkTableWin.c tkTableUtil.c
 
 
-libgui_a_SOURCES = guitcl.h paths.c subcommand.c subcommand.h xpmlib.c tclmain.c tkGraphCanvas.c tkCanvEdge.c tkCanvLayout.c tkCanvLayout.h tclhelp.c tclgetdir.c tclwinprint.c tclsizebox.c tclshellexe.c tclmapi.c tclwinfont.c	tclwingrab.c tclwinmode.c tclwinpath.c tclmsgbox.c tclcursor.c tkWinPrintText.c tkWinPrintCanvas.c tkWarpPointer.c $(TKTABLE_SOURCES)
+libgui_a_SOURCES = guitcl.h paths.c subcommand.c subcommand.h \
+xpmlib.c tclmain.c tkGraphCanvas.c \
+tkCanvEdge.c tkCanvLayout.c tkCanvLayout.h tclhelp.c tclgetdir.c \
+tclwinprint.c tclsizebox.c tclshellexe.c tclmapi.c tclwinfont.c	\
+tclwingrab.c tclwinmode.c tclwinpath.c tclmsgbox.c tclcursor.c \
+tkWinPrintText.c tkWinPrintCanvas.c tkWarpPointer.c $(TKTABLE_SOURCES)
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 CONFIG_HEADER = ../config.h

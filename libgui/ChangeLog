@@ -1,3 +1,7 @@
+2001-09-08  Ian Roxborough <irox@redhat.com>
+
+	* all: Tcl/Tk8.3 upgrade merge.
+
 2001-09-02  Martin M. Hunt  <hunt@redhat.com>
 
 	* library/panedwindow.tcl (fraction): Remove method.
@@ -119,6 +123,27 @@
 	help_command_data->help_dir member allocated in
 	help_initialize_command.
 
+2001-08-02  Mo DeJong  <mdejong@redhat.com>
+
+	* src/tkGraphCanvas.c (GetEdgeNodes): Use ckalloc
+	and strcpy instead of calling strdup() since this
+	memory is deallocated with ckfree() later on.
+
+2001-08-02  Mo DeJong  <mdejong@redhat.com>
+
+	* Makefile.in: Regen.
+	* configure: Regen.
+	* configure.in: Check for cross AR using the
+	AC_CHECK_TOOL macro to fix cross compile. Use
+	AC_CHECK_TOOL instead of AC_PROG_RANLIB for
+	ranlib. The ranlib change is not required
+	but it is more correct. Move the call to
+	AC_CANONICAL_HOST up in the file. Don't
+	set or subst ITCL_DIR since it is not used
+	and depends on pre Itcl 3.1 paths.
+	* library/Makefile.in: Regen.
+	* src/Makefile.in: Regen.
+	
 2001-05-18  Keith Seitz  <keiths@cygnus.com>
 
 	* library/center.tcl (center_window): Allow centering

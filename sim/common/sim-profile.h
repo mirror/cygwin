@@ -65,6 +65,10 @@ enum {
  | (1 << PROFILE_MODEL_IDX) \
  | (1 << PROFILE_CORE_IDX))
 
+/* Utility to set profile options.  */
+SIM_RC set_profile_option_mask (SIM_DESC sd_, const char *name_, int mask_,
+				const char *arg_);
+
 /* Utility to parse a --profile-<foo> option.  */
 /* ??? On the one hand all calls could be confined to sim-profile.c, but
    on the other hand keeping a module's profiling option with the module's
@@ -145,6 +149,10 @@ typedef struct {
      It is always computed, regardless of insn profiling.  */
   unsigned long total_insn_count;
 #define PROFILE_TOTAL_INSN_COUNT(p) ((p)->total_insn_count)
+
+  /* CPU frequency.  Always accepted, regardless of profiling options.  */
+  unsigned long cpu_freq;
+#define PROFILE_CPU_FREQ(p) ((p)->cpu_freq)
 
 #if WITH_PROFILE_INSN_P
   unsigned int *insn_count;

@@ -1,0 +1,67 @@
+# refill.exp -*- Tcl -*-
+# Test cache line refilling.
+#
+# Use hw-cache-buffer-8, a small cache memory, that makes it easy to cause refills.
+
+# Copyright (C) 2002 Red Hat, Inc.
+
+source $srcdir/$subdir/utils.exp
+
+set test "sid startup"
+sid_config_component_test_with_tracing "cache.conf" \
+        "load libcache.la cache_component_library" \
+        "hw-cache-buffer-8"
+if {[sid_start "cache.conf"]} { pass $test } else { fail $test; return }
+
+set test "acquire upstream bus handle"
+set cache_bus [sid_cmd "sid::component::find_bus $victim upstream"]
+if {$cache_bus != ""} { pass $test } else { fail $test }
+
+set test "generate test bus for downstream"
+set mem_bus [sid_cmd "sid::bus::new"]
+if {$mem_bus == ""} { fail $test } else { pass $test }
+
+set test "connect test bus to cache"
+set result [sid_cmd "sid::component::connect_accessor $victim downstream $mem_bus"]
+if {$result == "ok"} { pass $test } else { fail $test }
+
+instrument_bus $mem_bus
+set result [sid_cmd "sid::component::set_attribute_value $victim miss-latency 5"]
+
+# read a 32-bit word from 0x100
+set test "read from 0x100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l4 $cache_bus 0x100"]
+assert_miss
+
+# read another 32-bit word from 0x1000
+set test "read from 0x1000 (use miss latency)"
+clear_miss_flag
+set result [lindex [sid_cmd "sid::bus::read_h4_l4 $cache_bus 0x1000"] 0]
+set status [lindex $result 0]
+set latency [lindex $result 1]
+if {$status == "ok" && $latency == 5} { pass $test } else { fail $test }
+
+# now specify a refill latency and look for read latency=15
+set result [sid_cmd "sid::component::set_attribute_value $victim refill-latency 10"]
+
+# read a 32-bit word from 0x100
+set test "read from 0x100"
+clear_miss_flag
+set result [sid_cmd "sid::bus::read_h4_l4 $cache_bus 0x100"]
+assert_miss
+
+# read another 32-bit word from 0x1000
+set test "read from 0x1000 (use refill latency)"
+clear_miss_flag
+set result [lindex [sid_cmd "sid::bus::read_h4_l4 $cache_bus 0x1000"] 0]
+set status [lindex $result 0]
+set latency [lindex $result 1]
+if {$status == "ok" && $latency == 15} { pass $test } else { fail $test }
+
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test; return }
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "cache.conf" }

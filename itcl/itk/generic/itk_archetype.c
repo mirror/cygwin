@@ -54,6 +54,11 @@ typedef struct ArchComponent {
     ItclMember *member;         /* contains protection level for this comp */
     Tcl_Command accessCmd;      /* access command for component widget */
     Tk_Window tkwin;            /* Tk window for this component widget */
+    char *pathName;             /* Tk path name for this component widget.
+                                   We can't use the tkwin pointer after
+                                   the window has been destroyed so we
+                                   need to save a copy for use in
+                                   Itk_ArchCompDeleteCmd() */
 } ArchComponent;
 
 /*
@@ -791,10 +796,10 @@ Itk_ArchCompAddCmd(dummy, interp, objc, objv)
     oldFramePtr = _Tcl_ActivateCallFrame(interp, uplevelFramePtr);
 
       /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0
-    if (Tcl_EvalObj(interp, objv[2]) != TCL_OK) {
-#else
+#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
     if (Tcl_EvalObj(interp, objv[2], 0) != TCL_OK) {
+#else
+    if (Tcl_EvalObj(interp, objv[2]) != TCL_OK) {
 #endif
       /* END CYGNUS LOCAL */
         goto compFail;
@@ -986,10 +991,10 @@ Itk_ArchCompAddCmd(dummy, interp, objc, objv)
 
     if (result == TCL_OK) {
       /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0
-      result = Tcl_EvalObj(interp, objPtr);
-#else
+#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
       result = Tcl_EvalObj(interp, objPtr, 0);
+#else
+      result = Tcl_EvalObj(interp, objPtr);
 #endif
       /* END CYGNUS LOCAL */
       Tcl_PopCallFrame(interp);
@@ -1112,6 +1117,8 @@ Itk_ArchCompDeleteCmd(dummy, interp, objc, objv)
     ArchComponent *archComp;
     ArchOption *archOpt;
     ArchOptionPart *optPart;
+    Itcl_List delOptList;
+    Tcl_DString buffer;
 
     /*
      *  Get the Archetype info associated with this widget.
@@ -1143,8 +1150,31 @@ Itk_ArchCompDeleteCmd(dummy, interp, objc, objv)
             return TCL_ERROR;
         }
         archComp = (ArchComponent*)Tcl_GetHashValue(entry);
+
+       /*
+        *  Clean up the binding tag that causes the widget to
+        *  call this method automatically when destroyed.
+        *  Ignore errors if anything goes wrong.
+        */
+        Tcl_DStringInit(&buffer);
+        Tcl_DStringAppend(&buffer, "itk::remove_destroy_hook ", -1);
+        Tcl_DStringAppend(&buffer, archComp->pathName, -1);
+        (void) Tcl_Eval(interp, Tcl_DStringValue(&buffer));
+        Tcl_ResetResult(interp);
+        Tcl_DStringFree(&buffer);
+
+        Tcl_UnsetVar2(interp, "itk_component", token, 0);
         Tcl_DeleteHashEntry(entry);
 
+        /*
+         *  Clean up the options that belong to the component.  Do this
+         *  by scanning through all available options and looking for
+         *  those that belong to the component.  If we remove them as
+         *  we go, we'll mess up Tcl_NextHashEntry.  So instead, we
+         *  build up a list of options to remove, and then remove the
+         *  options below.
+         */
+        Itcl_InitList(&delOptList);
         entry = Tcl_FirstHashEntry(&info->options, &place);
         while (entry) {
             archOpt = (ArchOption*)Tcl_GetHashValue(entry);
@@ -1152,15 +1182,27 @@ Itk_ArchCompDeleteCmd(dummy, interp, objc, objv)
             while (elem) {
                 optPart = (ArchOptionPart*)Itcl_GetListValue(elem);
                 if (optPart->from == (ClientData)archComp) {
-                    Itk_DelOptionPart(optPart);
-                    elem = Itcl_DeleteListElem(elem);
+                    Itcl_AppendList(&delOptList, (ClientData)entry);
                 }
-                else {
-                    elem = Itcl_NextListElem(elem);
-                }
+                elem = Itcl_NextListElem(elem);
             }
             entry = Tcl_NextHashEntry(&place);
         }
+
+        /*
+         *  Now that we've figured out which options to delete,
+         *  go through the list and remove them.
+         */
+        elem = Itcl_FirstListElem(&delOptList);
+        while (elem) {
+            entry = (Tcl_HashEntry*)Itcl_GetListValue(elem);
+            token = Tcl_GetHashKey(&info->options, entry);
+
+            Itk_RemoveArchOptionPart(info, token, (ClientData)archComp);
+
+            elem = Itcl_NextListElem(elem);
+        }
+        Itcl_DeleteList(&delOptList);
 
         Itk_DelArchComponent(archComp);
     }
@@ -1544,10 +1586,10 @@ Itk_ArchOptUsualCmd(clientData, interp, objc, objv)
     if (entry) {
         codePtr = (Tcl_Obj*)Tcl_GetHashValue(entry);
       /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0
-        return Tcl_EvalObj(interp, codePtr);
-#else
+#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
         return Tcl_EvalObj(interp, codePtr, 0);
+#else
+        return Tcl_EvalObj(interp, codePtr);
 #endif
       /* END CYGNUS LOCAL */
     }
@@ -3134,6 +3176,8 @@ Itk_CreateArchComponent(interp, info, name, cdefn, accessCmd)
     archComp->member     = memPtr;
     archComp->accessCmd  = accessCmd;
     archComp->tkwin      = tkwin;
+    archComp->pathName   = (char *) ckalloc((unsigned)(strlen(wname)+1));
+    strcpy(archComp->pathName, wname);
 
     return archComp;
 }
@@ -3152,6 +3196,7 @@ Itk_DelArchComponent(archComp)
     ArchComponent *archComp;  /* pointer to component data */
 {
     ckfree((char*)archComp->member);
+    ckfree((char*)archComp->pathName);
     ckfree((char*)archComp);
 }
 
@@ -4043,10 +4088,10 @@ Itk_CreateGenericOpt(interp, switchName, accessCmd)
     Tcl_AppendToObj(codePtr, name, -1);
 
       /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0
-    if (Tcl_EvalObj(interp, codePtr) != TCL_OK) {
+#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
+    if (Tcl_EvalObj(interp, codePtr, 0) != TCL_OK) {
 #else
-      if (Tcl_EvalObj(interp, codePtr, 0) != TCL_OK) {
+      if (Tcl_EvalObj(interp, codePtr) != TCL_OK) {
 #endif
       /* END CYGNUS LOCAL */
         goto optionDone;

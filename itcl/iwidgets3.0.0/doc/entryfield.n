@@ -115,6 +115,16 @@ Name of font to use for display of text in entryfield.  The value
 may be given in any of the forms acceptable to \fBTk_GetFont\fR.
 .LP
 .nf
+Name:	\fBpasting\fR
+Class:	\fBBehavior\fR
+Command-Line Switch:	\fB-pasting\fR
+.fi
+.IP
+Option to enable/disable pasting into the entry component of the
+entryfield.  Valid values are 0 (disabled) or 1 (enabled).
+Defaults to 1.
+.LP
+.nf
 Name:	\fBvalidate\fR
 Class:	\fBCommand\fR
 Command-Line Switch:	\fB-validate\fR

@@ -117,6 +117,14 @@ ______________________________________________________________________________
 
 >> Changed component option basis to be that of the "usuals".
 
+>> Added a -pasting configuration option to allow user to enable/disable
+   pasting into the entry component of the entryfield. csmith@adc.com
+   (Chad Smith)
+
+>> Removed hardcoded state comparisons in the _keyPress method and replaced
+   with code to mask out <Ctrl> and <Alt> keypress events. csmith@adc.com
+   (Chad Smith)
+
 
 Pushbutton
 ______________________________________________________________________________

@@ -13,6 +13,9 @@
 #
 # @(#) $Id: scrolledhtml.test
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -42,7 +45,7 @@ incr c
 #
 test Scrolledhtml-2.$o {configuration option} {
     llength [.sh configure]
-} {57}
+} {58}
 
 incr o
 
@@ -195,3 +198,6 @@ test Scrolledhtml-1.$c {Scrolledhtml destruction} {
     destroy .sh
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

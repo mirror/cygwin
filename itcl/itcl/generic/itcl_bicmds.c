@@ -22,7 +22,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id: itcl_bicmds.c,v 1.2 1999/01/27 18:56:04 jingham Exp $
+ *     RCS:  $Id: itcl_bicmds.c,v 1.2.172.1 2001/05/18 02:21:42 mdejong Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -841,6 +841,10 @@ Itcl_BiInfoClassCmd(dummy, interp, objc, objv)
      */
     if (contextObj) {
         contextNs = contextObj->classDefn->namesp;
+    } else {
+      assert(contextClass != NULL);
+      assert(contextClass->namesp != NULL);
+      contextNs = contextClass->namesp;
     }
 
     if (contextNs->parentPtr == activeNs) {

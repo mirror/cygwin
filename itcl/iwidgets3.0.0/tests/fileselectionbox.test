@@ -11,7 +11,10 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# @(#) $Id: fileselectionbox.test,v 1.2 1999/01/27 18:56:40 jingham Exp $
+# @(#) $Id: fileselectionbox.test,v 1.2.172.1 2001/05/18 02:21:49 mdejong Exp $
+
+package require tcltest
+namespace import -force ::tcltest::*
 
 package require Iwidgets 3.0
 
@@ -193,3 +196,6 @@ test Fileselectionbox-1.$o {Fileselectionbox -childsitepos} {
     update
     destroy .fsb
 } {}
+
+::tcltest::cleanupTests
+exit

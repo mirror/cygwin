@@ -30,7 +30,7 @@ See the "options" manual entry for details on the standard options.
 .LP
 .nf
 .ta 4c 8c 12c
-\fBselectMode\fR
+\fBselectMode\fR	\fBlistvariable\fR
 .fi
 .LP
 See the "listbox" widget manual entry for details on the above
@@ -257,9 +257,9 @@ The following widget commands are possible for scrolledlistbox widgets:
 .nf
 .ta 4c 8c 12c
 \fBactivate\fR	\fBbbox\fR	\fBcurselection\fR	\fBdelete\fR
-\fBget\fR	\fBindex\fR	\fBinsert\fR	\fBnearest\fR
-\fBscan\fR	\fBsee\fR	\fBselection\fR	\fBsize\fR
-\fBxview\fR	\fByview\fR
+\fBget\fR	\fBindex\fR	\fBinsert\fR	\fBitemconfigure\fR
+\fBnearest\fR	\fBscan\fR	\fBsee\fR	\fBselection\fR
+\fBsize\fR	\fBxview\fR	\fByview\fR
 .fi
 .LP
 See the "listbox" manual entry for details on the associated methods.

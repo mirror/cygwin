@@ -46,6 +46,16 @@ Command-Line Switch:    \fB-command\fR
 Specifies a Tcl command procedure to be evaluated following a  change in 
 the current check box selection.
 .LP
+.nf
+Name:   \fBorient\fR
+Class:  \fBOrient\fR
+Command-Line Switch:    \fB-orient\fR
+Default Value:  \fBvertical\fR
+.fi
+.IP
+Specifies the orientation of the checkbuttons within the checkbox.  Valid
+values are either "horizontal" or "vertical".
+.LP
 .BE
 
 .SH DESCRIPTION

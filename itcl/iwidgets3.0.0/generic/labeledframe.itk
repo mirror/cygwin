@@ -105,14 +105,20 @@ class iwidgets::Labeledframe {
   public method clientHandlesConfigure {{yes 1}}
 
   #
-  # Private methods
+  # Protected methods
   #
-  private {
-    method smt {value} { _setMarginThickness $value }
+
+  protected {
     method _positionLabel {{when later}}
     method _collapseMargin {}
     method _setMarginThickness {value}
+    method smt {value} { _setMarginThickness $value }
+  }
 
+  #
+  # Private methods/data
+  #
+  private {
     proc _initTable {}
 
     variable _reposition ""  ;# non-null => _positionLabel pending

@@ -4,14 +4,9 @@
  *	This file implements the Dll entry point as needed by Windows.
  */
 
-/* 
- * dllEntryPoint.c --
- *
- *	This file implements the Dll entry point as needed by Windows.
- */
-
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+/* CYGNUS LOCAL */
 #include <tcl.h>
 
 /*
@@ -20,15 +15,21 @@
 
 BOOL APIENTRY		DllMain _ANSI_ARGS_((HINSTANCE hInst,
 			    DWORD reason, LPVOID reserved));
+/* END CYGNUS LOCAL */
 
-/* CYGNUS LOCAL */
+/*
+#if defined(_MSC_VER)
+#   define DllEntryPoint DllMain
+#endif
+*/
+
 #ifdef __CYGWIN32__
 
 /* cygwin32 requires an impure pointer variable, which must be
    explicitly initialized when the DLL starts up.  */
 struct _reent *_impure_ptr;
 extern struct _reent *_imp__reent_data;
-#endif
+#endif /* __CYGWIN32__ */
 
 /*
  *----------------------------------------------------------------------

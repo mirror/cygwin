@@ -1,255 +1,339 @@
-<HTML>
-<HEAD>
-<TITLE>iwidgets2.2.0 User Commands - fileselectiondialog</TITLE>
-</HEAD>
-<BODY BGCOLOR="#FFFFFF">
-<H1>iwidgets2.2.0 User Commands - fileselectiondialog</H1>
-<HR>
-<PRE>
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-</PRE>
-<H2>NAME</H2><PRE>
-     fileselectiondialog - Create and manipulate a file selection
-     dialog widget
-
-
-</PRE>
-<H2>SYNOPSIS</H2><PRE>
-     <STRONG>fileselectiondialog</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
-
-
-</PRE>
-<H2>INHERITANCE</H2><PRE>
-     itk::Toplevel  &lt;-  Shell  &lt;-  Dialogshell   &lt;-   Dialog   &lt;-
-     Fileselectiondialog
-
-
-</PRE>
-<H2>STANDARD OPTIONS</H2><PRE>
-     <STRONG>activeBackground</STRONG>               <STRONG>background</STRONG>      <STRONG>borderWidthcursor</STRONG>
-     <STRONG>foreground</STRONG>      <STRONG>highlightColor</STRONG> <STRONG>highlightThicknessinsertBackground</STRONG>
-     <STRONG>insertBorderWidth</STRONG>              <STRONG>insertOffTime</STRONG>   <STRONG>insertOnTimeinsertWidth</STRONG>
-     <STRONG>relief</STRONG>          <STRONG>repeatDelay</STRONG>    <STRONG>repeatInterval</STRONG>  <STRONG>selectBackground</STRONG>
-     <STRONG>selectBorderWidth</STRONG>              <STRONG>selectForeground</STRONG>
-
-     See the "options" manual entry for details on  the  standard
-     options.
-
-
-</PRE>
-<H2>ASSOCIATED OPTIONS</H2><PRE>
-     <STRONG>textBackground</STRONG>  <STRONG>textFont</STRONG>
-
-     See the "entryfield" widget manual entry for details on  the
-     above associated options.
-
-     <STRONG>childSitePos</STRONG>    <STRONG>directory</STRONG>      <STRONG>dirsLabel</STRONG>       <STRONG>dirSearchCommand</STRONG>
-     <STRONG>dirsFraction</STRONG>    <STRONG>dirsLabelPos</STRONG>   <STRONG>dirsOn</STRONG>          <STRONG>filesLabel</STRONG>
-     <STRONG>filesLabelOn</STRONG>    <STRONG>fileSearchCommand</STRONG>              <STRONG>filesLabelPosfilesOn</STRONG>
-     <STRONG>fileType</STRONG>        <STRONG>filterLabel</STRONG>    <STRONG>filterLabelPos</STRONG>  <STRONG>filterOn</STRONG>
-     <STRONG>invalid</STRONG>         <STRONG>mask</STRONG>           <STRONG>noMatchString</STRONG>   <STRONG>selectionCommand</STRONG>
-     <STRONG>selectionLabel</STRONG>  <STRONG>selectionLabelPos</STRONG>              <STRONG>selectionOnstyle</STRONG>
-     <STRONG>vertMargin</STRONG>
-
-     See the "fileselectionbox" widget manual entry  for  details
-     on the above associated options.
-
-     <STRONG>labelFont</STRONG>       <STRONG>labelMargin</STRONG>
-
-     See the "labeledwidget" widget manual entry for  details  on
-     the above associated options.
-
-     <STRONG>horizMargin</STRONG>     <STRONG>hscrollMode</STRONG>    <STRONG>sbWidth</STRONG>         <STRONG>scrollMargin</STRONG>
-     <STRONG>textBackground</STRONG>  <STRONG>textFont</STRONG>       <STRONG>vScrollMode</STRONG>
-
-     See the "scrolledlistbox" widget manual entry for details on
-     the above associated options.
-
-
-     <STRONG>activeRelief</STRONG>    <STRONG>elementBorderWidth</STRONG>             <STRONG>jumptroughColor</STRONG>
-
-     See the "scrollbar" widget class manual entry for details on
-     the above associated options.
-
-
-
-</PRE>
-<H2>INHERITED OPTIONS</H2><PRE>
-     <STRONG>buttonBoxPadX</STRONG>   <STRONG>buttonBoxPadY</STRONG>  <STRONG>buttonBoxPos</STRONG>    <STRONG>padX</STRONG>
-     <STRONG>padY</STRONG>            <STRONG>separator</STRONG>      <STRONG>thickness</STRONG>
-
-     See the "dialogshell" widget manual entry for details on the
-     above inherited options.
-
-     <STRONG>master</STRONG>          <STRONG>modality</STRONG>       <STRONG>title</STRONG>
-
-     See the "shell" widget manual entry for details on the above
-     inherited options.
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC OPTIONS</H2><PRE>
-     Name:           <STRONG>height</STRONG>
-     Class:          <STRONG>Height</STRONG>
-     Command-Line Switch:           <STRONG>-height</STRONG>
-
-          Specifies the height of the file selection dialog.  The
-          value  may  be specified in any of the forms acceptable
-          to Tk_GetPixels.  The default is 435 pixels.
-
-     Name:           <STRONG>width</STRONG>
-     Class:          <STRONG>Width</STRONG>
-     Command-Line Switch:           <STRONG>-width</STRONG>
-
-          Specifies the width of the file selection dialog.   The
-          value  may  be specified in any of the forms acceptable
-          to Tk_GetPixels.  The default is 450 pixels.
-
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-
-</PRE>
-<H2>DESCRIPTION</H2><PRE>
-     The <STRONG>fileselectiondialog</STRONG> command  creates  a  file  selection
-     dialog  similar  to the OSF/Motif standard composite widget.
-     The fileselectiondialog is derived from the Dialog class and
-     is  composed  of  a  FileSelectionBox with attributes set to
-     manipulate the dialog buttons.
-
-
-
-</PRE>
-<H2>METHODS</H2><PRE>
-     The <STRONG>fileselectiondialog</STRONG> command creates a  new  Tcl  command
-     whose  name is <EM>pathName</EM>.  This command may be used to invoke
-     various operations on the widget.  It has the following gen-
-     eral form:
-
-          <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
-
-     <EM>Option</EM> and the <EM>arg</EM>s determine the exact behavior of the com-
-     mand.   The  following  commands are possible for fileselec-
-     tiondialog widgets:
-
-
-</PRE>
-<H2>ASSOCIATED METHODS</H2><PRE>
-     <STRONG>get</STRONG>             <STRONG>childsite</STRONG>      <STRONG>filter</STRONG>
-
-     See the "fileselectionbox" class manual entry for details on
-     the associated methods.
-
-
-</PRE>
-<H2>INHERITED METHODS</H2><PRE>
-     <STRONG>add</STRONG>             <STRONG>buttonconfigure</STRONG>                <STRONG>defaulthide</STRONG>
-     <STRONG>insert</STRONG>          <STRONG>invoke</STRONG>         <STRONG>show</STRONG>
-
-     See the "buttonbox" widget manual entry for details  on  the
-     above inherited methods.
-
-     <STRONG>activate</STRONG>        <STRONG>center</STRONG>         <STRONG>deactivate</STRONG>
-
-     See the "shell" widget manual entry for details on the above
-     inherited methods.
-
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC METHODS</H2><PRE>
-     <EM>pathName</EM> <STRONG>cget</STRONG> <EM>option</EM>
-          Returns the current value of the  configuration  option
-          given  by  <EM>option</EM>.   <EM>Option</EM>  may have any of the values
-          accepted by the <STRONG>fileselectiondialog</STRONG> command.
-
-     <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
-          Query  or  modify  the  configuration  options  of  the
-          widget.   If  no  <EM>option</EM>  is  specified, returns a list
-          describing all of the available  options  for  <EM>pathName</EM>
-          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of
-          this list).  If <EM>option</EM> is specified with no <EM>value</EM>, then
-          the  command  returns  a  list describing the one named
-          option (this list will be identical to the  correspond-
-          ing  sublist  of  the  value  returned  if no <EM>option</EM> is
-          specified).  If one or more  <EM>option</EM> - <EM>value</EM>  pairs  are
-          specified,  then  the command modifies the given widget
-          option(s) to have the given value(s);  in this case the
-          command  returns  an empty string.  <EM>Option</EM> may have any
-          of the values accepted by the <STRONG>fileselectiondialog</STRONG>  com-
-          mand.
-
-
-
-</PRE>
-<H2>COMPONENTS</H2><PRE>
-     Name:           <STRONG>fsb</STRONG>
-     Class:          <STRONG>Fileselectionbox</STRONG>
-
-          The fsb component is the file  selection  box  for  the
-          file  selection  dialog.   See  the  "fileselectionbox"
-          widget manual entry for details on  the  fsb  component
-          item.
-
-
-
-</PRE>
-<H2>EXAMPLE</H2><PRE>
-           option add *textBackground white
-
-           fileselectiondialog .fsd
-           .fsd activate
-
-
-
-</PRE>
-<H2>AUTHOR</H2><PRE>
-     Mark L. Ulferts
-
-
-</PRE>
-<H2>KEYWORDS</H2><PRE>
-     fileselectiondialog, fileselectionbox, dialog,  dialogshell,
-     shell, widget
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</PRE>
-</BODY>
-</HTML>
+<TITLE>fileselectiondialog - Create and manipulate a file selection dialog widget</TITLE>
+<H1>fileselectiondialog - Create and manipulate a file selection dialog widget</H1>
+
+</pre><H2>SYNOPSIS</H2>
+<B>fileselectiondialog<I> <I>pathName </I>?<I>options</I>?
+</pre><H2>INHERITANCE</H2>
+itk::Toplevel &lt;- Shell &lt;- Dialogshell &lt;- Dialog &lt;- Fileselectiondialog
+</pre><H2>STANDARD OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>activeBackground</B><br>
+<B>foreground</B><br>
+<B>insertBorderWidth</B><br>
+<B>selectBackground</B><br>
+</td>
+<td valign=top>
+<B>background</B><br>
+<B>highlightColor</B><br>
+<B>insertOffTime</B><br>
+<B>selectBorderWidth</B><br>
+</td>
+<td valign=top>
+<B>borderWidth</B><br>
+<B>highlightThickness</B><br>
+<B>insertOnTime</B><br>
+<B>selectForeground</B><br>
+</td>
+<td valign=top>
+<B>cursor</B><br>
+<B>insertBackground</B><br>
+<B>insertWidth</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/options.n.html"> "options" </A> manual entry for details on the standard options.
+</pre><H2>ASSOCIATED OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>textBackground</B><br>
+</td>
+<td valign=top>
+<B>textFont</B><br>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the <A HREF="entryfield.n.html"> "entryfield" </A> widget manual entry for details on the above associated
+options.
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>childSitePos</B><br>
+<B>dirsOn</B><br>
+<B>filesOn</B><br>
+<B>invalid</B><br>
+<B>selectionOn</B><br>
+</td>
+<td valign=top>
+<B>directory</B><br>
+<B>filesLabel</B><br>
+<B>fileType</B><br>
+<B>mask</B><br>
+</td>
+<td valign=top>
+<B>dirsLabel</B><br>
+<B>filesLabelOn</B><br>
+<B>filterLabel</B><br>
+<B>noMatchString</B><br>
+</td>
+<td valign=top>
+<B>dirSearchCommand</B><br>
+<B>fileSearchCommand</B><br>
+<B>filterOn</B><br>
+<B>selectionLabel</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="fileselectionbox.n.html"> "fileselectionbox" </A> widget manual entry for details on the above
+associated options.
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>labelFont</B><br>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the <A HREF="labeledwidget.n.html"> "labeledwidget" </A> widget manual entry for details on the above
+associated options.
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>textBackground</B><br>
+</td>
+<td valign=top>
+<B>textFont</B><br>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the <A HREF="scrolledlistbox.n.html"> "scrolledlistbox" </A> widget manual entry for details on the above
+associated options.
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>activeRelief</B><br>
+</td>
+<td valign=top>
+<B>elementBorderWidth</B><br>
+</td>
+<td valign=top>
+<B>jump</B><br>
+</td>
+<td valign=top>
+<B>troughColor</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/scrollbar.n.html"> "scrollbar" </A> widget class manual entry for details on the above
+associated options.
+
+</pre><H2>INHERITED OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>buttonBoxPadX</B><br>
+<B>padY</B><br>
+</td>
+<td valign=top>
+<B>buttonBoxPadY</B><br>
+<B>separator</B><br>
+</td>
+<td valign=top>
+<B>buttonBoxPos</B><br>
+<B>thickness</B><br>
+</td>
+<td valign=top>
+<B>padX</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="dialogshell.n.html"> "dialogshell" </A> widget manual entry for details on the above
+inherited options.
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>height</B><br>
+</td>
+<td valign=top>
+<B>master</B><br>
+</td>
+<td valign=top>
+<B>modality</B><br>
+</td>
+<td valign=top>
+<B>width</B><br>
+</td>
+</table>
+<P>
+See the "shell" widget manual entry for details on the above
+inherited options.
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>title</B><br>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the "Toplevel" widget  manual entry for details on the above
+inherited options.
+</pre><HR>
+
+</pre><H2>DESCRIPTION</H2>
+<P>
+The <B>fileselectiondialog</B> command creates a file selection dialog 
+similar to the OSF/Motif standard composite widget.  The
+fileselectiondialog is derived from the Dialog class and is composed of 
+a FileSelectionBox with attributes set to manipulate the dialog buttons.
+
+</pre><H2>METHODS</H2>
+<P>
+The <B>fileselectiondialog</B> command creates a new Tcl command whose
+name is <I>pathName</I>.  This
+command may be used to invoke various
+operations on the widget.  It has the following general form:
+<pre>
+<I>pathName option </I>?<I>arg arg ...</I>?
+</pre>
+<I>Option</I> and the <I>arg</I>s
+determine the exact behavior of the command.  The following
+commands are possible for fileselectiondialog widgets:
+</pre><H2>ASSOCIATED METHODS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>get</B><br>
+</td>
+<td valign=top>
+<B>childsite</B><br>
+</td>
+<td valign=top>
+<B>filter</B><br>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the <A HREF="fileselectionbox.n.html"> "fileselectionbox" </A> class manual entry for details on the 
+associated methods.
+</pre><H2>INHERITED METHODS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>add</B><br>
+<B>insert</B><br>
+</td>
+<td valign=top>
+<B>buttonconfigure</B><br>
+<B>invoke</B><br>
+</td>
+<td valign=top>
+<B>default</B><br>
+<B>show</B><br>
+</td>
+<td valign=top>
+<B>hide</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="buttonbox.n.html"> "buttonbox" </A> widget manual entry for details on the above
+inherited methods.
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>activate</B><br>
+</td>
+<td valign=top>
+<B>center</B><br>
+</td>
+<td valign=top>
+<B>deactivate</B><br>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the "shell" widget manual entry for details on the above
+inherited methods.
+
+</pre><H2>WIDGET-SPECIFIC METHODS</H2>
+<DL>
+<DT> <I>pathName <B>cget</B> <I>option</I>
+</I></B>
+<DD> Returns the current value of the configuration option given
+by <I>option</I>.
+<I>Option</I> may have any of the values accepted by 
+the <B>fileselectiondialog</B> command.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>configure</B> ?<I>option</I>? ?<I>value option value ...</I>?
+</I></B>
+<DD> Query or modify the configuration options of the widget.
+If no <I>option</I> is specified, returns a list describing all of
+the available options for <I>pathName</I> (see <B>Tk_ConfigureInfo</B> for
+information on the format of this list).  If <I>option</I> is specified
+with no <I>value</I>, then the command returns a list describing the
+one named option (this list will be identical to the corresponding
+sublist of the value returned if no <I>option</I> is specified).  If
+one or more <I>option-value</I> pairs are specified, then the command
+modifies the given widget option(s) to have the given value(s);  in
+this case the command returns an empty string.
+<I>Option</I> may have any of the values accepted by 
+the <B>fileselectiondialog</B>
+command.
+
+</DL>
+</pre><H2>COMPONENTS</H2>
+<P>
+<pre>
+Name:                   <B>fsb</B>
+Class:                  <B>Fileselectionbox</B>
+</pre>
+<UL>
+The fsb component is the file selection box for the file selection dialog.
+See the <A HREF="fileselectionbox.n.html"> "fileselectionbox" </A> widget manual entry for details on the fsb
+component item.
+</UL>
+</table>
+
+</pre><H2>EXAMPLE</H2>
+<pre>
+ #
+ # Non-modal example
+ #
+ proc okCallback {} {
+     puts "You selected [.nmfsd get]"
+     .nmfsd deactivate
+ }
+
+ fileselectiondialog .nmfsd -title Non-Modal
+ .nmfsd buttonconfigure OK -command okCallback
+
+ .nmfsd activate
+
+ #
+ # Modal example
+ #
+ fileselectiondialog .mfsd -modality application
+ .mfsd center
+
+ if {[.mfsd activate]} {
+     puts "You selected [.mfsd get]"
+ } else {
+     puts "You cancelled the dialog"
+ }
+</pre>
+</pre><H2>AUTHOR</H2>
+<A HREF="mailto:mulferts@spd.dsccc.com">Mark L. Ulferts</A>
+</pre><H2>KEYWORDS</H2>
+fileselectiondialog, fileselectionbox, dialog, dialogshell, shell, widget

@@ -46,8 +46,7 @@ option add *Checkbox.relief		groove	widgetDefault
 # Usual options.
 #
 itk::usual Checkbox {
-    keep -background -borderwidth -cursor -disabledforeground \
-	-foreground -labelfont -selectcolor
+    keep -background -borderwidth -cursor -foreground -labelfont
 }
 
 # ------------------------------------------------------------------
@@ -58,10 +57,7 @@ class iwidgets::Checkbox {
 
     constructor {args} {}
 
-    itk_option define -disabledforeground \
-	disabledForeground DisabledForeground {}
-    itk_option define -selectcolor selectColor Background {}
-    itk_option define -command command Command {}
+    itk_option define -orient orient Orient vertical
 
     public {
       method add {tag args}
@@ -107,11 +103,26 @@ body iwidgets::Checkbox::constructor {args} {
 # ------------------------------------------------------------------
 
 # ------------------------------------------------------------------
-# OPTION: -command
+# OPTION: -orient
 #
-# Specifies a command to be evaluated upon change in the checkbox
+# Allows the user to orient the checkbuttons either horizontally
+# or vertically.  Added by Chad Smith (csmith@adc.com) 3/10/00.
 # ------------------------------------------------------------------
-configbody iwidgets::Checkbox::command {}
+configbody iwidgets::Checkbox::orient {
+  if {$itk_option(-orient) == "horizontal"} {
+    foreach tag $_buttons {
+      pack $itk_component($tag) -side left -anchor nw -padx 4 -expand 1
+    }
+  } elseif {$itk_option(-orient) == "vertical"} {
+    foreach tag $_buttons {
+      pack $itk_component($tag) -side top -anchor w -padx 4 -expand 0
+    }
+  } else {
+    error "Bad orientation: $itk_option(-orient).  Should be\
+      \"horizontal\" or \"vertical\"."
+  }
+}
+
 
 # ------------------------------------------------------------------
 #                            METHODS
@@ -168,10 +179,17 @@ body iwidgets::Checkbox::add {tag args} {
             $args
     } { 
       usual
+      keep -command -disabledforeground -selectcolor -state
       ignore -highlightthickness -highlightcolor
       rename -font -labelfont labelFont Font
     }
-    pack $itk_component($tag) -anchor w -padx 4
+
+    # Redraw the buttons with the proper orientation.
+    if {$itk_option(-orient) == "vertical"} {
+      pack $itk_component($tag) -side top -anchor w -padx 4 -expand 0
+    } else {
+      pack $itk_component($tag) -side left -anchor nw -expand 1
+    }
 
     lappend _buttons $tag
 
@@ -233,6 +251,17 @@ body iwidgets::Checkbox::delete {index} {
 # ------------------------------------------------------------------
 body iwidgets::Checkbox::select {index} {
     set tag [gettag $index]
+    #-----------------------------------------------------------
+    # BUG FIX: csmith (Chad Smith: csmith@adc.com), 3/30/99
+    #-----------------------------------------------------------
+    # This method should only invoke the checkbutton if it's not
+    # already selected.  Check its associated variable, and if
+    # it's set, then just ignore and return.
+    #-----------------------------------------------------------
+    if {[set [scope buttonVar($this,$tag)]] == 
+	[[component $tag] cget -onvalue]} {
+      return
+    }
     $itk_component($tag) invoke
 }
 
@@ -310,4 +339,3 @@ body iwidgets::Checkbox::buttonconfigure {index args} {
 body iwidgets::Checkbox::gettag {index} {
     return [lindex $_buttons [index $index]]
 }
-

@@ -11,7 +11,10 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# @(#) $Id: pushbutton.test,v 1.2 1999/01/27 18:56:41 jingham Exp $
+# @(#) $Id: pushbutton.test,v 1.2.172.1 2001/05/18 02:21:50 mdejong Exp $
+
+package require tcltest
+namespace import -force ::tcltest::*
 
 package require Iwidgets 3.0
 
@@ -134,3 +137,6 @@ test Pushbutton-1.$c {Pushbutton destruction} {
     destroy .pb
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

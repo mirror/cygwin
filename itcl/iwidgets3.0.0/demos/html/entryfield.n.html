@@ -1,305 +1,340 @@
-<HTML>
-<HEAD>
-<TITLE>iwidgets2.2.0 User Commands - entryfield</TITLE>
-</HEAD>
-<BODY BGCOLOR="#FFFFFF">
-<H1>iwidgets2.2.0 User Commands - entryfield</H1>
-<HR>
-<PRE>
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-</PRE>
-<H2>NAME</H2><PRE>
-     entryfield - Create and manipulate a entry field widget
-
-
-</PRE>
-<H2>SYNOPSIS</H2><PRE>
-     <STRONG>entryfield</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
-
-
-</PRE>
-<H2>INHERITANCE</H2><PRE>
-     itk::Widget &lt;- LabeledWidget &lt;- entryfield
-
-
-</PRE>
-<H2>STANDARD OPTIONS</H2><PRE>
-     <STRONG>background</STRONG>      <STRONG>borderWidth</STRONG>    <STRONG>cursor</STRONG>          <STRONG>exportSelection</STRONG>
-     <STRONG>foreground</STRONG>      <STRONG>highlightColor</STRONG> <STRONG>highlightThicknessinsertBackground</STRONG>
-     <STRONG>insertBorderWidth</STRONG>              <STRONG>insertOffTime</STRONG>   <STRONG>insertOnTimeinsertWidth</STRONG>
-     <STRONG>justify</STRONG>         <STRONG>relief</STRONG>         <STRONG>selectBackgroundselectBorderWidth</STRONG>
-     <STRONG>selectForeground</STRONG>               <STRONG>textVariable</STRONG>    <STRONG>width</STRONG>
-
-     See the "options" manual entry for details on  the  standard
-     options.
-
-
-</PRE>
-<H2>ASSOCIATED OPTIONS</H2><PRE>
-     <STRONG>show</STRONG>            <STRONG>state</STRONG>
-
-     See the "entry" manual entry for details on  the  associated
-     options.
-
-
-</PRE>
-<H2>INHERITED OPTIONS</H2><PRE>
-     <STRONG>labelBitmap</STRONG>     <STRONG>labelFont</STRONG>      <STRONG>labelImage</STRONG>      <STRONG>labelMargin</STRONG>
-     <STRONG>labelPos</STRONG>        <STRONG>labelText</STRONG>      <STRONG>labelVariable</STRONG>
-
-     See the "labeledwidget" class manual entry  for  details  on
-     the inherited options.
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC OPTIONS</H2><PRE>
-     Name:           <STRONG>childSitePos</STRONG>
-     Class:          <STRONG>Position</STRONG>
-     Command-Line Switch:           <STRONG>-childsitepos</STRONG>
-
-          Specifies the position of the child site in  the  entry
-          field: <STRONG>n</STRONG>, <STRONG>s</STRONG>, <STRONG>e</STRONG>, or <STRONG>w</STRONG>.  The default is e.
-
-     Name:           <STRONG>command</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-command</STRONG>
-
-          Specifies a Tcl command to be executed  upon  detection
-          of a Return key press event.
-
-     Name:           <STRONG>fixed</STRONG>
-     Class:          <STRONG>Fixed</STRONG>
-     Command-Line Switch:           <STRONG>-fixed</STRONG>
-          Restrict entry to the specified  number  of  chars.   A
-          value  of  0,  which  is the default, denotes no limit.
-          The value is the maximum number of chars the  user  may
-          type  into  the  field,  regardles of field width.  For
-          example, if the field width is set to 20 and the  fixed
-          value  is  10,  the  user  will only be able to type 10
-          characters into the field which is 20 characters long.
-
-     Name:           <STRONG>focusCommand</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-focuscommand</STRONG>
-
-          Specifies a Tcl command to be executed  upon  reception
-          of focus.
-
-     Name:           <STRONG>invalid</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-invalid</STRONG>
-
-          Specifies a Tcl command to be executed upon  determina-
-          tion of invalid input.  The default is bell.
-
-     Name:           <STRONG>textBackground</STRONG>
-     Class:          <STRONG>Background</STRONG>
-     Command-Line Switch:           <STRONG>-textbackground</STRONG>
-
-          Background color for  inside  textual  portion  of  the
-          entry  field.   The  value  may  be given in any of the
-          forms acceptable to <STRONG>Tk_GetColor</STRONG>.
-
-     Name:           <STRONG>textFont</STRONG>
-     Class:          <STRONG>Font</STRONG>
-     Command-Line Switch:           <STRONG>-textfont</STRONG>
-
-          Name of font to use for display of text in  entryfield.
-          The  value  may be given in any of the forms acceptable
-          to <STRONG>Tk_GetFont</STRONG>.
-
-     Name:           <STRONG>validate</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-validate</STRONG>
-
-          The validate option allows specification of  a  valida-
-          tion  mechanism.  Standard character validation such as
-          <STRONG>numeric</STRONG>, <STRONG>alphabetic</STRONG>, <STRONG>integer</STRONG>,  <STRONG>hexidecimal</STRONG>,  <STRONG>real</STRONG>,  and
-          <STRONG>alphanumeric</STRONG>  can  be  handled  through the use of key-
-          words.  Should more extensive validation be  necessary,
-          the  value  may  contain  the name of a command script.
-          The script should return a  boolean  value.   True  for
-          valid,  false  for invalid.  If false is returned, then
-          the procedure associated with the invalid  option  will
-          be  invoked.   If  the validation script contains any <STRONG>%</STRONG>
-          characters,  then  the  script  will  not  be  executed
-          directly.   Instead,  a new script will be generated by
-          replacing each <STRONG>%</STRONG>, and the character following it,  with
-          information   from  the  entryfield.   The  replacement
-          depends on the character following the <STRONG>%</STRONG>, as defined in
-          the list below.
-
-     <STRONG>%c</STRONG>   Replaced with the current input character.
-
-     <STRONG>%P</STRONG>   Replaced with the contents of the  entryfield  modified
-          to  include the latest keystoke.  This is equivalent to
-          peeking at  the  future  contents,  enabling  rejection
-          prior to the update.
-
-     <STRONG>%S</STRONG>   Replaced with the current contents  of  the  entryfield
-          prior to the latest keystroke being added.
-
-     <STRONG>%W</STRONG>   Replaced with the entryfield widget pathname.
-
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-
-</PRE>
-<H2>DESCRIPTION</H2><PRE>
-     The <STRONG>entryfield</STRONG> command creates an enhanced text entry widget
-     with  an  optional associated label.  Addtional options sup-
-     port validation and establishing a upper limit on the number
-     of characters which may be entered in the field.
-
-
-
-
-</PRE>
-<H2>METHODS</H2><PRE>
-     The <STRONG>entryfield</STRONG> command creates a new Tcl command whose  name
-     is  <EM>pathName</EM>.   This  command  may be used to invoke various
-     operations on the widget.   It  has  the  following  general
-     form:
-
-          <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
-
-     <EM>Option</EM> and the <EM>arg</EM>s determine the exact behavior of the com-
-     mand.   The  following  commands are possible for entryfield
-     widgets:
-
-
-</PRE>
-<H2>ASSOCIATED METHODS</H2><PRE>
-     <STRONG>delete</STRONG>          <STRONG>get</STRONG>            <STRONG>icursor</STRONG>         <STRONG>index</STRONG>
-     <STRONG>insert</STRONG>          <STRONG>scan</STRONG>           <STRONG>selection</STRONG>       <STRONG>xview</STRONG>
-
-     See the "entry" manual entry for details on  the  associated
-     methods.
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC METHODS</H2><PRE>
-     <EM>pathName</EM> <STRONG>cget</STRONG> <EM>option</EM>
-          Returns the current value of the  configuration  option
-          given  by  <EM>option</EM>.   <EM>Option</EM>  may have any of the values
-          accepted by the <STRONG>entryfield</STRONG> command.
-
-     <EM>pathName</EM> <STRONG>childsite</STRONG>
-          Returns the path name of the child site.
-
-     <EM>pathName</EM> <STRONG>clear</STRONG>
-          Clear entry widget
-
-     <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
-          Query  or  modify  the  configuration  options  of  the
-          widget.   If  no  <EM>option</EM>  is  specified, returns a list
-          describing all of the available  options  for  <EM>pathName</EM>
-          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of
-          this list).  If <EM>option</EM> is specified with no <EM>value</EM>, then
-          the  command  returns  a  list describing the one named
-          option (this list will be identical to the  correspond-
-          ing  sublist  of  the  value  returned  if no <EM>option</EM> is
-          specified).  If one or more  <EM>option</EM> - <EM>value</EM>  pairs  are
-          specified,  then  the command modifies the given widget
-          option(s) to have the given value(s);  in this case the
-          command  returns  an empty string.  <EM>Option</EM> may have any
-          of the values accepted by the <STRONG>entryfield</STRONG> command.
-
-
-
-</PRE>
-<H2>COMPONENTS</H2><PRE>
-     Name:           <STRONG>efchildsite</STRONG>
-     Class:          <STRONG>frame</STRONG>
-
-          The efchildsite component is the user  child  site  for
-          the  entry  field.  See the "frame" widget manual entry
-          for details on the efchildsite component item.
-
-     Name:           <STRONG>entry</STRONG>
-     Class:          <STRONG>entry</STRONG>
-
-          The entry component provides the entry field  for  user
-          text  input and display.  See the "entry" widget manual
-          entry for details on the entry component item.
-
-
-
-</PRE>
-<H2>EXAMPLE</H2><PRE>
-           option add *textBackground white
-
-           proc returnCmd {} {
-               puts stdout "Return Pressed"
-           }
-
-           proc invalidCmd {} {
-               puts stdout "Alphabetic contents invalid"
-           }
-
-           entryfield .ef -command returnCmd
-
-           entryfield .fef -labeltext "Fixed:" -fixed 10 -width 12
-
-           entryfield .nef -labeltext "Numeric:" -validate numeric -width 12
-
-           entryfield .aef -labeltext "Alphabetic:" \
-              -validate alphabetic -width 12 -invalid invalidCmd
-
-           entryfield .pef -labeltext "Password:" \
-              -show 267 -width 12 -command returnCmd
-
-           LabeledWidget::alignLabels .ef .fef .nef .aef .pef
-
-           pack .ef -fill x -expand yes -padx 10 -pady 5
-           pack .fef -fill x -expand yes -padx 10 -pady 5
-           pack .nef -fill x -expand yes -padx 10 -pady 5
-           pack .aef -fill x -expand yes -padx 10 -pady 5
-           pack .pef -fill x -expand yes -padx 10 -pady 5
-
-
-
-</PRE>
-<H2>AUTHOR</H2><PRE>
-     Sue Yockey
-
-     Mark L. Ulferts
-
-
-</PRE>
-<H2>KEYWORDS</H2><PRE>
-     entryfield, widget
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</PRE>
-</BODY>
-</HTML>
+<TITLE>entryfield - Create and manipulate a entry field widget</TITLE>
+<H1>entryfield - Create and manipulate a entry field widget</H1>
+
+</pre><H2>SYNOPSIS</H2>
+<B>entryfield<I> <I>pathName </I>?<I>options</I>?
+</pre><H2>INHERITANCE</H2>
+itk::Widget &lt;- LabeledWidget &lt;- entryfield
+</pre><H2>STANDARD OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>background</B><br>
+<B>foreground</B><br>
+<B>insertBorderWidth</B><br>
+<B>justify</B><br>
+<B>selectForeground</B><br>
+</td>
+<td valign=top>
+<B>borderWidth</B><br>
+<B>highlightColor</B><br>
+<B>insertOffTime</B><br>
+<B>relief</B><br>
+<B>textVariable</B><br>
+</td>
+<td valign=top>
+<B>cursor</B><br>
+<B>highlightThickness</B><br>
+<B>insertOnTime</B><br>
+<B>selectBackground</B><br>
+<B>width</B><br>
+</td>
+<td valign=top>
+<B>exportSelection</B><br>
+<B>insertBackground</B><br>
+<B>insertWidth</B><br>
+<B>selectBorderWidth</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/options.n.html"> "options" </A> manual entry for details on the standard options.
+</pre><H2>ASSOCIATED OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>show</B><br>
+</td>
+<td valign=top>
+<B>state</B><br>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/entry.n.html"> "entry" </A> manual entry for details on the associated options.
+</pre><H2>INHERITED OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>disabledForeground</B><br>
+<B>labelMargin</B><br>
+<B>state</B><br>
+</td>
+<td valign=top>
+<B>labelBitmap</B><br>
+<B>labelPos</B><br>
+</td>
+<td valign=top>
+<B>labelFont</B><br>
+<B>labelText</B><br>
+</td>
+<td valign=top>
+<B>labelImage</B><br>
+<B>labelVariable</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="labeledwidget.n.html"> "labeledwidget" </A> class manual entry for details on the 
+inherited options.
+</pre><H2>WIDGET-SPECIFIC OPTIONS</H2>
+<P>
+<pre>
+Name:                   <B>childSitePos</B>
+Class:                  <B>Position</B>
+Command-Line Switch:	<B>-childsitepos</B>
+</pre>
+<UL>
+Specifies the position of the child site in the entry field: <B>n</B>, 
+<B>s</B>, <B>e</B>, or <B>w</B>.  The default is e.
+</UL>
+<P>
+<pre>
+Name:                   <B>command</B>
+Class:                  <B>Command</B>
+Command-Line Switch:	<B>-command</B>
+</pre>
+<UL>
+Specifies a Tcl command to be executed upon detection of a Return key 
+press event.
+</UL>
+<P>
+<pre>
+Name:                   <B>fixed</B>
+Class:                  <B>Fixed</B>
+Command-Line Switch:	<B>-fixed</B>
+</pre>
+<UL>
+Restrict entry to the specified number of chars.  A value of 0, which is the
+default, denotes no limit.  The value is the maximum number of chars the 
+user may type into the field, regardles of field width.  For example,
+if the field width is set to 20 and the fixed value is 10, the user will 
+only be able to type 10 characters into the field which is 20 characters long.
+</UL>
+<P>
+<pre>
+Name:                   <B>focusCommand</B>
+Class:                  <B>Command</B>
+Command-Line Switch:	<B>-focuscommand</B>
+</pre>
+<UL>
+Specifies a Tcl command to be executed upon reception of focus.
+</UL>
+<P>
+<pre>
+Name:                   <B>invalid</B>
+Class:                  <B>Command</B>
+Command-Line Switch:	<B>-invalid</B>
+</pre>
+<UL>
+Specifies a Tcl command to be executed upon determination of invalid input.
+The default is bell.
+</UL>
+<P>
+<pre>
+Name:                   <B>textBackground</B>
+Class:                  <B>Background</B>
+Command-Line Switch:	<B>-textbackground</B>
+</pre>
+<UL>
+Background color for inside textual portion of the entry field.  The value
+may be given in any of the forms acceptable to <B>Tk_GetColor</B>.
+</UL>
+<P>
+<pre>
+Name:                   <B>textFont</B>
+Class:                  <B>Font</B>
+Command-Line Switch:	<B>-textfont</B>
+</pre>
+<UL>
+Name of font to use for display of text in entryfield.  The value
+may be given in any of the forms acceptable to <B>Tk_GetFont</B>.
+</UL>
+<P>
+<pre>
+Name:                   <B>validate</B>
+Class:                  <B>Command</B>
+Command-Line Switch:	<B>-validate</B>
+</pre>
+<UL>
+The validate option allows specification of a validation mechanism.  Standard
+character validation such as <B>numeric</B>, <B>alphabetic</B>, <B>integer</B>,
+<B>hexidecimal</B>, <B>real</B>, and <B>alphanumeric</B> can be handled through 
+the use of keywords.  Should more
+extensive validation be necessary, the value may contain the name of
+a command script.  The script should return a boolean value.  True for 
+valid, false for invalid.  If false is returned, then the procedure 
+associated with the invalid option will be invoked.
+If the validation script contains
+any <B>%</B> characters, then the script will not be
+executed directly.  Instead, a new script will be
+generated by replacing each <B>%</B>, and the character following
+it, with information from the entryfield.  The replacement
+depends on the character following the <B>%</B>, as defined in the
+list below.
+</UL>
+<DL>
+<DT> <B>%c</B>
+</I></B>
+<DD> Replaced with the current input character.
+</DL>
+<DL>
+<DT> <B>%P</B>
+</I></B>
+<DD> Replaced with the contents of the entryfield modified to include the latest
+keystoke.  This is equivalent to peeking at the future contents, enabling
+rejection prior to the update.
+</DL>
+<DL>
+<DT> <B>%S</B>
+</I></B>
+<DD> Replaced with the current contents of the entryfield prior to the latest
+keystroke being added.
+</DL>
+<DL>
+<DT> <B>%W</B>
+</I></B>
+<DD> Replaced with the entryfield widget pathname.
+</DL>
+<P>
+</pre><HR>
+
+</pre><H2>DESCRIPTION</H2>
+<P>
+The <B>entryfield</B> command creates an enhanced text entry widget with an
+optional associated label.  Addtional options support validation and 
+establishing a upper limit on the number of characters which may be
+entered in the field.
+</pre>
+
+</pre><H2>METHODS</H2>
+<P>
+The <B>entryfield</B> command creates a new Tcl command whose
+name is <I>pathName</I>.  This
+command may be used to invoke various
+operations on the widget.  It has the following general form:
+<pre>
+<I>pathName option </I>?<I>arg arg ...</I>?
+</pre>
+<I>Option</I> and the <I>arg</I>s
+determine the exact behavior of the command.  The following
+commands are possible for entryfield widgets:
+</pre><H2>ASSOCIATED METHODS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>delete</B><br>
+<B>insert</B><br>
+</td>
+<td valign=top>
+<B>get</B><br>
+<B>scan</B><br>
+</td>
+<td valign=top>
+<B>icursor</B><br>
+<B>selection</B><br>
+</td>
+<td valign=top>
+<B>index</B><br>
+<B>xview</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/entry.n.html"> "entry" </A> manual entry for details on the associated methods.
+</pre><H2>WIDGET-SPECIFIC METHODS</H2>
+<DL>
+<DT> <I>pathName <B>cget</B> <I>option</I>
+</I></B>
+<DD> Returns the current value of the configuration option given
+by <I>option</I>.
+<I>Option</I> may have any of the values accepted by the <B>entryfield</B>
+command.
+</DL>
+<DL>
+<DT> <I>pathName <B>childsite</B>
+</I></B>
+<DD> Returns the path name of the child site.
+</DL>
+<DL>
+<DT> <I>pathName <B>clear</B>
+</I></B>
+<DD> Clear entry widget
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>configure</B> ?<I>option</I>? ?<I>value option value ...</I>?
+</I></B>
+<DD> Query or modify the configuration options of the widget.
+If no <I>option</I> is specified, returns a list describing all of
+the available options for <I>pathName</I> (see <B>Tk_ConfigureInfo</B> for
+information on the format of this list).  If <I>option</I> is specified
+with no <I>value</I>, then the command returns a list describing the
+one named option (this list will be identical to the corresponding
+sublist of the value returned if no <I>option</I> is specified).  If
+one or more <I>option-value</I> pairs are specified, then the command
+modifies the given widget option(s) to have the given value(s);  in
+this case the command returns an empty string.
+<I>Option</I> may have any of the values accepted by the <B>entryfield</B>
+command.
+
+</DL>
+</pre><H2>COMPONENTS</H2>
+<P>
+<pre>
+Name:                   <B>efchildsite</B>
+Class:                  <B>frame</B>
+</pre>
+<UL>
+The efchildsite component is the user child site for the entry field.  See 
+the "frame" widget manual entry for details on the efchildsite component item.
+</UL>
+<P>
+<pre>
+Name:                   <B>entry</B>
+Class:                  <B>entry</B>
+</pre>
+<UL>
+The entry component provides the entry field for user text input and display.
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/entry.n.html"> "entry" </A> widget manual entry for details on the entry component item.
+</UL>
+</table>
+
+</pre><H2>EXAMPLE</H2>
+<pre>
+ option add *textBackground white
+ 
+ proc returnCmd {} {
+     puts stdout "Return Pressed"
+ }
+ 
+ proc invalidCmd {} {
+     puts stdout "Alphabetic contents invalid"
+ }
+ 
+ entryfield .ef -command returnCmd
+ 
+ entryfield .fef -labeltext "Fixed:" -fixed 10 -width 12
+ 
+ entryfield .nef -labeltext "Numeric:" -validate numeric -width 12
+ 
+ entryfield .aef -labeltext "Alphabetic:" \\
+    -validate alphabetic -width 12 -invalid invalidCmd
+ 
+ entryfield .pef -labeltext "Password:" \\
+    -show \267 -width 12 -command returnCmd
+ 
+ Labeledwidget::alignlabels .ef .fef .nef .aef .pef
+
+ pack .ef -fill x -expand yes -padx 10 -pady 5
+ pack .fef -fill x -expand yes -padx 10 -pady 5
+ pack .nef -fill x -expand yes -padx 10 -pady 5
+ pack .aef -fill x -expand yes -padx 10 -pady 5
+ pack .pef -fill x -expand yes -padx 10 -pady 5
+</pre>
+</pre><H2>AUTHOR</H2>
+<A HREF="mailto:syockey@spd.dsccc.com">Sue Yockey</A>
+</pre>
+<A HREF="mailto:mulferts@spd.dsccc.com">Mark L. Ulferts</A>
+<P>
+</pre><H2>KEYWORDS</H2>
+entryfield, widget

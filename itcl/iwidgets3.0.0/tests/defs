@@ -9,6 +9,11 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # @(#) defs 1.7 94/12/17 15:53:52
+# ------------------------------------------------------------------
+# THIS SCRIPT IS NOW DEPRECATED!  It is kept for older Tcl
+# installations that don't have the "tcltest" package.
+# Instead, use "package require tcltest" in the test suite.
+# ------------------------------------------------------------------
 
 package require Iwidgets
 

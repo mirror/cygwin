@@ -9,7 +9,7 @@
 # ----------------------------------------------------------------------
 #  AUTHOR: Mark L. Ulferts              EMAIL: mulferts@austin.dsccc.com
 #
-#  @(#) $Id: messagedialog.itk,v 1.2 1999/01/27 18:56:35 jingham Exp $
+#  @(#) $Id: messagedialog.itk,v 1.2.172.1 2001/05/18 02:21:48 mdejong Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1995 DSC Technologies Corporation
 # ======================================================================
@@ -39,6 +39,7 @@
 #
 itk::usual Messagedialog {
     keep -background -cursor -font -foreground -modality
+    keep -wraplength -justify
 }
 
 # ------------------------------------------------------------------
@@ -88,6 +89,7 @@ body iwidgets::Messagedialog::constructor {args} {
 	label $itk_interior.message
     } {
 	keep -background -cursor -font -foreground -text 
+	keep -wraplength -justify
 
 	rename -padx -textpadx textPadX Pad
 	rename -pady -textpady textPadY Pad

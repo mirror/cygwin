@@ -239,6 +239,7 @@ configbody iwidgets::Canvasprintbox::pagesize {
 	if {[lsearch $lst $opt] == -1} {
 		error "bad option \"pagesize\": should be one of: [ezPaperInfo types]"
 	}
+	$itk_component(paperom) select "*[string range $opt 1 end]"
 	_update_canvas
 }
 

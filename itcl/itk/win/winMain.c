@@ -21,15 +21,8 @@
 #include "itk.h"
 
 /* include tclInt.h for access to namespace API */
-#include "tclInt.h"
+#include "tkInt.h"
 
-/*
- * The following declarations refer to internal Tk routines.  These
- * interfaces are available for use, but are not supported.
- */
-
-EXTERN void		TkConsoleCreate(void);
-EXTERN int		TkConsoleInit(Tcl_Interp *interp);
 
 /*
  * Forward declarations for procedures defined later in this file:
@@ -95,8 +88,6 @@ WinMain(hInstance, hPrevInstance, lpszCmdLine, nCmdShow)
      * channels.  All I/O will be discarded until TkConsoleInit is
      * called to attach the console to a text widget.
      */
-
-    TkConsoleCreate();
 
     setargv(&argc, &argv);
 
@@ -182,7 +173,7 @@ Tcl_AppInit(interp)
      * application.
      */
 
-    if (TkConsoleInit(interp) == TCL_ERROR) {
+    if (Tk_CreateConsoleWindow(interp) == TCL_ERROR) {
 	goto error;
     }
 

@@ -43,8 +43,18 @@ Class:  \fBCommand\fR
 Command-Line Switch:    \fB-command\fR
 .fi
 .IP
-Specifies a Tcl command procedure to be evaluated following a  change in 
+Specifies a Tcl command procedure to be evaluated following a change in 
 the current radio box selection.
+.LP
+.nf
+Name:   \fBorient\fR
+Class:  \fBOrient\fR
+Command-Line Switch:    \fB-orient\fR
+Default Value:	\fBvertical\fR
+.fi
+.IP
+Specifies the orientation of the radiobuttons within the radiobox.  Valid
+values are either "horizontal" or "vertical".
 .LP
 .BE
 

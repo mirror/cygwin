@@ -1,410 +1,447 @@
-<HTML>
-<HEAD>
-<TITLE>iwidgets2.2.0 User Commands - scrolledlistbox</TITLE>
-</HEAD>
-<BODY BGCOLOR="#FFFFFF">
-<H1>iwidgets2.2.0 User Commands - scrolledlistbox</H1>
-<HR>
-<PRE>
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-</PRE>
-<H2>NAME</H2><PRE>
-     scrolledlistbox - Create  and  manipulate  scrolled  listbox
-     widgets
-
-
-</PRE>
-<H2>SYNOPSIS</H2><PRE>
-     <STRONG>scrolledlistbox</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
-
-
-</PRE>
-<H2>INHERITANCE</H2><PRE>
-     itk::Widget &lt;- Labeledwidget &lt;- Scrolledlistbox
-
-
-</PRE>
-<H2>STANDARD OPTIONS</H2><PRE>
-     <STRONG>activeBackground</STRONG>               <STRONG>background</STRONG>      <STRONG>borderWidthcursor</STRONG>
-     <STRONG>exportSelection</STRONG> <STRONG>foreground</STRONG>     <STRONG>highlightColor</STRONG>  <STRONG>highlightThickness</STRONG>
-     <STRONG>relief</STRONG>          <STRONG>repeatDelay</STRONG>    <STRONG>repeatInterval</STRONG>  <STRONG>selectBackground</STRONG>
-     <STRONG>selectBorderWidth</STRONG>              <STRONG>selectForeground</STRONG>
-
-     See the "options" manual entry for details on  the  standard
-     options.
-
-
-</PRE>
-<H2>ASSOCIATED OPTIONS</H2><PRE>
-     <STRONG>selectMode</STRONG>
-
-     See the "listbox" widget manual entry  for  details  on  the
-     above associated options.
-
-     <STRONG>activeRelief</STRONG>    <STRONG>elementBorderwidth</STRONG>             <STRONG>jumptroughColor</STRONG>
-
-     See the "scrollbar" widget manual entry for details  on  the
-     above associated options.
-
-
-</PRE>
-<H2>INHERITED OPTIONS</H2><PRE>
-     <STRONG>labeledBitmap</STRONG>   <STRONG>labelFont</STRONG>      <STRONG>labelImage</STRONG>      <STRONG>labelMargin</STRONG>
-     <STRONG>labelPos</STRONG>        <STRONG>labelText</STRONG>      <STRONG>labelVariable</STRONG>
-
-     See the "labeledwidget" class manual entry  for  details  on
-     the inherited options.
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC OPTIONS</H2><PRE>
-     Name:           <STRONG>dblClickCommand</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-dblclickcommand</STRONG>
-
-          Specifies a Tcl command procedure which is called  when
-          an  item is double clicked.  Typically this occurs when
-          mouse button 1 is double clicked over an item.   Selec-
-          tion policy does not matter.
-
-     Name:           <STRONG>height</STRONG>
-     Class:          <STRONG>Height</STRONG>
-     Command-Line Switch:           <STRONG>-height</STRONG>
-          Specifies the height of the scrolled  list  box  as  an
-          entire  unit.  The value may be specified in any of the
-          forms acceptable to <STRONG>Tk_GetPixels</STRONG>.  Any additional space
-          needed  to display the other components such as labels,
-          margins,  and  scrollbars  force  the  listbox  to   be
-          compressed.   A value of zero along with the same value
-          for the width causes the  value  given  for  the  visi-
-          bleitems   option   to  be  applied  which  administers
-          geometry  constraints  in  a  different  manner.    The
-          default height is zero.
-
-     Name:           <STRONG>hscrollMode</STRONG>
-     Class:          <STRONG>ScrollMode</STRONG>
-     Command-Line Switch:           <STRONG>-hscrollmode</STRONG>
-
-          Specifies the the display mode to be used for the  hor-
-          izontal scrollbar: <STRONG>static,</STRONG> <STRONG>dynamic,</STRONG> or <STRONG>none</STRONG>.  In static
-          mode,  the  scroll  bar  is  displayed  at  all  times.
-          Dynamic  mode  displays the scroll bar as required, and
-          none disables the scroll bar display.  The  default  is
-          static.
-
-     Name:           <STRONG>items</STRONG>
-     Class:          <STRONG>Items</STRONG>
-     Command-Line Switch:           <STRONG>-items</STRONG>
-
-          Specifies the contents of the listbox as a proper  list
-          of elements.
-
-     Name:           <STRONG>sbWidth</STRONG>
-     Class:          <STRONG>Width</STRONG>
-     Command-Line Switch:           <STRONG>-sbwidth</STRONG>
-
-          Specifies the width of the  scrollbar  in  any  of  the
-          forms acceptable to <STRONG>Tk_GetPixels</STRONG>.  The default width is
-          15 pixels..
-
-     Name:           <STRONG>scrollMargin</STRONG>
-     Class:          <STRONG>Margin</STRONG>
-     Command-Line Switch:           <STRONG>-scrollmargin</STRONG>
-
-          Specifies  the  distance  between   the   listbox   and
-          scrollbar   in   any   of   the   forms  acceptable  to
-          <STRONG>Tk_GetPixels</STRONG>.  The default is 3 pixels.
-
-     Name:           <STRONG>selectionCommand</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-selectioncommand</STRONG>
-
-          Specifies a Tcl command procedure which is called  when
-          an item is selected.  Selection policy does not matter.
-
-     Name:           <STRONG>textBackground</STRONG>
-     Class:          <STRONG>Background</STRONG>
-     Command-Line Switch <STRONG>-textbackground</STRONG>
-
-          Specifies the background color for the  listbox.   This
-          allows  the  background  within  the listbox to be dif-
-          ferent from the normal background color.
-
-     Name:           <STRONG>textFont</STRONG>
-     Class:          <STRONG>Font</STRONG>
-     Command-Line Switch:           <STRONG>-textfont</STRONG>
-
-          Specifies the font to be used for text in the  listbox.
-          This  allows for the font associated with text internal
-          to the scrolled listbox to be different than  the  font
-          for labels.
-
-     Name:           <STRONG>visibleitems</STRONG>
-     Class:          <STRONG>VisibleItems</STRONG>
-     Command-Line Switch:           <STRONG>-visibleitems</STRONG>
-
-          Specifies the widthxheight in characters and lines  for
-          the  listbox.   This option is only administered if the
-          width and height options are both set to  zero,  other-
-          wise they take precedence.  The default value is 20x10.
-          With the visibleitems  option  engaged,  geometry  con-
-          straints  are maintained only on the listbox.  The size
-          of the other components such as  labels,  margins,  and
-          scroll  bars,  are  additive and independent, effecting
-          the overall size of the scrolled  list  box.   In  con-
-          trast,  should  the  width  and height options have non
-          zero values, they are applied to the scrolled list  box
-          as  a  whole.  The listbox is compressed or expanded to
-          maintain the geometry constraints.
-
-     Name:           <STRONG>vscrollMode</STRONG>
-     Class:          <STRONG>ScrollMode</STRONG>
-     Command-Line Switch:           <STRONG>-vscrollmode</STRONG>
-
-          Specifies the the display mode to be used for the vert-
-          ical  scrollbar:  <STRONG>static,</STRONG>  <STRONG>dynamic,</STRONG> or <STRONG>none</STRONG>.  In static
-          mode,  the  scroll  bar  is  displayed  at  all  times.
-          Dynamic  mode  displays the scroll bar as required, and
-          none disables the scroll bar display.  The  default  is
-          static.
-
-     Name:           <STRONG>width</STRONG>
-     Class:          <STRONG>Width</STRONG>
-     Command-Line Switch:           <STRONG>-width</STRONG>
-
-          Specifies the width of the  scrolled  list  box  as  an
-          entire  unit.  The value may be specified in any of the
-          forms acceptable to <STRONG>Tk_GetPixels</STRONG>.  Any additional space
-          needed  to display the other components such as labels,
-          margins,  and  scrollbars  force  the  listbox  to   be
-          compressed.   A value of zero along with the same value
-          for the height causes the value  given  for  the  visi-
-          bleitems   option   to  be  applied  which  administers
-          geometry  constraints  in  a  different  manner.    The
-          default width is zero.
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-
-</PRE>
-<H2>DESCRIPTION</H2><PRE>
-     The <STRONG>scrolledlistbox</STRONG> command creates a scrolled listbox  with
-     additional   options   to  manage  horizontal  and  vertical
-     scrollbars.   This  includes  options   to   control   which
-     scrollbars  are displayed and the method, i.e. statically or
-     dynamically.
-
-
-
-</PRE>
-<H2>METHODS</H2><PRE>
-     The <STRONG>scrolledlistbox</STRONG> command creates a new Tcl command  whose
-     name  is <EM>pathName</EM>.  This command may be used to invoke vari-
-     ous operations on the widget.  It has the following  general
-     form:
-
-          <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
-
-     <EM>Option</EM> and the <EM>arg</EM>s determine the exact behavior of the com-
-     mand.
-
-     Many of the widget commands for a  scrolledlistbox  take  as
-     one  argument an indicator of which entry of the list box to
-     operate on.  These indicators are called <EM>index</EM>es and may  be
-     specified in any of the following forms:
-
-     <EM>number</EM>      Specifies the  element  as  a  numerical  index,
-                 where  0 corresponds to the first element in the
-                 listbox.
-
-     <STRONG>active</STRONG>      Indicates the element that has the location cur-
-                 sor.   This  element  will  be displayed with an
-                 underline when  the  listbox  has  the  keyboard
-                 focus,  and  it  is  specified with the <STRONG>activate</STRONG>
-                 widget command.
-
-     <STRONG>anchor</STRONG>      Indicates the anchor point  for  the  selection,
-                 which  is  set  with the <STRONG>selection</STRONG> <STRONG>anchor</STRONG> widget
-                 command.
-
-     <STRONG>end</STRONG>         Indicates the end of the listbox.  For some com-
-                 mands  this  means  just after the last element;
-                 for other commands it means the last element.
-
-     <STRONG>@</STRONG><EM>x</EM><STRONG>,</STRONG><EM>y</EM>        Indicates the element that covers the  point  in
-                 the  listbox  window  specified  by  <EM>x</EM> and <EM>y</EM> (in
-                 pixel coordinates).  If no element  covers  that
-                 point, then the closest element to that point is
-                 used.
-
-     <EM>pattern</EM>     If the index doesn't satisfy one  of  the  above
-                 forms  then  this  form  is  used.   <EM>Pattern</EM>  is
-                 pattern-matched against the items  in  the  list
-                 box,  in order from the top down, until a match-
-                 ing   entry   is   found.     The    rules    of
-                 <STRONG>Tcl_StringMatch</STRONG> are used.
-
-     The following widget commands are possible for scrolledlist-
-     box widgets:
-
-
-
-</PRE>
-<H2>ASSOCIATED METHODS</H2><PRE>
-     <STRONG>activate</STRONG>        <STRONG>bbox</STRONG>           <STRONG>curselection</STRONG>    <STRONG>delete</STRONG>
-     <STRONG>get</STRONG>             <STRONG>index</STRONG>          <STRONG>insert</STRONG>          <STRONG>nearest</STRONG>
-     <STRONG>scan</STRONG>            <STRONG>see</STRONG>            <STRONG>selection</STRONG>       <STRONG>size</STRONG>
-     <STRONG>xview</STRONG>           <STRONG>yview</STRONG>
-
-     See the "listbox" manual entry for details on the associated
-     methods.
-
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC METHODS</H2><PRE>
-     <EM>pathName</EM> <STRONG>cget</STRONG> <EM>option</EM>
-          Returns the current value of the  configuration  option
-          given  by  <EM>option</EM>.   <EM>Option</EM>  may have any of the values
-          accepted by the <STRONG>scrolledlistbox</STRONG> command.
-
-     <EM>pathName</EM> <STRONG>clear</STRONG>
-          Clears the listbox of all items.
-
-     <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
-          Query  or  modify  the  configuration  options  of  the
-          widget.   If  no  <EM>option</EM>  is  specified, returns a list
-          describing all of the available  options  for  <EM>pathName</EM>
-          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of
-          this list).  If <EM>option</EM> is specified with no <EM>value</EM>, then
-          the  command  returns  a  list describing the one named
-          option (this list will be identical to the  correspond-
-          ing  sublist  of  the  value  returned  if no <EM>option</EM> is
-          specified).  If one or more  <EM>option</EM> - <EM>value</EM>  pairs  are
-          specified,  then  the command modifies the given widget
-          option(s) to have the given value(s);  in this case the
-          command  returns  an empty string.  <EM>Option</EM> may have any
-          of the values accepted by the <STRONG>scrolledlistbox</STRONG> command.
-
-     <EM>pathName</EM> <STRONG>getcurselection</STRONG>
-          Returns the contents of the listbox  element  indicated
-          by the current selection indexes.  Short cut version of
-          get and curselection command combination.
-
-     <EM>pathName</EM> <STRONG>justify</STRONG> <EM>direction</EM>
-          Justifies the list contents via teh scroll bars in  one
-          of four directions:  <STRONG>left</STRONG>, <STRONG>right</STRONG>, <STRONG>top</STRONG>, or <STRONG>bottom</STRONG>.
-
-     <EM>pathName</EM> <STRONG>selecteditemcount</STRONG>
-          Returns the number of items currently selected  in  the
-          list.
-
-     <EM>pathName</EM> <STRONG>sort</STRONG> <EM>order</EM>
-          Sort the current list in either <STRONG>ascending</STRONG> or <STRONG>descending</STRONG>
-          order.  The  values  <STRONG>increasing</STRONG> and <STRONG>decreasing</STRONG> are also
-          accepted.
-
-
-
-</PRE>
-<H2>COMPONENTS</H2><PRE>
-     Name:           <STRONG>listbox</STRONG>
-     Class:          <STRONG>listbox</STRONG>
-
-          The listbox component is the listbox widget.   See  the
-          "listbox"  widget manual entry for details on the list-
-          box component item.
-
-     Name:           <STRONG>horizsb</STRONG>
-     Class:          <STRONG>Scrollbar</STRONG>
-
-          The horizsb component is  the  horizontal  scroll  bar.
-          See  the "scrollbar" widget manual entry for details on
-          the horizsb component item.
-
-     Name:           <STRONG>vertsb</STRONG>
-     Class:          <STRONG>Scrollbar</STRONG>
-
-          The vertsb component is the vertical scroll  bar.   See
-          the  "scrollbar" widget manual entry for details on the
-          vertsb component item.
-
-
-
-</PRE>
-<H2>EXAMPLE</H2><PRE>
-          wm minsize . 0 0
-          option add *textBackground white
-          proc selCmd {} {
-              puts stdout "[.slb getcurselection]"
-          }
-          proc defCmd {} {
-              puts stdout "Double Click"
-              return [selCmd]
-          }
-          scrolledlistbox .slb -selection single \
-              -items {Hello {Out There} World} \
-              -vscrollmode static -hscrollmode dynamic -labeltext "List" \
-              -selectioncommand selCmd -dblclickcommand defCmd
-          pack .slb -padx 10 -pady 10 -fill both -expand yes
-
-
-
-</PRE>
-<H2>AUTHOR</H2><PRE>
-     Mark L. Ulferts
-
-
-</PRE>
-<H2>KEYWORDS</H2><PRE>
-     scrolledlistbox, listbox, widget
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</PRE>
-</BODY>
-</HTML>
+<TITLE>scrolledlistbox - Create and manipulate scrolled listbox widgets</TITLE>
+<H1>scrolledlistbox - Create and manipulate scrolled listbox widgets</H1>
+
+</pre><H2>SYNOPSIS</H2>
+<B>scrolledlistbox<I> <I>pathName </I>?<I>options</I>?
+</pre><H2>INHERITANCE</H2>
+itk::Widget &lt;- Labeledwidget &lt;- Scrolledwidget &lt;- Scrolledlistbox
+</pre><H2>STANDARD OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>activeBackground</B><br>
+<B>exportSelection</B><br>
+<B>relief</B><br>
+</td>
+<td valign=top>
+<B>background</B><br>
+<B>foreground</B><br>
+<B>selectBackground</B><br>
+</td>
+<td valign=top>
+<B>borderWidth</B><br>
+<B>highlightColor</B><br>
+<B>selectBorderWidth</B><br>
+</td>
+<td valign=top>
+<B>cursor</B><br>
+<B>highlightThickness</B><br>
+<B>selectForeground</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/options.n.html"> "options" </A> manual entry for details on the standard options.
+</pre><H2>ASSOCIATED OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>selectMode</B><br>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/listbox.n.html"> "listbox" </A> widget manual entry for details on the above
+associated options.
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>activeRelief</B><br>
+</td>
+<td valign=top>
+<B>elementBorderwidth</B><br>
+</td>
+<td valign=top>
+<B>jump</B><br>
+</td>
+<td valign=top>
+<B>troughColor</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/scrollbar.n.html"> "scrollbar" </A> widget manual entry for details on the above
+associated options.
+</pre><H2>INHERITED OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>disabledForeground</B><br>
+<B>labelMargin</B><br>
+<B>state</B><br>
+</td>
+<td valign=top>
+<B>labelBitmap</B><br>
+<B>labelPos</B><br>
+</td>
+<td valign=top>
+<B>labelFont</B><br>
+<B>labelText</B><br>
+</td>
+<td valign=top>
+<B>labelImage</B><br>
+<B>labelVariable</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="labeledwidget.n.html"> "labeledwidget" </A> class manual entry for details on the inherited 
+options.
+</pre><H2>WIDGET-SPECIFIC OPTIONS</H2>
+<P>
+<pre>
+Name:                   <B>dblClickCommand</B>
+Class:                  <B>Command</B>
+Command-Line Switch:	<B>-dblclickcommand</B>
+</pre>
+<UL>
+Specifies a Tcl command procedure which is called when an item is
+double clicked.  Typically this occurs when mouse button 1 is double 
+clicked over an item.  Selection policy does not matter.
+</UL>
+<P>
+<pre>
+Name:                   <B>height</B>
+Class:                  <B>Height</B>
+Command-Line Switch:	<B>-height</B>
+</pre>
+<UL>
+Specifies the height of the scrolled list box as an entire unit.
+The value may be specified in any of the forms acceptable to 
+<B>Tk_GetPixels</B>.  Any additional space needed to display the other
+components such as labels, margins, and scrollbars force the listbox
+to be compressed.  A value of zero along with the same value for 
+the width causes the value given for the visibleitems option 
+to be applied which administers geometry constraints in a different
+manner.  The default height is zero.
+</UL>
+<P>
+<pre>
+Name:                   <B>hscrollMode</B>
+Class:                  <B>ScrollMode</B>
+Command-Line Switch:	<B>-hscrollmode</B>
+</pre>
+<UL>
+Specifies the the display mode to be used for the horizontal
+scrollbar: <B>static, dynamic,</B> or <B>none</B>.  In static mode, the 
+scroll bar is displayed at all times.  Dynamic mode displays the
+scroll bar as required, and none disables the scroll bar display.  The 
+default is static.
+</UL>
+<P>
+<pre>
+Name:                   <B>sbWidth</B>
+Class:                  <B>Width</B>
+Command-Line Switch:	<B>-sbwidth</B>
+</pre>
+<UL>
+Specifies the width of the scrollbar in any of the forms acceptable 
+to <B>Tk_GetPixels</B>.  The default width is 15 pixels..
+</UL>
+<P>
+<pre>
+Name:                   <B>scrollMargin</B>
+Class:                  <B>Margin</B>
+Command-Line Switch:	<B>-scrollmargin</B>
+</pre>
+<UL>
+Specifies the distance between the listbox and scrollbar in any of the 
+forms acceptable to <B>Tk_GetPixels</B>.  The default is 3 pixels.
+</UL>
+<P>
+<pre>
+Name:                   <B>selectionCommand</B>
+Class:                  <B>Command</B>
+Command-Line Switch:	<B>-selectioncommand</B>
+</pre>
+<UL>
+Specifies a Tcl command procedure which is called when an item is
+selected.  Selection policy does not matter.
+</UL>
+<P>
+<pre>
+Name:                   <B>state</B>
+Class:                  <B>State</B>
+Command-Line Switch:	<B>-state</B>
+</pre>
+<UL>
+Specifies one of two states for the listbox: <B>normal</B> or <B>disabled</B>.
+If the listbox is disabled then selection is ignored.  The default is
+normal.
+</UL>
+<P>
+<pre>
+Name:                   <B>textBackground</B>
+Class:                  <B>Background</B>
+Command-Line Switch <B>-textbackground</B>
+</pre>
+<UL>
+Specifies the background color for the listbox.  This allows the background 
+within the listbox to be different from the normal background color.
+</UL>
+<P>
+<pre>
+Name:                   <B>textFont</B>
+Class:                  <B>Font</B>
+Command-Line Switch:	<B>-textfont</B>
+</pre>
+<UL>
+Specifies the font to be used for text in the listbox.  This allows for 
+the font associated with text internal to the scrolled listbox to be 
+different than the font for labels.
+</UL>
+<P>
+<pre>
+Name:                   <B>visibleitems</B>
+Class:                  <B>VisibleItems</B>
+Command-Line Switch:	<B>-visibleitems</B>
+</pre>
+<UL>
+Specifies the widthxheight in characters and lines for the listbox.
+This option is only administered if the width and height options
+are both set to zero, otherwise they take precedence.  The default value
+is 20x10.  With the visibleitems option engaged, geometry constraints 
+are maintained only on the listbox.  The size of the other components such as 
+labels, margins, and scroll bars, are additive and independent, 
+effecting the overall size of the scrolled list box.  In contrast,
+should the width and height options have non zero values, they
+are applied to the scrolled list box as a whole.  The listbox 
+is compressed or expanded to maintain the geometry constraints.
+</UL>
+<P>
+<pre>
+Name:                   <B>vscrollMode</B>
+Class:                  <B>ScrollMode</B>
+Command-Line Switch:	<B>-vscrollmode</B>
+</pre>
+<UL>
+Specifies the the display mode to be used for the vertical
+scrollbar: <B>static, dynamic,</B> or <B>none</B>.  In static mode, the 
+scroll bar is displayed at all times.  Dynamic mode displays the 
+scroll bar as required, and none disables the scroll bar display.  The 
+default is static.
+</UL>
+<P>
+<pre>
+Name:                   <B>width</B>
+Class:                  <B>Width</B>
+Command-Line Switch:	<B>-width</B>
+</pre>
+<UL>
+Specifies the width of the scrolled list box as an entire unit.
+The value may be specified in any of the forms acceptable to 
+<B>Tk_GetPixels</B>.  Any additional space needed to display the other
+components such as labels, margins, and scrollbars force the listbox
+to be compressed.  A value of zero along with the same value for 
+the height causes the value given for the visibleitems option 
+to be applied which administers geometry constraints in a different
+manner.  The default width is zero.
+</UL>
+</pre><HR>
+
+</pre><H2>DESCRIPTION</H2>
+<P>
+The <B>scrolledlistbox</B> command creates 
+a scrolled listbox with additional options to manage
+horizontal and vertical scrollbars.  This includes options to control
+which scrollbars are displayed and the method, i.e. statically or
+dynamically.
+
+</pre><H2>METHODS</H2>
+<P>
+The <B>scrolledlistbox</B> command creates a new Tcl command whose
+name is <I>pathName</I>.  This
+command may be used to invoke various
+operations on the widget.  It has the following general form:
+<pre>
+<I>pathName option </I>?<I>arg arg ...</I>?
+</pre>
+<I>Option</I> and the <I>arg</I>s
+determine the exact behavior of the command.
+<P>
+Many of the widget commands for a scrolledlistbox take as one argument an
+indicator of which entry of the list box to operate on.  These
+indicators are called <I>index</I>es and may be specified in
+any of the following forms:
+<DL>
+<DT> <I>number</I>
+</I></B>
+<DD> Specifies the element as a numerical index, where 0 corresponds
+to the first element in the listbox.
+</DL>
+<DL>
+<DT> <B>active</B>
+</I></B>
+<DD> Indicates the element that has the location cursor.  This element
+will be displayed with an underline when the listbox has the
+keyboard focus, and it is specified with the <B>activate</B>
+widget command.
+</DL>
+<DL>
+<DT> <B>anchor</B>
+</I></B>
+<DD> Indicates the anchor point for the selection, which is set with the
+<B>selection anchor</B> widget command.
+</DL>
+<DL>
+<DT> <B>end</B>
+</I></B>
+<DD> Indicates the end of the listbox.
+For some commands this means just after the last element;
+for other commands it means the last element.
+</DL>
+<DL>
+<DT> <B>@<I>x<B>,<I>y</I>
+</I></B>
+<DD> Indicates the element that covers the point in the listbox window
+specified by <I>x</I> and <I>y</I> (in pixel coordinates).  If no
+element covers that point, then the closest element to that
+point is used.
+</DL>
+<DL>
+<DT> <I>pattern</I>
+</I></B>
+<DD> If the index doesn't satisfy one of the above forms then this
+form is used.  <I>Pattern</I> is pattern-matched against the items in
+the list box, in order from the top down, until a matching entry is found.
+The rules of <B>Tcl_StringMatch</B> are used.
+</DL>
+<P>
+The following widget commands are possible for scrolledlistbox widgets:
+
+</pre><H2>ASSOCIATED METHODS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>activate</B><br>
+<B>get</B><br>
+<B>scan</B><br>
+<B>xview</B><br>
+</td>
+<td valign=top>
+<B>bbox</B><br>
+<B>index</B><br>
+<B>see</B><br>
+<B>yview</B><br>
+</td>
+<td valign=top>
+<B>curselection</B><br>
+<B>insert</B><br>
+<B>selection</B><br>
+</td>
+<td valign=top>
+<B>delete</B><br>
+<B>nearest</B><br>
+<B>size</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/listbox.n.html"> "listbox" </A> manual entry for details on the associated methods.
+
+</pre><H2>WIDGET-SPECIFIC METHODS</H2>
+<DL>
+<DT> <I>pathName <B>cget</B> <I>option</I>
+</I></B>
+<DD> Returns the current value of the configuration option given
+by <I>option</I>.
+<I>Option</I> may have any of the values accepted by the <B>scrolledlistbox</B>
+command.
+</DL>
+<DL>
+<DT> <I>pathName <B>clear</B>
+</I></B>
+<DD> Clears the listbox of all items.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>configure</B> ?<I>option</I>? ?<I>value option value ...</I>?
+</I></B>
+<DD> Query or modify the configuration options of the widget.
+If no <I>option</I> is specified, returns a list describing all of
+the available options for <I>pathName</I> (see <B>Tk_ConfigureInfo</B> for
+information on the format of this list).  If <I>option</I> is specified
+with no <I>value</I>, then the command returns a list describing the
+one named option (this list will be identical to the corresponding
+sublist of the value returned if no <I>option</I> is specified).  If
+one or more <I>option-value</I> pairs are specified, then the command
+modifies the given widget option(s) to have the given value(s);  in
+this case the command returns an empty string.
+<I>Option</I> may have any of the values accepted by the <B>scrolledlistbox</B>
+command.
+</DL>
+<DL>
+<DT> <I>pathName <B>getcurselection</B>
+</I></B>
+<DD> Returns the contents of the listbox element indicated by the current
+selection indexes.  Short cut version of get and curselection command
+combination.
+</DL>
+<DL>
+<DT> <I>pathName <B>justify <I>direction</I>
+</I></B>
+<DD> Justifies the list contents via teh scroll bars in one of four directions:
+<B>left</B>, <B>right</B>, <B>top</B>, or <B>bottom</B>.
+</DL>
+<DL>
+<DT> <I>pathName <B>selecteditemcount</B>
+</I></B>
+<DD> Returns the number of items currently selected in the list.
+</DL>
+<DL>
+<DT> <I>pathName <B>sort</B> <I>order</I>
+</I></B>
+<DD> Sort the current list in either <B>ascending</B> or <B>descending</B> order.  
+The values <B>increasing</B> and <B>decreasing</B> are also accepted.
+
+</DL>
+</pre><H2>COMPONENTS</H2>
+<P>
+<pre>
+Name:                   <B>listbox</B>
+Class:                  <B>listbox</B>
+</pre>
+<UL>
+The listbox component is the listbox widget.  See the "listbox" widget 
+manual entry for details on the listbox component item.
+</UL>
+<P>
+<pre>
+Name:                   <B>horizsb</B>
+Class:                  <B>Scrollbar</B>
+</pre>
+<UL>
+The horizsb component is the horizontal scroll bar.  See the "scrollbar" 
+widget manual entry for details on the horizsb component item.
+</UL>
+<P>
+<pre>
+Name:                   <B>vertsb</B>
+Class:                  <B>Scrollbar</B>
+</pre>
+<UL>
+The vertsb component is the vertical scroll bar.  See the "scrollbar" widget 
+manual entry for details on the vertsb component item.
+</UL>
+</table>
+
+</pre><H2>EXAMPLE</H2>
+<pre>
+ option add *textBackground white
+ proc selCmd {} {
+    puts stdout "[.slb getcurselection]"
+ }
+ proc defCmd {} {
+    puts stdout "Double Click"
+    return [selCmd]
+ }
+ scrolledlistbox .slb -selection single \\
+    -vscrollmode static -hscrollmode dynamic -labeltext "List" \\
+    -selectioncommand selCmd -dblclickcommand defCmd
+ pack .slb -padx 10 -pady 10 -fill both -expand yes
+ .slb insert end {Hello {Out There} World} 
+</pre>
+</pre><H2>AUTHOR</H2>
+<A HREF="mailto:mulferts@spd.dsccc.com">Mark L. Ulferts</A>
+</pre><H2>KEYWORDS</H2>
+scrolledlistbox, listbox, widget

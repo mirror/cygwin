@@ -1,510 +1,456 @@
-<HTML>
-<HEAD>
-<TITLE>iwidgets2.2.0 User Commands - fileselectionbox</TITLE>
-</HEAD>
-<BODY BGCOLOR="#FFFFFF">
-<H1>iwidgets2.2.0 User Commands - fileselectionbox</H1>
-<HR>
-<PRE>
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-</PRE>
-<H2>NAME</H2><PRE>
-     fileselectionbox - Create and manipulate  a  file  selection
-     box widget
-
-
-</PRE>
-<H2>SYNOPSIS</H2><PRE>
-     <STRONG>fileselectionbox</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
-
-
-</PRE>
-<H2>INHERITANCE</H2><PRE>
-     itk::Widget &lt;- Fileselectionbox
-
-
-</PRE>
-<H2>STANDARD OPTIONS</H2><PRE>
-     <STRONG>activeBackground</STRONG>               <STRONG>background</STRONG>      <STRONG>borderWidthcursor</STRONG>
-     <STRONG>foreground</STRONG>      <STRONG>highlightColor</STRONG> <STRONG>highlightThicknessinsertBackground</STRONG>
-     <STRONG>insertBorderWidth</STRONG>              <STRONG>insertOffTime</STRONG>   <STRONG>insertOnTimeinsertWidth</STRONG>
-     <STRONG>relief</STRONG>          <STRONG>repeatDelay</STRONG>    <STRONG>repeatInterval</STRONG>  <STRONG>selectBackground</STRONG>
-     <STRONG>selectBorderWidth</STRONG>              <STRONG>selectForeground</STRONG>
-
-     See the "options" manual entry for details on  the  standard
-     options.
-
-
-</PRE>
-<H2>ASSOCIATED OPTIONS</H2><PRE>
-     <STRONG>textBackground</STRONG>  <STRONG>textFont</STRONG>
-
-     See the "entryfield" widget manual entry for details on  the
-     above associated options.
-
-     <STRONG>labelFont</STRONG>       <STRONG>labelMargin</STRONG>
-
-     See the "labeledwidget" widget manual entry for  details  on
-     the above associated options.
-
-     <STRONG>activeRelief</STRONG>    <STRONG>elementBorderWidth</STRONG>             <STRONG>jumptroughColor</STRONG>
-
-     See the "scrollbar" widget class manual entry for details on
-     the above associated options.
-
-     <STRONG>hscrollMode</STRONG>     <STRONG>sbWidth</STRONG>        <STRONG>scrollMargin</STRONG>    <STRONG>textBackground</STRONG>
-     <STRONG>textFont</STRONG>        <STRONG>vscrollMode</STRONG>
-
-     See the "scrolledlistbox" widget manual entry for details on
-     the above associated options.
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC OPTIONS</H2><PRE>
-     Name:           <STRONG>childSitePos</STRONG>
-     Class:          <STRONG>Position</STRONG>
-     Command-Line Switch:           <STRONG>-childsitepos</STRONG>
-
-          Specifies the position of the child site in the  selec-
-          tion box: <STRONG>n</STRONG>, <STRONG>s</STRONG>, <STRONG>e</STRONG>, or <STRONG>w</STRONG>.  The default is s.
-
-     Name:           <STRONG>dblDirsCommand</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-dbldirscommand</STRONG>
-
-          Specifies a Tcl command procedure which is called  when
-          an  directory  list  item is double clicked.  Typically
-          this occurs when mouse button 1 is double clicked  over
-          a directory name.
-
-     Name:           <STRONG>dblFilesCommand</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-dblfilescommand</STRONG>
-
-          Specifies a Tcl command procedure which is called  when
-          an  file  list  item is double clicked.  Typically this
-          occurs when mouse button 1 is  double  clicked  over  a
-          file name.
-
-     Name:           <STRONG>directory</STRONG>
-     Class:          <STRONG>Directory</STRONG>
-     Command-Line Switch:           <STRONG>-directory</STRONG>
-
-          Specifies the initial default directory.   The  default
-          is the present working directory.
-
-     Name:           <STRONG>dirsfraction</STRONG>
-     Class:          <STRONG>DirsFraction</STRONG>
-     Command-Line Switch:           <STRONG>-dirsfraction</STRONG>
-
-          Specifies the fraction as a percentage of  the  overall
-          width that the directory list takes up.
-
-     Name:           <STRONG>dirSearchCommand</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-dirsearchcommand</STRONG>
-
-          Specifies a Tcl command to be  executed  to  perform  a
-          directory search.  The command will receive the current
-          working directory and filter mask  as  arguments.   The
-          command  should  return  a  list of files which will be
-          placed into the directory list.
-
-     Name:           <STRONG>dirsLabel</STRONG>
-     Class:          <STRONG>Text</STRONG>
-     Command-Line Switch:           <STRONG>-dirslabel</STRONG>
-
-          Specifies the text of the label for the directory list.
-          The default is "Directories".
-
-     Name:           <STRONG>dirsLabelPos</STRONG>
-     Class:          <STRONG>Position</STRONG>
-     Command-Line Switch:           <STRONG>-dirslabelpos</STRONG>
-          Specifies the position of the label along the  side  of
-          the directory list: <STRONG>n</STRONG>, <STRONG>ne</STRONG>, <STRONG>e</STRONG>, <STRONG>se</STRONG>, <STRONG>s</STRONG>, <STRONG>sw</STRONG>, <STRONG>w</STRONG>, or <STRONG>nw</STRONG>.  The
-          default is nw.
-
-     Name:           <STRONG>dirsOn</STRONG>
-     Class:          <STRONG>DirsOn</STRONG>
-     Command-Line Switch:           <STRONG>-dirson</STRONG>
-
-          Specifies whether or not to display the directory list.
-          The  value  may be given in any of the forms acceptable
-          to <STRONG>Tcl_GetBoolean</STRONG>.  The default is true.
-
-     Name:           <STRONG>fileSearchCommand</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-filesearchcommand</STRONG>
-
-          Specifies a Tcl command to be  executed  to  perform  a
-          file  search.   The  command  will  receive the current
-          working directory and filter mask  as  arguments.   The
-          command  should  return  a  list of files which will be
-          placed into the file list.
-
-     Name:           <STRONG>filesLabel</STRONG>
-     Class:          <STRONG>Text</STRONG>
-     Command-Line Switch:           <STRONG>-fileslabel</STRONG>
-
-          Specifies the text of the label  for  the  files  list.
-          The default is "Files".
-
-     Name:           <STRONG>filesLabelPos</STRONG>
-     Class:          <STRONG>Position</STRONG>
-     Command-Line Switch:           <STRONG>-fileslabelpos</STRONG>
-
-          Specifies the position of the label along the  side  of
-          the  files  list: : <STRONG>n</STRONG>, <STRONG>ne</STRONG>, <STRONG>e</STRONG>, <STRONG>se</STRONG>, <STRONG>s</STRONG>, <STRONG>sw</STRONG>, <STRONG>w</STRONG>, or <STRONG>nw</STRONG>.  The
-          default is nw.
-
-     Name:           <STRONG>filesOn</STRONG>
-     Class:          <STRONG>FilesOn</STRONG>
-     Command-Line Switch:           <STRONG>-fileson</STRONG>
-
-          Specifies whether or not to  display  the  files  list.
-          The  value  may be given in any of the forms acceptable
-          to <STRONG>Tcl_GetBoolean</STRONG>.  The default is true.
-
-     Name:           <STRONG>fileType</STRONG>
-     Class:          <STRONG>FileType</STRONG>
-     Command-Line Switch:           <STRONG>-filetype</STRONG>
-
-          Specify the type of files which may appear in the  file
-          list: <STRONG>regular</STRONG>, <STRONG>directory</STRONG>, or <STRONG>any</STRONG>.  The default is regu-
-          lar.
-
-     Name:           <STRONG>filterCommand</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-filtercommand</STRONG>
-
-          Specifies a Tcl command to be executed upon hitting the
-          Return key in the filter entry widget.
-
-     Name:           <STRONG>filterFocusCommand</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-filterfocuscommand</STRONG>
-
-          Specifies a Tcl command to be executed  upon  reception
-          of focus by the filter.
-
-     Name:           <STRONG>filterLabel</STRONG>
-     Class:          <STRONG>Text</STRONG>
-     Command-Line Switch:           <STRONG>-filterlabel</STRONG>
-
-          Specifies the text of the label for  the  filter  entry
-          field.  The default is "Filter".
-
-     Name:           <STRONG>filterLabelPos</STRONG>
-     Class:          <STRONG>Position</STRONG>
-     Command-Line Switch:           <STRONG>-filterlabelpos</STRONG>
-
-          Specifies the position of the label along the  side  of
-          the filter: <STRONG>n</STRONG>, <STRONG>ne</STRONG>, <STRONG>e</STRONG>, <STRONG>se</STRONG>, <STRONG>s</STRONG>, <STRONG>sw</STRONG>, <STRONG>w</STRONG>, or <STRONG>nw</STRONG>.  The default
-          is nw.
-
-     Name:           <STRONG>filterOn</STRONG>
-     Class:          <STRONG>FilterOn</STRONG>
-     Command-Line Switch:           <STRONG>-filteron</STRONG>
-
-          Specifies whether or not to display the  filter  entry.
-          The  value  may be given in any of the forms acceptable
-          to <STRONG>Tcl_GetBoolean</STRONG>.  The default is true.
-
-     Name:           <STRONG>height</STRONG>
-     Class:          <STRONG>Height</STRONG>
-     Command-Line Switch:           <STRONG>-height</STRONG>
-
-          Specifies the height of the selection box.   The  value
-          may  be  specified  in  any  of the forms acceptable to
-          Tk_GetPixels.  The default is 360 pixels.
-
-     Name:           <STRONG>horizmargin</STRONG>
-     Class:          <STRONG>Margin</STRONG>
-     Command-Line Switch:           <STRONG>-horizmargin</STRONG>
-
-          Specifies    distance    between    the    lists    and
-          filter/selection  entries.   The  value may be given in
-          any of  the  forms  acceptable  to  <STRONG>Tk_GetPixels</STRONG>.   The
-          default is 7.
-
-     Name:           <STRONG>invalid</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-invalid</STRONG>
-
-          Command to be executed should the  filter  contents  be
-          proven invalid.  The default is {bell}.
-
-     Name:           <STRONG>mask</STRONG>
-     Class:          <STRONG>Mask</STRONG>
-     Command-Line Switch:           <STRONG>-mask</STRONG>
-
-          Specifies the initial file mask string.  The default is
-          "*".
-
-     Name:           <STRONG>noMatchString</STRONG>
-     Class:          <STRONG>NoMatchString</STRONG>
-     Command-Line Switch:           <STRONG>-nomatchstring</STRONG>
-
-          Specifies the string to be displayed in the files  list
-          should  no  files  match  the  mask.  The default is "[
-          ]".
-
-     Name:           <STRONG>selectDirCommand</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-selectdirommand</STRONG>
-
-          Specifies a Tcl command to be executed following selec-
-          tion of a directory in the directory list.
-
-     Name:           <STRONG>selectFileCommand</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-selectfileommand</STRONG>
-
-          Specifies a Tcl command to be executed following selec-
-          tion of a file in the files list.
-
-     Name:           <STRONG>selectionCommand</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-selectioncommand</STRONG>
-
-          Specifies a Tcl command to be executed upon hitting the
-          Return key in the selection entry widget.
-
-     Name:           <STRONG>selectionFocusCommand</STRONG>
-     Class:          <STRONG>Command</STRONG>
-     Command-Line Switch:           <STRONG>-selectionfocuscommand</STRONG>
-
-          Specifies a Tcl command to be executed  upon  reception
-          of focus by the selection entry.
-
-     Name:           <STRONG>selectionImage</STRONG>
-     Class:          <STRONG>Image</STRONG>
-     Command-Line Switch:           <STRONG>-selectionimage</STRONG>
-
-          Specifies a image to be used  as  the  selection  entry
-          label.  The  image  may be any of the values created by
-          the <STRONG>image</STRONG> <STRONG>create</STRONG> command.
-
-     Name:           <STRONG>selectionLabel</STRONG>
-     Class:          <STRONG>Text</STRONG>
-     Command-Line Switch:           <STRONG>-selectionlabel</STRONG>
-
-          Specifies the text of the label for the selection entry
-          field.  The default is "Selection".
-
-     Name:           <STRONG>selectionLabelPos</STRONG>
-     Class:          <STRONG>Position</STRONG>
-     Command-Line Switch:           <STRONG>-selectionlabelpos</STRONG>
-
-          Specifies the position of the label along the  side  of
-          the  selection:  <STRONG>n</STRONG>,  <STRONG>ne</STRONG>,  <STRONG>e</STRONG>,  <STRONG>se</STRONG>, <STRONG>s</STRONG>, <STRONG>sw</STRONG>, <STRONG>w</STRONG>, or <STRONG>nw</STRONG>.  The
-          default is nw.
-
-     Name:           <STRONG>selectionOn</STRONG>
-     Class:          <STRONG>SelectionOn</STRONG>
-     Command-Line Switch:           <STRONG>-selectionon</STRONG>
-
-          Specifies whether  or  not  to  display  the  selection
-          entry.   The  value  may  be  given in any of the forms
-          acceptable to <STRONG>Tcl_GetBoolean</STRONG>.  The default is true.
-
-     Name:           <STRONG>style</STRONG>
-     Class:          <STRONG>Syle</STRONG>
-     Command-Line Switch:           <STRONG>-style</STRONG>
-
-          Specifies display style of the fileselectionbox:  <STRONG>motif</STRONG>
-          or <STRONG>notif</STRONG>.  The default is motif which reflects the lay-
-          out of the OSF/Motif standard Xmfileselectionbox widget
-          composed  of  directory and file scrolled lists as well
-          as filter and selection entry fields.  The notif option
-          setting  varies  the layout by removing directory names
-          from the files, separates the lists by a paned  window,
-          and  changes  the  filter  and  entry  fields into com-
-          boboxes.
-
-     Name:           <STRONG>vertmargin</STRONG>
-     Class:          <STRONG>Margin</STRONG>
-     Command-Line Switch:           <STRONG>-vertmargin</STRONG>
-
-          Specifies  distance  between  the  directory  and  file
-          lists.   The  value  may  be  given in any of the forms
-          acceptable to <STRONG>Tk_GetPixels</STRONG>.  The default  is  7.   This
-          option  is  only useful for motif styled fileselection-
-          boxes.  For notif styled  ones,  use  the  dirsfraction
-          option  to  modify  spacing  between  the directory and
-          files lists.
-
-     Name:           <STRONG>width</STRONG>
-     Class:          <STRONG>Width</STRONG>
-     Command-Line Switch:           <STRONG>-width</STRONG>
-
-          Specifies the width of the selection  box.   The  value
-          may  be  specified  in  any  of the forms acceptable to
-          Tk_GetPixels.  The default is 470 pixels.
-
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-
-</PRE>
-<H2>DESCRIPTION</H2><PRE>
-     The <STRONG>fileselectionbox</STRONG> command creates a  file  selection  box
-     similar  to the OSF/Motif standard Xmfileselectionbox compo-
-     site widget.  The fileselectionbox is composed of  directory
-     and  file  scrolled  lists  as  well as filter and selection
-     entry fields.  Bindings are in place such that selection  of
-     a  directory  list  item  loads  the  filter entry field and
-     selection of a file list  item  loads  the  selection  entry
-     field.   Options exist to control the appearance and actions
-     of the widget.
-
-
-
-</PRE>
-<H2>METHODS</H2><PRE>
-     The <STRONG>fileselectionbox</STRONG> command creates a new Tcl command whose
-     name  is <EM>pathName</EM>.  This command may be used to invoke vari-
-     ous operations on the widget.  It has the following  general
-     form:
-
-          <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
-
-     <EM>Option</EM> and the <EM>arg</EM>s determine the exact behavior of the com-
-     mand.   The  following  commands are possible for fileselec-
-     tionbox widgets:
-
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC METHODS</H2><PRE>
-     <EM>pathName</EM> <STRONG>cget</STRONG> <EM>option</EM>
-          Returns the current value of the  configuration  option
-          given  by  <EM>option</EM>.   <EM>Option</EM>  may have any of the values
-          accepted by the <STRONG>fileselectionbox</STRONG> command.
-
-     <EM>pathName</EM> <STRONG>childsite</STRONG>
-          Returns the child site widget path name.
-
-     <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
-          Query  or  modify  the  configuration  options  of  the
-          widget.   If  no  <EM>option</EM>  is  specified, returns a list
-          describing all of the available  options  for  <EM>pathName</EM>
-          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of
-          this list).  If <EM>option</EM> is specified with no <EM>value</EM>, then
-          the  command  returns  a  list describing the one named
-          option (this list will be identical to the  correspond-
-          ing  sublist  of  the  value  returned  if no <EM>option</EM> is
-          specified).  If one or more  <EM>option</EM> - <EM>value</EM>  pairs  are
-          specified,  then  the command modifies the given widget
-          option(s) to have the given value(s);  in this case the
-          command  returns  an empty string.  <EM>Option</EM> may have any
-          of the values accepted by the <STRONG>fileselectionbox</STRONG> command.
-
-     <EM>pathName</EM> <STRONG>filter</STRONG>
-          Update the current contents of the file  selection  box
-          based on the current filter entry field value.
-
-     <EM>pathName</EM> <STRONG>get</STRONG>
-          Returns  the  current  value  of  the  selection  entry
-          widget.
-
-
-
-</PRE>
-<H2>COMPONENTS</H2><PRE>
-     Name:           <STRONG>childsite</STRONG>
-     Class:          <STRONG>Frame</STRONG>
-
-          The childsite component is the user child site for  the
-          file  selection  box.   See  the  "frame" widget manual
-          entry for details on the childsite component item.
-
-     Name:           <STRONG>dirs</STRONG>
-     Class:          <STRONG>Scrolledlistbox</STRONG>
-
-          The dirs component is the directory list  box  for  the
-          file  selection  box.  See the "scrolledlistbox" widget
-          manual entry for details on the dirs component item.
-
-     Name:           <STRONG>files</STRONG>
-     Class:          <STRONG>Scrolledlistbox</STRONG>
-
-          The files component is the file list box for  the  file
-          selection box.  See the "scrolledlistbox" widget manual
-          entry for details on the files component item.
-
-     Name:           <STRONG>filter</STRONG>
-     Class:          <STRONG>Entryfield</STRONG>
-
-          The filter component is the entry field for user  input
-          of  the  filter  value.   See  the  "entryfield" widget
-          manual entry for details on the filter component item.
-
-
-     Name:           <STRONG>selection</STRONG>
-     Class:          <STRONG>Entryfield</STRONG>
-
-          The selection component is the  entry  field  for  user
-          input  of  the  currently selected file value.  See the
-          "entryfield" widget manual entry  for  details  on  the
-          selection component item.
-
-
-
-</PRE>
-<H2>EXAMPLE</H2><PRE>
-          option add *textBackground GhostWhite
-
-          fileselectionbox .fsb
-          pack .fsb -padx 10 -pady 10 -fill both -expand yes
-
-
-
-</PRE>
-<H2>AUTHOR(S)</H2><PRE>
-     Mark L. Ulferts
-
-     Anthony Parent
-
-
-</PRE>
-<H2>KEYWORDS</H2><PRE>
-     fileselectionbox, widget
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</PRE>
-</BODY>
-</HTML>
+<TITLE>fileselectionbox - Create and manipulate a file selection box widget</TITLE>
+<H1>fileselectionbox - Create and manipulate a file selection box widget</H1>
+
+</pre><H2>SYNOPSIS</H2>
+<B>fileselectionbox<I> <I>pathName </I>?<I>options</I>?
+</pre><H2>INHERITANCE</H2>
+itk::Widget &lt;- Fileselectionbox
+</pre><H2>STANDARD OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>activeBackground</B><br>
+<B>foreground</B><br>
+<B>insertBorderWidth</B><br>
+<B>selectBackground</B><br>
+</td>
+<td valign=top>
+<B>background</B><br>
+<B>highlightColor</B><br>
+<B>insertOffTime</B><br>
+<B>selectBorderWidth</B><br>
+</td>
+<td valign=top>
+<B>borderWidth</B><br>
+<B>highlightThickness</B><br>
+<B>insertOnTime</B><br>
+<B>selectForeground</B><br>
+</td>
+<td valign=top>
+<B>cursor</B><br>
+<B>insertBackground</B><br>
+<B>insertWidth</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/options.n.html"> "options" </A> manual entry for details on the standard options.
+</pre><H2>ASSOCIATED OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>textBackground</B><br>
+</td>
+<td valign=top>
+<B>textFont</B><br>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the <A HREF="entryfield.n.html"> "entryfield" </A> widget manual entry for details on the above
+associated options.
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>labelFont</B><br>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the <A HREF="labeledwidget.n.html"> "labeledwidget" </A> widget manual entry for details on the above
+associated options.
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>activeRelief</B><br>
+</td>
+<td valign=top>
+<B>elementBorderWidth</B><br>
+</td>
+<td valign=top>
+<B>jump</B><br>
+</td>
+<td valign=top>
+<B>troughColor</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/scrollbar.n.html"> "scrollbar" </A> widget class manual entry for details on the above
+associated options.
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>textBackground</B><br>
+</td>
+<td valign=top>
+<B>textFont</B><br>
+</td>
+<td valign=top>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the <A HREF="scrolledlistbox.n.html"> "scrolledlistbox" </A> widget manual entry for details on the above
+associated options.
+</pre><H2>WIDGET-SPECIFIC OPTIONS</H2>
+<P>
+<pre>
+Name:                   <B>childSitePos</B>
+Class:                  <B>Position</B>
+Command-Line Switch:	<B>-childsitepos</B>
+</pre>
+<UL>
+Specifies the position of the child site in the selection box: <B>n</B>, 
+<B>s</B>, <B>e</B>, <B>w</B>, <B>top</B>, <B>bottom</B>, or <B>center</B>.  The 
+default is s.
+</UL>
+</table>
+<UL>
+Specifies a Tcl command procedure which is called when an file list item is
+double clicked.  Typically this occurs when mouse button 1 is double 
+clicked over a file name.
+</UL>
+<P>
+<pre>
+Name:                   <B>directory</B>
+Class:                  <B>Directory</B>
+Command-Line Switch:	<B>-directory</B>
+</pre>
+<UL>
+Specifies the initial default directory.  The default is the present 
+working directory.
+</UL>
+<P>
+<pre>
+Name:                   <B>dirSearchCommand</B>
+Class:                  <B>Command</B>
+Command-Line Switch:	<B>-dirsearchcommand</B>
+</pre>
+<UL>
+Specifies a Tcl command to be executed to perform a directory search.
+The command will receive the current working directory and filter
+mask as arguments.  The command should return a list of files which
+will be placed into the directory list.
+</UL>
+<P>
+<pre>
+Name:                   <B>dirsLabel</B>
+Class:                  <B>Text</B>
+Command-Line Switch:	<B>-dirslabel</B>
+</pre>
+<UL>
+Specifies the text of the label for the directory list.  The default is
+"Directories".
+</UL>
+<P>
+<pre>
+Name:                   <B>dirsOn</B>
+Class:                  <B>DirsOn</B>
+Command-Line Switch:	<B>-dirson</B>
+</pre>
+<UL>
+Specifies whether or not to display the directory list.  The
+value may be given in any of the forms acceptable to <B>Tcl_GetBoolean</B>.
+The default is true.
+</UL>
+<P>
+<pre>
+Name:                   <B>fileSearchCommand</B>
+Class:                  <B>Command</B>
+Command-Line Switch:	<B>-filesearchcommand</B>
+</pre>
+<UL>
+Specifies a Tcl command to be executed to perform a file search.
+The command will receive the current working directory and filter
+mask as arguments.  The command should return a list of files which
+will be placed into the file list.
+</UL>
+<P>
+<pre>
+Name:                   <B>filesLabel</B>
+Class:                  <B>Text</B>
+Command-Line Switch:	<B>-fileslabel</B>
+</pre>
+<UL>
+Specifies the text of the label for the files list.  The default is "Files".
+</UL>
+<P>
+<pre>
+Name:                   <B>filesOn</B>
+Class:                  <B>FilesOn</B>
+Command-Line Switch:	<B>-fileson</B>
+</pre>
+<UL>
+Specifies whether or not to display the files list.  The
+value may be given in any of the forms acceptable to <B>Tcl_GetBoolean</B>.
+The default is true.
+</UL>
+<P>
+<pre>
+Name:                   <B>fileType</B>
+Class:                  <B>FileType</B>
+Command-Line Switch:	<B>-filetype</B>
+</pre>
+<UL>
+Specify the type of files which may appear in the file list: <B>regular</B>,
+<B>directory</B>, or <B>any</B>.  The default is regular.
+</UL>
+<P>
+<pre>
+Name:                   <B>filterCommand</B>
+Class:                  <B>Command</B>
+Command-Line Switch:	<B>-filtercommand</B>
+</pre>
+<UL>
+Specifies a Tcl command to be executed upon hitting the Return key
+in the filter entry widget.  
+</UL>
+<P>
+<pre>
+Name:                   <B>filterLabel</B>
+Class:                  <B>Text</B>
+Command-Line Switch:	<B>-filterlabel</B>
+</pre>
+<UL>
+Specifies the text of the label for the filter entry field.  The default is
+"Filter".
+</UL>
+<P>
+<pre>
+Name:                   <B>filterOn</B>
+Class:                  <B>FilterOn</B>
+Command-Line Switch:	<B>-filteron</B>
+</pre>
+<UL>
+Specifies whether or not to display the filter entry.  The
+value may be given in any of the forms acceptable to <B>Tcl_GetBoolean</B>.
+The default is true.
+</UL>
+<P>
+<pre>
+Name:                   <B>height</B>
+Class:                  <B>Height</B>
+Command-Line Switch:	<B>-height</B>
+</pre>
+<UL>
+Specifies the height of the selection box.  The value may be specified in 
+any of the forms acceptable to Tk_GetPixels.  The default is 360 pixels.
+</UL>
+<P>
+<pre>
+Name:                   <B>invalid</B>
+Class:                  <B>Command</B>
+Command-Line Switch:	<B>-invalid</B>
+</pre>
+<UL>
+Command to be executed should the filter contents be proven 
+invalid.  The default is {bell}.
+</UL>
+<P>
+<pre>
+Name:                   <B>mask</B>
+Class:                  <B>Mask</B>
+Command-Line Switch:	<B>-mask</B>
+</pre>
+<UL>
+Specifies the initial file mask string.  The default is "*".
+</UL>
+<P>
+<pre>
+Name:                   <B>noMatchString</B>
+Class:                  <B>NoMatchString</B>
+Command-Line Switch:	<B>-nomatchstring</B>
+</pre>
+<UL>
+Specifies the string to be displayed in the files list should no files
+match the mask.  The default is "".
+</UL>
+<P>
+<pre>
+Name:                   <B>selectDirCommand</B>
+Class:                  <B>Command</B>
+Command-Line Switch:	<B>-selectdirommand</B>
+</pre>
+<UL>
+Specifies a Tcl command to be executed following selection of a 
+directory in the directory list.
+</UL>
+<P>
+<pre>
+Name:                   <B>selectFileCommand</B>
+Class:                  <B>Command</B>
+Command-Line Switch:	<B>-selectfileommand</B>
+</pre>
+<UL>
+Specifies a Tcl command to be executed following selection of a 
+file in the files list.
+</UL>
+<P>
+<pre>
+Name:                   <B>selectionCommand</B>
+Class:                  <B>Command</B>
+Command-Line Switch:	<B>-selectioncommand</B>
+</pre>
+<UL>
+Specifies a Tcl command to be executed upon hitting the Return key
+in the selection entry widget.  
+</UL>
+<P>
+<pre>
+Name:                   <B>selectionLabel</B>
+Class:                  <B>Text</B>
+Command-Line Switch:	<B>-selectionlabel</B>
+</pre>
+<UL>
+Specifies the text of the label for the selection entry field.  The default
+is "Selection".
+</UL>
+<P>
+<pre>
+Name:                   <B>selectionOn</B>
+Class:                  <B>SelectionOn</B>
+Command-Line Switch:	<B>-selectionon</B>
+</pre>
+<UL>
+Specifies whether or not to display the selection entry.  The
+value may be given in any of the forms acceptable to <B>Tcl_GetBoolean</B>.
+The default is true.
+</UL>
+<P>
+<pre>
+Name:                   <B>width</B>
+Class:                  <B>Width</B>
+Command-Line Switch:	<B>-width</B>
+</pre>
+<UL>
+Specifies the width of the selection box.  The value may be specified in 
+any of the forms acceptable to Tk_GetPixels.  The default is 470 pixels.
+</UL>
+<P>
+</pre><HR>
+
+</pre><H2>DESCRIPTION</H2>
+<P>
+The <B>fileselectionbox</B> command creates a file selection box similar 
+to the OSF/Motif standard Xmfileselectionbox composite widget.  The 
+fileselectionbox is composed of directory and file scrolled lists as 
+well as filter and selection entry fields.  Bindings are in place such that
+selection of a directory list item loads the filter entry field and
+selection of a file list item loads the selection entry field.  Options
+exist to control the appearance and actions of the widget.
+
+</pre><H2>METHODS</H2>
+<P>
+The <B>fileselectionbox</B> command creates a new Tcl command whose
+name is <I>pathName</I>.  This
+command may be used to invoke various
+operations on the widget.  It has the following general form:
+<pre>
+<I>pathName option </I>?<I>arg arg ...</I>?
+</pre>
+<I>Option</I> and the <I>arg</I>s
+determine the exact behavior of the command.  The following
+commands are possible for fileselectionbox widgets:
+
+</pre><H2>WIDGET-SPECIFIC METHODS</H2>
+<DL>
+<DT> <I>pathName <B>cget</B> <I>option</I>
+</I></B>
+<DD> Returns the current value of the configuration option given
+by <I>option</I>.
+<I>Option</I> may have any of the values accepted by the <B>fileselectionbox</B>
+command.
+</DL>
+<DL>
+<DT> <I>pathName <B>childsite</B>
+</I></B>
+<DD> Returns the child site widget path name.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>configure</B> ?<I>option</I>? ?<I>value option value ...</I>?
+</I></B>
+<DD> Query or modify the configuration options of the widget.
+If no <I>option</I> is specified, returns a list describing all of
+the available options for <I>pathName</I> (see <B>Tk_ConfigureInfo</B> for
+information on the format of this list).  If <I>option</I> is specified
+with no <I>value</I>, then the command returns a list describing the
+one named option (this list will be identical to the corresponding
+sublist of the value returned if no <I>option</I> is specified).  If
+one or more <I>option-value</I> pairs are specified, then the command
+modifies the given widget option(s) to have the given value(s);  in
+this case the command returns an empty string.
+<I>Option</I> may have any of the values accepted by the <B>fileselectionbox</B>
+command.
+</DL>
+<DL>
+<DT> <I>pathName <B>filter</B>
+</I></B>
+<DD> Update the current contents of the file selection box based on the current
+filter entry field value.
+</DL>
+<DL>
+<DT> <I>pathName <B>get</B>
+</I></B>
+<DD> Returns the current value of the selection entry widget.
+
+</DL>
+</pre><H2>COMPONENTS</H2>
+<P>
+<pre>
+Name:                   <B>dirs</B>
+Class:                  <B>Scrolledlistbox</B>
+</pre>
+<UL>
+The dirs component is the directory list box for the file selection box.
+See the <A HREF="scrolledlistbox.n.html"> "scrolledlistbox" </A> widget manual entry for details on the dirs 
+component item.
+</UL>
+<P>
+<pre>
+Name:                   <B>files</B>
+Class:                  <B>Scrolledlistbox</B>
+</pre>
+<UL>
+The files component is the file list box for the file selection box.
+See the <A HREF="scrolledlistbox.n.html"> "scrolledlistbox" </A> widget manual entry for details on the files
+component item.
+</UL>
+<P>
+<pre>
+Name:                   <B>filter</B>
+Class:                  <B>Entryfield</B>
+</pre>
+<UL>
+The filter component is the entry field for user input of the filter value.
+See the <A HREF="entryfield.n.html"> "entryfield" </A> widget manual entry for details on the filter 
+component item.
+</UL>
+<P>
+<pre>
+Name:                   <B>selection</B>
+Class:                  <B>Entryfield</B>
+</pre>
+<UL>
+The selection component is the entry field for user input of the currently
+selected file value.  See the "entryfield" widget manual entry for details 
+on the selection component item.
+</UL>
+</table>
+
+</pre><H2>EXAMPLE</H2>
+<pre>
+fileselectionbox .fsb
+pack .fsb -padx 10 -pady 10 -fill both -expand yes 
+</pre>
+</pre><H2>AUTHOR(S)</H2>
+<A HREF="mailto:mulferts@spd.dsccc.com">Mark L. Ulferts</A>
+</pre><H2>KEYWORDS</H2>
+fileselectionbox, widget

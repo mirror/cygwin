@@ -38,7 +38,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id: itcl_obsolete.c,v 1.3 1999/02/06 01:43:41 jingham Exp $
+ *     RCS:  $Id: itcl_obsolete.c,v 1.3.152.2 2001/05/18 02:21:43 mdejong Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -480,10 +480,10 @@ ItclOldClassCmd(clientData, interp, objc, objv)
 
     if (result == TCL_OK) {
       /* CYGNUS LOCAL - Fix for Tcl8.1 */
-#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0
-      result = Tcl_EvalObj(interp, objv[2]);
-#else
+#if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 1
       result = Tcl_EvalObj(interp, objv[2], 0);
+#else
+      result = Tcl_EvalObj(interp, objv[2]);
 #endif
       /* END CYGNUS LOCAL */
       Tcl_PopCallFrame(interp);

@@ -13,6 +13,9 @@
 #
 # @(#) $Id: hyperhelp.test
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -160,3 +163,6 @@ test Hyperhelp-1.$c {Hyperhelp destruction} {
     destroy .h
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

@@ -1,250 +1,224 @@
-<HTML>
-<HEAD>
-<TITLE>iwidgets2.2.0 User Commands - labeledwidget</TITLE>
-</HEAD>
-<BODY BGCOLOR="#FFFFFF">
-<H1>iwidgets2.2.0 User Commands - labeledwidget</H1>
-<HR>
-<PRE>
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-</PRE>
-<H2>NAME</H2><PRE>
-     labeledwidget - Create and manipulate a labeled widget
-
-
-</PRE>
-<H2>SYNOPSIS</H2><PRE>
-     <STRONG>labeledwidget</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
-
-
-</PRE>
-<H2>INHERITANCE</H2><PRE>
-     itk::Widget &lt;- labeledwidget
-
-
-</PRE>
-<H2>STANDARD OPTIONS</H2><PRE>
-     <STRONG>background</STRONG>      <STRONG>cursor</STRONG>         <STRONG>foreground</STRONG>
-
-     See the "options" manual entry for details on  the  standard
-     options.
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC OPTIONS</H2><PRE>
-     Name:           <STRONG>labelBitmap</STRONG>
-     Class:          <STRONG>Bitmap</STRONG>
-     Command-Line Switch:           <STRONG>-labelbitmap</STRONG>
-
-          Specifies a bitmap to display in the widget, in any  of
-          the  forms  acceptable  to  <STRONG>Tk_GetBitmap</STRONG>.   This option
-          overrides the <EM>labeltext</EM> option.
-
-     Name:           <STRONG>labelFont</STRONG>
-     Class:          <STRONG>Font</STRONG>
-     Command-Line Switch:           <STRONG>-labelfont</STRONG>
-
-          Specifies the font to be used for the label.
-
-     Name:           <STRONG>labelImage</STRONG>
-     Class:          <STRONG>Image</STRONG>
-     Command-Line Switch:           <STRONG>-labelimage</STRONG>
-
-          Specifies a image to be used as the  label.  The  image
-          may  be  any  of the values created by the <STRONG>image</STRONG> <STRONG>create</STRONG>
-          command.  This option overrides  both  the  <EM>labelbitmap</EM>
-          and <EM>labeletext</EM> options.
-
-     Name:           <STRONG>labelMargin</STRONG>
-     Class:          <STRONG>Margin</STRONG>
-     Command-Line Switch:           <STRONG>-labelmargin</STRONG>
-
-          Specifies the distance between the childsite and  label
-          in  any  of  the forms acceptable to <STRONG>Tk_GetPixels</STRONG>.  The
-          default is 1 pixel.
-
-     Name:           <STRONG>labelPos</STRONG>
-     Class:          <STRONG>Position</STRONG>
-     Command-Line Switch:           <STRONG>-labelpos</STRONG>
-          Specifies the position of the label along the  side  of
-          the  childsite:  <STRONG>n</STRONG>,  <STRONG>ne</STRONG>,  <STRONG>e</STRONG>,  <STRONG>se</STRONG>, <STRONG>s</STRONG>, <STRONG>sw</STRONG>, <STRONG>w</STRONG>, or <STRONG>nw</STRONG>.  The
-          default is w.
-
-     Name:           <STRONG>labelText</STRONG>
-     Class:          <STRONG>Text</STRONG>
-     Command-Line Switch:           <STRONG>-labeltext</STRONG>
-
-          Specifies the text of the label around the childsite.
-
-     Name:           <STRONG>labelVariable</STRONG>
-     Class:          <STRONG>Variable</STRONG>
-     Command-Line Switch:           <STRONG>-labelvariable</STRONG>
-
-          Specifies the text variable of  the  label  around  the
-          childsite.
-
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-
-</PRE>
-<H2>DESCRIPTION</H2><PRE>
-     The <STRONG>labeledwidget</STRONG> command creates  a  labeled  widget  which
-     contains  a label and child site.  The child site is a frame
-     which can filled with any widget  via  a  derived  class  or
-     though  the  use  of  the  childsite method.  This class was
-     designed to be a general purpose base class  for  supporting
-     the  combination  of  label  widget  and  a  childsite.  The
-     options include the ability to position the label around the
-     childsite  widget,  modify  the font and margin, and control
-     the display of the labels.
-
-
-
-</PRE>
-<H2>METHODS</H2><PRE>
-     The <STRONG>labeledwidget</STRONG> command creates a new  Tcl  command  whose
-     name  is <EM>pathName</EM>.  This command may be used to invoke vari-
-     ous operations on the widget.  It has the following  general
-     form:
-
-          <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
-
-     <EM>Option</EM> and the <EM>arg</EM>s determine the exact behavior of the com-
-     mand.  The following commands are possible for labeledwidget
-     widgets:
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC METHODS</H2><PRE>
-     <EM>pathName</EM> <STRONG>childsite</STRONG>
-          Return the path name of the child site.
-
-     <EM>pathName</EM> <STRONG>cget</STRONG> <EM>option</EM>
-          Returns the current value of the  configuration  option
-          given  by  <EM>option</EM>.   <EM>Option</EM>  may have any of the values
-          accepted by the <STRONG>labeledwidget</STRONG> command.
-
-     <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
-          Query  or  modify  the  configuration  options  of  the
-          widget.   If  no  <EM>option</EM>  is  specified, returns a list
-          describing all of the available  options  for  <EM>pathName</EM>
-          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of
-          this list).  If <EM>option</EM> is specified with no <EM>value</EM>, then
-          the  command  returns  a  list describing the one named
-          option (this list will be identical to the  correspond-
-          ing  sublist  of  the  value  returned  if no <EM>option</EM> is
-          specified).  If one or more  <EM>option</EM> - <EM>value</EM>  pairs  are
-          specified,  then  the command modifies the given widget
-          option(s) to have the given value(s);  in this case the
-          command  returns  an empty string.  <EM>Option</EM> may have any
-          of the values accepted by the <STRONG>labeledwidget</STRONG> command.
-
-
-
-</PRE>
-<H2>STATIC METHODS</H2><PRE>
-     <STRONG>Labeledwidget::alignlabels</STRONG> <EM>widget</EM> ?<EM>widget</EM> ...?
-          The alignlabels  procedure  takes  a  list  of  widgets
-          derived from the Labeledwidget class and uses the label
-          margin to make each widget have the  same  total  space
-          for  the  combination  of  label  and  margin.  The net
-          effect is to left align the  labels.   Generally,  this
-          method is only useful with a label position of w, which
-          is the default.
-
-
-
-</PRE>
-<H2>COMPONENTS</H2><PRE>
-     Name:           <STRONG>label</STRONG>
-     Class:          <STRONG>label</STRONG>
-
-          The label component provides the label for the  labeled
-          widget.   See  the  "label"  widget  manual  entry  for
-          details on the label component item.
-
-     Name:           <STRONG>lwchildsite</STRONG>
-     Class:          <STRONG>frame</STRONG>
-
-          The lwchildsite component is the user  child  site  for
-          the  labeled  widget.   See  the  "frame" widget manual
-          entry for details on the lwchildsite component item.
-
-
-
-</PRE>
-<H2>EXAMPLE</H2><PRE>
-          The labeledwidget was primarily  meant  to  be  a  base
-          class.   The  ScrolledListBox  and  EntryField are good
-          examples of derived classes of the labeledwidget class.
-          In   order  to  provide  equal  support  for  composite
-          classes, the 'childsite' methods also exists.  The fol-
-          lowing is an example of 'childsite' method usage.
-
-
-           labeledwidget .lw -labeltext "Canvas Widget" -labelpos s
-           pack .lw -fill both -expand yes -padx 10 -pady 10
-
-           set cw [canvas [.lw childsite].c -relief raised -width 200 -height 200]
-           pack $cw -padx 10 -pady 10
-
-
-
-</PRE>
-<H2>AUTHOR</H2><PRE>
-     Mark L. Ulferts
-
-
-</PRE>
-<H2>KEYWORDS</H2><PRE>
-     labeledwidget, widget
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</PRE>
-</BODY>
-</HTML>
+<TITLE>labeledwidget - Create and manipulate a labeled widget</TITLE>
+<H1>labeledwidget - Create and manipulate a labeled widget</H1>
+
+</pre><H2>SYNOPSIS</H2>
+<B>labeledwidget<I> <I>pathName </I>?<I>options</I>?
+</pre><H2>INHERITANCE</H2>
+itk::Widget &lt;- labeledwidget
+</pre><H2>STANDARD OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>background</B><br>
+</td>
+<td valign=top>
+<B>cursor</B><br>
+</td>
+<td valign=top>
+<B>foreground</B><br>
+</td>
+<td valign=top>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/options.n.html"> "options" </A> manual entry for details on the standard options.
+</pre><H2>WIDGET-SPECIFIC OPTIONS</H2>
+<P>
+<pre>
+Name:                   <B>disabledForeground</B>
+Class:                  <B>DisabledForeground</B>
+Command-Line Switch:	<B>-disabledforeground</B>
+</pre>
+<UL>
+Specifies the foreground to be used when the state is disabled. 
+</UL>
+<P>
+<pre>
+Name:                   <B>labelBitmap</B>
+Class:                  <B>Bitmap</B>
+Command-Line Switch:	<B>-labelbitmap</B>
+</pre>
+<UL>
+Specifies a bitmap to display in the widget, in any of the forms 
+acceptable to <B>Tk_GetBitmap</B>.  This option overrides the <I>labeltext</I>
+option.
+</UL>
+<P>
+<pre>
+Name:                   <B>labelFont</B>
+Class:                  <B>Font</B>
+Command-Line Switch:	<B>-labelfont</B>
+</pre>
+<UL>
+Specifies the font to be used for the label.
+</UL>
+<P>
+<pre>
+Name:                   <B>labelImage</B>
+Class:                  <B>Image</B>
+Command-Line Switch:	<B>-labelimage</B>
+</pre>
+<UL>
+Specifies a image to be used as the label. The image may be any of the
+values created by the <B>image create</B> command.  This option overrides
+both the <I>labelbitmap</I> and <I>labeletext</I> options.
+</UL>
+<P>
+<pre>
+Name:                   <B>labelMargin</B>
+Class:                  <B>Margin</B>
+Command-Line Switch:	<B>-labelmargin</B>
+</pre>
+<UL>
+Specifies the distance between the childsite and label in any of the forms
+acceptable to <B>Tk_GetPixels</B>.  The default is 2 pixel.
+</UL>
+<P>
+<pre>
+Name:                   <B>labelPos</B>
+Class:                  <B>Position</B>
+Command-Line Switch:	<B>-labelpos</B>
+</pre>
+<UL>
+Specifies the position of the label along the side of the childsite: 
+<B>nw</B>, <B>n</B>, <B>ne</B>, <B>sw</B>, <B>s</B>, <B>se</B>, <B>en</B>, <B>e</B>, 
+<B>es</B>, <B>wn</B>, <B>w</B>, or <B>ws</B>.  The default is w.
+</UL>
+<P>
+<pre>
+Name:                   <B>labelText</B>
+Class:                  <B>Text</B>
+Command-Line Switch:	<B>-labeltext</B>
+</pre>
+<UL>
+Specifies the text of the label around the childsite.
+</UL>
+<P>
+<pre>
+Name:                   <B>labelVariable</B>
+Class:                  <B>Variable</B>
+Command-Line Switch:	<B>-labelvariable</B>
+</pre>
+<UL>
+Specifies the text variable of the label around the childsite.
+</UL>
+<P>
+<pre>
+Name:                   <B>state</B>
+Class:                  <B>State</B>
+Command-Line Switch:	<B>-state</B>
+</pre>
+<UL>
+Specifies one of two states for the label: <B>normal</B> or <B>disabled</B>.
+If the label is disabled then it is displayed in a disabled foreground
+color.  The default is normal.
+</UL>
+<P>
+</pre><HR>
+
+</pre><H2>DESCRIPTION</H2>
+<P>
+The <B>labeledwidget</B> command creates a labeled widget which contains 
+a label and child site.  The child site is a frame 
+which can filled with any widget via a derived class or though the use 
+of the childsite method.  This class
+was designed to be a general purpose base class for supporting the 
+combination of label widget and a childsite.  The options include the
+ability to position the label around the childsite widget, modify the
+font and margin, and control the display of the labels.
+
+</pre><H2>METHODS</H2>
+<P>
+The <B>labeledwidget</B> command creates a new Tcl command whose
+name is <I>pathName</I>.  This
+command may be used to invoke various
+operations on the widget.  It has the following general form:
+<pre>
+<I>pathName option </I>?<I>arg arg ...</I>?
+</pre>
+<I>Option</I> and the <I>arg</I>s
+determine the exact behavior of the command.  The following
+commands are possible for labeledwidget widgets:
+</pre><H2>WIDGET-SPECIFIC METHODS</H2>
+<DL>
+<DT> <I>pathName <B>childsite</B>
+</I></B>
+<DD> Return the path name of the child site.
+</DL>
+<DL>
+<DT> <I>pathName <B>cget</B> <I>option</I>
+</I></B>
+<DD> Returns the current value of the configuration option given
+by <I>option</I>.
+<I>Option</I> may have any of the values accepted by the <B>labeledwidget</B>
+command.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>configure</B> ?<I>option</I>? ?<I>value option value ...</I>?
+</I></B>
+<DD> Query or modify the configuration options of the widget.
+If no <I>option</I> is specified, returns a list describing all of
+the available options for <I>pathName</I> (see <B>Tk_ConfigureInfo</B> for
+information on the format of this list).  If <I>option</I> is specified
+with no <I>value</I>, then the command returns a list describing the
+one named option (this list will be identical to the corresponding
+sublist of the value returned if no <I>option</I> is specified).  If
+one or more <I>option-value</I> pairs are specified, then the command
+modifies the given widget option(s) to have the given value(s);  in
+this case the command returns an empty string.
+<I>Option</I> may have any of the values accepted by the <B>labeledwidget</B>
+command.
+
+</DL>
+</pre><H2>STATIC METHODS</H2>
+<DL>
+<DT> <B>Labeledwidget::alignlabels</B> <I>widget</I> ?<I>widget ...</I>?
+</I></B>
+<DD> The alignlabels procedure takes a list of widgets derived from
+the Labeledwidget class and uses the label margin to make each widget
+have the same total space for the combination of label and margin.  The
+net effect is to left align the labels.  Generally, this method is only 
+useful with a label position of w, which is the default.
+
+</DL>
+</pre><H2>COMPONENTS</H2>
+<P>
+<pre>
+Name:                   <B>label</B>
+Class:                  <B>label</B>
+</pre>
+<UL>
+The label component provides the label for the labeled widget.  See the 
+"label" widget manual entry for details on the label component item.
+</UL>
+<P>
+<pre>
+Name:                   <B>lwchildsite</B>
+Class:                  <B>frame</B>
+</pre>
+<UL>
+The lwchildsite component is the user child site for the labeled widget.  See 
+the "frame" widget manual entry for details on the lwchildsite component item.
+</UL>
+</table>
+
+</pre><H2>EXAMPLE</H2>
+<UL>
+The labeledwidget was primarily meant to be a base class.  The
+ScrolledListBox and EntryField are good examples of derived
+classes of the labeledwidget class.  In order to provide equal
+support for composite classes, the 'childsite' methods also exists.
+The following is an example of 'childsite' method usage.
+</UL>
+<P>
+<pre>
+ labeledwidget .lw -labeltext "Canvas Widget" -labelpos s
+ pack .lw -fill both -expand yes -padx 10 -pady 10
+
+ set cw [canvas [.lw childsite].c -relief raised -width 200 -height 200]
+ pack $cw -padx 10 -pady 10
+</pre>
+</pre><H2>AUTHOR</H2>
+<A HREF="mailto:mulferts@spd.dsccc.com">Mark L. Ulferts</A>
+</pre><H2>KEYWORDS</H2>
+labeledwidget, widget

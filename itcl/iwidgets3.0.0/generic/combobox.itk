@@ -360,7 +360,7 @@ configbody iwidgets::Combobox::state {
 				   must be normal  or disabled"
 	}
     }
-    if {[info exists itk_component(arrowBtn)]} {
+    if {[winfo exists itk_component(arrowBtn)]} {
 	$itk_component(arrowBtn) configure -state $itk_option(-state)
     }
 }
@@ -435,6 +435,9 @@ body iwidgets::Combobox::curselection {} {
 body iwidgets::Combobox::delete {component first {last {}}} {
     switch -- $component {
 	entry {
+	    if {$last == {}} {
+	      set last [expr $first + 1]
+	    }
 	    iwidgets::Entryfield::delete $first $last
 	}
 	list {
@@ -656,7 +659,25 @@ body iwidgets::Combobox::_createComponents {} {
 	# --- build a dropdown combobox ---
 
 	# make the arrow childsite be on the right hand side
-	configure -childsitepos e -command [code $this _addToList]
+
+  	#-------------------------------------------------------------
+	# BUG FIX: csmith (Chad Smith: csmith@adc.com), 3/4/99
+  	#-------------------------------------------------------------
+	# The following commented line of code overwrites the -command
+	# option when passed into the constructor.  The order of calls
+	# in the constructor is:
+	# 	1) eval itk_initalize $args (initializes -command)
+	#       2) _doLayout
+	#       3) _createComponents (overwrites -command)
+	# The solution is to only set the -command option if it hasn't
+	# already been set.  The following 4 lines of code do this.
+  	#-------------------------------------------------------------
+	# ** configure -childsitepos e -command [code $this _addToList]
+  	#-------------------------------------------------------------
+	configure -childsitepos e
+	if ![llength [cget -command]] {
+	  configure -command [code $this _addToList]
+	}
 	
 	# arrow button to popup the list
 	itk_component add arrowBtn {

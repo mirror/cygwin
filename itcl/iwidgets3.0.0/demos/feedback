@@ -8,19 +8,16 @@ package require Iwidgets 3.0
 
 # itkwish interprets the rest...
 # ----------------------------------------------------------------------
+. configure -background white
 
-frame .f -width 200 -height 100
-pack propagate .f no
-
-iwidgets::feedback .f.fb -labeltext "Status" -steps 22
-pack .f.fb -padx 4 -pady 4 -fill both -expand yes
+iwidgets::feedback .fb -labeltext "Status" -steps 22
+pack .fb -padx 4 -pady 4
 
 button .go -text "Go" -command {
-    .f.fb reset
+    .fb reset
     for {set i 0} {$i < 22} {incr i} {
-        .f.fb step
+        .fb step
         after 100
     }
 }
-pack .f
 pack .go -padx 4 -pady 4

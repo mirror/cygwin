@@ -11,6 +11,9 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 package require Iwidgets 3.0
 
 if {[string compare test [info procs test]] == 1} {
@@ -41,7 +44,7 @@ incr c
 #
 test Combobox-2.$o {configuration option} {
     llength [.cb configure]
-} {50}
+} {51}
 
 incr o
 
@@ -141,7 +144,7 @@ foreach test {
     {-margin bogus {bad screen distance "bogus"}}
     {-popupcursor bogus {bad cursor spec "bogus"}}
     {-selectborderwidth bogus {bad screen distance "bogus"}}
-    {-state bogus {bad state value "bogus": must be normal or disabled}}
+    {-state bogus {bad state "bogus": must be disabled or normal}}
     {-unique bogus {bad unique value "bogus": should be boolean}}
     {-vscrollmode bogus {bad vscrollmode option "bogus": should be static, dynamic, or none}}
     {-width bogus {expected integer but got "bogus"}} } {
@@ -295,3 +298,6 @@ test Combobox-4.5 {Combobox destruction} {
     destroy .cb4
     update 
 } {}
+
+::tcltest::cleanupTests
+exit

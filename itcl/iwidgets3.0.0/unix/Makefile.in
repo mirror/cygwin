@@ -28,6 +28,12 @@ VERSION = $(ITCL_VERSION).$(IWIDGETS_VERSION)
 
 prefix =	@prefix@
 exec_prefix =	@exec_prefix@
+srcdir = @srcdir@
+libdir=@libdir@
+bindir=@bindir@
+includedir=@includedir@
+mandir=@mandir@
+datadir=@datadir@
 
 # The following definition can be set to non-null for special systems
 # like AFS with replication.  It allows the pathnames used for installation
@@ -40,23 +46,23 @@ INSTALL_ROOT =
 # Directory from which applications will reference the library of
 # [incr Widgets] scripts (note: you can set the IWIDGETS_LIBRARY environment
 # variable at run-time to override this value):
-IWIDGETS_LIBRARY = $(prefix)/share/iwidgets$(VERSION)
+IWIDGETS_LIBRARY = $(datadir)/iwidgets$(VERSION)
 # END CYGNUS LOCAL
 
 # Path name to use when installing library scripts:
 SCRIPT_INSTALL_DIR = $(INSTALL_ROOT)$(IWIDGETS_LIBRARY)
 
 # Directory in which to install the archive libtcl.a:
-LIB_INSTALL_DIR = $(INSTALL_ROOT)$(exec_prefix)/lib
+LIB_INSTALL_DIR = $(INSTALL_ROOT)$(libdir)
 
 # Directory in which to install the program tclsh:
-BIN_INSTALL_DIR = $(INSTALL_ROOT)$(exec_prefix)/bin
+BIN_INSTALL_DIR = $(INSTALL_ROOT)$(bindir)
 
 # Directory in which to install the include file itcl.h:
-INCLUDE_INSTALL_DIR = $(INSTALL_ROOT)$(prefix)/include
+INCLUDE_INSTALL_DIR = $(INSTALL_ROOT)$(includedir)
 
 # Top-level directory in which to install manual entries:
-MAN_INSTALL_DIR = $(INSTALL_ROOT)$(prefix)/man
+MAN_INSTALL_DIR = $(INSTALL_ROOT)$(mandir)
 
 # Directory in which to install manual entry for itclsh:
 MAN1_INSTALL_DIR = $(MAN_INSTALL_DIR)/man1
@@ -150,7 +156,9 @@ standalone:
 
 plusplus:
 
-install: install-libraries install-demos install-man
+install: install-libraries install-demos install-man install-binaries
+
+install-binaries:
 
 install-libraries:
 	@$(MKINSTALLDIRS) $(SCRIPT_INSTALL_DIR) $(LIB_INSTALL_DIR)

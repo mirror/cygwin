@@ -1,402 +1,509 @@
-<HTML>
-<HEAD>
-<TITLE>iwidgets2.2.0 User Commands - notebook</TITLE>
-</HEAD>
-<BODY BGCOLOR="#FFFFFF">
-<H1>iwidgets2.2.0 User Commands - notebook</H1>
-<HR>
-<PRE>
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-</PRE>
-<H2>NAME</H2><PRE>
-     notebook - create and manipulate notebook widgets
-
-
-</PRE>
-<H2>SYNOPSIS</H2><PRE>
-     <STRONG>notebook</STRONG> <EM>pathName</EM> ?<EM>options</EM>?
-
-
-</PRE>
-<H2>INHERITANCE</H2><PRE>
-     itk::Widget &lt;- notebook
-
-
-</PRE>
-<H2>STANDARD OPTIONS</H2><PRE>
-     <STRONG>background</STRONG>      <STRONG>foreground</STRONG>     <STRONG>scrollCommand</STRONG>   <STRONG>width</STRONG>
-     <STRONG>cursor</STRONG>          <STRONG>height</STRONG>
-
-     See the "options" manual entry for details on  the  standard
-     options.
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC OPTIONS</H2><PRE>
-     Name:           <STRONG>auto</STRONG>
-     Class:          <STRONG>Auto</STRONG>
-     Command-Line Switch:           <STRONG>-auto</STRONG>
-
-          Specifies    whether    to    use     the     automatic
-          packing/unpacking algorithm of the notebook. A value of
-          <STRONG>true</STRONG> indicates that page frames will  be  unpacked  and
-          packed  acoording  to  the  algorithm  described in the
-          <STRONG>select</STRONG> command. A value of  <STRONG>false</STRONG>  leaves  the  current
-          page  packed  and subsequent selects, next, or previous
-          commands do not switch pages automatically.  In  either
-          case   the  page's  associated  command  (see  the  <STRONG>add</STRONG>
-          command's  description  of  the  <STRONG>command</STRONG>   option)   is
-          invoked.  The  value may have any of the forms accepted
-          by the <STRONG>Tcl_GetBoolean</STRONG>, such as true, false, 0, 1,  yes,
-          or no.
-
-          For example, if a series of pages in a notebook  simply
-          change  certain  display  configurations of a graphical
-          display, the <STRONG>-auto</STRONG> flag could be used. By  setting  it,
-          the <STRONG>-command</STRONG> procs could do the appropriate reconfigur-
-          ing of the page when the page is switched.
-
-</PRE>
-<H2><HR ALIGN=LEFT WIDTH=70% SIZE=3></H2><PRE>
-
-
-</PRE>
-<H2>DESCRIPTION</H2><PRE>
-     The <STRONG>notebook</STRONG> command creates a  new  window  (given  by  the
-     pathName  argument)  and  makes  it  into a notebook widget.
-     Additional options, described above may be specified on  the
-     command  line or in the option database to configure aspects
-     of the notebook such as its  colors,  font,  and  text.  The
-     <STRONG>notebook</STRONG>  command returns its <EM>pathName</EM> argument. At the time
-     this command is invoked, there must not exist a window named
-     pathName, but pathName's parent must exist.
-     A notebook is a widget that contains  a  set  of  pages.  It
-     displays  one page from the set as the selected page. When a
-     page is selected, the page's contents are displayed  in  the
-     page area. When first created a notebook has no pages. Pages
-     may be added or  deleted  using  widget  commands  described
-     below.
-
-
-
-</PRE>
-<H2>NOTEBOOK PAGES</H2><PRE>
-     A notebook's pages area contains a single child site  <STRONG>frame</STRONG>.
-     When  a new page is created it is a child of this frame. The
-     page's child site frame serves as a geometry  container  for
-     applications  to pack widgets into. It is this frame that is
-     automatically unpacked or packed when  the  <STRONG>auto</STRONG>  option  is
-     <STRONG>true</STRONG>. This creates the effect of one page being visible at a
-     time. When a new page is selected, the  previously  selected
-     page's  child  site frame is automatically unpacked from the
-     notebook's child site frame and the  newly  selected  page's
-     child site is packed into the notebook's child site frame.
-
-     However, sometimes it is desirable to handle page changes in
-     a  different manner. By specifying the <STRONG>auto</STRONG> option as <STRONG>false</STRONG>,
-     child site packing can be disabled and done differently. For
-     example,  all  widgets might be packed into the first page's
-     child site frame. Then when a  new  page  is  selected,  the
-     application can reconfigure the widgets and give the appear-
-     ance that the page was flipped.
-
-     In both cases the <STRONG>command</STRONG> option for a page specifies a  Tcl
-     Command to execute when the page is selected. In the case of
-     <STRONG>auto</STRONG> being <STRONG>true</STRONG>, it is called between the unpacking  of  the
-     previously  selected  page  and  the  packing  of  the newly
-     selected page.
-
-
-
-</PRE>
-<H2>WIDGET-SPECIFIC METHODS</H2><PRE>
-     The <STRONG>notebookfR</STRONG> <STRONG>command</STRONG> <STRONG>creates</STRONG> <STRONG>a</STRONG> <STRONG>new</STRONG> <STRONG>Tcl</STRONG> <STRONG>command</STRONG> <STRONG>whose</STRONG>  <STRONG>name</STRONG>
-     <STRONG>is</STRONG>  <EM>pathName</EM>.  This  command  may  be used to invoke various
-     operations on the widget. It has the following general form:
-
-          <EM>pathName</EM> <EM>option</EM> ?<EM>arg</EM> <EM>arg</EM> ...?
-
-     <EM>option</EM> and the <EM>arg</EM>s determine the exact behavior of the com-
-     mand.
-
-     Many of the widget commands for a notebook take as one argu-
-     ment  an  indicator of which page of the notebook to operate
-     on. These indicators are called indexes and may be specified
-     in any of the following forms:
-
-     <EM>number</EM>
-          Specifies the index of the the component. For menus,  0
-          corresponds  to the left-most menu of the menu bar. For
-          entries, 0 corresponds to the  top-most  entry  of  the
-          menu.   <EM>number</EM>  Specifies the page numerically, where 0
-          corresponds to the first page in the notebook, 1 to the
-          second, and so on.
-
-     <STRONG>select</STRONG>
-          Specifies the currently selected page's  index.  If  no
-          page is currently selected, the value -1 is returned.
-
-     <STRONG>end</STRONG>  Specifes the last page in the notebooks's index. If the
-          notebook is empty this will return -1.
-
-     <EM>pattern</EM>
-          If the index doesn't satisfy the form of a number, then
-          this  form  is used. Pattern is pattern-matched against
-          the <STRONG>label</STRONG> of each page in the notebook, in  order  from
-          the  first  to the last page, until a matching entry is
-          found. The rules of <STRONG>Tcl_StringMatch</STRONG> are used.
-
-     The following commands are possible for notebook widgets:
-
-     <EM>pathName</EM> <STRONG>add</STRONG> ?<EM>option</EM> <EM>value</EM>?
-          Add a new page at the end of the notebook. A new  child
-          site frame is created. Returns the child site pathName.
-          If additional arguments are present, they  specify  any
-          of the following options:
-
-          <STRONG>-background</STRONG> <EM>value</EM>
-               Specifies a background color to use for displaying
-               the  child site frame of this page. If this option
-               is specified as an  empty  string  (the  default),
-               then  the  background option for the overall note-
-               book is used.
-
-          <STRONG>-command</STRONG> <EM>value</EM>
-               Specifies a Tcl command to be executed  when  this
-               page  is  selected.  This  allows the programmer a
-               hook to reconfigure this  page's  widgets  or  any
-               other page's widgets.
-
-               If the notebook has the auto option set  to  true,
-               when  a  page  is  selected  this  command will be
-               called immediately after the  previously  selected
-               page  is unpacked and immediately before this page
-               is selected. The index value select is valid  dur-
-               ing  this  Tcl command. `index select' will return
-               this page's page number.
-
-               If the auto option is set to false, when a page is
-               selected  the  unpack and pack calls are bypassed.
-               This Tcl command is still called.
-
-          <STRONG>-foreground</STRONG> <EM>value</EM>
-               Specifies a foreground color to use for displaying
-               tab   labels   when   tabs  are  in  their  normal
-               unselected state. If this option is  specified  as
-               an empty string (the default), then the foreground
-               option for the overall notebook is used.
-
-          <STRONG>-label</STRONG> <EM>value</EM>
-               Specifies a string to associate  with  this  page.
-               This label serves as an additional identifier used
-               to reference the page. This label may be used  for
-               the index value in widget commands.
-
-     <EM>pathName</EM> <STRONG>childSite</STRONG> ?<EM>index</EM>?
-          If passed no arguments, returns a list of pathNames for
-          all  the  pages  in  the  notebook.  If the notebook is
-          empty, an empty list is returned
-
-          If index is passed, it returns  the  pathName  for  the
-          page's  child  site  frame  specified by index. Widgets
-          that are created with this pathName will  be  displayed
-          when the associated page is selected. If index is not a
-          valid index, an empty string is returned.
-
-     <EM>pathName</EM> <STRONG>cget</STRONG> <EM>option</EM>
-          Returns the current value of the  configuration  option
-          given by <EM>option</EM>.
-
-     <EM>pathName</EM> <STRONG>configure</STRONG> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
-          Query  or  modify  the  configuration  options  of  the
-          widget.  If  no  <EM>option</EM>  is  specified,  returns a list
-          describing all of the available  options  for  <EM>pathName</EM>
-          (see  <STRONG>Tk_ConfigureInfo</STRONG> for information on the format of
-          this list). If <EM>option</EM> is specified with no <EM>value</EM>,  then
-          the  command  returns  a  list describing the one named
-          option (this list will be identical to the  correspond-
-          ing  sublist  of  the  value  returned  if no option is
-          specified). If  one  or  more  option-value  pairs  are
-          specified,  then  the command modifies the given widget
-          option(s) to have the given value(s); in this case  the
-          command returns an empty string. <EM>Option</EM> may have any of
-          the values accepted by the <STRONG>notebook</STRONG> command.
-
-     <EM>pathName</EM> <STRONG>delete</STRONG> <EM>index1</EM> ?index2?
-          Delete all of  the  pages  between  <EM>index1</EM>  and  <EM>index2</EM>
-          inclusive.  If  <EM>index2</EM>  is  omitted then it defaults to
-          <EM>index1</EM>. Returns an empty string.
-
-     <EM>pathName</EM> <STRONG>index</STRONG> <EM>index</EM>
-          Returns the numerical index corresponding to <EM>index</EM>.
-
-     <STRONG>pathName</STRONG> <STRONG>insert</STRONG> <EM>index</EM> ?<EM>option</EM> <EM>value</EM>?
-          Insert a new page  in  the  notebook  before  the  page
-          specified  by <EM>index</EM>. A new child site <STRONG>frame</STRONG> is created.
-          See the <STRONG>add</STRONG> command  for  valid  options.  Returns  the
-          child site pathName.
-
-     <EM>pathName</EM> <STRONG>next</STRONG>
-          Advances the selected page to the next page  (order  is
-          determined   by  insertion  order).  If  the  currently
-          selected page is the last page  in  the  notebook,  the
-          selection  wraps  around to the first page in the note-
-          book.
-
-          For notebooks with auto set to true the current  page's
-          child  site  is unpacked from the notebook's child site
-          frame. Then the next page's child site is  packed  into
-          the  notebooks  child site frame. The Tcl command given
-          with the command option will be invoked  between  these
-          two operations.
-
-          For notebooks with auto set to false  the  Tcl  command
-          given with the command option will be invoked.
-
-     <EM>pathName</EM> <STRONG>pagecget</STRONG> <EM>index</EM> ?<EM>option</EM>?
-          Returns the current value of the  configuration  option
-          given  by  <EM>option</EM>  for the page specified by <EM>index</EM>. The
-          valid available options are the same  as  available  to
-          the <STRONG>add</STRONG> command.
-
-     <EM>pathName</EM> <STRONG>pageconfigure</STRONG> <EM>index</EM> ?<EM>option</EM>? ?<EM>value</EM> <EM>option</EM> <EM>value</EM> ...?
-          This  command  is  similar  to  the  configure command,
-          except that it applies to the options for an individual
-          page,  whereas configure applies to the options for the
-          notebook. Options may have any of the  values  accepted
-          by  the  add  widget command. If options are specified,
-          options are modified as indicated in  the  command  and
-          the  command returns an empty string. If no options are
-          specified,  returns  a  list  describing  the   current
-          options for page <EM>index</EM> (see <STRONG>Tk_ConfigureInfo</STRONG> for infor-
-          mation on the format of this list).
-
-     <EM>pathName</EM> <STRONG>prev</STRONG>
-          Moves the selected page to the previous page (order  is
-          determined   by  insertion  order).  If  the  currently
-          selected page is the first page in  the  notebook,  the
-          selection  wraps  around  to the last page in the note-
-          book.
-
-          For notebooks with <STRONG>auto</STRONG> set to <STRONG>true</STRONG> the current  page's
-          child  site  is unpacked from the notebook's child site
-          frame. Then the previous page's child  site  is  packed
-          into  the  notebooks  child site frame. The Tcl command
-          given with the command option will be  invoked  between
-          these two operations.
-
-          For notebooks with <STRONG>auto</STRONG> set to <STRONG>false</STRONG>  the  Tcl  command
-          given with the command option will be invoked.
-
-     <EM>pathName</EM> <STRONG>select</STRONG> <EM>index</EM>
-          Selects the page specified by <EM>index</EM>  as  the  currently
-          selected page.
-
-          For notebooks with <STRONG>auto</STRONG> set to <STRONG>true</STRONG> the current  page's
-          child  site  is unpacked from the notebook's child site
-          frame. Then the index page's child site is packed  into
-          the  notebooks  child site frame. The Tcl command given
-          with the command option will be invoked  between  these
-          two operations.
-
-          For notebooks with <STRONG>auto</STRONG> set to <STRONG>false</STRONG>  the  Tcl  command
-          given with the command option will be invoked.
-
-     <EM>pathName</EM> <STRONG>view</STRONG>
-          Returns the currently selected page.  This  command  is
-          for compatibility with the scrollbar widget.
-
-     <EM>pathName</EM> <STRONG>view</STRONG> <EM>index</EM>
-          Selects the page specified by <EM>index</EM>  as  the  currently
-          selected  page.  This command is for compatibility with
-          the scrollbar widget.
-
-     <EM>pathName</EM> <STRONG>view</STRONG> <EM>moveto</EM> <EM>fraction</EM>
-          Uses the fraction value to determine the  corresponding
-          page to move to. This command is for compatibility with
-          the scrollbar widget.
-
-     <EM>pathName</EM> <STRONG>view</STRONG> <EM>scroll</EM> <EM>num</EM> <EM>what</EM>
-          Uses the <EM>num</EM> value to determine how many pages to  move
-          forward  or backward (num can be negative or positive).
-          The <EM>what</EM> argument is ignored. This command is for  com-
-          patibility with the scrollbar widget.
-
-
-
-</PRE>
-<H2>EXAMPLE</H2><PRE>
-     Following is an example that creates  a  notebook  with  two
-     pages. In this example, we use a scrollbar widget to control
-     the notebook widget.
-
-          # Create the notebook widget and pack it.
-            notebook .nb -width 100 -height 100
-            pack .nb -anchor nw \
-                  -fill both \
-                  -expand yes \
-                  -side left \
-                  -padx 10 \
-                  -pady 10
-
-          # Add two pages to the notebook, labelled
-          # "Page One" and "Page Two", respectively.
-            .nb add -label "Page One"
-            .nb add -label "Page Two"
-
-          # Get the child site frames of these two pages.
-            set page1CS [.nb childsite 0]
-            set page2CS [.nb childsite "Page Two"]
-
-          # Create buttons on each page of the notebook
-            button $page1CS.b -text "Button One"
-            pack $page1CS.b
-            button $page2CS.b -text "Button Two"
-            pack $page2CS.b
-
-          # Select the first page of the notebook
-            .nb select 0
-
-          # Create the scrollbar and associate teh scrollbar
-          # and the notebook together, then pack the scrollbar
-            ScrollBar .scroll -command ".nb view"
-            .nb configure -scrollcommand ".scroll set"
-            pack .scroll -fill y -expand yes -pady 10
-
-
-</PRE>
-<H2>AUTHOR</H2><PRE>
-     Bill W. Scott
-
-
-</PRE>
-<H2>KEYWORDS</H2><PRE>
-     notebook page
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</PRE>
-</BODY>
-</HTML>
+<TITLE>notebook - create and manipulate notebook widgets</TITLE>
+<H1>notebook - create and manipulate notebook widgets</H1>
+
+</pre><H2>SYNOPSIS</H2>
+<B>notebook</B> <I>pathName</I> ?<I>options</I>?
+</pre><H2>INHERITANCE</H2>
+itk::Widget &lt;- notebook
+</pre><H2>STANDARD OPTIONS</H2>
+<P>
+<table cellpadding=5>
+<td valign=top>
+<B>background</B><br>
+<B>cursor</B><br>
+</td>
+<td valign=top>
+<B>foreground</B><br>
+<B>height</B><br>
+</td>
+<td valign=top>
+<B>scrollCommand</B><br>
+</td>
+<td valign=top>
+<B>width</B><br>
+</td>
+</table>
+<P>
+See the <A HREF="http://www.sco.com/Technology/tcl/man/tk_man/options.n.html"> "options" </A> manual entry for details on the standard options.
+</pre><H2>WIDGET-SPECIFIC OPTIONS</H2>
+<P>
+<pre>
+Name:                   <B>auto</B>
+Class:                  <B>Auto</B>
+Command-Line Switch:	<B>-auto</B>
+</pre>
+<UL>
+Specifies whether to use the automatic packing/unpacking algorithm of the
+notebook. A value of <B>true</B> indicates that page frames will be unpacked 
+and packed acoording to the algorithm described in the <B>select</B> command. 
+A value of <B>false</B> leaves the current page packed and subsequent selects, 
+next, or previous commands do not switch pages automatically. In either 
+case the page's associated command (see the <B>add</B> command's description 
+of the <B>command</B> option) is invoked. The value may have any of the 
+forms accepted by the <B>Tcl_GetBoolean</B>, such as true, false, 0, 1, yes, 
+or no.
+</UL>
+<UL>
+For example, if a series of pages in a notebook simply change certain display
+configurations of a graphical display, the <B>-auto</B> flag could be used. 
+By setting it, the <B>-command</B> procs could do the appropriate reconfiguring
+of the page when the page is switched.
+</UL>
+</pre><HR>
+</pre><H2>DESCRIPTION</H2>
+<P>
+The <B>notebook</B> command creates a new window (given by the pathName 
+argument) and makes it into a notebook widget. Additional options, described 
+above may be specified on the command line or in the option database to 
+configure aspects of the notebook such as its colors, font, and text. 
+The <B>notebook</B> command returns its <I>pathName</I> argument. At the time 
+this command is invoked, there must not exist a window named pathName, but 
+pathName's parent must exist.
+
+A notebook is a widget that contains a set of pages. It displays one page from 
+the set as the selected page. When a page is selected, the page's contents are 
+displayed in the page area. When first created a notebook has no pages. Pages 
+may be added or deleted using widget commands described below.
+
+</pre><H2>NOTEBOOK PAGES</H2>
+<P>
+A notebook's pages area contains a single child site <B>frame</B>. When a new 
+page is created it is a child of this frame. The page's child site frame 
+serves as a geometry container for applications to pack widgets into. It is 
+this frame that is automatically unpacked or packed when the <B>auto</B> 
+option is <B>true</B>. This creates the effect of one page being visible at 
+a time. When a new page is selected, the previously selected page's child 
+site frame is automatically unpacked from the notebook's child site frame 
+and the newly selected page's child site is packed into the notebook's 
+child site frame.
+
+However, sometimes it is desirable to handle page changes in a different 
+manner. By specifying the <B>auto</B> option as <B>false</B>, child site 
+packing can be disabled and done differently. For example, all widgets might 
+be packed into the first page's child site frame. Then when a new page is 
+selected, the application can reconfigure the widgets and give the appearance
+that the page was flipped.
+
+In both cases the <B>command</B> option for a page specifies a Tcl Command to
+execute when the page is selected. In the case of <B>auto</B> being <B>true</B>, 
+it is called between the unpacking of the previously selected page and the 
+packing of the newly selected page.
+
+</pre><H2>WIDGET-SPECIFIC METHODS</H2>
+<P>
+The <B>notebookfR command creates a new Tcl command whose name 
+is <I>pathName</I>. This command may be used to invoke various operations 
+on the widget. It has the following general form:
+<pre>
+<I>pathName option </I>?<I>arg arg ...</I>?
+</pre>
+<I>option</I> and the <I>arg</I>s
+determine the exact behavior of the command.
+<P>
+Many of the widget commands for a notebook take as one argument an indicator 
+of which page of the notebook to operate on. These indicators are called 
+indexes and may be specified in any of the following forms:
+<DL>
+<DT> <I>number</I>
+</I></B>
+<DD> Specifies the index of the the component. For menus, 0 corresponds to the 
+left-most menu of the menu bar. For entries, 0 corresponds to the top-most 
+entry of the menu.
+<I>number</I>
+Specifies the page numerically, where 0 corresponds to the first page in 
+the notebook, 1 to the second, and so on.
+</DL>
+<DL>
+<DT> <B>select</B>
+</I></B>
+<DD> Specifies the currently selected page's index. If no page is currently 
+selected, the value -1 is returned.
+</DL>
+<DL>
+<DT> <B>end</B>
+</I></B>
+<DD> Specifes the last page in the notebooks's index. If the notebook is empty 
+this will return -1.
+</DL>
+<DL>
+<DT> <I>pattern</I>
+</I></B>
+<DD> If the index doesn't satisfy the form of a number, then this form is used. 
+Pattern is pattern-matched against the <B>label</B> of each page in the 
+notebook, in order from the first to the last page, until a matching entry 
+is found. The rules of <B>Tcl_StringMatch</B> are used.
+</DL>
+<P>
+'.............................................................................
+The following commands are possible for notebook widgets:
+<DL>
+<DT> <I>pathName</I> <B>add</B> ?<I>option value</I>?
+</I></B>
+<DD> Add a new page at the end of the notebook. A new child site frame is 
+created. Returns the child site pathName. If additional arguments are 
+present, they specify any of the following options:
+</DL>
+<UL>
+<DL>
+<DT> <B>-background</B> <I>value</I>
+</I></B>
+<DD> Specifies a background color to use for displaying the child site frame 
+of this page. If this option is specified as an empty string (the default), 
+then the background option for the overall notebook is used.
+</DL>
+<DL>
+<DT> <B>-command</B> <I>value</I>
+</I></B>
+<DD> Specifies a Tcl command to be executed when this page is selected. This 
+allows the programmer a hook to reconfigure this page's widgets or any other
+page's widgets.
+<UL>
+If the notebook has the auto option set to true, when a page is selected 
+this command will be called immediately after the previously selected page 
+is unpacked and immediately before this page is selected. The index value 
+select is valid during this Tcl command. `index select' will return this 
+page's page number. 
+</UL>
+<UL>
+If the auto option is set to false, when a page is selected the unpack and 
+pack calls are bypassed. This Tcl command is still called.
+</UL>
+</DL>
+<DL>
+<DT> <B>-foreground</B> <I>value</I>
+</I></B>
+<DD> Specifies a foreground color to use for displaying tab labels when tabs are 
+in their normal unselected state. If this option is specified as an empty 
+string (the default), then the foreground option for the overall notebook 
+is used. 
+</DL>
+<DL>
+<DT> <B>-label</B> <I>value</I>
+</I></B>
+<DD> Specifies a string to associate with this page. This label serves as an 
+additional identifier used to reference the page. This label may be used 
+for the index value in widget commands. 
+</DL>
+</UL>
+<DL>
+<DT> <I>pathName</I> <B>childSite</B> ?<I>index</I>?
+</I></B>
+<DD> If passed no arguments, returns a list of pathNames for all the pages in 
+the notebook. If the notebook is empty, an empty list is returned
+<UL>
+If index is passed, it returns the pathName for the page's child site 
+frame specified by index. Widgets that are created with this pathName will 
+be displayed when the associated page is selected. If index is not a valid 
+index, an empty string is returned. 
+</UL>
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>cget</B> <I>option</I>
+</I></B>
+<DD> Returns the current value of the configuration option given by <I>option</I>.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>configure</B> ?<I>option</I>? ?<I>value</I> <I>option</I> <I>value</I> ...?
+</I></B>
+<DD> Query or modify the configuration options of the widget. If no <I>option</I> 
+is specified, returns a list describing all of the available options 
+for <I>pathName</I> (see <B>Tk_ConfigureInfo</B> for information on the 
+format of this list). If <I>option</I> is specified with no <I>value</I>, 
+then the command returns a list describing the one named option (this 
+list will be identical to the corresponding sublist of the value returned 
+if no option is specified). If one or more option-value pairs are specified, 
+then the command modifies the given widget option(s) to have the given 
+value(s); in this case the command returns an empty string. <I>Option</I> 
+may have any of the values accepted by the <B>notebook</B> command.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>delete</B> <I>index1</I> ?i</B></I>ndex2?
+</I></B>
+<DD> Delete all of the pages between <I>index1</I> and <I>index2</I> inclusive. 
+If <I>index2</I> is omitted then it defaults to <I>index1</I>. Returns an 
+empty string.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>index</B> <I>index</I>
+</I></B>
+<DD> Returns the numerical index corresponding to <I>index</I>.
+</DL>
+<DL>
+<DT> <B>pathName</B> <B>insert</B> <I>index</I> ?<I>option</I> <I>value</I>?
+</I></B>
+<DD> Insert a new page in the notebook before the page specified by <I>index</I>. 
+A new child site <B>frame</B> is created. See the <B>add</B> command for 
+valid options. Returns the child site pathName.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>next</B>
+</I></B>
+<DD> Advances the selected page to the next page (order is determined by insertion 
+order). If the currently selected page is the last page in the notebook, 
+the selection wraps around to the first page in the notebook. 
+<UL>
+For notebooks with auto set to true the current page's child site is 
+unpacked from the notebook's child site frame. Then the next page's child 
+site is packed into the notebooks child site frame. The Tcl command given 
+with the command option will be invoked between these two operations.
+</UL>
+<UL>
+For notebooks with auto set to false the Tcl command given with the 
+command option will be invoked.
+</UL>
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>pagecget</B> <I>index</I> ?<I>option</I>?
+</I></B>
+<DD> Returns the current value of the configuration option given by <I>option</I> 
+for the page specified by <I>index</I>. The valid available options are the 
+same as available to the <B>add</B> command.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>pageconfigure</B> <I>index</I> ?<I>option</I>? ?<I>value</I> <I>option</I> <I>value</I> ...?
+</I></B>
+<DD> This command is similar to the configure command, except that it applies to 
+the options for an individual page, whereas configure applies to the options 
+for the notebook. Options may have any of the values accepted by the add 
+widget command. If options are specified, options are modified as indicated 
+in the command and the command returns an empty string. If no options are 
+specified, returns a list describing the current options for 
+page <I>index</I> (see <B>Tk_ConfigureInfo</B> for information on the 
+format of this list).
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>prev</B>
+</I></B>
+<DD> Moves the selected page to the previous page (order is determined by 
+insertion order). If the currently selected page is the first page in the 
+notebook, the selection wraps around to the last page in the notebook.
+<UL>
+For notebooks with <B>auto</B> set to <B>true</B> the current page's child 
+site is unpacked from the notebook's child site frame. Then the previous 
+page's child site is packed into the notebooks child site frame. The Tcl 
+command given with the command option will be invoked between these two 
+operations.
+</UL>
+<UL>
+For notebooks with <B>auto</B> set to <B>false</B> the Tcl command given with 
+the command option will be invoked.
+</UL>
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>select</B> <I>index</I>
+</I></B>
+<DD> Selects the page specified by <I>index</I> as the currently selected page.
+<UL>
+For notebooks with <B>auto</B> set to <B>true</B> the current page's child 
+site is unpacked from the notebook's child site frame. Then the index page's 
+child site is packed into the notebooks child site frame. The Tcl command 
+given with the command option will be invoked between these two operations.
+</UL>
+<UL>
+For notebooks with <B>auto</B> set to <B>false</B> the Tcl command given with 
+the command option will be invoked.
+</UL>
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>view</B>
+</I></B>
+<DD> Returns the currently selected page. This command is for compatibility 
+with the scrollbar widget.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>view</B> <I>index</I>
+</I></B>
+<DD> Selects the page specified by <I>index</I> as the currently selected page. 
+This command is for compatibility with the scrollbar widget.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>view</B> <I>moveto</I> <I>fraction</I>
+</I></B>
+<DD> Uses the fraction value to determine the corresponding page to move to. 
+This command is for compatibility with the scrollbar widget.
+</DL>
+<DL>
+<DT> <I>pathName</I> <B>view</B> <I>scroll</I> <I>num</I> <I>what</I>
+</I></B>
+<DD> Uses the <I>num</I> value to determine how many pages to move forward or 
+backward (num can be negative or positive). The <I>what</I> argument is 
+ignored. This command is for compatibility with the scrollbar widget.
+
+</DL>
+</pre><H2>EXAMPLE</H2>
+<P>
+Following is an example that creates a notebook with two pages. In this example, we use a scrollbar widget to control the notebook widget.
+<table cellpadding=5>
+<td valign=top>
+<UL><br>
+the<br>
+pack<br>
+-width<br>
+pack<br>
+\\<br>
+-expand<br>
+left<br>
+\\<br>
+#<br>
+to<br>
+#<br>
+"Page<br>
+add<br>
+.nb<br>
+Two"<br>
+Get<br>
+frames<br>
+pages.<br>
+childsite<br>
+[.nb<br>
+</UL><br>
+buttons<br>
+of<br>
+$page1CS.b<br>
+pack<br>
+-text<br>
+$page2CS.b<br>
+Select<br>
+of<br>
+select<br>
+#<br>
+and<br>
+#<br>
+together,<br>
+scrollbar<br>
+".nb<br>
+-scrollcommand<br>
+.scroll<br>
+yes<br>
+</td>
+<td valign=top>
+</UL><br>
+notebook<br>
+it.<br>
+100<br>
+.nb<br>
+-fill<br>
+yes<br>
+\\<br>
+-pady<br>
+Add<br>
+the<br>
+"Page<br>
+Two",<br>
+-label<br>
+add<br>
+</UL><br>
+the<br>
+of<br>
+set<br>
+0]<br>
+childsite<br>
+<UL><br>
+on<br>
+the<br>
+-text<br>
+$page1CS.b<br>
+"Button<br>
+</UL><br>
+the<br>
+the<br>
+0<br>
+Create<br>
+associate<br>
+and<br>
+then<br>
+ScrollBar<br>
+view"<br>
+".scroll<br>
+-fill<br>
+-pady<br>
+</td>
+<td valign=top>
+#<br>
+widget<br>
+notebook<br>
+-height<br>
+-anchor<br>
+both<br>
+\\<br>
+-padx<br>
+10<br>
+two<br>
+notebook,<br>
+One"<br>
+respectively.<br>
+"Page<br>
+-label<br>
+<UL><br>
+child<br>
+these<br>
+page1CS<br>
+set<br>
+"Page<br>
+#<br>
+each<br>
+notebook<br>
+"Button<br>
+button<br>
+Two"<br>
+<UL><br>
+first<br>
+notebook<br>
+</UL><br>
+the<br>
+teh<br>
+the<br>
+pack<br>
+.scroll<br>
+.nb<br>
+set"<br>
+y<br>
+10<br>
+</td>
+<td valign=top>
+Create<br>
+and<br>
+.nb<br>
+100<br>
+nw<br>
+\\<br>
+-side<br>
+10<br>
+<UL><br>
+pages<br>
+labelled<br>
+and<br>
+.nb<br>
+One"<br>
+"Page<br>
+#<br>
+site<br>
+two<br>
+[.nb<br>
+page2CS<br>
+Two"]<br>
+Create<br>
+page<br>
+button<br>
+One"<br>
+$page2CS.b<br>
+pack<br>
+#<br>
+page<br>
+.nb<br>
+<UL><br>
+scrollbar<br>
+scrollbar<br>
+notebook<br>
+the<br>
+-command<br>
+configure<br>
+pack<br>
+-expand<br>
+</UL><br>
+</td>
+</table>
+</pre><H2>AUTHOR</H2>
+Bill W. Scott
+</pre><H2>KEYWORDS</H2>
+notebook page 

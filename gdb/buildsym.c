@@ -1,21 +1,22 @@
 /* Support routines for building symbol tables in GDB's internal format.
-   Copyright 1986-1999 Free Software Foundation, Inc.
+   Copyright 1986-2000 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* This module provides subroutines used for creating and adding to
    the symbol table.  These routines are called from various symbol-
@@ -35,7 +36,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "gdb_string.h"
 
 /* Ask buildsym.h to define the vars it normally declares `extern'.  */
-#define	EXTERN			/**/
+#define	EXTERN
+/**/
 #include "buildsym.h"		/* Our own declarations */
 #undef	EXTERN
 
@@ -79,10 +81,24 @@ struct complaint innerblock_anon_complaint =
 {"inner block (0x%lx-0x%lx) not inside outer block (0x%lx-0x%lx)", 0, 0};
 
 struct complaint blockvector_complaint =
-{"block at 0x%lx out of order", 0, 0};
+{"block at %s out of order", 0, 0};
 
 /* maintain the lists of symbols and blocks */
 
+/* Add a pending list to free_pendings. */
+void
+add_free_pendings (struct pending *list)
+{
+  register struct pending *link = list;
+
+  if (list)
+    {
+      while (link->next) link = link->next;
+      link->next = free_pendings;
+      free_pendings = list;
+    }
+}
+      
 /* Add a symbol to one of the lists of symbols.  */
 
 void
@@ -146,7 +162,7 @@ find_symbol_in_list (struct pending *list, char *name, int length)
 
 /* ARGSUSED */
 void
-really_free_pendings (int foo)
+really_free_pendings (PTR dummy)
 {
   struct pending *next, *next1;
 
@@ -220,7 +236,7 @@ finish_block (struct symbol *symbol, struct pending **listhead,
     }
 
   block = (struct block *) obstack_alloc (&objfile->symbol_obstack,
-    (sizeof (struct block) + ((i - 1) * sizeof (struct symbol *))));
+	    (sizeof (struct block) + ((i - 1) * sizeof (struct symbol *))));
 
   /* Copy the symbols into the block.  */
 
@@ -382,7 +398,7 @@ finish_block (struct symbol *symbol, struct pending **listhead,
 	      else
 		{
 		  complain (&innerblock_anon_complaint, BLOCK_START (pblock->block),
-		     BLOCK_END (pblock->block), BLOCK_START (block),
+			    BLOCK_END (pblock->block), BLOCK_START (block),
 			    BLOCK_END (block));
 		}
 	      if (BLOCK_START (pblock->block) < BLOCK_START (block))
@@ -485,17 +501,11 @@ make_blockvector (struct objfile *objfile)
 	  if (BLOCK_START (BLOCKVECTOR_BLOCK (blockvector, i - 1))
 	      > BLOCK_START (BLOCKVECTOR_BLOCK (blockvector, i)))
 	    {
-
-	      /* FIXME-32x64: loses if CORE_ADDR doesn't fit in a
-	         long.  Possible solutions include a version of
-	         complain which takes a callback, a
-	         sprintf_address_numeric to match
-	         print_address_numeric, or a way to set up a GDB_FILE
-	         which causes sprintf rather than fprintf to be
-	         called.  */
+	      CORE_ADDR start
+		= BLOCK_START (BLOCKVECTOR_BLOCK (blockvector, i));
 
 	      complain (&blockvector_complaint,
-			(unsigned long) BLOCK_START (BLOCKVECTOR_BLOCK (blockvector, i)));
+			longest_local_hex_string ((LONGEST) start));
 	    }
 	}
     }
@@ -531,6 +541,7 @@ start_subfile (char *name, char *dirname)
      source file.  */
 
   subfile = (struct subfile *) xmalloc (sizeof (struct subfile));
+  memset ((char *) subfile, 0, sizeof (struct subfile));
   subfile->next = subfiles;
   subfiles = subfile;
   current_subfile = subfile;
@@ -569,7 +580,7 @@ start_subfile (char *name, char *dirname)
      program.  But to demangle we need to set the language to C++.  We
      can distinguish cfront code by the fact that it has #line
      directives which specify a file name ending in .C.
-  
+
      So if the filename of this subfile ends in .C, then change the
      language of any pending subfiles from C to C++.  We also accept
      any other C++ suffixes accepted by deduce_language_from_filename
@@ -695,7 +706,7 @@ record_line (register struct subfile *subfile, int line, CORE_ADDR pc)
       subfile->line_vector_length = INITIAL_LINE_VECTOR_LENGTH;
       subfile->line_vector = (struct linetable *)
 	xmalloc (sizeof (struct linetable)
-		 + subfile->line_vector_length * sizeof (struct linetable_entry));
+	   + subfile->line_vector_length * sizeof (struct linetable_entry));
       subfile->line_vector->nitems = 0;
       have_line_numbers = 1;
     }
@@ -855,7 +866,7 @@ end_symtab (CORE_ADDR end_addr, struct objfile *objfile, int section)
   /* Cleanup any undefined types that have been left hanging around
      (this needs to be done before the finish_blocks so that
      file_symbols is still good).
-  
+
      Both cleanup_undefined_types and finish_global_stabs are stabs
      specific, but harmless for other symbol readers, since on gdb
      startup or when finished reading stabs, the state is set so these
@@ -921,7 +932,7 @@ end_symtab (CORE_ADDR end_addr, struct objfile *objfile, int section)
 	      if (objfile->flags & OBJF_REORDERED)
 		qsort (subfile->line_vector->item,
 		       subfile->line_vector->nitems,
-		       sizeof (struct linetable_entry), compare_line_numbers);
+		     sizeof (struct linetable_entry), compare_line_numbers);
 	    }
 
 	  /* Now, allocate a symbol table.  */
@@ -968,8 +979,8 @@ end_symtab (CORE_ADDR end_addr, struct objfile *objfile, int section)
 	  if (subfile->debugformat != NULL)
 	    {
 	      symtab->debugformat = obsavestring (subfile->debugformat,
-				      strlen (subfile->debugformat),
-					  &objfile->symbol_obstack);
+					      strlen (subfile->debugformat),
+						  &objfile->symbol_obstack);
 	    }
 
 	  /* All symtabs for the main file and the subfiles share a
@@ -1025,7 +1036,7 @@ push_context (int desc, CORE_ADDR valu)
       context_stack_size *= 2;
       context_stack = (struct context_stack *)
 	xrealloc ((char *) context_stack,
-	      (context_stack_size * sizeof (struct context_stack)));
+		  (context_stack_size * sizeof (struct context_stack)));
     }
 
   new = &context_stack[context_stack_depth++];

@@ -1,6 +1,6 @@
 /* window.cc: hidden windows for signals/itimer support
 
-   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Sergey Okhapkin <sos@prospect.com.ru>
 
@@ -18,10 +18,13 @@ details. */
 #include <limits.h>
 #include <wingdi.h>
 #include <winuser.h>
+#define USE_SYS_TYPES_FD_SET
+#include <winsock2.h>
 #include <unistd.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
+#include "cygthread.h"
 
 static NO_COPY UINT timer_active = 0;
 static NO_COPY struct itimerval itv;
@@ -61,7 +64,10 @@ WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
       return 0;
     case WM_ASYNCIO:
-      raise (SIGIO);
+      if (WSAGETSELECTEVENT (lParam) == FD_OOB)
+	raise (SIGURG);
+      else
+	raise (SIGIO);
       return 0;
     default:
       return DefWindowProc (hwnd, uMsg, wParam, lParam);
@@ -97,10 +103,10 @@ Winmain (VOID *)
     }
 
   /* Create hidden window. */
-  ourhwnd = CreateWindow (classname, classname,
-	WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
-	CW_USEDEFAULT, CW_USEDEFAULT, (HWND) NULL,
-	(HMENU) NULL, user_data->hmodule, (LPVOID) NULL);
+  ourhwnd = CreateWindow (classname, classname, WS_POPUP, CW_USEDEFAULT,
+			  CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			  (HWND) NULL, (HMENU) NULL, user_data->hmodule,
+			  (LPVOID) NULL);
 
   SetEvent (window_started);
 
@@ -113,11 +119,9 @@ Winmain (VOID *)
   /* Start the message loop. */
 
   while (GetMessage (&msg, ourhwnd, 0, 0) == TRUE)
-    {
-      DispatchMessage (&msg);
-    }
+    DispatchMessage (&msg);
 
-  return msg.wParam;
+  ExitThread (0);
 }
 
 HWND __stdcall
@@ -126,29 +130,15 @@ gethwnd ()
   if (ourhwnd != NULL)
     return ourhwnd;
 
-  HANDLE hThread;
+  cygthread *h;
 
   window_started = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-  hThread = makethread (Winmain, NULL, 0, "win");
-  if (!hThread)
-    {
-      system_printf ("Cannot start window thread");
-    }
-  else
-    {
-      SetThreadPriority (hThread, THREAD_PRIORITY_HIGHEST);
-      CloseHandle (hThread);
-    }
+  h = new cygthread (Winmain, NULL, "win");
+  h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
   WaitForSingleObject (window_started, INFINITE);
   CloseHandle (window_started);
+  h->zap_h ();
   return ourhwnd;
-}
-
-void __stdcall
-window_terminate ()
-{
-  if (ourhwnd)
-    SendMessage (ourhwnd, WM_DESTROY, 0, 0);
 }
 
 extern "C" int
@@ -158,7 +148,7 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
 
   if (which != ITIMER_REAL)
     {
-      set_errno (EINVAL);
+      set_errno (ENOSYS);
       return -1;
     }
   /* Check if we will wrap */

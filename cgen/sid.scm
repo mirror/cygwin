@@ -1,5 +1,5 @@
 ; Simulator generator support routines.
-; Copyright (C) 2000-2004 Red Hat, Inc.
+; Copyright (C) 2000-2005 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; One goal of this file is to provide cover functions for all methods.
@@ -191,6 +191,7 @@
 		 (case bitsize
 		   ((8) "UQI")
 		   ((16) "UHI")
+		   ((24) "USI")
 		   ((32) "USI")
 		   (else (error "bad bitsize argument to gen-ifetch" bitsize)))
 		 " (pc, "

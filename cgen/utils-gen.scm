@@ -1,5 +1,5 @@
 ; Application independent utilities for C/C++ code generation.
-; Copyright (C) 2000, 2001 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2005 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -241,8 +241,7 @@
        (-gen-ifld-extract-base f total-length base-value)
        (if (ifld-beyond-base? f base-length total-length)
 	   (-gen-ifld-extract-beyond f base-length total-length var-list)
-	   (-gen-ifld-extract-base f (min base-length total-length)
-				   base-value)))
+	   (-gen-ifld-extract-base f base-length base-value)))
    ";"
    (if macro? " \\\n" "\n")
    )

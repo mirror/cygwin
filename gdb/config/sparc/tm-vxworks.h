@@ -1,5 +1,6 @@
-/* Target machine description for VxWorks sparc's, for GDB, the GNU debugger.
-   Copyright 1993, 1999 Free Software Foundation, Inc.
+/* Target-dependent defenitions for VxWorks SPARC.
+
+   Copyright 1993, 1999, 2004 Free Software Foundation, Inc.
    Contributed by Cygnus Support.
 
    This file is part of GDB.
@@ -19,9 +20,12 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#include "sparc/tm-spc-em.h"
+#ifndef TM_VXWORKS_H
+#define TM_VXWORKS_H
+
+#define GDB_MULTI_ARCH GDB_MULTI_ARCH_TM
+
+/* Get generic VxWorks definitions.  */
 #include "config/tm-vxworks.h"
 
-/* Number of registers in a ptrace_getfpregs call. */
-
-/* #define VX_SIZE_FPREGS (don't know how many) */
+#endif /* tm-vxworks.h */

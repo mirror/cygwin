@@ -1,5 +1,7 @@
-/* Macro definitions for running gdb on a Sun 4 running sunos 4.
-   Copyright 1989, 1992, 1996, 2000 Free Software Foundation, Inc.
+/* Native-dependent definitions for GNU/Linux SPARC.
+
+   Copyright 1989, 1992, 1996, 1998, 1999, 2000, 2002, 2003
+   Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -18,25 +20,18 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#include "regcache.h"
+#ifndef NM_LINUX_H
+#define NM_LINUX_H
 
-/* Do implement the attach and detach commands.  */
+#include "config/nm-linux.h"
 
-#define ATTACH_DETACH
+/* Type of the third argument to the `ptrace' system call.  */
+#define PTRACE_ARG3_TYPE long
 
-/* Override copies of {fetch,store}_inferior_registers in infptrace.c.  */
+/* Type of the fourth argument to the `ptrace' system call.  */
+#define PTRACE_XFER_TYPE long
 
+/* Override copies of {fetch,store}_inferior_registers in `infptrace.c'.  */
 #define FETCH_INFERIOR_REGISTERS
 
-/* Before storing, we need to read all the registers.  */
-
-#define CHILD_PREPARE_TO_STORE() deprecated_read_register_bytes (0, NULL, DEPRECATED_REGISTER_BYTES)
-
-/* Return sizeof user struct to callers in less machine dependent routines */
-
-#define KERNEL_U_SIZE kernel_u_size()
-extern int kernel_u_size (void);
-
-/* SunOS 4.x uses nonstandard "char *" as type of third argument to ptrace() */
-
-#define PTRACE_ARG3_TYPE char*
+#endif /* nm-linux.h */

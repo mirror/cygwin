@@ -1,5 +1,6 @@
-/* Macro definitions for Sparc running under LynxOS.
-   Copyright 1993, 1994 Free Software Foundation, Inc.
+/* Native-dependent definitions for NetBSD/sparc a.out.
+
+   Copyright 1999, 2003 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -18,20 +19,12 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#ifndef TM_SPARCLYNX_H
-#define TM_SPARCLYNX_H
+#ifndef NM_NBSDAOUT_H
+#define NM_NBSDAOUT_H
 
-#include "config/tm-lynx.h"
+#include "sparc/nm-nbsd.h"
 
-/* Use generic Sparc definitions. */
-#include "sparc/tm-sparc.h"
+/* Get generic NetBSD a.out native definitions.  */
+#include "config/nm-nbsdaout.h"
 
-/* Lynx does this backwards from everybody else */
-
-#undef FRAME_SAVED_I0
-#undef FRAME_SAVED_L0
-
-#define FRAME_SAVED_I0 0
-#define FRAME_SAVED_L0 (8 * DEPRECATED_REGISTER_RAW_SIZE (I0_REGNUM))
-
-#endif /* TM_SPARCLYNX_H */
+#endif /* nm-nbsdaout.h */

@@ -2179,7 +2179,7 @@ esac
 
 
 echo $ac_n "checking ARM family support""... $ac_c" 1>&6
-echo "configure:2180: checking ARM family support" >&5
+echo "configure:2183: checking ARM family support" >&5
 
 
 
@@ -2193,7 +2193,7 @@ fi
 echo "$ac_t""$sidtarget_arm" 1>&6
 
 echo $ac_n "checking X86 family support""... $ac_c" 1>&6
-echo "configure:2194: checking X86 family support" >&5
+echo "configure:2197: checking X86 family support" >&5
 
 
 
@@ -2207,7 +2207,7 @@ fi
 echo "$ac_t""$sidtarget_x86" 1>&6
 
 echo $ac_n "checking MIPS family support""... $ac_c" 1>&6
-echo "configure:2208: checking MIPS family support" >&5
+echo "configure:2211: checking MIPS family support" >&5
 
 
 
@@ -2221,7 +2221,7 @@ fi
 echo "$ac_t""$sidtarget_mips" 1>&6
 
 echo $ac_n "checking M32R family support""... $ac_c" 1>&6
-echo "configure:2222: checking M32R family support" >&5
+echo "configure:2225: checking M32R family support" >&5
 
 
 
@@ -2235,7 +2235,7 @@ fi
 echo "$ac_t""$sidtarget_m32r" 1>&6
 
 echo $ac_n "checking M68K family support""... $ac_c" 1>&6
-echo "configure:2236: checking M68K family support" >&5
+echo "configure:2239: checking M68K family support" >&5
 
 
 
@@ -2249,7 +2249,7 @@ fi
 echo "$ac_t""$sidtarget_m68k" 1>&6
 
 echo $ac_n "checking PPC family support""... $ac_c" 1>&6
-echo "configure:2250: checking PPC family support" >&5
+echo "configure:2253: checking PPC family support" >&5
 
 
 
@@ -2263,7 +2263,7 @@ fi
 echo "$ac_t""$sidtarget_ppc" 1>&6
 
 echo $ac_n "checking Sanyo Xstormy16 family support""... $ac_c" 1>&6
-echo "configure:2433: checking Sanyo Xstormy16 family support" >&5
+echo "configure:2267: checking Sanyo Xstormy16 family support" >&5
 
 
 
@@ -2287,6 +2287,8 @@ else
   SID_STATIC_TRUE='#'
   SID_STATIC_FALSE=
 fi
+
+program_transform_name=s,x,x,
 
 trap '' 1 2 15
 cat > confcache <<\EOF

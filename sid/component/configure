@@ -3625,6 +3625,8 @@ subdirs="bochs cfgroot tcl audio cgen-cpu families timers"
 make_subdirs="cache consoles gdb gloss glue ide interrupt lcd loader mapper memory mmu parport profiling rtc sched uart testsuite"
 
 
+program_transform_name=s,x,x,
+
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure

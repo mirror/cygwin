@@ -1,3 +1,9 @@
+2003-10-24  Dave Brolley  <brolley@redhat.com>
+
+	* configure.in: Set program_transform_name to s,x,x, to avoid
+	installing with the target prefix.
+	* configure: Regenerate.
+
 2003-10-07  Dave Brolley  <brolley@redhat.com>
 
 	For Graydon Hoare  <graydon@redhat.com>

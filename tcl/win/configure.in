@@ -247,5 +247,5 @@ AC_SUBST(POST_MAKE_LIB)
 AC_SUBST(MAKE_DLL)
 AC_SUBST(MAKE_EXE)
 
-AC_OUTPUT(Makefile tclConfig.sh tcl.hpj ../unix/tclConfig.sh)
+AC_OUTPUT(Makefile tclConfig.sh tcl.hpj)
 

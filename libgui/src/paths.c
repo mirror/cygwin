@@ -68,6 +68,9 @@ proc initialize_paths {} {\n\
   }\n\
   cd [file dirname $exec_name]\n\
   # Handle build with --exec-prefix and build without.\n\
+  set d [file join [file dirname [pwd]] usr share]\n\
+  lappend prefdirs $d\n\
+  lappend guidirs [file join $d cygnus gui]\n\
   set d [file join [file dirname [pwd]] share]\n\
   lappend prefdirs $d\n\
   lappend guidirs [file join $d cygnus gui]\n\

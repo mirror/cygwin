@@ -1341,8 +1341,7 @@
    (if (hw-scalar? (op:type self))
        ""
        (string-append "      "
-		      (gen-argbuf-ref (string-append (if out? "out_" "in_")
-						      (gen-sym self)))
+		      (gen-argbuf-ref (send self 'sbuf-profile-sym out?))
 		      " = "
 		      (send (op:type self) 'gen-record-profile
 			    (op:index self) sfmt estate)
@@ -1364,8 +1363,7 @@
 		      ""
 		      (string-append ", "
 				     (gen-argbuf-ref
-				      (string-append (if out? "out_" "in_")
-						     (gen-sym self)))))
+				      (send self 'sbuf-profile-sym out?))))
 		  ");\n"))
 )
 
@@ -1575,14 +1573,13 @@
 			       (not (insn-op-lookup (car arg) insn
 						    (if out? 'out 'in))))
 			      ""
-			      (string-append "    "
-					     (if out? "out_" "in_")
-					     (gen-c-symbol (car arg))
-					     " = "
-					     (gen-argbuf-ref
-					      (string-append (if out? "out_" "in_")
-							     (gen-c-symbol (car arg))))
-					     ";\n"))))
+			      (let ((sym (gen-profile-sym (gen-c-symbol (car arg))
+							   out?)))
+				(string-append "    "
+					       sym
+					       " = "
+					       (gen-argbuf-ref sym)
+					       ";\n")))))
 
 	  ; Return C code to declare variable to hold unit argument ARG.
 	  ; OUT? is #f for input args, #t for output args.
@@ -1592,8 +1589,8 @@
 			      (string-append "    "
 					     (mode:c-type (mode:lookup (cadr arg)))
 					     " "
-					     (if out? "out_" "in_")
-					     (gen-c-symbol (car arg))
+					     (gen-profile-sym (gen-c-symbol (car arg))
+							      out?)
 					     " = "
 					     (if (null? (cddr arg))
 						 "0"
@@ -1606,8 +1603,8 @@
 			 (if (null? (cdr arg)) ; ignore scalars
 			     ""
 			     (string-append ", "
-					    (if out? "out_" "in_")
-					    (gen-c-symbol (car arg))))))
+					    (gen-profile-sym (gen-c-symbol (car arg))
+							     out?)))))
 	  )
 
      (string-list
@@ -1645,24 +1642,20 @@
 		      ((cycles) "")
 		      ((in)
 		       (if (caddr arg)
-			   (string-append "    in_"
-					  (gen-c-symbol (cadr arg))
+			   (string-append "    "
+					  (gen-profile-sym (gen-c-symbol (cadr arg)) #f)
 					  " = "
 					  (gen-argbuf-ref
-					   (string-append
-					    "in_"
-					    (gen-c-symbol (caddr arg))))
+					   (gen-profile-sym (gen-c-symbol (caddr arg)) #f))
 					  ";\n")
 			   ""))
 		      ((out)
 		       (if (caddr arg)
-			   (string-append "    out_"
-					  (gen-c-symbol (cadr arg))
+			   (string-append "    "
+					  (gen-profile-sym (gen-c-symbol (cadr arg)) #t)
 					  " = "
 					  (gen-argbuf-ref
-					   (string-append
-					    "out_"
-					    (gen-c-symbol (caddr arg))))
+					   (gen-profile-sym (gen-c-symbol (caddr arg)) #t))
 					  ";\n")
 			   ""))
 		      (else

@@ -43,8 +43,19 @@ AC_CHECK_LIB(nsl, gethostbyname, socket_libs="$socket_libs -lnsl",
 		socket_libs="$socket_libs -lresolv"))
 AC_SUBST(socket_libs)
 
-AC_CHECK_FUNCS(ftime times gettimeofday usleep strtoul strtoull select sched_yield)
+AC_CHECK_FUNCS(ftime times gettimeofday usleep strtoul strtoull select sched_yield vsnprintf vasprintf)
 
+dnl We want vsnprintf if available, otherwise try vasprintf
+AC_CHECK_FUNC(vsnprintf,
+   [AC_DEFINE(_ISOC99_SOURCE, 1, [Define if ISO C99 Features in use])],
+   [AC_CHECK_FUNC(vasprintf,
+      [AC_DEFINE(_GNU_SOURCE, 1, [Define if GNU extensions in use])])])
+
+dnl To pick up __USE_MISC stuff like inet_aton and putenv
+AC_DEFINE(_SVID_SOURCE, 1, [Define if SVID extensions in use])
+dnl To pick up __USE_BSD stuff like usleep
+AC_DEFINE(_BSD_SOURCE, 1, [Define if SVID extensions in use])
+  
 old_libs="$LIBS"
 LIBS="$LIBS $socket_libs"
 AC_CHECK_FUNCS(inet_aton inet_addr)

@@ -1,3 +1,11 @@
+2003-06-10  Dave Brolley  <brolley@redhat.com>
+
+	* configure.in: Call AC_CHECK_FUNCS for vsnprintf and vasprintf.
+	Define _ISOC99_SOURCE if using vsnprintf, otherwise define _GNU_SOURCE
+	if using vasprintf. Define _BSD_SOURCE and _SVID_SOURCE.
+	* configure: Regenerated.
+	* config.in: Regenerated.
+
 2003-05-06  Anthony Green  <green@redhat.com>
 
 	* configure.in: The "clog" symbol is found in both libm and old

@@ -1,5 +1,11 @@
 2000-08-14  Jimmy Guo  <guo@cup.hp.com>
 
+	* runtest.exp: Eliminate from test_top_dirs entries that
+        are subdirectories of other entries, to avoid redundant
+        testing on *.exp files in these subdirectories.
+
+2000-08-14  Jimmy Guo  <guo@cup.hp.com>
+
 	* runtest.exp: Reapply part of the backed out change to
 	runtest.exp -- handle multiple directories in TCL variables
 	dir_to_run and cmdline_dir_to_run.

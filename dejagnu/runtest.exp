@@ -1664,6 +1664,49 @@ foreach current_target $target_list {
 	set test_top_dirs [lsort [getdirs -all ${srcdir} "${tool}*"]]
 	if { ${test_top_dirs} == "" } {
 	    set test_top_dirs ${srcdir}
+	} else {
+	    # JYG:
+	    # DejaGNU's notion of test tree and test files is very
+	    # general:
+	    # given ${srcdir} and ${tool}, any subdirectory (at any
+	    # level deep) with the "${tool}" prefix starts a test tree;
+	    # given a test tree, any *.exp file underneath (at any
+	    # level deep) is a test file.
+	    #
+	    # For test tree layouts with ${tool} prefix on
+	    # both a parent and a child directory, we need to eliminate
+	    # the child directory entry from test_top_dirs list.
+	    # e.g. gdb.hp/gdb.base-hp/ would result in two entries
+	    # in the list: gdb.hp, gdb.hp/gdb.base-hp.
+	    # If the latter not eliminated, test files under
+	    # gdb.hp/gdb.base-hp would be run twice (since test files
+	    # are gathered from all sub-directories underneath a
+	    # directory).
+	    #
+	    # Since ${tool} may be g++, etc. which could confuse
+	    # regexp, we cannot do the simpler test:
+	    #     ...
+	    #     if [regexp "${srcdir}/.*${tool}.*/.*${tool}.*" ${dir}]
+	    #     ...
+	    # instead, we rely on the fact that test_top_dirs is
+	    # a sorted list of entries, and any entry that contains
+	    # the previous valid test top dir entry in its own pathname
+	    # must be excluded.
+
+	    set temp_top_dirs ""
+	    set prev_dir ""
+	    foreach dir "${test_top_dirs}" {
+		if { [string length ${prev_dir}] == 0 ||
+		     [string first "${prev_dir}/" ${dir}] == -1} {
+	            # the first top dir entry, or an entry that
+		    # does not share the previous entry's entire
+	            # pathname, record it as a valid top dir entry.
+		    #
+		    lappend temp_top_dirs ${dir}
+		    set prev_dir ${dir}
+		}
+	    }
+	    set test_top_dirs ${temp_top_dirs}
 	}
 	verbose "Top level testsuite dirs are ${test_top_dirs}" 2
 	set testlist "";

@@ -1,3 +1,13 @@
+2001-07-05  Ben Elliston  <bje@redhat.com>
+
+	* README: Update.
+
+	* read.scm (include): Include files from srcdir/cpu.
+	(-cgen): Likewise for loading .cpu files.
+	* *.cpu: Move all cpu descriptions into cpu subdirectory.
+	* *.opc: Likewise.
+	* simplify.inc: Likewise.
+
 2001-07-04  Ben Elliston  <bje@redhat.com>
 
 	* read.scm (include): Log "Including file" message at level 1,

@@ -1,3 +1,7 @@
+2002-05-17  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* Remove msdos subdirectory - it is obsolete.
+
 2002-04-06  Nathanael Nerode  <neroden@twcny.rr.com>
 
 	* utils/configure.in: autoconfiscate

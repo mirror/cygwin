@@ -1203,7 +1203,7 @@ Bit numbering is determined by the @code{insn-lsb0?} field of
 @subsection length
 The number of bits in the field.  The field must be contiguous.  For
 non-contiguous instruction fields use "multi-ifields"
-(@pxref{Non-contiguous fields}).
+(@xref{Instruction fields}).
 
 @subsection follows
 Optional.  Experimental.
@@ -1272,7 +1272,6 @@ There's no need to provide an error case as presumably @code{value}
 would never have an invalid value, though certainly one could provide an
 error case if one wanted to.
 
-@node Non-contiguous fields
 @subsection Non-contiguous fields
 @cindex Fields, non-contiguous
 

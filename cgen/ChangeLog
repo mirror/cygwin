@@ -1,3 +1,45 @@
+2003-04-16  Dave Brolley  <brolley@redhat.com>
+
+	* doc/rtl.texi (Iiming): Correct example to use 'model-name'.
+	* utils.scm (copyright-fsf): Update generate copyright years.
+	(copyright-cygnus): Ditto.
+	* sid.scm (-op-gen-set-trace): Generate code to fill in bitmask of modified
+	operands.
+	(-gen-arch-model-decls): Don't generate unit enum declaration or MAX_UNITS
+	here.
+	(<operand>'gen-profile-code): New parameter 'when'.
+	(<iunit>'gen-profile-code): Ditto.
+	(<insn>'gen-profile-code): Ditto.
+	(<unit>'gen-profile-code): Ditto. Only generate 'referenced' and
+	'insn_reference' for the 'after' function.
+	* model.scm (unit:enum): Moved to sim-model.scm.
+	* sim-model.scm (unit:enum): Moved from model.scm.
+	* sid-decode.scm (-gen-scache-decls): Generate the 'written' field.
+	* cgen-sid.scm (sim-arguments): Document the generation of model.h.
+	* sid-model.scm (unit:enum): New version for sid.
+	(gen-model-class-name): New function.
+	(gen-model-unit-fn-decl): New function.
+	(gen-model-fn-decls): Call gen-model-unit-fn-decl.
+	(gen-model-unit-fn-name): New parameter 'when'.
+	(-gen-model-insn-fn-name): Ditto.
+	(-gen-model-insn-qualified-fn-name): New function.
+	(-gen-model-insn-fn-decl): New function.
+	(-gen-model-insn-fn-decls): New function.
+	(-gen-model-insn-fn): New parameter 'when'. Call
+	-gen-model-insn-qualified-fn-name.
+	(-gen-model-insn-fns): Generate the constructor for the model. Generate
+	functions for modelling insn before and after execution.
+	(-gen-model-class-decls): New function.
+	(" (gen-model-class-name model) "): New function.
+	(gen-model-classes): New function.
+	(-gen-insn-timing): Generate functions for modelling insn before and after
+	execution.
+	(-gen-insn-unit-timing): Generate class-qualified names.
+	(-gen-model-timing-table): Ditto.
+	(cgen-model.cxx): Generate #include for @cpu@.h. Omit generation of code
+	not needed (yet) by sid.
+	(cgen-model.h): New function.
+
 2003-04-15  Rohit Kumar Srivastava <rohits@kpitcummins.com>
 
 	* cpu/sh.cpu: Replace occurrances of 'Hitachi' with 'Renesas'.

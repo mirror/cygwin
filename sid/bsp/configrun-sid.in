@@ -821,7 +821,8 @@ if ($exec)
     $second_section .= "# loader
 set loader file \"$exec\"
 set loader verbose? $opt_verbose
-connect-bus loader load-accessor mapper access-port # don't trace loading
+connect-bus loader load-accessor-data mapper access-port # don't trace loading
+connect-bus loader load-accessor-insn mapper access-port # don't trace loading
 connect-pin init-sequence output-1 -> loader load!
 connect-pin loader start-pc-set -> cpu start-pc-set!
 connect-pin loader endian-set -> cpu endian-set!

@@ -6,7 +6,7 @@
 
   Attributes: file verbose? state-snapshot
   Pins: load! start-pc-set endian-set error
-  Accessors: load-accessor
+  Accessors: load-accessor-insn load-accessor-data
 
   Shared library: libloader.la
   Symbol: loader_component_library
@@ -61,7 +61,8 @@
 	new mapper bus
 	connect-pin reset-manager input <- main starting
 	connect-pin reset-manager output-1 -> loader load!
-        connect-bus loader load-accessor bus access-port
+        connect-bus loader load-accessor-insn bus access-port
+        connect-bus loader load-accessor-data bus access-port
 	set loader file "/foo/bar.x"
         set loader verbose? 1
 	connect-pin loader start-pc-set -> cpu start-pc-set!
@@ -82,4 +83,5 @@
       - verbose? | setting | 1/0 | 0 | configuration
 
     * accessors
-      - load-accessor | write little_int_1 | loading
+      - load-accessor-insn | write little_int_1 | loading
+      - load-accessor-data | write little_int_1 | loading

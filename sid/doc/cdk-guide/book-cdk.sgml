@@ -1,0 +1,2573 @@
+<!DOCTYPE BOOK PUBLIC "-//Davenport//DTD DocBook V3.0//EN">
+<BOOK><!-- Copyright 2001 by Red Hat, Inc. --><!-- Process this file through "make normalize" before CVS operations (diff/commit). -->
+<BOOKINFO>
+<TITLE>SID Simulator Component Developer's Guide</TITLE>
+<DATE>$Date: 2001/08/16 16:23:22 $</DATE>
+<PUBLISHER>
+<PUBLISHERNAME>Red Hat, Inc.</PUBLISHERNAME>
+<ADDRESS><EMAIL>sid@sources.redhat.com</EMAIL></ADDRESS>
+</PUBLISHER>
+<COPYRIGHT>
+<YEAR>2001</YEAR>
+<HOLDER>Red Hat, Inc.</HOLDER>
+</COPYRIGHT>
+<DATE>$Date: 2001/08/16 16:23:22 $</DATE>
+<LEGALNOTICE>
+<PARA>This material may be distributed only
+    subject to the terms and conditions set forth in the Open Publication
+    License, V1.0 or later (the latest version is presently available at <ULINK URL="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</ULINK>).
+   </PARA>
+<PARA>    Distribution of substantively modified versions of this document is
+    prohibited without the explicit permission of the copyright holder.
+   </PARA>
+<PARA>    Distribution of the work or derivative of the work in any standard (paper)
+    book form for commercial purposes is prohibited unless prior permission is
+    obtained from the copyright holder.
+   </PARA>
+</LEGALNOTICE>
+</BOOKINFO>
+<TOC>
+<TITLE>Table of Contents</TITLE>
+</TOC>
+<CHAPTER ID="CH-INTRODUCTION">
+<TITLE>Introduction</TITLE>
+<PARA>The SID Component Developer's Kit (CDK) from Red Hat, Inc. provides
+    you with the tools you need to create a simulated environment and to create
+    simulated components. With these tools you can write and test software for
+    an embedded system before the physical hardware is ready. The CDK provides: 
+
+    <ITEMIZEDLIST MARK="bullet">
+<LISTITEM>
+<PARA>An API and tutorial to enable you to create your own simulated
+          components </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>A library of simulated hardware components (plug-ins) for
+          commonly-used parts. For more information, refer to the <CITETITLE>Simulator
+            User's Guide. </CITETITLE> </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>The ability for you to customize your environment. </PARA>
+</LISTITEM>
+</ITEMIZEDLIST></PARA>
+<PARA>This guide provides documentation for the Component Developer's
+    Kit. It guides you through the steps you need to take to develop your own
+    simulation components.</PARA>
+<SECT1 ID="ABOUT-SID">
+<TITLE>About the SID Simulation Environment</TITLE><!-- label: about-sid -->
+<PARA>The SID development environment enables levels of debugging and testing
+      that are not readily available on real hardware. The SID simulation environment
+      offers: 
+      <VARIABLELIST>
+<VARLISTENTRY>
+<TERM>Greater Availability. </TERM>
+<LISTITEM>
+<PARA>Early production hardware is often available in very limited quantities.
+              SID allows a greater number of embedded software developers to access the
+              tools they need to write and test software.</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>More Control.</TERM>
+<LISTITEM>
+<PARA>The simulator can be easily stopped, reconfigured, and rerun. The system
+              state can be saved and restored. This is not easy on real hardware. </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Increased Debugging Ability.</TERM>
+<LISTITEM>
+<PARA>The simulator provides a debugging environment that is not possible
+              to create on real hardware. The simulator can show internal state of devices
+              revealing information that cannot be captured with a logic probe. The simulator
+              also provides more debugging control (with the use of triggerpoints, for
+              example) than is possible on real hardware. </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Increased Stability.</TERM>
+<LISTITEM>
+<PARA>Early prototype hardware may have bugs or be unstable. The simulator
+              enables comparative testing on early prototype hardware so that hardware
+              bugs are easier to identify.</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+</VARIABLELIST>
+    </PARA>
+<PARA>The SID Simulation environment 
+      provides continuity between developing and debugging on real hardware
+      and on simulated hardware.</PARA>
+</SECT1>
+<SECT1 ID="THE-CDK">
+<TITLE>The Component Developer's Kit (CDK)</TITLE><!-- label: the-cdk -->
+<PARA>The Component Developer's Kit CDK is a toolkit for building new simulation
+      components. </PARA>
+<SECT2 ID="API-REFERENCE-BOOK">
+<TITLE>API Reference</TITLE><!-- label: API-Reference-book -->
+<PARA>All SID components adhere to a single API. To learn all about the SID API, refer to <XREF LINKEND="API-REF">.
+      </PARA>
+</SECT2>
+<SECT2 ID="CDK-TUTORIAL-BOOK">
+<TITLE>CDK Tutorial</TITLE><!-- label: CDK-tutorial-book -->
+<PARA>To assist you in developing your own components, we provide a step-by-step
+        tutorial that describes how we created a SID component of a simple timer
+        chip.</PARA>
+<PARA>For a detailed run-through of how to create a simulation component,
+        refer to <CITETITLE>CDK Tutorial.</CITETITLE></PARA>
+</SECT2>
+</SECT1>
+<SECT1 ID="DOCUMENTATION-CONVENTIONS">
+<TITLE>Document Conventions</TITLE><!-- label: documentation-conventions -->
+<INDEXTERM>
+<PRIMARY>       conventions
+      </PRIMARY>
+<SECONDARY>     documentation
+      </SECONDARY>
+</INDEXTERM>
+<INDEXTERM>
+<PRIMARY>       documentation conventions
+      </PRIMARY>
+</INDEXTERM>
+<PARA>The documentation uses the following general conventions:</PARA>
+<PARA><VARIABLELIST>
+<VARLISTENTRY>
+<TERM>Italic Font</TERM>
+<LISTITEM>
+<PARA>Indicates a section name or a manual name.
+            </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Bold Font</TERM>
+<LISTITEM>
+<PARA>Is used for the menu, window, and buttons names you see on your screen.
+            </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Plain Typewriter Font</TERM>
+<LISTITEM>
+<PARA>Denotes code fragments, command lines, contents of files, and command
+              names; also indicates directory, file, and project names where they appear
+              in body text. </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>Bold, Italic Typewriter Font</TERM>
+<LISTITEM>
+<PARA>Represents a variable for which you should substitute an actual value.
+            </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+</VARIABLELIST></PARA>
+</SECT1>
+</CHAPTER>
+<CHAPTER ID="API-REF">
+<TITLE>API Reference</TITLE>
+<INDEXTERM>
+<PRIMARY>API</PRIMARY>
+<SECONDARY>introduction</SECONDARY>
+</INDEXTERM>
+<SECT1>
+<TITLE>API Overview</TITLE>
+<SECT2>
+<TITLE>Components</TITLE>
+<PARA>  A SID component is a C++ object of type
+        <CLASSNAME>sid::component</CLASSNAME> which calls, and is called
+        by, other SID components. A complete simulation is a set of
+        components connected together. Simulations are single-threaded,
+        and there is no underlying "supervisory" simulation code. As the
+        simulation runs, control repeatedly loops within a "root"
+        component, calling into its connected components, which perform
+        any local simulation tasks and in turn call their connected
+        components before returning control to their caller. This cycle
+        continues until the simulation is terminated.
+      </PARA>
+</SECT2>
+<SECT2>
+<TITLE>Attributes</TITLE>
+<PARA>SID Components come equipped with a set of string-valued
+        attributes, which can be queried and set during configuration or
+        simulation, to inspect or modify the behavior of the
+        component. Attributes generally provide information and control
+        which is of interest to the simulation user, rather than to
+        other components in the simulation. Conventionally, attributes
+        are grouped into named "categories" by role, though attributes
+        may have no category, and may in addition be accessed without
+        regard to their category. Categories merely assist in treating a
+        group of attributes similarly, for example in a simulator's
+        graphical user interface.</PARA>
+</SECT2>
+<SECT2>
+<TITLE>Pins and Buses</TITLE>
+<PARA>  SID models a component's communication connections as a set of
+        buses and pins. These terms are intended to reflect the design
+        of the hardware being simulated, and SID's API presents these
+        terms as the abstract C++ classes
+        <CLASSNAME>sid::bus</CLASSNAME> and
+        <CLASSNAME>sid::pin</CLASSNAME>. A SID component may have many
+        pins and many buses, each of which represents the
+        <EMPHASIS>receiving</EMPHASIS> end of a connection to another
+        component.
+      </PARA>
+<PARA>  A pin represents a non-refutable, one-way connection through
+        which an integer value may be "driven". Pins are best thought
+        of as "triggers", which may carry an informative value but
+        which do not have any sort of request/response mechanism built
+        into them. A bus, on the other hand, represents a read/write
+        interface through which integer values <EMPHASIS>and
+        addresses</EMPHASIS> are transmitted. Every bus request
+        returns a <CLASSNAME>sid::bus::status</CLASSNAME> object,
+        which describes both the success or failure of the request and
+        the latency of the bus transaction, as modeled by the
+        recipient. Buses are best thought of as small windows into the
+        recipient's memory or register set, through which the sender
+        may attempt to read or write values.
+      </PARA>
+<PARA>  Pins and buses do not in general exist beyond the scope of the
+        component they belong do; a component is usually responsible
+        for managing the lifecycle of its own pins and buses. Moreover
+        components do not often set up their own connections. Instead,
+        each component presents a set of "factory methods", which can
+        be called with string names of buses or pins. The component
+        must then choose to either construct a pin or bus "on demand",
+        serve a pin and bus from a fixed set compiled into the
+        component, or respond with a <RETURNVALUE>NULL</RETURNVALUE>
+        pointer, indicating an unknown pin or bus was requested. A
+        component may also be asked to place a pointer to a given pin
+        or bus in a named slot within itself, which it will use as the
+        <EMPHASIS>sending</EMPHASIS> end of a connection during
+        simulation. Slots for buses are referred to as "accessors",
+        whereas slots for pins are simply "output pins".
+      </PARA>
+<EXAMPLE>
+<TITLE>Bus Connection</TITLE>
+<PARA>    It is very important to understand the relationship between
+          sending and receiving ends of bus and pin connections, so we
+          present an example here. Suppose we load a CPU component C
+          and a memory component M. Suppose that C has an accessor
+          named "system-mem" which it intends to use for reading and
+          writing to some sort of memory device, and suppose that M
+          has a bus named "data-bus" through which it expects to
+          receive read/write requests. The scenario is depicted blow.
+        </PARA>
+<GRAPHIC FILEREF="images/accessor-bus.jpg"></GRAPHIC>
+<PARA>    Recall that the accessor is the <EMPHASIS>sending</EMPHASIS>
+          end of the connection we wish to make, and that the bus is
+          the <EMPHASIS>receiving</EMPHASIS> end. Some people find the
+          terms "master" and "slave" clearer than "sender" and
+          "receiver", since information is permitted to flow both ways
+          on a bus. In the master/slave terminology, the bus master
+          makes bus <EMPHASIS>requests</EMPHASIS>; the bus slave
+          <EMPHASIS>services</EMPHASIS> them. Whether the bus requests
+          are reads or writes is irrelevant to this relationship. The
+          following code will establish the connection:
+        </PARA>
+<PARA>    <PROGRAMLISTING>          sid::bus *memory_data_bus = M.find_bus ("data-bus");
+            C.connect_accessor ("system-mem", memory_data_bus);
+          </PROGRAMLISTING>
+        </PARA>
+<PARA>    Most connections are not established by hand this way, but
+          are done by a "configuration root" component, which reads a
+          simple configuration command language, loads and
+          instantiates components, hooks up buses to accessors, output
+          pins to input pins, and sets attribute values. Each of these
+          configuration commands is closely mirrored by a small
+          sequence of SID API calls, such as in the above example.
+        </PARA>
+<PARA>    Note that in this example only one component is transmitting
+          signals to the memory's bus. This is not intrinsic to the
+          connection mechanism; connections are usually just
+          assignments to pointer variables within the sending
+          component. There could just as easily be several components
+          all sending to the same bus at various times during
+          simulation. Additionally, while an accessor can only ever 
+          be connected to one bus, an output pin can be connected to
+          <EMPHASIS>multiple</EMPHASIS> input pins; driving the output
+          simply drives <EMPHASIS>all</EMPHASIS> the connected pins.
+          Obviously this arrangement does not make sense for buses, in 
+          which each bus request results its own unique status code.
+          To connect one accessor to multiple buses, one needs a bus
+          mapper to arbitrate the connection. See the component reference
+          manual for details on bus mappers.
+        </PARA>
+</EXAMPLE>
+</SECT2>
+<SECT2>
+<TITLE>Relationships</TITLE>
+<PARA>  In addition to pins, buses and attributes, SID components may
+        have named slots for holding pointers to other
+        components. Such an association, when made in terms of the
+        <CLASSNAME>sid::component</CLASSNAME> interface, is called a
+        "relationship" of the pointer-holder. A component may hold
+        many pointers to different components in a single
+        relationship, and may have components placed in its
+        relationship lists by the configuration process.
+      </PARA>
+<PARA>  Relationships give components the ability to call related
+        components' <CLASSNAME>sid::component</CLASSNAME> API, rather
+        than simply communicate with them through
+        <CLASSNAME>sid::bus</CLASSNAME> and
+        <CLASSNAME>sid::pin</CLASSNAME> connections. If such a
+        capability is not strictly required, the more conservative bus
+        and pin communication APIs are generally preferred for the
+        sake of minimizing potential bugs.
+      </PARA>
+</SECT2>
+<SECT2>
+<TITLE>Component Libraries</TITLE>
+<PARA>  Components are conventionally packaged into separate shared
+        object (.so) or dynamic link library (.DLL) files, and loaded
+        on demand into the SID process by the configuration
+        component. Each such file may contain several component
+        classes, but by convention such components are functionally
+        similar. SID specifies an API for querying such files and
+        instantiating their components. Any file which implements 
+        a component must support this API for SID to make use of it.
+      </PARA>
+</SECT2>
+</SECT1>
+<SECT1>
+<TITLE>the <CLASSNAME>sid::component</CLASSNAME> interface</TITLE>
+<PARA>      Any component must implement the following interface, though
+      most of the methods can be implemented trivially, if not
+      relevant. Additionally, there are several mix-in classes located
+      in extra SID utility headers. These mix-ins are not part of the
+      official component API, but cover a wide variety of common
+      component implementation strategies and greatly simplify the
+      task of writing a component; programmers are encouraged to read
+      these headers for more details.
+    </PARA>
+<SECT2>
+<TITLE>Attributes</TITLE>
+<PROGRAMLISTING>        vector&lt;string&gt; attribute_names ();
+
+        vector&lt;string&gt; attribute_names (const string&amp; <PARAMETER>category</PARAMETER>);
+
+        string attribute_value (const string&amp; <PARAMETER>name</PARAMETER>);
+
+        status set_attribute_value (const string&amp; name, const string&amp; value);
+      </PROGRAMLISTING>
+<PARA>  A component's attributes are listed with <FUNCTION>attribute_names</FUNCTION>. Once an attribute
+        name is known it can be queried with <FUNCTION>attribute_value</FUNCTION> or set with
+        <FUNCTION>set_attribute_value</FUNCTION>. 
+      </PARA>
+</SECT2>
+<SECT2>
+<TITLE>Pins</TITLE>
+<PROGRAMLISTING>        vector&lt;string&gt; pin_names ();
+
+        pin *find_pin (const string&amp; <PARAMETER>name</PARAMETER>);
+
+        status connect_pin (const string&amp; <PARAMETER>name</PARAMETER>, pin *<PARAMETER>pin</PARAMETER>);
+
+        vector&lt;pin *&gt; connected_pins (const string&amp; <PARAMETER>name</PARAMETER>);
+
+        status disconnect_pin (const string&amp; <PARAMETER>name</PARAMETER>, pin *<PARAMETER>pin</PARAMETER>);
+      </PROGRAMLISTING>
+<PARA>  A component's input and output pins are listed, by name, with
+        <FUNCTION>pin_names</FUNCTION>. A pointer to an input pin can
+        be obtained, by name, with <FUNCTION>find_pin</FUNCTION>. This
+        pointer points to a <CLASSNAME>sid::pin</CLASSNAME> object,
+        and is thus the <EMPHASIS>receiving</EMPHASIS> end of a pin
+        connection. To complete the connection, this pin-pointer must
+        be associated with an output pin name in the component acting
+        as the <EMPHASIS>sending</EMPHASIS> end of the connection,
+        using the <FUNCTION>connect_pin</FUNCTION> method. The input
+        pins connected to a given output pins can be fetched with
+        <FUNCTION>connected_pins</FUNCTION>, and individually
+        disconnected from the output pin with
+        <FUNCTION>disconnect_pin</FUNCTION>.
+      </PARA>
+</SECT2>
+<SECT2>
+<TITLE>Buses</TITLE>
+<PROGRAMLISTING>        vector&lt;string&gt; bus_names ();
+
+        vector&lt;string&gt; accessor_names ();
+
+        bus *find_bus (const string&amp; <PARAMETER>name</PARAMETER>);
+
+        status connect_accessor (const string&amp; <PARAMETER>name</PARAMETER>, bus *<PARAMETER>bus</PARAMETER>);
+
+        status disconnect_accessor (const string&amp; <PARAMETER>name</PARAMETER>, bus *<PARAMETER>bus</PARAMETER>);
+
+        vector&lt;bus *&gt; connected_bus (const string&amp; <PARAMETER>name</PARAMETER>);
+      </PROGRAMLISTING>
+<PARA>  A component's buses are listed, by name, with
+        <FUNCTION>bus_names</FUNCTION>; its bus accessors are listed
+        with <FUNCTION>accessor_names</FUNCTION>. A pointer to a bus can
+        be obtained, by name, with <FUNCTION>find_bus</FUNCTION>. This
+        pointer points to a <CLASSNAME>sid::bus</CLASSNAME> object,
+        and is thus the <EMPHASIS>slave</EMPHASIS> end of a bus
+        connection. To complete the connection, this bus-pointer must
+        be associated with an accessor name in the component acting
+        as the <EMPHASIS>bus master</EMPHASIS>,
+        using the <FUNCTION>connect_accessor</FUNCTION> method. The
+        bus connected to an accessor can be fetched with
+        <FUNCTION>connected_bus</FUNCTION>, and disconnected from the
+        accessor with <FUNCTION>disconnect_bus</FUNCTION>.
+      </PARA>
+</SECT2>
+<SECT2>
+<TITLE>Relationships</TITLE>
+<PROGRAMLISTING>        vector&lt;string&gt; relationship_names ();
+
+        status relate (const string&amp; <PARAMETER>name</PARAMETER>, component *<PARAMETER>comp</PARAMETER>);
+
+        status unrelate (const string&amp; <PARAMETER>name</PARAMETER>, component *<PARAMETER>comp</PARAMETER>);
+
+        vector&lt;component *&gt; related_components (const string&amp; <PARAMETER>name</PARAMETER>);
+      </PROGRAMLISTING>
+<PARA>  A component's relationship names are listed with
+        <FUNCTION>relationship_names</FUNCTION>. Once an relationship
+        name is known components can be added to it with
+        <FUNCTION>relate</FUNCTION> or removed from it with
+        <FUNCTION>unrelate</FUNCTION>. The set of components currently
+        in a given relationship name can be fetched with
+        <FUNCTION>related_components</FUNCTION>
+      </PARA>
+</SECT2>
+</SECT1>
+<SECT1>
+<TITLE>the <CLASSNAME>sid::bus</CLASSNAME> interface</TITLE>
+<SECT2>
+<TITLE>Reading</TITLE>
+<PROGRAMLISTING>        status read (host_int_4 <PARAMETER>addr</PARAMETER>, little_int_1&amp; <PARAMETER>data</PARAMETER>);
+
+        status read (host_int_4 <PARAMETER>addr</PARAMETER>, little_int_2&amp; <PARAMETER>data</PARAMETER>);
+
+        status read (host_int_4 <PARAMETER>addr</PARAMETER>, little_int_4&amp; <PARAMETER>data</PARAMETER>);
+
+        status read (host_int_4 <PARAMETER>addr</PARAMETER>, little_int_8&amp; <PARAMETER>data</PARAMETER>);
+
+        status read (host_int_4 <PARAMETER>addr</PARAMETER>, big_int_1&amp; <PARAMETER>data</PARAMETER>);
+
+        status read (host_int_4 <PARAMETER>addr</PARAMETER>, big_int_2&amp; <PARAMETER>data</PARAMETER>);
+
+        status read (host_int_4 <PARAMETER>addr</PARAMETER>, big_int_4&amp; <PARAMETER>data</PARAMETER>);
+
+        status read (host_int_4 <PARAMETER>addr</PARAMETER>, big_int_8&amp; <PARAMETER>data</PARAMETER>);      
+      </PROGRAMLISTING>
+<PARA>  To read from a bus, the bus master calls the overloaded
+        function <FUNCTION>read</FUNCTION> with an address to read
+        from, and a reference to a data word. Addresses are
+        conventionally interpreted as <EMPHASIS>byte</EMPHASIS>
+        addresses. If the read is successful, the data word will
+        contain the word read; otherwise it will be unchanged.
+      </PARA>
+</SECT2>
+<SECT2>
+<TITLE>Writing</TITLE>
+<PROGRAMLISTING>        status write (host_int_4 <PARAMETER>addr</PARAMETER>, little_int_1 <PARAMETER>data</PARAMETER>);
+
+        status write (host_int_4 <PARAMETER>addr</PARAMETER>, little_int_2 <PARAMETER>data</PARAMETER>);
+
+        status write (host_int_4 <PARAMETER>addr</PARAMETER>, little_int_4 <PARAMETER>data</PARAMETER>);
+
+        status write (host_int_4 <PARAMETER>addr</PARAMETER>, little_int_8 <PARAMETER>data</PARAMETER>);
+
+        status write (host_int_4 <PARAMETER>addr</PARAMETER>, big_int_1 <PARAMETER>data</PARAMETER>);
+
+        status write (host_int_4 <PARAMETER>addr</PARAMETER>, big_int_2 <PARAMETER>data</PARAMETER>);
+
+        status write (host_int_4 <PARAMETER>addr</PARAMETER>, big_int_4 <PARAMETER>data</PARAMETER>);
+
+        status write (host_int_4 <PARAMETER>addr</PARAMETER>, big_int_8 <PARAMETER>data</PARAMETER>);      
+      </PROGRAMLISTING>
+<PARA>  To write to a bus, the bus master calls the overloaded
+        function <FUNCTION>write</FUNCTION> with an address to write
+        to, and a data word. Addresses are conventionally interpreted
+        as <EMPHASIS>byte</EMPHASIS> addresses. The result of a write
+        indicates whether the write was considered, by the bus slave,
+        to be successful. Note however that the slave is not in any
+        way required to reflect the contents of a successful write in
+        terms of any future reads from the same address.
+      </PARA>
+</SECT2>
+<SECT2>
+<TITLE>Status codes</TITLE>
+<PARA>  All bus transactions are initiated by a bus master, and
+        respond with a status code object. Such an object has the
+        following fields:
+        <VARIABLELIST>
+<VARLISTENTRY>
+<TERM><STRUCTFIELD>code</STRUCTFIELD></TERM>
+<LISTITEM>
+<PARA>a value from the
+              <CLASSNAME>sid::bus::status_t</CLASSNAME> enumeration:
+              either <CLASSNAME>ok</CLASSNAME>,
+              <CLASSNAME>misaligned</CLASSNAME>,
+              <CLASSNAME>unmapped</CLASSNAME>, or
+              <CLASSNAME>unpermitted</CLASSNAME>.
+              </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM><STRUCTFIELD>latency</STRUCTFIELD></TERM>
+<LISTITEM>
+<PARA>a scalar quantity, in unspecified units, describing the latency of the
+                bus transaction.</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+</VARIABLELIST>
+      </PARA>
+<PARA>  The <CLASSNAME>sid::bus::status</CLASSNAME> class has simple
+        zero-, one- and two-argument constructors, indicating general
+        zero-latency success, success status alone (with zero latency)
+        or status and latency of the bus transaction. For example, one
+        can return from a bus transaction with any of the following
+        statements:
+      </PARA>
+<PROGRAMLISTING>      return status ();           // status = ok, latency = 0
+
+      return status (unmapped);   // status = unmapped, latency = 0
+
+      return status (ok, 5);      // status = ok, latency = 5
+    </PROGRAMLISTING>
+</SECT2>
+</SECT1>
+<SECT1>
+<TITLE>the <CLASSNAME>sid::pin</CLASSNAME> interface</TITLE>
+<PROGRAMLISTING>          void driven(host_int_4 <PARAMETER>value</PARAMETER>);
+    </PROGRAMLISTING>
+<PARA>      The only operation one can perform on a pin is to drive a
+      value to it; this may or may not have any effect, but it
+      cannot fail.      
+    </PARA>
+</SECT1>
+<SECT1>
+<TITLE>the <CLASSNAME>sid::component_library</CLASSNAME> interface</TITLE>
+<PARA>Every component library must contain a
+    <CLASSNAME>sid::component_library</CLASSNAME> structure in order
+    for SID to load and instantiate its components. For example,
+    assuming the definition of suitable functions
+    <FUNCTION>exampleListTypes</FUNCTION>,
+    <FUNCTION>exampleCreate</FUNCTION>, and
+    <FUNCTION>exampleDelete</FUNCTION>, the following declaration
+    would provide an interface for SID to instantiate components:
+    </PARA>
+<PROGRAMLISTING>      extern const component_library example_component_library;
+      
+      const component_library example_component_library DLLEXPORT =
+      {
+        COMPONENT_LIBRARY_MAGIC,
+       &amp; exampleListTypes,
+       &amp; exampleCreate,
+       &amp; exampleDelete
+      };
+    </PROGRAMLISTING>
+<PARA>      The precise type and meaning of these fields follows.
+    </PARA>
+<PROGRAMLISTING>      host_int_4 magic;
+
+      vector&lt;string&gt; (*list_component_types) ();
+
+      component* (*create_component) (const string&#38; typeName);
+    
+      void (*delete_component) (component* c);
+    </PROGRAMLISTING>
+<PARA>      The <CLASSNAME>sid::component_library</CLASSNAME> structure
+      contains a magic number, for API version compatibility
+      assurance, as well as pointers to 3 functions. The magic number
+      should be initialized to the constant
+      <CLASSNAME>COMPONENT_LIBRARY_MAGIC</CLASSNAME>, provided in
+      SID's headers. The function pointed to by
+      <FUNCTION>list_component_types</FUNCTION> must return a vector
+      containing the string names of each type of component found in
+      this library. These names are the same names used in the
+      configuration command language, for example: <GRAPHIC FILEREF="images/name-structure.jpg" SCALE="75"></GRAPHIC>
+    </PARA>
+<PARA>      The function pointed to by <FUNCTION>create_component</FUNCTION>
+      takes such a component name, and should construct a component of
+      the given type and returns a pointer to it. If construction
+      fails or an unknown type of component was requested, the
+      function may return the value 0 to indicate failure. The
+      function pointed to by <FUNCTION>delete_component</FUNCTION>
+      should delete the provided component.
+    </PARA>
+</SECT1>
+</CHAPTER>
+<CHAPTER ID="CH-TUTORIAL">
+<TITLE>CDK Tutorial</TITLE>
+<INDEXTERM>
+<PRIMARY>CDK</PRIMARY>
+<SECONDARY>tutorial</SECONDARY>
+</INDEXTERM>
+<PARA>This chapter details the API that all SID components must follow.</PARA>
+<SECT1 ID="CDK-TUTORIAL">
+<TITLE>CDK Tutorial</TITLE><!-- label: cdk-tutorial -->
+<PARA>This tutorial describes how the various parts of the Component Developer's
+Kit architecture can be used to create a complete and functional simulation
+model.</PARA>
+<PARA>To provide some context, the tutorial guides you through the design
+and implementation of a sample component--a timer chip. This chip was chosen
+for several reasons:</PARA>
+<ITEMIZEDLIST MARK="bullet">
+<LISTITEM>
+<PARA>It is both simple to understand and simple to implement. </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>It has both memory-mapped registers and pins, so it can be
+used to demonstrate the main functional interfaces in the simulator. </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>It has a time-dependent aspect, which opens the door to more
+ interesting design and implementation trade-offs. </PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+<PARA>The tutorial presents a series of steps leading from the initial examination
+of the chip specifications to the external configuration script that will
+be used to exercise the component.</PARA>
+<SECT2 ID="TUTORIAL-STEP-1">
+<TITLE>Step 1: Define the Functionality Required</TITLE><!-- label: tutorial-step-1 -->
+<PARA>The first step in developing a component is to define its functional
+ requirements. All chips have two aspects that must be represented in their
+software model</PARA>
+<INDEXTERM>
+<PRIMARY>component development</PRIMARY>
+<SECONDARY>defining functional
+ requirements</SECONDARY>
+</INDEXTERM>
+<ITEMIZEDLIST MARK="bullet">
+<LISTITEM>
+<PARA>The physical interface of buses, pins, and registers </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>The behavioral interface to application software and the external
+world </PARA>
+</LISTITEM>
+</ITEMIZEDLIST>
+<PARA>This section describes the timer chip in enough detail to resolve the
+ design and functional considerations.</PARA>
+<SECT3 ID="TUTORIAL-STEP-1-EXAMPLE-1">
+<TITLE>Example</TITLE><!-- label: tutorial-step-1-example-1 -->
+<PARA>The particular timer used in this tutorial is a dual 16-bit down counter
+ type, in which each timer can be pre-scaled and set in either free-running
+mode or periodic timer mode. For the purposes of this example, the specifications
+are taken from the on-board timers of the ARM CPU. However, the principles
+can be generalized to most timers, and in fact, the interface aspects apply
+to a broad range of peripherals.</PARA>
+<PARA>The following details the timer registers:</PARA>
+<PARA><!-- label: fig:tutorial-step-1-table-registers --><TABLE>
+<TITLE ID="TB-TUTORIAL-STEP-1-TABLE-REGISTERS">Registers</TITLE>
+<TGROUP COLS="4">
+<COLSPEC COLNAME="COL1" COLWIDTH="91*">
+<COLSPEC COLNAME="COL2" COLWIDTH="77*">
+<COLSPEC COLNAME="COL3" COLWIDTH="126*">
+<COLSPEC COLNAME="COL4" COLWIDTH="102*">
+<THEAD>
+<ROW>
+<ENTRY>Address</ENTRY>
+<ENTRY>Name</ENTRY>
+<ENTRY>Read Location</ENTRY>
+<ENTRY>Write Location</ENTRY>
+</ROW>
+</THEAD>
+<TBODY>
+<ROW>
+<ENTRY COLNAME="COL1"><LITERAL>base<SUBSCRIPT>i</SUBSCRIPT> + 0x0</LITERAL></ENTRY>
+<ENTRY COLNAME="COL2"><LITERAL>LOAD_REG</LITERAL></ENTRY>
+<ENTRY NAMEST="COL3" NAMEEND="COL4">16-bit timer load value</ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><LITERAL>base<SUBSCRIPT>i</SUBSCRIPT> + 0x4</LITERAL></ENTRY>
+<ENTRY COLNAME="COL2"><LITERAL>VAL_REG</LITERAL></ENTRY>
+<ENTRY COLNAME="COL3">16-bit timer load value</ENTRY>
+<ENTRY COLNAME="COL4">reserved</ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><LITERAL>base<SUBSCRIPT>i</SUBSCRIPT> + 0x8</LITERAL></ENTRY>
+<ENTRY COLNAME="COL2"><LITERAL>CTL_REG</LITERAL></ENTRY>
+<ENTRY NAMEST="COL3" NAMEEND="COL4">8-bit timer control</ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><LITERAL>base<SUBSCRIPT>i</SUBSCRIPT> + 0xC</LITERAL></ENTRY>
+<ENTRY COLNAME="COL2"><LITERAL>CLR_REG</LITERAL></ENTRY>
+<ENTRY COLNAME="COL3">reserved</ENTRY>
+<ENTRY COLNAME="COL4">interrupt clear</ENTRY>
+</ROW>
+</TBODY>
+</TGROUP>
+</TABLE></PARA>
+<PARA><TABLE>
+<TITLE ID="TB-TUTORIAL-STEP-1-TABLE-CTRLREGS">Control Registers</TITLE>
+<TGROUP COLS="10">
+<COLSPEC COLNAME="COL1" COLWIDTH="25*">
+<COLSPEC COLNAME="COL2" COLWIDTH="25*">
+<COLSPEC COLNAME="COL3" COLWIDTH="200*">
+<COLSPEC COLNAME="COL4" COLWIDTH="200*">
+<COLSPEC COLNAME="COL5" COLWIDTH="25*">
+<COLSPEC COLNAME="COL6" COLWIDTH="25*">
+<COLSPEC COLNAME="COL7" COLWIDTH="150*">
+<COLSPEC COLNAME="COL8" COLWIDTH="150*">
+<COLSPEC COLNAME="COL9" COLWIDTH="25*">
+<COLSPEC COLNAME="COL10" COLWIDTH="25*">
+<TBODY>
+<ROW>
+<ENTRY NAMEST="COL1" NAMEEND="COL2" ALIGN="CENTER">31&ndash;8</ENTRY>
+<ENTRY COLNAME="COL3">7</ENTRY>
+<ENTRY COLNAME="COL4">6</ENTRY>
+<ENTRY NAMEST="COL5" NAMEEND="COL6" ALIGN="CENTER">5&ndash;4</ENTRY>
+<ENTRY COLNAME="COL7">3</ENTRY>
+<ENTRY COLNAME="COL8">2</ENTRY>
+<ENTRY NAMEST="COL9" NAMEEND="COL10" ALIGN="CENTER">1&ndash;0</ENTRY>
+</ROW>
+<ROW>
+<ENTRY NAMEST="COL1" NAMEEND="COL2" ALIGN="CENTER">0</ENTRY>
+<ENTRY COLNAME="COL3" ALIGN="CENTER">Enable</ENTRY>
+<ENTRY COLNAME="COL4" ALIGN="CENTER">Mode</ENTRY>
+<ENTRY NAMEST="COL5" NAMEEND="COL6" ALIGN="CENTER">0</ENTRY>
+<ENTRY NAMEST="COL7" NAMEEND="COL8" ALIGN="CENTER">Prescale</ENTRY>
+<ENTRY NAMEST="COL9" NAMEEND="COL10" ALIGN="CENTER">0</ENTRY>
+</ROW>
+<ROW>
+<ENTRY NAMEST="COL1" NAMEEND="COL2" ALIGN="CENTER">0</ENTRY>
+<ENTRY COLNAME="COL3"><SIMPLELIST TYPE="VERT">
+<MEMBER>0 = Disabled</MEMBER>
+<MEMBER>1 = Disabled</MEMBER>
+</SIMPLELIST></ENTRY>
+<ENTRY COLNAME="COL4"><SIMPLELIST TYPE="VERT">
+<MEMBER>0 = Free-running</MEMBER>
+<MEMBER>1 = Periodic</MEMBER>
+</SIMPLELIST></ENTRY>
+<ENTRY NAMEST="COL5" NAMEEND="COL6" ALIGN="CENTER">0</ENTRY>
+<ENTRY COLNAME="COL7">Bits 3&ndash;2</ENTRY>
+<ENTRY COLNAME="COL8">Divisor</ENTRY>
+<ENTRY NAMEST="COL9" NAMEEND="COL10" ALIGN="CENTER">0</ENTRY>
+</ROW>
+<ROW>
+<ENTRY NAMEST="COL1" NAMEEND="COL2" ALIGN="CENTER">0</ENTRY>
+<ENTRY COLNAME="COL3"><SIMPLELIST TYPE="VERT">
+<MEMBER>0 = Disabled</MEMBER>
+<MEMBER>1 = Disabled</MEMBER>
+</SIMPLELIST></ENTRY>
+<ENTRY COLNAME="COL4"><SIMPLELIST TYPE="VERT">
+<MEMBER>0 = Free-running</MEMBER>
+<MEMBER>1 = Periodic</MEMBER>
+</SIMPLELIST></ENTRY>
+<ENTRY NAMEST="COL5" NAMEEND="COL6" ALIGN="CENTER">0</ENTRY>
+<ENTRY COLNAME="COL7">00</ENTRY>
+<ENTRY COLNAME="COL8">1</ENTRY>
+<ENTRY NAMEST="COL9" NAMEEND="COL10" ALIGN="CENTER">0</ENTRY>
+</ROW>
+<ROW>
+<ENTRY NAMEST="COL1" NAMEEND="COL2" ALIGN="CENTER">0</ENTRY>
+<ENTRY COLNAME="COL3"><SIMPLELIST TYPE="VERT">
+<MEMBER>0 = Disabled</MEMBER>
+<MEMBER>1 = Disabled</MEMBER>
+</SIMPLELIST></ENTRY>
+<ENTRY COLNAME="COL4"><SIMPLELIST TYPE="VERT">
+<MEMBER>0 = Free-running</MEMBER>
+<MEMBER>1 = Periodic</MEMBER>
+</SIMPLELIST></ENTRY>
+<ENTRY NAMEST="COL5" NAMEEND="COL6" ALIGN="CENTER">0</ENTRY>
+<ENTRY COLNAME="COL7">01</ENTRY>
+<ENTRY COLNAME="COL8">16</ENTRY>
+<ENTRY NAMEST="COL9" NAMEEND="COL10" ALIGN="CENTER">0</ENTRY>
+</ROW>
+<ROW>
+<ENTRY NAMEST="COL1" NAMEEND="COL2" ALIGN="CENTER">0</ENTRY>
+<ENTRY COLNAME="COL3"><SIMPLELIST TYPE="VERT">
+<MEMBER>0 = Disabled</MEMBER>
+<MEMBER>1 = Disabled</MEMBER>
+</SIMPLELIST></ENTRY>
+<ENTRY COLNAME="COL4"><SIMPLELIST TYPE="VERT">
+<MEMBER>0 = Free-running</MEMBER>
+<MEMBER>1 = Periodic</MEMBER>
+</SIMPLELIST></ENTRY>
+<ENTRY NAMEST="COL5" NAMEEND="COL6" ALIGN="CENTER">0</ENTRY>
+<ENTRY COLNAME="COL7">10</ENTRY>
+<ENTRY COLNAME="COL8">256</ENTRY>
+<ENTRY NAMEST="COL9" NAMEEND="COL10" ALIGN="CENTER">0</ENTRY>
+</ROW>
+<ROW>
+<ENTRY NAMEST="COL1" NAMEEND="COL2" ALIGN="CENTER">0</ENTRY>
+<ENTRY COLNAME="COL3"><SIMPLELIST TYPE="VERT">
+<MEMBER>0 = Disabled</MEMBER>
+<MEMBER>1 = Disabled</MEMBER>
+</SIMPLELIST></ENTRY>
+<ENTRY COLNAME="COL4"><SIMPLELIST TYPE="VERT">
+<MEMBER>0 = Free-running</MEMBER>
+<MEMBER>1 = Periodic</MEMBER>
+</SIMPLELIST></ENTRY>
+<ENTRY NAMEST="COL5" NAMEEND="COL6" ALIGN="CENTER">0</ENTRY>
+<ENTRY COLNAME="COL7">11</ENTRY>
+<ENTRY COLNAME="COL8">Undefined</ENTRY>
+<ENTRY NAMEST="COL9" NAMEEND="COL10" ALIGN="CENTER">0</ENTRY>
+</ROW>
+</TBODY>
+</TGROUP>
+</TABLE></PARA>
+<PARA>Each register is 32-bits wide. Since there are two timers, there are
+ two base addresses: base 0 is selectable; base 1 = base 0 + 0x20.</PARA>
+<PARA>The timers operate by counting down from the 16-bit value in LOAD_REG.
+ The count rate can be varied by the pre-scale settings of the control register.
+The pre-scale is a divisor applied to the input clock. Therefore, with a pre-scale
+setting of 1, the timer counts down at the input clock rate; with a pre-scale
+value of 16, the timer counts down at 1/16 of the input clock rate. The current
+count can be read at any time from VAL_REG. Once the counter reaches zero,
+the timer takes one of two actions depending on the Mode setting, which is
+bit 6 of the control register. If the timer is in free-running mode, it will
+reload the current count value from LOAD_REG and start counting down again;
+if the timer is in periodic mode, it will generate an interrupt, and then
+reload its current count and continue.</PARA>
+<PARA>The above set of behaviors forms the functional requirements of the
+ simulated timer model. Specifically, the registers must be present at the
+prescribed addresses, and must appear to application software as if they were
+the real registers. Similarly, the interrupt and clock behaviors must be modeled
+accurately with respect to interrupt timing and pre-scale behavior.</PARA>
+</SECT3>
+</SECT2>
+<SECT2 ID="TUTORIAL-STEP-2">
+<TITLE>Step 2: Design the Model</TITLE><!-- label: tutorial-step-2 -->
+<PARA>Once the functionality of the hardware is understood, it must be mapped
+onto the simulator's API and level of abstraction. There are some design decisions
+that can be made to raise or lower the level of abstraction. Many of these
+decisions trade performance of the simulated component against its fidelity
+to the actual hardware. </PARA>
+<INDEXTERM>
+<PRIMARY>component development</PRIMARY>
+<SECONDARY>designing the
+model</SECONDARY>
+</INDEXTERM>
+<PARA>The timers in this tutorial are simple and therefore do not require
+ many design decisions, but developing components such as CPUs or Ethernet
+controllers involves evaluating many trade-offs. As an example, a CPU with
+a hardware level 1 cache may be modeled without the cache, since cache simulation
+is time and space consuming and may not affect the correctness of the simulated
+application. This is a common motivation for reducing the accuracy of a component,
+ since often the simulator is only required to behave with functional correctness
+from the target software's point of view.</PARA>
+<SECT3 ID="TUTORIAL-STEP-2-EXAMPLE-1">
+<TITLE>Example</TITLE><!-- label: tutorial-step-2-example-1 -->
+<PARA>The simulator architecture possesses some basic properties that impact
+component implementation: <ITEMIZEDLIST MARK="bullet">
+<LISTITEM>
+<PARA>Components communicate with other components only through
+pin and bus connections. </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>Components do not have an internal concept of time. </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>Components must not block (that is, suspend) the main thread
+of control.</PARA>
+</LISTITEM>
+</ITEMIZEDLIST></PARA>
+<PARA>In the case of the timer, the simulator framework dictates that the
+bus interface must be used to allow access to the registers; interrupt generation
+should use the pin interface; and the events that change the timer's counters
+must be externally generated.</PARA>
+<PARA>There are several approaches to use when setting up the external timer
+ generation of the timer model. The simulator includes an event scheduler
+component that maintains the concept of simulated time and supports a queue
+of time-ordered events. The timer's clocking is thus achieved by enqueueing
+a request to be notified at some specific future time.<ITEMIZEDLIST MARK="bullet">
+<LISTITEM>
+<PARA>The simplest approach is to specify the future time as one
+system clock tick past the current time. This allows the component to examine
+its pre-scale state and decrement the internal counters appropriately. The
+problem with this approach is that it is inefficient--there is significant
+communication with the scheduler on every clock tick. </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>A second approach is to set the notify time to the value of
+the pre-scaler, which, at best, can reduce the communication with the scheduler
+by up to a factor of 256, in this example. </PARA>
+</LISTITEM>
+<LISTITEM>
+<PARA>A third approach achieves minimal communication by calculating
+the pre-scaled total time, and requesting notification only when the internal
+counter value reaches zero. </PARA>
+</LISTITEM>
+</ITEMIZEDLIST></PARA>
+<PARA>One consideration in timing notification is that the timer must make
+ its internal count value available at any intermediate time, since this is
+a functional requirement of supporting reads of VAL_REG. In the first two
+approaches, this requirement can be supported directly. In the third approach,
+intermediate counts do not have to be kept because the notification from the
+scheduler arrives only when the count is zero. Intermediate times can be supported
+on-demand, by querying the scheduler for the current time when a request for
+the intermediate count is received. If the start time of the current period
+is also saved, then the intermediate count can be calculated  by dividing
+the elapsed time, which is the current time less the start time, by the pre-scale
+value.</PARA>
+<PARA>This discussion is presented to illustrate the reasoning process that
+ the component designer might use. For purposes of illustration, the remainder
+of the example will assume that the scheduler is set to notify the timer component
+at the pre-scale rate, the second option given above.</PARA>
+</SECT3>
+</SECT2>
+<SECT2 ID="TUTORIAL-STEP-3">
+<TITLE>Step 3: Define the Component</TITLE><!-- label: tutorial-step-3 -->
+<PARA>The first implementation step is to define the component. All components
+derive from the abstract sid::component class that provides supervisory access
+and the methods needed to connect and initialize the model.</PARA>
+<INDEXTERM>
+<PRIMARY>component development</PRIMARY>
+<SECONDARY>defining the
+component</SECONDARY>
+</INDEXTERM>
+<SECT3 ID="TUTORIAL-STEP-3-EXAMPLE-1">
+<TITLE>Example</TITLE><!-- label: tutorial-step-3-example-1 -->
+<PARA>The timer and its internal state can be defined as follows. For clarity,
+nested classes used for pins and buses will be omitted at this point:</PARA>
+<PROGRAMLISTING>
+
+class Timer: public virtual sid::component
+{
+public:
+  Timer()
+    :scheduler_pin(0), clock_pin(this), bus(this), enabled(false) { }  
+
+  // Provide implementations for abstract methods in sid::component.
+  // See include/sidcomp.h.
+
+  vector&lt;string&#62; pin_names();
+  sid::pin* find_pin(const string&amp; name);
+  sid::component::status connect_pin(const string&amp; name, 
+    sid::pin* pin);
+  sid::component::status disconnect_pin(const string&amp; name, 
+    sid::pin* pin);
+  vector&lt;sid::pin*&#62; connected_pins(const string&amp; name);
+
+  vector&lt;string&#62; accessor_names();
+  sid::component::status connect_accessor(const string&amp; name,
+    sid::bus* bus);
+  sid::component::status disconnect_accessor(const string&amp; name,
+    sid::bus* bus);
+
+  vector&lt;string&#62; bus_names();
+  sid::bus* find_bus(const string&amp; name);
+  sid::bus* connected_bus(const string&amp; name);
+
+  vector&lt;string&#62; attribute_names();
+  vector&lt;string&#62; attribute_names(const string&amp; category);
+  string attribute_value(const string&amp; name);
+  sid::component::status set_attribute_value(const string&amp; name,
+    const string&amp; value);
+
+  vector&lt;string&#62; relationship_names();
+  sid::component::status relate(const string&amp; rel, 
+    sid::component* c);
+  sid::component::status unrelate(const string&amp; rel, 
+    sid::component* c);
+  vector&lt;sid::component*&#62; related_components(const string&amp; rel);
+
+private:
+  // Data members that represent the timer's internal state.
+
+  bool enabled;
+  sid::host_int_2 load_value, prescale, counter;
+  enum timer_mode { PERIODIC, FREERUNNING } mode;
+};</PROGRAMLISTING>
+<PARA>The Timer class contains all of the internal state needed to model a
+ single timer. As a result, two instances of the class must be created, and
+mapped at appropriate addresses, to model the hardware. The internal state
+does not try to mimic the hardware layout; instead, it is organized to simplify
+the implementation for the component writer. In general, registers that store
+states as a bit field should be internally represented with separate member
+variables and they should only be assembled into a packed bit field when necessary.</PARA>
+<PARA>The Timer class also defines all of the abstract methods from the sid::component
+class that form the SID component API. Each of these methods must be implemented
+to fulfill the API. As you will see, these methods quite often can be implemented
+at a minimum if the component does not require all of the API's facilities.</PARA>
+</SECT3>
+</SECT2>
+<SECT2 ID="TUTORIAL-STEP-4">
+<TITLE>Step 4: Define the Pins</TITLE><!-- label: tutorial-step-4 -->
+<PARA>The SID API only addresses the concept of input pins. An input pin 
+is one which is made visible to other components, through the  <FUNCTION>pin_names()</FUNCTION>  and  <FUNCTION>  find_pin() </FUNCTION>  methods.
+There is no concept of an output pin, except that it is a component's internal
+collection of other components' pin objects.</PARA>
+<INDEXTERM>
+<PRIMARY>component development</PRIMARY>
+<SECONDARY>defining the
+pins</SECONDARY>
+</INDEXTERM>
+<SECT3 ID="TUTORIAL-STEP-4-EXAMPLE-1">
+<TITLE>Example</TITLE><!-- label: tutorial-step-4-example-1 -->
+<PARA>The timer component will have two output pins: the interrupt pin and
+a control pin to be used in conjunction with the scheduler component. Since
+we do not wish to limit the number of other components that may be interrupted
+by the timer, it is necessary to maintain a "net list" of pin connections
+that can be iterated over each time a value is driven across the interrupt
+pin:</PARA>
+<PROGRAMLISTING>private:
+  // A netlist, which tracks pins connected to the interrupt pin.
+  typedef set&lt;sid::pin*&#62; netlist_t;
+  netlist_t intpin_netlist;</PROGRAMLISTING>
+<PARA>The following methods do just that:</PARA>
+<PROGRAMLISTING>void
+Timer::drive_interrupt(sid::host_int_4 value)
+{
+  // Iterate the netlist, driving the value to all pins connected to
+  // the interrupt pin.
+
+  for (netlist_t::const_iterator it = intpin_netlist.begin();
+       it != intpin_netlist.end();
+       it++)
+    {
+      (*it)-&#62;driven(value);
+    }
+}
+
+
+// Return a list of pins that are connected to a named pin.
+// We recognize "interrupt" and "divided-clock-control".
+
+vector&lt;sid::pin*&#62;
+Timer::connected_pins(const string&amp; name)
+{
+  vector&lt;sid::pin*&#62; pins;
+  netlist_t::const_iterator it;
+
+  if (name == "interrupt")
+    {
+      for (it = intpin_netlist.begin(); it != intpin_netlist.end();
+           it++)
+        {
+          pins.push_back(*it);
+        }
+      return pins;
+    }
+  else if (name == "divided-clock-control")
+    {
+      pins.push_back(scheduler_pin);
+      return pins;
+    }
+  return vector&lt;sid::pin*&#62;();
+}
+
+
+// Connect a pin to a named pin.
+// We recognize "interrupt" and "divided-clock-control".
+
+// We allow multiple pins to be connected to the interrupt pin (with
+// infinite fan-out!), so these are kept in a netlist.  For
+// efficiency, the STL container chosen for the netlist ensures that
+// no duplicate pin handles are stored.
+
+sid::component::status
+Timer::connect_pin(const string&amp; name, sid::pin* pin)
+{
+  if (name == "interrupt")
+    {
+      // Add this pin to the netlist.
+      intpin_netlist.insert(intpin_netlist.end(), pin);
+      return sid::component::ok;
+    }
+  else if (name == "divided-clock-control")
+    {
+      // Reassign the scheduler pin.
+      scheduler_pin = pin;
+      return sid::component::ok;
+    }
+  return sid::component::not_found;
+}
+
+// Disconnect a pin from a named pin.
+
+sid::component::status
+Timer::disconnect_pin(const string&amp; name, sid::pin* pin)
+{
+  if (name == "interrupt")
+    {
+      // Remove this pin from the netlist.
+      if (intpin_netlist.erase(pin) &#62; 0)
+        return sid::component::ok;
+    }
+  else if (name == "divided-clock-control"&amp; &amp; scheduler_pin == pin)
+    {
+      // Elsewhere, we make sure to not use this pin if it's null.
+      scheduler_pin = 0;
+      return sid::component::ok;
+    }
+  return sid::component::not_found;
+}</PROGRAMLISTING>
+<PARA>The component will also have one input pin which is exported to other
+components: divided-clock-event. This pin, when connected to the  scheduler
+component, can be used to deliver event notifications to the  timer. We can
+create a specific pin for this, based on the  <FUNCTION>sid::pin </FUNCTION>
+class:</PARA>
+<PROGRAMLISTING>class clock_pin_t: public sid::pin
+  {
+    // clock_pin_t is a specialized pin.
+    // It calls timer-&#62;tick() whenever a value is driven. 
+  public:
+    clock_pin_t(Timer* t): timer(t) { }
+    void driven(sid::host_int_4 value) { timer-&#62;tick(); }
+  private:
+    Timer* timer;
+  };
+  friend class clock_pin_t;
+  clock_pin_t clock_pin;
+
+  // This method is called whenever the scheduler delivers an event,
+  // because the "divided-clock-event" pin will be connected to the
+  // scheduler.  It is a specialized pin with these fixed semantics.
+  void tick();</PROGRAMLISTING>
+<PARA>And the following component API method is used to publicize this pin:</PARA>
+<PROGRAMLISTING>// Return a list of pin names which are visible to other components.
+
+vector&lt;string&#62;
+Timer::pin_names()
+{
+  vector&lt;string&#62; pins;
+  pins.push_back("divided-clock-event");
+  return pins;
+}
+
+
+// Find a pin of a given name.
+// We only recognize "divided-clock-event".
+
+sid::pin*
+Timer::find_pin(const string&amp; name)
+{
+  if (name == "divided-clock-event")
+    return&amp; clock_pin;
+
+  return 0;
+}</PROGRAMLISTING>
+</SECT3>
+</SECT2>
+<SECT2 ID="TUTORIAL-STEP-5">
+<TITLE>Step 5: Define the Bus</TITLE><!-- label: tutorial-step-5 -->
+<PARA>Like pins, buses work as demand-driven functional callbacks.  The simulator
+abstracts buses to a read/write interface on address  and data.</PARA>
+<INDEXTERM>
+<PRIMARY>component development</PRIMARY>
+<SECONDARY>defining the
+bus</SECONDARY>
+</INDEXTERM>
+<SECT3 ID="TUTORIAL-STEP-5-EXAMPLE-1">
+<TITLE>Example</TITLE><!-- label: tutorial-step-5-example-1 -->
+<PARA>The timer bus interface can be declared as follows. It should be  nested
+within the Timer class to facilitate information hiding:</PARA>
+<PROGRAMLISTING> // register_bus is a specialized bus.
+ // It handles the majority of the component's functionality, since
+ // that is mostly controlled by the timer's register set.
+
+ class register_bus: public sid::bus
+ {
+ public:
+
+  register_bus(Timer* t): timer(t) { }
+
+   // Prototypes for bus read/write methods of all kinds.
+
+   sid::bus::status read(sid::host_int_4 addr, sid::little_int_1&amp; data);
+   sid::bus::status read(sid::host_int_4 addr, sid::big_int_1&amp; data);
+   sid::bus::status read(sid::host_int_4 addr, sid::little_int_2&amp; data);
+   sid::bus::status read(sid::host_int_4 addr, sid::big_int_2&amp; data);
+   sid::bus::status read(sid::host_int_4 addr, sid::little_int_4&amp; data);
+   sid::bus::status read(sid::host_int_4 addr, sid::big_int_4&amp; data);
+   sid::bus::status read(sid::host_int_4 addr, sid::little_int_8&amp; data);
+   sid::bus::status read(sid::host_int_4 addr, sid::big_int_8&amp; data);
+   sid::bus::status write(sid::host_int_4 addr, sid::little_int_1 data);
+   sid::bus::status write(sid::host_int_4 addr, sid::big_int_1 data);
+   sid::bus::status write(sid::host_int_4 addr, sid::little_int_2 data);
+   sid::bus::status write(sid::host_int_4 addr, sid::big_int_2 data);
+   sid::bus::status write(sid::host_int_4 addr, sid::little_int_4 data);
+   sid::bus::status write(sid::host_int_4 addr, sid::big_int_4 data);
+   sid::bus::status write(sid::host_int_4 addr, sid::little_int_8 data);
+   sid::bus::status write(sid::host_int_4 addr, sid::big_int_8 data);
+
+ private:
+   Timer* timer;
+ };
+ friend class register_bus;
+ register_bus bus;
+
+</PROGRAMLISTING>
+<PARA>Each  <FUNCTION>read()</FUNCTION> and  <FUNCTION>write()</FUNCTION>
+ method must be defined before a bus object may  be instantiated. There is
+a read and write method for each byte order and each transaction width. To
+simplify this example, only 32-bit (4-byte) read and write methods will be
+supported for the timer's 32-bit register file. All of the remaining methods
+will return an error, but in a more complete implementation, should manage
+these smaller bus transactions when it makes sense.</PARA>
+<PROGRAMLISTING>sid::bus::status
+Timer::register_bus::read(sid::host_int_4 addr, sid::little_int_1&amp; data)
+{
+  return sid::bus::unpermitted;
+}
+
+</PROGRAMLISTING>
+<PARA>It is worth noting that all addresses seen by this component will be
+relative to 0. This is because the memory mapped address range is not known
+in advance. In a complete simulated system, the mapper component will handle
+the mapping from a memory mapped region into the device's address space.</PARA>
+<PARA>A contrived example illustrates how the bus interface works:</PARA>
+<PROGRAMLISTING>  host_int_4 addr = 0;
+  host_int_4 check, val = 0x5555;
+  sid::bus* bus = component-&#62;find_bus("registers");
+
+  bus-&#62;write(addr, val);  // write a value.
+  bus-&#62;read(addr, check); // read back value.
+
+  assert(val == check);</PROGRAMLISTING>
+<PARA>Other bus-related API methods that must be provided are shown below.</PARA>
+<PARA>These methods enable supervisor components to connect to this  component's
+bus:</PARA>
+<PROGRAMLISTING>// Return a list of bus names. We have just one--"registers".
+
+vector&lt;string&#62;
+Timer::bus_names()
+{
+  vector&lt;string&#62; buses;
+  buses.push_back("registers");
+  return buses;
+}
+
+sid::bus*
+Timer::find_bus(const string&amp; name)
+{
+  if (name == "registers")
+    return&amp; bus;
+  return 0;
+}
+
+sid::bus*
+Timer::connected_bus(const string&amp; name)
+{
+  // No connected buses; return a null pointer.
+  return 0;
+}</PROGRAMLISTING>
+</SECT3>
+</SECT2>
+<SECT2 ID="TUTORIAL-STEP-6">
+<TITLE>Step 6: Add Scheduling Support</TITLE><!-- label: tutorial-step-6 -->
+<PARA>The scheduler is another SID component that is present in typical  simulation
+systems. In order to request timed events to be delivered  to a component,
+the component must negotiate them using a well-defined  protocol. The component
+connects two pins to the scheduler:</PARA>
+<INDEXTERM>
+<PRIMARY>component development</PRIMARY>
+<SECONDARY>adding scheduling
+support</SECONDARY>
+</INDEXTERM>
+<PROGRAMLISTING>divided-clock-event
+divided-clock-control</PROGRAMLISTING>
+<PARA>Events are scheduled by communicating to the scheduler using this pin
+ interface. To schedule an event at a future time, that time (as the number
+of seconds since UNIX epoch) must be carried across the  <COMPUTEROUTPUT>divided-clock-control</COMPUTEROUTPUT> pin. If the most significant bit is
+set, then the event is to be delivered regularly with the specified frequency.</PARA>
+<SECT3 ID="TUTORIAL-STEP-6-EXAMPLE-1">
+<TITLE>Example</TITLE><!-- label: tutorial-step-6-example-1 -->
+<PARA>To cancel an event subscription, the value 0 must be carried across
+ the divided-clock-control pin. To simplify the implementation, these routines
+have been encapsulated within appropriately named methods:</PARA>
+<PROGRAMLISTING>// Schedule an event to be delivered at a later time.
+
+void
+Timer::schedule(sid::host_int_4 time)
+{
+  // The scheduler component tests bit 31 of a value carried on its
+  // "control" pin.  If this bit is set, the event will be delivered
+  // routinely at the specified interval.  Otherwise, the event will
+  // only occur once.
+
+  assert ((time&amp;  0x80000000) == 0);
+  assert ((time&amp;  0x7FFFFFFF) != 0);
+  
+  if (scheduler_pin)
+    scheduler_pin-&#62;driven(0x80000000 | time);
+}
+
+
+// Cancel any pending event.
+
+void
+Timer::cancel()
+{
+  // Cancel the event by driving a zero value to the scheduler.
+
+  if (scheduler_pin)
+    scheduler_pin-&#62;driven(0);
+}
+
+// Reset the schedule, in case the timer's enable or divisor registers
+// have been altered.
+
+void
+Timer::reset_schedule()
+{
+  cancel();
+  
+  if (!enabled)
+    return;
+  
+  assert (prescale &lt;= 2);
+  unsigned divisor = 1 &lt;&lt; (prescale * 4);
+  
+  schedule(divisor);
+}</PROGRAMLISTING>
+</SECT3>
+</SECT2>
+<SECT2 ID="TUTORIAL-STEP-7">
+<TITLE>Step 7: Complete All Abstract Methods</TITLE><!-- label: tutorial-step-7 -->
+<PARA>Now all of the remaining abstract methods from the  <FUNCTION>sid::component </FUNCTION> class need to be implemented. Often, these method bodies are trivial
+when the  component does not utilize the entire API.</PARA>
+<INDEXTERM>
+<PRIMARY>component development</PRIMARY>
+<SECONDARY>completing abstract
+methods</SECONDARY>
+</INDEXTERM>
+<PROGRAMLISTING>vector&lt;string&#62;
+  Timer::accessor_names()
+  {
+    // No accessors.
+    return vector&lt;string&#62;();
+  }
+ 
+  sid::component::status
+  Timer::connect_accessor(const string&amp; name, sid::bus* bus)
+  {
+    // No accessors; any name is unknown.
+    return sid::component::not_found;
+  }
+ 
+  sid::component::status
+  Timer::disconnect_accessor(const string&amp; name, sid::bus* bus)
+  {
+    // No accessors; any name is unknown.
+    return sid::component::not_found;
+  }
+ 
+  vector&lt;string&#62;
+  Timer::attribute_names()
+  {
+    return vector&lt;string&#62;();
+  }
+  
+  vector&lt;string&#62;
+  Timer::attribute_names(const string&amp; category)
+  {
+    return vector&lt;string&#62;();
+  }
+  
+  string
+  Timer::attribute_value(const string&amp; name)
+  {
+    // No attributes--return the empty string for any attribute value.
+    return string();
+  }
+  
+  sid::component::status
+  Timer::set_attribute_value(const string&amp; name, const string&amp; value)
+  {
+    // No attributes--return not_found regardless of attribute name.
+    return sid::component::not_found;
+  }
+ 
+  vector&lt;sid::component*&#62;
+  Timer::related_components(const string&amp; rel)
+  {
+    // No related components.
+    return vector&lt;sid::component*&#62;();
+  }
+  
+  sid::component::status
+  Timer::unrelate(const string&amp; rel, sid::component* c)
+  {
+    // No related components; always unfound.
+    return sid::component::not_found;
+  }
+  
+  sid::component::status
+  Timer::relate(const string&amp; rel, sid::component* c)
+  {
+    // No related components; always unfound.
+    return sid::component::not_found;
+  }
+  
+  vector&lt;string&#62;
+  Timer::relationship_names()
+  {
+    // No relations.
+    return vector&lt;string&#62;();
+  }</PROGRAMLISTING>
+</SECT2>
+<SECT2 ID="TUTORIAL-STEP-8">
+<TITLE>Step 8: Complete the Model Functionality</TITLE><!-- label: tutorial-step-8 -->
+<PARA>For the timer, the functionality can be easily inferred from the hardware's
+functional description. For example, the bus'  <FUNCTION>read</FUNCTION> call-back
+method would look something like the following:</PARA>
+<INDEXTERM>
+<PRIMARY>component development</PRIMARY>
+<SECONDARY>completing abstract
+methods</SECONDARY>
+</INDEXTERM>
+<PROGRAMLISTING>// Handle 32-bit (little endian) reads.
+// If the address is not 32-bit aligned or does not match any register
+// address, return an error.
+
+sid::bus::status
+Timer::register_bus::read(sid::host_int_4 addr, sid::little_int_4&amp; data)
+{
+  if (addr % 4 != 0)
+    return sid::bus::misaligned;
+  
+  switch (addr)
+    { 
+    case 0x0:
+      data = timer-&#62;load_value;
+      break;
+      
+    case 0x4:
+      data = timer-&#62;counter;
+      break;
+      
+    case 0x8:
+      data =
+        (timer-&#62;enabled &lt;&lt; 7) | 
+        (timer-&#62;mode &lt;&lt; 6) | 
+        (timer-&#62;prescale &lt;&lt; 2);
+      break;
+      
+    case 0xC:
+      break;
+      
+    default:
+      return sid::bus::unmapped;
+    }
+
+  return sid::bus::ok;
+}</PROGRAMLISTING>
+<PARA>The address (<COMPUTEROUTPUT>addr</COMPUTEROUTPUT>)  is a localized
+offset into the component's address space. The switch statement responds to
+these offsets by setting the load or control register value, or by clearing
+the interrupt, as appropriate.</PARA>
+<PARA>To simplify the implementation and alleviate duplicated code, the big-endian
+version of <FUNCTION>read()</FUNCTION>: </PARA>
+<PROGRAMLISTING>// Handle 32-bit (big endian) reads.
+// Just do a little endian read and rearrange the result.
+
+sid::bus::status
+Timer::register_bus::read(sid::host_int_4 addr, sid::big_int_4&amp; data)
+{
+  sid::little_int_4 le_data;
+  sid::bus::status st = read(addr, le_data);
+  data.set_target_memory_value (le_data.target_memory_value ());
+  return st;
+}</PROGRAMLISTING>
+<PARA>This is how the  <FUNCTION>write()</FUNCTION> method might look for
+a little-endian 32-bit  read:</PARA>
+<PROGRAMLISTING>// Handle 32-bit (little endian) writes.
+// If the address is not 32-bit aligned or does not match any register
+// address, return an error.
+
+sid::bus::status
+Timer::register_bus::write(sid::host_int_4 addr, sid::little_int_4 data)
+{
+  if (addr % 4 != 0)
+    return sid::bus::misaligned;
+  
+  switch (addr)
+    {
+    case 0x0:
+      // A write to LOAD_REG.
+      // Clear top 16 bits when loading a new value.
+      timer-&#62;load_value = data&amp;  0xFFFF;
+      // Reset the counter value.
+      timer-&#62;counter = timer-&#62;load_value;
+      break;
+
+    case 0x4:
+      break;
+
+    case 0x8:
+      // A write to CTL_REG.
+      timer-&#62;prescale = (data&amp;  0x0C) &#62;&#62; 2;
+      timer-&#62;enabled = ((data&amp;  0x80) == 0x80);
+      timer-&#62;mode = ((data&amp;  0x40) &#62;&#62; 6) ? PERIODIC : FREERUNNING;
+      timer-&#62;reset_schedule();
+      break;
+
+    case 0xC:
+      timer-&#62;drive_interrupt(0);
+      break;
+
+    default:
+      return sid::bus::unmapped;
+    }
+
+  return sid::bus::ok;
+}
+
+</PROGRAMLISTING>
+<PARA>Again, </PARA>
+<PROGRAMLISTING>// Handle 32-bit (big endian) writes.
+// Just rearrange the data and do a little endian write.
+
+sid::bus::status
+Timer::register_bus::write(sid::host_int_4 addr, sid::big_int_4 data)
+{
+  sid::little_int_4 le_data;
+  le_data.set_target_memory_value (data.target_memory_value ());
+  return write(addr, le_data);
+}</PROGRAMLISTING>
+</SECT2>
+<SECT2 ID="TUTORIAL-STEP-9">
+<TITLE>Step 9: Configure the Connection</TITLE><!-- label: tutorial-step-9 -->
+<PARA>Now that the timer is implemented, it is time to hook it up and try
+it out. The simulator takes its configuration directions from a configuration
+file. </PARA>
+<INDEXTERM>
+<PRIMARY>component development</PRIMARY>
+<SECONDARY>configuring
+the connection</SECONDARY>
+</INDEXTERM>
+<SECT3 ID="TUTORIAL-STEP-9-EXAMPLE-1">
+<TITLE>Example</TITLE><!-- label: tutorial-step-9-example-1 -->
+<PARA>Here is a configuration file fragment that illustrates the use of the
+new timer component:</PARA>
+<PROGRAMLISTING>...
+# components
+new ARM7100 cpu
+new arm-timer timer1
+new arm-timer timer2
+new mapper map
+# pin connections
+connect-pin timer1 interrupt -&#62; cpu INTR
+connect-pin timer2 interrupt -&#62; cpu INTR
+# bus connections
+connect-bus cpu data-bus map access-port
+connect-bus map [0xa0000-0xa0010] timer1 registers
+connect-bus map [0xa0020-0xa0030] timer2 registers
+...</PROGRAMLISTING>
+<PARA>The configuration file segment instructs the simulator to instantiate
+ the following four components: a CPU, two timers, and an address mapper.</PARA>
+<PARA>The strings used to identify the components are specified in a shared
+library wrapper described in the <CITETITLE>API Reference</CITETITLE> manual.
+ Like the bus and pin names, they are arbitrary, and must be determined from
+the component documentation. The configuration file directs SID to connect
+the output pins of the two timers to the interrupt input pin of the CPU.</PARA>
+<NOTE>
+<TITLE>Note</TITLE>
+<PARA>The names  <FUNCTION>timer1</FUNCTION>  and  <FUNCTION>timer2</FUNCTION>
+ refer to the instance names defined in the script, while the name of the
+pin,  <FUNCTION>interrupt</FUNCTION>, is available by virtue of the fact that
+the  <FUNCTION>sid::component::pin_names()</FUNCTION> method names it. </PARA>
+</NOTE>
+<PARA>The last part of the file connects the CPU data bus to the address 
+mapper, and then adds the timers at address 0xa0000 and 0xa0020, using the
+address separation defined in the hardware specification (Figure 1).</PARA>
+<PARA>This is just a fragment of the full configuration file, which must also define search paths to find the component libraries and add some memory  so
+that a target program can be loaded and run.</PARA>
+</SECT3>
+</SECT2>
+</SECT1>
+</CHAPTER>
+<CHAPTER ID="CH-BRIDGE-TCL">
+<TITLE>Theory of Operations for bridge-tcl Component</TITLE>
+<INDEXTERM>
+<PRIMARY>bridge-tcl</PRIMARY>
+<SECONDARY>theory of operations</SECONDARY>
+</INDEXTERM>
+<PARA>A bridge-tcl component is a shell that hooks all SID API calls to an
+embedded Tcl interpreter so that they can be handled as Tcl procedure calls.
+In addition, SID API calls are exposed to that interpreter, so the Tcl procedures
+can call back out to the C++ system. With these two capabilities, a user-provided
+Tcl package may become a first class SID component.  </PARA>
+<PARA>Objects such as bus, component, and pin pointers may be passed through
+Tcl scripts safely, because the bridging calls represent these as unique strings,
+and convert them back to C++ pointers automatically. Any pointers seen through
+incoming call arguments, or outgoing call return values, are transparently
+converted into unique long-lived opaque strings. This way, C++ pointers can
+safely pass through the Tcl bridge in both directions.</PARA>
+<PARA>Unlike C++ components, Tcl scripts that run in a bridge-tcl do not have
+access to the  <FUNCTION>sidutil:: </FUNCTION> group of utility classes. This
+means that only low level operations are directly provided, and  <FUNCTION>sidutil:: </FUNCTION> abstractions would need to be rewritten (if needed)
+in tcl.</PARA>
+<SECT1>
+<TITLE>Incoming SID API Calls</TITLE>
+<PARA>Almost all incoming SID API calls are passed through verbatim to the
+embedded Tcl interpreter. (Exceptions are parametrized and noted below.)
+Plain types are mapped according to the table below: C++ object to Tcl for
+arguments, and Tcl to C++ for return values. If Tcl procedures by the appropriate
+names are not loaded into the interpreter by the time they are invoked from
+another SID component, a <ERRORTYPE>TCL ERROR</ERRORTYPE> message is printed
+to cerr, and a function-specific error indication is returned.  </PARA>
+<PARA>Calls belonging to  <FUNCTION>sid::pin </FUNCTION> and  <FUNCTION>sid::bus </FUNCTION> are similarly mapped to Tcl procedure calls. The C++ pin/bus object
+on which they are called is passed to the procedures as an extra argument.
+(C++ pin/bus objects may be constructed for a Tcl component through special
+callback functions, listed below.)  </PARA>
+<PARA>Functions with multiple outputs, like the  <FUNCTION>sid::bus::read </FUNCTION> reference arguments, map to Tcl procedures returning a list with
+the mapped C++ return type as first element, and the output reference argument
+as second element.</PARA>
+<INFORMALTABLE>
+<TGROUP COLS="2">
+<COLSPEC COLNAME="COL1" COLWIDTH="57*">
+<COLSPEC COLNAME="COL2" COLWIDTH="114*">
+<THEAD>
+<ROW>
+<ENTRY COLNAME="COL1">C++ Type</ENTRY>
+<ENTRY COLNAME="COL2">Tcl Type</ENTRY>
+</ROW>
+</THEAD>
+<TBODY>
+<ROW>
+<ENTRY COLNAME="COL1">string</ENTRY>
+<ENTRY COLNAME="COL2">string</ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>vector&lt;string&#62;</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2">list of strings</ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1">component,bus,pin pointer</ENTRY>
+<ENTRY COLNAME="COL2">opaque strings</ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>{little,big,host}_int_{1,2,4,8}</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2">numeric integer - care with 64-bit ints</ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>component::status </FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2">string:  <FUNCTION>ok, bad_value, not_found </FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>bus::status </FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2">string:  <FUNCTION>ok, misaligned, unmapped, unpermitted</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>vector&lt;component*&#62;</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2">list of opaque strings</ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>vector&lt;pin*&#62;</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2">list of opaque strings</ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1">0 (null pointer) </ENTRY>
+<ENTRY COLNAME="COL2">""</ENTRY>
+</ROW>
+</TBODY>
+</TGROUP>
+</INFORMALTABLE>
+<PARA>In <CLASSNAME>sid::component</CLASSNAME>:</PARA>
+<INFORMALTABLE>
+<TGROUP COLS="2">
+<COLSPEC COLNAME="COL1" COLWIDTH="71*">
+<COLSPEC COLNAME="COL2" COLWIDTH="100*">
+<THEAD>
+<ROW>
+<ENTRY COLNAME="COL1">Incoming C++ call</ENTRY>
+<ENTRY COLNAME="COL2">Outgoing Tcl call</ENTRY>
+</ROW>
+</THEAD>
+<TBODY>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>attribute_names()</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>attribute_names</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>attribute_names(category)</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>attribute_names_in_category $category</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>attribute_value(name) </FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>attribute_value $name</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>set_attribute_value(name,value)</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>set_attribute_value $name $value</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>pin_names </FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>pin_names</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>find_pin(name) </FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>find_pin $name</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>connect_pin(name, pin) </FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>connect_pin $name $pin</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>disconnect_pin(name, pin)</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>disconnect_pin $name $pin</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>connected_pins(name)</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>connected_pins $name</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>bus_names</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>bus_names</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>find_bus(name)</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>find_bus $name</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>accessor_names</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>accessor_names</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>connect_accessor(name,bus)</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>connect_accessor $name $bus</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>disconnect_accessor(name,bus)</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>disconnect_accessor $name $bus</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>connected_bus(name)</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>connected_bus $name</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>relationships()</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>relationships</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>set_related_components(rel,comps)</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>set_related_components $rel $comp1 $comp2
+$comp3 ...</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>related_components(rel)</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>related_components $rel</FUNCTION></ENTRY>
+</ROW>
+</TBODY>
+</TGROUP>
+</INFORMALTABLE>
+<PARA>In <CLASSNAME>sid::pin</CLASSNAME>:</PARA>
+<INFORMALTABLE>
+<TGROUP COLS="2">
+<COLSPEC COLNAME="COL1" COLWIDTH="62*">
+<COLSPEC COLNAME="COL2" COLWIDTH="109*">
+<THEAD>
+<ROW>
+<ENTRY COLNAME="COL1">Incoming C++ call</ENTRY>
+<ENTRY COLNAME="COL2">Outgoing Tcl call</ENTRY>
+</ROW>
+</THEAD>
+<TBODY>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>driven</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>driven $pin</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>driven(value)</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>driven_h4 $pin $value</FUNCTION></ENTRY>
+</ROW>
+</TBODY>
+</TGROUP>
+</INFORMALTABLE>
+<PARA>In <CLASSNAME>sid::bus</CLASSNAME>, for  <FUNCTION>host_int_4</FUNCTION>
+address and  <FUNCTION>{big,little}_int_Y</FUNCTION> data types:</PARA>
+<INFORMALTABLE>
+<TGROUP COLS="2">
+<COLSPEC COLNAME="COL1" COLWIDTH="62*">
+<COLSPEC COLNAME="COL2" COLWIDTH="109*">
+<THEAD>
+<ROW>
+<ENTRY COLNAME="COL1">Incoming C++ call</ENTRY>
+<ENTRY COLNAME="COL2">Outgoing Tcl call</ENTRY>
+</ROW>
+</THEAD>
+<TBODY>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>read(address,data)</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>read_h4_{l,b}Y $address   ** return [list
+$status $data] **</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>write(address,data)</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>write_h4_{l,b}Y $address $data</FUNCTION></ENTRY>
+</ROW>
+</TBODY>
+</TGROUP>
+</INFORMALTABLE>
+<PARA>Incoming C++ calls that access these parameters are not passed through
+to the embedded Tcl interpreter. Rather, they are processed in the bridge
+code attribute.</PARA>
+<VARIABLELIST>
+<VARLISTENTRY>
+<TERM>load!</TERM>
+<LISTITEM>
+<PARA>Loads the given Tcl script into the interpreter using the
+source procedure pin </PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>event!</TERM>
+<LISTITEM>
+<PARA>Passes control to the tcl/Tk event loop, in non-blocking mode</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+</VARIABLELIST>
+</SECT1>
+<SECT1>
+<TITLE>Outgoing SID API Calls</TITLE>
+<PARA>Once a Tcl program is loaded into the interpreter, it is able to make
+outgoing SID API calls, not merely respond to incoming ones. All SID API functions
+are exposed to Tcl as procedure hooks, in a very symmetric way to the incoming
+calls.  Simply, each function in the incoming set has a shadow:  <FUNCTION>sid::component::FUNCTION, sid::pin::FUNCTION </FUNCTION> or  <FUNCTION>sid::bus::FUNCTION, </FUNCTION> as appropriate. Each outgoing procedure takes a receiver handle
+(the same opaque string passed in an incoming call) as its first argument.
+ </PARA>
+<PARA>There is no checking that would prevent an outgoing SID API call from
+becoming recursive and referring to the originating component, either directly
+or indirectly.  As for all other components, infinite recursion prevention
+is the responsibility of the component author.</PARA>
+<INFORMALTABLE>
+<TGROUP COLS="2">
+<COLSPEC COLNAME="COL1" COLWIDTH="62*">
+<COLSPEC COLNAME="COL2" COLWIDTH="109*">
+<THEAD>
+<ROW>
+<ENTRY COLNAME="COL1">Incoming</ENTRY>
+<ENTRY COLNAME="COL2">Outgoing</ENTRY>
+</ROW>
+</THEAD>
+<TBODY>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>attribute_value $name</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>sid::component::attribute_value $component
+$name</FUNCTION></ENTRY>
+</ROW>
+<ROW>
+<ENTRY COLNAME="COL1"><FUNCTION>driven_h4 $pin $value</FUNCTION></ENTRY>
+<ENTRY COLNAME="COL2"><FUNCTION>sid::pin::driven_h4 $pin $value</FUNCTION></ENTRY>
+</ROW>
+</TBODY>
+</TGROUP>
+</INFORMALTABLE>
+<PARA>There are some special outgoing functions that function as constructors
+for local object handles.</PARA>
+<VARIABLELIST>
+<VARLISTENTRY>
+<TERM>sid::component::this</TERM>
+<LISTITEM>
+<PARA>Returns an opaque string handle to this component.</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>sid::pin::new</TERM>
+<LISTITEM>
+<PARA>Returns an opaque string handle to a new private C++ pin, usable as
+a return value to find_pin.</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+<VARLISTENTRY>
+<TERM>sid::bus::new</TERM>
+<LISTITEM>
+<PARA>Returns an opaque string handle to a new private C++ bus, usable as
+a return value to find_bus.</PARA>
+</LISTITEM>
+</VARLISTENTRY>
+</VARIABLELIST>
+</SECT1>
+</CHAPTER>
+<APPENDIX>
+<TITLE>Sample Source Code</TITLE>
+<SECT1>
+<TITLE>timer.cxx Source File</TITLE>
+<PROGRAMLISTING>// Copyright (C) 2001 Red Hat
+//
+// Description: A complete version of the example given in the
+// Component Developers' Kit (CDK) reference guide.
+//
+// Noteworthy remarks about the code in this source file:
+// * For clarity, the C++ "using" keyword is used sparingly and
+//   all members
+//   of the "sid::" namespace appear fully qualified.
+// * Documentation for the Standard Template Library, plus any obscure
+//   C++ syntax you may encounter can be discovered in the 3rd edition 
+//   of ``The C++ Programming Language'', by Stroustrup. 
+//   ISBN 0-201-88954-4.
+
+#include &lt;sidcomp.h&#62;
+#include &lt;sidso.h&#62;
+#include &lt;sidtypes.h&#62;
+
+#include &lt;set&#62;
+#include &lt;string&#62;
+#include &lt;vector&#62;
+
+
+// Wrap everything in a unique namespace 
+namespace timer_example
+{
+
+
+// Import standard types into this namespace.
+using namespace std;
+
+
+// None of the sid API routines is allowed to throw an exception.
+#define NT throw()
+
+
+class Timer: public virtual sid::component
+{
+public:
+  Timer()
+    :scheduler_pin(0), clock_pin(this), bus(this), enabled(false) { }
+  
+  // Provide implementations for abstract methods in sid::component.
+  // See include/sidcomp.h.
+  
+  vector&lt;string&#62; pin_names() NT;
+  sid::pin* find_pin(const string&amp; name) NT;
+  sid::component::status connect_pin(const string&amp; name, sid::pin* pin) NT;
+  sid::component::status disconnect_pin(const string&amp; name, sid::pin* pin) NT;
+  vector&lt;sid::pin*&#62; connected_pins(const string&amp; name) NT;
+  
+  vector&lt;string&#62; accessor_names() NT;
+  sid::component::status connect_accessor(const string&amp; name, sid::bus* bus) NT;
+  sid::component::status disconnect_accessor(const string&amp; name, sid::bus* bus) NT;
+  
+  vector&lt;string&#62; bus_names() NT;
+  sid::bus* find_bus(const string&amp; name) NT;
+  sid::bus* connected_bus(const string&amp; name) NT;
+  
+  vector&lt;string&#62; attribute_names() NT;
+  vector&lt;string&#62; attribute_names(const string&amp; category) NT;
+  string attribute_value(const string&amp; name) NT;
+  sid::component::status set_attribute_value(const string&amp; name, const string&amp; value) NT;
+  
+  vector&lt;string&#62; relationship_names() NT;
+  sid::component::status relate(const string&amp; rel, sid::component* c) NT;
+  sid::component::status unrelate(const string&amp; rel, sid::component* c) NT;
+  vector&lt;sid::component*&#62; related_components(const string&amp; rel) NT;
+  
+private:
+  // A netlist, which tracks pins connected to the interrupt pin.
+  typedef set&lt;sid::pin*&#62; netlist_t;
+  netlist_t intpin_netlist;
+
+  // A handle to the scheduler's "control" pin.
+  // The scheduler is a preexisting SID component which can schedule
+  // and deliver events to a component via an "event" pin.
+  // See schedule() for more details.
+  sid::pin* scheduler_pin;
+
+  // Schedule an event for some time in the future.
+  void schedule(sid::host_int_4 time);
+
+  // Cancel any pending events.
+  void cancel();
+
+  // Reschedule an event.
+  void reset_schedule();
+
+  // This method is called whenever the scheduler delivers an event,
+  // because the "divided-clock-event" pin will be connected to the
+  // scheduler.  It is a specialized pin with these fixed semantics.
+  // Refer to class clock_pin_t below.
+  void tick();
+
+  // Drive a value on the interrupt pin (which propagates to all
+  // connected pins).
+  void drive_interrupt(sid::host_int_4 value);
+
+  class clock_pin_t: public sid::pin
+  {
+    // clock_pin_t is a specialized pin.
+    // It calls timer-&#62;tick() whenever a value is driven. 
+  public:
+    clock_pin_t(Timer* t): timer(t) { }
+    void driven(sid::host_int_4 value) NT { timer-&#62;tick(); }
+  private:
+    Timer* timer;
+  };
+  friend class clock_pin_t;
+  clock_pin_t clock_pin;
+
+
+  // register_bus is a specialized bus.
+  // It handles the majority of the component's functionality, since
+  // that is mostly controlled by the timer's register set.
+
+  class register_bus: public sid::bus
+  {
+  public:
+    register_bus(Timer* t): timer(t) { }
+
+    // Prototypes for bus read/write methods of all kinds.
+
+    sid::bus::status read(sid::host_int_4 addr, sid::little_int_1&amp; data) NT;
+    sid::bus::status read(sid::host_int_4 addr, sid::big_int_1&amp; data) NT;
+    sid::bus::status read(sid::host_int_4 addr, sid::little_int_2&amp; data) NT;
+    sid::bus::status read(sid::host_int_4 addr, sid::big_int_2&amp; data) NT;
+    sid::bus::status read(sid::host_int_4 addr, sid::little_int_4&amp; data) NT;
+    sid::bus::status read(sid::host_int_4 addr, sid::big_int_4&amp; data) NT;
+    sid::bus::status read(sid::host_int_4 addr, sid::little_int_8&amp; data) NT;
+    sid::bus::status read(sid::host_int_4 addr, sid::big_int_8&amp; data) NT;
+
+    sid::bus::status write(sid::host_int_4 addr, sid::little_int_1 data) NT;
+    sid::bus::status write(sid::host_int_4 addr, sid::big_int_1 data) NT;
+    sid::bus::status write(sid::host_int_4 addr, sid::little_int_2 data) NT;
+    sid::bus::status write(sid::host_int_4 addr, sid::big_int_2 data) NT;
+    sid::bus::status write(sid::host_int_4 addr, sid::little_int_4 data) NT;
+    sid::bus::status write(sid::host_int_4 addr, sid::big_int_4 data) NT;
+    sid::bus::status write(sid::host_int_4 addr, sid::little_int_8 data) NT;
+    sid::bus::status write(sid::host_int_4 addr, sid::big_int_8 data) NT;
+
+  private:
+    Timer* timer;
+  };
+  friend class register_bus;
+  register_bus bus;
+
+  // Data members that represent the timer's internal state.
+
+  bool enabled;
+  sid::host_int_2 load_value, prescale, counter;
+  enum timer_mode { PERIODIC, FREERUNNING } mode;
+};
+
+
+// Return a list of pin names which are visible to other components.
+
+vector&lt;string&#62;
+Timer::pin_names() NT
+{
+  vector&lt;string&#62; pins;
+  pins.push_back("divided-clock-event");
+  return pins;
+}
+
+
+// Return a list of pins that are connected to a named pin.
+// We recognize "interrupt" and "divided-clock-control".
+
+vector&lt;sid::pin*&#62;
+Timer::connected_pins(const string&amp; name) NT
+{
+  vector&lt;sid::pin*&#62; pins;
+  netlist_t::const_iterator it;
+
+  if (name == "interrupt")
+    {
+      for (it = intpin_netlist.begin(); it != intpin_netlist.end();
+           it++)
+        {
+          pins.push_back(*it);
+        }
+      return pins;
+    }
+  else if (name == "divided-clock-control")
+    {
+      pins.push_back(scheduler_pin);
+      return pins;
+    }
+  return vector&lt;sid::pin*&#62;();
+}
+
+
+// Connect a pin to a named pin.
+// We recognize "interrupt" and "divided-clock-control".
+
+// We allow multiple pins to be connected to the interrupt pin (with
+// infinite fan-out!), so these are kept in a netlist.  For
+// efficiency, the STL container chosen for the netlist ensures that
+// no duplicate pin handles are stored.
+
+sid::component::status
+Timer::connect_pin(const string&amp; name, sid::pin* pin) NT
+{
+  if (name == "interrupt")
+    {
+      // Add this pin to the netlist.
+      intpin_netlist.insert(intpin_netlist.end(), pin);
+      return sid::component::ok;
+    }
+  else if (name == "divided-clock-control")
+    {
+      // Reassign the scheduler pin.
+      scheduler_pin = pin;
+      return sid::component::ok;
+    }
+  return sid::component::not_found;
+}
+
+// Disconnect a pin from a named pin.
+
+sid::component::status
+Timer::disconnect_pin(const string&amp; name, sid::pin* pin) NT
+{
+  if (name == "interrupt")
+    {
+      // Remove this pin from the netlist.
+      if (intpin_netlist.erase(pin) &#62; 0)
+        return sid::component::ok;
+    }
+  else if (name == "divided-clock-control"&amp; &amp; scheduler_pin == pin)
+    {
+      // Elsewhere, we make sure to not use this pin if it's null.
+      scheduler_pin = 0;
+      return sid::component::ok;
+    }
+  return sid::component::not_found;
+}
+
+
+// Find a pin of a given name.
+// We only recognize "divided-clock-event".
+
+sid::pin*
+Timer::find_pin(const string&amp; name) NT
+{
+  if (name == "divided-clock-event")
+    return&amp; clock_pin;
+
+  return 0;
+}
+
+
+vector&lt;string&#62;
+Timer::accessor_names() NT
+{
+  // No accessors.
+  return vector&lt;string&#62;();
+}
+
+
+sid::component::status
+Timer::connect_accessor(const string&amp; name, sid::bus* bus) NT
+{
+  // No accessors; any name is unknown.
+  return sid::component::not_found;
+}
+
+
+sid::component::status
+Timer::disconnect_accessor(const string&amp; name, sid::bus* bus) NT
+{
+  // No accessors; any name is unknown.
+  return sid::component::not_found;
+}
+
+
+// Return a list of bus names. We have just one--"registers".
+
+vector&lt;string&#62;
+Timer::bus_names() NT
+{
+  vector&lt;string&#62; buses;
+  buses.push_back("registers");
+  return buses;
+}
+
+sid::bus*
+Timer::find_bus(const string&amp; name) NT
+{
+  if (name == "registers")
+    return&amp; bus;
+  return 0;
+}
+
+
+sid::bus*
+Timer::connected_bus(const string&amp; name) NT
+{
+  // No connected buses; return a null pointer.
+  return 0;
+}
+
+
+vector&lt;string&#62;
+Timer::attribute_names() NT
+{
+  // No attributes; return an empty vector.
+  return vector&lt;string&#62;();
+}
+
+vector&lt;string&#62;
+Timer::attribute_names(const string&amp; category) NT
+{
+  // No attributes, regardless of category. Return an empty vector.
+  return vector&lt;string&#62;();
+}
+
+string
+Timer::attribute_value(const string&amp; name) NT
+{
+  // No attributes--return the empty string for any attribute value.
+  return string();
+}
+
+sid::component::status
+Timer::set_attribute_value(const string&amp; name, const string&amp; value) NT
+{
+  // No attributes--return not_found regardless of attribute name.
+  return sid::component::not_found;
+}
+
+
+vector&lt;sid::component*&#62;
+Timer::related_components(const string&amp; rel) NT
+{
+  // No related components.
+  return vector&lt;sid::component*&#62;();
+}
+
+sid::component::status
+Timer::unrelate(const string&amp; rel, sid::component* c) NT
+{
+  // No related components; always unfound.
+  return sid::component::not_found;
+}
+
+sid::component::status
+Timer::relate(const string&amp; rel, sid::component* c) NT
+{
+  // No related components; always unfound.
+  return sid::component::not_found;
+}
+
+vector&lt;string&#62;
+Timer::relationship_names() NT
+{
+  // No relations.
+  return vector&lt;string&#62;();
+}
+
+
+
+void
+Timer::drive_interrupt(sid::host_int_4 value) NT
+{
+  // Iterate the netlist, driving the value to all pins connected to
+  // the interrupt pin.
+
+  for (netlist_t::const_iterator it = intpin_netlist.begin();
+       it != intpin_netlist.end();
+       it++)
+    {
+      (*it)-&#62;driven(value);
+    }
+}
+
+
+// Schedule an event to be delivered at a later time.
+
+void
+Timer::schedule(sid::host_int_4 time)
+{
+  // The scheduler component tests bit 31 of a value carried on its
+  // "control" pin.  If this bit is set, the event will be delivered
+  // routinely at the specified interval.  Otherwise, the event will
+  // only occur once.
+
+  assert ((time&amp;  0x80000000) == 0);
+  assert ((time&amp;  0x7FFFFFFF) != 0);
+  
+  if (scheduler_pin)
+    scheduler_pin-&#62;driven(0x80000000 | time);
+}
+
+
+// Cancel any pending event.
+
+void
+Timer::cancel()
+{
+  // Cancel the event by driving a zero value to the scheduler.
+
+  if (scheduler_pin)
+    scheduler_pin-&#62;driven(0);
+}
+
+
+// Reset the schedule, in case the timer's enable or divisor registers
+// have been altered.
+
+void
+Timer::reset_schedule()
+{
+  cancel();
+  
+  if (!enabled)
+    return;
+  
+  assert (prescale &lt;= 2);
+  unsigned divisor = 1 &lt;&lt; (prescale * 4);
+  
+  schedule(divisor);
+}
+
+
+// Handle 32-bit (little endian) reads.
+// If the address is not 32-bit aligned or does not match any register
+// address, return an error.
+
+sid::bus::status
+Timer::register_bus::read(sid::host_int_4 addr, sid::little_int_4&amp; data) NT
+{
+  if (addr % 4 != 0)
+    return sid::bus::misaligned;
+  
+  switch (addr)
+    { 
+    case 0x0:
+      data = timer-&#62;load_value;
+      break;
+      
+    case 0x4:
+      data = timer-&#62;counter;
+      break;
+      
+    case 0x8:
+      data =
+        (timer-&#62;enabled &lt;&lt; 7) | 
+        (timer-&#62;mode &lt;&lt; 6) | 
+        (timer-&#62;prescale &lt;&lt; 2);
+      break;
+      
+    case 0xC:
+      break;
+      
+    default:
+      return sid::bus::unmapped;
+    }
+
+  return sid::bus::ok;
+}
+
+
+// Handle 32-bit (big endian) reads.
+// Just do a little endian read and rearrange the result.
+
+sid::bus::status
+Timer::register_bus::read(sid::host_int_4 addr, sid::big_int_4&amp; data) NT
+{
+  sid::little_int_4 le_data;
+  sid::bus::status st = read(addr, le_data);
+  data.set_target_memory_value (le_data.target_memory_value ());
+  return st;
+}
+
+
+// Handle 32-bit (little endian) writes.
+// If the address is not 32-bit aligned or does not match any register
+// address, return an error.
+
+sid::bus::status
+Timer::register_bus::write(sid::host_int_4 addr, sid::little_int_4 data) NT
+{
+  if (addr % 4 != 0)
+    return sid::bus::misaligned;
+  
+  switch (addr)
+    {
+    case 0x0:
+      // A write to LOAD_REG.
+      // Clear top 16 bits when loading a new value.
+      timer-&#62;load_value = data&amp;  0xFFFF;
+      // Reset the counter value.
+      timer-&#62;counter = timer-&#62;load_value;
+      break;
+
+    case 0x4:
+      break;
+
+    case 0x8:
+      // A write to CTL_REG.
+      timer-&#62;prescale = (data&amp;  0x0C) &#62;&#62; 2;
+      timer-&#62;enabled = ((data&amp;  0x80) == 0x80);
+      timer-&#62;mode = (data&amp;  0x40) ? PERIODIC : FREERUNNING;
+      timer-&#62;reset_schedule();
+      break;
+
+    case 0xC:
+      timer-&#62;drive_interrupt(0);
+      break;
+
+    default:
+      return sid::bus::unmapped;
+    }
+
+  return sid::bus::ok;
+}
+
+
+// Handle 32-bit (big endian) writes.
+// Just rearrange the data and do a little endian write.
+
+sid::bus::status
+Timer::register_bus::write(sid::host_int_4 addr, sid::big_int_4 data) NT
+{
+  sid::little_int_4 le_data;
+  le_data.set_target_memory_value (data.target_memory_value ());
+  return write(addr, le_data);
+}
+
+// For simplicity, bus accesses that are not 32-bits wide are not
+// handled.  Ideally, different widths should be handled sensibly.
+// For example, a one-byte write to location n+1, where n is 32-bit
+// aligned, should behave as you might expect.
+
+sid::bus::status
+Timer::register_bus::read(sid::host_int_4 addr, sid::little_int_1&amp; data) NT
+{
+  return sid::bus::unpermitted;
+}
+
+sid::bus::status
+Timer::register_bus::read(sid::host_int_4 addr, sid::big_int_1&amp; data) NT
+{
+  return sid::bus::unpermitted;
+}
+
+sid::bus::status
+Timer::register_bus::read(sid::host_int_4 addr, sid::little_int_2&amp; data) NT
+{
+  return sid::bus::unpermitted;
+}
+
+sid::bus::status
+Timer::register_bus::read(sid::host_int_4 addr, sid::big_int_2&amp; data) NT
+{
+  return sid::bus::unpermitted;
+}
+
+sid::bus::status
+Timer::register_bus::read(sid::host_int_4 addr, sid::little_int_8&amp; data) NT
+{
+  return sid::bus::unpermitted;
+}
+
+sid::bus::status
+Timer::register_bus::read(sid::host_int_4 addr, sid::big_int_8&amp; data) NT
+{
+  return sid::bus::unpermitted;
+}
+
+sid::bus::status
+Timer::register_bus::write(sid::host_int_4 addr, sid::little_int_1 data) NT
+{
+  return sid::bus::unpermitted;
+}
+
+sid::bus::status
+Timer::register_bus::write(sid::host_int_4 addr, sid::big_int_1 data) NT
+{
+  return sid::bus::unpermitted;
+}
+
+sid::bus::status
+Timer::register_bus::write(sid::host_int_4 addr, sid::little_int_2 data) NT
+{
+  return sid::bus::unpermitted;
+}
+
+sid::bus::status
+Timer::register_bus::write(sid::host_int_4 addr, sid::big_int_2 data) NT
+{
+  return sid::bus::unpermitted;
+}
+
+sid::bus::status
+Timer::register_bus::write(sid::host_int_4 addr, sid::little_int_8 data) NT
+{
+  return sid::bus::unpermitted;
+}
+
+sid::bus::status
+Timer::register_bus::write(sid::host_int_4 addr, sid::big_int_8 data) NT
+{
+  return sid::bus::unpermitted;
+}
+
+// Called when the scheduled event arrives.
+// Decrement the counter register and check for an interrupt
+// condition--and if so, drive the interrupt pin.
+
+void
+Timer::tick()
+{
+  if (!enabled) return;
+  
+  counter--;
+  if (counter == 0)
+    {
+      if (mode == PERIODIC)
+        {
+          counter = load_value;
+          drive_interrupt(1);
+        }
+      else
+        {
+          // Rolls over from maximum value; no interrupts.
+          counter = 0xFFFF;
+        }
+    }
+}
+
+
+// Return a list of component types supported by this library.
+
+static vector&lt;string&#62;
+TimerListTypes() NT
+{
+  vector&lt;string&#62; types;
+  types.push_back("hw-timer-example");
+  return types;
+}
+
+// Instantiate a component, given a specified component type.
+
+static sid::component*
+TimerCreate(const string&amp; typeName) NT
+{
+  if (typeName == "hw-timer-example")
+    return new Timer();
+
+  return 0;
+}
+
+// Destruct a component instance.
+
+static void
+TimerDelete(sid::component* c) NT
+{
+  delete dynamic_cast&lt;Timer*&#62;(c);
+}
+
+
+} // end namespace
+
+
+// This symbol is used by the library loader to validate the library
+// and instantiate components of the types supported by this library.
+
+extern const sid::component_library example_component_library;
+
+const sid::component_library example_component_library DLLEXPORT =
+{
+  sid::COMPONENT_LIBRARY_MAGIC,
+  &amp; timer_example::TimerListTypes,
+  &amp; timer_example::TimerCreate,
+  &amp; timer_example::TimerDelete
+};
+
+</PROGRAMLISTING>
+</SECT1>
+</APPENDIX><!-- Index -->
+</BOOK><!-- Keep this comment at the end of the file
+Local variables:
+mode:sgml
+sgml-omittag:nil
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:1
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-default-dtd-file:"book-sid.ced"
+sgml-exposed-tags:nil
+sgml-local-catalogs:("/usr/share/sgml/docbook/sgml-dtd-3.0/catalog" "/usr/lib/sgml/CATALOG")
+sgml-local-ecat-files:nil
+sgml-namecase-general:t
+sgml-general-insert-case:lower
+End:
+-->

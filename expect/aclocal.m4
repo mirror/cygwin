@@ -463,6 +463,10 @@ changequote(,)
         ac_cv_c_tkconfig=`(cd $i/unix; pwd)`
 	break
       fi
+      if test -f "$i/win/tkConfig.sh" ; then
+        ac_cv_c_tkconfig=`(cd $i/win; pwd)`
+	break
+      fi
     done
   fi
 changequote([,])

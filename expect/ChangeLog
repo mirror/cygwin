@@ -1,3 +1,9 @@
+2003-07-14  Alexandre Oliva  <aoliva@redhat.com>
+
+	* aclocal.m4 (CY_AC_PATH_TKCONFIG): Look for it in .../tk/win.
+	* configure: Rebuilt.
+	* Dbgconfigure: Rebuilt to pick up 2002-07-30's change.
+
 2003-01-29  Andrew Cagney  <ac131313@redhat.com>
 
 	* configure.in (EXP_AND_TCL_LIBS): Set to TCL_CC_SEARCH_FLAGS

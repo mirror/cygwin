@@ -243,6 +243,11 @@ proc sid_assert_includes_none {cmd patterns} {
     pass $test
 }
 
+# assert that a bus transaction was "ok"
+proc sid_assert_bus_ok {result} {
+    return [string match ok [lindex $result 0]]
+}
+
 
 # Find a file somewhere in the build or install directory hierarchy.
 # Decide where to look based on TOOL_OPTIONS variable (the --tool_opts=VALUE

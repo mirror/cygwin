@@ -1,3 +1,9 @@
+2000-05-23  Syd Polk  <spolk@redhat.com>
+
+	* unix/Makefile.in: Calculate TCL_BIN_DIR.
+	* win/Makefile.in: Calculate TCL_BIN_DIR.
+	* unix/tclConfig.sh.in: Export TCL_BIN_DIR.
+
 Sat Jun 10 22:43:00 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* win/tclWinFile.c (TclMatchFiles): Revert Mon Jun 5 18:48:32 2000

@@ -1339,6 +1339,7 @@ else
 fi
 
 TCL_LIB_FULL_PATH="`pwd`/${TCL_LIB_FILE}"
+TCL_BIN_DIR="`pwd`"
 
 #--------------------------------------------------------------------
 #	The statements below define the symbol TCL_PACKAGE_PATH, which
@@ -1383,6 +1384,7 @@ AC_SUBST(TCL_VERSION)
 # CYGNUS LOCAL
 AC_SUBST(TCL_SHARED_LIB_FILE)
 AC_SUBST(TCL_UNSHARED_LIB_FILE)
+AC_SUBST(TCL_BIN_DIR)
 # END CYGNUS LOCAL
 
 AC_OUTPUT(Makefile tclConfig.sh)

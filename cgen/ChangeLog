@@ -1,3 +1,10 @@
+2000-12-01  Ben Elliston  <bje@redhat.com>
+
+	* sim-cpu.scm (cgen-cpu.h): Only emit argbuf, scache and extract
+	definitions if run without with-multipla-isa?.
+	(cgen-defs.h): New function. Emit an ISA-specific defs file.
+	* cgen-sim.scm (sim-arguments): Accept -G option to generate defs.
+
 2000-11-24  Ben Elliston  <bje@redhat.com>
 
 	* sim-cpu.scm (-gen-hardware-struct): New function.

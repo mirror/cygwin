@@ -1,11 +1,11 @@
 // gloss.h - Basic process emulation plus ROM monitor support.
 // -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
-// The name "gloss" is derived from Cygnus' "libgloss" library.
+// The name "gloss" is derived from the "libgloss" library.
 // "gloss" is an acronym for: GNU Low-level Operating System Support.
 // However, this header [and this directory] provides a base for all such
 // components.

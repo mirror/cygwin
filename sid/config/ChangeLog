@@ -1,3 +1,8 @@
+2003-10-10  Ben Elliston  <bje@wasabisystems.com>
+
+	* config.guess: Update from FSF sources.
+	* config.sub: Likewise.
+
 2003-10-06  Dave Brolley  <brolley@redhat.com>
 
 	* config.sub: Add frv to be ignored.

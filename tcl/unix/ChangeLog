@@ -1,17 +1,13 @@
-Wed Oct 20 20:15:36 1999  Jeffrey A Law  (law@cygnus.com)
-
-	* configure.in: Handle hpux11.
-	* configure: Rebuilt.
-
 Fri Mar 19 09:29:42 1999  Michael Tiemann  <tiemann@holodeck.cygnus.com>
 
 	* configure.in, configure (IRIX64-6.*): Use -n32 instead of -32
 	for SHLIB_LD.
 
-1999-01-30  Brendan Kehoe  <brendan@cygnus.com>
+1998-10-28  Ben Elliston  <bje@cygnus.com>
 
-	* Makefile.in ($(UNIX_DIR)/configure): Comment out dependency and
-	running autoconf to regenerate it.
+	* tclConfig.sh.in (TCL_BUILD_INCLUDES): Remove.
+	* configure.in (TCL_BUILD_INCLUDES): Remove. Do not subst.
+	* configure: Regenerate.
 
 Fri Apr 10 16:52:30 1998  Ian Lance Taylor  <ian@cygnus.com>
 

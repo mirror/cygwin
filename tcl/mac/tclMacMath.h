@@ -12,7 +12,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclMacMath.h,v 1.2 1998/09/14 18:40:05 stanton Exp $
+ * RCS: @(#) $Id: tclMacMath.h,v 1.6.8.1 2000/04/06 22:38:30 spolk Exp $
  */
 
 #ifndef _TCLMACMATH

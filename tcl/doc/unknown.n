@@ -5,7 +5,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" RCS: @(#) $Id: unknown.n,v 1.12 1999/01/26 03:53:07 jingham Exp $
+'\" RCS: @(#) $Id: unknown.n,v 1.6.8.1 2000/04/06 22:38:27 spolk Exp $
 '\" 
 .so man.macros
 .TH unknown n "" Tcl "Tcl Built-In Commands"

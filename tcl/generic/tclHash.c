@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclHash.c,v 1.8 1999/01/26 03:53:13 jingham Exp $
+ * RCS: @(#) $Id: tclHash.c,v 1.6.8.1 2000/04/06 22:38:28 spolk Exp $
  */
 
 #include "tclInt.h"
@@ -83,6 +83,11 @@ Tcl_InitHashTable(tablePtr, keyType)
 					 * TCL_STRING_KEYS, TCL_ONE_WORD_KEYS,
 					 * or an integer >= 2. */
 {
+#if (TCL_SMALL_HASH_TABLE != 4) 
+    panic("Tcl_InitHashTable: TCL_SMALL_HASH_TABLE is %d, not 4\n",
+	    TCL_SMALL_HASH_TABLE);
+#endif
+    
     tablePtr->buckets = tablePtr->staticBuckets;
     tablePtr->staticBuckets[0] = tablePtr->staticBuckets[1] = 0;
     tablePtr->staticBuckets[2] = tablePtr->staticBuckets[3] = 0;

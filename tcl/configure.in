@@ -11,13 +11,7 @@ AC_INIT(generic/tcl.h)
 AC_CANONICAL_HOST
 
 case "${host}" in
-*-*-cygwin*)
-	CONFIGDIR="win"
-	AC_SUBST(CONFIGDIR)
-	CONFIGDIR2="cygwin"
-	AC_SUBST(CONFIGDIR2)
-	;;
-*-*-mingw32*)
+*cygwin* | *mingw32* | *windows32*)
 	CONFIGDIR="win"
 	AC_SUBST(CONFIGDIR)
 	;;
@@ -29,5 +23,5 @@ case "${host}" in
 esac
 
 AC_PROG_MAKE_SET
-AC_CONFIG_SUBDIRS($CONFIGDIR $CONFIGDIR2)
+AC_CONFIG_SUBDIRS($CONFIGDIR)
 AC_OUTPUT(Makefile)

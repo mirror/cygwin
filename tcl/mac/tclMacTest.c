@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclMacTest.c,v 1.10 1999/01/26 03:53:27 jingham Exp $
+ * RCS: @(#) $Id: tclMacTest.c,v 1.6.8.1 2000/04/06 22:38:31 spolk Exp $
  */
 
 #define TCL_TEST
@@ -211,32 +211,3 @@ WriteTextResource(
 	    (char *) NULL);
     return TCL_ERROR;
 }
-
-int
-TclMacChmod(
-    char *path, 
-    int mode)
-{
-    HParamBlockRec hpb;
-    OSErr err;
-    
-    c2pstr(path);
-    hpb.fileParam.ioNamePtr = (unsigned char *) path;
-    hpb.fileParam.ioVRefNum = 0;
-    hpb.fileParam.ioDirID = 0;
-    
-    if (mode & 0200) {
-        err = PBHRstFLockSync(&hpb);
-    } else {
-        err = PBHSetFLockSync(&hpb);
-    }
-    p2cstr((unsigned char *) path);
-    
-    if (err != noErr) {
-        errno = TclMacOSErrorToPosixError(err);
-        return -1;
-    }
-    
-    return 0;
-}
-

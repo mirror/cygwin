@@ -5,7 +5,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" RCS: @(#) $Id: Interp.3,v 1.2 1998/09/14 18:39:49 stanton Exp $
+'\" RCS: @(#) $Id: Interp.3,v 1.6.8.2 2000/09/15 16:54:17 spolk Exp $
 '\" 
 .so man.macros
 .TH Tcl_Interp 3 7.5 Tcl "Tcl Library Procedures"
@@ -107,7 +107,8 @@ returning an error) will generally assume that the result
 has been initialized when the procedure is called.
 If such a procedure is to be called after the result has been
 changed, then \fBTcl_ResetResult\fR should be called first to
-reset the result to its initialized state.
+reset the result to its initialized state.  The direct use of
+\fIinterp->result\fR is strongly deprecated (see \fBTcl_SetResult\fR).
 .PP
 The \fIerrorLine\fR
 field is valid only after \fBTcl_Eval\fR returns
@@ -123,3 +124,4 @@ occurred.
 
 .SH KEYWORDS
 free, initialized, interpreter, malloc, result
+

@@ -9,11 +9,10 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclWinError.c,v 1.9 1999/01/26 03:53:42 jingham Exp $
+ * RCS: @(#) $Id: tclWinError.c,v 1.6.8.1 2000/04/06 22:38:39 spolk Exp $
  */
 
-#include "tclInt.h"
-#include "tclPort.h"
+#include "tclWinInt.h"
 
 /*
  * The following table contains the mapping from Win32 errors to
@@ -391,3 +390,5 @@ TclWinConvertWSAError(errCode)
 	Tcl_SetErrno(EINVAL);
     }
 }
+
+

@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclMacAppInit.c,v 1.10 1999/01/26 03:53:22 jingham Exp $
+ * RCS: @(#) $Id: tclMacAppInit.c,v 1.6.8.1 2000/04/06 22:38:30 spolk Exp $
  */
 
 #include "tcl.h"
@@ -26,10 +26,10 @@ short InstallConsole _ANSI_ARGS_((short fd));
 #endif
 
 #ifdef TCL_TEST
-EXTERN int		Procbodytest_Init _ANSI_ARGS_((Tcl_Interp *interp));
-EXTERN int		Procbodytest_SafeInit _ANSI_ARGS_((Tcl_Interp *interp));
-EXTERN int		TclObjTest_Init _ANSI_ARGS_((Tcl_Interp *interp));
-EXTERN int		Tcltest_Init _ANSI_ARGS_((Tcl_Interp *interp));
+extern int		Procbodytest_Init _ANSI_ARGS_((Tcl_Interp *interp));
+extern int		Procbodytest_SafeInit _ANSI_ARGS_((Tcl_Interp *interp));
+extern int		TclObjTest_Init _ANSI_ARGS_((Tcl_Interp *interp));
+extern int		Tcltest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #endif /* TCL_TEST */
 
 /*
@@ -85,7 +85,7 @@ main(
  *
  * Results:
  *	Returns a standard Tcl completion code, and leaves an error
- *	message in interp->result if an error occurs.
+ *	message in the interp's result if an error occurs.
  *
  * Side effects:
  *	Depends on the startup script.

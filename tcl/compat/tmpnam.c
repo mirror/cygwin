@@ -9,7 +9,7 @@
  * software without specific written prior permission. This software
  * is provided ``as is'' without express or implied warranty.
  *
- * RCS: @(#) $Id: tmpnam.c,v 1.12 1999/01/26 03:52:55 jingham Exp $
+ * RCS: @(#) $Id: tmpnam.c,v 1.6.8.1 2000/04/06 22:38:26 spolk Exp $
  */
 
 #include <sys/param.h>

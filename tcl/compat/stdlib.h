@@ -9,12 +9,12 @@
  *	declare all the procedures needed here (such as strtod).
  *
  * Copyright (c) 1991 The Regents of the University of California.
- * Copyright (c) 1994 Sun Microsystems, Inc.
+ * Copyright (c) 1994-1998 Sun Microsystems, Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: stdlib.h,v 1.2 1998/09/14 18:39:45 stanton Exp $
+ * RCS: @(#) $Id: stdlib.h,v 1.6.8.1 2000/04/06 22:38:26 spolk Exp $
  */
 
 #ifndef _STDLIB

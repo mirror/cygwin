@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclMacUtil.c,v 1.9 1999/01/26 03:53:27 jingham Exp $
+ * RCS: @(#) $Id: tclMacUtil.c,v 1.6.8.2 2000/09/15 16:55:54 spolk Exp $
  */
 
 #include "tcl.h"
@@ -351,13 +351,17 @@ FSpPathFromLocation(
 	     * If the file doesn't currently exist we start over.  If the
 	     * directory exists everything will work just fine.  Otherwise we
 	     * will just fail later.  If the object is a directory, append a
-	     * colon so full pathname ends with colon.
+	     * colon so full pathname ends with colon, but only if the name is
+	     * not empty.  NavServices returns FSSpec's with the parent ID set,
+	     * but the name empty...
 	     */
 	    if (err == fnfErr) {
 		BlockMoveData(spec, &tempSpec, sizeof(FSSpec));
 	    } else if ( (pb.hFileInfo.ioFlAttrib & ioDirMask) != 0 ) {
-		tempSpec.name[0] += 1;
-		tempSpec.name[tempSpec.name[0]] = ':';
+	        if (tempSpec.name[0] > 0) {
+		    tempSpec.name[0] += 1;
+		    tempSpec.name[tempSpec.name[0]] = ':';
+		}
 	    }
 			
 	    /* 
@@ -439,3 +443,4 @@ GetGlobalMouse(
     OSEventAvail(0, &event);
     *mouse = event.where;
 }
+

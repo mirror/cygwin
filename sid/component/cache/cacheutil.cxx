@@ -377,11 +377,11 @@ cache::hash_fn (const cache_tag& tag) const
   if (UNLIKELY(index >= this->sets.size()))
     {
       cerr << "cache: bad hash parameters (mask=" 
-	   << sidutil::make_numeric_attribute (this->hash_params.mask, ios::hex|ios::showbase)
+	   << sidutil::make_numeric_attribute (this->hash_params.mask, std::ios::hex|std::ios::showbase)
 	   << " shift="
 	   << sidutil::make_numeric_attribute (this->hash_params.shift)
 	   << ") for address="
-	   << sidutil::make_numeric_attribute (addr, ios::hex|ios::showbase)
+	   << sidutil::make_numeric_attribute (addr, std::ios::hex|std::ios::showbase)
 	   << " #sets="
 	   << sidutil::make_numeric_attribute (this->sets.size())
 	   << endl;

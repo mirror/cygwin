@@ -677,7 +677,7 @@ unset arg_host_triplet arg_build_triplet
 
 if [expr  { $build_triplet == ""  &&  $host_triplet == ""} ] {
     # find config.guess
-    foreach dir "$libdir $libdir/libexec $libdir/.. $execpath $srcdir $srcdir/.. $srcdir/../.." {
+    foreach dir "$libdir $libdir/libexec $libdir/.. $libdir/../../libexec $execpath $srcdir $srcdir/.. $srcdir/../.." {
 	verbose "Looking for ${dir}/config.guess" 2
 	if [file exists ${dir}/config.guess] {
 	    set config_guess ${dir}/config.guess

@@ -48,7 +48,7 @@ set prior(writes) [get_attr write-accesses]
 set prior(misaligned-reads) [get_attr misaligned-reads]
 set prior(misaligned-writes) [get_attr misaligned-writes]
 set result [sid_cmd "sid::bus::write_h4_l2 $cache_bus 0x101 0x5555"]
-assert_miss
+assert_hit
 assert_variant write-accesses $prior(writes)
 assert_variant misaligned-writes $prior(misaligned-writes) 
 assert_invariant read-accesses $prior(reads)

@@ -1,3 +1,7 @@
+2004-07-01  Dave Brolley  <brolley@redhat.com>
+
+	* sidcomp.cache/misaligned.exp: 16 bit access should now be a hit.
+
 2003-10-28  Dave Brolley  <brolley@redhat.com>
 
 	* lib/cpudefs.exp (run-sid-tests-raw): Use sid_find_sid.

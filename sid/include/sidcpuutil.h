@@ -477,16 +477,21 @@ public:
 	add_attribute_virtual ("state-snapshot", this,
 			       & basic_cpu::save_state,
 			       & basic_cpu::restore_state);
+	this->trace_extract_p = false;
 	add_attribute ("trace-extract?", & trace_extract_p, "setting");
+	this->trace_semantics_p = false;
 	add_attribute_notify ("trace-semantics?", & this->trace_semantics_p, this,
 			       & basic_cpu::update_trace_result_p, 
 			       "setting");
+	this->trace_disass_p = false;
 	add_attribute_notify ("trace-disassemble?", & this->trace_disass_p, this,
 			       & basic_cpu::update_trace_result_p, 
 			       "setting");
 	// `trace-result?' should go away after all simulators are updated to
 	// use `trace-semantics?'.
+	this->trace_result_p = false;
 	add_attribute ("trace-result?", & this->trace_result_p, "setting");
+	this->trace_counter_p = false;
 	add_attribute ("trace-counter?", & this->trace_counter_p, "setting");
       }
 

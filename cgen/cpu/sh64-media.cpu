@@ -1,5 +1,6 @@
 ; Hitachi SHmedia instruction set description.  -*- Scheme -*-
 ; Copyright (C) 2000, 2001 Red Hat, Inc.
+; Copyright (C) 2002 SuperH Ltd
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -31,18 +32,18 @@
 ; saturate -- signed saturatation function
 
 (define-pmacro (saturate mode n i)
-  (if mode (lt i (neg mode (sll mode 1 (sub n 1))))
+  (if mode (lt i (neg DI (sll DI 1 (sub n 1))))
       (neg (sll mode 1 (sub n 1)))
-      (if mode (lt i (sll mode 1 (sub n 1)))
+      (if mode (lt i (sll DI 1 (sub n 1)))
 	  i
  	  (sub mode (sll mode 1 (sub n 1)) 1))))
 
 ; usaturate -- unsigned saturation function
 
 (define-pmacro (usaturate mode n i)
-  (if mode (lt i (const mode 0))
+  (if mode (lt i (const DI 0))
       (const mode 0)
-      (if mode (lt i (sll mode 1 n))
+      (if mode (lt i (sll DI 1 n))
 	  i
 	  (sub mode (sll mode 1 n) 1))))
 
@@ -759,33 +760,122 @@
        (+ (f-op 33) rm disp10 rd (f-rsvd 0))
        (set rd (ext DI (mem HI (add rm (ext DI disp10x2))))))
 
+(define-pmacro (-ldhi-byte)
+  (if (and bytecount 1)
+      (set val (add (sll val 8) (zext DI (mem QI addr))))))
+
+(define-pmacro (-ldhi-word)
+  (if (and bytecount 2)
+      (set val (add (sll val 16) (zext DI (mem HI (and addr -4)))))))
+
+(define-pmacro (-ldhi-long)
+  (if (and bytecount 4)
+      (set val (add (sll val 32) (zext DI (mem SI (and addr -8)))))))
+
 (dshmi ldhil "Load high part (long word)"
        ()
        "ldhi.l $rm, $disp6, $rd"
        (+ (f-op 48) rm (f-ext 6) disp6 rd (f-rsvd 0))
-       ; FIXME.
-       (unimp "ldhil"))
+       (sequence ((DI addr) (QI bytecount) (SI val))
+		 (set addr (add rm disp6))
+		 (set bytecount (add (and addr 3) 1))
+		 (set val 0)
+		 (if (and bytecount 4)
+		     (set rd (ext DI (mem SI (and addr -4))))
+		     (if endian
+			 (sequence () ; Big endian.
+				   (-ldhi-word)
+				   (-ldhi-byte)
+				   (set rd (ext DI val)))
+			 (sequence () ; Little endian.
+				   (-ldhi-byte)
+				   (-ldhi-word)
+				   (set rd
+					(ext DI
+					 (sll SI val
+					      (sub 32 (mul 8 bytecount))))))))))
 
 (dshmi ldhiq "Load high part (quad word)"
        ()
        "ldhi.q $rm, $disp6, $rd"
        (+ (f-op 48) rm (f-ext 7) disp6 rd (f-rsvd 0))
-       ; FIXME.
-       (unimp "ldhiq"))
+       (sequence ((DI addr) (QI bytecount) (DI val))
+		 (set addr (add rm disp6))
+		 (set bytecount (add (and addr 7) 1))
+		 (set val 0)
+		 (if (and bytecount 8)
+		     (set rd (mem DI (and addr -8)))
+		     (if endian
+			 (sequence () ; Big endian.
+				   (-ldhi-long)
+				   (-ldhi-word)
+				   (-ldhi-byte)
+				   (set rd val))
+			 (sequence () ; Little endian.
+				   (-ldhi-byte)
+				   (-ldhi-word)
+				   (-ldhi-long)
+				   (set rd
+					(sll val
+					     (sub 64 (mul 8 bytecount)))))))))
+
+(define-pmacro (-ldlo-byte)
+  (if (and bytecount 1)
+      (set val (add (sll val 8) (zext DI (mem QI addr))))))
+
+(define-pmacro (-ldlo-word)
+  (if (and bytecount 2)
+      (set val (add (sll val 16) (zext DI (mem HI (and (add addr 1) -2)))))))
+
+(define-pmacro (-ldlo-long)
+  (if (and bytecount 4)
+      (set val (add (sll val 32) (zext DI (mem SI (and (add addr 3) -4)))))))
 
 (dshmi ldlol "Load low part (long word)"
        ()
        "ldlo.l $rm, $disp6, $rd"
        (+ (f-op 48) rm (f-ext 2) disp6 rd (f-rsvd 0))
-       ; FIXME.
-       (unimp "ldlol"))
+       (sequence ((DI addr) (QI bytecount) (SI val))
+		 (set addr (add rm disp6))
+		 (set bytecount (sub 4 (and addr 3)))
+		 (set val 0)
+		 (if (and bytecount 4)
+		     (set rd (ext DI (mem SI addr)))
+		     (if endian
+			 (sequence () ; Big endian.
+				   (-ldlo-byte)
+				   (-ldlo-word)
+				   (set rd
+					(ext DI
+					 (sll SI val
+					      (sub 32 (mul 8 bytecount))))))
+			 (sequence () ; Little endian.
+				   (-ldlo-word)
+				   (-ldlo-byte)
+				   (set rd (ext DI val)))))))
 
 (dshmi ldloq "Load low part (quad word)"
        ()
        "ldlo.q $rm, $disp6, $rd"
        (+ (f-op 48) rm (f-ext 3) disp6 rd (f-rsvd 0))
-       ; FIXME;
-       (unimp "ldloq"))
+       (sequence ((DI addr) (QI bytecount) (DI val))
+		 (set addr (add rm disp6))
+		 (set bytecount (sub 8 (and addr 7)))
+		 (set val 0)
+		 (if (and bytecount 8)
+		     (set rd (mem DI addr))
+		     (if endian
+			 (sequence () ; Big endian.
+				   (-ldlo-byte)
+				   (-ldlo-word)
+				   (-ldlo-long)
+				   (set rd
+					(sll val (sub 64 (mul 8 bytecount)))))
+			 (sequence () ; Little endian.
+				   (-ldlo-long)
+				   (-ldlo-word)
+				   (-ldlo-byte)
+				   (set rd val))))))
 
 (dshmi ldxb "Load byte (extended displacement)"
        ()
@@ -894,21 +984,24 @@
        (+ (f-op 2) rm (f-ext 1) rn rd (f-rsvd 0))
        (slice-word add))
 
-(define-pmacro (-maddsl arg1 arg2) (saturate SI 32 (add arg1 arg2)))
+(define-pmacro (-maddsl arg1 arg2) (saturate SI 32 (add (ext DI arg1)
+							(ext DI arg2))))
 (dshmi maddsl "Multimedia add (saturating, long word)"
        ()
        "madds.l $rm, $rn, $rd"
        (+ (f-op 2) rm (f-ext 6) rn rd (f-rsvd 0))
        (slice-long -maddsl))
 
-(define-pmacro (-maddsub arg1 arg2) (usaturate QI 8 (add arg1 arg2)))
+(define-pmacro (-maddsub arg1 arg2) (usaturate QI 8 (add (zext DI arg1)
+							 (zext DI arg2))))
 (dshmi maddsub "Multimedia add (saturating, unsigned byte)"
        ()
        "madds.ub $rm, $rn, $rd"
        (+ (f-op 2) rm (f-ext 4) rn rd (f-rsvd 0))
        (slice-byte -maddsub))
 
-(define-pmacro (-maddsw arg1 arg2) (saturate HI 16 (add arg1 arg2)))
+(define-pmacro (-maddsw arg1 arg2) (saturate HI 16 (add (ext DI arg1)
+							(ext DI arg2))))
 (dshmi maddsw "Multimedia add (saturating, word)"
        ()
        "madds.w $rm, $rn, $rd"
@@ -976,10 +1069,10 @@
        "mcnvs.lw $rm, $rn, $rd"
        (+ (f-op 19) rm (f-ext 13) rn rd (f-rsvd 0))
        (sequence ((HI result3) (HI result2) (HI result1) (HI result0))
-		 (set result0 (saturate HI 16 (subword SI rm 0)))
-		 (set result1 (saturate HI 16 (subword SI rm 1)))
-		 (set result2 (saturate HI 16 (subword SI rn 0)))
-		 (set result3 (saturate HI 16 (subword SI rn 1)))
+		 (set result0 (saturate HI 16 (subword SI rm 1)))
+		 (set result1 (saturate HI 16 (subword SI rm 0)))
+		 (set result2 (saturate HI 16 (subword SI rn 1)))
+		 (set result3 (saturate HI 16 (subword SI rn 0)))
 		 (set rd (-join-hi result3 result2 result1 result0))))
 
 (dshmi mcnvswb "Multimedia convert/saturate (word to byte)"
@@ -988,14 +1081,14 @@
        (+ (f-op 19) rm (f-ext 8) rn rd (f-rsvd 0))
        (sequence ((QI result7) (QI result6) (QI result5) (QI result4) 
 		  (QI result3) (QI result2) (QI result1) (QI result0))
-		 (set result0 (saturate QI 8 (subword HI rm 0)))
-		 (set result1 (saturate QI 8 (subword HI rm 1)))
-		 (set result2 (saturate QI 8 (subword HI rm 2)))
-		 (set result3 (saturate QI 8 (subword HI rm 3)))
-		 (set result4 (saturate QI 8 (subword HI rn 0)))
-		 (set result5 (saturate QI 8 (subword HI rn 1)))
-		 (set result6 (saturate QI 8 (subword HI rn 2)))
-		 (set result7 (saturate QI 8 (subword HI rn 3)))
+		 (set result0 (saturate QI 8 (subword HI rm 3)))
+		 (set result1 (saturate QI 8 (subword HI rm 2)))
+		 (set result2 (saturate QI 8 (subword HI rm 1)))
+		 (set result3 (saturate QI 8 (subword HI rm 0)))
+		 (set result4 (saturate QI 8 (subword HI rn 3)))
+		 (set result5 (saturate QI 8 (subword HI rn 2)))
+		 (set result6 (saturate QI 8 (subword HI rn 1)))
+		 (set result7 (saturate QI 8 (subword HI rn 0)))
 		 (set rd (-join-qi result7 result6 result5 result4
 				 result3 result2 result1 result0))))
 
@@ -1005,14 +1098,14 @@
        (+ (f-op 19) rm (f-ext 12) rn rd (f-rsvd 0))
        (sequence ((QI result7) (QI result6) (QI result5) (QI result4)
 			       (QI result3) (QI result2) (QI result1) (QI result0))
-		 (set result0 (usaturate QI 8 (subword HI rm 0)))
-		 (set result1 (usaturate QI 8 (subword HI rm 1)))
-		 (set result2 (usaturate QI 8 (subword HI rm 2)))
-		 (set result3 (usaturate QI 8 (subword HI rm 3)))
-		 (set result4 (usaturate QI 8 (subword HI rn 0)))
-		 (set result5 (usaturate QI 8 (subword HI rn 1)))
-		 (set result6 (usaturate QI 8 (subword HI rn 2)))
-		 (set result7 (usaturate QI 8 (subword HI rn 3)))
+		 (set result0 (usaturate QI 8 (subword HI rm 3)))
+		 (set result1 (usaturate QI 8 (subword HI rm 2)))
+		 (set result2 (usaturate QI 8 (subword HI rm 1)))
+		 (set result3 (usaturate QI 8 (subword HI rm 0)))
+		 (set result4 (usaturate QI 8 (subword HI rn 3)))
+		 (set result5 (usaturate QI 8 (subword HI rn 2)))
+		 (set result6 (usaturate QI 8 (subword HI rn 1)))
+		 (set result7 (usaturate QI 8 (subword HI rn 0)))
 		 (set rd (-join-qi result7 result6 result5 result4 result3
 				 result2 result1 result0))))
 
@@ -1047,14 +1140,16 @@
        "mmacfx.wl $rm, $rn, $rd"
        (+ (f-op 18) rm (f-ext 1) rn rd (f-rsvd 0))
        (sequence ((SI temp) (SI result1) (SI result0))
-		 (set result0 (subword SI rd 0))
-		 (set result1 (subword SI rd 1))
-		 (set temp (mul (zext SI (subword HI rm 0)) (zext SI (subword HI rn 0))))
-		 (set temp (saturate SI 32 (sll temp 1)))
-		 (set result0 (saturate SI 32 (add result0 temp)))
-		 (set temp (mul (zext SI (subword HI rm 1)) (zext SI (subword HI rn 1))))
-		 (set temp (saturate SI 32 (sll temp 1)))
-		 (set result1 (saturate SI 32 (add result1 temp)))
+		 (set result0 (subword SI rd 1))
+		 (set result1 (subword SI rd 0))
+		 (set temp (mul (zext SI (subword HI rm 3)) (zext SI (subword HI rn 3))))
+		 (set temp (saturate SI 32 (sll DI temp 1)))
+		 (set result0 (saturate SI 32 (add (ext DI result0)
+						   (ext DI temp))))
+		 (set temp (mul (zext SI (subword HI rm 2)) (zext SI (subword HI rn 2))))
+		 (set temp (saturate SI 32 (sll DI temp 1)))
+		 (set result1 (saturate SI 32 (add (ext DI result1)
+						   (ext DI temp))))
 		 (set rd (-join-si result1 result0))))
 
 (dshmi mmacnfx.wl "Multimedia fractional multiple (word to long)"
@@ -1062,14 +1157,16 @@
        "mmacnfx.wl $rm, $rn, $rd"
        (+ (f-op 18) rn (f-ext 5) rn rd (f-rsvd 0))
        (sequence ((SI temp) (SI result1) (SI result0))
-		 (set result0 (subword SI rd 0))
-		 (set result1 (subword SI rd 1))
-		 (set temp (mul (zext SI (subword HI rm 0)) (zext SI (subword HI rn 0))))
-		 (set temp (saturate SI 32 (sll temp 1)))
-		 (set result0 (saturate SI 32 (sub result0 temp)))
-		 (set temp (mul (zext SI (subword HI rm 1)) (zext SI (subword HI rn 1))))
-		 (set temp (saturate SI 32 (sll temp 1)))
-		 (set result1 (saturate SI 32 (sub result1 temp)))
+		 (set result0 (subword SI rd 1))
+		 (set result1 (subword SI rd 0))
+		 (set temp (mul (zext SI (subword HI rm 3)) (zext SI (subword HI rn 3))))
+		 (set temp (saturate SI 32 (sll DI temp 1)))
+		 (set result0 (saturate SI 32 (sub (ext DI result0)
+						   (ext DI temp))))
+		 (set temp (mul (zext SI (subword HI rm 2)) (zext SI (subword HI rn 2))))
+		 (set temp (saturate SI 32 (sll DI temp 1)))
+		 (set result1 (saturate SI 32 (sub (ext DI result1)
+						   (ext DI temp))))
 		 (set rd (-join-si result1 result0))))
 
 (dshmi mmull "Multimedia multiply (long word)"
@@ -1089,9 +1186,9 @@
        "mmulfx.l $rm, $rn, $rd"
        (+ (f-op 19) rm (f-ext 6) rn rd (f-rsvd 0))
        (sequence ((DI temp) (SI result0) (SI result1))
-		 (set temp (mul (zext DI (subword SI rm 0)) (zext DI (subword SI rn 0))))
-		 (set result0 (saturate SI 32 (sra temp 31)))
 		 (set temp (mul (zext DI (subword SI rm 1)) (zext DI (subword SI rn 1))))
+		 (set result0 (saturate SI 32 (sra temp 31)))
+		 (set temp (mul (zext DI (subword SI rm 0)) (zext DI (subword SI rn 0))))
 		 (set result1 (saturate SI 32 (sra temp 31)))
 		 (set rd (-join-si result1 result0))))
 
@@ -1100,13 +1197,13 @@
        "mmulfx.w $rm, $rn, $rd"
        (+ (f-op 19) rm (f-ext 5) rn rd (f-rsvd 0))
        (sequence ((SI temp) (HI result0) (HI result1) (HI result2) (HI result3))
-		 (set temp (mul (zext SI (subword HI rm 0)) (zext SI (subword HI rn 0))))
-		 (set result0 (saturate HI 16 (sra temp 15)))
-		 (set temp (mul (zext SI (subword HI rm 1)) (zext SI (subword HI rn 1))))
-		 (set result1 (saturate HI 16 (sra temp 15)))
-		 (set temp (mul (zext SI (subword HI rm 2)) (zext SI (subword HI rn 2))))
-		 (set result2 (saturate HI 16 (sra temp 15)))
 		 (set temp (mul (zext SI (subword HI rm 3)) (zext SI (subword HI rn 3))))
+		 (set result0 (saturate HI 16 (sra temp 15)))
+		 (set temp (mul (zext SI (subword HI rm 2)) (zext SI (subword HI rn 2))))
+		 (set result1 (saturate HI 16 (sra temp 15)))
+		 (set temp (mul (zext SI (subword HI rm 1)) (zext SI (subword HI rn 1))))
+		 (set result2 (saturate HI 16 (sra temp 15)))
+		 (set temp (mul (zext SI (subword HI rm 0)) (zext SI (subword HI rn 0))))
 		 (set result3 (saturate HI 16 (sra temp 15)))
 		 (set rd (-join-hi result3 result2 result1 result0))))
 
@@ -1116,13 +1213,13 @@
        (+ (f-op 19) rm (f-ext 9) rn rd (f-rsvd 0))
        (sequence ((SI temp) (HI result0) (HI result1) (HI result2) (HI result3) (HI c))
 		 (set c (sll 1 14))
-		 (set temp (mul (zext SI (subword HI rm 0)) (zext SI (subword HI rn 0))))
-		 (set result0 (saturate HI 16 (sra (add temp c) 15)))
-		 (set temp (mul (zext SI (subword HI rm 1)) (zext SI (subword HI rn 1))))
-		 (set result1 (saturate HI 16 (sra (add temp c) 15)))
-		 (set temp (mul (zext SI (subword HI rm 2)) (zext SI (subword HI rn 2))))
-		 (set result2 (saturate HI 16 (sra (add temp c) 15)))
 		 (set temp (mul (zext SI (subword HI rm 3)) (zext SI (subword HI rn 3))))
+		 (set result0 (saturate HI 16 (sra (add temp c) 15)))
+		 (set temp (mul (zext SI (subword HI rm 2)) (zext SI (subword HI rn 2))))
+		 (set result1 (saturate HI 16 (sra (add temp c) 15)))
+		 (set temp (mul (zext SI (subword HI rm 1)) (zext SI (subword HI rn 1))))
+		 (set result2 (saturate HI 16 (sra (add temp c) 15)))
+		 (set temp (mul (zext SI (subword HI rm 0)) (zext SI (subword HI rn 0))))
 		 (set result3 (saturate HI 16 (sra (add temp c) 15)))
 		 (set rd (-join-hi result3 result2 result1 result0))))
 
@@ -1131,8 +1228,8 @@
        "mmulhi.wl $rm, $rn, $rd"
        (+ (f-op 19) rm (f-ext 14) rn rd (f-rsvd 0))
        (sequence ((SI result1) (SI result0))
-		 (set result0 (mul (zext SI (subword HI rm 2)) (zext SI (subword HI rn 2))))
-		 (set result1 (mul (zext SI (subword HI rm 3)) (zext SI (subword HI rn 3))))
+		 (set result0 (mul (zext SI (subword HI rm 1)) (zext SI (subword HI rn 1))))
+		 (set result1 (mul (zext SI (subword HI rm 0)) (zext SI (subword HI rn 0))))
 		 (set rd (-join-si result1 result0))))
 
 (dshmi mmullowl "Multimedia multiply lower halves (word to long)"
@@ -1140,8 +1237,8 @@
        "mmullo.wl $rm, $rn, $rd"
        (+ (f-op 19) rm (f-ext 10) rn rd (f-rsvd 0))
        (sequence ((SI result1) (SI result0))
-		 (set result0 (mul (zext SI (subword HI rm 0)) (zext SI (subword HI rn 0))))
-		 (set result1 (mul (zext SI (subword HI rm 1)) (zext SI (subword HI rn 1))))
+		 (set result0 (mul (zext SI (subword HI rm 3)) (zext SI (subword HI rn 3))))
+		 (set result1 (mul (zext SI (subword HI rm 2)) (zext SI (subword HI rn 2))))
 		 (set rd (-join-si result1 result0))))
 
 (dshmi mmulsumwq "Multimedia multiply and accumulate (word to quad)"
@@ -1166,7 +1263,7 @@
        "mperm.w $rm, $rn, $rd"
        (+ (f-op 10) rm (f-ext 13) rn rd (f-rsvd 0))
        (sequence ((QI control) (HI result3) (HI result2) (HI result1) (HI result0))
-		 (set control (and QI rn #x3f))
+		 (set control (and QI rn #xff))
 		 (set result0 (subword HI rm (sub 3 (and control 3))))
 		 (set result1 (subword HI rm (sub 3 (and (srl control 2) 3))))
 		 (set result2 (subword HI rm (sub 3 (and (srl control 4) 3))))
@@ -1178,7 +1275,7 @@
        "msad.ubq $rm, $rn, $rd"
        (+ (f-op 18) rm (f-ext 0) rn rd (f-rsvd 0))
        (sequence ((DI acc))
-		 (set acc (abs DI (sub (subword QI rm 0) (subword QI rn 1))))
+		 (set acc (abs DI (sub (subword QI rm 0) (subword QI rn 0))))
 		 (set acc (add DI acc (abs (sub (subword QI rm 1) (subword QI rn 1)))))
 		 (set acc (add DI acc (abs (sub (subword QI rm 2) (subword QI rn 2)))))
 		 (set acc (add DI acc (abs (sub (subword QI rm 3) (subword QI rn 3)))))
@@ -1188,14 +1285,14 @@
 		 (set acc (add DI acc (abs (sub (subword QI rm 7) (subword QI rn 7)))))
 		 (set rd (add rd acc))))
 
-(define-pmacro (-mshaldsl arg) (saturate SI 32 (sll arg (and rn 31))))
+(define-pmacro (-mshaldsl arg) (saturate SI 32 (sll DI arg (and rn 31))))
 (dshmi mshaldsl "Multimedia saturating arithmetic left shift (long word)"
        ()
        "mshalds.l $rm, $rn, $rd"
        (+ (f-op 3) rm (f-ext 6) rn rd (f-rsvd 0))
        (slice-long-unop -mshaldsl))
 
-(define-pmacro (-mshaldsw arg) (saturate HI 16 (sll arg (and rn 15))))
+(define-pmacro (-mshaldsw arg) (saturate HI 16 (sll DI arg (and rn 15))))
 (dshmi mshaldsw "Multimedia saturating arithmetic left shift (word)"
        ()
        "mshalds.w $rm, $rn, $rd"
@@ -1228,14 +1325,14 @@
        (+ (f-op 11) rm (f-ext 4) rn rd (f-rsvd 0))
        (sequence ((QI result7) (QI result6) (QI result5) (QI result4)
 		  (QI result3) (QI result2) (QI result1) (QI result0))
-		 (set result0 (subword QI rm 4))
-		 (set result1 (subword QI rn 4))
-		 (set result2 (subword QI rm 5))
-		 (set result3 (subword QI rn 5))
-		 (set result4 (subword QI rm 6))
-		 (set result5 (subword QI rn 6))
-		 (set result6 (subword QI rm 7))
-		 (set result7 (subword QI rn 7))
+		 (set result0 (subword QI rm 3))
+		 (set result1 (subword QI rn 3))
+		 (set result2 (subword QI rm 2))
+		 (set result3 (subword QI rn 2))
+		 (set result4 (subword QI rm 1))
+		 (set result5 (subword QI rn 1))
+		 (set result6 (subword QI rm 0))
+		 (set result7 (subword QI rn 0))
 		 (set rd (-join-qi result7 result6 result5 result4 result3
 				 result2 result1 result0))))
 
@@ -1244,8 +1341,8 @@
        "mshfhi.l $rm, $rn, $rd"
        (+ (f-op 11) rm (f-ext 6) rn rd (f-rsvd 0))
        (sequence ((SI result1) (SI result0))
-		 (set result0 (subword SI rm 1))
-		 (set result1 (subword SI rn 1))
+		 (set result0 (subword SI rm 0))
+		 (set result1 (subword SI rn 0))
 		 (set rd (-join-si result1 result0))))
 
 (dshmi mshfhiw "Multimedia shuffle higher-half (word)"
@@ -1253,10 +1350,10 @@
        "mshfhi.w $rm, $rn, $rd"
        (+ (f-op 11) rm (f-ext 5) rn rd (f-rsvd 0))
        (sequence ((HI result3) (HI result2) (HI result1) (HI result0))
-		 (set result0 (subword HI rm 2))
-		 (set result1 (subword HI rn 2))
-		 (set result2 (subword HI rm 3))
-		 (set result3 (subword HI rn 3))
+		 (set result0 (subword HI rm 1))
+		 (set result1 (subword HI rn 1))
+		 (set result2 (subword HI rm 0))
+		 (set result3 (subword HI rn 0))
 		 (set rd (-join-hi result3 result2 result1 result0))))
 
 (dshmi mshflob "Multimedia shuffle lower-half (byte)"
@@ -1265,14 +1362,14 @@
        (+ (f-op 11) rm (f-ext 0) rn rd (f-rsvd 0))
        (sequence ((QI result7) (QI result6) (QI result5) (QI result4)
 		  (QI result3) (QI result2) (QI result1) (QI result0))
-		 (set result0 (subword QI rm 0))
-		 (set result1 (subword QI rn 0))
-		 (set result2 (subword QI rm 1))
-		 (set result3 (subword QI rn 1))
-		 (set result4 (subword QI rm 2))
-		 (set result5 (subword QI rn 2))
-		 (set result6 (subword QI rm 3))
-		 (set result7 (subword QI rn 3))
+		 (set result0 (subword QI rm 7))
+		 (set result1 (subword QI rn 7))
+		 (set result2 (subword QI rm 6))
+		 (set result3 (subword QI rn 6))
+		 (set result4 (subword QI rm 5))
+		 (set result5 (subword QI rn 5))
+		 (set result6 (subword QI rm 4))
+		 (set result7 (subword QI rn 4))
 		 (set rd (-join-qi result7 result6 result5 result4 result3
 				 result2 result1 result0))))
 
@@ -1281,8 +1378,8 @@
        "mshflo.l $rm, $rn, $rd"
        (+ (f-op 11) rm (f-ext 2) rn rd (f-rsvd 0))
        (sequence ((SI result1) (SI result0))
-		 (set result0 (subword SI rm 0))
-		 (set result1 (subword SI rn 0))
+		 (set result0 (subword SI rm 1))
+		 (set result1 (subword SI rn 1))
 		 (set rd (-join-si result1 result0))))
 
 (dshmi mshflow "Multimedia shuffle lower-half (word)"
@@ -1290,10 +1387,10 @@
        "mshflo.w $rm, $rn, $rd"
        (+ (f-op 11) rm (f-ext 1) rn rd (f-rsvd 0))
        (sequence ((HI result3) (HI result2) (HI result1) (HI result0))
-		 (set result0 (subword HI rm 0))
-		 (set result1 (subword HI rn 0))
-		 (set result2 (subword HI rm 1))
-		 (set result3 (subword HI rn 1))
+		 (set result0 (subword HI rm 3))
+		 (set result1 (subword HI rn 3))
+		 (set result2 (subword HI rm 2))
+		 (set result3 (subword HI rn 2))
 		 (set rd (-join-hi result3 result2 result1 result0))))
 
 (define-pmacro (-mshlldl arg) (sll arg (and rn 31)))
@@ -1336,21 +1433,24 @@
        (+ (f-op 2) rm (f-ext 9) rn rd (f-rsvd 0))
        (slice-word sub))
 
-(define-pmacro (-msubsl arg1 arg2) (saturate SI 32 (sub arg1 arg2)))
+(define-pmacro (-msubsl arg1 arg2) (saturate SI 32 (sub (ext DI arg1)
+							(ext DI arg2))))
 (dshmi msubsl "Multimedia subtract (saturating long)"
        ()
        "msubs.l $rm, $rn, $rd"
        (+ (f-op 2) rm (f-ext 14) rn rd (f-rsvd 0))
        (slice-long -msubsl))
 
-(define-pmacro (-msubsub arg1 arg2) (usaturate QI 8 (sub arg1 arg2)))
+(define-pmacro (-msubsub arg1 arg2) (usaturate QI 8 (sub (zext DI arg1)
+							 (zext DI arg2))))
 (dshmi msubsub "Multimedia subtract (saturating byte)"
        ()
        "msubs.ub $rm, $rn, $rd"
        (+ (f-op 2) rm (f-ext 12) rn rd (f-rsvd 0))
        (slice-byte -msubsub))
 
-(define-pmacro (-msubsw arg1 arg2) (saturate HI 16 (sub arg1 arg2)))
+(define-pmacro (-msubsw arg1 arg2) (saturate HI 16 (sub (ext DI arg1)
+							(ext DI arg2))))
 (dshmi msubsw "Multimedia subtract (saturating word)"
        ()
        "msubs.w $rm, $rn, $rd"
@@ -1569,10 +1669,22 @@
        (set (mem HI (add rm (ext DI disp10x2))) (and HI rd #xffff)))
 
 (define-pmacro (-sthi-byte)
-  (sequence ()
-	    (set (mem UQI addr) (and QI val #xff))
-	    (set val (srl val 8))
-	    (set addr (add addr 1))))
+  (if (and bytecount 1)
+      (sequence ()
+		(set (mem UQI addr) (and QI val #xff))
+		(set val (srl val 8)))))
+
+(define-pmacro (-sthi-word)
+  (if (and bytecount 2)
+      (sequence ()
+		(set (mem HI (and addr -4)) (and HI val #xffff))
+		(set val (srl val 16)))))
+
+(define-pmacro (-sthi-long)
+  (if (and bytecount 4)
+      (sequence ()
+		(set (mem SI (and addr -8)) (and SI val #xffffffff))
+		(set val (srl val 32)))))
 
 (dshmi sthil "Store high part (long word)"
       ()
@@ -1581,18 +1693,18 @@
        (sequence ((DI addr) (QI bytecount) (DI val))
 		 (set addr (add rm disp6))
 		 (set bytecount (add (and addr 3) 1))
-		 (if endian
-		     (set val rd)
-		     (set val (srl rd (sub 32 (mul 8 bytecount)))))
-		 (set addr (add (sub addr bytecount) 1))
-		 (if (gt bytecount 3)
-		     (-sthi-byte))
-		 (if (gt bytecount 2)
-		     (-sthi-byte))
-		 (if (gt bytecount 1)
-		     (-sthi-byte))
-		 (if (gt bytecount 0)
-		     (-sthi-byte))))
+		 (if (and bytecount 4)
+		     (set (mem SI (and addr -4)) rd)
+		     (if endian
+			 (sequence ()
+				   ; Big endian.
+				   (set val rd)
+				   (-sthi-byte)
+				   (-sthi-word))
+			 (sequence ()
+				   (set val (srl rd (sub 32 (mul 8 bytecount))))
+				   (-sthi-word)
+				   (-sthi-byte))))))
 
 (dshmi sthiq "Store high part (quad word)"
        ()
@@ -1601,40 +1713,77 @@
        (sequence ((DI addr) (QI bytecount) (DI val))
 		 (set addr (add rm disp6))
 		 (set bytecount (add (and addr 7) 1))
-		 (if endian
-		     (set val rd)
-		     (set val (srl rd (sub 64 (mul 8 bytecount)))))
-		 (set addr (add (sub addr bytecount) 1))
-		 (if (gt bytecount 7)
-		     (-sthi-byte))
-		 (if (gt bytecount 6)
-		     (-sthi-byte))
-		 (if (gt bytecount 5)
-		     (-sthi-byte))
-		 (if (gt bytecount 4)
-		     (-sthi-byte))
-		 (if (gt bytecount 3)
-		     (-sthi-byte))
-		 (if (gt bytecount 2)
-		     (-sthi-byte))
-		 (if (gt bytecount 1)
-		     (-sthi-byte))
-		 (if (gt bytecount 0)
-		     (-sthi-byte))))
+		 (if (and bytecount 8)
+		     (set (mem DI (and addr -8)) rd)
+		     (if endian
+			 (sequence ()
+				   (set val rd)
+				   (-sthi-byte)
+				   (-sthi-word)
+				   (-sthi-long))
+			 (sequence ()
+				   (set val (srl rd (sub 64 (mul 8 bytecount))))
+				   (-sthi-long)
+				   (-sthi-word)
+				   (-sthi-byte))))))
+
+(define-pmacro (-stlo-byte)
+  (if (and bytecount 1)
+      (sequence ()
+		(set (mem UQI addr) (and QI val #xff))
+		(set val (srl val 8)))))
+
+(define-pmacro (-stlo-word)
+  (if (and bytecount 2)
+      (sequence ()
+		(set (mem UHI (and (add addr 1) -2)) (and HI val #xffff))
+		(set val (srl val 16)))))
+
+(define-pmacro (-stlo-long)
+  (if (and bytecount 4)
+      (sequence ()
+		(set (mem USI (and (add addr  3) -4)) (and SI val #xffffffff))
+		(set val (srl val 32)))))
 
 (dshmi stlol "Store low part (long word)"
        ()
        "stlo.l $rm, $disp6, $rd"
        (+ (f-op 56) rm (f-ext 2) disp6 rd (f-rsvd 0))
-       ; FIXME.
-       (unimp "stlol"))
+       (sequence ((DI addr) (QI bytecount) (DI val))
+		 (set addr (add rm disp6))
+		 (set bytecount (sub 4 (and addr 3)))
+		 (if (and bytecount 4)
+		     (set (mem USI addr) rd)
+		     (if endian
+			 (sequence ()
+				   (set val (srl rd (sub 32 (mul 8 bytecount))))
+				   (-stlo-word)
+				   (-stlo-byte))
+			 (sequence ()
+				   (set val rd)
+				   (-stlo-byte)
+				   (-stlo-word))))))
 
 (dshmi stloq "Store low part (quad word)"
        ()
        "stlo.q $rm, $disp6, $rd"
        (+ (f-op 56) rm (f-ext 3) disp6 rd (f-rsvd 0))
-       ; FIXME.
-       (unimp "stloq"))
+       (sequence ((DI addr) (QI bytecount) (DI val))
+		 (set addr (add rm disp6))
+		 (set bytecount (sub 8 (and addr 7)))
+		 (if (and bytecount 8)
+		     (set (mem UDI addr) rd)
+		     (if endian
+			 (sequence ()
+				   (set val (srl rd (sub 64 (mul 8 bytecount))))
+				   (-stlo-long)
+				   (-stlo-word)
+				   (-stlo-byte))
+			 (sequence ()
+				   (set val rd)
+				   (-stlo-byte)
+				   (-stlo-word)
+				   (-stlo-long))))))
 
 (dshmi stxb "Store byte (extended displacement)"
        ()

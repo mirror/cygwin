@@ -1228,9 +1228,9 @@
 
 (dshci movw5 "Store word to memory (register indirect w/ displacement)"
        ()
-       "mov.w r0, @($imm4x2, $rn)"
-       (+ (f-op8 #x81) rn imm4x2)
-       (set (mem HI (add rn imm4x2)) (subword HI r0 1)))
+       "mov.w r0, @($imm4x2, $rm)"
+       (+ (f-op8 #x81) rm imm4x2)
+       (set (mem HI (add rm imm4x2)) (subword HI r0 1)))
 
 (dshci movw6 "Load word from memory (register indirect w/ zero displacement)"
        ()

@@ -188,7 +188,7 @@ clean:
 	rm -f core errs *~ \#* TAGS *.E a.out errors
 
 distclean: clean
-	rm -f Makefile config.status config.cache config.log
+	rm -f Makefile pkgIndex.tcl iwidgets.tcl config.status config.cache config.log
 
 depend:
 	makedepend -- $(CC_SWITCHES) -- $(SRCS)

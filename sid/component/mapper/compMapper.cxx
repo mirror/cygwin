@@ -63,6 +63,7 @@ using sidutil::attribute_coder_virtual_parameterized;
 
 struct mapping_record
 {
+  host_int_4 mapped_base;       // Base of mapped address
   host_int_4 low, high;         // inclusive address range
   host_int_4 hit_count;         // number of accesses via this record
   bus* accessor;                // target bus
@@ -165,10 +166,9 @@ class generic_mapper;
 class generic_mapper_bus: public bus
 {
 public:
-  generic_mapper_bus (generic_mapper* target, bool transparent_p): target (target)
+  generic_mapper_bus (generic_mapper* target): target (target)
     {
       this->tlb1 = this->tlb2 = 0;
-      this->low_multiplier = (transparent_p ? 0 : 1);
     }
 
 
@@ -201,7 +201,7 @@ public:
       for (unsigned i=0; i<slave_size; i++)
 	ds.write_byte (i, data.read_byte (i + slave_offset - master_offset));
 
-      host_int_4 mapped_address = (address - (this->low_multiplier * r->low)) >> (r->stride_shift - r->width_shift);
+      host_int_4 mapped_address = (address - (r->low - r->mapped_base)) >> (r->stride_shift - r->width_shift);
       
       bus::status st = r->accessor->write (mapped_address, ds);
       st.latency += target->latency;
@@ -230,7 +230,7 @@ public:
 	return bus::misaligned;
 
       DataSlave ds;
-      host_int_4 mapped_address = (address - (this->low_multiplier * r->low)) >> (r->stride_shift - r->width_shift);
+      host_int_4 mapped_address = (address - (r->low - r->mapped_base)) >> (r->stride_shift - r->width_shift);
       bus::status s = r->accessor->read (mapped_address, ds);
 
       // Copy data bytes for master
@@ -287,7 +287,6 @@ private:
   generic_mapper* target;
   mutable struct mapping_record* tlb1;
   mutable struct mapping_record* tlb2;
-  unsigned low_multiplier;
 
 public:
   void clear_tlb () { tlb1 = tlb2 = 0; }
@@ -343,14 +342,16 @@ private:
   component::status set_hits (std::string entry, const std::string& value);
 
   host_int_2 latency;
+  bool is_transparent;
 };
 
 
 generic_mapper::generic_mapper (bool transparent_p)
-  :my_bus (this, transparent_p),
+  :my_bus (this),
    bank (0),
    bank_pin (this, & generic_mapper::bank_pin_handler),
-   latency (0)
+   latency (0),
+   is_transparent (transparent_p)
 {
   add_bus ("access-port", &this->my_bus);
   add_attribute_virtual ("state-snapshot", this,
@@ -502,7 +503,7 @@ generic_mapper_bus::write_any (host_int_4 address, Data data) throw ()
 	// bypass stride/offset calculations?
 	if (LIKELY(! r->use_strideoffset_p))
 	  {
-	    host_int_4 mapped_address = address - (this->low_multiplier * r->low);
+	    host_int_4 mapped_address = address - (r->low - r->mapped_base);
 	    bus::status st = r->accessor->write (mapped_address, data);
 	    st.latency += target->latency;
 	    return st;
@@ -546,7 +547,7 @@ generic_mapper_bus::read_any (host_int_4 address, Data& data) throw ()
 	// bypass stride/offset calculations?
 	if (LIKELY(! r->use_strideoffset_p))
 	  {
-	    host_int_4 mapped_address = address - (this->low_multiplier * r->low);
+	    host_int_4 mapped_address = address - (r->low - r->mapped_base);
 	    bus::status st = r->accessor->read (mapped_address, data);
 	    st.latency += target->latency;
 	    return st;
@@ -589,10 +590,14 @@ generic_mapper_bus::read_any (host_int_4 address, Data& data) throw ()
 // GARBAGE1[SPEC]GARBAGE2
 //
 // where SPEC ::=
-// LOW-HIGH                              (2 tokens)
-// LOW-HIGH,STRIDE,WIDTH                 (3 tokens)
-// BYTES_PER_WORD*LOW-HIGH               (4 tokens)
-// BYTES_PER_WORD*LOW-HIGH,STRIDE,WIDTH  (5 tokens)
+// LOW-HIGH
+// LOW-HIGH,STRIDE,WIDTH
+// MAPPED_BASE=LOW-HIGH
+// MAPPED_BASE=LOW-HIGH,STRIDE,WIDTH
+// BYTES_PER_WORD*LOW-HIGH
+// BYTES_PER_WORD*LOW-HIGH,STRIDE,WIDTH
+// BYTES_PER_WORD*MAPPED_BASE=LOW-HIGH
+// BYTES_PER_WORD*MAPPED_BASE=LOW-HIGH,STRIDE,WIDTH
 //
 // and GARBAGE2 ::=
 // {BANKS}GARBAGE3
@@ -617,7 +622,6 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
       return 0;
     }
 
-  string garbage1 = fields_outer[0];
   string spec = fields_outer[1];
   string garbage2 = fields_outer[2];
 
@@ -663,22 +667,20 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
       return 0;
     }
 
-  // XXX: equivocate */-/, separators
-  vector<string> fields = tokenize (spec, "*-,");  
+  // Check for the BYTES_PER_WORD* specification.
+  vector<string> fields = tokenize (spec, "*");  
   
-  // Must have between 2 and 5 tokens (including empties
-  // before/after "[" and "]"
-  if (fields.size() < 2 || fields.size() > 5)
+  // Must have 1 or 2 tokens
+  if (fields.size() > 2)
     {
-      cerr << "mapper error: parse error (bad number of [SPEC] fields) in "
+      cerr << "mapper error: parse error (more than one word size) in "
 	   << str << endl;
       return 0;
     }
 
-  // strip the word width off the front of the descriptor array
-  record.bytes_per_word = 1;
-  if (fields.size() == 3 || fields.size() == 5) 
+  if (fields.size() == 2) 
     {
+      // strip the word width off the front of the descriptor array
       component::status stat = parse_attribute(fields [0], record.bytes_per_word);
       if (stat != component::ok) 
 	{
@@ -687,12 +689,49 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
 	}
       fields.erase (fields.begin ());
     }
+  else
+    record.bytes_per_word = 1;
 
-  assert (fields.size() == 2 || fields.size() == 4);
-  
-  record.use_strideoffset_p = (fields.size() == 4);
-  record.spec = str;
-  record.hit_count = 0;
+  assert (fields.size() == 1);
+  spec = fields[0];
+
+  // Check for a mapped_base output address specification
+  fields = tokenize (spec, "=");
+
+  // Must have 1 or 2 tokens
+  if (fields.size() > 2)
+    {
+      cerr << "mapper error: parse error (more than one mapped base address) in "
+	   << str << endl;
+      return 0;
+    }
+
+  bool mapped_base_default;
+  if (fields.size() == 2) 
+    {
+      // strip the mapped_base address off the front of the descriptor array
+      component::status stat = parse_attribute(fields [0], record.mapped_base);
+      if (stat != component::ok) 
+	{
+	  cerr << "mapper error: parse error (mapped_base) in " << str << endl;
+	  return 0;
+	}
+      fields.erase (fields.begin ());
+      mapped_base_default = false;
+    }
+  else
+    mapped_base_default = true;
+
+  assert (fields.size() == 1);
+  spec = fields[0];
+
+  // Now parse the address range and the stride/width, if any
+  fields = tokenize (spec, "-,");
+  if (fields.size() != 2 && fields.size() != 4)
+    {
+      cerr << "mapper error: parse error (wrong number of arguments to [SPEC]) in " << str << endl;
+      return 0;
+    }
 
   // parse two or four fields
   component::status s1 = parse_attribute(fields[0], record.low);
@@ -702,6 +741,8 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
       cerr << "mapper error: parse error (low-high) in " << str << endl;
       return 0;
     }
+
+  record.use_strideoffset_p = (fields.size() == 4);
   if (record.use_strideoffset_p)
     {
       component::status s3 = parse_attribute(fields[2], record.stride);
@@ -720,7 +761,18 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
       return 0;
     }
 
+  // We now enough information to set the default for the mapped_base address
+  // if required.
+  if (mapped_base_default)
+    {
+      if (is_transparent)
+	record.mapped_base = record.low;
+      else
+	record.mapped_base = 0;
+    }
+
   // scale all values by the word width
+  record.mapped_base *= record.bytes_per_word;
   record.low    *= record.bytes_per_word;
   record.high   *= record.bytes_per_word;
   record.stride *= record.bytes_per_word;
@@ -772,6 +824,7 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
 
       // compute offset; adjust high/low to contain entire stride regions
       record.offset = record.low & record.stride_mask;
+      record.mapped_base &= ~ record.stride_mask;
       record.low &= ~ record.stride_mask;
       record.high |= record.stride_mask;
     }
@@ -789,6 +842,8 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
 
   // fill in slot
   record.accessor = acc;
+  record.spec = str;
+  record.hit_count = 0;
 
   /*
   cout << "new mapping_record: "

@@ -626,7 +626,7 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
 
   // cout << "suffix=" << garbage2 << endl;
   // for (int j=0; j<bankspec.size(); j++)
-  //  cout << "bank[" << j << "] = `" << bankspec[j] << "'" << endl;
+  //   cout << "bank[" << j << "] = `" << bankspec[j] << "'" << endl;
 
   if (bankspec.size() == 3)
     {
@@ -651,7 +651,7 @@ generic_mapper::make_name_mapping (const string& str, bus* acc) const
 	  // cout << "added bank=" << bank << endl;
 	}
     }
-  else if (bankspec.size() == 0) // no "{" nor "}" appears
+  else if (bankspec.size() <= 1) // no "{" nor "}" appears, or no suffix at all
     {
       // No bank number specification: default 0
       record.banks.push_back (0);

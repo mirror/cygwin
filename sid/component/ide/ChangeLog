@@ -7,10 +7,33 @@
 
 	* Makefile.am (check-local): Rename target from "checkme".
 
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* hw-disk-ide.xml: Add <?xml ... ?> prefix.
+
+2001-07-04  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add maintainer-mode doc building configury.
+	* configure: Regenerate.
+	* Makefile.am: Add maintainer-mode doc building.
+	* Makefile.in: Regenerate.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* hw-disk-ide.txt: Generate.
+
+2001-06-27  graydon hoare  <graydon@redhat.com>
+
+	* hw-disk-ide.xml: Add.
+
 2001-05-31  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (DEJAGNUTESTS): Add idedocs.exp.
 	* Makefile.in: Regenerate.
+
+2001-03-23  John Healy  <jhealy@redhat.com>
+
+	* Makefile.in: Regenerated.
 
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 

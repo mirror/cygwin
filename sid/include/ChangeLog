@@ -1,3 +1,8 @@
+2001-01-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* sidbusutil.h (mux_passthrough_bus): New bus allowing one
+	input bus tied to one of two accessors with dynamic switching.
+
 2001-01-10  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidcpuutil.h (basic_cpu): Inherit from fixed_relation_map_component.

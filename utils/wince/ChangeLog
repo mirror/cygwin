@@ -1,3 +1,11 @@
+2004-08-05  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.in: Delete Makefile in 'distclean'; fixes PR gdb/920.
+	Remove dead code.
+	* configure.in: Update to autoconf 2.59, rename to...
+	* configure.ac: ...this.
+	* configure: Regenerate.
+
 2000-02-25  DJ Delorie  <dj@cygnus.com>
 
 	* cesetup.c: add support for CE 3.00 SDK and ARM chips

@@ -17,12 +17,9 @@
 prefix = @prefix@
 exec_prefix = @exec_prefix@
 
-host_alias = @host_alias@
-target_alias = @target_alias@
 program_transform_name = @program_transform_name@
 bindir = $(exec_prefix)/bin
 libdir = $(exec_prefix)/lib
-tooldir = $(libdir)/$(target_alias)
 
 datadir = $(prefix)/share
 mandir = $(prefix)/man
@@ -107,6 +104,7 @@ clean:		mostlyclean
 
 distclean:	clean
 	rm -f config.log config.cache
+	rm -f Makefile
 
 maintainer-clean realclean:	distclean
 

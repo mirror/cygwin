@@ -1,5 +1,9 @@
 2004-08-05  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* Remove misc/doschk -- users should get it from upstream at
+	ftp.gnu.org/pub/non-gnu/doschk/doschk-1.1.tar.gz.
+	* Remove misc directory, which contains nothing else.
+
 	* Remove sparclite subdirectory -- it is obsolete.
 	* configure.in, Makefile.def: Remove references thereto.
 	* configure, Makefile.in: Regenerate.

@@ -5,7 +5,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\"
-'\" RCS: @(#) $Id: socket.n,v 1.6.8.1 2000/04/06 22:38:27 spolk Exp $
+'\" RCS: @(#) $Id: socket.n,v 1.7 2002/10/01 10:03:19 dkf Exp $
 .so man.macros
 .TH socket n 8.0 Tcl "Tcl Built-In Commands"
 .BS
@@ -37,7 +37,9 @@ connection is opened and the command returns a channel identifier
 that can be used for both reading and writing.
 \fIPort\fR and \fIhost\fR specify a port
 to connect to;  there must be a server accepting connections on
-this port.  \fIPort\fR is an integer port number and \fIhost\fR
+this port.  \fIPort\fR is an integer port number
+(or service name, where supported and understood by the host operating
+system) and \fIhost\fR
 is either a domain-style name such as \fBwww.sunlabs.com\fR or
 a numerical IP address such as \fB127.0.0.1\fR.
 Use \fIlocalhost\fR to refer to the host on which the command is invoked.
@@ -53,7 +55,9 @@ interfaces.  If the option is omitted then the client-side interface
 will be chosen by the system software.
 .TP
 \fB\-myport\fI port\fR
-\fIPort\fR specifies an integer port number to use for the client's
+\fIPort\fR specifies an integer port number (or service name, where
+supported and understood by the host operating system) to use for the
+client's
 side of the connection.  If this option is omitted, the client's
 port number will be chosen at random by the system software.
 .TP
@@ -71,7 +75,9 @@ returns immediately and \fBfblocked\fR on the socket returns 1.
 .SH "SERVER SOCKETS"
 .PP
 If the \fB\-server\fR option is specified then the new socket
-will be a server for the port given by \fIport\fR.
+will be a server for the port given by \fIport\fR (either an integer
+or a service name, where supported and understood by the host
+operating system).
 Tcl will automatically accept connections to the given port.
 For each connection Tcl will create a new channel that may be used to
 communicate with the client.  Tcl then invokes \fIcommand\fR
@@ -100,18 +106,22 @@ new connections are opened.  If the application doesn't enter the
 event loop, for example by invoking the \fBvwait\fR command or
 calling the C procedure \fBTcl_DoOneEvent\fR, then no connections
 will be accepted.
+.PP
+If \fIport\fR is specified as zero, the operating system will allocate
+an unused port for use as a server socket.  The port number actually
+allocated my be retrieved from the created server socket using the
+\fBfconfigure\fR command to retrieve the \fB\-sockname\fR option as
+described below.
 
 .SH "CONFIGURATION OPTIONS"
 The \fBfconfigure\fR command can be used to query several readonly
 configuration options for socket channels:
-.VS 8.0.5
 .TP
 \fB\-error\fR
 This option gets the current error status of the given socket.  This
 is useful when you need to determine if an asynchronous connect
 operation succeeded.  If there was an error, the error message is
 returned.  If there was no error, an empty string is returned.
-.VE 8.0.5
 .TP
 \fB\-sockname\fR
 This option returns a list of three elements, the address, the host name

@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclResult.c,v 1.6.8.1 2000/04/06 22:38:29 spolk Exp $
+ * RCS: @(#) $Id: tclResult.c,v 1.5 2002/01/25 20:40:55 dgp Exp $
  */
 
 #include "tclInt.h"
@@ -297,7 +297,7 @@ Tcl_SetResult(interp, string, freeProc)
  *----------------------------------------------------------------------
  */
 
-char *
+CONST char *
 Tcl_GetStringResult(interp)
      register Tcl_Interp *interp; /* Interpreter whose result to return. */
 {

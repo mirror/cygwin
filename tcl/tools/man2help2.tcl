@@ -9,7 +9,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 # 
-# RCS: @(#) $Id: man2help2.tcl,v 1.6.8.2 2000/09/15 16:58:08 spolk Exp $
+# RCS: @(#) $Id: man2help2.tcl,v 1.12 2002/10/03 13:34:32 dkf Exp $
 # 
 
 # Global variables used by these scripts:
@@ -271,22 +271,29 @@ proc macro {name args} {
 	    }
 	    tab
 	}
-	AS {}				;# next page and previous page
+	AS {
+	    # next page and previous page
+	}
 	br {
 	    lineBreak	
 	}
 	BS {}
 	BE {}
 	CE {
-	    decrNestingLevel
+	    puts -nonewline $::file "\\f0\\fs20 "
 	    set state(noFill) 0
 	    set state(breakPending) 0
-	    newPara 0i
+	    newPara ""
+	    set state(leftIndent) [expr {$state(leftIndent) - $state(offset)}]
+	    set state(sb) 80
 	}
-	CS {				;# code section
-	    incrNestingLevel
+	CS {
+	    # code section
 	    set state(noFill) 1
-	    newPara 0i
+	    newPara ""
+	    set state(leftIndent) [expr {$state(leftIndent) + $state(offset)}]
+	    set state(sb) 80
+	    puts -nonewline $::file "\\f1\\fs18 "
 	}
 	DE {
 	    set state(noFill) 0
@@ -510,7 +517,7 @@ proc formattedText {text} {
 	    }
 	    o {
 		text "\\'"
-		regexp "'([^']*)'(.*)" $text all ch text
+		regexp {'([^']*)'(.*)} $text all ch text
 		text $chars($ch)
 	    }
 	    default {
@@ -705,7 +712,7 @@ proc SHmacro {argList} {
 
     set args [join $argList " "]
     if {[llength $argList] < 1} {
-	puts stderr "Bad .SH macro: .$name $args"
+	puts stderr "Bad .SH macro: .SH $args"
     }
 
     # control what the text proc does with text
@@ -823,11 +830,11 @@ proc TPmacro {argList} {
 # argList -		List of arguments to the .TH macro.
 
 proc THmacro {argList} {
-    global file curPkg curSect curID id_keywords state curVer
+    global file curPkg curSect curID id_keywords state curVer bitmap
 
     if {[llength $argList] != 5} {
 	set args [join $argList " "]
-	puts stderr "Bad .TH macro: .$name $args"
+	puts stderr "Bad .TH macro: .TH $args"
     }
     incr curID
     set name	[lindex $argList 0]		;# Tcl_UpVar
@@ -861,6 +868,10 @@ proc THmacro {argList} {
     tab
     text $curSect
     font R
+    if {[info exists bitmap]} {
+	# a right justified bitmap
+	puts $file "\\\{bmrt $bitmap\\\}"
+    }
     puts $file "\\fs20"
     set state(breakPending) -1
 }
@@ -896,8 +907,11 @@ proc newPara {leftIndent {firstIndent 0i}} {
     if $state(paragraph) {
 	puts -nonewline $file "\\line\n"
     }
-    set state(leftIndent) [expr {$state(leftMargin) \
-	    + ($state(offset) * $state(nestingLevel)) +[getTwips $leftIndent]}]
+    if {$leftIndent != ""} {
+	set state(leftIndent) [expr {$state(leftMargin) \
+		+ ($state(offset) * $state(nestingLevel)) \
+		+ [getTwips $leftIndent]}]
+    }
     set state(firstIndent) [getTwips $firstIndent]
     set state(paragraphPending) 1
 }
@@ -966,5 +980,4 @@ proc decrNestingLevel {} {
 	incr state(nestingLevel) -1
     }
 }
-
 

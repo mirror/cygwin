@@ -4,7 +4,7 @@
 ::  edit this (or make your own) for your needs and wants using
 ::  the instructions for calling makefile.vc found in makefile.vc
 ::
-::  RCS: @(#) $Id: buildall.vc.bat,v 1.2 2002/11/26 19:48:06 hunt Exp $
+::  RCS: @(#) $Id: buildall.vc.bat,v 1.3 2003/01/21 19:40:21 hunt Exp $
 
 echo Sit back and have a cup of coffee while this grinds through ;)
 echo You asked for *everything*, remember?

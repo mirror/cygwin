@@ -5,7 +5,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" RCS: @(#) $Id: Tcl.n,v 1.6.8.1 2000/04/06 22:38:26 spolk Exp $
+'\" RCS: @(#) $Id: Tcl.n,v 1.5 2002/10/10 16:11:01 dgp Exp $
 '\"
 .so man.macros
 .TH Tcl n "8.1" Tcl "Tcl Built-In Commands"
@@ -82,13 +82,15 @@ Variable substitution may take any of the following forms:
 .RS
 .TP 15
 \fB$\fIname\fR
-\fIName\fR is the name of a scalar variable;  the name is terminated
-by any character that isn't a letter, digit, or underscore.
+\fIName\fR is the name of a scalar variable;  the name is a sequence
+of one or more characters that are a letter, digit, underscore,
+or namespace separators (two or more colons).
 .TP 15
 \fB$\fIname\fB(\fIindex\fB)\fR
 \fIName\fR gives the name of an array variable and \fIindex\fR gives
 the name of an element within that array.
-\fIName\fR must contain only letters, digits, and underscores.
+\fIName\fR must contain only letters, digits, underscores, and
+namespace separators, and may be an empty string.
 Command substitutions, variable substitutions, and backslash
 substitutions are performed on the characters of \fIindex\fR.
 .TP 15

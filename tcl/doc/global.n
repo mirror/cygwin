@@ -5,7 +5,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" RCS: @(#) $Id: global.n,v 1.6.8.1 2000/04/06 22:38:27 spolk Exp $
+'\" RCS: @(#) $Id: global.n,v 1.4 2002/06/11 13:22:35 msofer Exp $
 '\" 
 .so man.macros
 .TH global n "" Tcl "Tcl Built-In Commands"
@@ -27,9 +27,10 @@ For the duration of the current procedure
 (and only while executing in the current procedure),
 any reference to any of the \fIvarname\fRs
 will refer to the global variable by the same name.
+.PP
 
 .SH "SEE ALSO"
-namespace(n), variable(n)
+namespace(n), upvar(n), variable(n)
 
 .SH KEYWORDS
 global, namespace, procedure, variable

@@ -5,7 +5,7 @@
 # Copyright (c) 1999 by Scriptics Corporation.
 # All rights reserved.
 # 
-# RCS: @(#) $Id: genWinImage.tcl,v 1.2.8.1 2000/09/15 16:58:07 spolk Exp $
+# RCS: @(#) $Id: genWinImage.tcl,v 1.5 2000/04/25 22:29:21 hobbs Exp $
 
 
 # This file is insensitive to the directory from which it is invoked.
@@ -155,4 +155,3 @@ proc genWinImage::generateInstallers {} {
 }
 
 genWinImage::init
-

@@ -18,7 +18,7 @@
 #	its .o file placed before all others in the command; then
 #	"ld" is executed to bind the objects together.
 #
-# RCS: @(#) $Id: ldAout.tcl,v 1.6.8.1 2000/04/06 22:38:30 spolk Exp $
+# RCS: @(#) $Id: ldAout.tcl,v 1.5 2001/09/28 01:21:53 dgp Exp $
 #
 # Copyright (c) 1995, by General Electric Company. All rights reserved.
 #
@@ -182,7 +182,7 @@ proc tclLdAout {{cc {}} {shlib_suffix {}} {shlib_cflags none}} {
     append C {typedef int Tcl_PackageInitProc (Tcl_Interp *);} \n
     append C {Tcl_PackageInitProc *} \n
     append C TclLoadDictionary_ $modName { (symbol)} \n
-    append C {    char * symbol;} \n
+    append C {    CONST char * symbol;} \n
     append C {
 	{
 	    int i;

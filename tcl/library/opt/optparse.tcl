@@ -8,7 +8,7 @@
 #	on it.  If your code does rely on this package you
 #	may directly incorporate this code into your application.
 #
-# RCS: @(#) $Id: optparse.tcl,v 1.2 2002/11/26 19:47:57 hunt Exp $
+# RCS: @(#) $Id: optparse.tcl,v 1.3 2003/01/21 19:40:10 hunt Exp $
 
 package require Tcl 8
 # When this version number changes, update the pkgIndex.tcl file

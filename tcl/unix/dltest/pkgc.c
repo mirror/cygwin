@@ -10,7 +10,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: pkgc.c,v 1.6.8.2 2000/09/15 16:58:32 spolk Exp $
+ * RCS: @(#) $Id: pkgc.c,v 1.4 2000/04/04 08:06:07 hobbs Exp $
  */
 #include "tcl.h"
 
@@ -162,5 +162,3 @@ Pkgc_SafeInit(interp)
 	    (Tcl_CmdDeleteProc *) NULL);
     return TCL_OK;
 }
-
-

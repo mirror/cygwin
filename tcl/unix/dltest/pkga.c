@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: pkga.c,v 1.6.8.2 2000/09/15 16:58:30 spolk Exp $
+ * RCS: @(#) $Id: pkga.c,v 1.4 2000/04/04 08:06:07 hobbs Exp $
  */
 #include "tcl.h"
 
@@ -128,5 +128,3 @@ Pkga_Init(interp)
 	    (ClientData) 0, (Tcl_CmdDeleteProc *) NULL);
     return TCL_OK;
 }
-
-

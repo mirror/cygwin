@@ -10,7 +10,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 # 
-# RCS: @(#) $Id: msgcat.tcl,v 1.2 2002/11/26 19:47:56 hunt Exp $
+# RCS: @(#) $Id: msgcat.tcl,v 1.3 2003/01/21 19:40:09 hunt Exp $
 
 package require Tcl 8.2
 # When the version number changes, be sure to update the pkgIndex.tcl file,

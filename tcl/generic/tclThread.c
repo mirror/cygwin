@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclThread.c,v 1.6.8.2 2000/09/15 16:55:32 spolk Exp $
+ * RCS: @(#) $Id: tclThread.c,v 1.5 2000/04/05 00:42:20 welch Exp $
  */
 
 #include "tclInt.h"
@@ -577,4 +577,3 @@ Tcl_MutexUnlock(mutexPtr)
 {
 }
 #endif
-

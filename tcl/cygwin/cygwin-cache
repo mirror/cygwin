@@ -64,4 +64,5 @@ cat <<'EOF' >> confdefs.h
 #define RETSIGTYPE void
 #define HAVE_SIGNED_CHAR 1
 #define HAVE_SYS_IOCTL_H 1
+#define HAVE_TM_ZONE 1
 EOF

@@ -1,3 +1,8 @@
+2004-11-01  Jim Blandy  <jimb@redhat.com>
+
+	* ptrace-target.c (stop_lwp): Use tkill when possible; otherwise,
+	fall back gracefully to using kill.
+
 2004-10-31  Jim Blandy  <jimb@redhat.com>
 
 	* stock-breakpoints.c (stock_bp_make_table): Bother to return the

@@ -1335,10 +1335,6 @@ attach_lwp (lwpid_t lwpid)
 }
 
 
-/* Generate code for the tkill system call.  */
-_syscall2(int, tkill, pid_t, tid, int, sig)
-
-
 /* Function: stop_lwp
    Use SIGSTOP to force an lwp to stop. 
    Returns -1 for failure, zero for success. */
@@ -1346,19 +1342,49 @@ _syscall2(int, tkill, pid_t, tid, int, sig)
 extern int
 stop_lwp (lwpid_t lwpid)
 {
-  if (tkill (lwpid, SIGSTOP) == 0)
-    {
-#if 0 /* Too noisy! */
-      if (thread_db_noisy)
-	fprintf (stderr, "<tkill (%d, SIGSTOP)>\n", lwpid);
+  int result;
+
+  /* Under NPTL, signals sent via kill get delivered to whatever
+     thread in the group can handle them; they don't necessarily go to
+     the thread whose PID you passed.  This makes kill useless for
+     stop_lwp's purposes: it's trying to stop a particular thread.
+
+     The tkill system call lets you direct a signal at a particular
+     thread.  Use that if it's available (as it is on all systems
+     where it's necessary); otherwise, fall back to kill.  */
+#ifdef SYS_tkill
+  {
+    /* This is true if we don't know for a fact that this kernel
+       doesn't support tkill.  */
+    static int could_have_tkill = 1;
+
+    if (could_have_tkill)
+      {
+	errno = 0;
+	result = syscall (SYS_tkill, lwpid, SIGSTOP);
+	if (errno == 0)
+	  return result;
+	else if (errno == ENOSYS)
+	  /* Fall through to kill, below, and don't try tkill again.  */
+	  could_have_tkill = 0;
+	else
+	  {
+	    fprintf (stderr, "<<< ERROR -- tkill (%d, SIGSTOP) failed >>>\n",
+		     lwpid);
+	    return -1;
+	  }
+      }
+  }
 #endif
-      return 0;
-    }
-  else
+
+  result = kill (lwpid, SIGSTOP);
+  if (result != 0)
     {
-      fprintf (stderr, "<<< ERROR -- tkill (%d, SIGSTOP) failed >>>\n", lwpid);
+      fprintf (stderr, "<<< ERROR -- kill (%d, SIGSTOP) failed >>>\n", lwpid);
       return -1;
     }
+
+  return 0;
 }
 
 /* proc_service callback functions */

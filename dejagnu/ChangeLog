@@ -17,6 +17,11 @@
 	* debian/preinst : New file.
 	* debian/rules : New file.
 	* debian/site.exp : New file.
+        * testsuite/libdejagnu: New directory.
+        * testsuite/libdejagnu/Makefile.am: New file.
+        * testsuite/libdejagnu/Makefile.in: New file.
+        * testsuite/libdejagnu/tunit.exp: New file.
+        * testsuite/libdejagnu/unit.cc: New file.
 
 2002-04-14  Elena Zannoni  <ezannoni@redhat.com>
 

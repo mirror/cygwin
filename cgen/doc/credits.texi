@@ -5,8 +5,9 @@
 @node Credits
 @chapter Credits
 
-The following people, listed in alphabetical order, have helped in their own
-way.  Thanks!
+The following people, listed in alphabetical order, have contributed to
+CGEN in their own way--thanks!  If you feel your name has been wrongly
+omitted from this list, please contact one of the maintainers.
 
 @itemize @minus
 @item Dave Brolley
@@ -16,7 +17,9 @@ way.  Thanks!
 @item Bob Cmelik
 @item Frank Ch. Eigler
 @item Ben Elliston
+@item Matthew Green
 @item Kim Knuttila
+@item Greg McGary
 @item Ken Raeburn
 @item Jim Wilson
 @end itemize

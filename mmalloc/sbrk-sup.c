@@ -1,5 +1,5 @@
 /* Support for sbrk() regions.
-   Copyright 1992 Free Software Foundation, Inc.
+   Copyright 1992, 2000 Free Software Foundation, Inc.
    Contributed by Fred Fish at Cygnus Support.   fnf@cygnus.com
 
 This file is part of the GNU C Library.
@@ -19,12 +19,17 @@ License along with the GNU C Library; see the file COPYING.LIB.  If
 not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.  */
 
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>	/* Prototypes for sbrk (maybe) */
+#endif
 #include <string.h>	/* Prototypes for memcpy, memmove, memset, etc */
 
 #include "mmprivate.h"
 
 static PTR sbrk_morecore PARAMS ((struct mdesc *, int));
+#if NEED_DECLARATION_SBRK
 extern PTR sbrk PARAMS ((int));
+#endif
 
 /* The mmalloc() package can use a single implicit malloc descriptor
    for mmalloc/mrealloc/mfree operations which do not supply an explicit

@@ -5,7 +5,8 @@ ACLOCAL_AMFLAGS = -I $(srcdir)/../../../config
 
 noinst_LTLIBRARIES = libm32r.la
 
-INCLUDES = -I$(srcdir) -I$(srcdir)/.. -I../../../include -I$(srcdir)/../../../include
+BFDINCLUDES =  -I../../../../bfd -I$(srcdir)/../../../../include
+INCLUDES = -I$(srcdir) -I$(srcdir)/.. -I../../../include -I$(srcdir)/../../../include $(BFDINCLUDES)
 CXXFLAGS = $(TOP_CXXFLAGS)
 
 pkgdata_DATA = hw-cpu-m32r_d.txt
@@ -28,4 +29,7 @@ cgen-all: $(CGEN_ALL)
 cgen-m32r:
 	$(SHELL) ../CGEN.sh cpu-decode $(srcdir) $(cgendir) "$(CGENFLAGS)" \
 	m32r "with-scache" m32rbf m32r m32r m32rbf "m32r-" \
-	"desc.h cpu.h defs.h decode.h decode.cxx semantics.cxx"
+	"desc.h cpu.h decode.h decode.cxx semantics.cxx write.cxx defs.h"
+
+html_stylesheet=$(srcdir)/../../component_html.xsl
+include $(srcdir)/../../../config/Makefile.docs

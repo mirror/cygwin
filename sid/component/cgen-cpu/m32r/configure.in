@@ -12,5 +12,8 @@ AC_PROG_CXXCPP
 AC_EXEEXT
 AC_LANG_CPLUSPLUS
 
+dnl building docs
+RH_DOCBUILD_CHECK
+
 dnl Outputs
 AC_OUTPUT(Makefile)

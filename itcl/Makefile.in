@@ -28,7 +28,7 @@ all:
 		then true; else exit 1; fi \
 	done;
 
-test:
+test check:
 	for dir in $(subdirs) ; do \
 		if (echo "Making in $$dir"; cd $$dir && $(MAKE) $@); \
 		then true; else exit 1; fi \

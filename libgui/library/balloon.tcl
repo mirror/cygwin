@@ -74,10 +74,6 @@ itcl_class Balloon {
       %s _cancel
       %s _unshowballoon
     } $this $this]
-    bind $_top <3> [format {
-      %s _cancel
-      %s _unshowballoon
-    } $this $this]
 
     if {$tcl_platform(platform) == "windows"} then {
       set bg SystemInfoBackground

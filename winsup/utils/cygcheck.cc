@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 #include <ctype.h>
 #include <windows.h>
 #include "cygwin/include/sys/cygwin.h"
@@ -33,7 +33,7 @@ typedef __int64 longlong;
 
 void dump_setup (int, char **, bool);
 
-static const char version[] = "$Revision: 1.28 $";
+static const char version[] = "$Revision: 1.29 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",

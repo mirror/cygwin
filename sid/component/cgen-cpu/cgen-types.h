@@ -24,6 +24,9 @@ typedef sid::host_int_2 UHI;
 typedef sid::host_int_4 USI;
 typedef sid::host_int_8 UDI;
 
+typedef USI SF;
+typedef UDI DF;
+
 #define GETLODI(di) ((SI) (di))
 #define GETHIDI(di) ((SI) ((UDI) (di) >> 32))
 #define SETLODI(di, val) ((di) = (((di) & 0xffffffff00000000LL) | (val)))
@@ -41,7 +44,7 @@ typedef unsigned long IADDR;
 // Data addresses.
 typedef unsigned long ADDR;
 // Deprecated.
-typedef IADDR PCADDR;
+typedef IADDR PCADDR;  
 
 } // namespace cgen
 

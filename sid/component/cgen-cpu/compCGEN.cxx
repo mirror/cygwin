@@ -1,6 +1,6 @@
 // compCGEN.cxx - CPU components.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -13,6 +13,12 @@
 #include <functional>
 
 #include "cgen-cpu.h"
+
+extern "C" {
+#include "bfd.h"
+#include "dis-asm.h"
+#include "tracedis.h"
+}
 
 #if SIDTARGET_ARM
 #include "arm7f.h"
@@ -31,6 +37,7 @@ using namespace cgen;
 cgen_bi_endian_cpu::cgen_bi_endian_cpu ():
   trace_stream (cout)
 {
+  trace_count = 0;
   warnings_enabled = false;
   add_attribute ("enable-warnings?", & warnings_enabled, "setting");
   this->engine_type = ENGINE_UNKNOWN;
@@ -137,6 +144,86 @@ cgen_bi_endian_cpu::set_engine_type (const string& s)
   return component::ok;
 }
 
+
+// Disassembly support.
+
+void
+cgen::cgen_bi_endian_cpu::disassemble (PCADDR pc,
+  disassembler_ftype printfn,
+  enum bfd_flavour flavour,
+  enum bfd_architecture arch,
+  enum bfd_endian endian,
+  const char *name)
+{
+  cgen_disassemble((bfd_vma)pc, &this->info, this,
+                   & cgen_bi_endian_cpu::cgen_read_memory,
+                   & cgen_bi_endian_cpu::cgen_memory_error,
+                   & cgen_bi_endian_cpu::cgen_print_address,
+                   & cgen_bi_endian_cpu::cgen_symbol_at_address,
+                   printfn,
+                   flavour,
+                   arch,
+                   endian,
+		   name);
+}
+
+int
+cgen_bi_endian_cpu::cgen_read_memory(bfd_vma memaddr, bfd_byte *myaddr,
+		     unsigned int length,
+		     struct disassemble_info *info)
+{
+  cgen_bi_endian_cpu *thisp = static_cast<cgen_bi_endian_cpu *>(info->application_data);
+
+  switch (length) {
+#if 0 // XXX not sure if this has byte order dependancies or not
+  case 1:
+    *((host_int_1 *)myaddr) = thisp->read_insn_memory_1(0, memaddr);
+    break;
+  case 2:
+    *((host_int_2 *)myaddr) = thisp->read_insn_memory_2(0, memaddr);
+    break;
+  case 4:
+    *((host_int_4 *)myaddr) = thisp->read_insn_memory_4(0, memaddr);
+    break;
+  case 8:
+    *((host_int_8 *)myaddr) = thisp->read_insn_memory_8(0, memaddr);
+    break;
+#endif
+  default:
+    for (int i = 0; i < length; i++)
+      *(myaddr + i) = thisp->read_insn_memory_1(0, memaddr + i);
+  }
+  return 0;
+}
+
+void
+cgen_bi_endian_cpu::cgen_memory_error(int status, bfd_vma memaddr,
+		       struct disassemble_info *info)
+{
+  cgen_bi_endian_cpu *thisp = static_cast<cgen_bi_endian_cpu *>(info->application_data);
+
+  thisp->trace_stream 
+    << "memory_error: status " << status << " addr 0x" << hex << memaddr << dec << endl;
+}
+
+void
+cgen_bi_endian_cpu::cgen_print_address(bfd_vma addr, struct disassemble_info *info)
+{
+  cgen_bi_endian_cpu *thisp = static_cast<cgen_bi_endian_cpu *>(info->application_data);
+
+  thisp->trace_stream
+    << "0x" << hex << addr << dec;
+}
+
+int
+cgen_bi_endian_cpu::cgen_symbol_at_address(bfd_vma addr,
+					   struct disassemble_info * info)
+{
+  cerr << "cgen_bi_endian_cpu::symbol_at_address!?" << endl;
+  return 0;
+}
+
+
 // Tracing support.
 
 void
@@ -151,6 +238,14 @@ void
 cgen_bi_endian_cpu::end_trace ()
 {
   this->trace_stream << endl;
+}
+
+// Counter support
+
+void
+cgen_bi_endian_cpu::trace_counter (PCADDR pc)
+{
+  this->trace_stream << this->trace_count++ << "\t";
 }
 
 

@@ -1,5 +1,8 @@
-// -*- C++ -*-
-// Copyright (C) 2000 Red Hat
+// cgen-cpu.h  -*- C++ -*-
+
+// Copyright (C) 2000, 2001 Red Hat.
+// This file is part of SID and is licensed under the GPL.
+// See the file COPYING.SID for conditions for redistribution.
 
 #ifndef CGEN_CPU_H
 #define CGEN_CPU_H
@@ -19,6 +22,12 @@
 #include "cgen-types.h"
 #include "cgen-ops.h"
 #include "cgen-engine.h"
+
+#include "bfd.h"
+#include "dis-asm.h"
+
+// ansidecl.h interferes with this perfectly ordinary word
+#undef AND
 
 #include <vector>
 #include <string>
@@ -48,7 +57,7 @@ protected:
   virtual component::status set_engine_type (const string& s);
 
 public:
-  // true -> print execution warning messages
+  // true -> print execution warning messages and signal debugger
   // [what it is is at the programmer's whim]
   bool warnings_enabled;
 
@@ -58,6 +67,22 @@ public:
   // Cover fns to start/end insn tracing.
   void begin_trace (PCADDR pc, const char* insn_name);
   void end_trace ();
+  // Disassembly tracing support
+  void disassemble (PCADDR pc, disassembler_ftype printfn,
+		    enum bfd_flavour flavour, enum bfd_architecture arch,
+		    enum bfd_endian endian, const char *name);
+  struct disassemble_info info;
+protected:
+  static int cgen_read_memory (bfd_vma memaddr, bfd_byte *myaddr,
+		     unsigned int length,
+		     struct disassemble_info *info);
+  static void cgen_print_address(bfd_vma addr, struct disassemble_info *info);
+  static void cgen_memory_error(int status, bfd_vma memaddr,
+		       struct disassemble_info *info);
+  static int cgen_symbol_at_address(bfd_vma addr, struct disassemble_info * info);
+  // Counter tracing support
+  void trace_counter (PCADDR pc);
+  int trace_count;
 
 public:
   cgen_bi_endian_cpu ();
@@ -74,6 +99,11 @@ public:
   GETMEMUQI(PCADDR pc, ADDR addr) const
     {
       return this->read_data_memory_1 (pc, addr);
+    }
+  inline void
+  SETMEMBI(PCADDR pc, ADDR addr, BI value) const
+    {
+      return this->write_insn_memory_1 (pc, addr, value);
     }
   inline void
   SETMEMQI(PCADDR pc, ADDR addr, QI value) const
@@ -135,6 +165,37 @@ public:
     {
       return this->write_data_memory_8 (pc, addr, value);
     }
+  inline void
+  SETMEMUDI(PCADDR pc, ADDR addr, UDI value) const
+    {
+      return this->write_data_memory_8 (pc, addr, value);
+    }
+
+  // floats (can you think of a better way to do this?)
+  inline SF
+  GETMEMSF(PCADDR pc, IADDR addr) const
+    {
+      return reinterpret_cast<SF>(this->read_insn_memory_4 (pc, addr));
+    }
+  inline void
+  SETMEMSF(PCADDR pc, ADDR addr, SF value) const
+    {
+      return this->write_insn_memory_4 (pc, addr, reinterpret_cast<USI>(value));
+    }
+
+  inline DF
+  GETMEMDF(PCADDR pc, IADDR addr) const
+    {
+      return reinterpret_cast<DF>(this->read_insn_memory_8 (pc, addr));
+    }
+  inline void
+  SETMEMDF(PCADDR pc, ADDR addr, DF value) const
+    {
+      return this->write_insn_memory_8 (pc, addr, reinterpret_cast<UDI>(value));
+    }
+
+  // IMEM: instruction memory calls
+
   inline QI
   GETIMEMQI(PCADDR pc, IADDR addr) const
     {
@@ -215,6 +276,9 @@ public:
     {
       return this->write_insn_memory_8 (pc, addr, value);
     }
+
+
+
 };
 
 

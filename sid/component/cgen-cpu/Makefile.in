@@ -69,6 +69,7 @@ EXEEXT = @EXEEXT@
 GUILE = @GUILE@
 LD = @LD@
 LIBTOOL = @LIBTOOL@
+LINKS = @LINKS@
 LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -76,7 +77,9 @@ NM = @NM@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
+SABLOTRON = @SABLOTRON@
 VERSION = @VERSION@
+XSLTPROC = @XSLTPROC@
 cpu_incl = @cpu_incl@
 cpu_libs = @cpu_libs@
 cpu_subdirs = @cpu_subdirs@
@@ -86,13 +89,16 @@ sidtarget_m68k = @sidtarget_m68k@
 sidtarget_mips = @sidtarget_mips@
 sidtarget_ppc = @sidtarget_ppc@
 
+INTLLIBS = @INTLLIBS@
+
 AUTOMAKE_OPTIONS = foreign
 SUBDIRS = @cpu_subdirs@ .
 ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
 
 pkglib_LTLIBRARIES = libcgencpu.la
 
-INCLUDES = -I. -I.. @cpu_incl@ -I../../include -I$(srcdir)/../../include
+INCLUDESBFD = -I../../../bfd -I$(srcdir)/../../../include
+INCLUDES = -I. -I.. @cpu_incl@ -I../../include -I$(srcdir)/../../include $(INCLUDESBFD)
 
 CXXFLAGS = 
 TOP_CXXFLAGS = $(CXXFLAGS)
@@ -100,9 +106,13 @@ AM_CXXFLAGS = $(TOP_CXXFLAGS)
 AM_MAKEFLAGS = "TOP_CXXFLAGS=$(TOP_CXXFLAGS)"
 MAKEOVERRIDES = 
 
-libcgencpu_la_SOURCES = compCGEN.cxx 
+OPCODES = ../../../opcodes/libopcodes.la
+LIBIBERTY = -L../../../libiberty -liberty
+TRACEDIS = tracedis.c
+
+libcgencpu_la_SOURCES = compCGEN.cxx $(TRACEDIS)
 libcgencpu_la_LDFLAGS = -module -no-undefined
-libcgencpu_la_LIBADD = @cpu_libs@
+libcgencpu_la_LIBADD = @cpu_libs@ $(OPCODES) $(INTLLIBS) $(LIBIBERTY)
 libcgencpu_la_DEPENDENCIES = @cpu_libs@
 
 DEJAGNUTESTS = cpumonkey.exp dhrystone.exp
@@ -117,11 +127,16 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I.
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libcgencpu_la_OBJECTS =  compCGEN.lo
+libcgencpu_la_OBJECTS =  compCGEN.lo tracedis.lo
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@
+CFLAGS = @CFLAGS@
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 DIST_COMMON =  ./stamp-h.in CGEN.sh.in ChangeLog Makefile.am Makefile.in \
 aclocal.m4 config.in configure configure.in
 
@@ -130,7 +145,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/compCGEN.P
+DEP_FILES =  .deps/compCGEN.P .deps/tracedis.P
 SOURCES = $(libcgencpu_la_SOURCES)
 OBJECTS = $(libcgencpu_la_OBJECTS)
 
@@ -544,13 +559,13 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 check-local: all
 	-(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
 	for subdir in @cpu_subdirs@; do \
-		( cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) checkme ); \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) check); \
 	done
 
 .PHONY: cgen-all
 cgen-all:
 	for subdir in @cpu_subdirs@; do \
-		( cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) cgen-all ); \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) cgen-all); \
 	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

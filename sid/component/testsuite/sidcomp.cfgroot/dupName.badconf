@@ -1,0 +1,26 @@
+## This conf file contains new command with component names that are not unique
+
+
+# configuration logging
+set main verbose? 1
+
+# component libraries
+load libcgencpu.la cgen_component_library
+load libcgencpu.la cgen_component_library
+load libconsoles.la console_component_library
+load libgloss.la gloss_component_library
+load libinterrupt.la interrupt_component_library
+load libloader.la loader_component_library
+load libmapper.la mapper_component_library
+load libmemory.la mem_component_library
+load libmmu.la mmu_component_library
+load libsched.la sched_component_library
+load libtimers.la timer_component_library
+
+# Components
+
+new hw-cpu-arm7t cpu
+new hw-cpu-arm7t cpu			# same component, same name
+new sw-load-elf loader
+new sid-io-stdio stdio
+new sid-io-stdio loader			# different component, same name

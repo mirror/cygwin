@@ -1,0 +1,83 @@
+* Name
+  sid-io-stdio
+
+* Synopsis
+  This component performs input/output on the standard input/output. 
+
+  Pins: stdin stdout poll
+  Attributes: state-snapshot
+
+  Library: libconsoles.la
+  Symbol name: console_component_library
+
+* Functionality
+  - Modelling
+
+    This component acts as an interface between the host system's
+    stdio streams and pins in the simulated system.
+
+    This component uses non-blocking I/O on the host. It cannot use
+    blocking I/O because the entire simulation would block. As a
+    result, this component requires time slices from the simulator to
+    check for pending data that must be read from stdin.  To do this,
+    you can use a common scheduler component (sid-sched-*) to
+    efficiently yield time to the sid-io-stdio component.  However, you
+    should carefully consider the choice of the time interval to be
+    used by the scheduler.  We recommend approximately 10 times per
+    second.
+
+  - Behaviors
+
+    * Output
+
+    When the "stdout" input pin is driven with a value between 0 and
+    255, the value is immediately written to stdout.
+
+    * Input
+
+    When the "poll" pin is driven, the stdin stream is checked for
+    unread input, without blocking.  All available input is
+    consumed, and transmitted individually by driving the "stdin"
+    pin with each byte, in sequence.
+
+  - SID conventions
+    * This is a functional component.
+    * This component supports null state save/restore.
+
+* Environment
+  - Related components
+    You can connect a stdio console to a serial data transmission
+    component, such as a UART. You can also connect it to a 
+    ROM monitor/system call emulator, such as the sw-gloss-arm/angel 
+    which performs I/O across some sort of debug channel.
+    In order for a stdio console component to collect data from
+    standard input without blocking the entire simulation,
+    non-blocking I/O is used. It is necessary to give simulation time
+    to the component to collect any data from stdin and to buffer the data.
+    To do this, you can use the common scheduler component (see
+    Functionality, Modelling).
+    
+    The following is an example of how a stdio console might be 
+    configured to connect into a system:
+
+	new sid-sched-host sched
+	new sw-gloss-arm/angel angel
+	new sid-io-stdio stdio
+	set sched enabled? 1
+	set sched num-clients 1
+	set sched 0-regular? 1
+	set sched 0-time 50
+	connect-pin sched 0-event -> stdio poll
+	connect-pin angel debug-tx -> stdio stdout
+	connect-pin angel debug-rx <- stdio stdin
+
+* SID interface reference
+
+  - low level:
+    * pins
+      - poll | input | N/A | input
+      - stdin | output | any character code | input
+      - stdout | input | any character code | output
+
+    * attributes
+      - state-snapshot | | opaque string | n/a | state save/restore

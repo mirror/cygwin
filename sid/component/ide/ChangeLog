@@ -1,0 +1,340 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compIDE.cxx: Import more std:: identifiers.
+	(write_sector, read_sector): Use standard filebuf operations.
+
+2000-03-22  matthew green  <mrg@redhat.com>
+
+	* compIDE.cxx: Make struct drive public within this context
+	to appease newer GCC error checking.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-28  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (ide_controller_ctor_0): Hyphenate miscreant attributes.
+	* hw-disk-ide.txt: Match changes.
+
+1999-12-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (operator <<,>>): Save/restore num-heads and
+ 	num-sectors-per-track as 16-bit quantities.
+
+1999-12-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-disk-ide.txt: Reworked to better fit template.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-disk-ide.txt: New file.  Renamed fro
+	* README: Deleted.
+	* Makefile.am: Install new file.
+	* Makefile.in: Regenerated.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (compIdeDelete): Use dynamic_cast<>.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-10-14  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README:  Very minor docs fix.
+
+1999-10-10  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* compIDE.cxx (drive): Changed order of initialization.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (read, write): Take value, not const-ref.
+
+1999-10-07  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* compIDE.cxx (write): Remove try and catch blocks.
+	(read): Likewise.
+
+1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Update for bool/number notation changes.
+
+1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (*): Use host_int_X, not compiler_int_X.
+
+1999-09-08  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README:  Minor grammatical changes.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx: Import and use sidutil::std_error_string.
+	* Makefile.in: Regenerated.
+
+1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (operator >>): Use ANSI setstate() instead of setf().
+
+1999-08-16  Ian Carmichael  <iancarm@cygnus.com>
+
+	* compIDE.cxx: readByte and writeByte members renamed.
+
+1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
+
+	* compIDE.cxx: (*) Change big_int_N and little_int_N so that
+	the default operations all use their integer values.
+
+1999-08-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* idetest.conf.in: Removed.
+	* idetest.c: Likewise.
+	* idetest.s: Ditto.
+	* idetest.x: Same as above.
+
+1999-08-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (*:operator >>): Don't leave extraneous whitespace
+	at end of state snapshot string.
+
+1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* compIDE.cxx: Introduce proper namespace usage. 
+
+1999-07-25  Faisal Khoja  <fkhoja@cygnus.com>
+ 	
+	* compIDE.cxx: Introduced Exception Handlings
+	
+1999-07-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (*): Remove debugging output to cerr.
+
+1999-07-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (ide_hooking_register_bus): New class.
+	(ide_command_bank_bus): Renamed from "proxy_commandbus".
+	(read, write) Support big- and little-endian accesses.
+	(ide_controller): Use new hooking classes for buses.
+	(triggerpoint_manager): New member.
+	(pin_factory, pin_junkhard, post_access_hook): New functions.
+	Pass to triggerpoint manager.
+	(add_watchable_register): New function.
+	(ide_controller_ctor_0): Call it for all the control registers.
+	(drive): Use host_int values for state dumps variables.
+	
+	* README: Documented new attributes/watchables.
+	* Makefile.am (DEJAGNUTESTS): Add idetrigger.exp.
+	* Makefile.in: Regenerated.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): New macro.
+	(checkme): New target to run dejagnu on $DEJAGNUTESTS only.
+	* Makefile.in: Regenerated.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* testsuite: Removed directory.
+	* Makefile.am (SUBDIRS): Don't recurse into it.
+	* Makefile.in: Regenerated.
+	* acconfig.h: Removed.
+	* aclocal.m4: Ditto.
+	* config.in: Ditto.
+	* configure: Ditto.
+	* configure.in: Ditto.
+	* stamp-h.in: Ditto.
+
+1999-06-30  Permaine Cheung  <pcheung@cygnus.com>
+
+	* README: Fix typo.
+
+1999-06-25  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Rewrote using new component doc template.
+	* compIDE.cxx (drive): Use smaller integer types for attribute-accessed
+ 	configurable values.
+
+1999-06-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (ctor): Rename "driveN-present" -> "driveN-present?".
+	Make "driveN-file" a notifying attribute.
+	(drive): Include long-lived fstream* member.  Initialize file name
+	to "/dev/null".
+	(filename_changed): Close/open it.
+	(drive::operator >>): Call it.
+	(check_file_good): New function.
+	(write_sector): Use long-lived fstream*.
+	(read_sector): Use long-lived fstream*.
+	(command_set): Signal errors for attempted access to missing drives.
+	Detect misaddressed writes early.
+	(current_block_valid): Reject case of partial configuration.
+	
+	* configure.in: Look for strerror.
+	* configure: Regenerated.
+	* config.in: Regenerated.
+
+1999-06-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (identify_drive): New function.
+	(command_set): Call it for IDE command 0xEC.
+	(drive::fifo_*): New functions for synthesizing sector buffer.
+
+1999-06-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (ide_controller_ctor_0): New function.
+	(ide_controller ctor): Amputate body parts; put them into *_ctor_0.
+
+1999-06-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (ide_controller): Remove address type declaration
+ 	from word_bus template.
+
+1999-06-14  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* compIDE.cxx (write): changed the syntax for calling write 
+	function from file word_bus in order to compile on native NT.
+ 	(read): changed the syntax for calling read function for
+	same reason.  Fixed typo in write-vs-read function call.
+	  
+1999-06-11  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (proxy_commandbus): New class for handling weird
+	16-bit data register access.
+	(ide_controller): Use it instead of control_register_bus.
+	(ide_controller::drive ctor): New function.
+	(operator <<,>>): Reduce state snapshot size.  Encode
+	strings safely.
+	
+	* README: New skeleton file.
+	
+	* configure.in: Recurse into testsuite/.
+	* Makefile.am (SUBDIRS): Define.
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+
+1999-06-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (compIdeDelete): New function.
+	(ide_component_library): Register it.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (compIdeListTypes, compIdeCreate):
+	Renamed type "ide" -> "hw-disk-ide".
+	* idetest.conf.in: Updated with new component type names.
+
+1999-05-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (restore_state): Return sid::component::status.
+
+1999-05-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* aclocal.m4: Regenerated.
+
+1999-05-11  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx: Add usual state save/restore code.  Allay
+	minor warnings.
+
+1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (ide_component_library): DLLEXPORT it.
+	* configure.in: Be win32-dll-capable.
+	* configure: Regenerated.
+	* aclocal.m4: Regenerated for new libtool.
+	* Makefile.in: Ditto.
+
+	* idetest.conf.in: Use .la component DSO names.
+
+1999-05-01  Ron Unrau <runrau@cygnus.com>
+
+	* idetest.conf.in: don't specify wait states for memory
+
+1999-04-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (LDFLAGS): Add -no-undefined
+	* Makefile.in: Regenerated.
+
+	* compIDE.cxx (ide_controller ctor): Qualify member function
+	pointers.
+
+1999-04-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (interrupt): Change argument type.
+
+1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Use new AC_CONFIG_AUX_DIR.
+	* configure: Regenerated.
+	* Makefile.am: Build libtool -modules.
+	* Makefile.in: Regenerated.
+
+1999-03-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compGloss.cxx: Adapt to renamed COMPONENT_LIBRARY_MAGIC macro.
+
+1999-03-10  Ron Unrau  <runrau@cygnus.com>
+
+	* compIDE.cxx: incorporate revised pin API
+
+1999-03-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (class ide_controller): Remove unneeded virtual
+ 	inheritance.  Add relationship API stub.
+
+1999-03-01  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (data_port_set): Reset to idle state after
+	transfer done.
+	(data_port_get): Ditto.
+ 	(read_current_block): Ditto.
+	(command_set): Clear boot-time-only AMNF bit.
+ 	* idetest.conf.in: Added disk configuration attributes.
+
+1999-02-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx (ide_controller): Fix member/ctor ordering.
+	Fill in much missing code.
+	
+	* idetest.c: IDE target-domain test driver.
+	* idetest.conf.in: New file to run test.
+	* configure.in: Create idetest.conf in build tree.
+	
+	* configure: Rebuilt.
+	* Makefile.in: Rebuilt.
+
+1999-02-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compIDE.cxx: New file: IDE drive/controller skeleton.
+	* Makefile.am: New file.
+	* configure.in: New file.
+	* stamp-h.in: New blank file.
+	* acconfig.h: New file.
+	* config.in: Generated new file.
+	* aclocal.m4: Generated new file.
+	* Makefile.in: Generated new file.
+	* configure: Generated new file.
+

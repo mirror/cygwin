@@ -1,0 +1,304 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* HD44780U.h: Import more std:: identifiers.
+	* T6963C.cxx: Ditto.
+	* T6963C.h: Add more explicit namespace:: qualifiers.
+	* HD44780U.cxx (*): Use make_numeric_attribute, instead of
+	hex<<value<<dec idiom.
+
+2000-03-15  Permaine Cheung  <pcheung@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): Add lcd1val.exp and lcd1inv.exp.
+	* Makefile.in: Regenerated.
+
+2000-02-24  Ron Unrau  <runrau@redhat.com>
+
+	* hw-visual-lcd.txt: reformat Behavior and Reference sections 
+	  to follow documentation conventions
+     
+2000-02-08  Mary Lynn Kostash  <mkostash@redhat.com>
+
+	* hw-lcd-char-display.txt: Minor rewording. Fixed typo in
+	  Behavior section: "depth" attribute renamed "height".
+     
+2000-02-08  Ron Unrau  <runrau@redhat.com>
+
+	* T6963C.cxx (T6963C ctor): add "settings" configuration to attributes
+	* HD44780U.cxx (HD44780U ctor): ditto
+	* T6963C.h: make refresh_period host_int_4
+	* lcd-char-display.cxx: add trigger points to input pins
+	  - add settings classification to attributes.
+	  - make attributes host_int_2.
+	* hw-lcd-char-display.txt: update to reflect changes
+
+2000-02-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* T6963C.cxx (T6963C ctor): Initialize accessor value.
+
+2000-02-03  Ben Elliston  <bje@redhat.com>
+
+	* T6963C.cxx (T6963C::restore_state): Do not generate any pin or
+	bus traffic when restoring state.
+	(operator <<): Save frame and row/col pin states.
+	(operator >>): Restore them.
+
+	* HD44780U.cxx (HD44780U::restore_state): Do not generate any pin
+	or bus traffic when restoring state.
+	(operator <<): Save frame and row/col pin states.
+	(operator >>): Restore them.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-10  Ron Unrau  <runrau@cygnus.com>
+
+	* hw-visual-lcd.tk (attribute_names*): list attributes correctly
+	(set_pixel): no longer need to check for origin
+	(driven_h4): add local variable declarations
+	* T6963C.cxx: make output pins visible to TV
+	* HD44780U.cxx: ditto
+	* HD44780U.h: add verbose attribute
+	* hw-lcd-hd44780u.txt: reformat and refer to hw-visual-lcd
+	* hw-lcd-t6963c.txt: ditto
+
+2000-01-06  Mary Lynn Kostash
+
+	* hw-visual-lcd.txt: Reworded part of Modelling section.
+
+2000-01-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): Add lcdmonkey.exp.
+	* Makefile.in: Regenerated.
+
+2000-01-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-visual-lcd.tk: New file.  Renamed from lcd.tcl.  
+	(*): Removed lcd:: namespace use.
+	(driven_h4): Simplified.
+	(driven): Removed.
+	(attribute_names_in_category): New file.
+	* hw-visual-lcd.txt: New file.  Renamed from hw-lcd-tcl-display.txt.
+	* lcd.tcl, hw-lcd-tcl-display.txt: Removed.
+	* Makefile.am: Install new files.  Forget about old ones.
+	* Makefile.in: Regenerated.
+
+1999-12-22  Ron Unrau  <runrau@cygnus.com>
+
+	* T6963C.cxx (executeCommand): make mask symbolic
+	* lcd.tcl: correct old comments
+	* hw-lcd-hd44780u.txt: fix typos
+	* hw-lcd-t6963c.txt: new doc file
+	* hw-lcd-tcl-display.txt: new doc file
+	* hw-lcd-char-display.txt: new doc file
+	* Makefile.am: install .txt files
+	* Makefile.in: regenerated
+
+1999-12-19  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* T6963C.cxx (executeCommand): Fixed typo. ~0x0C instead of 0x03.
+
+1999-12-15  Ron Unrau  <runrau@cygnus.com>
+
+	* HD44780U.{h,cxx}: make the ac register unsigned
+	* hw-lcd-hd44780u.txt: new file
+
+1999-12-14  Ron Unrau  <runrau@cygnus.com>
+
+	* HD44780U.{h,cxx}: use component names to differentiate ROMs
+	* T6963C.{h,cxx}: sweeping changes to save/restore, component name, etc
+	* rom-t6963c.cxx: new ROM initialization file
+	* rom*.cxx: character set fixes and additions
+	* Makefile.am: build rom-t6963c.cxx
+	* Makefile.in: regenerated
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Ron Unrau  <runrau@cygnus.com>
+
+	* HD44780U.{h,cxx}: sweeping functionality changes
+	* rom-japan.cxx: new japanese characters file
+	* rom-europe.cxx: new european characters file
+	* rom-5X10.cxx: new 5X10 characters file
+	* rom.cxx: do not initialize the array to 0s here.
+	* Makefile.am: incorporate the new rom files
+	* Makefile.in: Regenerated.
+	* T6963C.cxx (reset): initialize rom explicitly
+	
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* HD44780U.cxx (HD44780U_Delete): Use dynamic_cast<>.
+	* T6963C.cxx (T6963C_Delete): Ditto.
+	* lcd-char-display.cxx (DevicesDelete): Ditto.
+	(init): Take unused host_int_4 argument.
+
+1999-11-17  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* HD44780U.cxx (operator >>): Cleanup.
+ 	(operator <<): Likewise.
+	* HD44780U.H: Removed extra decl of host_int_1 and host_int_4.
+	* T6963C.cxx (operator >>): Cleanup.
+	(operator <<): Likewise.
+	* lcd-char-display.cxx (operator >>): Removed.
+	(operator <<): Likewise.
+	(save_state): Added arbitrary return string.
+	(restore_state): Check for arbitrary string.
+
+1999-11-08  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): Define.
+	(checkme): New target.
+	* Makefile.in: Regenerate.
+
+1999-11-06  Ron Unrau  <runrau@cygnus.com>
+
+	* lcd.tcl: add a background-color attribute
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-10-08  Frank Ch. Eigler  <fche@toenail.to.cygnus.com>
+
+	* HD44780U.cxx (HD44780U_Delete): New function.
+	(hd44780u_component_library): Register it.
+	* T6963C.cxx (T6963C_Delete): New function.
+	(t6963c_component_library): Register it.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* HD44780U.cxx (busRead, busWrite): Take value, not const-ref.
+	* T6963C.cxx (busRead, busWrite): Same.
+	* lcd-char-display.cxx (set_pixel, new_frame): Same.
+	* HD44780U.h (*): Corresponding changes.
+	* T6963.h (*): Same.
+
+1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lcd.tcl: Don't unhexify pin driven values.
+
+1999-09-17 Faisal khoja  <fkhoja@cygnus.com>
+
+	* T6963C.h, T6963C.cxx (save_state): New method
+ 	(restore_state): Likewise
+	(operator <<): Likewise
+	(operator >>): Likewise
+
+1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* HD44780U.cxx (*): Use host_int_X, not compiler_int_X.
+	* HD44780U.h, T6963C.cxx T6963C.h: Ditto.
+	
+1999-09-09  Ron Unrau  <runrau@cygnus.com>
+
+	* lcd.tcl: (set_attr_value) remove puts
+
+1999-09-05  Ron Unrau  <runrau@cygnus.com>
+
+	* lcd.tcl: encapsulate in a namespace so it can be embedded in other
+	tcl components.
+
+1999-09-01  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* HD44780U.cxx (save_state): Clean up.
+	(operator >>): Likewise.
+	(operator <<): Likewise.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* HD44780U.cxx (operator >>): Use ANSI setstate() instead of setf().
+	Remove error messages.
+	* lcd-char-display.cxx (operator >>): Ditto.
+
+1999-08-17  Ron Unrau  <runrau@cygnus.com>
+
+	* HD44780U.cxx: busRead - adjust AC before reloading DR
+	  - execute: initialize DR after setting AC
+
+1999-08-17  Ron Unrau  <runrau@cygnus.com>
+
+	* T6963C.h T6963C.cxx: new files
+	* rom.cxx: added lots of new characters
+		- changed API so that it can be shared by both LCDs
+	* HD44780U.h: merged row and col pins to row_col pin
+		- removed data and init pins, added frame pin
+		- added start of scheduler support
+	* HD44780U.cxx: HD44780U::HD44780U - init new pins and scheduler
+		- Hd44780U::reset() - use new init_rom api
+		- HD44780U::refresh() - use frame and row_col pins
+	* lcd.tcl: merged row/col/data pins into row_col
+		- use frame pin for smoother refresh
+		- added height/width/bits-per-pixel attributes
+	* lcd-char-display.cxx: track changes in lcd.tcl
+	* Makefile.am: include new target
+	* Makefile.in: regenerated
+
+1999-08-16  Ian Carmichael  <iancarm@cygnus.com>
+
+	* lcd.tcl: sid::component members renamed.
+
+1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* HD44780U.h: Introduced proper namespace format. Add save/restore
+	functionality and streaming operators.
+	* HD44780U.cxx: Likewise.
+	* lcd-char-display.cxx: Likewise. Inherit from
+	fixed_attribute_map_component.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (SUBDIRS): Don't recurse into @subdirs@.
+	(liblcd_char_display_la_LIBADD): Add @lcd_libs@.
+	* Makefile.in: Regenerated.
+	* acconfig.h: Removed.
+	* aclocal.m4: Ditto.
+	* config.h.in: Ditto.
+	* configure: Ditto.
+	* configure.in: Ditto.
+
+1999-06-26  Ron Unrau <runrau@cygnus.com>
+
+	* lcd-char-display.cxx: include "config.h"
+
+1999-06-26  Ron Unrau <runrau@cygnus.com>
+
+	LCD controller HD44780U and 2 LCD "displays"
+
+	* HD44780U.h: new file
+	* HD44780U.cxx: new file
+	* rom.cxx: new file
+	* lcd-char-display.cxx: new file
+	* lcd.tcl: new file
+	* acconfig.h: new file
+	* aclocal.m4: new file
+	* configure.in: new file
+	* configure: generated with autoconf
+	* config.h.in: generated with autoheader
+	* Makefile.am: new file
+	* Makefile.in: generated with automake

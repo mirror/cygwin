@@ -1,0 +1,8 @@
+# Run a monkey test on the components in this component library. 
+
+if {! $sidtarget(arm)} then { untested "hw-timer-arm/ref-* not available"; return }
+
+load_lib "monkey.exp"
+
+monkey_test hw-timer-arm/ref-nosched timer_component_library libtimers.la
+monkey_test hw-timer-arm/ref-sched timer_component_library libtimers.la

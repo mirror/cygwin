@@ -1,0 +1,51 @@
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Removed AC_PROG_PATH(AR, ar).
+	* configure: Regenerated.
+	* aclocal.m4: Ditto.
+	* Makefile.in: Ditto.
+
+2000-09-22  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: REgenerated.
+
+2000-05-22  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.in: Regenerate.
+
+2000-03-25  Ben Elliston  <bje@redhat.com>
+
+	* configure.in (AC_CONFIG_SUBDIRS): Drop arbitary_components.
+	* configure: Regenerate.
+
+2000-03-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (clean-local): Disable due to infinite recursion.
+	* Makefile.in: Regenerated.
+
+2000-02-17  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (all-local): Suppress command line.
+	* Makefile.in: Regenerate.
+
+2000-02-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (SUBDIRS): Make empty.
+	(all-demos, clean-demos): New targets.
+	(all-local): Give a helpful message.
+	(clean-local): Call clean-demos.
+	* Makefile.in: Regenerated.
+	* stamp-h.in: Regenerated.
+
+1999-11-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.am: New File
+	* configure.in: Likewise
+	* config.in: Likewise
+	* acconfig.h Likewise
+	* aclocal.m4: Generated
+	* configure: Likewise
+	* stamp-h.in: Likewise
+	* Makefile.in: Likewise
+
+	

@@ -1,0 +1,58 @@
+# Testsuite for the standard I/O console.
+#
+# Copyright (C) 1999 Red Hat
+
+set test "sid configuration"
+sid_config_component_etc_test_with_tracing "stdio2.conf" \
+    "load [sid_find_file libconsoles.la] console_component_library" \
+    "sid-io-stdio" \
+    "connect-pin main perform-activity -> wrapper poll"
+pass $test
+
+set test "sid start"
+if {[sid_start "stdio2.conf"]} { pass $test } else { fail $test ; return }
+
+set test "check attribute list"
+sid_assert_includes_all "sid::component::attribute_names $victim" "state-snapshot"
+
+set test "check attribute pin list"
+set category "pin"
+set pattr [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if { $pattr == "" } then { pass $test } else { fail $test }
+
+set test "check attribute register list"
+set category "register"
+set rattr [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if { $rattr == "" } then { pass $test } else { fail $test }
+
+set test "check attribute setting list"
+set category "setting"
+set sattr [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if { $sattr == "" } then { pass $test } else { fail $test }
+
+set test "check attribute watchable list"
+set category "watchable"
+set wattr [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if { $wattr == "" } then { pass $test } else { fail $test }
+
+set test "check pin names"
+sid_assert_includes_all "sid::component::pin_names $victim" {stdin stdout poll}
+
+set test "check bus names"
+set bus [sid_cmd "sid::component::bus_names $victim"]
+if { $bus == "" } then { pass $test } else { fail $test }
+
+set test "check accessor names"
+set acc [sid_cmd "sid::component::accessor_names $victim"]
+if { $acc == "" } then { pass $test } else { fail $test }
+
+set test "check relationship names"
+set rel [sid_cmd "sid::component::relationship_names $victim"]
+if { $rel == "" } then { pass $test } else { fail $test }
+
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "stdio2.conf" }

@@ -1,0 +1,87 @@
+set test "sid configuration"
+sid_config_component_test_with_tracing "lcd2.conf" \
+    "load [sid_find_file liblcd-char-display.la] lcd_char_display_component_library" \
+    "hw-lcd-char-display"
+pass $test
+
+set test "sid startup"
+if [sid_start "lcd2.conf"] then { pass $test } else { fail $test ; return }
+
+foreach badvalue {10000000000000000 xyz FALSE 1.234e-10} {
+  foreach name {width height} {
+     set test "set width to $badvalue"
+     set status [sid_cmd "sid::component::set_attribute_value $victim $name $badvalue"]
+     set value1 [sid_cmd "sid::component::attribute_value $victim width"]
+     set value2 [sid_cmd "sid::component::attribute_value $victim height"]
+     if {$status == "bad_value" && $value1 == "80" && $value2 == "24"} { pass $test } else { fail "$test -- got $status, $value1, $value2" }
+  }
+}
+
+foreach name {width height} {
+    set test "set $name to -1"
+    set status [sid_cmd "sid::component::set_attribute_value $victim $name -1"]
+    set result [sid_cmd "sid::component::attribute_value $victim $name"]
+    if {$status == "ok" && $result == "65535"} { pass $test } else { fail "$test -- got $status, $result" }
+}
+
+foreach name {width height} {
+    set test "set $name to 0"
+    set status [sid_cmd "sid::component::set_attribute_value $victim $name 0"]
+    set result [sid_cmd "sid::component::attribute_value $victim $name"]
+    if {$status == "ok" && $result == "0"} { pass $test } else { fail "$test -- got $status, $result" }
+}
+
+set test "query incorrect attributes name"
+set value [sid_cmd "sid::component::attribute_value $victim seqattr"]
+if {$value == ""} then { pass $test } else { fail $test }
+
+set test "set attributes values to non existing attribute"
+set status [sid_cmd "sid::component::set_attribute_value $victim attr 112"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "find pin that does not exist"
+set pin [sid_cmd "sid::component::find_pin $victim newpin"]
+if {$pin == ""} then { pass $test } else { fail $test }
+
+set test "connect pin that does not exist"
+set pin [sid_cmd "sid::pin::new"]
+set status [sid_cmd "sid::component::connect_pin $victim newpin2 $pin"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "disconnect pin that does not exist"
+set pin [sid_cmd "sid::pin::new"]
+set status [sid_cmd "sid::component::disconnect_pin $victim output--0 $pin"]
+if {$status == "not_found" } then { pass $test } else { fail $test }
+
+set test "check connected pins that does not exist"
+set pins [sid_cmd "sid::component::connected_pins $victim notexist"]
+if {$pins == ""} then { pass $test } else { fail $test }
+
+set test "connect accessor that does not exist"
+set bus [sid_cmd "sid::bus::new"]
+set status [sid_cmd "sid::component::connect_accessor $victim accessor $bus"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "find bus that does not exist"
+set bus [sid_cmd "sid::component::find_bus $victim anybus"]
+if {$bus == ""} then { pass $test } else { fail $test }
+
+set test "find connected bus that does not exist"
+set bus [sid_cmd "sid::component::connected_bus $victim anybus"]
+if {$bus == ""} then { pass $test } else { fail $test }
+
+set test "set relationships that does not exist"
+set status [sid_cmd "sid::component::relate $victim relationship $victim"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "query relationships that does not exist"
+set comps [sid_cmd "sid::component::related_components $victim relation2"]
+if {$comps == ""} then { pass $test } else { fail $test }
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "lcd2.conf" }

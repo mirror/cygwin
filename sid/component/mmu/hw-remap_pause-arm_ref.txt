@@ -1,0 +1,166 @@
+* Name
+  hw-remap/pause-arm/ref
+
+* Synopsis
+  The remap and pause controller, present on the ARM PID7T board, 
+  handles four rather independent functions:
+
+        * Identification
+        * Remapping of memory (such that, for instance, a power-on
+          reset of the board will cause a ROM to be mapped to address 0)
+        * Pausing the CPU until an interrupt occurs.
+        * Checking for reset status ("was the board just reset?")
+
+  Pins: reset halt!
+  Buses: access-port registers
+  Attributes: remapping? num-relocations N-start N-end N-reloc-to
+  Accessors: all
+
+  Library: libmmu.la
+  Symbol name: mmu_component_library
+
+* Functionality
+  - Modelling
+    * The controller has a variety of functions, most of
+      which are trivial to simulate.  A minimal implementation is
+      provided for controller identification.  The most complex aspect
+      of this component is how remapping is handled.  During boot-up,
+      the controller uses a "reset map" that maps a range of
+      addresses to some other location (typically address 0).  At some
+      point, the target program will write to one of the controller's
+      registers, causing it to switch to a "normal map", in which case
+      no address translation occurs.  
+
+      In order for the mapping to occur, this controller must be
+      placed between the CPU and other components, such as peripherals
+      and the main memory.  This additional level of indirection for
+      bus traffic (particularly between a CPU and memory) may
+      introduce performance penalties.  This controller should be used 
+      only when necessary.  Even then, it is possible to route bus
+      traffic around this component if the remapping facility is not
+      required.
+
+  - Behaviors
+
+    * Register access
+         
+        The "registers" bus provides read/write access to the internal
+        registers of the remap/pause controller.  The memory map of
+        the register set is shown below.  More detail about each of
+        these registers can be found in the ARM documentation (see
+        ``References'').
+
+                address         read            write
+                0               (reserved)      pause
+                + 0x10          identification  (reserved)
+                + 0x20          (reserved)      clear reset map
+                + 0x30          reset status    reset status set
+                + 0x34          (reserved)      reset status clear
+
+    * Resetting
+
+        If the "reset" pin is driven with a non-zero value, the reset
+        status is updated within the component such that interrogating
+        the controller's reset status will indicate that a power on
+        reset has occurred.
+
+    * Halting
+
+        The "halt!" pin may be connected to a component such as an ARM
+        CPU which knows to halt instruction processing when the pin is
+        driven with a non-zero value.  This pin will be driven when
+        the pause register is written to.
+
+    * Remapping
+
+        This "access-port" bus provides upstream access the remapper
+        function in this component.  Reads/writes to this bus are
+        translated (if appropriate) and passed onto the second bus,
+        as set by the "all" accessor.
+
+    * Remapping setup
+
+        The "remapping?" attribute specifies which memory map will be
+        used.  It is anticipated that this attribute will be used at
+        the start of a simulation session to provide the equivalent of
+        a jumper for enabling the reset or the normal memory map at
+        power-up.  If the attribute is set to `yes', then any
+        relocations that have been defined will apply. As usual,
+        writing to the `clear reset map' register will cause the
+        normal map to be used.
+
+        Please note that the polarity of the "remapping?" flag is
+        opposite to some ARM documentation.  ARM refers to a "Normal
+        (Remapped)" condition on the PID7T board when the customary
+        sid mapping is disabled, and "Reset" mapping condition when
+        the customary sid mapping is enabled.  This is just a
+        terminology and sid configuration policy issue.
+
+        The "num-relocations" attribute specifies how many relocations
+        are to be defined via the numeric N- attributes (see below).
+        This serves little purpose other than to dynamically generate
+        the N- attributes necessary for defining the relocations.
+        Note: this attribute may only be set once.
+
+        The "N-start" family of attributes specify the starting
+        addresses of a memory regions that are to be relocated to a
+        different location.  If there are three available relocations
+        (due to setting "num-relocations" to 3), then there will be
+        three sets of attributes, prefixed by 0-, 1-, and 2-.  The
+        first starting address attribute is 0-start.
+
+        The "N-end" family of attributes specify the end of the memory
+        regions that are to be relocated to a different location.
+        Usually, this is:
+                (base + limit) - 1
+        That is, the address given to the N-start and N-end attributes
+        are all inclusive.
+
+        The "N-reloc-to" family of attributes specify the addresses to
+        which region N will be relocated.
+
+  - SID conventions
+    * This is a functional component.
+    * It supports state save/restore.
+    * It provides a single attribute-based triggerpoint, "remapping?".
+
+* Environment
+  - Related components
+    * This component usually sits between a CPU and the remaining
+      components of a complete system (in order to handle the
+      remapping discussed above).  Thus, the CPU's data and
+      instruction memory accesses are routed through this component.
+      This component would then be connected to the traditional mapper
+      component which will redirect bus traffic based on the target
+      address.
+
+    * A configuration file fragment illustrating this idea appears
+      below:
+
+        new hw-remap/pause-arm/ref remapper
+        new hw-mapper-basic bus
+        new hw-cpu-arm7t cpu
+        connect-bus cpu insn-memory remapper access-port
+        connect-bus cpu data-memory remapper access-port
+        connect-bus remapper all bus access-port
+
+* SID interface reference
+  - low level:
+    * pins
+      - reset | input | 0 or non-zero | resetting
+      - halt! | output | 0 or non-zero | halting
+    * buses
+      - access-port | all addresses | any | remapping
+      - registers | 0x0 to 0x37 | read/write words | register access
+    * accessors
+      - all | any bus operation | remapping
+    * attributes
+      - remapping? | setting | boolean string | true | remapping, remapping setup
+      - num-relocations | | numeric string | 0 | remapping setup
+      - N-start | setting | numeric string | n/a | remapping setup
+      - N-end | setting | numeric string | n/a | remapping setup
+      - N-reloc-to | setting | numeric string | n/a | remapping setup
+
+* References
+  More details about this controller can be found on the web at
+  <http://www.arm.com/Documentation/UserMans/rps/#rp>.

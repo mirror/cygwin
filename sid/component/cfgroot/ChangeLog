@@ -1,0 +1,645 @@
+2000-11-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compConfig.cxx (register_dso): Tolerate libtool's mangling of
+	preloaded ".la" archives to ".a" suffix.
+
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Removed AC_PROG_PATH(AR, ar).
+	* configure: Regenerated.
+	* aclocal.m4: Ditto.
+	* Makefile.in: Ditto.
+	* libltdl/configure: Ditto.
+	* libltdl/aclocal.m4: Ditto.
+	* libltdl/Makefile.in: Ditto.
+
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libltdl/ltdl.c [_WIN32]: Added check for not __CYGWIN__ since
+        wll logic should not be used on Cygwin.
+        [HAVE_LIBDL]: Removed check for not __CYGWIN__.
+        (sys_wll_open): Added fix so NULL filename would not be input
+        to string functions.
+
+2000-11-14  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compConfig.cxx (cfgroot ctor): Call LTDL_SET_PRELOADED_SYMBOLS.
+
+2000-09-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in, libltdl/Makefile.in: Regenerated.
+
+2000-07-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compConfig.cxx (register_dso): Remove special handling of "-static-"
+	dso file name.  Instead, always look in the running executable if the
+	dso file name is not found.
+	* sid-control-cfgroot.txt: Document this.
+	* Makefile.in: Regenerated to record new config/* dependencies.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compConfig.cxx: Import more std:: identifiers.
+	* libltdl/Makefile.in, libltdl/aclocal.m4: Regenerated.
+
+2000-05-23  Jeff Johnston  <jjohnstn@cygnus.com>
+
+        * Makefile.in: Regenerated.
+        * libltdl/Makefile.in: Ditto.
+        * libltdl/aclocal.m4: Ditto.
+
+2000-05-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* libltdl/Makefile.am (ACLOCAL_AMFLAGS): Specify.
+	* libltdl/Makefile.in: Regenerated.
+
+2000-05-23  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.in: Regenerate.
+	* libltdl/Makefile.in: Ditto.
+
+2000-04-20  Frank Ch. Eigler  <fche@redhat.com>
+
+	* libltdl/Makefile.am: Imported from libtool snapshot.
+	* libltdl/ltdl.c: Ditto.
+	* libltdl/ltdl.h: Ditto.
+	* libltdl/configure.in: Ditto.
+	* libltdl/Makefile.in, aclocal.m4, config.h.in, configure: Regenerated.
+
+2000-04-18  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compConfig.cxx (consume_token): Use isascii(), not isgraph(), for
+	more consistent detection of naughty characters.
+
+2000-03-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* libltdl/Makefile.in: Regenerated.
+
+2000-02-17  Mary Lynn Kostash  <mkostash@redhat.com>
+
+	* sid-control-cfgroot.txt: Changes as per bje's review comments.
+
+2000-02-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compConfig.cxx (cfgroot dtor): Print deletion messages if verbose_p.
+	(instantiate_component): Maintain creator_map by name, not component*.
+
+2000-01-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (configure_line): Append "\n" to incoming line.
+
+2000-01-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (parse_command): Detect EOF directly, not from
+	emptiness of parse tokens.
+
+2000-01-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component): Inherit from
+ 	recursion_limited.  Add "activity_count" member.
+	(cfgroot_component ctor): Export "activity-count" r/o attribute.
+	(run): Prevent harmful recursion.
+	* sid-control-cfgroot.txt: Document new attribute and recursion
+	detection.
+
+2000-01-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component ctor): Initialize running flag.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component ctor): Convert $SID_EXEC_PREFIX
+	to POSIX form if running on cygwin.
+	* configure.in: Look for cygwin conversion function.
+	* config.in, configure: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (configure): Print shorter error message if config
+	file could not be opened.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (parse_command): Factor error handling.
+	Remove deprecated "dso" command.
+
+2000-01-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (inform_component_catalog_informees): Optionally
+	restrict broadcast to a single focus component.
+	(instantiate_component): Send a focused broadcast if already running.
+
+2000-01-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component): Add config_file_history member.
+	(configure, configure_line): Update it.
+	(cfgroot_component ctor): Export it as "config-file-history".
+	(instantiate-component): Use "auto-print" as category name instead of
+ 	"autoprint".
+	* sid-control-cfgroot.txt: Document new attribute and auto-print
+	rename.  Mention "unrelate" command.
+
+1999-12-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Don't look redundantly for libstdc++.
+	* configure, config.in: Regenerated.
+
+1999-12-28  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (last_config_file_name): Removed function.
+	(nothing): New exciting function.
+	(configure): Save/restore config-file etc. for nested calls.
+	Remove one useless error message.
+	(configure_line): Ditto.  Evaluate one command.
+	(autoprint_p): New setting.
+	(instantiate_component): Use it.
+	(cfgroot_component ctor): Initialize various bool settings.
+	Register "config-line!" virtual attribute.  Remove "config-file"
+	attribute.
+	* sid-control-cfgroot.txt: Document changes.
+
+1999-12-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (unset_relation): New function.
+	(parse_command): Call it for "unrelate" command.
+	(*): Remove superfluous "sid::" namespace prefix throughout.
+	(*): Make error and verbose? message forms consistent.
+	Uniformize sid::component::status error dispatching logic.
+
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sid-control-cfgroot.txt: New file, renamed from:
+	* README: Gone.
+	* Makefile.am: Install it.
+	* Makefile.in: Regenerated.
+
+1999-11-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component ctor): Set libltdl search path to
+	$SID_LIBRARY_PATH and ($SID_EXEC_PREFIX xor --exec-prefix).
+	* README: Document SID_LIBRARY_PATH & SID_EXEC_PREFIX.
+	* Makefile.am (AM_CXXFLAGS): Define SID_EXEC_PREFIX.
+	* Makefile.in: Regenerated.
+	* libltdl/ltdl.c: Updated from libtool snapshot to fix str*chr bugs.
+	* libltdl/ltdl.h: Ditto.
+
+1999-12-01  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (AM_CXXFLAGS): Define.
+	(CXXFLAGS): Remove.
+	* Makefile.in: Regenerate.
+
+1999-11-30  Ben Elliston  <bje@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component ctor): Call lt_dlinit(). Call
+	lt_dlsetsearchpath() to establish a default search path.
+	(cfgroot_component dtor): Call lt_dlexit().
+	* Makefile.am (CXXFLAGS): Define.
+	* Makefile.in: Regenerate.
+	* README (load-cmd): Update.
+
+	* compConfig.cxx (cfgroot_component::parse_command): Handle new
+	"disconnect-pin" and "disconnect-bus" configuration keywords.
+	(cfgroot_component::disconnect_pin): New method.
+	(cfgroot_component::disconnect_bus): Likewise.
+
+	* README (cfg-line): Update BNF grammar.
+	(disconnect-pin-cmd): New production.
+	(disconnect-bus-cmd): Likewise.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.h: Removed.  Moved contents into compConfig.cxx.
+	* compConfig.cxx (consume_token): Emit better invalid character
+	warnings.
+	(register_dso): Simplify error message printing.
+	(cfgroot_component ctor): Remove deprecated pins & attributes.
+	Use ordinary multi-relation for "component-catalog-informees".
+	(stop, run): Take unused host_int_4 argument.
+	(relationships, related_components, set_related_components): Gone.
+	(compConfigDelete): Use dynamic_cast<>.
+	(parse_command): Parse modified "relate" command.
+	(set_relation): Perform modified "relate" command.
+	* README: Update definition of "relate" command.
+
+1999-11-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (connect_pin): Clarify input-vs-output pin
+	error messages.  Detect duplicate connection errors.
+
+1999-11-10  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in (enable-timebomb): New option.  Look for ctime and
+	header.
+	* configure: Regenerated.
+	* config.in: Regenerated.
+	* compConfig.cxx (run): Notify user of license expiry.
+
+1999-11-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component ctor): Define new "config-file" 
+	attribute.
+	* README: Document it.
+
+1999-11-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component ctor): Don't export "config-file!"
+	attribute to target view.
+
+1999-10-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (parse_command): Accept "load" as an alias of the
+	"dso" command.
+	* README: Document "load", deprecate "dso".
+
+1999-10-20  Ben Elliston  <bje@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component::consume_token): Emit an error
+	message for unterminated string literals. Fix for CR 101404.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+
+1999-10-19  Ben Elliston  <bje@cygnus.com>
+
+	* compConfig.h (cfgroot_component::emit_error): New method.
+	* compConfig.cxx (cfgroot_component::emit_error): Implement.
+	(cfgroot_component::*): Use it.
+	(cfgroot_component::parse_command): Emit errors when EOF is
+	encountered unexpectedly. 
+	(cfgroot_component::parse_command): Test for valid arrow
+	operators. Fix for CR 101408.
+	(cfgroot_component::consume_token): Discard non-printable
+	characters in non-string literals.
+
+	* Makefile.am (DEJAGNUTESTS): Define.
+	(checkme): New target.
+	* Makefile.in: Regenerate.
+
+	* compConfig.cxx (cfgroot_component::configure): Lines are
+	numbered from 1, not 0. Fix for CR 101403.
+	(cfgroot_component ctor): Likewise.
+	(cfgroot_component::consume_token): Handle newlines correctly.
+
+1999-10-14  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README: Minor doc fixes.
+
+1999-10-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (parse_command): Detect EOF while looking for
+	relate "-" terminator.
+	(*): Change while (1) -> while (true).
+
+1999-10-08  Frank Ch. Eigler  <fche@toenail.to.cygnus.com>
+
+	* compConfig.cxx (register_dso): Check that component library
+	supplies all three factory functions.  Later, assert 
+	list_component_types hook.
+	(instantiate_component): Assert create_component hook.
+	(cfgroot_component dtor): Assert delete_component hook.
+
+1999-10-07  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* compConfig.h: Removed try and catch. Some Indenting too
+	* compConfig.cxx: Likewise
+
+1999-09-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.h (crash): New member if !NDEBUG.  Call abort().
+	* compConfig.cxx (cfgroot_component ctor): Add **crash-sid-now**
+	setting attribute if !NDEBUG.  Call crash() on write.
+
+1999-09-25  Doug Evans  <devans@casey.cygnus.com>
+
+	* (cfgroot_component::set_attribute): Distinguish "bad value" vs
+	"not found" failures.
+
+1999-09-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Added template-compliant content.
+
+1999-09-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): Define.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Regenerated.
+	* configure: Regenerated.
+
+1999-08-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (connect_pin): Don't call find_pin on originating
+	component of a pin connection.  Report connect_pin results instead.
+
+1999-08-28  Ben Elliston  <bje@cygnus.com>
+
+	* compConfig.h (cfgroot_component::line_num): New member.
+	* compConfig.cxx (cfgroot_component::consume_token): Count newlines.
+	(cfgroot_component ctor): Initialise line_num.
+	(cfgroot_component::configure): Reset line_num.
+	(*): Issue error messages prefixed by filename and line number (CR
+	100941).
+
+	* compConfig.cxx (cfgroot_component::connect_pin): Give more
+	helpful error diagnostics when pins do not exist (CR 100942).
+	(cfgroot_component::next_token): Remove extraneous debug output.
+	* compConfig.h (cfgroot_component): Namespace shortcut.
+
+1999-08-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (run): Set "running" state flag before "starting"
+	pin is driven.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (configure): Use sidutil::std_error_string.
+	* compConfig.h: Import it.
+	* configure.in: Don't look for strerror.
+	* configure: Regenerated.
+	* config.in: Regenerated.
+ 
+1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (operator >>): Use ANSI setstate() instead of setf().
+
+1999-08-16  Ian Carmichael  <iancarm@cygnus.com>
+
+	* README: sid::component members renamed.
+	* compConfig.cxx: sid::component members renamed.
+	* compConfig.h: sid::component members renamed.
+
+1999-08-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.h (persistent_p): New member.
+	* compConfig.cxx (cfgroot_component ctor): Expose it as "persistent?".
+	(run): While persistent_p, loop in starting/running/stopping.
+	(operator <<, >>): Save/restore persistent_p.
+
+1999-08-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component ctor): Renamed pins:
+	"running"->"starting", "shutdown-status"->"stop!", added new pin
+	"stopping".  Maintain backward compatibility temporarily.
+	(stop): New function, callback for "stop!" pin.
+	(run): Signal simulation lifecycle using new pins.
+	* compConfig.h: Matching changes.
+	* README: Matching changes.
+
+1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* compConfig.h: Introduced proper namespace usage and exception
+	handlers.
+	* compConfig.cxx: Likewise.
+
+1999-07-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component ctor): Add more attributes
+	visible to the target view.
+
+1999-07-28  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* libltdl/configure.in (NEED_USCORE): Don't need for solaris hosts.
+	* libltdl/configure: Regenerated.
+
+1999-07-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component ctor): Remove "gdb-cpu" and
+ 	"gloss" pseudo-relations.  Update new component_type_map member.
+	(resume): Removed.
+	(instantiate_component): Track component type names.
+	(listRelationships): Support only selected fixed relations.
+	(setRelatedComponents): Ditto.
+	(getRelatedComponents): Ditto.
+	(inform_catalog_map_informees): New function.  Inform external
+ 	components about component catalog.
+	(run): Call it.
+	* compConfig.h (cfgroot_component): Match declarations to changes.
+
+1999-06-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in (AC_DISABLE_SHARED): By default, disable shared build. 
+	(AC_LIBTOOL_WIN32_DLL): Remove temptation.
+	* libltdl/configure.in: Ditto.
+	* configure: Regenerated.
+	* libltdl/configure: Ditto.
+
+1999-06-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (register_dso): Print better message on
+	component_library DSO magic value mismatch.
+
+1999-06-11  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (operator <<,>>): Encode strings safely.
+
+1999-06-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.h (component_creator_map): New member in cfgroot.
+	* compConfig.cxx (instantiate_component): Remember components I
+	created.
+	(dtor): Use component_library::deleteComponent to delete them.
+	(compConfigDelete): New function.
+	(config_component_library): Register it.
+
+1999-06-09  Ian Carmichael  <iancarm@cygnus.com>
+
+	Remove mutable members.
+	* compConfig.h: Remove "mutable" from all maps.
+	* compConfig.cxx: (cfgroot_component::listRelationships, 
+	  getRelatedComponents): Fix const problems.  Replace uses of 
+	  iterator with const_interator.  Change map["abc"] to 
+          map.find("abc")->second.
+
+	Add destructor which deletes allocated components.
+	* compConfig.h: (cfgroot_component) Add destructor.
+	* compConfig.cxx: (cfgroot_component::~cfgroot_component):  New.  Delete
+	  created components.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (compConfigListTypes, compConfigCreate):
+	Renamed type "cfgroot" -> "sid-control-cfgroot".
+
+1999-06-07  Doug Evans  <devans@casey.cygnus.com>
+
+	* libltdl/configure.in (dlerror): Fix typo in dlopen found in -ldl
+	test.
+
+1999-06-06  Ron Unrau  <runrau@cygnus.com>
+
+	* compConfig.h: add a relation_map for gdb relations.
+	  Delete method cpu() declaration.
+	* compConfig.cxx (cfgroot_component): initialize "gdb-cpu" and "gloss"
+	   relations.
+	  (setRelatedComponents): set uni-relations
+	  (getRelatedComponents): get uni-relations
+	  (cpu): deleted
+
+1999-05-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (configure): Produce nonempty error message
+	without strerror().
+
+1999-05-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* libltdl/configure.in (NEED_USCORE): Change this buggy test
+	to a simple host-dependent switch.
+	* libltdl/configure: Regenerated.
+	* libltdl/config.h.in: Regenerated.
+
+1999-05-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (parse): Take istream& argument.
+	(ctor): Add back "config-file!" attribute.
+	Rename "<<run>>" pin to "run!".
+	(last_config_file_name): New function.
+	(configure): Return sid::component::status value.
+	(run): Do nothing on empty component list. 	
+	* compConfig.h (config_component): Matching declaration changes.
+	Make configure() protected:.
+	(restore_state): Return sid::component::status.
+	
+1999-05-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.h (setRelatedComponents): Declare return type.
+	* compConfig.cxx (setRelatedComponents): Return "not_found".
+	(set_relation): Check success of setRelatedComponents
+	call. 
+
+1999-05-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* aclocal.m4: Regenerated.
+	* libltdl/acinclude.m4: Fixed AC_DISABLE_FAST_INSTALL typo.
+	* libltdl/aclocal.m4: Regenerated.
+
+1999-05-13  Ron Unrau  <runrau@cygnus.com>
+
+	* compConfig.h: new file - break out root definition from impl
+	* compConfig.cxx - use API to configure instead of pins
+
+1999-05-11  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component): Add usual state save/restore.
+
+1999-05-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* libltdl/*: New files.  Imported libtool 1.3's libltdl (with mods).
+	* configure.in: Build libltdl as a convenience library.  Assume it
+	is present.
+	* Makefile.am (INCLUDES): Look there for headers.
+	(SUBDIRS): Build it.
+	(LIBADD): Link to it.
+	* compConfig.cxx: Assume libltdl is available.
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+	* config.in: Regenerated.
+
+1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx: (register_dso) Use libltdl as OS-independent .la
+ 	loader.  Be more verbose.
+	(register_la): Removed.
+	(parse_command): Call only register_dso.
+	(ctor): Add "verbose?" attribute alias.
+	
+	(config_component_library): DLLEXPORT it.
+	* configure.in: Look for libltdl.  Be win32-dll-capable.
+	* configure: Regenerated.
+	* config.in: Ditto.
+	* aclocal.m4: Regenerated for new libtool.
+	* Makefile.in: Ditto.
+
+1999-05-01  Ron Unrau <runrau@cygnus.com>
+
+	* compConfig.cxx (connect_bus): setAccessor can now differentiate
+	  between not_found and bad_value
+
+1999-04-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (LDFLAGS): Add -no-undefined
+	* Makefile.in: Regenerated.
+
+	* compConfig.cxx (cfgroot_component ctor): Qualify member function
+	pointers.
+
+1999-04-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (run): Don't badly cast pin.drive() argument.
+
+1999-03-29  Ben Elliston  <bje@cygnus.com>
+
+	* compConfig.cxx (class cfgroot_component): Reorder public,
+	protected and private access levels in class definition.
+
+1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (register_la): Parse libdir= field from
+	installed libXXXX.la file.
+	(instantiate_component): Don't automatically send new component
+	its name and creator.
+	(set_attribute): Don't automatically read-verify new attribute.
+	
+	* configure.in: Use new AC_CONFIG_AUX_DIR.
+	* configure: Regenerated.
+	* Makefile.am: Build libtool -modules.
+	* Makefile.in: Regenerated.
+
+1999-03-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx (parse): Use strerror for error messages instead
+ 	of perror.  Adapt to renamed COMPONENT_LIBRARY_MAGIC macro.
+	* configure.in: Look for strerror.
+	* configure: Regenerated.
+	* config.in: Regenerated.
+	* Makefile.in: Regenerated.
+
+1999-03-16  Ben Elliston  <bje@cygnus.com>
+
+	* compConfig.cxx: Include <stdio.h> to supress a missing prototype
+	warning about perror().
+
+1999-03-12  Ron Unrau  <runrau@cygnus.com>
+
+	* compConfig.cxx: check return values from setAccessor, connectPin, 
+	  disconnectPin, and setAttrValue.
+
+1993-03-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: New file; explains configuration file format.
+
+1999-03-12  Ben Elliston  <bje@cygnus.com>
+
+	* compConfig.cxx (cfgroot_component::parse): Use perror() to give
+	more helpful diagnostics when the configuration file cannot be
+	opened.
+
+1999-03-10  Ron Unrau  <runrau@cygnus.com>
+
+	* compConfig.cxx: incorporate revised pin API
+
+1999-03-05  Frank Ch. Eigler  <fche@cygnus.com>
+	
+	* compConfig.cxx (cfgroot_component): Remove unneeded virtual
+ 	inheritance.  Make some members mutable.  Declare use of new
+ 	relationship API.
+	(parse_command): Interpret new "relate" command.
+	(set_relation): New function.
+	(instantiate_component): Inform new component of creator
+ 	relationship.
+	(*Relate*): Add relationship API services to enumerate child
+ 	components.
+
+1999-03-01  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compConfig.cxx: New file: configuration file parser;
+	candidate root component.
+	* Makefile.am: New file.
+	* configure.in: New file.
+	* stamp-h.in: New blank file.
+	* acconfig.h: New file.
+	* config.in: Generated new file.
+	* aclocal.m4: Generated new file.
+	* Makefile.in: Generated new file.
+	* configure: Generated new file.

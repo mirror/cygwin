@@ -1,0 +1,304 @@
+set test "sid configuration"
+sid_config_component_test "diskio.conf" \
+    "load [sid_find_file libide.la] ide_component_library" \
+    "hw-disk-ide"
+pass $test
+
+set junk_files ""
+
+set test "sid startup"
+if [sid_start "diskio.conf"] then { pass $test } else { fail $test ; return }
+
+
+set test "get buses"
+set controlbus [sid_cmd "sid::component::find_bus $victim control-block-bus"]
+set commandbus [sid_cmd "sid::component::find_bus $victim command-block-bus"]
+if {$controlbus != "" && $commandbus != ""} then { pass $test } else { fail $test }
+
+
+
+# IDE client subroutines
+
+proc wait_ide_bit  { bus address mask value } {
+    global test
+    set iters 0
+    while {$iters < 10} {
+	set result [sid_cmd "sid::bus::read_h4_l1 $bus $address"]
+	if {[lindex $result 0] != "ok"} then { 
+	    fail "$test - wait $address $mask $value - [lindex $result 0]" 
+	    return "oops1"
+	}
+	set byte [lindex $result 1]
+	if {($byte & $mask) == $value} then { return "ok" }
+	incr iters
+    }
+    fail "$test - wait $address $mask $value - timeout"
+    return "oops2"
+}
+
+proc wait_drdy { } {
+    global commandbus
+    return [wait_ide_bit $commandbus 07 0x40 0x40]
+}
+
+proc wait_drq { } {
+    global controlbus
+    return [wait_ide_bit $controlbus 06 0x08 0x08]
+}
+
+proc wait_error { } {
+    global controlbus
+    return [wait_ide_bit $controlbus 06 0x01 0x01]
+}
+
+proc wait_noerror { } {
+    global controlbus
+    return [wait_ide_bit $controlbus 06 0x01 0x00]
+}
+
+
+array set sector ""
+proc read_sector { size } {
+    global test
+    global commandbus
+    global sector
+    set bytes 0
+    while {$bytes < 512} {
+	if {$size == 1} then {
+	    set result [sid_cmd "sid::bus::read_h4_l1 $commandbus 00"]
+	} elseif {$size == "2l"} {
+	    set result [sid_cmd "sid::bus::read_h4_l2 $commandbus 00"]
+	} else {
+	    set result [sid_cmd "sid::bus::read_h4_b2 $commandbus 00"]
+	}
+	if {[lindex $result 0] != "ok"} then { 
+	    fail "$test - read sector - read status [lindex $result 0]" 
+	    return "gack"
+	}
+	set value [lindex $result 1]
+	if {$size == 1} then {
+	    set sector($bytes) $value
+	    incr bytes
+	} elseif {$size == "2l"} {
+	    set high [expr {($value >> 8) & 0xff}]
+	    set low [expr {$value & 0xff}]
+	    set sector($bytes) $low
+	    incr bytes
+	    set sector($bytes) $high
+	    incr bytes
+	} else {
+	    set low [expr {($value >> 8) & 0xff}]
+	    set high [expr {$value & 0xff}]
+	    set sector($bytes) $low
+	    incr bytes
+	    set sector($bytes) $high
+	    incr bytes
+	}
+    }
+    return "ok"
+}
+
+
+proc write_sector { size } {
+    global test
+    global commandbus
+    global sector
+    set bytes 0
+    while {$bytes < 512} {
+	if {$size == "1"} then {
+	    set value $sector($bytes)
+	    incr bytes
+	} elseif {$size == "2l"} {
+	    set low $sector($bytes)
+	    incr bytes
+	    set high $sector($bytes)
+	    incr bytes
+	    set value [expr {($high << 8) | $low}]
+	} else {
+	    set high $sector($bytes)
+	    incr bytes
+	    set low $sector($bytes)
+	    incr bytes
+	    set value [expr {($high << 8) | $low}]
+	}
+	if {$size == 1} then {
+	    set result [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x00 $value"]
+	} elseif {$size == "2l"} {
+	    set result [sid_cmd "sid::bus::write_h4_l2 $commandbus 0x00 $value"]
+	} else {
+	    set result [sid_cmd "sid::bus::write_h4_b2 $commandbus 0x00 $value"]
+	}
+	if {$result != "ok"} then { 
+	    fail "$test - write sector - write status $result" 
+	    return "gack"
+	}
+    }
+    return "ok"
+}
+
+
+proc prepare_sector_transfer { drive cylinder head sector lba } {
+    global commandbus
+    verbose -log "transfer drive=$drive cylinder=$cylinder head=$head sector=$sector lba=$lba"
+    # one sector
+    set oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x02 0x01"]
+    # sector number
+    lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x03 $sector"]
+    # cylinder low/high
+    set cyllow [expr {$cylinder & 0xff}]
+    set cylhigh [expr {($cylinder >> 8) & 0xff}]
+    lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x04 $cyllow"]
+    lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x05 $cylhigh"]
+    # drive/head
+    set drivhead [expr {($drive ? 0x10 : 0x00) | ($head & 0xf) | ($lba ? 0x40 : 0x00)}]
+    lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x06 $drivhead"]
+    if {$oks == "ok ok ok ok ok"} then { return "ok" } else { return "nope" }
+}
+
+
+proc sector_substring { from length } {
+    global sector
+    set result ""
+    for {set i $from} {$i < ($from + $length)} {incr i} {
+	append result [format "%c" $sector($i)]
+    }
+    return $result
+}
+
+proc set_sector { s } {
+    global sector
+    for {set i 0} {$i < 512} {incr i} {
+	scan [string index $s [expr {$i % [string length $s]}]] %c byte
+	set sector($i) $byte
+    }
+}
+
+
+
+set test "configure drive 0"
+set oks [sid_cmd "sid::component::set_attribute_value $victim drive0-present? 1"]
+set testfile0 "diskio.drive0"
+lappend junk_files "$testfile0"
+lappend oks [sid_cmd "sid::component::set_attribute_value $victim drive0-file $testfile0"]
+# 512c 16h 64s : 256 MB
+lappend oks [sid_cmd "sid::component::set_attribute_value $victim drive0-num-cylinders 512"]
+lappend oks [sid_cmd "sid::component::set_attribute_value $victim drive0-num-heads 16"]
+lappend oks [sid_cmd "sid::component::set_attribute_value $victim drive0-num-sectors-per-track 64"]
+if {$oks == "ok ok ok ok ok"} then { pass $test } else { fail $test }
+
+
+set test "read identification for drive 0"
+set oks [wait_drdy]
+lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x06 0x00"]
+lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0xEC"]
+lappend oks [wait_drq]
+lappend oks [read_sector 1]
+verbose -log "serial: [sector_substring 20 20]"
+verbose -log "fw: [sector_substring 46 8]"
+set model [sector_substring 54 40]
+verbose -log "model: $model"
+if {$oks == "ok ok ok ok ok" 
+    && [string match "SID virtual IDE*" $model]} then { 
+    pass $test 
+} else { fail $test }
+
+
+set test "read identification for nonexistent drive 1"
+set oks [wait_drdy]
+lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x06 0x10"]
+lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0xEC"]
+lappend oks [wait_error]
+if {$oks == "ok ok ok ok" } then { pass $test } else { fail $test }
+
+
+set test "write first sector of drive 0"
+# 64 chars, repeated
+set_sector "<-- Super duper rubber dingy oh sector data 0123456789ABCDEF -->"
+set oks [wait_drdy]
+lappend oks [prepare_sector_transfer 0 0 0 0 0]
+lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x30"]
+lappend oks [wait_drq]
+lappend oks [write_sector 1]
+lappend oks [wait_noerror]
+if {$oks == "ok ok ok ok ok ok"} then { pass $test } else { fail $test }
+
+
+set test "write second sector of drive 0 using shorts"
+# 64 chars, repeated
+set_sector "<- oh one two three four five six seven eight nine ten eleven ->"
+set oks [wait_drdy]
+lappend oks [prepare_sector_transfer 0 0 0 1 0]
+lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x30"]
+lappend oks [wait_drq]
+lappend oks [write_sector 2b]
+lappend oks [wait_noerror]
+if {$oks == "ok ok ok ok ok ok"} then { pass $test } else { fail $test }
+
+
+set test "configure drive 1"
+set oks [sid_cmd "sid::component::set_attribute_value $victim drive1-present? 1"]
+set testfile1 "diskio.drive1"
+lappend junk_files "$testfile1"
+lappend oks [sid_cmd "sid::component::set_attribute_value $victim drive1-file $testfile1"]
+# 4c 4h 4s : 32 MB
+lappend oks [sid_cmd "sid::component::set_attribute_value $victim drive1-num-cylinders 16"]
+lappend oks [sid_cmd "sid::component::set_attribute_value $victim drive1-num-heads 16"]
+lappend oks [sid_cmd "sid::component::set_attribute_value $victim drive1-num-sectors-per-track 16"]
+if {$oks == "ok ok ok ok ok"} then { pass $test } else { fail $test }
+
+
+set test "copy CHS sectors 0,1 on drive 0 TO LBA sectors 1,0 on drive 1"
+set oks [wait_drdy]
+lappend oks [prepare_sector_transfer 0 0 0 0 0]
+lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x20"]
+lappend oks [wait_drq]
+lappend oks [read_sector 2l]
+lappend oks [wait_noerror]
+lappend oks [prepare_sector_transfer 1 0 0 1 1]
+lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x30"]
+lappend oks [wait_drq]
+lappend oks [write_sector 2b]
+lappend oks [wait_noerror]
+lappend oks [prepare_sector_transfer 0 0 0 1 0]
+lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x20"]
+lappend oks [wait_drq]
+lappend oks [read_sector 1]
+lappend oks [wait_noerror]
+lappend oks [prepare_sector_transfer 1 0 0 0 1]
+lappend oks [sid_cmd "sid::bus::write_h4_l1 $commandbus 0x07 0x30"]
+lappend oks [wait_drq]
+lappend oks [write_sector 1]
+lappend oks [wait_noerror]
+if {$oks == "ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok"} then { pass $test } else { fail $test }
+
+
+set test "shut down ide drive models"
+# this way they close their fstreams
+set oks [sid_cmd "sid::component::set_attribute_value $victim drive0-file /dev/null"]
+lappend oks [sid_cmd "sid::component::set_attribute_value $victim drive1-file /dev/null"]
+lappend oks [sid_cmd "sid::component::set_attribute_value $victim drive0-present? 0"]
+lappend oks [sid_cmd "sid::component::set_attribute_value $victim drive1-present? 0"]
+if {$oks == "ok ok ok ok"} then { pass $test } else { fail $test }
+
+
+set test "check contents of $testfile1"
+set tf1 [open $testfile1 "r"]
+set contents [read $tf1]
+close $tf1
+verbose -log "$testfile1: $contents"
+# Check just the very beginning and end.
+if {[string match "?? oh one*ABCDEF ???" $contents] && [string length $contents]==1024} then { pass $test } else { fail $test }
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test }
+
+
+# zap temp files if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { 
+    file delete "diskio.conf" 
+    foreach f $junk_files {
+	file delete $f
+    }
+}

@@ -1,0 +1,303 @@
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * ltconfig: Changed to accept host AR which is needed by libtool.
+        * libtool.m4: Changed to find host AR and to pass host AR to libtool.
+
+2000-09-22  Frank Ch. Eigler  <fche@redhat.com>
+
+	* info.tcl.in: Record @enable_shared@.
+
+2000-09-07  matthew green  <mrg@redhat.com>
+
+	* config.sub: Import updated version from top level.
+
+2000-08-29  Frank Ch. Eigler  <fche@redhat.com>
+
+	* config.sub: Import updated version from top level.
+
+2000-07-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* ltconfig (symcode): For gnu ld, add "R" and remove "W".
+
+2000-07-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* libstdc++.m4: New file, provides CY_LIBSTDCXX_CHECK.
+	* am_rpm_init.m4: New file, to assist building RPMs in the future.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidtargets.m4 (CY_SIDTARGET_CHECK): Make --enable-targets=all
+	inference logic more robust; less sensitive to Cygnus configure
+	changes.
+
+2000-05-23  Ben Elliston  <bje@redhat.com>
+
+	* sidtargets.m4: Rework detection of no selected targets.
+
+2000-04-20  Frank Ch. Eigler  <fche@redhat.com>
+
+	* ltdl.m4: New file, imported from libtool snapshot.
+
+2000-04-18  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidtargets.m4 (CY_SIDTARGET_CHECK): Correct typo in
+	${all_targets}.
+	* unix.exp (sid_find_sid_bsp): Always point to "configrun-sid" script.
+
+2000-02-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* unix.exp (sid_find_file): Stop search as soon as first glob
+	pattern matches.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* unix.exp (sidcomp_start): Set $crappy_tcl on solaris host.
+
+2000-01-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_config_component_etc_test): Set tester's
+	"real-victim" relation.
+	(sid_config_component_etc_test_with_tracing): Ditto.
+ 
+2000-01-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidtargets.m4: Add ppc*/powerpc* target detection.
+	* info.tcl.in: Define sidtarget(ppc).
+
+2000-01-11  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* info.tcl.in: Add missing new-line at end.
+
+2000-01-11  Ben Elliston  <bje@cygnus.com>
+
+	* sidtargets.m4: Add support for the m68k family; pass more robust
+	expressions to test(1).
+	* info.tcl.in: Set sidtarget(m68k).
+
+2000-01-10  Ben Elliston  <bje@cygnus.com>
+
+	* info.tcl.in: Make sidtarget an associative array.
+
+2000-01-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_config_component_etc_test_with_tracing): Use new
+	name for tracing component.
+
+2000-01-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_start): Include source subtrees in SID_LIBRARY_PATH.
+
+1999-12-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_start): Set TCL_LIBRARY if testing build tree.
+	Convert it to y:\u\k format on cygwin.
+
+1999-11-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_start): Define SID_LIBRARY_PATH if testing build tree.
+
+1999-11-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_find_sid_bsp): Parse toolchain_prefix to guess at
+	right *-sid bsp script.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (*): Use new "relate" command syntax.
+
+1999-11-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidtargets.m4: Accept target "thumb-*" as sidtarget_arm.
+
+1999-10-25  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidtargets.m4: Accept target=NONE for --enable-targets=all default.
+
+1999-10-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp: (sid_config_etc_test): Use "load".
+	(sid_config_etc_test_with_tracing): Ditto.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* info.tcl.in: Set sidtarget_{arm,mips,m32r}.
+	* sidtargets.m4: New file.  Define CY_SIDTARGET_CHECK macro.
+	* unix.exp (sidcomp_start): Eliminate junk message.
+
+1999-10-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_find_file): Look up to three levels deep from
+	search base directories.
+
+1999-10-02  Frank Ch. Eigler  <fche@toenail.to.cygnus.com>
+
+	* unix.exp (sid_start): Use timeout-30 to wait for startup
+	handshake from sid child process.
+	(sid_cmd): Use a longer timeout for "command>" prompt.  Break
+	encoded command strings properly, even unlucky sized ones.
+
+1999-10-01  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_cmd): Use timeout control by variable, avoid
+	"expect -timeout".
+
+1999-09-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_cmd): Produce more informative dejagnu messages. 
+	Call a sid crash a failure.  Call subsequent tests unresolved.
+	(prettyprint): New minor proc.
+	(sid_stop): Tolerate early death from sid.
+	(sid_find_gcc): New proc.
+
+1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_assert_equals): New test for numeric equality.
+
+1999-09-21  Permaine Cheung  <pcheung@cygnus.com>
+
+	* unix.exp (sid_config_component_etc_test): Turn off tracing. The 
+	original proc is now called sid_(...)_test_with_tracing.
+
+1999-09-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* config.guess, config.sub: Replaced files, taken from current
+ 	libtool 1.3c development snapshot.
+	* libtool.m4: New file, from same place.
+	* ltmain.sh: Ditto.
+	* ltconfig: Ditto.  
+	(archive_expsym_cmds): Use $nonopt instead of $CC for cygwin.
+
+1999-09-10  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_cmd): Use "H*" instead of "h*" binary scan/format
+	for more readable nibble ordering.
+
+1999-08-26  Ben Elliston  <bje@cygnus.com>
+
+	* unix.exp (sid_cmd): Reassemble long results. Make regular
+	expressions tighter for more reliable matching.
+
+1999-07-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_find_file): Look only two levels deep (../..) for
+ 	files.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sidcomp_start): Load info.tcl from new location.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp: Updated with new component type names.
+
+1999-05-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_config_component_etc_test): Set "hexify?" attribute
+	of tester tcl component.
+
+1999-05-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ltmain.sh (file_magic): Search for win32 DLLs by more possible
+ 	names.
+
+	* unix.exp (sid_start): Use statically linked mksid executable if
+ 	TOOL_OPTIONS includes "static"
+	(sid_find_file): Accept TOOL_OPTIONS substring "install".
+
+1999-05-14  Ben Elliston  <bje@cygnus.com>
+
+	* unix.exp (sidcomp_start): Remove surplus debug output.
+
+1999-05-13  Ben Elliston  <bje@cygnus.com>
+
+	* unix.exp (sid_find_file): Be even more careful with glob!
+
+1999-05-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_find_file): Collect glob results more carefully.
+
+1999-05-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ltconfig (whole_archive_flag_spec): Disable this function; make
+	ltmain fall back to manual convenience archive extraction.
+
+1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* config.guess: Update from new libtool 1.3.
+	* config.sub: Ditto.
+	* ltconfig: Ditto.
+	* ltmain.sh: Ditto.  Add back one personal patch that didn't make it
+	into libtool 1.3 release.
+	
+	* info.tcl.in: New file.
+	* unix.exp (sidcomp_start): Load it.
+	
+	(sid_find_file): New procedure to find simulation pieces
+	in build and source or install directory.  Use TOOL_OPTIONS to choose.
+	(sid_config_component_etc_test): Use sid_find_file.
+	(sid_find_sid): Ditto.
+	(sid_find_sid_bsp): Ditto.
+
+1999-05-04  Doug Evans  <devans@casey.cygnus.com>
+
+	* unix.exp (sid_find_gas,sid_find_ld): New procs.
+	(sid_find_sid,sid_find_sid_bsp): New procs.
+
+1999-05-04  Ben Elliston  <bje@cygnus.com>
+
+	* unix.exp (sidcomp_exit): Remove surplus debug output.
+	(sidcomp_start): Likewise.
+
+1999-04-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ltconfig: Merge in some recent libtool 1.3 prerelease work.
+	* ltmain.in: Ditto.
+
+1999-04-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ltconfig: Fix cygwin dll symbol extracting.
+
+1999-04-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_cmd): Use hex encoding for all data traffic to
+	inferior sid running tester.tcl.
+
+1999-04-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_cmd): Escape multiple-line commands with "\"
+	continuation character.
+
+1999-04-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_config_component_etc_test): New routine.  Adds
+ 	given strings to beginning and end of sid.conf file.
+	(sid_config_component_test): Call new routine with
+ 	backward-compatible arguments.
+	(sid_start): Set global $victim after startup.
+	(sid_stop): Kill sid process at stop.
+	(sid_cmd): Make more verbose "unresolved" messages.  Return "" on
+ 	errors.
+	
+1999-04-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_cmd): Upon an ERROR return from the tcl bridge,
+ 	make test case "unresolved".
+
+1999-03-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp (sid_config_component_test): Interject a tcl tracer
+ 	between tester and victim.
+
+1999-03-25  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* unix.exp: Dejagnu driver for sid testing.
+
+1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* config.guess: New file.
+	* config.sub: New file.
+	* install-sh: New file.
+	* ltconfig: New file - libtool 1.3 prerelease.
+	* ltmain.sh: New file - libtool 1.3 prerelease.
+	* missing: New file.
+	* mkinstalldirs: New file.

@@ -1,0 +1,170 @@
+* Name
+  hw-disk-ide
+
+* Synopsis
+  This component models a simple ATA (IDE) hard drive controller plus up to two
+  disk drives.
+
+  Buses: control-block-bus command-block-bus
+  Pins: interrupt
+  Attributes: state-snapshot drive0-present? drive1-present? drive0-file 
+              drive1-file drive0-num-cylinders drive1-num-cylinders 
+              drive0-num-heads drive1-num-heads drive0-num-sectors-per-track 
+              drive1-num-sectors-per-track altstatus control drive-address 
+              data error precomp sector-count sector-number cylinder-low
+	      cylinder-high drive/head command
+  Library: libide.la
+  Symbol name: ide_component_library
+
+* Functionality
+  - Modelling
+    * This component models a PC-style ATA (IDE) hard drive controller
+      plus up to two disk drives.  The two individually configured drives
+      use host files for storage of the disk image.  Access time
+      appears to be instantaneous to the simulated target.
+
+    * This model supports only old IDE programming interfaces.  These
+      should be a common subset of most real IDE-like devices (hard
+      drives, CD-ROMs, CompactFlash drives, etc.).  Only PIO
+      (programmed I/O) is supported, so no ATAPI or DMA functions are
+      available.  However, the drive models are self-describing, so
+      they can indicate that these missing functions are not
+      available.
+
+  - Behaviors
+    * Initialization
+      All parameters must be set for the selected simulated drive (N=0
+      or 1) to become available.  The given disk image file will be
+      opened for read and write as long as the "driveN-file" attribute
+      is set.  Undefined behaviour occurs if these settings are
+      changed while the drive model is in use, or if the values are
+      illegal.  Undefined behaviour occurs if the same disk image file
+      is shared by more than one simulated drive.
+
+    * Register access
+
+      Several standard IDE registers may be accessed across the
+      "control-block-bus" and "command-block-bus", and also via
+      watchable attributes.
+
+      The "data port" register lives at address 0 in the
+      command-block-bus.  As a quirk of the IDE interface standard,
+      either an 8- or 16-bit access to address 0 on this bus will
+      access this register.
+
+    * Command execution
+      To control IDE devices, you set the registers that specify the 
+      location of an intended transfer, then write a command byte into 
+      the command register.  An IDE interface standard provides for
+      synchronization between a processor and the IDE controller.  The DRQ, 
+      DRDY, and ERROR bits in the status register are emulated for this.
+
+    * Command execution: read/write
+      IDE commands 0x20, 0x21, 0x30, 0x31 are supported.  Multiple-sector 
+      transfers are supported and involve DRQ/interrupt synchronization.  
+      LBA and CHS addressing are both supported.
+
+    * Command execution: identify
+      IDE command 0xEC is supported.  It arranges to copy data into or out of 
+      the selected drive's sector buffers
+
+    * Command execution: stub commands
+      IDE commands 0x10-0x1F (RECALIBRATE) and 0x70-0x7F (SEEK) are simulated
+      by instantaneous stubs.
+
+    * Command execution: unknown commands
+      An attempt to execute illegal commands, or commands on nonexistent drives,
+      results in an ERROR bit in the status register, and an interrupt.
+
+  - SID conventions
+    * This is a functional component.
+
+    * It supports state save/restore for controller state (including
+      registers and sector buffers).  It does not include a snapshot
+      of the disk images, however.
+
+    * It supports triggerpoints for most control registers.
+
+* Environment
+  - Related components
+    * The IDE model is a self-contained slave peripheral.  It does not
+      need to be coupled with other specific components to operate.
+
+    * To use an IDE model in a system simulation, you must map its
+      two buses into an address space, connect its interrupt line 
+      (if needed), and configure its drives.  The following
+      configuration file fragment shows how:
+
+	# Add the IDE drive model library
+	load libide.la ide_component_library
+	# Instantiate component
+	new hw-disk-ide ide0
+	# ... assume memory mapper named "mapper"
+	# ... assume PC standard IDE channel 0 addresses
+	connect-bus mapper [0x3F0-0x3F7] ide0 control-block-bus
+	connect-bus mapper [0x1F0-0x1F7] ide0 command-block-bus
+	# ... assume some fictional interrupt controller
+	connect-pin ide0 interrupt -> fic irq14
+	#
+	# (For PC standard IDE channel 1,
+	#  use base addresses 0x370 and 0x170,
+	#  and irq15 respectively.)
+	#
+	# ... configure drive 0 (master): 128*10*32 sectors = 20 MB capacity
+	set ide0 drive0-present? 1
+	set ide0 drive0-file "/tmp/drive-0-image"
+	set ide0 drive0-num-cylinders 128
+	set ide0 drive0-num-heads 10
+	set ide0 drive0-num-sectors-per-track 32
+
+  - Host system
+    * The IDE drive model relies on up to two external files for
+      storage of the virtual disk images.  These files may be accessed
+      in a sparse way by the target program, so the resulting files
+      may have "holes".  Configuring a virtual drive that is larger
+      than 2 GB is not supported.  The various "driveN-num-*"
+      parameters are multiplied together to arrive at the number of
+      512-byte sectors to model.
+
+    * Some error conditions are signalled by messages to cerr.  These
+      include some host I/O errors, and some simulated violations of
+      IDE command synchronization.
+
+* SID interface reference
+  - low level:
+
+    * pins
+      - interrupt | output | 0,1 | command execution
+
+    * buses
+      - control-block-bus | 0x6-0x7 | read/write | register access
+      - command-block-bus | 0x0-0x7 | read/write | register access, command execution
+
+    * attributes
+      - state-snapshot | | opaque string | n/a | state save/restore
+      - driveN-present? | setting | boolean | no | initialization
+      - driveN-file | setting | file name | "/dev/null" | initialization
+      - driveN-num-cylinders | setting | numeric | 0 | initialization
+      - driveN-num-heads | setting | numeric | 0 | initialization
+      - driveN-num-sectors-per-track | setting | numeric | 0 | initialization
+      - altstatus | watchable, register | numeric | n/a | register access
+      - control | watchable, register | numeric | n/a | register access
+      - drive address | watchable, register | numeric | n/a | register access
+      - data | watchable, register | numeric | n/a | register access
+      - error | watchable, register | numeric | n/a | register access
+      - precomp | watchable, register | numeric | n/a | register access
+      - sector-count | watchable, register | numeric | n/a | register access
+      - sector-number | watchable, register | numeric | n/a | register access
+      - cylinder-low | watchable, register | numeric | n/a | register access
+      - cylinder-high | watchable, register | numeric | n/a | register access
+      - drive/head | watchable, register | numeric | n/a | register access
+      - command | watchable, register | numeric | n/a | register access
+      - interrupt | pin | 0-1 | n/a | command execution
+
+* References
+  The IDE specifications used for constructing this model were gleaned from
+  several sources.  The official ATA specs were not available.
+
+  - The Quantum Bigfoot AT hard drive reference manual.
+  - The psim PowerPC simulator's "hw-ide" module.
+  - The Linux kernel IDE drivers.

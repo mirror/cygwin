@@ -1,0 +1,720 @@
+2000-11-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* pregen/: New subdirectory.
+	* configure.in (pregen/pregen-configs): Generate build tree script.
+	* Makefile.am (SUBDIRS): Define; add pregen/.
+	(DATA): Remove all FAM* definitions and references.
+	* armpid-cygmon.img, armpid-eCos.img: Removed.
+	* Makefile.in, configure: Regenerated.
+
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configrun-sid.in: Don't assert given executable's existence if
+	"--no-run" was given.
+
+2000-11-21  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configrun-sid.in: Relax gloss / gdb restriction such that
+	gloss-tty is allowed even when gdb port is specified.
+
+2000-11-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configrun-sid.in: Find perl interpreter via #! /usr/bin/env.
+	* configure.in (PERL): Don't look for this sucker any more.
+	* configure: Regenerated.
+
+2000-11-14  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am: Fixed typo in FAM0SCRIPTS reference.
+	* Makefile.in: Regenerated.
+
+2000-11-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configrun-sid.in: Ignore tty or stdio gloss settings if
+	gdb port number is specified.
+
+2000-11-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configrun-sid.in: Permit blank gloss_memspecs.  Increase stdio
+	polling time to 150 ms.
+
+2000-10-30  Jeff Johnston <jjohnstn@redhat.com>
+
+	* configrun-sid.in:  Moved gloss setting into a sub so
+	that boards may allow syscalls, in addition to hardware
+	specific settings such as memory models and peripherals like timers.
+
+2000-10-18  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configrun-sid.in (gprof): Changed option so that it is binary and
+	there is no N value specified.
+	(insn-count): New option to specify number of ticks that insns will 
+	be processed uninterrupted and number of ticks for gprof profiling.  
+	Changed code that sets cpu_insn_count default to use insn-count.
+
+2000-10-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configrun-sid.in: Use "sw-gloss-generic/libgloss" when possible.
+
+2000-10-05  matthew green  <mrg@redhat.com>
+
+	* configrun-sid.in (configure_harvard_bus): New sub used by
+	Harvard architectures.
+
+2000-09-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in, aclocal.m4, configure: Regenerated.
+
+2000-09-14 Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure-sid.in: Hooked up gloss process-signal to
+	yield-net input pin.
+
+2000-07-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configrun-sid.in: Completely forget about mksid.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* aclocal.m4, configure: Regenerated.
+
+2000-06-01  Ben Elliston  <bje@redhat.com>
+
+	* configrun-sid.in: Include mem specs, even if board=none.
+
+2000-05-31  Ben Elliston  <bje@redhat.com>
+
+	* configrun-sid.in: Accept --board=none.
+
+2000-05-24  Ben Elliston  <bje@redhat.com>
+
+	* configrun-sid.in: Fix syntax errors.
+
+2000-05-23  Jeff Johnston <jjohnstn@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Ditto.
+	* configure: Ditto.
+
+2000-05-22  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.in: Regenerate.
+	* aclocal.m4: Likewise.
+	* configure: Likewise.
+
+2000-05-10  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (.NOTPARALLEL): Add dummy target for make control.
+	* Makefile.in: Regenerated.
+
+2000-04-18  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configrun-sid.in: New master configuration script.
+	* configure.in: Configure it.  Forget about other .in files.
+	* arm-elf-sid, m32r-elf-sid, m68k-elf-sid: New files.
+	* arm-elf-sid.in, m32r-elf-sid.in, m68k-elf-sid.in: Removed.
+	* Makefile.am: Rename *SCRIPTS/*DATA macro names.  Install source-tree
+	TARGET-elf-sid mini-wrappers.  Use "configsid-run" to build packaged
+	.conf files.
+	* configure, aclocal.m4, Makefile.in: Regenerated.
+
+2000-03-30  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mips-elf-sid.in: Remove $opt_tv.
+
+2000-03-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm-elf-sid.in (board=pid7t): Set a 1/4 time scale for the
+	timers to virtually speed up eCos test run times.
+
+2000-03-22  matthew green  <mrg@redhat.com>
+
+	* arm-elf-sid.in: Add support for the Cogent CMA110 board with the
+	CMA222 ARM CPU board.
+	* Makefile.am: Generate a cma110:cma222 board with and without tksm.
+	Remove support for targetview.
+	* Makefile.in: Regenerate.
+	* arm-elf-sid.in: Remove support for targetview.
+	* mips-elf-sid.in: Likewise.
+
+2000-03-14  matthew green  <mrg@redhat.com>
+
+	* arm-elf-sid.in: Update for split up interrupt controller
+	irq-registers and fiq-registers.
+		 
+2000-03-14  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm-elf-sid.in: Remove cpu/gloss "halt!" pin.  Set default
+	cpu step-insn-count to 10000.
+	* m32r-elf-sid.in: Ditto.
+	* mips-elf-sid.in: Ditto.  Default to "pbb" engine.
+
+2000-02-17  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm-elf-sid.in: Connect cpu step-cycles pin to target-sched.
+
+2000-02-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm-elf-sid.in (pid7t): Connect timer reset lines to hw-reset-net.
+
+2000-02-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm-elf-sid.in (sidrtc): Correct informative accessor name.
+
+2000-02-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm-elf-sid.in (tcl-event-consumer): Instantiate only if known
+	tcl/tk components have been requested.
+
+2000-02-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm-elf-sid.in (stdio): Set up host-sched polling only if a
+	stdio instance exists.
+	(sidcodec): New undocumented option for sid-io-audio et al.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (sidconf_new): Add "--wrap" option to create a
+	sid-api-trace instance for each wrapped component.
+	* Makefile.am (M68SCRIPTS): Fixed typo.
+	* Makefile.in: Regenerated.
+
+2000-01-20  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (MIPSDATA, M32RDATA): Remove.
+	(M68KSCRIPTS): New macro.
+	(bin_SCRIPTS): Update.
+	* Makefile.in: Regenerate.
+	* m68k-elf-sid.in: New file.
+	* configure.in: Output m68k-elf-sid.
+	* configure: Regenerate.
+
+2000-01-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (tty): Add modifier for board=gloss and
+	board=pid7t to connect character I/O streams to a hw-visual-tty
+	instance.
+	(tcl-event-consumer): New everpresent component.
+
+2000-01-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Add target names to mapper [accessor] names.
+	* Makefile.am (ARMDATA): Package some new config files with tksm.
+	* Makefile.in, aclocal.m4: Regenerated.
+
+2000-01-11  Ben Elliston  <bje@cygnus.com>
+
+	* configure: Regenerate.
+	* aclocal.m4: Likewise.
+	* Makefile.in: Likewise.
+
+1999-12-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am: Rename generated arm-* configuration files.
+	* Makefile.in: Regenerated.
+
+1999-12-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (cpu): Set scheduler's cpu-time subscription to
+	$cpu_insn_count to approximate target time of instruction steps.
+
+1999-12-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (mapper): Rename component instance to "mapper".
+	(hw-reset-net): New glue component for hardware reset signals.
+	(pid7t): Connect intctrl etc. to hw-reset-net.  Add "normalmap"
+	board option to disable remapper as if by jumper.
+	
+1999-12-06  Patrick Macdonald  <patrickm@cygnus.com>
+
+	* arm-elf-sid.in: add verbose? to targetview
+	* mips-elf-sid.in: add verbose? to targetview
+
+1999-12-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am: Create arm-cygmon-EL.conf during build.
+	* Makefile.in: Regenerated.
+
+1999-12-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (pid7t): When connected to socketio, make UART
+ 	receive fifos quite big.
+	
+1999-12-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armpid-cygmon.img: Rebuilt as of 1999-11-19.  Now includes
+	disassembler support.
+
+1999-12-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (pid7t): Use new "disconnect-bus" to wedge
+	hw-remap/pause-arm/ref into bus chain.  Don't complain about
+	missing executable.
+	(gloss): Disable Z packet for performance.
+	(tksm): Correct !event boostrapping.
+
+1999-12-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Make pbb engine default.
+	* m32r-elf-sid.in: Update obsolete bits so it runs again.
+
+1999-12-01  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mips-elf-sid.in: Remove unused variable.
+
+1999-11-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* m32r-elf-sid.in: Don't mess with obsolete LTDL_LIBRARY_PATH.
+	* arm-elf-sid.in: Ditto.  Use autoloading tcl components for tksm &
+	visual-core-trace.
+	* mips-elf-sid.in: Ditto.
+
+1999-11-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in (perl): Signal WARN instead of ERROR if perl is
+	not found.
+	* configure: Regenerated.
+
+1999-11-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Add undocumented "--sidrtc" option for hw-rtc-sid.
+	* mips-elf-sid.in: Ditto.
+
+1999-11-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mips-elf-sid.in: Dehexify throughout.  Don't connect
+	"halt!" redundantly between cpu and idt components.
+
+1999-11-25  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (tv-socket): Use host scheduler slot 5.
+
+1999-11-25  Patrick Macdonald  <patrickm@cygnus.com>
+
+	* arm-elf-sid.in: add tv-socket commands, remove commPin
+	  and port from the targetview.
+	* mips-elf-sid.in: add tv-socket commands, remove commPin
+	  and port from the targetview.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Use new "relate" command syntax.
+	* m32r-elf-sid.in: Ditto.
+	* mips-elf-sid.in: Ditto.
+
+1999-11-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Include CVS id of script in generated
+ 	configuration files.
+
+1999-11-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (gloss): Don't connect "halt!" redundantly
+ 	between cpu and angel components.
+
+1999-11-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am: Create arm-eCos-*.conf files with
+	--board=pid7t-uart1:gdb	option.
+	* Makefile.in: Regenerated.
+
+1999-11-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (pid7t): Remove INCOMPLETE warnings.  Configure
+	remapper commonly.  Expand default DRAM size to 16MB.  Manage
+	uart<->outside connections with --board.
+
+1999-11-12  Ben Elliston  <bje@cygnus.com>
+
+	* arm-elf-sid.in: Adapt to new hw-remap/pause-arm/ref attribute
+	names.  Re-connect it into the bus chain.
+
+1999-11-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (board=pid7t-eCosstub): Stub for future support.
+	* armpid-eCos.img: New file.  Needs to be updated (M4-M0 problem).
+	* Makefile.am: Install it.
+	* Makefile.in: Regenerated.
+
+1999-11-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Adapt to renamed gdb & stdio components.
+	* mips-elf-sid.in, m32r-elf-sid.in: Ditto.
+
+1999-11-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (board=pid7t): Disable remapper temporarily.
+	
+	* Makefile.am: Add spaces between conditional DATA targets.
+	* Makefile.in: Regenerated.
+	
+	* aclocal.m4: Regenerated.
+	* configure: Regenerated.
+
+1999-10-25  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Support "--gprof" option for target profiling.
+
+	* aclocal.m4: Regenerated.
+	* configure: Regenerated.
+
+1999-10-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Use "load" instead of "dso" sid configuration cmd.
+	* mips-elf-sid.in: Same.
+	* m32r-elf-sid.in: Ditto.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Call CY_SIDTARGET_CHECK.
+	* Makefile.am: Conditionally install {arm,mips,m32r}-elf-sid and
+	configuration files.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Regenerated.
+	* configure: Regenerated.
+
+1999-10-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Require perl version 5.004+.
+
+1999-10-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armpid-cygmon.img: Updated from churchill-991013 snapshot.
+
+1999-10-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armpid-cygmon.img: New file: cygmon.img snapshot from devo.
+	* Makefile.am: Install new file.
+	* Makefile.in: Regenerated.
+	* arm-elf-sid.in (board=pid7t-cygmon): Arrange to load cygmon.img.
+	Configure remapper partially.
+  	(*): Warn about missing executable but don't instantiate loader.
+	Look for "--board" matches by regexp, not string equality.
+
+1999-10-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (memory-region): Support hex numbers, and devans'
+	file/read-only/alias options.
+
+1999-10-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (opt_no_run): New option "--no-run": generate
+ 	config file but don't run sid on it.  Infer "--save-temps".
+
+	* Makefile.am (pkgdata_DATA): New target.  Create default
+ 	churchill/sid configuration files.
+	* Makefile.in: Regenerated.
+
+1999-09-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Insist on existence of perl interpreter.
+	* configure: Regenerated.
+
+1999-09-26  Doug Evans  <devans@casey.cygnus.com>
+
+	* m32r-elf-sid.in (component_libs): Add consoles, glue.
+	(configuration): Create init-sequence and connect to cpu,loader,gloss.
+	Create stdio and connect to gloss.
+	Fix format of hex memory size.
+
+1999-09-25  Doug Evans  <devans@casey.cygnus.com>
+
+	* Makefile.am (bin_SCRIPTS): Add mips-elf-sid.
+	* Makefile.in: Rebuild.
+	* configure.in: Output mips-elf-sid.
+	* configure.in: Rebuild.
+	* mips-elf-sid.in: New file.
+
+	* arm-elf-sid.in: Connect init-sequence output-2 -> angel reset.
+
+	* m32r-elf-sid.in: Set $opt_help=0.  Fix name of loader verbose?
+	attribute.
+
+1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Warn if -EL/-EB not specified, and nor is an
+ 	executable.  Stop hexifying gdb/tv port numbers, memory size,
+	timing parameters.
+	(board=gloss): Don't instantiate sw-io-stdio if also have --gdb.
+
+1999-09-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): Define.
+	* Makefile.in: Regenerated.
+
+1999-09-16  Patrick Macdonald  <patrickm@cygnus.com>
+
+	* arm-elf-sid.in: Connect the targetview triggerpoint pin 
+	to gdb's stop-target pin.
+
+1999-09-16  Ben Elliston  <bje@cygnus.com>
+
+	* arm-elf-sid.in: Add --trace-core-visual option.
+
+1999-09-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Reduce CPU step-insn-count and tksm refresh
+ 	rate, to account for temporary attribute hexification.  Add tksm<->gdb
+	connection for triggerpoint signalling.
+
+1999-09-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Connect bridge-tk's !event-control pin for adaptive
+	event polling control.
+
+1999-08-31  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Use sid-sched-host-accurate instead of misbehaving
+	sid-sched-host.
+
+1999-08-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Connect loader's new "error" pin.
+	(board=pid7t): Add 1MB ROM memory region at 0x04000000.
+
+1999-08-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Supply more host- and target-time scheduler slots.
+	(--gdb): Create gdb-socket component.  Connect it up.  Rename boolean
+	gdb attributes. 
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (board=pid7t): Add socketio-server components
+	for uart1 & 2.  Don't use sid stdin.
+	(--tksm): Decrease tcl event frequency to 10 Hz.
+
+1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Use "set cpu endian big" / "little" instead of
+	numeric codes.  Connect flush-icache pins gdb->cpu.
+
+1999-08-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Don't report INT/etc. signal forwarding.
+
+1999-08-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Add "deinit-sequence" for shutdown notification.
+	Inform gdb.  Use fork/exec instead of system to manage sid process.
+	Teleport incoming signals to it.
+	
+1999-08-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Add "--persistent" option.  Put informative gunk
+	into configuration file.
+	(board pid7t): Reset uarts.  Connect uarts' I/O to stdio.
+	Connect uarts' Sout to gdb's target-tx.
+
+1999-08-13  Ben Elliston  <bje@cygnus.com>
+
+	* arm-elf-sid.in: Consider Angel attribute name changes.
+
+1999-08-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Gack - manually convert --gdb and --tv port
+	numbers to hex.
+
+1999-08-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Don't trace loading traffic in "--trace-core" mode.
+	Adjust to renamed hw-glue-probe-bus attribute.
+
+1999-08-10  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Adapt to new cfgroot pin names.
+	* m32r-elf-sid.in: Ditto.
+	* arm-pid7t.conf.in: Obsolete - removed.
+
+1999-08-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Add "--trace-core" option.  Use new 
+	"hw-glue-probe-bus" component for effect.
+
+1999-08-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (pid7t): Connect interrupt lines for uart1, uart2,
+	parport.  Connect their buses too.
+
+1999-08-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Handle --board=pid7t with --gdb.
+
+1999-07-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Add "--tksm" option to start a tk system monitor.
+
+1999-07-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (*): Add support for target view configuration,
+	executable-less startup for gdb remote loading, -EB/-EL options,
+	gloss->gdb target output forwarding, etc.
+
+	* Makefile.am (pkgdata_DATA): Zap.
+	* configure.in (arm-pid7t.conf): Don't generate any more.
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+
+1999-07-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (*): Reworked script.  Added "--board", "--tv",
+ 	"--gdb" options.  Begin hookup of CPU to target scheduler.  Begin
+ 	GDB hookup.
+
+1999-06-20  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* arm-elf-sid.in: Enabled the line "set sched 0-time 50"
+	  as Frank fixed the problems in file compSched.cxx
+
+1999-06-16  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* arm-elf-sid.in: Disabled the line "set sched 0-time 50"
+	temporarily to run hello world program until the actual bug
+	is fixed.
+
+1999-06-10  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (pkgdata_DATA): Add arm-pid7t.conf.
+	* Makefile.in: Regenerate.
+	* arm-pid7t.conf (sched): Remove.
+	(host-sched): New component instance.
+	(target-sched): Likewise.
+	(timer1, timer2, stdio): Use them.
+	
+1999-06-09  Doug Evans  <devans@casey.cygnus.com>
+
+	* arm-pid7t.conf.in (bus - mem range): Fix off by one error.
+	(loader file): Replace name of loader file and comment that the
+	user needs to change it first.
+
+1999-06-09  Ben Elliston  <bje@cygnus.com>
+
+	* arm-pid7t.conf.in: New file.
+	Connect the main bus to the remapper's register bus.
+	
+	* configure.in (AC_OUTPUT): Add arm-pid7t.conf.
+	* configure: Regenerate.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Updated with new component type names.
+	* m32r-elf-sid.in: Ditto.
+
+1999-06-07  Doug Evans  <devans@casey.cygnus.com>
+
+	* arm-elf-sid.in: New arg --engine=scache|pbb.
+
+1999-06-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Use $mksidexec for --mksid output.  $mksid
+	points to installed "mksid" program itself.
+	* m32r-elf-sid.in: Ditto.
+
+1999-05-31  Ben Elliston  <bje@cygnus.com>
+
+	* arm-elf-sid.in: Add a host-based scheduler; invoke the stdio
+	console component every 50ms to process I/O. Connect the CPU and
+	Angel `halt!' pins together.
+
+1999-05-30  Ben Elliston  <bje@cygnus.com>
+
+	* arm-elf-sid.in: Connect the stdio console into the system.
+
+1999-05-25  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in (usage): New function.
+	(--help): New option.  Call &usage.
+	(--save-temps): New option.
+	(args): Pass target program command-line arguments to angel.
+
+	* m32r-elf-sid.in: Ditto for all except target args.
+
+1999-05-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Change gloss-cpu relation name.
+
+1999-05-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Correct use of AC_CONFIG_AUX_DIR.
+	* configure: Regenerated.
+	* aclocal.m4: Regenerated.
+
+1999-05-09  Doug Evans  <devans@casey.cygnus.com>
+
+	* arm-elf-sid.in: Connect loader endian-set -> cpu endian-set!.
+
+1999-05-07  Doug Evans  <devans@casey.cygnus.com>
+
+	* arm-elf-sid.in: connect cpu trap-code -> angel fault-code.
+	connect cpu trap <-> angel fault.
+
+1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am: Make scripts executable in install directory.
+	* Makefile.in: Regenerated.
+
+	* arm-elf-sid.in: In "-mksid" mode, use its "-static" option.
+	Use libtool ".la" names for component DSOs.  Use unqualified
+	DSO path names - instead rely on $LTDL_LIBRARY_PATH to find
+	installed DSOs.  Use $SID instead of installed "sid" for
+	dynamic simulator executable.  Similarly $MKSID.
+	* m32r-elf-sid.in: Analogous changes to above.
+
+1999-04-23  Ben Elliston  <bje@cygnus.com>
+
+	* arm-elf-sid.in: Rename `verbose?' attribute to `verbose'.
+	
+1999-04-22  Ben Elliston  <bje@cygnus.com>
+
+	* arm-elf-sid.in: Connect the Angel `process-signal' pin to the
+	main shutdown pin so that we can stop.
+
+1999-04-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm-elf-sid.in: Remove redundant config fragment.
+
+1999-04-13  Ben Elliston  <bje@cygnus.com>
+
+	* arm-elf-sid.in: Hook the Angel monitor into the system.
+
+1999-04-02  Ben Elliston  <bje@cygnus.com>
+
+	* arm-elf-sid.in: Give more meaningful error diagnostics.
+	* m32r-elf-sid.in: Likewise.
+	
+1999-03-30  Ben Elliston  <bje@cygnus.com>
+
+	* arm-elf-sid.in: Replace `m32r' with `arm' in some places.
+
+1999-03-29  Ben Elliston  <bje@cygnus.com>
+
+	* arm-elf-sid.in: New file; mimic m32r-elf-sid.in.
+	* configure.in: Generate arm-elf-sid.
+	* configure: Regenerate.
+	* Makefile.am (bin_SCRIPTS): Add arm-elf-sid.
+	* Makefile.in: Regenerate.
+
+1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* m32r-elf-sid.in: Generate config file in $TMPDIR-/tmp.
+	* configure.in: Use new AC_CONFIG_AUX_DIR.
+	* configure: Regenerated.
+	* Makefile.in: Regenerated.
+
+1999-03-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* m32r-elf-sid.in: Don't use install's "-s" option.
+
+1999-03-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* m32r-elf-sid.in: New file: perl script to emulate m32r-elf-run.
+	* Makefile.am: New file.
+	* Makefile.in: New generated file.
+	* configure.in: New file.
+	* configure: New generated file.
+	* aclocal.m4: New generated file.
+

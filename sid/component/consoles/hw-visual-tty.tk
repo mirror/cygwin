@@ -1,0 +1,381 @@
+# hw-visual-tty.tk  -*- tcl -*-
+# A sid component emulating a dumb tty.
+
+# Based on expect/example/tkterm:
+# # Name: tkterm - terminal emulator using Expect and Tk text widget, v1.0
+# # Author: Don Libes, July '94
+#
+# However, terminal emulation was ripped out and replaced by a "dumb
+# tty" style treatment of I/O.
+
+
+#############################################
+# Variables that must be initialized before using this:
+#############################################
+set rows 24		;# number of rows in term
+set cols 80		;# number of columns in term
+set term .t		;# name of text widget used by term
+set term_alone 1	;# if 1, directly pack term into .
+			;# else you must pack
+
+#############################################
+# Readable variables of interest
+#############################################
+# cur_row		;# current row where insert marker is
+# cur_col		;# current col where insert marker is
+
+
+#############################################
+# Procs you may want to initialize before using this:
+#############################################
+
+# term_chars_changed is called after every change to the displayed chars
+# You can use if you want matches to occur in the background (a la bind)
+# If you want to test synchronously, then just do so - you don't need to
+# redefine this procedure.
+proc term_chars_changed {} {
+}
+
+# term_cursor_changed is called after the cursor is moved
+proc term_cursor_changed {} {
+}
+
+# Example tests you can make
+#
+# Test if cursor is at some specific location
+# if {$cur_row == 1 && $cur_col == 0} ...
+#
+# Test if "foo" exists anywhere in line 4
+# if {[string match *foo* [$term get 4.0 4.end]]}
+#
+# Test if "foo" exists at line 4 col 7
+# if {[string match foo* [$term get 4.7 4.end]]}
+#
+# Test if a specific character at row 4 col 5 is in standout
+# if {-1 != [lsearch [$term tag names 4.5] standout]} ...
+#
+# Return contents of screen
+# $term get 1.0 end
+#
+# Return indices of first string on lines 4 to 6 that is in standout mode
+# $term tag nextrange standout 4.0 6.end
+#
+# Replace all occurrences of "foo" with "bar" on screen
+# for {set i 1} {$i<=$rows} {incr i} {
+#	regsub -all "foo" [$term get $i.0 $i.end] "bar" x
+#	$term delete $i.0 $i.end
+#	$term insert $i.0 $x
+# }
+
+#############################################
+# End of things of interest
+#############################################
+
+set term_standout 0	;# if in standout mode or not
+
+# this shouldn't be needed if Ousterhout fixes text bug
+text $term -relief sunken -bd 1 -width $cols -height $rows -wrap none
+
+if {$term_alone} {
+	pack $term
+}
+
+$term tag configure standout -background  black -foreground white
+
+proc term_clear {} {
+	global term
+
+	$term delete 1.0 end
+	term_init
+}
+
+proc term_init {} {
+	global rows cols cur_row cur_col term
+
+	# initialize it with blanks to make insertions later more easily
+	set blankline [format %*s $cols ""]\n
+	for {set i 1} {$i <= $rows} {incr i} {
+		$term insert $i.0 $blankline
+	}
+
+	set cur_row 1
+	set cur_col 0
+
+	$term mark set insert $cur_row.$cur_col
+}
+
+proc term_down {} {
+	global cur_row rows cols term
+
+	if {$cur_row < $rows} {
+		incr cur_row
+	} else {
+		# already at last line of term, so scroll screen up
+		$term delete 1.0 "1.end + 1 chars"
+
+		# recreate line at end
+		$term insert end [format %*s $cols ""]\n
+	}
+}
+
+proc term_insert {s} {
+	global cols cur_col cur_row
+	global term term_standout
+
+	set chars_rem_to_write [string length $s]
+	set space_rem_on_line [expr $cols - $cur_col]
+
+	if {$term_standout} {
+		set tag_action "add"
+	} else {
+		set tag_action "remove"
+	}
+
+	##################
+	# write first line
+	##################
+
+	if {$chars_rem_to_write > $space_rem_on_line} {
+		set chars_to_write $space_rem_on_line
+		set newline 1
+	} else {
+		set chars_to_write $chars_rem_to_write
+		set newline 0
+	}
+
+	$term delete $cur_row.$cur_col $cur_row.[expr $cur_col + $chars_to_write]
+	$term insert $cur_row.$cur_col [
+		string range $s 0 [expr $space_rem_on_line-1]
+	]
+
+	$term tag $tag_action standout $cur_row.$cur_col $cur_row.[expr $cur_col + $chars_to_write]
+
+	# discard first line already written
+	incr chars_rem_to_write -$chars_to_write
+	set s [string range $s $chars_to_write end]
+	
+	# update cur_col
+	incr cur_col $chars_to_write
+	# update cur_row
+	if $newline {
+		term_down
+	}
+
+	##################
+	# write full lines
+	##################
+	while {$chars_rem_to_write >= $cols} {
+		$term delete $cur_row.0 $cur_row.end
+		$term insert $cur_row.0 [string range $s 0 [expr $cols-1]]
+		$term tag $tag_action standout $cur_row.0 $cur_row.end
+
+		# discard line from buffer
+		set s [string range $s $cols end]
+		incr chars_rem_to_write -$cols
+
+		set cur_col 0
+		term_down
+	}
+
+	#################
+	# write last line
+	#################
+
+	if {$chars_rem_to_write} {
+		$term delete $cur_row.0 $cur_row.$chars_rem_to_write
+		$term insert $cur_row.0 $s
+		$term tag $tag_action standout $cur_row.0 $cur_row.$chars_rem_to_write
+		set cur_col $chars_rem_to_write
+	}
+
+	term_chars_changed
+}
+
+proc term_update_cursor {} {
+	global cur_row cur_col term
+
+	$term mark set insert $cur_row.$cur_col
+
+	term_cursor_changed
+}
+
+term_init
+
+set flush 0
+proc screen_flush {} {
+	global flush
+	incr flush
+	if {$flush == 24} {
+		update idletasks
+		set flush 0
+	}
+#	update idletasks
+#	after 1000 a
+}
+
+
+bind $term <Any-Enter> {
+    focus %W
+}
+
+bind $term <Meta-KeyPress> {
+    if {"%A" != ""} {
+	drive "\033"
+	drive %A
+    }
+}
+
+bind $term <KeyPress> {
+    drive %A
+    break
+}
+
+bind $term <Control-space> {
+    drive "\0"
+}
+bind $term <Control-at> {
+    drive "\0"
+}
+
+
+set shutdown_hook [list]
+bind $term <Destroy> {
+    global shutdown_hook
+    foreach hook $shutdown_hook {
+	set result [uplevel \#0 $hook]
+	# puts "hw-visual-tty cleaning up: [list $hook] -> [list $result]"
+    }
+    set shutdown_hook [list]
+}
+
+
+# ----------------------------------------------------------------------------
+
+
+proc drive {char} {
+    global rx_pins
+    set number 0
+    binary scan $char c number
+    foreach p $rx_pins {
+	sid::pin::driven_h4 $p $number
+    }
+}
+
+
+# A naughty user has closed down our window.  Boo hoo.
+proc shutdown {} {
+    global tx_pin
+}
+
+
+# ----------------------------------------------------------------------------
+# sid callbacks
+
+set rx_pins [list]
+set tx_pin [sid::pin::new]
+
+proc pin_names {} {
+    return [list "tx" "rx"]
+}
+proc find_pin {name} {
+    global tx_pin
+    if {$name == "tx"} { return $tx_pin }
+    return ""
+}
+proc connect_pin {name pin} {
+    global rx_pins
+    set ix [lsearch -exact $rx_pins $pin]
+    if {$name == "rx" && $ix<0} then { lappend rx_pins $pin; return ok }
+    if {$name == "rx"} { return bad_value }
+    return not_found
+}
+proc disconnect_pin {name pin} {
+    global rx_pins
+    set ix [lsearch -exact $rx_pins $pin]
+    if {$name == "rx" && $ix>=0} then { set rx_pins [lreplace $rx_pins $ix $ix]; return ok }
+    if {$name == "rx"} { return bad_value }
+    return not_found
+}
+
+set last_char "<nothing>"
+proc driven_h4 {pin value} {
+    global tx_pin cur_col last_char
+
+    if {($pin == $tx_pin)} then {
+	set char [binary format c $value]
+	if {$value >= 32 && $value < 127} then {
+	    term_insert $char
+	    term_update_cursor
+	} elseif {$char == "\r"} then {
+	    screen_flush
+	    set cur_col 0
+	    term_down
+	    term_update_cursor
+	} elseif {$char == "\n" && $last_char != "\r"} then {
+	    screen_flush
+	    set cur_col 0
+	    term_down
+	    term_update_cursor
+	} elseif {$char == "\b"} then {
+	    incr cur_col -1
+	    term_update_cursor
+	} elseif {$char == "\t"} then {
+	    incr cur_col [expr {8 - ($cur_col % 8)}]
+	    term_update_cursor
+	} elseif {$char == "\a"} then {
+	    bell
+	}
+    }
+    set last_char $char
+}
+
+proc attribute_names_in_category {cat} { return [list] }
+proc attribute_value {a} { return "" }
+proc set_attribute_value {a v} { return not_found }
+
+# This call may be received if tksm is opening us up as a component GUI
+set related_components [list]
+
+proc relate {rel comp} {
+    global tx_pin rx_pins related_components shutdown_hook
+
+    set type [lindex $rel 0]
+    set name [lindex $rel 1]
+    lappend related_components $comp
+
+    wm title . $rel
+
+    # we know a few component types by name, so we can connect ourselves!
+    switch -glob $type {
+	sw-gloss-* {
+	    set comp_txpin_name "debug-tx"
+	    set comp_rxpin_name "debug-rx"
+	}
+	hw-uart-* {
+	    set comp_txpin_name "Sout"
+	    set comp_rxpin_name "Sin"
+	}
+	default {
+	    set comp_txpin_name "tx"
+	    set comp_rxpin_name "rx"
+	}
+    }
+
+    set comp_rxpin [sid::component::find_pin $comp $comp_rxpin_name]
+    if {$comp_rxpin == ""} then {
+	puts "hw-visual-tty: cannot connect to $name pin $comp_rxpin_name"
+	return bad_value
+    } else {
+	connect_pin "rx" $comp_rxpin
+    }
+
+    set status [sid::component::connect_pin $comp $comp_txpin_name $tx_pin] 
+    if {$status != "ok"} then {
+	puts "hw-visual-tty: cannot connect to $name pin $comp_txpin_name"
+	return bad_value
+    }
+
+    lappend shutdown_hook [list sid::component::disconnect_pin $comp $comp_txpin_name $tx_pin]
+
+    return ok
+}

@@ -1,0 +1,118 @@
+if {! $sidtarget(arm)} then { untested "hw-timer-arm/ref-* not available"; return }
+
+set test "sid configuration w/ scheduler"
+sid_config_component_etc_test_with_tracing "sched.conf" \
+    "load [sid_find_file libtimers.la] timer_component_library" \
+    "hw-timer-arm/ref-sched" \
+    "load [sid_find_file libsched.la] sched_component_library
+new sid-sched-sim sched
+set sched num-clients 1
+set sched enabled? 1
+connect-pin sched 0-control <- wrapper divided-clock-control
+connect-pin sched 0-event -> wrapper divided-clock-event
+relate tester sched sched
+"
+pass $test
+
+set test "sid startup"
+if [sid_start "sched.conf"] then { pass $test } else { fail $test ; return }
+
+set test "test presence of scheduler component"
+set sched [sid_cmd "set relationships(sched)"]
+if {"$sched" == ""} then { fail $test } else { pass $test }
+
+set test "attribute list"
+sid_assert_success "sid::component::attribute_names $victim"
+
+set test "reserved register write_h4_l4 (0x04)"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+sid_assert_success "sid::bus::write_h4_l4 $bus 4 0"
+set test "reserved register read_h4_l4 (0x04)"
+sid_assert_success "sid::bus::read_h4_l4 $bus 4"
+
+set test "reserved register write_h4_l4 (0x10)"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+sid_assert_success "sid::bus::write_h4_l4 $bus 0x10 0"
+set test "reserved register read_h4_l4 (0x010)"
+sid_assert_success "sid::bus::read_h4_l4 $bus 0x10"
+
+set test "set / retrieve a load value (byte)"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+sid_cmd "sid::bus::write_h4_l1 $bus 0 0xAA"
+set val [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
+if {[lindex $val 0] == "ok" && [lindex $val 1] == 0xAA} then {pass $test} else {fail $test}
+
+set test "set / retrieve a load value (half-word)"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+sid_cmd "sid::bus::write_h4_l2 $bus 0 0xAABB"
+set val [sid_cmd "sid::bus::read_h4_l2 $bus 0"]
+if {[lindex $val 0] == "ok" && [lindex $val 1] == 0xAABB} then {pass $test} else {fail $test}
+
+set test "set / retrieve a load value (word)"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+sid_cmd "sid::bus::write_h4_l4 $bus 0 0xC"
+set val [sid_cmd "sid::bus::read_h4_l4 $bus 0x0"]
+if {[lindex $val 0] == "ok" && [lindex $val 1] == 0xC} then {pass $test} else {fail $test}
+
+set test "retrieve timer value (word)"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+set val [sid_cmd "sid::bus::read_h4_l4 $bus 0x4"]
+if {[lindex $val 0] == "ok" && [lindex $val 1] == 0xC} then {pass $test} else {fail $test}
+
+set test "clear interrupts"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+set val [sid_cmd "sid::bus::write_h4_l4 $bus 0x0C 0"]
+if {$val == "ok"} then {pass $test} else {fail $test}
+
+set test "get control word"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+set val [sid_cmd "sid::bus::read_h4_l4 $bus 0x08"]
+# XXX: assert also the current value of the control word?
+if {[string match "ok*" $val]} then {pass $test} else {fail $test}
+
+set test "turn timer on"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+set val [sid_cmd "sid::bus::write_h4_l4 $bus 0x08 0xC4"]
+# C4: enabled | periodic | prescale=01 (divide-by-16)
+if {$val == "ok"} then {pass $test} else {fail $test}
+
+set test "tick presence of scheduler clock pin"
+set clock_pin [sid_cmd "sid::component::find_pin $sched advance"]
+if {$clock_pin == ""} then { fail $test } else { pass $test }
+
+# 0C = last value stored in timer, a few tests ago
+set test "tick timer for almost 0x0C steps = 0xB scheduler ticks"
+set sensor_pin [sid_cmd "sid::pin::new"]
+sid_cmd "set sensor_count 0"
+sid_cmd "set sensor_state 0"
+sid_cmd "set hook_driven_h4($sensor_pin) {global driven_h4_value; incr sensor_count ; set sensor_state \$driven_h4_value}"
+sid_cmd "sid::component::connect_pin $victim interrupt $sensor_pin"
+# one less tick than enough
+for {set i 0} {$i < 0xB} {incr i} {
+    sid_cmd "sid::pin::driven_h4 $clock_pin 0"
+}
+set val [sid_cmd "set sensor_count"]
+if {$val == "0"} then {pass $test} else {fail $test}
+
+# one more tick - timer should trigger
+set test "tick timer for final tick"
+sid_cmd "sid::pin::driven_h4 $clock_pin 0"
+set val1 [sid_cmd "set sensor_count"]
+set val2 [sid_cmd "set sensor_state"]
+if {$val1 == "1" && $val2 == "1"} then {pass $test} else {fail $test}
+
+set test "clear interrupt"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+set val [sid_cmd "sid::bus::write_h4_l4 $bus 0x0C 0"]
+set val1 [sid_cmd "set sensor_count"]
+set val2 [sid_cmd "set sensor_state"]
+if {$val1 == 2 && $val2 == 0} then {pass $test} else {fail $test}
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "sched.conf" }

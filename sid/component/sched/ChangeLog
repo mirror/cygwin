@@ -1,0 +1,426 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compSched.cxx: Import more std:: identifiers.
+	(operator <<,>>): Correct iterator use.
+
+2000-02-17  Mary Lynn Kostash  <mkostash@redhat.com>
+
+	* sid-sched.txt: Changes as per bje's review comments.
+
+2000-01-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (scheduler_component_base): Add recursion_limited 
+	base class.
+	(scheduler_component_base ctor): Initialize it.
+	(scheduler_component advance): Prevent harmful recursion.
+	* sid-sched.txt: Document this.
+
+2000-01-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (operator <<,>>): Save/restore more attribute and
+	pin values.
+
+1999-12-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (scheduler_client::set_time): Round time up if
+ 	scale is too small.
+
+1999-12-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (operator <<,>>): Save/restore num-clients as a
+	decimal integer.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sid-sched.txt: New file.  Renamed from
+	* README: Removed.
+	* Makefile.am: Install new file.
+	* Makefile.in: Regenerated.
+
+1999-12-07  Ben Elliston  <bje@cygnus.com>
+
+	* README: Formatting tweaks to help pass the doc test.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (*): Drive output pins with sentinel values.
+	(cancel_control): Removed.  Update callers.
+	(advance, time_query, yield_step_loop): Take unused args.
+	(scheduler_component_base): New dummy base class.
+	(do_delete): Use dynamic_cast<>.
+	* README: Update to describe new encoding of 'cancel' operation.
+
+1999-11-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (reset_events): Avoid redundant set if last_time=0.
+
+1999-11-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (schedule_irregular): Consider argument as a delta
+	time.
+	(scheduler_client): Add new members scale_mul, scale_div.
+	(scheduler_client ctor): Initialize them to 1/1.
+	(scheduler_component operator <<): Save them.
+	(scheduler_component operator >>): Restore them.
+	(set_time): Perform scaling.
+	(set_control): Defer most processing to set_time.
+	(get_scale_attr, set_scale_attr): New UI conversion functions
+	(client_num_update): Track new "NNN-control" attribute.
+	* Makefile.am (DEJAGNUTESTS): Add schedmonkey.exp.
+	* Makefile.in: Regenerated.
+	* README: Document new "scale" attribute.
+
+1999-11-01  Permaine Cheung  <pcheung@cygnus.com>
+
+	* README: Fix pin name in configuration.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (set_control): Take value, not const-ref.
+
+1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Update for bool/number notation changes.
+	* compSched.cxx (operator <<, >>): Use make_numeric_attribute.
+	(set_time, client_num_update): Ditto.
+	(scheduler_component): Declare num_clients as a host_int_1 to
+	limit maximum number of clients.
+
+1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (*): Use host_int_X, not compiler_int_X.
+
+1999-09-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (system_now): Move out-of-line for debuggability.
+ 	(generic_scheduler::next_event): New function.
+	(generic_scheduler::advance_any): Dispatch all due/overdue events.
+	Limit iteration to detect hopeless overload.
+
+1999-09-08  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README: Minor grammatical fixes.
+
+1999-08-31  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (host_time_keeper_base): Add new members num_yields
+	and total_yield_time.
+	(yield): Maintain new statistics.  Prefer usleep() on cygwin.
+	Confirm forward time flow.
+	(accurate_host_time_keeper::operator <<): Print new stats.
+
+1999-08-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (operator <<,>>): New functions for all time_keepers.
+	(generic_scheduler): Make timer member public.
+	(scheduler_component ctor): Expose them as "timekeeper-info" attr.
+	(host_time_keeper_base): New base class.  Drowsy sleep() manager.
+	(apprx_host_time_keeper): Renamed from host_time_keeper.
+	(accurate_host_time_keeper): New class with no dilution at all.
+	(generic_scheduler::yield): Simplify logic.
+	(create): Use accurate_host_time_keeper for sid-sched-host-accurate.
+	
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (operator >>): Use ANSI setstate() instead of setf().
+
+1999-08-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (scheduler_component_ctor_1): New function.
+	(scheduler_component_ctor_2): New function.
+	(scheduler_component_ctor_3): New function.
+	(scheduler_component ctor): Move guts into above functions.  Call them.
+	
+1999-08-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (list_types, create): Rename component type
+	"sid-scheduler-host-precise" -> "...-accurate".
+	(scheduler_component ctor): Add attributes for target view access.
+	(get_time, set_time): New functions.
+	(host_time_keeper::yield): Test but don't assert forward flow of time. 
+	* README: New documentation file.
+	* README.old: Renamed copy of old README.
+
+1999-08-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (operator <<): Add dummy number at state string end.
+	(operator >>): Consume dummy number and thus entire string.
+
+1999-07-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (scheduler_component ctor): Add more attributes
+	visible to a target view.
+
+1999-07-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (generic_scheduler::advance): Exit loop early
+	if event lists run out.
+
+1999-07-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (*): Rename "yield_p" -> "yield_host_time_p".
+	(generic_scheduler::yield_step_loop_p): New member.
+	(advance): Exit loop if yield_step_loop_p becomes set.
+	(scheduler_component::yield_pin): New member.
+	(yield_step_loop): Set yield_step_loop_p.
+	(scheduler_component ctor): Associate new "yield" pin with function.
+	Rename "yield?" attribute to "yield-host-time?".
+	* README: Document changes.
+	
+	* Makefile.am (DEJAGNUFLAGS): New macro.
+	(checkme): New target.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* testsuite: Removed directory.
+	* Makefile.am (SUBDIRS): Don't recurse into it.
+	* Makefile.in: Regenerated.
+	* acconfig.h: Removed.
+	* aclocal.m4: Ditto.
+	* config.in: Ditto.
+	* configure: Ditto.
+	* configure.in: Ditto.
+	* stamp-h.in: Ditto.
+
+1999-06-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (host_time_keeper::get_now): Move out-of-line.
+	(refill_regular_events_table): Ditto.
+	
+1999-06-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (tick_t): Change back to compiler_int_8.
+	(get_now): New functions, returning time value by reference.
+	(now): Deleted functions.  Pointed callers to get_now instead.
+
+	(generic_scheduler): Use plain value vectors for regular_events and
+ 	irregular_events.  Adjust all users.  Effect is to avoid heap
+ 	allocation during scheduler operation.
+	(ctor): Enumerate members to be initialized.
+	
+	(advance_any): New function; combined form of previous advance_*.
+	(advance_both, advance_*regular, advance_nop): Removed function.
+	(reset_advance_function): Removed function.  Updated callers.
+	(advance_function): Removed function pointer.
+
+	(set_control): Cancel existing scheduled events on new request.
+	
+1999-06-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (tick_t): Change typedef to host_int_8, as a
+ 	compiler bug workaround attempt.
+	(host_time_keeper): Change types of adaptive counters to
+ 	compiler_int_4.
+	(refill_regular_events_table): Use tick_t for next_tick_index.
+	(generic_scheduler operator >>): Read into tick_t, not clock_t.
+	
+1999-06-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (do_delete): New function.
+	(sched_component_library): Register it.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (list_types, create): Renamed types
+	"host-time-scheduler" -> "sid-sched-host",
+	"host-time-scheduler-precise" -> "sid-sched-host-precise",
+	"target-time-scheduler" -> "sid-sched-sim".
+	* README: Updated with new component type names.
+
+1999-06-01  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (host_time_keeper): Support template-specified
+ 	dilution for reducing accuracy by cutting system call use rate.
+	(list_types): Export "host-time-scheduler" with 25-ms dilution,
+	and "host-time-scheduler-precise" with 1-ms (nil) dilution.
+	Remove previous "XXX-time-schedule" type aliases.
+	* README: Document both host-time schedulers.
+
+1999-05-31  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (host_time_keeper): Added new instance variables for
+	adaptive host time estimation.
+	(system_now): New routine, copied from previous `now'.  Use
+	`gettimeofday' by default.
+	(now): New routine.  Adaptive host time estimator.
+	(set_now): Reset adaptive parameters.
+	(yield): Ditto.
+	* configure.in: Look for gettimeofday.
+	* configure: Regenerated.
+	* config.in: Regenerated.
+
+1999-05-28  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (generic_scheduler::operator<<,>>): Add 
+ 	functional state save/restore code.
+	(clear_pin_mappings): New function.
+	(add_pin_mapping): New function.
+	(scheduler_component::operator<<,>>): Store client data.
+	(state_save): Return a value, duh.
+	
+1999-05-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (generic_scheduler): Add stub state save/restore
+	functions.  Maintain internal pin-to-string mapping table.
+
+1999-05-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (restore_state): Return sid::component::status.
+
+1999-05-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* aclocal.m4: Regenerated.
+
+1999-05-11  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx: Add usual state save/restore code (incomplete).
+	Allay minor warnings.
+	(set_now): New timekeeper functions, for use by state restore.
+	(cancel): Deallocate cancelled regular event.
+	(client_num_update): Preserve previous clients as far as possible.
+	* README: Update for new num-clients behavior.
+
+1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (sched_component_library): DLLEXPORT it.
+	* configure.in: Be win32-dll-capable.
+	* configure: Regenerated.
+	* config.in: Ditto.
+	* aclocal.m4: Regenerated for new libtool.
+	* Makefile.in: Ditto.
+
+1999-04-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Look for declarations of usleep and ftime.
+	* acconfig.h: Add #undef HAVE_* templates for these.
+	* compSched.cxx: Give Solaris-like declarations for them, if needed.
+	* configure: Regenerated.
+	* config.in: Regenerated.
+
+1999-04-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (LDFLAGS): Add -no-undefined
+	* Makefile.in: Regenerated.
+
+	* compSched.cxx (scheduler_component ctor): Qualify member function
+	pointers.
+
+1999-04-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (yield): New function in *_time_keeper classes.
+	In host_time_keeper, yield CPU using usleep(3).
+	(generic_scheduler::yield): New function.  Call the above.
+	(generic_scheduler::advance): Take new yield_p argument.
+	Call yield if scheduler runs out of events.
+	(scheduler_component): Add new "yield?" attribute.
+	(README): Document changes.
+
+	(configure.in): Look for usleep function.
+	(configure): Regenerated.
+	(config.in): Regenerated.
+	
+	(list_types, create): Add more intuitive aliases for component
+ 	type names.
+
+1999-04-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Updated docs to point to sidutil:: helper class.
+
+1999-04-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Updated docs for NNN-control pin.
+	* compSched.cxx (set_control): Interpret top bit of driven value as
+	"regular vs. irregular" mode selection.
+	(refill_regular_events_table): Don't crash if last regular event
+ 	is deleted.
+	
+1999-04-01  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (*): Adapt to renamed fixed_attribute_map functions.
+
+1999-03-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx: Added cerr tracing calls; commented out same.
+	(deliver_*): Don't advance "time" here.
+	(advance_*): Advance "time" here.
+	(generic_scheduler): Add step_cycle_limit variable.
+	(advance): Use it to limit loop iterations.
+	(scheduler_component): Expose it as an attribute.
+	(refill_regular_events_table): Correct timetable init logic.
+	(set_control): Remove old cancel detection logic.
+	(advance_both): Renamed version of `advance_generic'.
+	
+	* README: Added step-cycle-limit attribute docs.
+
+1999-03-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: New file.  Theory of operation of scheduler.
+
+	* compSched.cxx (schedule_*): Call reset_advance_function()
+	after scheduling changes.
+	(cancel): Implement.
+	(cancel_control): New function.  Trigger on NNN-control->driven().
+
+1999-03-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx (scheduler_component): Initialize some more members
+	during ctor.
+	(client_num_update): Fix leapfrogging bug in deallocation loop.
+
+	* testsuite: New directory.
+	* configure.in: Configure it.
+	* Makefile.am: Build it.
+	* configure: Regenerated.
+	* Makefile.in: Regenerated.
+
+1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Use new AC_CONFIG_AUX_DIR.
+	* configure: Regenerated.
+	* Makefile.am: Build libtool -modules.
+	* Makefile.in: Regenerated.
+
+1999-03-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compSched.cxx: New file: Generic event scheduler.
+	* Makefile.am: New file.
+	* configure.in: New file.
+	* stamp-h.in: New blank file.
+	* acconfig.h: New file.
+	* config.in: Generated new file.
+	* aclocal.m4: Generated new file.
+	* Makefile.in: Generated new file.
+	* configure: Generated new file.
+

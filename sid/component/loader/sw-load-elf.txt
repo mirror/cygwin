@@ -1,0 +1,85 @@
+* Name
+  sw-load-elf
+
+* Synopsis
+  This component loads ELF files from the host filesystem into simulated memory.
+
+  Attributes: file verbose? state-snapshot
+  Pins: load! start-pc-set endian-set error
+  Accessors: load-accessor
+
+  Shared library: libloader.la
+  Symbol: loader_component_library
+
+* Functionality
+ 
+  - Modelling
+    * This component helps to simulate a process environment by
+      impersonating an OS loader.
+
+  - Behaviors
+    * Configuration
+
+      The "file" attribute stores the name of a file to attempt to load. 
+      The "verbose?" attribute, when set, encourages this component to provide 
+      informative messages to cout during loading.
+
+    * Loading
+
+      When the "load!" pin is driven, this component will attempt to
+      load an ELF file from the host filesystem.  The loadable parts
+      of the file are sent one byte at a time through an accessor.
+      During the process, the starting PC and the program endianness
+      are signalled by driving the values onto the "start-pc-set" and
+      "endian-set" output pins.  The endianness value is 0/1/2 for
+      unknown/big/little.
+
+      If the file cannot be found or if it has other errors, a message is
+      sent to cerr and the loading process is stopped.  The "error"
+      output pin is driven in this case.
+
+      Like operating system loaders, sw-load-elf uses the ELF "program
+      header" to identify the bytes to load into memory.  It does not
+      use the "section header".  This means that it tends to load more
+      bytes than gdb would.
+
+  - SID conventions
+    * This is a functional component.
+    * It supports state save/restore, though state is minimal.
+    * It does not support triggerpoints.
+    * It does not limit recursion.
+    * It presents attributes in the "setting" category.
+
+* Environment
+  - Related components
+    * This component can be used as an initialization sequencer in a
+      scenario with ordering dependencies.  See this configuration fragment:
+
+	new hw-glue-sequence-8 reset-manager
+	new CPU-OF-SOME-TYPE cpu
+	new sw-load-elf loader
+	new mapper bus
+	connect-pin reset-manager input <- main starting
+	connect-pin reset-manager output-1 -> loader load!
+        connect-bus loader load-accessor bus access-port
+	set loader file "/foo/bar.x"
+        set loader verbose? 1
+	connect-pin loader start-pc-set -> cpu start-pc-set!
+	connect-pin loader endian-set -> cpu endian-set!
+        connect-pin loader error -> main stop!
+
+* SID interface reference
+  - low level:
+    * pins
+      - load! | input | any | loading
+      - start-pc-set | output | any | loading
+      - endian-set | output | 0/1/2 | loading
+      - error | output | any | loading
+
+    * attributes
+      - state-snapshot | no category | opaque string | n/a | state save/restore
+      - file | setting | file name | "/dev/null" | configuration
+      - verbose? | setting | 1/0 | 0 | configuration
+
+    * accessors
+      - load-accessor | write little_int_1 | loading

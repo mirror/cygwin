@@ -1,0 +1,24 @@
+# This conf file contains set, connect-pin, relate, connect-bus commands without 
+# new command on that component
+
+# configuration logging
+set main verbose? 0
+
+# component libraries
+load libcgencpu.la cgen_component_library
+load libconsoles.la console_component_library
+load libgloss.la gloss_component_library
+load libinterrupt.la interrupt_component_library
+load libloader.la loader_component_library
+load libmapper.la mapper_component_library
+load libmemory.la mem_component_library
+load libmmu.la mmu_component_library
+load libsched.la sched_component_library
+load libtimers.la timer_component_library
+
+# Scheduler
+set target-sched enabled? 1
+connect-pin target-sched 0-control <- timer1 divided-clock-control
+relate angel cpu cpu
+connect-bus remapper all bus access-port
+

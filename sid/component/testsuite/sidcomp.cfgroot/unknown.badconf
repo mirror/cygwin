@@ -1,0 +1,67 @@
+abc  main verbose 0			# unknown command
+setmainverbose0				# unknown command
+
+# configuration logging (original)
+set main verbose? 0
+
+# component libraries
+dsoi libcgencpu.la cgen_component_library		# unknown command
+ds libconsoles.la console_component_library	# unknown command
+
+
+## component libraries (original)
+load libcgencpu.la cgen_component_library
+load libconsoles.la console_component_library
+load libgloss.la gloss_component_library
+load libinterrupt.la interrupt_component_library
+load libloader.la loader_component_library
+load libmapper.la mapper_component_library
+load libmemory.la mem_component_library
+load libmmu.la mmu_component_library
+load libsched.la sched_component_library
+Dso libtimers.la timer_component_library	# unknown command (conf file is case sensitive)
+load libtimers.la timer_component_library	# unknown command (conf file is case sensitive)
+
+
+
+unknowncommand hw-cpu-arm7t cpu		# unknown command
+newnew hw-cpu-arm7t cpu			# unknown command
+n sw-load-elf loader			# unknown command
+-> new hw-cpu-arm7t cpu			# unknown command
+
+# Components (original)
+
+new hw-cpu-arm7t cpu
+new sw-load-elf loader
+new sid-io-stdio stdio
+new sw-gloss-arm/angel angel
+new hw-interrupt-arm/ref intctrl
+new hw-mapper-basic bus
+new hw-remap/pause-arm/ref remapper
+new sid-sched-host host-sched
+new sid-sched-sim target-sched
+new hw-memory-ram/rom-basic mem
+new hw-timer-arm/ref-sched timer1
+New hw-timer-arm/ref-sched timer2	# unknown command (conf file is case sensitive)
+
+# Scheduler
+settarget target-sched enabled? 1	# unknown command
+reset target-sched num-clients 2	# unknown command
+
+set target-sched enabled? 1	
+Set target-sched num-clients 2	# unknown command (conf file is case sensitive)
+
+CCconnect-pin target-sched 0-control - timer1 divided-clock-control	# unknown command
+connect target-sched 1-control - timer2 divided-clock-control		# unknown command
+
+
+# Component relationships
+Relationship angel cpu cpu -		# unknown command
+Relate angel cpu cpu -			# unknown command (conf file is case sensitive)
+
+# Main pin connections
+-pin main perform-activity -> host-sched advance	# unknown command
+
+# ELF loader
+bus loader load-accessor bus access-port		# unknown command
+

@@ -1,0 +1,240 @@
+* Name
+  sid-control-cfgroot
+
+* Synopsis
+  This component configures and executes a simulation run.
+
+  Pins: run! starting perform-activity stop! stopping
+  Attributes: verbose? config-file! config-line! persistent? state-snapshot
+	running starting perform-activity stop! stopping auto-print?
+	config-file-history activity-count
+  Relationships: component-catalog-informees
+
+  Shared library: (not available)
+  Symbol: config_component_library
+
+* Functionality
+ 
+  - Modelling
+    * This component encapsulates the configuration file parser
+      and the simulation main loop.  It does not correspond to
+      hardware.
+
+  - Behaviors
+    * Configuration
+
+      When the "config-file!" attribute is written to, the value is
+      interpreted as a file name, and processed as a configuration
+      file.  The name of the file is appended to a history list,
+      which is accessible as the read-only attribute "config-file-history".
+
+      The format of the configuration file is described in the APPENDIX
+      below.  As each line is read, the appropriate component API
+      functions are called.  In case of any failure, a message is
+      printed to standard error, and a failure result code will be
+      returned from the set_attribute_value call.
+
+      If the "auto-print?" attribute is set to a true value, then as
+      each component instance is created, all its attributes in the
+      "auto-print" category will be queried and printed to standard
+      output.
+
+      The effects of multiple writes to the "config-file!" attribute
+      are cumulative.  The sid-control-cfgroot component is always
+      implicitly present with the component name "main".  If the
+      "verbose?" attribute is set, some tracing messages are printed 
+      during configuration.
+
+      When the "config-line!" attribute is written to, the supplied
+      value is interpreted as a single configuration command and
+      executed, as if that value was written to a file, and the file's
+      name supplied to the "config-file!" attribute.
+
+    * Startup
+
+      When the "run!" pin is driven, the simulation top level loop
+      begins.  This process has several stages.  
+
+      First, all components registered in the
+      "component-catalog-informees" relationship are given the
+      then-current list of components.  This is done by setting a
+      number of individual component relationships for every informee.
+      Each relationship contains a single instantiated component
+      pointer, and has the name constructed as "TYPE NAME", as
+      appropriate for that component.
+
+      Immediately after this, the simulation main loop behavior takes
+      over.  Only after that main loop is finished will control return
+      to the function that sent the "run!" signal to this component.
+
+    * Main loop
+
+      The main loop has two levels.  An infinite outer loop remains
+      active as long as the "persistent?" attribute is set to a
+      boolean true value.  
+
+      The body of this loop performs a sequence of steps.  First, it
+      drives the "starting" output pin.  Then, it enters the inner
+      main loop.  At the start of this loop, the "running" attribute
+      is set to boolean true.  In the loop, the "activity-count"
+      attribute is incremented, and the "perform-activity" output pin
+      is repeatedly driven.  This loop runs until the "stop!" input
+      pin is driven.  (This could happen during the initial "starting"
+      signal, in which case this inner loop will not be entered at
+      all.)  After the inner loop exits, the "stopping" output pin is
+      driven.
+
+  - SID conventions
+    * This is a supervisory component.
+    * It supports state save/restore, though state is minimal.
+    * It does not support triggerpoints.
+    * It prevents harmful recursion from the "run!" input pin.
+    * It presents attributes in the "setting", "pin", and "register"
+      categories.
+
+* Environment
+  - Related components
+
+* SID interface reference
+  - low level:
+    * pins
+      - run! | input | any | startup
+      - starting | output | void | main loop
+      - perform-activity | output | void | main loop
+      - stop! | input | any | main loop
+      - stopping | output | void | main loop
+
+    * attributes
+      - config-file! | | file name | n/a | configuration
+      - config-line! | | any string | n/a | configuration
+      - config-file-history | register | file names | n/a | configuration
+      - verbose? | setting | boolean | false | configuration, main loop
+      - persistent? | setting | boolean | false | main loop
+      - auto-print? | setting | boolean | true | main loop
+      - state-snapshot | | opaque string | n/a | state save/restore
+      - starting | pin | n/a | n/a | main loop	
+      - running | register | boolean | n/a | main loop
+      - activity-count | register | number | n/a | main loop	
+      - perform-activity | pin | n/a | n/a | main loop	
+      - stop! | pin | n/a | n/a | main loop	
+      - stopping | pin | n/a | n/a | main loop	
+
+    * relationships
+      - component-catalog-informees | simulation startup
+
+
+APPENDIX: configuration file format
+
+The configuration file format is very simple, and the parser/lexer are
+minimal.  Each command in the configuration file maps to 1-3
+sid::component API calls.  There is no application- or
+component-dependent logic.
+
+
+Grammar:
+
+cfg-file ::= cfg-line | cfg-file cfg-line
+
+cfg-line ::=
+  load-cmd | new-cmd | connect-pin-cmd | disconnect-pin-cmd |
+  connect-bus-cmd | disconnect-bus-cmd | set-cmd | relate-cmd | unrelate-cmd
+
+load-cmd ::= "load" file-name symbol-name
+file-name ::= string
+symbol-name ::= string
+  -- Register a component library.  Load the shared library from the
+     file named by the first string, or fall back to the sid mainline
+     executable itself.  Look up a component_library symbol named by
+     the second string.  Add all component type names to the catalog
+     of types.  Its sid::component_library::list_component_types hook is
+     called.  A compatibility magic value in the component library is
+     tested.  If a filename omits a directory specification, then the
+     installed location and a search path held in the SID_LIBRARY_PATH
+     environment variable is searched for the library.  The library
+     directory under that given by SID_EXEC_PREFIX environment variable
+     (optionally set at sid installation time), or else the build-time
+     --exec-prefix, is also searched.
+
+new-cmd ::= "new" type-name comp-name
+type-name ::= string
+comp-name ::= string
+  -- Instantiate a new component.  The first string is the component
+     type, as registered in a prior load-cmd.  The second string is the
+     new component instance's nick-name.  The nicknames must be unique
+     among those built by cfgroot.  The lucky winner's
+     sid::component_library::create_component hook is called.
+
+connect-pin-cmd ::= "connect-pin" comp-name pin-name dir comp-name pin-name
+dir ::= "->" | "<-" | "<->"
+comp-name ::= string
+pin-name ::= string
+  -- Establish a new pin-to-pin connection between two components.
+     The component/pin to the left of the "->" or right of the "<-"
+     operator receives a sid::component::connect_pin call.  The other
+     receives a sid::component::find_pin call.  If the "<->" operator
+     is specified, then establish two pin-to-pin links in opposite
+     directions.
+
+disconnect-pin-cmd ::= "disconnect-pin" comp-name pin-name dir
+		       comp-name pin-name
+dir ::= "->" | "<-" | "<->"
+comp-name ::= string
+pin-name ::= string
+  -- Break an existing pin-to-pin connection between two components.
+     The component/pin to the left of the "->" or right of the "<-"
+     operator receives a sid::component::disconnect_pin call.  The
+     other receives a sid::component::find_pin call.  If the "<->"
+     operator is specified, then the connection will be broken in both
+     directions.
+
+connect-bus-cmd ::= "connect-bus" comp-name acc-name comp-name bus-name
+comp-name ::= string
+acc-name ::= string
+bus-name ::= string
+  -- Establish a new accessor-to-bus connection between two components.
+     The left component receives a sid::component::connect_accessor call; the
+     right component receives a sid::component::find_bus call.
+
+disconnect-bus-cmd ::= "disconnect-bus" comp-name acc-name comp-name bus-name
+comp-name ::= string
+acc-name ::= string
+bus-name ::= string
+  -- Break an existing accessor-to-bus connection between two
+     components.  The left component recevies a
+     sid::component::disconnect_accessor call; the right component
+     receives a sid::component::find_bus call.
+
+set-cmd ::= "set" comp-name attr-name attr-value
+comp-name ::= string
+attr-name ::= string
+attr-value ::= string
+  -- Set the given attribute of the given component to the given value.
+     The component receives a sid::component::set_attribute_value call.
+
+relate-cmd ::= "relate" comp-name rel-name comp-name
+comp-name ::= string
+rel-name ::= string
+  -- Add the second named component to the named component relationship
+     set for the first given component.  The first component receives
+     a sid::component::relate call.
+
+unrelate-cmd ::= "unrelate" comp-name rel-name comp-name
+comp-name ::= string
+rel-name ::= string
+  -- Remove the second named component from the named component relationship
+     set for the first given component.  The first component receives
+     a sid::component::unrelate call.
+
+
+Lexer issues:
+
+A string is a white-space-separated sequence of printable (isprint())
+characters.  If started with double-quotes, all characters between
+opening and closing quotes are included in the string.  Embedded lexer
+control characters ('\' and '"') may be escaped by a '\' prefix.  "\n"
+is interpreted as a C++ \n.  (What other escape sequences are worth
+supporting?)
+
+A "#" character found where a string is expected is interpreted as a
+comment to end-of-line, and the search for the next string found is
+returned instead.

@@ -1,0 +1,24 @@
+dnl Process this thid file  with autoconf to produce a configure script
+AC_INIT(Makefile.in)
+AC_CONFIG_AUX_DIR(../config)
+AM_INIT_AUTOMAKE(sidcomp,0.1)
+AM_CONFIG_HEADER(config.h:config.in)
+
+dnl automake support
+AM_MAINTAINER_MODE
+AC_LIBTOOL_WIN32_DLL
+AM_PROG_LIBTOOL
+
+AC_EXEEXT
+AC_PROG_CXX
+AC_PROG_CXXCPP
+AC_PROG_MAKE_SET
+AC_ARG_PROGRAM
+AC_LANG_CPLUSPLUS
+
+AC_CHECK_LIB(stdc++, main)
+AC_CHECK_LIB(m, main)
+
+AC_CONFIG_SUBDIRS(voice-pager)
+
+AC_OUTPUT(Makefile)

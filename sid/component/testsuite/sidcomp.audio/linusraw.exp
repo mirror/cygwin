@@ -1,0 +1,101 @@
+set test "sid configuration"
+sid_config_component_test "linusraw.conf" \
+    "load [sid_find_file libaudio.la] audio_component_library" \
+    "sid-io-audio"
+pass $test
+
+
+# duplicate of audio_config::audio_config(host_int_4)
+proc audio_config { bits encoding channels frequency } {
+    set bits27_24 $bits
+    set bits21_20 [expr {$encoding == "ulaw" ? 0 :
+			 $encoding == "alaw" ? 1 :
+			 $encoding == "pcm" ? 2 :
+			 3}]
+    set bits18_16 $channels
+    set bits15_0 $frequency
+    return [expr {($bits27_24 << 24) |
+		  ($bits21_20 << 20) |
+		  ($bits18_16 << 16) |
+		  ($bits15_0 << 0)}]
+}
+
+
+set test "sid startup"
+if [sid_start "linusraw.conf"] then { pass $test } else { fail $test ; return }
+
+
+# linusraw.raw was generated on Red Hat Linux 5.2 thusly:
+# sox -V /usr/share/sndconfig/sample.au -U -r 8000 -c 1 linusraw.bin
+set fname [file join $srcdir sidcomp.audio linusraw.bin]
+set test "load Linus sound sample from $fname"
+if {![file exists $fname]} then { set rawsample ""; untested $test } else {
+    set fhandle [open $fname r]
+    fconfigure $fhandle -translation binary 
+    set fsize [file size $fname]
+    set rawsample [read $fhandle]
+    close $fhandle
+    if {[string length $rawsample] == $fsize} then { pass $test } else { fail $test }
+}
+
+
+set test "set configuration"
+set code [audio_config 8 ulaw 1 8000] 
+set config_pin [sid_cmd [list sid::component::find_pin $victim config-set]]
+sid_cmd [list sid::pin::driven_h4 $config_pin $code]
+set config [sid_cmd [list sid::component::attribute_value $victim config]]
+if {$config == "8-bit uLaw mono 8000Hz"} then { pass $test } else { fail $test }
+
+
+set test "assert tx"
+set tx_prev_p [sid_cmd [list sid::component::attribute_value $victim "tx-mode?"]]
+set tx_pin [sid_cmd [list sid::component::find_pin $victim tx-mode]]
+sid_cmd [list sid::pin::driven_h4 $tx_pin 1]
+set tx_now_p [sid_cmd [list sid::component::attribute_value $victim "tx-mode?"]]
+if {$tx_prev_p == "no" && $tx_now_p == "yes"} then { pass $test } else { fail $test }
+
+
+set test "play Linus sound sample"
+set strlen [string length $rawsample]
+binary scan $rawsample c* decsample1
+set decsample [list]
+foreach sample $decsample1 {
+    lappend decsample [expr {int($sample) & 0xFF}]
+}
+set tx_sample_pin [sid_cmd [list sid::component::find_pin $victim tx-sample]]
+if {! $crappy_tcl} then {
+    # upload sample quickly
+    sid_cmd [list eval " \
+set decsample {$decsample}; \
+for {set i 0} {\$i < \[llength \$decsample\]} {incr i} { \
+    set sample \[lindex \$decsample \$i\] ; \
+    sid::pin::driven_h4 $tx_sample_pin \$sample \
+} \
+    "] 
+} else {
+    # upload sample slowly
+    set prevtimeout $timeout
+    set timeout 60
+    for {set i 0} {$i < [llength $decsample]} {incr i} {
+        set sample [lindex $decsample $i]
+        sid_cmd [list sid::pin::driven_h4 $tx_sample_pin $sample]
+    }
+    set timeout $prevtimeout
+}
+pass $test
+
+set test "deassert tx"
+set tx_prev_p [sid_cmd [list sid::component::attribute_value $victim "tx-mode?"]]
+set tx_pin [sid_cmd [list sid::component::find_pin $victim tx-mode]]
+sid_cmd [list sid::pin::driven_h4 $tx_pin 0]
+set tx_count [sid_cmd [list sid::component::attribute_value $victim tx-samples-count]]
+set tx_now_p [sid_cmd [list sid::component::attribute_value $victim "tx-mode?"]]
+if {$tx_prev_p == "yes" && $tx_now_p == "no" && $tx_count == $strlen} then { pass $test } else { fail $test }
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "linusraw.conf" }

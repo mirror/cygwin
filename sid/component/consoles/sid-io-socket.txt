@@ -1,0 +1,177 @@
+* Name
+  sid-io-socket-server sid-io-socket-client
+
+* Synopsis
+
+  Members of this family of components perform I/O on a TCP socket and relay data
+  across a pair of pins to some other component.
+
+  Pins: init fini tx rx poll-event poll-control
+  Attributes: tx-count tx-buffer rx-count poll-count avg-tx-buffer-size server? 
+	sockaddr-local sockaddr-peer verbose? trace-traffic? buffer-while-disconnected? 
+	connected? max-poll-interval poll-interval
+	init fini tx rx
+
+  Library: libconsoles.la
+  Symbol name: console_component_library
+
+* Functionality
+  - Modelling
+
+    This simulated component uses non-blocking I/O on the host.
+    Therefore it must be regularly polled, for example by a host-time
+    scheduler.  This component is able to automatically regulate a
+    scheduler subscription to produce fast response/throughput during
+    high traffic times, or reduce CPU load in low traffic times.
+
+    The "sid-io-socket-server" component implements a TCP server, and
+    "sid-io-socket-client" implements a TCP client.  In other words,
+    one expects an incoming socket connection, the other uses an
+    outgoing socket connection.  The two components are otherwise
+    interchangeable and are treated below as one kind.
+
+    Multiple instances of these components coexist comfortably.
+
+  - Behaviors
+
+    * Initialization
+
+      When the "init" pin is driven, the component creates and binds a
+      file descriptor to the IP address specified by the
+      "sockaddr-local" attribute.  The host operating system may
+      assign some available TCP port number if the attribute is not
+      set.  An actual TCP connection attempt is not made at this time.
+ 
+      When the "fini" pin is driven, the component closes its file
+      descriptors, thus closing its connection (if any).
+
+    * Connection
+
+      When the "poll-event" pin is driven, but no connection exists, a
+      non-blocking TCP connect operation is attempted.  For a server,
+      this means an "accept()" call, and for a client, a "connect()".
+      The "server?" attribute will contain a boolean true value for
+      the former, false for the latter.
+
+      If the connection is successful, the "connected?" attribute is
+      set to a true value, and the "sockaddr-peer" attribute is filled
+      in.  If connection is ever lost, "connected?" is reset, and a
+      new connection will be attempted at the next "poll-event"
+      signal.
+
+      If the "verbose?" attribute is set, a trace message is emitted
+      whenever the connection status changes.
+
+    * Pin I/O 
+
+      When the "tx" pin is driven with a value, the bottom 8 bits are
+      extracted and enqueued in a transmit buffer.  The "tx-buffer"
+      attribute provides a read-only view of the current buffer, and
+      the "avg-tx-buffer-size" provides a moving average length of
+      this buffer.  If a TCP connection does not exist, and
+      "buffer-while-disconnected?" is set to a boolean false value,
+      then bytes received on the "tx" pin are ignored instead of
+      buffered.
+
+      Whenever the "tx" pin is driven without value out of 0-255
+      range, it is interpreted as an "end-of-file" indication, which
+      causes the current socket connection, if any, to be shut down.
+      Similarly, if the disconnection is caused by the peer, the "rx"
+      pin is driven with an out-of-range value to signal an
+      "end-of-file" condition.
+
+      Whenever a character is received from the TCP socket, it is
+      immediately transmitted on the "rx" pin as an 8-bit value.
+      (This happens only during a poll.)
+
+    * Socket I/O polling
+
+      When the "poll-event" pin is driven, and a connection exists,
+      this component attempts to receive then transmit batches of
+      bytes, in a non-blocking manner.  If the "trace-traffic?"
+      attribute is set to a boolean true value, a tracing message is
+      written to standard out for each successful "read()" or "write()"
+      operation.
+
+      The "tx-count" and "rx-count" attributes accumulate the number
+      of bytes transmitted and received, respectively.  The
+      "poll-count" attribute accumulates the number of "poll-event"
+      events, including those made while disconnected.
+
+      After all "poll-event" signals, the component drives the
+      "poll-control" pin with a value meant to set the interval to the
+      next polling event.  Each successful non-blocking socket I/O
+      operation tends to reduce the polling interval, and each
+      unsuccessful one gradually increases the interval.  This
+      adaptive process attempts to provide a good trade-off between
+      socket I/O performance (speed & throughput) and host OS load
+      (polling frequency).  The "poll-interval" attribute contains the
+      last selected polling interval, and "max-poll-interval" sets a
+      maximum on the adaptive increase.  (The minimum is 0.)
+
+  - SID conventions
+    * This is a functional component.
+    * It does not support state save/restore, nor triggerpoints.
+    * It prevents harmful recursion on the "poll-event" input pin.
+
+* Environment
+  - Related components
+
+    The "init" and "fini" pins must be driven in the proper sequence.
+
+    Since this component family merely pumps data in and out of a
+    socket, some other component should serve as the source and sink
+    of the characters.
+
+    The adaptive polling control mechanism is designed to operate best
+    when connected to a host-time scheduler.  This mechanism may be
+    unused, as long as the "poll-event" pin is driven regularly by
+    some other source.
+
+    The following configuration file fragment shows a hypothetical use
+    of the socket components.
+
+        new SOMETYPE source
+        new SOMETYPE sink
+        new sid-sched-host-accurate sched
+        new sid-io-socket-server srv                    # be a server
+	set srv sockaddr-local 0.0.0.0:3420             # listen on port 3420
+	set sched num-clients 1
+	connect-pin main starting -> srv init
+        connect-pin main stopping -> srv fini
+        connect-pin sched 0-event -> srv poll-event     # adaptive polling
+        connect-pin sched 0-control <- srv poll-control # adaptive polling
+        set srv verbose? 1
+        connect-pin srv tx <- source tx
+        connect-pin srv rx -> sink rx
+
+* SID interface reference
+
+  - low level:
+    * pins
+      - init | input | N/A | initialization
+      - fini | input | N/A | initialization
+      - tx | input | byte or void | pin I/O
+      - rx | output | byte or void | pin I/O
+      - poll-event | input | any | connection, socket I/O polling
+      - poll-control | output | limited value | connection, socket I/O polling
+
+    * attributes
+      - tx-count | register | numeric | n/a | socket I/O polling
+      - tx-buffer | register | string | n/a | pin I/O
+      - rx-count | register | numeric | n/a | socket I/O polling
+      - poll-count | register | numeric | n/a | socket I/O polling
+      - avg-tx-buffer-size | register | floating point string | n/a | pin I/O
+      - server? | setting | boolean | 1/0 | initialization
+      - sockaddr-local | setting/register | ipaddress:port | 0.0.0.0:0 | connection
+      - sockaddr-peer | register/setting | ipaddress:port | 0.0.0.0:0 | connection
+      - verbose? | setting | boolean | 0 | connection
+      - trace-traffic? | setting | boolean | 0 | socket I/O polling
+      - buffer-while-disconnected? | setting | boolean | yes | pin I/O
+      - connected? | register | boolean | n/a | connection
+      - max-poll-interval | setting | numeric | 250 | socket I/O polling
+      - poll-interval | register | numeric | n/a | socket I/O polling
+      - init | pin | numeric | n/a | initialization
+      - fini | pin | numeric | n/a | initialization
+      - tx | pin | numeric | n/a | pin I/O
+      - rx | pin | numeric | n/a | pin I/O

@@ -1,0 +1,90 @@
+set test "sid configuration"
+sid_config_component_test_with_tracing "lcd1.conf" \
+    "load [sid_find_file liblcd-char-display.la] lcd_char_display_component_library" \
+    "hw-lcd-char-display"
+pass $test
+
+set test "sid startup"
+if [sid_start "lcd1.conf"] then { pass $test } else { fail $test ; return }
+
+set test "check attribute list"
+sid_assert_includes_all "sid::component::attribute_names $victim" {state-snapshot width height}
+
+set category "pin"
+set test "check $category attribute list"
+sid_assert_includes_all "sid::component::attribute_names_in_category $victim $category" {row-col FR init}
+
+set category "register"
+set test "check $category attribute list"
+set r_attr [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if {$r_attr == ""} then { pass $test } else { fail $test }
+
+set category "watchable"
+set test "check $category attribute list"
+sid_assert_includes_all "sid::component::attribute_names_in_category $victim $category" {row-col FR init}
+
+set category "setting"
+set test "check $category attribute list"
+sid_assert_includes_all "sid::component::attribute_names_in_category $victim $category" {width height}
+
+set test "check default value for width"
+set default_value [sid_cmd "sid::component::attribute_value $victim width"]
+if {$default_value == "80"} then { pass $test } else { fail $test }
+
+set test "check default value for height"
+set default_value [sid_cmd "sid::component::attribute_value $victim height"]
+if {$default_value == "24"} then { pass $test } else { fail $test }
+
+set test "get FR pin"
+set FR_pin [sid_cmd "sid::component::find_pin $victim FR"]
+if {$FR_pin != ""} { pass $test } else { fail $test }
+
+foreach value {0 1} {
+set test "drive FR pin with $value"
+sid_assert_success "sid::pin::driven_h4 $FR_pin $value"
+}
+
+set test "get row-col pin"
+set row_col_pin [sid_cmd "sid::component::find_pin $victim row-col"]
+if {$row_col_pin != ""} { pass $test } else { fail $test }
+
+for {set value 0} {$value < 10} {incr value} {
+set test "drive row-col pin with $value"
+sid_assert_success "sid::pin::driven_h4 $FR_pin $value"
+}
+
+set test "Save state"
+set value1 [sid_cmd "sid::component::set_attribute_value $victim width 800"]
+set value2 [sid_cmd "sid::component::set_attribute_value $victim height 240"]
+set state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {$state != "" && $value1 == "ok" && $value2 == "ok"} then { pass $test } else { fail $test }
+
+set test "Change the width setting to 100"
+set value [sid_cmd "sid::component::set_attribute_value $victim width 100"]
+if {$value == "ok"} then { pass $test } else { fail $test }
+
+set test "Check the width setting"
+set value [sid_cmd "sid::component::attribute_value $victim width"]
+if {$value == "100"} then { pass $test } else { fail $test }
+
+set test "Change the height setting to 12"
+set value [sid_cmd "sid::component::set_attribute_value $victim height 12"]
+if {$value == "ok"} then { pass $test } else { fail $test }
+
+set test "Check the height setting"
+set value [sid_cmd "sid::component::attribute_value $victim height"]
+if {$value == "12"} then { pass $test } else { fail $test }
+
+set test "Restore previous state"
+sid_cmd "sid::pin::driven_h4 $FR_pin 0"
+set status [sid_cmd "sid::component::set_attribute_value $victim state-snapshot $state"]
+if {$status == "ok"} then { pass $test } else { fail $test }
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "lcd1.conf" }

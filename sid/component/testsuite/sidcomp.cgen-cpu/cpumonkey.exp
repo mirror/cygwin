@@ -1,0 +1,38 @@
+# Run a monkey test on the components in this component library. 
+
+load_lib "monkey.exp"
+
+
+if {$sidtarget(arm)} then {
+    # thorough 3-minute test
+    monkey_test hw-cpu-arm7t cgen_component_library libcgencpu.la 3m
+} else { untested "monkey test hw-cpu-arm7t" }
+
+
+# the others are wimpy
+# special handling for step! pin - depends on prior initialization
+proc pin_safe_p {pin_name} {
+   if {$pin_name == "step!"} then { return 0 }
+   if {$pin_name == "abort"} then { return 0 }
+   return 1
+}
+
+
+# special handling for step! pin - depends on prior initialization
+proc pin_safe_p {pin_name} {
+   if {$pin_name == "step!"} then { return 0 }
+   if {$pin_name == "abort"} then { return 0 }
+   return 1
+}
+
+if {$sidtarget(m32r)} then {
+    monkey_test hw-cpu-m32r/d cgen_component_library libcgencpu.la
+} else { untested "monkey test hw-cpu-m32r/d" }
+
+# special handling for step! pin - depends on prior initialization
+proc pin_safe_p {pin_name} {
+   if {$pin_name == "step!"} then { return 0 }
+   if {$pin_name == "abort"} then { return 0 }
+   return 1
+}
+

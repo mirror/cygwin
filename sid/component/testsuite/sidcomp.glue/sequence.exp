@@ -1,0 +1,87 @@
+set test "sid configuration"
+sid_config_component_test_with_tracing "base.conf" \
+    "load [sid_find_file libglue.la] glue_component_library" \
+    "hw-glue-sequence"
+pass $test
+
+set test "sid startup"
+if [sid_start "base.conf"] then { pass $test } else { fail $test ; return }
+
+set test "check attribute list"
+sid_assert_includes_all "sid::component::attribute_names $victim" {"num-outputs" "state-snapshot"}
+
+set test "get input pin"
+set ipin [sid_cmd "sid::component::find_pin $victim input"]
+if {$ipin != ""} then { pass $test } else { fail $test }
+
+set test "set outputs=0"
+sid_assert_success "sid::component::set_attribute_value $victim num-outputs 0"
+
+set test "attempt setting bad output"
+set junkpin [sid_cmd "sid::pin::new"]
+set result [sid_cmd "sid::component::connect_pin $victim output-4 $junkpin"]
+if {$result == "not_found"} then { pass $test } else { fail $test }
+
+set size 10
+set test "set outputs=$size"
+sid_assert_success "sid::component::set_attribute_value $victim num-outputs $size"
+
+set test "set $size output pins"
+for {set i 0} {$i < $size} {incr i} {
+    set pin [sid_cmd "sid::pin::new"]
+    sid_cmd "set hook_driven_h4($pin) { global driven_h4_value driven_history ; lappend driven_history $i \$driven_h4_value }"
+    set status [sid_cmd "sid::component::connect_pin $victim output-$i $pin"]
+    if {$status != "ok" } then { fail $test ; return }
+}
+pass $test
+
+set test "drive with value"
+sid_cmd "set driven_history {}"
+sid_cmd "sid::pin::driven_h4 $ipin 0xAA"
+set status [sid_cmd "set driven_history"]
+if {$status == {0 170 1 170 2 170 3 170 4 170 5 170 6 170 7 170 8 170 9 170}} then { pass $test } else { fail $test }
+
+set test "shrink output list"
+set result [sid_cmd "sid::component::set_attribute_value $victim num-outputs 4"]
+if {$result == "ok"} then { pass $test } else { fail $test }
+
+set test "drive after shrinking"
+sid_cmd "set driven_history {}"
+sid_cmd "sid::pin::driven_h4 $ipin 8"
+set status [sid_cmd "set driven_history"]
+if {$status == {0 8 1 8 2 8 3 8}} then { pass $test } else { fail $test }
+
+set test "get state snapshot"
+set state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {$state != ""} then { pass $test } else { fail $test }
+
+set test "restore state snapshot"
+set result [sid_cmd "sid::component::set_attribute_value $victim state-snapshot [list $state]"]
+if {$result == "ok"} then { pass $test } else { fail $test }
+
+set test "prepare for infinite recursion detection test"
+sid_cmd [list sid::component::set_attribute_value $victim num-outputs 1]
+set pins [sid_cmd [list sid::component::connected_pins $victim output-0]]
+foreach p $pins {
+    sid_cmd [list sid::component::disconnect_pin $victim output-0 $p]
+}
+pass $test
+
+set test "infinite recursion detection"
+# use real-victim, not victim, since trace component itself imposes a recursion limit 
+set real_victim [sid_cmd [list set relationships(real-victim)]]
+set ipin [sid_cmd [list sid::component::find_pin $real_victim input]] 
+set result [sid_cmd [list sid::component::connect_pin $real_victim output-0 $ipin]]
+# trigger recursion
+sid_cmd [list sid::pin::driven_h4 $ipin 0]
+# test for liveness by disconnection
+set result2 [sid_cmd [list sid::component::disconnect_pin $real_victim output-0 $ipin]]
+if {$ipin != "" && $result == "ok" && $result2 == "ok"} then { pass $test } else { fail $test }
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "base.conf" }

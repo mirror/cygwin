@@ -1,0 +1,10 @@
+# Audio test
+
+load_lib "cpudefs.exp"
+
+set sid_run_repetitions 1
+
+if {$sidtarget(arm)} then {
+    # use undocumented --sidcodec option
+    run-sid-c-bsp-tests arm-elf arm7 $srcdir/sidcomp.audio "linuscodec.c" {-O2 -DSIDCODEC=0xE0000000 -mbig-endian} {--cpu=arm --sidcodec=0xE0000000} axb
+}

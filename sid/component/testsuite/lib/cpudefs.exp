@@ -1,0 +1,453 @@
+global prefix
+
+# In general, this belongs in a file in $tool/testsuite/lib,
+# but that doesn't exist [nor do we want to create N lib directories].
+
+# Run the tests that match PATTERN using the sid executable.
+# Each testcase must have a `sim' entry specifying the sid configuration file.
+# See the docs for run-one-sid-test.
+
+set build_ltldpath [join [glob "../*" "$srcdir/../*"] ":"]
+set install_ltldpath "$prefix/lib/sidcomp"
+set sid_run_repetitions 1
+
+proc run-sid-tests { toolchain-prefix all-machs testcase-srcdir pattern as-opts ld-opts sid-opts exe-suffix } {
+    set as-prog [sid_find_gas ${toolchain-prefix}]
+    set ld-prog [sid_find_ld ${toolchain-prefix}]
+    set sid-prog [sid_find_sid]
+
+    run-sid-test \
+	    ${as-prog} ${as-opts} \
+	    ${ld-prog} ${ld-opts} \
+	    {} {} \
+	    ${sid-prog} ${sid-opts} \
+	    ${all-machs} ${testcase-srcdir} $pattern ${exe-suffix} \
+	    sid-run-conf
+}
+
+# Run the tests that match PATTERN using the ${toolchain-prefix}-run
+# SID cover script.
+
+proc run-sid-bsp-tests { toolchain-prefix all-machs testcase-srcdir pattern as-opts ld-opts sid-opts exe-suffix } {
+    set as-prog [sid_find_gas ${toolchain-prefix}]
+    set ld-prog [sid_find_ld ${toolchain-prefix}]
+    set sid-bsp-prog [sid_find_sid_bsp ${toolchain-prefix}]
+
+    run-sid-test \
+	    ${as-prog} ${as-opts} \
+	    ${ld-prog} ${ld-opts} \
+	    {} {}  \
+	    ${sid-bsp-prog} ${sid-opts} \
+	    ${all-machs} ${testcase-srcdir} $pattern ${exe-suffix} \
+	    sid-run-bsp
+}
+
+# Run the tests that match PATTERN using the ${toolchain-prefix}-run
+# SID cover script.
+
+proc run-sid-c-bsp-tests { toolchain-prefix all-machs testcase-srcdir pattern gcc-opts sid-opts exe-suffix } {
+    set gcc-prog [sid_find_gcc ${toolchain-prefix}]
+    set sid-bsp-prog [sid_find_sid_bsp ${toolchain-prefix}]
+
+    run-sid-test \
+	    {} {} \
+	    {} {} \
+	    ${gcc-prog} ${gcc-opts}  \
+	    ${sid-bsp-prog} ${sid-opts} \
+	    ${all-machs} ${testcase-srcdir} $pattern ${exe-suffix} \
+	    sid-run-bsp
+}
+
+
+proc run-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-machs testcase-srcdir pattern exe-suffix runner } {
+    global runtests
+
+    verbose "as = $as ${as-opts}"
+    verbose "ld = $ld ${ld-opts}"
+    verbose "gcc = $gcc ${gcc-opts}"
+    verbose "sid = $sid ${sid-opts}"
+    verbose "all-machs = ${all-machs}"
+    verbose "testcase-srcdir = ${testcase-srcdir}"
+    verbose "pattern = ${pattern}"
+
+    foreach src [lsort [glob -nocomplain ${testcase-srcdir}/$pattern]] {
+	# If we're only testing specific files and this isn't one of them,
+	# skip it.
+	if ![runtest_file_p $runtests $src] {
+	    continue
+	}
+
+	run-one-sid-test \
+		$as ${as-opts} \
+		$ld ${ld-opts} \
+		$gcc ${gcc-opts} \
+		$sid ${sid-opts} \
+		${all-machs} $src ${exe-suffix} \
+		$runner
+    }
+}
+
+# Argument to run-one-sid-test to compute the command_line argument for
+# testcases using a .conf file.
+
+proc sid-run-conf { sid sid-opts conf-file test-prog run-options } {
+    global srcdir subdir
+    global prefix
+    # Install a usable .conf file in the build directory.
+    set filename [file tail ${conf-file}]
+    set rc [remote_download host $srcdir/$subdir/${conf-file} ${filename}.in]
+    if { $rc == "" } {
+	verbose -log "download failed, $srcdir/$subdir/${conf-file}"
+	return [list unresolved ""]
+    }
+    set remote-conf-file $rc
+    # s/@-prefix-@/$prefix/
+    # ??? Another way to do this would be to do it entirely in tcl [open,
+    # read,regsub,write].
+    # ??? Another way would be to be able to pass command line arguments
+    # to sid that are usable in the .conf file.
+    set rc [remote_exec host sed "-e s,@-prefix-@,$prefix, -e s,@-srcdir-@,$srcdir, -e s,@-testprog-@,${test-prog}, " \
+	    "${remote-conf-file}" "${filename}" 10]
+    if { [lindex $rc 0] == -1 } {
+	verbose -log "@-prefix-@ substitution failed, [lindex $rc 1]"
+	return [list unresolved ""]
+    }
+
+    # compute component library search path: build tree, then install tree
+    global prefix build_ltldpath install_ltldpath
+    set sidpath [sid_find_sid]
+    global build_ltldpath
+    set ltldpath ":$build_ltldpath:$install_ltldpath:"
+    return [sid_run "$sid ${sid-opts} ${conf-file}" "" "" "${run-options} \"env(SID)=$sidpath\" \"env(SID_LIBRARY_PATH)=$ltldpath\""]
+}
+
+# Argument to run-one-sid-test to compute the command_line argument for
+# testcases using ${target-alias}-run.
+
+proc sid-run-bsp { sid sid-opts sid-mach-opts test-prog run-options } {
+    # compute component library search path: build tree, then install tree
+    global prefix build_ltldpath install_ltldpath
+    set ltldpath ":$build_ltldpath:$install_ltldpath:"
+    set sidpath [sid_find_sid]
+
+    return [sid_run "$sid ${sid-opts} ${sid-mach-opts} ${test-prog}" "" "" "${run-options} \"env(SID)=$sidpath\" \"env(SID_LIBRARY_PATH)=$ltldpath\""]
+}
+
+# Run testcase SRC.
+# SRC is a fully specified file name.
+# AS,LD,GCC,SID are file names of their respective executables.
+# EXE-SUFFIX is the suffix to give the executable.  This is to distinguish the
+# same testcase being used multiple times (each with different compilation
+# options).
+#
+# This works with either the main sid executable (that takes a configuration
+# file for an argument) or with the easy-to-use(TM) ${target-alias}-run cover
+# script.
+#
+# ALL_MACHS is a list of machs to use if "mach: all" is specified in the file.
+# The file can contain options in the form "# option(mach list): value"
+# Possibilities:
+# mach: [all | machine names]
+# as[(mach-list)]: <assembler options>
+# ld[(mach-list)]: <linker options>
+# sim[(mach-list)]: <simulator options>
+# output[(mach-list)]: program output pattern to match with string-match
+# xerror[(mach-list)]: program is expected to return with a "failure" exit code
+# If `output' is not specified, the program must output "pass" if !xerror or
+# "fail" if xerror.
+# The parens in "optname()" are optional if the specification is for all machs.
+
+proc run-one-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-machs src exe-suffix runner } {
+    verbose "Testing $src."
+
+    set file $src
+    set name [file tail $src]
+    set testcase-dir [file dirname $src]
+
+    set opt_array [slurp_options "${file}"]
+    if { $opt_array == -1 } {
+	unresolved $name
+	return
+    }
+    set opts(as) {}
+    set opts(ld) {}
+    set opts(gcc) {}
+    set opts(sim) {}
+    set opts(output) {}
+    set opts(mach) {}
+    set opts(timeout) {}
+    set opts(xerror) "no"
+
+    foreach i $opt_array {
+	set opt_name [lindex $i 0]
+	set opt_machs [lindex $i 1]
+	set opt_val [lindex $i 2]
+	if ![info exists opts($opt_name)] {
+	    perror "unknown option $opt_name in file $file"
+	    unresolved $name
+	    return
+	}
+	foreach m $opt_machs {
+	    set opts($opt_name,$m) $opt_val
+	}
+	if { "$opt_machs" == "" } {
+	    set opts($opt_name) $opt_val
+	}
+    }
+
+    set testname "$name (${as-opts},${ld-opts},${gcc-opts},${sid-opts})"
+    set sourcefile $file
+    if { $opts(output) == "" } {
+	if { "$opts(xerror)" == "no" } {
+	    set opts(output) "pass\n"
+	} else {
+	    set opts(output) "fail\n"
+	}
+    }
+    # Change \n sequences to newline chars.
+    regsub -all "\\\\n" $opts(output) "\n" opts(output)
+
+    # ??? Need a mach-suffix to go with exe-suffix.
+    if {$opts(mach) == "all"} then { set opts(mach) ${all-machs} }
+    foreach mach $opts(mach) {
+	verbose "Testing $name on $mach."
+	global test
+	set test "$mach $testname"
+
+	set exe-name ${name}.${exe-suffix}
+
+	if [string match "*.c" $sourcefile] {
+	    if ![info exists opts(gcc,$mach)] {
+		set opts(gcc,$mach) $opts(gcc)
+	    }
+	    send_log "$gcc ${gcc-opts} $opts(gcc,$mach) -I${testcase-dir} -o ${exe-name} $sourcefile\n"
+	    catch "exec $gcc ${gcc-opts} $opts(gcc,$mach) -I${testcase-dir} -o ${exe-name} $sourcefile" comp_output
+
+	    if ![string match "" $comp_output] {
+		verbose -log "$comp_output" 3
+		perror "$mach $testname - compile failed"
+		continue
+	    }
+	} else {
+	    if ![info exists opts(as,$mach)] {
+		set opts(as,$mach) $opts(as)
+	    }
+	    send_log "$as ${as-opts} $opts(as,$mach) -I${testcase-dir} -o ${name}.o $sourcefile\n"
+	    catch "exec $as ${as-opts} $opts(as,$mach) -I${testcase-dir} -o ${name}.o $sourcefile" comp_output
+
+	    if ![string match "" $comp_output] {
+		verbose -log "$comp_output" 3
+		perror "$mach $testname - assembly failed"
+		continue
+	    }
+	    
+	    if ![info exists opts(ld,$mach)] {
+		set opts(ld,$mach) $opts(ld)
+	    }
+	    send_log "$ld ${ld-opts} $opts(ld,$mach) -o ${exe-name} ${name}.o\n"
+	    catch "exec $ld ${ld-opts} $opts(ld,$mach) -o ${exe-name} ${name}.o" comp_output
+	    
+	    if ![string match "" $comp_output] {
+		verbose -log "$comp_output" 3
+		perror "$mach $testname - linking failed"
+		continue
+	    }
+	}
+
+	# If no machine specific options, default to the general version.
+	if ![info exists opts(sim,$mach)] {
+	    set opts(sim,$mach) $opts(sim)
+	}
+
+	# Build the options argument.
+	set options ""
+	if { "$opts(timeout)" != "" } {
+	    set options "$options timeout=$opts(timeout)"
+	}
+
+        global sid_run_repetitions
+	global last_sid_run_time
+	set last_sid_run_time 99999
+        for {set iter 0} {$iter < $sid_run_repetitions} {incr iter} {
+	    set result [$runner $sid "${sid-opts}" "$opts(sim,$mach)" ${exe-name} "$options"]
+	    if {$iter == 0} { 
+		set min_sid_run_time $last_sid_run_time
+	    } elseif {$last_sid_run_time < $min_sid_run_time} {
+		set min_sid_run_time $last_sid_run_time
+	    }
+            set status [lindex $result 0]
+    	    set output [lindex $result 1]
+
+	    if { "$status" == "pass" } {
+	        if { "$opts(xerror)" == "no" } {
+	    	    if [string match $opts(output) $output] {
+		        pass $test
+		    } else {
+		        verbose -log "output:  $output" 3
+		        verbose -log "pattern: $opts(output)" 3
+		        fail "$mach $testname"
+			return
+		    }
+	        } else {
+		    verbose -log "`pass' return code when expecting failure" 3
+		    fail $test
+		    return
+	        }
+	    } elseif { "$status" == "fail" } {
+	        if { "$opts(xerror)" == "no" } {
+		    fail "$mach $testname"
+		    return
+	        } else {
+		    if [string match $opts(output) $output] {
+		        pass $test
+		    } else {
+		        verbose -log "output:  $output" 3
+		        verbose -log "pattern: $opts(output)" 3
+		        fail $test
+			return
+	    	    }
+	        }
+	    } else {
+	        $status "$mach $testname"
+	    }
+	}
+        if {$sid_run_repetitions > 1} then {
+	    note "$test simulation time: $min_sid_run_time ms"
+        }
+    }
+}
+
+# Run a program on the simulator.
+#
+# SIM_OPTS are options for the simulator.
+# PROG_OPTS are options passed to the simulated program.
+# At present REDIR must be "" or "> foo".
+# OPTIONS is a list of options internal to this routine.
+# This is modelled after target_compile.  We want to be able to add new
+# options without having to update all our users.
+# Currently:
+#	env(foo)=val	- set environment variable foo to val for this run
+#	timeout=val	- set the timeout to val for this run
+#
+# The result is a list of two elements.
+# The first is one of pass/fail/etc.
+# The second is the program's output.
+#
+# This is different than the sim_load routine provided by
+# dejagnu/config/sim.exp.  It's not clear how to pass arguments to the
+# simulator (not the simulated program, the simulator) with sim_load.
+#
+# This used to support running dejagnu on a different host, but due to
+# the need for multiple files and having one file refering to the other files,
+# this is much more difficult.  Thus this support has been deleted.  Should
+# it ever be needed it can be revisited.
+# REQUIRED_FILES is unused, but it's meant to contain the list of files that
+# need to be downloaded to the host.  The catch is to update the sid .conf
+# file to point to where they were put.
+
+# sim sim_opts prog prog_opts
+proc sid_run { command_line required_files redir options } {
+    # Set the default value of the timeout.
+    # FIXME: The timeout value we actually want is a function of
+    # host, target, and testcase.
+    set testcase_timeout [board_info target sim_time_limit]
+    if { "$testcase_timeout" == "" } {
+	set testcase_timeout [board_info host testcase_timeout]
+    }
+    if { "$testcase_timeout" == "" } {
+	set testcase_timeout 240 ;# 240 same as in dejagnu/config/sim.exp.
+    }
+
+    # Initialize the environment we pass to the testcase.
+    set testcase_env ""
+
+    # Process OPTIONS ...
+    foreach o $options {
+	if [regexp {^env\((.*)\)=(.*)} $o full var val] {
+	    set testcase_env "$testcase_env $var=$val"
+	} elseif [regexp {^timeout=(.*)} $o full val] {
+	    set testcase_timeout $val
+	}
+	
+    }
+	
+    verbose "testcase timeout is set to $testcase_timeout" 1
+
+    if [is_remote host] {
+	# Let's make this a catastrophic error so should the time ever come
+	# for it's need, the problem stands out.
+	error "remote host operation isn't supported"
+    }
+
+    # FIXME: this works for UNIX only
+    if { "$testcase_env" != "" } {
+	set command_line "env $testcase_env $command_line"
+    }
+
+    send_log "$command_line\n"
+
+    set start_time [clock clicks]
+    if { "$redir" == "" } {
+	remote_spawn host "$command_line"
+    } else {
+	remote_spawn host "$command_line $redir" writeonly
+    }
+    set result [remote_wait host $testcase_timeout]
+    set end_time [clock clicks]
+    set run_time [expr {($end_time - $start_time) / 1000}]
+    global test
+    global last_sid_run_time
+    set last_sid_run_time $run_time
+    # note "$test simulation time: $run_time ms"
+
+    set return_code [lindex $result 0]
+    set output [lindex $result 1]
+    # Remove the \r part of "\r\n" so we don't break all the patterns
+    # we want to match.
+    regsub -all -- "\r" $output "" output
+
+    # ??? Not sure the test for pass/fail is right.
+    # We just care that the simulator ran correctly, not whether the simulated
+    # program return 0 or non-zero from `main'.
+    set status fail
+    if { $return_code == 0 } {
+	set status pass
+    }
+
+    return [list $status $output]
+}
+
+# Subroutine of run_sim_test to process options in FILE.
+
+proc slurp_options { file } {
+    #verbose "Slurping $file"
+    if [catch { set f [open $file r] } x] {
+	#perror "couldn't open `$file': $x"
+	perror "$x"
+	return -1
+    }
+    set opt_array {}
+    # whitespace expression
+    set ws  {[ 	]*}
+    set nws {[^ 	]*}
+    # whitespace is ignored anywhere except within the options list;
+    # option names are alphabetic only
+    set pat "^#${ws}(\[a-zA-Z\]*)\\(?(\[^):\]*)\\)?$ws:${ws}(.*)$ws\$"
+    # Allow comment as first line of file.
+    set firstline 1
+    while { [gets $f line] != -1 } {
+	set line [string trim $line]
+	# Whitespace here is space-tab.
+	if [regexp $pat $line xxx opt_name opt_machs opt_val] {
+	    # match!
+	    lappend opt_array [list $opt_name $opt_machs $opt_val]
+	} else {
+	    if { ! $firstline } {
+		break
+	    }
+	}
+	set firstline 0
+    }
+    close $f
+    return $opt_array
+}

@@ -1,0 +1,47 @@
+SID - an embedded system simulation framework
+Copyright 1999, 2000 Red Hat.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this software; see the file COPYING.  If not, write to
+the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+Boston, MA 02111-1307 USA
+
+
+Note 1:
+
+The SID simulator framework is designed to allow independently built
+component libraries to plug into an executable, according to a
+standard open API and run-time linking ABI.  It is our position
+that such runtime dynamic linking is mere aggregation for purposes of
+Copyright, and therefore, SID component libraries are not automatically
+considered derived works of each other or of an executable.  This means
+that third party components do not have to be covered by the GNU General
+Public License, merely by virtue of being potentially loaded together
+within a SID simulation.  This clause does not however invalidate
+any other reasons why the component library or executable might be
+covered by the GNU General Public License.
+
+
+Note 2:
+
+The header files in the include/ subdirectory are licensed under
+the GPL with the following exception clause.    These files may be
+used as a part of a free software library without restriction. 
+Specifically, if a component library or executable instantiates templates or
+use macros or inline functions from these files, these files do not by
+themselves cause the resulting component library or executable to be
+covered by the GNU General Public License.  This exception does not
+however invalidate any other reasons why the component library or
+executable file might be covered by the GNU General Public License.
+
+

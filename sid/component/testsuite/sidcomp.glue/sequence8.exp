@@ -1,0 +1,37 @@
+set test "sid configuration"
+sid_config_component_test "base3.conf" \
+    "load [sid_find_file libglue.la] glue_component_library" \
+    "hw-glue-sequence-8"
+pass $test
+
+set test "sid startup"
+if [sid_start "base3.conf"] then { pass $test } else { fail $test ; return }
+
+set test "check default num-outputs is 8"
+set noutput [sid_cmd "sid::component::attribute_value $victim num-outputs"]
+if {$noutput == 8} then { pass $test } else { fail $test }
+
+# cr 101195
+set test "check pin names"
+sid_assert_includes_all "sid::component::pin_names $victim" {"input" "output-0" "output-1" "output-2" "output-3" "output-4" "output-5" "output-6" "output-7"}
+
+set test "loop through output pins"
+set newpin [sid_cmd "sid::pin::new"]
+for {set i 0} {$i < 8} {incr i} {
+   set pin [sid_cmd "sid::component::connect_pin $victim output-$i $newpin"]
+   if {$pin == ""} then { fail $test ; return }
+}
+pass $test               
+
+set test "num-outputs cannot be changed"
+set num [sid_cmd [list sid::component::attribute_value $victim num-outputs]]
+set s [sid_cmd [list sid::component::set_attribute_value $victim num-outputs [expr "$num + 1"]]]
+if {$s == "ok"} then {fail $test} else {pass $test}
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "base3.conf" }

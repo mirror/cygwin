@@ -1,0 +1,388 @@
+# Initialisation.
+
+if {! $sidtarget(arm)} then { untested "hw-remap/pause-arm/ref not available"; return }
+
+set remap(0,start) 0x12000
+set remap(0,end) 0x1301F
+set remap(0,reloc-to) 0x5000
+
+set remap(1,start) 0x18000
+set remap(1,end) 0x18FFF
+set remap(1,reloc-to) 0x100
+
+set test "sid configuration"
+sid_config_component_test_with_tracing "arm-remap.conf" \
+    "load [sid_find_file libmmu.la] mmu_component_library" \
+    "hw-remap/pause-arm/ref"
+pass $test
+
+set test "sid startup"
+if {[sid_start "arm-remap.conf"]} { pass $test } else { fail $test ; return }
+
+# Set up an array of triggerpoint sensor pins (connected to the victim).
+# Maintain another array that counts the number of times the triggerpoints are hit.
+
+catch {unset watchpins triggercount}
+foreach watchable {remapping?} {
+    set test "establish a triggerpoint for watchable state variable: $watchable"
+    set watchpins($watchable) [sid_cmd "sid::pin::new"]
+    sid_cmd "set triggercount($watchable) 0"
+    sid_cmd \
+        "set hook_driven_h4($watchpins($watchable)) {global triggercount driven_h4_value; incr triggercount($watchable) }"
+
+    # Some limited URL encoding hacks.
+    # see sid/include/sidwatchutil.h for the rules.
+    regsub -- {\?} $watchable "%3F" watchEnc
+    set result [sid_cmd "sid::component::connect_pin $victim watch:${watchEnc}:change $watchpins($watchable)"]
+    if {$result == "ok"} { pass $test } else { fail $test }
+}
+
+
+set test "set bus accessor"
+set bus [sid_cmd "sid::bus::new"]
+set result [sid_cmd [list sid::component::connect_accessor $victim all $bus]]
+if {$result == "ok"} then { pass $test } else { fail $test }
+
+set test "basic attributes present"
+sid_assert_includes_all "sid::component::attribute_names $victim" \
+	{"num-relocations" "remapping?" "state-snapshot"}
+
+
+set test "take snapshot of startup state"
+set state1 [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {[string compare $state1 "remapping 1 num-relocs 0 relocs "] == 0} {
+    pass $test
+} else {
+    fail $test
+}
+
+
+set test "remapping? attribute is yes at initialisation"
+set result [sid_cmd "sid::component::attribute_value $victim remapping?"]
+if {$result == "yes"} { pass $test } else { fail "$test -- got $result" }
+
+
+set test "switch to normal map for startup"
+set result [sid_cmd "sid::component::set_attribute_value $victim remapping? no"]
+if {$result == "ok"} { pass $test } else { fail "$test -- got $result" }
+
+
+set test "remapping? is now set to no"
+set result [sid_cmd "sid::component::attribute_value $victim remapping?"]
+if {$result == "no"} { pass $test } else { fail "$test -- got $result" }
+
+
+set test "switch back to reset map for continuation of these tests"
+set result [sid_cmd "sid::component::set_attribute_value $victim remapping? yes"]
+if {$result == "ok"} { pass $test } else { fail "$test -- got $result" }
+
+
+set test "remapping? is now set to yes"
+set result [sid_cmd "sid::component::attribute_value $victim remapping?"]
+if {$result == "yes"} { pass $test } else { fail "$test -- got $result" }
+
+
+set test "num-relocations is initially zero"
+set result [sid_cmd "sid::component::attribute_value $victim num-relocations"]
+if {$result == "0"} { pass $test } else { fail "$test -- got $result" }
+
+
+set test "configure for two (2) relocations"
+set result [sid_cmd "sid::component::set_attribute_value $victim num-relocations 2"]
+if {$result == "ok"} { pass $test } else { fail "$test -- got $result" }
+
+
+set test "validate num-relocations is two (2)"
+set result [sid_cmd "sid::component::attribute_value $victim num-relocations"]
+if {$result == "2"} { pass $test } else { fail "$test -- got $result" }
+
+
+set test "falling back to only one relocation gives bad_value"
+set result [sid_cmd "sid::component::set_attribute_value $victim num-relocations 1"]
+if {$result == "bad_value"} { pass $test } else { fail "$test -- got $result" }
+
+
+set test "newly generated attributes are present"
+sid_assert_includes_all "sid::component::attribute_names $victim" \
+	{"0-start" "0-reloc-to" "0-end" "1-start" "1-reloc-to" "1-end"}
+
+
+set test "no extraneous attributes have been generated"
+set okay 1
+set attrs [sid_cmd "sid::component::attribute_names $victim"]
+foreach attrib $attrs {
+    if {[regexp {([2-9]|[0-9][0-9]+)-[a-z]+} $attrib]} {
+	fail "$test -- $attrib"; set okay 0; break
+    }
+}
+if {$okay} { pass $test }
+
+
+foreach prefix {0 1} {
+    set test "validate ${prefix}- attributes are all initialized"
+    set okay 1
+    set result [sid_cmd "sid::component::attribute_value $victim ${prefix}-start"]
+    if {$result != "0"} { set okay 0 }
+    set result [sid_cmd "sid::component::attribute_value $victim ${prefix}-end"]
+    if {$result != "0"} { set okay 0 }
+    set result [sid_cmd "sid::component::attribute_value $victim ${prefix}-reloc-to"]
+    if {$result != "0"} { set okay 0 }
+    if {$okay} { pass $test } else { fail $test }
+}
+
+
+foreach prefix {0 1} {
+    set test "set ${prefix}- attributes"
+    set okay 1
+    set result [sid_cmd "sid::component::set_attribute_value $victim ${prefix}-start $remap($prefix,start)"]
+    if {$result != "ok"} { set okay 0 }
+    set result [sid_cmd "sid::component::set_attribute_value $victim ${prefix}-end $remap($prefix,end)"]
+    if {$result != "ok"} { set okay 0 }
+    set result [sid_cmd "sid::component::set_attribute_value $victim ${prefix}-reloc-to $remap($prefix,reloc-to)"]
+    if {$result != "ok"} { set okay 0 }
+    if {$okay} { pass $test } else { fail $test }
+}
+
+
+foreach prefix {0 1} {
+    set test "validate ${prefix}- attributes are set correctly"
+    set okay 1
+    set result [sid_cmd "sid::component::attribute_value $victim ${prefix}-start"]
+    if {$result != $remap($prefix,start)} { set okay 0 }
+    set result [sid_cmd "sid::component::attribute_value $victim ${prefix}-end"]
+    if {$result != $remap($prefix,end)} { set okay 0 }
+    set result [sid_cmd "sid::component::attribute_value $victim ${prefix}-reloc-to"]
+    if {$result != $remap($prefix,reloc-to)} { set okay 0 }
+    if {$okay} { pass $test } else { fail $test }
+}
+
+
+set test "register bus is present"
+set result [sid_cmd "sid::component::find_bus $victim registers"]
+if {$result != ""} { pass $test } else { fail $test }
+
+set test "access-port bus is present"
+set result [sid_cmd "sid::component::find_bus $victim access-port"]
+if {$result != ""} { 
+    pass $test
+    set initial_bus $result
+} else { fail $test }
+
+foreach pin {reset halt!} {
+    set test "$pin pin is present"
+    sid_assert_success "sid::component::find_pin $victim $pin"
+}
+
+
+set test "connect accessor to a dummy bus"
+set outbus [sid_cmd "sid::bus::new"]
+set r1 [sid_cmd [list sid::component::disconnect_accessor $victim all $bus]]
+set r2 [sid_cmd [list sid::component::connect_accessor $victim all $outbus]]
+if {$r1 == "ok" && $r2 == "ok"} then { pass $test } else { fail $test }
+
+# Test writes around the mapped region.
+
+set okay 1
+sid_cmd "set hook_written(h4,l4,$outbus) {}"
+set bus [sid_cmd "sid::component::find_bus $victim access-port"]
+for {set addr 0x10000} {$addr < 0x20000} {set addr [expr $addr + 4]} {
+    set test "remap for address [format %x $addr]"
+    sid_cmd "sid::bus::write_h4_l4 $bus $addr 0x12345678"
+    set translated_addr [sid_cmd "set written_addr"]
+
+    set expected_addr $addr
+
+    # Check that the translation occurred.
+    # Modify the expected address if it should be relocated by the
+    # remapper.
+
+    if { ($addr >= $remap(0,start)) && ($addr < $remap(0,end)) } {
+        set expected_addr [expr $addr - $remap(0,start) + $remap(0,reloc-to)]
+    }
+    if { ($addr >= $remap(1,start)) && ($addr < $remap(1,end)) } {
+	set expected_addr [expr $addr - $remap(1,start) + $remap(1,reloc-to)]
+    }
+	
+    if {$translated_addr != $expected_addr} {
+	set okay 0
+	fail "$test -- expected [format %x $expected_addr], got [format %x $translated_addr]"
+    }
+}
+if {$okay} { pass "remap around the mapped region" }
+
+
+set test "take another state snapshot"
+set state2 [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {[regexp {^remapping [01] num-relocs [0-9]+ relocs ([0-9a-fA-Fx]+,[0-9a-fA-Fx]+,[0-9a-fA-Fx]+ )+$} $state2]} {
+    pass $test
+} else {
+    fail $test
+}
+
+
+# Test reading/writing to/from reserved registers.
+
+set test "reserved register write_h4_l4 (0x10)"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+sid_assert_success "sid::bus::write_h4_l4 $bus 0x10 0"
+
+foreach offset {0x0 0x20 0x34} {
+    set test "reserved register read_h4_l4 (0x$offset)"
+    set bus [sid_cmd "sid::component::find_bus $victim registers"]
+    sid_assert_success "sid::bus::read_h4_l4 $bus $offset"
+}
+
+
+# "Reset status set" register is not implemented in the reference
+# implementation, so treat it as an unused register.
+
+set test "reset status set register write (unused)"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+sid_assert_success "sid::bus::write_h4_l4 $bus 0x30 0"
+
+
+# Test the identification register.  Bit 0 should be clear.
+# Ideally, the whole register will be clear.
+
+set test "read identification register"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+set result [sid_cmd "sid::bus::read_h4_l4 $bus 0x10"]
+if {[lindex $result 0] == "ok" && [lindex $result 1] == 0} {
+    pass $test
+} else {
+    fail $test
+}
+
+
+# Test the pause register. Writing to this register should cause
+# a value of 1 to be driven across the halt! pin.
+
+set probe_pin [sid_cmd "sid::pin::new"]
+sid_cmd "sid::component::connect_pin $victim halt! $probe_pin"
+
+sid_cmd "set halt_sense 0"
+sid_cmd "set hook_driven_h4($probe_pin) {
+    global driven_h4_value halt_sense
+    set halt_sense \$driven_h4_value
+}"
+
+set test "write to pause register causes halt! pin to be driven high"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+sid_cmd "sid::bus::write_h4_l4 $bus 0 0"
+if {[sid_cmd "set halt_sense"] == "1"} { pass $test } else { fail $test }
+sid_cmd "sid::component::disconnect_pin $victim halt! $probe_pin"
+
+
+set test "reset status register is clear at power-up"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+set result [sid_cmd "sid::bus::read_h4_l4 $bus 0x30"]
+
+if {[lindex $result 0] == "ok" && [lindex $result 1] == 0} {
+    pass $test
+} else { 
+    fail $test
+}
+
+
+set test "reset status register is set after a reset"
+set pin [sid_cmd "sid::component::find_pin $victim reset"]
+sid_cmd "sid::pin::driven_h4 $pin 1"
+
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+set result [sid_cmd "sid::bus::read_h4_l4 $bus 0x30"]
+
+if {[lindex $result 0] == "ok" && [lindex $result 1] == 1} {
+    pass $test
+} else {
+    fail $test
+}
+
+
+# This test case depends on the previous one (ie. that the reset
+# status register is set).
+
+set test "reset status clear register write"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+sid_cmd "sid::bus::write_h4_l4 $bus 0x34 0xFFFFFFFF"
+set result [sid_cmd "sid::bus::read_h4_l4 $bus 0x34"]
+
+
+# This is not completely conclusive, but the above memory transaction
+# should clear all bits in the "reset status" register, including bit
+# number 0.
+
+if {[lindex $result 0] == "ok" && [lindex $result 1] == 0} {
+    pass $test
+} else {
+    fail $test
+}
+
+
+set test "clear reset mode memory map"
+set bus [sid_cmd "sid::component::find_bus $victim registers"]
+sid_assert_success "sid::bus::write_h4_l4 $bus 0x20 0"
+
+
+set test "bus handle is invariant after switching to the normal map"
+set bus [sid_cmd "sid::component::find_bus $victim access-port"]
+if {[info exists initial_bus]} {
+    if {$bus != "" && $bus == $initial_bus} { pass $test } else { fail $test }
+} else {
+    unresolved $test
+}
+
+set test "remapping? attribute is not in normal mode"
+set result [sid_cmd "sid::component::attribute_value $victim remapping?"]
+if {$result == "no"} { pass $test } else { fail "$test -- got $result" }
+
+
+# Test writes with the normal mapping.
+
+sid_cmd "set hook_written(h4,l4,$outbus) {}"
+set bus [sid_cmd "sid::component::find_bus $victim access-port"]
+set okay 1
+
+for {set addr 50000} {$addr < 70000} {set addr [expr $addr + 4]} {
+    set test "normal mapping for address $addr"
+    sid_cmd "sid::bus::write_h4_l4 $bus $addr 0x12345678"
+    set translated_addr [sid_cmd "set written_addr"]
+    if {$translated_addr != $addr} { set okay 0; fail $test }
+}
+if {$okay} { pass "remap through the normal mapping" }
+
+
+set test "restore initial state"
+if {[info exists state1]} {
+    set result [sid_cmd "sid::component::set_attribute_value $victim state-snapshot [list $state1]"]
+    if {$result == "ok"} {
+	# Check component state for initial conditions.
+	set num_relocs [sid_cmd "sid::component::attribute_value $victim num-relocations"]
+	set remapping_p [sid_cmd "sid::component::attribute_value $victim remapping?"]
+	if {$num_relocs == "0" && $remapping_p == "yes"} { pass $test } else { fail $test }
+    } else {
+	fail "$test -- expected ok, got $result"
+    }
+} else {
+    fail "$test -- no live state1 variable"
+}
+
+set test "remapping? triggerpoint fired three times"
+if {[sid_cmd "set triggercount(remapping?)"] == "3"} { pass $test } else { fail $test }
+catch {unset watchpins triggercount}
+
+
+# Stop SID.
+
+set test "sid stop"
+if {[sid_stop]} {
+    pass $test
+} else {
+    fail $test
+    return
+}
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} {
+    file delete "arm-remap.conf"
+}

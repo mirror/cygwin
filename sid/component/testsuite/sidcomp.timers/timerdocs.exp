@@ -1,0 +1,5 @@
+load_lib "docs.exp"
+
+foreach timer {arm/ref-nosched arm/ref-sched} {
+    doc_test timers hw-timer-$timer
+}

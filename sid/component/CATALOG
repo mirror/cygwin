@@ -1,0 +1,81 @@
+This is a current list of sid component shared libraries.
+
+DIRECTORY	DSO			COMPONENT_LIBRARY		MAINTAINERS
+
+audio		libaudio.la		audio_component_library		fche
+cfgroot		libconfig.la		config_component_library	fche
+cgen-cpu	libcgencpu.la		cgen_component_library		bje,fche
+consoles	libconsoles.la		console_component_library	bje,fche
+gdb		libgdb.la		gdb_component_library		fche
+gloss		libgloss.la		gloss_component_library		bje,fche
+glue		libglue.la		glue_component_library		fche
+ide		libide.la		ide_component_library		fche
+interrupt	libinterrupt.la		interrupt_component_library	bje,mrg
+lcd		libhd44780u.la		hd44780u_component_library	runrau
+lcd		libt6963c.la		t6963c_component_library	runrau
+lcd		liblcd-char-display.la	lcd_char_display_component_library runrau
+loader		libloader.la		loader_component_library	fche
+mapper		libmapper.la		mapper_component_library	fche,runrau
+memory		libmemory.la		mem_component_library		fche,bje
+mmu		libmmu.la		mmu_component_library		bje
+parport		libparport.la		parport_component_library       fkhoja
+profiling	libprof.la		prof_component_library		fche
+rtc		librtc.la		rtc_component_library		bje,fche
+sched		libsched.la		sched_component_library		fche
+targetview	libtargetview.la	targetview_component_library	patrickm
+tcl		libtclapi.la		tcl_bridge_library		fche
+timers		libtimers.la		timer_component_library		bje,fche
+uart		libuart.la		uart_component_library		runrau
+
+
+This is a current list of sid components living somewhere in these libraries.
+
+TYPE-NAME		DESCRIPTION
+
+bridge-tcl		TCL interpreter-based generic component shell
+bridge-tk		TCL/TK interpreter-based generic component shell
+bridge-blt		TCL/TK/BLT interpreter-based generic component shell
+hw-audio-sid		Fictional audio codec.
+hw-cpu-arm7t		ARM7 / ARM7T CPU model
+hw-cpu-m32r/d		M32R/D CPU model
+hw-disk-ide		IDE hard drive model (controller + drives)
+hw-glue-probe-bus	Bus traffic tracer.
+hw-glue-sequence	Sequential pin event dispatcher
+hw-interrupt-arm/ref	ARM7 reference peripheral: interrupt controller
+hw-interrupt-cogent/cma222	Interrupt controller: Cogent CMA222 ARM CPU board
+hw-lcd-hd44780u		HD44780U LCD controller
+hw-lcd-char-display	curses based LCD display
+hw-mapper-basic		Generic address space decoder/mapper
+hw-memory-flash-am29	AMD Am29 flash memory, generic model
+hw-memory-flash-am29*	AMD Am29 flash memory, family members
+hw-memory-flash-at29	ATMEL AT29 flash memory, generic model
+hw-memory-flash-at29*	ATMEL AT29 flash memory, family members
+hw-memory-ram/rom-basic	Generic RAM/ROM model
+hw-parport-ps/2		PS/2-style parallel printer port, like Exar 16C552.
+hw-remap/pause-arm/ref	ARM7 reference peripheral: remap/pause controller 
+hw-rtc-ds1642		Dallas DS1642 timekeeping NVRAM (Y2K "compatible").
+hw-rtc-ds1742		Dallas DS1742 timekeeping NVRAM (Y2K compliant).
+hw-rtc-sid		Fictional high-precision wall-clock timer.
+hw-timer-arm/ref-nosched	ARM7 reference peripheral: timer
+hw-timer-arm/ref-sched	Same as above, but using external scheduler for timing
+hw-uart-ns16550		16550 UART model
+hw-visual-clock         tk xclock gui
+hw-visual-lcd           tk lcd display gui
+hw-visual-tty           tk mini-xterm gui
+sid-control-cfgroot	Configuration file reader; top level loop
+sid-control-tksm        tk System Monitor
+sid-io-audio		Host audio interface.
+sid-io-audio-nop	NOP audio interface.
+sid-io-socket-server	Socket server<->tx/rx data pump
+sid-io-socket-client	Socket client<->tx/rx data pump
+sid-io-stdio		Nonblocking stdio-to-pins data bridge
+sid-sched-host		Generic scheduler for host time tracking (25ms accuracy)
+sid-sched-host-accurate	More accurate version of same
+sid-sched-sim		Generic scheduler for arbitrary target time tracking
+sw-debug-gdb		GDB interface (gdb stub emulation)
+sw-gloss-arm/angel	GLOSS process emulation for ARM ANGEL ABI
+sw-gloss-mips32/idt	GLOSS process emulation for IDT MIPS32 monitor
+sw-gloss-m32r/libgloss	GLOSS process emulation for M32R flavour of libgloss
+sw-glue-attribbank	Arbitrary attribute storage
+sw-load-elf		ELF program loader
+sw-profile-gprof	GPROF profile data collector (-pg run-time emulation)

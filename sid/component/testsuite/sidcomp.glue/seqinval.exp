@@ -1,0 +1,100 @@
+set test "sid configuration"
+sid_config_component_test_with_tracing "base5.conf" \
+    "load [sid_find_file libglue.la] glue_component_library" \
+    "hw-glue-sequence"
+pass $test
+
+set test "sid startup"
+if [sid_start "base5.conf"] then { pass $test } else { fail $test ; return }
+
+set test "attribute list with incorrect category names"
+set category "something"
+set names [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if {$names == ""} then { pass $test } else { fail $test }
+
+set test "query incorrect attributes name"
+set value [sid_cmd "sid::component::attribute_value $victim seqattr"]
+if {$value == ""} then { pass $test } else { fail $test }
+
+set test "set num-outputs to 1*2"
+set status [sid_cmd "sid::component::set_attribute_value $victim num-outputs 1*2"]
+if {$status == "bad_value"} then { pass $test } else { fail $test }
+
+# cr 101204
+set test "set num-outputs to -1"
+set status [sid_cmd "sid::component::set_attribute_value $victim num-outputs -1"]
+set value [sid_cmd "sid::component::attribute_value $victim num-outputs"]
+if {$status == "ok" && $value == 255} then { pass $test } else { fail $test }
+
+set test "set num-outputs to aa"
+set status [sid_cmd "sid::component::set_attribute_value $victim num-outputs aa"]
+if {$status == "bad_value"} then { pass $test } else { fail $test }
+
+set test "set num-outputs 1.0123"
+set status [sid_cmd "sid::component::set_attribute_value $victim num-outputs 1.0123"]
+if {$status == "bad_value"} then { pass $test } else { fail $test }
+
+set test "set num-outputs true"
+set status [sid_cmd "sid::component::set_attribute_value $victim num-outputs true"]
+if {$status == "bad_value"} then { pass $test } else { fail $test }
+
+set test "set attributes values to non existing attribute"
+set status [sid_cmd "sid::component::set_attribute_value $victim attr 112"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "find pin that does not exist"
+set pin [sid_cmd "sid::component::find_pin $victim newpin"]
+if {$pin == ""} then { pass $test } else { fail $test }
+
+set test "connect pin that does not exist"
+set pin [sid_cmd "sid::pin::new"]
+set status [sid_cmd "sid::component::connect_pin $victim newpin2 $pin"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "disconnect pin that does not exist"
+set pin [sid_cmd "sid::pin::new"]
+set status [sid_cmd "sid::component::disconnect_pin $victim output--0 $pin"]
+if {$status == "not_found" } then { pass $test } else { fail $test }
+
+set test "check connected pins that does not exist"
+set pins [sid_cmd "sid::component::connected_pins $victim notexist"]
+if {$pins == ""} then { pass $test } else { fail $test }
+
+set test "connect accessor that does not exist"
+set bus [sid_cmd "sid::bus::new"]
+set status [sid_cmd "sid::component::connect_accessor $victim accessor $bus"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "find bus that does not exist"
+set bus [sid_cmd "sid::component::find_bus $victim anybus"]
+if {$bus == ""} then { pass $test } else { fail $test }
+
+set test "find connected bus that does not exist"
+set bus [sid_cmd "sid::component::connected_bus $victim anybus"]
+if {$bus == ""} then { pass $test } else { fail $test }
+
+set test "connect accessor to a bus that does not exist"
+set bus [sid_cmd "sid::bus::new"]
+set status [sid_cmd "sid::component::connect_accessor $victim accessor $bus"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "set relationships that does not exist"
+set status [sid_cmd "sid::component::relate $victim relationship $victim"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "set relationships to relate to a non existing component"
+set status [sid_cmd "sid::component::relate $victim relationship $victim"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "query relationships that does not exist"
+set comps [sid_cmd "sid::component::related_components $victim relation2"]
+if {$comps == ""} then { pass $test } else { fail $test }
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "base5.conf" }

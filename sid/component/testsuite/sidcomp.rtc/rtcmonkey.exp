@@ -1,0 +1,7 @@
+# Run a monkey test on the components in this component library. 
+
+load_lib "monkey.exp"
+
+monkey_test hw-rtc-ds1642 rtc_component_library librtc.la
+monkey_test hw-rtc-ds1742 rtc_component_library librtc.la
+monkey_test hw-rtc-sid rtc_component_library librtc.la

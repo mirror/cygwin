@@ -1,0 +1,276 @@
+# Initialisation.
+set manufacturer_code 0x1F
+set default_size 524288
+set default_sector_size 512
+set default_device_code 0x5B
+
+set test "sid configuration"
+sid_config_component_test_with_tracing "at29a.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29"
+pass $test
+
+set test "sid start"
+if {[sid_start "at29a.conf"]} { pass $test } else { fail $test ; return }
+
+set test "check setting attribute list"
+set category "setting"
+sid_assert_includes_all "sid::component::attribute_names_in_category $victim $category" \
+  {size sector-size image-file size-max}
+
+set test "check pin attribute list"
+set category "pin"
+sid_assert_includes_all "sid::component::attribute_names_in_category $victim $category" \
+  {image-load image-store}
+
+set test "check register attribute list"
+set category "register"
+set result [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if {$result == ""} { pass $test } else { fail $test }
+
+set test "check watchable attribute list"
+set category "watchable"
+set result [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if {$result == ""} { pass $test } else { fail $test }
+
+set test "check pin names"
+sid_assert_includes_all "sid::component::pin_names $victim" {image-load image-store}
+
+set test "check bus names"
+sid_assert_includes_all "sid::component::bus_names $victim" {read-write-port}
+
+set test "check accessor names"
+set result [sid_cmd "sid::component::accessor_names $victim"]
+if {$result == ""} { pass $test } else { fail $test }
+
+set test "check relationships"
+set result [sid_cmd "sid::component::relationship_names $victim"]
+if {$result == ""} { pass $test } else { fail $test }
+
+set test "check default device-code is $default_device_code"
+set size [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$size == $default_device_code} { pass $test } else { fail $test }
+
+set test "check default manufacturer-code is $manufacturer_code"
+set size [sid_cmd "sid::component::attribute_value $victim manufacturer-code"]
+if {$size == $manufacturer_code} { pass $test } else { fail $test }
+
+set test "check default size is $default_size"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == $default_size} { pass $test } else { fail $test }
+
+set test "check default sector-size is $default_sector_size"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == $default_sector_size} { pass $test } else { fail $test }
+
+set test "try to set manufacturer-code to 0x2F"
+set status [sid_cmd "sid::component::set_attribute_value $victim manufacturer-code 0x2F"]
+set code [sid_cmd "sid::component::attribute_value $victim manufacturer-code"]
+if {$status == "bad_value" && $code == "0x1F"} { pass $test } else { fail $test }
+
+set test "check size-max"
+set maxsize [sid_cmd "sid::component::attribute_value $victim size-max"]
+if {$maxsize == "33554432"} { pass $test } else { fail $test }
+
+set test "set size to size-max"
+set status [sid_cmd "sid::component::set_attribute_value $victim size $maxsize"]
+set result [sid_cmd "sid::component::attribute_value $victim size"]
+if {$status == "ok" && $result == "33554432"} { pass $test } else { fail $test }
+
+set test "set size to size-max-1"
+set size [expr {$maxsize - 1}]
+set status [sid_cmd "sid::component::set_attribute_value $victim size $size"]
+set result [sid_cmd "sid::component::attribute_value $victim size"]
+if {$status == "ok" && $result == "33554431"} { pass $test } else { fail $test }
+
+set test "set sector-size to 1"
+set status [sid_cmd "sid::component::set_attribute_value $victim sector-size 1"]
+set result [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$status == "ok" && $result == "1"} { pass $test } else { fail $test }
+
+set test "set sector-size to 0"
+set status [sid_cmd "sid::component::set_attribute_value $victim sector-size 0"]
+set result [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$status == "bad_value" && $result == "1"} { pass $test } else { fail $test }
+
+set test "set device-code to 0x01"
+set status [sid_cmd "sid::component::set_attribute_value $victim device-code 0x01"]
+set result [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$status == "ok" && $result == "0x01"} { pass $test } else { fail $test }
+
+set test "set device-code to 0x00"
+set status [sid_cmd "sid::component::set_attribute_value $victim device-code 0x00"]
+set result [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$status == "ok" && $result == "0x00"} { pass $test } else { fail $test }
+
+set test "read memory image from a file that contains more bytes than the size"
+set file [open "test.dat1" w]
+fconfigure $file -translation binary
+set data 0
+set size 4096
+set status [sid_cmd "sid::component::set_attribute_value $victim size $size"]
+for {set i 0} {$i < $size} {incr i} {
+    set data [expr {(($data * 19) + 13) % 256}]
+    puts -nonewline $file [binary format "c" $data]
+}
+close $file
+set status [sid_cmd "sid::component::set_attribute_value $victim size 2048"]
+set res [sid_cmd "sid::component::set_attribute_value $victim image-file test.dat1"]
+set pin [sid_cmd "sid::component::find_pin $victim image-load"]
+sid_cmd "sid::pin::driven_h4 $pin 0"
+if {$status == "ok" && $res == "ok" && $pin != ""} then { pass $test } else { fail $test }
+
+
+set test "verify after image-load"
+set data 0
+set rwp [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+for {set i 0} {$i < $size} {incr i} {
+    set data [expr {(($data * 19) + 13) % 256}]
+    set addr $i
+    set result [sid_cmd "sid::bus::read_h4_l1 $rwp $addr"]
+    set status [lindex $result 0]
+    if {$status != "ok"} { fail "$test - bad"; break }
+    set result_data [lindex $result 1]
+    if {$result_data != $data} {
+       fail "$test - mismatch @ $i - $result_data vs $data"
+       break
+    }
+}
+if {$i == $size} then { pass $test } 
+
+set test "read memory image from a file that contains less bytes than the size"
+set status [sid_cmd "sid::component::set_attribute_value $victim size 8192"]
+set rwp [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set data 5
+for {set addr 4096} {$addr < 8192} {incr addr} {
+   set data [expr {(($data * 17) + 23) % 256}]
+   set result [sid_cmd "sid::bus::write_h4_l1 $rwp $addr $data"]
+   if {$result != "ok"} then { puts $result; break }
+}
+set res [sid_cmd "sid::component::set_attribute_value $victim image-file test.dat1"]
+set pin [sid_cmd "sid::component::find_pin $victim image-load"]
+sid_cmd "sid::pin::driven_h4 $pin 0"
+if { $addr == 8192 && $status == "ok" && $res == "ok" && $pin != ""} then { pass $test } else { fail $test }
+
+set test "verify after image-load II"
+set data 0
+set rwp [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+for {set i 0} {$i < $size} {incr i} {
+    if {$i < 4096 } then {
+	set data [expr {(($data * 19) + 13) % 256}]
+    } else {
+	set data 0
+    }
+    set addr $i
+    set result [sid_cmd "sid::bus::read_h4_l1 $rwp $addr"]
+    set status [lindex $result 0]
+    if {$status != "ok"} { fail "$test - $status @ $addr"; break }
+    set result_data [lindex $result 1]
+    if {$result_data != $data} {
+       fail "$test - mismatch @ $i - $result_data vs $data"
+       break
+    }
+}
+if {$i == $size} then { pass $test } 
+
+
+proc unlock_sector {} {
+    global rwp
+    foreach pair {{0xAA 0x5555} {0x55 0xAAAA} {0xA0 0x5555}} {
+	set hex_data [lindex $pair 0]
+	set hex_addr [lindex $pair 1]
+	set result [sid_cmd "sid::bus::write_h4_l1 $rwp $hex_addr $hex_data"]
+	if {$result != "ok"} {
+	    return 0
+	}
+    }
+    return 1
+}
+
+set test "set memory before image-store"
+set num_bytes [expr $size - 4096]
+set sector_size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {[expr $num_bytes % $sector_size] != 0} {
+    unresolved "$test -- memory size is not a multiple of the sector size"
+} else {
+    for {set i 4096} {$i < $size} {incr i} {
+	set addr $i
+	if {[expr $addr % $sector_size] == 0} {
+	    if {![unlock_sector]} { fail $test; break }
+	}
+	set data [expr ($i - 4096) % 256]
+	set result [sid_cmd "sid::bus::write_h4_l1 $rwp $addr $data"]
+	if {$result != "ok"} then { fail "$test - $result @ $addr "; break }
+	set result [sid_cmd "sid::bus::read_h4_l1 $rwp $addr"]
+	if {[lindex $result 0] != "ok" || [lindex $result 1] != $data} {
+	    warning "$test -- validating data @ $addr, got $result"
+	}
+    }
+    if {$i == $size} then { pass $test }
+}
+
+set test "drive image-store"
+file delete -force file.2
+set res [sid_cmd "sid::component::set_attribute_value $victim image-file file.2"]
+set file [sid_cmd "sid::component::attribute_value $victim image-file"]
+if {$file != "file.2"} {
+    fail $test
+} else {
+    set pin [sid_cmd "sid::component::find_pin $victim image-store"]
+    sid_cmd "sid::pin::driven_h4 $pin 0"
+    if { $res == "ok" && $pin != ""} then { pass $test } else { fail $test }
+}
+
+set test "reset memory after image-store"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+for {set i 0} {$i < $size} {incr i} {
+    if {[expr $i % $sector_size] == 0} {
+	if {![unlock_sector]} {
+	    fail $test; break
+	}
+    }
+    set data [expr 2*$i%256]
+    set result [sid_cmd "sid::bus::write_h4_l1 $rwp $i $data"]
+    if {$result != "ok"} { fail "$test - bad"; break }
+}
+if { $i == $size } then { pass $test }
+
+set test "load the stored image and verify values"
+set file [sid_cmd "sid::component::attribute_value $victim image-file"]
+if {$file != "file.2"} { fail $test }
+set pin [sid_cmd "sid::component::find_pin $victim image-load"]
+sid_cmd "sid::pin::driven_h4 $pin 0"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size != 8192} { fail $test }
+set data 0
+for {set i 0} {$i < $size} {incr i} {
+    set addr $i
+    if {$i < 4096 } then {
+	set data [expr {(($data * 19) + 13) % 256}]
+    } else {
+	set data [expr ($i - 4096) % 256]
+    }
+    set result [sid_cmd "sid::bus::read_h4_l1 $rwp $addr"]
+    set status [lindex $result 0]
+    if {$status != "ok"} { fail "$test - bad"; break }
+    set result_data [lindex $result 1]
+    if {$result_data != $data} {
+       fail "$test - mismatch @ $i - $result_data vs $data"
+       break
+    }
+}
+if {$size == 8192 && $i == $size && $pin != ""} then { pass $test ; file delete -force $file }
+
+set test "find image-store pin"
+set p [sid_cmd "sid::component::find_pin $victim image-store"]
+if {$p != ""} then { pass $test } else { puts $status; fail $test }
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29a.conf" }

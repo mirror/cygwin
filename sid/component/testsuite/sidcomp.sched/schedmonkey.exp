@@ -1,0 +1,25 @@
+# Run a monkey test on the components in this component library. 
+
+load_lib "monkey.exp"
+
+monkey_test sid-sched-sim sched_component_library libsched.la
+
+proc state_saved_p {attr_name} {
+    switch $attr_name {
+	time { return 0 }
+	timekeeper-info { return 0 }
+	default { return 1}
+    }
+}
+
+monkey_test sid-sched-host-accurate sched_component_library libsched.la
+
+proc state_saved_p {attr_name} {
+    switch $attr_name {
+	time { return 0 }
+	timekeeper-info { return 0 }
+	default { return 1}
+    }
+}
+
+monkey_test sid-sched-host sched_component_library libsched.la

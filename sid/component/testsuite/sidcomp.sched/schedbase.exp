@@ -1,0 +1,282 @@
+set test "sid configuration"
+sid_config_component_test_with_tracing "schedbase.conf" \
+    "load [sid_find_file libsched.la] sched_component_library" \
+    "sid-sched-sim"
+pass $test
+
+set test "sid startup"
+if [sid_start "schedbase.conf"] then { pass $test } else { fail $test ; return }
+
+set test "attribute list"
+sid_assert_success "sid::component::attribute_names $victim"
+
+set test "check num-clients=0"
+sid_assert_matches "sid::component::attribute_value $victim num-clients" "0"
+
+set test "set num-clients=2"
+sid_assert_success "sid::component::set_attribute_value $victim num-clients 2"
+
+set test "attribute list proper after growth"
+sid_assert_includes_all "sid::component::attribute_names $victim" {"0-regular?" "1-regular?" "0-time" "1-time" "state-snapshot" "step-cycle-limit"}
+
+set test "reset num-clients=1"
+sid_cmd "sid::component::set_attribute_value $victim num-clients 0"
+sid_assert_success "sid::component::set_attribute_value $victim num-clients 1"
+
+set test "set out-of-range num-clients"
+set s [sid_cmd "sid::component::set_attribute_value $victim num-clients 2000"]
+if {$s == "bad_value"} then { pass $test } else { fail $test }
+
+set test "check num-clients=1"
+sid_assert_matches "sid::component::attribute_value $victim num-clients" "1"
+
+set test "attribute list proper after shrinkage"
+sid_assert_includes_none "sid::component::attribute_names $victim" {"1-regular?" "1-time"}
+
+set test "one-shot event"
+set clock_pin [sid_cmd "sid::component::find_pin $victim advance"]
+set control0_pin [sid_cmd "sid::component::find_pin $victim 0-control"]
+# create a pin that can consume output events
+set event0_consumer_pin [sid_cmd "sid::pin::new"]
+sid_cmd "set event0_count 0"
+sid_cmd "set hook_driven_h4($event0_consumer_pin) {incr event0_count}"
+sid_cmd "sid::component::connect_pin $victim 0-event $event0_consumer_pin"
+sid_cmd "sid::component::set_attribute_value $victim 0-regular? 0"
+sid_cmd "sid::component::set_attribute_value $victim 0-time 1"
+sid_cmd "sid::pin::driven_h4 $clock_pin 0"
+set count [sid_cmd {set event0_count}]
+if {$count == 1} then { pass $test } else { fail $test }
+
+set test "multiple interleaved regular subscriptions"
+set clock_pin [sid_cmd "sid::component::find_pin $victim advance"]
+# clear previous subscriptions
+sid_cmd "sid::component::set_attribute_value $victim num-clients 0"
+sid_cmd "sid::component::set_attribute_value $victim num-clients 3"
+#
+set control0_pin [sid_cmd "sid::component::find_pin $victim 0-control"]
+sid_cmd "sid::component::set_attribute_value $victim 0-regular? 1"
+set event0_consumer_pin [sid_cmd "sid::pin::new"]
+sid_cmd "set event0_count 0"
+sid_cmd "set hook_driven_h4($event0_consumer_pin) {incr event0_count ; puts \$event0_count}"
+sid_cmd "sid::component::connect_pin $victim 0-event $event0_consumer_pin"
+#
+set control1_pin [sid_cmd "sid::component::find_pin $victim 1-control"]
+sid_cmd "sid::component::set_attribute_value $victim 1-regular? 1"
+set event1_consumer_pin [sid_cmd "sid::pin::new"]
+sid_cmd "set event1_count 0"
+sid_cmd "set hook_driven_h4($event1_consumer_pin) {incr event1_count ; puts \$event1_count}"
+sid_cmd "sid::component::connect_pin $victim 1-event $event1_consumer_pin"
+# and another to keep the clock moving by 1
+set control2_pin [sid_cmd "sid::component::find_pin $victim 2-control"]
+sid_cmd "sid::component::set_attribute_value $victim 2-regular? 1"
+set event2_consumer_pin [sid_cmd "sid::pin::new"]
+sid_cmd "set event2_count 0"
+sid_cmd "set hook_driven_h4($event2_consumer_pin) {incr event2_count ; puts \$event2_count}"
+sid_cmd "sid::component::connect_pin $victim 2-event $event2_consumer_pin"
+#
+sid_cmd "sid::pin::driven_h4 $control0_pin 0x80000003"
+sid_cmd "sid::pin::driven_h4 $control1_pin 0x80000005"
+sid_cmd "sid::pin::driven_h4 $control2_pin 0x80000001"
+# process all pending events per scheduler advancement
+sid_cmd "sid::component::set_attribute_value $victim step-cycle-limit 1"
+# step 30 times
+for {set i 0} {$i < 30} {incr i} {
+    sid_cmd "sid::pin::driven_h4 $clock_pin 0"
+}
+set count0 [sid_cmd "set event0_count"]
+set count1 [sid_cmd "set event1_count"]
+set count2 [sid_cmd "set event2_count"]
+if {$count0 == 10 && $count1 == 6 && $count2 == 30} then { pass $test } else { fail $test }
+
+
+set test "multiple interleaved regular subscriptions with scaling"
+set clock_pin [sid_cmd "sid::component::find_pin $victim advance"]
+# clear previous subscriptions
+sid_cmd "sid::component::set_attribute_value $victim num-clients 0"
+sid_cmd "sid::component::set_attribute_value $victim num-clients 3"
+#
+set control0_pin [sid_cmd "sid::component::find_pin $victim 0-control"]
+sid_cmd "sid::component::set_attribute_value $victim 0-regular? 1"
+sid_cmd "sid::component::set_attribute_value $victim 0-scale 2/1"
+set event0_consumer_pin [sid_cmd "sid::pin::new"]
+sid_cmd "set event0_count 0"
+sid_cmd "set hook_driven_h4($event0_consumer_pin) {incr event0_count ; puts \$event0_count}"
+sid_cmd "sid::component::connect_pin $victim 0-event $event0_consumer_pin"
+#
+set control1_pin [sid_cmd "sid::component::find_pin $victim 1-control"]
+sid_cmd "sid::component::set_attribute_value $victim 1-regular? 1"
+sid_cmd "sid::component::set_attribute_value $victim 1-scale 1/5"
+set event1_consumer_pin [sid_cmd "sid::pin::new"]
+sid_cmd "set event1_count 0"
+sid_cmd "set hook_driven_h4($event1_consumer_pin) {incr event1_count ; puts \$event1_count}"
+sid_cmd "sid::component::connect_pin $victim 1-event $event1_consumer_pin"
+# and another to keep the clock moving by 1
+set control2_pin [sid_cmd "sid::component::find_pin $victim 2-control"]
+sid_cmd "sid::component::set_attribute_value $victim 2-regular? 1"
+sid_cmd "sid::component::set_attribute_value $victim 2-scale 5"
+set event2_consumer_pin [sid_cmd "sid::pin::new"]
+sid_cmd "set event2_count 0"
+sid_cmd "set hook_driven_h4($event2_consumer_pin) {incr event2_count ; puts \$event2_count}"
+sid_cmd "sid::component::connect_pin $victim 2-event $event2_consumer_pin"
+#
+sid_cmd "sid::pin::driven_h4 $control0_pin 0x80000003"
+sid_cmd "sid::pin::driven_h4 $control1_pin 0x80000005"
+sid_cmd "sid::pin::driven_h4 $control2_pin 0x80000001"
+# process all pending events per scheduler advancement
+sid_cmd "sid::component::set_attribute_value $victim step-cycle-limit 1"
+# step 30 times
+for {set i 0} {$i < 30} {incr i} {
+    sid_cmd "sid::pin::driven_h4 $clock_pin 0"
+}
+set count0 [sid_cmd "set event0_count"]
+set count1 [sid_cmd "set event1_count"]
+set count2 [sid_cmd "set event2_count"]
+if {$count0 == 5 && $count1 == 30 && $count2 == 6} then { pass $test } else { fail $test }
+
+
+
+set test "save state snapshot"
+set state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+# verbose -log "state = $state" 1
+if {$state != ""} then { pass $test } else { fail $test }
+
+set test "cancel some regular events; exercise yielding"
+set control0_pin [sid_cmd "sid::component::find_pin $victim 0-control"]
+set control1_pin [sid_cmd "sid::component::find_pin $victim 1-control"]
+set control2_pin [sid_cmd "sid::component::find_pin $victim 2-control"]
+set yield_pin [sid_cmd "sid::component::find_pin $victim yield"]
+sid_cmd "sid::pin::driven_h4 $control0_pin 0"
+# don't sid_cmd "sid::pin::driven_h4 $control1_pin 0"
+sid_cmd "sid::pin::driven_h4 $control2_pin 0"
+sid_cmd "set event0_count 0"
+sid_cmd "set event1_count 0"
+sid_cmd "set event2_count 0"
+# step 5+3+15 times total
+# (5+3)/2 times without yielding; two ticks per advance
+sid_cmd "sid::component::set_attribute_value $victim step-cycle-limit 2"
+for {set i 0} {$i < 4} {incr i} {
+    sid_cmd "sid::pin::driven_h4 $clock_pin 0"
+}
+# 15 times with yielding
+sid_cmd "sid::component::set_attribute_value $victim step-cycle-limit 100"
+sid_cmd "set hook_driven_h4($event1_consumer_pin) {incr event1_count ; puts \$event1_count ; puts yielding ; sid::pin::driven_h4 $yield_pin 0}"
+for {set i 0} {$i < 15} {incr i} {
+    sid_cmd "sid::pin::driven_h4 $clock_pin 0"
+}
+
+set count0 [sid_cmd "set event0_count"]
+set count1 [sid_cmd "set event1_count"]
+set count2 [sid_cmd "set event2_count"]
+if {$count0 == 0 && $count1 == 23 && $count2 == 0} then { pass $test } else { fail $test }
+
+set test "cancel last regular event"
+set control1_pin [sid_cmd "sid::component::find_pin $victim 1-control"]
+sid_cmd "sid::pin::driven_h4 $control1_pin 0"
+sid_cmd "set event0_count 0"
+sid_cmd "set event1_count 0"
+sid_cmd "set event2_count 0"
+# step 5+3+15 times
+for {set i 0} {$i < 23} {incr i} {
+    sid_cmd "sid::pin::driven_h4 $clock_pin 0"
+}
+set count0 [sid_cmd "set event0_count"]
+set count1 [sid_cmd "set event1_count"]
+set count2 [sid_cmd "set event2_count"]
+if {$count0 == 0 && $count1 == 0 && $count2 == 0} then { pass $test } else { fail $test }
+
+set test "mess around with scheduler state before state restore"
+sid_cmd "sid::component::set_attribute_value $victim enabled? 0"
+sid_cmd "sid::component::set_attribute_value $victim yield-host-time? 1"
+sid_cmd "sid::component::set_attribute_value $victim 0-time 999"
+sid_cmd "sid::component::set_attribute_value $victim 1-regular? 0"
+sid_cmd "sid::component::set_attribute_value $victim step-cycle-limit 4"
+
+set test "save state snapshot before restore"
+set state2 [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+# verbose -log "state = $state2" 1
+if {$state2 != ""} then { pass $test } else { fail $test }
+
+set test "restore state snapshot"
+set ok [sid_cmd "sid::component::set_attribute_value $victim state-snapshot [list $state]"]
+if {$ok == "ok"} then { pass $test } else { fail $test }
+
+set test "save state snapshot after restore"
+set state3 [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+# verbose -log "state = $state3" 1
+if {$state3 != ""} then { pass $test } else { fail $test }
+
+set test "compare original and post-restore state snapshots"
+if {$state == $state3} then { pass $test } else { fail $test }
+
+# do the same cancel test again as above
+
+set test "cancel some regular events (after restore)"
+set clock_pin [sid_cmd "sid::component::find_pin $victim advance"]
+set control0_pin [sid_cmd "sid::component::find_pin $victim 0-control"]
+set control1_pin [sid_cmd "sid::component::find_pin $victim 1-control"]
+set control2_pin [sid_cmd "sid::component::find_pin $victim 2-control"]
+sid_cmd "sid::pin::driven_h4 $control0_pin 0"
+# don't sid_cmd "sid::pin::driven_h4 $control1_pin 0"
+sid_cmd "sid::pin::driven_h4 $control2_pin 0"
+sid_cmd "set event0_count 0"
+sid_cmd "set event1_count 0"
+sid_cmd "set event2_count 0"
+# step 5+3+15 times
+for {set i 0} {$i < 23} {incr i} {
+    sid_cmd "sid::pin::driven_h4 $clock_pin 0"
+}
+set count0 [sid_cmd "set event0_count"]
+set count1 [sid_cmd "set event1_count"]
+set count2 [sid_cmd "set event2_count"]
+if {$count0 == 0 && $count1 == 23 && $count2 == 0} then { pass $test } else { fail $test }
+
+set test "cancel last regular event (after restore)"
+set control1_pin [sid_cmd "sid::component::find_pin $victim 1-control"]
+sid_cmd "sid::pin::driven_h4 $control1_pin 0"
+sid_cmd "set event0_count 0"
+sid_cmd "set event1_count 0"
+sid_cmd "set event2_count 0"
+# step 5+3+15 times
+for {set i 0} {$i < 23} {incr i} {
+    sid_cmd "sid::pin::driven_h4 $clock_pin 0"
+}
+set count0 [sid_cmd "set event0_count"]
+set count1 [sid_cmd "set event1_count"]
+set count2 [sid_cmd "set event2_count"]
+if {$count0 == 0 && $count1 == 0 && $count2 == 0} then { pass $test } else { fail $test }
+
+
+set test "invalid scales"
+set s1 [sid_cmd [list sid::component::set_attribute_value $victim 0-scale 1/1]]
+set s2 [sid_cmd [list sid::component::set_attribute_value $victim 0-scale 1/0]]
+set s3 [sid_cmd [list sid::component::set_attribute_value $victim 0-scale 0/4]]
+set s4 [sid_cmd [list sid::component::set_attribute_value $victim 0-scale -5/0x4]]
+set s5 [sid_cmd [list sid::component::set_attribute_value $victim 0-scale /4]]
+set s6 [sid_cmd [list sid::component::set_attribute_value $victim 0-scale 5/]]
+set s7 [sid_cmd [list sid::component::set_attribute_value $victim 0-scale /]]
+if {$s1 == "ok" && $s2 == "bad_value" && $s3 == "bad_value" && $s4 == "ok" &&
+    $s5 == "bad_value" && $s6 == "bad_value" && $s7 == "bad_value"
+} then { pass $test } else { fail $test }
+
+
+set test "tolerate teeny scales"
+set s1 [sid_cmd [list sid::component::set_attribute_value $victim 0-time 15]]
+set s2 [sid_cmd [list sid::component::set_attribute_value $victim 0-regular? yes]]
+set s3 [sid_cmd [list sid::component::set_attribute_value $victim 0-scale 1/1000]]
+sid_cmd [list sid::pin::driven_h4 $clock_pin 0]
+if {$s1 == "ok" && $s2 == "ok" && $s3 == "ok"} then { pass $test } else { fail $test }
+
+
+set test "try save/restore with num_clients=10"
+set r1 [sid_cmd [list sid::component::set_attribute_value $victim num-clients 10]]
+set s [sid_cmd [list sid::component::attribute_value $victim state-snapshot]]
+set r2 [sid_cmd [list sid::component::set_attribute_value $victim state-snapshot $s]]
+if {$r1 == "ok" && $r2 == "ok"} then { pass $test } else { fail $test }
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "schedbase.conf" }

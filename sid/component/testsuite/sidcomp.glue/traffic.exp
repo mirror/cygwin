@@ -1,0 +1,40 @@
+set test "sid configuration"
+sid_config_component_test "traffic.conf" \
+    "load [sid_find_file libglue.la] glue_component_library" \
+    "hw-glue-sequence"
+pass $test
+
+set test "sid startup"
+if [sid_start "traffic.conf"] then { pass $test } else { fail $test ; return }
+
+
+set test "intense attribute traffic"
+set okay 1
+for {set i 0} {$i < 100} {incr i} {
+    if {[expr $i % 100] == 0} { verbose "done $i runs" }
+    set reps 1000
+    set value [expr {($i * 137) % 100}]
+    sid_cmd [list eval "
+        set okcount 0
+        set ok \[sid::component::set_attribute_value $victim num-outputs $value\]
+	for {set j 0} {\$j < $reps} {incr j} {
+#          set ok ok
+           set ok \[sid::component::set_attribute_value $victim num-outputs $value\]
+#          set ok2 $value
+           set ok2 \[sid::component::attribute_value $victim num-outputs\]
+           if {\$ok == \"ok\" && \$ok2 == $value} then { incr okcount }
+        } 
+    "]
+    set result [sid_cmd "set okcount"]
+    if {$result != $reps} then { set okay 0 ; break }
+}
+if {$okay} { pass $test } else { fail $test }
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "traffic.conf" }

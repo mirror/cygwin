@@ -1,0 +1,22 @@
+# BSP testsuite - suitable for performance measurements
+
+load_lib "cpudefs.exp"
+
+# run these tests several times
+set sid_run_repetitions 3
+
+if {$sidtarget(arm)} then {
+    run-sid-c-bsp-tests arm-elf arm7 $srcdir/sidcomp.bsp "test-*.c" {-g -O2 -mlittle-endian} {--cpu=arm --engine=scache} axl
+    run-sid-c-bsp-tests arm-elf arm7 $srcdir/sidcomp.bsp "test-*.c" {-g -O2 -mbig-endian} {--cpu=arm --engine=scache} axb
+    run-sid-c-bsp-tests arm-elf arm7 $srcdir/sidcomp.bsp "test-*.c" {-g -O2 -mlittle-endian} {--cpu=arm --engine=pbb} axl
+    run-sid-c-bsp-tests arm-elf arm7 $srcdir/sidcomp.bsp "test-*.c" {-g -O2 -mbig-endian} {--cpu=arm --engine=pbb} axb
+    run-sid-c-bsp-tests thumb-elf arm7t $srcdir/sidcomp.bsp "test-*.c" {-g -O2 -mlittle-endian} {--cpu=thumb --engine=scache} axl
+    run-sid-c-bsp-tests thumb-elf arm7t $srcdir/sidcomp.bsp "test-*.c" {-g -O2 -mbig-endian} {--cpu=thumb --engine=scache} axb
+    run-sid-c-bsp-tests thumb-elf arm7t $srcdir/sidcomp.bsp "test-*.c" {-g -O2 -mlittle-endian} {--cpu=thumb --engine=pbb} axl
+    run-sid-c-bsp-tests thumb-elf arm7t $srcdir/sidcomp.bsp "test-*.c" {-g -O2 -mbig-endian} {--cpu=thumb --engine=pbb} axb
+}
+
+
+# reset value for remaining tests
+set sid_run_repetitions 1
+

@@ -1,0 +1,41 @@
+Design notes for the ARM re-map and pause controller
+April 21, 1999
+
+Noteworthy points of the component design:
+
+* The mapping of addresses is handled by assigning this device to
+  be the accessor for, say, a CPU.  When in "reset" mode, mappings
+  are applied to incoming addresses and then passed onto an external
+  bus.  In "normal" mode, address transactions are passed through by
+  proxy.
+
+* The pause function is implemented with a pin (called "halt!"),
+  which is driven high.  Lowering this pin or an external interrupt
+  on the nIRQ or fIRQ lines will cause the CPU to continue.
+
+* The documentation describes a minimal form of identification--
+  one which says that there is no further identification.  This 
+  has been implemented by returning a word with bit 0 cleared 
+  to indicate this.
+
+* There is a reset pin called "reset", to simulate power-on resets
+  if desired.
+ 
+* The controller has been implemented with the following pin-out:
+
+			    +----------------+
+                            |                |
+			    | re-map & pause |---> halt!
+                            |  controller    |
+		  reset --->|                |~~ bus transactions with
+			    +----------------+   other component (e.g.
+						 mapper)
+
+* The memory map looks something like this:
+
+			read		write
+	remapBase	(reserved)	pause
+	+ 0x10		identification	(reserved)
+	+ 0x20		(reserved)	clear reset map
+	+ 0x30		reset status	reset status set
+	+ 0x34		(reserved)	reset status clear

@@ -1,0 +1,12 @@
+new hw-parport-ps/2 pport
+set pport BIDEN_VAL 1
+set pport INTSEL_VAL 1
+connect-bus mapper pport:[0xa01100-0xa01102,1,1] pport Bus
+connect-pin panel up-pin -> pport PD0
+connect-pin panel down-pin -> pport PD1
+connect-pin panel rec-pin -> pport PD2
+connect-pin panel play-pin -> pport PD3
+connect-pin panel del-pin -> pport PD4
+connect-pin panel done-pin -> pport PD5
+connect-pin panel stop-pin -> pport PD6
+connect-pin panel ack-pin -> pport ACK

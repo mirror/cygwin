@@ -1,0 +1,69 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* gprof.cxx: Import more std:: identifiers.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Ben Elliston  <bje@cygnus.com>
+
+	* sw-profile-gprof.txt: Update "relate" command usage.
+
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sw-profile-gprof.txt: New file.  Renamed from
+	* README: Deleted.
+	* Makefile.am: Install new file.
+	* Makefile.in: Regenerated.
+
+1999-11-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gprof.cxx (gprof_component ctor): Reorder initializers to
+	allay warnings.
+	(store): Use formerly unused variable.
+	* Makefile.am (DEJAGNUFLAGS): Set to runprof.exp
+	* Makefile.in: Regenerated.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gprof.cxx (accumulate, reset, store): Take unused arg.
+	(do_delete): Use dynamic_cast<>.
+
+1999-11-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Fixed some typos, added some filler.
+
+1999-11-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: New documentation file.
+	* gprof.cxx (bucket_size_get, bucket_size_set): New functions.
+	Check bucket-size changes carefully.
+	(gprof_component ctor): Make "bucket-size" a virtual attribute.
+
+1999-10-25  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gprof.cxx: New file: sw-profile-gprof component. 
+	* Makefile.am: New file.
+	* Makefile.in: New generated file.
+

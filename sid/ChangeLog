@@ -1,0 +1,203 @@
+2000-11-19  Frank Ch. Eigler <fche@redhat.com>
+
+	* Makefile.am (install-info): Add dummy target.
+	* Makefile.in: Regenerated.
+
+2000-09-22  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in: Pass `enabled_shared' down to autoconf outputs.
+	* Makefile.in, configure: Regenerated.
+
+2000-09-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in, aclocal.m4: Regenerated.
+
+2000-09-12  matthew green  <mrg@redhat.com>
+
+	* Makefile.in: Regenerate.
+	* aclocal.m4: Likewise.
+	* configure: Likewise.
+
+2000-07-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated to record new config/* dependencies.
+
+2000-07-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in: Pass "--disable-shared" to sid subdirectories if
+	shared libstdc++ is not found.
+	* aclocal.m4, configure: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* aclocal.m4, configure: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in, aclocal.m4, configure: Regenerate.
+
+2000-05-22  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.in, aclocal.m4, configure: Regenerate.
+
+2000-04-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in: Roll back last change, d'oh.
+	* Makefile.in, configure, aclocal.m4: Regenerated.
+
+2000-04-17  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in: Don't run CY_SIDTARGET_CHECK.
+	* Makefile.in, configure, aclocal.m4: Regenerated.
+
+2000-03-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* COPYING.SID: New file.
+	* Makefile.am (EXTRA_DIST): Enlist it.
+	* Makefile.in, aclocal.m4: Regenerated.
+
+2000-03-25  Ben Elliston  <bje@redhat.com>
+
+	* COPYING: New file.
+
+2000-02-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in: Recurse into demos/.
+	* configure: Regenerated.
+
+2000-01-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure, Makefile.in, aclocal.m4: Regenerated.
+	
+2000-01-11  Ben Elliston  <bje@cygnus.com>
+
+	* configure: Regenerate.
+	* aclocal.m4: Likewise.
+	* Makefile.in: Likewise.
+
+2000-01-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure: Renegerate with newer autoconf.
+
+2000-01-07  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in (AC_CONFIG_SUBDIRS): Add "samples" subdirectory.
+	* configure: Regenerate.
+
+1999-11-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* aclocal.m4: Regenerated.
+	* configure: Regenerated.
+
+1999-10-25  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* aclocal.m4: Regenerated.
+	* configure: Regenerated.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Call CY_SIDTARGET_CHECK for config/init.tcl.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Regenerated.
+	* configure: Regenerated.
+
+1999-09-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Look for C++ and some other tools paranoidly.
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+
+1999-09-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): Define.
+	* Makefile.in: Regenerated.
+
+1999-06-21  Ben Elliston  <bje@cygnus.com>
+
+	* cygwin32_compilerProblems: Move to int-doc subdirectory.
+
+1999-06-16  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* cygwin32_compilerProblems: Created new file
+	  to keep log of native NT compiler bugs.
+
+1999-05-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Correct use of AC_CONFIG_AUX_DIR.
+	* configure: Regenerated.
+	* aclocal.m4: Regenerated.
+
+1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Generate config/info.tcl.
+	* configure: Regenerated.
+	
+1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* config: New subdirectory for AC_CONFIG_AUX_DIR.
+	* configure.in: Use it.
+	* Makefile.in: Rebuilt.
+	* configure: Rebuilt.
+
+1999-03-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in (subdirs): Added bsp/.
+	* configure: Rebuilt.
+
+1999-03-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in (subdirs): Fewer subdirs after reorg.
+	* configure: Rebuilt.
+	
+1999-03-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in (subdirs): Added compGloss.
+	* configure: Rebuilt.
+
+1999-02-26  Frank Ch. Eigler  <fche@cygnus.com>
+	
+	* ltmain (no_builtin_flag): Add -fno-exceptions as g++ problem workaround.
+	* configure.in: Add compIDE, compUart, compConfig.
+	* configure: Rebuilt.
+
+1999-02-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am: Switch to foreign mode.  Adjust for automake 1.4.
+	* configure.in: Adjust for autoconf 2.13.
+	* Makefile.in: Rebuilt.
+	* aclocal.m4: Rebuilt.
+	* configure: Rebuilt.
+
+1999-02-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* move-if-change: New file.
+	* configure.in (subdirs): Add compCGEN.
+	* configure: Rebuilt.
+
+1999-01-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in (subdirs): Add compLoader.
+	* configure: Rebuilt.
+
+1998-12-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in (subdirs): Make include/ subdir a self-configure.  
+	Add compTcl.
+	* Makefile.am (SUBDIRS): Remove include/.
+	* Makefile.in: Rebuilt.
+	* configure: Rebuilt.
+
+	* ltconfig: For GNU LD on ELF host, add '$deplib' to archive_cmds
+	experimentally.
+
+1998-12-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Added compMapper subdirectory.
+	* configure: Rebuilt.
+
+1998-12-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* acinclude.m4: Removed.
+	* aclocal.m4: Rebuilt.
+	* Makefile.in: Rebuilt.
+

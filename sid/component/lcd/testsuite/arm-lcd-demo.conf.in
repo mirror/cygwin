@@ -1,0 +1,98 @@
+# sid configuration file
+
+set main verbose? 0
+set main persistent? 0
+
+dso @prefix@/lib/sidcomp/libtargetview.la targetview_component_library
+dso @prefix@/lib/sidcomp/libmapper.la mapper_component_library
+dso @prefix@/lib/sidcomp/libcgencpu.la cgen_component_library
+dso @prefix@/lib/sidcomp/libconsoles.la console_component_library
+dso @prefix@/lib/sidcomp/libsched.la sched_component_library
+dso @prefix@/lib/sidcomp/libgloss.la gloss_component_library
+dso @prefix@/lib/sidcomp/libhd44780u.la hd44780u_component_library
+dso @prefix@/lib/sidcomp/libgdb.la gdb_component_library
+dso @prefix@/lib/sidcomp/libglue.la glue_component_library
+dso @prefix@/lib/sidcomp/libloader.la loader_component_library
+dso @prefix@/lib/sidcomp/libmemory.la mem_component_library
+dso @prefix@/lib/sidcomp/libtclapi.la tcl_bridge_library
+
+# first section
+new hw-cpu-arm7t cpu
+new hw-mapper-basic bus
+new hw-glue-sequence-8 init-sequence
+new hw-glue-sequence-1 yield-net
+new hw-glue-sequence-1 hw-reset-net
+new hw-glue-sequence-8 deinit-sequence
+new sid-sched-host host-sched
+new sid-sched-sim target-sched
+new hw-lcd-hd44780u-a00 lcd
+new hw-visual-lcd display
+# gloss
+new sw-gloss-arm/angel angel
+new sid-io-stdio stdio
+# loader
+new sw-load-elf loader
+# second section
+# settings
+set cpu step-insn-count 1000
+set cpu trace-result? 0
+set cpu trace-extract? 0
+set host-sched num-clients 5 # large enough?
+set host-sched 0-regular? 1
+set host-sched 0-time 50
+set host-sched 1-regular? 1
+set host-sched 1-time 500
+set target-sched num-clients 10 # large enough?
+set target-sched 0-regular? 1
+set target-sched 0-time 1000
+
+set display width 48
+set display height 16
+
+# pin connections
+connect-pin main perform-activity -> host-sched advance
+connect-pin main perform-activity -> target-sched advance
+connect-pin main perform-activity -> display !event
+connect-pin main starting -> init-sequence input
+connect-pin main stopping -> deinit-sequence input
+connect-pin init-sequence output-0 -> hw-reset-net input
+connect-pin hw-reset-net output-0 -> cpu reset!
+connect-pin target-sched 0-event -> cpu step!
+connect-pin yield-net output-0 -> cpu yield
+connect-pin yield-net output-0 -> host-sched yield
+connect-pin host-sched 1-event -> lcd refresh-sync-event
+connect-pin host-sched 1-control <- lcd refresh-sync-control
+# bus connections
+connect-bus cpu insn-memory bus access-port
+connect-bus cpu data-memory bus access-port
+# gloss
+relate angel cpu cpu
+connect-pin init-sequence output-2 -> angel reset
+connect-pin cpu trap <-> angel trap
+connect-pin cpu trap-code -> angel trap-code
+connect-pin cpu halt! <-> angel halt!
+set angel verbose? 0
+connect-bus angel target-memory bus access-port
+# angel w/o gdb
+connect-pin host-sched 0-event -> stdio poll
+connect-pin angel debug-tx -> stdio stdout
+connect-pin angel debug-rx <- stdio stdin
+connect-pin angel process-signal -> main stop!
+set cpu engine-type scache
+# loader
+set loader file ./lcd-ex
+connect-bus loader load-accessor bus access-port 
+connect-pin init-sequence output-1 -> loader load!
+connect-pin loader start-pc-set -> cpu start-pc-set!
+connect-pin loader endian-set -> cpu endian-set!
+connect-pin loader error -> main stop!
+# memory region 1
+new hw-memory-ram/rom-basic mem1
+set mem1 size 0x800000
+connect-bus bus [0,0x7fffff] mem1 read-write-port
+
+#add the lcd
+connect-bus bus [0x800040-0x800050,4,1] lcd bus
+connect-pin lcd row-col -> display row-col
+connect-pin lcd FR -> display FR
+set lcd verbose? 0

@@ -1,0 +1,605 @@
+# Testsuite for parallel port.
+#
+#  Copyright (C) 1999 Red Hat
+
+set test "sid configuration"
+sid_config_component_test_with_tracing "parport.conf" \
+	"load [sid_find_file libparport.la] parport_component_library" \
+	"hw-parport-ps/2"
+pass $test
+
+set test "sid startup"
+if {[sid_start "parport.conf"]} { 
+  pass $test 
+} else { 
+  fail $test 
+  return 
+}
+
+# Lets acquire bus 
+set test "acquire bus"
+set bus [sid_cmd "sid::component::find_bus $victim Bus"]
+if {$bus == ""} {
+  fail $test
+} else {
+  pass $test
+} 
+
+# Lets check default values in registers
+set test "Reading default PR reg. val 0"
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x00"]
+if {[lindex $result 0] == "ok" } {
+    if {[lindex $result 1] == 0x00 } { pass $test } else { fail $test } 
+} else {
+    fail "$test bus error"
+}
+
+# this default SR test is little risky as I am predicting input pin value
+set test "Reading default SR reg val 0x07"
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
+if {[lindex $result 0] == "ok" } {
+   if {[lindex $result 1] == 0x07 } { 
+      pass $test 
+   } else { 
+      fail $test  
+   } 
+} else {
+    fail "$test bus error" 
+}
+
+set test "Reading default COM reg val 0xE0"
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x02"]
+if {[lindex $result 0] == "ok" } {
+    if {[lindex $result 1] == 0xE0 } { pass $test } else { fail $test } 
+} else {
+    fail "$test bus error"
+}
+
+# testing the presence of 8 data lines.
+for {set i 0} {$i < 8} {incr i} {
+   set test "Presence data pin $i"
+   set ip_dp($i) [sid_cmd "sid::component::find_pin $victim PD$i"]
+   if {$ip_dp($i) != "" } { pass $test } else { fail $test }
+}
+
+# creating 8 pins to be connected to the output of 8 data lines
+set data_pin0 [sid_cmd "sid::pin::new"]
+set data_pin1 [sid_cmd "sid::pin::new"]
+set data_pin2 [sid_cmd "sid::pin::new"]
+set data_pin3 [sid_cmd "sid::pin::new"]
+set data_pin4 [sid_cmd "sid::pin::new"]
+set data_pin5 [sid_cmd "sid::pin::new"]
+set data_pin6 [sid_cmd "sid::pin::new"]
+set data_pin7 [sid_cmd "sid::pin::new"]
+
+sid_cmd "set op_dp(0) 0"
+sid_cmd "set op_dp(1) 0"
+sid_cmd "set op_dp(2) 0"
+sid_cmd "set op_dp(3) 0"
+sid_cmd "set op_dp(4) 0"
+sid_cmd "set op_dp(5) 0"
+sid_cmd "set op_dp(6) 0"
+sid_cmd "set op_dp(7) 0"
+
+# Driven methods for each newly created pin 
+sid_cmd "set hook_driven_h4($data_pin0) {
+    global driven_h4_value op_dp
+    if \[expr \$driven_h4_value == 0\] {
+       set op_dp(0) 0
+    } else {
+	set op_dp(0) 1
+    }
+}"
+
+sid_cmd "set hook_driven_h4($data_pin1) {
+    global driven_h4_value op_dp
+    if \[expr \$driven_h4_value == 0\] {
+       set op_dp(1) 0
+    } else {
+	set op_dp(1) 1
+    }
+}"
+
+sid_cmd "set hook_driven_h4($data_pin2) {
+    global driven_h4_value op_dp
+    if \[expr \$driven_h4_value == 0\] {
+       set op_dp(2) 0
+    } else {
+	set op_dp(2) 1
+    }
+}"
+
+sid_cmd "set hook_driven_h4($data_pin3) {
+    global driven_h4_value op_dp
+    if \[expr \$driven_h4_value == 0\] {
+       set op_dp(3) 0
+    } else {
+	set op_dp(3) 1
+    }
+}"
+
+sid_cmd "set hook_driven_h4($data_pin4) {
+    global driven_h4_value op_dp
+    if \[expr \$driven_h4_value == 0\] {
+       set op_dp(4) 0
+    } else {
+	set op_dp(4) 1
+    }
+}"
+
+sid_cmd "set hook_driven_h4($data_pin5) {
+    global driven_h4_value op_dp
+    if \[expr \$driven_h4_value == 0\] {
+       set op_dp(5) 0
+    } else {
+	set op_dp(5) 1
+    }
+}"
+
+sid_cmd "set hook_driven_h4($data_pin6) {
+    global driven_h4_value op_dp
+    if \[expr \$driven_h4_value == 0\] {
+       set op_dp(6) 0
+    } else {
+	set op_dp(6) 1
+    }
+}"
+
+sid_cmd "set hook_driven_h4($data_pin7) {
+    global driven_h4_value op_dp
+    if \[expr \$driven_h4_value == 0\] {
+       set op_dp(7) 0
+    } else {
+	set op_dp(7) 1
+    }
+}"
+
+# connecting pins to output data pins
+sid_cmd "sid::component::connect_pin $victim PD0 $data_pin0"
+sid_cmd "sid::component::connect_pin $victim PD1 $data_pin1"
+sid_cmd "sid::component::connect_pin $victim PD2 $data_pin2"
+sid_cmd "sid::component::connect_pin $victim PD3 $data_pin3"
+sid_cmd "sid::component::connect_pin $victim PD4 $data_pin4"
+sid_cmd "sid::component::connect_pin $victim PD5 $data_pin5"
+sid_cmd "sid::component::connect_pin $victim PD6 $data_pin6"
+sid_cmd "sid::component::connect_pin $victim PD7 $data_pin7"
+
+# By default all data lines are in output mode.
+# need to check whether I will get list or just var in case of write
+foreach data { 0xFF 0xAB 0x00 } {
+# Write to PR register
+    sid_assert_success "sid::bus::write_h4_l1 $bus 0 $data"
+# Read PR register    
+    set test "reading PR register $data"
+    set r_result [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
+    if { [lindex $r_result 0] == "ok" } {
+	if { [lindex $r_result 1] == $data } { pass $test} else {fail $test}
+    } else {
+       fail "$test (bus error)"
+    }
+# Check pin values
+    for {set i 0} { $i < 8 } {incr i} {
+       set test " op data pin $i val "
+       if { [expr $data & [expr 1 << $i ]] > 0 } {
+          set bit_val 1 
+       } else { 
+          set bit_val 0 
+       }
+       set pin_val [sid_cmd "set op_dp($i)"]
+       if {$pin_val == $bit_val} { pass $test } else { fail $test }
+   }
+}
+
+# creating four pins to be connected to 4 output pins
+set strobe_pin [sid_cmd "sid::pin::new"]
+set autofdxt_pin [sid_cmd "sid::pin::new"]
+set slctin_pin [sid_cmd "sid::pin::new"]
+set init_pin [sid_cmd "sid::pin::new"]
+
+sid_cmd "set hook_driven_h4($strobe_pin) {
+    global driven_h4_value op0
+    if \[expr \$driven_h4_value == 0\] {
+       set op0 0
+    } else {
+	set op0 1
+    }
+}"
+
+sid_cmd "set hook_driven_h4($autofdxt_pin) {
+    global driven_h4_value op1
+    if \[expr \$driven_h4_value == 0\] {
+       set op1 0
+    } else {
+	set op1 1
+    }
+}"
+
+sid_cmd "set hook_driven_h4($init_pin) {
+    global driven_h4_value op2
+    if \[expr \$driven_h4_value == 0\] {
+       set op2 0
+    } else {
+       set op2 1
+    }
+}"
+
+sid_cmd "set hook_driven_h4($slctin_pin) {
+    global driven_h4_value op3
+    if \[expr \$driven_h4_value == 0\] {
+        set op3 0
+    } else {
+	set op3 1
+    }
+}"
+
+# connecting newly created pin
+set test " connected strobe pin"
+set result [sid_cmd "sid::component::connect_pin $victim STROBE $strobe_pin"]
+if { $result == "ok"} {pass $test} else {fail $test}
+
+set test " connected autofdxt pin" 
+sid_cmd "sid::component::connect_pin $victim AUTOFDXT $autofdxt_pin"
+if { $result == "ok"} {pass $test} else {fail $test}
+
+set test " connected slctin pin"
+sid_cmd "sid::component::connect_pin $victim SLCTIN $slctin_pin"
+if { $result == "ok"} {pass $test} else {fail $test}
+
+set test " connected init pin"
+sid_cmd "sid::component::connect_pin $victim INIT $init_pin"
+if { $result == "ok"} {pass $test} else {fail $test}
+
+# setting global variables to default values
+sid_cmd "set op0 1"
+sid_cmd "set op1 1"
+sid_cmd "set op2 0"
+sid_cmd "set op3 1"
+
+# lets write to CON register. Read COM & output pins  
+foreach data {0x1F 0xC6 0x00} {
+# Writing to CON register
+    sid_assert_success "sid::bus::write_h4_l1 $bus 0x02 $data"
+# Reading from COM register
+    set com_val [expr $data | 0xE0]
+    set test "reading COM register expect $com_val"
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x02"]
+    if {[lindex $result 0] == "ok" } { 
+       pass $test 
+    } else { 
+       fail "$test bus error" 
+    }
+    set test " expected COM value $com_val "
+    if {[lindex $result 1] == $com_val } { pass $test } else { fail $test}
+# Lets check output pins.
+   foreach pin_num {0 1 3} {
+       if {[expr $data & [expr 1 << $pin_num]] > 0 } {
+          set bit_val 1
+       } else {
+          set bit_val 0
+       }
+       set pin_val [sid_cmd "set op$pin_num"]
+       set test "Control op pin $pin_num"
+       if {$bit_val != $pin_val} { pass $test } else { fail $test }
+   }
+   if {[expr $data & [expr 1 << 2]] > 0 } { set bit_val 1} else {set bit_val 0}
+   set pin_val [sid_cmd "set op2"]
+   set test " Control op pin 2"
+   if {$bit_val == $pin_val} { pass $test } else {fail $test}
+}
+
+
+# Time to test inputs. This includes SR register & PR register in input mode.
+# make sure to test PR register with iosel register & bit #5 of control 
+# register.
+set test " get Error pin "
+set ip(3) [sid_cmd "sid::component::find_pin $victim ERROR"]
+if {$ip(3) != "" } { pass $test } else { fail $test }
+
+set test " get SLCT pin "
+set ip(4) [sid_cmd "sid::component::find_pin $victim SLCT"]
+if {$ip(4) != "" } { pass $test } else { fail $test} 
+
+set test " get PE pin "
+set ip(5) [sid_cmd "sid::component::find_pin $victim PE"]
+if {$ip(5) != ""} { pass $test } else { fail $test }
+
+set test " get ACK pin "
+set ip(6) [sid_cmd "sid::component::find_pin $victim ACK"]
+if {$ip(6) != "" } { pass $test } else { fail $test }
+
+set test " get Busy pin "
+set ip(7) [sid_cmd "sid::component::find_pin $victim BUSY"]
+if {$ip(7) != "" } { pass $test } else { fail $test }
+
+set SR_maskval 0xF8
+foreach data { 0xF8 0xC0 0x00 } {
+    for {set i 3} {$i < 8} {incr i} {
+       if { [expr $data & [expr 1 << $i]] > 0 } { 
+          set dr_val 1
+       } else { 
+          set dr_val 0 
+       }
+       sid_cmd "sid::pin::driven_h4 $ip($i) $dr_val"
+   }
+    set test " Inspect SR reg expect val $data"
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
+   if {[lindex $result 0] == "ok"} {pass $test} else {fail "$test bus error"}
+    set reg_val [lindex $result 1]
+    if {[expr $reg_val & $SR_maskval] == $data } { 
+      pass $test 
+    } else { fail " $test $reg_val" }
+}
+
+# make PR register value to 0
+sid_assert_success "sid::bus::write_h4_l1 $bus 0x00 0x00"
+
+# Lets set bit 5 of control register to make data lines in read mode.
+sid_assert_success "sid::bus::write_h4_l1 $bus 0x02 0xE0"
+
+# save state
+set test "Save state"
+set state1 [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {$state1 != ""} {pass $test} else {fail $test}
+
+# now we are in read mode. Lets try to write to PR register
+set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x00 0xFF"]
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x00"]
+set test " Read mode check write to PR register "
+if { [lindex $result 0] == "ok" } { pass $test } else { fail "$test bus error"}
+set test " Expecting read PR value 0x00 "
+if { [lindex $result 1] == 0x00 } { 
+   pass $test 
+} else { 
+   fail $test 
+    if  { [lindex $result 1] == 0xFF } {
+      fail " Able to write in read mode Oops! "
+    } 
+}
+
+for { set i 0 } { $i < 8 } { incr i } {
+   set pin_val [sid_cmd "set op_dp($i)"]
+   set test " op_dp($i) should be 0 "
+   if { $pin_val == 0 }  { pass $test } else { fail $test }
+}
+
+# lets drive few values through data pins and see if PR register gets updated.
+foreach data { 0xFF 0x33 0x00} {
+    for { set i 0 } { $i < 8 } { incr i } {
+	if {[expr $data & [expr 1 << $i]] > 0} {
+           set pin_val 1
+        } else { 
+           set pin_val 0
+	}
+       sid_cmd "sid::pin::driven_h4 $ip_dp($i) $pin_val"
+    }
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x00"]
+    set test " Read mode PR register "
+    if { [lindex $result 0] == "ok" } { pass $test } else { fail "$test bus" }
+    set test " Read mode PR reg value $data "
+    if {[lindex $result 1] == $data } { pass $test } else { fail $test }   
+}
+
+set test " biden attribute value "
+set result [sid_cmd "sid::component::attribute_value $victim BIDEN_VAL"]
+if {$result == 1} { pass $test} else { fail $test }
+
+set test "set biden to 0"
+set result [sid_cmd "sid::component::set_attribute_value $victim BIDEN_VAL 0"]
+if { $result == "ok" } { pass $test } else {fail $test }
+
+# 2 cases write & read 
+# Theoretically I am in read mode because IOSEL register default value != 0x55
+# lets drive few values through data pins and see if PR register gets updated.
+foreach data { 0xAB 0x66 0x00} {
+    for { set i 0 } { $i < 8 } { incr i } {
+       if {[expr $data & [expr 1 << $i]] > 0 } {
+	  set pin_val 1
+       } else {
+          set pin_val 0 
+       }
+       sid_cmd "sid::pin::driven_h4 $ip_dp($i) $pin_val"
+   }
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x00"]
+    set test " Read mode PR register iosel "
+    if {[lindex $result 0] == "ok" } { pass $test } else { fail $test }
+    set test " Read mode iosel PR reg value $data "
+    if {[lindex $result 1] == $data } { pass $test } else { fail $test }   
+}
+
+set test " write iosel register with value 0xAA Read Mode"
+sid_assert_success "sid::bus::write_h4_l1 $bus 0x01 0xAA"
+
+# lets drive few values through data pins and see if PR register gets updated.
+foreach data { 0xCC 0x44 0x00 0xAA} {
+    for { set i 0 } { $i < 8 } { incr i } {
+       if {[expr $data & [expr 1 << $i]] > 0 } {
+	  set pin_val 1
+       } else {
+          set pin_val 0 
+       }
+       sid_cmd "sid::pin::driven_h4 $ip_dp($i) $pin_val"
+   }
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x00"]
+    set test " Read mode iosel0xAA PR register "
+    if {[lindex $result 0] == "ok" } { pass $test } else { fail $test }
+    set test " Read mode iosel0xAA PR reg value $data "
+    if {[lindex $result 1] == $data } { pass $test } else { fail $test }   
+}
+
+
+# save state
+set test "Save state"
+set state2 [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {$state2 != ""} {pass $test} else {fail $test}
+
+set test "states are different"
+if {[string compare $state1 $state2] != 0} {pass $test} else {fail $test}
+
+#set test "restore state"
+#set result [sid_cmd "sid::component::set_attribute_value $victim state-snapshot [list $state1]"]
+#if {$result =="ok"} {pass $test} else {fail $test}
+
+sid_assert_success "sid::bus::write_h4_l1 $bus 0x01 0x55"
+# now in write mode.
+
+foreach data { 0xEE 0xAA 0x00 } {
+# Write to PR resgister
+    set test "writing PR register $data iosel 0x55"
+    sid_assert_success "sid::bus::write_h4_l1 $bus 0 $data" 
+# Read PR register    
+    set test " reading PR register iosel 0x55"
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
+    if { [lindex $result 0] == "ok" } {
+	if { [lindex $result 1] == $data } { pass $test} else {fail $test}
+    } else {
+       fail "$test (bus error)"
+    }
+# Check pin values
+    for {set i 0} { $i < 8 } {incr i} {
+       set test "op data pin $i val iosel0x55"
+       if {[expr $data & [expr 1 << $i]] > 0} { 
+          set bit_val 1
+       } else { 
+          set bit_val 0
+       }
+       set pin_val [sid_cmd "set op_dp($i)"]
+       if { $bit_val == $pin_val } { pass $test } else { fail $test }
+   }
+}
+
+set test "restore state"
+set result [sid_cmd "sid::component::set_attribute_value $victim state-snapshot [list $state1]"]
+if {$result =="ok"} {pass $test} else {fail $test}
+
+set test " test random regs after restore"
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x00" ]
+if {[lindex $result 0] == "ok" } { pass $test } else { fail "$test bus err" }
+if {[lindex $result 1] == 0x0 } { pass $test } else { fail $test }
+
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x02" ]
+if {[lindex $result 0] == "ok" } { pass $test } else { fail "$test bus err" }
+if {[lindex $result 1] == 0xE0 } { pass $test } else { fail $test }
+
+# Time to test handshaking. One of the cool features of parallel port.
+# lets make intsel 0. enable interrupt (bit #4 control register) 
+# now INTP pin & bit 2 of SR should follow ack.
+set test " get intsel attr "
+set result [sid_cmd "sid::component::attribute_value $victim INTSEL_VAL"]
+if { $result != "" } { pass $test } else {fail $test}
+
+set test " set intsel val to 0 "
+set result [sid_cmd "sid::component::set_attribute_value $victim INTSEL_VAL 0"]
+if { $result == "ok" } { pass $test } else { fail $test } 
+
+set test " set CON register bit 4 to 1 "
+sid_assert_success "sid::bus::write_h4_l1 $bus 0x02 0xD0"
+set test " read COM value expected 0xF0"
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x02" ]
+if {[lindex $result 0] == "ok" } { pass $test } else { fail "$test bus err" }
+if {[lindex $result 1] == 0xF0 } { pass $test } else { fail $test }
+
+set intp_pin [sid_cmd "sid::pin::new"]
+
+sid_cmd "set hook_driven_h4($intp_pin) {
+    global driven_h4_value intp_val
+    if \[expr \$driven_h4_value == 0\] {
+       set intp_val 0
+    } else {
+       set intp_val 1
+    }
+}"
+sid_cmd "sid::component::connect_pin $victim INTP $intp_pin"
+
+#driving input signal pins to 0
+for {set i 3} {$i < 8} {incr i } {
+   sid_cmd "sid::pin::driven_h4 $ip($i) 0"
+}
+
+# time to send ack signals and see impact on intp & bit 2 SR register
+foreach pin_val { 0 1 0 } {
+   sid_cmd "sid::pin::driven_h4 $ip(6) $pin_val"
+   set result [sid_cmd "set intp_val"]
+   set test " reading intp pin "
+   if { $result == $pin_val } { pass $test } else { fail $test }
+   set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
+   set test " reading SR to see ack & bit 2 "
+   if {[lindex $result 0] == "ok" } { pass $test } else {fail "$test bus err"}
+   set exp_val 3
+   if {$pin_val != 0 }  {
+      set exp_val 0x47
+   }
+   if {[lindex $result 1] == $exp_val } { pass $test } else { fail $test}
+}
+
+# enable INTP pin & put change ack to see latch mode.
+# currently ack is low so setting intsel to 1 won't raise interrupt.
+set test " set intsel value 1"
+set result [sid_cmd "sid::component::set_attribute_value $victim INTSEL_VAL 1"]
+if { $result == "ok" } { pass $test } else { fail $test }
+set test " reading SR intsel 1"
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
+if {[lindex $result 0] == "ok" } { pass $test } else { fail "$test bus error"}
+if {[lindex $result 1] == 0x07 } { pass $test } else { fail $test }
+# set ack high 
+sid_cmd "sid::pin::driven_h4 $ip(6) 1"  
+set result [sid_cmd "set intp_val"]
+set test "ack high intsel 1"
+if {$result == 0} { pass $test } else { fail $test }
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
+if {[lindex $result 1] == 0x47 } { pass $test } else { fail $test }
+
+# set ack low and raise interrupt
+sid_cmd "sid::pin::driven_h4 $ip(6) 0"
+set result [sid_cmd "set intp_val"]
+set test "interrupt raised"
+if {$result == 1} { pass $test } else { fail $test }
+
+# once latch mode is set turn ack on/off intp should not respond to ack
+foreach pin_val { 1 0 1 } {
+  sid_cmd "sid::pin::driven_h4 $ip(6) $pin_val"
+  set result [sid_cmd "set intp_val"]
+  set test " intp pin should remain 1"
+  if { $result == 1 } { pass $test } else { fail $test }
+}
+
+# read the SR register & see clearing intp pin.
+set test "clearing interrupt"
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
+if { [lindex $result 0] == "ok" } { pass $test} else { fail "$test bus err"}
+set reg_val [lindex $result 1]
+if { [expr $reg_val & [expr 1 << 2]] == 0 } { pass $test} else { fail $test }
+
+# now bit 2 should go to one 
+set test " clearing interrupt bit 2 should be 1 "
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
+if {[lindex $result 0] == "ok" } { pass $test} else { fail $test}
+set reg_val [lindex $result 1]
+if { [expr $reg_val & [expr 1 << 2]] != 0 } { pass $test} else { fail $test }
+
+# put in latch mode and then disable interrupts, later set intsel 0
+# send low ack raise interrupt
+sid_cmd "sid::pin::driven_h4 $ip(6) 0"
+set result [sid_cmd "set intp_val"]
+set test " Again raised interrupt"
+if {$result != 1} { fail $test} else {pass $test}
+
+# no more interrupts
+set test "disabling interrupt bit 5"
+sid_assert_success "sid::bus::write_h4_l1 $bus 0x02 0xC0"
+set result [sid_cmd "set intp_val"]
+if {$result == 0}  { pass $test} else {fail $test}
+
+set test "setting intsel back to 0"
+sid_cmd "sid::component::set_attribute_value $victim INTSEL_VAL 0"
+sid_cmd "sid::pin::driven_h4 $ip(6) 1"
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x01"]
+if {[lindex $result 1] == 0x47} {pass $test } else { fail $test }
+
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} {
+    file delete "parport.conf"
+}

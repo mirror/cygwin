@@ -1,0 +1,391 @@
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * configure: Regenerated.
+        * aclocal.m4: Ditto.
+        * Makefile.in: Ditto.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (libarm7ttimers_la_LDFLAGS): Unset.
+	(noinst_LTLIBRARIES): Replace pkglib_LTLIBRARIES.
+	* Makefile.in: Regenerated.
+
+2000-07-14  Jeff Johnston <jjohnstn@redhat.com>
+
+	* arm.cxx: Removed library set-up code which is now
+	in compTIMERS.cxx in parent directory.  Took class
+	definition code out to put in header file.
+	* arm7t-timer.h: New header file taken from arm.cxx.
+	* Makefile.am: Modified to build libarm7ttimers.la.
+	* configure.in: New file.
+	* aclocal.m4: Ditto.
+	* Makefile.in: Generated.
+	* configure: Ditto.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm.cxx: Import more std:: identifiers.
+
+2000-05-22  Ben Elliston  <bje@redhat.com>
+
+	* arm.cxx (compTimerDelete): Only delete armTimer objects if the
+	ARM component family is selected by the SIDTARGET_ARM macro.
+
+2000-03-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm.cxx (stream,destream): Save "reset" pin too.
+	Remove pesky ':' separators from state snapshot strings.
+
+2000-02-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm.cxx (armTimer ctor): Create "reset" pin.
+	(reset_pin_handler): New function.  Defer to
+	(reset): New virtual functions for armTimer and armTimerNoSched.
+	* hw-timer-arm_ref.txt: Document new pin.
+
+2000-02-04  Ben Elliston  <bje@redhat.com>
+
+	* arm.cxx (armTimer::stream): New method.
+	(armTimer::destream): Likewise.
+	(armTimerNoSched::stream): Likewise.
+	(armTimerNoSched::destream): Likewise.
+	(operator <<): Use virtual stream() method.
+	(operator >>): Likewise.
+
+2000-02-03  Ben Elliston  <bje@redhat.com>
+
+	* arm.cxx (operator <<): Include interrupt attribute in state.
+	(operator >>): Likewise.
+	* hw-timer-arm_ref.txt (Synopsis): Update.
+
+2000-01-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (armTimer ctor): Export registers as read/write attributes.
+	Export interrupt pin.
+	(armTimer::tick): Send 1 signal edge on interrupt line.
+	(word_write): Send 0 signal edge on interrupt line.
+	(armTimerNoSched::tick): Grudgingly accept illegal prescale values.
+
+1999-12-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (armTimer ctor): Export register attributes in that category.
+	(armTimerNoSched ctor): Export "ticks" pseudo-register.
+	(armTimer::mode operator >>): Detect additional error.
+	* README: Remark on changed attributes.
+
+1999-12-14  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx (armTimer::bus_interface::word_write): Add a trigger
+	checkpoint at the completion of a bus write, as it may alter the
+	component's state.
+
+1999-12-10  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-timer-arm_ref.txt: Standardized behaviors & reference section.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	
+1999-12-10  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx (armTimer::triggerpoint_manager): New member.
+	(armTimer::pin_factory): New method.
+	(armTimer::pin_junkyard): Likewise.
+	(armTimer ctor): Initialise triggerpoint_manager. Add watchable
+	attributes: counter, load-value, enabled, mode, prescale.
+	(armTimer::tick): Insert a checkpoint.
+	(armTimerNoSched::tick): Likewise.
+	(armTimer::bus_interface::word_write): Likewise.
+	* hw-timer-arm_ref.txt: Document watchable attributes and
+	triggerpoint support.
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-timer-arm_ref.txt: New file.  Content moved from
+	* README: Removed component doc part.
+	* Makefile.am: Install new file.
+	* Makefile.in: Regenerated.
+
+1999-12-07  Ben Elliston  <bje@cygnus.com>
+
+	* README: Formatting tweaks to help pass the doc test.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (armTimerNoSched::tick): New callthrough function.
+ 	(compTimerDelete): Use dynamic_cast<>.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx: Define hw-timer-arm/ref* types #if SIDTARGET_ARM.
+	* Makefile.in: Regenerated.
+
+1999-10-10  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* arm.cxx (operator <<): Added return.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (word_write, word_read): Take value, not const-ref.
+
+1999-09-27  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): Add timermonkey.exp.
+	* Makefile.in: Regenerate.
+
+1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (*): Use host_int_X, not compiler_int_X.
+
+1999-09-13  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx (armTimer ctor): counter and load-value attributes are
+	registers. enabled, mode and prescale attributes are settings.
+
+	* Makefile.am (DEJAGNUTESTS): Define.
+	(checkme): New target.
+	* Makefile.in: Regenerate.
+
+1999-09-01  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* arm.cxx (save_state): Remove debugging code.
+	(operator <<): Remove some extra else statements.
+
+1999-09-01  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README: Doc fixes. Sentences reworded.
+
+1999-08-30  Ben Elliston  <bje@cygnus.com>
+
+	* README: Update.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (operator >>): Use ANSI setstate() instead of setf().
+
+1999-08-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (reset_schedule): Disable debugging output.
+	(operator >>): Remove parse error output.
+
+1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
+
+	* arm.cxx: (*) Change big_int_N and little_int_N so that
+	the default operations all use their integer values.
+
+1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* arm.cxx: Introduce proper namespace usage.
+
+1999-07-16  Faisal Khoja   <fkhoja@cygnus.com>
+
+	* arm.cxx: Introduced state save & restore.
+	Added four methods namely save_state, restore_state,
+	operator << , and operator >>.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* testsuite: Removed directory.
+	* Makefile.am (SUBDIRS): Don't recurse into it.
+	* Makefile.in: Regenerated.
+	* acconfig.h: Removed.
+	* aclocal.m4: Ditto.
+	* config.in: Ditto.
+	* configure: Ditto.
+	* configure.in: Ditto.
+	* stamp-h.in: Ditto.
+
+1999-06-28  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx (armTimer::tick): Demote from public to protected.
+	(armTimer::reset_schedule): Likewise.
+	(armTimerNoSched::clockpin): Move private members down.
+	(armTimerNoSched::ticks): Likewise.
+	(armTimerNoSched::tick): Make private.
+	(armTimerSched): Move public members to the top.
+
+	* README: Rewrite using standard documentation template.
+	
+1999-06-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (armTimerSched): Use new scheduler_event_subscription
+ 	interface class.  Forget about generic_scheduler_interface
+ 	throughout.
+
+1999-06-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (bus_interface): Drop word_bus<> address type parameter.
+	Use host_int_4 instead.
+
+1999-06-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (compTimerDelete): New function.
+	(timer_component_library): Register it.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (compTimerListTypes, compTimerCreate): Renamed types:
+	"timer-arm-ref*" -> "hw-timer-arm/ref-nosched",
+	"timer-arm-ref-sched" -> "hw-timer-arm/ref-sched".
+
+1999-05-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* aclocal.m4: Regenerated.
+	* Makefile.in: Regenerated
+
+1999-05-12  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in (AC_OUTPUT): Do not output `timer-m32r.conf'.
+	* configure: Regenerate.	
+
+1999-05-11  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx: Allay minor warnings.
+
+1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (timer_component_library): DLLEXPORT it.
+	* configure.in: Be win32-dll-capable.
+	* configure: Regenerated.
+	* config.in: Ditto.
+	* aclocal.m4: Regenerated for new libtool.
+	* Makefile.in: Ditto.
+
+	* timer-m32r.conf.in: Use .la component DSO names.
+
+1999-05-01  Ron Unrau  <runrau@cygnus.com>
+
+	* timer-m32r.conf.in: don't specify wait states for memory
+
+1999-04-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (LDFLAGS): Add -no-undefined
+	* Makefile.in: Regenerated.
+
+1999-04-21  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx (compTimerCreate): Fix typo; s/arf/arm.
+
+1999-04-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (armTimer): Moved some code out into new classes.  Make
+ 	register attributes read-only temporarily.
+	(armTimerNoSched): New class: equivalent to previous armTimer.
+  	Exposes pin "clock".
+	(armTimerSched): New class: uses external scheduler to perform
+ 	clock prescaling.  Exposes pin "divided-clock".
+	
+	(armTimerSched::reset_schedule): New function.  Update divisor in
+ 	external scheduler.
+	(word_write): Call it upon write to control register.
+	
+	(armTimer::tick): Don't use divisor.
+	(armTimerNoSched::tick): Divide here.
+	
+	(compTimerListTypes): Add new component type
+ 	"timer-arm-ref-sched".   Add "timer-arm-ref-nosched" as alias
+	to old "timer-arm-ref".
+
+1999-04-03  Ron Unrau  <runrau@cygnus.com>
+
+	* arm.cxx: swap addr<->data in bus::read and bus::write
+
+1999-03-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (operator <<,>>): Add streaming operators for enum
+ 	armTimer::timer_mode.
+	(class armTimer): Make them friends.  Use plain unsigned ticks.
+  	Use smaller type for loadValue.
+	(tick): Avoid division-by-zero for prescale value 0.  Reworked
+ 	logic slightly to clarify interrupt / rollover policy.
+	(word_write): During a write to the loadValue register, also
+	load the counter.  Return bus::unmapped for bad addresses.
+	(word_read): Return bus::unmapped for bad addresses.
+	
+	* configure.in (subdirs): Descend into testsuite/.
+	* Makefile.am: Ditto.
+	* configure: Regenerated.
+	* Makefile.in: Regenerated.
+
+1999-03-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-03-26  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx: Fixes for bugs exposed by testing.
+	(armTimer::counter): Use a 16-bit data type on the host.
+	(armTimer::tick): Simplify and correct the interrupt logic.
+	(armTimer::word_write): Mask the top 16 bits of incoming 
+	values, not 24 bits.
+
+	* test.c: New file; test the timer with volatile pointers.
+	* test.s: Likewise. Tweak assembly output from m32r-elf-gcc.
+	* timer-m32r-conf.in: New file; a sample system configuration that
+	includes an ARM reference timer.
+	
+	* configure.in: Output timer-m32r.conf.
+	* configure: Regenerate.
+
+	* arm.cxx: Refer to a URL that documents this device.
+	(armTimer::activity_pin_t): Remove; favour the new callback_pin.
+	(armTimer::busReadHandler): Likewise.
+	(armTimer::busWriteHandler): Likewise.
+	(armTimer::cleared): Remove unused data member.
+	(armTimer::armTimer): Call the activity pin `clock'.
+	(armTimer::tick): New method; called when clock is driven.
+	(armTimer::bus_interface::word_write): Do the handler's work.
+	(armTimer::bus_interface::word_read): Likewise.
+	(compTimerListTypes): Rename `armpid' to `timer-arm-ref'.
+	
+1999-03-25  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx (compTimer): Rename to `armTimer'. Apply throughout.
+	(armTimer::armTimer): Add useful attributes.
+	(armTimer::bus_interface::word_read): Return bus::ok.
+	(armTimer::bus_interface::word_write): Likewise.
+
+1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Use new AC_CONFIG_AUX_DIR.
+	* configure: Regenerated.
+	* Makefile.am: Build libtool -modules.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Regenerated.
+
+1999-03-24  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx: Rename component to "armpid" for want of a better name.
+	Add support for the bus interface. Implement register I/O.
+
+1999-03-23  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx: New file.
+	* Makefile.am: Likewise.
+	* configure.in: Likewise.
+	* stamp-h.in: Likewise.
+	* Makefile.in: Generate.
+	* aclocal.m4: Likewise.
+	* config.h.in: Likewise.
+	* configure: Likewise.
+
+1999-03-17  Ben Elliston  <bje@cygnus.com>
+
+	* README: New file.

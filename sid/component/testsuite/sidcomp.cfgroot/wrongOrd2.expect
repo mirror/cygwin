@@ -1,0 +1,5 @@
+wrongOrd2.badconf:20: component target-sched not found
+wrongOrd2.badconf:21: component timer1 not found
+wrongOrd2.badconf:22: component angel not found
+wrongOrd2.badconf:23: component remapper not found
+Configuration error.  Aborting.

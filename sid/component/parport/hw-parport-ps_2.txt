@@ -1,0 +1,135 @@
+* Name
+  hw-parport-ps/2
+
+* Synopsis
+  This component models a PS/2-style parallel port controller.
+
+  Pins: STROBE AUTOFDXT INIT SLCTIN PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7
+	INTP ERROR SLCT BUSY PE ACK INTSEL BIDEN RESET
+  Attributes: PR SR COM CON IOSEL STROBE AUTOFDXT INIT SLCTIN 
+        PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7	INTP ERROR SLCT BUSY PE ACK INTSEL BIDEN RESET
+	state-snapshot
+  Buses: registers
+  Library: libparport.la
+  Symbol name: parport_component_library
+
+* Functionality
+  - Modelling
+
+    * The PS/2 parallel port controller is a simple 8-bit I/O
+      interface to a printer.  From its origins, the parallel port
+      system has evolved into higher functionality IEEE-1284
+      controllers, but this sid component implements a version of the
+      simple original standard.
+
+    * The specific hardware being modelled is the parallel port part
+      of the Exar 16C552 device.
+
+  - Behaviors
+ 
+    * Register access
+
+      Byte-wide operations on the "registers" bus access control
+      registers of the model.  The control registers are also exported
+      as attributes.
+
+	  name            address       values        permitted accesses
+
+          Port		| 0x00	      | 0x00 - 0xFF | read/write
+	  IO Select	| 0x01	      | 0x00 - 0xFF | write
+	  Control       | 0x02	      | 0xC0 - 0xFF | write
+	  Status	| 0x01	      | 0x03 - 0xFF | read
+	  Command	| 0x02	      | 0xE0 - 0xFF | read
+
+    * Parallel I/O
+
+      In the default output-only mode, a data byte written to the
+      "Port" control register is transmitted bit-by-bit to the
+      PD0..PD7 output pins.  
+     
+      The parallel port controller model may be switched into the
+      input mode by using the appropriate combination of signals on
+      the BIDEN pin, the I/O Select register, and a bit in the Control
+      register.  In this mode, signals driven onto the PD0..PD7 input
+      pins are forwarded to the "Port" control register.
+
+      The usual parallel port handshaking signals (STROBE, ACK, ERROR,
+      ERROR, BUSY, PE) are used to carry out the Centronics printer
+      protocol.  The appropriate pins use an "active-low" polarity,
+      which means that zero is interpreted as an asserted signal, and
+      non-zero as a deasserted signal.  Tri-state signals in hardware
+      are not specifically modelled.
+
+    * Reset
+
+      When the RESET input pin is driven, control registers and pins
+      return to their usual power-on states.
+
+  - SID conventions
+    * This is a functional component.
+    * It supports state save/restore and triggerpoints.
+
+* Environment
+
+  - Related components
+
+    * This component is customarily attached to a source of a reset
+      signal.  The PD0..PD7 pins may be connected to simulated
+      switches or indicators as needed.
+
+	new hw-parport-ps/2 pport
+	new hw-cpu-foo cpu
+	new hw-mapper-basic mapper
+	new hw-blinker-light led
+	connect-pin main starting -> pport RESET
+	connect-pin pport INTP -> cpu interrupt
+	connect-pin pport PD0 -> led signal
+	connect-bus mapper [0x3f0-0x3f8,4,1] pport Bus
+
+* SID interface reference
+
+ - low level:
+  * pins
+   STROBE | output | 0, 1 | parallel I/O
+   AUTOFDXT | output | 0, 1 | parallel I/O
+   SLCTIN | output | 0, 1 | parallel I/O
+   INIT | output | 0, 1 |  parallel I/O
+   INTP | output  | 0, 1 | parallel I/O
+   ERROR | input | 0, 1 |  parallel I/O
+   SLCT | input | 0, 1 |  parallel I/O
+   PE | input  | 0, 1 |  parallel I/O
+   ACK | input | 0, 1 |  parallel I/O
+   BUSY | input | 0, 1 | parallel I/O
+   INTSEL | input | 0, 1 |  parallel I/O
+   BIDEN | input | 0, 1 | parallel I/O
+   RESET | input | any | reset
+   PD0..PD7 | input/output | 0, 1 | parallel I/O
+
+  * buses
+   Bus | 0x00 - 0x02 | byte-wide-access only | register access
+
+  * attributes
+   STROBE | pin | 0, 1 | parallel I/O
+   AUTOFDXT | pin | 0, 1 | parallel I/O
+   SLCTIN | pin | 0, 1 | parallel I/O
+   INIT | pin | 0, 1 |  parallel I/O
+   INTP | pin  | 0, 1 | parallel I/O
+   ERROR | pin | 0, 1 |  parallel I/O
+   SLCT | pin | 0, 1 |  parallel I/O
+   PE | pin  | 0, 1 |  parallel I/O
+   ACK | pin | 0, 1 |  parallel I/O
+   BUSY | pin | 0, 1 | parallel I/O
+   INTSEL | pin | 0, 1 |  parallel I/O
+   BIDEN | pin | 0, 1 | parallel I/O
+   RESET | pin | any | reset
+   PD0..PD7 | pin | 0, 1 | parallel I/O
+   PR | register | numeric string | register access
+   SR | register | numeric string | register access
+   COM | register | numeric string | register access
+   CON | register | numeric string | register access
+   IOSEL | register | numeric string | register access
+   state-snapshot | | opaque string | state save/restore
+
+* References
+    http://imeg.com/jadtech/ieee.htm
+    http://www.exar.com/products/st16c552_a.html

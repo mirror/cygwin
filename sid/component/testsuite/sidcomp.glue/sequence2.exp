@@ -1,0 +1,37 @@
+set test "sid configuration"
+sid_config_component_test "base2.conf" \
+    "load [sid_find_file libglue.la] glue_component_library" \
+    "hw-glue-sequence-2"
+pass $test
+
+set test "sid startup"
+if [sid_start "base2.conf"] then { pass $test } else { fail $test ; return }
+
+set test "check default num-outputs is 2"
+set noutput [sid_cmd "sid::component::attribute_value $victim num-outputs"]
+if {$noutput == 2} then { pass $test } else { fail $test }
+
+# cr 101195
+set test "check pin names"
+sid_assert_includes_all "sid::component::pin_names $victim" {"output-0" "output-1" "input"}
+
+set test "loop through output pins"
+set newpin [sid_cmd "sid::pin::new"]
+for {set i 0} {$i < 2} {incr i} {
+   set pin [sid_cmd "sid::component::connect_pin $victim output-$i $newpin"]
+   if {$pin == ""} then { fail $test ; return }
+}
+pass $test               
+
+set test "num-outputs cannot be changed"
+set num [sid_cmd [list sid::component::attribute_value $victim num-outputs]]
+set s [sid_cmd [list sid::component::set_attribute_value $victim num-outputs [expr "$num + 1"]]]
+if {$s == "ok"} then {fail $test} else {pass $test}
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "base2.conf" }

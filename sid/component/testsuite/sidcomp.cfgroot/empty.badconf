@@ -1,0 +1,4 @@
+# use some empty strings
+"set" "main" "attrname" ""
+"set" "main" "" "attrvalue"
+"set" "" "attrname" "attrvalue"

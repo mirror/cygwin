@@ -1,0 +1,6 @@
+dupRel.badconf:28: cannot set relation cpu for component angel
+dupRel.badconf:29: cannot set relation rel1 for component angel
+dupRel.badconf:30: cannot set relation cpu2 for component angel
+dupRel.badconf:31: cannot set relation cpu for component cpu
+dupRel.badconf:32: cannot set relation stdio for component stdio
+Configuration error.  Aborting.

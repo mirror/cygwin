@@ -1,0 +1,46 @@
+This directory contains a suite of simulated timer components within the
+SID simulation framework.  The first such timer to be implemented is the
+timer from the ARM PID7T development board.
+
+Design notes for the ARM timer component
+March 17, 1999
+
+The timer peripheral on the ARM PID7T is a simple 16-bit down counter.
+It is also one which is simple to simulate.  To avoid repeating the
+functional description, sufficient details of this timer is available
+from <http://www.arm.com/Documentation/UserMans/rps/#timer>.
+
+Noteworthy points of the component design:
+
+* The ARM PID7T comes with two such timers--which may or may not be
+  implemented on the same piece of silicon.  Instead of implementing a
+  dual timer, a functionally equivalent system can be configured using
+  two instances of a single timer. This simplifies the implementation
+  and gives more design flexibility to system builders.
+
+* The block diagram for this timer appears below.  This illustrates
+  the need for one input pin and one output pin.
+
+			   +----------+
+			   |	      |
+		system --->|  timer   |---> terminal count
+		clock      |          |     interrupt
+			   +----------+
+
+* In accordance with the ARM specification, there will be 20
+  contiguous bytes of memory mapped registers:
+
+			When read	When written
+
+	TimerBase	TimerLoad	TimerLoad
+	TimerBase+4	TimerValue	Reserved
+	TimerBase+8	TimerControl	TimerControl
+	TimerBase+12	Reserved	TimerClear
+	TimerBase+16	Reserved	Reserved
+
+* At initialisation time, all registers will be zeroed. This appears
+  to be a satisfactory state for the timer to be in.
+
+* The interrupt pin will be driven whenever the timer is in periodic
+  timer mode and the counter decrements to zero.  The interrupt pin
+  ceases to be driven once the TimerClear register is written to.

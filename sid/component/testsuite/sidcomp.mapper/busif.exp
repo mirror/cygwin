@@ -1,0 +1,368 @@
+
+proc build-config { file target } {
+    set f [open $file "w"]
+    puts $f "load [sid_find_file libtclapi.la] tcl_bridge_library"
+    puts $f "load [sid_find_file libmapper.la] mapper_component_library"
+    puts $f "load [sid_find_file lib${target}.la] ${target}_component_library"
+    puts $f "new bridge-tcl tester"
+    puts $f "new hw-mapper-basic mapper"
+    puts $f "new ${target}-big-1 big-1-bus"
+    puts $f "new ${target}-big-2 big-2-bus"
+    puts $f "new ${target}-big-4 big-4-bus"
+    puts $f "new ${target}-big-8 big-8-bus"
+    puts $f "set tester load! [sid_find_file tester.tcl]"
+    puts $f "set tester hexify? yes-please-and-thanks"
+    puts $f "relate tester victim mapper"
+    puts $f "connect-pin main perform-activity -> tester command-io!"
+    puts $f "connect-pin main perform-activity -> tester !event"
+    puts $f "connect-bus mapper \[0x80000-0x800ff,4,1\] big-1-bus bus"
+    puts $f "connect-bus mapper \[0x80100-0x801ff,8,2\] big-2-bus bus"
+    puts $f "connect-bus mapper \[0x80200-0x802ff\] big-4-bus bus"
+    puts $f "connect-bus mapper \[0x80300-0x803ff\] big-8-bus bus"
+    verbose "Created sid configuration file $file" 
+    close $f
+}
+
+proc sid_read_write { cmd } {
+    global spawn_id
+    global expect_out
+    global test
+
+    if [catch { exp_pid }] then {
+	unresolved "$test - spawned sid process already gone"
+	return
+    }
+
+    # wait for prompt
+    global timeout
+    set last_timeout $timeout
+    set timeout 3
+    set ok 1
+    expect {
+	timeout { unresolved "$test - timeout before [prettyprint $cmd]"; set ok 0 }
+	eof { unresolved "$test - eof before [prettyprint $cmd]"; set ok 0 }
+	"command>"
+    }
+    set timeout $last_timeout
+    if {! $ok} then { return "" }
+
+    # encode string
+    binary scan $cmd H* encoded
+
+    set iterations [expr [string length $encoded] / 64]
+    for {set i 0} {$i < $iterations} {incr i} {
+	set first [expr $i * 64]
+	set last [expr $first + 63]
+	send "[string range $encoded $first $last]+\n"
+    }
+    set first [expr $i * 64]
+    set read_write ""
+    send "[string range $encoded $first end]\n"
+
+    expect {
+	timeout { fail "$test - timeout after [prettyprint $cmd]" ; return "" }
+	eof { fail "$test - eof after [prettyprint $cmd]"; return "" }
+	-re "(ERROR:\[^\n\]*)" {
+	    fail "$test - [prettyprint $expect_out(1,string)] after [prettyprint $cmd]"
+	    return ""
+	}
+	-re "write>>(.*)<<write.*result>>(\[0-9a-f\]*)<<result" {
+	   set read_write $expect_out(1,string)
+	   set result $expect_out(2,string)
+	}
+	-re "read>>(.*)<<read.*result>>(\[0-9a-f\]*)<<result" {
+	   set read_write $expect_out(1,string)
+	   set result $expect_out(2,string)
+	}
+	-re "result>>(\[0-9a-f\]*)<<result" {
+	    set result $expect_out(1,string)
+	}
+	-re "split>>(\[0-9a-f\]*)<<split" {
+	    set result $expect_out(1,string)
+	    while {1} {
+		expect {
+		    timeout { fail "$test - timeout3" ; return "" }
+		    eof { fail "$test - eof3" ; return "" }
+		    -re "split>>(\[0-9a-f\]*)<<split" {
+			append result $expect_out(1,string)
+		    }
+		    -re "split-end" { break }
+		}
+	    }
+	}
+    }
+    # undo encoding in tester.tcl
+    set decoded [binary format H* $result]
+    verbose "result $decoded"
+    if { [string match "*ok*" $decoded] == 0 } then { 
+        fail "$test - bus failure: $decoded"
+	return ""
+    }
+
+    verbose "read_write $read_write" 3
+    return [append read_write " " $decoded]
+}
+
+global test
+global bus
+
+proc write_test { result laddr mask } {
+    global test
+
+    # already noted as failure
+    if { $result == "" } then { return }
+
+    if { [lindex $result 1] == $laddr } then {
+        pass "$test - laddr check"
+    } else {
+        fail "$test - address [lindex $result 1] != $laddr"
+    }
+    if { [lindex $result 3] == $mask } then {
+        pass "$test - mask check"
+    } else {
+        fail "$test - mask [lindex $result 3] != $mask"
+    }
+}
+
+proc read_test { result laddr mask val } {
+    global test
+
+    # already noted as failure
+    if { $result == "" } then { return } 
+
+    if { [lindex $result 1] == $laddr } then { 
+        pass "$test - laddr check"
+    } else {
+        fail "$test - address [lindex $result 1] != $laddr"
+    } 
+    if { [lindex $result 3] == $mask } then {
+        pass "$test - mask check"
+    } else {
+        fail "$test - mask [lindex $result 3] != $mask"
+    }
+
+    set num [lindex $result 7]
+    if { $num == $val } then {
+        pass "$test - val check"
+    } else {
+        verbose "read_test: $result"
+        # possibly different formats, like hex?
+        if { [ string match "*0x*" $num ] == 0 } then { 
+            set num [format "0x%x" $num]
+	    verbose "formatted num $num"
+	}
+	if { $num == $val } then { 
+	    pass "$test - val check" 
+	} else { 
+	    fail "$test - value $num != $val"
+	}
+    }
+}
+
+set test "building conf file"
+build-config "busif.conf" "busif"
+
+set test "sid startup"
+if {[sid_start "busif.conf"]} { pass $test } else { fail $test; return }
+
+set test "acquire mapper bus handle"
+set bus [sid_cmd "sid::component::find_bus $victim access-port"]
+if { $bus != "" } { pass $test } else { fail $test }
+
+set test "byte write to byte device - stride 4"
+set result [sid_read_write "sid::bus::write_h4_b1 $bus 0x80000 1"]
+write_test $result 0 0x0ff
+
+set test "byte read from byte device - stride 4"
+set result [sid_read_write "sid::bus::read_h4_b1 $bus 0x80000"]
+read_test $result 0 0x0ff 1
+
+set test "short write to byte device - stride 4"
+set result [sid_read_write "sid::bus::write_h4_b2 $bus 0x80004 0x0200"]
+write_test $result 1 0x0ff
+
+set test "short read from byte device - stride 4"
+set result [sid_read_write "sid::bus::read_h4_b2 $bus 0x80004"]
+read_test $result 1 0x0ff 0x0200
+
+set test "word write to byte device - stride 4"
+set result [sid_read_write "sid::bus::write_h4_b4 $bus 0x80008 0x03000000"]
+write_test $result 2 0x0ff
+
+set test "word read from byte device - stride 4"
+set result [sid_read_write "sid::bus::read_h4_b4 $bus 0x80008"]
+read_test $result 2 0x0ff 0x03000000
+
+# The following operations would evoke a bus::misaligned, since the
+# accesses span two stride units.
+
+#set test "long write to byte device - stride 4"
+#set result [sid_read_write "sid::bus::write_h4_b8 $bus 0x80010 0x400000005"]
+#write_test $result 4 0x0ff
+
+#set test "long read from byte device - stride 4"
+#set result [sid_read_write "sid::bus::read_h4_b8 $bus 0x80010"]
+# read_test $result 4 0x0ff 4
+
+set test "short write to short device - stride 8"
+set result [sid_read_write "sid::bus::write_h4_b2 $bus 0x80100 0x0102"]
+write_test $result 0 0x0ffff
+
+set test "short read from short device - stride 8"
+set result [sid_read_write "sid::bus::read_h4_b2 $bus 0x80100"]
+read_test $result 0 0x0ffff 0x0102
+
+set test "word write to short device - stride 8"
+set result [sid_read_write "sid::bus::write_h4_b4 $bus 0x80108 0x03040000"]
+write_test $result 2 0x0ffff
+
+set test "word read from short device - stride 8"
+set result [sid_read_write "sid::bus::read_h4_b4 $bus 0x80108"]
+read_test $result 2 0x0ffff 0x03040000
+
+set test "long write to short device - stride 8"
+set result [sid_read_write "sid::bus::write_h4_b8 $bus 0x80110 0x0506000000000000"]
+write_test $result 4 0x0ffff
+
+set test "long read from short device - stride 8"
+set result [sid_read_write "sid::bus::read_h4_b8 $bus 0x80110"]
+# read_test $result 4 0x0ffff 0x0506
+
+for {set i 0} {$i < 4} {incr i} {
+    set test "byte write to word device, offset $i"
+    set result [sid_read_write "sid::bus::write_h4_b1 $bus [expr 0x80200 + $i] [expr 1 + $i]"]
+    set mask [format "0x%08x" [expr 0x0ff << (24 - ($i*8))]]
+    write_test $result 0 $mask
+}
+
+for {set i 0} {$i < 4} {incr i} {
+    set test "byte read from word device, offset $i"
+    set result [sid_read_write "sid::bus::read_h4_b1 $bus [expr 0x80200 + $i]"]
+    set mask [format "0x%08x" [expr 0x0ff << (24 - ($i*8))]]
+    read_test $result 0 $mask [expr 1 + $i]
+}
+
+set test "short write to word device"
+set result [sid_read_write "sid::bus::write_h4_b2 $bus 0x80204 0x0506"]
+write_test $result 4 0xffff0000
+
+set test "short write to word device, offset 2"
+set result [sid_read_write "sid::bus::write_h4_b2 $bus 0x80206 0x0708"]
+write_test $result 4 0x0ffff
+
+set test "short read from word device"
+set result [sid_read_write "sid::bus::read_h4_b2 $bus 0x80204"]
+read_test $result 4 0xffff0000 0x0506
+
+set test "short read from word device, offset 2"
+set result [sid_read_write "sid::bus::read_h4_b2 $bus 0x80206"]
+read_test $result 4 0x0ffff 0x0708
+
+set test "word write to word device"
+set result [sid_read_write "sid::bus::write_h4_b4 $bus 0x80208 0x090a0b0c"]
+write_test $result 8 0xffffffff
+
+set test "word read from word device"
+set result [sid_read_write "sid::bus::read_h4_b4 $bus 0x80208"]
+read_test $result 8 0xffffffff 0x090a0b0c
+
+set test "long write to word device"
+set result [sid_read_write "sid::bus::write_h4_b8 $bus 0x80210 0x1112131415161718"]
+write_test $result 16 0xffffffff
+
+set test "long read from word device"
+set result [sid_read_write "sid::bus::read_h4_b4 $bus 0x80210"]
+# read_test $result 16 0xffffffff 0x11121314
+
+for {set i 0} {$i < 8} {incr i} {
+    set test "byte write to long device, offset $i"
+    set result [sid_read_write "sid::bus::write_h4_b1 $bus [expr 0x80300 + $i] [expr 1 + $i]"]
+    # I don't know how to get expr to handle 64-bit numbers :-(
+    if { $i < 4 } then {
+        set mask [format "0x%08x00000000" [expr 0x0ff << (24 - ($i*8))]]
+    } else {
+        set mask [format "0x00000000%08x" [expr 0x0ff << (24 - (($i-4)*8))]]
+    }
+    write_test $result 0 $mask
+}
+
+for {set i 0} {$i < 8} {incr i} {
+    set test "byte read from long device, offset $i"
+    set result [sid_read_write "sid::bus::read_h4_b1 $bus [expr 0x80300 + $i]"]
+    # I don't know how to get expr to handle 64-bit numbers :-(
+    if { $i < 4 } then {
+        set mask [format "0x%08x00000000" [expr 0x0ff << (24 - ($i*8))]]
+    } else {
+        set mask [format "0x00000000%08x" [expr 0x0ff << (24 - (($i-4)*8))]]
+    }
+    read_test $result 0 $mask [expr $i + 1]
+}
+
+for {set i 0} {$i < 7} {incr i} {
+    set test "short write to long device, offset $i"
+    set result [sid_read_write "sid::bus::write_h4_b2 $bus [expr 0x80308 + $i] [expr ((9 + $i) << 8) | (10 + $i)]"]
+    # I don't know how to get expr to handle 64-bit numbers :-(
+    if { $i < 3 } then {
+        set mask [format "0x%08x00000000" [expr 0x0ffff << (16 - ($i*8))]]
+    } elseif { $i > 5 } {
+        set mask [format "0x00000000%08x" [expr 0x0ffff << (16 - (($i-4)*8))]]
+    } else {
+        continue
+    }
+    write_test $result 8 $mask
+}
+
+for {set i 0} {$i < 7} {incr i} {
+    set test "short read from long device, offset $i"
+    set result [sid_read_write "sid::bus::read_h4_b2 $bus [expr 0x80308 + $i]"]
+    # I don't know how to get expr to handle 64-bit numbers :-(
+    if { $i < 3 } then {
+        set mask [format "0x%08x00000000" [expr 0x0ffff << (16 - ($i*8))]]
+    } elseif { $i > 5 } {
+        set mask [format "0x00000000%08x" [expr 0x0ffff << (16 - (($i-4)*8))]]
+    } else {
+        continue
+    }
+    set val [format "0x%x" [expr ((9 + $i) << 8) | (10 + $i)]]
+    read_test $result 8 $mask $val
+}
+
+set test "word write to long device"
+set result [sid_read_write "sid::bus::write_h4_b4 $bus 0x80310 0x11121314"]
+write_test $result 16 0xffffffff00000000
+
+set test "word write to long device, offset 2"
+set result [sid_read_write "sid::bus::write_h4_b4 $bus 0x80312 0x13141516"]
+write_test $result 16 0x0000ffffffff0000
+
+set test "word write to long device, offset 4"
+set result [sid_read_write "sid::bus::write_h4_b4 $bus 0x80314 0x15161718"]
+write_test $result 16 0x00000000ffffffff
+
+set test "word read from long device"
+set result [sid_read_write "sid::bus::read_h4_b4 $bus 0x80310"]
+read_test $result 16 0xffffffff00000000 0x11121314
+
+set test "word read from long device, offset 2"
+set result [sid_read_write "sid::bus::read_h4_b4 $bus 0x80312"]
+read_test $result 16 0x0000ffffffff0000 0x13141516
+
+set test "word read from long device, offset 4"
+set result [sid_read_write "sid::bus::read_h4_b4 $bus 0x80314"]
+read_test $result 16 0x00000000ffffffff 0x15161718
+
+set test "long write to long device"
+set val 0x191a1b1c1d1e1f20
+set result [sid_read_write "sid::bus::write_h4_b8 $bus 0x80318 $val"]
+write_test $result 0x18 0xffffffffffffffff
+
+set test "long read from long device"
+set result [sid_read_write "sid::bus::read_h4_b8 $bus 0x80318"]
+# read_test $result 0x18 0xffffffffffffffff $val
+
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test; return }
+
+# zap conf file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "busif.conf" }

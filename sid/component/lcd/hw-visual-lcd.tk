@@ -1,0 +1,137 @@
+# Copyright (C) 2000 Red Hat
+#
+# A simple tk-based LCD display component
+
+variable row_col_pin
+set row_col_pin [sid::pin::new]
+
+variable frame_pin
+set frame_pin [sid::pin::new]
+
+variable attributes
+
+#default attribute values - width is 20 cols by 8 pixels/col by 4 bits/pixel
+set attributes(bits_per_pixel) 4
+set attributes(width) [expr 20*8*4]
+set attributes(height) [expr 4*8*4]
+
+frame .screen -relief groove -borderwidth 4
+pack .screen -side top
+
+canvas .screen.c 
+pack .screen.c
+
+proc find_pin {name} {
+    variable row_col_pin
+    variable frame_pin
+
+    if {$name == "row-col" } { return $row_col_pin }
+    if {$name == "FR" } { return $frame_pin }
+    return ""
+}
+
+proc attribute_names {} { 
+    variable attributes
+    return [list "width" "height" "bits-per-pixel" "background-color"]
+}
+
+proc attribute_names_in_category {cat} {
+    if {$cat == "setting"} then { 
+        return [list "width" "height" "bits-per-pixel" "background-color"]
+    }
+
+    return [list]
+}
+    
+
+proc set_attribute_value {attr value} {
+     variable attributes
+
+     if {$attr == "width"} then {
+         set size [expr $value * $attributes(bits_per_pixel)]
+         set attributes(width) $size
+	 .screen.c configure -width $size
+	 return "ok"
+     }
+
+     if {$attr == "height"} then {
+         set size [expr $value * $attributes(bits_per_pixel)]
+         set attributes(height) $size
+	 .screen.c configure -height $size
+	 return "ok"
+     }
+
+     if {$attr == "bits-per-pixel"} then {
+         set attributes(bits_per_pixel) $value
+	 return "ok"
+     }
+
+     if {$attr == "background-color"} then {
+         .screen.c configure -background $value
+	 return "ok"
+     }
+
+     return "not_found"
+}
+     
+proc attribute_value {attr} {
+     variable attributes
+
+     if {$attr == "width"} then {
+         return $attributes(width)
+     }
+
+     if {$attr == "height"} then {
+         return $attributes(height)
+     }
+
+     if {$attr == "bits-per-pixel"} then {
+         return $attributes(bits_per_pixel)
+     }
+
+     if {$attr == "background-color"} then {
+         # return just the '#rrggbb' at the end
+	 set lbg [split [.screen.c configure -background]]
+	 return [lindex $lbg [expr [llength $lbg] - 1]]
+     }
+
+     return ""
+}
+     
+proc connect_pin {name pin} { return "not_found" }
+proc disconnect_pin {name pin} { return "not_found" }
+proc connected_pins {name} { return "" }
+proc find_bus {name} { return "" }
+proc connect_accessor {name bus} { return "" }
+proc connected_bus {name} { return "" }
+
+proc set_pixel {args} {
+    variable attributes
+
+    set val $args
+    set bpp $attributes(bits_per_pixel)
+    set rowp [expr ($val >> 16) * $bpp]
+    set colp [expr ($val & 0xffff) * $bpp]
+
+    .screen.c create rectangle $colp $rowp \
+			[expr $colp+($bpp-1)] [expr $rowp+($bpp-1)] \
+			-fill black
+}
+
+proc new_frame {arg} {
+    if {$arg == 1} then {
+        .screen.c delete all
+    } else {
+        update
+    }
+}
+
+proc driven_h4 {pin value} {
+    variable row_col_pin
+    variable frame_pin
+
+    if {$pin == $row_col_pin} then { set_pixel $value }
+    if {$pin == $frame_pin} then { new_frame $value }
+}
+
+update

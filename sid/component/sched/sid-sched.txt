@@ -1,0 +1,175 @@
+* Name
+  sid-sched-sim sid-sched-host sid-sched-host-accurate
+
+* Synopsis
+  These components manage multiple signal schedules.
+
+  Attributes: enabled? num-clients step-cycle-limit time yield-host-time? 
+              advance-count N-regular? N-time N-control N-event N-scale
+  Pins: advance yield time-query time-high time-low N-control N-event
+
+  Shared library: libsched.la
+  Symbol: sched_component_library
+
+* Functionality
+ 
+  - Modelling
+
+    * These components function as general purpose signal schedulers.
+      They approximately correspond to a collection of programmable clock
+      dividers.
+
+    * The number of controllable outputs ("subscriptions") is a matter
+      of configuration.
+
+    * The three component types are identical, except in their notions
+      of "time".  See the Timing section below.
+
+  - Behaviors
+
+    * Configuration
+
+      When the "num-clients" is written-to, this component adjusts its
+      list of scheduler clients.  Each "client" corresponds to a set of
+      "N-" pins and attributes, with its own signalling schedule.
+
+    * Timing
+
+      There is no global concept of simulation time in sid.  Instead,
+      each scheduler instance maintains its own notion of "time".  
+
+      A "sid-sched-sim" scheduler maintains a 64-bit integer as a time
+      counter.  When advancing, this "time" counter is set to jump
+      forward to the earliest of the upcoming subscribed signals.
+      This way, it represents the clock of a traditional event-driven
+      simulator.
+      
+      The "sid-sched-host" and "sid-sched-host-accurate" schedulers use
+      a millisecond-precision timer of the host operating system.  Its
+      "time" is simply that of the operating system.  When
+      advancing, there may be no scheduled events due, even though
+      there may be scheduled events.  In such a case, if the
+      "yield-host-time?"  attribute is set to "1", a host-time
+      scheduler will yield some amount of time to the host operating
+      system using a function like usleep().
+
+      The "time-query" pin, when driven, causes a scheduler to signal
+      its current 64-bit "time" back, in two 32-bit halves, on the
+      "time-high", then "time-low" pins.  Similarly, the "time"
+      attribute may be accessed to get/set the scheduler's time.
+
+    * Subscription 
+
+      The scheduler maintains a number of "subscriptions".  Each
+      subscription represents a request to provide a series of
+      recurring "regular" signals, or a single-shot "irregular"
+      signal, some time in the simulation's future.  Each subscription
+      has an associated set of pins and attributes to control it.
+
+      Each subscription is defined by an index, a regular-vs-irregular
+      flag, and a time quantity.  The index is a number between 0 and
+      "num-clients" -1, and is represented as "N" in the pin/attribute
+      list templates in this document.  The regular-vs-irregular flag
+      is accessible as the "N-regular?" attribute.  The time
+      quantity is accessible as the "N-time" attribute.  If the
+      value is zero, it is interpreted as a request to cancel all pending
+      events for this subscription.  Otherwise, the value is taken to
+      be a delta until the "time" of the requested event.
+
+      You can also set these controls by driving encoded values into
+      the "N-control" pin.  The top bit is interpreted as the
+      regular-vs-irregular flag (1: regular, 0:irregular), and the
+      remaining bits as the delta "time" value.  If the delta is zero,
+      events for this subscription are cancelled.
+
+      In each case, the time value sent is multiplied by a scale before
+      being merged into the master schedule.  The scaling value is
+      available on the "N-scale" attribute, and may be specified as
+      a plain number, or as a fraction of two numbers (e.g., "1/5").
+
+    * Advancing
+
+      When you have disabled the scheduler by setting the "enabled?"
+      attribute to 0, advancing as described below, does not occur.
+
+      Whenever the "advance" input pin is driven, the scheduler may
+      dispatch one or more signals by driving the "N-event" output
+      pins with some value.  A counter accessed by the "advance-count"
+      attribute is incremented.
+
+      Whether any particular "N-event" pin is driven depends on the
+      subscription associated with that pin, and the passage of that
+      scheduler's "time".  All events that are due "now", or that are 
+      overdue are dispatched.
+
+      If there are multiple due or overdue events, the scheduler may
+      loop over the pending event up to "step-cycle-limit" number of
+      times, as an optimization.  This loop may be aborted early if
+      the "yield" input pin is driven.
+
+  - SID conventions
+    * This is a functional component.
+    * It supports state save/restore.
+    * It does not support triggerpoints.
+    * It prevents harmful recursion on the "advance" input pin.
+    * It presents attributes in the "pin", "register" and "setting" categories.
+
+* Environment
+  - Related components
+
+    * Schedulers may be nested, though normally they are advanced via the
+      top level event source (sid-control-cfgroot).
+
+	new sid-sched-sim target-sched
+        new sid-sched-host host-sched
+	new SOME_KIND_OF_CPU cpu
+	set target-sched num-clients 1
+	connect-pin main perform-activity -> target-sched advance
+	connect-pin main perform-activity -> host-sched advance
+	connect-pin target-sched 0-event -> cpu step!
+	set target-sched 0-regular? 1 
+	set target-sched 0-time 50 
+
+  - Performance
+
+    * These schedulers use data structures and algorithms that attempt
+      to be efficient for large number of event subscriptions.
+
+    * The "sid-sched-host-accurate" variety attempts to be accurate to
+      1 ms, but this requires many more host OS system calls and
+      therefore slows down the simulation.  The basic "sid-sched-host"
+      type of scheduler attempt to be accurate to only 25 ms.  It does 
+      this by frequently estimating the host time by adaptive extrapolation.
+
+* SID interface reference
+
+
+  - low level:
+
+    * pins
+
+      - advance | input | any | advancing
+      - yield | input | any | advancing
+      - N-event | output | no value | advancing
+      - N-control | input | coded value | subscription
+      - time-query | input | any | timing      
+      - time-high | output | high order 32 bits of 64-bit value | timing
+      - time-low | output | low order 32 bits of 64-bit value | timing
+
+    * attributes
+
+      - state-snapshot | no category | opaque string | n/a | state save/restore
+      - num-clients | setting | numeric | "0" | configuration
+      - N-regular? | setting | boolean | "0" | subscription
+      - N-time | setting | numeric | "0" | subscription
+      - N-scale | setting | numeric fraction | "1" | subscription
+      - N-event | pin | n/a | n/a | advancing
+      - N-control | pin | n/a | n/a | subscription
+      - advance | pin | n/a | n/a | advancing
+      - yield | pin | n/a | n/a | advancing
+      - enabled? | setting | boolean | "1" | advancing
+      - yield-host-time? | setting | boolean | "0" | timing
+      - step-cycle-limit | setting | numeric | advancing
+      - time | register | numeric | timing
+      - advance-count | register | numeric | advancing
+ 

@@ -1,0 +1,10 @@
+invaComp.badconf:20: component type cpu unknown
+invaComp.badconf:21: component type hw-load-elf unknown
+invaComp.badconf:22: component type io-stdio unknown
+invaComp.badconf:23: component type angel unknown
+invaComp.badconf:24: component type hw-hw-hw-hw-mapper-basic unknown
+invaComp.badconf:25: component type hw-remap/pause-arm/ref/ref/ref/ref unknown
+invaComp.badconf:26: component type 1 unknown
+invaComp.badconf:27: component type _comp unknown
+invaComp.badconf:29: unexpected end of file
+Configuration error.  Aborting

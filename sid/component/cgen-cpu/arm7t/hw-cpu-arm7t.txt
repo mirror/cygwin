@@ -1,0 +1,236 @@
+* Name
+  hw-cpu-arm7t
+
+* Synopsis
+  This component models the ARM7 Thumb processor.
+
+  Buses: debugger-bus 
+  Pins: start-pc-set! endian-set!  reset!  nreset trap trap-code step!
+        nm tbit nfiq nirq yield flush-icache step-cycles
+  Accessors: data-memory insn-memory
+  Attributes: debug-exec? trace-extract?  trace-result?  engine-type
+        insn-count step-insn-count enable-step-trap?  endian r0 r1 r2 r3 r4 r5 r6 r7 r8 r9
+	r10 r11 r12 r13 r14 r15  pc cpsr cpsr-flags
+        gdb-register-N gdb-num-registers gdb-exp-registers
+	yield nm step-cycles tbit nfiq nirq state-snapshot
+	r8_fiq r9_fiq r10_fiq r11_fiq r12_fiq r13_fiq r13_svc r13_abt r13_irq r13_und
+	r14_fiq r14_svc r14_abt r14_irq r14_und spsr_fiq spsr_svc spsr_abt spsr_irq spsr_und
+
+  Library: libcgencpu.la
+  Symbol name: cgen_component_library
+
+* Functionality
+
+  - Modelling
+
+    * This component models a simplified ARM7 Thumb processor.  
+    * It does not model floating point instructions.
+    * It models supervisory functions such as exceptions/traps in
+      order to be able to run an operating system.
+
+  - Behaviors
+
+    * Initialization
+
+      The CPU performs a power-on-reset style of operation when the
+      "reset!"  pin is driven.  
+
+      Other mode settings may be controlled by pins and/or attributes:
+      "endian-set!"/"endian" to set endianness, "tbit" to set thumb
+      mode, "start-pc-set!" to set the PC.  These are useful if the
+      standard powerup state of the CPU needs to be changed for
+      running a program that expects an initialized environment.
+
+    * Execution
+
+      The component executes zero or more instructions when the
+      "step!" pin is driven.  You can specify the maximum number 
+      of instructions to be executed via the "step-insn-count"
+      attribute.  If the "yield" pin is driven in a reentrant fashion
+      while the instruction loop is active, the loop will be exited at 
+      the next opportunity.  At the end of the loop, the "step-cycles"
+      output pin is driven with the number of instructions actually
+      executed, though this value is clamped to be at least 1.  The
+      "insn-count" attribute accumulates the total number of instructions
+      executed since reset.
+
+      Each instruction is first fetched from memory via the
+      "insn-memory" accessor, and its decoding traced if the
+      "trace-extract?" attribute is set to a true value.  The decoded
+      form may be cached indefinitely afterwards, although this cache is
+      flushed when the "flush-icache" pin is driven.
+
+      The "engine-type" attribute specifies whether the "scache"
+      ("semantic cache") or "pbb" ("pseudo basic block") dispatching
+      mechanism is used during execution.  The "scache" mode executes
+      each instruction in isolation and checks all triggerpoints after
+      each.  If the "enable-step-trap?" attribute is set, after each
+      instruction, a single-stepping trap is signalled as described in
+      the "Exceptions/traps" behavior below.
+
+      The "pbb" mode executes a series of sequential instructions in one 
+      uninterruptible sequence, and is thus faster.  However, it cannot 
+      handle triggerpoints or single-stepping, nor can it respond to 
+      icache flushing as quickly.  The "pbb" mode is temporarily and 
+      transparently downgraded to the "scache" mode when needed.
+
+      During the execution of an instruction, this component may make
+      accesses using the "data-memory" accessor, may update its
+      simulated registers, and may trigger an exception/trap.  
+
+    * Exceptions/traps
+
+      When encountering exception/trap conditions such as memory
+      access errors or software interrupts, this component signals the
+      event using the "trap" pin.  (For some traps, the "trap-code"
+      pin is driven with extra information just beforehand.)  An
+      external component may interpret the values in the table below,
+      and declare a disposition for the condition.  In the absence of
+      input, the condition will be treated as the hardware would, that
+      is by dispatching to exception vectors, switching processor
+      modes, etc.
+
+      The trap codes sent on the "trap" output pin are:
+      "trap"    cause                   "trap-code"
+      1         software trap           instruction bitmap
+      2         breakpoint              bkpt number
+      3         system call             syscall number
+      4         invalid instruction     n/a
+      5         memory fault            faulting address
+      6         arithmetic overflow     faulting address
+      7         stepped                 n/a
+
+      The disposition codes returned on the "trap" input pin are:
+      "trap"    effect
+      0 or n/a  dispatch as hardware would
+      1         handled; continue
+      2         reissue
+      3         handled; skip instruction and continue
+
+    * Hardware interrupts
+
+      Hardware interrupts are signalled by driving the pins "nfiq" or
+      "nirq" with a zero value.  Incoming interrupts are queued and
+      are processed when the "step!"  pin is next invoked.  Note that
+      this may not be the next instruction if the "step-insn-count"
+      attribute is greater than one.
+
+    * Register access
+
+      All 16 general purpose registers are accessible as attribute
+      "r0" through "r15".  "pc" is an alias of "r15".  The CPSR
+      register is accessible as "cpsr", and also as "cpsr-flags" for
+      a decoded textual form.  The current endianness is
+      available as attribute "endian".  The current cpsr mode is
+      available as attribute/pin "nm".  The current thumb/arm bit is
+      available as attribute/pin "tbit".
+
+      Banked registers (e.g. "r14_svc", "spsr_und") are also exposed
+      as read/write attributes.
+
+      This component exports a number of attributes for use by the
+      sw-debug-gdb component.  These are the "gdb-*" attributes, in
+      the "debugger" category.  The "gdb-register-N" group access all
+      registers in gdb's indexing scheme, in raw target byte order.
+      The "gdb-register-pc" is a special watchable value with no 
+      associated attribute.  The "gdb-num-registers" attribute provides 
+      the limit for N.  The "gdb-exp-registers" attribute provides a
+      semicolon-separated list of "expedited" register numbers.
+
+      The "debugger-bus" bus provides access to the target program's
+      address space, and is used by gdb to access target memory.
+
+  - SID conventions
+
+    * This is a functional component.
+    * It supports save/restore of the CPU state.
+    * Triggerpoints are supported for CPU registers.
+    * It prevents harmful recursion from the "step!" input pin.
+
+* Environment
+
+  Related components:
+
+  * CPUs connect to many components: memory to store data and
+    instructions, a scheduler to provide "step!" signals, software
+    trap emulators, debugger interfaces.  The "step-cycles" output pin
+    may be used as a N-event-control input for a target scheduler to
+    track an estimate of consumed target time.
+
+  Host system:
+
+  * Some error conditions are signalled by messages to standard error.
+    These include some illegal CPU states caused by the simulated
+    program.
+
+* SID interface reference
+
+  Low level:
+
+  * pins
+
+  start-pc-set! | input | any value | initialization
+  endian-set! | input | 1 (big) / 2 (little) | initialization
+  reset! | input | 0 or 1 | initialization
+  nreset | input | 0 or 1 | execution
+  trap | input/output | enum values | exceptions/traps
+  trap-code | output | various values | exceptions/traps
+  step! | input | any value | execution
+  step-cycles | output | 1..step-insn-count | execution
+  nm | output | 0 or 1 | register access
+  tbit | output | 0 or 1 | register access
+  nfiq | input | 0 or 1 | hardware interrupts
+  nirq | input | 0 or 1 | hardware interrupts
+  yield | input | any | execution
+  flush-icache | input | any | execution
+
+  * accessors
+
+  data-memory | any | execution
+  insn-memory | typically 4-byte accesses | execution
+
+  * buses
+
+  debugger-bus | any | any | debugger access
+
+  * attributes
+
+  debug-exec? | setting | boolean | false | initialization
+  trace-extract? | setting | boolean | false | initialization
+  trace-result? | setting | boolean | false | initialization
+  engine-type | setting | scache or pbb | pbb | execution
+  insn-count | watchable register | number | execution
+  step-insn-count | setting | number | execution
+  enable-step-trap? | setting | boolean | false | execution
+  endian | register | "1"/"big"/"2"/"little" | big | initialization, register access
+  rN | watchable register | number | n/a | register access
+  pc | watchable register | number | n/a | register access
+  cpsr | watchable register | number | n/a | register access
+  cpsr-flags | register | string | n/a | register access
+  gdb-register-N | debugger | byte array | n/a | register access
+  gdb-num-registers | debugger | number | n/a | register access
+  gdb-exp-registers | debugger | number list | n/a | register access
+  nm | watchable pin | number | n/a | register access
+  trap | watchable pin | number | n/a | execution/traps
+  trap-code | watchable pin | number | n/a | execution/traps
+  tbit | watchable pin | number | n/a | register access
+  nfiq | watchable pin | number | n/a | hardware interrupts
+  nirq | watchable pin | number | n/a | hardware interrupts
+  step-cycles | watchable pin | number | n/a | execution
+  state-snapshot | | opaque string  | state save/restore
+  rN_fiq | watchable register | number | n/a | register access
+  rN_svc | watchable register | number | n/a | register access
+  rN_abt | watchable register | number | n/a | register access
+  rN_irq | watchable register | number | n/a | register access
+  rN_und | watchable register | number | n/a | register access
+  spsr_fiq | watchable register | number | n/a | register access
+  spsr_svc | watchable register | number | n/a | register access
+  spsr_abt | watchable register | number | n/a | register access
+  spsr_irq | watchable register | number | n/a | register access
+  spsr_und | watchable register | number | n/a | register access
+
+
+* References
+
+  ARM
+  Arm Architecture Reference Manual, ARM DDI 0100B

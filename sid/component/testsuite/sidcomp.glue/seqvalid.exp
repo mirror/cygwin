@@ -1,0 +1,191 @@
+set test "sid configuration"
+sid_config_component_test_with_tracing "base4.conf" \
+    "load [sid_find_file libglue.la] glue_component_library" \
+    "hw-glue-sequence"
+pass $test
+
+set test "sid startup"
+if [sid_start "base4.conf"] then { pass $test } else { fail $test ; return }
+
+set test "check attribute list"
+sid_assert_includes_all "sid::component::attribute_names $victim" {"num-outputs" "state-snapshot" "input"}
+
+set test "check bus names"
+set bus [sid_cmd "sid::component::bus_names $victim"]
+if {$bus == ""} then { pass $test } else { fail $test }
+
+set test "check setting attribute list"
+set category "setting"
+sid_assert_includes_all "sid::component::attribute_names_in_category $victim $category" {"num-outputs"}                      
+
+set test "check pin attribute list"
+set category "pin"
+sid_assert_includes_all "sid::component::attribute_names_in_category $victim $category" {"input"}                      
+
+set test "check register attribute list"
+set category "register"
+set regs [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if {$regs == ""} then { pass $test } else { fail $test }
+
+set test "check register watchable list"
+set category "watchable"
+sid_assert_includes_all "sid::component::attribute_names_in_category $victim $category" {"input" "num-outputs"}                      
+
+set test "check accessor names"
+set accessors [sid_cmd "sid::component::accessor_names $victim"]
+if {$accessors == ""} then { pass $test } else { fail $test }
+
+set test "check relationships names"
+set rel [sid_cmd "sid::component::relationship_names $victim" ]
+if { $rel == "" } then { pass $test } else { fail $test }
+
+# cr 101195
+set test "check pin names"
+sid_assert_includes_all "sid::component::pin_names $victim" {"input"}                      
+set test "get input pin"
+set ipin [sid_cmd "sid::component::find_pin $victim input"]
+if {$ipin != ""} then { pass $test } else { fail $test }
+
+set test "erroneously connect input pin"
+set pin [sid_cmd "sid::pin::new"]
+set status [sid_cmd "sid::component::connect_pin $victim input $pin"]
+if {$status != "ok"} then { pass $test } else { fail $test }
+
+set test "erroneously check connected input pin"
+set pins [sid_cmd "sid::component::connected_pins $victim input"]
+if {$pins == ""} then { pass $test } else { fail $test }
+
+set test "erroneously disconnect input pin"
+set status [sid_cmd "sid::component::disconnect_pin $victim input $pin"]
+if {$status != "ok"} then { pass $test } else { fail $test }
+
+set test "check default num-outputs"
+set noutput [sid_cmd "sid::component::attribute_value $victim num-outputs"]
+if {$noutput == 0} then { pass $test } else { fail $test }
+
+set test "set outputs=0"
+sid_assert_success "sid::component::set_attribute_value $victim num-outputs 0"
+
+set test "check num-outputs=0"
+set noutput [sid_cmd "sid::component::attribute_value $victim num-outputs"]
+if {$noutput == 0} then { pass $test } else { fail $test }
+
+set test "attempt setting bad output"
+set junkpin [sid_cmd "sid::pin::new"]
+set result [sid_cmd "sid::component::connect_pin $victim output-4 $junkpin"]
+if {$result == "not_found"} then { pass $test } else { fail $test }
+
+set size 10
+set test "set outputs=$size"
+sid_assert_success "sid::component::set_attribute_value $victim num-outputs $size"
+
+set test "check num-outputs=10"
+set noutput [sid_cmd "sid::component::attribute_value $victim num-outputs"]
+if {$noutput == 10} then { pass $test } else { fail $test }
+
+# cr 101195
+set test "check pin names for num-outputs=10"
+sid_assert_includes_all "sid::component::pin_names $victim" {"input" "output-0" "output-1" "output-2" "output-3" "output-4" "output-5" "output-6" "output-7" "output-8" "output-9"}
+
+set test "set $size output pins"
+for {set i 0} {$i < $size} {incr i} {
+    set pin [sid_cmd "sid::pin::new"]
+    sid_cmd "set hook_driven_h4($pin) { global driven_h4_value driven_history ; lappend driven_history $i \$driven_h4_value }"
+    set status [sid_cmd "sid::component::connect_pin $victim output-$i $pin"]
+    if {$status != "ok" } then { fail $test ; return }
+}
+pass $test
+
+set test "drive with value"
+sid_cmd "set driven_history {}"
+sid_cmd "sid::pin::driven_h4 $ipin 0xAA"
+set status [sid_cmd "set driven_history"]
+if {$status == {0 170 1 170 2 170 3 170 4 170 5 170 6 170 7 170 8 170 9 170}} then { pass $test } else { fail $test }
+
+set test "check connected pins"
+for {set i 0} {$i < 10} {incr i} {
+    set pin [sid_cmd "sid::component::connected_pins $victim output-$i"]
+    if {$pin == "" } then { fail $test ; return }
+}
+pass $test
+
+set test "shrink output list"
+set result [sid_cmd "sid::component::set_attribute_value $victim num-outputs 4"]
+if {$result == "ok"} then { pass $test } else { fail $test }
+
+set test "drive after shrinking"
+sid_cmd "set driven_history {}"
+sid_cmd "sid::pin::driven_h4 $ipin 8"
+set status [sid_cmd "set driven_history"]
+if {$status == {0 8 1 8 2 8 3 8}} then { pass $test } else { fail $test }
+
+set test "disconnect pins"
+set opin [sid_cmd [list sid::component::connected_pins $victim output-1]]
+set status [sid_cmd [list sid::component::disconnect_pin $victim output-1 $opin]]
+if {$status != "ok" } then { fail $test } else { pass $test }
+ 
+set test "check connected pins after disconnect pins"
+for {set i 0} {$i < 4} {incr i} {
+    if { $i == 1 } then {
+       set pin [sid_cmd "sid::component::connected_pins $victim output-1"]
+       if {$pin != "" } then { fail $test ; return }
+    } else {
+       set pin [sid_cmd "sid::component::connected_pins $victim output-$i"]
+       if {$pin == "" } then { fail $test ; return }
+    }
+}
+pass $test
+
+set i 100
+while { $i < 256 } {
+   set test "set num-outputs attribute to be $i"
+   set status [sid_cmd "sid::component::set_attribute_value $victim num-outputs $i"]
+   if { $status != "ok" } then { fail $test ; return } 
+   set test "check num-outputs attribute is $i"
+   set noutput [sid_cmd "sid::component::attribute_value $victim num-outputs"]
+   if {$noutput != $i} then { fail $test ; return }
+   set i [ expr $i*2 ]
+}
+pass $test 
+
+set test "set num-outputs too high"
+set r1 [sid_cmd "sid::component::set_attribute_value $victim num-outputs 256"]
+set r2 [sid_cmd "sid::component::set_attribute_value $victim num-outputs 10000000"]
+if {$r1 == "bad_value" && $r2 == "bad_value"} then { pass $test } else { fail $test }
+
+# cr 101214
+set test "set num-outputs before state snapshot"
+set status [sid_cmd "sid::component::set_attribute_value $victim num-outputs 17"]
+if { $status == "ok" } then { pass "$test - A" } else { fail "$test - A" }
+set numoutput [sid_cmd "sid::component::attribute_value $victim num-outputs"]
+if { $numoutput == 17 } then { pass "$test - B" } else { fail "$test - B" }
+
+set test "get state snapshot"
+set state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {$state != ""} then { pass $test } else { fail $test }
+
+set test "set num-outputs to 5 after save state"
+set size 5
+set status [sid_cmd "sid::component::set_attribute_value $victim num-outputs $size"]
+if { $status == "ok" } then { pass $test } else { fail $test }
+
+set test "check num-outputs=5 after save state"
+set noutput [sid_cmd "sid::component::attribute_value $victim num-outputs"]
+if {$noutput == 5} then { pass $test } else { fail $test }
+
+set test "restore state snapshot"
+set result [sid_cmd "sid::component::set_attribute_value $victim state-snapshot [list $state]"]
+if {$result == "ok"} then { pass $test } else { fail $test }
+
+set test "check num-outputs=17 after restore state"
+set noutput [sid_cmd "sid::component::attribute_value $victim num-outputs"]
+if {$noutput == 17} then { pass $test } else { fail $test }
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "base4.conf" }

@@ -1,0 +1,72 @@
+set test "sid configuration"
+sid_config_component_test "base.conf" \
+    "load [sid_find_file libglue.la] glue_component_library" \
+    "sw-glue-attribbank"
+pass $test
+
+set test "sid startup"
+if [sid_start "base.conf"] then { pass $test } else { fail $test ; return }
+
+set test "check initial attribute list"
+set result [sid_cmd "sid::component::attribute_names $victim"]
+if {$result == ""} then { pass $test } else { fail $test }
+
+# prepare our copy of attribute table
+catch {unset attr}
+set attr(poof) peef
+set attr("a") {a b c d}
+set attr("hello") "goodbye\0come back"
+set attr(012345) 67890
+set attr(12345)  " "
+# XXX: tcl system cannot seem to pass through empty strings!
+# set attr(12345)  ""
+
+set test "set testing attributes"
+foreach name [array names attr] {
+    set value $attr($name)
+    set result [sid_cmd "sid::component::set_attribute_value $victim [list $name] [list $value]"]
+    if {$result != "ok"} then { fail $test ; return }
+}
+pass $test
+
+set test "check testing attribute list"
+sid_assert_includes_all "sid::component::attribute_names $victim" [array names attr]
+
+set test "retrieve testing attributes"
+foreach name [array names attr] {
+    set value $attr($name)
+    set result [sid_cmd "sid::component::attribute_value $victim [list $name]"]
+    if {$result != $value} then { fail "$test - $result vs $value"; return }
+}
+pass $test
+
+set test "overwrite a few testing attributes"
+set attr("hello") "nothing"
+set attr(012345)  "something"
+set attr(new)     "sushi swims"
+foreach name {{"hello"} 012345 new} {
+    set value $attr($name)
+    set result [sid_cmd "sid::component::set_attribute_value $victim [list $name] [list $value]"]
+    if {$result != "ok"} then { fail $test ; return }
+}
+pass $test
+
+set test "check testing attribute list after overwrite"
+sid_assert_includes_all "sid::component::attribute_names $victim" [array names attr]
+
+set test "retrieve testing attributes after overwrite"
+foreach name [array names attr] {
+    set value $attr($name)
+    set result [sid_cmd "sid::component::attribute_value $victim [list $name]"]
+    if {$result != $value} then { fail "$test - $result vs $value"; return }
+}
+pass $test
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "base.conf" }

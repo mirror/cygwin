@@ -1,0 +1,116 @@
+* Copyright (C) 1999 Red Hat
+
+* Name
+  hw-lcd-hd44780u-a00 hw-lcd-hd44780u-a02
+
+* Synopsis
+  Simulates the Hitachi HD44780U LCD controller. The controller supports
+  1 or 2 lines of 8 5X8 dots with cursor, or 1 line of 8 5X10 dots with cursor.
+  The chip includes an 80 character display RAM, a 64 byte character generator
+  RAM, and a 240 character ROM of predefined fonts. Two ROMS are available: 
+  hw-lcd-hd44780u-a00 specifies the Japanese standard font; hw-lcd-hd44780u-a02
+  is the European standard font.
+
+  Buses: bus
+  Pins: row-col FR
+  Attributes: refresh-period-msec verbose?
+
+  Library: libhd44780u.la
+  Symbol name: hd44780u_component_library
+
+* Functionality
+  - Modeling
+    The LCD controller model is somewhat abstracted from the physical device:
+
+    o All commands in the model are executed instantaneously, while the real
+      device requires significant time to execute a command. As a result, the
+      busy flag in the model is never set.
+
+    o The real device has 40 segment driver pins, 16 common driver pins, and
+      6 more pins related to data and clock. These are replaced by 2(!) pins
+      in the model. The FR (frame) pin is driven to 1 to identify that a new
+      frame is starting, and driven to 0 when the frame is finished. The
+      row-col pin incorporates all the functionality of the row and column
+      drivers on the real chip. This pin is driven once for each "on" pixel
+      in the display, and the value on the pin is the [X,Y] co-ordinates of
+      the pixel, encoded as two adjacent 16-bit values in the 32-bit pin value.
+
+      With these two pins, a display refresh cycle starts when the FR pin is
+      asserted; the [X,Y] co-ordinates of all the "on" pixels are then 
+      transmitted on the row-col pin; and the FR pin is de-asserted to end 
+      the refresh cycle.
+
+    o The physical device uses an external crystal to set the duty cycle.
+      The model uses the refresh-period-msec attribute to communicate with
+      the scheduler to set the refresh rate.
+
+      To reduce system overhead, the model tries to reduce its interaction
+      with the scheduler and display. Specifically, a single refresh cycle is 
+      initiated if there is a write to the component, to capture any internal
+      state changes that may affect the display. Because several writes are
+      often required to effect a meaningful change, the refresh is delayed to
+      occur refresh-period-msec milliseconds after the first write. As well,
+      the refresh is continued periodically if blink is enabled.
+
+  - Behaviors
+    * Configuration
+      The refresh-period-msec attribute is used specify the refresh period
+      (in milliseconds) for continuous update modes such as blink.
+
+    * Debug
+      The boolean verbose? attribute can be used to track internal operations
+
+    * Display
+      See discussion of the FR and row-col pins in Modeling section above
+
+  - SID conventions
+    * This is a functional component
+    * Save/restore is supported via the state-snapshot attribute
+    * Trigger point support is available on the IR, DR, and AC registers.
+
+* Environment
+  - Related components
+    * Besides the CPU bus, the LCD controller is typically connected to a
+      display of some kind. Clearly, the display component must be aware of the
+      refresh protocol used by the HD44780U model. As well, the scheduler is
+      typically used to set up the time between refreshes of the display.
+
+    * The following configuration file segment shows how the LCD controller
+      can be connected to the lcd.tcl display and host-time scheduler:
+
+      new hw-lcd-hd44780u-a00 lcd	# Standard Japanese font
+      new hw-visual-lcd display		# The display is implemented in Tcl
+      new sid-sched-host sched		# Use the real-time scheduler
+      
+      # scheduling (must appear before pin assignments)
+      set sched num-clients 1
+      set sched 0-regular? 1
+      set sched 0-time 500		# in msec
+
+      # display size is in pixels - ie. font-width*display-height
+      set display width 40		# 8 chars X 5 pixels per char
+      set display height 8		# single line of 8 pixels
+
+      # connect the LCD to the scheduler
+      connect-pin sched 0-event -> lcd refresh-sync-event
+      connect-pin sched 0-control <- lcd refresh-sync-control
+      # connect the LCD to the display
+      connect-pin lcd row-col -> display row-col
+      connect-pin lcd FR -> display FR
+
+* SID interface reference
+  - low level:
+    * pins
+      - FR | output | binary | display
+      - row-col | output | 2 shorts as a 32-bit value | display
+
+    * buses
+      - bus | 0 to 1 | byte-wide access
+
+    * attributes
+      - refresh-period-msec | setting | any positive value | 500 | configuration
+      - verbose? | setting | boolean | false | debug
+
+* References
+  HD44780U (LCD-II) Dot Matrix Liquid Crystal Display Controller Driver
+  (from the Hitachi web site)

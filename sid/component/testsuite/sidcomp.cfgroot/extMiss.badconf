@@ -1,0 +1,18 @@
+## This conf file contains commands that may have extra or missing arguments
+
+
+# configuration logging
+set main verbose? 0 1 0  # extra attribute values
+set main verbose? 1
+
+# component libraries
+load libcgencpu.la cgen_component_library cgen_component_library
+# extra symbol name
+load libcgencpu.la               # missing symbol name
+load cgen_component_library                      # missing library name
+load libcgencpu.la cgen_component_library libcgencpu.la cgen_component_library
+# extra symbol name
+load "libcgencpu.la" "cgen_component_library"    # extra "
+load 'libconsoles.la' 'console_component_library'        # extra '
+
+relate angel cpu cpu

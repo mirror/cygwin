@@ -1,0 +1,653 @@
+# Initialisation.
+set manufacturer_code 1F
+
+set test "sid configuration"
+sid_config_component_test "am29.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-am29"
+pass $test
+
+proc write_seq {pairs} {
+    global victim
+    set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+    foreach pair $pairs {
+	set addr [lindex $pair 0]
+	set data [lindex $pair 1]
+	set result [sid_cmd "sid::bus::write_h4_l1 $bus $addr $data"]
+	if {$result != "ok"} { return 0 }
+    }
+    return 1
+}
+
+proc erase_mode {} {
+    return [write_seq {{0x555 0xAA} {0x2AA 0x55} {0x555 0x80} \
+	    {0x555 0xAA} {0x2AA 0x55} {0x555 0x10}}]
+}
+
+proc sector_erase_mode {} {
+    return [write_seq {{0x555 0xAA} {0x2AA 0x55} {0x555 0x80} \
+	    {0x555 0xAA} {0x2AA 0x55}}]
+}
+
+proc autoselect_mode {} {
+    return [write_seq {{0x555 0xAA} {0x2AA 0x55} {0x555 0x90}}]
+}
+
+proc program_mode {} {
+    return [write_seq {{0x555 0xAA} {0x2AA 0x55} {0x555 0xA0}}]
+}
+
+proc bypass_mode {} {
+    return [write_seq {{0x555 0xAA} {0x2AA 0x55} {0x555 0x20}}]
+}
+
+set test "sid start"
+if {[sid_start "am29.conf"]} { pass $test } else { fail $test ; return }
+
+set test "attribute list"
+sid_assert_includes_all "sid::component::attribute_names $victim" \
+	{ image-file image-load image-store device-code manufacturer-code \
+	mode state-snapshot sector-size size-max size }
+
+set test "read-write-port bus is present"
+set result [sid_cmd "sid::component::find_bus $victim read-write-port"]
+if {$result != ""} { pass $test } else { fail $test }
+
+
+# Test various sector sizes.
+
+foreach bad_sectorsize {0 123456789} {
+    set test "set an invalid sector size of $bad_sectorsize bytes"
+    set result [sid_cmd \
+      "sid::component::set_attribute_value $victim sector-size $bad_sectorsize"]
+    if {$result == "bad_value"} { pass $test } else { fail $test}
+}
+
+foreach sectorsize {16 32 128 256 512 1024} {
+    set test "set and validate sector size of $sectorsize bytes"
+    sid_cmd "sid::component::set_attribute_value $victim sector-size $sectorsize"
+    set result [sid_cmd "sid::component::attribute_value $victim sector-size"]
+    if {"$result" == "$sectorsize"} { pass $test } else { 
+	fail "$test -- got $result and $sectorsize" 
+    }
+}
+
+set test "validate memory is fully erased from the factory"
+set okay 1
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+foreach addr {100 200 300 512 968 1024 2048 3000} {
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
+    if {[lindex $result 0] != "ok" || [lindex $result 1] != "0xFF"} {
+	set okay 0
+	fail "$test -- got unexpected $result @ address $addr"
+	break
+    }
+}
+if {$okay} { pass $test }
+
+# FIXME: use a coder instead of the raw enum values.
+
+set test "initial mode is READ (0)"
+set result [sid_cmd "sid::component::attribute_value $victim mode"]
+if {$result == "0"} {
+    pass $test
+} else {
+    fail "$test -- got $result, expected 0"
+}   
+
+# Enter autoselect mode. Check the mode at each step.
+
+set test "enter autoselect mode"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set okay 1
+
+foreach triplet {{0x555 0xAA 1} {0x2AA 0x55 2} {0x555 0x90 3}} {
+    set addr [lindex $triplet 0]
+    set data [lindex $triplet 1]
+    set expected_mode [lindex $triplet 2]
+
+    set result [sid_cmd "sid::bus::write_h4_l1 $bus $addr $data"]
+    if {$result != "ok"} {
+	fail "$test -- error at $addr: $result"
+	set okay 0
+	break
+    }
+    set mode [sid_cmd "sid::component::attribute_value $victim mode"]
+    if {$mode != $expected_mode} {
+	fail "$test -- did not switch to correct internal state"
+	set okay 0
+	break
+    }
+}
+if {$okay} { pass $test }
+
+
+set test "return to read mode"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x123 0xF0"]
+if {$result == "ok"} {
+    set mode [sid_cmd "sid::component::attribute_value $victim mode"]
+    if {$mode == "0"} {
+	pass $test
+    } else {
+	fail "$test -- did not switch to read mode"
+    }
+} else {
+    fail "$test -- bus error: $result"
+}
+
+set test "invalid unlock1 sequence sends device to read mode"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set okay 1
+foreach triplet {{0x555 0xAA 1} {0x2AA 0x54 0}} {
+    set addr [lindex $triplet 0]
+    set data [lindex $triplet 1]
+    set expected_mode [lindex $triplet 2]
+
+    set result [sid_cmd "sid::bus::write_h4_l1 $bus $addr $data"]
+    if {$result != "ok"} {
+	fail "$test -- error at $addr: $result"
+	set okay 0
+	break
+    }
+    set mode [sid_cmd "sid::component::attribute_value $victim mode"]
+    if {$mode != $expected_mode} {
+	fail "$test -- did not switch to correct internal state"
+	set okay 0
+	break
+    }
+}
+if {$okay} { pass $test }
+
+
+set test "invalid unlock2 sequence sends device to read mode"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set okay 1
+foreach triplet {{0x555 0xAA 1} {0x2AA 0x55 2} {0x555 0x91 0}} {
+    set addr [lindex $triplet 0]
+    set data [lindex $triplet 1]
+    set expected_mode [lindex $triplet 2]
+    
+    set result [sid_cmd "sid::bus::write_h4_l1 $bus $addr $data"]
+    if {$result != "ok"} {
+	fail "$test -- error at $addr: $result"
+	set okay 0
+	break
+    }
+    set mode [sid_cmd "sid::component::attribute_value $victim mode"]
+    if {$mode != $expected_mode} {
+	fail "$test -- did not switch to correct internal state"
+	set okay 0
+	break
+    }
+}
+if {$okay} { pass $test }
+
+
+set test "autoselect mode allows multiple reads of info addresses"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+if {[autoselect_mode]} {
+    foreach addr {0 1 0 1 1 0 0} {
+	set mode [sid_cmd "sid::component::attribute_value $victim mode"]
+	if {$mode != "3"} {
+	    fail "$test -- not in autoselect mode; in mode $mode"
+	    break
+	}
+	set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
+	if {[lindex $result 0] != "ok"} {
+	    fail "$test -- bus error"
+	    break
+	}
+    }
+} else {
+    fail "$test -- did not enter autoselect mode"
+}
+
+set test "issue reset command"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set mode [sid_cmd "sid::component::attribute_value $victim mode"]
+if {$mode != "3"} {
+    fail "$test -- prior test should have left the device in autoselect mode"
+} else {
+    set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x123 0xF0"]
+    if {$result != "ok"} {
+	fail "$test -- bus error"
+    } else {
+	set mode [sid_cmd "sid::component::attribute_value $victim mode"]
+	if {$mode == "0"} {
+	    pass $test
+	} else {
+	    fail "$test -- in mode $mode, expected mode 0"
+	}
+    }
+}
+
+
+set test "read manufacturer code without entering autoselect mode"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
+if {[lindex $result 0] == "ok" && [lindex $result 1] != 0x1F} {
+    pass $test
+} else {
+    fail "$test -- read 0x1F from address 0!"
+}
+
+
+set test "read device id code without entering autoselect mode"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 1"]
+sid_cmd "sid::component::set_attribute_value $victim device-code 0x4F"
+if {[lindex $result 0] == "ok" && [lindex $result 1] != 0x4F} {
+    pass $test
+} else {
+    fail "$test -- read 0x4F from address 1!"
+}
+
+
+set test "read manufacturer code"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+if {![autoselect_mode]} {
+    fail $test
+} else {
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
+    if {[lindex $result 0] == "ok" && [lindex $result 1] == "0x01"} {
+	pass $test
+    } else {
+	fail "$test -- expected 0x01, got $result"
+    }
+}
+
+
+set test "read device id code for a typical flash (id=0x4F)"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+sid_cmd "sid::component::set_attribute_value $victim device-code 0x4F"
+set result [sid_cmd "sid::bus::read_h4_l1 $bus 1"]
+if {[lindex $result 0] == "ok" && [lindex $result 1] == "0x4F"} {
+    pass $test
+} else {
+    fail "$test -- expected 0x4F, got $result"
+}
+
+set test "read sector protect verify status for each sector address"
+set okay 1
+set sectorsize [sid_cmd "sid::component::attribute_value $victim sector-size"]
+set memsize [sid_cmd "sid::component::attribute_value $victim size"]
+set numsectors [expr $memsize / $sectorsize]
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+for {set i 0} {$i < $numsectors} {incr i} {
+    set addr [expr [expr $i << 16] | 2]
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
+    if {[lindex $result 0] != "ok" || [lindex $result 1] != "0"} {
+	fail "$test -- expected {ok,0}, got $result"
+	set okay 0
+	break
+    }
+}
+if {$okay} {pass $test}
+
+
+set test "return to read mode"
+set mode [sid_cmd "sid::component::attribute_value $victim mode"]
+if {$mode == "0"} {
+    fail "$test -- mode is already 0"
+} else {
+    sid_cmd "sid::bus::write_h4_l1 $bus 0x123 0xF0"
+    set result [sid_cmd "sid::component::attribute_value $victim mode"]
+    if {$result == "0"} {
+	pass $test
+    } else {
+	fail "$test -- in mode $result, expected mode 0"
+    }
+}
+
+
+set test "set size to 512 bytes"
+sid_assert_success "sid::component::set_attribute_value $victim size 512"
+
+set test "validate size is 512 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "512"} { pass $test } else { fail $test }
+
+
+set test "test for memory leaks"
+set iterations 100
+for {set i 0} {$i < $iterations} {incr i} {
+    # some size between 1 .. 16MB
+    set size [expr {1000000 + (($i * 101) % 16) * 1000000}]
+    sid_cmd "sid::component::set_attribute_value $victim size $size"
+}
+sid_assert_success "sid::component::set_attribute_value $victim size 0"
+
+
+set test "set memory size to 8192 bytes"
+sid_cmd "sid::component::set_attribute_value $victim size 8192"
+set memsize [sid_cmd "sid::component::attribute_value $victim size"]
+if {$memsize == "8192"} { pass $test } else { fail $test }
+
+
+set test "set sector size to 256 bytes"
+sid_cmd "sid::component::set_attribute_value $victim sector-size 256"
+set sectorsize [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$sectorsize == "256"} { pass $test } else { fail $test }
+
+
+set test "chip erase sets all ones"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set okay 1
+# First, preprogram a few locations with zero.
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+for {set i 0} {$i < $size} {set i [expr $i + 256]} {
+    if {[program_mode]} {
+	set result [sid_cmd "sid::bus::write_h4_l1 $bus $i 0"]
+	if {$result != "ok"} { fail $test; set okay 0; break }
+    } else {<
+	fail "$test -- failed to enter programming mode"; set okay 0; break
+    }
+}
+if {$okay && [erase_mode]} {
+    set mode [sid_cmd "sid::component::attribute_value $victim mode"]
+    if {$mode != "0"} {
+	fail "$test -- did not return to read mode"; set okay 0; break
+    } else {
+	# Validate all ones are set in locations previously set to 0.
+	for {set i 0} {$i < $size} {set i [expr $i + 256]} {
+	    set result [sid_cmd "sid::bus::read_h4_l1 $bus $i"]
+	    if {[lindex $result 0] != "ok" || [lindex $result 1] != "0xFF"} {
+		fail "$test -- @ $i expected {ok,0xFF} got $result"
+		set okay 0
+		break
+	    }
+	}
+    }
+}
+if {$okay} {pass $test}
+
+
+set test "write a single byte"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+if {[program_mode]} {
+    if {[sid_cmd "sid::component::attribute_value $victim mode"] == "4"} {
+	set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x123 0x39"]
+	if {$result == "ok"} {
+	    set mode [sid_cmd "sid::component::attribute_value $victim mode"] 
+	    if {$mode == "0"} {
+		pass $test
+	    } else { fail $test }
+	} else { fail $test }
+    } else { fail $test }
+} else { fail $test }
+
+
+set test "write lots of bytes across sector boundaries"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set okay 1
+foreach addr {0x10 0x39 0x120 0x290 0x391 0x500 0x800 0x1024 0x1701} {
+    if {[program_mode]} {
+	if {[sid_cmd "sid::component::attribute_value $victim mode"] == "4"} {
+	    set result [sid_cmd "sid::bus::write_h4_l1 $bus $addr 0x39"]
+	    if {$result == "ok"} {
+		if {[sid_cmd "sid::component::attribute_value $victim mode"] == "0"} { 
+		    pass $test 
+		} else {
+		    fail "$test -- restored mode is not 0"; set okay 0; break
+		}
+	    } else { 
+		fail "$test -- bus error @ $addr: $result"; set okay 0; break
+	    }
+	} else {
+	    fail "$test -- mode is not 4"; set okay 0; break
+	}
+    } else { 
+	fail "$test -- failed to enter programming mode"; set okay 0; break
+    }
+}
+if {$okay} { pass $test } else { fail $test }
+
+
+set test "validate freshly written bytes"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set okay 1
+foreach addr {0x10 0x39 0x120 0x290 0x391 0x500 0x800 0x1024 0x1701} {
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
+    if {[lindex $result 0] == "ok" && [lindex $result 1] == "0x39"} {
+	pass $test
+    } else {
+	fail "$test -- mismatch @ $addr: [lindex $result 1] != 0x39"
+    }
+}
+
+set test "enter unlock bypass mode"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+if {[bypass_mode]} {
+    set mode [sid_cmd "sid::component::attribute_value $victim mode"]
+    if {$mode == "8"} {
+	pass $test
+    } else {
+	fail "$test -- expected mode 8, got mode $mode"
+    }
+} else {
+    fail "$test -- unable to enter bypass mode"
+}
+
+
+set test "reset from unlock bypass mode to read mode"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x123 0x90"]
+set mode [sid_cmd "sid::component::attribute_value $victim mode"]
+if {$result != "ok" || $mode != "9"} {
+    fail "$test -- expected ok,9, got $result,$mode"
+} else {
+    set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x123 0x00"]
+    set mode [sid_cmd "sid::component::attribute_value $victim mode"]
+    if {$result == "ok"} {
+	if {$mode == "0"} {
+	    pass $test
+	} else {
+	    fail "$test -- expected mode 0, got mode $mode"
+	}
+    } else {
+	fail "$test -- bus error ($result)"
+    }
+}
+
+
+set test "unlock bypass program"
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+if {[bypass_mode]} {
+    set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x123 0xA0"]
+    if {$result != "ok"} {
+	fail "$test -- bus error ($result)"
+    } else {
+	set mode [sid_cmd "sid::component::attribute_value $victim mode"]
+	if {$mode == "4"} {
+	    set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x123 0x77"]
+	    if {$result != "ok"} {
+		fail "$test -- bus error ($result)"
+		set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x123"]
+		if {[lindex $result 0] != "ok" || [lindex $result 1] != "0x77"} {
+		    fail "$test -- expected ok,0x77, got $result"
+		} else {
+		    pass $test
+		}
+	    }
+	} else {
+	    fail "$test -- expected mode 4, got mode $mode"
+	}
+    }
+} else {
+    fail "$test -- unable to enter bypass mode"
+}
+
+
+# Test that a zero bit cannot be reprogrammed to a 1.
+# Use FF and 00 as the test bytes, for simplicity.
+
+set test "a zero cannot be reset to a one in any location"
+if {![program_mode]} {
+    fail "$test -- unable to enter programming mode"
+} else {
+    set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x123 0"]
+    if {$result != "ok"} {
+	fail "$test -- bus error ($result)"
+    } else {
+	set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x123"]
+	if {[lindex $result 0] != "ok"} {
+	    fail "$test -- bus error ($result)"
+	} else {
+	    if {[lindex $result 1] != "0"} {
+		fail "$test -- expected 0, got [lindex $result 1]"
+	    } else {
+		program_mode
+		set result [sid_cmd "sid::bus::write_h4_l1 $bus 0x123 0xFF"]
+		if {$result != "ok"} {
+		    fail "$test -- bus error ($result)"
+		} else {
+		    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x123"]
+		    if {[lindex $result 0] != "ok"} {
+			fail "$test -- bus error ($result)"
+		    } else {
+			if {[lindex $result 1] != "0"} {
+			    fail "$test -- expected 0, got [lindex $result 1]"
+			} else {
+			    # Woohoo!
+			    pass $test
+			}
+		    }
+		}
+	    }
+	}
+    }
+}
+
+# Test sector erase.
+# Erase sector 1, leaving sectors 0 and 2 unmodified.
+# ss = sector size
+#
+# Before:
+# 0            1            2          3
+# +------------+------------+----------+
+# | 7777777777 | 7777777777 | 77777777 |
+# +------------+------------+----------+
+#
+# After:
+# 0            1            2          3
+# +------------+------------+----------+
+# | 7777777777 | FFFFFFFFFF | 77777777 |
+# +------------+------------+----------+
+#
+# ie mem[ss-1] = mem[ss*2] = 0x77.
+# all bytes in sector 1 are 0xFF.
+
+set test "sector erase"
+set okay 1
+if {![erase_mode]} {
+    fail "$test -- unable to erase entire chip"
+} else {
+    set sectorsize [sid_cmd "sid::component::attribute_value $victim sector-size"]
+    for {set i 0} {$i < [expr 3 * $sectorsize]} {incr i} {
+	if {![program_mode]} {
+	    fail "$test -- unable to enter program mode"
+	    set okay 0
+	    break
+	}
+	set result [sid_cmd "sid::bus::write_h4_l1 $bus $i 0x77"]
+	if {$result != "ok"} {
+	    fail "$test -- bus error ($result)"
+	    set okay 0
+	    break
+	}
+    }
+    if {!$okay || ![sector_erase_mode]} {
+	fail "$test -- unable to enter sector erase mode"
+    } else {
+	# Erase sector 1.
+	set sa [expr 1 << 16]
+	set result [sid_cmd "sid::bus::write_h4_l1 $bus $sa 0x30"]
+
+	if {$result != "ok"} {
+	    fail "$test -- bus error ($result)"
+	} else {
+	    # Now check the lay of the land.
+	    for {set i 0} {$i < [expr 3 * $sectorsize]} {incr i} {
+		set result [sid_cmd "sid::bus::read_h4_l1 $bus $i"]
+		if {[lindex $result 0] != "ok"} {
+		    fail "$test -- bus error ($result)"
+		} else {
+		    if {$i < $sectorsize && [lindex $result 1] != "0x77"} {
+			fail "$test -- $i not 0x77"
+			set okay 0
+			break
+		    } elseif {$i >= $sectorsize && $i < [expr 2 * $sectorsize]} {
+			if {[lindex $result 1] != "0xFF"} {
+			    fail "$test -- $i not 0xFF"
+			    set okay 0
+			    break
+			}
+		    } elseif {$i >= [expr 2 * $sectorsize] && $i < [expr 3 * $sectorsize]} {
+			if {[lindex $result 1] != "0x77"} {
+			    fail "$test -- $i not 0x77"
+			    set okay 0
+			    break
+			}
+		    }
+		}
+	    }
+	}
+    }
+    if {$okay} { pass $test }
+}
+    
+
+set test "read memory image from a file"
+set file [open "test.dat" w]
+fconfigure $file -translation binary
+set data 0
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+for {set i 0} {$i < $size} {incr i} {
+    set data [expr {(($data * 19) + 13) % 256}]
+    puts -nonewline $file [binary format "c" $data]
+}
+close $file
+set res [sid_cmd "sid::component::set_attribute_value $victim image-file test.dat"]
+set pin [sid_cmd "sid::component::find_pin $victim image-load"]
+sid_cmd "sid::pin::driven_h4 $pin 0"
+file delete -force $file
+if {$res == "ok" && $pin != ""} then { pass $test } else { fail $test }
+file delete -force $file
+
+
+set test "verify read memory image"
+set data 0
+set bus [sid_cmd "sid::component::find_bus $victim read-write-port"]
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+for {set i 0} {$i < $size} {incr i} {
+    set data [expr {(($data * 19) + 13) % 256}]
+    set addr $i
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus $addr"]
+    set status [lindex $result 0]
+    if {$status != "ok"} { fail "$test - bad"; break }
+    set result_data [lindex $result 1]
+    if {$result_data != $data} {
+	fail "$test - mismatch @ $i - $result_data vs $data"
+	break
+    }
+}
+if {$i == $size} { pass $test } else { fail "$test $i $size" }
+
+
+set test "save state"
+set state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {$state != ""} { pass $test } else { fail $test }
+
+
+set test "restore state"
+sid_assert_success "sid::component::set_attribute_value $victim state-snapshot [list $state]"
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "am29.conf" }

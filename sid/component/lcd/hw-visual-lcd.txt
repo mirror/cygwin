@@ -1,0 +1,87 @@
+* Name
+  hw-visual-lcd
+
+* Synopsis
+  Simulates a dot matrix LCD display, using Tcl/Tk to manage the graphics 
+  window
+
+  Pins: row-col FR
+  Attributes: width height bits-per-pixel background-color
+
+  Library: none
+  Symbol name: hw-visual-display
+
+* Functionality
+  - Modeling
+    The LCD display model is somewhat abstracted from the physical device:
+
+    o A real display typically has separate row and column pins that are cycled
+      to select each pixel in the display. These are replaced by 2 pins
+      in the model. The FR (frame) pin is driven to 1 to identify that a new
+      frame is starting, and driven to 0 when the frame is finished. The
+      row-col pin incorporates all of the functionality of the row and column
+      drivers on the real chip. This pin is driven once for each "on" pixel
+      in the display.  The value on the pin is the [X,Y] co-ordinates of
+      the pixel, encoded as two adjacent 16-bit values in the 32-bit pin value.
+
+      The two pins are used to initiate and terminate a display refresh cycle.
+      A display refresh cycle starts when the FR pin is asserted; the [X,Y] 
+      co-ordinates of all the "on" pixels are then transmitted on the row-col 
+      pin; and the FR pin is de-asserted to end the refresh cycle.
+
+    o The physical device must be refreshed periodically, but the model retains
+      its last written values indefinitely.
+
+  - Behaviors
+    o Configuration
+      The window geometry is specified in SCREEN pixels via the width and
+      depth attributes. Each pixel in the simulated display occupies a box of
+      bits-per-pixel by bits-per-pixel screen pixels. Bits-per-pixel is also
+      a settable attribute, and defaults to a 4X4 box. Thus, the number of
+      simulated rows is depth/bits-per-pixel; and the number of simulated
+      columns is width/bits-per-pixel.
+
+      While "on" pixels are currently always drawn as black, the background
+      color of the simulated display can be specified using the standard Tcl/Tk
+      color specification syntax (eg. #6fa700 or white). This color is 
+      specified with the background-color attribute.
+
+    o Display
+      See discussion of the FR and row-col pins in Modeling section above
+
+  - SID conventions
+    o This is a functional component
+    o Save/restore is not supported
+    o Triggerpoint support is not available
+
+* Environment
+  - Related components
+    * The LCD display is typically connected to a controller via the tk-bridge.
+      The following configuration file segment shows how the HD44780U LCD 
+      controller can be connected to the hw-visual-lcd display:
+
+      new hw-lcd-hd44780u-a00 lcd	# Standard Japanese font
+      new hw-visual-lcd display		# instantiate the display
+      
+      # display size is in pixels - ie. font-width*display-height
+      set display width 40		# 8 chars X 5 pixels per char
+      set display height 8		# single line of 8 pixels
+
+      # connect the LCD to the display
+      connect-pin lcd row-col -> display row-col
+      connect-pin lcd FR -> display FR
+
+* SID interface reference
+  - low level:
+    * pins
+      - FR | input | binary | display
+      - row-col | input | 2 shorts as a 32-bit value | display
+
+    * attributes
+      - width | setting | any positive value | 20*8*4 = 480 | configuration
+      - height | display | any positive value | 4*8*4 = 128 | configuration
+      - bits-per-pixel | setting | any positive value | 4 | configuration
+      - background-color | setting | any legal tk color specifier 
+        | tk canvas default | configuration
+
+

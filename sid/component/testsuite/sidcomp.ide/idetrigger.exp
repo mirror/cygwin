@@ -1,0 +1,108 @@
+set test "sid configuration"
+sid_config_component_test_with_tracing "idetrig.conf" \
+    "load [sid_find_file libide.la] ide_component_library" \
+    "hw-disk-ide"
+pass $test
+
+set test "sid startup"
+if [sid_start "idetrig.conf"] then { pass $test } else { fail $test ; return }
+
+set test "fetch attribute categories"
+set attrs [sid_cmd "sid::component::attribute_names $victim"]
+set watchables [sid_cmd "sid::component::attribute_names_in_category $victim watchable"]
+set registers [sid_cmd "sid::component::attribute_names_in_category $victim register"]
+set pins [sid_cmd "sid::component::attribute_names_in_category $victim pin"]
+if {$attrs != "" && $watchables != "" && $registers != "" && $pins != ""} then { pass $test } else { fail $test }
+
+set test "prepare watch signalling pins"
+set watch1_pin [sid_cmd "sid::pin::new"]
+sid_cmd "set watch1_count 0"
+set watch2_pin [sid_cmd "sid::pin::new"]
+sid_cmd "set watch2_count 0"
+sid_cmd "set hook_driven_h4($watch1_pin) { global watch1_count ; incr watch1_count }"
+sid_cmd "set hook_driven_h4($watch2_pin) { global watch2_count ; incr watch2_count }"
+set command_bus [sid_cmd "sid::component::find_bus $victim command-block-bus"]
+set control_bus [sid_cmd "sid::component::find_bus $victim control-block-bus"]
+if {$watch1_pin != "" && $watch2_pin != "" 
+    && $command_bus != "" && $control_bus != ""} then { pass $test } else { fail $test }
+
+set test "obsolete watch pin syntax"
+set status [sid_cmd "sid::component::connect_pin $victim {watch-sector%2Dcount-change} $watch1_pin"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "watch an ordinary passive r/w attribute for changes"
+sid_cmd "sid::bus::write_h4_l1 $command_bus 2 00"
+set status [sid_cmd "sid::component::connect_pin $victim {watch:sector%2Dcount:change} $watch1_pin"]
+set v1 [sid_cmd "set watch1_count"]
+sid_cmd "sid::bus::write_h4_l1 $command_bus 2 01"
+set v2 [sid_cmd "set watch1_count"]
+sid_cmd "sid::bus::write_h4_l1 $command_bus 2 01"
+set v3 [sid_cmd "set watch1_count"]
+sid_cmd "sid::bus::write_h4_l1 $command_bus 2 02"
+set v4 [sid_cmd "set watch1_count"]
+if {$status == "ok" && $v1 == 0 && $v2 == 1 && $v3 == 1 && $v4 == 2} then { pass $test } else { fail $test }
+
+set test "stop watching it"
+set status [sid_cmd "sid::component::disconnect_pin $victim {watch:sector%2Dcount:change} $watch1_pin"]
+sid_cmd "sid::bus::write_h4_l1 $command_bus 2 03"
+sid_cmd "sid::bus::write_h4_l1 $command_bus 2 04"
+sid_cmd "sid::bus::write_h4_l1 $command_bus 2 05"
+set v5 [sid_cmd "set watch1_count"]
+if {$status == "ok" && $v5 == $v4} then { pass $test } else { fail $test }
+
+set test "watch an ordinary passive r/w register for mask/value match"
+set status [sid_cmd "sid::component::connect_pin $victim {watch:cylinder%2Dlow:mask/value:0x0F:0x07} $watch2_pin"]
+set v1 [sid_cmd "set watch2_count"]
+sid_cmd "sid::bus::write_h4_l1 $command_bus 4 0x37"
+set v2 [sid_cmd "set watch2_count"]
+sid_cmd "sid::bus::write_h4_l1 $command_bus 4 0x09"
+set v3 [sid_cmd "set watch2_count"]
+sid_cmd "sid::bus::write_h4_l1 $command_bus 4 0x19"
+set v4 [sid_cmd "set watch2_count"]
+sid_cmd "sid::bus::write_h4_l1 $command_bus 4 0x17"
+set v5 [sid_cmd "set watch2_count"]
+sid_cmd "sid::bus::write_h4_l1 $command_bus 4 0x17"
+set v6 [sid_cmd "set watch2_count"]
+if {$status == "ok" && $v1 == 0 && $v2 == 1 && $v3 == 1 && $v4 == 1 && $v5 == 2 && $v6 == 2} then { pass $test } else { fail $test }
+
+
+set test "stop watching that too"
+set status [sid_cmd "sid::component::disconnect_pin $victim {watch:cylinder%2Dlow:mask/value:0x0F:0x07} $watch2_pin"]
+sid_cmd "sid::bus::write_h4_l1 $command_bus 4 0x09"
+sid_cmd "sid::bus::write_h4_l1 $command_bus 4 0x19"
+sid_cmd "sid::bus::write_h4_l1 $command_bus 4 0x17"
+set v7 [sid_cmd "set watch2_count"]
+if {$status == "ok" && $v7 == $v6} then { pass $test } else { fail $test }
+
+
+set test "watch same register with several separate triggerpoints"
+set s1 [sid_cmd "sid::component::connect_pin $victim {watch:cylinder%2Dlow:mask/value:0x0F:0x04} $watch1_pin"]
+set s2 [sid_cmd "sid::component::connect_pin $victim {watch:cylinder%2Dlow:value:0x05} $watch2_pin"]
+sid_cmd "set watch1_count 0"
+sid_cmd "set watch2_count 0"
+sid_cmd "sid::bus::write_h4_l1 $command_bus 4 0x04"
+set v1a [sid_cmd "set watch1_count"]
+set v2a [sid_cmd "set watch2_count"]
+sid_cmd "sid::bus::write_h4_l1 $command_bus 4 0x05"
+set v1b [sid_cmd "set watch1_count"]
+set v2b [sid_cmd "set watch2_count"]
+sid_cmd "sid::bus::write_h4_l1 $command_bus 4 0x08"
+set v1c [sid_cmd "set watch1_count"]
+set v2c [sid_cmd "set watch2_count"]
+sid_cmd "sid::bus::write_h4_l1 $command_bus 4 0x54"
+set v1d [sid_cmd "set watch1_count"]
+set v2d [sid_cmd "set watch2_count"]
+if {$s1 == "ok" && $s2 == "ok" &&
+    $v1a == 1 && $v2a == 0 &&
+    $v1b == 1 && $v2b == 1 &&
+    $v1c == 1 && $v2b == 1 &&
+    $v1d == 2 && $v2b == 1} then { pass $test } else { fail $test }
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "idetrig.conf" }

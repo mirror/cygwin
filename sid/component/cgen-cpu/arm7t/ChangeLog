@@ -1,0 +1,29 @@
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * configure: Regenerated.
+        * aclocal.m4: Ditto.
+        * Makefile.in: Ditto.
+
+2000-11-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm-decode.cxx, thumb-decode.cxx: Regenerated.  Reorganized.
+
+2000-11-10  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm-decode.cxx, thumb-decode.cxx: Regenerated.  Improved.
+
+2000-11-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (CXXFLAGS): Use TOP_CXXFLAGS.
+	* Makefile.in: Regenerated.
+
+2000-10-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* arm-decode.h, -defs.h, -decode.cxx, -decode.h: Regenerated.
+	* arm7f.cxx (thumb_swi): Allay warnings.
+
+2000-09-22  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am, configure.in: Reworked to use new CGEN.sh conventions.
+	* arm-decode.cxx: Regenerated with new trace syntax.
+	* Makefile.in, configure: Regenerated.

@@ -1,0 +1,70 @@
+# This conf file contains Connect-bus command with invalid bus names
+
+# configuration logging
+set main verbose? 0
+
+# component libraries
+load libcgencpu.la cgen_component_library
+load libconsoles.la console_component_library
+load libgloss.la gloss_component_library
+load libinterrupt.la interrupt_component_library
+load libloader.la loader_component_library
+load libmapper.la mapper_component_library
+load libmemory.la mem_component_library
+load libmmu.la mmu_component_library
+load libsched.la sched_component_library
+load libtimers.la timer_component_library
+
+# Components
+
+new hw-cpu-arm7t CPU
+new sw-load-elf loader
+new sid-io-stdio stdio
+new sw-gloss-arm/angel angel
+new hw-interrupt-arm/ref intctrl
+new hw-mapper-basic bus
+new hw-remap/pause-arm/ref remapper
+new sid-sched-host host-sched
+new sid-sched-sim target-sched
+new hw-memory-ram/rom-basic mem
+new hw-timer-arm/ref-sched timer1
+new hw-timer-arm/ref-sched timer2
+
+# Scheduler
+
+set target-sched enabled? 1
+set target-sched num-clients 2
+
+set host-sched enabled? 1
+set host-sched num-clients 1
+set host-sched 0-regular? 1
+set host-sched 0-time 50
+
+connect-pin target-sched 0-control <- timer1 divided-clock-control
+connect-pin target-sched 1-control <- timer2 divided-clock-control
+connect-pin target-sched 0-event -> timer1 divided-clock-event
+connect-pin target-sched 1-event -> timer2 divided-clock-event
+connect-pin host-sched 0-event -> stdio poll
+
+# Component relationships
+relate angel cpu CPU
+
+# Main pin connections
+connect-pin main perform-activity -> host-sched advance
+connect-pin main perform-activity -> target-sched advance
+connect-pin main starting -> loader load!
+connect-pin main perform-activity -> CPU step!
+
+# ELF loader
+connect-pin loader start-pc-set -> CPU start-pc-set!
+connect-pin loader endian-set -> CPU endian-set!
+connect-bus loader " "  bus access-port			# Error: accessor name is blank
+
+# Bus connections
+connect-bus remapper ALL bus access-port		# Error: accessor ALL does not exist
+connect-bus CPU insn----memory remapper access-port	# Error: accessor insn----memory does not exist
+connect-bus CPU CPU remapper access-port		# Error: accessor CPU does not exist
+connect-bus angel target-memory remapper another-bus	# Error: bus does not exist
+connect-bus angel anybus remapper another-bus		# Error: both accessor and bus do not exist
+connect-bus bus [0,0x7fffff] mem access-port		# Error: bus access-port does not exist
+connect-bus bus [0,0x7fffff] CPU step!			# Error: CPU step! is a pin name

@@ -1,0 +1,142 @@
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * configure: Regenerated.
+        * aclocal.m4: Ditto.
+        * Makefile.in: Ditto.
+
+2000-11-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (CXXFLAGS, TOP_CXXFLAGS, AM_CXXFLAGS, AM_MAKEFLAGS,
+	MAKEOVERRIDES): New macro concotion to rename/copy incoming CXXFLAGS
+	to TOP_CXXFLAGS in subdirectories.
+	* Makefile.in: Regenerated.
+
+2000-10-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (MAKEOVERRIDES): Define empty macro to prevent 
+	automatic override of local CXXFLAGS from top-level Makefile.
+	* Makefile.in: Regenerated.
+
+2000-10-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* CGEN.sh.in: Add writeback-function file generation (-W flag).
+	* cgen-ops.h (SUBWORDHIQI, -HIBI, -BIHI): New functions.
+
+2000-10-10  Frank Ch. Eigler  <fche@redhat.com>
+
+	* CGEN.sh.in: Disable excessive "set -x" tracing.
+
+2000-09-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* CGEN.sh: Removed, replaced by
+	* CGEN.sh.in: New file.  Be able to run guile in build tree.
+	* configure.in: Look for guile and generate CGEN.sh.
+	* Makefile.in, aclocal.m4, configure: Regenerated.
+
+2000-09-15  matthew green  <mrg@redhat.com>
+
+	* cgen-cpu.h (GETIMEMUQI, SETIMEMUQI): New inline rtx functions.
+	(GETIMEMUHI, SETIMEMUHI): Likewise.
+	(GETIMEMUSI, SETIMEMUSI): Likewise.
+	(GETIMEMUDI, SETIMEMUDI): Likewise.
+
+2000-09-11  Jeff Johnston  <jjohsntn@redhat.com>
+
+	* cgen-ops.h (GTUINT, LTUINT, GEUINT, LEUINT): New macros.
+	(ADDOFHI, ADDCHI, ADDCFHI, SUBCHI, SUBOFHI, SUBCFHI): Ditto.
+
+2000-09-06  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cgen-cpu.h (SETIMEM*): New inline functions.
+	* cgen-engine.h (cpu_memory_trap ctors): Reorder initializers.
+
+2000-08-30  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* cgen-cpu.h: (GETIMEMQI, GETIMEMHI, GETIMEMSI, GETIMEMDI):  Changed 
+	to specify pc argument as well as address.  New argument is passed on
+	to appropriate read_insn routine.
+	* arm7t/arm7f.cxx: Changed all callers of GETIMEMxx to duplicate
+	pc argument.
+	* m32r/m32rbf.cxx: Ditto.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* aclocal.m4, configure: Regenerated.
+
+2000-06-14  Frank Ch. Eigler  <fche@redhat.com>
+
+	Regenerating with new cgen decode tree generator.
+	* arm7t/arm-decode.cxx, arm-decode.h: Regenerated.
+	* arm7t/arm-sem.cxx arm-semsw.cxx: Ditto (without decode-splits).
+
+2000-05-31  Ben Elliston  <bje@redhat.com>
+
+	* cgen-ops.h (ADDCQI, ADDCFQI, SUBCQI, SUBCFQI): New functions.
+	(RORQI, ROLQI): New macros.
+
+2000-05-23  Jeff Johnston <jjohnstn@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Ditto.
+	* configure: Ditto.
+	* stamp-h.in: Ditto.
+
+2000-05-23  Ben Elliston  <bje@redhat.com>
+
+	* arm7t/Makefile.in: Regenerate.
+	* m32r/Makefile.in: Likewise.
+	* Makefile.in: Likewise.
+
+2000-04-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cgen-engine.h (last_traced_pc_pbb): New member in pbb_scache<>.
+	(pbb_before): Track this PC address.
+	(pbb_after): Print extra insn trace if "after" virtual insn is after
+	a delay-slot insn.
+	(compile_after_insn): Hijack "before" virtual insn fields to store
+	scache insn.
+
+	* arm7t/atm7f.cxx (arm_pbb_begin, thumb_pbb_begin): Update call to
+	`compile_after_insn'.
+	* arm7t/arm-*, arm7t/thumb-*: Regenerated.
+	* m32r/m32r-*: Regenerated.
+
+2000-04-18  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure, aclocal.m4, Makefile.in: Regenerated.
+
+2000-04-07  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (libcgencpu_la_DEPENDENCIES): Specify.
+	* Makefile.in: Regenerate.
+
+2000-04-05  Frank Ch. Eigler  <fche@redhat.com>
+
+	* m32r/m32r-*: Regenerated.
+	* cgen-cpu.h (GETMEMDI, SETMEMDI, GETIMEMDI): New functions.
+	* cgen-ops.h (ADDOFDI, SUBOFDI): New functions.
+	* Makefile.am (checkme): Don't fail if multi-family tests fail.
+	* Makefile.in: Regenerated.
+
+2000-03-30  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (cgen-all, checkme): New recursive targets.
+	(cgen-*): Removed old targets that now live in subdirs.
+	* arm7t/Makefile.am: Refer to $srcdir/../CGEN.sh.
+	* m32r/Makefile.am: Ditto.
+	* Makefile.in: Regenerated.
+	* arm7t/Makefile.in: Regenerated.
+	* m32r/Makefile.in: Ditto.
+
+2000-03-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: New file.  Use CPU-family-specific subdirectories.
+	* Makefile.am: Corresponding changes.
+	* CGEN.sh (rootdir): Expect to be run from said subdirectories.
+	* configure, Makefile.in, aclocal.m4: Generated.
+	* stamp-h.in, config.in: Ditto.
+	
+	* ChangeLog.1: New file to collect historical entries.
+	
+	* arm7t: New directory.  Populate with old arm* files.
+	* m32r: New directory.  Populate with old m32r* files.

@@ -1,0 +1,75 @@
+set main verbose 0
+
+# loading dynamic libraries
+dso @prefix@/lib/sidcomp/libmapper.la mapper_component_library
+dso @prefix@/lib/sidcomp/libsched.la sched_component_library
+dso @prefix@/lib/sidcomp/libmemory.la mem_component_library
+dso @prefix@/lib/sidcomp/libtclapi.la tcl_bridge_library
+dso @prefix@/lib/sidcomp/libt6963c.la t6963c_component_library
+dso @prefix@/lib/sidcomp/libparport.la parport_component_library
+
+# Creating components
+new hw-mapper-basic mapper_bus
+new sid-sched-host sched
+new hw-lcd-t6963c lcd_contr
+new hw-parport-ps/2 pport
+new bridge-tk display
+new bridge-tk input_lcdcontr
+new bridge-tk input_parport
+
+# scheduling  copied from Ron's t6963tclconf
+set sched num-clients 1
+set sched 0-regular? 1
+set sched 0-time 100
+
+# source files 
+set display load! @srcdir@/../lcd.tcl
+set display eval! "namespace import lcd::*"
+set input_lcdcontr load! @srcdir@/lcdcontroller.tk
+set input_parport load! @srcdir@/../../parport/testsuite/lcdkeypad.tk
+
+#pin connections
+connect-pin main perform-activity -> display !event
+connect-pin main perform-activity -> input_lcdcontr !event
+connect-pin main perform-activity -> input_parport !event
+
+connect-pin main perform-activity -> sched advance
+connect-pin sched 0-event -> lcd_contr refresh-sync-event
+connect-pin sched 0-control <- lcd_contr refresh-sync-control
+
+# setting attributes -hex values in component lcd controller.
+set lcd_contr display-width 20
+set lcd_contr display-height 6
+
+# setting attributes in lcd display component 20*8, 6*8
+set display width 160
+set display height 48
+
+# bus connection from testing code to mapper
+connect-bus input_lcdcontr input_lcdbus mapper_bus access-port
+connect-bus mapper_bus [0xa0000-0xa0004,4,1] lcd_contr bus
+
+#connecting 64KB ram to controller
+new hw-memory-ram/rom-basic dram
+set dram size 65535
+
+#connect memory bus with external-ram bus in lcd controller.
+connect-bus lcd_contr external-ram dram read-write-port
+
+#connect input_parport bus parallel port component bus 
+connect-bus input_parport inputppbus pport Bus
+
+#connect pins.
+connect-pin lcd_contr row-col -> display row-col
+connect-pin lcd_contr FR -> display FR
+connect-pin pport PD0 -> input_lcdcontr pin0_lcdcontr
+connect-pin pport PD1 -> input_lcdcontr pin1_lcdcontr
+connect-pin pport PD2 -> input_lcdcontr pin2_lcdcontr
+connect-pin pport PD3 -> input_lcdcontr pin3_lcdcontr
+connect-pin pport PD4 -> input_lcdcontr pin4_lcdcontr
+connect-pin pport PD5 -> input_lcdcontr pin5_lcdcontr
+connect-pin pport PD6 -> input_lcdcontr pin6_lcdcontr
+connect-pin pport PD7 -> input_lcdcontr pin7_lcdcontr
+connect-pin pport STROBE -> input_lcdcontr pin8_lcdcontr
+connect-pin input_lcdcontr outputack -> pport ACK
+connect-pin input_parport inputbiden -> pport BIDEN

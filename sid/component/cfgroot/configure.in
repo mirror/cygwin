@@ -1,0 +1,50 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(Makefile.in)
+AC_CONFIG_AUX_DIR(../../config)
+AM_INIT_AUTOMAKE(sidcomp,0.1)
+AM_CONFIG_HEADER(config.h:config.in)
+
+AM_MAINTAINER_MODE
+AC_DISABLE_SHARED
+AC_LIBLTDL_CONVENIENCE
+AM_PROG_LIBTOOL
+
+AC_EXEEXT
+AC_PROG_CXX
+AC_PROG_CXXCPP
+AC_PROG_MAKE_SET
+AC_ARG_PROGRAM
+AC_LANG_CPLUSPLUS
+AC_HEADER_STDC
+
+dnl No need to check for these any more: they are always included
+dnl AC_CHECK_LIB(ltdl, lt_dlopen)
+dnl AC_CHECK_HEADERS(ltdl.h)
+AC_SUBST(LIBLTDL)
+
+AC_CHECK_FUNCS(cygwin_conv_to_full_posix_path)
+
+dnl Timebomb processing
+AC_CHECK_HEADERS(time.h)
+AC_CHECK_FUNCS(ctime)
+AC_ARG_ENABLE(timebomb, 
+	[  --enable-timebomb=TIME  refuse to start after TIME seconds past epoch])	
+SID_TIMEBOMB=0
+if test -z "$enable_timebomb"
+then
+	SID_TIMEBOMB=0
+elif test "$enable_timebomb" = "no"
+then
+	SID_TIMEBOMB=0
+elif expr "$enable_timebomb" : '[[0-9]]*$' >/dev/null
+then
+	SID_TIMEBOMB=$enable_timebomb
+# XXX: support relative "days from now" format
+else
+	AC_ERROR([Must specify timebomb time in proper format])
+fi
+AC_DEFINE_UNQUOTED(SID_TIMEBOMB, $SID_TIMEBOMB, [Timebomb - seconds since epoch - 0=unlimited])
+
+dnl Outputs
+AC_CONFIG_SUBDIRS(libltdl)
+AC_OUTPUT(Makefile)

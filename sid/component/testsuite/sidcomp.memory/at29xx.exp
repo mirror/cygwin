@@ -1,0 +1,509 @@
+set test "at29c256 :sid configuration"
+sid_config_component_test "at29c256.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29c256"
+pass $test
+
+set test "at29c256 :sid start"
+if {[sid_start "at29c256.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29c256 :validate size is 32*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "32768"} { pass $test } else { fail $test }
+
+set test "at29c256 :validate sector-size is 64"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "64"} { pass $test } else { fail $test }
+
+set test "at29c256 :validate device-code is 0xDC"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0xDC"} { pass $test } else { fail $test }
+
+set test "at29c256 :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29c256.conf" }
+
+
+set test "at29lv256 :sid configuration"
+sid_config_component_test "at29lv256.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29lv256"
+pass $test
+
+set test "at29lv256 :sid start"
+if {[sid_start "at29lv256.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29lv256 :validate size is 32*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "32768"} { pass $test } else { fail $test }
+
+set test "at29lv256 :validate sector-size is 64"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "64"} { pass $test } else { fail $test }
+
+set test "at29lv256 :validate device-code is 0xBC"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0xBC"} { pass $test } else { fail $test }
+
+set test "at29lv256 :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29lv256.conf" }
+
+
+set test "at29c257 :sid configuration"
+sid_config_component_test "at29c257.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29c257"
+pass $test
+
+set test "at29c257 :sid start"
+if {[sid_start "at29c257.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29c257 :validate size is 32*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "32768"} { pass $test } else { fail $test }
+
+set test "at29c257 :validate sector-size is 64"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "64"} { pass $test } else { fail $test }
+
+set test "at29c257 :validate device-code is 0xDC"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0xDC"} { pass $test } else { fail $test }
+
+set test "at29c257 :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29c257.conf" }
+
+
+set test "at29c512 :sid configuration"
+sid_config_component_test "at29c512.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29c512"
+pass $test
+
+set test "at29c512 :sid start"
+if {[sid_start "at29c512.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29c512 :validate size is 64*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "65536"} { pass $test } else { fail $test }
+
+set test "at29c512 :validate sector-size is 128"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "128"} { pass $test } else { fail $test }
+
+set test "at29c512 :validate device-code is 0x5D"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0x5D"} { pass $test } else { fail $test }
+
+set test "at29c512 :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29c512.conf" }
+
+
+set test "at29lv512 :sid configuration"
+sid_config_component_test "at29lv512.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29lv512"
+pass $test
+
+set test "at29lv512 :sid start"
+if {[sid_start "at29lv512.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29lv512 :validate size is 64*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "65536"} { pass $test } else { fail $test }
+
+set test "at29lv512 :validate sector-size is 128"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "128"} { pass $test } else { fail $test }
+
+set test "at29lv512 :validate device-code is 0x3D"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0x3D"} { pass $test } else { fail $test }
+
+set test "at29lv512 :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29lv512.conf" }
+
+
+set test "at29c010a :sid configuration"
+sid_config_component_test "at29c010a.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29c010a"
+pass $test
+
+set test "at29c010a :sid start"
+if {[sid_start "at29c010a.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29c010a :validate size is 128*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "131072"} { pass $test } else { fail $test }
+
+set test "at29c010a :validate sector-size is 128"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "128"} { pass $test } else { fail $test }
+
+set test "at29c010a :validate device-code is 0xD5"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0xD5"} { pass $test } else { fail $test }
+
+set test "at29c010a :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29c010a.conf" }
+
+
+set test "at29lv010a :sid configuration"
+sid_config_component_test "at29lv010a.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29lv010a"
+pass $test
+
+set test "at29lv010a :sid start"
+if {[sid_start "at29lv010a.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29lv010a :validate size is 128*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "131072"} { pass $test } else { fail $test }
+
+set test "at29lv010a :validate sector-size is 128"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "128"} { pass $test } else { fail $test }
+
+set test "at29lv010a :validate device-code is 0x35"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0x35"} { pass $test } else { fail $test }
+
+set test "at29lv010a :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29lv010a.conf" }
+
+
+set test "at29bv010a :sid configuration"
+sid_config_component_test "at29bv010a.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29bv010a"
+pass $test
+
+set test "at29bv010a :sid start"
+if {[sid_start "at29bv010a.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29bv010a :validate size is 128*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "131072"} { pass $test } else { fail $test }
+
+set test "at29bv010a :validate sector-size is 128"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "128"} { pass $test } else { fail $test }
+
+set test "at29bv010a :validate device-code is 0x35"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0x35"} { pass $test } else { fail $test }
+
+set test "at29bv010a :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29bv010a.conf" }
+
+
+set test "at29c020 :sid configuration"
+sid_config_component_test "at29c020.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29c020"
+pass $test
+
+set test "at29c020 :sid start"
+if {[sid_start "at29c020.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29c020 :validate size is 256*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "262144"} { pass $test } else { fail $test }
+
+set test "at29c020 :validate sector-size is 256"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "256"} { pass $test } else { fail $test }
+
+set test "at29c020 :validate device-code is 0xDA"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0xDA"} { pass $test } else { fail $test }
+
+set test "at29c020 :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29c020.conf" }
+
+
+set test "at29lv020 :sid configuration"
+sid_config_component_test "at29lv020.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29lv020"
+pass $test
+
+set test "at29lv020 :sid start"
+if {[sid_start "at29lv020.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29lv020 :validate size is 256*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "262144"} { pass $test } else { fail $test }
+
+set test "at29lv020 :validate sector-size is 256"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "256"} { pass $test } else { fail $test }
+
+set test "at29lv020 :validate device-code is 0xBA"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0xBA"} { pass $test } else { fail $test }
+
+set test "at29lv020 :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29lv020.conf" }
+
+
+set test "at29bv020 :sid configuration"
+sid_config_component_test "at29bv020.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29bv020"
+pass $test
+
+set test "at29bv020 :sid start"
+if {[sid_start "at29bv020.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29bv020 :validate size is 256*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "262144"} { pass $test } else { fail $test }
+
+set test "at29bv020 :validate sector-size is 256"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "256"} { pass $test } else { fail $test }
+
+set test "at29bv020 :validate device-code is 0xBA"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0xBA"} { pass $test } else { fail $test }
+
+set test "at29bv020 :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29bv020.conf" }
+
+
+set test "at29c040a :sid configuration"
+sid_config_component_test "at29c040.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29c040"
+pass $test
+
+set test "at29c040a :sid start"
+if {[sid_start "at29c040.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29c040a :validate size is 512*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "524288"} { pass $test } else { fail $test }
+
+set test "at29c040a :validate sector-size is 512"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "512"} { pass $test } else { fail $test }
+
+set test "at29c040a :validate device-code is 0x5B"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0x5B"} { pass $test } else { fail $test }
+
+set test "at29c040a :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29c040.conf" }
+
+
+set test "at29lv040 :sid configuration"
+sid_config_component_test "at29lv040.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29lv040"
+pass $test
+
+set test "at29lv040 :sid start"
+if {[sid_start "at29lv040.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29lv040 :validate size is 512*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "524288"} { pass $test } else { fail $test }
+
+set test "at29lv040 :validate sector-size is 512"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "512"} { pass $test } else { fail $test }
+
+set test "at29lv040 :validate device-code is 0x3B"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0x3B"} { pass $test } else { fail $test }
+
+set test "at29lv040 :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29lv040.conf" }
+
+
+set test "at29bv040 :sid configuration"
+sid_config_component_test "at29bv040.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29bv040"
+pass $test
+
+set test "at29bv040 :sid start"
+if {[sid_start "at29bv040.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29bv040 :validate size is 512*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "524288"} { pass $test } else { fail $test }
+
+set test "at29bv040 :validate sector-size is 512"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "512"} { pass $test } else { fail $test }
+
+set test "at29bv040 :validate device-code is 0x3B"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0x3B"} { pass $test } else { fail $test }
+
+set test "at29bv040 :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29bv040.conf" }
+
+
+set test "at29c040a :sid configuration"
+sid_config_component_test "at29c040a.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29c040a"
+pass $test
+
+set test "at29c040a :sid start"
+if {[sid_start "at29c040a.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29c040a :validate size is 512*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "524288"} { pass $test } else { fail $test }
+
+set test "at29c040a :validate sector-size is 256"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "256"} { pass $test } else { fail $test }
+
+set test "at29c040a :validate device-code is 0xA4"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0xA4"} { pass $test } else { fail $test }
+
+set test "at29c040a :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29c040a.conf" }
+
+
+set test "at29lv040a :sid configuration"
+sid_config_component_test "at29lv040a.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29lv040a"
+pass $test
+
+set test "at29lv040a :sid start"
+if {[sid_start "at29lv040a.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29lv040a :validate size is 512*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "524288"} { pass $test } else { fail $test }
+
+set test "at29lv040a :validate sector-size is 256"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "256"} { pass $test } else { fail $test }
+
+set test "at29lv040a :validate device-code is 0xC4"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0xC4"} { pass $test } else { fail $test }
+
+set test "at29lv040a :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29lv040a.conf" }
+
+
+set test "at29bv040a :sid configuration"
+sid_config_component_test "at29bv040a.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29bv040a"
+pass $test
+
+set test "at29bv040a :sid start"
+if {[sid_start "at29bv040a.conf"]} { pass $test } else { fail $test ; return }
+
+
+set test "at29bv040a :validate size is 512*1024 bytes"
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$size == "524288"} { pass $test } else { fail $test }
+
+set test "at29bv040a :validate sector-size is 256"
+set size [sid_cmd "sid::component::attribute_value $victim sector-size"]
+if {$size == "256"} { pass $test } else { fail $test }
+
+set test "at29bv040a :validate device-code is 0xC4"
+set code [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$code == "0xC4"} { pass $test } else { fail $test }
+
+set test "at29bv040a :sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29bv040a.conf" }
+

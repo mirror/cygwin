@@ -1,0 +1,9 @@
+CPinvaComp.badconf:43: component target not found
+CPinvaComp.badconf:44: component sid-sched-sim not found
+CPinvaComp.badconf:45: component timer12 not found
+CPinvaComp.badconf:46: component t-sched not found
+CPinvaComp.badconf:53: component main1 not found
+CPinvaComp.badconf:54: component ```main``` not found
+CPinvaComp.badconf:58: unterminated string literal
+CPinvaComp.badconf:58: unexpected end of file
+Configuration error.  Aborting.

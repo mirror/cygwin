@@ -1,0 +1,6 @@
+multiCP.badconf:46: component timer2 has no input pin divided-clock-control
+multiCP.badconf:59: output pin divided-clock-control is already connected to input pin 0-control
+multiCP.badconf:60: output pin divided-clock-control is already connected to input pin 1-control
+multiCP.badconf:60: unknown command ;
+multiCP.badconf:60: output pin divided-clock-control is already connected to input pin 0-control
+Configuration error.  Aborting.

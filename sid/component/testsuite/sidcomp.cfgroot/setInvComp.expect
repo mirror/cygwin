@@ -1,0 +1,8 @@
+setInvComp.badconf:35: component target not found
+setInvComp.badconf:36: component 0-control not found
+setInvComp.badconf:38: component set not found
+setInvComp.badconf:43: component mem  not found
+setInvComp.badconf:44: component ~/mem not found
+setInvComp.badconf:45: component _cpu not found
+setInvComp.badconf:46: component ..cpu not found
+Configuration error.  Aborting.

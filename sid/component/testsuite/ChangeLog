@@ -1,0 +1,1203 @@
+2000-11-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* lib/cpudefs.exp (run-one-sid-test): Initialize last_sid_run_time.
+
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-11-13  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.consoles/socketval.exp, consmonkey.exp: Disable tests.
+
+2000-10-30  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.consoles/socketval.exp: Limit indefinite looping during
+	socket connection test.
+
+2000-10-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* sidcomp.profiling/runprof.exp: Changed reference to gprof
+	option which is now a switch and specified the insn count
+	using the new insn-count option.
+
+2000-07-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.cfgroot/extMiss.expect, multiDso.expect, wrongOrd.expect:
+	Update for new dlopen->dlsym error message.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-04-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.bsp/*bsp.exp: Pass "-g -O2" to target compiler.
+	* sidcomp.bsp/dhrystone.exp: Ditto.  Correct endianness options.
+	* sidcomp.bsp/test-memory.c: Undo last silly change.
+
+2000-04-24  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.bsp/test-memory.c: Move volatile qualifier to generate
+	more predictable number of memory accesses.
+	* sidcomp.cgen-cpu/armimemfault.ms: Update gloss error message.
+	* sidcomp.cgen-cpu/armmemfault.ms, arminvinsn.ms: Ditto.
+
+2000-04-18  Frank Ch. Eigler  <fche@redhat.com>
+
+	* lib/cpudefs.exp (build_ltldpath): Add $srcdir/../* for tcl files.
+	* sidcomp.cgen-cpu/cpudocs.exp: Adjust to match cgen-cpu subdirs.
+
+2000-04-18  Frank Ch. Eigler  <fche@redhat.com>
+
+	* lib/cpudefs.exp (*run*): Remove engine-type argument.
+	(sid-run-conf): Don't substitute "@-engine-@".
+	* sidcomp.cgen-cpu/armeit.conf: Don't use @-engine-@.
+	* sidcomp.audio/linuscodec.exp: Adapt to new sid-running conventions.
+	* sidcomp.bsp/armbsp.exp, sidcomp.bsp/m32rbsp.exp: Ditto.
+	* sidcomp.cgen-cpu/armconf.exp, armmisc.conf: Ditto.
+	* sidcomp.profiling/runprof.exp: Ditto.
+	* sidcomp.bsp/dhrystone.exp: Ditto.
+	* sidcomp.cfgroot/illegCh.expect: Detect graphic character error.
+
+2000-03-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.bsp/dhry21.c (WORK_FACTOR): Increase to 25000.
+
+2000-03-15  Permaine Cheung  <pcheung@redhat.com>
+
+	* sidcomp.lcd/lcd1val.exp: New test.
+	* sidcomp.lcd/lcd1inv.exp: New test.
+
+2000-03-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.bsp/mipsbsp.exp: Run engine=pbb tests also.
+	* sidcomp.cfgroot/CBinvaComp.badconf: Forget cpu/gloss halt! pins.
+	* sidcomp.cfgroot/CBinaComp.expect, multiCB.badconf: Ditto.
+	* sidcomp.cfgroot/multiCB.expect, multiDso.badconf: Ditto.
+	* sidcomp.cfgroot/multiSet.badconf, wrongOrd.expect: Ditto.
+	* sidcomp.gloss/angel.exp: Ditto.
+
+2000-03-14  matthew green  <mrg@redhat.com>
+
+	* sidcomp.interrupt/interruptdocs.exp: Add cogent/cma222 support.
+	* sidcomp.interrupt/interruptmonkey.exp: Likewise.
+	* sidcomp.interrupt/arm-interrupt.exp: Update for new irq-registers,
+	fiq-registers and renamed fiq-enable-register. Report the type of
+	bus failure in more cases.
+	* sidcomp.interrupt/cma222-interrupt.exp: Likewise.
+	* sidcomp.cfgroot/CBinvaComp.badconf: Update for new irq-registers,
+	fiq-registers and renamed fiq-enable-register.
+	* sidcomp.cfgroot/comment.badconf: Likewise.
+	* sidcomp.cfgroot/comment.expect: Likewise.
+	* sidcomp.cfgroot/illegCh.badconf: Likewise.
+	* sidcomp.cfgroot/illegCh.expect: Likewise.
+	* sidcomp.cfgroot/multiCB.badconf: Likewise.
+	* sidcomp.cfgroot/multiDso.badconf: Likewise.
+	* sidcomp.cfgroot/multiSet.badconf: Likewise.
+	* sidcomp.cfgroot/wrongOrd.badconf: Likewise.
+
+2000-02-21  matthew green  <mrg@redhat.com>
+
+	* sidcomp.interrupt/cma222-interrupt.exp: New test.
+
+2000-02-16  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.cgen-cpu/cpudocs.exp: New test.
+
+	* lib/docs.exp (Existence test): Append ".txt" to filenames that
+	appear in DejaGNU messages.
+	
+2000-02-11  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.rtc/ds1642.exp: Connect a 2KB memory to the victim.
+	* sidcomp.rtc/ds1742.exp: Likewise.
+
+2000-02-10  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.rtc/ds1642.exp: Update test.
+	* sidcomp.rtc/ds1742.exp: Likewise.
+
+	* lib/monkey.exp (monkey_test_state_restore): Select prior state
+	snapshots using a random $pick, not $num_state_snapshots.
+
+2000-02-08  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.mmu/mmumonkey.exp (state_safe_p): Disable state
+	save/restore tests, at least until the monkey tester can handle
+	dynamically generated attributes.
+
+2000-02-03  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.mapper/busif.exp: Re-enable.  Correct 15+ tests in error.
+
+2000-02-02  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.mapper/busif.exp: Disable until failure analysis is provided.
+
+2000-02-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.audio/linuscodec.c: New file: target app for codec testing.
+	* sidcomp.audio/linuscodec.exp: Rewrote - run target app instead.
+
+2000-01-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.audio/linuscodec.exp: New test for hw-audio-sid.
+	* sidcomp.audio/linusraw.exp (audio_config): New proc.
+	Add new test for audio configuration.  Don't bother with explicit
+	polling.
+
+2000-01-27  Ron Unrau  <runrau@redhat.com>
+
+	* sidcomp.mapper/busif.exp: New test.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.audio/linusraw.exp: New test for sid-io-audio.
+	* sidcomp.audio/linusraw.bin: New binary file: audio test sample.
+	* sidcomp.audio/aumonkey.exp: New file.
+	* Makefile.in: Regenerated.
+
+2000-01-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cfgroot/empty.badconf: New test half.
+	* sidcomp.cfgroot/empty.expect: New test better half.
+
+2000-01-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.glue/sequence.exp: Test infinite recursion prevention.
+	* lib/monkey.exp: Add comments about state save/restore testing.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-12  Permaine Cheung  <pcheung@cygnus.com>
+
+	* sidcomp.cfgroot/cr100925.badconf: New file.
+	* sidcomp.cfgroot/cr100925.expect: New file.
+	* sidcomp.cfgroot/cr100931.badconf: New file.
+	* sidcomp.cfgroot/cr100931.expect: New file.
+	* sidcomp.cfgroot/cr100974.badconf: New file.
+	* sidcomp.cfgroot/cr100974.expect: New file.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.consoles/stdioinv.exp: Use "load", not "dso" config command.
+	* sidcomp.consoles/stdioval.exp: Ditto.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cfgroot/CPinvaComp.expect: Update error message.
+	* sidcomp.cfgroot/invaComp.expect: Update error message.
+
+2000-01-11  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cgen-cpu/armeit.conf: Remove stride/width from RAM mapping.
+	* sidcomp.mapper/basicmapper.exp: Update for new accessor-name
+	preservation.  Add tests for width-adjusting stride/width mappings.
+	Test both reads and writes.  Speed up exhaustive tests by sampling.
+
+2000-01-10  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.bsp/armbsp.exp: sidtarget is now an associative array.
+	* sidcomp.bsp/dhrystone.exp: Likewise.
+	* sidocmp.bsp/m32rbsp.exp: Likewise.
+	* sidcomp.bsp/mipsbsp.exp: Likewise.
+	* sidcomp.cgen-cpu/armconf.exp: Likewise.
+	* sidcomp.cgen-cpu/armmisc.exp: Likewise.
+	* sidcomp.cgen-cpu/cpumonkey.exp: Likewise.
+	* sidcomp.gloss/angel.exp: Likewise.
+	* sidcomp.interrupt/arm-interrupt.exp: Likewise.
+	* sidcomp.mmu/arm-remap.exp: Likewise.
+	* sidcomp.mmu/mmumonkey.exp: Likewise.
+	* sidcomp.profiling/runprof.exp: Likewise.
+	* sidcomp.timers/timerbase.exp: Likewise.
+	* sidcomp.timers/timermonkey.exp: Likewise.
+	* sidcomp.timer/timersched.exp: Likewise.
+
+2000-01-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.bsp/dhrystone.exp: Run tests twice so run times get logged
+	in dejagnu console.
+
+2000-01-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/monkey.exp (state_safe_p, state_saved_p): New hooks.
+	(do_one_test): New proc.  Factored out from monkey_test.
+	(monkey_test): Reset all monkey mine hooks at end of test.
+	(monkey_test_state_save, monkey_test_restore_state): New tests for
+	state-snapshot correctness.
+
+	* sidcomp.cgen-cpu/cpumonkey.exp: Set mine hooks before some tests.
+	* sidcomp.memory/memmonkey.exp: Ditto.
+	* sidcomp.glue/gluemonkey.exp: Disable state-snapshot tests for
+	sw-glue-attribbank.
+	* sidcomp.sched/schedmonkey.exp: Register unsaved attributes.
+	* sidcomp.lcd/lcdmonkey.exp: New file.
+	* sidcomp.parport/parmonkey.exp: New file.
+	* sidcomp.glue/sequence.exp: Use traced tests.
+	* sidcomp.parport/parport.exp: Ditto.
+	* sidcomp.glue/seqvalid.exp: Simplify disconnect test.
+
+2000-01-05  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.rtc/rtcdocs.exp: Test hw-visual-clock documentation.
+
+2000-01-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.glue/sequence1.exp: Test unchangeability of "num-outputs".
+	* sidcomp.glue/sequence2.exp, sidcomp.glue/sequence8.exp: Ditto.
+
+2000-01-04  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* sidcomp.parport/parport.exp: Test save/restore. 
+
+2000-01-04  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.cfgroot/multiCB.expect: Update.
+
+1999-12-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.mapper/basicmapper.exp: Add new test for overlap detection.
+
+1999-12-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cgen-cpu/armeit.conf: Disable auto-print? function.
+
+1999-12-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.glue/traffic.exp: Add better support for commented-out
+	partial traffic testing.
+
+1999-12-28  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cfgroot/badconf.exp: Simplify matching logic.  Add verbose
+	message.
+	* sidcomp.cfgroot/*.expect: Forget old error message.
+
+1999-12-28  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.ide/idetrigger.exp: Adopt newly hyphenated watchable names.
+
+1999-12-22  Permaine Cheung  <pcheung@cygnus.com>
+
+	* sidcomp.consoles/socketval.exp: New test file.
+	* sidcomp.consoles/socketinv.exp: New test file.
+
+1999-12-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.ide/idebase.exp: Add new test for boundary save/restore. 
+
+1999-12-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.sched/schedbase.exp: Test for assertion failure due to
+	too-small scale for regular event.
+
+1999-12-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cfgroot/*.expect: Update for new cfgroot message forms.
+	
+1999-12-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.interrupt/arm-interrupt.exp: Use consistent active-low
+	polarity for interrupt output pins.
+
+1999-12-16  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.mmu/arm-remap.exp: Add triggerpoint and state
+	save/restore tests.
+
+1999-12-16  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.mapper/basicmapper.exp: Assert that mapped bus
+	transactions are of the correct width and endianness.
+
+1999-12-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.lcd/lcdbase.exp: Update for renamed hw-lcd* component.
+
+1999-12-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.glue/traffic.exp: Rework to heavily stress
+	attribute<->number conversion.
+
+1999-12-14  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.rtc/ds1642.exp: Add triggerpoint tests.
+	* sidcomp.rtc/ds1742.exp: Likewise.
+
+	* sidcomp.timers/timerbase.exp: Update test case.
+
+1999-12-10  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/docs.exp (doc_exists): Look for docs by any leading
+ 	substring, not just "-"-separated ones.
+
+1999-12-10  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.interrupt/interruptmonkey.exp: New file.
+	* sidcomp.interrupt/arm-interrupt.exp: Add triggerpoint tests.
+
+1999-12-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.sched/schedbase.exp: Test save/restore for num-clients=10.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	
+1999-12-10  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.timers/timerbase.exp: Add triggerpoint tests.
+
+1999-12-09  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.timers/timerbase.exp: Reindent.
+
+	* lib/docs.exp (readme_test): Rename from this ..
+	(doc_test): .. to this. Invoke new doc_* tests.
+	(doc_load): New proc.
+	(readme_exists): Rename from this ..
+	(doc_exists): .. to this. Expand the search for files by removing
+	each trailing element from the component's structured name.
+	(readme_includes_component): Rename from this ..
+	(doc_includes_component): .. to this.
+	(doc_trailing_whitespace): New proc.
+	* sidcomp.cfgroot/cfgrootdocs.exp: Update all callers.
+	* sidcomp.consoles/consdocs.exp: Likewise.
+	* sidcomp.glue/gluedocs.exp: Likewise.
+	* sidcomp.ide/idedocs.exp: Likewise.
+	* sidcomp.interrupt/interruptdocs.exp: Likewise.
+	* sidcomp.mapper/mapperdocs.exp: Likewise.
+	* sidcomp.memory/memdocs.exp: Likewise.
+	* sidcomp.mmu/mmudocs.exp: Likewise.
+	* sidcomp.parport/parportdocs.exp: Likewise.
+	* sidcomp.profiling/profilingdocs.exp: Likewise.
+	* sidcomp.rtc/rtcdocs.exp: Likewise.
+	* sidcomp.sched/scheddocs.exp: Likewise.
+	* sidcomp.timers/timerdocs.exp: Likewise.
+	* sidcomp.uart/uartdocs.exp: Likewise.
+
+	* lib/monkey.exp (monkey_test): Unset more globals.
+
+1999-12-08  Permaine Cheung  <pcheung@cygnus.com>
+
+	* sidcomp.mapper/basicmapper.exp: Rename "buses" to "buses_array".
+	
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Permaine Cheung  <pcheung@cygnus.com>
+
+	* sidcomp.consoles/stdioval.exp: Rename "attr" & get rid of "puts".
+	
+1999-12-07  Faisal khoja  <fkhoja@cygnus.com>
+
+	* sidcomp.parport/parport.exp: New file.
+	
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/monkey.exp: Unset some globals used in other tests.
+	* sidcomp.glue/attribbank.exp: Ditto.
+
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/docs.exp: Temporarily disable this kind of test.
+
+1999-12-07  Permaine Cheung  <pcheung@cygnus.com>
+
+	* sidcomp.bsp/stdioval.exp: New test file.
+	* sidcomp.bsp/stdioinv.exp: Ditto.
+
+1999-12-07  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.mapper/basicmapper.exp: Add many new test cases.
+
+	* sidcomp.consoles/consdocs.exp: New file.
+	* sidcomp.glue/gluedocs.exp: Test sw-glue-attribbank.
+	* sidcomp.parport/parportdocs.exp: New file.
+	* sidcomp.profiling/profilingdocs.exp: New file.
+	* sidcomp.rtc/rtcdocs.exp: Test hw-rtc-sid.
+	* sidcomp.sched/scheddocs.exp: New file.
+	* sidcomp.timer/timerdocs.exp: Likewise.
+	* sidcomp.uart/uartdocs.exp: Likewise.
+
+	* lib/docs.exp (readme_includes_component): Emit a more helpful
+	message upon failure.
+
+1999-12-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.bsp/dhrystone.exp: Test both little- and big-endian mips32.
+	* sidcomp.bsp/mipsbsp.exp: Ditto.
+
+1999-12-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cfgroot/multiCB.expect: Expect newly tested-for error.
+	* sidcomp.mmu/arm-remap.exp: Disconnect accessor before
+	reconnecting.  Test more return values.
+
+1999-12-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.bsp/dhrystone.exp: Run tests just once.  Omit --engine
+ 	argument to use the default.
+
+1999-12-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/cpudefs.exp (run-one-sid-test): Only print run time NOTE if
+	test was rerun several times.
+	* sidcomp.bsp/armbsp.exp: Rerun tests just three times.  Make up
+ 	for this by forking into arm & thumb tests.
+	* sidcomp.bsp/dhrystone.exp: Ditto.  Get ready for mips pbb testing.
+	* sidcomp.bsp/mipsbsp.exp: Get ready for mips pbb testing.
+	* sidcomp.bsp/m32rbsp.exp: New file.  Lightly test m32r.
+
+1999-11-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/cpudefs.exp (sid-run-conf, sid-run-bsp): Define SID_LIBRARY_PATH.
+	* sidcomp.cfgroot/badconf.exp (sid_check_err): Ditto.
+	* sidcomp.cfgroot/libErr.expect: Fix match pattern for improved error
+	message.
+	* sidcomp.cfgroot/wrongOrd.expect: Ditto.
+	* sidcomp.cfgroot/extMiss.expect: Ditto.
+
+1999-11-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/cpudefs.exp (run-one-sid-test): Pass $mach into NOTE:s better.
+	Signal fatal compiler/assembler/linker errors.  Print only one NOTE
+	per sid_run_repetitions.
+	(sid_run): Track last sid execution time.
+
+	* sidcomp.bsp/armbsp.exp: Run only test-*.c.
+	* sidcomp.bsp/mipsbsp.exp: New file: same as armbsp.exp for mips.
+
+	* sidcomp.bsp/dhry21.c: New file: Dhrystone 2.1 benchmark.
+	* sidcomp.bsp/dhrystone.exp: Run it on arm & mips.
+
+	* sidcomp.rtc/rtcmonkey.exp: Test hw-rtc-sid.
+
+1999-11-26  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.memory/memdocs.exp: New file.
+	* sidcomp.glue/traffic.exp: Likewise.
+
+	* sidcomp.cfgroot/badconf.exp (sid_check_err): Close test files.
+
+1999-11-25  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.cfgroot/cfgrootdocs.exp: New file.
+	* sidcomp.glue/gluedocs.exp: Likewise.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/monkey.exp (monkey_test_pin): Only have value-carrying pins.
+	* sidcomp.cfgroot/*.badconf: Use new "relate" command.  Update
+ 	references to deprecated cfgroot pins/attributes.
+	* sidcomp.cfgroot/*.expect: Update for newly tested error conditions.
+	* sidcomp.cfgroot/illegCh.expect: Ditto.  Expect new "invalid
+ 	character" error.
+	* sidcomp.cfgroot/multiDso.badconf: Ditto.  Use ".la" dso's.
+	* sidcomp.glue/*.exp: Update for new "sid::component::relate" call.
+	* sidcomp.glue/sequence.exp: Ditto.  Eliminate driven(void) pin
+	variety.
+	* sidcomp.glue/seqvalid.exp: Ditto.
+	* sidcomp.ide/idetrigger.exp: Ditto.
+	* sidcomp.lcd/lcdbase.exp: Ditto.
+	* sidcomp.memory/*.exp: Ditto.
+	* sidcomp.rtc/ds1642.exp, ds1742.exp: Ditto.
+	* sidcomp.sched/*.exp: Ditto.
+	* sidcomp.timers/*.exp: Ditto.
+	
+1999-11-23  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.ide/idedocs.exp: New file.
+	* sidcomp.interrupt/interruptdocs.exp: Likewise.
+
+1999-11-22  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.mapper/mapperdocs.exp: New file.
+
+1999-11-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/monkey.exp (monkey_test_pin): Don't try to drive an
+	output pin.
+
+	* sidcomp.cfgroot/multiCP.badconf: Adjust tests to stress bad pin
+	connection directions.
+	* sidcomp.cfgroot/multiCP.expect: Expect new error messages.
+	
+	* sidcomp.cfgroot/CBinvaComp.badconf: Fix trap-code pin connection.
+	* sidcomp.cfgroot/CPinvaPin.badconf: Ditto.
+	* sidcomp.cfgroot/comment.badconf: Ditto.
+	* sidcomp.cfgroot/illegCh.badconf: Ditto.
+	* sidcomp.cfgroot/multiCB.badconf: Ditto.
+	* sidcomp.cfgroot/multiSet.badconf: Ditto.
+	* sidcomp.cfgroot/wrongOrd.badconf: Ditto.
+	* sidcomp.cgen-cpu/armeit.conf: Ditto.
+	
+	* sidcomp.cfgroot/CPinvaPin.expect: Fix pin connection error messages.
+	* sidcomp.cfgroot/comment.expect: Ditto.
+	* sidcomp.cfgroot/multiSet.expect: Ditto.	
+	* sidcomp.cfgroot/wrongOrd.expect: Ditto.
+	* sidcomp.cfgroot/wrongOrd3.expect: Ditto.
+
+	* sidcomp.glue/sequence1.exp: Correct tests for output pins.
+	* sidcomp.glue/sequence2.exp: Ditto.
+	* sidcomp.glue/sequence8.exp: Ditto.
+	* sidcomp.glue/seqvalid.exp: Ditto.
+	* sidcomp.memory/at29val.exp: Ditto.
+
+1999-11-19  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.mapper/basicmapper.exp: New file.
+	* sidcomp.mapper/mappermonkey.exp: Likewise.
+
+1999-11-17  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* stdio.exp: Check for constant string.
+	* arm-interrupt.exp: Removed big foreach loop. Added test for save
+	and restore.
+	* timerbase.exp: Likewise.
+
+1999-11-15  Ben Elliston  <bje@cygnus.com>
+
+	* lib/docs.exp: New file.
+	* sidcomp.mmu/mmudocs.exp: Use it.
+	* sidcomp.rtc/rtcdocs.exp: Likewise.
+
+	* sidcomp.memory/at29val.exp: In tests where memory is to be
+	modified, be sure to unlock sectors before programming.
+	(unlock_sector): New convenience proc.
+
+1999-11-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/monkey.exp (random_string): Try harder to generate some
+	valid numbers.
+
+1999-11-12  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.mmu/arm-remap.exp: Don't use "attr" as a variable name,
+	as it seems to be used by something else in DejaGNU. Weird.
+
+1999-11-12  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.mmu/arm-remap.exp: Make $remap a 2-dimensional array
+	that stores two candidate relocations.  Add tests for
+	"remapping?", "num-relocations" and "N-{start,end,reloc-to}"
+	attributes. Alter test for bus accesses around mapped region so
+	that it tests more than one relocation.
+
+1999-11-12  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.cgen-cpu/cpumonkey.exp: Use 3m, not 180s for clarity.
+
+1999-11-10  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.mmu/arm-remap.exp: Add a test case that ensures that the
+	access-port bus handle does not change during the lifetime of the
+	component instance.
+
+1999-11-10  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cgen-cpu/cpumonkey.exp: Test arm7 cpu without
+	restrictions.
+
+1999-11-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cgen-cpu/armimemfault.ms: New puny test.
+
+1999-11-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.consoles/consmonkey.exp: New file.
+
+1999-11-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.bsp/armbsp.exp: Test both PBB and SCACHE engines.
+
+1999-11-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.sched/schedbase.exp: Enable tracing.  Add new tests for
+	NNN-scale attribute.
+
+1999-11-09  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.memory/at29inv.exp: Remove calls to puts. Use the
+	DejaGNU output methods instead.
+
+1999-11-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cfgroot/*: Adapt to renamed gdb & stdio components.
+	* sidcomp.cgen-cpu/armeit.conf: Ditto.
+	* sidcomp.consoles/stdio.exp: Same.
+
+1999-11-05  Permaine Cheung  <pcheung@cygnus.com>
+
+	* sidcomp.confroot/illegCh.expect.solaris: Removed.
+	* sidcomp.cfgroot/badconf.exp: Reverse changes put in yesterday.
+	* sidcomp.cfgroot/illegCh.expect: Update.
+
+1999-11-04  Permaine Cheung  <pcheung@cygnus.com>
+
+	* sidcomp.confroot/illegCh.expect.solaris: New verification file.
+	* sidcomp.cfgroot/extMiss.expect: Update to work on Linux and Solaris.
+	* sidcomp.cfgroot/libErr.expect: Update to work on Linux and Solaris.
+	* sidcomp.cfgroot/symErr.expect: Update to work on Linux and Solaris.
+	* sidcomp.cfgroot/wrongOrd.expect: Update to work on Linux and Solaris.
+	* sidcomp.cfgroot/badconf.exp: Update to work on Linux and Solaris.
+
+1999-11-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.profiling/runprof.exp: New test for gprof component.
+	* sidcomp.profiling/test-prof.c: New file.
+
+1999-11-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.ide/idetrigger.exp: Add new test for multiple triggerpoints
+	on same register.
+
+1999-10-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.memory/at29val.exp: Reindent some tests.  Keep
+ 	intermediate files after test failures.  Fix use of "image-load"
+ 	test indexing variable.
+
+1999-10-26  Permaine Cheung <pcheung@cygnus.com>
+
+	* sidcomp.cfgroot/extMiss.expect: Update for "dso"->"load".
+	* sidcomp.cfgroot/comment.expect: Update.
+
+1999-10-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cfgroot/extMiss.badconf: Update for "dso"->"load".
+
+1999-10-22  Frank Ch. Eigler  <fche@cygnus.com>
+	
+	* lib/monkey.exp: Use "load" not "dso" configuration command.
+	* sidcomp.*/*.exp: Same.
+	* sidcomp.cfgroot/*.badconf: Same.
+
+1999-10-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.bsp/test-insn.c: Increase work factor.  Use
+	register variables to stress CPU throughput.
+
+1999-10-20  Permaine Cheung  <pcheung@cygnus.com>
+
+	* sidcomp.memory/at29xx.exp: New test file.
+	* sidcomp.memory/at29val.exp: New test file.
+	* sidcomp.memory/at29inv.exp: New test file.
+        * sidcomp.cfgroot/extMiss.badconf: New test file.
+        * sidcomp.cfgroot/extMiss.expect: New test file.
+	* sidcomp.cfgroot/badconf.exp: Update to use string match.
+        * sidcomp.cfgroot/illegCh.expect: Update.
+        * sidcomp.cfgroot/wrongOrd.expect: Update.
+        * sidcomp.cfgroot/symErr.expect: Update.
+
+1999-10-20  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.cfgroot/CPinvaComp.expect: Update; CR 101404.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/monkey.exp (monkey_start): Detect sid startup errors.
+	(monkey_test): Same.
+	* sidcomp.bsp/armbsp.exp: Make conditional on $sidtarget_arm.
+	* sidcomp.cgen-cpu/armconf.exp: Ditto.
+	* sidcomp.cgen-cpu/armmisc.exp: Again.
+	* sidcomp.cgen-cpu/cpumonkey.exp: Conditionalize per-cpu tests.
+	* sidcomp.gloss/angel.exp: Predicate on $sidtarget_arm.
+	* sidcomp.mmu/arm-remap.exp: Same.
+	* sidcomp.mmu/mmumonkey.exp: Same.
+	* sidcomp.timers/timerbase.exp: Same.
+	* sidcomp.timers/timermonkey.exp: Same.
+	* sidcomp.timers/timersched.exp: Same.
+	* Makefile.in: Regenerated.
+
+1999-10-20  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.cfgroot/CPinvaComp.expect: Update.
+	* sidcomp.cfgroot/CPinvaPin.expect: Likewise.
+	* sidcomp.cfgroot/illegCh.expect: Likewise.
+	* sidcomp.cfgroot/invaComp.expect: Likewise.
+	* sidcomp.cfgroot/wrongOrd.expect: Likewise.
+
+1999-10-19  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.cfgroot/badconf.exp: Usablilty improvements.
+	* sidcomp.cfgroot/invaComp.expect: Update.
+	* sidcomp.cfgroot/multiDso.expect: Likewise.
+	* sidcomp.cfgroot/unknown.expect: Likewise.
+	* sidcomp.cfgroot/wrongOrd.expect: Likewise.
+
+1999-10-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cfgroot/badconf.exp: Set LTDL_LIBRARY_PATH.  Expand fail
+	message.
+
+1999-10-18  Permaine Cheung  <pcheung@cygnus.com>
+
+	* sidcomp.cfgroot/badconf.exp: New test file.
+
+1999-10-18  Permaine Cheung  <pcheung@cygnus.com>
+
+        * sidcomp.cfgroot/CBinvaComp.badconf: New test file.
+        * sidcomp.cfgroot/CBinvaName.badconf: New test file.
+        * sidcomp.cfgroot/CPinvaComp.badconf: New test file.
+        * sidcomp.cfgroot/CPinvaPin.badconf: New test file.
+        * sidcomp.cfgroot/comment.badconf: New test file.
+        * sidcomp.cfgroot/dupName.badconf: New test file.
+        * sidcomp.cfgroot/dupRel.badconf: New test file.
+        * sidcomp.cfgroot/illegCh.badconf: New test file.
+        * sidcomp.cfgroot/invaComp.badconf: New test file.
+        * sidcomp.cfgroot/invaName.badconf: New test file.
+        * sidcomp.cfgroot/invaRel.badconf: New test file.
+        * sidcomp.cfgroot/libErr.badconf: New test file.
+        * sidcomp.cfgroot/multiCB.badconf: New test file.
+        * sidcomp.cfgroot/multiCP.badconf: New test file.
+        * sidcomp.cfgroot/multiDso.badconf: New test file.
+        * sidcomp.cfgroot/multiSet.badconf: New test file.
+        * sidcomp.cfgroot/setInvAtt.badconf: New test file.
+        * sidcomp.cfgroot/setInvAttV.badconf: New test file.
+        * sidcomp.cfgroot/setInvComp.badconf: New test file.
+        * sidcomp.cfgroot/symErr.badconf: New test file.
+        * sidcomp.cfgroot/unknown.badconf: New test file.
+        * sidcomp.cfgroot/wrongOrd.badconf: New test file.
+        * sidcomp.cfgroot/wrongOrd1.badconf: New test file.
+        * sidcomp.cfgroot/wrongOrd2.badconf: New test file.
+        * sidcomp.cfgroot/wrongOrd3.badconf: New test file.
+        * sidcomp.cfgroot/CBinvaComp.expect: New test file.
+        * sidcomp.cfgroot/CBinvaName.expect: New test file.
+        * sidcomp.cfgroot/CPinvaComp.expect: New test file.
+        * sidcomp.cfgroot/CPinvaPin.expect: New test file.
+        * sidcomp.cfgroot/comment.expect: New test file.
+        * sidcomp.cfgroot/dupName.expect: New test file.
+        * sidcomp.cfgroot/dupRel.expect: New test file.
+        * sidcomp.cfgroot/illegCh.expect: New test file.
+        * sidcomp.cfgroot/invaComp.expect: New test file.
+        * sidcomp.cfgroot/invaName.expect: New test file.
+        * sidcomp.cfgroot/invaRel.expect: New test file.
+        * sidcomp.cfgroot/libErr.expect: New test file.
+        * sidcomp.cfgroot/multiCB.expect: New test file.
+        * sidcomp.cfgroot/multiCP.expect: New test file.
+        * sidcomp.cfgroot/multiDso.expect: New test file.
+        * sidcomp.cfgroot/multiSet.expect: New test file.
+        * sidcomp.cfgroot/setInvAtt.expect: New test file.
+        * sidcomp.cfgroot/setInvAttV.expect: New test file.
+        * sidcomp.cfgroot/setInvComp.expect: New test file.
+        * sidcomp.cfgroot/symErr.expect: New test file.
+        * sidcomp.cfgroot/unknown.expect: New test file.
+        * sidcomp.cfgroot/wrongOrd.expect: New test file.
+        * sidcomp.cfgroot/wrongOrd1.expect: New test file.
+        * sidcomp.cfgroot/wrongOrd2.expect: New test file.
+        * sidcomp.cfgroot/wrongOrd3.expect: New test file.
+
+1999-10-18  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.memory/am29.exp: Add testcases for invalid sector sizes.
+	* sidcomp.memory/at29.exp: Likewise.
+
+1999-10-12  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.memory/am29.exp: Put the component into programming mode
+	before writing a particular test byte.
+
+	* lib/monkey.exp (monkey_test): Include the name of the component
+	being tested when noting the test duration.
+
+1999-10-08  Frank Ch. Eigler  <fche@toenail.to.cygnus.com>
+
+	* lib/monkey.exp (monkey_test): Add support for "s" (seconds)
+	iteration-limit suffix.  Make default test last thirty of them.
+	* sidcomp.glue/gluemonkey.exp: New test file.
+	* sidcomp.rtc/rtcmonkey.exp: New test file.
+	* sidcomp.mmu/mmumonkey.exp: New test file.
+
+1999-10-08  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.memory/am29.exp: New test case.
+	* sidcomp.memory/memmonkey.exp: Money test hw-memory-flash-am29.
+
+1999-10-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.glue/attribval.exp: Correct obsolete parts of last
+	checkin.
+
+1999-10-06  Permaine Cheung  <pcheung@cygnus.com>
+
+	* sidcomp.glue/attribval.exp: Add tests to check for unknown
+	attributes values.
+
+1999-10-06  Ben Elliston  <bje@cygnus.com>
+
+	* lib/monkey.exp (monkey_test): Issue a note, not a warning, when
+	using duration-based testing.
+
+1999-10-05  Ben Elliston  <bje@cygnus.com>
+
+	* lib/monkey.exp (monkey_test): Handle monkey counts suffixed by
+	`h', `m' or `d' to specify a test duration (in hours, minutes or
+	days, respectively) instead of a fixed number of iterations.
+
+1999-10-02  Frank Ch. Eigler  <fche@toenail.to.cygnus.com>
+
+	* lib/cpudefs.exp (sid_run_repetitions): New global to effect
+	repeated runs of a sid execution test.
+	(run-sid-tests): Make $testname even more verbose.  Perform
+	repetition if desired.
+	* sidcomp.bsp/armbsp.exp: Ask for five repetitions for more
+	stable timing measurements.  Use "-mlittle-endian" explicitly.
+
+	* sidcomp.rtc/ds1642.exp: Correct month/day-of-week attribute
+	testing.
+	* sidcomp.rtc/ds1742.exp: Same.
+	
+	* sidcomp.mmu/arm-remap.exp: Use tracing wrapper again.
+
+1999-09-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/cpudefs.exp (run-sid-test): Add arguments for gcc/gcc-opts.
+	Update callers.
+	(run-sid-c-bsp-tests): New proc.
+	(run-one-sid-test): For source files matching "*c", run a gcc/run
+	instead of gas/ld/run test.  Set global $test informatively.
+	(sid_run): Report sid run time via dejagnu "note".
+	* lib/monkey.exp (monkey_test): Set global $test more informatively.
+
+	* sidcomp.cgen-cpu/cpumonkey.exp: Avoid "gdb-register-25" attr alias.
+	
+	* sidcomp.bsp/armbsp.exp: New file: test driver.
+	* sidcomp.bsp/test-insn.c: Reincarnated file: stress insn throughput.
+	* sidcomp.bsp/test-memory.c: Ditto: stress memory throughput.
+
+1999-09-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/monkey.exp (monkey_test_pin): Test for empty pin list first.
+	(monkey_test_bus, monkey_test_attribute): Ditto for their lists.
+
+	* sidcomp.sched/schedmonkey.exp: New file.
+	* sidcomp.cgen-cpu/cpumonkey.exp: New file.  Suffers from several
+	serious restrictions.
+
+1999-09-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lib/monkey.exp (random_string): New proc for structured string
+ 	generation.
+	(monkey_test_attribute): Use it.
+	(*): Use [list] structure to wrap sid_cmd arguments.
+	(monkey_test): Set global "test" explicitly.
+	(pin_safe_p, bus_safe_p, attr_safe_p): Hooks to place monkey mines.
+	(monkey_test_pin, monkey_test_bus, monkey_test_attribute): Obey them.
+	* sidcomp.memory/memmonkey.exp: Keep monkey from stepping on 
+	"image-store" pin.
+
+1999-09-29  Frank Ch. Eigler  <fche@cygnus.com>
+	
+	* lib/cpudefs.exp: New file - moved over from
+	* defs.tcl: Removed.
+	* sidcomp.cgen-cpu/armconf.exp: load_lib new file.
+	* sidcomp.cgen-cpu/armmisc.exp: load_lib new file.
+
+1999-09-28  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cgen-cpu/armeit.tcl (encode): Useless - delete - use [list].
+	* sidcomp.consoles/stdio.exp, sidcomp.glue/attribbank.exp: Ditto.
+	* sidcomp.glue/attribinval.exp, sidcomp.glue/attribval.exp: Again.
+	* sidcomp.glue/seqinval.exp, sidcomp.glue/sequence.exp: Still.
+	* sidcomp.glue/sequence1.exp, sidcomp.glue/sequence2.exp: Some more.
+	* sidcomp.glue/sequence8.exp, sidcomp.glue/seqvalid.exp: Also.
+	* sidcomp.ide/diskio.exp, sidcomp.ide/idebase.exp: Same.
+	* sidcomp.ide/idetrigger.exp, sidcomp.timers/timerbase.exp: Likewise.
+	* sidcomp.interrupt/arm-interrupt.exp: Similarly.
+	* sidcomp.lcd/lcdbase.exp, sidcomp.memory/genericmemory.exp: As before.
+	* sidcomp.rtc/ds1742.exp, sidcomp.sched/schedbase.exp: Yet some.
+
+1999-09-28  Frank Ch. Eigler  <fche@cygnus.com>
+	
+	* sidcomp.ide/idetrigger.exp: Use ":" as name separator for
+ 	triggerpoint watcher pins.  Add test for obsolete version.
+
+1999-09-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.memory/memmonkey.exp: New file: monkey test at29 & generics.
+	* sidcomp.memory/at29.exp: Update for new image load/save attrs/pins.
+	* sidcomp.memory/genericmemory.exp: Ditto.
+	
+1999-09-27  Ben Elliston  <bje@cygnus.com>
+
+	* lib/monkey.exp: New file.
+	* sidcomp.timers/timermonkey.exp: New file.
+
+1999-09-25  Doug Evans  <devans@casey.cygnus.com>
+
+	* sidcomp.cgen-cpu/armmemfault.ms: Update expected output.
+
+	* sidcomp.gloss/angel.exp: Reset component at start.
+
+1999-09-24  Permaine Cheung  <pcheung@cygnus.com>
+
+	* sidcomp.glue/sequence1.exp: New file.
+	* sidcomp.glue/sequence2.exp: Likewise.
+	* sidcomp.glue/sequence8.exp: Likewise.
+	* sidcomp.glue/seqvalid.exp: Likewise.
+	* sidcomp.glue/seqinval.exp: Likewise.
+	* sidcomp.glue/attribval.exp: Likewise.
+	* sidcomp.glue/attribinval.exp: Likewise.
+
+1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cgen-cpu/armeit.conf: Update numeric literal formats.
+	* sidcomp.consiles/stdio.exp: Ditto.
+	* sidcomp.gloss/angel.exp: Ditto.  Turn tracing back on.
+	* sidcomp.glue/seqinval.exp: Ditto.  Add "-1=255" test.  Correct typos.
+	* sidcomp.glue/sequence.exp: Ditto.
+	* sidcomp.glue/seqvalid.exp: Ditto.  Test reduced num-outputs limits.
+	* sidcomp.ide/diskio.exp: Ditto.
+	* sidcomp.ide/idetrigger.exp: Ditto.
+	* sidcomp.interrupt/arm-interrupt.exp: Ditto.
+	* sidcomp.lcd/lcdbase.exp: Ditto.
+	* sidcomp.memory/at29.exp: Ditto.
+	* sidcomp.memory/genericmemory.exp: Ditto.
+	* sidcomp.mmu/arm-remap.exp: Ditto.  Use sid_assert_equals sometimes.
+	* sidcomp.rtc/ds1642.exp: Ditto.
+	* sidcomp.rtc/ds1742.exp: Ditto.
+	* sidcomp.sched/schedbase.exp: Ditto.
+	* sidcomp.sched/schedhost.exp: Ditto.
+	* sidcomp.sched/schedhost2.exp: Ditto.
+	* sidcomp.timers/timerbase.exp: Ditto.
+	* sidcomp.timers/timersched.exp: Ditto.
+
+1999-09-20  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.rtc/ds1642.exp: Add test case for invalid values.
+	* sidcomp.rtc/ds1742.exp: Likewise.
+
+1999-09-19  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.rtc/ds1642.exp: Correctly form the day field when
+	setting the day register.
+	* sidcomp.rtc/ds1742.exp: Likewise.
+
+1999-09-17  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.timers/timerbase.exp: Only create one sensor_pin and
+	assign to it the callback scripts for driven and driven_h4
+	events. (CR 101184)
+	Indent so that the foreach loop is evident to the reader!
+
+1999-09-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* testsuite/sidcomp.gloss/angel.exp: Add "None" pseudo-signal.  
+	Use it in "exception (exit)" test.
+
+1999-09-15  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.rtc/ds1642.exp: Rework for UTC time.
+	* sidcomp.rtc/ds1742.exp: Likewise.
+
+1999-09-13  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.interrupt/arm-interrupt.exp: Correctly set $interrupted
+	with the new sense of the interrupt pin.
+
+	* sidcomp.lcd/lcdbase.exp: Remove debug output.
+	* sidcomp.rtc/ds1742.exp: Likewise.
+	* sidcomp.timers/timerbase.exp: Likewise.
+
+1999-09-10  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.ide/idetrigger.exp: Use %-escaped watchable names for pins.
+
+1999-09-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.memory/genericmemory.exp: Add new test for saving/restoring
+	very large memory buffers.
+
+1999-09-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.sched/schedbase.exp: Match "interleaving" test to account
+	for newly corrected scheduler behavior.
+ 
+1999-09-01  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* sidcomp.consoles/stdio.exp: Test state saving.
+	* sidcomp.interrupt/arm-interrupt.exp: Test save/restore state.
+	* sidcomp.lcd/lcdbase.exp: Likewise.
+	* sidcomp.rtc/ds1742.exp: Likewise.
+	* sidcomp.timers/timerbase.exp: Likewise.
+
+1999-08-28  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cgen-cpu/armeit.conf: Use new loader "verbose?" attribute.
+
+1999-08-26  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.rtc/ds1742.exp: Overhaul for ds1x42 rewrite.
+	* sidcomp.rtc/ds1642.exp: Likewise.
+
+	* sidcomp.ide/idetrigger.exp: Remove call to match_max.
+	* sidcomp.ide/idebase.exp: Likewise.
+	* sidcomp.ide/diskio.exp: Likewise.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-08-24  Ron Unrau  <runrau@cygnus.com>
+
+	* sidcomp.lcd/lcdbase.exp: Drop 0x in constants (for now).
+
+1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.gloss/angel.exp: Set fake cpu's endian attribute.
+
+1999-08-21  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.interrupt/arm-interrupt.exp: Register working interrupt
+	masking as a single pass.
+
+1999-08-19  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.mmu/arm-remap.exp: Group tiny test cases into larger,
+	more sensible tests--report only one pass for each.
+
+1999-08-19  Ron Unrau  <runrau@cygnus.com>
+
+	* sidcomp.lcd/lcdbase.exp: set AC to decrement before doing read.
+
+1999-08-17  Ron Unrau  <runrau@cygnus.com>
+
+	* sidcomp.lcd/lcdbase.exp: change pin names to track component changes
+
+1999-08-16  Ian Carmichael  <iancarm@cygnus.com>
+
+	* sidcomp.cgen-cpu/armeit.tcl: sid::component members renamed.
+	* sidcomp.consoles/stdio.exp: sid::component members renamed.
+	* sidcomp.gloss/angel.exp: sid::component members renamed.
+	* sidcomp.glue/attribbank.exp: sid::component members renamed.
+	* sidcomp.glue/sequence.exp: sid::component members renamed.
+	* sidcomp.ide/diskio.exp: sid::component members renamed.
+	* sidcomp.ide/idebase.exp: sid::component members renamed.
+	* sidcomp.ide/idetrigger.exp: sid::component members renamed.
+	* sidcomp.interrupt/arm-interrupt.exp: sid::component members renamed.
+	* sidcomp.lcd/lcdbase.exp: sid::component members renamed.
+	* sidcomp.memory/at29.exp: sid::component members renamed.
+	* sidcomp.memory/genericmemory.exp: sid::component members renamed.
+	* sidcomp.mmu/arm-remap.exp: sid::component members renamed.
+	* sidcomp.rtc/ds1642.exp: sid::component members renamed.
+	* sidcomp.rtc/ds1742.exp: sid::component members renamed.
+	* sidcomp.sched/schedbase.exp: sid::component members renamed.
+	* sidcomp.sched/schedhost.exp: sid::component members renamed.
+	* sidcomp.sched/schedhost2.exp: sid::component members renamed.
+	* sidcomp.timers/timerbase.exp: sid::component members renamed.
+	* sidcomp.timers/timersched.exp: sid::component members renamed.
+
+1999-08-13  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.cgen-cpu/armeit.conf: New Angel attribute naming.
+
+	* sidcomp.gloss/angel.exp: Couple to an sw-glue-attribbank instead
+	of an ARM CPU for testing.
+	Completely overhaul to reduce endian sensitivity.
+
+1999-08-12  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.cgen-cpu/armeit.conf: Initialise the CPU. Use a
+	sequencer to ensure that program loading occurs second.
+
+	* sidcomp.gloss/angel.exp: Expect no failures.
+
+1999-08-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.rtc/ds1742.exp: Renamed "sid-scheduler-host-precise" -> 
+	"...-accurate".
+	* sidcomp.rtc/ds1642.exp: Ditto.
+
+1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
+
+	* sidcomp.cgen-cpu/armeit.conf: Attributes now in HEX.
+	* sidcomp.gloss/angel.exp: Ditto.
+	* sidcomp.interrupt/arm-interrupt.exp: Ditto.
+	* sidcomp.memory/at29.exp: Ditto.
+	* sidcomp.memory/genericmemory.exp: Ditto.
+
+1999-08-10  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* defs.tcl (build_ltldpath): Compute automatically from ../*.
+
+1999-08-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.cgen-cpu/armeit.conf: Update pin connections to cfgroot.
+
+1999-08-06  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.rtc/ds1642.exp: Fix broken test cases. Tcl's "clock
+	format" command returns values padded with leading zeros.
+	* sidcomp.rtc/ds1742.exp: Likewise.
+
+	* sidcomp.lcd/lcdbase.exp: Fail broken tests. 
+
+1999-07-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.sched/schedbase.exp (*): Use unique conf file name.
+	Add new testing for effects of yield pin.  Rename "yield?".
+	* sidcomp.sched/schedhost.exp (*): Ditto.
+	* sidcomp.sched/schedhost2.exp (*): Ditto.
+
+1999-07-13  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.rtc/ds1642.exp (end_write): Introduce a two second delay
+	before ending writes to catch problems in computing the time delta
+	maintained internally by the RTC.
+	* sidcomp.rtc/ds1742.exp (end_write): Likewise.
+
+1999-07-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp.ide/diskio.exp: Test both big- and little-endian access.
+	* sidcomp.ide/idebase.exp: Use unique sid configuration file name.
+	* sidcomp.ide/idetrigger.exp: New file.
+
+1999-07-07  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.rtc/ds1642.exp: Test against hw-rtc-ds1642.
+	* sidcomp.rtc/ds1742.exp: Test against hw-rtc-ds1742.
+
+1999-07-06  Ben Elliston  <bje@cygnus.com>
+
+	* sidcomp.rtc/ds1642.exp: Test against hw-rtc-dallas/1642.
+
+	* sidcomp.rtc/ds1642.exp: New file.
+	* sidcomp.rtc/ds1742.exp: Likewise.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am: New file.
+	* Makefile.in: Generate.
+	* defs.tcl: Moved over from ../cgen-cpu/.
+	* sidcomp.cgen-cpu/armconf.exp: Moved over from ../cgen-cpu/.
+	* sidcomp.cgen-cpu/armeit.conf: Ditto.
+	* sidcomp.cgen-cpu/armeit.tcl: Ditto.
+	* sidcomp.cgen-cpu/armfiq.cs: Ditto.
+	* sidcomp.cgen-cpu/armhello.ms: Ditto.
+	* sidcomp.cgen-cpu/arminvinsn.ms: Ditto.
+	* sidcomp.cgen-cpu/armirq.cs: Ditto.
+	* sidcomp.cgen-cpu/armmemfault.ms: Ditto.
+	* sidcomp.cgen-cpu/armmisc.exp: Ditto.
+	* sidcomp.cgen-cpu/armutils.inc: Ditto.
+	* sidcomp.consoles/stdio.exp: Moved over from ../consoles/.
+	* sidcomp.gloss/angel.exp: Moved over from ../gloss/.
+	* sidcomp.glue/attribbank.exp: Moved over from ../glue/.
+	* sidcomp.glue/sequence.exp: Ditto.
+	* sidcomp.ide/diskio.exp: Moved over from ../ide/.
+	* sidcomp.ide/idebase.exp: Ditto.
+	* sidcomp.interrupt/arm-interrupt.exp: Moved over from ../interrupt/.
+	* sidcomp.lcd/lcdbase.exp: Moved over from ../lcd/.  Designated two
+	failing tests as xfail.
+	* sidcomp.memory/at29.exp: Moved over from ../memory/.
+	* sidcomp.memory/genericmemory.exp: Ditto.
+	* sidcomp.mmu/arm-remap.exp: Moved over from ../mmu/.
+	* sidcomp.sched/schedbase.exp: Moved over from ../sched/.
+	* sidcomp.sched/schedhost.exp: Ditto.
+	* sidcomp.sched/schedhost2.exp: Ditto.
+	* sidcomp.timers/timerbase.exp: Moved over from ../timers/.
+	* sidcomp.timers/timersched.exp: Ditto.

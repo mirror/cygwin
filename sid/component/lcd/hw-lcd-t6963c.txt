@@ -1,0 +1,154 @@
+* Copyright (C) 1999 Red Hat
+
+* Name
+  hw-lcd-t6963c-0101 hw-lcd-t6963c-0201
+
+* Synopsis
+  Simulates the Toshiba T6963C LCD controller. The controller supports display
+  sizes from 32 to 80 columns and from 2 to 32 lines. The fonts may also be
+  varied from 5X8 dots to 8X8 dots. The chip supports an external display RAM
+  of up to 64 Kbytes. This RAM may be arbitrarily configured between text and
+  graphics, and attributes such as blink and reverse can be specified on a per
+  character basis. The chip comes with a 128 character ROM of predefined fonts.
+  Two ROMS are available: hw-lcd-t6963c-0101 specifies the European standard 
+  font; hw-lcd-t6963c-0201 is the Japanese standard font.
+
+  Buses: bus
+  Accessor: external-ram
+  Pins: row-col FR
+  Attributes: refresh-period-msec display-width display-height font-width
+
+  Library: libt6963c.la
+  Symbol name: t6963c_component_library
+
+* Functionality
+  - Modeling
+    The LCD controller model is somewhat abstracted from the physical device:
+
+    o All commands in the model are executed instantaneously, while the real
+      device requires significant time to execute a command. As a result, the
+      status flag in the model always shows "ready".
+
+    o The real device has a number of shift/latch pins that are used to drive
+      the display. These are replaced by 2 pins in the model. The FR (frame) 
+      pin is driven to 1 to identify that a new frame is starting, and driven 
+      to 0 when the frame is finished. The row-col pin is driven once for each
+      "on" pixel in the display, and the value on the pin is the [X,Y] co-
+      ordinates of the pixel, encoded as two adjacent 16-bit values in the 
+      32-bit pin value.
+
+      With these two pins, a display refresh cycle starts when the FR pin is
+      asserted; the [X,Y] co-ordinates of all the "on" pixels are then 
+      transmitted on the row-col pin; and the FR pin is de-asserted to end 
+      the refresh cycle.
+
+    o The physical device uses an external crystal to set the duty cycle.
+      The model uses the refresh-period-msec attribute to communicate with
+      the scheduler to set the refresh rate.
+
+      To reduce system overhead, the model tries to reduce its interaction
+      with the scheduler and display. Specifically, a single refresh cycle is 
+      initiated if there is a write to the component, to capture any internal
+      state changes that may affect the display. Because several writes are
+      often required to effect a meaningful change, the refresh is delayed to
+      occur refresh-period-msec milliseconds after the first write. As well,
+      the refresh is continued periodically if blink is enabled.
+
+    o The physical device uses a number of pins to set the display geometry
+      (MDS, MD0-3) and font width (FS0-1). The model uses the display-width,
+      display-height, and font-width attributes to set these parameters.
+
+    o Screen Peek and Screen Copy are not (currently) supported.
+
+    o Dual-Scan is not (currently) supported.
+
+  - Behaviors
+    * Configuration
+
+      refresh-period-msec: used specify the refresh period (in milliseconds)
+      for continuous update modes such as blink.
+
+      display-width: specifies the number of columns in pixels. Legal values
+      are those that can be represented by the MD2-MD3 pins on the real chip.
+
+      display-height: specifies the number of rows in characters (each 
+      each character is 8 pixels high). Legal values correspond to the 
+      single-scan (ie. non-DUAL mode) values that can be represented by the 
+      MDS, MD0, and MD11 pins on the real chip.
+
+      font-width: specifies the width of each character in pixels.
+      Corresponds to the values specifiable by the FS0-1 pins on the real chip.
+ 
+    * Display
+
+      See discussion of the FR and row-col pins in Modeling section above
+
+  - SID conventions
+    * This is a functional component
+    * Save/restore is supported via the state-snapshot attribute
+    * Trigger point support is available on the following registers:
+      SR, X-ADRS, Y-ADRS, Offset, ADP, TH, GH, TA, and GA.
+
+* Environment
+  - Related components
+    * The T6963C requires an external memory for its display RAM. This RAM
+      can be any size up to 64KBytes. Besides the memory (and CPU bus), the 
+      LCD controller is usually connected to a display of some kind. Clearly,
+      the display component must be aware of the refresh protocol used by the 
+      T6963C model. Finally, the scheduler is typically used to set up the 
+      time between refreshes of the display.
+
+    * The following configuration file segment shows how the LCD controller
+      can be connected to 64K external RAM, the tcl based display, and the 
+      host-time scheduler:
+
+      new hw-lcd-t6963c-0101 lcd	# Standard European font
+      new hw-visual-lcd display		# The display is implemented in Tcl
+      new sid-sched-host sched		# Use the real-time scheduler
+      
+      # scheduling (must appear before pin assignments)
+      set sched num-clients 1
+      set sched 0-regular? 1
+      set sched 0-time 500		# in msec
+
+      # display size is in pixels - ie. font-width*display-height
+      set display width 160		# 20 chars X 8 pixels per char
+      set display height 48		# 6 lines of 8 pixels per line
+
+      # lcd geometry values must match allowed pin settings
+      set lcd display-width 32		# 32 chars (closest to 20)
+      set lcd display-height 6		# 6 rows/lines
+
+      # connect the LCD to the scheduler
+      connect-pin sched 0-event -> lcd refresh-sync-event
+      connect-pin sched 0-control <- lcd refresh-sync-control
+      # connect the LCD to the display
+      connect-pin lcd row-col -> display row-col
+      connect-pin lcd FR -> display FR
+
+      # connect external display ram
+      new hw-memory-ram/rom-basic d-ram
+      set d-ram size 65535
+      connect-bus lcd external-ram d-ram read-write-port
+
+
+* SID interface reference
+  - low level:
+    * pins
+      - FR | output | binary | display
+      - row-col | output | 2 shorts as a 32-bit value | display
+
+    * buses
+      - bus | 0 to 1 | byte-wide access
+
+    * accessors
+      - external-ram | 0 to 0xffff | byte-wide read/write
+
+    * attributes
+      - refresh-period-msec | setting | any positive value | 500 | configuration
+      - display-width | setting | 32, 40, 64, 80 | 80 | configuration
+      - display-height | setting | 2, 4, 6, ... 16 | 16 | configuration
+      - font-width | setting | 5, 6, 7, 8 | 8 | configuration
+
+* References
+  T6963C Dot Matrix LCD Control LSI (from the Toshiba web site)

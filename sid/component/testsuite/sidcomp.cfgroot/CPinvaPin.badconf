@@ -1,0 +1,73 @@
+# This conf file contains connect-pin command with invalid pin name and invalid direction
+
+# configuration logging
+set main verbose? 1
+
+# component libraries
+load libcgencpu.la cgen_component_library
+load libconsoles.la console_component_library
+load libgloss.la gloss_component_library
+load libinterrupt.la interrupt_component_library
+load libloader.la loader_component_library
+load libmapper.la mapper_component_library
+load libmemory.la mem_component_library
+load libmmu.la mmu_component_library
+load libsched.la sched_component_library
+load libtimers.la timer_component_library
+
+# Components
+
+new hw-cpu-arm7t cpu
+new sw-load-elf loader
+new sid-io-stdio stdio
+new sw-gloss-arm/angel angel
+new hw-interrupt-arm/ref intctrl
+new hw-mapper-basic bus
+new hw-remap/pause-arm/ref remapper
+new sid-sched-host host-sched
+new sid-sched-sim target-sched
+new hw-memory-ram/rom-basic mem
+new hw-timer-arm/ref-sched timer1
+new hw-timer-arm/ref-sched timer2
+
+# Scheduler
+
+set target-sched enabled? 1
+set target-sched num-clients 2
+
+set host-sched enabled? 1
+set host-sched num-clients 1
+set host-sched 0-regular? 1
+set host-sched 0-time 50
+
+connect-pin target-sched 0-control <- timer1 divided-clock-control
+connect-pin target-sched 1-control <- timer2 divided-clock-control
+connect-pin target-sched 0-event -> timer1 divided-clock-event
+connect-pin target-sched 1-event -> timer2 divided-clock-event
+connect-pin host-sched 0-event -> stdio poll
+
+# Component relationships
+relate angel cpu cpu
+
+# Main pin connections
+connect-pin main perform-activity -> host-sched advance
+connect-pin main perform-activity -> target-sched advance
+connect-pin main starting -> loader load!
+connect-pin main perform-activity -> cpu step!
+
+# ELF loader
+connect-pin loader start-pc-set -> cpu start-pc-set!
+connect-pin loader endian-set -> cpu endian-set!
+connect-bus loader load-accessor bus access-port
+
+# Gloss support
+connect-pin cpu ttttrap <-> angel trap		# pin should be trap
+connect-pin cpu trap-code -> angel trap-1-code	# pin should be trap-code
+connect-pin cpu trap <-> angel 1		# pin should be fault
+connect-pin cpu trap-code - angel fault-code	# invalid direction
+connect-pin cpu halt! >-< angel halt!		# invalid direction
+connect-pin angel process-signal -< main stop!  # invalid direction
+connect-pin angel debug-tx > stdio stdout	# invalid direction
+connect-pin angel debug-tx . stdio stdout	# invalid direction
+connect-pin angel debug-rx <- bus access-port	# invalid pin name
+

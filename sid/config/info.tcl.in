@@ -1,0 +1,13 @@
+# additional configure-time settings
+
+global prefix
+set prefix "@prefix@"
+set enable_shared "@enable_shared@"
+
+# pull out "--enable-targets"/"--target" settings
+global sidtarget
+set sidtarget(arm) @sidtarget_arm@
+set sidtarget(mips) @sidtarget_mips@
+set sidtarget(m32r) @sidtarget_m32r@
+set sidtarget(m68k) @sidtarget_m68k@
+set sidtarget(ppc) @sidtarget_ppc@

@@ -1,0 +1,1090 @@
+#! /usr/bin/env perl
+# -*- perl -*-
+#
+# Emulate a standalone simulator.  Construct a sid configuration file
+# and run it.
+
+#use strict;
+use Getopt::Long;
+require 5.004;
+
+# sid component library pointers: AUTOCONF these!
+$sidsharedir="@prefix@/share/sid";
+$sidsuffix_la=".la";
+$sidprefix="lib";
+
+# sid executable pointers
+$sid=$ENV{'SID'} ? $ENV{'SID'} : "sid"; # look in $SID or install tree
+
+
+%cpu_comptype = (
+		 "arm" => "hw-cpu-arm7t",
+		 "thumb" => "hw-cpu-arm7t",
+	         # INSERT NEW ENTRIES HERE
+		 "m32r" => "hw-cpu-m32r/d"
+		 );
+
+%gloss_comptype = (
+		   "arm" => "sw-gloss-arm/angel",
+		   "thumb" => "sw-gloss-arm/angel",
+	           # INSERT NEW ENTRIES HERE
+		   "m32r" => "sw-gloss-m32r/libgloss"
+		   );
+
+%gloss_memspecs = (
+		   "arm" => "0x00000000,0x00800000",
+		   "thumb" => "0x00000000,0x00800000",
+	           # INSERT NEW ENTRIES HERE
+		   "m32r" => "0x00000000,0x00800000"
+		  );
+
+
+
+# ----------------------------------------------------------------------------
+# Consume argument list
+
+$opt_cpu="";
+$opt_help=0;
+$opt_verbose=0;
+$opt_save_temps=0;
+$opt_no_run=0;
+$opt_trace_extract=0;
+$opt_trace_semantics=0;
+$opt_trace_core=0;
+$opt_trace_core_visual=0;
+@opt_memory_region = ();
+$opt_gdb=0;
+$opt_persistent=0;
+$opt_gprof=0;
+$opt_tksm=0;
+$opt_board="gloss-stdio";
+$opt_engine="pbb";
+$opt_EB=0;
+$opt_EL=0;
+$opt_sidrtc="";
+$opt_sidcodec="";
+@opt_wrap = ();
+
+$any_tcl = 0;
+
+
+# (see perldoc Getopt::Long)
+@options = (	   
+	    "cpu=s",
+	    "help!",
+	    "verbose!",
+	    "save-temps!",
+	    "trace-extract!",
+	    "trace-semantics!",
+	    "trace-core!",
+	    "trace-core-visual!",
+	    "memory-region=s@",
+	    "gdb=i",
+	    "tv=i",
+	    "tksm!",
+	    "board=s",
+	    "engine=s",
+	    "EB!",
+	    "EL!",
+	    "persistent!",
+	    "no-run!",
+	    "insn-count=i",
+	    "gprof!",
+	    "sidrtc=s",
+	    "sidcodec=s",
+	    "wrap=s@",
+);
+
+sub usage {
+  print STDERR "
+Usage: $0 [option ..] [--] [exec args ..]
+Options:
+ --help                     Print this help message.
+ --cpu=CPU                  Select target processor                     [none]
+ --verbose                  Turn on various run-time verbosity settings.  [no]
+ --save-temps               Keep generated sid configuration file.        [no]
+ --trace-extract            Turn on CPU insn decode tracing.              [no]
+ --trace-semantics          Turn on CPU insn execute tracing.             [no]
+ --trace-core               Turn on bus access tracing.                   [no]
+ --trace-core-visual        Turn on visual bus access tracing.            [no]
+ --memory-region=BASE,SIZE  Add RAM region from BASE to BASE+SIZE-1.      [no]
+ --gdb=PORT                 Add a gdb/debugger interface on TCP port.   [none]
+ --board=BOARD              Model given board or system.               [gloss]
+ --engine=scache|pbb        Set given cgen CPU engine.                   [pbb]
+ -EB | -EL                  Set powerup CPU mode to big/little endian   [auto]
+ --tksm                     Add an experimental Tk system monitor         [no]
+ --persistent               Rerun top-level loop indefinitely             [no]
+ --no-run                   Make config file (--save-temps) and exit.     [no]
+ --insn-count=N             Block of uninterrupted ticks for insns     [10000]
+ --gprof                    GPROF-profile, collect every N ticks          [no]
+ --wrap=COMPONENT           Turn on SID API tracing for named component [none]
+";
+  exit (0);
+}
+
+sub configure_gloss
+  {
+    my $board = $_[0];
+
+    $memspecs = $gloss_memspecs{$opt_cpu};
+    @regions = split (/:/, $memspecs);
+    foreach $region (@regions)
+      {
+	push @opt_memory_region, $region;
+      }
+
+    $gloss_component_type = $gloss_comptype{$opt_cpu} || die "Unknown cpu $opt_cpu for gloss component type\n";
+    $first_section .= "# gloss\n" .
+      &sidconf_new("$gloss_component_type", "gloss") . "\n";
+    
+    $second_section .= "# gloss
+relate gloss cpu cpu
+connect-pin init-sequence output-2 -> gloss reset
+connect-pin cpu trap <-> gloss trap
+connect-pin cpu trap-code -> gloss trap-code
+set gloss verbose? $opt_verbose
+connect-bus gloss target-memory $bus_upstream
+";
+
+    if ($#exec_args >= 0) {
+      $second_section .= "# args
+set gloss command-line \"$exec @exec_args\"
+";
+    }
+
+    # pick tty of choice
+    if ($board =~ /tty/)
+      {
+        $any_tcl = 1;
+  
+        $first_section .= "# gloss <-> tty\n" .
+	    &sidconf_new("hw-visual-tty", "tty") . "\n";
+	    $third_section .= "# gloss <-> tty
+relate tty \"$gloss_component_type gloss\" gloss
+";
+      }
+
+    # check if gdb option is not specified
+    if ($opt_gdb == 0)
+      { 
+	# gloss-stdio only allowed if gdb not specified 
+        if ($board =~ /stdio/)
+          {
+  	    $first_section .= "# gloss <-> stdio\n" .
+	      &sidconf_new("sid-io-stdio", "stdio") . "\n";
+	    $second_section .= "# gloss <-> stdio
+set host-sched 0-regular? 1
+set host-sched 0-time 150 # apprx. human perception limit
+connect-pin host-sched 0-event -> stdio poll
+connect-pin gloss debug-tx -> stdio stdout
+connect-pin gloss debug-rx <- stdio stdin
+";
+          }
+        $second_section .= "# gloss w/o gdb
+connect-pin gloss process-signal -> main stop!
+connect-pin gloss process-signal -> yield-net input
+";
+      }
+    # gloss gdb connections handled later in gdb section
+}
+
+my @ARGV_COPY = @ARGV;
+
+# handle args
+&GetOptions(@options);
+
+# handle help
+if ($opt_help) {
+  &usage;
+}
+
+# handle leftover options
+$exec = $#ARGV >= 0 ? (shift @ARGV) : "";
+@exec_args = ();
+foreach $arg (@ARGV) {
+  # The double quotemeta() call is intended to allow arguments containing
+  # weird characters to go through both the cfgroot parser AND the run-time
+  # target libgloss parser.
+  push @exec_args, quotemeta(quotemeta($arg)); 
+}
+
+#if (!$exec && !$opt_gdb)
+#  {
+#    warn "Executable name not supplied";
+#  }
+
+if ($exec)
+  {
+    die "Cannot read executable `$exec'" if (! -r $exec && ! $opt_no_run);
+  }
+
+# infer --save-temps from --no-run
+if ($opt_no_run && (! $opt_save_temps)) 
+  {
+    $opt_save_temps = 1;
+  }
+
+
+# complete component library list
+%component_libs=(
+		 "audio" => "audio_component_library", 
+		 "cgencpu" => "cgen_component_library", 
+		 "consoles" => "console_component_library",
+		 "gdb" => "gdb_component_library",
+		 "gloss" => "gloss_component_library",
+		 "glue" => "glue_component_library",
+		 "ide" => "ide_component_library",
+		 "interrupt" => "interrupt_component_library",
+		 "hd44780u" => "hd44780u_component_library",
+		 "loader" => "loader_component_library",
+		 "mapper" => "mapper_component_library",
+		 "memory" => "mem_component_library",
+		 "mmu" => "mmu_component_library",
+		 "parport" => "parport_component_library",
+		 "prof" => "prof_component_library",
+		 "rtc" => "rtc_component_library",
+		 "sched" => "sched_component_library",
+		 "tclapi" => "tcl_bridge_library",
+		 "timers" => "timer_component_library",
+		 "uart" => "uart_component_library"
+);
+
+
+# ----------------------------------------------------------------------------
+# Configuration file construction
+
+
+$whoami=qx{whoami}; chop ($whoami);
+$hostname=qx{hostname}; chop ($hostname);
+$date=qx{date}; chop ($date);
+$uname=qx{uname}; chop ($uname);
+$version=q$Id$;
+$zeroth_section = "# sid configuration file
+# created by $version
+# run by $whoami @ $hostname ($uname) at $date
+# args: @ARGV_COPY
+set main verbose? $opt_verbose
+set main persistent? $opt_persistent
+";
+
+
+$cpu_component_type = $cpu_comptype{$opt_cpu} || die "Unknown cpu $opt_cpu for cpu component type\n";
+$first_section = "# first section\n" .
+  &sidconf_new("$cpu_component_type", "cpu") . "\n" .
+  &sidconf_new("hw-mapper-basic", "mapper") . "\n" .
+  &sidconf_new("hw-glue-sequence-8", "init-sequence") . "\n" .
+  &sidconf_new("hw-glue-sequence-1", "hw-reset-net") . "\n" .
+  &sidconf_new("hw-glue-sequence-8", "deinit-sequence") . "\n" .
+  &sidconf_new("hw-glue-sequence-1", "yield-net") . "\n" .
+  &sidconf_new("sid-sched-host-accurate", "host-sched") . "\n" .
+  &sidconf_new("sid-sched-sim", "target-sched") . "\n" .
+  "";
+
+if ($opt_trace_core || $opt_trace_core_visual) 
+  {
+    $first_section .= "# core tracing\n" .
+      &sidconf_new("hw-glue-probe-bus", "bus-probe") . "\n";
+    $bus_upstream = "bus-probe upstream";
+  }
+else
+  {
+    $bus_upstream = "mapper access-port";
+  }
+
+if ($opt_insn_count)
+  {
+    $cpu_insn_count = $opt_insn_count; 
+  } 
+else
+  {
+    $cpu_insn_count = 10000;
+  }
+
+if ($opt_gprof)
+  { 
+    $first_section .= "# gprof\n" .
+      &sidconf_new("sw-profile-gprof", "gprof") . "\n";
+  }
+
+$second_section = "# second section
+# settings
+set cpu step-insn-count $cpu_insn_count
+set cpu trace-result? $opt_trace_semantics
+set cpu trace-extract? $opt_trace_extract
+set host-sched num-clients 10 # large enough?
+set target-sched num-clients 10 # large enough?
+# pin connections
+connect-pin main perform-activity -> host-sched advance
+connect-pin main perform-activity -> target-sched advance
+connect-pin main starting -> init-sequence input
+connect-pin main stopping -> deinit-sequence input
+connect-pin init-sequence output-0 -> hw-reset-net input
+connect-pin hw-reset-net output-0 -> cpu reset!
+connect-pin target-sched 0-event -> cpu step!
+connect-pin target-sched 0-control <- cpu step-cycles
+connect-pin yield-net output-0 -> cpu yield
+connect-pin yield-net output-0 -> host-sched yield
+# bus connections
+connect-bus cpu insn-memory $bus_upstream
+connect-bus cpu data-memory $bus_upstream
+";
+
+
+if ($opt_gprof)
+  {
+    $second_section .= "# gprof connections
+connect-pin target-sched 0-event -> gprof sample
+connect-pin deinit-sequence output-7 -> gprof store
+relate gprof target-component cpu
+set gprof value-attribute pc
+set gprof bucket-size 4 # bytes per bucket
+";
+  }
+
+if ($opt_trace_core || $opt_trace_core_visual)
+  {
+    $second_section .= "# core tracing
+connect-bus bus-probe downstream mapper access-port
+";
+  }
+
+if ($opt_trace_core)
+  {
+    $second_section .= "set bus-probe trace? 1\n";  
+  }
+
+$third_section = "";
+if ($opt_EB && $opt_EL) { die "Both -EB and -EL specified\n"; }
+if (!$opt_EB && !$opt_EL && !$exec) { warn "Should specify executable or endianness"; &usage; }
+if ($opt_EB) { $third_section .= "set cpu endian big\n"; }
+if ($opt_EL) { $third_section .= "set cpu endian little\n"; }
+
+
+# ----------------------------------------------------------------------------
+# Board-dependent logic
+
+
+if ($opt_board eq "none")
+  {
+    $memspecs = $gloss_memspecs{$opt_cpu} || die "Unknown cpu $opt_cpu for gloss memory specs\n";
+    @regions = split (/:/, $memspecs);
+    foreach $region (@regions)
+      {
+	push @opt_memory_region, $region;
+      }
+  }
+elsif ($opt_board =~ /gloss/)
+  {
+    configure_gloss($opt_board);
+  }
+elsif ($opt_board =~ /pid7t/) 
+  {
+    # XXX: incorrect!
+    # XXX: what about SRAM, SSRAM memory regions???
+
+    if ($opt_board =~ /cygmon/)
+      {
+	die "board pid7t-cygmon only supported in little-endian mode (-EL)\n" unless ($opt_EL);
+	unshift @opt_memory_region, ( "0x04000000,0x00100000,file=$sidsharedir/armpid-cygmon.img,read-only" );
+      }
+    elsif ($opt_board =~ /eCosstub/)
+      {
+	die "board pid7t-eCos only supported in little-endian mode (-EL)\n" unless ($opt_EL);
+	unshift @opt_memory_region, ( "0x04000000,0x00100000,file=$sidsharedir/armpid-eCos.img,read-only" );
+      }
+    else
+      {
+	unshift @opt_memory_region, ( "0x04000000,0x00100000" ); # default 1MB ROM - writeable
+      }
+
+    unshift @opt_memory_region, ( "0x00000000,0x01000000" ); # default 16MB RAM
+
+    $first_section .= "# pid7t components\n" .
+      &sidconf_new("hw-remap/pause-arm/ref", "remapper") . "\n" .
+      &sidconf_new("hw-timer-arm/ref-sched", "timer1") . "\n" .
+      &sidconf_new("hw-timer-arm/ref-sched", "timer2") . "\n" .
+      &sidconf_new("hw-interrupt-arm/ref", "intctrl") . "\n" .
+      &sidconf_new("hw-uart-ns16550", "uart1") . "\n" .
+      &sidconf_new("hw-uart-ns16550", "uart2") . "\n" .
+      &sidconf_new("hw-parport-ps/2", "parport") . "\n" .
+      "";
+
+    $second_section .= "# pid7t control connections
+connect-pin target-sched 2-control <- timer1 divided-clock-control
+connect-pin target-sched 2-event -> timer1 divided-clock-event
+set target-sched 2-scale 1/4  # artificial speed-up
+connect-pin timer1 interrupt -> intctrl interrupt-source-4
+connect-pin target-sched 3-control <- timer2 divided-clock-control
+connect-pin target-sched 3-event -> timer2 divided-clock-event
+set target-sched 3-scale 1/4  # artificial speed-up
+connect-pin timer2 interrupt -> intctrl interrupt-source-5
+connect-pin intctrl interrupt -> cpu nirq
+connect-pin intctrl fast-interrupt -> cpu nfiq
+connect-pin hw-reset-net output-0 -> uart1 Reset
+connect-pin hw-reset-net output-0 -> uart2 Reset
+connect-pin hw-reset-net output-0 -> intctrl reset
+connect-pin hw-reset-net output-0 -> timer1 reset
+connect-pin hw-reset-net output-0 -> timer2 reset
+connect-pin uart1 INTR -> intctrl interrupt-source-8
+connect-pin uart2 INTR -> intctrl interrupt-source-9
+connect-pin parport INTP -> intctrl interrupt-source-10
+# pid7t memory map
+connect-bus mapper intctrl:[0xA000000,0xA000013] intctrl irq-registers
+connect-bus mapper intctrl:[0xA000100,0xA00010F] intctrl fiq-registers
+connect-bus mapper timer1:[0xA800000,0xA80000F] timer1 registers
+connect-bus mapper timer2:[0xA800020,0xA80002F] timer2 registers
+connect-bus mapper remapper:[0xB000000,0xB000037] remapper registers
+connect-bus mapper uart1:[0xD800000,0xD80001F,4,1] uart1 Bus
+connect-bus mapper uart2:[0xD800020,0xD80003F,4,1] uart2 Bus
+connect-bus mapper parport:[0xD800040,0xD80005F,4,1] parport Bus
+# set uart unframed mode
+set uart1 sio-framing? 0
+set uart2 sio-framing? 0
+# remapper configuration
+# NB: remapping polarity is opposite to document
+set remapper num-relocations 1
+set remapper 0-start 0x0
+set remapper 0-end 0xFFFF
+set remapper 0-reloc-to 0x04000000
+";
+
+    # reconnect bus masters to pass through remapper
+    $third_section .= "# remapper reconnection
+connect-bus remapper all $bus_upstream
+disconnect-bus cpu insn-memory $bus_upstream
+connect-bus cpu insn-memory remapper access-port
+disconnect-bus cpu data-memory $bus_upstream
+connect-bus cpu data-memory remapper access-port
+";
+
+    # create uart <-> real world connections
+    if ($opt_board =~ /normalmap/)
+      {
+    $third_section .= "# disable remapper
+set remapper remapping? no
+";
+      }
+
+      # pull in this configuration.
+       configure_uart1_uart2();
+  }
+elsif ($opt_board =~ /^cma110/) 
+  {
+    # missing:
+    # PS/2 kbd/ms, PCI, flash, gloss
+
+    unshift @opt_memory_region, ( "0x00000000,0x00800000" ); # default 8MB RAM
+    if ($opt_board =~ /:cma222/)
+      {
+
+        $first_section .= "# cma110/cma222 specific parts\n" .
+	  &sidconf_new("hw-timer-arm/ref-sched", "timer") . "\n" .
+	  &sidconf_new("hw-interrupt-cogent/cma222", "intctrl") . "\n" .
+	  "";
+
+        $second_section .= "# cma222 control connections
+connect-pin target-sched 2-control <- timer divided-clock-control
+connect-pin target-sched 2-event -> timer divided-clock-event
+connect-pin timer interrupt -> intctrl interrupt-source-4
+connect-pin intctrl interrupt -> cpu nirq
+# connect the on-cpu board devices
+connect-bus mapper intctrl:[0xF600000,0xF600037] intctrl irq-registers
+connect-bus mapper timer:[0xF700020,0xF70003F] timer registers
+";
+      }
+    else
+      {
+        die "Unknown board `$opt_board'\n";
+      }
+
+    $first_section .= "# cma110 common parts\n" .
+      &sidconf_new("hw-uart-ns16550", "uart1") . "\n" .
+      &sidconf_new("hw-uart-ns16550", "uart2") . "\n" .
+      &sidconf_new("hw-parport-ps/2", "parport") . "\n" .
+      &sidconf_new("hw-rtc-ds1642", "rtc") . "\n" .
+      &sidconf_new("hw-lcd-hd44780u-a02", "lcd") . "\n" .
+      &sidconf_new("hw-visual-lcd", "display") . "\n" .
+      "";
+
+    $second_section .= "# cma110 control connections
+connect-pin hw-reset-net output-0 -> uart1 Reset
+connect-pin hw-reset-net output-0 -> uart2 Reset
+connect-pin hw-reset-net output-0 -> timer reset
+connect-pin uart1 INTR -> intctrl interrupt-source-2
+connect-pin uart2 INTR -> intctrl interrupt-source-1
+connect-pin parport INTP -> intctrl interrupt-source-4
+# configure the clock
+set host-sched num-clients 10
+set host-sched 0-regular? 1
+set host-sched 0-time 1000 # 1 sec
+connect-pin host-sched 0-event -> rtc clock
+connect-pin rtc clock-control -> host-sched 1-control
+connect-pin rtc clock-event <- host-sched 1-event
+# configure the lcd
+#set display width 40 # 8 chars X 5 pixels per char
+# note that hw-lcd-hd44780u may not support width of 80; this board
+# has one though.
+set display width 80 # 16 chars X 5 pixels per char
+set display height 16 # two lines of 8 pixels
+connect-pin host-sched 9-event -> lcd refresh-sync-event
+connect-pin host-sched 9-control <- lcd refresh-sync-control
+connect-pin lcd row-col -> display row-col
+connect-pin lcd FR -> display FR
+# memory map
+# 8MB main memory
+#connect-bus PCI pcibus:[0x4000000,0x5FEFFFF] pcibus config-space
+#connect-bus ??? ??????:[0x5FF0000,0x5FFFFFF] v360epc registers
+# ARM EPROM/FLASH memory
+connect-bus mapper rtc:[0xE800000,0xE803FFF] rtc read-write-port
+connect-bus mapper uart1:[0xE900000,0xE90001F,4,1] uart1 Bus
+connect-bus mapper uart2:[0xE900020,0xE90003F,4,1] uart2 Bus
+connect-bus mapper parport:[0xE900080,0xE90009F,4,1] parport Bus
+# kbd/ms
+connect-bus mapper lcd:[0xE900100,0xE90010F,4,1] lcd bus
+# DIP switches
+#connect-bus PCI pcibus:[0xF200000,0xF2FFFFF] pcibus control-registers
+# set uart unframed mode
+set uart1 sio-framing? 0
+set uart2 sio-framing? 0
+";
+
+    # pull in this configuration.
+    configure_uart1_uart2();
+
+  }
+else
+  {
+    die "Unknown board `$opt_board'\n";
+  }
+
+#
+# this is used by both the arm710t and cogent cma110 boards.
+sub configure_uart1_uart2
+  {
+    # create uart <-> real world connections
+    if ($opt_board =~ /uart1:stdio/)
+      {
+	$first_section .= "# stdio1\n" .
+	  &sidconf_new("sid-io-stdio", "stdio1") . "\n";
+	$second_section .= "# stdio1 polling
+set host-sched 0-regular? 1
+set host-sched 0-time 50
+connect-pin host-sched 0-event -> stdio1 poll
+";
+	$third_section .= "# stdio1 connection
+connect-pin uart1 Sout -> stdio1 stdout
+connect-pin uart1 Sin <- stdio1 stdin
+";
+      }
+
+    if ($opt_board =~ /uart2:stdio/)
+      {
+	$first_section .= "# stdio2\n" .
+	  &sidconf_new("sid-io-stdio", "stdio2") . "\n";
+	$second_section .= "# stdio2 polling
+set host-sched 0-regular? 1
+set host-sched 0-time 50
+connect-pin host-sched 0-event -> stdio2 poll
+";
+	$third_section .= "# stdio2 connection
+connect-pin uart2 Sout -> stdio2 stdout
+connect-pin uart2 Sin <- stdio2 stdout
+";
+      }
+
+    if ($opt_board =~ /uart1:tty/)
+      {
+	$any_tcl = 1;
+
+	$first_section .= "# tty1\n" .
+	  &sidconf_new("hw-visual-tty", "tty1") . "\n";
+	$third_section .= "# tty1 auto-connection
+relate tty1 \"hw-uart-ns16550 uart1\" uart1
+";
+      }
+
+    if ($opt_board =~ /uart2:tty/)
+      {
+	$any_tcl = 1;
+
+	$first_section .= "# tty2\n" .
+	  &sidconf_new("hw-visual-tty", "tty2") . "\n";
+	$third_section .= "# tty2 auto-connection
+relate tty2 \"hw-uart-ns16550 uart2\" uart2
+";
+      }
+
+    if ($opt_board =~ /uart1:([0-9]+)/)
+      {
+	$port = $1;
+
+	$first_section .= "# uart1 socket\n" .
+	  &sidconf_new("sid-io-socket-server", "uart1-console") . "\n";
+
+	$second_section .= "# uart1 socketio config
+connect-pin host-sched 3-event -> uart1-console poll-event
+connect-pin host-sched 3-control <- uart1-console poll-control
+set uart1-console verbose? $opt_verbose
+set uart1-console sockaddr-local 0.0.0.0:$port
+connect-pin init-sequence output-2 -> uart1-console init
+connect-pin deinit-sequence output-6 -> uart1-console fini
+# make big receive fifo
+set uart1 in-fifo-length 4096
+";
+
+	$third_section .= "# uart1 <-> socket
+connect-pin uart1 Sout -> uart1-console tx
+connect-pin uart1 Sin <- uart1-console rx
+";
+      }
+
+    if ($opt_board =~ /uart2:([0-9]+)/)
+      {
+	$port = $1;
+
+	$first_section .= "# uart2 socket\n" .
+	  &sidconf_new("sid-io-socket-server", "uart2-console") . "\n";
+
+	$second_section .= "# uart2 socketio config
+connect-pin host-sched 4-event -> uart2-console poll-event
+connect-pin host-sched 4-control <- uart2-console poll-control
+set uart2-console verbose? $opt_verbose
+set uart2-console sockaddr-local 0.0.0.0:$port
+connect-pin init-sequence output-2 -> uart2-console init
+connect-pin deinit-sequence output-6 -> uart2-console fini
+# make big receive fifo
+set uart2 in-fifo-length 4096
+";
+
+	$third_section .= "# uart2 <-> socket
+connect-pin uart2 Sout -> uart2-console tx
+connect-pin uart2 Sin <- uart2-console rx
+";
+      }
+
+    if ($opt_board =~ /uart1:gdb/ && $opt_gdb != 0) 
+      {
+	$third_section .= "# uart1 <-> gdb also
+connect-pin uart1 Sout -> gdb target-tx
+";
+      }
+
+    if ($opt_board =~ /uart2:gdb/ && $opt_gdb != 0) 
+      {
+	$third_section .= "# uart2 <-> gdb also
+connect-pin uart2 Sout -> gdb target-tx
+";
+      }
+  }
+
+
+# ----------------------------------------------------------------------------
+# Misc. logic
+
+sub configure_harvard_bus
+  {
+    my $cpu = $_[0];
+
+    $first_section .= "# $cpu harvard bus mappers\n" .
+	  &sidconf_new("hw-mapper-basic", "data-mapper") . "\n" .
+	  &sidconf_new("hw-mapper-basic", "insn-mapper") . "\n";
+
+    $second_section .= "# $cpu harvard bus specific.
+disconnect-bus cpu insn-memory $bus_upstream
+connect-bus cpu insn-memory insn-mapper access-port
+disconnect-bus cpu data-memory $bus_upstream
+";
+    if ($opt_trace_core || $opt_trace_core_visual)
+      {
+        $second_section .= "# $cpu harvard bus data probe.
+connect-bus cpu data-memory bus-probe upstream
+disconnect-bus bus-probe downstream mapper access-port
+connect-bus bus-probe downstream data-mapper access-port
+";
+      }
+    else
+      {
+    $second_section .= "# $cpu harvard bus data mapping.
+connect-bus cpu data-memory data-mapper access-port
+";
+      }
+
+    if ($opt_board =~ /gloss/ || $opt_board =~ /user/)
+      {
+        $second_section .= "# $cpu harvard bus specific gloss .
+disconnect-bus gloss target-memory $bus_upstream
+connect-bus gloss target-memory data-mapper access-port
+";
+      }
+   
+  }
+
+
+
+
+# --engine
+if ($opt_engine eq "pbb")
+  {
+    $second_section .= "set cpu engine-type pbb\n";
+  }
+elsif ($opt_engine eq "scache") 
+  {
+    $second_section .= "set cpu engine-type scache\n";
+  }
+else
+  {
+    die "Invalid engine type $opt_engine\n";
+  }
+
+
+# --gdb
+if ($opt_gdb != 0)
+  {
+    $first_section .= "# gdb\n" .
+      &sidconf_new("sw-debug-gdb", "gdb") . "\n" .
+      &sidconf_new("sid-io-socket-server", "gdb-socket") . "\n" .
+      "";
+
+    $second_section .= "# gdb
+relate gdb cpu cpu
+relate gdb target-schedulers target-sched
+relate gdb host-schedulers host-sched
+connect-pin gdb process-signal -> main stop!
+connect-pin init-sequence output-3 -> gdb init
+connect-pin deinit-sequence output-5 -> gdb deinit
+connect-pin gdb yield -> yield-net input
+connect-pin gdb flush-icache -> cpu flush-icache
+set gdb trace-gdbsid? $opt_verbose
+set gdb trace-gdbserv? $opt_verbose
+# gdb-socket
+connect-pin init-sequence output-2 -> gdb-socket init
+connect-pin deinit-sequence output-6 -> gdb-socket fini
+connect-pin gdb-socket rx -> gdb remote-rx
+connect-pin gdb-socket tx <- gdb remote-tx
+connect-pin host-sched 6-event -> gdb-socket poll-event
+connect-pin host-sched 6-control <- gdb-socket poll-control
+set gdb-socket sockaddr-local 0.0.0.0:$opt_gdb
+set gdb-socket verbose? $opt_verbose
+";
+
+    if ($opt_board =~ /gloss/) 
+      {
+	$second_section .= "# gdb w/ gloss
+connect-pin gloss trap-chain <-> gdb trap
+connect-pin gloss trap-code-chain -> gdb trap-code
+connect-pin gloss process-signal -> gdb gloss-process-signal
+connect-pin gloss debug-tx -> gdb target-tx
+relate gdb gloss gloss
+set gdb enable-Z-packet? false
+set gdb operating-mode? false
+";
+      }
+    elsif ($opt_board =~ /pid7t/)
+      {
+	$second_section .= "# gdb w/ pid7t
+connect-pin cpu trap <-> gdb trap
+connect-pin cpu trap-code -> gdb trap-code
+";
+      }
+  }
+
+
+if ($exec)
+  {
+    $first_section .= "# loader\n" .
+      &sidconf_new("sw-load-elf", "loader") . "\n";
+
+    $second_section .= "# loader
+set loader file \"$exec\"
+set loader verbose? $opt_verbose
+connect-bus loader load-accessor mapper access-port # don't trace loading
+connect-pin init-sequence output-1 -> loader load!
+connect-pin loader start-pc-set -> cpu start-pc-set!
+connect-pin loader endian-set -> cpu endian-set!
+connect-pin loader error -> main stop!
+";
+
+  }
+
+
+# --trace-core-visual
+
+if ($opt_trace_core_visual != 0)
+  {
+    $any_tcl = 1;
+
+    $first_section .= "# visual bus access viewer\n" .
+      &sidconf_new("hw-visual-probe-bus", "visual-bus-probe") . "\n";
+    $second_section .= "# visual bus access viewer
+set visual-bus-probe addr2line-cmd \"arm-elf-addr2line -C -f -e $exec\"
+relate visual-bus-probe cpu cpu
+connect-pin bus-probe address -> visual-bus-probe address
+connect-pin bus-probe data-high -> visual-bus-probe data-high
+connect-pin bus-probe data-low -> visual-bus-probe data-low
+connect-pin bus-probe status -> visual-bus-probe status
+connect-pin bus-probe type -> visual-bus-probe type
+";
+  }
+
+# --tksm
+if ($opt_tksm != 0)
+  {
+    $any_tcl = 1;
+
+    $first_section .= "# tk system monitor\n" . 
+      &sidconf_new("sid-control-tksm", "tksm") . "\n";
+
+    $second_section .= "# tk system monitor
+relate main component-catalog-informees tksm
+# refresh
+set host-sched 1-regular? 1
+set host-sched 1-time 1000
+connect-pin host-sched 1-event -> tksm refresh
+";
+  }
+
+if ($opt_tksm && $opt_gdb)
+  {
+    $third_section .= "# triggerpoint signal
+connect-pin tksm triggerpoint-hit -> gdb stop-target
+";
+  }
+
+
+# ----------------------------------------------------------------------------
+# Memory logic.
+
+$mems = 0;
+while ($#opt_memory_region >= 0)
+  {
+    $spec = shift @opt_memory_region;
+    $mems ++;
+    # Format: BASE,SIZE
+    #         [,read-only]
+    #         [,alias=BASE2]
+    #         [,file=NAME]
+    #         [,relate=COMPONENT/RELATION]  (depracated)
+    @spec = split /,/, $spec;
+
+    die "Cannot parse memory region specification `$spec'.\n" if ($#spec < 1);
+    
+    $base = shift @spec;
+    $base = oct($base) if ($base =~ /^0/);
+    $size = shift @spec;
+    $size = oct($size) if ($size =~ /^0/);
+
+    die "Illegal memory region size `$size'\n" if ($size <= 0);
+
+    $last = $base + $size - 1;
+    $membus = "read-write-port"; # default read-write
+    $memfile = ""; # default no file
+    @aliases = ();
+    @relates = ();
+
+    # common stuff
+    $third_section .= "# memory region $mems ($spec)\n" .
+      &sidconf_new("hw-memory-ram/rom-basic", "mem$mems") . "\n" .
+	"set mem$mems size $size\n";
+
+    # consume other options
+    while ($#spec >= 0) 
+      {
+	$opt = shift @spec;
+	if ($opt eq "read-only") { $membus = "read-only-port"; }
+	elsif ($opt =~ /file=(.*)/) { $memfile = $1; }
+	elsif ($opt =~ /alias=(.*)/) { push @aliases, $1 }
+	elsif ($opt =~ /relate=(.*)/) { push @relates, $1 }
+	else { die "Cannot parse memory region option `$opt'.\n"; }
+      }
+
+    # process memory maps
+    $third_section .= "connect-bus mapper mem$mems:[$base,$last] mem$mems $membus\n";
+
+    foreach $alias (@aliases)
+      {
+	$alias = oct($alias) if ($alias =~ /^0/);
+	$aliasend = $alias + $size - 1;
+	$third_section .= "connect-bus mapper mem$mems:[$alias,$aliasend] mem$mems $membus\n";
+      }
+
+    foreach $relate (@relates)
+      {
+	$relate =~ /(.*)\/(.*)/;
+	$third_section .= "relate $1 $2 mem$mems\n";
+      }
+
+    # process file backing store
+    if ($memfile) 
+      {
+	$third_section .= "set mem$mems image-file \"$memfile\"
+connect-pin init-sequence output-1 -> mem$mems image-load
+";
+	# save only if memory was writeable
+	if ($membus eq "read-write-port")
+	  {
+	    $third_section .= "connect-pin deinit-sequence output-6 -> mem$mems image-store\n";
+	  }
+      }
+  }
+
+
+# ----------------------------------------------------------------------------
+# Really miscellanous stuff.
+
+# sidrtc: 8 bytes
+if ($opt_sidrtc)
+  {
+    $addr = $opt_sidrtc;
+    $addr = oct($addr) if ($addr =~ /^0/);    
+    $addrend = $addr + 7;
+
+    $first_section .= "# special rtc\n" .
+      &sidconf_new("hw-rtc-sid", "sidrtc") . "\n";
+
+    $third_section .= "# special rtc mapping
+connect-bus mapper sidrtc:[$addr,$addrend] sidrtc registers
+";
+  }
+
+
+# sidcodec: 20 bytes
+if ($opt_sidcodec)
+  {
+    $addr = $opt_sidcodec;
+    $addr = oct($addr) if ($addr =~ /^0/);    
+    $addrend = $addr + 19;
+
+    $first_section .= "# special codec & host audio\n" .
+      &sidconf_new("hw-audio-sid", "sidcodec") . "\n" .
+      &sidconf_new("sid-io-audio", "sidaudio") . "\n" .
+      "";
+
+    $third_section .= "# special codec mapping
+connect-bus mapper sidcodec:[$addr,$addrend] sidcodec registers
+# codec <-> host audio connections
+connect-pin sidcodec tx-sample -> sidaudio tx-sample
+connect-pin sidcodec rx-sample <- sidaudio rx-sample
+connect-pin sidcodec tx-mode -> sidaudio tx-mode
+connect-pin sidcodec tx-pending <- sidaudio tx-pending
+connect-pin sidcodec rx-mode -> sidaudio rx-mode
+connect-pin sidcodec rx-pending <- sidaudio rx-pending
+connect-pin sidcodec config-set -> sidaudio config-set
+# host audio polling
+set host-sched 7-regular? 1
+set host-sched 7-time 100
+connect-pin host-sched 7-event -> sidaudio poll
+";
+  }
+
+
+# any tcl stuff?
+if ($any_tcl)
+  {
+    $first_section .= "# tcl/tk adaptive event polling" . "\n" .
+      &sidconf_new("bridge-tcl", "tcl-event-consumer") . "\n";
+    $third_section .= "# tcl/tk adaptive event polling
+connect-pin host-sched 2-event -> tcl-event-consumer !event
+connect-pin host-sched 2-control <- tcl-event-consumer !event-control
+connect-pin init-sequence output-7 -> tcl-event-consumer !event
+";
+  }
+
+
+# add dso commands
+while(($lib,$symbol) = each %component_libs)
+  {
+    $lib_la = "$sidprefix$lib$sidsuffix_la";
+
+    # minor optimization: don't include large tcl dll unless needed
+    next if ($any_tcl == 0 && $lib eq "tclapi");
+
+    $zeroth_section .= "load $lib_la $symbol\n";
+  }
+
+
+# ----------------------------------------------------------------------------
+
+
+# Build config file
+$tmpdir = $ENV{'TMPDIR'} ? $ENV{'TMPDIR'} : "/tmp";
+$basename = $exec ne "" ? `basename $exec` : "sid";
+chomp($basename);
+$tfile = $opt_save_temps ? "$basename.conf" : "$tmpdir/$basename-$$.conf";
+open CONFIG, ">$tfile" || die ("Cannot write to $tfile\n");
+print CONFIG $zeroth_section;
+print CONFIG $first_section;
+print CONFIG $second_section;
+print CONFIG $third_section;
+close CONFIG;
+
+# ----------------------------------------------------------------------------
+# Exit early?
+
+if ($opt_save_temps)
+  {
+    print "Configuration file saved to `$tfile'.\n";
+  }
+
+if ($opt_no_run)
+  {
+    exit (0);
+  }
+
+
+# ----------------------------------------------------------------------------
+# (Generate and) run a simulator
+
+@args = ("$sid");
+push @args, ($tfile);
+
+
+# fork & exec
+$pid = fork();
+if ($pid < 0)
+  {
+    die "Fork failed\n";
+  }
+elsif ($pid == 0)
+  {
+    # child
+    exec @args;
+    die "Exec failed\n";
+  }
+else
+  {
+    $SIG{'INT'} = sub { kill 'INT', $pid; };
+    $SIG{'QUIT'} = sub { kill 'QUIT', $pid; };
+    $SIG{'TERM'} = sub { kill 'TERM', $pid; };
+    wait;
+  }
+
+if (! $opt_save_temps) 
+  {
+    unlink $tfile;
+  }
+exit 0;
+
+
+sub sidconf_new {
+  my ($comptype,$compname) = @_;
+  my $wrap_this = 0;
+  for ($i=0; $i<scalar(@opt_wrap); $i++) {
+    if ($opt_wrap[$i] eq $compname) {
+      $wrap_this = 1;
+      $any_tcl = 1;
+    }
+  }
+  # print $wrap_this == 0 ? "not" : "";
+  # print " wrapping $compname $comptype\n";
+  if ($wrap_this)
+    {
+      return "new sid-api-trace ${compname}
+new ${comptype} ${compname}-traced
+relate ${compname} victim ${compname}-traced";
+    }
+  else
+    {
+      return "new ${comptype} ${compname}";
+    }
+}
+

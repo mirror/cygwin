@@ -1,0 +1,5 @@
+load_lib "docs.exp"
+
+foreach component {hw-glue-sequence hw-glue-probe-bus sw-glue-attribbank} {
+    doc_test glue $component
+}

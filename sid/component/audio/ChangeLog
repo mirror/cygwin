@@ -1,0 +1,68 @@
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * configure: Regenerated.
+        * aclocal.m4: Ditto.
+        * Makefile.in: Ditto.
+
+2000-09-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compAudio.cxx (poll_tx, poll_rx): Correct std_error_string() call.
+	* components.h: Import more std:: identifiers.
+
+2000-05-22  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.in: Regenerate.
+
+2000-02-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compAudio.cxx (generic_audio dtor): Don't call virtual function.
+	(fd_audio dtor): Ditto.  Do fd closing directly here.
+	* compCodec.cxx (basic_codec dtor): Zap dummy.
+	* components.cxx (compAudioDelete): Guard against dynamic_cast
+	after delete.
+	* components.h: Corresponding changes.  Add blank ctor/dtor pairs
+	for all component classes.
+
+2000-02-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compCodec.cxx (rx_offset): New member.  Export it as an attribute.
+	(reg_read): Use it instead of weird rx_count/etc. calculation.
+	* components.h: Corresponding change.
+
+	* compAudio.cxx (begin_rx): Asyncificate correct fd.
+
+2000-02-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compAudio.cxx (cygwin_audio): Fill in port for Windows.
+	(generic_audio): Add tx-pending, rx-pending pins.
+	(update_txrx_pending_pins): New function.
+	(tx_mode_pin_handler, rx_mode_pin_handler, poll_pin_handler): Call it.
+	* compCodec.cxx (generic_codec): Add tx-pending, rx-pending pins.
+	(reg_read): Present pin sense values in status register.
+	* components.h: Corresponding changes.
+
+2000-01-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compAudio.cxx (operator >>): Add dummy for audio_config attribute.
+	(audio_config encode, ctors): New functions.
+	(generic_audio): Add new "config-set" pin & handler.
+	(tx_mode_pin_handler): Attempt to flush tx-buffer on tx close.
+	* compCodec.cxx (basic_codec ctor): Add "config-set" pin.
+	(reg_write, reg_read): Rewrite using word_bus<big_int_4>.  Add config
+	register.
+	* components.h: Corresponding changes.
+	* Makefile.am (DEJAGNUTESTS): Add linuscodec.exp.
+	* Makefile.in: Regenerated.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* components.h: New source file.
+	* components.cxx, compAudio.cxx, compCodec.cxx: Ditto.
+	* configure.in, Makefile.am: New build files.
+	* configure, Makefile.in, aclocal.m4, config.in, stamp-h.in: New
+	generated files.
+

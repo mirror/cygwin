@@ -1,0 +1,5 @@
+load_lib "docs.exp"
+
+foreach sched {host host-accurate sim} {
+    doc_test sched sid-sched-$sched
+}

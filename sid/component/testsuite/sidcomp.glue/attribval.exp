@@ -1,0 +1,124 @@
+set test "sid configuration"
+sid_config_component_test "attribb1.conf" \
+    "load [sid_find_file libglue.la] glue_component_library" \
+    "sw-glue-attribbank"
+pass $test
+
+set test "sid startup"
+if [sid_start "attribb1.conf"] then { pass $test } else { fail $test ; return }
+
+set test "check setting attribute list"
+set category "setting"
+set set [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if {$set == ""} then { pass $test } else { fail $test }
+
+set test "check pin attribute list"
+set category "pin"
+set pin [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if {$pin == ""} then { pass $test } else { fail $test }
+
+set test "check register attribute list"
+set category "register"
+set regs [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if {$regs == ""} then { pass $test } else { fail $test }
+
+set test "check register watchable list"
+set category "watchable"
+set watch [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if {$watch == ""} then { pass $test } else { fail $test }
+
+set test "query pin names"
+set result [sid_cmd "sid::component::pin_names $victim"]
+if {$result == ""} then { pass $test } else { fail $test }
+
+set test "query bus names"
+set result [sid_cmd "sid::component::bus_names $victim"]
+if {$result == ""} then { pass $test } else { fail $test }
+
+set test "query accessor names"
+set result [sid_cmd "sid::component::accessor_names $victim"]
+if {$result == ""} then { pass $test } else { fail $test }
+
+set test "query relationships names"
+set result [sid_cmd "sid::component::relationship_names $victim"]
+if {$result == ""} then { pass $test } else { fail $test }
+
+set new("accessor_names") "accessor"
+set new(sid) "sid"
+set new(1e6)  "1.0e6 "
+set new(-1true.0)  "false "
+set new("\")  " "
+set new("_new_att")  "any"
+set new(".cc")  "c++ file"
+set new("save")  "restore"
+set new("123")  "-111truefalseokay"
+
+set test "set weird attribute names"
+foreach name [array names new] {
+   set value $new($name)
+   set result [sid_cmd "sid::component::set_attribute_value $victim [list $name] [list $value]"]             
+   if {$result != "ok"} then { fail $test ; return } 
+}
+pass $test
+
+set test "check testing attribute list"
+sid_assert_includes_all "sid::component::attribute_names $victim" [array names new]
+
+set test "retrieve testing attributes"
+foreach name [array names new] {
+   set value $new($name)
+   set result [sid_cmd "sid::component::attribute_value $victim [list $name]"]
+   if {$result != $value} then { fail "$test - $result vs $value"; return }
+}
+pass $test      
+
+set test "set 1000 attributes"
+for {set i 1} {$i < 1002} {incr i} {
+   set name "attr-$i"
+   set result [sid_cmd "sid::component::set_attribute_value $victim [list $name] [list $i]"]             
+   if {$result != "ok"} then { fail $test ; return } 
+}
+pass $test
+
+set test "check attributes after setting"
+for {set i 1} {$i < 1002} {incr i} {
+   set name "attr-$i"
+   set val [sid_cmd "sid::component::attribute_value $victim [list $name] "]
+   if {$val != $i} then { fail $test ; return } 
+}
+pass $test
+
+set test "adding another 1000 attributes"
+for {set i 1002} {$i < 2002} {incr i} {
+   set name "attr-$i"
+   set result [sid_cmd "sid::component::set_attribute_value $victim [list $name] [list $i]"]             
+   if {$result != "ok"} then { fail $test ; return } 
+}
+pass $test
+
+set test "check attributes after setting"
+for {set i 1} {$i < 2002} {incr i} {
+   set name "attr-$i"
+   set val [sid_cmd "sid::component::attribute_value $victim [list $name]"]
+   if {$val != $i} then { fail $test ; return } 
+}
+pass $test
+
+set test "check values for unknown attributes"
+foreach name {unknown attr--1 attr-20020 new_attrib sw-glue-attribbank} {
+   set val [sid_cmd "sid::component::attribute_value $victim [list $name] "]
+   if {$val != ""} then { fail $test ; return } 
+}
+pass $test
+
+set test "check some attribute list after trying to get unknown attribute values"
+sid_assert_includes_all "sid::component::attribute_names $victim" [array names new]
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "attribb1.conf" }

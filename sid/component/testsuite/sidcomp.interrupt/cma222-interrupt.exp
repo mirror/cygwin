@@ -1,0 +1,332 @@
+# Testsuite for the Cogent CMA222 ARM interrupt controller.
+# This testsuite tries to exercise just about every aspect of this
+# component simulation.
+#
+# Copyright (C) 2000 Red Hat
+
+if {! $sidtarget(arm)} then { untested "hw-interrupt-arm/ref not available"; return }
+
+# The number of available regular interrupt lines.
+set numLines 8
+
+# A convenience variable.
+set all_ones 0xFF
+
+set test "sid configuration"
+sid_config_component_test "cma222-intr.conf" \
+    "load [sid_find_file libinterrupt.la] interrupt_component_library" \
+    "hw-interrupt-cogent/cma222"
+pass $test
+
+set test "sid start"
+if {[sid_start "cma222-intr.conf"]} {
+    pass $test
+} else {
+    fail $test
+    return
+}
+
+# A pin we use again, and again, and again.
+set probe_pin [sid_cmd "sid::pin::new"]
+
+
+# Set up an array of triggerpoint sensor pins (connected to the victim).
+# Maintain another array that counts the number of times the triggerpoints are hit.
+
+#catch {unset watchpins triggercount}
+foreach watchable \
+  {interrupt irq-raw-status irq-enable-register} {
+    set test "establish a triggerpoint for watchable state variable: $watchable"
+    set watchpins($watchable) [sid_cmd "sid::pin::new"]
+    sid_cmd "set triggercount($watchable) 0"
+    sid_cmd \
+        "set hook_driven_h4($watchpins($watchable)) {global triggercount driven_h4_value; incr triggercount($watchable) }"
+
+    # Some limited URL encoding hacks.
+    # see sid/include/sidwatchutil.h for the rules.
+    regsub -all -- "-" $watchable "%2D" watchEnc
+    set result [sid_cmd "sid::component::connect_pin $victim watch:${watchEnc}:change $watchpins($watchable)"]
+    set w [sid_cmd "sid::component::attribute_names_in_category $victim watchable"]
+    if {$result == "ok"} { pass $test } else { fail "$test -- $result" }
+}
+
+
+# There are no attributes for this component, but let's do this for good measure.
+set test "attribute list"
+sid_assert_success "sid::component::attribute_names $victim"
+
+
+# Check for presence of the output pin.
+set test "get irq pin"
+sid_assert_success "sid::component::find_pin $victim interrupt"
+
+
+# Check for presence of input pins. Record the names given to them by
+# the Tcl bridge--we use them later.
+
+# Check for all 8 interrupt input lines.
+for {set i 0} {$i < $numLines} {incr i} {
+    set test "get interrupt-source-$i pin"
+    if {[set irq_source($i) [sid_cmd "sid::component::find_pin $victim interrupt-source-$i"]] != ""} {
+	pass $test
+    } else {
+	fail $test
+    }
+}
+
+
+# Check for the presence of the register set (a named bus). Record the
+# name given to it by sid_cmd, as we'll use it throughout this
+# testsuite. 
+set test "get irq-register bus" 
+if {[set bus [sid_cmd "sid::component::find_bus $victim irq-registers"]] != ""} {
+    pass $test
+} else {
+    fail $test
+}
+
+if {0 == 1} {
+set test "Save state"
+set state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {$state != ""} then { pass $test } else { fail $test }
+
+# Allow interrupts from any source.
+# This is a basic version of the more complete testing that happens
+# further on in this script.
+
+foreach pattern {0x0 0x12 0x55 0xAA 0xFF} {
+    set test "disable all interrupt lines"
+    sid_assert_success "sid::bus::write_h4_l1 $bus 0x18 0x00"
+
+    set test "validate all interrupt lines are disabled"
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x10"]
+
+    set status [lindex $result 0]
+    if {[lindex $result 0] == "ok"} {
+	if {[lindex $result 1] == 0} { pass $test } else { fail $test }
+    } else {
+	fail "$test (bus error; status $status)"
+    }
+
+    set test "initialise set of enabled interrupt lines"
+    sid_assert_success "sid::bus::write_h4_l1 $bus 0x18 $pattern"
+
+    set test "validate set of enabled interrupt lines"
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x10"]
+    set status [lindex $result 0]
+    if {[lindex $result 0] == "ok"} {
+	if {[lindex $result 1] == $pattern} { pass $test } else { fail "$test (pattern $pattern; result $result)" }
+    } else {
+	fail "$test (bus error; status $status)"
+    }
+}
+
+set test "Repeat Save state"
+set rpstate [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+set comp_res [string compare $state $rpstate]
+if {$comp_res != 0} then { pass $test } else { fail $test }
+
+set test "Restore State"
+set ok [sid_cmd "sid::component::set_attribute_value $victim state-snapshot [list $state]"]
+if {$ok == "ok"} then { pass $test } else { fail $test }
+}
+
+# At the completion of this test, all interrupts *should* be enabled.
+
+
+# Generate an interrupt on each of the regular interrupt lines.
+# Once it is acknowledged, suspend the interrupt source.
+
+# This is a double nested loop -- $numLines*$numLines tests are performed
+# to make sure that other interrupt lines going high does not invoke an
+# interrupt (ie. to ensure that the masking works correctly for all cases).
+
+sid_cmd "set hook_driven_h4($probe_pin) { 
+    global driven_h4_value interrupted
+    # Make the pin values sensible.
+    # The pin values are normally negated in the controller to make it
+    # easy to connect this component to related CPUs like the ARM7.
+
+    if \[expr \$driven_h4_value == 0\] { 
+	set interrupted 1
+    } else {
+        set interrupted 0
+    }
+}"
+
+sid_cmd "sid::component::connect_pin $victim interrupt $probe_pin"
+
+set failures 0
+for {set i 0} {$i < $numLines} {incr i} {
+    set test "disable all interrupt lines"
+#note "outer loop $i"
+    sid_assert_success "sid::bus::write_h4_l1 $bus 0x18 0x00"
+
+    set test "validate all interrupt lines are cleared"
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x0"]
+    if {[lindex $result 0] == "ok"} {
+	set val [lindex $result 1]
+	if {$val != 0} {
+	    incr failures
+	    fail $test
+	}
+    } else {
+	incr failures
+	fail "$test -- [lindex $result 0]"
+    }
+
+    set test "validate all interrupt lines are disabled"
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x10"]
+    if {[lindex $result 0] == "ok"} {
+	set val [lindex $result 1]
+	if {$val != 0} {
+	    incr failures
+	    fail $test
+	}
+    } else {
+	incr failures
+	fail "$test -- [lindex $result 0]"
+    }
+
+    set test "enable interrupt line $i"
+    sid_assert_success "sid::bus::write_h4_l1 $bus 0x18 [expr 1 << $i]"
+
+    set test "validate only interrupt line $i is enabled"
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x10"]
+    if {[lindex $result 0] == "ok"} {
+	if {[lindex $result 1] != [expr 1 << $i]} {
+	    incr failures
+	    fail $test
+	}
+    } else {
+	incr failures
+	fail "$test -- [lindex $result 0]"
+    }
+    
+# XXX mrg this does not work yet.
+
+    # Note that this has large portions of code in the "incr" section,
+    # like a perl 'continue' section.
+    for {set j 0} {$j < $numLines} {
+	# Lower the interrupt source.	
+	sid_cmd "sid::pin::driven_h4 $irq_source($j) 0"
+
+	# this doesn't work for the cma222; interrupts 0, 3 and 4 are
+	# only de-asserted by clearing the bit in the various register.
+	# so, we check that it hasn't been deasserted, and then clear
+	# it anyway.  note that we only do this if we are testing the
+	# same interrupt from the outer loop.
+
+	if {$j == 0 || $j == 3 || $j == 4} {
+	    if {$j == $i && $old_failures == $failures} {
+		set test "validate interrupt $j is still enabled"
+		set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x0"]
+		set status [lindex $result 0]
+		if {$status == "ok"} {
+		    set val [lindex $result 1]
+		    if {$val == [expr 1 << $j]} { pass $test } else { fail "$test (result $val)" }
+		} else {
+		    incr failures
+		    fail "$test (bus error; status $status)"
+		}
+	    }
+            sid_assert_success "sid::bus::write_h4_l1 $bus 0x8 0xFF"
+	}
+
+	# Now make sure that the interrupt is really no longer pending.
+
+# disable this bit for now, cuz it doesn't quite work yet.
+	if {0 == 1} {
+	    set test "making sure interrupt $j is no longer pending"
+	    set result [sid_cmd "sid::bus::read_h4_l1 $bus 0x0"]
+	    set status [lindex $result 0]
+	    if {$status == "ok"} {
+		if {[lindex $result 1] == 0} { pass $test } else { fail "$test (result $result)" }
+	    } else {
+		fail "$test (bus error; status $status)"
+	    }
+	}
+
+	incr j
+    } {
+	# save this away
+	set old_failures $failures
+
+#note "inner loop $j"
+	sid_cmd "set interrupted 0"
+	
+	# Raise an interrupt on interrupt line `j'.
+	sid_cmd "sid::pin::driven_h4 $irq_source($j) 1"
+	
+	if {$i == $j} { set test "permitting" } else { set test "masking" }
+	append test " interrupt from interrupt $j when enabling interrupt $i only"
+	    
+	set result [sid_cmd "set interrupted"]
+	#set result [sid_cmd "sid::pin::read_h4_l1 $bus 0"]
+	if {$result == "1"} {
+	    if {$i == $j} { 
+		set test_save $test
+		set test "bit $i is set in the masked status register"
+		set result [sid_cmd "sid::bus::read_h4_l1 $bus 0"]
+		if {[lindex $result 0] == "ok"} {
+		    if {[lindex $result 1] != [expr 1 << $i]} {
+			incr failures
+			fail $test
+			continue;
+		    }
+		} else {
+		    incr failures
+		    fail "$test -- [lindex $result 0]"
+		    continue;
+		}
+		set test $test_save
+	    } else {
+		incr failures
+		fail $test
+		continue;
+	    }
+	} else {
+	    if {$i == $j} { 
+		incr failures
+		fail "$test (no interrupt)"
+		continue;
+	    }
+	}
+    }
+}
+
+if {!$failures} { pass "interrupt masking" }
+
+
+sid_cmd "sid::component::disconnect_pin $victim interrupt $probe_pin"
+
+
+
+# Test if triggerpoints fired correctly.
+
+set num 17
+set test "interrupt triggerpoint fired $num times"
+set count [sid_cmd "set triggercount(interrupt)"]
+if {$count == "$num"} { pass $test } else { fail "$test; fired $count times" }
+
+set num 128
+set test "irq-raw-status triggerpoint fired $num times"
+set count [sid_cmd "set triggercount(irq-raw-status)"]
+if {$count == "$num"} { pass $test } else { fail "$test; fired $count times" }
+
+set num 15
+set test "irq-enable-register triggerpoint fired $num times"
+set count [sid_cmd "set triggercount(irq-enable-register)"]
+if {$count == "$num"} { pass $test } else { fail "$test; fired $count times" }
+
+catch {unset watchpins triggercount}
+
+
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} {
+    file delete "cma222-intr.conf"
+}

@@ -1,0 +1,9 @@
+# Run a monkey test on the components in this component library. 
+
+load_lib "monkey.exp"
+
+monkey_test hw-lcd-hd44780u-a00 hd44780u_component_library libhd44780u.la
+monkey_test hw-lcd-hd44780u-a02 hd44780u_component_library libhd44780u.la
+monkey_test hw-lcd-t6963c-0201 t6963c_component_library libt6963c.la
+monkey_test hw-lcd-t6963c-0101 t6963c_component_library libt6963c.la
+

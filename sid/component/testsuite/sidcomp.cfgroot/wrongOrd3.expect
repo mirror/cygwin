@@ -1,0 +1,10 @@
+wrongOrd3.badconf:20: component remapper not found
+wrongOrd3.badconf:21: component cpu not found
+wrongOrd3.badconf:22: component angel not found
+wrongOrd3.badconf:23: component bus not found
+wrongOrd3.badconf:42: component target-sched has no input pin 0-control
+wrongOrd3.badconf:43: component target-sched has no input pin 1-control
+wrongOrd3.badconf:44: component target-sched has no output pin 0-event
+wrongOrd3.badconf:45: component target-sched has no output pin 1-event
+wrongOrd3.badconf:46: component host-sched has no output pin 0-event
+Configuration error.  Aborting.

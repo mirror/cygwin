@@ -1,0 +1,44 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(Makefile.in)
+AC_CONFIG_AUX_DIR(config)
+
+dnl set $CC early on
+AC_PROG_CC
+
+AM_INIT_AUTOMAKE(sid,0.1)
+
+dnl automake support
+AM_MAINTAINER_MODE
+AC_EXEEXT
+AC_PROG_CXX
+AC_PROG_CXXCPP
+AC_PROG_MAKE_SET
+AC_ARG_PROGRAM
+AC_LANG_CPLUSPLUS
+
+dnl The following is needed for config/info.tcl.
+CY_SIDTARGET_CHECK
+
+dnl Disable shared libraries
+AC_CACHE_CHECK(whether can build shared SID component libraries, ac_cv_libstdcxx_shared, [
+   CY_LIBSTDCXX_CHECK
+   ac_cv_libstdcxx_shared=$have_libstdcxx_shared
+])
+
+if test x$ac_cv_libstdcxx_shared != xyes -o x$enable_shared = xno
+then
+  AC_MSG_WARN(Disabling shared SID component libraries.)
+  # This variable is not really proper to mess with.  However,
+  # there appears to be no other way of adding an extra argument
+  # to child directories' configure runs.  This is largely safe
+  # because this code is run long after the ac_configure_args were
+  # parsed for the enable_* etc. args.
+  ac_configure_args="$ac_configure_args --disable-shared"
+  enable_shared=no
+else
+  enable_shared=yes
+fi
+AC_SUBST(enable_shared)
+
+AC_CONFIG_SUBDIRS(include component main bsp samples demos)
+AC_OUTPUT(Makefile config/info.tcl)

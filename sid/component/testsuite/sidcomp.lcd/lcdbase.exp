@@ -1,0 +1,154 @@
+set test "sid configuration"
+sid_config_component_etc_test "base.conf" \
+    "load [sid_find_file libhd44780u.la] hd44780u_component_library" \
+    "hw-lcd-hd44780u-a02" \
+    "load [sid_find_file liblcd-char-display.la] lcd_char_display_component_library
+new hw-lcd-char-display display
+relate tester display display"
+pass $test
+
+# Initialisation.
+set LCD(IR) 0
+set LCD(AC) 0
+set LCD(DR) 1
+
+set test "sid startup"
+if [sid_start "base.conf"] then { pass $test } else { fail $test ; return }
+
+set test "acquire bus"
+set bus [sid_cmd "sid::component::find_bus $victim bus"]
+if {$bus == ""} { fail $test } else { pass $test }
+
+set display [sid_cmd "set relationships(display)"]
+
+set test "Save state"
+set state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {$state != ""} then { pass $test } else { fail $test }
+
+foreach test_type { regular resstate } {
+set test "get display row-col pin"
+set row_col_pin [sid_cmd "sid::component::find_pin $display row-col"]
+if {$row_col_pin != ""} { pass $test } else { fail $test }
+sid_cmd "sid::component::connect_pin $victim row_col $row_col_pin"
+
+set test "correct AC value after DR write"
+# The 32 is in HEX, but somebody is not grok-ing the 0x prefix
+set result [sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) 0x32"]
+if {$result != "ok"} { 
+    fail $test
+} else {
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus $LCD(AC)"]
+    if {[lindex $result 0] == "ok" && [lindex $result 1] == 1} {
+	pass $test
+    } else {
+	fail $test
+    }
+}
+
+set test "correct AC value after 2nd DR write"
+# The 23 is in HEX, but somebody is not grok-ing the 0x prefix
+set result [sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) 0x23"]
+if {$result != "ok"} {
+    fail $test
+} else {
+    set result [sid_cmd "sid::bus::read_h4_l1 $bus $LCD(AC)"]
+    if {[lindex $result 0] == "ok" && [lindex $result 1] == 2} {
+	pass $test
+    } else {
+	fail $test
+    }
+}
+
+set test "DR read"
+sid_cmd "sid::bus::write_h4_l1 $bus $LCD(IR) 4"
+sid_cmd "sid::bus::read_h4_l1 $bus $LCD(DR)"
+set result [sid_cmd "sid::bus::read_h4_l1 $bus $LCD(DR)"]
+if {[lindex $result 0] == "ok" && [lindex $result 1] == 0x23} {
+    pass $test
+} else {
+    fail $test
+}
+
+
+set test "AC read"
+set result [sid_cmd "sid::bus::read_h4_l1 $bus $LCD(AC)"]
+if {[lindex $result 0] == "ok" && [lindex $result 1] == 0} {
+    pass $test
+} else {
+    fail $test
+}
+
+
+# FIXME: it seems like binding callback procedures to a certain pair
+# of pins in the LCD controller or the character display would make it
+# possible to verify that the right things are displayed.
+
+set test "display ``Hi Alex!''"
+set result [sid_cmd "sid::bus::write_h4_l1 $bus $LCD(IR) 0x80"]
+set okay 1
+
+foreach char [split "Hi Alex!" ""] {
+    scan $char %c code
+    set result [sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) $code"]
+    if {$result != "ok"} {
+	set okay 0
+	break
+    }
+}
+
+set test "draw Cygnus logo"
+sid_cmd "sid::bus::write_h4_l1 $bus $LCD(IR) 0x43"
+
+set okay 1
+foreach byte {3 4 9 0xA 0xA 0xA 0xA 9 4 3 0 0 0 0 0 0 4 0x13 0xB 0 0 0xA 0x13 4 0x18} {
+    set result [sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) $byte"]
+    if {$result != "ok"} {
+	set okay 0
+	break
+    }
+}
+sid_cmd "sid::bus::write_h4_l1 $bus $LCD(IR) 1"
+sid_cmd "sid::bus::write_h4_l1 $bus $LCD(IR) 0x80"
+sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) 0"
+sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) 2"
+if {$okay} { pass $test } else { fail $test }
+
+set test "display ``Cygnus rules''"
+set okay 1
+foreach char [split "Cygnus" ""] {
+    scan $char %c byte
+    set result [sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) $code"]
+    if {$result != "ok"} {
+	set okay 0
+	break
+    }
+}
+
+sid_cmd "sid::bus::write_h4_l1 $bus $LCD(IR) 0xC0"
+sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) 1"
+sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) 3"
+
+foreach char [split "rules!" ""] {
+    scan $char %c byte
+    set result [sid_cmd "sid::bus::write_h4_l1 $bus $LCD(DR) $code"]
+    if {$result != "ok"} {
+	set okay 0
+	break
+    }
+}
+
+set res_testtype [string compare $test_type "regular"]
+if { $res_testtype == 0 } {
+  set test "Restore state"
+  set ok [sid_cmd "sid::component::set_attribute_value $victim state-snapshot [list $state]"]
+  if {$ok == "ok"} then { pass $test } else { fail $test }
+}
+}
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "base.conf" }

@@ -1,0 +1,568 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* generic.h: Import more std:: identifiers.
+	* generic.cxx: Ditto.
+	(imageload_handler, imagestore_handler): Simplify, standardize.
+	(stream_state, destream_state): Cast between host_int_1 and char.
+
+2000-02-16  Ben Elliston  <bje@redhat.com>
+
+	* hw-memory-flash-am29.txt: Remove some irrelevant text.
+
+2000-02-07  Ben Elliston  <bje@redhat.com>
+
+	* generic.h (generic_memory::save_state): Make non-pure.
+	(generic_memory::restore_state): Likewise.
+	(generic_memory::stream_generic_state): Rename from this ..
+	(generic_memory::stream_state): .. to this.
+	(generic_memory::destream_generic_state): Rename from this ..
+	(generic_memory::destream_state): .. to this.
+	(generic_memory): Make operator <<, >> friends.
+	* generic.cxx (operator <<): Define.
+	(operator >>): Likewise.
+	* ramrom.h (ramrom_memory dtor): Remove.
+	(save_state): Remove.
+	(restore_state): Likewise.
+	* ramrom.cxx (ramrom_memory dtor): Remove.
+	(operator <<): Likewise.
+	(operator >>): Likewise.
+	* flash.h (flash_memory::stream_state): New method.
+	(flash_memory::destream_state): Likewise
+	* flash.cxx (flash_memory::stream_state): Define.
+	(flash_memory::destream_state): Likewise.
+	* am29.h (am29_flash_memory::stream_state): New method.
+	(am29_flash_memory::destream_state): Likewise.
+	(am29_flash_memory::save_state): Remove.
+	(am29_flash_memory::restore_state): Likewise.
+	* am29.cxx (am29_flash_memory::stream_state): Define.
+	(am29_flash_memory::destream_state): Likewise.
+	(operator <<): Remove.
+	(operator >>): Likewise.
+	* at29.h (at29_flash_memory::stream_state): New method.
+	(at29_flash_memory::destream_state): Likewise.
+	(at29_flash_memory::save_state): Remove.
+	(at29_flash_memory::restore_state): Likewise.
+	* at29.cxx (at29_flash_memory::stream_state): Define.
+	(at29_flash_memory::destream_state): Likewise.
+	(operator <<): Remove.
+	(operator >>): Likewise.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* generic.cxx (stream_generic_state): Save pin values and forgotten
+	attribute.
+	(destream_generic_state): Ditto for restoring.
+
+1999-12-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-memory-ram_rom-basic.txt: Corrected, reworked to fit template.
+	* hw-memory-flash-am29.txt: Reworked to fit template.
+	* hw-memory-flash-at29.txt: Ditto.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-memory-ram_rom-basic.txt: New file.  Content from old README.
+	* hw-memory-flash-am29.txt: Ditto.
+	* hw-memory-flash-at29.txt: Ditto.
+	* README: Removed.
+	* Makefile.am: Install new files.
+	* Makefile.in: Regenerated.
+
+1999-11-26  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): Add memdocs.exp.
+	* Makefile.in: Regenerate.
+
+	* README (hw-memory-ram/rom-basic): Document.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* components.cxx (compMemoryDelete): Use dynamic_cast<>.
+	* generic.cxx (imageload_handler): Take unused arg.  Update callers.
+	(imagestore_handler): Ditto.
+	* generic.h: Matching changes.
+
+1999-11-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* generic.cxx (imageload_handler): Don't complain, just fill memory
+	with zeroes, if input file is too short.
+
+1999-11-12 Mary Lynn Kostash <mkostash@cygnus.com>
+
+	* README: Fixed typos, added missing Environment heading.
+
+1999-11-08  Ben Elliston  <bje@cygnus.com>
+
+	* at29.cxx (at29_flash_memory ctor): manufacturer-code and
+	device-code attributes are settings.
+
+	* am29.cxx (am29_flash_memory ctor): mode is a read-only
+	attribute.
+
+1999-11-01  Permaine Cheung <pcheung@cygnus.com>
+
+	* README: Fix component name in configuration in Environment
+	section.
+
+1999-10-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* generic.cxx (attempt_resize): Standardize error messages. 
+	(imagestore_handler, imageload_handler): Ditto.
+
+1999-10-20  Permaine Cheung  <pcheung@cygnus.com>
+
+	* Makefile.am: Added new test files.
+	* Makefile.in: Regenerated.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-10-18  Ben Elliston  <bje@cygnus.com>
+
+	* flash.h
+	(flash_uniform_sector_memory::get_sector_size_attr): New method.
+	(flash_uniform_sector_memory::set_sector_size_attr): Likewise.
+	* flash.cxx
+	(flash_uniform_sector_memory::get_sector_size_attr): Implement.
+	(flash_uniform_sector_memory::set_sector_size_attr): Likewise.
+	(flash_uniform_sector_memory ctor): Virtualise "sector-size"
+	attribute; use get/set methods mentioned above.
+
+1999-10-14  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README: Doc fixes based on review comments.
+
+1999-10-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* generic.cxx (imageload_handler): Handle short reads more
+	informatively.
+	(imagestore_handler): Ditto for writes.
+
+1999-10-12  Ben Elliston  <bje@cygnus.com>
+
+	* am29.cxx (am29_flash_memory::am29_bus::write): Bug fix for an
+	out-by-one error--test bits 0 to 7, not 0 to 6. Also fix a case
+	fall-through by returning.
+
+	* README: Document the hw-memory-flash-am29 component.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* am29.cxx (write_ok, read, write): Take value, not const-ref.
+	* am29.h (NOPERM_READ, NOPERM_WRITE): Same.
+	(*): Corresponding changes.
+	* at29.cxx (write_ok, read, write): Take value, not const-ref.
+	* at29.h (NOPERM_READ, NOPERM_WRITE): Same.
+	(*): Corresponding changes.
+	* flash.h (write_ok): Take value, not const-ref.
+	* generic.h (SID_GB_READ, SID_GB_WRITE): Take value, not const-ref.
+	(read_any, write_any): Same.
+
+1999-10-07  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* at29.h (write): Removed try & catch
+	(read): Likewise
+	* at29.cxx: Likewise
+	* generic.h (write): Removed try & catch
+	(read): Likewise
+	* generic.cxx: Likewise
+
+1999-10-08  Ben Elliston  <bje@cygnus.com>
+
+	* am29.cxx (am29_flash_memory ctor): manufacturer-code and
+	device-code attributes are settings.
+
+	* components.cxx (compMemoryListTypes): Add hw-memory-flash-am29
+	and family members. Remove surplus debug output.
+	(compMemoryCreate): Recognise hw-memory-flash-am29 family.
+	* am29.h: New file.
+	* am29.cxx: Likewise.
+	* Makefile.am (libmemory_la_SOURCES): Add am29.cxx.
+	(DEJAGNUTESTS): Add am29.exp, memmonkey.exp.
+	(checkme): Depend on all.
+	* Makefile.in: Regenerate.
+
+1999-09-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* components.cxx: New file.  Collect component_library functions.
+	* ramrom.cxx: New file: implement hw-memory-ram/rom-basic.
+	* ramrom.h: New file.
+	* at29.cxx (write_ok): Use new "noSectorNum" constant instead of -1.
+	(at29_flash_memory ctor): Initialize more robustly.
+	(at29_bus): Renamed class from at29_flash_memory::at29_bus.
+	(operator <<,>>): Add partial state save/restore code.
+	(*): Remove unnecessary try/catch blocks.
+	* at29.h (at29_flash_memory_type): Adopt sidtypes throughout.
+	(at29_bus): Move out of at29_flash_memory type.
+	* flash.h (flash_memory): Inherit from generic_memory.  Simplified.
+	* flash.cxx: Removed code that duplicates generic_memory.
+	* generic.h: New file.  Collect common code here.
+	(read_any, write_any): Simplify.  Restore memory bound checking.
+	* generic.cxx (attempt_resize): New function.  Replace (resize).
+	Limit allocation to "size-max", a new attribute.
+	(imageload_handler, imagesave_handler): New functions.
+	(stream_generic_state, destream_generic_state): New functions.
+	Replace old (operator<<,>>).  Tolerate malloc errors.
+	(get_size_attr, set_size_attr): Tolerate malloc errors.	
+	
+	* README: Mention new pins/attributes.
+	* Makefile.am: Mention new files.
+	* Makefile.in: Regenerated.
+
+1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Update for bool/number notation changes.
+
+1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* flash.cxx  (*): Use host_int_X, not compiler_int_X.
+	* flash.h, generic.cxx: Same here.
+
+1999-09-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* generic.cxx (operator <<): Fix buffer overrun in RLE-encoding.
+	(*): Reformat slightly.
+
+1999-08-31  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README: Doc fixes.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* flash.h: Import sidutil::std_error_string.
+	* generic.cxx (load_image): Use it.
+	* Makefile.in: Regenerated.
+
+1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* generic.cxx (operator >>): Use ANSI setstate() instead of setf().
+
+1999-08-16  Ian Carmichael  <iancarm@cygnus.com>
+
+	* generic.cxx: readByte and writeByte members renamed.
+
+1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
+
+	* at29.cxx, generic.cxx: (*) Change big_int_N and 
+	little_int_N so that the default operations all use 
+	their integer values.
+
+1999-08-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* generic.xx (operator >>): Correct RLE-mode snapshot key.
+
+1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* at29.h: Introduced proper namespace usage.
+	* flash.h: Likewise.
+	* flash.cxx: Likewise.
+	* generic.cxx: Likewise.
+
+1999-07-27  Ben Elliston  <bje@cygnus.com>
+
+	* generic.cxx (generic_memory ctor): Make `size' a setting
+	attribute.
+	* flash.cxx (flash_memory ctor): Likewise.
+	(flash_uniform_sector_memory ctor): Make `sector-size' a setting
+	attribute.
+
+1999-07-26  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* generic.cxx: Add exception handling.
+
+1999-07-25  Faisal Khoja  <fkhoja@cygnus.com>
+	
+	* flash.h: Add exception handlers.
+	* at29.h: Likewise.
+	* at29.cxx: Likewise.
+
+1999-07-24  Ben Elliston  <bje@cygnus.com>
+
+	* flash.h (flash_uniform_sector_memory dtor): Remove declaration.
+
+1999-07-23  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* flash.h (~flash_uniform_sector_memory): Added { } to compile on NT.
+
+1999-07-22  Ben Elliston  <bje@cygnus.com>
+
+	* flash.cxx (flash_memory ctor): Remove `sector-size' attribute.
+	(flash_uniform_sector_memory ctor): Add it here, instead.
+	* flash.h (NOPERM_WRITE): Move here from at29.h.
+	(NOPERM_READ): Likewise.
+	(class flash_uniform_sector_memory): New class.
+	(flash_memory::sector_size): Move to flash_uniform_sector_memory.
+	* at29.h (at29_flash_memory): Inherit flash_uniform_sector_memory.
+	(NOPERM_WRITE): Move to flash.h.
+	(NOPERM_READ): Likewise.
+
+1999-07-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* at29.cxx (at29_flash_memory ctor): Call resize() after setting
+ 	memory size.  Accept ctor arguments to customize model.
+	(at29_flash_memory::types): New static const table.
+	* at29.h (at29_flash_memory): Corresponding declaration changes.
+	(at29_flash_memory_type): New struct.
+	* flash.h (resize): Make protected instead of private.
+	* generic.cxx (compMemoryListTypes): Add at29_flash_memory::types.
+	(compMemoryCreate): Use at29_flash_memory::types.
+	
+	* README: Updated to list AT29 family members, add attribute
+ 	defaults, etc.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): New macro.
+	(checkme): New target to run dejagnu on $DEJAGNUTESTS only.
+	* Makefile.in: Regenerated.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+	
+	* generic.cxx (operator >>): Don't new[] buffer redundantly.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* testsuite: Removed directory.
+	* Makefile.am (SUBDIRS): Don't recurse into it.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Ditto.
+	* configure: Ditto.
+	* configure.in: Ditto.
+
+1999-06-29  Ben Elliston  <bje@cygnus.com>
+
+	* README: Rewrite using standard documentation template.
+
+1999-06-23  Ben Elliston  <bje@cygnus.com>
+
+	* at29.cxx (at29_flash_memory::at29_bus::read): Re-work and
+	simplify method body.
+	(at29_flash_memory::at29_bus::read): Use the little endian version
+	of this method to do the real work.
+	(at29_flash_memory::at29_bus::write): Likewise.
+	* at29.h (NOPERM_READ): New macro.
+	(NOPERM_WRITE): Likewise.
+	Use these macros to declare unpermitted bus read/write methods.
+	
+1999-06-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* at29.cxx (at29_flash_memory): Use add_attribute_ro_value for
+	manufacturer-code attribute.
+
+1999-06-22  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (libmemory_la_SOURCES): Add flash.cxx, at29.cxx.
+	* Makefile.in: Regenerate.
+	* generic.cxx (compMemoryListTypes): Add hw-memory-flash-at29.
+	(compMemoryCreate): Handle this new component type.
+	* at29.h: New file.
+	* at29.cxx: Likewise.
+	* flash.h: Likewise.
+	* flash.cxx: Likewise.
+
+1999-06-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* generic.cxx (generic_read_write_bus): Update bus API calls
+	throughout.
+	(generic_read_only_bus): Ditto.
+	(generic_memory dtor): Simplify.
+	(write_any): Assert that access address is in range.
+	(read_any): Ditto.
+	
+1999-06-15  Ben Elliston  <bje@cygnus.com>
+
+	* generic.cxx (generic_read_only_bus): Put public members first.
+	(generic_read_write_bus): Likewise.
+	(generic_memory): Do not inline constructor/destructor. Put public
+	members first.
+	(generic_memory::image_file): Rename from this ..
+	(generic_memory::image_filename): .. to this. Update all callers.
+	(generic_memory::generic_memory): Move method body to here.
+	(generic_memory::~generic_memory): Likewise.
+
+	* compMemory.cxx: Rename from this ..
+	* generic.cxx: .. to this.
+	* Makefile.am (libmemory_la_SOURCES): Update.
+	* Makefile.in: Regenerate.
+
+1999-06-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMemory.cxx (compMemoryDelete): New function.
+	(mem_component_library): Register it.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+	
+	* compMemory.cxx (compMemoryListTypes, compMemoryCreate):
+	Renamed type "memory" -> "hw-memory-ram/rom-basic".
+	* README: Update with new component type names.
+	
+1999-06-01  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMemory.cxx (operator>>,<<): Implement simple-minded RLE
+ 	encoding for memory state-snapshot.
+
+1999-05-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMemory.cxx (load_image): New function.
+	(ctor): Add "load-image!" attribute, which calls above function.
+	* README (load-image!): Document new attribute.
+	(wait-states): Forget about this amputated function.
+	* configure.in: Look for strerror().
+	* configure: Regenerated.
+
+1999-05-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMemory.cxx (restore_state): Return sid::component::status.
+
+1999-05-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* aclocal.m4: Regenerated.
+
+1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMemory.cxx (mem_component_library): DLLEXPORT it.
+	* configure.in: Be win32-dll-capable.
+	* configure: Regenerated.
+	* config.in: Ditto.
+	* aclocal.m4: Regenerated for new libtool.
+	* Makefile.in: Ditto.
+
+1999-05-01  Ron Unrau  <runrau@cygnus.com>
+
+	* compMemory.cxx: streamline for speed
+
+1999-04-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (LDFLAGS): Add -no-undefined
+	* Makefile.in: Regenerated.
+
+1999-04-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: New file.
+	* compMemory.cxx (operator <<, >>): Use unencoded binary string 
+	for state snapshot.
+
+1999-04-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMemory.cxx (generic_memory_bus): Use compiler_int_X
+	for more members.  Add "state-snapshot" virtual attribute.
+	(save_state, restore_state): New functions. Call:
+	(operator <<, operator >>): New functions. Very rudimentary state 
+	streaming.
+	(memory_tester): Removed class and its traces.
+	* memtest.conf.in: Removed.
+	
+	* configure.in (AC_CONFIG_SUBDIRS): Configure testsuite/.
+	* Makefile.am (SUBDIRS): Descend there.
+	* configure: Regenerated.
+	* Makefile.in: Regenerated.
+
+1999-04-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMemory.cxx (*): Adapt to renamed fixed_attribute_map functions.
+
+1999-04-03  Ron Unrau  <runrau@cygnus.com>
+
+	* compMemory.cxx: swap addr<->data in bus::read and bus::write
+
+1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Use new AC_CONFIG_AUX_DIR.
+	* configure: Regenerated.
+	* Makefile.am: Build libtool -modules.
+	* Makefile.in: Regenerated.
+
+1999-03-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMemory.cxx (write_any,read_any): Revert changes.
+
+1999-03-15  Ron Unrau  <runrau@cygnus.com>
+
+	* compMemory.cxx(write_any,read_any): make host-endian independent
+
+1999-03-10  Ron Unrau  <runrau@cygnus.com>
+
+	* compMemory.cxx: incorporate revised pin API
+
+1999-03-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMemory.cxx (class generic_memory): Remove unneeded virtual
+ 	inheritance.  Add relationship API stub.
+	(class memory_tester): Ditto.
+
+1999-02-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMemory.cxx: Clean up some warnings.
+
+1999-02-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMemory.cxx (generic_memory): Add "wait-states" attribute for
+ 	returning "sid::bus::notready" indication on every N-1 out of N
+ 	accesses.  Use attribute-change callback for memory resizing.
+	(generic_memory_bus): Use it.
+	
+	* Makefile.am: Switch to foreign mode.  Adjust for automake 1.4.
+	* configure.in: Adjust for autoconf 2.13.
+	* Makefile.in: Rebuilt.
+	* aclocal.m4: Rebuilt.
+	* configure: Rebuilt.
+
+1999-01-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMemory.cxx (generic_memory): Use fixed_bus_map_component
+	mixin.
+	(memory_tester): Use fixed_accessor_map_component mixin.
+
+1998-12-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (INCLUDES): Added . and ../include.
+	* configure.in: Removed compulsory checks.
+	* Makefile.in: Rebuilt.
+ 	* configure: Rebuilt.
+
+1998-12-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Look for strstream.h.
+	* configure: Rebuilt.
+	* compMemory.cxx: Added tracing calls (commented out).
+
+1998-12-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMemory.cxx (compMemory): Use new stub functions from
+ 	sidcomputil.h to mix in unused sub-APIs.
+	(memory_tester): New component that performs basic memory
+ 	component testing that was previously done in compDummy.
+	(compMemoryListTypes): Register new component type.
+	(compMemoryCreate): Register new component type.
+	* memtest.conf.in: New sid config file to drive memory tests.
+
+	* aclocal.m4: New file to enable local configuration.
+	* configure.in: Make script self-contained.
+	* Makefile.in: Rebuilt.
+	* configure: Rebuilt.
+

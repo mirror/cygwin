@@ -1,0 +1,344 @@
+# -*- Tcl -*-
+# monkey.exp
+#
+# Copyright (C) 2000 Red Hat
+#
+# Procedures for a monkey testing library. These procs are used to
+# fire random input to a victim component. If sid does not close its
+# stdin (ie crash), then the test is considered to have passed.
+#
+# State save/restore functionality is sometimes tested also.  It confirms that
+# standard attributes recover their save-time values at any subsequent restore. 
+# Dejagnu WARNINGs are emitted when something was overlooked.
+#
+# monkey_start and monkey_stop must be called at the start and end of
+# the test case. monkey_test can run a complete monkey test on a
+# component.
+
+
+
+# Return a random number between 0 and n-1.
+proc random {n} {
+    return [expr [expr int(16777216 * [expr rand()])] % int($n)]
+}
+
+
+# generate string with sequential chars between [low .. high]
+proc string_spectrum {low high} {
+    set chars {} 
+    for {set i $low} {$i <= $high} {incr i} {
+	lappend chars $i
+    }
+    return [binary format c* $chars]
+}
+
+
+set charsets(0) "0123456789"; set lenexps(0) 4
+set charsets(1) [string_spectrum 0 255] ; set lenexps(1) 12
+set charsets(2) "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"; set lenexps(2) 8
+set charsets(3) "bx-0123456789abcdef"; set lenexps(3) 4
+
+proc random_string {} {
+    global charsets lenexps
+    set class [random 4]
+    set charset $charsets($class)
+    set lenexp $lenexps($class)
+
+    set numchars [string length $charset]
+    set len [random [expr pow(2,$lenexp)]]
+    set garbage {}
+    for {set i 0} {$i < $len} {incr i} {
+	append garbage [string index $charset [random $numchars]]
+    }
+    return $garbage
+}
+
+
+# Override these procs in client .exp files to make monkey avoid accessing
+# specific pins/buses/attributes, based on respective names.
+
+proc pin_safe_p {pin_name} { return 1 }
+proc bus_safe_p {bus_name} { return 1 }
+proc attr_safe_p {attr_name} { return 1 }
+proc state_safe_p {} { return 1 }
+proc state_saved_p {attr_name} { return 1 }
+# XXX: add more?
+# eg., add parameters for operation type, non-name arguments 
+
+
+
+# Run a monkey test for a component.
+# type -- the component type.
+# symbol -- the name of the component library header.
+# lib -- the library name (e.g. libtimers.la).
+# iterations -- the number of random events to generate for the test.
+#   (may be overridden by a SID_MONKEYS environment variable)
+
+proc monkey_test {type sym lib {iterations 30s}} {
+    global env
+    global pins buses attributes
+
+
+    if [info exist env(SID_MONKEYS)] {
+	set iterations $env(SID_MONKEYS)
+    }
+
+    global test
+    set test "monkey test $type"
+    if {[monkey_start $type $sym $lib] < 0} then { return }
+
+    # If $iterations ends in a recognised time specifier
+    # (e.g. m => minutes), then run the tests for the specified
+    # duration, rather than as a fixed number of iterations.
+
+    if {[regexp {[smhd]$} $iterations]} {
+	regexp {([0-9]+)[smhd]$} $iterations ignore units
+	set now [clock seconds]
+	switch [string range $iterations end end] {
+	    s { set finishtime [expr $units + $now] }
+	    m { set finishtime [expr 60 * $units + $now] }
+	    h { set finishtime [expr 3600 * $units + $now] }
+	    d { set finishtime [expr 3600 * 24 * $units + $now] }
+	    default { error "unknown unit of time in $iterations" }
+	}
+	note "Testing $type until [clock format $finishtime]"
+	while {[clock seconds] < $finishtime} {
+	    do_one_test
+	}
+    } else {
+	for {set i 0} {$i < $iterations} {incr i} {
+	    do_one_test
+	}
+    }
+    sid_stop
+    pass "$test ($iterations iterations)"
+
+    catch {unset pins buses attributes}
+
+    # restore hooks for next monkey_test
+    proc pin_safe_p {pin_name} { return 1 }
+    proc bus_safe_p {bus_name} { return 1 }
+    proc attr_safe_p {attr_name} { return 1 }
+    proc state_safe_p {} { return 1 }
+    proc state_saved_p {attr_name} { return 1 }
+}
+
+
+# Do one monkey testing round
+proc do_one_test {} {
+    global num_state_snapshots
+
+    set value [random 100]
+    # skew distribution toward effective tests
+    if {$value < 30} then { 
+	monkey_test_pin
+    } elseif {$value < 50} then {
+	monkey_test_bus
+    } elseif {$value < 96} then {
+	monkey_test_attribute
+    } elseif {$value < 98} then {
+	monkey_test_state_save
+    } else {
+	monkey_test_state_restore
+    }
+}
+
+
+
+# Start the monkey test--only called by monkey_test.  Return <0 on failure.
+proc monkey_start {type sym lib} {
+    global test victim
+    global pins buses attributes
+    global num_state_snapshots
+    global state_snapshots
+    global state_snapshot_attrs state_snapshot_bad_attrs
+    
+    sid_config_component_test_with_tracing \
+	    "monkey.conf" "load [sid_find_file $lib] $sym" $type
+	    
+    sid_start "monkey.conf"
+    if {$victim == ""} then { fail "$test - sid startup"; return -1 }
+   
+    catch {unset pins buses attributes}
+    set pins [sid_cmd [list sid::component::pin_names $victim]]
+    set buses [sid_cmd [list sid::component::bus_names $victim]]
+    set attributes [sid_cmd [list sid::component::attribute_names $victim]]
+
+    catch {unset num_state_snapshots state_snapshots state_snapshot_attrs state_snapshot_bad_attrs}
+    set num_state_snapshots 0
+    set state_snapshot_bad_attrs [list]
+
+    return 0
+}
+
+# Monkey test a pin (decided at runtime).
+proc monkey_test_pin {} {
+    global pins victim
+
+    # Pick a random pin.
+    if {[llength $pins] == 0} then { return }
+    set pin [lindex $pins [random [llength $pins]]]
+    if {! [pin_safe_p $pin]} then { return }
+
+    set handle [sid_cmd [list sid::component::find_pin $victim $pin]]
+    if {$handle == ""} then {
+	# probably just output-only pin
+	return
+    }
+
+    # Value-carrying pin.
+    set value [random [expr int(pow(2,16))]]
+    sid_cmd [list sid::pin::driven_h4 $handle $value]
+}
+
+# Monkey test a bus (transaction type and width decided at runtime).
+# The entire 2^32 address space is not tested, but the important
+# addresses lie in the 0 to 1K range.
+
+proc monkey_test_bus {} {
+    global buses victim
+
+    # Pick a random bus.
+    if {[llength $buses] == 0} then { return }
+    set bus [lindex $buses [random [llength $buses]]]
+    if {! [bus_safe_p $bus]} then { return }
+
+    set handle [sid_cmd [list sid::component::find_bus $victim $bus]]
+
+    # Pick an endianness.
+    if {[random 2] > 0} { set endian b } else { set endian l }
+
+    # Pick data width.
+    switch [random 4] {
+	0 { set width 1 }
+	1 { set width 2 }
+	2 { set width 4 }
+	3 { set width 8 }
+	default { warning "This should never happen!" }
+    }
+
+    # Pick address.
+    set addr [random [expr int(pow(2,30))]]
+
+    # Pick read or write operation.
+    if {[random 2] > 0} { set op write } else { set op read }
+    
+    # Do the operation.
+    if {$op == "write"} {
+	switch $width {
+	    1 { set data [random 256] }
+	    2 { set data [random 65536] }
+	    4 { set data [random [expr int(pow(2,30))]] }
+	    8 { set data [random [expr int(pow(2,30))]] }
+	}
+	sid_cmd [list sid::bus::write_h4_$endian$width $handle $addr $data]
+    } else {
+	sid_cmd [list sid::bus::read_h4_$endian$width $handle $addr]
+    }
+}    
+
+# Monkey test an attribute (decided at runtime).
+# A random string of garbage, composed of a random number of
+# characters from $charset is used.
+
+proc monkey_test_attribute {} {
+    global charset numchars
+    global attributes victim
+
+    # Pick a random attribute.
+    if {[llength $attributes] == 0} then { return }
+    set attr [lindex $attributes [random [llength $attributes]]]
+    if {! [attr_safe_p $attr]} then { return }
+
+    set garbage [random_string]
+    sid_cmd [list sid::component::set_attribute_value $victim $attr $garbage]
+}
+
+
+# Accumulate a state snapshot of the target component.
+# Collect both the "state-snapshot" attribute, and also pin/register/setting attributes.
+proc monkey_test_state_save {} {
+    global num_state_snapshots
+    global state_snapshots
+    global state_snapshot_attrs
+    global victim
+
+    # do no work if this is deemed unsafe
+    if {! [state_safe_p]} then { return }
+
+    set state [sid_cmd [list sid::component::attribute_value $victim state-snapshot]]
+    if {$state == ""} then {
+	# state save/restore apparently not supported
+	return
+    }
+
+    incr num_state_snapshots
+    set state_snapshots($num_state_snapshots) $state
+
+    # fetch all user-visible attribute names
+    set attrnames [list]
+    foreach category {pin setting register} {
+	set attrlist [sid_cmd [list sid::component::attribute_names_in_category $victim $category]]
+	foreach an $attrlist {
+	    lappend attrnames $an
+	}
+    }
+    # collect their current values 
+    foreach attrname $attrnames {
+	set attrvalue [sid_cmd [list sid::component::attribute_value $victim $attrname]]
+	set state_snapshot_attrs($num_state_snapshots,$attrname) $attrvalue
+    }
+}
+
+
+# Pick a random state snapshot accumulated from the target component and attempt to
+# restore it.  Confirm that user-visible attributes are back to their old values.
+proc monkey_test_state_restore {} {
+    global num_state_snapshots
+    global state_snapshots
+    global state_snapshot_attrs state_snapshot_bad_attrs
+    global victim
+    global test
+
+    if {$num_state_snapshots == 0} then {
+	return
+    }
+
+    set pick [expr [random $num_state_snapshots] + 1]
+
+    set state $state_snapshots($pick)
+    set result [sid_cmd [list sid::component::set_attribute_value $victim state-snapshot $state]]
+    if {$result != "ok"} then {
+	# don't warn over and over again - dummy attribute
+	set attrname "state-snapshot"
+	if {[lsearch -exact $state_snapshot_bad_attrs $attrname] == -1} then {
+	    warning "$test - state restore failed"
+	    lappend state_snapshot_bad_attrs $attrname
+	}
+    }
+
+    # fetch all user-visible attribute names
+    set attrnames [list]
+    foreach category {pin setting register} {
+	set attrlist [sid_cmd [list sid::component::attribute_names_in_category $victim $category]]
+	foreach an $attrlist {
+	    lappend attrnames $an
+	}
+    }
+    # compare their current values 
+    foreach attrname $attrnames {
+	set attrvalue1 [sid_cmd [list sid::component::attribute_value $victim $attrname]]
+	set attrvalue2 $state_snapshot_attrs($pick,$attrname)
+	if {$attrvalue1 != $attrvalue2} then {
+	    # quietly accept failure for known-unsaved attributes
+	    if {! [state_saved_p $attrname]} then {
+		lappend state_snapshot_bad_attrs $attrname
+	    }
+	    # don't warn over and over again
+	    if {[lsearch -exact $state_snapshot_bad_attrs $attrname] == -1} then {
+		warning "$test - state restore did not preserve $attrname"
+		lappend state_snapshot_bad_attrs $attrname
+	    }
+	}
+    }
+}

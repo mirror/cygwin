@@ -1,0 +1,353 @@
+# unix.exp - Test driver for the SID component testsuite.  -*- Tcl -*-
+
+# Copyright (C) 1999, 2000 Red Hat.
+# This file is part of SID and is licensed under the GPL.
+# See the file COPYING.SID for conditions for redistribution.
+
+############################################################################
+# Utility routines for sid test cases
+
+proc sid_config_component_etc_test { file pfx type sfx } {
+    global prefix
+    set f [open $file "w"]
+    puts $f "$pfx"
+    puts $f "load [sid_find_file libtclapi.la] tcl_bridge_library"
+    puts $f "new bridge-tcl tester"
+    puts $f "new $type real-victim"
+    puts $f "set tester load! [sid_find_file tester.tcl]"
+    puts $f "set tester hexify? yes-please-and-thanks"
+    puts $f "relate tester victim real-victim"
+    puts $f "relate tester real-victim real-victim"
+    puts $f "connect-pin main perform-activity -> tester command-io!"
+    puts $f "connect-pin main perform-activity -> tester !event"
+    puts $f "$sfx"
+    verbose "Created sid configuration file $file without tracing" 
+    close $f
+}
+
+proc sid_config_component_etc_test_with_tracing { file pfx type sfx } {
+    global prefix
+    set f [open $file "w"]
+    puts $f "$pfx"
+    puts $f "load [sid_find_file libtclapi.la] tcl_bridge_library"
+    puts $f "new bridge-tcl tester"
+    puts $f "new sid-api-trace wrapper"
+    puts $f "new $type real-victim"
+    puts $f "set tester load! [sid_find_file tester.tcl]"
+    puts $f "set tester hexify? yes-please-and-thanks"
+    puts $f "relate tester victim wrapper"
+    puts $f "relate tester real-victim real-victim"
+    puts $f "relate wrapper victim real-victim"
+    puts $f "set wrapper victim-trace? 1"
+    puts $f "connect-pin main perform-activity -> tester command-io!"
+    puts $f "connect-pin main perform-activity -> tester !event"
+    puts $f "connect-pin main perform-activity -> wrapper !event"
+    puts $f "$sfx"
+    verbose "Created sid configuration file $file with tracing" 
+    close $f
+}
+
+
+proc sid_config_component_test_with_tracing { file pfx type } {
+    sid_config_component_etc_test_with_tracing $file $pfx $type ""
+}
+
+proc sid_config_component_test { file pfx type } {
+    sid_config_component_etc_test $file $pfx $type ""
+}
+
+
+# Start up a SID executable.  If TOOL_OPTIONS includes the substring
+# "static", then use a statically linked sid program, built using
+# mksidconf.  Otherwise use the plain main/dynamic "sid" frontend.
+# In this case, TOOL_OPTIONS also better include "install", since
+# mksid currently only works on the install tree.
+
+proc sid_start {file} {
+    global spawn_id
+    global TOOL_OPTIONS
+    global prefix
+    global srcdir
+    global victim
+    global env
+    verbose "starting sid" 2
+
+    if {[string match "*install*" $TOOL_OPTIONS]} then {
+	# testing install tree
+	# rely on compiled-in SID_EXEC_PREFIX to find parts
+    } else {
+	# testing build tree
+	set env(SID_LIBRARY_PATH) [join [glob "../*" "$srcdir/../*"] ":"]
+	# srcdir=/..../sid/component/testsuite
+	set tcl_library "$srcdir/../../../tcl/library"
+        global host_os
+	switch -glob $host_os {
+	  {cygwin*} { set tcl_library [exec cygpath -w $tcl_library] }
+        }
+	set env(TCL_LIBRARY) $tcl_library
+    }
+
+    if {[string match "*static*" $TOOL_OPTIONS]} then {
+	set mksidconf [sid_find_file "mksidconf"]
+	system $mksidconf -static $file
+	regsub "(.*).conf" $file {./\1} sid
+        regsub "(.*).conf" $file {\1.sconf} file
+    } else {
+	set sid [sid_find_file "sid" "sid.exe"]
+    }
+
+    set pid [spawn $sid $file]
+
+    global timeout
+    set last_timeout $timeout
+    set timeout 30
+    expect {
+	timeout { perror "timeout while starting [list $sid $file]"; return 0}
+	eof { perror "eof while starting [list $sid $file]"; return 0}
+	-re "tester.ready" }
+    set timeout $last_timeout
+
+    set victim [sid_cmd "set relationships(victim)"]
+    verbose "victim component: $victim" 2
+    return $pid
+}
+
+
+proc sid_stop {} {
+    global spawn_id
+    verbose "closing down sid" 2
+    catch {close -slave}
+    catch {exec "kill" [exp_pid]}
+    wait
+    return 1
+}
+
+
+
+# generate a printworthy subset of argument
+proc prettyprint { cmd } {
+    regsub -all {[^ -~]} $cmd {.} cmdpretty
+    return [list $cmdpretty]
+}
+
+
+proc sid_cmd { cmd } {
+    global spawn_id
+    global expect_out
+    global test
+
+    if [catch { exp_pid }] then {
+	unresolved "$test - spawned sid process already gone"
+	return
+    }
+
+    # wait for prompt
+    global timeout
+    set last_timeout $timeout
+    set timeout 3
+    set ok 1
+    expect {
+	timeout { unresolved "$test - timeout before [prettyprint $cmd]"; set ok 0 }
+	eof { unresolved "$test - eof before [prettyprint $cmd]"; set ok 0 }
+	"command>"
+    }
+    set timeout $last_timeout
+    if {! $ok} then { return "" }
+
+    # encode string
+    binary scan $cmd H* encoded
+
+    set iterations [expr [string length $encoded] / 64]
+    for {set i 0} {$i < $iterations} {incr i} {
+	set first [expr $i * 64]
+	set last [expr $first + 63]
+	send "[string range $encoded $first $last]+\n"
+    }
+    set first [expr $i * 64]
+    send "[string range $encoded $first end]\n"
+
+    expect {
+	timeout { fail "$test - timeout after [prettyprint $cmd]" ; return "" }
+	eof { fail "$test - eof after [prettyprint $cmd]"; return "" }
+	-re "(ERROR:\[^\n\]*)" {
+	    fail "$test - [prettyprint $expect_out(1,string)] after [prettyprint $cmd]"
+	    return ""
+	}
+	-re "result>>(\[0-9a-f\]*)<<result" {
+	    set result $expect_out(1,string)
+	}
+	-re "split>>(\[0-9a-f\]*)<<split" {
+	    set result $expect_out(1,string)
+	    while {1} {
+		expect {
+		    timeout { fail "$test - timeout3" ; return "" }
+		    eof { fail "$test - eof3" ; return "" }
+		    -re "split>>(\[0-9a-f\]*)<<split" {
+			append result $expect_out(1,string)
+		    }
+		    -re "split-end" { break }
+		}
+	    }
+	}
+    }
+    # undo encoding in tester.tcl
+    set decoded [binary format H* $result]
+    verbose "result $decoded" 3
+    return $decoded
+}
+
+
+# call a command; ignore result (but assert that it's not an ERROR.)
+proc sid_assert_success {cmd} {
+    global test
+    set result [sid_cmd $cmd]
+    if [string match "*ERROR*" $result] then { fail $test } else { pass $test }
+}
+
+# call a command; assert match on return value
+proc sid_assert_matches {cmd pattern} {
+    global test
+    set result [sid_cmd $cmd]
+    if [string match $pattern $result] then { pass $test } else { fail $test }
+}
+
+proc sid_assert_equals {cmd number} {
+    global test
+    set result [sid_cmd $cmd]
+    if {$result == $number} then { pass $test } else { fail $test }
+}
+
+# call a command; assert match on list result
+proc sid_assert_includes_all {cmd patterns} {
+    global test
+    set result [sid_cmd $cmd]
+    foreach pat $patterns {
+	if {[string first $pat $result] == -1} then {fail $test ; return }
+    }
+    pass $test
+}
+
+# call a command; assert match on list result
+proc sid_assert_includes_none {cmd patterns} {
+    global test
+    set result [sid_cmd $cmd]
+    foreach pat $patterns {
+	if {[string first $pat $result] != -1} then {fail $test ; return }
+    }
+    pass $test
+}
+
+
+# Find a file somewhere in the build or install directory hierarchy.
+# Decide where to look based on TOOL_OPTIONS variable (the --tool_opts=VALUE
+# option from $RUNTESTFLAGS).  If that includes the substring "install", use 
+# the install directory tree ($prefix etc.) to find the given file.  If the
+# variable is unset or set not to "install", use the build & source directories 
+# instead.
+proc sid_find_file {args} {
+    global TOOL_OPTIONS
+    global prefix
+    global srcdir
+    if {[string match "*install*" $TOOL_OPTIONS]} then {
+	set bases [list "$prefix"]
+    } else {
+	# try to get to the build and source directory
+	set bases [list "../.." "$srcdir/../.."]
+    }
+    set files {} 
+    foreach base $bases {
+        foreach file $args {
+	    verbose "looking for $file under $base" 2
+	    if {[llength $files] > 0} then { break }
+	    set files [concat $files [glob -nocomplain -- $base/$file $base/*/$file $base/*/*/$file $base/*/*/*/$file]]
+	}
+    }
+    verbose -log "found $files" 2
+    switch [llength $files] {
+	0 { perror "No matches for $args under $bases" }
+	1 { return $files }
+	default { return [lindex $files 0] }
+    }
+}
+
+
+# These routines don't really belong in unix.exp, but until there's
+# another file.
+# These were derived from find_gas,etc. in libgloss.exp.
+# There's no real heuristic that will work, so for now go with something
+# simple: use dejagnu's tool_root_dir.
+
+proc sid_find_gas { toolchain_prefix } {
+    global toolchain_root_dirs
+    if { [info exists toolchain_root_dirs($toolchain_prefix)]
+    && [file exists $toolchain_root_dirs($toolchain_prefix)/gas/as-new] } {
+	return $toolchain_root_dirs($toolchain_prefix)/gas/as-new
+    }
+    return ${toolchain_prefix}-as
+}
+
+proc sid_find_ld { toolchain_prefix } {
+    global toolchain_root_dirs
+    if { [info exists toolchain_root_dirs]
+    && [file exists $toolchain_root_dirs($toolchain_prefix)/ld/ld-new] } {
+	return $toolchain_root_dirs($toolchain_prefix)/ld/ld-new
+    }
+    return ${toolchain_prefix}-ld
+}
+
+
+proc sid_find_gcc { toolchain_prefix } {
+    global toolchain_root_dirs
+    if { [info exists toolchain_root_dirs]
+    && [file exists $toolchain_root_dirs($toolchain_prefix)/gcc/xgcc] } {
+	return "$toolchain_root_dirs($toolchain_prefix)/gcc/xgcc -B$toolchain_root_dirs($toolchain_prefix)/gcc/"
+    }
+    return ${toolchain_prefix}-gcc
+}
+
+proc sid_find_sid {} {
+    return [sid_find_file "sid" "sid.exe"]
+}
+
+
+proc sid_find_sid_bsp { toolchain_prefix } {
+    # ignore toolchain_prefix.
+    return [sid_find_file "configrun-sid"]
+}
+
+
+############################################################################
+# Routines automatically called by runtest
+
+# sidcomp_version -- print and return version number
+proc sidcomp_version {} {
+    puts "version?"
+    set version 0.1
+    clone_output "sidcomp test $version\n"
+}
+
+# sidcomp_exit -- quit and cleanup
+proc sidcomp_exit {} {
+    # Do nothing.
+}
+
+# sidcomp_start -- start the test bucket
+proc sidcomp_start {} {
+    global TOOL_OPTIONS host_triplet crappy_tcl
+    if {[info exists TOOL_OPTIONS]} then { } else { set TOOL_OPTIONS "build" }
+    source "../../config/info.tcl"
+
+    # tcl on some platforms can't handle passing large strings between
+    # the expect and the sid processes without corruption.  Set crappy_tcl
+    # for these
+    switch -glob $host_triplet {
+	*-*-solaris* { set crappy_tcl 1 }
+	default { set crappy_tcl 0 }
+    }
+}
+
+
+############################################################################
+# Do these things during test suite startup.
+
+sidcomp_start

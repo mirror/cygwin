@@ -1273,8 +1273,44 @@ EOF
 fi
 echo "$ac_t""$sid_cv_cctype_std" 1>&6
 		
+echo $ac_n "checking whether __builtin_expect is supported""... $ac_c" 1>&6
+echo "configure:1278: checking whether __builtin_expect is supported" >&5
+if eval "test \"`echo '$''{'sid_cv_builtin_expect'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  cat > conftest.$ac_ext <<EOF
+#line 1283 "configure"
+#include "confdefs.h"
 
+int main() {
 
+  if (__builtin_expect (2, 2))
+    return 0; 
+  else
+    return 1;
+
+; return 0; }
+EOF
+if { (eval echo configure:1295: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+  rm -rf conftest*
+  sid_cv_builtin_expect="yes"
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  sid_cv_builtin_expect="no"
+fi
+rm -f conftest*
+fi
+
+if test "${sid_cv_builtin_expect}" = "yes"; then
+	cat >> confdefs.h <<\EOF
+#define HAVE_BUILTIN_EXPECT 1
+EOF
+
+fi
+echo "$ac_t""$sid_cv_builtin_expect" 1>&6
+		
 
 trap '' 1 2 15
 cat > confcache <<\EOF

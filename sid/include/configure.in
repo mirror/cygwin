@@ -45,8 +45,19 @@ if test "${sid_cv_cctype_std}" = "yes"; then
 fi
 AC_MSG_RESULT([$sid_cv_cctype_std])
 		
-
-
+AC_MSG_CHECKING([whether __builtin_expect is supported])
+AC_CACHE_VAL(sid_cv_builtin_expect,
+	AC_TRY_COMPILE([],[
+  if (__builtin_expect (2, 2))
+    return 0; 
+  else
+    return 1;
+],[sid_cv_builtin_expect="yes"],[sid_cv_builtin_expect="no"]))
+if test "${sid_cv_builtin_expect}" = "yes"; then
+	AC_DEFINE(HAVE_BUILTIN_EXPECT, 1, [Define if compiler supports __builtin_expect])
+fi
+AC_MSG_RESULT([$sid_cv_builtin_expect])
+		
 
 dnl Outputs
 AC_OUTPUT(Makefile)

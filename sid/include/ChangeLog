@@ -1,3 +1,10 @@
+2001-03-05  Frank Ch. Eigler  <fche@redhat.com>
+
+        On advice from Momchil Velikov <velco@fadata.bg>:
+	* configure.in: Test for compiler support of __builtin_expect.
+	* sidconfig.h: Define LIKELY/UNLIKEY depending on this test.
+	* configure, sidconfutil.in: Regenerated.
+
 2001-03-01  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidconfig.h (LIKELY, UNLIKELY): New conditional cover macros

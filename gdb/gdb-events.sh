@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # User Interface Events.
-# Copyright 1999 Free Software Foundation, Inc.
+# Copyright 1999-2000 Free Software Foundation, Inc.
 #
 # Contributed by Cygnus Solutions.
 #
@@ -73,11 +73,10 @@ f:void:breakpoint_modify:int b:b
 #*:void:target_wait_loop_hook:void
 #*:void:init_gdb_hook:char *argv0:argv0
 #*:void:command_loop_hook:void
-#*:void:fputs_unfiltered_hook:const char *linebuff,GDB_FILE *stream:linebuff, stream
+#*:void:fputs_unfiltered_hook:const char *linebuff,struct ui_file *stream:linebuff, stream
 #*:void:print_frame_info_listing_hook:struct symtab *s, int line, int stopline, int noerror:s, line, stopline, noerror
 #*:int:query_hook:const char *query, va_list args:query, args
 #*:void:warning_hook:const char *string, va_list args:string, args
-#*:void:flush_hook:GDB_FILE *stream:stream
 #*:void:target_output_hook:char *b:b
 #*:void:interactive_hook:void
 #*:void:registers_changed_hook:void
@@ -214,8 +213,8 @@ echo ""
 echo ""
 cat <<EOF
 /* Interface into events functions.
-   Where a *_p() predicate is present, it must called before calling
-   the hook proper. */
+   Where a *_p() predicate is present, it must be called before
+   calling the hook proper. */
 EOF
 function_list | while eval read $read
 do
@@ -258,7 +257,7 @@ echo "#endif"
 cat <<EOF
 
 /* Install custom gdb-events hooks. */
-extern void set_gdb_event_hooks (struct gdb_events *vector);
+extern struct gdb_events *set_gdb_event_hooks (struct gdb_events *vector);
 
 /* Deliver any pending events. */
 extern void gdb_events_deliver (struct gdb_events *vector);
@@ -362,13 +361,15 @@ echo "#endif"
 echo ""
 cat <<EOF
 #if WITH_GDB_EVENTS
-void
+struct gdb_events *
 set_gdb_event_hooks (struct gdb_events *vector)
 {
+  struct gdb_events *old_events = current_event_hooks;
   if (vector == NULL)
     current_event_hooks = &queue_event_hooks;
   else
     current_event_hooks = vector;
+  return old_events;
 EOF
 function_list | while eval read $read
 do
@@ -534,6 +535,7 @@ void _initialize_gdb_events (void);
 void
 _initialize_gdb_events (void)
 {
+struct cmd_list_element *c;
 #if WITH_GDB_EVENTS
 EOF
 function_list | while eval read $read
@@ -546,13 +548,21 @@ do
 done
 cat <<EOF
 #endif
-  add_show_from_set (add_set_cmd ("eventdebug",
+  c=add_set_cmd ("eventdebug",
                                   class_maintenance,
                                   var_zinteger,
                                   (char *)&gdb_events_debug,
                                   "Set event debugging.\n\\
-When non-zero, event/notify debugging is enabled.", &setlist),
-                     &showlist);
+When non-zero, event/notify debugging is enabled.", &setlist);
+  deprecate_cmd(c,"set debug event");
+  deprecate_cmd(add_show_from_set(c,&showlist),"show debug event");
+  add_show_from_set (add_set_cmd("event",
+  				 class_maintenance,
+				 var_zinteger,
+				 (char *)&gdb_events_debug,
+				 "Set event debugging.\n\\
+When non-zero, event/notify debugging is enabled.", &setdebuglist),&showdebuglist);
+
 }
 EOF
 

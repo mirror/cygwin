@@ -16,6 +16,12 @@
 #ifndef _TCLWINPORT
 #define _TCLWINPORT
 
+#define WIN32_LEAN_AND_MEAN
+#define __USE_W32_SOCKETS
+#include <windows.h>
+#undef WIN32_LEAN_AND_MEAN
+#include <winsock.h>
+
 #include <malloc.h>
 #include <stdio.h>
 
@@ -24,17 +30,12 @@
 #include <errno.h>
 #include <process.h>
 #include <signal.h>
-#include <winsock.h>
 #include <sys/stat.h>
 #include <sys/timeb.h>
 #include <time.h>
 #include <io.h>
 #include <fcntl.h>
 #include <float.h>
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#undef WIN32_LEAN_AND_MEAN
 
 #ifdef _MSC_VER
 #define PASCAL
@@ -66,10 +67,10 @@
  * use by tclAlloc.c.
  */
 
-/* On cygwin32, we just use the supplied malloc and free, rather than
+/* On cygwin, we just use the supplied malloc and free, rather than
    using tclAlloc.c.  The cygwin32 malloc is derived from the same
    sources as tclAlloc.c, anyhow.  */
-#ifdef __CYGWIN32__
+#ifdef __CYGWIN__
 #define TclpAlloc(size)		malloc(size)
 #define TclpFree(ptr)		free(ptr)
 #define TclpRealloc(ptr, size)	realloc(ptr, size)

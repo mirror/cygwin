@@ -14,6 +14,8 @@ host_alias=@host_alias@
 
 CC = @CC@
 CFLAGS = @CFLAGS@
+EXTRA_CFLAGS = @EXTRA_CFLAGS@
+TIX_CFLAGS = $(CFLAGS) $(EXTRA_CFLAGS)
 NM = @NM@
 AS = @AS@
 LD = @LD@
@@ -387,10 +389,10 @@ endif
 #
 
 $(TMPDIR)/testMain.$(OBJEXT): $(ROOT)/win/tixWinMain.c
-	$(CC) -c $(TK_INCLUDES) -DSTATIC_BUILD -DTK_TEST $(CFLAGS) -o $@ $?
+	$(CC) -c $(TK_INCLUDES) -DSTATIC_BUILD -DTK_TEST $(TIX_CFLAGS) -o $@ $?
 
 $(TMPDIR)/tixWinMain.$(OBJEXT): $(ROOT)/win/tixWinMain.c
-	$(CC) -c $(TK_INCLUDES) -DSTATIC_BUILD $(CFLAGS) -o $@ $?
+	$(CC) -c $(TK_INCLUDES) -DSTATIC_BUILD $(TIX_CFLAGS) -o $@ $?
 
 ifeq ($(OBJEXT),o)
 
@@ -408,10 +410,10 @@ endif
 #
 
 .c.$(OBJEXT):
-	$(CC) -c $(CFLAGS) -DDLL_BUILD -DBUILD_tix $(TK_INCLUDES) -c -o $@ $<
+	$(CC) -c $(TIX_CFLAGS) -DDLL_BUILD -DBUILD_tix $(TK_INCLUDES) -c -o $@ $<
 
 $(TMPDIR)/%.$(OBJEXT): %.c
-	$(CC) -c $(CFLAGS) -DDLL_BUILD -DBUILD_tix $(TK_INCLUDES) -c -o $@ $<
+	$(CC) -c $(TIX_CFLAGS) -DDLL_BUILD -DBUILD_tix $(TK_INCLUDES) -c -o $@ $<
 
 clean:
 	rm -f $(TMPDIR)/*.$(OBJEXT) $(TMPDIR)/*.exp $(TMPDIR)/*.def 

@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclWin32Dll.c,v 1.14 1999/01/26 03:53:41 jingham Exp $
+ * RCS: @(#) $Id: tclWin32Dll.c,v 1.15 2000/01/26 20:03:51 dj Exp $
  */
 
 #include "tclWinInt.h"
@@ -58,11 +58,11 @@ BOOL APIENTRY		DllMain _ANSI_ARGS_((HINSTANCE hInst,
 #ifndef STATIC_BUILD
 
 /* CYGNUS LOCAL */
-#ifdef __CYGWIN32__
-/* cygwin32 requires an impure pointer variable, which must be
+#ifdef __CYGWIN__0
+/* CYGWIN requires an impure pointer variable, which must be
    explicitly initialized when the DLL starts up.  */
 struct _reent *_impure_ptr;
-extern struct _reent *__imp_reent_data;
+extern struct _reent *_imp__reent_data;
 #endif
 /* END CYGNUS LOCAL */
 
@@ -119,10 +119,10 @@ DllMain(hInst, reason, reserved)
     OSVERSIONINFO os;
 
     /* CYGNUS LOCAL */
-#ifdef __CYGWIN32__
-    /* cygwin32 requires the impure data pointer to be initialized
+#ifdef __CYGWIN__0
+    /* Cygwin requires the impure data pointer to be initialized
        when the DLL starts up.  */
-    _impure_ptr = __imp_reent_data;
+    _impure_ptr = _imp__reent_data;
 #endif
     /* END CYGNUS LOCAL */
 

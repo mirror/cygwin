@@ -1,3 +1,11 @@
+2001-04-06  Christopher Faylor <cgf@redhat.com>
+
+	* configure.in: Add test for -mwin32 requirement switch when building
+	on cygwin.
+	* configure: Regenerate.
+	* win/Makefile.in (EXTRA_CFLAGS): Add a place to potentially put
+	-mwin32 flag.
+
 Tue Jun  6 22:09:02 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* win/Makefile.in: Set up and use autoconf variables throughout to

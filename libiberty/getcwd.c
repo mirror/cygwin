@@ -14,6 +14,9 @@ DESCRIPTION
 	current directory's path doesn't fit in LEN characters, the result
 	is NULL and errno is set.
 
+	If pathname is a null pointer, getcwd() will obtain size bytes of
+	space using malloc.
+
 BUGS
 	Emulated via the getwd() call, which is reasonable for most
 	systems that do not have getcwd().
@@ -26,6 +29,12 @@ BUGS
 #include <sys/param.h>
 #endif
 #include <errno.h>
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
 
 extern char *getwd ();
 extern int errno;
@@ -47,6 +56,13 @@ getcwd (buf, len)
     if (strlen (ourbuf) >= len) {
       errno = ERANGE;
       return 0;
+    }
+    if (!buf) {
+       buf = (char*)malloc(len);
+       if (!buf) {
+           errno = ENOMEM;
+	   return 0;
+       }
     }
     strcpy (buf, ourbuf);
   }

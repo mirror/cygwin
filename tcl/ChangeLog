@@ -1,3 +1,8 @@
+2001-07-17  Frank Ch. Eigler  <fche@redhat.com>
+
+	* generic/tclInitScript.h (initScript): Check that nameofexecutable
+	is valid (file exists) before traversing it as a possible link.
+
 2001-04-06  Christopher Faylor <cgf@redhat.com>
 
 	Throughout change __CYGWIN32__ to __CYGWIN__.

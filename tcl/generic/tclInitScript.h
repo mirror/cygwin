@@ -84,7 +84,7 @@ static char initScript[] = "if {[info proc tclInit]==\"\"} {\n\
         # running a link and not the actual program.  So look for a\n\
         # link and chase it down to its source.\n\
         set execName [info nameofexecutable]\n\
-        if {[string compare [file type $execName] \"link\"] == 0} {\n\
+        if {[file exists $execName] && [string compare [file type $execName] \"link\"] == 0} {\n\
             set execName [file readlink $execName]\n\
             if {[string compare [file pathtype $execName] \"relative\"] == 0} {\n\
               set execName [file join [pwd] $execName]\n\

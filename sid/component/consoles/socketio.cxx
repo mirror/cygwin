@@ -1,7 +1,7 @@
 // socketio.cxx - A console that uses a socket to do its I/O.
 // -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -341,6 +341,13 @@ socketio::tx_handler (host_int_4 value)
   this->avg_out_buffer_size = 
     ((0.99 * this->avg_out_buffer_size) +
      (0.01 * this->out_buffer.length()));
+
+  // expedite poll
+  if (this->poll_interval > 1)
+    {
+      this->poll_interval = 1;
+      this->update_poll_interval ();
+    }
 }
 
 

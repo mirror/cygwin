@@ -5641,7 +5641,6 @@ sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
 sidtarget_ppc=$sidtarget_default
-sidtarget_sh=$sidtarget_default
 sidtarget_xstormy16=$sidtarget_default
 
 for targ in $all_targets

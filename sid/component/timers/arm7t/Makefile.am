@@ -11,3 +11,6 @@ libarm7ttimers_la_LDFLAGS =
 
 pkgdata_DATA = hw-timer-arm_ref.txt
 
+
+html_stylesheet=$(srcdir)/../../component_html.xsl
+include $(srcdir)/../../../config/Makefile.docs

@@ -11,6 +11,15 @@
 # PARTICULAR PURPOSE.
 
 
+# Makefile.docs -*- Makefile -*-
+# Copyright (C) 2001 Red Hat.
+# This file is part of SID and is licensed under the GPL.
+# See the file COPYING.SID for conditions for redistribution.
+#
+# ... to be included in document-building Makefile.am's
+#
+
+
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -68,6 +77,7 @@ DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
 LD = @LD@
 LIBTOOL = @LIBTOOL@
+LINKS = @LINKS@
 LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -75,7 +85,9 @@ NM = @NM@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
+SABLOTRON = @SABLOTRON@
 VERSION = @VERSION@
+XSLTPROC = @XSLTPROC@
 
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I $(srcdir)/../../../config
@@ -87,6 +99,10 @@ libarm7ttimers_la_SOURCES = arm.cxx
 libarm7ttimers_la_LDFLAGS = 
 
 pkgdata_DATA = hw-timer-arm_ref.txt
+
+html_stylesheet = $(srcdir)/../../component_html.xsl
+
+SUFFIXES = .xml .txt .html
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../../config/mkinstalldirs
 CONFIG_CLEAN_FILES = 
@@ -104,6 +120,11 @@ CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@
+CFLAGS = @CFLAGS@
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 DATA =  $(pkgdata_DATA)
 
 DIST_COMMON =  README ChangeLog Makefile.am Makefile.in aclocal.m4 \
@@ -120,8 +141,8 @@ OBJECTS = $(libarm7ttimers_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .cxx .lo .o .s
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+.SUFFIXES: .S .c .cxx .html .lo .o .s .txt .xml
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../../config/Makefile.docs
 	cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
@@ -415,6 +436,16 @@ all-redirect all-am all installdirs mostlyclean-generic \
 distclean-generic clean-generic maintainer-clean-generic clean \
 mostlyclean distclean maintainer-clean
 
+
+@MAINTAINER_MODE_TRUE@@HAVE_XSLTPROC_TRUE@.xml.html:
+@MAINTAINER_MODE_TRUE@@HAVE_XSLTPROC_TRUE@	xsltproc --output $@ $(html_stylesheet) $<
+
+@MAINTAINER_MODE_TRUE@@HAVE_XSLTPROC_FALSE@@HAVE_SABLOTRON_TRUE@.xml.html:
+@MAINTAINER_MODE_TRUE@@HAVE_XSLTPROC_FALSE@@HAVE_SABLOTRON_TRUE@	sabcmd $(html_stylesheet) $< $@
+
+@MAINTAINER_MODE_TRUE@@HAVE_LINKS_TRUE@.html.txt:
+@MAINTAINER_MODE_TRUE@@HAVE_LINKS_TRUE@	links -dump $< > $@
+@MAINTAINER_MODE_TRUE@@HAVE_LINKS_TRUE@	cp $@ $(srcdir)/$@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

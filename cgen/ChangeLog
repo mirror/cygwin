@@ -1,3 +1,8 @@
+2002-03-20  Hans-Peter Nilsson  <hp@axis.com>
+
+	* doc/pmacros.texi (Symbol concatenation): Mention that .sym
+	results are expanded recursively.
+
 2002-03-19  Hans-Peter Nilsson  <hp@axis.com>
 
 	* pmacros.scm (-pmacro-expand,scan): If result is a symbol,

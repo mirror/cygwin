@@ -18,14 +18,35 @@ AM_CXXFLAGS=$(TOP_CXXFLAGS)
 AM_MAKEFLAGS= "TOP_CXXFLAGS=$(TOP_CXXFLAGS)"
 MAKEOVERRIDES=
 
-OPCODES = ../../../opcodes/libopcodes.la
 LIBIBERTY = -L../../../libiberty -liberty
 TRACEDIS = tracedis.c
 
 libcgencpu_la_SOURCES = compCGEN.cxx $(TRACEDIS)
 libcgencpu_la_LDFLAGS = -module -no-undefined
-libcgencpu_la_LIBADD = @cpu_libs@ $(OPCODES) $(INTLLIBS) $(LIBIBERTY)
-libcgencpu_la_DEPENDENCIES = @cpu_libs@
+libcgencpu_la_LIBADD = @cpu_libs@ $(INTLLIBS) $(LIBIBERTY) cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo
+libcgencpu_la_DEPENDENCIES = @cpu_libs@ cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo
+
+OPCODES_COMPILE_FLAGS = -DHAVE_CONFIG_H \
+	-I../../../opcodes \
+	-I../../../bfd \
+	-I../../../intl \
+	-I$(srcdir)/../../../opcodes \
+	-I$(srcdir)/../../../include \
+	-I$(srcdir)/../../../bfd     \
+	-I$(srcdir)/../../../intl    \
+	-D_GNU_SOURCE 
+
+cgen-asm.lo: ../../../opcodes/cgen-asm.c
+	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
+
+cgen-dis.lo: ../../../opcodes/cgen-dis.c
+	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
+
+cgen-opc.lo: ../../../opcodes/cgen-opc.c
+	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
+
+dis-buf.lo: ../../../opcodes/dis-buf.c
+	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
 
 DEJAGNUTESTS = cpumonkey.exp dhrystone.exp
 check-local: all

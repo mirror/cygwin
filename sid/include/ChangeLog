@@ -5,6 +5,10 @@
 	(basic_cpu ctor): Initialize them.
 	(cg_profile): New function.
 
+2001-10-12  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* sidcpuutil.h (sidutil): Clarified expedited_regno_list comment.
+
 2001-10-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidcpuutil.h (basic_cpu ctor): Initialize those tracing flags.

@@ -74,6 +74,19 @@ Functionality:
    |                | tracing messages will be       |
    |                | printed to stderr during a     |
    |                | system call emulation.         |
+   |                |                                |
+   |                | The syscall-numbering-scheme   |
+   |                | setting causes the gloss       |
+   |                | component to use the system    |
+   |                | call numbering scheme          |
+   |                | specified. The gloss component |
+   |                | may then properly interpret    |
+   |                | non-standard syscall numbers   |
+   |                | that come from target-program  |
+   |                | libgloss routines. Currently,  |
+   |                | the only available             |
+   |                | non-standard numbering scheme  |
+   |                | is cygmon.                     |
    |----------------+--------------------------------|
    | initialization | When the reset pin is driven,  |
    |                | all open files are closed and  |
@@ -186,29 +199,32 @@ Component Reference:
    |debug-rx      |in       |0-255      |stdio         |
    +---------------------------------------------------+
 
-   +-------------------------------------------------------------+
-   |                         attributes                          |
-   |-------------------------------------------------------------|
-   |    name    |category| legal | default value |  behaviors   ||
-   |            |        |values |               |              ||
-   |------------+--------+-------+---------------+--------------||
-   |verbose?    |setting |boolean|false          |system call   ||
-   |            |        |       |               |emulation     ||
-   |------------+--------+-------+---------------+--------------||
-   |heap-base   |setting |number |0x80000        |initialization||
-   |------------+--------+-------+---------------+--------------||
-   |heap-limit  |setting |number |1024           |initialization||
-   |------------+--------+-------+---------------+--------------||
-   |stack-base  |setting |number |0x200000       |initialization||
-   |------------+--------+-------+---------------+--------------||
-   |stack-limit |setting |number |0x200000       |initialization||
-   |------------+--------+-------+---------------+--------------||
-   |command-line|setting |any    |''             |initialization||
-   |------------+--------+-------+---------------+--------------||
-   |max-fds     |setting |number |32             |initialization||
-   |------------+--------+-------+---------------+--------------||
-   |'tk tty'    |gui     |-      |'hw-visual-tty'|component gui ||
-   +-------------------------------------------------------------+
+   +-------------------------------------------------------------------------+
+   |                               attributes                                |
+   |-------------------------------------------------------------------------|
+   |          name          |category| legal | default value |  behaviors   ||
+   |                        |        |values |               |              ||
+   |------------------------+--------+-------+---------------+--------------||
+   |verbose?                |setting |boolean|false          |system call   ||
+   |                        |        |       |               |emulation     ||
+   |------------------------+--------+-------+---------------+--------------||
+   |syscall-numbering-scheme|setting |string |libgloss       |system call   ||
+   |                        |        |       |               |emulation     ||
+   |------------------------+--------+-------+---------------+--------------||
+   |heap-base               |setting |number |0x80000        |initialization||
+   |------------------------+--------+-------+---------------+--------------||
+   |heap-limit              |setting |number |1024           |initialization||
+   |------------------------+--------+-------+---------------+--------------||
+   |stack-base              |setting |number |0x200000       |initialization||
+   |------------------------+--------+-------+---------------+--------------||
+   |stack-limit             |setting |number |0x200000       |initialization||
+   |------------------------+--------+-------+---------------+--------------||
+   |command-line            |setting |any    |''             |initialization||
+   |------------------------+--------+-------+---------------+--------------||
+   |max-fds                 |setting |number |32             |initialization||
+   |------------------------+--------+-------+---------------+--------------||
+   |'tk tty'                |gui     |-      |'hw-visual-tty'|component gui ||
+   +-------------------------------------------------------------------------+
 
    +-------------------------------------------------+
    |                    accessors                    |

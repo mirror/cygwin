@@ -1,0 +1,141 @@
+2001-11-15  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* bochs.h [BX_SUPPORT_SID] (BX_VGA_MEM_READ): Change
+	expansion to 0 from NULL to prevent compiler warnings.
+
+	* cpu/cpu-sid.h: Remove #define for LOG_THIS; it
+	was causing the compiler to issue redefinition warnings.
+	* cpu/cpu-sid.cc: Add #define for LOG_THIS, to
+	prevent compiler warnings.
+	* cpu/init-sid.cc: Likewise.
+	* memory/memory-sid.cc: Likewise.
+
+2001-11-13  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* cpu/cpu-sid.cc: Added proper copyright notice.
+	* cpu/cpu-sid.h: Likewise.
+	* cpu/debugstuff-sid.cc: Likewise.
+	* cpu/exception-sid.cc: Likewise.
+	* cpu/fetchdecode-sid.cc: Likewise.
+	* cpu/init-sid.cc: Likewise.
+	* cpu/x86-memory-modes.cc: Likewise.
+	* cpu/x86.cc: Likewise.
+	* cpu/x86.h: Likewise.
+	* memory/memory-sid.cc: Likewise.
+	* memory/memory-sid.h: Likewise.
+	* cpu/debugstuff-sid.cc: Remove unneeded debug message.
+	* README: New file.
+
+2001-11-09  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* cpu/debugstuff-sid.cc (dbg_set_reg): Remove some checks that
+	bochs performed when writing to the eflags register.  They were
+	causing some gdb testsuite failures.
+	* memory/memory-sid.cc: Add exception handling to read_physical
+	and write_physical.
+
+2001-11-07  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* cpu/x86-memory-modes.cc: Change memory mode setup to use
+	sidcpuutil.h write_data_memory functions.
+	* cpu/x86-memory-modes.cc: Change default memory mode's gdt to
+	more closely resemble cygmon mode's.
+	* cpu/x86.cc: Remove write_memory and read_memory implementations.
+	* cpu/x86.h: Make sid_mem_c's read_physical and write_physical
+	friends of x86_cpu.
+	* cpu/x86.h: Remove write_memory and read_memory declarations.
+	* memory/memory-sid.cc: Rewrite write_physical and read_physical
+	implementations to use sidcpuutil.h's write_data_memory_* and
+	read_data_memory_* members.
+
+2001-10-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in (AC_CHECK_SIZEOF*): Give default sizes for
+	canadian-cross builds.
+	* configure: Regenerated.
+
+2001-10-12  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* cpu/x86.cc: Add blocking_on_syscall again.
+	* cpu/x86.h: Add blocking_on_syscall again.
+	* cpu/exception-sid.cc: Add trap to breakpoint comment.
+
+	* bochs.h: Include debug/debug.h.
+	* cpu/Makefile.am: Add debug.h to INCLUDES and added debugstuff-sid.cc
+	to libcpu_la_SOURCES.
+	* cpu/cpu-sid.cc: Add detail to error reporting.
+	* cpu/cpu-sid.h: Add dbg_get_eflags, dbg_get_reg, dbg_set_reg, INT3
+	removed verbose_p.
+	* cpu/exception-sid.cc: Intercept vector == 0x03 to call do_breakpoint.
+	* cpu/fetchdecode-sid.cc: Change BxOpcodeInfo to call sid version of INT3.
+	* cpu/soft_int-sid.cc: Include INT3 implementation.
+	* cpu/x86-memory-modes.cc: Change limit_scaled's to the proper value,
+	0xffffffff.
+	* cpu/x86.cc: Remove blocking_on_syscall, remove watchable_register "pc".
+	* cpu/x86.cc: Add call to create_gdb_register_attrs.
+	* cpu/x86.cc: Change do_syscall to use yield() rather than
+	blocking_on_syscall.
+	* cpu/x86.cc (step_insn): Catch cpu_exception, and add call to signal_trap
+	when enable_step_trap_p is set.
+	* cpu/x86.cc: Add implementations for do_breakpoint, flush_icache,
+	dgb_get_reg, dbg_set_reg, remove set_endian.
+	* cpu/x86.h: Add do_breakpoint, remove set_endian and blocking_on_syscall.
+	* cpu/x86.h: Change x86 component to a basic_bi_endian_cpu from a
+	basic_little_endian_cpu.
+
+2001-10-01  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* Makefile.am: Add conditional compiling of cpu/* fpu/* and 
+	memory/* files.
+	* components.cxx: Add info to generate stub when sid not
+	configured for x86 target.
+	* cpu/x86.h: Add verbose_p member.
+	* cpu/x86.cc: Add verbose_p support.
+
+2001-09-28  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in: Removed AC_OUTPUT calls for nonexistent subdirs.
+	* configure: Regenerated.
+
+2001-09-24  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* fpu/*: Add fpu support to bochs component.
+
+2001-09-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in (with_nogui): Hard-code --with-nogui.
+	* configure: Regenerated.
+
+2001-09-18  Frank Ch. Eigler  <fche@redhat.com>
+
+	* memory/misc_mem.cc (BX_MEM_C): Use sprintf, not snprintf, for
+	portability to Solaris.
+
+2001-09-18  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cpu/cpu.cc (prefetch): Make itranslate_* call conditional on
+	BX_SUPPORT_PAGING.
+	* cpu/cpu.h ({i,d}translate_linear): Make declaration conditional.
+	* cpu/main-hack.cc (main): Comment out if BX_SUPPORT_SID.
+
+2001-09-13  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* cpu/*: Remove deprecated files: memory-base.h memory-bochs.cc
+	memory-bochs.h memory-sid.cc memory-sid.h misc_mem.cc.
+	* memory/*: Remove deprecated files: memory-base.h memory-bochs.cc
+	memory-bochs.h.
+	* cpu/x86-memory-modes.cc: Add support for cygmon protected
+	memory mode.
+	* cpu/x86.cc: Add proper handling of signal_trap return values
+	to do_syscall().
+	* cpu/x86.h: Add memory-mode member to x86_cpu.
+
+2001-08-30  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* cpu/*: Make changes to support syscalls.
+
+2001-08-20  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	Subclass BX_CPU_C to create sid_cpu_c class.
+
+	Make changes to fetch/decode code; bochs now runs test asm program.

@@ -3,6 +3,10 @@
 	* libstdc++.m4: Reject shared libstdc++ possibility if g++ replies with
 	no path to "--print-file-name=libstdc++.a".
 
+2001-09-14  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* sidtargets.m4: Add x86 support.
+
 2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.docs: Support xsltproc; prefer it to sabcmd.

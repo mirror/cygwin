@@ -14,17 +14,20 @@ require 5.004;
 %cpu_comptype = (
 		 "arm" => "hw-cpu-arm7t",
 		 "thumb" => "hw-cpu-arm7t",
+		 "x86" => "hw-cpu-x86",
 	         # INSERT NEW ENTRIES HERE
 		 "m32r" => "hw-cpu-m32r/d"
 		 );
 
 %cpu_defaultendian = (
+		      "x86" => "-EL",
 		      "m32r" => "-EB"
 		      );
 
 %gloss_comptype = (
 		   "arm" => "sw-gloss-arm/angel",
 		   "thumb" => "sw-gloss-arm/angel",
+		   "x86" => "sw-gloss-generic/libgloss",
 	           # INSERT NEW ENTRIES HERE
 		   "m32r" => "sw-gloss-m32r/libgloss"
 		   );
@@ -32,6 +35,7 @@ require 5.004;
 %gloss_memspecs = (
 		   "arm" => "0x00000000,0x00800000",
 		   "thumb" => "0x00000000,0x00800000",
+		   "x86" => "0x00000,0x500000",
 	           # INSERT NEW ENTRIES HERE
 		   "m32r" => "0x00000000,0x00800000"
 		  );
@@ -79,7 +83,7 @@ if ($ENV{'SID'}) {
   $sid .= "/sid";
 }
 
-$version=q$Id: configrun-sid.in,v 1.30 2001/11/08 21:55:10 fche Exp $;
+$version=q$Id: configrun-sid.in,v 1.31 2001/11/27 22:58:59 fitzsim Exp $;
 
 # by default the loader data mapper connects to the cpu-mapper access-port
 $load_mapper_data = "cpu-mapper access-port";
@@ -198,6 +202,10 @@ connect-pin cpu trap-code -> gloss trap-code
 set gloss verbose? $opt_verbose
 connect-bus gloss target-memory $bus_upstream
 ";
+    if ($opt_cpu eq "x86")
+      {
+	 $second_section .= "set gloss syscall-numbering-scheme cygmon\n";
+      }
 
     if ($#exec_args >= 0) {
       $second_section .= "# args
@@ -338,7 +346,8 @@ if ($opt_gdb)
 		 "sched" => "sched_component_library",
 		 "tclapi" => "tcl_bridge_library",
 		 "timers" => "timer_component_library",
-		 "uart" => "uart_component_library"
+		 "uart" => "uart_component_library",
+		 "x86" => "x86_component_library"
 );
 
 
@@ -455,6 +464,11 @@ connect-pin cache-flush-net output-1 -> dcache invalidate-all\n";
 } else {
   $second_section .= "connect-bus cpu data-memory $bus_upstream\n";
 }
+
+if ($opt_cpu eq "x86")
+  {
+      $second_section .= "set cpu memory-mode cygmon\n";
+  }
 
 if ($opt_gprof)
   {
@@ -863,7 +877,11 @@ if ($opt_cpu eq "arm")
 # --engine
 if ($opt_engine eq "pbb")
   {
-    $second_section .= "set cpu engine-type pbb\n";
+# FIXME: the x86 component should support this setting
+    if ($opt_cpu ne "x86")
+      {
+	$second_section .= "set cpu engine-type pbb\n";
+      } 
   }
 elsif ($opt_engine eq "scache")
   {

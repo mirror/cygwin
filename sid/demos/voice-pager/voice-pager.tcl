@@ -1,6 +1,6 @@
 option add *font {Helvetica 10 bold}
 
-wm title . {Cygnus Voice Pager $Revision: 1.1 $}
+wm title . {Cygnus Voice Pager $Revision: 1.2 $}
 
 if {0} {
     # not needed - just bind to the <Destroy> event.

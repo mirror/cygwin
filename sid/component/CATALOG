@@ -1,8 +1,9 @@
-This is a current list of sid component shared libraries. $Date: 2001/08/04 11:50:50 $
+This is a current list of sid component shared libraries. $Date: 2001/11/27 22:58:59 $
 
 DIRECTORY       DSO                     COMPONENT_LIBRARY                  MAINTAINERS
 
 audio           libaudio.la             audio_component_library            Red Hat
+bochs		libx86.la		x86_component_library		   Red Hat
 cache		libcache.la		cache_component_library		   Red Hat
 cfgroot         libconfig.la            config_component_library           Red Hat
 cgen-cpu        libcgencpu.la           cgen_component_library             Red Hat
@@ -39,6 +40,7 @@ hw-audio-sid            Fictional audio codec
 hw-cache-basic		Basic 16kb direct-mapped cache
 hw-cache-*		Other memory caches (ref. component docs)
 hw-cpu-arm7t            ARM7 / ARM7T CPU model
+hw-cpu-x86		X86 CPU model
 hw-cpu-m32r/d           M32R/D CPU model
 hw-disk-ide             IDE hard drive model (controller + drives)
 hw-glue-bus-mux         Bus multiplexer

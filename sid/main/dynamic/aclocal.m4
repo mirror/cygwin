@@ -621,7 +621,7 @@ then
     AC_MSG_WARN(Assuming --enable-targets=all)
     all_targets=""
     sidtarget_default=1
-else
+else 
     all_targets="$target"
     sidtarget_default=0
 fi
@@ -639,6 +639,7 @@ AC_ARG_ENABLE(targets,
 
 dnl Enumerate known chip families
 sidtarget_arm=$sidtarget_default
+sidtarget_x86=$sidtarget_default
 sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
@@ -650,6 +651,7 @@ do
    case "$targ" in
       arm*)   sidtarget_arm=1 ;;
       thumb*) sidtarget_arm=1 ;;
+      i386*) sidtarget_x86=1 ;;
       mips*)  sidtarget_mips=1 ;;
       m32r*)  sidtarget_m32r=1 ;;
       m68k*)  sidtarget_m68k=1 ;;
@@ -662,6 +664,7 @@ done
 dnl Ensure at least one of these variables is non-zero.
 case 1 in
   ${sidtarget_arm}) ;;
+  ${sidtarget_x86}) ;;
   ${sidtarget_mips}) ;;
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
@@ -678,6 +681,11 @@ AC_MSG_CHECKING(ARM family support)
 AC_SUBST(sidtarget_arm)
 AM_CONDITIONAL(SIDTARGET_ARM,[test "x$sidtarget_arm" = x1])
 AC_MSG_RESULT($sidtarget_arm)
+
+AC_MSG_CHECKING(X86 family support)
+AC_SUBST(sidtarget_x86)
+AM_CONDITIONAL(SIDTARGET_X86,[test "x$sidtarget_x86" = x1])
+AC_MSG_RESULT($sidtarget_x86)
 
 AC_MSG_CHECKING(MIPS family support)
 AC_SUBST(sidtarget_mips)

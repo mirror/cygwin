@@ -3216,7 +3216,7 @@ then
     echo "configure: warning: Assuming --enable-targets=all" 1>&2
     all_targets=""
     sidtarget_default=1
-else
+else 
     all_targets="$target"
     sidtarget_default=0
 fi
@@ -3236,6 +3236,7 @@ fi
 
 
 sidtarget_arm=$sidtarget_default
+sidtarget_x86=$sidtarget_default
 sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
@@ -3246,6 +3247,7 @@ do
    case "$targ" in
       arm*)   sidtarget_arm=1 ;;
       thumb*) sidtarget_arm=1 ;;
+      i386*) sidtarget_x86=1 ;;
       mips*)  sidtarget_mips=1 ;;
       m32r*)  sidtarget_m32r=1 ;;
       m68k*)  sidtarget_m68k=1 ;;
@@ -3257,6 +3259,7 @@ done
 
 case 1 in
   ${sidtarget_arm}) ;;
+  ${sidtarget_x86}) ;;
   ${sidtarget_mips}) ;;
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
@@ -3267,7 +3270,7 @@ esac
 
 
 echo $ac_n "checking ARM family support""... $ac_c" 1>&6
-echo "configure:3271: checking ARM family support" >&5
+echo "configure:3274: checking ARM family support" >&5
 
 
 
@@ -3280,8 +3283,22 @@ else
 fi
 echo "$ac_t""$sidtarget_arm" 1>&6
 
+echo $ac_n "checking X86 family support""... $ac_c" 1>&6
+echo "configure:3288: checking X86 family support" >&5
+
+
+
+if test "x$sidtarget_x86" = x1; then
+  SIDTARGET_X86_TRUE=
+  SIDTARGET_X86_FALSE='#'
+else
+  SIDTARGET_X86_TRUE='#'
+  SIDTARGET_X86_FALSE=
+fi
+echo "$ac_t""$sidtarget_x86" 1>&6
+
 echo $ac_n "checking MIPS family support""... $ac_c" 1>&6
-echo "configure:3285: checking MIPS family support" >&5
+echo "configure:3302: checking MIPS family support" >&5
 
 
 
@@ -3295,7 +3312,7 @@ fi
 echo "$ac_t""$sidtarget_mips" 1>&6
 
 echo $ac_n "checking M32R family support""... $ac_c" 1>&6
-echo "configure:3299: checking M32R family support" >&5
+echo "configure:3316: checking M32R family support" >&5
 
 
 
@@ -3309,7 +3326,7 @@ fi
 echo "$ac_t""$sidtarget_m32r" 1>&6
 
 echo $ac_n "checking M68K family support""... $ac_c" 1>&6
-echo "configure:3313: checking M68K family support" >&5
+echo "configure:3330: checking M68K family support" >&5
 
 
 
@@ -3323,7 +3340,7 @@ fi
 echo "$ac_t""$sidtarget_m68k" 1>&6
 
 echo $ac_n "checking PPC family support""... $ac_c" 1>&6
-echo "configure:3327: checking PPC family support" >&5
+echo "configure:3344: checking PPC family support" >&5
 
 
 
@@ -3339,7 +3356,7 @@ echo "$ac_t""$sidtarget_ppc" 1>&6
 
 
 
-subdirs="cfgroot tcl audio cgen-cpu families timers"
+subdirs="bochs cfgroot tcl audio cgen-cpu families timers"
 
 
 
@@ -3448,7 +3465,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile testsuite/Makefile tconfig.h:tconfig.in siddoc
+trap 'rm -fr `echo "Makefile testsuite/Makefile tconfig.h:tconfig.in siddoc	
 	cache/Makefile
 	consoles/Makefile
 	gdb/Makefile
@@ -3549,6 +3566,9 @@ s%@HAVE_SABLOTRON_FALSE@%$HAVE_SABLOTRON_FALSE%g
 s%@sidtarget_arm@%$sidtarget_arm%g
 s%@SIDTARGET_ARM_TRUE@%$SIDTARGET_ARM_TRUE%g
 s%@SIDTARGET_ARM_FALSE@%$SIDTARGET_ARM_FALSE%g
+s%@sidtarget_x86@%$sidtarget_x86%g
+s%@SIDTARGET_X86_TRUE@%$SIDTARGET_X86_TRUE%g
+s%@SIDTARGET_X86_FALSE@%$SIDTARGET_X86_FALSE%g
 s%@sidtarget_mips@%$sidtarget_mips%g
 s%@SIDTARGET_MIPS_TRUE@%$SIDTARGET_MIPS_TRUE%g
 s%@SIDTARGET_MIPS_FALSE@%$SIDTARGET_MIPS_FALSE%g
@@ -3604,7 +3624,7 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile testsuite/Makefile tconfig.h:tconfig.in siddoc
+CONFIG_FILES=\${CONFIG_FILES-"Makefile testsuite/Makefile tconfig.h:tconfig.in siddoc	
 	cache/Makefile
 	consoles/Makefile
 	gdb/Makefile
@@ -3826,7 +3846,7 @@ if test "$no_recursion" != yes; then
     esac
   done
 
-  for ac_config_dir in cfgroot tcl audio cgen-cpu families timers; do
+  for ac_config_dir in bochs cfgroot tcl audio cgen-cpu families timers; do
 
     # Do not complain, so a configure script can configure whichever
     # parts of a large source tree are present.

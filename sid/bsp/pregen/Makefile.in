@@ -68,6 +68,7 @@ sidtarget_m32r = @sidtarget_m32r@
 sidtarget_m68k = @sidtarget_m68k@
 sidtarget_mips = @sidtarget_mips@
 sidtarget_ppc = @sidtarget_ppc@
+sidtarget_x86 = @sidtarget_x86@
 
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I $(srcdir)/../../config

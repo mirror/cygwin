@@ -1,3 +1,10 @@
+2001-10-17  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* sw-debug-gdb.xml: New file.
+	* sw-debug-gdb.txt: New file.
+	* Makefile.am: Add docs support.
+	* Makefile.in: Regenerated.
+
 2001-10-16  Dave Brolley  <brolley@redhat.com>
 
 	* gdb.h (target_schedulers_enabled): New vector member of class gdb.

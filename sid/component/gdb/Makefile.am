@@ -11,4 +11,8 @@ libgdb_la_SOURCES = gdb.cxx \
 
 libgdb_la_LDFLAGS = -module -no-undefined
 
+pkgdata_DATA = sw-debug-gdb.txt
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs
 

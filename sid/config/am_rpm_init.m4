@@ -159,7 +159,7 @@ dnl
 dnl   # end of file
 dnl   ---------- >8 ----------
 dnl
-dnl @version $Id: am_rpm_init.m4,v 1.2 2001/08/04 10:20:01 bje Exp $
+dnl @version $Id: am_rpm_init.m4,v 1.3 2001/11/27 22:59:12 fitzsim Exp $
 dnl @author Dale K. Hawkins <dhawkins@cdrgts.com>
 
 dnl AM_RPM_INIT

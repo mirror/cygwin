@@ -194,6 +194,8 @@ protected:
   bool tmpnam (string& filename, int& errcode);
   bool isatty (int fd, bool& result, int& errcode);
 
+  string syscall_numbering_scheme;
+  
   // true -> send various debugging messages to cerr.
   // ??? Would be nice to be able to specify a file.
   bool verbose_p;

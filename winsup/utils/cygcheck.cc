@@ -42,7 +42,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.59 $";
+static const char version[] = "$Revision: 1.60 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -102,9 +102,14 @@ static char **paths = 0;
  * keyeprint() is used to report failure modes
  */
 static int
-keyeprint (const char *name)
+keyeprint (const char *name, bool show_error = true, bool print_failed = true)
 {
-  fprintf (stderr, "cygcheck: %s failed: %lu\n", name, GetLastError ());
+  if (show_error)
+    fprintf (stderr, "cygcheck: %s%s: %lu\n", name,
+	print_failed ? " failed" : "", GetLastError ());
+  else
+    fprintf (stderr, "cygcheck: %s%s\n", name,
+	print_failed ? " failed" : "");
   return 1;
 }
 

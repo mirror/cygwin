@@ -1,3 +1,7 @@
+2001-03-21  Ben Elliston  <bje@redhat.com>
+
+	* cgen-maint.m4: New file.
+
 2001-02-05  Frank Ch. Eigler  <fche@redhat.com>
 
 	* ltmain.sh (link/dlpreload): Apply export-symbols-regexp to

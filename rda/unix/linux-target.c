@@ -1827,8 +1827,14 @@ linux_get_reg (struct gdbserv *serv, int regno, struct gdbserv_reg *reg)
       /* A buffer initialized to zeros we can refer to.  */
       static struct gdbserv_reg zeros;
 
-      /* Make sure we're not going to try to copy out more than we have.  */
+      /* Make sure we're not going to try to copy out more bytes than
+	 we have.  */
       assert (reginfo[regno].ptrace_size <= sizeof (zeros.buf));
+
+      /* Make sure we don't have some random offset that will take us
+	 beyond the end of the buffer.  Offsets for NOREGS entries
+	 should be zero.  */
+      assert (reginfo[regno].offset == 0);
 
       buf = (char *) zeros.buf;
     }

@@ -1,3 +1,69 @@
+2003-06-10  Doug Evans  <dje@sebabeach.org>
+
+	* mach.scm (current-*-add!): Disallow redefinition.  Make result
+	"unspecified".
+	* insn.scm (insn-builtin!): Don't define relaxable here, now defined in
+	operand.scm.
+	* operand.scm (operand-builtin!): Define RELAXABLE for insns too.
+	* cpu/m32r.cpu (disp8,disp24): RELAX renamed to RELAXABLE.
+
+	* gen-all-doc: Split arm and frv docs up a bit.
+
+	* cpu/arm.cpu: Add IDOC attribute.
+	* cpu/frv.cpu: Ditto.
+	* cpu/i960.cpu: Ditto.
+	* cpu/openrisc.cpu: Ditto.
+	* cpu/xstormy16.cpu: Ditto.
+	* cpu/m32r.cpu: Ditto.
+	(all insns): Explicitly specify IDOC attribute.
+
+	* Makefile.am (MACH,ISAS,INSN_FILE_NAME): New vars.
+	(desc,opcodes,sim-arch,sim-cpu,gas-test,sim-test): Use MACH,ISAS.
+	(html): Use MACH,ISAS,INSN_FILE_NAME.  Generate insn.html separately.
+	* Makefile.in: Regenerate.
+	* attr.scm (<integer-attribute>:parse-value-def): Implement.
+	(-attr-read): Defer computing default value until we know the type.
+	(attr-has-attr?): Delete, move contents to <attr-list>:has-attr?.
+	(<attr-list>:attr-present?): New method.
+	(atlist-attr-present?,obj-attr-present?): New fns.
+	(obj-has-attr-value?,obj-has-attr-value-no-default?): New fns.
+	(attr-builtin!): New insn attr IDOC.
+	* cgen-doc.scm (doc-arguments): New args -I,-N.
+	* enum.scm (parse-enum-vals): New arg errtxt, all callers updated.
+	Support comment as fourth element of enum value.
+	(enum-val-name,enum-val-value,enum-val-attrs,enum-val-comment): New fns.
+	* html.scm (gen-html-header): New arg kind, all callers updated.
+	(gen-table-of-contents): New arg insn-file, all callers updated.
+	(gen-list-entry,gen-doc-header): New fn.
+	(get-operands): Delete.
+	(gen-iformat-table): Rewrite.
+	(gen-insn-doc-1): Print constant-folded and trimmed semantics.
+	(gen-insn-doc-list): New args name, comment, insns.  All callers updated.
+	(get-insn-properties,guess-insn-idoc-attr!): New fn.
+	(insn-sets-pc?,insn-refs-mem?,insn-uses-fpu?): New fns.
+	(get-insns-for-category,gen-categories-insn-lists): New fns.
+	(gen-insn-docs): Simplify each insn's semantics first.
+	Print insn tables sorted by IDOC categories.
+	(*insn-html-file-name*): New global.
+	(cgen-insn.html): New fn.
+	(cgen-all): Update.
+	* insn.scm (<insn>): Create a setter for the `tmp' member.
+	* semantics.scm (insn-build-known-values): Renamed from
+	-build-known-values.  All callers updated.
+
+	* rtl.scm: Move traveral/evaluation support to ...
+	* rtl-traverse.scm: New file.
+	* read.scm: Maybe-load rtl-traverse.scm.
+
+	* rtl.scm (-rtx-valid-types): Add SETRTX.
+
+	* rtx-funcs.scm (nop,parallel): Fix mode.
+
+	* utils.scm (eqv-lookup-index): New fn.
+	(assq-lookup-index): Renamed from lookup-index.  All callers updated.
+
+	* dev.scm (load-doc): Set APPLICATION.
+
 2003-06-10  Dave Brolley  <brolley@redhat.com>
 
 	* sid-cpu.scm: Generate #include of config.h into @prefix@-sem.cxx.

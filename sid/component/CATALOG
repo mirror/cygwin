@@ -1,4 +1,4 @@
-This is a current list of sid component shared libraries. $Date: 2001/11/27 22:58:59 $
+This is a current list of sid component shared libraries. $Date: 2001/11/28 06:21:20 $
 
 DIRECTORY       DSO                     COMPONENT_LIBRARY                  MAINTAINERS
 
@@ -44,7 +44,7 @@ hw-cpu-x86		X86 CPU model
 hw-cpu-m32r/d           M32R/D CPU model
 hw-disk-ide             IDE hard drive model (controller + drives)
 hw-glue-bus-mux         Bus multiplexer
-hw-glue-probe-bus       Bus traffic tracer.
+hw-glue-probe-bus       Bus traffic tracer
 hw-glue-sequence        Sequential pin event dispatcher
 hw-interrupt-arm/ref    ARM7 reference peripheral: interrupt controller
 hw-interrupt-cogent/cma222      Interrupt controller: Cogent CMA222 ARM CPU board

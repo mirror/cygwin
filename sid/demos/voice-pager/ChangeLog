@@ -1,3 +1,10 @@
+2002-01-31  Klaus Pedersen <klaus.kruse.pedersen@mail.tele.dk>
+
+	* voice-pager-demo.conf.in: Load libtclapi.la.  `mapper' has been
+	renamed to `cpu-mapper' in bsp-generated configuration files;
+	update accordingly.
+	* voice-pager-demo.conf.pport: Likewise.
+
 2002-01-03  Ben Elliston  <bje@redhat.com>
 
 	* voice-pager.tcl: Update window title.
@@ -56,7 +63,7 @@
 
 	* mem-map.h (CODEC_BASE): Define.
 	* adac-driver.cxx: Use it instead of SIDCODEC.
-	* voice-pager.tcl.in: Add $Revision: 1.4 $ in title bar.
+	* voice-pager.tcl.in: Add $Revision: 1.5 $ in title bar.
 
 2000-02-07  Frank Ch. Eigler  <fche@redhat.com>
 

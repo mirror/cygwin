@@ -44,6 +44,15 @@ if test "$INSTALL" = "./install.sh"; then
     INSTALL=`pwd`/install.sh
 fi
 
+# Make sure prefix and exec_prefix default to proper values
+
+if test "${prefix}" = "NONE"; then
+    prefix=/usr/local
+fi
+if test "${exec_prefix}" = "NONE"; then
+    exec_prefix=$prefix
+fi
+
 #--------------------------------------------------------------------
 #	Version information about this TIX release.
 #--------------------------------------------------------------------
@@ -259,11 +268,7 @@ TIX_LIB_FULL_PATH="`pwd`/${TIX_LIB_FILE}"
 #--------------------------------------------------------------------
 #	Find out where tcl is installed.
 #--------------------------------------------------------------------
-if test x"${exec_prefix}" = xNONE; then
-    TCL_BIN_DIR="${prefix}/bin"
-else
-    TCL_BIN_DIR="${exec_prefix}/bin"
-fi
+TCL_BIN_DIR="${exec_prefix}/bin"
 # END RED HAT LOCAL
 
 #--------------------------------------------------------------------

@@ -105,10 +105,15 @@ proc run-sid-tests-raw { toolchain-prefix all-machs testcase-srcdir pattern as-o
        }
 
        # Look for configuration line specified using # configline() in a testcase
-       if { $opts(configline) != "" } {
-	   set {conf-line} "-e \"$opts(configline)\""
-       } else {
-	   set {conf-line} ""
+       set {conf-line} ""
+       foreach i $opt_array {
+	   if {![string compare [lindex $i 0] "configline"]} {
+	       set opt_machs [lindex $i 1]
+	       if {"$opt_machs" == ""} {
+		   set cfgline [lindex $i 2]
+		   append {conf-line} "-e \"$cfgline\" "
+	       }
+	   }
        }
 
        # Look for the configuration file in the pregen directory first and

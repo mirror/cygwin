@@ -1,3 +1,12 @@
+2001-06-28  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * arm7f.cxx (arm7f_cpu::memory_trap): Remove code under now
+        non-existent debug_exec_p flag.
+        (arm7f_cpu::arm_tbit_set): Change reference to debug_exec_p to 
+	use new warnings_enabled flag.
+        * hw-cpu-arm7t.txt: Change all debug-exec? references to
+	enable-warnings?.
+
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am (ACLOCAL_AMFLAGS): Refer to $srcdir.

@@ -130,3 +130,6 @@
 
 /* Define if system headers will define prfpregset_t */
 #undef HAVE_PRFPREGSET_T
+
+/* Define name / location of libthread_db.so */
+#undef LIBTHREAD_DB_SO

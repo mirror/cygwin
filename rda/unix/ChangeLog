@@ -1,3 +1,10 @@
+2003-01-16  Kevin Buettner  <kevinb@redhat.com>
+
+	* config.in (LIBTHREAD_DB_SO): New macro.
+	* configure.in (mips64*linux*): Remove no-threads.o from
+	TARGET_MODULES list.  Add thread-db.o to this list.
+	* configure: Regenerate.
+
 2003-01-10  Kevin Buettner  <kevinb@redhat.com>
 
 	* Makefile.in: Regenerate using "automake --cygnus --ignore-deps".

@@ -31,7 +31,7 @@ dnl define ptrace_arg3_type
 
 case "$target" in
   mips64*linux*)
-    TARGET_MODULES="linux-target.o no-threads.o ptrace-target.o" 
+    TARGET_MODULES="linux-target.o thread-db.o ptrace-target.o" 
     AC_DEFINE(LINUX_TARGET)
     AC_DEFINE(GREGSET_T,  prgregset_t)
     AC_DEFINE(FPREGSET_T, prfpregset_t)

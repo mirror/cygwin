@@ -1,3 +1,34 @@
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* compLoader.cxx (loader_probe_bus): Now takes pin as an argument.
+	Remove warn_write_to_code_p. Initialize write_to_code_address_pin.
+	(SID_GB_WRITE): Drive write_to_code_address_pin instead of
+	generating a message here.
+	(write_to_code_address_pin): New member of generic_loader.
+	(set_warn_write_to_code): Removed.
+	(generic_loader): remove "warn-write-to-code?" attribute and pin.
+	Add "write-to-code-address" pin.
+	* sw-load-elf.xml: Remove reference to "warn-write-to-code?" pin
+	and attribute. Document "write-to-code-address" pin.
+	* sw-load-elf.txt: Regenerated.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* compLoader.cxx: Use sidutil::fixed_bus_map_component.
+	(loader_probe_bus): New class.
+	(warn_write_to_code_pin): New member of generic_loader.
+	(probe_upstream): Ditto.
+	(probe_downstream): Ditto.
+	(set_warn_write_to_code): New method of generic_loader.
+	(generic_loader): Now inherits fixed_bus_map_component.
+	Initialize new members.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* elfload.c (textSegmentAddress): New function.
+	* elfload.h (textSegmentAddress): Likewise.
+
 2002-02-05  Dave Brolley  <brolley@redhat.com>
 
 	* elfload.c (readElfFile): Obtain the load address from offset 24 for

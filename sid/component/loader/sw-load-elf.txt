@@ -17,44 +17,58 @@ Functionality:
    +-------------------------------------------------+
    |                    Behaviors                    |
    |-------------------------------------------------|
-   | configuration | The "file" attribute stores the |
-   |               | name of a file to attempt to    |
-   |               | load. The "verbose?" attribute, |
-   |               | when set, encourages this       |
-   |               | component to provide            |
-   |               | informative messages to cout    |
-   |               | during loading.                 |
-   |---------------+---------------------------------|
-   |       loading | When the load! pin is driven,   |
-   |               | this component will attempt to  |
-   |               | load an ELF file from the host  |
-   |               | filesystem. The loadable parts  |
-   |               | of the file are sent one byte   |
-   |               | at a time through an accessor.  |
-   |               | During the process, the         |
-   |               | starting PC and the program     |
-   |               | endianness are signalled by     |
-   |               | driving the values onto the     |
-   |               | start-pc-set and endian-set     |
-   |               | output pins. The endianness     |
-   |               | value is 0/1/2 for              |
-   |               | unknown/big/little.             |
-   |               |                                 |
-   |               | If the file cannot be found or  |
-   |               | if it has other errors, a       |
-   |               | message is sent to cerr and the |
-   |               | loading process is stopped. The |
-   |               | error output pin is driven in   |
-   |               | this case.                      |
-   |               |                                 |
-   |               | Like operating system loaders,  |
-   |               | sw-load-elf uses the ELF        |
-   |               | "program header" to identify    |
-   |               | the bytes to load into memory.  |
-   |               | It does not use the "section    |
-   |               | header". This means that it     |
-   |               | tends to load more bytes than   |
-   |               | gdb would.                      |
+   |  configuration | The "file" attribute stores    |
+   |                | the name of a file to attempt  |
+   |                | to load. The "verbose?"        |
+   |                | attribute, when set,           |
+   |                | encourages this component to   |
+   |                | provide informative messages   |
+   |                | to cout during loading.        |
+   |----------------+--------------------------------|
+   |        loading | When the load! pin is driven,  |
+   |                | this component will attempt to |
+   |                | load an ELF file from the host |
+   |                | filesystem. The loadable parts |
+   |                | of the file are sent one byte  |
+   |                | at a time through an accessor. |
+   |                | During the process, the        |
+   |                | starting PC and the program    |
+   |                | endianness are signalled by    |
+   |                | driving the values onto the    |
+   |                | start-pc-set and endian-set    |
+   |                | output pins. The endianness    |
+   |                | value is 0/1/2 for             |
+   |                | unknown/big/little.            |
+   |                |                                |
+   |                | If the file cannot be found or |
+   |                | if it has other errors, a      |
+   |                | message is sent to cerr and    |
+   |                | the loading process is         |
+   |                | stopped. The error output pin  |
+   |                | is driven in this case.        |
+   |                |                                |
+   |                | Like operating system loaders, |
+   |                | sw-load-elf uses the ELF       |
+   |                | "program header" to identify   |
+   |                | the bytes to load into memory. |
+   |                | It does not use the "section   |
+   |                | header". This means that it    |
+   |                | tends to load more bytes than  |
+   |                | gdb would.                     |
+   |----------------+--------------------------------|
+   | error checking | All read requests coming in    |
+   |                | though the "probe-upstream"    |
+   |                | bus are checked against known  |
+   |                | code segments and, for each    |
+   |                | attempt to write to a code     |
+   |                | segment, the                   |
+   |                | write-to-code-address pin is   |
+   |                | driven with the address of the |
+   |                | write attempt. All reads and   |
+   |                | writes coming in through the   |
+   |                | probe-upstream bus are passed  |
+   |                | on to the probe-downstream     |
+   |                | accessor.                      |
    +-------------------------------------------------+
 
    +-------------------------------------------------+
@@ -100,43 +114,58 @@ Component Reference:
 
   Component: sw-load-elf
 
-   +-------------------------------------------------+
-   |                      pins                       |
-   |-------------------------------------------------|
-   |     name     |direction |legalvalues |behaviors |
-   |--------------+----------+------------+----------|
-   |load!         |in        |any         |loading   |
-   |--------------+----------+------------+----------|
-   |start-pc-set  |out       |any         |loading   |
-   |--------------+----------+------------+----------|
-   |endian-set    |out       |0/1/2       |loading   |
-   |--------------+----------+------------+----------|
-   |error         |out       |any         |loading   |
-   +-------------------------------------------------+
+   +-------------------------------------------------------------+
+   |                            pins                             |
+   |-------------------------------------------------------------|
+   |         name          | direction | legalvalues | behaviors |
+   |-----------------------+-----------+-------------+-----------|
+   |load!                  |in         |any          |loading    |
+   |-----------------------+-----------+-------------+-----------|
+   |start-pc-set           |out        |any          |loading    |
+   |-----------------------+-----------+-------------+-----------|
+   |endian-set             |out        |0/1/2        |loading    |
+   |-----------------------+-----------+-------------+-----------|
+   |error                  |out        |any          |loading    |
+   |-----------------------+-----------+-------------+-----------|
+   |write-to-code-address  |out        |any address  |error      |
+   |                       |           |             |checking   |
+   +-------------------------------------------------------------+
 
-   +---------------------------------------------------------+
-   |                       attributes                        |
-   |---------------------------------------------------------|
-   |     name     |category|legal |  default  |  behaviors  ||
-   |              |        |values|   value   |             ||
-   |--------------+--------+------+-----------+-------------||
-   |state-snapshot|-       |opaque|-          |save/restore ||
-   |              |        |string|           |             ||
-   |--------------+--------+------+-----------+-------------||
-   |file          |setting |file  |"/dev/null"|configuration||
-   |              |        |name  |           |             ||
-   |--------------+--------+------+-----------+-------------||
-   |verbose?      |setting |1/0   |0          |configuration||
-   +---------------------------------------------------------+
+   +-----------------------------------------------------+
+   |                        buses                        |
+   |-----------------------------------------------------|
+   |      name      | addresses |  accesses  | behaviors |
+   |----------------+-----------+------------+-----------|
+   |probe-upstream  |-          |read/write  |error      |
+   |                |           |            |checking   |
+   +-----------------------------------------------------+
+
+   +-------------------------------------------------------------------+
+   |                            attributes                             |
+   |-------------------------------------------------------------------|
+   |      name      | category | legal  |default value|   behaviors   ||
+   |                |          | values |             |               ||
+   |----------------+----------+--------+-------------+---------------||
+   |state-snapshot  |-         |opaque  |-            |save/restore   ||
+   |                |          |string  |             |               ||
+   |----------------+----------+--------+-------------+---------------||
+   |file            |setting   |file    |"/dev/null"  |configuration  ||
+   |                |          |name    |             |               ||
+   |----------------+----------+--------+-------------+---------------||
+   |verbose?        |setting   |1/0     |0            |configuration  ||
+   +-------------------------------------------------------------------+
 
    +-------------------------------------------------+
    |                    accessors                    |
    |-------------------------------------------------|
-   |        name        |    accesses    | behaviors |
-   |--------------------+----------------+-----------|
-   | load-accessor-insn | write          | loading   |
-   |                    | little_int_1   |           |
-   |--------------------+----------------+-----------|
-   | load-accessor-data | write          | loading   |
-   |                    | little_int_1   |           |
+   |        name        |   accesses    | behaviors  |
+   |--------------------+---------------+------------|
+   | load-accessor-insn | write         | loading    |
+   |                    | little_int_1  |            |
+   |--------------------+---------------+------------|
+   | load-accessor-data | write         | loading    |
+   |                    | little_int_1  |            |
+   |--------------------+---------------+------------|
+   | probe-downstream   | read/write    | error      |
+   |                    |               | checking   |
    +-------------------------------------------------+

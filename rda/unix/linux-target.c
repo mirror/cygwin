@@ -2640,18 +2640,29 @@ mips_singlestep (struct gdbserv *serv, pid_t pid, int sig)
     targ |= (insn.j_format.target << 2);
     break;
 
-  /* Some cop instructions are conditional... */
-  case cop0_op:
+  /* Some cop1 instructions are conditional branches.  */
   case cop1_op:
-  case cop2_op:
-    if (insn.i_format.rs != bc_op)
-      break;
-    else
-      ; /* fall through... */
+    if (insn.i_format.rs == bc_op
+        || insn.i_format.rs == bc_op + 1  /* e.g, BC1ANY2 on MIPS-3D */
+	|| insn.i_format.rs == bc_op + 2  /* e.g, BC1ANY4 on MIPS-3D */)
+      {
+	is_branch = is_cond = 1;
+	targ += 4 + (insn.i_format.simmediate << 2);
+      }
+    break;
 
-  /*
-   * These are conditional.
-   */
+  /* Some cop2 instructions are conditional branches.  */
+  case cop2_op:
+    /* MIPS32 Architecture For Programmers Volume II, rev 1.90 documents
+       bc2f, bc2fl, bc2t, and bc2tl.  */
+    if (insn.i_format.rs == bc_op)
+      {
+	is_branch = is_cond = 1;
+	targ += 4 + (insn.i_format.simmediate << 2);
+      }
+    break;
+
+  /* Other conditional branches...  */
   case beq_op:
   case beql_op:
   case bne_op:
@@ -2660,7 +2671,6 @@ mips_singlestep (struct gdbserv *serv, pid_t pid, int sig)
   case blezl_op:
   case bgtz_op:
   case bgtzl_op:
-  case cop1x_op:
     is_branch = is_cond = 1;
     targ += 4 + (insn.i_format.simmediate << 2);
     break;

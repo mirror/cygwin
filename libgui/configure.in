@@ -61,7 +61,7 @@ if test x$ide_cv_os_cygwin32 = xyes; then
   ac_win_build="yes"
 fi
 
-case "${target}" in
+case "${host}" in
 *-*-cygwin*)
         touch ac$$.c
         if ${CC} -c -mwin32 ac$$.c >/dev/null 2>&1; then

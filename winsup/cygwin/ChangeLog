@@ -1,3 +1,35 @@
+2001-11-13  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (_write): Allow zero length as per SUSv2.
+
+2001-11-12  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_console.cc (fhandler_console::read): Revert 2001-10-23
+	change to only honor keydown events.
+
+2001-11-11  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump version to 1.3.6.
+
+2001-11-10  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::build_fhandler): Don't increment console fd count
+	if new operation fails.  Increment fork_fixup field here.
+	(dtable::dup2): Don't increment fork_fixup field here.
+	* net.cc (fdsock): Ditto.
+
+2001-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* select.cc: Set errno using set_sig_errno() throughout.
+	* signal.cc (signal): Always set SA_RESTART flag.
+	* syscalls.cc (_read): Revert previous patch.
+
+2001-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* select.cc (fhandler_tty_slave::ready_for_read):  Return 0 on EBADF.
+	* syscalls.cc (_read): If ready_for_read() failed, save errno from
+	being overwritten by signal handler call.
+
 2001-11-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* lib/getopt.c (getopt_internal): Reset optind to 1 only if optreset
@@ -7,6 +39,10 @@
 
 	* select.cc (fhandler_tty_slave::ready_for_read): Correct inverted
 	not_open test.
+
+2001-11-05  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump version to 1.3.5.
 
 2001-11-05  Corinna Vinschen  <corinna@vinschen.de>
 

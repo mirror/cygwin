@@ -1,6 +1,6 @@
 /* syscalls.cc: syscalls
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -8,6 +8,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <sys/stat.h>
 #include <sys/vfs.h> /* needed for statfs */
 #include <fcntl.h>
@@ -20,11 +21,27 @@ details. */
 #include <sys/uio.h>
 #include <errno.h>
 #include <limits.h>
-#include "winsup.h"
+#include <winnls.h>
+#include <wininet.h>
 #include <lmcons.h> /* for UNLEN */
+#include <cygwin/version.h>
+#include <sys/cygwin.h>
+#include "cygerrno.h"
+#include "perprocess.h"
+#include "security.h"
+#include "fhandler.h"
+#include "path.h"
+#include "dtable.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 #include <unistd.h>
+#include "shared_info.h"
+#include "cygheap.h"
 
-extern BOOL allow_ntsec;
+extern int normalize_posix_path (const char *, char *);
+
+SYSTEM_INFO system_info;
 
 /* Close all files and process any queued deletions.
    Lots of unix style applications will open a tmp file, unlink it,
@@ -34,20 +51,64 @@ extern BOOL allow_ntsec;
 void __stdcall
 close_all_files (void)
 {
-  for (int i = 0; i < (int)dtable.size; i++)
-    if (!dtable.not_open (i))
-      _close (i);
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
 
+  fhandler_base *fh;
+  for (int i = 0; i < (int) cygheap->fdtab.size; i++)
+    if ((fh = cygheap->fdtab[i]) != NULL)
+      {
+	fh->close ();
+	cygheap->fdtab.release (i);
+      }
+
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
   cygwin_shared->delqueue.process_queue ();
 }
 
-extern "C"
+BOOL __stdcall
+check_pty_fds (void)
+{
+  int res = FALSE;
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK, "check_pty_fds");
+  fhandler_base *fh;
+  for (int i = 0; i < (int) cygheap->fdtab.size; i++)
+    if ((fh = cygheap->fdtab[i]) != NULL &&
+	(fh->get_device () == FH_TTYS || fh->get_device () == FH_PTYM))
+      {
+	res = TRUE;
+	break;
+      }
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK, "check_pty_fds");
+  return res;
+}
+
 int
+dup (int fd)
+{
+  int res;
+  cygheap_fdnew newfd;
+
+  if (newfd < 0)
+    res = -1;
+  else
+    res = dup2 (fd, newfd);
+
+  return res;
+}
+
+int
+dup2 (int oldfd, int newfd)
+{
+  return cygheap->fdtab.dup2 (oldfd, newfd);
+}
+
+extern "C" int
 _unlink (const char *ourname)
 {
   int res = -1;
+  sigframe thisframe (mainthread);
 
-  path_conv win32_name (ourname, SYMLINK_NOFOLLOW);
+  path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
 
   if (win32_name.error)
     {
@@ -57,9 +118,13 @@ _unlink (const char *ourname)
 
   syscall_printf ("_unlink (%s)", win32_name.get_win32 ());
 
-  DWORD atts;
-  atts = win32_name.file_attributes ();
-  if (atts != 0xffffffff && atts & FILE_ATTRIBUTE_DIRECTORY)
+  if (!win32_name.exists ())
+    {
+      syscall_printf ("unlinking a nonexistent file");
+      set_errno (ENOENT);
+      goto done;
+    }
+  else if (win32_name.isdir ())
     {
       syscall_printf ("unlinking a directory");
       set_errno (EPERM);
@@ -67,77 +132,148 @@ _unlink (const char *ourname)
     }
 
   /* Windows won't check the directory mode, so we do that ourselves.  */
-  if (! writable_directory (win32_name.get_win32 ()))
+  if (!writable_directory (win32_name))
     {
       syscall_printf ("non-writable directory");
       goto done;
     }
 
-  if (DeleteFileA (win32_name.get_win32 ()))
-    res = 0;
-  else
+  /* Check for shortcut as symlink condition. */
+  if (win32_name.has_attribute (FILE_ATTRIBUTE_READONLY))
     {
-      res = GetLastError ();
-
-      /* if access denied, chmod to be writable in case it is not
-	 and try again */
-      /* FIXME!!! Should check whether ourname is directory or file
-	 and only try again if permissions are not sufficient */
-      if (res == ERROR_ACCESS_DENIED)
-	{
-	  /* chmod ourname to be writable here */
-	  res = chmod (ourname, 0777);
-
-	  if (DeleteFileA (win32_name.get_win32 ()))
-	    {
-	      res = 0;
-	      goto done;
-	    }
-	  res = GetLastError ();
-	}
-
-      /* If we get ERROR_SHARING_VIOLATION, the file may still be open -
-	 Windows NT doesn't support deleting a file while it's open.  */
-      if (res == ERROR_SHARING_VIOLATION)
-	{
-	  cygwin_shared->delqueue.queue_file (win32_name.get_win32 ());
-	  res = 0;
-	}
-      else
-	{
-	  __seterrno ();
-	  res = -1;
-	}
+      int len = strlen (win32_name);
+      if (len > 4 && strcasematch ((char *) win32_name + len - 4, ".lnk"))
+	SetFileAttributes (win32_name, (DWORD) win32_name & ~FILE_ATTRIBUTE_READONLY);
     }
 
-done:
+  DWORD lasterr;
+  lasterr = 0;
+  for (int i = 0; i < 2; i++)
+    {
+      if (DeleteFile (win32_name))
+	{
+	  syscall_printf ("DeleteFile succeeded");
+	  goto ok;
+	}
+
+      lasterr = GetLastError ();
+      if (i || lasterr != ERROR_ACCESS_DENIED || win32_name.issymlink ())
+	break;		/* Couldn't delete it. */
+
+      /* if access denied, chmod to be writable, in case it is not,
+	 and try again */
+      (void) chmod (win32_name, 0777);
+    }
+
+  /* Windows 9x seems to report ERROR_ACCESS_DENIED rather than sharing
+     violation.  So, set lasterr to ERROR_SHARING_VIOLATION in this case
+     to simplify tests. */
+  if (wincap.access_denied_on_delete () && lasterr == ERROR_ACCESS_DENIED
+      && !win32_name.isremote ())
+    lasterr = ERROR_SHARING_VIOLATION;
+
+  /* Tried to delete file by normal DeleteFile and by resetting protection
+     and then deleting.  That didn't work.
+
+     There are two possible reasons for this:  1) The file may be opened and
+     Windows is not allowing it to be deleted, or 2) We may not have permissions
+     to delete the file.
+
+     So, first assume that it may be 1) and try to remove the file using the
+     Windows FILE_FLAG_DELETE_ON_CLOSE semantics.  This seems to work only
+     spottily on Windows 9x/Me but it does seem to work reliably on NT as
+     long as the file doesn't exist on a remote drive. */
+
+  bool delete_on_close_ok;
+
+  delete_on_close_ok  = !win32_name.isremote ()
+			&& wincap.has_delete_on_close ();
+
+  /* Attempt to use "delete on close" semantics to handle removing
+     a file which may be open. */
+  HANDLE h;
+  h = CreateFile (win32_name, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih,
+		  OPEN_EXISTING, FILE_FLAG_DELETE_ON_CLOSE, 0);
+  if (h == INVALID_HANDLE_VALUE)
+    {
+      if (GetLastError () == ERROR_FILE_NOT_FOUND)
+	goto ok;
+    }
+  else
+    {
+      CloseHandle (h);
+      syscall_printf ("CreateFile/CloseHandle succeeded");
+      /* Everything is fine if the file has disappeared or if we know that the
+	 FILE_FLAG_DELETE_ON_CLOSE will eventually work. */
+      if (GetFileAttributes (win32_name) == (DWORD) -1 || delete_on_close_ok)
+	goto ok;	/* The file is either gone already or will eventually be
+			   deleted by the OS. */
+    }
+
+  /* FILE_FLAGS_DELETE_ON_CLOSE was a bust.  If this is a sharing
+     violation, then queue the file for deletion when the process
+     exits.  Otherwise, punt. */
+  if (lasterr != ERROR_SHARING_VIOLATION)
+    goto err;
+
+  syscall_printf ("couldn't delete file, err %d", lasterr);
+
+  /* Add file to the "to be deleted" queue. */
+  cygwin_shared->delqueue.queue_file (win32_name);
+
+ /* Success condition. */
+ ok:
+  res = 0;
+  goto done;
+
+ /* Error condition. */
+ err:
+  __seterrno ();
+  res = -1;
+
+ done:
   syscall_printf ("%d = unlink (%s)", res, ourname);
   return res;
 }
 
-extern "C"
-pid_t
+extern "C" int
+remove (const char *ourname)
+{
+  path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
+
+  if (win32_name.error)
+    {
+      set_errno (win32_name.error);
+      syscall_printf ("-1 = remove (%s)", ourname);
+      return -1;
+    }
+
+  return win32_name.isdir () ? rmdir (ourname) : _unlink (ourname);
+}
+
+extern "C" pid_t
 _getpid ()
 {
   return myself->pid;
 }
 
 /* getppid: POSIX 4.1.1.1 */
-extern "C"
-pid_t
+extern "C" pid_t
 getppid ()
 {
   return myself->ppid;
 }
 
 /* setsid: POSIX 4.3.2.1 */
-extern "C"
-pid_t
+extern "C" pid_t
 setsid (void)
 {
-  /* FIXME: for now */
   if (myself->pgid != _getpid ())
     {
+      if (myself->ctty == TTY_CONSOLE &&
+	  !cygheap->fdtab.has_console_fds () &&
+	  !check_pty_fds ())
+	FreeConsole ();
       myself->ctty = -1;
       myself->sid = _getpid ();
       myself->pgid = _getpid ();
@@ -148,80 +284,89 @@ setsid (void)
   return -1;
 }
 
-static int
-read_handler (int fd, void *ptr, size_t len, int blocksigs)
+extern "C" ssize_t
+_read (int fd, void *ptr, size_t len)
 {
+  if (len == 0)
+    return 0;
+
+  if (__check_null_invalid_struct_errno (ptr, len))
+    return -1;
+
   int res;
-  fhandler_base *fh = dtable[fd];
+  extern int sigcatchers;
+  int e = get_errno ();
 
-  if (dtable.not_open (fd))
+  while (1)
     {
-      set_errno (EBADF);
-      return -1;
+      sigframe thisframe (mainthread);
+
+      cygheap_fdget cfd (fd);
+      if (cfd < 0)
+	return -1;
+
+      DWORD wait = cfd->is_nonblocking () ? 0 : INFINITE;
+
+      /* Could block, so let user know we at least got here.  */
+      syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d", fd, ptr, len, wait ? "" : "non", sigcatchers);
+
+      if (wait && (!cfd->is_slow () || cfd->get_r_no_interrupt ()))
+	debug_printf ("non-interruptible read\n");
+      else if (!cfd->ready_for_read (fd, wait))
+	{
+	  res = -1;
+	  goto out;
+	}
+
+      /* FIXME: This is not thread safe.  We need some method to
+	 ensure that an fd, closed in another thread, aborts I/O
+	 operations. */
+      if (!cfd.isopen())
+	return -1;
+
+      /* Check to see if this is a background read from a "tty",
+	 sending a SIGTTIN, if appropriate */
+      res = cfd->bg_check (SIGTTIN);
+
+      if (!cfd.isopen())
+	return -1;
+
+      if (res > bg_eof)
+	{
+	  myself->process_state |= PID_TTYIN;
+	  if (!cfd.isopen())
+	    return -1;
+	  res = cfd->read (ptr, len);
+	  myself->process_state &= ~PID_TTYIN;
+	}
+
+    out:
+      if (res >= 0 || get_errno () != EINTR || !thisframe.call_signal_handler ())
+	break;
+      set_errno (e);
     }
 
-  if ((fh->get_flags() & (O_NONBLOCK | O_NDELAY)) && !fh->ready_for_read (fd, 0, 0))
-    {
-      syscall_printf ("nothing to read");
-      set_errno (EAGAIN);
-      return -1;
-    }
-
-  /* Check to see if this is a background read from a "tty",
-     sending a SIGTTIN, if appropriate */
-  res = fh->bg_check (SIGTTIN, blocksigs);
-  if (res > 0)
-    {
-      myself->process_state |= PID_TTYIN;
-      res = fh->read (ptr, len);
-      myself->process_state &= ~PID_TTYIN;
-    }
-  syscall_printf ("%d = read (%d<%s>, %p, %d)", res, fd, fh->get_name (), ptr, len);
+  syscall_printf ("%d = read (%d, %p, %d), errno %d", res, fd, ptr, len,
+		  get_errno ());
+  MALLOC_CHECK;
   return res;
 }
 
-extern "C" int
-_read (int fd, void *ptr, size_t len)
-{
-  if (dtable.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
-
-  fhandler_base *fh = dtable[fd];
-
-  /* Could block, so let user know we at least got here.  */
-  syscall_printf ("read (%d, %p, %d)", fd, ptr, len);
-
-  if (!fh->is_slow () || (fh->get_flags () & (O_NONBLOCK | O_NDELAY)) ||
-      fh->get_r_no_interrupt ())
-    {
-      debug_printf ("non-interruptible read\n");
-      return read_handler (fd, ptr, len, 0);
-    }
-
-  if (fh->ready_for_read (fd, INFINITE, 0))
-    return read_handler (fd, ptr, len, 1);
-
-  set_sig_errno (EINTR);
-  syscall_printf ("%d = read (%d<%s>, %p, %d), errno %d", -1, fd, fh->get_name (),
-		  ptr, len, get_errno ());
-  MALLOC_CHECK;
-  return -1;
-}
-
-extern "C"
-int
+extern "C" ssize_t
 _write (int fd, const void *ptr, size_t len)
 {
+  if (len == 0)
+    return 0;
+
+  if (__check_invalid_read_ptr_errno (ptr, len))
+    return -1;
+
   int res = -1;
 
-  if (dtable.not_open (fd))
-    {
-      set_errno (EBADF);
-      goto done;
-    }
+  sigframe thisframe (mainthread);
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    goto done;
 
   /* Could block, so let user know we at least got here.  */
   if (fd == 1 || fd == 2)
@@ -229,14 +374,12 @@ _write (int fd, const void *ptr, size_t len)
   else
     syscall_printf  ("write (%d, %p, %d)", fd, ptr, len);
 
-  fhandler_base *fh;
-  fh = dtable[fd];
+  res = cfd->bg_check (SIGTTOU);
 
-  res = fh->bg_check (SIGTTOU, 0);
-  if (res > 0)
+  if (res > bg_eof)
     {
       myself->process_state |= PID_TTYOU;
-      res = fh->write (ptr, len);
+      res = cfd->write (ptr, len);
       myself->process_state &= ~PID_TTYOU;
     }
 
@@ -246,8 +389,7 @@ done:
   else
     syscall_printf ("%d = write (%d, %p, %d)", res, fd, ptr, len);
 
-  MALLOC_CHECK;
-  return (ssize_t)res;
+  return (ssize_t) res;
 }
 
 /*
@@ -257,8 +399,7 @@ done:
  * these.
  */
 
-extern "C"
-ssize_t
+extern "C" ssize_t
 writev (int fd, const struct iovec *iov, int iovcnt)
 {
   int i;
@@ -312,8 +453,7 @@ writev (int fd, const struct iovec *iov, int iovcnt)
  * these.
  */
 
-extern "C"
-ssize_t
+extern "C" ssize_t
 readv (int fd, const struct iovec *iov, int iovcnt)
 {
   int i;
@@ -343,87 +483,86 @@ readv (int fd, const struct iovec *iov, int iovcnt)
 /* _open */
 /* newlib's fcntl.h defines _open as taking variable args so we must
    correspond.  The third arg if it exists is: mode_t mode. */
-extern "C"
-int
+extern "C" int
 _open (const char *unix_path, int flags, ...)
 {
-  int fd;
   int res = -1;
   va_list ap;
   mode_t mode = 0;
-  fhandler_base *fh;
+  sigframe thisframe (mainthread);
 
   syscall_printf ("open (%s, %p)", unix_path, flags);
-  if (!check_null_empty_path_errno(unix_path))
+  if (!check_null_empty_str_errno (unix_path))
     {
-      SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," open ");
-
       /* check for optional mode argument */
       va_start (ap, flags);
       mode = va_arg (ap, mode_t);
       va_end (ap);
 
-      fd = dtable.find_unused_handle ();
+      fhandler_base *fh;
+      cygheap_fdnew fd;
 
-      if (fd < 0)
-	set_errno (ENMFILE);
-      else if ((fh = dtable.build_fhandler (fd, unix_path, NULL)) == NULL)
-	res = -1;		// errno already set
-      else if (!fh->open (unix_path, flags, (mode & 0777) & ~myself->umask))
+      if (fd >= 0)
 	{
-	  dtable.release (fd);
-	  res = -1;
+	  path_conv pc;
+	  if (!(fh = cygheap->fdtab.build_fhandler_from_name (fd, unix_path,
+							      NULL, pc)))
+	    res = -1;		// errno already set
+	  else if (!fh->open (&pc, flags, (mode & 07777) & ~cygheap->umask))
+	    {
+	      fd.release ();
+	      res = -1;
+	    }
+	  else if ((res = fd) <= 2)
+	    set_std_handle (res);
 	}
-      else if ((res = fd) <= 2)
-	set_std_handle (res);
-      ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," open");
     }
 
   syscall_printf ("%d = open (%s, %p)", res, unix_path, flags);
   return res;
 }
 
-extern "C"
-off_t
+extern "C" off_t
 _lseek (int fd, off_t pos, int dir)
 {
   off_t res;
+  sigframe thisframe (mainthread);
 
-  if (dtable.not_open (fd))
+  if (dir != SEEK_SET && dir != SEEK_CUR && dir != SEEK_END)
     {
-      set_errno (EBADF);
+      set_errno (EINVAL);
       res = -1;
     }
   else
     {
-      res = dtable[fd]->lseek (pos, dir);
+      cygheap_fdget cfd (fd);
+      if (cfd >= 0)
+	res = cfd->lseek (pos, dir);
+      else
+	res = -1;
     }
   syscall_printf ("%d = lseek (%d, %d, %d)", res, fd, pos, dir);
 
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 _close (int fd)
 {
   int res;
+  sigframe thisframe (mainthread);
 
   syscall_printf ("close (%d)", fd);
 
   MALLOC_CHECK;
-  if (dtable.not_open (fd))
-    {
-      debug_printf ("handle %d not open", fd);
-      set_errno (EBADF);
-      res = -1;
-    }
+  cygheap_fdget cfd (fd, true);
+  if (cfd < 0)
+    res = -1;
   else
     {
-      SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
-      res = dtable[fd]->close ();
-      dtable.release (fd);
-      ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
+      cfd->close ();
+      cfd.release ();
+      res = 0;
     }
 
   syscall_printf ("%d = close (%d)", res, fd);
@@ -431,19 +570,17 @@ _close (int fd)
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 isatty (int fd)
 {
   int res;
+  sigframe thisframe (mainthread);
 
-  if (dtable.not_open (fd))
-    {
-      syscall_printf ("0 = isatty (%d)", fd);
-      return 0;
-    }
-
-  res = dtable[fd]->is_tty ();
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    res = 0;
+  else
+    res = cfd->is_tty ();
   syscall_printf ("%d = isatty (%d)", res, fd);
   return res;
 }
@@ -455,32 +592,47 @@ isatty (int fd)
    we should just copy the file.
 */
 
-extern "C"
-int
+extern "C" int
 _link (const char *a, const char *b)
 {
   int res = -1;
-  path_conv real_a (a, SYMLINK_NOFOLLOW);
+  sigframe thisframe (mainthread);
+  path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
+  path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
 
   if (real_a.error)
     {
       set_errno (real_a.error);
-      syscall_printf ("-1 = link (%s, %s)", a, b);
-      return -1;
+      goto done;
     }
-
-  path_conv real_b (b, SYMLINK_NOFOLLOW);
-
   if (real_b.error)
     {
-      set_errno (real_b.error);
-      syscall_printf ("-1 = link (%s, %s)", a, b);
-      return -1;
+      set_errno (real_b.case_clash ? ECASECLASH : real_b.error);
+      goto done;
+    }
+
+  if (real_b.exists ())
+    {
+      syscall_printf ("file '%s' exists?", (char *)real_b);
+      set_errno (EEXIST);
+      goto done;
+    }
+  if (real_b.get_win32 ()[strlen (real_b.get_win32 ()) - 1] == '.')
+    {
+      syscall_printf ("trailing dot, bailing out");
+      set_errno (EINVAL);
+      goto done;
     }
 
   /* Try to make hard link first on Windows NT */
-  if (os_being_run == winNT)
+  if (wincap.has_hard_links ())
     {
+      if (CreateHardLinkA (real_b.get_win32 (), real_a.get_win32 (), NULL))
+	{
+	  res = 0;
+	  goto done;
+	}
+
       HANDLE hFileSource;
 
       WIN32_STREAM_ID StreamId;
@@ -489,7 +641,6 @@ _link (const char *a, const char *b)
       DWORD cbPathLen;
       DWORD StreamSize;
       WCHAR wbuf[MAX_PATH];
-      char buf[MAX_PATH];
 
       BOOL bSuccess;
 
@@ -510,9 +661,7 @@ _link (const char *a, const char *b)
 	}
 
       lpContext = NULL;
-      cygwin_conv_to_full_win32_path (real_b.get_win32 (), buf);
-      OemToCharW (buf, wbuf);
-      cbPathLen = (strlen (buf) + 1) * sizeof (WCHAR);
+      cbPathLen = sys_mbstowcs (wbuf, real_b.get_win32 (), MAX_PATH) * sizeof (WCHAR);
 
       StreamId.dwStreamId = BACKUP_LINK;
       StreamId.dwStreamAttributes = 0;
@@ -526,7 +675,7 @@ _link (const char *a, const char *b)
       /* Write the WIN32_STREAM_ID */
       bSuccess = BackupWrite (
 	hFileSource,
-	(LPBYTE) &StreamId,	// buffer to write
+	 (LPBYTE) &StreamId,	// buffer to write
 	StreamSize,		// number of bytes to write
 	&dwBytesWritten,
 	FALSE,			// don't abort yet
@@ -540,7 +689,7 @@ _link (const char *a, const char *b)
 	     Need to handle. */
 	  bSuccess = BackupWrite (
 		hFileSource,
-		(LPBYTE) wbuf,	// buffer to write
+		 (LPBYTE) wbuf,	// buffer to write
 		cbPathLen,	// number of bytes to write
 		&dwBytesWritten,
 		FALSE,		// don't abort yet
@@ -559,8 +708,7 @@ _link (const char *a, const char *b)
 	    &dwBytesWritten,
 	    TRUE,		// abort
 	    FALSE,		// don't process security
-	    &lpContext
-	    );
+	    &lpContext);
 	}
       else
 	syscall_printf ("cannot write streamId, %E");
@@ -585,58 +733,27 @@ done:
   return res;
 }
 
-#if 0
-static BOOL
-rel2abssd (PSECURITY_DESCRIPTOR psd_rel, PSECURITY_DESCRIPTOR psd_abs,
-		DWORD abslen)
-{
-#ifdef _MT_SAFE
-  struct _winsup_t *r=_reent_winsup();
-  char *dacl_buf=r->_dacl_buf;
-  char *sacl_buf=r->_sacl_buf;
-  char *ownr_buf=r->_ownr_buf;
-  char *grp_buf=r->_grp_buf;
-#else
-  static char dacl_buf[1024];
-  static char sacl_buf[1024];
-  static char ownr_buf[1024];
-  static char grp_buf[1024];
-#endif
-  DWORD dacl_len = 1024;
-  DWORD sacl_len = 1024;
-  DWORD ownr_len = 1024;
-  DWORD grp_len = 1024;
-
-  BOOL res = MakeAbsoluteSD (psd_rel, psd_abs, &abslen, (PACL) dacl_buf,
-			     &dacl_len, (PACL) sacl_buf, &sacl_len,
-			     (PSID) ownr_buf, &ownr_len, (PSID) grp_buf,
-			     &grp_len);
-
-  syscall_printf ("%d = rel2abssd (...)", res);
-  return res;
-}
-#endif
-
 /* chown: POSIX 5.6.5.1 */
 /*
- * chown() is only implemented for Windows NT.  Under other operating
+ * chown () is only implemented for Windows NT.  Under other operating
  * systems, it is only a stub that always returns zero.
- *
- * Note: the SetFileSecurity API in NT can only set the current
- * user as file owner so we have to use the Backup API instead.
  */
-extern "C"
-int
-chown (const char * name, uid_t uid, gid_t gid)
+static int
+chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 {
   int res;
+  uid_t old_uid;
+  gid_t old_gid;
 
-  if (os_being_run != winNT)    // real chown only works on NT
+  if (check_null_empty_str_errno (name))
+    return -1;
+
+  if (!wincap.has_security ())  // real chown only works on NT
     res = 0;			// return zero (and do nothing) under Windows 9x
   else
     {
       /* we need Win32 path names because of usage of Win32 API functions */
-      path_conv win32_path (name);
+      path_conv win32_path (PC_NONULLEMPTY, name, fmode);
 
       if (win32_path.error)
 	{
@@ -654,48 +771,94 @@ chown (const char * name, uid_t uid, gid_t gid)
 	}
 
       DWORD attrib = 0;
-      if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
-        attrib |= S_IFDIR;
-      int has_acls;
-      has_acls = allow_ntsec && win32_path.has_acls ();
-      res = get_file_attribute (has_acls, win32_path.get_win32 (), (int *) &attrib);
+      if (win32_path.isdir ())
+	attrib |= S_IFDIR;
+      res = get_file_attribute (win32_path.has_acls (),
+				win32_path.get_win32 (),
+				(int *) &attrib,
+				&old_uid,
+				&old_gid);
       if (!res)
-	res = set_file_attribute (win32_path.has_acls (),
-                                  win32_path.get_win32 (),
-				  uid, gid, attrib,
-                                  myself->logsrv);
-
-      if (res != 0 && get_errno () == ENOSYS)
-      {
-        /* fake - if not supported, pretend we're like win95
-           where it just works */
-        res = 0;
-      }
+	{
+	  if (uid == (uid_t) -1)
+	    uid = old_uid;
+	  if (gid == (gid_t) -1)
+	    gid = old_gid;
+	  if (win32_path.isdir())
+	    attrib |= S_IFDIR;
+	  res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
+				    gid, attrib, cygheap->user.logsrv ());
+	}
+      if (res != 0 && (!win32_path.has_acls () || !allow_ntsec))
+	{
+	  /* fake - if not supported, pretend we're like win95
+	     where it just works */
+	  res = 0;
+	}
     }
 
 done:
-  syscall_printf ("%d = chown (%s,...)", res, name);
+  syscall_printf ("%d = %schown (%s,...)",
+		  res, (fmode & PC_SYM_NOFOLLOW) ? "l" : "", name);
   return res;
 }
 
+extern "C" int
+chown (const char * name, uid_t uid, gid_t gid)
+{
+  sigframe thisframe (mainthread);
+  return chown_worker (name, PC_SYM_FOLLOW, uid, gid);
+}
+
+extern "C" int
+lchown (const char * name, uid_t uid, gid_t gid)
+{
+  sigframe thisframe (mainthread);
+  return chown_worker (name, PC_SYM_NOFOLLOW, uid, gid);
+}
+
+extern "C" int
+fchown (int fd, uid_t uid, gid_t gid)
+{
+  sigframe thisframe (mainthread);
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    {
+      syscall_printf ("-1 = fchown (%d,...)", fd);
+      return -1;
+    }
+
+  const char *path = cfd->get_name ();
+
+  if (path == NULL)
+    {
+      syscall_printf ("-1 = fchown (%d,...) (no name)", fd);
+      set_errno (ENOSYS);
+      return -1;
+    }
+
+  syscall_printf ("fchown (%d,...): calling chown_worker (%s,FOLLOW,...)",
+		  fd, path);
+  return chown_worker (path, PC_SYM_FOLLOW, uid, gid);
+}
+
 /* umask: POSIX 5.3.3.1 */
-extern "C"
-mode_t
+extern "C" mode_t
 umask (mode_t mask)
 {
   mode_t oldmask;
 
-  oldmask = myself->umask;
-  myself->umask = mask & 0777;
+  oldmask = cygheap->umask;
+  cygheap->umask = mask & 0777;
   return oldmask;
 }
 
 /* chmod: POSIX 5.6.4.1 */
-extern "C"
-int
+extern "C" int
 chmod (const char *path, mode_t mode)
 {
   int res = -1;
+  sigframe thisframe (mainthread);
 
   path_conv win32_path (path);
 
@@ -713,37 +876,40 @@ chmod (const char *path, mode_t mode)
       goto done;
     }
 
-  if (win32_path.file_attributes () == (DWORD)-1)
+  if (!win32_path.exists ())
     __seterrno ();
   else
     {
-      DWORD attr = win32_path.file_attributes ();
       /* temporary erase read only bit, to be able to set file security */
-      SetFileAttributesA (win32_path.get_win32 (),
-			  attr & ~FILE_ATTRIBUTE_READONLY);
+      SetFileAttributes (win32_path, (DWORD) win32_path & ~FILE_ATTRIBUTE_READONLY);
 
-      int has_acls = allow_ntsec && win32_path.has_acls ();
-      uid_t uid = get_file_owner (has_acls, win32_path.get_win32 ());
-      if (! set_file_attribute (has_acls, win32_path.get_win32 (),
-				uid,
-				get_file_group (has_acls,
-                                                win32_path.get_win32 ()),
-				mode,
-                                myself->logsrv)
+      uid_t uid;
+      gid_t gid;
+
+      if (win32_path.isdir ())
+	mode |= S_IFDIR;
+      get_file_attribute (win32_path.has_acls (),
+			  win32_path.get_win32 (),
+			  NULL, &uid, &gid);
+      /* FIXME: Do we really need this to be specified twice? */
+      if (win32_path.isdir ())
+	mode |= S_IFDIR;
+      if (!set_file_attribute (win32_path.has_acls (), win32_path, uid, gid,
+				mode, cygheap->user.logsrv ())
 	  && allow_ntsec)
 	res = 0;
 
       /* if the mode we want has any write bits set, we can't
 	 be read only. */
       if (mode & (S_IWUSR | S_IWGRP | S_IWOTH))
-	attr &= ~FILE_ATTRIBUTE_READONLY;
+	(DWORD) win32_path &= ~FILE_ATTRIBUTE_READONLY;
       else
-	attr |= FILE_ATTRIBUTE_READONLY;
+	(DWORD) win32_path |= FILE_ATTRIBUTE_READONLY;
 
       if (S_ISLNK (mode) || S_ISSOCK (mode))
-	attr |= FILE_ATTRIBUTE_SYSTEM;
+	(DWORD) win32_path |= FILE_ATTRIBUTE_SYSTEM;
 
-      if (!SetFileAttributesA (win32_path.get_win32 (), attr))
+      if (!SetFileAttributes (win32_path, win32_path))
 	__seterrno ();
       else
 	{
@@ -760,18 +926,18 @@ done:
 
 /* fchmod: P96 5.6.4.1 */
 
-extern "C"
-int
+extern "C" int
 fchmod (int fd, mode_t mode)
 {
-  if (dtable.not_open (fd))
+  sigframe thisframe (mainthread);
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
     {
       syscall_printf ("-1 = fchmod (%d, 0%o)", fd, mode);
-      set_errno (EBADF);
       return -1;
     }
 
-  const char *path = dtable[fd]->get_name ();
+  const char *path = cfd->get_name ();
 
   if (path == NULL)
     {
@@ -785,73 +951,38 @@ fchmod (int fd, mode_t mode)
   return chmod (path, mode);
 }
 
-/* Cygwin internal */
-static int
-num_entries (const char *win32_name)
-{
-  WIN32_FIND_DATA buf;
-  HANDLE handle;
-  char buf1[MAX_PATH];
-  int count = 0;
-
-  strcpy (buf1, win32_name);
-  int len = strlen (buf1);
-  if (len == 0 || isdirsep (buf1[len - 1]))
-    strcat (buf1, "*");
-  else
-    strcat (buf1, "/*");	/* */
-
-  handle = FindFirstFileA (buf1, &buf);
-
-  if (handle == INVALID_HANDLE_VALUE)
-    return 0;
-  count ++;
-  while (FindNextFileA (handle, &buf))
-    {
-      if ((buf.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-	count ++;
-    }
-  FindClose (handle);
-  return count;
-}
-
-extern "C"
-int
+extern "C" int
 _fstat (int fd, struct stat *buf)
 {
-  int r;
+  int res;
+  sigframe thisframe (mainthread);
 
-  if (dtable.not_open (fd))
-    {
-      syscall_printf ("-1 = fstat (%d, %p)", fd, buf);
-      set_errno (EBADF);
-      r = -1;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    res = -1;
   else
     {
       memset (buf, 0, sizeof (struct stat));
-      r = dtable[fd]->fstat (buf);
-      syscall_printf ("%d = fstat (%d, %x)", r,fd,buf);
+      res = cfd->fstat (buf, NULL);
     }
 
-  return r;
+  syscall_printf ("%d = fstat (%d, %p)", res, fd, buf);
+  return res;
 }
 
 /* fsync: P96 6.6.1.1 */
-extern "C"
-int
+extern "C" int
 fsync (int fd)
 {
-  if (dtable.not_open (fd))
+  sigframe thisframe (mainthread);
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
     {
       syscall_printf ("-1 = fsync (%d)", fd);
-      set_errno (EBADF);
       return -1;
     }
 
-  HANDLE h = dtable[fd]->get_handle ();
-
-  if (FlushFileBuffers (h) == 0)
+  if (FlushFileBuffers (cfd->get_handle ()) == 0)
     {
       __seterrno ();
       return -1;
@@ -860,169 +991,83 @@ fsync (int fd)
 }
 
 /* sync: standards? */
-extern "C"
-int
+extern "C" int
 sync ()
 {
   return 0;
 }
 
-int __stdcall
-stat_dev (DWORD devn, int unit, unsigned long ino, struct stat *buf)
+suffix_info stat_suffixes[] =
 {
-  switch (devn)
-    {
-    case FH_CONOUT:
-    case FH_PIPEW:
-      buf->st_mode = STD_WBITS;
-      break;
-    case FH_CONIN:
-    case FH_PIPER:
-      buf->st_mode = STD_RBITS;
-      break;
-    default:
-      buf->st_mode = STD_RBITS | S_IWUSR | S_IWGRP | S_IWOTH;
-      break;
-    }
-
-  buf->st_mode |= S_IFCHR;
-  buf->st_blksize = S_BLKSIZE;
-  buf->st_nlink = 1;
-  buf->st_dev = buf->st_rdev = FHDEVN (devn) << 8 | (unit & 0xff);
-  buf->st_ino = ino;
-  buf->st_atime = buf->st_mtime = buf->st_ctime = time (NULL);
-  return 0;
-}
+  suffix_info ("", 1),
+  suffix_info (".exe", 1),
+  suffix_info (NULL)
+};
 
 /* Cygwin internal */
-static int
-stat_worker (const char *caller, const char *name, struct stat *buf,
-	      int nofollow)
+int __stdcall
+stat_worker (const char *name, struct stat *buf, int nofollow, path_conv *pc)
 {
   int res = -1;
-  int atts;
-  char *win32_name;
-  char drive[4] = "X:\\";
+  path_conv real_path;
+  fhandler_base *fh = NULL;
+
+  if (!pc)
+    pc = &real_path;
+
   MALLOC_CHECK;
+  if (check_null_invalid_struct_errno (buf))
+    goto done;
 
-  debug_printf ("%s (%s, %p)", caller, name, buf);
-
-  path_conv real_path (name, nofollow ? SYMLINK_NOFOLLOW : SYMLINK_FOLLOW, 1);
-  if (real_path.error)
+  fh = cygheap->fdtab.build_fhandler_from_name (-1, name, NULL, *pc,
+						(nofollow ?
+						 PC_SYM_NOFOLLOW
+						 : PC_SYM_FOLLOW)
+						| PC_FULL, stat_suffixes);
+  if (pc->error)
     {
-      set_errno (real_path.error);
-      goto done;
-    }
-
-  memset (buf, 0, sizeof (struct stat));
-
-  win32_name = real_path.get_win32 ();
-  if (real_path.is_device ())
-    return stat_dev (real_path.get_devn (), real_path.get_unitn (),
-		     hash_path_name (0, win32_name), buf);
-
-  atts = real_path.file_attributes ();
-
-/* FIXME: this is of dubious merit and is fundamentally flawed.
-   E.g., what if the .exe file is a symlink?  This is not accounted
-   for here.  Also, what about all of the other special extensions?
-
-   This could be "fixed" by passing the appropriate extension list
-   to path_conv but I'm not sure that this is really justified.  */
-
-  /* If we can't find the name, try again with a .exe suffix
-     [but only if not already present].  */
-  if (atts == -1 && GetLastError () == ERROR_FILE_NOT_FOUND &&
-      !(strrchr (win32_name, '.') > strrchr (win32_name, '\\')))
-    {
-      debug_printf ("trying with .exe suffix");
-      strcat (win32_name, ".exe");
-      atts = (int) GetFileAttributesA (win32_name);
-      if (atts == -1)
-	strchr (win32_name, '\0')[4] = '\0';
-    }
-
-  debug_printf ("%d = GetFileAttributesA (%s)", atts, win32_name);
-
-  drive[0] = win32_name[0];
-  UINT dtype;
-
-  if (atts == -1 || !(atts & FILE_ATTRIBUTE_DIRECTORY) ||
-      (os_being_run == winNT
-       && (((dtype = GetDriveType (drive)) != DRIVE_NO_ROOT_DIR
-	     //&& dtype != DRIVE_REMOTE
-	     && dtype != DRIVE_UNKNOWN))))
-    {
-      fhandler_disk_file fh (NULL);
-
-      if (fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
-			      (nofollow ? O_NOSYMLINK : 0), 0))
-	{
-	  res = fh.fstat (buf);
-	  fh.close ();
-	  if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
-	    buf->st_nlink = num_entries (win32_name);
-	}
+      debug_printf ("got %d error from build_fhandler_from_name", pc->error);
+      set_errno (pc->error);
     }
   else
     {
-      WIN32_FIND_DATA wfd;
-      HANDLE handle;
-      /* hmm, the number of links to a directory includes the
-	 number of entries in the directory, since all the things
-	 in the directory point to it */
-      buf->st_nlink += num_entries (win32_name);
-      buf->st_dev = FHDEVN(FH_DISK) << 8;
-      buf->st_ino = hash_path_name (0, real_path.get_win32 ());
-      buf->st_mode = S_IFDIR | STD_RBITS | STD_XBITS;
-      if ((atts & FILE_ATTRIBUTE_READONLY) == 0)
-	buf->st_mode |= STD_WBITS;
-
-      int has_acls = allow_ntsec && real_path.has_acls ();
-
-      buf->st_uid = get_file_owner (has_acls, real_path.get_win32 ());
-      buf->st_gid = get_file_group (has_acls, real_path.get_win32 ());
-
-      if ((handle = FindFirstFile (real_path.get_win32(), &wfd)) != INVALID_HANDLE_VALUE)
-	{
-	  buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
-	  buf->st_mtime   = to_time_t (&wfd.ftLastWriteTime);
-	  buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
-	  buf->st_size    = wfd.nFileSizeLow;
-	  buf->st_blksize = S_BLKSIZE;
-	  buf->st_blocks  = (buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
-	  FindClose (handle);
-	}
-      res = 0;
+      debug_printf ("(%s, %p, %d, %p), file_attributes %d", name, buf, nofollow,
+		    pc, (DWORD) real_path);
+      memset (buf, 0, sizeof (struct stat));
+      res = fh->fstat (buf, pc);
     }
 
  done:
+  if (fh)
+    delete fh;
   MALLOC_CHECK;
-  syscall_printf ("%d = %s (%s, %p)", res, caller, name, buf);
+  syscall_printf ("%d = (%s, %p)", res, name, buf);
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 _stat (const char *name, struct stat *buf)
 {
-  return stat_worker ("stat", name, buf, 0);
+  sigframe thisframe (mainthread);
+  syscall_printf ("entering");
+  return stat_worker (name, buf, 0);
 }
 
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
-extern "C"
-int
+extern "C" int
 lstat (const char *name, struct stat *buf)
 {
-  return stat_worker ("lstat", name, buf, 1);
+  sigframe thisframe (mainthread);
+  syscall_printf ("entering");
+  return stat_worker (name, buf, 1);
 }
 
 extern int acl_access (const char *, int);
 
-extern "C"
-int
+extern "C" int
 access (const char *fn, int flags)
 {
+  sigframe thisframe (mainthread);
   // flags were incorrectly specified
   if (flags & ~(F_OK|R_OK|W_OK|X_OK))
     {
@@ -1034,54 +1079,54 @@ access (const char *fn, int flags)
     return acl_access (fn, flags);
 
   struct stat st;
-  int r = stat (fn, &st);
+  int r = stat_worker (fn, &st, 0);
   if (r)
     return -1;
   r = -1;
   if (flags & R_OK)
     {
       if (st.st_uid == myself->uid)
-        {
-          if (!(st.st_mode & S_IRUSR))
-            goto done;
-        }
+	{
+	  if (! (st.st_mode & S_IRUSR))
+	    goto done;
+	}
       else if (st.st_gid == myself->gid)
-        {
-          if (!(st.st_mode & S_IRGRP))
-            goto done;
-        }
-      else if (!(st.st_mode & S_IROTH))
-        goto done;
+	{
+	  if (! (st.st_mode & S_IRGRP))
+	    goto done;
+	}
+      else if (! (st.st_mode & S_IROTH))
+	goto done;
     }
   if (flags & W_OK)
     {
       if (st.st_uid == myself->uid)
-        {
-          if (!(st.st_mode & S_IWUSR))
-            goto done;
-        }
+	{
+	  if (! (st.st_mode & S_IWUSR))
+	    goto done;
+	}
       else if (st.st_gid == myself->gid)
-        {
-          if (!(st.st_mode & S_IWGRP))
-            goto done;
-        }
-      else if (!(st.st_mode & S_IWOTH))
-        goto done;
+	{
+	  if (! (st.st_mode & S_IWGRP))
+	    goto done;
+	}
+      else if (! (st.st_mode & S_IWOTH))
+	goto done;
     }
   if (flags & X_OK)
     {
       if (st.st_uid == myself->uid)
-        {
-          if (!(st.st_mode & S_IXUSR))
-            goto done;
-        }
+	{
+	  if (! (st.st_mode & S_IXUSR))
+	    goto done;
+	}
       else if (st.st_gid == myself->gid)
-        {
-          if (!(st.st_mode & S_IXGRP))
-            goto done;
-        }
-      else if (!(st.st_mode & S_IXOTH))
-        goto done;
+	{
+	  if (! (st.st_mode & S_IXGRP))
+	    goto done;
+	}
+      else if (! (st.st_mode & S_IXOTH))
+	goto done;
     }
   r = 0;
 done:
@@ -1090,106 +1135,139 @@ done:
   return r;
 }
 
-extern "C"
-int
+extern "C" int
 _rename (const char *oldpath, const char *newpath)
 {
+  sigframe thisframe (mainthread);
   int res = 0;
+  char *lnk_suffix = NULL;
 
-  path_conv real_old (oldpath, SYMLINK_NOFOLLOW);
+  path_conv real_old (oldpath, PC_SYM_NOFOLLOW);
 
   if (real_old.error)
     {
+      syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
       set_errno (real_old.error);
-      syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
       return -1;
     }
 
-  path_conv real_new (newpath, SYMLINK_NOFOLLOW);
+  path_conv real_new (newpath, PC_SYM_NOFOLLOW);
 
-  if (real_new.error)
+  /* Shortcut hack. */
+  char new_lnk_buf[MAX_PATH + 5];
+  if (real_old.issymlink () && !real_new.error && !real_new.case_clash)
     {
-      set_errno (real_new.error);
-      syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
-      return -1;
+      int len_old = strlen (real_old.get_win32 ());
+      if (strcasematch (real_old.get_win32 () + len_old - 4, ".lnk"))
+	{
+	  strcpy (new_lnk_buf, newpath);
+	  strcat (new_lnk_buf, ".lnk");
+	  newpath = new_lnk_buf;
+	  real_new.check (newpath, PC_SYM_NOFOLLOW);
+	}
     }
 
-  if (! writable_directory (real_old.get_win32 ())
-      || ! writable_directory (real_new.get_win32 ()))
+  if (real_new.error || real_new.case_clash)
     {
       syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
+      set_errno (real_new.case_clash ? ECASECLASH : real_new.error);
       return -1;
     }
 
-  int oldatts = GetFileAttributesA (real_old.get_win32 ());
-  int newatts = GetFileAttributesA (real_new.get_win32 ());
+  if (!writable_directory (real_old) || !writable_directory (real_new))
+    {
+      syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
+      set_errno (EACCES);
+      return -1;
+    }
 
-  if (oldatts == -1) /* file to move doesn't exist */
+  if (!real_old.exists ()) /* file to move doesn't exist */
     {
        syscall_printf ("file to move doesn't exist");
+       set_errno (ENOENT);
        return (-1);
     }
 
-  if (newatts != -1 && newatts & FILE_ATTRIBUTE_READONLY)
+  /* Destination file exists and is read only, change that or else
+     the rename won't work. */
+  if (real_new.has_attribute (FILE_ATTRIBUTE_READONLY))
+    SetFileAttributes (real_new, (DWORD) real_new & ~FILE_ATTRIBUTE_READONLY);
+
+  /* Shortcut hack No. 2, part 1 */
+  if (!real_old.issymlink () && !real_new.error && real_new.issymlink () &&
+      real_new.known_suffix && strcasematch (real_new.known_suffix, ".lnk") &&
+      (lnk_suffix = strrchr (real_new.get_win32 (), '.')))
+     *lnk_suffix = '\0';
+
+  if (!MoveFile (real_old, real_new))
+    res = -1;
+
+  if (res == 0 || (GetLastError () != ERROR_ALREADY_EXISTS
+		   && GetLastError () != ERROR_FILE_EXISTS))
+    goto done;
+
+  if (wincap.has_move_file_ex ())
     {
-      /* Destination file exists and is read only, change that or else
-	 the rename won't work. */
-      SetFileAttributesA (real_new.get_win32 (), newatts & ~ FILE_ATTRIBUTE_READONLY);
+      if (MoveFileEx (real_old.get_win32 (), real_new.get_win32 (),
+		      MOVEFILE_REPLACE_EXISTING))
+	res = 0;
     }
-
-  /* First make sure we have the permissions */
-  if (!MoveFileEx (real_old.get_win32 (), real_new.get_win32 (), MOVEFILE_REPLACE_EXISTING))
+  else
     {
-      res = -1;
-
-      /* !!! fixme, check for windows version before trying this.. */
-      if (GetLastError () == ERROR_CALL_NOT_IMPLEMENTED)
+      syscall_printf ("try win95 hack");
+      for (int i = 0; i < 2; i++)
 	{
-	  /* How sad, we must be on win95, try it the stupid way */
-	  syscall_printf ("try win95 hack");
-	  for (;;)
+	  if (!DeleteFileA (real_new.get_win32 ()) &&
+	      GetLastError () != ERROR_FILE_NOT_FOUND)
 	    {
-	      if (MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
-		{
-		  res = 0;
-		  break;
-		}
-
-	      if (GetLastError () != ERROR_ALREADY_EXISTS)
-		{
-		  syscall_printf ("%s already_exists", real_new.get_win32 ());
-		  break;
-		}
-
-	      if (!DeleteFileA (real_new.get_win32 ()) &&
-		  GetLastError () != ERROR_FILE_NOT_FOUND)
-		{
-		  syscall_printf ("deleting %s to be paranoid",
-				  real_new.get_win32 ());
-		  break;
-		}
+	      syscall_printf ("deleting %s to be paranoid",
+			      real_new.get_win32 ());
+	      break;
+	    }
+	  else if (MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
+	    {
+	      res = 0;
+	      break;
 	    }
 	}
-      if (res)
-	__seterrno ();
     }
 
-  if (res == 0)
+done:
+  if (res)
+    {
+      __seterrno ();
+      /* Reset R/O attributes if neccessary. */
+      if (real_new.has_attribute (FILE_ATTRIBUTE_READONLY))
+	SetFileAttributes (real_new, real_new);
+    }
+  else
     {
       /* make the new file have the permissions of the old one */
-      SetFileAttributesA (real_new.get_win32 (), oldatts);
+      SetFileAttributes (real_new, real_old);
+
+      /* Shortcut hack, No. 2, part 2 */
+      /* if the new filename was an existing shortcut, remove it now if the
+	 new filename is equal to the shortcut name without .lnk suffix. */
+      if (lnk_suffix)
+	{
+	  *lnk_suffix = '.';
+	  DeleteFile (real_new);
+	}
     }
 
-  syscall_printf ("%d = rename (%s, %s)", res, real_old.get_win32 (),
-		  real_new.get_win32 ());
+  syscall_printf ("%d = rename (%s, %s)", res, (char *) real_old,
+		  (char *) real_new);
 
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 system (const char *cmdstring)
 {
+  if (check_null_empty_str_errno (cmdstring))
+    return -1;
+
+  sigframe thisframe (mainthread);
   int res;
   const char* command[4];
   _sig_func_ptr oldint, oldquit;
@@ -1222,33 +1300,70 @@ system (const char *cmdstring)
   return res;
 }
 
-extern "C"
-void
+extern "C" int
 setdtablesize (int size)
 {
-  if (size > (int)dtable.size)
-    dtable.extend (size);
+  if (size <= (int)cygheap->fdtab.size || cygheap->fdtab.extend (size - cygheap->fdtab.size))
+    return 0;
+
+  return -1;
 }
 
-extern "C"
-int
+extern "C" int
 getdtablesize ()
 {
-  return dtable.size;
+  return cygheap->fdtab.size > OPEN_MAX ? cygheap->fdtab.size : OPEN_MAX;
 }
 
-extern "C"
-size_t
+extern "C" size_t
 getpagesize ()
 {
-  return sysconf (_SC_PAGESIZE);
+  if (!system_info.dwPageSize)
+    GetSystemInfo (&system_info);
+  return (int) system_info.dwPageSize;
+}
+
+static int
+check_posix_perm (const char *fname, int v)
+{
+  extern int allow_ntea, allow_ntsec, allow_smbntsec;
+
+  /* Windows 95/98/ME don't support file system security at all. */
+  if (!wincap.has_security ())
+    return 0;
+
+  /* ntea is ok for supporting permission bits but it doesn't support
+     full POSIX security settings. */
+  if (v == _PC_POSIX_PERMISSIONS && allow_ntea)
+    return 1;
+
+  if (!allow_ntsec)
+    return 0;
+
+  char *root = rootdir (strcpy ((char *)alloca (strlen (fname)), fname));
+
+  if (!allow_smbntsec
+      && ((root[0] == '\\' && root[1] == '\\')
+	  || GetDriveType (root) == DRIVE_REMOTE))
+    return 0;
+
+  DWORD vsn, len, flags;
+  if (!GetVolumeInformation (root, NULL, 0, &vsn, &len, &flags, NULL, 16))
+    {
+      __seterrno ();
+      return 0;
+    }
+
+  return (flags & FS_PERSISTENT_ACLS) ? 1 : 0;
 }
 
 /* FIXME: not all values are correct... */
-extern "C"
-long int
+extern "C" long int
 fpathconf (int fd, int v)
 {
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
   switch (v)
     {
     case _PC_LINK_MAX:
@@ -1266,26 +1381,31 @@ fpathconf (int fd, int v)
     case _PC_PATH_MAX:
       return PATH_MAX;
     case _PC_PIPE_BUF:
-      return 4096;
+      return PIPE_BUF;
     case _PC_CHOWN_RESTRICTED:
     case _PC_NO_TRUNC:
       return -1;
     case _PC_VDISABLE:
-      if (isatty (fd))
+      if (cfd->is_tty ())
 	return -1;
       else
 	{
 	  set_errno (EBADF);
 	  return -1;
 	}
+    case _PC_POSIX_PERMISSIONS:
+    case _PC_POSIX_SECURITY:
+      if (cfd->get_device () == FH_DISK)
+	return check_posix_perm (cfd->get_win32_name (), v);
+      set_errno (EINVAL);
+      return -1;
     default:
       set_errno (EINVAL);
       return -1;
     }
 }
 
-extern "C"
-long int
+extern "C" long int
 pathconf (const char *file, int v)
 {
   switch (v)
@@ -1298,64 +1418,139 @@ pathconf (const char *file, int v)
       return _POSIX_LINK_MAX;
     case _PC_MAX_CANON:
     case _PC_MAX_INPUT:
-	return _POSIX_MAX_CANON;
+      return _POSIX_MAX_CANON;
     case _PC_PIPE_BUF:
-      return 4096;
+      return PIPE_BUF;
     case _PC_CHOWN_RESTRICTED:
     case _PC_NO_TRUNC:
       return -1;
     case _PC_VDISABLE:
-	return -1;
+      return -1;
+    case _PC_POSIX_PERMISSIONS:
+    case _PC_POSIX_SECURITY:
+      {
+	path_conv full_path (file, PC_SYM_FOLLOW | PC_FULL);
+	if (full_path.error)
+	  {
+	    set_errno (full_path.error);
+	    return -1;
+	  }
+	if (full_path.is_device ())
+	  {
+	    set_errno (EINVAL);
+	    return -1;
+	  }
+	return check_posix_perm (full_path, v);
+      }
     default:
       set_errno (EINVAL);
       return -1;
     }
 }
 
-extern "C"
-char *
+extern "C" char *
+ttyname (int fd)
+{
+  cygheap_fdget cfd (fd);
+  if (cfd < 0 || !cfd->is_tty ())
+    {
+      return 0;
+    }
+  return (char *) (cfd->ttyname ());
+}
+
+extern "C" char *
 ctermid (char *str)
 {
   static NO_COPY char buf[16];
   if (str == NULL)
     str = buf;
-  if (!tty_attached (myself))
+  if (!real_tty_attached (myself))
     strcpy (str, "/dev/conin");
   else
     __small_sprintf (str, "/dev/tty%d", myself->ctty);
   return str;
 }
 
-extern "C"
-char *
-ttyname (int fd)
+/* Tells stdio if it should do the cr/lf conversion for this file */
+extern "C" int
+_cygwin_istext_for_stdio (int fd)
 {
-  if (dtable.not_open (fd) || !dtable[fd]->is_tty ())
+  syscall_printf ("_cygwin_istext_for_stdio (%d)\n", fd);
+  if (CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING)
     {
+      syscall_printf (" _cifs: old API\n");
+      return 0; /* we do it for old apps, due to getc/putc macros */
+    }
+
+  cygheap_fdget cfd (fd, false, false);
+  if (cfd < 0)
+    {
+      syscall_printf (" _cifs: fd not open\n");
       return 0;
     }
-  return (char *)(dtable[fd]->ttyname ());
+
+  if (cfd->get_device () != FH_DISK)
+    {
+      syscall_printf (" _cifs: fd not disk file\n");
+      return 0;
+    }
+
+  if (cfd->get_w_binary () || cfd->get_r_binary ())
+    {
+      syscall_printf (" _cifs: get_*_binary\n");
+      return 0;
+    }
+
+  syscall_printf ("_cygwin_istext_for_stdio says yes\n");
+  return 1;
+}
+
+/* internal newlib function */
+extern "C" int _fwalk (struct _reent *ptr, int (*function) (FILE *));
+
+static int setmode_mode;
+static int setmode_file;
+
+static int
+setmode_helper (FILE *f)
+{
+  if (fileno (f) != setmode_file)
+    return 0;
+  syscall_printf ("setmode: file was %s now %s\n",
+		 f->_flags & __SCLE ? "cle" : "raw",
+		 setmode_mode & O_TEXT ? "cle" : "raw");
+  if (setmode_mode & O_TEXT)
+    f->_flags |= __SCLE;
+  else
+    f->_flags &= ~__SCLE;
+  return 0;
+}
+
+extern "C" int
+getmode (int fd)
+{
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
+
+  return cfd->get_flags () & (O_BINARY | O_TEXT);
 }
 
 /* Set a file descriptor into text or binary mode, returning the
    previous mode.  */
 
-extern "C"
-int
+extern "C" int
 setmode (int fd, int mode)
 {
-  if (dtable.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
-  if (mode != O_BINARY  && mode != O_TEXT)
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
+  if (mode != O_BINARY  && mode != O_TEXT && mode != 0)
     {
       set_errno (EINVAL);
       return -1;
     }
-
-  fhandler_base *p = dtable[fd];
 
   /* Note that we have no way to indicate the case that writes are
      binary but not reads, or vice-versa.  These cases can arise when
@@ -1363,78 +1558,88 @@ setmode (int fd, int mode)
      interfaces should not use setmode.  */
 
   int res;
-  if (p->get_w_binary () && p->get_r_binary ())
+  if (cfd->get_w_binary () && cfd->get_r_binary ())
     res = O_BINARY;
+  else if (cfd->get_w_binset () && cfd->get_r_binset ())
+    res = O_TEXT;	/* Specifically set O_TEXT */
   else
-    res = O_TEXT;
+    res = 0;
 
-  if (mode & O_BINARY)
+  if (!mode)
+    cfd->reset_to_open_binmode ();
+  else if (mode & O_BINARY)
     {
-      p->set_w_binary (1);
-      p->set_r_binary (1);
+      cfd->set_w_binary (1);
+      cfd->set_r_binary (1);
     }
   else
     {
-      p->set_w_binary (0);
-      p->set_r_binary (0);
+      cfd->set_w_binary (0);
+      cfd->set_r_binary (0);
     }
 
+  if (_cygwin_istext_for_stdio (fd))
+    setmode_mode = O_TEXT;
+  else
+    setmode_mode = O_BINARY;
+  setmode_file = fd;
+  _fwalk (_REENT, setmode_helper);
+
+  syscall_printf ("setmode (%d<%s>, %s) returns %s\n", fd, cfd->get_name (),
+		  mode & O_TEXT ? "text" : "binary",
+		  res & O_TEXT ? "text" : "binary");
   return res;
 }
 
 /* ftruncate: P96 5.6.7.1 */
-extern "C"
-int
+extern "C" int
 ftruncate (int fd, off_t length)
 {
+  sigframe thisframe (mainthread);
   int res = -1;
 
-  if (dtable.not_open (fd))
-    {
-      set_errno (EBADF);
-    }
+  if (length < 0)
+    set_errno (EINVAL);
   else
     {
-      HANDLE h = dtable[fd]->get_handle ();
-      off_t prev_loc;
-
-      if (h)
+      cygheap_fdget cfd (fd);
+      if (cfd >= 0)
 	{
-	  /* remember curr file pointer location */
-	  prev_loc = dtable[fd]->lseek (0, SEEK_CUR);
+	  HANDLE h = cygheap->fdtab[fd]->get_handle ();
 
-	  dtable[fd]->lseek (length, SEEK_SET);
-	  if (!SetEndOfFile (h))
+	  if (cfd->get_handle ())
 	    {
-	      __seterrno ();
-	    }
-	  else
-	    res = 0;
+	      /* remember curr file pointer location */
+	      off_t prev_loc = cfd->lseek (0, SEEK_CUR);
 
-	  /* restore original file pointer location */
-	  dtable[fd]->lseek (prev_loc, 0);
+	      cfd->lseek (length, SEEK_SET);
+	      if (!SetEndOfFile (h))
+		__seterrno ();
+	      else
+		res = 0;
+
+	      /* restore original file pointer location */
+	      cfd->lseek (prev_loc, 0);
+	    }
 	}
     }
-  syscall_printf ("%d = ftruncate (%d, %d)", res, fd, length);
 
+  syscall_printf ("%d = ftruncate (%d, %d)", res, fd, length);
   return res;
 }
 
 /* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
-/* FIXME: untested */
-extern "C"
-int
+extern "C" int
 truncate (const char *pathname, off_t length)
 {
+  sigframe thisframe (mainthread);
   int fd;
   int res = -1;
 
   fd = open (pathname, O_RDWR);
 
   if (fd == -1)
-    {
-      set_errno (EBADF);
-    }
+    set_errno (EBADF);
   else
     {
       res = ftruncate (fd, length);
@@ -1445,38 +1650,32 @@ truncate (const char *pathname, off_t length)
   return res;
 }
 
-extern "C"
-long
+extern "C" long
 get_osfhandle (int fd)
 {
-  long res = -1;
+  long res;
 
-  if (dtable.not_open (fd))
-    {
-      set_errno ( EBADF);
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd >= 0)
+    res = (long) cfd->get_handle ();
   else
-    {
-      res = (long) dtable[fd]->get_handle ();
-    }
-  syscall_printf ("%d = get_osfhandle(%d)", res, fd);
+    res = -1;
 
+  syscall_printf ("%d = get_osfhandle (%d)", res, fd);
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 statfs (const char *fname, struct statfs *sfs)
 {
-  char full_path[MAX_PATH];
-
+  sigframe thisframe (mainthread);
   if (!sfs)
     {
       set_errno (EFAULT);
       return -1;
     }
-  cygwin_conv_to_full_win32_path (fname, full_path);
 
+  path_conv full_path (fname, PC_SYM_FOLLOW | PC_FULL);
   char *root = rootdir (full_path);
 
   syscall_printf ("statfs %s", root);
@@ -1507,24 +1706,21 @@ statfs (const char *fname, struct statfs *sfs)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 fstatfs (int fd, struct statfs *sfs)
 {
-  if (dtable.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
-  fhandler_disk_file *f = (fhandler_disk_file *) dtable[fd];
-  return statfs (f->get_name (), sfs);
+  sigframe thisframe (mainthread);
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
+  return statfs (cfd->get_name (), sfs);
 }
 
 /* setpgid: POSIX 4.3.3.1 */
-extern "C"
-int
+extern "C" int
 setpgid (pid_t pid, pid_t pgid)
 {
+  sigframe thisframe (mainthread);
   int res = -1;
   if (pid == 0)
     pid = getpid ();
@@ -1536,37 +1732,41 @@ setpgid (pid_t pid, pid_t pgid)
       set_errno (EINVAL);
       goto out;
     }
-  pinfo *p;
-  p = procinfo (pid);
-  if (p == NULL)
-    {
-      set_errno (ESRCH);
-      goto out;
-    }
-  /* A process may only change the process group of itself and its children */
-  if (p == myself || p->ppid == myself->pid)
-    {
-      p->pgid = pgid;
-      res = 0;
-    }
   else
     {
-      set_errno (EPERM);
-      goto out;
+      pinfo p (pid);
+      if (!p)
+	{
+	  set_errno (ESRCH);
+	  goto out;
+	}
+      /* A process may only change the process group of itself and its children */
+      if (p == myself || p->ppid == myself->pid)
+	{
+	  p->pgid = pgid;
+	  if (p->pid != p->pgid)
+	    p->set_has_pgid_children (0);
+	  res = 0;
+	}
+      else
+	{
+	  set_errno (EPERM);
+	  goto out;
+	}
     }
 out:
   syscall_printf ("pid %d, pgid %d, res %d", pid, pgid, res);
   return res;
 }
 
-extern "C"
-pid_t
+extern "C" pid_t
 getpgid (pid_t pid)
 {
+  sigframe thisframe (mainthread);
   if (pid == 0)
     pid = getpid ();
 
-  pinfo *p = procinfo (pid);
+  pinfo p (pid);
   if (p == 0)
     {
       set_errno (ESRCH);
@@ -1575,35 +1775,32 @@ getpgid (pid_t pid)
   return p->pgid;
 }
 
-extern "C"
-int
+extern "C" int
 setpgrp (void)
 {
+  sigframe thisframe (mainthread);
   return setpgid (0, 0);
 }
 
-extern "C"
-pid_t
+extern "C" pid_t
 getpgrp (void)
 {
+  sigframe thisframe (mainthread);
   return getpgid (0);
 }
 
-extern "C"
-char *
+extern "C" char *
 ptsname (int fd)
 {
-  if (dtable.not_open (fd))
-    {
-      set_errno (EBADF);
-      return 0;
-    }
-  return (char *)(dtable[fd]->ptsname ());
+  sigframe thisframe (mainthread);
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return 0;
+  return (char *) (cfd->ptsname ());
 }
 
 /* FIXME: what is this? */
-extern "C"
-int
+extern "C" int
 regfree ()
 {
   return 0;
@@ -1615,88 +1812,368 @@ regfree ()
    Although mknod hasn't been implemented yet, some GNU tools (e.g. the
    fileutils) assume its existence so we must provide a stub that always
    fails. */
-extern "C"
-int
-mknod ()
+extern "C" int
+mknod (const char *_path, mode_t mode, dev_t dev)
+{
+  set_errno (ENOSYS);
+  return -1;
+}
+
+extern "C" int
+mkfifo (const char *_path, mode_t mode)
 {
   set_errno (ENOSYS);
   return -1;
 }
 
 /* setgid: POSIX 4.2.2.1 */
-/* FIXME: unimplemented! */
-extern "C"
-int
-setgid (gid_t a)
+extern "C" int
+setgid (gid_t gid)
 {
-  set_errno (ENOSYS);
-  return 0;
+  int ret = setegid (gid);
+  if (!ret)
+    cygheap->user.real_gid = myself->gid;
+  return ret;
 }
 
 /* setuid: POSIX 4.2.2.1 */
-/* FIXME: unimplemented! */
-extern "C"
-int
-setuid (uid_t b)
+extern "C" int
+setuid (uid_t uid)
 {
-  set_errno (ENOSYS);
-  return 0;
+  int ret = seteuid (uid);
+  if (!ret)
+    cygheap->user.real_uid = myself->uid;
+  debug_printf ("real: %d, effective: %d", cygheap->user.real_uid, myself->uid);
+  return ret;
 }
 
+extern struct passwd *internal_getlogin (cygheap_user &user);
+
 /* seteuid: standards? */
-extern "C"
-int
-seteuid (uid_t c)
+extern "C" int
+seteuid (uid_t uid)
 {
-  set_errno (ENOSYS);
+  sigframe thisframe (mainthread);
+  if (wincap.has_security ())
+    {
+      char orig_username[UNLEN + 1];
+      char orig_domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+      char username[UNLEN + 1];
+      DWORD ulen = UNLEN + 1;
+      char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+      DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+      SID_NAME_USE use;
+
+      if (uid == (uid_t) -1 || uid == myself->uid)
+	{
+	  debug_printf ("new euid == current euid, nothing happens");
+	  return 0;
+	}
+      struct passwd *pw_new = getpwuid (uid);
+      if (!pw_new)
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
+
+      cygsid tok_usersid;
+      DWORD siz;
+
+      char *env;
+      orig_username[0] = orig_domain[0] = '\0';
+      if ((env = getenv ("USERNAME")))
+	strncat (orig_username, env, UNLEN + 1);
+      if ((env = getenv ("USERDOMAIN")))
+	strncat (orig_domain, env, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      if (uid == cygheap->user.orig_uid)
+	{
+
+	  debug_printf ("RevertToSelf () (uid == orig_uid, token=%d)",
+			cygheap->user.token);
+	  RevertToSelf ();
+	  if (cygheap->user.token != INVALID_HANDLE_VALUE)
+	    cygheap->user.impersonated = FALSE;
+
+	  HANDLE ptok = INVALID_HANDLE_VALUE;
+	  if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
+	    debug_printf ("OpenProcessToken(): %E\n");
+	  else if (!GetTokenInformation (ptok, TokenUser, &tok_usersid,
+					 sizeof tok_usersid, &siz))
+	    debug_printf ("GetTokenInformation(): %E");
+	  else if (!LookupAccountSid (NULL, tok_usersid, username, &ulen,
+				      domain, &dlen, &use))
+	    debug_printf ("LookupAccountSid(): %E");
+	  else
+	    {
+	      setenv ("USERNAME", username, 1);
+	      setenv ("USERDOMAIN", domain, 1);
+	    }
+	  if (ptok != INVALID_HANDLE_VALUE)
+	    CloseHandle (ptok);
+	}
+      else
+	{
+	  cygsid usersid, pgrpsid, tok_pgrpsid;
+	  HANDLE sav_token = INVALID_HANDLE_VALUE;
+	  BOOL sav_impersonation;
+	  BOOL current_token_is_internal_token = FALSE;
+	  BOOL explicitely_created_token = FALSE;
+
+	  struct group *gr = getgrgid (myself->gid);
+	  debug_printf ("myself->gid: %d, gr: %d", myself->gid, gr);
+
+	  usersid.getfrompw (pw_new);
+	  pgrpsid.getfromgr (gr);
+
+	  /* Only when ntsec is ON! */
+	  /* Check if new user == user of impersonation token and
+	     - if reasonable - new pgrp == pgrp of impersonation token. */
+	  if (allow_ntsec && cygheap->user.token != INVALID_HANDLE_VALUE)
+	    {
+	      if (!GetTokenInformation (cygheap->user.token, TokenUser,
+					&tok_usersid, sizeof tok_usersid, &siz))
+		{
+		  debug_printf ("GetTokenInformation(): %E");
+		  tok_usersid = NO_SID;
+		}
+	      if (!GetTokenInformation (cygheap->user.token, TokenPrimaryGroup,
+					&tok_pgrpsid, sizeof tok_pgrpsid, &siz))
+		{
+		  debug_printf ("GetTokenInformation(): %E");
+		  tok_pgrpsid = NO_SID;
+		}
+	      /* Check if the current user token was internally created. */
+	      TOKEN_SOURCE ts;
+	      if (!GetTokenInformation (cygheap->user.token, TokenSource,
+					&ts, sizeof ts, &siz))
+		debug_printf ("GetTokenInformation(): %E");
+	      else if (!memcmp (ts.SourceName, "Cygwin.1", 8))
+		current_token_is_internal_token = TRUE;
+	      if ((usersid && tok_usersid && usersid != tok_usersid) ||
+		  /* Check for pgrp only if current token is an internal
+		     token. Otherwise the external provided token is
+		     very likely overwritten here. */
+		  (current_token_is_internal_token &&
+		   pgrpsid && tok_pgrpsid && pgrpsid != tok_pgrpsid))
+		{
+		  /* If not, RevertToSelf and close old token. */
+		  debug_printf ("tsid != usersid");
+		  RevertToSelf ();
+		  sav_token = cygheap->user.token;
+		  sav_impersonation = cygheap->user.impersonated;
+		  cygheap->user.token = INVALID_HANDLE_VALUE;
+		  cygheap->user.impersonated = FALSE;
+		}
+	    }
+
+	  /* Only when ntsec is ON! */
+	  /* If no impersonation token is available, try to
+	     authenticate using NtCreateToken() or subauthentication. */
+	  if (allow_ntsec && cygheap->user.token == INVALID_HANDLE_VALUE)
+	    {
+	      HANDLE ptok = INVALID_HANDLE_VALUE;
+
+	      ptok = create_token (usersid, pgrpsid);
+	      if (ptok != INVALID_HANDLE_VALUE)
+		explicitely_created_token = TRUE;
+	      else
+		{
+		  /* create_token failed. Try subauthentication. */
+		  debug_printf ("create token failed, try subauthentication.");
+		  ptok = subauth (pw_new);
+		}
+	      if (ptok != INVALID_HANDLE_VALUE)
+		{
+		  cygwin_set_impersonation_token (ptok);
+		  /* If sav_token was internally created, destroy it. */
+		  if (sav_token != INVALID_HANDLE_VALUE &&
+		      current_token_is_internal_token)
+		    CloseHandle (sav_token);
+		}
+	      else if (sav_token != INVALID_HANDLE_VALUE)
+		cygheap->user.token = sav_token;
+	    }
+	  /* If no impersonation is active but an impersonation
+	     token is available, try to impersonate. */
+	  if (cygheap->user.token != INVALID_HANDLE_VALUE &&
+	      !cygheap->user.impersonated)
+	    {
+	      debug_printf ("Impersonate (uid == %d)", uid);
+	      RevertToSelf ();
+
+	      /* If the token was explicitely created, all information has
+		 already been set correctly. */
+	      if (!explicitely_created_token)
+		{
+		  /* Try setting owner to same value as user. */
+		  if (usersid &&
+		      !SetTokenInformation (cygheap->user.token, TokenOwner,
+					    &usersid, sizeof usersid))
+		    debug_printf ("SetTokenInformation(user.token, "
+				  "TokenOwner): %E");
+		  /* Try setting primary group in token to current group
+		     if token not explicitely created. */
+		  if (pgrpsid &&
+		      !SetTokenInformation (cygheap->user.token,
+					    TokenPrimaryGroup,
+					    &pgrpsid, sizeof pgrpsid))
+		    debug_printf ("SetTokenInformation(user.token, "
+				  "TokenPrimaryGroup): %E");
+
+		}
+
+	      /* Now try to impersonate. */
+	      if (!LookupAccountSid (NULL, usersid, username, &ulen,
+				     domain, &dlen, &use))
+		debug_printf ("LookupAccountSid (): %E");
+	      else if (!ImpersonateLoggedOnUser (cygheap->user.token))
+		system_printf ("Impersonating (%d) in set(e)uid failed: %E",
+			       cygheap->user.token);
+	      else
+		{
+		  cygheap->user.impersonated = TRUE;
+		  setenv ("USERNAME", username, 1);
+		  setenv ("USERDOMAIN", domain, 1);
+		}
+	    }
+	}
+
+      cygheap_user user;
+      /* user.token is used in internal_getlogin () to determine if
+	 impersonation is active. If so, the token is used for
+	 retrieving user's SID. */
+      user.token = cygheap->user.impersonated ? cygheap->user.token
+					      : INVALID_HANDLE_VALUE;
+      /* Unsetting these both env vars is necessary to get NetUserGetInfo()
+	 called in internal_getlogin ().  Otherwise the wrong path is used
+	 after a user switch, probably. */
+      unsetenv ("HOMEDRIVE");
+      unsetenv ("HOMEPATH");
+      struct passwd *pw_cur = internal_getlogin (user);
+      if (pw_cur != pw_new)
+	{
+	  debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
+			cygheap->user.token, pw_cur->pw_uid,
+			pw_new->pw_uid, cygheap->user.orig_uid);
+	  setenv ("USERNAME", orig_username, 1);
+	  setenv ("USERDOMAIN", orig_domain, 1);
+	  set_errno (EPERM);
+	  return -1;
+	}
+      myself->uid = uid;
+      cygheap->user = user;
+    }
+  else
+    set_errno (ENOSYS);
+  debug_printf ("real: %d, effective: %d", cygheap->user.real_uid, myself->uid);
   return 0;
 }
 
 /* setegid: from System V.  */
-extern "C"
-int
-setegid (gid_t a)
+extern "C" int
+setegid (gid_t gid)
 {
-  set_errno (ENOSYS);
+  sigframe thisframe (mainthread);
+  if (wincap.has_security ())
+    {
+      if (gid != (gid_t) -1)
+	{
+	  struct group *gr;
+
+	  if (!(gr = getgrgid (gid)))
+	    {
+	      set_errno (EINVAL);
+	      return -1;
+	    }
+	  myself->gid = gid;
+	  if (allow_ntsec)
+	    {
+	      cygsid gsid;
+	      HANDLE ptok;
+
+	      if (gsid.getfromgr (gr))
+		{
+		  if (!OpenProcessToken (GetCurrentProcess (),
+					 TOKEN_ADJUST_DEFAULT,
+					 &ptok))
+		    debug_printf ("OpenProcessToken(): %E\n");
+		  else
+		    {
+		      if (!SetTokenInformation (ptok, TokenPrimaryGroup,
+						&gsid, sizeof gsid))
+			debug_printf ("SetTokenInformation(myself, "
+				      "TokenPrimaryGroup): %E");
+		      CloseHandle (ptok);
+		    }
+		}
+	    }
+	}
+    }
+  else
+    set_errno (ENOSYS);
   return 0;
 }
 
 /* chroot: privileged Unix system call.  */
-extern "C"
-int
-chroot (const char *path)
+/* FIXME: Not privileged here. How should this be done? */
+extern "C" int
+chroot (const char *newroot)
 {
-  set_errno (ENOSYS);
-  return -1;
+  sigframe thisframe (mainthread);
+  path_conv path (newroot, PC_SYM_FOLLOW | PC_FULL);
+
+  int ret;
+  if (path.error)
+    ret = -1;
+  else if (!path.exists ())
+    {
+      set_errno (ENOENT);
+      ret = -1;
+    }
+  else if (!path.isdir ())
+    {
+      set_errno (ENOTDIR);
+      ret = -1;
+    }
+  else
+    {
+      char buf[MAX_PATH];
+      normalize_posix_path (newroot, buf);
+      cygheap->root.set (buf, path);
+      ret = 0;
+    }
+
+  syscall_printf ("%d = chroot (%s)", ret ? get_errno () : 0,
+				      newroot ? newroot : "NULL");
+  return ret;
 }
 
-extern "C"
-int
+extern "C" int
 creat (const char *path, mode_t mode)
 {
+  sigframe thisframe (mainthread);
   return open (path, O_WRONLY | O_CREAT | O_TRUNC, mode);
 }
 
-extern "C"
-void
+extern "C" void
 __assertfail ()
 {
   exit (99);
 }
 
-extern "C"
-int
+extern "C" int
 getw (FILE *fp)
 {
+  sigframe thisframe (mainthread);
   int w, ret;
   ret = fread (&w, sizeof (int), 1, fp);
   return ret != 1 ? EOF : w;
 }
 
-extern "C"
-int
+extern "C" int
 putw (int w, FILE *fp)
 {
+  sigframe thisframe (mainthread);
   int ret;
   ret = fwrite (&w, sizeof (int), 1, fp);
   if (feof (fp) || ferror (fp))
@@ -1704,9 +2181,8 @@ putw (int w, FILE *fp)
   return 0;
 }
 
-extern "C"
-int
-wcscmp (wchar_t *s1, wchar_t *s2)
+extern "C" int
+wcscmp (const wchar_t *s1, const wchar_t *s2)
 {
   while (*s1  && *s1 == *s2)
     {
@@ -1714,12 +2190,11 @@ wcscmp (wchar_t *s1, wchar_t *s2)
       s2++;
     }
 
-  return (*(unsigned short *) s1) - (*(unsigned short *) s2);
+  return (* (unsigned short *) s1) - (* (unsigned short *) s2);
 }
 
-extern "C"
-int
-wcslen (wchar_t *s1)
+extern "C" size_t
+wcslen (const wchar_t *s1)
 {
   int l = 0;
   while (s1[l])
@@ -1730,8 +2205,7 @@ wcslen (wchar_t *s1)
 /* FIXME: to do this right, maybe work out the usoft va_list machine
    and use wsvprintfW instead?
 */
-extern "C"
-int
+extern "C" int
 wprintf (const char *fmt, ...)
 {
   va_list ap;
@@ -1743,16 +2217,14 @@ wprintf (const char *fmt, ...)
   return ret;
 }
 
-extern "C"
-int
+extern "C" int
 vhangup ()
 {
   set_errno (ENOSYS);
   return -1;
 }
 
-extern "C"
-_PTR
+extern "C" _PTR
 memccpy (_PTR out, const _PTR in, int c, size_t len)
 {
   const char *inc = (char *) in;
@@ -1769,10 +2241,10 @@ memccpy (_PTR out, const _PTR in, int c, size_t len)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 nice (int incr)
 {
+  sigframe thisframe (mainthread);
   DWORD priority[] =
     {
       IDLE_PRIORITY_CLASS,
@@ -1817,8 +2289,7 @@ nice (int incr)
  * Find the first bit set in I.
  */
 
-extern "C"
-int
+extern "C" int
 ffs (int i)
 {
   static const unsigned char table[] =
@@ -1840,25 +2311,10 @@ ffs (int i)
   return table[x >> a] + a;
 }
 
-extern "C"
-void
-swab (const void *src, void *dst, ssize_t n)
-{
-  const char *from = (const char *) src;
-  char *to = (char *) dst;
-
-  while (n > 1)
-    {
-      const char b0 = from[--n], b1 = from[--n];
-      to[n] = b0;
-      to[n + 1] = b1;
-    }
-}
-
-extern "C"
-void
+extern "C" void
 login (struct utmp *ut)
 {
+  sigframe thisframe (mainthread);
   register int fd;
   int currtty = ttyslot ();
 
@@ -1877,12 +2333,13 @@ login (struct utmp *ut)
 }
 
 /* It isn't possible to use unix-style I/O function in logout code because
-cygwin's I/O subsystem may be inaccessible at logout() call time.
+cygwin's I/O subsystem may be inaccessible at logout () call time.
+FIXME (cgf): huh?
 */
-extern "C"
-int
+extern "C" int
 logout (char *line)
 {
+  sigframe thisframe (mainthread);
   int res = 0;
   HANDLE ut_fd;
   static const char path_utmp[] = _PATH_UTMP;

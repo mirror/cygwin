@@ -1,3 +1,7 @@
+2001-11-28  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* configure.in: Add AC_EXEEXT.
+
 2001-11-15  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* bochs.h [BX_SUPPORT_SID] (BX_VGA_MEM_READ): Change
@@ -12,7 +16,7 @@
 
 2001-11-13  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
-	* cpu/cpu-sid.cc: Added proper copyright notice.
+	* cpu/cpu-sid.cc: Add proper copyright notice.
 	* cpu/cpu-sid.h: Likewise.
 	* cpu/debugstuff-sid.cc: Likewise.
 	* cpu/exception-sid.cc: Likewise.
@@ -61,31 +65,30 @@
 	* cpu/exception-sid.cc: Add trap to breakpoint comment.
 
 	* bochs.h: Include debug/debug.h.
-	* cpu/Makefile.am: Add debug.h to INCLUDES and added debugstuff-sid.cc
-	to libcpu_la_SOURCES.
+	* cpu/Makefile.am: Add debug.h to INCLUDES and add
+	debugstuff-sid.cc to libcpu_la_SOURCES.
 	* cpu/cpu-sid.cc: Add detail to error reporting.
 	* cpu/cpu-sid.h: Add dbg_get_eflags, dbg_get_reg, dbg_set_reg, INT3
 	removed verbose_p.
 	* cpu/exception-sid.cc: Intercept vector == 0x03 to call do_breakpoint.
 	* cpu/fetchdecode-sid.cc: Change BxOpcodeInfo to call sid version of INT3.
 	* cpu/soft_int-sid.cc: Include INT3 implementation.
-	* cpu/x86-memory-modes.cc: Change limit_scaled's to the proper value,
-	0xffffffff.
+	* cpu/x86-memory-modes.cc: Change limit_scaled's to the proper
+	value, 0xffffffff.
 	* cpu/x86.cc: Remove blocking_on_syscall, remove watchable_register "pc".
 	* cpu/x86.cc: Add call to create_gdb_register_attrs.
-	* cpu/x86.cc: Change do_syscall to use yield() rather than
-	blocking_on_syscall.
+	* cpu/x86.cc: Change do_syscall to use yield() rather than blocking_on_syscall.
 	* cpu/x86.cc (step_insn): Catch cpu_exception, and add call to signal_trap
 	when enable_step_trap_p is set.
-	* cpu/x86.cc: Add implementations for do_breakpoint, flush_icache,
-	dgb_get_reg, dbg_set_reg, remove set_endian.
+	* cpu/x86.cc: Add implementations for do_breakpoint,
+	flush_icache, dgb_get_reg, dbg_set_reg, remove set_endian.
 	* cpu/x86.h: Add do_breakpoint, remove set_endian and blocking_on_syscall.
 	* cpu/x86.h: Change x86 component to a basic_bi_endian_cpu from a
 	basic_little_endian_cpu.
 
 2001-10-01  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
-	* Makefile.am: Add conditional compiling of cpu/* fpu/* and 
+	* Makefile.am: Add conditional compiling of cpu/* fpu/* and
 	memory/* files.
 	* components.cxx: Add info to generate stub when sid not
 	configured for x86 target.

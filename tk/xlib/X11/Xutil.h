@@ -364,7 +364,7 @@ extern void XDestroyRegion(
 #endif
 );
 
-extern void XEmptyRegion(
+extern Bool XEmptyRegion(
 #if NeedFunctionPrototypes
     Region		/* r */
 #endif

@@ -19,6 +19,8 @@ details. */
 #include <errno.h>
 #include <unistd.h>
 #include "winsup.h"
+#include <wingdi.h>
+#include <winuser.h>
 #include <ctype.h>
 
 /*
@@ -108,6 +110,23 @@ set_console_state_for_spawn ()
   return 1;
 }
 
+void
+fhandler_console::set_cursor_maybe ()
+{
+  CONSOLE_SCREEN_BUFFER_INFO now;
+  static CONSOLE_SCREEN_BUFFER_INFO last = {{0, 0}, {-1, -1}, 0, {0, 0}, {0, 0}};
+
+  if (!GetConsoleScreenBufferInfo (get_output_handle(), &now))
+    return;
+
+  if (last.dwCursorPosition.X != now.dwCursorPosition.X ||
+      last.dwCursorPosition.Y != now.dwCursorPosition.Y)
+    {
+      SetConsoleCursorPosition (get_output_handle (), now.dwCursorPosition);
+      last.dwCursorPosition = now.dwCursorPosition;
+    }
+}
+
 int
 fhandler_console::read (void *pv, size_t buflen)
 {
@@ -115,30 +134,29 @@ fhandler_console::read (void *pv, size_t buflen)
     return 0;
 
   HANDLE h = get_io_handle ();
-  int copied_chars = 0;
 
 #define buf ((char *) pv)
 
   int ch;
   set_input_state ();
-  while (buflen)
-    if ((ch = get_readahead ()) < 0)
-      break;
-    else
-      {
-	buf[copied_chars++] = (unsigned char)(ch & 0xff);
-	buflen--;
-      }
+
+  int copied_chars = get_readahead_into_buffer (buf, buflen);
 
   if (copied_chars)
     return copied_chars;
 
   HANDLE w4[2];
   DWORD nwait;
+  char tmp[17];
 
   w4[0] = h;
-  nwait = 2;
-  w4[1] = signal_arrived;
+  if (iscygthread ())
+    nwait = 1;
+  else
+    {
+      w4[1] = signal_arrived;
+      nwait = 2;
+    }
 
   for (;;)
     {
@@ -146,6 +164,7 @@ fhandler_console::read (void *pv, size_t buflen)
       if ((bgres = bg_check (SIGTTIN)) <= 0)
 	return bgres;
 
+      set_cursor_maybe ();	/* to make cursor appear on the screen immediately */
       switch (WaitForMultipleObjects (nwait, w4, FALSE, INFINITE))
 	{
 	case WAIT_OBJECT_0:
@@ -157,6 +176,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	  __seterrno ();
 	  return -1;
 	}
+
       DWORD nread;
       INPUT_RECORD input_rec;
       const char *toadd;
@@ -169,6 +189,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	}
 
 #define ich (input_rec.Event.KeyEvent.uChar.AsciiChar)
+#define wch (input_rec.Event.KeyEvent.uChar.UnicodeChar)
 
       /* check if we're just disposing of this one */
 
@@ -177,27 +198,35 @@ fhandler_console::read (void *pv, size_t buflen)
 	  kill_pgrp (tc->getpgid (), SIGWINCH);
 	  continue;
 	}
-debug_printf ("ich %d, keydown %d, type %d", ich, input_rec.Event.KeyEvent.bKeyDown, input_rec.EventType);
       if (input_rec.EventType != KEY_EVENT ||
 	  !input_rec.Event.KeyEvent.bKeyDown)
 	continue;
 
-      if (ich == 0)  /* arrow/function keys */
+      if (wch == 0 ||
+	  /* arrow/function keys */
+	  (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
 	{
 	  toadd = get_nonascii_key (input_rec);
 	  if (!toadd)
 	    continue;
 	  nread = strlen (toadd);
 	}
-      else if (!(input_rec.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED))
-	toadd = &ich;
       else
 	{
-	  static char tmp[2];
-	  tmp[0] = '\033';
-	  tmp[1] = tolower (ich);
-	  toadd = tmp;
-	  nread = 2;
+	  tmp[1] = ich;
+	  /* Need this check since US code page seems to have a bug when
+	     converting a CTRL-U. */
+	  if ((unsigned char)ich > 0x7f)
+	    OemToCharBuff (tmp + 1, tmp + 1, 1);
+	  if (!(input_rec.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED))
+	    toadd = tmp + 1;
+	  else
+	    {
+	      tmp[0] = '\033';
+	      tmp[1] = tolower (tmp[1]);
+	      toadd = tmp;
+	      nread++;
+	    }
 	}
 
       if (line_edit (toadd, nread))
@@ -407,7 +436,7 @@ fhandler_console::ioctl (unsigned int cmd, void *buf)
 	  }
 	return 0;
       case TIOCSWINSZ:
-	(void) bg_check (SIGTTOU, 0);
+	(void) bg_check (SIGTTOU);
 	return 0;
     }
 
@@ -1027,13 +1056,20 @@ fhandler_console::write_normal (const unsigned char *src,
   /* Print all the base ones out */
   if (found != src)
     {
-      if (! WriteFile (get_output_handle (), src,  found - src, &done, 0))
+      char buf[256];
+      int len = found - src;
+      do {
+	int l2 = min (256, len);
+	CharToOemBuff ((LPCSTR)src, buf, l2);
+	if (! WriteFile (get_output_handle (), buf, l2, &done, 0))
 	{
 	  debug_printf ("write failed, handle %p", get_output_handle ());
 	  __seterrno ();
 	  return 0;
 	}
-      src += done;
+	len -= done;
+	src += done;
+      } while (len > 0);
     }
   if (src < end)
     {
@@ -1225,6 +1261,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  break;
 	}
     }
+
   syscall_printf ("%d = write_console (,..%d)", len, len);
 
   return len;
@@ -1258,7 +1295,10 @@ static struct {
   {VK_F11,	{"\033[23~",	NULL,		NULL,		NULL}},
   {VK_F12,	{"\033[24~",	NULL,		NULL,		NULL}},
   {VK_NUMPAD5,	{"\033[G",	NULL,		NULL,		NULL}},
+  {VK_CLEAR,	{"\033[G",	NULL,		NULL,		NULL}},
   {'6',		{NULL,		NULL,		"\036",		NULL}},
+  /* FIXME: Should this be \033OQ? */
+  {VK_DIVIDE,	{"/",		"/",		"/",		"/"}},
   {0,		{"",		NULL,		NULL,		NULL}}
 };
 
@@ -1284,6 +1324,13 @@ get_nonascii_key (INPUT_RECORD& input_rec)
     if (input_rec.Event.KeyEvent.wVirtualKeyCode == keytable[i].vk)
       return keytable[i].val[modifier_index];
 
+  if (input_rec.Event.KeyEvent.wVirtualKeyCode < 127)
+    {
+      /* FIXME: Probably not thread-safe */
+      static char buf[2];
+      buf[0] = input_rec.Event.KeyEvent.wVirtualKeyCode;
+      return buf;
+    }
   return NULL;
 }
 
@@ -1323,7 +1370,7 @@ fhandler_console::set_close_on_exec (int val)
 }
 
 void
-fhandler_console::fixup_after_fork (HANDLE parent)
+fhandler_console::fixup_after_fork (HANDLE)
 {
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();

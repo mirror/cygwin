@@ -1,3 +1,12 @@
+2000-07-21  Stan Shebs  <shebs@shebs.cnchost.com>
+
+	* spu.c: Bump to version 0.3; make all space dynamically sized
+	and allocated, add generation of library constructs of which
+	only a given percentage are used in the generated program.
+	(main): New options --lib-enums, --lib-functions, --lib-macros,
+	--lib-structs.
+	* README: Update version number.
+
 2000-07-17  Stan Shebs  <shebs@shebs.cnchost.com>
 
 	* spu.c: Rewrite almost everything; add enum generation, C++

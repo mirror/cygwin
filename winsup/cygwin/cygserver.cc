@@ -32,7 +32,7 @@ details. */
 #include "cygwin/cygserver_transport.h"
 
 // Version string.
-static const char version[] = "$Revision: 1.1.2.29 $";
+static const char version[] = "$Revision: 1.1.2.30 $";
 
 /*
  * Support function for the XXX_printf() macros in "woutsup.h".
@@ -402,7 +402,7 @@ public:
 
   virtual ~server_request()
   {
-    safe_delete (transport_layer_base, _conn);
+    safe_delete (_conn);
   }
 
   virtual void process ()
@@ -764,7 +764,7 @@ main (const int argc, char *argv[])
   printf ("\nShutdown request received - new requests will be denied\n");
   request_queue.stop ();
   printf ("All pending requests processed\n");
-  safe_delete (transport_layer_base, transport);
+  safe_delete (transport);
   printf ("No longer accepting requests - cygwin will operate in daemonless mode\n");
   cache.stop ();
   printf ("All outstanding process-cache activities completed\n");

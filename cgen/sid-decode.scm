@@ -768,6 +768,9 @@ typedef UINT @prefix@_insn_word;
 		  copyright-red-hat package-red-hat-simulators)
    "\
 
+#if HAVE_CONFIG_H
+#include \"config.h\"
+#endif
 #include \"@cpu@.h\"
 
 using namespace @cpu@; // FIXME: namespace organization still wip

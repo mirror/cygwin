@@ -183,26 +183,13 @@ cache_component::write_any (host_int_4 addr, DataType data)
   cache_tag tag = acache.addr_to_tag (addr);
   if (UNLIKELY (addr % sizeof (data) != 0))
     {
-      // Punt on misaligned accesses
       if (LIKELY (collect_p))
 	stats.misaligned_writes++;
-
-      cache_line* line = acache.find (tag);
-      if (line)
-      {
-	if (line->dirty_p ())
-        {	
-	  // flush a dirty line being replaced
-	  if ((st = write_line (*line)) != bus::ok)
-	    return st;
-	}
-	acache.expunge (*line);
-      }
-
-      st = downstream->read (addr, data);
-      st.latency += miss_latency;
-      return st;
     }
+
+  // Punt on access across lines
+  if (UNLIKELY (addr % line_size + sizeof (data) > line_size))
+    return bus::misaligned;
 
   cache_line* line = acache.find (tag);
   if (LIKELY (line))
@@ -280,11 +267,11 @@ cache_component::read_any (host_int_4 addr, DataType& data)
     {
       if (LIKELY (collect_p))
 	stats.misaligned_reads++;
-
-      st = downstream->read (addr, data);
-      st.latency += miss_latency;
-      return st;
     }
+
+  // Punt on accesses across lines
+  if (UNLIKELY (addr % line_size + sizeof (data) > line_size))
+    return bus::misaligned;
 
   cache_tag tag = acache.addr_to_tag (addr);
   cache_line* line = acache.find (tag);

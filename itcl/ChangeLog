@@ -1,0 +1,295 @@
+Wed Apr 19 13:58:32 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* itcl/unix/config.log, itcl/unix/confdefs.h: Delete generated
+ 	files.
+
+2000-01-26  DJ Delorie  <dj@cygnus.com>
+
+	* itcl/win/dllEntryPoint.c (DllMain): Use _imp__ instead of __imp_
+	* itk/win/dllEntryPoint.c (DllMain): ditto
+	* itcl/generic/itcl_methods.c (tclByteCodeType): ditto, but unused
+
+1999-12-21  Mo DeJong  <mdejong@cygnus.com>
+
+	* itcl/generic/itcl_parse.c: Applied patch to fix
+	crash when tearing down the itcl::parser namespace.
+
+1999-09-23  Ben Elliston  <bje@cygnus.com>
+
+	* itcl/unix/configure.in: Quoting fix for AC_EGREP_CPP.
+	* itcl/win/configure.in: Likewise.
+	* itk/unix/configure.in: Likewise.
+	* itk/win/configure.in: Likewise.
+	* itcl/unix/configure: Regenerate.
+	* itcl/win/configure: Likewise.
+	* itk/unix/configure: Likewise.
+	* itk/win/configure: Likewise.
+
+1999-09-22  DJ Delorie  <dj@cygnus.com>
+
+	* itcl/win/Makefile.in (ITCL_LIB_DIR etc): use @dir@ form
+	* itk/win/Makefile.in (INSTALL_LIB_DIR etc): ditto
+
+1999-07-13  Jonathan Larmour  <jlarmour@cygnus.co.uk>
+
+	* itcl/unix/configure.in: Workaround bug in autoconf 2.13 by adding
+	an extra AC_PROG_CPP before AC_EGREP_CPP
+	* itcl/win/configure.in: Likewise
+	* itk/unix/configure.in: Likewise
+	* itk/win/configure.in: Likewise
+	* itcl/unix/configure: regenerated
+	* itcl/win/configure: regenerated
+	* itk/unix/configure: regenerated
+	* itk/win/configure: regenerated
+
+1999-06-16  Keith Seitz  <keiths@cygnus.com>
+
+	* itk/win/Makefile.in (install-man): Don't install *.3 -- there
+	are no manpages in this section.
+
+1999-03-26  Martin Hunt  <hunt@cygnus.com>
+
+	* iwidgets3.0.0/generic/scrolledwidget.itk 
+	(iwidgets::Scrolledwidget::sbwidth): The default width of 15
+	was incompatible with Windows.  Change the default to "" and
+	only actually change the scrollbar width if someone changes
+	it to something else.
+
+1999-03-22  James Ingham  <jingham@cygnus.com>
+
+	* itcl/unix/configure.in: Leave the LD_SEARCH_PATH off of
+	MAKE_LIBS.  This loses on OSF with --enable-shared.
+	* itcl/unix/configure: regenerated
+	* itk/unix/configure.in: Leave the LD_SEARCH_PATH off of
+	MAKE_LIBS.  This lses on OSF with --enable-shared.
+	* itk/unix/configure: regenerated
+
+1999-03-18  Keith Seitz  <keiths@cygnus.com>
+
+	* iwidgets3.0.0/unix/Makefile.in (install-libraries): Don't bother with
+	making symlinks for other versions of iwidgets -- we don't use them.	
+
+1999-03-03  James Ingham  <jingham@cygnus.com>
+
+	* iwidgets3.0.0/generic/labeledframe.itk (_reconfigure): Make sure 
+	that the widget has not been destroyed while in the update
+	idletasks.  FIXME - see if we can eliminate the need for this
+	update. 
+
+	* iwidgets3.0.0/generic/labeledframe.itk (clientHandlesConfigure): 
+	Added method to allow the user of the labeled frame to do the
+	reconfigure, so this can be batched up and reduce flashing.
+
+1999-03-02  DJ Delorie  <dj@cygnus.com>
+
+	* itk/win/configure.in: support cross compiling, fix syntax error
+	in BASELIBS.
+	* itk/win/configure: regenerate
+
+1999-03-02  Syd Polk  <spolk@cygnus.com>
+
+	* itk/win/configure.in: Generated incorrect library name for cygwin
+	build.
+	* itk/win/configure: Regenerate.
+
+Fri Feb 26 12:48:01 1999  Geoffrey Noer  <noer@cygnus.com>
+
+	* configure.in: Change "cygwin32*" check to "cygwin*".
+	* configure: Regenerate.
+	* itcl/win/configure.in: Change "cygwin32*" check to "cygwin*".
+	* itcl/win/configure: Regenerate.
+	* itk/win/configure.in: Change "cygwin32*" check to "cygwin*".
+	* itk/win/configure: Regenerate.
+
+1999-02-24  James Ingham  <jingham@cygnus.com>
+
+	* iwidgets3.0.0/generic/labeledframe.itk: Make it derive from Widget
+	not Archetype (which was a BAD idea).  Add an interposing frame so 
+	you didn't have to much with the highlightthickness of the
+	MegaWidget itself.  Doing this allows you to actually use the
+	labeledframe in derived classes.
+	* iwidgets3.0.0/generic/scrolledwidget.itk: Derive from labeledframe,
+	not labeledwidget.  This way you can add a relief around the
+	label, which looks better for scrolled text, scrolled listboxes
+	and scrolled canvases.
+	* iwidgets3.0.0/generic scrolledcanvas.itk, scrolledlistbox.itk,
+	scrolledtext.itk: Pushed throught the changes needed to get the
+	derivation from labeledframe to work.
+
+1999-02-22  Syd Polk  <spolk@cygnus.com>
+
+	* itcl/win/configure.in: Export ITCL_SH.
+	* itcl/win/configure: Regenerate.
+
+	* itk/win/configure.in: Set all of the build components based on cygwin
+	vs. Visual C++.
+	Fix ITK_BUILD_LIB_SPEC, ITK_LIB_SPEC, ITK_LIB_FULL_PATH.
+	* itk/win/configure: Regenerate.
+
+1999-02-19  Syd Polk  <spolk@cygnus.com>
+
+	* itk/win/rc/itk.rc: Fixed problem in .rc file that winres did not
+	like.
+
+1999-02-18  Syd Polk  <spolk@cygnus.com>
+
+	* itcl/unix/Makefile.in: "make install" was failing
+	with itclConfig.sh.
+
+	* itcl/win/configure.in: Export ITCL_BUILD_LIB_SPEC and
+	ITCL_LIB_FULL_PATH.
+	* itcl/win/configure: Regnerate.
+	* itcl/win/Makefile.in: Minor corrections to dependencies.
+
+	* itk/generic/itk_cmds.c: Fixed newline in constant.
+
+	* itk/win/configure.in: Added AC_OBJEXT.
+	* itk/win/configure: Regenerated.
+
+	* itk/win/Makefile.in: Added OBJEXT. Overhauled for MSVC
+	build.
+
+1999-02-18  James Ingham  <jingham@cygnus.com>
+
+	* itcl/unix/Makefile.in itk/unix/Makefile.in: fix the install
+	target so it points to itclConfig.sh in the itcl or itk, rather
+	than in the itcl/unix or itk/unix directories.
+	* itcl/win/configure.in: use the ITCLCYGRC & ITCLCYGSHRC variables 
+	in the name of the windres output file.
+	* itcl.rc: For some reason, windres is choking on STRINGIFY of the 
+	Itcl version numbers.  Some day we should figure out why.  For
+	now, I just put in the version numbers by hand.
+
+1999-02-10  Syd Polk  <spolk@cygnus.com>
+
+	* Makefile.in: Propogate make errors from subdirectories
+	back to the top level.
+
+	* itcl/win/configure.in: Moved itclConfig.sh. Fixed problems
+	finding tclConfig.sh and tkConfig.sh.
+	Figure out all of the appropriate directories at this level
+	so that cygwin and msvc differences can be accounted for.
+	* itcl/win/configure: Regenerate.
+	* itcl/win/Makefile.in: Use OBJEXT.
+	Set build directories correctly.
+	Set -DDLL_BUILD, -DSTATIC_BUILD, and -DBUILD_itcl correctly.
+
+	* itk/win/configure.in: Moved itkConfig.sh. Look for itclConfig.sh
+	in new place. Fixed problems finding tclConfig.sh and tkConfig.sh.
+	* itk/win/configure: Regnerate.
+
+	* itcl/generic/itcl_cmds.c (initScript): Fixed broken new line.
+
+	* itcl/win/dllEntryPoint.c: DllMain was not setup correctly for
+	Microsoft.
+
+1999-02-09  James Ingham  <jingham@cygnus.com>
+
+	* itcl/itcl/unix/configure.in: 
+	* itcl/itk/unix/configure.in:
+ 	LD_SEARCH_FLAGS should NOT be passed to the library build line.
+
+	* itcl/itcl/unix/configure:
+	* itcl/itk/unix/configure:
+	regenerate.
+
+	* itcl/itk/generic/itk_archetype.c: Put a few CYGNUS LOCAL markers 
+	in around the 8.1 Fixups that I had left out.
+		
+1992-02-08  Syd Polk  <spolk@cygnus.com>
+
+	* itcl/itcl/unix/configure.in: Moved itclConfig.sh.in up a level
+	so that building on Windows will work.
+	Added exporting of itclsh so that other parts of the build
+	tree can call it.
+	Added exporting of TCL_CFLAGS.
+	Added exporting of TCL_LIB_FULL_PATH.
+	Generate and export ITCL_LIB_FULL_PATH.
+	* itcl/itcl/unix/configure: Regenerated
+	* itcl/itcl/unix/Makefile.in: Use TCL_CFLAGS so that
+	-fwritable-strings is enabled.
+	Add dependency for TCL_LIB_FULL_PATH.
+	* itcl/itclConfig.sh.in: Moved from lower directory.
+	* itcl/itk/unix/configure.in: Moved itkConfig.sh.in up a level.
+	Added export of TCL_CFLAGS.
+	Added export of TCL_LIB_FULL_PATH, TK_LIB_FULL_PATH,
+	ITCL_LIB_FULL_PATH, and ITK_LIB_FULL_PATH.
+	* itcl/itk/unix/Makefile.in: Use TCL_CFLAGS so that
+	-fwritable-strings is enabled.
+	Add dependencies for TCL_LIB_FULL_PATH and TK_LIB_FULL_PATH.
+	* itcl/itk/unix/configure: Regenerated.
+	* itcl/itkConfig.sh.in: Moved from a lwoer directory.
+	* itcl/iwidgets3.0.0/configure.in: Look for itclConfig.sh and
+	itkConfig.sh in different places.
+
+1999-02-05  James Ingham  <jingham@cygnus.com>
+
+	* itcl/itk/generic/itk_archetype.c (Itk_ArchCompAddCmd): 
+	* itcl/itcl/generic/itcl_cmds.c (Itcl_ProtectionCmd):
+	  itcl/itcl/generic/itcl_ensemble.c (Itcl_EnsembleCmd):
+	  itcl/itcl/generic/itcl_methods.c (Itcl_EvalMemberCode):
+	                                   (Itcl_ConstructBase):
+	  itcl/itcl/generic/itcl_obsolete.c (ItclOldClassCmd):
+	  itcl/itcl/generic/itcl_parse.c (Itcl_ClassCmd):
+	                                 (Itcl_ClassProtectionCmd):
+	Fix up calls to Tcl_EvalObj for Tcl8.1.
+
+	* itcl/itcl/unix/configure.in:
+	* itcl/itk/unix/configure.in:
+	Pick up CFLAGS from AC_PROG_CC rather than hard coding them.
+	* itcl/itcl/unix/configure:
+	* itcl/itk/unix/configure:
+	regenerate.
+	
+1999-01-30  Brendan Kehoe  <brendan@cygnus.com>
+
+	* Makefile.in (install-info info install-check): Add these null
+	rules, for the standard build process to work..
+
+1999-01-28  James Ingham  <jingham@cygnus.com>
+
+	* itcl/itcl/unix/configure.in: Check the TCL_LIB_VERSIONS_OK
+	variable, and strip out dots if it is nodots.
+	* itcl/itk/unix/configure.in: Check the TCL_LIB_VERSIONS_OK
+	variable, and strip out dots if it is nodots.
+	* itcl/itcl/unix/configure: regenerate.
+	* itcl/itk/unix/configure: regenerate.	
+
+1999-01-21  James Ingham  <jingham@cygnus.com>
+
+	* itcl/library/init.tcl (auto_import): Comment out this function.
+	It does not work, because it can not populate the source
+	namespace's export list.  There is no easy way to fix this, and
+	since it is just an optimization over the original Tcl proc, we
+	will just use Tcl one for now.
+
+1999-01-20  James Ingham  <jingham@cygnus.com>
+
+	* itcl/library/init.tcl: updated to Itcl 3.0.1.  Does not force
+	the addition of class to the auto_mkindex_parser namespace, but
+	uses the namespace import instead.
+
+1998-12-15  Martin M. Hunt  <hunt@cygnus.com>
+
+	* iwidgets3.0.0/generic/panedwindow.itk: Reverted back to original
+	distribution. The new panedwindow widget is now in libgui. 
+
+	* iwidgets3.0.0/generic/pane.itk: Reverted.
+	
+1998-12-11  Martin M. Hunt  <hunt@cygnus.com>
+
+	* iwidgets3.0.0/generic/panedwindow.itk: Major changes to
+	support panes that are fixed (non-resizable). This allows
+ 	the panedwindow to be used as a more general purpose
+	container widget where individual parts may or may not be
+	resizable.
+	
+	* iwidgets3.0.0/generic/pane.itk (iwidgets::Pane): Added
+	-resizable option to support non-resizable panes.
+
+1998-12-08  Martin M. Hunt  <hunt@cygnus.com>
+
+	* iwidgets3.0.0/generic/panedwindow.itk: Major changes to 
+	the default look and resizing method to be more modern, more
+	windows-like, and work better when widgets are placed in childsites.
+

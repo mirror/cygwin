@@ -44,6 +44,12 @@ Functionality:
    accesses to addressable units of fixed width at a fixed stride from one
    another.
 
+   The downstream addresses passed by the hw-mapper-basic variant are
+   relative to the matching region, so are zero-based. The
+   hw-mapper-transparent does not make downstream addresses relative, so it
+   may be more suitable for carving up an address space by multiple layers of
+   mapping.
+
    See the "mapping" behavior below for more details.
 
    +-------------------------------------------------+
@@ -78,6 +84,9 @@ Functionality:
    |                |     the incoming address, so   |
    |                |     outgoing addresses will be |
    |                |     relative and zero-based.   |
+   |                |     The hw-mapper-transparent  |
+   |                |     component variant omits    |
+   |                |     this subtraction.          |
    |                |   * If the accessor has        |
    |                |     stride/width values,       |
    |                |     divide the relative        |
@@ -228,3 +237,7 @@ Component Reference:
    | the specified     | any access | mapping        |
    | forms             |            |                |
    +-------------------------------------------------+
+
+  Variant: hw-mapper-transparent
+
+   Same as hw-mapper-basic

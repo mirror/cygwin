@@ -1,3 +1,14 @@
+2001-10-10  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compMapper.cxx (generic_mapper_bus): New field low_multiplier.
+	(ctor): Initialize it depending on transparent mode.
+	(write_strideoffset_any, read_strideoffset_any, write_any, read_any):
+	Use field to be conditionally transparent.
+	(generic_mapper ctor): Take transparent_p arg; pass it down.
+	(compMapperListTypes, compMapperCreate): Support hw-mapper-transparent.
+	* hw-mapper-basic.xml: Document this new variant.
+	* hw-mapper-basic.txt: Regenerated.
+
 2001-09-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* compMapper.cxx (tlb1/tlb2): Add support for a second tlb entry.

@@ -26,6 +26,6 @@ AM_CXXFLAGS =
 endif
 
 sid_SOURCES = mainDynamic.cxx
-sid_LDFLAGS = -export-dynamic -static
+sid_LDFLAGS = -export-dynamic -static -export-symbols-regex '[a-zA-Z0-9]*_component_library$$'
 sid_LDADD = ../../component/cfgroot/libconfig.la $(NEARBY_LIBS2)
 

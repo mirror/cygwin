@@ -112,7 +112,6 @@ static const CGEN_MACH @arch@_cgen_mach_table[] = {
   (logit 2 "Generating instruction field decls ...\n")
   (string-list
    "/* Ifield support.  */\n\n"
-   "extern const struct cgen_ifld @arch@_cgen_ifld_table[];\n\n"
    "/* Ifield attribute indices.  */\n\n"
    (gen-attr-enum-decl "cgen_ifld" (current-ifld-attr-list))
    (gen-enum-decl 'ifield_type "@arch@ ifield types"
@@ -1014,6 +1013,7 @@ init_tables ()
    gen-insn-decls
    "/* cgen.h uses things we just defined.  */\n"
    "#include \"opcode/cgen.h\"\n\n"
+   "extern const struct cgen_ifld @arch@_cgen_ifld_table[];\n\n"
    -gen-attr-table-decls
    -gen-mach-table-decls
    gen-hw-table-decls

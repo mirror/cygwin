@@ -2,7 +2,7 @@ echo Setting up the environment for debugging gdb.\n
 
 set complaints 1
 
-b fatal
+b internal_error
 
 b info_command
 commands
@@ -10,9 +10,9 @@ commands
 	return
 end
 
-dir @srcdir@
-dir .
 dir @srcdir@/../mmalloc
 dir @srcdir@/../libiberty
 dir @srcdir@/../bfd
+dir @srcdir@
+dir .
 set prompt (top-gdb) 

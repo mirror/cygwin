@@ -433,10 +433,13 @@ void
    " extract_" (gen-sym sfmt) ":\n"
    "  {\n"
    "    const IDESC *idesc = &" IDESC-TABLE-VAR "[itype];\n"
-   "    CGEN_INSN_INT insn = "
-   (if (adata-integral-insn? CURRENT-ARCH)
-       "entire_insn;\n"
-       "base_insn;\n")
+   (if (< (length (sfmt-iflds sfmt)) 0)
+       (string-append
+	"    CGEN_INSN_INT insn = "
+	(if (adata-integral-insn? CURRENT-ARCH)
+	    "entire_insn;\n"
+	    "base_insn;\n"))
+       "")
    (gen-define-field-macro sfmt)
    (gen-define-ifields (sfmt-iflds sfmt) (sfmt-length sfmt) "    " #f)
    "\n"

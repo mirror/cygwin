@@ -1,3 +1,9 @@
+2004-04-05  Kevin Buettner  <kevinb@redhat.com>
+
+	* linux-target.c (reginfo) [FRV_LINUX_TARGET]: Add support for
+	registers fsr0, acc0-acc7, accg0-accg7, msr0, msr1, gner0, gner1,
+	fner0, and fner1.
+
 2004-03-19  Kevin Buettner  <kevinb@redhat.com>
 
 	* ptrace-target.c (ptrace_exit_program): Cause main loop to exit.

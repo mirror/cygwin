@@ -119,6 +119,10 @@ baseboards_files = $(srcdir)/baseboards/README $(srcdir)/baseboards/*.exp
 config_dest = $(DESTDIR)$(pkgdatadir)/config
 config_files = $(srcdir)/config/README $(srcdir)/config/*.exp
 
+install-info:
+
+uninstall-info:
+
 install-data-local:
 	$(mkinstalldirs) $(lib_dest) $(includedir)
 	for f in $(lib_files); do \

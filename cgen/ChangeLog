@@ -1,3 +1,7 @@
+2001-03-14  Nick Clifton  <nickc@redhat.com>
+
+	* utils.scm (copyright-fsf): Add 2001.  Remove (C).
+
 2001-03-05  Dave Brolley  <brolley@redhat.com>
 
 	* sim-decode.scm (-gen-extract-case): Generate declaration of "insn"

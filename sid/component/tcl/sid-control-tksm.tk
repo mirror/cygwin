@@ -469,7 +469,7 @@ proc open_component_window { category name type comp } {
 
 	frame $subwidgetname -relief sunken -borderwidth 2
 	label $subwidgetname.label -text $r
-	entry $subwidgetname.value -width 20
+	entry $subwidgetname.value -width 0
 
 	append refreshcmds "
 	    set prev_value \[$subwidgetname.value get\]
@@ -527,7 +527,7 @@ proc open_component_window { category name type comp } {
 	bind $subwidgetname.label <Leave> "$subwidgetname.label configure -foreground black"
 
 	pack $subwidgetname.label -side left -fill none
-	pack $subwidgetname.value -ipadx 20 -side right -fill none
+	pack $subwidgetname.value -ipadx 5 -side right -fill x
 	pack $subwidgetname -side top -fill x
     }
     pack $wn.regs -side top -fill x

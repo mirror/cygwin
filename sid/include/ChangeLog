@@ -1,3 +1,9 @@
+2004-03-22  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (trace_pin): New member of basic_cpu.
+	(trace_pin_handler): New method of basic_cpu.
+	(basic_cpu): Add and initialize trace_pin.
+
 2003-12-17  Dave Brolley  <brolley@redhat.com>
 
 	* sidmiscutil.h (delete_saved_messages): Use 'clear' method.

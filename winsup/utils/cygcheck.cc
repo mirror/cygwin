@@ -42,7 +42,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.55 $";
+static const char version[] = "$Revision: 1.56 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1083,9 +1083,9 @@ dump_sysinfo ()
       DWORD serno = 0, maxnamelen = 0, flags = 0;
       name[0] = name[0] = fsname[0] = 0;
       sprintf (drive, "%c:\\", i + 'a');
-      /* Report all errors, except if the Volume is ERROR_NOT_READY. 
-         ERROR_NOT_READY is returned when removeable media drives are empty
-         (CD, floppy, etc.) */
+      /* Report all errors, except if the Volume is ERROR_NOT_READY.
+	 ERROR_NOT_READY is returned when removeable media drives are empty
+	 (CD, floppy, etc.) */
       if (!GetVolumeInformation
 	  (drive, name, sizeof (name), &serno, &maxnamelen, &flags, fsname,
 	   sizeof (fsname)) && GetLastError () != ERROR_NOT_READY)

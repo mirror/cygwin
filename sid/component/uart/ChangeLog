@@ -4,6 +4,29 @@
 	deal with.
 	* Uart.h (dtor): Add throw() specifier.
 
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* hw-uart-ns16550.xml: Add <?xml ... ?> prefix.
+
+2001-07-04  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add maintainer-mode doc building configury.
+	* configure: Regenerate.
+	* Makefile.am: Add maintainer-mode doc building.
+	* Makefile.in: Regenerate.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* hw-uart-ns16550.txt: Generate.
+
+2001-06-27  graydon hoare  <graydon@redhat.com>
+
+	* hw-uart-ns16550.xml: Add.
+
+2001-03-23  John Healy  <jhealy@redhat.com>
+
+	* Makefile.in: Regenerated.
+
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.in: Regenerated.

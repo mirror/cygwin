@@ -12,3 +12,6 @@ libuart_la_SOURCES = Uart.cxx
 libuart_la_LDFLAGS = -module -no-undefined
 
 
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs

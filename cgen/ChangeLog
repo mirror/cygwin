@@ -1,5 +1,8 @@
 2005-02-16  Dave Brolley  <brolley@redhat.com>
 
+	* utils.scm: Update copyright years.
+	* utils-gen.scm (gen-ifld-extract): Pass base-length to -gen-ifld-extract-base.
+	* sid.scm (gen-ifetch): Handle the case where bitsize == 24.
 	* operand.scm (-derived-operand-parse): Move logit message from level 1
 	to level 2.
 

@@ -1,5 +1,9 @@
 2001-10-04  Frank Ch. Eigler  <fche@redhat.com>
 
+	* sidcpuutil.h (basic_cpu ctor): Initialize those tracing flags.
+
+2001-10-04  Frank Ch. Eigler  <fche@redhat.com>
+
 	* sidcpuutil.h (update_trace_result_p): New function.
 	({get,set}_trace_{sem,disasm,count,result}): Removed functions.
 	(basic_cpu ctor): Use plain attributes or notify-attributes,

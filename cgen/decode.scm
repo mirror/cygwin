@@ -280,8 +280,9 @@
 	(cond 
 	 ; No new matches?
 	 ((null? new-picks)
-	  (begin (assert (not (null? old-picks)))
-		 old-picks))
+	  (if (null? old-picks)
+	      (logit 1 "-population-top-few: No bits left to pick from!\n"))
+	  old-picks)
 	 ; Way too many matches?
 	 ((> (+ (length new-picks) (length old-picks)) (+ 2 size))
 	  (list-take (+ 2 size) (append new-picks old-picks)))

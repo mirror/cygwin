@@ -1,3 +1,10 @@
+2001-10-16  Frank Ch. Eigler  <fche@redhat.com>
+
+	* *-guide/images/*.png: New files, replacing ...
+	* *-guide/images/*.jpg: Gone.
+	* cdk-guide/book-cdk.sgml: Switch over.
+	* sid-guide/book-sid.sgml: Ditto.
+
 2001-10-15  Frank Ch. Eigler  <fche@redhat.com>
 
 	* cdk-guide/Makefile (normalize): Rewrite.

@@ -256,7 +256,7 @@
           has a bus named "data-bus" through which it expects to
           receive read/write requests. The scenario is depicted blow.
         </PARA>
-<GRAPHIC FILEREF="images/accessor-bus.jpg"></GRAPHIC>
+<GRAPHIC FILEREF="images/accessor-bus.png" SCALE="55"></GRAPHIC>
 <PARA>    Recall that the accessor is the <EMPHASIS>sending</EMPHASIS>
           end of the connection we wish to make, and that the bus is
           the <EMPHASIS>receiving</EMPHASIS> end. Some people find the
@@ -581,7 +581,7 @@
       <FUNCTION>list_component_types</FUNCTION> must return a vector
       containing the string names of each type of component found in
       this library. These names are the same names used in the
-      configuration command language, for example: <GRAPHIC FILEREF="images/name-structure.jpg" SCALE="75"></GRAPHIC>
+      configuration command language, for example: <GRAPHIC FILEREF="images/name-structure.png" SCALE="75"></GRAPHIC>
     </PARA>
 <PARA>      The function pointed to by <FUNCTION>create_component</FUNCTION>
       takes such a component name, and should construct a component of

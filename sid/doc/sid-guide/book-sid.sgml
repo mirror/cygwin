@@ -588,7 +588,7 @@
     contain a collection of related <PRODUCTNAME> SID</PRODUCTNAME>
     component types. Each component type has a unique structured name
     that describes its type of functionality. Names are typically
-    structured to describe the component's role. For example: <GRAPHIC FILEREF="images/name-structure.jpg" SCALE="75"></GRAPHIC>
+    structured to describe the component's role. For example: <GRAPHIC FILEREF="images/name-structure.png" SCALE="75"></GRAPHIC>
     </PARA>
 </LISTITEM>
 <LISTITEM>
@@ -1822,7 +1822,7 @@
     and in elf file format. The default is big-endian. Once the code is
     loaded on SID, the execution and debugging proceed in the usual
     manner.</PARA>
-<GRAPHIC FILEREF="images/sid-diagram.jpg" SCALE="55"></GRAPHIC>
+<GRAPHIC FILEREF="images/sid-diagram.png" SCALE="55"></GRAPHIC>
 <PARA></PARA>
 </SECT1>
 <SECT1>

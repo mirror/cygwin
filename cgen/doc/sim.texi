@@ -42,4 +42,4 @@ Same as @file{semantics.c} but as one giant @code{switch} statement.
 
 A ``CPU family'' is an artificial creation to sort architecture variants
 along whatever lines seem useful.  Additional hand-written files must be
-provided.  @xref{Porting} for details.
+provided.  @xref{Porting}, for details.

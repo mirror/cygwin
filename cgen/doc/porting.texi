@@ -104,7 +104,7 @@ The best way to do that is to take an existing file (such as the M32R)
 and use it as a template.
 
 Writing a CPU description file generally involves writing each of the
-following types of entries, in order.  @xref{RTL} for detailed
+following types of entries, in order.  @xref{RTL}, for detailed
 descriptions of each type of entry that appears in the description file.
 
 @menu
@@ -305,7 +305,7 @@ write:
 
 @code{dnop} is short for ``define normal operand'' @footnote{A profound
 aversion to typing causes me to often provide brief names of things that
-get typed a lot.}.  @xref{RTL} for more information.
+get typed a lot.}.  @xref{RTL}, for more information.
 
 @node Writing define-insn
 @subsection Writing define-insn
@@ -424,7 +424,7 @@ Here is an example from the M32R port.
 @code{.sym/.str} are short for Scheme's @code{symbol-append} and
 @code{string-append} operations and are conceptually the same as the C
 preprocessor's @code{##} concatenation operator.  @xref{Symbol
-concatenation} and @xref{String concatenation} for details.
+concatenation}, and @xref{String concatenation}, for details.
 
 @node Interactive development
 @subsection Interactive development

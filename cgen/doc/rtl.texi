@@ -416,7 +416,7 @@ The syntax of @code{define-isa} is:
 Specifies the default size of an instruction word in bits.
 This affects the numbering of field bits in words beyond the
 base instruction.
-@xref{Instruction fields} for more information.
+@xref{Instruction fields}, for more information.
 
 ??? There is currently no explicit way to specify a different instruction
 word bitsize for particular instructions, it is derived from the instruction
@@ -1210,7 +1210,7 @@ Bit numbering is determined by the @code{insn-lsb0?} field of
 @subsection length
 The number of bits in the field.  The field must be contiguous.  For
 non-contiguous instruction fields use "multi-ifields"
-(@xref{Instruction fields}).
+(@pxref{Instruction fields}).
 
 @subsection follows
 Optional.  Experimental.
@@ -2185,7 +2185,7 @@ Perform a comparison. @samp{cmpop} is one of @code{eq}, @code{ne},
 @code{gtu}, @code{geu}.
 
 @item (mathop mode operand)
-Perform a mathematical operation. @samp {mathop} is one of @code{sqrt},
+Perform a mathematical operation. @samp{mathop} is one of @code{sqrt},
 @code{cos}, @code{sin}.
 
 @item (if mode condition then [else])

@@ -1,5 +1,5 @@
 /* XSTORMY16 opcode support.  -*- C -*-
-   Copyright (C) 2001 Red Hat, Inc.
+   Copyright (C) 2001, 2002 Red Hat, Inc.
    This file is part of CGEN.  */
 
 /* This file is an addendum to xstormy16.cpu.  Heavy use of C code isn't
@@ -55,7 +55,7 @@ parse_mem8 (cd, strp, opindex, valuep)
       if (s[1] == '-' && s[2] == '-')
 	return _("Bad register in preincrement");
 
-      while (isalnum (*++s))
+      while (ISALNUM (*++s))
 	;
       if (s[0] == '+' && s[1] == '+' && (s[2] == ')' || s[2] == ','))
 	return _("Bad register in postincrement");

@@ -1,3 +1,11 @@
+2004-10-19  Jim Blandy  <jimb@redhat.com>
+
+	* ptrace-target.c (ptrace_create_child): Don't use sys_nerr to
+	check that errno is in a valid range.  The use sys_nerr is
+	deprecated on GNU/Linux, and according to the ISO C standard and
+	POSIX, strerror always returns a valid string, even for invalid
+	errno codes.
+
 2004-10-07  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.am (rda_DEPENDENCIES): Add ../lib/librda.la.

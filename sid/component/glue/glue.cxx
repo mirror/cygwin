@@ -427,8 +427,7 @@ probing_bus::traceAccess(host_int_4 addr, DataType data, host_int_4 code, bus::s
     (s == bus::ok) ? "" : // print nothing for "ok"
     (s == bus::misaligned) ? " misaligned!" :
     (s == bus::unmapped) ? " unmapped!" :
-    (s == bus::unpermitted) ? " unpermitted!" :
-    (s == bus::delayed) ? " delayed!" : " (unknown)!";
+    (s == bus::unpermitted) ? " unpermitted!" : " (unknown)!";
   
   cout << access_type1 << '-' << access_endian << '-' << access_size << ':'
        << make_numeric_attribute (addr, ios::hex | ios::showbase) << ' '

@@ -92,7 +92,8 @@
   (if (memq 'debug-extensions *features*)
       ((if flag debug-enable debug-disable) 'debug))
   
-  ;; Now, actually start using the debugging evaluator.
+  ;; Now, make that debugging / no-debugging setting actually take
+  ;; effect.
   ;;
   ;; Guile has two separate evaluators, one that does the extra
   ;; bookkeeping for backtraces, and one which doesn't, but runs

@@ -1,5 +1,9 @@
 2004-09-27  Jim Blandy  <jimb@redhat.com>
 
+	* dwarf2-frame.c (dwarf2_frame_cache): Properly retrieve a frame's
+	return address when the CIE and FDE refer to the return address by
+	different numbers.
+
 	Merge from trunk:
 	
 	2004-07-23  Martin Hunt  <hunt@redhat.com>

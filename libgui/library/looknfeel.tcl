@@ -32,7 +32,11 @@ proc standard_look_and_feel {} {
     array set actual [font actual windows-message]
     set actual(-slant) italic
     eval define_font global/italic [array get actual]
-    define_font global/menu -family windows-menu
+
+    # The menu font used to be set via the "windows-menu"
+    # font family, however this seems to have been deprecated
+    # for Tcl/Tk version 8.3, so we hard code it instead.
+    define_font global/menu -family {MS Sans Serif} -size 8
   } else {
     set size 12
     define_font global/default -family courier -size $size 

@@ -1,3 +1,9 @@
+2003-05-01  DJ Delorie  <dj@redhat.com>
+
+	* cpu/xstormy16.cpu (alignfix-mem): Correct logic for unaligned
+	word accesses.
+	(set-alignfix-mem): Likewise.
+
 2003-04-16  Dave Brolley  <brolley@redhat.com>
 
 	* doc/rtl.texi (Iiming): Correct example to use 'model-name'.

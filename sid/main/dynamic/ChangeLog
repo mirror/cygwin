@@ -1,3 +1,8 @@
+2004-04-01  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.h (get_size): New method of CacheCfg.
+	(get_line_size): Ditto.
+
 2004-03-22  Dave Brolley  <brolley@redhat.com>
 
 	* mainDynamic.cxx (main): Call add_board in place of add_child.

@@ -190,7 +190,12 @@ function gentest {
     echo \"#objdump: -dr\" >>${1}.d
     echo \"#name: $1\" >>${1}.d
     $BUILD/../binutils/objdump -dr a.out | \
-	sed -e 's/(/\\\\(/g' -e 's/)/\\\\)/g' -e 's/[+]/\\\\+/g' -e 's/[*]/\\\*/g' | \
+	sed -e 's/(/\\\\(/g' \
+            -e 's/)/\\\\)/g' \
+            -e 's/\\[/\\\\\\[/g' \
+            -e 's/\\]/\\\\\\]/g' \
+            -e 's/[+]/\\\\+/g' \
+            -e 's/[*]/\\\\*/g' | \
 	sed -e 's/^.*file format.*$/.*: +file format .*/' \
 	>>${1}.d
     rm -f a.out

@@ -4,8 +4,8 @@
 This is GDB, the GNU source-level debugger.
 A summary of new features is in the file `NEWS'.
 
-See the GDB home page at http://www.cygnus.com/gdb/ for up to date
-release information, mailing list links and archives, etc.
+See the GDB home page at http://sourceware.cygnus.com/gdb/ for up to
+date release information, mailing list links and archives, etc.
 
 
 Unpacking and Installation -- quick overview
@@ -40,6 +40,9 @@ To build GDB, you can just do:
 	./configure
 	make
 	cp gdb/gdb /usr/local/bin/gdb	(or wherever you want)
+
+(Building GDB with DJGPP tools for MS-DOS/MS-Windows is slightly
+different; see the file gdb/config/djgpp/README for details.)
 
 This will configure and build all the libraries as well as GDB.
 If `configure' can't determine your system type, specify one as its
@@ -152,6 +155,8 @@ directory.  That directory contains:
 
 `gdb-4.18/readline'
      source for the GNU command-line interface
+     NOTE:  The readline library is compiled for use by GDB, but will
+     not be installed on your system when "make install" is issued.
 
 `gdb-4.18/sim'
      source for some simulators (ARM, D10V, SPARC, M32R, MIPS, PPC, V850, etc)
@@ -172,6 +177,9 @@ directory.  That directory contains:
 `gdb-4.18/utils'
      A grab bag of random utilities.
 
+   Note: the following instructions are for building GDB on Unix or
+Unix-like systems.  Instructions for building with DJGPP for
+MS-DOS/MS-Windows are in the file gdb/config/djgpp/README.
 
    The simplest way to configure and build GDB is to run `configure'
 from the `gdb-VERSION-NUMBER' source directory, which in this example

@@ -7,8 +7,8 @@ if {! $sidtarget(arm)} then { untested "hw-cpu-arm7t not available"; return }
 # The .cs suffix is for ".conf'd .s".
 load_lib "cpudefs.exp"
 
-run-sid-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu "arm*.cs" -EL -EL "" xl
-run-sid-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu "arm*.cs" -EB -EB "" xb
+run-sid-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu.arm7t "arm*.cs" -EL -EL "" xl
+run-sid-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu.arm7t "arm*.cs" -EB -EB "" xb
 
-#run-sid-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu "arm*.cs" -EL -EL "" pbb xl
-#run-sid-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu "arm*.cs" -EB -EB "" pbb xb
+#run-sid-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu.arm7t "arm*.cs" -EL -EL "" pbb xl
+#run-sid-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu.arm7t "arm*.cs" -EB -EB "" pbb xb

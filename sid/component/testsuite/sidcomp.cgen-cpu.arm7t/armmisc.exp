@@ -5,8 +5,8 @@ if {! $sidtarget(arm)} then { untested "hw-cpu-arm7t not available"; return }
 # The .ms suffix is for "misc .s".
 load_lib "cpudefs.exp"
 
-run-sid-bsp-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu "arm*.ms" -EL -EL "--cpu=arm --engine=scache" xl
-run-sid-bsp-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu "arm*.ms" -EB -EB "--cpu=arm --engine=scache" xb
+run-sid-bsp-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu.arm7t "arm*.ms" -EL -EL "--cpu=arm --engine=scache" xl
+run-sid-bsp-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu.arm7t "arm*.ms" -EB -EB "--cpu=arm --engine=scache" xb
 
-#run-sid-bsp-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu "arm*.ms" -EL -EL "--engine=pbb" xl
-#run-sid-bsp-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu "arm*.ms" -EB -EB "--engine=pbb" xb
+#run-sid-bsp-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu.arm7t "arm*.ms" -EL -EL "--engine=pbb" xl
+#run-sid-bsp-tests arm-elf arm7tdmi $srcdir/sidcomp.cgen-cpu.arm7t "arm*.ms" -EB -EB "--engine=pbb" xb

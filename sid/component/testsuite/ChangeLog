@@ -1,5 +1,9 @@
 2001-05-14  Ben Elliston  <bje@redhat.com>
 
+	* sidcomp.cgen-cpu.arm7t/armconf.exp: Update srcdir names.
+	* sidcomp.cgen-cpu.arm7t/armeit.conf: Likewise.
+	* sidcomp.cgen-cpu.arm7t/armmisc.exp: Likewise.
+
 	* sidcomp.cgen-cpu/armconf.exp: Move to sidcomp.cgen-cpu.arm7t.
 	* sidcomp.cgen-cpu/armeit.conf: Ditto.
 	* sidcomp.cgen-cpu/armeit.tcl: Ditto.

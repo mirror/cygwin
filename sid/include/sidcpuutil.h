@@ -101,9 +101,25 @@ namespace sidutil
 		   protected fixed_pin_map_component,
 		   protected fixed_accessor_map_component,
 		   protected fixed_attribute_map_component,
-		   protected no_relation_component,
+		   protected fixed_relation_map_component,
 		   protected fixed_bus_map_component
   {
+    // custom memory allocators for poisioning freshly-allocated memory
+  public:
+    void* operator new (size_t sz)
+    {
+      void* p = std::operator new (sz);
+      // Initialize the object with garbage, to ease detection of missing initialization.
+      char* q = (char*) p;
+      char deadbeef[] = { 0xde, 0xad, 0xbe, 0xef };
+      for (unsigned i=0; i<sz; i++)
+	*q++ = deadbeef[i % 4];
+      return p;
+    }
+    void operator delete (void* p)
+    {
+      std::operator delete (p);
+    }
 
     // recursion protection
   protected:

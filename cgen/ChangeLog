@@ -1,3 +1,7 @@
+2000-12-12  Ben Elliston  <bje@redhat.com>
+
+	* doc/rtl.texi (Expressions): Document the (delay ..) rtx.
+
 2000-12-08  Ben Elliston  <bje@redhat.com>
 
 	* dev.scm (load-sid): New function.

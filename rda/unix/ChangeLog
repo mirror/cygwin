@@ -1,3 +1,20 @@
+2004-12-03  Jim Blandy  <jimb@redhat.com>
+
+	Remove code to handle threads exiting without generating a wait
+	status; that was a kernel bug, not an intended feature, and
+	there's no easy way to support both.
+	* lwp-pool.c (lwp_pool_continue_and_drop): Delete function.
+	* lwp-pool.h (lwp_pool_continue_and_drop): Delete declaration.
+	* thread-db.c (enum death_state): Delete type.
+	(struct gdbserv_thread): Remove 'death_state' member.
+	(add_thread_to_list): Don't initialize it.
+	(death_state_str, debug_report_death_state_change,
+	death_state_got_event, death_state_notified): Delete functions.
+	(handle_thread_db_event): Don't handle death events specially, and
+	don't handle the notifying thread specially.
+	(continue_thread): Don't treat threads whose death has been
+	foretold and who have completed their notification specially.
+
 2004-12-02  Jim Blandy  <jimb@redhat.com>
 
 	* lwp-pool.c: Doc fixes.  (Use "LWP" instead of "thread".)

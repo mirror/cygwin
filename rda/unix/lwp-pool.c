@@ -1346,34 +1346,6 @@ lwp_pool_continue_lwp (pid_t pid, int signal)
 
 
 int
-lwp_pool_continue_and_drop_lwp (pid_t pid, int signal)
-{
-  struct lwp *l = hash_find_known (pid);
-  int result = 0;
-
-  if (debug_lwp_pool)
-    fprintf (stderr, "lwp_pool_continue_and_drop_lwp (%d, %d)\n",
-	     (int) pid, signal);
-
-  result = lwp_pool_continue_lwp (l->pid, signal);
-  if (result == 0)
-    {
-      hash_delete (l);
-      if (l->next)
-        queue_delete (l);
-      free (l);
-
-      if (debug_lwp_pool)
-        fprintf (stderr,
-                 "                         stopped -- %d --> freed\n",
-                 (int) pid);
-    }
-
-  return result;
-}
-  
-
-int
 lwp_pool_singlestep_lwp (struct gdbserv *serv, pid_t lwp, int signal)
 {
   struct lwp *l = hash_find_known (lwp);

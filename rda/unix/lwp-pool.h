@@ -108,23 +108,6 @@ void lwp_pool_continue_all (void);
 int lwp_pool_continue_lwp (pid_t pid, int signal);
 
 
-/* Continue LWP, and forget about it entirely.  LWP should not produce
-   any further wait statuses.  If SIGNAL is non-zero, continue it with
-   signal SIGNAL.  Return zero on success, -1 on failure.  (On
-   failure, the LWP is still present in the LWP pool.)
-
-   Under NPTL, LWP's simply disappear, without becoming a zombie or
-   producing any wait status.  At the kernel level, we have no way of
-   knowing that the LWP's PID is now free and may be reused ---
-   perhaps by an entirely different program!  However, libthread_db
-   can provide its clients with events that indicate when a thread is
-   about to die; we must rely on that information to help us keep our
-   LWP table clean.  Otherwise, we may find ourselves sending signals
-   to processes we don't have any relation to, and certainly won't get
-   wait statuses for.  */
-int lwp_pool_continue_and_drop_lwp (pid_t pid, int signal);
-
-
 /* Continue PID in SERV for one instruction, delivering SIGNAL if it
    is non-zero, and stop with SIGSTOP if/when that instruction has
    been completed.

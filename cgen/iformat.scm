@@ -90,11 +90,23 @@
 )
 
 ; Given FLD-LIST, compute the base length in bits.
-; Computing the min of state-base-insn-bitsize and the total-length
-; is for [V]LIW instruction sets.
+;
+; For variable length instruction sets, or with cpus with multiple
+; instruction sets, compute the base appropriate for this set of
+; ifields.  Check that ifields are not shared among isas with
+; inconsistent base insn lengths.
 
 (define (compute-insn-base-mask-length fld-list)
-  (min (state-base-insn-bitsize) (compute-insn-length fld-list))
+  (let* ((isa-base-bitsizes
+	  (remove-duplicates
+	   (map isa-base-insn-bitsize
+		(map current-isa-lookup
+		     (collect (lambda (ifld) 
+				(bitset-attr->list (atlist-attr-value (obj-atlist ifld) 'ISA #f)))
+			      fld-list))))))
+    (if (= 1 (length isa-base-bitsizes))
+	(min (car isa-base-bitsizes) (compute-insn-length fld-list))
+	(error "ifields have inconsistent isa/base-insn-size values:" isa-base-bitsizes)))
 )
 
 ; Given FLD-LIST, compute the bitmask of constant values in the base part

@@ -212,13 +212,13 @@
 	))
 )
 
-
 ; Compute population counts for each bit.  Return it as a vector indexed by bit number.
 ; Rather than computing raw popularity, attempt to compute "disinguishing value" or
 ; inverse-entropy for each bit.  The idea is that the larger the number for any particular
 ; bit slot, the more instructions it can be used to distinguish.  Raw mask popularity
 ; is not enough -- popular masks may include useless "reserved" fields whose values
 ; don't change, and thus are useless in distinguishing.
+
 (define (-distinguishing-bit-population masks mask-lens values lsb0?)
   (let* ((max-length (apply max mask-lens))
 	 (0-population (make-vector max-length 0))
@@ -263,8 +263,8 @@
 	  (vector->list 0-population) (vector->list 1-population))))
 )
 
-
 ; Return a list (0 ... limit-1)
+
 (define (-range limit)
   (let loop ((i 0)
 	     (indices (list)))
@@ -272,14 +272,16 @@
 )
 
 ; Return a list (base ... base+size-1)
+
 (define (-range2 base size)
   (let loop ((i base)
 	     (indices (list)))
     (if (= i (+ base size)) (reverse indices) (loop (+ i 1) (cons i indices))))
 )
 
+; Return a copy of given vector, with all entries with given indices set
+; to `value'
 
-; Return a copy of given vector, with all entries with given indices set to `value'
 (define (-vector-copy-set-all vector indices value)
   (let ((new-vector (make-vector (vector-length vector))))
     (for-each (lambda (index)
@@ -290,9 +292,10 @@
     new-vector)
 )
 
-
-; Return a list of indices whose counts in the given vector exceed the given threshold.
+; Return a list of indices whose counts in the given vector exceed the given
+; threshold.
 ; Sort them in decreasing order of populatority.
+
 (define (-population-above-threshold population threshold)
   (let* ((unsorted
 	  (find (lambda (index) (if (vector-ref population index) 
@@ -305,10 +308,10 @@
     sorted)
 )
 
-
 ; Return the top few most popular indices in the population vector,
 ; ignoring any that are already used (marked by #f).  Don't exceed
 ; `size' unless the clustering is just too good to pass up.
+
 (define (-population-top-few population size)
   (let loop ((old-picks (list))
 	     (remaining-population population)
@@ -345,8 +348,6 @@
 		;  vvvv
 		(* 0.75 count-threshold))))))
 )
-
-
 
 ; Given list of insns, return list of bit numbers of constant bits in opcode
 ; that they all share (or mostly share), up to MAX elements.
@@ -396,7 +397,6 @@
 	   "(" sorted-indices ")\n")
     sorted-indices)
 )
-
 
 (define (OLDdecode-get-best-bits insn-list already-used startbit max decode-bitsize lsb0?)
   (let ((masks (map insn-base-mask insn-list))

@@ -705,7 +705,6 @@
   (find (lambda (insn) (not (multi-insn? insn))) insn-list)
 )
 
-
 ; Filter out instructions whose ifield patterns are strict supersets of
 ; another, keeping the less general cousin.  Used to resolve ambiguity
 ; when there are no more bits to consider.

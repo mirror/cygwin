@@ -466,9 +466,6 @@ void
 ; build the first decode table.  If nil, we compute 8 bits of it (FIXME)
 ; ourselves.
 ; LSB0? is non-#f if bit number 0 is the least significant bit.
-; FIXME: Need to be perfect for every subtable, or allow target more control.
-; Leave for later (and don't give target more control until oodles of effort
-; have been spent trying to be perfect! ... or close enough).
 
 (define (-gen-decode-fn insn-list initial-bitnums lsb0?)
 

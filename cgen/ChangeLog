@@ -1,3 +1,8 @@
+2000-11-02  Ben Elliston  <bje@redhat.com>
+
+	* doc/porting.texi (Building a GAS test suite): Document my change
+	to gas-build.sh.
+
 2000-11-01  Ben Elliston  <bje@redhat.com>
 
 	* sim-test.scm (cgen-build.sh): Include "-*- Asm -*-" in test cases.

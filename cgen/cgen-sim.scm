@@ -1,6 +1,6 @@
 ; Simulator generator entry point.
 ; This is invoked to build: arch.h, cpu-<cpu>.h, memops.h, semops.h, decode.h,
-; decode.c, extract.c, semantics.c, ops.c, model.c, mainloop.in.
+; decode.c, defs.h, extract.c, semantics.c, ops.c, model.c, mainloop.in.
 ;
 ; memops.h, semops.h, ops.c, mainloop.in are either deprecated or wip.
 ;
@@ -39,6 +39,8 @@
 	 (lambda (arg) (file-write arg cgen-cpuall.h)))
    (list '-F "file" "generate memops.h in <file>"
 	 (lambda (arg) (file-write arg cgen-mem-ops.h)))
+   (list '-G "file" "generate defs.h in <file>"
+	 (lambda (arg) (file-write arg cgen-defs.h)))
    (list '-P "file" "generate semops.h in <file>"
 	 (lambda (arg) (file-write arg cgen-sem-ops.h)))
    (list '-T "file" "generate decode.h in <file>"

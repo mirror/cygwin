@@ -823,14 +823,50 @@ SEM_FN_NAME (@cpu@,init_idesc_table) (SIM_CPU *current_cpu)
    -gen-hardware-types
    -gen-cpu-reg-access-decls
    -gen-model-decls
-   (lambda () (gen-argbuf-type #t))
-   (lambda () (gen-scache-type #t))
-   -gen-extract-macros
+
+   (if (not (with-multiple-isa?))
+     (string-list
+       (lambda () (gen-argbuf-type #t))
+       (lambda () (gen-scache-type #t))
+       -gen-extract-macros)
+     "")
+
    (if (and (with-parallel?) (not (with-generic-write?)))
        -gen-parallel-exec-type
        "")
    -gen-trace-record-type
    "#endif /* CPU_@CPU@_H */\n"
+   )
+)
+
+; Generate defs-<isa>.h.
+
+(define (cgen-defs.h)
+  (logit 1 "Generating " (obj:name (current-isa)) " defs.h ...\n")
+
+  (sim-analyze-insns!)
+
+  ; Tell the rtl->c translator we're not the simulator.
+  ; ??? Minimizes changes in generated code until this is changed.
+  ; RTL->C happens for field decoding.
+  (rtl-c-config! #:rtl-cover-fns? #f)
+
+  (string-write
+   (gen-copyright (string-append
+                  "ISA definitions header for "
+                  (obj:name (current-isa))
+                  ".")
+                 CURRENT-COPYRIGHT CURRENT-PACKAGE)
+   "\
+#ifndef DEFS_@PREFIX@_H
+#define DEFS_@PREFIX@_H
+
+"
+   (lambda () (gen-argbuf-type #t))
+   (lambda () (gen-scache-type #t))
+   -gen-extract-macros
+
+   "#endif /* DEFS_@PREFIX@_H */\n"
    )
 )
 

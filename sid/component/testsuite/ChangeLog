@@ -1,3 +1,8 @@
+2001-01-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* sidcomp.glue/gluemonkey.exp: Add test for hw-glue-bus-mux.
+	* sidcomp.glue/gluedocs.exp: Add hw-glue-bus-mux.txt.
+
 2000-11-27  Frank Ch. Eigler  <fche@redhat.com>
 
 	* lib/cpudefs.exp (run-one-sid-test): Initialize last_sid_run_time.

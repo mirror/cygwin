@@ -1,5 +1,5 @@
 load_lib "docs.exp"
 
-foreach component {hw-glue-sequence hw-glue-probe-bus sw-glue-attribbank} {
+foreach component {hw-glue-sequence hw-glue-probe-bus hw-glue-bus-mux sw-glue-attribbank} {
     doc_test glue $component
 }

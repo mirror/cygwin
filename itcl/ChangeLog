@@ -1,3 +1,10 @@
+Tue Jun  6 22:09:02 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* itcl/win/Makefile.in: Set up and use autoconf variables throughout to
+	allow overriding variables from the make command line.
+	* itk/win/Makefile.in: Ditto.
+	* itcl/iwidgets3.0.0/unix/Makefile.in: Ditto.
+
 2000-05-03  Syd Polk  <spolk@redhat.com>
 
 	* Makefile.in (check test): Call "make test" explicitly when

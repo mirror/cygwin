@@ -5,6 +5,12 @@ prefix = @prefix@
 exec_prefix = @exec_prefix@
 VPATH = @srcdir@:@srcdir@/../generic
 srcdir = @srcdir@
+libdir=@libdir@
+bindir=@bindir@
+includedir=@includedir@
+mandir=@mandir@
+datadir=@datadir@
+host_alias=@host_alias@
 
 CC = @CC@
 CFLAGS = @CFLAGS@
@@ -428,21 +434,21 @@ TIX_VERSION = @TIX_VERSION@
 # Directory in which to install the library of Tix scripts and demos
 # (note: you can set the TIX_LIBRARY environment variable at run-time to
 # override the compiled-in location):
-TIX_LIBRARY =	$(prefix)/share/tix$(TIX_VERSION)
+TIX_LIBRARY =	$(datadir)/tix$(TIX_VERSION)
 
 # CYGNUS LOCAL: dj - change to autoconf'd directories
 
 # Directory in which to install the archive libtix.a:
-LIB_DIR =	@libdir@
+LIB_DIR =	$(libdir)
 
 # Directory in which to install the program wish:
-BIN_DIR =	@bindir@
+BIN_DIR =	$(bindir)
 
 # Directory in which to install the include file tix.h:
-INCLUDE_DIR =	@includedir@
+INCLUDE_DIR =	$(includedir)
 
 # Top-level directory for manual entries:
-MAN_DIR =	@mandir@
+MAN_DIR =	$(mandir)
 
 # Directory in which to install manual entry for wish:
 MAN1_DIR =	$(MAN_DIR)/man1

@@ -1,3 +1,8 @@
+Tue Jun  6 22:09:02 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* win/Makefile.in: Set up and use autoconf variables throughout to
+	allow overriding variables from the make command line.
+
 2000-01-26  DJ Delorie  <dj@cygnus.com>
 
 	* win/tkWin32Dll.c (DllMain): Use _imp__ instead of __imp_

@@ -1,3 +1,8 @@
+2004-10-27  Nick Clifton  <nickc@redhat.com>
+
+	* cpu/iq2000m.cpu: Import latest version from cpu/ directory.
+	* cpu/iq2000.cpu: Likewise.
+
 2004-07-21  DJ Delorie  <dj@redhat.com>
 
 	* cpu/xstormy16.cpu (movhmemgr): Use hmem8, not lmem8.

@@ -272,8 +272,6 @@
 
 2001-03-22  Ben Elliston  <bje@redhat.com>
 
-	* configure.in: Add xstormy16 support.
-	* compCGEN.cxx: Add xstormy16 support.
 	* Makefile.in: Regenerate.
 	* configure: Likewise.
 	* aclocal.m4: Likewise.

@@ -32,7 +32,7 @@ details. */
 #include "cygwin/cygserver_transport.h"
 
 // Version string.
-static const char version[] = "$Revision: 1.1.2.28 $";
+static const char version[] = "$Revision: 1.1.2.29 $";
 
 /*
  * Support function for the XXX_printf() macros in "woutsup.h".
@@ -494,7 +494,7 @@ server_submission_loop::request_loop ()
 client_request_shutdown::client_request_shutdown ()
   : client_request (CYGSERVER_REQUEST_SHUTDOWN)
 {
-  syscall_printf ("created");
+  // verbose: syscall_printf ("created");
 }
 
 void

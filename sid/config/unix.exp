@@ -7,6 +7,8 @@
 ############################################################################
 # Utility routines for sid test cases
 
+source "../../config/info.tcl"
+
 proc sid_config_component_etc_test { file pfx type sfx } {
     global prefix
     set f [open $file "w"]
@@ -278,31 +280,40 @@ proc sid_find_file {args} {
 # simple: use dejagnu's tool_root_dir.
 
 proc sid_find_gas { toolchain_prefix } {
-    global toolchain_root_dirs
-    if { [info exists toolchain_root_dirs($toolchain_prefix)]
-    && [file exists $toolchain_root_dirs($toolchain_prefix)/gas/as-new] } {
-	return $toolchain_root_dirs($toolchain_prefix)/gas/as-new
+    global tool_root_dir target_alias
+    verbose -log " trd=${tool_root_dir} tal=${target_alias}  tp=${toolchain_prefix}" 2
+    if {[is_remote host] || 
+	($target_alias != $toolchain_prefix) ||
+	![file exists ${tool_root_dir}/../gas/as-new]} {
+	return ${toolchain_prefix}-as
+    } else {
+	return ${tool_root_dir}/../gas/as-new
     }
-    return ${toolchain_prefix}-as
 }
 
 proc sid_find_ld { toolchain_prefix } {
-    global toolchain_root_dirs
-    if { [info exists toolchain_root_dirs]
-    && [file exists $toolchain_root_dirs($toolchain_prefix)/ld/ld-new] } {
-	return $toolchain_root_dirs($toolchain_prefix)/ld/ld-new
+    global tool_root_dir target_alias
+    verbose -log " trd=${tool_root_dir} tal=${target_alias}  tp=${toolchain_prefix}" 2
+    if {[is_remote host] || 
+	($target_alias != $toolchain_prefix) ||
+	![file exists ${tool_root_dir}/../ld/ld-new]} {
+	return ${toolchain_prefix}-ld
+    } else {
+	return ${tool_root_dir}/../ld/ld-new
     }
-    return ${toolchain_prefix}-ld
 }
 
 
 proc sid_find_gcc { toolchain_prefix } {
-    global toolchain_root_dirs
-    if { [info exists toolchain_root_dirs]
-    && [file exists $toolchain_root_dirs($toolchain_prefix)/gcc/xgcc] } {
-	return "$toolchain_root_dirs($toolchain_prefix)/gcc/xgcc -B$toolchain_root_dirs($toolchain_prefix)/gcc/"
+    global tool_root_dir target_alias
+    verbose -log " trd=${tool_root_dir} tal=${target_alias}  tp=${toolchain_prefix}" 2
+    if {[is_remote host] || 
+	($target_alias != $toolchain_prefix) ||
+	![file exists ${tool_root_dir}/../gcc/xgcc]} {
+	return ${toolchain_prefix}-gcc
+    } else {
+	return "${tool_root_dir}/../gcc/xgcc -B${tool_root_dir}/../gcc/"
     }
-    return ${toolchain_prefix}-gcc
 }
 
 proc sid_find_sid {} {
@@ -335,7 +346,6 @@ proc sidcomp_exit {} {
 proc sidcomp_start {} {
     global TOOL_OPTIONS host_triplet crappy_tcl
     if {[info exists TOOL_OPTIONS]} then { } else { set TOOL_OPTIONS "build" }
-    source "../../config/info.tcl"
 
     # tcl on some platforms can't handle passing large strings between
     # the expect and the sid processes without corruption.  Set crappy_tcl

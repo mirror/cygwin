@@ -1434,7 +1434,7 @@ esac
 
 
 echo $ac_n "checking ARM family support""... $ac_c" 1>&6
-echo "configure:1468: checking ARM family support" >&5
+echo "configure:1438: checking ARM family support" >&5
 
 
 
@@ -1449,7 +1449,7 @@ echo "$ac_t""$sidtarget_arm" 1>&6
 
 
 echo $ac_n "checking MIPS family support""... $ac_c" 1>&6
-echo "configure:1498: checking MIPS family support" >&5
+echo "configure:1453: checking MIPS family support" >&5
 
 
 
@@ -1463,7 +1463,7 @@ fi
 echo "$ac_t""$sidtarget_mips" 1>&6
 
 echo $ac_n "checking M32R family support""... $ac_c" 1>&6
-echo "configure:1512: checking M32R family support" >&5
+echo "configure:1467: checking M32R family support" >&5
 
 
 
@@ -1477,7 +1477,7 @@ fi
 echo "$ac_t""$sidtarget_m32r" 1>&6
 
 echo $ac_n "checking M68K family support""... $ac_c" 1>&6
-echo "configure:1526: checking M68K family support" >&5
+echo "configure:1481: checking M68K family support" >&5
 
 
 
@@ -1491,7 +1491,7 @@ fi
 echo "$ac_t""$sidtarget_m68k" 1>&6
 
 echo $ac_n "checking PPC family support""... $ac_c" 1>&6
-echo "configure:1540: checking PPC family support" >&5
+echo "configure:1495: checking PPC family support" >&5
 
 
 
@@ -1508,7 +1508,7 @@ echo "$ac_t""$sidtarget_ppc" 1>&6
 
 
 echo $ac_n "checking whether can build shared SID component libraries""... $ac_c" 1>&6
-echo "configure:1600: checking whether can build shared SID component libraries" >&5
+echo "configure:1512: checking whether can build shared SID component libraries" >&5
 if eval "test \"`echo '$''{'ac_cv_libstdcxx_shared'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1521,7 +1521,7 @@ then
   echo "configure: warning: Cannot test for libstdc++ without g++" 1>&2
 else
   echo $ac_n "checking for libstdc++ {static/shared}""... $ac_c" 1>&6
-echo "configure:1613: checking for libstdc++ {static/shared}" >&5
+echo "configure:1525: checking for libstdc++ {static/shared}" >&5
 
   stlibname=libstdc++.a
   case ${host} in
@@ -1578,6 +1578,7 @@ then
 else
   enable_shared=yes
 fi
+
 
 
 subdirs="include component main bsp samples demos"
@@ -1761,6 +1762,7 @@ s%@sidtarget_ppc@%$sidtarget_ppc%g
 s%@SIDTARGET_PPC_TRUE@%$SIDTARGET_PPC_TRUE%g
 s%@SIDTARGET_PPC_FALSE@%$SIDTARGET_PPC_FALSE%g
 s%@enable_shared@%$enable_shared%g
+s%@target@%$target%g
 s%@subdirs@%$subdirs%g
 
 CEOF

@@ -1,0 +1,109 @@
+* Name
+  hw-memory-ram/rom-basic
+
+* Synopsis
+  This is a general-purpose byte-addressable RAM or ROM.  Its contents
+  may be primed with existing data from a file.  The size of the
+  memory may be altered at any time.
+
+  Buses: read-only-port read-write-port
+  Pins: image-load image-store
+  Attributes: size size-max image-file image-load image-store
+              state-snapshot
+  Library: libmemory.la
+  Symbol name: mem_component_library
+
+* Functionality
+
+  - Modelling
+    * This component does not model any particular hardware component.
+      It models a generic memory without any access delays.
+
+  - Behaviors
+
+    * Configuration
+
+      When the "size" attribute is written-to with a legal value, a
+      new cleared byte array is allocated with the new size.  The old
+      byte array is thrown away.  The "size-max" read-only attribute
+      supplies to the user the maximum size that this component will
+      attempt to allocate.  (Larger memory banks may be modelled by
+      using multiple instances of this component.)
+
+    * Image save/load
+
+      When the "image-load" pin is driven, this component will open
+      and attempt to load the contents of the file given by the
+      "image-file" attribute into the memory image.  The file is
+      copied byte-for-byte.  If the file is too short, zeroes are used
+      to fill out the rest of the memory.
+ 
+      Similarly, when the "image-store" pin is driven, the component
+      will write to the "image-file" file a byte-for-byte dump of the
+      entire memory image.
+
+    * Reading/writing
+
+      When an access is received on either the "read-only-port" or
+      "read-write-port" bus, the component checks the incoming
+      address.  If it is an in-range read access, it will be carried
+      out.  If it is a write access, it will be prevented through the
+      "read-only-port".
+
+      There are no restrictions on access alignment or size imposed by
+      this model.
+
+  - SID conventions
+    * This is a functional component.
+    * The component supports saving and restoring state in addition to
+      memory persistence, via the image-store pin/attribute.
+    * Triggerpoints are not supported.
+
+* Environment
+
+  - Related components
+
+  * It is most likely that this component will be used as the main
+    memory for a CPU and connected through a mapper component such
+    as hw-mapper-basic.
+
+  * A configuration file fragment appears below:
+
+	new hw-mapper-basic bus
+	new hw-cpu-arm7t cpu
+	new hw-memory-ram/rom-basic mem
+	set mem size 65536
+	connect-bus cpu insn-memory bus access-port
+	connect-bus cpu data-memory bus access-port
+	connect bus [0-65535] mem read-write-port
+	# a read-only shadow in high memory
+	connect bus [400000,465535] mem read-only-port
+
+  - Host system
+
+  * The memory is modelled as a contiguous array of bytes in host
+    memory.  As such, a component configured for 8MB of memory
+    requires 8MB of host memory.  This is an important consideration
+    for simulations running on machines with low memory or on busy
+    multiuser systems.  Similarly, when a memory image is written to
+    disk, the same amount of space may be used there.
+
+* SID interface reference
+
+  - low level:
+
+    * buses
+    - read-only-port | 0 .. size-1 | any access | reading/writing
+    - read-write-port | 0 .. size-1 | any access | reading/writing
+
+    * attributes
+    - size | setting | numeric | default 0 | configuration
+    - size-max | setting | numeric | fixed at 32MB | configuration
+    - image-file | setting | filename | no default | image save/load
+    - image-load | pin | any | no default | image save/load
+    - image-store | pin | any | no default | image save/load
+    - state-snapshot | state | opaque string | none | state save/restore
+
+    * pins
+    - image-load | input | any | image save/load
+    - image-store | input | any | image save/load

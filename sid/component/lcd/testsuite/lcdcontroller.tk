@@ -1,0 +1,207 @@
+# Global Variables
+set NUM_OPLINES 9
+set lcdinit_done 0 
+set lcdbus_access 0
+set ack_access 0
+set STATUS_CRW 3
+set LCD_STATUSREG 0xa0004
+set LCD_CMDREG 0xa0004
+set LCD_DATAREG 0xa0000
+set STATUS_AUTOW 8
+
+# 9 pins. 8 for data pins 0-7, and 1 for strobe pin
+for { set j 0 } { $j < $NUM_OPLINES } {incr j} {
+	set lcd_ippin($j) [sid::pin::new]
+}
+
+# array to store pin values. Represent ASCII characters
+for { set j 0 } { $j < [expr $NUM_OPLINES - 1] } { incr j } {
+	set val_arr($j) 0
+}
+
+#get pin
+proc find_pin {name} {
+	global lcd_ippin
+	if { [string compare $name "pin0_lcdcontr"] == 0 } { return $lcd_ippin(0) }
+	if { [string compare $name "pin1_lcdcontr"] == 0 } { return $lcd_ippin(1) }
+	if { [string compare $name "pin2_lcdcontr"] == 0 } { return $lcd_ippin(2) }
+	if { [string compare $name "pin3_lcdcontr"] == 0 } { return $lcd_ippin(3) }
+	if { [string compare $name "pin4_lcdcontr"] == 0 } { return $lcd_ippin(4) }
+	if { [string compare $name "pin5_lcdcontr"] == 0 } { return $lcd_ippin(5) }
+	if { [string compare $name "pin6_lcdcontr"] == 0 } { return $lcd_ippin(6) }
+	if { [string compare $name "pin7_lcdcontr"] == 0 } { return $lcd_ippin(7) }
+	if { [string compare $name "pin8_lcdcontr"] == 0 } { return $lcd_ippin(8) }
+	return ""
+}
+
+# driven method for 8 data pins and one strobe pin
+proc driven_h4 { pin value } {
+	global lcd_ippin ack_access val_arr
+	global NUM_OPLINES
+	if { [string compare $pin $lcd_ippin(8)] == 0} { 
+	   if { $value == 0} {
+#	     #strobe signal is low thus data is ready
+	      send_lcddata
+	      sid::pin::driven_h4 $ack_access 0
+	    }
+	} else {
+	    for { set i 0} { $i < [expr $NUM_OPLINES - 1] } { incr i } {
+	       if { [string compare $pin $lcd_ippin($i)] == 0 } { 
+		   set val_arr($i) $value
+		   break
+	          }
+               }
+        }
+}
+
+# connect bus with mapper
+proc connect_accessor {name bus} {
+  global lcdbus_access
+  if { [string compare $name "input_lcdbus"] == 0} {
+    set lcdbus_access $bus
+    return "ok"
+    } else {
+	puts " Bus name doesn't match "
+	return "not_found"
+    }
+}
+
+proc connect_pin {name pin} {
+  global ack_access
+  if { [string compare $name "outputack"] == 0 } {
+	set ack_access $pin
+	return "ok"
+  } else {
+	puts " ack pin name not found "
+	return "not_found"
+  }
+}
+
+proc send_lcddata {} {
+	global lcdinit_done lcdbus_access NUM_OPLINES
+        global LCD_CMDREG LCD_STATUSREG LCD_DATAREG STATUS_CRW
+	global val_arr STATUS_AUTOW
+	set res 0
+
+# reading input array for finding ascii value
+	for { set k 0 } { $k < [expr $NUM_OPLINES - 1] } {incr k} {
+	    if { $val_arr($k) > 0 } {		
+		set res [expr $res + [expr int([expr pow(2,$k)])]]
+	     }
+	}
+# subtract 32 from ascii value to make it lcd equivalent char.
+	set res [expr $res - 32] 
+
+	if { $lcdinit_done == 0 } {
+# lcd hasn't initialized
+	    puts " Needs Initilization "
+	    Initialize_lcd
+	    reset_addptr
+# need to think about clearing memory area 
+# number of rows will always be 16.
+	}
+
+# send and display data 
+# currently, I am going with write byte, move pointer ahead
+# need to talk with R. Unrau
+	 check_status $STATUS_CRW
+	 sid::bus::write_h4_b1 $lcdbus_access $LCD_DATAREG $res
+	 check_status $STATUS_CRW
+	 sid::bus::write_h4_b1 $lcdbus_access $LCD_CMDREG 0xC0
+# how long we will move this pointer once hit the end bring back.
+}
+
+#setting address ptr to text home address
+proc reset_addptr {} {
+  global lcdbus_access STATUS_CRW LCD_DATAREG LCD_CMDREG
+  check_status $STATUS_CRW
+  sid::bus::write_h4_b1 $lcdbus_access $LCD_DATAREG 0
+  check_status $STATUS_CRW
+  sid::bus::write_h4_b1 $lcdbus_access $LCD_DATAREG 0
+  check_status $STATUS_CRW
+  sid::bus::write_h4_b1 $lcdbus_access $LCD_CMDREG 0x24
+}
+
+#initialize lcd
+proc Initialize_lcd {} {
+   global lcdbus_access
+   global lcdinit_done LCD_STATUSREG LCD_CMDREG LCD_DATAREG
+   global STATUS_CRW
+   set lcdinit_done 1
+   
+# setting text home address at top 0x0000
+
+   check_status $STATUS_CRW
+# writing lower byte 0x00
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_DATAREG 0x00
+   check_status $STATUS_CRW
+#writing higher byte 0x00
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_DATAREG 0x00
+   check_status $STATUS_CRW
+# writing command 0x40
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_CMDREG 0x40
+
+# Setting text area set 0x0020
+
+   check_status $STATUS_CRW
+# writing lower byte 0x14  20 columns
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_DATAREG 0x14
+   check_status $STATUS_CRW
+# writing higher byte 00
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_DATAREG 0x00
+   check_status $STATUS_CRW
+# wrting command 0x41
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_CMDREG 0x41
+
+# setting graphic home address 0x0200
+
+  check_status $STATUS_CRW
+# data 00
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_DATAREG 0x00
+  check_status $STATUS_CRW
+#data 02
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_DATAREG 0x02
+#status 
+   check_status $STATUS_CRW
+# command 0x42
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_CMDREG 0x42    
+
+
+# Setting graphic area set 0014
+
+  check_status $STATUS_CRW
+# lower byte data 0x20 
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_DATAREG 0x14
+   check_status $STATUS_CRW
+# higher byte 0x00
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_DATAREG 0x00
+   check_status $STATUS_CRW
+# command 0x43
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_CMDREG 0x43
+
+# set OR mode
+
+   check_status $STATUS_CRW
+#command 80
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_CMDREG 0x80
+
+# display mode text, graphic, and cursor off
+
+  check_status $STATUS_CRW
+# command 0x9C 
+   sid::bus::write_h4_b1 $lcdbus_access $LCD_CMDREG 0x9C
+
+   puts " Initilialization routine completed "
+}
+
+
+# check status register bits 0 & 1
+proc check_status {stat_val} {
+  global lcdbus_access LCD_STATUSREG
+  set stat [sid::bus::read_h4_b1 $lcdbus_access $LCD_STATUSREG]
+  if { [lindex $stat 0] == "ok" } {
+      if { [expr [lindex $stat 1] & $stat_val] != $stat_val }  {
+         puts " Error status NOE $stat_val"
+    } 
+   } else { puts "Error Init not ok" }
+}

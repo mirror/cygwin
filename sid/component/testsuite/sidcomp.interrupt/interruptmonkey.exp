@@ -1,0 +1,6 @@
+# Run a monkey test on the components in this component library. 
+
+load_lib "monkey.exp"
+
+monkey_test hw-interrupt-arm/ref interrupt_component_library libinterrupt.la
+monkey_test hw-interrupt-cogent/cma222 interrupt_component_library libinterrupt.la

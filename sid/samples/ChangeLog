@@ -1,0 +1,53 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure, Makefile.in, aclocal.m4: Regenerated.
+
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Removed AC_PROG_PATH(AR, ar).
+	* configure: Regenerated.
+	* aclocal.m4: Ditto.
+	* Makefile.in: Ditto.
+
+2000-03-15  matthew green  <mrg@redhat.com>
+
+	* timer.cxx: Add several `throw()' specifiers to functions whose
+	virtual declaration included the throw. New GCC checks this more
+	completely.
+
+2000-02-16  Ben Elliston  <bje@redhat.com>
+
+	* timer.cxx (Timer::attribute_names): Add more comments.
+
+2000-02-08  Ben Elliston  <bje@redhat.com>
+
+	* timer.cxx (Timer::register_bus::write): Remove unused case.
+	(Timer::register_bus::read): Likewise.
+
+2000-01-10  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* timer.cxx (read, write little_int_4): Omit endianness munging.
+
+2000-01-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Don't look for -lm, -lstdc++.
+	* configure: Regenerated.
+	* config.in, stamp-h.in, Makefile.in, aclocal.m4: Ditto.
+
+2000-01-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* timer.cxx (*): Import namespace std.  Fill in some missing sid::
+ 	qualifiers.  Wrap contents in a namespace.
+	(read, write): Correct endianness conversions.  Simplify control
+ 	flow slightly.  Fill in missing read(big_int_2) function.
+
+2000-01-07  Ben Elliston  <bje@cygnus.com>
+
+	* timer.cxx: New file.
+	* Makefile.am: Likewise.
+	* Makefile.in: Generate.
+	* configure.in: New file.
+	* configure: Generate.
+	* aclocal.m4: Likewise.
+	* config.in: Likewise.
+	* stamp-h.in: Likewise.

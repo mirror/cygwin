@@ -1,0 +1,138 @@
+* Name
+  hw-mapper-basic
+
+* Synopsis
+
+  This component is a generalized model of the distributed computer
+  circuitry that decodes bus addresses.
+
+  Attributes: access-count cache-hit-count ACCESSOR-hits
+  Buses: access-port
+  Accessors: ACCESSOR
+  Shared library: libmapper.la
+  Symbol: mapper_component_library
+
+* Functionality
+  - Modelling
+
+    * This component distributes bus accesses to one of a number of
+      configured bus accessors, depending on the address of the
+      incoming memory access.  
+
+    * A mapper defines an address space.  The address space is
+      decomposed into non-overlapping regions by configuring a dynamic
+      collection of accessors.  Each accessor is connected to a single
+      slave bus.  To configure the address mapping, you must name each 
+      accessor according to one of these forms:
+
+          [<low>-<high>]
+      or  [<low>-<high>,<stride>,<width>]
+      where:
+          <low> is the starting address for the mapped region.
+          <high> is the ending address for the mapped region.
+          <stride> is the step size between addressable units.
+          <width> is the width of addressable units.
+
+      In addition, any text may appear outside the "[" and "]" brackets,
+      as long as that text does not include any of the separator
+      characters "[" "]" "-" ",".
+
+      Each number may be specified in decimal, hexadecimal, octal, and
+      binary forms, with the appropriate prefix (none, "0x", "0",
+      "0b", respectively).
+
+      The first form is appropriate if the slave device is willing to
+      accept all possible sid::bus accesses (subject to the address
+      range limits).  The second form is appropriate if the slave
+      device is willing to accept only accesses to addressable units
+      of fixed width at a fixed stride from one another.
+
+      See the "mapping" behavior below for more details.
+       
+  - Behaviors
+
+    * Configuration
+
+      When an accessor of the prescribed format is set, and the
+      address range is valid, the supplied bus is registered in the
+      decoding table.  Future accesses on the "access-port" bus will
+      consider that address range as a candidate.
+
+      Reasons for rejecting an address range include overlapping with
+      an existing entry, or inconsistent ranges or stride/width
+      values.
+
+    * Mapping
+
+      When an incoming access on the "access-port" bus is received,
+      its base address is compared to all the registered outgoing
+      accessors.  If one is found that contains the address, the
+      current address is transformed according to the following rules:
+
+	* The accessor's <low> address is subtracted from the incoming
+          address, so outgoing addresses will be relative and zero-based.
+        * If the accessor has stride/width values, divide the relative
+          address by the quotient (<stride>/<width>).  As a result,
+          outgoing addresses will refer to consecutive addressable units, 
+          and an outgoing access of the desired width will be made.
+	* If the accessor has no stride/width values, the relative
+          address and the incoming access width will be used to make
+          an outgoing access.
+
+      This component will return an incoming access prematurely with
+      "sid::bus::unmapped" if no accessor covers the incoming address.
+      Similarly, it will signal a "sid::bus::misaligned" condition if
+      an incoming access could be handled by a stride/width accessor,
+      but the addressed bytes don't cover exactly one addressable
+      unit.
+
+      Whenever an incoming access is attempted, the component
+      increments its "access-count" attribute.  When a repeated access
+      hits an internal mapping cache, the "cache-hit-count" is
+      incremented.  Whenever an incoming address is contained in a
+      specific accessor's address interval, the "ACCESSOR-hits"
+      attribute is incremented.  (The ACCESSOR string is the name of
+      the accessor.)
+
+  - SID conventions
+    * This is a functional component.
+    * This component does not support triggerpoints, nor does it support
+      state save/restore.
+
+* Environment
+  - Related components
+    * Commonly, this component will be placed between a CPU and an
+      array of bus peripherals.  The hw-glue-probe-bus component may
+      be used in conjunction with this component to analyze and
+      troubleshoot bus configuration problems, being chained to either
+      the CPU side of the mapper or the peripherals side.
+
+    * An illustration of a simple configuration for an ARM7T system
+      with a main memory and a memory mapped UART follows:
+
+	new hw-cpu-arm7t cpu
+	new hw-mapper-basic bus
+	new hw-uart-ns16550
+	new hw-memory-ram/rom-basic mem
+	set mem size 4194304
+	connect-bus cpu insn-memory bus access-port
+	connect-bus cpu data-memory bus access-port
+	connect-bus bus [0xD800000,0xD80001F,4,1] uart Bus
+	connect-bus bus [0x0,0x400000] mem read-write-port
+
+      Here, the CPU's accessors are connected directly to the mapper.
+      All peripherals are connected downstream from the mapper.  They
+      will have their bus transactions routed to them by the mapper,
+      by virtue of configuration.
+
+* SID interface reference
+  - low level:
+    * buses
+      - access-port | any address | any access | mapping
+    * accessors
+      - ACCESSOR, any of the specified forms | any access | configuration, mapping
+    * attributes
+      - access-count | register | number | 0 | mapping
+      - cache-hit-count | register | number | 0 | mapping
+      - ACCESSOR-count | register | number | 0 | mapping
+      - state-snapshot | | opaque string | n/a | state save/restore

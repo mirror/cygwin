@@ -1,0 +1,133 @@
+* Name
+  hw-interrupt-arm/ref
+
+* Synopsis
+  This component simulates the ARM reference interrupt controller.
+
+  Pins: reset interrupt fast-interrupt fast-interrupt-source
+        interrupt-source-0..interrupt-source-31
+  Buses: irq-registers fiq-registers
+  Attributes: interrupt fast-interrupt irq-raw-status irq-enable-register
+	fiq-raw-status fiq-enable-register
+
+  Library: libinterrupt.la
+  Symbol name: interrupt_component_library
+
+* Functionality
+
+  - Modelling
+   
+    * The interrupt controller model features a fast interrupt line
+      (to be attached to the fIRQ line of the CPU) and 32 general
+      purpose interrupts.
+
+    * This component models ARM's abstract reference interrupt
+      controller, which is not exactly the same as the one found on
+      the PID7T evaluation board.  The version on the PID7T board has
+      an additional "FIQSelect" register, and only 15 IRQ source pins.
+
+  - Behaviors
+
+    * Reset
+
+      When the "reset" input pin is driven, this component is reset to
+      the hardware's normal power-up state.
+
+    * Register access
+
+      There are two available register busses for this model.  The normal
+      IRQ registers are available on the "irq-registers" bus, and the FIQ
+      (fast) registers are available on the "fiq-registers" bus.  Typically,
+      one would map the "fiq-registers" with an offset of 0x100 from the
+      "irq-registers". This allows one to map other devices between these
+      registers.
+
+      When the "irq-registers" bus is accessed, the appropriate 32-bit
+      control register is read or written.
+
+	address		read		write
+	0		IRQStatus	(reserved)
+	0x4		IRQRawStatus	(reserved)
+	0x8		IRQEnable	IRQEnableSet
+	0xC		(reserved)	IRQEnableClear
+	0x10		(reserved)	IRQSoft
+
+      When the "fiq-registers" bus is accessed, the appropriate 32-bit
+      control register is read or written.
+
+	address		read		write
+	0x0		FIQStatus	(reserved)
+	0x4		FIQRawStatus	(reserved)
+	0x8		FIQEnable	FIQEnableSet
+	0xC		(reserved)	FIQEnableClear
+
+      Several registers are also available as watchable attributes.
+
+    * Interrupt processing
+
+      When any interrupt source is signalled, or interrupt-enabled
+      masks are modified, pending interrupts are processed.  There are
+      three interrupt sources: the "interrupt-source-N" input pins,
+      the "fast-interrupt-source" input pin, and the special software
+      interrupt register.  Subject to the then-current
+      interrupt-enabling registers, an "interrupt" and/or
+      "fast-interrupt" output pin may be driven.
+
+      The polarity for the input interrupt source pins is positive,
+      meaning that non-zero values are interpreted as "asserted".  On
+      the other hand, the polarity for the output interrupt pins is
+      negative, meaning that zero values are to be interpreted as
+      "asserted".  
+
+      Similarly named attributes may be used to generate/monitor pin
+      traffic.
+
+  - SID conventions
+  
+  * This is a functional component.
+  * This component supports state save/restore and triggerpoints.
+
+* Environment
+
+  - Related components
+    The interrupt controller typically sits between a CPU component, which 
+    usually has only one interrupt pin, and an array of other peripheral 
+    components.  Each of the peripheral components is capable of generating 
+    its own interrupt.  The following configuration file fragment
+    demonstrates how to connect to simple timers into the interrupt
+    subsystem of a more complete simulation:
+
+	new hw-cpu-arm7t cpu
+	new hw-timer-arm/ref-nosched timer1
+	new hw-timer-arm/ref-nosched timer2
+	new hw-interrupt-arm/ref intcontrl
+        connect-pin timer1 interrupt -> intcontrl interrupt-source-0
+	connect-pin timer2 interrupt -> intcontrl interrupt-source-1
+	connect-pin intcontrl interrupt -> cpu nirq
+
+* SID interface reference
+
+  - low level:
+    * pins
+      - reset | input | any | reset
+      - fast-interrupt-source | input | any | interrupt handling
+      - interrupt-source-[0,31] | input | any | interrupt handling
+      - fast-interrupt | output | 0,1 | interrupt handling
+      - interrupt | output | 0,1 | interrupt handling
+
+    * buses
+      - irq-registers | 0x0 - 0x1C | read/write | register access
+      - fiq-registers | 0x0 - 0x0F | read/write | register access
+
+    * attributes
+      - interrupt | pin watchable | numeric | n/a | interrupt handling
+      - fast-interrupt | pin watchable | numeric | n/a | interrupt handling
+      - irq-raw-status | register watchable | numeric | n/a | register access
+      - irq-enable-register | register watchable | numeric | n/a | register access
+      - fiq-raw-status | register watchable | numeric | n/a | register access
+      - fiq-enable-register | register watchable | numeric | n/a | register access
+
+* References
+  <http://www.arm.com/Documentation/UserMans/rps/#int>
+
+

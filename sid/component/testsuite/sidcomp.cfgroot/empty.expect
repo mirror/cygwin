@@ -1,0 +1,4 @@
+empty.badconf:2: component main attribute attrname not found
+empty.badconf:3: component main attribute  not found
+empty.badconf:4: component  not found
+Configuration error.  Aborting.

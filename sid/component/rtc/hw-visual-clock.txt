@@ -1,0 +1,71 @@
+* Name
+  hw-visual-clock
+
+* Synopsis
+  This is a graphical component for displaying the time given by a
+  related real-time clock, such as the hw-rtc-ds1642.
+
+  Attributes: geometry title
+  Relations: (any)
+
+  Library: libtclapi.la
+  Symbol name: tcl_bridge_library
+
+* Functionality
+
+  - Modelling
+    * This component uses a graphical clock face to represent the time
+      stored by a real-time clock.  This component will inter-operate
+      with many kinds of real time clocks, provided they provide
+      "hour", "minute" and "second" attributes.
+
+  - Behaviors
+    * Window layout
+      The component supports resizing of its window.  Its geometry
+      may also be specified by another component, in which case the
+      window will be resized accordingly.  The minimum geometry is
+      150x150 and the aspect ratio must be 1 to 1 (that is, the window
+      must remain square, so that the clock face is circular).
+
+      The component also allows you to alter the window title via the
+      "title" attribute.  By default, the window will be titled by the
+      name of the relation through which the target component was
+      configured.
+
+    * Time display
+      When a related real-time clock component is specified, this
+      component will periodically query that component's "hour",
+      "minute" and "second" attributes to obtain values for the 
+      clock's known time.  This will be shown on the graphical 
+      display.  If no related component is specified, the clock face will be 
+      cleared.
+     
+  - SID conventions
+
+    * This is a supervisory gui component.
+    * It has no state to save, and it has no use for triggerpoints.
+
+* Environment
+
+  - Related components
+    * To use this component, relate it to a real-time clock component
+      instance that provides the necessary "hour", "minute" and
+      "second" attributes:
+
+        new hw-rtc-ds1642 rtc
+	[...]
+        new hw-visual-clock clock-display
+	relate clock-display "rtc window" rtc
+
+    * Because this component is written in Tk, the bridge-tk event
+      handling pins must be connected for at least one Tcl/Tk/BLT
+      component.
+
+* SID interface reference
+  - low level:
+    * attributes
+      - geometry | setting | XxY, where X, Y >= 100, X=Y | 150x150 | window layout
+      - title | setting | any string | "hw-visual-clock" | window layout
+
+    * relations
+      - (any name) | window layout, time display

@@ -1,0 +1,48 @@
+set test "sid configuration"
+sid_config_component_test "idebase.conf" \
+    "load [sid_find_file libide.la] ide_component_library" \
+    "hw-disk-ide"
+pass $test
+
+set test "sid startup"
+if [sid_start "idebase.conf"] then { pass $test } else { fail $test ; return }
+
+set test "set some parameters"
+sid_cmd [list sid::component::set_attribute_value $victim drive0-present? 1]
+sid_cmd [list sid::component::set_attribute_value $victim drive0-file "/dev/null"]
+
+set test "save state snapshot"
+set state [sid_cmd [list sid::component::attribute_value $victim state-snapshot]]
+# verbose -log "state = $state" 1
+if {$state != ""} then { pass $test } else { fail $test }
+
+set test "set some more parameters"
+sid_cmd [list sid::component::set_attribute_value $victim drive1-present? 1]
+sid_cmd [list sid::component::set_attribute_value $victim drive1-file "/dev/null"]
+
+set test "restore state snapshot"
+set ok [sid_cmd [list sid::component::set_attribute_value $victim state-snapshot $state]]
+if {$ok == "ok"} then { pass $test } else { fail $test }
+
+set test "compare new state snapshot"
+set state2 [sid_cmd [list sid::component::attribute_value $victim state-snapshot]]
+if {$state == $state2} then { pass $test } else { fail $test }
+
+set test "set toughie state parameters"
+sid_cmd [list sid::component::set_attribute_value $victim drive0-present? yes]
+sid_cmd [list sid::component::set_attribute_value $victim drive0-file "D:\\drive0"]
+sid_cmd [list sid::component::set_attribute_value $victim drive0-num-cylinders 1]
+sid_cmd [list sid::component::set_attribute_value $victim drive0-num-heads 12]
+sid_cmd [list sid::component::set_attribute_value $victim drive0-num-sectors-per-track 3]
+set state [sid_cmd [list sid::component::attribute_value $victim state-snapshot]]
+set r [sid_cmd [list sid::component::set_attribute_value $victim state-snapshot $state]]
+if {$r == "ok"} then { pass $test } else { fail $test }
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "idebase.conf" }

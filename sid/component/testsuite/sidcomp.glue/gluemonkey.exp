@@ -1,0 +1,8 @@
+# Run a monkey test on the components in this component library. 
+
+load_lib "monkey.exp"
+
+monkey_test hw-glue-sequence glue_component_library libglue.la
+
+proc state_safe_p {} { return 0 }
+monkey_test sw-glue-attribbank glue_component_library libglue.la

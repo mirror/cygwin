@@ -1,0 +1,56 @@
+set test "sid configuration"
+sid_config_component_test "schedhost2.conf" \
+    "load [sid_find_file libsched.la] sched_component_library" \
+    "sid-sched-host-accurate"
+pass $test
+
+set test "sid startup"
+if [sid_start "schedhost2.conf"] then { pass $test } else { fail $test ; return }
+
+set test "host time regular events"
+set clock_pin [sid_cmd "sid::component::find_pin $victim advance"]
+sid_cmd "sid::component::set_attribute_value $victim num-clients 1"
+set control0_pin [sid_cmd "sid::component::find_pin $victim 0-control"]
+# create a pin that can consume output events
+set event0_consumer_pin [sid_cmd "sid::pin::new"]
+sid_cmd "set event0_count 0"
+sid_cmd "set hook_driven_h4($event0_consumer_pin) {incr event0_count}"
+sid_cmd "sid::component::connect_pin $victim 0-event $event0_consumer_pin"
+set interval 256
+sid_cmd "sid::pin::driven_h4 $control0_pin 0x80000100"
+# run the scheduler for about 5 host seconds
+set now [clock seconds]
+set interval2 5000
+set end [expr {$now + $interval2/1000}]
+while {[clock seconds] < $end} {
+    sid_cmd "sid::pin::driven_h4 $clock_pin 0"    
+}
+set count [sid_cmd {set event0_count}]
+verbose -log "received $count ticks, expected [expr {$interval2/$interval}]"
+if {abs($count - $interval2/$interval) < 5} then { pass $test } else { fail $test }
+
+set test "idle-mode host time regular events"
+sid_cmd "sid::component::set_attribute_value $victim yield-host-time? 1"
+sid_cmd "set event0_count 0"
+set interval 1024
+sid_cmd "sid::pin::driven_h4 $control0_pin 0x80000400"
+# run the scheduler for about 20 host seconds
+set now [clock seconds]
+set interval2 20000
+set end [expr {$now + $interval2/1000}]
+while {[clock seconds] < $end} {
+    sid_cmd "sid::pin::driven_h4 $clock_pin 0"    
+}
+set count [sid_cmd {set event0_count}]
+verbose -log "received $count ticks, expected [expr {$interval2/$interval}]"
+if {abs($count - $interval2/$interval) < 5} then { pass $test } else { fail $test }
+
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "schedhost2.conf" }

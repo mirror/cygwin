@@ -1,0 +1,50 @@
+* Name
+  hw-rtc-sid
+
+* Synopsis
+  This component is a fictional simplified high-precision real time clock.
+
+  Buses: registers
+
+  Library: librtc.la
+  Symbol name: rtc_component_library
+
+* Functionality
+
+  - Modelling
+    * This component is similar to high-precision dedicated counters
+      present as performance tuning aids in some microprocessors.  It
+      supplies snapshots of the host systems' time to a target application.
+
+  - Behaviors
+    * Timing
+
+      Whenever this component's bus is read with a valid address, it
+      returns the addressed subset of two words of information.  The
+      first word (address 0x0) contains the number of seconds since the
+      host system's epoch.  The second word (address 0x4) contains the
+      number of nanoseconds within that second.  Both words are supplied
+      in big-endian order.
+  
+  - SID conventions
+
+    * This is a functional component.
+    * It has no state to save, and has no use for triggerpoints.
+
+* Environment
+
+  - Related components
+    * To use this component, map it into 8 bytes of address
+      space, as in the following sample configuration file fragment: 
+
+	new hw-rtc-sid rtc
+        connect-bus mapper [0x1000,0x1007] rtc registers
+
+  - Host system
+    * The component relies on the accuracy and precision of UTC time
+      maintained by the host.
+
+* SID interface reference
+  - low level:
+    * buses
+      - registers | 0x0 - 0x7 | read | timing

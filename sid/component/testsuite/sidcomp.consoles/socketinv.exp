@@ -1,0 +1,123 @@
+# Testsuite for the socket server
+#
+# Copyright (C) 1999 Red Hat
+
+set test "sid configuration"
+sid_config_component_test_with_tracing "server2.conf" \
+    "load [sid_find_file libconsoles.la] console_component_library" \
+    "sid-io-socket-server" 
+pass $test
+
+set test "sid start"
+if {[sid_start "server2.conf"]} { pass $test } else { fail $test ; return }
+
+set test "find pin that does not exist"
+set pin [sid_cmd "sid::component::find_pin $victim pin"]
+if {$pin == ""} then { pass $test } else { fail $test }
+
+set test "connect to a pin that does not exist"
+set pin [sid_cmd "sid::pin::new"] 
+set status [sid_cmd "sid::component::connect_pin $victim input $pin"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "check connected pins on a pin that does not exist"
+set pin [sid_cmd "sid::component::connected_pins $victim input2"]
+if {$pin == ""} then { pass $test } else { fail $test }
+
+set test "check disconnecting pin on a pin that does not exist"
+set pin [sid_cmd "sid::pin::new"] 
+set status [sid_cmd "sid::component::disconnect_pin $victim input $pin"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "find bus that does not exist"
+set pin [sid_cmd "sid::component::find_bus $victim bus"]
+if {$pin == ""} then { pass $test } else { fail $test }
+
+set test "connect to an accessor that does not exist"
+set bus [sid_cmd "sid::bus::new"] 
+set status [sid_cmd "sid::component::connect_accessor $victim bus1 $bus"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "check connected bus on a bus that does not exist"
+set bus2 [sid_cmd "sid::component::connected_bus $victim bus2"]
+if {$bus2 == ""} then { pass $test } else { fail $test }
+
+set test "set relationships that does not exist"
+set status [sid_cmd "sid::component::relate $victim any $victim"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "set relationships to relate to a non existing component"
+set status [sid_cmd "sid::component::relate $victim relationship $victim"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "query relationships that does not exist"
+set comps [sid_cmd "sid::component::related_components $victim rel"]
+if {$comps == ""} then { pass $test } else { fail $test }
+
+set test "set non existing attribute to -1"
+set status [sid_cmd "sid::component::set_attribute_value $victim new -1" ]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+foreach num_attr {tx-count rx-count poll-count max-poll-interval poll-interval} {
+   foreach badval {-1 "127.0.0.0:xxx" true 0.0e0 } {
+      set test "set attribute $num_attr to $badval"
+      set status [sid_cmd "sid::component::set_attribute_value $victim $num_attr $badval"]
+      if {$num_attr == "max-poll-interval" && $badval == "-1" || $num_attr == "poll-interval" && $badval == "-1"} {
+         if {$status == "ok"} then {pass $test} else { fail $test}
+      } else {
+         if {$status == "bad_value"} then {pass $test} else { fail $test}
+      }
+  } 
+}
+
+foreach bool_attr {server? verbose? trace-traffic? buffer-while-disconnected? connected?} {
+   foreach badval {-1 "127.0.0.0:xxx" 123e5 string} {
+      set test "set attribute $bool_attr to $badval"
+      set status [sid_cmd "sid::component::set_attribute_value $victim $bool_attr $badval"]
+      if {$status == "bad_value"} then {pass $test} else { fail $test}
+  } 
+}
+
+foreach addr_attr {sockaddr-local sockaddr-peer} {
+   foreach badval {-1 "127.0.0.0:xxx" 123e5 string on "a.b.c.d:e"} {
+      set test "set attribute $addr_attr to $badval"
+      set status [sid_cmd "sid::component::set_attribute_value $victim $addr_attr $badval"]
+      if {$status == "bad_value"} then {pass $test} else { fail $test}
+  } 
+}
+
+foreach pin_attr {init fini tx rx} {
+   foreach badval {"127.0.0.0:111" 123e5 string on} {
+      set test "set attribute $pin_attr to $badval"
+      set status [sid_cmd "sid::component::set_attribute_value $victim $pin_attr $badval"]
+      if {$status == "bad_value"} then {pass $test} else { fail $test}
+  } 
+}
+
+foreach ro_attr {tx-count tx-buffer rx-count poll-count avg-tx-buffer-size sockaddr-peer connected?} {
+   foreach badval {123 1.1 "127.0.0.1:123" yes} {
+      set test "set attribute $ro_attr to $badval"
+      set status [sid_cmd "sid::component::set_attribute_value $victim $ro_attr $badval"]
+      if {$status == "bad_value"} then {pass $test} else { fail $test}
+  } 
+}
+
+set test "try driving fini pin before driving init pin"
+set fini [sid_cmd "sid::component::find_pin $victim fini"]
+sid_assert_success "sid::pin::driven_h4 $fini 1"
+if {$fini != "" } then { pass $test } else { fail $test }
+
+foreach value {-1 0 255 256} {
+   set test "try driving tx pin with $value when there is no connection"
+   set tx [sid_cmd "sid::component::find_pin $victim tx"]
+   sid_assert_success "sid::pin::driven_h4 $tx $value"
+}
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "server2.conf" }

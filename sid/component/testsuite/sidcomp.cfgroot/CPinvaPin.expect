@@ -1,0 +1,10 @@
+CPinvaPin.badconf:64: component cpu has no output pin ttttrap
+CPinvaPin.badconf:65: component angel has no input pin trap-1-code
+CPinvaPin.badconf:66: component angel has no input pin 1
+CPinvaPin.badconf:67: directional arrow expected
+CPinvaPin.badconf:68: directional arrow expected
+CPinvaPin.badconf:69: directional arrow expected
+CPinvaPin.badconf:70: directional arrow expected
+CPinvaPin.badconf:71: directional arrow expected
+CPinvaPin.badconf:72: component bus has no output pin access-port
+Configuration error.  Aborting.

@@ -1,0 +1,55 @@
+## This conf file contains relate commands with invalid component names
+
+# configuration logging
+set main verbose? 0
+
+# component libraries
+load libcgencpu.la cgen_component_library
+load libconsoles.la console_component_library
+load libgloss.la gloss_component_library
+load libinterrupt.la interrupt_component_library
+load libloader.la loader_component_library
+load libmapper.la mapper_component_library
+load libmemory.la mem_component_library
+load libmmu.la mmu_component_library
+load libsched.la sched_component_library
+load libtimers.la timer_component_library
+
+# Components
+
+new hw-cpu-arm7t cpu
+new sw-load-elf loader
+new sid-io-stdio stdio
+new sw-gloss-arm/angel angel
+new hw-interrupt-arm/ref intctrl
+new hw-mapper-basic bus
+new hw-remap/pause-arm/ref remapper
+new sid-sched-host host-sched
+new sid-sched-sim target-sched
+new hw-memory-ram/rom-basic mem
+new hw-timer-arm/ref-sched timer1
+new hw-timer-arm/ref-sched timer2
+
+# Scheduler
+
+set target-sched enabled? 1
+set target-sched num-clients 2
+
+set host-sched enabled? 1
+set host-sched num-clients 1
+set host-sched 0-regular? 1
+set host-sched 0-time 50
+
+connect-pin target-sched 0-control <- timer1 divided-clock-control
+connect-pin target-sched 1-control <- timer2 divided-clock-control
+connect-pin target-sched 0-event -> timer1 divided-clock-event
+connect-pin target-sched 1-event -> timer2 divided-clock-event
+connect-pin host-sched 0-event -> stdio poll
+
+# Component relationships
+relate angel test cpu					# invalid relation name
+relate target-sched cpu cpu				# component does not allow that relation
+relate ang cpu cpu1 					# invalid component name
+relate connect-pin cpu connect-bus			# invalid component name
+relate loader loader angel				# try to create a relationship that is not allowed
+relate mem cpu cpu					# try to create a relationship that is not allowed

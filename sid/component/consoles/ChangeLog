@@ -1,0 +1,323 @@
+2000-11-16  matthew green  <mrg@redhat.com>
+
+	* Makefile.am: Use $(socket_libs) to add -lnsl -lsocket if needed.
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* components.h: Import more std:: identifiers.
+	* socketio.cxx (*): Explicitly qualify more std:: identifiers.
+	Quash negative-literal warnings.
+
+2000-03-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* components.h: Don't #include sidcpuutil.h.
+
+2000-02-18  Mary Lynn Kostash  <mkostash@redhat.com>
+
+	* sid-io-socket.txt: Minor rewording.
+
+2000-02-17  Ben Elliston  <bje@redhat.com>
+
+	* sid-io-socket.txt: Simplify some text.
+
+2000-02-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* hw-visual-tty.tk (attribute_value): New dummy proc.
+	(set_attribute_value): Ditto.
+
+2000-02-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* components.cxx (compConsoleDelete): Guard against dynamic_cast
+	after delete.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* socketio.cxx (socketio ctor): Initialize recursion_limited base.
+	(poll:) Use it.
+	* sid-io-socket.txt: Document harmful recursion prevention.
+
+2000-01-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-visual-tty.tk: New file.
+	* Makefile.am: Install it in pkgdata.
+	* Makefile.in: Regenerated.
+
+2000-01-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* socketio.cxx (operator <<,>>): Remove state save/restore stub.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sid-io-socket.txt: Put default back for buffer-while-disconnected?,
+	but take it away from connected?.
+
+1999-12-22  Permaine Cheung  <pcheung@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): Add socketinv.exp and socketval.exp.
+	* Makefile.in: Regenerated.
+	* sid-io-socket.txt: Default for buffer-while-disconnected should
+	be n/a.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-09  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): Add consdocs.exp.
+	* Makefile.in: Regenerated.
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sid-io-stdio.txt: New file.  Contents come from old README.
+	* sid-io-socket.txt: Ditto.
+	* README: Removed.
+	* Makefile.am: Install new files.
+	* Makefile.in: Regenerated.
+
+1999-12-07  Permaine Cheung  <pcheung@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): Add stdioval.exp and stdioinv.exp.
+	* Makefile.in: Regenerated.
+
+1999-11-25  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* socketio.cxx (innocent_errno_p): Use argument.
+	(poll_transmit): Treat non-innocent errors as EOFs.
+	(poll_receive): Ditto.  Drive unsigned char value.
+
+1999-11-24  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README: Fixed grammar.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* socketio.cxx (read): Take unused host_int_4 arg.
+	(init_handler, fini_handler): Ditto.
+	(tx_handler): Conditionally dispatch to tx_eof_handler.
+	(poll_receive, poll_transmit): Drive -1 on EOF.
+	(update_poll_interval): Clamp max_poll_interval too.
+	(socketio ctor): Notify on max_poll_interval change too. 
+	* stdio.cxx (read): Take unused host_int_4 arg.
+	* components.h: Matching changes.
+	* components.cxx (compConsoleDelete): Use dynamic_cast<>.
+	* README: Update EOF coding behaviors.
+
+1999-11-17  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* stdio.cxx (save_state): Added arbitrary return string.
+	(restore_state): Check for arbitrary string.
+
+1999-11-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* components.h (poll_interval, max_poll_interval): Change type of
+	these socketio members to host_int_2.
+	* socketio.cxx (update_poll_interval): Clamp supplied value 1..max.
+
+1999-11-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* socketio.cxx (init_handler): Improve test for multiple initialization.
+	(poll_connect): Fix buggy assert in socket client.
+	(poll): Test for uninitialized polling.
+	* Makefile.am (DEJAGNUTESTS): Add consmonkey.exp.
+	* Makefile.in: Regenerated.
+
+1999-11-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* socketio.cxx (update_poll_interval): Avoid 0 value.
+	(wait_less): Ditto.
+
+1999-11-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* components.cxx: Rename "sw-io-stdio" -> "sid-io-stdio".
+	* README: Matching change.
+
+1999-11-01  Permiane Cheung  <pcheung@cygnus.com>
+
+	* README: Fix configuration in Environment section.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-10-14  Mary Lynn Kostash  <mkostash@cygnus.com>\
+
+	* README:  A few more doc fixes.
+
+1999-10-13  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README:  Doc fixes based on review comments.
+
+1999-10-10  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* socketio.cxx (poll_receive): Changed J's type to int from
+	unsigned.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* socketio.cxx (write): Take value for pin::driven, not const-ref.
+	(tx_handler): Same.
+	* stdio.cxx (write): Same.
+	* components.h (*): Corresponding changes.
+	
+1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Update for bool/number notation changes.
+	* socketio.cxx (operator <<): Use make_numeric_attribute for port
+ 	number.
+	* socketio.h: Import make_numeric_attribute.
+
+1999-09-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Reorganized sw-io-stdio section.  Added new section for
+	sid-io-socket-* components.
+
+1999-09-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* components.h (BSD_COMP): Add compatibility macro for Solaris 2.6.
+
+1999-09-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* socketio.cxx (asyncificate): Use both ioctl & fcntl.
+
+1999-09-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* socketio.cxx (asyncificate): Use ioctl/FIONBIO instead of
+ 	fcntl/O_NONBLOCK on cygwin.
+	* components.h: #include a few more system headers for ioctl decl.
+
+1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* components.h (*): Use host_int_X, not compiler_int_X.
+
+1999-09-10  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* socketio.cxx (socketio ctor): Reduce default maximum
+	max_poll_interval to 250ms.
+
+1999-09-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* components.h (socketio): Add trace_traffic_p member.
+	* socketio.cxx (socketio ctor): Export it as "trace-traffic?".
+	(poll_transmit, poll_receive): Trace traffic if above flag set.
+
+1999-09-01  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* socketio.cxx: Define INADDR_NONE if necessary.
+	(init_handler, poll_connect): Paranoidly set AF_INET on
+	sin_family before bind/connect.
+
+1999-09-01  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README:  Doc fixes. Sentences reworded.
+
+1999-08-31  Frank Ch. Eigler  <fche@cygnus.com>
+
+	(restore_state): Return bad_value on error.
+	* socketio.cxx (operator >>): Use INADDR_NONE instead of -1.
+	Set sin_family.
+	(socketio ctor): Set sin_family on sock_name and peer_name.
+	(init_handler): Bind socket unconditionally.
+	
+	* stdio.cxx (save_state): Remove tracing message.
+
+1999-08-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* socketio.cxx (avg_out_buffer_size): New member.
+	(tx_handler): Compute above statistical value.  Be less verbose.
+	(init_handler): Accept mistimed event without crashing.
+	(tx_eof_handler): New function.  Disconnect.
+	(socketio ctor): Trigger it on incoming driven() call.  Export
+ 	new "avg-tx-buffer-size" attribute.
+	(poll_receive): Be less verbose.  Forward EOF indication via
+	driven() when appropriate.  shutdown() before close().
+	(poll_transmit): Ditto.
+	* components.h (socketio): Match declaration changes.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* socketio.cxx: New file.
+	* stdio.cxx: Remove component_library parts.
+	* components.h, components.cxx: New files for component_library parts.
+	* Makefile.am: Build new files.
+	* Makefile.in: Regenerated.
+
+1999-08-24  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): Define.
+	(checkme): New target.
+	* Makefile.in: Regenerate.
+
+1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* stdio.cxx: Introduced proper namespace format. Inherit from
+	fixed_attribute_map_component to support save/restore. Add
+	save/restore functionality and streaming operators.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* testsuite: Removed directory.
+	* Makefile.am (SUBDIRS): Don't recurse into it.
+	* Makefile.in: Regenerated.
+	* acconfig.h: Removed.
+	* aclocal.m4: Ditto.
+	* config.in: Ditto.
+	* configure: Ditto.
+	* configure.in: Ditto.
+	* stamp-h.in: Ditto.
+
+1999-06-23  Ben Elliston  <bje@cygnus.com>
+
+	* README: Rewrite using new documentation template.
+
+1999-06-15  Ben Elliston  <bje@cygnus.com>
+
+	* README: New file. Document the stdio console component.
+
+1999-06-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* stdio.cxx (compConsoleDelete): New function.
+	(console_component_library): Register it.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* stdio.cxx (compConsoleListTypes, compConsoleCreate):
+	Renamed type "console-stdio" -> "sw-io-stdio".
+
+1999-05-31  Faisal Khoja <fkhoja@cygnus.com>
+	* stdio.cxx (read): added #include<unistd.h>
+	to call read (int, void*, size_t) from above mentioned 
+	header file. Header is added in order to compile on NT using 
+	cygwin 99r1. 
+
+1999-05-30  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am: New file.
+	* configure.in: Likewise.
+	* Makefile.in: Generate.
+	* configure: Likewise.
+	* config.in: Likewise.
+	* stamp-h.in: Likewise.
+	* aclocal.m4: Likewise.
+	* stdio.cxx: New file; standard I/O console.
+	(stdioConsole::read): Use read(), not streams for doing
+	non-blocking input from stdin.
+	(stdioConsole ctor): Rename `activity-pin' to `poll'.
+

@@ -1,0 +1,4 @@
+multiSet.badconf:42: component target-sched attribute num-clients bad value 2000
+multiSet.badconf:62: component target-sched has no output pin 2-event
+multiSet.badconf:64: component host-sched has no output pin 3-event
+Configuration error.  Aborting.

@@ -1,0 +1,16 @@
+# BSP testsuite - suitable for performance measurements
+
+load_lib "cpudefs.exp"
+
+# run these tests several times
+set sid_run_repetitions 4
+
+
+if {$sidtarget(m32r)} then {
+    run-sid-c-bsp-tests m32r-elf m32r $srcdir/sidcomp.bsp "test-*.c" {-g -O2} {--cpu=m32r} m32rx
+}
+
+
+# reset value for remaining tests
+set sid_run_repetitions 1
+

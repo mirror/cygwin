@@ -1,0 +1,17 @@
+wrongOrd.badconf:7: dlsym of libcgencpu.la *
+wrongOrd.badconf:11: dlsym of libinterrupt.la *
+wrongOrd.badconf:23: component type loader unknown
+wrongOrd.badconf:27: component type intctrl unknown
+wrongOrd.badconf:35: component type timer2 unknown
+wrongOrd.badconf:40: component 1 not found
+wrongOrd.badconf:45: component num-clients not found
+wrongOrd.badconf:46: component host-sched attribute 0-regular? not found
+wrongOrd.badconf:47: component host-sched attribute 0-time not found
+wrongOrd.badconf:53: component host-sched has no output pin 0-event
+wrongOrd.badconf:73: directional arrow expected
+wrongOrd.badconf:78: directional arrow expected
+wrongOrd.badconf:80: directional arrow expected
+wrongOrd.badconf:89: component step-insn-count not found
+wrongOrd.badconf:96: component ?0,0x7fffff? not found
+wrongOrd.badconf:101: component ?0xB000000,0xB000037? not found
+Configuration error.  Aborting.

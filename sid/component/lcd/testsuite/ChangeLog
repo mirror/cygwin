@@ -1,0 +1,213 @@
+2000-12-05  Nicholas Duffek  <nsd@redhat.com>
+
+	* Makefile.in: Use $(pkglibdir) instead of $(VPATH) for libtool
+	-rpath argument.
+
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* hd-tester.h: Import std::.
+	* t6963c-japan.h, t6963c-tester.h: Ditto.
+
+2000-02-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Reregenerated.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-25  Ron Unrau  <runrau@cygnus.com>
+
+	* hd-5X10.conf: new path independent config file
+	* hd-europe.conf: ditto
+	* hd-one-line.conf: ditto
+	* hd-two-line.conf: ditto
+	* t6963c-tcl.conf: ditto
+	* t6963c-japan.conf: ditto
+	* *.conf.in: removed - replaced by *.conf files
+	* Makefile.am: add -rpath to make noinst libs runnable
+	  add all-local target to gather *.conf files
+	* Makefile.in: regenerated
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-10  Ron Unrau  <runrau@cygnus.com>
+
+	* arm-lcd-demo.conf.in: use hw-visual-lcd
+	* hd-{5X10,europe,one-line,two-line}.conf.in: ditto
+	* t6963c-{japan,tcl}.conf.in: ditto
+	* lcd-ex.c: make it a C program, removed forced refresh
+
+2000-01-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated with newer automake.
+
+1999-12-08  Ron Unrau  <runrau@cygnus.com>
+
+	* hd-tester.{h,cxx}: new common test harness for HD44780U
+	* hd-europe.{h,cxx,conf.in}: new european font tests
+	* t6963c-japan.{h,cxx,conf.in}: new japanese font tests
+	* hd-5X10.{h,cxx}: use common hd test harness
+	* hd-one-line.{h,cxx}: ditto
+	* hd-two-line.{h,cxx}: ditto
+	* t6963c-tester.cxx: show full european character set
+	* hd-*.conf.in: use ROM differentiated component name
+	* t6963c-tester.conf.in: use ROM differentiated component name
+	* Makefile.am: add new test components
+	* Makefile.in: regenerated
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Ron Unrau  <runrau@cygnus.com>
+
+	* Makefile.am: test component libraries should not be installed
+	* Makefile.in: regenerate
+
+1999-12-08  Ron Unrau  <runrau@cygnus.com>
+
+	* hd-two-line.{cxx,h,conf.in}: new 5X8 X 2-line test files
+	* hd-one-line.{cxx,h,conf.in}: new 5X8 X 1-line test files
+	* hd-5X10.{cxx,h,conf.in}: new 5X10 X 1-line test files
+	* Makefile.am: build the new test components
+	* Makefile.in: regenerated
+	* arm-lcd-demo.conf.in: track API and component changes
+	* t6963c-tcl.conf.in: ditto
+	* t6963c-tester.h: remove relation
+	* t6963c-tester.cxx: fix bit rot, quicken display rate
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* t6963c-tester.cxx (run): Take unused argument.
+	(run): Drive output pin with sentinel value.
+	(T6963CTesterDelete): Use dynamic_cast<>.
+	* t6963c-tester.h: Matching changes.
+
+1999-11-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* t6963c-tester.h (run_ipin, run_opin): New members; forks of
+	run_pin.
+	* t6963c-tester.cxx (*): Drive new *opin, sense new *ipin.	
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-10-10  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* t6963-tester.cxx (draw_string): Changed type of i to unsigned.
+	(test_or_mode): Changed j's type to unsigned.
+	
+1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lcdcontroller.tk (*): Don't hexify bus address/data traffic.
+
+1999-09-19  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* t6963c-tester.cxx (draw_string): Removed debugging messages.
+ 	(draw_logo): Likewise
+	
+1999-09-17  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* t6963c-tester.h: Inherit From fixed_relation_map_component
+	Added a data member to establish relation with T6963C.
+	* t6963c-tester.cxx(T6963C-tester): added uni_relation;
+ 	(draw_string): Added test to check save/restore.
+	(draw_logo): Likewise		 	
+	
+1999-09-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* simplcddemo.conf.in: Fix typo in "namespace import" command.
+	* t6963c-tcl.conf.in: Ditto.
+
+1999-09-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* simplcddemo.conf.in: Use bridge-tk "eval!" instead of "import!".
+	* t6963c-tcl.conf.in: Ditto.
+
+1999-09-05  Ron Unrau  <runrau@cygnus.com>
+
+	* simplelcddemo.conf.in: add import! statement for lcd::*
+	* t6963c-tcl.conf.in: ditto
+
+1999-08-31  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* simplelcddemo.conf.in: New demo File
+	* lcdcontroller.tk: Likewise
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-08-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* t6963c-tester.cxx (T6963C_tester ctor): Correct pmf construction.
+
+1999-08-17  Ron Unrau  <runrau@cygnus.com>
+
+	* t6963c-tester.h t6963c-tester.cxx: new files
+	* t6963c-tcl.conf.in: new file
+	* Makefile.am: build tester
+	* Makefile.in: regenerated
+	* arm-lcd-demo.conf.in: track config changes
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sidcomp: Removed directory.
+	* Makefile.am (AUTOMAKE_OPTIONS): No longer a dejagnu test directory.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Removed.
+	* config.h.in: Ditto.
+	* configure: Ditto.
+	* configure.in: Ditto.
+
+1999-06-28  Ron Unrau  <runrau@cygnus.com>
+
+	* arm-lcd-demo.conf.in: fix "connect->pin" and "load!" typo
+	* lcd-ex.c: set correct base address, write to "magic" register
+	  for demo purposes.
+
+1999-06-28  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (AUTOMAKE_OPTIONS): Add `dejagnu'.
+	(INCLUDES): Remove.
+	(noinst_PROGRAMS): Likewise.
+	(lcd_driver_SOURCES): Likewise.
+	(lcd_driver_DEPENDENCIES): Likewise.
+	(lcd_driver_LDADD): Likewise.
+	(TESTS): Likewise.
+	* Makefile.in: Regenerate.
+	* driver.cxx: Remove.
+	* sidcomp/base.exp: New file.
+
+1999-06-26  Ron Unrau <runrau@cygnus.com>
+
+	LCD controller testsuite
+
+	* driver.cxx: new file
+	* arm-lcd-demo-conf.in: new file
+	* lcd-ex.c: new file
+	* aclocal.m4: new file
+	* configure.in: new file
+	* configure: generated with autoconf
+	* Makefile.am: new file
+	* Makefile.in: generated with automake

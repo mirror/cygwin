@@ -1,0 +1,64 @@
+set test "sid configuration"
+sid_config_component_etc_test_with_tracing "stdio1.conf" \
+    "load [sid_find_file libconsoles.la] console_component_library" \
+    "sid-io-stdio" \
+    "connect-pin main perform-activity -> wrapper poll"
+pass $test
+
+set test "sid start"
+if {[sid_start "stdio1.conf"]} { pass $test } else { fail $test ; return }
+
+set test "find pin that does not exist"
+set pin [sid_cmd "sid::component::find_pin $victim pin"]
+if {$pin == ""} then { pass $test } else { fail $test }
+
+set test "connect to a pin that does not exist"
+set pin [sid_cmd "sid::pin::new"] 
+set status [sid_cmd "sid::component::connect_pin $victim input $pin"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "check connected pins on a pin that does not exist"
+set pin [sid_cmd "sid::component::connected_pins $victim input2"]
+if {$pin == ""} then { pass $test } else { fail $test }
+
+set test "check disconnecting pin on a pin that does not exist"
+set pin [sid_cmd "sid::pin::new"] 
+set status [sid_cmd "sid::component::disconnect_pin $victim input $pin"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "find bus that does not exist"
+set pin [sid_cmd "sid::component::find_bus $victim bus"]
+if {$pin == ""} then { pass $test } else { fail $test }
+
+set test "connect to an accessor that does not exist"
+set bus [sid_cmd "sid::bus::new"] 
+set status [sid_cmd "sid::component::connect_accessor $victim bus1 $bus"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "check connected bus on a bus that does not exist"
+set bus2 [sid_cmd "sid::component::connected_bus $victim bus2"]
+if {$bus2 == ""} then { pass $test } else { fail $test }
+
+set test "set relationships that does not exist"
+set status [sid_cmd "sid::component::relate $victim any $victim"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "set relationships to relate to a non existing component"
+set status [sid_cmd "sid::component::relate $victim relationship $victim"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "query relationships that does not exist"
+set comps [sid_cmd "sid::component::related_components $victim rel"]
+if {$comps == ""} then { pass $test } else { fail $test }
+
+set test "set non existing attribute to -1"
+set status [sid_cmd "sid::component::set_attribute_value $victim new -1" ]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "stdio1.conf" }

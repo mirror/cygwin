@@ -1,0 +1,127 @@
+* Name
+  sw-profile-gprof
+
+* Synopsis
+  This component accumulates profiling information from a target CPU and
+  generates a gprof-compatible histogram file.
+
+  Attributes: value-count value-min value-max value-attribute 
+		output-file output-file-endianness sample reset store
+  Pins: sample reset store
+  Relations: target-component
+  Shared library: libprof.la
+  Symbol: prof_component_library
+
+* Functionality
+ 
+  - Modelling
+    * This component emulates profiling routines embedded in target
+      programs, as if they were compiled with "gcc -pg".
+
+  - Behaviors
+    * Configuration
+      This component needs to be configured with the "target-component"
+      relation.  The first element in the relation will be used as the
+      target of profiling.  The "value-attribute" setting contains the
+      name of the target component's attribute that will be collected.
+
+      The "bucket-size" attribute configures the width of the
+      histogram buckets.  It is invalid to change the bucket size if
+      any samples have been accumulated (if "value-count" is nonzero).
+
+      The "output-file" setting gives the name of the eventual profiling
+      output file.  The "output-file-endianness" setting determines the
+      endianness of the gprof formatted output.
+
+    * Data gathering
+      Whenever the "sample" pin is driven, this component takes a single
+      sample of the configured target component's value attribute.  The
+      attribute is interpreted as a numeric string, and the resulting
+      number is accumulated in a big histogram, in the appropriate bucket.
+      The bucket is chosen by masking the number into "bucket-size"-wide
+      buckets.
+
+      If the target component is unset, or its target attribute does not
+      result in a valid numeric string, no sample is accumulated.  If a
+      sample was collected, "value-count" is incremented, and "value-min"
+      and "value-max" registers are updated.
+
+      Whenever the "reset" pin is driven, the entire accumulated
+      histogram and associated counters are discarded and a new count
+      will be started.  It is not necessary to drive this pin at
+      simulation startup.
+
+    * Profile generation
+      Whenever the "store" pin is driven, this component dumps the entire
+      accumulated histogram into a gprof (version 1) formatted file.  The
+      file's endianness is chosen based on the "target-file-endianness"
+      setting.  If it is unset, the target component's "endian" attribute
+      will be queried and used if valid.
+
+      The histogram is not automatically cleared after the store
+      operation.  This makes it possible to save multiple generational
+      profiling files to track history of a program cumulatively.  If
+      the "reset" pin is triggered after every "store", then separate
+      intervals of the program's execution may be profiled.
+
+  - SID conventions
+    * This is a supervisory component.
+    * It does not support state save/restore.
+    * It does not support triggerpoints.
+    * It does not detect reentrancy.
+    * It presents attributes in the "pin", "setting" and categories.
+
+* Environment
+
+  - Related components
+    * This component is typically connected to a CPU, and told to
+      monitor the CPU's program counter (pc) register.  Sampling may
+      be driven by any activity in SID, such as bus traffic (see
+      hw-probe-bus), or host or target schedulers (see sid-sched-*).
+      Perhaps the simplest way is to take a CPU PC sample every time
+      the CPU has completed a batch of instructions.
+
+	new sw-profile-gprof gprof
+	new SOME_KIND_OF_CPU cpu
+	relate gprof target-component cpu
+	connect-pin shutdown-manager output-5 -> gprof store
+	connect-pin foo output -> cpu step!
+	connect-pin foo output -> gprof sample
+	# Set sampling interval by number of CPU instructions.
+	set cpu step-insn-count 127
+
+  - Host system
+    * The amount of data tracked by this component may be very large,
+      if "bucket-size" is small and the target value has a large number
+      of distinct values.  Internally, a map or hash_map is used to
+      track each bucket, so it does not matter how sparse the target
+      value domain is.  However, at store time, each potential
+      bucket in the histogram, from "value-min" to "value-max", is
+      recorded, so sparse values may generate large blocks of zeroes in
+      the output.
+
+    * Since this component generates a histogram-type gprof file
+      instead of the arc-type file that "-pg"-compiled target programs
+      usually generate, gprof must be run with an option such as
+      "--flat-profile".  Call graph information is not collected.
+    	
+* SID interface reference
+  - low level:
+    * pins
+      - sample | input | any | data gathering
+      - reset | input | any | data gathering
+      - store | input | any | profile generation
+
+    * attributes
+      - value-count | register | decimal string | n/a | data gathering
+      - value-min | register | decimal string | n/a | data gathering
+      - value-max | register | decimal string | n/a | data gathering
+      - value-attribute | setting | name | "pc" | data gathering
+      - output-file | setting | file name | "gmon.out" | configuration
+      - output-file-endianness | setting | 0/1/2/little/big/unknown | unknown | configuration
+      - sample | pin | n/a | n/a | data gathering
+      - reset | pin | n/a | n/a | data gathering
+      - store | pin | n/a | n/a | profile generation
+
+    * relationships
+      - target-component | configuration

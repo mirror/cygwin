@@ -1,0 +1,62 @@
+2000-07-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* static/: Removed subdirectory.
+	* configure.in: Forget about it.
+	* configure: Regenerated.
+
+2000-07-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated to record new config/* dependencies.
+
+2000-05-22  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.in: Regenerate.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+
+1999-09-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): Define.
+	* Makefile.in: Regenerated.
+
+1999-07-19  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in (AC_CONFIG_SUBDIRS): Remove `ide'.
+	* configure: Regenerate.
+
+1999-05-13  Ron Unrau  <runrau@cygnus.com>
+
+	* ide: new directory
+	* configure.in: add ide directory
+	* configure: Regenerate.
+	   
+1999-04-13  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in (AC_CONFIG_SUBDIRS): Remove `dummy'.
+	* configure: Regenerate.
+
+1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Use new AC_CONFIG_AUX_DIR.
+	* configure: Regenerated.
+	* Makefile.in: Regenerated.
+
+1999-03-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDummy.cxx: Adapt to renamed COMPONENT_LIBRARY_MAGIC macro.
+
+1999-03-11  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (SUBDIRS): Remove .
+	* Makefile.in: Regenerated.
+
+
+
+
+
+
+
+	

@@ -1,0 +1,3 @@
+load_lib "docs.exp"
+
+doc_test parport hw-parport-ps/2

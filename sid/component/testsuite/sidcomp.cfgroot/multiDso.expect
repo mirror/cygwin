@@ -1,0 +1,2 @@
+multiDso.badconf:20: dlsym of console_component_library1 in component library dso *symbol*
+Configuration error.  Aborting.

@@ -1,0 +1,8 @@
+// -*- C++ -*-
+// Enumerate available sid component families. 
+
+#define SIDTARGET_ARM @sidtarget_arm@
+#define SIDTARGET_MIPS @sidtarget_mips@
+#define SIDTARGET_M32R @sidtarget_m32r@
+#define SIDTARGET_M68K @sidtarget_m68k@
+#define SIDTARGET_PPC @sidtarget_ppc@

@@ -1,0 +1,122 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(Makefile.in)
+AC_CONFIG_AUX_DIR(../../config)
+AM_INIT_AUTOMAKE(sidcomp,0.1)
+AM_CONFIG_HEADER(config.h:config.in)
+
+dnl automake support
+AM_MAINTAINER_MODE
+AC_LIBTOOL_WIN32_DLL
+AM_PROG_LIBTOOL
+AC_PROG_CXX
+AC_PROG_CXXCPP
+AC_EXEEXT
+AC_LANG_CPLUSPLUS
+
+dnl both varieties
+AC_CHECK_LIB(m, main)
+
+
+dnl allow user to set these 
+AC_ARG_WITH(tcl-lib,      [  --with-tcl-lib=FLAG     add FLAG to LIBS to find tcl library])
+AC_ARG_WITH(tcl-include,  [  --with-tcl-include=FLAG add FLAG to CPPFLAGS to find tcl headers])
+AC_ARG_WITH(tk-lib,       [  --with-tk-lib=FLAG      add FLAG to LIBS to find tk library])
+AC_ARG_WITH(tk-include,   [  --with-tk-include=FLAG  add FLAG to CPPFLAGS to find tk headers])
+AC_ARG_WITH(blt-lib,      [  --with-blt-lib=FLAG     add FLAG to LIBS to find blt library])
+AC_ARG_WITH(blt-include,  [  --with-blt-include=FLAG add FLAG to CPPFLAGS to find blt headers])
+
+
+dnl find some appropriate copy of tcl/tk.
+case "$host" in
+*-cygwin*) tcl_hostdir=win; tcl_libdot="" ;;
+*-freebsd* | *-netbsd* | *-openbsd* | *-sunos*) # BSD omits the dot
+           tcl_hostdir=unix; tcl_libdot="" ;;
+*)         tcl_hostdir=unix; tcl_libdot="." ;;
+esac
+
+dnl look in build tree
+if test -z "$with_tcl_lib" -a -z "$with_tcl_include"
+then
+  AC_MSG_CHECKING(tcl in build tree)
+  if test -d ../../../tcl; then
+     with_tcl_include="-I$srcdir/../../../tcl/generic"
+     with_tcl_lib="-L../../../tcl/$tcl_hostdir -ltcl8${tcl_libdot}0"
+  fi
+  AC_MSG_RESULT($with_tcl_lib)
+fi
+
+if test -z "$with_tk_lib" -a -z "$with_tk_include"
+then
+  AC_MSG_CHECKING(tk in build tree)
+  if test -d ../../../tk; then
+    with_tk_include="-I$srcdir/../../../tk/generic -I$srcdir/../../../tk/xlib"
+    with_tk_lib="-L../../../tk/$tcl_hostdir -ltk8${tcl_libdot}0"
+  fi
+  AC_MSG_RESULT($with_tk_lib)
+fi
+
+dnl AC_MSG_CHECKING(blt in build tree)
+dnl if test -d ../../../blt; then
+dnl    with_blt_include="-I../../../blt/include"
+dnl   with_blt_lib="../../../blt/$tcl_hostdir/libBLT.a"
+dnl fi
+dnl AC_MSG_RESULT($with_blt_lib)
+
+
+
+CPPFLAGS="$CPPFLAGS $with_tcl_include $with_tk_include $with_blt_include"
+
+case "$host" in
+
+*-cygwin*)
+dnl cygwin variety
+AC_CHECK_LIB(winspool, main)
+AC_CHECK_LIB(comdlg32, main)
+AC_CHECK_LIB(user32, main)
+AC_CHECK_LIB(gdi32, main)
+AC_CHECK_LIB(advapi32, main)
+AC_CHECK_LIB(kernel32, main)
+dnl While we're using a Win32-based instead of cygwin-based tcl interpreter,
+dnl we have to map file names.
+AC_CHECK_HEADERS(sys/cygwin.h)
+AC_CHECK_FUNCS(cygwin_conv_to_full_win32_path cygwin_conv_to_full_posix_path)
+AC_DEFINE(SIDTCL_MAP_CYGWIN_NAMES, 1, [Define if POSIX file names should be mapped to win32])
+;;
+
+*)
+dnl unix variety
+AC_PATH_XTRA
+CFLAGS="${CFLAGS} ${X_CFLAGS}"
+CPPFLAGS="${CPPFLAGS} ${X_CFLAGS}"
+LIBS="${X_LIBS} ${LIBS}"
+AC_CHECK_LIB(dl, dlopen)
+AC_CHECK_LIB(X11, XOpenDisplay)
+LIBS="${X_LIBS} ${X_PRE_LIBS} ${LIBS} ${X_EXTRA_LIBS}"
+;;
+
+esac
+
+
+LIBS="$with_tcl_lib $with_tk_lib $with_blt_lib $LIBS"
+
+if test -z "$with_tcl_lib"; then
+   AC_CHECK_LIB(tcl8${tcl_libdot}0, Tcl_Init,[],[
+      AC_CHECK_LIB(tcl, Tcl_Init)])
+fi
+if test -z "$with_tk_lib"; then
+   AC_CHECK_LIB(tk8${tcl_libdot}0, Tk_Init,[],[
+      AC_CHECK_LIB(tk, Tk_Init)])
+fi
+dnl if test -z "$with_blt_lib"; then
+dnl    AC_CHECK_LIB(BLT, Blt_Init)
+dnl fi
+
+dnl headers
+AC_CHECK_HEADERS(blt.h)
+AC_CHECK_HEADERS(tcl.h)
+AC_CHECK_HEADERS(tk.h)
+AC_CHECK_HEADERS(dirent.h)
+AC_CHECK_FUNCS(opendir)
+
+dnl Outputs
+AC_OUTPUT(Makefile)

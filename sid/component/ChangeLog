@@ -1,0 +1,353 @@
+2000-12-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in, configure: Complete the job of forgetting pcmcia.
+
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* pcmcia: Removed empty directory.
+	* configure.in, CATALOG: Forget about it.
+	* configure, Makefile.in: Regenerated.
+
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Removed AC_PROG_PATH(AR, ar).
+	* configure: Regenerated.
+	* aclocal.m4: Ditto.
+	* Makefile.in: Ditto.
+
+2000-10-27  Ben Elliston  <bje@redhat.com>
+
+	* CATALOG (sw-gloss-mips32/idt): Give correct description.
+	
+2000-09-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in, aclocal.m4: Regenerated.
+
+2000-09-12  matthew green  <mrg@redhat.com>
+
+	* Makefile.in: Regenerate.
+	* aclocal.m4: Likewise.
+	* configure: Likewise.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* aclocal.m4, configure: Regenerated.
+
+2000-07-14  Jeff Johnston <jjohnstn@redhat.com>
+
+	* configure.in: Changed so that timers directory is
+	configured rather than having its Makefile generated.
+	* configure: Regenerated.
+
+2000-05-23  Jeff Johnston  <jjohnstn@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Ditto.
+	* configure: Ditto.
+	* stamp-h.in: Ditto.
+
+2000-05-22  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.in, aclocal.m4, configure: Regenerate.
+
+2000-04-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-04-18  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure, aclocal.m4: Regenerated.
+
+2000-03-30  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in (AC_CONFIG_SUBDIRS): Add cgen-cpu.
+	(make_subdirs): Remove cgen-cpu.
+	* configure: Regenerated.
+
+2000-03-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* tconfig.in (SIDTARGET_PPC): Define.
+	* aclocal.m4: Regenerated.
+
+2000-03-21  Ben Elliston  <bje@redhat.com>
+
+	* configure.in (AC_OUTPUT): Do not emit a targetview/Makefile.
+	* configure: Regenerate.
+
+2000-02-22  Frank Ch. Eigler  <fche@redhat.com>
+
+	* CATALOG: Add tksm and hw-visual-* components.
+
+2000-02-22  matthew green  <mrg@redhat.com>
+
+	* CATALOG: Add hw-interrupt-cogent/cma222.
+
+2000-02-22  Ben Elliston  <bje@redhat.com>
+
+	* CATALOG: mrg co-maintains the interrupt component library.
+
+2000-02-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure: Correctly regenerated.
+
+2000-01-27  Ron Unrau  <runrau@redhat.com>
+
+	* configure.in: add mapper/testsuite
+	* configure: regenerated
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* audio: New subdirectory.
+	* configure.in (AC_CONFIG_SUBDIRS): Add it.
+	* CATALOG: Mention new audio-related components.  Become sole
+	sw-debug-gdb maintainer.
+	* Makefile.in, aclocal.m4, configure: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* siddoc.in: Convert $SID_EXEC_PATH to POSIX form if running on cygwin.
+	* configure.in: Substitute CYGWIN in .in files.
+	* configure: Regenerated.
+
+2000-01-11  Ben Elliston  <bje@cygnus.com>
+
+	* configure: Regenerate.
+	* aclocal.m4: Likewise.
+	* Makefile.in: Likewise.
+	* tconfig.in (SIDTARGET_M68K): Define.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	* configure: Regenerated
+	* configure.in: Removed parport/testsuite from AC_OUTPUT 
+
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* siddoc.in: Handle $prefix = "$exec_prefix/..".  Return the entire
+	component list for "siddoc -l".
+
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* CATALOG: Add mips32 entries.  Sort others.  Remove dummy.
+	* siddoc.in: New file: documentation reader.
+	* Makefile.am (bin_SCRIPTS): Install new file.
+	* Makefile.in: Regenerated.
+	* dummy: Removed directory.
+	* configure.in: Forget about dummy component.  Make "siddoc" script.
+	* configure: Regenerated.
+
+1999-11-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* CATALOG: Add an entry for hw-rtc-sid fictional rtc model.
+
+1999-11-25  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* CATALOG: Add an entry for runrau's t6963c model.
+
+1999-11-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* CATALOG: Rename "sid-control-gdb" -> "sw-debug-gdb",
+	"sw-io-stdio" -> "sid-io-stdio".
+
+1999-11-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* aclocal.m4: Regenerated.
+	* configure: Regenerated.
+	
+	* CATALOG: Update cgen-cpu maintainer list.
+
+1999-10-25  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* CATALOG: Mention new sw-profile-gprof component.
+	* configure.in: Build new sid/component/profiling directory.
+	
+	* aclocal.m4: Regenerated.
+	* configure: Regenerated.
+	
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Call CY_SIDTARGET_CHECK.  Generate tconfig.h.
+	* tconfig.in: New file.
+	* aclocal.m4: Regenerated.
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+
+1999-10-15  Ron Unrau  <runrau@cygnus.com>
+
+	* configure.in: enable building the hdl component
+	* configure: regenerated
+
+1999-10-08  Ben Elliston  <bje@cygnus.com>
+
+	* CATALOG: Add hw-memory-flash-am29 and family members.
+
+1999-09-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): Define.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Regenerated.
+	* configure: Regenerated.
+
+1999-08-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Check for select function.
+	(AC_CONFIG_SUBDIRS): Remove gdb.  
+	(make_subdirs, AC_OUTPUT): Configure gdb it at this level now.
+	* configure, config.in: Regenerated.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Check for socket-related libraries and functions.
+	* configure: Regenerated.
+	* Makefile.in: Regenerated.
+	* config.in: Regenerated.
+	* CATALOG: Record sid-io-socket* component types.
+
+1999-08-13  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in: Perform checks for libcurses more accurately.
+	* configure: Regenerate.
+	
+1999-08-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* CATALOG: Rename "sid-scheduler-host-precise" -> "...-accurate".
+
+1999-08-10  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* CATALOG: Add bridge-tk-blt.
+
+1999-08-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* CATALOG: Add hw-glue-probe-bus.  Simplify some descriptions.
+
+1999-07-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* CATALOG: Blame me for sid-control-gdb from now on.
+
+1999-07-22  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* configure.in: Added check header ../ucbinclude/sys/ioctl.h
+	* configure: Regenerate.
+
+1999-07-17  Ron Unrau  <runrau@cygnus.com>
+
+	* CATALOG: add gdb and lcd
+
+1999-07-17  Ron Unrau  <runrau@cygnus.com>
+
+	* configure.in: add gdb, which uses its own configure.in
+	* configure: regenerated
+
+1999-07-07  Ben Elliston  <bje@cygnus.com>
+
+	* CATALOG: Add new Dallas RTC components.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* testsuite: New directory.
+	
+	* configure.in: Rewrote to avoid needless recursive configuration.
+	* Makefile.am (SUBDIRS): Matching changes.
+	* stamp-h.in: New generated file.
+	* aclocal.m4: Regenerated.
+	* config.in: Regenerated.
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+
+1999-07-05  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* CATALOG: Added parallel port to second list.
+
+1999-06-30  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* CATALOG: Added parallel port.
+
+1999-06-27  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in: Add `lcd' component subdirectory.
+	* configure: Regenerate.
+
+1999-06-25  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in: Add `rtc' component subdirectory.
+	* configure: Regenerate.
+
+1999-06-24  Ben Elliston  <bje@cygnus.com>
+
+	* CATALOG: Add AT29 flash memory and PCMCIA library.
+
+	* configure.in: Add `pcmcia' component subdirectory.
+	* configure: Regenerate.
+
+1999-06-09  Ben Elliston  <bje@cygnus.com>
+
+	* CATALOG (sid-io-stdio): Rename from this ..
+	(sw-io-stdio): To this; documentation fix.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Add `glue' subdirectory.
+	* CATALOG: Added glue descriptions.
+	* configure: Regenerated.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* CATALOG: Updated with new component type names.
+
+1999-06-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* CATALOG: New file.
+
+1999-05-30  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in: Add `consoles' component subdirectory.
+	* configure: Regenerate.
+
+1999-05-20  Patrick Macdonald  <patrickm@cygnus.com>
+
+	* configure.in: add 'targetview' component subdirectory.
+	* configure: regenerated.
+
+1999-04-30  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in: Add `mmu' component subdirectory.
+	* configure: Regenerate.
+
+1999-04-20  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in: Add `interrupt' component subdirectory.
+	* configure: Regenerate.
+
+1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Use new AC_CONFIG_AUX_DIR.
+	* configure: Regenerated.
+	* Makefile.in: Regenerated.
+
+1999-03-17  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in: Add `timers' component subdirectory.
+	* configure: Regenerate.
+
+1999-03-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in (subdirs): Added sched component.
+	* configure: Rebuilt.
+
+1999-03-13  Ben Elliston  <bje@cygnus.com>
+
+        * Makefile.am (SUBDIRS): Remove .
+        * Makefile.in: Regenerate.
+
+1999-03-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: New file.
+	* Makefile.am: New file.
+	* Makefile.in: New gneerated file.
+	* aclocal.m4: New generated file.
+	* configure: New generated file.

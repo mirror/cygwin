@@ -1,0 +1,360 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-08-10  Frank Ch. Eigler  <fche@redhat.com>
+
+	* components.cxx (IntController<> ctor): Move it similarly.
+	* components.h: ... to here.
+
+2000-07-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* components.cxx (drive_irq_interrupts, drive_fiq_interrupts,
+	drive_interrupts, reset): Move IntController<> virtual functions
+	from here ...
+	* components.h: ... to here.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* components.h: Import more std:: identifiers.
+
+2000-05-10  Frank Ch. Eigler  <fche@redhat.com>
+
+	* components.h (operator <<,>>): Move inline function templates...
+	* component.cxx: ... to here.  Remove controller-feature tests.
+
+2000-03-14  matthew green  <mrg@redhat.com>
+
+	* components.cxx: Move most of the common code in the arm and cogent
+	controllers here and components.h. New `template<class bus_size> class
+	IntController's constructor and several generic functions for use by
+	controllers: drive_irq_interrupts(), drive_fiq_interrupts(),
+	drive_interrupts(), and reset().
+	* components.h: Move arm and cma222 specific classes to their own
+	header files. Define `template<class bus_size> class IntController',
+	the internal `interrupt_bus' and `interrupt_lines' classes, the
+	features and interfaces available.  Move all watchpoint, triggerpoint
+	and save/restore support here.  The << and >> operators defined
+	here are useful for any interrupt component.
+	* arm.cxx: Remove the code that is now in components.cxx and
+	components.h.
+	* cma222.cxx: Likewise.
+	* arm.h: New header for arm/ref controller, defining class 
+	armIntController with the new scheme.
+	* cma222.h: New header for cogent/cma222 controller, defining class
+	cma222IntController with the new scheme.
+	* hw-interrupt-arm_ref.txt: Account for split and renamed irq-registers
+	and fiq-registers. fiq-enable-register was already renamed. Note that
+	the IRQ and FIQ registers are available via different banks.
+	* hw-interrupt-cogent_cma222.txt: Account for renamed irq-registers.
+
+2000-02-29  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated with correct automake.
+
+2000-02-22  matthew green  <mrg@redhat.com>
+
+	* Makefile.am: Add new tests.
+	* Makefile.in: Regenerate.
+
+2000-02-21  matthew green  <mrg@redhat.com>
+
+	* Makefile.am (libinterrupt_la_SOURCES): Add cma222.xxx,
+	components.cxx.
+	(pkgdata_DATA): Add hw-interrupt-cogent_cma222.txt.
+	* Makefile.in: Regenerate.
+	* components.cxx: New file, containing the component_library from
+	arm.cxx and its members.
+	* components.h: Header file for above.
+	* arm.cxx: Move initialisation to components.cxx.
+	* cma222.cxx: New file.
+	* hw-interrupt-cogent_cma222.txt: Likewise.
+	* hw-interrupt-arm_ref.txt: Fix error in configuration file
+	fragment.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (operator <<,>>): Simplify.  Save/restore pin values.
+
+1999-12-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (interrupt_line::driven): Call base class' driven() too.
+	(armIntController ctor): Export all pins as watchable attributes.
+	Export registers as read/write attributes.
+
+1999-12-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (armIntController ctor): Categorize watchable registers.
+
+1999-12-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (driveOutputs): New function.  Send output interrupt
+ 	signal edges.  Check triggerpoints.
+	(fastInterrupt): Defer to new function.
+	(word_write, word_read): Ditto.
+	(raiseInterrupt, clearInterrupt): Ditto.  Don't use reference args.
+	(interrupt_line::driven): Don't check triggerpoints again.
+	(drive_irqpin,drive_fiqpin): Removed functions.
+ 
+	* hw-interrupt-arm_ref.txt: Added note on differences between this
+	component and PID7T hardware.
+	* Makefile.am (DEJAGNUTESTS): Add docs & monkey tests.
+	* Makefile.in: Regenerated.
+	
+1999-12-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (operator >>): Don't generate pin traffic during restore.
+
+1999-12-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (armIntController ctor): Export watchable pseudo-registers
+	as attributes.
+	* hw-interrupt-arm_ref.txt: Reworked according to template.
+
+1999-12-10  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx (armIntController::triggerpoint_manager): New member.
+	(armIntController::pin_factory): New method.
+	(armIntController::pin_junkyard): Likewise.
+	(armIntController ctor): Initialise triggerpoint_manager. Add
+	watchables "interrupt", "fast-interrupt", "irq-raw-status",
+	"irq-enable-register", "fiq-raw-status", "fiq-enabled".
+	(armIntController::interrupt_line::driven): Insert a checkpoint.
+	(armIntController::fastInterrupt): Likewise.
+	(armIntController::reset): Likewise.
+	(armIntController::bus_interface::word_write): Likewise.
+	* hw-interrupt-arm_ref.txt: Document triggerpoint support.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-interrupt-arm_ref.txt: New file.  Renamed from
+	* README: Deleted.
+	* Makefile.am: Install new file.
+	* Makefile.in: Regenerated.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (compInterruptDelete): Use dynamic_cast<>.
+
+1999-11-17  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* arm.cxx: Removed extra declaration of host_int_4.
+	(drive_irqpin): New method.
+	(drive_fiqpin): New method.
+	(bus_interface::word_write): Swaped irqPin drives.
+	(operator <<): Cleanup.
+	(operator >>): Cleanup and added calls to new methods.
+
+1999-11-01  Permaine Cheung  <pcheung@cygnus.com>
+
+	* README: Adding directional arrow on connect-pin commands in
+	Environment section.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx: Define hw-interrupt-arm/ref only #if SIDTARGET_ARM.
+	* Makefile.in: Regenerated.
+
+1999-10-10  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* arm.cxx (armIntController ctor): Change order of initialization.
+	
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (word_write, word_read, driven): Take value, not const-ref.
+	(fastInterrupt, reset): Same.
+
+1999-10-07  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* arm.cxx (driven): Removed try and catch
+
+1999-10-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (armIntController ctor): Use make_numeric_attribute
+	instead of string-stream hack for register attributes.
+
+1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Update for bool/number notation changes.
+
+1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (*): Use host_int_X, not compiler_int_X.
+
+1999-09-13  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx (armIntController::raiseInterrupt): Invert sense of the
+	value carried across the interrupt pin.
+	(armIntController::clearInterrupt): Likewise.
+	(armIntController ctor): Add "interrupt" and "fast-interrupt"
+	pin-watching attributes.
+	* Makefile.am (DEJAGNUTESTS): Define.
+	(checkme): New target.
+	* Makefile.in: Regenerate.
+	* README: Update documentation.
+
+1999-09-01  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* arm.cxx (save_state): Clean up.
+	(operator <<): Likewise.
+	(operator >>): Likewise.
+
+1999-08-24  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README: Docs fixes.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (operator >>): Use ANSI setstate() instead of setf().  
+	Remove error messages.
+
+1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
+
+	* arm.cxx: (*) Change big_int_N and little_int_N so that
+	the default operations all use their integer values.
+
+1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* arm.cxx: Introduce proper namespace usage.
+
+1999-07-25  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* arm.cxx: Add exception handling.
+
+1999-07-16  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* arm.cxx: Introduced state save & restore.
+	  Added four methods namely save_state, restore_state,
+	  operator << , and operator >>.
+	  Changed inheritance from no_attribute_component to 
+	  fixed_attribute_map_component.
+	
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* testsuite: Removed directory.
+	* Makefile.am (SUBDIRS): Don't recurse into it.
+	* Makefile.in: Regenerated.
+	* acconfig.h: Removed.
+	* aclocal.m4: Ditto.
+	* config.in: Ditto.
+	* configure: Ditto.
+	* configure.in: Ditto.
+	* stamp-h.in: Ditto.
+
+1999-06-25  Ben Elliston  <bje@cygnus.com>
+
+	* README: Rewrite using new documentation template.
+
+1999-06-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (bus_interface): Remove address type declaration from
+	word_bus template.
+
+1999-06-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (compInterruptDelete): New function.
+	(interrupt_component_library): Register it.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (compTimer*): Renamed functions to compInterrupt*.
+	Renamed type "interrupt-arm-ref" -> "hw-interrupt-arm/ref".
+
+1999-05-25  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx (armIntController::word_bus): Use 4 byte addressing, not
+	one byte.
+	(armIntController::word_bus::word_read): Likewise. Catch addresses
+	correctly--offsets should have been expressed in hex.
+	(armIntController:word_bus::word_write): Likewise.
+
+1999-05-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* aclocal.m4: Regenerated.
+
+1999-05-12  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx (armIntController::bus_interface): Correct the order
+	of template parameters to word_bus<>.
+	(armIntController ctor): Initialise `bus' and register it.
+	(armIntController::interrupt): Rename to `raiseInterrupt'.
+	(armIntController::clearInterrupt): New method.
+	(armIntController::bus): New member; needed to name a bus.
+	(armIntController::interrupt_line::driven): Raise or clear the
+	interrupt depending on the value carried on the pin.
+	(armIntController::bus_interface::word_write): Minor bug fixes.
+
+1999-05-11  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx: Allay minor warnings.
+
+1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.cxx (interrupt_component_library): DLLEXPORT it.
+	* configure.in: Be win32-dll-capable.
+	* configure: Regenerated.
+	* config.in: Ditto.
+	* aclocal.m4: Regenerated for new libtool.
+	* Makefile.in: Ditto.
+
+1999-05-04  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (SUBDIRS): Add.
+	* Makefile.in: Regenerate.
+	* configure.in (AC_CONFIG_SUBDIRS): Add `testsuite'.
+	* configure: Regenerate.
+
+1999-04-26  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx (armIntController::interrupt): Make bit testing more
+	obvious to the reader.
+	(armIntController::bus_interface::word_write): Likewise.
+
+1999-04-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (LDFLAGS): Add -no-undefined
+	* Makefile.in: Regenerated.
+
+	* arm.cxx (armIntController ctor): Qualify member function
+	pointers.
+
+1999-04-21  Ben Elliston  <bje@cygnus.com>
+
+	* arm.cxx (armIntController::armIntController): Generate a string
+	object from `i' in a clean way.
+
+1999-04-20  Ben Elliston  <bje@cygnus.com>
+
+	* README: New file.
+	* arm.cxx: Ditto.
+	* configure.in: Ditto.
+	* Makefile.am: Ditto.
+	* Makefile.in: Generate.
+	* aclocal.m4: Ditto.
+	* config.in: Ditto.
+	* configure: Ditto.
+	* stamp-h.in: Ditto.

@@ -1,0 +1,36 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+        * configure, aclocal.m4, Makefile.in: Regenerated.
+
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * configure: Regenerated.
+        * aclocal.m4: Ditto.
+        * Makefile.in: Ditto.
+
+2000-09-22  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in, aclocal.m4, configure: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (checkme): Remove recursion.
+	* Makefile.in, aclocal.m4, configure, stamp-h.in: Regenerated.
+	
+2000-07-14  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* compTIMERS.cxx: Added header files and namespace information
+	for when dealing with a platform that has no subdirectory.
+
+2000-07-04  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Changed to configure platform-specific files.
+	* configure: Regenerated.
+	* Makefile.am: Changed to build sub-directory timer libraries.
+	* Makefile.in: Regenerated.
+	* arm.cxx: Moved to arm7t directory.
+	* README: Ditto.
+	* hw-timer-arm_ref.txt: Ditto.
+	* config.in: New file.
+	* stamp-h.in: Ditto.
+	* compTIMERS.cxx: Common code to register timer components.

@@ -1,0 +1,39 @@
+* Name
+  sw-glue-attribbank
+
+* Synopsis
+  This component stores an arbitrary collection of attribute name/value pairs.
+
+  Attributes: *
+  Shared library: libglue.la
+  Symbol: glue_component_library
+
+* Functionality
+ 
+  - Modelling
+    * It stores copies of all incoming attribute values indefinitely.
+
+  - Behaviors
+    * Attribute storage
+      This component accepts all data values.  It returns copies verbatim.
+      Any unknown attribute name, when read, returns the empty string.
+
+  - SID conventions
+    * This is a functional component.
+    * It does not support state save/restore, since even the
+      "state-snapshot" attribute is not assigned any special semantics. 
+
+* Environment
+  - Related components
+    * This component may be used in unit tests as a passive model of
+      another component.  This is especially useful if the other component 
+      is complicated to configure and to use in a testing environment, 
+      and if its attributes only are of interest.
+  - Host system
+    * If many attribute names or lengthy attribute values are stored,
+      this component may use much host memory. 
+
+* SID interface reference
+  - low level:
+    * attributes
+      - any | no category | any | n/a | attribute storage

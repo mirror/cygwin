@@ -1,0 +1,68 @@
+* Name
+  hw-glue-sequence hw-glue-sequence-1 hw-glue-sequence-2 hw-glue-sequence-8
+
+* Synopsis
+  This component family distributes pin signals from a source to a sequence 
+  of sinks.
+
+  Attributes: num-outputs state-snapshot input
+  Pins: input output-NNN
+  Shared library: libglue.la
+  Symbol: glue_component_library
+
+* Functionality
+ 
+  - Modelling
+    * This component resembles a fan-out net in a circuit, or a very fast
+      shift register.
+    * The number of outputs is a matter of configuration.  For the "-1", "-2",
+      and "-8" family members, the num-outputs is initialized. 
+
+  - Behaviors
+    * Configuration
+      When the "num-outputs" is written-to, this
+      component adjusts its list of output pins, named "output-0",
+      "output-1", and so on.  New ones may be generated or old ones may
+      disappear.
+
+    * Data forwarding
+      Each input signal on the "input" pin is forwarded to
+      all external pins connected to the "output-0" pin, then
+      "output-1", and so on, in sequence, for all configured outputs.
+
+  - SID conventions
+    * This is a functional component.
+    * It supports state save/restore, though state is minimal (the number 
+      of outputs).
+    * It supports triggerpoints by watching the input pin and the 
+     "num-outputs" attribute.
+    * It limits recursion on the "input" pin.
+    * It presents attributes in the "pin", "setting", and "watchable" categories.
+
+* Environment
+  - Related components
+    * This component may be used as an initialization sequencer in a
+      scenario with ordering dependencies.  See this configuration fragment:
+
+	new hw-glue-sequence reset-manager
+	new SOME_KIND_OF_CPU cpu
+	new SOME_KIND_OF_LOADER loader
+	set reset-manager num-outputs 3
+	connect-pin reset-manager input <- main running
+	connect-pin reset-manager output-0 -> cpu reset
+	connect-pin reset-manager output-1 -> loader load!
+
+    * It could be used as a central point to distribute a many-to-many
+      broadcast signal.
+
+* SID interface reference
+  - low level:
+    * pins
+      - input | input | any | data forwarding
+      - output-NNN | output | any | data forwarding
+	See above.
+
+    * attributes
+      - state-snapshot | no category | opaque string | n/a | state save/restore
+      - num-outputs | setting, watchable | small positive number | 0 | configuration
+      - input | pin, watchable | n/a | n/a | data forwarding

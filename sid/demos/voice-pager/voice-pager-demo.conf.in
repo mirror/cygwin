@@ -1,0 +1,38 @@
+new hw-rtc-ds1742 rtc_1742
+new hw-memory-ram/rom-basic rtcmem
+set rtcmem size 2048
+connect-bus rtc_1742 memory-bus rtcmem read-write-port
+#
+load libt6963c.la t6963c_component_library
+new hw-lcd-t6963c-0101 lcd
+new bridge-tk panel
+set panel load! @srcdir@/lcd.tcl
+set panel load! @srcdir@/voice-pager.tcl
+connect-pin main perform-activity -> panel !event
+#lcd settings
+set lcd display-width 32
+set lcd display-height 6
+set lcd refresh-period-msec 100
+# display size is in pixels - ie. font-width*display-height
+set panel bits-per-pixel 2
+set panel width 256
+set panel height 48
+set panel background-color "#6fa700"
+# lcd <-> sched connections: using host-sched subscription slot#4
+set host-sched 4-regular? 1
+set host-sched 4-time 1000
+connect-pin host-sched 4-event -> lcd refresh-sync-event
+connect-pin host-sched 4-control <- lcd refresh-sync-control
+# connect lcd
+new hw-memory-ram/rom-basic d-ram
+set d-ram size 65535
+connect-bus lcd external-ram d-ram read-write-port
+connect-pin lcd row-col -> panel row-col
+connect-pin lcd FR -> panel FR
+# rtc<->sched connection: use host-sched subscription slot #9
+set host-sched 9-regular? 1
+set host-sched 9-time 1000
+connect-pin host-sched 9-event -> rtc_1742 clock
+# Memory map
+connect-bus mapper rtc_1742:[0xa00000-0xa01000,1,1] rtc_1742 read-write-port
+connect-bus mapper lcd:[0xa01200-0xa01201,1,1] lcd bus

@@ -1,0 +1,67 @@
+proc sid_check_err {filename} {
+    global spawn_id
+    global TOOL_OPTIONS
+    global prefix
+    global srcdir
+    global test
+
+    set build_ltldpath [join [glob "../*"] ":"]
+    set install_ltldpath "$prefix/lib/sidcomp"
+    set ltldpath ":$build_ltldpath:$install_ltldpath:"
+
+    if {[string match "*static*" $TOOL_OPTIONS]} then {
+        set mksidconf [sid_find_file "mksidconf"]
+        system $mksidconf -static $file
+        regsub "(.*).conf" $file {./\1} sid
+        regsub "(.*).conf" $file {\1.sconf} file
+    } else {
+        set sid [sid_find_file "sid" "sid.exe"]
+    }
+
+    global timeout
+    set last_timeout $timeout
+    set timeout 30
+    set expfile [open "$srcdir/sidcomp.cfgroot/$filename.expect" r]
+    catch {exec env SID_LIBRARY_PATH=$ltldpath $sid "$srcdir/sidcomp.cfgroot/$filename.badconf"} result
+
+    set output [split $result \n]
+    for {set i 0} {$i < [llength $output] } {incr i} {
+       set line [lindex $output $i]
+	if {[string first $filename $line] != "-1"} {
+	    set wholeline [split $line /]
+	    set linelength [llength $wholeline]
+	    set startindex [lsearch $wholeline $filename*]
+	    set resultline [lindex $wholeline $startindex]
+	    #             set lastindex [expr $linelength - 1]
+	    if {$startindex != [expr $linelength -1] } then {
+                for {set j [expr $startindex + 1]} {$j < $linelength } {incr j} { 
+                    append resultline /[lindex $wholeline $j]
+                }
+	    }
+	    #            gets rid of the path
+	    if { [gets $expfile  expectline] >= 0 } then {
+                if {[string match $expectline $resultline] == "0"} then {
+		    fail "$test - mismatch on line [expr $i + 1]\n  expected $expectline\n  result   $resultline"
+		    close $expfile
+		    return
+                }
+	    } else {
+                warning "can't get next line in expected file"
+                fail $test; return
+	    }  
+	}
+    }
+    close $expfile
+    verbose "$test - matched $i lines"
+    if { $i == [llength $output] } then { pass $test }
+    set timeout $last_timeout
+}
+
+
+foreach file [glob -nocomplain "$srcdir/sidcomp.cfgroot/*.badconf"] {
+   set wholepath [split $file /]
+   set name [lindex $wholepath [expr [llength $wholepath] -1 ]]
+   set conffile [lindex [split $name .] 0]
+   set test "testing sid with bad config file $conffile.badconf"
+   set id [sid_check_err $conffile]
+}

@@ -1,0 +1,6 @@
+load_lib "docs.exp"
+
+doc_test cgen-cpu/arm7t hw-cpu-arm7t
+doc_test cgen-cpu/m32r hw-cpu-m32r/d
+
+

@@ -1,0 +1,215 @@
+2000-11-16  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (AM_CXXFLAGS): Add -DSID_STATIC conditionally.
+	* mainDynamic.cxx (lt_preloaded_symbols,!SID_STATIC): Make stub table.
+	* Makefile.in: Regenerated.
+
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure: Regenerated.
+	* aclocal.m4: Ditto.
+	* Makefile.in: Ditto.
+
+2000-07-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mainDynamic.cxx (main): Print usage message if sid is invoked with
+	no arguments.
+
+2000-07-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in: Define SID_STATIC automake var if --disable-shared.
+	* Makefile.am: If SID_STATIC, --dlpreopen all nearby component
+	libraries when linking sid executable.
+	* configure, Makefile.in: Regenerated.
+
+2000-05-22  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.in: Regenerate.
+
+2000-02-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mainDynamic.cxx (main): Delete cfgroot even on __CYGWIN__.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDynamic.cxx (usage): New function.
+	(main): Use getopt.  Process several new command line options.
+	* configure.in: Look for getopt.h.
+	* configure, config.in: Regenerated.
+
+1999-12-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Don't look redundantly for libstdc++.
+	* configure, config.in: Regenerated.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDynamic.cxx (sid_{pre,post}_{configure,run}): New debugging
+	hook functions.
+	(main): Call them at the appropriate points.  Drive output pins with
+	sentinel values.
+	(sid_breakpoint): Zap.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+
+1999-09-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): Define.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Regenerated.
+	* configure: Regenerated.
+
+1999-08-16  Ian Carmichael  <iancarm@cygnus.com>
+
+	* mainDynamic.cxx: sid::component members renamed.
+
+1999-08-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* sid.conf.in: Deleted.
+	* configure.in: Forget about it.
+	* configure: Regenerated.
+	* Makefile.in: Regenerated.
+
+1999-07-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDynamic.cxx (main): Don't delete cfgroot on __CYGWIN__.
+
+1999-06-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDynamic.cxx (config_component_library): Don't DLLIMPORT
+	symbol from statically linked library.
+
+1999-06-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDynamic.cxx (main): Delete cfgroot via its component_library.
+
+1999-06-09  Ian Carmichael  <iancarm@cygnus.com>
+
+	* mainDynamic.cxx (main): Delete cfgroot component before exit.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDynamic.cxx (main): Updated with new component type names.
+	* sid.conf.in: Ditto.
+
+1999-05-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDynamic.cxx: Don't #include "compConfig.h".
+	* Makefile.am (INCLUDES): Don't include -I.../cfgroot.
+	* Makefile.in: Regenerated.
+
+1999-05-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDynamic.cxx (main): Use cfgroot's "config-file!" attribute
+	to load configuration file.
+
+1999-05-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* aclocal.m4: Regenerated.
+
+1999-05-13  Ron Unrau  <runrau@cygnus.com>
+
+	* mainDynamic.cxx: Configure via API vs pin
+	* Makefile.am: includes now include cfgroot 
+	* Makefile.in: regenerate
+
+1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDynamic.cxx: DLLIMPORT config_component_library.
+	(main): Drive cfgroot's <<run>> pin without value.
+	
+	* Makefile.am: Link in libconfig.la [cfgroot] statically.
+	* configure.in: Look for AR tool.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Regenerated for new libtool.
+	* configure: Regenereated.
+
+	* sid.conf.in: Use .la component DSO names.
+
+1999-04-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDynamic.cxx: Don't #include Scheduler.h.
+
+1999-04-19  Doug Evans  <devans@casey.cygnus.com>
+
+	* mainDynamic.cxx (sid_breakpoint): New function.
+
+1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Use new AC_CONFIG_AUX_DIR.  Stop looking for -ldl.
+	* configure: Regenerated.
+	* Makefile.in: Regenerated.
+
+1999-03-10  Ron Unrau  <runrau@cygnus.com>
+
+	* mainDynamic.cxx: incorporate revised pin API
+
+1999-02-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDynamic.cxx (main_component): Remove all traces.
+	(config_parser): Ditto.
+	(main): Use external cfgroot_component instead of above.
+	* Makefile.am: Refer to ../compConfig for linked-in cfgroot_component.
+	* Makefile.in: Rebuilt.
+
+1999-02-21  Ron Unrau  <runrau@cygnus.com>
+
+	* Use Scheduler
+
+1999-02-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am: Switch to foreign mode.  Adjust for automake 1.4.
+	* configure.in: Adjust for autoconf 2.13.
+	* Makefile.in: Rebuilt.
+	* aclocal.m4: Rebuilt.
+	* configure: Rebuilt.
+	* config.in: Rebuilt.
+	
+1999-02-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDynamic.cxx (main_component): Add "running" pin to indicate
+	post-configuration state.  Use fixed_pin_map mix-in.
+	(set_attribute): Read back attribute values just written, to confirm
+	acceptance.
+	
+1998-12-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (INCLUDES): Added . and ../include.
+	* configure.in: Removed compulsory checks.  Use local config.h.
+	* Makefile.in: Rebuilt.
+ 	* configure: Rebuilt.
+	* config.in: Generated new file
+	* acconfig.m4: New file.
+	* mainDynamic.cxx (register_la): Load libtool-style ".la" DSO.
+	Experimental. 
+	(parse_command): Call it for "dso" command.
+	
+1998-12-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Look for strstream.h.
+	* configure: Rebuilt.
+	* mainDynamic.cxx (consume): Chomp inter-word space individually.
+
+1998-12-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* mainDynamic.cxx (main_component): Use new stub functions from
+ 	sidcomputil.h to mix in unused sub-APIs.
+	(register_dso): Return true for success.
+	(instantiate_component): Return true for success.
+	(connect_pin): Return true for success.
+	(connect_bus): Return true for success.
+	(set_attribute): New function.
+	(config_parser): New class for parsing configuration file.  Use
+ 	"->"/"<-"/"<->" for pin connection directions.  Support attribute
+ 	setting.
+	(main): Run simulator only if configuration was successful.
+	(sid.conf.in): Removed memory test parts.
+	
+	* aclocal.m4: New file to enable local configuration.
+	* configure.in: Make script self-contained.
+	* Makefile.in: Rebuilt.
+	* configure: Rebuilt.
+

@@ -1,0 +1,177 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Devices.h: Import std::.
+	* driver.cxx: Ditto.
+
+2000-02-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Devices.cxx (DevicesDelete): Guard against dynamic_cast after delete.
+
+2000-01-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Devices.h (DeviceDriver ctor): Initialize pointer member.
+	* driver.cxx (main): Check at least one sid error return value.
+
+1999-11-29  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (noinst_LTLIBRARIES): Remove.
+	(libuart_test_la_SOURCES): Likewise.
+	(libuart_test_la_LDFLAGS): Likewise.
+	(uart_driver_SOURCES): Add Devices.cxx, Devices.h, uart-def.h.
+	(uart_driver_DEPENDENCIES): Drop reliance on libuart-test.la.
+	(uart_driver_LDADD): Likewise.
+	* Makefile.in: Regenerate.
+
+	* driver.cxx (main): Remove extraneous output.
+
+	* test-uart.conf.in: Remove.
+	* test2-uart.conf.in: Likewise.
+	* uart-m32r.conf.in: Likewise.
+	* hello.c: Likewise.
+	* hello.s: Likewise.
+	* hello.x: Likewise.
+	
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* driver.cxx (main): Drive output pin with sentinel value.
+	* Devices.cxx (write): Ditto.
+	(DevicesDelete): Use dynamic_cast<>.
+
+1999-11-08  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (check_PROGRAMS): Add.
+	(noinst_PROGRAMS): Remove.
+	* Makefile.in: Regenerate.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-10-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* driver.cxx: Changed types of i and old_count to unsigned int.
+	Changed parse_attribute<int> to parse_attribute<unsigned int> if
+	arg2 of parse_attribute() is either i or old_count.
+	* Devices.cxx (run): Changed type of i and j to unsigned.
+	* Devices.h (class WriteTrigger): Changed return type of method
+	init to void.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Devices.cxx (echo): Take value, not const-ref.
+	* Devices.h (driven): Same.
+	(*): Corresponding changes.
+
+1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Devices.h (ldisc): Make member unsigned to activate sidutil
+ 	attribute conversions.
+	* driver.cxx (main): Update attribute accesses for number notation
+ 	changes.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-08-16  Ian Carmichael  <iancarm@cygnus.com>
+
+	* driver.cxx: sid::component members renamed.
+
+1999-08-17  Ron Unrau  <runrau@cygnus.com>
+
+	* Devices.cxx: get rid of compiler warnings
+
+1999-08-13  Ben Elliston  <bje@cygnus.com>
+
+	* driver.cxx: Emit less output in normal conditions.
+
+1999-07-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (LTLIBRARIES): Don't install libuart-test.la.
+	* Makefile.in: Regenerated.
+
+1999-07-25  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Devices.h: Exception handling
+
+1999-07-10  Faisal khoja  <fkhoja@cygnus.com>
+
+	* driver.cxx (main): Introduced few lines to test saving & 
+	restoring state.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Removed.
+	* configure: Ditto.
+	* configure.in: Ditto.
+
+1999-06-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Devices.cxx (intrHandler, run): Allay some printf warnings.
+	* drivers.cxx (main): Ditto.
+
+1999-06-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* driver.cxx (main): Use new listAttrNames(category) call to
+	list/query registers and pins.
+
+	* test2-uart.conf.in: Correct component reference typos.
+
+1999-06-08  Ron Unrau  <runrau@cygnus.com>
+
+	* driver.cxx: Do not use UART_ADDRESS as base (no mapper is used).
+	* Devices.cxx: ditto
+	* test-uart.conf.in: track new component naming convention
+	* test2-uart.conf.in: ditto
+	* uart-m32r.conf.in: ditto
+
+1999-06-08  Ron Unrau  <runrau@cygnus.com>
+
+	* driver.cxx: add pin get/set attribute tests
+
+1999-05-28  Ron Unrau  <runrau@cygnus.com>
+
+	* Populate with tests that were originally in component/uart
+	* aclocal.m4: new file
+	* ChangeLog: new file
+	* configure.in: new file
+	* configure: generate
+	* Devices.cxx: new file
+	* Devices.h: new file
+	* driver.cxx: new file
+	* hello.[csx]: new files
+	* Makefile.am: new file
+	* Makefile.in: generate
+	* test-uart.conf.in: new file
+	* test2-uart.conf.in: new file	
+	* uart-m32r.conf.in: new file
+	* uart-def.h: new file

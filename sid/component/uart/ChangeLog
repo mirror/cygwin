@@ -1,0 +1,441 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Uart.h: Import and use more std:: identifiers.
+	* Uart.cxx (make_attribute, parse_attribute): Ditto.
+
+2000-02-22  matthew green  <mrg@redhat.com>
+
+	* Uart.cxx: string()ify the 2nd argument to add_attribute_ro_value().
+
+2000-02-08  Ben Elliston  <bje@redhat.com>
+
+	* hw-uart-ns16550.txt (Synopsis): Add state-snapshot attribute.
+	(SID Interface Reference): Likewise.
+
+2000-01-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (Uart ctor): Initialize more members.
+	(Uart_ctor_2): Expose INTR pin.
+	* hw-uart-ns16550.txt: Mentioned target-view attributes.
+	* Makefile.in: Regenerated.
+
+2000-01-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (Uart ctor): Add component-gui reference attribute to
+	"hw-visual-tty".
+	* hw-uart-ns16550.txt: Document it.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-uart-ns16550.txt: New file.  Renamed from
+	* README: Removed.
+	* Makefile.am: Install new file.
+	* Makefile.in: Regenerated.
+
+1999-12-07  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README: Minor rewording.
+
+1999-12-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Document bus access width restriction.
+
+1999-12-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Document new attributes.
+
+1999-12-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (in_fifo_length, out_fifo_length): New members.
+	Replace UART_IN/OUT_FIFO_DEPTH manifests throughout.
+	(operator <<,>>): Save/restore them.
+	(Uart ctor): Export them as attributes.
+	(update_fifo_lengths): New function.
+	* Uart.h: Matching declaration changes.
+	(in_fifo, in_errs, out_fifo): Make these vector<>s.
+
+1999-11-25  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README: Added timeout to list of attributes at
+	the front of the file (was in table at bottom already).
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (reset): Take unused arg.  Update callers.
+	(UartDelete): Use dynamic_cast<>.
+	* Uart.h: Matching changes.
+
+1999-11-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (operator <<): Call recall() on output pins.
+
+1999-11-17  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Uart.h: Include <sidwatchutil.h>.
+	Removed extra decl. of host_int_1 and host_int_4.
+	Added trigger point support. Comment a few places.
+	(pin_factory): New method.
+	(pin_junkyard): Likewise.
+	* Uart.cxx: Added triggerpoint support.
+ 	(operator  <<): Cleanup and added save state for sio_framing_p,
+	rxrdy, and txrdy data members.
+	(operator >>): Likewise. Added call to method busWriteHandler.
+	Restored intr pin.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-10-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Uart.cxx (Uart constr): reorder initialization of busif and sin.
+	(operator >>): Changed types of i, j and k from int to unsigned.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (busReadHandler): Take value, not const-ref.
+	(busWriteHandler, sinHandler): Same.
+	* Uart.h (*): Corresponding changes.
+
+1999-10-07  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Uart.h (driven): Removed try & catch
+
+1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (*): Use host_int_X, not compiler_int_X.
+	* Uart.h, testsuite/Devices.cxx: DItto.
+
+1999-09-07  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README:  Minor grammatical changes. 
+
+1999-09-02  Ben Elliston  <bje@cygnus.com>
+
+	* Uart.h (Uart::save_state): Remove debugging output.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (operator >>): Use ANSI setstate() instead of setf().
+	Remove error messages.
+
+1999-08-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx: get rid of bit-twiddling macros
+	* Uart.h: shuffle some includes/declarations to Uart.cxx
+
+1999-08-13  Frank Ch. Eigler  <fche@cygnus.com>
+	* Uart.h (sio_framing_p): New member.
+	* Uart.h (sio_framing_p): New member.
+	* Uart.cxx (Uart ctor): Set sio_framing_p, export it as "sio-framing?".
+	(sinHandler, xmit): If !sio_framing_p, pass raw data bytes across
+	Sin/Sout.
+	* README: Document changes.
+
+1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
+
+	* Devices.cxx, driver.cxx: (*) Change big_int_N and 
+	little_int_N so that the default operations all use 
+	their integer values.  Attributes now in HEX format.
+
+1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Uart.h: Introduced proper namespace usage. Include sidso.h.
+	* Uart.cxx: Do not include sidso.h.
+
+1999-07-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-07-25  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Uart.h: Exception handling
+
+1999-07-25  Ron Unrau  <runrau@cygnus.com>
+
+	* README: new file
+
+1999-07-10  Faisal Khoja  <fkhoja@cygnus.com>
+	* Uart.cxx, Uart.h: Introduced friend stream functions,
+	  and two methods for saving & restoring states.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (SUBDIRS): Don't recurse into @subdirs@.
+	(liuart_la_SOURCES): Don't include header file name.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Removed.
+	* configure: Ditto.
+	* configure.in: Ditto.
+
+1999-06-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (Uart_ctor_*): New functions.
+	(Uart ctor): Amputate body parts and put them into Uart_ctor_*.
+	* Uart.h: Declare new functions.
+	
+1999-06-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (Uart): Use new scheduler_event_subscription
+ 	interface class.  Forget about generic_scheduler_interface
+ 	throughout.
+	(ctor): Don't set obsolete "regs" attribute.
+	* Uart.h (Uart): Updated declarations accordingly.  Remove
+	obsolete *_attr_names members.
+
+1999-06-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (Uart ctor): Register some attributes with "register"
+ 	or "pin" categories.
+
+1999-06-11  Ron Unrau <runrau@cygnus.com>
+
+	* Uart.h: use callback_byte_bus instead of hand-rolled class
+	* Uart.cxx: Uart::Uart: bus constructor changes
+	  + busReadHandler: change API to conform to callback_byte_bus
+	  + busWriteHandler: ditto
+	  + UartListTypes: fix typo in uart name
+
+1999-06-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (UartDelete): New function.
+	(uart_component_library): Register it.
+	* testsuite/Devices.cxx (DevicesDelete): New function.
+	(devices_component_library): Register it.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (UartListTypes, UartCreate):
+	Renamed type: "Uart" -> "hw-uart-ns16550".
+	* testsuite/driver.cxx (main): Updated with new component 
+	type names.	
+
+1999-06-08  Ron Unrau <runrau@cygnus.com>
+
+	* Uart.h: declare pin_name_string
+
+1999-06-08  Ron Unrau <runrau@cygnus.com>
+
+	* Uart.cxx: add pin attributes
+
+1999-06-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx (attribute_coder_uart_reg): New class for mapping
+	UART registers to/from string attributes.
+	(Uart::Uart): Register registers with above coder.
+	(listExtraAttrNames): Removed.
+	(getExtraAttrValue): Removed.
+	(setExtraAttrValue): Removed.
+	* Uart.h (Uart): Removed reg_names member.  Removed *ExtraAttr*
+	declarations.
+
+	* testsuite/Makefile.am (uart_driver_DEPENDENCIES): Add
+	dependent libraries.
+	* testsuite/Makefile.in: Regenerated.
+
+1999-06-01  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* testsuite/Makefile.am (TESTS): Add uart-driver.
+	* testsuite/Makefile.in: Regenerated.
+
+	* testsuite/driver.cxx (main): Use "target-time-scheduler" type.
+	* testsuite/test-uart.conf.in: Ditto.
+	* testsuite/test2-uart.conf.in: Ditto.
+
+1999-06-01  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Devices.cxx: Deleted.
+	* Devices.h: Deleted.
+	* driver.cxx: Deleted.
+	* hello.c: Deleted.
+	* hello.s: Deleted.
+	* hello.x: Deleted.
+	* test-uart.conf.in: Deleted.
+	* test2-uart.conf.in: Deleted.
+	* uart-def.h: Deleted.
+	* uart-m32r.conf.in: Deleted.
+
+1999-05-28  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* testsuite/Devices.cxx: Swapped #include <stdio.h> and Devices.h
+	to bypass a 99r1 cygwin compiler bug.
+
+1999-05-28  Ron Unrau  <runrau@cygnus.com>
+
+	* Uart.h: declare reg_names here instead of as a const in Uart.cxx
+	* Uart.cxx: initialize reg_names manually, instead of by initializer
+		list.
+	      - use inline functions instead of macros for BIT_SET, etc.
+	      - getExtraAttrValue: use ostrstream instead of building char
+	        string manually.
+	* move tests to testsuite subdirectory
+	* configure.in: configure testsuite subdirectory
+	* configure: regenerated
+	* Makefile.am: no longer build tests here
+	* Makefile.in: regenerated
+
+1999-05-18  Ron Unrau  <runrau@cygnus.com>
+
+	* Uart.h: declare new overloaded methods listExtraAttrNames, 
+	  getExtraAttrValue, and setExtaAttrValue
+	* Uart.cxx: implement above methods to support get/set register
+	* driver.cxx: add simple test for register attributes
+
+1999-05-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* aclocal.m4: Regenerated.
+
+1999-05-11  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.cxx: Allay minor warnings.
+
+1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Devices.cxx (devices_component_library): DLLEXPORT it.
+	* Uart.cxx (uart_component_library): Ditto.
+	* configure.in: Be win32-dll-capable.
+	* driver.cxx: DLLIMPORT extern component_library instances.
+	* configure: Regenerated.
+	* config.in: Ditto.
+	* aclocal.m4: Regenerated for new libtool.
+	* Makefile.in: Ditto.
+
+	* test-uart.conf.in: Use .la component DSO names.
+	* test2-uart.conf.in: Ditto.
+	* uart-m32r.conf.in: Ditto.
+	
+1999-05-01  Ron Unrau  <runrau@cygnus.com>
+
+	* uart-m32r.conf.in: put uart at stride 4, using hex address
+	* hello.{c,s,x}: modify to use stride 4 addressing
+
+1999-04-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (LDFLAGS): Add -no-undefined
+	* Makefile.in: Regenerated.
+
+	* Devices.h (SerialSink ctor): Qualify member function
+	pointers.
+	* Uart.cxx (Uart ctor): Ditto.
+	* Uart.h (init): Declare return type.
+
+1999-04-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Uart.h, Uart.cxx: Stop using Scheduler.h.  Use external
+	scheduler component via generic_scheduler_interface.
+	* Devices.h, Devices.cxx: Ditto.
+	
+	* Makefile.am: Link libsched.la into uart-driver binary.
+	* Makefile.in: Regenerated.
+
+	* test-uart.conf.in: Add scheduler component.
+	* test2-uart.conf.in: New file.  Trace all UART interactions.
+	* configure.in: Process it.
+	* configure: Regenerated.a
+	
+1999-04-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Devices.cxx (Main::run): Make explicit the ghastly
+ 	cast between char* and host_int_4.
+	* Devices.h (WriteTrigger::driven): Ditto.
+
+1999-04-03  Ron Unrau  <runrau@cygnus.com>
+
+	* Uart.h, Devices.cxx, driver.cxx: swap addr<->data in bus::read/write
+
+1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Use new AC_CONFIG_AUX_DIR.
+	* configure: Regenerated.
+	* Makefile.am: Build libtool -modules.
+	* Makefile.in: Regenerated.
+
+1999-03-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Devices.h, Uart.h: Adapt stragglers to changed
+ 	sid::pin::driven(...) signature.
+
+1999-03-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Devices.{h,cxx}, Uart.{h,cxx}, driver.cxx: Adapt to renamed
+ 	COMPONENT_LIBRARY_MAGIC macro.  Switch to sidutil::callback_pin
+ 	only.  Adapt to changed sid::pin::driven(...) signature.
+
+1999-03-15  Ron Unrau  <runrau@cygnus.com>
+
+	* Uart.h,Uart.cxx: use new Scheduler callback interface
+
+1999-03-13  Ron Unrau  <runrau@cygnus.com>
+
+	* Devices.h, Uart.h: need more friends?
+
+1999-03-11  Ron Unrau  <runrau@cygnus.com>
+
+	* hello.c: make more realistic by polling on TRE bit
+	* hello.[sx]: regenerate
+	* Driver.h: do not overload driven(host_int_4)
+	* test-uart.conf.in: fix typo in Bus names
+
+1999-03-12  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (noinst_PROGRAMS): Add `uart-driver'.
+	(bin_PROGRAMS): Remove.
+
+	* Makefile.in: Regenerate.
+	
+1999-03-10  Ron Unrau  <runrau@cygnus.com>
+
+	* Uart.h, Uart.cxx: incorporate revised pin API
+	* Devices.h, Devices.cxx, driver.cxx: ditto
+
+1999-03-11  Ben Elliston  <bje@cygnus.com>
+
+	* Devices.h (class BinaryPin::intr_pin): Explicitly set the return
+	type of init(..) to `int' to silence a warning from EGCS.
+	(class WriteTrigger): Likewise.
+	(class SerialInputPin): Likewise.
+	
+1999-03-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Devices.h (class DeviceDriver): Remove unneeded virtual
+ 	inheritance.  Add relationship API stub.
+	(class SerialSink) Ditto.
+	(class Main) Ditto.
+	* Uart.h (class Uart): Ditto.
+
+1999-03-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am: Switch to "foreign" mode to make/use dependencies.
+	* Makefile.in: Rebuilt.
+
+Sun Feb 21, 1999  Ron Unrau <runrau@cygnus.com>
+
+	* Initial check-in of Uart code
+
+
+
+	

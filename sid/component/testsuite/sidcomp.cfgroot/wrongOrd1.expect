@@ -1,0 +1,12 @@
+wrongOrd1.badconf:5: component type hw-cpu-arm7t unknown
+wrongOrd1.badconf:6: component type sw-load-elf unknown
+wrongOrd1.badconf:7: component type sid-io-stdio unknown
+wrongOrd1.badconf:8: component type sw-gloss-arm/angel unknown
+wrongOrd1.badconf:9: component type hw-interrupt-arm/ref unknown
+wrongOrd1.badconf:10: component type hw-mapper-basic unknown
+wrongOrd1.badconf:11: component type hw-remap/pause-arm/ref unknown
+wrongOrd1.badconf:12: component type sid-sched-host unknown
+wrongOrd1.badconf:13: component type sid-sched-sim unknown
+wrongOrd1.badconf:14: component type hw-memory-ram/rom-basic unknown
+wrongOrd1.badconf:15: component type hw-timer-arm/ref-sched unknown
+Configuration error.  Aborting.

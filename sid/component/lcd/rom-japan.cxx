@@ -1,0 +1,464 @@
+// rom-japan.cxx - description.  -*- C++ -*-
+
+// Copyright (C) 1999, 2000 Red Hat.
+// This file is part of SID and is licensed under the GPL.
+// See the file COPYING.SID for conditions for redistribution.
+
+void 
+init_rom_japan( unsigned char rom[][8] ) {
+  int i;
+  unsigned char *fm;
+
+  fm = &(rom[0x5c][0]);	// yen
+  fm[0] = 0x11;
+  fm[1] = 0x0a;
+  fm[2] = 0x1f;
+  fm[3] = 0x4;
+  fm[4] = 0x1f;
+  fm[5] = 0x4;
+  fm[6] = 0x4;
+
+  fm = &(rom[0x7e][0]);	// right arrow
+  fm[1] = 0x4;
+  fm[2] = 0x2;
+  fm[3] = 0x1f;
+  fm[4] = 0x2;
+  fm[5] = 0x4;
+
+  fm = &(rom[0x7e][0]);	// left arrow
+  fm[1] = 0x4;
+  fm[2] = 0x8;
+  fm[3] = 0x1f;
+  fm[4] = 0x8;
+  fm[5] = 0x4;
+
+  fm = &(rom[0xa1][0]);
+  fm[4] = 0x1c;
+  fm[5] = 0x14;
+  fm[6] = 0x1c;
+
+  fm = &(rom[0xa2][0]);
+  fm[0] = 0x7;
+  for( i=1; i<4; i++ ) fm[i] = 4;
+
+  fm = &(rom[0xa3][0]);
+  for( i=4; i<7; i++ ) fm[i] = 4;
+  fm[7] = 0x1c;
+
+  fm = &(rom[0xa4][0]);
+  fm[4] = 0x10;
+  fm[5] = 0x8;
+  fm[6] = 0x4;
+
+  fm = &(rom[0xa5][0]);
+  fm[3] = 0xc;
+  fm[4] = 0xc;
+
+  fm = &(rom[0xa6][0]);
+  fm[1] = 0x1f;
+  fm[2] = 0x1;
+  fm[3] = 0x1f;
+  fm[4] = 0x1;
+  fm[5] = 0x2;
+  fm[6] = 0x4;
+
+  fm = &(rom[0xa7][0]);
+  fm[2] = 0x1f;
+  fm[3] = 0x1;
+  fm[4] = 0x6;
+  fm[5] = 0x4;
+  fm[6] = 0x8;
+
+  fm = &(rom[0xa8][0]);
+  fm[2] = 0x2;
+  fm[3] = 0x4;
+  fm[4] = 0xc;
+  fm[5] = 0x14;
+  fm[6] = 0x4;
+
+  fm = &(rom[0xa9][0]);
+  fm[2] = 0x4;
+  fm[3] = 0x1f;
+  fm[4] = 0x11;
+  fm[5] = 0x1;
+  fm[6] = 0x6;
+
+  fm = &(rom[0xaa][0]);
+  fm[2] = 0x1f;
+  fm[3] = 0x4;
+  fm[4] = 0x4;
+  fm[5] = 0x4;
+  fm[6] = 0x1f;
+
+  fm = &(rom[0xab][0]);
+  fm[2] = 0x2;
+  fm[3] = 0x1f;
+  fm[4] = 0x6;
+  fm[5] = 0xa;
+  fm[6] = 0x12;
+
+  fm = &(rom[0xac][0]);
+  fm[2] = 0x8;
+  fm[3] = 0x1f;
+  fm[4] = 0x9;
+  fm[5] = 0xa;
+  fm[6] = 0x8;
+
+  fm = &(rom[0xad][0]);
+  fm[3] = 0xe;
+  fm[4] = 0x2;
+  fm[5] = 0x2;
+  fm[6] = 0x1f;
+
+  fm = &(rom[0xae][0]);
+  fm[2] = 0x1e;
+  fm[3] = 0x2;
+  fm[4] = 0x1e;
+  fm[5] = 0x2;
+  fm[6] = 0x1e;
+
+  fm = &(rom[0xaf][0]);
+  fm[3] = 0x15;
+  fm[4] = 0x15;
+  fm[5] = 0x1;
+  fm[6] = 0x6;
+
+  fm = &(rom[0xb0][0]);
+  fm[3] = 0x1f;
+
+  fm = &(rom[0xb1][0]);
+  fm[0] = 0x1f;
+  fm[1] = 1;
+  fm[2] = 0x5;
+  fm[3] = 0x6;
+  fm[4] = 0x4;
+  fm[5] = 0x4;
+  fm[6] = 0x8;
+
+  fm = &(rom[0xb2][0]);
+  fm[0] = 1;
+  fm[1] = 2;
+  fm[2] = 0x4;
+  fm[3] = 0x0c;
+  fm[4] = 0x14;
+  fm[5] = 0x4;
+  fm[6] = 0x4;
+
+  fm = &(rom[0xb3][0]);
+  fm[0] = 0x4;
+  fm[1] = 0x1f;
+  fm[2] = 0x11;
+  fm[3] = 0x11;
+  fm[4] = 0x1;
+  fm[5] = 0x2;
+  fm[6] = 0x4;
+
+  fm = &(rom[0xb4][0]);
+  for( i=2; i<6; i++ ) fm[i] = 4;
+  fm[1] = 0x1f;
+  fm[6] = 0x1f;
+
+  fm = &(rom[0xb5][0]);
+  fm[0] = 0x2;
+  fm[1] = 0x1f;
+  fm[2] = 0x2;
+  fm[3] = 0x6;
+  fm[4] = 0x0a;
+  fm[5] = 0x12;
+  fm[6] = 0x2;
+
+  fm = &(rom[0xb6][0]);
+  for( i=2; i<6; i++ ) fm[i] = 9;
+  fm[0] = 0x08;
+  fm[1] = 0x1f;
+  fm[6] = 0x12;
+
+  fm = &(rom[0xb7][0]);
+  for( i=0; i<7; i++ ) fm[i] = 4;
+  fm[1] = 0x1f;
+  fm[3] = 0x1f;
+
+  fm = &(rom[0xb8][0]);
+  fm[1] = 0x0f;
+  fm[2] = 0x09;
+  fm[3] = 0x11;
+  fm[4] = 0x1;
+  fm[5] = 0x2;
+  fm[6] = 0x0c;
+
+  fm = &(rom[0xb9][0]);
+  fm[0] = 0x08;
+  fm[1] = 0x0f;
+  fm[2] = 0x12;
+  fm[3] = 0x2;
+  fm[4] = 0x2;
+  fm[5] = 0x2;
+  fm[6] = 0x4;
+
+  fm = &(rom[0xba][0]);
+  for( i=2; i<6; i++ ) fm[i] = 1;
+  fm[1] = 0x1f;
+  fm[6] = 0x1f;
+
+  fm = &(rom[0xbb][0]);
+  fm[0] = 0x0a;
+  fm[1] = 0x1f;
+  fm[2] = 0x0a;
+  fm[3] = 0x0a;
+  fm[4] = 0x2;
+  fm[5] = 0x4;
+  fm[6] = 0x8;
+
+  fm = &(rom[0xbc][0]);
+  fm[1] = 0x18;
+  fm[2] = 0x1;
+  fm[3] = 0x19;
+  fm[4] = 0x1;
+  fm[5] = 0x2;
+  fm[6] = 0x1c;
+
+  fm = &(rom[0xbd][0]);
+  fm[1] = 0x1f;
+  fm[2] = 0x1;
+  fm[3] = 0x2;
+  fm[4] = 0x4;
+  fm[5] = 0x0a;
+  fm[6] = 0x11;
+
+  fm = &(rom[0xbe][0]);
+  fm[0] = 0x08;
+  fm[1] = 0x1f;
+  fm[2] = 0x09;
+  fm[3] = 0x0a;
+  fm[4] = 0x8;
+  fm[5] = 0x8;
+  fm[6] = 0x7;
+
+  fm = &(rom[0xbf][0]);
+  fm[1] = 0x11;
+  fm[2] = 0x11;
+  fm[3] = 0x09;
+  fm[4] = 0x1;
+  fm[5] = 0x2;
+  fm[6] = 0x0c;
+
+  fm = &(rom[0xc0][0]);
+  fm[1] = 0x0f;
+  fm[2] = 0x09;
+  fm[3] = 0x15;
+  fm[4] = 0x3;
+  fm[5] = 0x2;
+  fm[6] = 0x0c;
+
+  fm = &(rom[0xc1][0]);
+  fm[0] = 0x2;
+  fm[1] = 0x1c;
+  fm[2] = 0x4;
+  fm[3] = 0x1f;
+  fm[4] = 0x4;
+  fm[5] = 0x4;
+  fm[6] = 0x8;
+
+  fm = &(rom[0xc2][0]);
+  fm[1] = 0x15;
+  fm[2] = 0x15;
+  fm[3] = 0x15;
+  fm[4] = 0x1;
+  fm[5] = 0x2;
+  fm[6] = 0x4;
+
+  fm = &(rom[0xc3][0]);
+  fm[0] = 0xe;
+  fm[2] = 0x1f;
+  fm[3] = 0x4;
+  fm[4] = 0x4;
+  fm[5] = 0x4;
+  fm[6] = 0x8;
+
+  fm = &(rom[0xc4][0]);
+  for( i=0; i<7; i++ ) fm[i] = 8;
+  fm[3] = 0x0c;
+  fm[4] = 0x0a;
+
+  fm = &(rom[0xc5][0]);
+  fm[0] = 0x4;
+  fm[1] = 0x4;
+  fm[2] = 0x1f;
+  fm[3] = 0x4;
+  fm[4] = 0x4;
+  fm[5] = 0x8;
+  fm[6] = 0x10;
+
+  fm = &(rom[0xc6][0]);
+  fm[1] = 0x0e;
+  fm[6] = 0x1f;
+
+  fm = &(rom[0xc7][0]);
+  fm[1] = 0x1f;
+  fm[2] = 0x1;
+  fm[3] = 0x0a;
+  fm[4] = 0x4;
+  fm[5] = 0x0a;
+  fm[6] = 0x10;
+
+  fm = &(rom[0xc8][0]);
+  fm[0] = 0x4;
+  fm[1] = 0x1f;
+  fm[2] = 0x2;
+  fm[3] = 0x4;
+  fm[4] = 0x0e;
+  fm[5] = 0x15;
+  fm[6] = 0x4;
+
+  fm = &(rom[0xc9][0]);
+  for( i=0; i<5; i++ ) fm[i] = 2;
+  fm[5] = 0x04;
+  fm[6] = 0x08;
+
+  fm = &(rom[0xca][0]);
+  fm[1] = 0x04;
+  fm[2] = 0x02;
+  for( i=3; i<7; i++ ) fm[i] = 0x11;
+
+  fm = &(rom[0xcb][0]);
+  for( i=0; i<6; i++ ) fm[i] = 0x10;
+  fm[2] = 0x1f;
+  fm[6] = 0x0f;
+
+  fm = &(rom[0xcc][0]);
+  fm[1] = 0x1f;
+  fm[2] = 0x1;
+  fm[3] = 0x1;
+  fm[4] = 0x1;
+  fm[5] = 0x02;
+  fm[6] = 0x0c;
+
+  fm = &(rom[0xcd][0]);
+  fm[1] = 0x8;
+  fm[2] = 0x14;
+  fm[3] = 0x02;
+  fm[4] = 0x1;
+  fm[5] = 0x1;
+
+  fm = &(rom[0xce][0]);
+  for( i=0; i<7; i++ ) fm[i] = 0x4;
+  fm[1] = 0x1f;
+  fm[4] = 0x15;
+  fm[5] = 0x15;
+
+  fm = &(rom[0xcf][0]);
+  fm[1] = 0x1f;
+  fm[2] = 0x1;
+  fm[3] = 0x1;
+  fm[4] = 0x0a;
+  fm[5] = 0x4;
+  fm[6] = 0x2;
+
+  fm = &(rom[0xd0][0]);
+  fm[1] = 0x0e;
+  fm[3] = 0x0e;
+  fm[5] = 0x0e;
+  fm[6] = 0x1;
+
+  fm = &(rom[0xd1][0]);
+  fm[1] = 0x4;
+  fm[2] = 0x8;
+  fm[3] = 0x10;
+  fm[4] = 0x11;
+  fm[5] = 0x1f;
+  fm[6] = 0x1;
+
+  fm = &(rom[0xd2][0]);
+  fm[1] = 0x1;
+  fm[2] = 0x1;
+  fm[3] = 0x0a;
+  fm[4] = 0x4;
+  fm[5] = 0x0a;
+  fm[6] = 0x10;
+
+  fm = &(rom[0xd3][0]);
+  fm[1] = 0x1f;
+  fm[2] = 0x8;
+  fm[3] = 0x1f;
+  fm[4] = 0x8;
+  fm[5] = 0x8;
+  fm[6] = 0x7;
+
+  fm = &(rom[0xd4][0]);
+  for( i=0; i<7; i++ ) fm[i] = 0x08;
+  fm[2] = 0x1f;
+  fm[3] = 0x09;
+  fm[4] = 0x0a;
+
+  fm = &(rom[0xd5][0]);
+  for( i=2; i<6; i++ ) fm[i] = 0x02;
+  fm[1] = 0x0e;
+  fm[6] = 0x1f;
+
+  fm = &(rom[0xd6][0]);
+  for( i=2; i<6; i++ ) fm[i] = 0x01;
+  fm[1] = 0x1f;
+  fm[3] = 0x1f;
+  fm[6] = 0x1f;
+
+  fm = &(rom[0xd7][0]);
+  fm[0] = 0x0e;
+  fm[2] = 0x1f;
+  fm[3] = 0x1;
+  fm[4] = 0x1;
+  fm[5] = 0x2;
+  fm[6] = 0x4;
+
+  fm = &(rom[0xd8][0]);
+  for( i=0; i<4; i++ ) fm[i] = 0x12;
+  fm[4] = 0x2;
+  fm[5] = 0x4;
+  fm[6] = 0x8;
+
+  fm = &(rom[0xd9][0]);
+  fm[1] = 0x4;
+  fm[2] = 0x14;
+  fm[3] = 0x14;
+  fm[4] = 0x15;
+  fm[5] = 0x15;
+  fm[6] = 0x16;
+
+  fm = &(rom[0xda][0]);
+  fm[1] = 0x10;
+  fm[2] = 0x10;
+  fm[3] = 0x11;
+  fm[4] = 0x12;
+  fm[5] = 0x14;
+  fm[6] = 0x18;
+
+  fm = &(rom[0xdb][0]);
+  for( i=2; i<6; i++ ) fm[i] = 0x11;
+  fm[1] = 0x1f;
+  fm[6] = 0x1f;
+
+  fm = &(rom[0xdc][0]);
+  fm[1] = 0x1f;
+  fm[2] = 0x11;
+  fm[3] = 0x11;
+  fm[4] = 0x1;
+  fm[5] = 0x2;
+  fm[6] = 0x4;
+
+  fm = &(rom[0xdd][0]);
+  fm[1] = 0x18;
+  fm[3] = 0x1;
+  fm[4] = 0x1;
+  fm[5] = 0x2;
+  fm[6] = 0x1c;
+
+  fm = &(rom[0xde][0]);
+  fm[0] = 0x4;
+  fm[1] = 0x12;
+  fm[2] = 0x8;
+
+  fm = &(rom[0xdf][0]);
+  fm[0] = 0x1c;
+  fm[1] = 0x14;
+  fm[2] = 0x1c;
+}
+

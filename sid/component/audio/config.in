@@ -1,0 +1,44 @@
+/* config.in.  Generated automatically from configure.in by autoheader.  */
+
+/* Define if you have the <mmreg.h> header file.  */
+#undef HAVE_MMREG_H
+
+/* Define if you have the <mmsystem.h> header file.  */
+#undef HAVE_MMSYSTEM_H
+
+/* Define if you have the <sys/audioio.h> header file.  */
+#undef HAVE_SYS_AUDIOIO_H
+
+/* Define if you have the <sys/ioctl.h> header file.  */
+#undef HAVE_SYS_IOCTL_H
+
+/* Define if you have the <sys/soundcard.h> header file.  */
+#undef HAVE_SYS_SOUNDCARD_H
+
+/* Define if you have the kernel32 library (-lkernel32).  */
+#undef HAVE_LIBKERNEL32
+
+/* Define if you have the m library (-lm).  */
+#undef HAVE_LIBM
+
+/* Define if you have the winmm library (-lwinmm).  */
+#undef HAVE_LIBWINMM
+
+/* Name of package */
+#undef PACKAGE
+
+/* Version number of package */
+#undef VERSION
+
+/* Define if Windows sound API should be used */
+#undef SOUND_CYGWIN
+
+/* Define if Solaris sound API should be used */
+#undef SOUND_SOLARIS
+
+/* Define if Linux sound API should be used */
+#undef SOUND_LINUX
+
+/* Define if no sound API is available */
+#undef SOUND_NONE
+

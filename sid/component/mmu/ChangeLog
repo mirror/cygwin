@@ -1,0 +1,305 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-09-06  Frank Ch. Eigler  <fche@redhat.com>
+
+	* armRemap.cxx (bus_update): Tweak ?: syntax to satisfy RHL 7.0 g++.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* armRemap.cxx: Import more std:: identifiers.
+
+2000-02-16  Ben Elliston  <bje@redhat.com>
+
+	* hw-remap_pause-arm_ref.txt: Add clarifications.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-16  Ben Elliston  <bje@cygnus.com>
+
+	* armRemap.cxx (armRemapPause::num_relocations): Rename from
+	numRelocations. Update all callers/clients.
+	(armRemapPause::save_state): New method.
+	(armRemapPause::restore_state): Likewise.
+	(armRemapPause::operator>>): Likewise.
+	(armRemapPause::operator<<): Likewise.
+	(armRemapPause::triggerpoint_manager): New member.
+	(armRemapPause::pin_factory): New method.
+	(armRemapPause::pin_junkyard): Likewise.
+	(armRemapPause ctor): Initialise triggerpoint_manager. Add
+	watcable "remapping?" and attribute "state-snapshot".
+	(armRemapPause::remap_bus::bus_update): Trigger checkpoint.
+	(armRemapPause::remap_bus::use_normal_map): Likewise.  *
+	hw-remap_pause-arm_ref.txt (SID conventions): Update.
+
+1999-12-15  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* hw-remap_pause-arm_ref.txt: Grammar changes.
+
+1999-12-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-remap_pause-arm_ref.txt: Reworked to fit template.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-remap_pause-arm_ref.txt: New file.  Content from old
+	* README: Removed component docs.
+	* Makefile.am: Install new file.
+	* Makefile.in: Regenerated.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armRemap.cxx (compMmuDelete): Use dynamic_cast<>.
+
+1999-11-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armRemap.cxx (numRelocations): Change type to host_int_1.
+	(set_num_relocations): Use host_int_1 intermediate type to limit
+	user-generated allocation.
+
+1999-11-12  Ben Elliston  <bje@cygnus.com>
+
+	* armRemap.cxx: Replace "parametrized" with "parameterized".
+
+1999-11-12  Ben Elliston  <bje@cygnus.com>
+
+	* armRemap.cxx (armRemapPause::reset_map_bus::in_range): Remove.
+	(armRemapPause::reset_map_bus::translate): New method.
+	(armRemapPause::remap_bus): New class.
+	(armRemapPause::startup_bus, normal_bus, my_bus): Remove.
+	(armRemapPause::downstream_bus, upstream_bus): New members.
+	(armRemapPause::remapping_p): Likewise.
+	(armRemapPause::translation_t): New type.
+	(armRemapPause::addr_pair_t): Likewise.
+	(armRemapPause::entry_t): Likewise.
+	(armRemapPause::translations, entries): New members.
+	(armRemapPause::numRelocations): Likewise.
+	(armRemapPause::get_num_relocations, set_num_relocations): New.
+	(armRemapPause::get_start, set_start): Likewise.
+	(armRemapPause::get_end, set_end): Likewise.
+	(armRemapPause::get_reloc, set_reloc): Likewise.
+	(armRemapPause ctor): Initialise new members.
+	Remove "remap-from", "remap-to" and "remap-limit" attributes.
+	Create new "remapping?" and "num-relocations" attributes.
+	(armRemapPause::bus_interface::word_write): Switch buses using
+	remap_bus::use_normal_map() instead of altering the "access-port"
+	bus at runtime.
+
+	* README (hw-remap/pause-arm/ref): Update to reflect the above.
+	(Synopsis): Likewise.
+	(SID interface reference): Add missing details.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Fix configuration in Environment section.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armRemap.cxx: Define hw-remap/pause-arm/ref component type only
+	#if SIDTARGET_ARM.
+	* Makefile.in: Regenerated.
+
+1999-10-18  Ben Elliston  <bje@cygnus.com>
+
+	* README (References): Correct the URL at arm.com.
+
+1999-10-13  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README: Doc fixes based on feedback.
+
+1999-10-10  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* armRemap.cxx (reset_map_bus::write): Added return statement.
+	(reset_map_bus::read): Added return statement.
+	(constructor): Made the order of initialization as order of decl.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armRemap.cxx (map_bus ctor): Assert target component non-null.
+	(SID_RM_WRITE, SID_RM_READ): Check for target->my_bus null.
+	* Makefile.am (checkme): New target.
+	(DEJAGNU_TESTS): New macro.
+	* Makefile.in: Regenerated.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armRemap.cxx (SID_RM_WRITE, SID_RM_READ): Take value, not const-ref.
+	(in_range, word_read, word_write, reset): Same.
+
+1999-10-07  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* armRemap.cxx (write): Removed try & catch. some indenting
+	(read): Likewise
+
+1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armRemap.cxx (*): Use host_int_X, not compiler_int_X.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
+
+	* armRemap.cxx: (*) Change big_int_N and little_int_N so that
+	the default operations all use their integer values.
+
+1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* armRemap.cxx: Introduce proper namespace usage.
+
+1999-07-29  Ben Elliston  <bje@cygnus.com>
+
+	* armRemap.cxx (armRemapPause ctor): All attributes of this
+	component are settings.
+
+1999-07-25  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* armRemap.cxx: Add exception handling.
+
+1999-07-19  Ben Elliston  <bje@cygnus.com>
+
+	* armRemap.cxx (armRemapPause::normal_map_bus::SID_RM_READ): Call
+	read(), not write().
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* testsuite: Removed directory.
+	* Makefile.am (SUBDIRS): Don't recurse into it.
+	* Makefile.in: Regenerated.
+	* acconfig.h: Removed.
+	* aclocal.m4: Ditto.
+	* config.in: Ditto.
+	* configure: Ditto.
+	* configure.in: Ditto.
+	* stamp-h.in: Ditto.
+
+1999-06-28  Ben Elliston  <bje@cygnus.com>
+
+	* README: Rewrite using the standard documentation template.
+
+1999-06-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armRemap.cxx (reset_map_bus): Updated bus API calls throughout.
+	(in_range): Removed host_int_8 address type.
+	(normal_map_bus): Ditto.
+	(bus_interface): Remove word_bus<> address type parameter.  Use
+	host_int_4 throughout.
+
+1999-06-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armRemap.cxx (compMmuDelete): New function.
+	(mmu_component_library): Register it.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armRemap.cxx (compMmuListTypes, compMmuCreate):
+	Rename type "remap-pause-arm" -> "hw-remap/pause-arm/ref".
+
+1999-06-07  Ben Elliston  <bje@cygnus.com>
+
+	* armRemap.cxx (armRemapPause): Inherit from fixed accessor map
+	component.
+	(armRemapPause::current_bus): Remove.
+	(armRemapPause::setAccessor): Likewise.
+	(armRemapPause::reset_map_bus::in_range): Correctly test if
+	address falls within base and limit.
+	(armRemapPause ctor): Update to reflect defunct members.
+	(armRemapPause::bus_interface::word_write): Switch bus mappings
+	correctly. Bug fix for clearing reset status bits.
+	
+1999-06-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armRemap.cxx (compMmuCreate): Add "remap-pause-arm" type name
+	alias.
+
+1999-06-03  Ben Elliston  <bje@cygnus.com>
+
+	* armRemap.cxx (armRemapPause::map_bus): New class.
+	(armRemapPause::reset_map_bus): Likewise.
+	(armRemapPause::normal_map_bus): Likewise.
+	(armRemapPause): You can never have too many friends.
+	(armRemapPause::startup_bus): New member.
+	(armRemapPause::normal_bus): Likewise.
+	(armRemapPause::current_bus): Likewise.
+	(armRemapPause::my_bus): Likewise.
+	(armRemapPause::remapFrom,remapTo,remapLimit): Likewise.
+	(armRemapPause::wait): Rename to `halt'.
+	(armRemapPause ctor): Add new attributes, pins and buses.
+	(armRemapPause::setAccessor): New method.
+	(armRemapPause::bus_interface::word_write): Bug fixes.
+	(armRemapPause::bus_interface::word_read): Likewise.
+	(compMmuListTypes): Rename from `compTimerListTypes'.
+	(compMmuCreate): Rename from `compTimerCreate'.
+
+1999-06-01  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armRemap.cxx (bus_interface): Exchange address/bus template types.
+	(armRemapPause): Instantiate a bus_interface member.
+	(ctor): Export it as bus "registers".
+
+1999-05-31  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (LDFLAGS): Add -no-undefined.
+	* Makefile.in: Regenerated.
+
+1999-05-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* aclocal.m4: Regenerated.
+
+1999-05-11  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armRemap.cxx: Allay minor warnings.
+
+1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armRemap.cxx (ctor): Properly qualify member function pointer.
+	
+	(mmu_component_library): DLLEXPORT it.
+	* configure.in: Look for libltdl.  Be win32-dll-capable.
+	* configure: Regenerated.
+	* config.in: Ditto.
+	* aclocal.m4: Regenerated for new libtool.
+	* Makefile.in: Ditto.
+
+1999-05-04  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (SUBDIRS): Add.
+	* Makefile.in: Regenerate.
+	* configure.in (AC_CONFIG_SUBDIRS): Add `testsuite'.
+	* configure: Regenerate.
+
+1999-04-30  Ben Elliston  <bje@cygnus.com>
+
+	* armRemap.cxx: New file.
+	* configure.in: Likewise.
+	* Makefile.am: Likewise.
+	* Makefile.in: Generate.
+	* configure: Likewise.
+	* aclocal.m4: Likewise.
+	* config.in: Likewise.
+	* stamp-h.in: Likewise.
+
+1999-04-21  Ben Elliston  <bje@cygnus.com>
+
+	* README: New file.
+

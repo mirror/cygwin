@@ -1,0 +1,115 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(Makefile.in)
+AC_CONFIG_AUX_DIR(../config)
+AM_INIT_AUTOMAKE(sidcomp,0.1)
+AM_CONFIG_HEADER(config.h:config.in)
+
+dnl automake support
+AM_MAINTAINER_MODE
+AC_LIBTOOL_WIN32_DLL
+AM_PROG_LIBTOOL
+
+AC_EXEEXT
+AC_PROG_CXX
+AC_PROG_CXXCPP
+AC_PROG_MAKE_SET
+AC_ARG_PROGRAM
+AC_LANG_CPLUSPLUS
+AC_HEADER_STDC
+AC_HEADER_TIME
+
+AC_CHECK_LIB(stdc++, main)
+AC_CHECK_LIB(m, main)
+
+dnl For lcd component only.
+dnl Check if we can link curses programs without libtermcap.
+dnl If not, add it in.
+lcd_libs=
+AC_CHECK_LIB(curses, refresh, lcd_libs="-lcurses $lcd_libs",
+             AC_CHECK_LIB(curses, refresh,
+		lcd_libs="-lcurses -ltermcap", ,-ltermcap)) 
+AC_SUBST(lcd_libs)
+
+dnl For socket-related components only.
+socket_libs=
+AC_CHECK_LIB(socket, connect, socket_libs="-lsocket $socket_libs")
+AC_CHECK_LIB(nsl, gethostbyname, socket_libs="$socket_libs -lnsl",
+	AC_CHECK_LIB(resolv, gethostbyname,
+		socket_libs="$socket_libs -lresolv"))
+AC_SUBST(socket_libs)
+
+AC_CHECK_FUNCS(ftime gettimeofday usleep strtoul strtoull select)
+
+old_libs="$LIBS"
+LIBS="$LIBS $socket_libs"
+AC_CHECK_FUNCS(inet_aton inet_addr)
+LIBS="$old_libs"
+
+AC_CHECK_HEADERS(curses.h time.h unistd.h)
+AC_CHECK_HEADERS(sys/time.h sys/timeb.h sys/types.h )
+AC_CHECK_HEADERS(sys/socket.h netinet/in.h netinet/tcp.h arpa/inet.h)
+
+dnl XXX: for Solaris?
+AC_CHECK_HEADERS(../ucbinclude/sys/ioctl.h)
+
+AC_CACHE_CHECK(whether ftime is declared, ac_cv_decl_ftime, [
+AC_EGREP_HEADER(ftime, sys/timeb.h, [ac_cv_decl_ftime=yes], [ac_cv_decl_ftime=no
+])])
+if test x$ac_cv_decl_ftime = xyes; then
+  AC_DEFINE(HAVE_FTIME_DECL, 1, [Define if ftime(3) is declared via sys/timeb.h])
+fi
+AC_CACHE_CHECK(whether usleep is declared, ac_cv_decl_usleep, [
+AC_EGREP_HEADER(usleep, unistd.h, [ac_cv_decl_usleep=yes], [ac_cv_decl_usleep=no
+])])
+if test x$ac_cv_decl_usleep = xyes; then
+  AC_DEFINE(HAVE_USLEEP_DECL, 1, [Define if usleep(2) via unistd.h])
+fi
+
+AC_CACHE_CHECK(whether socklen_t is declared, ac_cv_decl_socklen_t, [
+AC_EGREP_HEADER(socklen_t, sys/socket.h, [ac_cv_decl_socklen_t=yes], [ac_cv_decl_socklen_t=no
+])])
+if test x$ac_cv_decl_socklen_t = xyes; then
+  AC_DEFINE(HAVE_SOCKLEN_T, 1, [Define if socklen_t is declared via sys/socket.h])
+fi
+
+AC_SUBST(CYGWIN)
+
+
+dnl Perform --target/--enable-targets processing.
+CY_SIDTARGET_CHECK
+
+
+dnl All self-configuring component subdirectories should be listed here.
+dnl
+dnl cfgroot is here because it's statically linked, and libltdl is its baby.
+dnl tcl is here because it looks for tcl/tk in a too complex way for this file.
+dnl audio is here because it has more host-dependent configuration
+dnl cgen-cpu is here because it has target-dependent configuration
+AC_CONFIG_SUBDIRS([cfgroot tcl audio cgen-cpu timers])
+
+
+
+dnl All other component subdirectories should be listed here, so "make"
+dnl can recursively descend there - see "Makefile.am".
+make_subdirs="consoles gdb gloss glue ide interrupt lcd loader mapper memory mmu parport profiling rtc sched uart testsuite"
+AC_SUBST(make_subdirs)
+
+dnl List all component subdirectory files not covered by AC_CONFIG_SUBDIRS
+dnl that need autoconf @substitution@.
+AC_OUTPUT([Makefile testsuite/Makefile tconfig.h:tconfig.in siddoc
+	consoles/Makefile
+	gdb/Makefile
+	gloss/Makefile
+	glue/Makefile
+	ide/Makefile
+	interrupt/Makefile
+	lcd/Makefile lcd/testsuite/Makefile
+	loader/Makefile
+	mapper/Makefile mapper/testsuite/Makefile
+	memory/Makefile
+	mmu/Makefile
+	parport/Makefile
+	profiling/Makefile
+	rtc/Makefile
+	sched/Makefile
+	uart/Makefile uart/testsuite/Makefile])

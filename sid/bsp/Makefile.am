@@ -1,0 +1,39 @@
+## Process this with automake to create Makefile.in
+
+AUTOMAKE_OPTIONS = foreign
+ACLOCAL_AMFLAGS = -I ../config
+
+SUBDIRS = . pregen
+
+if SIDTARGET_ARM
+FAM0SCRIPTS = arm-elf-sid
+else
+FAM0SCRIPTS = 
+endif
+
+FAM1SCRIPTS =
+
+if SIDTARGET_M32R
+FAM2SCRIPTS = m32r-elf-sid
+else
+FAM2SCRIPTS = 
+endif
+
+if SIDTARGET_M68K
+FAM3SCRIPTS = m68k-elf-sid
+else
+FAM3SCRIPTS =
+endif
+
+FAM4SCRIPTS =
+
+FAM5SCRIPTS =
+
+FAM6SCRIPTS =
+
+FAM7SCRIPTS =
+
+ALLFAMSCRIPTS = $(FAM0SCRIPTS) $(FAM1SCRIPTS) $(FAM2SCRIPTS) $(FAM3SCRIPTS) \
+		$(FAM4SCRIPTS) $(FAM5SCRIPTS) $(FAM6SCRIPTS) $(FAM7SCRIPTS)
+
+bin_SCRIPTS = configrun-sid $(ALLFAMSCRIPTS)

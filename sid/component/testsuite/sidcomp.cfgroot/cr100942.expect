@@ -1,0 +1,4 @@
+cr100942.badconf:9: component cpu has no output pin ttttrap
+cr100942.badconf:10: component angel has no input pin trap-1-code
+cr100942.badconf:11: component angel has no input pin trap-1-code
+Configuration error.  Aborting.

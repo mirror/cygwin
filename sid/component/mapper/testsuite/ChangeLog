@@ -1,0 +1,26 @@
+2000-12-05  Nicholas Duffek  <nsd@redhat.com>
+
+	* Makefile.in: Use $(pkglibdir) instead of $(VPATH) for libtool
+	-rpath argument.
+
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* busif.cxx: Import more headers and std:: namespace.
+
+2000-02-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Correctly regenerated.
+
+2000-01-27  Ron Unrau  <runrau@redhat.com>
+
+	* busif.cxx: new bus tester model
+	* Makefile.am: new file
+	* Makefile.in: generated

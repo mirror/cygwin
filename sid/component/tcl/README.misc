@@ -1,0 +1,21 @@
+Sample tcl components
+---------------------
+
+The "trace.tcl" script, when loaded into a tcl-bridge component, acts
+as a tracing front-end component for any other selected sid component.
+That component is identified to the script via a "victim" component
+relationship.  Then this tracer tcl-based component can take the place
+of the victim to the rest of the system.  It is almost a wrapper.
+
+The script transparently passes through almost all sid API calls
+between the "outside" and the chosen victim.  It is capable of tracing
+all sid::pin/bus/component API traffic to that victim.  If the
+"victim-trace?" attribute is set, it will log them to stdout.
+
+
+The "tester.tcl" script acts as a tcl "read-eval-print" loop within
+sid.  Every time its "command-io" pin is driven from the outside, it
+presents a prompt, and evaluates a single tcl command entered there,
+and prints the result back.  An external program can therefore make
+arbitrary sid API calls, using this component as an interactive
+command interpreter.  This script is used in dejagnu unit testing.

@@ -1,0 +1,11 @@
+# Run a monkey test on the components in this component library. 
+
+# XXX: FChE 2000-11-13: disable this test; it hangs too easily
+return
+
+load_lib "monkey.exp"
+
+monkey_test sid-io-stdio console_component_library libconsoles.la
+monkey_test sid-io-socket-client console_component_library libconsoles.la
+monkey_test sid-io-socket-server console_component_library libconsoles.la
+

@@ -1,0 +1,10 @@
+extMiss.badconf:5: unknown command 1
+extMiss.badconf:5: unknown command 0
+extMiss.badconf:9: unknown command cgen_component_library
+extMiss.badconf:12: dlsym of load in component library dso libcgencpu.la failed: *symbol*
+extMiss.badconf:12: unknown command cgen_component_library
+extMiss.badconf:13: unknown command libcgencpu.la
+extMiss.badconf:13: unknown command cgen_component_library
+extMiss.badconf:16: dlsym of 'console_component_library' in component library dso 'libconsoles.la' failed: *symbol*
+extMiss.badconf:18: component angel not found
+Configuration error.  Aborting.

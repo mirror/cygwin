@@ -1,0 +1,319 @@
+# -*- Tcl -*-
+# basicmapper.exp
+#
+# Copyright (C) 1999 Red Hat
+#
+# Description:
+# A testsuite for the generic mapper component (hw-mapper-basic).
+
+set test "sid configuration"
+sid_config_component_test_with_tracing "basicmapper.conf" \
+	"load [sid_find_file libmapper.la] mapper_component_library" \
+	"hw-mapper-basic"
+pass $test
+
+set test "sid startup"
+if {[sid_start "basicmapper.conf"]} { pass $test } else { fail $test; return }
+
+
+set test "all attributes are present"
+sid_assert_includes_all "sid::component::attribute_names $victim" \
+	{"state-snapshot"}
+
+
+set test "access-port bus is present"
+sid_assert_includes_all "sid::component::bus_names $victim" "access-port"
+
+
+set test "acquire mapper bus handle"
+set mbus [sid_cmd "sid::component::find_bus $victim access-port"]
+if {$mbus != ""} { pass $test } else { fail $test }
+
+
+set test "no known accessors at startup"
+set accessors [sid_cmd "sid::component::accessor_names $victim"]
+if {$accessors == ""} { pass $test } else { fail $test }
+
+
+if {[info exists buses_array]} { unset buses_array }
+foreach num {1 2} {
+    set test "generate test bus #$num"
+    set buses_array($num) [sid_cmd "sid::bus::new"]
+    if {$buses_array($num) == ""} { fail $test } else { pass $test }
+}
+
+
+set test "connect test bus #1 to the mapper"
+set accname {[0x100,0x200,1,1]}
+set result [sid_cmd "sid::component::connect_accessor $victim [list $accname] $buses_array(1)"]
+if {$result != "ok"} { fail "$test -- got $result" } else { pass $test }
+
+
+set test "prior accessor is now registered"
+set accname {[0x100,0x200,1,1]}
+set accessors [sid_cmd "sid::component::accessor_names $victim"]
+if {[string compare [lindex $accessors 0] $accname] == 0} { pass $test } else { fail "$test $accessors $accname" }
+
+
+# Try out some bad accessor names.  They should be rejected as bad values.
+
+foreach bad_accessor \
+    {abc [foo] [bar [0,abc] [zog] [0-foo] [0--foo] [0x100-0x200,3,1] [0x100-0x200,1,3]} {
+	set test "connect an accessor with an invalid name: $bad_accessor"
+	set result \
+	    [sid_cmd "sid::component::connect_accessor $victim [list $bad_accessor] $buses_array(1)"]
+	if {$result == "bad_value"} { pass $test } else { fail $test }
+}
+
+
+set test "only one accessor is still registered"
+set accname {[0x100,0x200,1,1]}
+set accessors [sid_cmd "sid::component::accessor_names $victim"]
+if {[string compare [lindex $accessors 0] $accname] == 0} { pass $test } else { fail $test }
+
+
+set test "connect test bus #2 to the mapper"
+set accname {[0x300-0x600,4,1]}
+set result [sid_cmd "sid::component::connect_accessor $victim [list $accname] $buses_array(2)"]
+if {$result != "ok"} { fail "$test -- got $result" } else { pass $test }
+
+
+set test "two accessors are now registered"
+set okay 1
+set accessors [sid_cmd "sid::component::accessor_names $victim"]
+set expected {[0x100,0x200,1,1] [0x300-0x600,4,1]}
+
+if {[llength $accessors] != 2} {
+    fail $test
+} else {
+    for {set i 0} {$i < 2} {incr i} {
+	if {[lindex $accessors $i] != [lindex $expected $i]} {
+	    fail "$test -- expected [lindex $expected $i], got [lindex $accessors $i]"
+	    set okay 0
+	    break
+	}
+    }
+    if {$okay} { pass $test }
+}
+
+set test "detect & reject overlapping address ranges"
+set sca sid::component::connect_accessor
+set r1 [sid_cmd [list $sca $victim \[0x300-0x600,4,1\] $buses_array(2)]]
+set r2 [sid_cmd [list $sca $victim \[0x200-0x500,4,1\] $buses_array(2)]]
+set r3 [sid_cmd [list $sca $victim \[0x400-0x500,4,1\] $buses_array(2)]]
+set r4 [sid_cmd [list $sca $victim \[0x500-0x700,4,1\] $buses_array(2)]]
+set r5 [sid_cmd [list $sca $victim \[0x200-0x700,4,1\] $buses_array(2)]]
+set r6 [sid_cmd [list $sca $victim \[0x0-0xffff\] $buses_array(2)]]
+if {"$r1$r2$r3$r4$r5$r6" == "bad_valuebad_valuebad_valuebad_valuebad_valuebad_value"} then { pass $test } else { fail $test }
+
+set test "disconnect existing accessors--to start afresh"
+set accessors [sid_cmd "sid::component::accessor_names $victim"]
+set okay 1
+for {set i 0} {$i < [llength $accessors]} {incr i} {
+    set num [expr $i + 1]
+    set acc [lindex $accessors $i]
+    set bus [sid_cmd [list sid::component::connected_bus $victim $acc]]
+    set result [sid_cmd [list sid::component::disconnect_accessor $victim $acc $bus]]
+    if {$result != "ok"} { set okay 0; break }
+}
+if {$okay} { pass $test } else { fail $test }
+
+# We need many, many mapped regions to test all widths and strides:
+# For each transaction width below, we have a nominated starting location for the mapped
+# regsions.  Then, for each stride, we have a 0x800 byte long region, 0x1000 bytes apart:
+#
+# +--- base
+# |
+# v 0            0x800   0x1000        0x1800  0x2000         0x2800  0x3000
+# +---------------+-----+---------------+-----+----------------+-----+
+# | stride1 regn  |.....| stride2 regn  |.....| stride4 regn   |.....|
+# +---------------+-----+---------------+-----+----------------+-----+
+#
+# All of the mapped regions are tied to a simple bus object in Tcl.
+# All widths, strides and byte orders are tested to ensure that the
+# memory transaction is mapped to the right place.
+
+set basetable(1) 0x1000
+set basetable(2) 0x10000
+set basetable(4) 0x20000
+set basetable(8) 0x30000
+
+# Set up all of the mapped regions described above.
+# Do not create regions when the width is greater than the stride.
+# It doesn't make sense (FIXME: so add a test case for it!)
+
+set okay 1
+unset acc
+foreach width {1 2 4 8} {
+    set test "establish many ${width}-byte wide accessors for testing"
+    set base $basetable($width) 
+    set offset 0
+    for {set stride 1} {$stride <= 256} {set stride [expr $stride << 1]} {
+	
+	if {$width > $stride} continue
+	
+	set acc(start) [format %\#x [expr $base + $offset]]
+	set acc(end) [format %\#x [expr $acc(start) + 0x800]]
+	set offset [expr $offset + 0x1000]
+
+	set accname "\[$acc(start)-$acc(end),$stride,$width\]"
+	set result [sid_cmd "sid::component::connect_accessor $victim [list $accname] $buses_array(1)"]
+	if {$result != "ok"} { set okay 0; break }
+    }
+    if {$okay} { pass $test } else { fail $test }
+}
+unset acc
+unset offset
+
+# Populate the hook_read(..) associative array.
+
+sid_cmd "if {[info exists hook_written]} { unset hook_written }"
+sid_cmd "if {[info exists hook_read]} { unset hook_read }"
+foreach endian {l b} {
+    foreach width {1 2 4 8} {
+	sid_cmd "set hook_read(h4,${endian}${width},$buses_array(1)) {return {ok 0}}"
+	sid_cmd "set hook_written(h4,${endian}${width},$buses_array(1)) {return ok}"
+    }
+}
+
+
+# Now a simple walk test.  Within each mapped region, assert that all
+# accesses are sent to their rightful locations on the device bus:
+# (s => stride value)
+#
+# +--- 0   s      2s     3s     4s     5s     6s
+# |        |      |      |      |      |      |    .. etc.
+# v        v      v      v      v      v      v
+# +-----------------------------------------------------+
+# |XXX     |XXX   |XXX   |XXX   |XXX   |XXX   |         | mapper-bus
+# +--------+------+------+------+------+------+---------+
+#   |        /     /      /      /     /
+#   |       /     /      /      /     /
+#   V      V     V      V      V     V
+# +-----+-----+-----+-----+-----+-----+
+# | XXX | XXX | XXX | XXX | XXX | XXX | device-bus
+# +-----+-----+-----+-----+-----+-----+
+
+foreach width {1 2 4 8} {
+    set offset 0
+    set base $basetable($width)
+    for {set stride 1} {$stride <= 256} {set stride [expr $stride << 1]} {
+	
+	if {$width > $stride} continue
+
+	set test "simple walk along bus (aligned ${width}-byte reads/writes) with stride $stride"
+	set okay 1
+	set start_addr [format %\#x [expr $base + $offset]]
+	set end_addr [format %\#x [expr $start_addr + 0x800]]
+	set offset [expr $offset + 0x1000]
+	
+	# ensure that all register accesses are to adjacent indices.
+	set expected_index 0
+	for {set addr $start_addr} {$addr < $end_addr} {set addr [expr $addr + $stride]} {
+	    # skip 75% of the exhaustive iterations
+	    if {rand() < 0.25} then { set lb [list l b] } else { set lb [list] }
+	    foreach endian $lb {
+		set result [sid_cmd "sid::bus::write_h4_${endian}${width} $mbus $addr 0xFF"]
+		if {$result != "ok" || \
+			[sid_cmd "set written_addr"] != $expected_index || \
+			[string index [sid_cmd "set written_endian"] 0] != $endian || \
+			[sid_cmd "set written_width"] != $width} {
+		    set okay 0
+		}
+		
+		set result [sid_cmd "sid::bus::read_h4_${endian}${width} $mbus $addr"]
+		if {[lindex $result 0] != "ok" || \
+			[sid_cmd "set read_addr"] != $expected_index || \
+			[string index [sid_cmd "set read_endian"] 0] != $endian || \
+			[sid_cmd "set read_width"] != $width} {
+		    set okay 0
+		}
+	    }
+	    
+	    set expected_index [expr $expected_index + $width]
+	}
+	if {$okay} { pass $test } else { fail $test }
+    }
+}
+
+
+# Test also the case where access width has to be adjusted 
+# for accessor's declared width.
+foreach width {1 2 4 8} {
+    set offset 0
+    set base $basetable($width)
+    for {set stride 1} {$stride <= 256} {set stride [expr $stride << 1]} {
+	
+	if {$width > $stride} then { continue }
+
+	set start_addr [format %\#x [expr $base + $offset]]
+	set end_addr [format %\#x [expr $start_addr + 0x800]]
+	set offset [expr $offset + 0x1000]
+
+	foreach accwidth {1 2 4 8} {
+	    set test "width-adjusted walk along bus (${accwidth}-byte reads/writes) with stride $stride width $width"
+	    set okay 1
+
+	    # ensure that all register accesses are to adjacent indices.
+	    set expected_index 0
+	    for {set addr $start_addr} {$addr < $end_addr} {set addr [expr $addr + $stride]} {
+		set req "acc=$accwidth width=$width addr=$addr stride=$stride"
+
+		if {($accwidth > $stride) || ($accwidth < $width) || (($addr % $stride) >= $width)} then { 
+		    set expresult "misaligned" 
+		} else {
+		    set expresult "ok" 
+		}
+
+		# skip 95% of the exhaustive iterations
+		if {rand() < 0.05} then { set lb [list l b] } else { set lb [list] }
+		foreach endian $lb {
+		    set result [sid_cmd "sid::bus::write_h4_${endian}${accwidth} $mbus $addr 0xFF"]
+		    if {$expresult == "ok" || $result != $expresult} {
+			set desired [list $expected_index $endian $width]
+			set actual [list \
+					[sid_cmd "set written_addr"] \
+					[string index [sid_cmd "set written_endian"] 0] \
+					[sid_cmd "set written_width"]]
+			if {$desired != $actual} then {
+			    verbose "mismatch write: $desired vs $actual, $expresult vs $result, $req"
+			    set okay 0
+			}
+		    }
+
+		    set result [sid_cmd "sid::bus::read_h4_${endian}${accwidth} $mbus $addr"]
+		    if {$expresult == "ok" || [lindex $result 0] != $expresult} {
+			set desired [list $expected_index $endian $width]
+			set actual [list \
+					[sid_cmd "set read_addr"] \
+					[string index [sid_cmd "set read_endian"] 0] \
+					[sid_cmd "set read_width"]]
+			if {$desired != $actual} then {
+			    verbose "mismatch read: $desired vs $actual, $expresult vs $result, $req"
+			    set okay 0
+			}
+		    }
+		}
+		
+		set expected_index [expr $expected_index + $width]
+	    }
+
+	    if {$okay} { pass $test } else { fail $test }
+	}
+    }
+}
+
+
+
+
+
+sid_cmd "if {[info exists hook_written]} { unset hook_written }"
+sid_cmd "if {[info exists hook_read]} { unset hook_read }"
+
+
+set  test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test; return }
+
+# zap conf file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "basicmapper.conf" }

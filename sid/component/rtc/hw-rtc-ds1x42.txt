@@ -1,0 +1,138 @@
+* Name
+  hw-rtc-ds1642 hw-rtc-ds1742
+
+* Synopsis
+  The Dallas DS1642 and DS1742 are time-keeping NVRAM devices.  The
+  DS1742 is Y2K compliant as it maintains a century field in a section
+  of NVRAM that was previously reserved by Dallas in the DS1642.
+
+  Pins: clock clock-control clock-event
+  Buses: read-write-port
+  Attributes: epoch-time year month date day-of-week hour minute second
+	      state-snapshot "tk xclock clone"
+	      century (ds1742 only)
+  Accessors:  memory-bus
+  Library: librtc.la
+  Symbol name: rtc_component_library
+
+* Functionality
+
+  - Modelling
+
+  The DS1x42 components model real time using a single pin that can be
+  driven at a simulated interval representing one second.  For
+  modelling time in the target domain, a target scheduler may be used.
+  For modelling real "wall-clock" time, the host scheduler may be
+  used.
+  
+  The DS1x42 have a "frequency test" function that involves toggling
+  the least significant bit of the "seconds" register at an idealized
+  frequency of 512Hz.  When managed by a sid scheduler component, the
+  actual frequency is around 500Hz.
+
+  - Behaviors
+
+  * Timekeeping
+
+    Whenever the "clock" input is driven, it is interpreted as a
+    signal that one second has passed.  An internal counter is
+    incremented and all the time-related registers are recomputed.
+    The counter is accessible by the "epoch-time" attribute.
+
+  * Frequency testing
+
+    When the "clock-control" and "clock-event" pin-pair is connected
+    to an external scheduler, the DS1642 standard "test bit" is
+    toggled at an approximate simulated frequency.
+
+  * Register access
+
+    The DS1642/DS1742 control registers and 2048-byte NVRAM are
+    accessed across the "read-write-port" bus for byte-wide
+    operations.  The control registers are also exposed as attributes.
+
+    This family of parts includes 2KB of non-volatile RAM.  This
+    component does not explicitly model this memory.  Instead, it
+    interacts through the "memory-bus" accessor with an external
+    memory like hw-memory-ram/rom-basic.
+
+  - SID conventions
+    * These are functional components.
+    * They support state save/restore.
+    * They support setting triggerpoints on the state of data with the following
+      names:
+	- "epoch-time"		Canonical internal representation of time.
+	- "oscillating"		The oscillator is connected.
+	- "write-mode"		The device is in write mode, for updates.
+
+* Environment
+  - Related components
+
+    * The 2KB of non-volatile memory included in these parts is not
+      explicitly modeled by this component.  Instead, it uses the
+      "memory-bus" accessor to interact with an external memory like
+      hw-memory-ram/rom-basic:
+
+	new hw-memory-ram/rom-basic nvram
+	set nvram size 2048
+	connect-bus rtc memory-bus nvram read-write-port
+
+    * In order to enable the "frequency test" function, you need to
+      couple an external scheduler to this component. The following is
+      an example of how to configure such a connection between a
+      scheduler and the DS1742 component:
+
+	new sid-sched-host-accurate sched
+	new hw-rtc-ds1742 rtc
+	set sched num-clients 2
+	set sched 0-regular? 1
+	set sched 0-time 1000 # 1 sec
+	connect-pin sched 0-event -> rtc clock
+	connect-pin rtc clock-control -> sched 1-control
+	connect-pin rtc clock-event <- sched 1-event
+
+    * The "hw-visual-clock" component is a candidate gui for this
+      component.
+
+        new hw-rtc-ds1742 rtc
+        new hw-visual-clock rtc-gui
+	relate rtc-gui "your rtc friend" rtc
+
+  - Host system
+
+    * These components rely on the accuracy and integrity of UTC time
+      maintained by the host, as the time and date are initialized
+      when the component is instantiated. The UNIX time() system call
+      is used to acquire the time.
+
+* SID interface reference
+  - low level:
+    * pins
+      - clock | input | any | timekeeping
+      - clock-control | output | positive number | frequency testing
+      - clock-event | input | any | frequency testing
+
+    * buses
+      - read-write-port | 0x0 - 0x7FF | read/write byte-wide | register access
+
+    * attributes
+      - epoch-time | | unsigned 32-bit integer | n/a | timekeeping
+      - year | register | 0..99 | n/a | register access
+      - month | register | 1..12 | n/a | register access
+      - date | register | 1..31 | n/a | register access
+      - day-of-week | register | 1..7 | n/a | regiser access
+      - hour | register | 0..23 | n/a | register access
+      - minute | register | 0..59 | n/a | register access
+      - second | register | 0..59 | n/a | register access
+      - century | register | 19..25 | n/a | register access (DS1742 only)
+      - state-snapshot | | opaque string | n/a | state save/restore
+      - "tk xclock clone" | gui | "hw-visual-clock" | (same) | component gui
+
+    * accessors
+      - memory-bus | byte-wide accesses | register access
+
+* References
+
+  Dallas Semiconductor DS1642 data sheet, revision 031698; DS1742 data
+  sheet, revision 091498. Obtained from
+  <http://www.dalsemi.com/Prod_info/Time_Keep/index.html>.

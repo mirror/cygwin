@@ -1,0 +1,177 @@
+#! /bin/sh
+# Generate CGEN simulator files.
+#
+# Usage: /bin/sh cgen.sh cpu-decode srcdir \
+#	cgen cgendir cgenflags \
+#	arch archflags cpu isa mach prefix file-prefix file-specs
+#
+# cpu-decode: specified as is, exists for consistency with other such scripts.
+#
+# file-specs: any of
+#	desc.h             - generate desc.h file (architecture-wide decls)
+#	cpu.h              - generate cpu.h file (#included in cpu's class)
+#	defs.h             - generate defs.h file (cpu-family specific decls)
+#	decode.h           - generate decoder header file
+#	decode.cxx         - generate decoder
+#	semantics.cxx      - generate semantics
+#	sem-switch.cxx     - generate semantics, pbb switch version
+#
+# archflags: any combination of
+#	with-multiple-isa  - the architecture has multiple isas
+#	with-scache        - generate scache support
+#	with-sem-fns       - tell the decoder semantic fns will be generated
+#	with-sem-switch    - tell the decoder a semantic switch will be gen'd
+#
+# We store the generated files in the source directory until we decide to
+# ship a Scheme interpreter (or other implementation).
+# Maybe we never will.
+
+# NB: starting pwd is BUILD/sid/component/cgen-cpu/TARGET
+
+
+# We want to behave like make, any error forces us to stop.
+set -e
+# set -x
+
+action=$1
+srcdir=$2
+cgendir=$3
+cgenflags=$4
+arch=$5
+archflags=$6
+cpu=$7
+isa=$8
+mach=$9
+# bring parms past 9 portably into view
+shift ; prefix=$9
+shift ; fileprefix=$9
+shift ; filespecs=$9
+
+rootdir=${srcdir}/../../../..
+brootdir=../../../..
+
+lowercase='abcdefghijklmnopqrstuvwxyz'
+uppercase='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+ARCH=`echo ${arch} | tr "${lowercase}" "${uppercase}"`
+CPU=`echo ${cpu} | tr "${lowercase}" "${uppercase}"`
+PREFIX=`echo ${prefix} | tr "${lowercase}" "${uppercase}"`
+
+
+# Find GUILE in the install or build trees
+if [ -x ${brootdir}/guile/libguile/guile ]
+then
+    cgen="env GUILE_LOAD_PATH=${brootdir}/guile:${rootdir}/guile ${brootdir}/guile/libguile/guile"
+else
+    cgen=guile
+fi
+
+
+rm -f tmp-desc.h1 tmp-desc.h
+rm -f tmp-cpu.h1 tmp-cpu.h
+rm -f tmp-defs.h1 tmp-defs.h
+rm -f tmp-sem.cxx1 tmp-sem.cxx
+rm -f tmp-semsw.cxx1 tmp-semsw.cxx
+rm -f tmp-dec.h1 tmp-dec.h
+rm -f tmp-dec.cxx1 tmp-dec.cxx
+
+fileopts=""
+for f in $filespecs
+do
+    case $f in
+    desc.h) fileopts="$fileopts -H tmp-desc.h1" ;;
+    cpu.h) fileopts="$fileopts -C tmp-cpu.h1" ;;
+    defs.h) fileopts="$fileopts -E tmp-defs.h1" ;;
+    decode.h) fileopts="$fileopts -T tmp-dec.h1" ;;
+    decode.cxx) fileopts="$fileopts -D tmp-dec.cxx1" ;;
+    semantics.cxx) fileopts="$fileopts -S tmp-sem.cxx1" ;;
+    sem-switch.cxx) fileopts="$fileopts -X tmp-semsw.cxx1" ;;
+    write.cxx) fileopts="$fileopts -W tmp-write.cxx1" ;;
+    *) echo "unknown file spec: $f" >&2 ; exit 1 ;;
+    esac
+done
+
+${cgen} -s ${cgendir}/cgen-sid.scm \
+	-s ${cgendir} \
+	${cgenflags} \
+	-f "${archflags}" \
+	-m ${mach} \
+	-i ${isa} \
+	-a ${arch} \
+	${fileopts}
+
+
+# NB below, the ``@ prefix @'' sequence is quoted strange, since
+# it this cgen notation collides with autoconf's.
+
+for f in $filespecs
+do
+    case $f in
+    desc.h)
+	sed -e "s,@ARCH@,${ARCH},g" -e "s,@arch@,${arch},g" \
+	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
+	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
+	    < tmp-desc.h1 > tmp-desc.h
+	${rootdir}/move-if-change tmp-desc.h ${srcdir}/${fileprefix}desc.h
+	;;
+    cpu.h)
+	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
+	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
+	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
+	    < tmp-cpu.h1 > tmp-cpu.h
+	${rootdir}/move-if-change tmp-cpu.h ${srcdir}/${fileprefix}cpu.h
+	;;
+    defs.h)
+	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
+	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
+	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
+	    < tmp-defs.h1 > tmp-defs.h
+	${rootdir}/move-if-change tmp-defs.h ${srcdir}/${fileprefix}defs.h
+	;;
+    decode.h)
+	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
+	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
+	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
+	    < tmp-dec.h1 > tmp-dec.h
+	${rootdir}/move-if-change tmp-dec.h ${srcdir}/${fileprefix}decode.h
+	;;
+    decode.cxx)
+	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
+	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
+	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
+	    < tmp-dec.cxx1 > tmp-dec.cxx
+	${rootdir}/move-if-change tmp-dec.cxx ${srcdir}/${fileprefix}decode.cxx
+	;;
+    semantics.cxx)
+	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
+	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
+	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
+	    < tmp-sem.cxx1 > tmp-sem.cxx
+	${rootdir}/move-if-change tmp-sem.cxx ${srcdir}/${fileprefix}sem.cxx
+	;;
+    sem-switch.cxx)
+	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
+	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
+	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
+	    < tmp-semsw.cxx1 > tmp-semsw.cxx
+	${rootdir}/move-if-change tmp-semsw.cxx ${srcdir}/${fileprefix}semsw.cxx
+	;;
+    write.cxx)
+	sed -e "s=@ARCH@=${ARCH}=g" -e "s=@arch@=${arch}=g" \
+	    -e "s=@CPU@=${CPU}=g" -e "s=@cpu@=${cpu}=g" \
+	    -e "s=@PREFIX@=${PREFIX}=g" -e "s=@"prefix"@=${prefix}=g" \
+	    < tmp-write.cxx1 > tmp-write.cxx
+	${rootdir}/move-if-change tmp-write.cxx ${srcdir}/${fileprefix}write.cxx
+	;;
+    esac
+done
+
+rm -f tmp-desc.h1 tmp-desc.h
+rm -f tmp-cpu.h1 tmp-cpu.h
+rm -f tmp-defs.h1 tmp-defs.h
+rm -f tmp-sem.cxx1 tmp-sem.cxx
+rm -f tmp-semsw.cxx1 tmp-semsw.cxx
+rm -f tmp-write.cxx1 tmp-write.cxx
+rm -f tmp-dec.h1 tmp-dec.h
+rm -f tmp-dec.cxx1 tmp-dec.cxx
+
+exit 0

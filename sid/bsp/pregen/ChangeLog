@@ -1,0 +1,12 @@
+2000-11-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am: New file.  Conditionally maintain pregenerated
+	sid configuration files.
+	* Makefile.in: New generated file.
+	* pregen-configs.in: New file.  Pregeneration driver.
+	* armpid-cygmon.img, armpid-eCos.img: Moved here from parent dir.
+	* arm-cma-tksm.conf, arm-cma.conf, arm-gloss-tksm.conf: New gen files.
+	* arm-gloss.conf, arm-glossBE.conf, arm-pid-cygmon-tksm.conf: Ditto.
+	* arm-pid-cygmon.conf, arm-pid-tksm.conf, arm-pid.conf: Ditto.
+	* arm-pidBE.conf: Ditto.
+

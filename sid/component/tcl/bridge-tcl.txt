@@ -1,0 +1,286 @@
+* Name
+  bridge-tcl bridge-tk bridge-blt
+
+* Synopsis
+
+  This family of components implements a bridge between the C++ SID
+  API and Tcl, in an embedded Tcl/Tk/Tk+blt 8.0 interpreter.
+
+  * Pins: !event !event-control (+BRIDGED)
+  * Attributes: load! eval! (+BRIDGED)
+  * Buses: (BRIDGED)
+  * Accessors: (BRIDGED)
+  * Relationships: (BRIDGED)
+
+  * Library: libtclapi.la
+  * Symbol name: tcl_component_library
+
+* Functionality
+
+  - Modelling 
+
+  * As this family of components is just a bridge, the nature of
+    modelling performed is up to the script on the other side of the
+    bridge.  This component merely funnels SID API calls between the
+    outer C++ system and each bridge component's isolated embedded tcl
+    interpreter.
+
+  - Behaviors
+
+  * Configuration
+
+    You must configure the embedded Tcl interpreter with the
+    Tcl scripting code that will receive bridged C++ SID API calls.
+    This can be done in two ways.  First, if the "load!" attribute is
+    written to, the value is interpreted as a file name, and loaded
+    into the Tcl interpreter as if with the Tcl "source" command.
+    This file may contain procedure definitions and any Tcl code to be
+    evaluated right away.  Second, if the "eval!" attribute is written
+    to, the value is interpreted as a Tcl expression as if the
+    Tcl_Eval() function had been used.
+
+    A "bridge-tk" type component is automatically initialized with the
+    usual bindings to the Tk windowing toolkit.  A "bridge-blt" type
+    component, where available, includes the same Tk bindings, in  
+    addition to the usual bindings to the BLT Tcl extension library.
+
+  * Event handling
+
+    The embedded Tcl interpreter requires regular-event polling in
+    order to operate, especially if the tk or tk+blt extensions are in
+    use.  Whenever the "!event" input pin is driven, the
+    Tcl_DoOneEvent() function is called repeatedly for all pending Tcl
+    events.  
+
+    In response, the "!event-control" output pin is driven with a
+    number between 1 and 1000.  The number represents the component's
+    suggestion about the time interval to the next "!event" signal,
+    and is meant to be compatible with the "sid-sched-*" components'
+    "NNN-control" inputs.  This way, the Tcl bridge component attempts
+    to adaptively regulate its own event polling rate, balancing good
+    response time in busy periods and low overhead during idle
+    periods.
+
+  * Bridging
+
+    With only the exceptions noted above, all incoming C++ SID API
+    calls are bridged by making appropriate calls to an embedded Tcl
+    interpreter.  One Tcl procedure call is made per C++ call.  Types
+    and function names are mapped as specified in the Incoming sid API 
+    calls section.
+
+    The invoked Tcl procedure may perform any necessary processing and
+    return a value.  It may make further SID API calls outward to
+    other components through the symmetrical Tcl-to-C++ bridging 
+    described in the Outgoing sid API calls section.
+
+    Tcl interpreter errors are caught during the bridging process.  In
+    case the interpreter fails to run the appropriate Tcl procedure to
+    completion, a "TCL ERROR" message is printed to stderr, and some
+    error-suggesting return value is made up for completing the C++
+    call.  This situation is analogous to a C++ component throwing an
+    exception during its execution of an incoming SID API call, though
+    in the pure C++ case, uncaught exceptions cause the SID process to
+    terminate.
+
+  - SID conventions
+
+    This component bridges an API.  Any conventions supported by the
+    loaded script on the Tcl side will be supported on the C++ side
+    of the bridge.  The bridge does not implement any SID conventions
+    on its own.
+
+* Environment
+
+  - Related components
+
+  * As suggested in the "Event handling" behavior section above, this
+    component performs best if the "!event" and "!event-control" pins
+    are connected to a scheduler.  If the bridge component is to carry
+    out any work, it is necessary to load Tcl script fragments into
+    it.  Here is a script fragment that does both.
+
+	new bridge-tcl tracer
+	new sid-sched-host sched
+	set tracer load! "/path/my-component.tcl"
+	connect-pin sched 0-event -> tracer !event
+	connect-pin sched 0-control <- tracer !event-control
+
+  * A more sophisticated way to use a bridge component is to
+    associate SID triggerpoint hits with scripted actions.  For example,
+    the following fragment activates a triggerpoint on a register of a
+    peripheral, and prints a message whenever it hits.  Note how the Tcl
+    script is fed in piece by piece using the "eval!" attribute.
+
+	new bridge-tcl watcher
+	new some-type victim
+	# Configure bare minimum tcl code to make an input pin and
+	# respond to it being driven.  Note how find_pin does not
+	# check the pin name, so any name will be accepted in the
+	# later connect-pin line.
+	set watcher eval! "set p [sid::pin::new]"
+	set watcher eval! "proc find_pin {name} {global p ; return $p}"
+	set watcher eval! "proc driven_h4 {pin value} {puts \"triggerpoint hit v=$value!\"}"
+	# triggerpoint: watch victim component's register "r0" for value 0xAA
+	connect-pin victim watch:r0:value:0xAA -> watcher anyname
+
+  - Host system
+
+  * The bridge-tcl and bridge-tk components are available on all
+    platforms.  The bridge-blt component is available only if the BLT
+    Tcl extension library was compiled into this component.
+
+  * Each instance of a "bridge-tk" or "bridge-blt" component creates a
+    separate new top-level tk window.
+
+
+* SID interface reference
+
+  - low level:
+
+    Note that this list includes only those low level interfaces that
+    are actually provided by the bridge component.  In order to act
+    transparent, these are excluded from the pin_names and
+    attribute_names inquiry functions.  All visible low level
+    interfaces actually come from the Tcl scripting code loaded into
+    the bridge.
+
+    * pins
+      - !event | input | any | event handling
+      - !event-control | output | 1-1000 | event handling
+
+    * attributes
+      - load! | | file name | n/a | configuration
+      - eval! | | string | n/a | configuration
+
+
+
+Theory of operation for tcl-bridge component
+--------------------------------------------
+
+A tcl-bridge component is a shell that hooks all sid API calls to an
+embedded tcl interpreter so that they can be handled as tcl procedure 
+calls.  In addition, sid API calls are exposed to that interpreter, so 
+the tcl procedures can call back out to the C++ system.  With these two
+capabilities, a user-provided tcl package may *become* a first class
+sid component.
+
+Objects such as bus, component, and pin pointers may be passed through
+tcl scripts safely, because the bridging calls represent these as
+unique strings, and convert them back to C++ pointers automatically.  Any
+pointers seen through incoming call arguments, or outgoing call return
+values, are transparently converted into unique long-lived opaque
+strings.  This way, C++ pointers can safely pass through the tcl
+bridge in both directions.
+
+Unlike C++ components, tcl scripts that run in a tcl-bridge do not
+have access to the sidutil:: group of utility classes.  This means
+that only low level operations are directly provided, and sidutil::
+abstractions would need to be rewritten (if needed) in tcl.
+
+
+Incoming sid API calls
+----------------------
+
+Almost all incoming sid API calls are passed through verbatim to the
+embedded tcl interpreter.  (Exceptions are parameterized and noted
+below.)  Plain types are mapped according to the table below: C++
+object to tcl for arguments, and tcl to C++ for return values.  If tcl
+procedures by the appropriate names are not loaded into the
+interpreter by the time they are invoked from another sid component,
+a "TCL ERROR" message is printed to cerr, and a function-specific
+error indication is returned.
+
+Calls belonging to sid::pin and sid::bus are similarly mapped to
+tcl procedure calls.  The C++ pin/bus object on which they are called
+is passed to the procedures as an extra argument.  (C++ pin/bus
+objects may be constructed for a tcl component through special
+callback functions, listed below.)
+
+Functions with multiple outputs, like the sid::bus::read reference
+arguments, map to tcl procedures returning a list with the mapped C++
+return type as first element, and the output reference argument as
+second element.
+
+
+C++ type			tcl type
+
+string				string
+vector<string>			list of strings
+component,bus,pin pointer	opaque string
+{little,big,host}_int_{1,2,4,8}	numeric integer - care with 64-bit ints!
+component::status		string: "ok", "bad_value", "not_found"
+bus::status			string: "ok", "misaligned", "unmapped",
+					"unpermitted", "delayed"
+vector<component*>              list of opaque strings
+vector<pin*>                    list of opaque strings
+0 (null pointer)		""
+
+
+incoming C++ call		outgoing tcl call
+
+-- in sid::component
+
+attribute_names()		attribute_names
+attribute_names(category)	attribute_names_in_category $category
+attribute_value(name)		attribute_value $name
+set_attribute_value(name,value)	set_attribute_value $name $value
+pin_names			pin_names
+find_pin(name)                  find_pin $name
+connect_pin(name, pin)          connect_pin $name $pin
+disconnect_pin(name, pin)       disconnect_pin $name $pin
+connected_pins(name)            connected_pins $name
+bus_names			bus_names
+find_bus(name)			find_bus $name
+accessor_names			accessor_names
+connect_accessor(name,bus)	connect_accessor $name $bus
+disconnect_accessor(name,bus)   disconnect_accessor $name $bus
+connected_bus(name)		connected_bus $name
+relationship_names()		relationship_names
+relate(rel,comp)		relate $rel $comp
+unrelate(rel,comp)		unrelate $rel $comp
+related_components(rel)		related_components $rel
+
+-- in sid::pin
+
+driven(value)				driven_h4 $pin $value
+
+-- in sid::bus, for host_int_4 address and {big,little}_int_Y data types
+
+read(address,data)			read_h4_{l,b}Y $address   ** return [list $status $data] **
+write(address,data)			write_h4_{l,b}Y $address $data
+
+
+Outgoing sid API calls
+----------------------
+
+Once a tcl program is loaded into the interpreter, it is able to make 
+outgoing sid API calls, not merely respond to incoming ones.  All sid 
+API functions are exposed to tcl as procedure hooks, in a very
+symmetric way to the incoming calls.  Simply, each function in the
+incoming set has a shadow: "sid::component::FUNCTION",
+"sid::pin::FUNCTION" or "sid::bus::FUNCTION", as appropriate.  Each
+outgoing procedure takes a receiver handle (the same opaque string
+passed in an incoming call) as its first argument.
+
+There is no checking that would prevent an outgoing sid API call from
+becoming recursive and referring to the originating component, either
+directly or indirectly.  As for all other components, infinite
+recursion prevention is the responsibility of the component author.
+
+
+incoming			outgoing
+
+attribute_value $name		sid::component::attribute_value $component $name
+driven_h4 $pin $value		sid::pin::driven_h4 $pin $value
+... etc ...
+
+
+There are some special outgoing functions that function as
+constructors for local object handles.
+
+sid::component::this	returns an opaque string handle to this component 
+sid::pin::new		returns an opaque string handle to a new private C++ pin,
+			   usable as a return value to `find_pin'
+sid::bus::new		returns an opaque string handle to a new private C++ bus,
+			   usable as a return value to `find_bus'

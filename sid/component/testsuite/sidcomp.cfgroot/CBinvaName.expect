@@ -1,0 +1,9 @@
+CBinvaName.badconf:61: component loader accessor   not found
+CBinvaName.badconf:64: component remapper accessor ALL not found
+CBinvaName.badconf:65: component CPU accessor insn----memory not found
+CBinvaName.badconf:66: component CPU accessor CPU not found
+CBinvaName.badconf:67: component remapper has no bus another-bus
+CBinvaName.badconf:68: component remapper has no bus another-bus
+CBinvaName.badconf:69: component mem has no bus access-port
+CBinvaName.badconf:70: component CPU has no bus step!
+Configuration error.  Aborting.

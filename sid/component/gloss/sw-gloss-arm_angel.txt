@@ -1,0 +1,159 @@
+* Name
+  sw-gloss-arm/angel
+
+* Synopsis
+  This component emulates the Angel ROM monitor software.  
+
+  Pins: reset trap trap-code trap-chain trap-code-chain process-signal debug-tx debug-rx
+  Relations: cpu
+  Attributes: verbose? max-fds heap-base heap-limit stack-base stack-limit command-line "tk tty"
+  Accessors: target-memory
+
+  Library: libgloss.la
+  Symbol name: gloss_component_library
+
+* Functionality
+
+  - Modelling
+
+    This component emulates the ANGEL ROM monitor software by
+    intercepting the ARM CPU component model's software interrupt
+    (SWI).  It implements common system calls, such as read() and
+    write().
+
+  - Behaviors
+
+    * System call emulation
+
+    When the "trap" input pin is driven, this component will attempt
+    to emulate the requested system call.  It checks whether the
+    current "trap-code" and "trap" values correspond to a system call 
+    that can be emulated.
+
+    If this is indeed a valid ANGEL system call, the component emulates
+    the call by accessing the target processor's registers (through the 
+    "cpu" relation) and memory (through the "target-memory" accessor).
+    In most cases, it signals back a "skip" or "reissue" indication 
+    through the "trap" output pin.
+
+    If the requested system call is not a valid ANGEL system call, 
+    the trap signal is chained by driving the "trap-code-chain" 
+    and "trap-chain" output pins with the same values as received.  
+    If an external component is connected to these chain pins, 
+    and if that external component signals a "handled" indication 
+    back on the "trap-chain" input, then this component will 
+    consider the trap as handled and will return.
+
+    If this is a trap condition that would kill an ordinary
+    process-model program, then the "process-signal" output pin is
+    driven with an exit code similar to that used by UNIX wait(2).
+    Such conditions include memory faults, invalid instructions, etc.
+
+    See the documentation of "hw-cpu-arm7t" for the list of supported
+    trap & trap-code values.
+
+    If the "verbose?" attribute is set to a true value, detailed
+    tracing messages will be printed to stderr during a system call
+    emulation.
+
+    * Initialization
+
+    When the "reset" pin is driven, all open files are closed and the
+    simulated stdio file handles (0/1/2) are attached to the host's
+    same stdio file handles.
+
+    The "heap-base", "heap-limit", "stack-base", "stack-limit", and
+    "command-line" attributes provide access to values that are
+    exposed to several ANGEL system calls.
+
+    The "max-fds" attribute specifies the largest simulated file
+    descriptor that will be made available to the target program.
+
+    * STDIO
+
+    Accesses to the special simulated file handles 0/1/2 are mapped to
+    pin I/O on the "debug-tx" and "debug-rx" pins.  Input from the
+    "debug-rx" pin is buffered for future reads.  Reads may block
+    until data is received.  Writes to stdout or stderr are modelled
+    by sending the supplied characters, one-at-a-time, out through the
+    "debug-tx" pin.
+
+  - SID conventions
+
+    * This is a supervisory component.
+    * It does not support triggerpoints nor state save/restore.
+    * It does not limit recursion.
+
+* Environment
+
+  - Related components
+
+    * The Angel component communicates closely with a CPU and main memory.  
+      It uses the CPU for retrieving system call arguments from
+      registers and placing results in a register.  It uses memory for 
+      accessing data when system call arguments are pointers into the
+      target memory.  An example of this is the char* argument to write().
+      The coupling to the CPU and memory is quite relaxed: the only
+      requirement is that the endianness of the CPU be known via attribute
+      and that attributes for registers exist with names of the form
+      "rN".
+
+    * The configuration file fragment below shows how to connect an 
+      Angel component into a more complete system:
+
+	new hw-cpu-arm7t cpu
+	new hw-memory-ram/rom-basic mem
+	new sw-gloss-arm/angel angel
+	new sid-io-stdio stdio
+	relate angel cpu cpu
+	connect-pin cpu trap <-> angel trap
+	connect-pin cpu trap-code -> angel trap-code
+	connect-pin angel process-signal -> main stop!
+	connect-pin angel debug-tx -> stdio stdout
+	connect-pin angel debug-rx <- stdio stdin
+	connect-bus angel target-memory cpu debugger-port
+
+  - Host system
+
+    * The component implements the Angel's semi-hosted system calls
+      such as open() and close().  Use these calls with caution: they 
+      can perform file I/O on the host, therefore it is possible to
+      write rogue target programs that delete or modify files on the host.
+
+* SID interface reference
+
+  - low level:
+    * pins
+      - reset | input | any | initialization
+      - trap | input/output | trap type enum | system call emulation
+      - trap-code | input | trap code value | system call emulation
+      - process-signal | output | signal number | system call emulation
+      - debug-tx | output | 0-255 | stdio
+      - debug-rx | input | 0-255 | stdio
+
+    * accessors
+ 
+      - target-memory | any | system call emulation
+
+    * attributes
+
+      - verbose? | setting | boolean | false | system call emulation
+      - heap-base | setting | number | 0x80000 | initialization
+      - heap-limit | setting | number | 1024| initialization
+      - stack-base | setting | number | 0x200000 | initialization
+      - stack-limit | setting | number | 0x200000 | initialization
+      - command-line | setting | any | "" | initialization
+      - max-fds | setting | number | 32 | initialization
+      - "tk tty" | gui | n/a | "hw-visual-tty" | component gui
+
+    * relations
+ 
+      - cpu | system call emulation
+
+* References
+
+  ARM Software Development Toolkit Reference Guide (version 2.11)
+  Document number: ARM DUI 0041B
+  Chapter 8 (``Angel'')
+
+  newlib source code is also useful for clarification.

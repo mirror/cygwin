@@ -1,0 +1,244 @@
+# -*- Tcl -*-
+#
+# Copyright (C) 2000 Red Hat
+#
+# Description:
+# A simple graphical clock component that can talk to a related
+# real-time clock component.
+
+
+# Compulsory SID callback procs.
+
+proc attribute_names {} { return [list "geometry" "title"] }
+
+proc attribute_names_in_category {category} {
+    switch $category {
+	"setting" { return [attribute_names] }
+	default { return [list] }
+    }
+}
+
+proc attribute_value {name} {
+    switch $name {
+	"geometry" { return "[window_width]x[window_width]" }
+	"title" { return [wm title .] }
+    }
+}
+
+proc set_attribute_value {name value} {
+    switch -exact -- $name {
+	"geometry" {
+	    set pair [split $value x]
+	    if {[llength $pair] != 2} { return bad_value }
+	    
+	    # Enforce 1-to-1 aspect ratio.
+	    set x [lindex $pair 0]
+	    set y [lindex $pair 1]
+	    if {$x != $y} { return bad_value }
+
+	    # Enforce minsize.
+	    if {$x < 100} { return bad_value }
+	    
+	    wm geom . ${x}x${y}
+	}
+	"title" {
+	    wm title . $value
+	    update
+	}
+	default { return not_found }
+    }
+    return ok
+}
+
+proc pin_names {} { return "" }
+proc bus_names {} { return "" }
+proc accessor_names {} { return "" }
+proc relationship_names {} { return [list "time-source"] }
+
+proc find_pin {pin} { return not_found }
+proc find_bus {bus} { return not_found }
+proc connect_pin {name pin} { return not_found }
+proc disconnect_pin {name pin} { return not_found }
+
+proc relate {relation component} {
+    global peer
+    catch {unset peer}
+    set peer $component
+    wm title . $relation
+    return ok
+}
+
+proc unrelate {relation component} {
+    global peer
+    unset peer
+    wm title . "unassociated"
+    return ok
+}
+
+
+proc related_components {relation} {
+    global peer
+    if {[info exists peer]} {
+	return [list $peer]
+    } else {
+	return [list]
+    }
+}	
+
+
+# Return the current width of the top-level window.
+
+proc window_width {} {
+    set geometry [split [wm geometry .] "+x"]
+    return [lindex $geometry 0]
+}
+
+
+# Return the current height of the top-level window.
+
+proc window_height {} {
+    set geometry [split [wm geometry .] "+x"]
+    return [lindex $geometry 1]
+}
+
+
+# Initialise the top-level window.
+
+proc init_window {} {
+    wm title . hw-visual-clock
+
+    # Enforce a 1-to-1 aspect ratio and a minimum size of 150x150.
+    wm aspect . 1 1 1 1
+    wm minsize . 150 150
+
+    canvas .face -width 200 -height 200
+    pack .face
+}
+
+
+# Convert (r,theta) to (x,y).
+
+proc polar_to_cartesian {r theta} {
+    # Re-express `theta' in radians.
+    # The Tcl transcendental functions need angles in radians.
+    set pi [expr atan(1) * 4]
+    set theta [expr $theta / [expr 180 / $pi]]
+
+    set x [expr $r * cos($theta)]
+    set y [expr $r * sin($theta)]
+    
+    return [list $x $y]
+}
+
+proc draw_face {} {
+    global centre radius
+
+    set dim [window_width]
+    # wm geometry . "${dim}x${dim}"
+
+    # An optimisation until I can remedy spurious <Configure> events.
+    # if {$dim == [.face cget -width]} { return }
+    # .face configure -width [window_width] -height [window_height]
+
+    set centre [list [expr int($dim / 2)] [expr int($dim / 2)]]
+
+    set x1 [expr int(0.08 * $dim)]
+    set x2 [expr $dim - $x1]
+    set radius [expr ($x2 - $x1) / 2]
+
+    catch {.face delete markings}
+
+    # Draw the markings.
+    for {set theta 0} {$theta < 360} {set theta [expr $theta + 6]} {
+
+	set point1 [polar_to_cartesian [expr int($radius * .9)] $theta]
+	set point2 [polar_to_cartesian $radius $theta]
+
+	set x1 [expr int([lindex $centre 0] + [lindex $point1 0])]
+	set y1 [expr int([lindex $centre 1] + [lindex $point1 1])]
+	set x2 [expr int([lindex $centre 0] + [lindex $point2 0])]
+	set y2 [expr int([lindex $centre 0] + [lindex $point2 1])]
+
+	if {[expr $theta % 30] == 0} { set width 2 } else { set width 1 }
+	.face create line $x1 $y1 $x2 $y2 -width $width -tags markings
+    }
+}
+
+proc get_hour {} {
+    global peer
+    if {[info exists peer]} {
+	return [sid::component::attribute_value $peer hour]
+    }
+}
+
+proc get_minute {} {
+    global peer
+    if {[info exists peer]} {
+	return [sid::component::attribute_value $peer minute]
+    }
+}
+
+proc get_second {} {
+    global peer
+    if {[info exists peer]} {
+	return [sid::component::attribute_value $peer second]
+    }
+}
+
+
+# Redraw the window once per second.
+proc refresh_periodically {} {
+    draw_face
+    draw_hands
+    after 1000 refresh_periodically
+}
+
+
+# Redraw the hands on the clock.
+# All of the hands are tagged with the tag "hands" to make it easy to
+# remove them all in one operatiom.
+
+proc draw_hands {} {
+    global centre radius peer
+
+    # If there is no peer, don't try to show the time.
+    if {![info exists peer]} { return }
+
+    set theta_h [expr ([get_hour] * 30) + ([get_minute] / 2)]
+    set theta_h [expr $theta_h + 270]
+
+    set theta_m [expr [get_minute] * 6]
+    set theta_m [expr $theta_m + 270]
+
+    set theta_s [expr [get_second] * 6]
+    set theta_s [expr $theta_s + 270]
+
+    catch {.face delete hands}
+
+    set x1 [lindex $centre 0]
+    set y1 [lindex $centre 1]
+
+    set point [polar_to_cartesian [expr int($radius * 0.70)] $theta_h]
+    set x2 [expr int($x1 + [lindex $point 0])]
+    set y2 [expr int($y1 + [lindex $point 1])]
+    .face create line $x1 $y1 $x2 $y2 -width 5 -tags hands
+
+    set point [polar_to_cartesian [expr int($radius * 0.84)] $theta_m]
+    set x2 [expr int($x1 + [lindex $point 0])]
+    set y2 [expr int($y1 + [lindex $point 1])]
+    .face create line $x1 $y1 $x2 $y2 -width 5 -tags hands
+
+    set point [polar_to_cartesian [expr int($radius * 0.90)] $theta_s]
+    set x2 [expr int($x1 + [lindex $point 0])]
+    set y2 [expr int($y1 + [lindex $point 1])]
+    .face create line \
+	    $x1 $y1 $x2 $y2 -width 1 -arrow last -fill red -tags hands
+}
+
+
+init_window
+refresh_periodically
+
+# Local Variables:
+# mode: tcl
+# End:

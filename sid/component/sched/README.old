@@ -1,0 +1,195 @@
+Theory of operation for scheduler component
+-------------------------------------------
+
+A scheduler arranges to dispatch timed events to a herd of client
+components.  Each component may wish receive events at different
+regular or irregular intervals.  These intervals are defined by
+moments along a "time" axis.  The scheduler keeps track of all the
+event subscriptions, and as "time" passes, dispatches the events.
+
+Event subscriptions may be changed or cancelled on the fly, across a
+functional pin interface.  Dispatching as a whole may be suspended,
+across a supervisory attribute interface.
+
+Each scheduler defines its own notion of "time".  There is a scheduler
+variety that measures "time" as in real host milliseconds.  There is
+another variety that measures "time" as simulated target time as a
+multiple of some fixed quantum.  
+
+Regular events occur repeatedly, once per interval; irregular events
+occur only once.  Regular events may be useful to simulated timers;
+irregular events to components who model activity of various lengths.
+Both types of events are interleaved properly, to guarantee that
+events are dispatched in increasing time order.
+
+
+Scheduler low level interface
+-----------------------------
+
+An event consumer component may be configured to connect to whichever
+type of scheduler makes sense for that component.  An "event
+subscription" is controlled by a collection of pins and attributes
+exported by the scheduler.  The names of pins/attributes are prefixed
+by NNN, a number for the "subscription number", starting at 0.
+
+attribute "NNN-regular?" - mode selection: "1" for regular, "0" for irregular
+attribute "NNN-time"     - decimal string: computed "time" of next event
+pin       "NNN-control"  - control input pin.  If passed a value using 
+                           the driven(host_int_4) method, it sets the
+                           delta-"time" for this subscription to the
+	                   bottom 31 bits of the given value.  The
+	                   "NNN-time" attribute is updated
+	                   accordingly.  The top bit of the given
+	                   value is interpreted as a mode switch: "1"
+	                   for regular mode, "0" for irregular mode.
+	                   The "NNN-regular?" attribute is updated
+	                   accordingly.  If passed no value using the
+	                   driven() method, this subscription is
+	                   suspended.  Pending events are removed from
+	                   the queue.
+pin       "NNN-event"    - output pin: event is being dispatched
+
+In addition, the scheduler exports a set of global attributes and pins
+for, for use by supervisory or connected functional components.
+
+pin       "advance"      - input pin: trigger to advance time and
+                           dispatch events.  This pin could be
+                           connected to the "perform-activity" output
+                           of the cfgroot.
+attribute "step-cycle-limit" - step control: positive decimal string that
+                           limits the number of events dispatched per
+                           input event on the "advance" pin.  Default "1".
+	                   A larger value allows the scheduler to retain
+                           control longer.
+pin "yield"              - step looping control: when driven, an in-progress 
+                           event dispatching loop based on "step-cycle-limit"
+                           is directed to abort early.
+attribute "enabled?"     - enable control: "1" for on, "0" for off.
+                           When disabled, the scheduler dispatches no
+                           events, even though "time" may pass.  When
+                           re-enabled and advanced, past-due events
+                           will be dispatched.  A debugger may find
+                           this useful to suspend event scheduling
+                           during breakpoint handling.  Default "1".
+attribute "yield-host-time?" - yield control: "1" for on, "0" for off. 
+	                   When this setting is set, the scheduler
+                           will attempt to yield the CPU during "idle"
+                           times.  Default "0".
+pin       "time-query"   - handshaking input pin: when driven, the
+                           scheduler drives its current "time" onto
+                           the two following pins.   This is how a
+                           component may query the scheduler for the
+                           "current time".
+pin       "time-high"    - output pin: high order 32 bits of "time"
+pin       "time-low"     - output pin: low order 32 bits of "time".
+                           These above pins are not driven by mere
+                           "time" advancement because of performance
+                           concerns.
+attribute "time"         - r/w attribute: decimal string of "current time"
+attribute "num-clients"  - r/w attribute: decimal string indicating
+                           the (max) number of event subscribers.
+                           Valid NNN will range from 0 to
+                           "num-clients"-1.  Upon a write to this
+                           attribute, the subscription list is changed
+	                   as little as necessary.  If the list is to
+	                   be shrunk, old entries will be removed; if the
+                           list is to be grown, new entries will be
+                           appended.
+
+
+Three scheduling component types are defined in "libsched.so" in
+"scheduler_component_library".  They are "sid-sched-host",
+"sid-sched-host-precise", and "sid-sched-sim".
+
+The host-time schedulers measure "time" in absolute host milliseconds
+since the UNIX epoch using the gettimeofday(3) or ftime(3) functions.
+They can yield CPU using the usleep(3) function.  The non "-precise"
+version attempts to limit itself to relatively infrequent time checking
+system calls using a simpleminded PLL scheme.  In exchange it suffers
+from dilution of precision on the order of 25 ms.  The "-precise"
+version does not attempt to limit its use of time checking system
+calls, and therefore imposes more processor load.
+
+The target-time ("sim") scheduler measures "time" as a monotonically
+increasing 64-bit time number, starting at 0 at startup.  It cannot
+yield.  Whenever advanced, it jumps to the "time" of the next pending
+event.  The number does not have a designated identity with a metric
+time unit.  The interpretation of the value is up to the application &
+configuration.  (NOTE: this may change -- a per-subscriber scale could
+set the a factor such as "target-nanoseconds per unit".)
+
+
+
+Scheduler sidutil:: interface
+-----------------------------
+
+See sid/include/sidschedutil.h.  The class generic_scheduler_interface
+implements a functional interface to an external scheduler component.
+It manages schedule subscriptions by name, and maps them to control
+pin traffic.  It dispatches events to local callback functions.  (See
+the file for more details.)
+
+
+
+Scheduler component internals
+-----------------------------
+
+The two scheduler types in the DLL are implemented by almost the same
+piece of code.  Here is a list of interesting classes: 
+
+generic_scheduler<TK> - Maintains the data structures needed for
+                        scheduling in general.  Includes a TK
+                        (time-keeper) of some sort.  The timing tables 
+                        have a bunch of scheduling_events.  Exports a
+                        scheduling API to scheduler_client<>.
+target_time_keeper    - TK class to track target time
+host_time_keeper      - TK class to track host time
+scheduling_event      - A record representing a single scheduled
+                        event.  It knows the "time" of the next
+                        trigger moment, and the output pin to tickle.
+
+scheduler_component<> - An actual sid component.  It has-a scheduler
+                        object, which is some type of
+                        generic_scheduler<>.  It calls the
+                        generic_scheduler<> to advance the time and
+                        handles global pins/attributes.
+
+scheduler_client<SCH> - Represents a scheduling subscription -
+                        contains the "NNN-" attributes and pins listed
+                        above.  The generic_scheduler<> maintains a
+                        vector of these.  SCH refers to the
+                        scheduler_component who gets and loses the
+                        "NNN-" attributes and pins.  It makes calls to
+                        the component's generic_scheduler<> to
+                        add/remove/change scheduled events.
+ 
+
+The key data structures are all in generic_scheduler.  These are:
+
+irregular event queue - This is a heap of scheduling_events, for
+                        all irregular events.  They go in, and
+                        eventually they come out dispatched or
+                        cancelled.
+regular event set     - This is a list of scheduling_events, for all
+                        regular event subscriptions.  They stay in
+                        until they are cancelled.
+regular timetable     - This is a time-sorted list of pointers to the
+                        regular event vector.  The list is longish,
+                        and includes a bunch of planned trigger
+                        moments of regular events.  All regular event
+                        subscriptions are interleaved in this vector.
+                        An iterator is kept that points at the next
+                        planned entry.
+	                The purpose of this table is to avoid having
+	                to scan through the regular event set for each
+	                clock tick.  It is a pre-planned schedule that
+	                caches future events over a longer "time"
+	                span.  It is flushed when any regular event
+	                subscriptions get changed.
+
+During a clock advance, the times stored in the head of the irregular
+event heap, and the "next" regular timetable entry are compared.  The
+lesser one (in "time") gets to go if it is due ("current time" >=
+"trigger time").  The regular event timetable is refilled if it is
+used up.  This repeats until all events pending "now" have been
+dispatched.

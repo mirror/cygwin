@@ -1,0 +1,4 @@
+load_lib "docs.exp"
+
+doc_test interrupt hw-interrupt-arm/ref
+doc_test interrupt hw-interrupt-cogent/cma222

@@ -1,0 +1,57 @@
+#! /bin/sh 
+#
+# Generate some sid configuration files ahead of time.
+#
+# Calling convention
+# - cwd is in build tree, with usable ../configrun-sid
+
+# snarf autoconf variables 
+srcdir="@srcdir@"
+
+if [ ! -x ../configrun-sid ]; then
+    echo "Call `basename $0` from BUILD/sid/bsp/pregen!"
+    exit 1
+fi
+
+
+crs () {
+    ../configrun-sid $@
+}
+
+mvic() {
+    mv -f $1 $srcdir/$2
+}
+
+
+
+crs --cpu=arm --no-run --gdb=5000 -EL
+mvic sid.conf arm-gloss.conf
+
+crs --cpu=arm --no-run --gdb=5000 -EL --tksm
+mvic sid.conf arm-gloss-tksm.conf
+
+crs --cpu=arm --no-run --gdb=5000 -EB
+mvic sid.conf arm-glossBE.conf
+
+crs --cpu=arm --no-run --gdb=5000 --board=pid7t-uart1:gdb -EL
+mvic sid.conf arm-pid.conf
+
+crs --cpu=arm --no-run --gdb=5000 --board=pid7t-uart1:gdb -EL --tksm
+mvic sid.conf arm-pid-tksm.conf
+
+crs --cpu=arm --no-run --gdb=5000 --board=pid7t-uart1:gdb -EB
+mvic sid.conf arm-pidBE.conf
+
+crs --cpu=arm --no-run --board=pid7t-cygmon-uart1:5000 -EL
+mvic sid.conf arm-pid-cygmon.conf
+
+crs --cpu=arm --no-run --board=pid7t-cygmon-uart1:5000 -EL --tksm
+mvic sid.conf arm-pid-cygmon-tksm.conf
+
+crs --cpu=arm --no-run --gdb=5000 --board=cma110:cma222-uart1:gdb -EL
+mvic sid.conf arm-cma.conf
+
+crs --cpu=arm --no-run --gdb=5000 --board=cma110:cma222-uart1:gdb -EL --tksm
+mvic sid.conf arm-cma-tksm.conf
+
+

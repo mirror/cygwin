@@ -1,0 +1,4 @@
+load_lib "docs.exp"
+
+doc_test consoles sid-io-stdio
+doc_test consoles sid-io-socket-server

@@ -1,0 +1,6 @@
+load_lib "docs.exp"
+
+doc_test rtc hw-rtc-ds1642
+doc_test rtc hw-rtc-ds1742
+doc_test rtc hw-rtc-sid
+doc_test rtc hw-visual-clock

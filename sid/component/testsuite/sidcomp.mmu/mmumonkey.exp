@@ -1,0 +1,8 @@
+# Run a monkey test on the components in this component library. 
+
+if {! $sidtarget(arm)} then { untested "hw-remap/pause-arm/ref not available"; return }
+
+load_lib "monkey.exp"
+
+proc state_safe_p {} { return 0 }
+monkey_test hw-remap/pause-arm/ref mmu_component_library libmmu.la

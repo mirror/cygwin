@@ -1,0 +1,13 @@
+load_lib "cpudefs.exp"
+
+if {$sidtarget(arm)} then {
+    file delete -force "gmon.out"
+
+    run-sid-c-bsp-tests arm-elf arm7tdmi $srcdir/sidcomp.profiling "*.c" {-mlittle-endian} {--cpu=arm --gprof --insn-count=2037} axl
+
+    # make this a little smarter
+    set test "profiling created gmon.out"
+    if {[file exists "gmon.out"]} then { pass $test } else { fail $test }
+
+    # XXX: actually run CROSS-gprof on result
+}

@@ -1,0 +1,125 @@
+* Name
+  hw-uart-ns16550
+
+* Synopsis
+  The PC16550D contains independent serial input and output ports that perform
+  byte-at-a-time I/O. The 16550 is distinguished from its predecessor, the 
+  16450, by two 16-byte FIFOs. The FIFOs allow the CPU to buffer data to 
+  reduce the frequency of interrupts.  The 16550 also supports model-control
+  functions DMA hand-shaking, and have a loop-back mode for testing.
+
+  Pins: Sin, Sout, INTR, TxRDY, RxRDY, RTS, DTR, OUT1, OUT2, CTS, DSR, DCD, RI,
+	Reset
+  Bus: Bus
+  Attributes: timeout sio-framing? in-fifo-length out-fifo-length "tk tty"
+	RBR IER IIR LCR MCR LSR MSR SCR DLL DLM THR FCR Sin Sout Reset INTR
+	TxRDY RxRDY RTS DTR OUT1 OUT2 CTS DSR RI DCD state-snapshot
+  Library: libuart.la
+  Symbol name: uart_component_library
+
+* Functionality
+  - Modeling
+    The Uart model is somewhat abstracted from its hardware counterpart:
+
+    * The Sin and Sout pins carry a character at a time, including the parity
+      bit, if enabled. Normally, a character is 7-bits wide, so the model 
+      transmits and receives one byte at a time. However, the chip supports
+      character widths of 5 to 8 bits, so up to 9 bits (8 data + parity) may
+      be transmitted. Stop bits are not modeled.  If the "sio-framing?" 
+      attribute is off, then only the raw data bits are passed on the pins.
+      The "in-fifo-length" attribute may be used to simulate an arbitrarily
+      large input FIFO.  The "out-fifo-length" attribute is the converse,
+      though is just a placebo since there is no output FIFO processing at
+      all.
+
+    * The preceding point suggests that the model uses an infinite baud rate, 
+      since all the bits in a character are transmitted in a single event. 
+      This means that:
+
+      - The timing pins (XIN, XOUT, RCLK, BAUDOUT) are not simulated.
+      - Break functionality cannot be modeled.
+      - Framing errors cannot occur.
+      - The Divisor Latch is modeled but its values are ignored.
+      - To handle Character Timeouts, the UART model relies on callbacks
+        from the scheduler.
+    
+  - SID conventions
+
+    * This is a functional component
+    * It has state save/restore support
+    * It has not been explicitly made reentrant
+    * Pins and registers are both accessible from the Target View Manager
+
+* Environment
+
+  - Related components
+    * Besides the CPU bus, the UART typically connects to both a
+      serial source and a serial sink component. The sink/source may be
+      combined, as with a modem component. More advanced designs will use
+      the TxRDY/RxRDY pins to communicate with a DMA controller.
+
+      If the UART is run using interrupts (versus polling) it should also be
+      connected to the scheduler so that transmit/receive timeouts are
+      handled correctly.
+
+      Because the UART will be programmed to use a specific line discipline,
+      you must take care to match this discipline in both the sink and source.
+
+    * The following configuration file segment shows how to connect the
+      UART to a keyboard and console for interrupt-driven operation:
+
+      # components involved - cpu and bus are assumed
+      new hw-uart-ns16550 uart
+      new hw-keyboard keyboard
+      new hw-console console
+      new sid-sched-sim target-sched
+      set target-sched num-clients 2
+      # connect uart to bus at memory-mapped address 0x800000
+      connect-bus bus [0x800000-0x800008,4,1] uart Bus
+      # pin connections
+      connect-pin uart INTR -> cpu intr
+      connect-pin uart Sout -> console SIN
+      connect-pin keyboard SOUT -> uart Sin
+      connect-pin target-sched 0-event -> uart rx-timeout-event
+      connect-pin target-sched 1-event -> uart tx-timeout-event
+      # use 7-bits even-parity as the line discipline
+      set console line-disc "bits=7 parity=even"
+      set keyboard line-disc "bits=7 parity=even"
+
+* SID interface reference
+
+  - low level:
+
+    * pins
+      - Sin  | input  | data + parity | Serial input
+      - Sout | output | data + parity | Serial output
+      - INTR | output | 0,1 | active high interrupt pin
+      - TxRdy | output | 0,1 | active low Transmitter Ready (DMA control)
+      - RxRdy | output | 0,1 | active low Receiver Ready (DMA control)
+      - RTS | output | 0,1 | active low Request to Send (modem control)
+      - DTR | output | 0,1 | active low Data Transmit Ready (modem control)
+      - OUT1 | output | 0,1 | active low User Output (modem control)
+      - OUT2 | output | 0,1 | active low User Output (modem control)
+      - CTS | input | 0,1 | active low Clear To Send (modem control)
+      - DSR | input | 0,1 | active low Data Set Ready (modem control)
+      - RI | input | 0,1 | active low Ring Indicator (modem control
+      - DCD | input | 0,1 | active low Data Carrier Detect (modem control)
+      - Reset | input | any | Master Reset
+
+    * buses
+      - Bus | 0x0-0x7 | read/write, bytes only | access to registers
+        Although there are only 8 addresses, there are 12 registers
+
+    * attributes
+      - timeout | write | positive integers | 10 | Sets the time to wait
+        (in wall-clock ms?) before a channel is considered to have timed-out
+      - sio-framing? | setting | "1" or "0" | "1" | Sin/Sout control
+      - in-fifo-length | setting | 1-65535 | 16 | Sin/Sout control
+      - out-fifo-length | setting | 1-65535 | 16 | Sin/Sout control
+      - "tk tty" | gui | n/a | "hw-visual-tty" | component gui
+      - state-snapshot | state | opaque string | none | state save/restore
+
+* References
+  National Semiconductor PC16550 data sheet, dated June 1995. 
+  Obtained from <http://www.national.com/pf/PC/PC16550D.html>
+  This page has links to the data sheet and application notes (in PDF)

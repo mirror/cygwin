@@ -1,0 +1,5 @@
+# Run a monkey test on the components in this component library. 
+
+load_lib "monkey.exp"
+
+monkey_test hw-parport-ps/2 parport_component_library libparport.la

@@ -1,0 +1,7 @@
+invaRel.badconf:50: cannot set relation test for component angel
+invaRel.badconf:51: cannot set relation cpu for component target-sched
+invaRel.badconf:52: component ang not found
+invaRel.badconf:53: component connect-pin not found
+invaRel.badconf:54: cannot set relation loader for component loader
+invaRel.badconf:55: cannot set relation cpu for component mem
+Configuration error.  Aborting.

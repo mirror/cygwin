@@ -1,0 +1,22 @@
+set main verbose? 0
+
+load libcgencpu.la cgen_component_library
+load libgloss.la gloss_component_library
+load libloader.la loader_component_library
+load libmapper.la mapper_component_library
+load libsched.la sched_component_library
+
+new hw-cpu-arm7t cpu
+new sw-load-elf loader
+new sw-gloss-arm/angel angel
+new hw-mapper-basic bus
+
+relate angel cpu cpu
+
+connect-pin main starting -> loader load!
+connect-pin main perform-activity -> cpu step!
+
+connect-bus loader load-accessor bus access-port
+
+connect-pin cpu trap - angel trap               # ERROR: invalid direction
+# new hw-cpu-arm7t main

@@ -1,0 +1,7 @@
+setInvAttV.badconf:4: component main attribute verbose? bad value anything
+setInvAttV.badconf:35: component target-sched attribute enabled? bad value -234
+setInvAttV.badconf:41: component host-sched attribute 0-regular? not found
+setInvAttV.badconf:42: component host-sched attribute 0-time not found
+setInvAttV.badconf:45: component mem attribute size bad value ~!@#$%^&
+setInvAttV.badconf:49: component cpu attribute engine-type bad value 0
+Configuration error.  Aborting.

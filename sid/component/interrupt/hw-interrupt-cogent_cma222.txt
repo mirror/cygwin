@@ -1,0 +1,108 @@
+* Name
+  hw-interrupt-cogent/cma222
+
+* Synopsis
+  This component simulates the interrupt controller on the Cogent
+  CMA222 ARM710T CPU model.
+
+  Pins: interrupt interrupt-source-0..interrupt-source-7
+  Buses: irq-registers
+  Attributes: interrupt irq-raw-status irq-enable-register
+
+  Library: libinterrupt.la
+  Symbol name: interrupt_component_library
+
+* Functionality
+
+  - Modelling
+   
+    * The interrupt controller model features 8 interrupt sources
+      for the follow services: reset, serial port A, serial port B,
+      timer, motherboard ethernet (CMA101) or parallel port (CMA102
+      and CMA110), and 3 interrupt lines for motherboard slots.
+
+  - Behaviors
+
+    * Reset
+
+      When the "interrupt-source-0" input pin is driven, this component
+      is reset to the hardware's normal power-up state.
+
+    * Register access
+
+      When the "irq-registers" bus is accessed, the appropriate 8-bit control
+      register is read or written.  Available registers are as follows:
+      ISR (Interrupt Source Register), Clear ISR, IMR (Interrupt Mask
+      Register), and 3 Interrupt Acknowledge slot registers.  These
+      registers are mapped at base address 0xF000000, and the following
+      offsets:
+
+	offset		read		write
+	0xF600000	ISR		(reserved)
+	0xF600008	(reserved)	Clear ISR
+	0xF600010	IMR		(reserved)
+	0xF600018	(reserved)	IMR	
+	0xF600020	IRQAckSlot1	(reserved)
+	0xF600028	IRQAckSlot2	(reserved)
+	0xF600030	IRQAckSlot3	(reserved)
+
+      Several registers are also available as watchable attributes.
+
+    * Interrupt processing
+
+      When any interrupt source is signalled, or interrupt-enabled
+      masks are modified, pending interrupts are processed.  There is
+      only one interrupt source: the "interrupt-source-N" input pins.
+      Subject to the then-current interrupt-enabling registers, the
+      "interrupt" output pin may be driven.
+
+      The polarity for the input interrupt source pins is positive,
+      meaning that non-zero values are interpreted as "asserted".  On
+      the other hand, the polarity for the output interrupt pins is
+      negative, meaning that zero values are to be interpreted as
+      "asserted".  
+
+      Similarly named attributes may be used to generate/monitor pin
+      traffic.
+
+  - SID conventions
+  
+  * This is a functional component.
+  * This component supports state save/restore and triggerpoints.
+
+* Environment
+
+  - Related components
+    The interrupt controller sits between the ARM710T CPU on the CMA222
+    CPU board, and the other components on this board or the CMA motherboard.
+    The following configuration file fragment shows all the onboard devices
+    of the CMA110 motherboard connected to the interrupt controller.
+
+	new hw-cpu-arm7t cpu
+	new hw-timer-arm/ref-nosched timer
+	new hw-interrupt-cogent/cma222 intcontrl
+	new hw-uart-ns16550 uart1
+	new hw-uart-ns16550 uart2
+	connect-pin uart2 INTR -> intctrl interrupt-source-1
+	connect-pin uart1 INTR -> intctrl interrupt-source-2
+        connect-pin timer interrupt -> intcontrl interrupt-source-3
+	connect-pin parport INTP -> intctrl interrupt-source-4
+	connect-pin intcontrl interrupt -> cpu nirq
+
+* SID interface reference
+
+  - low level:
+    * pins
+      - interrupt-source-[0,7] | input | any | interrupt handling
+      - interrupt | output | 0,1 | interrupt handling
+
+    * buses
+      - irq-registers | 0x0 - 0x37F | read/write | register access
+
+    * attributes
+      - interrupt | pin watchable | numeric | n/a | interrupt handling
+      - irq-raw-status | register watchable | numeric | n/a | register access
+      - irq-enable-register | register watchable | numeric | n/a | register access
+
+* References
+  <http://www.cogcomp.com/data_sheets/>

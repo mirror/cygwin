@@ -1,0 +1,330 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* components.h: Import more std:: identifiers.
+
+2000-02-22  matthew green  <mrg@redhat.com>
+
+	* ds1x42.cxx: string()ify the 2nd argument to add_attribute_ro_value().
+
+2000-03-15  matthew green  <mrg@redhat.com>
+
+	* components.h: Add several `throw()' specifiers to functions whose
+	virtual declaration included the throw. New GCC checks this more
+	completely.
+	* ds1x42.cxx: Likewise.
+
+2000-02-14  Ben Elliston  <bje@redhat.com>
+
+	* components.h (ds1642::memory): Remove.
+	(ds1642::membus): New member.
+	(ds1642::memSize): Likewise.
+	* ds1x42.cxx (ds1642::ds1642_bus::write_data): Use a bus accessor
+	to perform NVRAM reads/writes with an external memory.
+	(ds1642::ds1642_bus::read_data): Likewise.
+	(ds1642 ctor): Initialise membus. Add a "memory-bus" accessor.
+	(ds1642::write_7f8): Again, use the accessor.
+	(operator <<): Don't save memory state.
+	(operator >>): And don't restore it.
+	* hw-rtc-ds1x42.txt: Update; document "memory-bus" accessor.
+
+2000-02-10  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (librtc_la_SOURCES): Remove mktime.c.
+	* Makefile.in: Regenerate.
+	* mktime.c: Remove.
+	* mktime.h: Likewise.
+	* components.h (ds1642::refresh): New method.
+	(ds1642::valid): Likewise.
+	* ds1x42.cxx: Overhaul to better guard against invalid data.
+	(bcd_to_bin): Return an unsigned type.
+	(ds1642::refresh): Define.
+	(ds1642::valid): Likewise.
+
+2000-02-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* components.cxx (rtcDelete): Guard against dynamic_cast after delete.
+
+2000-01-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-rtc-ds1x42.txt: Adjusted attribute reference section for template.
+	Added mention of related gui component.
+	* hw-visual-clock.tk (relate, unrelate): Accept any relationship name.
+	Set window title from it.
+	* hw-visual-clock.txt: Document acceptance of any relationship name.
+
+2000-01-07  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* hw-visual-clock.txt: Minor changes to wording.
+
+2000-01-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ds1x42.cxx (ds1642 ctor): Add new "gui" category attribute.
+	* hw-rtc-ds1x42.txt (Related components): Corrected conf syntax.
+	* hw-visual-clock.tk (relate, unrelate): Use "target" relation, not 
+	"time-source".
+	(refresh_periodically): Redraw face & hands.
+	(draw_face): Don't resize windows.
+	(mainline): Don't bind to <Configure>.
+	* hw-visual-clock.txt: Document relation name change.  Describe this
+	as a supervisory gui component.
+	* clockdemo.conf: New demo file.
+
+2000-01-06  Frank Ch. Eigler  <fche@cygnus.com>
+	
+	* hw-visual-clock.txt: Added mention of tcl nature.
+	* Makefile.am (pkgdata_DATA): Add hw-visual-clock.txt.
+	* Makefile.in: Regenerated.
+
+2000-01-05  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (pkgdata_DATA): Add hw-visual-clock.tk.
+	* Makefile.in: Regenerate.
+	* hw-visual-clock.tk: New file.
+	* hw-visual-clock.txt: Likewise.
+
+1999-12-15  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* hw-rtc-ds1x42.txt: Added clock to list of pins.
+
+1999-12-14  Ben Elliston  <bje@cygnus.com>
+
+	* hw-rtc-ds1x42.txt (hw-rtc-ds1642,hw-rtc-ds1742): Document
+	triggerpoint support.
+
+	* components.h (ds1642::triggerpoint_manager): New member.
+	(ds1642::pin_factory): New method.
+	(ds1642::pin_junkyard): Likewise.
+	* ds1x42.cxx (ds1642::ds1642_bus::write_data): Insert triggerpoint
+	checks at appropriate places.
+	(ds1642 ctor): Initialise triggerpoint_manager; add watchables:
+	epoch-time, oscillating, write-mode.
+	(ds1642::tick): Insert a checkpoint.
+	(ds1642::write_7f8): Likewise.
+	(ds1752::write_7f8): Likewise.
+
+1999-12-10  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-rtc-ds1x42.txt: New file.  Combined contents from
+	* hw-rtc-ds1642.txt, hw-rtc-ds1742.txt: Removed.
+	* Makefile.am: Install new file.  Add docs test.
+	* Makefile.in: Regenerated.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-rtc-ds1642.txt: New file.  Content from old README.
+	* hw-rtc-ds1742.txt: Ditto.  Looks a lot like the other one.
+	* hw-rtc-sid: New file.
+	* README: Removed.
+	* Makefile.am: Install new files.
+	* Makefile.in: Regenerated.
+
+1999-12-16  Mary Lynn Kostash <mkostash@cygnus.com>
+
+	* README: Minor re-wording of hw-rtc-sid info.
+
+1999-12-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Document hw-rtc-sid.
+
+1999-11-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* components.h: New file.  Declare all components in this library.
+	* components.cxx: New file.  Implement rtc_component_library.
+	* ds1x42.cxx: Removed transplanted portions.
+	* sidrtc.cxx: New file.  Implement fictional timer.
+	* Makefile.am (SOURCES): Add new .cxx files.
+	* Makefile.in: Regenerated.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ds1x42.cxx (tick): Take unused argument.
+	(rtcDelete): Use dynamic_cast<>.
+
+1999-11-08  Ben Elliston  <bje@cygnus.com>
+
+	* README (hw-rtc-ds1642): Document missing attributes.
+	(hw-rtc-ds1742): Likewise. Patch for 901493-CR.
+
+	* ds1x42.cxx (ds1742::set_century): Remove bogus assertion. Patch
+	for 901466-CR.
+
+1999-11-03  Mary Lynn Kostash <mkostash@cygnus.com>
+
+        * README: Doc fixes.  Removed reference to year 2038.
+
+1999-11-01  Permaine Cheung  <pcheung@cygnus.com>
+
+	* README: Fix pin names in configuration in Environment section
+
+1999-10-21  Ben Elliston  <bje@cygnus.com>
+
+	* ds1x42.cxx (ds1642 ctor): epoch-time is a read-only attribute.
+	* README: Make current.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ds1x42.cxx (set_century_attribute): Check value range before 
+	passing to set_century().
+	* Makefile.am (DEJAGNU_TESTS): Add rtcmonkey.exp.
+	* Makefile.in: Regenerated.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ds1x42.cxx (read_7f8, write_7f8): Take value, not const-ref.
+	(read_data, write_data): Same.
+
+1999-09-20  Ben Elliston  <bje@cygnus.com>
+
+	* ds1x42.cxx (write_data): Validate written values.
+	Minor alterations to eliminate G++ warnings.
+
+1999-09-14  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (librtc_la_SOURCES): Add mktime.c.
+	* Makefile.in: Regenerate.
+	* ds1x42.cxx: Include "mktime.h".
+	(ds1642 ctor): Break down time with gmtime, not localtime.
+	(ds1642::tick): Likewise.
+	(ds1642::write_7f8): Generate time_t value using utc_mktime().
+	(ds1742::write_7f8): Likewise.
+	* mktime.h: New file.
+	* mktime.c: Likewise.
+	* README: Update.
+
+1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ds1x42.cxx (*): Use host_int_X, not compiler_int_X.
+
+1999-09-01  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* ds1x42.cxx (save_state): Clean up.
+	(operator <<): Send char as int through stream.
+	(operator >>): Clean up and read chars as ints from stream.
+
+1999-08-31  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README: doc fixes.  Just stylistic changes.
+
+1999-08-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ds1x42.cxx (ds1642 ctor): Form tick pmf correctly.
+
+1999-08-26  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (librtc_la_SOURCES): Update.
+	(checkme): Depend on `all'.
+	* Makefile.in: Regenerate.
+	* ds1x42.cxx: New file; complete rewrite.
+	* ds1742.cxx: Remove.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ds1742.cxx (operator >>): Use ANSI setstate() instead of setf().
+
+1999-08-12  Ben Elliston  <bje@cygnus.com>
+
+	* README: Update documentation for component renaming in
+	1999-07-07.
+
+1999-08-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Renamed "sid-scheduler-host-precise" -> "...-accurate".
+
+1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* ds1742.cxx: Introduce proper namespace usage.
+
+1999-07-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): New macro.
+	(checkme): New phony target.
+	* Makefile.in: Regenerated.
+
+1999-07-14  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* ds1742.cxx: Introduced four new methods to help save
+	and restore of states in rtc.
+	save_state, restore_state, operator <<, and operator >>	
+
+1999-07-13  Ben Elliston  <bje@cygnus.com>
+
+	* ds1742.cxx (ds1742::ds1742_bus::write_data): The frequency test
+	can be run any time, as long as the oscillator is connected.
+	(ds1742::ds1742_bus::write_data): Use std::time() and not the time
+	recorded at the instant that the `write' bit was set when
+	computing delta `t'.
+	
+1999-07-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-07-07  Ben Elliston  <bje@cygnus.com>
+
+	* ds1742.cxx (rtcListTypes): Rename components from the form
+	`hw-rtc-dallas/1?42' to `hw-rtc-ds1?42'.
+	(rtcCreate): Likewise.
+
+1999-07-06  Ben Elliston  <bje@cygnus.com>
+
+	* README: New file.
+
+	* Makefile.am (pkglib_LTLIBRARIES): Add librtc.la.
+	(INCLUDES): Define.
+	(librtc_la_SOURCES): Add ds1742.cxx.
+	(librtc_la_LDFLAGS): Define.
+	* Makefile.in: Regenerate.
+	* ds1742.cxx: New file.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* testsuite: Removed directory.
+	* Makefile.am (SUBDIRS): Don't recurse into it.
+	* Makefile.in: Regenerated.
+	* acconfig.h: Removed.
+	* aclocal.m4: Ditto.
+	* config.in: Ditto.
+	* configure: Ditto.
+	* configure.in: Ditto.
+	* stamp-h.in: Ditto.
+
+1999-06-25  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am: New file.
+	* configure.in: Likewise.
+	* Makefile.in: Generate.
+	* aclocal.m4: Likewise.
+	* configure: Likewise.
+	* config.in: Likewise.
+	* stamp-h.in: Likewise.

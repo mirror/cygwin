@@ -1,0 +1,897 @@
+# tksm - tk system monitor
+# By #ohm, la resistance
+
+# Initialization
+
+
+array set refresh_fragments [list]
+set refresh_pin [sid::pin::new]
+set refresh_ok 1
+
+
+set stop_pins [list]
+proc any_stop_pins_p {} {
+    global stop_pins
+    return [llength $stop_pins]
+}
+
+array set triggerpoint_action [list]
+array set triggerpoint_info [list]
+
+# $components(name) = component-handle
+array set components [list]
+
+proc cfgroot_component {} {
+    global components
+    return $components(main)
+}
+
+proc component_names {} {
+    global components
+    return [array names components]
+}
+
+
+# ---------------------------------------------------------------------------
+# State save/restore support data
+
+# $state_snapshots($slot,$name) = state-snapshot
+array set state_snapshots [list]
+proc save_state {slot} {
+    global components state_snapshots
+    foreach name [component_names] {
+	set comp $components($name)
+	set state [sid::component::attribute_value $comp state-snapshot]
+	set state_snapshots($slot,$name) $state
+    }
+}
+
+proc restore_state {slot} {
+    global components state_snapshots
+    set failed [list]
+    foreach name [component_names] {
+	set comp $components($name)
+	if {! [info exists state_snapshots($slot,$name)]} then { continue }
+	set state $state_snapshots($slot,$name)
+	if {$state == ""} then { continue }
+	set status [sid::component::set_attribute_value $comp state-snapshot $state]
+	if {$status != "ok"} then { lappend failed "${name}:${status}" }
+    }
+    if {[llength $failed] > 0} then {
+	tk_dialog .oops3 Error "Cannot restore state to some components: $failed" error 0 "oh well"
+    }
+}
+
+proc zap_state {slot} {
+    global state_snapshots
+    foreach name [component_names] {
+	if {[info exists state_snapshots($slot,$name)]} then { 
+	    unset state_snapshots($slot,$name) 
+	}
+    }
+}
+
+
+
+set num_state_slots 0
+proc push_new_state {} {
+    global num_state_slots
+    incr num_state_slots
+    save_state $num_state_slots
+    .control.statenum configure -text $num_state_slots
+}
+proc zap_top_state {} {
+    global num_state_slots
+    if {$num_state_slots == 0} then { return }
+    zap_state $num_state_slots
+    incr num_state_slots -1 
+    .control.statenum configure -text $num_state_slots
+}
+proc peek_top_state {} {
+    global num_state_slots
+    if {$num_state_slots == 0} then { return }
+    restore_state $num_state_slots
+}
+
+
+
+proc stop_tksm {} {
+    set comp [cfgroot_component]
+    set stoppin [sid::component::find_pin $comp "stop!"]
+    if {$stoppin != ""} then {sid::pin::driven_h4 $stoppin 1}
+}
+
+
+# ---------------------------------------------------------------------------
+
+# Configuration graphing interface
+
+# Create a "dot" format description of the current configuration graph
+proc polkadot {} {
+    global components
+    set dot "digraph sid \{\n"
+
+    append dot "// nodes\n"
+    append dot "node \[shape=\"box\"\];\n"
+
+    # collect pin/bus/component-handle -> dot-node-name mapping table
+    foreach name [component_names] {
+	set comp $components($name)
+	set cn "$comp"
+
+	append dot "subgraph \"cluster $cn\" \{ label=\"$name\";\n"
+	set comps($comp) $cn
+
+	if {[sid::component::pin_names $comp] != ""} then {
+	    append dot "  subgraph \"cluster $name-pins\" \{ label=\"pins\"; \n"
+	    foreach pin_nm [sid::component::pin_names $comp] {
+		set ph [sid::component::find_pin $comp $pin_nm]
+		set pn "$cn pin $pin_nm"
+		append dot "    \"$pn\" \[label=\"$pin_nm\"\];\n"
+		if {$ph != ""} then { ;# input pin
+		    set pins($ph) $pn
+		}
+	    }
+	    append dot "  \} // pins\n"
+	}
+
+	if {[sid::component::bus_names $comp] != ""} then {
+	    append dot "  subgraph \"cluster $name-buses\" \{ label=\"buses\"; \n"
+	    foreach bus_nm [sid::component::bus_names $comp] {
+		set bh [sid::component::find_bus $comp $bus_nm]
+		set bn "$cn bus $bus_nm"
+		append dot "    \"$bn\" \[label=\"$bus_nm\"\];\n"
+		set buses($bh) $bn
+	    }
+	    append dot "  \} // buses\n"
+	}
+
+	if {[sid::component::accessor_names $comp] != ""} then {
+	    append dot "  subgraph \"cluster $name-accessors\" \{ label=\"accessors\"; \n"
+	    foreach acc_nm [sid::component::accessor_names $comp] {
+		set an "$cn accessor $acc_nm"
+		append dot "    \"$an\" \[label=\"$acc_nm\"\];\n"
+	    }
+	    append dot "  \} // accessors\n"
+	}
+
+	if {[sid::component::relationship_names $comp] != ""} then {
+	    append dot "  subgraph \"cluster $name-relations\" \{ label=\"relations\"; \n"
+	    foreach rel_nm [sid::component::relationship_names $comp] {
+		set rn "$cn relation $rel_nm"
+		append dot "    \"$rn\" \[label=\"$rel_nm\"\];\n"
+	    }
+	    append dot "  \} // relations\n"
+	}
+	append dot "\} // component\n"
+    }
+
+    append dot "// edges\n"
+    
+    # generate pin/bus/relation edges
+    foreach name [component_names] {
+	set comp $components($name)
+	set cn "$comp"
+
+	foreach pin_nm [sid::component::pin_names $comp] {
+	    set pn "$cn pin $pin_nm"
+	    foreach conn_pin [sid::component::connected_pins $comp $pin_nm] {
+		if {[info exists pins($conn_pin)]} then {
+		    append dot "\"$pn\" -> \"$pins($conn_pin)\"; \n"
+		} else {
+		    append dot "\"$pn\" -> \"anonymous-pin\"; \n"
+		}
+	    }
+	}
+
+	foreach acc_nm [sid::component::accessor_names $comp] {
+	    set an "$cn accessor $acc_nm"
+	    set acc_bus [sid::component::connected_bus $comp $acc_nm]
+	    if {$acc_bus != ""} {
+		if {[info exists buses($acc_bus)]} then {
+		    append dot "\"$an\" -> \"$buses($acc_bus)\"; \n"
+		} else {
+		    append dot "\"$an\" -> \"anonymous-bus\"; \n"
+		}
+	    }
+	}
+	
+	foreach rel_nm [sid::component::relationship_names $comp] {
+	    set rn "$cn relation $rel_nm"
+	    foreach rel_comp [sid::component::related_components $comp $rel_nm] {
+		if {[info exists comps($rel_comp)]} then {
+		    append dot "\"$rn\" -> \"$comps($rel_comp)\"; \n"
+		} else {
+		    append dot "\"$rn\" -> \"anonymous-component\"; \n"
+		}
+	    }
+	}
+    }
+
+    append dot "\} // digraph\n"
+    return $dot
+}
+
+
+proc show_polkadot {} {
+    set dot [polkadot]
+    set filename "/tmp/dot.[clock seconds]"
+    set file [open $filename w]
+    puts $file $dot
+    close $file
+    catch {exec dotty $filename &}
+    # race
+    set now [clock seconds]
+    while {($now + 5) > [clock seconds]} { }
+    file delete $filename
+}
+
+
+
+# ---------------------------------------------------------------------------
+# Top-level window layout
+
+wm title . "System Monitor"
+#wm resizable . 0 0
+#scrollbar .x -orient horizontal
+#scrollbar .y -orient vertical
+#pack .x -side bottom -fill x
+#pack .y -side right -fill y
+
+frame .control -borderwidth 2
+checkbutton .control.autorefresh -variable refresh_ok -text "Auto refresh"
+# button .control.graph -text "Graphviz" -command {show_polkadot}
+# pack .control.autorefresh .control.graph -side left
+pack .control.autorefresh -side left -padx 20
+label .control.state -text "State"
+label .control.statenum -text "0"
+button .control.statepush -padx 4 -borderwidth 1 -text "save" -command {push_new_state}
+button .control.statepop -padx 4 -borderwidth 1 -text "restore" -command {peek_top_state}
+button .control.statezap -padx 4 -borderwidth 1 -text "discard" -command {zap_top_state}
+pack .control.state .control.statenum .control.statepush .control.statepop .control.statezap -side left
+pack .control -side top
+bind .control <Destroy> {stop_tksm}
+
+
+# Ask user to fill in a number of text fields.
+# w: window path
+# title/text: labels
+# args: field names
+# result: list of field values (or empty list if cancelled)
+proc tk_ask {w title text bitmap args} {
+    global tkask_vars
+    global tkask_disposition
+    global tcl_platform
+
+    foreach a $args {
+	set tkask_vars($a) {}
+    }
+
+    # destroy/recreate window
+    catch {destroy $w}
+    toplevel $w -class Dialog
+    wm title $w $title
+    wm iconname $w Dialog
+    wm protocol $w WM_DELETE_WINDOW {set tkask_disposition -1}
+    wm transient $w [winfo toplevel [winfo parent $w]]
+
+    # create window skeleton
+    frame $w.bot
+    frame $w.mid
+    frame $w.top
+    if {$tcl_platform(platform) == "unix"} {
+        $w.bot configure -relief raised -bd 1
+        $w.mid configure -relief raised -bd 1
+        $w.top configure -relief raised -bd 1
+    }
+    pack $w.bot -side bottom -fill both
+    pack $w.top $w.mid -side top -fill both -expand 1
+
+    # fill top part
+
+    option add *Dialog.msg.wrapLength 3i widgetDefault
+    label $w.msg -justify left -text $text
+    if {$tcl_platform(platform) == "macintosh"} {
+        $w.msg configure -font system
+    } else {
+        $w.msg configure -font {Times 18}
+    }
+    pack $w.msg -in $w.top -side right -expand 1 -fill both -padx 3m -pady 3m
+    if {$bitmap != ""} {
+        if {($tcl_platform(platform) == "macintosh") && ($bitmap == "error")} {
+            set bitmap "stop"
+        }
+        label $w.bitmap -bitmap $bitmap
+        pack $w.bitmap -in $w.top -side left -padx 3m -pady 3m
+    }
+
+    # fill middle part
+    set i 0
+    foreach a $args {
+	frame $w.mid$i
+	label $w.mid$i.l -text $a
+	entry $w.mid$i.r -width 20 -textvariable tkask_vars($a)
+	pack $w.mid$i.l -side left
+	pack $w.mid$i.r -side right
+	grid $w.mid$i -in $w.mid -column 0 -row $i -sticky ew -pady 10
+	incr i
+    }
+
+    # fill bottom part
+    set i 0
+    foreach but {ok cancel} {
+        button $w.button$i -text $but -command "set tkask_disposition $i"
+        if {$i == 0} {
+            $w.button$i configure -default active
+        } else {
+            $w.button$i configure -default normal
+        }
+        grid $w.button$i -in $w.bot -column $i -row 0 -sticky ew -padx 10
+        grid columnconfigure $w.bot $i
+        # We boost the size of some Mac buttons for l&f
+        if {$tcl_platform(platform) == "macintosh"} {
+            set tmp [string tolower $but]
+            if {($tmp == "ok") || ($tmp == "cancel")} {
+                grid columnconfigure $w.bot $i -minsize [expr 59 + 20]
+            }
+        }
+        incr i
+    }
+
+
+    # handle <Return>,<Destroy>
+    bind $w <Return> "
+            $w.button0 configure -state active -relief sunken
+            update idletasks
+            after 100
+            set tkask_disposition 0
+        "
+    bind $w <Destroy> {set tkask_disposition -1}
+
+    # withdraw & resize dialog
+    wm withdraw $w
+    update idletasks
+    set x [expr {[winfo screenwidth $w]/2 - [winfo reqwidth $w]/2 \
+            - [winfo vrootx [winfo parent $w]]}]
+    set y [expr {[winfo screenheight $w]/2 - [winfo reqheight $w]/2 \
+            - [winfo vrooty [winfo parent $w]]}]
+    wm geom $w +$x+$y
+    update idle
+    wm deiconify $w
+
+    # grab & focus
+    set oldFocus [focus]
+    set oldGrab [grab current $w]
+    if {$oldGrab != ""} {
+        set grabStatus [grab status $oldGrab]
+    }
+    grab $w
+    focus $w.button0
+
+    # wait for user
+    tkwait variable tkask_disposition
+    catch {focus $oldFocus}
+    catch {
+        bind $w <Destroy> {}
+        destroy $w
+    }
+    if {$oldGrab != ""} {
+        if {$grabStatus == "global"} {
+            grab -global $oldGrab
+        } else {
+            grab $oldGrab
+        }
+    }
+
+    # collect results
+    if {$tkask_disposition != 0} then {
+	return [list] 
+    } else {
+	set r [list]
+	foreach a $args {
+	    lappend r $tkask_vars($a)
+	}
+	return $r
+    }
+}
+
+
+
+# Take a component name and/or attribute name, and mangle it into something
+# unique and safe for use as a tk widget path.
+set unique_wn_suffix 0
+proc widgetname {base args} {
+    global unique_wn_suffix
+    set name ""
+    foreach a $args {
+        regsub -all {[^a-z0-9]} $a {_} mangled
+	set name "${name}_${mangled}"
+    }
+    incr unique_wn_suffix
+    set name "${base}.${name}_${unique_wn_suffix}"
+    # puts "$args -> $name"
+    return $name
+}
+
+
+proc have_none_p {comp category} {
+    set registers [sid::component::attribute_names_in_category $comp $category]
+    if {[llength $registers] == 0} then { return 1 } else { return 0 }
+}
+
+proc not_watchable_p {comp attribute} {
+    foreach w [sid::component::attribute_names_in_category $comp watchable] {
+	if {$w == $attribute} then { return 0 }
+    }
+    return 1
+}
+
+
+proc refresh_all {} {
+    global refresh_fragments
+    set search [array startsearch refresh_fragments]
+    while {[array anymore refresh_fragments $search]} {
+	set name [array nextelement refresh_fragments $search]
+	set script $refresh_fragments($name)
+	eval $script
+    }
+    array donesearch refresh_fragments $search
+    # update may fail if top level window was closed
+    catch { update }
+}
+
+
+
+proc open_component_window { category name type comp } {
+
+    set wn [widgetname "" $name $category]
+
+    toplevel $wn
+    wm title $wn "$name $category list"
+    #wm resizable $wn 0 0
+
+    # scrollbar $wn.y -orient vertical
+    # pack $wn.y -side right -fill y
+
+    set registers [sid::component::attribute_names_in_category $comp $category]
+    if {[llength $registers] == 0} then {
+	tk_dialog .oops2 Oops "Nothing to show for $name $category list." warning 0 "oh well"
+	destroy $wn
+	return
+    } 
+
+#    set refreshcmds "puts \"refreshing $name $category\""
+    set refreshcmds ""
+    frame $wn.regs -relief raised -borderwidth 2
+
+    foreach r $registers {
+	set subwidgetname [widgetname $wn $r]
+
+	frame $subwidgetname -relief sunken -borderwidth 2
+	label $subwidgetname.label -text $r
+	entry $subwidgetname.value -width 20
+
+	append refreshcmds "
+	    set prev_value \[$subwidgetname.value get\]
+	    set value \[sid::component::attribute_value $comp [list $r]\]
+            $subwidgetname.value delete 0 end
+	    $subwidgetname.value insert 0 \$value
+            if {\$value == \$prev_value} then { set c black } else { set c red }
+	    $subwidgetname.label configure -foreground \$c"
+	bind $subwidgetname.value <Escape> " 
+	    set value \[sid::component::attribute_value $comp [list $r]\]
+            $subwidgetname.value delete 0 end
+	    $subwidgetname.value insert 0 \$value
+	    $subwidgetname.label configure -foreground blue"
+	bind $subwidgetname.value <Return> "
+	    set value \[$subwidgetname.value get\]
+	    set prev_value \[sid::component::attribute_value $comp [list $r] \]
+	    set status \[sid::component::set_attribute_value $comp [list $r] \$value\]
+            if {\$status != \"ok\"} then {
+                tk_dialog .oops Error \"Error setting $name $category [list $r] to \$value: \$status\" error 0 ok
+	        set new_value \[sid::component::attribute_value $comp [list $r]\]
+                if {\$new_value != \$prev_value} then {
+	            set status2 \[sid::component::set_attribute_value $comp [list $r] \$prev_value\]
+                    if {\$status2 != \"ok\"} then {
+                         tk_dialog .oops Error \"Error restoring $name $category [list $r] back to \$prev_value: \$status\" error 0 damn
+                    }
+                }
+            }
+	    $subwidgetname.label configure -foreground green"
+	bind $subwidgetname.value <Enter> "global refresh_ok ; set refresh_ok 0"
+	bind $subwidgetname.value <Leave> "global refresh_ok ; set refresh_ok 1"
+
+	set event_command \
+	    "destroy .m
+             menu .m -tearoff 0
+            .m add command -label {Watch change} -command {
+                 add_triggerpoint $subwidgetname $comp [list $r] change
+                 destroy .m}
+            .m add command -label {Watch value} -command {
+                 add_triggerpoint $subwidgetname $comp [list $r] value
+                 destroy .m}
+            .m add command -label {Watch mask/value} -command {
+                 add_triggerpoint $subwidgetname $comp [list $r] mask/value
+                 destroy .m}
+            .m add command -label {Watch range} -command {
+                 add_triggerpoint $subwidgetname $comp [list $r] range
+                 destroy .m}
+            if \[not_watchable_p $comp [list $r]\] { .m entryconfigure 0 -state disabled
+                                              .m entryconfigure 1 -state disabled
+                                              .m entryconfigure 2 -state disabled 
+                                              .m entryconfigure 3 -state disabled }
+            tk_popup .m %X %Y" 
+	bind $subwidgetname.label <Button-1> $event_command
+	bind $subwidgetname.label <Button-3> $event_command
+	bind $subwidgetname.label <Enter> "$subwidgetname.label configure -foreground yellow"
+	bind $subwidgetname.label <Leave> "$subwidgetname.label configure -foreground black"
+
+	pack $subwidgetname.label -side left -fill none
+	pack $subwidgetname.value -ipadx 20 -side right -fill none
+	pack $subwidgetname -side top -fill x
+    }
+    pack $wn.regs -side top -fill x
+
+    global refresh_fragments
+    eval $refreshcmds
+    set refresh_fragments($wn) $refreshcmds
+    bind $wn <Destroy> "
+        if {\"%W\" == \"$wn\"} then {
+            global refresh_fragments
+            if {[info exists refresh_fragments($wn)]} { unset refresh_fragments($wn) }
+        }"
+
+    frame $wn.buttons 
+    button $wn.buttons.refresh -text Refresh -command {refresh_all}
+    button $wn.buttons.regen -text Regenerate -command "destroy $wn ; open_component_window $category $name $type $comp"
+    button $wn.buttons.close -text "M'kay" -command "destroy $wn"
+    pack $wn.buttons.refresh $wn.buttons.regen -side left
+    pack $wn.buttons.close -side right 
+    pack $wn.buttons -side bottom -fill x
+}
+
+
+
+set component_gui_number 0
+proc open_component_gui { gui name type comp } {
+    global component_gui_number 
+    global compgui_pending_relations
+
+    incr component_gui_number
+
+    # perform work by instantiating component of choice
+
+    set comptype [sid::component::attribute_value $comp $gui]
+    set compname tksm-gui-${component_gui_number}
+
+    # leave a mark for `proc relate' to inform new gui component
+    set compgui_pending_relations($compname,component) $comp
+    set compgui_pending_relations($compname,relation) "$type $name"
+
+    set r [sid::component::set_attribute_value [cfgroot_component] "config-line!" "new \"$comptype\" \"$compname\" "]
+    if {$r != "ok"} then { tk_dialog .oops Error "Cannot create gui component $comptype" error 0 ok; return }
+}
+
+
+
+proc remove_triggerpoint { component watcher_name pin } {
+    global triggerpoint_action
+    global triggerpoint_info
+    unset triggerpoint_action($pin)
+    unset triggerpoint_info($pin)
+    set s [sid::component::disconnect_pin $component $watcher_name $pin]
+    if {$s != "ok"} then {
+	tk_dialog .oops3 Oops "Cannot remove $watcher_name: $s" "error" 0 "oh well"
+    }
+}
+
+
+
+proc tp_ignore_enter { pin } {
+    global triggerpoint_info
+    set triggerpoint_info($pin) "not"
+}
+
+proc tp_ignore { pin } {
+    # nop
+}
+
+proc tp_count_enter { pin } {
+    global triggerpoint_info
+    set triggerpoint_info($pin) 0
+}
+
+proc tp_count { pin } {
+    global triggerpoint_info
+    incr triggerpoint_info($pin) 
+}
+
+proc tp_stop_enter { pin } {
+    global triggerpoint_info
+    set triggerpoint_info($pin) "waiting"
+}
+
+proc tp_stop { pin } {
+    global triggerpoint_info
+
+    # clear other tp_stop pins' "hit-stopping" indications
+    global triggerpoint_action
+    set search [array startsearch triggerpoint_action]
+    while {[array anymore triggerpoint_action $search]} {
+	set otherpin [array nextelement triggerpoint_action $search]
+	set action $triggerpoint_action($otherpin)
+	if {$action == "tp_stop"} then { tp_stop_enter $otherpin }
+    }
+    array donesearch triggerpoint_action $search
+    
+    set triggerpoint_info($pin) "stopping"
+    global stop_pins
+    foreach s $stop_pins { 
+	sid::pin::driven_h4 $s 0
+    }
+}
+
+
+proc tp_switch { pin } {
+    global triggerpoint_action
+    set a $triggerpoint_action($pin) 
+    eval "${a}_enter $pin"
+    refresh_all 
+}
+
+
+
+# mirror map_watchable_name in sidwatchutil.h
+proc map_watchable_name { name } {
+    set out ""
+    for {set i 0} {$i < [string length $name]} {incr i} {
+	set c [string index $name $i]
+	if {($c >= "a" && $c <= "z") ||
+	    ($c >= "A" && $c <= "Z") ||
+	    ($c >= "0" && $c <= "9") ||
+	    ($c == "_")} then {
+	    append out $c
+	} else {
+	    set hex "0123456789ABCDEF"
+	    append out "%"
+	    if {$c == ""} then { set cnum 0 } else { scan $c %c cnum }
+	    append out [string index $hex [expr {($cnum >> 4) & 0x0f}]]
+	    append out [string index $hex [expr {$cnum & 0x0f}]]
+	}
+    }
+    return $out
+}
+
+
+proc add_triggerpoint { parentwidget component watchable mode } {
+    if {$mode == "change"} then {
+	set args "" 
+    } elseif {$mode == "value"} then {
+	set v [tk_ask .tpq "Triggerpoint details" "Enter triggerpoint specification" info "value" ]
+	if {[llength $v] == 0} then { return }
+	set args ":[lindex $v 0]"
+    } elseif {$mode == "mask/value"} then {
+	set v [tk_ask .tpq "Triggerpoint details" "Enter triggerpoint specification" info "mask" "value" ]
+	if {[llength $v] == 0} then { return }
+	set args ":[lindex $v 0]:[lindex $v 1]"
+    } elseif {$mode == "range"} then {
+	set v [tk_ask .tpq "Triggerpoint details" "Enter triggerpoint specification" info "low" "high" ]
+	if {[llength $v] == 0} then { return }
+	set args ":[lindex $v 0]:[lindex $v 1]"
+    }
+
+    set recepient_pin [sid::pin::new]
+    set mapped [map_watchable_name $watchable]
+    set watcher_name "watch:${mapped}:${mode}${args}"
+    # puts $watcher_name
+    set s [sid::component::connect_pin $component $watcher_name $recepient_pin]
+    if {$s == "ok"} then {
+	set wn [widgetname $parentwidget $watchable]
+	label $wn -text "(wait)"
+
+	global triggerpoint_info
+	set triggerpoint_info($recepient_pin) {}
+	global triggerpoint_action
+	set triggerpoint_action($recepient_pin) tp_ignore
+	tp_switch $recepient_pin
+
+	set my_refresh_fragment "
+	    global triggerpoint_info 
+	    set i \$triggerpoint_info($recepient_pin) 
+            if {\$i == \"\"} then { 
+	        $wn configure -text \"(watch $mode$args)\"
+            } else {
+	        $wn configure -text \"(watch $mode$args: \$i)\"
+            }
+            "
+	global refresh_fragments
+	set refresh_fragments($wn) $my_refresh_fragment
+
+	# must quote "%" in $watcher_name since bind does textual substitutions
+	regsub -all {%} $watcher_name {%%} watcher_name2 
+	bind $wn <Destroy> "
+            if {\"%W\" == \"$wn\"} {
+                remove_triggerpoint $component $watcher_name2 $recepient_pin
+                global refresh_fragments
+                if {[info exists refresh_fragments($wn)]} { unset refresh_fragments($wn) }
+            }"
+
+	set event_command \
+	    "global triggerpoint_action
+             destroy .m
+             menu .m -tearoff 0
+             menu .m.action -tearoff 0
+             .m add cascade -label {Action} -menu .m.action
+             .m.action add radiobutton -label {Ignore} -variable triggerpoint_action($recepient_pin) -value tp_ignore -command \"tp_switch $recepient_pin\"
+             .m.action add radiobutton -label {Count} -variable triggerpoint_action($recepient_pin) -value tp_count -command \"tp_switch $recepient_pin\"
+             .m.action add radiobutton -label {Stop} -variable triggerpoint_action($recepient_pin) -value tp_stop -command \"tp_switch $recepient_pin\"
+             if {! \[any_stop_pins_p\]} then { .m.action entryconfigure 2 -state disabled }
+             .m add command -label {Reset} -command \"tp_switch $recepient_pin\"
+             .m add command -label {Delete} -command \"pack forget $wn ; destroy $wn\"
+             tk_popup .m %X %Y"
+	bind $wn <Button-1> $event_command
+	bind $wn <Button-3> $event_command
+	bind $wn <Enter> "$wn configure -foreground yellow"
+	bind $wn <Leave> "$wn configure -foreground black"
+
+
+	pack $wn -side right -fill none
+    } else {
+	tk_dialog .oops3 Oops "Cannot set a $mode triggerpoint on $watchable: $s" "error" 0 "oh well"
+    }
+}
+
+
+
+# SID callbacks
+
+# XXX: proc unrelate {rel comp} { }
+
+proc relate {rel comp} {
+    # XXX: what if type or name has a space in it?
+    set type [lindex $rel 0]
+    set name [lindex $rel 1]
+
+    global components
+    set components($name) $comp
+
+    # handle any pending relations for gui components
+    global compgui_pending_relations
+    if {[info exists compgui_pending_relations($name,component)]} then {
+	sid::component::relate $comp \
+		$compgui_pending_relations($name,relation) \
+		$compgui_pending_relations($name,component)
+    }
+   
+    # puts "$name $type $comp"
+
+    frame .c_$name -relief sunken -borderwidth 2
+    label .c_$name.name -text $name
+    label .c_$name.type -text $type
+    pack .c_$name.name -side left 
+    pack .c_$name.type -side right 
+    pack .c_$name -side top -fill x -ipadx 20
+
+    set event_command \
+       "destroy .m
+        menu .m -tearoff 0
+
+        menu .m.views -tearoff 0
+        .m add cascade -label {View} -menu .m.views
+        .m.views add command -label Registers -command \"open_component_window register $name $type $comp; destroy .m\"
+
+        if \[have_none_p $comp register\] { .m.views entryconfigure 0 -state disabled }
+       .m.views add command -label Pins -command \"open_component_window pin $name $type $comp; destroy .m\"
+        if \[have_none_p $comp pin\] { .m.views entryconfigure 1 -state disabled }
+       .m.views add command -label Settings -command \"open_component_window setting $name $type $comp; destroy .m\"
+        if \[have_none_p $comp setting\] { .m.views entryconfigure 2 -state disabled }
+
+        menu .m.guis -tearoff 0
+        .m add cascade -label {GUIs} -menu .m.guis"
+    foreach gui [sid::component::attribute_names_in_category $comp gui] {
+	append event_command "
+        .m.guis add command -label \"$gui\" -command \"open_component_gui {$gui} {$name} {$type} {$comp}; destroy .m\" "
+    }
+
+    append event_command "
+        if \[have_none_p $comp gui\] { .m entryconfigure 3 -state disabled }
+        tk_popup .m %X %Y"
+
+    bind .c_$name.name <Button-1> $event_command
+    bind .c_$name.name <Button-3> $event_command
+    bind .c_$name.type <Button-1> $event_command
+    bind .c_$name.type <Button-3> $event_command
+    bind .c_$name.name <Enter> ".c_$name.name configure -foreground yellow"
+    bind .c_$name.name <Leave> ".c_$name.name configure -foreground black"
+    bind .c_$name.type <Enter> ".c_$name.type configure -foreground yellow"
+    bind .c_$name.type <Leave> ".c_$name.type configure -foreground black"
+}
+
+
+proc find_pin { name } {
+    # triggerpoint pins don't have to be listed here 
+    global refresh_pin
+    if {$name == "refresh" } then { return $refresh_pin }
+    return ""
+}
+
+proc pin_names {} {
+    # triggerpoint pins don't have to be listed here 
+    return [list "refresh"]
+}
+
+proc driven_h4 {pin value} {
+    global triggerpoint_action
+    if {[info exists triggerpoint_action($pin)]} then {
+	eval $triggerpoint_action($pin) $pin
+	# global triggerpoint_info
+	# puts "$triggerpoint_action($pin) $pin -> $triggerpoint_info($pin)"
+	return
+    }
+    global refresh_pin
+    global refresh_ok
+    if {$pin == $refresh_pin && $refresh_ok == 1} then {
+	refresh_all
+	return
+    }
+}
+
+proc connect_pin {name pin} {
+    if {$name == "triggerpoint-hit"} then {
+	global stop_pins
+	lappend stop_pins $pin
+	return "ok"
+    }
+    return "not_found"
+}
+
+proc disconnect_pin {name pin} {
+    if {$name == "triggerpoint-hit"} then {
+	global stop_pins
+	set ix [lsearch -exact stop_pins $pin]
+	if {$ix >= 0} then {
+	    lreplace stop_pins $ix $ix
+	} else {
+	    return "bad_value"
+	}
+	return "ok"
+    }
+    return "not_found"
+}
+
+proc connected_pins {name} {
+    if {$name == "triggerpoint-hit"} then {
+	global stop_pins
+	return $stop_pins
+    }
+    return ""
+}
+proc bus_names {} { return "" }
+proc find_bus {b} { return "" }
+
+# stubs that allow this component to be listed safely in itself
+proc attribute_names_in_category { category } {
+    if {$category == "auto-print"} then {
+	return [list "warning"]
+    } else {
+	return [list]
+    }
+}
+proc attribute_names {} {
+    return [list "warning"]
+}
+proc attribute_value {name} {
+    if {$name == "warning"} then {
+	return "WARNING: TKSM is experimental and is recommended for advanced users only."
+    } else {
+	return ""
+    }
+}
+proc set_attribute_value {name} { return bad_value }
+
+proc accessor_names {} { return [list] }
+proc relationship_names {} { return [list] }
+
+# Local Variables:
+# mode: tcl
+# End:

@@ -1,0 +1,280 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* ps2.h: Import more std:: identifiers.  Correct sid:: qualifiers.
+
+2000-03-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-03-25  Ben Elliston  <bje@redhat.com>
+
+	* ParPort.h: Rename from this ..
+	* ps2.h: .. to this.
+	* ParPort.cxx: Rename from this ..
+	* ps2.cxx: .. to this.
+	* Makefile.am (libparport_la_SOURCES): Update.
+	* Makefile.in: Regenerate.
+
+2000-03-22  matthew green  <mrg@redhat.com>
+
+	* ParPort.h: Make class parport_iopin public within this context
+	to appease newer GCC error checking.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): Add parmonkey.exp.
+	* Makefile.in: Regenerated.
+
+2000-01-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ParPort.cxx (operator <<,>>): Save & restore pin values.
+
+1999-12-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-parport-ps_2.txt: Rewrote and simplified.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	* Makefile.am: Removed SUBDIR option
+
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	
+1999-12-07  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* ParPort.{cxx,h} (read_parport): Renamed from ReadParPort.
+	(class parport_inputpin): Renamed from ParPortInputPin.
+	(write_parport): Renamed from WriteParPort.
+	(add_bus_pins): Renamed from Add_Bus_Pins.
+	(store_registerAttr): Renamed from Store_RegisterAttr.
+	(store_outputpinAttr): Renamed from Store_OutputPinAttr.
+	(store_inputpinAttr): Renamed from Store_InputPinAttr.
+	(initialize_bioutpins): Renamed from Initialize_BIOutpins.
+	(reset_internalregs): Rename from reset_Internalregs.
+	(reset_outputpins): Renamed from reset_OutputPins.
+	(sense_inputpins): Renamed from sense_InputPins.
+	(clear_intp): Renamed from clear_INTP.
+	(set_intppin): Renamed from Set_INTPpin.
+	(set_intp_acklow): Renamed from Set_INTP_acklow.
+	(set_intp_ackhigh): Renamed from Set_INTP_ackhigh.
+	(intsel_attrhandler): New Method.
+	* ParPort.cxx: Removed TRISTATE_VAL.
+ 	(set_intp_acklow): Drive irq pin to logic 0 during tristate.
+	(set_intp_ackhigh): Likewise.
+	(reset_outputpins): Likewise.
+	(intsel_handler): Likewise.
+	(change_intp): Likewise.
+	(store_inputpinAttr): Changed call to add_attribute_notify from 
+	add_attribute for attribute "INTSEL_VAL".
+	(busy_handler): swaped Busy bit setting.
+	
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-parport-ps_2.txt: New file.  Renamed from
+	* README: Deleted.
+	* Makefile.am: Install new file.
+	* Makefile.in: Regenerated.
+
+1999-12-07  Ben Elliston  <bje@cygnus.com>
+
+	* README: Start tweaking to pass the doc tests. More to do.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ParPort.cxx (reset): Take unused arg.  Update callers.
+	(ParPortDelete): Use dynamic_cast<>.
+	* ParPort.h: Matching changes.
+
+1999-11-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ParPort.h (parport_iopin): Change inheritance to derive from
+	new sidutil::inputoutput_pin.  Add minor utility members.  
+	(make_attribute, parse_attribute): New conversion routines for *iopin.
+	(iopins_readmode): Make this a const member function.
+	(data_bus): Declare these as an array member. 
+
+1999-11-17  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* ParPort.h (output_mode): New method.
+	* ParPort.cxx (output_mode): Likewise.
+	(operator <<): Changed order of output data.
+	(operator >>): Changed order of input data.
+	Added call to new method and to WriteParPort method.
+
+1999-11-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* README: Added sections for save/restore and default values
+ 	* ParPort.h (sense_InputPins): New method
+	* ParPort.cxx (sense_InputPins): New Mthod
+	(reset): Removed call to reset_OutputPin method
+	(reset_Internalregs): Added call to reset_OutputPin & sense_InputPins.
+
+1999-11-07  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* README: Fixed bugs.
+	* ParPort.cxx (ReadParPort): Return unmapped if address is 0x03.
+	(WriteParPort): Likewise.
+
+1999-10-25  Ron Unrau  <runrau@cygnus.com>
+
+	* Parport.cxx (ReadParPort, WriteParPort): set register indexing
+	  to correspond to hardware addresses.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-10-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* ParPort.cxx (constr): Changed the order of initialization of data 
+	members bus_size and reset_pin.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ParPort.cxx (driven, ReadParPort, WriteParPort): Take value, not
+	const-ref.
+	* ParPort.h (*): Corresponding changes.
+
+1999-10-07  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* ParPort.h (driven): Removed try and catch.
+	* ParPort.cxx: Likewise
+
+1999-10-05  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* ParPort.cxx (ParPort): initialize triggering
+	(Store_RegisterAttr): Added trigger code and categorized "watchable".
+	(Store_OutputPinAttr): Likewise.
+	(Store_InputPinAttr): Likewise.
+	(WriteParPort): Added trigger dispatch code.
+	(error_handler): Likewise.
+	(slct_handler): Likewise
+	(page_empty_handler): Likewise
+	(ack_handler): Likewise
+	(busy_handler): Likewise
+	(intsel_handler): Likewise
+	(biden_handler): Likewise
+	(parport_iopin::driven): Likewise
+	* ParPort.h: Added data member of type self_watcher<ParPort>,
+	and made self_watcher as friend class
+	(pin_factory): New method
+	(pin_junkyard): Likewise
+
+1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ParPort.cxx, ParPort.h (*): Use host_int_X, not compiler_int_X.
+
+1999-09-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* ParPort.cxx (Store_InputPinAttr):Introduced two new attributes.
+	Namely BIDEN_VAL, INTSEL_VAL
+	* ParPort.h: changed types of biden_val & AL_intsel_val from host_int_1 to
+	host_int_4.
+
+1999-09-07  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* ParPort.cxx, ParPort.h: Defined new class for I/O data pins, 
+	parport_iopin.
+	(initialize_iodatapins): new method
+	(update_ipprreg):Likewise
+	(iopins_readmode):Likewise
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ParPort.cxx (operator >>): Use ANSI setstate() instead of setf().
+	Remove error message.  Correct error signalling.
+
+1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* ParPort.h: Introduced proper namespace usage. Include sidso.h.
+	* ParPort.cxx: Do not include sidso.h. 
+
+1999-07-25 Faisal khoja <fkhoja@cygnus.com>
+
+	* ParPort.h: Exception handlings
+	* ParPort.cxx: Likewise
+
+1999-07-15 Faisal Khoja <fkhoja@cygnus.com>
+	
+	* README: Removed names of private methods under save & 
+	  restore documentation
+
+1999-07-12 Faisal Khoja <fkhoja@cygnus.com>
+
+	* ParPort.cxx: Documented methods.
+	* ParPort.h: Little bit of formatting.
+	* README: Document component.
+
+1999-07-07 Faisal Khoja <fkhoja@cygnus.com>
+
+	* ParPort.cxx (restore_state): Corrected spelling mistakes in
+	error messages. Removed drive call.
+
+1999-07-07 Faisal Khoja <fkhoja@cygnus.com>
+
+	* ParPort.cxx, ParPort.h: Added friend functions to support output
+	and input streams. Also added save and restore utility.
+
+1999-07-05 Faisal Khoja <fkhoja@cygnus.com>
+
+	* ParPort.cxx: removed attribute_coder_parport_reg class. Changed
+	function calls from add_attribute_coder to add_attribute. 
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (SUBDIRS): Don't recurse into @subdirs@.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Ditto.
+	* config.h.in: Ditto.
+	* configure: Ditto.
+	* configure.in: Ditto.
+	* stamp-h.in: Ditto.
+
+1999-07-05 Faisal Khoja <fkhoja@cygnus.com>
+	
+	* ParPort.cxx, ParPort.h: Formatted code, removed #define
+ 	with enumerated types as guided by Ben.	
+
+1999-06-30 Faisal Khoja <fkhoja@cygnus.com>
+
+	* ParPort.cxx: changed name to "hw-parrport-ps/2"
+	  as per kind instructions from F.Eigler
+
+1999-06-30  Faisal Khoja <fkhoja@cygnus.com>
+
+	* Makefile.am: New file.
+	* configure.in: Likewise.
+	* Makefile.in: Generate.
+	* aclocal.m4: Likewise.
+	* stamp-h.in: Likewise.
+	* configure: Likewise.
+	* config.in: Likewise.
+	* ParPort.cxx: New file.
+	* ParPort.h: Likewise.
+	* README: Likewise.

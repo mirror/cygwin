@@ -1,0 +1,6 @@
+# -*- Tcl -*-
+# Run a monkey test on the components in this component library. 
+
+load_lib "monkey.exp"
+
+monkey_test hw-mapper-basic mapper_component_library libmapper.la

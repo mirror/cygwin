@@ -1,0 +1,54 @@
+## This conf file contains set command with invalid attribute names
+
+# configuration logging
+set main "verbose?" 0					# should be verbose
+
+# component libraries
+load libcgencpu.la cgen_component_library
+load libconsoles.la console_component_library
+load libgloss.la gloss_component_library
+load libinterrupt.la interrupt_component_library
+load libloader.la loader_component_library
+load libmapper.la mapper_component_library
+load libmemory.la mem_component_library
+load libmmu.la mmu_component_library
+load libsched.la sched_component_library
+load libtimers.la timer_component_library
+
+# Components
+
+new hw-cpu-arm7t cpu
+new sw-load-elf loader
+new sid-io-stdio stdio
+new sw-gloss-arm/angel angel
+new hw-interrupt-arm/ref intctrl
+new hw-mapper-basic bus
+new hw-remap/pause-arm/ref remapper
+new sid-sched-host host-sched
+new sid-sched-sim target-sched
+new hw-memory-ram/rom-basic mem
+new hw-timer-arm/ref-sched timer1
+new hw-timer-arm/ref-sched timer2
+
+# Scheduler
+
+set target-sched enabled 1				# should be enabled?
+set target-sched number-of-clients 2			# should be num-clients
+
+set host-sched disabled? 1				# should be enabled?
+set host-sched num-clientss 1				# should be clients
+set host-sched sim? 1					# host-sched does not have attrib sim
+set host-sched host-sched 50				# host-sched does not have attrib host-sched
+
+# Alter this attribute to get more available system RAM.
+set mem ramsize 8388608				# should be size
+set cpu size 1					# cpu does not have attrib size
+set loader size 8388608				# loader does not have attrib size
+
+# Attributes
+set loader file hello				# should be files
+set loader ver 0				# should be verbose
+set angel timer1 0				# angel does not have attrib timer1
+set cpu _engine-type_ scache			# should be engine-type
+set cpu step-count 1000				# should be step-insn-count
+

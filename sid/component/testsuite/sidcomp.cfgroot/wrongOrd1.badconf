@@ -1,0 +1,15 @@
+# This conf file contains new command without load command
+
+# Components
+
+new hw-cpu-arm7t cpu
+new sw-load-elf loader
+new sid-io-stdio stdio
+new sw-gloss-arm/angel angel
+new hw-interrupt-arm/ref intctrl
+new hw-mapper-basic bus
+new hw-remap/pause-arm/ref remapper
+new sid-sched-host host-sched
+new sid-sched-sim target-sched
+new hw-memory-ram/rom-basic mem
+new hw-timer-arm/ref-sched timer1

@@ -1,0 +1,5 @@
+symErr.badconf:7: dlsym of cgen_component_lib in component library dso libcgencpu.la failed: *symbol*
+symErr.badconf:9: dlsym of console_component_libraryabc in component library dso libconsoles.la failed: *symbol*
+symErr.badconf:11: dlsym of gloss_component_library/// in component library dso libgloss.la failed: *symbol*
+symErr.badconf:14: unknown command extra
+Configuration error.  Aborting.

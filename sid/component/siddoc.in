@@ -1,0 +1,105 @@
+#! /bin/sh
+# Copyright (c) 1999 Red Hat
+#
+# Display installed SID component documentation files.
+
+
+# Configuration
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+doc_prefix=${SID_EXEC_PREFIX-$exec_prefix}
+
+# Convert windows->posix on cygwin host
+if [ x@CYGWIN@ = xyes ]
+then
+    doc_prefix=`cygpath -u "$doc_prefix"`
+fi
+
+doc_suffix="share/sidcomp"
+doc_searchdirs="${doc_prefix}/${doc_suffix}:${doc_prefix}/../${doc_suffix}"
+pager="${PAGER-cat}"
+
+
+if [ $# -eq 0 ]
+then
+    echo "Usage: `basename $0` [-l] name ..." 1>&2
+    echo 1>&2
+    echo "Search: $doc_searchdirs"
+    echo "Pager: $pager"
+    exit 0
+fi
+
+
+
+# List files in doc_searchdirs
+listfiles() {
+    for dir in `echo $doc_searchdirs | tr ':' ' '`
+    do
+        if [ -d "$dir" ]
+        then
+            for file in `echo "$dir"/*.txt`
+	    do
+		if [ -f "$file" ]
+		then
+		    echo -n "${file} "
+		    cat "$file" | awk '
+/^\* Name/ { flag++; next; }
+(flag==1)  { print; flag++; }
+'
+		fi
+	    done
+        fi
+    done
+}
+
+
+list() {
+    shift
+    echo $@
+}
+
+print() {
+    $pager $1
+}
+
+
+# Handle options
+if [ x$1 = "x-l" ]
+then
+    display="list"
+    shift
+else
+    display="print"
+fi
+
+
+foundflag="/tmp/found.$$"
+trap 'rm -f $foundflag; exit' 0 1 2 3 4 5 9 15
+
+
+if [ $# -eq 0 ]
+then
+    set -- -
+fi
+
+for comp in $@
+do
+    rm -f $foundflag
+    listfiles | while read file components
+    do
+	if expr "$components" : ".*${comp}.*" >/dev/null
+	then
+	    eval $display "$file" "$components"
+	    touch $foundflag
+	fi
+    done
+    if [ ! -f $foundflag ]
+    then
+	echo "No documentation found for $comp." 1>&2
+    fi
+done
+
+
+# Local Variables:
+# sh-mode
+# End:

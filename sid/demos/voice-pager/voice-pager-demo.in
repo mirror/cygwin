@@ -1,0 +1,11 @@
+#! /bin/sh
+
+PROGRAM=`pwd`/Test-voice-pager.out
+CONF=${PROGRAM}.conf
+MODE=${MODE-pport}
+DEMOCONF1=voice-pager-demo.conf
+DEMOCONF2=@srcdir@/voice-pager-demo.conf.${MODE}
+
+set -x
+arm-elf-sid --no-run --sidcodec=0xA01300 $@ $PROGRAM
+sid -f $CONF -f $DEMOCONF1 -f $DEMOCONF2

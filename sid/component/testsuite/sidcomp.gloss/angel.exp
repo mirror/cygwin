@@ -1,0 +1,969 @@
+# Testsuite for the Angel ROM monitor.
+
+if {! $sidtarget(arm)} then { untested "sw-gloss-arm/angel not available"; return }
+
+# There are a number of gotchas in this testsuite:
+#
+# 1. Some tests depend on others (open depends on close, and vice-versa).
+#
+# 2. Some file I/O tests later in the file *demand* that fd 2 be available
+#    for their tests. This means that if new tests are added before the test
+#    that actually opens fd 2 and leaves it open, the allocated fd may not be
+#    exactly 2 and tests will fail.
+
+set test "sid configuration"
+sid_config_component_etc_test_with_tracing "angel.conf" \
+	"load [sid_find_file libgloss.la] gloss_component_library" \
+	"sw-gloss-arm/angel" \
+	"load [sid_find_file libmemory.la] mem_component_library
+load [sid_find_file libglue.la] glue_component_library
+new sw-glue-attribbank cpu
+relate real-victim cpu cpu
+relate tester cpu cpu
+new hw-memory-ram/rom-basic mem
+set mem size 0x4000
+connect-bus real-victim target-memory mem read-write-port"
+
+pass $test
+
+set test "sid startup"
+if {[sid_start "angel.conf"]} { pass $test } else { fail $test ; return }
+
+set test "attribute list"
+sid_assert_success "sid::component::attribute_names $victim"
+
+set test "basic attributes present"
+sid_assert_includes_all "sid::component::attribute_names $victim" \
+    {"verbose?" "heap-base" "heap-limit" "stack-base" "stack-limit"}
+
+set test "set command line"
+sid_assert_success "sid::component::set_attribute_value $victim command-line \"ls -l\""
+
+set test "validate command line"
+sid_assert_matches "sid::component::attribute_value $victim command-line" "ls -l"
+
+set test "set heap base"
+sid_assert_success "sid::component::set_attribute_value $victim heap-base 0xDEADBEEF"
+
+set test "validate heap base"
+sid_assert_equals "sid::component::attribute_value $victim heap-base" [expr 0xDEADBEEF]
+
+set test "set heap limit"
+sid_assert_success "sid::component::set_attribute_value $victim heap-limit 0x54321"
+
+set test "validate heap limit"
+sid_assert_equals "sid::component::attribute_value $victim heap-limit" [expr 0x54321]
+
+set test "set stack base"
+sid_assert_success "sid::component::set_attribute_value $victim stack-base 0x0FEDBEEF"
+
+set test "validate stack base"
+sid_assert_equals "sid::component::attribute_value $victim stack-base" [expr 0x0FEDBEEF]
+
+set test "set stack limit"
+sid_assert_success "sid::component::set_attribute_value $victim stack-limit 0x12345"
+
+set test "validate stack limit"
+sid_assert_equals "sid::component::attribute_value $victim stack-limit" [expr 0x12345]
+
+set test "set verbose on"
+sid_assert_success "sid::component::set_attribute_value $victim verbose? 1"
+
+set test "validate verbose on"
+sid_assert_matches "sid::component::attribute_value $victim verbose?" yes
+
+set test "set verbose off"
+sid_assert_success "sid::component::set_attribute_value $victim verbose? 0"
+
+set test "validate verbose off"
+sid_assert_matches "sid::component::attribute_value $victim verbose?" no
+
+foreach pin {trap trap-code fault fault-code process-signal} {
+    set test "get $pin pin"
+    sid_assert_success "sid::component::find_pin $victim $pin"
+}
+    
+# Check that the CPU component is available.
+set test "test presence of CPU component"
+set cpu [sid_cmd "set relationships(cpu)"]
+if {$cpu != ""} { pass $test } else { fail $test }
+
+# Init the CPU.
+set test "set CPU endianness"
+sid_assert_success "sid::component::set_attribute_value $cpu endian-set! 2"
+
+set test "set CPU endianness more"
+sid_assert_success "sid::component::set_attribute_value $cpu endian little"
+
+set swi 0x123456
+set trap_codes(software) 1
+
+set newlib(sig,None)  0
+set newlib(sig,Quit)  3
+set newlib(sig,Abort) 6
+
+set newlib(err,BadF)  9
+
+set syscalls(open) 1
+set syscalls(close) 2
+set syscalls(writec) 3
+set syscalls(write0) 4
+set syscalls(write) 5
+set syscalls(readc) 6
+set syscalls(read) 7
+set syscalls(iserror) 8
+set syscalls(istty) 9
+set syscalls(seek) 10
+set syscalls(flen) 12
+set syscalls(tmpnam) 13
+set syscalls(remove) 14
+set syscalls(rename) 15
+set syscalls(clock) 16
+set syscalls(time) 17
+set syscalls(system) 18
+set syscalls(errno) 19
+set syscalls(get-cmdline) 21
+set syscalls(heapinfo) 22
+set syscalls(report-exception) 24
+
+set i 0
+foreach mode {r rb r+ r+b w wb w+ w+b a ab a+ a+b} {
+    set open_modes($mode) $i
+    incr i
+}
+
+# Reset the component.
+set reset_pin [sid_cmd "sid::component::find_pin $victim reset"]
+sid_cmd "sid::pin::driven_h4 $reset_pin 1"
+
+# Establish some probes.
+set trap_probe_pin [sid_cmd "sid::component::find_pin $victim trap"]
+set trap_code_probe_pin [sid_cmd "sid::component::find_pin $victim trap-code"]
+if {$trap_probe_pin == "" || $trap_code_probe_pin == ""} { 
+    fail "system calls - missing pins on victim" 
+}
+
+set probe_pin [sid_cmd "sid::pin::new"]
+
+set test "get memory bus"
+set rwbus [sid_cmd "sid::component::connected_bus $victim target-memory"]
+if {$rwbus == ""} { fail $test } else { pass $test }
+
+proc do_syscall {callnum arg} {
+    global cpu syscalls
+    global swi trap_codes
+    global trap_probe_pin trap_code_probe_pin
+
+    sid_cmd "sid::component::set_attribute_value $cpu r0 $syscalls($callnum)"
+
+    # Most Angel sys calls take an argument in R1 or a pointer to an argument
+    # in an "argument block".
+    if {$arg != ""} {
+	sid_cmd "sid::component::set_attribute_value $cpu r1 $arg"
+    }
+    sid_cmd "sid::pin::driven_h4 $trap_code_probe_pin $swi"
+    sid_cmd "sid::pin::driven_h4 $trap_probe_pin $trap_codes(software)"
+}
+
+proc memWriteByte {addr data} {
+    global rwbus
+    sid_cmd "sid::bus::write_h4_l1 $rwbus $addr $data"
+}
+
+proc memReadByte {addr} {
+    global rwbus test
+    set result [sid_cmd "sid::bus::read_h4_l1 $rwbus $addr"]
+    if {[lindex $result 0] != "ok"} { 
+	fail "read byte from $addr (bus error)"
+	return 0
+    } else {
+	return [lindex $result 1]
+    }
+}
+
+proc memReadWord {addr} {
+    global rwbus test
+    set test "read a word @ $addr"
+    set result [sid_cmd "sid::bus::read_h4_l4 $rwbus $addr"]
+    if {[lindex $result 0] != "ok"} {
+	fail "read word from $addr (bus error)"
+	return 0
+    } else {
+	return [lindex $result 1]
+    }
+}
+
+proc memReadString {addr} {
+    global rwbus
+    set result ""
+    while {1} {
+	set byte [memReadByte $addr]
+	if {$byte == "0" } { break }
+	append result [format "%c" $byte]
+	incr addr
+    }
+    return $result
+}
+
+proc memWriteWord {addr data} {
+    global rwbus
+    sid_cmd "sid::bus::write_h4_l4 $rwbus $addr $data"
+}
+
+proc memWriteString {addr string} {
+    global rwbus
+    foreach char [split $string {}] {
+	scan $char %c val
+	memWriteByte $addr $val
+	incr addr
+    }
+    # Tack on the NUL terminator.
+    memWriteByte $addr 0
+}
+
+proc get_result {} {
+    global cpu
+    return [sid_cmd "sid::component::attribute_value $cpu r0"]
+}
+
+##############
+# Test OPEN. #
+##############
+
+# Magic filename for stdin/stdout.
+set filename ":tt"
+
+# Get stdin.
+memWriteString 0x2000 $filename
+memWriteWord 0x1000 0x2000
+memWriteWord 0x1004 $open_modes(r)
+memWriteWord 0x1008 [string length $filename]
+set test "open syscall (stdin)"
+do_syscall open 0x1000
+if {[get_result] == "0"} { pass $test } else { fail $test }
+
+# Get stdout.
+memWriteString 0x2000 $filename
+memWriteWord 0x1000 0x2000
+memWriteWord 0x1004 $open_modes(w)
+memWriteWord 0x1008 [string length $filename]
+set test "open syscall (stdout)"
+do_syscall open 0x1000
+if {[get_result] == "1"} { pass $test } else { fail $test }
+
+# For each loop, test file present and absent cases.
+
+set filename "dummy"
+set missing "foonly"
+
+close [open $filename w]
+if {[file exists $missing]} {
+    warning "dummy missing file is actually present; removing it"
+    file delete -force $missing
+}
+
+#sid_cmd "sid::component::set_attribute_value $victim verbose? 1"
+
+foreach mode {r rb r+ r+b} {
+    # Open the file that exists.
+
+    memWriteString 0x2000 $filename
+    memWriteWord 0x1000 0x2000
+    memWriteWord 0x1004 $open_modes($mode)
+    memWriteWord 0x1008 [string length $filename]
+    set test "open syscall (mode $mode)"
+    do_syscall open 0x1000
+    set result [get_result]
+    if {$result != "" && $result != 0xFFFFFFFF} {
+	memWriteWord 0x1000 $result
+	do_syscall close 0x1000
+	pass $test
+    } else {
+	fail $test
+    }
+
+    # Now open a file that does not exist.
+
+    memWriteString 0x2000 $missing
+    memWriteWord 0x1000 0x2000
+    memWriteWord 0x1004 $open_modes($mode)
+    memWriteWord 0x1008 [string length $missing]
+    set test "open syscall (mode $mode, missing file)"
+    do_syscall open 0x1000
+    if {[get_result] == 0xFFFFFFFF && ![file exists $missing]} {
+	pass $test 
+    } else {
+	fail $test
+    }
+}
+
+foreach mode {w wb w+ w+b} {
+    # For the file which is present, but something in it so that
+    # we can verify that the file will be truncated when opened.
+    set fd [open $filename w]
+    puts $fd "Hello world"
+    close $fd
+    
+    memWriteString 0x2000 $filename
+    memWriteWord 0x1000 0x2000
+    memWriteWord 0x1004 $open_modes($mode)
+    memWriteWord 0x1008 [string length $filename]
+    set test "open syscall (mode $mode)"
+    do_syscall open 0x1000
+    set result [get_result]
+    if {$result != "" && $result != 0xFFFFFFFF} {
+	memWriteWord 0x1000 $result
+	do_syscall close 0x1000
+	if {[file size $filename] == 0} { pass $test } else { fail $test }
+    } else {
+	fail $test
+    }
+    
+    # Test for missing file.  This should be created by the open call.
+    memWriteString 0x2000 $missing
+    memWriteWord 0x1000 0x2000
+    memWriteWord 0x1004 $open_modes($mode)
+    memWriteWord 0x1008 [string length $missing]
+    set test "open syscall (mode $mode, missing file)"
+    do_syscall open 0x1000
+    set result [get_result]
+    if {$result != "" && $result != 0xFFFFFFFF} {
+	memWriteWord 0x1000 $result
+	do_syscall close 0x1000
+	if {[file exists $missing] && [file size $missing] == 0} {
+	    pass $test
+	} else {
+	    fail $test 
+	}
+    } else {
+	fail $test
+    }
+    file delete -force $missing
+}
+
+foreach mode {a ab a+ a+b} {
+    set fd [open $filename w]
+    puts $fd "Hello world"
+    close $fd
+    set origSize [file size $filename]
+
+    memWriteString 0x2000 $filename
+    memWriteWord 0x1000 0x2000
+    memWriteWord 0x1004 $open_modes($mode)
+    memWriteWord 0x1008 [string length $filename]
+    set test "open syscall (mode $mode)"
+    do_syscall open 0x1000
+    set result [get_result]
+    if {$result != "" && $result != 0xFFFFFFFF} {
+	memWriteWord 0x1000 $result
+	do_syscall close 0x1000
+	if {[file exists $filename] && [file size $filename] == $origSize} {
+	    pass $test
+	} else {
+	    fail $test
+	}
+    } else {
+	fail $test
+    }
+
+    memWriteString 0x2000 $missing
+    memWriteWord 0x1000 0x2000
+    memWriteWord 0x1004 $open_modes($mode)
+    memWriteWord 0x1008 [string length $missing]
+    set test "open syscall (mode $mode)"
+    do_syscall open 0x1000
+    set result [get_result]
+    if {$result != "" && $result != 0xFFFFFFFF} {
+	memWriteWord 0x1000 $result
+	do_syscall close 0x1000
+	if {[file exists $missing] && [file size $missing] == 0} {
+	    pass $test
+	} else {
+	    fail $test
+	}
+    } else {
+	fail $test
+    }
+    file delete -force $missing
+}
+
+# 15 (0xF) is an invalid open mode.
+# Check that we get an error result on this syscall.
+
+memWriteString 0x2000 $filename
+memWriteWord 0x1004 0xF
+memWriteWord 0x1008 [string length $filename]
+set test "open syscall (invalid mode)"
+do_syscall open 0x1000
+if {[get_result] == 0xFFFFFFFF} { pass $test } else { fail $test }
+
+# Open two dummy files (fd 2, 3) for later tests that want to do file
+# I/O with some real files.
+
+set filename "dummy"
+
+foreach fd {2 3} {
+    memWriteString 0x2000 $filename
+    memWriteWord 0x1000 0x2000
+    memWriteWord 0x1004 4
+    memWriteWord 0x1008 8
+    set test "open syscall (for dummy file)"
+    do_syscall open 0x1000
+    set result [get_result]
+    if {$result == ""} {
+	fail $test
+    } else {
+	# stdin and stdout should already be assigned to {0,1}.
+	if {[expr $result >= $fd] && [file exists $filename]} {
+	    if {[expr $result != $fd]} {
+		warning "assigned unexpected descriptor $result"
+	    }
+	    pass $test
+	} else { 
+	    fail $test 
+	}
+    }
+}
+
+
+###############
+# Test CLOSE. #
+###############
+
+# Try to close the last file we opened (assume descriptor 3).
+
+memWriteWord 0x1000 3
+do_syscall close 0x1000
+set test "close syscall (file on the host)"
+if {[get_result] == "0"} { pass $test } else { fail $test }
+
+# Try to close a file with a bad file descriptor.
+
+memWriteWord 0x1000 0x42
+do_syscall close 0x1000
+set result [get_result]
+set test "close syscall (bad file descriptor)"
+if {$result != "0" && $result != ""} { pass $test } else { fail $test }
+
+
+################
+# Test WRITEC. #
+################
+
+sid_cmd "set real_output {}"
+sid_cmd "sid::component::connect_pin $victim debug-tx $probe_pin"
+sid_cmd "set hook_driven_h4($probe_pin) { 
+    global driven_h4_value real_output
+    append real_output \[format %c \$driven_h4_value\]
+}"
+
+# 41 is ASCII "A" in hex.
+memWriteWord 0x1000 0x41
+do_syscall writec 0x1000
+set test "writec syscall"
+
+if {[sid_cmd "set real_output"] == "A"} { pass $test } else { fail $test }
+sid_cmd "sid::component::disconnect_pin $victim debug-tx $probe_pin"
+
+
+################
+# Test WRITE0. #
+################
+
+sid_cmd "set real_output {}"
+sid_cmd "sid::component::connect_pin $victim debug-tx $probe_pin"
+sid_cmd "set hook_driven_h4($probe_pin) { 
+    global driven_h4_value real_output
+    append real_output \[format %c \$driven_h4_value\]
+}"
+
+set output "This is a test."
+memWriteString 0x1000 $output
+do_syscall write0 0x1000
+set test "write0 syscall"
+
+if {[sid_cmd "set real_output"] == $output} { pass $test } else { fail $test }
+sid_cmd "sid::component::disconnect_pin $victim debug-tx $probe_pin"
+
+
+###############
+# Test WRITE. #
+###############
+
+sid_cmd "set real_output {}"
+sid_cmd "sid::component::connect_pin $victim debug-tx $probe_pin"
+sid_cmd "set hook_driven_h4($probe_pin) { 
+    global driven_h4_value real_output
+    append real_output \[format %c \$driven_h4_value\]
+}"
+
+set output "Hello, stdout."
+memWriteWord 0x1000 1 ;# stdout
+memWriteWord 0x1004 0x2000
+memWriteWord 0x1008 [string length $output]
+memWriteString 0x2000 $output
+
+do_syscall write 0x1000
+set test "write syscall"
+
+if {[get_result] == "0" && [sid_cmd "set real_output"] == $output} { 
+    pass $test 
+} else { 
+    fail $test
+}
+sid_cmd "sid::component::disconnect_pin $victim debug-tx $probe_pin"
+
+
+###############
+# Test READC. #
+###############
+
+set char 0x70
+set rx_pin [sid_cmd "sid::component::find_pin $victim debug-rx"]
+sid_cmd "sid::pin::driven_h4 $rx_pin $char"
+
+set test "readc syscall"
+do_syscall readc {}
+if {[get_result] == $char} { pass $test } else { fail $test }
+
+
+##############
+# Test READ. #
+##############
+
+set input "Hello, stdin."
+memWriteWord 0x1000 0x0 ;# stdin
+memWriteWord 0x1004 0x2000
+memWriteWord 0x1008 13
+set rx_pin [sid_cmd "sid::component::find_pin $victim debug-rx"]
+foreach char [split $input {}] {
+    scan $char %c val
+    sid_cmd "sid::pin::driven_h4 $rx_pin $val"
+}
+set test "read syscall"
+do_syscall read 0x1000
+set result [get_result]
+if {$result == "0"} {
+    set addr 0x2000
+    set difference 0
+    foreach char [split $input {}] {
+	scan $char %c val
+	set byte $val
+	if {$byte != [memReadByte $addr]} {
+	    set difference 1
+	    break
+	}
+	incr addr
+    }
+    if {!$difference} { pass $test } else { fail $test }
+} else {
+    fail $test
+}
+
+#################
+# Test ISERROR. #
+#################
+
+memWriteWord 0x1000 0xFFFFFFFF
+do_syscall iserror 0x1000
+set test "iserror syscall (negative status word)"
+set result [get_result]
+if {$result != "0" && $result != ""} { pass $test } else { fail $test }
+
+memWriteWord 0x1000 0
+do_syscall iserror 0x1000
+set test "iserror syscall (zero status word)"
+if {[get_result] == "0"} { pass $test } else { fail $test }
+
+memWriteWord 0x1000 1
+do_syscall iserror 0x1000
+set test "iserror syscall (positive status word)"
+if {[get_result] == "0"} { pass $test } else { fail $test }
+
+
+###############
+# Test ISTTY. #
+###############
+
+foreach fd {0 1} {
+    memWriteWord 0x1000 $fd
+    do_syscall istty 0x1000
+    set test "istty syscall (for interactive files)"
+    if {[get_result] == 0xFFFFFFFF} { pass $test } else { fail $test }
+}
+
+# fd 2 is a file ("dummy") that we opened way back when ..
+
+memWriteWord 0x1000 2
+do_syscall istty 0x1000
+set test "istty syscall (for non-interactive files)"
+if {[get_result] == 0} { pass $test } else { fail $test }
+
+# Test with an invalid file descriptor.
+
+memWriteWord 0x1000 0x66
+do_syscall istty 0x1000
+set test "istty syscall (bad file descriptor)"
+set result [get_result]
+if {$result == 1} { pass $test } else { fail $test }
+
+
+##############
+# Test SEEK. #
+##############
+
+# Write some known data to a file, seek to the third byte and read it.
+# Check that it is "ABCDEFG"
+#                      `- this.
+
+set test "seek syscall"
+set filename "dummy"
+set fd [open $filename w]
+puts $fd "ABCDEFGH"
+close $fd
+
+# Use open() to get a file descriptor.
+memWriteString 0x2000 $filename
+memWriteWord 0x1000 0x2000
+memWriteWord 0x1004 0 ;# open mode "r"
+memWriteWord 0x1008 [string length $filename]
+do_syscall open 0x1000
+set result [get_result]
+
+if {$result != 0xFFFFFFFF && $result != ""} { 
+    memWriteWord 0x1000 3
+    memWriteWord 0x1004 3 ;# byte 3
+    do_syscall seek 0x1000
+    if {[get_result] == "0"} {
+	# Read a byte and check it for "D".
+	memWriteWord 0x1000 3
+	memWriteWord 0x1004 0x3000
+	memWriteWord 0x1008 1
+	do_syscall read 0x1000
+	if {[get_result] == "0"} {
+	    # 44 hex is "D".
+	    if {[memReadByte 0x3000] == 0x44} { pass $test } else { fail $test }
+	} else {
+	    fail $test
+	}
+    } else {
+	fail $test
+    }
+} else {
+    fail $test
+}
+file delete -force $fd
+
+# Test SEEK with a bad file descriptor.
+
+set test "seek syscall (bad file descriptor)"
+memWriteWord 0x1000 0x42
+memWriteWord 0x1004 3 ;# byte 3.
+do_syscall seek 0x1000
+set result [get_result]
+if {$result == "" || $result == 0} { fail $test } else { pass $test }
+
+
+##############
+# Test FLEN. #
+##############
+
+# Create a small file and determine its size.
+# Then validate this against what FLEN tells us.
+
+set filename "dummy"
+set fd [open $filename w]
+puts $fd "Hello world"
+close $fd
+set filesize [file size $filename]
+
+# Use open() to get a file descriptor.
+
+memWriteString 0x2000 $filename
+memWriteWord 0x1000 0x2000
+memWriteWord 0x1004 0
+memWriteWord 0x1008 5
+do_syscall open 0x1000
+set fd [get_result]
+if {$fd != 0xFFFFFFFF && $fd != ""} {
+    # Now make the FLEN syscall.
+    memWriteWord 0x1000 4
+    do_syscall flen 0x1000
+    set test "flen syscall"
+    if {[get_result] == $filesize} { pass $test } else { fail $test }
+} else {
+    fail $test
+}
+file delete -force $filename
+
+# Test FLEN with a bad file descriptor.
+
+memWriteWord 0x1000 0x42
+do_syscall flen 0x1000
+set test "flen syscall (bad file descriptor)"
+if {[get_result] == 0xFFFFFFFF} { pass $test } else { fail $test }
+
+
+################
+# Test TMPNAM. #
+################
+
+memWriteWord 0x1000 0x2000
+# The "target specific identifier" argument is unused.
+memWriteWord 0x1004 0
+memWriteWord 0x1008 0xFFFF
+do_syscall tmpnam 0x1000
+set test "tmpnam syscall"
+
+if {[get_result] == "0"} {
+    # The form of the temporary filename is going to vary
+    # from host to host.  It's difficult to validate.
+    if {[memReadString 0x2000] == ""} { fail $test } else { pass $test }
+} else {
+    fail $test
+}
+
+
+################
+# Test REMOVE. #
+################
+
+set filename dummy
+
+# Check for correct response when removing an existing file.
+
+close [open $filename w]
+
+memWriteWord 0x1000 0x2000
+memWriteWord 0x1004 5
+memWriteString 0x2000 $filename
+do_syscall remove 0x1000
+set test "remove syscall"
+if {[get_result] == "0" && ![file exists $filename]} { pass $test } else { fail $test }
+
+file delete -force $filename
+
+# Check for correct response when removing an absent file.
+
+memWriteWord 0x1000 0x2000
+memWriteWord 0x1004 5
+memWriteString 0x2000 $filename
+do_syscall remove 0x1000
+set result [get_result]
+set test "remove syscall (non-existent file)"
+if {$result != 0 && $result != ""} { pass $test } else { fail $test }
+
+
+################
+# Test RENAME. #
+################
+
+# Create a small file and rename it.
+
+unset filename
+set filename(old) "dumb"
+set filename(new) "dumber"
+
+file delete -force $filename(old)
+close [open $filename(old) w]
+
+memWriteWord 0x1000 0x2000
+memWriteWord 0x1004 4
+memWriteWord 0x1008 0x3000
+memWriteWord 0x100C 6
+memWriteString 0x2000 $filename(old)
+memWriteString 0x3000 $filename(new)
+
+do_syscall rename 0x1000
+set test "rename syscall"
+if {[get_result] == "0" && \
+	![file exists $filename(old)] && \
+	[file exists $filename(new)]} { pass $test } else { fail $test }
+
+file delete -force $filename(old) $filename(new)
+
+# Try to rename a non-existent file.
+
+set filename(old) "absent1"
+set filename(new) "absent2"
+set test "rename syscall (non-existent file)"
+if {[file exists $filename(old)]} { warning "file already exists" }
+
+memWriteWord 0x1000 0x2000
+memWriteWord 0x1004 4
+memWriteWord 0x1008 0x3000
+memWriteWord 0x100C 6
+memWriteString 0x2000 $filename(old)
+memWriteString 0x3000 $filename(new)
+
+do_syscall rename 0x1000
+set test "rename syscall (non-existent file)"
+set result [get_result]
+if {$result != "0" && $result != ""} { pass $test } else { fail $test }
+
+
+###############
+# Test CLOCK. #
+###############
+
+do_syscall clock {}
+set result [get_result]
+set test "clock syscall"
+
+if {$result == $syscalls(clock)} {
+    warning "$test may have returned the syscall number"
+}
+
+if {[expr $result > 100]} {
+    warning "$test (component appears to be using too much host CPU time)"
+}
+
+if {[expr $result >= 0] && [expr $result <= 100]} { pass $test } else { $fail $test }
+
+
+##############
+# Test TIME. #
+##############
+
+# Record the time on the host.  Check that the time reported by the
+# monitor is within three seconds of the recorded value.
+
+set now [clock seconds]
+do_syscall time {} 
+set result [get_result] 
+set test "time syscall"
+if {$result != "" && [expr abs([expr $now - $result])] < 3} {
+    pass $test 
+} else { 
+    fail $test
+}
+
+
+################
+# Test SYSTEM. #
+################
+
+set cmd "exit 6"
+memWriteWord 0x1000 0x2000
+memWriteWord 0x1004 [string length $cmd]
+memWriteString 0x2000 $cmd
+do_syscall system 0x1000
+set test "system syscall"
+set result [get_result]
+set exit_code [expr {($result & 0xFF00) >> 8}]
+if {$exit_code == 6} { pass $test } else { fail $test }
+
+
+###############
+# Test ERRNO. #
+###############
+
+# Check that this system call can retrieve the right error number,
+# given a system call which provokes a known errno value (namely,
+# closing a file with a bad file descriptor).
+
+set test "errno syscall"
+memWriteWord 0x1000 0x42
+do_syscall close 0x1000
+set result [get_result]
+
+if {$result == "0" || $result == ""} {
+    unresolved $test
+} else {
+    # Get the errno and check it for EBADF.
+    do_syscall errno {}
+    if {[get_result] == $newlib(err,BadF)} { pass $test } else { fail $test }
+}
+
+
+#####################
+# Test GET_CMDLINE. #
+#####################
+
+set cmdline [sid_cmd "sid::component::attribute_value $victim command-line"]
+
+memWriteWord 0x1000 0x2000
+do_syscall get-cmdline 0x1000
+set test "get-cmdline syscall"
+
+if {[get_result] == $syscalls(get-cmdline)} {
+    # ie. R0 was not overwritten with an error code.
+    
+    # We know the value in the attribute field is already correct,
+    # due to prior tests at the top of this test case, so compare
+    # with that.
+    if {[string compare [memReadString 0x2000] $cmdline] == 0} {
+	pass "get-cmdline syscall"
+    } else { 
+	fail "get-cmdline syscall"
+    }
+} else {
+    fail $test
+}
+
+
+######################
+# Test GET_HEAPINFO. #
+######################
+
+set heapbase   [sid_cmd "sid::component::attribute_value $victim heap-base"]
+set heaplimit  [sid_cmd "sid::component::attribute_value $victim heap-limit"]
+set stackbase  [sid_cmd "sid::component::attribute_value $victim stack-base"]
+set stacklimit [sid_cmd "sid::component::attribute_value $victim stack-limit"]
+
+memWriteWord 0x1000 0x2000
+do_syscall heapinfo 0x1000
+
+set difference 0
+set addr 0x2000
+foreach value [list $heapbase $heaplimit $stackbase $stacklimit] {
+    if {[memReadWord $addr] != $value} {
+	set difference 1
+	break
+    }
+    # Some pointer arithmetic, Tcl-style!
+    incr addr 4
+}
+set test "heapinfo syscall"
+if {!$difference} { pass $test } else { fail $test }
+
+
+##########################
+# Test REPORT_EXCEPTION. #
+##########################
+
+sid_cmd "sid::component::connect_pin $victim process-signal $probe_pin"
+sid_cmd "set hook_driven_h4($probe_pin) { 
+    global pin_fired driven_h4_value
+    set pin_fired \$driven_h4_value
+}"
+
+sid_cmd "set pin_fired 0"
+do_syscall report-exception 0x20026
+set test "report exception (exit)"
+set result [sid_cmd "set pin_fired"]
+if {$result == $newlib(sig,None)} { pass $test } else { fail $test }
+
+sid_cmd "set pin_fired 0"
+do_syscall report-exception 0x20022 
+set test "report exception (abort)"
+set result [sid_cmd "set pin_fired"]
+if {$result == $newlib(sig,Abort)} { pass $test } else { fail $test }
+
+
+# Stop SID.
+
+set test "sid stop"
+if {[sid_stop]} {
+    pass $test
+} else {
+    fail $test
+    return
+}
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} {
+    file delete "angel.conf"
+}
+

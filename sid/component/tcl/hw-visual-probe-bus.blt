@@ -1,0 +1,162 @@
+# -*- Tcl -*-
+
+package require BLT
+
+namespace import blt::*
+namespace import -force blt::tile::*
+
+option add *TileOffset			0
+option add *HighlightThickness		0
+option add *takeFocus			1
+option add *Element.ScaleSymbols	no
+option add *Element.Smooth		linear
+option add *activeLine.Color		yellow4
+option add *activeLine.Fill		yellow
+option add *activeLine.LineWidth	0
+option add *Element.Pixels		3
+option add *Graph.halo			7i
+
+set visual [winfo screenvisual .] 
+if { $visual != "staticgray" } {
+    option add *print.background yellow
+    option add *quit.background red
+}
+
+proc FormatLabel { w value } {
+    global addr2line_cmd symbol_cache
+    set hex_addr [format %X [expr int($value)]]
+
+    if {[info exists symbol_cache($hex_addr)]} {
+	return $symbol_cache($hex_addr)
+    }
+    
+    # FIXME: use macro substitution.
+    if {$addr2line_cmd != "" && \
+	    ![catch "exec $addr2line_cmd $hex_addr" msg]} {
+	set function_name [lindex [split $msg "\n"] 0]
+	set result "$function_name ($hex_addr)"
+    } else {
+	set result $hex_addr
+    }
+    set symbol_cache($hex_addr) $result
+    return $result
+}
+
+proc find_pin {name} {
+    global pin_list
+    if {[info exist pin_list($name)]} {
+	return $pin_list($name)
+    } else {
+	return {}
+    }
+}
+
+proc attribute_value {name} {
+    global addr2line_cmd
+    if {$name == "addr2line-cmd"} {
+        return $addr2line_cmd
+    } else {
+        return ""
+    }
+}
+
+proc set_attribute_value {name value} {
+    global addr2line_cmd
+    if {$name == "addr2line-cmd"} {
+	set addr2line_cmd $value
+	return ok
+    }
+    return not_found
+}
+
+proc relate {rel comp} {
+    global relationships
+    lappend relationships($rel) $comp
+    return ok
+}
+
+proc add_pin {name script} {
+    global pin_list
+    global hook_driven_h4
+
+    set temp [sid::pin::new]
+    set pin_list($name) $temp
+    set hook_driven_h4($temp) $script
+}
+
+proc driven_h4 {pin value} {
+    global hook_driven_h4 h4_driven_value
+    set h4_driven_value $value
+    if {[info exists hook_driven_h4($pin)]} {
+	uplevel \#0 $hook_driven_h4($pin)
+    } else {
+	error "pin driven without hook: $pin"
+    }
+}
+
+proc attribute_names_in_category {category} {
+    switch $category {
+      setting { return "addr2line-cmd" }
+      default { return "" }
+    }
+}
+
+set addr2line_cmd ""
+
+add_pin "address" {
+    global h4_driven_value address
+    set address $h4_driven_value
+}
+add_pin "data-low" {}
+add_pin "data-high" {}
+add_pin "status" {}
+add_pin "type" {
+    global h4_driven_value address
+    global relationships
+
+    set cpu $relationships(cpu)
+    set pc [sid::component::attribute_value $cpu pc]
+    set addr $address
+
+    set val $h4_driven_value
+    if {[expr $val & 0x100]} {
+	read_x append $pc
+	read_y append $addr
+    } else {
+	write_x append $pc
+	write_y append $addr
+    }
+    #update
+}
+
+set graph .graph
+
+graph $graph -title "Memory accesses"
+$graph xaxis configure -title "PC" -command FormatLabel
+$graph yaxis configure -title "Memory address" -command FormatLabel
+
+$graph legend configure \
+	-activerelief sunken -background ""
+
+$graph element create reads -symbol square -color green3 -fill green2 \
+    -linewidth 0 -outlinewidth 0 -pixels 2 -label Reads
+$graph element create writes -symbol square -color blue -fill blue \
+    -linewidth 0 -outlinewidth 0 -pixels 2 -label Writes
+table . .graph 0,0  -fill both
+update
+
+vector write_x(0) write_y(0) read_x(0) read_y(0) 
+$graph element configure writes -xdata write_x -ydata write_y
+$graph element configure reads -xdata read_x -ydata read_y
+
+wm title . "Memory access plot"
+wm min . 0 0
+
+Blt_ZoomStack $graph
+Blt_Crosshairs $graph
+Blt_ActiveLegend $graph
+Blt_ClosestPoint $graph
+
+busy hold $graph
+update
+busy release $graph

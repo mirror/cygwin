@@ -1,0 +1,347 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compMapper.cxx: Import more std:: identifiers.
+	(locate): Correct iterator use.
+
+2000-02-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Correctly regenerated.
+
+2000-01-27  Ron Unrau  <runrau@redhat.com>
+
+	* testsuite: new directory
+	* Makefile.am: recursively build testsuite
+	* Makefile.in: Regenerated.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (generic_mapper ctor): Initialize more members.
+
+2000-01-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (make_name_mapping): Permit text outside accessor
+	specification brackets.
+	* hw-mapper-basic.txt: Document this.
+
+2000-01-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-mapper-basic.txt: Fixed grammarian semantic distortion event.
+
+2000-01-13  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* hw-mapper-basic.txt: Reworded for clarity.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-11  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx: Rewrote.  Handles stride/offset mappings.  Collects
+	access statistics in attributes.
+	* hw-mapper-basic.txt: Rewrote mapping sections.
+
+1999-12-29  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (overlaps_p): New function for mapping_record's.
+	(mr_cmp): Renamed class from mapping_record::cmp.
+	(generic_mapper_bus): Specialize to host_int_4 addresses.
+	(connect_accessor): Detect overlaps.  Forbid duplicates.
+	(disconnect_accessor): Rewrite.
+	(*): Homogenize error messages.
+	* hw-mapper-basic.txt: Added configuration behavior.
+
+1999-12-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-mapper-basic.txt: Reworked according to template.  Added small
+	description of mapping transform.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* hw-mapper-basic.txt: New file.  Renamed from
+	* README: Removed.
+	* Makefile.am: Install new file.
+	* Makefile.in: Regenerated.
+
+1999-11-29  Ben Elliston  <bje@cygnus.com>
+
+	* compMapper.cxx (generic_mapper::disconnect_accessor): New method.
+	(generic_mapper::connect_accessor): Do not clear mapping entries.
+
+1999-11-25  Mary Lynn Kostash  <mkostash@cygnus.com>
+
+	* README: Reworded to clarify meaning.
+
+1999-11-25  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): Add mapperdocs.exp.
+	* Makefile.in: Regenerate.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (generic_mapper dtor): New blank function.
+	(compMapperDelete): Use dynamic_cast<>.
+
+1999-11-22  Ben Elliston  <bje@cygnus.com>
+
+	* README: New file.
+
+1999-11-19  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile.am (DEJAGNUTESTS): Add mappermonkey.exp.
+	* Makefille.in: Regenerate.
+
+	* Makefile.am (noinst_PROGRAMS): Elide.
+	(maptest_SOURCES): Likewise.
+	(maptest_DEPENDENCIES): Likewise.
+	(maptest_LDADD): Likewise.
+	(DEJAGNUTESTS): Define.
+	(checkme): New target.
+	* Makefile.in: Regenerate.
+	* maptest.cxx: Remove.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-10-10  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* compMapper.cxx (access_test): Removed unused variables.
+	(offset_test): Likewise.
+	(main): Commented fprintf with %d format--introduced same message
+	without %d format.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (locate): Declare very inline.
+	(write, read): Take value for bus::read/write, not const-ref.
+	* maptest.cxx (word_write, word_read): Same.
+
+1999-10-07  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* compMapper.cxx (write): Removed catch & try
+	(read): Likewise
+	(accessor_names): Likewise
+	(connect_accessor): Likewise
+	(connected_bus): Likewise
+		
+1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (make_mapping_name): Use make_numeric_attribute
+	to reconstruct mapping names.
+
+1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx, maptest.cxx (*): Use host_int_X, not compiler_int_X.
+
+1999-09-01  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* compMapper.cxx (save_state): Return empty string.
+	(restore_state): Check for empty string.
+
+1999-08-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-08-16  Ian Carmichael  <iancarm@cygnus.com>
+
+	* compMapper.cxx: sid::component members renamed.
+	* maptest.cxx: sid::component members renamed.
+
+1999-08-11  Ian Carmichael  <iancarm@cygnus.com>
+
+	* compMapper.cxx, maptest.cxx: (*) Change big_int_N 
+	and little_int_N so that the default operations all use 
+	their integer values.
+
+1999-08-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (make_mapping_name): Reject several mapping errors.
+	(save_state, restore_state): Operate silently.
+	(*): Formatting, namespace use tweaks.
+
+1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* compMapper.cxx: Introduced proper namespace usage.
+
+1999-07-25  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* compMapper.cxx: Exception handlings
+
+1999-07-19  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* compMapper.cxx (generic_mapper::save_state): New method.
+	(generic_mapper::restore_state): Likewise.
+
+1999-07-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	* acconfig.h: Removed.
+	* aclocal.m4: Ditto.
+	* config.in: Ditto.
+	* configure: Ditto.
+	* configure.in: Ditto.
+	* stamp-h.in: Ditto.
+
+1999-06-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (never_match): Become an static class variable
+ 	in generic_mapper_bus.
+	(generic_mapper_bus): Updated bus API calls throughout.
+	* maptest.cxx (Dummy): Remove address type declaration from word_bus 
+	template.  Use host_int_4 throughout.
+	(main): Update mapper component type name.
+
+1999-06-10  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* compMapper.cxx : Introduced word "struct" in  following 
+	two lines to compile using gnupro 99r1 on NT.
+	static struct mapping_record never_match = { 10, 0, 0, 0, 0, 0 };
+	mutable struct mapping_record* tlb; 
+
+1999-06-09  Ian Carmichael  <iancarm@cygnus.com>
+
+	* compMapper.cxx (locate): A few performance tweaks.  Not 
+	enough though.  The entier mapper needs to be reworked.
+
+1999-06-09  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (compMapperDelete): New function.
+	(mapper_component_library): Register it.
+
+1999-06-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (compMapperListTypes, compMapperCreate):
+	Rename type "mapper" -> "hw-mapper-basic".
+	* maptest.conf.in: Removed defunct test.
+	* configure.in: Forget about maptest.conf.in.
+	* configure: Regenerated.
+
+1999-06-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (listAccessorNames): Reincarnated old function.
+
+1999-05-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* aclocal.m4: Regenerated.
+
+1999-05-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (make_name_mapping): Use strtoul instead of strtol.
+	(locate): Don't mask off bottom two address bits.
+	
+	(mapper_component_library): DLLEXPORT it.
+	* configure.in: Be win32-dll-capable.
+	* configure: Regenerated.
+	* aclocal.m4: Regenerated for new libtool.
+	* Makefile.in: Ditto.
+
+	* maptest.conf.in: Use .la component DSO names.
+	
+1999-05-01  Ron Unrau  <runrau@cygnus.com>
+
+	* compMapper.cxx: add some support for stride offset
+	* compMapper.cxx (make_name_mapping): support hex addresses
+	* maptest.cxx: new file
+	* Makefile.am: build maptest
+	* Makefile.in: regenerate
+
+1999-04-21  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (LDFLAGS): Add -no-undefined
+	* Makefile.in: Regenerated.
+
+1999-04-14  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (generic_mapper_bus::tlb): New member.
+	(locate): Use tlb pointer as one-entry TLB.
+
+1999-04-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (*): Adapt to renamed component::status enum.
+	Adapt to renamed fixed_attribute_map functions.
+
+1999-04-03  Ron Unrau  <runrau@cygnus.com>
+
+	* compMapper.cxx: swap addr<->data in bus::read and bus::write
+
+1999-03-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (*): Remove listAccessorNames from API.
+
+1999-03-24  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Use new AC_CONFIG_AUX_DIR.
+	* configure: Regenerated.
+	* Makefile.am: Build libtool -modules.
+	* Makefile.in: Regenerated.
+
+1999-03-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx: Adapt to renamed COMPONENT_LIBRARY_MAGIC macro.
+
+1999-03-12  Ron Unrau  <runrau@cygnus.com>
+
+	* compMapper.cxx: setAccessor, connectPin, disconnectPin, and 
+	  setAttrValue now return status
+
+1999-03-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (class compMapper): Remove unneeded virtual
+ 	inheritance.  Add relationship API stub.
+
+1999-02-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am: Switch to foreign mode.  Adjust for automake 1.4.
+	* configure.in: Adjust for autoconf 2.13.
+	* Makefile.in: Rebuilt.
+	* aclocal.m4: Rebuilt.
+	* configure: Rebuilt.
+	* config.in: Rebuilt.
+	
+1999-01-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx (generic_mapper): Use fixed_bus_map_component
+	mixin.
+
+1998-12-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.am (INCLUDES): Added . and ../include.
+	* configure.in: Removed compulsory checks.
+	* Makefile.in: Rebuilt.
+ 	* configure: Rebuilt.
+	* config.in: Rebuilt.
+
+1998-12-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* compMapper.cxx: New file: simple address mapper component.
+	* maptest.conf.in: New sid config file to drive mapper tests.
+	* Makefile.am: New file.
+	* configure.in: New file.
+	* stamp-h.in: New blank file.
+	* acconfig.h: New file.
+	* config.in: Generated new file.
+	* aclocal.m4: Generated new file.
+	* Makefile.in: Generated new file.
+	* configure: Generated new file.
+

@@ -1,0 +1,500 @@
+2000-11-22  Frank Ch. Eigler  <fche@redhat.com>
+
+	* configure.in (perl): Don't look for this.
+	* configure, Makefile.in: Regenerated.
+
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * configure.in: Removed AC_PROG_PATH(AR, ar).
+        * configure: Regenerated.
+        * aclocal.m4: Ditto.
+        * Makefile.in: Ditto.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-02-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* voice-pager-demo.conf.in: Add nvram companion for rtc.
+
+2000-02-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* voice-pager.tcl: New file, renamed from
+	* voice-pager.tcl.in: Removed.
+	* voice-pager-demo.conf.in: Load .tcl file from source tree.
+	* Makefile.am (noinst_DATA): Remove useless definition.
+	(all-local): Copy button bitmaps to build tree.
+	* configure.in: Don't generate voice-pager.tcl.
+	* configure, Makefile.in: Regenerated.
+
+2000-02-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* voice-pager-demo.conf.in: New file.  Get lcd.tcl loaded via load!
+	attribute.  Collect common parts of
+	* voice-pager-demo.conf.pport, voice-pager-demo.conf.hdl: Factored.
+	* voice-pager-demo.in: Use new file.  Add "set -x" tracing.
+	* configure.in: Generate voice-pager-demo.conf.
+	* configure, Makefile.in: Regenerated.
+	* voice-pager.tcl.in: Disable title bar.  Bind application shutdown
+	to <Destroy> event instead.  Don't source lcd.tcl here.
+
+2000-02-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mem-map.h (CODEC_BASE): Define.
+	* adac-driver.cxx: Use it instead of SIDCODEC.
+	* voice-pager.tcl.in: Add $Revision: 1.1 $ in title bar.
+
+2000-02-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* README: Simplified build instructions.
+	* page-snack.cxx, page-snack.h: Removed.
+	* v1comp.h, voice-pager-no-adac.cxx: Gone.
+	* adac_driver.cxx, adac_driver.h: Rewrote for hw-audio-sid.
+	* VoicePager.cxx: Removed NOADCDAC versions.
+	(display_msg): Wait a second.
+	(initialize_rtc): Correct Y2K bug.
+	(poll_input): Simplify.  Poll codec in loop.
+	(*): Adapt to new adac_driver device type.
+	* VoicePager.h: Corresponding changes.
+	* play.bit, record.bit, stop.bit: New files.
+	* voice-pager.tcl.in: Remove snack references.  Use new bitmaps.
+	* voice-pager-demo.in: Rewrote to just 9 lines.
+	* voice-pager-demo.conf.pport: New file.
+	* voice-pager-demo.conf.hdl: New file.
+	* Makefile.am: Remove "no-adac" targets.  Mention new .conf.* files.
+	* Makefile.in, configure, stamp-h.in: Regenerated.
+
+2000-01-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* lcd.tcl: New file, copied over from component/tcl.
+	* voice-pager.tcl.in: Refer to it.
+
+1999-12-01  Ron Unrau  <runrau@cygnus.com>
+
+	* voice-pager-demo.in: remove trainling '-'s on relate directives
+
+1999-11-30  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* README: Don't mention bad old LTDL_LIBRARY_PATH.
+	* voice-pager-demo.in: Don't set it either.
+
+1999-11-06  Ron Unrau  <runrau@cygnus.com>
+
+	* voice-pager.tcl.in: use the share/sidcomp/lcd.tcl
+	* lcd.tcl: removed
+	* voice-pager-demo.in: set screen bg color, rename keypad to panel
+
+1999-11-06  Ron Unrau  <runrau@cygnus.com>
+
+	* configure.in: do not generate *.conf files
+	* configure: regenerated
+	* armv1.conf.in vp-no-adac.conf.in: subsumed by voice-page-demo.in
+	* wogdbarmv1.conf.in wogdbvp-no-adac.conf.in: ditto
+
+1999-11-06  Ron Unrau  <runrau@cygnus.com>
+
+	* armv1.conf hdl-no-adac.conf vp-no-adac.conf: removed
+	* Makefile: removed
+	* voice-pager.tcl: removed
+	* mapper-read-write.{h,cxx}: no longer used
+	* vp-base.tcl vp-comp-no-adac.tcl vp-base-no-adac.tcl: ditto
+	
+1999-11-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* armv1.conf.in: Adapt to renamed stdio & gdb components.
+	* hdl-no-adac.conf, voice-pager-demo.in, vp-no-adac.conf: Ditto.
+	* vp-no-adac.conf.in, wogdbarmv1.conf.in: Same.
+	* wogdbvp-no-adac.conf.in: Same.
+
+1999-11-04  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Test-voice-pager.cxx: removed cout.
+	* VoicePager.cxx(show_lcdmsg): New Method
+	(clear_lcddisplay): New Method
+	(get_adcdata): Added some lcd display messages
+	(send_dacdata): Likewise
+	VoicePager.h: Added above new methods.
+	* adac-driver.cxx(constr): Removed cout statements
+	* configure.in: Added more files to output in build tree
+	* v1comp.tcl: little clean up
+	* voice-pager-no-adac.cxx: clean up
+	* wogdbarmv1.conf.in: New File
+	* wogdbvp-no-adac.conf.in: New File
+	* Makefile.in: Generated
+	* aclocal.m4: Likewise
+	* configure: Likewise
+	* vp-no-adac.conf.in: Changed memory size to 0x800000
+	changed stack position to 0x600000
+	* Makefile.am: Added noinst_SOURCES 
+	
+1999-11-04  Ron Unrau  <runrau@cygnus.com>
+
+	* voice-pager-demo.in: new config script generator
+	* configure.in: add perl check, voice-pager-demo target
+	* configure: regenerated
+	* Makefile.am: make voice-pager-demo executable
+	* Makefile.in: regenerated
+	* parport-driver.cxx: lose debug output
+	* voice-pager.tcl.in: remove extra '/' in blt pathname
+	  revert back to allowing any mouse button for keypad
+ 
+1999-11-03  Faisal khoja  <fkhoja@cygnus.com>
+
+	* Makefile.am: New File
+	* configure.in: Likewise
+	* config.in: Likewise
+	* acconfig.h Likewise
+	* aclocal.m4: Generated
+	* configure: Likewise
+	* stamp-h.in: Likewise
+	* Makefile.in: Likewise
+	* v1comp.tcl: Removed ALAW
+	* armv1.conf.in: New File
+	* vp-no-adac.conf.in: New File
+	* voice-pager.tcl.in: New File
+
+1999-11-01  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile: Added adac-driver.o
+	* VoicePager.h (record_sound): Removed
+	(class VoicePagerADAC): Added data member of type adac_driver
+	* VoicePager.cxx: Likewise
+	(get_adcdata): Removed hard coded paths with methods calls
+	(send_dacdata): Likewise
+	* adac-driver.h: New File
+	* adac-driver.cxx: Likewise
+	* armv1.conf: Removed ADC?, and SndObjects attributes. 
+	Added addresses for adc buses (data ,and size buses).
+	Changed stride from 4 to 1 for adc data bus.
+	Added more addresses to Sanck bus.
+ 	* vp-no-adc.conf: Removed ADC? & SndObjects attributes.
+	* mem-map.h: Added addressing for adc data bus
+	Changed type od adc size bus from char* to int*
+	* page-snack.h (copy_sndtoattr, copy_sndfromattr): New methods
+	* page-snack.cxx: Likewise
+	* parport-driver.h: Converted most of methods to inline 
+	* v1comp.tcl: adc_mode, and soundarr_val are not used any more.
+ 	Removed attributes ADC? & SndObjects
+  	* voicepager.tcl: Removed attributes ADC? & SndObjects
+	
+1999-10-31  Ron Unrau  <runrau@cygnus.com>
+
+	* hdl-no-adac.conf: allow eagle/pport to poll for their connections
+	  - modify vpc-command to use eagle-port
+	  - make hdl-pport pin names the same as parport
+
+1999-10-30  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* armv1.conf: Did a mistake in absolute path
+	* vp-no-adc.conf: Likewise
+
+1999-10-30  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* armv1.conf: Added gdb stuff, hard coded filename paths.
+	* vp-no-adc.conf: Likewise
+	* voice-pager.tcl: Hardcoded paths for lcd.tcl , v1comp.tcl, and bitmap
+	
+1999-10-29  Ron Unrau  <runrau@cygnus.com>
+
+	* VoicePager.{cxx,h}: move private enums from base clase to accessible
+	  const vars in implementation
+	* armv1.conf: re-enable INTSEL/ACK, remove non-ADAC stuff
+	* vp-no-adac.conf: track changes to armv1.conf
+	* mem-map.h: use a typedef for the addresses
+	* parport-driver.{cxx,h}: rename methods and make in-line
+	* voice-pager.tcl: re-enable ACKs
+
+1999-10-26  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile: Removed mapper-read-write.* as target and dependency.
+	* VoicePager.{h,cxx}: Introduced abstract class and two drived classes.
+	* armv1.conf: Introduced additional statements to make it compatiable 
+	for both adc and non adc version.
+	* lcd-driver.{h,cxx}: Wrapped driver into class.
+	* parport-driver.{h,cxx}: Likewise
+	* rtc-driver.{h,cxx}: Likewise
+	* page-snack.{h,cxx}: Likewise
+	* page-lcd.{h,cxx}: Likewise 
+	(constructor): Introduced argument. Added data member lcd_drobj
+	* mem-map.h: Changed addresses & made types to volatile unsigned char*
+	* Test-voice-pager.cxx: Little bit testing 
+	* v1comp.tcl: Introduced attributes. Compatiable for adc & non adc
+	* voice-pager.tcl: Brought GUI layout back from vp-base-no-adac.tcl 
+  	* voice-pager-no-adac.cxx: Uses object of type VoicePagerWOADC
+	
+1999-10-26  Ron Unrau  <runrau@cygnus.com>
+
+	* hdl-no-adac.conf: new config file using HDL bridge
+
+1999-10-26  Ron Unrau  <runrau@cygnus.com>
+
+	* VoicePager.cxx: don't update screen until finished recording
+	* parport-driver.cxx: test IRQ bit in SR to detect changes
+	* voice-pager.tcl: add ACK pin
+	* armv1.conf: set INTSEL, connect ACK pin
+	* vp-no-adac.conf: ditto
+
+1999-10-25  Ron Unrau  <runrau@cygnus.com>
+
+	* Test-voice-pager.cxx: move VoicePager class to its own file
+	* parport-driver.{h,cxx}: make register offsets local
+	* rtc-driver.{h,cxx}: ditto
+	* lcd-driver.{h,cxx}: ditto
+	* page-snack.{h,cxx}: ditto
+	* voice-pager.tcl: now common subset driver between with and without
+	  ADAC versions.
+	* armv1.conf: give pport stride 1
+	* Makefile: define CXX, rules, etc and generate both with and without
+	  ADAC targets
+	* VoicePager.{h,cxx}: new files
+	* voice-pager-no-adac.cxx: new driver
+	* vp-no-adac.conf: new config file
+	* mem-map.h: new file
+	* vp-base-no-adac.tcl: new tcl driver
+	* vp-base.tcl: new tcl driver
+	* vp-comp-no-adac.tcl: new file
+
+1999-10-15  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Test-voice-pager.cxx (get_adcdata): Use a char* to contain
+	adc bytes in inner loop.
+	(send_dacdata): Ditto for dac bytes.
+	(display_msg): Allay -Wall warnings.
+
+	* ChangeLog: New file - copied from
+	* Changelog: Removed.
+
+1999-10-15  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile: Addded optimization -O2
+	* parport-driver.cxx: some Clean up
+	* parport-driver.h: Likewise
+	* page-lcd.cxx: Likewise
+	* lcd-driver.cxx: Likewise
+	* lcd-driver.h: Likewise
+	* mapper-read-write.h: Likewise
+	* rtc-driver.cxx: Likewise
+	* rtc-driver.h: Likewise
+	* Test-voice-pager.cxx: Patched memory leakage. Documented
+	* v1comp.tcl: Removed hex to int conversion
+	* lcd.tcl: Likewise
+	* armv1.conf: Added 0x with hex numbers. Added gloss reset
+
+1999-10-15  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.am: Removed. Good Bye to my file
+	* Makefile.in: Likewise
+	* PagerUI.cxx: Likewise
+	* PagerUI.h: Likewise
+	* acconfig.h: Likewise
+	* box-tester.cxx: Likewise
+	* box-tester.h: Likewise
+	* armv1.conf.in: Likeise
+	* box-test.config.in: Likewise
+	* config.h.in: Likewise
+	* config.in: Likewise
+	* configure: Likewise
+	* configure.in: Likewise
+	* lcd-driver-base.h: Likewise
+	* lcd-driver-cpu.cxx: Likewise
+	* lcd-driver-sid.cxx: Likewise
+	* stamp-h.in: Likewise
+	* testcode.cxx: Likewise
+	* ppager.cxx: Likewise
+	* ppager.h: Likewise
+
+1999-09-27  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* rtc-driver.cxx: Introduced enum TIME_DIFFHRS to set the time 
+	difference. 
+	(initialize_rtc): set res_time according to TIME_DIFFHRS
+
+1999-09-26  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* mapper-read-write.h (write(unsigned long,unsigned int)): new method
+	read( unsigned long addr, unsigned int& data ):Likewise
+	* mapper-read-write.cxx: Likewise
+
+1999-09-26  Faisal Kkoja  <fkhoja@cygnus.com>
+
+	* rtc-driver.cxx(set_century): Set the write bit again.
+	(get_rtctime): Removed ostrstream with sprintf.
+	* Test-voice-pager.cxx: Introduced calls to adc component.
+	set the proper error messages. Removed debugging code.
+	Introduced limit on recording.
+	* bp1.bit: New Bitmap files
+	* bp2.bit  Likewise
+	* bp3.bit: Likewise
+	* armv1.conf: moved further stack position
+	* voice-pager.tcl: Removed help menu bar. Introduced bitmaps 
+	for buttons
+	* lcd.tcl: Introduced background lcd color.
+	* v1comp.tcl(write_register):Don't flush the sound object during 
+	delete mode.
+
+1999-09-24  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* armv1.conf Changed stack pointer base, changed memory size for lcd,
+	introduced 2 new buses from arbitary sid component (adc_dac).
+	* lcd-driver.h: Changed mapper bus addresses
+	* parport-driver.h: Likewise
+	* rtc-driver.h: Likewise
+	* rtc-driver.cxx: Likewise
+	* parport-driver.cxx: Likewise
+	* lcd-driver.cxx: Likewise
+	* page-snack.h: Likewise
+	* page-snack.cxx: Likewise
+	* page-lcd.h: cleanup of code
+	* page-lcd.cxx: likewise
+	* v1comp.tcl: some cleanup of debugging code
+	* voice-pager.tcl: cleanup debugging code
+	
+1999-09-20  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* lcd.tcl: Copied from component/lcd
+
+1999-09-20  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* v1comp.tcl: Removed hard coded paths
+	* armv1.conf: Likewise
+	
+1999-09-19  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* v1comp.tcl (write_register): Keeping PLAY_BIT global than variable
+	(read_register): Likewise
+
+1999-09-19  Faisal Khoja  <fkhoja@cygnus.com>
+	
+	* lcd-driver.h: Added <strstream.h>
+	* page-lcd.h: changed MAXMSGS to 20
+	* rtc-driver.h: Removed old comments
+ 	 
+1999-09-19  Faisal Khoja  <fkhoja@cygnus.com>
+	
+	* armv1.conf: Removed lcd and snack as tk-bridge components. 
+	* Test-voice-pager.cxx (class VoicePager): intrduces two data members record_process play_process
+	Increased max msgs to 20 and random tel. numbers to 12.
+	(poll_input): using 2 new data members. Also introduced some display error messages on lcd.
+	(Play_storedmsg): Display error messages on lcd.
+	(delete_storedmsg): Likewise
+	(record_newmsg): Likewise
+	* rtc-driver.cxx: Commented Debugging messages
+	* lcd-driver.cxx: Likewise
+	* parport-driver.cxx: Likewise
+	* page-snack.h (play_donestatus): New method
+	* page-snack.cxx (play_donestatus): Likewise
+	* page-lcd.cxx: included page-lcd.h as header. Removed debugging messages
+	* voice-pager.tcl: source snack tcl file and lcd tcl file
+	Introduced stop button.
+	(stop_button): New Method
+	(find_bus): New Method
+	(read_h4_b1): Likewise
+	(read_h4_l1): Likewise
+	(write_h4_l1): Likewise
+	(write_h4_b1): Likewise
+	(attribute_name): Likewise
+	(set_attribute_value): Likewise
+	(attribute_value): Likewise
+	(driven_h4): Likewise
+	(driven): Likewise
+	* v1comp.tcl: introduced namespacing.
+ 	(read_h4_b1): New Method
+	(read_h4_l1): Likewise
+	(read_register): Likewise
+	(write_register): under switch play setting global variable PLAY_BIT
+        (write_h4_b1): Convert data arg from Hex to int	
+	(write_h4_l1): Likewise
+
+	
+1999-09-16  Faisal Khoja  <fkhoja@cygnus.com>
+	
+	* rtc-driver.cxx (get_rtctime): commented day and seconds display
+	* Test-voice-pager.cxx (init_rndtelnum): New method
+	* Test-voice-pager.cxx (get_rndtelnum): Likewise
+
+1999-09-16  Faisal Khoja  <fkhoja@cygnus.com>
+	
+	* armv1.conf.in: removed @prefix@, and @srcdir@
+	* voice-pager.tcl (record_button): introduced a new argument.
+
+1999-09-16  Faisal Khoja  <fkhoja@cygnus.com>
+	
+	* armv1.conf: New File
+	* README: Likewise
+	* Test-voice-pager.cxx: NewFile
+	* page-snack.h: Likewise
+	* page-snack.cxx: Likewise
+	* page-lcd.cxx : Likewise
+	* page-lcd.h : Likewise
+	* Makefile: Likewise
+	* lcd.tcl: Likewise
+
+1999-09-16  Faisal Khoja  <fkhoja@cygnus.com>
+	
+	* armv1.conf.in: introduced snack stuff
+	* parport-driver.cxx (read_PRreg): new method
+	* parport-driver.h: Likewise
+	* testcode.cxx: some more cool testing for snack
+	* v1comp.tcl: Introduced write_h4_l1& write_h4_b1 methods.	
+
+1999-09-15  Faisal Khoja  <fkhoja@cygnus.com>
+	
+	* armv1.conf.in: increased lcd width  
+	* ppager.cxx: removed inline methods
+	* testcode.cxx: some more cool testing
+	
+1999-09-14  Faisal Khoja  <fkhoja@cygnus.com>
+	
+	* armv1.conf.in: New File
+	* mapper-read-write.cxx: Likewise
+	* mapper-read-write.h: Likewise
+	* parport-driver.cxx: Likewise
+	* parport-driver.h: Likewise
+	* ppager.cxx: Likewise
+	* ppager.h: Likewise
+	* rtc-driver.cxx: Likewise
+	* rtc-driver.h: Likewise
+	* testcode.cxx: Likewise
+	* v1comp.tcl: Likewise
+	* lcd-driver.cxx: Made changes
+	* lcd-driver.h: made Changes
+
+1999-09-09  Ron Unrau  <runrau@cygnus.com>
+
+	* voice-pager.tcl: use snack 1.6
+	* PagerUI.{h,cxx}: add id field to Event, add id to append interface
+	  new method current_id
+	* box-tester.{h,cxx}: add playback_pin, use id to select messages
+	  to play
+	* box-test.config.in: hook-up playback_pin
+
+1999-09-08  Ron Unrau  <runrau@cygnus.com>
+
+	* voice-pager.tcl: added delete button
+	* box-tester.{h,cxx}: move lcd driver stuff into lcd-driver*
+	* PagerUI.{h,cxx}: new files - application code for UI
+	* lcd-driver.{h,cxx}: new files - basic interaction with LCD
+	* lcd-driver-base.h: new file - to allow native and/or arm development
+	* lcd-driver-sid.cxx: new file - for native development
+	* lcd-driver-cpu.cxx: new file - for arm development
+	* box-test.config.in: add new buttons, change to 2-bits/pixel, faster
+	  refresh, access lcd through mapper
+	* Makefile.am: use PagerUI and lcd-driver
+	* Makefile.in: regenerated
+
+1999-09-05  Ron Unrau  <runrau@cygnus.com>
+
+	* voice-pager.tcl: new file - first attempt at voice pager layout
+	* box-tester.{h,cxx}: new files - simple tester for the voice box
+	* box-test.config.in: new file - config script for tester
+	* acconfig.h: new file
+	* aclocal.m4: new file
+	* config.in: new file
+	* config.h.in: generated with autoheader
+	* configure.in: new file
+	* configure: generated
+	* Makefile.am: new file
+	* Makefile.in: generated with automake
+	* stamp-h.in: new file
+

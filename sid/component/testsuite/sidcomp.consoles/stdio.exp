@@ -1,0 +1,51 @@
+# Testsuite for the standard I/O console.
+#
+# Copyright (C) 1999 Red Hat
+
+set test "sid configuration"
+sid_config_component_etc_test_with_tracing "stdio.conf" \
+    "load [sid_find_file libconsoles.la] console_component_library" \
+    "sid-io-stdio" \
+    "connect-pin main perform-activity -> wrapper poll"
+pass $test
+
+set test "sid start"
+if {[sid_start "stdio.conf"]} {
+    pass $test
+} else {
+    fail $test 
+    return
+}
+
+# There are no attributes for this component, but let's do this for good 
+# measure.
+set test "attribute list"
+sid_assert_success "sid::component::attribute_names $victim"
+
+# Check for the presence of all pins.
+foreach pin {stdin stdout poll} {
+    set test "get $pin pin"
+    sid_assert_success "sid::component::find_pin $victim $pin"
+}
+
+# Test output.
+set stdout [sid_cmd "sid::component::find_pin $victim stdout"]
+foreach char [split "Hello-world" {}] {
+    # The character codes must be passed to driven_h4 in hex.
+    scan $char %c val
+    sid_cmd "sid::pin::driven_h4 $stdout $val"
+}
+
+# new save/restore test
+set test "Save state"
+set state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {$state == "console"} then { pass $test } else { fail $test }
+
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} {
+    file delete "stdio.conf"
+}

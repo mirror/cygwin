@@ -1,0 +1,8 @@
+# -*- Tcl -*-
+
+load_lib "docs.exp"
+
+doc_test memory hw-memory-ram/rom-basic
+doc_test memory hw-memory-flash-at29
+doc_test memory hw-memory-flash-am29
+

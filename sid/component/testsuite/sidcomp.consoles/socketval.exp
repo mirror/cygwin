@@ -1,0 +1,271 @@
+# Testsuite for the socket server
+#
+# Copyright (C) 1999 Red Hat
+#include <tcl.h>
+
+# XXX: FChE 2000-11-13: disable this test; it hangs too easily
+return
+
+set test "sid configuration"
+sid_config_component_etc_test_with_tracing "server.conf" \
+    "load [sid_find_file libconsoles.la] console_component_library" \
+    "sid-io-socket-server" \
+    "load [sid_find_file libsched.la] sched_component_library
+new sid-sched-host-accurate sched
+new sid-io-socket-client client
+set sched num-clients 2
+set sched enabled? 1
+connect-pin sched 0-control <- wrapper poll-control
+connect-pin sched 0-event -> wrapper poll-event
+connect-pin sched 1-control <- client poll-control
+connect-pin sched 1-event -> client poll-event
+relate tester client client"
+pass $test
+
+set test "sid start"
+if {[sid_start "server.conf"]} { pass $test } else { fail $test ; return }
+
+set test "check attribute list"
+sid_assert_includes_all "sid::component::attribute_names $victim" {tx-count tx-buffer rx-count poll-count avg-tx-buffer-size server? sockaddr-local sockaddr-peer verbose? trace-traffic? buffer-while-disconnected? connected? max-poll-interval poll-interval}
+
+set test "check attribute pin list"
+set category "pin"
+sid_assert_includes_all "sid::component::attribute_names_in_category $victim $category" {init fini tx rx}
+
+set test "check attribute register list"
+set category "register"
+sid_assert_includes_all "sid::component::attribute_names_in_category $victim $category" {tx-count tx-buffer rx-count poll-count avg-tx-buffer-size sockaddr-peer connected? poll-interval}
+
+set test "check attribute setting list"
+set category "setting"
+sid_assert_includes_all "sid::component::attribute_names_in_category $victim $category" {server? sockaddr-local verbose? trace-traffic? buffer-while-disconnected? max-poll-interval}
+
+set test "check attribute watchable list"
+set category "watchable"
+set attr [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if { $attr == "" } then { pass $test } else { fail $test }
+
+set test "check pin names"
+set pins [sid_cmd "sid::component::pin_names $victim"]
+sid_assert_includes_all "sid::component::pin_names $victim" {poll-control rx fini init poll-event tx}
+
+set test "check bus names"
+set bus [sid_cmd "sid::component::bus_names $victim"]
+if { $bus == "" } then { pass $test } else { fail $test }
+
+set test "check accessor names"
+set acc [sid_cmd "sid::component::accessor_names $victim"]
+if { $acc == "" } then { pass $test } else { fail $test }
+
+set test "check relationship names"
+set rel [sid_cmd "sid::component::relationship_names $victim"]
+if { $rel == "" } then { pass $test } else { fail $test }
+
+set test "query server? attribute"
+set value [sid_cmd "sid::component::attribute_value $victim server?"]
+if { $value == "yes" } then { pass $test } else { fail $test }
+
+set test "test presence of client component"
+set client [sid_cmd "set relationships(client)"]
+if {$client != ""} { pass $test } else { fail $test }
+
+set test "query server? attribute for client"
+set value [sid_cmd "sid::component::attribute_value $client server?"]
+if { $value == "no" } then { pass $test } else { fail $test }
+
+set test "check default for max-poll-interval"
+set value [sid_cmd "sid::component::attribute_value $victim max-poll-interval"]
+if { $value == "250" } then { pass $test } else { fail $test }
+
+set test "check default for sockaddr-peer"
+set value [sid_cmd "sid::component::attribute_value $victim sockaddr-peer"]
+if { $value == "0.0.0.0:0" } then { pass $test } else { fail $test }
+
+set test "check default for sockaddr-local"
+set value [sid_cmd "sid::component::attribute_value $victim sockaddr-local"]
+if { $value == "0.0.0.0:0" } then { pass $test } else { fail $test }
+
+set test "check default for verbose?"
+set value [sid_cmd "sid::component::attribute_value $victim verbose?"]
+if { $value == "no" } then { pass $test } else { fail $test }
+
+set test "check default for trace-traffic?"
+set value [sid_cmd "sid::component::attribute_value $victim trace-traffic?"]
+if { $value == "no" } then { pass $test } else { fail $test }
+
+set test "check if connection exists "
+set value [sid_cmd "sid::component::attribute_value $victim connected?"]
+if { $value == "no" } then { pass $test } else { fail $test }
+
+set test "query connected? attribute at initialization"
+set ipaddr "127.0.0.1:1234"
+set status [sid_cmd "sid::component::set_attribute_value $victim sockaddr-local $ipaddr "]
+set init [sid_cmd "sid::component::find_pin $victim init"]
+set value 1
+sid_cmd "sid::pin::driven_h4 $init $value"
+set con [sid_cmd "sid::component::attribute_value $victim connected?"]
+set addr [sid_cmd "sid::component::attribute_value $victim sockaddr-local"]
+if { $status == "ok" && $init != "" && $con == "no" && $addr == $ipaddr} then { pass $test } else { fail $test }
+
+set test "set up client"
+set ipaddr "0.0.0.0:1234"
+set status [sid_cmd "sid::component::set_attribute_value $client sockaddr-peer $ipaddr "]
+set addr [sid_cmd "sid::component::attribute_value $client sockaddr-peer"]
+set clientinit [sid_cmd "sid::component::find_pin $client init"]
+set value 1
+sid_cmd "sid::pin::driven_h4 $clientinit $value"
+set con [sid_cmd "sid::component::attribute_value $client connected?"]
+if { $status == "ok" && $clientinit != "" && $con == "no" && $addr == $ipaddr} then { pass $test } else { fail $test }
+
+set test "drive poll-event and attempt to accept"
+set value 1
+set clientpollevent [sid_cmd "sid::component::find_pin $client poll-event"]
+set pollevent [sid_cmd "sid::component::find_pin $victim poll-event"]
+while { [sid_cmd "sid::component::attribute_value $victim connected?"] != "yes" || [sid_cmd "sid::component::attribute_value $client connected?"] != "yes"} {
+    sid_cmd "sid::pin::driven_h4 $pollevent $value"
+    sid_cmd "sid::pin::driven_h4 $clientpollevent $value"
+#poll until connected
+} 
+set peer [sid_cmd "sid::component::attribute_value $victim sockaddr-peer"]
+set con [sid_cmd "sid::component::attribute_value $victim connected?"]
+if { $pollevent != "" && $clientpollevent != "" && $peer != "0.0.0.0:0" && $con == "yes"} then { pass $test } else { fail $test }
+
+set old_avg_tx [sid_cmd "sid::component::attribute_value $victim avg-tx-buffer-size"]
+set tx [sid_cmd "sid::component::find_pin $victim tx"]
+set atoz ABCDEFGHIJKLMNOPQRSTUVWXYZ
+for {set i 0} {$i < 26} {incr i} {
+   set alpha [expr $i + 65]
+   set test "drive tx pin to $alpha and check tx-buffer value"
+   sid_cmd "sid::pin::driven_h4 $tx $alpha"
+   set buf [sid_cmd "sid::component::attribute_value $victim tx-buffer"]
+   set expected_value [string range $atoz 0 $i]
+   set new_avg_tx [sid_cmd "sid::component::attribute_value $victim avg-tx-buffer-size"]
+   if { $tx != "" && [ string compare $buf $expected_value ] == "0" && $old_avg_tx != $new_avg_tx } then { pass $test } else { fail $test }
+   set old_avg_tx $new_avg_tx
+}
+
+set prevtx_count [sid_cmd "sid::component::attribute_value $victim tx-count"]
+set prevrx_count [sid_cmd "sid::component::attribute_value $client rx-count"]
+set prevbuf [sid_cmd "sid::component::attribute_value $victim tx-buffer"]
+
+
+set test "drive poll-event and check if tx-buffer is cleared"
+sid_cmd "sid::pin::driven_h4 $pollevent 1"
+set buf [sid_cmd "sid::component::attribute_value $victim tx-buffer"]
+if {$buf == "" && $prevbuf != ""} then { pass $test} else {fail $test}
+
+set test "check if tx-count changes after poll-event is driven"
+set tx_count [sid_cmd "sid::component::attribute_value $victim tx-count"]
+if { $tx_count != $prevtx_count } then { pass $test } else { fail $test}
+
+set test "check if client rx-count changes after poll-event is driven on server side"
+set value 1
+sid_cmd "sid::pin::driven_h4 $clientpollevent $value"
+set rx_count [sid_cmd "sid::component::attribute_value $client rx-count"]
+if { $rx_count != $prevrx_count } then { pass $test } else { fail $test}
+
+set test "check if poll-count changes"
+set prev_count [sid_cmd "sid::component::attribute_value $victim poll-count"]
+sid_cmd "sid::pin::driven_h4 $pollevent 1"
+set poll_count [sid_cmd "sid::component::attribute_value $victim poll-count"]
+set exp_count [expr $prev_count+1]
+if { $poll_count == $exp_count && $prev_count != "0" } then { pass $test } else { fail $test}
+
+set test "drive fini pin to close connection"
+set value 1
+set fini [sid_cmd "sid::component::find_pin $victim fini"]
+sid_cmd "sid::pin::driven_h4 $fini $value"
+set con [sid_cmd "sid::component::attribute_value $victim connected?"]
+if { $fini != "" && $con == "no" } then { pass $test } else { fail $test }
+
+set test "drive tx pin with buffer-while-disconnected? to no and check if buffer is not updated"
+set status [sid_cmd "sid::component::set_attribute_value $victim buffer-while-disconnected? no "]
+set value [sid_cmd "sid::component::attribute_value $victim buffer-while-disconnected?"]
+set prev_buf [sid_cmd "sid::component::attribute_value $victim tx-buffer"]
+sid_cmd "sid::pin::driven_h4 $tx 65"
+set buf [sid_cmd "sid::component::attribute_value $victim tx-buffer"]
+if {$status == "ok" && $value == "no" && $buf == $prev_buf} then {pass $test} else {fail $test}
+
+set test "drive tx pin with buffer-while-disconnected? to yes and check if buffer is updated"
+set status [sid_cmd "sid::component::set_attribute_value $victim buffer-while-disconnected? yes "]
+set value [sid_cmd "sid::component::attribute_value $victim buffer-while-disconnected?"]
+set prev_buf [sid_cmd "sid::component::attribute_value $victim tx-buffer"]
+sid_cmd "sid::pin::driven_h4 $tx 65"
+set buf [sid_cmd "sid::component::attribute_value $victim tx-buffer"]
+if {$status == "ok" && $value == "yes" && $buf != $prev_buf} then {pass $test} else {fail $test}
+
+set test "drive fini pin to close connection on client side"
+set value 1
+set clientfini [sid_cmd "sid::component::find_pin $client fini"]
+sid_cmd "sid::pin::driven_h4 $clientfini $value"
+set con [sid_cmd "sid::component::attribute_value $client connected?"]
+if { $clientfini != "" && $con == "no" } then { pass $test } else { fail $test }
+
+set test "mulitple connect and disconnect"
+set value 1
+set ipaddr "127.0.0.1:1234"
+set status1 [sid_cmd "sid::component::set_attribute_value $victim sockaddr-local $ipaddr "]
+set ipaddr "0.0.0.0:1234"
+set status2 [sid_cmd "sid::component::set_attribute_value $client sockaddr-peer $ipaddr "]
+set pollevent [sid_cmd "sid::component::find_pin $victim poll-event"]
+set clientpollevent [sid_cmd "sid::component::find_pin $client poll-event"]
+set init [sid_cmd "sid::component::find_pin $victim init"]
+set clientinit [sid_cmd "sid::component::find_pin $client init"]
+set value 1
+while {$value < 255} {
+   sid_cmd "sid::pin::driven_h4 $init $value"
+   sid_cmd "sid::pin::driven_h4 $clientinit $value"
+   set iterations 0
+    while { ($iterations < 60) && [sid_cmd "sid::component::attribute_value $victim connected?"] != "yes" || [sid_cmd "sid::component::attribute_value $client connected?"] != "yes"} {
+       sid_cmd "sid::pin::driven_h4 $pollevent $value"
+       sid_cmd "sid::pin::driven_h4 $clientpollevent $value"
+       incr iterations
+       sleep 1
+#poll until connected
+   } 
+   set clientfini [sid_cmd "sid::component::find_pin $client fini"]
+   set fini [sid_cmd "sid::component::find_pin $victim fini"]
+   sid_cmd "sid::pin::driven_h4 $fini $value"
+   sid_cmd "sid::pin::driven_h4 $clientfini $value"
+   set con [sid_cmd "sid::component::attribute_value $victim connected?"]
+   if { $init == "" || $clientinit == "" || $status1 != "ok" || $status2 != "ok" || $con == "yes" || $pollevent == "" || $clientpollevent =="" || $fini == "" || $clientfini == "" || $tx == ""} then { fail $test ; return }
+   set value [expr $value * 2]
+}
+pass $test
+
+set value 1
+set ipaddr "127.0.0.1:2345"
+set status1 [sid_cmd "sid::component::set_attribute_value $victim sockaddr-local $ipaddr "]
+set ipaddr "0.0.0.0:2345"
+set status2 [sid_cmd "sid::component::set_attribute_value $client sockaddr-peer $ipaddr "]
+set pollevent [sid_cmd "sid::component::find_pin $victim poll-event"]
+set clientpollevent [sid_cmd "sid::component::find_pin $client poll-event"]
+set init [sid_cmd "sid::component::find_pin $victim init"]
+set clientinit [sid_cmd "sid::component::find_pin $client init"]
+set clienttx [sid_cmd "sid::component::find_pin $client tx"]
+set clientfini [sid_cmd "sid::component::find_pin $client fini"]
+set fini [sid_cmd "sid::component::find_pin $victim fini"]
+set value 1
+foreach value {-1 256 10000} {
+set test "disconnect by driving $value to tx pin on client side to terminate connection"
+   sid_cmd "sid::pin::driven_h4 $init 1"
+   sid_cmd "sid::pin::driven_h4 $clientinit 1"
+   while { [sid_cmd "sid::component::attribute_value $victim connected?"] != "yes" || [sid_cmd "sid::component::attribute_value $client connected?"] != "yes"} {
+       sid_cmd "sid::pin::driven_h4 $pollevent 1"
+       sid_cmd "sid::pin::driven_h4 $clientpollevent 1"
+#poll until connected
+   } 
+   sid_cmd "sid::pin::driven_h4 $clienttx $value"
+   sid_cmd "sid::pin::driven_h4 $tx $value"
+   set con [sid_cmd "sid::component::attribute_value $victim connected?"]
+   if { $init == "" || $clientinit == "" || $status1 != "ok" || $status2 != "ok" || $con == "yes" || $pollevent == "" || $clientpollevent =="" || $fini == "" || $clientfini == "" || $tx == ""} then { fail $test } else {pass $test}
+   sid_cmd "sid::pin::driven_h4 $fini 1"
+   sid_cmd "sid::pin::driven_h4 $clientfini 1"
+}
+
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "server.conf" }

@@ -1,0 +1,132 @@
+* Name
+  hw-memory-flash-am29 hw-memory-flash-am29f010a hw-memory-flash-am29lv010b hw-memory-flash-am29lv040b hw-memory-flash-am29lv081b hw-memory-flash-am29lv017b hw-memory-flash-am29lv033c
+
+* Synopsis
+  This is a simulated AMD Am29 series flash memory. It can be
+  configured to emulate any of the Am29 family members.
+
+  Buses: read-write-port
+  Pins: image-load image-store
+  Attributes: device-code image-file manufacturer-code mode sector-size size size-max
+
+  Library: libmemory.la
+  Symbol name: mem_component_library
+
+* Functionality
+
+  - Modelling
+
+  * Memory operations such as programming and erasing are achieved
+    instantly in simulation.  As such, device facilities for
+    performing in-progress operations such as suspending and resuming
+    erase operations are not implemented.
+
+  * Hardware sector protection is not implemented.
+
+  - Behaviors
+
+    * Configuration
+
+      Flash memory chips are self-describing using their device-code
+      and manufacturer-code values, accessible both to a target
+      program, and to the simulator user via attributes.  Since a
+      target program may infer memory size from these values, further
+      simulation configuration that overrides these values should be
+      avoided unless necessary.
+
+      The "device-code" attribute represents the device code of the
+      flash memory part being simulated.  Refer to the AMD data sheet
+      for a complete list of device identification codes.  The
+      "manufacturer-code" read-only attribute represents the
+      manufacturer code of the flash memory.  It is a constant value
+      for AMD.  The "sector-size" attribute specifies the size of an
+      individual sector in the flash memory.  Typical values are 16
+      and 64 Kbytes.
+
+      When the "size" attribute is written-to with a legal value, a
+      new cleared byte array is allocated with the new size.  The old
+      byte array is thrown away.  The "size-max" read-only attribute
+      supplies to the user the maximum size that this component will
+      attempt to allocate.
+
+    * Image save/load
+
+      When the "image-load" pin is driven, this component will open
+      and attempt to load the contents of the file given by the
+      "image-file" attribute into the memory image.  The file is
+      copied byte-for-byte.  If the file is too short, zeroes are used
+      to fill out the rest of the memory.
+ 
+      Similarly, when the "image-store" pin is driven, the component
+      will write to the "image-file" file a byte-for-byte dump of the
+      entire memory image.
+
+    * Reading/writing
+
+      When an access is received on the "read-write-port" bus, the
+      component checks the incoming address and rejects it if
+      out-of-range. The component also rejects non-byte-sized accesses.
+
+      Memory can be read at will, but AMD's protocol must be followed
+      to put the device into byte program mode or unlock bypass mode.
+      The "mode" read-only attribute reveals the internal state of the
+      device state machine.  This is primarily designed for testing
+      purposes.
+
+  - SID conventions
+
+    * This is a functional component.
+    * The component supports saving and restoring state in addition to
+      memory persistence, via the image-store pin/attribute.
+    * Triggerpoints are not supported.
+
+* Environment
+
+ - Related components
+
+    * Customized versions of this component are available for standard
+      members of the Am29 flash family.  Instantiating each of them is
+      equivalent to instantiating this generic component and adding
+      the matching "sector-size", "size", and "device-code" attribute
+      settings.
+
+    * A flash memory will usually form a small part of the complete
+      memory subsystem, providing a region of non-volatile memory. The 
+      following configuration file fragment demonstrates this:
+
+	new hw-mapper-basic bus
+	new hw-memory-flash-am29lv010b flash # AM29LV010B: 128KB size, 16K sectors-size
+	connect-bus bus [0,0x1FFFF] flash read-write-port
+
+  - Host system
+
+  * The memory is modelled as a contiguous array of bytes in host
+    memory.  As such, a component configured for 8MB of memory
+    requires 8MB of host memory.  This is an important consideration
+    for simulations running on machines with low memory or on busy
+    multiuser systems.  Similarly, when a memory image is written to
+    disk, the same amount of space may be used there.
+
+* SID interface reference
+
+  - low level:
+
+    * buses
+      - read-write-port | 0 .. size-1 | byte-wide access only | reading/writing
+
+    * attributes
+      - device-code | setting | 0 .. 0xFF | 0x4F | configuration
+      - manufacturer-code | setting | 0x01 | 0x01 | configuration
+      - size | setting | numeric | 524288 | configuration
+      - size-max | setting | numeric | fixed at 32MB | configuration
+      - sector-size | setting | numeric | 65536 | configuration
+      - image-file | setting | filename | | image save/load
+      - mode | | 0 .. 9 | 0 for read mode | reading/writing
+
+    * pins
+      - image-load | input | any | image load/store
+      - image-store | input | any | image load/store
+
+* References
+  AMD Am29 series data sheets, application notes.
+  Start from: <http://www.amd.com/products/nvd/techdocs/techdocs.html>

@@ -1,0 +1,19 @@
+## This file contains load commands where the shared library cannot be found
+
+# configuration logging
+set main verbose? 0
+
+# component libraries
+load libcgencpu.la cgen_component_library
+load -nonstatic- console_component_library		# library cannot be found
+load gloss_component_library gloss_component_library	# library cannot be found
+load libgloss gloss_component_library	#library cannot be found
+load libgloss.la gloss_component_library
+load libinterrupt.la interrupt_component_library
+load libloader.la loader_component_library
+load libconsoles.la console_component_library
+load libmapper.la mapper_component_library
+load libmemory.la mem_component_library
+load libmmu.la mmu_component_library
+load libsched.la sched_component_library
+load libtimers.la timer_component_library

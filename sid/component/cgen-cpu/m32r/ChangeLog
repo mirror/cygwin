@@ -1,0 +1,30 @@
+2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * configure: Regenerated.
+        * aclocal.m4: Ditto.
+        * Makefile.in: Ditto.
+
+2000-11-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* m32r-decode.cxx: Regenerated.  Reorganized.
+
+2000-11-10  Frank Ch. Eigler  <fche@redhat.com>
+
+	* m32r-decode.cxx: Regenerated.  Improved.
+
+2000-11-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (CXXFLAGS): Use TOP_CXXFLAGS.
+	* Makefile.in: Regenerated.
+
+2000-10-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* m32r-decode.h, -defs.h: Regenerated.
+
+2000-09-22  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am, configure.in: Reworked to use new CGEN.sh conventions.
+	* m32r-decode.cxx: Regenerated with new trace syntax.
+	* m32r-cpu.h, m32r-decode.h: Regenerated with new copyright.
+	* m32r-defs.h, m32r-desc.h, m32r-sem.cxx: Ditto.
+	* Makefile.in, configure: Regenerated.

@@ -1,0 +1,466 @@
+2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-05-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* gdb.cxx (remote_rx_handler): Quash negative-literal warning.
+	* gdb.h: Import more std:: identifiers.
+
+2000-04-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* gdb.cxx (operating_mode_p): New setting.  Export as attribute.
+	(cpu_trap_handler): Rewrite.  Respect operating_mode_p.
+	(process_get_mem, process_set_mem): Tolerate 8-byte addresses.
+	* gdb.h: Corresponding changes.
+	* gdbserv.h: Add some more GDBSERV_SIG* enums.
+
+2000-04-20  Frank Ch. Eigler  <fche@redhat.com>
+
+	* gdb.cxx (cpu_trap_handler): Also detect cpu_trap_breakpoint.
+
+Wed Apr  5 20:56:28 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* gdbserv-target.h (enum gdbserv_target_rc, enum
+ 	gdbserv_target_bp): Declare.
+	(struct gdbserv_target): Add alternative remove_breakpoint and
+ 	set_breakpoint that use these enums.
+	* gdbserv-state.c (gdbserv_data_packet): Rewrite Z/z packet code
+ 	making use of enums.
+
+Wed Apr  5 08:50:02 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* gdbserv-input.h (struct gdbserv_input): Make buf
+ 	unsigned. Rename bufsiz to sizeof_buf.
+	* gdbserv-input.c (gdbserv_input_attach, add_char_to_packet):
+ 	Update.
+
+Wed Mar 29 17:10:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* gdbserv-input.c (gdbserv_input_reg): Delete.
+	* gdbserv.h: Update.
+
+	* gdbserv-state.c: Partial merge with libstub/asvp.
+ 	(gdbserv_data_packet): Update support for ``g'' and ``G'' packets.
+	(gdbserv_data_packet): Replace some gdbserv_input_reg with
+ 	gdbserv_input_reg_beb.
+	(gdbserv_data_packet): Don't try to parse a breakpoint packet when
+ 	it isn't supported.
+
+Fri Mar 24 18:42:58 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* gdbserv-state.c: Partial merge with libstub/asvp.
+ 	(state2str): Formatting.
+	(gdbserv_fromclient_detach): Formatting.
+	(gdbserv_fromclient_data): Ditto.
+	(gdbserv_data_packet): Add support for ``i'', ``qRcmd''
+	(gdbserv_fromtarget_break): Use expedied_reg_nr to expedite
+ 	registers when available.
+
+Fri Mar 24 18:38:49 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* gdbserv-target.h (struct gdbserv_target): Add process_rcmd,
+ 	input_reg, output_reg, gg_reg_nr, expedited_reg_nr, sizeof_reg,
+ 	set_reg, get_reg, cyclestep_program, get_mem, set_mem.
+
+Fri Mar 24 15:49:03 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* gdbserv-output.c: Merge with libstub/asvp.
+	(gdbserv_output_reg_beb, gdbserv_output_reg_leb): New functions.
+
+Tue Mar 21 16:17:42 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* gdbserv-input.c: Merge with libstub/asvp.
+	(gdbserv_input_hex_ulong): Rename gdbserv_input_ulong.
+ 	(gdbserv_input_string_match, gdbserv_input_reg_leb,
+ 	gdbserv_input_reg_beb, unpack_reg_bytes): New function.
+	(gdbserv_input_escaped_binary): Reformat.
+	(gdbserv_input_wait_for_ack, add_char_to_packet): Update
+ 	documentation.
+
+	* gdbserv.h (gdbserv_input_ulong): Delete declaration.
+	* gdbserv-state.c (gdbserv_data_packet): Update.
+
+Fri Mar 17 17:52:02 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* gdbserv-utils.c: Merge with libstub/asvp/gdbserv.h.
+ 	(gdbserv_reg_to_ulonglong, gdbserv_reg_to_ulong): Negate negative
+ 	values.
+	* gdbserv-utils.h: Fix indentation.
+	* gdbserv-input.c (gdbserv_input_reg): Use memset to clear reg.
+
+Fri Mar 17 14:45:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* gdbserv.h: Merge with libstub/asvp/gdbserv.h.  Move #include
+ 	<stdio.h> to gdb.cxx.  Add negative_p to struct gdbserv_reg.
+	(gdbserv_output_reg_beb, gdbserv_output_reg_leb,
+ 	gdbserv_input_reg_beb, gdbserv_input_reg_leb): Add declarations.
+	(gdbserv_input_reg, gdbserv_input_ulong): Deprecate.
+
+	* gdb.cxx: Include <stdio.h>.
+	* gdbserv-state.c (gdbserv_fromtarget_break,
+ 	gdbserv_fromtarget_exit): Update sigval parameter.
+
+2000-02-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* gdb.cxx (process_get_exp_regs_hook): New function.
+	(process_signal_hook): New function.
+	(process_get_exp_regs): New function.  Return expedited registers.
+	(process_signal): New function.  Record a pending/ignorable signal.
+	(stop_handler): Ignore event if it was recorded as pending.
+	(trapstop_handler, cpu_trap_handler): Ditto.
+	(gdbsid_target_attach): Register new hooks.
+	(sigkill_program): Transition to "exited" instead of "broken" state.
+	(process_set_reg): Remove verbose [byte][byte][byte] tracing.
+	(process_get_reg): Return an error packet to signal unimplementedness.
+	(process_set_regs): Ditto.
+	* gdb.h: Corresponding changes.
+	* gdbserv-target.h (process_get_exp_regs): New hook.
+	* gdbserv-state.c (gdbserv_fromtarget_break): Collect expedited
+	registers from target for 'T' response packet using hook.
+
+2000-02-14  Frank Ch. Eigler  <fche@redhat.com>
+
+	* gdb.cxx (add_hw_breakpoint): New function.  Track hw_breakpoints
+	by insertion count.
+	(remove_hw_breakpoint): Ditto.
+	(remove_all_hw_breakpoints): New function.  Clean up leftovers.
+	(set_breakpoint): Call the first.
+	(remove_breakpoint): Call the second.
+	(process_detach): Call the third.
+	* gdb.h: Corresponding changes.
+
+2000-01-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2000-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (read_bus_word): Signal "E" errors to gdb on bus errors.
+	(write_bus_word, process_get_mem, process_set_mem): Ditto.
+
+1999-12-09  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+	
+1999-12-08  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-12-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (cpu_trap_handler): Ignore incoming breakpoint instruction
+	signals if emulating breakpoints with triggerpoints. 
+
+1999-11-26  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (remove_breakpoint, set_breakpoint): Use "gdb-register-pc"
+	watchable.
+	(cpu_trap_handler): Remove cpu-specific code.  Respond to all
+	invalid_insn and trap_software indications.
+	* gdb.h: Bring in sidutil::map_watchable_name().
+	* gdbserv.h (GDBSERV_REG_SIZE): Expand to 16.
+
+1999-11-26  Ben Elliston  <bje@cygnus.com>
+
+	* gdbserv-utils.c (gdbserv_reg_to_ulong): Allay G++ warnings.
+	(gdbserv_reg_to_ulonglong): Likewise.
+
+1999-11-25  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdbserv-target.h (set_breakpoint, remove_breakpoint): Add
+	a return value and an argument.
+	* gdb.h (trapstop_pin, trapstop_handler, enable_Z_packet): New
+	members in gdb class.
+	(set_breakpoint, remove_breakpoint): Update declaration.
+	* gdb.cxx (set_breakpoint_hook, remove_breakpoint_hook): Pass
+	through new argument & return value.
+	(set_breakpoint, remove_breakpoint): Rewrite.  Conditionally
+	implement using triggerpoints on CPU's PC register.
+	(ctor): Export "enable-Z-packet?" attribute.
+	* gdbserv-state.c (gdbserv_data_packet): Rewrite handling of
+	`z'/`Z' packets.
+
+1999-11-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (flush_i_cache): Drive output pin with sentinel value.
+	(target_power): Ditto.
+	(remote_rx_handler): Ditto.  Conditionally dispatch to 
+	remote_rx_eof_handler.
+	(init_handler): Take unused arg.  Update callers.
+	(deinit_handler, stop_handler, start_handler): Ditto.
+	(gdb_delete): Use dynamic_cast<>.
+	* gdb.h: Matching changes.
+
+1999-11-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.h (cpu_trap_ipin, cpu_trap_opin): New members; forked from
+	cpu_trap_pin;
+	* gdb.cxx (cpu_trap_handler): Drive *opin / sense *ipin.
+	(ctor): Register *opin and *ipin together.
+
+1999-11-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	From Andrew Cagney <cagney@cygnus.com>:
+	* gdbserv-state.c (gdbserv_data_packet): Remove `b' baud rate packet.
+	Support `Z'/`z' breakpoint packets, though cripple them temporarily.
+	* gdbserv-target.h (gdbserv_target): Remove set_baud_rate hook.
+	Add LEN parameter to set_breakpoint and remove_breakpoint.
+	
+	* gdb.cxx (remove_breakpoint_*, set_breakpoint_*): Add LEN parameter.
+	* gdb.h: Matching declaration changes.
+	
+1999-11-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (gdb ctor): Initialize more pointer member variables.
+
+1999-11-05  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx: Rename "sid-control-gdb" -> "sw-debug-gdb".
+
+1999-11-02  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdbserv.h (GDBSERV_SIGKILL): New enum.
+	* gdb.cxx (sigkill_program): Use it.
+
+1999-10-19  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* Makefile.in: Regenerated.
+
+1999-10-10  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* gdb.cxx (sigkill_program): Changed return type to void from int.
+	(sigkill_program_hook): Changed return type to void.
+	(singlestep_program): Cast variable s as int.
+	(continue_program): Likewise.
+	(target_power): Likewise.
+	(set_breakpoint): Removed unused variable pc.
+	(write_bus_word): Added bus->write(...) and commented s=bus->write(...)
+	* gdbserv-target.h: changed return type of (*sigkill_program) 
+	(struct gdbserv*) function to void from int.
+	* gdb.h: Changed return type of sigkill_program_hook to void
+	Changed return type of sigkill_program to void.
+
+1999-10-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (read_bus_word, write_bus_word): Take values for
+	bus::read/write, not const-ref.
+	(remote_rx_handler): Take value for pin::driven(), not const-ref.
+	(gloss_signal_handler, cpu_trap_handler, target_tx_handler): Same.
+	* gdb.h (*): Corresponding changes.
+
+1999-10-01  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdbserv-input.h (gdbserv_input): Change type of `buf' to char*.
+	Add new `bufsize' field.
+	* gdbserv-input.c (gdbserv_input_attach): Initialize empty buffer.
+	(add_char_to_packet): Enlarge receive buffer as necessary.
+	Add assertions to confirm buffer size before other use.
+
+1999-09-23  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (process_set_reg, process_set_regs): Use 
+	make_numeric_attribute to generate register attribute names.
+	* gdb.h: Import make_numeric_attribute.
+
+1999-09-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.h (*): Use host_int_X, not compiler_int_X.
+
+1999-08-31  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (stop_pin, start_pin): New members for gdb class.
+	(stop_handler, start_handler): New functions.
+	(gdb ctor): Export new pins as "stop-target" and "start-target".
+	* gdb.h: Matching declaration changes.
+
+1999-08-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (gdbsid_client_write_hook): New function.  Impersonate
+	raw_write in gdbsocket.c.
+	(gdbsid_client_write): New function.  Use new remote-tx pin.
+	(remote_rx_eof_handler): New function.  Detach from gdbserv.
+	(remote_rx_handler): New function.  Supply character to gdbserv.
+	(gdb ctor): Associate above with new remote-rx pin.  Rename
+	boolean attributes to have "?" suffix.  Don't exit_on_detach.
+	Forget about "poll" pin.  Register new remote-* pins.
+	(gdbsid_target_attach): Use new instead of malloc().
+	(init_handler): Forget about gdbsocket.
+	(gdb dtor): Ditto.
+	(deinit_handler): Ditto.  Disconnect anyway.
+	(update_trace_flags): Forget about gdbsocket_trace.
+	(gdb_poll_handler): Removed.
+	(exit_program): Don't signal shutdown pin.
+	* gdb.h: Matching declaration changes.
+	* gdbserv-input.c (add_char_to_packet): Detect gdb break here.
+	* gdbserv-state.c (gdbserv_fromclient_detach): free() gdbserv.
+	(gdbserv_fromclient_data): Become less verbose.
+	* gdbsocket.c, gdbsocket.h: Removed.
+	* Makefile.am: Forget about these files.
+	* Makefile.in: Regenerated.
+	* configure.in, configure, config.in, acconfig.h: Removed.
+	* aclocal.m4, stamp-h.in: Gone.
+
+1999-08-20  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (process_set_gen): Disable nonfunctional code.
+	(remove_breakpoint, set_breakpoint): Remove dud code.
+	(process_set_reg): Rewrite.  Use cpu attributes.
+	(process_get_regs): Rewrite.  Use cpu attributes.
+	(read_bus_word, write_bus_word): New functions.
+	(process_get_mem, process_set_mem): Rewrite.  Use new functions.
+	(sigkill_program): Send back a halted-with-SIGINT packet.
+	(*): Remove obsolete commented-out code.  Add XXX reminders.
+	* gdb.h: Add more using NAMESPACE::IDENTIFIER clauses.  Remove
+	obsolete #includes.
+	(dbg_register_number_t): New typedef.
+
+1999-08-19  Ian Carmichael  <iancarm@cygnus.com>
+
+	* gdbserv-input.c (gdbserv_input_escaped_binary): Merge Cagney's
+	changes.
+
+1999-08-18  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (deinit_handler): Decouple from gdbserv.
+	(cpu_trap_handler): Print trace message if trace_gdbsid.
+	(process_set_mem): Tweak trace message.
+	(exit_program): Turn off target power & signal shutdown pin.
+
+1999-08-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (deinit_pin): New member.
+	(deinit_handler): New function.  Shut down gdb socket.
+	(ctor): Export new pin as "deinit".
+	* gdb.h: Matching declaration changes.
+
+1999-08-17  Ian Carmichael  <iancarm@cygnus.com>
+
+	* gdbserv-state.c (gdbserv_data_packet): Merge 'X' and 'M' packets
+	eliminating duplicate code.
+
+1999-08-17  Ian Carmichael  <iancarm@cygnus.com>
+
+	Support 'X' packet.
+	* gdbserv-state.c (gdbserv_data_packet): Handle 'X' packet.
+	* gdbserv-input.c (gdbserv_input_escaped_binary): New function.
+	* gdb.cxx (process_set_mem): Add new 'int binary' parameter.  Call
+	appropriate routine to read binary or non-binary input.
+	* gdb.cxx (process_set_mem_hook): Add new 'int binary' parameter.
+	* gdb.h (process_set_mem): Ditto.
+	* gdbserv.h (process_set_mem): Ditto.
+	* gdbserv-target.h (process_set_mem): Ditto.
+
+1999-08-16  Ian Carmichael  <iancarm@cygnus.com>
+
+	* gdb.cxx: sid::component members renamed.
+
+1999-08-16  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (process_detach): Don't turn target power on.
+	(gloss_signal_handler): Don't talk to gdb if not attached.
+	(cpu_trap_handler): Ditto.
+	(target_tx_handler): Same.
+
+1999-08-13  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (update_trace_flags): New function: update trace FILE*s.
+	(gdb ctor): Call it as trace attribute change notification.
+	* gdb.h: Declare new function.
+
+1999-08-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx (gdb ctor): Export some new attributes for target view.
+
+1999-08-03  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* gdb.h: Introduced proper namespace usage. Include sidso.h.
+	* gdb.cxx: Do not include sidso.h.
+
+1999-07-28  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* arm.conf.in: Removed.
+	* configure.in: Don't create arm.conf.
+	* Makefile.in: Regenerated.
+	* configure: Regenerated.
+
+1999-07-27  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* gdb.cxx: Massive changes to implement nonblocking gdb<->cpu etc.
+	interface.  Integrate old gdbsid.cxx.
+	* gdb.h: Matching changes.
+	* gdbserv-input.c (gdbserv_input_wait_for_ack): Don't consider an
+	unexpected ACK an warningworthy condition.
+	* gdbserv.h (GDBSERV_SIGQUIT, GDBSERV_SIGNONE, GDBSERV_SIGSEGV):
+	Define new enums.
+	* gdbsocket.c (gdbsocket_startup): Use htons on port number.
+	(gdbsocket_shutdown): Make trace message conditional.
+	* gdbsid.cxx: Gone.
+	* gdbsid.h: History.
+	* Makefile.am: Don't include ../gloss.  Forget about gdbsid.cxx.
+	* Makefile.in: Regenerated.
+
+1999-07-25  Faisal Khoja  <fkhoja@cygnus.com>
+
+	* gdb.h: Exception handling
+
+1999-07-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* configure.in: Add AC_LIBTOOL_WIN32_DLL.
+	* configure: Regenerated
+
+1999-07-21  Ron Unrau  <runrau@cygnus.com>
+
+	* added missing config.h (actually, Ian did this)
+	* conditionalize use of TCP_NODELAY
+
+1999-07-19  Faisal Khoja <fkhoja@cygnus.com>
+
+	* gdbserv.h (gdbserv_fromtarget_break): changed
+	  type of arg2 from enum to int to compile on NT.
+	* gdbserv-state.c (gdbserv_fromtarget_break) changed
+	  arg2 to int.
+	* gdbsocket.c: Introduced #ifdef as netinet/tcp.h 
+	  is not found on NT (thanks Ben).
+
+1999-07-17  Ron Unrau  <runrau@cygnus.com>
+
+	* gdb.h: New file.
+	* gdb.cxx: New file.
+	* gdbsid.h: New file.
+	* gdbsid.cxx: New file.
+
+	These are from devo/libstub/asvp:
+
+	* gdbserv-client.h: New file.
+	* gdbserv-input.c: New file.
+	* gdbserv-input.h: New file.
+	* gdbserv-output.c: New file.
+	* gdbserv-output.h: New file.
+	* gdbserv-state.c: New file.
+	* gdbserv-state.h: New file.
+	* gdbserv-target.h: New file.
+	* gdbserv-utils.c: New file.
+	* gdbserv-utils.h: New file.
+	* gdbserv.h: New file.
+	* gdbsocket.c: New file.
+	* gdbsocket.h: New file.
+
+	* arm.conf.in: New file.
+
+	* Makefile.am: New file.
+	* Makefile.in: Generated.
+	* configure.in: New file.
+	* configure: Generated.
+	* config.in: New file.
+	* acconfig.h: New file.
+	* aclocal.m4: New file.
+	* stamp-h.in: New file.

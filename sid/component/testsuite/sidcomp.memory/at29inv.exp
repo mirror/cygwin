@@ -1,0 +1,166 @@
+# Initialisation.
+set manufacturer_code 0x1F
+set default_size 524288
+set default_sector_size 512
+set default_device_code 0x5B
+
+set test "sid configuration"
+sid_config_component_test "at29b.conf" \
+    "load [sid_find_file libmemory.la] mem_component_library" \
+    "hw-memory-flash-at29"
+pass $test
+
+set test "sid start"
+if {[sid_start "at29b.conf"]} { pass $test } else { fail $test ; return }
+
+set test "try to set size-max"
+set status [sid_cmd "sid::component::set_attribute_value $victim size-max 1024"]
+set tsize [sid_cmd "sid::component::attribute_value $victim size-max"]
+if {$status == "bad_value" && $tsize == "33554432"} { pass $test } else { fail $test }
+
+set test "set size to 10000000000000000"
+set status1 [sid_cmd "sid::component::set_attribute_value $victim size 8192"]
+set status2 [sid_cmd "sid::component::set_attribute_value $victim size 10000000000000000"]
+set result [sid_cmd "sid::component::attribute_value $victim size"]
+if { $status1 == "ok" && $status2 == "bad_value" && $result == "8192"} { pass $test } else { fail $test }
+# $result should be what it was last set successfully
+
+set test "set size to size-max+1"
+set maxsize [sid_cmd "sid::component::attribute_value $victim size-max"]
+set result [sid_cmd "sid::component::attribute_value $victim size"]
+set size [expr {$maxsize + 1}]
+set status [sid_cmd "sid::component::set_attribute_value $victim size $size"]
+set result [sid_cmd "sid::component::attribute_value $victim size"]
+if {$status == "bad_value" && $result == "8192"} { pass $test } else { fail $test }
+
+foreach badvalue {-1 abcdefghijklmn FALSE 1.234e-10} {
+# -1 gives bad value because the 2's compliment of -1 is bigger than size-max
+    set test "set size to $badvalue"
+    set status [sid_cmd "sid::component::set_attribute_value $victim size $badvalue"]
+    set result [sid_cmd "sid::component::attribute_value $victim size"]
+    if {$status == "bad_value" && $result == "8192"} { pass $test } else { 
+        fail $test }
+}
+
+set test "set size to 0"
+set status [sid_cmd "sid::component::set_attribute_value $victim size 0"]
+set result [sid_cmd "sid::component::attribute_value $victim size"]
+if {$status == "ok" && $result == "0"} { pass $test } else { fail $test }
+
+foreach badvalue {-1 0 10000000000000000 xyz FALSE 1.234e-10} {
+    set test "set sector-size to $badvalue"
+    set status [sid_cmd "sid::component::set_attribute_value $victim sector-size $badvalue"]
+    set result [sid_cmd "sid::component::attribute_value $victim sector-size"]
+    if {$status == "bad_value" && $result == $default_sector_size} { pass $test } else { fail "$test -- got $status, $result" }
+}
+
+set test "set device-code to 0x100"
+set status1 [sid_cmd "sid::component::set_attribute_value $victim device-code 0x01"]
+set status2 [sid_cmd "sid::component::set_attribute_value $victim device-code 0x100"]
+set result [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$status1 == "ok" && $status == "bad_value" && $result == "1"} { pass $test } else { fail $test }
+
+set test "set device-code to -1"
+# should set to 255
+set status [sid_cmd "sid::component::set_attribute_value $victim device-code -1"]
+set result [sid_cmd "sid::component::attribute_value $victim device-code"]
+if {$status == "ok" && $result == "0xFF"} { pass $test } else { fail $test }
+
+foreach badvalue {10000000000000000 xyz FALSE 1.234e-10} {
+    set test "set device-code to $badvalue"
+    set status [sid_cmd "sid::component::set_attribute_value $victim device-code $badvalue"]
+    set result [sid_cmd "sid::component::attribute_value $victim device-code"]
+    if {$status == "bad_value" && $result == "0xFF"} { pass $test } else { 
+        fail $test }
+}
+
+#cr 101337
+set test "set sector-size bigger than size "
+set status1 [sid_cmd "sid::component::set_attribute_value $victim size 32768"]
+set status2 [sid_cmd "sid::component::set_attribute_value $victim sector-size 65536"]
+set ssize [sid_cmd "sid::component::attribute_value $victim sector-size"]
+set size [sid_cmd "sid::component::attribute_value $victim size"]
+if {$status1 == "ok" && $status2 == "bad_value" && $ssize<=$size} then { pass $test } else { fail $test }
+
+set test "drive image-load with unset image-file attribute"
+set names [sid_cmd "sid::component::attribute_value $victim image-file"]
+set pin [sid_cmd "sid::component::find_pin $victim image-load"]
+sid_cmd "sid::pin::driven_h4 $pin 0"
+if {$names == "" && $pin != ""} then { pass $test } else { fail $test }
+
+set test "drive image-store with unset image-file attribute"
+set names [sid_cmd "sid::component::attribute_value $victim image-file"]
+set pin [sid_cmd "sid::component::find_pin $victim image-store"]
+sid_cmd "sid::pin::driven_h4 $pin 0"
+if {$names == "" && $pin != ""} then { pass $test } else { fail $test }
+
+set test "attribute list with incorrect category names"
+set category "something"
+set names [sid_cmd "sid::component::attribute_names_in_category $victim $category"]
+if {$names == ""} then { pass $test } else { fail $test }
+
+set test "query incorrect attributes name"
+set value [sid_cmd "sid::component::attribute_value $victim seqattr"]
+if {$value == ""} then { pass $test } else { fail $test }
+
+set test "set attributes values to non existing attribute"
+set status [sid_cmd "sid::component::set_attribute_value $victim attr 112"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "find pin that does not exist"
+set pin [sid_cmd "sid::component::find_pin $victim newpin"]
+if {$pin == ""} then { pass $test } else { fail $test }
+
+set test "connect pin that does not exist"
+set pin [sid_cmd "sid::pin::new"]
+set status [sid_cmd "sid::component::connect_pin $victim newpin2 $pin"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "disconnect pin that does not exist"
+set pin [sid_cmd "sid::pin::new"]
+set status [sid_cmd "sid::component::disconnect_pin $victim output--0 $pin"]
+if {$status == "not_found" } then { pass $test } else { fail $test }
+
+set test "check connected pins that does not exist"
+set pins [sid_cmd "sid::component::connected_pins $victim notexist"]
+if {$pins == ""} then { pass $test } else { fail $test }
+
+set test "connect read-write-port as a accessor"
+set bus [sid_cmd "sid::bus::new"]
+set status [sid_cmd "sid::component::connect_accessor $victim read-write-port $bus"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "check connected read-write-port bus"
+set bus [sid_cmd "sid::component::connected_bus $victim read-write-port"]
+if {$bus == ""} then { pass $test } else { fail $test }
+
+set test "connect accessor that does not exist"
+set bus [sid_cmd "sid::bus::new"]
+set status [sid_cmd "sid::component::connect_accessor $victim accessor $bus"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "find bus that does not exist"
+set bus [sid_cmd "sid::component::find_bus $victim anybus"]
+if {$bus == ""} then { pass $test } else { fail $test }
+
+set test "find connected bus that does not exist"
+set bus [sid_cmd "sid::component::connected_bus $victim anybus"]
+if {$bus == ""} then { pass $test } else { fail $test }
+
+set test "set relationships that does not exist"
+set status [sid_cmd "sid::component::relate $victim relationship $victim"]
+if {$status == "not_found"} then { pass $test } else { fail $test }
+
+set test "query relationships that does not exist"
+set comps [sid_cmd "sid::component::related_components $victim relation2"]
+if {$comps == ""} then { pass $test } else { fail $test }
+
+
+
+set test "sid stop"
+if [sid_stop] then { pass $test } else { fail $test ; return }
+
+
+# zap temp file if tests were successful 
+global exit_status
+if {$exit_status == "0"} then { file delete "at29b.conf" }

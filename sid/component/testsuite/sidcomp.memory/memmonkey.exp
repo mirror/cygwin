@@ -1,0 +1,39 @@
+# Run a monkey test on the components in this component library. 
+
+load_lib "monkey.exp"
+
+
+# Limit monkey maneuvering, else he will make monkey droppings
+# all over testsuite directory. 
+proc pin_safe_p {pin_name} {
+    if {$pin_name == "image-store"} then { return 0 }
+    return 1
+}
+proc attr_safe_p {attr_name} {
+    if {$attr_name == "image-store"} then { return 0 }
+    return 1
+}
+
+monkey_test hw-memory-ram/rom-basic mem_component_library libmemory.la
+
+proc pin_safe_p {pin_name} {
+    if {$pin_name == "image-store"} then { return 0 }
+    return 1
+}
+proc attr_safe_p {attr_name} {
+    if {$attr_name == "image-store"} then { return 0 }
+    return 1
+}
+
+monkey_test hw-memory-flash-at29 mem_component_library libmemory.la
+
+proc pin_safe_p {pin_name} {
+    if {$pin_name == "image-store"} then { return 0 }
+    return 1
+}
+proc attr_safe_p {attr_name} {
+    if {$attr_name == "image-store"} then { return 0 }
+    return 1
+}
+
+monkey_test hw-memory-flash-am29 mem_component_library libmemory.la

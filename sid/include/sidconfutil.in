@@ -1,0 +1,32 @@
+/* sidconfutil.in.  Generated automatically from configure.in by autoheader.  */
+
+/* Define if you have the ANSI C header files.  */
+#undef STDC_HEADERS
+
+/* Define if you have the strerror function.  */
+#undef HAVE_STRERROR
+
+/* Define if you have the <ext/hash_map> header file.  */
+#undef HAVE_EXT_HASH_MAP
+
+/* Define if you have the <hash_map> header file.  */
+#undef HAVE_HASH_MAP
+
+/* Define if you have the <sstream> header file.  */
+#undef HAVE_SSTREAM
+
+/* Define if you have the <strstream.h> header file.  */
+#undef HAVE_STRSTREAM_H
+
+/* Name of package */
+#undef PACKAGE
+
+/* Version number of package */
+#undef VERSION
+
+/* Define to disable run-time assert() checking. */
+#undef NDEBUG
+
+/* Define if std:: prefix works for <cctype> functions */
+#undef STD_CCTYPE
+

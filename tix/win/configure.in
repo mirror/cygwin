@@ -1,19 +1,22 @@
 dnl This whole file is CYGNUS LOCAL
 
 AC_INIT(../generic/tixInit.c)
+AC_CONFIG_AUX_DIR(../..)
 
+AC_CANONICAL_HOST
 AC_PROG_CC
 AC_OBJEXT
-NM=${NM-nm}
-AC_SUBST(NM)
-AS=${AS-as}
-AC_SUBST(AS)
-LD=${LD-ld}
-AC_SUBST(LD)
-DLLTOOL=${DLLTOOL-dlltool}
-AC_SUBST(DLLTOOL)
-WINDRES=${WINDRES-windres}
-AC_SUBST(WINDRES)
+AC_CYGWIN
+CYGWIN=$ac_cv_cygwin
+AC_SUBST(CYGWIN)
+AC_SUBST(GCC)
+
+AC_CHECK_TOOL(RANLIB, ranlib, :)
+AC_CHECK_TOOL(NM, nm, :)
+AC_CHECK_TOOL(AS, as, :)
+AC_CHECK_TOOL(DLLTOOL, dlltool, :)
+AC_CHECK_TOOL(WINDRES, windres, :)
+
 AC_PROG_INSTALL
 
 # Check for Tcl and Tk.

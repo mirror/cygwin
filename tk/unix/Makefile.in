@@ -248,7 +248,7 @@ TK_LD_SEARCH_FLAGS	= @TK_LD_SEARCH_FLAGS@
 
 AC_FLAGS		= @EXTRA_CFLAGS@ @DEFS@
 AR			= @AR@
-RANLIB			= @RANLIB@
+TK_RANLIB		= @RANLIB@
 SRC_DIR			= @srcdir@/..
 TOP_DIR			= @srcdir@/..
 GENERIC_DIR		= $(TOP_DIR)/generic
@@ -399,12 +399,12 @@ doc: $(SRC_DIR)/doc/man.macros
 ${TK_LIB_FILE}: ${OBJS}
 	rm -f ${TK_LIB_FILE}
 	@MAKE_LIB@
-	$(RANLIB) ${TK_LIB_FILE}
+	$(TK_RANLIB) ${TK_LIB_FILE}
 
 ${STUB_LIB_FILE}: ${STUB_LIB_OBJS}
 	rm -f ${STUB_LIB_FILE}
 	@MAKE_STUB_LIB@
-	$(RANLIB) ${STUB_LIB_FILE}
+	$(TK_RANLIB) ${STUB_LIB_FILE}
 
 # Make target which outputs the list of the .o contained in the Tk lib
 # usefull to build a single big shared library containing Tcl/Tk and other
@@ -486,7 +486,7 @@ install-binaries: $(TK_LIB_FILE) $(TK_STUB_LIB_FILE) $(TK_BUILD_EXP_FILE) wish
 	    fi
 	@echo "Installing $(TK_LIB_FILE) to $(LIB_INSTALL_DIR)/"
 	@$(INSTALL_DATA) $(TK_LIB_FILE) $(LIB_INSTALL_DIR)/$(TK_LIB_FILE)
-	@(cd $(LIB_INSTALL_DIR); $(RANLIB) $(TK_LIB_FILE))
+	@(cd $(LIB_INSTALL_DIR); $(TK_RANLIB) $(TK_LIB_FILE))
 	@chmod 555 $(LIB_INSTALL_DIR)/$(TK_LIB_FILE)
 	@echo "Installing wish as $(BIN_INSTALL_DIR)/wish$(VERSION)"
 	@$(INSTALL_PROGRAM) wish $(BIN_INSTALL_DIR)/wish$(VERSION)

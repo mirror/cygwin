@@ -1,3 +1,8 @@
+2001-06-22  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.h (API_MAJOR_VERSION, API_MINOR_VERSION): Relabel
+	previous change impact to 3/1 from 4/0.
+
 2001-06-22  Ben Elliston  <bje@redhat.com>
 
 	* sidcomp.h (API_MAJOR_VERSION): Bump to 4.

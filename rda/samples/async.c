@@ -22,6 +22,8 @@
    Alternative licenses for RDA may be arranged by contacting Red Hat,
    Inc.  */
 
+#define _GNU_SOURCE             /* enables strsignal prototype in <string.h> */
+
 #include "config.h"
 
 #include <stdio.h>

@@ -316,11 +316,15 @@ bus::status
 cache_component::read_line (cache_line& line)
 {
   bus::status st;
+  int overall_latency = 0;
   host_int_4 base = acache.tag_to_addr (line.tag ());
   for (host_int_4 offset = 0; offset < line_size; offset += 4)
     {
       sid::big_int_4 data;
       st = downstream->read (base + offset, data);
+      // Latency for line fills is the latency of the first read
+      if (offset == 0)
+	overall_latency = st.latency;
       if (st != bus::ok)
 	return st;
       line.insert (offset, data);
@@ -328,6 +332,7 @@ cache_component::read_line (cache_line& line)
   line.unlock ();
   line.clean ();
   line.validate ();
+  st.latency = overall_latency;
   return st;
 }
 

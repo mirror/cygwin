@@ -60,7 +60,6 @@ proc run-sid-tests-raw { toolchain-prefix all-machs testcase-srcdir pattern as-o
        # options and only worry about processing the one we want.
        set opt_array [slurp_options "${file}"]
        if { $opt_array == -1 } {
-           unresolved $name
            return
        }
 
@@ -72,8 +71,7 @@ proc run-sid-tests-raw { toolchain-prefix all-machs testcase-srcdir pattern as-o
               set opt_machs [lindex $i 1]
               set opt_val [lindex $i 2]
               if ![info exists opts($opt_name)] {
-                  perror "unknown option $opt_name in file $file"
-                  unresolved $name
+                  unresolved "$file - unknown option $opt_name"
                   return
               }
               foreach m $opt_machs {
@@ -87,7 +85,7 @@ proc run-sid-tests-raw { toolchain-prefix all-machs testcase-srcdir pattern as-o
 
        # A configuration file must be specified, so make sure we have one.
        if { $opts(configfile) == "" && $cfile == ""} {
-          perror "A sid configuration file must be specified."
+          unresolved "$file - no sid configuration file specified."
           return
        }
 
@@ -263,7 +261,6 @@ proc run-one-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-mach
 
     set opt_array [slurp_options "${file}"]
     if { $opt_array == -1 } {
-	unresolved $name
 	return
     }
     set opts(as) {}
@@ -281,8 +278,7 @@ proc run-one-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-mach
 	set opt_machs [lindex $i 1]
 	set opt_val [lindex $i 2]
 	if ![info exists opts($opt_name)] {
-	    perror "unknown option $opt_name in file $file"
-	    unresolved $name
+	    unresolved "$name - unknown option $opt_name"
 	    return
 	}
 	foreach m $opt_machs {
@@ -323,7 +319,7 @@ proc run-one-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-mach
 
 	    if ![string match "" $comp_output] {
 		verbose -log "$comp_output" 3
-		perror "$mach $testname - compile failed"
+		untested "$mach $testname - compile failed"
 		continue
 	    }
 	} else {
@@ -335,7 +331,7 @@ proc run-one-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-mach
 
 	    if ![string match "" $comp_output] {
 		verbose -log "$comp_output" 3
-		perror "$mach $testname - assembly failed"
+		untested "$mach $testname - assembly failed"
 		continue
 	    }
 	    
@@ -347,7 +343,7 @@ proc run-one-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-mach
 	    
 	    if ![string match "" $comp_output] {
 		verbose -log "$comp_output" 3
-		perror "$mach $testname - linking failed"
+		untested "$mach $testname - linking failed"
 		continue
 	    }
 	}
@@ -379,34 +375,34 @@ proc run-one-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-mach
 	    if { "$status" == "pass" } {
 	        if { "$opts(xerror)" == "no" } {
 	    	    if [string match $opts(output) $output] {
-		        pass $test
+		        pass "$test \#$iter"
 		    } else {
 		        verbose -log "output:  $output" 3
 		        verbose -log "pattern: $opts(output)" 3
-		        fail "$mach $testname"
+		        fail "$mach $testname \#$iter"
 			return
 		    }
 	        } else {
 		    verbose -log "`pass' return code when expecting failure" 3
-		    fail $test
+		    fail "$test \#$iter"
 		    return
 	        }
 	    } elseif { "$status" == "fail" } {
 	        if { "$opts(xerror)" == "no" } {
-		    fail "$mach $testname"
+		    fail "$mach $testname \#$iter"
 		    return
 	        } else {
 		    if [string match $opts(output) $output] {
-		        pass $test
+		        pass "$test \#$iter"
 		    } else {
 		        verbose -log "output:  $output" 3
 		        verbose -log "pattern: $opts(output)" 3
-		        fail $test
+		        fail "$test \#$iter"
 			return
 	    	    }
 	        }
 	    } else {
-	        $status "$mach $testname"
+	        $status "$mach $testname \#$iter"
 	    }
 	}
         if {$sid_run_repetitions > 1} then {
@@ -475,7 +471,7 @@ proc sid_run { command_line required_files redir options } {
     if [is_remote host] {
 	# Let's make this a catastrophic error so should the time ever come
 	# for it's need, the problem stands out.
-	error "remote host operation isn't supported"
+	unsupported "remote host operation isn't supported"
     }
 
     # FIXME: this works for UNIX only
@@ -521,7 +517,7 @@ proc slurp_options { file } {
     #verbose "Slurping $file"
     if [catch { set f [open $file r] } x] {
 	#perror "couldn't open `$file': $x"
-	perror "$x"
+	untested "$x"
 	return -1
     }
     set opt_array {}

@@ -827,7 +827,8 @@ namespace sidutil
     // Some convenience operators for accessing register fields
     void operator = (const DataType& v)
       {
-	value_control_register<DataType>::operator= (v);
+	ValueType shifted_v = v << this->shift_amount();
+	value_control_register<DataType>::set (shifted_v, this->get_mask()); 
       }
 
   protected:

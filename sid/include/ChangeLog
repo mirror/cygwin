@@ -1,3 +1,8 @@
+2001-12-04  Ben Elliston  <bje@redhat.com>
+
+	* sidbusutil.h (ro_value_control_register::operator=): Bug
+	fix. Use parent's set() method.
+
 2001-11-30  Ben Elliston  <bje@redhat.com>
 
 	* sidbusutil.h (class ro_value_control_register): New class.

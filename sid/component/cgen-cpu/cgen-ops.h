@@ -153,6 +153,7 @@ namespace cgen {
 #define ROLSI(x, y) (SLLSI((x), (y)) | SRLSI((x), 32-(y)))
 #define JOINSIDI(x, y)  (MAKEDI(x, y))
 #define JOINUQIUHI(x, y)  (((x) << 8) | (y))
+#define JOINHISI(x, y)  (((x) << 16) | (y))
 // XXX: endianness issues undecided
 #define SUBWORDDISI(x, y) ((y) == 0 ? GETHIDI(x) : GETLODI(x))
 #define SUBWORDSISI(x) ((SI) (x))

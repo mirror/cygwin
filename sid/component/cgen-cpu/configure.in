@@ -15,6 +15,15 @@ AC_LANG_CPLUSPLUS
 
 AC_CHECK_LIB(m, main)
 
+dnl Check if we need libintl.
+AC_MSG_CHECKING([whether libintl is required for gettext])
+AC_LANG_SAVE
+AC_LANG_C
+AC_TRY_LINK_FUNC([textdomain],
+  [INTLLIBS=; AC_MSG_RESULT([no])],
+  [INTLLIBS='-L../../../intl -lintl']; AC_MSG_RESULT([yes]))
+AC_LANG_RESTORE
+
 dnl Perform --target/--enable-targets processing.
 CY_SIDTARGET_CHECK
 
@@ -39,9 +48,13 @@ AC_CONFIG_SUBDIRS($cpu_subdirs)
 AC_SUBST(cpu_subdirs)
 AC_SUBST(cpu_incl)
 AC_SUBST(cpu_libs)
+AC_SUBST(INTLLIBS)
 
 dnl Look for GUILE in install tree
 AC_CHECK_PROGS(GUILE, guile, false)
+
+dnl building docs
+RH_DOCBUILD_CHECK
 
 dnl Outputs
 AC_OUTPUT(Makefile CGEN.sh)

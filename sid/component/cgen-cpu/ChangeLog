@@ -7,28 +7,124 @@
 
 	* cgen-ops.h (ADDCDI): New function.
 
+2001-07-20  Ben Elliston  <bje@redhat.com>
+
+	* configure.in: Check whether libintl is required for gettext.
+	* acinclude.m4: Remove.
+	* configure: Rebuild.
+	* aclocal.m4: Likewise.
+	* Makefile.in: Likewise.
+
 2001-07-13  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (check-local): Rename target from "checkme".
 
-2001-07-13  Dave Brolley  <brolley@redhat.com>
+2001-07-12  Dave Brolley  <brolley@redhat.com>
 
 	* cgen-ops.h (ADDCFDI): New function.
 
+2001-07-10  matthew green  <mrg@redhat.com>
+
+	* Makefile.in: Regenerate.
+	* aclocal.m4: Regenerate.
+	* configure: Regenerate.
+	* cgen-ops.h (JOINHISI): New define.
+
+2001-07-02  Ben Elliston  <bje@redhat.com>
+
+	* common-xml/interface.xml (debug-exec?): Remove.
+
+2001-06-29  graydon hoare  <graydon@redhat.com>
+
+	* common-xml/*: Add files.
+
 2001-06-28  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * compCGEN.cxx (cgen_cpu::stream_state): Change reference to
-        debug_exec_p to use new warnings_enabled flag.
-        (cgen_cpu::destream_state): Ditto.
-        (cgen_bi_endian_cpu::cgen_bi_endian_cpu): Remove
-        debug_exec_p setting and add warnings_enabled flag which is tied                to new enable-warnings? setting.
-        * cgen-cpu.h (cgen_bi_endian_cpu::debug_exec_p): Removed.
-        (cgen_bi_endian_cpu::warnings_enabled): New member.
+	* compCGEN.cxx (cgen_cpu::stream_state): Change reference to
+	debug_exec_p to use new warnings_enabled flag.
+	(cgen_cpu::destream_state): Ditto.
+
+2001-06-28  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* compCGEN.cxx (cgen_bi_endian_cpu::cgen_bi_endian_cpu): Remove
+	debug_exec_p setting and add warnings_enabled flag which is tied		to new enable-warnings? setting.
+	* cgen-cpu.h (cgen_bi_endian_cpu::debug_exec_p): Removed.
+	(cgen_bi_endian_cpu::warnings_enabled): New member.
 
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am (ACLOCAL_AMFLAGS): Refer to $srcdir.
 	* Makefile.in: Regenerated.
+
+2001-06-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cgen-cpu.h, tracedis.h: #undef AND unwittingly acquired
+	from ansidecl.h.
+
+2001-06-20  matthew green  <mrg@redhat.com>
+
+	* Makefile.am (INCLUDESBFD, OPCODES, LIBIBERTY, TRACEDIS): Set
+	unconditionally.
+	* cgen-cpu.h: Delete CGEN_BFD_DISASSEMBLER conditional.
+	* compCGEN.cxx: Likewise.
+	* configure.in (CY_SID_BFD_DISASM_CHECK): Delete.
+	* configure: Regenerate.
+	* Makefile.in: Likewise.
+	* aclocal.m4: Likewise.
+	* config.in: Likewise.
+
+2001-06-07  matthew green  <mrg@redhat.com>
+
+	* Makefile.am (BFDLIBS): Remove.
+	* Makefile.in: Regenerate.
+	* cgen-cpu.h (disassemble): Now takes a `const char *name' parameter.
+	* compCGEN.cxx (cgen_bi_endian_cpu::disassemble): Likewise.
+	* tracedis.c (cgen_disassemble): Likewise.  Also, call register_name()
+	with arch & name.
+	(bfd_get_arch): New dummy function.
+	(bfd_put_bits, bfd_get_bits): New functions. Copy from libbfd.
+	(hack_list): New list of arch to name mappings.
+	(register_name): New function.
+	(bfd_lookup_arch): New function. Uses hack_list.
+	* tracedis (cgen_disassemble): Update prototype.
+
+2001-06-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cgen-cpu.h: Move new getter/setter functions to *MEM* from *IMEM*.
+
+2001-06-06  graydon hoare  <graydon@redhat.com>
+
+	* cgen-types.h: Add SF,DF,BI types.
+	* cgen-cpu.h (class cgen_bi_endian_cpu): Add some getter/setter
+	functions for various memory types.
+
+2001-05-29  matthew green  <mrg@redhat.com>
+
+	* Makefile.am (OPCODES, BFDLIB, LIBIBERTY, TRACEDIS, INCLUDESBFD): New
+	variables set conditionally on CGEN_BFD_DISASSEMBLER.
+	* acinclude.m4: New. Pull in gettext & bfd.
+	* cgen-cpu.h: If CGEN_BFD_DISASSEMBLER, include "bfd.h" and "dis-asm.h".
+	(cgen_bi_endian_cpu): If CGEN_BFD_DISASSEMBLER, new disassemble(),
+	cgen_read_memory(), cgen_print_address(), cgen_memory_error() and
+	cgen_symbol_at_address() methods, and new disassemble_info{} info.
+	New trace_counter() method and int trace_count.
+	* compCGEN.cxx: If CGEN_BFD_DISASSEMBLER, include "bfd.h", "tracedis.h"
+	and "dis-asm.h".
+	(cgen_bi_endian_cpu ctor): Initialise trace_count to zero.
+	(cgen_bi_endian_cpu::disassemble): New method, calls cgen_disasseble().
+	(cgen_bi_endian_cpu::cgen_read_memory): New method, conditional on
+	CGEN_BFD_DISASSEMBLER..
+	(cgen_bi_endian_cpu::cgen_memory_error): Likewise.
+	(cgen_bi_endian_cpu::cgen_print_address): Likewise.
+	(cgen_bi_endian_cpu::cgen_symbol_at_address: Likewise.
+	(cgen_bi_endian_cpu::trace_counter): New method.
+	* configure.in (CY_SID_BFD_DISASM_CHECK): Use.
+	* tracedis.c (cgen_disassemble): New file, front end to disassembler.
+	* tracedis.h: Header file for above.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Regenerated.
+	* config.in: Regenerated.
+	* configure: Regenerated.
 
 2001-05-23  Ben Elliston  <bje@redhat.com>
 
@@ -41,10 +137,15 @@
 	(cgen_bi_endian_cpu::GETMEMUHI): Ditto.
 	(cgen_bi_endain_cpu::SETMEMUHI): Ditto.
 
-2001-03-21  Ben Elliston  <bje@redhat.com>
+2001-03-22  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.in: Regenerate.
 	* configure: Likewise.
+	* aclocal.m4: Likewise.
+
+2001-03-21  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.in: Regenerate.
 
 2001-03-01  Frank Ch. Eigler  <fche@redhat.com>
 

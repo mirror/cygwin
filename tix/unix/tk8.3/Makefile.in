@@ -85,7 +85,7 @@ LIBS_TCLONLY = @TCL_BUILD_LIB_SPEC@ @TCL_LIBS@
 
 RUN_TCLSH	= TCL_LIBRARY=$(TCL_SRC_DIR)/library \
 		  TK_LIBRARY=$(TK_SRC_DIR)/library \
-	          $(TCL_BIN_DIR)/tclsh
+	          $(TCL_BIN_DIR)/tclsh8.3
 
 
 #----------------------------------------------------------------

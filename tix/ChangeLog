@@ -1,3 +1,12 @@
+2002-01-11  Keith Seitz  <keiths@redhat.com>
+
+	* unix/tk8.3/Makefile.in (RUN_TCLSH): Update with
+	real name/location of tcl.
+	* unix/tk8.3/configure.in (TCL_BIN_DIR): Figure out
+	where tclsh is installed: it's needed by the install
+	target.
+	* unix/tk8.3/configure: Regenerated.
+
 2002-01-07  Phil Edwards <pedwards@disaster.jaj.com>
 
 	* unix/Makefile.in: When installing the tix

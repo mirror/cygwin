@@ -1,6 +1,6 @@
 // gprof.cxx - A component for generating gprof profile data.  -*- C++ -*-
 
-// Copyright (C) 1999-2001 Red Hat.
+// Copyright (C) 1999-2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -303,11 +303,11 @@ namespace profiling_components
 		put_bytes (of, host_int_1(0), 1);      // GMON_TAG_TIME_HIST
 		// gmon_hist_hdr
 		put_bytes (of, this->value_min, 4);    // gmon_hist_hdr.low_pc
-		put_bytes (of, this->value_max, 4);    // gmon_hist_hdr.high_pc
+		host_int_4 uprounded_value_max = this->value_max + this->bucket_size;
+		put_bytes (of, uprounded_value_max, 4); // gmon_hist_hdr.high_pc
 		assert (this->bucket_size != 0);
 		host_int_4 num_buckets = 1 + (this->value_max - this->value_min) / this->bucket_size;
 		put_bytes (of, num_buckets, 4);        // gmon_hist_hdr.hist_size
-		// XXX: actual prof_rate not available here ...
 		put_bytes (of, host_int_4(1), 4);      // gmon_hist_hdr.prof_rate
 		put_bytes (of, "tick", 15);            // gmon_hist_hdr.dimen
 		put_bytes (of, "t", 1);                // gmon_hist_hdr.dimen_abbrev

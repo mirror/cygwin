@@ -1,5 +1,5 @@
 ; xstormy16 CPU core description. -*- Scheme -*-
-; Copyright (C) 2001, 2002 Red Hat, Inc.
+; Copyright (C) 2001, 2002, 2003 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -391,10 +391,10 @@
 (define-pmacro (set-psw Rd index value)
   (sequence ((HI nvalue))
     (set nvalue value)
+    (set (reg HI h-gr index) nvalue)
     (set psw (or (and psw #x0F9C)
 		 (or (sll index 12)
-		     (basic-psw nvalue))))
-    (set (reg HI h-gr index) nvalue)))
+		     (basic-psw nvalue))))))
 
 ; Update the PSW for destination register Rd.
 (define-pmacro (set-psw-nowrite index value)
@@ -412,43 +412,28 @@
 		 (basic-psw nvalue)))
     (set dest nvalue)))
 
-; Update the PSW for destination non-register dest, set dest to value,
-; ensuring to write the correct (weird) alignment.
-(define-pmacro (set-mem-alignfix-psw dest value)
-  (sequence ((HI nvalue) (SI ndest))
-    (set nvalue value)
-    (set ndest dest)
-    (set psw (or (and psw #xFF9C)
-		 (basic-psw nvalue)))
-    (if (and ndest 1)
-      (sequence ()
-	(set ndest (sub ndest 1))
-	(set nvalue (or (and (sll nvalue 8) #xFF00)
-			(and (srl nvalue 8) #xFF)))))
-    (set dest nvalue)))
-
 ; Update the PSW as with set-psw, but also set the carry flag.
 (define-pmacro (set-psw-carry Rd index value carry)
   (sequence ((HI nvalue))
     (set nvalue value)
+    (set (reg HI h-gr index) nvalue)
     (set psw (or (or (and psw #x0F98)
 		     (sll carry 2))
 		 (or (sll index 12)
-		     (basic-psw nvalue))))
-    (set (reg HI h-gr index) nvalue)))
+		     (basic-psw nvalue))))))
 
 ; The all-purpose addition operation.
 (define-pmacro (set-psw-add Rd index a b c)
   (sequence ((HI value))
     (set value (addc a b c))
+    (set (reg HI h-gr index) value)
     (set psw (or (or (and psw #x0F80)
 		     (basic-psw value))
 		 (or (or (sll HI (add-oflag HI a b c) 4)
 			 (sll HI (add-cflag HI a b c) 2))
 		     (or (and (srl HI (addc HI (and a #xF) (and b #xF) c) 
 				   1) #x8)
-			 (sll index 12)))))
-    (set (reg HI h-gr index) value)))
+			 (sll index 12)))))))
 
 ; Set the PSW for a subtraction of a-b into Rd, but don't actually
 ; do the subtract.
@@ -469,14 +454,14 @@
 (define-pmacro (set-psw-sub Rd index a b c)
   (sequence ((HI value))
     (set value (subc a b c))
+    (set (reg HI h-gr index) value)
     (set psw (or (or (and psw #x0F80)
 		     (basic-psw value))
 		 (or (or (sll HI (sub-oflag HI a b c) 4)
 			 (sll HI (sub-cflag HI a b c) 2))
 		     (or (and (srl HI (subc HI (and a #xF) (and b #xF) c)
 				   1) #x8)
-			 (sll index 12)))))
-    (set (reg HI h-gr index) value)))
+			 (sll index 12)))))))
 
 ; A 17-bit rotate-left operation
 (define-pmacro (set-psw-rotate17 Rd index src c rot)
@@ -487,6 +472,11 @@
 		     (sll SI c 16))))
     (set tmpfoo (rol tmpfoo (and rot #x1F)))
     (set-psw-carry (reg HI h-gr index) index (trunc HI tmpfoo) (and (srl tmpfoo 16) 1))))
+
+; We have to be careful to get the right group of 16 shifts from the above.
+(define-pmacro (set-psw-rrotate17 Rd index src c rot)
+  (set-psw-rotate17 Rd index src c (sub 47 (mod (add (and rot #xf) 15) 17)))
+  )
 
 
 ; Move Operations
@@ -516,7 +506,7 @@
      ("mov$ws2 $lmem8,#$imm16")
      (+ OP1_7 OP2A_8 ws2 lmem8 imm16)
      (if ws2
-	 (set-mem-alignfix-psw (mem HI lmem8) imm16)
+	 (set-mem-psw (mem HI (and lmem8 #xFFFE)) imm16)
 	 (set-mem-psw (mem QI lmem8) (and imm16 #xFF)))
      ()
 )
@@ -526,7 +516,7 @@
      ("mov$ws2 $hmem8,#$imm16")
      (+ OP1_7 OP2A_A ws2 hmem8 imm16)
      (if ws2
-	 (set-mem-alignfix-psw (mem HI hmem8) imm16)
+	 (set-mem-psw (mem HI (and hmem8 #xFFFE)) imm16)
 	 (set-mem-psw (mem QI hmem8) (and imm16 #xFF)))
      ()
 )
@@ -558,7 +548,7 @@
      ("mov$ws2 $lmem8,$Rm")
      (+ OP1_9 Rm ws2 lmem8)
      (if ws2 
-	 (set-mem-alignfix-psw (mem HI lmem8) Rm)
+	 (set-mem-psw (mem HI (and lmem8 #xFFFE)) Rm)
 	 (set-mem-psw (mem QI lmem8) Rm))
      ()
 )
@@ -568,7 +558,7 @@
      ("mov$ws2 $hmem8,$Rm")
      (+ OP1_B Rm ws2 hmem8)
      (if ws2 
-	 (set-mem-alignfix-psw (mem HI lmem8) Rm)
+	 (set-mem-psw (mem HI (and lmem8 #xFFFE)) Rm)
 	 (set-mem-psw (mem QI lmem8) Rm))
      ()
 )
@@ -619,7 +609,7 @@
 	       (if ws2
 		   (set-alignfix-mem Rs Rdm)
 		   (set (mem QI Rs) Rdm))
-	       (set-psw-nowrite (index-of Rs) Rs))
+	       (set-psw-nowrite (index-of Rdm) Rdm))
      ()
 )
 
@@ -632,7 +622,8 @@
 	       (if ws2
 		   (set-alignfix-mem Rs Rdm)
 		   (set (mem QI Rs) Rdm))
-	       (set-psw Rs (index-of Rs) (add Rs (add ws2 1))))
+	       (set-psw-nowrite (index-of Rdm) Rdm)
+	       (set Rs (add Rs (add ws2 1))))
      ()
 )
 
@@ -642,7 +633,8 @@
      ("mov$ws2 (--$Rs),$Rdm")
      (+ OP1_6 OP2A_A ws2 Rs OP4M_0 Rdm)
      (sequence ()
-	       (set-psw Rs (index-of Rs) (sub Rs (add ws2 1)))
+	       (set Rs (sub Rs (add ws2 1)))
+	       (set-psw-nowrite (index-of Rdm) Rdm)
 	       (if ws2
 		   (set-alignfix-mem Rs Rdm)
 		   (set (mem QI Rs) Rdm)))
@@ -695,7 +687,7 @@
 	       (if ws2
 		   (set-alignfix-mem (add Rs imm12) Rdm)
 		   (set (mem QI (add Rs imm12)) Rdm))
-	       (set-psw Rs (index-of Rs) Rs))
+	       (set-psw-nowrite (index-of Rdm) Rdm))
      ()
 )
 
@@ -708,7 +700,8 @@
 	       (if ws2
 		   (set-alignfix-mem (add Rs imm12) Rdm)
 		   (set (mem QI (add Rs imm12)) Rdm))
-	       (set-psw Rs (index-of Rs) (add Rs 1)))
+	       (set-psw-nowrite (index-of Rdm) Rdm)
+	       (set Rs (add Rs 1)))
      ()
 )
 
@@ -718,7 +711,8 @@
      ("mov$ws2 (--$Rs,$imm12),$Rdm")
      (+ OP1_6 OP2A_A ws2 Rs OP4M_1 Rdm OP5_0 imm12)
      (sequence ()
-	       (set-psw Rs (index-of Rs) (sub Rs 1))
+	       (set Rs (sub Rs 1))
+	       (set-psw-nowrite (index-of Rdm) Rdm)
 	       (if ws2
 		   (set-alignfix-mem (add Rs imm12) Rdm)
 		   (set (mem QI (add Rs imm12)) Rdm)))
@@ -844,9 +838,9 @@
      (+ OP1_7 OP2A_6 ws2 Rs OP4M_0 Rdm)
      (sequence ()
 	       (if ws2
-		   (set-psw Rs (index-of Rs) (alignfix-mem (join SI HI R8 Rdm)))
-		   (set-psw Rs (index-of Rs) (and #xFF (mem QI (join SI HI R8 Rdm)))))
-	       (set-psw Rs (index-of Rs) Rs))
+		   (set-alignfix-mem (join SI HI R8 Rs) Rdm)
+		   (set (mem QI (join SI HI R8 Rs)) Rdm))
+	       (set-psw-nowrite (index-of Rdm) Rdm))
      ()
 )
 
@@ -857,9 +851,10 @@
      (+ OP1_6 OP2A_6 ws2 Rs OP4M_0 Rdm)
      (sequence ()
 	       (if ws2
-		   (set-psw Rs (index-of Rs) (alignfix-mem (join SI HI R8 Rdm)))
-		   (set-psw Rs (index-of Rs) (and #xFF (mem QI (join SI HI R8 Rdm)))))
-	       (set-psw Rs (index-of Rs) (add Rs (add ws2 1))))
+		   (set-alignfix-mem (join SI HI R8 Rs) Rdm)
+		   (set (mem QI (join SI HI R8 Rs)) Rdm))
+	       (set-psw-nowrite (index-of Rdm) Rdm)
+	       (set Rs (add Rs (add ws2 1))))
      ()
 )
 
@@ -869,10 +864,11 @@
      ("movf$ws2 (--$Rs),$Rdm")
      (+ OP1_6 OP2A_E ws2 Rs OP4M_0 Rdm)
      (sequence ()
-	       (set-psw Rs (index-of Rs) (sub Rs (add ws2 1)))
+	       (set-psw-nowrite (index-of Rdm) Rdm)
+	       (set Rs (sub Rs (add ws2 1)))
 	       (if ws2
-		   (set-psw Rs (index-of Rs) (alignfix-mem (join SI HI R8 Rdm)))
-		   (set-psw Rs (index-of Rs) (and #xFF (mem QI (join SI HI R8 Rdm))))))
+		   (set-alignfix-mem (join SI HI R8 Rs) Rdm)
+		   (set (mem QI (join SI HI R8 Rs)) Rdm)))
      ()
 )
 
@@ -923,7 +919,7 @@
 		   (set (mem HI (and (add (join SI HI Rb Rs) imm12) #xFFFFFFFE))
 			Rdm)
 		   (set (mem QI (add (join SI HI Rb Rs) imm12)) Rdm))
-	       (set-psw Rs (index-of Rs) Rs))
+	       (set-psw-nowrite (index-of Rdm) Rdm))
      ()
 )
 
@@ -937,7 +933,8 @@
 	       (if ws2
 		   (set (mem HI (and (add (join SI HI Rb Rs) imm12) #xFFFFFFFE)) Rdm)
 		   (set (mem QI (add (join SI HI Rb Rs) imm12)) Rdm))
-	       (set-psw Rs (index-of Rs) (add Rs (add ws2 1))))
+	       (set-psw-nowrite (index-of Rdm) Rdm)
+	       (set Rs (add Rs (add ws2 1))))
      ()
 )
 
@@ -947,7 +944,8 @@
      ("movf$ws2 ($Rb,--$Rs,$imm12),$Rdm")
      (+ OP1_6 OP2A_E ws2 Rs OP4M_1 Rdm OP5A_0 Rb imm12)
      (sequence ()
-	       (set-psw Rs (index-of Rs) (sub Rs 1))
+	       (set Rs (sub Rs 1))
+	       (set-psw-nowrite (index-of Rdm) Rdm)
 	       (if ws2
 		   (set (mem HI (and (add (join SI HI Rb Rs) imm12) #xFFFFFFFE)) Rdm)
 		   (set (mem QI (add (join SI HI Rb Rs) imm12)) Rdm)))
@@ -1302,7 +1300,7 @@
      ()
      ("rrc $Rd,$Rs")
      (+ OP1_3 OP2_8 Rs Rd)
-     (set-psw-rotate17 Rd (index-of Rd) Rd psw-cy (neg (and Rs #xF)))
+     (set-psw-rrotate17 Rd (index-of Rd) Rd psw-cy Rs)
      ()
 )
 
@@ -1311,7 +1309,7 @@
      ()
      ("rrc $Rd,#$imm4")
      (+ OP1_3 OP2_9 imm4 Rd)
-     (set-psw-rotate17 Rd (index-of Rd) Rd psw-cy (neg imm4))
+     (set-psw-rrotate17 Rd (index-of Rd) Rd psw-cy imm4)
      ()
 )
 

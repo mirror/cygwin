@@ -73,10 +73,14 @@ CONST TclFileAttrProcs tclpFileAttrProcs[] = {
 	{GetWinFileShortName, CannotSetAttribute},
 	{GetWinFileAttributes, SetWinFileAttributes}};
 
-#ifdef HAVE_NO_SEH
-static void *ESP;
-static void *EBP;
-#endif /* HAVE_NO_SEH */
+#if defined(HAVE_NO_SEH) && defined(TCL_MEM_DEBUG)
+static void *INITIAL_ESP,
+            *INITIAL_EBP,
+            *INITIAL_HANDLER,
+            *RESTORED_ESP,
+            *RESTORED_EBP,
+            *RESTORED_HANDLER;
+#endif /* HAVE_NO_SEH && TCL_MEM_DEBUG */
 
 /*
  * Prototype for the TraverseWinTree callback function.
@@ -95,7 +99,6 @@ static int		ConvertFileNameFormat(Tcl_Interp *interp,
 			    Tcl_Obj **attributePtrPtr);
 static int		DoCopyFile(CONST TCHAR *srcPtr, CONST TCHAR *dstPtr);
 static int		DoCreateDirectory(CONST TCHAR *pathPtr);
-static int		DoDeleteFile(CONST TCHAR *pathPtr);
 static int		DoRemoveJustDirectory(CONST TCHAR *nativeSrc, 
 			    int ignoreError, Tcl_DString *errorPtr);
 static int		DoRemoveDirectory(Tcl_DString *pathPtr, int recursive, 
@@ -188,14 +191,21 @@ DoRenameFile(
      */
 
 #ifdef HAVE_NO_SEH
+# ifdef TCL_MEM_DEBUG
     __asm__ __volatile__ (
-            "movl  %esp, _ESP" "\n\t"
-            "movl  %ebp, _EBP");
+            "movl %%esp,  %0" "\n\t"
+            "movl %%ebp,  %1" "\n\t"
+            "movl %%fs:0, %2" "\n\t"
+            : "=m"(INITIAL_ESP),
+              "=m"(INITIAL_EBP),
+              "=r"(INITIAL_HANDLER) );
+# endif /* TCL_MEM_DEBUG */
 
     __asm__ __volatile__ (
+            "pushl %ebp" "\n\t"
             "pushl $__except_dorenamefile_handler" "\n\t"
             "pushl %fs:0" "\n\t"
-            "mov   %esp, %fs:0");
+            "movl  %esp, %fs:0");
 #else
     __try {
 #endif /* HAVE_NO_SEH */
@@ -204,16 +214,35 @@ DoRenameFile(
 	}
 #ifdef HAVE_NO_SEH
     __asm__ __volatile__ (
-            "jmp   dorenamefile_pop" "\n"
-            "dorenamefile_reentry:" "\n\t"
-            "movl  _ESP, %esp" "\n\t"
-            "movl  _EBP, %ebp");
+            "jmp  dorenamefile_pop" "\n"
+        "dorenamefile_reentry:" "\n\t"
+            "movl %%fs:0, %%eax" "\n\t"
+            "movl 0x8(%%eax), %%esp" "\n\t"
+            "movl 0x8(%%esp), %%ebp" "\n"
+        "dorenamefile_pop:" "\n\t"
+            "movl (%%esp), %%eax" "\n\t"
+            "movl %%eax, %%fs:0" "\n\t"
+            "add  $12, %%esp" "\n\t"
+            :
+            :
+            : "%eax");
 
+# ifdef TCL_MEM_DEBUG
     __asm__ __volatile__ (
-            "dorenamefile_pop:" "\n\t"
-            "mov   (%esp), %eax" "\n\t"
-            "mov   %eax, %fs:0" "\n\t"
-            "add   $8, %esp");
+            "movl  %%esp,  %0" "\n\t"
+            "movl  %%ebp,  %1" "\n\t"
+            "movl  %%fs:0, %2" "\n\t"
+            : "=m"(RESTORED_ESP),
+              "=m"(RESTORED_EBP),
+              "=r"(RESTORED_HANDLER) );
+
+    if (INITIAL_ESP != RESTORED_ESP)
+        panic("ESP restored incorrectly");
+    if (INITIAL_EBP != RESTORED_EBP)
+        panic("EBP restored incorrectly");
+    if (INITIAL_HANDLER != RESTORED_HANDLER)
+        panic("HANDLER restored incorrectly");
+# endif /* TCL_MEM_DEBUG */
 #else
     } __except (EXCEPTION_EXECUTE_HANDLER) {}
 #endif /* HAVE_NO_SEH */
@@ -251,7 +280,7 @@ DoRenameFile(
 	decode:
 	if (srcAttr & FILE_ATTRIBUTE_DIRECTORY) {
 	    TCHAR *nativeSrcRest, *nativeDstRest;
-	    char **srcArgv, **dstArgv;
+	    CONST char **srcArgv, **dstArgv;
 	    int size, srcArgc, dstArgc;
 	    WCHAR nativeSrcPath[MAX_PATH];
 	    WCHAR nativeDstPath[MAX_PATH];
@@ -450,6 +479,8 @@ _except_dorenamefile_handler(
 {
     __asm__ __volatile__ (
             "jmp dorenamefile_reentry");
+    /* Nuke compiler warning about unused static function */
+    _except_dorenamefile_handler(NULL, NULL, NULL, NULL);
     return 0; /* Function does not return */
 }
 #endif /* HAVE_NO_SEH */
@@ -514,14 +545,21 @@ DoCopyFile(
      */
 
 #ifdef HAVE_NO_SEH
+# ifdef TCL_MEM_DEBUG
     __asm__ __volatile__ (
-            "movl  %esp, _ESP" "\n\t"
-            "movl  %ebp, _EBP");
+            "movl %%esp,  %0" "\n\t"
+            "movl %%ebp,  %1" "\n\t"
+            "movl %%fs:0, %2" "\n\t"
+            : "=m"(INITIAL_ESP),
+              "=m"(INITIAL_EBP),
+              "=r"(INITIAL_HANDLER) );
+# endif /* TCL_MEM_DEBUG */
 
     __asm__ __volatile__ (
+            "pushl %ebp" "\n\t"
             "pushl $__except_docopyfile_handler" "\n\t"
             "pushl %fs:0" "\n\t"
-            "mov   %esp, %fs:0");
+            "movl  %esp, %fs:0");
 #else
     __try {
 #endif /* HAVE_NO_SEH */
@@ -530,16 +568,35 @@ DoCopyFile(
 	}
 #ifdef HAVE_NO_SEH
     __asm__ __volatile__ (
-            "jmp   docopyfile_pop" "\n"
-            "docopyfile_reentry:" "\n\t"
-            "movl  _ESP, %esp" "\n\t"
-            "movl  _EBP, %ebp");
+            "jmp  docopyfile_pop" "\n"
+        "docopyfile_reentry:" "\n\t"
+            "movl %%fs:0, %%eax" "\n\t"
+            "movl 0x8(%%eax), %%esp" "\n\t"
+            "movl 0x8(%%esp), %%ebp" "\n"
+        "docopyfile_pop:" "\n\t"
+            "movl (%%esp), %%eax" "\n\t"
+            "movl %%eax, %%fs:0" "\n\t"
+            "add  $12, %%esp" "\n\t"
+            :
+            :
+            : "%eax");
 
+# ifdef TCL_MEM_DEBUG
     __asm__ __volatile__ (
-            "docopyfile_pop:" "\n\t"
-            "mov   (%esp), %eax" "\n\t"
-            "mov   %eax, %fs:0" "\n\t"
-            "add   $8, %esp");
+            "movl  %%esp,  %0" "\n\t"
+            "movl  %%ebp,  %1" "\n\t"
+            "movl  %%fs:0, %2" "\n\t"
+            : "=m"(RESTORED_ESP),
+              "=m"(RESTORED_EBP),
+              "=r"(RESTORED_HANDLER) );
+
+    if (INITIAL_ESP != RESTORED_ESP)
+        panic("ESP restored incorrectly");
+    if (INITIAL_EBP != RESTORED_EBP)
+        panic("EBP restored incorrectly");
+    if (INITIAL_HANDLER != RESTORED_HANDLER)
+        panic("HANDLER restored incorrectly");
+# endif /* TCL_MEM_DEBUG */
 #else
     } __except (EXCEPTION_EXECUTE_HANDLER) {}
 #endif /* HAVE_NO_SEH */
@@ -576,7 +633,7 @@ DoCopyFile(
 	    }
 	    if (dstAttr & FILE_ATTRIBUTE_READONLY) {
 		(*tclWinProcs->setFileAttributesProc)(nativeDst, 
-			dstAttr & ~FILE_ATTRIBUTE_READONLY);
+			dstAttr & ~((DWORD)FILE_ATTRIBUTE_READONLY));
 		if ((*tclWinProcs->copyFileProc)(nativeSrc, nativeDst, 0) != FALSE) {
 		    return TCL_OK;
 		}
@@ -604,6 +661,7 @@ _except_docopyfile_handler(
 {
     __asm__ __volatile__ (
             "jmp docopyfile_reentry");
+    _except_docopyfile_handler(NULL,NULL,NULL,NULL);
     return 0; /* Function does not return */
 }
 #endif /* HAVE_NO_SEH */
@@ -611,7 +669,7 @@ _except_docopyfile_handler(
 /*
  *---------------------------------------------------------------------------
  *
- * TclpObjDeleteFile, DoDeleteFile --
+ * TclpObjDeleteFile, TclpDeleteFile --
  *
  *      Removes a single file (not a directory).
  *
@@ -637,11 +695,11 @@ int
 TclpObjDeleteFile(pathPtr)
     Tcl_Obj *pathPtr;
 {
-    return DoDeleteFile(Tcl_FSGetNativePath(pathPtr));
+    return TclpDeleteFile(Tcl_FSGetNativePath(pathPtr));
 }
 
-static int
-DoDeleteFile(
+int
+TclpDeleteFile(
     CONST TCHAR *nativePath)	/* Pathname of file to be removed (native). */
 {
     DWORD attr;
@@ -682,7 +740,7 @@ DoDeleteFile(
 		Tcl_SetErrno(EISDIR);
 	    } else if (attr & FILE_ATTRIBUTE_READONLY) {
 		int res = (*tclWinProcs->setFileAttributesProc)(nativePath, 
-			attr & ~FILE_ATTRIBUTE_READONLY);
+			attr & ~((DWORD)FILE_ATTRIBUTE_READONLY));
 		if ((res != 0) && ((*tclWinProcs->deleteFileProc)(nativePath)
 			!= FALSE)) {
 		    return TCL_OK;
@@ -1321,7 +1379,7 @@ TraversalDelete(
 {
     switch (type) {
 	case DOTREE_F: {
-	    if (DoDeleteFile(nativeSrc) == TCL_OK) {
+	    if (TclpDeleteFile(nativeSrc) == TCL_OK) {
 		return TCL_OK;
 	    }
 	    break;

@@ -1,3 +1,9 @@
+2002-10-21  Adam Nemet  <anemet@lnxw.com>
+
+	* libgloss.exp (get_multilibs): Don't use the first argument
+	passed to this function as the multilib option unless it is in
+	fact a multilib option.
+
 2003-01-31  Kazu Hirata  <kazu@cs.umass.edu>
 
 	* dejagnu/baseboards/h8300-sim.exp: Don't set

@@ -1,3 +1,44 @@
+2003-02-11  Martin M. Hunt  <hunt@redhat.com>
+	From Mumit Khan  <khan@nanotech.wisc.edu>
+
+	* generic/tclIOUtil.c (SetFsPathFromAny): Add Cygwin specific
+	code to convert POSIX filename to native format.
+	* generic/tclFileName.c (Tcl_TranslateFileName): And remove
+	from here.
+	(TclDoGlob): Adjust.
+	* win/tclWinFile.c (TclpObjChdir): Use chdir on Cygwin.
+
+
+2003-02-06  Martin M. Hunt  <hunt@redhat.com>
+
+	* win/tcl.m4 (SC_CONFIG_CFLAGS): Don't default to -O.
+	* unix/tcl.m4 (SC_CONFIG_CFLAGS): Don't default to -O.	
+	CFLAGS gets set to "-O2" by default in top level
+	configure. Adding "-O" here causes the "-O2" to be
+	ignored, but only when the user types "make" within
+	the tcl subdirectory. This caused some confusion.
+	* win/configure: Rebuilt.
+	* unix/configure: Rebuilt.
+
+	* generic/tclEnv.c (TclUnsetEnv): Cast arg to unsigned.
+
+	Import from latest tcl sources to fix a bug with
+	"file copy"
+	2003-01-25  Mo DeJong  <mdejong@users.sourceforge.net>	
+	* win/tclWinFCmd.c (DoRenameFile, DoCopyFile, squelch_warnings):
+	Re-implement inline ASM SEH handlers for gcc.
+	The esp and ebp registers are now saved on the
+	stack instead of in global variables so that
+	the code is thread safe. Add additional checks
+	when TCL_MEM_DEBUG is defined to be sure the
+	values were recovered from the stack properly.
+	Remove squelch_warnings functions and add
+	a dummy call in the handler methods to squelch
+	compiler warnings.
+	* win/tclWinReg.c: Add casts to avoid compiler
+	warning. Fix assignment in if expression bug.
+
+
 2002-10-22  Jeff Hobbs  <jeffh@ActiveState.com>
 
 	*** 8.4.1 TAGGED FOR RELEASE ***

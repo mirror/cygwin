@@ -390,6 +390,7 @@ proc run-one-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-mach
 	        if { "$opts(xerror)" == "no" } {
 	    	    if [string match $opts(output) $output] {
 		        pass "$test \#$iter"
+			file delete ${name}.o ${exe-name}
 		    } else {
 		        verbose -log "output:  $output" 3
 		        verbose -log "pattern: $opts(output)" 3
@@ -408,6 +409,7 @@ proc run-one-sid-test { as as-opts ld ld-opts gcc gcc-opts sid sid-opts all-mach
 	        } else {
 		    if [string match $opts(output) $output] {
 		        pass "$test \#$iter"
+			file delete ${name}.o ${exe-name}
 		    } else {
 		        verbose -log "output:  $output" 3
 		        verbose -log "pattern: $opts(output)" 3

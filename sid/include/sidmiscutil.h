@@ -1,6 +1,6 @@
 // sidmiscutil.h - Useful utility classes.  -*- C++ -*-
 
-// Copyright (C) 1999-2001 Red Hat.
+// Copyright (C) 1999-2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -40,10 +40,10 @@ namespace sidutil
     bool
     find(const Obj1& one, Obj2& two) const
       {
-	forward_t::const_iterator it = this->forward.find(one);
+	typename forward_t::const_iterator it = this->forward.find(one);
 	if (it != this->forward.end())
 	  {
-	    backward_t::const_iterator ti = this->backward.find(it->second);
+	    typename backward_t::const_iterator ti = this->backward.find(it->second);
 	    assert (ti != this->backward.end());
 	    two = it->second;
 	    return true;
@@ -56,10 +56,10 @@ namespace sidutil
     bool
     find(const Obj2& two, Obj1& one) const
       {
-	backward_t::iterator ti = this->backward.find(two);
+	typename backward_t::iterator ti = this->backward.find(two);
 	if (ti != this->backward.end())
 	  {
-	    forward_t::const_iterator it = this->forward.find(ti->second);
+	    typename forward_t::const_iterator it = this->forward.find(ti->second);
 	    assert (it != this->forward.end());
 	    one = ti->second;
 	    return true;

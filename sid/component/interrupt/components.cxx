@@ -40,8 +40,10 @@ static void
 compInterruptDelete(component* c)
 {
 #if SIDTARGET_ARM
-  delete dynamic_cast<armIntController*>(c);
-  delete dynamic_cast<cma222IntController*>(c);
+  armIntController* g1 = dynamic_cast<armIntController*>(c);
+  if (g1) { delete g1; return; }
+  cma222IntController* g2 = dynamic_cast<cma222IntController*>(c);
+  if (g2) { delete g2; return; }
 #endif
 }
 

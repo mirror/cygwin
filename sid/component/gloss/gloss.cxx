@@ -241,7 +241,7 @@ gloss32::update_endian()
 // imposed length limit; read from memory until a NUL is encountered.
 
 bool
-gloss32::get_string (address32 address, string& value, unsigned length = 0)
+gloss32::get_string (address32 address, string& value, unsigned length)
 {
   if (! cpu_memory_bus)
     {

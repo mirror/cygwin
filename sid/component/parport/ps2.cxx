@@ -1137,7 +1137,7 @@ ParPort::intsel_attrhandler()
 // Constructor of nested class parport_inputpin 
 ParPort::parport_inputpin::parport_inputpin(ParPort* owner_obj,
 					  void(ParPort::*fun_ptr)(host_int_4),
-					  bool pin_type = false)
+					  bool pin_type)
   :parport(owner_obj),
    handle_driven(fun_ptr)
 {

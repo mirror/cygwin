@@ -2,7 +2,7 @@
 // mappings between application objects and their string
 // representations.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -27,18 +27,8 @@
 
 #include <limits.h>
 
-
-#ifdef HAVE_EXT_HASH_MAP
-#include <ext/hash_map>
-#define HAVE_HASHING 1
-#else
-#ifdef HAVE_HASH_MAP
-#include <hash_map>
-#define HAVE_HASHING 1
-#else
+// <ext/hash_map>? <hash_map>?  std::?  __gnu_cxx::?  Too much hassle.
 #undef HAVE_HASHING
-#endif
-#endif
 
 #if HAVE_SSTREAM
 #include <sstream>
@@ -693,7 +683,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
     operator () (const std::string& s) const
       {
 	// XXX: improve? 
-	return std::hash<const char*> () (s.c_str ()); 
+	return hash<const char*> () (s.c_str ()); 
       }
   };
 #endif
@@ -705,7 +695,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
   private:
     // use hash table for this, if available
 #ifdef HAVE_HASHING
-    typedef std::hash_map<std::string,attribute_coder_base*,hash_string> attribute_map_t;
+    typedef hash_map<std::string,attribute_coder_base*,hash_string> attribute_map_t;
 #else
     typedef std::map<std::string,attribute_coder_base*> attribute_map_t;
 #endif

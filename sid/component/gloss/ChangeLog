@@ -1,3 +1,7 @@
+2002-11-22  Frank Ch. Eigler  <fche@redhat.com>
+
+	* gloss.cxx (get_string): Correct formal arg list.
+
 2002-09-05  Ben Elliston  <bje@redhat.com>
 
 	* gloss.h: Specify std:: namespace where necessary.

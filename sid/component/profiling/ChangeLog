@@ -1,3 +1,7 @@
+2002-11-22  Frank Ch. Eigler  <fche@redhat.com>
+
+	* gprof.cxx: Give up on hash_map; use plain map<> for count tables.
+
 2002-11-11  Frank Ch. Eigler  <fche@redhat.com>
 
 	* gprof.cxx: Namespace usage fixes.

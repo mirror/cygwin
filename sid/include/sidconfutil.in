@@ -6,12 +6,6 @@
 /* Define if you have the strerror function.  */
 #undef HAVE_STRERROR
 
-/* Define if you have the <ext/hash_map> header file.  */
-#undef HAVE_EXT_HASH_MAP
-
-/* Define if you have the <hash_map> header file.  */
-#undef HAVE_HASH_MAP
-
 /* Define if you have the <sstream> header file.  */
 #undef HAVE_SSTREAM
 

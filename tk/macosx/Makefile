@@ -3,7 +3,7 @@
 # Simple makefile for building on Mac OS X with the
 # Project Builder command line tool 'pbxbuild'
 #
-# RCS: @(#) $Id: Makefile,v 1.1 2002/09/24 20:38:41 kseitz Exp $
+# RCS: @(#) $Id: Makefile,v 1.2 2003/01/21 19:53:15 hunt Exp $
 #
 ################################################################################
 

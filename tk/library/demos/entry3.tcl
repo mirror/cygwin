@@ -4,7 +4,7 @@
 # permitted input is constrained in some way.  It also shows off a
 # password entry.
 #
-# RCS: @(#) $Id: entry3.tcl,v 1.1 2002/09/24 20:38:53 kseitz Exp $
+# RCS: @(#) $Id: entry3.tcl,v 1.2 2003/01/21 19:53:14 hunt Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."

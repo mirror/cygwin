@@ -3,7 +3,7 @@
 # This demonstration script creates a toplevel window containing
 # a paned window that separates two windows vertically.
 #
-# RCS: @(#) $Id: paned2.tcl,v 1.1 2002/09/24 20:38:54 kseitz Exp $
+# RCS: @(#) $Id: paned2.tcl,v 1.2 2003/01/21 19:53:14 hunt Exp $
 
 if {![info exists widgetDemo]} {
     error "This script should be run from the \"widget\" demo."

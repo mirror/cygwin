@@ -1,7 +1,7 @@
 # This file is a Tcl script to test out Tk's "tk_dialog" command.
 # It is organized in the standard fashion for Tcl tests.
 #
-# RCS: @(#) $Id: dialog.test,v 1.1 2002/09/24 20:39:05 kseitz Exp $
+# RCS: @(#) $Id: dialog.test,v 1.2 2003/01/21 19:53:16 hunt Exp $
 #
 
 package require tcltest 2.1

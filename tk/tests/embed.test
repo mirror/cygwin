@@ -4,7 +4,7 @@
 # Copyright (c) 1998-1999 by Scriptics Corporation.
 # All rights reserved.
 #
-# RCS: @(#) $Id: embed.test,v 1.1 2002/09/24 20:39:05 kseitz Exp $
+# RCS: @(#) $Id: embed.test,v 1.2 2003/01/21 19:53:16 hunt Exp $
 
 package require tcltest 2.1
 namespace import -force tcltest::configure

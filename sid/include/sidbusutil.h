@@ -26,7 +26,7 @@ namespace sidutil
   {
   protected:
     word_bus() {}
-    ~word_bus() {}
+    ~word_bus() throw() {}
 
     virtual sid::bus::status word_write(sid::host_int_4 addr,
 					DataType mask,
@@ -218,7 +218,7 @@ namespace sidutil
       {
 	assert (target != 0);
       }
-    ~passthrough_bus() {}
+    ~passthrough_bus() throw() {}
     
     // Some macros to make manufacturing of the cartesian-product
     // calls simpler.
@@ -268,7 +268,7 @@ namespace sidutil
         t[1] = t2;
 	t[2] = NULL;
       }
-    ~mux_passthrough_bus() {}
+    ~mux_passthrough_bus() throw() {}
     void switch_bus()
     {
       // Switch to the next bus if the current one is valid (0 or 1)
@@ -342,7 +342,7 @@ namespace sidutil
       { 
 	assert (target != 0);
       }
-    ~passthrough_word_bus() {}
+    ~passthrough_word_bus() throw() {}
 
     virtual sid::bus::status word_write(sid::host_int_4 addr,
 					DataType mask,
@@ -420,7 +420,7 @@ namespace sidutil
 	assert (insn_bus != 0);
 	assert (data_bus != 0);
       }
-    ~harvard_bus() {}
+    ~harvard_bus() throw() {}
 
     sid::bus *map_addr_to_bus (sid::host_int_4 *addr)
       {
@@ -489,7 +489,7 @@ namespace sidutil
   {
   protected:
     byte_bus() {}
-    ~byte_bus() {}
+    ~byte_bus() throw() {}
     
     virtual sid::bus::status 
     write_data(sid::host_int_4 addr, sid::host_int_1 data) throw () = 0;
@@ -572,7 +572,7 @@ namespace sidutil
 			 sid::host_int_4, sid::host_int_1 )
 		      ) : receiver(h), reader(r), writer(w) {}
 
-    ~callback_byte_bus() {}
+    ~callback_byte_bus() throw() {}
 
   protected:
     Receiver* receiver;
@@ -968,6 +968,8 @@ private:
   {
   public:
 
+    ~fixed_accessor_map_component() throw() {}
+
     // Returns vector of accessor names to components.
     std::vector<std::string>
     accessor_names() throw ()
@@ -1056,6 +1058,8 @@ private:
   class fixed_bus_map_component: public virtual sid::component
   {
   public:
+    ~fixed_bus_map_component() throw() {}
+
     std::vector<std::string>
     bus_names() throw ()
       {

@@ -89,7 +89,7 @@ class cfgroot_component: public virtual component,
 {
 public:
   cfgroot_component();
-  virtual ~cfgroot_component();
+  virtual ~cfgroot_component() throw();
 
 protected:
   host_int_8 activity_count;
@@ -634,7 +634,7 @@ cfgroot_component::cfgroot_component():
 }
 
 
-cfgroot_component::~cfgroot_component() 
+cfgroot_component::~cfgroot_component() throw()
 {
     // Delete every item in the component_creator map.
     for (component_creator_map_t::iterator it = this->component_creator_map.begin ();

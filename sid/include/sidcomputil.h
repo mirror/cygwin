@@ -177,6 +177,8 @@ namespace sidutil
   class fixed_relation_map_component: public virtual sid::component
   {
   public:
+    ~fixed_relation_map_component() throw() {}
+
     typedef std::vector<sid::component*> component_relation_t;
 
     std::vector<std::string> 

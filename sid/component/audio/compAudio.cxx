@@ -363,7 +363,7 @@ fd_audio::fd_audio()
 }
 
 
-fd_audio::~fd_audio()
+fd_audio::~fd_audio() throw()
 {
   if (this->rx_fd >= 0)
     close (this->rx_fd);

@@ -1,3 +1,10 @@
+2001-07-12  matthew green  <mrg@redhat.com>
+
+	* compAudio.cxx (fd_audio): Add missing throw() specifiers to this dtor.
+	* components.h (basic_codec, generic_audio, nop_audio, fd_audio,
+	linux_audio, solaris_audio): Add missing throw() specifiers to these
+	dtors.
+
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am (ACLOCAL_AMFLAGS): Refer to $srcdir.

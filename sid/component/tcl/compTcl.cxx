@@ -254,7 +254,7 @@ namespace tcl_api_component
 	tcl_component_ctor_0 ();
       }
 
-    ~tcl_component ()
+    ~tcl_component () throw()
       {
 	// XXX: kill buses?, pins?
 	if (interp)

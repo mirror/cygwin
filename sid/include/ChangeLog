@@ -1,3 +1,23 @@
+2001-07-12  matthew green  <mrg@redhat.com>
+
+	* sidattrutil.h (attribute_coder_base, attribute_coder_virtual,
+	attribute_coder_alias, attribute_coder_virtual_parameterized,
+	attribute_coder, attribute_coder_ro, attribute_coder_ro_value,
+	attribute_coder_bus_rw, attribute_coder_bus_wo,
+	fixed_attribute_map_component): Add missing throw() specifiers
+	to these dtors.
+	* sidbusutil.h (word_bus, passthrough_bus, mux_passthrough_bus,
+	passthrough_word_bus, harvard_bus, byte_bus, callback_byte_bus,
+	fixed_accessor_map_component, fixed_bus_map_component): Likewise.
+	* sidcomputil.h (fixed_relation_map_component): Likewise.
+	* sidpinutil.h (list_output, output_pin): Likewise
+	(fixed_pin_map_component): Likewise
+	* sidcpuutil.h (basic_cpu, basic_big_endian_cpu,
+	basic_little_endian_cpu, basic_bi_endian_cpu): Likewise.
+	(basic_cpu::read_insn_memory, basic_cpu::write_insn_memory,
+	basic_cpu::read_data_memory, basic_cpu::write_data_memory): Rework
+	to avoid GCC 2.95.3 errors.
+
 2001-07-06  Ben Elliston  <bje@redhat.com>
 
 	* sidcpuutil.h: Use std::string for C++ conformance.

@@ -464,7 +464,7 @@ public:
 	add_attribute ("trace-result?", & trace_result_p, "setting");
       }
 
-    ~basic_cpu() {}
+    virtual ~basic_cpu() throw() {} 
   };
 
 
@@ -481,8 +481,11 @@ public:
     BigOrLittleInt basic_cpu::read_insn_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt) const
       {
 	BigOrLittleInt value;
-	sid::bus::status s = 
-	  (LIKELY(this->insn_bus)) ? this->insn_bus->read (address, value) : sid::bus::unmapped;
+	sid::bus::status s;
+	if (LIKELY(this->insn_bus))
+	  s = this->insn_bus->read (address, value);
+	else
+	  s = sid::bus::unmapped;
 	total_latency += s.latency;
 	if (LIKELY(s == sid::bus::ok))
 	  return value;
@@ -493,8 +496,11 @@ public:
     template <typename BigOrLittleInt>
     BigOrLittleInt basic_cpu::write_insn_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt value) const
       {
-	sid::bus::status s = 
-	  (LIKELY(this->insn_bus)) ? this->insn_bus->write (address, value) : sid::bus::unmapped;
+	sid::bus::status s;
+	if (LIKELY(this->insn_bus))
+	  s = this->insn_bus->write (address, value);
+	else
+	  s = sid::bus::unmapped;
 	total_latency += s.latency;
 	if (LIKELY(s == sid::bus::ok))
 	  return value;
@@ -506,8 +512,11 @@ public:
     BigOrLittleInt basic_cpu::read_data_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt) const
       {
 	BigOrLittleInt value;
-	sid::bus::status s = 
-	  (LIKELY(this->data_bus)) ? this->data_bus->read (address, value) : sid::bus::unmapped;
+	sid::bus::status s;
+	if (LIKELY(this->data_bus))
+	  s = this->data_bus->read (address, value);
+	else
+	  s = sid::bus::unmapped;
 	total_latency += s.latency;
 	if (LIKELY(s == sid::bus::ok))
 	  return value;
@@ -518,8 +527,11 @@ public:
     template <typename BigOrLittleInt>
     BigOrLittleInt basic_cpu::write_data_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt value) const
       {
-	sid::bus::status s = 
-	  (LIKELY(this->data_bus)) ? this->data_bus->write (address, value) : sid::bus::unmapped;
+	sid::bus::status s;
+	if (LIKELY(this->data_bus))
+	  s = this->data_bus->write (address, value);
+	else
+	  s = sid::bus::unmapped;
 	total_latency += s.latency;
 	if (LIKELY(s == sid::bus::ok))
 	  return value;
@@ -542,7 +554,7 @@ public:
       {
 	add_attribute_ro_value ("endian", endian_big, "register");
       }
-    ~basic_big_endian_cpu () {}
+    ~basic_big_endian_cpu () throw() {}
 
     sid::host_int_1 read_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address) const
       {
@@ -637,7 +649,7 @@ public:
       {
 	add_attribute_ro_value ("endian", endian_little, "register");
       }
-    ~basic_little_endian_cpu () {}
+    ~basic_little_endian_cpu () throw() {}
 
     sid::host_int_1 read_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address) const
       {
@@ -736,7 +748,7 @@ public:
 	this->_current_endianness = endian_big;
 	add_attribute ("endian", & this->_current_endianness, "register");
       }
-    ~basic_bi_endian_cpu () {}
+    ~basic_bi_endian_cpu () throw() {}
 
     void set_endian(sid::host_int_4 v)
       {

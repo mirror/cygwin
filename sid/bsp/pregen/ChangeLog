@@ -1,3 +1,7 @@
+2001-12-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* ALL.conf: Regenerated with endianness-setting tweak.
+
 2001-10-29  Frank Ch. Eigler  <fche@redhat.com>
 
 	* pregen-configs.in (mep): Add --tksm for some configurations.

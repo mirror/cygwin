@@ -13,3 +13,6 @@ pkgdata_DATA = hw-visual-clock.tk hw-visual-clock.txt hw-rtc-ds1x42.txt hw-rtc-s
 DEJAGNUTESTS=ds1642.exp ds1742.exp rtcmonkey.exp rtcdocs.exp
 check-local: all
 	(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
+
+html_stylesheet=$(srcdir)/../component_html.xsl
+include $(srcdir)/../../config/Makefile.docs

@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libglue.la" dlsym="glue_component_library">
+  <defcomponent name="sw-glue-attribbank" type="concrete">
+
+
+    <!-- attributes -->
+    <defattribute name="any" legalvalues="any" behaviors="attribute storage" />
+  </defcomponent>
+  <synop>
+  This component stores an arbitrary collection of attribute name/value pairs.
+  </synop>
+  <func>
+    <modelling>
+      It stores copies of all incoming attribute values indefinitely.
+    </modelling>
+
+    <behavior name="attribute-storage">      
+      This component accepts all data values.  It returns copies verbatim.
+      Any unknown attribute name, when read, returns the empty string.
+    </behavior>
+
+    <convention name="functional" supported="true" />
+
+    <convention name="save/restore" supported="false">
+      It does not support state save/restore, since even the
+      <attribute>state-snapshot</attribute> attribute is not assigned
+      any special semantics.
+    </convention>
+
+  </func>
+
+  <env>
+    <title>Related components</title>
+    <p>
+      This component may be used in unit tests as a passive model of
+      another component.  This is especially useful if the other component 
+      is complicated to configure and to use in a testing environment, 
+      and if its attributes only are of interest.
+    </p>
+    <title>Host system</title>
+      <p>If many attribute names or lengthy attribute values are stored,
+      this component may use much host memory.</p>
+
+  </env>
+</defcomplib>
+

@@ -1,0 +1,222 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libmemory.la" dlsym="mem_component_library">
+  <defcomponent name="hw-memory-flash" type="abstract">
+
+    <!-- buses -->
+    <defbus name="read-write-port" addresses="0 .. size-1" accesses="byte-wide access only" />
+
+
+    <!-- attributes -->
+    <defattribute name="device-code" category="setting" legalvalues="0 .. 0xFF" defaultvalue="0x5B" behaviors="configuration" />
+    <defattribute name="manufacturer-code" category="setting" legalvalues="0x1F" defaultvalue="0x1F" behaviors="configuration" />
+    <defattribute name="size" category="setting" legalvalues="numeric" defaultvalue="524288" behaviors="configuration" />
+    <defattribute name="size-max" category="setting" legalvalues="numeric" defaultvalue="fixed at 32MB" behaviors="configuration" />
+    <defattribute name="sector-size" category="setting" legalvalues="numeric" defaultvalue="512" behaviors="configuration" />
+    <defattribute name="image-file" category="setting" legalvalues="filename" behaviors="image save/load" />
+    <defattribute name="read-latency" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="memory latency" />
+    <defattribute name="write-latency" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="memory latency" />
+
+    <!-- pins -->
+    <defpin name="image-load" direction="in" legalvalues="any" behaviors="image load/store" />
+    <defpin name="image-store" direction="in" legalvalues="any" behaviors="image load/store" />
+
+    <variants>
+
+      <defcomponent name="hw-memory-flash-atmel" type="abstract">
+	<variants>
+	  <defcomponent name="hw-memory-flash-at29" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29c256" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29lv256" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29c257" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29c512" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29lv512" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29c010a" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29lv010a" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29bv010a" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29c020" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29lv020" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29bv020" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29c040" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29lv040" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29bv040" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29c040a" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29lv040a" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-at29bv040a" type="concrete"/>	
+	</variants>
+      </defcomponent>
+
+      <defcomponent name="hw-memory-flash-amd" type="abstract">
+
+	<defattribute name="mode" legalvalues="0 .. 9" defaultvalue="0 for read mode" behaviors="reading/writing" />
+
+	<variants>
+	  <defcomponent name="hw-memory-flash-am29" type="concrete"/>
+	  <defcomponent name="hw-memory-flash-am29f010a" type="concrete"/> 
+	  <defcomponent name="hw-memory-flash-am29lv010b" type="concrete"/> 
+	  <defcomponent name="hw-memory-flash-am29lv040b" type="concrete"/> 
+	  <defcomponent name="hw-memory-flash-am29lv081b" type="concrete"/> 
+	  <defcomponent name="hw-memory-flash-am29lv017b" type="concrete"/> 
+	  <defcomponent name="hw-memory-flash-am29lv033c" type="concrete"/>
+	</variants>
+      </defcomponent>
+
+    </variants>
+
+
+  </defcomponent>
+  <synop>
+    <p>This is a simulated ATMEL AT29 or AMD Am29 series flash memory.
+    It can be configured to emulate any of the AT29 or Am29 family
+    members.</p>  
+  </synop>
+  <func>
+    <modelling>
+
+      <p>Memory operations such as programming and erasing are achieved
+	instantly in simulation.  As such, device facilities for
+	performing in-progress operations such as suspending and resuming
+	erase operations are not implemented.</p>
+
+      <p>Hardware sector protection is not implemented.</p>
+
+      <p>In the actual hardware, the ATMEL flash memory has timing
+	sensitivities when programming sectors.  During such programming, 
+	the final byte that is modified in a sector is set to an
+	incorrect value until the programming has been completed.  In
+	simulation, the programming of a sector appears to be
+	instantaneous.  Therefore, it may not be possible to detect
+	software programs that are not sensitive to the timing
+	requirements in real hardware.</p>  
+      
+      <p>In AMTEL components, the data security facility that prevents
+	the memory from being inadvertently modified in the presence of
+	bus transients, has a similar restriction that forces data
+	writes to be performed in rapid succession.  If an interval
+	elapses, data security is re-enabled and the unlocking code
+	sequence must be reissued (see ``References'' for more
+	details).</p>
+
+    </modelling>
+
+    <behavior name="configuration">
+      <p>Flash memory chips are self-describing using their device-code
+      and manufacturer-code values, accessible both to a target
+      program, and to the simulator user via attributes.  Since a
+      target program may infer memory size from these values, further
+      simulation configuration that overrides these values should be
+      avoided unless necessary.</p>
+
+      <p>The <attribute>device-code</attribute> attribute represents
+      the device code of the flash memory part being simulated.  Refer
+      to the ATMEL or AMD data sheet for a complete list of device
+      identification codes.  The
+      <attribute>manufacturer-code</attribute> read-only attribute
+      represents the manufacturer code of the flash memory.  It is a
+      constant value for ATMEL and AMD.  The
+      <attribute>sector-size</attribute> attribute specifies the size
+      of an individual sector in the flash memory.  Typical values are
+      64 to 512 bytes.</p>
+
+      <p>When the <attribute>size</attribute> attribute is written-to
+      with a legal value, a new cleared byte array is allocated with
+      the new size.  The old byte array is thrown away.  The
+      <attribute>size-max</attribute> read-only attribute supplies to
+      the user the maximum size that this component will attempt to
+      allocate.</p>
+      </behavior>
+
+    <behavior name="image save/load">
+
+      <p>When the <pin>image-load</pin> pin is driven, this component
+      will open and attempt to load the contents of the file given by
+      the <attribute>image-file</attribute> attribute into the memory
+      image.  The file is copied byte-for-byte.  If the file is too
+      short, zeroes are used to fill out the rest of the memory.</p>
+ 
+      <p>Similarly, when the <pin>image-store</pin> pin is driven, the
+      component will write to the <attribute>image-file</attribute>
+      file a byte-for-byte dump of the entire memory image.</p>
+    </behavior>
+
+    <behavior name="reading/writing">
+
+      <p>When an access is received on the <bus>read-write-port</bus>
+      bus, the component checks the incoming address and rejects it if
+      out-of-range. The component also rejects non-byte-sized
+      accesses.</p>
+
+      <p>Memory can be read at will, but for the AMD models, AMD's
+      protocol must be followed to put the device into byte program
+      mode or unlock bypass mode.  The <attribute>mode</attribute>
+      read-only attribute reveals the internal state of the device
+      state machine.  This is primarily designed for testing
+      purposes. For AMTEL models, the data security protocol must be
+      followed when writing to the memory - see ATMEL documentation.
+      </p>
+
+      </behavior>
+
+    <behavior name="memory latency">
+      <p>The component models the effects of memory latency.  The
+      <attribute>read-latency</attribute> and
+      <attribute>write-latency</attribute> values specify the
+      latencies for memory reads and writes, respectively.</p>
+    </behavior>
+
+    <convention name="functional" supported="true" />
+    <convention name="latency" supported="true">
+      <p>The component models memory latency.</p>
+    </convention>
+
+    <convention name="save/restore" supported="true">
+      <p>The component supports saving and restoring state in addition to
+      memory persistence, via the <pin>image-store</pin> pin/attribute.</p>
+    </convention>
+    <convention name="triggerpoints" supported="false" />
+  </func>
+  <env>
+    <title>Related components</title>
+    <ul>
+      <li>
+	<p>Customized versions of this component are available for
+	standard members of the AT29 flash family.  Instantiating each
+	of them is equivalent to instantiating this generic component
+	and setting the appropriate
+	<attribute>sector-size</attribute>,
+	<attribute>size</attribute>, and
+	<attribute>device-code</attribute> attribute settings.</p>
+      </li>
+      
+      <li><p>A flash memory will usually form a small part of the complete
+	  memory subsystem, providing a region of non-volatile memory. The 
+	  following configuration file fragment demonstrates this:</p>
+	<code>
+	new hw-mapper-basic bus
+	new hw-memory-flash-at29lv040 flash # AT29LV040: 512KB size, 512 sector-size
+	connect-bus bus [0,0x7FFFF] flash read-write-port
+	</code>
+      </li>
+
+    </ul>
+
+    <title>Host system</title>
+
+    <p>The memory is modelled as a contiguous array of bytes in host
+    memory.  As such, a component configured for 8MB of memory
+    requires 8MB of host memory.  This is an important consideration
+    for simulations running on machines with low memory or on busy
+    multiuser systems.  Similarly, when a memory image is written to
+    disk, the same amount of space may be used there.</p>
+
+  </env>
+
+  <refs>
+    <p>
+      <a type="url" href="http://www.amd.com/products/nvd/techdocs/techdocs.html">AMD Am29 series data sheets, application notes</a>, 
+      <a type="url" href="http://www.amtel.com">ATMEL AT29 series data sheets, application notes</a>.
+    </p>
+  </refs>
+
+</defcomplib>

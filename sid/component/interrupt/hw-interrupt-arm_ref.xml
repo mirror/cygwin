@@ -1,0 +1,207 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libinterrupt.la" dlsym="interrupt_component_library">
+  <defcomponent name="hw-interrupt-arm/ref" type="concrete">
+
+    <!-- pins -->
+    <defpin name="reset" direction="in" legalvalues="any" behaviors="reset" />
+    <defpin name="fast-interrupt-source" direction="in" legalvalues="any" behaviors="interrupt handling" />
+    <defpin name="interrupt-source-[0,31]" direction="in" legalvalues="any" behaviors="interrupt handling" />
+    <defpin name="fast-interrupt" direction="out" legalvalues="0..1" behaviors="interrupt handling" />
+    <defpin name="interrupt" direction="out" legalvalues="0..1" behaviors="interrupt handling" />
+
+
+    <!-- buses -->
+    <defbus name="irq-registers" addresses="0x0..0x1C" accesses="read/write" behaviors="register access" />
+    <defbus name="fiq-registers" addresses="0x0..0x0F" accesses="read/write" behaviors="register access" />
+
+
+    <!-- attributes -->
+    <defattribute name="interrupt" category="pin watchable" legalvalues="numeric" behaviors="interrupt handling" />
+    <defattribute name="fast-interrupt" category="pin watchable" legalvalues="numeric" behaviors="interrupt handling" />
+    <defattribute name="irq-raw-status" category="register watchable" legalvalues="numeric" behaviors="register access" />
+    <defattribute name="irq-enable-register" category="register watchable" legalvalues="numeric" behaviors="register access" />
+    <defattribute name="fiq-raw-status" category="register watchable" legalvalues="numeric" behaviors="register access" />
+    <defattribute name="fiq-enable-register" category="register watchable" legalvalues="numeric" behaviors="register access" />
+  </defcomponent>
+  <synop>
+    <p>
+      This component simulates the ARM reference interrupt controller.</p>
+  </synop>
+  <func>
+    <modelling>
+      <p>
+	<p>
+	  The interrupt controller model features a fast interrupt line
+	  (to be attached to the fIRQ line of the CPU) and 32 general
+	  purpose interrupts.</p>
+	<p>
+	  This component models ARM's abstract reference interrupt
+	  controller, which is not exactly the same as the one found on
+	  the PID7T evaluation board.  The version on the PID7T board has
+	  an additional <name>FIQSelect</name> register, and only 15 IRQ source pins.</p></p>
+    </modelling>
+    <behavior name="reset">
+      <p>
+	When the <pin>reset</pin> input pin is driven, this component is reset to
+	the hardware's normal power-up state.</p>
+    </behavior>
+    <behavior name="register access">
+      <p>
+	<p>
+      There are two available register busses for this model.  The normal
+      IRQ registers are available on the <bus>irq-registers</bus> bus, and the FIQ
+      (fast) registers are available on the <bus>fiq-registers</bus> bus.  Typically,
+      one would map the <bus>fiq-registers</bus> with an offset of 0x100 from the
+      <bus>irq-registers</bus>. This allows one to map other devices between these
+      registers.</p>
+
+	<p>
+	  When the <bus>irq-registers</bus> bus is accessed, the appropriate 32-bit
+	  control register is read or written.
+	
+	  <table>
+	    <tr>
+	      <th>
+		address</th>
+	      <th>
+		read</th>
+	      <th>
+		write</th></tr>
+	    <tr>
+	      <td>
+		0</td>
+	      <td>
+		IRQStatus</td>
+	      <td>
+		(reserved)</td></tr>
+	    <tr>
+	      <td>
+		0x4</td>
+	      <td>
+		IRQRawStatus</td>
+	      <td>
+		(reserved)</td></tr>
+	    <tr>
+	      <td>
+		0x8</td>
+	      <td>
+		IRQEnable</td>
+	      <td>
+		IRQEnableSet</td></tr>
+	    <tr>
+	      <td>
+		0xC</td>
+	      <td>
+		(reserved)</td>
+	      <td>
+		IRQEnableClear</td></tr>
+	    <tr>
+	      <td>
+		0x10</td>
+	      <td>
+		(reserved)</td>
+	      <td>
+		IRQSoft</td></tr></table>
+	</p>
+	<p>
+	  When the <bus>fiq-registers</bus> bus is accessed, the appropriate 32-bit
+	  control register is read or written.
+	  
+	  <table>
+	    <tr>
+	      <th>
+		address</th>
+	      <th>
+		read</th>
+	      <th>
+		write</th></tr>
+	    <tr>
+	      <td>
+		0x0</td>
+	      <td>
+		FIQStatus</td>
+	      <td>
+		(reserved)</td></tr>
+	    <tr>
+	      <td>
+		0x4</td>
+	      <td>
+		FIQRawStatus</td>
+	      <td>
+		(reserved)</td></tr>
+	    <tr>
+	      <td>
+		0x8</td>
+	      <td>
+		FIQEnable</td>
+	      <td>
+		FIQEnableSet</td></tr>
+	    <tr>
+	      <td>
+		0xC</td>
+	      <td>
+		(reserved)</td>
+	      <td>
+		FIQEnableClear</td></tr></table>
+	  Several registers are also available as watchable attributes.</p></p>
+    </behavior>
+    <behavior name="interrupt processing">
+      <p>
+	When any interrupt source is signalled, or interrupt-enabled
+	masks are modified, pending interrupts are processed.  There are
+	three interrupt sources: the <pin>interrupt-source-N</pin> input pins,
+	the <pin>fast-interrupt-source</pin> input pin, and the special software
+	interrupt register.  Subject to the then-current
+	interrupt-enabling registers, an <pin>interrupt</pin> and/or
+	<pin>fast-interrupt</pin> output pin may be driven.</p>
+      
+      <p>
+	The polarity for the input interrupt source pins is positive,
+	meaning that non-zero values are interpreted as "asserted".  On
+	the other hand, the polarity for the output interrupt pins is
+	negative, meaning that zero values are to be interpreted as
+	"asserted".</p>
+      
+      <p>
+	Similarly named attributes may be used to generate/monitor pin
+	traffic.</p>
+    </behavior>
+    <convention name="functional" supported="true">
+      <p>
+	This is a functional component.</p>
+    </convention>
+    <convention name="state save/restore" supported="true">
+      <p>
+	This component supports state save/restore</p>
+    </convention>
+    <convention name="triggerpoints">
+      <p>
+	This component supports triggerpoints</p>
+    </convention>
+  </func>
+  <env>
+    <title>
+      Related components</title>
+    <p>
+      The interrupt controller typically sits between a CPU component, which 
+      usually has only one interrupt pin, and an array of other peripheral 
+      components.  Each of the peripheral components is capable of generating 
+      its own interrupt.  The following configuration file fragment
+      demonstrates how to connect to simple timers into the interrupt
+      subsystem of a more complete simulation:
+      
+      <code>	new hw-cpu-arm7t cpu
+	new hw-timer-arm/ref-nosched timer1
+	new hw-timer-arm/ref-nosched timer2
+	new hw-interrupt-arm/ref intcontrl
+        connect-pin timer1 interrupt -&gt; intcontrl interrupt-source-0
+	connect-pin timer2 interrupt -&gt; intcontrl interrupt-source-1
+	connect-pin intcontrl interrupt -&gt; cpu nirq</code></p>
+  </env>
+  <refs>
+    <a href="http://www.arm.com/Documentation/UserMans/rps/#int" type="url">
+      ARM Technical Documentation</a>
+  </refs>
+</defcomplib>

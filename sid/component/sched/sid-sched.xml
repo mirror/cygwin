@@ -1,0 +1,204 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libsched.la" dlsym="sched_component_library">
+  <defcomponent name="sid-sched" type="abstract">
+
+
+    <!-- pins -->
+    <defpin name="advance" direction="in" legalvalues="any" behaviors="advancing" />
+    <defpin name="yield" direction="in" legalvalues="any" behaviors="advancing" />
+    <defpin name="N-event" direction="out" legalvalues="no value" behaviors="advancing" />
+    <defpin name="N-control" direction="in" legalvalues="coded value" behaviors="subscription" />
+    <defpin name="time-query" direction="in" legalvalues="any" behaviors="timing" />
+    <defpin name="time-high" direction="out" legalvalues="high order 32 bits of 64-bit value" behaviors="timing" />
+    <defpin name="time-low" direction="out" legalvalues="low order 32 bits of 64-bit value" behaviors="timing" />
+
+
+    <!-- attributes -->
+    <defattribute name="state-snapshot" category="no category" legalvalues="opaque string" behaviors="state save/restore" />
+    <defattribute name="num-clients" category="setting" legalvalues="numeric" defaultvalue="'0'" behaviors="configuration" />
+    <defattribute name="N-regular?" category="setting" legalvalues="boolean" defaultvalue="'0'" behaviors="subscription" />
+    <defattribute name="N-time" category="setting" legalvalues="numeric" defaultvalue="'0'" behaviors="subscription" />
+    <defattribute name="N-scale" category="setting" legalvalues="numeric fraction" defaultvalue="'1'" behaviors="subscription" />
+    <defattribute name="N-event" category="pin" behaviors="advancing" />
+    <defattribute name="N-control" category="pin" behaviors="subscription" />
+    <defattribute name="advance" category="pin" behaviors="advancing" />
+    <defattribute name="yield" category="pin" behaviors="advancing" />
+    <defattribute name="enabled?" category="setting" legalvalues="boolean" defaultvalue="'1'" behaviors="advancing" />
+    <defattribute name="yield-host-time?" category="setting" legalvalues="boolean" defaultvalue="'0'" behaviors="timing" />
+    <defattribute name="step-cycle-limit" category="setting" legalvalues="numeric" defaultvalue="advancing" />
+    <defattribute name="time" category="register" legalvalues="numeric" defaultvalue="timing" />
+    <defattribute name="advance-count" category="register" legalvalues="numeric" defaultvalue="advancing" />
+
+    <variants>
+      <defcomponent name="sid-sched-sim" type="concrete" /> 
+      <defcomponent name="sid-sched-host" type="concrete" /> 
+      <defcomponent name="sid-sched-host-accurate" type="concrete" /> 
+    </variants>
+    
+  </defcomponent>
+  <synop>
+  These components manage multiple signal schedules.
+  </synop>
+  <func>
+    <modelling>
+      <p> These components function as general purpose signal
+      schedulers.  They approximately correspond to a collection of
+      programmable clock dividers.
+      </p>
+
+      <p>The number of controllable outputs ("subscriptions") is a
+      matter of configuration.</p>
+
+      <p>The three component types are identical, except in their
+      notions of <attribute>time</attribute>.  See the Timing section below.</p>
+
+    </modelling>
+
+    <behavior name="configuration">
+      <p>When the <attribute>num-clients</attribute> is written-to, this component adjusts
+      its list of scheduler clients.  Each "client" corresponds to a
+      set of "N-" pins and attributes, with its own signalling
+      schedule.</p>
+    </behavior>
+
+    <behavior name="timing">
+      <p> There is no global concept of simulation time in sid.
+      Instead, each scheduler instance maintains its own notion of
+      <attribute>time</attribute>.
+      </p>
+
+      <p>
+	A <component>sid-sched-sim</component> scheduler maintains a 64-bit integer as a
+	time counter.  When advancing, this <attribute>time</attribute> counter is set to
+	jump forward to the earliest of the upcoming subscribed
+	signals.  This way, it represents the clock of a traditional
+	event-driven simulator.  </p>
+
+      <p> The <component>sid-sched-host</component> and <component>sid-sched-host-accurate</component>
+      schedulers use a millisecond-precision timer of the host
+      operating system.  Its <attribute>time</attribute> is simply that of the operating
+      system.  When advancing, there may be no scheduled events due,
+      even though there may be scheduled events.  In such a case, if
+      the <attribute>yield-host-time?</attribute>  attribute is set to <tt>1</tt>, a host-time
+      scheduler will yield some amount of time to the host operating
+      system using a function like usleep().
+      </p>
+
+      <p> The <pin>time-query</pin> pin, when driven, causes a scheduler to
+      signal its current 64-bit <attribute>time</attribute> back, in two 32-bit halves, on
+      the <pin>time-high</pin>, then <pin>time-low</pin> pins.  Similarly, the <attribute>time</attribute>
+      attribute may be accessed to get/set the scheduler's time.  
+      </p>
+      </behavior>
+
+    <behavior name="subscription">
+      <p> The scheduler maintains a number of "subscriptions".  Each
+      subscription represents a request to provide a series of
+      recurring "regular" signals, or a single-shot "irregular"
+      signal, some time in the simulation's future.  Each subscription
+      has an associated set of pins and attributes to control it.
+      </p>
+
+      <p> Each subscription is defined by an index, a
+      regular-vs-irregular flag, and a time quantity.  The index is a
+      number between 0 and <attribute>num-clients</attribute> -1, and is represented as <tt>N</tt>
+      in the pin/attribute list templates in this document.  The
+      regular-vs-irregular flag is accessible as the <attribute>N-regular?</attribute> 
+      attribute.  The time quantity is accessible as the <attribute>N-time</attribute>
+      attribute.  If the value is zero, it is interpreted as a request
+      to cancel all pending events for this subscription.  Otherwise,
+      the value is taken to be a delta until the <attribute>time</attribute> of the
+      requested event.
+      </p>
+
+      <p> You can also set these controls by driving encoded values
+      into the <pin>N-control</pin> pin.  The top bit is interpreted as the
+      regular-vs-irregular flag (1: regular, 0:irregular), and the
+      remaining bits as the delta <attribute>time</attribute> value.  If the delta is zero,
+      events for this subscription are cancelled.
+      </p>
+
+      <p> In each case, the time value sent is multiplied by a scale
+      before being merged into the master schedule.  The scaling value
+      is available on the <attribute>N-scale</attribute> attribute, and may be specified as
+      a plain number, or as a fraction of two numbers (e.g., <tt>1/5</tt>).
+      </p>
+    </behavior>
+
+    <behavior name="advancing">
+      <p> When you have disabled the scheduler by setting the
+      <attribute>enabled?</attribute>  attribute to 0, advancing as described below, does
+      not occur.
+      </p>
+
+      <p> Whenever the <pin>advance</pin> input pin is driven, the scheduler
+      may dispatch one or more signals by driving the <pin>N-event</pin> output
+      pins with some value.  A counter accessed by the <attribute>advance-count</attribute>
+      attribute is incremented.
+      </p>
+
+      <p> Whether any particular <pin>N-event</pin> pin is driven depends on
+      the subscription associated with that pin, and the passage of
+      that scheduler's <attribute>time</attribute>.  All events that are due "now", or that
+      are overdue are dispatched.
+      </p>
+
+      <p> If there are multiple due or overdue events, the scheduler
+      may loop over the pending event up to <attribute>step-cycle-limit</attribute> number
+      of times, as an optimization.  This loop may be aborted early if
+      the <pin>yield</pin> input pin is driven.
+      </p>
+
+    </behavior>
+
+    <convention name="functional" supported="true" />
+    <convention name="save/restore" supported="true" />
+    <convention name="triggerpoints" supported="false"/>
+    <convention name="inhibit-recursion" supported="true">
+      <p> It prevents harmful recursion on the <pin>advance</pin> input pin.</p>
+    </convention>
+    <convention name="category" supported="true">
+      <p>It presents attributes in the <tt>pin</tt>, <tt>register</tt> and <tt>setting</tt> categories.</p>
+    </convention>
+
+  </func>
+  <env>
+  <title>Related components</title>
+
+    <p>Schedulers may be nested, though normally they are advanced via the
+      top level event source (sid-control-cfgroot).</p>
+<code>
+	new sid-sched-sim target-sched
+        new sid-sched-host host-sched
+	new SOME_KIND_OF_CPU cpu
+	set target-sched num-clients 1
+	connect-pin main perform-activity -> target-sched advance
+	connect-pin main perform-activity -> host-sched advance
+	connect-pin target-sched 0-event -> cpu step!
+	set target-sched 0-regular? 1 
+	set target-sched 0-time 50 
+
+</code>
+  <title>Performance</title>
+
+    <p> These schedulers use data structures and algorithms that attempt
+      to be efficient for large number of event subscriptions.</p>
+
+     <p>The <component>sid-sched-host-accurate</component> variety attempts to be accurate to
+      1 ms, but this requires many more host OS system calls and
+      therefore slows down the simulation.  The basic <component>sid-sched-host</component>
+      type of scheduler attempt to be accurate to only 25 ms.  It does 
+      this by frequently estimating the host time by adaptive extrapolation.</p>
+
+    <title>High level interface</title>
+    <p>
+          See the <tt>&lt;sidschedutil.h&gt;</tt> header file for optional utility
+      classes.  These use the low level interface below to manage a
+      scheduler subscription, or to get scheduler <attribute>time</attribute>.
+    </p>
+
+  </env>
+</defcomplib>
+

@@ -1,0 +1,107 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="none" dlsym="hw-visual-display">
+  <defcomponent name="hw-visual-lcd" type="concrete">
+
+
+    <!-- pins -->
+    <defpin name="FR" direction="in" legalvalues="binary" behaviors="display" />
+    <defpin name="row-col" direction="in" legalvalues="2 shorts as a 32-bit value" behaviors="display" />
+
+
+    <!-- attributes -->
+    <defattribute name="width" category="setting" legalvalues="any positive value" defaultvalue="20*8*4 = 480" behaviors="configuration" />
+    <defattribute name="height" category="display" legalvalues="any positive value" defaultvalue="4*8*4 = 128" behaviors="configuration" />
+    <defattribute name="bits-per-pixel" category="setting" legalvalues="any positive value" defaultvalue="4" behaviors="configuration" />
+    <defattribute name="background-color" category="setting" legalvalues="any legal tk color specifier" />
+  </defcomponent>
+  <synop>
+  Simulates a dot matrix LCD display, using Tcl/Tk to manage the graphics 
+  window
+  </synop>
+  <func>
+    <modelling>
+      <p> The LCD display model is somewhat abstracted from the
+      physical device:</p>
+
+      <ul>
+
+	<li>
+	  <p> A real display typically has separate <tt>row</tt> and
+	  <tt>column</tt> pins that are cycled to select each pixel in
+	  the display. These are replaced by 2 pins in the model. The
+	  <pin>FR</pin> (frame) pin is driven to 1 to identify that a
+	  new frame is starting, and driven to 0 when the frame is
+	  finished. The <pin>row-col</pin> pin incorporates all of the
+	  functionality of the row and column drivers on the real
+	  chip. This pin is driven once for each "on" pixel in the
+	  display.  The value on the pin is the [X,Y] co-ordinates of
+	  the pixel, encoded as two adjacent 16-bit values in the
+	  32-bit pin value.</p>
+
+	  <p>The two pins are used to initiate and terminate a display
+	  refresh cycle.  A display refresh cycle starts when the
+	  <pin>FR</pin> pin is asserted; the [X,Y] co-ordinates of all
+	  the "on" pixels are then transmitted on the
+	  <pin>row-col</pin> pin; and the <pin>FR</pin> pin is
+	  de-asserted to end the refresh cycle. </p>
+	</li>
+	
+	<li>
+	  <p>The physical device must be refreshed periodically, but
+	  the model retains its last written values
+	  indefinitely.</p>
+	</li>
+      </ul>
+    </modelling>
+
+    <behavior name="configuration">
+      <p>The window geometry is specified in SCREEN pixels via the
+      width and depth attributes. Each pixel in the simulated display
+      occupies a box of <attribute>bits-per-pixel</attribute> by
+      <attribute>bits-per-pixel</attribute> screen
+      pixels. <attribute>bits-per-pixel</attribute> is also a settable
+      attribute, and defaults to a 4X4 box. Thus, the number of
+      simulated rows is
+      <tt><attribute>depth</attribute>/<attribute>bits-per-pixel</attribute></tt>;
+      and the number of simulated columns is
+      <tt><attribute>width</attribute>/<attribute>bits-per-pixel</attribute></tt>.</p>
+
+      <p>While "on" pixels are currently always drawn as black, the background
+      color of the simulated display can be specified using the standard Tcl/Tk
+      color specification syntax (eg. <tt>#6fa700</tt> or <tt>white</tt>). This color is 
+      specified with the <attribute>background-color</attribute> attribute.</p>
+    </behavior>
+
+    <behavior name="display">
+      <p>See discussion of the <pin>FR</pin> and <pin>row-col</pin> pins in Modeling section
+      above</p>
+    </behavior>
+
+
+    <convention name="functional" supported="true" />
+    <convention name="save/restore" supported="false" />
+    <convention name="triggerpoints" supported="false" />
+  </func>
+
+  <env>
+    <title>Related components</title>
+    <p>The LCD display is typically connected to a controller via the tk-bridge.
+      The following configuration file segment shows how the HD44780U LCD 
+      controller can be connected to the hw-visual-lcd display:</p>
+    <code>
+      new hw-lcd-hd44780u-a00 lcd	# Standard Japanese font
+      new hw-visual-lcd display		# instantiate the display
+      
+      # display size is in pixels - ie. font-width*display-height
+      set display width 40		# 8 chars X 5 pixels per char
+      set display height 8		# single line of 8 pixels
+
+      # connect the LCD to the display
+      connect-pin lcd row-col -&gt; display row-col
+      connect-pin lcd FR -&gt; display FR
+
+    </code>
+  </env>
+</defcomplib>

@@ -1,0 +1,183 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libt6963c.la" dlsym="t6963c_component_library">
+  <defcomponent name="hw-lcd-t6963c" type="abstract">
+
+
+    <!-- pins -->
+    <defpin name="FR" direction="out" legalvalues="binary" behaviors="display" />
+    <defpin name="row-col" direction="out" legalvalues="2 shorts as a 32-bit value" behaviors="display" />
+
+
+    <!-- buses -->
+    <defbus name="bus" addresses="0..1" accesses="byte-wide access" />
+
+
+    <!-- accessors -->
+    <defaccessor name="external-ram" accesses="0..0xffff" behaviors="byte-wide read/write" />
+
+
+    <!-- attributes -->
+    <defattribute name="refresh-period-msec" category="setting" legalvalues="any positive value" defaultvalue="500" behaviors="configuration" />
+    <defattribute name="display-width" category="setting" legalvalues="32, 40, 64, 80" defaultvalue="80" behaviors="configuration" />
+    <defattribute name="display-height" category="setting" legalvalues="2, 4, 6, ... 16" defaultvalue="16" behaviors="configuration" />
+    <defattribute name="font-width" category="setting" legalvalues="5, 6, 7, 8" defaultvalue="8" behaviors="configuration" />
+    
+    <variants>
+      <defcomponent name="hw-lcd-t6963c-0101">
+      </defcomponent>
+      <defcomponent name="hw-lcd-t6963c-0201">
+      </defcomponent>
+    </variants>
+  </defcomponent>
+  <synop>
+    <p>
+      Simulates the Toshiba T6963C LCD controller. The controller supports display
+      sizes from 32 to 80 columns and from 2 to 32 lines. The fonts may also be
+      varied from 5X8 dots to 8X8 dots. The chip supports an external display RAM
+      of up to 64 Kbytes. This RAM may be arbitrarily configured between text and
+      graphics, and attributes such as blink and reverse can be specified on a per
+      character basis. The chip comes with a 128 character ROM of predefined fonts.
+      Two ROMS are available: hw-lcd-t6963c-0101 specifies the European standard 
+      font; hw-lcd-t6963c-0201 is the Japanese standard font.</p>
+  </synop>
+  <func>
+    <modelling>
+      <p>
+	<p>
+	  The LCD controller model is somewhat abstracted from the physical device:</p>
+	<ul>
+	  <li>
+	    <p>
+	      All commands in the model are executed instantaneously, while the real
+	      device requires significant time to execute a command. As a result, the
+	      status flag in the model always shows "ready".</p></li>
+	  <li>
+	    <p>
+	      The real device has a number of shift/latch pins that are used to drive
+	      the display. These are replaced by 2 pins in the model. The
+	      <pin>FR</pin> (frame) 
+	      pin is driven to 1 to identify that a new frame is starting, and driven 
+	      to 0 when the frame is finished. The
+	      <pin>row-col</pin> pin is driven once for each
+	      "on" pixel in the display, and the value on the pin is the [X,Y] co-
+	      ordinates of the pixel, encoded as two adjacent 16-bit values in the 
+	      32-bit pin value.</p>
+	    
+	    <p>
+	      With these two pins, a display refresh cycle starts when the
+	      <pin>FR</pin> pin is
+	      asserted; the [X,Y] co-ordinates of all the "on" pixels are then 
+	      transmitted on the
+	      <pin>row-col</pin> pin; and the
+	      <pin>FR</pin> pin is de-asserted to end 
+	      the refresh cycle.</p></li>
+	  <li>
+	    <p>
+	      The physical device uses an external crystal to set the duty cycle.
+	      The model uses the refresh-period-msec attribute to communicate with
+	      the scheduler to set the refresh rate.</p>
+	    <p>
+	      To reduce system overhead, the model tries to reduce its interaction
+	      with the scheduler and display. Specifically, a single refresh cycle is 
+	      initiated if there is a write to the component, to capture any internal
+	      state changes that may affect the display. Because several writes are
+	      often required to effect a meaningful change, the refresh is delayed to
+	      occur refresh-period-msec milliseconds after the first write. As well,
+	      the refresh is continued periodically if blink is enabled.</p></li>
+	  <li>
+	    <p>
+	      The physical device uses a number of pins to set the display geometry
+	      (MDS, MD0-3) and font width (FS0-1). The model uses the display-width,
+	      display-height, and font-width attributes to set these parameters.</p></li>
+	  <li>
+	    <p>
+	      Screen Peek and Screen Copy are not (currently) supported.</p></li>
+	  <li>
+	    <p>
+	      Dual-Scan is not (currently) supported.</p></li></ul></p>
+    </modelling>
+    <behavior name="configuration">
+      <p>
+	refresh-period-msec: used specify the refresh period (in milliseconds)
+	for continuous update modes such as blink.</p>
+      <p>
+	display-width: specifies the number of columns in pixels. Legal values
+	are those that can be represented by the MD2-MD3 pins on the real chip.</p>
+      <p>
+	display-height: specifies the number of rows in characters (each 
+	each character is 8 pixels high). Legal values correspond to the 
+	single-scan (ie. non-DUAL mode) values that can be represented by the 
+	MDS, MD0, and MD11 pins on the real chip.</p>
+      <p>
+	font-width: specifies the width of each character in pixels.
+	Corresponds to the values specifiable by the FS0-1 pins on the real chip.</p>
+    </behavior>
+    <behavior name="display">
+      <p>
+	See discussion of the FR and row-col pins in Modeling section above</p>
+    </behavior>
+    <convention name="functional" supported="true">
+      <p>
+	This is a functional component</p>
+    </convention>
+    <convention name="Save/restore" supported="true">
+      <p>
+	Save/restore is supported via the state-snapshot attribute</p>
+    </convention>
+    <convention name="Trigger point">
+      <p>
+	Trigger point support is available on the following registers:
+	SR, X-ADRS, Y-ADRS, Offset, ADP, TH, GH, TA, and GA.</p>
+    </convention>
+  </func>
+  <env>
+    <p>
+    <title>
+      Related components</title>
+    <p>
+      The T6963C requires an external memory for its display RAM. This RAM
+      can be any size up to 64KBytes. Besides the memory (and CPU bus), the 
+      LCD controller is usually connected to a display of some kind. Clearly,
+      the display component must be aware of the refresh protocol used by the 
+      T6963C model. Finally, the scheduler is typically used to set up the 
+      time between refreshes of the display.</p>
+    <p>
+      The following configuration file segment shows how the LCD controller
+      can be connected to 64K external RAM, the tcl based display, and the 
+      host-time scheduler:
+      
+      <code>      new hw-lcd-t6963c-0101 lcd	# Standard European font
+      new hw-visual-lcd display		# The display is implemented in Tcl
+      new sid-sched-host sched		# Use the real-time scheduler
+      
+      # scheduling (must appear before pin assignments)
+      set sched num-clients 1
+      set sched 0-regular? 1
+      set sched 0-time 500		# in msec
+
+      # display size is in pixels - ie. font-width*display-height
+      set display width 160		# 20 chars X 8 pixels per char
+      set display height 48		# 6 lines of 8 pixels per line
+
+      # lcd geometry values must match allowed pin settings
+      set lcd display-width 32		# 32 chars (closest to 20)
+      set lcd display-height 6		# 6 rows/lines
+
+      # connect the LCD to the scheduler
+      connect-pin sched 0-event -&gt; lcd refresh-sync-event
+      connect-pin sched 0-control &lt;- lcd refresh-sync-control
+      # connect the LCD to the display
+      connect-pin lcd row-col -&gt; display row-col
+      connect-pin lcd FR -&gt; display FR
+
+      # connect external display ram
+      new hw-memory-ram/rom-basic d-ram
+      set d-ram size 65535
+      connect-bus lcd external-ram d-ram read-write-port</code></p></p>
+  </env>
+  <refs>
+    T6963C Dot Matrix LCD Control LSI (from the Toshiba web site)
+  </refs>
+</defcomplib>

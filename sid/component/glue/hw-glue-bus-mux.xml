@@ -1,0 +1,103 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libglue.la" dlsym="glue_component_library">
+  <defcomponent name="hw-glue-bus-mux" type="concrete">
+
+
+    <!-- buses -->
+    <defbus name="upstream" addresses="unrestricted" accesses="unrestricted" behaviors="bus traffic" />
+
+
+    <!-- accessors -->
+    <defaccessor name="downstream1" accesses="unrestricted" behaviors="bus traffic" />
+    <defaccessor name="downstream2" accesses="unrestricted" behaviors="bus traffic" />
+
+
+    <!-- pins -->
+    <defpin name="switch" direction="in" legalvalues="0 or non-zero" behaviors="switching" />
+
+
+    <!-- attributes -->
+    <defattribute name="switch" category="pin" behaviors="switching" />
+  </defcomponent>
+  <synop>
+    <p>
+      This component provides switchable access from one bus to two separate
+      accessors.</p>
+  </synop>
+  <func>
+    <modelling>
+      <p>
+	This component is a bus multiplexer with one input bus, two
+	output accessors, and a switch to alternate between them.</p>
+    </modelling>
+    <behavior name="initialization">
+      <p>
+	At start-up, the single input bus, "upstream", is tied by default
+	to "downstream1".</p>
+    </behavior>
+    <behavior name="switching">
+      <p>
+	When the
+	<pin>switch</pin> pin is driven with the value 0, the output accessor
+	will be
+	<accessor>downstream1</accessor>. When the
+	<pin>switch</pin> pin is driven with the value 1,
+	the output accessor will be
+	<accessor>downstream2</accessor>.
+	The
+	<pin>switch</pin> pin can be driven any number of times, each time
+	causing the corresponding output to be selected.
+	If the
+	<pin>switch</pin> pin is driven with a value other than 0 or 1, then
+	subsequent accesses to the input bus,
+	<bus>upstream</bus>, will return
+	sid::bus::unmapped.
+      </p>
+    </behavior>
+    <behavior name="bus traffic">
+      <p>
+	Input to the
+	<bus>upstream</bus> bus is passed on to the current
+	output accessor: either
+	<accessor>downstream1</accessor> or
+	<accessor>downstream2</accessor>.</p>
+    </behavior>
+    <convention name="functional" supported="true">
+      <p>
+	This is a functional component.</p>
+    </convention>
+    <convention name="presentation" supported="true">
+      <p>
+	This component presents one attribute in the "pin" category.</p>
+    </convention>
+  </func>
+  <env>
+    <p>
+      <title>
+	Related components</title>
+      <p>
+	This component may be used as to implement a multiplexer by
+	combining two bus-mux components with the same accessors in the
+	opposite order.  For example:
+	
+	<code>	new hw-glue-bus-mux bus-mux1
+	new hw-glue-bus-mux bus-mux2
+        connect-bus cpu data-memory-x bus-mux1 upstream
+        connect-bus coprocessor data-memory-x bus-mux2 upstream
+        connect-bus bus-mux1 downstream1 data-memory-x1 read-write-port
+        connect-bus bus-mux1 downstream2 data-memory-x2 read-write-port
+        connect-bus bus-mux2 downstream1 data-memory-x2 read-write-port
+        connect-bus bus-mux2 downstream2 data-memory-x1 read-write-port
+	connect-pin cpu memory-x-ctl bus-mux1 switch
+        connect-pin cpu memory-x-ctl bus-mux2 switch</code></p>
+    </p>
+  </env>
+</defcomplib>
+
+
+
+
+
+

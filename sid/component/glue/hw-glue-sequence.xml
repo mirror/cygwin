@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libglue.la" dlsym="glue_component_library">
+  <defcomponent name="hw-glue-sequence" type="abstract">
+
+    <!-- pins -->
+    <defpin name="input" direction="in" legalvalues="any" behaviors="data forwarding" />
+    <defpin name="output-NNN" direction="out" legalvalues="any" behaviors="data forwarding" />
+
+    <!-- attributes -->
+    <defattribute name="state-snapshot" category="no category" legalvalues="opaque string" behaviors="state save/restore" />
+    <defattribute name="num-outputs" category="setting, watchable" legalvalues="small positive number" defaultvalue="0" behaviors="configuration" />
+    <defattribute name="input" category="pin, watchable" behaviors="data forwarding" />
+    <variants>
+      <defcomponent name="hw-glue-sequence-1">
+      </defcomponent>
+      <defcomponent name="hw-glue-sequence-2">
+      </defcomponent>
+      <defcomponent name="hw-glue-sequence-8">
+      </defcomponent>
+    </variants>
+  </defcomponent>
+  <synop>
+    <p>
+      This component family distributes pin signals from a source to a sequence 
+      of sinks.</p>
+  </synop>
+  <func>
+    <modelling>
+      <p>
+	<ul>
+	  <li>
+	    This component resembles a fan-out net in a circuit, or a very fast
+	    shift register.</li>
+	  <li>
+	    The number of outputs is a matter of configuration.  For the <tt>-1</tt>, <tt>-2</tt>,
+	    and <tt>-8</tt> family members, the num-outputs is initialized.</li></ul></p>
+    </modelling>
+    <behavior name="configuration">
+      <p>
+	When the <attribute>num-outputs</attribute> is written-to, this
+	component adjusts its list of output pins, named output-0,
+	output-1, and so on.  New ones may be generated or old ones may
+	disappear.</p>
+    </behavior>
+    <behavior name="data forwarding">
+      <p>
+	Each input signal on the <pin>input</pin> pin is forwarded to
+	all external pins connected to the output-0 pin, then
+	output-1, and so on, in sequence, for all configured outputs.</p>
+    </behavior>
+    <convention name="functional" supported="true">
+      <p>
+	This is a functional component.</p>
+    </convention>
+    <convention name="state save/restore" supported="true">
+      <p>
+	This component supports state save/restore, though state is minimal (the number 
+	of outputs).</p>
+    </convention>
+    <convention name="triggerpoints" supported="true">
+      <p>
+	This component supports triggerpoints by watching the input pin and the 
+	<attribute>num-outputs</attribute> attribute.</p>
+    </convention>
+    <convention name="Recursion Control" supported="true">
+      <p>
+	This component limits recursion on the <pin>input</pin> pin.</p>
+    </convention>
+    <convention name="presentation" supported="true">
+      <p>
+	This component presents attributes in the <name>pin</name>, <name>setting</name>, and <name>watchable</name> categories.</p>
+    </convention>
+  </func>
+  <env>
+    <p>
+      <title>
+	Related components</title>
+      <p>
+	This component may be used as an initialization sequencer in a
+	scenario with ordering dependencies.  See this configuration fragment:
+	
+	<code>	new hw-glue-sequence reset-manager
+	new SOME_KIND_OF_CPU cpu
+	new SOME_KIND_OF_LOADER loader
+	set reset-manager num-outputs 3
+	connect-pin reset-manager input &lt;- main running
+	connect-pin reset-manager output-0 -&gt; cpu reset
+	connect-pin reset-manager output-1 -&gt; loader load!</code></p>
+      <p>
+	It could be used as a central point to distribute a many-to-many
+	broadcast signal.</p></p>
+  </env>
+</defcomplib>
+

@@ -1,0 +1,179 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libmemory.la" dlsym="mem_component_library">
+
+  <defcomponent name="hw-memory-ram/rom-basic" type="concrete">
+
+    <defbus name="read-only-port" addresses="0..size-1" accesses="any access" behaviors="reading/writing"/>
+    <defbus name="read-write-port" addresses="0..size-1" accesses="any access" behaviors="reading/writing"/>
+
+    <defattribute name="size" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="configuration"/>
+    <defattribute name="size-max" category="setting" legalvalues="numeric" defaultvalue="fixed at 32MB" behaviors="configuration"/>
+    <defattribute name="image-file" category="setting" legalvalues="filename" behaviors="image save/load"/>
+    <defattribute name="image-load" category="pin" legalvalues="any" behaviors="image save/load"/>
+    <defattribute name="image-store" category="pin" legalvalues="any" behaviors="image save/load"/>
+    <defattribute name="read-latency" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="memory latency"/>
+    <defattribute name="write-latency" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="memory latency"/>
+    <defattribute name="state-snapshot" category="state" legalvalues="opaque string" behaviors="state save/restore"/>
+
+    <defpin name="image-load" direction="in" legalvalues="any" behaviors="image save/load"/>
+    <defpin name="image-store" direction="in" legalvalues="any" behaviors="image save/load"/>
+    <defpin name="image-mmap" direction="in" legalvalues="any" behaviors="image mmap"/>
+    <defpin name="image-msync" direction="in" legalvalues="any" behaviors="image mmap"/>
+    <defpin name="error" direction="out" legalvalues="any" behaviors="error indication"/>
+
+  </defcomponent>
+
+  <synop>
+  This is a general-purpose byte-addressable RAM or ROM.  Its contents
+  may be primed with existing data from a file.  The size of the
+  memory may be altered at any time.
+  </synop>
+
+  <func>
+    <modelling>
+      <p>
+      This component does not model any particular hardware component.
+      It models a generic memory without any access delays.
+      </p>
+    </modelling>
+
+    <behavior name="configuration">
+      <p>
+      When the <attribute>size</attribute> attribute is written-to
+      with a legal value, a new cleared byte array is allocated with
+      the new size.  The old byte array is thrown away.  The
+      <attribute>size-max</attribute> read-only attribute supplies to
+      the user the maximum size that this component will attempt to
+      allocate.  (Larger memory banks may be modelled by using
+      multiple instances of this component.)
+      </p>
+    </behavior>
+
+    <behavior name="image save/load">
+      <p>
+      When the <pin>image-load</pin> pin is driven, this component
+      will open and attempt to load the contents of the file given by
+      the <attribute>image-file</attribute> attribute into the memory
+      image.  The file is copied byte-for-byte.  If the file is too
+      short, zeroes are used to fill out the rest of the memory.  </p>
+
+      <p>
+      Similarly, when the <pin>image-store</pin> pin is driven, the
+      component will write to the <pin>image-file</pin> file a
+      byte-for-byte dump of the entire memory image.
+      </p>
+    </behavior>
+   
+    <behavior name="image mmap">
+      <p>
+      As an alternative to the batch image load/store function, when
+      the <pin>image-mmap</pin> pin is driven, the component will map
+      into memory the first <attribute>size</attribute> bytes of
+      <attribute>image-file</attribute>.  It is mapped in
+      <tt>MAP_SHARED</tt>, <tt>PROT_READ|PROT_WRITE</tt> mode.
+      Additionally, when the <pin>image-msync</pin> pin is driven, the
+      msync system call is invoked to force a synchronization between
+      the physical file and the memory image.
+      </p>
+
+      <p>
+      The file will be unmapped when the component is deleted, or when
+      the <attribute>size</attribute> attribute is written to.  State
+      save/restore stores the content of the mapped memory buffer, not
+      the mapped-ness.
+      </p>
+    </behavior>
+
+    <behavior name="error indication">
+      <p>
+      When operating system errors prevent some configuration-related
+      action from succeeding, the <pin>error</pin> output pin is
+      driven.  Reasons may include attempting to access nonexistent
+      files, out-of-memory conditions, permission problems, and so on.
+      It is advantageous to configure the connection from this pin to
+      some system-wide recepient before failure-prone component
+      configuration occurs.
+      </p>
+    </behavior>
+
+    <behavior name="memory latency">
+      <p>
+      The component models the effects of memory latency.  The
+      <attribute>read-latency</attribute> and
+      <attribute>write-latency</attribute> values specify the
+      latencies for memory reads and writes, respectively.
+      </p>
+    </behavior>
+
+    <behavior name="reading/writing">
+      <p>
+      When an access is received on either the
+      <bus>read-only-port</bus> or <bus>read-write-port</bus> bus, the
+      component checks the incoming address.  If it is an in-range
+      read access, it will be carried out.  If it is a write access,
+      it will be prevented through the <bus>read-only-port</bus>.
+      </p>
+
+      <p>
+      There are no restrictions on access alignment or size imposed by
+      this model.
+      </p>
+    </behavior>
+
+    <convention name="functional" supported="true"/>
+    <convention name="latency" supported="true">
+      The component models memory latency.
+    </convention>
+    <convention name="save/restore" supported="true">
+      The component supports saving and restoring state in addition to
+      memory persistence, via the image-store pin/attribute.
+    </convention>
+    <convention name="triggerpoints" supported="false" />
+  </func>
+  <env>
+
+    <title>Related components</title>
+
+    <p>
+      It is most likely that this component will be used as the main
+      memory for a CPU and connected through a mapper component such
+      as hw-mapper-basic.
+    </p>
+
+    <p>
+    A configuration file fragment appears below:
+    </p>
+    <code>
+	new hw-mapper-basic bus
+	new hw-cpu-arm7t cpu
+	new hw-memory-ram/rom-basic mem
+	# error indication
+	connect-pin mem error -> main stop!
+	set mem size 65536
+	connect-bus cpu insn-memory bus access-port
+	connect-bus cpu data-memory bus access-port
+	connect bus [0-65535] mem read-write-port
+	# a read-only shadow in high memory
+	connect-bus [400000,465535] mem read-only-port
+    </code>
+
+    <title>Host system</title>
+    
+    <p>
+    The memory is modelled as a contiguous array of bytes in host
+    memory.  As such, a component configured for 8MB of memory
+    requires 8MB of host memory.  This is an important consideration
+    for simulations running on machines with low memory or on busy
+    multiuser systems.  Similarly, when a memory image is written to
+    disk, the same amount of space may be used there.</p>
+
+    <p>
+    When using memory mapped files, the host's virtual memory system
+    may reduce physical RAM requirements considerably.
+    </p>
+
+  </env>
+</defcomplib>
+

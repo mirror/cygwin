@@ -1,0 +1,138 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libparport.la" dlsym="parport_component_library">
+  <defcomponent name="hw-parport-ps/2" type="concrete">
+    <!-- pins -->
+    <defpin name="STROBE" direction="out" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defpin name="AUTOFDXT" direction="out" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defpin name="SLCTIN" direction="out" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defpin name="INIT" direction="out" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defpin name="INTP" direction="out" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defpin name="ERROR" direction="in" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defpin name="SLCT" direction="in" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defpin name="PE" direction="in" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defpin name="ACK" direction="in" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defpin name="BUSY" direction="in" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defpin name="INTSEL" direction="in" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defpin name="BIDEN" direction="in" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defpin name="RESET" direction="in" legalvalues="any" behaviors="reset" />
+    <defpin name="PD0..PD7" direction="inout" legalvalues="0, 1" behaviors="parallel i/o" />
+
+
+    <!-- buses -->
+    <defbus name="Bus" addresses="0x00 - 0x02" accesses="byte-wide-access only" behaviors="register access" />
+
+
+    <!-- attributes -->
+    <defattribute name="STROBE" category="pin" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defattribute name="AUTOFDXT" category="pin" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defattribute name="SLCTIN" category="pin" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defattribute name="INIT" category="pin" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defattribute name="INTP" category="pin" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defattribute name="ERROR" category="pin" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defattribute name="SLCT" category="pin" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defattribute name="PE" category="pin" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defattribute name="ACK" category="pin" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defattribute name="BUSY" category="pin" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defattribute name="INTSEL" category="pin" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defattribute name="BIDEN" category="pin" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defattribute name="RESET" category="pin" legalvalues="any" behaviors="reset" />
+    <defattribute name="PD0..PD7" category="pin" legalvalues="0, 1" behaviors="parallel i/o" />
+    <defattribute name="PR" category="register" legalvalues="numeric string" behaviors="register access" />
+    <defattribute name="SR" category="register" legalvalues="numeric string" behaviors="register access" />
+    <defattribute name="COM" category="register" legalvalues="numeric string" behaviors="register access" />
+    <defattribute name="CON" category="register" legalvalues="numeric string" behaviors="register access" />
+    <defattribute name="IOSEL" category="register" legalvalues="numeric string" behaviors="register access" />
+    <defattribute name="state-snapshot" legalvalues="opaque string" behaviors="state save/restore" />
+
+  </defcomponent>
+  <synop>
+  <p>This component models a PS/2-style parallel port controller.</p>
+  </synop>
+  <func>
+    <modelling>
+    <p>The PS/2 parallel port controller is a simple 8-bit I/O
+      interface to a printer.  From its origins, the parallel port
+      system has evolved into higher functionality IEEE-1284
+      controllers, but this sid component implements a version of the
+      simple original standard.</p>
+
+    <p>The specific hardware being modelled is the parallel port part
+      of the Exar 16C552 device.</p>
+    </modelling>
+
+    <behavior name="register access">
+
+      <p>Byte-wide operations on the <bus>registers</bus> bus access control
+      registers of the model.  The control registers are also exported
+      as attributes.</p>
+      <table>
+	<tr>	  <td>name</td>            <td>address</td>       <td>values</td>        <td>permitted accesses</td></tr>
+	<tr>      <td>Port</td>		 <td>0x00</td>	       <td>0x00 - 0xFF</td>  <td>read/write</td></tr>
+	<tr>	  <td>IO Select</td>	 <td>0x01</td>	       <td>0x00 - 0xFF</td>  <td>write</td></tr>
+	<tr>	  <td>Control</td>        <td>0x02</td>	       <td>0xC0 - 0xFF</td>  <td>write</td></tr>
+	<tr>	  <td>Status</td>	 <td>0x01</td>	       <td>0x03 - 0xFF</td>  <td>read</td></tr>
+	<tr>	  <td>Command</td>	 <td>0x02</td>	       <td>0xE0 - 0xFF</td>  <td>read</td></tr>
+      </table>
+      </behavior>
+
+    <behavior name="parallel i/o">
+
+      In the default output-only mode, a data byte written to the
+      <attribute>Port</attribute> control register is transmitted bit-by-bit to the
+      PD0..PD7 output pins.  
+     
+      The parallel port controller model may be switched into the
+      input mode by using the appropriate combination of signals on
+      the BIDEN pin, the I/O Select register, and a bit in the Control
+      register.  In this mode, signals driven onto the PD0..PD7 input
+      pins are forwarded to the <attribute>Port</attribute> control register.
+
+      The usual parallel port handshaking signals (STROBE, ACK, ERROR,
+      ERROR, BUSY, PE) are used to carry out the Centronics printer
+      protocol.  The appropriate pins use an "active-low" polarity,
+      which means that zero is interpreted as an asserted signal, and
+      non-zero as a deasserted signal.  Tri-state signals in hardware
+      are not specifically modelled.
+      </behavior>
+
+
+    <behavior name="reset">
+      When the RESET input pin is driven, control registers and pins
+      return to their usual power-on states.
+    </behavior>
+
+    <convention name="functional" supported="true" />
+    <convention name="save/restore" supported="true" />
+    <convention name="triggerpoints" supported="true" />
+
+  </func>
+  <env>
+
+  <title>Related components</title>
+
+    <p>This component is customarily attached to a source of a reset
+      signal.  The PD0..PD7 pins may be connected to simulated
+      switches or indicators as needed.</p>
+
+    <code>
+	new hw-parport-ps/2 pport
+	new hw-cpu-foo cpu
+	new hw-mapper-basic mapper
+	new hw-blinker-light led
+	connect-pin main starting -> pport RESET
+	connect-pin pport INTP -> cpu interrupt
+	connect-pin pport PD0 -> led signal
+	connect-bus mapper [0x3f0-0x3f8,4,1] pport Bus
+    </code>
+  </env>
+
+  <refs>
+    <ul>
+    <li><a href="http://imeg.com/jadtech/ieee.htm">http://imeg.com/jadtech/ieee.htm</a></li>
+    <li><a href="http://www.exar.com/products/st16c552_a.html">http://www.exar.com/products/st16c552_a.html</a></li>
+    </ul>
+  </refs>
+
+</defcomplib>

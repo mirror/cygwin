@@ -1,0 +1,136 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib  SYSTEM "http://sources.redhat.com/sid/component.dtd">
+<defcomplib lib="libhd44780u.la" dlsym="hd44780u_component_library">
+  <defcomponent name="hw-lcd-hd44780u" type="abstract">
+    <defpin name="FR" direction="out" legalvalues="binary" behaviors="display"/>
+    <defpin name="row-col" direction="out" legalvalues="2 shorts as a 32-bit value" behaviors="display"/>
+    <defbus name="bus" addresses="0..1" accesses="byte-wide access"/>
+    <defattribute name="refresh-period-msec" category="setting" legalvalues="any positive value" defaultvalue="500" behaviors="configuration"/>
+    <defattribute name="verbose?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="debug"/>
+    <variants>
+      <defcomponent name="hw-lcd-hd44780u-a00" type="concrete">
+      </defcomponent>
+      <defcomponent name="hw-lcd-hd44780u-a02" type="concrete">
+      </defcomponent>
+    </variants>
+  </defcomponent>
+  <synop>
+    <p>
+      Simulates the Hitachi HD44780U LCD controller. The controller supports
+      1 or 2 lines of 8 5X8 dots with cursor, or 1 line of 8 5X10 dots with cursor.
+      The chip includes an 80 character display RAM, a 64 byte character generator
+      RAM, and a 240 character ROM of predefined fonts. Two ROMS are available: 
+      hw-lcd-hd44780u-a00 specifies the Japanese standard font; hw-lcd-hd44780u-a02
+      is the European standard font.</p>
+  </synop>
+  <func>
+    <modelling>
+      <p>
+	<p>
+	  The LCD controller model is somewhat abstracted from the physical device:</p>
+	<ul>
+	  <li>
+	    <p>
+	      All commands in the model are executed instantaneously, while the real
+	      device requires significant time to execute a command. As a result, the
+	      busy flag in the model is never set.</p></li>
+	  <li>
+	    <p>
+	      The real device has 40 segment driver pins, 16 common driver pins, and
+	      6 more pins related to data and clock. These are replaced by 2(!) pins
+	      in the model. The
+	      <pin>FR</pin> (frame) pin is driven to 1 to identify that a new
+	      frame is starting, and driven to 0 when the frame is finished. The
+	      <pin>row-col</pin> pin incorporates all the functionality of the row and column
+	      drivers on the real chip. This pin is driven once for each "on" pixel
+	      in the display, and the value on the pin is the [X,Y] co-ordinates of
+	      the pixel, encoded as two adjacent 16-bit values in the 32-bit pin value.</p></li>
+	  <li>
+	    <p>
+	      With these two pins, a display refresh cycle starts when the
+	      <pin>FR</pin> pin is
+	      asserted; the [X,Y] co-ordinates of all the "on" pixels are then 
+	      transmitted on the
+	      <pin>row-col</pin> pin; and the FR pin is de-asserted to end 
+	      the refresh cycle.</p></li>
+	  <li>
+	    <p>
+	      The physical device uses an external crystal to set the duty cycle.
+	      The model uses the refresh-period-msec attribute to communicate with
+	      the scheduler to set the refresh rate.</p></li>
+	  <li>
+	    <p>
+	      To reduce system overhead, the model tries to reduce its interaction
+	      with the scheduler and display. Specifically, a single refresh cycle is 
+	      initiated if there is a write to the component, to capture any internal
+	      state changes that may affect the display. Because several writes are
+	      often required to effect a meaningful change, the refresh is delayed to
+	      occur refresh-period-msec milliseconds after the first write. As well,
+	      the refresh is continued periodically if blink is enabled.</p></li></ul></p>
+    </modelling>
+    <behavior name="configuration">
+      <p>
+	The refresh-period-msec attribute is used specify the refresh period
+	(in milliseconds) for continuous update modes such as blink.</p>
+    </behavior>
+    <behavior name="debug">
+      <p>
+	The boolean verbose? attribute can be used to track internal operations</p>
+    </behavior>
+    <behavior name="display">
+      <p>
+	See discussion of the FR and row-col pins in Modeling section above</p>
+    </behavior>
+    <convention name="functional" supported="true">
+      <p>
+	This is a functional component.</p>
+    </convention>
+    <convention name="Save/restore" supported="true">
+      <p>
+	Save/restore is supported via the state-snapshot attribute</p>
+    </convention>
+    <convention name="Triggerpoint" supported="true">
+      <p>
+	Trigger point support is available on the IR, DR, and AC registers.</p>
+    </convention>
+  </func>
+  <env>
+    <p>
+      <title>
+	Related components</title>
+      <p>
+	Besides the CPU bus, the LCD controller is typically connected to a
+	display of some kind. Clearly, the display component must be aware of the
+	refresh protocol used by the HD44780U model. As well, the scheduler is
+	typically used to set up the time between refreshes of the display.</p>
+      
+      <p>
+	The following configuration file segment shows how the LCD controller
+	can be connected to the lcd.tcl display and host-time scheduler:
+      
+	<code>      new hw-lcd-hd44780u-a00 lcd	# Standard Japanese font
+      new hw-visual-lcd display		# The display is implemented in Tcl
+      new sid-sched-host sched		# Use the real-time scheduler
+      
+      # scheduling (must appear before pin assignments)
+      set sched num-clients 1
+      set sched 0-regular? 1
+      set sched 0-time 500		# in msec
+
+      # display size is in pixels - ie. font-width*display-height
+      set display width 40		# 8 chars X 5 pixels per char
+      set display height 8		# single line of 8 pixels
+
+      # connect the LCD to the scheduler
+      connect-pin sched 0-event -&gt; lcd refresh-sync-event
+      connect-pin sched 0-control &lt;- lcd refresh-sync-control
+      # connect the LCD to the display
+      connect-pin lcd row-col -&gt; display row-col
+      connect-pin lcd FR -&gt; display FR</code></p></p>
+  </env>
+  <refs>
+    HD44780U (LCD-II) Dot Matrix Liquid Crystal Display Controller Driver
+    (from the Hitachi web site)
+  </refs>
+</defcomplib>
+

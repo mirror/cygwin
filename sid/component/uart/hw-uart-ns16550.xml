@@ -1,0 +1,128 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libuart.la" dlsym="uart_component_library">
+  <defcomponent name="hw-uart-ns16550" type="concrete">
+
+
+    <!-- pins -->
+    <defpin name="Sin" direction="in" legalvalues="data + parity" behaviors="serial input" />
+    <defpin name="Sout" direction="out" legalvalues="data + parity" behaviors="serial output" />
+    <defpin name="INTR" direction="out" legalvalues="0,1" behaviors="active high interrupt pin" />
+    <defpin name="TxRdy" direction="out" legalvalues="0,1" behaviors="active low transmitter ready (dma control)" />
+    <defpin name="RxRdy" direction="out" legalvalues="0,1" behaviors="active low receiver ready (dma control)" />
+    <defpin name="RTS" direction="out" legalvalues="0,1" behaviors="active low request to send (modem control)" />
+    <defpin name="DTR" direction="out" legalvalues="0,1" behaviors="active low data transmit ready (modem control)" />
+    <defpin name="OUT1" direction="out" legalvalues="0,1" behaviors="active low user output (modem control)" />
+    <defpin name="OUT2" direction="out" legalvalues="0,1" behaviors="active low user output (modem control)" />
+    <defpin name="CTS" direction="in" legalvalues="0,1" behaviors="active low clear to send (modem control)" />
+    <defpin name="DSR" direction="in" legalvalues="0,1" behaviors="active low data set ready (modem control)" />
+    <defpin name="RI" direction="in" legalvalues="0,1" behaviors="active low ring indicator (modem control" />
+    <defpin name="DCD" direction="in" legalvalues="0,1" behaviors="active low data carrier detect (modem control)" />
+    <defpin name="Reset" direction="in" legalvalues="any" behaviors="master reset" />
+
+
+    <!-- buses -->
+    <defbus name="Bus" addresses="0x0-0x7" accesses="read/write, bytes only" behaviors="access to registers" />
+
+
+    <!-- attributes -->
+    <defattribute name="timeout" category="write" legalvalues="positive integers" defaultvalue="10" behaviors="sets the time to wait" />
+  </defcomponent>
+  <synop>
+    The PC16550D contains independent serial input and output ports that perform
+    byte-at-a-time I/O. The 16550 is distinguished from its predecessor, the 
+    16450, by two 16-byte FIFOs. The FIFOs allow the CPU to buffer data to 
+    reduce the frequency of interrupts.  The 16550 also supports model-control
+    functions DMA hand-shaking, and have a loop-back mode for testing.
+  </synop>
+  <func>
+    <modelling>
+      <p>The Uart model is somewhat abstracted from its hardware counterpart:</p>
+      <ul>
+	<li>  
+	  <p>The Sin and Sout pins carry a character at a time, including the parity
+	    bit, if enabled. Normally, a character is 7-bits wide, so the model 
+	    transmits and receives one byte at a time. However, the chip supports
+	    character widths of 5 to 8 bits, so up to 9 bits (8 data + parity) may
+	    be transmitted. Stop bits are not modeled.  If the <attribute>sio-framing?</attribute> 
+	    attribute is off, then only the raw data bits are passed on the pins.
+	    The <attribute>in-fifo-length</attribute> attribute may be used to simulate an arbitrarily
+	    large input FIFO.  The <attribute>out-fifo-length</attribute> attribute is the converse,
+	    though is just a placebo since there is no output FIFO processing at
+	    all.</p>
+	</li>
+	<li>
+	  <p>The preceding point suggests that the model uses an infinite baud rate, 
+	    since all the bits in a character are transmitted in a single event. 
+	    This means that:</p>
+	  <ul>
+	    <li>The timing pins (XIN, XOUT, RCLK, BAUDOUT) are not simulated.</li>
+	    <li>Break functionality cannot be modeled.</li>
+	    <li>Framing errors cannot occur.</li>
+	    <li>The Divisor Latch is modeled but its values are ignored.</li>
+	    <li>To handle Character Timeouts, the UART model relies on callbacks
+	      from the scheduler.</li>
+	  </ul>
+	</li>
+      </ul>    
+    </modelling>
+
+    <convention name="functional" supported="true"/>
+    <convention name="save/restore" supported="true" />
+    <convention name="reentrant" supported="false" />
+    <convention name="target view manager" supported="true">
+      <p>Pins and registers are both accessible from the Target View Manager</p>
+    </convention>
+  </func>
+  <env>
+    <title>Related components</title>
+    <ul>     
+      <li>
+	<p>Besides the CPU bus, the UART typically connects to both a
+	serial source and a serial sink component. The sink/source may
+	be combined, as with a modem component. More advanced designs
+	will use the TxRDY/RxRDY pins to communicate with a DMA
+	controller.</p>
+	
+	<p>If the UART is run using interrupts (versus polling) it
+	should also be connected to the scheduler so that
+	transmit/receive timeouts are handled correctly.</p>
+	
+	<p>Because the UART will be programmed to use a specific line
+	discipline, you must take care to match this discipline in
+	both the sink and source.</p></li>
+      
+      <li>
+	<p>
+	  The following configuration file segment shows how to
+	  connect the UART to a keyboard and console for
+	  interrupt-driven operation:</p>
+	
+	<code>
+      # components involved - cpu and bus are assumed
+      new hw-uart-ns16550 uart
+      new hw-keyboard keyboard
+      new hw-console console
+      new sid-sched-sim target-sched
+      set target-sched num-clients 2
+      # connect uart to bus at memory-mapped address 0x800000
+      connect-bus bus [0x800000-0x800008,4,1] uart Bus
+      # pin connections
+      connect-pin uart INTR -> cpu intr
+      connect-pin uart Sout -> console SIN
+      connect-pin keyboard SOUT -> uart Sin
+      connect-pin target-sched 0-event -> uart rx-timeout-event
+      connect-pin target-sched 1-event -> uart tx-timeout-event
+      # use 7-bits even-parity as the line discipline
+      set console line-disc "bits=7 parity=even"
+      set keyboard line-disc "bits=7 parity=even"
+	</code>
+      </li>
+    </ul>
+  </env>
+  <refs>
+    <a type="url" href="http://www.national.com/pf/PC/PC16550D.html">National Semiconductor PC16550 data sheet, dated June 1995.</a>
+    This page has links to the data sheet and application notes (in PDF)
+  </refs>
+</defcomplib>

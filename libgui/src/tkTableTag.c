@@ -1233,7 +1233,7 @@ Table_TagCmd(ClientData clientData, register Tcl_Interp *interp,
 		/*
 		 * Move tag up in priority.
 		 */
-		for (i = tagPrio; i > value; i--) {
+		for (i = tagPrio; i && i > value; i--) {
 		    tablePtr->tagPrioNames[i] = tablePtr->tagPrioNames[i-1];
 		    tablePtr->tagPrios[i]     = tablePtr->tagPrios[i-1];
 		}

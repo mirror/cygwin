@@ -759,7 +759,7 @@ CGEN_CPU_DESC
 	    const CGEN_MACH *mach =
 	      lookup_mach_via_bfd_name (@arch@_cgen_mach_table, name);
 
-	    machs |= mach->num << 1;
+	    machs |= 1 << mach->num;
 	    break;
 	  }
 	case CGEN_CPU_OPEN_ENDIAN :

@@ -87,7 +87,7 @@ if ($ENV{'SID'}) {
   $sid .= "/sid";
 }
 
-$version=q$Id: configrun-sid.in,v 1.33 2001/12/17 09:31:17 mrg Exp $;
+$version=q$Id: configrun-sid.in,v 1.34 2001/12/28 21:16:48 fche Exp $;
 
 # by default the loader data mapper connects to the cpu-mapper access-port
 $load_mapper_data = "cpu-mapper access-port";
@@ -437,6 +437,9 @@ connect-pin init-sequence output-0 -> hw-reset-net input
 connect-pin hw-reset-net output-0 -> cpu reset!
 connect-pin target-sched 0-event -> cpu step!
 connect-pin target-sched 0-control <- cpu step-cycles
+connect-pin target-sched time-query <- cpu time-query
+connect-pin target-sched time-high -> cpu time-high
+connect-pin target-sched time-low -> cpu time-low
 connect-pin yield-net output-0 -> cpu yield
 connect-pin yield-net output-0 -> host-sched yield
 ";

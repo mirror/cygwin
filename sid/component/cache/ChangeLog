@@ -1,3 +1,8 @@
+2001-06-24  Ben Elliston  <bje@redhat.com>
+
+	* cache.cxx (set_hash_mask): Validate parse_attribute result.
+	(set_hash_shift): Ditto.
+
 2001-06-21  Ben Elliston  <bje@redhat.com>
 
 	* cache.h (cache_component::hit_latency): New member.

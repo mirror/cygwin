@@ -413,7 +413,9 @@ sid::component::status
 cache_component::set_hash_mask (const string& value)
 {
   unsigned shift;
-  parse_attribute (value, shift);
+
+  if (parse_attribute (value, shift) != sid::component::ok)
+    return sid::component::bad_value;
 
   if ((acache.hash_params.mask >> shift) >= acache.num_sets ())
     return sid::component::bad_value;
@@ -426,7 +428,9 @@ sid::component::status
 cache_component::set_hash_shift (const string& value)
 {
   sid::host_int_4 mask;
-  parse_attribute (value, mask);
+
+  if (parse_attribute (value, mask) != sid::component::ok)
+    return sid::component::bad_value;
 
   if ((mask >> acache.hash_params.shift) >= acache.num_sets ())
     return sid::component::bad_value;

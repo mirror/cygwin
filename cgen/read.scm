@@ -159,6 +159,7 @@
 
 (maybe-load "pmacros" #f 'define-pmacro)
 (maybe-load "cos" #f 'make)
+(maybe-load "slib/logical" #f 'logical:logand)
 (maybe-load "slib/sort" #f 'sort)
 ; Used to pretty-print debugging messages.
 (maybe-load "slib/pp" #f 'pretty-print)

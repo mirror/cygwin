@@ -79,8 +79,6 @@ namespace profiling_components
   using std::ostream;
   using std::ios;
   using std::ofstream;
-  using std::ios;
-  using std::ofstream;
 
 
 // ----------------------------------------------------------------------------

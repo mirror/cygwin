@@ -1,3 +1,14 @@
+2001-06-28  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.cfgroot/setInvAtt.badconf: Remove ARM-specific parts.
+	* sidcomp.cfgroot/setInvAttV.badconf: Likewise.
+	* sidcomp.cfgroot/setInvComp.badconf: Likewise.
+	* sidcomp.cfgroot/wrongOrd3.badconf: Likewise.
+	* sidcomp.cfgroot/setInvAtt.expect: Update to reflect new errors.
+	* sidcomp.cfgroot/setInvAttV.expect: Likewise.
+	* sidcomp.cfgroot/setInvComp.expect: Likewise.
+	* sidcomp.cfgroot/wrongOrd3.expect: Likewise.
+
 2001-06-23  Frank Ch. Eigler  <fche@redhat.com>
 
 	* config/default.exp: New file, moved from ../../config/unix.exp.

@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: dup03.c,v 1.1 2001/09/09 13:38:16 duda Exp $ */
+/* $Id: dup03.c,v 1.2 2003/01/24 01:09:39 cgf Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -110,14 +110,13 @@
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
-#include <stdlib.h>
 #include "test.h"
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
-char *TCID="dup03"; 		/* Test program identifier.    */
+const char *TCID="dup03"; 		/* Test program identifier.    */
 int TST_TOTAL=1;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

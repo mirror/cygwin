@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  */
 
-/* $Id: usctest.h,v 1.2 2000/09/06 14:21:52 duda Exp $ */
+/* $Id: usctest.h,v 1.3 2003/01/24 01:09:39 cgf Exp $ */
 
 /**********************************************************
  * 
@@ -115,7 +115,7 @@
  * to indicate valid options and return option arguments
  ***********************************************************************/
 typedef struct {		
-  char *option;      	/* Valid option string (one option only) like "a:" */
+  const char *option;	/* Valid option string (one option only) like "a:" */
   int  *flag;		/* pointer to location to set true if option given */
   char **arg;		/* pointer to location to place argument, if needed */
 } option_t;

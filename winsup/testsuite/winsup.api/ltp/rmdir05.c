@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: rmdir05.c,v 1.1 2001/09/09 13:38:17 duda Exp $ */
+/* $Id: rmdir05.c,v 1.2 2003/01/24 01:09:39 cgf Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -96,19 +96,18 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <stdlib.h>
 #include <string.h>
 #include "test.h"
 #include "usctest.h"
 
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
 
 extern char *get_high_address();
 
-char *TCID="rmdir05";		/* Test program identifier.    */
+const char *TCID="rmdir05";	/* Test program identifier.    */
 int TST_TOTAL=6;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines. */
 struct stat stat_buf;   	/* Stat buffer used for verification. */

@@ -29,7 +29,7 @@
  * 
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  */
-/* $Id: alarm02.c,v 1.2 2000/09/06 14:21:53 duda Exp $ */
+/* $Id: alarm02.c,v 1.3 2003/01/24 01:09:39 cgf Exp $ */
 /**********************************************************
  *
  *    OS Test - Silicon Graphics, Inc.
@@ -98,12 +98,12 @@
 #include "usctest.h"             /* required for usctest   */
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 void alarm_received();
 
 
 
-char *TCID="alarm02";          /* Test program identifier.    */
+const char *TCID="alarm02";          /* Test program identifier.    */
 int TST_TOTAL=3;                /* Total number of test cases. */
 extern int Tst_count;      /* Test Case counter for tst_ * routines */
 
@@ -122,7 +122,7 @@ main(int ac, char **av)
     const char *msg;          /* message returned from parse_opts */
 
     /* Parameters for alarm test */
-    char *buf[] = { "-1", "ULONG_MAX", "ULONG_MAX+1"};
+    const char *buf[] = { "-1", "ULONG_MAX", "ULONG_MAX+1"};
     unsigned long int sec[] = {-1, ULONG_MAX, ULONG_MAX+1};
     int exp[]                   = {0,0,0};
     int i;   

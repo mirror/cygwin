@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: execve01.c,v 1.2 2000/09/06 14:21:53 duda Exp $ */
+/* $Id: execve01.c,v 1.3 2003/01/24 01:09:39 cgf Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -124,7 +124,7 @@ extern void cleanup();
 
 
 
-char *TCID="execve01";		/* Test program identifier.    */
+const char *TCID="execve01";		/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 extern int Tst_nobuf;		/* used to turn off buffering in tst_ routines */
@@ -133,7 +133,7 @@ int exp_enos[]={0, 0};		/* Zero terminated list of expected errnos */
 
 int pid;			/* process id from fork */
 int status;			/* status returned from waitpid */
-char *args[2]={"/usr/bin/test", 0};	/* argument list for execve call */
+const char *const args[2]={"/usr/bin/test", 0};	/* argument list for execve call */
 extern char **environ;		/* pointer to this processes env, to pass along */
 
 int

@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: mkdir08.c,v 1.2 2000/09/06 14:21:53 duda Exp $ */
+/* $Id: mkdir08.c,v 1.3 2003/01/24 01:09:39 cgf Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -115,7 +115,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include "test.h"
 #include "usctest.h"
 
@@ -124,7 +123,7 @@ extern void cleanup();
 
 
 
-char *TCID="mkdir08"; 		/* Test program identifier.    */
+const char *TCID="mkdir08"; 	/* Test program identifier.    */
 int TST_TOTAL=1;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

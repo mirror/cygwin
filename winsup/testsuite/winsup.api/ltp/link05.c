@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: link05.c,v 1.2 2000/09/06 14:21:53 duda Exp $ */
+/* $Id: link05.c,v 1.3 2003/01/24 01:09:39 cgf Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -119,12 +119,12 @@
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 void help();
 
 
 
-char *TCID="link05"; 	/* Test program identifier.    */
+const char *TCID="link05"; 	/* Test program identifier.    */
 #ifdef CRAY
 int TST_TOTAL=2;    		/* Total number of test cases. */
 #else

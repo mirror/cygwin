@@ -29,7 +29,7 @@
  * 
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  */
-/* $Id: access01.c,v 1.3 2001/03/10 16:45:28 duda Exp $ */
+/* $Id: access01.c,v 1.4 2003/01/24 01:09:39 cgf Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -118,8 +118,6 @@
  * 
  *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#**/
 
-#include <string.h>
-#include <sys/unistd.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <errno.h>
@@ -128,9 +126,9 @@
 #include "test.h"
 #include "usctest.h"
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
-char *TCID="access01"; 	/* Test program identifier.    */
+const char *TCID="access01"; 	/* Test program identifier.    */
 int TST_TOTAL=4;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: signal03.c,v 1.1 2001/09/09 13:38:17 duda Exp $ */
+/* $Id: signal03.c,v 1.2 2003/01/24 01:09:39 cgf Exp $ */
 /***********************************************************************************
  * 
  * OS Test   -  Silicon Graphics, Inc.  Eagan, Minnesota
@@ -161,17 +161,15 @@
 
 #include <signal.h>
 #include <errno.h>  
-#include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
-#include <stdlib.h>
 #include <sys/wait.h>
 
 #include "test.h"
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 void do_test();
 void sigdfl_test();
 void update_timings();
@@ -212,7 +210,7 @@ struct ipc_t {
     struct tblock timings;
 } Ipc_info;
 
-char *TCID = "signal03";
+const char *TCID = "signal03";
 int TST_TOTAL = 5;
 extern int Tst_count;           /* count of test items completed */
 

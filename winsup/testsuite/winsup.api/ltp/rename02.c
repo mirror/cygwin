@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: rename02.c,v 1.3 2001/09/13 17:30:23 duda Exp $ */
+/* $Id: rename02.c,v 1.4 2003/01/24 01:09:39 cgf Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -123,7 +123,7 @@ void do_file_setup();
 
 
 
-char *TCID="rename02"; 		/* Test program identifier.    */
+const char *TCID="rename02"; 		/* Test program identifier.    */
 int TST_TOTAL=1;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

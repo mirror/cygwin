@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: setregid01.c,v 1.2 2000/09/06 14:21:53 duda Exp $ */
+/* $Id: setregid01.c,v 1.3 2003/01/24 01:09:39 cgf Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -123,7 +123,7 @@ extern void cleanup();
 
 
 
-char *TCID="setregid01";	/* Test program identifier.    */
+const char *TCID="setregid01";	/* Test program identifier.    */
 int TST_TOTAL=5;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
@@ -166,7 +166,7 @@ main(int ac, char **av)
 	 *  Dont change either real or effective gid
 	 */
 	gid=getgid();
-egid=getegid();
+	egid=getegid();
 
 
 	/* Call setregid(2) */

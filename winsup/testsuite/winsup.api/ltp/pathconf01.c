@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: pathconf01.c,v 1.2 2000/09/06 14:21:53 duda Exp $ */
+/* $Id: pathconf01.c,v 1.3 2003/01/24 01:09:39 cgf Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -109,7 +109,6 @@
  * 
  *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#**/
 
-#include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
@@ -121,18 +120,18 @@ extern void cleanup();
 
 
 
-char *TCID="pathconf01"; 	/* Test program identifier.    */
+const char *TCID="pathconf01"; 	/* Test program identifier.    */
 int TST_TOTAL;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
 int exp_enos[]={0, 0};
 
 int i;
-char *path = "/tmp";
+const char *path = "/tmp";
 
 struct pathconf_args
 {
-   char *define_tag;
+   const char *define_tag;
    int value;
 } args[] = {
     {"_PC_LINK_MAX", _PC_LINK_MAX},

@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: read01.c,v 1.1 2001/09/09 13:38:17 duda Exp $ */
+/* $Id: read01.c,v 1.2 2003/01/24 01:09:39 cgf Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -136,12 +136,12 @@ extern void cleanup();
 
 
 
-char *TCID="read01"; 		/* Test program identifier.    */
+const char *TCID="read01"; 		/* Test program identifier.    */
 int TST_TOTAL=1;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
 int exp_enos[]={0, 0};
-char fname[255], *malloc();
+char fname[255];
 int fd, i;
 int offset=0;
 char *s;

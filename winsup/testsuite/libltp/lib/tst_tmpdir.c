@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  */
 
-/* $Id: tst_tmpdir.c,v 1.1 2000/09/03 03:52:30 cgf Exp $ */
+/* $Id: tst_tmpdir.c,v 1.2 2003/01/24 01:09:39 cgf Exp $ */
 
 /**********************************************************
  *
@@ -63,11 +63,7 @@
  *      Neither tst_tmpdir() or tst_rmdir() has a return value.
  *
  *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#**/
-#include <stdio.h>
 #include <errno.h>
-#include <stdlib.h>        /* for getenv() */
-#include <string.h>        /* for string functions */
-#include <unistd.h>        /* for sysconf(), getcwd(), rmdir() */
 #include <sys/types.h>     /* for mkdir() */
 #include <sys/stat.h>      /* for mkdir() */
 #include "test.h"

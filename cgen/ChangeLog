@@ -1,3 +1,8 @@
+2000-12-03  Ben Elliston  <bje@redhat.com>
+
+	* desc-cpu.scm (cgen-desc.h): Clarify generated filenames.
+	(cgen-desc.c): Likewise.
+
 2000-12-01  Greg McGary  <greg@mcgary.org>
 
 	* desc.scm ((<keyword>,gen-defn): Prepend prefix to keyword names.

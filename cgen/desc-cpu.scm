@@ -874,7 +874,7 @@ init_tables ()
 ; Then they'd be usable and we wouldn't have to special case them here.
 
 (define (cgen-desc.h)
-  (logit 1 "Generating " (current-arch-name) "-desc.h ...\n")
+  (logit 1 "Generating " (current-arch-name) " desc.h ...\n")
   (string-write
    (gen-copyright "CPU data header for @arch@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
@@ -926,7 +926,7 @@ init_tables ()
 ; no place to put this file.  To be revisited when we do have such a place.
 
 (define (cgen-desc.c)
-  (logit 1 "Generating " (current-arch-name) "-desc.c ...\n")
+  (logit 1 "Generating " (current-arch-name) " desc.c ...\n")
   (string-write
    (gen-copyright "CPU data for @arch@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)

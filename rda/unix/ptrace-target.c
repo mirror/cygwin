@@ -122,8 +122,7 @@ ptrace_create_child (struct child_process *process)
 	    sleep (-1);	/* FIXME ??? */
 
 	  fprintf (stderr, "Cannot exec %s: %s.\n", process->executable,
-		   errno > 0 && errno < sys_nerr ? 
-		   strerror (errno) : "unknown error");
+		   strerror (errno));
 	fail:
 	  fflush (stderr);
 	  _exit (0177);

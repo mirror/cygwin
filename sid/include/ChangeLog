@@ -1,3 +1,8 @@
+2001-11-30  Ben Elliston  <bje@redhat.com>
+
+	* sidbusutil.h (class ro_value_control_register): New class.
+	(value_control_register::shift_amount): Make protected.
+
 2001-11-08  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidcpuutil.h (basic_cpu): Add cg caller/callee pins, trace_stream

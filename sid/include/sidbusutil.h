@@ -788,19 +788,53 @@ namespace sidutil
 					 const value_control_register<DataType>& it);
     friend std::istream& operator >> <> (std::istream& i, 
 					 value_control_register<DataType>& it);
-  
-private:
-    DataType field_value;
     
+  protected:
     // return index of mask LSB
     unsigned shift_amount() const
+    {
+      DataType mask = this->get_mask ();
+      for (unsigned i=0; i<sizeof(DataType)*8; i++)
+	if (mask & (1 << i))
+	  return i;
+      assert(0);
+    }
+    
+  private:
+    DataType field_value;
+  };
+
+  // This is a read-only value control register.  Its underlying value
+  // may be changed programmatically, but as far as a bus accessor is
+  // concerned, writing to the register has no effect.
+  template <typename DataType>
+  class ro_value_control_register: public value_control_register<DataType>
+  {
+  public:
+    ro_value_control_register(control_register_bank<DataType>* b,
+			      sid::host_int_4 o,
+			      DataType m,
+			      DataType v):
+      value_control_register<DataType>(b,o,m,true,true,v)
+    {}
+    
+    ro_value_control_register(control_register_bank<DataType>* b,
+			      sid::host_int_4 o,
+			      DataType m):
+      value_control_register<DataType>(b,o,m,true,true,0)
+    {}
+
+    // Some convenience operators for accessing register fields
+    void operator = (const DataType& v)
       {
-	DataType mask = this->get_mask ();
-	for (unsigned i=0; i<sizeof(DataType)*8; i++)
-	  if (mask & (1 << i))
-	    return i;
-	assert(0);
+	value_control_register<DataType>::operator= (v);
       }
+
+  protected:
+    void set (DataType set_value, DataType set_mask)
+    {
+      // do nothing
+    }
   };
 
   // This is a type of control register whose value never changes.

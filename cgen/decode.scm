@@ -212,12 +212,13 @@
 	))
 )
 
-; Compute population counts for each bit.  Return it as a vector indexed by bit number.
-; Rather than computing raw popularity, attempt to compute "disinguishing value" or
-; inverse-entropy for each bit.  The idea is that the larger the number for any particular
-; bit slot, the more instructions it can be used to distinguish.  Raw mask popularity
-; is not enough -- popular masks may include useless "reserved" fields whose values
-; don't change, and thus are useless in distinguishing.
+; Compute population counts for each bit.  Return it as a vector indexed by bit
+; number.  Rather than computing raw popularity, attempt to compute
+; "disinguishing value" or inverse-entropy for each bit.  The idea is that the
+; larger the number for any particular bit slot, the more instructions it can
+; be used to distinguish.  Raw mask popularity is not enough -- popular masks
+; may include useless "reserved" fields whose values don't change, and thus are
+; useless in distinguishing.
 
 (define (-distinguishing-bit-population masks mask-lens values lsb0?)
   (let* ((max-length (apply max mask-lens))
@@ -449,7 +450,14 @@
     (let* ((opcode (compute (insn-value insn) insn-len decode-len bitnums))
 	   (opcode-mask (compute (insn-base-mask insn) insn-len decode-len bitnums))
 	   (indices (missing-bit-indices opcode-mask (- (integer-expt 2 decode-len) 1))))
-      (logit 3 "insn =" (obj:name insn) " insn-value=" (insn-value insn) " insn-base-mask=" (insn-base-mask insn) " insn-len=" insn-len " decode-len=" decode-len " opcode=" opcode " opcode-mask=" opcode-mask " indices=" indices "\n")
+      (logit 3 "insn =" (obj:name insn)
+	     " insn-base-value=" (insn-base-value insn)
+	     " insn-base-mask=" (insn-base-mask insn)
+	     " insn-len=" insn-len
+	     " decode-len=" decode-len
+	     " opcode=" opcode
+	     " opcode-mask=" opcode-mask
+	     " indices=" indices "\n")
       (map (lambda (index) (+ opcode index)) indices)))
 )
 
@@ -588,7 +596,8 @@
 	      (if (= 1 (length slot))
 		  ; Only 1 insn left in the slot, so take it.
 		  (dtable-entry-make index 'insn (car slot))
-		  ; There is still more than one insn in 'slot', so there is still an ambiguity.
+		  ; There is still more than one insn in 'slot',
+		  ; so there is still an ambiguity.
 		  (begin
 		    ; If all insns are marked as DECODE-SPLIT, don't warn.
 		    (if (not (all-true? (map (lambda (insn)
@@ -600,9 +609,9 @@
 						(string-append ", " (obj:str-name insn)))
 					      slot))
 				 "\n"))
-			; Things aren't entirely hopeless.  We've warned about the ambiguity.
-		        ; Now, if there are any identical insns, filter them out.  If only one
-		        ; remains, then use it.
+			; Things aren't entirely hopeless.  We've warned about
+		        ; the ambiguity.  Now, if there are any identical insns,
+		        ; filter them out.  If only one remains, then use it.
 		    (set! slot (filter-identical-ambiguous-insns slot))
 		    (if (= 1 (length slot))
 			; Only 1 insn left in the slot, so take it.
@@ -618,11 +627,11 @@
 			(let ((assertions (map insn-ifield-assertion slot)))
 			  (if (not (all-true? assertions))
 			      (begin
-					; Save arguments for debugging purposes.
+				; Save arguments for debugging purposes.
 				(set! -build-decode-table-entry-args
 				      (list insn-vec startbit decode-bitsize index index-list lsb0? invalid-insn))
 				(error "Unable to resolve ambiguity (maybe need some ifield-assertion specs?)")))
-					; FIXME: Punt on even simple cleverness for now.
+				; FIXME: Punt on even simple cleverness for now.
 			  (let ((exprtable-entries
 				 (exprtable-sort (map exprtable-entry-make
 						      slot

@@ -1,7 +1,6 @@
 2001-11-15  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
-	* sid-guide/book-sid.sgml: Add example to Using GDB
-	section.
+	* sid-guide/book-sid.sgml: Add example to Using GDB section.
 
 2001-10-16  Frank Ch. Eigler  <fche@redhat.com>
 
@@ -25,3 +24,4 @@
 	* cdk-guide/images/name-structure.jpg: Add.
 	* cdk-guide/cdktutorial.sgml: Minor cleanups.
 	* cdk-guide/introduction.sgml: Ditto.
+

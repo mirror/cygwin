@@ -32,6 +32,7 @@
 #include "gdbserv-utils.h"
 #include "gdblog.h"
 #include "gdbserv-log.h"
+#include "crc32.h"
 
 static int output_thread_reg (struct gdbserv *gdbserv,
 			      struct gdbserv_thread *thread,
@@ -621,6 +622,77 @@ do_get_registers_p_packet (struct gdbserv *gdbserv)
     }
 }
 
+static long
+read_memory (struct gdbserv *gdbserv, struct gdbserv_reg *addr_p, void *block,
+             long len)
+{
+  long nr_read;
+  if (gdbserv->target->get_thread_mem != NULL)
+    nr_read = 
+      gdbserv->target->get_thread_mem (gdbserv, 
+				       gdbserv->general_thread,
+				       addr_p, block, len);
+  else if (gdbserv->target->get_mem != NULL)
+    nr_read = gdbserv->target->get_mem (gdbserv, addr_p, block, len);
+  else
+    assert (0);
+  return nr_read;
+}
+
+static void
+do_qCRC_packet (struct gdbserv *gdbserv)
+{
+  struct gdbserv_reg addr;
+  long len;
+  unsigned long crc = 0xffffffff;	/* See crc32.h.  */
+  struct gdbserv_reg crc_reg;
+
+  /* Fetch addr,length.  */
+  if (gdbserv_input_reg_beb (gdbserv, &addr, 0) < 0)
+    {
+      gdbserv_output_string (gdbserv, "E01");
+    }
+  else if (gdbserv_input_char (gdbserv) != ',')
+    {
+      gdbserv_output_string (gdbserv, "E02");
+    }
+  else if (gdbserv_input_hex_ulong (gdbserv, &len) < 0)
+    {
+      gdbserv_output_string (gdbserv, "E03");
+    }
+
+  while (len > 0)
+    {
+      char buf[1024];
+      unsigned long long addr_ull;
+      int size = sizeof (buf) < len ? sizeof (buf) : len;
+
+      /* Read a block.  Quit early if the read doesn't succeed.  */
+      size = read_memory (gdbserv, &addr, buf, size);
+      if (size <= 0)
+	{
+	  gdbserv_output_string (gdbserv, "E07");
+	  return;
+	}
+
+      /* Compute the accumlated CRC.  */
+      crc = crc32 (buf, size, crc);
+
+      /* Advance ``addr'' by ``size''.  */
+      gdbserv_reg_to_ulonglong (gdbserv, &addr, &addr_ull);
+      addr_ull += size;
+      gdbserv_ulonglong_to_reg (gdbserv, addr_ull, &addr);
+
+      /* Adjust the length based on amount actually read.  */
+      len -= size;
+    }
+
+  /* Output the CRC in the format expected by GDB.  */
+  gdbserv_output_char (gdbserv, 'C');
+  gdbserv_ulong_to_reg (gdbserv, crc, &crc_reg);
+  gdbserv_output_reg_beb (gdbserv, &crc_reg, 0);
+}
+
 void
 gdbserv_data_packet (struct gdbserv *gdbserv)
 {
@@ -685,6 +757,10 @@ gdbserv_data_packet (struct gdbserv *gdbserv)
 	      cmd[sizeof_cmd] = '\0';
 	      gdbserv->target->process_rcmd (gdbserv, cmd, sizeof_cmd);
 	    }
+	}
+      else if (gdbserv_input_string_match (gdbserv, "CRC:") >= 0)
+	{
+	  do_qCRC_packet (gdbserv);
 	}
       else if (gdbserv_input_string_match (gdbserv, "C") >= 0)
 	{

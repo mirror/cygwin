@@ -55,7 +55,7 @@ librda_la_LIBADD =
 am_librda_la_OBJECTS = gdbserv-input.lo gdbserv-output.lo \
 	gdbserv-state.lo gdbserv-utils.lo gdbsocket.lo gdblog.lo \
 	stdio-log.lo gdbserv-log.lo gdbloop.lo gdbsched.lo \
-	gdbserv-target.lo
+	gdbserv-target.lo crc32.lo
 librda_la_OBJECTS = $(am_librda_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
@@ -201,7 +201,8 @@ librda_la_SOURCES = \
 	gdbserv-log.c				\
 	gdbloop.c				\
 	gdbsched.c				\
-	gdbserv-target.c
+	gdbserv-target.c			\
+	crc32.c
 
 all: all-am
 
@@ -254,6 +255,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/crc32.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdblog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdbloop.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdbsched.Plo@am__quote@

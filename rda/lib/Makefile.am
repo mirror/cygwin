@@ -24,4 +24,5 @@ librda_la_SOURCES =				\
 	gdbserv-log.c				\
 	gdbloop.c				\
 	gdbsched.c				\
-	gdbserv-target.c
+	gdbserv-target.c			\
+	crc32.c

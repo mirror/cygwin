@@ -1344,14 +1344,14 @@ bits beginning at bit 4.  All fields defined with @code{dnf} are unsigned.
 
 The syntax of @code{df} is:
 
-@code{(df name comment attributes type start length mode encode decode)}
+@code{(df name comment attributes start length mode encode decode)}
 
 Example:
 
 @example
 (df f-disp8
     "disp8, slot unknown" (PCREL-ADDR)
-    INT 8 8
+    8 8 INT
     ((value pc) (sra WI (sub WI value (and WI pc (const -4))) (const 2)))
     ((value pc) (add WI (sll WI value (const 2)) (and WI pc (const -4)))))
 @end example

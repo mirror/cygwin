@@ -12,6 +12,12 @@ set -x
 # ??? Some are missing, need to add them after some research.
 archs="arm frv i960 m32r openrisc xstormy16"
 
+if [ ! -f sim.scm ]
+then
+    echo "Not in the src/cgen directory." >& 2
+    exit 1
+fi
+
 builddir=tmp-doc
 
 rm -rf $builddir

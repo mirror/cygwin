@@ -1,3 +1,10 @@
+2004-12-16  Jim Blandy  <jimb@redhat.com>
+
+	* sidtypes.h: (bytereverse (host_int_2)): The x86-64 has an
+        xchgb instruction, too.
+	(bytereverse (host_int_4)): The x86-64 has a bswap instruction, too.
+	(bytereverse (host_int_8)): Use bswap on the x86-64.
+
 2004-12-09  Jim Blandy  <jimb@redhat.com>
 
 	* sidtypes.h: Recognize AMD64 (x86-64) as a little-endian machine.

@@ -1,3 +1,13 @@
+2001-03-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidmiscutil.h (sid_file_search_path): New function for returning
+	a canonical file search path based on SID_LIBRARY_PATH and
+	SID_EXEC_PREFIX.
+	(find_sid_data_file): New function to use the above to locate sid
+	data files.
+	* configure.in (SID_EXEC_PREFIX): AC_DEFINE.
+	* configure, sidconfutil.h: Regenerated.
+
 2001-03-21  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.in: Regenerate.

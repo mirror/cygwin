@@ -47,6 +47,7 @@ using sidutil::make_attribute;
 using sidutil::parse_attribute;
 using sidutil::string2stream;
 using sidutil::stream2string;
+using sidutil::find_sid_data_file;
 
 // ----------------------------------------------------------------------------
 
@@ -138,7 +139,7 @@ generic_memory::imageload_handler (host_int_4)
       return;
     }
 
-  ifstream f (this->image_file_name.c_str(), ios::binary | ios::in);
+  ifstream f (find_sid_data_file(this->image_file_name).c_str(), ios::binary | ios::in);
   if (! f.good())
     {
       cerr << "memory: error opening " << this->image_file_name << ": "
@@ -167,7 +168,8 @@ generic_memory::imagestore_handler (host_int_4)
       return;
     }
 
-  ofstream f (this->image_file_name.c_str(), ios::binary | ios::out | ios::trunc);
+  ofstream f (find_sid_data_file(this->image_file_name).c_str(),
+	      ios::binary | ios::out | ios::trunc);
   if (! f.good())
     {
       cerr << "memory: error opening " << this->image_file_name << ": "
@@ -213,7 +215,7 @@ generic_memory::imagemmap_handler (host_int_4)
       return;
     }
 
-  int fd = open (this->image_file_name.c_str(), O_RDWR);
+  int fd = open (find_sid_data_file(this->image_file_name).c_str(), O_RDWR);
   if (fd < 0)
     {
       cerr << "memory: cannot open image-file during image-mmap:" << std_error_string() << endl;

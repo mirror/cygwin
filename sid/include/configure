@@ -1312,6 +1312,16 @@ fi
 echo "$ac_t""$sid_cv_builtin_expect" 1>&6
 		
 
+if test "${exec_prefix}" = "NONE"; then
+	sid_exec_prefix=${prefix}
+else
+	sid_exec_prefix=${exec_prefix}
+fi
+cat >> confdefs.h <<EOF
+#define SID_EXEC_PREFIX "$sid_exec_prefix"
+EOF
+
+
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure

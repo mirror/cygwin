@@ -1,3 +1,10 @@
+2001-03-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compConfig.cxx (configure): Use find_sid_data_file to locate
+	given sid config file.
+	* Makefile.am (AM_CXXFLAGS): Remove.
+	* Makefile.in: Regenerated.
+
 2001-03-21  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.in: Regenerate.

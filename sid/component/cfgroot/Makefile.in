@@ -86,7 +86,6 @@ SUBDIRS = @subdirs@
 pkglib_LTLIBRARIES = libconfig.la
 
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include -I$(srcdir)/libltdl
-AM_CXXFLAGS = -DSID_EXEC_PREFIX=\"$(exec_prefix)\"
 
 libconfig_la_SOURCES = compConfig.cxx
 libconfig_la_LDFLAGS = -module -no-undefined

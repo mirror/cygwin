@@ -1,3 +1,16 @@
+2000-03-31  Alexandre Oliva  <oliva@lsd.ic.unicamp.br>
+
+	* Makefile.in (expect-bld.sh): New wrapper script.
+	(all): Depend on it.
+	(LOCAL_EXPECT): Use it.
+
+1999-11-11  DJ Delorie  <dj@cygnus.com>
+
+	* configure.in: use new library name, provide define for sources
+	* configure: regenerate
+	* exp_event.c: only take win-specific parts out if we did detect
+	the unix/cygwin special version of libtcl.
+
 1999-10-29  Frank Ch. Eigler  <fche@cygnus.com>
 
 	* configure.in: For cygwin host, also override TCL_LIB_SPEC.

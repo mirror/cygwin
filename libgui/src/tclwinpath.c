@@ -133,7 +133,7 @@ path_posix_to_win32_path_list (ClientData cd, Tcl_Interp *interp, int argc,
   char *buf;
 
   size = cygwin32_posix_to_win32_path_list_buf_size (argv[2]);
-  buf = Tcl_Alloc (size);
+  buf = ckalloc (size);
   cygwin32_posix_to_win32_path_list (argv[2], buf);
   Tcl_SetResult (interp, buf, TCL_DYNAMIC);
   return TCL_OK;
@@ -149,7 +149,7 @@ path_win32_to_posix_path_list (ClientData cd, Tcl_Interp *interp, int argc,
   char *buf;
 
   size = cygwin32_win32_to_posix_path_list_buf_size (argv[2]);
-  buf = Tcl_Alloc (size);
+  buf = ckalloc (size);
   cygwin32_win32_to_posix_path_list (argv[2], buf);
   Tcl_SetResult (interp, buf, TCL_DYNAMIC);
   return TCL_OK;

@@ -249,7 +249,7 @@ PrintTextCmd(clientData, interp, argc, argv)
     Pixmap pixmap;
     int bottomY = 0;		/* Initialization needed only to stop
 				 * compiler warnings. */
-    DOCINFO *lpdi = malloc(sizeof(DOCINFO));
+    DOCINFO *lpdi = (DOCINFO *) ckalloc(sizeof(DOCINFO));
     TkTextIndex first, last;
     int numLines;
     HDC hDCpixmap;
@@ -291,7 +291,7 @@ PrintTextCmd(clientData, interp, argc, argv)
 
     memset(lpdi,0,sizeof(DOCINFO));
     lpdi->cbSize=sizeof(DOCINFO);
-    lpdi->lpszDocName=malloc(255);
+    lpdi->lpszDocName = (LPCSTR) ckalloc(255);
     sprintf((char*)lpdi->lpszDocName,"SN - Printing\0");
     lpdi->lpszOutput=NULL;
 
@@ -446,12 +446,12 @@ PrintTextCmd(clientData, interp, argc, argv)
     textPtr->dInfoPtr->flags|=DINFO_OUT_OF_DATE;
 
 done:
-    free ((char*) lpdi->lpszDocName);
-    free (lpdi);
+    ckfree ((char*) lpdi->lpszDocName);
+    ckfree ((char*) lpdi);
     return TCL_OK;
 error:
-    free ((char*) lpdi->lpszDocName);
-    free (lpdi);
+    ckfree ((char*) lpdi->lpszDocName);
+    ckfree ((char*) lpdi);
     return TCL_ERROR;
 }
 

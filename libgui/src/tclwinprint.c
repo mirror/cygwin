@@ -126,10 +126,10 @@ winprint_command_deleted (ClientData cd)
     {
       /* FIXME: I don't know if we are supposed to free the hDevMode
          and hDevNames fields.  */
-      Tcl_Free ((char *) wd->page_setup);
+      ckfree ((char *) wd->page_setup);
     }
 
-  Tcl_Free ((char *) wd);
+  ckfree ((char *) wd);
 }
 
 /* Implement ide_winprint page_setup.  */
@@ -216,7 +216,7 @@ winprint_page_setup_command (ClientData cd, Tcl_Interp *interp, int argc,
     }
 
   if (wd->page_setup == NULL)
-    wd->page_setup = (PAGESETUPDLG *) Tcl_Alloc (sizeof (PAGESETUPDLG));
+    wd->page_setup = (PAGESETUPDLG *) ckalloc (sizeof (PAGESETUPDLG));
 
   *wd->page_setup = psd;
 
@@ -916,7 +916,7 @@ ide_create_winprint_command (Tcl_Interp *interp)
 {
   struct winprint_data *wd;
   
-  wd = (struct winprint_data *) Tcl_Alloc (sizeof *wd);
+  wd = (struct winprint_data *) ckalloc (sizeof *wd);
   wd->page_setup = NULL;
   wd->aborted = 0;
   

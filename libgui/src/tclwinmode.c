@@ -61,11 +61,11 @@ seterrormode_command (ClientData cd, Tcl_Interp *interp,
 	{
 	  Tcl_AppendResult (interp, "unrecognized key \"", list[i],
 			    "\"", (char *) NULL);
-	  Tcl_Free ((char *) list);
+	  ckfree ((char *) list);
 	  return TCL_ERROR;
 	}
     }
-  Tcl_Free ((char *) list);
+  ckfree ((char *) list);
 
   val = SetErrorMode (val);
 

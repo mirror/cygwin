@@ -1,69 +1,105 @@
-* Name
-  hw-rtc-sid
+                hw-rtc-sid (librtc.la :: rtc_component_library)
 
-* Synopsis
-  This component is a fictional simplified high-precision real time clock.
+Synopsis:
 
-  Buses: registers
-  Attributes: hour minute second "tk xclock clone"
-  Library: librtc.la
-  Symbol name: rtc_component_library
+   This component is a fictional simplified high-precision real time clock.
 
-* Functionality
+     ----------------------------------------------------------------------
 
-  - Modelling
-    * This component is similar to high-precision dedicated counters
-      present as performance tuning aids in some microprocessors.  It
-      supplies snapshots of the host systems' time to a target application.
+Functionality:
 
-  - Behaviors
-    * Timing
+  Modelling:
 
-      Whenever this component's bus is read with a valid address, it
-      returns the addressed subset of two words of information.  The
-      first word (address 0x0) contains the number of seconds since the
-      host system's epoch.  The second word (address 0x4) contains the
-      number of nanoseconds within that second.  Both words are supplied
-      in big-endian order.
+   This component is similar to high-precision dedicated counters present as
+   performance tuning aids in some microprocessors. It supplies snapshots of
+   the host systems' time to a target application
 
-    * More timing
+   +-------------------------------------------------+
+   |                    Behaviors                    |
+   |-------------------------------------------------|
+   |      timing | Whenever this component's bus is  |
+   |             | read with a valid address, it     |
+   |             | returns the addressed subset of   |
+   |             | two words of information. The     |
+   |             | first word (address 0x0) contains |
+   |             | the number of seconds since the   |
+   |             | host system's epoch. The second   |
+   |             | word (address 0x4) contains the   |
+   |             | number of nanoseconds within that |
+   |             | second. Both words are supplied   |
+   |             | in big-endian order.              |
+   |-------------+-----------------------------------|
+   | more timing | As a special bonus, the hour,     |
+   |             | minute, and second attributes     |
+   |             | contain the appropriate numbers   |
+   |             | for the current moment, in the    |
+   |             | GMT timezone.                     |
+   +-------------------------------------------------+
 
-      As a special bonus, the "hour", "minute", and "second"
-      attributes contain the appropriate numbers for the current
-      moment, in the GMT timezone.
-  
-  - SID conventions
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |            functional | supported        | -    |
+   |-----------------------+------------------+------|
+   |          triggerpoint | not supported    | -    |
+   |-----------------------+------------------+------|
+   |    state save/restore | not supported    | -    |
+   |-----------------------+------------------+------|
+   |         component gui | supported        | -    |
+   +-------------------------------------------------+
 
-    * This is a functional component.
-    * It has no state to save, and has no use for triggerpoints.
-    * It supports component GUIs.
+     ----------------------------------------------------------------------
 
-* Environment
+Environment:
 
-  - Related components
-    * To use this component, map it into 8 bytes of address
-      space, as in the following sample configuration file fragment: 
+   Related components
+     * To use this component, map it into 8 bytes of address space, as in the
+       following sample configuration file fragment:
 
-	new hw-rtc-sid rtc
-        connect-bus mapper [0x1000,0x1007] rtc registers
+           new hw-rtc-sid rtc
+           connect-bus mapper [0x1000,0x1007] rtc registers
 
-    * The "hw-visual-clock" component is a candidate gui for this
-      component.
+     * The "hw-visual-clock" component is a candidate gui for this component.
 
-        new hw-rtc-sid rtc
-        new hw-visual-clock rtc-gui
-	relate rtc-gui "your rtc friend" rtc
+           new hw-rtc-sid rtc
+           new hw-visual-clock rtc-gui
+           relate rtc-gui "your rtc friend" rtc
 
-  - Host system
-    * The component relies on the accuracy and precision of UTC time
-      maintained by the host.
+   Host system
 
-* SID interface reference
-  - low level:
-    * buses
-      - registers | 0x0 - 0x7 | read | timing
-    * attributes
-      - hour | register | 0..23 | n/a | more timing
-      - minute | register | 0..59 | n/a | more timing
-      - second | register | 0..59 | n/a | more timing
-      - "tk xclock clone" | gui | "hw-visual-clock" | (same) | component gui
+   The component relies on the accuracy and precision of UTC time maintained
+   by the host.
+
+     ----------------------------------------------------------------------
+
+Component Reference:
+
+  Component: hw-rtc-sid
+
+   +-------------------------------------------------+
+   |                      buses                      |
+   |-------------------------------------------------|
+   |    name    | addresses  | accesses  | behaviors |
+   |------------+------------+-----------+-----------|
+   | registers  | 0x0..0x7   | read      | timing    |
+   +-------------------------------------------------+
+
+   +----------------------------------------------------+
+   |                     attributes                     |
+   |----------------------------------------------------|
+   | name |category|  legal values   |default|behaviors||
+   |      |        |                 | value |         ||
+   |------+--------+-----------------+-------+---------||
+   |hour  |register|0..23            |-      |more     ||
+   |      |        |                 |       |timing   ||
+   |------+--------+-----------------+-------+---------||
+   |minute|register|0..59            |-      |more     ||
+   |      |        |                 |       |timing   ||
+   |------+--------+-----------------+-------+---------||
+   |second|register|0..59            |-      |more     ||
+   |      |        |                 |       |timing   ||
+   |------+--------+-----------------+-------+---------||
+   |tk    |        |                 |       |component||
+   |xclock|gui     |"hw-visual-clock"|-      |gui      ||
+   |clone |        |                 |       |         ||
+   +----------------------------------------------------+

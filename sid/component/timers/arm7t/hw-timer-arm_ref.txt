@@ -1,132 +1,194 @@
-* Name
-  hw-timer-arm/ref-nosched hw-timer-arm/ref-sched
+           hw-timer-arm/ref (libtimers.la :: timer_component_library)
 
-* Synopsis
-  The timer peripheral on the ARM PID7T is a simple 16-bit down
-  counter.  It can be programmed with a number of modes and pre-scale
-  values.  For example, you can program the timer to raise an interrupt
-  when a specified interval has elapsed.  More details on the timer
-  can be found in the ARM documentation (see ``References'').
+Synopsis:
 
-  Pins: interrupt reset
-        clock (nosched variant only)
-	divided-clock-control divided-clock-event (sched variant only)
-  Buses: registers
-  Attributes: interrupt counter load-value enabled mode prescale
-	state-snapshot
-	ticks (nosched variant only)
+   The timer peripheral on the ARM PID7T is a simple 16-bit down counter. It
+   can be programmed with a number of modes and pre-scale values. For
+   example, you can program the timer to raise an interrupt when a specified
+   interval has elapsed. More details on the timer can be found in the ARM
+   documentation (see ``References'').
 
-  Library: libtimers.la
-  Symbol name: timer_component_library
+     ----------------------------------------------------------------------
 
-* Functionality
-  - Modelling
-    * This component models the ARM reference timer found on the ARM
-      PID7T development board.  The ARM PID7T comes with two such
-      timers, which may or may not be implemented on the same piece of
-      silicon.  Instead of implementing a dual timer, you can configure 
-      a functionally equivalent system by using two instances of a
-      single timer. This simplifies the implementation and provides more
-      design flexibility to system builders.
+Functionality:
 
-  - Behaviors
+  Modelling:
 
-    * Resetting
+   This component models the ARM reference timer found on the ARM PID7T
+   development board. The ARM PID7T comes with two such timers, which may or
+   may not be implemented on the same piece of silicon. Instead of
+   implementing a dual timer, you can configure a functionally equivalent
+   system by using two instances of a single timer. This simplifies the
+   implementation and provides more design flexibility to system builders.
 
-      Upon construction, or when the "reset" input pin is driven, the
-      timer is reset to a powerup state.  This includes deasserting the
-      interrupt line and disabling counting.
+   +------------------------------------------------------+
+   |                      Behaviors                       |
+   |------------------------------------------------------|
+   |   resetting|Upon construction, or when the reset     |
+   |            |input pin is driven, the timer is reset  |
+   |            |to a powerup state. This includes        |
+   |            |deasserting the interrupt line and       |
+   |            |disabling counting.                      |
+   |------------+-----------------------------------------|
+   |    clocking|The two variants of the ARM reference    |
+   |            |timer, hw-timer-arm/ref-sched and        |
+   |            |hw-timer-arm/ref-nosched, differ in the  |
+   |            |way that they receive clocking signals.  |
+   |            |The 'nosched' variant relies on a clock  |
+   |            |pin, which is interpreted as the regular |
+   |            |"system clock". The `sched' variant      |
+   |            |relies on an external scheduler component|
+   |            |to provide a pre-divided clock. Its      |
+   |            |divided-clock-control and                |
+   |            |divided-clock-event pins are used to     |
+   |            |signal to and from the scheduler.        |
+   |------------+-----------------------------------------|
+   |interrupting|Whenever the counter underflows, an      |
+   |            |interrupt signal is transmitted by       |
+   |            |driving the interrupt output pin to a    |
+   |            |nonzero value. When the interrupt is     |
+   |            |cleared, the pin is driven with a zero   |
+   |            |value.                                   |
+   |------------+-----------------------------------------|
+   |    register|The registers bus provides access to a   |
+   |      access|bank of control registers. The memory    |
+   |            |map, described in detail in the reference|
+   |            |documentation, is as follows:            |
+   |            |                                         |
+   |            |+---------------------------------------+|
+   |            || address | read         | write        ||
+   |            ||---------+--------------+--------------||
+   |            || 0       | TimerLoad    | TimerLoad    ||
+   |            ||---------+--------------+--------------||
+   |            || 4       | TimerValue   | Reserved     ||
+   |            ||---------+--------------+--------------||
+   |            || 8       | TimerControl | TimerControl ||
+   |            ||---------+--------------+--------------||
+   |            || 12      | Reserved     | TimerClear   ||
+   |            ||---------+--------------+--------------||
+   |            || 16      | Reserved     | Reserved     ||
+   |            |+---------------------------------------+|
+   +------------------------------------------------------+
 
-    * Clocking
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |    functional | supported | -                   |
+   |---------------+-----------+---------------------|
+   |  save/restore | supported | -                   |
+   |---------------+-----------+---------------------|
+   | triggerpoints | supported | The component       |
+   |               |           | supports            |
+   |               |           | triggerpoints set   |
+   |               |           | on any of the       |
+   |               |           | available           |
+   |               |           | attributes.         |
+   +-------------------------------------------------+
 
-      The two variants of the ARM reference timer,
-      `hw-timer-arm/ref-sched' and `hw-timer-arm/ref-nosched', differ
-      in the way that they receive clocking signals.  The `nosched'
-      variant relies on a "clock" pin, which is interpreted as the
-      regular "system clock".  The `sched' variant relies on an
-      external scheduler component to provide a pre-divided clock.
-      Its "divided-clock-control" and "divided-clock-event" pins are
-      used to signal to and from the scheduler.
+     ----------------------------------------------------------------------
 
-    * Interrupting
+Environment:
 
-      Whenever the counter underflows, an interrupt signal is
-      transmitted by driving the "interrupt" output pin to a nonzero
-      value.  When the interrupt is cleared, the pin is driven with a
-      zero value.
+   Related components
+     * The timer's interrupt pin is usually connected to the interrupt pin of
+       a CPU or a suitable interrupt controller.
 
-    * Register access
-      
-      The "registers" bus provides access to a bank of control
-      registers.  The memory map, described in detail in the reference
-      documentation, is as follows:
+     * This configuration file fragment illustrates how to configure the
+       'sched' variant of the timer:
 
-		address	read		write
-		0	TimerLoad	TimerLoad
-		4	TimerValue	Reserved
-		8	TimerControl	TimerControl
-		12	Reserved	TimerClear
-		16	Reserved	Reserved
+         new hw-timer-arm/ref-sched timer
+         new sid-sched-sim sched
+         new hw-interrupt-arm/ref intcontrlr
+         set sched num-clients 1
+         set sched enabled? 1
+         connect-pin sched 0-control <- timer divided-clock-control
+         connect-pin sched 0-event -> timer divided-clock-event
+         connect-pin timer interrupt -> intcontrlr interrupt-source-4
+        
 
-  - SID conventions
+     * This configuration file fragment illustrates how to configure the
+       'nosched' variant of the timer:
 
-    * This is a functional component.
-    * This component implements basic state save/restore support.
-    * The component supports triggerpoints set on any of the available
-      attributes.
+         new hw-timer-arm/ref-nosched timer
+         new hw-interrupt-arm/ref intcontrlr
+         connect-pin main perform-activity timer clock
+         connect-pin timer interrupt intcontrlr interrupt-source-4
+        
 
-* Environment
+   Host system
 
-  - Related components
-    * The timer's `interrupt' pin is usually connected to the
-      interrupt pin of a CPU or a suitable interrupt controller.
+   The hw-timer-arm/ref-sched variant of the timer is more efficient as it
+   does not rely on yielding simulation time to the timer for every clock
+   cycle; it should be used in almost all circumstances.
 
-    * This configuration file fragment illustrates how to configure
-      the `sched' variant of the timer:
+     ----------------------------------------------------------------------
 
-	new hw-timer-arm/ref-sched timer
-	new sid-sched-sim sched
-	new hw-interrupt-arm/ref intcontrlr
-	set sched num-clients 1
-	set sched enabled? 1
-	connect-pin sched 0-control <- timer divided-clock-control
-	connect-pin sched 0-event -> timer divided-clock-event
-	connect-pin timer interrupt -> intcontrlr interrupt-source-4
+Component Reference:
 
-    * This configuration file fragment illustrates how to configure
-      the `nosched' variant of the timer:
+  Component: hw-timer-arm/ref (Abstract)
 
-	new hw-timer-arm/ref-nosched timer
-	new hw-interrupt-arm/ref intcontrlr
-	connect-pin main perform-activity timer clock
-	connect-pin timer interrupt intcontrlr interrupt-source-4
+   +--------------------------------------------------------+
+   |                          pins                          |
+   |--------------------------------------------------------|
+   |        name         |direction|legalvalues| behaviors  |
+   |---------------------+---------+-----------+------------|
+   |interrupt            |out      |0 or       |interrupting|
+   |                     |         |non-zero   |            |
+   |---------------------+---------+-----------+------------|
+   |reset                |in       |any        |resetting   |
+   |---------------------+---------+-----------+------------|
+   |clock                |in       |any        |clocking    |
+   |---------------------+---------+-----------+------------|
+   |divided-clock-control|out      |positive   |clocking    |
+   |                     |         |value      |            |
+   |---------------------+---------+-----------+------------|
+   |divided-clock-event  |in       |any        |clocking    |
+   +--------------------------------------------------------+
 
-  - Host system
-    * The `sched' variant of the timer is more efficient as it does
-      not rely on yielding simulation time to the timer for every
-      clock cycle; it should be used in almost all circumstances.
+   +-------------------------------------------------+
+   |                      buses                      |
+   |-------------------------------------------------|
+   |   name    | addresses |  accesses  | behaviors  |
+   |-----------+-----------+------------+------------|
+   | registers | 0x0 to    | read/write | register   |
+   |           | 0x13      |            | access     |
+   +-------------------------------------------------+
 
-* SID interface reference
+   +-------------------------------------------------------+
+   |                      attributes                       |
+   |-------------------------------------------------------|
+   |   name   |category | legal values |default |behaviors||
+   |          |         |              | value  |         ||
+   |----------+---------+--------------+--------+---------||
+   |counter   |watchable|number        |register|         ||
+   |          |register |              |access  |         ||
+   |----------+---------+--------------+--------+---------||
+   |load-value|watchable|number        |register|         ||
+   |          |register |              |access  |         ||
+   |----------+---------+--------------+--------+---------||
+   |enabled   |watchable|true or false |register|         ||
+   |          |register |              |access  |         ||
+   |----------+---------+--------------+--------+---------||
+   |mode      |watchable|`periodic' or |register|         ||
+   |          |register |`free-running'|access  |         ||
+   |----------+---------+--------------+--------+---------||
+   |prescale  |watchable|0..3          |register|         ||
+   |          |register |              |access  |         ||
+   |----------+---------+--------------+--------+---------||
+   |ticks     |watchable|0..prescale-1 |clocking|         ||
+   |          |register |              |        |         ||
+   +-------------------------------------------------------+
 
-  - low level:
-    * pins
-      - interrupt | output | 0 or non-zero | interrupting
-      - reset | input | any | resetting
-      - clock | input | any | clocking
-      - divided-clock-control | output | positive value | clocking
-      - divided-clock-event | input | any | clocking
+  Variant: hw-timer-arm/ref-sched
 
-    * buses
-      - registers | 0x0 to 0x13 | read/write | register access
+   Same as hw-timer-arm/ref
 
-    * attributes
-      - counter | watchable register | number | register access
-      - load-value | watchable register | number | register access
-      - enabled | watchable register | true or false | register access
-      - mode | watchable register | `periodic' or `free-running' | register access
-      - prescale | watchable register | 0..3 | register access
-      - ticks | watchable register | 0..prescale-1 | clocking 
+  Variant: hw-timer-arm/ref-nosched
 
-* References
-  ARM reference documentation can be found on the web at
-  <http://www.arm.com/Documentation/UserMans/rps/#timer>
+   Same as hw-timer-arm/ref
+
+     ----------------------------------------------------------------------
+
+References:
+
+   ARM reference documentation can be found on the web.

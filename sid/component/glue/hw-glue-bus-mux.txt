@@ -1,74 +1,118 @@
-* Name
-  hw-glue-bus-mux
+             hw-glue-bus-mux (libglue.la :: glue_component_library)
 
-* Synopsis
-  This component provides switchable access from one bus to two separate
-  accessors.
+Synopsis:
 
-  Buses: upstream
-  Accessors: downstream1, downstream2
-  Attributes: switch
-  Pins: switch
-  Shared library: libglue.la
-  Symbol: glue_component_library
+   This component provides switchable access from one bus to two separate
+   accessors.
 
-* Functionality
- 
-  - Modelling
-    * This component is a bus multiplexer with one input bus, two
-      output accessors, and a switch to alternate between them.
+     ----------------------------------------------------------------------
 
-  - Behaviors
-    * Initialization
-      At start-up, the single input bus, "upstream", is tied by default
-      to "downstream1".
+Functionality:
 
-    * Switching
-      When the "switch" pin is driven with the value 0, the output accessor
-      will be "downstream1". When the "switch" pin is driven with the value 1,
-      the output accessor will be "downstream2".
-      The "switch" pin can be driven any number of times, each time
-      causing the corresponding output to be selected.
-      If the "switch" pin is driven with a value other than 0 or 1, then
-      subsequent accesses to the input bus, "upstream", will return
-      sid::bus::unmapped.
+  Modelling:
 
-    * Bus traffic
-      Input to the "upstream" bus is passed on to the current
-      output accessor: either "downstream1" or "downstream2".
+   This component is a bus multiplexer with one input bus, two output
+   accessors, and a switch to alternate between them.
 
-  - SID conventions
-    * This is a functional component.
-    * It presents one attribute in the "pin" category.
+   +-------------------------------------------------+
+   |                    Behaviors                    |
+   |-------------------------------------------------|
+   | initialization | At start-up, the single input  |
+   |                | bus, "upstream", is tied by    |
+   |                | default to "downstream1".      |
+   |----------------+--------------------------------|
+   |      switching | When the switch pin is driven  |
+   |                | with the value 0, the output   |
+   |                | accessor will be downstream1.  |
+   |                | When the switch pin is driven  |
+   |                | with the value 1, the output   |
+   |                | accessor will be downstream2.  |
+   |                | The switch pin can be driven   |
+   |                | any number of times, each time |
+   |                | causing the corresponding      |
+   |                | output to be selected. If the  |
+   |                | switch pin is driven with a    |
+   |                | value other than 0 or 1, then  |
+   |                | subsequent accesses to the     |
+   |                | input bus, upstream, will      |
+   |                | return sid::bus::unmapped.     |
+   |----------------+--------------------------------|
+   |    bus traffic | Input to the upstream bus is   |
+   |                | passed on to the current       |
+   |                | output accessor: either        |
+   |                | downstream1 or downstream2.    |
+   +-------------------------------------------------+
 
-* Environment
-  - Related components
-    * This component may be used as to implement a multiplexer by
-      combining two bus-mux components with the same accessors in the
-      opposite order.  For example:
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |   functional | supported | This is a functional |
+   |              |           | component.           |
+   |--------------+-----------+----------------------|
+   | presentation | supported | This component       |
+   |              |           | presents one         |
+   |              |           | attribute in the     |
+   |              |           | "pin" category.      |
+   +-------------------------------------------------+
 
-	new hw-glue-bus-mux bus-mux1
-	new hw-glue-bus-mux bus-mux2
-        connect-bus cpu data-memory-x bus-mux1 upstream
-        connect-bus coprocessor data-memory-x bus-mux2 upstream
-        connect-bus bus-mux1 downstream1 data-memory-x1 read-write-port
-        connect-bus bus-mux1 downstream2 data-memory-x2 read-write-port
-        connect-bus bus-mux2 downstream1 data-memory-x2 read-write-port
-        connect-bus bus-mux2 downstream2 data-memory-x1 read-write-port
-	connect-pin cpu memory-x-ctl bus-mux1 switch
-        connect-pin cpu memory-x-ctl bus-mux2 switch
+     ----------------------------------------------------------------------
 
-* SID interface reference
-  - low level:
-    * buses
-      - upstream | unrestricted | unrestricted | bus traffic
+Environment:
 
-    * accessors
-      - downstream1 | unrestricted | unrestricted | bus traffic
-      - downstream2 | unrestricted | unrestricted | bus traffic
+   Related components
 
-    * pins
-      - switch | input | 0 or non-zero | switching
+   This component may be used as to implement a multiplexer by combining two
+   bus-mux components with the same accessors in the opposite order. For
+   example:
 
-    * attributes
-      - switch | pin | n/a | n/a | switching
+         new hw-glue-bus-mux bus-mux1
+         new hw-glue-bus-mux bus-mux2
+         connect-bus cpu data-memory-x bus-mux1 upstream
+         connect-bus coprocessor data-memory-x bus-mux2 upstream
+         connect-bus bus-mux1 downstream1 data-memory-x1 read-write-port
+         connect-bus bus-mux1 downstream2 data-memory-x2 read-write-port
+         connect-bus bus-mux2 downstream1 data-memory-x2 read-write-port
+         connect-bus bus-mux2 downstream2 data-memory-x1 read-write-port
+         connect-pin cpu memory-x-ctl bus-mux1 switch
+         connect-pin cpu memory-x-ctl bus-mux2 switch
+
+     ----------------------------------------------------------------------
+
+Component Reference:
+
+  Component: hw-glue-bus-mux
+
+   +-------------------------------------------------+
+   |                      pins                       |
+   |-------------------------------------------------|
+   |  name   | direction |  legalvalues  | behaviors |
+   |---------+-----------+---------------+-----------|
+   | switch  | in        | 0 or non-zero | switching |
+   +-------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                      buses                      |
+   |-------------------------------------------------|
+   |  name   |  addresses  |  accesses   | behaviors |
+   |---------+-------------+-------------+-----------|
+   |upstream |unrestricted |unrestricted |bus traffic|
+   +-------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                   attributes                    |
+   |-------------------------------------------------|
+   | name |category|  legal   |  default  |behaviors||
+   |      |        |  values  |   value   |         ||
+   |------+--------+----------+-----------+---------||
+   |switch|pin     |-         |-          |switching||
+   +-------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                    accessors                    |
+   |-------------------------------------------------|
+   |      name      |    accesses    |   behaviors   |
+   |----------------+----------------+---------------|
+   | downstream1    | unrestricted   | bus traffic   |
+   |----------------+----------------+---------------|
+   | downstream2    | unrestricted   | bus traffic   |
+   +-------------------------------------------------+

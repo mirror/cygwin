@@ -1,81 +1,116 @@
-* Copyright (C) 1999 Red Hat
+                 hw-lcd-char-display (liblcd-char-display.la ::
+                      lcd_char_display_component_library)
 
-* Name
-  hw-lcd-char-display
+Synopsis:
 
-* Synopsis
-  Simulates a dot matrix LCD display, using curses (a cursor control library) 
-  to manage the graphics inside a text window.
+   Simulates a dot matrix LCD display, using curses (a cursor control
+   library) to manage the graphics inside a text window.
 
-  Pins: row-col FR init
-  Attributes: width height 
+     ----------------------------------------------------------------------
 
-  Library: liblcd-char-display.la
-  Symbol name: lcd_char_display_component_library
+Functionality:
 
-* Functionality
-  - Modelling
-    The LCD display model is somewhat abstracted from the physical device:
+  Modelling:
 
-    o A real display typically has separate row and column pins that are cycled
-      to select each pixel in the display. These are replaced by 2 pins
-      in the model. The FR (frame) pin is driven to 1 to identify that a new
-      frame is starting, and driven to 0 when the frame is finished. The
-      row-col pin incorporates all the functionality of the row and column
-      drivers on the real chip. This pin is driven once for each "on" pixel
-      in the display, and the value on the pin is the [X,Y] co-ordinates of
-      the pixel, encoded as two adjacent 16-bit values in the 32-bit pin value.
+   The LCD display model is somewhat abstracted from the physical device:
 
-      With these two pins, a display refresh cycle starts when the FR pin is
-      asserted; the [X,Y] co-ordinates of all the "on" pixels are then 
-      transmitted on the row-col pin; and the FR pin is de-asserted to end 
-      the refresh cycle.
+     * A real display typically has separate row and column pins that are
+       cycled to select each pixel in the display. These are replaced by 2
+       pins in the model. The FR (frame) pin is driven to 1 to identify that
+       a new frame is starting, and driven to 0 when the frame is finished.
+       The row-col pin incorporates all the functionality of the row and
+       column drivers on the real chip. This pin is driven once for each "on"
+       pixel in the display, and the value on the pin is the [X,Y]
+       co-ordinates of the pixel, encoded as two adjacent 16-bit values in
+       the 32-bit pin value.
 
-    o The physical device must be refreshed periodically, but the model retains
-      its last written values indefinitely.
+       With these two pins, a display refresh cycle starts when the FR pin is
+       asserted; the [X,Y] co-ordinates of all the "on" pixels are then
+       transmitted on the row-col pin; and the FR pin is de-asserted to end
+       the refresh cycle.
 
-  - Behaviors
-    * Configuration
-      The width and height attributes set the display size in units of
-      characters. For example, the default values are 80 and 24 for width
-      and height, respectively. This is the size of a standard CRT window.
+     * The physical device must be refreshed periodically, but the model
+       retains its last written values indefinitely.
 
-    * Display
-      See discussion of the FR and row-dol pins in Modeling section above.
+   +-------------------------------------------------+
+   |                    Behaviors                    |
+   |-------------------------------------------------|
+   | configuration | The width and height attributes |
+   |               | set the display size in units   |
+   |               | of characters. For example, the |
+   |               | default values are 80 and 24    |
+   |               | for width and height,           |
+   |               | respectively. This is the size  |
+   |               | of a standard CRT window.       |
+   |---------------+---------------------------------|
+   |       display | See discussion of the FR and    |
+   |               | row-col pins in Modeling        |
+   |               | section above.                  |
+   +-------------------------------------------------+
 
-  - SID conventions
-    * This is a functional component.
-    * Save/restore is supported.
-    * Triggerpoint support is available on all three input pins.
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |   functional | supported | This is a functional |
+   |    component |           | component.           |
+   |--------------+-----------+----------------------|
+   | Save/restore | supported | Save/restore is      |
+   |              |           | supported.           |
+   |--------------+-----------+----------------------|
+   | Triggerpoint | supported | Triggerpoint support |
+   |              |           | is available on all  |
+   |              |           | three input pins.    |
+   +-------------------------------------------------+
 
-* Environment
-  - Related components
-    * The LCD display is typically connected to an LCD controller.
-      The following configuration file segment shows how the HD44780U LCD 
-      controller can be connected to the display:
+     ----------------------------------------------------------------------
 
-      new hw-lcd-hd44780u-a00 lcd	# Standard Japanese font
-      new hw-lcd-char-display display
+Environment:
+
+   Related components
+
+   The LCD display is typically connected to an LCD controller. The following
+   configuration file segment shows how the hw-lcd-hd44780u LCD controller
+   can be connected to the display:
+
+       new hw-lcd-hd44780u-a00 lcd       # Standard Japanese font
+       new hw-lcd-char-display display
       
-      # display size is in pixels - ie. font-width*display-height
-      set display width 40		# 8 chars X 5 pixels per char
-      set display height 8		# single line of 8 pixels
+       # display size is in pixels - ie. font-width*display-height
+       set display width 40              # 8 chars X 5 pixels per char
+       set display height 8              # single line of 8 pixels
 
-      # connect the LCD to the display
-      connect-pin lcd row-col -> display row-col
-      connect-pin lcd FR -> display FR
+       # connect the LCD to the display
+       connect-pin lcd row-col -> display row-col
+       connect-pin lcd FR -> display FR
 
-* SID interface reference
-  - low level:
-    * pins
-      - FR | input | binary | display
-      - row-col | input | 2 shorts as a 32-bit value | display
+     ----------------------------------------------------------------------
 
-    * attributes
-      - width | configuration | any positive value | 80 | configuration
+Component Reference:
 
-      - height | configuration | any positive value | 24 | configuration
+  Component: hw-lcd-char-display
 
+   +-------------------------------------------------+
+   |                      pins                       |
+   |-------------------------------------------------|
+   |  name   | direction |  legalvalues  | behaviors |
+   |---------+-----------+---------------+-----------|
+   | FR      | in        | binary        | display   |
+   |---------+-----------+---------------+-----------|
+   | row-col | in        | 2 shorts as a | display   |
+   |         |           | 32-bit value  |           |
+   +-------------------------------------------------+
 
-
-
+   +----------------------------------------------------+
+   |                     attributes                     |
+   |----------------------------------------------------|
+   | name |  category   | legal  |default|  behaviors  ||
+   |      |             | values | value |             ||
+   |------+-------------+--------+-------+-------------||
+   |      |             |any     |       |             ||
+   |width |configuration|positive|80     |configuration||
+   |      |             |value   |       |             ||
+   |------+-------------+--------+-------+-------------||
+   |      |             |any     |       |             ||
+   |height|configuration|positive|24     |configuration||
+   |      |             |value   |       |             ||
+   +----------------------------------------------------+

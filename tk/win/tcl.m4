@@ -694,7 +694,12 @@ AC_DEFUN(SC_PROG_TCLSH, [
     ])
 
     if test -f "$ac_cv_path_tclsh" ; then
-	TCLSH_PROG=$ac_cv_path_tclsh
+	TCLSH_PROG="$ac_cv_path_tclsh"
+	AC_MSG_RESULT($TCLSH_PROG)
+    elif test -f "$TCL_BIN_DIR/tclConfig.sh" ; then
+	# One-tree build.
+	ac_cv_path_tclsh="$TCL_BIN_DIR/tclsh"
+	TCLSH_PROG="$ac_cv_path_tclsh"
 	AC_MSG_RESULT($TCLSH_PROG)
     else
 	AC_MSG_ERROR(No tclsh found in PATH:  $search_path)

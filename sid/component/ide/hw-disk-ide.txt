@@ -149,13 +149,13 @@ Environment:
          new hw-disk-ide ide0
          # ... assume memory mapper named "mapper"
          # ... assume PC standard IDE channel 0 addresses
-         connect-bus mapper [0x3F0-0x3F7] ide0 control-block-bus
+         connect-bus mapper [0x3F6-0x3F7] ide0 control-block-bus
          connect-bus mapper [0x1F0-0x1F7] ide0 command-block-bus
          # ... assume some fictional interrupt controller
          connect-pin ide0 interrupt -> fic irq14
          #
          # (For PC standard IDE channel 1,
-         #  use base addresses 0x370 and 0x170,
+         #  use base addresses 0x376 and 0x170,
          #  and irq15 respectively.)
          #
          # ... configure drive 0 (master): 128*10*32 sectors = 20 MB capacity
@@ -198,7 +198,7 @@ Component Reference:
    |-------------------------------------------------|
    |      name       |addresses| accesses |behaviors |
    |-----------------+---------+----------+----------|
-   |control-block-bus|0x6..0x7 |read/write|register  |
+   |control-block-bus|0x0..0x1 |read/write|register  |
    |                 |         |          |access    |
    |-----------------+---------+----------+----------|
    |                 |         |          |register  |

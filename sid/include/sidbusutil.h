@@ -1,6 +1,6 @@
 // sidbusutil.h -*- C++ -*- Different types and sizes of buses.
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -254,7 +254,7 @@ namespace sidutil
   private:
     sid::bus** target;
   };
-  
+
   // This sort of bus passes accesses through to one of two buses which
   // are specified by meta-pointers.  Access can be switched dynamically.
   class mux_passthrough_bus: public sid::bus
@@ -352,7 +352,7 @@ namespace sidutil
 				       DataType mask,
 				       DataType& data) = 0;
 
-    virtual int do_direct_passthrough (sid::host_int_4 addr) { return 0; } 
+    virtual int do_direct_passthrough (sid::host_int_4& addr) { return 0; } 
 
     // Some macros to make manufacturing of the cartesian-product
     // calls simpler.

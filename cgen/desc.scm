@@ -121,8 +121,9 @@ static const CGEN_ATTR_ENTRY bool_attr[] =
     (string-drop -2 ; Delete trailing ",\n" [don't want the ,]
 		 (string-map (lambda (e)
 			       (string-append
-				"  { "
-				"\"" (car e) "\", " ; operand name
+				"  { \""
+				(elm-get self 'prefix) (car e) ; operand name
+				"\", "
 				(if (string? (cadr e))
 				    (cadr e)
 				    (number->string (cadr e))) ; value

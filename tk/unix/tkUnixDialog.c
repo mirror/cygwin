@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkUnixDialog.c,v 1.7 1999/01/26 04:11:42 jingham Exp $
+ * RCS: @(#) $Id: tkUnixDialog.c,v 1.4.6.1 2000/05/04 21:26:30 spolk Exp $
  *
  */
  
@@ -126,7 +126,6 @@ Tk_ChooseColorCmd(clientData, interp, argc, argv)
  *
  *----------------------------------------------------------------------
  */
-int SN_donot_call_motif_filedialog_box = 0;
 
 int
 Tk_GetOpenFileCmd(clientData, interp, argc, argv)
@@ -137,8 +136,7 @@ Tk_GetOpenFileCmd(clientData, interp, argc, argv)
 {
     Tk_Window tkwin = (Tk_Window)clientData;
 
-    /* Don't use motif dialog box */
-    if (SN_donot_call_motif_filedialog_box == 0 && Tk_StrictMotif(tkwin)) {
+    if (Tk_StrictMotif(tkwin)) {
 	return EvalArgv(interp, "tkMotifFDialog", argc, argv);
     } else {
 	return EvalArgv(interp, "tkFDialog", argc, argv);
@@ -171,8 +169,7 @@ Tk_GetSaveFileCmd(clientData, interp, argc, argv)
 {
     Tk_Window tkwin = (Tk_Window)clientData;
 
-    /* Don't use motif dialog box */
-    if (SN_donot_call_motif_filedialog_box == 0 && Tk_StrictMotif(tkwin)) {
+    if (Tk_StrictMotif(tkwin)) {
 	return EvalArgv(interp, "tkMotifFDialog", argc, argv);
     } else {
 	return EvalArgv(interp, "tkFDialog", argc, argv);
@@ -207,4 +204,5 @@ Tk_MessageBoxCmd(clientData, interp, argc, argv)
 {
     return EvalArgv(interp, "tkMessageBox", argc, argv);
 }
+
 

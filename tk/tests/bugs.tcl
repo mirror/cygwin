@@ -8,7 +8,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: bugs.tcl,v 1.6 1999/01/26 04:11:34 jingham Exp $
+# RCS: @(#) $Id: bugs.tcl,v 1.7.6.1 2000/05/04 21:26:29 spolk Exp $
 
 if {[info procs test] != "test"} {
     source defs
@@ -28,3 +28,16 @@ test crash-1.1 {color} {
     . configure -bg rgb:345
     set foo ""
 } {}
+
+
+
+
+
+
+
+
+
+
+
+
+

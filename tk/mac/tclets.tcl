@@ -7,7 +7,7 @@
 # into a copy of a stub application (the user can pick).  The file is placed into the
 # TEXT resource named "tclshrc" which is automatically executed on startup.
 #
-# RCS: @(#) $Id: tclets.tcl,v 1.2 1998/09/14 18:23:33 stanton Exp $
+# RCS: @(#) $Id: tclets.tcl,v 1.7.6.1 2000/05/04 21:26:26 spolk Exp $
 #
 # Copyright (c) 1997 Sun Microsystems, Inc.
 #
@@ -213,3 +213,4 @@ proc Start {} {
 
 # Now that everything is defined, lets start the app!
 Start
+

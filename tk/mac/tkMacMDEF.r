@@ -15,7 +15,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkMacMDEF.r,v 1.2 1998/09/14 18:23:37 stanton Exp $
+ * RCS: @(#) $Id: tkMacMDEF.r,v 1.7.6.1 2000/05/04 21:26:26 spolk Exp $
  */
 
 #include <Types.r>
@@ -43,3 +43,4 @@ data 'MDEF' (591, preload) {
 	$"4E5E 205F 4FEF 0012 4ED0 846D 6169 6E00"            /* N^ _Oï..NÐ„main. */
 	$"0000"                                               /* .. */
 };
+

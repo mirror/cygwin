@@ -1,5 +1,5 @@
 @echo off
-rem RCS: @(#) $Id: mkd.bat,v 1.2 1999/01/26 04:11:44 jingham Exp $
+rem RCS: @(#) $Id: mkd.bat,v 1.4.6.1 2000/05/04 21:26:31 spolk Exp $
 
 if exist %1\tag.txt goto end
 
@@ -19,3 +19,4 @@ echo TAG >%1\tag.txt
 echo created directory %1
 
 :end
+

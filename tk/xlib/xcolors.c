@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: xcolors.c,v 1.2 1998/09/14 18:24:02 stanton Exp $
+ * RCS: @(#) $Id: xcolors.c,v 1.7.6.2 2000/09/26 16:10:17 spolk Exp $
  */
 
 #include <tkInt.h>
@@ -854,9 +854,9 @@ FindColor(name, colorPtr)
     if (l > u) {
 	return 0;
     }
-    colorPtr->red = xColors[i].red << 8;
-    colorPtr->green = xColors[i].green << 8;
-    colorPtr->blue = xColors[i].blue << 8;
+    colorPtr->red = ((xColors[i].red << 8) | xColors[i].red);
+    colorPtr->green = ((xColors[i].green << 8) | xColors[i].green);
+    colorPtr->blue = ((xColors[i].blue << 8) | xColors[i].blue);
     return 1;
 }
 
@@ -896,9 +896,12 @@ XParseColor(display, map, spec, colorPtr)
 	if (sscanf(spec+1, fmt, &red, &green, &blue) != 3) {
 	    return 0;
 	}
-	colorPtr->red = ((unsigned short) red) << (4 * (4 - i));
-	colorPtr->green = ((unsigned short) green) << (4 * (4 - i));
-	colorPtr->blue = ((unsigned short) blue) << (4 * (4 - i));
+	colorPtr->red = (((unsigned short) red) << (4 * (4 - i)))
+	    | ((unsigned short) red);
+	colorPtr->green = (((unsigned short) green) << (4 * (4 - i)))
+	    | ((unsigned short) green);
+	colorPtr->blue = (((unsigned short) blue) << (4 * (4 - i)))
+	    | ((unsigned short) blue);
     } else {
 	if (!FindColor(spec, colorPtr)) {
 	    return 0;
@@ -909,3 +912,5 @@ XParseColor(display, map, spec, colorPtr)
     colorPtr->pad = 0;
     return 1;
 }
+
+

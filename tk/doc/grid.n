@@ -4,7 +4,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" RCS: @(#) $Id: grid.n,v 1.7 1999/01/26 04:11:15 jingham Exp $
+'\" RCS: @(#) $Id: grid.n,v 1.7.6.1 2000/05/04 21:26:21 spolk Exp $
 '\" 
 .so man.macros
 .TH grid n 4.1 Tk "Tk Built-In Commands"
@@ -335,3 +335,4 @@ geometry manager written by Doug. Stein, and the \fBblt_table\fR geometry
 manager, written by George Howlett.
 .SH KEYWORDS
 geometry manager, location, grid, cell, propagation, size, pack
+

@@ -1,7 +1,7 @@
 # This file creates a visual test for arcs.  It is part of the Tk
 # visual test suite, which is invoked via the "visual" script.
 #
-# RCS: @(#) $Id: arc.tcl,v 1.7 1999/01/26 04:11:33 jingham Exp $
+# RCS: @(#) $Id: arc.tcl,v 1.7.6.1 2000/05/04 21:26:28 spolk Exp $
 
 catch {destroy .t}
 toplevel .t
@@ -138,3 +138,16 @@ bind .t.c a {
 bind .t.c b {set go 0}
 
 bind .t.c <Control-x> {.t.c delete current}
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -8,10 +8,9 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkWin32Dll.c,v 1.10 2000/01/26 21:22:58 dj Exp $
+ * RCS: @(#) $Id: tkWin32Dll.c,v 1.7.6.3 2000/10/02 23:14:06 spolk Exp $
  */
 
-#include "tkPort.h"
 #include "tkWinInt.h"
 
 /*
@@ -25,7 +24,7 @@ BOOL APIENTRY		DllMain _ANSI_ARGS_((HINSTANCE hInst,
 /* cygwin32 requires an impure pointer variable, which must be
    explicitly initialized when the DLL starts up.  */
 struct _reent *_impure_ptr;
-extern struct _reent *_imp__reent_data;
+extern struct _reent __declspec(dllimport) reent_data;
 #endif
 /* END CYGNUS LOCAL */
 
@@ -78,11 +77,10 @@ DllMain(hInstance, reason, reserved)
     DWORD reason;
     LPVOID reserved;
 {
-    /* CYGNUS LOCAL */
 #ifdef __CYGWIN32__
     /* cygwin32 requires the impure data pointer to be initialized
        when the DLL starts up.  */
-    _impure_ptr = _imp__reent_data;
+    _impure_ptr = &reent_data;
 #endif
     /* END CYGNUS LOCAL */
 
@@ -99,3 +97,4 @@ DllMain(hInstance, reason, reserved)
     }
     return(TRUE);
 }
+

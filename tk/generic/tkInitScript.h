@@ -9,8 +9,10 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkInitScript.h,v 1.7 1998/09/14 18:23:13 stanton Exp $
+ * RCS: @(#) $Id: tkInitScript.h,v 1.7.6.1 2000/05/04 21:26:24 spolk Exp $
  */
+
+
 
 /*
  * In order to find tk.tcl during initialization, the following script
@@ -46,11 +48,12 @@
  */
 
 static char initScript[] = "if {[info proc tkInit]==\"\"} {\n\
-  proc tkInit {} {\n\
-    global tk_library tk_version tk_patchLevel\n\
-    rename tkInit {}\n\
-    tcl_findLibrary tk $tk_version $tk_patchLevel tk.tcl TK_LIBRARY tk_library\n\
-  }\n\
+    proc tkInit {} {\n\
+        global tk_library tk_version tk_patchLevel\n\
+        rename tkInit {}\n\
+        tcl_findLibrary tk $tk_version $tk_patchLevel tk.tcl TK_LIBRARY tk_library\n\
+}\n\
 }\n\
 tkInit";
+
 

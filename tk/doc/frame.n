@@ -6,7 +6,7 @@
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
 '\"
-'\" RCS: @(#) $Id: frame.n,v 1.11 1999/01/26 04:11:15 jingham Exp $
+'\" RCS: @(#) $Id: frame.n,v 1.7.6.1 2000/05/04 21:26:21 spolk Exp $
 '\" 
 .so man.macros
 .TH frame n 8.0 Tk "Tk Built-In Commands"
@@ -132,3 +132,4 @@ frames are not intended to be interactive.
 
 .SH KEYWORDS
 frame, widget
+

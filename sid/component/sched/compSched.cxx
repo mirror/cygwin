@@ -1215,10 +1215,12 @@ operator << (ostream& o, const scheduler_component<Scheduler>& it)
   o << "scheduler-state "
     << it.enable_threshold << " "
     << it.enable_p << " "
+    << it.active_p << " "
     << it.yield_host_time_threshold << " "
     << it.yield_host_time_p << " "
     << it.sched.step_cycle_limit << " "   // this is a component attribute
     << it.advance_count << " "
+    << it.active_pin << " "
     << it.yield_pin << " "
     << it.advance_pin << endl;
 
@@ -1260,10 +1262,12 @@ operator >> (istream& i, scheduler_component<Scheduler>& it)
     {
       i >> it.enable_threshold
         >> it.enable_p
+        >> it.active_p
 	>> it.yield_host_time_threshold
 	>> it.yield_host_time_p
 	>> it.sched.step_cycle_limit
 	>> it.advance_count
+	>> it.active_pin
 	>> it.yield_pin
 	>> it.advance_pin;
 
@@ -1333,12 +1337,14 @@ class scheduler_component: public scheduler_component_base
   int enable_p;
   int yield_host_time_threshold;
   int yield_host_time_p;
+  bool active_p;
   host_int_8 advance_count;
   callback_pin<this_t> advance_pin;
   callback_pin<this_t> time_query_pin;
   callback_pin<this_t> yield_pin;
   output_pin time_low_pin;
   output_pin time_high_pin;
+  output_pin active_pin;
 
 public:
 
@@ -1392,9 +1398,25 @@ protected:
 	       << " yield_host_time_threshold=="
 	       << this->yield_host_time_threshold << endl;
 #endif
+	  // Drive the active pin if the threshold has been crossed.
+	  if (UNLIKELY(! this->active_p))
+	    {
+	      this->active_pin.drive (1);
+	      this->active_p = true;
+	    }
+
           this->advance_count ++;
   	  this->sched.advance (this->yield_host_time_p >= this->yield_host_time_threshold);
         }
+      else
+	{
+	  // Drive the active pin if the threshold has been crossed.
+	  if (UNLIKELY(this->active_p))
+	    {
+	      this->active_pin.drive (0);
+	      this->active_p = false;
+	    }
+	}
     }
 
 
@@ -1431,6 +1453,7 @@ public:
     clients(0),
     num_clients(0),
     enable_threshold(1),
+    active_p (false),
     enable_p(1),
     yield_host_time_threshold(1), 
     yield_host_time_p(0), 
@@ -1457,6 +1480,7 @@ scheduler_component<Scheduler>::scheduler_component_ctor_1()
   add_pin ("time-high", & this->time_high_pin);
   add_pin ("time-low", & this->time_low_pin);
   add_pin ("yield", & this->yield_pin);
+  add_pin ("active", & this->active_pin);
   add_attribute ("yield", & this->yield_pin, "pin");
   add_attribute ("enable-threshold", & this->enable_threshold, "setting");
   add_attribute ("enabled?", & this->enable_p, "setting");

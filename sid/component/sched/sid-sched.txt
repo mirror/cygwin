@@ -148,7 +148,20 @@ Functionality:
    |               | driving the N-event output pins |
    |               | with some value. A counter      |
    |               | accessed by the advance-count   |
-   |               | attribute is incremented.       |
+   |               | attribute is incremented. If    |
+   |               | the attribute enabled? has been |
+   |               | changed from a value below      |
+   |               | enable-threshold to a value     |
+   |               | greater than or equal to        |
+   |               | enable-threshold, then the pin  |
+   |               | active will be driven with the  |
+   |               | value 1. If the attribute       |
+   |               | enabled? has been changed from  |
+   |               | a value grater than or equal to |
+   |               | enable-threshold to a value     |
+   |               | less than enable-threshold,     |
+   |               | then the pin active will be     |
+   |               | driven with the value 0.        |
    |               |                                 |
    |               | Whether any particular N-event  |
    |               | pin is driven depends on the    |
@@ -245,6 +258,8 @@ Component Reference:
    |----------+---------+---------------+------------|
    |yield     |in       |any            |advancing   |
    |----------+---------+---------------+------------|
+   |active    |out      |boolean        |advancing   |
+   |----------+---------+---------------+------------|
    |N-event   |out      |no value       |advancing   |
    |----------+---------+---------------+------------|
    |N-control |in       |coded value    |subscription|
@@ -288,9 +303,9 @@ Component Reference:
    |-------------------------+--------+--------+----------------+-------------||
    |yield                    |pin     |-       |-               |advancing    ||
    |-------------------------+--------+--------+----------------+-------------||
-   |enable-theshold          |setting |numeric |'1'             |advancing    ||
+   |enabled?                 |setting |numeric |'1'             |advancing    ||
    |-------------------------+--------+--------+----------------+-------------||
-   |enabled?                 |setting |numeric |enable-threshold|advancing    ||
+   |enable-threshold         |setting |numeric |'1'             |advancing    ||
    |-------------------------+--------+--------+----------------+-------------||
    |yield-host-time-threshold|setting |numeric |'1'             |timing       ||
    |-------------------------+--------+--------+----------------+-------------||

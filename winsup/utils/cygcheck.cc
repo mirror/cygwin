@@ -33,7 +33,7 @@ typedef __int64 longlong;
 
 void dump_setup (int, char **, bool);
 
-static const char version[] = "$Revision: 1.26 $";
+static const char version[] = "$Revision: 1.27 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1267,7 +1267,8 @@ print_version ()
 cygcheck version %.*s\n\
 System Checker for Cygwin\n\
 Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
-Compiled on %s", len, v, __DATE__);
+Compiled on %s\n\
+", len, v, __DATE__);
 }
 
 int

@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
+Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 
 This file is part of the GNU Simulators.
 
@@ -44,6 +44,9 @@ struct argbuf {
   const IDESC *idesc;
   char trace_p;
   char profile_p;
+  /* ??? Temporary hack for skip insns.  */
+  char skip_count;
+  char unused;
   /* cpu specific data follows */
 };
 #endif

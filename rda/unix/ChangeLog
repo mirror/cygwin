@@ -1,3 +1,9 @@
+2005-03-11  Jim Blandy  <jimb@redhat.com>
+
+	* linux-target.c (linux_get_reg) [GETREGS_SETREGS_REGINFO]: In the
+	NOREGS case, check that reginfo doesn't specify an offset outside
+	our zeroed buffer.
+
 2005-03-10  Jim Blandy  <jimb@redhat.com>
 
 	Compile with no warnings.

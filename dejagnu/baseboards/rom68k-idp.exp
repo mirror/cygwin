@@ -21,7 +21,7 @@ if { [board_info $board obj_format] == "a.out" } {
     # Wrapping has to be specially done for m68k-aout, for whatever reason.
     set_board_info wrap_m68k_aout 1;
 
-    set extra_m68k_ld_flags "-N"
+    set extra_m68k_ld_flags "-N -nostdlib "
 
     # We need to tell GDB to load at the correct offset.
     set_board_info gdb_load_offset [board_info $board hex_startaddr];
@@ -29,7 +29,7 @@ if { [board_info $board obj_format] == "a.out" } {
     set extra_m68k_ld_flags ""
 }
 
-set_board_info ldflags "$extra_m68k_ld_flags -nostdlib [libgloss_link_flags] [newlib_link_flags]"
+set_board_info ldflags "$extra_m68k_ld_flags [libgloss_link_flags] [newlib_link_flags]"
 unset extra_m68k_ld_flags
 
 

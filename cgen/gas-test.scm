@@ -171,11 +171,19 @@
 #
 # Syntax: build.sh /path/to/build/gas
 
-BUILD=$1
+if [ $# = 0 ] ; then
+  if [ ! -x ../gas/as-new ] ; then
+    echo \"Usage: $0 [/path/to/gas/build]\"
+  else
+    BUILD=`pwd`/../gas
+  fi
+else
+  BUILD=$1
+fi
 
-if [ ! -f $BUILD/as-new ] ; then
-    echo \"$BUILD is not a GAS build directory.\"
-    exit 1
+if [ ! -x $BUILD/as-new ] ; then
+  echo \"$BUILD is not a gas build directory\"
+  exit 1
 fi
 
 # Put results here, so we preserve the existing set for comparison.

@@ -1,3 +1,9 @@
+2000-10-31  Ben Elliston  <bje@redhat.com>
+
+	* gas-test.scm (cgen-build.sh): Allow the generated script to run
+	with no command line arguments if the gas build directory can be
+	determined.
+
 2000-10-26  Doug Evans  <dje@casey.transmeta.com>
 
 	* insn.scm (-parse-insn-format-symbol): Fix spelling error,

@@ -712,7 +712,7 @@ void
   (set-with-parallel?! (state-parallel-exec?))
 
   (string-write
-   (gen-copyright "Decode header for @prefix@."
+   (gen-c-copyright "Decode header for @prefix@."
 		  copyright-red-hat package-red-hat-simulators)
    "\
 #ifndef @PREFIX@_DECODE_H
@@ -764,7 +764,7 @@ typedef UINT @prefix@_insn_word;
   (rtl-c-config! #:rtl-cover-fns? #t)
 
   (string-write
-   (gen-copyright "Simulator instruction decoder for @prefix@."
+   (gen-c-copyright "Simulator instruction decoder for @prefix@."
 		  copyright-red-hat package-red-hat-simulators)
    "\
 

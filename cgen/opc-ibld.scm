@@ -300,7 +300,7 @@ void
 (define (cgen-ibld.h)
   (logit 1 "Generating " (current-arch-name) "-ibld.h ...\n")
   (string-write
-   (gen-copyright "Instruction builder for @arch@."
+   (gen-c-copyright "Instruction builder for @arch@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #ifndef @ARCH@_IBLD_H

@@ -74,7 +74,7 @@
   (logit 1 "Generating " (gen-cpu-name) " desc.h ...\n")
 
   (string-write
-   (gen-copyright "Misc. entries in the @arch@ description file."
+   (gen-c-copyright "Misc. entries in the @arch@ description file."
 		  copyright-red-hat package-red-hat-simulators)
    "\
 #ifndef DESC_@ARCH@_H
@@ -212,7 +212,7 @@ namespace @arch@ {
   (rtl-c-config! #:rtl-cover-fns? #t)
 
   (string-write
-   (gen-copyright "CPU class elements for @cpu@."
+   (gen-c-copyright "CPU class elements for @cpu@."
 		  copyright-red-hat package-red-hat-simulators)
    "\
 // This file is included in the middle of the cpu class struct.
@@ -386,7 +386,7 @@ typedef struct @prefix@_trace_record {
   (rtl-c-config! #:rtl-cover-fns? #t)
 
   (string-write
-   (gen-copyright "CPU family header for @cpu@ / @prefix@."
+   (gen-c-copyright "CPU family header for @cpu@ / @prefix@."
 		  copyright-red-hat package-red-hat-simulators)
    "\
 #ifndef DEFS_@PREFIX@_H
@@ -472,7 +472,7 @@ namespace @cpu@ {
   (rtl-c-config! #:rtl-cover-fns? #t)
 
   (string-write
-   (gen-copyright (string-append "Simulator instruction operand writer for "
+   (gen-c-copyright (string-append "Simulator instruction operand writer for "
 				(current-arch-name) ".")
 		 copyright-red-hat package-red-hat-simulators)
    "\
@@ -591,7 +591,7 @@ using namespace @cpu@;
   (set-current-pbb-engine?! #f)
 
   (string-write
-   (gen-copyright "Simulator instruction semantics for @prefix@."
+   (gen-c-copyright "Simulator instruction semantics for @prefix@."
 		  copyright-red-hat package-red-hat-simulators)
    "\
 
@@ -1223,7 +1223,7 @@ restart:
   (set-current-pbb-engine?! #t)
 
   (string-write
-   (gen-copyright "Simulator instruction semantics for @prefix@."
+   (gen-c-copyright "Simulator instruction semantics for @prefix@."
 		  copyright-red-hat package-red-hat-simulators)
    "\
 

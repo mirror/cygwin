@@ -548,7 +548,7 @@ const IDESC *
   (set-with-parallel?! (state-parallel-exec?))
 
   (string-write
-   (gen-copyright "Decode header for @prefix@."
+   (gen-c-copyright "Decode header for @prefix@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #ifndef @PREFIX@_DECODE_H
@@ -578,7 +578,7 @@ const IDESC *
   (rtl-c-config! #:rtl-cover-fns? #t)
 
   (string-write
-   (gen-copyright "Simulator instruction decoder for @prefix@."
+   (gen-c-copyright "Simulator instruction decoder for @prefix@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #define WANT_CPU @cpu@

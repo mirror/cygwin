@@ -94,7 +94,7 @@
   (logit 1 "Generating arch.h ...\n")
 
   (string-write
-   (gen-copyright "Simulator header for @arch@."
+   (gen-c-copyright "Simulator header for @arch@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "#ifndef @ARCH@_ARCH_H\n"
    "#define @ARCH@_ARCH_H\n"
@@ -119,7 +119,7 @@
   (logit 1 "Generating arch.c ...\n")
 
   (string-write
-   (gen-copyright "Simulator support for @arch@."
+   (gen-c-copyright "Simulator support for @arch@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #include \"sim-main.h\"
@@ -138,7 +138,7 @@
   (logit 1 "Generating cpuall.h ...\n")
 
   (string-write
-   (gen-copyright "Simulator CPU header for @arch@."
+   (gen-c-copyright "Simulator CPU header for @arch@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "#ifndef @ARCH@_CPUALL_H\n"
    "#define @ARCH@_CPUALL_H\n"
@@ -157,7 +157,7 @@
   (logit 1 "Generating ops.c ...\n")
 
   (string-write
-   (gen-copyright "Simulator operational support for @arch@."
+   (gen-c-copyright "Simulator operational support for @arch@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #define MEMOPS_DEFINE_INLINE

@@ -766,19 +766,22 @@
 (define (bytes->bits bytes) (* bytes 8))
 
 ; Return a list of integers.
-; ARGS is either a list of one integer (N) meaning return a list from 0 to N-1,
-; or a list of two integers (START N) meaning return a list from START to
-; START+N-1.
-; FIXME: change to (iota n . start).
+; Usage:
+; (.iota count)            ; start=0, incr=1
+; (.iota count start)      ; incr=1
+; (.iota count start incr)
 
-(define (iota . args)
-  (case (length args)
-    ((1) (let loop ((n (car args)) (z nil))
-	   (if (<= n 0) z (loop (1- n) (cons (1- n) z)))))
-    ((2) (let ((start (car args)))
-	   (let loop ((n (cadr args)) (z nil))
-	     (if (<= n 0) z (loop (1- n) (cons (+ start (1- n)) z))))))
-    (else (error "iota: wrong number of arguments:" args)))
+(define (iota count . start-incr)
+  (if (> (length start-incr) 2)
+      (error "iota: wrong number of arguments:" start-incr))
+  (if (< count 0)
+      (error "iota: count must be non-negative:" n))
+  (let ((start (if (pair? start-incr) (car start-incr) 0))
+	(incr (if (= (length start-incr) 2) (cadr start-incr) 1)))
+    (let loop ((i start) (count count) (result '()))
+      (if (= count 0)
+	  (reverse! result)
+	  (loop (+ i incr) (- count 1) (cons i result)))))
 )
 
 ; Return a list of the first N powers of 2.
@@ -1189,11 +1192,15 @@ This file is part of the GNU simulators.
 This file is part of the Red Hat simulators.
 ")
 
+(define package-cgen "\
+This file is part of CGEN.
+")
+
 ; Return COPYRIGHT, with FILE-DESC as the first line
 ; and PACKAGE as the name of the package which the file belongs in.
 ; COPYRIGHT is a pair of (header . trailer).
 
-(define (gen-copyright file-desc copyright package)
+(define (gen-c-copyright file-desc copyright package)
   (string-append "/* " file-desc "\n\n"
 		 (car copyright)
 		 "\n" package "\n"

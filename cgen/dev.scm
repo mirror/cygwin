@@ -56,6 +56,11 @@
 			desc-init!
 			desc-finish!
 			desc-analyze!))
+      ((DOC) (cpu-load (string-append "./cpu/" arch ".cpu")
+			keep-mach keep-isa options
+			doc-init!
+			doc-finish!
+			doc-analyze!))
       ((OPCODES) (cpu-load (string-append "./cpu/" arch ".cpu")
 			   keep-mach keep-isa options
 			   opcodes-init!
@@ -86,6 +91,13 @@
 ; Tell maybe-load to always load the file.
 (if (not (defined? 'CHECK-LOADED?))
     (define CHECK-LOADED? #f))
+
+(define (load-doc)
+  (load "read")
+  (load "desc")
+  (load "desc-cpu")
+  (load "html")
+)
 
 (define (load-opc)
   (load "read")
@@ -146,6 +158,7 @@ First enable compiled in C code if desired.
 
 Then choose the application via one of:
 
+(load-doc)
 (load-opc)
 (load-gtest)
 (load-sim)

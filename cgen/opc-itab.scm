@@ -691,7 +691,7 @@ void
 (define (cgen-opc.h)
   (logit 1 "Generating " (current-arch-name) "-opc.h ...\n")
   (string-write
-   (gen-copyright "Instruction opcode header for @arch@."
+   (gen-c-copyright "Instruction opcode header for @arch@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #ifndef @ARCH@_OPC_H
@@ -714,7 +714,7 @@ void
 (define (cgen-opc.c)
   (logit 1 "Generating " (current-arch-name) "-opc.c ...\n")
   (string-write
-   (gen-copyright "Instruction opcode table for @arch@."
+   (gen-c-copyright "Instruction opcode table for @arch@."
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #include \"sysdep.h\"

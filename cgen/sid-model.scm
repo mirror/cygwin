@@ -492,7 +492,7 @@ const MACH " (gen-sym mach) "_mach =
   (set-with-parallel?! (state-parallel-exec?))
 
   (string-write
-   (gen-copyright "Simulator model support for @prefix@."
+   (gen-c-copyright "Simulator model support for @prefix@."
 		  copyright-red-hat package-red-hat-simulators)
    "\
 
@@ -519,7 +519,7 @@ using namespace @cpu@; // FIXME: namespace organization still wip
   (assert-keep-one)
 
   (string-write
-   (gen-copyright "Simulator model support for @prefix@."
+   (gen-c-copyright "Simulator model support for @prefix@."
 		  copyright-red-hat package-red-hat-simulators)
    "\
 #ifndef @PREFIX@_MODEL_H

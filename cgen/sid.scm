@@ -1580,8 +1580,8 @@
 		       (iota (length inputs)))
 	   (string-map (lambda (arg num) (gen-ref-arg arg num 'out))
 		       outputs
-		       (iota (length inputs)
-			     (length outputs))))
+		       (iota (length outputs)
+			     (length inputs))))
 	  "")
       ; Emit the call to the handler.
       "    " cycles-var-name " += "

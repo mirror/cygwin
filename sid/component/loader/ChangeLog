@@ -1,3 +1,9 @@
+2004-02-14  Dave Brolley  <brolley@redhat.com>
+
+        * Makefile.am (INCLUDES): Add $(srcdir)/../../../include to find
+        libiberty.h.
+        * Makefile.in: Regenerated.
+
 2004-02-12  Dave Brolley  <brolley@redhat.com>
 
 	* elfload.h: Use 'unsigned long long' instead of host_int_8.

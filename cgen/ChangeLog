@@ -1,3 +1,8 @@
+2000-09-06  Frank Ch. Eigler  <fche@redhat.com>
+
+	* utils-gen.scm (gen-multi-ifld-extract): Handle case of multi-ifield
+	with decode proc.
+
 2000-09-05  Dave Brolley  <brolley@redhat.com>
 
 	* sim.scm (sim-finish!): Honour the definition of FAST_P when calling

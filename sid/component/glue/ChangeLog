@@ -1,3 +1,8 @@
+2001-06-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* glue.cxx (probing_bus::traceAccess): Print non-zero latency.
+	* hw-glue-probe-bus.txt: Document this.
+
 2001-06-22  Ben Elliston  <bje@redhat.com>
 
 	* glue.cxx (probing_bus::traceAccess): Omit bus::delayed.

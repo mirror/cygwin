@@ -49,19 +49,20 @@
 
       One line per transaction is shown in a format resembling the common gdb simulators'
       "--trace-core" output:
-                MODE:ADDRESS ARROW DATA [STATUS]
+                MODE:ADDRESS ARROW DATA [LATENCY] [STATUS]
       where
       MODE is an encoding of the access type: {read,write}-{le,be}-{1,2,4,8}
            where "le" and "be" represent little- or big-endianness,
            and 1-8 represent the number of bytes transferred.
       ARROW is a redundant encoding of direction: {->,<-} for {read,write}
       ADDRESS and DATA are hex-encoded host-endian values,
+      LATENCY is a string encoding of the bus access latency, though 0 is omitted
       STATUS is a string encoding of the bus::status, though "ok" is omitted
 
       Examples:
 
       write-be-2:0xa002001c <- 0x3442
-      read-le-8:0x807fff30 -> 0xffffffff807fff68
+      read-le-8:0x807fff30 -> 0xffffffff807fff68 l:10
       write-be-4:0xfeedface <- 0xdeadbeef unmapped!
 
   - SID conventions

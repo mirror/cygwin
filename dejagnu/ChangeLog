@@ -1,5 +1,14 @@
 2004-11-11  Nick Clifton  <nickc@redhat.com>
 
+	* lib/libgloss.exp (libio_include_flags, g++_include_flags,
+	winsup_include_flags): Revert previous patch, restoring the use of
+	-I, for all libraries except newlib.  Newlib needs -isystem to
+	avoid the problems with <limits.h> but the C++ and winsup
+	libraries need -I because -isystem generates an implicit 'extern
+	"C"' which may not be appropriate for certain targets.
+
+2004-11-11  Nick Clifton  <nickc@redhat.com>
+
 	* Import this patch from dejagnu mainline sources.  It fixes
 	unexpected failures in the GCC and G++ testsuites where <limits.h>
 	is #include's in strict ANSI mode.

@@ -62,8 +62,6 @@ public:
   bool warnings_enabled;
 
   // Print messages here.  
-  // XXX: Should be a pointer or somesuch, so it can be changed during a run.
-  ostream& trace_stream;
   // Cover fns to start/end insn tracing.
   void begin_trace (PCADDR pc, const char* insn_name);
   void end_trace ();

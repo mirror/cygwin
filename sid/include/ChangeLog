@@ -1,3 +1,10 @@
+2001-11-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcpuutil.h (basic_cpu): Add cg caller/callee pins, trace_stream
+	fields.
+	(basic_cpu ctor): Initialize them.
+	(cg_profile): New function.
+
 2001-10-04  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidcpuutil.h (basic_cpu ctor): Initialize those tracing flags.

@@ -100,7 +100,7 @@ $load_mapper_data = "cpu-mapper access-port";
 	    "enable-warnings!" => ["enable-warnings", "Enable CPU execution warnings.", "no"],
 	    "memory-region=s@" => ["memory-region=BASE,SIZE", "Add RAM region from BASE to BASE+SIZE-1.", "no",
 				   "other options:",
-				   "   bus=MAPPER     Attach memory to bus MAPPER, not data",
+				   "   bus=MAPPER     Attach memory to bus MAPPER",
 				   "   read-only      Make memory read-only",
 				   "   alias=BASE2    Add an alias at BASE2",
 				   "   file=FILENAME  Load/save memory image from file",
@@ -120,7 +120,7 @@ $load_mapper_data = "cpu-mapper access-port";
 	    "persistent!" => ["persistent", "Rerun top-level loop indefinitely.", "no"],
 	    "no-run!" => ["no-run", "Make config file (--save-temps) and exit.", "no"],
 	    "insn-count=i" => ["insn-count=N", "Block of uninterrupted ticks for insns", "10000"],
-	    "gprof!" => ["gprof", "GPROF-profile, collect every N ticks", "no"],
+	    "gprof!" => ["gprof", "GPROF-profile, collect every insn-count ticks", "no"],
 	    "sidrtc=s" => [],
 	    "sidcodec=s" => [],
 	    "wrap=s@" => ["wrap=COMPONENT", "Turn on SID API tracing for named component", "none"],
@@ -462,6 +462,8 @@ if ($opt_gprof)
 connect-pin target-sched 0-event -> gprof sample
 connect-pin deinit-sequence output-7 -> gprof store
 relate gprof target-component cpu
+connect-pin cpu cg-caller -> gprof cg-caller
+connect-pin cpu cg-callee -> gprof cg-callee
 set gprof value-attribute pc
 set gprof bucket-size 4 # bytes per bucket
 ";

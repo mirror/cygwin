@@ -1,3 +1,9 @@
+2001-11-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cgen-cpu.h (cgen_bi_endian_cpu): Remove trace_stream field: it's
+	in basic_cpu now.
+	* compCGEN.cxx: Corresponding change.
+
 2001-08-03  matthew green  <mrg@redhat.com>
 
 	* cgen-cpu.h (~cgen_bi_endian_cpu): Add throw() specifier.

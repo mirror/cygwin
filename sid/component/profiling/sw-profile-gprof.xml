@@ -5,10 +5,11 @@
   <defcomponent name="sw-profile-gprof" type="concrete">
 
     <!-- pins -->
+    <defpin name="reset" direction="in" legalvalues="any" behaviors="resetting" />
     <defpin name="sample" direction="in" legalvalues="any" behaviors="data gathering" />
-    <defpin name="reset" direction="in" legalvalues="any" behaviors="data gathering" />
+    <defpin name="cg-caller" direction="in" legalvalues="any" behaviors="data gathering" />
+    <defpin name="cg-callee" direction="in" legalvalues="any" behaviors="data gathering" />
     <defpin name="store" direction="in" legalvalues="any" behaviors="profile generation" />
-
 
     <!-- attributes -->
     <defattribute name="value-count" category="register" legalvalues="decimal string" behaviors="data gathering" />
@@ -19,8 +20,10 @@
     <defattribute name="value-attribute" category="setting" legalvalues="name" defaultvalue="'pc'" behaviors="data gathering" />
     <defattribute name="output-file" category="setting" legalvalues="file name" defaultvalue="'gmon.out'" behaviors="configuration" />
     <defattribute name="output-file-endianness" category="setting" legalvalues="0/1/2/little/big/unknown" defaultvalue="unknown" behaviors="configuration" />
+    <defattribute name="reset" category="pin" behaviors="resetting" />
     <defattribute name="sample" category="pin" behaviors="data gathering" />
-    <defattribute name="reset" category="pin" behaviors="data gathering" />
+    <defattribute name="cg-caller" category="pin" behaviors="data gathering" />
+    <defattribute name="cg-callee" category="pin" behaviors="data gathering" />
     <defattribute name="store" category="pin" behaviors="profile generation" />
 
 
@@ -63,20 +66,31 @@
 
     <behavior name="data gathering">
       <p>
-      Whenever the <pin>sample</pin> pin is driven, this component takes a single
-      sample of the configured target component's value attribute.  The
-      attribute is interpreted as a numeric string, and the resulting
-      number is accumulated in a big histogram, in the appropriate bucket.
-      The bucket is chosen by masking the number into <attribute>bucket-size</attribute>-wide
-      buckets.
+      Whenever the <pin>sample</pin> pin is driven, this component
+      takes a single sample of the configured target component's value
+      attribute.  The attribute is interpreted as a numeric string,
+      and the resulting number is accumulated in a big histogram, in
+      the appropriate bucket.  The bucket is chosen by masking the
+      number into <attribute>bucket-size</attribute>-wide buckets.
+      If the target component is unset, or its target attribute does
+      not result in a valid numeric string, no sample is accumulated.
+      </p>
+      <p>Alternately, if the <pin>cg-caller</pin> and then the <pin>cg-callee</pin>
+      pins are driven, the values driven are interpreted as the caller and the
+      callee PC addresses of a subroutine call event.  These events are recorded
+      in a dynamic call graph.
       </p>
       <p>
-      If the target component is unset, or its target attribute does not
-      result in a valid numeric string, no sample is accumulated.  If a
-      sample was collected, and falls between the <attribute>limit-min</attribute> and <attribute>limit-max</attribute>
-      attributes' bounds, <attribute>value-count</attribute> is incremented, and <attribute>value-min</attribute>
-      and <attribute>value-max</attribute> registers are updated.
+      If a sample was collected, and falls between the
+      <attribute>limit-min</attribute> and
+      <attribute>limit-max</attribute> attributes' bounds,
+      <attribute>value-count</attribute> is incremented, and
+      <attribute>value-min</attribute> and
+      <attribute>value-max</attribute> registers are updated.
       </p>
+    </behavior>
+
+    <behavior name="resetting">
       <p>
       Whenever the <pin>reset</pin> pin is driven, the entire accumulated
       histogram and associated counters are discarded and a new count
@@ -87,18 +101,17 @@
 
     <behavior name="profile generation">
       Whenever the <pin>store</pin> pin is driven, this component dumps the entire
-      accumulated histogram into a gprof (version 1) formatted file.  The
+      accumulated histogram and call graph into a gprof (version 1) formatted file.  The
       file's endianness is chosen based on the <attribute>target-file-endianness</attribute>
       setting.  If it is unset, the target component's <attribute>endian</attribute> attribute
       will be queried and used if valid.
 
-      The histogram is not automatically cleared after the store
+      The histogram and call graph are not automatically cleared after the store
       operation.  This makes it possible to save multiple generational
       profiling files to track history of a program cumulatively.  If
       the <pin>reset</pin> pin is triggered after every <pin>store</pin>, then separate
       intervals of the program's execution may be profiled.
     </behavior>
-
 
     <convention name="supervisory" supported="true" />
     <convention name="save/restore" supported="false" />

@@ -1,6 +1,6 @@
 /* version.h -- Cygwin version numbers and accompanying documentation.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -42,7 +42,7 @@ details. */
 	 changes to the DLL and is mainly informative in nature. */
 
 #define CYGWIN_VERSION_DLL_MAJOR 1003
-#define CYGWIN_VERSION_DLL_MINOR 15
+#define CYGWIN_VERSION_DLL_MINOR 22
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -154,19 +154,44 @@ details. */
        56: Make ntsec on by default.
        57: Export setgroups.
        58: Export memalign, valloc, malloc_trim, malloc_usable_size, mallopt,
-           malloc_stats
+	   malloc_stats
        59: getsid
        60: MSG_NOSIGNAL
        61: Export getc_unlocked, getchar_unlocked, putc_unlocked,
 	   putchar_unlocked
-       62: Erroneously bumped.
-       63: Export pututline.
+       62: Erroneously bumped
+       63: Export pututline
+       64: Export fseeko, ftello
+       65: Export siginterrupt
+       66: Export nl_langinfo
+       67: Export pthread_getsequence_np
+       68: Export netdb stuff
+       69: Export strtof
+       70: Export asprintf, _asprintf_r, vasprintf, _vasprintf_r
+       71: Export strerror_r
+       72: Export nanosleep
+       73: Export setreuid32, setreuid, setregid32, setregid
+       74: Export _strtold a64l hcreate hcreate_r hdestroy hdestroy_r hsearch
+		  hsearch_r isblank iswalnum iswalpha iswblank iswcntrl iswctype
+		  iswdigit iswgraph iswlower iswprint iswpunct iswspace iswupper
+		  iswxdigit l64a mbrlen mbrtowc mbsinit mbsrtowcs mempcpy
+		  on_exit setbuffer setlinebuf strndup strnlen tdelete tdestroy
+		  tfind towctrans towlower towupper tsearch twalk wcrtomb wcscat
+		  wcschr wcscpy wcscspn wcslcat wcslcpy wcsncat wcsncmp wcsncpy
+		  wcspbrk wcsrchr wcsrtombs wcsspn wcsstr wctob wctob wctrans
+		  wctype wmemchr wmemcmp wmemcpy wmemmove wmemset
+       75: Export exp2 exp2f fdim fdimf fma fmaf fmax fmaxf fmin fminf lrint
+		  lrintf lround lroundf nearbyint nearbyintf remquo remquof
+		  round roundf scalbln scalblnf sincos sincosf tgamma tgammaf
+		  truncf
+       76: mallinfo
+       77: thread-safe exit/at_exit
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 63
+#define CYGWIN_VERSION_API_MINOR 77
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

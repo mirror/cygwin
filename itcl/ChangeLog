@@ -1,3 +1,8 @@
+2000-05-03  Syd Polk  <spolk@redhat.com>
+
+	* Makefile.in (check test): Call "make test" explicitly when
+	running toplevel "make check" or "make test".
+
 2000-04-29  Andreas Jaeger  <aj@suse.de>
 
 	* Makefile.in (check): Handle make check like make test.

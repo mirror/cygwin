@@ -505,7 +505,7 @@ AC_DEFUN(CY_AC_PATH_ITCLCONFIG, [
 if test x"${no_itcl}" = x ; then
   # we reset no_itcl in case something fails here
   no_itcl=true
-  AC_ARG_WITH(itclconfig, [  --with-itclconfig           directory containing itcl configuration (itclConfig.sh)],
+  AC_ARG_WITH(itclconfig, [  --with-itclconfig       Directory containing itcl configuration (itclConfig.sh)],
          with_itclconfig=${withval})
   AC_MSG_CHECKING([for Itcl configuration])
   AC_CACHE_VAL(ac_cv_c_itclconfig,[
@@ -631,7 +631,7 @@ AC_DEFUN(CY_AC_PATH_ITKCONFIG, [
 if test x"${no_itk}" = x ; then
   # we reset no_itk in case something fails here
   no_itk=true
-  AC_ARG_WITH(itkconfig, [  --with-itkconfig           directory containing itk configuration (itkConfig.sh)],
+  AC_ARG_WITH(itkconfig, [  --with-itkconfig        Directory containing itk configuration (itkConfig.sh)],
          with_itkconfig=${withval})
   AC_MSG_CHECKING([for Itk configuration])
   AC_CACHE_VAL(ac_cv_c_itkconfig,[
@@ -777,7 +777,7 @@ AC_DEFUN(CY_AC_PATH_TIXCONFIG, [
 if test x"${no_tix}" = x ; then
   # we reset no_tix in case something fails here
   no_tix=true
-  AC_ARG_WITH(tixconfig, [  --with-tixconfig           directory containing tix configuration (tixConfig.sh)],
+  AC_ARG_WITH(tixconfig, [  --with-tixconfig        Directory containing tix configuration (tixConfig.sh)],
          with_tixconfig=${withval})
   AC_MSG_CHECKING([for Tix configuration])
   AC_CACHE_VAL(ac_cv_c_tixconfig,[
@@ -871,6 +871,39 @@ dnl    AC_SUBST(TIX_BUILD_INCLUDES)
     AC_SUBST(TIX_BUILD_LIB_SPEC)
 dnl    AC_SUBST(TIX_LIB_SPEC)
 ])
+
+# Add --enable-maintainer-mode option to configure.
+# From Jim Meyering
+
+# serial 1
+
+AC_DEFUN(AM_MAINTAINER_MODE,
+[AC_MSG_CHECKING([whether to enable maintainer-specific portions of Makefiles])
+  dnl maintainer-mode is disabled by default
+  AC_ARG_ENABLE(maintainer-mode,
+[  --enable-maintainer-mode enable make rules and dependencies not useful
+                          (and sometimes confusing) to the casual installer],
+      USE_MAINTAINER_MODE=$enableval,
+      USE_MAINTAINER_MODE=no)
+  AC_MSG_RESULT($USE_MAINTAINER_MODE)
+  AM_CONDITIONAL(MAINTAINER_MODE, test $USE_MAINTAINER_MODE = yes)
+  MAINT=$MAINTAINER_MODE_TRUE
+  AC_SUBST(MAINT)dnl
+]
+)
+
+# Define a conditional.
+
+AC_DEFUN(AM_CONDITIONAL,
+[AC_SUBST($1_TRUE)
+AC_SUBST($1_FALSE)
+if $2; then
+  $1_TRUE=
+  $1_FALSE='#'
+else
+  $1_TRUE='#'
+  $1_FALSE=
+fi])
 
 
 # serial 1

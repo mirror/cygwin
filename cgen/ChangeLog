@@ -1,5 +1,8 @@
 2001-06-14  Geoffrey Keating  <geoffk@redhat.com>
 
+	* desc.scm (<keyword> 'gen-defn): Add extra zero into
+	CGEN_KEYWORD_ENTRY initializers.
+
 	* gas-test.scm (gen-gas-test): Create 8 testcases, not just 5.
 	(<operand> 'test-data): Involve both the index and the hardware
 	in testcase generation.

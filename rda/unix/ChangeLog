@@ -1,5 +1,14 @@
 2004-10-20  Jim Blandy  <jimb@redhat.com>
 
+	Use the libthread_db 'td_symbol_list' function to look up all the
+	symbols libthread_db will need when invited to by GDB.
+	* thread-db.c (add_symbol_to_list): Make 'name' argument const.
+	(td_symbol_list_p): New libthread_db function pointer.
+	(thread_db_dlopen): Initialize it.
+	(thread_db_attach): Use td_symbol_list to pre-load our symbol
+	cache with the names of all the symbols libthread_db will ever
+	request.
+
 	* thread-db.c (thread_db_get_gen): There's no reason to try to
 	open a thread agent until we've at least requested values for all
 	the symbols we know about.

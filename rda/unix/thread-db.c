@@ -70,7 +70,7 @@ struct symbol_cache {
    for those that have already been defined by the debugger. */
 
 static void
-add_symbol_to_list (char *name, paddr_t value, int defined_p)
+add_symbol_to_list (const char *name, paddr_t value, int defined_p)
 {
   struct symbol_cache *tmp;
 
@@ -374,6 +374,8 @@ static td_err_e (*td_thr_setxregs_p)     (const td_thrhandle_t *th,
 					  void *xregs);
 static td_err_e (*td_thr_event_enable_p) (const td_thrhandle_t *th, 
 					  int event);
+static const char **(*td_symbol_list_p)  (void);
+
 
 /* Function: thread_db_state_str
    Convert a thread_db state code to a string.
@@ -825,6 +827,7 @@ thread_db_dlopen (void)
   td_thr_getxregsize_p  = dlsym (dlhandle, "td_thr_getxregsize");
   td_thr_getxregs_p     = dlsym (dlhandle, "td_thr_getxregs");
   td_thr_setxregs_p     = dlsym (dlhandle, "td_thr_setxregs");
+  td_symbol_list_p      = dlsym (dlhandle, "td_symbol_list");
 
   return 0;		/* success */
 }
@@ -2314,14 +2317,28 @@ thread_db_attach (struct gdbserv *serv, struct gdbserv_target *target)
   else
     fprintf (stderr, "< ERROR attach: GDB will not read thread regs. >>>\n");
 
-  /* KLUDGE: Insert some magic symbols into the cached symbol list,
-     to be looked up later.  This is badly wrong -- we should be 
-     obtaining these values thru the thread_db interface.  Their names
-     should not be hard-coded here <sob>. */
-  add_symbol_to_list ("__pthread_sig_restart",   0, UNDEFINED);
-  add_symbol_to_list ("__pthread_sig_cancel",    0, UNDEFINED);
-  add_symbol_to_list ("__pthread_sig_debug",     0, UNDEFINED);
-  add_symbol_to_list ("__pthread_threads_debug", 0, UNDEFINED);
+  if (td_symbol_list_p)
+    {
+      /* Take all the symbol names libthread_db might try to look up
+	 and place them in our cached symbol list, to be looked up
+	 when invited by GDB.  */
+      const char **symbol_list = td_symbol_list_p ();
+      int i;
+
+      for (i = 0; symbol_list[i]; i++)
+	add_symbol_to_list (symbol_list[i], 0, UNDEFINED);
+    }
+  else
+    {
+      /* KLUDGE: Insert some magic symbols into the cached symbol list,
+	 to be looked up later.  This is badly wrong -- we should be 
+	 obtaining these values thru the thread_db interface.  Their names
+	 should not be hard-coded here <sob>. */
+      add_symbol_to_list ("__pthread_sig_restart",   0, UNDEFINED);
+      add_symbol_to_list ("__pthread_sig_cancel",    0, UNDEFINED);
+      add_symbol_to_list ("__pthread_sig_debug",     0, UNDEFINED);
+      add_symbol_to_list ("__pthread_threads_debug", 0, UNDEFINED);
+    }
 
   /* Attempt to open the thread_db interface.  This attempt will 
      most likely fail (unles the child is statically linked). */

@@ -1,5 +1,14 @@
 2001-08-02  Mo DeJong  <mdejong@redhat.com>
 
+	* src/tkWinPrintCanvas.c (PrintCanvasCmd):
+	* src/tkWinPrintText.c (PrintTextCmd): Plug
+	memory leak by calling free on memory allocated
+	in PrintCanvasCmd and PrintTextCmd method. Make
+	sure error cases branch to the cleanup code at
+	the end of the method instead of just returning.
+
+2001-08-02  Mo DeJong  <mdejong@redhat.com>
+
 	* src/tkWinPrintText.c (DisplayDLineToDrawable): Fix
 	compiler warning by adding missing static modifier
 	to funciton declaration.

@@ -1,33 +1,37 @@
 /* Support for complaint handling during symbol reading in GDB.
    Copyright (C) 1990, 1991, 1992  Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #include "defs.h"
 #include "complaints.h"
 #include "gdbcmd.h"
 
+extern void _initialize_complaints (void);
+
 /* Structure to manage complaints about symbol file contents.  */
 
-struct complaint complaint_root[1] = {
+struct complaint complaint_root[1] =
+{
   {
-    (char *) NULL,	/* Complaint message */
-    0,			/* Complaint counter */
-    complaint_root	/* Next complaint. */
+    (char *) NULL,		/* Complaint message */
+    0,				/* Complaint counter */
+    complaint_root		/* Next complaint. */
   }
 };
 
@@ -42,46 +46,33 @@ static unsigned int stop_whining = 0;
    case 0:  self explanatory message.
    case 1:  First message of a series that must start off with explanation.
    case 2:  Subsequent message, when user already knows we are reading
-            symbols and we can just state our piece.  */
+   symbols and we can just state our piece.  */
 
 static int complaint_series = 0;
 
 /* External variables and functions referenced. */
 
 extern int info_verbose;
-
 
+
 /* Functions to handle complaints during symbol reading.  */
 
 /* Print a complaint about the input symbols, and link the complaint block
    into a chain for later handling.  */
 
-/* VARARGS */
 void
-#ifdef ANSI_PROTOTYPES
-complain (struct complaint *complaint, ...)
-#else
-complain (va_alist)
-     va_dcl
-#endif
+complain (struct complaint *complaint,...)
 {
   va_list args;
-#ifdef ANSI_PROTOTYPES
   va_start (args, complaint);
-#else
-  struct complaint *complaint;
 
-  va_start (args);
-  complaint = va_arg (args, struct complaint *);
-#endif
-
-  complaint -> counter++;
-  if (complaint -> next == NULL)
+  complaint->counter++;
+  if (complaint->next == NULL)
     {
-      complaint -> next = complaint_root -> next;
-      complaint_root -> next = complaint;
+      complaint->next = complaint_root->next;
+      complaint_root->next = complaint;
     }
-  if (complaint -> counter > stop_whining)
+  if (complaint->counter > stop_whining)
     {
       return;
     }
@@ -91,36 +82,36 @@ complain (va_alist)
     {
 
       /* Isolated messages, must be self-explanatory.  */
-      case 0:
-        begin_line ();
-        puts_filtered ("During symbol reading, ");
-	wrap_here ("");
-	vprintf_filtered (complaint -> message, args);
-	puts_filtered (".\n");
-	break;
+    case 0:
+      begin_line ();
+      fputs_filtered ("During symbol reading, ", gdb_stderr);
+      wrap_here ("");
+      vfprintf_filtered (gdb_stderr, complaint->message, args);
+      fputs_filtered (".\n", gdb_stderr);
+      break;
 
       /* First of a series, without `set verbose'.  */
-      case 1:
-        begin_line ();
-	puts_filtered ("During symbol reading...");
-	vprintf_filtered (complaint -> message, args);
-	puts_filtered ("...");
-	wrap_here ("");
-	complaint_series++;
-	break;
+    case 1:
+      begin_line ();
+      fputs_filtered ("During symbol reading...", gdb_stderr);
+      vfprintf_filtered (gdb_stderr, complaint->message, args);
+      fputs_filtered ("...", gdb_stderr);
+      wrap_here ("");
+      complaint_series++;
+      break;
 
       /* Subsequent messages of a series, or messages under `set verbose'.
-	 (We'll already have produced a "Reading in symbols for XXX..."
-	 message and will clean up at the end with a newline.)  */
-      default:
-	vprintf_filtered (complaint -> message, args);
-	puts_filtered ("...");
-	wrap_here ("");
+         (We'll already have produced a "Reading in symbols for XXX..."
+         message and will clean up at the end with a newline.)  */
+    default:
+      vfprintf_filtered (gdb_stderr, complaint->message, args);
+      fputs_filtered ("...", gdb_stderr);
+      wrap_here ("");
     }
   /* If GDB dumps core, we'd like to see the complaints first.  Presumably
      GDB will not be sending so many complaints that this becomes a
      performance hog.  */
-  gdb_flush (gdb_stdout);
+  gdb_flush (gdb_stderr);
   va_end (args);
 }
 
@@ -139,9 +130,9 @@ clear_complaints (sym_reading, noisy)
 {
   struct complaint *p;
 
-  for (p = complaint_root -> next; p != complaint_root; p = p -> next)
+  for (p = complaint_root->next; p != complaint_root; p = p->next)
     {
-      p -> counter = 0;
+      p->counter = 0;
     }
 
   if (!sym_reading && !noisy && complaint_series > 1)

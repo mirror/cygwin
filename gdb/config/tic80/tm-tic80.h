@@ -2,39 +2,34 @@
    Copyright 1997
    Free Software Foundation, Inc. 
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #ifndef TM_TIC80_H
 #define TM_TIC80_H
 
-#ifdef __STDC__		/* Forward declare structs used in prototypes */
+/* Forward declare structs used in prototypes */
 struct frame_info;
 struct type;
 struct value;
 struct symbol;
 struct frame_saved_regs;
-#endif
 
 #define TARGET_BYTE_ORDER LITTLE_ENDIAN
-
-/* Define this if the C compiler puts an underscore at the front
-   of external names before giving them to the linker.  */
-
-#define NAMES_HAVE_UNDERSCORE
 
 #define NUM_REGS 38
 
@@ -61,9 +56,9 @@ struct frame_saved_regs;
 #define A0_REGNUM 34		/* Accumulator register 0 */
 #define A3_REGNUM 37		/* Accumulator register 1 */
 
-#define R0_REGNUM 0             /* General Purpose Register 0 - for sim */
-#define Rn_REGNUM 31            /* Last General Purpose Register - for sim */
-#define An_REGNUM A3_REGNUM     /* Last Accumulator register - for sim */
+#define R0_REGNUM 0		/* General Purpose Register 0 - for sim */
+#define Rn_REGNUM 31		/* Last General Purpose Register - for sim */
+#define An_REGNUM A3_REGNUM	/* Last Accumulator register - for sim */
 
 /* Total amount of space needed to store our copies of the machine's
    register state, the array `registers'.  */
@@ -121,12 +116,12 @@ struct frame_saved_regs;
    This is often the number of bytes in BREAKPOINT
    but not always.  */
 
-#define DECR_PC_AFTER_BREAK	0			/* FIXME! */
+#define DECR_PC_AFTER_BREAK	0	/* FIXME! */
 
 /* Discard from the stack the innermost frame, restoring all registers.  */
 
 #define POP_FRAME tic80_pop_frame(get_current_frame ())
-extern struct frame_info *tic80_pop_frame PARAMS ((struct frame_info *frame));
+extern struct frame_info *tic80_pop_frame (struct frame_info *frame);
 
 /* Return number of bytes at start of arglist that are not really args.  */
 
@@ -136,7 +131,7 @@ extern struct frame_info *tic80_pop_frame PARAMS ((struct frame_info *frame));
    Can set VAL to -1, meaning no way to tell.  */
 /* We can't tell how many args there are */
 
-#define FRAME_NUM_ARGS(val,fi) (val = -1)
+#define FRAME_NUM_ARGS(fi) (-1)
 
 #define FRAME_ARGS_SKIP 0
 #define FRAME_ARGS_ADDRESS(fi)   (fi)->frame
@@ -154,7 +149,7 @@ extern struct frame_info *tic80_pop_frame PARAMS ((struct frame_info *frame));
   int frameoffset;		\
   int framereg;
 
-extern void tic80_init_extra_frame_info PARAMS ((struct frame_info *fi));
+extern void tic80_init_extra_frame_info (struct frame_info *fi);
 #define INIT_EXTRA_FRAME_INFO(fromleaf, fi) tic80_init_extra_frame_info (fi)
 #define INIT_FRAME_PC		/* Not necessary */
 
@@ -166,13 +161,14 @@ extern void tic80_init_extra_frame_info PARAMS ((struct frame_info *fi));
 
 #define FRAME_FIND_SAVED_REGS(frame_info, frame_saved_regs)	    \
    tic80_frame_find_saved_regs(frame_info, &(frame_saved_regs))
-extern void tic80_frame_find_saved_regs PARAMS ((struct frame_info *, struct frame_saved_regs *));
+extern void tic80_frame_find_saved_regs (struct frame_info *,
+					 struct frame_saved_regs *);
 
 /* Advance PC across any function entry prologue instructions
    to reach some "real" code.  */
 
-#define SKIP_PROLOGUE(pc)	{ (pc) = tic80_skip_prologue (pc); }
-extern CORE_ADDR tic80_skip_prologue PARAMS ((CORE_ADDR pc));
+#define SKIP_PROLOGUE(pc) (tic80_skip_prologue (pc))
+extern CORE_ADDR tic80_skip_prologue (CORE_ADDR pc);
 
 /* Immediately after a function call, return the saved pc.
    Can't always go through the frames for this because on some machines
@@ -188,10 +184,10 @@ extern CORE_ADDR tic80_skip_prologue PARAMS ((CORE_ADDR pc));
    and produces the frame's chain-pointer. */
 
 #define FRAME_CHAIN(thisframe) (CORE_ADDR) tic80_frame_chain (thisframe)
-extern CORE_ADDR tic80_frame_chain PARAMS ((struct frame_info *));
+extern CORE_ADDR tic80_frame_chain (struct frame_info *);
 
 #define FRAME_SAVED_PC(FRAME)	tic80_frame_saved_pc (FRAME)
-extern CORE_ADDR tic80_frame_saved_pc PARAMS ((struct frame_info *));
+extern CORE_ADDR tic80_frame_saved_pc (struct frame_info *);
 
 /* Store the address of the place in which to copy the structure the
    subroutine will return.  This is called from call_function. 
@@ -222,17 +218,17 @@ extern CORE_ADDR tic80_frame_saved_pc PARAMS ((struct frame_info *));
 
 
 /* PUSH_ARGUMENTS */
-extern CORE_ADDR tic80_push_arguments PARAMS ((int nargs, 
-					       struct value **args, 
-					       CORE_ADDR sp,
-					       unsigned char struct_return,
-					       CORE_ADDR struct_addr));
+extern CORE_ADDR tic80_push_arguments (int nargs,
+				       struct value **args,
+				       CORE_ADDR sp,
+				       unsigned char struct_return,
+				       CORE_ADDR struct_addr);
 
 #define PUSH_ARGUMENTS(NARGS, ARGS, SP, STRUCT_RETURN, STRUCT_ADDR) \
-  (SP) = tic80_push_arguments (NARGS, ARGS, SP, STRUCT_RETURN, STRUCT_ADDR)
+  (tic80_push_arguments (NARGS, ARGS, SP, STRUCT_RETURN, STRUCT_ADDR))
 
 /* PUSH_RETURN_ADDRESS */
-extern CORE_ADDR tic80_push_return_address PARAMS ((CORE_ADDR, CORE_ADDR));
+extern CORE_ADDR tic80_push_return_address (CORE_ADDR, CORE_ADDR);
 #define PUSH_RETURN_ADDRESS(PC, SP)	tic80_push_return_address (PC, SP)
 
 /* override the standard get_saved_register function with 
@@ -254,4 +250,4 @@ extern CORE_ADDR tic80_push_return_address PARAMS ((CORE_ADDR, CORE_ADDR));
 #define PUSH_DUMMY_FRAME             generic_push_dummy_frame ()
 #define PC_IN_CALL_DUMMY(PC, SP, FP) generic_pc_in_call_dummy (PC, SP, FP)
 
-#endif	/* TM_TIC80_H */
+#endif /* TM_TIC80_H */

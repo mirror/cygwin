@@ -63,6 +63,7 @@ fi
 
 case "${target}" in
 *-*-cygwin*)
+	LIBGUI_CFLAGS="-DWIN32 $LIBGUI_CFLAGS"
         touch ac$$.c
         if ${CC} -c -mwin32 ac$$.c >/dev/null 2>&1; then
             case "$LIBGUI_CFLAGS" in

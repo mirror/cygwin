@@ -1,3 +1,8 @@
+2001-10-24  Keith Seitz  <keiths@redhat.com>
+
+	* configure.in (ac_win_build): Put "-DWIN32" back into LIBGUI_CFLAGS.
+	* configure: Regenerate.
+
 2001-10-12  Christopher Faylor  <cgf@redhat.com>
 
 	* win/configure.in: Add detection for -mwin32 option requirement under

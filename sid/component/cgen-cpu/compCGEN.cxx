@@ -250,7 +250,7 @@ cgen_bi_endian_cpu::begin_trace (PCADDR pc, const char* insn_name)
 void
 cgen_bi_endian_cpu::end_trace ()
 {
-  this->trace_stream << endl;
+  trace_stream.end_line ();
 }
 
 // Counter support

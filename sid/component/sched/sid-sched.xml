@@ -8,6 +8,7 @@
     <!-- pins -->
     <defpin name="advance" direction="in" legalvalues="any" behaviors="advancing" />
     <defpin name="yield" direction="in" legalvalues="any" behaviors="advancing" />
+    <defpin name="active" direction="out" legalvalues="boolean" behaviors="advancing" />
     <defpin name="N-event" direction="out" legalvalues="no value" behaviors="advancing" />
     <defpin name="N-control" direction="in" legalvalues="coded value" behaviors="subscription" />
     <defpin name="time-query" direction="in" legalvalues="any" behaviors="timing" />
@@ -26,8 +27,8 @@
     <defattribute name="N-control" category="pin" behaviors="subscription" />
     <defattribute name="advance" category="pin" behaviors="advancing" />
     <defattribute name="yield" category="pin" behaviors="advancing" />
-    <defattribute name="enable-theshold" category="setting" legalvalues="numeric" defaultvalue="'1'" behaviors="advancing" />
-    <defattribute name="enabled?" category="setting" legalvalues="numeric" defaultvalue="enable-threshold" behaviors="advancing" />
+    <defattribute name="enable-threshold" category="setting" legalvalues="numeric" defaultvalue="'1'" behaviors="advancing" />
+    <defattribute name="enabled?" category="setting" legalvalues="numeric" defaultvalue="'1'" behaviors="advancing" />
     <defattribute name="yield-host-time-threshold" category="setting" legalvalues="numeric" defaultvalue="'1'" behaviors="timing" />
     <defattribute name="yield-host-time?" category="setting" legalvalues="numeric" defaultvalue="'0'" behaviors="timing" />
     <defattribute name="step-cycle-limit" category="setting" legalvalues="numeric" defaultvalue="advancing" />
@@ -136,14 +137,21 @@
 
     <behavior name="advancing">
       <p> When you have disabled the scheduler by setting the
-      <attribute>enabled?</attribute>  attribute to a value less than enable-threshold,
+      <attribute>enabled?</attribute> attribute to a value less than enable-threshold,
       advancing as described below, does not occur.
       </p>
 
       <p> Whenever the <pin>advance</pin> input pin is driven, the scheduler
       may dispatch one or more signals by driving the <pin>N-event</pin> output
       pins with some value.  A counter accessed by the <attribute>advance-count</attribute>
-      attribute is incremented.
+      attribute is incremented. If the attribute <attribute>enabled?</attribute> has
+      been changed from a value below <attribute>enable-threshold</attribute> to a value
+      greater than or equal to <attribute>enable-threshold</attribute>, then the pin
+      <pin>active</pin> will be driven with the value 1. If the attribute
+      <attribute>enabled?</attribute> has been changed from a value grater than or equal to
+      <attribute>enable-threshold</attribute> to a value less than 
+      <attribute>enable-threshold</attribute>, then the pin
+      <pin>active</pin> will be driven with the value 0.
       </p>
 
       <p> Whether any particular <pin>N-event</pin> pin is driven depends on

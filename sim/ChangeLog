@@ -1,23 +1,38 @@
+1999-12-30  Chandra Chavva   <cchavva@cygnus.com>
+	
+	* d10v/d10v_sim.h (INC_ADDR): Added code to assign
+	proper address for loads with predec operations.
+
+1999-11-18  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in: Require autoconf 2.13 and remove obsolete
+	invocation of AC_C_CROSS.
+	* configure: Regenerate.
+
+1999-09-29  Doug Evans  <devans@casey.cygnus.com>
+
+	* configure.in: Configure the testsuite directory for thumb.
+	* configure: Regenerate.
+
+1999-07-16  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in: Configure the testsuite directory for arm.
+	* configure: Regenerate.
+
+1999-04-08  Nick Clifton  <nickc@cygnus.com>
+
+	* configure.in: Add support for MCore target.
+	* configure: Regenerate.
+
 1999-03-14  Stan Shebs  <shebs@andros.cygnus.com>
 
 	* Makefile.in (FLAGS_TO_PASS, TARGET_FLAGS_TO_PASS): Remove
  	RUNTEST instead of commenting out, fixes portability problem.
 
-1999-02-10  Doug Evans  <devans@casey.cygnus.com>
-
-	* configure.in (sparc*): Configure sparc subdir if --with-cgen or
-	--with-cgen-sim.
-	* configure: Rebuild.
-
 1999-02-08  Nick Clifton  <nickc@cygnus.com>
 
 	* configure.in: Add support for StrongARM target.
 	* configure: Regenerate.
-
-1999-02-02  Doug Evans  <devans@casey.cygnus.com>
-
-	* configure.in (sparc*): Configure sparc subdir if --with-cgen.
-	* configure: Rebuild.
 
 1999-01-04  Jason Molenda  (jsm@bugshack.cygnus.com)
 
@@ -40,8 +55,8 @@ Fri Sep 25 10:12:19 1998  Christopher Faylor <cgf@cygnus.com>
 
 Thu May 28 14:59:46 1998 Jillian Ye <jillian@cygnus.com>
 
-        * Makefile.in: Take RUNTEST out of FLAG_TO_PASS
-                       so that make check can be invoked recursively.
+        * Makefile.in: Take RUNTEST out of FLAGS_TO_PASS so that make
+ 	check can be invoked recursively.
 
 Wed Apr 29 12:38:53 1998  Mark Alexander  <marka@cygnus.com>
 
@@ -410,7 +425,7 @@ Mon Sep 13 12:47:15 1993  K. Richard Pixley  (rich@sendai.cygnus.com)
 	* Makefile.in (all-z8k, install-z8k, clean-z8k, all-h8300,
 	  install-h8300, clean-h8300, all-h8500, install-h8500,
 	  clean-h8500, all-sh, install-sh, clean-sh): do not echo
-	  recursion lines. 
+	  recursion lines.
 
 Wed Jun 30 14:12:05 1993  david d `zoo' zuhn  (zoo at poseidon.cygnus.com)
 

@@ -33,7 +33,7 @@ typedef __int64 longlong;
 
 void dump_setup (int, char **, bool);
 
-static const char version[] = "$Revision: 1.23 $";
+static const char version[] = "$Revision: 1.24 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1303,12 +1303,11 @@ main (int argc, char **argv)
   argc -= optind;
   argv += optind;
 
-  if (argc == 0 && !sysinfo && !keycheck && !check_setup) {
+  if (argc == 0 && !sysinfo && !keycheck && !check_setup)
      if (givehelp)
 	usage (stdout, 0);
      else
 	usage (stderr, 1);
-     }
 
   if ((check_setup || sysinfo) && keycheck)
     usage (stderr, 1);

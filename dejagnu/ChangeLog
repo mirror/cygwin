@@ -106,9 +106,30 @@
 
 	* target.exp (prune_warnings): Prune warnings from NetBSD linker.
 
+2001-01-09  Alexandre Oliva  <aoliva@redhat.com>
+
+	* baseboards/sh64-sim.exp (ieee_multilib_flags): Set to -mieee.
+
+2000-12-26  Alexandre Oliva  <aoliva@redhat.com>
+
+	* baseboards/sh64-sim.exp (gcc,stack_size): Set to a smaller
+	value than the address of the end of the stack.
+
+2000-12-16  Alexandre Oliva  <aoliva@redhat.com>
+
+	* baseboards/sh64-sim.exp (gcc,stack_size): Set.
+
 2000-11-29  Drew Moseley  <dmoseley@redhat.com>
 
 	* baseboards/xscale-cygmon.exp: New file for xscale board testing.
+
+2000-11-22  Ben Elliston  <bje@redhat.com>
+
+	* baseboards/sh64-sim.exp (target_install): Use sh64-elf now.
+
+2000-11-01  Ben Elliston  <bje@redhat.com>
+
+	* baseboards/sh64-sim.exp: New file.
 
 2000-10-19  Michael Snyder  <msnyder@cleaver.cygnus.com>
 

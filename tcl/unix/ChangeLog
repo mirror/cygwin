@@ -1,3 +1,9 @@
+2001-09-18  Ian Roxborough  <irox@redhat.com>
+
+	* Makefile.in: Added TCL_CFLAGS for flags that
+	shouldn't be supressed by the top level Makefile's
+	CFLAGS settings.
+
 Fri Mar 19 09:29:42 1999  Michael Tiemann  <tiemann@holodeck.cygnus.com>
 
 	* configure.in, configure (IRIX64-6.*): Use -n32 instead of -32

@@ -1,3 +1,9 @@
+2001-10-15  Ian Roxborough  <irox@redhat.com>
+
+	* win/tkWinButton.c (TkpComputeButtonGeometry):
+        Windows look and feel fix modified to leave
+        labels alone.
+
 Wed Oct 10 21:06:11 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* win/configure.in: Add detection for -mwin32 option requirement under

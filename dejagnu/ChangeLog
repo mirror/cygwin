@@ -1,3 +1,8 @@
+2003-05-13  Andreas Jaeger  <aj@suse.de>
+
+        * config.guess: Update to 2003-05-09 version.
+        * config.sub: Update to 2003-05-09 version.
+
 2003-03-27  Corinna Vinschen  <vinschen@redhat.com>
 
 	* config/sid.exp: Add gdb settings to use no hardware watchpoints.

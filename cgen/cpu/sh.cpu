@@ -1,4 +1,4 @@
-; Renesas SH architecture description.  -*- Scheme -*-
+; Renesas / SuperH SH architecture description.  -*- Scheme -*-
 ; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
@@ -7,7 +7,7 @@
 
 (define-arch
   (name sh)
-  (comment "Renesas SuperH (SH)")
+  (comment "Renesas / SuperH SuperH (SH)")
   (insn-lsb0? #t)
   (machs sh2 sh3 sh3e sh4 sh5)
   (isas compact media)

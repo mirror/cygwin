@@ -492,23 +492,10 @@
 ; Move Operations
 
 (define-pmacro (alignfix-mem where)
-  (if HI (and where 1)
-    (or HI
-      (and (sll (mem QI (sub where 1)) 8) #xFF00)
-      (and (mem QI where) #xFF))
-    (mem HI where)))
+  (mem HI (and where #xFFFE)))
 
 (define-pmacro (set-alignfix-mem where what)
-  (sequence ((SI nwhere) (HI nwhat))
-    (set nwhere where)
-    (if (and nwhere 1)
-      (sequence ()
-	(set nwhat (or HI
-		    (and (sll what 8) #xFF00)
-		    (and (srl what 8) #xFF)))
-        (set nwhere (sub nwhere 1)))
-      (set nwhat what))
-    (set (mem HI nwhere) what)))
+  (set (mem HI (and where #xFFFE)) what))
 
 (dni movlmemimm
      "Move immediate to low memory"

@@ -1730,7 +1730,16 @@ foreach current_target $target_list {
 		    # value (for example in MULTIPASS) and the test
 		    # directory matches that directory.
 		    if {[info exists dir_to_run] && $dir_to_run != ""} {
-			if ![string match "*${dir_to_run}*" $dir] {
+			# JYG: dir_to_run might be a space delimited list
+			# of directories.  Look for match on each item.
+			set found 0
+			foreach directory $dir_to_run {
+			    if [string match "*${directory}*" $dir] {
+				set found 1
+				break
+			    }
+			}
+			if {!$found} {
 			    continue
 			}
 		    }
@@ -1740,7 +1749,16 @@ foreach current_target $target_list {
 		    # directory matches that directory
 		    if {[info exists cmdline_dir_to_run] \
 			    && $cmdline_dir_to_run != ""} {
-			if ![string match "*${cmdline_dir_to_run}*" $dir] {
+			# JYG: cmdline_dir_to_run might be a space delimited
+			# list of directories.  Look for match on each item.
+			set found 0
+			foreach directory $cmdline_dir_to_run {
+			    if [string match "*${directory}*" $dir] {
+				set found 1
+				break
+			    }
+			}
+			if {!$found} {
 			    continue
 			}
 		    }

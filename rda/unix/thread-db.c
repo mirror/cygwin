@@ -183,6 +183,58 @@ next_undefined_symbol (void)
  * implement "info threads" for gdb.
  */
 
+
+/* Under NPTL, LWP's simply disappear, without becoming a zombie or
+   producing any wait status.  At the kernel level, we have no way of
+   knowing that the LWP's PID is now free and may be reused ---
+   perhaps by an entirely different program!  So we need to use the
+   death events from libthread_db to help us make the right calls to
+   lwp_pool_continue_and_drop_lwp to keep our LWP table clean.
+
+   There are two steps to delivering a TD_DEATH event:
+
+   - first, the thread sends enqueues the event.
+
+   - then, the thread takes some pre-negotiated action (hitting a
+     breakpoint; making a system call) to notify libthread_db's client
+     that there are events queued it should attend to.
+
+   What's tricky here is that the queueing of the event and the
+   notification are not synchronized.  Several threads could queue
+   events, and then perform their notification actions simultaneously.
+   So RDA could easily find TD_DEATH events for several threads in the
+   queue when the first of those threads performs its notification.
+   We need to continue to manage the remaining threads whose death is
+   foretold (are there any named Santiago?) until they have each
+   completed their notifications.
+
+   And since RDA consumes all the events each time a notification is
+   received, we should be prepared to receive notifications even when
+   the queue is empty as well.
+
+   'enum death_state' helps us keep track of the state of a given
+   thread, so we can call lwp_pool_continue_and_drop_lwp on a thread
+   when its death has been foretold, and it has completed its
+   notification.  */
+
+
+/* The thread_db death state.  */
+enum death_state {
+
+  /* We've received no indication that this thread will exit.  */
+  death_state_alive,
+
+  /* We've received a TD_DEATH event for this thread, but it hasn't
+     completed its event notification yet.  */
+  death_state_event_received,
+
+  /* We've received a TD_DEATH event for this thread, and it has
+     completed its event notification; we will continue it next using
+     lwp_pool_continue_and_drop_lwp.  */
+  death_state_drop_when_continued
+};
+
+
 /* Define the struct gdbserv_thread object. */
 
 struct gdbserv_thread {
@@ -237,7 +289,11 @@ struct gdbserv_thread {
      it actually is: they're all zombies.  */
   td_thrinfo_t ti;
 
+  /* The death state for this thread.  */
+  enum death_state death_state;
+
   struct gdbserv_thread *next;
+
 } *thread_list;
 
 /* Function: add_thread_to_list 
@@ -251,6 +307,7 @@ add_thread_to_list (td_thrinfo_t *ti)
   /* First cut -- add to start of list. */
   memset (new, 0, sizeof (*new));
   memcpy (&new->ti, ti, sizeof (td_thrinfo_t));
+  new->death_state = death_state_alive;
   new->next = thread_list;
   thread_list = new;
   return new;
@@ -1686,6 +1743,83 @@ thread_db_thread_info (struct gdbserv *serv, struct gdbserv_thread *thread)
 }
 
 
+static const char *
+death_state_str (enum death_state d)
+{
+  switch (d)
+    {
+    case death_state_alive: return "alive";
+    case death_state_event_received: return "event_received";
+    case death_state_drop_when_continued: return "drop_when_continued";
+    default:
+      {
+	static char buf[100];
+	sprintf (buf, "%d (unrecognized death_state)", d);
+	return buf;
+      }
+    }
+}
+
+
+static void
+debug_report_death_state_change (struct gdbserv_thread *thread,
+				 enum death_state old,
+				 enum death_state new)
+{
+  if (thread_db_noisy && old != new)
+    fprintf (stderr,
+	     "%19s -- %s -> %s\n",
+	     death_state_str (old),
+	     thread_debug_name (thread),
+	     death_state_str (new));
+}
+
+
+/* Record the fact that a TD_DEATH event was received for TID.  */
+static void
+death_state_got_event (thread_t tid)
+{
+  struct gdbserv_thread *thread = thread_list_lookup_by_tid (tid);
+  enum death_state old_state;
+
+  if (thread_db_noisy)
+    fprintf (stderr, "death_state_got_event (0x%x)\n", (unsigned int) tid);
+
+  if (! thread)
+    fprintf (stderr, "ERROR: death event for unknown thread 0x%x\n",
+	     (unsigned int) tid);
+
+  old_state = thread->death_state;
+
+  if (thread->death_state == death_state_alive)
+    thread->death_state = death_state_event_received;
+
+  debug_report_death_state_change (thread, old_state, thread->death_state);
+}
+
+
+/* Record the fact that THREAD has completed an event notification.
+   Call this for every thread that does an event notification, even
+   if there were no messages actually received, or if none of them
+   were TD_DEATH messages, or if none applied to the notifying thread.
+   The description of 'enum death_state' explains why.  */
+static void
+death_state_notified (struct gdbserv_thread *thread)
+{
+  enum death_state old_state;
+
+  if (thread_db_noisy)
+    fprintf (stderr, "death_state_notified (%p)\n", thread);
+
+  old_state = thread->death_state;
+
+  if (thread->death_state == death_state_event_received)
+    thread->death_state = death_state_drop_when_continued;
+
+  debug_report_death_state_change (thread, old_state, thread->death_state);
+}
+
+
 /* If we are using the libthread_db event interface, and PROCESS is
    stopped at an event breakpoint, handle the event.
 
@@ -1764,9 +1898,8 @@ handle_thread_db_event (struct child_process *process)
 	      break;
 	    }
 
-	  /* Tell the LWP pool code that this thread's death has been
-	     foretold.  */
-	  lwp_pool_thread_db_death_event ((pid_t) ti.ti_lid);
+	  /* Note that this thread's death has been foretold.  */
+	  death_state_got_event (ti.ti_tid);
 	}
     }
 
@@ -1792,11 +1925,11 @@ handle_thread_db_event (struct child_process *process)
       return 1;
     }
 
-  /* Tell the LWP pool that this thread has notified RDA of an event.  */
-  lwp_pool_thread_db_death_notified (lwp);
-
   /* Re-insert the event breakpoints.  */
   insert_thread_db_event_breakpoints (serv);
+
+  /* Note that this thread has performed an event notification.  */
+  death_state_notified (thread);
 
   /* If the wait status is a SIGTRAP signal, then that means the
      single-step proceeded normally.  Otherwise, it's a new event we
@@ -1820,7 +1953,15 @@ continue_thread (struct gdbserv_thread *thread, int signal)
   thread_db_flush_regset_caches();
 
   if (thread->ti.ti_lid != 0)
-    lwp_pool_continue_lwp (thread->ti.ti_lid, signal);
+    {
+      /* If this thread is now going to exit silently, just continue
+	 it now and let it die.  */
+      if (thread->death_state == death_state_drop_when_continued
+	  && signal == 0)
+	lwp_pool_continue_and_drop_lwp (thread->ti.ti_lid, 0);
+      else
+	lwp_pool_continue_lwp (thread->ti.ti_lid, signal);
+    }
 
   thread_db_invalidate_caches ();
 }

@@ -262,25 +262,6 @@ enum lwp_state {
 };
 
 
-/* The thread_db death state.  See the descriptions of the
-   lwp_pool_thread_db_* functions in lwp-pool.h.  */
-enum death_state {
-
-  /* We've received no indication that this thread will exit.  */
-  death_state_running,
-
-  /* We've received a TD_DEATH event for this thread, but it hasn't
-     completed its event notification yet.  */
-  death_state_event_received,
-
-  /* We've received a TD_DEATH event for this thread, and it has
-     completed its event notification; when we continue it next, we
-     will delete it from the hash table and forget about it
-     entirely.  */
-  death_state_delete_when_continued
-};
-
-
 struct lwp
 {
   /* This lwp's PID.  */
@@ -288,9 +269,6 @@ struct lwp
 
   /* The state this LWP is in.  */
   enum lwp_state state;
-
-  /* Its thread_db death notification state.  */
-  enum death_state death_state;
 
   /* If STATE is one of the lwp_state_*_interesting states, then this
      LWP is on the interesting LWP queue, headed by interesting_queue.
@@ -465,7 +443,6 @@ hash_find (pid_t lwp)
   l = malloc (sizeof (*l));
   l->pid = lwp;
   l->state = lwp_state_uninitialized;
-  l->death_state = 0;
   l->next = l->prev = NULL;
   l->status = 42;
 
@@ -658,7 +635,7 @@ hash_find_known (pid_t lwp)
    this queue.  If an LWP's state is lwp_state_dead_interesting, the
    LWP is not in the hash table any more.  */
 static struct lwp interesting_queue
-= { -1, 0, 0, &interesting_queue, &interesting_queue, 42 };
+= { -1, 0, &interesting_queue, &interesting_queue, 42 };
 
 
 static const char *
@@ -946,8 +923,11 @@ check_stop_pending (struct lwp *l)
 	       "ERROR: checking lwp %d for pending stop yielded "
 	       "bad state %s\n",
 	       (int) l->pid, lwp_state_str (l->state));
-      abort ();
-      break;
+      hash_delete (l);
+      if (l->next)
+	queue_delete (l);
+      free (l);
+      return 0;
     }
 }
 
@@ -1075,115 +1055,6 @@ lwp_pool_waitpid (pid_t pid, int *stat_loc, int options)
 
   return pid;
 }
-
-
-
-/* libthread_db-based death handling, for NPTL.  */
-
-
-static const char *
-death_state_str (enum death_state d)
-{
-  switch (d)
-    {
-    case death_state_running: return "death_state_running";
-    case death_state_event_received: return "death_state_event_received";
-    case death_state_delete_when_continued: 
-      return "death_state_delete_when_continued";
-    default:
-      {
-	static char buf[100];
-	sprintf (buf, "%d (unrecognized death_state)", d);
-	return buf;
-      }
-    }
-}
-
-
-static void
-debug_report_death_state_change (pid_t lwp,
-				 enum death_state old,
-				 enum death_state new)
-{
-  if (debug_lwp_pool && old != new)
-    fprintf (stderr,
-	     "%32s -- %5d -> %-32s\n",
-	     death_state_str (old), (int) lwp, death_state_str (new));
-}
-
-
-void
-lwp_pool_thread_db_death_event (pid_t pid)
-{
-  struct lwp *l = hash_find_known (pid);
-  enum death_state old_state = l->death_state;
-
-  if (debug_lwp_pool)
-    fprintf (stderr, "lwp_pool_thread_db_death_event (%d)\n",
-	     (int) pid);
-
-  if (l->state == lwp_state_uninitialized)
-    {
-      /* hash_find_known has already complained about this; we just
-	 clean up.  */
-      hash_delete (l);
-      free (l);
-      return;
-    }
-
-  if (l->death_state == death_state_running)
-    l->death_state = death_state_event_received;
-
-  debug_report_death_state_change (pid, old_state, l->death_state);
-}
-
-
-void
-lwp_pool_thread_db_death_notified (pid_t pid)
-{
-  struct lwp *l = hash_find_known (pid);
-  enum death_state old_state = l->death_state;
-
-  if (debug_lwp_pool)
-    fprintf (stderr, "lwp_pool_thread_db_death_notified (%d)\n",
-	     (int) pid);
-
-  if (l->state == lwp_state_uninitialized)
-    {
-      /* hash_find_known has already complained about this; we just
-	 clean up.  */
-      hash_delete (l);
-      free (l);
-      return;
-    }
-
-  if (l->death_state == death_state_event_received)
-    l->death_state = death_state_delete_when_continued;
-
-  debug_report_death_state_change (pid, old_state, l->death_state);
-}
-
-
-/* Subroutine for the 'continue' functions.  If the LWP L should be
-   forgotten once continued, delete it from the hash table, and free
-   its storage; we'll get no further wait status from it to indicate
-   that it's gone.  */
-static void
-check_for_exiting_nptl_lwp (struct lwp *l)
-{
-  if (l->state == lwp_state_running
-      && l->death_state == death_state_delete_when_continued)
-    {
-      if (debug_lwp_pool)
-	fprintf (stderr,
-		 "lwp_pool: %s: NPTL LWP %d will disappear silently\n",
-		 __func__, l->pid);
-      assert (! l->next && ! l->prev);
-      hash_delete (l);
-      free (l);
-    }
-}
-
 
 
 
@@ -1356,8 +1227,6 @@ lwp_pool_continue_all (void)
 	    }
 
 	  debug_report_state_change (l->pid, old_state, l->state);
-
-	  check_for_exiting_nptl_lwp (l);
 	}
     }
 }
@@ -1383,7 +1252,35 @@ lwp_pool_continue_lwp (pid_t pid, int signal)
     l->state = lwp_state_running;
   debug_report_state_change (l->pid, old_state, l->state);
 
-  check_for_exiting_nptl_lwp (l);
+  return result;
+}
+
+
+int
+lwp_pool_continue_and_drop_lwp (pid_t pid, int signal)
+{
+  struct lwp *l = hash_find_known (pid);
+  int result;
+
+  if (debug_lwp_pool)
+    fprintf (stderr, "lwp_pool_continue_and_drop_lwp (%d, %d)\n",
+	     (int) pid, signal);
+
+  /* We should only be continuing stopped threads, with no interesting
+     status to report.  And we should have cleaned up any pending
+     stops as soon as we created them.  */
+  assert (l->state == lwp_state_stopped);
+  result = continue_lwp (l->pid, signal);
+  if (result == 0)
+    {
+      hash_delete (l);
+      assert (! l->next && ! l->prev);
+      free (l);
+
+      if (debug_lwp_pool)
+	fprintf (stderr, "                         stopped -- %d --> freed\n",
+		 (int) pid);
+    }
 
   return result;
 }

@@ -1,5 +1,44 @@
 2004-11-29  Jim Blandy  <jimb@redhat.com>
 
+	Move libthread_db event-based thread death logic from lwp-pool.c
+	to thread-db.c, so the former can stay innocent of libthread_db's
+	details, and limit itself to kernel behavior.
+	* lwp-pool.h (lwp_pool_continue_and_drop): New declaration.
+	(lwp_pool_thread_db_death_event,
+	lwp_pool_thread_db_death_notified): Declarations deleted.
+	* lwp-pool.c (enum death_state): Move to thread-db.c.
+	(struct lwp): Delete 'death_state' member.
+	(hash_find): Don't initialize it.
+	(interesting_queue): Don't provide an initializer for it.
+	(check_stop_pending): Don't abort if wait_and_handle didn't put
+	the thread in a stopped state; that could be caused by kernel
+	behavior (say, threads exiting silently), not necessarily a logic
+	flaw in lwp-pool.c.
+	(death_state_str, debug_report_death_state_change): Move to
+	thread-db.c.
+	(lwp_pool_thread_db_death_event,
+	lwp_pool_thread_db_death_notified): Move to thread-db.c, and
+	rename (see below).
+	(check_for_exiting_nptl_lwp): Delete.
+	(lwp_pool_continue_all, lwp_pool_continue_lwp): Don't call
+	check_for_exiting_nptl_lwp.
+	(lwp_pool_continue_and_drop_lwp): New function.
+	* thread-db.c (enum death_state): Moved here from lwp-pool.c.
+	(struct gdbserv_thread): New member death_state.
+	(add_thread_to_list): Initialize it.
+	(death_state_str, debug_report_death_state_change): Moved here
+	from lwp-pool.c.
+	(death_state_got_event, death_state_notified): Renamed from
+	lwp_pool_thread_db_death_event and lwp_pool_thread_db_death_notified,
+	and changed to update the death state of a 'struct gdbserv_thread'
+	instead of a 'struct lwp'.
+	(handle_thread_db_event): Call death_state_got_event instead of
+	lwp_pool_thread_db_death_event, and death_state_notified instead
+	of lwp_pool_thread_db_death_notified.
+	(continue_thread): If the thread's death state indicates that it's
+	going to disappear without further ado when continued, continue it
+	with lwp_pool_continue_and_drop_lwp, not lwp_pool_continue_lwp.
+
 	* lwp-pool.h (lwp_pool_singlestep_lwp, lwp_pool_continue_lwp): Doc
 	fixes.
 

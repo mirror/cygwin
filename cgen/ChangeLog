@@ -1,3 +1,11 @@
+2003-12-04  Alan Modra  <amodra@bigpond.net.au>
+
+	* cpu/openrisc.opc (openrisc_sign_extend_16bit): Don't rely on
+	"short" being 16 bit.
+	(parse_hi16): Likewise.  Fix type-punned pointer warnings too, and
+	internationalize error message.
+	(parse_lo16): Likewise.  Remove useless code.
+
 2003-12-03  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
 
 	* cpu/m32r.cpu : Add new model m32r2.

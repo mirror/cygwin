@@ -1,3 +1,8 @@
+2000-09-05  Dave Brolley  <brolley@redhat.com>
+
+	* sim.scm (sim-finish!): Honour the definition of FAST_P when calling
+	@cpu@_pbb_begin. Use 0 if FAST_P is not defined.
+
 2000-08-29  Dave Brolley  <brolley@redhat.com>
 
 	* utils-gen.scm (gen-ifld-extract): Pass total-len if

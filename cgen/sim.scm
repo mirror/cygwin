@@ -1884,12 +1884,16 @@ struct scache {
       "--begin--" () () '(c-code VOID "\
   {
 #if WITH_SCACHE_PBB_@CPU@
-#ifdef DEFINE_SWITCH
+#if defined DEFINE_SWITCH || defined FAST_P
     /* In the switch case FAST_P is a constant, allowing several optimizations
        in any called inline functions.  */
     vpc = @cpu@_pbb_begin (current_cpu, FAST_P);
 #else
+#if 0 /* cgen engine can't handle dynamic fast/full switching yet.  */
     vpc = @cpu@_pbb_begin (current_cpu, STATE_RUN_FAST_P (CPU_STATE (current_cpu)));
+#else
+    vpc = @cpu@_pbb_begin (current_cpu, 0);
+#endif
 #endif
 #endif
   }

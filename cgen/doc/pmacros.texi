@@ -144,8 +144,8 @@ Acceptable arguments are symbols, strings, and numbers.
 The result is a symbol with the arguments concatenated together.
 Numbers are converted to a string, base 10, and then to a symbol.
 The result must be a valid Scheme symbol with the additional restriction
-that the first character must be a letter.  The result is not further
-expanded, regardless of whether there's a macro by that name.
+that the first character must be a letter.  The resulting symbol
+is recursively macro-expanded.
 
 @node String concatenation
 @section String concatenation

@@ -2,10 +2,29 @@
 
 	* arm7t-timer.h (dtor): Add prototype.
 
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* hw-timer-arm_ref.xml: Add <?xml ... ?> prefix.
+
 2001-07-06  Frank Ch. Eigler  <fche@redhat.com>
 
-        * Makefile.am (ACLOCAL_AMFLAGS): Define.
-        * aclocal.m4, autoconf, Makefile.in: Regenerated.
+	* Makefile.am (ACLOCAL_AMFLAGS): Define.
+	* aclocal.m4, autoconf, Makefile.in: Regenerated.
+
+2001-07-04  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add maintainer-mode doc building configury.
+	* configure: Regenerate.
+	* Makefile.am: Add maintainer-mode doc building.
+	* Makefile.in: Regenerate.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* hw-timer-arm_ref.txt: Generate.
+
+2001-06-28  Ben Elliston  <bje@redhat.com>
+
+	* hw-timer-arm_ref.xml: New file.
 
 2000-11-15  Jeff Johnston  <jjohnstn@redhat.com>
 

@@ -231,6 +231,11 @@ if ($opt_no_run && (! $opt_save_temps))
     $opt_save_temps = 1;
   }
 
+# infer --persistent from --gdb=xxxx
+if ($opt_gdb)
+  {
+    $opt_persistent = 1;
+  }
 
 # complete component library list
 %component_libs=(
@@ -770,6 +775,8 @@ connect-pin init-sequence output-3 -> gdb init
 connect-pin deinit-sequence output-5 -> gdb deinit
 connect-pin gdb yield -> yield-net input
 connect-pin gdb flush-icache -> cpu flush-icache
+connect-pin gdb restart -> hw-reset-net input
+set gdb exit-on-detach? 1
 set gdb trace-gdbsid? $opt_verbose
 set gdb trace-gdbserv? $opt_verbose
 # gdb-socket

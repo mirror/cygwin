@@ -1,3 +1,10 @@
+2001-01-03  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * configrun-sid.in: Imply --persistent if --gdb=xxxx specified.
+        Also set gdb "exit-on-detach" setting if gdb specified and
+        connect gdb restart pin to hw-reset-net.  This will cause hw reset
+        if gdb restarts a program or if gdb terminates and is run again.
+
 2000-12-15  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configrun-sid.in: Add support for default endianness for --gdb runs.

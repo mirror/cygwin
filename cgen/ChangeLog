@@ -1,3 +1,8 @@
+2002-06-18  Dave Brolley  <brolley@redhat.com>
+
+	* cpu/frv.cpu: New cpu description.
+	* cpu/frv.opc: New cpu support code.
+
 2002-05-21  Dave Brolley  <brolley@redhat.com>
 
 	* decode.scm (-opcode-slots): Don't consider bits beyond the length of

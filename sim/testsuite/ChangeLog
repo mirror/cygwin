@@ -1,3 +1,32 @@
+1999-09-15  Doug Evans  <devans@casey.cygnus.com>
+
+	* sim/arm/b.cgs: New testcase.
+	* sim/arm/bic.cgs: New testcase.
+	* sim/arm/bl.cgs: New testcase.
+
+Thu Sep  2 18:15:53 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+1999-08-30  Doug Evans  <devans@casey.cygnus.com>
+
+	* lib/sim-defs.exp (run_sim_test): Rename all_machs arg to
+	requested_machs, now is list of machs to run tests for.
+	Delete locals AS,ASFLAGS,LD,LDFLAGS.  Use target_assemble
+	and target_link instead.
+
+1999-04-21  Doug Evans  <devans@casey.cygnus.com>
+
+	* sim/m32r/nop.cgs: Add missing nop insn.
+
+Mon Mar 22 13:28:56 1999  Dave Brolley  <brolley@cygnus.com>
+
+	* sim/fr30/stb.cgs: Correct for unaligned access.
+	* sim/fr30/sth.cgs: Correct for unaligned access.
+	* sim/fr30/ldub.cgs: Fix typo: lduh->ldub. Correct
+	for unaligned access.
+	* sim/fr30/and.cgs: Test unaligned access.
+
 Fri Feb  5 12:41:11 1999  Doug Evans  <devans@canuck.cygnus.com>
 
 	* lib/sim-defs.exp (sim_run): Print simulator arguments log message.
@@ -140,6 +169,11 @@ Tue Sep 15 14:56:22 1998  Doug Evans  <devans@canuck.cygnus.com>
 	* sim/m32r/rte.cgs: Test bbpc,bbpsw.
 	* sim/m32r/trap.cgs: Test bbpc,bbpsw.
 
+Fri Jul 31 17:49:13 1998  Felix Lee  <flee@cygnus.com>
+
+	* lib/sim-defs.exp (sim_run): remote_spawn, use writeto instead of
+ 	writeonly.
+
 Fri Jul 24 09:40:34 1998  Doug Evans  <devans@canuck.cygnus.com>
 
 	* Makefile.in (clean,mostlyclean): Change leading spaces to a tab.
@@ -147,6 +181,15 @@ Fri Jul 24 09:40:34 1998  Doug Evans  <devans@canuck.cygnus.com>
 Wed Jul  1 15:57:54 1998  Doug Evans  <devans@seba.cygnus.com>
 
 	* sim/m32r/hw-trap.ms: New testcase.
+
+Tue Jun 16 15:44:01 1998 Jillian Ye <jillian@cygnus.com>
+
+	* lib/sim-defs.exp: Print out timeout setting info when "-v" is used.
+
+Thu Jun 11 15:24:53 1998  Doug Evans  <devans@canuck.cygnus.com>
+
+	* lib/sim-defs.exp (sim_run): Argument env_vals renamed to options,
+	which is now a list of options controlling the behaviour of sim_run.
 
 Wed Jun 10 10:53:20 1998  Doug Evans  <devans@seba.cygnus.com>
 
@@ -211,13 +254,11 @@ Wed Feb 25 11:01:17 1998  Doug Evans  <devans@canuck.cygnus.com>
 
 	* Makefile.in (RUNTEST): Fix path to runtest.
 
-	
 Fri Feb 20 11:00:02 1998  Nick Clifton  <nickc@cygnus.com>
 
 	* sim/m32r/unlock.cgs: Fixed test.
 	* sim/m32r/mvfc.cgs: Fixed test.
 	* sim/m32r/remu.cgs: Fixed test.
-
 	* sim/m32r/bnc24.cgs: Test long BNC instruction.
 	* sim/m32r/bnc8.cgs: Test short BNC instruction.
 	* sim/m32r/ld-plus.cgs: Test LD instruction.
@@ -235,6 +276,7 @@ Fri Feb 20 11:00:02 1998  Nick Clifton  <nickc@cygnus.com>
 	* sim/m32r/neg.cgs: Test NEG instruction.
 	* sim/m32r/not.cgs: Test NOT instruction.
 	* sim/m32r/unlock.cgs: Test UNLOCK instruction.
+
 Thu Feb 19 11:15:45 1998  Nick Clifton  <nickc@cygnus.com>
 
 	* sim/m32r/testutils.inc (mvaddr_h_gr): new macro to load an
@@ -281,6 +323,7 @@ Thu Feb 19 11:15:45 1998  Nick Clifton  <nickc@cygnus.com>
 	* sim/m32r/srli.cgs: Test SRLI instruction.
 	* sim/m32r/xor3.cgs: Test XOR3 instruction.
 	* sim/m32r/xor.cgs: Test XOR instruction.
+
 Tue Feb 17 12:46:05 1998  Doug Evans  <devans@seba.cygnus.com>
 
 	* config/default.exp: New file.

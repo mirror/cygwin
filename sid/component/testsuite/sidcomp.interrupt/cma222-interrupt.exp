@@ -14,7 +14,7 @@ set all_ones 0xFF
 
 set test "sid configuration"
 sid_config_component_test "cma222-intr.conf" \
-    "load [sid_find_file libinterrupt.la] interrupt_component_library" \
+    "load libinterrupt.la interrupt_component_library" \
     "hw-interrupt-cogent/cma222"
 pass $test
 

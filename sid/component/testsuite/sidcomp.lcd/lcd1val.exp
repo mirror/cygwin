@@ -1,6 +1,6 @@
 set test "sid configuration"
 sid_config_component_test_with_tracing "lcd1.conf" \
-    "load [sid_find_file liblcd-char-display.la] lcd_char_display_component_library" \
+    "load liblcd-char-display.la lcd_char_display_component_library" \
     "hw-lcd-char-display"
 pass $test
 

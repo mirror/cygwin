@@ -2,7 +2,7 @@ if {! $sidtarget(arm)} then { untested "hw-timer-arm/ref-* not available"; retur
 
 set test "sid configuration"
 sid_config_component_test "base.conf" \
-    "load [sid_find_file libtimers.la] timer_component_library" \
+    "load libtimers.la timer_component_library" \
     "hw-timer-arm/ref-nosched"
 pass $test
 

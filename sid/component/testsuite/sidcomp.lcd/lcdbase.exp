@@ -1,8 +1,8 @@
 set test "sid configuration"
 sid_config_component_etc_test "base.conf" \
-    "load [sid_find_file libhd44780u.la] hd44780u_component_library" \
+    "load libhd44780u.la hd44780u_component_library" \
     "hw-lcd-hd44780u-a02" \
-    "load [sid_find_file liblcd-char-display.la] lcd_char_display_component_library
+    "load liblcd-char-display.la lcd_char_display_component_library
 new hw-lcd-char-display display
 relate tester display display"
 pass $test

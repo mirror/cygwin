@@ -13,10 +13,10 @@ if {! $sidtarget(arm)} then { untested "sw-gloss-arm/angel not available"; retur
 
 set test "sid configuration"
 sid_config_component_etc_test_with_tracing "angel.conf" \
-	"load [sid_find_file libgloss.la] gloss_component_library" \
+	"load libgloss.la gloss_component_library" \
 	"sw-gloss-arm/angel" \
-	"load [sid_find_file libmemory.la] mem_component_library
-load [sid_find_file libglue.la] glue_component_library
+	"load libmemory.la mem_component_library
+load libglue.la glue_component_library
 new sw-glue-attribbank cpu
 relate real-victim cpu cpu
 relate tester cpu cpu

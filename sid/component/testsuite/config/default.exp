@@ -13,7 +13,7 @@ proc sid_config_component_etc_test { file pfx type sfx } {
     global prefix
     set f [open $file "w"]
     puts $f "$pfx"
-    puts $f "load [sid_find_file libtclapi.la] tcl_bridge_library"
+    puts $f "load libtclapi.la tcl_bridge_library"
     puts $f "new bridge-tcl tester"
     puts $f "new $type real-victim"
     puts $f "set tester load! [sid_find_file tester.tcl]"
@@ -31,7 +31,7 @@ proc sid_config_component_etc_test_with_tracing { file pfx type sfx } {
     global prefix
     set f [open $file "w"]
     puts $f "$pfx"
-    puts $f "load [sid_find_file libtclapi.la] tcl_bridge_library"
+    puts $f "load libtclapi.la tcl_bridge_library"
     puts $f "new bridge-tcl tester"
     puts $f "new sid-api-trace wrapper"
     puts $f "new $type real-victim"
@@ -59,11 +59,7 @@ proc sid_config_component_test { file pfx type } {
 }
 
 
-# Start up a SID executable.  If TOOL_OPTIONS includes the substring
-# "static", then use a statically linked sid program, built using
-# mksidconf.  Otherwise use the plain main/dynamic "sid" frontend.
-# In this case, TOOL_OPTIONS also better include "install", since
-# mksid currently only works on the install tree.
+# Start up a SID.  Use the plain main/dynamic "sid" frontend.
 
 proc sid_start {file} {
     global spawn_id
@@ -89,14 +85,7 @@ proc sid_start {file} {
 	set env(TCL_LIBRARY) $tcl_library
     }
 
-    if {[string match "*static*" $TOOL_OPTIONS]} then {
-	set mksidconf [sid_find_file "mksidconf"]
-	system $mksidconf -static $file
-	regsub "(.*).conf" $file {./\1} sid
-        regsub "(.*).conf" $file {\1.sconf} file
-    } else {
-	set sid [sid_find_file "sid" "sid.exe"]
-    }
+    set sid [sid_find_file "sid" "sid.exe"]
 
     set pid [spawn $sid $file]
 

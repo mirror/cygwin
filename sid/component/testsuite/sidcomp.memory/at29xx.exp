@@ -1,6 +1,6 @@
 set test "at29c256 :sid configuration"
 sid_config_component_test "at29c256.conf" \
-    "load [sid_find_file libmemory.la] mem_component_library" \
+    "load libmemory.la mem_component_library" \
     "hw-memory-flash-at29c256"
 pass $test
 

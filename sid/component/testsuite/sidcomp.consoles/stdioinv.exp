@@ -1,6 +1,6 @@
 set test "sid configuration"
 sid_config_component_etc_test_with_tracing "stdio1.conf" \
-    "load [sid_find_file libconsoles.la] console_component_library" \
+    "load libconsoles.la console_component_library" \
     "sid-io-stdio" \
     "connect-pin main perform-activity -> wrapper poll"
 pass $test

@@ -7,7 +7,7 @@ source $srcdir/$subdir/utils.exp
 
 set test "sid startup"
 sid_config_component_test_with_tracing "cache.conf" \
-        "load [sid_find_file libcache.la] cache_component_library" \
+        "load libcache.la cache_component_library" \
         "hw-cache-4way/16kb/32/lru"
 if {[sid_start "cache.conf"]} { pass $test } else { fail $test; return }
 

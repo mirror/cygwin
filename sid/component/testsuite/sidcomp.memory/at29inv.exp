@@ -6,7 +6,7 @@ set default_device_code 0x5B
 
 set test "sid configuration"
 sid_config_component_test "at29b.conf" \
-    "load [sid_find_file libmemory.la] mem_component_library" \
+    "load libmemory.la mem_component_library" \
     "hw-memory-flash-at29"
 pass $test
 

@@ -1,6 +1,6 @@
 set test "sid configuration"
 sid_config_component_test "schedhost2.conf" \
-    "load [sid_find_file libsched.la] sched_component_library" \
+    "load libsched.la sched_component_library" \
     "sid-sched-host-accurate"
 pass $test
 

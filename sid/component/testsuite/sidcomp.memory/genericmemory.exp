@@ -1,6 +1,6 @@
 set test "sid configuration"
 sid_config_component_test "base.conf" \
-    "load [sid_find_file libmemory.la] mem_component_library" \
+    "load libmemory.la mem_component_library" \
     "hw-memory-ram/rom-basic"
 pass $test
 

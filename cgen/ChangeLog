@@ -1,3 +1,10 @@
+2000-08-20  Doug Evans  <dje@casey.transmeta.com>
+
+	* rtl-c.scm (rtl-c-expr-with-estate): New fn.
+	(rtl-c-expr-parsed,rtl-c-expr): New fns.
+	(-rtl-c-get): Rename from rtl-c-get.
+	(rtl-c-get): New fn for getter logging.
+
 2000-07-28  Ben Elliston  <bje@redhat.com>
 
 	* NEWS: Update.

@@ -175,14 +175,7 @@ proc initialize_paths {} {\n\
   rename initialize_paths {}\n\
   set guidirs {}\n\
   set here [pwd]\n\
-  set exec_name [info nameofexecutable]\n\
-  if {[string compare [file type $exec_name] \"link\"] == 0} {\n\
-    set exec_name [file readlink $exec_name]\n\
-    if {[string compare [file pathtype $exec_name] \"relative\"] == 0} {\n\
-      set execName [file join [pwd] $exec_name]\n\
-    }\n\
-  }\n\
-  cd [file dirname $exe_name]\n\
+  cd [file dirname [info nameofexecutable]]\n\
   set d [file join [file dirname [pwd]] share]\n\
   lappend guidirs [file join $d cygnus gui]\n\
   set d [file join [file dirname [file dirname [pwd]]] share]\n\

@@ -292,17 +292,18 @@
 
 (define (-gen-insn-enum)
   (logit 2 "Generating instruction enum ...\n")
-  (string-list
-   (gen-enum-decl 'cgen_insn_type "@arch@ instruction types"
-		  "@ARCH@_INSN_"
-		  (cons '(invalid)
-			(append (gen-obj-list-enums (non-multi-insns (current-insn-list)))
-				'((max)))))
-   "/* Index of `invalid' insn place holder.  */\n"
-   "#define CGEN_INSN_INVALID @ARCH@_INSN_INVALID\n\n"
-   "/* Total number of insns in table.  */\n"
-   "#define MAX_INSNS ((int) @ARCH@_INSN_MAX)\n\n"
+  (let ((insns (gen-obj-list-enums (non-multi-insns (current-insn-list)))))
+    (string-list
+     (gen-enum-decl 'cgen_insn_type "@arch@ instruction types"
+		    "@ARCH@_INSN_"
+		    (cons '(invalid) insns))
+     "/* Index of `invalid' insn place holder.  */\n"
+     "#define CGEN_INSN_INVALID @ARCH@_INSN_INVALID\n\n"
+     "/* Total number of insns in table.  */\n"
+     "#define MAX_INSNS ((int) @ARCH@_INSN_"
+     (string-upcase (gen-c-symbol (caar (list-take -1 insns)))) " + 1)\n\n"
    )
+  )
 )
 
 ; Return a reference to the format table entry of INSN.

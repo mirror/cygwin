@@ -1,3 +1,10 @@
+2002-08-06  Keith Seitz  <keiths@redhat.com>
+
+	From Mo Dejong  <supermo@bayarea.net>:
+	* configure.in: Don't configure iwidgets when building
+	Source-Navigator.
+	* configure: Regenerated.
+
 2002-06-03  Keith Seitz  <keiths@redhat.com>
 
 	From Mo Dejong  <supermo@bayarea.net>:

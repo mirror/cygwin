@@ -1733,7 +1733,7 @@ thread_db_thread_info (struct gdbserv *serv, struct gdbserv_thread *thread)
   /* When a thread's LWP has exited, NPTL reports its ti_lid as
      being equal to that of the main process.  Which is a little
      confusing.  So print the pid in a helpfully detailed way.  */
-  sprintf (info, "Type %s State %s PID %d%s",
+  sprintf (info, "Type %s State %s LWP %d%s",
 	   thread_db_type_str (thread->ti.ti_type),
 	   thread_db_state_str (thread->ti.ti_state),
 	   thread->ti.ti_lid,

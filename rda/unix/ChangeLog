@@ -1,5 +1,9 @@
 2004-12-02  Jim Blandy  <jimb@redhat.com>
 
+	* thread-db.c (thread_db_thread_info): Produce output that more
+	closely resembles GDB's native thread output, to mollify the GDB
+	test suite.
+
 	* thread-db.c (thread_db_check_child_state): No need to call
 	lwp_pool_stop_all twice; update_thread_list stops any new threads.
 

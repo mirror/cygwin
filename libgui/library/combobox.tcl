@@ -792,6 +792,7 @@ proc ::combobox::widgetProc {w command args} {
 	    # *gasp* do a global grab!!! Mom always told not to
 	    # do things like this... :-)
 	    set grablist [grab current]
+	    set grabstatus {}
 	    foreach grabitem $grablist {
 		lappend grabstatus [grab status $grabitem]
 	    }

@@ -22,9 +22,6 @@ DJ_AC_PATH_DOCBOOK
 dnl we need the path to the tcl shell to build a release
 DJ_AC_PATH_TCLSH
 
-dnl we need to know if we have libstl v2 or v3
-DJ_AC_STL
-
 dnl Level of indirection for automake macro (baseboards:boards_DATA)
 BOARDS='$(boards)'
 AC_SUBST(BOARDS)

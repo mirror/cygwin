@@ -587,13 +587,13 @@ want of course):
 @example
   /* Set the machine number and endianness.  */
   gas_cgen_opcode_desc =
-    <arch>_cgen_opcode_open (CGEN_CPU_OPEN_MACHS,
-                             0 /* mach number */,
-                             CGEN_CPU_OPEN_ENDIAN,
-                             (target_big_endian
-                              ? CGEN_ENDIAN_BIG
-                              : CGEN_ENDIAN_LITTLE),
-                             CGEN_CPU_OPEN_END);
+    <arch>_cgen_cpu_open (CGEN_CPU_OPEN_MACHS,
+                          0 /* mach number */,
+                          CGEN_CPU_OPEN_ENDIAN,
+                          (target_big_endian
+                            ? CGEN_ENDIAN_BIG
+                            : CGEN_ENDIAN_LITTLE),
+                          CGEN_CPU_OPEN_END);
 
   <arch>_cgen_init_asm (gas_cgen_opcode_desc);
 

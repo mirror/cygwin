@@ -1327,7 +1327,7 @@
 (if (and #f (defined? 'proc-profile))
     (begin
       (proc-profile elm-get)
-      (proc-profile elm-set!)
+      (proc-profile elm-xset!)
       (proc-profile elm-present?)
       (proc-profile -method-lookup)
       (proc-profile send)

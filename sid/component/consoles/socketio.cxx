@@ -258,12 +258,12 @@ socketio::socketio(bool s):
 {
   // Disable transmit coalescing
   int on = 1;
-  int rc = setsockopt (this->fd, IPPROTO_TCP, TCP_NODELAY, (char*)&on, sizeof (on));
+  int rc = setsockopt (fd, IPPROTO_TCP, TCP_NODELAY, (char*)&on, sizeof (on));
   if (rc)
     cerr << "setsockopt TCP_NODELAY error: " << std_error_string() << endl;
 
   on = 1;
-  rc = setsockopt (this->fd, SOL_SOCKET, SO_KEEPALIVE, (char *)&on, sizeof (on));
+  rc = setsockopt (fd, SOL_SOCKET, SO_KEEPALIVE, (char *)&on, sizeof (on));
   if (rc)
     cerr << "setsockopt SO_KEEPALIVE error: " << std_error_string() << endl;
 

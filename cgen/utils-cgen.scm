@@ -624,22 +624,6 @@
    ";} while (0)\n")
 )
 
-; Return C code to fetch a value from instruction memory.
-; PC-VAR is the C expression containing the address of the start of the
-; instruction.
-; ??? Aligned/unaligned support?
-
-(define (gen-ifetch pc-var bitoffset bitsize)
-  (string-append "GETIMEM"
-		 (case bitsize
-		   ((8) "UQI")
-		   ((16) "UHI")
-		   ((32) "USI")
-		   (else (error "bad bitsize argument to gen-ifetch" bitsize)))
-		 " (current_cpu, "
-		 pc-var " + " (number->string (quotient bitoffset 8))
-		 ")")
-)
 
 ; Called before loading the .cpu file to initialize.
 

@@ -1,3 +1,8 @@
+2001-04-04  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.timers/timerdocs.exp: Look for ARM timer doco in the
+	timers/arm7t subdirectory.
+
 2001-03-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidcomp.bsp/armbsp.exp: Adapt to modern combined arm/thumb gcc.

@@ -1,3 +1,12 @@
-News for CGEN Version 0.7.3
+Major features in release 1.0:
 
-Prepping for public release.
+This is the first release of CGEN. It includes the most important
+applications, including the assembler, disassembler and simulator
+generators. A handful of CPU descriptions are also included:
+
+	* ARM7T
+	* Intel i960
+	* Intel IA-32 and IA-64
+	* Fujitsu FR-30
+	* Mitsubishi M32R/D
+	* SPARC

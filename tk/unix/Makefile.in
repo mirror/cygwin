@@ -621,8 +621,8 @@ install-doc:
 	    do \
 	    rm -f $(MANN_INSTALL_DIR)/$$i; \
 	    sed -e '/man\.macros/r man.macros' -e '/man\.macros/d' \
-		    $$i > $(MAN3_INSTALL_DIR)/$$name; \
-	    chmod 644 $(MAN3_INSTALL_DIR)/$$name; \
+		    $$i > $(MANN_INSTALL_DIR)/$$i; \
+	    chmod 644 $(MANN_INSTALL_DIR)/$$i; \
 	    done;
 	@echo "Cross-linking command (.n) docs";
 	@$(UNIX_DIR)/mkLinks $(MANN_INSTALL_DIR)

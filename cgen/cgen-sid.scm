@@ -10,9 +10,6 @@
 ; Load the various support routines.
 
 (define (load-files srcdir)
-  ; Fix up Scheme to be what we use (guile is always in flux).
-  (primitive-load-path (string-append srcdir "/fixup.scm"))
-
   (load (string-append srcdir "/read.scm"))
   (load (string-append srcdir "/utils-sim.scm"))
   (load (string-append srcdir "/sid.scm"))

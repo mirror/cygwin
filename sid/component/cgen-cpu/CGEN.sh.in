@@ -68,7 +68,7 @@ then
 else
     cgen=guile
 fi
-
+cgen="${cgen} -l ${cgendir}/guile.scm -s"
 
 rm -f tmp-desc-$$.h1 tmp-desc-$$.h
 rm -f tmp-cpu-$$.h1 tmp-cpu-$$.h
@@ -96,7 +96,7 @@ do
     esac
 done
 
-${cgen} -s ${cgendir}/cgen-sid.scm \
+${cgen} ${cgendir}/cgen-sid.scm \
 	-s ${cgendir} \
 	${cgenflags} \
 	-f "${archflags}" \

@@ -69,6 +69,7 @@ sidtarget_m68k = @sidtarget_m68k@
 sidtarget_mips = @sidtarget_mips@
 sidtarget_ppc = @sidtarget_ppc@
 sidtarget_x86 = @sidtarget_x86@
+sidtarget_xstormy16 = @sidtarget_xstormy16@
 
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I $(srcdir)/../config
@@ -80,6 +81,8 @@ SUBDIRS = . pregen
 @SIDTARGET_M32R_TRUE@FAM2SCRIPTS = @SIDTARGET_M32R_TRUE@m32r-elf-sid
 
 @SIDTARGET_M68K_TRUE@FAM3SCRIPTS = @SIDTARGET_M68K_TRUE@m68k-elf-sid
+
+@SIDTARGET_XSTORMY16_TRUE@FAM10SCRIPTS = @SIDTARGET_XSTORMY16_TRUE@xstormy16-elf-sid
 
 @SIDTARGET_X86_TRUE@FAM11SCRIPTS = @SIDTARGET_X86_TRUE@i386-elf-sid
 

@@ -1,3 +1,9 @@
+2003-10-26  Dave Brolley  <brolley@redhat.com>
+
+	* sid-decode.scm (-gen-record-profile-args): Test trace_counter_p
+	and final_insn_count_p.
+	(-gen-extract-fn): Call -gen-record-profile-args.
+
 2003-10-21  Dave Brolley  <brolley@redhat.com>
 
 	* sid-model.scm (-gen-model-class-decls): Generate MAX_UNITS as

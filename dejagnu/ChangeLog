@@ -1,3 +1,15 @@
+2002-07-19  Chris Demetriou  <cgd@broadcom.com>
+
+	* config.guess: Update from ../config.guess.
+	* config.sub: Update from ../config.sub.
+
+2002-06-28  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* runtest.exp: Extend search path for config.guess to include
+	$libdir/../../libexec.  This is where an install from the top
+	level build directory will place it, because the top level
+	Makefile overrides the definition of $(libexecdir).
+
 2002-06-18  Dave Brolley  <brolley@redhat.com>
 
 	From Catherine Moore, Michael Meissner, Mark Salter, Jim Blandy:

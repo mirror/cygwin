@@ -1,21 +1,22 @@
 /* Remote utility routines for the remote server for GDB.
    Copyright (C) 1986, 1989, 1993 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 #include "server.h"
 #include "terminal.h"
@@ -32,6 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include <fcntl.h>
 
 int remote_debug = 0;
+struct ui_file *gdb_stdlog;
 
 static int remote_desc;
 
@@ -53,17 +55,17 @@ remote_open (name)
 #ifdef HAVE_TERMIOS
       {
 	struct termios termios;
-	tcgetattr(remote_desc, &termios);
+	tcgetattr (remote_desc, &termios);
 
 	termios.c_iflag = 0;
 	termios.c_oflag = 0;
 	termios.c_lflag = 0;
-	termios.c_cflag &= ~(CSIZE|PARENB);
+	termios.c_cflag &= ~(CSIZE | PARENB);
 	termios.c_cflag |= CLOCAL | CS8;
 	termios.c_cc[VMIN] = 0;
 	termios.c_cc[VTIME] = 0;
 
-	tcsetattr(remote_desc, TCSANOW, &termios);
+	tcsetattr (remote_desc, TCSANOW, &termios);
       }
 #endif
 
@@ -75,7 +77,7 @@ remote_open (name)
 	termio.c_iflag = 0;
 	termio.c_oflag = 0;
 	termio.c_lflag = 0;
-	termio.c_cflag &= ~(CSIZE|PARENB);
+	termio.c_cflag &= ~(CSIZE | PARENB);
 	termio.c_cflag |= CLOCAL | CS8;
 	termio.c_cc[VMIN] = 0;
 	termio.c_cc[VTIME] = 0;
@@ -115,19 +117,19 @@ remote_open (name)
 
       /* Allow rapid reuse of this port. */
       tmp = 1;
-      setsockopt (tmp_desc, SOL_SOCKET, SO_REUSEADDR, (char *)&tmp,
-		  sizeof(tmp));
+      setsockopt (tmp_desc, SOL_SOCKET, SO_REUSEADDR, (char *) &tmp,
+		  sizeof (tmp));
 
       sockaddr.sin_family = PF_INET;
-      sockaddr.sin_port = htons(port);
+      sockaddr.sin_port = htons (port);
       sockaddr.sin_addr.s_addr = INADDR_ANY;
 
-      if (bind (tmp_desc, (struct sockaddr *)&sockaddr, sizeof (sockaddr))
+      if (bind (tmp_desc, (struct sockaddr *) &sockaddr, sizeof (sockaddr))
 	  || listen (tmp_desc, 1))
 	perror_with_name ("Can't bind address");
 
       tmp = sizeof (sockaddr);
-      remote_desc = accept (tmp_desc, (struct sockaddr *)&sockaddr, &tmp);
+      remote_desc = accept (tmp_desc, (struct sockaddr *) &sockaddr, &tmp);
       if (remote_desc == -1)
 	perror_with_name ("Accept failed");
 
@@ -137,18 +139,18 @@ remote_open (name)
 
       /* Enable TCP keep alive process. */
       tmp = 1;
-      setsockopt (tmp_desc, SOL_SOCKET, SO_KEEPALIVE, (char *)&tmp, sizeof(tmp));
+      setsockopt (tmp_desc, SOL_SOCKET, SO_KEEPALIVE, (char *) &tmp, sizeof (tmp));
 
       /* Tell TCP not to delay small packets.  This greatly speeds up
-	 interactive response. */
+         interactive response. */
       tmp = 1;
       setsockopt (remote_desc, protoent->p_proto, TCP_NODELAY,
-		  (char *)&tmp, sizeof(tmp));
+		  (char *) &tmp, sizeof (tmp));
 
       close (tmp_desc);		/* No longer need this */
 
-      signal (SIGPIPE, SIG_IGN); /* If we don't do this, then gdbserver simply
-				    exits when the remote side dies.  */
+      signal (SIGPIPE, SIG_IGN);	/* If we don't do this, then gdbserver simply
+					   exits when the remote side dies.  */
     }
 
 #if defined(F_SETFL) && defined (FASYNC)
@@ -160,7 +162,7 @@ remote_open (name)
 }
 
 void
-remote_close()
+remote_close ()
 {
   close (remote_desc);
 }
@@ -200,7 +202,7 @@ putpkt (buf)
 {
   int i;
   unsigned char csum = 0;
-  char buf2[2000];
+  char buf2[PBUFSIZ];
   char buf3[1];
   int cnt = strlen (buf);
   char *p;
@@ -260,7 +262,7 @@ putpkt (buf)
    will cause us to send a SIGINT to the child.  */
 
 static void
-input_interrupt()
+input_interrupt ()
 {
   int cc;
   char c;
@@ -269,7 +271,7 @@ input_interrupt()
 
   if (cc != 1 || c != '\003')
     {
-      fprintf(stderr, "input_interrupt, cc = %d c = %d\n", cc, c);
+      fprintf (stderr, "input_interrupt, cc = %d c = %d\n", cc, c);
       return;
     }
 
@@ -277,13 +279,13 @@ input_interrupt()
 }
 
 void
-enable_async_io()
+enable_async_io ()
 {
   signal (SIGIO, input_interrupt);
 }
 
 void
-disable_async_io()
+disable_async_io ()
 {
   signal (SIGIO, SIG_IGN);
 }
@@ -358,7 +360,7 @@ getpkt (buf)
 
       c1 = fromhex (readchar ());
       c2 = fromhex (readchar ());
-      
+
       if (csum == (c1 << 4) + c2)
 	break;
 
@@ -430,14 +432,17 @@ convert_ascii_to_int (from, to, n)
 }
 
 static char *
-outreg(regno, buf)
+outreg (regno, buf)
      int regno;
      char *buf;
 {
-  extern char registers[];
   int regsize = REGISTER_RAW_SIZE (regno);
 
-  *buf++ = tohex (regno >> 4);
+  if ((regno >> 12) != 0)
+    *buf++ = tohex ((regno >> 12) & 0xf);
+  if ((regno >> 8) != 0)
+    *buf++ = tohex ((regno >> 8) & 0xf);
+  *buf++ = tohex ((regno >> 4) & 0xf);
   *buf++ = tohex (regno & 0xf);
   *buf++ = ':';
   convert_int_to_ascii (&registers[REGISTER_BYTE (regno)], buf, regsize);
@@ -468,18 +473,30 @@ prepare_resume_reply (buf, status, signo)
 
   if (status == 'T')
     {
+#ifdef GDBSERVER_RESUME_REGS
+      static int gdbserver_resume_regs[] = GDBSERVER_RESUME_REGS ;
+      int i;
+      for (i = 0; 
+           i < sizeof (gdbserver_resume_regs) 
+	        / sizeof (gdbserver_resume_regs[0]);
+	   i++)
+	{
+	  int regnum = gdbserver_resume_regs[i];
+	  buf = outreg (regnum, buf);
+	}
+#else /* !defined(GDBSERVER_RESUME_REGS) */
       buf = outreg (PC_REGNUM, buf);
       buf = outreg (FP_REGNUM, buf);
       buf = outreg (SP_REGNUM, buf);
-#ifdef NPC_REGNUM
-      buf = outreg (NPC_REGNUM, buf);
-#endif
+      if (NPC_REGNUM >= 0)
+	buf = outreg (NPC_REGNUM, buf);
 #ifdef O7_REGNUM
       buf = outreg (O7_REGNUM, buf);
 #endif
+#endif /* GDBSERVER_RESUME_REGS */
 
       /* If the debugger hasn't used any thread features, don't burden it with
-	 threads.  If we didn't check this, GDB 4.13 and older would choke.  */
+         threads.  If we didn't check this, GDB 4.13 and older would choke.  */
       if (cont_thread != 0)
 	{
 	  if (old_thread_from_wait != thread_from_wait)

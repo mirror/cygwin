@@ -1,7 +1,7 @@
 // components.h - A simulation of the Dallas 1x42 time-keeping NVRAMs.
 // -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999-2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -39,7 +39,6 @@ using sidutil::fixed_pin_map_component;
 using sidutil::no_pin_component;
 using sidutil::fixed_bus_map_component;
 using sidutil::fixed_attribute_map_component;
-using sidutil::no_attribute_component;
 using sidutil::no_accessor_component;
 using sidutil::fixed_accessor_map_component;
 using sidutil::no_relation_component;
@@ -233,7 +232,7 @@ class sidrtc: public virtual component,
 	      protected no_accessor_component,
 	      protected no_relation_component,
 	      protected fixed_bus_map_component,
-	      protected no_attribute_component
+	      protected fixed_attribute_map_component
 {
   class mybus: public word_bus<big_int_4>
   {
@@ -246,6 +245,13 @@ class sidrtc: public virtual component,
   friend class mybus;
 
   mybus rtcbus;
+
+  string get_seconds_attribute();
+  string get_minutes_attribute();
+  string get_hours_attribute();
+
+  sid::component::status set_no_attribute(const string& value) 
+    { return sid::component::bad_value; }
 
 public:
   sidrtc();

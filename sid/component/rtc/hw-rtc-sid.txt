@@ -5,7 +5,7 @@
   This component is a fictional simplified high-precision real time clock.
 
   Buses: registers
-
+  Attributes: hour minute second "tk xclock clone"
   Library: librtc.la
   Symbol name: rtc_component_library
 
@@ -25,11 +25,18 @@
       host system's epoch.  The second word (address 0x4) contains the
       number of nanoseconds within that second.  Both words are supplied
       in big-endian order.
+
+    * More timing
+
+      As a special bonus, the "hour", "minute", and "second"
+      attributes contain the appropriate numbers for the current
+      moment, in the GMT timezone.
   
   - SID conventions
 
     * This is a functional component.
     * It has no state to save, and has no use for triggerpoints.
+    * It supports component GUIs.
 
 * Environment
 
@@ -40,6 +47,13 @@
 	new hw-rtc-sid rtc
         connect-bus mapper [0x1000,0x1007] rtc registers
 
+    * The "hw-visual-clock" component is a candidate gui for this
+      component.
+
+        new hw-rtc-sid rtc
+        new hw-visual-clock rtc-gui
+	relate rtc-gui "your rtc friend" rtc
+
   - Host system
     * The component relies on the accuracy and precision of UTC time
       maintained by the host.
@@ -48,3 +62,8 @@
   - low level:
     * buses
       - registers | 0x0 - 0x7 | read | timing
+    * attributes
+      - hour | register | 0..23 | n/a | more timing
+      - minute | register | 0..59 | n/a | more timing
+      - second | register | 0..59 | n/a | more timing
+      - "tk xclock clone" | gui | "hw-visual-clock" | (same) | component gui

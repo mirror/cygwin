@@ -7,7 +7,8 @@
 
   Buses: read-write-port
   Pins: image-load image-store
-  Attributes: device-code image-file manufacturer-code mode sector-size size size-max
+  Attributes: device-code image-file manufacturer-code mode
+	      sector-size size size-max read-latency write-latency
 
   Library: libmemory.la
   Symbol name: mem_component_library
@@ -73,9 +74,16 @@
       device state machine.  This is primarily designed for testing
       purposes.
 
+    * Memory latency
+
+      The component models the effects of memory latency.  The
+      read-latency and write-latency attribute values specify the
+      latencies for memory reads and writes, respectively.
+
   - SID conventions
 
     * This is a functional component.
+    * The component models memory latency.
     * The component supports saving and restoring state in addition to
       memory persistence, via the image-store pin/attribute.
     * Triggerpoints are not supported.
@@ -122,6 +130,8 @@
       - sector-size | setting | numeric | 65536 | configuration
       - image-file | setting | filename | | image save/load
       - mode | | 0 .. 9 | 0 for read mode | reading/writing
+      - read-latency | setting | default 0 | memory latency
+      - write-latency | setting | default 0 | memory latency
 
     * pins
       - image-load | input | any | image load/store

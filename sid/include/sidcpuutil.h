@@ -1,6 +1,6 @@
 // sidcpuutil.h - Elements common to CPU models.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999-2001 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -210,9 +210,13 @@ namespace sidutil
 	this->current_step_insn_count = 0;
 	this->yield_p = false;
 
+	// Check for triggerpoints due right now; may set yield_p!
+	this->triggerpoint_manager.check_and_dispatch ();
+
 	// Enter insn loop.  Poll continue_after_insn_p after each instruction
 	sid::host_int_8 prev_insn_count = this->total_insn_count;
-	this->step_insns ();
+	if (! this->yield_p)
+	  this->step_insns ();
 	sid::host_int_8 num_insns = this->total_insn_count - prev_insn_count;
 
 	// Clamp

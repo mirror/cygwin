@@ -1,3 +1,17 @@
+2005-03-10  Jim Blandy  <jimb@redhat.com>
+
+	* linux-target.c (stock_table_to_frv, frv_table_to_stock,
+	stock_bp_to_frv, frv_bp_to_stock, frv_make_bp_table, frv_set_bp,
+	frv_delete_bp, frv_bp_hit_p): New functions.
+	(frv_make_arch): Register the latter four as our breakpoint
+	methods.
+	(MAKE_ARCH): New #definition.
+	* configure.in: Use stock-breakpoints.o on FRV Linux, too.
+	* configure: Regenerated.
+
+	* linux-target.c (frv_fdpic_loadmap_addresses): Use '%lx' for
+	unsigned long argument.
+
 2004-12-03  Jim Blandy  <jimb@redhat.com>
 
 	Disable debugging messages by default.

@@ -1253,6 +1253,112 @@ frv_fdpic_loadmap_addresses (struct gdbserv *serv, int pid, int regno,
   return 0;
 }
 
+/* Breakpoint methods for the frv.  These use the stock breakpoint
+   code.
+
+   Although the FRV actually does require a custom breakpoint
+   implementation (you can only set breakpoints on the first
+   instruction in a VLIW bundle), we punt that for now: the only
+   client of this breakpoint code at the moment is thread-db.c, which
+   always sets breakpoints at function entry points, which are
+   guaranteed to be the start of a bundle.  */
+
+/* frv breakpoints tables are just stock breakpoint tables.  But we
+   like static typechecking; casts swallow error messages.  */
+static struct arch_bp_table *
+stock_table_to_frv (struct stock_bp_table *table)
+{
+  return (struct arch_bp_table *) table;
+}
+
+static struct stock_bp_table *
+frv_table_to_stock (struct arch_bp_table *table)
+{
+  return (struct stock_bp_table *) table;
+}
+
+/* frv breakpoints are just stock breakpoints.  But we like static
+   typechecking; casts swallow error messages.  */
+static struct arch_bp *
+stock_bp_to_frv (struct stock_bp *bp)
+{
+  return (struct arch_bp *) bp;
+}
+
+static struct stock_bp *
+frv_bp_to_stock (struct arch_bp *bp)
+{
+  return (struct stock_bp *) bp;
+}
+
+struct arch_bp_table *
+frv_make_bp_table (struct arch *arch,
+		   struct gdbserv *serv,
+		   struct gdbserv_target *target)
+{
+  static unsigned char breakpoint[] = {0xc0, 0x70, 0x00, 0x01};
+  struct stock_bp_table *table = stock_bp_make_table (serv, target);
+
+  stock_bp_set_bp_insn (table, sizeof (breakpoint), breakpoint);
+
+  return stock_table_to_frv (table);
+}
+
+
+static struct arch_bp *
+frv_set_bp (struct arch_bp_table *table,
+	    struct gdbserv_reg *addr)
+{
+  /* frv arch breakpoints are just stock breakpoints.  */
+  return stock_bp_to_frv (stock_bp_set_bp (frv_table_to_stock (table),
+					   addr));
+}
+
+
+static int
+frv_delete_bp (struct arch_bp *bp)
+{
+  return stock_bp_delete_bp (frv_bp_to_stock (bp));
+}
+
+
+static int
+frv_bp_hit_p (struct gdbserv_thread *thread,
+	      struct arch_bp *arch_bp)
+{
+  struct stock_bp *bp = frv_bp_to_stock (arch_bp);
+  struct stock_bp_table *table = stock_bp_table (bp);
+  struct gdbserv *serv = stock_bp_table_serv (table);
+  struct gdbserv_target *target = stock_bp_table_target (table);
+  struct gdbserv_reg bp_addr, pc;
+  unsigned long bp_addr_int, pc_int;
+
+  stock_bp_addr (&bp_addr, bp);
+  gdbserv_reg_to_ulong (serv, &bp_addr, &bp_addr_int);
+  target->get_thread_reg (serv, thread, PC_REGNUM, &pc);
+  gdbserv_reg_to_ulong (serv, &pc, &pc_int);
+
+  return bp_addr_int == pc_int;
+}
+
+
+/* Construct an architecture object for the frv.  */
+static struct arch *
+frv_make_arch (void)
+{
+  struct arch *a = allocate_empty_arch ();
+
+  a->closure = 0;		/* No closure needed at the moment.  */
+  a->make_bp_table = frv_make_bp_table;
+  a->set_bp = frv_set_bp;
+  a->delete_bp = frv_delete_bp;
+  a->bp_hit_p = frv_bp_hit_p;
+
+  return a;
+}
+
+#define MAKE_ARCH() (frv_make_arch ())
+
 /* End of FRV_LINUX_TARGET */
 #else
 #error Need a _LINUX_TARGET define for your architecture

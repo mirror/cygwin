@@ -137,7 +137,7 @@ static const CGEN_ATTR_ENTRY bool_attr[] =
     " =\n{\n"
     "  & " (gen-hw-asm-ref (elm-get self 'name)) "_entries[0],\n"
     "  " (number->string (length (elm-get self 'values))) ",\n"
-    "  0, 0, 0, 0\n"
+    "  0, 0, 0, 0, \"\"\n"
     "};\n\n"
     )
    )

@@ -274,10 +274,10 @@ $version=q$Id$;
 $zeroth_section = "# sid configuration file
 # created by $version
 # run by $whoami @ $hostname ($uname) at $date
-# args: @ARGV_COPY
-set main verbose? $opt_verbose
-set main persistent? $opt_persistent
-";
+# args: @ARGV_COPY\n";
+
+if ($opt_verbose) { $zeroth_section .= "set main verbose? true\n"; }
+if ($opt_persistent) { $zeroth_section .= "set main persistent? true\n"; }
 
 
 $cpu_component_type = $cpu_comptype{$opt_cpu} || die "Unknown cpu $opt_cpu for cpu component type\n";

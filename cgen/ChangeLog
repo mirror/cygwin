@@ -1,5 +1,13 @@
 2001-01-08  Frank Ch. Eigler  <fche@redhat.com>
 
+	* rtl.scm (hw): Copy hw-name to new operand's sem-name, to simplify
+	its subsequent gen-pretty-name.
+
+	* read.scm: Increase thread working stack limit and backtrace
+	depth limits.
+
+2001-01-08  Frank Ch. Eigler  <fche@redhat.com>
+
 	* doc/rtl.texi: Deprecate and depreciate the decode-assist construct.
 
 2001-01-06  Johan Rydberg  <jrydberg@opencores.org>

@@ -2035,7 +2035,7 @@
       ; of a hardware object (e.g. h-gr[0], h-gr[14]) can be distinguished.
       (let ((name (-rtx-hw-name hw hw-name index-arg)))
 	(send result 'set-name! name)
-	(op:set-sem-name! result name))
+	(op:set-sem-name! result hw-name))
 
       ; Empty comment and attribute.
       ; ??? Stick the arguments in the comment for debugging purposes?

@@ -99,6 +99,9 @@
       (read-disable 'positions)
       ))
 
+; Extend the default limits of the interpreter stack
+(debug-set! stack 100000)
+
 ; If this is set to #f, the file is always loaded.
 ; Don't override any current setting, e.g. from dev.scm.
 (if (not (defined? 'CHECK-LOADED?))
@@ -1104,7 +1107,8 @@ Define a preprocessor-style macro.
 			    (debug-enable 'backtrace)
 			    (debug-enable 'debug)
 			    (debug-enable 'backwards)
-			    (debug-set! depth 200)
+			    (debug-set! depth 2000)
+			    (debug-set! maxdepth 2000)
 			    (debug-set! frames 10)
 			    (read-enable 'positions)))
 		      )

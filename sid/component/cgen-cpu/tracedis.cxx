@@ -74,7 +74,7 @@ cgen_disassemble(bfd_vma pc,
 //
 // so that only really leaves bfd_lookup_arch() as an issue...we can hack it.
 
-enum bfd_architecture
+extern "C" enum bfd_architecture
 bfd_get_arch(bfd *abfd)
 { 
   return static_cast<enum bfd_architecture> (0);
@@ -82,45 +82,50 @@ bfd_get_arch(bfd *abfd)
 
 /* Stolen from libbfd.  */
 
-bfd_vma
-bfd_getb16 (register const bfd_byte *addr)
+extern "C" bfd_vma
+bfd_getb16 (register const void *addr)
 {
-  return (addr[0] << 8) | addr[1];
+  const bfd_byte *byteaddr = static_cast <const bfd_byte *> (addr);
+  return (byteaddr[0] << 8) | byteaddr[1];
 }
 
-bfd_vma
-bfd_getl16 (register const bfd_byte *addr)
+extern "C" bfd_vma
+bfd_getl16 (register const void *addr)
 {
-  return (addr[1] << 8) | addr[0];
+  const bfd_byte *byteaddr = static_cast <const bfd_byte *> (addr);
+  return (byteaddr[1] << 8) | byteaddr[0];
 }
 
-bfd_vma
-bfd_getb32 (register const bfd_byte *addr)
+extern "C" bfd_vma
+bfd_getb32 (register const void *addr)
 {
+  const bfd_byte *byteaddr = static_cast <const bfd_byte *> (addr);
   unsigned long v;
 
-  v = (unsigned long) addr[0] << 24;
-  v |= (unsigned long) addr[1] << 16;
-  v |= (unsigned long) addr[2] << 8;
-  v |= (unsigned long) addr[3];
+  v = (unsigned long) byteaddr[0] << 24;
+  v |= (unsigned long) byteaddr[1] << 16;
+  v |= (unsigned long) byteaddr[2] << 8;
+  v |= (unsigned long) byteaddr[3];
   return (bfd_vma) v;
 }
 
-bfd_vma
-bfd_getl32 (register const bfd_byte *addr)
+extern "C" bfd_vma
+bfd_getl32 (register const void *addr)
 {
+  const bfd_byte *byteaddr = static_cast <const bfd_byte *> (addr);
   unsigned long v;
 
-  v = (unsigned long) addr[0];
-  v |= (unsigned long) addr[1] << 8;
-  v |= (unsigned long) addr[2] << 16;
-  v |= (unsigned long) addr[3] << 24;
+  v = (unsigned long) byteaddr[0];
+  v |= (unsigned long) byteaddr[1] << 8;
+  v |= (unsigned long) byteaddr[2] << 16;
+  v |= (unsigned long) byteaddr[3] << 24;
   return (bfd_vma) v;
 }
 
-void
-bfd_put_bits (bfd_vma data, bfd_byte* addr, int bits, int big_p)
+extern "C" void
+bfd_put_bits (bfd_uint64_t data, void* addr, int bits, bfd_boolean big_p)
 {
+  bfd_byte *byteaddr = static_cast <bfd_byte *> (addr);
   int i;
   int bytes;
 
@@ -132,16 +137,17 @@ bfd_put_bits (bfd_vma data, bfd_byte* addr, int bits, int big_p)
     {
       int index = big_p ? bytes - i - 1 : i;
 
-      addr[index] = (bfd_byte) data;
+      byteaddr[index] = (bfd_byte) data;
       data >>= 8;
     }
 }
 
 /* Stolen from libbfd.  */
-bfd_vma
-bfd_get_bits (bfd_byte* addr, int bits, int big_p)
+extern "C" bfd_uint64_t
+bfd_get_bits (const void* addr, int bits, int big_p)
 {
-  bfd_vma data;
+  const bfd_byte *byteaddr = static_cast <const bfd_byte *> (addr);
+  bfd_uint64_t data;
   int i;
   int bytes;
 
@@ -154,7 +160,7 @@ bfd_get_bits (bfd_byte* addr, int bits, int big_p)
     {
       int index = big_p ? i : bytes - i - 1;
 
-      data = (data << 8) | addr[index];
+      data = (data << 8) | byteaddr[index];
     }
 
   return data;
@@ -199,7 +205,7 @@ register_name(enum bfd_architecture arch, const char *name)
   p->name = name;
 }
 
-const bfd_arch_info_type *
+extern "C" const bfd_arch_info_type *
 bfd_lookup_arch (enum bfd_architecture arch, unsigned long machine)
 { 
   static bfd_arch_info_type info;

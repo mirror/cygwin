@@ -2,9 +2,9 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
 
-This file is part of the Cygnus Simulators.
+This file is part of the Red Hat simulators.
 
 
 */
@@ -56,7 +56,7 @@ typedef enum cr_names {
 /* Enum declaration for cgen_insn attrs.  */
 typedef enum cgen_insn_attr {
   CGEN_INSN_ALIAS, CGEN_INSN_VIRTUAL, CGEN_INSN_UNCOND_CTI, CGEN_INSN_COND_CTI
- , CGEN_INSN_SKIP_CTI, CGEN_INSN_DELAY_SLOT, CGEN_INSN_RELAXABLE, CGEN_INSN_RELAX
+ , CGEN_INSN_SKIP_CTI, CGEN_INSN_DELAY_SLOT, CGEN_INSN_RELAXABLE, CGEN_INSN_RELAXED
  , CGEN_INSN_NO_DIS, CGEN_INSN_PBB, CGEN_INSN_FILL_SLOT, CGEN_INSN_SPECIAL
  , CGEN_INSN_END_BOOLS, CGEN_INSN_START_NBOOLS = 31, CGEN_INSN_MACH, CGEN_INSN_PIPE
  , CGEN_INSN_END_NBOOLS
@@ -97,13 +97,14 @@ struct m32r_insn_attr {
   inline int get_skip_cti_attr () { return (bools & (1<<CGEN_INSN_SKIP_CTI)) != 0; }
   inline int get_delay_slot_attr () { return (bools & (1<<CGEN_INSN_DELAY_SLOT)) != 0; }
   inline int get_relaxable_attr () { return (bools & (1<<CGEN_INSN_RELAXABLE)) != 0; }
-  inline int get_relax_attr () { return (bools & (1<<CGEN_INSN_RELAX)) != 0; }
+  inline int get_relaxed_attr () { return (bools & (1<<CGEN_INSN_RELAXED)) != 0; }
   inline int get_no_dis_attr () { return (bools & (1<<CGEN_INSN_NO_DIS)) != 0; }
   inline int get_pbb_attr () { return (bools & (1<<CGEN_INSN_PBB)) != 0; }
   inline int get_fill_slot_attr () { return (bools & (1<<CGEN_INSN_FILL_SLOT)) != 0; }
   inline int get_special_attr () { return (bools & (1<<CGEN_INSN_SPECIAL)) != 0; }
 };
 
+#define MACH_M32R_INSN_CHUNK_BITSIZE 0
 
 } // end m32r namespace
 

@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -71,7 +71,7 @@ typedef enum cc_tests {
 /* Enum declaration for cgen_insn attrs.  */
 typedef enum cgen_insn_attr {
   CGEN_INSN_ALIAS, CGEN_INSN_VIRTUAL, CGEN_INSN_UNCOND_CTI, CGEN_INSN_COND_CTI
- , CGEN_INSN_SKIP_CTI, CGEN_INSN_DELAY_SLOT, CGEN_INSN_RELAXABLE, CGEN_INSN_RELAX
+ , CGEN_INSN_SKIP_CTI, CGEN_INSN_DELAY_SLOT, CGEN_INSN_RELAXABLE, CGEN_INSN_RELAXED
  , CGEN_INSN_NO_DIS, CGEN_INSN_PBB, CGEN_INSN_END_BOOLS, CGEN_INSN_START_NBOOLS = 31
  , CGEN_INSN_MACH, CGEN_INSN_ISA, CGEN_INSN_R15_OFFSET, CGEN_INSN_END_NBOOLS
 } CGEN_INSN_ATTR;
@@ -108,7 +108,7 @@ struct arm_insn_attr {
   inline int get_skip_cti_attr () { return (bools & (1<<CGEN_INSN_SKIP_CTI)) != 0; }
   inline int get_delay_slot_attr () { return (bools & (1<<CGEN_INSN_DELAY_SLOT)) != 0; }
   inline int get_relaxable_attr () { return (bools & (1<<CGEN_INSN_RELAXABLE)) != 0; }
-  inline int get_relax_attr () { return (bools & (1<<CGEN_INSN_RELAX)) != 0; }
+  inline int get_relaxed_attr () { return (bools & (1<<CGEN_INSN_RELAXED)) != 0; }
   inline int get_no_dis_attr () { return (bools & (1<<CGEN_INSN_NO_DIS)) != 0; }
   inline int get_pbb_attr () { return (bools & (1<<CGEN_INSN_PBB)) != 0; }
 };

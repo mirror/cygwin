@@ -1,3 +1,16 @@
+2003-07-05  Doug Evans  <dje@sebabeach.org>
+
+	* arm-cpu.h: Regenerate.
+	* arm-decode.cxx: Regenerate.
+	* arm-decode.h: Regenerate.
+	* arm-desc.h: Regenerate.
+	* arm-sem.cxx: Regenerate.
+	* arm-semsw.cxx: Regenerate.
+	* thumb-decode.cxx: Regenerate.
+	* thumb-decode.h: Regenerate.
+	* thumb-sem.cxx: Regenerate.
+	* thumb-semsw.cxx: Regenerate.
+
 2003-02-06  Frank Ch. Eigler  <fche@redhat.com>
 
 	* arm-semsw.cxx: Sort of regenerated.

@@ -1,21 +1,22 @@
 /* Parameters for target machine Intel 960, for GDB, the GNU debugger.
    Copyright (C) 1990, 1991, 1993 Free Software Foundation, Inc.
    Contributed by Intel Corporation.
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* Definitions to target GDB to any i960.  */
 
@@ -39,7 +40,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* We have IEEE floating point, if we have any float at all.  */
 
-#define IEEE_FLOAT
+#define IEEE_FLOAT (1)
 
 /* Offset from address of function to start of its code.
    Zero on most machines.  */
@@ -49,8 +50,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Advance ip across any function entry prologue instructions
    to reach some "real" code.  */
 
-#define SKIP_PROLOGUE(ip)	{ ip = skip_prologue (ip); }
-extern CORE_ADDR skip_prologue ();
+#define SKIP_PROLOGUE(ip)	(i960_skip_prologue (ip))
+extern CORE_ADDR i960_skip_prologue ();
 
 /* Immediately after a function call, return the saved ip.
    Can't always go through the frames for this because on some machines
@@ -87,24 +88,24 @@ extern CORE_ADDR saved_pc_after_call ();
 /* Register numbers of various important registers (used to index
    into arrays of register names and register values).  */
 
-#define R0_REGNUM   0	/* First local register		*/
-#define SP_REGNUM   1	/* Contains address of top of stack */
-#define RIP_REGNUM  2	/* Return instruction pointer (local r2) */
-#define R15_REGNUM 15	/* Last local register		*/
-#define G0_REGNUM  16	/* First global register	*/
-#define G13_REGNUM 29	/* g13 - holds struct return address */
-#define G14_REGNUM 30	/* g14 - ptr to arg block / leafproc return address */
-#define FP_REGNUM  31	/* Contains address of executing stack frame */
-#define	PCW_REGNUM 32	/* process control word */
-#define	ACW_REGNUM 33	/* arithmetic control word */
-#define	TCW_REGNUM 34	/* trace control word */
-#define IP_REGNUM  35	/* instruction pointer */
-#define FP0_REGNUM 36	/* First floating point register */
+#define R0_REGNUM   0		/* First local register           */
+#define SP_REGNUM   1		/* Contains address of top of stack */
+#define RIP_REGNUM  2		/* Return instruction pointer (local r2) */
+#define R15_REGNUM 15		/* Last local register            */
+#define G0_REGNUM  16		/* First global register  */
+#define G13_REGNUM 29		/* g13 - holds struct return address */
+#define G14_REGNUM 30		/* g14 - ptr to arg block / leafproc return address */
+#define FP_REGNUM  31		/* Contains address of executing stack frame */
+#define	PCW_REGNUM 32		/* process control word */
+#define	ACW_REGNUM 33		/* arithmetic control word */
+#define	TCW_REGNUM 34		/* trace control word */
+#define IP_REGNUM  35		/* instruction pointer */
+#define FP0_REGNUM 36		/* First floating point register */
 
 /* Some registers have more than one name */
 
 #define PC_REGNUM  IP_REGNUM	/* GDB refers to ip as the Program Counter */
-#define PFP_REGNUM R0_REGNUM	/* Previous frame pointer	*/
+#define PFP_REGNUM R0_REGNUM	/* Previous frame pointer */
 
 /* Total amount of space needed to store our copies of the machine's
    register state, the array `registers'.  */
@@ -124,7 +125,7 @@ extern CORE_ADDR saved_pc_after_call ();
    other frames, and 2) This register is automatically "saved" upon
    subroutine calls and thus there is no need to search more than one
    stack frame for it.
-   
+
    On the i960, in fact, the name of this register in another frame is
    "mud" -- there is no overlap between the windows.  Each window is
    simply saved into the stack (true for our purposes, after having been
@@ -230,7 +231,7 @@ extern use_struct_convention_fn i960_use_struct_convention;
 
 /* Write into appropriate registers a function return value
    of type TYPE, given in virtual format, for "value returning" functions.
-  
+
    For 'return' command:  not (yet) implemented for i960.  */
 
 #define STORE_RETURN_VALUE(TYPE,VALBUF) \
@@ -286,12 +287,13 @@ extern use_struct_convention_fn i960_use_struct_convention;
    by FI does not have a frame on the stack associated with it.  If it
    does not, FRAMELESS is set to 1, else 0.  */
 
-#define FRAMELESS_FUNCTION_INVOCATION(FI, FRAMELESS) \
-  { (FRAMELESS) = (leafproc_return ((FI)->pc) != 0); }
+CORE_ADDR leafproc_return (CORE_ADDR ip);
+#define FRAMELESS_FUNCTION_INVOCATION(FI) \
+  (leafproc_return ((FI)->pc) != 0)
 
 /* Note that in the i960 architecture the return pointer is saved in the
    *caller's* stack frame.
-  
+
    Make sure to zero low-order bits because of bug in 960CA A-step part
    (instruction addresses should always be word-aligned anyway).  */
 
@@ -317,7 +319,7 @@ extern CORE_ADDR frame_args_address ();		/* i960-tdep.c */
 /* Set NUMARGS to the number of args passed to a frame.
    Can return -1, meaning no way to tell.  */
 
-#define FRAME_NUM_ARGS(numargs, fi)	(numargs = -1)
+#define FRAME_NUM_ARGS(fi)	(-1)
 
 /* Return number of bytes at start of arglist that are not really args.  */
 
@@ -327,12 +329,12 @@ extern CORE_ADDR frame_args_address ();		/* i960-tdep.c */
 
 #define FRAME_FIND_SAVED_REGS(frame_info_addr, sr) \
 	frame_find_saved_regs (frame_info_addr, &sr)
-extern void frame_find_saved_regs();		/* See i960-tdep.c */
+extern void frame_find_saved_regs ();	/* See i960-tdep.c */
 
 /* Things needed for making calls to functions in the inferior process */
 
 /* Push an empty stack frame, to record the current ip, etc.
-  
+
    Not (yet?) implemented for i960.  */
 
 #define PUSH_DUMMY_FRAME	\
@@ -340,19 +342,21 @@ error("Function calls into the inferior process are not supported on the i960")
 
 /* Discard from the stack the innermost frame, restoring all registers.  */
 
+
+void i960_pop_frame (void);
 #define POP_FRAME \
-	pop_frame ()
+	i960_pop_frame ()
 
 
 /* This sequence of words is the instructions
-  
-  	callx 0x00000000
-  	fmark
+
+   callx 0x00000000
+   fmark
  */
 
 /* #define CALL_DUMMY { 0x86003000, 0x00000000, 0x66003e00 } */
 
-/* #define CALL_DUMMY_START_OFFSET 0 *//* Start execution at beginning of dummy */
+																			    /* #define CALL_DUMMY_START_OFFSET 0 *//* Start execution at beginning of dummy */
 
 /* Indicate that we don't support calling inferior child functions.  */
 
@@ -360,7 +364,7 @@ error("Function calls into the inferior process are not supported on the i960")
 
 /* Insert the specified number of args and function address
    into a call sequence of the above form stored at 'dummyname'.
-  
+
    Ignore arg count on i960.  */
 
 /* #define FIX_CALL_DUMMY(dummyname, fun, nargs) *(((int *)dummyname)+1) = fun */

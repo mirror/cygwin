@@ -1,23 +1,24 @@
 /* Parameters for execution on a z8000 series machine.
    Copyright 1992, 1993 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
-#define IEEE_FLOAT 1
+#define IEEE_FLOAT (1)
 
 #undef TARGET_INT_BIT
 #undef TARGET_LONG_BIT
@@ -40,8 +41,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Advance PC across any function entry prologue instructions
    to reach some "real" code.  */
 
-#define SKIP_PROLOGUE(ip)   {(ip) = z8k_skip_prologue(ip);}
-extern CORE_ADDR mz8k_skip_prologue PARAMS ((CORE_ADDR ip));
+#define SKIP_PROLOGUE(ip)   (z8k_skip_prologue (ip))
+extern CORE_ADDR z8k_skip_prologue PARAMS ((CORE_ADDR ip));
 
 
 /* Immediately after a function call, return the saved pc.
@@ -49,7 +50,9 @@ extern CORE_ADDR mz8k_skip_prologue PARAMS ((CORE_ADDR ip));
    the new frame is not set up until the new function executes
    some instructions.  */
 
-#define SAVED_PC_AFTER_CALL(frame) saved_pc_after_call(frame)
+
+extern int z8k_saved_pc_after_call (struct frame_info *frame);
+#define SAVED_PC_AFTER_CALL(frame) z8k_saved_pc_after_call(frame)
 
 /* Stack grows downward.  */
 
@@ -68,8 +71,8 @@ extern CORE_ADDR mz8k_skip_prologue PARAMS ((CORE_ADDR ip));
 
 #define REGISTER_TYPE unsigned int
 
-#define NUM_REGS 	23   /* 16 registers + 1 ccr + 1 pc + 3 debug
-				regs + fake fp + fake sp*/
+#define NUM_REGS 	23	/* 16 registers + 1 ccr + 1 pc + 3 debug
+				   regs + fake fp + fake sp */
 #define REGISTER_BYTES  (NUM_REGS *4)
 
 /* Index within `registers' of the first byte of the space for
@@ -87,7 +90,7 @@ extern CORE_ADDR mz8k_skip_prologue PARAMS ((CORE_ADDR ip));
 /* Number of bytes of storage in the program's representation
    for register N.  */
 
-#define REGISTER_VIRTUAL_SIZE(N) REGISTER_RAW_SIZE(N) 
+#define REGISTER_VIRTUAL_SIZE(N) REGISTER_RAW_SIZE(N)
 
 /* Largest value REGISTER_RAW_SIZE can have.  */
 
@@ -103,7 +106,7 @@ extern CORE_ADDR mz8k_skip_prologue PARAMS ((CORE_ADDR ip));
 #define REGISTER_VIRTUAL_TYPE(N) \
  (REGISTER_VIRTUAL_SIZE(N) == 2? builtin_type_unsigned_int : builtin_type_long)
 
-/*#define INIT_FRAME_PC(x,y) init_frame_pc(x,y)*/
+/*#define INIT_FRAME_PC(x,y) init_frame_pc(x,y) */
 /* Initializer for an array of names of registers.
    Entries beyond the first NUM_REGS are ignored.  */
 
@@ -166,7 +169,8 @@ extern CORE_ADDR mz8k_skip_prologue PARAMS ((CORE_ADDR ip));
    is the address of a ptr sized byte word containing the calling
    frame's address.  */
 
-#define FRAME_CHAIN(thisframe) frame_chain(thisframe);
+extern CORE_ADDR z8k_frame_chain (struct frame_info *thisframe);
+#define FRAME_CHAIN(thisframe) z8k_frame_chain(thisframe);
 
 
 
@@ -175,10 +179,11 @@ extern CORE_ADDR mz8k_skip_prologue PARAMS ((CORE_ADDR ip));
 /* A macro that tells us whether the function invocation represented
    by FI does not have a frame on the stack associated with it.  If it
    does not, FRAMELESS is set to 1, else 0.  */
-#define FRAMELESS_FUNCTION_INVOCATION(FI, FRAMELESS) \
-  (FRAMELESS) = frameless_look_for_prologue(FI)
+#define FRAMELESS_FUNCTION_INVOCATION(FI) \
+  (frameless_look_for_prologue (FI))
 
-#define FRAME_SAVED_PC(FRAME) frame_saved_pc(FRAME)
+extern CORE_ADDR z8k_frame_saved_pc (struct frame_info *frame);
+#define FRAME_SAVED_PC(FRAME) z8k_frame_saved_pc(FRAME)
 
 #define FRAME_ARGS_ADDRESS(fi) ((fi)->frame)
 
@@ -190,20 +195,18 @@ extern CORE_ADDR mz8k_skip_prologue PARAMS ((CORE_ADDR ip));
 /* We can't tell how many args there are
    now that the C compiler delays popping them.  */
 #if !defined (FRAME_NUM_ARGS)
-#define FRAME_NUM_ARGS(val,fi) (val = -1)
+#define FRAME_NUM_ARGS(fi) (-1)
 #endif
 
 /* Return number of bytes at start of arglist that are not really args.  */
 
 #define FRAME_ARGS_SKIP 8
 
-#ifdef __STDC__
 struct frame_info;
-#endif
 extern void z8k_frame_init_saved_regs PARAMS ((struct frame_info *));
 #define FRAME_INIT_SAVED_REGS(fi) z8k_frame_init_saved_regs (fi)
-
 
+
 /* Things needed for making the inferior call functions.
    It seems like every m68k based machine has almost identical definitions
    in the individual machine's configuration files.  Most other cpu types
@@ -214,20 +217,20 @@ extern void z8k_frame_init_saved_regs PARAMS ((struct frame_info *));
 /* The CALL_DUMMY macro is the sequence of instructions, as disassembled
    by gdb itself:
 
-	fmovemx fp0-fp7,sp@-			0xf227 0xe0ff
-	moveml d0-a5,sp@-			0x48e7 0xfffc
-	clrw sp@-				0x4267
-	movew ccr,sp@-				0x42e7
+   fmovemx fp0-fp7,sp@-                 0xf227 0xe0ff
+   moveml d0-a5,sp@-                    0x48e7 0xfffc
+   clrw sp@-                            0x4267
+   movew ccr,sp@-                               0x42e7
 
-	/..* The arguments are pushed at this point by GDB;
-	no code is needed in the dummy for this.
-	The CALL_DUMMY_START_OFFSET gives the position of 
-	the following jsr instruction.  *../
+   /..* The arguments are pushed at this point by GDB;
+   no code is needed in the dummy for this.
+   The CALL_DUMMY_START_OFFSET gives the position of 
+   the following jsr instruction.  *../
 
-	jsr @#0x32323232			0x4eb9 0x3232 0x3232
-	addal #0x69696969,sp			0xdffc 0x6969 0x6969
-	trap #<your BPT_VECTOR number here>	0x4e4?
-	nop					0x4e71
+   jsr @#0x32323232                     0x4eb9 0x3232 0x3232
+   addal #0x69696969,sp                 0xdffc 0x6969 0x6969
+   trap #<your BPT_VECTOR number here>  0x4e4?
+   nop                                  0x4e71
 
    Note this is CALL_DUMMY_LENGTH bytes (28 for the above example).
    We actually start executing at the jsr, since the pushing of the
@@ -240,8 +243,8 @@ extern void z8k_frame_init_saved_regs PARAMS ((struct frame_info *));
 
 
 #define CALL_DUMMY { 0 }
-#define CALL_DUMMY_LENGTH 24		/* Size of CALL_DUMMY */
-#define CALL_DUMMY_START_OFFSET 8	/* Offset to jsr instruction*/
+#define CALL_DUMMY_LENGTH 24	/* Size of CALL_DUMMY */
+#define CALL_DUMMY_START_OFFSET 8	/* Offset to jsr instruction */
 
 
 /* Insert the specified number of args and function address
@@ -277,11 +280,12 @@ int sim_z8001_mode;
 
 #define NO_STD_REGS
 
-#define	PRINT_REGISTER_HOOK(regno) print_register_hook(regno)
+extern void z8k_print_register_hook (int regno);
+#define	PRINT_REGISTER_HOOK(regno) z8k_print_register_hook(regno)
 
 
+extern void z8k_set_pointer_size (int newsize);
 #define INIT_EXTRA_SYMTAB_INFO \
   z8k_set_pointer_size(objfile->obfd->arch_info->bits_per_address);
 
 #define REGISTER_SIZE 4
-

@@ -1,27 +1,28 @@
 /* Parameters for execution on a H8/500 series machine.
    Copyright (C) 1993, 1995 Free Software Foundation, Inc.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* Contributed by Steve Chamberlain sac@cygnus.com */
 
 #define GDB_TARGET_IS_H8500
 
-#define IEEE_FLOAT 1
+#define IEEE_FLOAT (1)
 
 /* Define the bit, byte, and word ordering of the machine.  */
 
@@ -43,7 +44,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Advance PC across any function entry prologue instructions
    to reach some "real" code.  */
 
-#define SKIP_PROLOGUE(ip)   { (ip) = h8500_skip_prologue(ip); }
+#define SKIP_PROLOGUE(ip)   (h8500_skip_prologue (ip))
 extern CORE_ADDR h8500_skip_prologue PARAMS ((CORE_ADDR));
 
 /* Immediately after a function call, return the saved pc.
@@ -74,7 +75,7 @@ extern CORE_ADDR saved_pc_after_call PARAMS ((void));
 
 /* Say how much memory is needed to store a copy of the register set */
 
-#define REGISTER_BYTES    (NUM_REGS * 4) 
+#define REGISTER_BYTES    (NUM_REGS * 4)
 
 /* Index within `registers' of the first byte of the space for
    register N.  */
@@ -148,8 +149,8 @@ extern struct type *h8500_register_virtual_type PARAMS ((int regno));
 
 #define NUM_REGS 	22
 
-#define SP_REGNUM       PR7_REGNUM /* Contains address of top of stack */
-#define FP_REGNUM       PR6_REGNUM /* Contains address of executing stack frame */
+#define SP_REGNUM       PR7_REGNUM	/* Contains address of top of stack */
+#define FP_REGNUM       PR6_REGNUM	/* Contains address of executing stack frame */
 
 #define PTR_SIZE (minimum_mode ? 2 : 4)
 #define PTR_MASK (minimum_mode ? 0x0000ffff : 0x00ffffff)
@@ -158,7 +159,7 @@ extern struct type *h8500_register_virtual_type PARAMS ((int regno));
    subroutine will return.  This is called from call_function. */
 
 /*#define STORE_STRUCT_RETURN(ADDR, SP) \
-  { write_register (0, (ADDR)); abort(); }*/
+   { write_register (0, (ADDR)); abort(); } */
 
 /* Extract from an array REGBUF containing the (raw) register state
    a function return value of type TYPE, and copy that, in virtual format,
@@ -178,16 +179,16 @@ extern struct type *h8500_register_virtual_type PARAMS ((int regno));
    as a CORE_ADDR (or an expression that can be used as one).  */
 
 #define EXTRACT_STRUCT_VALUE_ADDRESS(REGBUF) (*(CORE_ADDR *)(REGBUF))
-
 
+
 /* Define other aspects of the stack frame.  */
 
 /* A macro that tells us whether the function invocation represented
    by FI does not have a frame on the stack associated with it.  If it
    does not, FRAMELESS is set to 1, else 0.  */
 
-#define FRAMELESS_FUNCTION_INVOCATION(FI, FRAMELESS) \
-  (FRAMELESS) = frameless_look_for_prologue(FI)
+#define FRAMELESS_FUNCTION_INVOCATION(FI) \
+  (frameless_look_for_prologue (FI))
 
 /* Any function with a frame looks like this
    SECOND ARG
@@ -198,18 +199,18 @@ extern struct type *h8500_register_virtual_type PARAMS ((int regno));
    SAVED FP   <-FP POINTS HERE
    LOCALS0
    LOCALS1    <-SP POINTS HERE
-   
-   */
+
+ */
 
 #define INIT_EXTRA_FRAME_INFO(fromleaf, fci)  ;
-/*       (fci)->frame |= read_register(SEG_T_REGNUM) << 16;*/
+/*       (fci)->frame |= read_register(SEG_T_REGNUM) << 16; */
 
 #define FRAME_CHAIN(FRAME) h8500_frame_chain(FRAME)
 struct frame_info;
 extern CORE_ADDR h8500_frame_chain PARAMS ((struct frame_info *));
 
 #define FRAME_SAVED_PC(FRAME) frame_saved_pc(FRAME)
-extern CORE_ADDR frame_saved_pc PARAMS ((struct frame_info *frame));
+extern CORE_ADDR frame_saved_pc PARAMS ((struct frame_info * frame));
 
 #define FRAME_ARGS_ADDRESS(fi) ((fi)->frame)
 
@@ -221,7 +222,7 @@ extern CORE_ADDR frame_saved_pc PARAMS ((struct frame_info *frame));
 /* We can't tell how many args there are
    now that the C compiler delays popping them.  */
 
-#define FRAME_NUM_ARGS(val,fi) (val = -1)
+#define FRAME_NUM_ARGS(fi) (-1)
 
 /* Return number of bytes at start of arglist that are not really args.  */
 
@@ -236,7 +237,7 @@ extern CORE_ADDR frame_saved_pc PARAMS ((struct frame_info *frame));
 #define FRAME_FIND_SAVED_REGS(frame_info, frame_saved_regs)	    \
    frame_find_saved_regs(frame_info, &(frame_saved_regs))
 struct frame_saved_regs;
-extern void frame_find_saved_regs PARAMS ((struct frame_info *frame_info, struct frame_saved_regs *frame_saved_regs));
+extern void frame_find_saved_regs PARAMS ((struct frame_info * frame_info, struct frame_saved_regs * frame_saved_regs));
 
 
 /* Discard from the stack the innermost frame, restoring all registers.  */
@@ -246,8 +247,6 @@ extern void h8500_pop_frame PARAMS ((void));
 
 #define SHORT_INT_MAX 32767
 #define SHORT_INT_MIN -32768
-
-#define NAMES_HAVE_UNDERSCORE
 
 typedef unsigned short INSN_WORD;
 
@@ -269,10 +268,10 @@ extern int minimum_mode;
 extern int h8500_is_trapped_internalvar PARAMS ((char *name));
 
 #define VALUE_OF_TRAPPED_INTERNALVAR h8500_value_of_trapped_internalvar
-extern struct value * h8500_value_of_trapped_internalvar (/* struct internalvar *var */);
+extern struct value *h8500_value_of_trapped_internalvar ( /* struct internalvar *var */ );
 
 #define SET_TRAPPED_INTERNALVAR h8500_set_trapped_internalvar
-extern void h8500_set_trapped_internalvar (/* struct internalvar *var, value newval, int bitpos, int bitsize, int offset */);
+extern void h8500_set_trapped_internalvar ( /* struct internalvar *var, value newval, int bitpos, int bitsize, int offset */ );
 
 extern CORE_ADDR h8500_read_sp PARAMS ((void));
 extern void h8500_write_sp PARAMS ((CORE_ADDR));

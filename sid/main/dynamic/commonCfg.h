@@ -60,6 +60,8 @@ public:
   void set_size (sid::host_int_4 sz);
   void set_line_size (sid::host_int_4 sz);
   void set_way (sid::host_int_4 sz);
+  sid::host_int_4 get_size () const { return my_size; }
+  sid::host_int_4 get_line_size () const {return my_line_size; }
  protected:
   void compute_comptype ();
   string my_assoc;

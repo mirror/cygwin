@@ -1,3 +1,7 @@
+2002-07-27  Ian Dall  <ian@sibyl.beware.dropbear.id.au>
+
+	* testsuite/Makefile.in (site.exp): Fix typo.
+	
 2002-07-19  Chris Demetriou  <cgd@broadcom.com>
 
 	* config.guess: Update from ../config.guess.

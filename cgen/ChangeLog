@@ -1,3 +1,7 @@
+2001-07-09  Geoffrey Keating  <geoffk@redhat.com>
+
+	* ifield.scm (<ifield> 'field-start): Don't look at word-len.
+
 2001-07-06  Ben Elliston  <bje@redhat.com>
 
 	* opcodes.scm (read-cpu.opc): Read .opc files from subdir/cpu.

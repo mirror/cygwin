@@ -91,42 +91,11 @@
 (define (ifld-decode-mode f) (ifld-mode f))
 
 ; Return start of ifield.
-; WORD-LEN is the length of the word in which to compute the value or
-; #f meaning to use the default length (recorded with the bitrange).
-; WORD-LEN is present for architectures like the m32r where there are insns
-; smaller than the base insn size (LIW).
-; ??? Not sure it'll be applicable to other LIW architectures.  The m32r is
-; rather easy as the insns are 16 and 32 bits.
-; ??? Another way to do this would be to either set the base-insn-size for
-; the m32r to be 16 bits, or to add a new field to hold the insn-word-size
-; and set it to 16 for the m32r.  The problem here is that there is no
-; canonicalization that works regardless of whether a "word" is shortened
-; or lengthened.
 
 (method-make-virtual!
  <ifield> 'field-start
  (lambda (self word-len)
-   (let* ((bitrange (-ifld-bitrange self))
-	  (lsb0? (bitrange-lsb0? bitrange))
-	  (recorded-word-len (bitrange-word-length bitrange))
-	  (wanted-word-len (or word-len recorded-word-len)))
-     ; Note that this is only intended for situations like the m32r.
-     ; If it doesn't work elsewhere, it may be that you need to
-     ; do things different (use two fields instead of one).
-     (cond ((= wanted-word-len recorded-word-len)
-	    (bitrange-start bitrange))
-	   ((< wanted-word-len recorded-word-len)
-	    ; smaller word wanted
-	    (if lsb0?
-		(- (bitrange-start bitrange) (- recorded-word-len
-						wanted-word-len))
-		(bitrange-start bitrange)))
-	   (else
-	    ; larger word wanted
-	    (if lsb0?
-		(+ (bitrange-start bitrange) (- wanted-word-len
-						recorded-word-len))
-		(bitrange-start bitrange))))))
+   (bitrange-start (-ifld-bitrange self)))
 )
 
 (define (ifld-start ifld word-len)

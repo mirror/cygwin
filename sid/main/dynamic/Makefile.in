@@ -95,7 +95,7 @@ NEARBY_LIBS = $(wildcard ../../component/*/*.la)
 @SID_STATIC_FALSE@AM_CXXFLAGS = 
 
 sid_SOURCES = mainDynamic.cxx
-sid_LDFLAGS = -export-dynamic -static
+sid_LDFLAGS = -export-dynamic -static -export-symbols-regex '[a-zA-Z0-9]*_component_library$$'
 sid_LDADD = ../../component/cfgroot/libconfig.la $(NEARBY_LIBS2)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../config/mkinstalldirs

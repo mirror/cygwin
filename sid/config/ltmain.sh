@@ -3162,7 +3162,11 @@ extern \"C\" {
 	    $show "extracting global C symbols from \`$arg'"
 	    name=`echo "$arg" | sed -e 's%^.*/%%'`
 	    $run eval 'echo ": $name " >> "$nlist"'
-	    $run eval "$NM $arg | $global_symbol_pipe >> '$nlist'"
+	    if test -n "$export_symbols_regex"; then
+	      $run eval "$NM $arg | $global_symbol_pipe | egrep -e '$export_symbols_regex' >> '$nlist'"
+	    else
+	      $run eval "$NM $arg | $global_symbol_pipe >> '$nlist'"
+	    fi
 	  done
 
 	  if test -z "$run"; then

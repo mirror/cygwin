@@ -1,3 +1,8 @@
+2002-08-23  Andrew Cagney  <ac131313@redhat.com>
+
+	* config.guess: Import version 2002-08-23.
+	* config.sub: Import version 2002-08-22.
+
 2002-07-27  Ian Dall  <ian@sibyl.beware.dropbear.id.au>
 
 	* testsuite/Makefile.in (site.exp): Fix typo.

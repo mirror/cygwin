@@ -132,11 +132,12 @@ static const CGEN_MACH @arch@_cgen_mach_table[] = {
 	 (all-attrs (current-ifld-attr-list))
 	 (num-non-bools (attr-count-non-bools all-attrs)))
     (string-list
-     "\
+     "
 /* The instruction field table.  */
 
-#define A(a) (1 << CONCAT2 (CGEN_IFLD_,a))
-
+"
+     (gen-define-with-symcat "A(a) (1 << CGEN_IFLD_" "a)")
+     "
 const CGEN_IFLD @arch@_cgen_ifld_table[] =
 {
 "
@@ -248,11 +249,11 @@ const CGEN_IFLD @arch@_cgen_ifld_table[] =
      (string-list-map gen-defn (current-kw-list))
      (string-list-map -gen-hw-defn (current-hw-list))
      "
-
 /* The hardware table.  */
 
-#define A(a) (1 << CONCAT2 (CGEN_HW_,a))
-
+"
+     (gen-define-with-symcat "A(a) (1 << CGEN_HW_" "a)")
+     "
 const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
 {
 "
@@ -294,8 +295,8 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
   (string-list
    "#define CGEN_ARCH @arch@\n\n"
    "/* Given symbol S, return @arch@_cgen_<S>.  */\n"
-   "#define CGEN_SYM(s) CONCAT3 (@arch@,_cgen_,s)\n\n"
-   "/* Selected cpu families.  */\n"
+   (gen-define-with-symcat "CGEN_SYM(s) @arch@" "_cgen_" "s")
+   "\n\n/* Selected cpu families.  */\n"
    ; FIXME: Move to sim's arch.h.
    (string-map (lambda (cpu)
 		 (gen-obj-sanitize cpu
@@ -381,12 +382,13 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
   (let* ((all-attrs (current-op-attr-list))
 	 (num-non-bools (attr-count-non-bools all-attrs)))
     (string-list
-     "\
+     "
 /* The operand table.  */
 
-#define A(a) (1 << CONCAT2 (CGEN_OPERAND_,a))
-#define OPERAND(op) CONCAT2 (@ARCH@_OPERAND_,op)
-
+"
+     (gen-define-with-symcat "A(a) (1 << CGEN_OPERAND_" "a)")
+     (gen-define-with-symcat "OPERAND(op) @ARCH@_OPERAND_" "op")
+"
 const CGEN_OPERAND @arch@_cgen_operand_table[] =
 {
 "
@@ -477,12 +479,13 @@ const CGEN_OPERAND @arch@_cgen_operand_table[] =
   (let* ((all-attrs (current-insn-attr-list))
 	 (num-non-bools (attr-count-non-bools all-attrs)))
     (string-write
-     "\
-#define A(a) (1 << CONCAT2 (CGEN_INSN_,a))
-#define OP(field) CGEN_SYNTAX_MAKE_FIELD (OPERAND (field))
-
+     "
 /* The instruction table.  */
 
+#define OP(field) CGEN_SYNTAX_MAKE_FIELD (OPERAND (field))
+"
+     (gen-define-with-symcat "A(a) (1 << CGEN_INSN_" "a)")
+"
 static const CGEN_IBASE @arch@_cgen_insn_table[MAX_INSNS] =
 {
   /* Special null first entry.
@@ -499,9 +502,8 @@ static const CGEN_IBASE @arch@_cgen_insn_table[MAX_INSNS] =
      "\
 };
 
-#undef A
-#undef MNEM
 #undef OP
+#undef A
 
 "
      )

@@ -1,3 +1,23 @@
+2000-11-20  Frank Ch. Eigler  <fche@redhat.com>
+
+	* opc-itab.scm (-gen-ifmt-table, -gen-macro-insn-table: Remove 
+	unneeded "\n\n" from F() macro definition.
+
+2000-11-15  Greg McGary  <greg@mcgary.org>
+
+	* utils-cgen.scm (gen-define-with-symcat): New function.
+	* desc-cpu.scm (gen-ifld-defns): Use it.
+	(gen-hw-table-defns): Use it.
+	(-gen-hash-defines): Use it.
+	(gen-operand-table): Use it.
+	(gen-insn-table): Use it.  Remove spurious `#undef MNEM'.
+	* opc-itab.scm (-gen-ifmt-table): Use it.
+	(-gen-insn-opcode-table): Use it.
+	(-gen-macro-insn-table): Use it.
+	* opc-opinst.scm (-gen-operand-instance-tables): Use it.
+	* sim-cpu.scm (cgen-semantics.c): Use it.
+	(cgen-sem-switch.c): Use it.
+
 2000-11-10  Frank Ch. Eigler  <fche@redhat.com>
 
 	* utils-sim.scm (-gen-decode-insn-entry): Add fn? parameter to signal

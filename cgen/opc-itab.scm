@@ -214,7 +214,7 @@
 (define (-gen-ifmt-table)
   (string-write
    "/* Instruction formats.  */\n\n"
-   "#define F(f) & @arch@_cgen_ifld_table[CONCAT2 (@ARCH@_,f)]\n\n"
+   (gen-define-with-symcat "F(f) & @arch@_cgen_ifld_table[@ARCH@_" "f]")
    (string-list-map -gen-ifmt-table-1 (current-ifmt-list))
    "#undef F\n\n"
    )
@@ -350,10 +350,10 @@
   (let* ((all-attrs (current-insn-attr-list))
 	 (num-non-bools (attr-count-non-bools all-attrs)))
     (string-write
+     (gen-define-with-symcat "A(a) (1 << CGEN_INSN_" "a)")
+     (gen-define-with-symcat "OPERAND(op) @ARCH@_OPERAND_" "op")
      "\
-#define A(a) (1 << CONCAT2 (CGEN_INSN_,a))
 #define MNEM CGEN_SYNTAX_MNEMONIC /* syntax value for mnemonic */
-#define OPERAND(op) CONCAT2 (@ARCH@_OPERAND_,op)
 #define OP(field) CGEN_SYNTAX_MAKE_FIELD (OPERAND (field))
 
 /* The instruction table.  */
@@ -376,8 +376,8 @@ static const CGEN_OPCODE @arch@_cgen_insn_opcode_table[MAX_INSNS] =
 };
 
 #undef A
-#undef MNEM
 #undef OPERAND
+#undef MNEM
 #undef OP
 
 "
@@ -549,7 +549,7 @@ static unsigned int dis_hash_insn PARAMS ((const char *, CGEN_INSN_INT));
 	 (num-non-bools (attr-count-non-bools all-attrs)))
     (string-write
      "/* Formats for ALIAS macro-insns.  */\n\n"
-     "#define F(f) & @arch@_cgen_ifld_table[CONCAT2 (@ARCH@_,f)]\n\n"
+     (gen-define-with-symcat "F(f) & @arch@_cgen_ifld_table[@ARCH@_" "f]")
      (lambda ()
        (string-write-map -gen-ifmt-table-1
 			 (map insn-ifmt (find (lambda (minsn)
@@ -568,10 +568,10 @@ static unsigned int dis_hash_insn PARAMS ((const char *, CGEN_INSN_INT));
 					    (minsn-expansions minsn))
 				"  { 0, 0 }\n};\n\n")))
 			 minsn-list))
+     (gen-define-with-symcat "A(a) (1 << CGEN_INSN_" "a)")
+     (gen-define-with-symcat "OPERAND(op) @ARCH@_OPERAND_" "op")
      "\
-#define A(a) (1 << CONCAT2 (CGEN_INSN_,a))
 #define MNEM CGEN_SYNTAX_MNEMONIC /* syntax value for mnemonic */
-#define OPERAND(op) CONCAT2 (@ARCH@_OPERAND_,op)
 #define OP(field) CGEN_SYNTAX_MAKE_FIELD (OPERAND (field))
 
 /* The macro instruction table.  */
@@ -606,8 +606,8 @@ static const CGEN_OPCODE @arch@_cgen_macro_insn_opcode_table[] =
 };
 
 #undef A
-#undef MNEM
 #undef OPERAND
+#undef MNEM
 #undef OP
 \n"
     ))

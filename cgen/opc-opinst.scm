@@ -62,20 +62,22 @@
    "\
 /* Operand references.  */
 
+"
+   (gen-define-with-symcat "OP_ENT(op) @ARCH@_OPERAND_" "op")
+"\
 #define INPUT CGEN_OPINST_INPUT
 #define OUTPUT CGEN_OPINST_OUTPUT
 #define END CGEN_OPINST_END
 #define COND_REF CGEN_OPINST_COND_REF
-#define OP_ENT(op) CONCAT2 (@ARCH@_OPERAND_,op)
 
 "
    (lambda () (string-write-map -gen-operand-instance-table (current-sfmt-list)))
    "\
+#undef OP_ENT
 #undef INPUT
 #undef OUTPUT
 #undef END
 #undef COND_REF
-#undef OP_ENT
 
 "
    )

@@ -854,7 +854,19 @@ if test -r /dev/ptmx -a "x$svr4_ptys_broken" = x -a "$cross_compiling" != "yes" 
   # On some systems (e.g., IA-64 Linux), we need to define _XOPEN_SOURCE
   # in order to get a declaration for ptsname.  It is safe to simply
   # define that whenever we are using ptsname.
-  AC_DEFINE(_XOPEN_SOURCE)
+  AC_MSG_CHECKING([for NSIG definition with _XOPEN_SOURCE])
+  AC_TRY_COMPILE([
+/* _XOPEN_SOURCE can remove NSIG on UnixWare or OSF/1. */
+#define _XOPEN_SOURCE
+#include <signal.h>
+char junk[NSIG];],
+    [],
+	AC_DEFINE(_XOPEN_SOURCE)
+	AC_MSG_RESULT(yes)
+    ,
+	AC_MSG_RESULT(no)
+    ,
+  )
   # END CYGNUS LOCAL
 else
   AC_MSG_RESULT(no)

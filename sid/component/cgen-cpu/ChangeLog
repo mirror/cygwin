@@ -1,3 +1,13 @@
+2002-01-31  Ben Elliston  <bje@redhat.com>
+
+	* cgen-ops.h (SUBWORDSIQI): New.
+	(SUBWORDSIHI): Ditto.
+	(SUBWORDSFSI): Ditto.
+	(SUBWORDSISF): Ditto.
+	(SUBWORDDIDF): Ditto.
+	(SUBWORDDFSI): Ditto.
+	(SUBWORDSIUQI): Ditto.
+
 2002-01-23  Ben Elliston  <bje@redhat.com>
 
 	* tracedis.c (bfd_getb16): New function.

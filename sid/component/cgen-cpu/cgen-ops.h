@@ -1,6 +1,6 @@
 // cgen-ops.h - CGEN semantic ops.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -503,6 +503,57 @@ SUBOFDI (DI a, DI b, DI c)
   return res;
 }
 
+inline QI
+SUBWORDSIQI (SI in, int byte)
+{
+  assert (byte >= 0 && byte <= 3);
+  return static_cast<UQI> ((in >> (8 * (3 - byte))) & 0xFF);
+}
+
+
+inline HI
+SUBWORDSIHI (SI in, int word)
+{
+  if (word == 0)
+    return static_cast<USI> (in >> 16);
+  else
+    return in;
+}
+
+inline SI
+SUBWORDSFSI (SF in)
+{
+  SI* out = reinterpret_cast<SI*> (&in);
+  return *out;
+}
+
+inline SF
+SUBWORDSISF (SI in)
+{
+  SF* out = reinterpret_cast<SF*> (&in);
+  return *out;
+}
+
+inline DF
+SUBWORDDIDF (DI in)
+{
+  DF* out = reinterpret_cast<DF*> (&in);
+  return *out;
+}
+
+inline SI
+SUBWORDDFSI (DF in, int word)
+{
+  DI* di = reinterpret_cast<DI*> (&in);
+  return SUBWORDDISI (*di, word);
+}
+
+inline UQI
+SUBWORDSIUQI (SI in, int byte)
+{
+  assert (byte >= 0 && byte <= 7);
+  return static_cast<UQI> ((in >> (8 * (3 - byte))) & 0xFF);
+}
 
 } // namespace cgen
 

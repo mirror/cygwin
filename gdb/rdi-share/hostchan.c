@@ -230,7 +230,7 @@ void Adp_addToQueue(Packet **head, Packet *newpkt)
      */
     ASSERT(&(((Packet *)0)->pk_next) == 0, "bad struct Packet layout");
 
-#if DEBUG && 0
+#if defined(DEBUG) && 0
     printf("Adp_addToQueue(%p, %p)\n", head, newpkt);
 #endif
 
@@ -263,6 +263,16 @@ Packet *Adp_removeFromQueue(Packet **head)
         *head = pk->pk_next;
 
     return pk;
+}
+
+void Adp_SetLogEnable(int logEnableFlag)
+{
+  DevSW_SetLogEnable(logEnableFlag);
+}
+
+void Adp_SetLogfile(const char *filename)
+{
+  DevSW_SetLogfile(filename);
 }
 
 AdpErrs Adp_OpenDevice(const char *name, const char *arg,
@@ -546,7 +556,7 @@ static unsigned long tv_diff(const struct timeval *time_now,
             - ((time_was->tv_sec * 1000000) + time_was->tv_usec) );
 }
 
-#if !defined(__unix) && !defined(__CYGWIN32__)
+#if !defined(__unix) && !defined(__CYGWIN__)
 static void gettimeofday( struct timeval *time_now, void *dummy )
 {
     time_t t = clock();

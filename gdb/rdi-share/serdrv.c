@@ -32,6 +32,8 @@
 #include "params.h"
 #include "logging.h"
 
+extern int baud_rate;   /* From gdb/top.c */
+
 #ifdef COMPILING_ON_WINDOWS
 #  undef   ERROR
 #  undef   IGNORE
@@ -83,8 +85,11 @@ static struct writestate wstate;
  * The set of parameter options supported by the device
  */
 static unsigned int baud_options[] = {
-#ifdef __hpux
-    115200, 57600, 
+#if defined(B115200) || defined(__hpux)
+    115200,
+#endif
+#if defined(B57600) || defined(__hpux)
+    57600, 
 #endif
     38400, 19200, 9600
 };
@@ -229,6 +234,12 @@ static int SerialOpen(const char *name, const char *arg)
            printf( "could not understand baud rate %s\n", arg );
 #endif
     }
+    else if (baud_rate > 0)
+    {
+      /* If the user specified a baud rate on the command line "-b" or via
+         the "set remotebaud" command then try to use that one */
+      process_baud_rate( baud_rate );
+    }
 
 #ifdef COMPILING_ON_WINDOWS
     {
@@ -243,7 +254,7 @@ static int SerialOpen(const char *name, const char *arg)
 
     serial_reset();
 
-#if defined(__unix) || defined(__CYGWIN32__)
+#if defined(__unix) || defined(__CYGWIN__)
     Unix_ioctlNonBlocking();
 #endif
 
@@ -514,6 +525,13 @@ static int find_baud_rate( unsigned int *speed )
     } possibleBaudRates[] = {
 #if defined(__hpux)
         {115200,_B115200}, {57600,_B57600},
+#else
+#ifdef B115200
+        {115200,B115200},
+#endif
+#ifdef B57600
+	{57600,B57600},
+#endif
 #endif
 #ifdef COMPILING_ON_WINDOWS
         {38400,CBR_38400}, {19200,CBR_19200}, {9600, CBR_9600}, {0,0}

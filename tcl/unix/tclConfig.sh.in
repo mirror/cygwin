@@ -37,6 +37,9 @@ TCL_SHARED_BUILD=@TCL_SHARED_BUILD@
 # The name of the Tcl library (may be either a .a file or a shared library):
 TCL_LIB_FILE='@TCL_LIB_FILE@'
 
+# The directory the Tcl binaries are being built to.
+TCL_BIN_DIR='@TCL_BIN_DIR@'
+
 # The fullpath of the Tcl library (used for dependency checking)
 TCL_LIB_FULL_PATH='@TCL_LIB_FULL_PATH@'
 

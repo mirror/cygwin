@@ -588,8 +588,8 @@ else
         ac_cv_c_tclconfig=`(cd $i/unix; pwd)`
 	break
       fi
-      if test -f "$i/cygwin/tclConfig.sh" ; then
-        ac_cv_c_tclconfig=`(cd $i/cygwin; pwd)`
+      if test -f "$i/win/tclConfig.sh" ; then
+        ac_cv_c_tclconfig=`(cd $i/win; pwd)`
 	break
       fi
     done

@@ -1,3 +1,11 @@
+2002-07-30  Keith Seitz  <keiths@redhat.com>
+
+	From Mo DeJong  <supermo@bayarea.net>
+	* aclocal.m4 (CY_AC_PATH_TCLCONFIG): Check for a
+	tclConfig.sh file in tcl/cygwin if one can't
+	be found in tcl/unix. Update Itcl header check.
+	* configure: Regenerated.
+
 2002-04-11  Christopher Faylor  <cgf@redhat.com>
 
 	* configure.in: Don't use libutil.a on cygwin.

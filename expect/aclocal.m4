@@ -201,6 +201,10 @@ changequote(,)
         ac_cv_c_tclconfig=`(cd $i/unix; pwd)`
 	break
       fi
+      if test -f "$i/cygwin/tclConfig.sh" ; then
+        ac_cv_c_tclconfig=`(cd $i/cygwin; pwd)`
+	break
+      fi
     done
   fi
 changequote([,])
@@ -533,8 +537,8 @@ AC_DEFUN(CY_AC_PATH_ITCLH, [
 AC_MSG_CHECKING(for Itcl private headers. srcdir=${srcdir})
 if test x"${ac_cv_c_itclh}" = x ; then
   for i in ${srcdir}/../itcl ${srcdir}/../../itcl ${srcdir}/../../../itcl ; do
-    if test -f $i/src/itcl.h ; then
-      ac_cv_c_itclh=`(cd $i/src; pwd)`
+    if test -f $i/itcl/generic/itcl.h ; then
+      ac_cv_c_itclh=`(cd $i/itcl/generic; pwd)`
       break
     fi
   done

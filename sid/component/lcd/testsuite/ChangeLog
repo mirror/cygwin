@@ -1,3 +1,8 @@
+2001-01-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am: Use `pwd` for -rpath argument.
+	* Makefile.in: Regenerated.
+
 2000-12-05  Nicholas Duffek  <nsd@redhat.com>
 
 	* Makefile.in: Use $(pkglibdir) instead of $(VPATH) for libtool

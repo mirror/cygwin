@@ -1,3 +1,8 @@
+2001-05-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* iformat.scm (compute-insn-base-mask-length): Rewrite to tolerate
+	various-base-length instruction sets.
+
 2001-04-02  Ben Elliston  <bje@redhat.com>
 
 	* sid-cpu.scm (-last-insn): New function.

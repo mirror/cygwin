@@ -1,6 +1,6 @@
 // sidcpuutil.h - Elements common to CPU models.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002, 2003 Red Hat.
+// Copyright (C) 1999-2004 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -213,6 +213,7 @@ namespace sidutil
     // tracing
   private:
     string trace_filename;
+    callback_pin<basic_cpu> trace_pin;
     class cpu_trace_stream: public std::ofstream
     {
     public:
@@ -243,6 +244,11 @@ namespace sidutil
 
     template <typename T> friend
     cpu_trace_stream& operator<< (cpu_trace_stream& s, T t);
+
+    void trace_pin_handler (sid::host_int_4 value)
+      {
+	trace_stream << static_cast<char> (value);
+      }
 
   public:
     bool trace_extract_p;
@@ -546,7 +552,8 @@ public:
       endian_set_pin (this, & basic_cpu::endian_set_pin_handler),
       debugger_bus (& this->data_bus),
       trace_stream (),
-      trace_filename ("-") // standard output
+      trace_filename ("-"), // standard output
+      trace_pin (this, & basic_cpu::trace_pin_handler)
       {
 	// buses
 	this->data_bus = 0;
@@ -571,6 +578,7 @@ public:
 	add_watchable_pin ("trap", & this->trap_type_pin); // output side
 	add_watchable_pin ("trap-code", & this->trap_code_pin);
 	add_pin ("trap", & this->trap_disposition_pin); // input side
+	add_pin ("trace", & this->trace_pin);
 
 	// attributes
 	this->step_insn_count = 1;

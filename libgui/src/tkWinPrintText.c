@@ -212,7 +212,8 @@ typedef struct TextStyle {
 
 
 
-void DisplayDLineToDrawable(TkText *textPtr, DLine *dlPtr, DLine *prevPtr, TkWinDrawable *drawable);
+static void
+DisplayDLineToDrawable(TkText *textPtr, DLine *dlPtr, DLine *prevPtr, TkWinDrawable *drawable);
 
 /*
  *--------------------------------------------------------------

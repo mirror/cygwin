@@ -1,3 +1,7 @@
+2000-12-14  Ben Elliston  <bje@redhat.com>
+
+	* CATALOG: Update maintainers column.
+
 2000-12-01  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configure.in, configure: Complete the job of forgetting pcmcia.

@@ -1,3 +1,10 @@
+2001-11-12  Andrew Cagney  <ac131313@redhat.com>
+
+	* lib/remote.exp (local_exec, standard_close): Use SHELL
+	background instead of tcl background to background the kill
+	processes.  Work around problem found by Nick Duffek in older
+	CYGWINs.
+
 2001-10-10  Frank Ch. Eigler  <fche@redhat.com>
 
 	* config/sid.exp (set_host_info): New proc.  Call it to set

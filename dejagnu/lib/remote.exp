@@ -179,7 +179,10 @@ proc local_exec { commandline inp outp timeout } {
     # command in order to execute the execution. (English. Gotta love it.)
     if { ! $got_eof } {
 	verbose "killing $pid $pgid";
-	exec sh -c "exec > /dev/null 2>&1 && (kill -2 $pgid || kill -2 $pid) && sleep 5 && (kill -15 $pgid || kill $pid) && sleep 5 && (kill -9 $pgid || kill -9 $pid)" &;
+	# This is very, very nasty. SH, instead of EXPECT, is used to
+	# run this in the background since, on older CYGWINs, a
+	# strange file I/O error occures.
+	exec sh -c "exec > /dev/null 2>&1 && (kill -2 $pgid || kill -2 $pid) && sleep 5 && (kill -15 $pgid || kill $pid) && sleep 5 && (kill -9 $pgid || kill -9 $pid) &";
     }
     # This will hang if the kill doesn't work. Nothin' to do, and it's not ok.
     catch "close -i $spawn_id";
@@ -314,10 +317,11 @@ proc standard_close { host } {
 	}
 	if { $pid > 0 } {
 	    verbose "doing kill, pid is $pid";
-	    # This is very, very nasty. Then again, if after did something
-	    # reasonable...
+	    # This is very, very nasty. SH, instead of EXPECT, is used
+	    # to run this in the background since, on older CYGWINs, a
+	    # strange file I/O error occures.
 	    set pgid "-[join $pid { -}]";
-	    exec sh -c "exec > /dev/null 2>&1 && (kill -2 $pgid || kill -2 $pid) && sleep 5 && (kill $pgid || kill $pid) && sleep 5 && (kill -9 $pgid || kill -9 $pid)" &;
+	    exec sh -c "exec > /dev/null 2>&1 && (kill -2 $pgid || kill -2 $pid) && sleep 5 && (kill $pgid || kill $pid) && sleep 5 && (kill -9 $pgid || kill -9 $pid) &";
 	}
 	verbose "pid is $pid";
 	catch "close -i $shell_id";

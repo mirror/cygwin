@@ -726,7 +726,8 @@ cfgroot_component::register_dso(const string& dso_name, const string& _symbol_na
   dl_handle = lt_dlopen(dso_name.c_str());
 
   // Second, try ".la"->".a" kludge.
-  if ((dso_name.length() > 3) &&
+  if (! dl_handle &&
+      (dso_name.length() > 3) &&
       (dso_name[dso_name.length()-3] == '.') &&
       (dso_name[dso_name.length()-2] == 'l') &&
       (dso_name[dso_name.length()-1] == 'a'))

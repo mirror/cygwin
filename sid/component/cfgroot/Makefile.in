@@ -102,6 +102,7 @@ INCLUDES = -I. -I../../include -I$(srcdir)/../../include -I$(srcdir)/libltdl
 libconfig_la_SOURCES = compConfig.cxx
 libconfig_la_LDFLAGS = -module -no-undefined
 libconfig_la_LIBADD = @LIBLTDL@
+libconfig_la_DEPENDENCIES = @LIBLTDL@
 
 pkgdata_DATA = sid-control-cfgroot.txt
 
@@ -121,7 +122,6 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I.
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libconfig_la_DEPENDENCIES = 
 libconfig_la_OBJECTS =  compConfig.lo
 CXXFLAGS = @CXXFLAGS@
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)

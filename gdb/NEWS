@@ -1,6 +1,73 @@
 		What has changed in GDB?
 	     (Organized release by release)
 
+*** Changes since GDB-4.18:
+
+* New features
+
+On SVR4 native platforms (such as Solaris), if you attach to a process
+without first loading a symbol file, GDB will now attempt to locate and
+load symbols from the running process's executable file.
+
+C++ support has been greatly improved. Overload resolution now works properly
+in almost all cases. RTTI support is on the way.
+
+* New native configurations
+
+ARM GNU/Linux					arm*-*-linux*
+
+* New targets
+
+Motorola MCore					mcore-*-*
+x86 VxWorks					i[3456]86-*-vxworks*
+PowerPC VxWorks					powerpc-*-vxworks*
+TI TMS320C80					tic80-*-*
+
+* OBSOLETE configurations
+
+Altos 3068					m68*-altos-*
+Convex						c1-*-*, c2-*-*
+Pyramid						pyramid-*-*
+ARM RISCix					arm-*-* (as host)
+Tahoe						tahoe-*-*
+
+* Remote targets can connect to a sub-program
+
+A popen(3) style serial-device has been added.  This device starts a
+sub-process (such as a stand-alone simulator) and then communicates
+with that.  The sub-program to run is specified using the syntax
+``|<program> <args>'' vis:
+
+	(gdb) set remotedebug 1
+	(gdb) target extended-remote |mn10300-elf-sim program-args
+
+* MIPS 64 remote protocol
+
+A long standing bug in the mips64 remote protocol where by GDB
+expected certain 32 bit registers (ex SR) to be transfered as 32
+instead of 64 bits has been fixed.
+
+The command ``set remote-mips64-transfers-32bit-regs on'' has been
+added to provide backward compatibility with older versions of GDB.
+
+* ``set remotebinarydownload'' replaced by ``set remote X-packet''
+
+The command ``set remotebinarydownload'' command has been replaced by
+``set remote X-packet''.  Other commands in ``set remote'' family
+include ``set remote P-packet''.
+
+* Breakpoint commands accept ranges.
+
+The breakpoint commands ``enable'', ``disable'', and ``delete'' now
+accept a range of breakpoints, e.g. ``5-7''.  The tracepoint command
+``tracepoint passcount'' also accepts a range of tracepoints.
+
+* ``apropos'' command added.
+
+The ``apropos'' command searches through command names and
+documentation strings, printing out matches, making it much easier to
+try to find a command that does what you are looking for.
+
 *** Changes in GDB-4.18:
 
 * New native configurations

@@ -337,6 +337,20 @@ all: expect$(EXEEXT) $(EXP_LIB_FILES) ${X11_PROGS}
 info:
 dvi:
 
+# CYGNUS LOCAL aoliva
+LOCAL_EXPECT=$(SHELL) ./expect-bld.sh
+all: expect-bld.sh
+# Run expect within the build tree
+expect-bld.sh: Makefile
+	-rm -f $@ $@T
+	echo "#! $(SHELL)" > $@T
+	r=`pwd`; for var in LD_LIBRARY_PATH SHLIB_PATH ; do \
+	  echo "$$var=$$r:$$r/../tk/unix:$$r/../tcl/unix\$${$$var+:\$$$$var}; export $$var" >> $@T ; \
+	done; echo "exec $$r/expect \$${1+\"\$$@\"}" >> $@T
+	chmod +x $@T
+	mv $@T $@
+# END CYGNUS LOCAL
+
 # build expect binary that does not depend on Expect's shared libs
 expect$(EXEEXT): exp_main_exp.o $(EXP_UNSHARED_LIB_FILE)
 	$(CC) $(XCFLAGS) @TCL_LD_FLAGS@ -o expect$(EXEEXT) exp_main_exp.o @EXP_BUILD_LIB_SPEC@ $(TCLLIB) $(EXP_AND_TCL_LIBS)

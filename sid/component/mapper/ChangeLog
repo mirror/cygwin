@@ -1,3 +1,7 @@
+2001-09-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compMapper.cxx (tlb1/tlb2): Add support for a second tlb entry.
+
 2001-08-03  matthew green  <mrg@redhat.com>
 
 	* compMapper.cxx (~generic_mapper_bus, ~generic_mapper): Add

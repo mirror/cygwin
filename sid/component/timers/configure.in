@@ -37,5 +37,8 @@ AC_SUBST(cpu_subdirs)
 AC_SUBST(cpu_incl)
 AC_SUBST(cpu_libs)
 
+dnl building docs
+RH_DOCBUILD_CHECK
+
 dnl Outputs
 AC_OUTPUT(Makefile)

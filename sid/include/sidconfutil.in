@@ -30,3 +30,6 @@
 /* Define if std:: prefix works for <cctype> functions */
 #undef STD_CCTYPE
 
+/* Define if compiler supports __builtin_expect */
+#undef HAVE_BUILTIN_EXPECT
+

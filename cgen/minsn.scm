@@ -221,7 +221,7 @@
 		   (obj-atlist minsn)
 		   (minsn-syntax minsn)
 		   (minsn-compute-iflds (string-append errtxt
-						       ": " (obj:name minsn))
+						       ": " (obj:str-name minsn))
 					(cddr expn) alias-of)
 		   #f ; ifield-assertion
 		   #f ; semantics

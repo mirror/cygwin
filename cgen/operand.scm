@@ -221,9 +221,11 @@
 (method-make!
  <operand> 'gen-pretty-name
  (lambda (self mode)
-   (let* ((name (if (elm-bound? self 'pretty-sem-name) (elm-get self 'pretty-sem-name) 
-		    (if (elm-bound? self 'sem-name) (elm-get self 'sem-name)
-			(obj:name self))))
+   (let* ((name (->string (if (elm-bound? self 'pretty-sem-name)
+			      (elm-get self 'pretty-sem-name) 
+			      (if (elm-bound? self 'sem-name)
+				  (elm-get self 'sem-name)
+				  (obj:name self)))))
 	  (pname (cond ((string=? "h-memory" (string-take 8 name)) "memory")
 		       ((string=? "h-" (string-take 2 name)) (string-drop 2 name))
 		       (else name))))
@@ -714,7 +716,7 @@
 		; Assertions of any ifield values or #f if none.
 		(ifield-assertion . #f)
 		)
-	      ())
+	      '())
 )
 
 (method-make-make! <derived-operand>
@@ -744,7 +746,7 @@
 		; ??? Maybe allow <operand>'s too?
 		choices
 		)
-	      ())
+	      '())
 )
 
 (define (anyof-operand? x) (class-instance? <anyof-operand> x))
@@ -1479,10 +1481,7 @@
   (if (null? op-list)
       (error "op-sort: no operands!"))
   ; First sort by name.
-  (let ((sorted-ops (sort op-list
-			  (lambda (a b)
-			     (string<? (obj:name a) (obj:name b)))))
-	)
+  (let ((sorted-ops (alpha-sort-obj-list op-list)))
     (let loop ((result nil)
 	       ; Current set of operands with same name.
 	       (this-elm (list (car sorted-ops)))

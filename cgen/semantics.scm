@@ -780,15 +780,13 @@
 
     ; Drop dummy first arg and sort operand lists.
     (let ((sorted-ins
-	   (sort (map (lambda (op)
-			(rtx-xop-obj (cadr op)))
-		      (cdr in-ops))
-		 (lambda (a b) (string<? (obj:name a) (obj:name b)))))
+	   (alpha-sort-obj-list (map (lambda (op)
+				       (rtx-xop-obj (cadr op)))
+				     (cdr in-ops))))
 	  (sorted-outs
-	   (sort (map (lambda (op)
-			(rtx-xop-obj (cadr op)))
-		      (cdr out-ops))
-		 (lambda (a b) (string<? (obj:name a) (obj:name b)))))
+	   (alpha-sort-obj-list (map (lambda (op)
+				       (rtx-xop-obj (cadr op)))
+				     (cdr out-ops))))
 	  (sem-attrs (cdr sem-attrs)))
 
       (let ((in-op-nums (iota (length sorted-ins)))

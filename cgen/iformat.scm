@@ -146,10 +146,10 @@
 (define (-ifmt-search-key insn sorted-ifld-list)
   (string-map (lambda (ifld)
 		(string-append " ("
-			       (or (obj-attr-value insn 'sanitize)
+			       (or (->string (obj-attr-value insn 'sanitize))
 				   "-nosan-")
 			       " "
-			       (obj:name ifld)
+			       (obj:str-name ifld)
 			       " "
 			       (ifld-ilk ifld)
 			       ")"))
@@ -267,10 +267,10 @@
 (define (-sfmt-search-key insn cti? sorted-used-iflds sem-in-ops sem-out-ops)
   (let ((op-key (lambda (op)
 		  (string-append " ("
-				 (or (obj-attr-value insn 'sanitize)
+				 (or (->string (obj-attr-value insn 'sanitize))
 				     "-nosan-")
 				 " "
-				 (obj:name op)
+				 (obj:str-name op)
 				 ; ??? Including memory operands currently
 				 ; isn't necessary and it can account for some
 				 ; spurious differences.  On the other hand
@@ -279,7 +279,7 @@
 				 (if (memory? (op:type op))
 				     ""
 				     (string-append " "
-						    (obj:name (op:mode op))))
+						    (obj:str-name (op:mode op))))
 				 ; CGEN_OPERAND_INSTANCE_COND_REF is stored
 				 ; with the operand in the operand instance
 				 ; table thus formats must be distinguished
@@ -291,7 +291,7 @@
      cti?
      (insn-length insn)
      (string-map (lambda (ifld)
-		   (string-append " (" (obj:name ifld) " " (ifld-ilk ifld) ")"))
+		   (string-append " (" (obj:str-name ifld) " " (ifld-ilk ifld) ")"))
 		 sorted-used-iflds)
      (string-map op-key
 		 sem-in-ops)

@@ -17,7 +17,7 @@ static const CGEN_ISA @arch@_cgen_isa_table[] = {
 		      (gen-obj-sanitize
 		       isa
 		       (string-append "  { "
-				      "\"" (obj:name isa) "\", "
+				      "\"" (obj:str-name isa) "\", "
 				      (number->string
 				       (isa-default-insn-bitsize isa))
 				      ", "
@@ -68,7 +68,7 @@ static const CGEN_MACH @arch@_cgen_mach_table[] = {
 		      (gen-obj-sanitize
 		       mach
 		       (string-append "  { "
-				      "\"" (obj:name mach) "\", "
+				      "\"" (obj:str-name mach) "\", "
 				      "\"" (mach-bfd-name mach) "\", "
 				      (mach-enum mach) ", "
 				      (number->string (cpu-insn-chunk-bitsize (mach-cpu mach)))
@@ -147,7 +147,7 @@ const CGEN_IFLD @arch@_cgen_ifld_table[] =
 			  (string-append
 			   "  { "
 			   (ifld-enum ifld) ", "
-			   "\"" (obj:name ifld) "\", "
+			   "\"" (obj:str-name ifld) "\", "
                            (if
                             (or (has-attr? ifld 'VIRTUAL)
                                 (derived-ifield? ifld))
@@ -267,7 +267,7 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
 	(gen-obj-sanitize hw
 			  (string-list
 			   "  { "
-			   "\"" (obj:name hw) "\", "
+			   "\"" (obj:str-name hw) "\", "
 			   (hw-enum hw) ", "
 			   ; ??? No element currently requires both indices and
 			   ; values specs so we only output the needed one.
@@ -455,13 +455,13 @@ const CGEN_OPERAND @arch@_cgen_operand_table[] =
       (lambda (op)
 	(gen-obj-sanitize op
 			  (string-append
-			   "/* " (obj:name op) ": " (obj:comment op) " */\n"
+			   "/* " (obj:str-name op) ": " (obj:comment op) " */\n"
                           (if (or (derived-operand? op)
                                   (anyof-operand? op))
                               ""
                               (string-append 
 			         "  { "
-    		   	         "\"" (obj:name op) "\", "
+    		   	         "\"" (obj:str-name op) "\", "
 			         (op-enum op) ", "
 			         (hw-enum (op:hw-name op)) ", "
 			         (number->string (op:start op)) ", "
@@ -509,7 +509,7 @@ const CGEN_OPERAND @arch@_cgen_operand_table[] =
     "  {\n"
     "    "
     (if (has-attr? insn 'ALIAS) "-1" (insn-enum insn)) ", "
-    "\"" (obj:name insn) "\", "
+    "\"" (obj:str-name insn) "\", "
     "\"" (insn-mnemonic insn) "\", "
     ;(if (has-attr? insn 'ALIAS) "0" (number->string (insn-length insn))) ",\n"
     (number->string (insn-length insn)) ",\n"

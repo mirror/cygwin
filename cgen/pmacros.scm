@@ -41,8 +41,8 @@
 
 ; Builtin macros:
 ;
-; (.sym symbol1 symbol2 ...)          - symbol-append
-; (.str string1 string2 ...)          - string-append
+; (.sym symbol1 symbol2 ...)          - symbolstr-append
+; (.str string1 string2 ...)          - stringsym-append
 ; (.hex number)                       - convert to hex string
 ; (.upcase string)                    - convert to uppercase
 ; (.downcase string)                  - convert to lowercase
@@ -313,8 +313,8 @@
 ; Build a procedure that performs a pmacro expansion.
 
 (define (-pmacro-build-lambda params expansion)
-  (eval `(lambda ,params
-	   (-pmacro-expand ',expansion (-pmacro-env-make ',params (list ,@params)))))
+  (eval1 `(lambda ,params
+	    (-pmacro-expand ',expansion (-pmacro-env-make ',params (list ,@params)))))
 )
 
 ; ??? I'd prefer to use `define-macro', but boot-9.scm uses it and
@@ -380,12 +380,15 @@
 
 (define -pmacro-sym
   (lambda args
-    (apply symbol-append
-	   (map (lambda (elm)
-		  (if (number? elm)
-		      (number->string elm)
-		      elm))
-		args)))
+    (string->symbol
+     (apply string-append
+	    (map (lambda (elm)
+		   (cond ((number? elm) (number->string elm))
+			 ((symbol? elm) (symbol->string elm))
+			 ((string? elm) elm)
+			 (else
+			  (-pmacro-error "invalid argument to .str" elm))))
+		 args))))
 )
 
 ; .str - string-append, auto-convert numbers
@@ -394,9 +397,11 @@
   (lambda args
     (apply string-append
 	   (map (lambda (elm)
-		  (if (number? elm)
-		      (number->string elm)
-		      elm))
+		  (cond ((number? elm) (number->string elm))
+			((symbol? elm) (symbol->string elm))
+			((string? elm) elm)
+			(else
+			 (-pmacro-error "invalid argument to .str" elm))))
 		args)))
 )
 
@@ -555,7 +560,7 @@
 
   ; doesn't work, Hobbit creates "eval" variable
   ;(-pmacro-set! '.eval (-pmacro-make '.eval '(expr) #f eval "eval"))
-  (-pmacro-set! '.eval (-pmacro-make '.eval '(expr) #f (eval 'eval) "eval"))
+  (-pmacro-set! '.eval (-pmacro-make '.eval '(expr) #f (eval1 'eval) "eval"))
 )
 
 ; Initialize so we're ready to use after loading.

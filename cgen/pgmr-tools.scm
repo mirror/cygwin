@@ -122,7 +122,7 @@
 (define (pgmr-pretty-print-insn-value insn value)
   (define (dump-ifield ifld value name-width)
     (string-append
-     (string-take name-width (obj:name ifld))
+     (string-take name-width (obj:str-name ifld))
      ": "
      (number->string value)
      ", 0x"

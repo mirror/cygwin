@@ -913,7 +913,7 @@
 		       e)
 		      (else
 		       (assert (operand? e))
-		       (string-append "${" (obj:name e) "}"))))
+		       (string-append "${" (obj:str-name e) "}"))))
 	      elements))
 )
 

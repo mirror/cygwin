@@ -98,7 +98,7 @@
 (method-make!
  <c-expr> 'get-name
  (lambda (self)
-   (string-append "(" (obj:name (elm-get self 'mode)) ") "
+   (string-append "(" (obj:str-name (elm-get self 'mode)) ") "
 		  (cx:c self)))
 )
 
@@ -449,7 +449,7 @@
 		    (let ((mode (-rtx-lazy-sem-mode mode)))
 		      (send src 'cxmake-get estate mode #f #f)))
 		   (else
-		    (error (string-append "operand " (obj:name src)
+		    (error (string-append "operand " (obj:str-name src)
 					  " referenced in incompatible mode: ")
 			   (obj:name mode))))))
 
@@ -651,11 +651,11 @@
 	    (cx:make sem-mode
 		     (string-append "(* CGEN_CPU_FPU (current_cpu)->ops->"
 				    (string-downcase name)
-				    (string-downcase (obj:name sem-mode))
+				    (string-downcase (obj:str-name sem-mode))
 				    ") (CGEN_CPU_FPU (current_cpu), "
 				    (cx:c val) ")"))
 	    (cx:make sem-mode
-		     (string-append name (obj:name sem-mode)
+		     (string-append name (obj:str-name sem-mode)
 				    " (" (cx:c val) ")")))
 	(cx:make mode ; not sem-mode on purpose
 		 (string-append "(" c-op " ("
@@ -686,12 +686,12 @@
 	    (cx:make sem-mode
 		     (string-append "(* CGEN_CPU_FPU (current_cpu)->ops->"
 				    (string-downcase name)
-				    (string-downcase (obj:name sem-mode))
+				    (string-downcase (obj:str-name sem-mode))
 				    ") (CGEN_CPU_FPU (current_cpu), "
 				    (cx:c val1) ", "
 				    (cx:c val2) ")"))
 	    (cx:make sem-mode
-		     (string-append name (obj:name sem-mode)
+		     (string-append name (obj:str-name sem-mode)
 				    " (" (cx:c val1) ", "
 				    (cx:c val2) ")")))
 	(cx:make mode ; not sem-mode on purpose
@@ -712,7 +712,7 @@
 	 (val3 (rtl-c-get estate 'BI src3)))
     ; FIXME: Argument checking.
     (cx:make mode
-	  (string-append name (obj:name mode)
+	  (string-append name (obj:str-name mode)
 			 " ("
 			 (cx:c val1) ", "
 			 (cx:c val2) ", "
@@ -736,7 +736,7 @@
 
     (if (-rtx-use-sem-fn? estate c-op mode)
 	(cx:make sem-mode
-		 (string-append name (obj:name sem-mode)
+		 (string-append name (obj:str-name sem-mode)
 				" (" (cx:c val1) ", "
 				(cx:c val2) ")"))
 	(cx:make mode ; not sem-mode on purpose
@@ -793,22 +793,22 @@
     (if (and (not (estate-rtl-cover-fns? estate))
 	     (mode:host? (cx:mode s)))
 	(cx:make mode
-		 (string-append "((" (obj:name mode) ")"
-				" (" (obj:name (cx:mode s)) ")"
+		 (string-append "((" (obj:str-name mode) ")"
+				" (" (obj:str-name (cx:mode s)) ")"
 				" (" (cx:c s) "))"))
 	(if (or (mode-float? mode)
 		(mode-float? (cx:mode s)))
 	    (cx:make mode
 		     (string-append "(* CGEN_CPU_FPU (current_cpu)->ops->"
 				    (string-downcase name)
-				    (string-downcase (obj:name (-rtx-sem-mode (cx:mode s))))
-				    (string-downcase (obj:name (-rtx-sem-mode mode)))
+				    (string-downcase (obj:str-name (-rtx-sem-mode (cx:mode s))))
+				    (string-downcase (obj:str-name (-rtx-sem-mode mode)))
 				    ") (CGEN_CPU_FPU (current_cpu), "
 				    (cx:c s) ")"))
 	    (cx:make mode
 		     (string-append name
-				    (obj:name (-rtx-sem-mode (cx:mode s)))
-				    (obj:name (-rtx-sem-mode mode))
+				    (obj:str-name (-rtx-sem-mode (cx:mode s)))
+				    (obj:str-name (-rtx-sem-mode mode))
 				    " (" (cx:c s) ")")))))
 )
 
@@ -830,16 +830,16 @@
 	(if (mode-float? mode)
 	    (cx:make (mode:lookup 'BI)
 		     (string-append "(* CGEN_CPU_FPU (current_cpu)->ops->"
-				    (string-downcase name)
-				    (string-downcase (obj:name (-rtx-sem-mode mode)))
+				    (string-downcase (symbol->string name))
+				    (string-downcase (obj:str-name (-rtx-sem-mode mode)))
 				    ") (CGEN_CPU_FPU (current_cpu), "
 				    (cx:c val1) ", "
 				    (cx:c val2) ")"))
 	    (cx:make (mode:lookup 'BI)
-		     (string-append (string-upcase name)
+		     (string-append (string-upcase (symbol->string name))
 				    (if (memq name '(eq ne))
-					(obj:name (-rtx-sem-mode mode))
-					(obj:name mode))
+					(obj:str-name (-rtx-sem-mode mode))
+					(obj:str-name mode))
 				    " (" (cx:c val1) ", "
 				    (cx:c val2) ")")))
 	(cx:make (mode:lookup 'BI)
@@ -1097,7 +1097,8 @@
   (string-append
    "  "
    ; ??? mode:c-type
-   (string-map (lambda (temp) (string-append (obj:name (cx:mode temp)) " " (cx:c temp) ";"))
+   (string-map (lambda (temp) (string-append (obj:str-name (cx:mode temp))
+					     " " (cx:c temp) ";"))
 	       temp-list)
    "\n")
 )
@@ -1421,9 +1422,9 @@
   ; Ensure compatible modes.
   (apply s-c-raw-call (cons estate
 			    (cons out-mode
-				  (cons (string-append "JOIN"
-						       in-mode
-						       out-mode)
+				  (cons (stringsym-append "JOIN"
+							  in-mode
+							  out-mode)
 					(cons arg1 arg-rest)))))
 )
 
@@ -1433,7 +1434,8 @@
 	 ; Refetch mode in case it was DFLT.
 	 (val-mode (cx:mode val)))
     (cx:make mode
-	     (string-append "SUBWORD" (obj:name val-mode) (obj:name mode)
+	     (string-append "SUBWORD"
+			    (obj:str-name val-mode) (obj:str-name mode)
 			    " (" (cx:c val)
 			    (if (mode-bigger? val-mode mode)
 				(string-append

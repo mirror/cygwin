@@ -215,8 +215,8 @@
 	(in-ops (sfmt-in-ops sfmt))
 	(out-ops (sfmt-out-ops sfmt))
 	(sort-elms (lambda (a b)
-		     ; Sort by descending size, then ascending C type, then
-		     ; ascending name.
+		     ; Sort by descending size, then ascending C type name,
+		     ; then ascending name.
 		     (cond ((> (caddr a) (caddr b))
 			    #t)
 			   ((= (caddr a) (caddr b))
@@ -231,10 +231,10 @@
 	)
     (logit 4 
 	   "-sfmt-contents sfmt=" (obj:name sfmt) 
-	   " needed-iflds=" (string-map obj:name needed-iflds)
-	   " extracted-ops=" (string-map obj:name extracted-ops)
-	   " in-ops=" (string-map obj:name in-ops)
-	   " out-ops=" (string-map obj:name out-ops)
+	   " needed-iflds=" (string-map obj:str-name needed-iflds)
+	   " extracted-ops=" (string-map obj:str-name extracted-ops)
+	   " in-ops=" (string-map obj:str-name in-ops)
+	   " out-ops=" (string-map obj:str-name out-ops)
 	   "\n")
     (cons sfmt
 	  (sort

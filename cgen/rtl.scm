@@ -229,7 +229,7 @@
 		     class
 		     'function
 		     (if action
-			 (eval (list 'lambda (cons '*estate* args) action))
+			 (eval1 (list 'lambda (cons '*estate* args) action))
 			 #f)
 		     -rtx-num-next)))
       ; Add it to the table of rtx handlers.
@@ -257,7 +257,7 @@
 		     class
 		     'syntax
 		     (if action
-			 (eval (list 'lambda (cons '*estate* args) action))
+			 (eval1 (list 'lambda (cons '*estate* args) action))
 			 #f)
 		     -rtx-num-next)))
       ; Add it to the table of rtx handlers.
@@ -286,7 +286,7 @@
 		     arg-types arg-modes
 		     class
 		     'operand
-		     (eval (list 'lambda (cons '*estate* args) action))
+		     (eval1 (list 'lambda (cons '*estate* args) action))
 		     -rtx-num-next)))
       ; Add it to the table of rtx handlers.
       (hashq-set! -rtx-func-table name rtx)
@@ -315,7 +315,7 @@
     (let ((rtx (make <rtx-func> name args #f #f
 		     #f ; class
 		     'macro
-		     (eval (list 'lambda args action))
+		     (eval1 (list 'lambda args action))
 		     -rtx-num-next)))
       ; Add it to the table of rtx macros.
       (hashq-set! -rtx-macro-table name rtx)
@@ -759,20 +759,20 @@
 	 locals))
 )
 
-; Return a semi-pretty symbol describing RTX.
+; Return a semi-pretty string describing RTX.
 ; This is used by hw to include the index in the element's name.
 
 (define (rtx-pretty-name rtx)
   (if (pair? rtx)
       (case (car rtx)
 	((const) (number->string (rtx-const-value rtx)))
-	((operand) (obj:name (rtx-operand-obj rtx)))
-	((local) (rtx-local-name rtx))
-	((xop) (obj:name (rtx-xop-obj rtx)))
+	((operand) (symbol->string (obj:name (rtx-operand-obj rtx))))
+	((local) (symbol->string (rtx-local-name rtx)))
+	((xop) (symbol->string (obj:name (rtx-xop-obj rtx))))
 	(else
 	 (if (null? (cdr rtx))
 	     (car rtx)
-	     (apply string-append
+	     (apply stringsym-append
 		    (cons (car rtx)
 			  (map (lambda (elm)
 				 (string-append "-" (rtx-pretty-name elm)))
@@ -912,12 +912,12 @@
   (cond ((hw-scalar? hw)
 	 hw-name)
 	((rtx? index-arg)
-	 (symbol-append hw-name '- (rtx-pretty-name index-arg)))
+	 (symbolstr-append hw-name '- (rtx-pretty-name index-arg)))
 	(else
-	 (symbol-append hw-name ; (obj:name (op:type self))
-			'-
-			; (obj:name (op:index self)))))
-			(stringize index-arg "-"))))
+	 (symbolstr-append hw-name ; (obj:name (op:type self))
+			   '-
+			   ; (obj:name (op:index self)))))
+			   (stringize index-arg "-"))))
 )
 
 ; Return the <operand> object described by

@@ -61,10 +61,10 @@
 		      (+ last 1))))
 	  (if (eq? (car remaining) '-)
 	      (loop result val (cdr remaining))
-	      (let ((name (symbol-append prefix
-					 (if (pair? (car remaining))
-					     (caar remaining)
-					     (car remaining))))
+	      (let ((name (symbolstr-append prefix
+					    (if (pair? (car remaining))
+						(caar remaining)
+						(car remaining))))
 		    (attrs (if (and (pair? (car remaining))
 				    (pair? (cdar remaining))
 				    (pair? (cddar remaining)))
@@ -92,7 +92,7 @@
 
 (define (enum-vals-upcase vals)
   (map (lambda (elm)
-	 (cons (string->symbol (string-upcase (car elm))) (cdr elm)))
+	 (cons (symbol-upcase (car elm)) (cdr elm)))
        vals)
 )
 
@@ -122,7 +122,7 @@
   (logit 2 "Processing enum " name " ...\n")
 
   (let* ((name (parse-name name errtxt))
-	 (errtxt (string-append errtxt " " name)))
+	 (errtxt (stringsym-append errtxt " " name)))
 
     (make <enum>
 	  name

@@ -76,13 +76,13 @@
 ; ptr-to is currently private so there is no accessor.
 (define mode:host? (elm-make-getter <mode> 'host?))
 
-; Return C type to use for values of mode M.
+; Return string C type to use for values of mode M.
 
 (define (mode:c-type m)
   (let ((ptr-to (elm-xget m 'ptr-to)))
     (if ptr-to
 	(string-append (mode:c-type ptr-to) " *")
-	(obj:name m)))
+	(obj:str-name m)))
 )
 
 ; CM is short for "concat mode".  It is a list of modes of the elements
@@ -126,7 +126,7 @@
 ; Return enum cgen_mode_types value for M.
 
 (define (mode:enum m)
-  (gen-c-symbol (string-append "MODE_" (string-upcase (obj:name m))))
+  (gen-c-symbol (string-append "MODE_" (string-upcase (obj:str-name m))))
 )
 
 ; Return a boolean indicating if MODE1 is equal to MODE2
@@ -224,7 +224,7 @@
 		    non-mode-c-type printf-type sem-mode ptr-to host?)
   (logit 2 "Processing mode " name " ...\n")
   (let* ((name (parse-name name errtxt))
-	 (errtxt (string-append errtxt " " name))
+	 (errtxt (stringsym-append errtxt " " name))
 	 (result (make <mode>
 		       name
 		       (parse-comment comment errtxt)

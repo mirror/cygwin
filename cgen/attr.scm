@@ -304,7 +304,7 @@
 (define (-attr-parse errtxt type-class name comment attrs for default values)
   (logit 2 "Processing attribute " name " ...\n")
   (let* ((name (parse-name name errtxt))
-	 (errtxt (string-append errtxt ":" name))
+	 (errtxt (stringsym-append errtxt ":" name))
 	 (result (new type-class))
 	 (parsed-values (send result 'parse-value-def errtxt values)))
     (elm-xset! result 'name name)
@@ -610,7 +610,7 @@
 ; Convert a bitset value "a,b,c" into a list (a b c).
 
 (define (bitset-attr->list x)
-  (map string->symbol (string-cut x #\,))
+  (map string->symbol (string-cut (->string x) #\,))
 )
 
 ; Return the enum of ATTR-NAME for type TYPE.
@@ -751,8 +751,8 @@
     (for-each (lambda (elm)
 		(cond ((symbol? elm)
 		       ; boolean attribute
-		       (if (char=? (string-ref elm 0) #\!)
-			   (set! alist (acons (string->symbol (string-drop1 elm)) #f alist))
+		       (if (char=? (string-ref (symbol->string elm) 0) #\!)
+			   (set! alist (acons (string->symbol (string-drop1 (symbol->string elm))) #f alist))
 			   (set! alist (acons elm #t alist)))
 		       (if (not (current-attr-lookup (caar alist)))
 			   (context-error context "unknown attribute" (caar alist))))
@@ -921,7 +921,7 @@
    (if (not value)
        "0"
        "1"))
- ;(string-upcase (string-append (obj:name self) "_" value)))
+ ;(string-upcase (string-append (obj:str-name self) "_" value)))
 )
 
 (method-make!
@@ -945,7 +945,10 @@
 (method-make!
  <enum-attribute> 'gen-value-for-defn
  (lambda (self value)
-   (string-upcase (gen-c-symbol (string-append (obj:name self) "_" value))))
+   (string-upcase
+    (gen-c-symbol (string-append (obj:str-name self)
+				 "_"
+				 (symbol->string value)))))
 )
 
 ; Called before loading a .cpu file to initialize.

@@ -563,7 +563,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 	(cti? (insn-cti? insn))
 	(insn-len (insn-length-bytes insn)))
     (string-list
-     "/* " (obj:name insn) ": " (insn-syntax insn) " */\n\n"
+     "/* " (obj:str-name insn) ": " (insn-syntax insn) " */\n\n"
      "static SEM_PC\n"
      "SEM_FN_NAME (@prefix@," (gen-sym insn) ")"
      (if (and parallel? (not (with-generic-write?)))
@@ -620,7 +620,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 	(cti? (insn-cti? insn))
 	(insn-len (insn-length-bytes insn)))
     (string-list
-     "/* " (obj:name insn) ": " (insn-syntax insn) " */\n\n"
+     "/* " (obj:str-name insn) ": " (insn-syntax insn) " */\n\n"
      "static SEM_STATUS\n"
      "SEM_FN_NAME (@prefix@," (gen-sym insn) ")"
      (if (and parallel? (not (with-generic-write?)))
@@ -855,7 +855,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
   (string-write
    (gen-c-copyright (string-append
                   "ISA definitions header for "
-                  (obj:name (current-isa))
+                  (obj:str-name (current-isa))
                   ".")
                  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
@@ -915,7 +915,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 
   (string-write
    (gen-c-copyright (string-append "Simulator instruction operand reader for "
-				 (current-arch-name) ".")
+				   (symbol->string (current-arch-name)) ".")
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 #ifdef DEFINE_LABELS
@@ -993,7 +993,7 @@ SEM_FN_NAME (@prefix@,init_idesc_table) (SIM_CPU *current_cpu)
 
   (string-write
    (gen-c-copyright (string-append "Simulator instruction operand writer for "
-				 (current-arch-name) ".")
+				   (symbol->string (current-arch-name)) ".")
 		  CURRENT-COPYRIGHT CURRENT-PACKAGE)
    "\
 /* Write cached results of 1 or more insns executed in parallel.  */

@@ -1,3 +1,8 @@
+2004-11-18  Kevin Buettner  <kevinb@redhat.com>
+
+	* thread-db.c (thread_db_set_thread_reg): Don't allow a successful
+	return without first initializing ``reg''.
+
 2004-10-20  Jim Blandy  <jimb@redhat.com>
 
 	Use the libthread_db 'td_symbol_list' function to look up all the

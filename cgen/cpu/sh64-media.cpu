@@ -1,4 +1,4 @@
-; Hitachi SHmedia instruction set description.  -*- Scheme -*-
+; Renesas SHmedia instruction set description.  -*- Scheme -*-
 ; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; Copyright (C) 2002 SuperH Ltd
 ; This file is part of CGEN.
@@ -27,7 +27,7 @@
 
 ; Saturation functions.
 ; Force a value `i' into words `n' bits wide.
-; See Hitachi SH-5 CPU core, volume 2, p. 25 for details.
+; See Renesas SH-5 CPU core, volume 2, p. 25 for details.
 
 ; saturate -- signed saturatation function
 

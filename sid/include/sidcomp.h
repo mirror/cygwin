@@ -23,7 +23,7 @@ namespace sid
   // interopration attempts with obsolete component objects.
 
   const unsigned API_MAJOR_VERSION = 3;
-  const unsigned API_MINOR_VERSION = 1;
+  const unsigned API_MINOR_VERSION = 2;
 
   // PART 1: Buses
   //
@@ -52,12 +52,12 @@ namespace sid
       status ()
 	:code (ok), latency (0) {}
       status (enum status_t c)
-	:code (c), latency (0) {}
+	:code (static_cast<host_int_1>(c)), latency (0) {}
       status (enum status_t c, host_int_2 lat)
-	   :code (c), latency (lat) {}
+	   :code (static_cast<host_int_1>(c)), latency (lat) {}
       operator int() const { return static_cast<int>(code); }
 
-      enum status_t code;
+      host_int_1 code;
       host_int_2 latency;
     };
 

@@ -26,6 +26,9 @@ AC_CHECK_FUNCS(cygwin_conv_to_full_posix_path)
 AC_CHECK_HEADERS(time.h)
 AC_CHECK_FUNCS(ctime)
 
+dnl building docs
+RH_DOCBUILD_CHECK
+
 dnl Outputs
 AC_CONFIG_SUBDIRS(libltdl)
 AC_OUTPUT(Makefile)

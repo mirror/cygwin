@@ -7,6 +7,21 @@
 	* compConfig.cxx (cfgroot_component): Add missing throw() specifiers
 	to this dtor.
 
+2001-07-04  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add maintainer-mode doc building configury.
+	* configure: Regenerate.
+	* Makefile.am: Add maintainer-mode doc building.
+	* Makefile.in: Regenerate.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* sid-control-cfgroot.txt: Generate.
+
+2001-06-27  graydon hoare  <graydon@redhat.com>
+
+	* sid-control-cfgroot.xml: Add.
+
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am (ACLOCAL_AMFLAGS): Refer to $srcdir.

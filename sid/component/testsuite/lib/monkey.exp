@@ -1,14 +1,16 @@
 # -*- Tcl -*-
 # monkey.exp
 #
-# Copyright (C) 2000 Red Hat
+# Copyright (C) 2000, 2001 Red Hat
 #
 # Procedures for a monkey testing library. These procs are used to
 # fire random input to a victim component. If sid does not close its
 # stdin (ie crash), then the test is considered to have passed.
 #
-# State save/restore functionality is sometimes tested also.  It confirms that
-# standard attributes recover their save-time values at any subsequent restore. 
+# State save/restore functionality is sometimes tested also.  It
+# confirms that standard attributes recover their save-time values at
+# any subsequent restore.
+#
 # Dejagnu WARNINGs are emitted when something was overlooked.
 #
 # monkey_start and monkey_stop must be called at the start and end of
@@ -104,11 +106,11 @@ proc monkey_test {type sym lib {iterations 30s}} {
 	    note "Testing $type until [clock format $finishtime]"
 	}
 	while {[clock seconds] < $finishtime} {
-	    do_one_test
+	    if {[do_one_test] == 0} then return
 	}
     } else {
 	for {set i 0} {$i < $iterations} {incr i} {
-	    do_one_test
+	    if {[do_one_test] == 0} then return
 	}
     }
     sid_stop
@@ -132,16 +134,17 @@ proc do_one_test {} {
     set value [random 100]
     # skew distribution toward effective tests
     if {$value < 30} then { 
-	monkey_test_pin
+	set result [monkey_test_pin]
     } elseif {$value < 50} then {
-	monkey_test_bus
+	set result [monkey_test_bus]
     } elseif {$value < 96} then {
-	monkey_test_attribute
+	set result [monkey_test_attribute]
     } elseif {$value < 98} then {
-	monkey_test_state_save
+	set result [monkey_test_state_save]
     } else {
-	monkey_test_state_restore
+	set result [monkey_test_state_restore]
     }
+    return [expr ![string match "eof" $result]]
 }
 
 
@@ -189,7 +192,8 @@ proc monkey_test_pin {} {
 
     # Value-carrying pin.
     set value [random [expr int(pow(2,16))]]
-    sid_cmd [list sid::pin::driven_h4 $handle $value]
+    set result [sid_cmd [list sid::pin::driven_h4 $handle $value]]
+    if [string match "" $result] then { return "eof" }
 }
 
 # Monkey test a bus (transaction type and width decided at runtime).
@@ -232,10 +236,11 @@ proc monkey_test_bus {} {
 	    4 { set data [random [expr int(pow(2,30))]] }
 	    8 { set data [random [expr int(pow(2,30))]] }
 	}
-	sid_cmd [list sid::bus::write_h4_$endian$width $handle $addr $data]
+	set result [sid_cmd [list sid::bus::write_h4_$endian$width $handle $addr $data]]
     } else {
-	sid_cmd [list sid::bus::read_h4_$endian$width $handle $addr]
+	set result [sid_cmd [list sid::bus::read_h4_$endian$width $handle $addr]]
     }
+    if [string match "" $result] then { return "eof" }
 }    
 
 # Monkey test an attribute (decided at runtime).
@@ -252,7 +257,8 @@ proc monkey_test_attribute {} {
     if {! [attr_safe_p $attr]} then { return }
 
     set garbage [random_string]
-    sid_cmd [list sid::component::set_attribute_value $victim $attr $garbage]
+    set result [sid_cmd [list sid::component::set_attribute_value $victim $attr $garbage]]
+    if [string match "" $result] then { return "eof" }
 }
 
 

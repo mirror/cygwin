@@ -1,3 +1,10 @@
+2002-03-14  Ben Elliston  <bje@redhat.com>
+
+	* common-xml/behavior.xml (tracing): New behavior section.
+	* common-xml/interface.xml (trace-filename): New attribute.
+	(trace-extract?): Associate with "tracing" behavior.
+	(trace-result?): Likewise.
+
 2002-02-06  Frank Ch. Eigler  <fche@redhat.com>
 
 	* compCGEN.cxx (cgen_disassemble): New "isa_mask" argument.

@@ -589,7 +589,7 @@ proc dg-runtest { testcases flags default-extra-flags } {
 # dg-trim-dirname -- rip DIR_NAME out of FILE_NAME
 # 
 # Syntax: dg-trim-dirname dir_name file_name
-# We need to go through this contorsion in order to properly support
+# We need to go through this contortion in order to properly support
 # directory-names which might have embedded regexp special characters.
 
 proc dg-trim-dirname { dir_name file_name } {

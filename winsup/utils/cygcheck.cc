@@ -42,7 +42,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.53 $";
+static const char version[] = "$Revision: 1.54 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1064,7 +1064,7 @@ dump_sysinfo ()
   if (givehelp)
     {
       printf ("Listing available drives...\n");
-      printf ("Drv Type        Size   Free Flags              Name\n");
+      printf ("Drv Type          Size   Used Flags              Name\n");
     }
   int prev_mode =
     SetErrorMode (SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
@@ -1135,9 +1135,9 @@ dump_sysinfo ()
 
       printf ("%.2s  %s %-6s ", drive, drive_type, fsname);
       if (capacity_mb >= 0)
-	printf ("%5dMb %3d%% ", (int) capacity_mb, (int) percent_full);
+	printf ("%7dMb %3d%% ", (int) capacity_mb, (int) percent_full);
       else
-	printf ("  N/A    N/A ");
+	printf ("    N/A    N/A ");
       printf ("%s %s %s %s %s %s  %s\n",
 	      flags & FS_CASE_IS_PRESERVED ? "CP" : "  ",
 	      flags & FS_CASE_SENSITIVE ? "CS" : "  ",

@@ -1,7 +1,23 @@
 2005-03-10  Jim Blandy  <jimb@redhat.com>
 
+	* configure.in: Provide description for STOCK_BREAKPOINTS for use
+	in config.in.
+
 	Merge changes from trunk, to make progressive branch-vs.-trunk
 	diffs easier to generate.
+
+	2005-03-10  Jim Blandy  <jimb@redhat.com>
+
+	* Makefile.in, aclocal.m4: Regenerated with automake 1.9.4.
+
+	Make config.in generated automatically again.
+	* configure.in: Provide descriptions for all the preprocessor
+	symbols we define.
+	* configure: Regenerated.
+	* config.in: Regenerated using autoheader.
+
+	* linux-target.c (frv_fdpic_loadmap_addresses): Use '%lx' for
+	unsigned long argument.
 
 	2005-02-08  Kevin Buettner  <kevinb@redhat.com
 

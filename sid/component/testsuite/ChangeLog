@@ -1,3 +1,17 @@
+2001-05-14  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.cgen-cpu/armconf.exp: Move to sidcomp.cgen-cpu.arm7t.
+	* sidcomp.cgen-cpu/armeit.conf: Ditto.
+	* sidcomp.cgen-cpu/armeit.tcl: Ditto.
+	* sidcomp.cgen-cpu/armfiq.cs: Ditto.
+	* sidcomp.cgen-cpu/armhello.ms: Ditto.
+	* sidcomp.cgen-cpu/armimemfault.ms: Ditto.
+	* sidcomp.cgen-cpu/arminvinsn.ms: Ditto.
+	* sidcomp.cgen-cpu/armirq.cs: Ditto.
+	* sidcomp.cgen-cpu/armmemfault.ms: Ditto.
+	* sidcomp.cgen-cpu/armmisc.exp: Ditto.
+	* sidcomp.cgen-cpu/armutils.inc: Ditto.
+
 2001-04-04  Ben Elliston  <bje@redhat.com>
 
 	* sidcomp.cfgroot/libErr.expect: Update.

@@ -117,8 +117,8 @@ eg., direct/64kb/32, 4way/256kb/64/lru
 .BR "--EB" ", " "--EL"
 Set power-up CPU mode to big/little endian.
 .TP
-.BR "--gprof" "=FILE"
-Turn on GPROF profiling; collect every insn-count ticks.
+.BR "--gprof" "=FILE" "[,cycles[=N]]"
+Turn on GPROF profiling; collect after N ticks (default N=1) or every insn-count ticks, if cycles not specified.
 .TP
 .BR "--memory-region" "=BASE,SIZE"
 Add RAM from region from BASE to BASE+SIZE-1.  Comma-separated sub-options are:

@@ -104,6 +104,7 @@
  */
 #undef CONVEX
 #undef SOLARIS
+#undef _XOPEN_SOURCE
 
 #ifdef SOLARIS
 #define __EXTENSIONS__

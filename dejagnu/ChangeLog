@@ -1,3 +1,8 @@
+2001-11-19  Elena Zannoni  <ezannoni@redhat.com>
+
+	* lib/libgloss.exp (g++_link_flags): Libstdc++ is now in
+	libstdc++-v3/src/.libs.
+
 2001-11-12  Andrew Cagney  <ac131313@redhat.com>
 
 	* lib/remote.exp (local_exec, standard_close): Use SHELL

@@ -251,6 +251,10 @@ proc g++_link_flags { args } {
 	    append flags "-L${gccpath}/libstdc++ "
 	    append ld_library_path ":${gccpath}/libstdc++"
 	}
+	if [file exists "${gccpath}/libstdc++-v3/src/.libs/libstdc++.a"] {
+	    append flags "-L${gccpath}/libstdc++-v3/src/.libs "
+	    append ld_library_path ":${gccpath}/libstdc++-v3/src/.libs"
+	}
 	if [file exists "${gccpath}/libiberty/libiberty.a"] {
 	    append flags "-L${gccpath}/libiberty "
 	}

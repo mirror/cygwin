@@ -4,21 +4,22 @@
    Contributed by Alessandro Forin (af@cs.cmu.edu) at CMU.  Major work
    by Per Bothner, John Gilmore and Ian Lance Taylor at Cygnus Support.
 
-This file is part of GDB.
+   This file is part of GDB.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* Read symbols from an ECOFF file.  Most of the work is done in
    mdebugread.c.  */
@@ -41,6 +42,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "elf/common.h"
 #include "elf/mips.h"
 
+extern void _initialize_mipsread PARAMS ((void));
+
 static void
 mipscoff_new_init PARAMS ((struct objfile *));
 
@@ -48,15 +51,14 @@ static void
 mipscoff_symfile_init PARAMS ((struct objfile *));
 
 static void
-mipscoff_symfile_read PARAMS ((struct objfile *, struct section_offsets *,
-			       int));
+mipscoff_symfile_read PARAMS ((struct objfile *, int));
 
 static void
 mipscoff_symfile_finish PARAMS ((struct objfile *));
 
 static void
 read_alphacoff_dynamic_symtab PARAMS ((struct section_offsets *,
-				       struct objfile *objfile));
+				       struct objfile * objfile));
 
 /* Initialize anything that needs initializing when a completely new
    symbol file is specified (not just adding some symbols from another
@@ -84,13 +86,12 @@ mipscoff_symfile_init (objfile)
 /* Read a symbol file from a file.  */
 
 static void
-mipscoff_symfile_read (objfile, section_offsets, mainline)
+mipscoff_symfile_read (objfile, mainline)
      struct objfile *objfile;
-     struct section_offsets *section_offsets;
      int mainline;
 {
   bfd *abfd = objfile->obfd;
-  struct cleanup * back_to;
+  struct cleanup *back_to;
 
   init_minimal_symbol_collection ();
   back_to = make_cleanup ((make_cleanup_func) discard_minimal_symbols, 0);
@@ -103,11 +104,11 @@ mipscoff_symfile_read (objfile, section_offsets, mainline)
     error ("Error reading symbol table: %s", bfd_errmsg (bfd_get_error ()));
 
   mdebug_build_psymtabs (objfile, &ecoff_backend (abfd)->debug_swap,
-			 &ecoff_data (abfd)->debug_info, section_offsets);
+			 &ecoff_data (abfd)->debug_info);
 
   /* Add alpha coff dynamic symbols.  */
 
-  read_alphacoff_dynamic_symtab (section_offsets, objfile);
+  read_alphacoff_dynamic_symtab (objfile->section_offsets, objfile);
 
   /* Install any minimal symbols that have been collected as the current
      minimal symbols for this objfile. */
@@ -156,35 +157,42 @@ mipscoff_symfile_finish (objfile)
 
 /* Format of an alpha external ELF symbol.  */
 
-typedef struct {
-  unsigned char	st_name[4];		/* Symbol name, index in string tbl */
-  unsigned char	st_pad[4];		/* Pad to long word boundary */
-  unsigned char	st_value[8];		/* Value of the symbol */
-  unsigned char	st_size[4];		/* Associated symbol size */
-  unsigned char	st_info[1];		/* Type and binding attributes */
-  unsigned char	st_other[1];		/* No defined meaning, 0 */
-  unsigned char	st_shndx[2];		/* Associated section index */
-} Elfalpha_External_Sym;
+typedef struct
+{
+  unsigned char st_name[4];	/* Symbol name, index in string tbl */
+  unsigned char st_pad[4];	/* Pad to long word boundary */
+  unsigned char st_value[8];	/* Value of the symbol */
+  unsigned char st_size[4];	/* Associated symbol size */
+  unsigned char st_info[1];	/* Type and binding attributes */
+  unsigned char st_other[1];	/* No defined meaning, 0 */
+  unsigned char st_shndx[2];	/* Associated section index */
+}
+Elfalpha_External_Sym;
 
 /* Format of an alpha external ELF dynamic info structure.  */
 
-typedef struct {
-  unsigned char	d_tag[4];		/* Tag */
-  unsigned char	d_pad[4];		/* Pad to long word boundary */
-  union {
-    unsigned char d_ptr[8];		/* Pointer value */
-    unsigned char d_val[4];		/* Integer value */
-  } d_un;
-} Elfalpha_External_Dyn;
+typedef struct
+  {
+    unsigned char d_tag[4];	/* Tag */
+    unsigned char d_pad[4];	/* Pad to long word boundary */
+    union
+      {
+	unsigned char d_ptr[8];	/* Pointer value */
+	unsigned char d_val[4];	/* Integer value */
+      }
+    d_un;
+  }
+Elfalpha_External_Dyn;
 
 /* Struct to obtain the section pointers for alpha dynamic symbol info.  */
 
-struct alphacoff_dynsecinfo {
-  asection *sym_sect;		/* Section pointer for .dynsym section */
-  asection *str_sect;		/* Section pointer for .dynstr section */
-  asection *dyninfo_sect;	/* Section pointer for .dynamic section */
-  asection *got_sect;		/* Section pointer for .got section */
-};
+struct alphacoff_dynsecinfo
+  {
+    asection *sym_sect;		/* Section pointer for .dynsym section */
+    asection *str_sect;		/* Section pointer for .dynstr section */
+    asection *dyninfo_sect;	/* Section pointer for .dynamic section */
+    asection *got_sect;		/* Section pointer for .got section */
+  };
 
 static void
 alphacoff_locate_sections PARAMS ((bfd *, asection *, void *));
@@ -257,7 +265,7 @@ read_alphacoff_dynamic_symtab (section_offsets, objfile)
 
   /* Locate the dynamic symbols sections and read them in.  */
   memset ((char *) &si, 0, sizeof (si));
-  bfd_map_over_sections (abfd, alphacoff_locate_sections, (PTR) &si);
+  bfd_map_over_sections (abfd, alphacoff_locate_sections, (PTR) & si);
   if (si.sym_sect == NULL
       || si.str_sect == NULL
       || si.dyninfo_sect == NULL
@@ -274,16 +282,16 @@ read_alphacoff_dynamic_symtab (section_offsets, objfile)
   got_secptr = alloca (got_secsize);
 
   if (!bfd_get_section_contents (abfd, si.sym_sect, sym_secptr,
-				 (file_ptr)0, sym_secsize))
+				 (file_ptr) 0, sym_secsize))
     return;
   if (!bfd_get_section_contents (abfd, si.str_sect, str_secptr,
-				 (file_ptr)0, str_secsize))
+				 (file_ptr) 0, str_secsize))
     return;
   if (!bfd_get_section_contents (abfd, si.dyninfo_sect, dyninfo_secptr,
-				 (file_ptr)0, dyninfo_secsize))
+				 (file_ptr) 0, dyninfo_secsize))
     return;
   if (!bfd_get_section_contents (abfd, si.got_sect, got_secptr,
-				 (file_ptr)0, got_secsize))
+				 (file_ptr) 0, got_secsize))
     return;
 
   /* Find the number of local GOT entries and the index for the
@@ -292,7 +300,7 @@ read_alphacoff_dynamic_symtab (section_offsets, objfile)
        dyninfo_p < dyninfo_end;
        dyninfo_p += sizeof (Elfalpha_External_Dyn))
     {
-      Elfalpha_External_Dyn *x_dynp = (Elfalpha_External_Dyn *)dyninfo_p;
+      Elfalpha_External_Dyn *x_dynp = (Elfalpha_External_Dyn *) dyninfo_p;
       long dyn_tag;
 
       dyn_tag = bfd_h_get_32 (abfd, (bfd_byte *) x_dynp->d_tag);
@@ -369,7 +377,7 @@ read_alphacoff_dynamic_symtab (section_offsets, objfile)
 	  if (sym_value == 0)
 	    {
 	      int got_entry_offset =
-		(i - dt_mips_gotsym + dt_mips_local_gotno) * got_entry_size;
+	      (i - dt_mips_gotsym + dt_mips_local_gotno) * got_entry_size;
 
 	      if (got_entry_offset < 0 || got_entry_offset >= got_secsize)
 		continue;
@@ -394,7 +402,7 @@ read_alphacoff_dynamic_symtab (section_offsets, objfile)
 		ms_type = mst_text;
 	      else
 		ms_type = mst_file_text;
-	      sym_value += ANOFFSET (section_offsets, SECT_OFF_TEXT);
+	      sym_value += ANOFFSET (section_offsets, SECT_OFF_TEXT (objfile));
 	    }
 	  else if (sym_shndx == SHN_MIPS_DATA)
 	    {
@@ -402,7 +410,7 @@ read_alphacoff_dynamic_symtab (section_offsets, objfile)
 		ms_type = mst_data;
 	      else
 		ms_type = mst_file_data;
-	      sym_value += ANOFFSET (section_offsets, SECT_OFF_DATA);
+	      sym_value += ANOFFSET (section_offsets, SECT_OFF_DATA (objfile));
 	    }
 	  else if (sym_shndx == SHN_MIPS_ACOMMON)
 	    {
@@ -410,7 +418,7 @@ read_alphacoff_dynamic_symtab (section_offsets, objfile)
 		ms_type = mst_bss;
 	      else
 		ms_type = mst_file_bss;
-	      sym_value += ANOFFSET (section_offsets, SECT_OFF_BSS);
+	      sym_value += ANOFFSET (section_offsets, SECT_OFF_BSS (objfile));
 	    }
 	  else if (sym_shndx == SHN_ABS)
 	    {

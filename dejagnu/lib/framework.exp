@@ -308,7 +308,7 @@ proc clone_output { message } {
 
     regsub "^\[ \t\]*(\[^ \t\]+).*$" "$message" "\\1" firstword;
     case "$firstword" in {
-	{"PASS:" "XFAIL:" "KFAIL:" "UNRESOLVED:" "UNSUPPORTED:" "UNTESTED:"} {
+	{"PASS:" "XFAIL:" "UNRESOLVED:" "UNSUPPORTED:" "UNTESTED:"} {
 	    if $all_flag {
 		send_user "$message\n"
 		return "$message"

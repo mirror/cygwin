@@ -1,4 +1,4 @@
-This is a current list of sid component shared libraries. $Date: 2002/01/30 00:56:09 $
+This is a current list of sid component shared libraries. $Date: 2002/03/04 23:41:45 $
 
 DIRECTORY       DSO                     COMPONENT_LIBRARY                  MAINTAINERS
 
@@ -43,6 +43,7 @@ hw-cpu-arm7t            ARM7 / ARM7T CPU model
 hw-cpu-x86		X86 CPU model
 hw-cpu-m32r/d           M32R/D CPU model
 hw-cpu-xstormy16        Sanyo Xstormy16 CPU model
+hw-disk-harddrive	Newer IDE hard drive model (controller + drives)
 hw-disk-ide             IDE hard drive model (controller + drives)
 hw-glue-bus-mux         Bus multiplexer
 hw-glue-probe-bus       Bus traffic tracer

@@ -51,6 +51,7 @@ $opt_trace_extract=0;
 $opt_trace_semantics=0;
 $opt_trace_core=0;
 $opt_trace_core_visual=0;
+$opt_enable_warnings=0;
 @opt_memory_region = ();
 $opt_gdb=0;
 $opt_persistent=0;
@@ -79,6 +80,7 @@ $load_mapper_data = "mapper access-port";
 	    "trace-semantics!",
 	    "trace-core!",
 	    "trace-core-visual!",
+	    "enable-warnings!",
 	    "memory-region=s@",
 	    "gdb=i",
 	    "tv=i",
@@ -107,6 +109,7 @@ Options:
  --trace-extract            Turn on CPU insn decode tracing.              [no]
  --trace-semantics          Turn on CPU insn execute tracing.             [no]
  --trace-core               Turn on bus access tracing.                   [no]
+ --enable-warnings          Enable CPU execution warnings.                [no]
  --memory-region=BASE,SIZE  Add RAM region from BASE to BASE+SIZE-1.      [no]
                             other options:
                                read-only      Make memory read-only
@@ -335,6 +338,7 @@ $second_section = "# second section
 set cpu step-insn-count $cpu_insn_count
 set cpu trace-result? $opt_trace_semantics
 set cpu trace-extract? $opt_trace_extract
+set cpu enable-warnings? $opt_enable_warnings
 set host-sched num-clients 10 # large enough?
 set target-sched num-clients 10 # large enough?
 # pin connections

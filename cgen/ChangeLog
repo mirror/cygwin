@@ -1,5 +1,17 @@
 2001-03-24  Ben Elliston  <bje@redhat.com>
 
+	* gas-test.scm (<hw-asm>,test-data): Choose pseudo-random data.
+	(<keyword>,test-data): Likewise.
+	(<hw-address>,test-data): Likewise.
+	(<hw-iaddress>,test-data): Likewise.
+	(-collate-test-set): New function.
+	(build-test-set): Use it.
+	(gen-gas-test): Generate five test cases per instruction.
+	(cgen-allinsn.exp): Include "-*- Tcl -*-" in DejaGNU test file.
+
+	* read.scm: Load "slib/random" if random is not defined.
+	* slib/random.scm: New file.
+
 	* utils.scm: Remove comments about the Hobbit compiler.
 	(copyright-cygnus): Add 2001.
 	(package-cygnus-simulators): Replace "Cygnus" with "Red Hat".

@@ -1,5 +1,5 @@
-; CPU description file generator for the GAS testsuite.
-; Copyright (C) 2000 Red Hat, Inc.
+; CPU description file generator for the GNU assembler testsuite.
+; Copyright (C) 2000, 2001 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -33,37 +33,38 @@
  <hw-asm> 'test-data
  (lambda (self n)
    ; FIXME: floating point support
-   (let ((signed (list 0 1 -1 2 -2))
-	 (unsigned (list 0 1 2 3 4))
-	 (mode (elm-get self 'mode)))
+   (let* ((signed (list 0 1 -1 2 -2))
+	  (unsigned (list 0 1 2 3 4))
+	  (mode (elm-get self 'mode))
+	  (test-cases (if (eq? (mode:class mode) 'UINT) unsigned signed))
+	  (selection (map (lambda (z) (random (length test-cases))) (iota n))))
+     ; FIXME: wider ranges.
      (map number->string
-	  (list-take n
-		     (if (eq? (mode:class mode) 'UINT)
-			 unsigned
-			 signed)))))
+	  (map (lambda (n) (list-ref test-cases n)) selection))))
 )
 
 (method-make!
  <keyword> 'test-data
  (lambda (self n)
-   (let* ((values (elm-get self 'values))
-	  (n (min n (length values))))
-     ; FIXME: Need to handle mach variants.
-     (map car (list-take n values))))
+   (let* ((test-cases (elm-get self 'values))
+	  (selection (map (lambda (z) (random (length test-cases))) (iota n))))
+     (map (lambda (n) (car (list-ref test-cases n))) selection)))
 )
 
 (method-make!
  <hw-address> 'test-data
  (lambda (self n)
-   (let ((test-data '("foodata" "4" "footext" "-4")))
-     (list-take n test-data)))
+   (let* ((test-cases '("foodata" "4" "footext" "-4"))
+	  (selection (map (lambda (z) (random (length test-cases))) (iota n))))
+     (map (lambda (n) (list-ref test-cases n)) selection)))
 )
 
 (method-make!
  <hw-iaddress> 'test-data
  (lambda (self n)
-   (let ((test-data '("footext" "4" "foodata" "-4")))
-     (list-take n test-data)))
+   (let* ((test-cases '("footext" "4" "foodata" "-4"))
+	  (selection (map (lambda (z) (random (length test-cases))) (iota n))))
+     (map (lambda (n) (list-ref test-cases n)) selection)))
 )
 
 (method-make-forward! <hw-register> 'indices '(test-data))
@@ -96,6 +97,18 @@
 	  (else (loop result (cdr l)))))
 )
 
+; Collate a list of operands into a test test.
+; Input is a list of operand lists. Returns a collated set of test
+; inputs. For example:
+; ((r0 r1 r2) (r3 r4 r5) (2 3 8)) => ((r0 r3 2) (r1 r4 3) (r2 r5 8))
+
+(define (-collate-test-set L)
+  (if (=? (length (car L)) 0)
+      '()
+      (cons (map car L)
+	    (-collate-test-set (map cdr L))))
+)
+
 ; Given a list of operands for an instruction, return the test set
 ; (all possible combinations).
 ; N is the number of testcases for each operand.
@@ -104,10 +117,8 @@
 (define (build-test-set op-list n)
   (let ((test-data (map (lambda (op) (operand-test-data op n)) op-list))
 	(len (length op-list)))
-    ; FIXME: Make slicker later.
     (cond ((=? len 0) (list (list)))
-	  ((=? len 1) test-data)
-	  (else (list (map car test-data)))))
+	  (else (-collate-test-set test-data))))
 )
 
 ; Given an assembler expression and a set of operands build a testcase.
@@ -126,7 +137,7 @@
 )
 
 ; Generate the testsuite for INSN.
-; FIXME: This needs to be expanded upon.
+; FIXME: make the number of cases an argument to this application.
 
 (define (gen-gas-test insn)
   (logit 2 "Generating gas test data for " (obj:name insn) " ...\n")
@@ -136,8 +147,7 @@
    (gen-sym insn) ":\n"
    (let* ((syntax-list (insn-tmp insn))
 	  (op-list (extract-operands syntax-list))
-	  (test-set (build-test-set op-list 2)))
-     ;(display test-set) (newline)
+	  (test-set (build-test-set op-list 5)))
      (string-map (lambda (test-data)
 		   (build-asm-testcase syntax-list test-data))
 		 test-set))
@@ -231,7 +241,7 @@ footext:\n"
   (logit 1 "Generating allinsn.exp ...\n")
   (string-append
    "\
-# " (string-upcase (current-arch-name)) " assembler testsuite.
+# " (string-upcase (current-arch-name)) " assembler testsuite. -*- Tcl -*-
 
 if [istarget " (current-arch-name) "*-*-*] {
     run_dump_test \"allinsn\"

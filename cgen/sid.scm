@@ -1966,7 +1966,7 @@
     '(comment "write hardware elements via cover functions/methods"))
 
   ; If there is a .sim file, load it.
-  (let ((sim-file (string-append srcdir "/" (current-arch-name) ".sim")))
+  (let ((sim-file (string-append srcdir "/cpu/" (current-arch-name) ".sim")))
     (if (file-exists? sim-file)
 	(begin
 	  (display (string-append "Loading sim file " sim-file " ...\n"))

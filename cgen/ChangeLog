@@ -4,6 +4,7 @@
 
 	* read.scm (include): Include files from srcdir/cpu.
 	(-cgen): Likewise for loading .cpu files.
+	* sid.scm (sim-finish!): Read .sim files from srcdir/cpu.
 	* *.cpu: Move all cpu descriptions into cpu subdirectory.
 	* *.opc: Likewise.
 	* simplify.inc: Likewise.

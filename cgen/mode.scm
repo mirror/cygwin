@@ -286,6 +286,22 @@
   (mode:lookup (mode-real-name m))
 )
 
+; Return the version of MODE to use in semantic expressions.
+; This (essentially) converts aliases to their real value and then uses
+; mode:sem-mode.  The implementation is the opposite but the effect is the
+; same.
+; ??? Less efficient than it should be.  One improvement would be to
+; disallow unsigned modes from being aliased and set sem-mode for aliased
+; modes.
+
+(define (mode-sem-mode m)
+  (let* ((m1 (mode:lookup m))
+	 (sm (mode:sem-mode m1)))
+    (if sm
+	sm
+	(mode-real-mode m1)))
+)
+
 ; Return #t if mode M1-NAME is bigger than mode M2-NAME.
 
 (define (mode-bigger? m1-name m2-name)

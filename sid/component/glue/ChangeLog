@@ -1,3 +1,8 @@
+2001-03-28  Dave Brolley  <brolley@redhat.com>
+
+	* hw-glue-bus-mux.txt: Update description of switching behavior.
+	* glue.cxx (bus_mux::handle_switch_pin): Call upstream.select_bus.
+
 2001-01-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* glue.cxx (bus_mux): New bus multiplex component accepting

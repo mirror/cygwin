@@ -20,14 +20,18 @@
 
   - Behaviors
     * Initialization
-      At start-up, the single input bus: "upstream" is tied by default
+      At start-up, the single input bus, "upstream", is tied by default
       to "downstream1".
 
     * Switching
-      When the "switch" pin is driven high, the output accessor will
-      be switched from the current output accessor to the one not in use.
+      When the "switch" pin is driven with the value 0, the output accessor
+      will be "downstream1". When the "switch" pin is driven with the value 1,
+      the output accessor will be "downstream2".
       The "switch" pin can be driven any number of times, each time
-      causing the output to be switched.
+      causing the corresponding output to be selected.
+      If the "switch" pin is driven with a value other than 0 or 1, then
+      subsequent accesses to the input bus, "upstream", will return
+      sid::bus::unmapped.
 
     * Bus traffic
       Input to the "upstream" bus is passed on to the current

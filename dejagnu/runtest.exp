@@ -372,6 +372,7 @@ proc usage { } {
     send_user "\t--target \[string\]\tThe canonical config name of the target board\n"
     send_user "\t--debug (-de)\t\tSet expect debugging ON\n"
     send_user "\t--help (-he)\t\tPrint help text\n"
+    send_user "\t--mail \[name(s)\]\tWhom to mail the results to\n"
     send_user "\t--ignore \[name(s)\]\tThe names of specific tests to ignore\n"
     send_user "\t--objdir \[name\]\t\tThe test suite binary directory\n"
     send_user "\t--outdir \[name\]\t\tThe directory to put logs in\n"

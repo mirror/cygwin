@@ -1,5 +1,5 @@
 /*
- *  $Id: _types.h,v 1.1 2005/03/06 20:32:15 jjohnstn Exp $
+ *  $Id: _types.h,v 1.2 2005/03/22 18:12:29 cgf Exp $
  */
 
 #ifndef _MACHINE__TYPES_H
@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 /*
- * Guess on types by examining *_MIN/*_MAX defines.
+ * Guess on types by examining *_MIN / *_MAX defines.
  */
 #if defined(__GNUC__) && (__GNUC__ >= 3 ) \
   && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ > 2 ) 

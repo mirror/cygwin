@@ -1,3 +1,7 @@
+2001-05-03  Keith Seitz  <keiths@cygnus.com>
+
+	* src/tkWarpPointer.c (WarpPointer): Implement for windows.
+
 2001-04-06  Christopher Faylor <cgf@redhat.com>
 
 	* configure.in: Add test for -mwin32 requirement switch when building

@@ -1,5 +1,16 @@
 2000-11-10  Frank Ch. Eigler  <fche@redhat.com>
 
+	* utils-sim.scm (-gen-decode-insn-entry): Add fn? parameter to signal
+	request to emit calls to insn extractors as functions rather than
+	branches to inline blocks.
+	(-gen-decode-expr-set-itype, -gen-decode-expr-entry): Ditto.
+	(-gen-decode-table-entry, -gen-decoder-switch, gen-decoder): Ditto.
+
+	* sim-decode.c (-gen-decode-fn): Tell (gen-decode) to emit branches
+	to extractor clauses.
+
+2000-11-10  Frank Ch. Eigler  <fche@redhat.com>
+
 	* decode.scm (-distinguishing-bit-population): Significantly
 	improve popularity heuristic.  Renamed from
 	(-mask-bit-population): Gone.

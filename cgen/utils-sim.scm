@@ -66,7 +66,6 @@
      ((eq? (hw-index:type indx) 'derived-ifield)
       (ifld-needed-iflds indx))
      (else nil)))
-  ;;;; EUREKA ******
   )
 
 ; Operand extraction (ARGBUF) support code.
@@ -556,11 +555,12 @@
 ; Return code for one insn entry.
 ; REST is the remaining entries.
 
-(define (-gen-decode-insn-entry entry rest indent)
+(define (-gen-decode-insn-entry entry rest indent fn?)
   (assert (eq? 'insn (dtable-entry-type entry)))
   (logit 3 "Generating decode insn entry for " (obj:name (dtable-entry-value entry)) " ...\n")
 
-  (let ((insn (dtable-entry-value entry)))
+  (let* ((insn (dtable-entry-value entry))
+	 (fmt-name (gen-sym (insn-sfmt insn))))
 
     (cond
 
@@ -587,10 +587,9 @@
 		     (gen-cpu-insn-enum (current-cpu) insn)
 		     "; "
 		     (if (with-scache?)
-			 (string-append "goto "
-					"extract_"
-					(gen-sym (insn-sfmt insn))
-					";\n")
+			 (if fn?
+			     (string-append "@prefix@_extract_" fmt-name " (this, current_cpu, pc, base_insn, entire_insn);  goto done;\n")
+			     (string-append "goto extract_" fmt-name ";"))
 			 "goto done;\n")))))
 )
 
@@ -682,17 +681,16 @@
 ; Subroutine of -gen-decode-expr-entry.
 ; Return code to set `itype' and branch to the extraction phase.
 
-(define (-gen-decode-expr-set-itype indent insn-enum fmt-name)
+(define (-gen-decode-expr-set-itype indent insn-enum fmt-name fn?)
   (string-append
    indent
    "{ itype = "
    insn-enum
    "; "
    (if (with-scache?)
-       (string-append "goto "
-		      "extract_"
-		      fmt-name
-		      ";")
+       (if fn?
+	   (string-append "@prefix@_extract_" fmt-name " (this, current_cpu, pc, base_insn, entire_insn);  goto done;")
+	   (string-append "goto extract_" fmt-name ";"))
        "goto done;")
    " }\n"
    )
@@ -701,7 +699,7 @@
 ; Generate code to decode the expression table in ENTRY.
 ; INVALID-INSN is the <insn> object of the pseudo insn to handle invalid ones.
 
-(define (-gen-decode-expr-entry entry indent invalid-insn)
+(define (-gen-decode-expr-entry entry indent invalid-insn fn?)
   (assert (eq? 'expr (dtable-entry-type entry)))
   (logit 3 "Generating decode expr entry for " (exprtable-name (dtable-entry-value entry)) " ...\n")
 
@@ -728,7 +726,8 @@
 			   (-gen-decode-expr-set-itype
 			    indent
 			    (gen-cpu-insn-enum (current-cpu) invalid-insn)
-			    "sfmt_empty"))))
+			    "sfmt_empty"
+			    fn?))))
 
 	     ; Not all done, process next expr.
 
@@ -753,7 +752,8 @@
 			   (-gen-decode-expr-set-itype
 			    indent
 			    (gen-cpu-insn-enum (current-cpu) insn)
-			    (gen-sym (insn-sfmt insn))))
+			    (gen-sym (insn-sfmt insn))
+			    fn?))
 
 			  ; We don't use up all ifield values, so emit a test.
 			   (let ((iflds (map current-ifld-lookup ifld-names)))
@@ -773,7 +773,8 @@
 			      (-gen-decode-expr-set-itype
 			       (string-append indent "    ")
 			       (gen-cpu-insn-enum (current-cpu) insn)
-			       (gen-sym (insn-sfmt insn)))
+			       (gen-sym (insn-sfmt insn))
+			       fn?)
 			      indent "}\n")))))
 
 		 (loop (cdr expr-list)
@@ -786,7 +787,7 @@
 ; SWITCH-NUM, STARTBIT, DECODE-BITSIZE, INDENT, LSB0?, INVALID-INSN are same
 ; as for -gen-decoder-switch.
 
-(define (-gen-decode-table-entry table rest switch-num startbit decode-bitsize indent lsb0? invalid-insn)
+(define (-gen-decode-table-entry table rest switch-num startbit decode-bitsize indent lsb0? invalid-insn fn?)
   (assert (eq? 'table (dtable-entry-type table)))
   (logit 3 "Generating decode table entry for case " (dtable-entry-index table) " ...\n")
 
@@ -811,7 +812,8 @@
 			     (subdtable-table (dtable-entry-value table))
 			     (string-append indent "    ")
 			     lsb0?
-			     invalid-insn))))
+			     invalid-insn
+			     fn?))))
 )
 
 ; Subroutine of -decode-sort-entries.
@@ -879,6 +881,7 @@
 ; DECODE-BITSIZE is the number of bits of the insn that `insn' holds.
 ; LSB0? is non-#f if bit number 0 is the least significant bit.
 ; INVALID-INSN is the <insn> object of the pseudo insn to handle invalid ones.
+
 ; FIXME: for the few-alternative case (say, 2), generating
 ; if (0) {}
 ; else if (val == 0) { ... }
@@ -886,8 +889,7 @@
 ; else {}
 ; may well be less stressful on the compiler to optimize than small switch() stmts.
 
-
-(define (-gen-decoder-switch switch-num startbit decode-bitsize table-guts indent lsb0? invalid-insn)
+(define (-gen-decoder-switch switch-num startbit decode-bitsize table-guts indent lsb0? invalid-insn fn?)
   ; For entries that are a single insn, we're done, otherwise recurse.
 
   (string-list
@@ -926,13 +928,13 @@
 	  (cdr entries)
 	  (cons (case (dtable-entry-type (car entries))
 		  ((insn)
-		   (-gen-decode-insn-entry (car entries) (cdr entries) indent))
+		   (-gen-decode-insn-entry (car entries) (cdr entries) indent fn?))
 		  ((expr)
-		   (-gen-decode-expr-entry (car entries) indent invalid-insn))
+		   (-gen-decode-expr-entry (car entries) indent invalid-insn fn?))
 		  ((table)
 		   (-gen-decode-table-entry (car entries) (cdr entries)
 					    switch-num startbit decode-bitsize
-					    indent lsb0? invalid-insn))
+					    indent lsb0? invalid-insn fn?))
 		  )
 		result))))
 
@@ -941,7 +943,9 @@
    (gen-cpu-insn-enum (current-cpu) invalid-insn)
    ";"
    (if (with-scache?)
-       " goto extract_sfmt_empty;\n"
+       (if fn?
+	   " @prefix@_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;\n"
+	   " goto extract_sfmt_empty;\n")
        " goto done;\n")
    indent "  }\n"
    indent "}\n"
@@ -954,12 +958,14 @@
 ; DECODE-BITSIZE is the number of bits of the instruction that `insn' holds.
 ; LSB0? is non-#f if bit number 0 is the least significant bit.
 ; INVALID-INSN is the <insn> object of the pseudo insn to handle invalid ones.
+; FN? is non-#f if the extractors are functions rather than inline code
 
-(define (gen-decoder insn-list bitnums decode-bitsize indent lsb0? invalid-insn)
+(define (gen-decoder insn-list bitnums decode-bitsize indent lsb0? invalid-insn fn?)
   (logit 3 "Building decode tree.\n"
 	 "bitnums = " (stringize bitnums " ") "\n"
 	 "decode-bitsize = " (number->string decode-bitsize) "\n"
 	 "lsb0? = " (if lsb0? "#t" "#f") "\n"
+	 "fn? = " (if fn? "#t" "#f") "\n"
 	 )
 
   ; First build a table that decodes the instruction set.
@@ -971,6 +977,6 @@
     ; Now print it out.
 
     (-gen-decoder-switch "0" 0 decode-bitsize table-guts indent lsb0?
-			 invalid-insn)
+			 invalid-insn fn?)
     )
 )

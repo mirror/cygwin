@@ -193,6 +193,13 @@ Functionality:
    |                |to the target program's address     |
    |                |space, and is used by gdb to access |
    |                |target memory.                      |
+   |                |                                    |
+   |                |The gdb-breakpoint-big and          |
+   |                |gdb-breakpoint-little attributes, if|
+   |                |present, are used as memory images  |
+   |                |of software breakpoint instructions |
+   |                |for the appropriate run-time        |
+   |                |endianness mode.                    |
    +-----------------------------------------------------+
 
    +-------------------------------------------------+
@@ -270,54 +277,58 @@ Component Reference:
    |              |           |          | access    |
    +-------------------------------------------------+
 
-   +---------------------------------------------------------------------------+
-   |                                attributes                                 |
-   |---------------------------------------------------------------------------|
-   |      name       |category |     legal values     |default|   behaviors   ||
-   |                 |         |                      | value |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |endian           |register |'1'/'big'/'2'/'little'|big    |initialization,||
-   |                 |         |                      |       |register access||
-   |-----------------+---------+----------------------+-------+---------------||
-   |trace-extract?   |setting  |boolean               |false  |tracing        ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |trace-filename   |setting  |string                |-      |tracing        ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |trace-result?    |setting  |boolean               |false  |tracing        ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |engine-type      |setting  |scache or pbb         |pbb    |execution      ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |insn-count       |watchable|number                |-      |execution      ||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |step-insn-count  |setting  |number                |1      |execution      ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |enable-step-trap?|setting  |boolean               |false  |execution      ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |rN               |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |pc               |watchable|number                |-      |register access||
-   |                 |register |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |gdb-register-N   |debugger |byte array            |-      |register access||
-   |-----------------+---------+----------------------+-------+---------------||
-   |gdb-num-registers|debugger |number                |-      |register access||
-   |-----------------+---------+----------------------+-------+---------------||
-   |gdb-exp-registers|debugger |number list           |-      |register access||
-   |-----------------+---------+----------------------+-------+---------------||
-   |state-snapshot   |-        |opaque string         |-      |state          ||
-   |                 |         |                      |       |save/restore   ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |step-cycles      |watchable|number                |-      |execution      ||
-   |                 |pin      |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |trap             |watchable|number                |-      |execution/traps||
-   |                 |pin      |                      |       |               ||
-   |-----------------+---------+----------------------+-------+---------------||
-   |trap-code        |watchable|number                |-      |execution/traps||
-   |                 |pin      |                      |       |               ||
-   +---------------------------------------------------------------------------+
++-------------------------------------------------------------------------------+
+|                                  attributes                                   |
+|-------------------------------------------------------------------------------|
+|        name         |category |     legal values     |default|   behaviors   ||
+|                     |         |                      | value |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|endian               |register |'1'/'big'/'2'/'little'|big    |initialization,||
+|                     |         |                      |       |register access||
+|---------------------+---------+----------------------+-------+---------------||
+|trace-extract?       |setting  |boolean               |false  |tracing        ||
+|---------------------+---------+----------------------+-------+---------------||
+|trace-filename       |setting  |string                |-      |tracing        ||
+|---------------------+---------+----------------------+-------+---------------||
+|trace-result?        |setting  |boolean               |false  |tracing        ||
+|---------------------+---------+----------------------+-------+---------------||
+|engine-type          |setting  |scache or pbb         |pbb    |execution      ||
+|---------------------+---------+----------------------+-------+---------------||
+|insn-count           |watchable|number                |-      |execution      ||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|step-insn-count      |setting  |number                |1      |execution      ||
+|---------------------+---------+----------------------+-------+---------------||
+|enable-step-trap?    |setting  |boolean               |false  |execution      ||
+|---------------------+---------+----------------------+-------+---------------||
+|rN                   |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|pc                   |watchable|number                |-      |register access||
+|                     |register |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|gdb-register-N       |debugger |byte array            |-      |register access||
+|---------------------+---------+----------------------+-------+---------------||
+|gdb-num-registers    |debugger |number                |-      |register access||
+|---------------------+---------+----------------------+-------+---------------||
+|gdb-exp-registers    |debugger |number list           |-      |register access||
+|---------------------+---------+----------------------+-------+---------------||
+|gdb-breakpoint-big   |debugger |byte array            |-      |register access||
+|---------------------+---------+----------------------+-------+---------------||
+|gdb-breakpoint-little|debugger |byte array            |-      |register access||
+|---------------------+---------+----------------------+-------+---------------||
+|state-snapshot       |-        |opaque string         |-      |state          ||
+|                     |         |                      |       |save/restore   ||
+|---------------------+---------+----------------------+-------+---------------||
+|step-cycles          |watchable|number                |-      |execution      ||
+|                     |pin      |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|trap                 |watchable|number                |-      |execution/traps||
+|                     |pin      |                      |       |               ||
+|---------------------+---------+----------------------+-------+---------------||
+|trap-code            |watchable|number                |-      |execution/traps||
+|                     |pin      |                      |       |               ||
++-------------------------------------------------------------------------------+
 
    +-------------------------------------------------+
    |                    accessors                    |

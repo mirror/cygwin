@@ -1,7 +1,7 @@
 // m32rbf.cxx - Implementations of hand-written functions for the M32R
 // simulator. -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999-2002 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -35,6 +35,8 @@ m32rbf_cpu::m32rbf_cpu ():
   // XXX: add h_cr also!
 
   this->create_gdb_register_attrs (24, "", & this->hardware.h_pc);
+  this->add_attribute_ro_value ("gdb-breakpoint-big", 
+				string("\x10\xF1"));   // TRAP #1
 }
 
 

@@ -1,3 +1,8 @@
+2003-03-14  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cpu/iq2000.opc (parse_jtargq10): Add ATTRIBUTE_UNUSED on unused args.
+	(parse_jtargq10, iq2000_cgen_isa_register, parse_mlo16): Declare.
+
 2004-03-30  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
 
 	* cpu/m32r.opc (parse_hi16): Fixed shigh(0xffff8000) bug.

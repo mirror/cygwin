@@ -15,7 +15,7 @@ AC_LANG_CPLUSPLUS
 AC_HEADER_STDC
 
 dnl SID compile time requirements
-AC_CHECK_HEADERS(sstream strstream.h ext/hash_map hash_map)
+AC_CHECK_HEADERS(sstream strstream.h)
 AC_CHECK_FUNCS(strerror)
 
 dnl debugging functions
@@ -44,7 +44,7 @@ if test "${sid_cv_cctype_std}" = "yes"; then
 	AC_DEFINE(STD_CCTYPE, 1, [Define if std:: prefix works for <cctype> functions])
 fi
 AC_MSG_RESULT([$sid_cv_cctype_std])
-		
+
 AC_MSG_CHECKING([whether __builtin_expect is supported])
 AC_CACHE_VAL(sid_cv_builtin_expect,
 	AC_TRY_COMPILE([],[

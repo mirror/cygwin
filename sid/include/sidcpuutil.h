@@ -226,11 +226,7 @@ namespace sidutil
 	std::ofstream::open (filename.c_str (), std::ios::app);
 	cout_p = false;
       }
-    private:
       bool cout_p;
-
-      template <typename T> friend
-      basic_cpu::cpu_trace_stream& operator<< (basic_cpu::cpu_trace_stream& s, T t);
     };
 
     template <typename T> friend

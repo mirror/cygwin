@@ -69,7 +69,6 @@ namespace profiling_components
   using sidutil::endian_little;
 
   using std::map;
-  using std::hash_map;
   using std::vector;
   using std::string;
   using std::ofstream;
@@ -93,21 +92,8 @@ namespace profiling_components
 			 protected fixed_relation_map_component,
 			 protected no_bus_component
   {
-#ifdef HAVE_HASHING
-    struct hash_cg_pair
-    {
-      size_t operator () (const pair<host_int_4,host_int_4>& s) const
-      {
-	return (s.first << 1) ^ s.second;
-      }
-    };
-
-    typedef hash_map<host_int_4,host_int_4> hitcount_map_t;
-    typedef hash_map<pair<host_int_4,host_int_4>,host_int_4,hash_cg_pair> cg_count_map_t;
-#else
     typedef map<host_int_4,host_int_4> hitcount_map_t;
     typedef map<pair<host_int_4,host_int_4>,host_int_4> cg_count_map_t;
-#endif
     
     // statistics
     hitcount_map_t value_hitcount_map;

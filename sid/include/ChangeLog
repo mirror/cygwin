@@ -1,3 +1,13 @@
+2002-11-22  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidattrutil.h: Give up on hash tables - too many incompatible
+	libstdc++'s out there.
+	* configure.in: Don't bother looking for hash stuff.
+	* configure, sidconfutil.in: Regenerated.
+	* sidmiscutil.h: Add some "typename" qualifiers.
+	* sidcpuutil.h (cpu_trace_stream): Trade publicness for friendliness
+	regarding cout_p.
+
 2002-11-11  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidcpuutil.h (cpu_trace_stream): Add some std:: qualifiers.

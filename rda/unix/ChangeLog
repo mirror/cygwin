@@ -1,6 +1,6 @@
 2005-02-08  Kevin Buettner  <kevinb@redhat.com
 
-	* td_thr_tls_get_addr_p): New static global.
+	* thread-db.c (td_thr_tls_get_addr_p): New static global.
 	(thread_db_dlopen): Initialize ``td_thr_tls_get_addr_p''.
 	(thread_db_get_gen): Add support for qGetTLSAddr packet.
 

@@ -168,6 +168,8 @@ private:
   status set_hash_mask (const string& ignore);
   string get_hash_shift ();
   status set_hash_shift (const string& ignore);
+  string get_refill_latency ();
+  status set_refill_latency (const string& ignore);
 
   unsigned line_offset (const cache_line& line, const host_int_4& addr); 
 
@@ -198,6 +200,7 @@ private:
   host_int_2 hit_latency;
   host_int_2 miss_latency;
   host_int_2 refill_latency;
+  bool refill_latency_specified;
 };
 
 template <typename DataType>

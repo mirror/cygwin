@@ -72,7 +72,8 @@ cache_component::cache_component (unsigned assocy,
    assoc (assocy),
    hit_latency (0),
    miss_latency (0),
-   refill_latency (0)
+   refill_latency (0),
+   refill_latency_specified (false)
 {
   memset (&stats, 0, sizeof (stats));
 
@@ -139,10 +140,16 @@ cache_component::cache_component (unsigned assocy,
 
   add_attribute ("hit-latency", &hit_latency, "setting");
   add_attribute ("miss-latency", &miss_latency, "setting");
-  add_attribute ("refill-latency", &refill_latency, "setting");
+
+  add_attribute_virtual ("refill-latency", this,
+			 &cache_component::get_refill_latency,
+			 &cache_component::set_refill_latency,
+			 "setting");
 
   // FIXME: state save/restore
 }
+
+
 
 
 // dummy dtor
@@ -342,7 +349,12 @@ cache_component::read_line (cache_line& line)
   line.unlock ();
   line.clean ();
   line.validate ();
-  st.latency = refill_latency + overall_latency;
+
+  if (refill_latency_specified)
+    st.latency = refill_latency;
+  else
+    st.latency = overall_latency;
+
   return st;
 }
 
@@ -527,6 +539,21 @@ cache_component::set_hash_mask (const string& value)
     return sid::component::bad_value;
 
   acache.hash_params.mask = mask;
+  return sid::component::ok;
+}
+
+string
+cache_component::get_refill_latency ()
+{
+  return make_attribute (refill_latency);
+}
+
+sid::component::status
+cache_component::set_refill_latency (const string& value)
+{
+  if (parse_attribute (value, refill_latency) != sid::component::ok)
+    return sid::component::bad_value;
+  refill_latency_specified = true;
   return sid::component::ok;
 }
 

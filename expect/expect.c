@@ -45,14 +45,6 @@ would appreciate credit if this program or parts of it are used.
 #include "Dbg.h"
 #endif
 
-/* CYGNUS LOCAL: dj/expect */
-#if defined(__CYGWIN__) || defined(__CYGWIN32__)
-/* Hack.  expect is a mongrel win32/cygwin app, so we can't rely on tcl to
-   properly poll our descriptors.  This define lets timeouts work. */
-#define SIMPLE_EVENT
-#endif
-/* END CYGNUS LOCAL: dj/expect */
-
 /* initial length of strings that we can guarantee patterns can match */
 int exp_default_match_max =	2000;
 #define INIT_EXPECT_TIMEOUT_LIT	"10"	/* seconds */

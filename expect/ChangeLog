@@ -1,3 +1,10 @@
+Tue Sep 11 15:24:00 2001  Christopher Faylor <cgf@cygnus.com>
+
+	Remove unneeded CYGWIN code throughout.
+	Change CYGWIN32 to CYGWIN throughout.
+	* configure.in: Use gcc -mno-win32 option under Cygwin.
+	* configure: Regenerate.
+
 2001-07-09  Ian Roxborough  <irox@redhat.com>
 
 	* tclParse-compat.c: New file.

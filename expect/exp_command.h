@@ -194,12 +194,6 @@ struct exp_f {
 	 */
 #endif /* TCL_MAJOR_VERSION < 8 */
 
-#ifdef __CYGWIN32__
-        Tcl_Channel channel;    /* cygwin32 channel */
-        Tcl_FileProc *fileproc; /* Tcl_CreateFileHandler proc */
-        ClientData procdata;    /* Tcl_CreateFileHandler data */
-#endif
-  
 	int slave_fd;	/* slave fd if "spawn -pty" used */
 #ifdef HAVE_PTYTRAP
 	char *slave_name;/* Full name of slave, i.e., /dev/ttyp0 */

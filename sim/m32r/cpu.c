@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
+Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 
 This file is part of the GNU Simulators.
 
@@ -26,6 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define WANT_CPU_M32RBF
 
 #include "sim-main.h"
+#include "cgen-ops.h"
 
 /* Get the value of h-pc.  */
 
@@ -89,22 +90,6 @@ void
 m32rbf_h_accum_set (SIM_CPU *current_cpu, DI newval)
 {
   SET_H_ACCUM (newval);
-}
-
-/* Get the value of h-accums.  */
-
-DI
-m32rbf_h_accums_get (SIM_CPU *current_cpu, UINT regno)
-{
-  return GET_H_ACCUMS (regno);
-}
-
-/* Set a value for h-accums.  */
-
-void
-m32rbf_h_accums_set (SIM_CPU *current_cpu, UINT regno, DI newval)
-{
-  SET_H_ACCUMS (regno, newval);
 }
 
 /* Get the value of h-cond.  */

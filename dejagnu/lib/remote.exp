@@ -1057,7 +1057,7 @@ proc check_for_board_status  { variable } {
     if [regexp "(^|\[\r\n\])\\*\\*\\* EXIT code" $output] {
 	regsub "^.*\\*\\*\\* EXIT code " $output "" result;
 	regsub "\[\r\n\].*$" $result "" result;
-	regsub -all "(^|\[\r\n\])\\*\\*\\* EXIT code \[^\r\n\]*(\[\r\n\]\[\r\n\]?|$)" $output "" output;
+	regsub -all "(^|\r?\n)\\*\\*\\* EXIT code \[^\r\n\]*(\r?\n|$)" $output "" output;
 	regsub "^\[^0-9\]*" $result "" result
 	regsub "\[^0-9\]*$" $result "" result
 	verbose "got board status $result" 3

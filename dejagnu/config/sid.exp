@@ -16,6 +16,19 @@ set_board_info needs_status_wrapper  1
 set_board_info gdb,nosignals 1
 set_board_info gdb,noresults 1
 
+# Don't expect interrupts to work in gdb testsuite
+proc set_host_info { entry value } {
+    global target_info board_info
+    verbose "set_host_info $entry $value" 3
+
+    set machine host
+    if [info exists target_info($machine,name)] {
+        set machine $target_info($machine,name);
+    }
+    set board_info($machine,$entry) $value
+}
+set_host_info gdb,nointerrupts 1
+
 # Cannot pass command line arguments
 set_board_info noargs 1
 

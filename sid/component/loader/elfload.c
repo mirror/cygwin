@@ -1,6 +1,6 @@
 /* Simple ELF loader
  *
- * Copyright (c) 1998 Red Hat
+ * Copyright (c) 1998, 2002 Red Hat
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided

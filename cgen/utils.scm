@@ -60,7 +60,10 @@
   (lambda args
     (for-each (lambda (str)
 		(if (pair? str)
-		    (apply message str)
+		    (begin 
+		      (message "(")
+		      (for-each (lambda (s) (message s " ")) str)
+		      (message ")"))
 		    (display str (current-error-port))))
 	      args))
 )

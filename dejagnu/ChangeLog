@@ -1,3 +1,8 @@
+2001-08-24  Frank Ch. Eigler  <fche@redhat.com>
+
+	* baseboards/basic-sid.exp (find_sid_conf): Tolerate not finding
+	path to pregen configuration file.
+
 2001-07-17  Jason Merrill  <jason_merrill@redhat.com>
 
 	* lib/utils.exp (runtest_file_p): An argument can match trailing

@@ -197,9 +197,9 @@ operator >> (istream& i, target_time_keeper& it)
   {
   protected:
     unsigned long num_yields;
-    float total_yield_time;
+    tick_t total_yield_time;
     unsigned long num_sleeping_yields;
-    float total_sleep_time;
+    tick_t total_sleep_time;
     float drowsiness; // the amount by which select/usleep tend to oversleep
 
   public:
@@ -210,9 +210,9 @@ operator >> (istream& i, target_time_keeper& it)
       {
 	this->drowsiness = 0.0;
 	this->num_yields = 0;
-	this->total_yield_time = 0.0;
+	this->total_yield_time = 0;
 	this->num_sleeping_yields = 0;
-	this->total_sleep_time = 0.0;
+	this->total_sleep_time = 0;
 
 #if HAVE_LIBWINMM
 	// On Windows, this call is needed to request that the kernel
@@ -229,71 +229,77 @@ operator >> (istream& i, target_time_keeper& it)
 #endif
     }
 
-
     // Put the process to sleep until `then'.
-    void yield(tick_t then)
-      {
-	tick_t n;
-	this->system_now (n);
+    void yield(tick_t then);
+  };
 
-	if (then < n) then = n;
 
-	// NB: Since we've been asked to yield, let's do so,
-	// even if then == n.
 
-	this->num_yields ++;
-	this->total_yield_time += (then - n);
+// Put the process to sleep until `then'.
+void host_time_keeper_base::yield(tick_t then)
+{
+  tick_t n;
+  this->system_now (n);
 
-	// compensate for drowsiness
-	tick_t drowsiness_int = (tick_t) drowsiness;
+  if (then < n) then = n;
 
-	if ((then - n) <= drowsiness_int)
-	  {
-	    // usleep is deemed too drowsy .. but we can do a plain process
-	    // yield anyway
+  // NB: Since we've been asked to yield, let's do so,
+  // even if then == n.
+
+  this->num_yields ++;
+  this->total_yield_time += (then - n);
+
+  // compensate for drowsiness
+  tick_t drowsiness_int = (tick_t) drowsiness;
+
+  if ((then - n) <= drowsiness_int)
+    {
+      // usleep is deemed too drowsy .. but we can do a plain process
+      // yield anyway
 #if HAVE_SCHED_YIELD
-	    sched_yield ();
+      sched_yield ();
 #elif __CYGWIN__
-	    Sleep (0);
+      Sleep (0);
 #endif
 
-	    // Decay drowsiness slowly, to prevent a momentary
-	    // high-drowsiness pulse from keeping us from trying 
-            // again.
-	    if (UNLIKELY(((this->num_yields & 0xff) == 0) &&
-			 (this->drowsiness > 3.0)))
-	      this->drowsiness *= 0.5;
+      // Decay drowsiness slowly, to prevent a momentary
+      // high-drowsiness pulse from keeping us from trying 
+      // again.
+      if (UNLIKELY(((this->num_yields & 0xff) == 0) &&
+		   (this->drowsiness > 3.0)))
+	this->drowsiness *= 0.5;
 
-	    return;
-	  }
+      return;
+    }
 
-	unsigned long ms = ((then - n) - drowsiness_int);
-	if (ms > 1000) ms = 1000; // Clamp it
-	unsigned long us = ms * 1000;
+  unsigned long ms = ((then - n) - drowsiness_int);
+  if (ms > 1000) ms = 1000; // Clamp it
+  unsigned long us = ms * 1000;
 	
-	this->num_sleeping_yields ++;
-	this->total_sleep_time += ms;
+  this->num_sleeping_yields ++;
+  this->total_sleep_time += ms;
 	
 #if HAVE_USLEEP
-	usleep (us);
+  usleep (us);
 #else
-	sleep (us / 1000000);
+  sleep (us / 1000000);
 #endif
 	
-	// Help recalibrate the drowsiness measure periodically
-	if (UNLIKELY((this->num_sleeping_yields & 0xf) == 0))
-	  {
-	    tick_t n2;
-	    this->system_now (n2);
+  // Help recalibrate the drowsiness measure periodically
+  if (UNLIKELY((this->num_sleeping_yields & 0xf) == 0))
+    {
+      tick_t n2;
+      this->system_now (n2);
 	    
-	    // Update moving average
-	    this->drowsiness += 0.01 * (n2 - (n + ms));
-            // Clamp it to within reasonable limits
-	    if (this->drowsiness < 0.0) this->drowsiness = 0.0;
-	    if (this->drowsiness > 100.0) this->drowsiness = 100.0;
-	  }
-      }
-  };
+      // Update moving average
+      tick_t drowsiness_error = (n2 - (n + ms));
+      this->drowsiness += 0.01 * drowsiness_error;
+
+      // Clamp it to within reasonable limits
+      if (this->drowsiness < 0.0) this->drowsiness = 0.0;
+      if (this->drowsiness > 100.0) this->drowsiness = 100.0;
+    }
+}
 
 
 void host_time_keeper_base::system_now (tick_t& out) const
@@ -1063,6 +1069,7 @@ public:
   host_int_2 scale_mul, scale_div;  // time-to-ticks conversion factor
   tick_t time;       // time of next event (irregular) or interval (regular)
   bool regular_p;    // regular (vs irregular) event source
+  string name;       // "pretty" name, for use in scheduler GUI
 
   // These are public members for direct pin map twiddlers
   sidutil::output_pin event_pin;
@@ -1389,63 +1396,7 @@ protected:
 
   // Callback for client_list attribute update: grow new client slots
   // or delete superfluous clients.  Leave alone existing clients.
-  void
-  client_num_update()
-    {
-      unsigned last_size = this->clients.size();
-
-      // Drop old entries (if any)
-      // XXX: what about connected pins?
-      for(unsigned n=this->num_clients; n < last_size; n++)
-	{
-	  client_t* c = this->clients[n];
-
-	  string num = sidutil::make_numeric_attribute(n);
-	  this->remove_attribute (num + "-regular?");
-	  this->remove_attribute (num + "-time");
-	  this->remove_attribute (num + "-scale"); 
-	  this->remove_attribute (num + "-event");
-	  this->remove_attribute (num + "-control");
-	  this->remove_pin (num + "-event");
-	  this->remove_pin (num + "-control");
-	  delete c;
-	  this->clients[n] = 0;
-	}
-
-      // Resize array
-      this->clients.resize (this->num_clients);
-
-      // Create new entries (if any)
-      for(unsigned i=last_size; i < this->num_clients; i++)
-	{
-	  client_t* c = new client_t(this);
-
-	  string num = sidutil::make_numeric_attribute (i);
-	  this->add_attribute_notify (num + "-regular?", 
-				      & c->regular_p, c,
-				      & client_t::reset_events,
-				      "setting");
-	  this->add_attribute_notify (num + "-time", 
-				      & c->time, c,
-				      & client_t::reset_events, 
-				      "setting");
-	  this->add_attribute_virtual (num + "-scale", 
-				       c, & client_t::get_scale_attr, & client_t::set_scale_attr,
-				       "setting");
-	  this->add_attribute (num + "-event", & c->event_pin,
-			       "pin");
-	  this->add_attribute (num + "-control", & c->control_pin,
-			       "pin");
-	  this->add_pin (num + "-event", & c->event_pin);
-	  this->add_pin (num + "-control", & c->control_pin);
-
-	  assert (this->clients[i] == 0);
-	  this->clients[i] = c;
-	}
-
-      assert(this->num_clients == this->clients.size());
-    }
-
+  void client_num_update();
 
   // Request any pending generic_scheduler::advance() loop to exit prematurely
   void
@@ -1523,6 +1474,70 @@ scheduler_component<Scheduler>::scheduler_component_ctor_3()
 			 "register");
 }
 
+
+
+// Callback for client_list attribute update: grow new client slots
+// or delete superfluous clients.  Leave alone existing clients.
+template <class Scheduler>
+void
+scheduler_component<Scheduler>::client_num_update ()
+{
+  unsigned last_size = this->clients.size();
+
+  // Drop old entries (if any)
+  // XXX: what about connected pins?
+  for(unsigned n=this->num_clients; n < last_size; n++)
+    {
+      client_t* c = this->clients[n];
+
+      string num = sidutil::make_numeric_attribute(n);
+      this->remove_attribute (num + "-regular?");
+      this->remove_attribute (num + "-time");
+      this->remove_attribute (num + "-scale"); 
+      this->remove_attribute (num + "-name");
+      this->remove_attribute (num + "-event");
+      this->remove_attribute (num + "-control");
+      this->remove_pin (num + "-event");
+      this->remove_pin (num + "-control");
+      delete c;
+      this->clients[n] = 0;
+    }
+
+  // Resize array
+  this->clients.resize (this->num_clients);
+
+  // Create new entries (if any)
+  for(unsigned i=last_size; i < this->num_clients; i++)
+    {
+      client_t* c = new client_t(this);
+
+      string num = sidutil::make_numeric_attribute (i);
+      this->add_attribute_notify (num + "-regular?", 
+				  & c->regular_p, c,
+				  & client_t::reset_events,
+				  "setting");
+      this->add_attribute_notify (num + "-time", 
+				  & c->time, c,
+				  & client_t::reset_events, 
+				  "setting");
+      this->add_attribute_virtual (num + "-scale", 
+				   c, & client_t::get_scale_attr, & client_t::set_scale_attr,
+				   "setting");
+      this->add_attribute (num + "-name", & c->name, 
+			   "setting");
+      this->add_attribute (num + "-event", & c->event_pin,
+			   "pin");
+      this->add_attribute (num + "-control", & c->control_pin,
+			   "pin");
+      this->add_pin (num + "-event", & c->event_pin);
+      this->add_pin (num + "-control", & c->control_pin);
+
+      assert (this->clients[i] == 0);
+      this->clients[i] = c;
+    }
+
+  assert(this->num_clients == this->clients.size());
+}
 
 
 

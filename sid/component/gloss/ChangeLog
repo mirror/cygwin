@@ -1,3 +1,7 @@
+2001-11-30  Frank Ch. Eigler  <fche@redhat.com>
+
+	* gloss.cxx (write): Add missing ios:: namespace prefix.
+
 2001-10-26  Vladimir Makarov  <vmakarov@redhat.com>
 
 	* gloss.h (gloss32::do_sys_unlink): New function.

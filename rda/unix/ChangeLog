@@ -1,5 +1,8 @@
 2004-10-07  Jim Blandy  <jimb@redhat.com>
 
+	* Makefile.am (rda_DEPENDENCIES): Add ../lib/librda.la.
+	* Makefile.in: Regenerated.
+
 	* server.c (main): Check for an error return from
 	gdbsocket_startup.
 

@@ -241,11 +241,15 @@
 ; Return a boolean indicating if two bitranges overlap.
 
 (define (bitrange-overlap? start1 length1 start2 length2 lsb0?)
-  ; ??? lsb0?
-  (let ((end1 (+ start1 length1))
-	(end2 (+ start2 length2)))
-    (not (or (<= end1 start2)
-	     (>= start1 end2))))
+  (if lsb0?
+      (let ((end1 (- start1 length1))
+	    (end2 (- start2 length2)))
+	(and (< end1 start2)
+	     (> start1 end2)))
+      (let ((end1 (+ start1 length1))
+	    (end2 (+ start2 length2)))
+	(and (> end1 start2)
+	     (< start1 end2))))
 )
 
 ; Return a boolean indicating if BITPOS is beyond bitrange START,LEN.

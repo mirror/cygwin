@@ -1,3 +1,7 @@
+Wed Oct 22 19:03:57 UTC 2003  Brendan Conoboy  <blc@redhat.com>
+
+        * lcd-char-display.cxx: Prefix std:: to cout and endl.
+
 2002-11-11  Frank Ch. Eigler  <fche@redhat.com>
 
 	* lcd-char-display.cxx: #include "/usr/include/curses.h" if

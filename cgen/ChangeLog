@@ -1,5 +1,14 @@
 2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
 
+	* sid-cpu.scm (-gen-mach-params): New proc to emit ...CHUNK_BITSIZE...
+	(cgen-desc.h): Call it.
+	* sid-decode.scm (-gen-decode-fn): Use base-insn-bitsize as
+	decode-size.
+	* utils-sim.scm (-gen-decode-insn-entry): For SID only, prepare
+	entire_insn for extraction, if it's shorter than base-insn-bitsize.
+
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
 	* desc-cpu.scm (-gen-mach-table-defns): Emit fourth field: the
 	mach->cpu insn-chunk-bitsize.
 	(-gen-cpu-open): In @arch@_cgen_rebuild_tables, process above new

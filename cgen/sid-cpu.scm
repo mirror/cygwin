@@ -57,6 +57,17 @@
       ))
 )
 
+
+; Emit a macro that specifies the word-bitsize for each machine.
+(define (-gen-mach-params)
+  (string-map (lambda (mach) 
+		(string-append
+		 "#define MACH_" (string-upcase (gen-sym mach)) "_INSN_CHUNK_BITSIZE "
+		 (number->string (cpu-insn-chunk-bitsize (mach-cpu mach))) "\n"))
+	      (current-mach-list))
+)
+
+
 ; Generate <cpu>-desc.h.
 
 (define (cgen-desc.h)
@@ -77,6 +88,7 @@ namespace @arch@ {
 
    -gen-attr-decls
    -gen-insn-attr-decls
+   -gen-mach-params
 
    "
 } // end @arch@ namespace

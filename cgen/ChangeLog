@@ -1,3 +1,14 @@
+2005-02-23  Nick Clifton  <nickc@redhat.com>
+
+	* opcodes.scm (gen-parse-number): Add a cast to the desired
+	pointer signed'ness in order to prevent compile time warnings.
+	* cpu/ip2k.opc: Fixed compile time warnings about differing
+	signed'ness of pointers passed to functions.
+	* cpu/iq2000.opc: Likewise.
+	* cpu/m32r.opc: Likewise.
+	* cpu/openrisc.opc: Likewise.
+	* cpu/xstormy16.opc: Likewise.
+
 2005-02-22  Alan Modra  <amodra@bigpond.net.au>
 
 	* desc-cpu.scm (gen-ifld-decls): Move cgen_ifld_table from here..

@@ -1,5 +1,5 @@
 /* IQ2000 opcode support.  -*- C -*-
-   Copyright (C) 1996, 1997, 1998, 2001, 2002 Red Hat Inc.
+   Copyright (C) 1996, 1997, 1998, 2001, 2002, 2005 Red Hat Inc.
    This file is part of CGEN.  */
 
 /* This file is an addendum to iq2000.cpu.  Heavy use of C code isn't
@@ -40,11 +40,11 @@ extern int iq2000_cgen_insn_supported (CGEN_CPU_DESC cd, const CGEN_INSN *insn);
 
 static int iq2000_cgen_isa_register PARAMS ((const char **));
 static const char * parse_jtargq10 PARAMS ((CGEN_CPU_DESC, const char **, int, int, enum cgen_parse_operand_result *, bfd_vma *));
-static const char * parse_mimm PARAMS ((CGEN_CPU_DESC, const char **, int, long *));
+static const char * parse_mimm PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
 static const char * parse_imm  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
 static const char * parse_hi16 PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
-static const char * parse_lo16 PARAMS ((CGEN_CPU_DESC, const char **, int, long *));
-static const char * parse_mlo16 PARAMS ((CGEN_CPU_DESC, const char **, int, long *));
+static const char * parse_lo16 PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
+static const char * parse_mlo16 PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
 
 /* Special check to ensure that instruction exists for given machine */
 int
@@ -93,11 +93,11 @@ parse_mimm (cd, strp, opindex, valuep)
      CGEN_CPU_DESC cd;
      const char **strp;
      int opindex;
-     long *valuep;
+     unsigned long *valuep;
 {
   const char *errmsg;
 
-  /* Verify this isn't a register */
+  /* Verify this isn't a register.  */
   if (iq2000_cgen_isa_register (strp))
     errmsg = _("immediate value cannot be register");
   else
@@ -108,6 +108,7 @@ parse_mimm (cd, strp, opindex, valuep)
       if (errmsg == NULL)
 	{
 	  long x = (-value) & 0xFFFF0000;
+
 	  if (x != 0 && x != (long) 0xFFFF0000)
 	    errmsg = _("immediate value out of range");
 	  else
@@ -248,7 +249,7 @@ parse_lo16 (cd, strp, opindex, valuep)
      CGEN_CPU_DESC cd;
      const char **strp;
      int opindex;
-     long *valuep;
+     unsigned long *valuep;
 {
   if (strncasecmp (*strp, "%lo(", 4) == 0)
     {
@@ -281,7 +282,7 @@ parse_mlo16 (cd, strp, opindex, valuep)
      CGEN_CPU_DESC cd;
      const char **strp;
      int opindex;
-     long *valuep;
+     unsigned long *valuep;
 {
   if (strncasecmp (*strp, "%lo(", 4) == 0)
     {

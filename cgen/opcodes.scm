@@ -1,5 +1,5 @@
 ; General cpu info generator support.
-; Copyright (C) 2000, 2002 Red Hat, Inc.
+; Copyright (C) 2000, 2002, 2005 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Global state variables.
@@ -334,8 +334,15 @@
 		      (obj:name mode)))))
    " (cd, strp, "
    op-enum
-   ", &" result-var-name
-   ");\n"
+   ", "
+   ; This is to pacify gcc 4.x which will complain about
+   ; incorrect signed-ness of pointers passed to functions.
+   (case (obj:name mode)
+	 ((QI HI SI INT) "(long *)")
+	 ((BI UQI UHI USI UINT) "(unsigned long *)")
+   )
+   " (& " result-var-name
+   "));\n"
    )
 )
 

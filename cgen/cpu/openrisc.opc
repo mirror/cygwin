@@ -1,5 +1,5 @@
 /* OpenRISC opcode support.  -*- C -*-
-   Copyright (C) 2000, 2001, 2003 Free Software Foundation
+   Copyright (C) 2000, 2001, 2003, 2005 Free Software Foundation
    Based upon work by Red Hat, Inc.
    This file is part of CGEN.  */
 
@@ -36,9 +36,9 @@ extern long openrisc_sign_extend_16bit PARAMS ((long));
 #define CGEN_VERBOSE_ASSEMBLER_ERRORS
 
 static const char * parse_hi16
-  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
+  PARAMS ((CGEN_CPU_DESC, const char **, int, long *));
 static const char * parse_lo16
-  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
+  PARAMS ((CGEN_CPU_DESC, const char **, int, long *));
 
 long
 openrisc_sign_extend_16bit (value)
@@ -54,7 +54,7 @@ parse_hi16 (cd, strp, opindex, valuep)
      CGEN_CPU_DESC cd;
      const char **strp;
      int opindex;
-     unsigned long *valuep;
+     long *valuep;
 {
   const char *errmsg;
   enum cgen_parse_operand_result result_type;
@@ -68,13 +68,7 @@ parse_hi16 (cd, strp, opindex, valuep)
       bfd_vma value;
 
       *strp += 3;
-#if 0
-      errmsg = cgen_parse_signed_integer (cd, strp, opindex, valuep);
-      if (errmsg != NULL)
-        fprintf (stderr, "parse_hi: %s\n", errmsg);
-      if (errmsg != NULL)
-#endif
-        errmsg = cgen_parse_address (cd, strp, opindex, BFD_RELOC_HI16,
+      errmsg = cgen_parse_address (cd, strp, opindex, BFD_RELOC_HI16,
                                      &result_type, &value);
       if (**strp != ')')
         return _("missing `)'");
@@ -90,12 +84,14 @@ parse_hi16 (cd, strp, opindex, valuep)
       if (**strp == '-')
 	{
 	  long value;
+
 	  errmsg = cgen_parse_signed_integer (cd, strp, opindex, &value);
 	  ret = value;
 	}
       else
 	{
 	  unsigned long value;
+
 	  errmsg = cgen_parse_unsigned_integer (cd, strp, opindex, &value);
 	  ret = value;
 	}
@@ -112,7 +108,7 @@ parse_lo16 (cd, strp, opindex, valuep)
      CGEN_CPU_DESC cd;
      const char **strp;
      int opindex;
-     unsigned long *valuep;
+     long *valuep;
 {
   const char *errmsg;
   enum cgen_parse_operand_result result_type;
@@ -126,15 +122,8 @@ parse_lo16 (cd, strp, opindex, valuep)
       bfd_vma value;
 
       *strp += 3;
-#if 0 
-      errmsg = cgen_parse_signed_integer (cd, strp, opindex, valuep);
-      if (errmsg != NULL)
-        fprintf (stderr, "parse_lo: %s\n", errmsg);
-
-      if (errmsg != NULL)
-#endif
-        errmsg = cgen_parse_address (cd, strp, opindex, BFD_RELOC_LO16,
-                                     &result_type, &value);
+      errmsg = cgen_parse_address (cd, strp, opindex, BFD_RELOC_LO16,
+				   &result_type, &value);
       if (**strp != ')')
         return _("missing `)'");
 
@@ -146,12 +135,14 @@ parse_lo16 (cd, strp, opindex, valuep)
       if (**strp == '-')
 	{
 	  long value;
+
 	  errmsg = cgen_parse_signed_integer (cd, strp, opindex, &value);
 	  ret = value;
 	}
       else
 	{
 	  unsigned long value;
+
 	  errmsg = cgen_parse_unsigned_integer (cd, strp, opindex, &value);
 	  ret = value;
 	}

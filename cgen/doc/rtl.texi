@@ -556,6 +556,7 @@ The syntax of @code{define-cpu} is:
   (data-endian big|little|either)
   (float-endian big|little|either)
   (word-bitsize n)
+  (insn-chunk-bitsize n)
   (parallel-insns n)
   (file-transform transformation)
 )
@@ -586,6 +587,12 @@ by the @file{.cpu} file reader, but not all are supported internally.
 @subsubsection word-bitsize
 
 The number of bits in a word.  In GCC, this is @code{BITS_PER_WORD}.
+
+@subsubsection insn-chunk-bitsize
+
+The number of bits in an instruction word chunk, for purposes of
+per-chunk endianness conversion.  The default is zero, meaning
+no chunking is required.
 
 @subsubsection parallel-insns
 

@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
+Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 
 This file is part of the GNU Simulators.
 
@@ -27,32 +27,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #define TARGET_BIG_ENDIAN 1
 
-/* Cover fns for register access.  */
-USI a_m32r_h_pc_get (SIM_CPU *);
-void a_m32r_h_pc_set (SIM_CPU *, USI);
-SI a_m32r_h_gr_get (SIM_CPU *, UINT);
-void a_m32r_h_gr_set (SIM_CPU *, UINT, SI);
-USI a_m32r_h_cr_get (SIM_CPU *, UINT);
-void a_m32r_h_cr_set (SIM_CPU *, UINT, USI);
-DI a_m32r_h_accum_get (SIM_CPU *);
-void a_m32r_h_accum_set (SIM_CPU *, DI);
-DI a_m32r_h_accums_get (SIM_CPU *, UINT);
-void a_m32r_h_accums_set (SIM_CPU *, UINT, DI);
-BI a_m32r_h_cond_get (SIM_CPU *);
-void a_m32r_h_cond_set (SIM_CPU *, BI);
-UQI a_m32r_h_psw_get (SIM_CPU *);
-void a_m32r_h_psw_set (SIM_CPU *, UQI);
-UQI a_m32r_h_bpsw_get (SIM_CPU *);
-void a_m32r_h_bpsw_set (SIM_CPU *, UQI);
-UQI a_m32r_h_bbpsw_get (SIM_CPU *);
-void a_m32r_h_bbpsw_set (SIM_CPU *, UQI);
-BI a_m32r_h_lock_get (SIM_CPU *);
-void a_m32r_h_lock_set (SIM_CPU *, BI);
-
 /* Enum declaration for model types.  */
 typedef enum model_type {
-  MODEL_M32R_D, MODEL_TEST
- , MODEL_MAX
+  MODEL_M32R_D, MODEL_TEST, MODEL_M32RX, MODEL_MAX
 } MODEL_TYPE;
 
 #define MAX_MODELS ((int) MODEL_MAX)
@@ -61,7 +38,8 @@ typedef enum model_type {
 typedef enum unit_type {
   UNIT_NONE, UNIT_M32R_D_U_STORE, UNIT_M32R_D_U_LOAD, UNIT_M32R_D_U_CTI
  , UNIT_M32R_D_U_MAC, UNIT_M32R_D_U_CMP, UNIT_M32R_D_U_EXEC, UNIT_TEST_U_EXEC
- , UNIT_MAX
+ , UNIT_M32RX_U_STORE, UNIT_M32RX_U_LOAD, UNIT_M32RX_U_CTI, UNIT_M32RX_U_MAC
+ , UNIT_M32RX_U_CMP, UNIT_M32RX_U_EXEC, UNIT_MAX
 } UNIT_TYPE;
 
 #define MAX_UNITS (2)

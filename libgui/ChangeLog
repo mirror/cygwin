@@ -1,3 +1,7 @@
+2000-11-30  Tom Tromey  <tromey@cygnus.com>
+
+	* library/balloon.tcl (balloon): Document `balloon withdraw'.
+
 2000-11-27  Tom Tromey  <tromey@cygnus.com>
 
 	* library/debug.tcl (logfile): Also recognize stderr.

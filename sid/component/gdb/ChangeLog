@@ -1,3 +1,8 @@
+2001-01-26  Nicholas Duffek  <nsd@redhat.com>
+
+	* gdb.cxx (gdb::gloss_signal_handler): Extract exit value from
+	bits 8..15 of process exit signal.
+
 2001-01-03  Jeff Johnston  <jjohnstn@redhat.com>
 
         * gdb.cxx (restart_program): Added code to drive

@@ -1,3 +1,9 @@
+2000-09-21  Frank Ch. Eigler  <fche@redhat.com>
+
+	* slib/logical.scm: New file from slib.  Provides robust bitwise
+	logical operations for large integers.
+	* read.scm: maybe-load it.
+
 2000-09-15  Frank Ch. Eigler  <fche@redhat.com>
 
 	* enum.scm (define-full-insn-enum): Filter with keep-isa predicate.

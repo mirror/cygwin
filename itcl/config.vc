@@ -3,7 +3,7 @@
 #  Edit for your local configuration.  This should be the only file
 #  that needs editing to build [Incr Tcl/Tk].
 #
-# RCS: @(#) $Id: config.vc,v 1.1 2002/09/24 22:42:37 kseitz Exp $
+# RCS: @(#) $Id: config.vc,v 1.2 2003/01/21 20:40:24 hunt Exp $
 ######################################################################
 
 # only affects the linker and resource compiler

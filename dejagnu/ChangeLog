@@ -1,3 +1,7 @@
+2000-02-15  Alexandre Oliva  <oliva@lsd.ic.unicamp.br>
+
+	* lib/target.exp: Strip warnings about dangerous functions.
+
 1999-12-14  Geoff Keating  <geoffk@cygnus.com>
 
 	* baseboards/rom68k-idp.exp: Don't pass -nostdlib to the IDP

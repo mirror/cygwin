@@ -435,8 +435,8 @@ connect-bus icache downstream $bus_upstream
 set icache report-heading \"icache profile report\"
 connect-pin init-sequence output-1 -> icache invalidate-all
 connect-pin deinit-sequence output-6 -> icache report!
-connect-pin cache-flush-net output-1 -> icache flush-all
-connect-pin cache-flush-net output-2 -> icache invalidate-all\n";
+connect-pin cache-flush-net output-0 -> icache flush-all
+connect-pin cache-flush-net output-1 -> icache invalidate-all\n";
   # $bus_upstream = "icache upstream";
 } else {
   $second_section .= "connect-bus cpu insn-memory $bus_upstream\n";
@@ -449,8 +449,8 @@ connect-bus dcache downstream $bus_upstream
 set dcache report-heading \"dcache profile report\"
 connect-pin init-sequence output-1 -> dcache invalidate-all
 connect-pin deinit-sequence output-6 -> dcache report!
-connect-pin cache-flush-net output-1 -> dcache flush-all
-connect-pin cache-flush-net output-2 -> dcache invalidate-all\n";
+connect-pin cache-flush-net output-0 -> dcache flush-all
+connect-pin cache-flush-net output-1 -> dcache invalidate-all\n";
   $bus_upstream = "dcache upstream";
 } else {
   $second_section .= "connect-bus cpu data-memory $bus_upstream\n";

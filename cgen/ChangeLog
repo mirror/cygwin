@@ -366,18 +366,6 @@ Fri Apr 21 22:18:48 2000  Jim Wilson  <wilson@cygnus.com>
 	* doc/internals.texi (Conventions): Do not mention Hobbit.
 	* doc/porting.texi (Supported Guile versions): Likewise.
 
-2000-03-16  Frank Ch. Eigler  <fche@redhat.com>
-
-	* mipscom.cpu (break, syscall, define-trap): Make these non-cti
-	insns.
-	* sid-cpu.scm (-gen-sem-switch-engine): Adjust calling &
-	callback convention to new sid sidutil::basic_cpu code.
-	(-gen-sfrag-engine-fn): Ditto.
-	* sid.scm (-create-virtual-insns!): Ditto.
-	(-hw-gen-set-quiet-pc): Mark delay slot execution specially in pbb
-	mode.
-	(cxmake-skip): Implement properly for pbb mode.
-
 2000-03-03  Ben Elliston  <bje@redhat.com>
 
 	* doc/internals.texi: New file.
@@ -421,7 +409,6 @@ Thu Feb 24 14:09:01 2000  Doug Evans  <devans@seba.cygnus.com>
 	* sem-frags.scm (-frag-hash-compute!): Add appstuff arg for traversal.
 	(-frag-cost-compute!): Ditto.
 	* utils.scm (copyright-cygnus): Add Y2K.
-	* sid-cpu.scm (@prefix@_pbb_run): Add unsigned& argument.
 
 2000-01-25  Nick Clifton  <nickc@cygnus.com>
 
@@ -947,8 +934,6 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 
 	* utils-sim.scm: New file.
 	* dev.scm (load-sim): Load it.
-	(load-sid): Load it.
-	* cgen-sid.scm: Load it.
 	* cgen-sim.scm: Load it.
 	* iformat.scm (<sformat>): New member sbuf, not initialized by
 	default make.
@@ -998,7 +983,6 @@ Wed Aug 18 15:04:30 1999  Doug Evans  <devans@canuck.cygnus.com>
 
 	* dev.scm (load-opc): Use load instead of maybe-load.
 	(load-gtest,load-sim,load-stest): Ditto.
-	(load-sid): Ditto.
 
 1999-07-23  Doug Evans  <devans@casey.cygnus.com>
 

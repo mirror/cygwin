@@ -84,9 +84,9 @@ install-info:
 clean-info:
 dvi:
 
-PHONY: all install clean mostlyclean distclean maintainer-clean
-PHONY: info install-info clean-info dvi
-NOEXPORT:
+.PHONY: all install clean mostlyclean distclean maintainer-clean
+.PHONY: info install-info clean-info dvi
+.NOEXPORT:
 
 # Rules for regenerating this Makefile
 Makefile: $(srcdir)/Makefile.in config.status
@@ -119,7 +119,7 @@ FLAGS_TO_PASS = \
 [+ FOR subdirs +]
 [+target+]-[+subdir+]: configure-[+subdir+]
 	[+makeline_flag+]cd [+subdir+] && $(MAKE) [+target_flags+] [+target+]
-PHONY: [+target+]-[+subdir+]
+.PHONY: [+target+]-[+subdir+]
 [+ ENDFOR subdirs +][+ ENDFOR targets +]
 # Glue for configure.
 [+ FOR subdirs +]
@@ -127,6 +127,5 @@ configure-[+subdir+]: [+subdir+]/Makefile
 [+subdir+]/Makefile: config.status
 	test -d [+subdir+] || mkdir [+subdir+] ; \
 	cd [+subdir+] && $(abs_srcdir)/[+subdir+]/configure $(subconfigure_args)
-PHONY: configure-[+subdir+]
+.PHONY: configure-[+subdir+]
 [+ ENDFOR subdirs +]
-

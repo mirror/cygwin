@@ -71,9 +71,9 @@ install-info:
 clean-info:
 dvi:
 
-PHONY: all install clean mostlyclean distclean maintainer-clean
-PHONY: info install-info clean-info dvi
-NOEXPORT:
+.PHONY: all install clean mostlyclean distclean maintainer-clean
+.PHONY: info install-info clean-info dvi
+.NOEXPORT:
 
 # Rules for regenerating this Makefile
 Makefile: $(srcdir)/Makefile.in config.status
@@ -106,85 +106,85 @@ FLAGS_TO_PASS = \
 
 all-spu: configure-spu
 	cd spu && $(MAKE) $(FLAGS_TO_PASS) all
-PHONY: all-spu
+.PHONY: all-spu
 
 all-sparclite: configure-sparclite
 	cd sparclite && $(MAKE) $(FLAGS_TO_PASS) all
-PHONY: all-sparclite
+.PHONY: all-sparclite
 
 all-wince: configure-wince
 	cd wince && $(MAKE) $(FLAGS_TO_PASS) all
-PHONY: all-wince
+.PHONY: all-wince
 
 # Glue for install.
 
 install-spu: configure-spu
 	cd spu && $(MAKE)  install
-PHONY: install-spu
+.PHONY: install-spu
 
 install-sparclite: configure-sparclite
 	cd sparclite && $(MAKE)  install
-PHONY: install-sparclite
+.PHONY: install-sparclite
 
 install-wince: configure-wince
 	cd wince && $(MAKE)  install
-PHONY: install-wince
+.PHONY: install-wince
 
 # Glue for mostlyclean.
 
 mostlyclean-spu: configure-spu
 	cd spu && $(MAKE)  mostlyclean
-PHONY: mostlyclean-spu
+.PHONY: mostlyclean-spu
 
 mostlyclean-sparclite: configure-sparclite
 	cd sparclite && $(MAKE)  mostlyclean
-PHONY: mostlyclean-sparclite
+.PHONY: mostlyclean-sparclite
 
 mostlyclean-wince: configure-wince
 	cd wince && $(MAKE)  mostlyclean
-PHONY: mostlyclean-wince
+.PHONY: mostlyclean-wince
 
 # Glue for clean.
 
 clean-spu: configure-spu
 	cd spu && $(MAKE)  clean
-PHONY: clean-spu
+.PHONY: clean-spu
 
 clean-sparclite: configure-sparclite
 	cd sparclite && $(MAKE)  clean
-PHONY: clean-sparclite
+.PHONY: clean-sparclite
 
 clean-wince: configure-wince
 	cd wince && $(MAKE)  clean
-PHONY: clean-wince
+.PHONY: clean-wince
 
 # Glue for distclean.
 
 distclean-spu: configure-spu
 	-cd spu && $(MAKE)  distclean
-PHONY: distclean-spu
+.PHONY: distclean-spu
 
 distclean-sparclite: configure-sparclite
 	-cd sparclite && $(MAKE)  distclean
-PHONY: distclean-sparclite
+.PHONY: distclean-sparclite
 
 distclean-wince: configure-wince
 	-cd wince && $(MAKE)  distclean
-PHONY: distclean-wince
+.PHONY: distclean-wince
 
 # Glue for maintainer-clean.
 
 maintainer-clean-spu: configure-spu
 	-cd spu && $(MAKE)  maintainer-clean
-PHONY: maintainer-clean-spu
+.PHONY: maintainer-clean-spu
 
 maintainer-clean-sparclite: configure-sparclite
 	-cd sparclite && $(MAKE)  maintainer-clean
-PHONY: maintainer-clean-sparclite
+.PHONY: maintainer-clean-sparclite
 
 maintainer-clean-wince: configure-wince
 	-cd wince && $(MAKE)  maintainer-clean
-PHONY: maintainer-clean-wince
+.PHONY: maintainer-clean-wince
 
 # Glue for configure.
 
@@ -192,18 +192,17 @@ configure-spu: spu/Makefile
 spu/Makefile: config.status
 	test -d spu || mkdir spu ; \
 	cd spu && $(abs_srcdir)/spu/configure $(subconfigure_args)
-PHONY: configure-spu
+.PHONY: configure-spu
 
 configure-sparclite: sparclite/Makefile
 sparclite/Makefile: config.status
 	test -d sparclite || mkdir sparclite ; \
 	cd sparclite && $(abs_srcdir)/sparclite/configure $(subconfigure_args)
-PHONY: configure-sparclite
+.PHONY: configure-sparclite
 
 configure-wince: wince/Makefile
 wince/Makefile: config.status
 	test -d wince || mkdir wince ; \
 	cd wince && $(abs_srcdir)/wince/configure $(subconfigure_args)
-PHONY: configure-wince
-
+.PHONY: configure-wince
 

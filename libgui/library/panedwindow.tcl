@@ -830,6 +830,11 @@ body cyg::PanedWindow::_placeSash {i} {
 # ------------------------------------------------------------------
 body cyg::PanedWindow::_placePanes {{start 0} {end end} {forget 0}} {
   #puts "placeplanes $start $end"
+
+  if {!$_initialized} {
+    return 
+  }
+
   if {$end=="end"} { set end [expr [llength $_activePanes] - 1] }
   set _updatePanes [lrange $_activePanes $start $end]
 

@@ -2648,13 +2648,13 @@ Tcl_Obj *CONST argv[];	/* Argument objects. */
 	argc--; argv++;
 
 #if TCL_MAJOR_VERSION < 8
-  #define STARARGV *argv
+#  define STARARGV *argv
 #else
-  #if TCL_MINOR_VERSION < 3
-    #define STARARGV Tcl_GetStringFromObj(*argv,(int *)0)
-  #else
-    #define STARARGV Tcl_GetString(*argv)
-  #endif
+#  if TCL_MINOR_VERSION < 3
+#    define STARARGV Tcl_GetStringFromObj(*argv,(int *)0)
+#  else
+#    define STARARGV Tcl_GetString(*argv)
+#  endif
 #endif 
 
 	for (;argc>0;argc--,argv++) {

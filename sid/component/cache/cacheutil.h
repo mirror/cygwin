@@ -8,7 +8,9 @@
 #define CACHEUTIL_H
 
 #include <vector>
-#include <sidtypes.h>
+#include <iostream>
+#include <sidcomp.h>
+#include <sidattrutil.h>
 
 #include "log2.h"
 

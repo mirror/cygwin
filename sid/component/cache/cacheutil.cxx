@@ -347,7 +347,21 @@ unsigned
 cache::hash_fn (const cache_tag& tag) const
 {
   sid::host_int_4 addr = tag_to_addr (tag);
-  return (addr & hash_params.mask) >> hash_params.shift;
+  unsigned index = (addr & hash_params.mask) >> hash_params.shift;
+  if (UNLIKELY(index >= this->sets.size()))
+    {
+      cerr << "cache: bad hash parameters (mask=" 
+	   << sidutil::make_numeric_attribute (this->hash_params.mask, ios::hex|ios::showbase)
+	   << " shift="
+	   << sidutil::make_numeric_attribute (this->hash_params.shift)
+	   << ") for address="
+	   << sidutil::make_numeric_attribute (addr, ios::hex|ios::showbase)
+	   << " #sets="
+	   << sidutil::make_numeric_attribute (this->sets.size())
+	   << endl;
+      index = index % this->sets.size();
+    }
+  return index;
 }
 
 void

@@ -1,3 +1,8 @@
+2000-08-02  Jimmy Guo  <guo@hpcleara.cup.hp.com>
+
+	* lib/framework.exp (pass): make compiler_conditional_xfail_data
+	a global, corresponding to a recent change to 'proc fail'.
+	
 2000-07-21  Frank Ch. Eigler  <fche@redhat.com>
 
 	* example/Makefile.am (SUBDIRS): Remove to prevent automatic recursion

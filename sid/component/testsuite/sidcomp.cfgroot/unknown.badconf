@@ -63,5 +63,5 @@ Relate angel cpu cpu -			# unknown command (conf file is case sensitive)
 -pin main perform-activity -> host-sched advance	# unknown command
 
 # ELF loader
-bus loader load-accessor bus access-port		# unknown command
+bus loader load-accessor-data bus access-port		# unknown command
 

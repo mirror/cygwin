@@ -1,3 +1,15 @@
+2001-03-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.bsp/armbsp.exp: Adapt to modern combined arm/thumb gcc.
+	* sidcomp.bsp/dhrystone.exp: Double ditto.
+	* sidcomp.bsp/test-insn.c, test-memory.c (WORKFACTOR): Increase.
+	* sidcomp.cfgroot/CBinvaComp.{badconf,expect}: Update for semirecent
+	loader accessor renaming.
+	* sidcomp.cfgroot/{CPinvaPin,comment,cr100931,illegCh}.badconf: Ditto.
+	* sidcomp.cfgroot/{multiCB,multiDso,multiSet,unknown}.badconf: Ditto.
+	* sidcomp.cfgroot/{multiCB,unknown}.expect, wrongOrd.badconf: Ditto.
+	* sidcomp.cgen-cpu/armeit.conf: Ditto.
+
 2001-03-13  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidcomp.mapper/busif.exp: Disable if !enable_shared.

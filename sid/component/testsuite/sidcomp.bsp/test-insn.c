@@ -4,7 +4,7 @@
 */
 
 #ifndef WORKFACTOR
-#define WORKFACTOR 10
+#define WORKFACTOR 25
 #endif
 
 

@@ -8,8 +8,8 @@ if {$sidtarget(arm)} then {
     # use undocumented --sidrtc option
     run-sid-c-bsp-tests arm-elf arm7 $srcdir/sidcomp.bsp "dhry21.c" {-g -O2 -DSID=0xE0000000 -mbig-endian} {--cpu=arm --sidrtc=0xE0000000} axb
     run-sid-c-bsp-tests arm-elf arm7 $srcdir/sidcomp.bsp "dhry21.c" {-g -O2 -DSID=0xE0000000 -mlittle-endian} {--cpu=arm --sidrtc=0xE0000000} axl
-    run-sid-c-bsp-tests thumb-elf arm7t $srcdir/sidcomp.bsp "dhry21.c" {-g -O2 -DSID=0xE0000000 -mbig-endian} {--cpu=thumb --sidrtc=0xE0000000} axb
-    run-sid-c-bsp-tests thumb-elf arm7t $srcdir/sidcomp.bsp "dhry21.c" {-g -O2 -DSID=0xE0000000 -mlittle-endian} {--cpu=thumb --sidrtc=0xE0000000} axl
+    run-sid-c-bsp-tests arm-elf arm7t $srcdir/sidcomp.bsp "dhry21.c" {-g -O2 -DSID=0xE0000000 -mbig-endian -mthumb -mthumb-interwork} {--cpu=thumb --sidrtc=0xE0000000} axb
+    run-sid-c-bsp-tests arm-elf arm7t $srcdir/sidcomp.bsp "dhry21.c" {-g -O2 -DSID=0xE0000000 -mlittle-endian -mthumb -mthumb-interwork} {--cpu=thumb --sidrtc=0xE0000000} axl
 }
 
 

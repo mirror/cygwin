@@ -189,8 +189,8 @@
 
 2001-03-20  Patrick Macdonald  <patrickm@redhat.com>
 
-        * desc-cpu.scm (@arch@_cgen_cpu_open): Correct machine calculation for
-        arg_type CGEN_CPU_OPEN_BFDMACH.
+	* desc-cpu.scm (@arch@_cgen_cpu_open): Correct machine calculation for
+	arg_type CGEN_CPU_OPEN_BFDMACH.
 
 2001-03-20  Ben Elliston  <bje@redhat.com>
 

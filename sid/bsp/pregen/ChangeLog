@@ -38,7 +38,7 @@
 
 2001-08-06  Ben Elliston  <bje@redhat.com>
 
-	* (*.conf): Regenerate with cache component included.
+	* (*.conf): Regenerate with cache component library included.
 
 2001-08-01  Dave Brolley  <brolley@redhat.com>
 

@@ -21,6 +21,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 
 using std::vector;
 using std::string;
@@ -216,6 +217,17 @@ generic_memory::imagemmap_handler (host_int_4)
   if (fd < 0)
     {
       cerr << "memory: cannot open image-file during image-mmap:" << std_error_string() << endl;
+      this->error_pin.drive (0);
+      return;
+    }
+
+  /* Some kernels will SIGBUS the application if mmap'd file is not large enough.  */ 
+  struct stat desc;
+  int rc = fstat (fd, & desc);
+  if (rc < 0 || desc.st_size < this->buffer_length)
+    {
+      cerr << "memory: cannot confirm that mmap file is large enough (>= " 
+	   << this->buffer_length << " bytes)." << endl;
       this->error_pin.drive (0);
       return;
     }

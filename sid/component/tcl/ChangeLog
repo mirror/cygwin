@@ -1,3 +1,8 @@
+2001-06-22  Ben Elliston  <bje@redhat.com>
+
+	* compTcl.cxx (tcl_component_ctor_0): Omit "delayed" from the bus
+	status lookup table.
+
 2001-06-21  Ben Elliston  <bje@redhat.com>
 
 	* compTcl.cxx (encode_bus_status): Append bus latency when

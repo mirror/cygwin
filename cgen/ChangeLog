@@ -1,3 +1,10 @@
+2001-03-24  Ben Elliston  <bje@redhat.com>
+
+	* utils.scm: Remove comments about the Hobbit compiler.
+	(copyright-cygnus): Add 2001.
+	(package-cygnus-simulators): Replace "Cygnus" with "Red Hat".
+	(package-gnu-simulators): Tidy.
+
 2001-03-23  Ben Elliston  <bje@redhat.com>
 
 	* cgen-gas.scm: Inline documentation improvements.

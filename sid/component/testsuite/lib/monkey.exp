@@ -322,7 +322,7 @@ proc monkey_test_state_restore {} {
     set pick [expr [random $num_state_snapshots] + 1]
 
     set state $state_snapshots($pick)
-    set result [sid_cmd [list sid::component::set_attribute_value $victim state-snapshot [list $state]]]
+    set result [sid_cmd [list sid::component::set_attribute_value $victim state-snapshot $state]]
     if {$result != "ok"} then {
 	# don't warn over and over again - dummy attribute
 	set attrname "state-snapshot"

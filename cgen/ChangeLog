@@ -1,4 +1,7 @@
 2001-11-26  Geoffrey Keating  <geoffk@redhat.com>
+	    matthew green  <mrg@redhat.com>
+	    Frank Ch. Eigler  <fche@redhat.com>
+	    Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* cpu/xstormy16.cpu: New file.
 	* cpu/xstormy16.opc: New file.

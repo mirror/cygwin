@@ -1,3 +1,27 @@
+2001-01-06  matthew green  <mrg@redhat.com>
+
+	* gloss.cxx (gloss32::target_to_host_open_flags): Properly check for
+	valid open() flags.
+
+2001-01-04  matthew green  <mrg@redhat.com>
+
+	* gloss.cxx (gloss32::target_to_host_open_flags): Properly deal with
+	newlib open flags.
+	Need <sys/time.h> for gettimeofday().  Only include <sys/times.h> if
+	we have times().
+
+2000-12-30  matthew green  <mrg@redhat.com>
+
+	* gloss.cxx (do_sys_time): New function.
+	(do_sys_times): Likewise.
+	(do_sys_gettimeofday): Likewise.
+	(syscall_trap): Call do_sys_time().  Call new do_sys_times() and
+	do_sys_gettimeofday() for times() and .
+	* gloss.h (do_sys_time): Prototype.
+	(do_sys_times): Likewise.
+	(do_sys_gettimeofday): Likewise.
+	* libgloss.h (libgloss_syscall): Add `times' and `gettimeofday'.
+
 2000-11-21  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.in: Regenerated.

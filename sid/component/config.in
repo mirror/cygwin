@@ -27,6 +27,9 @@
 /* Define if you have the strtoull function.  */
 #undef HAVE_STRTOULL
 
+/* Define if you have the times function.  */
+#undef HAVE_TIMES
+
 /* Define if you have the usleep function.  */
 #undef HAVE_USLEEP
 

@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (c) 1999 Red Hat
+# Copyright (c) 1999-2001 Red Hat
 #
 # Display installed SID component documentation files.
 
@@ -41,11 +41,9 @@ listfiles() {
 	    do
 		if [ -f "$file" ]
 		then
-		    echo -n "${file} "
-		    cat "$file" | awk '
-/^\* Name/ { flag++; next; }
-(flag==1)  { print; flag++; }
-'
+		    component=`head -1 "$file" | awk '{print $1}'`
+                    variants=`grep Variant: "$file" | awk '{printf "%s ", $2}'`
+		    echo "${file} ${component} ${variants}"
 		fi
 	    done
         fi
@@ -87,6 +85,7 @@ do
     rm -f $foundflag
     listfiles | while read file components
     do
+        # echo "FOUND: $file $components"
 	if expr "$components" : ".*${comp}.*" >/dev/null
 	then
 	    eval $display "$file" "$components"
@@ -99,7 +98,3 @@ do
     fi
 done
 
-
-# Local Variables:
-# sh-mode
-# End:

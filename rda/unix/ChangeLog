@@ -1,5 +1,9 @@
 2004-10-31  Jim Blandy  <jimb@redhat.com>
 
+	* stock-breakpoints.c: #include all headers necessary to get
+	prototypes for functions used in this file.
+	* thread-db.c: Same.
+
 	* server.c (main): Initialize infd, outfd, and speed.
 	(tty_raw): Use proper name for speed_t "zero baud" value.
 

@@ -1,3 +1,17 @@
+2004-11-11  Nick Clifton  <nickc@redhat.com>
+
+	* Import this patch from dejagnu mainline sources.  It fixes
+	unexpected failures in the GCC and G++ testsuites where <limits.h>
+	is #include's in strict ANSI mode.
+	
+	2002-11-12  Hans-Peter Nilsson  <hp@bitrange.com>
+
+        * lib/libgloss.exp (newlib_include_flags): Use -isystem, not -I.
+        (libio_include_flags, g++_include_flags, libstdc++_include_flags,
+        winsup_include_flags): Ditto.
+        * doc/user.sgml (Local Config File): Use -isystem, not -I, in
+        example.
+
 2004-10-28  Nick Clifton  <nickc@redhat.com>
 
 	* baseboards/iq2000-sim.exp: New file.

@@ -19,7 +19,7 @@
     <defpin name="invalidate-all" direction="in" legalvalues="any" behaviors="invalidating" />
     <defpin name="invalidate-set" direction="in" legalvalues="set index" behaviors="invalidating" />
     <defpin name="flush-and-invalidate" direction="in" legalvalues="32-bit address" behaviors="flushing, invalidating" />
-    <defpin name="fluish-and-invalidate-set" direction="in" legalvalues="set index" behaviors="flushing, invalidating" />
+    <defpin name="flush-and-invalidate-set" direction="in" legalvalues="set index" behaviors="flushing, invalidating" />
     <defpin name="prefetch" direction="in" legalvalues="32-bit address" behaviors="prefetching" />
     <defpin name="lock" direction="in" legalvalues="32-bit address" behaviors="line locking" />
     <defpin name="unlock" direction="in" legalvalues="32-bit address" behaviors="line locking" />

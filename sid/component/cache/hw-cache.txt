@@ -266,7 +266,7 @@ Component Reference:
    |flush-and-invalidate     |in       |32-bit     |flushing,   |
    |                         |         |address    |invalidating|
    |-------------------------+---------+-----------+------------|
-   |fluish-and-invalidate-set|in       |set index  |flushing,   |
+   |flush-and-invalidate-set |in       |set index  |flushing,   |
    |                         |         |           |invalidating|
    |-------------------------+---------+-----------+------------|
    |prefetch                 |in       |32-bit     |prefetching |

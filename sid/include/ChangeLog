@@ -1,3 +1,8 @@
+2003-08-21  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (end_line): New method of basic_cpu::cpu_trace_stream.
+	(operator<<): Use static_cast instead of dynamic_cast.
+
 2003-06-20  Frank Ch. Eigler  <fche@redhat.com>
 
 	* sidattrutil.h (fixed_attribute_map_with_logging_component):

@@ -15,7 +15,7 @@
  *  OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
  *  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  *
- *  $Id: features.h,v 1.1 2000/12/12 01:24:08 jjohnstn Exp $
+ *  $Id: features.h,v 1.2 2001/01/12 02:41:33 dj Exp $
  */
 
 #ifndef _SYS_FEATURES_H
@@ -77,7 +77,7 @@ extern "C" {
 # define _POSIX_VERSION 199009L
 #endif
 
-#ifdef __CYGWIN32__
+#ifdef __CYGWIN__
 # define _POSIX_JOB_CONTROL	1
 # define _POSIX_SAVED_IDS	0
 # define _POSIX_VERSION		199009L

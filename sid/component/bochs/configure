@@ -5654,7 +5654,6 @@ do
       m68k*)  sidtarget_m68k=1 ;;
       powerpc*) sidtarget_ppc=1 ;;
       ppc*)   sidtarget_ppc=1 ;;
-      sh*) sidtarget_sh=1 ;;
       xstormy16*) sidtarget_xstormy16=1 ;;
       *)      echo "configure: warning: "Unknown target $targ"" 1>&2 ;;
    esac
@@ -5667,7 +5666,6 @@ case 1 in
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
   ${sidtarget_ppc}) ;;
-  ${sidtarget_sh}) ;;
   ${sidtarget_xstormy16}) ;;
   *) echo "configure: warning: No selected sid targets: use --enable-targets or --target" 1>&2
 	;;
@@ -5757,20 +5755,6 @@ else
   SIDTARGET_PPC_FALSE=
 fi
 echo "$ac_t""$sidtarget_ppc" 1>&6
-
-echo $ac_n "checking Hitachi SH family support""... $ac_c" 1>&6
-echo "configure:5914: checking Hitachi SH family support" >&5
-
-
-
-if test "x$sidtarget_sh" = x1; then
-  SIDTARGET_SH_TRUE=
-  SIDTARGET_SH_FALSE='#'
-else
-  SIDTARGET_SH_TRUE='#'
-  SIDTARGET_SH_FALSE=
-fi
-echo "$ac_t""$sidtarget_sh" 1>&6
 
 echo $ac_n "checking Sanyo Xstormy16 family support""... $ac_c" 1>&6
 echo "configure:5944: checking Sanyo Xstormy16 family support" >&5
@@ -6023,9 +6007,6 @@ s%@SIDTARGET_M68K_FALSE@%$SIDTARGET_M68K_FALSE%g
 s%@sidtarget_ppc@%$sidtarget_ppc%g
 s%@SIDTARGET_PPC_TRUE@%$SIDTARGET_PPC_TRUE%g
 s%@SIDTARGET_PPC_FALSE@%$SIDTARGET_PPC_FALSE%g
-s%@sidtarget_sh@%$sidtarget_sh%g
-s%@SIDTARGET_SH_TRUE@%$SIDTARGET_SH_TRUE%g
-s%@SIDTARGET_SH_FALSE@%$SIDTARGET_SH_FALSE%g
 s%@sidtarget_xstormy16@%$sidtarget_xstormy16%g
 s%@SIDTARGET_XSTORMY16_TRUE@%$SIDTARGET_XSTORMY16_TRUE%g
 s%@SIDTARGET_XSTORMY16_FALSE@%$SIDTARGET_XSTORMY16_FALSE%g

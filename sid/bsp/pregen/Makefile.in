@@ -70,7 +70,7 @@ sidtarget_mips = @sidtarget_mips@
 sidtarget_ppc = @sidtarget_ppc@
 
 AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS = -I ../../config
+ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
 mkinstalldirs = $(SHELL) $(top_srcdir)/../config/mkinstalldirs
 CONFIG_CLEAN_FILES =  pregen-configs
 DIST_COMMON =  ChangeLog Makefile.am Makefile.in pregen-configs.in

@@ -1,3 +1,8 @@
+2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): Refer to $srcdir.
+	* Makefile.in: Regenerated.
+
 2001-06-23  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configrun-sid.in: Add support for --memory-region latency settings.

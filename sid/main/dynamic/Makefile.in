@@ -78,7 +78,7 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 
 AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS = -I ../../config
+ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
 
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include
 
@@ -111,6 +111,7 @@ bin_PROGRAMS = sid
 @SID_STATIC_FALSE@NEARBY_LIBS = @SID_STATIC_FALSE@../../component/cfgroot/libconfig.la
 @SID_STATIC_TRUE@NEARBY_DEPS_LIBS = @SID_STATIC_TRUE@\
 @SID_STATIC_TRUE@	../../component/audio/libaudio.la \
+@SID_STATIC_TRUE@	../../component/cache/libcache.la \
 @SID_STATIC_TRUE@	../../component/cfgroot/libconfig.la \
 @SID_STATIC_TRUE@	../../component/cgen-cpu/libcgencpu.la \
 @SID_STATIC_TRUE@	../../component/consoles/libconsoles.la \
@@ -181,10 +182,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in  \
-		../../config/am_rpm_init.m4 ../../config/cgen-maint.m4 \
-		../../config/libstdc++.m4 ../../config/libtool.m4 \
-		../../config/ltdl.m4 ../../config/sidtargets.m4
+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in 
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)

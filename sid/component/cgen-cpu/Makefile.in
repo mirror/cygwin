@@ -88,7 +88,7 @@ sidtarget_ppc = @sidtarget_ppc@
 
 AUTOMAKE_OPTIONS = foreign
 SUBDIRS = @cpu_subdirs@ .
-ACLOCAL_AMFLAGS = -I ../../config
+ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
 
 pkglib_LTLIBRARIES = libcgencpu.la
 

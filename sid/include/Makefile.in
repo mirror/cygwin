@@ -65,7 +65,7 @@ PACKAGE = @PACKAGE@
 VERSION = @VERSION@
 
 AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS = -I ../config
+ACLOCAL_AMFLAGS = -I $(srcdir)/../config
 
 include_HEADERS = sidcomp.h sidso.h sidtypes.h
 noinst_HEADERS = sidbusutil.h sidcomputil.h sidpinutil.h sidattrutil.h sidschedutil.h sidmiscutil.h sidconfig.h sidconfutil.h
@@ -92,10 +92,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in  \
-		../config/am_rpm_init.m4 ../config/cgen-maint.m4 \
-		../config/libstdc++.m4 ../config/libtool.m4 \
-		../config/ltdl.m4 ../config/sidtargets.m4
+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in 
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)

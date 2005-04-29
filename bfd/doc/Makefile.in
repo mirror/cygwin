@@ -40,6 +40,8 @@ subdir = doc
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/../config/accross.m4 \
+	$(top_srcdir)/../config/acx.m4 $(top_srcdir)/../bfd/bfd.m4 \
 	$(top_srcdir)/../libtool.m4 $(top_srcdir)/../gettext.m4 \
 	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -50,14 +52,14 @@ CONFIG_CLEAN_FILES =
 depcomp =
 am__depfiles_maybe =
 SOURCES =
-INFO_DEPS = $(srcdir)/as.info
+INFO_DEPS = $(srcdir)/bfd.info
 TEXINFO_TEX = $(top_srcdir)/../texinfo/texinfo.tex
 am__TEXINFO_TEX_DIR = $(top_srcdir)/../texinfo
-DVIS = as.dvi
-PDFS = as.pdf
-PSS = as.ps
-HTMLS = as.html
-TEXINFOS = as.texinfo
+DVIS = bfd.dvi
+PDFS = bfd.pdf
+PSS = bfd.ps
+HTMLS = bfd.html
+TEXINFOS = bfd.texinfo
 TEXI2DVI = `if test -f $(top_srcdir)/../texinfo/util/texi2dvi; then \
              echo $(top_srcdir)/../texinfo/util/texi2dvi; \
            else \
@@ -67,27 +69,29 @@ TEXI2PDF = $(TEXI2DVI) --pdf --batch
 MAKEINFOHTML = $(MAKEINFO) --html
 AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS)
 DVIPS = dvips
-man1dir = $(mandir)/man1
-am__installdirs = "$(DESTDIR)$(man1dir)"
-NROFF = nroff
-MANS = $(man_MANS)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
-ALL_OBJ_DEPS = @ALL_OBJ_DEPS@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
+AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-BFDLIB = @BFDLIB@
-BFDVER_H = @BFDVER_H@
+BFD_HOST_64BIT_LONG = @BFD_HOST_64BIT_LONG@
+BFD_HOST_64_BIT = @BFD_HOST_64_BIT@
+BFD_HOST_64_BIT_DEFINED = @BFD_HOST_64_BIT_DEFINED@
+BFD_HOST_LONG_LONG = @BFD_HOST_LONG_LONG@
+BFD_HOST_U_64_BIT = @BFD_HOST_U_64_BIT@
 CATALOGS = @CATALOGS@
 CATOBJEXT = @CATOBJEXT@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
+CC_FOR_BUILD = @CC_FOR_BUILD@
 CFLAGS = @CFLAGS@
+COREFILE = @COREFILE@
+COREFLAG = @COREFLAG@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -99,13 +103,16 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-GDBINIT = @GDBINIT@
+EXEEXT_FOR_BUILD = @EXEEXT_FOR_BUILD@
 GMOFILES = @GMOFILES@
 GMSGFMT = @GMSGFMT@
 GT_NO = @GT_NO@
 GT_YES = @GT_YES@
+HDEFINES = @HDEFINES@
 INCLUDE_LOCALE_H = @INCLUDE_LOCALE_H@
 INSTALL_DATA = @INSTALL_DATA@
+INSTALL_LIBBFD_FALSE = @INSTALL_LIBBFD_FALSE@
+INSTALL_LIBBFD_TRUE = @INSTALL_LIBBFD_TRUE@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
@@ -114,10 +121,6 @@ INTLDEPS = @INTLDEPS@
 INTLLIBS = @INTLLIBS@
 INTLOBJS = @INTLOBJS@
 LDFLAGS = @LDFLAGS@
-LEX = @LEX@
-LEXLIB = @LEXLIB@
-LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
-LIBM = @LIBM@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -130,7 +133,6 @@ MAKEINFO = @MAKEINFO@
 MKINSTALLDIRS = @MKINSTALLDIRS@
 MSGFMT = @MSGFMT@
 OBJEXT = @OBJEXT@
-OPCODES_LIB = @OPCODES_LIB@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -144,15 +146,19 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+TDEFINES = @TDEFINES@
 USE_INCLUDED_LIBINTL = @USE_INCLUDED_LIBINTL@
 USE_NLS = @USE_NLS@
 VERSION = @VERSION@
 WARN_CFLAGS = @WARN_CFLAGS@
+WIN32LDFLAGS = @WIN32LDFLAGS@
+WIN32LIBADD = @WIN32LIBADD@
 XGETTEXT = @XGETTEXT@
-YACC = @YACC@
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
+all_backends = @all_backends@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__include = @am__include@
@@ -160,33 +166,37 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
-atof = @atof@
+bfd_backends = @bfd_backends@
+bfd_default_target_size = @bfd_default_target_size@
+bfd_file_ptr = @bfd_file_ptr@
+bfd_libs = @bfd_libs@
+bfd_machines = @bfd_machines@
+bfd_ufile_ptr = @bfd_ufile_ptr@
+bfdincludedir = @bfdincludedir@
+bfdlibdir = @bfdlibdir@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
 build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
-cgen_cpu_prefix = @cgen_cpu_prefix@
 datadir = @datadir@
 exec_prefix = @exec_prefix@
-extra_objects = @extra_objects@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
+host_noncanonical = @host_noncanonical@
 host_os = @host_os@
 host_vendor = @host_vendor@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
-install_tooldir = @install_tooldir@
 l = @l@
 libdir = @libdir@
 libexecdir = @libexecdir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
-obj_format = @obj_format@
 oldincludedir = @oldincludedir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
@@ -196,65 +206,110 @@ sysconfdir = @sysconfdir@
 target = @target@
 target_alias = @target_alias@
 target_cpu = @target_cpu@
-target_cpu_type = @target_cpu_type@
+target_noncanonical = @target_noncanonical@
 target_os = @target_os@
 target_vendor = @target_vendor@
-te_file = @te_file@
-AUTOMAKE_OPTIONS = 1.8 cygnus
+tdefaults = @tdefaults@
+wordsize = @wordsize@
+AUTOMAKE_OPTIONS = 1.9 cygnus
+DOCFILES = aoutx.texi  archive.texi archures.texi \
+	bfdt.texi  cache.texi coffcode.texi \
+	core.texi elf.texi elfcode.texi  format.texi \
+	libbfd.texi bfdwin.texi bfdio.texi \
+	opncls.texi  reloc.texi  section.texi  \
+	syms.texi  targets.texi init.texi hash.texi linker.texi \
+	mmo.texi
 
-# What version of the manual you want; "all" includes everything
-CONFIG = all
+PROTOS = archive.p archures.p bfd.p \
+	 core.p format.p \
+	bfdio.p bfdwin.p \
+	libbfd.p opncls.p reloc.p \
+	section.p syms.p targets.p  \
+	format.p  core.p init.p
 
-# Options to extract the man page from as.texinfo
-MANCONF = -Dman
-TEXI2POD = perl $(top_srcdir)/../etc/texi2pod.pl
-POD2MAN = pod2man --center="GNU Development Tools" \
-	--release="binutils-$(VERSION)" --section=1
+IPROTOS = cache.ip libbfd.ip reloc.ip init.ip archures.ip coffcode.ip
 
-man_MANS = as.1
-info_TEXINFOS = as.texinfo 
-CPU_DOCS = \
-	c-a29k.texi \
-	c-alpha.texi \
-	c-arc.texi \
-	c-arm.texi \
-	c-d10v.texi \
-	c-cris.texi \
-	c-h8300.texi \
-	c-h8500.texi \
-	c-hppa.texi \
-	c-i370.texi \
-	c-i386.texi \
-	c-i860.texi \
-	c-i960.texi \
-	c-ip2k.texi \
-	c-m32r.texi \
-	c-m68hc11.texi \
-	c-m68k.texi \
-	c-m88k.texi \
-	c-mips.texi \
-	c-mmix.texi \
-	c-msp430.texi \
-	c-ns32k.texi \
-	c-pdp11.texi \
-	c-pj.texi \
-	c-ppc.texi \
-	c-sh.texi \
-	c-sh64.texi \
-	c-sparc.texi \
-        c-tic54x.texi \
-	c-vax.texi \
-	c-v850.texi \
-	c-xtensa.texi \
-	c-z8k.texi
+# SRCDOC, SRCPROT, SRCIPROT only used to sidestep Sun Make bug in interaction 
+# between VPATH and suffix rules.  If you use GNU Make, perhaps other Makes,
+# you don't need these three:
+SRCDOC = $(srcdir)/../aoutx.h  $(srcdir)/../archive.c \
+	$(srcdir)/../archures.c $(srcdir)/../bfd.c \
+	$(srcdir)/../bfdio.c $(srcdir)/../bfdwin.c \
+	$(srcdir)/../cache.c $(srcdir)/../coffcode.h \
+	$(srcdir)/../corefile.c $(srcdir)/../elf.c \
+	$(srcdir)/../elfcode.h  $(srcdir)/../format.c \
+	$(srcdir)/../libbfd.c $(srcdir)/../opncls.c \
+	$(srcdir)/../reloc.c  $(srcdir)/../section.c \
+	$(srcdir)/../syms.c  $(srcdir)/../targets.c \
+	$(srcdir)/../hash.c $(srcdir)/../linker.c \
+	$(srcdir)/../mmo.c
 
+SRCPROT = $(srcdir)/../archive.c $(srcdir)/../archures.c \
+	$(srcdir)/../bfd.c $(srcdir)/../coffcode.h $(srcdir)/../corefile.c \
+	$(srcdir)/../format.c $(srcdir)/../libbfd.c \
+	$(srcdir)/../bfdio.c $(srcdir)/../bfdwin.c \
+	$(srcdir)/../opncls.c $(srcdir)/../reloc.c \
+	$(srcdir)/../section.c $(srcdir)/../syms.c \
+	$(srcdir)/../targets.c $(srcdir)/../init.c
 
-# This one isn't ready for prime time yet.  Not even a little bit.
-noinst_TEXINFOS = internals.texi
-MAINTAINERCLEANFILES = asconfig.texi gasver.texi
-BASEDIR = $(srcdir)/../..
-BFDDIR = $(BASEDIR)/bfd
-CONFIG_STATUS_DEPENDENCIES = $(BFDDIR)/configure.in
+SRCIPROT = $(srcdir)/../cache.c $(srcdir)/../libbfd.c \
+	$(srcdir)/../bfdio.c $(srcdir)/../bfdwin.c \
+	$(srcdir)/../reloc.c $(srcdir)/../cpu-h8300.c \
+	$(srcdir)/../cpu-i960.c $(srcdir)/../archures.c \
+	$(srcdir)/../init.c
+
+TEXIDIR = $(srcdir)/../../texinfo/fsf
+info_TEXINFOS = bfd.texinfo
+MKDOC = chew$(EXEEXT_FOR_BUILD)
+LIBBFD_H_DEP = \
+	$(srcdir)/../libbfd-in.h	\
+	$(srcdir)/../init.c		\
+	$(srcdir)/../libbfd.c		\
+	$(srcdir)/../bfdio.c		\
+	$(srcdir)/../bfdwin.c		\
+	$(srcdir)/../cache.c		\
+	$(srcdir)/../reloc.c		\
+	$(srcdir)/../archures.c		\
+	$(srcdir)/../elf.c		\
+	$(srcdir)/header.sed		\
+	$(srcdir)/proto.str		\
+	$(MKDOC)
+
+LIBCOFF_H_DEP = \
+	$(srcdir)/../libcoff-in.h	\
+	$(srcdir)/../coffcode.h		\
+	$(srcdir)/header.sed		\
+	$(srcdir)/proto.str		\
+	$(MKDOC)
+
+BFD_H_DEP = \
+	$(srcdir)/../bfd-in.h 		\
+	$(srcdir)/../init.c 		\
+	$(srcdir)/../opncls.c 		\
+	$(srcdir)/../libbfd.c 		\
+	$(srcdir)/../bfdio.c		\
+	$(srcdir)/../bfdwin.c		\
+	$(srcdir)/../section.c 		\
+	$(srcdir)/../archures.c		\
+	$(srcdir)/../reloc.c		\
+	$(srcdir)/../syms.c		\
+	$(srcdir)/../bfd.c		\
+	$(srcdir)/../archive.c		\
+	$(srcdir)/../corefile.c		\
+	$(srcdir)/../targets.c		\
+	$(srcdir)/../format.c		\
+	$(srcdir)/../linker.c		\
+	$(srcdir)/../simple.c		\
+	$(srcdir)/header.sed		\
+	$(srcdir)/proto.str		\
+	$(srcdir)/../version.h		\
+	$(MKDOC)
+
+noinst_TEXINFOS = bfdint.texi
+MOSTLYCLEANFILES = $(MKDOC) *.o
+CLEANFILES = *.p *.ip
+DISTCLEANFILES = bfd.?? bfd.??? bfd.h libbfd.h libcoff.h texput.log
+MAINTAINERCLEANFILES = $(DOCFILES)
 all: all-am
 
 .SUFFIXES:
@@ -341,8 +396,10 @@ distclean-libtool:
 	    rm -rf $(@:.html=); else rm -Rf $(@:.html=.htp) $@; fi; \
 	  exit 1; \
 	fi
-as.pdf: as.texinfo 
-as.html: as.texinfo 
+$(srcdir)/bfd.info: bfd.texinfo 
+bfd.dvi: bfd.texinfo 
+bfd.pdf: bfd.texinfo 
+bfd.html: bfd.texinfo 
 .dvi.ps:
 	$(DVIPS) -o $@ $<
 
@@ -384,8 +441,9 @@ dist-info: $(INFO_DEPS)
 	done
 
 mostlyclean-aminfo:
-	-rm -rf as.aux as.cp as.cps as.fn as.fns as.ky as.log as.pg as.pgs as.tmp \
-	  as.toc as.tp as.tps as.vr as.vrs as.dvi as.pdf as.ps as.html
+	-rm -rf bfd.aux bfd.cp bfd.cps bfd.fn bfd.ky bfd.kys bfd.log bfd.pg bfd.pgs \
+	  bfd.tmp bfd.toc bfd.tp bfd.tps bfd.vr bfd.vrs bfd.dvi \
+	  bfd.pdf bfd.ps bfd.html
 
 maintainer-clean-aminfo:
 	@list='$(INFO_DEPS)'; for i in $$list; do \
@@ -395,51 +453,6 @@ maintainer-clean-aminfo:
 	done
 
 clean-info: mostlyclean-aminfo
-install-man1: $(man1_MANS) $(man_MANS)
-	@$(NORMAL_INSTALL)
-	test -z "$(man1dir)" || $(mkdir_p) "$(DESTDIR)$(man1dir)"
-	@list='$(man1_MANS) $(dist_man1_MANS) $(nodist_man1_MANS)'; \
-	l2='$(man_MANS) $(dist_man_MANS) $(nodist_man_MANS)'; \
-	for i in $$l2; do \
-	  case "$$i" in \
-	    *.1*) list="$$list $$i" ;; \
-	  esac; \
-	done; \
-	for i in $$list; do \
-	  if test -f $(srcdir)/$$i; then file=$(srcdir)/$$i; \
-	  else file=$$i; fi; \
-	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
-	  case "$$ext" in \
-	    1*) ;; \
-	    *) ext='1' ;; \
-	  esac; \
-	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
-	  inst=`echo $$inst | sed -e 's/^.*\///'`; \
-	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
-	  echo " $(INSTALL_DATA) '$$file' '$(DESTDIR)$(man1dir)/$$inst'"; \
-	  $(INSTALL_DATA) "$$file" "$(DESTDIR)$(man1dir)/$$inst"; \
-	done
-uninstall-man1:
-	@$(NORMAL_UNINSTALL)
-	@list='$(man1_MANS) $(dist_man1_MANS) $(nodist_man1_MANS)'; \
-	l2='$(man_MANS) $(dist_man_MANS) $(nodist_man_MANS)'; \
-	for i in $$l2; do \
-	  case "$$i" in \
-	    *.1*) list="$$list $$i" ;; \
-	  esac; \
-	done; \
-	for i in $$list; do \
-	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
-	  case "$$ext" in \
-	    1*) ;; \
-	    *) ext='1' ;; \
-	  esac; \
-	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
-	  inst=`echo $$inst | sed -e 's/^.*\///'`; \
-	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
-	  echo " rm -f '$(DESTDIR)$(man1dir)/$$inst'"; \
-	  rm -f "$(DESTDIR)$(man1dir)/$$inst"; \
-	done
 tags: TAGS
 TAGS:
 
@@ -448,12 +461,8 @@ CTAGS:
 
 check-am:
 check: check-am
-all-am: Makefile $(MANS)
+all-am: Makefile
 installdirs:
-	for dir in "$(DESTDIR)$(man1dir)"; do \
-	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
-	done
-install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -468,11 +477,14 @@ install-strip:
 	  `test -z '$(STRIP)' || \
 	    echo "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'"` install
 mostlyclean-generic:
+	-test -z "$(MOSTLYCLEANFILES)" || rm -f $(MOSTLYCLEANFILES)
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -496,9 +508,9 @@ html-am: $(HTMLS)
 
 info: info-am
 
-info-am: $(INFO_DEPS) info-local
+info-am: $(INFO_DEPS)
 
-install-data-am: install-data-local install-man
+install-data-am:
 
 install-exec-am:
 
@@ -534,7 +546,7 @@ install-info-am: $(INFO_DEPS)
 	    install-info --info-dir="$(DESTDIR)$(infodir)" "$(DESTDIR)$(infodir)/$$relfile" || :;\
 	  done; \
 	else : ; fi
-install-man: install-man1
+install-man:
 
 installcheck-am:
 
@@ -556,56 +568,193 @@ ps: ps-am
 
 ps-am: $(PSS)
 
-uninstall-am: uninstall-man
-
-uninstall-man: uninstall-man1
+uninstall-am:
 
 .PHONY: all all-am check check-am clean clean-generic clean-info \
 	clean-libtool dist-info distclean distclean-generic \
-	distclean-libtool dvi dvi-am html html-am info info-am \
-	info-local install install-am install-data install-data-am \
-	install-data-local install-exec install-exec-am install-info \
-	install-info-am install-man install-man1 install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-aminfo maintainer-clean-generic mostlyclean \
-	mostlyclean-aminfo mostlyclean-generic mostlyclean-libtool pdf \
-	pdf-am ps ps-am uninstall uninstall-am uninstall-info-am \
-	uninstall-man uninstall-man1
+	distclean-libtool dvi dvi-am html html-am info info-am install \
+	install-am install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am install-man \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-aminfo \
+	maintainer-clean-generic mostlyclean mostlyclean-aminfo \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	uninstall uninstall-am uninstall-info-am
 
 
-asconfig.texi: $(CONFIG).texi
-	rm -f asconfig.texi
-	ln -s $(srcdir)/$(CONFIG).texi ./asconfig.texi >/dev/null 2>&1 \
-	  || ln $(srcdir)/$(CONFIG).texi ./asconfig.texi >/dev/null 2>&1 \
-	  || cp $(srcdir)/$(CONFIG).texi ./asconfig.texi
+$(MKDOC): chew.o
+	$(CC_FOR_BUILD) -o $(MKDOC) chew.o $(CFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD)
 
-gasver.texi: $(srcdir)/../../bfd/configure
-	rm -f $@
-	eval `grep '^ *VERSION=' $<`; echo '@set VERSION $$VERSION' > $@
+chew.o: chew.c
+	$(CC_FOR_BUILD) -c -I.. -I$(srcdir)/.. -I$(srcdir)/../../include -I$(srcdir)/../../intl -I../../intl $(H_CFLAGS) $(CFLAGS_FOR_BUILD) $(srcdir)/chew.c
 
-$(srcdir)/as.info: $(srcdir)/as.texinfo asconfig.texi gasver.texi $(CPU_DOCS)
-as.dvi: $(srcdir)/as.texinfo asconfig.texi gasver.texi $(CPU_DOCS)
+protos: libbfd.h libcoff.h bfd.h
+
+$(srcdir)/bfd.info bfd.dvi: $(DOCFILES) bfdsumm.texi bfd.texinfo
+
+# We can't replace these rules with an implicit rule, because
+# makes without VPATH support couldn't find the .h files in `..'.
+
+# We do not depend on chew directly so that we can distribute the info
+# files, and permit people to rebuild them, without requiring the makeinfo
+# program.  If somebody tries to rebuild info, but none of the .texi files
+# have changed, then nothing will be rebuilt.
+
+aoutx.texi: chew.c $(srcdir)/../aoutx.h $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../aoutx.h >aoutx.tmp
+	$(SHELL) $(srcdir)/../../move-if-change aoutx.tmp aoutx.texi
+
+archive.texi: chew.c $(srcdir)/../archive.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../archive.c >archive.tmp
+	$(SHELL) $(srcdir)/../../move-if-change archive.tmp archive.texi
+
+archures.texi: chew.c $(srcdir)/../archures.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str < $(srcdir)/../archures.c >archures.tmp
+	$(SHELL) $(srcdir)/../../move-if-change archures.tmp archures.texi
+
+# We use bfdt.texi, rather than bfd.texi, to avoid conflicting with
+# bfd.texinfo on an 8.3 filesystem.
+bfdt.texi: chew.c $(srcdir)/../bfd.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str < $(srcdir)/../bfd.c >bfd.tmp
+	$(SHELL) $(srcdir)/../../move-if-change bfd.tmp bfdt.texi
+
+cache.texi: chew.c $(srcdir)/../cache.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str < $(srcdir)/../cache.c >cache.tmp
+	$(SHELL) $(srcdir)/../../move-if-change cache.tmp cache.texi
+
+coffcode.texi: chew.c $(srcdir)/../coffcode.h $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../coffcode.h >coffcode.tmp
+	$(SHELL) $(srcdir)/../../move-if-change coffcode.tmp coffcode.texi
+
+core.texi: chew.c $(srcdir)/../corefile.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../corefile.c >core.tmp
+	$(SHELL) $(srcdir)/../../move-if-change core.tmp core.texi
+
+elf.texi: chew.c $(srcdir)/../elf.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../elf.c >elf.tmp
+	$(SHELL) $(srcdir)/../../move-if-change elf.tmp elf.texi
+
+elfcode.texi: chew.c $(srcdir)/../elfcode.h $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../elfcode.h >elfcode.tmp
+	$(SHELL) $(srcdir)/../../move-if-change elfcode.tmp elfcode.texi
+
+mmo.texi: chew.c $(srcdir)/../mmo.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../mmo.c >mmo.tmp
+	$(SHELL) $(srcdir)/../../move-if-change mmo.tmp mmo.texi
+
+format.texi: chew.c $(srcdir)/../format.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../format.c >format.tmp
+	$(SHELL) $(srcdir)/../../move-if-change format.tmp format.texi
+
+libbfd.texi: chew.c $(srcdir)/../libbfd.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str < $(srcdir)/../libbfd.c >libbfd.tmp
+	$(SHELL) $(srcdir)/../../move-if-change libbfd.tmp libbfd.texi
+
+bfdio.texi: chew.c $(srcdir)/../bfdio.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str < $(srcdir)/../bfdio.c >bfdio.tmp
+	$(SHELL) $(srcdir)/../../move-if-change bfdio.tmp bfdio.texi
+
+bfdwin.texi: chew.c $(srcdir)/../bfdwin.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str < $(srcdir)/../bfdwin.c >bfdwin.tmp
+	$(SHELL) $(srcdir)/../../move-if-change bfdwin.tmp bfdwin.texi
+
+opncls.texi: chew.c $(srcdir)/../opncls.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str  <$(srcdir)/../opncls.c >opncls.tmp
+	$(SHELL) $(srcdir)/../../move-if-change opncls.tmp opncls.texi
+
+reloc.texi: chew.c $(srcdir)/../reloc.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../reloc.c >reloc.tmp
+	$(SHELL) $(srcdir)/../../move-if-change reloc.tmp reloc.texi
+
+section.texi: chew.c $(srcdir)/../section.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../section.c >section.tmp
+	$(SHELL) $(srcdir)/../../move-if-change section.tmp section.texi
+
+syms.texi: chew.c $(srcdir)/../syms.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../syms.c >syms.tmp
+	$(SHELL) $(srcdir)/../../move-if-change syms.tmp syms.texi
+
+targets.texi: chew.c $(srcdir)/../targets.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../targets.c >targets.tmp
+	$(SHELL) $(srcdir)/../../move-if-change targets.tmp targets.texi
+
+init.texi: chew.c $(srcdir)/../init.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../init.c >init.tmp
+	$(SHELL) $(srcdir)/../../move-if-change init.tmp init.texi
+
+hash.texi: chew.c $(srcdir)/../hash.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../hash.c >hash.tmp
+	$(SHELL) $(srcdir)/../../move-if-change hash.tmp hash.texi
+
+linker.texi: chew.c $(srcdir)/../linker.c $(srcdir)/doc.str
+	$(MAKE) $(MKDOC)
+	./$(MKDOC) -f $(srcdir)/doc.str <$(srcdir)/../linker.c >linker.tmp
+	$(SHELL) $(srcdir)/../../move-if-change linker.tmp linker.texi
+
+libbfd.h: $(LIBBFD_H_DEP)
+	echo "$(LIBBFD_H_DEP)" | sed -f $(srcdir)/header.sed > $@
+	for file in $(LIBBFD_H_DEP); do \
+	  case $$file in \
+	    *-in.h) cat $$file >> $@ ;; \
+	    */header.sed) break ;; \
+	    *)	echo $$file | sed -e 's,.*/,,' -e 's,^,/* Extracted from ,' \
+				-e 's,$$,.  */,' >> $@ ; \
+		./$(MKDOC) -i -f $(srcdir)/proto.str < $$file >> $@ ;; \
+	  esac; \
+	done
+
+libcoff.h: $(LIBCOFF_H_DEP)
+	echo "$(LIBCOFF_H_DEP)" | sed -f $(srcdir)/header.sed > $@
+	for file in $(LIBCOFF_H_DEP); do \
+	  case $$file in \
+	    *-in.h) cat $$file >> $@ ;; \
+	    */header.sed) break ;; \
+	    *)	echo $$file | sed -e 's,.*/,,' -e 's,^,/* Extracted from ,' \
+				-e 's,$$,.  */,' >> $@ ; \
+		./$(MKDOC) -i -f $(srcdir)/proto.str < $$file >> $@ ;; \
+	  esac; \
+	done
+
+bfd.h: $(BFD_H_DEP)
+	echo "$(BFD_H_DEP)" | sed -f $(srcdir)/header.sed > $@
+	for file in $(BFD_H_DEP); do \
+	  case $$file in \
+	    *-in.h) cat $$file >> $@ ;; \
+	    */header.sed) break ;; \
+	    *)	echo $$file | sed -e 's,.*/,,' -e 's,^,/* Extracted from ,' \
+				-e 's,$$,.  */,' >> $@ ; \
+		./$(MKDOC) -f $(srcdir)/proto.str < $$file >> $@ ;; \
+	  esac; \
+	done
+	echo "#ifdef __cplusplus" >> $@
+	echo "}" >> $@
+	echo "#endif" >> $@
+	echo "#endif" >> $@
 
 # We want install to imply install-info as per GNU standards, despite the
 # cygnus option.
-install-data-local: install-info
-
-# Maintenance
-
-# We need it for the taz target in ../../Makefile.in.
-info-local: $(MANS)
-
-# Build the man page from the texinfo file
-# The sed command removes the no-adjust Nroff command so that
-# the man output looks standard.
-as.1: $(srcdir)/as.texinfo asconfig.texi gasver.texi $(CPU_DOCS)
-	touch $@
-	-$(TEXI2POD) $(MANCONF) < $(srcdir)/as.texinfo > as.pod
-	-($(POD2MAN) as.pod | \
-	        sed -e '/^.if n .na/d' > $@.T$$$$ && \
-	        mv -f $@.T$$$$ $@) || \
-	        (rm -f $@.T$$$$ && exit 1)
-	rm -f as.pod
+install: install-info
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

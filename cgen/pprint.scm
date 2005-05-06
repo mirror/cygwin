@@ -3,6 +3,94 @@
 ;;;; This file is part of CGEN.
 ;;;; See file COPYING.CGEN for details.
 
+;;; This file defines a printing function PPRINT, and some hooks to
+;;; let you print certain kind of objects in a summary way, and get at
+;;; their full values later.
+
+;;; PPRINT is a printer for Scheme objects that prints lists or
+;;; vectors that contain shared structure or cycles and prints them in
+;;; a finite, legible way.
+;;;
+;;; Ordinary values print in the usual way:
+;;;
+;;;   guile> (pprint '(1 #(2 3) 4))
+;;;   (1 #(2 3) 4)
+;;;
+;;; Values can share structure:
+;;; 
+;;;   guile> (let* ((c (list 1 2))
+;;;                 (d (list c c)))
+;;;            (write d)
+;;;            (newline))
+;;;   ((1 2) (1 2))
+;;;
+;;; In that list, the two instances of (1 2) are actually the same object;
+;;; the top-level list refers to the same object twice.
+;;;
+;;; Printing that structure with PPRINT shows the sharing:
+;;; 
+;;;   guile> (let* ((c (list 1 2))
+;;;                 (d (list c c)))
+;;;            (pprint d))
+;;;   (#0=(1 2) #0#)
+;;;
+;;; Here the "#0=" before the list (1 2) labels it with the number
+;;; zero.  Then, the "#0#" as the second element of the top-level list
+;;; indicates that the object appears here, too, referring to it by
+;;; its label.
+;;;
+;;; If you have several objects that appear more than once, they each
+;;; get a separate label:
+;;;
+;;;   guile> (let* ((a (list 1 2))
+;;;                 (b (list 3 4))
+;;;                 (c (list a b a b)))
+;;;            (pprint c))
+;;;   (#0=(1 2) #1=(3 4) #0# #1#)
+;;;
+;;; Cyclic values just share structure with themselves:
+;;;
+;;;   guile> (let* ((a (list 1 #f)))
+;;;            (set-cdr! a a)
+;;;            (pprint a))
+;;;   #0=(1 . #0#)
+;;;
+;;;
+;;; PPRINT also consults the function ELIDE? and ELIDED-NAME to see
+;;; whether it should print a value in a summary form.  You can
+;;; re-define those functions to customize PPRINT's behavior;
+;;; cos-pprint.scm defines them to handle COS objects and classes
+;;; nicely.
+;;;
+;;; (ELIDE? OBJ) should return true if OBJ should be elided.
+;;; (ELIDED-NAME OBJ) should return a (non-cyclic!) object to be used
+;;; as OBJ's abbreviated form.
+;;;
+;;; PPRINT prints an elided object as a list ($ N NAME), where NAME is
+;;; the value returned by ELIDED-NAME to stand for the object, and N
+;;; is a number; each elided object gets its own number.  You can refer
+;;; to the elided object number N as ($ N).
+;;;
+;;; For example, if you've loaded CGEN, pprint.scm, and cos-pprint.scm
+;;; (you must load cos-pprint.scm *after* loading pprint.scm), you can
+;;; print a list containing the <insn> and <ident> classes:
+;;;
+;;;   guile> (pprint (list <insn> <ident>))
+;;;   (($ 1 (class <insn>)) ($ 2 (class <ident>)))
+;;;   guile> (class-name ($ 1))
+;;;   <insn>
+;;;   guile> (class-name ($ 2))
+;;;   <ident>
+;;;
+;;; As a special case, PPRINT never elides the object that was passed
+;;; to it directly.  So you can look inside an elided object by doing
+;;; just that:
+;;;
+;;;   guile> (pprint ($ 2))
+;;;   #0=#("class" <ident> () ((name #:unbound #f . 0) ...
+;;;
+
+
 ;;; A list of elided objects, larger numbers first, and the number of
 ;;; the first element.
 (define elide-table '())
@@ -119,7 +207,6 @@
 		  (begin (display " ")
 			 (print-tail tail)))))))
 
-    (set! elide-table (make-hash-table 4093))
     (print original-obj)
     (newline)))
 

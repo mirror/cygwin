@@ -3,6 +3,16 @@
 ;;;; This file is part of CGEN.
 ;;;; See file COPYING.CGEN for details.
 
+;;; To use this with pprint.scm:
+;;;
+;;;   (load "pprint.scm")
+;;;   (load "cos-pprint.scm")
+;;;
+;;; You must load this file second, so it can redefine the ELIDE? and
+;;; ELIDED-NAME hooks.
+;;;
+;;; See the documentation in pprint.scm for details.
+
 (define (elide? obj)
   (or (object? obj) (class? obj)))
 

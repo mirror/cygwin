@@ -1,5 +1,9 @@
 2005-05-06  Jim Blandy  <jimb@redhat.com>
 
+	* pprint.scm, cos-pprint.scm: Add documentation.
+	
+	* pprint.scm (pprint): Don't wipe out elide-table after each call.
+	
 	* pprint.scm, cos-pprint.scm: New files.
 
 2005-04-04  Nick Clifton  <nickc@redhat.com>

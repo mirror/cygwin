@@ -579,6 +579,10 @@ public:
 
 // Instruction field support macros.
 
+/* Treating the TOTAL least significant bits of VAL as a field, and
+   numbering its leftmost bit zero, return the LENGTH-bit subfield
+   whose leftmost bit is START.
+   The '*INT' version sign-extends; the '*UINT' version doesn't.  */
 #define EXTRACT_MSB0_INT(val, total, start, length) \
 (((INT) (val) << ((sizeof (INT) * 8) - (total) + (start))) \
  >> ((sizeof (INT) * 8) - (length)))
@@ -586,6 +590,10 @@ public:
 (((UINT) (val) << ((sizeof (UINT) * 8) - (total) + (start))) \
  >> ((sizeof (UINT) * 8) - (length)))
 
+/* Treating the TOTAL least significant bits of VAL as a field, and
+   numbering its rightmost bit zero, return the LENGTH-bit subfield
+   whose leftmost bit is START.
+   The '*INT' version sign-extends; the '*UINT' version doesn't.  */
 #define EXTRACT_LSB0_INT(val, total, start, length) \
 (((INT) (val) << ((sizeof (INT) * 8) - (start) - 1)) \
  >> ((sizeof (INT) * 8) - (length)))

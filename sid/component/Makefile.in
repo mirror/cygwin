@@ -80,6 +80,7 @@ RANLIB = @RANLIB@
 SABLOTRON = @SABLOTRON@
 VERSION = @VERSION@
 XSLTPROC = @XSLTPROC@
+comp_defs = @comp_defs@
 lcd_libs = @lcd_libs@
 make_subdirs = @make_subdirs@
 sidtarget_arm = @sidtarget_arm@
@@ -97,6 +98,11 @@ ACLOCAL_AMFLAGS = -I $(srcdir)/../config
 SUBDIRS = @subdirs@ @make_subdirs@
 
 bin_SCRIPTS = siddoc
+
+CXXFLAGS = 
+TOP_CXXFLAGS = $(CXXFLAGS) @comp_defs@
+AM_CXXFLAGS = $(TOP_CXXFLAGS)
+AM_MAKEFLAGS = "TOP_CXXFLAGS=$(TOP_CXXFLAGS)"
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/../config/mkinstalldirs
 CONFIG_HEADER = config.h

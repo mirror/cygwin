@@ -89,6 +89,19 @@ if test x$ac_cv_decl_socklen_t = xyes; then
   AC_DEFINE(HAVE_SOCKLEN_T, 1, [Define if socklen_t is declared via sys/socket.h])
 fi
 
+dnl Need extra defines for Solaris threads
+case "$host" in
+  sparc-sun-solaris*)
+    # Note: If _REENTRANT isn't defined, then Solaris
+    # won't define thread-safe library routines.
+    comp_defs="-D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS"
+    ;;
+  *)
+    comp_defs=
+    ;;
+esac
+AC_SUBST(comp_defs)
+
 AC_SUBST(CYGWIN)
 
 dnl building docs

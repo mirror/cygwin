@@ -25,6 +25,7 @@
 
 #include "bfd.h"
 #include "dis-asm.h"
+#include "opcode/cgen-bitset.h"
 
 // ansidecl.h interferes with this perfectly ordinary word
 #undef AND
@@ -68,7 +69,7 @@ public:
   // Disassembly tracing support
   void disassemble (PCADDR pc, disassembler_ftype printfn,
 		    enum bfd_flavour flavour, enum bfd_architecture arch,
-		    enum bfd_endian endian, const char *name, unsigned long isa_mask = 0, int machine = 0);
+		    enum bfd_endian endian, const char *name, CGEN_BITSET *isas = NULL, int machine = 0);
   struct disassemble_info info;
 protected:
   static int cgen_read_memory (bfd_vma memaddr, bfd_byte *myaddr,
@@ -88,105 +89,105 @@ public:
 public:
   // rtl memory access methods
   inline QI
-  GETMEMQI(PCADDR pc, ADDR addr) const
+  GETMEMQI(PCADDR pc, ADDR addr)
     {
       return this->read_data_memory_1 (pc, addr);
     }
   inline UQI
-  GETMEMUQI(PCADDR pc, ADDR addr) const
+  GETMEMUQI(PCADDR pc, ADDR addr)
     {
       return this->read_data_memory_1 (pc, addr);
     }
   inline void
-  SETMEMBI(PCADDR pc, ADDR addr, BI value) const
+  SETMEMBI(PCADDR pc, ADDR addr, BI value)
     {
       return this->write_insn_memory_1 (pc, addr, value);
     }
   inline void
-  SETMEMQI(PCADDR pc, ADDR addr, QI value) const
+  SETMEMQI(PCADDR pc, ADDR addr, QI value)
     {
       return this->write_data_memory_1 (pc, addr, value);
     }
   inline void
-  SETMEMUQI(PCADDR pc, ADDR addr, UQI value) const
+  SETMEMUQI(PCADDR pc, ADDR addr, UQI value)
     {
       return this->write_data_memory_1 (pc, addr, value);
     }
   inline HI
-  GETMEMHI(PCADDR pc, ADDR addr) const
+  GETMEMHI(PCADDR pc, ADDR addr)
     {
       return this->read_data_memory_2 (pc, addr);
     }
   inline UHI
-  GETMEMUHI(PCADDR pc, ADDR addr) const
+  GETMEMUHI(PCADDR pc, ADDR addr)
     {
       return this->read_data_memory_2 (pc, addr);
     }
   inline void
-  SETMEMHI(PCADDR pc, ADDR addr, HI value) const
+  SETMEMHI(PCADDR pc, ADDR addr, HI value)
     {
       return this->write_data_memory_2 (pc, addr, value);
     }
   inline void
-  SETMEMUHI(PCADDR pc, ADDR addr, UHI value) const
+  SETMEMUHI(PCADDR pc, ADDR addr, UHI value)
     {
       return this->write_data_memory_2 (pc, addr, value);
     }
   inline SI
-  GETMEMSI(PCADDR pc, ADDR addr) const
+  GETMEMSI(PCADDR pc, ADDR addr)
     {
       return this->read_data_memory_4 (pc, addr);
     }
   inline void
-  SETMEMSI(PCADDR pc, ADDR addr, SI value) const
+  SETMEMSI(PCADDR pc, ADDR addr, SI value)
     {
       return this->write_data_memory_4 (pc, addr, value);
     }
   inline USI
-  GETMEMUSI(PCADDR pc, ADDR addr) const
+  GETMEMUSI(PCADDR pc, ADDR addr)
     {
       return this->read_data_memory_4 (pc, addr);
     }
   inline void
-  SETMEMUSI(PCADDR pc, ADDR addr, USI value) const
+  SETMEMUSI(PCADDR pc, ADDR addr, USI value)
     {
       return this->write_data_memory_4 (pc, addr, value);
     }
   inline DI
-  GETMEMDI(PCADDR pc, ADDR addr) const
+  GETMEMDI(PCADDR pc, ADDR addr)
     {
       return this->read_data_memory_8 (pc, addr);
     }
   inline void
-  SETMEMDI(PCADDR pc, ADDR addr, DI value) const
+  SETMEMDI(PCADDR pc, ADDR addr, DI value)
     {
       return this->write_data_memory_8 (pc, addr, value);
     }
   inline void
-  SETMEMUDI(PCADDR pc, ADDR addr, UDI value) const
+  SETMEMUDI(PCADDR pc, ADDR addr, UDI value)
     {
       return this->write_data_memory_8 (pc, addr, value);
     }
 
   // floats (can you think of a better way to do this?)
   inline SF
-  GETMEMSF(PCADDR pc, IADDR addr) const
+  GETMEMSF(PCADDR pc, IADDR addr)
     {
       return reinterpret_cast<SF>(this->read_insn_memory_4 (pc, addr));
     }
   inline void
-  SETMEMSF(PCADDR pc, ADDR addr, SF value) const
+  SETMEMSF(PCADDR pc, ADDR addr, SF value)
     {
       return this->write_insn_memory_4 (pc, addr, reinterpret_cast<USI>(value));
     }
 
   inline DF
-  GETMEMDF(PCADDR pc, IADDR addr) const
+  GETMEMDF(PCADDR pc, IADDR addr)
     {
       return reinterpret_cast<DF>(this->read_insn_memory_8 (pc, addr));
     }
   inline void
-  SETMEMDF(PCADDR pc, ADDR addr, DF value) const
+  SETMEMDF(PCADDR pc, ADDR addr, DF value)
     {
       return this->write_insn_memory_8 (pc, addr, reinterpret_cast<UDI>(value));
     }
@@ -194,82 +195,82 @@ public:
   // IMEM: instruction memory calls
 
   inline QI
-  GETIMEMQI(PCADDR pc, IADDR addr) const
+  GETIMEMQI(PCADDR pc, IADDR addr)
     {
       return this->read_insn_memory_1 (pc, addr);
     }
   inline void
-  SETIMEMQI(PCADDR pc, ADDR addr, QI value) const
+  SETIMEMQI(PCADDR pc, ADDR addr, QI value)
     {
       return this->write_insn_memory_1 (pc, addr, value);
     }
   inline UQI
-  GETIMEMUQI(PCADDR pc, IADDR addr) const
+  GETIMEMUQI(PCADDR pc, IADDR addr)
     {
       return this->read_insn_memory_1 (pc, addr);
     }
   inline void
-  SETIMEMUQI(PCADDR pc, ADDR addr, UQI value) const
+  SETIMEMUQI(PCADDR pc, ADDR addr, UQI value)
     {
       return this->write_insn_memory_1 (pc, addr, value);
     }
   inline HI
-  GETIMEMHI(PCADDR pc, IADDR addr) const
+  GETIMEMHI(PCADDR pc, IADDR addr)
     {
       return this->read_insn_memory_2 (pc, addr);
     }
   inline void
-  SETIMEMHI(PCADDR pc, ADDR addr, HI value) const
+  SETIMEMHI(PCADDR pc, ADDR addr, HI value)
     {
       return this->write_insn_memory_2 (pc, addr, value);
     }
   inline UHI
-  GETIMEMUHI(PCADDR pc, IADDR addr) const
+  GETIMEMUHI(PCADDR pc, IADDR addr)
     {
       return this->read_insn_memory_2 (pc, addr);
     }
   inline void
-  SETIMEMUHI(PCADDR pc, ADDR addr, UHI value) const
+  SETIMEMUHI(PCADDR pc, ADDR addr, UHI value)
     {
       return this->write_insn_memory_2 (pc, addr, value);
     }
   inline SI
-  GETIMEMSI(PCADDR pc, IADDR addr) const
+  GETIMEMSI(PCADDR pc, IADDR addr)
     {
       return this->read_insn_memory_4 (pc, addr);
     }
   inline void
-  SETIMEMSI(PCADDR pc, ADDR addr, SI value) const
+  SETIMEMSI(PCADDR pc, ADDR addr, SI value)
     {
       return this->write_insn_memory_4 (pc, addr, value);
     }
   inline USI
-  GETIMEMUSI(PCADDR pc, IADDR addr) const
+  GETIMEMUSI(PCADDR pc, IADDR addr)
     {
       return this->read_insn_memory_4 (pc, addr);
     }
   inline void
-  SETIMEMUSI(PCADDR pc, ADDR addr, USI value) const
+  SETIMEMUSI(PCADDR pc, ADDR addr, USI value)
     {
       return this->write_insn_memory_4 (pc, addr, value);
     }
   inline DI
-  GETIMEMDI(PCADDR pc, IADDR addr) const
+  GETIMEMDI(PCADDR pc, IADDR addr)
     {
       return this->read_insn_memory_8 (pc, addr);
     }
   inline void
-  SETIMEMDI(PCADDR pc, ADDR addr, DI value) const
+  SETIMEMDI(PCADDR pc, ADDR addr, DI value)
     {
       return this->write_insn_memory_8 (pc, addr, value);
     }
   inline UDI
-  GETIMEMUDI(PCADDR pc, IADDR addr) const
+  GETIMEMUDI(PCADDR pc, IADDR addr)
     {
       return this->read_insn_memory_8 (pc, addr);
     }
   inline void
-  SETIMEMUDI(PCADDR pc, ADDR addr, UDI value) const
+  SETIMEMUDI(PCADDR pc, ADDR addr, UDI value)
     {
       return this->write_insn_memory_8 (pc, addr, value);
     }

@@ -101,11 +101,11 @@ namespace sidutil
 
 
   class basic_cpu: public virtual sid::component,
-		   protected fixed_pin_map_component,
-		   protected fixed_accessor_map_component,
-		   protected fixed_attribute_map_component,
-		   protected fixed_relation_map_component,
-		   protected fixed_bus_map_component
+		   protected virtual fixed_pin_map_component,
+		   protected virtual fixed_accessor_map_component,
+		   protected virtual fixed_attribute_map_component,
+		   protected virtual fixed_relation_map_component,
+		   protected virtual fixed_bus_map_component
   {
     // custom memory allocators for poisioning freshly-allocated memory
   public:
@@ -260,7 +260,7 @@ namespace sidutil
     bool enable_step_trap_p;
     cpu_trace_stream trace_stream;
 
-    void step_pin_handler (sid::host_int_4)
+    virtual void step_pin_handler (sid::host_int_4)
       {
 	recursion_record limit (& this->step_limit);
 	if (UNLIKELY(! limit.ok())) return;
@@ -530,13 +530,23 @@ namespace sidutil
 
   protected:
     template <typename BigOrLittleInt>
-    BigOrLittleInt read_insn_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt) const;
+    BigOrLittleInt read_insn_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt);
     template <typename BigOrLittleInt>
-    BigOrLittleInt write_insn_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt value) const;
+    BigOrLittleInt write_insn_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt value);
     template <typename BigOrLittleInt>
-    BigOrLittleInt read_data_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt) const;
+    BigOrLittleInt read_data_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt);
     template <typename BigOrLittleInt>
-    BigOrLittleInt write_data_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt value) const;
+    BigOrLittleInt write_data_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt value);
+
+    virtual bool handle_insn_memory_read_error (sid::bus::status s, sid::host_int_4 & address) { return false; }
+    virtual bool handle_insn_memory_write_error (sid::bus::status s, sid::host_int_4 & address) { return false; }
+    virtual bool handle_data_memory_read_error (sid::bus::status s, sid::host_int_4 & address) { return false; }
+    virtual bool handle_data_memory_write_error (sid::bus::status s, sid::host_int_4 & address) { return false; }
+
+    virtual void record_insn_memory_read_latency (sid::bus::status s) { total_latency += s.latency; }
+    virtual void record_insn_memory_write_latency (sid::bus::status s) { total_latency += s.latency; }
+    virtual void record_data_memory_read_latency (sid::bus::status s) { total_latency += s.latency; }
+    virtual void record_data_memory_write_latency (sid::bus::status s) { total_latency += s.latency; }
 
     // ------------------------------------------------------------------------
     
@@ -642,63 +652,99 @@ public:
     }
   
     template <typename BigOrLittleInt>
-    BigOrLittleInt basic_cpu::read_insn_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt) const
+    BigOrLittleInt basic_cpu::read_insn_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt)
       {
-	BigOrLittleInt value;
 	sid::bus::status s;
-	if (LIKELY(this->insn_bus))
-	  s = this->insn_bus->read (address, value);
-	else
-	  s = sid::bus::unmapped;
-	total_latency += s.latency;
-	if (LIKELY(s == sid::bus::ok))
-	  return value;
+	do
+	  {
+	    BigOrLittleInt value;
+	    if (LIKELY(this->insn_bus))
+	      {
+		s = this->insn_bus->read (address, value);
+		if (LIKELY(s == sid::bus::ok))
+		  {
+		    if (UNLIKELY ((trace_counter_p || final_insn_count_p) && s.latency))
+		      record_insn_memory_read_latency (s);
+		    return value;
+		  }
+	      }
+	    else
+	      s = sid::bus::unmapped;
+	  }
+	while (UNLIKELY (handle_insn_memory_read_error (s, address)));
 
 	throw cpu_memory_fault (pc, address, s, "insn read");
       }
 
     template <typename BigOrLittleInt>
-    BigOrLittleInt basic_cpu::write_insn_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt value) const
+    BigOrLittleInt basic_cpu::write_insn_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt value)
       {
 	sid::bus::status s;
-	if (LIKELY(this->insn_bus))
-	  s = this->insn_bus->write (address, value);
-	else
-	  s = sid::bus::unmapped;
-	total_latency += s.latency;
-	if (LIKELY(s == sid::bus::ok))
-	  return value;
+	do
+	  {
+	    if (LIKELY(this->insn_bus))
+	      {
+		s = this->insn_bus->write (address, value);
+		if (LIKELY(s == sid::bus::ok))
+		  {
+		    if (UNLIKELY ((trace_counter_p || final_insn_count_p) && s.latency))
+		      record_insn_memory_write_latency (s);
+		    return value;
+		  }
+	      }
+	    else
+	      s = sid::bus::unmapped;
+	  }
+	while (UNLIKELY (handle_insn_memory_read_error (s, address)));
 
 	throw cpu_memory_fault (pc, address, s, "insn write");
       }
 
     template <typename BigOrLittleInt>
-    BigOrLittleInt basic_cpu::read_data_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt) const
+    BigOrLittleInt basic_cpu::read_data_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt)
       {
-	BigOrLittleInt value;
 	sid::bus::status s;
-	if (LIKELY(this->data_bus))
-	  s = this->data_bus->read (address, value);
-	else
-	  s = sid::bus::unmapped;
-	total_latency += s.latency;
-	if (LIKELY(s == sid::bus::ok))
-	  return value;
+	do
+	  {
+	    BigOrLittleInt value;
+	    if (LIKELY(this->data_bus))
+	      {
+		s = this->data_bus->read (address, value);
+		if (LIKELY(s == sid::bus::ok))
+		  {
+		    if (UNLIKELY ((trace_counter_p || final_insn_count_p) && s.latency))
+		      record_data_memory_read_latency (s);
+		    return value;
+		  }
+	      }
+	    else
+	      s = sid::bus::unmapped;
+	  }
+	while (UNLIKELY (handle_insn_memory_read_error (s, address)));
 
 	throw cpu_memory_fault (pc, address, s, "data read");
       }
 
     template <typename BigOrLittleInt>
-    BigOrLittleInt basic_cpu::write_data_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt value) const
+    BigOrLittleInt basic_cpu::write_data_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt value)
       {
 	sid::bus::status s;
-	if (LIKELY(this->data_bus))
-	  s = this->data_bus->write (address, value);
-	else
-	  s = sid::bus::unmapped;
-	total_latency += s.latency;
-	if (LIKELY(s == sid::bus::ok))
-	  return value;
+	do
+	  {
+	    if (LIKELY(this->data_bus))
+	      {
+		s = this->data_bus->write (address, value);
+		if (LIKELY(s == sid::bus::ok))
+		  {
+		    if (UNLIKELY ((trace_counter_p || final_insn_count_p) && s.latency))
+		      record_data_memory_write_latency (s);
+		    return value;
+		  }
+	      }
+	    else
+	      s = sid::bus::unmapped;
+	  }
+	while (UNLIKELY (handle_insn_memory_read_error (s, address)));
 
 	throw cpu_memory_fault (pc, address, s, "data write");
       }
@@ -721,82 +767,82 @@ public:
       }
     ~basic_big_endian_cpu () throw() {}
 
-    sid::host_int_1 read_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_1 read_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_insn_memory (pc, address, sid::big_int_1());
       }
 
-    sid::host_int_2 read_insn_memory_2 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_2 read_insn_memory_2 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_insn_memory (pc, address, sid::big_int_2());
       }
 
-    sid::host_int_4 read_insn_memory_4 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_4 read_insn_memory_4 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_insn_memory (pc, address, sid::big_int_4());
       }
 
-    sid::host_int_8 read_insn_memory_8 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_8 read_insn_memory_8 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_insn_memory (pc, address, sid::big_int_8());
       }
 
-    void write_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_1 value) const
+    void write_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_1 value)
       {
 	this->write_insn_memory (pc, address, sid::big_int_1(value));
       }
 
-    void write_insn_memory_2 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_2 value) const
+    void write_insn_memory_2 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_2 value)
       {
 	this->write_insn_memory (pc, address, sid::big_int_2(value));
       }
 
-    void write_insn_memory_4 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_4 value) const
+    void write_insn_memory_4 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_4 value)
       {
 	this->write_insn_memory (pc, address, sid::big_int_4(value));
       }
 
-    void write_insn_memory_8 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_8 value) const
+    void write_insn_memory_8 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_8 value)
       {
 	this->write_insn_memory (pc, address, sid::big_int_8(value));
       }
 
-    sid::host_int_1 read_data_memory_1 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_1 read_data_memory_1 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_data_memory (pc, address, sid::big_int_1());
       }
 
-    sid::host_int_2 read_data_memory_2 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_2 read_data_memory_2 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_data_memory (pc, address, sid::big_int_2());
       }
 
-    sid::host_int_4 read_data_memory_4 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_4 read_data_memory_4 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_data_memory (pc, address, sid::big_int_4());
       }
 
-    sid::host_int_8 read_data_memory_8 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_8 read_data_memory_8 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_data_memory (pc, address, sid::big_int_8());
       }
 
-    void write_data_memory_1 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_1 value) const
+    void write_data_memory_1 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_1 value)
       {
 	this->write_data_memory (pc, address, sid::big_int_1(value));
       }
 
-    void write_data_memory_2 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_2 value) const
+    void write_data_memory_2 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_2 value)
       {
 	this->write_data_memory (pc, address, sid::big_int_2(value));
       }
 
-    void write_data_memory_4 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_4 value) const
+    void write_data_memory_4 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_4 value)
       {
 	this->write_data_memory (pc, address, sid::big_int_4(value));
       }
 
-    void write_data_memory_8 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_8 value) const
+    void write_data_memory_8 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_8 value)
       {
 	this->write_data_memory (pc, address, sid::big_int_8(value));
       }
@@ -817,82 +863,82 @@ public:
       }
     ~basic_little_endian_cpu () throw() {}
 
-    sid::host_int_1 read_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_1 read_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_insn_memory (pc, address, sid::little_int_1());
       }
 
-    sid::host_int_2 read_insn_memory_2 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_2 read_insn_memory_2 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_insn_memory (pc, address, sid::little_int_2());
       }
 
-    sid::host_int_4 read_insn_memory_4 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_4 read_insn_memory_4 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_insn_memory (pc, address, sid::little_int_4());
       }
 
-    sid::host_int_8 read_insn_memory_8 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_8 read_insn_memory_8 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_insn_memory (pc, address, sid::little_int_8());
       }
 
-    void write_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_1 value) const
+    void write_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_1 value)
       {
 	this->write_insn_memory (pc, address, sid::little_int_1(value));
       }
 
-    void write_insn_memory_2 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_2 value) const
+    void write_insn_memory_2 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_2 value)
       {
 	this->write_insn_memory (pc, address, sid::little_int_2(value));
       }
 
-    void write_insn_memory_4 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_4 value) const
+    void write_insn_memory_4 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_4 value)
       {
 	this->write_insn_memory (pc, address, sid::little_int_4(value));
       }
 
-    void write_insn_memory_8 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_8 value) const
+    void write_insn_memory_8 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_8 value)
       {
 	this->write_insn_memory (pc, address, sid::little_int_8(value));
       }
 
-    sid::host_int_1 read_data_memory_1 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_1 read_data_memory_1 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_data_memory (pc, address, sid::little_int_1());
       }
 
-    sid::host_int_2 read_data_memory_2 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_2 read_data_memory_2 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_data_memory (pc, address, sid::little_int_2());
       }
 
-    sid::host_int_4 read_data_memory_4 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_4 read_data_memory_4 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_data_memory (pc, address, sid::little_int_4());
       }
 
-    sid::host_int_8 read_data_memory_8 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_8 read_data_memory_8 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	return this->read_data_memory (pc, address, sid::little_int_8());
       }
 
-    void write_data_memory_1 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_1 value) const
+    void write_data_memory_1 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_1 value)
       {
 	this->write_data_memory (pc, address, sid::little_int_1(value));
       }
 
-    void write_data_memory_2 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_2 value) const
+    void write_data_memory_2 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_2 value)
       {
 	this->write_data_memory (pc, address, sid::little_int_2(value));
       }
 
-    void write_data_memory_4 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_4 value) const
+    void write_data_memory_4 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_4 value)
       {
 	this->write_data_memory (pc, address, sid::little_int_4(value));
       }
 
-    void write_data_memory_8 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_8 value) const
+    void write_data_memory_8 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_8 value)
       {
 	this->write_data_memory (pc, address, sid::little_int_8(value));
       }
@@ -945,7 +991,7 @@ public:
       }
 
 
-    sid::host_int_1 read_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_1 read_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	if (this->_current_endianness == endian_little)
 	  return this->read_insn_memory (pc, address, sid::little_int_1());
@@ -953,7 +999,7 @@ public:
 	  return this->read_insn_memory (pc, address, sid::big_int_1());
       }
 
-    sid::host_int_2 read_insn_memory_2 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_2 read_insn_memory_2 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	if (this->_current_endianness == endian_little)
 	  return this->read_insn_memory (pc, address, sid::little_int_2());
@@ -961,7 +1007,7 @@ public:
 	  return this->read_insn_memory (pc, address, sid::big_int_2());
       }
 
-    sid::host_int_4 read_insn_memory_4 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_4 read_insn_memory_4 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	if (this->_current_endianness == endian_little)
 	  return this->read_insn_memory (pc, address, sid::little_int_4());
@@ -969,7 +1015,7 @@ public:
 	  return this->read_insn_memory (pc, address, sid::big_int_4());
       }
 
-    sid::host_int_8 read_insn_memory_8 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_8 read_insn_memory_8 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	if (this->_current_endianness == endian_little)
 	  return this->read_insn_memory (pc, address, sid::little_int_8());
@@ -977,7 +1023,7 @@ public:
 	  return this->read_insn_memory (pc, address, sid::big_int_8());
       }
 
-    void write_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_1 value) const
+    void write_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_1 value)
       {
 	if (this->_current_endianness == endian_little)
 	  this->write_insn_memory (pc, address, sid::little_int_1(value));
@@ -985,7 +1031,7 @@ public:
 	  this->write_insn_memory (pc, address, sid::big_int_1(value));
       }
 
-    void write_insn_memory_2 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_2 value) const
+    void write_insn_memory_2 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_2 value)
       {
 	if (this->_current_endianness == endian_little)
 	  this->write_insn_memory (pc, address, sid::little_int_2(value));
@@ -993,7 +1039,7 @@ public:
 	  this->write_insn_memory (pc, address, sid::big_int_2(value));
       }
 
-    void write_insn_memory_4 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_4 value) const
+    void write_insn_memory_4 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_4 value)
       {
 	if (this->_current_endianness == endian_little)
 	  this->write_insn_memory (pc, address, sid::little_int_4(value));
@@ -1001,7 +1047,7 @@ public:
 	  this->write_insn_memory (pc, address, sid::big_int_4(value));
       }
 
-    void write_insn_memory_8 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_8 value) const
+    void write_insn_memory_8 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_8 value)
       {
 	if (this->_current_endianness == endian_little)
 	  this->write_insn_memory (pc, address, sid::little_int_8(value));
@@ -1009,7 +1055,7 @@ public:
 	  this->write_insn_memory (pc, address, sid::big_int_8(value));
       }
 
-    sid::host_int_1 read_data_memory_1 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_1 read_data_memory_1 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	if (this->_current_endianness == endian_little)
 	  return this->read_data_memory (pc, address, sid::little_int_1());
@@ -1017,7 +1063,7 @@ public:
 	  return this->read_data_memory (pc, address, sid::big_int_1());
       }
 
-    sid::host_int_2 read_data_memory_2 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_2 read_data_memory_2 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	if (this->_current_endianness == endian_little)
 	  return this->read_data_memory (pc, address, sid::little_int_2());
@@ -1025,7 +1071,7 @@ public:
 	  return this->read_data_memory (pc, address, sid::big_int_2());
       }
 
-    sid::host_int_4 read_data_memory_4 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_4 read_data_memory_4 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	if (this->_current_endianness == endian_little)
 	  return this->read_data_memory (pc, address, sid::little_int_4());
@@ -1033,7 +1079,7 @@ public:
 	  return this->read_data_memory (pc, address, sid::big_int_4());
       }
 
-    sid::host_int_8 read_data_memory_8 (sid::host_int_4 pc, sid::host_int_4 address) const
+    sid::host_int_8 read_data_memory_8 (sid::host_int_4 pc, sid::host_int_4 address)
       {
 	if (this->_current_endianness == endian_little)
 	  return this->read_data_memory (pc, address, sid::little_int_8());
@@ -1041,7 +1087,7 @@ public:
 	  return this->read_data_memory (pc, address, sid::big_int_8());
       }
 
-    void write_data_memory_1 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_1 value) const
+    void write_data_memory_1 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_1 value)
       {
 	if (this->_current_endianness == endian_little)
 	  this->write_data_memory (pc, address, sid::little_int_1(value));
@@ -1049,7 +1095,7 @@ public:
 	  this->write_data_memory (pc, address, sid::big_int_1(value));
       }
 
-    void write_data_memory_2 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_2 value) const
+    void write_data_memory_2 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_2 value)
       {
 	if (this->_current_endianness == endian_little)
 	  this->write_data_memory (pc, address, sid::little_int_2(value));
@@ -1057,7 +1103,7 @@ public:
 	  this->write_data_memory (pc, address, sid::big_int_2(value));
       }
 
-    void write_data_memory_4 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_4 value) const
+    void write_data_memory_4 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_4 value)
       {
 	if (this->_current_endianness == endian_little)
 	  this->write_data_memory (pc, address, sid::little_int_4(value));
@@ -1065,7 +1111,7 @@ public:
 	  this->write_data_memory (pc, address, sid::big_int_4(value));
       }
 
-    void write_data_memory_8 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_8 value) const
+    void write_data_memory_8 (sid::host_int_4 pc, sid::host_int_4 address, sid::host_int_8 value)
       {
 	if (this->_current_endianness == endian_little)
 	  this->write_data_memory (pc, address, sid::little_int_8(value));

@@ -1,3 +1,62 @@
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (read_insn_memory): Only call
+	record_insn_memory_read_latency if --trace-counter or
+	--final-insn-count are specified.
+	(write_insn_memory): Ditto.
+	(read_data_memory): Ditto.
+	(write_data_memory): Ditto.
+
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (record_insn_memory_read_latency): New virtual method.
+	(record_insn_memory_write_latency): New virtual method.
+	(record_data_memory_read_latency): New virtual method.
+	(record_data_memory_write_latency): New virtual method.
+	(read_insn_memory): Call record_insn_memory_read_latency.
+	(write_insn_memory): Call record_insn_memory_write_latency.
+	(read_data_memory): Call record_data_memory_read_latency.
+	(write_data_memory): Call record_data_memory_write_latency.
+	* sidattrutil.h (fixed_attribute_map_with_logging_component::check_level):
+	now protected and returns bool.
+	* sidblockingutil.h: Rework ulog levels.
+	* sidbusutil.h (bus_arbitrator): Rework ulog levels. Return the result
+	of busy_status instead of bus::busy. New methods: busy_status and
+	access_latency.
+	(perform_read): Only call set_route_busy is status is bus::ok.
+	(perform_write): Only call set_route_busy is status is bus::ok.
+
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* sidbusutil.h (bus_arbitrator::input_interface): New class.
+	(bus_arbitrator::reschedule): Reschedule after the given number of
+	cycles.
+	(bus_arbitrator::arbitrate_read): New method.
+	(bus_arbitrator::arbitrate_write): New method.
+	(bus_arbitrator::prioritize_request): New virtual method.
+	(bus_arbitrator::perform_read): Propogate the lock from the upstream
+	interface to the downstream interface.
+	(bus_arbitrator::perform_write): Ditto.
+	(bus_arbitrator::lock_downstream): New virtual method.
+
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* sidblockingutil.h (blocking_component): Reimplement using mutexes
+	for synchronization.
+
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (basic_cpu): Inherit virtually from all base classes.
+	(basic_cpu::step_pin_handler): Now virtual.
+	(basic_cpu::{read,write}_{insn,data}_memory): No longer const. Call
+	handle_{insn,data}_memory_{read,write}_error for bus errors.
+	(basic_big_endian_cpu::{read,write_{insn,data}_memory*): No longer
+	const.
+	(basic_little_endian_cpu): Ditto.
+	* sidcomp.h (bus::status_t): Add 'busy'.
+	* sidattrutil.h: Remove unused code.
+	* sidblockingutil.h: New header.
+
 2005-01-26  Thiemo Seufer  <seufer@csv.ica.uni-stuttgart.de>
 
 	* sidtypes.h (HOST_BIG_ENDIAN): Add support for both MIPS

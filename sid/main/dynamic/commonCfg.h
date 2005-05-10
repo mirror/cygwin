@@ -70,6 +70,25 @@ public:
   string my_replace;
 };
 
+class BlockingCacheCfg :
+  public CacheCfg
+{
+public:
+  // 8-byte buffers
+  BlockingCacheCfg (const string name);
+  // direct caches
+  BlockingCacheCfg (const string name, 
+		    const sid::host_int_4 size, 
+		    const sid::host_int_4 linesize);
+  // complex associative caches
+  BlockingCacheCfg (const string name, 
+		    const string assoc, 
+		    const sid::host_int_4 size, 
+		    const sid::host_int_4 linesize, 
+		    const string replace);
+  virtual ~BlockingCacheCfg();
+};
+
 
 class SchedCfg :
   virtual public AtomicCfg

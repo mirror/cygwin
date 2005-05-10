@@ -254,6 +254,48 @@ void CacheCfg::set_refill_latency (sid::host_int_4 i)
   set (this, "refill-latency", sidutil::make_attribute (i));
 }
 
+// BlockingCacheCfg
+BlockingCacheCfg::~BlockingCacheCfg () {}
+BlockingCacheCfg::BlockingCacheCfg (const string name) : 
+  CacheCfg (name),
+  ComponentCfg (name),
+  AtomicCfg (name, 
+	     "libcache.la", 
+	     "cache_component_library",
+	     "hw-blocking-cache-buffer-8")
+{}
+
+// direct caches
+BlockingCacheCfg::BlockingCacheCfg (const string name, 
+		    const sid::host_int_4 size, 
+		    const sid::host_int_4 linesize) : 
+  CacheCfg (name, size, linesize),
+  ComponentCfg (name),
+  AtomicCfg (name, 
+	     "libcache.la", 
+	     "cache_component_library",
+	     "hw-blocking-cache-direct/" + 
+	     sidutil::make_attribute(size) + "kb/" +
+	     sidutil::make_attribute(linesize))
+{}
+
+// complex associative caches
+BlockingCacheCfg::BlockingCacheCfg (const string name, 
+	  const string assoc, 
+	  const sid::host_int_4 size, 
+	  const sid::host_int_4 linesize, 
+	  const string replace) : 
+  CacheCfg (name, assoc, size, linesize, replace),
+  ComponentCfg (name),
+  AtomicCfg (name, 
+	     "libcache.la", 
+	     "cache_component_library",
+	     "hw-blocking-cache-" + assoc + "/" + 
+	     sidutil::make_attribute(size) + "kb/" +
+	     sidutil::make_attribute(linesize) + "/" +
+	     replace)
+{}
+
 // CpuCfg
 
 

@@ -14,7 +14,20 @@ AC_EXEEXT
 AC_LANG_CPLUSPLUS
 
 AC_CHECK_LIB(m, main)
+AC_CHECK_LIB(pthread, pthread_create)
 AC_CHECK_FUNCS(getopt)
+
+dnl Need extra defines for Solaris threads
+case "$host" in
+  sparc-sun-solaris*)
+    # Note: If _REENTRANT isn't defined, then Solaris
+    # won't define thread-safe library routines.
+    cpu_defs="-D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS"
+    ;;
+  *)
+    cpu_defs=
+    ;;
+esac
 
 dnl Check if we need libintl.
 AC_MSG_CHECKING([whether libintl is required for gettext])

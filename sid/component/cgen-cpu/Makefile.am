@@ -12,7 +12,7 @@ pkglib_LTLIBRARIES = libcgencpu.la
 INCLUDESBFD = -I../../../bfd -I$(srcdir)/../../../include
 INCLUDES = -I. -I.. @cpu_incl@ -I../../include -I$(srcdir)/../../include $(INCLUDESBFD)
 
-CXXFLAGS=
+CXXFLAGS=@cpu_defs@
 TOP_CXXFLAGS=$(CXXFLAGS)
 AM_CXXFLAGS=$(TOP_CXXFLAGS)
 AM_MAKEFLAGS= "TOP_CXXFLAGS=$(TOP_CXXFLAGS)"

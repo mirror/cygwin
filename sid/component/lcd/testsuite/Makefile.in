@@ -80,6 +80,7 @@ RANLIB = @RANLIB@
 SABLOTRON = @SABLOTRON@
 VERSION = @VERSION@
 XSLTPROC = @XSLTPROC@
+comp_defs = @comp_defs@
 lcd_libs = @lcd_libs@
 make_subdirs = @make_subdirs@
 sidtarget_arm = @sidtarget_arm@

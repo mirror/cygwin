@@ -1,7 +1,7 @@
 // sidcomp.h - Define the external interface of a SID component, that
 // is, the SID component API expressed in -*- C++ -*-.
 
-// Copyright (C) 1999, 2000, 2001 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2004 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -45,6 +45,7 @@ namespace sid
       misaligned   = 0x01, // address misaligned
       unmapped     = 0x02, // address not in mapped range
       unpermitted  = 0x04, // may not read or may not write at address
+      busy         = 0x05  // target component is busy
     };
 
     struct status

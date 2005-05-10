@@ -1,6 +1,6 @@
 // sidbusutil.h -*- C++ -*- Different types and sizes of buses.
 
-// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2004 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -9,6 +9,10 @@
 
 #include <sidconfig.h>
 #include <sidtypes.h>
+#include <sidcomputil.h>
+#include <sidschedutil.h>
+#include <sidpinutil.h>
+#include <sidblockingutil.h>
 
 #include <string>
 #include <map>
@@ -52,8 +56,10 @@ namespace sidutil
 	sid::host_int_4 a = address;
 
 	unsigned bytesWritten = 0;
+	sid::host_int_2 max_latency = 0;
 	DataType d = 0;
         DataType mask = 0;
+	sid::bus::status s;
 	while(bytesWritten < accWidth)
 	  {
 	    sid::host_int_1 byte = data.read_byte(bytesWritten);
@@ -63,7 +69,6 @@ namespace sidutil
 	    if(((bytesWritten + a) % busWidth == (busWidth - 1)) || // last byte in target
 	       (bytesWritten == (accWidth - 1))) // last byte in source
 	      {
-		sid::bus::status s;
 
 		s = this->word_write(sid::host_int_4(a / busWidth), mask, d);
 		if (s != sid::bus::ok)
@@ -71,6 +76,8 @@ namespace sidutil
 		    this->post_access_hook();
 		    return s;
 		  }
+		if (s.latency > max_latency)
+		  max_latency = s.latency;
 
 		a = a + busWidth; // advance address
 		// Clear data.
@@ -82,7 +89,8 @@ namespace sidutil
 	  }
 
 	this->post_access_hook();
-	return sid::bus::ok;
+	s.latency = max_latency;
+	return s;
       }
     
 
@@ -101,7 +109,9 @@ namespace sidutil
 	
 	unsigned bytesRead = 0;
 	unsigned bytesAddressed = 0;
+	sid::host_int_2 max_latency = 0;
         DataType mask = 0;
+	sid::bus::status s;
 	while(bytesAddressed < accWidth)
 	  {
 	    mask.write_byte((bytesAddressed + a) % busWidth, 0xff);
@@ -109,8 +119,6 @@ namespace sidutil
 	    if(((bytesAddressed + a) % busWidth == (busWidth - 1)) || // last byte in target
 	       (bytesAddressed == (accWidth - 1))) // last byte in source
 	      {
-		sid::bus::status s;
-
 		DataType d = 0;
 		s = this->word_read(sid::host_int_4(a / busWidth), mask, d);
 		if (s != sid::bus::ok)
@@ -118,6 +126,8 @@ namespace sidutil
 		    this->post_access_hook();
 		    return s;
 		  }
+		if (s.latency > max_latency)
+		  max_latency = s.latency;
 
 		// Copy over newly read bytes
 		while (bytesRead <= bytesAddressed)
@@ -138,7 +148,8 @@ namespace sidutil
 	assert (bytesAddressed == bytesRead);
 
 	this->post_access_hook();
-	return sid::bus::ok;
+	s.latency = max_latency;
+	return s;
       }
     
     
@@ -1179,6 +1190,274 @@ namespace sidutil
   private:
     typedef std::map<std::string,sid::bus*> bus_map_t;
     mutable bus_map_t bus_map;
+  };
+
+  // Following class is a virtual base class used for implementing bus
+  // arbitrators.
+  class bus_arbitrator: public virtual sid::component,
+			protected fixed_bus_map_component,
+			protected virtual fixed_pin_map_component,
+			protected fixed_accessor_map_component,
+			protected no_relation_component,
+			public fixed_attribute_map_with_logging_component
+  {
+  public:
+    bus_arbitrator () :
+      sched ("step", this, & bus_arbitrator::step_cycle)
+      {
+	// Attributes
+	add_attribute ("name", &name);
+	// Control pins
+	//
+	add_pin ("running", & running_pin);
+	running_pin.set_active_high ();
+	add_pin ("active", & active_pin);
+	active_pin.set_active_high ();
+	add_pin ("passthrough", & passthrough_pin);
+	passthrough_pin.set_active_high ();
+      }
+    ~bus_arbitrator () throw () { }
+
+  protected:
+    // A bus for requests from the input interfaces.
+    // 
+    class input_interface : public sid::bus
+    { 
+    public:
+      input_interface (bus_arbitrator *h, int us) : host (h), upstream (us) { }
+
+#define SID_GB_WRITE(dtype) \
+      sid::bus::status write(sid::host_int_4 addr, dtype data) throw ()\
+	  { return host->write(upstream, addr, data); }
+
+#define SID_GB_READ(dtype) \
+      sid::bus::status read(sid::host_int_4 addr, dtype& data) throw ()\
+	  { return host->read(upstream, addr, data); }
+
+      SID_GB_WRITE(sid::little_int_1)
+      SID_GB_WRITE(sid::big_int_1)
+      SID_GB_WRITE(sid::little_int_2)
+      SID_GB_WRITE(sid::big_int_2)
+      SID_GB_WRITE(sid::little_int_4)
+      SID_GB_WRITE(sid::big_int_4)
+      SID_GB_WRITE(sid::little_int_8)
+      SID_GB_WRITE(sid::big_int_8)
+
+      SID_GB_READ(sid::little_int_1)
+      SID_GB_READ(sid::big_int_1)
+      SID_GB_READ(sid::little_int_2)
+      SID_GB_READ(sid::big_int_2)
+      SID_GB_READ(sid::little_int_4)
+      SID_GB_READ(sid::big_int_4)
+      SID_GB_READ(sid::little_int_8)
+      SID_GB_READ(sid::big_int_8)
+
+#undef SID_GB_WRITE
+#undef SID_GB_READ
+    private:
+      bus_arbitrator *host;
+      int upstream;
+    };
+    friend class input_interface;
+
+    // A struct representing a bus request
+    struct bus_request
+    {
+      bus_request () {}
+      bus_request (bool r, int us, int ds, sid::host_int_4 a, unsigned s)
+	: is_read(r), upstream(us), downstream(ds), addr(a), size(s)
+        { }
+      bool operator== (const bus_request &r)
+        {
+	  return is_read == r.is_read
+	    && upstream == r.upstream
+	    && downstream == r.downstream
+	    && addr == r.addr
+	    && size == r.size;
+        }
+      bool is_read;
+      int upstream;
+      int downstream;
+      sid::host_int_4 addr;
+      unsigned size;
+    };
+
+  protected:
+    // Handlers for input interfaces
+    //
+    template<class DataType>
+    sid::bus::status
+    write(int upstream, sid::host_int_4 addr, DataType data)
+      {
+	if (ulog_level >= 8 || ! check_passthrough ())
+	  log (5, "%s: received write request from %s interface at 0x%x\n",
+	       name.c_str (), up2str(upstream), addr);
+	return arbitrate_write (upstream, downstream_for_address (addr), addr, data);
+      }
+
+    template<class DataType>
+    sid::bus::status
+    read(int upstream, sid::host_int_4 addr, DataType& data)
+      {
+	if (ulog_level >= 8 || ! check_passthrough ())
+	  log (5, "%s: received read request from %s interface at 0x%x\n",
+	       name.c_str (), up2str(upstream), addr);
+	return arbitrate_read (upstream, downstream_for_address (addr), addr, data);
+      }
+
+    virtual const char *up2str (int upstream) = 0;
+    virtual int downstream_for_address (sid::host_int_4 address) = 0;
+
+  protected:
+    // Advance time
+    //
+    virtual void step_cycle ()
+      {
+	log (5, "%s: Stepping\n", name.c_str());
+	update_busy_routes ();
+      }
+
+    virtual void reschedule (sid::host_int_2 latency)
+      {
+        if (latency)
+	  {
+	    log (5, "%s: rescheduling (%d)\n", name.c_str (), latency);
+	    sched.schedule_irregular (1);
+	  }
+      }
+
+    // Methods for arbitration
+    //
+    template<class DataType>
+    sid::bus::status arbitrate_read (int upstream,
+				     int downstream,
+				     sid::host_int_4 addr,
+				     DataType& data)
+      {
+	// Check for direct passthrough
+	if (check_passthrough ())
+	  return downstream_bus (downstream)->read (addr, data);
+
+	// Prioritize the request
+	// Execute it if it's ready
+	bus_request r (true, upstream, downstream, addr, sizeof (data));
+	if (prioritize_request (r))
+	  return perform_read (r, data);
+
+	return busy_status ();
+      }
+
+    template<class DataType>
+    sid::bus::status arbitrate_write (int upstream,
+				      int downstream,
+				      sid::host_int_4 addr,
+				      DataType data)
+      {
+	// Check for direct passthrough
+	if (check_passthrough ())
+	  return downstream_bus (downstream)->write(addr, data);
+
+	// Prioritize the request
+	// Execute it if it's ready
+	bus_request r (false, upstream, downstream, addr, sizeof (data));
+	if (prioritize_request (r))
+	  return perform_write (r, data);
+
+	return busy_status ();
+      }
+
+    // Provide a default implementation which does no prioritization and
+    // handles the requests right away as they arrive.
+    virtual bool prioritize_request (bus_request &r) { return true; }
+
+    // Methods for downstream accessors
+    //
+    template<class DataType>
+    sid::bus::status perform_read (bus_request &r, DataType &data)
+      {
+	// See if the route is available
+	if (check_route_busy (r.upstream, r.downstream))
+	  return busy_status ();
+
+	// Propagate any locked pin from upstream
+	lock_downstream (r.upstream, r.downstream);
+
+	// Perform the read
+	sid::bus::status s = downstream_bus (r.downstream)->read (r.addr, data);
+
+	// Update status
+	if (s == sid::bus::ok)
+	  s = set_route_busy (r, s);
+	return s;
+      }
+
+    template<class DataType>
+    sid::bus::status perform_write (bus_request &r, DataType data)
+      {
+	// See if the route is available
+	if (check_route_busy (r.upstream, r.downstream))
+	  return busy_status ();
+  
+	// Propogate any locked pin from upstream
+	lock_downstream (r.upstream, r.downstream);
+
+	// Perform the write
+	sid::bus::status s = downstream_bus (r.downstream)->write (r.addr, data);
+
+	// Update status
+	if (s == sid::bus::ok)
+	  s = set_route_busy (r, s);
+	return s;
+      }
+
+    bool check_passthrough ()
+      {
+	if (passthrough_pin.state () == binary_pin_active)
+	  {
+	    log (8, "%s: passthrough enabled\n", name.c_str ());
+	    return true;
+	  }
+
+	if (running_pin.state () != binary_pin_active
+	    || active_pin.state () != binary_pin_active)
+	  {
+	    log (8, "%s: system is idle -- passthrough\n", name.c_str ());
+	    return true;
+	  }
+      return false;
+    }
+
+  protected:
+    // Route locking
+    //
+    virtual void lock_downstream (int upstream, int downstream) { }
+
+    virtual bool check_route_busy (int upstream, int downstream) { return false; }
+
+    virtual sid::bus::status set_route_busy (bus_request &r, sid::bus::status s) { return s; }
+    virtual void update_busy_routes () {}
+    virtual sid::bus::status busy_status ()
+      {
+	// Default - busy for 1 cycle
+	sid::bus::status s (sid::bus::busy, 1);
+	return s;
+      }
+
+    virtual sid::bus *downstream_bus (int downstream) = 0;
+
+  protected:
+    scheduler_event_subscription<bus_arbitrator> sched;
+    // This class must be a friend of scheduler_event_subscription<T>.
+    friend class scheduler_event_subscription<bus_arbitrator>;
+
+    // Attributes
+    string name;
+
+    // Control pins
+    //
+    binary_input_pin running_pin;
+    binary_input_pin active_pin;
+    binary_input_pin passthrough_pin;
   };
 }
 

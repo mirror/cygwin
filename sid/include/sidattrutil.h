@@ -1022,35 +1022,24 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
   : public virtual fixed_attribute_map_component,
     public virtual fixed_pin_map_component
   {
-#define SID_LOG_PERSISTENT_BUFFER (HAVE_VSNPRINTF || ! HAVE_VASPRINTF)
-#define SID_LOG_TRANSIENT_MALLOC_BUFFER (! SID_LOG_PERSISTENT_BUFFER)
   protected:
     fixed_attribute_map_with_logging_component () :
       ulog_level (0),
       ulog_mode ("less"),
       ulog_out_pin (),
-      buffer_output (true),
-      buffer_size (4096), // big enough for now
-      saved_messages (),
-      saved_levels ()
+      buffer_output (true)
       {
 	add_attribute ("buffer-output", &buffer_output, "setting");
 	add_attribute ("ulog-level", &ulog_level, "setting");
 	add_attribute ("ulog-mode",  &ulog_mode,  "setting");
 	add_pin ("ulog-out", & ulog_out_pin);
 	ulog_logger =  new logger (& ulog_out_pin, buffer_output, ulog_level, ulog_mode);
-#if SID_LOG_PERSISTENT_BUFFER
-	buffer = new char[buffer_size];
-#endif
       }
     ~fixed_attribute_map_with_logging_component () throw()
       {
 	// Output any saved messages.
 	// output_saved_messages ();
 	ulog_logger->output_saved_messages ();
-#if SID_LOG_PERSISTENT_BUFFER
-	delete [] buffer;
-#endif
       }
 
     void log (sid::host_int_4 level, const char *fmt, ...)
@@ -1063,38 +1052,16 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	va_end (ap);
       }
 
-private:
-    bool check_level (sid::host_int_4 level)
+  protected:
+    bool check_level (sid::host_int_4 level) const
       {
-	ulog_logger->check_level (level);
+	return ulog_logger->check_level (level);
       }
-
-    void output_saved_messages ()
-      {
-	while (saved_messages.size () > 0)
-	  {
-	    if (check_level (saved_levels[0]))
-	      {
-		std::string s = saved_messages[0];
-		for (int i = 0; i < s.size (); ++i)
-		  ulog_out_pin.drive (s[i]);
-	      }
-	    saved_messages.erase (saved_messages.begin ());
-	    saved_levels.erase (saved_levels.begin ());
-	  }
-      }
-
     sid::host_int_4 ulog_level;
     std::string ulog_mode;
     sidutil::output_pin ulog_out_pin;
     bool buffer_output;
     sidutil::logger *ulog_logger;
-    char *buffer;
-    long buffer_size;
-    std::vector<std::string> saved_messages;
-    std::vector<sid::host_int_4> saved_levels;
-#undef SID_LOG_PERSISTENT_BUFFER
-#undef SID_LOG_TRANSIENT_MALLOC_BUFFER
   };
 }
 

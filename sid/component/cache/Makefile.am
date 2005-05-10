@@ -4,8 +4,14 @@ AUTOMAKE_OPTIONS = foreign
 
 pkglib_LTLIBRARIES = libcache.la
 
+AM_CXXFLAGS=$(TOP_CXXFLAGS)
+AM_MAKEFLAGS= "TOP_CXXFLAGS=$(TOP_CXXFLAGS)"
+
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include
-libcache_la_SOURCES = cache.cxx cache.h cacheutil.cxx cacheutil.h log2.h
+EXTRA_SOURCES=
+libcache_la_SOURCES = cache.cxx cache.h \
+	$(EXTRA_SOURCES) \
+	cacheutil.cxx cacheutil.h log2.h
 libcache_la_LDFLAGS = -module -no-undefined
 
 pkgdata_DATA = hw-cache.txt

@@ -1,3 +1,142 @@
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* hw-cache.xml: Input to flush-set, invalidate-set and
+	* hw-cache.txt: Regenerated.
+	flush-and-invalidate-set is now an address.
+	* cacheutil.h (addr_to_tag): New method of cache.
+	* cacheutil.cxx (addr_to_tag): New method of cache.
+	* cache.cxx (cache_component::flush_set): Input argument is now an address.
+	(cache_component::flush_and_invalidate_set): Likewise.
+	(blocking_cache_component::flush_set): Likewise.
+	(blocking_cache_component::flush_and_invalidate_set): Likewise.
+
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* cache.cxx (cache_component): Initialize data_width. Add "data-width"
+	attribute.
+	(read_line): Access the data 4 or 8 bytes at a time, depending on
+	data_width.
+	(write_line): Ditto.
+	(read_downstream, write_downstream): New methods of cache_component.
+	* cache.h (read_downstream, write_downstream): New methods of
+	cache_component.
+	(data_width): New member of cache_component.
+
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* cache.cxx (cache_component): Add "operation-status" pin.
+	(cache_component::flush_all_lines): Accumulate latency and call
+	report_status.
+	(cache_component::flush_line): Ditto.
+	(cache_component::flush_set): Ditto.
+	(cache_component::flush_and_invalidate_set): Ditto.
+	(cache_component::invalidate_all_lines): Call report_status.
+	(cache_component::invalidate_line): Ditto.
+	(cache_component::flush_and_invalidate_line): Ditto.
+	(cache_component::invalidate_set): Ditto.
+	(cache_component::prefetch_line): Ditto.
+	(cache_component::lock_line): Ditto.
+	(cache_component::unlock_line): Ditto.
+	(blocking_cache_component::flush_all_lines): Call report_status if
+	child is blocked.
+	(blocking_cache_component::flush_line): Ditto.
+	(blocking_cache_component::flush_set): Ditto.
+	(blocking_cache_component::flush_and_invalidate_set): Ditto.
+	(blocking_cache_component::flush_and_invalidate_line): Ditto.
+	(blocking_cache_component::prefetch_line): Ditto.
+	* cache.h (report_status): New method of cache_component.
+	(operation_status_pin): New output pin.
+
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* cache.h (flush_all_lines, flush_line, flush_set) 
+	(flush_and_invalidate_set, flush_and_invalidate_line) 
+	(prefetch_line): Now virtual. Also, new methods of
+	blocking_cache_component.
+	(setup_flush_all_transaction, setup_flush_line_transaction)
+	(setup_flush_set_transaction)
+	(setup_flush_and_invalidate_set_transaction)
+	(setup_flush_and_invalidate_line_transaction)
+	(perform_flush_all_transaction, perform_flush_line_transaction)
+	(perform_flush_set_transaction)
+	(perform_flush_and_invalidate_set_transaction)
+	(perform_flush_and_invalidate_line_transaction): New methods of
+	blocking_cache_component.
+	* cache.cxx (blocking_cache_component::write): Remove log message. Don't
+	need return code from continue_child_thread_and_wait.
+	blocking_cache_component::read): Ditto.
+	(flush_all_lines, flush_line, flush_set) 
+	(flush_and_invalidate_set, flush_and_invalidate_line) 
+	(prefetch_line): New methods of blocking_cache_component.
+
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* cache.cxx (cache_component): Initialize total_latency_p. Add
+	"total-latency?" attribute.
+	(read_line): Return the total latency of all accesses if total_latency_p
+	is set.
+	(write_line): Ditto.
+	(handle_bus_error): Copy the status, s, to transaction_status.
+	(blocking_cache_component::read): Always return transaction_status.
+	(blocking_cache_component::write): Ditto.
+	* cache.h (total_latency_p): New member of cache_component.
+
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* cache.h (cache_component::lock_downstream): New virtual method.
+	(cache_component::unlock_downstream): New virutal method.
+	(blocking_cache_component::lock_downstream): New virtual override.
+	(blocking_cache_component::unlock_downstream): New virtual override.
+	* cache.cxx (read_line): Return the maximum latency from the reads
+	performed if refill latency is not requested. Call lock_downstream
+	before the first read. Call unlock_downstream before the final read.
+	(write_line): Ditto.
+	(blocking_cache_component): Add downstream-lock pin.
+
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* cache.cxx (blocking_cache_child_thread_root): Don't call
+	child->child_wait_for_resume.
+	(handle_bus_error): Ditto.
+	(DEFN_METHOD): SID_SIG_CHILD_BLOCKED is now ctl_child_blocked.
+
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* Makefile.am (AM_XXXFLAGS): Set it to $(TOP_CXXFLAGS).
+	(AM_MAKEFLAGS): Pass along TOP_CXXFLAGS.
+	* Makefile.in: Regenerated.
+
+2005-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* mep-cache.cxx (mep_cache): Inherit from blocking_cache_component.
+	* mep-cache.h (mep_cache): Inherit from blocking_cache_component.
+	* cache.h (sidblockingutil.h): #include it.
+	(namespace sid): Add "using" clause. Remove sid:: qualifier from
+	declarations.
+	(cache_component): Inhereit virtually from
+	fixed_attribute_map_component and fixed_pin_map_component.
+	(cache_component::write): Variants now virtual.
+	(cache_component::read): Ditto.
+	(cache_component::handle_read_error): New virtual method.
+	(cache_component::handle_write_error): New virtual method.
+	(cache_bus::write_any): Call cache.write.
+	(cache_bus::read_any): Call cache.read.
+	(blocking_cache_component): New class.
+	* cache.cxx (cache_component::write_any): Call handle_write_error to
+	handle bus errors.
+	(cache_component::write_line): Ditto.
+	(cache_component::read_any): Call handle_read_error as above.
+	(cache_component::read_line): Ditto.
+	(blocking_cache_child_thread_root): New function.
+	(blocking_cache_component): New constructor.
+	(handle_bus_error): New method.
+	(blocking_cache_component:write): New methods.
+	(blocking_cache_component::read): New methods.
+	(CacheListTypes): Add hw-blocking-cache-basic and
+	hw-blocking-cache-buffer-8, hw-blocking-cache-direct* and
+	hw-blocking-cache/*kb*.
+	(CacheCreate): Parse and construct the above.
+
 2004-07-20  Dave Brolley  <brolley@redhat.com>
 
 	* cacheutil.cxx (find): Make sure cache line is valid before returning

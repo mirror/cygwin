@@ -3323,6 +3323,18 @@ EOF
 
 fi
 
+case "$host" in
+  sparc-sun-solaris*)
+    # Note: If _REENTRANT isn't defined, then Solaris
+    # won't define thread-safe library routines.
+    comp_defs="-D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS"
+    ;;
+  *)
+    comp_defs=
+    ;;
+esac
+
+
 
 
 
@@ -3330,7 +3342,7 @@ fi
 # Extract the first word of "links", so it can be a program name with args.
 set dummy links; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3334: checking for $ac_word" >&5
+echo "configure:3346: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_LINKS'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3370,7 +3382,7 @@ fi
 # Extract the first word of "xsltproc", so it can be a program name with args.
 set dummy xsltproc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3374: checking for $ac_word" >&5
+echo "configure:3386: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_XSLTPROC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3410,7 +3422,7 @@ fi
 # Extract the first word of "sabcmd", so it can be a program name with args.
 set dummy sabcmd; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3414: checking for $ac_word" >&5
+echo "configure:3426: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_SABLOTRON'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3517,7 +3529,7 @@ esac
 
 
 echo $ac_n "checking ARM family support""... $ac_c" 1>&6
-echo "configure:3521: checking ARM family support" >&5
+echo "configure:3533: checking ARM family support" >&5
 
 
 
@@ -3531,7 +3543,7 @@ fi
 echo "$ac_t""$sidtarget_arm" 1>&6
 
 echo $ac_n "checking X86 family support""... $ac_c" 1>&6
-echo "configure:3535: checking X86 family support" >&5
+echo "configure:3547: checking X86 family support" >&5
 
 
 
@@ -3545,7 +3557,7 @@ fi
 echo "$ac_t""$sidtarget_x86" 1>&6
 
 echo $ac_n "checking MIPS family support""... $ac_c" 1>&6
-echo "configure:3549: checking MIPS family support" >&5
+echo "configure:3561: checking MIPS family support" >&5
 
 
 
@@ -3559,7 +3571,7 @@ fi
 echo "$ac_t""$sidtarget_mips" 1>&6
 
 echo $ac_n "checking M32R family support""... $ac_c" 1>&6
-echo "configure:3563: checking M32R family support" >&5
+echo "configure:3575: checking M32R family support" >&5
 
 
 
@@ -3573,7 +3585,7 @@ fi
 echo "$ac_t""$sidtarget_m32r" 1>&6
 
 echo $ac_n "checking M68K family support""... $ac_c" 1>&6
-echo "configure:3577: checking M68K family support" >&5
+echo "configure:3589: checking M68K family support" >&5
 
 
 
@@ -3587,7 +3599,7 @@ fi
 echo "$ac_t""$sidtarget_m68k" 1>&6
 
 echo $ac_n "checking PPC family support""... $ac_c" 1>&6
-echo "configure:3591: checking PPC family support" >&5
+echo "configure:3603: checking PPC family support" >&5
 
 
 
@@ -3601,7 +3613,7 @@ fi
 echo "$ac_t""$sidtarget_ppc" 1>&6
 
 echo $ac_n "checking Sanyo Xstormy16 family support""... $ac_c" 1>&6
-echo "configure:3605: checking Sanyo Xstormy16 family support" >&5
+echo "configure:3617: checking Sanyo Xstormy16 family support" >&5
 
 
 
@@ -3816,6 +3828,7 @@ s%@CXX@%$CXX%g
 s%@CXXCPP@%$CXXCPP%g
 s%@lcd_libs@%$lcd_libs%g
 s%@socket_libs@%$socket_libs%g
+s%@comp_defs@%$comp_defs%g
 s%@CYGWIN@%$CYGWIN%g
 s%@LINKS@%$LINKS%g
 s%@HAVE_LINKS_TRUE@%$HAVE_LINKS_TRUE%g

@@ -1,6 +1,6 @@
 // cacheutil.cxx -- Helper classes for a generic memory cache. -*- C++ -*-
 
-// Copyright (C) 2001, 2002, 2004 Red Hat.
+// Copyright (C) 2001, 2002, 2004, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -287,6 +287,12 @@ cache_tag
 cache::addr_to_tag (const sid::host_int_4& addr) const
 {
   return addr >> num_non_tag_bits;
+}
+
+unsigned
+cache::addr_to_index (const sid::host_int_4& addr) const
+{
+  return hash_fn (addr_to_tag (addr));
 }
 
 sid::host_int_4

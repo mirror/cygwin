@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -89,6 +89,7 @@ RANLIB = @RANLIB@
 SABLOTRON = @SABLOTRON@
 VERSION = @VERSION@
 XSLTPROC = @XSLTPROC@
+comp_defs = @comp_defs@
 lcd_libs = @lcd_libs@
 make_subdirs = @make_subdirs@
 sidtarget_arm = @sidtarget_arm@
@@ -104,8 +105,15 @@ AUTOMAKE_OPTIONS = foreign
 
 pkglib_LTLIBRARIES = libcache.la
 
+AM_CXXFLAGS = $(TOP_CXXFLAGS)
+AM_MAKEFLAGS = "TOP_CXXFLAGS=$(TOP_CXXFLAGS)"
+
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include
-libcache_la_SOURCES = cache.cxx cache.h cacheutil.cxx cacheutil.h log2.h
+EXTRA_SOURCES = 
+libcache_la_SOURCES = cache.cxx cache.h \
+	$(EXTRA_SOURCES) \
+	cacheutil.cxx cacheutil.h log2.h
+
 libcache_la_LDFLAGS = -module -no-undefined
 
 pkgdata_DATA = hw-cache.txt

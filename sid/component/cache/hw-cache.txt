@@ -23,11 +23,13 @@ Functionality:
 
    The parameters of the cache are a matter of configuration. At
    instantiation time, the following parameters are specified:
+
      * cache size in KB (1, 2, 4, 8, 16, 32, 64, 128, 256, 512)
      * line size in bytes (16, 32, 64, 128)
      * associativity (direct, full, 2way, 4way)
      * replacement policy for N-way and fully associative caches (lru, fifo,
        random)
+
    For a 16KB cache with a line size of 32 bytes, 2-way set associativity and
    a "least recently used" (LRU) replacement policy, the component name is
    hw-cache-2way/16kb/32/lru. For direct mapped caches, replacement policies
@@ -210,6 +212,7 @@ Functionality:
 Environment:
 
    Related components
+
      * This component is typically used as a cache between a CPU and main
        memory. A sample configiruation fragment is:
 
@@ -241,117 +244,110 @@ Component Reference:
 
   Component: hw-cache-basic
 
-   +------------------------------------------------------------+
-   |                            pins                            |
-   |------------------------------------------------------------|
-   |          name           |direction|legalvalues| behaviors  |
-   |-------------------------+---------+-----------+------------|
-   |report!                  |in       |-          |statistics  |
-   |                         |         |           |reporting   |
-   |-------------------------+---------+-----------+------------|
-   |flush                    |in       |32-bit     |flushing    |
-   |                         |         |address    |            |
-   |-------------------------+---------+-----------+------------|
-   |flush-all                |in       |any        |flushing    |
-   |-------------------------+---------+-----------+------------|
-   |flush-set                |in       |set index  |flushing    |
-   |-------------------------+---------+-----------+------------|
-   |invalidate               |in       |32-bit     |invalidating|
-   |                         |         |address    |            |
-   |-------------------------+---------+-----------+------------|
-   |invalidate-all           |in       |any        |invalidating|
-   |-------------------------+---------+-----------+------------|
-   |invalidate-set           |in       |set index  |invalidating|
-   |-------------------------+---------+-----------+------------|
-   |flush-and-invalidate     |in       |32-bit     |flushing,   |
-   |                         |         |address    |invalidating|
-   |-------------------------+---------+-----------+------------|
-   |flush-and-invalidate-set |in       |set index  |flushing,   |
-   |                         |         |           |invalidating|
-   |-------------------------+---------+-----------+------------|
-   |prefetch                 |in       |32-bit     |prefetching |
-   |                         |         |address    |            |
-   |-------------------------+---------+-----------+------------|
-   |lock                     |in       |32-bit     |line locking|
-   |                         |         |address    |            |
-   |-------------------------+---------+-----------+------------|
-   |unlock                   |in       |32-bit     |line locking|
-   |                         |         |address    |            |
-   +------------------------------------------------------------+
+   +-------------------------------------------------------------------+
+   |                               pins                                |
+   |-------------------------------------------------------------------|
+   |           name           | direction | legalvalues |  behaviors   |
+   |--------------------------+-----------+-------------+--------------|
+   |report!                   |in         |-            |statistics    |
+   |                          |           |             |reporting     |
+   |--------------------------+-----------+-------------+--------------|
+   |flush                     |in         |32-bit       |flushing      |
+   |                          |           |address      |              |
+   |--------------------------+-----------+-------------+--------------|
+   |flush-all                 |in         |any          |flushing      |
+   |--------------------------+-----------+-------------+--------------|
+   |flush-set                 |in         |any          |flushing      |
+   |--------------------------+-----------+-------------+--------------|
+   |invalidate                |in         |32-bit       |invalidating  |
+   |                          |           |address      |              |
+   |--------------------------+-----------+-------------+--------------|
+   |invalidate-all            |in         |any          |invalidating  |
+   |--------------------------+-----------+-------------+--------------|
+   |invalidate-set            |in         |any          |invalidating  |
+   |--------------------------+-----------+-------------+--------------|
+   |flush-and-invalidate      |in         |32-bit       |flushing,     |
+   |                          |           |address      |invalidating  |
+   |--------------------------+-----------+-------------+--------------|
+   |flush-and-invalidate-set  |in         |any          |flushing,     |
+   |                          |           |             |invalidating  |
+   |--------------------------+-----------+-------------+--------------|
+   |prefetch                  |in         |32-bit       |prefetching   |
+   |                          |           |address      |              |
+   |--------------------------+-----------+-------------+--------------|
+   |lock                      |in         |32-bit       |line locking  |
+   |                          |           |address      |              |
+   |--------------------------+-----------+-------------+--------------|
+   |unlock                    |in         |32-bit       |line locking  |
+   |                          |           |address      |              |
+   +-------------------------------------------------------------------+
 
-   +-------------------------------------------------+
-   |                      buses                      |
-   |-------------------------------------------------|
-   |  name   |  addresses  |  accesses   | behaviors |
-   |---------+-------------+-------------+-----------|
-   |upstream |unrestricted |unrestricted |bus traffic|
-   +-------------------------------------------------+
+   +----------------------------------------------------+
+   |                       buses                        |
+   |----------------------------------------------------|
+   |   name   |  addresses   |   accesses   | behaviors |
+   |----------+--------------+--------------+-----------|
+   |upstream  |unrestricted  |unrestricted  |bus traffic|
+   +----------------------------------------------------+
 
-   +--------------------------------------------------------------+
-   |                          attributes                          |
-   |--------------------------------------------------------------|
-   |       name        |category|  legal   |default|  behaviors  ||
-   |                   |        |  values  | value |             ||
-   |-------------------+--------+----------+-------+-------------||
-   |associativity      |setting |string    |-      |configuration||
-   |-------------------+--------+----------+-------+-------------||
-   |cache-size         |setting |numeric   |-      |configuration||
-   |-------------------+--------+----------+-------+-------------||
-   |line-size          |setting |numeric   |-      |configuration||
-   |-------------------+--------+----------+-------+-------------||
-   |hash-bit-mask      |setting |numeric   |0xf    |configuration||
-   |-------------------+--------+----------+-------+-------------||
-   |hash-shift-amount  |setting |0..31     |0      |configuration||
-   |-------------------+--------+----------+-------+-------------||
-   |write-through?     |setting |boolean   |false  |write        ||
-   |                   |        |          |       |strategy     ||
-   |-------------------+--------+----------+-------+-------------||
-   |write-allocate?    |setting |boolean   |false  |write        ||
-   |                   |        |          |       |strategy     ||
-   |-------------------+--------+----------+-------+-------------||
-   |read-accesses      |register|numeric   |0      |statistics   ||
-   |                   |        |          |       |gathering    ||
-   |-------------------+--------+----------+-------+-------------||
-   |write-accesses     |register|numeric   |0      |statistics   ||
-   |                   |        |          |       |gathering    ||
-   |-------------------+--------+----------+-------+-------------||
-   |misaligned-reads   |register|numeric   |0      |statistics   ||
-   |                   |        |          |       |gathering    ||
-   |-------------------+--------+----------+-------+-------------||
-   |misaligned-writes  |register|numeric   |0      |statistics   ||
-   |                   |        |          |       |gathering    ||
-   |-------------------+--------+----------+-------+-------------||
-   |flushes            |register|numeric   |0      |statistics   ||
-   |                   |        |          |       |gathering    ||
-   |-------------------+--------+----------+-------+-------------||
-   |replacements       |register|numeric   |0      |statistics   ||
-   |                   |        |          |       |gathering    ||
-   |-------------------+--------+----------+-------+-------------||
-   |read-hit-rate      |register|percentage|0%     |statistics   ||
-   |                   |        |string    |       |gathering    ||
-   |-------------------+--------+----------+-------+-------------||
-   |write-hit-rate     |register|percentage|0%     |statistics   ||
-   |                   |        |string    |       |gathering    ||
-   |-------------------+--------+----------+-------+-------------||
-   |collect-statistics?|setting |boolean   |true   |statistics   ||
-   |                   |        |          |       |reporting    ||
-   |-------------------+--------+----------+-------+-------------||
-   |                   |        |          |cache  |statistics   ||
-   |report-heading     |setting |string    |profile|reporting    ||
-   |                   |        |          |report |             ||
-   |-------------------+--------+----------+-------+-------------||
-   |hit-latency        |setting |numeric   |0      |memory       ||
-   |                   |        |          |       |latency      ||
-   |-------------------+--------+----------+-------+-------------||
-   |miss-latency       |setting |numeric   |0      |memory       ||
-   |                   |        |          |       |latency      ||
-   |-------------------+--------+----------+-------+-------------||
-   |refill-latency     |setting |numeric   |0      |memory       ||
-   |                   |        |          |       |latency      ||
-   |-------------------+--------+----------+-------+-------------||
-   |dump!              |setting |empty     |empty  |internal     ||
-   |                   |        |string    |       |diagnostics  ||
-   +--------------------------------------------------------------+
+   +------------------------------------------------------------------------+
+   |                               attributes                               |
+   |------------------------------------------------------------------------|
+   |       name        |category|legal values|default value |  behaviors   ||
+   |-------------------+--------+------------+--------------+--------------||
+   |associativity      |setting |string      |-             |configuration ||
+   |-------------------+--------+------------+--------------+--------------||
+   |cache-size         |setting |numeric     |-             |configuration ||
+   |-------------------+--------+------------+--------------+--------------||
+   |line-size          |setting |numeric     |-             |configuration ||
+   |-------------------+--------+------------+--------------+--------------||
+   |hash-bit-mask      |setting |numeric     |0xf           |configuration ||
+   |-------------------+--------+------------+--------------+--------------||
+   |hash-shift-amount  |setting |0..31       |0             |configuration ||
+   |-------------------+--------+------------+--------------+--------------||
+   |write-through?     |setting |boolean     |false         |write strategy||
+   |-------------------+--------+------------+--------------+--------------||
+   |write-allocate?    |setting |boolean     |false         |write strategy||
+   |-------------------+--------+------------+--------------+--------------||
+   |read-accesses      |register|numeric     |0             |statistics    ||
+   |                   |        |            |              |gathering     ||
+   |-------------------+--------+------------+--------------+--------------||
+   |write-accesses     |register|numeric     |0             |statistics    ||
+   |                   |        |            |              |gathering     ||
+   |-------------------+--------+------------+--------------+--------------||
+   |misaligned-reads   |register|numeric     |0             |statistics    ||
+   |                   |        |            |              |gathering     ||
+   |-------------------+--------+------------+--------------+--------------||
+   |misaligned-writes  |register|numeric     |0             |statistics    ||
+   |                   |        |            |              |gathering     ||
+   |-------------------+--------+------------+--------------+--------------||
+   |flushes            |register|numeric     |0             |statistics    ||
+   |                   |        |            |              |gathering     ||
+   |-------------------+--------+------------+--------------+--------------||
+   |replacements       |register|numeric     |0             |statistics    ||
+   |                   |        |            |              |gathering     ||
+   |-------------------+--------+------------+--------------+--------------||
+   |read-hit-rate      |register|percentage  |0%            |statistics    ||
+   |                   |        |string      |              |gathering     ||
+   |-------------------+--------+------------+--------------+--------------||
+   |write-hit-rate     |register|percentage  |0%            |statistics    ||
+   |                   |        |string      |              |gathering     ||
+   |-------------------+--------+------------+--------------+--------------||
+   |collect-statistics?|setting |boolean     |true          |statistics    ||
+   |                   |        |            |              |reporting     ||
+   |-------------------+--------+------------+--------------+--------------||
+   |report-heading     |setting |string      |cache profile |statistics    ||
+   |                   |        |            |report        |reporting     ||
+   |-------------------+--------+------------+--------------+--------------||
+   |hit-latency        |setting |numeric     |0             |memory latency||
+   |-------------------+--------+------------+--------------+--------------||
+   |miss-latency       |setting |numeric     |0             |memory latency||
+   |-------------------+--------+------------+--------------+--------------||
+   |refill-latency     |setting |numeric     |0             |memory latency||
+   |-------------------+--------+------------+--------------+--------------||
+   |dump!              |setting |empty string|empty         |internal      ||
+   |                   |        |            |              |diagnostics   ||
+   +------------------------------------------------------------------------+
 
    +-------------------------------------------------+
    |                    accessors                    |

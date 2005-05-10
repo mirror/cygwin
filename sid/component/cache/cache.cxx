@@ -1,6 +1,6 @@
 // cache.cxx -- A universal memory cache. -*- C++ -*-
 
-// Copyright (C) 2001, 2002, 2004 Red Hat.
+// Copyright (C) 2001, 2002, 2004, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -73,10 +73,12 @@ cache_component::cache_component (unsigned assocy,
    line_size (line_sz),
    cache_size (cache_sz),
    assoc (assocy),
+   data_width (4),
    hit_latency (0),
    miss_latency (0),
    refill_latency (0),
-   refill_latency_specified (false)
+   refill_latency_specified (false),
+   total_latency_p (false)
 {
   acache.init ();
   memset (&stats, 0, sizeof (stats));
@@ -96,6 +98,7 @@ cache_component::cache_component (unsigned assocy,
   add_pin ("prefetch", &prefetch_pin);
   add_pin ("lock", &lock_pin);  
   add_pin ("unlock", &unlock_pin);
+  add_pin ("operation-status", &operation_status_pin);
   
   add_attribute_ro ("cache-size", &cache_size, "setting");
   add_attribute_ro ("line-size", &line_size, "setting");
@@ -103,6 +106,7 @@ cache_component::cache_component (unsigned assocy,
 			 &cache_component::associativity,
 			 &cache_component::set_nothing,
 			 "setting");
+  add_attribute ("data-width", &data_width, "setting");
 
   add_attribute ("write-through?", &write_through_p, "setting");
   add_attribute ("write-allocate?", &write_allocate_p, "setting");
@@ -144,6 +148,7 @@ cache_component::cache_component (unsigned assocy,
 
   add_attribute ("hit-latency", &hit_latency, "setting");
   add_attribute ("miss-latency", &miss_latency, "setting");
+  add_attribute ("total-latency?", &total_latency_p, "setting");
 
   add_attribute_virtual ("refill-latency", this,
 			 &cache_component::get_refill_latency,
@@ -199,7 +204,14 @@ cache_component::write_any (host_int_4 addr, DataType data)
       line->insert (line_offset (*line, addr), data);
       if (write_through_p)
 	{
-	  if ((st = downstream->write (addr, data)) != bus::ok)
+	  do
+	    {
+	      st = downstream->write (addr, data);
+	      if (st == bus::ok)
+		break;
+	    }
+	  while (handle_write_error (st, addr));
+	  if (st != bus::ok)
 	    return st;
 	}
     }
@@ -224,7 +236,14 @@ cache_component::write_any (host_int_4 addr, DataType data)
 	    }
 	  else
 	    {
-	      if ((st = downstream->write (addr, data)) != bus::ok)
+	      do
+		{
+		  st = downstream->write (addr, data);
+		  if (st == bus::ok)
+		    break;
+		}
+	      while (handle_write_error (st, addr));
+	      if (st != bus::ok)
 		return st;
 	    }
 
@@ -237,7 +256,14 @@ cache_component::write_any (host_int_4 addr, DataType data)
       else
 	{
 	  // write through to memory to preserve the write
-	  if ((st = downstream->write (addr, data)) != bus::ok)
+	  do
+	    {
+	      st = downstream->write (addr, data);
+	      if (st == bus::ok)
+		break;
+	    }
+	  while (handle_write_error (st, addr));
+	  if (st != bus::ok)
 	    return st;
 	}
     }
@@ -304,7 +330,13 @@ cache_component::read_any (host_int_4 addr, DataType& data)
 	}
       else
 	{
-	  st = downstream->read (addr, data);
+	  do
+	    {
+	      st = downstream->read (addr, data);
+	      if (st == bus::ok)
+		break;
+	    }
+	  while (handle_read_error (st, addr));
 	  st.latency += miss_latency;
 	  return st;
 	}
@@ -322,27 +354,47 @@ bus::status
 cache_component::read_line (cache_line& line)
 {
   bus::status st;
-  int overall_latency = 0;
   host_int_4 base = acache.tag_to_addr (line.tag ());
-  for (host_int_4 offset = 0; offset < line_size; offset += 4)
+  lock_downstream ();
+  host_int_2 actual_fill_latency = 0;
+  for (host_int_4 offset = 0; offset < line_size; offset += data_width)
     {
-      sid::big_int_4 data;
-      st = downstream->read (base + offset, data);
-      // Record the latency of the first read.
-      if (offset == 0)
-	overall_latency = st.latency;
+      // Unlock the downstream interface for the last read
+      if (offset + data_width >= line_size)
+	unlock_downstream ();
+
+      sid::big_int_8 data8;
+      sid::big_int_4 data4;
+      host_int_4 address = base + offset;
+      if (data_width == 8)
+	st = read_downstream (address, data8);
+      else
+	st = read_downstream (address, data4);
+
       if (st != bus::ok)
-	return st;
-      line.insert (offset, data);
+	{
+	  unlock_downstream ();
+	  return st;
+	}
+
+      if (total_latency_p)
+	actual_fill_latency += st.latency;
+      else if (st.latency > actual_fill_latency)
+	actual_fill_latency = st.latency;
+
+      if (data_width == 8)
+	line.insert (offset, data8);
+      else
+	line.insert (offset, data4);
     }
   line.unlock ();
   line.clean ();
   line.validate ();
 
-  if (refill_latency_specified)
+  if (refill_latency_specified && ! total_latency_p)
     st.latency = refill_latency;
   else
-    st.latency = overall_latency;
+    st.latency = actual_fill_latency;
 
   return st;
 }
@@ -352,76 +404,158 @@ cache_component::write_line (cache_line& line)
 {
   bus::status st;
   host_int_4 base = acache.tag_to_addr (line.tag ());
-  for (host_int_4 offset = 0; offset < line_size; offset += 4)
+  lock_downstream ();
+  host_int_2 actual_latency = 0;
+  for (host_int_4 offset = 0; offset < line_size; offset += data_width)
     {
-      sid::big_int_4 data;
-      line.extract (offset, data);
-      st = downstream->write (base + offset, data);
+      // Unlock the downstream interface for the last write
+      if (offset + data_width >= line_size)
+	unlock_downstream ();
+
+      sid::big_int_4 data4;
+      sid::big_int_8 data8;
+      host_int_4 address = base + offset;
+      if (data_width == 8)
+	{
+	  line.extract (offset, data8);
+	  st = write_downstream (address, data8);
+	}
+      else
+	{
+	  line.extract (offset, data4);
+	  st = write_downstream (address, data4);
+	}
+
       if (st != bus::ok)
-	return st;
+	{
+	  unlock_downstream ();
+	  return st;
+	}
+
+      if (total_latency_p)
+	actual_latency += st.latency;
+      else if (st.latency > actual_latency)
+	actual_latency = st.latency;
     }
   line.clean ();
   if (LIKELY (collect_p))
     stats.flushes++;
+  st.latency = actual_latency;
+  return st;
+}
+
+template<typename DataType>
+bus::status
+cache_component::read_downstream (host_int_4 address, DataType &data)
+{
+  bus::status st;
+  do
+    {
+      st = downstream->read (address, data);
+      if (st == bus::ok)
+	break;
+    }
+  while (handle_read_error (st, address));
+  return st;
+}
+
+template<typename DataType>
+bus::status
+cache_component::write_downstream (host_int_4 address, DataType data)
+{
+  bus::status st;
+  do
+    {
+      st = downstream->write (address, data);
+      if (st == bus::ok)
+	break;
+    }
+  while (handle_write_error (st, address));
   return st;
 }
 
 void
 cache_component::flush_all_lines (host_int_4)
 {
+  host_int_2 total_latency = 0;
+  bus::status st;
   while (true)
     {
       cache_line* line = acache.find_any_dirty ();
       if (line == 0) break;
-      (void) write_line (*line);
+      st = write_line (*line);
+      if (st != bus::ok)
+	break;
+      total_latency += st.latency;
     }
+  st.latency = total_latency;
+  report_status (st);
 }
 
 void
 cache_component::flush_line (host_int_4 addr)
 {
+  bus::status st;
   cache_line* line = acache.find (acache.addr_to_tag (addr));
   if (line && line->dirty_p ())
-    (void) write_line (*line);
+    st = write_line (*line);
+  report_status (st);
 }
 
 void
-cache_component::flush_set (host_int_4 index)
+cache_component::flush_set (host_int_4 addr)
 {
-  if (index >= acache.num_sets ())
-    return; // bad value
+  host_int_4 index = acache.addr_to_index (addr);
+  assert (index < acache.num_sets ());
 
-  cache_set& set = acache [index];
-  for (unsigned i = 0; i < set.num_lines(); i++)
-    {
-      cache_line& line = set [i];
-      if (line.valid_p () && line.dirty_p ())
-	(void) write_line (line);
-    }
-}
-
-void
-cache_component::flush_and_invalidate_set (host_int_4 index)
-{
-  if (index >= acache.num_sets ())
-    return; // bad value
-
+  host_int_2 total_latency = 0;
+  bus::status st;
   cache_set& set = acache [index];
   for (unsigned i = 0; i < set.num_lines(); i++)
     {
       cache_line& line = set [i];
       if (line.valid_p () && line.dirty_p ())
 	{
-	  (void) write_line (line);
+	  st = write_line (line);
+	  if (st != bus::ok)
+	    break;
+	  total_latency += st.latency;
+	}
+    }
+  st.latency = total_latency;
+  report_status (st);
+}
+
+void
+cache_component::flush_and_invalidate_set (host_int_4 addr)
+{
+  host_int_4 index = acache.addr_to_index (addr);
+  assert (index < acache.num_sets ());
+
+  host_int_2 total_latency = 0;
+  bus::status st;
+  cache_set& set = acache [index];
+  for (unsigned i = 0; i < set.num_lines(); i++)
+    {
+      cache_line& line = set [i];
+      if (line.valid_p () && line.dirty_p ())
+	{
+	  st = write_line (line);
+	  if (st != bus::ok)
+	    break;
+	  total_latency += st.latency;
 	  line.invalidate ();
 	}
     }
+  st.latency = total_latency;
+  report_status (st);
 }
 
 void
 cache_component::invalidate_all_lines (host_int_4 ignore)
 {
   acache.invalidate ();
+  report_status (bus::ok);
 }
 
 void
@@ -430,6 +564,7 @@ cache_component::invalidate_line (host_int_4 addr)
   cache_line* line = acache.find (acache.addr_to_tag (addr));
   if (line)
     line->invalidate ();
+  report_status (bus::ok);
 }
 
 void
@@ -438,22 +573,28 @@ cache_component::flush_and_invalidate_line (host_int_4 addr)
   cache_line* line = acache.find (acache.addr_to_tag (addr));
   if (line && line->dirty_p ())
     {
-      (void) write_line (*line);
+      bus::status st = write_line (*line);
       line->invalidate ();
+      report_status (st);
+      return;
     }
+  report_status (bus::ok);
 }
 
 void
-cache_component::invalidate_set (host_int_4 set)
+cache_component::invalidate_set (host_int_4 addr)
 {
+  host_int_4 set = acache.addr_to_index (addr);
   acache.invalidate (set);
+  report_status (bus::ok);
 }
 
 void
 cache_component::prefetch_line (host_int_4 addr)
 {
   sid::big_int_1 dummy;
-  (void) read_any (addr, dummy);
+  bus::status st = read_any (addr, dummy);
+  report_status (st);
 }
 
 void
@@ -462,6 +603,7 @@ cache_component::lock_line (host_int_4 addr)
   cache_line* line = acache.find (acache.addr_to_tag (addr));
   if (line)
     line->lock ();
+  report_status (bus::ok);
 }
 
 void
@@ -470,6 +612,7 @@ cache_component::unlock_line (host_int_4 addr)
   cache_line* line = acache.find (acache.addr_to_tag (addr));
   if (line)
     line->unlock ();
+  report_status (bus::ok);
 }
 
 void
@@ -585,6 +728,203 @@ cache_component::write_hit_rate ()
       return make_attribute (static_cast<int> (rate)) + "%";
     }
 }
+
+// ------------------------------------------------------------------------
+// The blocking cache component.
+
+// This function is the root of the blockable child thread. It gets passed
+// to pthread_create.
+//
+extern "C" void *
+blocking_cache_child_thread_root (void *comp)
+{
+  // Set up this thread to receive and handle signals from the parent thread.
+  // this need only be done once.
+  //
+  blocking_cache_component *cache = static_cast<blocking_cache_component *>(comp);
+  cache->child_init ();
+
+  for (;;)
+    {
+      // Signal completion and wait for the signal to resume
+      cache->child_completed ();
+
+      // Now perform the transaction
+      cache->perform_transaction ();
+    }
+
+  // We should never reach here.
+  return NULL;
+}
+
+blocking_cache_component::blocking_cache_component (unsigned assocy,
+						    unsigned cache_sz, 
+						    unsigned line_sz,
+						    cache_replacement_algorithm& replacer,
+						    cache_line_factory& factory)
+  :cache_component (assocy, cache_sz, line_sz, replacer, factory),
+   blocking_component (this, blocking_cache_child_thread_root)
+{
+  add_pin ("downstream-lock", & downstream_lock_pin);
+  downstream_lock_pin.set_active_high ();
+}
+
+blocking_cache_component::blocking_cache_component (void *child_self,
+						    unsigned assocy,
+						    unsigned cache_sz, 
+						    unsigned line_sz,
+						    cache_replacement_algorithm& replacer,
+						    cache_line_factory& factory)
+  :cache_component (assocy, cache_sz, line_sz, replacer, factory),
+   blocking_component (child_self, blocking_cache_child_thread_root)
+{
+  add_pin ("downstream-lock", & downstream_lock_pin);
+  downstream_lock_pin.set_active_high ();
+}
+
+// Handles bus errors from reads and writes from/to insn and data memory.
+// Specifically, bus::busy is handled in blockable mode.
+//
+bool
+blocking_cache_component::handle_bus_error (bus::status s)
+{
+  if (s != bus::busy)
+    return false; // not handled
+
+  // Signal that we're blocked and wait for the signal to try again
+  transaction_status = s;
+  child_blocked ();
+  return true;
+}
+
+#define DEFN_METHOD(DataType) \
+bus::status \
+blocking_cache_component::write(host_int_4 addr, DataType data) \
+{ \
+  if (blockable) \
+    { \
+      /* Signal the child thread to resume */ \
+      need_child_thread (); \
+      setup_write_transaction (addr, data); \
+      continue_child_thread_and_wait (); \
+ \
+      return transaction_status; \
+    } \
+  return this->write_any(addr, data); \
+} \
+bus::status \
+blocking_cache_component::read(host_int_4 addr, DataType& data) \
+{ \
+  if (blockable) \
+    { \
+      /* Signal the child thread to resume */ \
+      need_child_thread (); \
+      setup_read_transaction (addr, data); \
+      continue_child_thread_and_wait (); \
+ \
+      get_transaction_data (data); \
+      return transaction_status; \
+    } \
+  return this->read_any(addr, data); \
+}
+DEFN_METHOD (big_int_1)
+DEFN_METHOD (big_int_2)
+DEFN_METHOD (big_int_4)
+DEFN_METHOD (big_int_8)
+DEFN_METHOD (little_int_1)
+DEFN_METHOD (little_int_2)
+DEFN_METHOD (little_int_4)
+DEFN_METHOD (little_int_8)
+#undef DEFN_METHOD
+
+void
+blocking_cache_component::flush_all_lines (host_int_4 v)
+{
+  if (blockable)
+    {
+      // Signal the child thread to resume
+      need_child_thread ();
+      setup_flush_all_transaction ();
+      int signal = continue_child_thread_and_wait ();
+      if (signal == ctl_child_blocked)
+	report_status (transaction_status);
+      return;
+    }
+  cache_component::flush_all_lines (v);
+}
+
+void
+blocking_cache_component::flush_line (host_int_4 addr)
+{
+  if (blockable)
+    {
+      // Signal the child thread to resume
+      need_child_thread ();
+      setup_flush_line_transaction (addr);
+      int signal = continue_child_thread_and_wait ();
+      if (signal == ctl_child_blocked)
+	report_status (transaction_status);
+      return;
+    }
+  cache_component::flush_line (addr);
+}
+
+void
+blocking_cache_component::flush_set (host_int_4 addr)
+{
+  if (blockable)
+    {
+      // Signal the child thread to resume
+      need_child_thread ();
+      setup_flush_set_transaction (addr);
+      int signal = continue_child_thread_and_wait ();
+      if (signal == ctl_child_blocked)
+	report_status (transaction_status);
+      return;
+    }
+  cache_component::flush_set (addr);
+}
+
+void
+blocking_cache_component::flush_and_invalidate_set (host_int_4 addr)
+{
+  if (blockable)
+    {
+      // Signal the child thread to resume
+      need_child_thread ();
+      setup_flush_and_invalidate_set_transaction (addr);
+      int signal = continue_child_thread_and_wait ();
+      if (signal == ctl_child_blocked)
+	report_status (transaction_status);
+      return;
+    }
+  cache_component::flush_and_invalidate_set (addr);
+}
+
+void
+blocking_cache_component::flush_and_invalidate_line (host_int_4 addr)
+{
+  if (blockable)
+    {
+      // Signal the child thread to resume
+      need_child_thread ();
+      setup_flush_and_invalidate_line_transaction (addr);
+      int signal = continue_child_thread_and_wait ();
+      if (signal == ctl_child_blocked)
+	report_status (transaction_status);
+      return;
+    }
+  cache_component::flush_and_invalidate_line (addr);
+}
+
+void
+blocking_cache_component::prefetch_line (host_int_4 addr)
+{
+  sid::big_int_1 dummy;
+  bus::status st = read (addr, dummy);
+  report_status (st);
+}
+
 
 cache_line *
 cache_replacement_fifo::expell (cache_set& cset)
@@ -715,7 +1055,9 @@ CacheListTypes ()
   vector<string> types;
 
   types.push_back ("hw-cache-basic");
+  types.push_back ("hw-blocking-cache-basic");
   types.push_back ("hw-cache-buffer-8");
+  types.push_back ("hw-blocking-cache-buffer-8");
 
   for (unsigned i = 0; i < (sizeof (assocs) / sizeof (string)); i++)
     for (unsigned j = 0; j < (sizeof (cache_sizes) / sizeof (string)); j++)
@@ -723,21 +1065,21 @@ CacheListTypes ()
 	{
 	  if (assocs[i] == "direct")
 	    {
-	      type = string ("hw-cache-direct/");
-	      type += cache_sizes[j] + "kb/";
+	      type = cache_sizes[j] + "kb/";
 	      type += line_sizes[k];
-	      types.push_back (type);
+	      types.push_back ("hw-cache-direct/" + type);
+	      types.push_back ("hw-blocking-cache-direct/" + type);
 	    }
 	  else
 	    for (unsigned m = 0;
 		 m < (sizeof (replacement_algorithms) / sizeof (string)); m++)
 	      {
-		type = string ("hw-cache-");
-		type += assocs[i] + "/";
+		type = assocs[i] + "/";
 		type += cache_sizes[j] + "kb/";
 		type += line_sizes[k] + "/";
 		type += replacement_algorithms[m];
-		types.push_back (type);
+		types.push_back ("hw-cache-" + type);
+		types.push_back ("hw-blocking-cache-" + type);
 	      }
 	}
   return types;
@@ -752,15 +1094,26 @@ CacheCreate (const string& typeName)
   if (typeName == "hw-cache-basic")
     return new cache_component (1, 16384, 32, null_replacement, internal_line_factory);
 
+  if (typeName == "hw-blocking-cache-basic")
+    return new blocking_cache_component (1, 16384, 32, null_replacement, internal_line_factory);
+
   if (typeName == "hw-cache-buffer-8")
     return new cache_component (0, 8, 8, null_replacement, internal_line_factory);
   
+  if (typeName == "hw-blocking-cache-buffer-8")
+    return new blocking_cache_component (0, 8, 8, null_replacement, internal_line_factory);
+   
   vector<string> parts = sidutil::tokenize (typeName, "-/");
 
-  if (parts.size () < 5 || parts[0] != "hw" || parts[1] != "cache")
+  unsigned extra_ix;
+  if (parts.size () >= 5 && parts[0] == "hw" && parts[1] == "cache")
+    extra_ix = 0;
+  else if (parts.size () >= 6 && parts[0] == "hw" && parts[1] == "blocking" && parts[2] == "cache")
+    extra_ix = 1;
+  else
     return 0;
   
-  string assoc_string = parts[2];
+  string assoc_string = parts[2 + extra_ix];
   for (match = false, i = 0; i < sizeof (assocs) / sizeof (string); i++)
     if (assoc_string == assocs[i])
       match = true;
@@ -770,7 +1123,7 @@ CacheCreate (const string& typeName)
   
   // Parse "<x>kb", where <x> is a positive integer. 
   int cache_sz;
-  string cache_size_string = parts[3].substr (0, parts[3].length() - 2);
+  string cache_size_string = parts[3 + extra_ix].substr (0, parts[3 + extra_ix].length() - 2);
   for (match = false, i = 0; i < sizeof (cache_sizes) / sizeof (string); i++)
     if (cache_size_string == cache_sizes[i])
       {
@@ -782,7 +1135,7 @@ CacheCreate (const string& typeName)
     return 0;
   
   int line_sz;
-  string line_size_string = parts[4];
+  string line_size_string = parts[4 + extra_ix];
   for (match = false, i = 0; i < sizeof (line_sizes) / sizeof (string); i++)
     if (line_size_string == line_sizes[i])
       {
@@ -795,11 +1148,11 @@ CacheCreate (const string& typeName)
   
   string replace_alg_string;
   if (assoc_string != "direct")
-    if (parts.size () < 6)
+    if (parts.size () + extra_ix < 6)
       return 0;
     else
       {
-	replace_alg_string = parts[5];
+	replace_alg_string = parts[5 + extra_ix];
 	for (match = false, i = 0; i < sizeof (replacement_algorithms) / sizeof (string); i++)
 	  if (replace_alg_string == replacement_algorithms[i])
 	    match = true;
@@ -823,15 +1176,30 @@ CacheCreate (const string& typeName)
         return 0;
     }
 
-  if (assoc == 1)
-    return new cache_component (assoc, cache_sz, line_sz, null_replacement, internal_line_factory);
+  if (extra_ix == 0)
+    {
+      if (assoc == 1)
+	return new cache_component (assoc, cache_sz, line_sz, null_replacement, internal_line_factory);
   
-  if (replace_alg_string == "lru")
-    return new cache_component (assoc, cache_sz, line_sz, lru_replacement, internal_line_factory);
-  else if (replace_alg_string == "fifo")
-    return new cache_component (assoc, cache_sz, line_sz, fifo_replacement, internal_line_factory);
-  else if (replace_alg_string == "random")
-    return new cache_component (assoc, cache_sz, line_sz, random_replacement, internal_line_factory);
+      if (replace_alg_string == "lru")
+	return new cache_component (assoc, cache_sz, line_sz, lru_replacement, internal_line_factory);
+      else if (replace_alg_string == "fifo")
+	return new cache_component (assoc, cache_sz, line_sz, fifo_replacement, internal_line_factory);
+      else if (replace_alg_string == "random")
+	return new cache_component (assoc, cache_sz, line_sz, random_replacement, internal_line_factory);
+    }
+  else
+    {
+      if (assoc == 1)
+	return new blocking_cache_component (assoc, cache_sz, line_sz, null_replacement, internal_line_factory);
+  
+      if (replace_alg_string == "lru")
+	return new blocking_cache_component (assoc, cache_sz, line_sz, lru_replacement, internal_line_factory);
+      else if (replace_alg_string == "fifo")
+	return new blocking_cache_component (assoc, cache_sz, line_sz, fifo_replacement, internal_line_factory);
+      else if (replace_alg_string == "random")
+	return new blocking_cache_component (assoc, cache_sz, line_sz, random_replacement, internal_line_factory);
+    }
 
   return 0;
 }

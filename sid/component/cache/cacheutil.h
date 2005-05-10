@@ -1,6 +1,6 @@
 // cacheutil.h -- Helper classes for a generic memory cache. -*- C++ -*-
 
-// Copyright (C) 2001, 2002, 2004 Red Hat.
+// Copyright (C) 2001, 2002, 2004, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -269,6 +269,9 @@ public:
 
   // Calculate a tag.
   cache_tag addr_to_tag (const sid::host_int_4& addr) const;
+
+  // Calculate a set index.
+  unsigned addr_to_index (const sid::host_int_4& addr) const;
 
   // Perform the inverse operation.
   sid::host_int_4 tag_to_addr (const cache_tag& tag) const;

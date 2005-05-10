@@ -1,3 +1,10 @@
+2005-05-10  Nick Clifton  <nickc@redhat.com>
+
+	* Update the address and phone number of the FSF organization in
+	the GPL notices in the following files:
+	COPYING.CGEN, utils.scm, cpu/iq2000m.cpu, cpu/openrisc.cpu,
+	cpu/powerpc.cpu, slib/random.scm
+
 2005-05-06  Jim Blandy  <jimb@redhat.com>
 
 	* pprint.scm, cos-pprint.scm: Add documentation.

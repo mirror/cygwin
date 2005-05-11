@@ -1,3 +1,26 @@
+2005-05-11  Nick Clifton  <nickc@redhat.com>
+
+	* Update the address and phone number of the FSF organization in
+	the GPL notices in the following files:
+	COPYING, config.guess, config.sub, missing, baseboards/sh-sim.exp,
+	config/arc.exp, config/arm-ice.exp, config/base-config.exp,
+	config/base68k.exp, config/bug.exp, config/cfdbug.exp,
+	config/cygmon.exp, config/d10v.exp, config/ddb-ether.exp,
+	config/ddb.exp, config/gdb_stub.exp, config/h8300.exp,
+	config/i386-bozo.exp, config/i960.exp, config/m32r-stub.exp,
+	config/m32r.exp, config/m68hc11.exp, config/netware.exp,
+	config/powerpc-bug.exp, config/proelf.exp, config/rom68k.exp,
+	config/sh.exp, config/sim.exp, config/slite.exp,
+	config/sparclet.exp, config/udi.exp, config/unix.exp,
+	config/vr4100.exp, config/vr4300.exp, config/vr5000.exp,
+	config/vrtx.exp, contrib/bluegnu2.0.3/config.guess,
+	contrib/bluegnu2.0.3/lib/dg.exp, debian/copyright,
+	example/calc/COPYING, example/calc/testsuite/calc.test/calc.exp,
+	example/calc/testsuite/config/unix.exp, lib/dg.exp, lib/rsh.exp,
+	lib/standard.exp, lib/targetdb.exp, lib/telnet.exp, lib/tip.exp,
+	testsuite/runtest.all/libs.exp,
+	testsuite/runtest.all/stats-sub.exp
+
 2004-11-11  Nick Clifton  <nickc@redhat.com>
 
 	* lib/libgloss.exp (libio_include_flags, g++_include_flags,

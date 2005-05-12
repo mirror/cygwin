@@ -130,13 +130,13 @@ proc run-sid-tests-raw { toolchain-prefix all-machs testcase-srcdir pattern as-o
        set testcase-dir [file dirname $src]
        set exe-name ${name}.${exe-suffix}
 
-       # Set sid-opts and run the test.
-       set sid-opts "${conf-file} -e \"set cpu-loader file ${exe-name}\" ${conf-line}"
+       # Set all-sid-opts and run the test.
+       set all-sid-opts "${conf-file} -e \"set cpu-loader file ${exe-name}\" ${sid-opts} ${conf-line}"
        run-one-sid-test \
                $as ${as-opts} \
                $ld ${ld-opts} \
                {} {} \
-               $sid ${sid-opts} \
+               $sid ${all-sid-opts} \
                ${all-machs} $src ${exe-suffix} \
                $runner
     }

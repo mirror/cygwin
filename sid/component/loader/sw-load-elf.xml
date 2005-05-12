@@ -9,6 +9,7 @@
     <defpin name="endian-set" direction="out" legalvalues="0/1/2" behaviors="loading"/>
     <defpin name="error" direction="out" legalvalues="any" behaviors="loading"/>
     <defpin name="write-to-code-address" direction="out" legalvalues="any address" behaviors="error checking"/>
+    <defpin name="probe" direction="in" legalvalues="any address" behaviors="error checking"/>
 
     <defattribute name="state-snapshot" legalvalues="opaque string" behaviors="save/restore"/>
     <defattribute name="file" category="setting" legalvalues="file name" defaultvalue='"/dev/null"' behaviors="configuration"/>
@@ -73,7 +74,8 @@
       to a code segment, the write-to-code-address pin is driven with the
       address of the write attempt. All reads and writes
       coming in through the probe-upstream bus are passed on to the
-      probe-downstream accessor.
+      probe-downstream accessor. In addition, addresses driven on the
+      "probe" pin are checked in the same way.
       </p>
     </behavior>
 

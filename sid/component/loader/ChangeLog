@@ -1,3 +1,12 @@
+2005-05-12  Dave Brolley  <brolley@redhat.com>
+
+	* compLoader.cxx (probe_address): New method of loader_probe_bus.
+	(loader_probe_bus::write): Call probe_address.
+	(handle_probe_pin): New method of generic_loader.
+	(generic_loader): Initialize probe_pin and add "probe" pin.
+	* sw-load-elf.xml: Describe the new pin.
+	* sw-load-elf.txt: Regenerated.
+	
 2004-06-29  Stan Cox  <scox@redhat.com>
 
 	* compLoader.cxx (generic_loader):  Add eflags_pin.

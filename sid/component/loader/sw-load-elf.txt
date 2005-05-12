@@ -68,7 +68,10 @@ Functionality:
    |                | writes coming in through the   |
    |                | probe-upstream bus are passed  |
    |                | on to the probe-downstream     |
-   |                | accessor.                      |
+   |                | accessor. In addition,         |
+   |                | addresses driven on the        |
+   |                | "probe" pin are checked in the |
+   |                | same way.                      |
    +-------------------------------------------------+
 
    +-------------------------------------------------+
@@ -128,6 +131,9 @@ Component Reference:
    |error                  |out        |any          |loading    |
    |-----------------------+-----------+-------------+-----------|
    |write-to-code-address  |out        |any address  |error      |
+   |                       |           |             |checking   |
+   |-----------------------+-----------+-------------+-----------|
+   |probe                  |in         |any address  |error      |
    |                       |           |             |checking   |
    +-------------------------------------------------------------+
 

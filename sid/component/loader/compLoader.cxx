@@ -77,14 +77,19 @@ class loader_probe_bus: public sidutil::passthrough_bus
     
     void set_section_table (const struct TextSection *s) { section_table = s; }
 
+    void probe_address (sid::host_int_4 addr)
+      {
+	if (write_to_code_address_pin && textSectionAddress (addr, section_table))
+	  write_to_code_address_pin->drive (addr);
+      }
+
     // Some macros to make manufacturing of the cartesian-product
     // calls simpler.
 #define SID_GB_WRITE(dtype) \
       sid::bus::status write(sid::host_int_4 addr, dtype data) throw ()\
 	  { if (LIKELY(*target)) \
               { \
-                if (write_to_code_address_pin && textSectionAddress (addr, section_table)) \
-                  write_to_code_address_pin->drive (addr); \
+                probe_address (addr); \
                 return (*target)->write(addr, data); \
               } \
             else return sid::bus::unpermitted; \
@@ -142,6 +147,12 @@ protected:
 
   loader_probe_bus probe_upstream;
   bus           *probe_downstream;
+  callback_pin<generic_loader> probe_pin;
+
+  void handle_probe_pin (sid::host_int_4 v)
+    {
+      probe_upstream.probe_address (v);
+    }
 
   // The load pin was triggered.
   virtual void load_it (host_int_4) = 0;
@@ -161,7 +172,8 @@ public:
     load_accessor_insn(0),
     load_accessor_data(0),
     probe_upstream (& probe_downstream, & this->write_to_code_address_pin),
-    probe_downstream(0)
+    probe_downstream(0),
+    probe_pin (this, & generic_loader::handle_probe_pin)
     {
       add_pin("load!", & this->doit_pin);
       add_pin("start-pc-set", & this->start_pc_pin);
@@ -174,6 +186,7 @@ public:
       add_attribute("file", & this->load_file, "setting");
       add_bus ("probe-upstream", & this->probe_upstream);
       add_accessor ("probe-downstream", & this->probe_downstream);
+      add_pin ("probe", & this->probe_pin);
       add_attribute("verbose?", & this->verbose_p, "setting");
       add_attribute_virtual ("state-snapshot", this,
 			     & generic_loader::save_state,

@@ -44,7 +44,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.67 $";
+static const char version[] = "$Revision: 1.68 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1466,12 +1466,15 @@ load_cygwin (int& argc, char **&argv)
       char *path = NULL;
       while (*_environ)
 	{
-	  if (!strncmp (*_environ, "PATH=", 5))
+	  if (strncmp (*_environ, "PATH=", 5) == 0)
 	    path = strdup (*_environ);
 	  nuke (*_environ);
         }
       for (char **ev = envp; *ev; ev++)
-	putenv (!strncmp (*ev, "PATH=", 5) ? path : *ev);
+	if (strncmp (*ev, "PATH=", 5) != 0)
+	 putenv (*ev);
+	else if (path)
+	  putenv (path);
     }
 }
 

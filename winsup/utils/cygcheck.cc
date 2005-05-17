@@ -44,7 +44,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.68 $";
+static const char version[] = "$Revision: 1.69 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1439,7 +1439,9 @@ nuke (char *ev)
   putenv (s);
 }
 
-DWORD (*cygwin_internal) (int, ...);
+extern "C" {
+unsigned long (*cygwin_internal) (int, ...);
+};
 
 static void
 load_cygwin (int& argc, char **&argv)

@@ -184,6 +184,13 @@
 ; Return C code to fetch a value from instruction memory.
 ; PC-VAR is the C expression containing the address of the start of the
 ; instruction.
+;
+; We don't bother trying to handle bitsizes that don't have a
+; corresponding GETIMEM method.  Doing so would require us to take
+; endianness into account just to ensure that the requested bits end
+; up at the proper place in the result.  It's easier just to make the
+; caller ask us for something we can do directly.
+;
 ; ??? Aligned/unaligned support?
 
 (define (gen-ifetch pc-var bitoffset bitsize)
@@ -191,7 +198,6 @@
 		 (case bitsize
 		   ((8) "UQI")
 		   ((16) "UHI")
-		   ((24) "USI")
 		   ((32) "USI")
 		   (else (error "bad bitsize argument to gen-ifetch" bitsize)))
 		 " (pc, "

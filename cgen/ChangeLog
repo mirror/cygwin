@@ -1,3 +1,10 @@
+2005-05-16  Jim Blandy  <jimb@redhat.com>
+
+	* sid.scm (gen-ifetch): Require BITSIZE to be exactly the size
+	fetched by one of our GETIMEM* methods.
+	* utils-gen.scm (-extract-chunk-specs): Always fetch full
+	base-insn-sized chunks.
+
 2005-05-10  Nick Clifton  <nickc@redhat.com>
 
 	* Update the address and phone number of the FSF organization in

@@ -308,7 +308,12 @@
 	  (reverse! result)
 	  (loop (+ start chunk-length)
 		(- remaining chunk-length)
-		(cons (cons start (min chunk-length remaining))
+		; Always fetch full CHUNK-LENGTH-sized chunks here,
+		; even if we don't actually need that many bytes.
+		; gen-ifetch only handles "normal" fetch sizes,
+		; and -gen-extract-word already knows how to find what
+		; it needs if we give it too much.
+		(cons (cons start chunk-length)
 		      result)))))
 )
 

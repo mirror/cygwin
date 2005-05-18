@@ -1,5 +1,5 @@
 ; Generic simulator application utilities.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2005 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -579,10 +579,25 @@
 
 ; Convert decoder table into C code.
 
+; Return code for the default entry of each switch table
+;
+(define (-gen-decode-default-entry indent invalid-insn fn?)
+  (string-append
+   "itype = "
+   (gen-cpu-insn-enum (current-cpu) invalid-insn)
+   ";"
+   (if (with-scache?)
+       (if fn?
+	   " @prefix@_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;\n"
+	   " goto extract_sfmt_empty;\n")
+       " goto done;\n")
+  )
+)
+
 ; Return code for one insn entry.
 ; REST is the remaining entries.
 
-(define (-gen-decode-insn-entry entry rest indent fn?)
+(define (-gen-decode-insn-entry entry rest indent invalid-insn fn?)
   (assert (eq? 'insn (dtable-entry-type entry)))
   (logit 3 "Generating decode insn entry for " (obj:name (dtable-entry-value entry)) " ...\n")
 
@@ -609,23 +624,27 @@
 
      (else
       (string-append indent "  case "
-		     (number->string (dtable-entry-index entry)) " : "
-		     "itype = " (gen-cpu-insn-enum (current-cpu) insn) ";"
+		     (number->string (dtable-entry-index entry)) " :\n"
 		     ; Compensate for base-insn-size > current-insn-size by adjusting entire_insn.
 		     ; Activate this logic only for sid simulators; they are consistent in
 		     ; interpreting base-insn-bitsize this way.
 		     (if (and (equal? APPLICATION 'SID-SIMULATOR)
 			      (> (state-base-insn-bitsize) (insn-length insn)))
 			 (string-append
-			  " entire_insn = base_insn >> "
+			  indent "    entire_insn = base_insn >> "
 			  (number->string (- (state-base-insn-bitsize) (insn-length insn)))
-			  ";")
+			  ";\n")
 			 "")
+		     ; Generate code to check that all of the opcode bits for this insn match
+		     indent "    if ((entire_insn & 0x" (number->hex (insn-base-mask insn)) ") == 0x" (number->hex (insn-value insn)) ")\n" 
+		     indent "      { itype = " (gen-cpu-insn-enum (current-cpu) insn) ";"
 		     (if (with-scache?)
 			 (if fn?
-			     (string-append " @prefix@_extract_" fmt-name " (this, current_cpu, pc, base_insn, entire_insn); goto done;\n")
-			     (string-append " goto extract_" fmt-name ";\n"))
-			 " goto done;\n")))))
+			     (string-append " @prefix@_extract_" fmt-name " (this, current_cpu, pc, base_insn, entire_insn); goto done;")
+			     (string-append " goto extract_" fmt-name ";"))
+			 " goto done;")
+		     " }\n"
+		     indent "    " (-gen-decode-default-entry indent invalid-insn fn?)))))
 )
 
 ; Subroutine of -decode-expr-ifield-tracking.
@@ -963,7 +982,7 @@
 	  (cdr entries)
 	  (cons (case (dtable-entry-type (car entries))
 		  ((insn)
-		   (-gen-decode-insn-entry (car entries) (cdr entries) indent fn?))
+		   (-gen-decode-insn-entry (car entries) (cdr entries) indent invalid-insn fn?))
 		  ((expr)
 		   (-gen-decode-expr-entry (car entries) indent invalid-insn fn?))
 		  ((table)
@@ -974,14 +993,8 @@
 		result))))
 
    ; ??? Can delete if all cases are present.
-   indent "  default : itype = "
-   (gen-cpu-insn-enum (current-cpu) invalid-insn)
-   ";"
-   (if (with-scache?)
-       (if fn?
-	   " @prefix@_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;\n"
-	   " goto extract_sfmt_empty;\n")
-       " goto done;\n")
+   indent "  default : "
+   (-gen-decode-default-entry indent invalid-insn fn?)
    indent "  }\n"
    indent "}\n"
    )

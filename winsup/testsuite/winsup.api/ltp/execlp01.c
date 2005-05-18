@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: execlp01.c,v 1.3 2003/01/24 01:09:39 cgf Exp $ */
+/* $Id: execlp01.c,v 1.4 2005/05/18 01:10:05 briand Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -171,7 +171,7 @@ main(int ac, char **av)
 	 */
 	switch(pid=fork()) {
 	case 0: 	/* CHILD - Call execlp(2) */
-	    execlp("/usr/bin/test", "/usr/bin/test", 0);
+	    execlp("/usr/bin/test", "/usr/bin/test", NULL);
 	    /* should not get here!! if we do, the parent will fail the Test Case */
 	    exit(errno);	
 	case -1:	/* ERROR!!! exit now!!*/

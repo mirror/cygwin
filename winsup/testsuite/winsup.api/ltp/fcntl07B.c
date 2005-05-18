@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: fcntl07B.c,v 1.3 2003/01/24 01:09:39 cgf Exp $ */
+/* $Id: fcntl07B.c,v 1.4 2005/05/18 01:10:06 briand Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -374,7 +374,7 @@ do_exec(const char *prog, int fd, const char *tcd)
     case -1:
 	return(-1);
     case 0:				/* child */
-	execlp(prog, openck, "-T", pidname, 0);
+	execlp(prog, openck, "-T", pidname, NULL);
 
 	/* the ONLY reason to do this is to get the errno printed out */
 	fprintf(stderr, "exec(%s, %s, -T, %s) failed.  Errno %s [%d]\n",

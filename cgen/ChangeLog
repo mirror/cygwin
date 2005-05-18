@@ -1,3 +1,10 @@
+2005-05-18  Dave Brolley  <brolley@redhat.com>
+
+	* utils-sim.scm (-gen-decode-default-entry): New function.
+	(-gen-decode-insn-entry): Now takes 'invalid-insn' argument. Generate
+	code to check that all opcodes bits match.
+	(-gen-decoder-switch): Use -gen-decode-default-entry.
+
 2005-05-16  Jim Blandy  <jimb@redhat.com>
 
 	* sid.scm (gen-ifetch): Require BITSIZE to be exactly the size

@@ -44,7 +44,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.70 $";
+static const char version[] = "$Revision: 1.71 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1466,7 +1466,6 @@ load_cygwin (int& argc, char **&argv)
   char **envp = (char **) cygwin_internal (CW_ENVP);
   if (envp)
     {
-      cygwin_internal (CW_DEBUG_SELF, "d:\\cygwin\\bin\\gdb.exe");
       /* Store path and revert to this value, otherwise path gets overwritten
          by the POSIXy Cygwin variation, which breaks cygcheck.
 	 Another approach would be to use the Cygwin PATH and convert it to

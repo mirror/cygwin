@@ -1,0 +1,20 @@
+2005-05-30  Michael Snyder  <msnyder@localhost.localdomain>
+
+	Add QTFrame message to support gdb 'tfind' command.
+	* demo-tfind.c: New file.
+	* Makefile.in: Add demo-tfind.c.
+	* demo-target.c (demo_process_set_gen): New function.
+	(demo_target): Set process_set_gen for general "set" requests.
+	(demo_process_get_regs): Call get_regs_hook if defined.
+	(demo_get_mem): Call get_mem_hook if defined.
+	* demo-target.h: Export demo_set_gen_hook, demo_get_regs_hook,
+	demo_get_mem_hook, and demo_tfind_open.
+	* main.c (usage): Document "-t" option to accept tracepoint file.
+	(main): Call demo_tfind_open to open tracepoint file.
+
+Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
+version-control: never
+End:

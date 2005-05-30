@@ -1,0 +1,60 @@
+This is an experimental, not-ready-for-primetime modification
+of the RDA 'sample' program to read tracepoint/checkpoint data
+from a file and 'serve' it back to gdb in reply to the QTFrame
+request (which implements gdb's 'tfind' command).
+
+The 'sample' program will export a socket for gdb to connect to,
+and will communicate with gdb by the remote protocol, essentially
+pretending to be a live target.  It will simulate memory and
+registers, but will not simulate execution.  It will have a 
+monolithic memory space like a typical target, but in addition
+will serve memory and register requests from data contained in
+trace frame records, which are read from a file.  Thus it can
+"replay" an execution sequence for gdb, from execution data
+collected earlier thru tracepoints or checkpoints.
+
+
+The tracepoint data file is given on the command line
+with the "-t" option:
+
+	./sample -t <my-file>
+
+The data file will begin with the line "CHECKPOINT FILE", 
+followed by one or more records, each of which represents
+a trace frame or checkpoint.
+
+Each trace frame record will be preceeded by a blank line,
+followed by the line "CHECKPOINT ID <n>" where <n> is a 
+unique integer.
+
+Each trace frame record will contain a register set, 
+preceeded by a line labeled "REGISTERS".  The register set
+data will be identical to a remote protocol "g" packet.
+
+Additionally, the trace frame record may include an optional
+line "PC=<address>", to make it easy to pick the PC out of
+the register set.
+
+Each trace frame record may also (optionally) include a set
+of memory records, preceeded by a line labeled "MEMORY".
+Each memory record will be on a single line, and will be
+formated as an SREC record (qv).  These lines can be up to 
+a little over 512 characters long, and each trace frame
+record can contain as many of these lines as needed.
+
+Here is a sample one-record file.  If the long lines get
+chopped up, imagine that everything between REGISTERS and
+MEMORY is on a single line, and each SREC line following
+MEMORY (each beginning with the string "S3") is on a 
+single line.
+
+CHECKPOINT FILE
+
+CHECKPOINT ID 0
+REGISTERS
+00000000ffffffff4d862508f49f8c002034edfe2834edfee436edfe7036edfe059a080882020000730000007b0000007b0000007b000000000000003300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007f03000000000000ffff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000801f0000ffffffff
+MEMORY
+S3fffeed342001000000040000004834edfe126a080840c96e08dbc025087e142708000000000000000000000000a835edfefac8070840c96e084d862508a835edfe6ec0070838737a00060000001c38fff65838fff6b0daf90e01000000b40f7a00f6ffffffa8a571085835edfe2228790008000000ffffffff6e170000040000005838fff601000000000000000100000038b88c0000b88c0088a77a0050167a0000000001040000001435edfed04a7b001435edfebd000000060000001c38fff65838fff600000000f49f8c0000000000f9bb7c000c35edfe00000000b0daf90e8035edfef8147a00b4000000b40000001c35edfe7e90800088a37a000035fff6b4000000xx
+S3fffeed35200d7c800008c06e0800000000b40000006835edfeb400000000000000f49f8c00e436edfe7036edfe6835edfeb40f7a00f8147a00010000009035edfee65b7900a4167a00000000000100000078c86e08000000000100000068c86e080000000000000000000000008c9af6fe8c9af6fe01000000e436edfe030000004036edfe010000007036edfef835edfed6f211084036edfe01000000f835edfec7f21108f8147a00010000000036edfe0cc06e08000000000000000000000000010000000000000074b42d084e0f000000000000f8c67a00f49f8c001836edfe0ece070826c007084036edfe2c85250806000000a0de8000f8147a005836edfee1bf0708xx
+S34dfeed36204036edfe000000001000000081af070800000000000000005836edfee682250803000000e436edfe000000004884250800000000800c7a00b836edfe238e7b0003000000e436edfexx
+

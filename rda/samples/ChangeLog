@@ -1,4 +1,8 @@
-2005-05-30  Michael Snyder  <msnyder@localhost.localdomain>
+2005-06-03  Michael Snyder  <msnyder@redhat.com>
+
+	* demo-tfind.c (tfind_set_gen): Return "OK" on tfind end.
+
+2005-05-30  Michael Snyder  <msnyder@redhat.com>
 
 	Add QTFrame message to support gdb 'tfind' command.
 	* demo-tfind.c: New file.

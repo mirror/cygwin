@@ -239,6 +239,8 @@ static void tfind_set_gen (struct gdbserv *serv)
 	      demo_get_regs_hook = NULL;
 	      demo_get_mem_hook  = NULL;
 	      cur_frame = -1;
+	      gdbserv_output_string (serv, "OK");
+	      return;
 	    }
 	  else if (tmp_frame >= 0 && tmp_frame < last_cached_frame)
 	    {

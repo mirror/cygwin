@@ -1,3 +1,10 @@
+2005-06-02  Jim Blandy  <jimb@redhat.com>
+
+	* cgen-cpu.h: Remove references to CGEN bitset type.
+
+	* configure.in: Don't forget to AC_SUBST the value of cpu_defs.
+	* configure: Regenerated.
+
 2005-05-10  Dave Brolley  <brolley@redhat.com>
 
 	* configure.in: Set 'comp_defs' with extra defines needed by Solaris.

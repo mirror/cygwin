@@ -65,6 +65,7 @@ AC_CONFIG_SUBDIRS($cpu_subdirs)
 AC_SUBST(cpu_subdirs)
 AC_SUBST(cpu_incl)
 AC_SUBST(cpu_libs)
+AC_SUBST(cpu_defs)
 AC_SUBST(INTLLIBS)
 
 dnl Look for GUILE in install tree

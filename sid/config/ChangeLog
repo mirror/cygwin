@@ -1,7 +1,7 @@
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* config.guess, config.sub, install-sh, missing, mkinstalldirs:
-	Update.
+	* depcomp: Update.
 
 	* docbuild.m4 (RH_DOCBUILD_CHECK): Propery quote macro name.
 	* libstdc++.m4 (CY_LIBSTDCXX_CHECK): Same.

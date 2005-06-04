@@ -1,3 +1,11 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* configure.in: Remove call to AC_ARG_PROGRAM, to avoid autoconf
+	warnings about multiple uses.
+	* configure: Regenerated with autoconf 2.59.
+
+	* aclocal.m4, Makefile.in: Regenerated with Automake 1.9.5.
+
 2002-02-07  Ben Elliston  <bje@redhat.com>
 
 	* VoicePager.cxx: Don't include <stdio.h>. Qualify std objects.

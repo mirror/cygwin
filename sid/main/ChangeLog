@@ -1,3 +1,8 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.
+	* configure: Regenerated with autoconf 2.59.
+
 2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
 
 	* Makefile.am (ACLOCAL_AMFLAGS): Refer to $srcdir.

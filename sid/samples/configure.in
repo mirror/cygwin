@@ -13,7 +13,6 @@ AC_EXEEXT
 AC_PROG_CXX
 AC_PROG_CXXCPP
 AC_PROG_MAKE_SET
-AC_ARG_PROGRAM
 AC_LANG_CPLUSPLUS
 
 dnl List all component subdirectory files not covered by AC_CONFIG_SUBDIRS

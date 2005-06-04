@@ -1,3 +1,9 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* Makefile.am (LIBIBERTY): Link against the libiberty.a from
+	libiberty/pic, not the non-PIC version in libiberty.
+	* Makefile.in: Regenerated with Automake 1.9.5.
+
 2005-05-12  Dave Brolley  <brolley@redhat.com>
 
 	* compLoader.cxx (probe_address): New method of loader_probe_bus.

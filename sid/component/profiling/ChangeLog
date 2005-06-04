@@ -1,3 +1,7 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* Makefile.in: Regenerated with Automake 1.9.5.
+
 2003-05-13  Dave Brolley  <brolley@redhat.com>
 
 	* gprof.cxx (profiling_components): Set bucket count to zero when it

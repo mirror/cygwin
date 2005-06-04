@@ -9,7 +9,7 @@ dnl building docs from xml/sgml source, when in maintainer mode.
 
 dnl 
 
-AC_DEFUN(RH_DOCBUILD_CHECK, [
+AC_DEFUN([RH_DOCBUILD_CHECK], [
 
 dnl check for presence of "links" text web browser
 AC_CHECK_PROG(LINKS,links,true,false)

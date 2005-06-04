@@ -1,3 +1,14 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* configure.in: Apply AC_CONFIG_SUBDIRS to literal strings only.
+	* acinclude.m4 (gcc_AC_CHECK_DECL, gcc_AC_CHECK_DECLS): Properly
+	quote macro names.
+	* configure: Regenerated.
+
+	* Makefile.am (LIBIBERTY): Link against the libiberty.a from
+	libiberty/pic, not the non-PIC version in libiberty.
+	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.
+
 2005-06-02  Jim Blandy  <jimb@redhat.com>
 
 	* cgen-cpu.h: Remove references to CGEN bitset type.

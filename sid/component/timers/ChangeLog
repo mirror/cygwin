@@ -1,3 +1,8 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* configure.in: Apply AC_CONFIG_SUBDIRS only to literal strings.
+	* configure: Regenerated.
+
 2001-07-13  Ben Elliston  <bje@redhat.com>
 
 	* Makefile.am (check-local): Rename target from "checkme".

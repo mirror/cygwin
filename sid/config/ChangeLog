@@ -1,3 +1,18 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* config.guess, config.sub, install-sh, missing, mkinstalldirs:
+	Update.
+
+	* docbuild.m4 (RH_DOCBUILD_CHECK): Propery quote macro name.
+	* libstdc++.m4 (CY_LIBSTDCXX_CHECK): Same.
+	* sidtarget.m4 (CY_SIDTARGET_CHECK): Same.
+
+	* sidtarget.m4 (CY_SIDTARGET_CHECK): No need to specify the shell
+	when running $ac_config_sub; $ac_config_sub contains the shell
+	itself now, and it's an error to specify it twice.
+	
+	* libtool.m4, ltdl.m4, ltmain.sh: Update from libtool 1.5.18.
+
 2003-10-10  Ben Elliston  <bje@wasabisystems.com>
 
 	* config.guess: Update from FSF sources.

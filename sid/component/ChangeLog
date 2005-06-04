@@ -1,3 +1,18 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.
+
+	* configure.in: Remove call to AC_ARG_PROGRAM, to avoid autoconf
+	warnings about multiple uses.
+	* configure: Regenerated with autoconf 2.59.
+
+	* families/configure.in: Apply AC_CONFIG_SUBDIRS to literal
+	strings only.
+	* families/configure: Regenerated.
+
+	* families/Makefile.in, families/aclocal.m4: Regenerated with
+	Automake 1.9.5.
+
 2005-05-10  Dave Brolley  <brolley@redhat.com>
 
 	* configure.in: Set 'comp_defs' with extra defines needed by Solaris.

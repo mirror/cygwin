@@ -1,3 +1,8 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.
+	* configure: Regenerated with autoconf 2.59.
+
 2004-08-04  Robert Shideleff <bigbob@shideleff.com>
 
 	* arm7f.cxx (arm7f_cpu): Change nfiq_pin and nirq_pin to normal

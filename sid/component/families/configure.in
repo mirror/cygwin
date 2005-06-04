@@ -15,10 +15,11 @@ AC_LANG_CPLUSPLUS
 dnl Perform --target/--enable-targets processing.
 CY_SIDTARGET_CHECK
 
-# Add per-target-family subdirectories here
+# Add per-target-family subdirectories here.
+# Apply AC_CONFIG_SUBDIRS to each subdirectory whose name you add
+# to the list.
 family_subdirs=
 
 
-AC_CONFIG_SUBDIRS($family_subdirs)
 AC_SUBST(family_subdirs)
 AC_OUTPUT([Makefile])

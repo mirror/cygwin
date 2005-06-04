@@ -7,12 +7,12 @@ dnl See the file COPYING.SID for conditions for redistribution.
 dnl Use CY_SIDTARGET_CHECK in configure.in to respond to the builder's
 dnl selection of --target/--enable-targets
 
-AC_DEFUN(CY_SIDTARGET_CHECK, [
+AC_DEFUN([CY_SIDTARGET_CHECK], [
 
 
 dnl Assume all targets if $host==$target or $target==NONE
-sid_host=`${CONFIG_SHELL-/bin/sh} $ac_config_sub $host`
-sid_target=`${CONFIG_SHELL-/bin/sh} $ac_config_sub $target`
+sid_host=`$ac_config_sub $host`
+sid_target=`$ac_config_sub $target`
 
 if test "$sid_host" = "$sid_target" -o "$target" = "NONE"
 then

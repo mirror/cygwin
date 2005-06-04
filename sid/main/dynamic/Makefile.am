@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
 
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include -I$(srcdir)/../../../include
-LIBIBERTY = ../../../libiberty/libiberty.a
+LIBIBERTY = ../../../libiberty/pic/libiberty.a
 
 bin_PROGRAMS = sid
 TARGETCFGS = ""

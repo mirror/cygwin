@@ -47,12 +47,15 @@ cpu_libs=
 cpu_incl=
 if test $sidtarget_arm -eq 1; then
 	cpu_subdirs="$cpu_subdirs arm7t"
+        AC_CONFIG_SUBDIRS(arm7t)
 fi
 if test $sidtarget_m32r -eq 1; then
 	cpu_subdirs="$cpu_subdirs m32r"
+        AC_CONFIG_SUBDIRS(m32r)
 fi
 if test $sidtarget_xstormy16 -eq 1; then
 	cpu_subdirs="$cpu_subdirs xstormy16"
+        AC_CONFIG_SUBDIRS(xstormy16)
 fi
 
 for dir in $cpu_subdirs; do
@@ -60,8 +63,6 @@ for dir in $cpu_subdirs; do
 	cpu_incl="$cpu_incl -I$srcdir/$dir"
 done
 
-dnl In the following, $cpu_subdirs is expanded at configure run time
-AC_CONFIG_SUBDIRS($cpu_subdirs)
 AC_SUBST(cpu_subdirs)
 AC_SUBST(cpu_incl)
 AC_SUBST(cpu_libs)

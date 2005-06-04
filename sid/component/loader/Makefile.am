@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-LIBIBERTY = -L../../../libiberty -liberty
+LIBIBERTY = -L../../../libiberty/pic -liberty
 
 pkglib_LTLIBRARIES = libloader.la
 

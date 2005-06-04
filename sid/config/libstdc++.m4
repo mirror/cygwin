@@ -8,7 +8,7 @@ dnl Use CY_LIBSTDC++_CHECK in configure.in to check
 dnl whether static/shared libstdc++ are available for the target.  Set
 dnl the have_libstdcxx_{static,shared} shell variables to "yes" or "no".
 
-AC_DEFUN(CY_LIBSTDCXX_CHECK, [
+AC_DEFUN([CY_LIBSTDCXX_CHECK], [
 if test x$GXX != xyes 
 then
   have_libstdcxx_shared=no

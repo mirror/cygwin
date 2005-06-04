@@ -1,3 +1,7 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* Makefile.in: Regenerated with Automake 1.9.5.
+
 Wed Oct 22 19:03:57 UTC 2003  Brendan Conoboy  <blc@redhat.com>
 
         * lcd-char-display.cxx: Prefix std:: to cout and endl.

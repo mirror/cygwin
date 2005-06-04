@@ -1,3 +1,17 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* dma/Makefile.in, harddrv/Makefile.in, vga/Makefile.in,
+	keyboard/Makefile.in, floppy/Makefile.in, unmapped/Makefile.in,
+	pit/Makefile.in, cpu/fpu/Makefile.in, cpu/memory/Makefile.in,
+	cpu/Makefile.in, gui/Makefile.in, cmos/Makefile.in,
+	pic/Makefile.in: Regenerated with Automake 1.9.5.
+	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.
+
+	* configure.in: Call m4_pattern_allow to reassure autoconf that
+	the AS_DYNAMIC_OBJS and AS_DYNAMIC_INCS variables are not
+	mistakes.
+	* configure: Regenerated with autoconf 2.59.
+
 2003-02-06  Frank Ch. Eigler  <fche@redhat.com>
 
 	* cpu/fpu/poly.h: Correct formatting of multiline inline asm.

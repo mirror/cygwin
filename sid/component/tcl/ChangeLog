@@ -1,3 +1,8 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.
+	* configure: Regenerated with autoconf 2.59.
+
 2003-02-06  Frank Ch. Eigler  <fche@redhat.com>
 
 	* configure.in: Look for tcl/tk 8.4 instead of 8.3.

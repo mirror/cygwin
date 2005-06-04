@@ -1,3 +1,7 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* Makefile.in: Regenerated with Automake 1.9.5.
+
 2004-08-06  Robert Shideleff <bigbob@shideleff.com>
 
 	* glue.cxx (pin_pacer_component): Add new component class & methods.

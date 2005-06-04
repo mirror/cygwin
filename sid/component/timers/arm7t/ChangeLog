@@ -1,3 +1,8 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.
+	* configure: Regenerated with autoconf 2.59.
+
 2005-02-12  Frank Ch. Eigler  <fche@elastic.org>
 
 	* arm7t-timer.h: Add needed friend decl.

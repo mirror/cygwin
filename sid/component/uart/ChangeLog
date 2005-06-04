@@ -1,3 +1,7 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* Makefile.in: Regenerated with Automake 1.9.5.
+
 2001-08-03  matthew green  <mrg@redhat.com>
 
 	* Uart.cxx (ctor): Remove unnecessary parens GCC 3.0 is unable to

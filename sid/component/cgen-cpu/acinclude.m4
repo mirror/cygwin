@@ -4,7 +4,7 @@ dnl to use a different cache variable name in this macro if it is invoked
 dnl in a different context somewhere else.
 dnl gcc_AC_CHECK_DECL(SYMBOL,
 dnl 	[ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND [, INCLUDES]]])
-AC_DEFUN(gcc_AC_CHECK_DECL,
+AC_DEFUN([gcc_AC_CHECK_DECL],
 [AC_MSG_CHECKING([whether $1 is declared])
 AC_CACHE_VAL(gcc_cv_have_decl_$1,
 [AC_TRY_COMPILE([$4],
@@ -22,7 +22,7 @@ dnl Check multiple functions to see whether each needs a declaration.
 dnl Arrange to define HAVE_DECL_<FUNCTION> to 0 or 1 as appropriate.
 dnl gcc_AC_CHECK_DECLS(SYMBOLS,
 dnl 	[ACTION-IF-NEEDED [, ACTION-IF-NOT-NEEDED [, INCLUDES]]])
-AC_DEFUN(gcc_AC_CHECK_DECLS,
+AC_DEFUN([gcc_AC_CHECK_DECLS],
 [for ac_func in $1
 do
 changequote(, )dnl

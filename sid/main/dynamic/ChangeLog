@@ -1,3 +1,13 @@
+2005-06-03  Jim Blandy  <jimb@redhat.com>
+
+	* Makefile.am (LIBIBERTY): Link against the libiberty.a from
+	libiberty/pic, not the non-PIC version in libiberty.
+	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.
+
+	* configure.in: Remove call to AC_ARG_PROGRAM, to avoid autoconf
+	warnings about multiple uses.
+	* configure: Regenerated with autoconf 2.59.
+
 2005-05-10  Dave Brolley  <brolley@redhat.com>
 
 	* commonCfg.cxx (~BlockingCacheCfg): New destructor.

@@ -777,11 +777,11 @@ they should be used unless it's not possible).
                 @item After parsing an instruction, call this to add the 
                         instruction to the frag and queue any fixups.
                 @end itemize
-        @item @code{gas_cgen_md_apply_fix3}
+        @item @code{gas_cgen_md_apply_fix}
                 @itemize @minus
-                @item Provides basic @code{md_apply_fix3} support.
-                @item @code{#define md_apply_fix3
-                        gas_cgen_md_apply_fix3} if you're able to use
+                @item Provides basic @code{md_apply_fix} support.
+                @item @code{#define md_apply_fix
+                        gas_cgen_md_apply_fix} if you're able to use
                         it.
                 @end itemize
         @item @code{gas_cgen_tc_gen_reloc}

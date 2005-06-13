@@ -1,3 +1,8 @@
+2005-06-13  Jim Blandy  <jimb@redhat.com>
+
+	* pmacros.scm (-pmacro-upcase, -pmacro-downcase): Handle symbols
+	as well as strings.
+
 2005-06-07  Zack Weinberg  <zack@codesourcery.com>
 
 	* doc/porting.texi: Change all mention of md_apply_fix3 and

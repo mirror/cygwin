@@ -424,13 +424,19 @@
 ; .upcase - convert a string to uppercase
 
 (define (-pmacro-upcase str)
-  (string-upcase str)
+  (cond
+   ((string? str) (string-upcase str))
+   ((symbol? str) (string->symbol (string-upcase (symbol->string str))))
+   (else (-pmacro-error "invalid argument to .upcase" str)))
 )
 
 ; .downcase - convert a string to lowercase
 
 (define (-pmacro-downcase str)
-  (string-downcase str)
+  (cond
+   ((string? str) (string-downcase str))
+   ((symbol? str) (string->symbol (string-downcase (symbol->string str))))
+   (else (-pmacro-error "invalid argument to .downcase" str)))
 )
 
 ; .substring - get part of a string

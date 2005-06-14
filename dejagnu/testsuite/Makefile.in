@@ -74,10 +74,7 @@ tclsh = @tclsh@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-RUNTEST = ` \
-  if [ -f ${top_srcdir}/runtest$(EXEEXT) ] ; then \
-    echo ${top_srcdir}/runtest$(EXEEXT); \
-  else echo "ERROR: runtest not found" ; exit 1; fi`
+RUNTEST = `   if [ -f ${top_srcdir}/runtest$(EXEEXT) ] ; then     echo ${top_srcdir}/runtest$(EXEEXT);   else echo "ERROR: runtest not found" ; exit 1; fi`
 
 
 RUNTESTDEFAULTFLAGS = --srcdir $$srcdir

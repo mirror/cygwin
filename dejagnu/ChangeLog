@@ -1,3 +1,8 @@
+2005-06-14  Martin Koegler  <mkoegler@auto.tuwien.ac.at>
+
+        * Makefile.am: Honor $DESTDIR for dejagnu.h
+	* Makefile.in: Regenerate.
+
 2005-05-11  Nick Clifton  <nickc@redhat.com>
 
 	* Update the address and phone number of the FSF organization in

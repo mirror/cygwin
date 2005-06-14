@@ -124,7 +124,7 @@ install-info:
 uninstall-info:
 
 install-data-local:
-	$(mkinstalldirs) $(lib_dest) $(includedir)
+	$(mkinstalldirs) $(lib_dest) $(DESTDIR)$(includedir)
 	for f in $(lib_files); do \
 	  test ! -f "$$f" || $(INSTALL_DATA) $$f $(lib_dest); \
 	done
@@ -134,7 +134,7 @@ install-data-local:
 	  test ! -f "$$f" || $(INSTALL_DATA) $$f $(baseboards_dest); \
 	done
 	#
-	$(INSTALL_DATA) $(srcdir)/dejagnu.h $(includedir); \
+	$(INSTALL_DATA) $(srcdir)/dejagnu.h $(DESTDIR)$(includedir); \
 	#
 	$(mkinstalldirs) $(config_dest)
 	for f in $(config_files); do \
@@ -155,7 +155,7 @@ uninstall-local:
 	for f in $(baseboards_files); do \
 	  test ! -f "$$f" || rm -f $(baseboards_dest)/`basename "$$f"`; \
 	done
-	rm -f $(includedir)/dejagnu.h;
+	rm -f $(DESTDIR)$(includedir)/dejagnu.h;
 
 site.exp: Makefile
 	@echo 'Making a new site.exp file...'

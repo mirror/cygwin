@@ -563,6 +563,22 @@
   (reverse! (list-drop n (reverse l)))
 )
 
+;; left fold
+(define (foldl kons accum lis) 
+  (if (null? lis) accum 
+      (foldl kons (kons accum (car lis)) (cdr lis))))
+
+;; right fold
+(define (foldr kons knil lis) 
+  (if (null? lis) knil 
+      (kons (car lis) (foldr kons knil (cdr lis)))))
+
+;; filter list on predicate
+(define (filter p ls)
+  (foldr (lambda (x a) (if (p x) (cons x a) a)) 
+	 '() ls))
+
+
 ; APL's +\ operation on a vector of numbers.
 
 (define (plus-scan l)
@@ -635,12 +651,13 @@
 
 ; Return intersection of two lists.
 
-(define (intersection l1 l2)
-  (cond ((null? l1) l1)
-	((null? l2) l2)
-	((memq (car l1) l2) (cons (car l1) (intersection (cdr l1) l2)))
-	(else (intersection (cdr l1) l2)))
-)
+(define (intersection a b) 
+  (foldl (lambda (l e) (if (memq e a) (cons e l) l)) '() b))
+
+; Return union of two lists.
+
+(define (union a b) 
+  (foldl (lambda (l e) (if (memq e l) l (cons e l))) a b))
 
 ; Return a count of the number of elements of list L1 that are in list L2.
 ; Uses memq.

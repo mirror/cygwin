@@ -1155,13 +1155,19 @@
 		; Allow a cpu family to override the isa parallel-insns spec.
 		; ??? Concession to the m32r port which can go away, in time.
 		parallel-insns
+
+		; Computed: maximum number of insns which may pass before there
+		; an insn writes back its output operands.
+		max-delay
+
 		)
 	      nil)
 )
 
 ; Accessors.
 
-(define-getters <cpu> cpu (word-bitsize insn-chunk-bitsize file-transform parallel-insns))
+(define-getters <cpu> cpu (word-bitsize insn-chunk-bitsize file-transform parallel-insns max-delay))
+(define-setters <cpu> cpu (max-delay))
 
 ; Return endianness of instructions.
 
@@ -1211,7 +1217,9 @@
 	      word-bitsize
 	      insn-chunk-bitsize
 	      file-transform
-	      parallel-insns)
+	      parallel-insns
+	      0 ; default max-delay. will compute correct value
+	      )
 	(begin
 	  (logit 2 "Ignoring " name ".\n")
 	  #f))) ; cpu is not to be kept

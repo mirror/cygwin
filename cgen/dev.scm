@@ -132,7 +132,7 @@
   (load "sid-model")
   (load "sid-decode")
   (set! verbose-level 3)
-  (set! APPLICATION 'SIMULATOR)
+  (set! APPLICATION 'SID-SIMULATOR)
 )
 
 (define (load-sim)

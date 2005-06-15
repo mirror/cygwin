@@ -47,10 +47,7 @@ bool @prefix@_idesc::idesc_table_initialized_p = false;\n\n"
 	       (if pbb?
 		   "0, "
 		   (string-append (-gen-sem-fn-name insn) ", "))
-	       "")
-           (if (with-parallel?)
-               (string-append (-gen-write-fn-name sfmt) ", ")
-               "")
+	       "") 
 	   "\"" (string-upcase name) "\", "
 	   (gen-cpu-insn-enum (current-cpu) insn)
 	   ", "
@@ -131,25 +128,6 @@ bool @prefix@_idesc::idesc_table_initialized_p = false;\n\n"
 )
 
 
-;; and the same for writeback functions
-
-(define (-gen-write-fn-name sfmt)
-  (string-append "@prefix@_write_" (gen-sym sfmt))
-)
-
-
-(define (-gen-write-fn-decls)
-  (string-write
-   "// Decls of each writeback fn.\n\n"
-   "using @cpu@::@prefix@_write_fn;\n"
-   (string-list-map (lambda (sfmt)
-		      (string-list "extern @prefix@_write_fn "
-				   (-gen-write-fn-name sfmt)
-				   ";\n"))
-		    (current-sfmt-list))
-   "\n"
-   )
-)
 
 
 ; idesc, argbuf, and scache types
@@ -164,14 +142,9 @@ struct @cpu@_cpu;
 struct @prefix@_scache;
 "
    (if (with-parallel?)
-       "struct @prefix@_parexec;\n" "")
-   (if (with-parallel?)
-       "typedef void (@prefix@_sem_fn) (@cpu@_cpu* cpu, @prefix@_scache* sem, @prefix@_parexec* par_exec);"
+       "typedef void (@prefix@_sem_fn) (@cpu@_cpu* cpu, @prefix@_scache* sem, int tick, @prefix@::write_stacks &buf);"
        "typedef sem_status (@prefix@_sem_fn) (@cpu@_cpu* cpu, @prefix@_scache* sem);")
    "\n"
-   (if (with-parallel?)
-       "typedef sem_status (@prefix@_write_fn) (@cpu@_cpu* cpu, @prefix@_scache* sem, @prefix@_parexec* par_exec);"
-       "")
    "\n"   
 "
 // Instruction descriptor.
@@ -190,12 +163,6 @@ struct @prefix@_idesc {
        "\
   // scache engine executor for this insn
   @prefix@_sem_fn* execute;\n\n"
-       "")
-
-   (if (with-parallel?)
-       "\
-  // scache write executor for this insn
-  @prefix@_write_fn* writeback;\n\n"
        "")
 
    "\
@@ -300,7 +267,7 @@ struct @prefix@_scache {
   // argument buffer
   @prefix@_sem_fields fields;
 
-" (if (or (with-any-profile?) (with-parallel-write?))
+" (if (with-any-profile?)
       (string-append "
   // writeback flags
   // Only used if profiling or parallel execution support enabled during
@@ -549,7 +516,7 @@ struct @prefix@_scache {
   (let ((in-ops (find op-profilable? (sfmt-in-ops sfmt)))
 	(out-ops (find op-profilable? (sfmt-out-ops sfmt)))
 	)
-    (if (and (null? in-ops) (null? out-ops))
+    (if (or (not (with-any-profile?)) (and (null? in-ops) (null? out-ops)))
 	""
 	(string-list
 	 "  /* Record the fields for profiling.  */\n"
@@ -714,6 +681,17 @@ void
 #ifndef @PREFIX@_DECODE_H
 #define @PREFIX@_DECODE_H
 
+"
+   (if (with-parallel?)
+       "\
+namespace @prefix@ {
+// forward declaration of struct in -defs.h
+struct write_stacks;
+}
+
+"
+       "")
+"\
 namespace @cpu@ {
 
 using namespace cgen;
@@ -735,10 +713,6 @@ typedef UINT @prefix@_insn_word;
    ; There's no pressing need for it though.
    (if (with-scache?)
        -gen-sem-fn-decls
-       "")
-
-   (if (with-parallel?)
-       -gen-write-fn-decls
        "")
 
    "\

@@ -1,5 +1,5 @@
 ; CPU family related simulator generator, excluding decoding and model support.
-; Copyright (C) 2000, 2002 Red Hat, Inc.
+; Copyright (C) 2000, 2002, 2003, 2005 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; ***********
@@ -199,6 +199,84 @@ namespace @arch@ {
    (-gen-hardware-struct #f (find hw-need-storage? (current-hw-list))))
 )
 
+(define (-gen-hw-stream-and-destream-fns) 
+  (let* ((sa string-append)
+	 (regs (find hw-need-storage? (current-hw-list)))
+	 (reg-dim (lambda (r) 
+		    (let ((dims (-hw-vector-dims r)))
+		      (if (equal? 0 (length dims)) 
+			  "0"
+			  (number->string (car dims))))))
+	 (write-stacks 
+	  (map (lambda (n) (sa n "_writes"))
+	       (append (map (lambda (r) (gen-c-symbol (obj:name r))) regs)
+		       (map (lambda (m) (sa m "_memory")) useful-mode-names))))
+	 (stream-reg (lambda (r) 
+		       (let ((rname (sa "hardware." (gen-c-symbol (obj:name r)))))
+			 (if (hw-scalar? r)
+			     (sa "    ost << " rname " << ' ';\n")
+			     (sa "    for (int i = 0; i < " (reg-dim r) 
+				 "; i++)\n      ost << " rname "[i] << ' ';\n")))))
+	 (destream-reg (lambda (r) 
+			 (let ((rname (sa "hardware." (gen-c-symbol (obj:name r)))))
+			   (if (hw-scalar? r)
+			       (sa "    ist >> " rname ";\n")
+			       (sa "    for (int i = 0; i < " (reg-dim r) 
+				   "; i++)\n      ist >> " rname "[i];\n")))))
+	 (stream-stacks (lambda (s) (sa "    stream_stacks ( stacks." s ", ost);\n")))
+	 (destream-stacks (lambda (s) (sa "    destream_stacks ( stacks." s ", ist);\n")))
+	 (stack-boilerplate
+	  (sa
+	   "  template <typename ST> \n"
+	   "  void stream_stacks (const ST &st, std::ostream &ost) const\n"
+	   "  {\n"
+	   "    for (int i = 0; i < @prefix@::pipe_sz; i++)\n"
+	   "    {\n"
+	   "      ost << st[i].t << ' ';\n"
+	   "      for (int j = 0; j <= st[i].t; j++)\n"
+	   "      {\n"
+	   "        ost << st[i].buf[j].pc << ' ';\n"
+	   "        ost << st[i].buf[j].val << ' ';\n"
+	   "        ost << st[i].buf[j].idx0 << ' ';\n"
+	   "      }\n"
+	   "    }\n"
+	   "  }\n"
+	   "  \n"
+	   "  template <typename ST> \n"
+	   "  void destream_stacks (ST &st, std::istream &ist)\n"
+	   "  {\n"
+	   "    for (int i = 0; i < @prefix@::pipe_sz; i++)\n"
+	   "    {\n"
+	   "      ist >> st[i].t;\n"
+	   "      for (int j = 0; j <= st[i].t; j++)\n"
+	   "      {\n"
+	   "        ist >> st[i].buf[j].pc;\n"
+	   "        ist >> st[i].buf[j].val;\n"
+	   "        ist >> st[i].buf[j].idx0;\n"
+	   "      }\n"
+	   "    }\n"
+	   "  }\n"
+	   "  \n")))
+    (sa
+     "  void stream_cgen_hardware (std::ostream &ost) const \n  {\n"
+     (string-map stream-reg regs)
+     "  }\n"
+     "  void destream_cgen_hardware (std::istream &ist) \n  {\n"
+     (string-map destream-reg regs)
+     "  }\n"
+     (if (with-parallel?) 
+	 (sa stack-boilerplate
+	     "  void stream_cgen_write_stacks (std::ostream &ost, "
+	     "const @prefix@::write_stacks &stacks) const \n  {\n"
+	     (string-map stream-stacks write-stacks)
+	     "  }\n"
+	     "  void destream_cgen_write_stacks (std::istream &ist, "
+	     "@prefix@::write_stacks &stacks) \n  {\n"
+	     (string-map destream-stacks write-stacks)
+	     "  }\n")
+	 ""))))
+
+
 ; Generate <cpu>-cpu.h
 
 (define (cgen-cpu.h)
@@ -221,6 +299,8 @@ public:
 \n"
 
    -gen-hardware-types
+
+   -gen-hw-stream-and-destream-fns
 
    "  // C++ register access function templates\n"
    "#define current_cpu this\n\n"
@@ -295,68 +375,150 @@ typedef struct {
    )
 )
 
-; Utility of gen-parallel-exec-type to generate the definition of one
-; structure in PAREXEC.
-; SFMT is an <sformat> object.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; begin stack-based write schedule
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define (gen-parallel-exec-elm sfmt)
-  (string-append
-   "    struct { /* " (obj:comment sfmt) " */\n"
-   (let ((sem-ops
-	  ((if (with-parallel-write?) sfmt-out-ops sfmt-in-ops) sfmt)))
-     (if (null? sem-ops)
-	 "      int empty;\n"
-	 (string-map
-	  (lambda (op)
-	    (logit 2 "Processing operand " (obj:name op) " of format "
-		   (obj:name sfmt) " ...\n")
-	      (if (with-parallel-write?)
-		  (let ((index-type (and (op-save-index? op)
-					 (gen-index-type op sfmt))))
-		    (string-append "      " (gen-type op)
-				   " " (gen-sym op) ";\n"
-				   (if index-type
-				       (string-append "      " index-type 
-						      " " (gen-sym op) "_idx;\n")
-				       "")))
-		  (string-append "      "
-				 (gen-type op)
-				 " "
-				 (gen-sym op)
-				 ";\n")))
-	  sem-ops)))
-   "    } " (gen-sym sfmt) ";\n"
-   )
-)
+(define useful-mode-names '(BI QI HI SI DI UQI UHI USI UDI SF DF))
+
+(define (-calculated-memory-write-buffer-size)
+  (let* ((is-mem? (lambda (op) (eq? (hw-sem-name (op:type op)) 'h-memory)))
+	 (count-mem-writes
+	  (lambda (sfmt) (length (find is-mem? (sfmt-out-ops sfmt))))))
+    (apply max (append '(0) (map count-mem-writes (current-sfmt-list))))))
+
+
+;; note: this doesn't really correctly approximate the worst case. user-supplied functions
+;; might rewrite the pipeline extensively while it's running. 
+;(define (-worst-case-number-of-writes-to hw-name)
+;  (let* ((sfmts (current-sfmt-list))
+;	 (out-ops (map sfmt-out-ops sfmts))
+;	 (pred (lambda (op) (equal? hw-name (gen-c-symbol (obj:name (op:type op))))))
+;	 (filtered-ops (map (lambda (ops) (find pred ops)) out-ops)))
+;    (apply max (cons 0 (map (lambda (ops) (length ops)) filtered-ops)))))
+	 
+(define (-hw-gen-write-stack-decl nm mode)
+  (let* (
+; for the time being, we're disabling this size-estimation stuff and just
+; requiring the user to supply a parameter WRITE_BUF_SZ before they include -defs.h
+;	 (pipe-sz (+ 1 (max-delay (cpu-max-delay (current-cpu)))))
+;	 (sz (* pipe-sz (-worst-case-number-of-writes-to nm))))
+	 
+	 (mode-pad (spaces (- 4 (string-length mode))))
+	 (stack-name (string-append nm "_writes")))
+    (string-append
+     "  write_stack< write<" mode "> >" mode-pad "\t" stack-name "\t[pipe_sz];\n")))
+
+
+(define (-hw-gen-write-struct-decl)
+  (let* ((dims (-worst-case-index-dims))
+	 (sa string-append)
+	 (ns number->string)
+	 (idxs (iota dims))
+	 (ctor (sa "write (PCADDR _pc, MODE _val"
+		   (string-map (lambda (x) (sa ", USI _idx" (ns x) "=0")) idxs)
+		   ") : pc(_pc), val(_val)"
+		   (string-map (lambda (x) (sa ", idx" (ns x) "(_idx" (ns x) ")")) idxs)
+		   " {} \n"))
+	 (idx-fields (string-map (lambda (x) (sa "    USI idx" (ns x) ";\n")) idxs)))
+    (sa
+     "\n\n"
+     "  template <typename MODE>\n"
+     "  struct write\n"
+     "  {\n"
+     "    USI pc;\n"
+     "    MODE val;\n"
+     idx-fields
+     "    " ctor 
+     "    write() {}\n"
+     "  };\n" )))
+	       
+(define (-hw-vector-dims hw) (elm-get (hw-type hw) 'dimensions))			    
+(define (-worst-case-index-dims)
+  (apply max
+	 (append '(1) ; for memory accesses
+		 (map (lambda (hw) (length (-hw-vector-dims hw))) 
+		      (find (lambda (hw) (not (scalar? hw))) (current-hw-list))))))
+
+
+(define (-gen-writestacks)
+  (let* ((hw (find register? (current-hw-list)))
+	 (modes useful-mode-names) 
+	 (hw-pairs (map (lambda (h) (list (gen-c-symbol (obj:name h))
+					    (obj:name (hw-mode h)))) 
+			hw))
+	 (mem-pairs (map (lambda (m) (list (string-append (symbol->string m)
+							  "_memory") m)) 
+			 modes))
+	 (all-pairs (append mem-pairs hw-pairs))
+
+	 (h1 "\n\n// write stacks used in parallel execution\n\n  struct write_stacks\n  {\n  // types of stacks\n\n")
+	 (wb (string-append
+	      "\n\n  // unified writeback function (defined in @prefix@-write.cc)"
+	        "\n  void writeback (int tick, @cpu@::@cpu@_cpu* current_cpu);"
+		"\n  // unified write-stack clearing function (defined in @prefix@-write.cc)"
+	        "\n  void reset ();"))
+	 (zz "\n\n  }; // end struct @prefix@::write_stacks \n\n"))    
+    (string-append	
+     (-hw-gen-write-struct-decl)
+     (foldl (lambda (s pair) (string-append s (apply -hw-gen-write-stack-decl pair))) h1 all-pairs)	  
+     wb
+     zz)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; end stack-based write schedule
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	  
 
 ; Generate the definition of the structure that holds register values, etc.
-; for use during parallel execution.  When instructions are executed parallelly
-; either
-; - their inputs are read before their outputs are written.  Thus we have to
-; fetch the input values of several instructions before executing any of them.
-; - or their outputs are queued here first and then written out after all insns
-; have executed.
-; The fetched/queued values are stored in an array of PAREXEC structs, one
-; element per instruction.
+; for use during parallel execution.  
 
-(define (gen-parallel-exec-type)
-  (logit 2 "Generating PAREXEC type ...\n")
-  (string-append
-   (if (with-parallel-write?)
-       "/* Queued output values of an instruction.  */\n"
-       "/* Fetched input values of an instruction.  */\n")
-   "\
+(define (gen-write-stack-structure)
+  (let ((membuf-sz (-calculated-memory-write-buffer-size))
+	(max-delay (cpu-max-delay (current-cpu))))
+    (logit 2 "Generating write stack structure ...\n")
+    (string-append
+     "  static const int max_delay = "   
+     (number->string max-delay) ";\n"
+     "  static const int pipe_sz = "     
+     (number->string (+ 1 max-delay)) "; // max_delay + 1\n"
 
-struct @prefix@_parexec {
-  union {\n"
-   (string-map gen-parallel-exec-elm (current-sfmt-list))
-   "\
-  } operands;
-  /* For conditionally written operands, bitmask of which ones were.  */
-  unsigned long long written;
-};\n\n"
-   )
-)
+"
+  template <typename ELT> 
+  struct write_stack 
+  {
+    int t;
+    const int sz;
+    ELT buf[WRITE_BUF_SZ];
+
+    write_stack       ()             : t(-1), sz(WRITE_BUF_SZ) {}
+    inline bool empty ()             { return (t == -1); }
+    inline void clear ()             { t = -1; }
+    inline void pop   ()             { if (t > -1) t--;}
+    inline void push  (const ELT &e) { if (t+1 < sz) buf [++t] = e;}
+    inline ELT &top   ()             { return buf [t>0 ? ( t<sz ? t : sz-1) : 0];}
+  };
+
+  // look ahead for latest write with index = idx, where time of write is
+  // <= dist steps from base (present) in write_stack array st.
+  // returning def if no scheduled write is found.
+
+  template <typename STKS, typename VAL>
+  inline VAL lookahead (int dist, int base, STKS &st, VAL def, int idx=0)
+  {
+    for (; dist > 0; --dist)
+    {
+      write_stack <VAL> &v = st [(base + dist) % pipe_sz];
+      for (int i = v.t; i > 0; --i) 
+	  if (v.buf [i].idx0 == idx) return v.buf [i];
+    }
+    return def;
+  }
+
+"
+ 
+     (-gen-writestacks)     
+     )))
 
 ; Generate the TRACE_RECORD struct definition.
 
@@ -392,15 +554,27 @@ typedef struct @prefix@_trace_record {
 #ifndef DEFS_@PREFIX@_H
 #define DEFS_@PREFIX@_H
 
-namespace @cpu@ {
-\n"
-
+")
    (if (with-parallel?)
-       gen-parallel-exec-type
-       "")
+       (string-write "\
+#include <stack>
+#include \"cgen-types.h\"
 
-   "\
-} // end @cpu@ namespace
+// forward declaration\n\n  
+namespace @cpu@ {
+struct @cpu@_cpu;
+}
+
+namespace @prefix@ {
+
+using namespace cgen;
+
+"
+		     gen-write-stack-structure
+		     "\
+} // end @prefix@ namespace
+"))
+   (string-write "\
 
 #endif /* DEFS_@PREFIX@_H */\n"
    )
@@ -417,47 +591,80 @@ namespace @cpu@ {
 ; Return C code to fetch and save all output operands to instructions with
 ; <sformat> SFMT.
 
-(define (-gen-write-args sfmt)
-  (string-map (lambda (op) (op:write op sfmt))
-	      (sfmt-out-ops sfmt))
-)
-
-; Utility of gen-write-fns to generate a writer function for <sformat> SFMT.
-
-(define (-gen-write-fn sfmt)
-  (logit 2 "Processing write function for \"" (obj:name sfmt) "\" ...\n")
-  (string-list
-   "\nsem_status\n"
-   (-gen-write-fn-name sfmt) " (@cpu@_cpu* current_cpu, @prefix@_scache* sem, @prefix@_parexec* par_exec)\n"
-   "{\n"
-   (if (with-scache?)
-       (gen-define-field-macro sfmt)
-       "")
-   (gen-define-parallel-operand-macro sfmt)
-   "  @prefix@_scache* abuf = sem;\n"
-   "  unsigned long long written = abuf->written;\n"
-   "  PCADDR pc = abuf->addr;\n"
-   "  PCADDR npc = 0; // dummy value for branches\n"
-   "  sem_status status = SEM_STATUS_NORMAL; // ditto\n"
-   "\n"
-   (-gen-write-args sfmt)
-   "\n"
-   "  return status;\n"
-   (gen-undef-parallel-operand-macro sfmt)
-   (if (with-scache?)
-       (gen-undef-field-macro sfmt)
-       "")
-   "}\n\n")
-)
-
-(define (-gen-write-fns)
-  (logit 2 "Processing writer functions ...\n")
-  (string-write-map (lambda (sfmt) (-gen-write-fn sfmt))
-		    (current-sfmt-list))
-)
-
 
 ; Generate <cpu>-write.cxx.
+
+(define (-gen-register-writer nm mode dims)
+  (let* ((pad "    ")
+	 (sa string-append)
+	 (mode (symbol->string mode))
+	 (idx-args (string-map (lambda (x) (sa "w.idx" (number->string x) ", ")) 
+			       (iota dims))))
+    (sa pad "while (! " nm "_writes[tick].empty())\n"
+	pad "{\n"
+	pad "  write<" mode "> &w = " nm "_writes[tick].top();\n"
+	pad "  current_cpu->" nm "_set(" idx-args "w.val);\n"
+	pad "  " nm "_writes[tick].pop();\n"
+	pad "}\n\n")))
+
+(define (-gen-memory-writer nm mode dims)
+  (let* ((pad "    ")
+	 (sa string-append)
+	 (mode (symbol->string mode))
+	 (idx-args (string-map (lambda (x) (sa ", w.idx" (number->string x) "")) 
+			       (iota dims))))
+    (sa pad "while (! " nm "_writes[tick].empty())\n"
+	pad "{\n"
+	pad "  write<" mode "> &w = " nm "_writes[tick].top();\n"
+	pad "  current_cpu->SETMEM" mode " (w.pc" idx-args ", w.val);\n"
+	pad "  " nm "_writes[tick].pop();\n"
+	pad "}\n\n")))
+
+
+(define (-gen-reset-fn)
+  (let* ((sa string-append)
+	 (objs (append (map (lambda (h) (gen-c-symbol (obj:name h))) 
+			    (find register? (current-hw-list)))
+		       (map (lambda (m) (sa (symbol->string m) "_memory"))
+			    useful-mode-names)))
+	 (clr (lambda (elt) (sa "    clear_stacks (" elt "_writes);\n"))))
+    (sa 
+     "  template <typename ST> \n"
+     "  static void clear_stacks (ST &st)\n"
+     "  {\n"
+     "    for (int i = 0; i < @prefix@::pipe_sz; i++)\n"
+     "      st[i].clear();\n"
+     "  }\n\n"
+     "  void @prefix@::write_stacks::reset ()\n  {\n"
+     (string-map clr objs)
+     "  }")))
+
+(define (-gen-unified-write-fn) 
+  (let* ((hw (find register? (current-hw-list)))
+	 (modes useful-mode-names)	
+	 (hw-triples (map (lambda (h) (list (gen-c-symbol (obj:name h))
+					    (obj:name (hw-mode h))
+					    (length (-hw-vector-dims h)))) 
+			hw))
+	 (mem-triples (map (lambda (m) (list (string-append (symbol->string m)
+							    "_memory")
+					     m 1)) 
+			 modes)))
+
+    (logit 2 "Generating writer function ...\n") 
+    (string-append
+     "
+
+  void @prefix@::write_stacks::writeback (int tick, @cpu@::@cpu@_cpu* current_cpu) 
+  {
+"
+     "\n    // register writeback loops\n"
+     (string-map (lambda (t) (apply -gen-register-writer t)) hw-triples)
+     "\n    // memory writeback loops\n"
+     (string-map (lambda (t) (apply -gen-memory-writer t)) mem-triples)
+"
+  }
+")))
 
 (define (cgen-write.cxx)
   (logit 1 "Generating " (gen-cpu-name) " write.cxx ...\n")
@@ -479,10 +686,10 @@ namespace @cpu@ {
    "\
 
 #include \"@cpu@.h\"
-using namespace @cpu@;
 
 "
-   -gen-write-fns
+   -gen-reset-fn
+   -gen-unified-write-fn
    )
 )
 
@@ -522,19 +729,14 @@ using namespace @cpu@;
 	 "sem_status\n")
      "@prefix@_sem_" (gen-sym insn)
      (if (with-parallel?)
-	 " (@cpu@_cpu* current_cpu, @prefix@_scache* sem, @prefix@_parexec* par_exec)\n"
+	 (string-append " (@cpu@_cpu* current_cpu, @prefix@_scache* sem, const int tick, \n\t"
+			"@prefix@::write_stacks &buf)\n")
 	 " (@cpu@_cpu* current_cpu, @prefix@_scache* sem)\n")
      "{\n"
      (gen-define-field-macro (insn-sfmt insn))
-     (if (with-parallel?)
-	 (gen-define-parallel-operand-macro (insn-sfmt insn))
-	 "")
      "  sem_status status = SEM_STATUS_NORMAL;\n"
      "  @prefix@_scache* abuf = sem;\n"
-     ; Unconditionally written operands are not recorded here.
-     (if (or (with-profile?) (with-parallel-write?))
-	 "  unsigned long long written = 0;\n"
-	 "")
+
      ; The address of this insn, needed by extraction and semantic code.
      ; Note that the address recorded in the cpu state struct is not used.
      ; For faster engines that copy will be out of date.
@@ -543,25 +745,14 @@ using namespace @cpu@;
      "\n"
      (gen-semantic-code insn)
      "\n"
-     ; Only update what's been written if some are conditionally written.
-     ; Otherwise we know they're all written so there's no point in
-     ; keeping track.
-     (if (or (with-profile?) (with-parallel-write?))
-	 (if (-any-cond-written? (insn-sfmt insn))
-	     "  abuf->written = written;\n"
-	     "")
-	 "")
      (if cti?
 	 "  current_cpu->done_cti_insn (npc, status);\n"
 	 "  current_cpu->done_insn (npc, status);\n")
      (if (with-parallel?)
 	 ""
 	 "  return status;\n")
-     (if (with-parallel?)
-	 (gen-undef-parallel-operand-macro (insn-sfmt insn))
-	 "")
      (gen-undef-field-macro (insn-sfmt insn))
-     "}\n\n"
+      "}\n\n"
      ))
 )
 
@@ -659,9 +850,6 @@ using namespace @cpu@; // FIXME: namespace organization still wip
      (if (with-scache?)
 	 (gen-define-field-macro (insn-sfmt insn))
 	 "")
-     (if parallel?
-	 (gen-define-parallel-operand-macro (insn-sfmt insn))
-	 "")
      ; Unconditionally written operands are not recorded here.
      (if (or (with-profile?) (with-parallel-write?))
 	 "      unsigned long long written = 0;\n"
@@ -697,9 +885,6 @@ using namespace @cpu@; // FIXME: namespace organization still wip
      (if (and cti? (not parallel?))
 	 (string-append "      pbb_br_npc = npc;\n"
 			"      pbb_br_status = br_status;\n")
-	 "")
-     (if parallel?
-	 (gen-undef-parallel-operand-macro (insn-sfmt insn))
 	 "")
      (if (with-scache?)
 	 (gen-undef-field-macro (insn-sfmt insn))
@@ -954,9 +1139,6 @@ struct @prefix@_pbb_label {
 			"      vpc = vpc + 1;\n")
 	 "")
      (gen-define-field-macro (sfrag-sfmt frag))
-     (if parallel?
-	 (gen-define-parallel-operand-macro (sfrag-sfmt frag))
-	 "")
      ; Unconditionally written operands are not recorded here.
      (if (or (with-profile?) (with-parallel-write?))
 	 "      unsigned long long written = 0;\n"
@@ -996,9 +1178,6 @@ struct @prefix@_pbb_label {
 	      (sfrag-trailer? frag))
 	 (string-append "      pbb_br_npc = npc;\n"
 			"      pbb_br_status = br_status;\n")
-	 "")
-     (if parallel?
-	 (gen-undef-parallel-operand-macro (sfrag-sfmt frag))
 	 "")
      (gen-undef-field-macro (sfrag-sfmt frag))
      "    }\n"

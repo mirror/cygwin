@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd" [
+<!ENTITY stdinterface SYSTEM "../common-xml/interface.xml">
+<!ENTITY stdbehavior SYSTEM "../common-xml/behavior.xml">
+<!ENTITY debugregisters SYSTEM "../common-xml/debugger-register-access.xml">
+<!ENTITY stdconventions SYSTEM "../common-xml/conventions.xml">
+<!ENTITY stdenvironment SYSTEM "../common-xml/environment.xml">
+]>
+
+<defcomplib lib="libcgencpu.la" dlsym="cgen_component_library">
+  <defcomponent name="hw-cpu-ms1" type="concrete">
+
+  &stdinterface;
+
+  </defcomponent>
+  <synop>
+    <p>This component models the Morpho Ms1 processor.</p>
+  </synop>
+  <func>
+    <modelling>
+      <p>This component models a simplified Ms1 processor.</p>
+      <p>It does not model floating point instructions.</p>
+      <p>It does not model supervisory functions such as
+	exceptions/traps.</p>
+
+    </modelling>
+    &stdbehavior;
+    <behavior name="register access">
+
+      <p>All 32 general purpose registers are accessible as attribute
+      <attribute>r0</attribute> through <attribute>r31</attribute>.
+      The <attribute>pc</attribute> attribute is also available.  The
+      current endianness is available as attribute
+      <attribute>endian</attribute>.</p>
+
+    &debugregisters;
+    </behavior>
+
+  &stdconventions;
+  </func>
+  <env>
+  &stdenvironment;
+  </env>
+</defcomplib>
+
+
+

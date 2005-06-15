@@ -1305,7 +1305,23 @@
 			"bad arg to `operand'" object-or-name)))
 )
 
-(define-fn xop (estate options mode object) object)
+(define-fn xop (estate options mode object) 
+  (let ((delayed (assoc '#:delay (estate-modifiers estate))))
+    (if (and delayed
+	     (equal? APPLICATION 'SID-SIMULATOR)
+	     (operand? object))
+	;; if we're looking at an operand inside a (delay ...) rtx, then we
+	;; are talking about a _delayed_ operand, which is a different
+	;; beast.  rather than try to work out what context we were
+	;; constructed within, we just clone the operand instance and set
+	;; the new one to have a delayed value. the setters and getters
+	;; will work it out.
+	(let ((obj (object-copy object))
+	      (amount (cadr delayed)))
+	  (op:set-delay! obj amount)
+	  obj)
+	;; else return the normal object
+	object)))
 
 (define-fn local (estate options mode object-or-name)
   (cond ((rtx-temp? object-or-name)
@@ -1364,9 +1380,38 @@
   (cx:make VOID "; /*clobber*/\n")
 )
 
-(define-fn delay (estate options mode n rtx)
-  (s-sequence (estate-with-modifiers estate '((#:delay))) VOID '() rtx) ; wip!
-)
+
+(define-fn delay (estate options mode num-node rtx)
+  (case APPLICATION
+    ((SID-SIMULATOR)
+     (let* ((n (cadddr num-node))
+	    (old-delay (let ((old (assoc '#:delay (estate-modifiers estate))))
+			 (if old (cadr old) 0)))
+	    (new-delay (+ n old-delay)))    
+       (begin
+	 ;; check for proper usage
+     	 (if (let* ((hw (case (car rtx) 
+			  ((operand) (op:type (rtx-operand-obj rtx)))
+			  ((xop) (op:type (rtx-xop-obj rtx)))
+			  (else #f))))		    	       
+	       (not (and hw (or (pc? hw) (memory? hw) (register? hw)))))
+	     (context-error 
+	      (estate-context estate) 
+	      (string-append 
+	       "(delay ...) rtx applied to wrong type of operand '" (car rtx) "'. should be pc, register or memory")))
+	 ;; signal an error if we're delayed and not in a "parallel-insns" CPU
+	 (if (not (with-parallel?)) 
+	     (context-error 	      
+	      (estate-context estate) 
+	      "delayed operand in a non-parallel cpu"))
+	 ;; update cpu-global pipeline bound
+	 (cpu-set-max-delay! (current-cpu) (max (cpu-max-delay (current-cpu)) new-delay))      
+	 ;; pass along new delay to embedded rtx
+	 (rtx-eval-with-estate rtx mode (estate-with-modifiers estate `((#:delay ,new-delay)))))))
+
+    ;; not in sid-land
+    (else (s-sequence (estate-with-modifiers estate '((#:delay))) VOID '() rtx))))
+
 
 ; Gets expanded as a macro.
 ;(define-fn annul (estate yes?)

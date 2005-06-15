@@ -90,6 +90,9 @@
 		; referenced.  #f means the operand is always referenced by
 		; the instruction.
 		(cond? . #f)
+		
+		; whether (and by how much) this instance of the operand is delayed.
+		(delayed . #f)
 		)
 	      nil)
 )
@@ -135,6 +138,8 @@
 (define op:set-num! (elm-make-setter <operand> 'num))
 (define op:cond? (elm-make-getter <operand> 'cond?))
 (define op:set-cond?! (elm-make-setter <operand> 'cond?))
+(define op:delay (elm-make-getter <operand> 'delayed))
+(define op:set-delay! (elm-make-setter <operand> 'delayed))
 
 ; Compute the hardware type lazily.
 ; FIXME: op:type should be named op:hwtype or some such.

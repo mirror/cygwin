@@ -1,3 +1,40 @@
+2005-06-15  Dave Brolley  <brolley@redhat.com>
+
+	* sid-cpu.scm (-gen-hw-stream-and-destream-fns): New function.
+	(cgen-cpu.h): Call it.
+
+	Contributed on behalf of Graydon Hoare
+	2001-06-05  graydon hoare  <graydon@redhat.com>
+
+	* utils.scm (foldl): Define.
+	(foldr): Define.
+	(filter): Define.
+	(union): Define.
+	(intersection): Simplify.
+	* sid.scm : Set APPLICATION to SID-SIMULATOR.
+	(-op-gen-delayed-set-maybe-trace): Define.
+	(<operand> 'gen-set-{quiet,trace}): Delegate to
+	op-gen-delayed-set-quiet etc. Note: this is still a little tangled
+	up and needs cleaning.
+	(-with-parallel?): Hardwire with-parallel to #t.
+	(<operand> 'cxmake-get): Replace with lookahead-aware code
+	* sid-decode.scm: Remove per-insn writeback fns.
+	(-gen-idesc-decls): Redefine sem_fn type.
+	* sid-cpu.scm (gen-write-stack-structure): Replace parexec stuff
+	with write stack stuff.
+	(cgen-write.cxx): Replace per-insn writebacks with single write
+	stack writeback. Add write stack reset function.
+	(-gen-scache-semantic-fn insn): Replace parexec stuff with write
+	stack stuff.
+	* rtl-c.scm (xop): Clone operand into delayed operand if #:delayed
+	estate attribute set.
+	(delay): Set #:delayed attribute to calculated delay, update
+	maximum delay of cpu, check (delay ...) usage.
+	* operand.scm (<operand>): Add delayed slot to <operand>.
+	* mach.scm (<cpu>): Add max-delay slot to <cpu>.
+	* dev.scm (load-sid): Set APPLICATION to SID-SIMULATOR.
+	* doc/rtl.texi (Expressions): Add section on (delay ...).
+
 2005-06-13  Jim Blandy  <jimb@redhat.com>
 
 	* pmacros.scm (-pmacro-upcase, -pmacro-downcase): Handle symbols

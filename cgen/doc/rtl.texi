@@ -2271,6 +2271,40 @@ Indicate that there are @samp{num} delay slots in the processing of
 @samp{expr}.  When using this rtx in instruction semantics, CGEN will
 infer that the instruction has the DELAY-SLOT attribute.
 
+@item (delay num expr)
+In older "sim" simulators, indicates that there are @samp{num} delay
+slots in the processing of @samp{expr}. When using this rtx in instruction
+semantics, CGEN will infer that the instruction has the DELAY-SLOT
+attribute.  
+
+In newer "sid" simulators, evaluates to the writeback queue for hardware
+operand @samp{expr}, at @samp{num} instruction cycles in the
+future. @samp{expr} @emph{must} be a hardware operand in this case. 
+
+For example, @code{(set (delay 3 pc) (+ pc 1))} will schedule write to
+the @samp{pc} register in the writeback phase of the 3rd instruction
+after the current. Alternatively, @code{(set gr1 (delay 3 gr2))} will
+immediately update the @samp{gr1} register with the @emph{latest write}
+to the @samp{gr2} register scheduled between the present and 3
+instructions in the future. @code{(delay 0 ...)}  refers to the
+writeback phase of the current instruction.
+
+This effect is modeled with a circular buffer of "write stacks" for each
+hardware element (register banks get a single stack). The size of the
+circular buffer is calculated from the uses of @code{(delay ...)} 
+rtxs. When a delayed write occurs, the simulator pushes the write onto
+the appropriate write stack in the "future" of the circular buffer for
+the written-to hardware element. At the end of each instruction cycle,
+the simulator executes all writes in all write stacks for the time slice
+just ending. When a delayed read (essentially a pipeline bypass) occurs,
+the simulator looks ahead in the circular buffer for any writes
+scheduled in the future write stack. If it doesn't find one, it
+progressively backs off towards the "current" instruction cycle's write
+stack, and if it still finds no scheduled writes then it returns the
+current state of the CPU. Thus while delayed writes are fast, delayed
+reads are potentially slower in a simulator with long pipelines and very
+large register banks.
+
 @item (annul yes?)
 @c FIXME: put annul into the glossary.
 Annul the following instruction if @samp{yes?} is non-zero. This rtx is

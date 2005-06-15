@@ -931,43 +931,6 @@
 	 (rtl-c++ INT yes? nil #:rtl-cover-fns? #t)))
 )
 
-; For parallel write post-processing, we don't want to defer setting the pc.
-; ??? Not sure anymore.
-;(method-make!
-; <pc> 'gen-set-quiet
-; (lambda (self estate mode index selector newval)
-;   (-op-gen-set-quiet self estate mode index selector newval)))
-;(method-make!
-; <pc> 'gen-set-trace
-; (lambda (self estate mode index selector newval)
-;   (-op-gen-set-trace self estate mode index selector newval)))
-
-; Name of C macro to access parallel execution operand support.
-
-(define -par-operand-macro "OPRND")
-
-; Return C code to fetch an operand's value and save it away for the
-; semantic handler.  This is used to handle parallel execution of several
-; instructions where all inputs of all insns are read before any outputs are
-; written.
-; For operands, the word `read' is only used in this context.
-
-(define (op:read op sfmt)
-  (let ((estate (estate-make-for-normal-rtl-c++ nil nil)))
-    (send op 'gen-read estate sfmt -par-operand-macro))
-)
-
-; Return C code to write an operand's value.
-; This is used to handle parallel execution of several instructions where all
-; outputs are written to temporary spots first, and then a final
-; post-processing pass is run to update cpu state.
-; For operands, the word `write' is only used in this context.
-
-(define (op:write op sfmt)
-  (let ((estate (estate-make-for-normal-rtl-c++ nil nil)))
-    (send op 'gen-write estate sfmt -par-operand-macro))
-)
-
 ; Default gen-read method.
 ; This is used to help support targets with parallel insns.
 ; Either this or gen-write (but not both) is used.
@@ -1017,36 +980,45 @@
 (method-make!
  <operand> 'cxmake-get
  (lambda (self estate mode index selector)
-   (let ((mode (if (mode:eq? 'DFLT mode)
-		   (send self 'get-mode)
-		   mode))
-	 (index (if index index (op:index self)))
-	 (selector (if selector selector (op:selector self))))
-     ; If the object is marked with the RAW attribute, access the hardware
-     ; object directly.
+   (let* ((mode (if (mode:eq? 'DFLT mode)
+		    (send self 'get-mode)
+		    mode))
+	  (hw (op:type self))
+	  (index (if index index (op:index self)))
+	  (idx (if index (-gen-hw-index index estate) ""))
+	  (idx-args (if (equal? idx "") "" (string-append ", " idx)))
+	  (selector (if selector selector (op:selector self)))
+	  (delayval (op:delay self))
+	  (md (mode:c-type mode))
+	  (name (if 
+		 (eq? (obj:name hw) 'h-memory)
+		 (string-append md "_memory")
+		 (gen-c-symbol (obj:name hw))))
+	  (getter (op:getter self))
+	  (def-val (cond ((obj-has-attr? self 'RAW)
+			  (send hw 'cxmake-get-raw estate mode index selector))
+			 (getter
+			  (let ((args (car getter))
+				(expr (cadr getter)))
+			    (rtl-c-expr mode expr
+					(if (= (length args) 0) nil
+					    (list (list (car args) 'UINT index)))
+					#:rtl-cover-fns? #t
+					#:output-language (estate-output-language estate))))
+			 (else
+			  (send hw 'cxmake-get estate mode index selector)))))
+     
      (logit 4 "<operand> cxmake-get self=" (obj:name self) " mode=" (obj:name mode)
 	    " index=" (obj:name index) " selector=" selector "\n")
-     (cond ((obj-has-attr? self 'RAW)
-	    (send (op:type self) 'cxmake-get-raw estate mode index selector))
-	   ; If the instruction could be parallely executed with others and
-	   ; we're doing read pre-processing, the operand has already been
-	   ; fetched, we just have to grab the cached value.
-	   ((with-parallel-read?)
-	    (cx:make-with-atlist mode
-				 (string-append -par-operand-macro
-						" (" (gen-sym self) ")")
-				 nil)) ; FIXME: want CACHED attr if present
-	   ((op:getter self)
-	    (let ((args (car (op:getter self)))
-		  (expr (cadr (op:getter self))))
-	      (rtl-c-expr mode expr
-			  (if (= (length args) 0)
-			      nil
-			      (list (list (car args) 'UINT index)))
-			  #:rtl-cover-fns? #t
-			  #:output-language (estate-output-language estate))))
-	   (else
-	    (send (op:type self) 'cxmake-get estate mode index selector)))))
+     
+     (if delayval
+	 (cx:make mode (string-append "lookahead ("
+				      (number->string delayval)
+				      ", tick, " 
+				      "buf." name "_writes, " 
+				      (cx:c def-val) 
+				      idx-args ")"))
+	 def-val)))
 )
 
 
@@ -1056,16 +1028,9 @@
   (send (op:type op) 'gen-set-quiet estate mode index selector newval)
 )
 
-(define (-op-gen-set-quiet-parallel op estate mode index selector newval)
-  (string-append
-   (if (op-save-index? op)
-       (string-append "    " -par-operand-macro " (" (-op-index-name op) ")"
-		      " = " (-gen-hw-index index estate) ";\n")
-       "")
-   "    "
-   -par-operand-macro " (" (gen-sym op) ")"
-   " = " (cx:c newval) ";\n")
-)
+(define (-op-gen-delayed-set-quiet op estate mode index selector newval)
+  (-op-gen-delayed-set-maybe-trace op estate mode index selector newval #f))
+
 
 (define (-op-gen-set-trace op estate mode index selector newval)
   (string-append
@@ -1129,15 +1094,41 @@
    "  }\n")
 )
 
-(define (-op-gen-set-trace-parallel op estate mode index selector newval)
-  (string-append
-   "  {\n"
-   "    " (mode:c-type mode) " opval = " (cx:c newval) ";\n"
-   (if (op:cond? op)
-       (string-append "    written |= (1ULL << "
-		      (number->string (op:num op))
-		      ");\n")
-       "")
+(define (-op-gen-delayed-set-trace op estate mode index selector newval)
+  (-op-gen-delayed-set-maybe-trace op estate mode index selector newval #t))
+
+(define (-op-gen-delayed-set-maybe-trace op estate mode index selector newval do-trace?)
+  (let* ((pad "    ")
+	 (hw (op:type op))
+	 (delayval (op:delay op))
+	 (md (mode:c-type mode))
+	 (name (if 
+		(eq? (obj:name hw) 'h-memory)
+		(string-append md "_memory")
+		(gen-c-symbol (obj:name hw))))
+	 (val (cx:c newval))
+	 (idx (if index (-gen-hw-index index estate) ""))
+	 (idx-args (if (equal? idx "") "" (string-append ", " idx)))
+	 )
+    
+    (string-append
+     "  {\n"
+
+     (if delayval 
+
+	 ;; delayed write: push it to the appropriate buffer
+	 (string-append	    
+	  pad md " opval = " val ";\n"
+	  pad "buf." name "_writes [(tick + " (number->string delayval)
+	  ") % @prefix@::pipe_sz].push (@prefix@::write<" md ">(pc, opval" idx-args "));\n")
+
+	 ;; else, uh, we should never have been called!
+	 (error "-op-gen-delayed-set-maybe-trace called on non-delayed operand"))       
+     
+     
+     (if do-trace?
+
+	 (string-append
 ; TRACE_RESULT_<MODE> (cpu, abuf, hwnum, opnum, value);
 ; For each insn record array of operand numbers [or indices into
 ; operand instance table].
@@ -1169,15 +1160,9 @@
 	   "(USI) "
 	   ""))
    "opval << dec << \"  \";\n"
-   (if (op-save-index? op)
-       (string-append "    " -par-operand-macro " (" (-op-index-name op) ")"
-		      " = " (-gen-hw-index index estate) ";\n")
-       "")
-   "    " -par-operand-macro " (" (gen-sym op) ")"
-   " = opval;\n"
    "  }\n")
-)
-
+	 ;; else no tracing is emitted
+	 ""))))
 
 ; Return C code to set the value of an operand.
 ; NEWVAL is a <c-expr> object of the value to store.
@@ -1196,8 +1181,8 @@
 	 (selector (if selector selector (op:selector self))))
      (cond ((obj-has-attr? self 'RAW)
 	    (send (op:type self) 'gen-set-quiet-raw estate mode index selector newval))
-	   ((with-parallel-write?)
-	    (-op-gen-set-quiet-parallel self estate mode index selector newval))
+	   ((op:delay self)
+	    (-op-gen-delayed-set-quiet self estate mode index selector newval))
 	   (else
 	    (-op-gen-set-quiet self estate mode index selector newval)))))
 )
@@ -1219,26 +1204,12 @@
 	 (selector (if selector selector (op:selector self))))
      (cond ((obj-has-attr? self 'RAW)
 	    (send (op:type self) 'gen-set-quiet-raw estate mode index selector newval))
-	   ((with-parallel-write?)
-	    (-op-gen-set-trace-parallel self estate mode index selector newval))
+	   ((op:delay self)
+	    (-op-gen-delayed-set-trace self estate mode index selector newval))
 	   (else
 	    (-op-gen-set-trace self estate mode index selector newval)))))
 )
 
-; Define and undefine C macros to tuck away details of instruction format used
-; in the parallel execution functions.  See gen-define-field-macro for a
-; similar thing done for extraction/semantic functions.
-
-(define (gen-define-parallel-operand-macro sfmt)
-  (string-append "#define " -par-operand-macro "(f) "
-		 "par_exec->operands."
-		 (gen-sym sfmt)
-		 ".f\n")
-)
-
-(define (gen-undef-parallel-operand-macro sfmt)
-  (string-append "#undef " -par-operand-macro "\n")
-)
 
 ; Operand profiling and parallel execution support.
 

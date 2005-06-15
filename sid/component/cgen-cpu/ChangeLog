@@ -1,3 +1,15 @@
+2005-06-15  Dave Brolley  <brolley@redhat.com>
+
+	Morpho ms1 cpu contributed on behalf of Red Hat
+	2004-05-14  Stan Cox  <scox@redhat.com>
+
+	* ms1: New directory.
+	* aclocal.m4: Regenerated.
+	* Makefile.in: Ditto.
+	* configure: Ditto.
+	* configure.in: Support added for ms1.
+	* compCGEN.cxx: Ditto.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* configure.in: Apply AC_CONFIG_SUBDIRS to literal strings only.
@@ -18,9 +30,9 @@
 
 2005-05-10  Dave Brolley  <brolley@redhat.com>
 
-	* configure.in: Set 'comp_defs' with extra defines needed by Solaris.
+	* configure.in: Set 'cpu_defs' with extra defines needed by Solaris.
 	* configure: Regenerated.
-	* Makefile.am (CXXFLAGS): Set it to @comp_defs@.
+	* Makefile.am (CXXFLAGS): Set it to @cpu_defs@.
 	* Makefile.in: Regenerated.
 
 2005-05-10  Dave Brolley  <brolley@redhat.com>

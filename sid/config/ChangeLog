@@ -1,3 +1,9 @@
+2005-06-24  Dave Brolley  <brolley@redhat.com>
+
+	* config.sub: Add ms1 support.
+	* info.tcl.in: Likewise.
+	* sidtargets.m4: Likewise.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* config.guess, config.sub, install-sh, missing, mkinstalldirs:

@@ -1,0 +1,88 @@
+2001-09-17  Ben Elliston  <bje@redhat.com>
+
+	* ms1-state-snapshot.exp: Run if $sidtarget(ms1) is set.
+
+2001-08-23  graydon hoare  <graydon@redhat.com>
+
+	* ms1-state-snapshot.exp: New test.
+	* test-img.x: New binary file for test.
+
+2001-08-02  John Healy  <jhealy@redhat.com>
+
+        * ms1-allinsn.exp: Load of basic-sid and run tests
+        using run-sid-tests-raw.
+
+2001-05-22  John Healy  <jhealy@redhat.com>
+
+	* addinsns.s, ctinsn.s, intctrlinsns.s, ioinsns.s, logicalinsns.s,
+	memoryinsns.s, memoryinsns.s, mulinsns.s, shiftinsns.s, subinsns.s:
+	Added machine identification.
+	* ms1-allinsn.exp: Added --nosched to assembler flags.
+
+2001-05-17  John Healy  <jhealy@redhat.com>
+	
+	* ioinsns.s: Added tests for the rest of the io instructions.
+
+2001-05-14  John Healy  <jhealy@redhat.com>
+
+	* ctinsns.s: Added test for brne instruction.
+
+2001-04-12  John Healy  <jhealy@redhat.com>
+
+	* ctinsns.s: Updated expected value for pc offset from jal insn.
+
+2001-04-11  John Healy  <jhealy@redhat.com>
+
+	* testutils.inc: Modified macros to use gloss-based syscalls and
+	to respect scheduling restrictions.
+	* addinsns.s, intctrlinsns.s, logicalinsns.s, memoryinsns.s,
+	mulinsns.s, shiftinsns.s, subinsns.s: Added .align directives to
+	.data sections and added nop's where necessary to obey the rules
+ 	of scheduling restrictions.
+
+2001-04-09  John Healy  <jhealy@redhat.com>
+
+	* ctinsns.s: Adjusted test cases to test for delayed branching.
+	* testutils.inc: Modified macros to allow for delayed branching.
+
+2001-04-09  John Healy  <jhealy@redhat.com>
+
+	* mulinsns.s: Added more tests.
+
+2001-04-06  John Healy  <jhealy@redhat.com>
+
+	* ctinsns.s, intctrlinsns.s, ioinsns.s, logicalinsns.s
+	memoryinsns.s, mulinsns.s shiftinsns.s, subinsns.s: Renamed to have
+        better filename extension (.cgs changed to .s).  New tests also added
+        to each file.
+	* addinsns.s: New file.  Tests from add.cgs, addi.cgs and addui.cgs
+	grouped into addinsns.s.  
+	* testutils.inc: Improved assertion and loading macros.
+
+2001-04-05  John Healy  <jhealy@redhat.com>
+
+	* intctrlinsns.cgs: New tests added.
+
+2001-04-03  John Healy  <jhealy@redhat.com>
+
+	* add.cgs: Improved tests.
+	* addi.cgs: New file.
+	* addiinsns.cgs: New file.
+	* addui.cgs: New file.
+	* ctinsns.cgs: New file.
+	* intctrlinsns.cgs: New file.
+	* ioinsns.cgs: New file.
+	* logicalinsns.cgs: New file.
+	* memoryinsns.cgs: New file.
+	* mulinsns.cgs: New file.
+	* shiftinsns.cgs: New file.
+	* subinsns.cgs: New file.
+	* testutils.inc: New file.
+	
+2001-03-28  John Healy  <jhealy@redhat.com>
+
+        * sidcomp.cgen-cpu.ms1/testutils.inc: Added support for
+        syscalls with up to three arguments.
+        * sidcomp.cgen-cpu.ms1/allinsn.exp: New file.
+        * sidcomp.cgen-cpu.ms1/add.cgs: New file.
+

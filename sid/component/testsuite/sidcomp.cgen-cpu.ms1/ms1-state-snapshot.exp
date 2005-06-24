@@ -1,0 +1,127 @@
+# Testsuite for the CPU state snapshot and restoring.
+# Copyright (C) 2001 Red Hat
+
+if {! $sidtarget(ms1)} { untested "hw-cpu-ms1 not available"; return }
+
+set cpu "ms1"
+set filename "$srcdir/sidcomp.cgen-cpu.ms1/test-img.x"
+set conf_file "statesnap.conf"
+set start_insn 0x22d4
+
+
+set test "sid configuration"
+sid_config_component_etc_test_with_tracing "$conf_file" \
+    "load libcgencpu.la cgen_component_library" \
+    "hw-cpu-$cpu" \
+    "load libmemory.la mem_component_library
+load libloader.la loader_component_library
+
+new hw-memory-ram/rom-basic mem
+new sw-load-elf loader
+
+set loader file $filename
+connect-pin loader start-pc-set -> real-victim start-pc-set!
+connect-pin loader endian-set -> real-victim endian-set!
+connect-bus loader load-accessor-insn mem read-write-port
+connect-bus loader load-accessor-data mem read-write-port
+
+set mem size 0xffffff
+connect-bus real-victim data-memory mem read-write-port
+connect-bus real-victim insn-memory mem read-write-port
+
+relate tester loader loader
+"
+pass $test
+
+
+set test "sid startup"
+if [sid_start "$conf_file"] then { pass $test } else { fail $test ; return }
+
+
+set test "acquire loader load! pin"
+set load_pin [sid_cmd "sid::component::find_pin [sid_cmd {set relationships(loader)}] load!"]
+if {$load_pin != ""} { pass $test } else { fail $test }
+
+set test "acquire cpu reset! pin"
+set reset_pin [sid_cmd "sid::component::find_pin $victim reset!"]
+if {$reset_pin == ""} then { fail $test } else { pass $test }
+
+set test "acquire cpu step! pin"
+set step_pin [sid_cmd "sid::component::find_pin $victim step!"]
+if {$step_pin == ""} then { fail $test } else { pass $test }
+
+set test "acquire cpu start-pc-set! pin"
+set set_pc_pin [sid_cmd "sid::component::find_pin $victim start-pc-set!"]
+if {$set_pc_pin == ""} then { fail $test } else { pass $test }
+
+sid_cmd "sid::pin::driven_h4 $reset_pin 1"
+sid_cmd "sid::pin::driven_h4 $load_pin 1"
+
+# ignore any initialization in crt0; we're just doing simple memory writes
+set test "advancing to interesting position of test image"
+sid_cmd "sid::pin::driven_h4 $set_pc_pin $start_insn"
+set result [sid_cmd "sid::component::attribute_value $victim pc"]
+if {$result != $start_insn} then { fail $test } else { pass $test }
+
+
+# set our step-size to 100, to finish test quickly
+set test "set step-insn-count attribute"
+set result [sid_cmd "sid::component::set_attribute_value $victim step-insn-count 100"]
+if {$result == ""} then { fail $test } else { pass $test }
+
+# advance 100 insns into interesting stuff
+sid_cmd "sid::pin::driven_h4 $step_pin 1"    
+
+# save state 1's PC
+set test "storing state 1's pc value"
+set first_pc [sid_cmd "sid::component::attribute_value $victim pc"]
+if {$first_pc == "" } then { fail $test } else { pass $test }
+
+
+# capture state
+set test "snapshot initial CPU state"
+set first_state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {$first_state == ""} then { fail $test } else { pass $test }
+
+
+# advance through 100 more insns
+sid_cmd "sid::pin::driven_h4 $step_pin 1"    
+
+
+# capture state
+set test "snapshot final CPU state"
+set second_state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {$second_state == ""} then { fail $test } else { pass $test }
+
+
+# rewind to first capture
+set test "restore initial CPU state"
+set result [sid_cmd "sid::component::set_attribute_value $victim state-snapshot \"$first_state\""]
+if {$result == ""} then { fail $test } else { pass $test }
+
+
+# check that pc was reset
+set test "checking pc value rewound properly"
+set rewind_pc [sid_cmd "sid::component::attribute_value $victim pc"]
+if {$rewind_pc != $first_pc } then { fail $test } else { pass $test }
+
+
+# advance through second 100 insns again
+sid_cmd "sid::pin::driven_h4 $step_pin 1"    
+
+# capture state
+set test "snapshot final CPU state again"
+set third_state [sid_cmd "sid::component::attribute_value $victim state-snapshot"]
+if {$third_state == ""} then { fail $test } else { pass $test }
+
+# compare states
+set test "comparing second and third states"
+if {$second_state != $third_state} then { fail $test } else { pass $test }
+
+
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "$conf_file" }

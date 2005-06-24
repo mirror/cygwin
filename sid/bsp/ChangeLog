@@ -1,3 +1,8 @@
+2005-06-24  Dave Brolley  <brolley@redhat.com>
+
+	* configrun-sid.in: Add ms1 support.
+	* Makefile.am: Likewise.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.

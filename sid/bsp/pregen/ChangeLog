@@ -1,3 +1,9 @@
+2005-06-24  Dave Brolley  <brolley@redhat.com>
+
+	* pregen-configs.in: Add support for Ms1.
+	* ms1-gloss.conf: New file.
+	* ms1-gdb.conf: Likewise.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.in: Regenerated with Automake 1.9.5.

@@ -256,6 +256,7 @@ case $basic_machine in
 	| mipsisa64sr71k | mipsisa64sr71kel \
 	| mipstx39 | mipstx39el \
 	| mn10200 | mn10300 \
+	| ms1 \
 	| msp430 \
 	| ns16k | ns32k \
 	| openrisc | or32 \
@@ -330,6 +331,7 @@ case $basic_machine in
 	| mipsisa64sr71k-* | mipsisa64sr71kel-* \
 	| mipstx39-* | mipstx39el-* \
 	| mmix-* \
+	| ms1-* \
 	| msp430-* \
 	| none-* | np1-* | ns16k-* | ns32k-* \
 	| orion-* \

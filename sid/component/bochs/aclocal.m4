@@ -7080,6 +7080,7 @@ sidtarget_x86=$sidtarget_default
 sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
+sidtarget_ms1=$sidtarget_default
 sidtarget_ppc=$sidtarget_default
 sidtarget_xstormy16=$sidtarget_default
 
@@ -7093,6 +7094,7 @@ do
       mips*)  sidtarget_mips=1 ;;
       m32r*)  sidtarget_m32r=1 ;;
       m68k*)  sidtarget_m68k=1 ;;
+      ms1*) sidtarget_ms1=1 ;;
       powerpc*) sidtarget_ppc=1 ;;
       ppc*)   sidtarget_ppc=1 ;;
       xstormy16*) sidtarget_xstormy16=1 ;;
@@ -7107,6 +7109,7 @@ case 1 in
   ${sidtarget_mips}) ;;
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
+  ${sidtarget_ms1}) ;;
   ${sidtarget_ppc}) ;;
   ${sidtarget_xstormy16}) ;;
   *) AC_MSG_WARN([No selected sid targets: use --enable-targets or --target])

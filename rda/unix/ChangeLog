@@ -1,5 +1,9 @@
 2005-03-10  Jim Blandy  <jimb@redhat.com>
 
+	* thread-db.c (thread_db_get_thread_reg,
+	thread_db_set_thread_reg): Correct Kevin's patch, incorrectly
+	merged.
+	
 	* configure.in: Provide description for STOCK_BREAKPOINTS for use
 	in config.in.
 
@@ -21,7 +25,7 @@
 
 	2005-02-08  Kevin Buettner  <kevinb@redhat.com
 
-	* td_thr_tls_get_addr_p): New static global.
+	* thread-db.c (td_thr_tls_get_addr_p): New static global.
 	(thread_db_dlopen): Initialize ``td_thr_tls_get_addr_p''.
 	(thread_db_get_gen): Add support for qGetTLSAddr packet.
 

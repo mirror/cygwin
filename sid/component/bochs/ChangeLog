@@ -1,3 +1,9 @@
+2005-06-30  Dave Brolley  <brolley@redhat.com>
+
+	* cpu/memory/Makefile.am (libmemory_la_SOURCES): Remove duplicate
+	sid-bochs-memory.cc
+	* cpu/memory/Makefile.in: Regenerate.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* dma/Makefile.in, harddrv/Makefile.in, vga/Makefile.in,

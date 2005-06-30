@@ -46,12 +46,31 @@
 #include "gdbserv-thread-db.h"
 
 #include "server.h"
+#include "arch.h"
 #include "ptrace-target.h"
+
+#ifdef STOCK_BREAKPOINTS
+#include "stock-breakpoints.h"
+#endif
 
 /* This is a linux native gdbserv target that uses the RDA library to
    implement a remote gdbserver on a linux host.  It controls the
    process to be debugged on the linux host, allowing GDB to pull the
    strings from any host on the network (or on a serial port).  */
+
+
+/* Generic architecture stuff.  */
+static struct arch *
+allocate_empty_arch (void)
+{
+  struct arch *a = malloc (sizeof (*a));
+  
+  memset (a, 0, sizeof (*a));
+
+  return a;
+}
+
+
 
 /*
  * Messy target-dependent register stuff
@@ -203,6 +222,17 @@ struct peekuser_pokeuser_reginfo
      have all of the architectures converted over so that we won't
      even need to mention this third option.
 
+  5) A function-like macro MAKE_ARCH (), expecting no arguments, which
+     expands to an expression that evaluates to a pointer to a 'struct
+     arch' object for the current architecture.  We use this to
+     initialize the 'arch' member of the child_process structure.
+
+     For now, this is optional; if not defined, child_process->arch is
+     set to zero.  When we've converted all the architectures to
+     produce an arch object, we can remove the default, so new ports
+     that don't define a MAKE_ARCH macro will get an error, instead of
+     silently losing functionality.
+
 */
 
      
@@ -345,6 +375,110 @@ static struct getregs_setregs_reginfo reginfo[] =
              fieldsize (struct user_fpxregs_struct, mxcsr), 4},
   /* ORIG_EAX - needed by gdb for signal handling.  */
   { GREGS, ORIG_EAX * 4, 4, 4 } };
+
+
+/* Breakpoint methods for the x86.  Except for bp_hit_p, these
+   are just wrappers for the stock breakpoint methods.  In C++, we
+   could use multiple inheritance for this, and it would all just
+   work...  */
+
+/* x86 breakpoints tables are just stock breakpoint tables.  But we
+   like static typechecking; casts swallow error messages.  */
+static struct arch_bp_table *
+stock_table_to_x86 (struct stock_bp_table *table)
+{
+  return (struct arch_bp_table *) table;
+}
+
+static struct stock_bp_table *
+x86_table_to_stock (struct arch_bp_table *table)
+{
+  return (struct stock_bp_table *) table;
+}
+
+/* x86 breakpoints are just stock breakpoints.  But we like static
+   typechecking; casts swallow error messages.  */
+static struct arch_bp *
+stock_bp_to_x86 (struct stock_bp *bp)
+{
+  return (struct arch_bp *) bp;
+}
+
+static struct stock_bp *
+x86_bp_to_stock (struct arch_bp *bp)
+{
+  return (struct stock_bp *) bp;
+}
+
+struct arch_bp_table *
+x86_make_bp_table (struct arch *arch,
+		   struct gdbserv *serv,
+		   struct gdbserv_target *target)
+{
+  struct stock_bp_table *table = stock_bp_make_table (serv, target);
+
+  /* Use 'int 3' as the breakpoint instruction.  */
+  stock_bp_set_bp_insn (table, 1, "\xcc");
+
+  return stock_table_to_x86 (table);
+}
+
+
+static struct arch_bp *
+x86_set_bp (struct arch_bp_table *table,
+	    struct gdbserv_reg *addr)
+{
+  /* x86 arch breakpoints are just stock breakpoints.  */
+  return stock_bp_to_x86 (stock_bp_set_bp (x86_table_to_stock (table),
+					   addr));
+}
+
+
+static int
+x86_delete_bp (struct arch_bp *bp)
+{
+  return stock_bp_delete_bp (x86_bp_to_stock (bp));
+}
+
+
+static int
+x86_bp_hit_p (struct gdbserv_thread *thread,
+	      struct arch_bp *arch_bp)
+{
+  struct stock_bp *bp = x86_bp_to_stock (arch_bp);
+  struct stock_bp_table *table = stock_bp_table (bp);
+  struct gdbserv *serv = stock_bp_table_serv (table);
+  struct gdbserv_target *target = stock_bp_table_target (table);
+  struct gdbserv_reg bp_addr, pc;
+  unsigned long bp_addr_int, pc_int;
+
+  stock_bp_addr (&bp_addr, bp);
+  gdbserv_reg_to_ulong (serv, &bp_addr, &bp_addr_int);
+  target->get_thread_reg (serv, thread, PC_REGNUM, &pc);
+  gdbserv_reg_to_ulong (serv, &pc, &pc_int);
+
+  /* When the x86 hits a breakpoint, the reported PC is one greater
+     than the address of the breakpoint.  */
+  return bp_addr_int + 1 == pc_int;
+}
+
+
+/* Construct an architecture object for the x86.  */
+static struct arch *
+x86_make_arch (void)
+{
+  struct arch *a = allocate_empty_arch ();
+
+  a->closure = 0;		/* No closure needed at the moment.  */
+  a->make_bp_table = x86_make_bp_table;
+  a->set_bp = x86_set_bp;
+  a->delete_bp = x86_delete_bp;
+  a->bp_hit_p = x86_bp_hit_p;
+
+  return a;
+}
+
+#define MAKE_ARCH() (x86_make_arch ())
 
 /* End of X86_LINUX_TARGET */
 
@@ -1118,6 +1252,112 @@ frv_fdpic_loadmap_addresses (struct gdbserv *serv, int pid, int regno,
     }
   return 0;
 }
+
+/* Breakpoint methods for the frv.  These use the stock breakpoint
+   code.
+
+   Although the FRV actually does require a custom breakpoint
+   implementation (you can only set breakpoints on the first
+   instruction in a VLIW bundle), we punt that for now: the only
+   client of this breakpoint code at the moment is thread-db.c, which
+   always sets breakpoints at function entry points, which are
+   guaranteed to be the start of a bundle.  */
+
+/* frv breakpoints tables are just stock breakpoint tables.  But we
+   like static typechecking; casts swallow error messages.  */
+static struct arch_bp_table *
+stock_table_to_frv (struct stock_bp_table *table)
+{
+  return (struct arch_bp_table *) table;
+}
+
+static struct stock_bp_table *
+frv_table_to_stock (struct arch_bp_table *table)
+{
+  return (struct stock_bp_table *) table;
+}
+
+/* frv breakpoints are just stock breakpoints.  But we like static
+   typechecking; casts swallow error messages.  */
+static struct arch_bp *
+stock_bp_to_frv (struct stock_bp *bp)
+{
+  return (struct arch_bp *) bp;
+}
+
+static struct stock_bp *
+frv_bp_to_stock (struct arch_bp *bp)
+{
+  return (struct stock_bp *) bp;
+}
+
+struct arch_bp_table *
+frv_make_bp_table (struct arch *arch,
+		   struct gdbserv *serv,
+		   struct gdbserv_target *target)
+{
+  static unsigned char breakpoint[] = {0xc0, 0x70, 0x00, 0x01};
+  struct stock_bp_table *table = stock_bp_make_table (serv, target);
+
+  stock_bp_set_bp_insn (table, sizeof (breakpoint), breakpoint);
+
+  return stock_table_to_frv (table);
+}
+
+
+static struct arch_bp *
+frv_set_bp (struct arch_bp_table *table,
+	    struct gdbserv_reg *addr)
+{
+  /* frv arch breakpoints are just stock breakpoints.  */
+  return stock_bp_to_frv (stock_bp_set_bp (frv_table_to_stock (table),
+					   addr));
+}
+
+
+static int
+frv_delete_bp (struct arch_bp *bp)
+{
+  return stock_bp_delete_bp (frv_bp_to_stock (bp));
+}
+
+
+static int
+frv_bp_hit_p (struct gdbserv_thread *thread,
+	      struct arch_bp *arch_bp)
+{
+  struct stock_bp *bp = frv_bp_to_stock (arch_bp);
+  struct stock_bp_table *table = stock_bp_table (bp);
+  struct gdbserv *serv = stock_bp_table_serv (table);
+  struct gdbserv_target *target = stock_bp_table_target (table);
+  struct gdbserv_reg bp_addr, pc;
+  unsigned long bp_addr_int, pc_int;
+
+  stock_bp_addr (&bp_addr, bp);
+  gdbserv_reg_to_ulong (serv, &bp_addr, &bp_addr_int);
+  target->get_thread_reg (serv, thread, PC_REGNUM, &pc);
+  gdbserv_reg_to_ulong (serv, &pc, &pc_int);
+
+  return bp_addr_int == pc_int;
+}
+
+
+/* Construct an architecture object for the frv.  */
+static struct arch *
+frv_make_arch (void)
+{
+  struct arch *a = allocate_empty_arch ();
+
+  a->closure = 0;		/* No closure needed at the moment.  */
+  a->make_bp_table = frv_make_bp_table;
+  a->set_bp = frv_set_bp;
+  a->delete_bp = frv_delete_bp;
+  a->bp_hit_p = frv_bp_hit_p;
+
+  return a;
+}
+
+#define MAKE_ARCH() (frv_make_arch ())
 
 /* End of FRV_LINUX_TARGET */
 #else
@@ -2710,6 +2950,20 @@ linux_attach (struct gdbserv *serv, void *data)
 
   linux_target->data = data;
   process->serv = serv;
+
+#if defined (MAKE_ARCH)
+  process->arch = MAKE_ARCH ();
+#else
+  process->arch = 0;
+#endif
+
+  if (process->arch
+      && process->arch->make_bp_table)
+    process->breakpoint_table
+      = process->arch->make_bp_table (process->arch, serv, linux_target);
+  else
+    process->breakpoint_table = 0;
+
 #if defined(_MIPSEL) || defined(_MIPSEB)
   process->is_ss = 0;
 #endif

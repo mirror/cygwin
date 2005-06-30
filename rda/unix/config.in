@@ -168,6 +168,9 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
+/* Define if the target uses the stock-breakpoints.o module. */
+#undef STOCK_BREAKPOINTS
+
 /* Version number of package */
 #undef VERSION
 

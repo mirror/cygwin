@@ -1,3 +1,104 @@
+2005-06-27  Jim Blandy  <jimb@redhat.com>
+
+	Add support for the Linux NPTL (New POSIX Thread Library) thread
+	implementation.
+	* arch.h, lwp-pool.c, lwp-pool.h, stock-breakpoints.c:
+	* stock-breakpoints.h: New files.
+	* gdbserv-thread-db.h (continue_lwp, singlestep_lwp, attach_lwp)
+	(stop_lwp): Move these ...
+	* lwp-ctrl.h: ... to here (new file).
+	* server.h (struct child_process): Include a pointer to the
+	architecture object, a breakpoint table, and a pointer to the
+	"focus thread".
+	* linux-target.c: Create architecture objects for the i386 and
+	FRV, and describe breakpoints for those architectures.
+	#include "arch.h".
+	[STOCK_BREAKPOINTS]: #include "stock-breakpoints.h".
+	(allocate_empty_arch): New function.
+	[X86_LINUX_TARGET] (stock_table_to_x86, x86_table_to_stock)
+	(stock_bp_to_x86, x86_bp_to_stock, x86_make_bp_table, x86_set_bp)
+	(x86_delete_bp, x86_bp_hit_p, x86_make_arch): New functions.
+	(MAKE_ARCH): #define to call x86_make_arch.
+	[X86_LINUX_TARGET] (stock_table_to_frv, frv_table_to_stock)
+	(stock_bp_to_frv, frv_bp_to_stock, frv_make_bp_table, frv_set_bp)
+	(frv_delete_bp, frv_bp_hit_p, frv_make_arch): New functions.
+	(MAKE_ARCH): #define to call frv_make_arch.
+	(linux_attach): If MAKE_ARCH is #defined, create an architecture
+	object for this process.  And if we have an architecture object,
+	make a breakpoint table.
+	* thread-db.c: #include <assert.h>, "arch.h", "lwp-ctrl.h", and
+	"lwp-pool.h".
+	(struct gdbserv_thread): Remove state-tracking flags 'attached',
+	'stopped', 'waited', and 'stepping'; all that state is handled
+	inside lwp-pool.c now.
+	(add_thread_to_list): Zero the entire newly allocated thread
+	structure.
+	(thread_list_lookup_by_lid): Prefer threads whose ti_lid values 
+	are different from that of the main process.
+	(thread_db_state_str, thread_db_type_str): Don't include
+	formatting spaces here.
+	(thread_db_event_str): New function.
+	(thread_debug_name): New function.
+	(get_thread_signals): Return a value indicating success or failure.
+	(ignore_thread_signal): New function.
+	(using_thread_db_events, create_notification, death_notification)
+	(get_event_notification, set_event_breakpoint)
+	(insert_thread_db_event_breakpoints)
+	(delete_thread_db_event_breakpoints, request_thread_db_events)
+	(hit_thread_db_event_breakpoint, handle_thread_db_event): New
+	variables and functions, for using libthread_db's event interface.
+	(thread_db_open): Gather error-handling code next to the operation
+	that might fail.  Decide here whether to use the signal-based
+	debugging interface, or the event-based debugging interface.
+	(stop_thread, stop_all_threads, struct event_list, pending_events)
+	(pending_events_listsize, pending_events_top, add_pending_event)
+	(select_pending_event, send_pending_signals, wait_all_threads):
+	Deleted; we now use lwp-pool.c for all this.
+	(attach_thread, continue_thread, continue_all_threads)
+	(singlestep_thread, thread_db_singlestep_program)
+	(thread_db_continue_thread, thread_db_singlestep_thread): Use the
+	lwp-pool.c functions, instead of calling the lwp manipulation
+	functions directly and managing state here.  Keep track of the
+	focus thread.
+	(find_new_threads_callback): Always call attach_thread.  If we're
+	using libthread_db events, enable event reporting for the new
+	thread.
+	(update_thread_list): Take the current child process as an
+	argument; if the current focus thread disappears, clear the
+	process's focus_thread pointer.
+	(thread_db_thread_next): Pass the current child process to
+	update_thread_list.
+	(thread_db_thread_info): Reformat thread descriptions.  Mark
+	threads whose pid is equal to the process ID.
+	(thread_db_check_child_state): Use the lwp-pool functions, instead
+	of calling waitpid and the old stop-all-threads functions.  If we
+	have a focus thread, only check for a status on that thread.
+	Check for libthread_db events.  Use ignore_thread_signal, instead
+	of writing it out.
+	(thread_db_break_program): New function.
+	(thread_db_attach): Register it as the target's 'break_program'
+	method.  Always preload the symbol list with the names we'll need
+	for the signal-based interface, even if we have td_symbol_list.
+	Use lwp_pool_new_stopped to register the initial thread.  Clear
+	the focus thread.
+	* ptrace-target.c: #define _GNU_SOURCE and #include <sys/types.h>
+	and <linux/unistd.h>, to get declarations for the functions we
+	need.
+	#include "lwp-ctrl.h".
+	(continue_lwp, singlestep_lwp, attach_lwp): Remove
+	unnecessary 'extern' keywords.  Move pre-function comments to
+	lwp-ctrl.h.  Take an ordinary 'pid_t', not an 'lwpid_t', since
+	we're calling ptrace / tkill, and that's what they expect; rename
+	arguments accordingly.  Preserve value of errno across calls to
+	fprintf when reporting errors.
+	(kill_lwp): All the above, and use tkill system call if available.
+	* configure.in: Whenever we include thread-db.o in TARGET_MODULES,
+	also include lwp-pool.o.
+	On i386 and FRV Linux, use the stock-breakpoints module.
+	* config.in: Add template for STOCK_BREAKPOINTS.
+	* Makefile.am (EXTRA_rda_SOURCES): Include stock-breakpoints.c.
+	* Makefile.in, aclocal.m4, configure: Regenerated.
+
 2005-03-11  Jim Blandy  <jimb@redhat.com>
 
 	* linux-target.c (linux_get_reg) [GETREGS_SETREGS_REGINFO]: In the

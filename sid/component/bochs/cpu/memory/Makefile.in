@@ -49,7 +49,7 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmemory_la_LIBADD =
-am_libmemory_la_OBJECTS = sid-bochs-memory.lo sid-bochs-memory.lo
+am_libmemory_la_OBJECTS = sid-bochs-memory.lo
 libmemory_la_OBJECTS = $(am_libmemory_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/../../config/depcomp
@@ -240,7 +240,7 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
 INCLUDES = -I$(top_builddir)/../../include -I$(srcdir) -I$(srcdir)/.. -I$(srcdir)/../.. -I$(srcdir)/../../../../include
 noinst_LTLIBRARIES = libmemory.la
-libmemory_la_SOURCES = sid-bochs-memory.cc sid-bochs-memory.cc
+libmemory_la_SOURCES = sid-bochs-memory.cc
 libmemory_la_LDFLAGS = -no-undefined
 all: all-am
 

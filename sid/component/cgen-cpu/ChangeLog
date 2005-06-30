@@ -1,3 +1,8 @@
+2005-06-30  Frank Ch. Eigler  <fche@elastic.org>
+
+	* cgen-cpu.h (GETMEM?F, SETMEM?F): Use pointer-cast-based
+	integer/float reinterpration instead of reinterpret_cast<>.
+
 2005-06-15  Dave Brolley  <brolley@redhat.com>
 
 	Morpho ms1 cpu contributed on behalf of Red Hat

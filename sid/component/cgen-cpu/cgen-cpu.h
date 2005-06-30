@@ -172,23 +172,27 @@ public:
   inline SF
   GETMEMSF(PCADDR pc, IADDR addr)
     {
-      return reinterpret_cast<SF>(this->read_insn_memory_4 (pc, addr));
+      SI iv = this->read_insn_memory_4 (pc, addr);
+      return * (SF *)(char *)(& iv);
     }
   inline void
   SETMEMSF(PCADDR pc, ADDR addr, SF value)
     {
-      return this->write_insn_memory_4 (pc, addr, reinterpret_cast<USI>(value));
+      SI iv = * (SI *)(char *)(& value);      
+      return this->write_insn_memory_4 (pc, addr, iv);
     }
 
   inline DF
   GETMEMDF(PCADDR pc, IADDR addr)
     {
-      return reinterpret_cast<DF>(this->read_insn_memory_8 (pc, addr));
+      DI iv = this->read_insn_memory_8 (pc, addr);
+      return * (DF *)(char *)(& iv);
     }
   inline void
   SETMEMDF(PCADDR pc, ADDR addr, DF value)
     {
-      return this->write_insn_memory_8 (pc, addr, reinterpret_cast<UDI>(value));
+      DI iv = * (DI *)(char *)(& value);      
+      return this->write_insn_memory_8 (pc, addr, iv);
     }
 
   // IMEM: instruction memory calls

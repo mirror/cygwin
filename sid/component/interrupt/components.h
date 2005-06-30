@@ -223,7 +223,7 @@ private:
 // functions in template class
 
 template<class bus_size>
-IntController<bus_size>::IntController<bus_size>
+IntController<bus_size>::IntController
   (host_int_4 num_irq,
    host_int_4 num_fiq,
    host_int_4 ctrlr_features):

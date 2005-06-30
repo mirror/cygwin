@@ -24,6 +24,8 @@
 
 #include "config.h"
 
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -33,6 +35,8 @@
 #include <errno.h>
 #include <signal.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <linux/unistd.h>
 
 #include "gdbserv.h" 
 #include "gdbserv-target.h" 
@@ -42,6 +46,7 @@
 
 #include "server.h"
 #include "ptrace-target.h"
+#include "lwp-ctrl.h"
 /* This is unix ptrace gdbserv target that uses the RDA library to implement
    a remote gdbserver on a unix ptrace host.  It controls the process
    to be debugged on the linux host, allowing GDB to pull the strings
@@ -1262,96 +1267,135 @@ ptrace_check_child_state (struct child_process *process)
   return 0;
 }
 
-/* Exported service functions */
+/* Exported service functions; see "lwp-ctrl.h".  */
 
-/* Function: continue_lwp
-   Send PTRACE_CONT to an lwp. 
-   Returns -1 for failure, zero for success. */
-
-extern int
-continue_lwp (lwpid_t lwpid, int signal)
+int
+continue_lwp (pid_t lwp, int signal)
 {
   if (thread_db_noisy)
-    fprintf (stderr, "<ptrace (PTRACE_CONT, %d, 0, %d)>\n", lwpid, signal);
+    fprintf (stderr, "<ptrace (PTRACE_CONT, %d, 0, %d)>\n", lwp, signal);
 
-  if (ptrace (PTRACE_CONT, lwpid, 0, signal) < 0)
+  if (ptrace (PTRACE_CONT, lwp, 0, signal) < 0)
     {
-      fprintf (stderr, "<<< ERROR: PTRACE_CONT %d failed >>>\n", lwpid);
+      fprintf (stderr, "<<< ERROR: PTRACE_CONT %d failed: %s >>>\n", 
+	       lwp, strerror (errno));
       return -1;
     }
   return 0;
 }
 
-/* Function: singlestep_lwp
-   Send PTRACE_SINGLESTEP to an lwp.
-   Returns -1 for failure, zero for success. */
-
 int
-singlestep_lwp (struct gdbserv *serv, lwpid_t lwpid, int signal)
+singlestep_lwp (struct gdbserv *serv, pid_t lwp, int signal)
 {
 
 #if defined (MIPS_LINUX_TARGET) || defined (MIPS64_LINUX_TARGET)
   {
     if (thread_db_noisy)
-      fprintf (stderr, "<singlestep_lwp lwpid=%d signal=%d>\n", lwpid, signal);
-    mips_singlestep (serv, lwpid, signal);
+      fprintf (stderr, "<singlestep_lwp lwp=%d signal=%d>\n", lwp, signal);
+    mips_singlestep (serv, lwp, signal);
     return 0;
   }
 #else
   if (thread_db_noisy)
-    fprintf (stderr, "<ptrace (PTRACE_SINGLESTEP, %d, 0, %d)>\n", lwpid, signal);
+    fprintf (stderr, "<ptrace (PTRACE_SINGLESTEP, %d, 0, %d)>\n", lwp, signal);
 
-  if (ptrace (PTRACE_SINGLESTEP, lwpid, 0, signal) < 0)
+  if (ptrace (PTRACE_SINGLESTEP, lwp, 0, signal) < 0)
     {
-      fprintf (stderr, "<<< ERROR: PTRACE_SINGLESTEP %d failed >>>\n", lwpid);
+      int saved_errno = errno;
+
+      fprintf (stderr, "<<< ERROR: PTRACE_SINGLESTEP %d failed: %s >>>\n",
+	       lwp, strerror (errno));
+      
+      errno = saved_errno;
       return -1;
     }
 #endif
   return 0;
 }
 
-/* Function: attach_lwp
-   Send PTRACE_ATTACH to an lwp.
-   Returns -1 for failure, zero for success. */
-
-extern int
-attach_lwp (lwpid_t lwpid)
+int
+attach_lwp (pid_t lwp)
 {
   errno = 0;
-  if (ptrace (PTRACE_ATTACH, lwpid, 0, 0) == 0)
+  if (ptrace (PTRACE_ATTACH, lwp, 0, 0) == 0)
     {
       if (thread_db_noisy)
-	fprintf (stderr, "<ptrace (PTRACE_ATTACH, %d, 0, 0)>\n", lwpid);
+	fprintf (stderr, "<ptrace (PTRACE_ATTACH, %d, 0, 0)>\n", lwp);
       return 0;
     }
   else
     {
+      int saved_errno = errno;
+
       fprintf (stderr, "<<< ERROR ptrace attach %d failed, %s >>>\n",
-	       lwpid, strerror (errno));
+	       lwp, strerror (errno));
+
+      errno = saved_errno;
       return -1;
     }
 }
 
-/* Function: stop_lwp
-   Use SIGSTOP to force an lwp to stop. 
-   Returns -1 for failure, zero for success. */
 
-extern int
-stop_lwp (lwpid_t lwpid)
+int
+kill_lwp (pid_t lwp, int signal)
 {
-  if (kill (lwpid, SIGSTOP) == 0)
-    {
-#if 0 /* Too noisy! */
-      if (thread_db_noisy)
-	fprintf (stderr, "<kill (%d, SIGSTOP)>\n", lwpid);
+  int result;
+
+  if (thread_db_noisy)
+    fprintf (stderr, "kill_lwp (%d, %d)\n", (int) lwp, signal);
+
+  /* Under NPTL, signals sent via kill get delivered to whatever
+     thread in the group can handle them; they don't necessarily go to
+     the thread whose PID you passed.  This makes kill useless for
+     kill_lwp's purposes: it's trying to send a signal to a particular
+     thread.
+
+     The tkill system call lets you direct a signal at a particular
+     thread.  Use that if it's available (as it is on all systems
+     where it's necessary); otherwise, fall back to kill.  */
+#ifdef SYS_tkill
+  {
+    /* This is true if we don't know for a fact that this kernel
+       doesn't support tkill.  */
+    static int could_have_tkill = 1;
+
+    if (could_have_tkill)
+      {
+	errno = 0;
+	result = syscall (SYS_tkill, lwp, signal);
+	if (errno == 0)
+	  return result;
+	else if (errno == ENOSYS)
+	  /* Fall through to kill, below, and don't try tkill again.  */
+	  could_have_tkill = 0;
+	else
+	  {
+	    int saved_errno = errno;
+
+	    fprintf (stderr,
+		     "<<< ERROR -- tkill (%d, %s) failed: %s >>>\n",
+		     lwp, strsignal (signal), strerror (errno));
+
+	    errno = saved_errno;
+	    return -1;
+	  }
+      }
+  }
 #endif
-      return 0;
-    }
-  else
+
+  result = kill (lwp, signal);
+  if (result != 0)
     {
-      fprintf (stderr, "<<< ERROR -- kill (%d, SIGSTOP) failed >>>\n", lwpid);
+      int saved_errno = errno;
+
+      fprintf (stderr, "<<< ERROR -- kill (%d, %s) failed >>>\n", 
+	       lwp, strsignal (signal));
+
+      errno = saved_errno;
       return -1;
     }
+
+  return 0;
 }
 
 /* proc_service callback functions */

@@ -1,5 +1,5 @@
 ; Instruction builder support.
-; Copyright (C) 2000, 2001 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2005 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Instruction field support.
@@ -8,10 +8,8 @@
   (logit 2 "Generating field get switch ...\n")
   (string-list
    "\
-int @arch@_cgen_get_int_operand
-  PARAMS ((CGEN_CPU_DESC, int, const CGEN_FIELDS *));
-bfd_vma @arch@_cgen_get_vma_operand
-  PARAMS ((CGEN_CPU_DESC, int, const CGEN_FIELDS *));
+int @arch@_cgen_get_int_operand     (CGEN_CPU_DESC, int, const CGEN_FIELDS *);
+bfd_vma @arch@_cgen_get_vma_operand (CGEN_CPU_DESC, int, const CGEN_FIELDS *);
 
 /* Getting values from cgen_fields is handled by a collection of functions.
    They are distinguished by the type of the VALUE argument they return.
@@ -19,10 +17,9 @@ bfd_vma @arch@_cgen_get_vma_operand
    not appropriate.  */
 
 int
-@arch@_cgen_get_int_operand (cd, opindex, fields)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     int opindex;
-     const CGEN_FIELDS * fields;
+@arch@_cgen_get_int_operand (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+			     int opindex,
+			     const CGEN_FIELDS * fields)
 {
   int value;
 
@@ -42,10 +39,9 @@ int
 }
 
 bfd_vma
-@arch@_cgen_get_vma_operand (cd, opindex, fields)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     int opindex;
-     const CGEN_FIELDS * fields;
+@arch@_cgen_get_vma_operand (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+			     int opindex,
+			     const CGEN_FIELDS * fields)
 {
   bfd_vma value;
 
@@ -70,10 +66,8 @@ bfd_vma
   (logit 2 "Generating field set switch ...\n")
   (string-list
    "\
-void @arch@_cgen_set_int_operand
-  PARAMS ((CGEN_CPU_DESC, int, CGEN_FIELDS *, int));
-void @arch@_cgen_set_vma_operand
-  PARAMS ((CGEN_CPU_DESC, int, CGEN_FIELDS *, bfd_vma));
+void @arch@_cgen_set_int_operand  (CGEN_CPU_DESC, int, CGEN_FIELDS *, int);
+void @arch@_cgen_set_vma_operand  (CGEN_CPU_DESC, int, CGEN_FIELDS *, bfd_vma);
 
 /* Stuffing values in cgen_fields is handled by a collection of functions.
    They are distinguished by the type of the VALUE argument they accept.
@@ -81,11 +75,10 @@ void @arch@_cgen_set_vma_operand
    not appropriate.  */
 
 void
-@arch@_cgen_set_int_operand (cd, opindex, fields, value)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     int opindex;
-     CGEN_FIELDS * fields;
-     int value;
+@arch@_cgen_set_int_operand (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+			     int opindex,
+			     CGEN_FIELDS * fields,
+			     int value)
 {
   switch (opindex)
     {
@@ -101,11 +94,10 @@ void
 }
 
 void
-@arch@_cgen_set_vma_operand (cd, opindex, fields, value)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     int opindex;
-     CGEN_FIELDS * fields;
-     bfd_vma value;
+@arch@_cgen_set_vma_operand (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+			     int opindex,
+			     CGEN_FIELDS * fields,
+			     bfd_vma value)
 {
   switch (opindex)
     {
@@ -172,7 +164,7 @@ void
   (string-list
    "\
 const char * @arch@_cgen_insert_operand
-  PARAMS ((CGEN_CPU_DESC, int, CGEN_FIELDS *, CGEN_INSN_BYTES_PTR, bfd_vma));
+  (CGEN_CPU_DESC, int, CGEN_FIELDS *, CGEN_INSN_BYTES_PTR, bfd_vma);
 
 /* Main entry point for operand insertion.
 
@@ -189,12 +181,11 @@ const char * @arch@_cgen_insert_operand
    resolved during parsing.  */
 
 const char *
-@arch@_cgen_insert_operand (cd, opindex, fields, buffer, pc)
-     CGEN_CPU_DESC cd;
-     int opindex;
-     CGEN_FIELDS * fields;
-     CGEN_INSN_BYTES_PTR buffer;
-     bfd_vma pc ATTRIBUTE_UNUSED;
+@arch@_cgen_insert_operand (CGEN_CPU_DESC cd,
+			     int opindex,
+			     CGEN_FIELDS * fields,
+			     CGEN_INSN_BYTES_PTR buffer,
+			     bfd_vma pc ATTRIBUTE_UNUSED)
 {
   const char * errmsg = NULL;
   unsigned int total_length = CGEN_FIELDS_BITSIZE (fields);
@@ -220,8 +211,7 @@ const char *
   (string-list
    "\
 int @arch@_cgen_extract_operand
-  PARAMS ((CGEN_CPU_DESC, int, CGEN_EXTRACT_INFO *, CGEN_INSN_INT,
-           CGEN_FIELDS *, bfd_vma));
+  (CGEN_CPU_DESC, int, CGEN_EXTRACT_INFO *, CGEN_INSN_INT, CGEN_FIELDS *, bfd_vma);
 
 /* Main entry point for operand extraction.
    The result is <= 0 for error, >0 for success.
@@ -239,13 +229,12 @@ int @arch@_cgen_extract_operand
    the handlers.  */
 
 int
-@arch@_cgen_extract_operand (cd, opindex, ex_info, insn_value, fields, pc)
-     CGEN_CPU_DESC cd;
-     int opindex;
-     CGEN_EXTRACT_INFO *ex_info;
-     CGEN_INSN_INT insn_value;
-     CGEN_FIELDS * fields;
-     bfd_vma pc;
+@arch@_cgen_extract_operand (CGEN_CPU_DESC cd,
+			     int opindex,
+			     CGEN_EXTRACT_INFO *ex_info,
+			     CGEN_INSN_INT insn_value,
+			     CGEN_FIELDS * fields,
+			     bfd_vma pc)
 {
   /* Assume success (for those operands that are nops).  */
   int length = 1;
@@ -277,8 +266,7 @@ int
 /* Function to call before using the instruction builder tables.  */
 
 void
-@arch@_cgen_init_ibld_table (cd)
-     CGEN_CPU_DESC cd;
+@arch@_cgen_init_ibld_table (CGEN_CPU_DESC cd)
 {
   cd->insert_handlers = & @arch@_cgen_insert_handlers[0];
   cd->extract_handlers = & @arch@_cgen_extract_handlers[0];

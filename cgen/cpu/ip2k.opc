@@ -10,8 +10,7 @@
    <arch>-opc.c additions use: "-- opc.c"
    <arch>-asm.c additions use: "-- asm.c"
    <arch>-dis.c additions use: "-- dis.c"
-   <arch>-ibd.h additions use: "-- ibd.h"
-*/
+   <arch>-ibd.h additions use: "-- ibd.h".  */
 
 /* -- opc.h */
 
@@ -24,29 +23,28 @@
 /* Override disassembly hashing - there are variable bits in the top
    byte of these instructions.  */
 #define CGEN_DIS_HASH_SIZE 8
-#define CGEN_DIS_HASH(buf,value) (((* (unsigned char*) (buf)) >> 5) % CGEN_DIS_HASH_SIZE)
+#define CGEN_DIS_HASH(buf, value) \
+  (((* (unsigned char*) (buf)) >> 5) % CGEN_DIS_HASH_SIZE)
 
 #define CGEN_ASM_HASH_SIZE 127
-#define CGEN_ASM_HASH(insn) ip2k_asm_hash(insn)
+#define CGEN_ASM_HASH(insn) ip2k_asm_hash (insn)
 
-extern unsigned int ip2k_asm_hash PARAMS ((const char *insn));
-extern int ip2k_cgen_insn_supported
-  PARAMS ((CGEN_CPU_DESC, const CGEN_INSN *));
+extern unsigned int ip2k_asm_hash (const char *);
+extern int ip2k_cgen_insn_supported (CGEN_CPU_DESC, const CGEN_INSN *);
 
 /* -- opc.c */
 
 #include "safe-ctype.h"
 
-/* A better hash function for instruction mnemonics. */
+/* A better hash function for instruction mnemonics.  */
 unsigned int
-ip2k_asm_hash (insn)
-     const char* insn;
+ip2k_asm_hash (const char* insn)
 {
   unsigned int hash;
   const char* m = insn;
 
-  for (hash = 0; *m && !ISSPACE(*m); m++)
-    hash = (hash * 23) ^ (0x1F & TOLOWER(*m));
+  for (hash = 0; *m && ! ISSPACE (*m); m++)
+    hash = (hash * 23) ^ (0x1F & TOLOWER (*m));
 
   /* printf ("%s %d\n", insn, (hash % CGEN_ASM_HASH_SIZE)); */
 
@@ -54,11 +52,10 @@ ip2k_asm_hash (insn)
 }
 
 
-/* Special check to ensure that instruction exists for given machine. */
+/* Special check to ensure that instruction exists for given machine.  */
+
 int
-ip2k_cgen_insn_supported (cd, insn)
-     CGEN_CPU_DESC cd;
-     const CGEN_INSN *insn;
+ip2k_cgen_insn_supported (CGEN_CPU_DESC cd, const CGEN_INSN *insn)
 {
   int machs = CGEN_INSN_ATTR_VALUE (insn, CGEN_INSN_MACH);
 
@@ -66,30 +63,17 @@ ip2k_cgen_insn_supported (cd, insn)
   if (machs == 0)
     return 1;
   
-  return ((machs & cd->machs) != 0);
+  return (machs & cd->machs) != 0;
 }
 
 
 /* -- asm.c */
 
-#define PARSE_FUNC_DECL(name) \
-  static const char *name (CGEN_CPU_DESC, const char **, int, long *)
-#define PARSE_UFUNC_DECL(name) \
-  static const char *name (CGEN_CPU_DESC, const char **, int, unsigned long *)
-
-PARSE_UFUNC_DECL (parse_fr);
-PARSE_UFUNC_DECL (parse_addr16);
-PARSE_UFUNC_DECL (parse_addr16_cjp);
-PARSE_FUNC_DECL (parse_lit8);
-PARSE_UFUNC_DECL (parse_bit3);
-
-
 static const char *
-parse_fr (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_fr (CGEN_CPU_DESC cd,
+	  const char **strp,
+	  int opindex,
+	  unsigned long *valuep)
 {
   const char *errmsg;
   const char *old_strp;
@@ -100,7 +84,7 @@ parse_fr (cd, strp, opindex, valuep)
   bfd_vma tempvalue;
 
   old_strp = *strp;
-  afteroffset = NULL; 
+  afteroffset = NULL;
 
   /* Check here to see if you're about to try parsing a w as the first arg
      and return an error if you are.  */
@@ -178,7 +162,7 @@ parse_fr (cd, strp, opindex, valuep)
 	    {
 	      /* Value is ok.  Fix up the first 2 bits and return.  */
 	      *valuep = 0x0100 | tempvalue;
-	      *strp += 4; /* skip over the (DP) in *strp.  */
+	      *strp += 4; /* Skip over the (DP) in *strp.  */
 	      return errmsg;
 	    }
 	  else
@@ -219,7 +203,7 @@ parse_fr (cd, strp, opindex, valuep)
 	    {
 	      /* Value is ok.  Fix up the first 2 bits and return.  */
 	      *valuep = 0x0180 | tempvalue;
-	      *strp += 4; /* skip over the (SP) in *strp.  */
+	      *strp += 4; /* Skip over the (SP) in *strp.  */
 	      return errmsg;
 	    }
 	  else
@@ -240,11 +224,11 @@ parse_fr (cd, strp, opindex, valuep)
     {
       *valuep = value;
 
-      /* if a parenthesis is found, warn about invalid form.  */
+      /* If a parenthesis is found, warn about invalid form.  */
       if (**strp == '(')
 	errmsg = _("illegal use of parentheses");
 
-      /* if a numeric value is specified, ensure that it is between
+      /* If a numeric value is specified, ensure that it is between
 	 1 and 255.  */
       else if (result_type == CGEN_PARSE_OPERAND_RESULT_NUMBER)
 	{
@@ -256,11 +240,10 @@ parse_fr (cd, strp, opindex, valuep)
 }
 
 static const char *
-parse_addr16 (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_addr16 (CGEN_CPU_DESC cd,
+	      const char **strp,
+	      int opindex,
+	      unsigned long *valuep)
 {
   const char *errmsg;
   enum cgen_parse_operand_result result_type;
@@ -273,7 +256,7 @@ parse_addr16 (cd, strp, opindex, valuep)
     code = BFD_RELOC_IP2K_LO8DATA;
   else
     {
-      /* Something is very wrong. opindex has to be one of the above. */
+      /* Something is very wrong. opindex has to be one of the above.  */
       errmsg = _("parse_addr16: invalid opindex.");
       return errmsg;
     }
@@ -282,13 +265,14 @@ parse_addr16 (cd, strp, opindex, valuep)
 			       & result_type, & value);
   if (errmsg == NULL)
     {
-      /* We either have a relocation or a number now. */
+      /* We either have a relocation or a number now.  */
       if (result_type == CGEN_PARSE_OPERAND_RESULT_NUMBER)
 	{
-	  /* We got a number back. */
+	  /* We got a number back.  */
 	  if (code == BFD_RELOC_IP2K_HI8DATA)
             value >>= 8;
-	  else    /* code = BFD_RELOC_IP2K_LOW8DATA */
+	  else
+	    /* code = BFD_RELOC_IP2K_LOW8DATA.  */
 	    value &= 0x00FF;
 	}   
       *valuep = value;
@@ -297,13 +281,11 @@ parse_addr16 (cd, strp, opindex, valuep)
   return errmsg;
 }
 
-
 static const char *
-parse_addr16_cjp (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_addr16_cjp (CGEN_CPU_DESC cd,
+		  const char **strp,
+		  int opindex,
+		  unsigned long *valuep)
 {
   const char *errmsg;
   enum cgen_parse_operand_result result_type;
@@ -324,7 +306,7 @@ parse_addr16_cjp (cd, strp, opindex, valuep)
 	  if ((value & 0x1) == 0)  /* If the address is even .... */
 	    {
 	      if (opindex == (CGEN_OPERAND_TYPE) IP2K_OPERAND_ADDR16CJP)
-                *valuep = (value >> 1) & 0x1FFF;  /* Should mask be 1FFF? */
+                *valuep = (value >> 1) & 0x1FFF;  /* Should mask be 1FFF?  */
 	      else if (opindex == (CGEN_OPERAND_TYPE) IP2K_OPERAND_ADDR16P)
                 *valuep = (value >> 14) & 0x7;
 	    }
@@ -343,20 +325,18 @@ parse_addr16_cjp (cd, strp, opindex, valuep)
   return errmsg; 
 }
 
-
 static const char *
-parse_lit8 (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     long *valuep;
+parse_lit8 (CGEN_CPU_DESC cd,
+	    const char **strp,
+	    int opindex,
+	    long *valuep)
 {
   const char *errmsg;
   enum cgen_parse_operand_result result_type;
   bfd_reloc_code_real_type code = BFD_RELOC_NONE;
   bfd_vma value;
 
-  /* Parse %OP relocating operators. */
+  /* Parse %OP relocating operators.  */
   if (strncmp (*strp, "%bank", 5) == 0)
     {
       *strp += 5;
@@ -387,7 +367,6 @@ parse_lit8 (cd, strp, opindex, valuep)
       *strp += 8;
       code = BFD_RELOC_IP2K_HI8INSN;
     }
-  
 
   /* Parse %op operand.  */
   if (code != BFD_RELOC_NONE)
@@ -405,7 +384,7 @@ parse_lit8 (cd, strp, opindex, valuep)
     {
       errmsg = cgen_parse_signed_integer (cd, strp, opindex, valuep);
 
-      /* Truncate to eight bits to accept both signed and unsigned input. */
+      /* Truncate to eight bits to accept both signed and unsigned input.  */
       if (errmsg == NULL)
 	*valuep &= 0xFF;
     }
@@ -414,11 +393,10 @@ parse_lit8 (cd, strp, opindex, valuep)
 }
 
 static const char *
-parse_bit3 (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_bit3 (CGEN_CPU_DESC cd,
+	    const char **strp,
+	    int opindex,
+	    unsigned long *valuep)
 {
   const char *errmsg;
   char mode = 0;
@@ -479,29 +457,15 @@ parse_bit3 (cd, strp, opindex, valuep)
   return errmsg;
 }
 
-
 /* -- dis.c */
 
-#define PRINT_FUNC_DECL(name) \
-static void name PARAMS ((CGEN_CPU_DESC, PTR, long, unsigned int, bfd_vma, int))
-
-PRINT_FUNC_DECL (print_fr);
-PRINT_FUNC_DECL (print_dollarhex);
-PRINT_FUNC_DECL (print_dollarhex8);
-PRINT_FUNC_DECL (print_dollarhex_addr16h);
-PRINT_FUNC_DECL (print_dollarhex_addr16l);
-PRINT_FUNC_DECL (print_dollarhex_p);
-PRINT_FUNC_DECL (print_dollarhex_cj);
-PRINT_FUNC_DECL (print_decimal);
-
 static void
-print_fr (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
+print_fr (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+	  void * dis_info,
+	  long value,
+	  unsigned int attrs ATTRIBUTE_UNUSED,
+	  bfd_vma pc ATTRIBUTE_UNUSED,
+	  int length ATTRIBUTE_UNUSED)
 {
   disassemble_info *info = (disassemble_info *) dis_info;
   const CGEN_KEYWORD_ENTRY *ke;
@@ -509,7 +473,7 @@ print_fr (cd, dis_info, value, attrs, pc, length)
   long offsettest;
   long offsetvalue;
 
-  if ( value == 0 ) /* This is (IP) */
+  if (value == 0) /* This is (IP).  */
     {
       (*info->fprintf_func) (info->stream, "%s", "(IP)");
       return;
@@ -518,46 +482,43 @@ print_fr (cd, dis_info, value, attrs, pc, length)
   offsettest = value >> 7;
   offsetvalue = value & 0x7F;
 
-  /* Check to see if first two bits are 10 -> (DP) */
-  if ( offsettest == 2 )
+  /* Check to see if first two bits are 10 -> (DP).  */
+  if (offsettest == 2)
     {
-      if ( offsetvalue == 0 )
+      if (offsetvalue == 0)
 	(*info->fprintf_func) (info->stream, "%s","(DP)");
       else
 	(*info->fprintf_func) (info->stream, "$%x%s",offsetvalue, "(DP)");
       return;
     }
 
-  /* Check to see if first two bits are 11 -> (SP) */
-  if ( offsettest == 3 )
+  /* Check to see if first two bits are 11 -> (SP).  */
+  if (offsettest == 3)
     {
-      if ( offsetvalue == 0 )
+      if (offsetvalue == 0)
 	(*info->fprintf_func) (info->stream, "%s", "(SP)");
       else
 	(*info->fprintf_func) (info->stream, "$%x%s", offsetvalue,"(SP)");
       return;
     }
 
-  /* Attempt to print as a register keyword. */
+  /* Attempt to print as a register keyword.  */
   ke = cgen_keyword_lookup_value (& ip2k_cgen_opval_register_names, value);
-  if (ke != NULL)
-    {
-      (*info->fprintf_func) (info->stream, "%s", ke->name);
-      return;
-    }
 
-  /* Print as an address literal. */
-  (*info->fprintf_func) (info->stream, "$%02x", value);
+  if (ke != NULL)
+    (*info->fprintf_func) (info->stream, "%s", ke->name);
+  else
+    /* Print as an address literal.  */
+    (*info->fprintf_func) (info->stream, "$%02x", value);
 }
 
 static void
-print_dollarhex (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
+print_dollarhex (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+		 void * dis_info,
+		 long value,
+		 unsigned int attrs ATTRIBUTE_UNUSED,
+		 bfd_vma pc ATTRIBUTE_UNUSED,
+		 int length ATTRIBUTE_UNUSED)
 {
   disassemble_info *info = (disassemble_info *) dis_info;
 
@@ -565,13 +526,12 @@ print_dollarhex (cd, dis_info, value, attrs, pc, length)
 }
 
 static void
-print_dollarhex8 (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
+print_dollarhex8 (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+		  void * dis_info,
+		  long value,
+		  unsigned int attrs ATTRIBUTE_UNUSED,
+		  bfd_vma pc ATTRIBUTE_UNUSED,
+		  int length ATTRIBUTE_UNUSED)
 {
   disassemble_info *info = (disassemble_info *) dis_info;
 
@@ -579,31 +539,29 @@ print_dollarhex8 (cd, dis_info, value, attrs, pc, length)
 }
 
 static void
-print_dollarhex_addr16h (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
+print_dollarhex_addr16h (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+			 void * dis_info,
+			 long value,
+			 unsigned int attrs ATTRIBUTE_UNUSED,
+			 bfd_vma pc ATTRIBUTE_UNUSED,
+			 int length ATTRIBUTE_UNUSED)
 {
   disassemble_info *info = (disassemble_info *) dis_info;
 
-  /* This is a loadh instruction. Shift the value to the left      */
-  /* by 8 bits so that disassembled code will reassemble properly. */
+  /* This is a loadh instruction. Shift the value to the left
+     by 8 bits so that disassembled code will reassemble properly.  */
   value = ((value << 8) & 0xFF00);
 
   (*info->fprintf_func) (info->stream, "$%04x", value);
 }
 
 static void
-print_dollarhex_addr16l (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
+print_dollarhex_addr16l (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+			 void * dis_info,
+			 long value,
+			 unsigned int attrs ATTRIBUTE_UNUSED,
+			 bfd_vma pc ATTRIBUTE_UNUSED,
+			 int length ATTRIBUTE_UNUSED)
 {
   disassemble_info *info = (disassemble_info *) dis_info;
 
@@ -611,13 +569,12 @@ print_dollarhex_addr16l (cd, dis_info, value, attrs, pc, length)
 }
 
 static void
-print_dollarhex_p (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
+print_dollarhex_p (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+		   void * dis_info,
+		   long value,
+		   unsigned int attrs ATTRIBUTE_UNUSED,
+		   bfd_vma pc ATTRIBUTE_UNUSED,
+		   int length ATTRIBUTE_UNUSED)
 {
   disassemble_info *info = (disassemble_info *) dis_info;
 
@@ -627,13 +584,12 @@ print_dollarhex_p (cd, dis_info, value, attrs, pc, length)
 }
 
 static void
-print_dollarhex_cj (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
+print_dollarhex_cj (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+		    void * dis_info,
+		    long value,
+		    unsigned int attrs ATTRIBUTE_UNUSED,
+		    bfd_vma pc ATTRIBUTE_UNUSED,
+		    int length ATTRIBUTE_UNUSED)
 {
   disassemble_info *info = (disassemble_info *) dis_info;
 
@@ -641,15 +597,13 @@ print_dollarhex_cj (cd, dis_info, value, attrs, pc, length)
   (*info->fprintf_func) (info->stream, "$%05x", value);
 }
 
-
 static void
-print_decimal (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
+print_decimal (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+	       void * dis_info,
+	       long value,
+	       unsigned int attrs ATTRIBUTE_UNUSED,
+	       bfd_vma pc ATTRIBUTE_UNUSED,
+	       int length ATTRIBUTE_UNUSED)
 {
   disassemble_info *info = (disassemble_info *) dis_info;
 

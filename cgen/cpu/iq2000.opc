@@ -15,8 +15,7 @@
    <arch>-opc.c additions use: "-- opc.c"
    <arch>-asm.c additions use: "-- asm.c"
    <arch>-dis.c additions use: "-- dis.c"
-   <arch>-ibd.h additions use: "-- ibd.h"
-*/
+   <arch>-ibd.h additions use: "-- ibd.h".  */
 
 /* -- opc.h */
 
@@ -32,36 +31,30 @@
    instructions have same mnemonics but different functionality. */
 #define CGEN_VALIDATE_INSN_SUPPORTED
 
-extern int iq2000_cgen_insn_supported (CGEN_CPU_DESC cd, const CGEN_INSN *insn);
+extern int iq2000_cgen_insn_supported (CGEN_CPU_DESC, const CGEN_INSN *);
 
 /* -- asm.c */
 
 #include "safe-ctype.h"
 
-static int iq2000_cgen_isa_register PARAMS ((const char **));
-static const char * parse_jtargq10 PARAMS ((CGEN_CPU_DESC, const char **, int, int, enum cgen_parse_operand_result *, bfd_vma *));
-static const char * parse_mimm PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
-static const char * parse_imm  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
-static const char * parse_hi16 PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
-static const char * parse_lo16 PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
-static const char * parse_mlo16 PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
+static const char * MISSING_CLOSING_PARENTHESIS = N_("missing `)'");
 
-/* Special check to ensure that instruction exists for given machine */
+/* Special check to ensure that instruction exists for given machine.  */
+
 int
-iq2000_cgen_insn_supported (cd, insn)
-     CGEN_CPU_DESC cd;
-     const CGEN_INSN *insn;
+iq2000_cgen_insn_supported (CGEN_CPU_DESC cd, const CGEN_INSN *insn)
 {
   int machs = cd->machs;
 
-  return ((CGEN_INSN_ATTR_VALUE (insn, CGEN_INSN_MACH) & machs) != 0);
+  return (CGEN_INSN_ATTR_VALUE (insn, CGEN_INSN_MACH) & machs) != 0;
 }
 
-static int iq2000_cgen_isa_register (strp)
-     const char **strp;
+static int
+iq2000_cgen_isa_register (const char **strp)
 {
   int len;
   int ch1, ch2;
+
   if (**strp == 'r' || **strp == 'R') 
     {
       len = strlen (*strp);
@@ -81,7 +74,9 @@ static int iq2000_cgen_isa_register (strp)
             return 1;
         }
     }
-  if (**strp == '%' && TOLOWER((*strp)[1]) != 'l' && TOLOWER((*strp)[1]) != 'h')
+  if (**strp == '%'
+      && TOLOWER ((*strp)[1]) != 'l'
+      && TOLOWER ((*strp)[1]) != 'h')
     return 1;
   return 0;
 }
@@ -89,11 +84,10 @@ static int iq2000_cgen_isa_register (strp)
 /* Handle negated literal.  */
 
 static const char *
-parse_mimm (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_mimm (CGEN_CPU_DESC cd,
+	    const char **strp,
+	    int opindex,
+	    unsigned long *valuep)
 {
   const char *errmsg;
 
@@ -121,11 +115,10 @@ parse_mimm (cd, strp, opindex, valuep)
 /* Handle signed/unsigned literal.  */
 
 static const char *
-parse_imm (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_imm (CGEN_CPU_DESC cd,
+	   const char **strp,
+	   int opindex,
+	   unsigned long *valuep)
 {
   const char *errmsg;
 
@@ -139,6 +132,7 @@ parse_imm (cd, strp, opindex, valuep)
       if (errmsg == NULL)
 	{
 	  long x = value & 0xFFFF0000;
+
 	  if (x != 0 && x != (long) 0xFFFF0000)
 	    errmsg = _("immediate value out of range");
 	  else
@@ -151,23 +145,23 @@ parse_imm (cd, strp, opindex, valuep)
 /* Handle iq10 21-bit jmp offset.  */
 
 static const char *
-parse_jtargq10 (cd, strp, opindex, reloc, type_addr, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     int reloc ATTRIBUTE_UNUSED;
-     enum cgen_parse_operand_result *type_addr ATTRIBUTE_UNUSED;
-     bfd_vma *valuep;
+parse_jtargq10 (CGEN_CPU_DESC cd,
+		const char **strp,
+		int opindex,
+		int reloc ATTRIBUTE_UNUSED,
+		enum cgen_parse_operand_result *type_addr ATTRIBUTE_UNUSED,
+		bfd_vma *valuep)
 {
   const char *errmsg;
   bfd_vma value;
   enum cgen_parse_operand_result result_type = CGEN_PARSE_OPERAND_RESULT_NUMBER;
 
   errmsg = cgen_parse_address (cd, strp, opindex, BFD_RELOC_IQ2000_OFFSET_21,
-			       &result_type, &value);
+			       & result_type, & value);
   if (errmsg == NULL && result_type == CGEN_PARSE_OPERAND_RESULT_NUMBER)
     {
-      /* Check value is within 23-bits (remembering that 2-bit shift right will occur).  */
+      /* Check value is within 23-bits
+	 (remembering that 2-bit shift right will occur).  */
       if (value > 0x7fffff)
         return _("21-bit offset out of range");
     }
@@ -178,11 +172,10 @@ parse_jtargq10 (cd, strp, opindex, reloc, type_addr, valuep)
 /* Handle high().  */
 
 static const char *
-parse_hi16 (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_hi16 (CGEN_CPU_DESC cd,
+	    const char **strp,
+	    int opindex,
+	    unsigned long *valuep)
 {
   if (strncasecmp (*strp, "%hi(", 4) == 0)
     {
@@ -192,17 +185,17 @@ parse_hi16 (cd, strp, opindex, valuep)
 
       *strp += 4;
       errmsg = cgen_parse_address (cd, strp, opindex, BFD_RELOC_HI16,
-				   &result_type, &value);
+				   & result_type, & value);
       if (**strp != ')')
-	return _("missing `)'");
+	return MISSING_CLOSING_PARENTHESIS;
 
       ++*strp;
       if (errmsg == NULL
   	  && result_type == CGEN_PARSE_OPERAND_RESULT_NUMBER)
 	{
-	  /* if value has top-bit of %lo on, then it will
+	  /* If value has top-bit of %lo on, then it will
 	     sign-propagate and so we compensate by adding
-	     1 to the resultant %hi value */
+	     1 to the resultant %hi value.  */
 	  if (value & 0x8000)
 	    value += 0x10000;
 	  value >>= 16;
@@ -212,8 +205,8 @@ parse_hi16 (cd, strp, opindex, valuep)
       return errmsg;
     }
 
-  /* we add %uhi in case a user just wants the high 16-bits or is using
-     an insn like ori for %lo which does not sign-propagate */
+  /* We add %uhi in case a user just wants the high 16-bits or is using
+     an insn like ori for %lo which does not sign-propagate.  */
   if (strncasecmp (*strp, "%uhi(", 5) == 0)
     {
       enum cgen_parse_operand_result result_type;
@@ -222,16 +215,15 @@ parse_hi16 (cd, strp, opindex, valuep)
 
       *strp += 5;
       errmsg = cgen_parse_address (cd, strp, opindex, BFD_RELOC_IQ2000_UHI16,
-				   &result_type, &value);
+				   & result_type, & value);
       if (**strp != ')')
-	return _("missing `)'");
+	return MISSING_CLOSING_PARENTHESIS;
 
       ++*strp;
       if (errmsg == NULL
   	  && result_type == CGEN_PARSE_OPERAND_RESULT_NUMBER)
-	{
-	  value >>= 16;
-	}
+	value >>= 16;
+
       *valuep = value;
 
       return errmsg;
@@ -245,11 +237,10 @@ parse_hi16 (cd, strp, opindex, valuep)
    handles the case where %lo() isn't present.  */
 
 static const char *
-parse_lo16 (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_lo16 (CGEN_CPU_DESC cd,
+	    const char **strp,
+	    int opindex,
+	    long *valuep)
 {
   if (strncasecmp (*strp, "%lo(", 4) == 0)
     {
@@ -259,9 +250,9 @@ parse_lo16 (cd, strp, opindex, valuep)
 
       *strp += 4;
       errmsg = cgen_parse_address (cd, strp, opindex, BFD_RELOC_LO16,
-				   &result_type, &value);
+				   & result_type, & value);
       if (**strp != ')')
-	return _("missing `)'");
+	return MISSING_CLOSING_PARENTHESIS;
       ++*strp;
       if (errmsg == NULL
 	  && result_type == CGEN_PARSE_OPERAND_RESULT_NUMBER)
@@ -278,11 +269,10 @@ parse_lo16 (cd, strp, opindex, valuep)
    handles the case where %lo() isn't present.  */
 
 static const char *
-parse_mlo16 (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_mlo16 (CGEN_CPU_DESC cd,
+	     const char **strp,
+	     int opindex,
+	     long *valuep)
 {
   if (strncasecmp (*strp, "%lo(", 4) == 0)
     {
@@ -292,9 +282,9 @@ parse_mlo16 (cd, strp, opindex, valuep)
 
       *strp += 4;
       errmsg = cgen_parse_address (cd, strp, opindex, BFD_RELOC_LO16,
-				   &result_type, &value);
+				   & result_type, & value);
       if (**strp != ')')
-	return _("missing `)'");
+	return MISSING_CLOSING_PARENTHESIS;
       ++*strp;
       if (errmsg == NULL
 	  && result_type == CGEN_PARSE_OPERAND_RESULT_NUMBER)

@@ -16,8 +16,7 @@
    <arch>-opc.c additions use: "-- opc.c"
    <arch>-asm.c additions use: "-- asm.c"
    <arch>-dis.c additions use: "-- dis.c"
-   <arch>-ibd.h additions use: "-- ibd.h"
-*/
+   <arch>-ibd.h additions use: "-- ibd.h"  */
 
 /* -- opc.h */
 #undef  CGEN_DIS_HASH_SIZE
@@ -25,7 +24,7 @@
 #undef  CGEN_DIS_HASH
 #define CGEN_DIS_HASH(buffer, value) (((unsigned char *) (buffer))[0] >> 2)
 
-extern long openrisc_sign_extend_16bit PARAMS ((long));
+extern long openrisc_sign_extend_16bit (long);
 /* -- */
 
 /* -- opc.c */
@@ -33,16 +32,12 @@ extern long openrisc_sign_extend_16bit PARAMS ((long));
 
 /* -- asm.c */
 
+static const char * MISSING_CLOSING_PARENTHESIS = N_("missing `)'");
+
 #define CGEN_VERBOSE_ASSEMBLER_ERRORS
 
-static const char * parse_hi16
-  PARAMS ((CGEN_CPU_DESC, const char **, int, long *));
-static const char * parse_lo16
-  PARAMS ((CGEN_CPU_DESC, const char **, int, long *));
-
 long
-openrisc_sign_extend_16bit (value)
-     long value;
+openrisc_sign_extend_16bit (long value)
 {
   return ((value & 0xffff) ^ 0x8000) - 0x8000;
 }
@@ -50,11 +45,7 @@ openrisc_sign_extend_16bit (value)
 /* Handle hi().  */
 
 static const char *
-parse_hi16 (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     long *valuep;
+parse_hi16 (CGEN_CPU_DESC cd, const char ** strp, int opindex, long * valuep)
 {
   const char *errmsg;
   enum cgen_parse_operand_result result_type;
@@ -69,9 +60,9 @@ parse_hi16 (cd, strp, opindex, valuep)
 
       *strp += 3;
       errmsg = cgen_parse_address (cd, strp, opindex, BFD_RELOC_HI16,
-                                     &result_type, &value);
+				   & result_type, & value);
       if (**strp != ')')
-        return _("missing `)'");
+        return MISSING_CLOSING_PARENTHESIS;
 
       ++*strp;
       if (errmsg == NULL
@@ -104,11 +95,7 @@ parse_hi16 (cd, strp, opindex, valuep)
 /* Handle lo().  */
 
 static const char *
-parse_lo16 (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     long *valuep;
+parse_lo16 (CGEN_CPU_DESC cd, const char ** strp, int opindex, long * valuep)
 {
   const char *errmsg;
   enum cgen_parse_operand_result result_type;
@@ -123,9 +110,9 @@ parse_lo16 (cd, strp, opindex, valuep)
 
       *strp += 3;
       errmsg = cgen_parse_address (cd, strp, opindex, BFD_RELOC_LO16,
-				   &result_type, &value);
+				   & result_type, & value);
       if (**strp != ')')
-        return _("missing `)'");
+        return MISSING_CLOSING_PARENTHESIS;
 
       ++*strp;
       ret = value;
@@ -155,6 +142,6 @@ parse_lo16 (cd, strp, opindex, valuep)
 /* -- */
 
 /* -- ibd.h */
-extern long openrisc_sign_extend_16bit PARAMS ((long));
+extern long openrisc_sign_extend_16bit (long);
 
 /* -- */

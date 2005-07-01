@@ -1,5 +1,5 @@
 /* SPARC opcode support.  -*- C -*-
-   Copyright (C) 2000 Red Hat, Inc.
+   Copyright (C) 2000, 2005 Red Hat, Inc.
    This file is part of CGEN.
    This file is copyrighted with the GNU General Public License.
    See file COPYING for details.  */
@@ -16,38 +16,39 @@
    <cpu>-opc.h additions use: "-- opc.h"
    <cpu>-opc.c additions use: "-- opc.c"
    <cpu>-asm.c additions use: "-- asm.c"
-   <cpu>-dis.c additions use: "-- dis.c"
-*/
+   <cpu>-dis.c additions use: "-- dis.c"  */
 
 /* -- opc.h */
 
-#undef CGEN_DIS_HASH_SIZE
+#undef  CGEN_DIS_HASH_SIZE
 #define CGEN_DIS_HASH_SIZE 256
-#undef CGEN_DIS_HASH
+#undef  CGEN_DIS_HASH
 extern const unsigned int sparc_cgen_opcode_bits[];
 #define CGEN_DIS_HASH(buffer, insn) \
-((((insn) >> 24) & 0xc0) \
- | (((insn) & sparc_cgen_opcode_bits[((insn) >> 30) & 3]) >> 19))
+  ((((insn) >> 24) & 0xc0) \
+   | (((insn) & sparc_cgen_opcode_bits[((insn) >> 30) & 3]) >> 19))
 
 /* -- */
 
 /* -- asm.c */
 
+static const char * MISSING_CLOSING_PARENTHESIS = N("missing `)'");
+
 /* It is important that we only look at insn code bits as that is how the
    opcode table is hashed.  OPCODE_BITS is a table of valid bits for each
    of the main types (0,1,2,3).  */
-const unsigned int sparc_cgen_opcode_bits[4] = {
+const unsigned int sparc_cgen_opcode_bits[4] =
+{
   0x01c00000, 0x0, 0x01f80000, 0x01f80000
 };
 
 /* Handle %lo().  */
 
 static const char *
-parse_lo10 (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     long *valuep;
+parse_lo10 (CGEN_CPU_DESC cd,
+	    const char **strp,
+	    int opindex,
+	    long *valuep)
 {
   const char *errmsg;
   enum cgen_parse_operand_result result_type;
@@ -57,9 +58,9 @@ parse_lo10 (cd, strp, opindex, valuep)
     {
       *strp += 4;
       errmsg = cgen_parse_address (od, strp, opindex, BFD_RELOC_LO10,
-				   &result_type, &value);
+				   & result_type, & value);
       if (**strp != ')')
-	return "missing `)'";
+	return MISSING_CLOSING_PARENTHESIS;
       ++*strp;
       value &= 0x3ff;
       *valuep = value;
@@ -70,11 +71,10 @@ parse_lo10 (cd, strp, opindex, valuep)
 }
 
 static const char *
-parse_lo13 (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     long *valuep;
+parse_lo13 (CGEN_CPU_DESC cd,
+	    const char **strp,
+	    int opindex,
+	    long *valuep)
 {
   const char *errmsg;
   enum cgen_parse_operand_result result_type;
@@ -84,9 +84,9 @@ parse_lo13 (cd, strp, opindex, valuep)
     {
       *strp += 4;
       errmsg = cgen_parse_address (od, strp, opindex, BFD_RELOC_LO10,
-				   &result_type, &value);
+				   & result_type, & value);
       if (**strp != ')')
-	return "missing `)'";
+	return MISSING_CLOSING_PARENTHESIS;
       ++*strp;
       value &= 0x3ff;
       *valuep = value;
@@ -99,11 +99,10 @@ parse_lo13 (cd, strp, opindex, valuep)
 /* Handle %hi().  */
 
 static const char *
-parse_hi22 (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_hi22 (CGEN_CPU_DESC cd,
+	    const char **strp,
+	    int opindex,
+	    unsigned long *valuep)
 {
   const char *errmsg;
   enum cgen_parse_operand_result result_type;
@@ -113,9 +112,9 @@ parse_hi22 (cd, strp, opindex, valuep)
     {
       *strp += 4;
       errmsg = cgen_parse_address (od, strp, opindex, BFD_RELOC_HI22,
-				   &result_type, &value);
+				   & result_type, & value);
       if (**strp != ')')
-	return "missing `)'";
+	return MISSING_CLOSING_PARENTHESIS;
       ++*strp;
       if (result_type == CGEN_PARSE_OPERAND_RESULT_NUMBER)
 	value >>= 10;
@@ -133,26 +132,25 @@ parse_hi22 (cd, strp, opindex, valuep)
 /* Include "%hi(foo)" in sethi output.  */
 
 static void
-print_hi22 (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd;
-     PTR dis_info;
-     long value;
-     unsigned int attrs;
-     bfd_vma pc;
-     int length;
+print_hi22 (CGEN_CPU_DESC cd,
+	    void * dis_info,
+	    long value,
+	    unsigned int attrs,
+	    bfd_vma pc,
+	    int length)
 {
   disassemble_info *info = (disassemble_info *) dis_info;
+
   (*info->fprintf_func) (info->stream, "%%hi(0x%lx)", value << 10);
 }
 
-#undef CGEN_PRINT_INSN
-#define CGEN_PRINT_INSN my_print_insn
+#undef  CGEN_PRINT_INSN
+#define CGEN_PRINT_INSN sparc_print_insn
 
 static int
-my_print_insn (cd, pc, info)
-     CGEN_CPU_DESC cd;
-     bfd_vma pc;
-     disassemble_info *info;
+sparc_print_insn (CGEN_CPU_DESC cd,
+		  bfd_vma pc,
+		  disassemble_info *info)
 {
   char buffer[CGEN_MAX_INSN_SIZE];
   char *buf = buffer;
@@ -161,7 +159,6 @@ my_print_insn (cd, pc, info)
   int len;
 
   /* Read the base part of the insn.  */
-
   status = (*info->read_memory_func) (pc, buf, 4, info);
   if (status != 0)
     {

@@ -1,3 +1,19 @@
+2005-07-01  Nick Clifton  <nickc@redhat.com>
+
+	* desc-cpu.scm: Update to ISO C90 function declaration style.
+	* opc-asmdis.scm: Likewise.
+	* opc-ibld.scm: Likewise.
+	* opc-itab.scm: Likewise.
+	* cpu/fr30.opc: Likewise.
+	* cpu/i960.opc: Likewise.
+	* cpu/ip2k.opc: Likewise.
+	* cpu/iq2000.opc: Likewise.
+	* cpu/m32r.opc: Likewise.
+	* cpu/openrisc.opc: Likewise.
+	* cpu/sh.opc: Likewise.
+	* cpu/sparc.opc: Likewise.
+	* cpu/xstormy16.opc: Likewise.
+
 2005-06-15  Dave Brolley  <brolley@redhat.com>
 
 	* sid-cpu.scm (-gen-hw-stream-and-destream-fns): New function.

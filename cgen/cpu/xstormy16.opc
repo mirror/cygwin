@@ -15,8 +15,7 @@
    <arch>-opc.c additions use: "-- opc.c"
    <arch>-asm.c additions use: "-- asm.c"
    <arch>-dis.c additions use: "-- dis.c"
-   <arch>-ibd.h additions use: "-- ibd.h"
-*/
+   <arch>-ibd.h additions use: "-- ibd.h".  */
 
 /* -- opc.h */
 
@@ -30,12 +29,6 @@
 /* -- */
 
 /* -- asm.c */
-static const char * parse_mem8
-  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
-static const char * parse_small_immediate
-  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
-static const char * parse_immediate16
-  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
 
 /* The machine-independent code doesn't know how to disambiguate
      mov (foo),r3
@@ -44,11 +37,10 @@ static const char * parse_immediate16
    where 'foo' is a label.  This helps it out. */
 
 static const char *
-parse_mem8 (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_mem8 (CGEN_CPU_DESC cd,
+	    const char **strp,
+	    int opindex,
+	    unsigned long *valuep)
 {
   if (**strp == '(')
     {
@@ -83,11 +75,10 @@ parse_mem8 (cd, strp, opindex, valuep)
    of the small size.  This is somewhat tricky.  */
    
 static const char *
-parse_small_immediate (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_small_immediate (CGEN_CPU_DESC cd,
+		       const char **strp,
+		       int opindex,
+		       unsigned long *valuep)
 {
   bfd_vma value;
   enum cgen_parse_operand_result result;
@@ -98,7 +89,7 @@ parse_small_immediate (cd, strp, opindex, valuep)
 
   errmsg = (* cd->parse_operand_fn)
     (cd, CGEN_PARSE_OPERAND_INTEGER, strp, opindex, BFD_RELOC_NONE,
-     &result, &value);
+     & result, & value);
   
   if (errmsg)
     return errmsg;
@@ -110,14 +101,13 @@ parse_small_immediate (cd, strp, opindex, valuep)
   return NULL;
 }
 
-/* Literal scan be either a normal literal, a @hi() or @lo relocation. */
+/* Literal scan be either a normal literal, a @hi() or @lo relocation.  */
    
 static const char *
-parse_immediate16 (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_immediate16 (CGEN_CPU_DESC cd,
+		   const char **strp,
+		   int opindex,
+		   unsigned long *valuep)
 {
   const char *errmsg;
   enum cgen_parse_operand_result result;

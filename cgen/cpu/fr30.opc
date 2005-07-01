@@ -1,5 +1,5 @@
 /* FR30 opcode support.  -*- C -*-
-   Copyright (C) 2000, 2001 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2005 Red Hat, Inc.
    This file is part of CGEN.  */
 
 /* This file is an addendum to fr30.cpu.  Heavy use of C code isn't
@@ -15,15 +15,14 @@
    <arch>-opc.c additions use: "-- opc.c"
    <arch>-asm.c additions use: "-- asm.c"
    <arch>-dis.c additions use: "-- dis.c"
-   <arch>-ibd.h additions use: "-- ibd.h"
-*/
+   <arch>-ibd.h additions use: "-- ibd.h".  */
 
 /* -- opc.h */
 
 /* ??? This can be improved upon.  */
-#undef CGEN_DIS_HASH_SIZE
+#undef  CGEN_DIS_HASH_SIZE
 #define CGEN_DIS_HASH_SIZE 16
-#undef CGEN_DIS_HASH
+#undef  CGEN_DIS_HASH
 #define CGEN_DIS_HASH(buffer, value) (((unsigned char *) (buffer))[0] >> 4)
 
 /* -- */
@@ -31,26 +30,13 @@
 /* -- asm.c */
 /* Handle register lists for LDMx and STMx.  */
 
-static int parse_register_number
-  PARAMS ((const char **));
-static const char * parse_register_list
-  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *, int, int));
-static const char * parse_low_register_list_ld
-  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
-static const char * parse_hi_register_list_ld
-  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
-static const char * parse_low_register_list_st
-  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
-static const char * parse_hi_register_list_st
-  PARAMS ((CGEN_CPU_DESC, const char **, int, unsigned long *));
-
 static int
-parse_register_number (strp)
-     const char **strp;
+parse_register_number (const char **strp)
 {
   int regno;
+
   if (**strp < '0' || **strp > '9')
-    return -1; /* error.  */
+    return -1; /* Error.  */
   regno = **strp - '0';
   ++*strp;
 
@@ -64,30 +50,29 @@ parse_register_number (strp)
 }
 
 static const char *
-parse_register_list (cd, strp, opindex, valuep, high_low, load_store)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     const char **strp;
-     int opindex ATTRIBUTE_UNUSED;
-     unsigned long *valuep;
-     int high_low;   /* 0 == high, 1 == low */
-     int load_store; /* 0 == load, 1 == store */
+parse_register_list (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+		     const char **strp,
+		     int opindex ATTRIBUTE_UNUSED,
+		     unsigned long *valuep,
+		     int high_low,   /* 0 == high, 1 == low.  */
+		     int load_store) /* 0 == load, 1 == store.  */
 {
-  int regno;
-
   *valuep = 0;
   while (**strp && **strp != ')')
     {
+      int regno;
+
       if (**strp != 'R' && **strp != 'r')
 	break;
       ++*strp;
 
       regno = parse_register_number (strp);
       if (regno == -1)
-	return "Register number is not valid";
+	return _("Register number is not valid");
       if (regno > 7 && !high_low)
-	return "Register must be between r0 and r7";
+	return _("Register must be between r0 and r7");
       if (regno < 8 && high_low)
-	return "Register must be between r8 and r15";
+	return _("Register must be between r8 and r15");
 
       if (high_low)
 	regno -= 8;
@@ -106,78 +91,64 @@ parse_register_list (cd, strp, opindex, valuep, high_low, load_store)
     }
 
   if (!*strp || **strp != ')')
-    return "Register list is not valid";
+    return _("Register list is not valid");
 
   return NULL;
 }
 
 static const char *
-parse_low_register_list_ld (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_low_register_list_ld (CGEN_CPU_DESC cd,
+			    const char **strp,
+			    int opindex,
+			    unsigned long *valuep)
 {
-  return parse_register_list (cd, strp, opindex, valuep, 0/*low*/, 0/*load*/);
+  return parse_register_list (cd, strp, opindex, valuep,
+			      0 /* Low.  */, 0 /* Load.  */);
 }
 
 static const char *
-parse_hi_register_list_ld (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_hi_register_list_ld (CGEN_CPU_DESC cd,
+			   const char **strp,
+			   int opindex,
+			   unsigned long *valuep)
 {
-  return parse_register_list (cd, strp, opindex, valuep, 1/*high*/, 0/*load*/);
+  return parse_register_list (cd, strp, opindex, valuep,
+			      1 /* High.  */, 0 /* Load.  */);
 }
 
 static const char *
-parse_low_register_list_st (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_low_register_list_st (CGEN_CPU_DESC cd,
+			    const char **strp,
+			    int opindex,
+			    unsigned long *valuep)
 {
-  return parse_register_list (cd, strp, opindex, valuep, 0/*low*/, 1/*store*/);
+  return parse_register_list (cd, strp, opindex, valuep,
+			      0 /* Low.  */, 1 /* Store.  */);
 }
 
 static const char *
-parse_hi_register_list_st (cd, strp, opindex, valuep)
-     CGEN_CPU_DESC cd;
-     const char **strp;
-     int opindex;
-     unsigned long *valuep;
+parse_hi_register_list_st (CGEN_CPU_DESC cd,
+			   const char **strp,
+			   int opindex,
+			   unsigned long *valuep)
 {
-  return parse_register_list (cd, strp, opindex, valuep, 1/*high*/, 1/*store*/);
+  return parse_register_list (cd, strp, opindex, valuep,
+			      1 /* High.  */, 1 /* Store.  */);
 }
 
 /* -- */
 
 /* -- dis.c */
-static void print_register_list
-  PARAMS ((PTR, long, long, int));
-static void print_hi_register_list_ld
-  PARAMS ((CGEN_CPU_DESC, PTR, long, unsigned, bfd_vma, int));
-static void print_low_register_list_ld
-  PARAMS ((CGEN_CPU_DESC, PTR, long, unsigned, bfd_vma, int));
-static void print_hi_register_list_st
-  PARAMS ((CGEN_CPU_DESC, PTR, long, unsigned, bfd_vma, int));
-static void print_low_register_list_st
-  PARAMS ((CGEN_CPU_DESC, PTR, long, unsigned, bfd_vma, int));
-static void print_m4
-  PARAMS ((CGEN_CPU_DESC, PTR, long, unsigned, bfd_vma, int));
-
 static void
-print_register_list (dis_info, value, offset, load_store)
-     PTR dis_info;
-     long value;
-     long offset;
-     int load_store; /* 0 == load, 1 == store */
+print_register_list (void * dis_info,
+		     long value,
+		     long offset,
+		     int load_store) /* 0 == load, 1 == store.  */
 {
   disassemble_info *info = dis_info;
   int mask;
   int index = 0;
-  char* comma = "";
+  char * comma = "";
 
   if (load_store)
     mask = 0x80;
@@ -206,63 +177,59 @@ print_register_list (dis_info, value, offset, load_store)
 }
 
 static void
-print_hi_register_list_ld (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
+print_hi_register_list_ld (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+			   void * dis_info,
+			   long value,
+			   unsigned int attrs ATTRIBUTE_UNUSED,
+			   bfd_vma pc ATTRIBUTE_UNUSED,
+			   int length ATTRIBUTE_UNUSED)
 {
-  print_register_list (dis_info, value, 8, 0/*load*/);
+  print_register_list (dis_info, value, 8, 0 /* Load.  */);
 }
 
 static void
-print_low_register_list_ld (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
+print_low_register_list_ld (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+			    void * dis_info,
+			    long value,
+			    unsigned int attrs ATTRIBUTE_UNUSED,
+			    bfd_vma pc ATTRIBUTE_UNUSED,
+			    int length ATTRIBUTE_UNUSED)
 {
-  print_register_list (dis_info, value, 0, 0/*load*/);
+  print_register_list (dis_info, value, 0, 0 /* Load.  */);
 }
 
 static void
-print_hi_register_list_st (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
+print_hi_register_list_st (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+			   void * dis_info,
+			   long value,
+			   unsigned int attrs ATTRIBUTE_UNUSED,
+			   bfd_vma pc ATTRIBUTE_UNUSED,
+			   int length ATTRIBUTE_UNUSED)
 {
-  print_register_list (dis_info, value, 8, 1/*store*/);
+  print_register_list (dis_info, value, 8, 1 /* Store.  */);
 }
 
 static void
-print_low_register_list_st (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
+print_low_register_list_st (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+			    void * dis_info,
+			    long value,
+			    unsigned int attrs ATTRIBUTE_UNUSED,
+			    bfd_vma pc ATTRIBUTE_UNUSED,
+			    int length ATTRIBUTE_UNUSED)
 {
-  print_register_list (dis_info, value, 0, 1/*store*/);
+  print_register_list (dis_info, value, 0, 1 /* Store.  */);
 }
 
 static void
-print_m4 (cd, dis_info, value, attrs, pc, length)
-     CGEN_CPU_DESC cd ATTRIBUTE_UNUSED;
-     PTR dis_info;
-     long value;
-     unsigned int attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc ATTRIBUTE_UNUSED;
-     int length ATTRIBUTE_UNUSED;
+print_m4 (CGEN_CPU_DESC cd ATTRIBUTE_UNUSED,
+	  void * dis_info,
+	  long value,
+	  unsigned int attrs ATTRIBUTE_UNUSED,
+	  bfd_vma pc ATTRIBUTE_UNUSED,
+	  int length ATTRIBUTE_UNUSED)
 {
   disassemble_info *info = (disassemble_info *) dis_info;
+
   (*info->fprintf_func) (info->stream, "%ld", value);
 }
 /* -- */

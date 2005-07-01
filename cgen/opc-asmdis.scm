@@ -1,5 +1,5 @@
 ; Assembler/disassembler support generator.
-; Copyright (C) 2000, 2001 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2005 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; Assembler support.
@@ -9,7 +9,7 @@
   (string-list
    "\
 const char * @arch@_cgen_parse_operand
-  PARAMS ((CGEN_CPU_DESC, int, const char **, CGEN_FIELDS *));
+  (CGEN_CPU_DESC, int, const char **, CGEN_FIELDS *);
 
 /* Main entry point for operand parsing.
 
@@ -25,11 +25,10 @@ const char * @arch@_cgen_parse_operand
    the handlers.  */
 
 const char *
-@arch@_cgen_parse_operand (cd, opindex, strp, fields)
-     CGEN_CPU_DESC cd;
-     int opindex;
-     const char ** strp;
-     CGEN_FIELDS * fields;
+@arch@_cgen_parse_operand (CGEN_CPU_DESC cd,
+			   int opindex,
+			   const char ** strp,
+			   CGEN_FIELDS * fields)
 {
   const char * errmsg = NULL;
   /* Used by scalar operands that still need to be parsed.  */
@@ -65,8 +64,7 @@ const char *
   (string-append
    "\
 void
-@arch@_cgen_init_asm (cd)
-     CGEN_CPU_DESC cd;
+@arch@_cgen_init_asm (CGEN_CPU_DESC cd)
 {
   @arch@_cgen_init_opcode_table (cd);
   @arch@_cgen_init_ibld_table (cd);
@@ -100,8 +98,7 @@ void
   (string-list
    "\
 void @arch@_cgen_print_operand
-  PARAMS ((CGEN_CPU_DESC, int, PTR, CGEN_FIELDS *,
-           void const *, bfd_vma, int));
+  (CGEN_CPU_DESC, int, PTR, CGEN_FIELDS *, void const *, bfd_vma, int);
 
 /* Main entry point for printing operands.
    XINFO is a `void *' and not a `disassemble_info *' to not put a requirement
@@ -119,16 +116,15 @@ void @arch@_cgen_print_operand
    the handlers.  */
 
 void
-@arch@_cgen_print_operand (cd, opindex, xinfo, fields, attrs, pc, length)
-     CGEN_CPU_DESC cd;
-     int opindex;
-     PTR xinfo;
-     CGEN_FIELDS *fields;
-     void const *attrs ATTRIBUTE_UNUSED;
-     bfd_vma pc;
-     int length;
+@arch@_cgen_print_operand (CGEN_CPU_DESC cd,
+			   int opindex,
+			   void * xinfo,
+			   CGEN_FIELDS *fields,
+			   void const *attrs ATTRIBUTE_UNUSED,
+			   bfd_vma pc,
+			   int length)
 {
- disassemble_info *info = (disassemble_info *) xinfo;
+  disassemble_info *info = (disassemble_info *) xinfo;
 
   switch (opindex)
     {
@@ -158,8 +154,7 @@ void
   (string-append
    "
 void
-@arch@_cgen_init_dis (cd)
-     CGEN_CPU_DESC cd;
+@arch@_cgen_init_dis (CGEN_CPU_DESC cd)
 {
   @arch@_cgen_init_opcode_table (cd);
   @arch@_cgen_init_ibld_table (cd);

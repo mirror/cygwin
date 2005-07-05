@@ -1,3 +1,9 @@
+2005-07-05  Nick Clifton  <nickc@redhat.com>
+
+	* cpu/iq2000.opc (parse_lo16, parse_mlo16): Make value parameter
+	unsigned in order to avoid compile time warnings about sign
+	conflicts.
+
 2005-07-01  Nick Clifton  <nickc@redhat.com>
 
 	* desc-cpu.scm: Update to ISO C90 function declaration style.

@@ -1,3 +1,8 @@
+2005-07-15  Alan Modra  <amodra@bigpond.net.au>
+
+	* cpu/fr30.opc (print_register_list): Correct format strings.
+	* cpu/ip2k.opc: Likewise.
+
 2005-07-05  Nick Clifton  <nickc@redhat.com>
 
 	* cpu/iq2000.opc (parse_lo16, parse_mlo16): Make value parameter

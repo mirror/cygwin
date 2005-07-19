@@ -44,7 +44,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.75 $";
+static const char version[] = "$Revision: 1.76 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -218,7 +218,14 @@ find_on_path (char *file, char *default_extension,
     }
 
   if (strchr (file, ':') || strchr (file, '\\') || strchr (file, '/'))
-    return cygpath (file, NULL);
+    {
+      char *fn = cygpath (file, NULL);
+      if (access (fn, F_OK) == 0)
+	return fn;
+      strcpy (rv, fn);
+      strcat (rv, default_extension);
+      return access (rv, F_OK) == 0 ? rv : fn;
+    }
 
   if (strchr (file, '.'))
     default_extension = (char *) "";

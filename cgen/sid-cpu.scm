@@ -736,7 +736,10 @@ using namespace cgen;
      (gen-define-field-macro (insn-sfmt insn))
      "  sem_status status = SEM_STATUS_NORMAL;\n"
      "  @prefix@_scache* abuf = sem;\n"
-
+     ; Unconditionally written operands are not recorded here.
+     (if (or (with-profile?) (with-parallel-write?))
+	 "  unsigned long long written = 0;\n"
+	 "")
      ; The address of this insn, needed by extraction and semantic code.
      ; Note that the address recorded in the cpu state struct is not used.
      ; For faster engines that copy will be out of date.
@@ -792,8 +795,11 @@ using namespace cgen;
 #endif
 #include \"@cpu@.h\"
 
-using namespace @cpu@; // FIXME: namespace organization still wip
-
+using namespace @cpu@; // FIXME: namespace organization still wip\n")
+  (if (with-parallel?)
+      (string-write "\
+using namespace @prefix@; // FIXME: namespace organization still wip\n"))
+  (string-write "\
 #define GET_ATTR(name) GET_ATTR_##name ()
 
 \n"

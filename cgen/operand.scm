@@ -295,7 +295,7 @@
 	      result)
 	    (parse-error "op:new-mode"
 			 (string-append "invalid mode for operand `"
-					(obj:name op)
+					(->string (obj:name op))
 					"'")
 			 new-mode-name))))
 )

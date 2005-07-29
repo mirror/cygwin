@@ -1,5 +1,8 @@
 2005-07-29  Dave Brolley  <brolley@redhat.com>
 
+	* sid-cpu.scm (-gen-scache-semantic-fn): Generate a declation of 'written'
+	if with-profile or with-parallel-write.
+	(cgen-semantics.cxx): Make the @prefix@ namespace available if with-parallel.
 	* operand.scm (op:new-mode): Convert (obj:name op) to a string for
 	string-append.
 

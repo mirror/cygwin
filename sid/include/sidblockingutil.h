@@ -1,6 +1,6 @@
 // sidblockingutil.h - Elements used for blockable components.  -*- C++ -*-
 
-// Copyright (C) 2004 Red Hat.
+// Copyright (C) 2004, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -28,17 +28,50 @@ namespace sidutil
       self (child_self),
       child_created (false),
       child_thread_function (f),
-      blockable (false)
+      blockable (false),
+      still_blockable (false),
+      control_status (ctl_parent)
       {
 	add_attribute ("name", &name);
-	add_attribute ("blockable?", & blockable, "setting");
+	add_attribute_notify ("blockable?", & still_blockable, this,
+			      & blocking_component::set_blockable,
+			      "setting");
       }
     ~blocking_component () throw()
       {
       }
 
+    // -------------------------------------------------------------------
+    // Child thread management
+    //
+  public:
+    void child_init ()
+      {
+	log (10, "%s: child_init\n", name.c_str ());
+	assert (child_created);
+	// Lock both mutexes
+	pthread_mutex_lock (& child_resume_mutex);
+	pthread_mutex_lock (& child_stopped_mutex);
+      }
+
   protected:
-    // Called by the parent thread to ensure that a child thread exists
+    void parent_init ()
+      {
+	log (10, "%s: parent_init\n", name.c_str ());
+
+	// Create mutexes for synchronizing the parent and child threads
+	pthread_mutex_init (& child_resume_mutex, NULL);
+	pthread_cond_init (& child_resume_condition, NULL);
+	pthread_mutex_init (& child_stopped_mutex, NULL);
+	pthread_cond_init (& child_stopped_condition, NULL);
+
+	// Lock both mutexes
+	pthread_mutex_lock (& child_resume_mutex);
+	pthread_mutex_lock (& child_stopped_mutex);
+	control_status = ctl_parent;
+      }
+
+    // Called to ensure that a child thread exists
     //
     void need_child_thread ()
       {
@@ -81,33 +114,12 @@ namespace sidutil
 	return wait_for_child_thread ();
       }
 
-  private:
-    // Called once by the parent thread just before the child thread is
-    // created.
-    void parent_init ()
-      {
-	log (10, "%s: parent_init\n", name.c_str ());
-
-	// Create mutexes for synchronizing the parent and child threads
-	pthread_mutex_init (& child_resume_mutex, NULL);
-	pthread_cond_init (& child_resume_condition, NULL);
-	pthread_mutex_init (& child_stopped_mutex, NULL);
-	pthread_cond_init (& child_stopped_condition, NULL);
-
-	// Lock both mutexes
-	pthread_mutex_lock (& child_resume_mutex);
-	pthread_mutex_lock (& child_stopped_mutex);
-	control_status = ctl_parent;
-      }
-
-    // Called by the parent to wait for the child thread to give up control
-    //
     int wait_for_child_thread ()
       {
 	log (10, "%s: wait_for_child_thread\n", name.c_str ());
 
 	// Signal the child to resume
-	assert (control_status == ctl_parent);
+	assert (control_status != ctl_child_start);
 	control_status = ctl_child_start;
 	pthread_cond_signal (& child_resume_condition);
 
@@ -121,24 +133,11 @@ namespace sidutil
 	pthread_mutex_lock (& child_resume_mutex);
 
 	// Check the value of control_status
-	int s = control_status;
-	assert (s != ctl_child_start);
-	control_status = ctl_parent;
-	return s;
+	assert (control_status != ctl_child_start);
+	return control_status;
       }
 
   public:
-    // Called by the child thread once when it is created.
-    //
-    void child_init ()
-      {
-	log (10, "%s: child_init\n", name.c_str ());
-	assert (child_created);
-	// Lock both mutexes
-	pthread_mutex_lock (& child_resume_mutex);
-	pthread_mutex_lock (& child_stopped_mutex);
-      }
-
     // Called by the child thread to signal normal completion of the child task
     //
     void child_completed ()
@@ -146,6 +145,7 @@ namespace sidutil
 	log (10, "%s: child_completed\n", name.c_str ());
 	log (11, "%s: child sending completion signal\n", name.c_str ());
 	control_status = ctl_child_complete;
+	blockable = still_blockable;
 	child_wait_for_resume ();
       }
 	    
@@ -159,7 +159,7 @@ namespace sidutil
 	child_wait_for_resume ();
       }
 
-  private:
+  protected:	    
     // Called by the child thread to wait for a signal from the parent thread
     // to resume
     void child_wait_for_resume ()
@@ -182,9 +182,18 @@ namespace sidutil
 	assert (control_status == ctl_child_start);
       }
 
+    void set_blockable ()
+      {
+	// Never change the status of 'blockable' while the child thread is
+	// active.
+	if (control_status == ctl_parent || control_status == ctl_child_complete)
+	  blockable = still_blockable;
+      }
+
   protected:
     string name;
     bool blockable;
+    bool still_blockable;
     void *self;
     bool child_created;
     pthread_t child_thread;

@@ -1,3 +1,17 @@
+2005-08-02  Dave Brolley  <brolley@redhat.com>
+
+	* sidbusutil.h (bus_arbitrator): Remove passthrough_pin.
+	(check_passthrough): Now takes 'upstream' argument. Correct all calls.
+	Don't check passthrough_pin here.
+	(access_latency): New virtual method of bus_arbitrator.
+	* sidblockingutil.h (blocking_component): Initialize still_blockable
+	and control_status. Add blockable? using add_attribute_notify.
+	(wait_for_child_thread): Assert that control_status != ctl_child_start.
+	Return control_status.
+	(child_completed): Set blockable to still_blockable.
+	(set_blockable): New method of blocking_component.
+	(still_blockable): New member of blocking_component.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* configure.in: Remove call to AC_ARG_PROGRAM, to avoid autoconf

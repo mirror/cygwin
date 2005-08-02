@@ -1,6 +1,6 @@
 // sidbusutil.h -*- C++ -*- Different types and sizes of buses.
 
-// Copyright (C) 1999, 2000, 2001, 2002, 2004 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2004, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -1213,8 +1213,6 @@ namespace sidutil
 	running_pin.set_active_high ();
 	add_pin ("active", & active_pin);
 	active_pin.set_active_high ();
-	add_pin ("passthrough", & passthrough_pin);
-	passthrough_pin.set_active_high ();
       }
     ~bus_arbitrator () throw () { }
 
@@ -1289,7 +1287,7 @@ namespace sidutil
     sid::bus::status
     write(int upstream, sid::host_int_4 addr, DataType data)
       {
-	if (ulog_level >= 8 || ! check_passthrough ())
+	if (ulog_level >= 8 || ! check_passthrough (upstream))
 	  log (5, "%s: received write request from %s interface at 0x%x\n",
 	       name.c_str (), up2str(upstream), addr);
 	return arbitrate_write (upstream, downstream_for_address (addr), addr, data);
@@ -1299,7 +1297,7 @@ namespace sidutil
     sid::bus::status
     read(int upstream, sid::host_int_4 addr, DataType& data)
       {
-	if (ulog_level >= 8 || ! check_passthrough ())
+	if (ulog_level >= 8 || ! check_passthrough (upstream))
 	  log (5, "%s: received read request from %s interface at 0x%x\n",
 	       name.c_str (), up2str(upstream), addr);
 	return arbitrate_read (upstream, downstream_for_address (addr), addr, data);
@@ -1335,7 +1333,7 @@ namespace sidutil
 				     DataType& data)
       {
 	// Check for direct passthrough
-	if (check_passthrough ())
+	if (check_passthrough (upstream))
 	  return downstream_bus (downstream)->read (addr, data);
 
 	// Prioritize the request
@@ -1354,7 +1352,7 @@ namespace sidutil
 				      DataType data)
       {
 	// Check for direct passthrough
-	if (check_passthrough ())
+	if (check_passthrough (upstream))
 	  return downstream_bus (downstream)->write(addr, data);
 
 	// Prioritize the request
@@ -1410,22 +1408,22 @@ namespace sidutil
 	return s;
       }
 
-    bool check_passthrough ()
+    virtual bool check_passthrough (int = 0)
       {
-	if (passthrough_pin.state () == binary_pin_active)
-	  {
-	    log (8, "%s: passthrough enabled\n", name.c_str ());
-	    return true;
-	  }
-
 	if (running_pin.state () != binary_pin_active
 	    || active_pin.state () != binary_pin_active)
 	  {
 	    log (8, "%s: system is idle -- passthrough\n", name.c_str ());
 	    return true;
 	  }
-      return false;
-    }
+	return false;
+      }
+
+  protected:
+    // Methods for timing
+    //
+    // Default to no latency
+    virtual sid::host_int_2 access_latency (bus_request &r) { return 0; }
 
   protected:
     // Route locking
@@ -1457,7 +1455,6 @@ namespace sidutil
     //
     binary_input_pin running_pin;
     binary_input_pin active_pin;
-    binary_input_pin passthrough_pin;
   };
 }
 

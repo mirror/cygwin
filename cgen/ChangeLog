@@ -1,3 +1,9 @@
+2005-08-02  Dave Brolley  <brolley@redhat.com>
+
+	* rtl-c.scm (s-unop): Don't dereference
+	CGEN_CPU_FPU (current_cpu)->ops->xxxxx in the generated code.
+	(s-binop, s-convop, s-cmpop): Likewise.
+
 2005-07-29  Dave Brolley  <brolley@redhat.com>
 
 	* sid-cpu.scm (-gen-scache-semantic-fn): Generate a declation of 'written'

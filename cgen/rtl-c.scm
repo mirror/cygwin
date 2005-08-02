@@ -1,5 +1,5 @@
 ; RTL->C translation support.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2005 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -649,10 +649,10 @@
     (if (-rtx-use-sem-fn? estate c-op mode)
 	(if (mode-float? mode)
 	    (cx:make sem-mode
-		     (string-append "(* CGEN_CPU_FPU (current_cpu)->ops->"
+		     (string-append "CGEN_CPU_FPU (current_cpu)->ops->"
 				    (string-downcase name)
 				    (string-downcase (obj:str-name sem-mode))
-				    ") (CGEN_CPU_FPU (current_cpu), "
+				    " (CGEN_CPU_FPU (current_cpu), "
 				    (cx:c val) ")"))
 	    (cx:make sem-mode
 		     (string-append name (obj:str-name sem-mode)
@@ -684,10 +684,10 @@
     (if (-rtx-use-sem-fn? estate c-op mode)
 	(if (mode-float? mode)
 	    (cx:make sem-mode
-		     (string-append "(* CGEN_CPU_FPU (current_cpu)->ops->"
+		     (string-append "CGEN_CPU_FPU (current_cpu)->ops->"
 				    (string-downcase name)
 				    (string-downcase (obj:str-name sem-mode))
-				    ") (CGEN_CPU_FPU (current_cpu), "
+				    " (CGEN_CPU_FPU (current_cpu), "
 				    (cx:c val1) ", "
 				    (cx:c val2) ")"))
 	    (cx:make sem-mode
@@ -799,11 +799,11 @@
 	(if (or (mode-float? mode)
 		(mode-float? (cx:mode s)))
 	    (cx:make mode
-		     (string-append "(* CGEN_CPU_FPU (current_cpu)->ops->"
+		     (string-append "CGEN_CPU_FPU (current_cpu)->ops->"
 				    (string-downcase name)
 				    (string-downcase (obj:str-name (-rtx-sem-mode (cx:mode s))))
 				    (string-downcase (obj:str-name (-rtx-sem-mode mode)))
-				    ") (CGEN_CPU_FPU (current_cpu), "
+				    " (CGEN_CPU_FPU (current_cpu), "
 				    (cx:c s) ")"))
 	    (cx:make mode
 		     (string-append name
@@ -829,10 +829,10 @@
     (if (-rtx-use-sem-fn? estate c-op mode)
 	(if (mode-float? mode)
 	    (cx:make (mode:lookup 'BI)
-		     (string-append "(* CGEN_CPU_FPU (current_cpu)->ops->"
+		     (string-append "CGEN_CPU_FPU (current_cpu)->ops->"
 				    (string-downcase (symbol->string name))
 				    (string-downcase (obj:str-name (-rtx-sem-mode mode)))
-				    ") (CGEN_CPU_FPU (current_cpu), "
+				    " (CGEN_CPU_FPU (current_cpu), "
 				    (cx:c val1) ", "
 				    (cx:c val2) ")"))
 	    (cx:make (mode:lookup 'BI)

@@ -1,3 +1,58 @@
+2005-08-19  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+
+	2005-07-13  Dave Brolley  <brolley@redhat.com>
+
+	* gloss.cxx (gloss32): Initialize dynamic_configurator. Add
+	dynamic-configurator relation.
+	* gloss.h (gloss32): Inherit virtually from
+	fixed_attribute_map_component.
+	(dynamic_configurator): New member of gloss32.
+
+	2005-07-05  Dave Brolley  <brolley@redhat.com>
+
+	* gloss.cxx (start_config): Removed from gloss32.
+	(gloss32): Remove "start-config" attribute. Add "config-error"
+	pin.
+	(reset): Don't call sys_config_set.
+	(sys_reconfig_set): Call set_error_result based on the value driven on
+	config_error_pin.
+	(sys_reconfig_reset): Likewise.
+	* gloss.h (start_config): Removed from gloss32.
+	(config_error_pin): New member of gloss32.
+
+	2005-06-06  Dave Brolley  <brolley@redhat.com>
+
+	* gloss.cxx (gloss32): Don't initialize dynamic_configurator.
+	Don't add dynamic-configurator relation.
+	(configure_pin): Renamed to sys_configure_pin.
+	(configure): New virtual override in gloss32.
+	(do_sys_reconfig): Print log messages to cerr and only when
+	verbose_p.
+	* gloss.h (gloss32): fixed_pin_map_component and configurable_component
+	inherited virtually.
+	(dynamic_configurator): Removed.
+	(configure_pin): Renamed to sys_configure_pin.
+	(configure): New virtual override in gloss32.
+
+	2005-05-29  Dave Brolley  <brolley@redhat.com>
+
+	* libgloss.h (SYS_reconfig): New enumerator.
+	* gloss.h (main, dynamic_configurator): New members of gloss32.
+	(configure_pin, config_result_pin, start_config): Likewise.
+	(sys_reconfig_set): New method of gloss32.
+	(sys_reconfig_reset, do_sys_reconfig): Likewise.
+	* gloss.cxx (gloss32): Initialize main, dynamic_configurator and
+	start_config. Add relations main, dynamic-configurator. Add
+	configure pin. Add start-config addtribute. Add config-result
+	pin.
+	(reset): Call sys_reconfig_set with start_config if it's not
+	empty.
+	(syscall_trap): Handle SYS_reconfig.
+	(sys_reconfig_set): New method of gloss32.
+	(sys_reconfig_reset, do_sys_reconfig): Likewise.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.in: Regenerated with Automake 1.9.5.

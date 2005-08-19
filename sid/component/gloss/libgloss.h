@@ -1,6 +1,6 @@
 // libgloss.h - Interface details for libgloss.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -19,6 +19,7 @@ public:
 
   enum libgloss_syscall
   {
+    SYS_reconfig = 0,
     SYS_exit = 1,
     SYS_open = 2, 
     SYS_close = 3, 

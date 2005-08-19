@@ -1,4 +1,4 @@
-# Copyright (C) 2000 Red Hat
+# Copyright (C) 2000, 2005 Red Hat
 #
 # This is a component that forwards almost all sid requests to another
 # component.  Further, it interjects proxy pin/bus objects between the
@@ -98,6 +98,8 @@ proc attribute_names_in_category {cat} {
 
 proc attribute_value {attr} {
     global victim
+    if {$attr == "component-type"} then { return "sid-api-trace" }
+    if {$attr == "victim"} then { return "$victim" }
     return [sidtrace [list sid::component::attribute_value $victim $attr]]
 }
 

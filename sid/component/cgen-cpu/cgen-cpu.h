@@ -1,6 +1,6 @@
 // cgen-cpu.h  -*- C++ -*-
 
-// Copyright (C) 2000, 2001, 2002, 2003, 2004 Red Hat.
+// Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -80,6 +80,33 @@ protected:
   static int cgen_symbol_at_address(bfd_vma addr, struct disassemble_info * info);
   // Counter tracing support
   void trace_counter (PCADDR pc);
+
+public:
+  // Called by semantic code to perform branches.
+  virtual void
+  branch (PCADDR new_pc, PCADDR& npc, sem_status& status)
+  {
+    branch_was_return = false;
+  }
+
+  // Called by the semantic code at the end of a non-cti insn.
+  // Make this a NOP; ordinary sequential PC stepping is done
+  // elsewhere.
+  virtual void done_insn (PCADDR npc, sem_status& status) {}
+     
+  // Called by the semantic code at the end of a cti insn.
+  virtual void
+  done_cti_insn (PCADDR npc, sem_status& status)
+  {
+    if (branch_was_return)
+      this->cg_return_pin.drive (npc);
+    branch_was_return = false;
+  }
+
+  virtual void notify_ret (sid::host_int_4 addr) { branch_was_return = true; last_caller = addr; last_callee = 0; }
+
+protected:
+  bool branch_was_return;
 
 public:
   cgen_bi_endian_cpu ();

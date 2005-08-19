@@ -1,5 +1,19 @@
 2005-08-19  Dave Brolley  <brolley@redhat.com>
 
+	* Contribute the following changes:
+
+	2005-07-13  Dave Brolley  <brolley@redhat.com>
+
+	* cgen-cpu.h (notify_ret): Set last_caller and last_callee.
+
+	2005-05-29  Dave Brolley  <brolley@redhat.com>
+
+	* cgen-cpu.h (branch, done_insn, done_cti_insn, notify_ret): 
+	New virtual overrides.
+	(was_return): New member of cgen_bi_endian_cpu.
+
+2005-08-19  Dave Brolley  <brolley@redhat.com>
+
 	* cgen-fpu.cxx: New file.
 	* cgen-fpu.h: New file.
 	* Makefile.am (libcgencpu_la_SOURCES): Add cgen-fpu.cxx.

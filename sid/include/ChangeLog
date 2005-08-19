@@ -1,3 +1,65 @@
+2005-08-19  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+
+	2005-07-13  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (num_cycles): New member of basic_cpu.
+	(step_pin_handler): Call configure_gprof.
+	(cg_profile): Call last_caller and last_callee.
+	(cg_profile_jump): Call last_caller and last_callee.
+	(configure_gprof): New method of basic_cpu.
+	(unconfigure_gprof): New method of basic_cpu.
+	(gprof_configured_p,configure_gprof_p,last_caller,last_callee)
+	(pprof_spec): New members of basic_cpu.
+	(configure): Call configure_gprof.
+	(basic_cpu): Initialize gprof_configured_p, configure_gprof_p,
+	last_caller and last_callee.
+	* sidattrutil.h (configurable_component): Moved here ...
+	* sidcomputil.h (configurable_component): ... from here.
+	* sidbusutil.h (bus_arbitrator): Inherit from no_relation_component.
+
+	2005-06-24  Dave Brolley  <brolley@redhat.com>
+
+	* sidattrutil.h (fixed_attribute_map_with_logging_component): 
+	Initialize buffer_output to false.
+
+	2005-06-21  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (basic_cpu::configure): Call update_final_insn_count_p
+	after processing "final-insn-count".
+
+	2005-06-06  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (print_final_insn_count_p): New member of basic_cpu.
+	(print_insn_summary): Check print_final_insn_count_p.
+	(update_final_insn_count_p): New method of basic_cpu.
+	(core_probe,main); New members of basic_cpu.
+	(basic_cpu::configure): Handle insn-count, verbose, trace-core,
+	trace-counter, trace-extract, trace-semantics and final-insn-count.
+	(stream_state): Stream print_final_insn_count_p.
+	(destream_state): Destream print_final_insn_count_p.
+	(basic_cpu): Initialize core_probe and main. Initialize
+	print_final_insn_count_p. Add final-insn-count? using
+	add_attribute_notify. Add relations core-probe and main.
+	* sidcomputil.h (configurable_component::configure_pin_handler): Now
+	virtual.
+
+	2005-05-29  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (basic_cpu): New inherits from configurable_component.
+	(cg_jump_pin,cg_return_pin): New members of basic_cpu.
+	(cg_profile_jump): New method of basic_cpu.
+	(configure): New virtual override on basic_cpu.
+	(basic_cpu): Initialize gprof. Add cg-return and cg-jump pins. Add
+	gprof relation.
+	* sidcomputil.h (configurable_component): New mix-in class for components.
+	* sidattrutil.h (sidcomputil.h): #include it.
+	(fixed_attribute_map_with_logging_component): Inherit from
+	configurable_component.
+	(configure): New virtual override in
+	fixed_attribute_map_with_logging_component.
+
 2005-08-02  Dave Brolley  <brolley@redhat.com>
 
 	* sidbusutil.h (bus_arbitrator): Remove passthrough_pin.

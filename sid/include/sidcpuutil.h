@@ -1,6 +1,6 @@
 // sidcpuutil.h - Elements common to CPU models.  -*- C++ -*-
 
-// Copyright (C) 1999-2004 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -105,7 +105,8 @@ namespace sidutil
 		   protected virtual fixed_accessor_map_component,
 		   protected virtual fixed_attribute_map_component,
 		   protected virtual fixed_relation_map_component,
-		   protected virtual fixed_bus_map_component
+		   protected virtual fixed_bus_map_component,
+		   protected virtual configurable_component
   {
     // custom memory allocators for poisioning freshly-allocated memory
   public:
@@ -206,9 +207,12 @@ namespace sidutil
     sid::host_int_8 total_insn_count;
     mutable sid::host_int_8 total_latency;
     sid::host_int_4 current_step_insn_count;
+    sid::host_int_4 num_cycles;
     output_pin step_cycles_pin;
     output_pin cg_caller_pin;
     output_pin cg_callee_pin;
+    output_pin cg_jump_pin;
+    output_pin cg_return_pin;
    
     // tracing
   private:
@@ -257,6 +261,7 @@ namespace sidutil
     bool trace_semantics_p;
     bool trace_counter_p;
     bool final_insn_count_p;
+    bool print_final_insn_count_p;
     bool enable_step_trap_p;
     cpu_trace_stream trace_stream;
 
@@ -264,6 +269,9 @@ namespace sidutil
       {
 	recursion_record limit (& this->step_limit);
 	if (UNLIKELY(! limit.ok())) return;
+
+	if (UNLIKELY (! gprof_configured_p && configure_gprof_p))
+	  configure_gprof ();
 
 	this->current_step_insn_count = 0;
 	this->yield_p = false;
@@ -283,10 +291,11 @@ namespace sidutil
 	const sid::host_int_4 min_num_cycles = 1;
 	const sid::host_int_4 max_num_cycles = 0x7FFFFFFF;
 	sid::host_int_8 insn_cycles = num_insns + latency_to_cycles (latency);
-	sid::host_int_4 num_cycles =
+	num_cycles =
 	  insn_cycles <= min_num_cycles ? min_num_cycles :
 	  insn_cycles >= max_num_cycles ? max_num_cycles :
 	  insn_cycles;
+
 	this->stepped (num_cycles);
       }
     void yield ()
@@ -300,8 +309,9 @@ namespace sidutil
       }
     virtual void print_insn_summary (sid::host_int_4)
       {
-	std::cerr << "instruction count: " << this->total_insn_count << "  "
-		  << "simulated cycles: " << this->total_latency + this->total_insn_count << std::endl;
+	if (print_final_insn_count_p)
+	  std::cerr << "instruction count: " << this->total_insn_count << "  "
+		    << "simulated cycles: " << this->total_latency + this->total_insn_count << std::endl;
       }
     virtual void stepped (sid::host_int_4 n)
       {
@@ -309,6 +319,8 @@ namespace sidutil
       }
     void cg_profile (sid::host_int_4 caller, sid::host_int_4 callee)
     {
+      last_caller = caller;
+      last_callee = callee;
       // The drive sequence is important: see sw-profile-gprof
       this->cg_caller_pin.drive (caller);
       this->cg_callee_pin.drive (callee);
@@ -323,6 +335,12 @@ namespace sidutil
 							std::ios::hex|std::ios::showbase)
 	                     << "  ";
 	}
+    }
+    void cg_profile_jump (sid::host_int_4 caller, sid::host_int_4 callee)
+    {
+      last_caller = caller;
+      last_callee = callee;
+      this->cg_jump_pin.drive (callee);
     }
 
   public:
@@ -381,6 +399,12 @@ namespace sidutil
       this->trace_result_p = (this->trace_semantics_p || this->trace_disass_p);
     }
 
+    void
+    update_final_insn_count_p ()
+    {
+      if (this->final_insn_count_p)
+	this->print_final_insn_count_p = true;
+    }
 
     // Reset the processor model to power-up state.
   private:
@@ -426,7 +450,166 @@ namespace sidutil
 	return static_cast<cpu_trap_disposition>(trap_disposition_pin.sense ());
       }
 
-    
+    void unconfigure_gprof (sid::host_int_4 num_cycles)
+      {
+	assert (gprof);
+	// First sample the address of the branch which caused
+	// the reconfig for the given number of cycles.
+	sid::pin *p;
+	if (num_cycles && last_caller)
+	  {
+	    p = gprof->find_pin ("sample");
+	    if (p)
+	      {
+		std::string save_pc = this->attribute_value ("pc");
+		if (! save_pc.empty ())
+		  {
+		    sid::component::status s = this->set_attribute_value ("pc", make_numeric_attribute (last_caller));
+		    if (s == sid::component::ok)
+		      do
+			{
+			  p->driven (1);
+			  --num_cycles;
+			} while (num_cycles);
+		    this->set_attribute_value ("pc", save_pc);
+		  }
+	      }
+	  }
+
+	// Then get gprof to reconfigure itself.
+	gprof->set_attribute_value ("configure!", gprof_spec);
+
+	// Then disconnect the call graph notification pins.
+	assert (! configure_gprof_p);
+	assert (gprof_configured_p);
+	p = gprof->find_pin ("cg-caller");
+	if (p) cg_caller_pin.disconnect (p); 
+	p = gprof->find_pin ("cg-callee");
+	if (p) cg_callee_pin.disconnect (p); 
+	gprof_configured_p = false;
+      }
+
+    void configure_gprof ()
+      {
+	// First get gprof to reconfigure itself.
+	assert (gprof);
+	gprof->set_attribute_value ("configure!", gprof_spec);
+
+	// Then connect the call graph notification pins.
+	assert (configure_gprof_p);
+	assert (! gprof_configured_p);
+	sid::pin *p = gprof->find_pin ("cg-caller");
+	if (p)
+	  {
+	    cg_caller_pin.connect (p); 
+	    if (last_caller && last_callee)
+	      p->driven (last_caller);
+	  }
+	p = gprof->find_pin ("cg-callee");
+	if (p) {
+	  cg_callee_pin.connect (p); 
+	  if (last_caller && last_callee)
+	    p->driven (last_callee); 
+	}
+	gprof_configured_p = true;
+      }
+
+    // ------------------------------------------------------------------------
+    // dynamic configuration
+  protected:
+    component *gprof;
+    component *core_probe;
+    component *main;
+    bool gprof_configured_p;
+    bool configure_gprof_p;
+    sid::host_int_4 last_caller;
+    sid::host_int_4 last_callee;
+    string gprof_spec;
+
+    virtual void configure (const string &config)
+      {
+	// Call up to the base class
+	configurable_component::configure (config);
+
+	// Handle configuration specific to this component
+	if (config.size () < 6)
+	  return;
+	if (config.substr (0, 6) == "gprof=")
+	  {
+	    if (! gprof)
+	      return; // nothing to configure
+	    gprof_spec = config;
+	    // Set a flag to configure the gprof component the next time
+	    // our step! pin is driven....
+	    configure_gprof_p = (config.size () > 6);
+	    // ... unless we are unconfiguring the gprof, in which
+	    // case do it now.
+	    if (gprof_configured_p && ! configure_gprof_p)
+	      unconfigure_gprof (num_cycles);
+	    return;
+	  }
+	if (config.size () <= 11)
+	  return;
+	if (config.substr (0, 11) == "insn-count=")
+	  {
+	    sid::host_int_4 n;
+	    sid::component::status s = parse_attribute (config.substr (11), n);
+	    if (s == sid::component::ok)
+	      step_insn_count = n;
+	    return;
+	  }
+	if (config.substr (0, 8) == "verbose=")
+	  {
+	    if (main)
+	      main->set_attribute_value ("verbose?", config.substr (8));
+	    return;
+	  }
+	if (config.size () < 15)
+	  return;
+	if (config.substr (0, 11) == "trace-core=")
+	  {
+	    if (core_probe)
+	      core_probe->set_attribute_value ("trace?", config.substr (11));
+	    return;
+	  }
+	if (config.size () < 18)
+	  return;
+	if (config.substr (0, 14) == "trace-counter=")
+	  {
+	    trace_counter_p = (config.substr (14) == "true");
+	    return;
+	  }
+	if (config.substr (0, 14) == "trace-extract=")
+	  {
+	    trace_extract_p = (config.substr (14) == "true");
+	    return;
+	  }
+	if (config.size () < 20)
+	  return;
+	if (config.substr (0, 16) == "trace-semantics=")
+	  {
+	    trace_semantics_p = (config.substr (16) == "true");
+	    update_trace_result_p ();
+	    return;
+	  }
+	if (config.size () < 21)
+	  return;
+	if (config.substr (0, 17) == "final-insn-count=")
+	  {
+	    final_insn_count_p = (config.substr (17) == "true");
+	    update_final_insn_count_p ();
+	    return;
+	  }
+	if (config.size () < 22)
+	  return;
+	if (config.substr (0, 18) == "trace-disassemble=")
+	  {
+	    trace_disass_p = (config.substr (18) == "true");
+	    update_trace_result_p ();
+	    return;
+	  }
+      }
+
     // state save/restore: Override these in derived classes, but
     // include a call up to this base implementation.
   protected:
@@ -444,6 +627,7 @@ namespace sidutil
 	  << " " << this->trace_semantics_p
 	  << " " << this->trace_counter_p
 	  << " " << this->final_insn_count_p
+	  << " " << this->print_final_insn_count_p
 	  // pins
 	  << " " << this->step_cycles_pin
 	  << " " << this->trap_type_pin
@@ -469,6 +653,7 @@ namespace sidutil
 	  >> this->trace_semantics_p
 	  >> this->trace_counter_p
 	  >> this->final_insn_count_p
+	  >> this->print_final_insn_count_p
 	  // pins
 	  >> this->step_cycles_pin
 	  >> this->trap_type_pin
@@ -567,7 +752,14 @@ public:
       debugger_bus (& this->data_bus),
       trace_stream (),
       trace_filename ("-"), // standard output
-      trace_pin (this, & basic_cpu::trace_pin_handler)
+      trace_pin (this, & basic_cpu::trace_pin_handler),
+      gprof (0),
+      gprof_configured_p (false),
+      configure_gprof_p (false),
+      last_caller (0),
+      last_callee (0),
+      core_probe (0),
+      main (0)
       {
 	// buses
 	this->data_bus = 0;
@@ -587,6 +779,8 @@ public:
 	add_pin ("start-pc-set!", & this->pc_set_pin);
 	add_pin ("cg-caller", & this->cg_caller_pin);
 	add_pin ("cg-callee", & this->cg_callee_pin);
+	add_pin ("cg-return", & this->cg_return_pin);
+	add_pin ("cg-jump", & this->cg_jump_pin);
 	add_pin ("print-insn-summary!", & this->print_insn_summary_pin);
 	add_pin ("endian-set!", & this->endian_set_pin);
 	add_pin ("eflags-set!", & this->eflags_set_pin);
@@ -625,7 +819,15 @@ public:
 	this->trace_counter_p = false;
 	add_attribute ("trace-counter?", & this->trace_counter_p, "setting");
 	this->final_insn_count_p = false;
-	add_attribute ("final-insn-count?", & this->final_insn_count_p, "setting");
+	this->print_final_insn_count_p = false;
+	add_attribute_notify ("final-insn-count?", & this->final_insn_count_p, this,
+			      & basic_cpu::update_final_insn_count_p,
+			      "setting");
+
+	// For dynamic configuration
+	add_uni_relation("gprof", &this->gprof);
+	add_uni_relation("core-probe", &this->core_probe);
+	add_uni_relation("main", &this->main);
       }
 
     virtual ~basic_cpu() throw() {}

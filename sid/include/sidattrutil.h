@@ -2,7 +2,7 @@
 // mappings between application objects and their string
 // representations.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2003 Red Hat.
+// Copyright (C) 1999, 2000, 2003, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -10,6 +10,7 @@
 #define SIDATTRUTIL_H
 
 #include <sidconfig.h>
+#include <sidcomputil.h>
 #include <sidpinutil.h>
 #include "sidtypes.h"
 
@@ -1017,17 +1018,51 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
       }
   };
 
+  // A configurable_component maintains a relationship with a
+  // sid-control-dynamic-configurator component and reconfigures itself
+  // when its configure! attribute is set.
+  class configurable_component:
+    public virtual fixed_attribute_map_component
+  {
+  public:
+    configurable_component ()
+      {
+	add_attribute_virtual ("configure!", this,
+			       & configurable_component::dynamic_config,
+			       & configurable_component::nothing);
+      }
+    ~configurable_component() throw() {}
+
+    // Dynamic reconfiguration support
+  private:
+    std::string configurable_component::nothing() { return ""; }
+  protected:
+    virtual component::status
+    dynamic_config(const std::string& spec)
+      {
+	// Call the configure method to handle each configuration item.
+	std::vector<std::string> parts = sidutil::tokenize (spec, ":");
+	unsigned size = parts.size ();
+	for (unsigned i = 0; i < size; ++i)
+	  configure (parts[i]);
+	return component::ok;
+      }
+
+    virtual void configure (const std::string &config) {}
+  };
+
   // A mix-in for classes with user logging.
   class fixed_attribute_map_with_logging_component
   : public virtual fixed_attribute_map_component,
-    public virtual fixed_pin_map_component
+    public virtual fixed_pin_map_component,
+    public virtual configurable_component
   {
   protected:
     fixed_attribute_map_with_logging_component () :
       ulog_level (0),
       ulog_mode ("less"),
       ulog_out_pin (),
-      buffer_output (true)
+      buffer_output (false)
       {
 	add_attribute ("buffer-output", &buffer_output, "setting");
 	add_attribute ("ulog-level", &ulog_level, "setting");
@@ -1038,7 +1073,6 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
     ~fixed_attribute_map_with_logging_component () throw()
       {
 	// Output any saved messages.
-	// output_saved_messages ();
 	ulog_logger->output_saved_messages ();
       }
 
@@ -1062,7 +1096,37 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
     sidutil::output_pin ulog_out_pin;
     bool buffer_output;
     sidutil::logger *ulog_logger;
+
+protected:
+    // Dynamic configuration support
+    virtual void configure (const string &config)
+      {
+	// Call up to the base class
+	configurable_component::configure (config);
+
+	// Handle items specific to this component
+	if (config.size () < 11)
+	  return;
+	if (config.substr (0, 10) == "ulog-mode=")
+	  {
+	    ulog_mode = config.substr (10);
+	    ulog_logger->set_attributes (buffer_output, ulog_level, ulog_mode);
+	    return;
+	  }
+	if (config.size () < 12)
+	  return;
+	if (config.substr (0, 11) == "ulog-level=")
+	  {
+	    sid::host_int_4 level;
+	    sid::component::status s = sidutil::parse_attribute (config.substr (11), level);
+	    if (s == sid::component::ok)
+	      ulog_level = level;
+	    ulog_logger->set_attributes (buffer_output, ulog_level, ulog_mode);
+	    return;
+	  }
+      }
   };
+
 }
 
 #endif // SIDATTRUTIL_H

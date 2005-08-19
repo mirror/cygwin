@@ -1,3 +1,87 @@
+2005-08-19  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute these changes:
+
+	2005-07-13  Dave Brolley  <brolley@redhat.com>
+
+	* compConfig.cxx (new_config_pin): Removed from
+	dynamic_configurator_component.
+	(clients): Added to dynamic_configurator_component.
+	(dynamic_configurator_component): Remove new-config pin. Add
+	clients as a multi relation.
+	(step_pin_handler): Set the configure! attribute of each component
+	related via the client relationship.
+	(do_configure): Set config_names[0] and config_specs[0] if the
+	handle is zero.
+	* sid-control-dynamic-configurator.xml: Document the removal of the
+	new-config pin and the addition of the clients relationship.
+	* sid-control-dynamic-configurator.txt: Regenerated.
+
+	2005-07-05  Dave Brolley  <brolley@redhat.com>
+
+	* compConfig.cxx (reset_pin_handler): New method of
+	dynamic_configurator_component.
+	(set_start_config): Likewise.
+	(reset): Likewise.
+	(reset_pin): New member of dynamic_configurator_component.
+	(config_error_pin): Likewise.
+	(dynamic_configurator_component): Initialize current_config, prev_config
+	and prev_user_config in the reset method. Add "start-config" attribute.
+	Add "reset" and "config-error" pins.
+	(configure): Check result of do_configure. Drive config_error_pin if not
+	ok.
+	(configure_pin_handler): Drive config_error_pin if the handle is not
+	valid.
+	* sid-control-dynamic-configurator.xml: Document the "config-error" and "reset"
+	pins
+	* sid-control-dynamic-configurator.txt: Regenerated.
+
+	2005-06-21  Dave Brolley  <brolley@redhat.com>
+
+	* compConfig.cxx (step_pin_handler): Always drive new_config_pin.
+
+	2005-06-06  Dave Brolley  <brolley@redhat.com>
+
+	* Makefile.am (pkgdata_DATA): Add sid-control-dynamic-configurator.txt.
+	* Makefile.in: Regenerated.
+	* compConfig.cxx (cfgroot_component::configure): Renamed to
+	configure_file.
+	(restore_config,set_syscall_config,check_config_change): New methods of
+	dynamic_configurator_component.
+	(in_function): Likewise.
+	(prev_user_config): New member of dynamic_configurator_component.
+	(dynamic_configurator_component): Prime the config_stack with a dummy
+	entry.
+	(add_warmup_functions): Tokenize based on ",".
+	(add_profile_functions): Move on to the next spec on parse error.
+	(dynamic_configurator_component::configure): Drive config_result_pin with
+	prev_user_config. Call set_syscall_config and check_config_change.
+	(do_configure): Don't drive the config_result_pin here. Don't drive the
+	step_control_pin here. Duplicate the first stack entry for the first
+	config in the dummy entry of the stack. Now takes a reference to a
+	config handle.
+	(configure_pin_handler): Drive the config_result_pin with prev_user_config.
+	Call restore_config, sys_syscall_config and check_config_change.
+	(function_callee_pin_handler): Always use sid-internal-warmup for _Sid_config.
+	(function_return_pin_handler): Return if the loader can't identify the current
+	function. Call restore_config and check_config_change.
+	* sid-control-dynamic-configurator.txt: New file.
+	* sid-control-dynamic-configurator.xml: New file.
+
+	2005-05-29  Dave Brolley  <brolley@redhat.com>
+
+	* compConfig.cxx (std::pair,sidutil::tokenize): Add using clause for these.
+	(dynamic_config,lookup_dynamic_config): New methods of cfgroot_component.
+	(dynamic_configs,found_dynamic_config): New members of cfgroot_component.
+	(configure_line): Initialize num_invalid_chars.
+	(cfgroot_component): Initialize dynamic_configs and found_dynamic_config.
+	Add virtual attributes dynamic-config! and lookup-dynamic-config!. Add
+	attribute found-dynamic-config.
+	(dynamic_configurator_component): New class.
+	(compConfigListTypes): Push back sid-control-dynamic-configurator.
+	(compConfigCreate): Handle sid-control-dynamic-configurator.
+	(compConfigDelete): Delete dynamic_configurator_component.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* configure.in: Remove call to AC_ARG_PROGRAM, to avoid autoconf

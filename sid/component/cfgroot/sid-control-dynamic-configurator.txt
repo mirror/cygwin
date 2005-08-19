@@ -1,0 +1,156 @@
+       sid-control-dynamic-configurator (internal :: config_component_library)
+
+Synopsis:
+
+   This component manages configuration profiles for a board.
+
+     ----------------------------------------------------------------------
+
+Functionality:
+
+  Modelling:
+
+   This component manages dynamic configuration of a board based upon the
+   setting of an attribute, the driving of an input pin and entry/exit
+   to/from functions. The selected configurations are made available to other
+   components in the system which then reconfigure themselves accordingly.
+
+   This component does not correspond to hardware.
+
+   +-------------------------------------------------------------+
+   |                          Behaviors                          |
+   |-------------------------------------------------------------|
+   |configuration|When the configure! attribute is written to,   |
+   |             |the value is interpreted as the name of a      |
+   |             |configuration spec. The corresponding          |
+   |             |configuration string is then obtained from the |
+   |             |configuration root component by setting its    |
+   |             |lookup-dynamic-config! attribute and then, if  |
+   |             |successful, reading its found-dynamic-config   |
+   |             |attribute. A numeric handle is assigned to this|
+   |             |configuration. The handle of the previous      |
+   |             |configuration is driven and its value is driven|
+   |             |on the config-result pin.                      |
+   |             |                                               |
+   |             |When the configure! pin is driven, the value is|
+   |             |interpreted as the handle of a configuration   |
+   |             |which was previously driven on the             |
+   |             |config-result pin. This configuration is then  |
+   |             |selected and the handle of the previous        |
+   |             |configuration is driven on the config-result   |
+   |             |                                               |
+   |             |When the profile-functions! attribute is       |
+   |             |written to, the value is interpreted as a      |
+   |             |specification of the form                      |
+   |             |FUNCTION_NAME[,FUNCTION_NAME]*:CONFIG_NAME,    |
+   |             |where FUNCTION_NAME is the name of a function  |
+   |             |in the target software and CONFIG_NAME is the  |
+   |             |name of a configuration specified to the       |
+   |             |configuration root component via its           |
+   |             |dynamic-config attribute. The listed functions |
+   |             |are then associated with the named             |
+   |             |configuration. The function-caller!,           |
+   |             |function-callee!, function-jump! and           |
+   |             |function-return! pins should be driven by the  |
+   |             |cpu component as the target software executes. |
+   |             |The values driven on these pins are interpreted|
+   |             |as memory addresses containing executable code.|
+   |             |The addresses are driven on the                |
+   |             |function-address, which should be connected to |
+   |             |the function? pin of the board's loader        |
+   |             |component. The name of the corresponding       |
+   |             |function is then obtained from the loader's    |
+   |             |current-function attribute. If the named       |
+   |             |function is associated with a configuration,   |
+   |             |that configuration is then selected.           |
+   |             |                                               |
+   |             |When the warmup-functions! attribute is written|
+   |             |to, the value is interpreted as a              |
+   |             |comma-separated list of function names in the  |
+   |             |target software. The listed functions are then |
+   |             |associated with the configuration named        |
+   |             |sid-internal-warmup. When one of the listed    |
+   |             |functions is entered (see profile-fuinctions!  |
+   |             |above), this configuration is selected. The    |
+   |             |special function _Sid_config should be         |
+   |             |specified as a warmup function and it does not |
+   |             |restore the previous configuration when        |
+   |             |returning to the function which called it.     |
+   |-------------+-----------------------------------------------|
+   |      running|When the step! is driven, and the currently    |
+   |             |selected configuration has changed since the   |
+   |             |previous time the step! was driven, the handle |
+   |             |of the currently selected configuration is     |
+   |             |driven on the new-config and the string        |
+   |             |representing the current configuration is made |
+   |             |available via the current-config attribute.    |
+   |             |                                               |
+   |             |When a new configuration is selected, using one|
+   |             |of the methods above, the step-control is      |
+   |             |driven with the value 1.                       |
+   +-------------------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |           supervisory | supported        | -    |
+   |-----------------------+------------------+------|
+   |          save/restore | not supported    | -    |
+   |-----------------------+------------------+------|
+   |         triggerpoints | not supported    | -    |
+   |-----------------------+------------------+------|
+   |     recursion-inhibit | not supported    | -    |
+   |-----------------------+------------------+------|
+   |            categories | not supported    | -    |
+   +-------------------------------------------------+
+
+     ----------------------------------------------------------------------
+
+Environment:
+
+     ----------------------------------------------------------------------
+
+Component Reference:
+
+  Component: sid-control-dynamic-configurator
+
+   +--------------------------------------------------------------+
+   |                             pins                             |
+   |--------------------------------------------------------------|
+   |      name      |direction|     legalvalues     |  behaviors  |
+   |----------------+---------+---------------------+-------------|
+   |step!           |in       |any                  |running      |
+   |----------------+---------+---------------------+-------------|
+   |step-control    |out      |1                    |running      |
+   |----------------+---------+---------------------+-------------|
+   |configure!      |in       |configuration handle |configuration|
+   |----------------+---------+---------------------+-------------|
+   |new-config      |out      |configuration handle |configuration|
+   |----------------+---------+---------------------+-------------|
+   |config-result   |out      |configuration handle |configuration|
+   |----------------+---------+---------------------+-------------|
+   |function-caller!|in       |address              |configuration|
+   |----------------+---------+---------------------+-------------|
+   |function-callee!|in       |address              |configuration|
+   |----------------+---------+---------------------+-------------|
+   |function-jump!  |in       |address              |configuration|
+   |----------------+---------+---------------------+-------------|
+   |function-return!|in       |address              |configuration|
+   |----------------+---------+---------------------+-------------|
+   |function-address|out      |address              |configuration|
+   +--------------------------------------------------------------+
+
+   +-------------------------------------------------------------------+
+   |                            attributes                             |
+   |-------------------------------------------------------------------|
+   |        name        | category | legal  | default |   behaviors   ||
+   |                    |          | values |  value  |               ||
+   |--------------------+----------+--------+---------+---------------||
+   |warmup-functions!   |-         |-       |-        |configuration  ||
+   |--------------------+----------+--------+---------+---------------||
+   |profile-functions!  |-         |-       |-        |configuration  ||
+   |--------------------+----------+--------+---------+---------------||
+   |configure!          |-         |-       |-        |configuration  ||
+   |--------------------+----------+--------+---------+---------------||
+   |current-config      |-         |-       |-        |configuration  ||
+   +-------------------------------------------------------------------+

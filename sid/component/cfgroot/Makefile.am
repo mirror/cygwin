@@ -14,7 +14,7 @@ libconfig_la_LDFLAGS = -module -no-undefined
 libconfig_la_LIBADD = @LIBLTDL@
 libconfig_la_DEPENDENCIES = @LIBLTDL@
 
-pkgdata_DATA = sid-control-cfgroot.txt
+pkgdata_DATA = sid-control-cfgroot.txt sid-control-dynamic-configurator.txt
 
 DEJAGNUTESTS=badconf.exp
 check-local: all

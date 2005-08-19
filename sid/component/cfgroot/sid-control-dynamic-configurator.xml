@@ -1,0 +1,129 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="internal" dlsym="config_component_library">
+  <defcomponent name="sid-control-dynamic-configurator" type="concrete">
+
+    <!-- pins -->
+    <defpin name="reset"		direction="in"  legalvalues="any"			behaviors="initialization" />
+    <defpin name="step!"		direction="in"  legalvalues="any"			behaviors="running" />
+    <defpin name="step-control"		direction="out" legalvalues="1"			behaviors="running" />
+    <defpin name="configure!"		direction="in"  legalvalues="configuration handle"	behaviors="configuration" />
+    <defpin name="config-result"	direction="out" legalvalues="configuration handle"	behaviors="configuration" />
+    <defpin name="config-error"	        direction="out" legalvalues="error code"	behaviors="configuration" />
+    <defpin name="function-caller!"	direction="in"  legalvalues="address"		behaviors="configuration" />
+    <defpin name="function-callee!"	direction="in"  legalvalues="address"		behaviors="configuration" />
+    <defpin name="function-jump!"	direction="in"  legalvalues="address"		behaviors="configuration" />
+    <defpin name="function-return!"	direction="in"  legalvalues="address"		behaviors="configuration" />
+    <defpin name="function-address"	direction="out" legalvalues="address"		behaviors="configuration" />
+
+    
+    <!-- attributes -->
+    <defattribute name ="warmup-functions!"	default="function list" behaviors="configuration" />
+    <defattribute name ="profile-functions!"	default="config spec"   behaviors="configuration" />
+    <defattribute name ="configure!"		default="config name"   behaviors="configuration" />
+    <defattribute name ="current-config"	default="config string" behaviors="configuration" />
+    
+    <!-- relationships -->
+    <defrelationship name="client"	behaviors="configuration" />
+    <defrelationship name="loader"	behaviors="configuration" />
+    <defrelationship name="main"	behaviors="configuration" />
+    
+  </defcomponent>
+
+  <synop>This component manages configuration profiles for a board.
+  </synop>
+
+  <func>
+    <modelling>
+      <p>
+      This component manages dynamic configuration of a board based upon the setting of an
+      attribute, the driving of an input pin and entry/exit to/from functions.  The selected
+      configurations are made available to other components in the system which then reconfigure
+      themselves accordingly.</p>
+
+      <p>This component does not correspond to hardware.</p>
+    </modelling>
+
+    <behavior name="configuration">
+
+      <p>
+      When the <attribute>configure!</attribute> attribute is written to, the value is
+      interpreted as the name of a configuration spec.  The corresponding configuration
+      string is then obtained from the configuration root component by setting its
+      <attribute>lookup-dynamic-config!</attribute> attribute and then, if successful,
+      reading its <attribute>found-dynamic-config</attribute> attribute.  A numeric handle
+      is assigned to this configuration. The handle of the previous configuration is driven
+      on the <pin>config-result</pin> pin. If an error occurs, a non-zero
+      value will be driven on the <pin>config-error</pin> pin.</p>
+
+      <p>
+      When the <pin>configure!</pin> pin is driven, the value is interpreted as
+      the handle of a configuration which was previously driven on the <pin>config-result</pin>
+      pin. This configuration is then selected and the handle of the previous configuration is
+      driven on the <pin>config-result</pin>. If an error occurs, a non-zero
+      value will be driven on the <pin>config-error</pin> pin.</p>
+
+      <p>
+      When the <attribute>profile-functions!</attribute> attribute is written to, the value is
+      interpreted as a specification of the form FUNCTION_NAME[,FUNCTION_NAME]*:CONFIG_NAME,
+      where FUNCTION_NAME is the name of a function in the target software and CONFIG_NAME is
+      the name of a configuration specified to the configuration root component via its
+      <attribute>dynamic-config</attribute> attribute. The listed functions are then associated
+      with the named configuration.  The <pin>function-caller!</pin>, <pin>function-callee!</pin>,
+      <pin>function-jump!</pin> and <pin>function-return!</pin> pins should be driven by the cpu
+      component as the target software executes.  The values driven on these pins are interpreted as
+      memory addresses containing executable code. The addresses are driven on the <pin>function-address</pin>,
+      which should be connected to the <pin>function?</pin> pin of the board's loader component. The name
+      of the corresponding function is then obtained from the loader's <attribute>current-function</attribute>
+      attribute. If the named function is associated with a configuration, that configuration is then
+      selected.</p>
+
+      <p>
+      When the <attribute>warmup-functions!</attribute> attribute is written to, the value is
+      interpreted as a comma-separated list of function names in the target software.  The listed
+      functions are then associated with the configuration named sid-internal-warmup.  When one of
+      the listed functions is entered (see <attribute>profile-fuinctions!</attribute> above), this
+      configuration is selected.  The special function _Sid_config should be specified as a
+      warmup function and it does not restore the previous configuration when returning to the function
+      which called it.</p>
+
+    </behavior>
+
+    <behavior name="initialization">
+
+      <p>
+      When the <pin>reset</pin> pin is driven, the configuration identified by the
+      <attribute>start-config</attribute> attribute is selected.</p>
+
+    </behavior>
+
+    <behavior name="running">
+
+      <p>
+      When the <pin>step!</pin> is driven, and the currently selected configuration has changed since the previous
+      time the <pin>step!</pin> was driven, the specifiction of the currently selected configuration is passed
+      on the <pin>new-config</pin> and the string representing the current configuration is made available
+      to each component related via the <relationship>client</relationship> by setting their
+      <attribute>configure!</attribute> attributes. Each client is then responsible for interpreting the
+      specification and configuring themselves accordingly.
+      </p> 
+
+      <p>
+      When a new configuration is selected, using one of the methods above, the <pin>step-control</pin> is
+      driven with the value 1.</p>
+
+    </behavior>
+
+    <convention name="supervisory" supported="true"/>
+    <convention name="save/restore" supported="false">state is minimal.</convention>
+    <convention name="triggerpoints" supported="false"/>
+    <convention name="recursion-inhibit" supported="false"/>
+    <convention name="categories" supported="false"/>
+
+  </func>
+  <env>
+  </env>
+
+  
+</defcomplib>

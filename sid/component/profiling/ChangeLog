@@ -1,3 +1,31 @@
+2005-08-19  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+
+	2005-07-13  Dave Brolley  <brolley@redhat.com>
+
+	* gprof.cxx (gprof_component): Inherit virtually from
+	fixed_attribute_map_component.
+
+	2005-05-29  Dave Brolley  <brolley@redhat.com>
+
+	* gprof.cxx: Keep a vector of statistics to allow switching from
+	one output file to another dynamically.
+	(sid::pin,sidutil::configurable_component)
+	(sidutil::output_pin,sidutil::tokenize): Add using clauses.
+	(profiling_components): Inherit virtually from fixed_pin_map_component
+	and fixed_relation_map_component. Inherit from configurable_component.
+	(statistics): New struct type.
+	(stats,current_stats): New members of gprof_component.
+	(set_nothing,value_min_get,value_max_get,value_count_get,limit_min_get)
+	(limit_min_set,limit_max_get,limit_max_set,output_file_get)
+	(output_file_set): New methods of gprof_component.
+	(reset): Initialize stats vector.
+	(store): Call store stats for each element of the stats vector.
+	(configure): New virtual override in gprof_component.
+	(gprof_component): Call reset. Add sim-sched-event attribute. Add
+	sim-sched relation.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.in: Regenerated with Automake 1.9.5.

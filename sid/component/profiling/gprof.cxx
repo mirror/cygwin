@@ -1,6 +1,6 @@
 // gprof.cxx - A component for generating gprof profile data.  -*- C++ -*-
 
-// Copyright (C) 1999-2002 Red Hat.
+// Copyright (C) 1999-2002, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -52,16 +52,20 @@ namespace profiling_components
   using sid::little_int_1;
   using sid::component;
   using sid::bus;
+  using sid::pin;
 
   using sidutil::fixed_pin_map_component;
   using sidutil::fixed_attribute_map_component;
   using sidutil::no_bus_component;
   using sidutil::no_accessor_component;
   using sidutil::fixed_relation_map_component;
+  using sidutil::configurable_component;
   using sidutil::input_pin;
+  using sidutil::output_pin;
   using sidutil::callback_pin;
   using sidutil::make_attribute;
   using sidutil::parse_attribute;
+  using sidutil::tokenize;
   using sidutil::std_error_string;
   using sidutil::endian;
   using sidutil::endian_unknown;
@@ -84,27 +88,56 @@ namespace profiling_components
 // ----------------------------------------------------------------------------
 
   class gprof_component: public virtual component,
-			 protected fixed_pin_map_component,
+			 protected virtual fixed_pin_map_component,
 			 protected no_accessor_component,
-			 protected fixed_attribute_map_component,
-			 protected fixed_relation_map_component,
-			 protected no_bus_component
+			 protected virtual fixed_attribute_map_component,
+			 protected virtual fixed_relation_map_component,
+			 protected no_bus_component,
+			 protected configurable_component
   {
     typedef map<host_int_4,host_int_4> hitcount_map_t;
     typedef map<pair<host_int_4,host_int_4>,host_int_4> cg_count_map_t;
     
     // statistics
-    hitcount_map_t value_hitcount_map;
-    cg_count_map_t cg_count_map;
-    host_int_4 value_count;
-    host_int_4 value_min, value_max;
-    host_int_4 limit_min, limit_max;
-    host_int_4 bucket_size;
+    struct statistics
+    {
+      hitcount_map_t value_hitcount_map;
+      cg_count_map_t cg_count_map;
+      host_int_4 value_count;
+      host_int_4 value_min, value_max;
+      host_int_4 limit_min, limit_max;
+      host_int_4 bucket_size;
+      string output_file;
+      statistics () :
+	value_count (0),
+	value_min (~0),
+	value_max (0),
+	limit_min (0),
+	limit_max (~0),
+	bucket_size (1), // != 0
+	output_file ("")
+        { }
+      const statistics &operator= (const statistics &other)
+        {
+	  this->value_count = other.value_count;
+	  this->value_min   = other.value_min;
+	  this->value_max   = other.value_max;
+	  this->limit_min   = other.limit_min;
+	  this->limit_max   = other.limit_max;
+	  this->bucket_size = other.bucket_size;
+	  this->output_file = other.output_file;
+	}
+    };
+
+    vector<statistics> stats;
+    unsigned current_stats;
+
+    component *sim_sched;
+    string sim_sched_event;
 
     string target_attribute;
     component* target_component;
 
-    string output_file;
     endian output_file_format;
 
     callback_pin<gprof_component> accumulate_pin;
@@ -115,9 +148,59 @@ namespace profiling_components
     callback_pin<gprof_component> reset_pin;
     callback_pin<gprof_component> store_pin;
 
+    component::status set_nothing (const string& str)
+      {
+	return component::bad_value;
+      }
+
+    string value_min_get()
+      {
+	return make_attribute (this->stats[current_stats].value_min);
+      }
+
+    string value_max_get()
+      {
+	return make_attribute (this->stats[current_stats].value_max);
+      }
+
+    string value_count_get()
+      {
+	return make_attribute (this->stats[current_stats].value_count);
+      }
+
+    string limit_min_get()
+      {
+	return make_attribute (this->stats[current_stats].limit_min);
+      }
+
+    component::status limit_min_set(const string& str)
+      {
+	host_int_4 new_limit_min;
+	component::status s = parse_attribute (str, new_limit_min);
+	// Reject malformed input
+	if (s == component::ok)
+	  this->stats[current_stats].limit_min = new_limit_min;
+	return s;
+      }
+
+    string limit_max_get()
+      {
+	return make_attribute (this->stats[current_stats].limit_max);
+      }
+
+    component::status limit_max_set(const string& str)
+      {
+	host_int_4 new_limit_max;
+	component::status s = parse_attribute (str, new_limit_max);
+	// Reject malformed input
+	if (s == component::ok)
+	  this->stats[current_stats].limit_max = new_limit_max;
+	return s;
+      }
+
     string bucket_size_get()
       {
-	return make_attribute (this->bucket_size);
+	return make_attribute (this->stats[current_stats].bucket_size);
       }
 
     component::status bucket_size_set(const string& str)
@@ -129,8 +212,8 @@ namespace profiling_components
 	if (s != component::ok) return s;
 
 	// Reject change if we already have samples 
-	if ((this->value_count != 0) &&
-	    (this->bucket_size != new_bucket_size))
+	if ((this->stats[current_stats].value_count != 0) &&
+	    (this->stats[current_stats].bucket_size != new_bucket_size))
 	  {
 	    cerr << "sw-profile-gprof: invalid time to change bucket size" << endl;
 	    return component::bad_value;
@@ -143,10 +226,21 @@ namespace profiling_components
 	    return component::bad_value;
 	  }
 
-	this->bucket_size = new_bucket_size;
+	this->stats[current_stats].bucket_size = new_bucket_size;
 	return component::ok;
       }
 
+
+    string output_file_get()
+      {
+	return this->stats[current_stats].output_file;
+      }
+
+    component::status output_file_set(const string& str)
+      {
+	this->stats[current_stats].output_file = str;
+	return component::ok;
+      }
 
     void accumulate (host_int_4)
       {
@@ -156,18 +250,18 @@ namespace profiling_components
 	host_int_4 value;
 	component::status s = parse_attribute (value_str, value);
 	if (s != component::ok) return;
-
+	//	std::cout << "sampled at 0x" << std::hex << value << std::dec << " for " << stats[current_stats].output_file << endl;
 	// Reject out-of-bounds samples
-	if (value < this->limit_min || value > this->limit_max) return;
+	if (value < this->stats[current_stats].limit_min || value > this->stats[current_stats].limit_max) return;
 
-	value_count ++;
+	stats[current_stats].value_count ++;
 
-	assert (this->bucket_size != 0);
-	host_int_4 quantized = (value / this->bucket_size) * this->bucket_size;
+	assert (this->stats[current_stats].bucket_size != 0);
+	host_int_4 quantized = (value / this->stats[current_stats].bucket_size) * this->stats[current_stats].bucket_size;
 
-	if (quantized < this->value_min) this->value_min = quantized;
-	if (quantized > this->value_max) this->value_max = quantized;
-	this->value_hitcount_map [quantized] ++;
+	if (quantized < this->stats[current_stats].value_min) this->stats[current_stats].value_min = quantized;
+	if (quantized > this->stats[current_stats].value_max) this->stats[current_stats].value_max = quantized;
+	this->stats[current_stats].value_hitcount_map [quantized] ++;
       }
 
     void accumulate_call (host_int_4 selfpc)
@@ -175,31 +269,35 @@ namespace profiling_components
 	host_int_4 callerpc = this->cg_caller_pin.sense();
 
 	// Reject out-of-bounds samples
-	if (selfpc < this->limit_min || selfpc > this->limit_max) return;
-	if (callerpc < this->limit_min || callerpc > this->limit_max) return;
+	if (selfpc < this->stats[current_stats].limit_min || selfpc > this->stats[current_stats].limit_max) return;
+	if (callerpc < this->stats[current_stats].limit_min || callerpc > this->stats[current_stats].limit_max) return;
 
-	value_count ++;
+	stats[current_stats].value_count ++;
 
-	assert (this->bucket_size != 0);
-	host_int_4 c_quantized = (callerpc / this->bucket_size) * this->bucket_size;
-	host_int_4 s_quantized = (selfpc / this->bucket_size) * this->bucket_size;
+	assert (this->stats[current_stats].bucket_size != 0);
+	host_int_4 c_quantized = (callerpc / this->stats[current_stats].bucket_size) * this->stats[current_stats].bucket_size;
+	host_int_4 s_quantized = (selfpc / this->stats[current_stats].bucket_size) * this->stats[current_stats].bucket_size;
 
-	if (c_quantized < this->value_min) this->value_min = c_quantized;
-	if (s_quantized < this->value_min) this->value_min = s_quantized;
-	if (c_quantized > this->value_max) this->value_max = c_quantized;
-	if (s_quantized > this->value_max) this->value_max = s_quantized;
+	if (c_quantized < this->stats[current_stats].value_min) this->stats[current_stats].value_min = c_quantized;
+	if (s_quantized < this->stats[current_stats].value_min) this->stats[current_stats].value_min = s_quantized;
+	if (c_quantized > this->stats[current_stats].value_max) this->stats[current_stats].value_max = c_quantized;
+	if (s_quantized > this->stats[current_stats].value_max) this->stats[current_stats].value_max = s_quantized;
 
-	this->cg_count_map [make_pair(c_quantized,s_quantized)] ++;
+	this->stats[current_stats].cg_count_map [make_pair(c_quantized,s_quantized)] ++;
       }
 
 
     void reset (host_int_4)
       {
-	this->cg_count_map.clear ();
-	this->value_hitcount_map.clear ();
-	this->value_min = ~0;
-	this->value_max = 0;
-	value_count = 0;
+	statistics new_stats;
+	if (! stats.empty ())
+	  {
+	    new_stats.bucket_size = stats[0].bucket_size;
+	    new_stats.output_file = stats[0].output_file;
+	  }
+	stats.clear ();
+	stats.push_back (new_stats);
+	current_stats = 0;
       }
 
 
@@ -257,12 +355,23 @@ namespace profiling_components
 	    return;
 	  }
 
-	ofstream of (this->output_file.c_str (),
+	for (vector<statistics>::iterator it = stats.begin ();
+	     it != stats.end ();
+	     ++it)
+	  store_stats (*it);
+      }
+
+    void store_stats (statistics &stats)
+      {
+	if (stats.output_file.empty ())
+	  stats.output_file = "gmon.out";
+
+	ofstream of (stats.output_file.c_str (),
                      ios::out | ios::trunc | ios::binary);
 	if (! of.good())
 	  {
 	    cerr << "sw-profile-gprof: Error opening "
-		 << this->output_file << ":" << std_error_string();
+		 << stats.output_file << ":" << std_error_string();
 	    return;
 	  }
 
@@ -275,7 +384,7 @@ namespace profiling_components
 	put_bytes (of, host_int_4(0), 4);      // gmon_hdr.spare
 	put_bytes (of, host_int_4(0), 4);      // gmon_hdr.spare
 
-	if (! this->value_hitcount_map.empty())
+	if (! stats.value_hitcount_map.empty())
 	  {
 	    // We may have to loop and dump out several adjacent histogram
 	    // tables, because histogram bucket count overflow.  The
@@ -284,18 +393,18 @@ namespace profiling_components
 	    // histogram tables.  We copy the histogram table here, since
 	    // its counters will be decremented by up to 2**16-1 per
 	    // iteration.
-	    hitcount_map_t value_hitcount_map_copy = this->value_hitcount_map;
+	    hitcount_map_t value_hitcount_map_copy = stats.value_hitcount_map;
 	    while (true)
 	      {
 		// write a new histogram record
 		// GMON_Record_Tag
 		put_bytes (of, host_int_1(0), 1);      // GMON_TAG_TIME_HIST
 		// gmon_hist_hdr
-		put_bytes (of, this->value_min, 4);    // gmon_hist_hdr.low_pc
-		host_int_4 uprounded_value_max = this->value_max + this->bucket_size;
+		put_bytes (of, stats.value_min, 4);    // gmon_hist_hdr.low_pc
+		host_int_4 uprounded_value_max = stats.value_max + stats.bucket_size;
 		put_bytes (of, uprounded_value_max, 4); // gmon_hist_hdr.high_pc
-		assert (this->bucket_size != 0);
-		host_int_4 num_buckets = 1 + (this->value_max - this->value_min) / this->bucket_size;
+		assert (stats.bucket_size != 0);
+		host_int_4 num_buckets = 1 + (stats.value_max - stats.value_min) / stats.bucket_size;
 		put_bytes (of, num_buckets, 4);        // gmon_hist_hdr.hist_size
 		put_bytes (of, host_int_4(1), 4);      // gmon_hist_hdr.prof_rate
 		put_bytes (of, "tick", 15);            // gmon_hist_hdr.dimen
@@ -303,9 +412,9 @@ namespace profiling_components
 		
 		// Dump out histogram counts
 		bool overflow = false;
-		for (host_int_4 bucket = this->value_min;
-		     bucket <= this->value_max;
-		     bucket += this->bucket_size)
+		for (host_int_4 bucket = stats.value_min;
+		     bucket <= stats.value_max;
+		     bucket += stats.bucket_size)
 		  {
 		    const host_int_4 max_count = 65535;
 		    host_int_4 count = 0;
@@ -337,8 +446,8 @@ namespace profiling_components
 	  } // (emitting hash table?)
 
 	// Now spit out the call graph stastics.
-	cg_count_map_t::const_iterator ci = this->cg_count_map.begin();
-	while (ci != this->cg_count_map.end())
+	cg_count_map_t::const_iterator ci = stats.cg_count_map.begin();
+	while (ci != stats.cg_count_map.end())
 	  {
 	    // write a new histogram record
 	    // GMON_Record_Tag
@@ -355,26 +464,92 @@ namespace profiling_components
 	of.close ();
       }
 
+    void configure (const string &config)
+      {
+	// Call up to the base classes first
+	configurable_component::configure (config);
+
+	// Now handle relevent configuration for us.
+	if (config.size () < 6)
+	  return;
+	if (config.substr (0, 6) == "gprof=")
+	  {
+	    // If a filename has been specified, then see if we need to switch files.
+	    if (config.size () > 6)
+	      {
+		vector<string> parts = tokenize (config.substr (6), ",");
+
+		// Special case: Default stats have not yet been assigned an
+		// output file and no data has been collected yet. Simply
+		// assign this file name.
+		if (current_stats == 0 && stats[0].value_count == 0
+		    && stats[0].output_file.empty ())
+		  stats[0].output_file = parts[0];
+		else
+		  {
+		    unsigned size = stats.size ();
+		    unsigned i;
+		    for (i = 0; i < size; ++i)
+		      if (stats[i].output_file == parts[0])
+			break;
+		    // This is a new output file, so create new stats for it.
+		    if (i >= size)
+		      {
+			statistics new_stats;
+			new_stats.bucket_size = stats[0].bucket_size;
+			new_stats.output_file = parts[0];
+			stats.push_back (new_stats);
+		      }
+		    current_stats = i;
+		  }
+
+		// If cycles was specified, then we need to be subscribed to the
+		// target scheduler
+		if (! sim_sched)
+		  return;
+		if (parts.size () == 2)
+		  {
+		    host_int_4 cycles;
+		    component::status s = parse_attribute (parts[1], cycles);
+		    if (s == component::ok)
+		      {
+			sim_sched->connect_pin (sim_sched_event + "-event", & accumulate_pin);
+			sim_sched->set_attribute_value (sim_sched_event + "-regular", "true");
+			sim_sched->set_attribute_value (sim_sched_event + "-time", make_attribute (cycles));
+			return;
+		      }
+		  }
+	      }
+	    // No gprof config or cycles was not specified. We will not be triggered by the
+	    // target scheduler.
+	    if (sim_sched)
+	      {
+		sim_sched->disconnect_pin (sim_sched_event + "-event", & accumulate_pin);
+		sim_sched->set_attribute_value (sim_sched_event + "-regular", "false");
+	      }
+	    return;
+	  }
+      }
 
   public:
     gprof_component ():
-      value_count (0),
-      value_min (~0),
-      value_max (0),
-      limit_min (0),
-      limit_max (~0),
-      bucket_size (1), // != 0
+      sim_sched (0),
+      sim_sched_event ("0"),
       target_attribute ("pc"),
       target_component (0),
-      output_file ("gmon.out"),
       output_file_format (endian_unknown),
       accumulate_pin (this, & gprof_component::accumulate),
       cg_callee_pin (this, & gprof_component::accumulate_call),
       reset_pin (this, & gprof_component::reset),
-      store_pin (this, & gprof_component::store)
+      store_pin (this, & gprof_component::store),
+      current_stats (0)
       {
+	// Reset before adding attributes etc.
+	reset (1);
+
 	add_pin ("sample", & this->accumulate_pin);
 	add_attribute ("sample", & this->accumulate_pin, "pin");
+	add_attribute ("sim-sched-event", & this->sim_sched_event, "setting");
 	add_pin ("cg-caller", & this->cg_caller_pin);
 	add_attribute ("cg-caller", & this->cg_caller_pin, "pin");
 	add_pin ("cg-callee", & this->cg_callee_pin);
@@ -387,15 +562,34 @@ namespace profiling_components
 			       & gprof_component::bucket_size_get,
 			       & gprof_component::bucket_size_set,
 			       "setting");
-	add_attribute_ro ("value-min", & this->value_min, "register");
-	add_attribute_ro ("value-max", & this->value_max, "register");
-	add_attribute_ro ("value-count", & this->value_count, "register");
-	add_attribute ("limit-min", & this->limit_min, "setting");
-	add_attribute ("limit-max", & this->limit_max, "setting");
+	add_attribute_virtual ("value-min", this,
+			       & gprof_component::value_min_get,
+			       & gprof_component::set_nothing, // ro
+			       "setting");
+	add_attribute_virtual ("value-max", this,
+			       & gprof_component::value_max_get,
+			       & gprof_component::set_nothing, // ro
+			       "setting");
+	add_attribute_virtual ("value-count", this,
+			       & gprof_component::value_count_get,
+			       & gprof_component::set_nothing, // ro
+			       "setting");
+	add_attribute_virtual ("limit-min", this,
+			       & gprof_component::limit_min_get,
+			       & gprof_component::limit_min_set,
+			       "setting");
+	add_attribute_virtual ("limit-max", this,
+			       & gprof_component::limit_max_get,
+			       & gprof_component::limit_max_set,
+			       "setting");
 	add_attribute ("value-attribute", & this->target_attribute, "setting");
-	add_attribute ("output-file", & this->output_file, "setting");
+	add_attribute_virtual ("output-file", this,
+			       & gprof_component::output_file_get,
+			       & gprof_component::output_file_set,
+			       "setting");
 	add_attribute ("output-file-endianness", & this->output_file_format, "setting");
 	add_uni_relation ("target-component", & this->target_component);
+	add_uni_relation ("sim-sched", & this->sim_sched);
       }
     ~gprof_component () throw () { }
   };

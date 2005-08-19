@@ -1,6 +1,6 @@
 // gdb.cxx - GDB stub implementation.  -*- C++ -*-
 
-// Copyright (C) 1999-2002, 2004 Red Hat.
+// Copyright (C) 1999-2002, 2004, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -1819,6 +1819,24 @@ gdb::target_tx_handler (host_int_4 value)
     }
 }
 
+
+void
+gdb::configure (const string &config)
+{
+  // Call up to the base class first
+  configurable_component::configure (config);
+
+  // Now handle relevent configuration for us.
+  if (config.size () <= 8)
+    return;
+  if (config.substr (0, 8) == "verbose=")
+    {
+      bool verbose_p = (config.substr (8) == "true");
+      trace_gdbserv = verbose_p;
+      trace_gdbsid = verbose_p;
+      return;
+    }
+}
 
 
 gdb::~gdb() throw()

@@ -1,3 +1,21 @@
+2005-08-19  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+
+	2005-07-13  Dave Brolley  <brolley@redhat.com>
+
+	* gdb.h (configurable_component): Inherit virtually from
+	fixed_attribute_map_component.
+
+	2005-06-06  Dave Brolley  <brolley@redhat.com>
+
+	* gdb.cxx (configure): New virtual override in gdb.
+	* gdb.h (configure): Likewise.
+	(gdb): fixed_pin_map_component, fixed_relation_map_component and
+	configurable_component inherited virtually.
+	* sw-debug-gdb.xml: Add description of new interfaces.
+	* sw-debug-gdb.txt: Regenerated.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.in: Regenerated with Automake 1.9.5.

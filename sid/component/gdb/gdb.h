@@ -1,6 +1,6 @@
 // gdb.h - description.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -54,6 +54,7 @@ using sidutil::no_bus_component;
 using sidutil::no_accessor_component;
 using sidutil::fixed_relation_map_component;
 using sidutil::fixed_pin_map_component;
+using sidutil::configurable_component;
 using sidutil::callback_pin;
 using sidutil::output_pin;
 using sidutil::input_pin;
@@ -67,11 +68,12 @@ using sidutil::map_watchable_name;
 using sidutil::tokenize;
 
 class gdb: public virtual component,
-	   public fixed_attribute_map_component,
-	   public fixed_pin_map_component,
+	   public virtual fixed_attribute_map_component,
+	   public virtual fixed_pin_map_component,
 	   public no_bus_component,
 	   public no_accessor_component,
-	   public fixed_relation_map_component
+	   public virtual fixed_relation_map_component,
+	   public virtual configurable_component
 {
 public:
   gdb();
@@ -171,6 +173,8 @@ private:
   // gdbserv state
   struct gdbserv* gdbserv;
   struct gdbserv_client* gdbserv_client;
+
+  virtual void configure (const string &config);
 
 public:
   // gdbserv_client<->gdb callback hooks

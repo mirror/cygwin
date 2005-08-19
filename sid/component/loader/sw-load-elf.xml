@@ -4,6 +4,11 @@
 <defcomplib lib="libloader.la" dlsym="loader_component_library">
   <defcomponent name="sw-load-elf" type="concrete">
 
+    <!-- relationships -->
+    <defrelationship name="dynamic-configurator"	behaviors="configuration" />
+
+    <!-- pins -->
+    <defpin name="function-address?"	direction="in"  legalvalues="address"	behaviors="configuration" />
     <defpin name="load!" direction="in" legalvalues="any" behaviors="loading"/>
     <defpin name="start-pc-set" direction="out" legalvalues="any" behaviors="loading"/>
     <defpin name="endian-set" direction="out" legalvalues="0/1/2" behaviors="loading"/>
@@ -14,6 +19,7 @@
     <defattribute name="state-snapshot" legalvalues="opaque string" behaviors="save/restore"/>
     <defattribute name="file" category="setting" legalvalues="file name" defaultvalue='"/dev/null"' behaviors="configuration"/>
     <defattribute name="verbose?" category="setting" legalvalues="1/0" defaultvalue="0" behaviors="configuration"/>
+    <defattribute name="configure!" category="setting" legalvalues="string" behaviors="configuration" />
     
     <defbus name="probe-upstream" accesses="read/write" behaviors="error checking"/>
 
@@ -42,6 +48,12 @@
       The "verbose?" attribute, when set, encourages this component to provide 
       informative messages to cout during loading.
       </p>
+
+      <p>When the <attribute>configure!</attribute> is set, the new value is interpreted
+         as a configuration spec.  The spec is a colon-separated list of items, each of
+         which is passed in turn to the 'configure' method for interpretation and possible
+         action.</p>
+
     </behavior>
 
     <behavior name="loading">

@@ -1,3 +1,44 @@
+2005-08-19  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+
+	2005-07-13  Dave Brolley  <brolley@redhat.com>
+
+	* compLoader.cxx (generic_loader): Inherit virtually from
+	fixed_attribute_map_component. Inherit from no_relation_component.
+
+	2005-06-06  Dave Brolley  <brolley@redhat.com>
+
+	* elfload.c (readElfFile): Return and empty symbol table if none found.
+
+	* compLoader.cxx: Add using cleause for
+	sidutil::configurable_component.
+	(generic_loader): fixed_pin_map_component and configurable_component
+	inherited virtually.
+	(configure): New virtual override in generic_loader.
+	(check_function_pin_handler): Return the empty string if no function
+	is associated with the given address.
+	* sw-load-elf.xml: Add description of new interfaces.
+	* sw-load-elf.txt: Regenerated.
+
+	2005-05-29  Dave Brolley  <brolley@redhat.com>
+
+	* elfload.h (StringTable, Symbol): New struct types.
+	(readElfFile): New takes symbol_table argument.
+	(SHT_SYMTAB, SHT_STRTAB, ELF32_ST_TYPE, STT_FUNC): New macros.
+	* elfload.c (stringTables,stringTableCount,stringTableNum): New
+	static variables.
+	(newStringTable): New static function.
+	(symbolTable,symbolCount,symbolNum): New static variables.
+	(newSymbol): New static function.
+	(readElfFile): New takes symbol_table argument. Build string tables and
+	symbol table while reading the input file.
+	* compLoader.cxx (elf_loader): New constructor.
+	(load_it): Obtain symmol_table from readElfFile.
+	(check_function_pin,symbol_table,current_function): New members
+	of elf_loader.
+	(check_function_pin_handler): New method of elf_loader.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.am (LIBIBERTY): Link against the libiberty.a from

@@ -1,7 +1,7 @@
 // gloss.h - Basic process emulation plus ROM monitor support.
 // -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -52,17 +52,19 @@ using sidutil::fixed_accessor_map_component;
 using sidutil::fixed_pin_map_component;
 using sidutil::no_bus_component;
 using sidutil::fixed_relation_map_component;
+using sidutil::configurable_component;
 using sidutil::callback_pin;
 using sidutil::output_pin;
 using sidutil::input_pin;
 
 
 class gloss32: public virtual component,
-	       protected fixed_attribute_map_component,
+	       protected virtual fixed_attribute_map_component,
 	       protected fixed_accessor_map_component,
-	       protected fixed_pin_map_component,
+	       protected virtual fixed_pin_map_component,
 	       protected no_bus_component,
-	       protected fixed_relation_map_component
+	       protected virtual fixed_relation_map_component,
+	       protected configurable_component
 {
 public:
 
@@ -73,6 +75,8 @@ protected:
 
   // The cpu we're connected to.
   component* cpu;
+  // The main SID component.
+  component* main;
   // Access to the cpu's memory.
   bus* cpu_memory_bus;
   // The endian of `cpu'.
@@ -150,8 +154,18 @@ protected:
   virtual void syscall_trap();
   bool blocked_p; // signal that syscall blocked
 
+  // Dynamic configuration
+  component *dynamic_configurator;
+  void configure (const string &config);
+
   // syscall support
+  output_pin sys_configure_pin;
+  input_pin config_result_pin;
+  input_pin config_error_pin;
   int32 errnum;
+  void do_sys_reconfig();
+  void sys_reconfig_set (const string &profile_name);
+  void sys_reconfig_reset (int32 handle);
   void do_sys_exit();
   void do_sys_read();
   void do_sys_write();

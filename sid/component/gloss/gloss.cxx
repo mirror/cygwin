@@ -1,6 +1,6 @@
 // gloss.cxx - Gloss routines.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -41,7 +41,9 @@ gloss32::gloss32() :
   trap_type_ipin(this, &gloss32::trap_pin_handler),
   rx_pin(this, &gloss32::rx_handler),
   cpu (0),
+  main (0),
   cpu_memory_bus (0),
+  dynamic_configurator (0),
   syscall_numbering_scheme("libgloss"),
   max_fds(32),
   verbose_p(false)
@@ -64,6 +66,9 @@ gloss32::gloss32() :
   add_attribute_ro_value ("tk tty", string("hw-visual-tty"), "gui");
 
   add_uni_relation("cpu", &this->cpu);
+  add_uni_relation("main", &this->main);
+  add_uni_relation("dynamic-configurator", &this->dynamic_configurator);
+  add_pin ("configure", &this->sys_configure_pin);
 
   add_attribute_virtual("command-line", this,
 			&gloss32::get_command_line,
@@ -71,6 +76,9 @@ gloss32::gloss32() :
 			"setting");
 
   add_attribute("syscall-numbering-scheme", &this->syscall_numbering_scheme, "setting");
+  add_pin ("config-result", &config_result_pin);
+  add_pin ("config-error", &config_error_pin);
+
   add_attribute("verbose?", &this->verbose_p, "setting");
   
   add_attribute("max-fds", &this->max_fds, "setting");
@@ -341,7 +349,7 @@ gloss32::get_halfword (address32 addr, sid::host_int_2& value)
   if (! cpu_memory_bus)
     {
       if (verbose_p)
-	cerr << "*** CPU memory bus not configure!" << endl;
+	cerr << "*** CPU memory bus not configured!" << endl;
       return false;
     }
 
@@ -790,6 +798,9 @@ gloss32::syscall_trap()
 
   switch (target_to_host_syscall(syscall))
     {
+    case libgloss::SYS_reconfig:
+      do_sys_reconfig();
+      break;
     case libgloss::SYS_read:
       do_sys_read();
       break;
@@ -845,6 +856,112 @@ gloss32::do_nonstandard_target_syscalls (int32 target_syscall)
     cerr << "Unimplemented syscall " << target_syscall << endl;
   set_int_result(-1);
   set_error_result(newlib::eNoSys);
+}
+
+void
+gloss32::configure (const string &config)
+{
+  // Call up to the base class first
+  configurable_component::configure (config);
+
+  // Now handle relevent configuration for us.
+  if (config.size () <= 8)
+    return;
+  if (config.substr (0, 8) == "verbose=")
+    {
+      verbose_p = (config.substr (8) == "true");
+      return;
+    }
+}
+
+void
+gloss32::sys_reconfig_set (const string &profile_name)
+{
+  // Make sure that the main component and the dynamic configurator component
+  // have been related to us.
+  if (! main)
+    {
+      set_error_result (1);
+      return;
+    }
+  if (! dynamic_configurator)
+    {
+      set_error_result (2);
+      return;
+    }
+
+  // Set main's lookup-dynamic-config attribute with the name we're looking
+  // for. main will then write the configuration string into its
+  // found-config-profile attribute if it is found.
+  component::status s = main->set_attribute_value ("lookup-dynamic-config!",
+						   profile_name);
+  if (s != component::ok)
+    {
+      set_error_result (3);
+      return;
+    }
+
+  // Pass the configuration string to the dynamic configurator for this board.
+  string config = main->attribute_value ("found-dynamic-config");
+  dynamic_configurator->set_attribute_value ("configure!", config);
+  if (s != component::ok)
+    {
+      set_error_result (4);
+      return;
+    }
+
+  host_int_4 result = config_result_pin.sense ();
+  set_int_result (result);
+  host_int_4 error = config_error_pin.sense ();
+  set_error_result (error);
+}
+
+void
+gloss32::sys_reconfig_reset (int32 handle)
+{
+  // Drive the configure! pin of the dynamic configurator
+  sys_configure_pin.drive (handle);
+
+  // If there is an error, then the config result will be zero, otherwise
+  // it will be a config handle.
+  host_int_4 result = config_result_pin.sense ();
+  set_int_result (result);
+  host_int_4 error = config_error_pin.sense ();
+  set_error_result (error);
+}
+
+void
+gloss32::do_sys_reconfig ()
+{
+  if (verbose_p)
+    cerr << "sys_reconfig: ";
+
+  int32 n, str_ptr, handle;
+  string profile_name;
+
+  get_int_argument(1, n);
+  switch (n)
+    {
+    case 0: // warmup ()
+      profile_name = "sid-internal-warmup";
+      if (verbose_p)
+	cerr << profile_name << endl;
+      sys_reconfig_set (profile_name);
+      break;
+    case 1: // set (name)
+      get_int_argument(2, str_ptr);
+      get_string(str_ptr, profile_name);
+      if (verbose_p)
+	cerr << "set " << profile_name << endl;
+      sys_reconfig_set (profile_name);
+      break;
+    case 2: // reset (handle)
+      get_int_argument(2, handle);
+      if (verbose_p)
+	cerr << "reset 0x" << ios::hex << handle << ios::dec << endl;
+      sys_reconfig_reset (handle);
+      break;
+    }
 }
 
 void

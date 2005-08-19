@@ -1,7 +1,7 @@
 // file.cxx - Joint header file for nearby component classes.
 // -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2003 Red Hat.
+// Copyright (C) 1999, 2000, 2003, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -72,6 +72,7 @@ using sidutil::fixed_attribute_map_component;
 using sidutil::fixed_pin_map_component;
 using sidutil::no_accessor_component;
 using sidutil::no_relation_component;
+using sidutil::configurable_component;
 using sidutil::output_pin;
 using sidutil::callback_pin;
 using sidutil::string2stream;
@@ -146,10 +147,11 @@ private:
 
   class socketio: public virtual component,
 		  protected no_bus_component,
-		  protected fixed_attribute_map_component,
-		  protected fixed_pin_map_component,
+		  protected virtual fixed_attribute_map_component,
+		  protected virtual fixed_pin_map_component,
 		  protected no_accessor_component,
 		  protected no_relation_component,
+		  protected virtual configurable_component,
 		  protected recursion_limited
   {
   private:
@@ -211,6 +213,7 @@ private:
     sid::component::status restore_state (const string& state)
       { return parse_attribute (state, *this); }
 
+    virtual void configure (const string &config);
 
   public:
     socketio (bool server_p);

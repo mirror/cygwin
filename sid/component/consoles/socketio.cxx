@@ -1,7 +1,7 @@
 // socketio.cxx - A console that uses a socket to do its I/O.
 // -*- C++ -*-
 
-// Copyright (C) 1999-2002, 2004 Red Hat.
+// Copyright (C) 1999-2002, 2004, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -599,6 +599,21 @@ socketio::poll ()
   this->poll_transmit();
 }
 
+void
+socketio::configure (const string &config)
+{
+  // Call up to the base class first
+  configurable_component::configure (config);
+
+  // Now handle relevent configuration for us.
+  if (config.size () <= 8)
+    return;
+  if (config.substr (0, 8) == "verbose=")
+    {
+      verbose_p = (config.substr (8) == "true");
+      return;
+    }
+}
 
 ostream& 
 operator << (ostream& out, const socketio& it)

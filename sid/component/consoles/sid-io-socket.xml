@@ -33,6 +33,10 @@
     <defattribute name="fini" category="pin" legalvalues="numeric" behaviors="initialization" />
     <defattribute name="tx" category="pin" legalvalues="numeric" behaviors="pin i/o" />
     <defattribute name="rx" category="pin" legalvalues="numeric" behaviors="pin i/o" />
+    <defattribute name="configure!" category="setting" legalvalues="string" behaviors="configuration" />
+
+    <!-- relationships -->
+    <defrelationship name="dynamic-configurator"	behaviors="configuration" />
 
     <variants>
       <defcomponent name="sid-io-socket-client" type="concrete" />
@@ -156,6 +160,15 @@
       last selected polling interval, and <attribute>max-poll-interval</attribute> sets a
       maximum on the adaptive increase.  (The minimum is 0.)
       </p>
+
+    </behavior>
+
+    <behavior name="configuration">
+      
+      <p>When the <attribute>configure!</attribute> is set, the new value is interpreted
+         as a configuration spec.  The spec is a colon-separated list of items, each of
+         which is passed in turn to the 'configure' method for interpretation and possible
+         action.</p>
 
     </behavior>
 

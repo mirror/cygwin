@@ -2,7 +2,10 @@
 
 Synopsis:
 
-   This component configures and executes a simulation run.
+   This component configures and executes a simulation run. This component
+   also maintains a mapping of configuration names to configuration strings
+   for use by the sid-control-dynamic-configurator components associated with
+   each board.
 
      ----------------------------------------------------------------------
 
@@ -134,127 +137,114 @@ Functionality:
    comment to end-of-line, and the search for the next string found is
    returned instead.
 
-   +-------------------------------------------------+
-   |                    Behaviors                    |
-   |-------------------------------------------------|
-   | configuration | When the config-file! attribute |
-   |               | is written to, the value is     |
-   |               | interpreted as a file name, and |
-   |               | processed as a configuration    |
-   |               | file. The name of the file is   |
-   |               | appended to a history list,     |
-   |               | which is accessible as the      |
-   |               | read-only attribute             |
-   |               | config-file-history.            |
-   |               |                                 |
-   |               | The format of the configuration |
-   |               | file is described in the        |
-   |               | APPENDIX below. As each line is |
-   |               | read, the appropriate component |
-   |               | API functions are called. In    |
-   |               | case of any failure, a message  |
-   |               | is printed to standard error,   |
-   |               | and a failure result code will  |
-   |               | be returned from the            |
-   |               | set_attribute_value call.       |
-   |               |                                 |
-   |               | If the auto-print? attribute is |
-   |               | set to a true value, then as    |
-   |               | each component instance is      |
-   |               | created, all its attributes in  |
-   |               | the auto-print category will be |
-   |               | queried and printed to standard |
-   |               | output.                         |
-   |               |                                 |
-   |               | The effects of multiple writes  |
-   |               | to the config-file! attribute   |
-   |               | are cumulative. The             |
-   |               | sid-control-cfgroot component   |
-   |               | is always implicitly present    |
-   |               | with the component name main.   |
-   |               | If the verbose? attribute is    |
-   |               | set, some tracing messages are  |
-   |               | printed during configuration.   |
-   |               |                                 |
-   |               | When the config-line! attribute |
-   |               | is written to, the supplied     |
-   |               | value is interpreted as a       |
-   |               | single configuration command    |
-   |               | and executed, as if that value  |
-   |               | was written to a file, and the  |
-   |               | file's name supplied to the     |
-   |               | config-file! attribute.         |
-   |---------------+---------------------------------|
-   |       startup | When the run! pin is driven,    |
-   |               | the simulation top level loop   |
-   |               | begins. This process has        |
-   |               | several stages.                 |
-   |               |                                 |
-   |               | First, all components           |
-   |               | registered in the               |
-   |               | component-catalog-informees     |
-   |               | relationship are given the      |
-   |               | then-current list of            |
-   |               | components. This is done by     |
-   |               | setting a number of individual  |
-   |               | component relationships for     |
-   |               | every informee. Each            |
-   |               | relationship contains a single  |
-   |               | instantiated component pointer, |
-   |               | and has the name constructed as |
-   |               | "TYPE NAME", as appropriate for |
-   |               | that component.                 |
-   |               |                                 |
-   |               | Immediately after this, the     |
-   |               | simulation main loop behavior   |
-   |               | takes over. Only after that     |
-   |               | main loop is finished will      |
-   |               | control return to the function  |
-   |               | that sent the run! signal to    |
-   |               | this component.                 |
-   |---------------+---------------------------------|
-   |     main loop | The main loop has two levels.   |
-   |               | An infinite outer loop remains  |
-   |               | active as long as the           |
-   |               | persistent? attribute is set to |
-   |               | a boolean true value. The body  |
-   |               | of this loop performs a         |
-   |               | sequence of steps. First, it    |
-   |               | drives the starting output pin. |
-   |               | Then, it enters the inner main  |
-   |               | loop. At the start of this      |
-   |               | loop, the running attribute is  |
-   |               | set to boolean true. In the     |
-   |               | loop, the activity-count        |
-   |               | attribute is incremented, and   |
-   |               | the perform-activity output pin |
-   |               | is repeatedly driven. This loop |
-   |               | runs until the stop! input pin  |
-   |               | is driven. (This could happen   |
-   |               | during the initial starting     |
-   |               | signal, in which case this      |
-   |               | inner loop will not be entered  |
-   |               | at all.) The value driven on    |
-   |               | the stop! is stored in the      |
-   |               | stop-code attribute. After the  |
-   |               | inner loop exits, the stopping  |
-   |               | output pin is driven.           |
-   +-------------------------------------------------+
+   +-----------------------------------------------------------+
+   |                         Behaviors                         |
+   |-----------------------------------------------------------|
+   |configuration|When the config-file! attribute is written   |
+   |             |to, the value is interpreted as a file name, |
+   |             |and processed as a configuration file. The   |
+   |             |name of the file is appended to a history    |
+   |             |list, which is accessible as the read-only   |
+   |             |attribute config-file-history.               |
+   |             |                                             |
+   |             |The format of the configuration file is      |
+   |             |described in the APPENDIX below. As each line|
+   |             |is read, the appropriate component API       |
+   |             |functions are called. In case of any failure,|
+   |             |a message is printed to standard error, and a|
+   |             |failure result code will be returned from the|
+   |             |set_attribute_value call.                    |
+   |             |                                             |
+   |             |If the auto-print? attribute is set to a true|
+   |             |value, then as each component instance is    |
+   |             |created, all its attributes in the auto-print|
+   |             |category will be queried and printed to      |
+   |             |standard output.                             |
+   |             |                                             |
+   |             |The effects of multiple writes to the        |
+   |             |config-file! attribute are cumulative. The   |
+   |             |sid-control-cfgroot component is always      |
+   |             |implicitly present with the component name   |
+   |             |main. If the verbose? attribute is set, some |
+   |             |tracing messages are printed during          |
+   |             |configuration.                               |
+   |             |                                             |
+   |             |When the config-line! attribute is written   |
+   |             |to, the supplied value is interpreted as a   |
+   |             |single configuration command and executed, as|
+   |             |if that value was written to a file, and the |
+   |             |file's name supplied to the config-file!     |
+   |             |attribute.                                   |
+   |             |                                             |
+   |             |When the dynamic-config! attribute is written|
+   |             |to, the value is interpreted as a            |
+   |             |configuration spec of the form               |
+   |             |NAME:CONFIG_STRING[|NAME:CONFIG_STRING]*.    |
+   |             |Each CONFIG_STRING is then associated with   |
+   |             |the given NAME.                              |
+   |             |                                             |
+   |             |When the lookup-dynamic-config! attribute is |
+   |             |written to, the value is interpreted as a    |
+   |             |name previously associated with a config     |
+   |             |string via the dynamic-config! attribute. The|
+   |             |associated configuration string is then made |
+   |             |available via the found-dynamic-config       |
+   |             |attribute.                                   |
+   |-------------+---------------------------------------------|
+   |      startup|When the run! pin is driven, the simulation  |
+   |             |top level loop begins. This process has      |
+   |             |several stages.                              |
+   |             |                                             |
+   |             |First, all components registered in the      |
+   |             |component-catalog-informees relationship are |
+   |             |given the then-current list of components.   |
+   |             |This is done by setting a number of          |
+   |             |individual component relationships for every |
+   |             |informee. Each relationship contains a single|
+   |             |instantiated component pointer, and has the  |
+   |             |name constructed as "TYPE NAME", as          |
+   |             |appropriate for that component.              |
+   |             |                                             |
+   |             |Immediately after this, the simulation main  |
+   |             |loop behavior takes over. Only after that    |
+   |             |main loop is finished will control return to |
+   |             |the function that sent the run! signal to    |
+   |             |this component.                              |
+   |-------------+---------------------------------------------|
+   |    main loop|The main loop has two levels. An infinite    |
+   |             |outer loop remains active as long as the     |
+   |             |persistent? attribute is set to a boolean    |
+   |             |true value. The body of this loop performs a |
+   |             |sequence of steps. First, it drives the      |
+   |             |starting output pin. Then, it enters the     |
+   |             |inner main loop. At the start of this loop,  |
+   |             |the running attribute is set to boolean true.|
+   |             |In the loop, the activity-count attribute is |
+   |             |incremented, and the perform-activity output |
+   |             |pin is repeatedly driven. This loop runs     |
+   |             |until the stop! input pin is driven. (This   |
+   |             |could happen during the initial starting     |
+   |             |signal, in which case this inner loop will   |
+   |             |not be entered at all.) The value driven on  |
+   |             |the stop! is stored in the stop-code         |
+   |             |attribute. After the inner loop exits, the   |
+   |             |stopping output pin is driven.               |
+   +-----------------------------------------------------------+
 
-   +-------------------------------------------------+
-   |                 SID Conventions                 |
-   |-------------------------------------------------|
-   |      supervisory|supported   |-                 |
-   |-----------------+------------+------------------|
-   |     save/restore|supported   |-                 |
-   |-----------------+------------+------------------|
-   |    triggerpoints|not         |-                 |
-   |                 |supported   |                  |
-   |-----------------+------------+------------------|
-   |recursion-inhibit|supported   |run!              |
-   |-----------------+------------+------------------|
-   |       categories|supported   |settingpinregister|
-   +-------------------------------------------------+
+   +----------------------------------------------------+
+   |                  SID Conventions                   |
+   |----------------------------------------------------|
+   |        supervisory|supported  |-                   |
+   |-------------------+-----------+--------------------|
+   |       save/restore|supported  |-                   |
+   |-------------------+-----------+--------------------|
+   |      triggerpoints|not        |-                   |
+   |                   |supported  |                    |
+   |-------------------+-----------+--------------------|
+   |  recursion-inhibit|supported  |run!                |
+   |-------------------+-----------+--------------------|
+   |         categories|supported  |settingpinregister  |
+   +----------------------------------------------------+
 
      ----------------------------------------------------------------------
 
@@ -266,55 +256,59 @@ Component Reference:
 
   Component: sid-control-cfgroot
 
-   +-------------------------------------------------+
-   |                      pins                       |
-   |-------------------------------------------------|
-   |      name       |direction|legalvalues|behaviors|
-   |-----------------+---------+-----------+---------|
-   |run!             |in       |-          |startup  |
-   |-----------------+---------+-----------+---------|
-   |starting         |out      |-          |main loop|
-   |-----------------+---------+-----------+---------|
-   |perform-activity |out      |-          |main loop|
-   |-----------------+---------+-----------+---------|
-   |stop!            |in       |-          |main loop|
-   |-----------------+---------+-----------+---------|
-   |stopping         |out      |-          |main loop|
-   +-------------------------------------------------+
+   +--------------------------------------------------------+
+   |                          pins                          |
+   |--------------------------------------------------------|
+   |       name       | direction | legalvalues | behaviors |
+   |------------------+-----------+-------------+-----------|
+   |run!              |in         |-            |startup    |
+   |------------------+-----------+-------------+-----------|
+   |starting          |out        |-            |main loop  |
+   |------------------+-----------+-------------+-----------|
+   |perform-activity  |out        |-            |main loop  |
+   |------------------+-----------+-------------+-----------|
+   |stop!             |in         |-            |main loop  |
+   |------------------+-----------+-------------+-----------|
+   |stopping          |out        |-            |main loop  |
+   +--------------------------------------------------------+
 
-   +-----------------------------------------------------------+
-   |                        attributes                         |
-   |-----------------------------------------------------------|
-   |       name        |category|legal |default|  behaviors   ||
-   |                   |        |values| value |              ||
-   |-------------------+--------+------+-------+--------------||
-   |config-file!       |-       |-     |-      |configuration ||
-   |-------------------+--------+------+-------+--------------||
-   |config-line!       |-       |-     |-      |configuration ||
-   |-------------------+--------+------+-------+--------------||
-   |config-file-history|register|-     |-      |configuration ||
-   |-------------------+--------+------+-------+--------------||
-   |verbose?           |setting |-     |-      |configuration,||
-   |                   |        |      |       |main loop     ||
-   |-------------------+--------+------+-------+--------------||
-   |persistent?        |setting |-     |-      |main loop     ||
-   |-------------------+--------+------+-------+--------------||
-   |auto-print?        |setting |-     |-      |main loop     ||
-   |-------------------+--------+------+-------+--------------||
-   |state-snapshot     |-       |-     |-      |state         ||
-   |                   |        |      |       |save/restore  ||
-   |-------------------+--------+------+-------+--------------||
-   |starting           |pin     |-     |-      |main loop     ||
-   |-------------------+--------+------+-------+--------------||
-   |running            |register|-     |-      |main loop     ||
-   |-------------------+--------+------+-------+--------------||
-   |activity-count     |register|-     |-      |main loop     ||
-   |-------------------+--------+------+-------+--------------||
-   |stop-code          |register|-     |-      |main loop     ||
-   |-------------------+--------+------+-------+--------------||
-   |perform-activity   |pin     |-     |-      |main loop     ||
-   |-------------------+--------+------+-------+--------------||
-   |stop!              |pin     |-     |-      |main loop     ||
-   |-------------------+--------+------+-------+--------------||
-   |stopping           |pin     |-     |-      |main loop     ||
-   +-----------------------------------------------------------+
+   +------------------------------------------------------------------------+
+   |                               attributes                               |
+   |------------------------------------------------------------------------|
+   |         name         |category|legal |default|       behaviors        ||
+   |                      |        |values| value |                        ||
+   |----------------------+--------+------+-------+------------------------||
+   |config-file!          |-       |-     |-      |configuration           ||
+   |----------------------+--------+------+-------+------------------------||
+   |config-line!          |-       |-     |-      |configuration           ||
+   |----------------------+--------+------+-------+------------------------||
+   |config-file-history   |register|-     |-      |configuration           ||
+   |----------------------+--------+------+-------+------------------------||
+   |verbose?              |setting |-     |-      |configuration, main loop||
+   |----------------------+--------+------+-------+------------------------||
+   |persistent?           |setting |-     |-      |main loop               ||
+   |----------------------+--------+------+-------+------------------------||
+   |auto-print?           |setting |-     |-      |main loop               ||
+   |----------------------+--------+------+-------+------------------------||
+   |state-snapshot        |-       |-     |-      |state save/restore      ||
+   |----------------------+--------+------+-------+------------------------||
+   |starting              |pin     |-     |-      |main loop               ||
+   |----------------------+--------+------+-------+------------------------||
+   |running               |register|-     |-      |main loop               ||
+   |----------------------+--------+------+-------+------------------------||
+   |activity-count        |register|-     |-      |main loop               ||
+   |----------------------+--------+------+-------+------------------------||
+   |stop-code             |register|-     |-      |main loop               ||
+   |----------------------+--------+------+-------+------------------------||
+   |perform-activity      |pin     |-     |-      |main loop               ||
+   |----------------------+--------+------+-------+------------------------||
+   |stop!                 |pin     |-     |-      |main loop               ||
+   |----------------------+--------+------+-------+------------------------||
+   |stopping              |pin     |-     |-      |main loop               ||
+   |----------------------+--------+------+-------+------------------------||
+   |dynamic-config!       |-       |-     |-      |configuration           ||
+   |----------------------+--------+------+-------+------------------------||
+   |lookup-dynamic-config!|-       |-     |-      |configuration           ||
+   |----------------------+--------+------+-------+------------------------||
+   |found-dynamic-config  |-       |-     |-      |configuration           ||
+   +------------------------------------------------------------------------+

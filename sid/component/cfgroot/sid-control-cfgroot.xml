@@ -27,14 +27,18 @@
     <defattribute name="perform-activity" category="pin" behaviors="main loop" />
     <defattribute name="stop!" category="pin" behaviors="main loop" />
     <defattribute name="stopping" category="pin" behaviors="main loop" />
-    
+    <defattribute name="dynamic-config!"        default="config spec"   behaviors="configuration" />
+    <defattribute name="lookup-dynamic-config!" default="config name"   behaviors="configuration" />
+    <defattribute name="found-dynamic-config"   default="config string" behaviors="configuration" />
     
     <!-- relationships -->
     <defrelationship name="component-catalog-informees" behaviors="simulation startup" />
     
   </defcomponent>
 
-  <synop>This component configures and executes a simulation run.
+  <synop>This component configures and executes a simulation run. This component also
+    maintains a mapping of configuration names to configuration strings for use by the
+    sid-control-dynamic-configurator components associated with each board.
   </synop>
 
   <func>
@@ -228,6 +232,19 @@ rel-name ::= string
       configuration command and executed, as if that value was written
       to a file, and the file's name supplied to the
       <attribute>config-file!</attribute> attribute.</p>
+
+      <p>
+      When the 
+	<attribute>dynamic-config!</attribute> attribute is written to, the value is
+      interpreted as a configuration spec of the form NAME:CONFIG_STRING[|NAME:CONFIG_STRING]*.
+      Each CONFIG_STRING is then associated with the given NAME.</p>
+
+      <p>
+      When the 
+	<attribute>lookup-dynamic-config!</attribute> attribute is written to, the value is
+      interpreted as a name previously associated with a config string via the 
+      <attribute>dynamic-config!</attribute> attribute.  The associated configuration
+      string is then made available via the <attribute>found-dynamic-config</attribute> attribute.</p>
 
     </behavior>
 

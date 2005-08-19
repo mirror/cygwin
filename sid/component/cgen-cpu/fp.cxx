@@ -1,6 +1,6 @@
 // fp.cxx - Floating point number class implementation. -*- C++ -*-
 
-// Copyright 1997, 1998, 2002 Free Software Foundation, Inc.
+// Copyright 1997, 1998, 2002, 2005 Free Software Foundation, Inc.
 // Copyright 2002 Red Hat, Inc.
 // This file is part of SID.
 
@@ -22,150 +22,6 @@
 // which in turn is heavily lifted from GCC's fp-bit library.
 
 #include "fp.h"
-
-using sid::host_int_4;
-using sid::host_int_8;
-using sid::signed_host_int_8;
-
-// XXX: more of this cruft should be C++-ed.
-
-#define FRAC32MASK   LSMASK64 (63, NR_FRAC_GUARD - 32 + 1)
-#define MAX_UINT32   LSMASK64 (31, 0)
-#define MAX_UINT64   LSMASK64 (63, 0)
-#define MAX_INT      (is_64bit ? MAX_INT64 ()  : MAX_INT32 ())
-#define MIN_INT      (is_64bit ? MIN_INT64 ()  : MIN_INT32 ())
-#define MAX_UINT     (is_64bit ? MAX_UINT64 () : MAX_UINT32 ())
-#define QUIET_NAN     LSBIT64 (NR_FRACBITS (double_p) - 1)
-#define IMPLICIT_1    LSBIT64 (NR_FRAC_GUARD)
-#define IMPLICIT_2    LSBIT64 (NR_FRAC_GUARD + 1)
-#define IMPLICIT_4    LSBIT64 (NR_FRAC_GUARD + 2)
-#define NORMAL_EXPMIN (-(EXPBIAS (double_p) )+1)
-#define NORMAL_EXPMAX (EXPBIAS (double_p))
-
-#if (WITH_TARGET_WORD_MSB == 0)
-#define _LSB_SHIFT(WIDTH, POS) (WIDTH - 1 - POS)
-#else
-#define _LSB_SHIFT(WIDTH, POS) (POS)
-#endif
-
-#if (WITH_TARGET_WORD_MSB == 0)
-#define _MSB_SHIFT(WIDTH, POS) (POS)
-#else
-#define _MSB_SHIFT(WIDTH, POS) (WIDTH - 1 - POS)
-#endif
-
-#define _MASK64(WIDTH, START, STOP) (((static_cast<host_int_8>(-1)) \
-				     >> (_MSB_SHIFT (WIDTH, START) \
-					 + _LSB_SHIFT (WIDTH, STOP))) \
-				    << _LSB_SHIFT (WIDTH, STOP))
-
-#if (WITH_TARGET_WORD_MSB == 0)
-#define _LSB_POS(WIDTH, SHIFT) (WIDTH - 1 - SHIFT)
-#else
-#define _LSB_POS(WIDTH, SHIFT) (SHIFT)
-#endif
-
-#define _LSMASK64(WIDTH, FIRST, LAST) _MASK64 (WIDTH, \
-					     _LSB_POS (WIDTH, FIRST), \
-					     _LSB_POS (WIDTH, LAST))
-
-#define LSMASK64(FIRST, LAST)  _LSMASK64 (64, (FIRST), (LAST))
-
-#define GUARDMSB   LSBIT64  (NR_GUARDS (double_p) - 1)
-#define GUARDLSB   LSBIT64  (NR_PAD)
-#define GUARDMASK  LSMASK64 (NR_GUARDS (double_p) - 1, 0)
-#define GUARDROUND LSMASK64 (NR_GUARDS (double_p) - 2, 0)
-
-static const int NR_SPARE = 2;
-static const int EXPMAX32 = 255;
-static const int EXPMAX64 = 2047;
-static const int NR_FRAC_GUARD = 60;
-static const int EXPBIAS32 = 127;
-static const int EXPBIAS64 = 1023;
-static const int NR_PAD32 = 30;
-static const int NR_PAD64 = 0;
-static const int NR_GUARDS32 = 7 + NR_PAD32;
-static const int NR_GUARDS64 = 8 + NR_PAD64;
-static const int NORMAL_EXPMAX32 = EXPBIAS32;
-static const int NORMAL_EXPMAX64 = EXPBIAS64;
-
-static inline
-signed_host_int_8 MAX_INT32 ()
-{
-  return LSMASK64 (30, 0);
-}
-
-static inline
-signed_host_int_8 MIN_INT32 ()
-{
-  return LSMASK64 (63, 31);
-}
-
-static inline
-signed_host_int_8 MAX_INT64 ()
-{
-  return LSMASK64 (62, 0);
-}
-
-static inline
-signed_host_int_8 MIN_INT64 ()
-{
-  return LSMASK64 (63, 63);
-}
-
-static inline
-unsigned EXPMAX (bool double_p)
-{
-  return double_p ? EXPMAX64 : EXPMAX32;
-} 
-
-static inline
-int EXPBIAS (bool double_p)
-{
-  return double_p ? EXPBIAS64 : EXPBIAS32;
-}
-
-static inline
-int NR_GUARDS (bool double_p)
-{
-  return double_p ? NR_GUARDS64 : NR_GUARDS32;
-}
-
-static inline
-int NR_EXPBITS (bool double_p)
-{
-  return double_p ? 11 : 8;
-}
-
-static inline
-int NR_FRACBITS (bool double_p)
-{
-  return double_p ? 52 : 23;
-}
-
-static inline
-int NR_INTBITS (bool is_64bit)
-{
-  return is_64bit ? 64 : 32;
-}
-
-static inline
-host_int_8 LSBIT64 (int pos)
-{
-  return host_int_8 (1) << pos;
-}
-
-static inline
-host_int_8 MSBIT64 (int pos)
-{
-  return host_int_8 (1) << (64 - 1 - pos);
-}
-
-static inline
-host_int_8 SIGNBIT (bool double_p)
-{
-  return double_p ? MSBIT64 (0) : MSBIT64 (32);
-}
 
 static void
 print_bits (std::ostream& out, host_int_8 x, int msbit, int digits)
@@ -264,7 +120,7 @@ namespace sidutil
 	if (fraction == IMPLICIT_1)
 	  return; // exact
 	if (is_64bit) // can't round
-	  throw fp::error (fp::invalid_cvi); // must be overflow
+	  throw fp::error (fp::overflow); // must be overflow
 
 	// For a 32bit with MAX_INT, rounding is possible.
 	switch (round)
@@ -302,7 +158,7 @@ namespace sidutil
     if (normal_exp > (NR_INTBITS (is_64bit) - 2))
       {
 	i = sign ? MIN_INT : MAX_INT;
-	throw fp::error (fp::invalid_cvi);
+	throw fp::error (fp::overflow);
       }
     // Normal number shift it into place.
     tmp = fraction;
@@ -329,6 +185,8 @@ namespace sidutil
   {
     host_int_8 tmp;
     int shift;
+    int is_64bit = (sizeof u == 8);
+    bool double_p = (sizeof u == 8);
 
     if (is_zero ())
       {
@@ -475,23 +333,20 @@ namespace sidutil
     host_int_8 exp;
     host_int_8 frac;
     host_int_8 packed;
+    int sign_bit = sign;
 
     switch (fp_class)
       {
 	// Create a NaN.
       case fp::class_qnan:
-	exp = EXPMAX (double_p);
-	// Force fraction to correct class.
-	frac = fraction;
-	frac >>= NR_GUARDS (double_p);
-	frac |= QUIET_NAN;
+	sign_bit = 0;
+	exp = qnan_exponent (double_p);
+	frac = qnan_fraction (double_p);
 	break;
       case fp::class_snan:
-	exp = EXPMAX (double_p);
-	// Force fraction to correct class.
-	frac = fraction;
-	frac >>= NR_GUARDS (double_p);
-	frac &= ~QUIET_NAN;
+	sign_bit = 0;
+	exp = snan_exponent (double_p);
+	frac = snan_fraction (double_p);
 	break;
       case fp::class_infinity:
 	exp = EXPMAX (double_p);
@@ -570,7 +425,7 @@ namespace sidutil
 	abort ();
       }
 
-    packed = ((sign ? SIGNBIT (double_p) : 0) | 
+    packed = ((sign_bit ? SIGNBIT (double_p) : 0) | 
 	      (exp << NR_FRACBITS (double_p)) | LSMASKED64 (frac, NR_FRACBITS (double_p) - 1, 0));
     t = packed;
   }
@@ -578,6 +433,7 @@ namespace sidutil
   template <typename T> void
   fp::unpack (const T& packed)
   {
+    status = ok;
     // Unpack a 32/64 bit integer into an fp object.
     bool double_p = (sizeof packed == 8);
 
@@ -627,7 +483,8 @@ namespace sidutil
 	    // Non zero fraction, means NaN.
 	    sign = signbit;
 	    fraction = (frac << NR_GUARDS (double_p));
-	    fp_class = (frac >= QUIET_NAN) ? fp::class_qnan : fp::class_snan;
+	    fp_class = is_qnan_fraction (frac, double_p) ? fp::class_qnan : fp::class_snan;
+	    status = is_qnan () ? invalid_qnan : invalid_snan;
 	  }
       }
     else
@@ -640,12 +497,14 @@ namespace sidutil
       }
 
     // Sanity checks.
+    if (! is_nan ())
     {
-      map_t val;
-      pack (val.i);
-
       if (double_p)
-	assert (val.i == packed);
+	{
+	  map_t val;
+	  pack (val.i);
+	  assert (val.i == packed);
+	}
       else
 	{
 	  host_int_4 val;
@@ -811,7 +670,7 @@ namespace sidutil
 	fp_class = fp::class_infinity;
 	break;
       case fp::round_up:
-	if (sign)
+	if (! sign)
 	  fp_class = fp::class_infinity;
 	break;
       case fp::round_down:
@@ -942,48 +801,48 @@ namespace sidutil
   }
 
   bool
-  operator<  (const fp& l, const fp& r)
+  fp::operator<  (const fp& r) const
   {
-    if (!l.is_nan () && !r.is_nan ())
+    if (!this->is_nan () && !r.is_nan ())
       {
 	map_t lval, rval;
-	l.pack (lval.i);
+	this->pack (lval.i);
 	r.pack (rval.i);
 	return (lval.d < rval.d);
       }
-    else if (l.is_snan () || r.is_snan ())
+    else if (this->is_snan () || r.is_snan ())
       throw fp::error (fp::invalid_snan);
     else
       throw fp::error (fp::invalid_qnan);
   }
 
   bool
-  operator<= (const fp& l, const fp& r)
+  fp::operator<= (const fp& r) const
   {
-    if (!l.is_nan () && !r.is_nan ())
+    if (!this->is_nan () && !r.is_nan ())
       {
 	map_t lval, rval;
-	l.pack (lval.i);
+	this->pack (lval.i);
 	r.pack (rval.i);
 	return (lval.d <= rval.d);
       }
-    else if (l.is_snan () || r.is_snan ())
+    else if (this->is_snan () || r.is_snan ())
       throw fp::error (fp::invalid_snan);
     else
       throw fp::error (fp::invalid_qnan);
   }
 
   bool 
-  operator== (const fp& l, const fp& r)
+  fp::operator== (const fp& r) const
   {
-    if (!l.is_nan () && !r.is_nan ())
+    if (!this->is_nan () && !r.is_nan ())
       {
 	map_t lval, rval;
-	l.pack (lval.i);
+	this->pack (lval.i);
 	r.pack (rval.i);
 	return (lval.d == rval.d);
       }
-    else if (l.is_snan () || r.is_snan ())
+    else if (this->is_snan () || r.is_snan ())
       throw fp::error (fp::invalid_snan);
     else
       throw fp::error (fp::invalid_qnan);
@@ -991,41 +850,31 @@ namespace sidutil
 
 
   bool
-  operator!= (const fp& l, const fp& r)
+  fp::operator!= (const fp& r) const
   {
-    if (!l.is_nan () && !r.is_nan ())
-      {
-	map_t lval, rval;
-	l.pack (lval.i);
-	r.pack (rval.i);
-	return (lval.d != rval.d);
-      }
-    else if (l.is_snan () || r.is_snan ())
-      throw fp::error (fp::invalid_snan);
-    else
-      throw fp::error (fp::invalid_qnan);
+    return !(*this == r);
   }
 
   bool
-  operator>= (const fp& l, const fp& r)
+  fp::operator>= (const fp& r) const
   {
-    return r <= l;
+    return r <= *this;
   }
 
   bool
-  operator>  (const fp& l, const fp& r)
+  fp::operator>  (const fp& r) const
   {
-    return r < l;
+    return r < *this;
   }
 
   fp
-  operator+ (const fp& l, const fp& r)
+  fp::operator+ (const fp& r) const
   {
     fp f;
 
-    if (l.is_snan ())
+    if (this->is_snan ())
       {
-	f = l;
+	f = *this;
 	f.fp_class = fp::class_qnan;
 	f.status = fp::invalid_snan;
 	return f;
@@ -1039,9 +888,9 @@ namespace sidutil
 	return f;
       }
 
-    if (l.is_qnan ())
+    if (this->is_qnan ())
       {
-	f = l;
+	f = *this;
 	f.status = fp::ok;
 	return f;
       }
@@ -1053,15 +902,15 @@ namespace sidutil
 	return f;
       }
 
-    if (l.is_infinity ())
+    if (this->is_infinity ())
       {
-	if (r.is_infinity () && l.sign != r.sign)
+	if (r.is_infinity () && this->sign != r.sign)
 	  {
 	    f = constant_qnan;
 	    f.status = fp::invalid_isi;
 	    return f;
 	  }
-	f = l;
+	f = *this;
 	f.status = fp::ok;
 	return f;
       }
@@ -1073,12 +922,12 @@ namespace sidutil
 	return f;
       }
 
-    if (l.is_zero ())
+    if (this->is_zero ())
       {
 	if (r.is_zero ())
 	  {
 	    f = constant_zero;
-	    f.sign = l.sign & r.sign;
+	    f.sign = this->sign & r.sign;
 	  }
 	else
 	  f = r;
@@ -1088,35 +937,35 @@ namespace sidutil
   
     if (r.is_zero ())
       {
-	f = l;
+	f = *this;
 	f.status = fp::ok;
 	return f;
       }
 
     fp::status_t status = fp::ok;
-    int shift = l.normal_exp - r.normal_exp;
+    int shift = this->normal_exp - r.normal_exp;
     host_int_8 lfraction;
     host_int_8 rfraction;
     // Use exp of larger.
     if (shift >= NR_FRAC_GUARD)
       {
 	// Left has much bigger magnitude.
-	f = l;
+	f = *this;
 	f.status = fp::inexact;
 	return f;
       }
     if (shift <= - NR_FRAC_GUARD)
       {
-	// Right has much bigger magnitute.
+	// Right has much bigger magnitude.
 	f = r;
 	f.status = fp::inexact;
 	return f;
       }
-    lfraction = l.fraction;
+    lfraction = this->fraction;
     rfraction = r.fraction;
     if (shift > 0)
       {
-	f.normal_exp = l.normal_exp;
+	f.normal_exp = this->normal_exp;
 	if (rfraction & LSMASK64 (shift - 1, 0))
 	  {
 	    status |= fp::inexact;
@@ -1138,7 +987,7 @@ namespace sidutil
       f.normal_exp = r.normal_exp;
 
     // Perform the addition.
-    if (l.sign)
+    if (this->sign)
       lfraction = - lfraction;
     if (r.sign)
       rfraction = - rfraction;
@@ -1183,168 +1032,21 @@ namespace sidutil
   }
 
   fp
-  operator- (const fp& l, const fp& r)
+  fp::operator- (const fp& r) const
   {
-    fp f;
-
-    if (l.is_snan ())
-      {
-	f = l;
-	f.fp_class = fp::class_qnan;
-	f.status = fp::invalid_snan;
-	return f;
-      }
-
-    if (r.is_snan ())
-      {
-	f = r;
-	f.fp_class = fp::class_qnan;
-	f.status = fp::invalid_snan;
-	return f;
-      }
-
-    if (l.is_infinity ())
-      {
-	if (r.is_infinity () && l.sign == r.sign)
-	  {
-	    f = constant_qnan;
-	    f.status = fp::invalid_isi;
-	    return f;
-	  }
-	f = l;
-	f.status = fp::ok;
-	return f;
-      }
-
-    if (r.is_infinity ())
-      {
-	f = r;
-	f.sign = !r.sign;
-	f.status = fp::ok;
-	return f;
-      }
-  
-    if (l.is_zero ())
-      {
-	if (r.is_zero ())
-	  {
-	    f = constant_zero;
-	    f.sign = l.sign & !r.sign;
-	  }
-	else
-	  {
-	    f = r;
-	    f.sign = !r.sign;
-	  }
-	f.status = fp::ok;
-	return f;
-      }
-    if (r.is_zero ())
-      {
-	f = l;
-	f.status = fp::ok;
-	return f;
-      }
-
-    fp::status_t status = fp::ok;
-    int shift = l.normal_exp - r.normal_exp;
-    host_int_8 lfraction;
-    host_int_8 rfraction;
-    // Use exp of larger.
-    if (shift >= NR_FRAC_GUARD)
-      {
-	// Left has much bigger magnitude.
-	f = l;
-	f.status = fp::inexact;
-	return f;
-      }
-    if (shift <= - NR_FRAC_GUARD)
-      {
-	// Right has much bigger magnitute.
-	f = r;
-	f.sign = !r.sign;
-	f.status = fp::inexact;
-	return f;
-      }
-    lfraction = l.fraction;
-    rfraction = r.fraction;
-    if (shift > 0)
-      {
-	f.normal_exp = l.normal_exp;
-	if (rfraction & LSMASK64 (shift - 1, 0))
-	  {
-	    status |= fp::inexact;
-	    rfraction |= LSBIT64 (shift); // Stick LSBit.
-	  }
-	rfraction >>= shift;
-      }
-    else if (shift < 0)
-      {
-	f.normal_exp = r.normal_exp;
-	if (lfraction & LSMASK64 (- shift - 1, 0))
-	  {
-	    status |= fp::inexact;
-	    lfraction |= LSBIT64 (- shift); // Stick LSBit.
-	  }
-	lfraction >>= -shift;
-      }
-    else
-      {
-	f.normal_exp = r.normal_exp;
-      }
-
-    // Perform the subtraction.
-    if (l.sign)
-      lfraction = - lfraction;
-    if (!r.sign)
-      rfraction = - rfraction;
-    f.fraction = lfraction + rfraction;
-
-    // Zero?
-    if (f.fraction == 0)
-      {
-	f = constant_zero;
-	return f;
-      }
-
-    // Sign?
-    f.fp_class = fp::class_number;
-    if (static_cast<signed_host_int_8> (f.fraction) >= 0)
-      f.sign = 0;
-    else
-      {
-	f.sign = 1;
-	f.fraction = - f.fraction;
-      }
-
-    // Normalize it.
-    if ((f.fraction & IMPLICIT_2))
-      {
-	f.fraction = (f.fraction >> 1) | (f.fraction & 1);
-	f.normal_exp ++;
-      }
-    else if (f.fraction < IMPLICIT_1)
-      {
-	do
-	  {
-	    f.fraction <<= 1;
-	    f.normal_exp --;
-	  }
-	while (f.fraction < IMPLICIT_1);
-      }
-
-    assert (f.fraction >= IMPLICIT_1 && f.fraction < IMPLICIT_2);
-    return f;
+    if (! r.is_nan ())
+      return *this + neg (r);
+    return *this + r;
   }
 
   fp
-  operator* (const fp& l, const fp& r)
+  fp::operator* (const fp& r) const
   {
     fp f;
 
-    if (l.is_snan ())
+    if (this->is_snan ())
       {
-	f = l;
+	f = *this;
 	f.fp_class = fp::class_qnan;
 	f.status = fp::invalid_snan;
 	return f;
@@ -1356,9 +1058,9 @@ namespace sidutil
 	f.status = fp::invalid_snan;
 	return f;
       }
-    if (l.is_qnan ())
+    if (this->is_qnan ())
       {
-	f = l;
+	f = *this;
 	f.status = fp::ok;
 	return f;
       }
@@ -1368,7 +1070,7 @@ namespace sidutil
 	f.status = fp::ok;
 	return f;
       }
-    if (l.is_infinity ())
+    if (this->is_infinity ())
       {
 	if (r.is_zero ())
 	  {
@@ -1376,26 +1078,26 @@ namespace sidutil
 	    f.status = fp::invalid_imz;
 	    return f;
 	  }
-	f = l;
-	f.sign = l.sign ^ r.sign;
+	f = *this;
+	f.sign = this->sign ^ r.sign;
 	return f;
       }
     if (r.is_infinity ())
       {
-	if (l.is_zero ())
+	if (this->is_zero ())
 	  {
 	    f = constant_qnan;
 	    f.status = fp::invalid_imz;
 	    return f;
 	  }
 	f = r;
-	f.sign = l.sign ^ r.sign;
+	f.sign = this->sign ^ r.sign;
 	return f;
       }
-    if (l.is_zero () || r.is_zero ())
+    if (this->is_zero () || r.is_zero ())
       {
 	f = constant_zero;
-	f.sign = l.sign ^ r.sign;
+	f.sign = this->sign ^ r.sign;
 	return f;
       }
 
@@ -1404,8 +1106,8 @@ namespace sidutil
   
     host_int_8 low;
     host_int_8 high;
-    host_int_8 nl = l.fraction & 0xffffffff;
-    host_int_8 nh = l.fraction >> 32;
+    host_int_8 nl = this->fraction & 0xffffffff;
+    host_int_8 nh = this->fraction >> 32;
     host_int_8 ml = r.fraction & 0xffffffff;
     host_int_8 mh = r.fraction >>32;
     host_int_8 pp_ll = ml * nl;
@@ -1425,8 +1127,8 @@ namespace sidutil
     high = res2;
     low = res0;
     
-    f.normal_exp = l.normal_exp + r.normal_exp;
-    f.sign = l.sign ^ r.sign;
+    f.normal_exp = this->normal_exp + r.normal_exp;
+    f.sign = this->sign ^ r.sign;
     f.fp_class = fp::class_number;
 
     // Input is bounded by [1,2)   ;   [2^60,2^61)
@@ -1469,13 +1171,13 @@ namespace sidutil
   }
 
   fp
-  operator/ (const fp& l, const fp& r)
+  fp::operator/ (const fp& r) const
   {
     fp f;
 
-    if (l.is_snan ())
+    if (this->is_snan ())
       {
-	f = l;
+	f = *this;
 	f.fp_class = fp::class_qnan;
 	f.status = fp::invalid_snan;
 	return f;
@@ -1487,9 +1189,9 @@ namespace sidutil
 	f.status = fp::invalid_snan;
 	return f;
       }
-    if (l.is_qnan ())
+    if (this->is_qnan ())
       {
-	f = l;
+	f = *this;
 	f.fp_class = fp::class_qnan;
 	return f;
       }
@@ -1499,7 +1201,7 @@ namespace sidutil
 	f.fp_class = fp::class_qnan;
 	return f;
       }
-    if (l.is_infinity ())
+    if (this->is_infinity ())
       {
 	if (r.is_infinity ())
 	  {
@@ -1508,13 +1210,13 @@ namespace sidutil
 	  }
 	else
 	  {
-	    f = l;
-	    f.sign = l.sign ^ r.sign;
+	    f = *this;
+	    f.sign = this->sign ^ r.sign;
 	  }
 	return f;
       }
 
-    if (l.is_zero ())
+    if (this->is_zero ())
       {
 	if (r.is_zero ())
 	  {
@@ -1523,8 +1225,8 @@ namespace sidutil
 	  }
 	else
 	  {
-	    f = l;
-	    f.sign = l.sign ^ r.sign;
+	    f = *this;
+	    f.sign = this->sign ^ r.sign;
 	  }
 	return f;
       }
@@ -1532,14 +1234,14 @@ namespace sidutil
     if (r.is_infinity ())
       {
 	f = constant_zero;
-	f.sign = l.sign ^ r.sign;
+	f.sign = this->sign ^ r.sign;
 	return f;
       }
 
     if (r.is_zero ())
       {
 	f.fp_class = fp::class_infinity;
-	f.sign = l.sign ^ r.sign;
+	f.sign = this->sign ^ r.sign;
 	f.status = fp::invalid_div0;
 	return f;
       }
@@ -1556,10 +1258,10 @@ namespace sidutil
     host_int_8 bit;
 
     f.fp_class = fp::class_number;
-    f.sign = l.sign ^ r.sign;
-    f.normal_exp = l.normal_exp - r.normal_exp;
+    f.sign = this->sign ^ r.sign;
+    f.normal_exp = this->normal_exp - r.normal_exp;
 
-    numerator = l.fraction;
+    numerator = this->fraction;
     denominator = r.fraction;
 
     // Fraction will be less than 1.0.
@@ -1813,7 +1515,7 @@ namespace sidutil
       }
     if (src.is_qnan())
       {
-	return dest;
+	return src;
       }
     dest = src;
     dest.sign = !src.sign;

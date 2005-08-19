@@ -74,7 +74,7 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-am_libcgencpu_la_OBJECTS = compCGEN.lo tracedis.lo
+am_libcgencpu_la_OBJECTS = compCGEN.lo cgen-fpu.lo fp.lo tracedis.lo
 libcgencpu_la_OBJECTS = $(am_libcgencpu_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/../../config/depcomp
@@ -265,7 +265,7 @@ AM_CXXFLAGS = $(TOP_CXXFLAGS)
 AM_MAKEFLAGS = "TOP_CXXFLAGS=$(TOP_CXXFLAGS)"
 MAKEOVERRIDES = 
 LIBIBERTY = -L../../../libiberty/pic -liberty
-libcgencpu_la_SOURCES = compCGEN.cxx tracedis.cxx
+libcgencpu_la_SOURCES = compCGEN.cxx cgen-fpu.cxx fp.cxx tracedis.cxx
 libcgencpu_la_LDFLAGS = -module -no-undefined
 libcgencpu_la_LIBADD = @cpu_libs@ $(INTLLIBS) $(LIBIBERTY) cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo dis-init.lo
 libcgencpu_la_DEPENDENCIES = @cpu_libs@ cgen-asm.lo cgen-dis.lo cgen-opc.lo dis-buf.lo dis-init.lo
@@ -374,6 +374,8 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/compCGEN.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cgen-fpu.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tracedis.Plo@am__quote@
 
 .cxx.o:

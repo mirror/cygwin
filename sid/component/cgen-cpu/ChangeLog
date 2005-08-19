@@ -1,3 +1,59 @@
+2005-08-19  Dave Brolley  <brolley@redhat.com>
+
+	* cgen-fpu.cxx: New file.
+	* cgen-fpu.h: New file.
+	* Makefile.am (libcgencpu_la_SOURCES): Add cgen-fpu.cxx.
+	* Makefile.in: Regenerated.
+	* Contribute the following enhancements to floating point
+	support:
+	
+	2005-06-14  Dave Brolley  <brolley@redhat.com>
+
+	* fp.h (do_round,do_normal_round,do_normal_underflow,do_normal_overflow):
+	Now virtual.
+	* fp.cxx (do_normal_overflow): Round up to infinity only if
+	the result is positive.
+	(operator-): Don't apply 'neg' to a nan.
+	(neg): Return src if it is a qnan.
+
+	2005-05-20  Dave Brolley  <brolley@redhat.com>
+
+	* fp.cxx (pack_any): Ensure that nan results have a positive sign.
+	(operator-): Simply call operator+ with the rhs negated.
+	* fp.h (is_negative): New method of fp.
+
+	2005-05-13  Dave Brolley  <brolley@redhat.com>
+
+	* fp.h (fp): All arithmetic operator methods are now members
+	of class fp.
+	* fp.cxx (fp): Likewise.
+
+	2005-04-27  Dave Brolley  <brolley@redhat.com>
+
+	* fp.cxx (fp::unpack): Only perform sanity check for non-nans.
+
+	2005-04-12  Dave Brolley  <brolley@redhat.com>
+
+	* fp.h: Move static constants and functions to top of file for
+	visibility within the file.
+	(get_status): New method of fp.
+	(get_class): Likewise.
+	(qnan_fraction): Likewise.
+	(snan_fraction): Likewise.
+	(qnan_exponent): Likewise.
+	(snan_exponent): Likewise.
+	* fp.cxx (fp_to_int): throw fp::overflow for overflow.
+	(pack_any): Use [sq]nan_{exponent,fraction} to construct nans.
+	(unpack): Initialize status to 'ok'. Set class and status using
+	is_qnan_fraction and is_qnan respectively.
+
+	2005-03-18  Dave Brolley  <brolley@redhat.com>
+
+	* fp.cxx: Move static items from here.
+	* fp.h: To here. Make some methods virtual. Make private members
+	protected.
+	(is_inexact): New method.
+	
 2005-06-30  Frank Ch. Eigler  <fche@elastic.org>
 
 	* cgen-cpu.h (GETMEM?F, SETMEM?F): Use pointer-cast-based

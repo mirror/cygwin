@@ -235,11 +235,26 @@ struct SessionCfg :
   AtomicCfg *tcl_bridge;
   bool verbose;
   bool use_stdio;
+  bool need_gprof;
+  bool need_core_probe;
   void add_ulog_file (const string filename);
+
   map<const string, AtomicCfg *> ulog_map;
   void add_gdb () { ++gdb_count; }
   void add_board (ComponentCfg *b) { ++board_count; add_child (b); }
   virtual void write_config (Writer &w);
+  // Support for dynamic configuration profiles
+  vector<AtomicCfg *> wrapped_components;
+  void add_wrapped_component (AtomicCfg *comp) { wrapped_components.push_back (comp); }
+  string wrap_config ();
+  void profile_config (const string &spec);
+protected:
+  void add_profile_config (const string &name, const string &options);
+  void profile_config_error (const string &spec);
+  string profile_opt_value (const string& opt, const vector<string>& opt_parts, unsigned max_parts);
+  string profile_opt_int_value (const string& opt, const vector<string>& opt_parts);
+  string profile_opt_gprof_value (const string& opt, const vector<string>& opt_parts);
+  bool match_profile_opt (const string &opt, const string& want, unsigned min_size);
 private:
   sid::host_int_4 board_count;
   sid::host_int_4 gdb_count;
@@ -303,6 +318,9 @@ public:
 	    SessionCfg *sess,
 	    gprof_type type,
             int interval);
+  GprofCfg (const string name, 
+	    CpuCfg *cpu, 
+	    SessionCfg *sess);
   virtual ~GprofCfg ();
 };
 
@@ -356,6 +374,11 @@ public:
   virtual void trace_semantics ();
   virtual void trace_disassemble ();
   virtual void trace_core ();
+  virtual void set_warmup (bool w = true);
+  virtual void add_profile_func (const string &spec);
+  virtual void add_warmup_func (const string &funcs);
+  virtual void set_start_config (const string &config);
+  virtual void write_load (Writer &w);
   virtual void write_config (Writer &w);
 
   virtual ~BoardCfg ();
@@ -365,6 +388,7 @@ public:
   CpuCfg *cpu;
   SessionCfg *sess;
   MapperCfg *main_mapper;
+  AtomicCfg *dynamic_configurator;
 
  protected:
   GdbCfg *gdb;
@@ -374,6 +398,10 @@ public:
   AtomicCfg *icache;
   AtomicCfg *dcache;  
   LoaderCfg *loader;
+
+  string start_config;
+  string warmup_funcs;
+  string profile_funcs;
 };
 
 #endif // __commonCfg_h__

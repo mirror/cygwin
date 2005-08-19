@@ -1,3 +1,132 @@
+2005-08-19  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+
+	2005-07-13  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (set_dynamic_config): New method of MepMemCfg.
+	(MepCacheCfg::set_dynamic_config): Don't use the new-config pin
+	or the dynamic-configurator attribute. Instead, relate the cache
+	to the dynamic configurator using its client relation.
+	(MepBoardCfg::write_config): Likewise for the insn_buffer, dmac,
+	hw_engines and peripherals. Call set_dynamic_config for shared_main_mem.
+	* mainDynamic.cxx (BoardConfig): New struct type.
+	(main): Keep a vector of the boards in board_configs. Call
+	set_start_config for each board after all the --wrap options have
+	been seen. Call add_wrapped_component to identify each wrapped
+	component to the session.
+	* commonCfg.h (wrapped_components): New member of SessionCfg.
+	(add_wrapped_component): New method of SessionCfg.
+	(wrap_config): Likewise.
+	* commonCfg.cxx (wrap_config): New method of SessionCfg.
+	(profile_config): Use possible_wrap_name to obtain the component
+	being wrapped so we can get its name.
+	(GdbCfg::write_config): Don't connect the new-config pin or use the
+	dynamic-configurator relation. Instead, use the dynamic configurator's
+	client relation.
+	(BoardCfg::write_config): Likewise. Relate the dynamic configurator
+	to gloss.
+	* baseCfg.cxx (wrap_component): Now returns AtomicCfg *.
+	(possible_wrap_name): Likewise.
+	(dynamic_config_for_wrapped_children): Don't connect the dynamic
+	configurator's new-config pin to the components or relate the
+	dynamic configurator to them. Rather, relate the components to the
+	dynamic configurator using its 'client' relation.
+	* baseCfg.h (wrap_component): Now returns AtomicCfg *.
+	(possible_wrap_name): Likewise.
+
+	2005-07-05  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.cxx (BoardCfg::write_load): Connect dynamic configurator's
+	"reset" pin to output 2 of reset_net.
+	(write_config): Set the "start-config" attribute of the dynamic
+	configurator not gloss. Relate "main" to the dynamic configurator
+	unconditionally. Connect the "config-error" pins of the dynamic
+	configurator and gloss.
+
+	2005-06-30  Dave Brolley  <brolley@redhat.com>
+
+	* mainDynamic.cxx (try_add_gprof): Make sure an argument is specified
+	after the comma.
+
+	2005-06-06  Dave Brolley  <brolley@redhat.com>
+
+	* mainDynamic.cxx (need_sess): Now takes 'verbose' argument. Use it
+	to initialize sess->verbose. Update all callers.
+	(main): Add " --model-busses" to board_start_config instead of
+	" --model_busses" (typo).
+	* commonCfg.h (need_core_probe): New member of SessionCfg.
+	(BoardCfg::dynamic_configurator): Now public.
+	* commonCfg.cxx (SessionCfg): Initialize need_core_probe.
+	(profile_config): Set need_core_probe for --trace-core. Call
+	use_tcl_bridge and possible_wrap_name for --wrap.
+	(LoaderCfg): Don't set verbose? attribute here.
+	(GlossCfg): Likewise.
+	(GdbCfg::write_config): Connect the stub and the socket to the
+	dynamic_configurator.
+	(BoardCfg): Initialize core_probe and warmup_funcs. Connect the cpu's
+	print-insn-summary pin to the shutdown sequence here.
+	(BoardCfg::write_load): Connect the dynamic configurator's step! pin
+	to the init-sequence's output 6. Set the core_probe's trace?
+	attribute. Set the gloss and loader's verbose? attributes.
+	(BoardCfg::write_config): Give the dynamic configurator its own
+	subscription to sim-sched. Set the cpu's 'main' and core-probe
+	relations. Connect gloss, core_probe, loader and all of the board's
+	wrapped childred to the dynamic configurator. Check whether components
+	are wrapped before connecting them to the dynamic configurator. Don't connect
+	the cpu's print-insn-summary pin to the shutdown sequence here.
+	* baseCfg.cxx (AtomicCfg): Initialize my_possibly_wrapped.
+	(wrap_component): Set my_possibly_wrapped.
+	(possible_wrap_name): New static method of AtomicCfg.
+	(AtomicCfg::write_construct): Check my_possibly_wrapped. Set
+	victim-trace? to false if only possibly wrapped.
+	(dynamic_config_for_wrapped_children): New method of AggregateCfg.
+	* baseCfg.h (possible_wrap_name): New static method of AtomicCfg.
+	(possibly_wrapped): New method of AtomicCfg.
+	(my_possibly_wrapped): New member of AtomicCfg.
+	(dynamic_config_for_wrapped_children): New method of AggregateCfg.
+
+	2005-05-29  Dave Brolley  <brolley@redhat.com>
+
+	* mainDynamic.cxx (usage): Document --profile-config,--profile-func,
+	--warmup-func and --warmup.
+	(Defs): Initialize warmup, profile_func and start_config.
+	(warmup,profile_func,warmup_func,start_config): New members of Defs.
+	(need_sess): Call profile_config with "sid-internal-warmup:".
+	(opt_warmup,opt_warmup_func,opt_profile_func,opt_profile_config): New
+	enumerators.
+	(long_options): Add --profile-config,--profile-func,
+	--warmup-func and --warmup.
+	(main): Accumulate start_config with reconfigurable options which occur
+	before the first --board. For each board call set_start_config with
+	the value of start_config concatenated with the additional reconfigurable
+	options specified for that --board. Call set_warmup, add_warmup_func and
+	add_profile_func for each board. Handle new option enums.
+	* commonCfg.h (add_profile_config): New method of SessionCfg.
+	(profile_config_error, profile_opt_value, profile_opt_int_value) 
+	(profile_opt_gprof_value, match_profile_opt, profile_config): New
+	methods of SessionCfg.
+	(GprofCfg): New constructor.
+	(write_load): New virtual override in BoardCfg.
+	(add_profile_func, add_warmup_func, set_warmup, set_start_config): New
+	methods of BoardCfg.
+	(need_gprof): New member of BoardCfg.
+	(start_config,warmup_funcs,profile_funcs): New members of BoardCfg.
+	* commonCfg.cxx (SessionCfg): Initialize need_gprof.
+	(add_profile_config): New method of SessionCfg.
+	(profile_config_error, profile_opt_value, profile_opt_int_value) 
+	(profile_opt_gprof_value, match_profile_opt, profile_config): New
+	methods of SessionCfg.
+	(GprofCfg): Always add a sunscription to sim_sched. Set the
+	sim-sched-event attribute.
+	(GprofCfg): New constructor.
+	(BoardCfg): Initialize dynamic_configurator and start_config.
+	(write_load): New virtual override in BoardCfg.
+	(BoardCfg::write_config): Make connections and set attributes to allow
+	for dynamic configuration.
+	(add_profile_func, add_warmup_func, set_warmup, set_start_config): New
+	methods of BoardCfg.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.am (LIBIBERTY): Link against the libiberty.a from

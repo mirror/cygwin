@@ -573,6 +573,8 @@ SessionCfg::SessionCfg (const string name)
     loader (NULL),
     verbose (false),
     use_stdio (true),
+    need_gprof (false),
+    need_core_probe (false),
     board_count (0),
     gdb_count (0)
 {
@@ -613,6 +615,12 @@ SessionCfg::add_ulog_file (const string name)
   set (ulog, "filename", name);
   ulog_map[name] = ulog;
   add_child (ulog);
+}
+
+void
+SessionCfg::add_profile_config (const string &name, const string &options)
+{
+  set (main_obj, "dynamic-config!", name + "|" + options);
 }
 
 void SessionCfg::set_loader (LoaderCfg *l)
@@ -701,6 +709,178 @@ void SessionCfg::use_tcl_bridge ()
   init_seq->add_output (7, tcl_bridge, "!event");
 }
 
+string
+SessionCfg::wrap_config ()
+{
+  string spec;
+  for (vector<AtomicCfg *>::const_iterator it = wrapped_components.begin ();
+       it != wrapped_components.end ();
+       ++it)
+    spec += " --wrap=" + (*it)->get_name ();
+  return spec;
+}
+
+// Process the argument to --profile-config which will
+// be a subset of the allowable SID command line options
+// which can be dynamically changed.
+//
+void
+SessionCfg::profile_config_error (const string &spec)
+{
+  cerr << "error: invalid argument to --profile-config: " << spec << endl;
+  exit (8);
+}
+
+string
+SessionCfg::profile_opt_value (const string& opt, const vector<string>& opt_parts, unsigned max_parts)
+{
+  unsigned size = opt_parts.size ();
+  if (size > max_parts)
+    profile_config_error (opt); // doesn't return
+
+  if (max_parts == 1)
+    return "true";
+
+  return opt_parts[1];
+}
+
+string
+SessionCfg::profile_opt_int_value (const string& opt, const vector<string>& opt_parts)
+{
+  unsigned size = opt_parts.size ();
+  if (size != 2)
+    profile_config_error (opt); // doesn't return
+
+  unsigned n;
+  sid::component::status s = sidutil::parse_attribute (opt_parts[1], n);
+  if (s != sid::component::ok)
+    profile_config_error (opt); // doesn't return
+
+  return opt_parts[1];
+}
+
+string
+SessionCfg::profile_opt_gprof_value (const string& opt, const vector<string>& opt_parts)
+{
+  unsigned size = opt_parts.size ();
+  if (size < 2 || size > 3)
+    profile_config_error (opt); // doesn't return
+
+  vector<string> sub_parts = sidutil::tokenize (opt_parts[1], ",");
+  string value = sub_parts[0];
+  if (size == 3)
+    {
+      if (sub_parts.size () != 2 || sub_parts[1] != "cycles")
+	profile_config_error (opt); // doesn't return
+
+      unsigned n;
+      sid::component::status s = sidutil::parse_attribute (opt_parts[2], n);
+      if (s != sid::component::ok)
+	profile_config_error (opt); // doesn't return
+
+      value += "," + opt_parts[2];
+    }
+
+  need_gprof = true;
+  return value;
+}
+
+bool
+SessionCfg::match_profile_opt (const string &opt, const string& want, unsigned min_size)
+{
+  unsigned opt_size = opt.size ();
+  unsigned want_size = want.size ();
+  if (opt_size < min_size || opt_size > want_size)
+    return false;
+  return opt == want.substr (0, opt_size);
+}
+
+void 
+SessionCfg::profile_config (const string &spec)
+{
+  // Extract the name of the config profile
+  vector<string> parts = sidutil::tokenize (spec, ":");
+  if (parts.size () != 2)
+    profile_config_error (spec);
+  string name = parts[0];
+
+  // Initialize the candidate options to their default values.
+  string trace_extract = "false";
+  string trace_semantics = "false";
+  string trace_disassemble = "false";
+  string trace_core = "false";
+  string trace_counter = "false";
+  string ulog_level = "0";
+  string ulog_mode = "less";
+  string wrap = "";
+  string verbose = "false";
+  string final_insn_count = "false";
+  string gprof = "";
+  string insn_count = "10000";
+
+  // Now examine the spec and reset those which are specified.
+  vector<string>opts = sidutil::tokenize (parts[1], " ");
+  int size = opts.size ();
+  for (int i = 0; i < size; ++i)
+    {
+      const string opt = opts[i];
+      vector<string> opt_parts = sidutil::tokenize (opt, "=");
+      const string opt_name = opt_parts[0];
+
+      if (match_profile_opt (opt_name, "--trace-extract", 9))
+	trace_extract = profile_opt_value (opt, opt_parts, 1);
+      else if (match_profile_opt (opt_name, "--trace-semantics", 9))
+	trace_semantics = profile_opt_value (opt, opt_parts, 1);
+      else if (match_profile_opt (opt_name, "--trace-disassemble", 9))
+	trace_disassemble = profile_opt_value (opt, opt_parts, 1);
+      else if (match_profile_opt (opt_name, "--trace-core", 11))
+	{
+	  trace_core = profile_opt_value (opt, opt_parts, 1);
+	  need_core_probe = true;
+	}
+      else if (match_profile_opt (opt_name, "--trace-counter", 11))
+	trace_counter = profile_opt_value (opt, opt_parts, 1);
+      else if (match_profile_opt (opt_name, "--ulog-level=", 8))
+	ulog_level = profile_opt_int_value (opt, opt_parts);
+      else if (match_profile_opt (opt_name, "--ulog-mode=", 8))
+	ulog_mode = profile_opt_value (opt, opt_parts, 2);
+      else if (match_profile_opt (opt_name, "--verbose", 3))
+	verbose = profile_opt_value (opt, opt_parts, 1);
+      else if (match_profile_opt (opt_name, "--wrap=", 3))
+	{
+	  string comp_name = profile_opt_value (opt, opt_parts, 2);
+	  use_tcl_bridge ();
+	  AtomicCfg *comp = AtomicCfg::possible_wrap_name (comp_name);
+	  if (! wrap.empty ()) wrap += ",";
+	  if (comp)
+	    wrap += comp->get_name ();
+	  else
+	    wrap += comp_name;
+	}
+      else if (match_profile_opt (opt_name, "--final-insn-count", 3))
+	final_insn_count = profile_opt_value (opt, opt_parts, 1);
+      else if (match_profile_opt (opt_name, "--gprof=", 3))
+	gprof = profile_opt_gprof_value (opt, opt_parts);
+      else if (match_profile_opt (opt_name, "--insn-count=", 3))
+	insn_count = profile_opt_int_value (opt, opt_parts);
+    }
+
+  // Now contruct a string representing the complete configuration
+  add_profile_config (name,
+		      "trace-extract="     + trace_extract     + ":" +
+		      "trace-semantics="   + trace_semantics   + ":" +
+		      "trace-disassemble=" + trace_disassemble + ":" +
+		      "trace-core="        + trace_core        + ":" +
+		      "trace-counter="     + trace_counter     + ":" +
+		      "ulog-level="        + ulog_level        + ":" +
+		      "ulog-mode="         + ulog_mode         + ":" +
+		      "wrap="              + wrap              + ":" +
+		      "verbose="           + verbose           + ":" +
+		      "final-insn-count="  + final_insn_count  + ":" +
+		      "gprof="             + gprof             + ":" +
+		      "insn-count="        + insn_count);
+}
+
 void SessionCfg::write_config (Writer &w)
 {
   AggregateCfg::write_config (w);
@@ -733,7 +913,6 @@ LoaderCfg::LoaderCfg (const string name,
 {
   assert (sess);
   set (this, "file", "a.out");
-  set (this, "verbose?", sess->verbose ? "true" : "false");
   conn_pin (this, "error", sess->main_obj, "stop!");
   sess->init_seq->add_output (1, this, "load!");
 }
@@ -778,7 +957,6 @@ GlossCfg::GlossCfg (const string name,
   conn_pin (this, "trap", cpu, "trap", both);
   conn_pin (this, "trap-code", cpu, "trap-code", dst_to_src);
   conn_bus (this, "target-memory", mem, mem_bus_name);
-  set (this, "verbose?", sess->verbose ? "true" : "false");
   assert (sess->init_seq);
   sess->init_seq->add_output (2, this, "reset");
 }
@@ -796,11 +974,9 @@ GlossCfg::GlossCfg (const string name,
   relate (this, "cpu", cpu);
   conn_pin (this, "trap", cpu, "trap", both);
   conn_pin (this, "trap-code", cpu, "trap-code", dst_to_src);
-  set (this, "verbose?", sess->verbose ? "true" : "false");
   assert (sess->init_seq);
   sess->init_seq->add_output (2, this, "reset");
 }
-
 
 // GprofCfg
 GprofCfg::~GprofCfg() {}
@@ -817,10 +993,13 @@ GprofCfg::GprofCfg (const string name,
 {
   assert (cpu);
   assert (sess);
+  // Add a subscription to the target scheduler. Even if it's not
+  // used now, it could be used due to dynamic configuration.
+  assert (sess->sim_sched);
+  int slot = sess->sim_sched->add_subscription (this, "sample");
+
   if (type == simulated_cycles)
     {
-      assert (sess->sim_sched);
-      int slot = sess->sim_sched->add_subscription (this, "sample");
       sess->sim_sched->set_regular (slot, true);
       sess->sim_sched->set_time (slot, interval);
     }
@@ -837,6 +1016,30 @@ GprofCfg::GprofCfg (const string name,
   set (this, "value-attribute", "pc");
   set (this, "bucket-size", "4"); // bytes-per-bucket
   set (this, "output-file", filename);
+  set (this, "sim-sched-event", sidutil::make_attribute (slot));
+}
+
+// Create a gprof component but don't activate it
+GprofCfg::GprofCfg (const string name,
+		    CpuCfg *cpu, 
+		    SessionCfg *sess) :
+  ComponentCfg (name),
+  AtomicCfg ( name, "libprof.la", 
+	      "prof_component_library",
+	      "sw-profile-gprof")
+{
+  assert (cpu);
+  assert (sess);
+  // Add a subscription to the target scheduler. Even if it's not
+  // used now, it could be used due to dynamic configuration.
+  assert (sess->sim_sched);
+  int slot = sess->sim_sched->add_subscription (this, "sample");
+
+  sess->shutdown_seq->add_output (7, this, "store");
+  relate (this, "target-component", cpu);
+  set (this, "value-attribute", "pc");
+  set (this, "bucket-size", "4"); // bytes-per-bucket
+  set (this, "sim-sched-event", sidutil::make_attribute (slot));
 }
 
 
@@ -914,6 +1117,19 @@ void GdbCfg::write_config (Writer &w)
       Setting (stub, "trace-gdbserv?", "true").write_to (w); 
       Setting (sock, "verbose?", "true").write_to (w); 
     }
+
+  // the stub and socket need to be connected to the dynamic_configurator.
+  if (board->dynamic_configurator)
+    {
+      if (! stub->possibly_wrapped ())
+	{
+	  Relation (board->dynamic_configurator, "client", stub).write_to (w);
+	}
+      if (! sock->possibly_wrapped ())
+	{
+	  Relation (board->dynamic_configurator, "client", sock).write_to (w);
+	}
+    }
 }
 
 
@@ -938,7 +1154,11 @@ BoardCfg::BoardCfg (const string name,
   main_mapper (NULL),
   icache (NULL),
   dcache (NULL),
-  loader (NULL)
+  loader (NULL),
+  core_probe (0),
+  dynamic_configurator (NULL),
+  start_config (""),
+  warmup_funcs ("_Sid_config")
 {
   assert (sess);
   cpu = new CpuCfg ("cpu", default_cpu_variant, sess);
@@ -958,6 +1178,9 @@ BoardCfg::BoardCfg (const string name,
       cpu->set_imem (main_mapper, "access-port");
       cpu->set_dmem (main_mapper, "access-port");
     }
+ 
+  sess->shutdown_seq->add_output (0, cpu, "print-insn-summary!");
+
   add_child (cpu);
   add_child (main_mapper);
   add_child (cache_flush_net);
@@ -997,9 +1220,49 @@ void BoardCfg::set_loader (LoaderCfg *l)
   add_child (l);
 }
 
+void BoardCfg::write_load (Writer &w)
+{
+  if (gloss)
+    {
+      // Create a dynamic reconfigurator to be used by this gloss
+      dynamic_configurator = new AtomicCfg ("dynamic-config", "libconfig.la", 
+					    "config_component_library",
+					    "sid-control-dynamic-configurator");
+      sess->init_seq->add_output (6, dynamic_configurator, "step!");
+      sess->reset_net->add_output (2, dynamic_configurator, "reset");
+      sess->sim_sched->add_subscription (dynamic_configurator, "step!", "step-control");
+      add_child (dynamic_configurator);
+
+      // If we may need a gprof for dynamic configuration but don't have
+      // one yet, then create a disabled one.
+      if (! gprof && sess->need_gprof)
+	{
+	  gprof = new GprofCfg ("gprof", cpu, sess);
+	  add_child (gprof);
+	}
+
+      // If we may need a core_probe for dynamic configuration but don't have
+      // one yet, then create a disabled one.
+      if (! core_probe && sess->need_core_probe)
+	{
+	  trace_core ();
+	  core_probe->set (core_probe, "trace?", "false");
+	}
+
+      if (sess->verbose)
+	set (gloss, "verbose?", "true");
+    }
+  if (loader)
+    if (sess->verbose)
+      set (loader, "verbose?", "true");
+
+  AggregateCfg::write_load (w);
+}
+
 void BoardCfg::write_config (Writer &w)
 {
   AggregateCfg::write_config (w);
+
   if (gloss)
     {      
       if (gdb)
@@ -1024,6 +1287,68 @@ void BoardCfg::write_config (Writer &w)
 	  PinConnection (gloss, "process-signal", sess->main_obj, "stop!").write_to(w);
 	  PinConnection (gloss, "process-signal", sess->yield_net, "input").write_to(w);
 	}
+
+      // Set up for dynamic configuration
+      assert (dynamic_configurator);
+      Relation (dynamic_configurator, "main", sess->main_obj).write_to (w);
+      PinConnection (dynamic_configurator, "step-control", cpu, "yield").write_to (w);
+      Relation (gloss, "main", sess->main_obj).write_to (w);
+      Relation (gloss, "dynamic-configurator", dynamic_configurator).write_to (w);
+      PinConnection (gloss, "configure", dynamic_configurator, "configure!").write_to (w);
+      PinConnection (dynamic_configurator, "config-result", gloss, "config-result").write_to (w);
+      PinConnection (dynamic_configurator, "config-error", gloss, "config-error").write_to (w);
+
+      // Set the starting configuration
+      if (start_config.empty ())
+	start_config = "sid-internal-warmup";
+      Setting (dynamic_configurator, "start-config", start_config).write_to (w);
+
+      // Connect the new-config pin of the dynamic configurator to
+      // the components of this board which need to know when the
+      // configuration changes.
+      assert (cpu);
+      Relation (cpu, "main", sess->main_obj).write_to (w);
+      if (! cpu->possibly_wrapped ())
+	{
+	  Relation (dynamic_configurator, "client", cpu).write_to (w);
+	}
+      if (gprof)
+      	{
+	  // gprof's configure! attribute will be set by the cpu.
+	  Relation (gprof, "sim-sched", sess->sim_sched).write_to (w);
+	  Relation (cpu, "gprof", gprof).write_to (w);
+      	}
+      if (! gloss->possibly_wrapped ())
+	{
+	  Relation (dynamic_configurator, "client", gloss).write_to (w);
+	}
+      if (core_probe)
+	Relation (cpu, "core-probe", core_probe).write_to (w);
+
+      // Connect the new-config pin of the dynamic configurator to any wrapped child components
+      dynamic_config_for_wrapped_children (dynamic_configurator, w);
+
+      // Make the connections which enable the dynamic configurator to change configs on function
+      // call and return.
+      if (loader)
+	{
+	  if (! loader->possibly_wrapped ())
+	    {
+	      Relation (dynamic_configurator, "client", loader).write_to (w);
+	    }
+	  PinConnection (cpu, "cg-caller", dynamic_configurator, "function-caller!").write_to (w);
+	  PinConnection (cpu, "cg-callee", dynamic_configurator, "function-callee!").write_to (w);
+	  PinConnection (cpu, "cg-jump", dynamic_configurator, "function-jump!").write_to (w);
+	  PinConnection (cpu, "cg-return", dynamic_configurator, "function-return!").write_to (w);
+	  Relation (dynamic_configurator, "loader", loader).write_to (w);
+	  PinConnection (dynamic_configurator, "function-address", loader, "function?").write_to (w);
+	}
+
+      // Initialize the warmup functions and profile functions.
+      assert (! warmup_funcs.empty ());
+      Setting (dynamic_configurator, "warmup-functions!", warmup_funcs).write_to (w);
+      if (! profile_funcs.empty ())
+	Setting (dynamic_configurator, "profile-functions!", profile_funcs.substr (1)).write_to (w); // Skip the initial delimeter.
     }
   else
     {
@@ -1113,7 +1438,6 @@ void BoardCfg::final_insn_count ()
 {
   assert (cpu);
   assert (sess->shutdown_seq);
-  sess->shutdown_seq->add_output (0, cpu, "print-insn-summary!");
   cpu->set (cpu, "final-insn-count?", "true");
 }
 
@@ -1207,4 +1531,34 @@ void BoardCfg::trace_core ()
   // this connection needs to be non-virtual, to avoid a feedback loop
   core_probe->conn_bus (core_probe, "downstream", main_mapper, "access-port", false);
   core_probe->set (core_probe, "trace?", "true");
+}
+
+void BoardCfg::add_profile_func (const string &spec)
+{
+  if (! spec.empty ())
+    profile_funcs += "|" + spec;
+}
+
+void BoardCfg::add_warmup_func (const string &funcs)
+{
+  if (! funcs.empty ())
+    warmup_funcs += "," + funcs;
+}
+
+void BoardCfg::set_warmup (bool w)
+{
+  if (w)
+    start_config = "sid-internal-warmup";
+}
+
+void BoardCfg::set_start_config (const string &config)
+{
+  if (! start_config.empty ())
+    return;
+
+  if (! config.empty ())
+    {
+      start_config = "sid-internal-start-" + get_name ();
+      sess->profile_config (start_config + ":" + config.substr (1));  // get past leading comma
+    }
 }

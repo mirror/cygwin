@@ -229,7 +229,8 @@ map<string, AtomicCfg *> AtomicCfg_impl::atomic_names;
 AtomicCfg::AtomicCfg (const string name, const string complib, 
 		      const string compsym, const string comptype) :
   ComponentCfg (name),
-  wrapped (false),
+  my_wrapped (false),
+  my_possibly_wrapped (false),
   my_complib (complib),
   my_compsym (compsym),
   my_comptype (comptype)
@@ -245,13 +246,27 @@ void AtomicCfg::add_prefix (const string prefix)
 
 AtomicCfg::~AtomicCfg() {}
 
-bool AtomicCfg::wrap_component (const string name)
+AtomicCfg *AtomicCfg::wrap_component (const string name)
 {
   if (AtomicCfg_impl::atomic_names.find (name) == 
       AtomicCfg_impl::atomic_names.end ())
-    return false;
-  AtomicCfg_impl::atomic_names[name]->wrapped = true;
-  return true;
+    return 0;
+  AtomicCfg *comp = AtomicCfg_impl::atomic_names[name];
+  comp->my_wrapped = true;
+  comp->my_possibly_wrapped = false;
+  return comp;
+}
+
+AtomicCfg *
+AtomicCfg::possible_wrap_name (const string &name)
+{
+  if (AtomicCfg_impl::atomic_names.find (name) == 
+      AtomicCfg_impl::atomic_names.end ())
+    return 0;
+  AtomicCfg *comp = AtomicCfg_impl::atomic_names[name];
+  if (! comp->my_wrapped)
+    comp->my_possibly_wrapped = true;
+  return comp;
 }
 
 void AtomicCfg::reset_load_map () 
@@ -276,11 +291,14 @@ void AtomicCfg::write_construct (Writer &w)
 {
   if (my_comptype == "")
     return;
-  if (wrapped)
+  if (my_wrapped || my_possibly_wrapped)
     {
       w.write_line ("new sid-api-trace " + my_name);
       w.write_line ("new " + my_comptype + " " + my_name + "-traced");      
       w.write_line ("relate " + my_name + " victim " + my_name + "-traced");      
+      w.write_line ("set " + my_name + " victim-name " + my_name + "-traced");      
+      if (my_possibly_wrapped)
+	w.write_line ("set " + my_name + " victim-trace? 0");      
     }
   else
     w.write_line ("new " + my_comptype + " " + my_name);
@@ -374,6 +392,33 @@ const ResolvedName AggregateCfg::resolve(const role r, const string name)
   return ref.first->resolve (r, ref.second);
 }
 
+
+void AggregateCfg::dynamic_config_for_wrapped_children (AtomicCfg *dynamic_configurator, Writer &w)
+{
+  assert (dynamic_configurator);
+  for (vector<ComponentCfg *>::const_iterator i = a_impl->my_children.begin();
+       i != a_impl->my_children.end(); ++i)
+    {
+      if (*i == dynamic_configurator)
+	continue;
+      AtomicCfg *a = dynamic_cast<AtomicCfg *>(*i);
+      if (a)
+	{
+	  if (a->possibly_wrapped ())
+	    {
+	      Relation (dynamic_configurator, "client", a).write_to (w);
+	    }
+	  continue;
+	}
+      AggregateCfg *ag = dynamic_cast<AggregateCfg *>(*i);
+      if (ag)
+	{
+	  ag->dynamic_config_for_wrapped_children (dynamic_configurator, w);
+	  continue;
+	}
+      assert (false);
+    }
+}
 
 
 Connection::Connection (ComponentCfg *src, const string srcport, 

@@ -1,3 +1,29 @@
+2005-08-19  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+
+	2005-07-13  Dave Brolley  <brolley@redhat.com>
+
+	* compTcl.cxx (set_attribute_value): Handle the configure! attribute.
+	(find_pin): Don't handle the configure! pin.
+	(relate): Don't handle the dynamic-configurator relation.
+	(unrelate): Likewise.
+	(configure_pin_handler): Removed.
+
+	2005-06-06  Dave Brolley  <brolley@redhat.com>
+
+	* sid-api-trace.tcl (attribute_value): Handle component-type and victim
+	attributes.
+	* compTcl.cxx (tcl_component): component and configurable_component
+	inherited virtually.
+	(victim_name): New member of tcl_component.
+	(set_attrinute_value): Handle victim-name attribute.
+	(find_pin): Handle the "configure" pin specially.
+	(relate): Handle the dynamic-configurator relation specially.
+	(unrelate): Likewise.
+	(configure_pin_handler,configure): New virtual overrides in
+	tcl_component.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.

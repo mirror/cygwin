@@ -1,6 +1,6 @@
 // compTcl.cxx - Tcl bridge component.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -86,6 +86,7 @@ namespace tcl_api_component
   using sid::big_int_4;
   using sid::big_int_8;
 
+  using sidutil::configurable_component;
   using sidutil::callback_pin;
   using sidutil::output_pin;
   using sidutil::make_attribute;
@@ -98,7 +99,6 @@ namespace tcl_api_component
 
 
 #ifndef DISABLE_THIS_COMPONENT
-
 
   // -----------------------------------------------------------------
 
@@ -168,7 +168,9 @@ namespace tcl_api_component
   // NB: the constructor may throw an exception if the embedded tcl interpreter
   // fails to "boot".
 
-  class tcl_component: public component
+  class tcl_component
+    : virtual public component,
+      public configurable_component
   {
   protected:
     // the interpreter itself 
@@ -187,6 +189,7 @@ namespace tcl_api_component
     // tables for mapping enumerations
     bijection<string,sid::bus::status> bus_status_lut;
     bijection<string,sid::component::status> component_status_lut;
+    string victim_name;
 
     // callback functions
     void event_pin_driven (host_int_4);
@@ -214,7 +217,8 @@ namespace tcl_api_component
       event_pin (this, & tcl_component::event_pin_driven),
       component_lut ("sid-component#"),
       bus_lut ("sid-bus#"),
-      pin_lut ("sid-pin#")
+      pin_lut ("sid-pin#"),
+      victim_name ("")
       {
 	this->interp = Tcl_CreateInterp ();
 	if (this->interp == 0)
@@ -333,8 +337,22 @@ namespace tcl_api_component
 	    bool ok = call_void (value);
 	    return ok ? component::ok : component::bad_value;
 	  }
+	else if (name == "victim-name")
+	  {
+	    victim_name = value;
+	    return component::ok;
+	  }
 	else
 	  {
+	    // Handle the configure! attribute before passing the request on to the victim
+	    // Only the sid-api-trace-component is configurable
+	    if (name == "configure!")
+	      {
+		string comp_type = attribute_value ("component-type");
+		if (comp_type == "sid-api-trace")
+		  configurable_component::set_attribute_value (name, value);
+	      }
+
 	    string result = call_scalar ("set_attribute_value "
 					+ quote (name) + " "
 					+ quote (value));
@@ -359,8 +377,11 @@ namespace tcl_api_component
 	if (name == "!event")
 	  return & this->event_pin;
 	else
-	  return (decode_pin_handle (call_scalar ("find_pin "
-						+ quote (name))));
+	  {
+	    pin *p = decode_pin_handle (call_scalar ("find_pin " 
+						      + quote (name)));
+	    return p;
+	  }
       }
 
     component::status
@@ -485,7 +506,8 @@ namespace tcl_api_component
       {
 	string cmd = "relate " + quote (rel) + " " + quote (encode_component_handle (comp));
 	string result = call_scalar (cmd);
-	return (decode_component_status (result));
+	component::status s = decode_component_status (result);
+	return s;
       }
 
 
@@ -495,7 +517,8 @@ namespace tcl_api_component
       {
 	string cmd = "unrelate " + quote (rel) + " " + quote (encode_component_handle (comp));
 	string result = call_scalar (cmd);
-	return (decode_component_status (result));
+	component::status s = decode_component_status (result);
+	return s;
       }
 
 
@@ -515,6 +538,9 @@ namespace tcl_api_component
 	  }
 	return comps;
       }
+
+  protected:
+    virtual void configure (const string &config);
   };
 
 
@@ -2038,6 +2064,44 @@ tcl_component::event_pin_driven (host_int_4)
   this->event_control_pin.drive (value);
 }
 
+void
+tcl_component::configure (const string &config)
+{
+  // Only the sid-api-trace-component is configurable
+  string comp_type = attribute_value ("component-type");
+  if (comp_type != "sid-api-trace")
+    return;
+
+  // Call up to the base class
+  configurable_component::configure (config);
+
+  // Now handle relevent configuration for us.
+  if (config.size () < 5)
+    return;
+  if (config.substr (0, 5) == "wrap=")
+    {
+      if (! victim_name.empty () && config.size () > 5)
+	{
+	  // Get the list of wrapped components.
+	  vector<string> components = tokenize (config.substr (5), ",");
+	  // If the name of our victim is in the list, then set up to
+	  // 'wrap' that component
+	  for (vector<string>::const_iterator it = components.begin ();
+	       it != components.end ();
+	       ++it)
+	    {
+	      if (*it + "-traced" == victim_name)
+		{
+		  set_attribute_value ("victim-trace?", "1");
+		  return;
+		}
+	    }
+	}
+      // --wrap disabled, or no victim to wrap
+      set_attribute_value ("victim-trace?", "0");
+      return;
+    }
+}
 
 
 #ifdef HAVE_TK_H

@@ -99,10 +99,14 @@ virtual public ComponentCfg
   virtual void write_load (Writer &w);
   virtual void write_construct (Writer &w);
   static void reset_load_map ();
-  static bool wrap_component (const string name);
+  static AtomicCfg *wrap_component (const string name);
+  static AtomicCfg *possible_wrap_name (const string &comp_name);
   string comp_type () const { return my_comptype; }
+  bool wrapped () const { return my_wrapped; }
+  bool possibly_wrapped () const { return my_wrapped || my_possibly_wrapped; }
  protected:
-  bool wrapped;
+  bool my_wrapped;
+  bool my_possibly_wrapped;
   string my_complib;
   string my_compsym;
   string my_comptype;
@@ -120,6 +124,7 @@ virtual public ComponentCfg
   virtual void write_config (Writer &w);
   void add_child (ComponentCfg *c);
   virtual const ResolvedName resolve(const role r, const string name);
+  void dynamic_config_for_wrapped_children (AtomicCfg *dynamic_configurator, Writer &w);
  protected:
   AggregateCfg_impl *a_impl;
 };

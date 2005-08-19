@@ -1,6 +1,6 @@
 // mainDynamic.cxx - high-tech mainline.  -*- C++ -*-
 
-// Copyright (C) 1999-2004 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -13,6 +13,8 @@
 #include <sidmiscutil.h>
 #include <getopt.h>
 
+
+#include <string>
 
 // Stub functions to set breakpoints on
 static void sid_pre_configure () {}
@@ -68,6 +70,8 @@ usage ()
   cout << "FILE names supplied without -f are done last, in sequence." << endl;
   cout << endl;
   cout << "--persistent          Run top-level loop indefinitely" << endl;
+  cout << "--profile-config=NAME,OPTIONS" << endl;
+  cout << "                      Specify options for a named profiling configuration" << endl;
   cout << "--rc                  Pass stop code as simulator exit rc" << endl;
   cout << "--save-temps=FILE     Write config to FILE, '-' for stdout." << endl;
   cout << "--wrap=COMPONENT      Turn on SID API tracing for COMPONENT" << endl;
@@ -120,10 +124,15 @@ usage ()
        << "                         mmap         Memory map given file" << endl
        << "                         latency=r:w  Set read, write latencies [0:0]" << endl
        << "                         latency=rw   Set both latencies [0]" << endl;
+  cout << "--profile-func=FUNCTIONS:NAME" << endl;
+  cout << "                      Specify functions which use a given profiling configuration" << endl;
   cout << "--ulog-level=LEVEL    Set the logging level for the current board" << endl;
   cout << "--ulog-mode=less|match|equal" << endl
        << "                      Set the logging mode for the current board" << endl;
   cout << "--ulog-file=-|FILE    Set the log file name" << endl;
+  cout << "--warmup              Start the simulation in 'warm-up' mode" << endl;
+  cout << "--warmup-func=FUNCTIONS" << endl;
+  cout << "                      Specify functions to be simulated in 'warm-up' mode" << endl;
   cout << endl
        << " note: most board-specific options can be used in board-neutral position " << endl
        << " where they are interpreted as session-specific or default settings. " << endl;
@@ -416,8 +425,12 @@ void try_add_gprof(const string optstring, BoardCfg *board)
   type = instruction_count;	// default type value
   if (toks.size() > 1)		// if we have a type argument
     {
+      if (toks[1].empty ())
+	{
+          cerr << "error: unknown sub-option to --gprof: " << optstring << endl;
+          exit (21);      
+	}
       vector<string> subtoks = sidutil::tokenize (toks[1], "=");
-      
       if (subtoks[0] == "cycles")	// If it is cycles
         {
           type = simulated_cycles;
@@ -468,6 +481,10 @@ struct Defs {
 	    ulog_level (0),
 	    ulog_mode ("less"),
 	    ulog_file ("-"),
+	    warmup (false),
+	    profile_func (""),
+	    warmup_func (""),
+	    start_config (""),
 	    step_insn_count ("10000")
   {}
   string cpu;
@@ -481,16 +498,28 @@ struct Defs {
   sid::host_int_4 ulog_level;
   string ulog_mode;
   string ulog_file;
+  bool warmup;
+  string profile_func;
+  string warmup_func;
+  string start_config;
   string step_insn_count;
 };
   
+struct BoardConfig
+{
+  BoardCfg *board;
+  string config;
+};
 
-void need_sess (SessionCfg *&sess)
+static void need_sess (SessionCfg *&sess, bool verbose)
 {
   if (! sess)
-    sess = new SessionCfg ("");
+    {
+      sess = new SessionCfg ("");
+      sess->profile_config ("sid-internal-warmup:");
+      sess->verbose = verbose;
+    }
 }
-
 
 // main line
 int
@@ -504,6 +533,7 @@ main(int argc, char* argv[])
   string output_file ("");
   SessionCfg *sess = NULL;
   BoardCfg *curr_board = NULL;
+  vector<BoardConfig> board_configs;
   int nboards = 0;
 
   if (argc == 1)
@@ -518,13 +548,16 @@ main(int argc, char* argv[])
 
   enum option_num { opt_help, opt_version, opt_save_temps, opt_wrap, 
 		    opt_verbose, opt_tksched, opt_enable_warnings,
-		    opt_persistent, opt_rc, opt_no_run, opt_sidrtc, opt_sidcodec, 
+		    opt_persistent, opt_profile_config,
+		    opt_rc, opt_no_run, opt_sidrtc, opt_sidcodec, 
 		    opt_tksm, opt_board, opt_cpu, opt_gdb, opt_gloss, opt_engine, 
 		    opt_insn_count, opt_load, opt_icache, opt_dcache, 
-		    opt_memory_region, opt_trace_extract, opt_trace_semantics,
+		    opt_memory_region, opt_profile_func,
+		    opt_trace_extract, opt_trace_semantics,
 		    opt_trace_disassemble, opt_trace_counter, opt_trace_core,
 		    opt_final_insn_count, opt_eb, opt_el, opt_gprof,
-		    opt_ulog_level, opt_ulog_mode, opt_ulog_file };
+		    opt_ulog_level, opt_ulog_mode, opt_ulog_file,
+		    opt_warmup, opt_warmup_func };
 		    
   int curr_opt;
 
@@ -543,6 +576,7 @@ main(int argc, char* argv[])
     {"tksched",         no_argument, & curr_opt, opt_tksched },
     {"enable-warnings", no_argument, & curr_opt, opt_enable_warnings },
     {"persistent",      no_argument, & curr_opt, opt_persistent },
+    {"profile-config",  required_argument, &curr_opt, opt_profile_config },
     {"rc",              no_argument, & curr_opt, opt_rc },
     {"tksm",            no_argument, & curr_opt, opt_tksm },
 
@@ -561,6 +595,7 @@ main(int argc, char* argv[])
     {"dcache",            required_argument, & curr_opt, opt_dcache },
     {"memory-region",     required_argument, & curr_opt, opt_memory_region },
     {"gloss",             no_argument, & curr_opt, opt_gloss },
+    {"profile-func",      required_argument, &curr_opt, opt_profile_func },
     {"trace-extract",     no_argument, & curr_opt, opt_trace_extract },
     {"trace-semantics",   no_argument, & curr_opt, opt_trace_semantics },
     {"trace-disassemble", no_argument, & curr_opt, opt_trace_disassemble },
@@ -572,9 +607,13 @@ main(int argc, char* argv[])
     {"ulog-level",        required_argument, &curr_opt, opt_ulog_level },
     {"ulog-mode",         required_argument, &curr_opt, opt_ulog_mode },
     {"ulog-file",         required_argument, &curr_opt, opt_ulog_file },
+    {"warmup",            no_argument, &curr_opt, opt_warmup },
+    {"warmup-func",       required_argument, &curr_opt, opt_warmup_func },
     { 0, 0, NULL, 0 }
  };
-  
+
+  string board_start_config = "";
+  string wrap_config = "";
   while (true)
     {
       int c = getopt_long (argc, argv, "+hvne:f:",
@@ -615,9 +654,17 @@ main(int argc, char* argv[])
 
 	    case opt_board:
 	      {
-		need_sess (sess);
+		need_sess (sess, verbose_p);
 		if (curr_board)
-		  sess->add_board (curr_board);
+		  {
+		    sess->add_board (curr_board);
+		    if (! defaults.warmup)
+		      {
+			BoardConfig bc = { curr_board, defaults.start_config + board_start_config };
+			board_configs.push_back (bc);
+		      }
+		    board_start_config = "";
+		  }
 		curr_board = NULL;
 		string new_board_type = optstring();
 		string new_board_name (new_board_type + "-" + 
@@ -648,6 +695,9 @@ main(int argc, char* argv[])
 			curr_board->set_ulog_level (defaults.ulog_level);
 			curr_board->set_ulog_mode (defaults.ulog_mode);
 			curr_board->set_ulog_file (defaults.ulog_file);
+			curr_board->set_warmup (defaults.warmup);
+			curr_board->add_warmup_func (defaults.warmup_func);
+			curr_board->add_profile_func (defaults.profile_func);
 			if (defaults.step_insn_count != "10000")
 			  curr_board->set_step_insn_count(defaults.step_insn_count);
 			break;
@@ -676,11 +726,13 @@ main(int argc, char* argv[])
 	      verbose_p = true;
 	      if (sess)
 		sess->verbose = true;
+	      defaults.start_config += " --verbose";
 	      break;
 	     
 	    case opt_gprof:
 	      option_requires_board (curr_board, "gprof");
 	      try_add_gprof(optstring(), curr_board);
+	      board_start_config += " --gprof=" + optstring();
 	      break;
 
 	    case opt_gdb:
@@ -695,7 +747,7 @@ main(int argc, char* argv[])
 	      break;
 
 	    case opt_load:
-	      need_sess (sess);
+	      need_sess (sess, verbose_p);
 	      try_load_file (optstring(), curr_board, sess);
 	      break;
 	      
@@ -708,44 +760,80 @@ main(int argc, char* argv[])
 	      
 	    case opt_trace_extract:
 	      if (curr_board)
-		curr_board->trace_extract();
+		{
+		  board_start_config += " --trace-extract";
+		  curr_board->trace_extract();
+		}
 	      else
-		defaults.trace_extract = true;
+		{
+		  defaults.trace_extract = true;
+		  defaults.start_config += " --trace-extract";
+		}
 	      break;
 
 	    case opt_trace_semantics:
 	      if (curr_board)
-		curr_board->trace_semantics();
+		{
+		  board_start_config += " --trace-semantics";
+		  curr_board->trace_semantics();
+		}
 	      else
-		defaults.trace_semantics = true;
+		{
+		  defaults.trace_semantics = true;
+		  defaults.start_config += " --trace-semantics";
+		}
 	      break;
 
 	    case opt_trace_disassemble:
 	      if (curr_board)
-		curr_board->trace_disassemble();
+		{
+		  curr_board->trace_disassemble();
+		  board_start_config += " --trace-disassemble";
+		}
 	      else
-		defaults.trace_disassemble = true;
+		{
+		  defaults.trace_disassemble = true;
+		  defaults.start_config += " --trace-disassemble";
+		}
 	      break;
 
 	    case opt_trace_counter:
 	      if (curr_board)
-		curr_board->trace_counter();
+		{
+		  curr_board->trace_counter();
+		  board_start_config += " --trace-counter";
+		}
 	      else
-		defaults.trace_counter = true;
+		{
+		  defaults.trace_counter = true;
+		  defaults.start_config += " --trace-counter";
+		}
 	      break;
 
 	    case opt_final_insn_count:
 	      if (curr_board)
-		curr_board->final_insn_count();
+		{
+		  curr_board->final_insn_count();
+		  board_start_config += " --final-insn-count";
+		}
 	      else
-		defaults.final_insn_count = true;
+		{
+		  defaults.final_insn_count = true;
+		  defaults.start_config += " --final-insn-count";
+		}
 	      break;
 
 	    case opt_trace_core:
 	      if (curr_board)
-		curr_board->trace_core();
+		{
+		  curr_board->trace_core();
+		  board_start_config += " --trace-core";
+		}
 	      else
-		defaults.trace_core = true;
+		{
+		  defaults.trace_core = true;
+		  defaults.start_config += " --trace-core";
+		}
 	      break;
 
 	    case opt_enable_warnings:
@@ -760,20 +848,28 @@ main(int argc, char* argv[])
 		string c (optstring());
 		if (sess)
 		  sess->use_tcl_bridge ();
-		if (! AtomicCfg::wrap_component (c))
+		AtomicCfg *comp = AtomicCfg::wrap_component (c);
+		if (! comp)
 		  {
 		    cerr << "error: no component named '" << c << "' to wrap" << endl;
 		    exit (9);
 		  }
+		sess->add_wrapped_component (comp);
 	      }
 	      break;
 
 	      
 	    case opt_insn_count:
 	      if (curr_board)
-		curr_board->set_step_insn_count(optstring());
+		{
+		  curr_board->set_step_insn_count(optstring());
+		  board_start_config += " --insn-count=" + optstring();
+		}
 	      else
-		defaults.step_insn_count = optstring();
+		{
+		  defaults.step_insn_count = optstring();
+		  defaults.start_config += " --insn-count=" + optstring();
+		}
 	      break;
 
 	    case opt_persistent:
@@ -805,7 +901,7 @@ main(int argc, char* argv[])
 	      break;
 
 	    case opt_memory_region:
-	      need_sess (sess);
+	      need_sess (sess, verbose_p);
 	      try_add_memory (optstring(), curr_board, sess);
 	      break;
 
@@ -835,28 +931,36 @@ main(int argc, char* argv[])
 
 	    case opt_ulog_level:
 	      if (curr_board)
-		curr_board->set_ulog_level (optaddr ("ulog-level"));
+		{
+		  curr_board->set_ulog_level (optaddr ("ulog-level"));
+		  board_start_config += " --ulog-level=" + optstring();
+		}
 	      else
 		{
 		  defaults.ulog_level = optaddr ("ulog-level");
-		  need_sess (sess);
+		  defaults.start_config += " --ulog-level=" + optstring();
+		  need_sess (sess, verbose_p);
 		  sess->set_ulog_level (optaddr ("ulog-level"));
 		}
 	      break;
 
 	    case opt_ulog_mode:
 	      if (curr_board)
-		curr_board->set_ulog_mode (optstring ());
+		{
+		  curr_board->set_ulog_mode (optstring ());
+		  board_start_config += " --ulog-mode=" + optstring();
+		}
 	      else
 		{
 		  defaults.ulog_mode = optstring ();
-		  need_sess (sess);
+		  defaults.start_config += " --ulog-mode=" + optstring();
+		  need_sess (sess, verbose_p);
 		  sess->set_ulog_mode (optstring ());
 		}
 	      break;
 
 	    case opt_ulog_file:
-	      need_sess (sess);
+	      need_sess (sess, verbose_p);
 	      sess->add_ulog_file (optstring ());
 	      if (curr_board)
 		curr_board->set_ulog_file (optstring ());
@@ -866,9 +970,43 @@ main(int argc, char* argv[])
 		  sess->set_ulog_file (optstring ());
 		}
 	      break;
+
+	    case opt_warmup:
+	      if (curr_board)
+		curr_board->set_warmup (true);
+	      else
+		defaults.warmup = true;
+	      break;
+
+	    case opt_warmup_func:
+	      if (curr_board)
+		curr_board->add_warmup_func (optstring ());
+	      else
+		{
+		  if (! defaults.warmup_func.empty ())
+		    defaults.warmup_func += ",";
+		  defaults.warmup_func += optstring ();
+		}
+	      break;
+
+	    case opt_profile_func:
+	      if (curr_board)
+		curr_board->add_profile_func (optstring ());
+	      else
+		{
+		  if (! defaults.profile_func.empty ())
+		    defaults.profile_func += "|";
+		  defaults.profile_func += optstring ();
+		}
+	      break;
+
+	    case opt_profile_config:
+	      need_sess (sess, verbose_p);
+	      sess->profile_config (optstring ());
+	      break;
 	    }
 	  break;
-	  
+
 
 	case '?':
 	default:
@@ -878,7 +1016,20 @@ main(int argc, char* argv[])
     }
 
   if (sess && curr_board)
-    sess->add_board (curr_board);
+    {
+      sess->add_board (curr_board);
+      if (! defaults.warmup)
+	{
+	  BoardConfig bc = { curr_board, defaults.start_config + board_start_config };
+	  board_configs.push_back (bc);
+
+	  string wrap_config = sess->wrap_config ();
+	  for (vector<BoardConfig>::const_iterator it = board_configs.begin ();
+	       it != board_configs.end ();
+	       ++it)
+	    it->board->set_start_config (it->config + wrap_config);
+	}
+    }
 
   if (persistent_p)
     config_items.push_back (make_pair (false, string("set main persistent? true")));

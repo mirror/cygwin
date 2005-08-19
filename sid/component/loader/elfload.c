@@ -1,6 +1,6 @@
 /* Simple ELF loader
  *
- * Copyright (c) 1998, 2002, 2004 Red Hat
+ * Copyright (c) 1998, 2002, 2004, 2005 Red Hat
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -59,7 +59,7 @@ textSectionAddress (unsigned long long address, const struct TextSection *sectio
 {
   int i;
 
-  // Not a text section address if there is no table.
+  /* Not a text section address if there is no table.  */
   if (! section_table)
     return 0;
 
@@ -74,6 +74,36 @@ textSectionAddress (unsigned long long address, const struct TextSection *sectio
   return 0;
 }
 
+/* A new string table table is created for each loader in the system.  */
+static struct StringTable *stringTables;
+static int stringTableCount;
+static int stringTableNum;
+
+static void
+newStringTable (int index)
+{
+  if (index >= stringTableNum)
+    {
+      stringTableNum = index + 10;
+      stringTables = xrealloc (stringTables, stringTableNum * sizeof (*stringTables));
+    }
+}
+
+/* A new symbol table is created for each loader in the system.  */
+static struct Symbol *symbolTable;
+static int symbolCount;
+static int symbolNum;
+
+static void
+newSymbol (int index)
+{
+  if (index >= symbolNum)
+    {
+      symbolNum = index + 10;
+      symbolTable = xrealloc (symbolTable, symbolNum * sizeof (*symbolTable));
+    }
+}
+
 
 /* Read in an ELF file, using FUNC to read data from the stream.
    The result is a boolean indicating success.
@@ -83,14 +113,19 @@ textSectionAddress (unsigned long long address, const struct TextSection *sectio
 
 int
 readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian,
-	     unsigned* e_flags, const struct TextSection **section_table)
+	     unsigned* e_flags, const struct TextSection **section_table,
+	     const struct Symbol **symbol_table)
 {
   unsigned char fileHeader [64];
   unsigned char psymHdr [56];
   unsigned char secHdr [64];
+  unsigned char symTabEntry [16];
   unsigned long long psymOffset;
   int psymSize;
   int psymNum;
+  unsigned long long symbolTableOffset;
+  unsigned long long symbolTableSize;
+  unsigned long long symbolTableStringTableIx;
   int eFlags;
   unsigned long long secOffset;
   int secSize;
@@ -211,11 +246,7 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian,
   /* FIXME: admin part of program segment is loaded.  */
 
   /* Look in the section table in order to determine which sections contain
-     code and which contain data.  */
-  textSections = 0;
-  textSectionNum = 0;
-  textSectionCount = 0;
-  newTextSection (textSectionCount);
+     code, data, symbols and strings.  */
   if (sixtyfourbit) 
     {
       secOffset = fetchQuad (fileHeader+40, littleEndian);
@@ -228,6 +259,13 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian,
       secSize = fetchShort (fileHeader+46, littleEndian);
       secNum = fetchShort (fileHeader+48, littleEndian);
     }
+  textSections = 0;
+  textSectionNum = 0;
+  textSectionCount = 0;
+  stringTables = 0;
+  stringTableNum = 0;
+  stringTableCount = 0;
+  newTextSection (textSectionCount);
   for (x = 0; x < secNum; x++)
     {
       if (func (0, secHdr, secOffset, secSize, 0) != secSize)
@@ -249,7 +287,8 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian,
         }
       else
         {
-	  if (fetchWord(secHdr+8, littleEndian) & SHF_EXECINSTR)
+	  unsigned flags = fetchWord(secHdr+8, littleEndian);
+	  if (flags & SHF_EXECINSTR)
 	    {
 	      textSections[textSectionCount].lbound = 
 		fetchWord(secHdr+12, littleEndian);
@@ -259,6 +298,24 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian,
 	      textSectionCount++;
 	      newTextSection (textSectionCount);
 	    }
+	  else if (fetchWord(secHdr+4, littleEndian) == SHT_STRTAB)
+	    {
+	      unsigned offset = fetchWord(secHdr+16, littleEndian);
+	      unsigned size = fetchWord(secHdr+20, littleEndian);
+	      char *strings = xmalloc (size);
+	      newStringTable (stringTableCount);
+	      stringTables[stringTableCount].ix = x;
+	      stringTables[stringTableCount].strings = strings;
+	      if (func (0, strings, offset, size, 0) != size)
+		return 0;
+	      ++stringTableCount;
+	    }
+	  else if (fetchWord(secHdr+4, littleEndian) == SHT_SYMTAB)
+	    {
+	      symbolTableOffset = fetchWord(secHdr+16, littleEndian);
+	      symbolTableSize = fetchWord(secHdr+20, littleEndian);
+	      symbolTableStringTableIx = fetchWord(secHdr+24, littleEndian);
+	    }
         }
       secOffset += secSize;
     }
@@ -267,9 +324,49 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian,
   textSections[textSectionCount].lbound = 0;
   textSections[textSectionCount].hbound = 0;
 
+  /* Can't look for functions in the symbol table until all the sections have been
+     examined, since the string table for the symbol table may follow the symbol
+     table itself.  Identify the correct string table first.  */
+  const char *strings = 0;
+  for (x = 0; x < stringTableCount; ++x)
+    {
+      if (stringTables[x].ix == symbolTableStringTableIx)
+	strings = stringTables[x].strings;
+    }
+
+  /* Now look for functions and record their addresses and lengths.  */
+  symbolTable = 0;
+  symbolCount = 0;
+  symbolNum = 0;
+  newSymbol (symbolCount);
+  if (strings)
+    {
+      for (x = 0; x < symbolTableSize; x += sizeof (symTabEntry))
+	{
+	  if (func (0, symTabEntry, symbolTableOffset + x, sizeof (symTabEntry), 0) != sizeof (symTabEntry))
+	    return 0;
+	  // TODO: Save only symbols representing functions
+	  // PROBLEM: Some don't have the STT_FUNC flag set
+	  symbolTable[symbolCount].name = strings + fetchWord(symTabEntry+0, littleEndian);
+	  symbolTable[symbolCount].addr = fetchWord(symTabEntry+4, littleEndian);
+	  symbolTable[symbolCount].size = fetchWord(symTabEntry+8, littleEndian);
+#if 0
+	  printf ("found symbol %s at 0x%Lx for 0x%Lx\n",
+		  symbolTable[symbolCount].name,
+		  symbolTable[symbolCount].addr,
+		  symbolTable[symbolCount].size);
+#endif
+	  symbolCount++;
+	  newSymbol (symbolCount);
+	}
+    }
+  // Terminate the symbol table.
+  symbolTable[symbolCount].name = 0;
+
   *entry_point = entryPoint;
   *little_endian = littleEndian;
   *section_table = textSections;
+  *symbol_table = symbolTable;
   *e_flags = eFlags;
 
   return 1;

@@ -1,6 +1,6 @@
 /* Header for simple ELF loader
  *
- * Copyright (c) 1998, 2004 Red Hat
+ * Copyright (c) 1998, 2004, 2005 Red Hat
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -32,6 +32,19 @@ struct TextSection
   unsigned long long hbound;
 };
 
+struct StringTable
+{
+  unsigned ix;
+  const char *strings;
+};
+
+struct Symbol
+{
+  const char *name;
+  unsigned long long addr;
+  unsigned long long size;
+};
+
 /* 
    PFLOAD represents a function that will read file data. 
    DEST or DEST2 is used as the destination address to be written with the
@@ -48,7 +61,7 @@ typedef int (*PFLOAD)(unsigned long long dest, char *dest2, unsigned long long o
 extern int textSectionAddress(unsigned long long, const struct TextSection *);
 /* Load an ELF executable into memory. FUNC is used to actually read the
    file. */
-extern int readElfFile(PFLOAD func, unsigned*, int*, unsigned*, const struct TextSection **);
+extern int readElfFile(PFLOAD func, unsigned*, int*, unsigned*, const struct TextSection **, const struct Symbol **);
 
 #define EI_CLASS 4
 #define ELFCLASS64  2 /* 64 bit */
@@ -62,5 +75,13 @@ extern int readElfFile(PFLOAD func, unsigned*, int*, unsigned*, const struct Tex
 
 /* ELF section header flags */
 #define SHF_EXECINSTR	(1 << 2)	/* Executable machine instructions */
+
+/* ELF section header types */
+#define SHT_SYMTAB 2
+#define SHT_STRTAB 3
+
+/* ELF Symbol Table fields */
+#define ELF32_ST_TYPE(i) ((i)&0xf)
+#define STT_FUNC 2
 
 #endif

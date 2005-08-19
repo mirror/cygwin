@@ -1,6 +1,6 @@
 // compLoader.cxx - object file loader component.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2003, 2004 Red Hat.
+// Copyright (C) 1999, 2000, 2003, 2004, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -50,6 +50,7 @@ using sidutil::fixed_attribute_map_component;
 using sidutil::fixed_pin_map_component;
 using sidutil::fixed_accessor_map_component;
 using sidutil::no_relation_component;
+using sidutil::configurable_component;
 using sidutil::output_pin;
 using sidutil::callback_pin;
 using sidutil::string2stream;
@@ -112,10 +113,11 @@ class loader_probe_bus: public sidutil::passthrough_bus
 
 class generic_loader: public virtual component,
 		      protected fixed_bus_map_component,
-		      protected fixed_attribute_map_component,
-		      protected fixed_pin_map_component,
+		      protected virtual fixed_attribute_map_component,
+		      protected virtual fixed_pin_map_component,
 		      protected fixed_accessor_map_component,
-		      protected no_relation_component
+		      protected no_relation_component,
+		      protected virtual configurable_component
 {
 private:
   callback_pin<generic_loader> doit_pin;
@@ -164,6 +166,8 @@ protected:
   sid::component::status restore_state(const string& state)
     { return parse_attribute(state, *this); }
 
+  virtual void configure (const string &config);
+
 public:
   generic_loader(): 
     doit_pin(this, & generic_loader::load_it), 
@@ -195,6 +199,22 @@ public:
   ~generic_loader() throw() { }
     
 };
+
+void
+generic_loader::configure (const string &config)
+{
+  // Call up to the base class first
+  configurable_component::configure (config);
+
+  // Now handle relevent configuration for us.
+  if (config.size () < 12)
+    return;
+  if (config.substr (0, 8) == "verbose=")
+    {
+      verbose_p = (config.substr (8) == "true");
+      return;
+    }
+}
 
 ostream& 
 operator << (ostream& out, const generic_loader& it)
@@ -229,6 +249,19 @@ operator >> (istream& in, generic_loader& it)
 
 class elf_loader: public generic_loader
 {
+public:
+  elf_loader ()
+    : generic_loader (),
+      symbol_table (0),
+      current_function (""),
+      check_function_pin (this, &elf_loader::check_function_pin_handler)
+    {
+      add_pin ("function?", &check_function_pin);
+      add_attribute ("current-function", & current_function);
+    }
+  ~elf_loader () throw () {}
+
+private:
   // static pointer to active instance (XXX: concurrency?)
   static elf_loader* freeloader;
 
@@ -270,7 +303,7 @@ class elf_loader: public generic_loader
       const struct TextSection *section_table;
       int success_p = readElfFile(& elf_loader::load_function,
 				  & entry_point, & little_endian_p,
-				  & eflags, & section_table);
+				  & eflags, & section_table, & symbol_table);
       probe_upstream.set_section_table (section_table);
       elf_loader::freeloader = 0;
 
@@ -300,6 +333,13 @@ class elf_loader: public generic_loader
       delete this->file;
       this->file = 0;
     }
+
+protected:
+  callback_pin<elf_loader> check_function_pin;
+  void check_function_pin_handler (host_int_4 addr);
+
+  const struct Symbol *symbol_table;
+  string current_function;
 };
 
 // static variable
@@ -374,6 +414,48 @@ elf_loader::load_function(host_int_8 dest_addr, char *host_addr, host_int_8 file
 	}
     }
   return bytes;
+}
+
+void
+elf_loader::check_function_pin_handler (host_int_4 addr)
+{
+  // Find the function corresponding to the given address in the symbol
+  // table, if any, and set current_function to that name. If no function is
+  // found, set current_function to a string representing the address.
+  if (symbol_table)
+    {
+      unsigned closest = 0;
+      host_int_8 min_difference = ~(host_int_8)0;
+      unsigned ix;
+      for (ix = 0; symbol_table[ix].name; ++ix)
+	{
+	  // Don't consider unnamed symbols.
+	  if (! symbol_table[ix].name[0])
+	    continue;
+	  host_int_8 sym_addr = symbol_table[ix].addr;
+	  host_int_8 sym_size = symbol_table[ix].size;
+	  if (addr == sym_addr)
+	    break;
+	  if (addr > sym_addr && addr < (sym_addr + sym_size))
+	    break;
+	  if (addr - sym_addr < min_difference)
+	    {
+	      min_difference = addr - sym_addr;
+	      closest = ix;
+	    }
+	}
+      if (symbol_table[ix].name)
+	{
+	  current_function = symbol_table[ix].name;
+	  return;
+	}
+      if (closest != 0)
+	{
+	  current_function = symbol_table[closest].name;
+	  return;
+	}
+    }
+  current_function = "";
 }
 
 // ----------------------------------------------------------------------------

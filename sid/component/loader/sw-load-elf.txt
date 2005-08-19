@@ -24,6 +24,16 @@ Functionality:
    |                | encourages this component to   |
    |                | provide informative messages   |
    |                | to cout during loading.        |
+   |                |                                |
+   |                | When the configure! is set,    |
+   |                | the new value is interpreted   |
+   |                | as a configuration spec. The   |
+   |                | spec is a colon-separated list |
+   |                | of items, each of which is     |
+   |                | passed in turn to the          |
+   |                | 'configure' method for         |
+   |                | interpretation and possible    |
+   |                | action.                        |
    |----------------+--------------------------------|
    |        loading | When the load! pin is driven,  |
    |                | this component will attempt to |
@@ -117,25 +127,25 @@ Component Reference:
 
   Component: sw-load-elf
 
-   +-------------------------------------------------------------+
-   |                            pins                             |
-   |-------------------------------------------------------------|
-   |         name          | direction | legalvalues | behaviors |
-   |-----------------------+-----------+-------------+-----------|
-   |load!                  |in         |any          |loading    |
-   |-----------------------+-----------+-------------+-----------|
-   |start-pc-set           |out        |any          |loading    |
-   |-----------------------+-----------+-------------+-----------|
-   |endian-set             |out        |0/1/2        |loading    |
-   |-----------------------+-----------+-------------+-----------|
-   |error                  |out        |any          |loading    |
-   |-----------------------+-----------+-------------+-----------|
-   |write-to-code-address  |out        |any address  |error      |
-   |                       |           |             |checking   |
-   |-----------------------+-----------+-------------+-----------|
-   |probe                  |in         |any address  |error      |
-   |                       |           |             |checking   |
-   +-------------------------------------------------------------+
+   +-----------------------------------------------------------------+
+   |                              pins                               |
+   |-----------------------------------------------------------------|
+   |         name          | direction | legalvalues |   behaviors   |
+   |-----------------------+-----------+-------------+---------------|
+   |function-address?      |in         |address      |configuration  |
+   |-----------------------+-----------+-------------+---------------|
+   |load!                  |in         |any          |loading        |
+   |-----------------------+-----------+-------------+---------------|
+   |start-pc-set           |out        |any          |loading        |
+   |-----------------------+-----------+-------------+---------------|
+   |endian-set             |out        |0/1/2        |loading        |
+   |-----------------------+-----------+-------------+---------------|
+   |error                  |out        |any          |loading        |
+   |-----------------------+-----------+-------------+---------------|
+   |write-to-code-address  |out        |any address  |error checking |
+   |-----------------------+-----------+-------------+---------------|
+   |probe                  |in         |any address  |error checking |
+   +-----------------------------------------------------------------+
 
    +-----------------------------------------------------+
    |                        buses                        |
@@ -159,6 +169,8 @@ Component Reference:
    |                |          |name    |             |               ||
    |----------------+----------+--------+-------------+---------------||
    |verbose?        |setting   |1/0     |0            |configuration  ||
+   |----------------+----------+--------+-------------+---------------||
+   |configure!      |setting   |string  |-            |configuration  ||
    +-------------------------------------------------------------------+
 
    +-------------------------------------------------+

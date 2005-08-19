@@ -1,3 +1,14 @@
+2005-08-19  Dave Brolley  <brolley@redhat.com>
+
+	* Makefile.am: Remove references to xstormy16-write.cxx.
+	* xstormy16-cpu.h: Regenerate.
+	* xstormy16-decode.cxx: Regenerate.
+	* xstormy16-decode.h: Regenerate.
+	* xstormy16-defs.h: Regenerate.
+	* xstormy16-desc.h: Regenerate.
+	* xstormy16-sem.cxx: Regenerate.
+	* xstormy16-write.cxx: Removed.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.

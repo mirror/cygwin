@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+Copyright (C) 2000-2005 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -23,6 +23,18 @@ public:
   SI h_gr[16];
   } hardware;
 
+  void stream_cgen_hardware (std::ostream &ost) const 
+  {
+    ost << hardware.h_pc << ' ';
+    for (int i = 0; i < 16; i++)
+      ost << hardware.h_gr[i] << ' ';
+  }
+  void destream_cgen_hardware (std::istream &ist) 
+  {
+    ist >> hardware.h_pc;
+    for (int i = 0; i < 16; i++)
+      ist >> hardware.h_gr[i];
+  }
   // C++ register access function templates
 #define current_cpu this
 

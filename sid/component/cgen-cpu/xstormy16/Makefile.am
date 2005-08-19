@@ -53,4 +53,4 @@ cgen-xstormy16:
 	$(SHELL) ../CGEN.sh cpu-decode $(srcdir) $(cgendir) "$(CGENFLAGS)" \
 	xstormy16 "with-scache" xstormy16 xstormy16 xstormy16 xstormy16 "xstormy16-" \
 	$(cgendir)/cpu/xstormy16.cpu \
-	"desc.h cpu.h defs.h decode.h decode.cxx write.cxx semantics.cxx"
+	"desc.h cpu.h defs.h decode.h decode.cxx semantics.cxx"

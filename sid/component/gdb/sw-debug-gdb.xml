@@ -19,6 +19,9 @@
     <defpin name="stop-target" direction="in" legalvalues="any" behaviors="execution"/>
     <defpin name="start-target" direction="in" legalvalues="any" behaviors="execution"/>
     <defpin name="deinit" direction="in" legalvalues="any" behaviors="deinitialization"/>
+    <!-- pins -->
+    <!-- relationships -->
+    <defrelationship name="dynamic-configurator"	behaviors="configuration" />
     <!-- attributes -->
     <defattribute name="trace-gdbserv?" legalvalues="boolean" defaultvalue="false" behaviors="setting"/>
     <defattribute name="trace-gdbsid?" legalvalues="boolean" defaultvalue="false" behaviors="setting"/>
@@ -31,6 +34,7 @@
     <defattribute name="fallback-Z-sw-to-hw?" legalvalues="boolean" defaultvalue="true" behaviors="setting"/>
     <defattribute name="operating-mode?" legalvalues="boolean" defaultvalue="true" behaviors="setting"/>
     <defattribute name="connected?" legalvalues="boolean, read-only" defaultvalue="false" behaviors="execution"/>
+    <defattribute name="configure!" category="setting" legalvalues="string" behaviors="configuration" />
   </defcomponent>
   <synop>
     <p>
@@ -196,6 +200,16 @@
 	for single stepping.
       </p>
     </behavior>
+
+    <behavior name="configuration">
+      
+      <p>When the <attribute>configure!</attribute> is set, the new value is interpreted
+         as a configuration spec.  The spec is a colon-separated list of items, each of
+         which is passed in turn to the 'configure' method for interpretation and possible
+         action.</p>
+
+    </behavior>
+
     <convention name="functional" supported="true">
     </convention>
     <convention name="save/restore" supported="false">

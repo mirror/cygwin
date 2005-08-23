@@ -1,3 +1,12 @@
+2005-08-23  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (step_pin_handler): Don't call configure_gprof here.
+	(unconfigure_gprof): Check gprof_configured_p.
+	(configure_gprof): Check gprof_configured_p.
+	(configure_gprof_p): Removed.
+	(gprof_spec): Removed.
+	(configure): Call configure_gprof here.
+
 2005-08-19  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:

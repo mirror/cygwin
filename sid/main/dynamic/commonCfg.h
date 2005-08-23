@@ -109,7 +109,13 @@ public:
 			string time_low);
   void set_regular (int n, bool v);
   void set_time (int n, int tv);
+  void set_priority (int n, int pv);
   virtual void write_config (Writer &w);
+
+  static const int config_priority  = 2;
+  static const int gprof_priority   = 1;
+  static const int default_priority = 0;
+
 protected:
   int n;
 };

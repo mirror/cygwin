@@ -1,3 +1,14 @@
+2005-08-23  Dave Brolley  <brolley@redhat.com>
+
+	* mainDynamic.cxx (try_add_gprof): Initialize interval.
+	* commonCfg.cxx (set_priority): New method of SchedCfg.
+	(GprofCfg): Always call set_time, set_regular and set_priority.
+	(BoardCfg::write_load): Don't connect init-seq to the dynamic
+	configurator's step! pin. Call set_priority.
+	* commonCfg.h (set_priority): New method of SchedCfg.
+	(config_priority,gprof_priority,default_priority): New constants in
+	SchedCfg.
+
 2005-08-19  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:

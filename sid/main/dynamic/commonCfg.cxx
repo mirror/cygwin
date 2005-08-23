@@ -439,6 +439,13 @@ void SchedCfg::set_time (int n, int tv)
   set (this, s + "-time", ts);
 }
 
+void SchedCfg::set_priority (int n, int pv)
+{
+  string s = sidutil::make_attribute (n);
+  string ps = sidutil::make_attribute (pv);
+  set (this, s + "-priority", ps);
+}
+
 void SchedCfg::write_config (Writer &w)
 {
   Setting (this, "num-clients", sidutil::make_attribute (n)).write_to (w);
@@ -997,18 +1004,18 @@ GprofCfg::GprofCfg (const string name,
   // used now, it could be used due to dynamic configuration.
   assert (sess->sim_sched);
   int slot = sess->sim_sched->add_subscription (this, "sample");
+  sess->sim_sched->set_regular (slot, true);
+  sess->sim_sched->set_time (slot, interval);
+  sess->sim_sched->set_priority (slot, SchedCfg::gprof_priority);
 
-  if (type == simulated_cycles)
+  if (type != simulated_cycles)
     {
-      sess->sim_sched->set_regular (slot, true);
-      sess->sim_sched->set_time (slot, interval);
-    }
-  else		// default to instruction_count
-    {
+      // default to instruction_count
       string ev = sidutil::make_attribute (cpu->get_subscription_number());
       ev += "-event";
       conn_pin (sess->sim_sched, ev, this, "sample");
     }
+
   sess->shutdown_seq->add_output (7, this, "store");
   relate (this, "target-component", cpu);
   conn_pin (cpu, "cg-caller", this, "cg-caller");
@@ -1034,6 +1041,9 @@ GprofCfg::GprofCfg (const string name,
   // used now, it could be used due to dynamic configuration.
   assert (sess->sim_sched);
   int slot = sess->sim_sched->add_subscription (this, "sample");
+  sess->sim_sched->set_regular (slot, true);
+  sess->sim_sched->set_time (slot, 1);
+  sess->sim_sched->set_priority (slot, SchedCfg::gprof_priority);
 
   sess->shutdown_seq->add_output (7, this, "store");
   relate (this, "target-component", cpu);
@@ -1228,9 +1238,9 @@ void BoardCfg::write_load (Writer &w)
       dynamic_configurator = new AtomicCfg ("dynamic-config", "libconfig.la", 
 					    "config_component_library",
 					    "sid-control-dynamic-configurator");
-      sess->init_seq->add_output (6, dynamic_configurator, "step!");
       sess->reset_net->add_output (2, dynamic_configurator, "reset");
-      sess->sim_sched->add_subscription (dynamic_configurator, "step!", "step-control");
+      int slot = sess->sim_sched->add_subscription (dynamic_configurator, "step!", "step-control");
+      sess->sim_sched->set_priority (slot, SchedCfg::config_priority);
       add_child (dynamic_configurator);
 
       // If we may need a gprof for dynamic configuration but don't have

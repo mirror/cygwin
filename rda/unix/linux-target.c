@@ -2851,14 +2851,46 @@ linux_process_rcmd (struct gdbserv *serv, const char *cmd, int cmdsize)
 {
   struct child_process *process = gdbserv_target_data (serv);
 
-  if (!strcmp (cmd, "1"))
+  if (strcmp (cmd, "rda-backend-noisy") == 0)
     {
       process->debug_backend = 1;
+      gdbserv_output_string_as_bytes (serv, "RDA backend diagnostics enabled.\n");
     }
-  else if (!strcmp (cmd, "0"))
+  else if (strcmp (cmd, "rda-backend-quiet") == 0)
     {
       process->debug_backend = 0;
+      gdbserv_output_string_as_bytes (serv, "RDA backend diagnostics disabled.\n");
     }
+  else if (strcmp (cmd, "thread-db-noisy") == 0)
+    {
+      thread_db_noisy = 1;
+      gdbserv_output_string_as_bytes (serv, "RDA thread-db diagnostics enabled.\n");
+    }
+  else if (strcmp (cmd, "thread-db-quiet") == 0)
+    {
+      thread_db_noisy = 0;
+      gdbserv_output_string_as_bytes (serv, "RDA thread-db diagnostics disabled.\n");
+    }
+  else if (strcmp (cmd, "proc-service-noisy") == 0)
+    {
+      proc_service_noisy = 1;
+      gdbserv_output_string_as_bytes (serv, "RDA proc-service diagnostics enabled.\n");
+    }
+  else if (strcmp (cmd, "proc-service-quiet") == 0)
+    {
+      proc_service_noisy = 0;
+      gdbserv_output_string_as_bytes (serv, "RDA proc-service diagnostics disabled.\n");
+    }
+  else
+    gdbserv_output_string_as_bytes (serv,
+      "Unrecognized monitor command.\n"
+      "Available commands are:\n"
+      "  monitor rda-backend-noisy\n"
+      "  monitor rda-backend-quiet\n"
+      "  monitor thread-db-noisy\n"
+      "  monitor thread-db-quiet\n"
+      "  monitor proc-service-noisy\n"
+      "  monitor proc-service-quiet\n");
 }
 
 /* This function is called from gdbloop_poll when a new incoming
@@ -3037,7 +3069,6 @@ struct server_vector gdbserver =
 int
 decr_pc_after_break (struct gdbserv *serv, pid_t pid)
 {
-  extern int thread_db_noisy;
   unsigned long pc;
   int status;
 

@@ -1389,6 +1389,8 @@ dynamic_configurator_component::reset ()
 	  configure (spec);
 	}
     }
+
+  step_control_pin.drive (1); // reconfigure during next cycle
 }
 
 // Set the starting configuration

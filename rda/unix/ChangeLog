@@ -1,3 +1,13 @@
+2005-08-23  Kevin Buettner  <kevinb@redhat.com>
+
+	* gdbserv-thread-db.h (proc_service_noisy): Declare.
+	* linux-target.c (linux_process_rcmd): Add "monitor" commands
+	for enabling and disabling various types of diagnostic messages.
+	Delete old "monitor 1" and "monitor 0" commands for enabling /
+	disabling just the back-end diagnostics.
+	(decr_pc_after_break): Delete extern declaration for
+	``thread_db_noisy''.
+
 2005-06-27  Jim Blandy  <jimb@redhat.com>
 
 	Add support for the Linux NPTL (New POSIX Thread Library) thread

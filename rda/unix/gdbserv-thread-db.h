@@ -35,6 +35,7 @@ typedef void *                 gdb_ps_write_buf_t;
 typedef size_t                 gdb_ps_size_t;
 
 extern int thread_db_noisy;
+extern int proc_service_noisy;
 
 /* Determine if register is a member of GREGSET_T.  */
 extern int is_gp_reg (int regnum);

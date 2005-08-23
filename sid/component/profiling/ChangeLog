@@ -1,3 +1,8 @@
+2005-08-23  Dave Brolley  <brolley@redhat.com>
+
+	* gprof.cxx (configure): Don't reset the N-regular attribute of the
+	scheduler. Call accumulate when configuring for cycles=N.
+
 2005-08-19  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:

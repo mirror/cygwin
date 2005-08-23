@@ -270,9 +270,6 @@ namespace sidutil
 	recursion_record limit (& this->step_limit);
 	if (UNLIKELY(! limit.ok())) return;
 
-	if (UNLIKELY (! gprof_configured_p && configure_gprof_p))
-	  configure_gprof ();
-
 	this->current_step_insn_count = 0;
 	this->yield_p = false;
 
@@ -450,54 +447,56 @@ namespace sidutil
 	return static_cast<cpu_trap_disposition>(trap_disposition_pin.sense ());
       }
 
-    void unconfigure_gprof (sid::host_int_4 num_cycles)
+    void unconfigure_gprof (const string &gprof_spec, sid::host_int_4 num_cycles)
       {
+	if (! gprof_configured_p)
+	  return;
+
 	assert (gprof);
-	// First sample the address of the branch which caused
-	// the reconfig for the given number of cycles.
 	sid::pin *p;
-	if (num_cycles && last_caller)
+
+#if 0 // can't happen?
+	// If 'cycles' was specified on the --gprof option, then
+	// first, sample the address of the branch which caused
+	// the reconfig for the given number of cycles.
+	if (num_cycles && last_caller && gprof_spec.size () > 6)
 	  {
-	    p = gprof->find_pin ("sample");
-	    if (p)
+	    vector<string> parts = tokenize (gprof_spec.substr (6), ",");
+	    if (parts.size () > 1)
 	      {
-		std::string save_pc = this->attribute_value ("pc");
-		if (! save_pc.empty ())
+		p = gprof->find_pin ("sample");
+		if (p)
 		  {
-		    sid::component::status s = this->set_attribute_value ("pc", make_numeric_attribute (last_caller));
-		    if (s == sid::component::ok)
-		      do
-			{
-			  p->driven (1);
-			  --num_cycles;
-			} while (num_cycles);
-		    this->set_attribute_value ("pc", save_pc);
+		    std::string save_pc = this->attribute_value ("pc");
+		    if (! save_pc.empty ())
+		      {
+			sid::component::status s = this->set_attribute_value ("pc", make_numeric_attribute (last_caller));
+			if (s == sid::component::ok)
+			  for (int i = 0; i < num_cycles; ++i)
+			    p->driven (1);
+			this->set_attribute_value ("pc", save_pc);
+		      }
 		  }
 	      }
 	  }
-
-	// Then get gprof to reconfigure itself.
-	gprof->set_attribute_value ("configure!", gprof_spec);
+#endif
 
 	// Then disconnect the call graph notification pins.
-	assert (! configure_gprof_p);
-	assert (gprof_configured_p);
 	p = gprof->find_pin ("cg-caller");
 	if (p) cg_caller_pin.disconnect (p); 
 	p = gprof->find_pin ("cg-callee");
-	if (p) cg_callee_pin.disconnect (p); 
+	if (p) cg_callee_pin.disconnect (p);
+
 	gprof_configured_p = false;
       }
 
     void configure_gprof ()
       {
-	// First get gprof to reconfigure itself.
-	assert (gprof);
-	gprof->set_attribute_value ("configure!", gprof_spec);
+	if (gprof_configured_p)
+	  return;
 
-	// Then connect the call graph notification pins.
-	assert (configure_gprof_p);
-	assert (! gprof_configured_p);
+	// Connect the call graph notification pins.
+	assert (gprof);
 	sid::pin *p = gprof->find_pin ("cg-caller");
 	if (p)
 	  {
@@ -511,6 +510,7 @@ namespace sidutil
 	  if (last_caller && last_callee)
 	    p->driven (last_callee); 
 	}
+
 	gprof_configured_p = true;
       }
 
@@ -520,11 +520,9 @@ namespace sidutil
     component *gprof;
     component *core_probe;
     component *main;
-    bool gprof_configured_p;
-    bool configure_gprof_p;
     sid::host_int_4 last_caller;
     sid::host_int_4 last_callee;
-    string gprof_spec;
+    bool gprof_configured_p;
 
     virtual void configure (const string &config)
       {
@@ -538,14 +536,13 @@ namespace sidutil
 	  {
 	    if (! gprof)
 	      return; // nothing to configure
-	    gprof_spec = config;
-	    // Set a flag to configure the gprof component the next time
-	    // our step! pin is driven....
-	    configure_gprof_p = (config.size () > 6);
-	    // ... unless we are unconfiguring the gprof, in which
-	    // case do it now.
-	    if (gprof_configured_p && ! configure_gprof_p)
-	      unconfigure_gprof (num_cycles);
+	    // First get gprof to configure itself
+	    gprof->set_attribute_value ("configure!", config);
+	    // Now do our own configuration
+	    if (config.size () > 6)
+	      configure_gprof ();
+	    else
+	      unconfigure_gprof (config, num_cycles);
 	    return;
 	  }
 	if (config.size () <= 11)
@@ -754,10 +751,9 @@ public:
       trace_filename ("-"), // standard output
       trace_pin (this, & basic_cpu::trace_pin_handler),
       gprof (0),
-      gprof_configured_p (false),
-      configure_gprof_p (false),
       last_caller (0),
       last_callee (0),
+      gprof_configured_p (false),
       core_probe (0),
       main (0)
       {

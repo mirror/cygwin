@@ -514,8 +514,10 @@ namespace profiling_components
 		    if (s == component::ok)
 		      {
 			sim_sched->connect_pin (sim_sched_event + "-event", & accumulate_pin);
-			sim_sched->set_attribute_value (sim_sched_event + "-regular", "true");
 			sim_sched->set_attribute_value (sim_sched_event + "-time", make_attribute (cycles));
+			// Take a sample now to make up for the one which just got cancelled when
+			// N-time was set.
+			accumulate (1);
 			return;
 		      }
 		  }
@@ -523,10 +525,7 @@ namespace profiling_components
 	    // No gprof config or cycles was not specified. We will not be triggered by the
 	    // target scheduler.
 	    if (sim_sched)
-	      {
-		sim_sched->disconnect_pin (sim_sched_event + "-event", & accumulate_pin);
-		sim_sched->set_attribute_value (sim_sched_event + "-regular", "false");
-	      }
+	      sim_sched->disconnect_pin (sim_sched_event + "-event", & accumulate_pin);
 	    return;
 	  }
       }

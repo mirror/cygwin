@@ -22,6 +22,7 @@
     <defattribute name="N-name" category="setting" behaviors="configuration" />
     <defattribute name="N-regular?" category="setting" legalvalues="boolean" defaultvalue="'0'" behaviors="subscription" />
     <defattribute name="N-time" category="setting" legalvalues="numeric" defaultvalue="'0'" behaviors="subscription" />
+    <defattribute name="N-priority" category="setting" legalvalues="numeric" defaultvalue="'0'" behaviors="subscription" />
     <defattribute name="N-scale" category="setting" legalvalues="numeric fraction" defaultvalue="'1'" behaviors="subscription" />
     <defattribute name="N-event" category="pin" behaviors="advancing" />
     <defattribute name="N-control" category="pin" behaviors="subscription" />
@@ -110,11 +111,13 @@
       </p>
 
       <p> Each subscription is defined by an index, a
-      regular-vs-irregular flag, and a time quantity.  The index is a
+      regular-vs-irregular flag, a priority and a time quantity.  The index is a
       number between 0 and <attribute>num-clients</attribute> -1, and is represented as <tt>N</tt>
       in the pin/attribute list templates in this document.  The
       regular-vs-irregular flag is accessible as the <attribute>N-regular?</attribute> 
-      attribute.  The time quantity is accessible as the <attribute>N-time</attribute>
+      attribute.  The priority is accessible as the <attribute>N-priority</attribute>
+      attribute. Higher values indicate higher priority.
+      The time quantity is accessible as the <attribute>N-time</attribute>
       attribute.  If the value is zero, it is interpreted as a request
       to cancel all pending events for this subscription.  Otherwise,
       the value is taken to be a delta until the <attribute>time</attribute> of the
@@ -164,6 +167,11 @@
       may loop over the pending event up to <attribute>step-cycle-limit</attribute> number
       of times, as an optimization.  This loop may be aborted early if
       the <pin>yield</pin> input pin is driven.
+      </p>
+
+      <p> If more than one event is scheduled at the same time. Events will be dispatched in
+      priority order. Events with higher priority will be dispatched before events with lower
+      priority.
       </p>
 
     </behavior>

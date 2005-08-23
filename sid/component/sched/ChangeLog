@@ -1,3 +1,22 @@
+2005-08-23  Dave Brolley  <brolley@redhat.com>
+
+	* compSched.cxx (scheduling_event): Constructors now take
+	a 'priority' argument.
+	(operator <): Consider priority of events.
+	(yield): Likewise.
+	(next_event): Likewise.
+	(schedule_irregular): Now takes a 'priority' argument. Used when
+	creating scheduling events.
+	(schedule_regular): Likewise.
+	(refill_regular_events_table): Consider priority of events.
+	(operator <<): Stream priority.
+	(operator >>): Destream priority.
+	(class scheduler_client): Add 'priority' member.
+	(set_time): Pass priority of the client to the scheduler.
+	(client_num_update): Handle N-priority attribute.
+	* sid-sched.xml: Describe the N-priority attribute.
+	* sid-sched.txt: Regenerated.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.in: Regenerated with Automake 1.9.5.

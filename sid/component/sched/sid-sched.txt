@@ -95,24 +95,28 @@ Functionality:
    |               |                                 |
    |               | Each subscription is defined by |
    |               | an index, a                     |
-   |               | regular-vs-irregular flag, and  |
-   |               | a time quantity. The index is a |
-   |               | number between 0 and            |
-   |               | num-clients -1, and is          |
+   |               | regular-vs-irregular flag, a    |
+   |               | priority and a time quantity.   |
+   |               | The index is a number between 0 |
+   |               | and num-clients -1, and is      |
    |               | represented as N in the         |
    |               | pin/attribute list templates in |
    |               | this document. The              |
    |               | regular-vs-irregular flag is    |
    |               | accessible as the N-regular?    |
-   |               | attribute. The time quantity is |
-   |               | accessible as the N-time        |
-   |               | attribute. If the value is      |
-   |               | zero, it is interpreted as a    |
-   |               | request to cancel all pending   |
-   |               | events for this subscription.   |
-   |               | Otherwise, the value is taken   |
-   |               | to be a delta until the time of |
-   |               | the requested event.            |
+   |               | attribute. The priority is      |
+   |               | accessible as the N-priority    |
+   |               | attribute. Higher values        |
+   |               | indicate higher priority. The   |
+   |               | time quantity is accessible as  |
+   |               | the N-time attribute. If the    |
+   |               | value is zero, it is            |
+   |               | interpreted as a request to     |
+   |               | cancel all pending events for   |
+   |               | this subscription. Otherwise,   |
+   |               | the value is taken to be a      |
+   |               | delta until the time of the     |
+   |               | requested event.                |
    |               |                                 |
    |               | You can also set these controls |
    |               | by driving encoded values into  |
@@ -181,6 +185,14 @@ Functionality:
    |               | This loop may be aborted early  |
    |               | if the yield input pin is       |
    |               | driven.                         |
+   |               |                                 |
+   |               | If more than one event is       |
+   |               | scheduled at the same time.     |
+   |               | Events will be dispatched in    |
+   |               | priority order. Events with     |
+   |               | higher priority will be         |
+   |               | dispatched before events with   |
+   |               | lower priority.                 |
    +-------------------------------------------------+
 
    +-------------------------------------------------+
@@ -290,6 +302,8 @@ Component Reference:
 |N-regular?                 |setting   |boolean   |'0'        |subscription   ||
 |---------------------------+----------+----------+-----------+---------------||
 |N-time                     |setting   |numeric   |'0'        |subscription   ||
+|---------------------------+----------+----------+-----------+---------------||
+|N-priority                 |setting   |numeric   |'0'        |subscription   ||
 |---------------------------+----------+----------+-----------+---------------||
 |N-scale                    |setting   |numeric   |'1'        |subscription   ||
 |                           |          |fraction  |           |               ||

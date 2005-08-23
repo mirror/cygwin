@@ -1,9 +1,8 @@
 // compSched.cxx - the scheduler component.  -*- C++ -*-
 
-// Copyright (C) 1999-2003 Red Hat.
+// Copyright (C) 1999-2003, 2005 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
-
 #include "config.h"
 
 #include <sidcomp.h>
@@ -129,12 +128,13 @@ namespace scheduler_component
     tick_t      when;
     tick_t      interval;
     output_pin* what;
+    host_int_4  priority;
 
-    scheduling_event(): when(0), interval(0), what(0) {}
-    scheduling_event(tick_t when, output_pin* what): 
-      when(when), interval(0), what(what) {}
-    scheduling_event(tick_t when, tick_t interval, output_pin* what): 
-      when(when), interval(interval), what(what) {}
+    scheduling_event(): when(0), interval(0), what(0), priority (0) {}
+    scheduling_event(tick_t when, output_pin* what, host_int_4 priority): 
+      when(when), interval(0), what(what), priority(priority) {}
+    scheduling_event(tick_t when, tick_t interval, output_pin* what, host_int_4 priority): 
+      when(when), interval(interval), what(what), priority(priority) {}
   };
 
   // Define a comparison function for heaps of scheduling events.  It
@@ -142,7 +142,7 @@ namespace scheduler_component
   inline bool
   operator < (const scheduling_event& a, const scheduling_event& b)
 {
-  return a.when > b.when;
+  return (a.when > b.when) || ((a.when == b.when) && (a.priority < b.priority));
 }
 
 
@@ -603,7 +603,9 @@ operator >> (istream& i, exact_host_time_keeper& it)
 	  }
 
 	tick_t yield_until;
-	if (   (rnext && irnext && (rnext->when < irnext->when))
+	if ((rnext && irnext
+	     && ((rnext->when < irnext->when)
+		 || (rnext->when == irnext->when && rnext->priority > irnext->priority)))
 	    || (rnext && !irnext))
 	  yield_until = rnext->when;
 	else if (irnext)
@@ -674,7 +676,9 @@ operator >> (istream& i, exact_host_time_keeper& it)
 	    rnext = & * this->regular_table_iter;
 	  }
 
-	if (   (rnext && irnext && (rnext->when < irnext->when))
+	if ((rnext && irnext
+	     && ((rnext->when < irnext->when)
+		 || (rnext->when == irnext->when && rnext->priority > irnext->priority)))
 	    || (rnext && !irnext))
 	  {
 	    return make_pair(rnext,true);
@@ -789,7 +793,7 @@ operator >> (istream& i, exact_host_time_keeper& it)
 
     // Schedule an irregular event.
     void
-    schedule_irregular(tick_t delta, output_pin* what)
+    schedule_irregular(tick_t delta, output_pin* what, host_int_4 priority)
       {
 	// cerr << "schedule_irregular when=" << when << endl;
 
@@ -798,29 +802,29 @@ operator >> (istream& i, exact_host_time_keeper& it)
 	this->get_now(now);
 	tick_t when = now + delta;
 
-	this->irregular_events.push_back(scheduling_event(when, what));
+	this->irregular_events.push_back(scheduling_event(when, what, priority));
 	push_heap(this->irregular_events.begin(), this->irregular_events.end());
       }
 
 
     // Schedule a regular event, starting "when"
     void
-    schedule_regular(tick_t when, tick_t interval, output_pin* what)
+    schedule_regular(tick_t when, tick_t interval, output_pin* what, host_int_4 priority)
       {
 	// cerr << "schedule_regular when=" << when << " interval=" << interval << endl;
-	this->regular_events.push_back (scheduling_event(when, interval, what));
+	this->regular_events.push_back (scheduling_event(when, interval, what, priority));
 	this->refill_regular_events_table();
       }
     // Schedule a regular event starting "now"
     void
-    schedule_regular(tick_t interval, output_pin* what)
+    schedule_regular(tick_t interval, output_pin* what, host_int_4 priority)
       {
 	// cerr << "scheduler_regular interval=" << interval << endl;
 
 	// infer "now" as starting time 
 	tick_t now;
 	this->get_now(now);
-	this->schedule_regular (now, interval, what);
+	this->schedule_regular (now, interval, what, priority);
       }
 
 
@@ -935,12 +939,16 @@ generic_scheduler<Timekeeper>::refill_regular_events_table()
 	{
 	  if (next_tick_time[reg] > next_tick_time[k])
 	    reg = k;
+	  else if (next_tick_time[reg] == next_tick_time[k]
+		   && this->regular_events[reg].priority < this->regular_events[k].priority)
+	    reg = k;
 	}
 
       slot->when = next_tick_time[reg];
       slot->interval = 0; // initialize unused field
       slot->what = this->regular_events[reg].what;
-      // cerr << " slot: when=" << slot->when << " what=" << slot->what << endl;
+      slot->priority = this->regular_events[reg].priority;
+      // cerr << " slot: when=" << slot->when << " what=" << slot->what << " priority=" << slot->priority << endl;
 
       next_tick_time[reg] += this->regular_events[reg].interval;
     }
@@ -975,7 +983,7 @@ operator << (ostream& o, const generic_scheduler<Timekeeper>& it)
       string name;
       bool ok = it.pin_state_map.find(e->what, name);
       assert (ok);
-      o << "  " << e->when << " " << e->interval << " " << name << endl;
+      o << "  " << e->when << " " << e->priority << " " << e->interval << " " << name << endl;
     }
 
   o << it.regular_events.size() << endl;
@@ -988,7 +996,7 @@ operator << (ostream& o, const generic_scheduler<Timekeeper>& it)
       string name;
       bool ok = it.pin_state_map.find(e->what, name);
       assert (ok);
-      o << "  " << e->when << " " << e->interval << " " << name << endl;
+      o << "  " << e->when << " " << e->priority << " " << e->interval << " " << name << endl;
     }
 
   return o;
@@ -1024,8 +1032,9 @@ operator >> (istream& i, generic_scheduler<Timekeeper>& it)
       for(unsigned t=0; t<num_irregular_events; t++)
 	{
 	  clock_t when, interval;
+	  host_int_4 priority;
 	  string name;
-	  i >> when >> interval >> name;
+	  i >> when >> priority >> interval >> name;
 	  // make base time absolute
 	  when += delta;
 	  // find new pin
@@ -1033,7 +1042,7 @@ operator >> (istream& i, generic_scheduler<Timekeeper>& it)
 	  bool ok = it.pin_state_map.find(name, pin);
 	  assert (ok);
 	  // add it
-	  it.irregular_events.push_back(scheduling_event(when, interval, pin));
+	  it.irregular_events.push_back(scheduling_event(when, interval, pin, priority));
 	}
 
       // Clear regular events table
@@ -1045,8 +1054,9 @@ operator >> (istream& i, generic_scheduler<Timekeeper>& it)
       for(unsigned t=0; t<num_regular_events; t++)
 	{
 	  clock_t when, interval;
+	  host_int_4 priority;
 	  string name;
-	  i >> when >> interval >> name;
+	  i >> when >> priority >> interval >> name;
 	  // make base time absolute
 	  when += delta;
 	  // find new pin
@@ -1054,7 +1064,7 @@ operator >> (istream& i, generic_scheduler<Timekeeper>& it)
 	  bool ok = it.pin_state_map.find(name, pin);
 	  assert (ok);
 	  // add it
-	  it.regular_events.push_back(scheduling_event(when, interval, pin));
+	  it.regular_events.push_back(scheduling_event(when, interval, pin, priority));
 	}
 
       // get scheduler ready for operation with new data
@@ -1083,6 +1093,7 @@ public:
   host_int_2 scale_mul, scale_div;  // time-to-ticks conversion factor
   tick_t time;       // time of next event (irregular) or interval (regular)
   bool regular_p;    // regular (vs irregular) event source
+  host_int_4 priority; // priority of client
   string name;       // "pretty" name, for use in scheduler GUI
 
   // These are public members for direct pin map twiddlers
@@ -1103,18 +1114,18 @@ private:
       // silently prevent division-by-zero
       if (this->scale_div == 0)
 	this->scale_div = 1;
-      tick_t sched_time = t * this->scale_mul / this->scale_div;
 
       if (LIKELY(t != 0))
 	{
 	  // round up away from zero
+	  tick_t sched_time = t * this->scale_mul / this->scale_div;
 	  if (sched_time == 0)
 	    sched_time = 1;
 
 	  if (this->regular_p)
-	    this->comp->sched.schedule_regular (sched_time, & this->event_pin);
+	    this->comp->sched.schedule_regular (sched_time, & this->event_pin, this->priority);
 	  else
-	    this->comp->sched.schedule_irregular (sched_time, & this->event_pin);
+	    this->comp->sched.schedule_irregular (sched_time, & this->event_pin, this->priority);
 	}
     }
 
@@ -1140,6 +1151,7 @@ public:
     scale_div (1),
     time (0),
     regular_p (true),
+    priority (0),
     event_pin (),
     control_pin(this, & scheduler_client::set_control),
     comp(comp)
@@ -1236,7 +1248,9 @@ operator << (ostream& o, const scheduler_component<Scheduler>& it)
 	<< it.clients[j]->time << " "
 	<< it.clients[j]->scale_mul << " "
 	<< it.clients[j]->scale_div << " "
-	<< it.clients[j]->regular_p << endl;
+	<< it.clients[j]->regular_p << " "
+	<< it.clients[j]->priority << " "
+	<< endl;
       its.add_pin_mapping((make_numeric_attribute(j) + "-event"),
 			  & it.clients[j]->event_pin);
     }
@@ -1282,7 +1296,8 @@ operator >> (istream& i, scheduler_component<Scheduler>& it)
 	  i >> it.clients[j]->time 
 	    >> it.clients[j]->scale_mul
 	    >> it.clients[j]->scale_div 
-	    >> it.clients[j]->regular_p;
+	    >> it.clients[j]->regular_p
+	    >> it.clients[j]->priority;
 
 	  it.sched.add_pin_mapping((make_numeric_attribute(j) + "-event"),
 				   & it.clients[j]->event_pin);
@@ -1522,6 +1537,7 @@ scheduler_component<Scheduler>::client_num_update ()
       string num = sidutil::make_numeric_attribute(n);
       this->remove_attribute (num + "-regular?");
       this->remove_attribute (num + "-time");
+      this->remove_attribute (num + "-priority");
       this->remove_attribute (num + "-scale"); 
       this->remove_attribute (num + "-name");
       this->remove_attribute (num + "-event");
@@ -1547,6 +1563,10 @@ scheduler_component<Scheduler>::client_num_update ()
 				  "setting");
       this->add_attribute_notify (num + "-time", 
 				  & c->time, c,
+				  & client_t::reset_events, 
+				  "setting");
+      this->add_attribute_notify (num + "-priority", 
+				  & c->priority, c,
 				  & client_t::reset_events, 
 				  "setting");
       this->add_attribute_virtual (num + "-scale", 

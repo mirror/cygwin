@@ -1,3 +1,10 @@
+2005-08-23  Dave Brolley  <brolley@redhat.com>
+
+	* compConfig.cxx (reset): Drive step_control_pin.
+	(get_current_config): Removed.
+	* sid-control-dynamic-configurator.xml: Correct description of interface.
+	* sid-control-dynamic-configurator.txt: Regenerated.
+
 2005-08-19  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute these changes:

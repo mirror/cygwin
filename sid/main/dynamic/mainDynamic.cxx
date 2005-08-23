@@ -419,7 +419,7 @@ void try_add_gprof(const string optstring, BoardCfg *board)
 {
   gprof_type type;
   string interval_string;
-  int interval;
+  int interval = 1;
   vector<string> toks = sidutil::tokenize (optstring, ",");
 
   type = instruction_count;	// default type value

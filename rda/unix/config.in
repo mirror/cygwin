@@ -3,6 +3,9 @@
 /* Define if target is Alpha Linux */
 #undef ALPHA_LINUX_TARGET
 
+/* Define if target is am33 Linux. */
+#undef AM33_2_0_LINUX_TARGET
+
 /* Define if target is ARM Linux */
 #undef ARM_LINUX_TARGET
 

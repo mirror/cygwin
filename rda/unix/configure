@@ -4658,6 +4658,37 @@ done
 
 
 case "$target" in
+  am33_2.0*linux*)
+    TARGET_MODULES="linux-target.o thread-db.o lwp-pool.o ptrace-target.o"
+    cat >>confdefs.h <<\_ACEOF
+#define LINUX_TARGET 1
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define GREGSET_T prgregset_t
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define HAVE_LWPID_T 1
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define HAVE_PSADDR_T 1
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define HAVE_PRGREGSET_T 1
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define FPREGSET_T prfpregset_t
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define HAVE_PRFPREGSET_T 1
+_ACEOF
+
+    ;;
   mips64*linux*)
     TARGET_MODULES="linux-target.o thread-db.o lwp-pool.o ptrace-target.o"
     cat >>confdefs.h <<\_ACEOF
@@ -4777,7 +4808,7 @@ esac
 
 # Some architectures use the stock breakpoint model.
 case "$target" in
-  i?86*linux* | frv*linux*)
+  i?86*linux* | frv*linux* | am33*linux*)
     TARGET_MODULES="$TARGET_MODULES stock-breakpoints.o"
 
 cat >>confdefs.h <<\_ACEOF
@@ -4790,6 +4821,37 @@ esac
 
 
 case "$target" in
+  am33_2.0*linux*)
+
+cat >>confdefs.h <<\_ACEOF
+#define AM33_2_0_LINUX_TARGET 1
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define PTRACE_XFER_SIZE 4
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define PTRACE_XFER_TYPE_LONG 1
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define PTRACE_ARG1_TYPE_LONG 1
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define PTRACE_ARG2_TYPE_LONG 1
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define PTRACE_ARG3_TYPE_LONG 1
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define PTRACE_ARG4_TYPE_LONG 1
+_ACEOF
+
+    ;;
   *solaris*)
 
 cat >>confdefs.h <<\_ACEOF

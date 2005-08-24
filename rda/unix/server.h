@@ -24,7 +24,7 @@
 
 /* Shared definitions for an RDA based native gdb server.  */
 
-#if defined(_MIPSEL) || defined(_MIPSEB)
+#if defined(_MIPSEL) || defined(_MIPSEB) || defined(AM33_2_0_LINUX_TARGET)
 /*
  * We single-step by setting breakpoints. When an exception
  * is handled, we need to restore the previous instructions
@@ -35,7 +35,8 @@
 struct ss_save {
 	int in_use;
 	struct gdbserv_reg ss_addr;
-        unsigned int ss_val;
+	char ss_val[8];
+	int ss_size;
 };
 #endif
 
@@ -66,7 +67,7 @@ struct child_process {
   int  debug_informational;
   int  running;
   
-#if defined(_MIPSEL) || defined(_MIPSEB)
+#if defined(_MIPSEL) || defined(_MIPSEB) || defined(AM33_2_0_LINUX_TARGET)
    int  is_ss;                 /* we are single stepping */
    struct ss_save ss_info[2];  /* single stepping saved information */
 #endif

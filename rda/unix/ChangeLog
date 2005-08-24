@@ -1,5 +1,53 @@
 2005-08-23  Kevin Buettner  <kevinb@redhat.com>
 
+	* configure.in (am33_2.0*linux*): New target.
+	* Makefile.in: Regenerate.
+	* aclocal.m4: Regenerate.
+	* config.in: Regenerate.
+	* configure: Regenerate.
+	* gdbserv-thread-db.h (mips_singlestep): Change return type to
+	``void''.
+	(am33_singlestep): New declaration.
+	* linux-target.c [AM33_2_0_LINUX_TARGET]
+	(GETREGS_SETREGS_REGINFO, SOFTWARE_SINGLESTEP, PC_REGNUM, A0_REGNUM)
+	(A1_REGNUM, A2_REGNUM, A3_REGNUM, LAR_REGNUM, MDR_REGNUM, SP_REGNUM)
+	(NUM_REGS, sign_extend): Define.
+	(PT_A3, PT_A2, PT_D3, PT_D2, PT_MCVF, PT_MCRL, PT_MCRH, PT_MDRQ)
+	(PT_E1, PT_E0, PT_E7, PT_E6, PT_E5, PT_E4, PT_E3, PT_E2, PT_SP)
+	(PT_LAR, PT_LIR, PT_MDR, PT_A1, PT_A0, PT_D1, PT_D0, PT_ORIG_D0)
+	(PT_EPSW, PT_PC): Define.
+	(reginfo): New table.
+	(stock_table_to_am33, am33_table_to_stock, stock_bp_to_am33)
+	(am33_bp_to_stock, am33_make_bp_table, am33_set_bp, am33_delete_bp)
+	(am33_bp_hit_p, am33_make_arch): New functions.
+	(MAKE_ARCH): Define.
+	(am33_singlestep_program, am33_read_byte, am33_read_disp16)
+	(am33_read_disp32, am33_get_register, am33_get_areg, am33_singlestep):
+	New functions.
+	(am33_opcode_size): New table.
+	[MIPS_LINUX_TARGET | MIPS64_LINUX_TARGET] (SOFTWARE_SINGLESTEP):
+	Define.
+	(linux_attach): Set am33 specific ``singlestep_program''.  Revise
+	proprocessor condition upon which ``is_ss'' is set.
+	[SOFTWARE_SINGLESTEP] (set_singlestep_breakpoint): New function.
+	(mips_get_reg, mips_poke_instruction): Delete.
+	(mips_singlestep): Adjust return type.  Use set_singlestep_breakpoint()
+	where appropriate.
+	* ptrace-target.c (handle_waitstatus): Adjust call to ptrace_set_mem()
+	to account for different type of singlestep breakpoint shadow value.
+	Also, pass the stored breakpoint size.  Add diagnostics.
+	(ptrace_attach): Add AM33_2_0_LINUX_TARGET to list of targets needing
+	to clear ``is_ss''.
+	(singlestep_lwp): Add code to call am33 specific singlestep code.
+	* server.h (struct ss_save): Add AM33_2_0_LINUX_TARGET to the list
+	of preprocessor conditions which declare this struct.  Revise type
+	of ``ss_val'' from ``int'' to a ``char'' array.  Add new field
+	``ss_size''.
+	(struct child_process): Define fields ``is_ss'' and ``ss_info'' for
+	AM33_2_0_LINUX_TARGET.
+
+2005-08-23  Kevin Buettner  <kevinb@redhat.com>
+
 	* gdbserv-thread-db.h (proc_service_noisy): Declare.
 	* linux-target.c (linux_process_rcmd): Add "monitor" commands
 	for enabling and disabling various types of diagnostic messages.

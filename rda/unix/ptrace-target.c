@@ -161,7 +161,7 @@ handle_waitstatus (struct child_process *process, union wait w)
       return (process->stop_signal = WTERMSIG (w));
     }
 
-#if defined(_MIPSEL) || defined(_MIPSEB)
+#if defined(_MIPSEL) || defined(_MIPSEB) || defined(AM33_2_0_LINUX_TARGET)
   /*
    * If we were single_stepping, restore the opcodes hoisted
    * for the breakpoint[s].
@@ -174,9 +174,19 @@ handle_waitstatus (struct child_process *process, union wait w)
 	  {
 	    ptrace_set_mem (process->serv,
 	                    &process->ss_info[i].ss_addr,
-			    &process->ss_info[i].ss_val,
-			    sizeof (process->ss_info[i].ss_val));
+			    process->ss_info[i].ss_val,
+			    process->ss_info[i].ss_size);
 	    process->ss_info[i].in_use = 0;
+	    if (process->debug_backend)
+	      {
+		long addr;
+		gdbserv_host_bytes_from_reg (process->serv, &addr,
+		                             sizeof (addr),
+		                             &process->ss_info[i].ss_addr, 0);
+		fprintf (stderr,
+		         "Singlestep breakpoint %d cleared at location %lx\n",
+			 i, addr);
+	      }
 	  }
       process->is_ss = 0;
     }
@@ -1239,7 +1249,7 @@ ptrace_attach (struct gdbserv *serv, void *data)
 
   ptrace_target->data = data;	/* Save ptr to child_process struct.  */
 
-#if defined(_MIPSEL) || defined(_MIPSEB)
+#if defined(_MIPSEL) || defined(_MIPSEB) || defined(AM33_2_0_LINUX_TARGET)
   process->is_ss = 0;
 #endif
 
@@ -1288,13 +1298,15 @@ int
 singlestep_lwp (struct gdbserv *serv, pid_t lwp, int signal)
 {
 
-#if defined (MIPS_LINUX_TARGET) || defined (MIPS64_LINUX_TARGET)
-  {
-    if (thread_db_noisy)
-      fprintf (stderr, "<singlestep_lwp lwp=%d signal=%d>\n", lwp, signal);
-    mips_singlestep (serv, lwp, signal);
-    return 0;
-  }
+#if defined (AM33_2_0_LINUX_TARGET)
+  if (thread_db_noisy)
+    fprintf (stderr, "<singlestep_lwp lwpid=%d signal=%d>\n", lwp, signal);
+  am33_singlestep (serv, lwp, signal);
+  return 0;
+#elif defined (MIPS_LINUX_TARGET) || defined (MIPS64_LINUX_TARGET)
+  if (thread_db_noisy)
+    fprintf (stderr, "<singlestep_lwp lwpid=%d signal=%d>\n", lwp, signal);
+  mips_singlestep (serv, lwp, signal);
 #else
   if (thread_db_noisy)
     fprintf (stderr, "<ptrace (PTRACE_SINGLESTEP, %d, 0, %d)>\n", lwp, signal);

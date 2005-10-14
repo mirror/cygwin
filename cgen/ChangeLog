@@ -1,3 +1,8 @@
+2005-10-14  Kazuhiro Inaoka <inaoka.kazuhiro@renesas.com>
+
+	* cpu/m32r.opc (parse_slo16): Do not assume a 32-bit host word
+	size.
+
 2005-08-02  Dave Brolley  <brolley@redhat.com>
 
 	* rtl-c.scm (s-unop): Don't dereference

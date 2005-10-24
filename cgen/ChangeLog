@@ -1,3 +1,8 @@
+2005-10-24  DJ Delorie  <dj@redhat.com>
+
+	* operand.scm (-anyof-merge-syntax): Print a more useful error
+	message.
+
 2005-10-19  Nick Clifton  <nickc@redhat.com>
 
 	* cpu/m32r.opc (parse_slo16): Fix bad application of previous

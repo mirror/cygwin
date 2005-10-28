@@ -44,13 +44,13 @@ cgen_disassemble(bfd_vma pc,
 		 int machine,
 		 enum bfd_endian endian,
 		 const char *name,
-		 unsigned long isa_mask)
+		 CGEN_BITSET *isas)
 {
   register_name(arch, name, machine);
   INIT_DISASSEMBLE_INFO(*info, this_ptr, trace_printf);
   info->application_data = this_ptr;
   info->flavour = flavour;
-  info->insn_sets = isa_mask; /* may be 0 */
+  info->insn_sets = isas; /* may be NULL */
   info->arch = arch;
   info->mach = machine;
   info->endian = endian;

@@ -1,5 +1,5 @@
 ; CPU architecture description.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2003 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -902,8 +902,7 @@
   (apply min (cons 65535
 		   (map insn-length (find (lambda (insn)
 					    (and (not (has-attr? insn 'ALIAS))
-						 (eq? (obj-attr-value insn 'ISA)
-						      (obj:name isa))))
+						 (isa-supports? isa insn)))
 					  (non-multi-insns (current-insn-list))))))
 )
 
@@ -913,8 +912,7 @@
   (apply max (cons 0
 		   (map insn-length (find (lambda (insn)
 					    (and (not (has-attr? insn 'ALIAS))
-						 (eq? (obj-attr-value insn 'ISA)
-						      (obj:name isa))))
+						 (isa-supports? isa insn)))
 					  (non-multi-insns (current-insn-list))))))
 )
 

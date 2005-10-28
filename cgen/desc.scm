@@ -1,5 +1,5 @@
 ; General cpu info generator support.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2003 Red Hat, Inc.
 ; This file is part of CGEN.
 ;
 ; This file generates C versions of the more salient parts of the description
@@ -128,7 +128,7 @@ static const CGEN_ATTR_ENTRY bool_attr[] =
 				(if (string? (cadr e))
 				    (cadr e)
 				    (number->string (cadr e))) ; value
-				", {0, {0}}, 0, 0"
+				", {0, {{{0, 0}}}}, 0, 0"
 				" },\n"
 				))
 			     (elm-get self 'values)))

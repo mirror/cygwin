@@ -1,5 +1,5 @@
 ; CGEN Utilities.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2002, 2003 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 ;
@@ -467,6 +467,64 @@
 
 ; Attributes
 
+; Return the C/C++ type to use to hold a value for attribute ATTR.
+
+(define (gen-attr-type attr)
+  (if (string=? (string-downcase (gen-sym attr)) "isa")
+      "CGEN_BITSET"
+      (case (attr-kind attr)
+	((boolean) "int")
+	((bitset)  "unsigned int")
+	((integer) "int")
+	((enum)    (string-append "enum " (string-downcase (gen-sym attr)) "_attr"))
+	))
+)
+
+; Return C macros for accessing an object's attributes ATTRS.
+; PREFIX is one of "cgen_ifld", "cgen_hw", "cgen_operand", "cgen_insn".
+; ATTRS is an alist of attribute values.  The value is unimportant except that
+; it is used to determine bool/non-bool.
+; Non-bools need to be separated from bools as they're each recorded
+; differently.  Non-bools are recorded in an int for each.  All bools are
+; combined into one int to save space.
+; ??? We assume there is at least one bool.
+
+(define (-gen-attr-accessors prefix attrs)
+  (string-append
+   "/* " prefix " attribute accessor macros.  */\n"
+   (string-map (lambda (attr)
+		 (string-append
+		  "#define CGEN_ATTR_"
+		  (string-upcase prefix)
+		  "_"
+		  (string-upcase (gen-sym attr))
+		  "_VALUE(attrs) "
+		  (if (bool-attr? attr)
+		      (string-append
+		       "(((attrs)->bool & (1 << "
+		       (string-upcase prefix)
+		       "_"
+		       (string-upcase (gen-sym attr))
+		       ")) != 0)")
+		      (string-append
+		       "((attrs)->nonbool["
+		       (string-upcase prefix)
+		       "_"
+		       (string-upcase (gen-sym attr))
+		       "-"
+		       (string-upcase prefix)
+		       "_START_NBOOLS-1]."
+		       (case (attr-kind attr)
+			 ((bitset)
+			  (if (string=? (string-downcase (gen-sym attr)) "isa")
+			      ""
+			      "non"))
+			 (else "non"))
+		       "bitset)"))
+		  "\n"))
+	       attrs)
+   "\n")
+)
 ; Return C code to declare an enum of attributes ATTRS.
 ; PREFIX is one of "cgen_ifld", "cgen_hw", "cgen_operand", "cgen_insn".
 ; ATTRS is an alist of attribute values.  The value is unimportant except that
@@ -565,6 +623,27 @@
    ))
 )
 
+; Return the C definition of the terminating entry of an object's attributes.
+; ALL-ATTRS is an ordered alist of all attributes.
+; "ordered" means all the non-boolean attributes are at the front and
+; duplicate entries have been removed.
+
+(define (gen-obj-attr-end-defn all-attrs num-non-bools)
+  (let ((all-non-bools (list-take num-non-bools all-attrs)))
+    (string-append
+     "{ 0, {"
+     (if (null? all-non-bools)
+	 " { 0, 0 }"
+	 (string-drop1 ; drop the leading ","
+	  (string-map (lambda (attr)
+			(let ((val (attr-default attr)))
+					; FIXME: Are we missing attr-prefix here?
+			  (string-append ", "
+					 (send attr 'gen-value-for-defn val))))
+		      all-non-bools)))
+     " } }"
+     ))
+)
 ; Return a boolean indicating if ATLIST indicates a CTI insn.
 
 (define (atlist-cti? atlist)

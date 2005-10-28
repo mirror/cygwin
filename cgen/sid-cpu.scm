@@ -80,6 +80,8 @@
 #ifndef DESC_@ARCH@_H
 #define DESC_@ARCH@_H
 
+#include \"opcode/cgen-bitset.h\"
+
 namespace @arch@ {
 \n"
 
@@ -650,11 +652,9 @@ using namespace cgen;
 							    "_memory")
 					     m 1)) 
 			 modes)))
-
     (logit 2 "Generating writer function ...\n") 
     (string-append
      "
-
   void @prefix@::write_stacks::writeback (int tick, @cpu@::@cpu@_cpu* current_cpu) 
   {
 "

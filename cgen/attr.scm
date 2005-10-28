@@ -1,5 +1,5 @@
 ; Attributes.
-; Copyright (C) 2000 Red Hat, Inc.
+; Copyright (C) 2000, 2003 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -613,6 +613,42 @@
   (map string->symbol (string-cut (->string x) #\,))
 )
 
+; Generate a list representing a bit mask of the indices of 'values'
+; within 'all-values'. Each element in the resulting list represents a byte.
+; Both bits and bytes are indexed from left to right starting at 0
+; with 8 bits in a byte.
+(define (charmask-bytes values all-values vec-length)
+  (logit 3 "charmask-bytes for " values " " all-values "\n")
+  (let ((result (make-vector vec-length 0))
+	(indices (map (lambda (name)
+			(list-ref (map cadr all-values)
+				  (element-lookup-index name (map car all-values) 0)))
+		      values)))
+    (logit 3 "indices: " indices "\n")
+    (for-each (lambda (x)
+		(let* ((byteno (quotient x 8))
+		       (bitno (- 7 (remainder x 8)))
+		       (byteval (logior (vector-ref result byteno)
+					(ash 1 bitno))))
+		  (vector-set! result byteno byteval)))
+	      indices)
+    (logit 3 "result: " (vector->list result) "\n")
+    (vector->list result))
+)
+
+; Convert a bitset value into a bit string based on the
+; index of each member in values
+(define (bitset-attr->charmask value values)
+  (let* ((values-names (map car values))
+	 (values-values (map cadr values))
+	 (vec-length (+ 1 (quotient (apply max values-values) 8))))
+    (string-append "{ " (number->string vec-length) ", \""
+		   (string-map (lambda (x)
+				 (string-append "\\x" (number->hex x)))
+			       (charmask-bytes (bitset-attr->list value)
+					       values vec-length))
+		   "\" }"))
+)
 ; Return the enum of ATTR-NAME for type TYPE.
 ; TYPE is one of 'ifld, 'hw, 'operand, 'insn.
 
@@ -916,7 +952,7 @@
 ; (maybe utils-cgen.scm?) and there's only a few of them.
 
 (method-make!
- <boolean-attribute> 'gen-value-for-defn
+ <boolean-attribute> 'gen-value-for-defn-raw
  (lambda (self value)
    (if (not value)
        "0"
@@ -925,30 +961,82 @@
 )
 
 (method-make!
+ <boolean-attribute> 'gen-value-for-defn
+ (lambda (self value)
+   (send self 'gen-value-for-defn-raw value))
+)
+
+(method-make!
+ <bitset-attribute> 'gen-value-for-defn-raw
+ (lambda (self value)
+   (if (string=? (string-downcase (gen-sym self)) "isa")
+       (bitset-attr->charmask value (elm-get self 'values))
+       (string-drop1
+	(string-upcase
+	 (string-map (lambda (x)
+		       (string-append "|(1<<"
+				      (gen-sym self)
+				      "_" (gen-c-symbol x) ")"))
+		     (bitset-attr->list value)))))
+ )
+)
+
+(method-make!
  <bitset-attribute> 'gen-value-for-defn
  (lambda (self value)
-   (string-drop1
-    (string-upcase
-     (string-map (lambda (x)
-		   (string-append "|(1<<"
-				  (gen-sym self)
-				  "_" (gen-c-symbol x) ")"))
-		 (bitset-attr->list value)))))
+   (string-append
+    "{ "
+    (if (string=? (string-downcase (gen-sym self)) "isa")
+	(bitset-attr->charmask value (elm-get self 'values))
+	(string-append
+	 "{ "
+	 (string-drop1
+	  (string-upcase
+	   (string-map (lambda (x)
+			 (string-append "|(1<<"
+					(gen-sym self)
+					"_" (gen-c-symbol x) ")"))
+		       (bitset-attr->list value))))
+	 ", 0 }"))
+    " }")
+ )
+)
+
+(method-make!
+ <integer-attribute> 'gen-value-for-defn-raw
+ (lambda (self value)
+   (number->string value)
+ )
 )
 
 (method-make!
  <integer-attribute> 'gen-value-for-defn
  (lambda (self value)
-   (number->string value))
+   (string-append 
+    "{ { "
+    (send self 'gen-value-for-defn-raw value)
+    ", 0 } }")
+ )
+)
+
+(method-make!
+ <enum-attribute> 'gen-value-for-defn-raw
+ (lambda (self value)
+   (string-upcase
+    (gen-c-symbol (string-append (obj:str-name self)
+				 "_"
+				 (symbol->string value))))
+ )
 )
 
 (method-make!
  <enum-attribute> 'gen-value-for-defn
  (lambda (self value)
-   (string-upcase
-    (gen-c-symbol (string-append (obj:str-name self)
-				 "_"
-				 (symbol->string value)))))
+   (string-append
+    "{ { "
+     (send self 'gen-value-for-defn-raw value)
+     ", 0 } }")
+ )
 )
 
 ; Called before loading a .cpu file to initialize.

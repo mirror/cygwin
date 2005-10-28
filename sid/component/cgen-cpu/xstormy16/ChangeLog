@@ -1,3 +1,7 @@
+2005-10-28  Dave Brolley  <brolley@redhat.com>
+
+	* xstormy16-desc.h: Regenerate.
+
 2005-08-19  Dave Brolley  <brolley@redhat.com>
 
 	* Makefile.am: Remove references to xstormy16-write.cxx.

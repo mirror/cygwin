@@ -12,6 +12,8 @@ This file is part of the Red Hat simulators.
 #ifndef DESC_XSTORMY16_H
 #define DESC_XSTORMY16_H
 
+#include "opcode/cgen-bitset.h"
+
 namespace xstormy16 {
 
 // Enums.

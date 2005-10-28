@@ -230,7 +230,7 @@
 				       (attr-default attr))))
 			  ; FIXME: Are we missing attr-prefix here?
 			  (string-append ", "
-					 (send attr 'gen-value-for-defn val))))
+					 (send attr 'gen-value-for-defn-raw val))))
 		      all-non-bools)))
      " }"))
 )

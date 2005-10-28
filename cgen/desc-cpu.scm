@@ -114,6 +114,7 @@ static const CGEN_MACH @arch@_cgen_mach_table[] = {
    "/* Ifield support.  */\n\n"
    "/* Ifield attribute indices.  */\n\n"
    (gen-attr-enum-decl "cgen_ifld" (current-ifld-attr-list))
+   (-gen-attr-accessors "cgen_ifld" (current-ifld-attr-list))
    (gen-enum-decl 'ifield_type "@arch@ ifield types"
 		  "@ARCH@_"
 		  (append (gen-obj-list-enums (non-derived-ifields (current-ifld-list)))
@@ -161,7 +162,7 @@ const CGEN_IFLD @arch@_cgen_ifld_table[] =
 			   "  },\n")))
       ifld-list)
      "\
-  { 0, 0, 0, 0, 0, 0, {0, {0}} }
+  { 0, 0, 0, 0, 0, 0, " (gen-obj-attr-end-defn all-attrs num-non-bools) " }
 };
 
 #undef A
@@ -180,6 +181,7 @@ const CGEN_IFLD @arch@_cgen_ifld_table[] =
   (string-list
    "/* Hardware attribute indices.  */\n\n"
    (gen-attr-enum-decl "cgen_hw" (current-hw-attr-list))
+   (-gen-attr-accessors "cgen_hw" (current-hw-attr-list))
    (gen-enum-decl 'cgen_hw_type "@arch@ hardware types"
 		  "HW_" ; FIXME: @ARCH@_
 		  (append (nub (map (lambda (hw)
@@ -281,7 +283,7 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
 			   " },\n")))
       (current-hw-list))
      "\
-  { 0, 0, CGEN_ASM_NONE, 0, {0, {0}} }
+  { 0, 0, CGEN_ASM_NONE, 0, " (gen-obj-attr-end-defn all-attrs num-non-bools) " }
 };
 
 #undef A
@@ -298,6 +300,8 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
 (define (-gen-hash-defines)
   (logit 2 "Generating #define's ...\n")
   (string-list
+   "#include \"opcode/cgen-bitset.h\"\n"
+   "\n"
    "#define CGEN_ARCH @arch@\n\n"
    "/* Given symbol S, return @arch@_cgen_<S>.  */\n"
    (gen-define-with-symcat "CGEN_SYM(s) @arch@" "_cgen_" "s")
@@ -365,6 +369,7 @@ const CGEN_HW_ENTRY @arch@_cgen_hw_table[] =
   (string-list
    "/* Operand attribute indices.  */\n\n"
    (gen-attr-enum-decl "cgen_operand" (current-op-attr-list))
+   (-gen-attr-accessors "cgen_operand" (current-op-attr-list))
    (gen-enum-decl 'cgen_operand_type "@arch@ operand types"
 		  "@ARCH@_OPERAND_"
 		  (nub (append (gen-obj-list-enums (current-op-list))
@@ -475,7 +480,7 @@ const CGEN_OPERAND @arch@_cgen_operand_table[] =
 			      )))))
       (current-op-list))
      "/* sentinel */\n\
-  { 0, 0, 0, 0, 0,\n    { 0, { (const PTR) 0 } },\n    { 0, { 0 } } }
+  { 0, 0, 0, 0, 0,\n    { 0, { (const PTR) 0 } },\n    " (gen-obj-attr-end-defn all-attrs num-non-bools) " }
 };
 
 #undef A
@@ -494,6 +499,7 @@ const CGEN_OPERAND @arch@_cgen_operand_table[] =
   (string-list
    "/* Insn attribute indices.  */\n\n"
    (gen-attr-enum-decl "cgen_insn" (current-insn-attr-list))
+   (-gen-attr-accessors "cgen_insn" (current-insn-attr-list))
    )
 )
 
@@ -552,7 +558,7 @@ static const CGEN_IBASE @arch@_cgen_insn_table[MAX_INSNS] =
   /* Special null first entry.
      A `num' value of zero is thus invalid.
      Also, the special `invalid' insn resides here.  */
-  { 0, 0, 0, 0, {0, {0}} },\n"
+  { 0, 0, 0, 0, " (gen-obj-attr-end-defn all-attrs num-non-bools) " },\n"
 
      (lambda ()
        (string-write-map (lambda (insn)
@@ -696,7 +702,7 @@ static void
 @arch@_cgen_rebuild_tables (CGEN_CPU_TABLE *cd)
 {
   int i;
-  unsigned int isas = cd->isas;
+  CGEN_BITSET *isas = cd->isas;
   unsigned int machs = cd->machs;
 
   cd->int_insn_p = CGEN_INT_INSN_P;
@@ -708,7 +714,7 @@ static void
   cd->min_insn_bitsize = 65535; /* Some ridiculously big number.  */
   cd->max_insn_bitsize = 0;
   for (i = 0; i < MAX_ISAS; ++i)
-    if (((1 << i) & isas) != 0)
+    if (cgen_bitset_contains (isas, i))
       {
 	const CGEN_ISA *isa = & @arch@_cgen_isa_table[i];
 
@@ -793,7 +799,7 @@ CGEN_CPU_DESC
 {
   CGEN_CPU_TABLE *cd = (CGEN_CPU_TABLE *) xmalloc (sizeof (CGEN_CPU_TABLE));
   static int init_p;
-  unsigned int isas = 0;  /* 0 = \"unspecified\" */
+  CGEN_BITSET *isas = 0;  /* 0 = \"unspecified\" */
   unsigned int machs = 0; /* 0 = \"unspecified\" */
   enum cgen_endian endian = CGEN_ENDIAN_UNKNOWN;
   va_list ap;
@@ -812,7 +818,7 @@ CGEN_CPU_DESC
       switch (arg_type)
 	{
 	case CGEN_CPU_OPEN_ISAS :
-	  isas = va_arg (ap, unsigned int);
+	  isas = va_arg (ap, CGEN_BITSET *);
 	  break;
 	case CGEN_CPU_OPEN_MACHS :
 	  machs = va_arg (ap, unsigned int);
@@ -843,9 +849,6 @@ CGEN_CPU_DESC
     machs = (1 << MAX_MACHS) - 1;
   /* Base mach is always selected.  */
   machs |= 1;
-  /* ISA unspecified means \"all\".  */
-  if (isas == 0)
-    isas = (1 << MAX_ISAS) - 1;
   if (endian == CGEN_ENDIAN_UNKNOWN)
     {
       /* ??? If target has only one, could have a default.  */
@@ -853,7 +856,7 @@ CGEN_CPU_DESC
       abort ();
     }
 
-  cd->isas = isas;
+  cd->isas = cgen_bitset_copy (isas);
   cd->machs = machs;
   cd->endian = endian;
   /* FIXME: for the sparc case we can determine insn-endianness statically.

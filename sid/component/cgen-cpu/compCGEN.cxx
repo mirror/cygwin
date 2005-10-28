@@ -158,7 +158,7 @@ cgen::cgen_bi_endian_cpu::disassemble (PCADDR pc,
   enum bfd_architecture arch,
   enum bfd_endian endian,
   const char *name,
-  unsigned long isa_mask,
+  CGEN_BITSET *isas,
   int machine)
 {
   cgen_disassemble((bfd_vma)pc, &this->info, this,
@@ -172,7 +172,7 @@ cgen::cgen_bi_endian_cpu::disassemble (PCADDR pc,
 		   machine,
                    endian,
 		   name,
-		   isa_mask);
+		   isas);
 }
 
 int

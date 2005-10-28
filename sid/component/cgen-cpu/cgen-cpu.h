@@ -25,6 +25,7 @@
 
 #include "bfd.h"
 #include "dis-asm.h"
+#include "opcode/cgen-bitset.h"
 
 // ansidecl.h interferes with this perfectly ordinary word
 #undef AND
@@ -68,7 +69,7 @@ public:
   // Disassembly tracing support
   void disassemble (PCADDR pc, disassembler_ftype printfn,
 		    enum bfd_flavour flavour, enum bfd_architecture arch,
-		    enum bfd_endian endian, const char *name, unsigned long isa_mask = 0, int machine = 0);
+		    enum bfd_endian endian, const char *name, CGEN_BITSET *isas = 0, int machine = 0);
   struct disassemble_info info;
 protected:
   static int cgen_read_memory (bfd_vma memaddr, bfd_byte *myaddr,

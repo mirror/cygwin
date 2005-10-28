@@ -1,3 +1,19 @@
+2005-10-28  Dave Brolley  <brolley@redhat.com>
+
+	Contribute the following changes:
+	2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* tracedis.cxx (cgen_disassemble): Rename isa_mask to isas. Now
+	(CGEN_ISA_MASK*).
+	* tracedis.h (opcode/cgen-bitset.h): #include it.
+	(cgen_disassemble): Rename isa_mask to isas. Now
+	(CGEN_ISA_MASK*).
+	(cgen_bi_endian_cpu::disassemble): 'isas' now (CGEN_ISA_MASK *).
+	* cgen-cpu.h (opcode/cgen-bitset.h): #include it.
+	(cgen_bi_endian_cpu::disassemble): 'isas' now (CGEN_ISA_MASK *).
+	* compCGEN.cxx (cgen_disassemble): Rename isa_mask to isas. Now
+	(CGEN_ISA_MASK*).
+
 2005-08-19  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:

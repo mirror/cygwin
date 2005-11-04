@@ -1,3 +1,13 @@
+2005-11-04  Kevin Buettner  <kevinb@redhat.com>
+
+	* thread-db.c (ALWAYS_UPDATE_THREAD_LIST): Define to be 0.
+	(handle_thread_db_event): Update thread list upon receipt of
+	TD_CREATE or TD_DEATH events.
+	(thread_db_check_child_state): Potentially disable, depending upon
+	value of ALWAYS_UPDATE_THREAD_LIST, the thread list update.
+	(thread_db_check_child_state): Update thread list for signal based
+	event model too.
+
 2005-08-23  Kevin Buettner  <kevinb@redhat.com>
 
 	* configure.in (am33_2.0*linux*): New target.

@@ -48,6 +48,8 @@
 int thread_db_noisy = 0;
 int proc_service_noisy = 0;
 
+#define ALWAYS_UPDATE_THREAD_LIST 0
+
 /*
  * A tiny local symbol table.
  *
@@ -1779,6 +1781,7 @@ handle_thread_db_event (struct child_process *process)
   struct gdbserv_thread *thread = process->event_thread;
   lwpid_t lwp;
   union wait w;
+  int do_update = 0;
 
   /* We need to be actually using the event interface.  */
   if (! using_thread_db_events)
@@ -1812,13 +1815,16 @@ handle_thread_db_event (struct child_process *process)
 	  break;
 	}
 
-      /* The only messages we're concerned with are TD_CREATE and
-	 TD_DEATH.
+      if (msg.event == TD_CREATE || msg.event == TD_DEATH)
+	do_update = 1;
+    }
 
-	 Every time thread_db_check_child_state gets a wait status
-	 from waitpid, we call update_thread_list, so our list is
-	 always up to date; we don't actually need to do anything with
-	 these messages for our own sake.  */
+  if (do_update)
+    {
+#if !ALWAYS_UPDATE_THREAD_LIST
+      /* Update the thread list.  */
+      update_thread_list (process);
+#endif
     }
 
   /* Disable the event breakpoints while we step the thread across them.  */
@@ -2122,9 +2128,11 @@ thread_db_check_child_state (struct child_process *process)
 		     process->stop_signal,
 		     (unsigned long) debug_get_pc (process->serv, process->pid));
 
+#if ALWAYS_UPDATE_THREAD_LIST
 	  /* Update the thread list, and attach to (and thereby stop)
              any new threads we find.  */
 	  update_thread_list (process);
+#endif
 
 	  process->event_thread = thread_list_lookup_by_lid (process->pid);
 
@@ -2170,6 +2178,12 @@ thread_db_check_child_state (struct child_process *process)
 		    process->stop_signal = restart_signal;
 		  else				/* not main thread */
 		    process->stop_signal = 0;
+
+#if !ALWAYS_UPDATE_THREAD_LIST
+		  /* Update the thread list.  */
+		  update_thread_list (process);
+#endif
+
 		}
 	      process->signal_to_send = process->stop_signal;
 	      currentvec->continue_program (serv);

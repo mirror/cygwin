@@ -1,3 +1,31 @@
+2005-11-08  Kevin Buettner  <kevinb@redhat.com>
+
+	* diagnostics.h: New file.
+	* gdbserv-thread-db.h (debug_get_pc): Move declaration to new
+	file diagnostics.h.
+	* linux-target.c (diagnostics.h): Include.
+	(linux_process_rcmd): Add new monitor commands "lwp-pool-noisy",
+	"lwp-pool-quiet", "all-noisy", and "all-quiet".  Delete monitor
+	commands "proc-service-noisy" and "proc-service-quiet".
+	* lwp-pool.c (diagnostics.h): Include.
+	(debug_lwp_pool): Remove `static' qualifier.
+	(debug_report_state_change):  Add code for printing out the PC value
+	at which program stopped.
+	(debug_report_state_change, wait_and_handle, check_stop_pending)
+	(lwp_pool_waitpid, lwp_pool_stop_all, lwp_pool_continue_all)
+	(lwp_pool_continue_lwp, lwp_pool_attach): Add `serv' argument.  Fix
+	all callers.
+	* lwp-pool.h (lwp_pool_attach, lwp_pool_waitpid, lwp_pool_stop_all)
+	(lwp_pool_continue_all, lwp_pool_continue_lwp): Add `serv' argument.
+	(lwp_pool_singlestep_lwp): Revise comment regarding consistency of
+	not passing `serv' parameter.
+	* thread-db.c (diagnostics.h): Include.
+	(proc_service_noisy): Delete this unused global.
+	(attach_thread, continue_thread): Add `serv' parameter.  Fix all
+	callers.
+	(update_thread_list, thread_db_singlestep_program): Add diagnostic
+	messages.
+
 2005-11-04  Kevin Buettner  <kevinb@redhat.com>
 
 	* thread-db.c (ALWAYS_UPDATE_THREAD_LIST): Define to be 0.

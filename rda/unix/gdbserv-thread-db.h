@@ -92,10 +92,6 @@ extern void mips_singlestep (struct gdbserv *serv, pid_t pid, int sig);
 extern void am33_singlestep (struct gdbserv *serv, pid_t pid, int sig);
 #endif
 
-
-/* Fetch the value of PC for debugging purposes.  */
-extern unsigned long debug_get_pc (struct gdbserv *serv, pid_t pid);
-
 /* Adjust PC value after trap has been hit.  */
 extern int decr_pc_after_break (struct gdbserv *serv, pid_t pid);
 

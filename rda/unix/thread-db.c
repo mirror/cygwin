@@ -43,10 +43,10 @@
 #include "gdbserv-thread-db.h"
 #include "lwp-ctrl.h"
 #include "lwp-pool.h"
+#include "diagnostics.h"
 
 /* Make lots of noise (debugging output). */
 int thread_db_noisy = 0;
-int proc_service_noisy = 0;
 
 #define ALWAYS_UPDATE_THREAD_LIST 0
 
@@ -1378,7 +1378,7 @@ thread_db_detach (struct gdbserv *serv, struct gdbserv_target *target)
 }
 
 static void
-attach_thread (struct gdbserv_thread *thread)
+attach_thread (struct gdbserv *serv, struct gdbserv_thread *thread)
 {
   if (thread->ti.ti_lid != 0)
     {
@@ -1392,7 +1392,7 @@ attach_thread (struct gdbserv_thread *thread)
 	 even when the LWP has exited --- in that case, it returns
 	 ps_getpid (&proc_handle).  The LWP pool code tolerates
 	 multiple requests to attach to the same PID.  */
-      int status = lwp_pool_attach (thread->ti.ti_lid);
+      int status = lwp_pool_attach (serv, thread->ti.ti_lid);
 
       /* If we're using signals to communicate with the thread
 	 library, send the newly attached thread the restart
@@ -1413,6 +1413,7 @@ static int
 find_new_threads_callback (const td_thrhandle_t *thandle, void *data)
 {
   struct gdbserv_thread *thread;
+  struct gdbserv *serv = data;
   td_thrinfo_t ti;
   td_err_e     ret;
 
@@ -1434,7 +1435,7 @@ find_new_threads_callback (const td_thrhandle_t *thandle, void *data)
 	  if (thread_db_noisy)
 	    fprintf (stderr, "(new thread %s)\n", thread_debug_name (thread));
 
-	  attach_thread (thread);
+	  attach_thread (serv, thread);
 
 	  if (using_thread_db_events)
 	    {
@@ -1465,11 +1466,15 @@ static void
 update_thread_list (struct child_process *process)
 {
   struct gdbserv_thread *thread, *next;
+  struct gdbserv *serv = process->serv;
   td_thrhandle_t handle;
+
+  if (thread_db_noisy)
+    fprintf (stderr, "thread-db.c: update_thread_list\n");
 
   /* First make sure all libthread threads are in the list. */
   td_ta_thr_iter_p (thread_agent, find_new_threads_callback, 
-		    (void *) 0, 
+		    serv, 
 		    TD_THR_ANY_STATE, 
 		    TD_THR_LOWEST_PRIORITY,
 		    TD_SIGNO_MASK,
@@ -1840,7 +1845,7 @@ handle_thread_db_event (struct child_process *process)
   if (thread_db_noisy)
     fprintf (stderr, "(waiting after event bp step %s)\n",
 	     thread_debug_name (thread));
-  if (lwp_pool_waitpid (lwp, (int *) &w, 0) < 0)
+  if (lwp_pool_waitpid (serv, lwp, (int *) &w, 0) < 0)
     {
       fprintf (stderr, "error waiting for thread %d after "
 	       "stepping over event breakpoint:\n%s",
@@ -1869,12 +1874,13 @@ handle_thread_db_event (struct child_process *process)
    Send continue to a struct gdbserv_thread. */
 
 static void
-continue_thread (struct gdbserv_thread *thread, int signal)
+continue_thread (struct gdbserv *serv, struct gdbserv_thread *thread,
+                 int signal)
 {
   thread_db_flush_regset_caches();
 
   if (thread->ti.ti_lid != 0)
-    lwp_pool_continue_lwp (thread->ti.ti_lid, signal);
+    lwp_pool_continue_lwp (serv, thread->ti.ti_lid, signal);
 
   thread_db_invalidate_caches ();
 }
@@ -1892,15 +1898,15 @@ thread_db_continue_program (struct gdbserv *serv)
 
   /* First resume the event thread. */
   if (process->event_thread)
-      continue_thread (process->event_thread, process->signal_to_send);
+      continue_thread (serv, process->event_thread, process->signal_to_send);
   else
-    lwp_pool_continue_lwp (process->pid, process->signal_to_send);
+    lwp_pool_continue_lwp (serv, process->pid, process->signal_to_send);
 
   process->stop_signal = process->stop_status = 
     process->signal_to_send = 0;
 
   /* Then resume everyone else. */
-  lwp_pool_continue_all ();
+  lwp_pool_continue_all (serv);
   process->running = 1;
   thread_db_invalidate_caches ();
 
@@ -1932,15 +1938,27 @@ thread_db_singlestep_program (struct gdbserv *serv)
 
   /* First singlestep the event thread. */
   if (process->event_thread)
-    singlestep_thread (serv, process->event_thread, process->signal_to_send);
+    {
+      if (thread_db_noisy)
+	fprintf (stderr, "thread_db_singlestep_program: Single stepping event thread %d starting from %#lx\n",
+	         process->event_thread->ti.ti_lid,
+		 debug_get_pc (serv, process->event_thread->ti.ti_lid));
+      singlestep_thread (serv, process->event_thread, process->signal_to_send);
+    }
   else
-    lwp_pool_singlestep_lwp (serv, process->pid, process->signal_to_send);
+    {
+      if (thread_db_noisy)
+	fprintf (stderr, "thread_db_singlestep_program: Single stepping %d starting from %#lx\n",
+	         process->pid,
+		 debug_get_pc (serv, process->pid));
+      lwp_pool_singlestep_lwp (serv, process->pid, process->signal_to_send);
+    }
 
   process->stop_status = process->stop_signal =
     process->signal_to_send = 0;
 
   /* Then resume everyone else. */
-  lwp_pool_continue_all ();
+  lwp_pool_continue_all (serv);
   process->running = 1;
   thread_db_invalidate_caches ();
 
@@ -1974,7 +1992,7 @@ thread_db_continue_thread (struct gdbserv *serv,
   else
     {
       process->pid = thread->ti.ti_lid;		/* thread to be continued */
-      continue_thread (thread, process->signal_to_send);
+      continue_thread (serv, thread, process->signal_to_send);
       process->stop_status = process->stop_signal =
 	process->signal_to_send = 0;
       process->running = 1;
@@ -2091,10 +2109,10 @@ thread_db_check_child_state (struct child_process *process)
 	 status results only from that thread, even though there may
 	 be others collected from before.  */
       if (process->focus_thread)
-	eventpid = lwp_pool_waitpid (process->focus_thread->ti.ti_lid,
+	eventpid = lwp_pool_waitpid (serv, process->focus_thread->ti.ti_lid,
 				     (int *) &w, WNOHANG);
       else
-	eventpid = lwp_pool_waitpid (-1, (int *) &w, WNOHANG);
+	eventpid = lwp_pool_waitpid (serv, -1, (int *) &w, WNOHANG);
 
       if (eventpid > 0)	/* found an event */
 	{
@@ -2118,7 +2136,7 @@ thread_db_check_child_state (struct child_process *process)
 	    }
 
 	  /* Stop all the threads we know about.  */
-	  lwp_pool_stop_all ();
+	  lwp_pool_stop_all (serv);
 
 	  if (thread_db_noisy)
 	    fprintf (stderr,
@@ -2185,6 +2203,8 @@ thread_db_check_child_state (struct child_process *process)
 #endif
 
 		}
+
+	      /* Continue the program.  */
 	      process->signal_to_send = process->stop_signal;
 	      currentvec->continue_program (serv);
 	      return 0;
@@ -2195,7 +2215,7 @@ thread_db_check_child_state (struct child_process *process)
 	  /* Pass this event back to GDB. */
 	  if (process->debug_backend)
 	    fprintf (stderr, "wait returned '%c' (%d) for %d.\n", 
-		     process->stop_status, process->stop_signal, eventpid);
+		     process->stop_status, process->stop_signal, process->pid);
 	  return 1;
 	}
     }

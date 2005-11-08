@@ -37,7 +37,9 @@
 #include "lwp-pool.h"
 #include "lwp-ctrl.h"
 
-static int debug_lwp_pool = 0;
+#include "diagnostics.h"
+
+int debug_lwp_pool = 0;
 
 
 /* THE LIFETIME OF A TRACED LWP
@@ -772,14 +774,20 @@ lwp_state_str (enum lwp_state state)
 
 
 static void
-debug_report_state_change (pid_t lwp,
+debug_report_state_change (struct gdbserv *serv,
+                           pid_t lwp,
 			   enum lwp_state old,
 			   enum lwp_state new)
 {
   if (debug_lwp_pool && old != new)
-    fprintf (stderr,
-	     "%32s -- %5d -> %-32s\n",
-	     lwp_state_str (old), (int) lwp, lwp_state_str (new));
+    {
+      fprintf (stderr,
+	       "%32s -- %5d -> %s",
+	       lwp_state_str (old), (int) lwp, lwp_state_str (new));
+      if (new == lwp_state_stopped)
+	fprintf (stderr, "    (at %#lx)", debug_get_pc (serv, lwp));
+      fprintf (stderr, "\n");
+    }
 }
 
 
@@ -793,7 +801,7 @@ debug_report_state_change (pid_t lwp,
 
    If waitpid returns an error, print a message to stderr.  */
 static int
-wait_and_handle (struct lwp *l, int flags)
+wait_and_handle (struct gdbserv *serv, struct lwp *l, int flags)
 {
   int status;
   pid_t new_pid; 
@@ -910,7 +918,7 @@ wait_and_handle (struct lwp *l, int flags)
 	}
     }
 
-  debug_report_state_change (l->pid, old_state, l->state);
+  debug_report_state_change (serv, l->pid, old_state, l->state);
 
   return 1;
 }
@@ -936,11 +944,11 @@ wait_and_handle (struct lwp *l, int flags)
    some INTERESTING state.  It's really just wait_and_handle, with
    some error checking wrapped around it.  */
 static int
-check_stop_pending (struct lwp *l)
+check_stop_pending (struct gdbserv *serv, struct lwp *l)
 {
   assert (l->state == lwp_state_running_stop_pending);
 
-  wait_and_handle (l, __WALL);
+  wait_and_handle (serv, l, __WALL);
 
   switch (l->state)
     {
@@ -971,7 +979,7 @@ check_stop_pending (struct lwp *l)
 
 
 pid_t
-lwp_pool_waitpid (pid_t pid, int *stat_loc, int options)
+lwp_pool_waitpid (struct gdbserv *serv, pid_t pid, int *stat_loc, int options)
 {
   struct lwp *l;
   enum lwp_state old_state;
@@ -992,7 +1000,7 @@ lwp_pool_waitpid (pid_t pid, int *stat_loc, int options)
 	 the interesting queue.  */
       while (! queue_non_empty (&interesting_queue))
 	{
-	  int result = wait_and_handle (NULL, options | __WALL);
+	  int result = wait_and_handle (serv, NULL, options | __WALL);
 
 	  if (result <= 0)
 	    return result;
@@ -1013,7 +1021,7 @@ lwp_pool_waitpid (pid_t pid, int *stat_loc, int options)
       while (l->state == lwp_state_running
 	     || l->state == lwp_state_running_stop_pending)
 	{
-	  int result = wait_and_handle (l, options | __WALL);
+	  int result = wait_and_handle (serv, l, options | __WALL);
 
 	  if (result <= 0)
 	    return result;
@@ -1050,7 +1058,7 @@ lwp_pool_waitpid (pid_t pid, int *stat_loc, int options)
 	 is not interesting any more.  */
       l->state = lwp_state_stopped;
       queue_delete (l);
-      debug_report_state_change (l->pid, old_state, l->state);
+      debug_report_state_change (serv, l->pid, old_state, l->state);
       break;
 
     case lwp_state_dead_interesting:
@@ -1069,7 +1077,7 @@ lwp_pool_waitpid (pid_t pid, int *stat_loc, int options)
 	 uninteresting, but it's still got a stop pending.  */
       queue_delete (l);
       l->state = lwp_state_stopped_stop_pending;
-      debug_report_state_change (l->pid, old_state, l->state);
+      debug_report_state_change (serv, l->pid, old_state, l->state);
       break;
 
     default:
@@ -1088,7 +1096,7 @@ lwp_pool_waitpid (pid_t pid, int *stat_loc, int options)
 
 
 void
-lwp_pool_stop_all (void)
+lwp_pool_stop_all (struct gdbserv *serv)
 {
   int i;
 
@@ -1149,13 +1157,13 @@ lwp_pool_stop_all (void)
 	      break;
 	    }
 
-	  debug_report_state_change (l->pid, old_state, l->state);
+	  debug_report_state_change (serv, l->pid, old_state, l->state);
 	}
     }
 
   /* Gather wait results until the stopping queue is empty.  */
   while (queue_non_empty (&stopping_queue))
-    if (wait_and_handle (NULL, __WALL) < 0)
+    if (wait_and_handle (serv, NULL, __WALL) < 0)
       {
 	fprintf (stderr, "ERROR: lwp_pool_stop_all wait failed: %s",
 		 strerror (errno));
@@ -1199,7 +1207,7 @@ lwp_pool_stop_all (void)
 
 
 void
-lwp_pool_continue_all (void)
+lwp_pool_continue_all (struct gdbserv *serv)
 {
   int i;
 
@@ -1255,7 +1263,7 @@ lwp_pool_continue_all (void)
               if (continue_lwp (l->pid, 0) == 0)
                 {
                   l->state = lwp_state_running_stop_pending;
-                  if (check_stop_pending (l) == 0)
+                  if (check_stop_pending (serv, l) == 0)
                     {
                       if (continue_lwp (l->pid, 0) == 0)
                         l->state = lwp_state_running;
@@ -1270,14 +1278,14 @@ lwp_pool_continue_all (void)
 	      break;
 	    }
 
-	  debug_report_state_change (l->pid, old_state, l->state);
+	  debug_report_state_change (serv, l->pid, old_state, l->state);
 	}
     }
 }
 
 
 int
-lwp_pool_continue_lwp (pid_t pid, int signal)
+lwp_pool_continue_lwp (struct gdbserv *serv, pid_t pid, int signal)
 {
   struct lwp *l = hash_find_known (pid);
   enum lwp_state old_state = l->state;
@@ -1324,7 +1332,7 @@ lwp_pool_continue_lwp (pid_t pid, int signal)
       if (continue_lwp (l->pid, signal) == 0)
         {
           l->state = lwp_state_running_stop_pending;
-          if (check_stop_pending (l) == 0)
+          if (check_stop_pending (serv, l) == 0)
             {
               if (continue_lwp (l->pid, 0) == 0)
                 l->state = lwp_state_running;
@@ -1339,7 +1347,7 @@ lwp_pool_continue_lwp (pid_t pid, int signal)
       break;
     }
 
-  debug_report_state_change (l->pid, old_state, l->state);
+  debug_report_state_change (serv, l->pid, old_state, l->state);
 
   return result;
 }
@@ -1393,7 +1401,7 @@ lwp_pool_singlestep_lwp (struct gdbserv *serv, pid_t lwp, int signal)
       if (continue_lwp (l->pid, signal) == 0)
         {
           l->state = lwp_state_running_stop_pending;
-          if (check_stop_pending (l) == 0)
+          if (check_stop_pending (serv, l) == 0)
             {
               if (singlestep_lwp (serv, l->pid, 0) == 0)
                 l->state = lwp_state_running;
@@ -1408,7 +1416,7 @@ lwp_pool_singlestep_lwp (struct gdbserv *serv, pid_t lwp, int signal)
       break;
     }
 
-  debug_report_state_change (l->pid, old_state, l->state);
+  debug_report_state_change (serv, l->pid, old_state, l->state);
 
   return result;
 }
@@ -1434,7 +1442,7 @@ lwp_pool_new_stopped (pid_t pid)
 
 
 int
-lwp_pool_attach (pid_t pid)
+lwp_pool_attach (struct gdbserv *serv, pid_t pid)
 {
   /* Are we already managing this LWP?  */
   struct lwp *l = hash_find (pid);
@@ -1464,7 +1472,7 @@ lwp_pool_attach (pid_t pid)
 	fprintf (stderr, "lwp_pool: %s: new LWP %d state %s\n",
 		 __func__, l->pid, lwp_state_str (l->state));
 
-      check_stop_pending (l);
+      check_stop_pending (serv, l);
 
       return 1;
     }

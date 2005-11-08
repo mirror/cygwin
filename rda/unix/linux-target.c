@@ -48,6 +48,7 @@
 #include "server.h"
 #include "arch.h"
 #include "ptrace-target.h"
+#include "diagnostics.h"
 
 #ifdef STOCK_BREAKPOINTS
 #include "stock-breakpoints.h"
@@ -3109,26 +3110,42 @@ linux_process_rcmd (struct gdbserv *serv, const char *cmd, int cmdsize)
       thread_db_noisy = 0;
       gdbserv_output_string_as_bytes (serv, "RDA thread-db diagnostics disabled.\n");
     }
-  else if (strcmp (cmd, "proc-service-noisy") == 0)
+  else if (strcmp (cmd, "lwp-pool-noisy") == 0)
     {
-      proc_service_noisy = 1;
-      gdbserv_output_string_as_bytes (serv, "RDA proc-service diagnostics enabled.\n");
+      debug_lwp_pool = 1;
+      gdbserv_output_string_as_bytes (serv, "RDA lwp-pool diagnostics enabled.\n");
     }
-  else if (strcmp (cmd, "proc-service-quiet") == 0)
+  else if (strcmp (cmd, "lwp-pool-quiet") == 0)
     {
-      proc_service_noisy = 0;
-      gdbserv_output_string_as_bytes (serv, "RDA proc-service diagnostics disabled.\n");
+      debug_lwp_pool = 0;
+      gdbserv_output_string_as_bytes (serv, "RDA lwp-pool diagnostics disabled.\n");
+    }
+  else if (strcmp (cmd, "all-noisy") == 0)
+    {
+      process->debug_backend = 1;
+      thread_db_noisy = 1;
+      debug_lwp_pool = 1;
+      gdbserv_output_string_as_bytes (serv, "All RDA diagnostics enabled.\n");
+    }
+  else if (strcmp (cmd, "all-quiet") == 0)
+    {
+      process->debug_backend = 0;
+      thread_db_noisy = 0;
+      debug_lwp_pool = 0;
+      gdbserv_output_string_as_bytes (serv, "All RDA diagnostics disabled.\n");
     }
   else
     gdbserv_output_string_as_bytes (serv,
       "Unrecognized monitor command.\n"
       "Available commands are:\n"
+      "  monitor all-noisy\n"
+      "  monitor all-quiet\n"
       "  monitor rda-backend-noisy\n"
       "  monitor rda-backend-quiet\n"
       "  monitor thread-db-noisy\n"
       "  monitor thread-db-quiet\n"
-      "  monitor proc-service-noisy\n"
-      "  monitor proc-service-quiet\n");
+      "  monitor lwp-pool-noisy\n"
+      "  monitor lwp-pool-quiet\n");
 }
 
 /* This function is called from gdbloop_poll when a new incoming

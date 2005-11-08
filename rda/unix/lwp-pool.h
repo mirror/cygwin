@@ -70,7 +70,7 @@ void lwp_pool_new_stopped (pid_t pid);
    lwp_pool_waitpid will report it, but the wait status caused by the
    attach is handled internally, and will not be reported via
    lwp_pool_waitpid.  */
-int lwp_pool_attach (pid_t pid);
+int lwp_pool_attach (struct gdbserv *serv, pid_t pid);
 
 
 /* Do we need a function for detaching from each LWP in the pool
@@ -86,7 +86,7 @@ int lwp_pool_attach (pid_t pid);
 
    The only bit that may be set in OPTIONS is WNOHANG.  We need to
    monitor the status of all LWP's, so we add __WALL as appropriate.  */
-pid_t lwp_pool_waitpid (pid_t pid, int *stat_loc, int options);
+pid_t lwp_pool_waitpid (struct gdbserv *serv, pid_t pid, int *stat_loc, int options);
 
 
 /* Stop all running LWP's in the pool.  This function does not return
@@ -94,26 +94,23 @@ pid_t lwp_pool_waitpid (pid_t pid, int *stat_loc, int options);
 
    The wait status caused by the stop is handled internally, and will
    not be reported by lwp_pool_waitpid.  */
-void lwp_pool_stop_all (void);
+void lwp_pool_stop_all (struct gdbserv *serv);
 
 
 /* Continue all stopped, uninteresting LWP's in the pool.
    If some of the LWP's have been resumed with lwp_pool_singlestep or
    lwp_pool_continue, those will be left to continue to run.  */
-void lwp_pool_continue_all (void);
+void lwp_pool_continue_all (struct gdbserv *serv);
 
 
 /* Continue PID.  If SIGNAL is non-zero, continue it with signal
    SIGNAL.  Return zero on success, -1 on failure.  */
-int lwp_pool_continue_lwp (pid_t pid, int signal);
+int lwp_pool_continue_lwp (struct gdbserv *serv, pid_t pid, int signal);
 
 
 /* Continue PID in SERV for one instruction, delivering SIGNAL if it
    is non-zero, and stop with SIGSTOP if/when that instruction has
-   been completed.
-
-   The SERV argument is there because singlestep_lwp requires it.
-   Inconsistency, bleah.  */
+   been completed.  */
 int lwp_pool_singlestep_lwp (struct gdbserv *serv, pid_t pid, int signal);
 
 

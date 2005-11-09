@@ -1,5 +1,15 @@
 2005-11-08  Kevin Buettner  <kevinb@redhat.com>
 
+	* lwp-pool.c (struct lwp): Add new member `do_step'.
+	(wait_and_handle): Clear `do_step' when a SIGTRAP is received.
+	(continue_or_step_lwp): New function.
+	(lwp_pool_continue_all, lwp_pool_continue_lwp): Call
+	continue_or_step_lwp() instead of continue_lwp().
+	(lwp_singlestep_lwp): Set `do_step' after a successful call to
+	singlestep_lwp().
+
+2005-11-08  Kevin Buettner  <kevinb@redhat.com>
+
 	* linux-target.c (am33_singlestep_okay): Use `pid', not
 	`process->pid' when reading and writing memory since the
 	latter may refer to an already running thread.

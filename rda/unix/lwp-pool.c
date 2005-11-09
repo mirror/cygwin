@@ -320,6 +320,12 @@ struct lwp
   /* If STATE is one of the lwp_state_*_interesting states, then
      STATUS is the interesting wait status.  */
   int status;
+
+  /* Indicates the stepping status.  We must be prepared to step the
+     given lwp upon continue since it's possible to get thread notification
+     signals prior to a step actually occuring.  Receipt of a SIGTRAP is
+     sufficient to clear this flag.  */
+  int do_step;
 };
  
   
@@ -879,6 +885,12 @@ wait_and_handle (struct gdbserv *serv, struct lwp *l, int flags)
       
       stopsig = WSTOPSIG (status);
 
+      if (stopsig == SIGTRAP)
+	{
+	  /* No longer stepping once a SIGTRAP is received.  */
+	  l->do_step = 0;
+	}
+
       switch (l->state)
 	{
 	case lwp_state_uninitialized:
@@ -1205,6 +1217,18 @@ lwp_pool_stop_all (struct gdbserv *serv)
     }
 }
 
+int
+continue_or_step_lwp (struct gdbserv *serv, struct lwp *l, int sig)
+{
+  int status;
+  if (l->do_step)
+    status = singlestep_lwp (serv, l->pid, sig);
+  else
+    status = continue_lwp (l->pid, sig);
+
+  return status;
+}
+
 
 void
 lwp_pool_continue_all (struct gdbserv *serv)
@@ -1237,7 +1261,7 @@ lwp_pool_continue_all (struct gdbserv *serv)
 	      break;
 
 	    case lwp_state_stopped:
-	      if (continue_lwp (l->pid, 0) == 0)
+	      if (continue_or_step_lwp (serv, l, 0) == 0)
 		l->state = lwp_state_running;
 	      break;
 
@@ -1265,7 +1289,7 @@ lwp_pool_continue_all (struct gdbserv *serv)
                   l->state = lwp_state_running_stop_pending;
                   if (check_stop_pending (serv, l) == 0)
                     {
-                      if (continue_lwp (l->pid, 0) == 0)
+                      if (continue_or_step_lwp (serv, l, 0) == 0)
                         l->state = lwp_state_running;
                     }
                 }
@@ -1314,7 +1338,7 @@ lwp_pool_continue_lwp (struct gdbserv *serv, pid_t pid, int signal)
       break;
 
     case lwp_state_stopped:
-      result = continue_lwp (l->pid, signal);
+      result = continue_or_step_lwp (serv, l, signal);
       if (result == 0)
         l->state = lwp_state_running;
       break;
@@ -1334,7 +1358,7 @@ lwp_pool_continue_lwp (struct gdbserv *serv, pid_t pid, int signal)
           l->state = lwp_state_running_stop_pending;
           if (check_stop_pending (serv, l) == 0)
             {
-              if (continue_lwp (l->pid, 0) == 0)
+              if (continue_or_step_lwp (serv, l, 0) == 0)
                 l->state = lwp_state_running;
             }
         }
@@ -1385,7 +1409,10 @@ lwp_pool_singlestep_lwp (struct gdbserv *serv, pid_t lwp, int signal)
     case lwp_state_stopped:
       result = singlestep_lwp (serv, l->pid, signal);
       if (result == 0)
-        l->state = lwp_state_running;
+	{
+	  l->state = lwp_state_running;
+	  l->do_step = 1;
+	}
       break;
 
     case lwp_state_stopped_stop_pending:
@@ -1404,7 +1431,10 @@ lwp_pool_singlestep_lwp (struct gdbserv *serv, pid_t lwp, int signal)
           if (check_stop_pending (serv, l) == 0)
             {
               if (singlestep_lwp (serv, l->pid, 0) == 0)
-                l->state = lwp_state_running;
+		{
+		  l->state = lwp_state_running;
+		  l->do_step = 1;
+		}
             }
         }
       break;

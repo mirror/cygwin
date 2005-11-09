@@ -3694,6 +3694,7 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
   int displ;
   static char bp_inst = 0xff;
   static int hw_singlestep_okay = 1;
+  pid_t save_pid;
 
   if (hw_singlestep_okay)
     {
@@ -3718,6 +3719,12 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
 	}
       /* Fall through into software singlestep code.  */
     }
+
+  /* In a multi-threaded program, process->pid might be a running thread
+     and we can't read / write into running threads.  So set process->pid
+     to the lwp.  */
+  save_pid = process->pid;
+  process->pid = pid;
 
   pc = am33_get_register (serv, pid, PC_REGNUM);
   opcode = am33_read_byte (serv, pc);
@@ -3910,6 +3917,9 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
   if (errno)
     fprintf (stderr, "PTRACE_CONT (am33) error: %s in %d\n",
 	     strerror (errno), pid);
+
+  /* Restore the saved pid.  */
+  process->pid = save_pid;
 }
 #endif
 

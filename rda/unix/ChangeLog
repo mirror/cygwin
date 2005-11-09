@@ -1,5 +1,11 @@
 2005-11-08  Kevin Buettner  <kevinb@redhat.com>
 
+	* linux-target.c (am33_singlestep_okay): Use `pid', not
+	`process->pid' when reading and writing memory since the
+	latter may refer to an already running thread.
+
+2005-11-08  Kevin Buettner  <kevinb@redhat.com>
+
 	* diagnostics.h: New file.
 	* gdbserv-thread-db.h (debug_get_pc): Move declaration to new
 	file diagnostics.h.

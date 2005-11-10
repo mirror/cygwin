@@ -796,6 +796,17 @@ debug_report_state_change (struct gdbserv *serv,
     }
 }
 
+/* Remove (dead) LWP from the hash table and put it on the `interesting'
+   queue.  */
+static void
+mark_lwp_as_dead_but_interesting (struct lwp *l)
+{
+  hash_delete (l);
+  l->state = lwp_state_dead_interesting;
+  if (l->next)
+    queue_delete (l);
+  queue_enqueue (&interesting_queue, l);
+}
 
 /* Wait for a status from the LWP L (or any LWP, if L is NULL),
    passing FLAGS to waitpid, and record the resulting wait status in
@@ -868,15 +879,7 @@ wait_and_handle (struct gdbserv *serv, struct lwp *l, int flags)
   l->status = status;
 
   if (WIFEXITED (status) || WIFSIGNALED (status))
-    {
-      /* Remove dead LWP's from the hash table, and put them in the
-	 interesting queue.  */
-      hash_delete (l);
-      l->state = lwp_state_dead_interesting;
-      if (l->next)
-	queue_delete (l);
-      queue_enqueue (&interesting_queue, l);
-    }
+    mark_lwp_as_dead_but_interesting (l);
   else
     {
       int stopsig;
@@ -1143,9 +1146,24 @@ lwp_pool_stop_all (struct gdbserv *serv)
 	    case lwp_state_running:
 	      /* A 'no such process' error here indicates an NPTL thread
 		 that has exited.  */
-	      kill_lwp (l->pid, SIGSTOP);
-	      l->state = lwp_state_running_stop_pending;
-	      queue_enqueue (&stopping_queue, l);
+	      if (kill_lwp (l->pid, SIGSTOP) < 0)
+		{
+		  /* Thread has exited.  See if a status is available.  */
+		  if (wait_and_handle (serv, l, WNOHANG) < 0)
+		    {
+		      /* Nope, it's truly gone without providing a status.
+		         Put it on the interesting queue so that GDB is
+			 notified that it's gone.  */
+		      l->status = 0;
+		      mark_lwp_as_dead_but_interesting (l);
+		    }
+		}
+	      else
+		{
+		  l->state = lwp_state_running_stop_pending;
+		  queue_enqueue (&stopping_queue, l);
+		}
+
 	      break;
 
 	    case lwp_state_stopped:

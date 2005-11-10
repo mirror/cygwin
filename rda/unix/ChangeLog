@@ -1,3 +1,12 @@
+2005-11-10  Kevin Buettner  <kevinb@redhat.com>
+
+	* lwp-pool.c (mark_lwp_as_dead_but_interesting): New function.
+	(wait_and_handle): Replace lines of code implementing guts of
+	new function mark_lwp_as_dead_but_interesting() with call to
+	that function.  Make a new call to this function after it
+	has been determined that an lwp has exited without leaving a
+	status.
+
 2005-11-08  Kevin Buettner  <kevinb@redhat.com>
 
 	* lwp-pool.c (struct lwp): Add new member `do_step'.

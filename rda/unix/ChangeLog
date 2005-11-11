@@ -1,3 +1,8 @@
+2005-11-11  Kevin Buettner  <kevinb@redhat.com>
+
+	* lwp-pool.c (clear_all_do_step_flags): New function.
+	(lwp_pool_singlestep_lwp): Use it.
+
 2005-11-10  Kevin Buettner  <kevinb@redhat.com>
 
 	* lwp-pool.c (mark_lwp_as_dead_but_interesting): New function.

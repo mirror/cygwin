@@ -1395,6 +1395,23 @@ lwp_pool_continue_lwp (struct gdbserv *serv, pid_t pid, int signal)
 }
 
 
+/* Clear the `do_step' flags for all LWPs in the hash table.  */
+
+static void
+clear_all_do_step_flags (void)
+{
+  int i;
+
+  for (i = 0; i < hash_size; i++)
+    {
+      struct lwp *l = hash[i];
+
+      if (l)
+	l->do_step = 0;
+    }
+}
+
+
 int
 lwp_pool_singlestep_lwp (struct gdbserv *serv, pid_t lwp, int signal)
 {
@@ -1405,6 +1422,12 @@ lwp_pool_singlestep_lwp (struct gdbserv *serv, pid_t lwp, int signal)
   if (debug_lwp_pool)
     fprintf (stderr, "lwp_pool_singlestep_lwp (%p, %d, %d)\n",
 	     serv, (int) lwp, signal);
+
+  /* Neither GDB nor the software singlestep code contained in RDA
+     expect more than one LWP to be stepped simultaneously.  Clear the
+     `do_step' flag in all LWPs.  The flag for the LWP that we're about
+     to step will be set later on.  */
+  clear_all_do_step_flags ();
 
   switch (l->state)
     {

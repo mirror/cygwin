@@ -143,6 +143,14 @@ private:
   bool remove_sw_breakpoint (host_int_8, host_int_4);
   bool remove_all_sw_breakpoints ();
 
+  // hw watchpoint tracking
+  typedef map<string,int> hw_watchpoints_t;
+  hw_watchpoints_t hw_watchpoints; // watcher name -> insertion-count
+  bool add_hw_watchpoint (host_int_8, host_int_4);
+  bool remove_hw_watchpoint (host_int_8, host_int_4);
+  bool remove_hw_watchpoint (const string &);
+  bool remove_all_hw_watchpoints ();
+
   // pending signal tracking
   typedef map<int,int> pending_signal_counts_t;
   pending_signal_counts_t pending_signal_counts;

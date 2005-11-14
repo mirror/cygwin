@@ -1,3 +1,17 @@
+2005-11-14  Dave Brolley  <brolley@redhat.com>
+
+	* gdb.h (hw_watchpoints_t): New typedef in gdb.
+	(hw_watchpoints): New member of gdb.
+	(remove_all_hw_watchpoints, remove_hw_watchpoint): New methods
+	of gdb.
+	(add_hw_watchpoint): New method of gdb.
+	* gdb.cxx (remove_breakpoint): Handle GDBSERV_TARGET_BP_WRITE.
+	(set_breakpoint): Likewise.
+	(remove_all_hw_watchpoints, remove_hw_watchpoint): New methods
+	of gdb.
+	(add_hw_watchpoint): New method of gdb.
+	(process_detach): Call remove_all_hw_watchpoints.
+
 2005-08-19  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:

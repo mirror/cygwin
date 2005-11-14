@@ -1007,17 +1007,19 @@ gdb::remove_breakpoint (unsigned long type, struct gdbserv_reg *addr, struct gdb
   if (! enable_Z_packet) return 1;
   if (this->cpu == 0) return -1;
 
-  bool ok = false;
+  int rc = 1; // Not supported
 
   if ((type == GDBSERV_TARGET_BP_HARDWARE) || 
       (type == GDBSERV_TARGET_BP_SOFTWARE && force_Z_sw_to_hw))
-    ok = this->remove_hw_breakpoint (watch_pc, bp_length);
+    rc = this->remove_hw_breakpoint (watch_pc, bp_length) ? 0 : -1;
   else if ((type == GDBSERV_TARGET_BP_SOFTWARE) || 
 	   (type == GDBSERV_TARGET_BP_HARDWARE && force_Z_hw_to_sw))
-    ok = this->remove_sw_breakpoint (watch_pc, bp_length);
+    rc = this->remove_sw_breakpoint (watch_pc, bp_length) ? 0 : -1;
+  else if (type == GDBSERV_TARGET_BP_WRITE)
+    rc = this->remove_hw_watchpoint (watch_pc, bp_length) ? 0 : -1;
   // Fail on uses of other breakpoint types (WRITE, READ, ACCESS, UNKNOWN)
 
-  return ok ? 0 : -1;
+  return rc;
 }
 
 
@@ -1146,6 +1148,64 @@ gdb::remove_sw_breakpoint (host_int_8 address, host_int_4 length)
 }
 
 
+bool
+gdb::remove_all_hw_watchpoints ()
+{
+  while (true)
+    {
+      hw_watchpoints_t::iterator it = this->hw_watchpoints.begin();
+      if (it == this->hw_watchpoints.end()) break;
+
+      // clean up carcass with refcount=0
+      if (it->second == 0)
+	{
+	  this->hw_watchpoints.erase(it);
+	  continue;
+	}
+
+      // decrement refcount
+      string watcher_name = it->first;
+      bool ok = this->remove_hw_watchpoint (watcher_name);
+      if (!ok) return ok;
+    }
+  return true;
+}
+
+
+bool
+gdb::remove_hw_watchpoint (const string &watcher_name)
+{  
+  if (this->hw_watchpoints[watcher_name] <= 0)
+    {
+      cerr << "sw-debug-gdb: duplicate watchpoint count underflow!" << endl;
+      return false;
+    }
+
+  this->hw_watchpoints[watcher_name] --;
+  if (this->hw_watchpoints[watcher_name] == 0)
+    {
+      component::status s = this->cpu->disconnect_pin (watcher_name, & this->trapstop_pin);
+      return (s == component::ok);
+    }
+  else
+    return true;
+}
+
+
+bool
+gdb::remove_hw_watchpoint (host_int_8 address, host_int_4 length)
+{  
+  string watcher_name = string ("watch:")
+    + map_watchable_name ("gdb-watchpoint-"
+			  + make_numeric_attribute (address)
+			  + "-"
+			  + make_numeric_attribute (length))
+    + ":change";
+
+  return remove_hw_watchpoint (watcher_name);
+}
+
+
 int
 gdb::set_breakpoint (unsigned long type, struct gdbserv_reg *addr, struct gdbserv_reg *len)
 {
@@ -1165,17 +1225,20 @@ gdb::set_breakpoint (unsigned long type, struct gdbserv_reg *addr, struct gdbser
 
   if (! enable_Z_packet) return 1;
   if (this->cpu == 0) return -1;
-  bool ok = false;
+
+  int rc = 1; // Not supported
 
   if ((type == GDBSERV_TARGET_BP_HARDWARE) || 
       (type == GDBSERV_TARGET_BP_SOFTWARE && force_Z_sw_to_hw))
-    ok = this->add_hw_breakpoint (watch_pc, bp_length);
+    rc = this->add_hw_breakpoint (watch_pc, bp_length) ? 0 : -1;
   else if ((type == GDBSERV_TARGET_BP_SOFTWARE) || 
 	   (type == GDBSERV_TARGET_BP_HARDWARE && force_Z_hw_to_sw))
-    ok = this->add_sw_breakpoint (watch_pc, bp_length);
-  // Fail on uses of other breakpoint types (WRITE, READ, ACCESS, UNKNOWN)
+    rc = this->add_sw_breakpoint (watch_pc, bp_length) ? 0 : -1;
+  else if (type == GDBSERV_TARGET_BP_WRITE)
+    rc = this->add_hw_watchpoint (watch_pc, bp_length) ? 0 : -1;
+  // Fail on uses of other breakpoint types (READ, ACCESS, UNKNOWN)
 
-  return ok ? 0 : -1;
+  return rc;
 }
 
 
@@ -1266,6 +1329,31 @@ gdb::add_sw_breakpoint (host_int_8 address, host_int_4 length)
 }
 
 
+bool
+gdb::add_hw_watchpoint (host_int_8 address, host_int_4 length)
+{
+  // XXX: be sensitive to length
+
+  string watcher_name = string ("watch:")
+    + map_watchable_name ("gdb-watchpoint-"
+			  + make_numeric_attribute (address)
+			  + "-"
+			  + make_numeric_attribute (length))
+    + ":change";
+
+  // see also ::remove_hw_watchpoint()
+
+  this->hw_watchpoints[watcher_name] ++;
+  if (this->hw_watchpoints[watcher_name] == 1)
+    {
+      component::status s = this->cpu->connect_pin (watcher_name, & this->trapstop_pin);
+      return (s == component::ok);
+    }
+  else
+    return true;
+}
+
+
 void
 gdb::process_detach ()
 {
@@ -1274,7 +1362,8 @@ gdb::process_detach ()
 
   bool ok =
     this->remove_all_hw_breakpoints () &&
-    this->remove_all_sw_breakpoints ();
+    this->remove_all_sw_breakpoints () &&
+    this->remove_all_hw_watchpoints ();
   if (!ok)
     {
       cerr << "sw-debug-gdb: cannot clean up breakpoints" << endl;

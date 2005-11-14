@@ -141,7 +141,47 @@ namespace sidutil
     // Virtual pin interfaces between self_watcher and fixed_pin_map_component
     sid::component::status pin_factory (const std::string& name)
       {
-	return this->triggerpoint_manager.create_virtual_pin (name);
+	sid::component::status s = this->triggerpoint_manager.create_virtual_pin (name);
+	if (s == sid::component::not_found)
+	  {
+	    // If this is not a watchpoint, then return now.
+	    // N.B. The name has been mapped by map_watchable_name and is of the form
+	    //   watch:gdb%xxwatchpoint%xx<addr>%xx<len>:change
+	    std::vector<std::string> tokens = sidutil::tokenize (name, ":");
+	    if (tokens.size () != 3 || tokens[0] != "watch" || tokens[2] != "change")
+	      return s;
+
+	    // gdb%xxwatchpoint%xx<addr>%xx<len>
+	    if (tokens[1].size () < 3 + 3 + 10 + 3 + 1 + 3 + 1)
+	      return s;
+
+	    std::string watchable_prefix = map_watchable_name ("gdb-watchpoint-");
+	    unsigned watchable_prefix_length = watchable_prefix.size ();
+	    if (tokens[1].substr (0, watchable_prefix_length) != watchable_prefix)
+	      return s;
+
+	    tokens = sidutil::tokenize (tokens[1].substr (watchable_prefix_length), tokens[1].substr (3, 1));
+	    if (tokens.size () != 2)
+	      return s;
+
+	    // This is a watch point, add the necessary watchable now.
+	    std::pair<sid::host_int_4,sid::host_int_4> addr_and_len;
+	    s = sidutil::parse_attribute (tokens[0], addr_and_len.first);
+	    assert (s == sid::component::ok);
+
+	    tokens[1] = tokens[1].substr (2); // get past hex digits xx
+	    s = sidutil::parse_attribute (tokens[1], addr_and_len.second);
+	    assert (s == sid::component::ok);
+
+	    add_watchable_register ("gdb-watchpoint-" + tokens[0] + "-" + tokens[1], addr_and_len, this,
+				    & basic_cpu::read_watchpoint_memory,
+				    & basic_cpu::write_watchpoint_memory);
+
+	    // Now try to create the virtual pin again. It should succeed.
+	    s = this->triggerpoint_manager.create_virtual_pin (name);
+	    assert (s == sid::component::ok);
+	  }
+	return s;
       }
     void pin_junkyard (const std::string& name)
       {
@@ -720,6 +760,11 @@ namespace sidutil
     template <typename BigOrLittleInt>
     BigOrLittleInt write_data_memory (sid::host_int_4 pc, sid::host_int_4 address, BigOrLittleInt value);
 
+    virtual sid::host_int_1 read_data_memory_1 (sid::host_int_4 pc, sid::host_int_4 address) = 0;
+    virtual sid::host_int_2 read_data_memory_2 (sid::host_int_4 pc, sid::host_int_4 address) = 0;
+    virtual sid::host_int_4 read_data_memory_4 (sid::host_int_4 pc, sid::host_int_4 address) = 0;
+    virtual sid::host_int_8 read_data_memory_8 (sid::host_int_4 pc, sid::host_int_4 address) = 0;
+
     virtual bool handle_insn_memory_read_error (sid::bus::status s, sid::host_int_4 & address) { return false; }
     virtual bool handle_insn_memory_write_error (sid::bus::status s, sid::host_int_4 & address) { return false; }
     virtual bool handle_data_memory_read_error (sid::bus::status s, sid::host_int_4 & address) { return false; }
@@ -729,6 +774,52 @@ namespace sidutil
     virtual void record_insn_memory_write_latency (sid::bus::status s) { total_latency += s.latency; }
     virtual void record_data_memory_read_latency (sid::bus::status s) { total_latency += s.latency; }
     virtual void record_data_memory_write_latency (sid::bus::status s) { total_latency += s.latency; }
+
+    virtual std::string basic_cpu::read_watchpoint_memory (std::pair<sid::host_int_4,sid::host_int_4> addr_and_length)
+      {
+	// Extract the address and length from the argument.
+	sid::host_int_4 address = addr_and_length.first;
+	sid::host_int_4 length  = addr_and_length.second;
+
+	// We'll need the current pc.
+	std::string pc_str = this->attribute_value ("pc");
+	sid::host_int_4 pc;
+	sid::component::status rc = sidutil::parse_attribute (pc_str, pc);
+	assert (rc == sid::component::ok);
+
+	// Just read from insn memory by default
+	switch (length)
+	  {
+	  case 1:
+	    {
+	      sid::host_int_1 r1 = read_data_memory_1 (pc, address);
+	      return sidutil::make_attribute (r1);
+	    }
+	  case 2:
+	    {
+	      sid::host_int_2 r2 = read_data_memory_2 (pc, address);
+	      return sidutil::make_attribute (r2);
+	    }
+	  case 4:
+	    {
+	      sid::host_int_4 r4 = read_data_memory_4 (pc, address);
+	      return sidutil::make_attribute (r4);
+	    }
+	  case 8:
+	    {
+	      sid::host_int_8 r8 = read_data_memory_8 (pc, address);
+	      return sidutil::make_attribute (r8);
+	    }
+	  }
+
+	throw cpu_memory_fault (pc, address, sid::bus::unmapped, "watchpoint read");
+	return "";
+      }
+
+    virtual sid::component::status basic_cpu::write_watchpoint_memory (std::pair<sid::host_int_4,sid::host_int_4> addr_and_length, const std::string &value)
+      {
+	return sid::component::bad_value;
+      }
 
     // ------------------------------------------------------------------------
     
@@ -946,8 +1037,6 @@ public:
 
 	throw cpu_memory_fault (pc, address, s, "data write");
       }
-
-
 
   // ------------------------------------------------------------------------
   // Derived classes for memory access functions of various endianness

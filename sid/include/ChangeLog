@@ -1,3 +1,11 @@
+2005-11-14  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (basic_cpu::pin_factory): Parse, recognize and add
+	watchable register and virtual pin for names representing hardware
+	watchpoints.
+	(read_data_memory_*): Make accessible as virtual methods from basic_cpu.
+	(read_watchpoint_memory): New method of basic_cpu.
+
 2005-08-23  Dave Brolley  <brolley@redhat.com>
 
 	* sidcpuutil.h (step_pin_handler): Don't call configure_gprof here.

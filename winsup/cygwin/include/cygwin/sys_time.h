@@ -1,4 +1,4 @@
-/* time.h
+/* sys_time.h
 
    Copyright 2005 Red Hat Inc.
 
@@ -8,8 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef _CYGWIN_TIME_H
-#define _CYGWIN_TIME_H
+#ifndef _CYGWIN_SYS_TIME_H
+#define _CYGWIN_SYS_TIME_H
 #include <sys/select.h>
 
 #ifdef __cplusplus
@@ -22,4 +22,4 @@ int clock_setres (clockid_t, struct timespec *);
 #ifdef __cplusplus
 }
 #endif
-#endif /* _CYGWIN_TIME_H */
+#endif /*_CYGWIN_SYS_TIME_H*/

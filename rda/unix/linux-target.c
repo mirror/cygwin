@@ -535,35 +535,35 @@ enum
 
 static struct getregs_setregs_reginfo reginfo[] =
 {
-  { GREGS,  PT_D0 * 4,   sizeof (greg_t),   4 },
-  { GREGS,  PT_D1 * 4,   sizeof (greg_t),   4 },
-  { GREGS,  PT_D2 * 4,   sizeof (greg_t),   4 },
-  { GREGS,  PT_D3 * 4,   sizeof (greg_t),   4 },
-  { GREGS,  PT_A0 * 4,   sizeof (greg_t),   4 },
-  { GREGS,  PT_A1 * 4,   sizeof (greg_t),   4 },
-  { GREGS,  PT_A2 * 4,   sizeof (greg_t),   4 },
-  { GREGS,  PT_A3 * 4,   sizeof (greg_t),   4 },
-  { GREGS,  PT_SP * 4,   sizeof (greg_t),   4 },
-  { GREGS,  PT_PC * 4,   sizeof (greg_t),   4 },
-  { GREGS,  PT_MDR * 4,  sizeof (greg_t),   4 },
-  { GREGS,  PT_EPSW * 4, sizeof (greg_t),   4 }, /* psw */
-  { GREGS,  PT_LIR * 4,  sizeof (greg_t),   4 },
-  { GREGS,  PT_LAR * 4,  sizeof (greg_t),   4 },
-  { GREGS,  PT_MDRQ * 4, sizeof (greg_t),   4 },
-  { GREGS,  PT_E0 * 4,   sizeof (greg_t),   4 }, /* r0 */
-  { GREGS,  PT_E1 * 4,   sizeof (greg_t),   4 }, /* r1 */
-  { GREGS,  PT_E2 * 4,   sizeof (greg_t),   4 }, /* r2 */
-  { GREGS,  PT_E3 * 4,   sizeof (greg_t),   4 }, /* r3 */
-  { GREGS,  PT_E4 * 4,   sizeof (greg_t),   4 }, /* r4 */
-  { GREGS,  PT_E5 * 4,   sizeof (greg_t),   4 }, /* r5 */
-  { GREGS,  PT_E6 * 4,   sizeof (greg_t),   4 }, /* r6 */
-  { GREGS,  PT_E7 * 4,   sizeof (greg_t),   4 }, /* r7 */
-  { GREGS,  PT_SP * 4,   sizeof (greg_t),   4 }, /* ssp */
-  { GREGS,  PT_SP * 4,   sizeof (greg_t),   4 }, /* msp */
-  { GREGS,  PT_SP * 4,   sizeof (greg_t),   4 }, /* usp */
-  { GREGS,  PT_MCRH * 4, sizeof (greg_t),   4 },
-  { GREGS,  PT_MCRL * 4, sizeof (greg_t),   4 },
-  { GREGS,  PT_MCVF * 4, sizeof (greg_t),   4 },
+  { GREGS,  PT_D0 * 4,   4,   4 },
+  { GREGS,  PT_D1 * 4,   4,   4 },
+  { GREGS,  PT_D2 * 4,   4,   4 },
+  { GREGS,  PT_D3 * 4,   4,   4 },
+  { GREGS,  PT_A0 * 4,   4,   4 },
+  { GREGS,  PT_A1 * 4,   4,   4 },
+  { GREGS,  PT_A2 * 4,   4,   4 },
+  { GREGS,  PT_A3 * 4,   4,   4 },
+  { GREGS,  PT_SP * 4,   4,   4 },
+  { GREGS,  PT_PC * 4,   4,   4 },
+  { GREGS,  PT_MDR * 4,  4,   4 },
+  { GREGS,  PT_EPSW * 4, 4,   4 }, /* psw */
+  { GREGS,  PT_LIR * 4,  4,   4 },
+  { GREGS,  PT_LAR * 4,  4,   4 },
+  { GREGS,  PT_MDRQ * 4, 4,   4 },
+  { GREGS,  PT_E0 * 4,   4,   4 }, /* r0 */
+  { GREGS,  PT_E1 * 4,   4,   4 }, /* r1 */
+  { GREGS,  PT_E2 * 4,   4,   4 }, /* r2 */
+  { GREGS,  PT_E3 * 4,   4,   4 }, /* r3 */
+  { GREGS,  PT_E4 * 4,   4,   4 }, /* r4 */
+  { GREGS,  PT_E5 * 4,   4,   4 }, /* r5 */
+  { GREGS,  PT_E6 * 4,   4,   4 }, /* r6 */
+  { GREGS,  PT_E7 * 4,   4,   4 }, /* r7 */
+  { GREGS,  PT_SP * 4,   4,   4 }, /* ssp */
+  { GREGS,  PT_SP * 4,   4,   4 }, /* msp */
+  { GREGS,  PT_SP * 4,   4,   4 }, /* usp */
+  { GREGS,  PT_MCRH * 4, 4,   4 },
+  { GREGS,  PT_MCRL * 4, 4,   4 },
+  { GREGS,  PT_MCVF * 4, 4,   4 },
 
   /* AM33 uses single precision floating point registers where two
      consecutive registers are combined to form a double.  The

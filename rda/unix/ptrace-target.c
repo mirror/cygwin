@@ -443,9 +443,11 @@ ptrace_break_program (struct gdbserv *serv)
 {
   struct child_process *process = gdbserv_target_data (serv);
 
+  /* We send SIGSTOP (rather than some other signal such as SIGINT)
+     because SIGSTOP cannot be blocked or ignored.  */
   if (process->debug_backend)
-    fprintf (stderr, " -- send SIGINT to child %d\n", process->pid);
-  kill (process->pid, SIGINT);
+    fprintf (stderr, " -- send SIGSTOP to child %d\n", process->pid);
+  kill (process->pid, SIGSTOP);
 }
 
 /* get_trap_number vector

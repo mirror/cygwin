@@ -1,5 +1,12 @@
 2005-12-01  Kevin Buettner  <kevinb@redhat.com>
 
+	* thread-db.c (handle_thread_db_event): Allow underlying target a
+	chance to look at the wait status too.
+	(thread_db_check_child_state): Ensure that there's a thread list
+	to work with when using the thread_db event model.
+
+2005-12-01  Kevin Buettner  <kevinb@redhat.com>
+
 	* linux-target.c (reginfo) [AM33_2_0_LINUX_TARGET]: Don't use
 	``sizeof (greg_t)'' due to this type not being defined any longer
 	in the headers that linux-target includes.

@@ -1853,6 +1853,9 @@ handle_thread_db_event (struct child_process *process)
       /* We don't have any new status to report...  */
       return 1;
     }
+  /* Give underlying target a chance to look at the wait status.  This
+     is necessary for software singlestep to work correctly.  */
+  handle_waitstatus (process, w);
 
   /* Re-insert the event breakpoints.  */
   insert_thread_db_event_breakpoints (serv);
@@ -2146,11 +2149,19 @@ thread_db_check_child_state (struct child_process *process)
 		     process->stop_signal,
 		     (unsigned long) debug_get_pc (process->serv, process->pid));
 
-#if ALWAYS_UPDATE_THREAD_LIST
-	  /* Update the thread list, and attach to (and thereby stop)
-             any new threads we find.  */
-	  update_thread_list (process);
+#if !ALWAYS_UPDATE_THREAD_LIST
+	  /* The thread_db event model requires that `event_thread' (see
+	     below) gets set correctly, but this won't happen unless there's
+	     a thread list to search.  So, if the thread_list is empty and
+	     we're using the thread_db event model, we need to update the
+	     thread list.  */
+	  if (thread_list == NULL && using_thread_db_events)
 #endif
+	    {
+	      /* Update the thread list, and attach to (and thereby stop)
+		 any new threads we find.  */
+	      update_thread_list (process);
+	    }
 
 	  process->event_thread = thread_list_lookup_by_lid (process->pid);
 

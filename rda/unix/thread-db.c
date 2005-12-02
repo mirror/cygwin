@@ -2073,10 +2073,15 @@ thread_db_break_program (struct gdbserv *serv)
 
   /* We always send the signal to the main thread.  It's not correct
      to use process->pid; that's whatever thread last reported a
-     status, and it may well have been exiting.  */
+     status, and it may well have been exiting.
+
+     We send SIGSTOP, rather than some other signal such as SIGINT,
+     because SIGSTOP cannot be blocked or ignored.  On Linux, using
+     a signal that can be blocked means that the process never gets
+     interrupted, since it's the kernel which does the blocking.  */
   if (process->debug_backend)
-    fprintf (stderr, " -- send SIGINT to child %d\n", proc_handle.pid);
-  kill (proc_handle.pid, SIGINT);
+    fprintf (stderr, " -- send SIGSTOP to child %d\n", proc_handle.pid);
+  kill (proc_handle.pid, SIGSTOP);
 }
 
 /* Function: check_child_state

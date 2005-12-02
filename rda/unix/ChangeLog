@@ -1,3 +1,9 @@
+2005-12-02  Kevin Buettner  <kevinb@redhat.com>
+
+	* ptrace-target.c (ptrace_break_program): Use SIGSTOP instead of
+	SIGINT to interrupt inferior process.
+	* thread-db.c (thread_db_break_program): Likewise.
+
 2005-12-01  Kevin Buettner  <kevinb@redhat.com>
 
 	* thread-db.c (handle_thread_db_event): Allow underlying target a

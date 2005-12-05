@@ -1,3 +1,8 @@
+2005-12-05  Hans-Peter Nilsson  <hp@axis.com>
+
+	* utils-sim.scm (-gen-decode-insn-entry): Correct last change for
+	non-(adata-integral-insn? CURRENT-ARCH) case.
+
 2005-10-28  Dave Brolley  <brolley@redhat.com>
 
 	Contribute the following changes:

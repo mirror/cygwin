@@ -636,7 +636,9 @@
 			  ";\n")
 			 "")
 		     ; Generate code to check that all of the opcode bits for this insn match
-		     indent "    if ((entire_insn & 0x" (number->hex (insn-base-mask insn)) ") == 0x" (number->hex (insn-value insn)) ")\n" 
+		     indent "    if (("
+		     (if (adata-integral-insn? CURRENT-ARCH) "entire_insn" "base_insn")
+		     " & 0x" (number->hex (insn-base-mask insn)) ") == 0x" (number->hex (insn-value insn)) ")\n" 
 		     indent "      { itype = " (gen-cpu-insn-enum (current-cpu) insn) ";"
 		     (if (with-scache?)
 			 (if fn?

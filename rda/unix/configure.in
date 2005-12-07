@@ -127,6 +127,8 @@ case "$target" in
   ;;
 esac
 
+TARGET_MODULES="$TARGET_MODULES diagnostics.o"
+
 AC_SUBST(TARGET_MODULES)
 
 case "$target" in

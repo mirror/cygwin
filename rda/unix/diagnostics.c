@@ -1,4 +1,4 @@
-/* diagnostics.h - Functions and variables used in RDA diagnostics.
+/* diagnostics.c - Functions and variables used in RDA diagnostics.
 
    Copyright 2005 Red Hat, Inc.
 
@@ -22,20 +22,35 @@
    Alternative licenses for RDA may be arranged by contacting Red Hat,
    Inc.  */
 
-/* When non-zero, print thread-db related diagnostic messages.  */
-extern int thread_db_noisy;
-
-/* When non-zero, print lwp pool related diagnostic messages.  */
-extern int debug_lwp_pool;
-
-/* Fetch the PC value for a given pid.  */
-struct gdbserv;
-extern unsigned long debug_get_pc (struct gdbserv *serv, pid_t pid);
+#include "config.h"
+#include "gdbserv.h"
+#include "gdbserv-output.h"
 
 /* Output an "O" packet.  */
-void output_O_packet (struct gdbserv *serv, char *message);
+void
+output_O_packet (struct gdbserv *serv, char *message)
+{
+  gdbserv_output_attach (serv);
+  gdbserv_output_char (serv, 'O');
+  gdbserv_output_string_as_bytes (serv, message);
+  gdbserv_output_packet (serv);
+  gdbserv_output_discard (serv);
+}
 
 /* Print out a helpful message regarding SIGSTOP to the GDB console using
-   an "O" packet.  This message will only be printed at most once per
-   session.  */
-void print_sigstop_message (struct gdbserv *serv);
+   an "O" packet.  This message will be printed at most once per session.  */
+void
+print_sigstop_message (struct gdbserv *serv)
+{
+  static int once = 0;
+
+  if (!once)
+    {
+      output_O_packet (serv, "\n"
+      "RDA has sent SIGSTOP to the inferior process.  If you wish to continue\n"
+      "without sending this signal, make sure that \"handle SIGSTOP nopass\" has\n"
+      "been set or use \"signal 0\" to continue.\n");
+      once = 1;
+    }
+}
+

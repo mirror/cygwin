@@ -1,3 +1,15 @@
+2005-12-07  Kevin Buettner  <kevinb@redhat.com>
+
+	* Makefile.am (EXTRA_rda_SOURCES): Add diagnostics.c.
+	* configure.in (TARGET_MODULES): Add diagnostics.o.
+	* Makefile.in, configure: Regenerate.
+	* diagnostics.c: New file.
+	* diagnostics.h (output_O_packet, print_sigstop_message): New
+	functions.
+	* ptrace-target.c (diagnostics.h): Include.
+	(ptrace_break_program): Call print_sigstop_message().
+	* thread_db.c (thread_db_break_program): Likewise.
+
 2005-12-02  Kevin Buettner  <kevinb@redhat.com>
 
 	* ptrace-target.c (ptrace_break_program): Use SIGSTOP instead of

@@ -2081,6 +2081,10 @@ thread_db_break_program (struct gdbserv *serv)
      interrupted, since it's the kernel which does the blocking.  */
   if (process->debug_backend)
     fprintf (stderr, " -- send SIGSTOP to child %d\n", proc_handle.pid);
+
+  /* Tell the GDB user that SIGSTOP has been sent to the inferior.  */
+  print_sigstop_message (serv);
+
   kill (proc_handle.pid, SIGSTOP);
 }
 

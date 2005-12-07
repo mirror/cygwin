@@ -4818,6 +4818,8 @@ _ACEOF
   ;;
 esac
 
+TARGET_MODULES="$TARGET_MODULES diagnostics.o"
+
 
 
 case "$target" in

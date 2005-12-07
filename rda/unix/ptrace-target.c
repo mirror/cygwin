@@ -665,13 +665,9 @@ ptrace_compute_signal (struct gdbserv *serv, unsigned long tgtsig)
   if (tgtsig == SIGPWR)
     return GDBSERV_SIGPWR;
 #endif
-#if defined (SIGRTMIN) && defined (SIGRTMAX)
-    if (tgtsig == SIGRTMIN)
-      return GDBSERV_SIGRT32;
-    if (tgtsig == SIGRTMIN + 32)
-      return GDBSERV_SIGRT64;
-    if (tgtsig > SIGRTMIN && tgtsig <  SIGRTMAX)
-      return GDBSERV_SIGRT33 + tgtsig - 1;
+#if defined (__SIGRTMIN) && defined (__SIGRTMAX)
+    if (tgtsig >= __SIGRTMIN && tgtsig <  __SIGRTMAX)
+      return GDBSERV_SIGRT32 + tgtsig - __SIGRTMIN;
     return GDBSERV_SIGNONE;	/* ? */
 #endif
 }
@@ -915,73 +911,73 @@ ptrace_process_signal (struct gdbserv *serv, int sig)
   case GDBSERV_SIGPRIO:
     process->signal_to_send = SIGPRIO;		break;
 #endif
-#if defined (SIGRTMIN) && defined (SIGRTMAX)
+#if defined (__SIGRTMIN) && defined (__SIGRTMAX)
   case GDBSERV_SIGRT32:
-    process->signal_to_send = SIGRTMIN;		break;
+    process->signal_to_send = __SIGRTMIN;	break;
   case GDBSERV_SIGRT33:
-    process->signal_to_send = SIGRTMIN+1;	break;
+    process->signal_to_send = __SIGRTMIN+1;	break;
   case GDBSERV_SIGRT34:
-    process->signal_to_send = SIGRTMIN+2;	break;
+    process->signal_to_send = __SIGRTMIN+2;	break;
   case GDBSERV_SIGRT35:
-    process->signal_to_send = SIGRTMIN+3;	break;
+    process->signal_to_send = __SIGRTMIN+3;	break;
   case GDBSERV_SIGRT36:
-    process->signal_to_send = SIGRTMIN+4;	break;
+    process->signal_to_send = __SIGRTMIN+4;	break;
   case GDBSERV_SIGRT37:
-    process->signal_to_send = SIGRTMIN+5;	break;
+    process->signal_to_send = __SIGRTMIN+5;	break;
   case GDBSERV_SIGRT38:
-    process->signal_to_send = SIGRTMIN+6;	break;
+    process->signal_to_send = __SIGRTMIN+6;	break;
   case GDBSERV_SIGRT39:
-    process->signal_to_send = SIGRTMIN+7;	break;
+    process->signal_to_send = __SIGRTMIN+7;	break;
   case GDBSERV_SIGRT40:
-    process->signal_to_send = SIGRTMIN+8;	break;
+    process->signal_to_send = __SIGRTMIN+8;	break;
   case GDBSERV_SIGRT41:
-    process->signal_to_send = SIGRTMIN+9;	break;
+    process->signal_to_send = __SIGRTMIN+9;	break;
   case GDBSERV_SIGRT42:
-    process->signal_to_send = SIGRTMIN+10;	break;
+    process->signal_to_send = __SIGRTMIN+10;	break;
   case GDBSERV_SIGRT43:
-    process->signal_to_send = SIGRTMIN+11;	break;
+    process->signal_to_send = __SIGRTMIN+11;	break;
   case GDBSERV_SIGRT44:
-    process->signal_to_send = SIGRTMIN+12;	break;
+    process->signal_to_send = __SIGRTMIN+12;	break;
   case GDBSERV_SIGRT45:
-    process->signal_to_send = SIGRTMIN+13;	break;
+    process->signal_to_send = __SIGRTMIN+13;	break;
   case GDBSERV_SIGRT46:
-    process->signal_to_send = SIGRTMIN+14;	break;
+    process->signal_to_send = __SIGRTMIN+14;	break;
   case GDBSERV_SIGRT47:
-    process->signal_to_send = SIGRTMIN+15;	break;
+    process->signal_to_send = __SIGRTMIN+15;	break;
   case GDBSERV_SIGRT48:
-    process->signal_to_send = SIGRTMIN+16;	break;
+    process->signal_to_send = __SIGRTMIN+16;	break;
   case GDBSERV_SIGRT49:
-    process->signal_to_send = SIGRTMIN+17;	break;
+    process->signal_to_send = __SIGRTMIN+17;	break;
   case GDBSERV_SIGRT50:
-    process->signal_to_send = SIGRTMIN+18;	break;
+    process->signal_to_send = __SIGRTMIN+18;	break;
   case GDBSERV_SIGRT51:
-    process->signal_to_send = SIGRTMIN+19;	break;
+    process->signal_to_send = __SIGRTMIN+19;	break;
   case GDBSERV_SIGRT52:
-    process->signal_to_send = SIGRTMIN+20;	break;
+    process->signal_to_send = __SIGRTMIN+20;	break;
   case GDBSERV_SIGRT53:
-    process->signal_to_send = SIGRTMIN+21;	break;
+    process->signal_to_send = __SIGRTMIN+21;	break;
   case GDBSERV_SIGRT54:
-    process->signal_to_send = SIGRTMIN+22;	break;
+    process->signal_to_send = __SIGRTMIN+22;	break;
   case GDBSERV_SIGRT55:
-    process->signal_to_send = SIGRTMIN+23;	break;
+    process->signal_to_send = __SIGRTMIN+23;	break;
   case GDBSERV_SIGRT56:
-    process->signal_to_send = SIGRTMIN+24;	break;
+    process->signal_to_send = __SIGRTMIN+24;	break;
   case GDBSERV_SIGRT57:
-    process->signal_to_send = SIGRTMIN+25;	break;
+    process->signal_to_send = __SIGRTMIN+25;	break;
   case GDBSERV_SIGRT58:
-    process->signal_to_send = SIGRTMIN+26;	break;
+    process->signal_to_send = __SIGRTMIN+26;	break;
   case GDBSERV_SIGRT59:
-    process->signal_to_send = SIGRTMIN+27;	break;
+    process->signal_to_send = __SIGRTMIN+27;	break;
   case GDBSERV_SIGRT60:
-    process->signal_to_send = SIGRTMIN+28;	break;
+    process->signal_to_send = __SIGRTMIN+28;	break;
   case GDBSERV_SIGRT61:
-    process->signal_to_send = SIGRTMIN+29;	break;
+    process->signal_to_send = __SIGRTMIN+29;	break;
   case GDBSERV_SIGRT62:
-    process->signal_to_send = SIGRTMIN+30;	break;
+    process->signal_to_send = __SIGRTMIN+30;	break;
   case GDBSERV_SIGRT63:
-    process->signal_to_send = SIGRTMIN+31;	break;
+    process->signal_to_send = __SIGRTMIN+31;	break;
   case GDBSERV_SIGRT64:
-    process->signal_to_send = SIGRTMIN+32;	break;
+    process->signal_to_send = __SIGRTMIN+32;	break;
 #endif
   }
   /* Since we will handle the signal, we don't want gdbserv

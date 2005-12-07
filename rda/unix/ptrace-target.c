@@ -47,6 +47,8 @@
 #include "server.h"
 #include "ptrace-target.h"
 #include "lwp-ctrl.h"
+#include "diagnostics.h"
+
 /* This is unix ptrace gdbserv target that uses the RDA library to implement
    a remote gdbserver on a unix ptrace host.  It controls the process
    to be debugged on the linux host, allowing GDB to pull the strings
@@ -447,6 +449,7 @@ ptrace_break_program (struct gdbserv *serv)
      because SIGSTOP cannot be blocked or ignored.  */
   if (process->debug_backend)
     fprintf (stderr, " -- send SIGSTOP to child %d\n", process->pid);
+  print_sigstop_message (serv);
   kill (process->pid, SIGSTOP);
 }
 

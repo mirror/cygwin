@@ -183,7 +183,7 @@ AM_CFLAGS = -Wall
 INCLUDES = -I$(srcdir) -I$(srcdir)/../include 
 rda_SOURCES = server.c 
 EXTRA_rda_SOURCES = linux-target.c solaris-target.c \
-	ptrace-target.c dummy-target.c stock-breakpoints.c
+	ptrace-target.c dummy-target.c stock-breakpoints.c diagnostics.c
 
 rda_LDADD = $(TARGET_MODULES) ../lib/librda.la
 rda_DEPENDENCIES = $(server_OBJECTS) $(TARGET_MODULES) ../lib/librda.la
@@ -260,6 +260,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/diagnostics.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dummy-target.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/linux-target.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ptrace-target.Po@am__quote@

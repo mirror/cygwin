@@ -30,7 +30,7 @@
  * http://oss.sgi.com/projects/GenInfo/NoticeExplan/
  *
  */
-/* $Id: dup03.c,v 1.2 2003/01/24 01:09:39 cgf Exp $ */
+/* $Id: dup03.c,v 1.3 2005/12/11 22:31:00 cgf Exp $ */
 /**********************************************************
  * 
  *    OS Test - Silicon Graphics, Inc.
@@ -271,8 +271,8 @@ cleanup()
 
     /* close the open file we've been dup'ing */
     if (Fd) {
-    	for (; Nfds >0 ; Nfds--) {
-    	    if (close(Fd[Nfds-1]) == -1) {
+    	while (Nfds-- >0) {
+    	    if (close(Fd[Nfds]) == -1) {
 		tst_resm(TWARN, "close(%s) Failed, errno=%d : %s",
 				Fname, errno, strerror(errno));
 	    }

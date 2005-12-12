@@ -3,17 +3,17 @@
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I $(srcdir)/../../../config
 
-noinst_LTLIBRARIES = libms1.la
+noinst_LTLIBRARIES = libmt.la
 
 BFDINCLUDES =  -I../../../../bfd -I$(srcdir)/../../../../include
 INCLUDES = -I$(srcdir) -I$(srcdir)/.. -I../../../include -I$(srcdir)/../../../include $(BFDINCLUDES)
 CXXFLAGS = $(TOP_CXXFLAGS)
 
-pkgdata_DATA = hw-cpu-ms1.txt
+pkgdata_DATA = hw-cpu-mt.txt
 
-libms1_la_SOURCES = ms1.cxx ms1-decode.cxx ms1-sem.cxx ms1-write.cxx
-libms1_la_LDFLAGS =
-libms1_la_LIBADD = ms1-asm.lo ms1-dis.lo ms1-opc.lo ms1-ibld.lo ms1-desc.lo
+libmt_la_SOURCES = mt.cxx mt-decode.cxx mt-sem.cxx mt-write.cxx
+libmt_la_LDFLAGS =
+libmt_la_LIBADD = ms1-asm.lo ms1-dis.lo ms1-opc.lo ms1-ibld.lo ms1-desc.lo
 
 OPCODES_COMPILE_FLAGS = -DHAVE_CONFIG_H \
 	-I../../../../opcodes \
@@ -43,14 +43,14 @@ ms1-desc.lo: ../../../../opcodes/ms1-desc.c
 cgendir = $(srcdir)/../../../../cgen
 CGENFLAGS = -v
 
-CGEN_ALL = cgen-ms1
+CGEN_ALL = cgen-mt
 .PHONY: cgen-all $(CGEN_ALL)
 cgen-all: $(CGEN_ALL)
 
-cgen-ms1:
+cgen-mt:
 	$(SHELL) ../CGEN.sh cpu-decode $(srcdir) $(cgendir) "$(CGENFLAGS)" \
 	ms1 "with-scache" ms1 ms1 ms1-003 ms1 "ms1-" \
-	$(srcdir)/../../../../cpu/ms1.cpu \
+	$(srcdir)/../../../../cpu/mt.cpu \
 	"desc.h cpu.h decode.h decode.cxx write.cxx semantics.cxx defs.h"
 
 html_stylesheet=$(srcdir)/../../component_html.xsl

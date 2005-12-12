@@ -1,3 +1,9 @@
+2005-12-12  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Rename ms1 files to mt as appropriate.
+	* Makefile.am: Replace ms1 files with mt files.
+	* Makefile.in: Rebuilt.
+
 2005-06-15  Dave Brolley  <brolley@redhat.com>
 
 	* New cpu port contributed by Red Hat and written by

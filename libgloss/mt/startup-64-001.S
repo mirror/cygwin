@@ -1,5 +1,5 @@
 /*
- * $Header: /cvs/src/src/libgloss/ms1/Attic/startup-64-001.S,v 1.1 2005/07/06 12:58:12 aldyh Exp $
+ * $Header: /cvs/src/src/libgloss/mt/startup-64-001.S,v 1.1 2005/12/12 11:16:41 nathan Exp $
  *
  * interrupt_vectors.s -- the interrupt handler jump table. 
  *

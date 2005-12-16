@@ -1,3 +1,9 @@
+2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Second part of ms1 to mt renaming.
+	* aclocal.m4: Rebuilt.
+	* configure: Rebuilt.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* configure.in: Apply AC_CONFIG_SUBDIRS only to literal strings.

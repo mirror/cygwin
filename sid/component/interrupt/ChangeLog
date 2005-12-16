@@ -1,6 +1,11 @@
+2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Second part of ms1 to mt renaming.
+	* Makefile.in: Rebuilt.
+
 2005-06-30  Aldy Hernandez  <aldyh@redhat.com>
 
-        * components.h (bus_size): Fix constructor to be legitimate C++.
+	* components.h (bus_size): Fix constructor to be legitimate C++.
 
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 

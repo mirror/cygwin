@@ -464,7 +464,7 @@ ac_includes_default="\
 #endif"
 
 ac_subdirs_all="$ac_subdirs_all bochs cfgroot tcl audio cgen-cpu families timers"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL lcd_libs socket_libs comp_defs CYGWIN LINKS HAVE_LINKS_TRUE HAVE_LINKS_FALSE XSLTPROC HAVE_XSLTPROC_TRUE HAVE_XSLTPROC_FALSE SABLOTRON HAVE_SABLOTRON_TRUE HAVE_SABLOTRON_FALSE sidtarget_arm SIDTARGET_ARM_TRUE SIDTARGET_ARM_FALSE sidtarget_x86 SIDTARGET_X86_TRUE SIDTARGET_X86_FALSE sidtarget_mips SIDTARGET_MIPS_TRUE SIDTARGET_MIPS_FALSE sidtarget_m32r SIDTARGET_M32R_TRUE SIDTARGET_M32R_FALSE sidtarget_m68k SIDTARGET_M68K_TRUE SIDTARGET_M68K_FALSE sidtarget_ms1 SIDTARGET_MS1_TRUE SIDTARGET_MS1_FALSE sidtarget_ppc SIDTARGET_PPC_TRUE SIDTARGET_PPC_FALSE sidtarget_xstormy16 SIDTARGET_XSTORMY16_TRUE SIDTARGET_XSTORMY16_FALSE subdirs make_subdirs LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL lcd_libs socket_libs comp_defs CYGWIN LINKS HAVE_LINKS_TRUE HAVE_LINKS_FALSE XSLTPROC HAVE_XSLTPROC_TRUE HAVE_XSLTPROC_FALSE SABLOTRON HAVE_SABLOTRON_TRUE HAVE_SABLOTRON_FALSE sidtarget_arm SIDTARGET_ARM_TRUE SIDTARGET_ARM_FALSE sidtarget_x86 SIDTARGET_X86_TRUE SIDTARGET_X86_FALSE sidtarget_mips SIDTARGET_MIPS_TRUE SIDTARGET_MIPS_FALSE sidtarget_m32r SIDTARGET_M32R_TRUE SIDTARGET_M32R_FALSE sidtarget_m68k SIDTARGET_M68K_TRUE SIDTARGET_M68K_FALSE sidtarget_mt SIDTARGET_MT_TRUE SIDTARGET_MT_FALSE sidtarget_ppc SIDTARGET_PPC_TRUE SIDTARGET_PPC_FALSE sidtarget_xstormy16 SIDTARGET_XSTORMY16_TRUE SIDTARGET_XSTORMY16_FALSE subdirs make_subdirs LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -22962,7 +22962,7 @@ sidtarget_x86=$sidtarget_default
 sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
-sidtarget_ms1=$sidtarget_default
+sidtarget_mt=$sidtarget_default
 sidtarget_ppc=$sidtarget_default
 sidtarget_xstormy16=$sidtarget_default
 
@@ -22975,7 +22975,7 @@ do
       mips*)  sidtarget_mips=1 ;;
       m32r*)  sidtarget_m32r=1 ;;
       m68k*)  sidtarget_m68k=1 ;;
-      ms1*) sidtarget_ms1=1 ;;
+      mt*) sidtarget_mt=1 ;;
       powerpc*) sidtarget_ppc=1 ;;
       ppc*)   sidtarget_ppc=1 ;;
       xstormy16*) sidtarget_xstormy16=1 ;;
@@ -22990,7 +22990,7 @@ case 1 in
   ${sidtarget_mips}) ;;
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
-  ${sidtarget_ms1}) ;;
+  ${sidtarget_mt}) ;;
   ${sidtarget_ppc}) ;;
   ${sidtarget_xstormy16}) ;;
   *) { echo "$as_me:$LINENO: WARNING: No selected sid targets: use --enable-targets or --target" >&5
@@ -23079,21 +23079,21 @@ fi
 echo "$as_me:$LINENO: result: $sidtarget_m68k" >&5
 echo "${ECHO_T}$sidtarget_m68k" >&6
 
-echo "$as_me:$LINENO: checking MS1 family support" >&5
-echo $ECHO_N "checking MS1 family support... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking MT family support" >&5
+echo $ECHO_N "checking MT family support... $ECHO_C" >&6
 
 
 
-if test "x$sidtarget_ms1" = x1; then
-  SIDTARGET_MS1_TRUE=
-  SIDTARGET_MS1_FALSE='#'
+if test "x$sidtarget_mt" = x1; then
+  SIDTARGET_MT_TRUE=
+  SIDTARGET_MT_FALSE='#'
 else
-  SIDTARGET_MS1_TRUE='#'
-  SIDTARGET_MS1_FALSE=
+  SIDTARGET_MT_TRUE='#'
+  SIDTARGET_MT_FALSE=
 fi
 
-echo "$as_me:$LINENO: result: $sidtarget_ms1" >&5
-echo "${ECHO_T}$sidtarget_ms1" >&6
+echo "$as_me:$LINENO: result: $sidtarget_mt" >&5
+echo "${ECHO_T}$sidtarget_mt" >&6
 
 echo "$as_me:$LINENO: checking PPC family support" >&5
 echo $ECHO_N "checking PPC family support... $ECHO_C" >&6
@@ -23325,10 +23325,10 @@ echo "$as_me: error: conditional \"SIDTARGET_M68K\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${SIDTARGET_MS1_TRUE}" && test -z "${SIDTARGET_MS1_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"SIDTARGET_MS1\" was never defined.
+if test -z "${SIDTARGET_MT_TRUE}" && test -z "${SIDTARGET_MT_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SIDTARGET_MT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"SIDTARGET_MS1\" was never defined.
+echo "$as_me: error: conditional \"SIDTARGET_MT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -24003,9 +24003,9 @@ s,@SIDTARGET_M32R_FALSE@,$SIDTARGET_M32R_FALSE,;t t
 s,@sidtarget_m68k@,$sidtarget_m68k,;t t
 s,@SIDTARGET_M68K_TRUE@,$SIDTARGET_M68K_TRUE,;t t
 s,@SIDTARGET_M68K_FALSE@,$SIDTARGET_M68K_FALSE,;t t
-s,@sidtarget_ms1@,$sidtarget_ms1,;t t
-s,@SIDTARGET_MS1_TRUE@,$SIDTARGET_MS1_TRUE,;t t
-s,@SIDTARGET_MS1_FALSE@,$SIDTARGET_MS1_FALSE,;t t
+s,@sidtarget_mt@,$sidtarget_mt,;t t
+s,@SIDTARGET_MT_TRUE@,$SIDTARGET_MT_TRUE,;t t
+s,@SIDTARGET_MT_FALSE@,$SIDTARGET_MT_FALSE,;t t
 s,@sidtarget_ppc@,$sidtarget_ppc,;t t
 s,@SIDTARGET_PPC_TRUE@,$SIDTARGET_PPC_TRUE,;t t
 s,@SIDTARGET_PPC_FALSE@,$SIDTARGET_PPC_FALSE,;t t

@@ -6,6 +6,6 @@
 #define SIDTARGET_MIPS @sidtarget_mips@
 #define SIDTARGET_M32R @sidtarget_m32r@
 #define SIDTARGET_M68K @sidtarget_m68k@
-#define SIDTARGET_MS1 @sidtarget_ms1@
+#define SIDTARGET_MT @sidtarget_mt@
 #define SIDTARGET_PPC @sidtarget_ppc@
 #define SIDTARGET_XSTORMY16 @sidtarget_xstormy16@

@@ -1,3 +1,12 @@
+2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Second part of ms1 to mt renaming.
+	* aclocal.m4: Rebuilt.
+	* configure: Rebuilt.
+	* tconfig.in: Adjust.
+	* families/aclocal.m4: Rebuilt.
+	* families/configure: Rebuilt.
+
 2005-06-24  Dave Brolley  <brolley@redhat.com>
 
 	* tconfig.in: Add ms1 support.

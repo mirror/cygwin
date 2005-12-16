@@ -1,4 +1,4 @@
-/* CPU family header for ms1 / ms1.
+/* CPU family header for mt / mt.
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
@@ -9,8 +9,8 @@ This file is part of the Red Hat simulators.
 
 */
 
-#ifndef DEFS_MS1_H
-#define DEFS_MS1_H
+#ifndef DEFS_MT_H
+#define DEFS_MT_H
 
 #include <stack>
 #include "cgen-types.h"
@@ -18,11 +18,11 @@ This file is part of the Red Hat simulators.
 // forward declaration
 
   
-namespace ms1 {
-struct ms1_cpu;
+namespace mt {
+struct mt_cpu;
 }
 
-namespace ms1 {
+namespace mt {
 
 using namespace cgen;
 
@@ -94,13 +94,13 @@ using namespace cgen;
   write_stack< write<USI> > 	h_pc_writes	[pipe_sz];
 
 
-  // unified writeback function (defined in ms1-write.cc)
-  void writeback (int tick, ms1::ms1_cpu* current_cpu);
-  // unified write-stack clearing function (defined in ms1-write.cc)
+  // unified writeback function (defined in mt-write.cc)
+  void writeback (int tick, mt::mt_cpu* current_cpu);
+  // unified write-stack clearing function (defined in mt-write.cc)
   void reset ();
 
-  }; // end struct ms1::write_stacks 
+  }; // end struct mt::write_stacks 
 
-} // end ms1 namespace
+} // end mt namespace
 
-#endif /* DEFS_MS1_H */
+#endif /* DEFS_MT_H */

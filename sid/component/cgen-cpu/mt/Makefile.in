@@ -23,7 +23,7 @@
 #
 
 
-SOURCES = $(libms1_la_SOURCES)
+SOURCES = $(libmt_la_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -72,10 +72,10 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../../config/mkinstalldirs
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libms1_la_DEPENDENCIES = ms1-asm.lo ms1-dis.lo ms1-opc.lo ms1-ibld.lo \
-	ms1-desc.lo
-am_libms1_la_OBJECTS = ms1.lo ms1-decode.lo ms1-sem.lo ms1-write.lo
-libms1_la_OBJECTS = $(am_libms1_la_OBJECTS)
+libmt_la_DEPENDENCIES = mt-asm.lo mt-dis.lo mt-opc.lo mt-ibld.lo \
+	mt-desc.lo
+am_libmt_la_OBJECTS = mt.lo mt-decode.lo mt-sem.lo mt-write.lo
+libmt_la_OBJECTS = $(am_libmt_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp = $(SHELL) $(top_srcdir)/../../../config/depcomp
 am__depfiles_maybe = depfiles
@@ -87,8 +87,8 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libms1_la_SOURCES)
-DIST_SOURCES = $(libms1_la_SOURCES)
+SOURCES = $(libmt_la_SOURCES)
+DIST_SOURCES = $(libmt_la_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -233,7 +233,7 @@ INCLUDES = -I$(srcdir) -I$(srcdir)/.. -I../../../include -I$(srcdir)/../../../in
 pkgdata_DATA = hw-cpu-mt.txt
 libmt_la_SOURCES = mt.cxx mt-decode.cxx mt-sem.cxx mt-write.cxx
 libmt_la_LDFLAGS = 
-libmt_la_LIBADD = ms1-asm.lo ms1-dis.lo ms1-opc.lo ms1-ibld.lo ms1-desc.lo
+libmt_la_LIBADD = mt-asm.lo mt-dis.lo mt-opc.lo mt-ibld.lo mt-desc.lo
 OPCODES_COMPILE_FLAGS = -DHAVE_CONFIG_H \
 	-I../../../../opcodes \
 	-I../../../../bfd \
@@ -246,7 +246,7 @@ OPCODES_COMPILE_FLAGS = -DHAVE_CONFIG_H \
 
 cgendir = $(srcdir)/../../../../cgen
 CGENFLAGS = -v
-CGEN_ALL = cgen-ms1
+CGEN_ALL = cgen-mt
 html_stylesheet = $(srcdir)/../../component_html.xsl
 SUFFIXES = .xml .txt .html
 all: all-am
@@ -295,8 +295,8 @@ clean-noinstLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libms1.la: $(libms1_la_OBJECTS) $(libms1_la_DEPENDENCIES) 
-	$(CXXLINK)  $(libms1_la_LDFLAGS) $(libms1_la_OBJECTS) $(libms1_la_LIBADD) $(LIBS)
+libmt.la: $(libmt_la_OBJECTS) $(libmt_la_DEPENDENCIES) 
+	$(CXXLINK)  $(libmt_la_LDFLAGS) $(libmt_la_OBJECTS) $(libmt_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -304,10 +304,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ms1-decode.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ms1-sem.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ms1-write.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ms1.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mt-decode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mt-sem.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mt-write.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mt.Plo@am__quote@
 
 .cxx.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -632,27 +632,27 @@ uninstall-am: uninstall-info-am uninstall-pkgdataDATA
 	uninstall-am uninstall-info-am uninstall-pkgdataDATA
 
 
-ms1-asm.lo: ../../../../opcodes/ms1-asm.c
+mt-asm.lo: ../../../../opcodes/mt-asm.c
 	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
 
-ms1-dis.lo: ../../../../opcodes/ms1-dis.c
+mt-dis.lo: ../../../../opcodes/mt-dis.c
 	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
 
-ms1-opc.lo: ../../../../opcodes/ms1-opc.c
+mt-opc.lo: ../../../../opcodes/mt-opc.c
 	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
 
-ms1-ibld.lo: ../../../../opcodes/ms1-ibld.c
+mt-ibld.lo: ../../../../opcodes/mt-ibld.c
 	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
 
-ms1-desc.lo: ../../../../opcodes/ms1-desc.c
+mt-desc.lo: ../../../../opcodes/mt-desc.c
 	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
 .PHONY: cgen-all $(CGEN_ALL)
 cgen-all: $(CGEN_ALL)
 
-cgen-ms1:
+cgen-mt:
 	$(SHELL) ../CGEN.sh cpu-decode $(srcdir) $(cgendir) "$(CGENFLAGS)" \
-	ms1 "with-scache" ms1 ms1 ms1-003 ms1 "ms1-" \
-	$(srcdir)/../../../../cpu/ms1.cpu \
+	mt "with-scache" mt mt ms1-003 mt "mt-" \
+	$(srcdir)/../../../../cpu/mt.cpu \
 	"desc.h cpu.h decode.h decode.cxx write.cxx semantics.cxx defs.h"
 
 @HAVE_XSLTPROC_TRUE@@MAINTAINER_MODE_TRUE@.xml.html:

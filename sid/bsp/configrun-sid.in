@@ -17,14 +17,14 @@ require 5.004;
 		 "x86" => "hw-cpu-x86",
 	         # INSERT NEW ENTRIES HERE
 		 "m32r" => "hw-cpu-m32r/d",
-		 "ms1" => "hw-cpu-ms1",
+		 "mt" => "hw-cpu-mt",
 		 "xstormy16" => "hw-cpu-xstormy16",
 		 );
 
 %cpu_defaultendian = (
 		      "x86" => "-EL",
 		      "m32r" => "-EB",
-		      "ms1" => "-EB",
+		      "mt" => "-EB",
 		      "xstormy16" => "-EL",
 		      );
 
@@ -34,7 +34,7 @@ require 5.004;
 		   "x86" => "sw-gloss-generic/libgloss",
 	           # INSERT NEW ENTRIES HERE
 		   "m32r" => "sw-gloss-m32r/libgloss",
-		   "ms1" => "sw-gloss-generic/libgloss",
+		   "mt" => "sw-gloss-generic/libgloss",
 		   "xstormy16" => "sw-gloss-generic/libgloss",
 		   );
 
@@ -44,7 +44,7 @@ require 5.004;
 		   "x86" => "0x00000,0x500000",
 	           # INSERT NEW ENTRIES HERE
 		   "m32r" => "0x00000000,0x00800000",
-		   "ms1" => "0x00000000,0x00800000",
+		   "mt" => "0x00000000,0x00800000",
 		   "xstormy16" => "0x00000000,0x00800000",
 		  );
 
@@ -396,7 +396,7 @@ $first_section = "# first section\n" .
   &sidconf_new("sid-sched-sim", "target-sched") . "\n" .
   "";
 
-if ($opt_cpu eq "ms1")
+if ($opt_cpu eq "mt")
   {
       $first_section .= "# add io bus probe\n" .
       &sidconf_new("hw-glue-probe-bus", "io-bus-probe") . "\n";
@@ -488,7 +488,7 @@ if ($opt_cpu eq "x86")
       $second_section .= "set cpu memory-mode cygmon\n";
   }
 
-if ($opt_cpu eq "ms1")
+if ($opt_cpu eq "mt")
   {
       # Uncomment the next three lines to enable io bus tracing.
       #$second_section .= "# Connect bus tracer to io bus accessor\n" .
@@ -906,7 +906,7 @@ if ($opt_cpu eq "arm")
     $enable_z_packet = "true";
   }
 
-if ($opt_cpu eq "ms1")
+if ($opt_cpu eq "mt")
   {
     $enable_z_packet = "true";
   }

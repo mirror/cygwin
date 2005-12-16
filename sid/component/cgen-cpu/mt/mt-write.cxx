@@ -1,4 +1,4 @@
-/* Simulator instruction operand writer for ms1.
+/* Simulator instruction operand writer for mt.
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
@@ -10,16 +10,16 @@ This file is part of the Red Hat simulators.
 */
 
 
-#include "ms1.h"
+#include "mt.h"
 
   template <typename ST> 
   static void clear_stacks (ST &st)
   {
-    for (int i = 0; i < ms1::pipe_sz; i++)
+    for (int i = 0; i < mt::pipe_sz; i++)
       st[i].clear();
   }
 
-  void ms1::write_stacks::reset ()
+  void mt::write_stacks::reset ()
   {
     clear_stacks (h_spr_writes);
     clear_stacks (h_pc_writes);
@@ -35,8 +35,7 @@ This file is part of the Red Hat simulators.
     clear_stacks (SF_memory_writes);
     clear_stacks (DF_memory_writes);
   }
-
-  void ms1::write_stacks::writeback (int tick, ms1::ms1_cpu* current_cpu) 
+  void mt::write_stacks::writeback (int tick, mt::mt_cpu* current_cpu) 
   {
 
     // register writeback loops

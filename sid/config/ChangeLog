@@ -1,3 +1,10 @@
+2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Second part of ms1 to mt renaming.
+	* config.sub: Adjust.
+	* info.tcl.in: Adjust.
+	* sidtargets.m4: Adjust.
+
 2005-06-24  Dave Brolley  <brolley@redhat.com>
 
 	* config.sub: Add ms1 support.

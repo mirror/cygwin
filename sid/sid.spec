@@ -113,7 +113,7 @@ make install
 /usr/bin/configrun-sid
 /usr/bin/m68k-elf-sid
 /usr/bin/m32r-elf-sid
-/usr/bin/ms1-elf-sid
+/usr/bin/mt-elf-sid
 /usr/bin/xstormy16-elf-sid
 /usr/bin/sid
 /usr/bin/siddoc

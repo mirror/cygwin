@@ -1,36 +1,36 @@
-// ms1.h - Hand-written code for the MS1 CPU. -*- C++ -*-
+// mt.h - Hand-written code for the MT CPU. -*- C++ -*-
 
 // Copyright (C) 2004 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
 #include "cgen-cpu.h"
-#include "ms1-desc.h"
+#include "mt-desc.h"
 #define WRITE_BUF_SZ 2
-#include "ms1-defs.h"
-#include "ms1-decode.h"
+#include "mt-defs.h"
+#include "mt-decode.h"
 #undef WRITE_BUF_SZ
 
-namespace ms1
+namespace mt
 {
-  class ms1_cpu_cgen
+  class mt_cpu_cgen
     {
       // Include cgen generated elements.
-#include "ms1-cpu.h"
+#include "mt-cpu.h"
 
     public:
      /* ELF flags */
      USI eflags;
      inline void cgen_rtx_error(const char* msg) const
 	{
-	  cerr << "ms1-cpu rtx error: " << msg << endl;
+	  cerr << "mt-cpu rtx error: " << msg << endl;
 	}
     };
 
-  class ms1_cpu: public ms1_cpu_cgen, public cgen_bi_endian_cpu
+  class mt_cpu: public mt_cpu_cgen, public cgen_bi_endian_cpu
     {
     private:
-      scache_engine<ms1_scache> engine;
+      scache_engine<mt_scache> engine;
 
       // Bus that will be used later for i/o.
       sid::bus *io_bus;
@@ -101,7 +101,7 @@ namespace ms1
 
 
       // pipeline modelling
-      ms1::write_stacks write_stacks;
+      mt::write_stacks write_stacks;
       int tick;
 
       // Interrupt enable/disable tracking support.
@@ -109,8 +109,8 @@ namespace ms1
 
       
     public:
-      ms1_cpu ();
-      ~ms1_cpu () throw() { };
+      mt_cpu ();
+      ~mt_cpu () throw() { };
 
       void set_eflags (host_int_4 v)
       {
@@ -204,4 +204,4 @@ namespace ms1
 
     };
 
-} // namespace ms1
+} // namespace mt

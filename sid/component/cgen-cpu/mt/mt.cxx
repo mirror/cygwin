@@ -1,4 +1,4 @@
-// ms1.cxx - Implementations of hand-written functions for the MS1
+// mt.cxx - Implementations of hand-written functions for the MT
 // simulator. -*- C++ -*-
 
 // Copyright (C) 2004 Red Hat.
@@ -9,14 +9,14 @@
 // and one or more cpu-family specific parts.  MSi1 is a fairly simple
 // port so we don't currently do this.
 
-#include "ms1.h"
+#include "mt.h"
 
 using namespace std;
 using namespace sid;
 using namespace sidutil;
-using namespace ms1;
+using namespace mt;
 
-ms1_cpu::ms1_cpu ()
+mt_cpu::mt_cpu ()
   :tick(0),
    engine (32768) // XXX: tune size  
 {
@@ -49,7 +49,7 @@ ms1_cpu::ms1_cpu ()
 }
 
 void
-ms1_cpu::reset()
+mt_cpu::reset()
 {
   this->write_stacks.reset();
   this->hardware.h_pc = 0;
@@ -59,14 +59,14 @@ ms1_cpu::reset()
 }
 
 void
-ms1_cpu::flush_icache ()
+mt_cpu::flush_icache ()
 {
   this->engine.flush ();
 }
 
 
 void
-ms1_cpu::invalid_insn (PCADDR pc)
+mt_cpu::invalid_insn (PCADDR pc)
 {
   cout << hex << "XXX: invalid insn @ " << pc << dec << endl;
   // abort();
@@ -75,7 +75,7 @@ ms1_cpu::invalid_insn (PCADDR pc)
 
 // Memory trap(/fault) handling.
 void
-ms1_cpu::memory_trap (const cpu_memory_fault& t)
+mt_cpu::memory_trap (const cpu_memory_fault& t)
 {
   this->h_pc_set (t.pc);
   
@@ -84,7 +84,7 @@ ms1_cpu::memory_trap (const cpu_memory_fault& t)
 
 
 void
-ms1_cpu::do_syscall (PCADDR pc)
+mt_cpu::do_syscall (PCADDR pc)
 {
 
   // Get the syscall arguments
@@ -103,7 +103,7 @@ ms1_cpu::do_syscall (PCADDR pc)
   switch (whatnext)
     {
     case cpu_trap_unhandled:
-      // cerr << "hw-cpu-ms1: invalid insn handler unimplemented!" << endl;
+      // cerr << "hw-cpu-mt: invalid insn handler unimplemented!" << endl;
       // When no gloss component is configured, we have to do the normal SI.
       h_pc_set(8);
       return;
@@ -141,13 +141,13 @@ ms1_cpu::do_syscall (PCADDR pc)
 }
 
 void
-ms1_cpu::do_break (PCADDR pc)
+mt_cpu::do_break (PCADDR pc)
 {
   cpu_trap_disposition whatnext = this->signal_trap (cpu_trap_breakpoint, 0);
   switch (whatnext)
     {
     case cpu_trap_unhandled:
-      // cerr << "hw-cpu-ms1: breakpoint handler unimplemented!" << endl;
+      // cerr << "hw-cpu-mt: breakpoint handler unimplemented!" << endl;
       // No gdb component?  Do the proper break processing.
       // Put pc+4 into R15
       h_spr_set (15, pc +4);
@@ -177,7 +177,7 @@ ms1_cpu::do_break (PCADDR pc)
 }
 
 USI
-ms1_cpu::io_read (host_int_4 pc, host_int_4 address) 
+mt_cpu::io_read (host_int_4 pc, host_int_4 address) 
 {
   big_int_4 value;
   sid::bus::status s =
@@ -202,7 +202,7 @@ ms1_cpu::io_read (host_int_4 pc, host_int_4 address)
 } 
 
 void
-ms1_cpu::io_write (host_int_4 pc, host_int_4 address, big_int_4 value)
+mt_cpu::io_write (host_int_4 pc, host_int_4 address, big_int_4 value)
 { 
   sid::bus::status s =  
     (LIKELY(this->io_bus)) ? this->io_bus->write (address, value) : sid::bus::unmapped;
@@ -231,7 +231,7 @@ ms1_cpu::io_write (host_int_4 pc, host_int_4 address, big_int_4 value)
 // Stepper
 
 void
-ms1_cpu::step_insns ()
+mt_cpu::step_insns ()
 {
   bool found;
   bool increment;
@@ -242,7 +242,7 @@ ms1_cpu::step_insns ()
       increment = true;
       PCADDR pc = this->h_pc_get ();
       bool found;
-      ms1_scache* sem = engine.find (pc, found);
+      mt_scache* sem = engine.find (pc, found);
       if (!found)
 	{
 	  try
@@ -257,7 +257,7 @@ ms1_cpu::step_insns ()
 	    }
 	}
 
-      // printable_name must agree with bfd/cpu-ms1.c.
+      // printable_name must agree with bfd/cpu-mt.c.
       if (this->get_eflags () == 2)
 	printable_name = "ms1-003";
       else
@@ -268,9 +268,9 @@ ms1_cpu::step_insns ()
 	this->begin_trace (pc, sem->idesc->insn_name);
 
       if (trace_disass_p)
-	this->disassemble (pc, print_insn_ms1,
+	this->disassemble (pc, print_insn_mt,
 			   bfd_target_elf_flavour,
-			   bfd_arch_ms1,
+			   bfd_arch_mt,
 			   (current_endianness() == endian_little ? 
 			    BFD_ENDIAN_LITTLE : BFD_ENDIAN_BIG), 
 			   printable_name,
@@ -316,7 +316,7 @@ ms1_cpu::step_insns ()
 
 
       // move ahead thru circular pipeline
-      tick = (tick + 1) % ms1::pipe_sz;
+      tick = (tick + 1) % mt::pipe_sz;
 
       // Do post-instruction processing  ----------------------------
       if (this->enable_step_trap_p) 
@@ -331,20 +331,20 @@ ms1_cpu::step_insns ()
 
 
 void
-ms1_cpu::stream_state (ostream& o) const
+mt_cpu::stream_state (ostream& o) const
 {
-  o << " ms1-cpu-cgen ";
+  o << " mt-cpu-cgen ";
   stream_cgen_hardware (o);
   o << ' ' << tick << ' ';
   stream_cgen_write_stacks (o, write_stacks);
 }
 
 void
-ms1_cpu::destream_state (istream& i)
+mt_cpu::destream_state (istream& i)
 {
   string key;
   i >> key;
-  if (key != "ms1-cpu-cgen")
+  if (key != "mt-cpu-cgen")
     {
       i.setstate (ios::badbit);
       return;

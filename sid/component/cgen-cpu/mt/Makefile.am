@@ -13,7 +13,7 @@ pkgdata_DATA = hw-cpu-mt.txt
 
 libmt_la_SOURCES = mt.cxx mt-decode.cxx mt-sem.cxx mt-write.cxx
 libmt_la_LDFLAGS =
-libmt_la_LIBADD = ms1-asm.lo ms1-dis.lo ms1-opc.lo ms1-ibld.lo ms1-desc.lo
+libmt_la_LIBADD = mt-asm.lo mt-dis.lo mt-opc.lo mt-ibld.lo mt-desc.lo
 
 OPCODES_COMPILE_FLAGS = -DHAVE_CONFIG_H \
 	-I../../../../opcodes \
@@ -25,19 +25,19 @@ OPCODES_COMPILE_FLAGS = -DHAVE_CONFIG_H \
 	-I$(srcdir)/../../../../intl    \
 	-D_GNU_SOURCE 
 
-ms1-asm.lo: ../../../../opcodes/ms1-asm.c
+mt-asm.lo: ../../../../opcodes/mt-asm.c
 	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
 
-ms1-dis.lo: ../../../../opcodes/ms1-dis.c
+mt-dis.lo: ../../../../opcodes/mt-dis.c
 	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
 
-ms1-opc.lo: ../../../../opcodes/ms1-opc.c
+mt-opc.lo: ../../../../opcodes/mt-opc.c
 	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
 
-ms1-ibld.lo: ../../../../opcodes/ms1-ibld.c
+mt-ibld.lo: ../../../../opcodes/mt-ibld.c
 	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
 
-ms1-desc.lo: ../../../../opcodes/ms1-desc.c
+mt-desc.lo: ../../../../opcodes/mt-desc.c
 	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
 
 cgendir = $(srcdir)/../../../../cgen
@@ -49,7 +49,7 @@ cgen-all: $(CGEN_ALL)
 
 cgen-mt:
 	$(SHELL) ../CGEN.sh cpu-decode $(srcdir) $(cgendir) "$(CGENFLAGS)" \
-	ms1 "with-scache" ms1 ms1 ms1-003 ms1 "ms1-" \
+	mt "with-scache" mt mt ms1-003 mt "mt-" \
 	$(srcdir)/../../../../cpu/mt.cpu \
 	"desc.h cpu.h decode.h decode.cxx write.cxx semantics.cxx defs.h"
 

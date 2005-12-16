@@ -1,3 +1,11 @@
+2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Second part of ms1 to mt renaming.
+	* Makefile.am: Adjust.
+	* Makefile.in: Rebuilt.
+	* aclocal.m4: Rebuilt.
+	* configrun-sid.in: Adjust.
+
 2005-06-24  Dave Brolley  <brolley@redhat.com>
 
 	* configrun-sid.in: Add ms1 support.

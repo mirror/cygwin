@@ -7107,7 +7107,7 @@ sidtarget_x86=$sidtarget_default
 sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
-sidtarget_ms1=$sidtarget_default
+sidtarget_mt=$sidtarget_default
 sidtarget_ppc=$sidtarget_default
 sidtarget_xstormy16=$sidtarget_default
 
@@ -7121,7 +7121,7 @@ do
       mips*)  sidtarget_mips=1 ;;
       m32r*)  sidtarget_m32r=1 ;;
       m68k*)  sidtarget_m68k=1 ;;
-      ms1*) sidtarget_ms1=1 ;;
+      mt*)    sidtarget_mt=1 ;;
       powerpc*) sidtarget_ppc=1 ;;
       ppc*)   sidtarget_ppc=1 ;;
       xstormy16*) sidtarget_xstormy16=1 ;;
@@ -7136,7 +7136,7 @@ case 1 in
   ${sidtarget_mips}) ;;
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
-  ${sidtarget_ms1}) ;;
+  ${sidtarget_mt}) ;;
   ${sidtarget_ppc}) ;;
   ${sidtarget_xstormy16}) ;;
   *) AC_MSG_WARN([No selected sid targets: use --enable-targets or --target])
@@ -7172,10 +7172,10 @@ AC_SUBST(sidtarget_m68k)
 AM_CONDITIONAL(SIDTARGET_M68K,[test "x$sidtarget_m68k" = x1])
 AC_MSG_RESULT($sidtarget_m68k)
 
-AC_MSG_CHECKING(MS1 family support)
-AC_SUBST(sidtarget_ms1)
-AM_CONDITIONAL(SIDTARGET_MS1,[test "x$sidtarget_ms1" = x1])
-AC_MSG_RESULT($sidtarget_ms1)
+AC_MSG_CHECKING(MT family support)
+AC_SUBST(sidtarget_mt)
+AM_CONDITIONAL(SIDTARGET_MT,[test "x$sidtarget_mt" = x1])
+AC_MSG_RESULT($sidtarget_mt)
 
 AC_MSG_CHECKING(PPC family support)
 AC_SUBST(sidtarget_ppc)

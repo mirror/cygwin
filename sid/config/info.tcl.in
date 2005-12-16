@@ -18,6 +18,6 @@ set sidtarget(x86) @sidtarget_x86@
 set sidtarget(mips) @sidtarget_mips@
 set sidtarget(m32r) @sidtarget_m32r@
 set sidtarget(m68k) @sidtarget_m68k@
-set sidtarget(ms1) @sidtarget_ms1@
+set sidtarget(mt) @sidtarget_mt@
 set sidtarget(ppc) @sidtarget_ppc@
 set sidtarget(xstormy16) @sidtarget_xstormy16@

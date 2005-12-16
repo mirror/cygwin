@@ -1,4 +1,4 @@
-/* CPU class elements for ms1.
+/* CPU class elements for mt.
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
@@ -38,7 +38,7 @@ public:
   template <typename ST> 
   void stream_stacks (const ST &st, std::ostream &ost) const
   {
-    for (int i = 0; i < ms1::pipe_sz; i++)
+    for (int i = 0; i < mt::pipe_sz; i++)
     {
       ost << st[i].t << ' ';
       for (int j = 0; j <= st[i].t; j++)
@@ -53,7 +53,7 @@ public:
   template <typename ST> 
   void destream_stacks (ST &st, std::istream &ist)
   {
-    for (int i = 0; i < ms1::pipe_sz; i++)
+    for (int i = 0; i < mt::pipe_sz; i++)
     {
       ist >> st[i].t;
       for (int j = 0; j <= st[i].t; j++)
@@ -65,7 +65,7 @@ public:
     }
   }
   
-  void stream_cgen_write_stacks (std::ostream &ost, const ms1::write_stacks &stacks) const 
+  void stream_cgen_write_stacks (std::ostream &ost, const mt::write_stacks &stacks) const 
   {
     stream_stacks ( stacks.h_spr_writes, ost);
     stream_stacks ( stacks.h_pc_writes, ost);
@@ -81,7 +81,7 @@ public:
     stream_stacks ( stacks.SF_memory_writes, ost);
     stream_stacks ( stacks.DF_memory_writes, ost);
   }
-  void destream_cgen_write_stacks (std::istream &ist, ms1::write_stacks &stacks) 
+  void destream_cgen_write_stacks (std::istream &ist, mt::write_stacks &stacks) 
   {
     destream_stacks ( stacks.h_spr_writes, ist);
     destream_stacks ( stacks.h_pc_writes, ist);

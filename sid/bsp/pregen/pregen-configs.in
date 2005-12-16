@@ -72,11 +72,11 @@ mvic a.out.conf i386-gloss.conf
 crs --cpu=x86 --no-run --gdb=5000
 mvic sid.conf i386-gdb.conf
 
-crs --cpu=ms1 --no-run a.out
-mvic a.out.conf ms1-gloss.conf
+crs --cpu=mt --no-run a.out
+mvic a.out.conf mt-gloss.conf
 
-crs --cpu=ms1 --no-run --gdb=5000
-mvic sid.conf ms1-gdb.conf
+crs --cpu=mt --no-run --gdb=5000
+mvic sid.conf mt-gdb.conf
 
 crs --cpu=xstormy16 --no-run a.out
 mvic a.out.conf xstormy16-gloss.conf

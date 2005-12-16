@@ -1,3 +1,19 @@
+2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Second part of ms1 to mt renaming.
+	* Makefile.am: Adjust.
+	* Makefile.in: Rebuilt.
+	* hw-cpu-mt.txt: Adjust.
+	* mt-cpu.h: Rebuilt.
+	* mt-decode.cxx: Rebuilt.
+	* mt-decode.h: Rebuilt.
+	* mt-defs.h: Rebuilt.
+	* mt-desc.h: Rebuilt.
+	* mt-sem.cxx: Rebuilt.
+	* mt-write.cxx: Rebuilt.
+	* mt.cxx: Adjust.
+	* mt.h: Adjust.
+
 2005-12-12  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Rename ms1 files to mt as appropriate.

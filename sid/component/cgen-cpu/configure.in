@@ -53,9 +53,9 @@ if test $sidtarget_m32r -eq 1; then
 	cpu_subdirs="$cpu_subdirs m32r"
         AC_CONFIG_SUBDIRS(m32r)
 fi
-if test $sidtarget_ms1 -eq 1; then
-	cpu_subdirs="$cpu_subdirs ms1"
-        AC_CONFIG_SUBDIRS(ms1)
+if test $sidtarget_mt -eq 1; then
+	cpu_subdirs="$cpu_subdirs mt"
+        AC_CONFIG_SUBDIRS(mt)
 fi
 if test $sidtarget_xstormy16 -eq 1; then
 	cpu_subdirs="$cpu_subdirs xstormy16"

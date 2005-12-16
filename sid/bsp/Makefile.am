@@ -20,8 +20,8 @@ if SIDTARGET_M68K
 FAM3SCRIPTS = m68k-elf-sid
 endif
 
-if SIDTARGET_MS1
-FAM8SCRIPTS = ms1-elf-sid
+if SIDTARGET_MT
+FAM8SCRIPTS = mt-elf-sid
 endif
 
 if SIDTARGET_XSTORMY16

@@ -1,4 +1,4 @@
-/* Simulator instruction semantics for ms1.
+/* Simulator instruction semantics for mt.
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
@@ -13,23 +13,23 @@ This file is part of the Red Hat simulators.
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "ms1.h"
+#include "mt.h"
 
-using namespace ms1; // FIXME: namespace organization still wip
-using namespace ms1; // FIXME: namespace organization still wip
-
+using namespace mt; // FIXME: namespace organization still wip
+using namespace mt; // FIXME: namespace organization still wip
 #define GET_ATTR(name) GET_ATTR_##name ()
 
 
 // ********** x-invalid: --invalid--
 
 void
-ms1_sem_x_invalid (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_x_invalid (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 0;
 
@@ -46,12 +46,13 @@ ms1_sem_x_invalid (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** add: add $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_add (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_add (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -69,12 +70,13 @@ ms1_sem_add (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** addu: addu $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_addu (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_addu (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -92,12 +94,13 @@ ms1_sem_addu (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** addi: addi $frdr,$frsr1,#$imm16
 
 void
-ms1_sem_addi (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_addi (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addi.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -119,12 +122,13 @@ ms1_sem_addi (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** addui: addui $frdr,$frsr1,#$imm16z
 
 void
-ms1_sem_addui (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_addui (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addui.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -142,12 +146,13 @@ ms1_sem_addui (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** sub: sub $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_sub (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_sub (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -165,12 +170,13 @@ ms1_sem_sub (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** subu: subu $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_subu (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_subu (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -188,12 +194,13 @@ ms1_sem_subu (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** subi: subi $frdr,$frsr1,#$imm16
 
 void
-ms1_sem_subi (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_subi (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addi.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -215,12 +222,13 @@ ms1_sem_subi (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** subui: subui $frdr,$frsr1,#$imm16z
 
 void
-ms1_sem_subui (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_subui (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addui.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -238,12 +246,13 @@ ms1_sem_subui (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** mul: mul $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_mul (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_mul (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -273,12 +282,13 @@ current_cpu->cgen_rtx_error ("operand out of range");
 // ********** muli: muli $frdr,$frsr1,#$imm16
 
 void
-ms1_sem_muli (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_muli (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addi.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -311,12 +321,13 @@ current_cpu->cgen_rtx_error ("op2 is 0");
 // ********** and: and $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_and (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_and (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -334,12 +345,13 @@ ms1_sem_and (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** andi: andi $frdr,$frsr1,#$imm16z
 
 void
-ms1_sem_andi (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_andi (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addui.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -357,12 +369,13 @@ ms1_sem_andi (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** or: or $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_or (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_or (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -380,12 +393,13 @@ ms1_sem_or (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** nop: nop
 
 void
-ms1_sem_nop (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_nop (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -398,12 +412,13 @@ ms1_sem_nop (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** ori: ori $frdr,$frsr1,#$imm16z
 
 void
-ms1_sem_ori (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_ori (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addui.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -421,12 +436,13 @@ ms1_sem_ori (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** xor: xor $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_xor (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_xor (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -444,12 +460,13 @@ ms1_sem_xor (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** xori: xori $frdr,$frsr1,#$imm16z
 
 void
-ms1_sem_xori (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_xori (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addui.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -467,12 +484,13 @@ ms1_sem_xori (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** nand: nand $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_nand (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_nand (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -490,12 +508,13 @@ ms1_sem_nand (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** nandi: nandi $frdr,$frsr1,#$imm16z
 
 void
-ms1_sem_nandi (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_nandi (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addui.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -513,12 +532,13 @@ ms1_sem_nandi (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** nor: nor $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_nor (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_nor (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -536,12 +556,13 @@ ms1_sem_nor (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** nori: nori $frdr,$frsr1,#$imm16z
 
 void
-ms1_sem_nori (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_nori (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addui.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -559,12 +580,13 @@ ms1_sem_nori (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** xnor: xnor $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_xnor (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_xnor (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -582,12 +604,13 @@ ms1_sem_xnor (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** xnori: xnori $frdr,$frsr1,#$imm16z
 
 void
-ms1_sem_xnori (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_xnori (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addui.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -605,12 +628,13 @@ ms1_sem_xnori (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** ldui: ldui $frdr,#$imm16z
 
 void
-ms1_sem_ldui (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_ldui (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addui.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -628,12 +652,13 @@ ms1_sem_ldui (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** lsl: lsl $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_lsl (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_lsl (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -651,12 +676,13 @@ ms1_sem_lsl (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** lsli: lsli $frdr,$frsr1,#$imm16
 
 void
-ms1_sem_lsli (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_lsli (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addi.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -674,12 +700,13 @@ ms1_sem_lsli (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** lsr: lsr $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_lsr (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_lsr (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -697,12 +724,13 @@ ms1_sem_lsr (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** lsri: lsri $frdr,$frsr1,#$imm16
 
 void
-ms1_sem_lsri (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_lsri (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addi.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -720,12 +748,13 @@ ms1_sem_lsri (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** asr: asr $frdrrr,$frsr1,$frsr2
 
 void
-ms1_sem_asr (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_asr (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -743,12 +772,13 @@ ms1_sem_asr (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** asri: asri $frdr,$frsr1,#$imm16
 
 void
-ms1_sem_asri (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_asri (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addi.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -766,12 +796,13 @@ ms1_sem_asri (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** brlt: brlt $frsr1,$frsr2,$imm16o
 
 void
-ms1_sem_brlt (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_brlt (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_brlt.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -779,7 +810,7 @@ ms1_sem_brlt (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 if (LTSI (current_cpu->hardware.h_spr[FLD (f_sr1)], current_cpu->hardware.h_spr[FLD (f_sr2)])) {
   {
     USI opval = ADDSI (pc, EXTSISI (FLD (f_imm16s)));
-    buf.h_pc_writes [(tick + 1) % ms1::pipe_sz].push (ms1::write<USI>(pc, opval));
+    buf.h_pc_writes [(tick + 1) % mt::pipe_sz].push (mt::write<USI>(pc, opval));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
@@ -793,12 +824,13 @@ if (LTSI (current_cpu->hardware.h_spr[FLD (f_sr1)], current_cpu->hardware.h_spr[
 // ********** brle: brle $frsr1,$frsr2,$imm16o
 
 void
-ms1_sem_brle (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_brle (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_brlt.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -806,7 +838,7 @@ ms1_sem_brle (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 if (LESI (current_cpu->hardware.h_spr[FLD (f_sr1)], current_cpu->hardware.h_spr[FLD (f_sr2)])) {
   {
     USI opval = ADDSI (pc, EXTSISI (FLD (f_imm16s)));
-    buf.h_pc_writes [(tick + 1) % ms1::pipe_sz].push (ms1::write<USI>(pc, opval));
+    buf.h_pc_writes [(tick + 1) % mt::pipe_sz].push (mt::write<USI>(pc, opval));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
@@ -820,12 +852,13 @@ if (LESI (current_cpu->hardware.h_spr[FLD (f_sr1)], current_cpu->hardware.h_spr[
 // ********** breq: breq $frsr1,$frsr2,$imm16o
 
 void
-ms1_sem_breq (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_breq (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_brlt.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -833,7 +866,7 @@ ms1_sem_breq (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 if (EQSI (current_cpu->hardware.h_spr[FLD (f_sr1)], current_cpu->hardware.h_spr[FLD (f_sr2)])) {
   {
     USI opval = ADDSI (pc, EXTSISI (FLD (f_imm16s)));
-    buf.h_pc_writes [(tick + 1) % ms1::pipe_sz].push (ms1::write<USI>(pc, opval));
+    buf.h_pc_writes [(tick + 1) % mt::pipe_sz].push (mt::write<USI>(pc, opval));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
@@ -847,12 +880,13 @@ if (EQSI (current_cpu->hardware.h_spr[FLD (f_sr1)], current_cpu->hardware.h_spr[
 // ********** brne: brne $frsr1,$frsr2,$imm16o
 
 void
-ms1_sem_brne (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_brne (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_brlt.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -860,7 +894,7 @@ ms1_sem_brne (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 if (NOTBI (EQSI (current_cpu->hardware.h_spr[FLD (f_sr1)], current_cpu->hardware.h_spr[FLD (f_sr2)]))) {
   {
     USI opval = ADDSI (pc, EXTSISI (FLD (f_imm16s)));
-    buf.h_pc_writes [(tick + 1) % ms1::pipe_sz].push (ms1::write<USI>(pc, opval));
+    buf.h_pc_writes [(tick + 1) % mt::pipe_sz].push (mt::write<USI>(pc, opval));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
@@ -874,18 +908,19 @@ if (NOTBI (EQSI (current_cpu->hardware.h_spr[FLD (f_sr1)], current_cpu->hardware
 // ********** jmp: jmp $imm16o
 
 void
-ms1_sem_jmp (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_jmp (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_brlt.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
   {
     USI opval = ADDSI (pc, EXTSISI (FLD (f_imm16s)));
-    buf.h_pc_writes [(tick + 1) % ms1::pipe_sz].push (ms1::write<USI>(pc, opval));
+    buf.h_pc_writes [(tick + 1) % mt::pipe_sz].push (mt::write<USI>(pc, opval));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
@@ -897,12 +932,13 @@ ms1_sem_jmp (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** jal: jal $frdrrr,$frsr1
 
 void
-ms1_sem_jal (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_jal (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -913,13 +949,13 @@ current_cpu->do_syscall (pc);
 {
   {
     SI opval = ADDSI (pc, 8);
-    buf.h_spr_writes [(tick + 1) % ms1::pipe_sz].push (ms1::write<SI>(pc, opval, FLD (f_drrr)));
+    buf.h_spr_writes [(tick + 1) % mt::pipe_sz].push (mt::write<SI>(pc, opval, FLD (f_drrr)));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "spr" << '[' << FLD (f_drrr) << ']' << ":=0x" << hex << opval << dec << "  ";
   }
   {
     USI opval = current_cpu->hardware.h_spr[FLD (f_sr1)];
-    buf.h_pc_writes [(tick + 1) % ms1::pipe_sz].push (ms1::write<USI>(pc, opval));
+    buf.h_pc_writes [(tick + 1) % mt::pipe_sz].push (mt::write<USI>(pc, opval));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
@@ -934,12 +970,13 @@ current_cpu->do_syscall (pc);
 // ********** dbnz: dbnz $frsr1,$imm16o
 
 void
-ms1_sem_dbnz (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_dbnz (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_brlt.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -947,7 +984,7 @@ ms1_sem_dbnz (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 if (NOTBI (EQSI (current_cpu->hardware.h_spr[FLD (f_sr1)], 0))) {
   {
     USI opval = ADDSI (pc, EXTSISI (FLD (f_imm16s)));
-    buf.h_pc_writes [(tick + 1) % ms1::pipe_sz].push (ms1::write<USI>(pc, opval));
+    buf.h_pc_writes [(tick + 1) % mt::pipe_sz].push (mt::write<USI>(pc, opval));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
@@ -961,12 +998,13 @@ if (NOTBI (EQSI (current_cpu->hardware.h_spr[FLD (f_sr1)], 0))) {
 // ********** ei: ei
 
 void
-ms1_sem_ei (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_ei (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -979,12 +1017,13 @@ current_cpu->enable_interrupts ();
 // ********** di: di
 
 void
-ms1_sem_di (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_di (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -997,12 +1036,13 @@ current_cpu->disable_interrupts ();
 // ********** si: si $frdrrr
 
 void
-ms1_sem_si (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_si (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_add.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1023,12 +1063,13 @@ current_cpu->do_syscall (pc);
 // ********** reti: reti $frsr1
 
 void
-ms1_sem_reti (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_reti (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_brlt.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1036,7 +1077,7 @@ ms1_sem_reti (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 current_cpu->enable_interrupts ();
   {
     USI opval = current_cpu->hardware.h_spr[FLD (f_sr1)];
-    buf.h_pc_writes [(tick + 1) % ms1::pipe_sz].push (ms1::write<USI>(pc, opval));
+    buf.h_pc_writes [(tick + 1) % mt::pipe_sz].push (mt::write<USI>(pc, opval));
     if (UNLIKELY(current_cpu->trace_result_p))
       current_cpu->trace_stream << "pc" << ":=0x" << hex << opval << dec << "  ";
   }
@@ -1049,12 +1090,13 @@ current_cpu->enable_interrupts ();
 // ********** ldw: ldw $frdr,$frsr1,#$imm16
 
 void
-ms1_sem_ldw (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_ldw (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_addi.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1078,12 +1120,13 @@ ms1_sem_ldw (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** stw: stw $frsr2,$frsr1,#$imm16
 
 void
-ms1_sem_stw (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_stw (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.sfmt_brlt.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1107,12 +1150,13 @@ ms1_sem_stw (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** break: break
 
 void
-ms1_sem_break (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_break (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1125,66 +1169,13 @@ current_cpu->do_break (pc);
 // ********** iflush: iflush
 
 void
-ms1_sem_iflush (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_iflush (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
-  PCADDR pc = abuf->addr;
-  PCADDR npc = pc + 4;
-
-((void) 0); /*nop*/
-
-  current_cpu->done_insn (npc, status);
-#undef FLD
-}
-
-// ********** ldctxt: ldctxt $frsr1,$frsr2,#$rc,#$rcnum,#$contnum
-
-void
-ms1_sem_ldctxt (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
-{
-#define FLD(f) abuf->fields.fmt_empty.f
-  sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
-  PCADDR pc = abuf->addr;
-  PCADDR npc = pc + 4;
-
-((void) 0); /*nop*/
-
-  current_cpu->done_insn (npc, status);
-#undef FLD
-}
-
-// ********** ldfb: ldfb $frsr1,$frsr2,#$imm16z
-
-void
-ms1_sem_ldfb (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
-{
-#define FLD(f) abuf->fields.fmt_empty.f
-  sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
-  PCADDR pc = abuf->addr;
-  PCADDR npc = pc + 4;
-
-((void) 0); /*nop*/
-
-  current_cpu->done_insn (npc, status);
-#undef FLD
-}
-
-// ********** stfb: stfb $frsr1,$frsr2,#$imm16z
-
-void
-ms1_sem_stfb (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
-{
-#define FLD(f) abuf->fields.fmt_empty.f
-  sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1197,12 +1188,13 @@ ms1_sem_stfb (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** fbcb: fbcb $frsr1,#$rbbc,#$ball,#$brc,#$rc1,#$cbrb,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_fbcb (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_fbcb (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1215,12 +1207,13 @@ ms1_sem_fbcb (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** mfbcb: mfbcb $frsr1,#$rbbc,$frsr2,#$rc1,#$cbrb,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_mfbcb (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_mfbcb (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1233,12 +1226,13 @@ ms1_sem_mfbcb (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** fbcci: fbcci $frsr1,#$rbbc,#$ball,#$brc,#$fbdisp,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_fbcci (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_fbcci (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1251,12 +1245,13 @@ ms1_sem_fbcci (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** fbrci: fbrci $frsr1,#$rbbc,#$ball,#$brc,#$fbdisp,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_fbrci (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_fbrci (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1269,12 +1264,13 @@ ms1_sem_fbrci (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** fbcri: fbcri $frsr1,#$rbbc,#$ball,#$brc,#$fbdisp,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_fbcri (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_fbcri (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1287,12 +1283,13 @@ ms1_sem_fbcri (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** fbrri: fbrri $frsr1,#$rbbc,#$ball,#$brc,#$fbdisp,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_fbrri (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_fbrri (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1305,12 +1302,13 @@ ms1_sem_fbrri (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** mfbcci: mfbcci $frsr1,#$rbbc,$frsr2,#$fbdisp,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_mfbcci (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_mfbcci (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1323,12 +1321,13 @@ ms1_sem_mfbcci (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** mfbrci: mfbrci $frsr1,#$rbbc,$frsr2,#$fbdisp,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_mfbrci (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_mfbrci (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1341,12 +1340,13 @@ ms1_sem_mfbrci (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** mfbcri: mfbcri $frsr1,#$rbbc,$frsr2,#$fbdisp,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_mfbcri (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_mfbcri (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1359,12 +1359,13 @@ ms1_sem_mfbcri (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** mfbrri: mfbrri $frsr1,#$rbbc,$frsr2,#$fbdisp,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_mfbrri (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_mfbrri (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1377,12 +1378,13 @@ ms1_sem_mfbrri (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** fbcbdr: fbcbdr $frsr1,#$rbbc,$frsr2,#$ball2,#$brc2,#$rc1,#$cbrb,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_fbcbdr (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_fbcbdr (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1395,12 +1397,13 @@ ms1_sem_fbcbdr (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** rcfbcb: rcfbcb #$rbbc,#$type,#$ball,#$brc,#$rownum,#$rc1,#$cbrb,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_rcfbcb (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_rcfbcb (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1413,12 +1416,13 @@ ms1_sem_rcfbcb (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** mrcfbcb: mrcfbcb $frsr2,#$rbbc,#$type,#$rownum,#$rc1,#$cbrb,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_mrcfbcb (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_mrcfbcb (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1431,12 +1435,13 @@ ms1_sem_mrcfbcb (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** cbcast: cbcast #$mask,#$rc2,#$ctxdisp
 
 void
-ms1_sem_cbcast (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_cbcast (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1449,12 +1454,13 @@ ms1_sem_cbcast (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** dupcbcast: dupcbcast #$mask,#$cell,#$rc2,#$ctxdisp
 
 void
-ms1_sem_dupcbcast (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_dupcbcast (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1467,12 +1473,13 @@ ms1_sem_dupcbcast (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** wfbi: wfbi #$bankaddr,#$rownum1,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_wfbi (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_wfbi (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1485,12 +1492,13 @@ ms1_sem_wfbi (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** wfb: wfb $frsr1,$frsr2,#$fbdisp,#$rownum2,#$ctxdisp
 
 void
-ms1_sem_wfb (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_wfb (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1503,12 +1511,13 @@ ms1_sem_wfb (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** rcrisc: rcrisc $frdrrr,#$rbbc,$frsr1,#$colnum,#$rc1,#$cbrb,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_rcrisc (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_rcrisc (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1521,12 +1530,13 @@ ms1_sem_rcrisc (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** fbcbinc: fbcbinc $frsr1,#$rbbc,#$incamt,#$rc1,#$cbrb,#$cell,#$dup,#$ctxdisp
 
 void
-ms1_sem_fbcbinc (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_fbcbinc (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1539,12 +1549,13 @@ ms1_sem_fbcbinc (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** rcxmode: rcxmode $frsr2,#$rda,#$wr,#$xmode,#$mask1,#$fbdisp,#$rownum2,#$rc2,#$ctxdisp
 
 void
-ms1_sem_rcxmode (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_rcxmode (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1557,12 +1568,13 @@ ms1_sem_rcxmode (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** interleaver: intlvr $frsr1,#$mode,$frsr2,#$id,#$size
 
 void
-ms1_sem_interleaver (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_interleaver (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1575,12 +1587,13 @@ ms1_sem_interleaver (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** wfbinc: wfbinc #$rda,#$wr,#$fbincr,#$ball,#$colnum,#$length,#$rownum1,#$rownum2,#$dup,#$ctxdisp
 
 void
-ms1_sem_wfbinc (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_wfbinc (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1593,12 +1606,13 @@ ms1_sem_wfbinc (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** mwfbinc: mwfbinc $frsr2,#$rda,#$wr,#$fbincr,#$length,#$rownum1,#$rownum2,#$dup,#$ctxdisp
 
 void
-ms1_sem_mwfbinc (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_mwfbinc (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1611,12 +1625,13 @@ ms1_sem_mwfbinc (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** wfbincr: wfbincr $frsr1,#$rda,#$wr,#$ball,#$colnum,#$length,#$rownum1,#$rownum2,#$dup,#$ctxdisp
 
 void
-ms1_sem_wfbincr (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_wfbincr (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1629,12 +1644,13 @@ ms1_sem_wfbincr (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** mwfbincr: mwfbincr $frsr1,$frsr2,#$rda,#$wr,#$length,#$rownum1,#$rownum2,#$dup,#$ctxdisp
 
 void
-ms1_sem_mwfbincr (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_mwfbincr (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1647,12 +1663,13 @@ ms1_sem_mwfbincr (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** fbcbincs: fbcbincs #$perm,#$a23,#$cr,#$cbs,#$incr,#$ccb,#$cdb,#$rownum2,#$dup,#$ctxdisp
 
 void
-ms1_sem_fbcbincs (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_fbcbincs (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1665,12 +1682,13 @@ ms1_sem_fbcbincs (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** mfbcbincs: mfbcbincs $frsr1,#$perm,#$cbs,#$incr,#$ccb,#$cdb,#$rownum2,#$dup,#$ctxdisp
 
 void
-ms1_sem_mfbcbincs (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_mfbcbincs (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1683,12 +1701,13 @@ ms1_sem_mfbcbincs (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** fbcbincrs: fbcbincrs $frsr1,#$perm,#$ball,#$colnum,#$cbx,#$ccb,#$cdb,#$rownum2,#$dup,#$ctxdisp
 
 void
-ms1_sem_fbcbincrs (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_fbcbincrs (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 
@@ -1701,12 +1720,13 @@ ms1_sem_fbcbincrs (ms1_cpu* current_cpu, ms1_scache* sem, const int tick,
 // ********** mfbcbincrs: mfbcbincrs $frsr1,$frsr2,#$perm,#$cbx,#$ccb,#$cdb,#$rownum2,#$dup,#$ctxdisp
 
 void
-ms1_sem_mfbcbincrs (ms1_cpu* current_cpu, ms1_scache* sem, const int tick, 
-	ms1::write_stacks &buf)
+mt_sem_mfbcbincrs (mt_cpu* current_cpu, mt_scache* sem, const int tick, 
+	mt::write_stacks &buf)
 {
 #define FLD(f) abuf->fields.fmt_empty.f
   sem_status status = SEM_STATUS_NORMAL;
-  ms1_scache* abuf = sem;
+  mt_scache* abuf = sem;
+  unsigned long long written = 0;
   PCADDR pc = abuf->addr;
   PCADDR npc = pc + 4;
 

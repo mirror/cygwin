@@ -1,8 +1,8 @@
-            hw-cpu-ms1 (libcgencpu.la :: cgen_component_library)
+            hw-cpu-mt (libcgencpu.la :: cgen_component_library)
 
 Synopsis:
 
-   This component models the Morpho Ms1 processor.
+   This component models the Morpho Mt processor.
 
      ----------------------------------------------------------------------
 
@@ -10,7 +10,7 @@ Functionality:
 
   Modelling:
 
-   This component models a simplified Ms1 processor.
+   This component models a simplified Mt processor.
 
    It does not model floating point instructions.
 
@@ -236,7 +236,7 @@ Environment:
 
 Component Reference:
 
-  Component: hw-cpu-ms1
+  Component: hw-cpu-mt
 
    +-----------------------------------------------------------+
    |                           pins                            |

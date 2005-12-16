@@ -1,3 +1,11 @@
+2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Second part of ms1 to mt renaming.
+	* Makefile.in: Rebuilt.
+	* mt-gdb.conf: Renamed & rebuilt.
+	* mt-gloss.conf: Renamed & rebuilt.
+	* pregen-configs.in: Adjust.
+
 2005-06-24  Dave Brolley  <brolley@redhat.com>
 
 	* pregen-configs.in: Add support for Ms1.

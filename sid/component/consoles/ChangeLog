@@ -1,3 +1,8 @@
+2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Second part of ms1 to mt renaming.
+	* sid/component/consoles/Makefile.in: Rebuilt.
+
 2005-08-19  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:
@@ -10,8 +15,8 @@
 	2005-06-06  Dave Brolley  <brolley@redhat.com>
 
 	* components.h: Add using clause for sidutil::configurable_component.
-	(socketio): fixed_pin_map_component and configurable_component inherited
-	virtually. no_relation_component no longer inherited.
+	(socketio): fixed_pin_map_component and configurable_component
+	inherited virtually. no_relation_component no longer inherited.
 	(configure): New virtual override in socketio.
 	* socketio.cxx (configure): Likewise.
 	* sid-io-socket.xml: Add description of new interfaces.

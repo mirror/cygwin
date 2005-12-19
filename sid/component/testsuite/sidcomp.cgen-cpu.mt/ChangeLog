@@ -1,3 +1,10 @@
+2005-12-19  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* mt-allinsn.exp: Renamed from ms1-allinsn.exp. Updated.
+	* mt-state-snapshot.exp: Renamed from
+	ms1-state-snapshot.exp. Updated.
+	* mulinsns.s, shiftinsns.s, subinsns.s: Updated.
+
 2001-09-17  Ben Elliston  <bje@redhat.com>
 
 	* ms1-state-snapshot.exp: Run if $sidtarget(ms1) is set.

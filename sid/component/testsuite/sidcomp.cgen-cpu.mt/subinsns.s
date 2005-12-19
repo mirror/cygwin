@@ -1,4 +1,4 @@
-# mach(): ms1
+# mach(): mt
 
 	.include "testutils.inc"
 	start

@@ -1,6 +1,6 @@
 # mRISC-I simulator testsuite.
 
-if {! $sidtarget(ms1)} { untested "hw-cpu-ms1 not available"; return }
+if {! $sidtarget(mt)} { untested "hw-cpu-mt not available"; return }
 
 # Load a baseboard description for SID simulators.
 load_base_board_description "basic-sid"
@@ -9,10 +9,10 @@ load_base_board_description "basic-sid"
 load_lib "cpudefs.exp"
 
 # all machines
-set all_machs "ms1"
+set all_machs "mt"
 
 # Add --nosched to the flags to supress scheduling restrictions.
 set gas_flags "--gdwarf2 --nosched"
 
 # Run the tests
-run-sid-tests-raw ms1-elf ms1 $srcdir/sidcomp.cgen-cpu.ms1 "*.s" $gas_flags "" "" ms1-gloss.conf x
+run-sid-tests-raw mt-elf mt $srcdir/sidcomp.cgen-cpu.mt "*.s" $gas_flags "" "" mt-gloss.conf x

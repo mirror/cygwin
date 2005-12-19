@@ -1,10 +1,10 @@
 # Testsuite for the CPU state snapshot and restoring.
 # Copyright (C) 2001 Red Hat
 
-if {! $sidtarget(ms1)} { untested "hw-cpu-ms1 not available"; return }
+if {! $sidtarget(mt)} { untested "hw-cpu-mt not available"; return }
 
-set cpu "ms1"
-set filename "$srcdir/sidcomp.cgen-cpu.ms1/test-img.x"
+set cpu "mt"
+set filename "$srcdir/sidcomp.cgen-cpu.mt/test-img.x"
 set conf_file "statesnap.conf"
 set start_insn 0x22d4
 

@@ -212,7 +212,7 @@ namespace @arch@ {
 	 (write-stacks 
 	  (map (lambda (n) (sa n "_writes"))
 	       (append (map (lambda (r) (gen-c-symbol (obj:name r))) regs)
-		       (map (lambda (m) (sa m "_memory")) useful-mode-names))))
+		       (map (lambda (m) (sa (object->string m) "_memory")) useful-mode-names))))
 	 (stream-reg (lambda (r) 
 		       (let ((rname (sa "hardware." (gen-c-symbol (obj:name r)))))
 			 (if (hw-scalar? r)
@@ -406,10 +406,10 @@ typedef struct {
 ;	 (pipe-sz (+ 1 (max-delay (cpu-max-delay (current-cpu)))))
 ;	 (sz (* pipe-sz (-worst-case-number-of-writes-to nm))))
 	 
-	 (mode-pad (spaces (- 4 (string-length mode))))
+	 (mode-pad (spaces (- 4 (string-length (object->string mode)))))
 	 (stack-name (string-append nm "_writes")))
     (string-append
-     "  write_stack< write<" mode "> >" mode-pad "\t" stack-name "\t[pipe_sz];\n")))
+     "  write_stack< write<" (object->string mode) "> >" mode-pad "\t" stack-name "\t[pipe_sz];\n")))
 
 
 (define (-hw-gen-write-struct-decl)

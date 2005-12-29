@@ -47,7 +47,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.79 $";
+static const char version[] = "$Revision: 1.80 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -85,6 +85,7 @@ static common_apps[] = {
   {"cat", 0},
   {"cp", 0},
   {"cpp", 1},
+  {"crontab", 0},
   {"find", 0},
   {"gcc", 0},
   {"gdb", 0},
@@ -101,6 +102,8 @@ static common_apps[] = {
   {"sh", 0},
   {"tar", 0},
   {"test", 0},
+  {"vi", 0},
+  {"vim", 0},
   {0, 0}
 };
 

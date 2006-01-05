@@ -47,7 +47,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.80 $";
+static const char version[] = "$Revision: 1.81 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1275,10 +1275,17 @@ dump_sysinfo ()
       /* Report all errors, except if the Volume is ERROR_NOT_READY.
 	 ERROR_NOT_READY is returned when removeable media drives are empty
 	 (CD, floppy, etc.) */
-      if (!GetVolumeInformation
-	  (drive, name, sizeof (name), &serno, &maxnamelen, &flags, fsname,
-	   sizeof (fsname)) && GetLastError () != ERROR_NOT_READY)
-	display_error ("dump_sysinfo: GetVolumeInformation()");
+      if (!GetVolumeInformation (drive, name, sizeof (name), &serno,
+				 &maxnamelen, &flags, fsname,
+				 sizeof (fsname))
+	  && GetLastError () != ERROR_NOT_READY)
+	{
+#	  define FMT "dump_sysinfo: GetVolumeInformation() for drive %c:"
+	  char buf[sizeof (FMT)];
+	  sprintf (buf, FMT, 'A' + i);
+	  display_error (buf);
+#	  undef FMT
+	}
 
       int dtype = GetDriveType (drive);
       char drive_type[4] = "unk";

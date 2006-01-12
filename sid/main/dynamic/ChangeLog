@@ -23,12 +23,6 @@
 
 	2005-07-13  Dave Brolley  <brolley@redhat.com>
 
-	* mepCfg.cxx (set_dynamic_config): New method of MepMemCfg.
-	(MepCacheCfg::set_dynamic_config): Don't use the new-config pin
-	or the dynamic-configurator attribute. Instead, relate the cache
-	to the dynamic configurator using its client relation.
-	(MepBoardCfg::write_config): Likewise for the insn_buffer, dmac,
-	hw_engines and peripherals. Call set_dynamic_config for shared_main_mem.
 	* mainDynamic.cxx (BoardConfig): New struct type.
 	(main): Keep a vector of the boards in board_configs. Call
 	set_start_config for each board after all the --wrap options have
@@ -72,8 +66,6 @@
 
 	* mainDynamic.cxx (need_sess): Now takes 'verbose' argument. Use it
 	to initialize sess->verbose. Update all callers.
-	(main): Add " --model-busses" to board_start_config instead of
-	" --model_busses" (typo).
 	* commonCfg.h (need_core_probe): New member of SessionCfg.
 	(BoardCfg::dynamic_configurator): Now public.
 	* commonCfg.cxx (SessionCfg): Initialize need_core_probe.

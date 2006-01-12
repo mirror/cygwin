@@ -117,8 +117,6 @@
 
 2005-05-10  Dave Brolley  <brolley@redhat.com>
 
-	* mep-cache.cxx (mep_cache): Inherit from blocking_cache_component.
-	* mep-cache.h (mep_cache): Inherit from blocking_cache_component.
 	* cache.h (sidblockingutil.h): #include it.
 	(namespace sid): Add "using" clause. Remove sid:: qualifier from
 	declarations.

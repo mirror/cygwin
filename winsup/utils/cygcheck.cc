@@ -47,7 +47,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.83 $";
+static const char version[] = "$Revision: 1.84 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1137,7 +1137,7 @@ dump_sysinfo ()
 	  osversion.dwPlatformId == VER_PLATFORM_WIN32_NT ?
 	  osversion.szCSDVersion : "");
 
-  HINSTANCE k32 = LoadLibrary ("kernel32.dll");
+  HMODULE k32 = LoadLibrary ("kernel32.dll");
 
   BOOL (WINAPI *wow64_func) (HANDLE, PBOOL) = (BOOL (WINAPI *) (HANDLE, PBOOL))
     GetProcAddress (k32, "IsWow64Process");

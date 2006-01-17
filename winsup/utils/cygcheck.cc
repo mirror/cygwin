@@ -1,6 +1,7 @@
 /* cygcheck.cc
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -51,7 +52,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.85 $";
+static const char version[] = "$Revision: 1.86 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",

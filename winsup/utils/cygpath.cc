@@ -22,7 +22,7 @@ details. */
 #include <ctype.h>
 #include <errno.h>
 
-static const char version[] = "$Revision: 1.40 $";
+static const char version[] = "$Revision: 1.41 $";
 
 static char *prog_name;
 static char *file_arg;
@@ -379,7 +379,6 @@ dowin (char option)
 	  GetWindowsDirectory (buf, MAX_PATH);
 	  strcat (buf, "\\Profiles");
 	}
-fprintf (stderr, "************** buf %s\n", buf);
       break;
 
     case 'S':

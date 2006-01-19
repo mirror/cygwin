@@ -52,7 +52,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.87 $";
+static const char version[] = "$Revision: 1.88 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -100,6 +100,7 @@ static common_apps[] = {
   {"ls", 0},
   {"make", 0},
   {"mv", 0},
+  {"patch", 0},
   {"perl", 0},
   {"rm", 0},
   {"sed", 0},

@@ -1,26 +1,18 @@
-2006-01-18  Christopher Faylor  <cgf@timesys.com>
+2006-01-20  Christopher Faylor  <cgf@timesys.com>
 
-	* heap.cc (heap_init): Remove Sleep.
+	* include/sys/dirent.h: Add comments for people who are REALLY confused
+	about whether they should be using something called __invalid_d_ino or
+	not.
 
-2006-01-18  Corinna Vinschen  <corinna@vinschen.de>
+2006-01-19  Christopher Faylor  <cgf@timesys.com>
 
-	* net.cc (rresvport): Remove extern declaration.
-
-2006-01-18  Corinna Vinschen  <corinna@vinschen.de>
-
-	* autoload.cc (rresvport): Remove.
-	* net.cc (last_used_rrecvport): New global shared variable.
-	(cygwin_rresvport): Implement rresvport without using rresvport from
-	wsock32.
+	* include/sys/dirent.h (__invalid_ino32): Rename from __ino32.  Don't
+	define unused d_type macros.
 
 2006-01-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/socket.h (struct sockaddr_storage): Fix typo in
 	ss_family member name.
-
-2006-01-16  Christopher Faylor  <cgf@timesys.com>
-
-	* include/cygwin/version.h: Bump DLL minor version number to 20.
 
 2006-01-13  Corinna Vinschen  <corinna@vinschen.de>
 

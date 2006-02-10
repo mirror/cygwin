@@ -1,3 +1,7 @@
+2006-02-10  Nick Clifton  <nickc@redhat.com>
+
+	* cpu/iq2000.opc (parse_hi16): Truncate shifted value to 16 bits.
+
 2005-12-28  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* sid-cpu.scm (-gen-hw-stream-and-destream-fns): Stringize mode

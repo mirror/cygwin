@@ -5,7 +5,7 @@
 <BOOK><!-- Copyright 2001 by Red Hat, Inc. --><!-- Process this file through "make normalize" before CVS operations (diff/commit). -->
 <BOOKINFO>
 <TITLE>SID Simulator Component Developer's Guide</TITLE>
-<DATE>$Date: 2001/11/27 22:59:13 $</DATE>
+<DATE>$Date: 2006/03/01 21:07:02 $</DATE>
 <PUBLISHER>
 <PUBLISHERNAME>Red Hat, Inc.</PUBLISHERNAME>
 <ADDRESS><EMAIL>sid@sources.redhat.com</EMAIL></ADDRESS>
@@ -14,10 +14,10 @@
 <YEAR>2001</YEAR>
 <HOLDER>Red Hat, Inc.</HOLDER>
 </COPYRIGHT>
-<DATE>$Date: 2001/11/27 22:59:13 $</DATE>
+<DATE>$Date: 2006/03/01 21:07:02 $</DATE>
 <LEGALNOTICE>
 <PARA><![ %HTMLONLY; [HTML edition]]> <![ %PRINTONLY; [Print edition]]>
-<LITERAL>$Date: 2001/11/27 22:59:13 $</LITERAL></PARA>
+<LITERAL>$Date: 2006/03/01 21:07:02 $</LITERAL></PARA>
 <PARA>This material may be distributed only
     subject to the terms and conditions set forth in the Open Publication
     License, V1.0 or later (the latest version is presently available at <ULINK URL="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</ULINK>).
@@ -2545,9 +2545,9 @@ TimerDelete(sid::component* c) NT
 // This symbol is used by the library loader to validate the library
 // and instantiate components of the types supported by this library.
 
-extern const sid::component_library example_component_library;
+DLLEXPORT extern const sid::component_library example_component_library;
 
-const sid::component_library example_component_library DLLEXPORT =
+const sid::component_library example_component_library =
 {
   sid::COMPONENT_LIBRARY_MAGIC,
   &amp; timer_example::TimerListTypes,

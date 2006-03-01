@@ -1633,9 +1633,9 @@ scheduler_component<Scheduler>::client_num_update ()
 
 
 // static object in root namespace
-extern const sid::component_library sched_component_library;
+DLLEXPORT extern const sid::component_library sched_component_library;
 
-const sid::component_library sched_component_library DLLEXPORT = 
+const sid::component_library sched_component_library =
 {
   sid::COMPONENT_LIBRARY_MAGIC,
   & scheduler_component::list_types, 

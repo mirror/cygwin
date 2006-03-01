@@ -47,9 +47,9 @@ compInterruptDelete(component* c)
 #endif
 }
 
-extern const component_library interrupt_component_library;
+DLLEXPORT extern const component_library interrupt_component_library;
 
-const component_library interrupt_component_library DLLEXPORT =
+const component_library interrupt_component_library =
 {
   COMPONENT_LIBRARY_MAGIC,
   &compInterruptListTypes,

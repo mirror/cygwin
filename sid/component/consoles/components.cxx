@@ -53,8 +53,8 @@ compConsoleDelete(component* c)
 } // end of namespace console_stuff
 
 
-extern const sid::component_library console_component_library;
-const sid::component_library console_component_library DLLEXPORT =
+DLLEXPORT extern const sid::component_library console_component_library;
+const sid::component_library console_component_library =
 {
   sid::COMPONENT_LIBRARY_MAGIC,
   & console_stuff::compConsoleListTypes,

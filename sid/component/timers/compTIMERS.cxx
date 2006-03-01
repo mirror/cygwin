@@ -21,8 +21,6 @@ using namespace sid;
 #endif
 
  
-extern const component_library timer_component_library;
-
 static vector<string>
 compTimerListTypes()
 {
@@ -58,7 +56,9 @@ compTimerDelete(component* c)
 }
 
 
-const component_library timer_component_library DLLEXPORT =
+DLLEXPORT extern const component_library timer_component_library;
+
+const component_library timer_component_library =
 {
   COMPONENT_LIBRARY_MAGIC,
   &compTimerListTypes,

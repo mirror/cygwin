@@ -664,9 +664,9 @@ TimerDelete(sid::component* c)
 // This symbol is used by the library loader to validate the library
 // and instantiate components of the types supported by this library.
 
-extern const sid::component_library example_component_library;
+DLLEXPORT extern const sid::component_library example_component_library;
 
-const sid::component_library example_component_library DLLEXPORT =
+const sid::component_library example_component_library =
 {
   sid::COMPONENT_LIBRARY_MAGIC,
   &timer_example::TimerListTypes,

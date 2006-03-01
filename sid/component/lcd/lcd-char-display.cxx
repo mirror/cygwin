@@ -211,9 +211,9 @@ DevicesDelete(component* c)
 }
 
 // static object
-extern const component_library lcd_char_display_component_library;
+DLLEXPORT extern const component_library lcd_char_display_component_library;
 
-const component_library lcd_char_display_component_library DLLEXPORT = 
+const component_library lcd_char_display_component_library =
 {
   COMPONENT_LIBRARY_MAGIC,
   & DevicesListTypes, 

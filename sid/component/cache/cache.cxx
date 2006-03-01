@@ -1046,8 +1046,6 @@ cache_replacement_random::expell (cache_set& cset)
 }
 
 
-extern const sid::component_library cache_component_library;
-
 static vector<string>
 CacheListTypes ()
 {
@@ -1210,7 +1208,9 @@ CacheDelete (component* c)
   delete dynamic_cast<cache_component*>(c);
 }
 
-const sid::component_library cache_component_library DLLEXPORT =
+DLLEXPORT extern const sid::component_library cache_component_library;
+
+const sid::component_library cache_component_library =
 {
   sid::COMPONENT_LIBRARY_MAGIC,
   &CacheListTypes,

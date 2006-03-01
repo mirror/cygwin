@@ -795,9 +795,9 @@ pin_pacer_component::pin_pacer_component():
 
 
 // static object in root namespace
-extern const sid::component_library glue_component_library;
+DLLEXPORT extern const sid::component_library glue_component_library;
 
-const sid::component_library glue_component_library DLLEXPORT = 
+const sid::component_library glue_component_library =
 {
   sid::COMPONENT_LIBRARY_MAGIC,
   & glue_components::list_types, 

@@ -711,8 +711,6 @@ armRemapPause::bus_interface::word_read(host_int_4 addr,
 #endif // SIDTARGET_ARM
 
 
-extern const component_library mmu_component_library;
-
 static vector<string>
 compMmuListTypes()
 {
@@ -742,7 +740,9 @@ compMmuDelete(component* c)
 }
 
 
-const component_library mmu_component_library DLLEXPORT =
+DLLEXPORT extern const component_library mmu_component_library;
+
+const component_library mmu_component_library =
 {
   COMPONENT_LIBRARY_MAGIC,
   &compMmuListTypes,

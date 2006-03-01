@@ -2315,9 +2315,9 @@ do_delete (component* c)
 
 
 // static object
-extern const sid::component_library tcl_bridge_library;
+DLLEXPORT extern const sid::component_library tcl_bridge_library;
 
-const sid::component_library tcl_bridge_library DLLEXPORT = 
+const sid::component_library tcl_bridge_library =
 {
   sid::COMPONENT_LIBRARY_MAGIC,
   & tcl_api_component::list_types, 

@@ -1,3 +1,8 @@
+2006-03-14  Hans-Peter Nilsson  <hp@axis.com>
+
+	* dev.scm (cload) <SID-SIMULATOR>: New case, duplicated from
+	SIMULATOR.
+
 2006-03-03 Shrirang Khisti <shrirangk@kpitcummins.com)
 
 	* cpu/xc16x.opc (parse_hash): Return NULL if the input was parsed

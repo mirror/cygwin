@@ -76,6 +76,11 @@
 			     sim-init!
 			     sim-finish!
 			     sim-analyze!))
+      ((SID-SIMULATOR) (cpu-load (string-append "./cpu/" arch ".cpu")
+			     keep-mach keep-isa options
+			     sim-init!
+			     sim-finish!
+			     sim-analyze!))
       ((SIM-TEST) (cpu-load (string-append "./cpu/" arch ".cpu")
 			    keep-mach keep-isa options
 			    sim-test-init!

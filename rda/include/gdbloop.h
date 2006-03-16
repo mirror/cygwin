@@ -34,13 +34,17 @@ extern "C" {
 
 /* Really simple minded event-loop.  Assumes that the target is using
    both gdbsocket* and gdbsched* to implement things. If TIMEOUT is
-   negative, block infinitely.  If TIMEOUT is zero, don't block.  */
+   negative, block infinitely.  If TIMEOUT is zero, don't block.
+   Otherwise, a positive timeout represents the time in milliseconds
+   to wait.  */
 
 void gdbloop (long current_time, int timeout);
 
-/* Even more simple minded event-loop.  Assumes that everything is in
-   units of one second.  Calls gdbloop() above, using time() for
-   CURRENT_TIME.  */
+/* An even more simple minded event-loop.  Calls gdbloop()
+   above, using time() for CURRENT_TIME.  TIMEOUT is as above
+   in which a negative TIMEOUT will block indefinitely, a zero
+   timeout won't block at all, and a positive TIMEOUT will
+   block for (at most) the specified number of milliseconds.  */
 
 void gdbloop_poll (int timeout);
 

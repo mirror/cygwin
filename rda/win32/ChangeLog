@@ -1,3 +1,8 @@
+2006-03-16  Kevin Buettner  <kevinb@redhat.com>
+
+	* server.c (main): Revise comment to indicate that polling
+	granularity is milliseconds.
+
 2004-12-09  Jim Blandy  <jimb@redhat.com>
 
 	* configure.in: Remove nonsense test.

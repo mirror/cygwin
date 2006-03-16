@@ -1,3 +1,8 @@
+2006-03-16  Kevin Buettner  <kevinb@redhat.com>
+
+	* server.c (main): Change polling interval for gdbloop_poll()
+	from one second to ten milliseconds.
+
 2005-12-07  Kevin Buettner  <kevinb@redhat.com>
 
 	* ptrace-target.c (ptrace_compute_signal, ptrace_process_signal):

@@ -86,7 +86,7 @@ fds_isset (int fd, void *context, enum gdbsocket_fd_event event)
 }
 
 static void
-poll_gdbsocket (long timeout)
+poll_gdbsocket (long timeout /* in milliseconds */)
 {
   int s;
   struct fds fds;
@@ -103,8 +103,8 @@ poll_gdbsocket (long timeout)
   if (timeout >= 0)
     {
       struct timeval timeval;
-      timeval.tv_sec = timeout;
-      timeval.tv_usec = 0;
+      timeval.tv_sec = timeout / 1000;
+      timeval.tv_usec = (timeout % 1000) * 1000;
       s = select (fds.nr, &fds.read, &fds.write, NULL, &timeval);
     }
   else

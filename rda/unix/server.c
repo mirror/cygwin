@@ -413,7 +413,7 @@ main (int argc, char **argv)
   /* Poll for socket traffic. */
   while (! server_quit_p)
     {
-      gdbloop_poll (1 /* second */);
+      gdbloop_poll (10 /* milliseconds */);
       if (! server_quit_p)
 	{
 	  if (gdbserver.check_child_state (process))

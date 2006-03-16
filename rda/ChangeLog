@@ -1,3 +1,11 @@
+2006-03-16  Kevin Buettner  <kevinb@redhat.com>
+
+	* include/gdbloop.h (gdbloop, gdbloop_poll): Revise comments
+	to indicate that timeout granulatiry is now in milliseconds
+	rather than seconds.
+	* lib/gdbloop.c (poll_gdbsocket): Change ``timeout'' granulatiry
+	from seconds to milliseconds.
+
 2005-03-03  Kevin Buettner  <kevinb@redhat.com>
 
 	* lib/crc32.h, lib/crc32.c: New files.

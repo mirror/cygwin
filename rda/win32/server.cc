@@ -120,7 +120,7 @@ main (int argc, char **argv)
   /* Poll for socket traffic. */
   while (! process->quit_server ())
     {
-      gdbloop_poll (0 /* second */);
+      gdbloop_poll (0 /* milliseconds */);
       if (process->check_state ())
 	{
 	  switch (process->status ())

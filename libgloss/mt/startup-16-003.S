@@ -1,5 +1,5 @@
 /*
- * $Header: /cvs/src/src/libgloss/mt/startup-16-003.S,v 1.1 2005/12/12 11:16:41 nathan Exp $
+ * $Header: /cvs/src/src/libgloss/mt/startup-16-003.S,v 1.2 2006/03/22 12:47:59 nathan Exp $
  *
  * interrupt_vectors.s -- the interrupt handler jump table. 
  *
@@ -185,7 +185,7 @@ _IVEC_DEFAULT:
 	or	r0, r0, r0
 
 
-	.section .internal_io, "a", @progbits
+	.section .internal_io, "a", @nobits
 	.fill 256		; Fill the first page.
 
 	; This is the memory-mapped I/O region.

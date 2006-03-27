@@ -775,7 +775,7 @@ namespace sidutil
     virtual void record_data_memory_read_latency (sid::bus::status s) { total_latency += s.latency; }
     virtual void record_data_memory_write_latency (sid::bus::status s) { total_latency += s.latency; }
 
-    virtual std::string basic_cpu::read_watchpoint_memory (std::pair<sid::host_int_4,sid::host_int_4> addr_and_length)
+    virtual std::string read_watchpoint_memory (std::pair<sid::host_int_4,sid::host_int_4> addr_and_length)
       {
 	// Extract the address and length from the argument.
 	sid::host_int_4 address = addr_and_length.first;
@@ -816,7 +816,7 @@ namespace sidutil
 	return "";
       }
 
-    virtual sid::component::status basic_cpu::write_watchpoint_memory (std::pair<sid::host_int_4,sid::host_int_4> addr_and_length, const std::string &value)
+    virtual sid::component::status write_watchpoint_memory (std::pair<sid::host_int_4,sid::host_int_4> addr_and_length, const std::string &value)
       {
 	return sid::component::bad_value;
       }

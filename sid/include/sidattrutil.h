@@ -1035,7 +1035,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 
     // Dynamic reconfiguration support
   private:
-    std::string configurable_component::nothing() { return ""; }
+    std::string nothing() { return ""; }
   protected:
     virtual component::status
     dynamic_config(const std::string& spec)

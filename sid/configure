@@ -3619,7 +3619,7 @@ do
       mips*)  sidtarget_mips=1 ;;
       m32r*)  sidtarget_m32r=1 ;;
       m68k*)  sidtarget_m68k=1 ;;
-      mt*)  sidtarget_mt=1 ;;
+      mt*)    sidtarget_mt=1 ;;
       powerpc*) sidtarget_ppc=1 ;;
       ppc*)   sidtarget_ppc=1 ;;
       xstormy16*) sidtarget_xstormy16=1 ;;
@@ -3850,6 +3850,9 @@ fi
 
 
 
+# In case this directory exists, we prefer it to non-pic.
+# In case it doesn't exist, create at least a blank one here, so libtool doesn't barf looking for it
+mkdir -p ../libiberty/pic
 
 
 

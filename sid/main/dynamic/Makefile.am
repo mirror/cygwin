@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
 
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include -I$(srcdir)/../../../include
-LIBIBERTY = ../../../libiberty/pic/libiberty.a
+LIBIBERTY = -L../../../libiberty/pic -L../../../libiberty -liberty
 
 bin_PROGRAMS = sid
 TARGETCFGS = ""
@@ -82,5 +82,5 @@ endif
 
 sid_SOURCES = mainDynamic.cxx baseCfg.cxx commonCfg.cxx $(TARGETCFGS)
 sid_LDFLAGS = -export-dynamic -static -export-symbols-regex '[a-zA-Z0-9]*_library$$' $(NEARBY_LIBS)
-sid_DEPENDENCIES = $(NEARBY_DEPS_LIBS) ../../version.h $(LIBIBERTY)
+sid_DEPENDENCIES = $(NEARBY_DEPS_LIBS) ../../version.h
 sid_LDADD = $(LIBIBERTY)

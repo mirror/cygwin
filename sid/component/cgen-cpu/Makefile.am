@@ -18,7 +18,7 @@ AM_CXXFLAGS=$(TOP_CXXFLAGS)
 AM_MAKEFLAGS= "TOP_CXXFLAGS=$(TOP_CXXFLAGS)"
 MAKEOVERRIDES=
 
-LIBIBERTY = -L../../../libiberty/pic -liberty
+LIBIBERTY = -L../../../libiberty/pic -L../../../libiberty -liberty
 
 libcgencpu_la_SOURCES = compCGEN.cxx cgen-fpu.cxx fp.cxx tracedis.cxx
 libcgencpu_la_LDFLAGS = -module -no-undefined

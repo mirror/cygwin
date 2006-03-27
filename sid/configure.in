@@ -40,6 +40,9 @@ fi
 AC_SUBST(enable_shared)
 AC_SUBST(target)
 
+# In case this directory exists, we prefer it to non-pic.
+# In case it doesn't exist, create at least a blank one here, so libtool doesn't barf looking for it
+mkdir -p ../libiberty/pic
 
 AC_CONFIG_SUBDIRS(include component main bsp samples demos)
 AC_OUTPUT(Makefile doc/Makefile config/info.tcl)

@@ -387,9 +387,9 @@ class bus_prober: public virtual component,
   string label;
 
 public:
-  bus_prober::~bus_prober () throw () {}
+  ~bus_prober () throw () {}
 
-  bus_prober::bus_prober ():
+  bus_prober ():
     upstream (this),
     downstream (0)
     {

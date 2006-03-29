@@ -1443,7 +1443,11 @@ arm7f_cpu::compute_operand2_immshift (SI rm, int type, int shift)
     case SHIFT_TYPE_LSL : return rm << shift;
     case SHIFT_TYPE_LSR : return (USI) rm >> shift;
     case SHIFT_TYPE_ASR : return rm >> shift;
-    case SHIFT_TYPE_ROR : return RORSI (rm, shift);
+    case SHIFT_TYPE_ROR : 
+      if (shift == 0) // it is RRX
+        return ((USI)rm >> 1) | ((USI)this->hardware.h_cbit << 31);
+      else
+        return RORSI (rm, shift);
     }
   abort();
 }

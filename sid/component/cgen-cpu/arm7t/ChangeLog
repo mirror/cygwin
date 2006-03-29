@@ -1,3 +1,7 @@
+2006-03-29  Harry Hsin-Hua Pan  <harry@andestech.com>
+
+	* arm7f.cxx (compute_operand2_immshift): Implement RRX.
+	
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.

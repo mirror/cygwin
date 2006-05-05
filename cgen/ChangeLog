@@ -1,3 +1,8 @@
+2006-05-05  Steve Ellcey  <sje@cup.hp.com>
+
+	* configure.in: Remove AC_ARG_PROGRAM.
+	* configure: Regenerate with autoconf 2.59.
+
 2006-03-14  Hans-Peter Nilsson  <hp@axis.com>
 
 	* dev.scm (cload) <SID-SIMULATOR>: New case, duplicated from

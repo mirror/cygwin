@@ -13,6 +13,5 @@ arch=${target_cpu}
 AC_SUBST(arch)
 
 AM_MAINTAINER_MODE
-AC_ARG_PROGRAM
 
 AC_OUTPUT([Makefile doc/Makefile])

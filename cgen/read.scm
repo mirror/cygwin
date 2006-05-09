@@ -1,5 +1,5 @@
 ; Top level file for reading and recording .cpu file contents.
-; Copyright (C) 2000, 2001 Red Hat, Inc.
+; Copyright (C) 2000, 2001, 2006 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -781,8 +781,8 @@ Define a preprocessor-style macro.
 ; .cpu file include mechanism
 
 (define (include file)
-  (logit 1 "Including file " file " ...\n")
-  (reader-read-file! (string-append srcdir "/cpu/" file))
+  (logit 1 "Including file " (string-append arch-path file) " ...\n")
+  (reader-read-file! (string-append arch-path file))
   (logit 2 "Resuming previous file ...\n")
 )
 
@@ -994,6 +994,8 @@ Define a preprocessor-style macro.
     )
 )
 
+(define arch-path (string-append srcdir "/cpu/"))
+
 ; Accessors for application option specs
 (define (opt-get-first-pass opt)
   (or (list-ref opt 3) (lambda args #f)))
@@ -1072,6 +1074,7 @@ Define a preprocessor-style macro.
 	      (else
 	       (cond ((str=? "-a" (car opt))
 		      (set! arch-file arg)
+		      (set! arch-path (dirname arg))
 		      )
 		     ((str=? "-b" (car opt))
 		      (set! debugging #t)

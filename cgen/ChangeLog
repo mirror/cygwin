@@ -7,6 +7,9 @@
 	* sim.scm (-gen-arch-model-decls): Likewise.
 	* sid-cpu.scm (-gen-scache-semantic-fn): Generate code to set
 	abuf->written if profiling.
+	(-gen-hw-stream-and-destream-fns): Use symbol->string instead of
+	object->string om the mode.
+	(-hw-gen-write-stack-decl): Likewise.
 	* read.scm (include): Use arch-path as file location.
 	(arch-path): Define it with a default setting.
 	(-cgen): Update arch-path when "-a" option is specified.

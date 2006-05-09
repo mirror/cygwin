@@ -1,3 +1,9 @@
+2006-05-09  Dave Brolley  <brolley@redhat.com>
+
+	* read.scm (include): Use arch-path as file location.
+	(arch-path): Define it with a default setting.
+	(-cgen): Update arch-path when "-a" option is specified.
+
 2006-05-05  Steve Ellcey  <sje@cup.hp.com>
 
 	* configure.in: Remove AC_ARG_PROGRAM.

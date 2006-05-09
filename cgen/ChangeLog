@@ -1,5 +1,7 @@
 2006-05-09  Dave Brolley  <brolley@redhat.com>
 
+	* utils-sim.scm (-gen-decode-insn-entry): Generated code should shift
+	'entire_insn' not 'base_insn'.
 	* sid-model.scm (-gen-model-class-decls): Handle the case where insn-timing
 	is null.
 	* sim.scm (-gen-arch-model-decls): Likewise.

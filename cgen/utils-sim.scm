@@ -1,5 +1,5 @@
 ; Generic simulator application utilities.
-; Copyright (C) 2000, 2005 Red Hat, Inc.
+; Copyright (C) 2000, 2005, 2006 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -631,7 +631,7 @@
 		     (if (and (equal? APPLICATION 'SID-SIMULATOR)
 			      (> (state-base-insn-bitsize) (insn-length insn)))
 			 (string-append
-			  indent "    entire_insn = base_insn >> "
+			  indent "    entire_insn = entire_insn >> "
 			  (number->string (- (state-base-insn-bitsize) (insn-length insn)))
 			  ";\n")
 			 "")

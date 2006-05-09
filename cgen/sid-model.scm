@@ -1,5 +1,5 @@
 ; Simulator model support, plus misc. things associated with a cpu family.
-; Copyright (C) 2000, 2002, 2003 Red Hat, Inc.
+; Copyright (C) 2000, 2002, 2003, 2006 Red Hat, Inc.
 ; This file is part of CGEN.
 
 (define (unit:enum u)
@@ -261,7 +261,9 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 			      (if (null? timing)
 				  '(1)
 				  (map (lambda (insn-timing)
-					 (length (timing:units (cdr insn-timing))))
+					 (if (null? (cdr insn-timing))
+					     '1
+					     (length (timing:units (cdr insn-timing)))))
 				       timing))))
 			  insn-list))))))
    ";\n"

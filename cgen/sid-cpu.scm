@@ -1,5 +1,5 @@
 ; CPU family related simulator generator, excluding decoding and model support.
-; Copyright (C) 2000, 2002, 2003, 2005 Red Hat, Inc.
+; Copyright (C) 2000, 2002, 2003, 2005, 2006 Red Hat, Inc.
 ; This file is part of CGEN.
 
 ; ***********
@@ -748,6 +748,14 @@ using namespace cgen;
      "\n"
      (gen-semantic-code insn)
      "\n"
+     ; Only update what's been written if some are conditionally written.
+     ; Otherwise we know they're all written so there's no point in
+     ; keeping track.
+     (if (or (with-profile?) (with-parallel-write?))
+	 (if (-any-cond-written? (insn-sfmt insn))
+	     "  abuf->written = written;\n"
+	     "")
+	 "")
      (if cti?
 	 "  current_cpu->done_cti_insn (npc, status);\n"
 	 "  current_cpu->done_insn (npc, status);\n")

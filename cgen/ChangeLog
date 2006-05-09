@@ -5,6 +5,7 @@
 	* read.scm (include): Use arch-path as file location.
 	(arch-path): Define it with a default setting.
 	(-cgen): Update arch-path when "-a" option is specified.
+	* utils.scm (dirname): New function.
 
 2006-05-05  Steve Ellcey  <sje@cup.hp.com>
 

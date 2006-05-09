@@ -1,5 +1,5 @@
 ; Generic Utilities.
-; Copyright (C) 2000-2005 Red Hat, Inc.
+; Copyright (C) 2000-2005, 2006 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -153,6 +153,15 @@
       (error "gen-file-name: not symbol or string:" str))
   (map-over-string (lambda (c) (if (id-char? c) c #\-))
 		   (->string str))
+)
+
+; Return the directory name of the given file name
+
+(define (dirname s)
+  (let loop ((i (string-length s)))
+    (cond ((= i 0) "")
+	  ((char=? #\/ (string-ref s (- i 1))) (substring s 0 i))
+	  (else (loop (- i 1)))))
 )
 
 ; Turn STR into lowercase.

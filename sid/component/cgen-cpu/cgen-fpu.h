@@ -46,8 +46,8 @@ public:
   virtual int lesf (cgen_fpu*, SF, SF);
   virtual int gtsf (cgen_fpu*, SF, SF);
   virtual int gesf (cgen_fpu*, SF, SF);
+  virtual int unorderedsf (cgen_fpu*, SF, SF);
 
-#if 0
   /* basic DF ops */
   virtual DF adddf (cgen_fpu*, DF, DF);
   virtual DF subdf (cgen_fpu*, DF, DF);
@@ -56,44 +56,47 @@ public:
   virtual DF negdf (cgen_fpu*, DF);
   virtual DF absdf (cgen_fpu*, DF);
   virtual DF sqrtdf (cgen_fpu*, DF);
+#if 0
   virtual DF invdf (cgen_fpu*, DF);
   virtual DF cosdf (cgen_fpu*, DF);
   virtual DF sindf (cgen_fpu*, DF);
   virtual DF mindf (cgen_fpu*, DF, DF);
   virtual DF maxdf (cgen_fpu*, DF, DF);
-
+#endif
   virtual int eqdf (cgen_fpu*, DF, DF);
   virtual int nedf (cgen_fpu*, DF, DF);
   virtual int ltdf (cgen_fpu*, DF, DF);
   virtual int ledf (cgen_fpu*, DF, DF);
   virtual int gtdf (cgen_fpu*, DF, DF);
   virtual int gedf (cgen_fpu*, DF, DF);
+  virtual int unordereddf (cgen_fpu*, DF, DF);
 
   /* SF/DF conversion ops */
   virtual DF fextsfdf (cgen_fpu*, SF);
   virtual SF ftruncdfsf (cgen_fpu*, DF);
-#endif // not implemented yet
 
   virtual SF floatsisf (cgen_fpu*, SI);
-#if 0 // not implemented yet
   virtual SF floatdisf (cgen_fpu*, DI);
+#if 0 // not implemented yet
   virtual SF ufloatsisf (cgen_fpu*, USI);
   virtual SF ufloatdisf (cgen_fpu*, UDI);
 #endif // not implemented yet
 
   virtual SI fixsfsi (cgen_fpu*, SF);
-#if 0 // not implemented yet
   virtual DI fixsfdi (cgen_fpu*, SF);
+#if 0 // not implemented yet
   virtual USI ufixsfsi (cgen_fpu*, SF);
   virtual UDI ufixsfdi (cgen_fpu*, SF);
-
+#endif
   virtual DF floatsidf (cgen_fpu*, SI);
   virtual DF floatdidf (cgen_fpu*, DI);
+#if 0
   virtual DF ufloatsidf (cgen_fpu*, USI);
   virtual DF ufloatdidf (cgen_fpu*, UDI);
-
+#endif
   virtual SI fixdfsi (cgen_fpu*, DF);
   virtual DI fixdfdi (cgen_fpu*, DF);
+#if 0
   virtual USI ufixdfsi (cgen_fpu*, DF);
   virtual UDI ufixdfdi (cgen_fpu*, DF);
 

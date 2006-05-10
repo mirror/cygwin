@@ -1,6 +1,6 @@
 // fp.cxx - Floating point number class implementation. -*- C++ -*-
 
-// Copyright 1997, 1998, 2002, 2005 Free Software Foundation, Inc.
+// Copyright 1997, 1998, 2002, 2005, 2006 Free Software Foundation, Inc.
 // Copyright 2002 Red Hat, Inc.
 // This file is part of SID.
 
@@ -754,6 +754,12 @@ namespace sidutil
   }
 
   void
+  fp::integer (long long& i, round_mode_t mode)
+  {
+    fp_to_int (i, mode);
+  }
+
+  void
   fp::integer (unsigned int& i, round_mode_t mode)
   {
     fp_to_int (i, mode);
@@ -761,6 +767,12 @@ namespace sidutil
 
   void
   fp::integer (unsigned long& i, round_mode_t mode)
+  {
+    fp_to_int (i, mode);
+  }
+
+  void
+  fp::integer (unsigned long long& i, round_mode_t mode)
   {
     fp_to_int (i, mode);
   }

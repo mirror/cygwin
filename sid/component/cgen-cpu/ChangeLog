@@ -1,5 +1,16 @@
 2006-05-10  Dave Brolley  <brolley@redhat.com>
 
+	* fp.cxx (fp::integer (long long&, round_mode_t)): New method.
+	(fp::integer (unsigned long long&, round_mode_t)): New method.
+	* fp.h: Likewise.
+	* cgen-fpu.cxx (unorderedsf): New method.
+	(adddf, subdf, muldf, divdf, negdf, absdf, sqrtdf): Implemented.
+	(eqdf, ltdf, ledf, gtdf, gedf, gedf): Implemented.
+	(unordereddf): New method.
+	(unordereddf, fextsfdf): Implemented.
+	(floatdisf, fixsfsi, fixsfdi, floatsidf, floatdidf, fixdfsi) 
+	(fixdfdi): Implemented.
+	* cgen-fpu.h: Likewise.
 	* cgen-cpu.h (trace_counter): Now virtual.
 	(SETMEMBI): Write to data memory
 	(class cgen_bi_endian_cpu, class cgen_bi_endian_cpu) 

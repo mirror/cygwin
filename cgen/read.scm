@@ -796,8 +796,8 @@ Define a preprocessor-style macro.
 		    (cons 'if (cons test (cons then else)))
 		    ""))
   ; ??? rtx-eval test
-  (if (not (memq (car test) '(keep-isa? keep-mach?)))
-      (reader-error "only (if (keep-mach?|keep-isa? ...) ...) is currently supported"))
+  (if (not (memq (car test) '(keep-isa? keep-mach? application-is?)))
+      (reader-error "only (if (keep-mach?|keep-isa?|application-is? ...) ...) are currently supported" test ""))
   (case (car test)
     ((keep-isa?)
      (if (keep-isa? (cadr test))
@@ -807,6 +807,12 @@ Define a preprocessor-style macro.
 	     (eval1 (car else)))))
     ((keep-mach?)
      (if (keep-mach? (cadr test))
+	 (eval1 then)
+	 (if (null? else)
+	     #f
+	     (eval1 (car else)))))
+    ((application-is?)
+     (if (eq? APPLICATION (cadr test))
 	 (eval1 then)
 	 (if (null? else)
 	     #f

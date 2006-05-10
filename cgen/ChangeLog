@@ -1,6 +1,8 @@
 2006-05-10  Dave Brolley  <brolley@redhat.com>
 
-	* read.scm (-cgen): Add trailing "/" to arch-path.
+	* read.scm (cmd-if): Provide the correct argument to reader-error. Add
+	support for (if (application-is? <appname>) (...) (...)).
+	(-cgen): Add trailing "/" to arch-path.
 	* utils.scm (dirname): Removed. dirname is a primitive function.
 
 2006-05-09  Dave Brolley  <brolley@redhat.com>

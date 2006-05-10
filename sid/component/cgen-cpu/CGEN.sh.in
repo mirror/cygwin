@@ -2,7 +2,7 @@
 # Generate CGEN simulator files.
 #
 # Usage: /bin/sh cgen.sh cpu-decode srcdir \
-#	cgen cgendir cgenflags \
+#	cgendir cgenflags \
 #	arch archflags cpu isa mach prefix file-prefix \
 #	arch-file file-specs
 #

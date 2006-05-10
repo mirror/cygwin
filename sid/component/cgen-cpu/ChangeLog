@@ -1,5 +1,10 @@
 2006-05-10  Dave Brolley  <brolley@redhat.com>
 
+	* cgen-cpu.h (trace_counter): Now virtual.
+	(SETMEMBI): Write to data memory
+	(class cgen_bi_endian_cpu, class cgen_bi_endian_cpu) 
+	(class cgen_bi_endian_cpu, class cgen_bi_endian_cpu): Read/write
+	from data memory.
 	* CGEN.sh.in: Correct usage comment.
 
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>

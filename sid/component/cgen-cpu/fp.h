@@ -1,6 +1,6 @@
 // fp.h - Floating point number class using host integer ops.  -*- C++ -*-
 
-// Copyright 1997, 1998, 2002, 2005 Free Software Foundation, Inc.
+// Copyright 1997, 1998, 2002, 2005, 2006 Free Software Foundation, Inc.
 // Copyright 2002 Red Hat, Inc.
 // This file is part of SID.
 
@@ -259,8 +259,10 @@ namespace sidutil
       // Conversions to integers.
       virtual void integer (int&, round_mode_t = round_default);
       virtual void integer (long&, round_mode_t = round_default);
+      virtual void integer (long long&, round_mode_t = round_default);
       virtual void integer (unsigned int&, round_mode_t = round_default);
       virtual void integer (unsigned long&, round_mode_t = round_default);
+      virtual void integer (unsigned long long&, round_mode_t = round_default);
 
       // Pack an fp into registers of various sizes.
       void pack (cgen::SF&) const;

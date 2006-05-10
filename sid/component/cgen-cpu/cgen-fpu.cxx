@@ -114,33 +114,138 @@ int cgen_fp_ops::gesf (cgen_fpu*, SF x, SF y)
   return fp (x) >= fp (y);
 }
 
-#if 0
+int cgen_fp_ops::unorderedsf (cgen_fpu*, SF x, SF y)
+{
+  fp f1(x);
+  fp f2(y);
+  return f1.is_nan () || f2.is_nan ();
+}
+
 /* basic DF ops */
-DF cgen_fp_ops::adddf (cgen_fpu*, DF, DF);
-DF cgen_fp_ops::subdf (cgen_fpu*, DF, DF);
-DF cgen_fp_ops::muldf (cgen_fpu*, DF, DF);
-DF cgen_fp_ops::divdf (cgen_fpu*, DF, DF);
-DF cgen_fp_ops::negdf (cgen_fpu*, DF);
-DF cgen_fp_ops::absdf (cgen_fpu*, DF);
-DF cgen_fp_ops::sqrtdf (cgen_fpu*, DF);
+DF cgen_fp_ops::adddf (cgen_fpu *fpu, DF x, DF y)
+{
+  fp r = fp (x) + fp (y);
+  check_result (fpu, r);
+  DF tmp;
+  r.pack (tmp);
+  return tmp;
+}
+
+DF cgen_fp_ops::subdf (cgen_fpu *fpu, DF x, DF y)
+{
+  fp r = fp (x) - fp (y);
+  check_result (fpu, r);
+  DF tmp;
+  r.pack (tmp);
+  return tmp;
+}
+
+DF cgen_fp_ops::muldf (cgen_fpu *fpu, DF x, DF y)
+{
+  fp r = fp (x) * fp (y);
+  check_result (fpu, r);
+  DF tmp;
+  r.pack (tmp);
+  return tmp;
+}
+
+DF cgen_fp_ops::divdf (cgen_fpu *fpu, DF x, DF y)
+{
+  fp r = fp (x) / fp (y);
+  check_result (fpu, r);
+  DF tmp;
+  r.pack (tmp);
+  return tmp;
+}
+
+DF cgen_fp_ops::negdf (cgen_fpu *fpu, DF x)
+{
+  fp r (x);
+  r = fp::neg (r);
+  check_result (fpu, r);
+  DF tmp;
+  r.pack (tmp);
+  return tmp;
+}
+
+DF cgen_fp_ops::absdf (cgen_fpu *fpu, DF x)
+{
+  fp r (x);
+  r = fp::abs (r);
+  check_result (fpu, r);
+  DF tmp;
+  r.pack (tmp);
+  return tmp;
+}
+
+DF cgen_fp_ops::sqrtdf (cgen_fpu *fpu, DF x)
+{
+  fp r (x);
+  r = fp::sqrt (r);
+  check_result (fpu, r);
+  DF tmp;
+  r.pack (tmp);
+  return tmp;
+}
+
+#if 0
 DF cgen_fp_ops::invdf (cgen_fpu*, DF);
 DF cgen_fp_ops::cosdf (cgen_fpu*, DF);
 DF cgen_fp_ops::sindf (cgen_fpu*, DF);
 DF cgen_fp_ops::mindf (cgen_fpu*, DF, DF);
 DF cgen_fp_ops::maxdf (cgen_fpu*, DF, DF);
+#endif
 
-int cgen_fp_ops::eqdf (cgen_fpu*, DF, DF);
-int cgen_fp_ops::nedf (cgen_fpu*, DF, DF);
-int cgen_fp_ops::ltdf (cgen_fpu*, DF, DF);
-int cgen_fp_ops::ledf (cgen_fpu*, DF, DF);
-int cgen_fp_ops::gtdf (cgen_fpu*, DF, DF);
-int cgen_fp_ops::gedf (cgen_fpu*, DF, DF);
+int cgen_fp_ops::eqdf (cgen_fpu *fpu, DF x, DF y)
+{
+  return fp (x) == fp (y);
+}
 
-  /* SF/DF conversion ops */
-DF cgen_fp_ops::fextsfdf (cgen_fpu*, SF);
-SF cgen_fp_ops::ftruncdfsf (cgen_fpu*, DF);
+int cgen_fp_ops::nedf (cgen_fpu *fpu, DF x, DF y)
+{
+  return fp (x) == fp (y);
+}
+int cgen_fp_ops::ltdf (cgen_fpu *fpu, DF x, DF y)
+{
+  return fp (x) < fp (y);
+}
+int cgen_fp_ops::ledf (cgen_fpu *fpu, DF x, DF y)
+{
+  return fp (x) <= fp (y);
+}
+int cgen_fp_ops::gtdf (cgen_fpu *fpu, DF x, DF y)
+{
+  return fp (x) > fp (y);
+}
+int cgen_fp_ops::gedf (cgen_fpu *fpu, DF x, DF y)
+{
+  return fp (x) >= fp (y);
+}
 
-#endif // not implemented yet
+int cgen_fp_ops::unordereddf (cgen_fpu *fpu, DF x, DF y)
+{
+  fp f1(x);
+  fp f2(y);
+  return f1.is_nan () || f2.is_nan ();
+}
+
+/* SF/DF conversion ops */
+DF cgen_fp_ops::fextsfdf (cgen_fpu *fpu, SF x)
+{
+  fp r (x);
+  DF tmp;
+  r.pack (tmp);
+  return tmp;
+}
+
+SF cgen_fp_ops::ftruncdfsf (cgen_fpu *fpu, DF x)
+{
+  fp r (x);
+  SF tmp;
+  r.pack (tmp);
+  return tmp;
+}
+
 SF cgen_fp_ops::floatsisf (cgen_fpu* fpu, SI x)
 {
   fp r = fp::from_int (x);
@@ -149,31 +254,80 @@ SF cgen_fp_ops::floatsisf (cgen_fpu* fpu, SI x)
   r.pack (tmp);
   return tmp;
 }
+
+SF cgen_fp_ops::floatdisf (cgen_fpu *fpu, DI x)
+{
+  fp r = fp::from_int (x);
+  check_result (fpu, r);
+  DF tmp;
+  r.pack (tmp);
+  return tmp;
+}
+
 #if 0 // not implemented yet
-SF cgen_fp_ops::floatdisf (cgen_fpu*, DI);
 SF cgen_fp_ops::ufloatsisf (cgen_fpu*, USI);
 SF cgen_fp_ops::ufloatdisf (cgen_fpu*, UDI);
 #endif // not implemented yet
 
-SI cgen_fp_ops::fixsfsi (cgen_fpu*, SF x)
+SI cgen_fp_ops::fixsfsi (cgen_fpu *fpu, SF x)
 {
   fp r (x);
-  unsigned int tmp;
+  SI tmp;
   r.integer (tmp, fp::round_default);
   return tmp;
 }
+
+DI cgen_fp_ops::fixsfdi (cgen_fpu *fpu, SF x)
+{
+  fp r (x);
+  DI tmp;
+  r.integer (tmp, fp::round_default);
+  return tmp;
+}
+
 #if 0 // not implemented yet
-DI cgen_fp_ops::fixsfdi (cgen_fpu*, SF);
 USI cgen_fp_ops::ufixsfsi (cgen_fpu*, SF)
 UDI cgen_fp_ops::ufixsfdi (cgen_fpu*, SF);
+#endif
+DF cgen_fp_ops::floatsidf (cgen_fpu *fpu, SI x)
+{
+  fp r = fp::from_int (x);
+  check_result (fpu, r);
+  DF tmp;
+  r.pack (tmp);
+  return tmp;
+}
 
-DF cgen_fp_ops::floatsidf (cgen_fpu*, SI);
-DF cgen_fp_ops::floatdidf (cgen_fpu*, DI);
+DF cgen_fp_ops::floatdidf (cgen_fpu *fpu, DI x)
+{
+  fp r = fp::from_int (x);
+  check_result (fpu, r);
+  DF tmp;
+  r.pack (tmp);
+  return tmp;
+}
+
+#if 0
 DF cgen_fp_ops::ufloatsidf (cgen_fpu*, USI);
 DF cgen_fp_ops::ufloatdidf (cgen_fpu*, UDI);
+#endif
+SI cgen_fp_ops::fixdfsi (cgen_fpu *fpu, DF x)
+{
+  fp r (x);
+  SI tmp;
+  r.integer (tmp, fp::round_default);
+  return tmp;
+}
 
-SI cgen_fp_ops::fixdfsi (cgen_fpu*, DF);
-DI cgen_fp_ops::fixdfdi (cgen_fpu*, DF);
+DI cgen_fp_ops::fixdfdi (cgen_fpu *fpu, DF x)
+{
+  fp r (x);
+  DI tmp;
+  r.integer (tmp, fp::round_default);
+  return tmp;
+}
+
+#if 0
 USI cgen_fp_ops::ufixdfsi (cgen_fpu*, DF);
 UDI cgen_fp_ops::ufixdfdi (cgen_fpu*, DF);
 

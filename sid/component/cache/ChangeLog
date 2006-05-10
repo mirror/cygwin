@@ -1,3 +1,11 @@
+2006-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* cache.cxx (buffer_sizes): New static table.
+	(CacheListTypes): List hw-cache-buffer-* using buffer_sizes. Same for
+	hw-blocking-cache-buffer-*.
+	(CacheCreate): Parse hw-cache-buffer-N and hw-blocking-cache-buffer-N
+	in order to determine buffer size.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

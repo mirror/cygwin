@@ -26,6 +26,9 @@ using std::endl;
 
 #include "cache.h"
 
+static string buffer_sizes[] =
+  { "4", "8" };
+
 static string line_sizes[] =
   { "16", "32", "64", "128" };
 
@@ -1054,8 +1057,12 @@ CacheListTypes ()
 
   types.push_back ("hw-cache-basic");
   types.push_back ("hw-blocking-cache-basic");
-  types.push_back ("hw-cache-buffer-8");
-  types.push_back ("hw-blocking-cache-buffer-8");
+
+  for (unsigned i = 0; i < (sizeof (buffer_sizes) / sizeof (string)); i++)
+    {
+      types.push_back ("hw-cache-buffer-" + buffer_sizes[i]);
+      types.push_back ("hw-blocking-cache-buffer-" + buffer_sizes[i]);
+    }
 
   for (unsigned i = 0; i < (sizeof (assocs) / sizeof (string)); i++)
     for (unsigned j = 0; j < (sizeof (cache_sizes) / sizeof (string)); j++)
@@ -1095,12 +1102,22 @@ CacheCreate (const string& typeName)
   if (typeName == "hw-blocking-cache-basic")
     return new blocking_cache_component (1, 16384, 32, null_replacement, internal_line_factory);
 
-  if (typeName == "hw-cache-buffer-8")
-    return new cache_component (0, 8, 8, null_replacement, internal_line_factory);
+  if (typeName.substr (0, 16) == "hw-cache-buffer-")
+    {
+      unsigned size;
+      if (parse_attribute (typeName.substr (16), size) != sid::component::ok)
+	return 0;
+      return new cache_component (0, size, size, null_replacement, internal_line_factory);
+    }
   
-  if (typeName == "hw-blocking-cache-buffer-8")
-    return new blocking_cache_component (0, 8, 8, null_replacement, internal_line_factory);
-   
+  if (typeName.substr (0, 25) == "hw-blocking-cache-buffer-")
+    {
+      unsigned size;
+      if (parse_attribute (typeName.substr (25), size) != sid::component::ok)
+	return 0;
+      return new blocking_cache_component (0, size, size, null_replacement, internal_line_factory);
+    }
+  
   vector<string> parts = sidutil::tokenize (typeName, "-/");
 
   unsigned extra_ix;

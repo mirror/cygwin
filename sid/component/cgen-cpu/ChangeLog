@@ -1,3 +1,7 @@
+2006-05-10  Dave Brolley  <brolley@redhat.com>
+
+	* CGEN.sh.in: Correct usage comment.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

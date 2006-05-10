@@ -1613,8 +1613,14 @@ dynamic_configurator_component::function_jump_pin_handler (host_int_4 addr)
   function_address_pin.drive (addr);
   string function = loader->attribute_value("current-function");
 
-  // If the current function is on the stack, then assume we're
-  // returning to it, otherwise assume we're calling it.
+  // If the current function is on top of the stack, then assume
+  // a local branch.
+  assert (config_stack.size () >= 1);
+  if (config_stack.back ().first == function)
+    return;
+
+  // Otherwise, if the current function is not on the stack, then assume we're
+  // calling it. Otherwise assume we're returning to it.
   for (vector < pair<string,unsigned> >::const_iterator it = config_stack.begin ();
        it != config_stack.end ();
        ++it)

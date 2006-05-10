@@ -80,7 +80,7 @@ protected:
 		       struct disassemble_info *info);
   static int cgen_symbol_at_address(bfd_vma addr, struct disassemble_info * info);
   // Counter tracing support
-  void trace_counter (PCADDR pc);
+  virtual void trace_counter (PCADDR pc);
 
 public:
   // Called by semantic code to perform branches.
@@ -128,7 +128,7 @@ public:
   inline void
   SETMEMBI(PCADDR pc, ADDR addr, BI value)
     {
-      return this->write_insn_memory_1 (pc, addr, value);
+      return this->write_data_memory_1 (pc, addr, value);
     }
   inline void
   SETMEMQI(PCADDR pc, ADDR addr, QI value)
@@ -200,27 +200,27 @@ public:
   inline SF
   GETMEMSF(PCADDR pc, IADDR addr)
     {
-      SI iv = this->read_insn_memory_4 (pc, addr);
+      SI iv = this->read_data_memory_4 (pc, addr);
       return * (SF *)(char *)(& iv);
     }
   inline void
   SETMEMSF(PCADDR pc, ADDR addr, SF value)
     {
       SI iv = * (SI *)(char *)(& value);      
-      return this->write_insn_memory_4 (pc, addr, iv);
+      return this->write_data_memory_4 (pc, addr, iv);
     }
 
   inline DF
   GETMEMDF(PCADDR pc, IADDR addr)
     {
-      DI iv = this->read_insn_memory_8 (pc, addr);
+      DI iv = this->read_data_memory_8 (pc, addr);
       return * (DF *)(char *)(& iv);
     }
   inline void
   SETMEMDF(PCADDR pc, ADDR addr, DF value)
     {
       DI iv = * (DI *)(char *)(& value);      
-      return this->write_insn_memory_8 (pc, addr, iv);
+      return this->write_data_memory_8 (pc, addr, iv);
     }
 
   // IMEM: instruction memory calls

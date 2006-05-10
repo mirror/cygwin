@@ -1074,7 +1074,7 @@ Define a preprocessor-style macro.
 	      (else
 	       (cond ((str=? "-a" (car opt))
 		      (set! arch-file arg)
-		      (set! arch-path (dirname arg))
+		      (set! arch-path (string-append (dirname arg) "/"))
 		      )
 		     ((str=? "-b" (car opt))
 		      (set! debugging #t)

@@ -155,15 +155,6 @@
 		   (->string str))
 )
 
-; Return the directory name of the given file name
-
-(define (dirname s)
-  (let loop ((i (string-length s)))
-    (cond ((= i 0) "")
-	  ((char=? #\/ (string-ref s (- i 1))) (substring s 0 i))
-	  (else (loop (- i 1)))))
-)
-
 ; Turn STR into lowercase.
 
 (define (string-downcase str)

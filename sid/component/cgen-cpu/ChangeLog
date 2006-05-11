@@ -1,5 +1,7 @@
 2006-05-11  Dave Brolley  <brolley@redhat.com>
 
+	* cgen-model.h (cgen_model): Initialize vliw_cycles.
+	(model_insn_after): Correct comment re: last_p.
 	* cgen-ops.h (SUBWORDDIHI, SUBWORDDIQI, SUBWORDDFDI): New functions.
 	* compCGEN.cxx (cgen_bi_endian_cpu): Initialize branch_was_return.
 

@@ -16,7 +16,10 @@ namespace cgen
 class cgen_model
 {
 public:
-  cgen_model (cgen_bi_endian_cpu *c) : cpu (c) {}
+  cgen_model (cgen_bi_endian_cpu *c) :
+    cpu (c),
+    vliw_cycles (0)
+  {}
 
   // To be overridden as needed. Call before each insn is executed. first_p is
   // true when the insn is the first of a group of parallel insns.
@@ -31,7 +34,7 @@ public:
   }
 
   // To be overridden as needed. Call after each insn is executed. last_p is
-  // true when the insn is the first of a group of parallel insns. cycles is the
+  // true when the insn is the last of a group of parallel insns. cycles is the
   // number of cycles used by each particular insn.
   virtual void model_insn_after (bool last_p = true, sid::host_int_4 cycles = 1)
     {

@@ -1,6 +1,6 @@
 /* Simple ELF loader
  *
- * Copyright (c) 1998, 2002, 2004, 2005 Red Hat
+ * Copyright (c) 1998, 2002, 2004, 2005, 2006 Red Hat
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -119,7 +119,7 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian,
   unsigned char fileHeader [64];
   unsigned char psymHdr [56];
   unsigned char secHdr [64];
-  unsigned char symTabEntry [16];
+  unsigned char symTabEntry [24];
   unsigned long long psymOffset;
   int psymSize;
   int psymNum;
@@ -284,6 +284,24 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian,
 	      textSectionCount++;
 	      newTextSection (textSectionCount);
 	    }
+	  else if (fetchWord(secHdr+4, littleEndian) == SHT_STRTAB)
+	    {
+	      unsigned offset = fetchQuad(secHdr+24, littleEndian);
+	      unsigned size = fetchQuad(secHdr+32, littleEndian);
+	      char *strings = xmalloc (size);
+	      newStringTable (stringTableCount);
+	      stringTables[stringTableCount].ix = x;
+	      stringTables[stringTableCount].strings = strings;
+	      if (func (0, strings, offset, size, 0) != size)
+		return 0;
+	      ++stringTableCount;
+	    }
+	  else if (fetchWord(secHdr+4, littleEndian) == SHT_SYMTAB)
+	    {
+	      symbolTableOffset = fetchQuad(secHdr+24, littleEndian);
+	      symbolTableSize = fetchQuad(secHdr+32, littleEndian);
+	      symbolTableStringTableIx = fetchWord(secHdr+40, littleEndian);
+	    }
         }
       else
         {
@@ -341,15 +359,25 @@ readElfFile (PFLOAD func, unsigned* entry_point, int* little_endian,
   newSymbol (symbolCount);
   if (strings)
     {
-      for (x = 0; x < symbolTableSize; x += sizeof (symTabEntry))
+      const unsigned symTabEntrySize = sixtyfourbit ? 24 : 16;
+      for (x = 0; x < symbolTableSize; x += symTabEntrySize)
 	{
-	  if (func (0, symTabEntry, symbolTableOffset + x, sizeof (symTabEntry), 0) != sizeof (symTabEntry))
+	  if (func (0, symTabEntry, symbolTableOffset + x, symTabEntrySize, 0) != symTabEntrySize)
 	    return 0;
 	  // TODO: Save only symbols representing functions
 	  // PROBLEM: Some don't have the STT_FUNC flag set
-	  symbolTable[symbolCount].name = strings + fetchWord(symTabEntry+0, littleEndian);
-	  symbolTable[symbolCount].addr = fetchWord(symTabEntry+4, littleEndian);
-	  symbolTable[symbolCount].size = fetchWord(symTabEntry+8, littleEndian);
+	  if (sixtyfourbit)
+	    {
+	      symbolTable[symbolCount].name = strings + fetchWord(symTabEntry+0, littleEndian);
+	      symbolTable[symbolCount].addr = fetchQuad(symTabEntry+8, littleEndian);
+	      symbolTable[symbolCount].size = fetchQuad(symTabEntry+16, littleEndian);
+	    }
+	  else
+	    {
+	      symbolTable[symbolCount].name = strings + fetchWord(symTabEntry+0, littleEndian);
+	      symbolTable[symbolCount].addr = fetchWord(symTabEntry+4, littleEndian);
+	      symbolTable[symbolCount].size = fetchWord(symTabEntry+8, littleEndian);
+	    }
 #if 0
 	  printf ("found symbol %s at 0x%Lx for 0x%Lx\n",
 		  symbolTable[symbolCount].name,

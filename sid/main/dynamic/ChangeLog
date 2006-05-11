@@ -1,3 +1,20 @@
+2006-05-11  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.cxx (CacheCfg::CacheCfg (const string name)): Now takes
+	a second argument for the size of the buffer. Initialize my_size using
+	the size provided. Call compute_comptype.
+	(compute_comptype): Use my_size to complete "hw_cache_buffer-".
+	(BoardCfg): Initalize step_insn_count. Initialize
+	step_insn_count_1_required.
+	(BoardCfg::write_load): Set the cpu's step-insn-count based on
+	step_insn_count_1_required.
+	(set_step_insn_count): Just set step_insn_count here.
+	(trace_counter): Set step_insn_count_1_required.
+	* commonCfg.h (CacheCfg::CacheCfg (const string name)): Now takes
+	a second argument for the size of the buffer.
+	(step_insn_count): New member of BoardCfg.
+	(step_insn_count_1_required): New member of BoardCfg.
+
 2006-03-27  Frank Ch. Eigler  <fche@elastic.org>
 
 	* Makefile*., aclocal.m4: Fix libiberty[pic] references.

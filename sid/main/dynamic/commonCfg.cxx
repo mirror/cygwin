@@ -108,17 +108,19 @@ sid::host_int_4 MemCfg::write_latency()
 
 // CacheCfg
 CacheCfg::~CacheCfg () {}
-CacheCfg::CacheCfg (const string name) : 
+CacheCfg::CacheCfg (const string name, sid::host_int_4 size) : 
   ComponentCfg (name),
   AtomicCfg (name, 
 	     "libcache.la", 
 	     "cache_component_library",
-	     "hw-cache-buffer-8"),
+	     ""),
   my_assoc (""),
-  my_size (8),
+  my_size (size),
   my_line_size (0),
   my_replace ("")
-{}
+{
+  compute_comptype ();
+}
 
 // direct caches
 CacheCfg::CacheCfg (const string name, 
@@ -161,7 +163,7 @@ void CacheCfg::compute_comptype ()
 {
   if (my_assoc == "")
     {
-      my_comptype = "hw-cache-buffer-8";
+      my_comptype = "hw-cache-buffer-" + sidutil::make_attribute (my_size);
     }
   else
     {
@@ -1168,11 +1170,12 @@ BoardCfg::BoardCfg (const string name,
   core_probe (0),
   dynamic_configurator (NULL),
   start_config (""),
-  warmup_funcs ("_Sid_config")
+  warmup_funcs ("_Sid_config"),
+  step_insn_count ("10000"),
+  step_insn_count_1_required_p (false)
 {
   assert (sess);
   cpu = new CpuCfg ("cpu", default_cpu_variant, sess);
-  set_step_insn_count ("10000");
   set_engine ("pbb");
   main_mapper = new MapperCfg ("main-map");
   assert (main_mapper);
@@ -1265,6 +1268,8 @@ void BoardCfg::write_load (Writer &w)
   if (loader)
     if (sess->verbose)
       set (loader, "verbose?", "true");
+
+  set (cpu, "step-insn-count", step_insn_count_1_required_p ? "1" : step_insn_count);
 
   AggregateCfg::write_load (w);
 }
@@ -1388,7 +1393,7 @@ void BoardCfg::set_engine (const string engine)
 void BoardCfg::set_step_insn_count (const string count)
 {
   assert (cpu);
-  cpu->set (cpu, "step-insn-count", count);
+  step_insn_count = count;
 }
 
 void BoardCfg::set_endian (const string endian)
@@ -1455,6 +1460,7 @@ void BoardCfg::trace_counter ()
 {
   assert (cpu);
   cpu->set (cpu, "trace-counter?", "true");
+  step_insn_count_1_required_p = true;
 }
 
 void BoardCfg::trace_disassemble ()

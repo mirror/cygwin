@@ -37,8 +37,8 @@ class CacheCfg :
   virtual public AtomicCfg
 {
 public:
-  // 8-byte buffers
-  CacheCfg (const string name);
+  // n-byte buffers
+  CacheCfg (const string name, sid::host_int_4 size = 8);
   // direct caches
   CacheCfg (const string name, 
 	    const sid::host_int_4 size, 
@@ -408,6 +408,8 @@ public:
   string start_config;
   string warmup_funcs;
   string profile_funcs;
+  string step_insn_count;
+  bool step_insn_count_1_required_p;
 };
 
 #endif // __commonCfg_h__

@@ -1,6 +1,6 @@
 // cgen-ops.h - CGEN semantic ops.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2002 Red Hat.
+// Copyright (C) 1999, 2000, 2002, 2006 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -558,6 +558,28 @@ SUBWORDDIDF (DI in)
 {
   DF* out = reinterpret_cast<DF*> (&in);
   return *out;
+}
+
+inline HI
+SUBWORDDIHI (DI in, int word)
+{
+  assert (word >= 0 && word <= 3);
+  return (UHI) (in >> (16 * (3 - word))) & 0xFFFF;
+}
+
+inline QI
+SUBWORDDIQI (DI in, int byte)
+{
+  assert (byte >= 0 && byte <= 7);
+  return (UQI) (in >> (8 * (7 - byte))) & 0xFF;
+}
+
+inline DI
+SUBWORDDFDI (DF in)
+{
+  union { DF in; DI out; } x;
+  x.in = in;
+  return x.out;
 }
 
 inline SI

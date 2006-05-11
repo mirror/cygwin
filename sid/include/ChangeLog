@@ -1,3 +1,9 @@
+2006-05-11  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (cg_profile): Now virtual.
+	(cg_profile_jump): Now virtual.
+	(dynamic_config): New vritual override.
+
 2006-03-27  Frank Ch. Eigler  <fche@elastic.org>
 
 	* sidcpuutil.h (basic_cpu::{read,write}_watchpoint_memory): Remove

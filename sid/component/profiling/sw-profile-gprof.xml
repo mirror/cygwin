@@ -8,7 +8,9 @@
     <defpin name="reset" direction="in" legalvalues="any" behaviors="resetting" />
     <defpin name="sample" direction="in" legalvalues="any" behaviors="data gathering" />
     <defpin name="cg-caller" direction="in" legalvalues="any" behaviors="data gathering" />
+    <defpin name="cg-caller-hi" direction="in" legalvalues="any" behaviors="data gathering" />
     <defpin name="cg-callee" direction="in" legalvalues="any" behaviors="data gathering" />
+    <defpin name="cg-callee-hi" direction="in" legalvalues="any" behaviors="data gathering" />
     <defpin name="store" direction="in" legalvalues="any" behaviors="profile generation" />
 
     <!-- attributes -->
@@ -17,13 +19,17 @@
     <defattribute name="value-max" category="register" legalvalues="decimal string" behaviors="data gathering" />
     <defattribute name="limit-min" category="setting" legalvalues="decimal string" defaultvalue="0" behaviors="data gathering" />
     <defattribute name="limit-max" category="setting" legalvalues="decimal string" defaultvalue="infinity" behaviors="data gathering" />
+    <defattribute name="bucket-size" category="setting" legalvalues="integer" defaultvalue="1" behaviors="data gathering" />
+    <defattribute name="pc-size" category="setting" legalvalues="4 or 8" defaultvalue="4" behaviors="data gathering" />
     <defattribute name="value-attribute" category="setting" legalvalues="name" defaultvalue="'pc'" behaviors="data gathering" />
     <defattribute name="output-file" category="setting" legalvalues="file name" defaultvalue="'gmon.out'" behaviors="configuration" />
     <defattribute name="output-file-endianness" category="setting" legalvalues="0/1/2/little/big/unknown" defaultvalue="unknown" behaviors="configuration" />
     <defattribute name="reset" category="pin" behaviors="resetting" />
     <defattribute name="sample" category="pin" behaviors="data gathering" />
     <defattribute name="cg-caller" category="pin" behaviors="data gathering" />
+    <defattribute name="cg-caller-hi" category="pin" behaviors="data gathering" />
     <defattribute name="cg-callee" category="pin" behaviors="data gathering" />
+    <defattribute name="cg-callee-hi" category="pin" behaviors="data gathering" />
     <defattribute name="store" category="pin" behaviors="profile generation" />
 
 
@@ -50,12 +56,17 @@
       This component needs to be configured with the <relation>target-component</relation>
       relation.  The first element in the relation will be used as the
       target of profiling.  The <attribute>value-attribute</attribute> setting contains the
-      name of the target component's attribute that will be collected.
+      name of the target component's attribute that will be collected. If pc-size is 64, then
+      the target component should also have an attribute with the same name suffixed by "-hi"
       </p>
       <p>
       The <attribute>bucket-size</attribute> attribute configures the width of the
       histogram buckets.  It is invalid to change the bucket size if
       any samples have been accumulated (if <attribute>value-count</attribute> is nonzero).
+      </p>
+      <p>
+      The <attribute>pc-size</attribute> attribute configures the width of the
+      program counter in bytes.  Valid values are 4 and 8.
       </p>
       <p>
       The <attribute>output-file</attribute> setting gives the name of the eventual profiling
@@ -75,10 +86,13 @@
       If the target component is unset, or its target attribute does
       not result in a valid numeric string, no sample is accumulated.
       </p>
-      <p>Alternately, if the <pin>cg-caller</pin> and then the <pin>cg-callee</pin>
+      <p>Alternately, if the <pin>cg-caller</pin> and perhaps the <pin>cg-caller-hi</pin>
+      and then the <pin>cg-callee</pin> and perhaps the <pin>cg-callee-hi</pin>
       pins are driven, the values driven are interpreted as the caller and the
       callee PC addresses of a subroutine call event.  These events are recorded
-      in a dynamic call graph.
+      in a dynamic call graph. The -hi versions of the <pin>cg-caller-pin</pin> and
+      <pin>cg-callee-pin</pin> are used to provide 64 bit pc values and, if used,
+      must be driven before their counterparts.
       </p>
       <p>
       If a sample was collected, and falls between the

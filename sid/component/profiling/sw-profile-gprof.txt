@@ -26,7 +26,11 @@ Functionality:
    |                | setting contains the name of   |
    |                | the target component's         |
    |                | attribute that will be         |
-   |                | collected.                     |
+   |                | collected. If pc-size is 64,   |
+   |                | then the target component      |
+   |                | should also have an attribute  |
+   |                | with the same name suffixed by |
+   |                | "-hi"                          |
    |                |                                |
    |                | The bucket-size attribute      |
    |                | configures the width of the    |
@@ -35,6 +39,11 @@ Functionality:
    |                | size if any samples have been  |
    |                | accumulated (if value-count is |
    |                | nonzero).                      |
+   |                |                                |
+   |                | The pc-size attribute          |
+   |                | configures the width of the    |
+   |                | program counter in bytes.      |
+   |                | Valid values are 4 and 8.      |
    |                |                                |
    |                | The output-file setting gives  |
    |                | the name of the eventual       |
@@ -62,13 +71,20 @@ Functionality:
    |                | accumulated.                   |
    |                |                                |
    |                | Alternately, if the cg-caller  |
-   |                | and then the cg-callee pins    |
+   |                | and perhaps the cg-caller-hi   |
+   |                | and then the cg-callee and     |
+   |                | perhaps the cg-callee-hi pins  |
    |                | are driven, the values driven  |
    |                | are interpreted as the caller  |
    |                | and the callee PC addresses of |
    |                | a subroutine call event. These |
    |                | events are recorded in a       |
-   |                | dynamic call graph.            |
+   |                | dynamic call graph. The -hi    |
+   |                | versions of the cg-caller-pin  |
+   |                | and cg-callee-pin are used to  |
+   |                | provide 64 bit pc values and,  |
+   |                | if used, must be driven before |
+   |                | their counterparts.            |
    |                |                                |
    |                | If a sample was collected, and |
    |                | falls between the limit-min    |
@@ -168,62 +184,64 @@ Component Reference:
 
   Component: sw-profile-gprof
 
-   +-------------------------------------------------+
-   |                      pins                       |
-   |-------------------------------------------------|
-   |  name   |direction|legalvalues|    behaviors    |
-   |---------+---------+-----------+-----------------|
-   |reset    |in       |any        |resetting        |
-   |---------+---------+-----------+-----------------|
-   |sample   |in       |any        |data gathering   |
-   |---------+---------+-----------+-----------------|
-   |cg-caller|in       |any        |data gathering   |
-   |---------+---------+-----------+-----------------|
-   |cg-callee|in       |any        |data gathering   |
-   |---------+---------+-----------+-----------------|
-   |store    |in       |any        |profile          |
-   |         |         |           |generation       |
-   +-------------------------------------------------+
+   +-----------------------------------------------------+
+   |                        pins                         |
+   |-----------------------------------------------------|
+   |    name    |direction|legalvalues|    behaviors     |
+   |------------+---------+-----------+------------------|
+   |reset       |in       |any        |resetting         |
+   |------------+---------+-----------+------------------|
+   |sample      |in       |any        |data gathering    |
+   |------------+---------+-----------+------------------|
+   |cg-caller   |in       |any        |data gathering    |
+   |------------+---------+-----------+------------------|
+   |cg-caller-hi|in       |any        |data gathering    |
+   |------------+---------+-----------+------------------|
+   |cg-callee   |in       |any        |data gathering    |
+   |------------+---------+-----------+------------------|
+   |cg-callee-hi|in       |any        |data gathering    |
+   |------------+---------+-----------+------------------|
+   |store       |in       |any        |profile generation|
+   +-----------------------------------------------------+
 
-+----------------------------------------------------------------------------------+
-|                                    attributes                                    |
-|----------------------------------------------------------------------------------|
-|         name         |category|      legal values      | default  |  behaviors  ||
-|                      |        |                        |  value   |             ||
-|----------------------+--------+------------------------+----------+-------------||
-|value-count           |register|decimal string          |-         |data         ||
-|                      |        |                        |          |gathering    ||
-|----------------------+--------+------------------------+----------+-------------||
-|value-min             |register|decimal string          |-         |data         ||
-|                      |        |                        |          |gathering    ||
-|----------------------+--------+------------------------+----------+-------------||
-|value-max             |register|decimal string          |-         |data         ||
-|                      |        |                        |          |gathering    ||
-|----------------------+--------+------------------------+----------+-------------||
-|limit-min             |setting |decimal string          |0         |data         ||
-|                      |        |                        |          |gathering    ||
-|----------------------+--------+------------------------+----------+-------------||
-|limit-max             |setting |decimal string          |infinity  |data         ||
-|                      |        |                        |          |gathering    ||
-|----------------------+--------+------------------------+----------+-------------||
-|value-attribute       |setting |name                    |'pc'      |data         ||
-|                      |        |                        |          |gathering    ||
-|----------------------+--------+------------------------+----------+-------------||
-|output-file           |setting |file name               |'gmon.out'|configuration||
-|----------------------+--------+------------------------+----------+-------------||
-|output-file-endianness|setting |0/1/2/little/big/unknown|unknown   |configuration||
-|----------------------+--------+------------------------+----------+-------------||
-|reset                 |pin     |-                       |-         |resetting    ||
-|----------------------+--------+------------------------+----------+-------------||
-|sample                |pin     |-                       |-         |data         ||
-|                      |        |                        |          |gathering    ||
-|----------------------+--------+------------------------+----------+-------------||
-|cg-caller             |pin     |-                       |-         |data         ||
-|                      |        |                        |          |gathering    ||
-|----------------------+--------+------------------------+----------+-------------||
-|cg-callee             |pin     |-                       |-         |data         ||
-|                      |        |                        |          |gathering    ||
-|----------------------+--------+------------------------+----------+-------------||
-|store                 |pin     |-                       |-         |profile      ||
-|                      |        |                        |          |generation   ||
-+----------------------------------------------------------------------------------+
++--------------------------------------------------------------------------------------------+
+|                                         attributes                                         |
+|--------------------------------------------------------------------------------------------|
+|          name          | category |       legal values       |  default   |   behaviors   ||
+|                        |          |                          |   value    |               ||
+|------------------------+----------+--------------------------+------------+---------------||
+|value-count             |register  |decimal string            |-           |data gathering ||
+|------------------------+----------+--------------------------+------------+---------------||
+|value-min               |register  |decimal string            |-           |data gathering ||
+|------------------------+----------+--------------------------+------------+---------------||
+|value-max               |register  |decimal string            |-           |data gathering ||
+|------------------------+----------+--------------------------+------------+---------------||
+|limit-min               |setting   |decimal string            |0           |data gathering ||
+|------------------------+----------+--------------------------+------------+---------------||
+|limit-max               |setting   |decimal string            |infinity    |data gathering ||
+|------------------------+----------+--------------------------+------------+---------------||
+|bucket-size             |setting   |integer                   |1           |data gathering ||
+|------------------------+----------+--------------------------+------------+---------------||
+|pc-size                 |setting   |4 or 8                    |4           |data gathering ||
+|------------------------+----------+--------------------------+------------+---------------||
+|value-attribute         |setting   |name                      |'pc'        |data gathering ||
+|------------------------+----------+--------------------------+------------+---------------||
+|output-file             |setting   |file name                 |'gmon.out'  |configuration  ||
+|------------------------+----------+--------------------------+------------+---------------||
+|output-file-endianness  |setting   |0/1/2/little/big/unknown  |unknown     |configuration  ||
+|------------------------+----------+--------------------------+------------+---------------||
+|reset                   |pin       |-                         |-           |resetting      ||
+|------------------------+----------+--------------------------+------------+---------------||
+|sample                  |pin       |-                         |-           |data gathering ||
+|------------------------+----------+--------------------------+------------+---------------||
+|cg-caller               |pin       |-                         |-           |data gathering ||
+|------------------------+----------+--------------------------+------------+---------------||
+|cg-caller-hi            |pin       |-                         |-           |data gathering ||
+|------------------------+----------+--------------------------+------------+---------------||
+|cg-callee               |pin       |-                         |-           |data gathering ||
+|------------------------+----------+--------------------------+------------+---------------||
+|cg-callee-hi            |pin       |-                         |-           |data gathering ||
+|------------------------+----------+--------------------------+------------+---------------||
+|store                   |pin       |-                         |-           |profile        ||
+|                        |          |                          |            |generation     ||
++--------------------------------------------------------------------------------------------+

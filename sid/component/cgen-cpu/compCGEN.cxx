@@ -1,6 +1,6 @@
 // compCGEN.cxx - CPU components.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2006 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -42,6 +42,7 @@ using namespace cgen;
 // ----------------------------------------------------------------------------
 cgen_bi_endian_cpu::cgen_bi_endian_cpu ()
 {
+  branch_was_return = false;
   warnings_enabled = false;
   add_attribute ("enable-warnings?", & warnings_enabled, "setting");
   this->engine_type = ENGINE_UNKNOWN;

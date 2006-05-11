@@ -1,3 +1,8 @@
+2006-05-11  Dave Brolley  <brolley@redhat.com>
+
+	* cgen-ops.h (SUBWORDDIHI, SUBWORDDIQI, SUBWORDDFDI): New functions.
+	* compCGEN.cxx (cgen_bi_endian_cpu): Initialize branch_was_return.
+
 2006-05-10  Dave Brolley  <brolley@redhat.com>
 
 	* fp.cxx (fp::integer (long long&, round_mode_t)): New method.

@@ -1,3 +1,27 @@
+2006-05-11  Dave Brolley  <brolley@redhat.com>
+
+	* gprof.cxx (hitcount_map_t): PC now host_int_8.
+	(cg_count_map_t): Likewise.
+	(statistics): value_min,value_max,limit_min,limit_max likewise.
+	New member, pc_size.
+	(statistics::operator=): Copy pc_size.
+	(cg_caller_hi_pin): New pin.
+	(cg_callee_hi_pin): New pin.
+	(limit_min_set): Handle 64 bits.
+	(limit_max_set): Handle 64 bits.
+	(pc_size_get): New method.
+	(pc_size_set): New method.
+	(accumulate): Use target_attribute + "-hi" to obtain 64 bit pc. Handle
+	64 bits throughout.
+	(accumulate_call): Use {caller,callee}_hi pin to obtain 64 bit pc. Handle
+	64 bits throughout.
+	(store_stats): Handle 32 or 64 bit pc.
+	(gprof_component): Add cg-caller_hi and cg-callee-hi pins. Add pc-size
+	attribute. Initialize value on cg-caller-hi and cg-callee-hi to zero.
+	* sw-profile-gprof.xml: Document cg-caller-hi, cg-callee-hi,
+	bucket-size, pc-size.
+	* sw-profile-gprof.txt: Regenerated.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

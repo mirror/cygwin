@@ -1,6 +1,6 @@
 // sidcpuutil.h - Elements common to CPU models.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -354,7 +354,7 @@ namespace sidutil
       {
 	this->step_cycles_pin.drive (n);
       }
-    void cg_profile (sid::host_int_4 caller, sid::host_int_4 callee)
+    virtual void cg_profile (sid::host_int_4 caller, sid::host_int_4 callee)
     {
       last_caller = caller;
       last_callee = callee;
@@ -373,7 +373,7 @@ namespace sidutil
 	                     << "  ";
 	}
     }
-    void cg_profile_jump (sid::host_int_4 caller, sid::host_int_4 callee)
+    virtual void cg_profile_jump (sid::host_int_4 caller, sid::host_int_4 callee)
     {
       last_caller = caller;
       last_callee = callee;
@@ -645,6 +645,18 @@ namespace sidutil
 	    update_trace_result_p ();
 	    return;
 	  }
+      }
+
+    virtual component::status dynamic_config(const string& spec)
+      {
+	// Call up to the base class
+	component::status s = configurable_component::dynamic_config (spec);
+
+	// Check whether insn-count must be forced to 1
+	if (trace_counter_p)
+	  configure ("insn-count=1");
+
+	return s;
       }
 
     // state save/restore: Override these in derived classes, but

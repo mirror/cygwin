@@ -1,3 +1,8 @@
+2006-05-15  Frank Ch. Eigler  <fche@elastic.org>
+
+	From Wesley Li-Wei Chou <wesley@andestech.com>:
+	* component.dtd: Add xml encoding tag to header.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

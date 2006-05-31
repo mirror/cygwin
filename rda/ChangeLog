@@ -1,3 +1,12 @@
+2006-05-31  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* samples/Makefile.am: Replace INTLLIBS and INTLDEPS with LIBINTL
+	and LIBINTL_DEP everywhere.
+	* acinclude.m4: Include new gettext macros.
+	* configure.in: Use ZW_GNU_GETTEXT_SISTER_DIR.
+	* Makefile.in, aclocal.m4, configure, lib/Makefile.in,
+	qe/Makefile.in, samples/Makefile.in: Regenerated.
+
 2006-03-16  Kevin Buettner  <kevinb@redhat.com>
 
 	* include/gdbloop.h (gdbloop, gdbloop_poll): Revise comments

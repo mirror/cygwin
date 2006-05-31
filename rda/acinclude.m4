@@ -7,10 +7,4 @@ AC_DEFUN([AM_PROG_LIBTOOL],)
 AC_SUBST(LIBTOOL)
 ])
 
-sinclude(../gettext.m4)
-dnl The lines below arrange for aclocal not to bring gettext.m4's
-dnl CY_WITH_NLS into aclocal.m4.
-ifelse(yes,no,[
-AC_DEFUN([CY_WITH_NLS],)
-AC_SUBST(INTLLIBS)
-])
+sinclude(../../gettext-sister.m4)

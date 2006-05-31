@@ -12,8 +12,8 @@ INCLUDES = -I$(srcdir) -I$(srcdir)/../include
 
 sample_SOURCES = main.c demo-target.c
 sample_DEPLIBS = ../lib/librda.la 
-sample_LDADD = $(sample_DEPLIBS) $(INTLLIBS)
-sample_DEPENDENCIES = $(sample_DEPLIBS) $(INTLDEPS)
+sample_LDADD = $(sample_DEPLIBS) $(LIBINTL)
+sample_DEPENDENCIES = $(sample_DEPLIBS) $(LIBINTL_DEP)
 
 async_SOURCES = async.c demo-target.c
 async_LDADD = ../lib/librda.la

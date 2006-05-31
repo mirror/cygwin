@@ -97,7 +97,7 @@ esac
 dnl $targ_subdirs is expanded at configure run time
 AC_SUBST(targ_subdirs)
 
-CY_WITH_NLS
+ZW_GNU_GETTEXT_SISTER_DIR
 
 dnl Outputs
 AC_OUTPUT(Makefile lib/Makefile samples/Makefile qe/Makefile)

@@ -1,3 +1,12 @@
+2006-06-14  Dave Brolley  <brolley@redhat.com>
+
+	* gprof.cxx (gprof_component): Remove sim_sched and sim_sched_event.
+	Remove the sim-sched-event attribute and the sim-sched relation.
+	(accumulate): Increment the bucket count by the value driven on the
+	pin.
+	(configure): No longer a subscription to the target scheduler to
+	maintain.
+
 2006-05-11  Dave Brolley  <brolley@redhat.com>
 
 	* gprof.cxx (hitcount_map_t): PC now host_int_8.

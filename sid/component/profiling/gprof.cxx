@@ -135,9 +135,6 @@ namespace profiling_components
     vector<statistics> stats;
     unsigned current_stats;
 
-    component *sim_sched;
-    string sim_sched_event;
-
     string target_attribute;
     component* target_component;
 
@@ -272,7 +269,7 @@ namespace profiling_components
 	return component::ok;
       }
 
-    void accumulate (host_int_4)
+    void accumulate (host_int_4 ticks)
       {
 	if (! this->target_component) return;
 
@@ -300,7 +297,7 @@ namespace profiling_components
 
 	if (quantized < this->stats[current_stats].value_min) this->stats[current_stats].value_min = quantized;
 	if (quantized > this->stats[current_stats].value_max) this->stats[current_stats].value_max = quantized;
-	this->stats[current_stats].value_hitcount_map [quantized] ++;
+	this->stats[current_stats].value_hitcount_map [quantized] += ticks;
       }
 
     void accumulate_call (host_int_4 selfpc_low)
@@ -559,38 +556,13 @@ namespace profiling_components
 		      }
 		    current_stats = i;
 		  }
-
-		// If cycles was specified, then we need to be subscribed to the
-		// target scheduler
-		if (! sim_sched)
-		  return;
-		if (parts.size () == 2)
-		  {
-		    host_int_4 cycles;
-		    component::status s = parse_attribute (parts[1], cycles);
-		    if (s == component::ok)
-		      {
-			sim_sched->connect_pin (sim_sched_event + "-event", & accumulate_pin);
-			sim_sched->set_attribute_value (sim_sched_event + "-time", make_attribute (cycles));
-			// Take a sample now to make up for the one which just got cancelled when
-			// N-time was set.
-			accumulate (1);
-			return;
-		      }
-		  }
 	      }
-	    // No gprof config or cycles was not specified. We will not be triggered by the
-	    // target scheduler.
-	    if (sim_sched)
-	      sim_sched->disconnect_pin (sim_sched_event + "-event", & accumulate_pin);
 	    return;
 	  }
       }
 
   public:
     gprof_component ():
-      sim_sched (0),
-      sim_sched_event ("0"),
       target_attribute ("pc"),
       target_component (0),
       output_file_format (endian_unknown),
@@ -605,7 +577,6 @@ namespace profiling_components
 
 	add_pin ("sample", & this->accumulate_pin);
 	add_attribute ("sample", & this->accumulate_pin, "pin");
-	add_attribute ("sim-sched-event", & this->sim_sched_event, "setting");
 	add_pin ("cg-caller", & this->cg_caller_pin);
 	add_attribute ("cg-caller", & this->cg_caller_pin, "pin");
 	add_pin ("cg-caller-hi", & this->cg_caller_hi_pin);
@@ -653,7 +624,6 @@ namespace profiling_components
 			       "setting");
 	add_attribute ("output-file-endianness", & this->output_file_format, "setting");
 	add_uni_relation ("target-component", & this->target_component);
-	add_uni_relation ("sim-sched", & this->sim_sched);
 
 	cg_caller_hi_pin.driven (0);
 	cg_callee_hi_pin.driven (0);

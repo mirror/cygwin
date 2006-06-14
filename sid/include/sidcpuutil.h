@@ -253,6 +253,7 @@ namespace sidutil
     output_pin cg_callee_pin;
     output_pin cg_jump_pin;
     output_pin cg_return_pin;
+    output_pin sample_gprof_pin;
    
     // tracing
   private:
@@ -310,7 +311,6 @@ namespace sidutil
 	recursion_record limit (& this->step_limit);
 	if (UNLIKELY(! limit.ok())) return;
 
-	this->current_step_insn_count = 0;
 	this->yield_p = false;
 
 	// Check for triggerpoints due right now; may set yield_p!
@@ -320,7 +320,12 @@ namespace sidutil
 	sid::host_int_8 prev_latency = this->total_latency;
 	sid::host_int_8 prev_insn_count = this->total_insn_count;
 	if (! this->yield_p)
-	  this->step_insns ();
+	  {
+	    if (UNLIKELY (this->gprof_configured_p))
+	      this->sample_gprof (1);
+	    this->gprof_prev_latency = this->total_latency;
+	    this->step_insns ();
+	  }
 	sid::host_int_8 num_insns = this->total_insn_count - prev_insn_count;
 	sid::host_int_8 latency = this->total_latency - prev_latency;
 
@@ -392,10 +397,40 @@ namespace sidutil
       return num;
     }
 
+    void sample_gprof (sid::host_int_4 num_insns)
+    {
+      this->gprof_counter += num_insns;
+
+      // Sample for gprof in insn-count mode?
+      if (this->gprof_cycles == 0)
+	{
+	  sid::host_int_4 ticks = this->gprof_counter / this->step_insn_count;
+	  if (ticks > 0)
+	    {
+	      this->sample_gprof_pin.drive (ticks);
+	      this->gprof_counter %= this->step_insn_count;
+	    }
+	  return;
+	}
+
+      // Sample for gprof in cycle mode
+      if ((sid::signed_host_int_8)(this->total_latency) > (sid::signed_host_int_8)(this->gprof_prev_latency))
+	this->gprof_counter += this->total_latency - this->gprof_prev_latency;
+
+      sid::host_int_4 ticks = this->gprof_counter / this->gprof_cycles;
+      if (ticks > 0)
+	{
+	  this->sample_gprof_pin.drive (ticks);
+	  this->gprof_counter %= this->gprof_cycles;
+	}
+    }
+
     virtual void step_insns () = 0;
     bool stop_after_insns_p (sid::host_int_4 num)
       {
 	this->current_step_insn_count += num;
+
+	bool rc;
 	if (UNLIKELY(this->yield_p ||
 		    (this->current_step_insn_count >= this->step_insn_count)))
           {
@@ -403,12 +438,22 @@ namespace sidutil
             // arithmetic overhead in the inner insn-stepping loops.
 	    this->total_insn_count += this->current_step_insn_count;
 	    this->current_step_insn_count = 0;
-	    return true;
+	    rc = true; // stop!
           }
         else
+	  rc = false; // don't stop
+
+	// Sample for gprof?
+	if (UNLIKELY (this->gprof_configured_p))
 	  {
-	    return false;
+	    // Count 1 fewer insns if exiting to account for the one counted on entry
+	    if (rc)
+	      --num;
+	    this->sample_gprof (num);
 	  }
+	this->gprof_prev_latency = this->total_latency;
+
+	return rc;
       }
 
     void
@@ -487,7 +532,7 @@ namespace sidutil
 	return static_cast<cpu_trap_disposition>(trap_disposition_pin.sense ());
       }
 
-    void unconfigure_gprof (const string &gprof_spec, sid::host_int_4 num_cycles)
+    void unconfigure_gprof ()
       {
 	if (! gprof_configured_p)
 	  return;
@@ -495,42 +540,18 @@ namespace sidutil
 	assert (gprof);
 	sid::pin *p;
 
-#if 0 // can't happen?
-	// If 'cycles' was specified on the --gprof option, then
-	// first, sample the address of the branch which caused
-	// the reconfig for the given number of cycles.
-	if (num_cycles && last_caller && gprof_spec.size () > 6)
-	  {
-	    vector<string> parts = tokenize (gprof_spec.substr (6), ",");
-	    if (parts.size () > 1)
-	      {
-		p = gprof->find_pin ("sample");
-		if (p)
-		  {
-		    std::string save_pc = this->attribute_value ("pc");
-		    if (! save_pc.empty ())
-		      {
-			sid::component::status s = this->set_attribute_value ("pc", make_numeric_attribute (last_caller));
-			if (s == sid::component::ok)
-			  for (int i = 0; i < num_cycles; ++i)
-			    p->driven (1);
-			this->set_attribute_value ("pc", save_pc);
-		      }
-		  }
-	      }
-	  }
-#endif
-
 	// Then disconnect the call graph notification pins.
 	p = gprof->find_pin ("cg-caller");
 	if (p) cg_caller_pin.disconnect (p); 
 	p = gprof->find_pin ("cg-callee");
 	if (p) cg_callee_pin.disconnect (p);
+	p = gprof->find_pin ("sample");
+	if (p) sample_gprof_pin.disconnect (p);
 
 	gprof_configured_p = false;
       }
 
-    void configure_gprof ()
+    void configure_gprof (const string &config)
       {
 	if (gprof_configured_p)
 	  return;
@@ -551,6 +572,22 @@ namespace sidutil
 	    p->driven (last_callee); 
 	}
 
+	p = gprof->find_pin ("sample");
+	if (p)
+	  sample_gprof_pin.connect (p);
+
+	vector<string> parts = tokenize (config.substr (6), ",");
+	if (parts.size () == 2)
+	  {
+	    component::status s = parse_attribute (parts[1], gprof_cycles);
+	    gprof_counter = gprof_cycles - 1;
+	  }
+	else
+	  {
+	    gprof_cycles = 0;
+	    gprof_counter = step_insn_count - 1;
+	  }
+
 	gprof_configured_p = true;
       }
 
@@ -563,6 +600,9 @@ namespace sidutil
     sid::host_int_4 last_caller;
     sid::host_int_4 last_callee;
     bool gprof_configured_p;
+    sid::host_int_4 gprof_cycles;
+    sid::host_int_4 gprof_counter;
+    sid::host_int_8 gprof_prev_latency;
 
     virtual void configure (const string &config)
       {
@@ -580,9 +620,9 @@ namespace sidutil
 	    gprof->set_attribute_value ("configure!", config);
 	    // Now do our own configuration
 	    if (config.size () > 6)
-	      configure_gprof ();
+	      configure_gprof (config);
 	    else
-	      unconfigure_gprof (config, num_cycles);
+	      unconfigure_gprof ();
 	    return;
 	  }
 	if (config.size () <= 11)
@@ -592,7 +632,11 @@ namespace sidutil
 	    sid::host_int_4 n;
 	    sid::component::status s = parse_attribute (config.substr (11), n);
 	    if (s == sid::component::ok)
-	      step_insn_count = n;
+	      {
+		step_insn_count = n;
+		if (gprof_configured_p && gprof_cycles == 0)
+		  gprof_counter = step_insn_count - 1;
+	      }
 	    return;
 	  }
 	if (config.substr (0, 8) == "verbose=")
@@ -838,6 +882,7 @@ namespace sidutil
 public:
     basic_cpu ():
       total_latency (0),
+      current_step_insn_count (0),
       step_limit ("instruction stepping", 1),
       sched_query (this),
       triggerpoint_manager (this),
@@ -857,6 +902,7 @@ public:
       last_caller (0),
       last_callee (0),
       gprof_configured_p (false),
+      gprof_prev_latency (0),
       core_probe (0),
       main (0)
       {
@@ -881,6 +927,7 @@ public:
 	add_pin ("cg-return", & this->cg_return_pin);
 	add_pin ("cg-jump", & this->cg_jump_pin);
 	add_pin ("print-insn-summary!", & this->print_insn_summary_pin);
+	add_pin ("sample-gprof", &sample_gprof_pin);
 	add_pin ("endian-set!", & this->endian_set_pin);
 	add_pin ("eflags-set!", & this->eflags_set_pin);
 	add_watchable_pin ("trap", & this->trap_type_pin); // output side

@@ -1,3 +1,19 @@
+2006-06-14  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (basic_cpu::sample_gprof_pin): New pin.
+	(sample_gprof): New method of basic_cpu.
+	(step_pin_handler): Don't reset current_step_insn_count.
+	Call sample_gprof, if requested and save latency.
+	(stop_after_insns_p): Likewise.
+	(unconfigure_gprof): Now takes no arguments. Remove unused code.
+	Disconnect the sample_gprof_pin.
+	(configure_gprof): Now takes configuration string. Connect the
+	sample_gprof_pin. Determine the sampling mode.
+	(gprof_cycles,gprof_counter,gprof_prev_latency): New members of
+	basic_cpu.
+	(configure): Initialize gprof_counter.
+	(basic_cpu): Add sample-gprof pin.
+
 2006-05-11  Dave Brolley  <brolley@redhat.com>
 
 	* sidcpuutil.h (cg_profile): Now virtual.

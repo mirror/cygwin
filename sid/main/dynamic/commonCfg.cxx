@@ -1002,21 +1002,8 @@ GprofCfg::GprofCfg (const string name,
 {
   assert (cpu);
   assert (sess);
-  // Add a subscription to the target scheduler. Even if it's not
-  // used now, it could be used due to dynamic configuration.
-  assert (sess->sim_sched);
-  int slot = sess->sim_sched->add_subscription (this, "sample");
-  sess->sim_sched->set_regular (slot, true);
-  sess->sim_sched->set_time (slot, interval);
-  sess->sim_sched->set_priority (slot, SchedCfg::gprof_priority);
 
-  if (type != simulated_cycles)
-    {
-      // default to instruction_count
-      string ev = sidutil::make_attribute (cpu->get_subscription_number());
-      ev += "-event";
-      conn_pin (sess->sim_sched, ev, this, "sample");
-    }
+  conn_pin (cpu, "sample-gprof", this, "sample");
 
   sess->shutdown_seq->add_output (7, this, "store");
   relate (this, "target-component", cpu);
@@ -1025,7 +1012,6 @@ GprofCfg::GprofCfg (const string name,
   set (this, "value-attribute", "pc");
   set (this, "bucket-size", "4"); // bytes-per-bucket
   set (this, "output-file", filename);
-  set (this, "sim-sched-event", sidutil::make_attribute (slot));
 }
 
 // Create a gprof component but don't activate it
@@ -1039,19 +1025,11 @@ GprofCfg::GprofCfg (const string name,
 {
   assert (cpu);
   assert (sess);
-  // Add a subscription to the target scheduler. Even if it's not
-  // used now, it could be used due to dynamic configuration.
-  assert (sess->sim_sched);
-  int slot = sess->sim_sched->add_subscription (this, "sample");
-  sess->sim_sched->set_regular (slot, true);
-  sess->sim_sched->set_time (slot, 1);
-  sess->sim_sched->set_priority (slot, SchedCfg::gprof_priority);
 
   sess->shutdown_seq->add_output (7, this, "store");
   relate (this, "target-component", cpu);
   set (this, "value-attribute", "pc");
   set (this, "bucket-size", "4"); // bytes-per-bucket
-  set (this, "sim-sched-event", sidutil::make_attribute (slot));
 }
 
 
@@ -1330,7 +1308,6 @@ void BoardCfg::write_config (Writer &w)
       if (gprof)
       	{
 	  // gprof's configure! attribute will be set by the cpu.
-	  Relation (gprof, "sim-sched", sess->sim_sched).write_to (w);
 	  Relation (cpu, "gprof", gprof).write_to (w);
       	}
       if (! gloss->possibly_wrapped ())

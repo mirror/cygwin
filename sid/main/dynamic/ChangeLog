@@ -1,3 +1,11 @@
+2006-06-14  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.cxx (GprofCfg): Don't subscribe to the target scheduler.
+	Connect the cpu's sample-gprof pin to our sample pin. No longer any
+	relation with the target scheduler.
+	(BoardCfg::write_config): Nl longer any relation between gprof and
+	the target scheduler.
+
 2006-05-11  Dave Brolley  <brolley@redhat.com>
 
 	* commonCfg.cxx (CacheCfg::CacheCfg (const string name)): Now takes

@@ -1,3 +1,9 @@
+2006-06-20  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.cxx (BoardCfg::write_config): If there is a loader, then
+	relate it to the cpu and connect the cpu's disassembly-symbol-address
+	pin to the loader's function? pin.
+
 2006-06-14  Dave Brolley  <brolley@redhat.com>
 
 	* commonCfg.cxx (GprofCfg): Don't subscribe to the target scheduler.

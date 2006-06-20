@@ -1256,6 +1256,14 @@ void BoardCfg::write_config (Writer &w)
 {
   AggregateCfg::write_config (w);
 
+  // Make the connection which allows the cpu to query the loader regarding
+  // addresses.
+  if (loader)
+    {
+      Relation (cpu, "loader", loader).write_to (w);
+      PinConnection (cpu, "disassembly-symbol-address", loader, "function?").write_to (w);
+    }
+
   if (gloss)
     {      
       if (gdb)

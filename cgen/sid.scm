@@ -170,17 +170,6 @@
 
 ; Attribute support.
 
-; Return the C++ type to use to hold a value for attribute ATTR.
-
-(define (gen-attr-type attr)
-  (case (attr-kind attr)
-    ((boolean) "int")
-    ((bitset)  "unsigned int")
-    ((integer) "int")
-    ((enum)    (string-append "enum " (string-downcase (gen-sym attr)) "_attr"))
-    )
-)
-
 ; Return C code to fetch a value from instruction memory.
 ; PC-VAR is the C expression containing the address of the start of the
 ; instruction.

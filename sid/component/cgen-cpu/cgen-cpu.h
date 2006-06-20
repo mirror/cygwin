@@ -70,7 +70,11 @@ public:
   void disassemble (PCADDR pc, disassembler_ftype printfn,
 		    enum bfd_flavour flavour, enum bfd_architecture arch,
 		    enum bfd_endian endian, const char *name, CGEN_BITSET *isas = 0, int machine = 0);
+  string symbol_at_address;
   struct disassemble_info info;
+  component *loader;
+  output_pin disassembly_symbol_address_pin;
+
 protected:
   static int cgen_read_memory (bfd_vma memaddr, bfd_byte *myaddr,
 		     unsigned int length,

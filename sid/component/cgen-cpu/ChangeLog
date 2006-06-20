@@ -1,3 +1,13 @@
+2006-06-20  Dave Brolley  <brolley@redhat.com>
+
+	* compCGEN.cxx (cgen_bi_endian_cpu): Initialize loader. Add "loader"
+	relation and "disassembly-symbol-address" pin.
+	(cgen_print_address): Call cgen_symbol_at_address and print the
+	symbol name.
+	(cgen_symbol_at_address): Implemented.
+	* cgen-cpu.h (class cgen_bi_endian_cpu): Add symbol_at_address,
+	loader and disassembly_symbol_address_pin.
+
 2006-06-14  Dave Brolley  <brolley@redhat.com>
 
 	* cgen-fpu.h (cgen_fp_ops): All operations now take

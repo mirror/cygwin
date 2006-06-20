@@ -42,6 +42,7 @@ using namespace cgen;
 // ----------------------------------------------------------------------------
 cgen_bi_endian_cpu::cgen_bi_endian_cpu ()
 {
+  loader = 0;
   branch_was_return = false;
   warnings_enabled = false;
   add_attribute ("enable-warnings?", & warnings_enabled, "setting");
@@ -50,6 +51,8 @@ cgen_bi_endian_cpu::cgen_bi_endian_cpu ()
 			 & cgen_bi_endian_cpu::set_engine_type,
 			 & cgen_bi_endian_cpu::get_engine_type,
 			 "setting");
+  add_uni_relation("loader", &loader);
+  add_pin ("disassembly-symbol-address", & disassembly_symbol_address_pin);
 }
 
 
@@ -230,16 +233,33 @@ cgen_bi_endian_cpu::cgen_print_address(bfd_vma addr, struct disassemble_info *in
 {
   cgen_bi_endian_cpu *thisp = static_cast<cgen_bi_endian_cpu *>(info->application_data);
 
-  thisp->trace_stream
-    << "0x" << hex << addr << dec;
+  thisp->trace_stream << hex << addr << dec;
+
+  if (cgen_symbol_at_address (addr, info))
+    if (! thisp->symbol_at_address.empty ())
+      thisp->trace_stream << " <" << thisp->symbol_at_address << '>';
 }
 
 int
 cgen_bi_endian_cpu::cgen_symbol_at_address(bfd_vma addr,
 					   struct disassemble_info * info)
 {
-  cerr << "cgen_bi_endian_cpu::symbol_at_address!?" << endl;
-  return 0;
+  cgen_bi_endian_cpu *thisp = static_cast<cgen_bi_endian_cpu *>(info->application_data);
+  if (thisp->loader)
+    {
+      thisp->disassembly_symbol_address_pin.drive (addr);
+      thisp->symbol_at_address = thisp->loader->attribute_value("current-function");
+    }
+  else
+    thisp->symbol_at_address = "";
+    
+  if (thisp->symbol_at_address.empty ())
+    {
+      cerr << "cgen_bi_endian_cpu::symbol_at_address!?" << endl;
+      return 0; // failed
+    }
+
+  return 1; // success
 }
 
 

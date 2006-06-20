@@ -420,7 +420,7 @@ void
 elf_loader::check_function_pin_handler (host_int_4 addr)
 {
   // Find the function corresponding to the given address in the symbol
-  // table, if any, and set current_function to that name. If no function is
+  // table, if any, and set current_function to that name. If a function is
   // found, set current_function to a string representing the address.
   if (symbol_table)
     {

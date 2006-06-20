@@ -322,8 +322,7 @@ namespace sidutil
 	if (! this->yield_p)
 	  {
 	    if (UNLIKELY (this->gprof_configured_p))
-	      this->sample_gprof (1);
-	    this->gprof_prev_latency = this->total_latency;
+	      this->sample_gprof (true);
 	    this->step_insns ();
 	  }
 	sid::host_int_8 num_insns = this->total_insn_count - prev_insn_count;
@@ -397,31 +396,46 @@ namespace sidutil
       return num;
     }
 
-    void sample_gprof (sid::host_int_4 num_insns)
+    void sample_gprof (bool before)
     {
-      this->gprof_counter += num_insns;
+      // What is the current cycle/insn? Always count insns.
+      sid::host_int_8 current_cycle = this->total_insn_count + this->current_step_insn_count;
 
-      // Sample for gprof in insn-count mode?
+      // If called before the insn execution loop, then the current insn
+      // hasn't been counted yet.
+      if (before)
+	++current_cycle;
+
+      // Count total_latency if we're in cycle mode.
+      if (this->gprof_cycles != 0)
+	current_cycle += this->total_latency;
+
+      // Have we advanced?
+      if (current_cycle <= this->gprof_prev_cycle)
+	return;
+
+      gprof_counter += current_cycle - this->gprof_prev_cycle;
+      this->gprof_prev_cycle = current_cycle;
+
       if (this->gprof_cycles == 0)
 	{
+	  // Sample for gprof in insn-count mode.
 	  sid::host_int_4 ticks = this->gprof_counter / this->step_insn_count;
 	  if (ticks > 0)
 	    {
 	      this->sample_gprof_pin.drive (ticks);
 	      this->gprof_counter %= this->step_insn_count;
 	    }
-	  return;
 	}
-
-      // Sample for gprof in cycle mode
-      if ((sid::signed_host_int_8)(this->total_latency) > (sid::signed_host_int_8)(this->gprof_prev_latency))
-	this->gprof_counter += this->total_latency - this->gprof_prev_latency;
-
-      sid::host_int_4 ticks = this->gprof_counter / this->gprof_cycles;
-      if (ticks > 0)
+      else
 	{
-	  this->sample_gprof_pin.drive (ticks);
-	  this->gprof_counter %= this->gprof_cycles;
+	  // Sample for gprof in cycle mode.
+	  sid::host_int_4 ticks = this->gprof_counter / this->gprof_cycles;
+	  if (ticks > 0)
+	    {
+	      this->sample_gprof_pin.drive (ticks);
+	      this->gprof_counter %= this->gprof_cycles;
+	    }
 	}
     }
 
@@ -445,13 +459,7 @@ namespace sidutil
 
 	// Sample for gprof?
 	if (UNLIKELY (this->gprof_configured_p))
-	  {
-	    // Count 1 fewer insns if exiting to account for the one counted on entry
-	    if (rc)
-	      --num;
-	    this->sample_gprof (num);
-	  }
-	this->gprof_prev_latency = this->total_latency;
+	  this->sample_gprof (false);
 
 	return rc;
       }
@@ -534,6 +542,7 @@ namespace sidutil
 
     void unconfigure_gprof ()
       {
+	gprof_unconfigured_p = true;
 	if (! gprof_configured_p)
 	  return;
 
@@ -576,16 +585,23 @@ namespace sidutil
 	if (p)
 	  sample_gprof_pin.connect (p);
 
+	// Set the state so that the next insn will be sampled, followed by
+	// samples at the specified interval. Reset gprof_prev_cycle only
+	// if gprof has been unconfigured at some point.
 	vector<string> parts = tokenize (config.substr (6), ",");
 	if (parts.size () == 2)
 	  {
 	    component::status s = parse_attribute (parts[1], gprof_cycles);
 	    gprof_counter = gprof_cycles - 1;
+	    if (gprof_unconfigured_p)
+	      gprof_prev_cycle = this->total_insn_count + this->total_latency;
 	  }
 	else
 	  {
 	    gprof_cycles = 0;
 	    gprof_counter = step_insn_count - 1;
+	    if (gprof_unconfigured_p)
+	      gprof_prev_cycle = this->total_insn_count;
 	  }
 
 	gprof_configured_p = true;
@@ -600,9 +616,10 @@ namespace sidutil
     sid::host_int_4 last_caller;
     sid::host_int_4 last_callee;
     bool gprof_configured_p;
+    bool gprof_unconfigured_p;
     sid::host_int_4 gprof_cycles;
     sid::host_int_4 gprof_counter;
-    sid::host_int_8 gprof_prev_latency;
+    sid::host_int_8 gprof_prev_cycle;
 
     virtual void configure (const string &config)
       {
@@ -635,7 +652,12 @@ namespace sidutil
 	      {
 		step_insn_count = n;
 		if (gprof_configured_p && gprof_cycles == 0)
-		  gprof_counter = step_insn_count - 1;
+		  {
+		    // Set the state so that the next insn will be sampled,
+		    // followed by samples at the specified interval.
+		    gprof_counter = step_insn_count - 1;
+		    gprof_prev_cycle = this->total_insn_count - 1;
+		  }
 	      }
 	    return;
 	  }
@@ -902,7 +924,8 @@ public:
       last_caller (0),
       last_callee (0),
       gprof_configured_p (false),
-      gprof_prev_latency (0),
+      gprof_unconfigured_p (false),
+      gprof_prev_cycle (0),
       core_probe (0),
       main (0)
       {

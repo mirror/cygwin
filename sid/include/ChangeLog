@@ -1,3 +1,14 @@
+2006-06-20  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (basic_cpu): Remove gprof_prev_latency. Add
+	gprof_prev_cycle, gprof_unconfigured_p.
+	(sample_gprof): Now takes bool argument. Compute number of samples
+	based on total_insn_count + current_step_insn_count + total_latency.
+	(unconfigure_gprof): Set gprof_unconfigured_p.
+	(configure_gprof): Only reset gprof_pref_cycle if gprof_unconfigured_p
+	is true.
+	(configure): When configuring --insn-count reset gprof_prev_cycle.
+
 2006-06-14  Dave Brolley  <brolley@redhat.com>
 
 	* sidcpuutil.h (basic_cpu::sample_gprof_pin): New pin.

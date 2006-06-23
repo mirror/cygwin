@@ -85,21 +85,21 @@ bfd_get_arch(bfd *abfd)
 /* Stolen from libbfd.  */
 
 extern "C" bfd_vma
-bfd_getb16 (register const void *addr)
+bfd_getb16 (const void *addr)
 {
   const bfd_byte *byteaddr = static_cast <const bfd_byte *> (addr);
   return (byteaddr[0] << 8) | byteaddr[1];
 }
 
 extern "C" bfd_vma
-bfd_getl16 (register const void *addr)
+bfd_getl16 (const void *addr)
 {
   const bfd_byte *byteaddr = static_cast <const bfd_byte *> (addr);
   return (byteaddr[1] << 8) | byteaddr[0];
 }
 
 extern "C" bfd_vma
-bfd_getb32 (register const void *addr)
+bfd_getb32 (const void *addr)
 {
   const bfd_byte *byteaddr = static_cast <const bfd_byte *> (addr);
   unsigned long v;
@@ -112,7 +112,7 @@ bfd_getb32 (register const void *addr)
 }
 
 extern "C" bfd_vma
-bfd_getl32 (register const void *addr)
+bfd_getl32 (const void *addr)
 {
   const bfd_byte *byteaddr = static_cast <const bfd_byte *> (addr);
   unsigned long v;

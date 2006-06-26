@@ -56,6 +56,12 @@ public:
       this->hardware.h_pc = (PCADDR) v; 
     }
 
+  host_int_4
+  get_pc ()
+    {
+      return this->hardware.h_pc;
+    }
+
   // Called by semantic code to perform branches.
   inline void
   branch (PCADDR new_pc, PCADDR& npc, sem_status& status)

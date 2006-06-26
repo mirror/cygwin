@@ -1,3 +1,7 @@
+2006-06-26  Dave Brolley  <brolley@redhat.com>
+
+	* m32rbf.h (get_pc): New member of m32rbf_cpu.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.

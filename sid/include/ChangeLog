@@ -1,3 +1,12 @@
+2006-06-26  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (gprof_pc_pin,gprof_pc_hi_pin): New members of
+	basic_cpu.
+	(sample_gprof): Drive gprof_pc_pin and gprof_pc_hi_pin.
+	(get_pc,get_pc_hi): New methods of basic_cpu.
+	(read_watchpoint_memory): Use get_pc.
+	(basic_cpu): Add gprof-pc and gprof-pc-hi pins.
+
 2006-06-20  Dave Brolley  <brolley@redhat.com>
 
 	* sidcpuutil.h (basic_cpu): Remove gprof_prev_latency. Add

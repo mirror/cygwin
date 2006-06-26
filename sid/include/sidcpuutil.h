@@ -253,6 +253,8 @@ namespace sidutil
     output_pin cg_callee_pin;
     output_pin cg_jump_pin;
     output_pin cg_return_pin;
+    output_pin gprof_pc_hi_pin;
+    output_pin gprof_pc_pin;
     output_pin sample_gprof_pin;
    
     // tracing
@@ -417,6 +419,8 @@ namespace sidutil
       gprof_counter += current_cycle - this->gprof_prev_cycle;
       this->gprof_prev_cycle = current_cycle;
 
+      this->gprof_pc_hi_pin.drive (this->get_pc_hi ());
+      this->gprof_pc_pin.drive (this->get_pc ());
       if (this->gprof_cycles == 0)
 	{
 	  // Sample for gprof in insn-count mode.
@@ -514,6 +518,8 @@ namespace sidutil
   private:
     callback_pin<basic_cpu> pc_set_pin;
     virtual void set_pc(sid::host_int_4) = 0;
+    virtual sid::host_int_4 get_pc() = 0;
+    virtual sid::host_int_4 get_pc_hi() { return 0; }
     void pc_set_pin_handler(sid::host_int_4 v) { this->set_pc (v); }
 
     // Set the initial endianness after reset
@@ -860,10 +866,7 @@ namespace sidutil
 	sid::host_int_4 length  = addr_and_length.second;
 
 	// We'll need the current pc.
-	std::string pc_str = this->attribute_value ("pc");
-	sid::host_int_4 pc;
-	sid::component::status rc = sidutil::parse_attribute (pc_str, pc);
-	assert (rc == sid::component::ok);
+	sid::host_int_4 pc = get_pc ();
 
 	// Just read from insn memory by default
 	switch (length)
@@ -951,6 +954,8 @@ public:
 	add_pin ("cg-jump", & this->cg_jump_pin);
 	add_pin ("print-insn-summary!", & this->print_insn_summary_pin);
 	add_pin ("sample-gprof", &sample_gprof_pin);
+	add_pin ("gprof-pc-hi", &gprof_pc_hi_pin);
+	add_pin ("gprof-pc", &gprof_pc_pin);
 	add_pin ("endian-set!", & this->endian_set_pin);
 	add_pin ("eflags-set!", & this->eflags_set_pin);
 	add_watchable_pin ("trap", & this->trap_type_pin); // output side

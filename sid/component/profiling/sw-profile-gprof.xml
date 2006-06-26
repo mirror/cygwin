@@ -6,6 +6,8 @@
 
     <!-- pins -->
     <defpin name="reset" direction="in" legalvalues="any" behaviors="resetting" />
+    <defpin name="pc" direction="in" legalvalues="any" behaviors="data gathering" />
+    <defpin name="pc-hi" direction="in" legalvalues="any" behaviors="data gathering" />
     <defpin name="sample" direction="in" legalvalues="any" behaviors="data gathering" />
     <defpin name="cg-caller" direction="in" legalvalues="any" behaviors="data gathering" />
     <defpin name="cg-caller-hi" direction="in" legalvalues="any" behaviors="data gathering" />
@@ -21,7 +23,6 @@
     <defattribute name="limit-max" category="setting" legalvalues="decimal string" defaultvalue="infinity" behaviors="data gathering" />
     <defattribute name="bucket-size" category="setting" legalvalues="integer" defaultvalue="1" behaviors="data gathering" />
     <defattribute name="pc-size" category="setting" legalvalues="4 or 8" defaultvalue="4" behaviors="data gathering" />
-    <defattribute name="value-attribute" category="setting" legalvalues="name" defaultvalue="'pc'" behaviors="data gathering" />
     <defattribute name="output-file" category="setting" legalvalues="file name" defaultvalue="'gmon.out'" behaviors="configuration" />
     <defattribute name="output-file-endianness" category="setting" legalvalues="0/1/2/little/big/unknown" defaultvalue="unknown" behaviors="configuration" />
     <defattribute name="reset" category="pin" behaviors="resetting" />
@@ -55,8 +56,7 @@
       <p>
       This component needs to be configured with the <relation>target-component</relation>
       relation.  The first element in the relation will be used as the
-      target of profiling.  The <attribute>value-attribute</attribute> setting contains the
-      name of the target component's attribute that will be collected. If pc-size is 64, then
+      target of profiling.  If pc-size is 64, then
       the target component should also have an attribute with the same name suffixed by "-hi"
       </p>
       <p>
@@ -78,13 +78,12 @@
     <behavior name="data gathering">
       <p>
       Whenever the <pin>sample</pin> pin is driven, this component
-      takes a single sample of the configured target component's value
-      attribute.  The attribute is interpreted as a numeric string,
-      and the resulting number is accumulated in a big histogram, in
-      the appropriate bucket.  The bucket is chosen by masking the
-      number into <attribute>bucket-size</attribute>-wide buckets.
-      If the target component is unset, or its target attribute does
-      not result in a valid numeric string, no sample is accumulated.
+      takes a single sample using the number drive  on the pin.
+      The resulting number is accumulated in a big histogram, in
+      the appropriate bucket.  The bucket is chosen by combining the two 32 bit values
+      last driven on the <pin>pc</pin> and the <pin>pc-hi</pin> pins to form one 64 bit index.
+      This index is then masked into <attribute>bucket-size</attribute>-wide buckets.
+      If the target component is unset then no sample is accumulated.
       </p>
       <p>Alternately, if the <pin>cg-caller</pin> and perhaps the <pin>cg-caller-hi</pin>
       and then the <pin>cg-callee</pin> and perhaps the <pin>cg-callee-hi</pin>
@@ -144,18 +143,15 @@
       be driven by any activity in SID, such as bus traffic (see
       <tt>hw-probe-bus</tt>), or host or target schedulers (see
       <tt>sid-sched-*</tt>).
-      Perhaps the simplest way is to take a CPU PC sample every time
-      the CPU has completed a batch of instructions.</p>
+      </p>
 
     <code>
 	new sw-profile-gprof gprof
 	new SOME_KIND_OF_CPU cpu
 	relate gprof target-component cpu
 	connect-pin shutdown-manager output-5 -&gt; gprof store
-	connect-pin foo output -&gt; cpu step!
-	connect-pin foo output -&gt; gprof sample
-	# Set sampling interval by number of CPU instructions.
-	set cpu step-insn-count 127
+	connect-pin cpu sample-gprof -&gt; gprof sample
+	connect-pin cpu gprof-pc -&gt; gprof pc
     </code>
     <title>
    Host system

@@ -91,7 +91,7 @@ if ($ENV{'SID'}) {
   $sid .= "/sid";
 }
 
-$version=q$Id: configrun-sid.in,v 1.37 2005/12/16 10:23:12 nathan Exp $;
+$version=q$Id: configrun-sid.in,v 1.38 2006/06/26 22:00:12 brolley Exp $;
 
 # by default the loader data mapper connects to the cpu-mapper access-port
 $load_mapper_data = "cpu-mapper access-port";
@@ -499,12 +499,13 @@ if ($opt_cpu eq "mt")
 if ($opt_gprof)
   {
     $second_section .= "# gprof connections
-connect-pin target-sched 0-event -> gprof sample
 connect-pin deinit-sequence output-7 -> gprof store
-relate gprof target-component cpu
+connect-pin cpu sample-gprof -> gprof sample
+connect-pin cpu gprof-pc -> gprof pc
+connect-pin cpu gprof-pc-hi -> gprof pc-hi
 connect-pin cpu cg-caller -> gprof cg-caller
 connect-pin cpu cg-callee -> gprof cg-callee
-set gprof value-attribute pc
+relate gprof target-component cpu
 set gprof bucket-size 4 # bytes per bucket
 ";
   }

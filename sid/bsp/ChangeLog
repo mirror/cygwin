@@ -1,3 +1,12 @@
+2006-06-26  Dave Brolley  <brolley@redhat.com>
+
+	* configrun-sid.in (opt_gprof): Do not
+	"connect-pin target-sched 0-event -> gprof sample".
+	Do not "set gprof value-attribute pc".
+	connect-pin cpu sample-gprof -> gprof sample.
+	connect-pin cpu gprof-pc -> gprof pc.
+	connect-pin cpu gprof-pc-hi -> gprof pc-hi.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

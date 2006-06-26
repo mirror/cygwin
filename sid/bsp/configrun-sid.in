@@ -499,12 +499,13 @@ if ($opt_cpu eq "mt")
 if ($opt_gprof)
   {
     $second_section .= "# gprof connections
-connect-pin target-sched 0-event -> gprof sample
 connect-pin deinit-sequence output-7 -> gprof store
-relate gprof target-component cpu
+connect-pin cpu sample-gprof -> gprof sample
+connect-pin cpu gprof-pc -> gprof pc
+connect-pin cpu gprof-pc-hi -> gprof pc-hi
 connect-pin cpu cg-caller -> gprof cg-caller
 connect-pin cpu cg-callee -> gprof cg-callee
-set gprof value-attribute pc
+relate gprof target-component cpu
 set gprof bucket-size 4 # bytes per bucket
 ";
   }

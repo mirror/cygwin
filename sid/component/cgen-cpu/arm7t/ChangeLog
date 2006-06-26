@@ -1,3 +1,8 @@
+2006-06-26  Dave Brolley  <brolley@redhat.com>
+
+	* arm7f.h (get_pc): New member of arm7f_cpu.
+	* hw-cpu-arm7t.txt: Regenerated.
+
 2006-03-29  Harry Hsin-Hua Pan  <harry@andestech.com>
 
 	* arm7f.cxx (compute_operand2_immshift): Implement RRX.

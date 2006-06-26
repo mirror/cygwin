@@ -130,6 +130,12 @@ private:
       this->h_pc_set ((PCADDR) v);
     }
 
+  host_int_4
+  get_pc ()
+    {
+      return this->h_pc_get ();
+    }
+
   // debug support routines
   string dbg_get_reg (host_int_4 n);
   component::status dbg_set_reg (host_int_4 n, const string& s);

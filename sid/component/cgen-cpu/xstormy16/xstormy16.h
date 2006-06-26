@@ -48,6 +48,11 @@ namespace xstormy16
 	  this->hardware.h_pc = (PCADDR) v; 
 	}
 
+      host_int_4 get_pc ()
+        {
+	  return this->hardware.h_pc;
+	}
+
       // syscall temporary registers
       USI syscall_arg0;
       USI syscall_arg1;

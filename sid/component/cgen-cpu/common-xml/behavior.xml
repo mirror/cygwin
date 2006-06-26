@@ -79,6 +79,20 @@
       stream.</p>
     </behavior>
 
+    <behavior name="profiling">
+
+      <p>The component can be configured to provide samples for use by the
+      <component>sw-profile-gprof</component> component in creating
+      a gmon output file. A sample is provided each time the
+      <pin>sample-gprof</pin> is driven. Each time, before the
+      <pin>sample-gprof</pin> is driven, the <pin>gprof-pc</pin> and
+      <pin>gprof-pc-hi</pin> pins will be driven in order to provide the
+      current program counter. <pin>gprof-pc</pin> represents the low order
+      32 bits of the pc and <pin>gprof-pc-hi</pin> represents the high order
+      32 bits of the pc (if any).
+      </p>
+    </behavior>
+
     <behavior name="exceptions/traps">
 
       <p>When encountering exception/trap conditions such as memory

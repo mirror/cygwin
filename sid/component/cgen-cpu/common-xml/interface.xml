@@ -13,6 +13,9 @@
     <defpin name="flush-icache" direction="in" legalvalues="any" behaviors="execution" />
     <defpin name="print-insn-summary!" direction="in" legalvalues="any" behaviors="tracing" />
     <defpin name="trace" direction="in" legalvalues="any" behaviors="tracing" />
+    <defpin name="gprof-pc" direction="out" legalvalues="integer" behaviors="profiling" />
+    <defpin name="gprof-pc-hi" direction="out" legalvalues="integer" behaviors="profiling" />
+    <defpin name="sample-gprof" direction="out" legalvalues="positive integer" behaviors="profiling" />
 
     <!-- accessors -->
     <defaccessor name="data-memory" accesses="any" behaviors="execution" />

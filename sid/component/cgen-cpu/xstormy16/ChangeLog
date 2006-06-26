@@ -2,10 +2,6 @@
 
 	* xstormy16.h (get_pc): New member of xstormy16_cpu.
 
-2006-06-26  Dave Brolley  <brolley@redhat.com>
-
-	* xstormy16.h (get_pc): New member of xstormy16_cpu.
-
 2005-10-28  Dave Brolley  <brolley@redhat.com>
 
 	* xstormy16-desc.h: Regenerate.

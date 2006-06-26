@@ -1,5 +1,7 @@
 2006-06-26  Dave Brolley  <brolley@redhat.com>
 
+	* sw-profile-gprof.xml: Document new sampling interface.
+	* sw-profile-gprof.txt: Regenerated.
 	* gprof.cxx (target_attribute): Removed from gprof_component.
 	(pc_pin,pc_hi_pin): Added to gprof_component.
 	(bucket_size_set): Use local reference for this->stats[current_stats].

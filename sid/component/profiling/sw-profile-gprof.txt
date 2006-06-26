@@ -22,11 +22,7 @@ Functionality:
    |                | target-component relation. The |
    |                | first element in the relation  |
    |                | will be used as the target of  |
-   |                | profiling. The value-attribute |
-   |                | setting contains the name of   |
-   |                | the target component's         |
-   |                | attribute that will be         |
-   |                | collected. If pc-size is 64,   |
+   |                | profiling. If pc-size is 64,   |
    |                | then the target component      |
    |                | should also have an attribute  |
    |                | with the same name suffixed by |
@@ -54,21 +50,20 @@ Functionality:
    |----------------+--------------------------------|
    | data gathering | Whenever the sample pin is     |
    |                | driven, this component takes a |
-   |                | single sample of the           |
-   |                | configured target component's  |
-   |                | value attribute. The attribute |
-   |                | is interpreted as a numeric    |
-   |                | string, and the resulting      |
-   |                | number is accumulated in a big |
+   |                | single sample using the number |
+   |                | drive on the pin. The          |
+   |                | resulting number is            |
+   |                | accumulated in a big           |
    |                | histogram, in the appropriate  |
    |                | bucket. The bucket is chosen   |
-   |                | by masking the number into     |
+   |                | by combining the two 32 bit    |
+   |                | values last driven on the pc   |
+   |                | and the pc-hi pins to form one |
+   |                | 64 bit index. This index is    |
+   |                | then masked into               |
    |                | bucket-size-wide buckets. If   |
-   |                | the target component is unset, |
-   |                | or its target attribute does   |
-   |                | not result in a valid numeric  |
-   |                | string, no sample is           |
-   |                | accumulated.                   |
+   |                | the target component is unset  |
+   |                | then no sample is accumulated. |
    |                |                                |
    |                | Alternately, if the cg-caller  |
    |                | and perhaps the cg-caller-hi   |
@@ -151,17 +146,14 @@ Environment:
    This component is typically connected to a CPU, and told to monitor the
    CPU's program counter (pc) register. Sampling may be driven by any
    activity in SID, such as bus traffic (see hw-probe-bus), or host or target
-   schedulers (see sid-sched-*). Perhaps the simplest way is to take a CPU PC
-   sample every time the CPU has completed a batch of instructions.
+   schedulers (see sid-sched-*).
 
          new sw-profile-gprof gprof
          new SOME_KIND_OF_CPU cpu
          relate gprof target-component cpu
          connect-pin shutdown-manager output-5 -> gprof store
-         connect-pin foo output -> cpu step!
-         connect-pin foo output -> gprof sample
-         # Set sampling interval by number of CPU instructions.
-         set cpu step-insn-count 127
+         connect-pin cpu sample-gprof -> gprof sample
+         connect-pin cpu gprof-pc -> gprof pc
     
 
    Host system
@@ -190,6 +182,10 @@ Component Reference:
    |    name    |direction|legalvalues|    behaviors     |
    |------------+---------+-----------+------------------|
    |reset       |in       |any        |resetting         |
+   |------------+---------+-----------+------------------|
+   |pc          |in       |any        |data gathering    |
+   |------------+---------+-----------+------------------|
+   |pc-hi       |in       |any        |data gathering    |
    |------------+---------+-----------+------------------|
    |sample      |in       |any        |data gathering    |
    |------------+---------+-----------+------------------|
@@ -223,8 +219,6 @@ Component Reference:
 |bucket-size             |setting   |integer                   |1           |data gathering ||
 |------------------------+----------+--------------------------+------------+---------------||
 |pc-size                 |setting   |4 or 8                    |4           |data gathering ||
-|------------------------+----------+--------------------------+------------+---------------||
-|value-attribute         |setting   |name                      |'pc'        |data gathering ||
 |------------------------+----------+--------------------------+------------+---------------||
 |output-file             |setting   |file name                 |'gmon.out'  |configuration  ||
 |------------------------+----------+--------------------------+------------+---------------||

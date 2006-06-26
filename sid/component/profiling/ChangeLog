@@ -1,3 +1,14 @@
+2006-06-26  Dave Brolley  <brolley@redhat.com>
+
+	* gprof.cxx (target_attribute): Removed from gprof_component.
+	(pc_pin,pc_hi_pin): Added to gprof_component.
+	(bucket_size_set): Use local reference for this->stats[current_stats].
+	(accumulate_call): Likewise.
+	(accumulate): Likewise. Use pc_pin and pc_hi_pin instead of
+	target_attribute to get the pc.
+	(gprof_component): Add pc and pc-hi pins. Don't add value-attribute
+	attribute. Initialize the driven value of pc_hi_pin with 0.
+
 2006-06-14  Dave Brolley  <brolley@redhat.com>
 
 	* gprof.cxx (gprof_component): Remove sim_sched and sim_sched_event.

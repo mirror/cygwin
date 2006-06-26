@@ -135,13 +135,14 @@ namespace profiling_components
     vector<statistics> stats;
     unsigned current_stats;
 
-    string target_attribute;
     component* target_component;
 
     endian output_file_format;
 
     callback_pin<gprof_component> accumulate_pin;
 
+    input_pin pc_hi_pin;
+    input_pin pc_pin;
     input_pin cg_caller_hi_pin;
     input_pin cg_caller_pin;
     input_pin cg_callee_hi_pin;
@@ -214,8 +215,9 @@ namespace profiling_components
 	if (s != component::ok) return s;
 
 	// Reject change if we already have samples 
-	if ((this->stats[current_stats].value_count != 0) &&
-	    (this->stats[current_stats].bucket_size != new_bucket_size))
+	statistics &st = this->stats[current_stats];
+	if ((st.value_count != 0) &&
+	    (st.bucket_size != new_bucket_size))
 	  {
 	    cerr << "sw-profile-gprof: invalid time to change bucket size" << endl;
 	    return component::bad_value;
@@ -228,7 +230,7 @@ namespace profiling_components
 	    return component::bad_value;
 	  }
 
-	this->stats[current_stats].bucket_size = new_bucket_size;
+	st.bucket_size = new_bucket_size;
 	return component::ok;
       }
 
@@ -273,31 +275,21 @@ namespace profiling_components
       {
 	if (! this->target_component) return;
 
-	string value_str = this->target_component->attribute_value (this->target_attribute);
-	host_int_8 value;
-	component::status s = parse_attribute (value_str, value);
-	if (s != component::ok) return;
-
-	value_str = this->target_component->attribute_value (this->target_attribute + "-hi");
-	host_int_8 value_hi;
-	s = parse_attribute (value_str, value_hi);
-	if (s != component::ok)
-	  value_hi = 0;
-
-	value = (value_hi << 32) | (value & 0xffffffff);
+	host_int_8 value = (((host_int_8)this->pc_hi_pin.sense ()) << 32) | (this->pc_pin.sense () & 0xffffffff);
 
 	//	std::cout << "sampled at 0x" << std::hex << value << std::dec << " for " << stats[current_stats].output_file << endl;
 	// Reject out-of-bounds samples
-	if (value < this->stats[current_stats].limit_min || value > this->stats[current_stats].limit_max) return;
+	statistics &st = this->stats[current_stats];
+	if (value < st.limit_min || value > st.limit_max) return;
 
-	stats[current_stats].value_count ++;
+	st.value_count ++;
 
-	assert (this->stats[current_stats].bucket_size != 0);
-	host_int_8 quantized = (value / this->stats[current_stats].bucket_size) * this->stats[current_stats].bucket_size;
+	assert (st.bucket_size != 0);
+	host_int_8 quantized = (value / st.bucket_size) * st.bucket_size;
 
-	if (quantized < this->stats[current_stats].value_min) this->stats[current_stats].value_min = quantized;
-	if (quantized > this->stats[current_stats].value_max) this->stats[current_stats].value_max = quantized;
-	this->stats[current_stats].value_hitcount_map [quantized] += ticks;
+	if (quantized < st.value_min) st.value_min = quantized;
+	if (quantized > st.value_max) st.value_max = quantized;
+	st.value_hitcount_map [quantized] += ticks;
       }
 
     void accumulate_call (host_int_4 selfpc_low)
@@ -306,21 +298,22 @@ namespace profiling_components
 	host_int_8 callerpc = (((host_int_8)this->cg_caller_hi_pin.sense ()) << 32) | (this->cg_caller_pin.sense () & 0xffffffff);
 
 	// Reject out-of-bounds samples
-	if (selfpc < this->stats[current_stats].limit_min || selfpc > this->stats[current_stats].limit_max) return;
-	if (callerpc < this->stats[current_stats].limit_min || callerpc > this->stats[current_stats].limit_max) return;
+	statistics &st = this->stats[current_stats];
+	if (selfpc < st.limit_min || selfpc > st.limit_max) return;
+	if (callerpc < st.limit_min || callerpc > st.limit_max) return;
 
-	stats[current_stats].value_count ++;
+	st.value_count ++;
 
-	assert (this->stats[current_stats].bucket_size != 0);
-	host_int_8 c_quantized = (callerpc / this->stats[current_stats].bucket_size) * this->stats[current_stats].bucket_size;
-	host_int_8 s_quantized = (selfpc / this->stats[current_stats].bucket_size) * this->stats[current_stats].bucket_size;
+	assert (st.bucket_size != 0);
+	host_int_8 c_quantized = (callerpc / st.bucket_size) * st.bucket_size;
+	host_int_8 s_quantized = (selfpc / st.bucket_size) * st.bucket_size;
 
-	if (c_quantized < this->stats[current_stats].value_min) this->stats[current_stats].value_min = c_quantized;
-	if (s_quantized < this->stats[current_stats].value_min) this->stats[current_stats].value_min = s_quantized;
-	if (c_quantized > this->stats[current_stats].value_max) this->stats[current_stats].value_max = c_quantized;
-	if (s_quantized > this->stats[current_stats].value_max) this->stats[current_stats].value_max = s_quantized;
+	if (c_quantized < st.value_min) st.value_min = c_quantized;
+	if (s_quantized < st.value_min) st.value_min = s_quantized;
+	if (c_quantized > st.value_max) st.value_max = c_quantized;
+	if (s_quantized > st.value_max) st.value_max = s_quantized;
 
-	this->stats[current_stats].cg_count_map [make_pair(c_quantized,s_quantized)] ++;
+	st.cg_count_map [make_pair(c_quantized,s_quantized)] ++;
       }
 
 
@@ -563,7 +556,6 @@ namespace profiling_components
 
   public:
     gprof_component ():
-      target_attribute ("pc"),
       target_component (0),
       output_file_format (endian_unknown),
       accumulate_pin (this, & gprof_component::accumulate),
@@ -577,6 +569,10 @@ namespace profiling_components
 
 	add_pin ("sample", & this->accumulate_pin);
 	add_attribute ("sample", & this->accumulate_pin, "pin");
+	add_pin ("pc", & this->pc_pin);
+	add_attribute ("pc", & this->pc_pin, "pin");
+	add_pin ("pc-hi", & this->pc_hi_pin);
+	add_attribute ("pc-hi", & this->pc_hi_pin, "pin");
 	add_pin ("cg-caller", & this->cg_caller_pin);
 	add_attribute ("cg-caller", & this->cg_caller_pin, "pin");
 	add_pin ("cg-caller-hi", & this->cg_caller_hi_pin);
@@ -617,7 +613,6 @@ namespace profiling_components
 			       & gprof_component::limit_max_get,
 			       & gprof_component::limit_max_set,
 			       "setting");
-	add_attribute ("value-attribute", & this->target_attribute, "setting");
 	add_attribute_virtual ("output-file", this,
 			       & gprof_component::output_file_get,
 			       & gprof_component::output_file_set,
@@ -625,6 +620,7 @@ namespace profiling_components
 	add_attribute ("output-file-endianness", & this->output_file_format, "setting");
 	add_uni_relation ("target-component", & this->target_component);
 
+	pc_hi_pin.driven (0);
 	cg_caller_hi_pin.driven (0);
 	cg_callee_hi_pin.driven (0);
       }

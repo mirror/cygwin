@@ -1,3 +1,8 @@
+2006-06-26  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.cxx (GprofCfg): Connect the cpu's gprof-pc and gprof-pc-hi
+	pins to our pc and p-hi pins respectively.
+
 2006-06-20  Dave Brolley  <brolley@redhat.com>
 
 	* commonCfg.cxx (BoardCfg::write_config): If there is a loader, then

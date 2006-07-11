@@ -167,6 +167,12 @@ x86_cpu::set_pc (sid::host_int_4 value)
   bx_cpu.eip = value - bx_cpu.sregs[BX_SEG_REG_CS].cache.u.segment.base;
 }
 
+sid::host_int_4
+x86_cpu::get_pc (void)
+{
+  return bx_cpu.eip;
+}
+
 string
 x86_cpu::dbg_get_reg(unsigned int reg)
 {

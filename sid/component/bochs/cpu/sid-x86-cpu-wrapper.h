@@ -66,6 +66,7 @@ public:
   void reset ();
   void flush_icache ();
   void set_pc (sid::host_int_4 value);
+  sid::host_int_4 get_pc (void);
   string dbg_get_reg(unsigned int);
   component::status dbg_set_reg(unsigned int, const string &);
 

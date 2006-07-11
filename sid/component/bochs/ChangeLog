@@ -1,3 +1,7 @@
+2006-07-11  Thiemo Seufer  <ths@networkno.de>
+
+	* cpu/sid-x86-cpu-wrapper.* (get_pc): Implement function.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

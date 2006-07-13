@@ -22,8 +22,6 @@ if test -z "$CC"; then
   test -z "$CC" && AC_MSG_ERROR([no acceptable cc found in \$PATH])
 fi
 
-AC_PROG_CC_GNU
-
 if test $ac_cv_prog_gcc = yes; then
   GCC=yes
 dnl Check whether -g works, even if CFLAGS is set, in case the package
@@ -32,7 +30,6 @@ dnl normal versions of a library), tasteless as that idea is.
   ac_test_CFLAGS="${CFLAGS+set}"
   ac_save_CFLAGS="$CFLAGS"
   CFLAGS=
-  AC_PROG_CC_G
   if test "$ac_test_CFLAGS" = set; then
     CFLAGS="$ac_save_CFLAGS"
   elif test $ac_cv_prog_cc_g = yes; then

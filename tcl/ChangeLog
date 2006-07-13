@@ -1,3 +1,17 @@
+2006-07-13  Steve Ellcey  <sje@cup.hp.com>
+
+	* configure.in: Fix for autoconf 2.5.
+	* cygwin/configure.in: Fix for autoconf 2.5.
+	* win/configure.in: Fix for autoconf 2.5.
+	* unix/configure.in: Fix for autoconf 2.5.
+	* unix/tcl.m4: Fix for autoconf 2.5.
+	* configure: Regenerate.
+	* cygwin/configure: Regenerate.
+	* tools/configure: Regenerate.
+	* unix/configure: Regenerate.
+	* unix/dltest/configure: Regenerate.
+	* win/configure: Regenerate.
+
 2006-02-08  Alexandre Oliva  <aoliva@redhat.com>
 
 	* unix/tcl.m4 (SC_CONFIG_CFLAGS, SC_BLOCKING_STYLE): Remove

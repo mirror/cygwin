@@ -1,6 +1,6 @@
 // gloss.cxx - Gloss routines.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002, 2005 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2005, 2006 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -63,6 +63,7 @@ gloss32::gloss32() :
 
   add_pin("debug-tx", &this->tx_pin);
   add_pin("debug-rx", &this->rx_pin);
+  add_pin("debug-rx-eof", &this->rx_eof_pin);
   add_attribute_ro_value ("tk tty", string("hw-visual-tty"), "gui");
 
   add_uni_relation("cpu", &this->cpu);
@@ -1542,6 +1543,11 @@ gloss32::read (int fd, address32 addr, size32 len,
 		  rx_buffer.erase (rx_buffer.begin());
 		  strbuf += c;
 		}
+	    }
+	  else if (rx_eof_pin.sense () != 0)
+	    {
+	      len_read = 0;
+	      return true;
 	    }
 	  else
 	    {

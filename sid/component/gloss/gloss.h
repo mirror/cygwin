@@ -1,7 +1,7 @@
 // gloss.h - Basic process emulation plus ROM monitor support.
 // -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002, 2005 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2005, 2006 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -119,6 +119,7 @@ protected:
   callback_pin<gloss32> rx_pin;
   void rx_handler(host_int_4 byte);
   vector<host_int_1> rx_buffer;
+  input_pin rx_eof_pin;
   output_pin tx_pin;
 
   // ABI-specifics, for getting syscall arguments and setting results.

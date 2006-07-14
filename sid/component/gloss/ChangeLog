@@ -1,3 +1,9 @@
+2006-07-14  Dave Brolley  <brolley@redhat.com>
+
+	* gloss.h (rx_eof_pin): New member of gloss32.
+	* gloss.cxx (gloss32): Add debug-rx-eof pin.
+	(read): Check rx_eof_pin.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

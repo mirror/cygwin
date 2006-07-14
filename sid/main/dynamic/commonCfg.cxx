@@ -1285,6 +1285,7 @@ void BoardCfg::write_config (Writer &w)
 	  assert (sess->stdio_obj);
 	  PinConnection (gloss, "debug-tx", sess->stdio_obj, "stdout").write_to(w);
 	  PinConnection (gloss, "debug-rx", sess->stdio_obj, "stdin", dst_to_src).write_to(w);
+	  PinConnection (gloss, "debug-rx-eof", sess->stdio_obj, "eof", dst_to_src).write_to(w);
 	  PinConnection (gloss, "process-signal", sess->main_obj, "stop!").write_to(w);
 	  PinConnection (gloss, "process-signal", sess->yield_net, "input").write_to(w);
 	}

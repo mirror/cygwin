@@ -32,10 +32,15 @@ Functionality:
    |--------+----------------------------------------|
    |  input | When the poll pin is driven, the stdin |
    |        | stream is checked for unread input,    |
-   |        | without blocking. All available input  |
-   |        | is consumed, and transmitted           |
+   |        | without blocking. If end of file has   |
+   |        | not been detected, the eof pin is      |
+   |        | driven with the value 0. All available |
+   |        | input is consumed, and transmitted     |
    |        | individually by driving the stdin pin  |
-   |        | with each byte, in sequence.           |
+   |        | with each byte, in sequence. When end  |
+   |        | of file is detected, the eof is driven |
+   |        | with a value of 1 and no data is       |
+   |        | transmitted via the stdin pin.         |
    +-------------------------------------------------+
 
    +-------------------------------------------------+
@@ -96,16 +101,18 @@ Component Reference:
    | stdin  | out       | any character  | input     |
    |        |           | code           |           |
    |--------+-----------+----------------+-----------|
+   | eof    | out       | boolean        | input     |
+   |--------+-----------+----------------+-----------|
    | stdout | in        | any character  | output    |
    |        |           | code           |           |
    +-------------------------------------------------+
 
-   +----------------------------------------------------+
-   |                     attributes                     |
-   |----------------------------------------------------|
-   |     name     |category|legal |default| behaviors  ||
-   |              |        |values| value |            ||
-   |--------------+--------+------+-------+------------||
-   |state-snapshot|-       |opaque|-      |state       ||
-   |              |        |string|       |save/restore||
-   +----------------------------------------------------+
+   +--------------------------------------------------------------+
+   |                          attributes                          |
+   |--------------------------------------------------------------|
+   |      name      | category | legal  | default |  behaviors   ||
+   |                |          | values |  value  |              ||
+   |----------------+----------+--------+---------+--------------||
+   |state-snapshot  |-         |opaque  |-        |state         ||
+   |                |          |string  |         |save/restore  ||
+   +--------------------------------------------------------------+

@@ -1,7 +1,7 @@
 // file.cxx - Joint header file for nearby component classes.
 // -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2003, 2005 Red Hat.
+// Copyright (C) 1999, 2000, 2003, 2005, 2006 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -106,6 +106,9 @@ private:
   callback_pin<stdioConsole> activity_pin;
   callback_pin<stdioConsole> stdout_pin;
   output_pin stdin_pin;
+  output_pin eof_pin;
+
+  bool eof_p;
 
   // save & restore state
   string save_state ( );

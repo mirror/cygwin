@@ -8,6 +8,7 @@
     <!-- pins -->
     <defpin name="poll" direction="in" legalvalues="N/A" behaviors="input" />
     <defpin name="stdin" direction="out" legalvalues="any character code" behaviors="input" />
+    <defpin name="eof" direction="out" legalvalues="boolean" behaviors="input" />
     <defpin name="stdout" direction="in" legalvalues="any character code" behaviors="output" />
 
 
@@ -45,9 +46,12 @@
 
     <behavior name="input">
     When the <pin>poll</pin> pin is driven, the <tt>stdin</tt> stream is checked for
-    unread input, without blocking.  All available input is consumed,
+    unread input, without blocking.  If end of file has not been detected, the <pin>eof</pin>
+    pin is driven with the value 0. All available input is consumed,
     and transmitted individually by driving the <pin>stdin</pin> pin with each
-    byte, in sequence.
+    byte, in sequence. When end of file is detected, the <pin>eof</pin> is driven with
+    a value of 1 and no data is transmitted via the <pin>stdin</pin> pin.
+
     </behavior>
 
     <convention name="functional" supported="true"/>

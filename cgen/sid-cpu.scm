@@ -171,6 +171,10 @@ namespace @arch@ {
        (not (obj-has-attr? hw 'VIRTUAL)))
 )
 
+(define (hw-need-write-stack? hw)
+  (and (register? hw) (hw-used-in-delay-rtl? hw))
+)
+
 ; Subroutine of -gen-hardware-types to generate the struct containing
 ; hardware elements of one isa.
 
@@ -204,6 +208,7 @@ namespace @arch@ {
 (define (-gen-hw-stream-and-destream-fns) 
   (let* ((sa string-append)
 	 (regs (find hw-need-storage? (current-hw-list)))
+	 (stack-regs (find hw-need-write-stack? (current-hw-list)))
 	 (reg-dim (lambda (r) 
 		    (let ((dims (-hw-vector-dims r)))
 		      (if (equal? 0 (length dims)) 
@@ -211,8 +216,8 @@ namespace @arch@ {
 			  (number->string (car dims))))))
 	 (write-stacks 
 	  (map (lambda (n) (sa n "_writes"))
-	       (append (map (lambda (r) (gen-c-symbol (obj:name r))) regs)
-		       (map (lambda (m) (sa (symbol->string m) "_memory")) useful-mode-names))))
+	       (append (map (lambda (r) (gen-c-symbol (obj:name r))) stack-regs)
+		       (map (lambda (m) (sa (symbol->string m) "_memory")) write-stack-memory-mode-names))))
 	 (stream-reg (lambda (r) 
 		       (let ((rname (sa "hardware." (gen-c-symbol (obj:name r)))))
 			 (if (hw-scalar? r)
@@ -381,7 +386,7 @@ typedef struct {
 ;;; begin stack-based write schedule
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define useful-mode-names '(BI QI HI SI DI UQI UHI USI UDI SF DF))
+(define write-stack-memory-mode-names '())
 
 (define (-calculated-memory-write-buffer-size)
   (let* ((is-mem? (lambda (op) (eq? (hw-sem-name (op:type op)) 'h-memory)))
@@ -444,8 +449,8 @@ typedef struct {
 
 
 (define (-gen-writestacks)
-  (let* ((hw (find register? (current-hw-list)))
-	 (modes useful-mode-names) 
+  (let* ((hw (find hw-need-write-stack? (current-hw-list)))
+	 (modes write-stack-memory-mode-names) 
 	 (hw-pairs (map (lambda (h) (list (gen-c-symbol (obj:name h))
 					    (obj:name (hw-mode h)))) 
 			hw))
@@ -626,9 +631,9 @@ using namespace cgen;
 (define (-gen-reset-fn)
   (let* ((sa string-append)
 	 (objs (append (map (lambda (h) (gen-c-symbol (obj:name h))) 
-			    (find register? (current-hw-list)))
+			    (find hw-need-write-stack? (current-hw-list)))
 		       (map (lambda (m) (sa (symbol->string m) "_memory"))
-			    useful-mode-names)))
+			    write-stack-memory-mode-names)))
 	 (clr (lambda (elt) (sa "    clear_stacks (" elt "_writes);\n"))))
     (sa 
      "  template <typename ST> \n"
@@ -642,8 +647,8 @@ using namespace cgen;
      "  }")))
 
 (define (-gen-unified-write-fn) 
-  (let* ((hw (find register? (current-hw-list)))
-	 (modes useful-mode-names)	
+  (let* ((hw (find hw-need-write-stack? (current-hw-list)))
+	 (modes write-stack-memory-mode-names)	
 	 (hw-triples (map (lambda (h) (list (gen-c-symbol (obj:name h))
 					    (obj:name (hw-mode h))
 					    (length (-hw-vector-dims h)))) 

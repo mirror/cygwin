@@ -1,3 +1,13 @@
+2006-07-14  Dave Brolley  <brolley@redhat.com>
+
+	* stdio.cxx (stdioConsole): Initialize eof_p. Add "eof" pin.
+	(read): Remove 'value'. Check eof_p. Drive eof_pin and set
+	eof_p as needed.
+	* components.h (eof_pin): New member of stdioConsole.
+	(eof_p): Likewise.
+	* sid-io-stdio.xml: Document eof pin.
+	* sid-io-stdio.txt: Regenerated.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

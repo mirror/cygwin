@@ -78,6 +78,8 @@ rm -f tmp-semsw-$$.cxx1 tmp-semsw-$$.cxx
 rm -f tmp-dec-$$.h1 tmp-dec-$$.h
 rm -f tmp-dec-$$.cxx1 tmp-dec-$$.cxx
 
+# Do semantics first, if specified because some information is collected
+# about write stacks during this pass which is used by other passes.
 fileopts=""
 for f in $filespecs
 do
@@ -89,8 +91,8 @@ do
     decode.cxx) fileopts="$fileopts -D tmp-dec-$$.cxx1" ;;
     model.h) fileopts="$fileopts -N tmp-mod-$$.h1" ;;
     model.cxx) fileopts="$fileopts -M tmp-mod-$$.cxx1" ;;
-    semantics.cxx) fileopts="$fileopts -S tmp-sem-$$.cxx1" ;;
-    sem-switch.cxx) fileopts="$fileopts -X tmp-semsw-$$.cxx1" ;;
+    semantics.cxx) fileopts="-S tmp-sem-$$.cxx1 $fileopts" ;;
+    sem-switch.cxx) fileopts="-X tmp-semsw-$$.cxx1 $fileopts" ;;
     write.cxx) fileopts="$fileopts -W tmp-write-$$.cxx1" ;;
     *) echo "unknown file spec: $f" >&2 ; exit 1 ;;
     esac

@@ -1100,6 +1100,11 @@
 	 (idx-args (if (equal? idx "") "" (string-append ", " idx)))
 	 )
     
+    (if delayval
+	(if (eq? (obj:name hw) 'h-memory)
+	    (set write-stack-memory-mode-names (cons md write-stack-memory-mode-names))
+	    (elm-set! hw 'used-in-delay-rtl? #t)))
+
     (string-append
      "  {\n"
 

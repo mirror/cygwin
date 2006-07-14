@@ -66,6 +66,10 @@
 		; or #f if not computed yet.
 		; This is a derived from the ISA attribute and is for speed.
 		(isas-cache . #f)
+
+		; Flag indicates whether this hw has been used in a (delay ...)
+		; rtl expression
+		(used-in-delay-rtl? . #f)
 		)
 	      nil)
 )
@@ -77,7 +81,7 @@
    ; ??? These might be more properly named hw-get/hw-set, but those names
    ; seem ambiguous.
    (get . getter) (set . setter)
-   isas-cache)
+   isas-cache used-in-delay-rtl?)
 )
 
 ; Mode,rank,shape support.
@@ -159,6 +163,15 @@
 )
 
 (define (hw-isas hw) (send hw 'get-isas))
+
+; Was this hardware used in a (delay ...) rtl expression?
+
+(method-make!
+ <hardware-base> 'used-in-delay-rtl?
+ (lambda (self) (elm-get self 'used-in-delay-rtl?))
+)
+
+(define (hw-used-in-delay-rtl? hw) (send hw 'used-in-delay-rtl?))
 
 ; FIXME: replace pc?,memory?,register?,iaddress? with just one method.
 

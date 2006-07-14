@@ -1,3 +1,19 @@
+2006-07-14  Dave Brolley  <brolley@redhat.com>
+
+	* sid.scm (-op-gen-delayed-set-maybe-trace): If delay used, note the
+	hardware or memory mode which was used.
+	* sid-cpu.scm (hw-need-write-stack?): New function.
+	(-gen-hw-stream-and-destream-fns): Compute stack-regs. Use it to
+	identify hardware which uses write stacks.
+	(useful-mode-names): Renamed to write-stack-memory-mode-names.
+	Initialized to an empty list.
+	(-gen-writestacks, -gen-reset-fn, -gen-unified-write-fn): Use
+	hw-need-write-stack?.
+	* hardware.scm (used-in-delay-rtl?): New member of <hardware-base>.
+	(define-getters <hardware-base>): Define used-in-delay-rtl?.
+	(used-in-delay-rtl?): New method of <hardware-base>.
+	(hw-used-in-delay-rtl?): New function.
+
 2006-06-20  Dave Brolley  <brolley@redhat.com>
 
 	* sid.scm (gen-attr-type): Removed.

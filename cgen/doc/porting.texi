@@ -519,11 +519,11 @@ The instruction conditionally sets pc.
 
 @item SKIP-CTI
 
-NB. This is an expermental attribute.  Its usage needs to evolve.
+NB. This is an experimental attribute.  Its usage needs to evolve.
 
 @item DELAY-SLOT
 
-NB. This is an expermental attribute.  Its usage needs to evolve.
+NB. This is an experimental attribute.  Its usage needs to evolve.
 @end itemize
 
 @end itemize
@@ -995,7 +995,7 @@ are various ways to do this, and several are supported.  Which one to
 choose depends on the environment in which the CPU will be used.  For
 example when executing a program in a single-CPU environment without
 devices, most or all available cycles can be devoted to simulation of the
-atarget CPU.  However, in an environment with devices or multiple cpus, one
+target CPU.  However, in an environment with devices or multiple cpus, one
 may wish the CPU to execute one instruction then relinquish control so a
 device operation may be done or an instruction can be simulated on a
 second cpu.  Efficient techniques for the former aren't necessarily the best

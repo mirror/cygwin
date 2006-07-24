@@ -201,7 +201,7 @@ similar speed in file generation.  Guile isn't fast enough.
 And while Guile+Hobbit may be, for the one-time builder the time
 taken to compile Hobbit, run it, and compile the result, will appear
 to swamp any gains.  There is also the additional burden of
-building Guile first (though with my prefered Guile implementation
+building Guile first (though with my preferred Guile implementation
 I'm _hoping_ that wouldn't be a problem).
 
 The pragmatic choice is C.  Blech.
@@ -214,7 +214,7 @@ Java would also be a better implementation language than C
 [an interesting experiment would be Kawa].  But it's worse as a pragmatic
 choice than C++.
 
-My prefered choice is a small-and-fast subset of Guile that gets
+My preferred choice is a small-and-fast subset of Guile that gets
 distributed with binutils, gdb, etc.  IMO Guile is too bloated
 and unmaintainable for the casual maintainer (hacking on its innards
 requires too steep a learning curve, and is one that is easily slipped back

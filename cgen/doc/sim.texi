@@ -7,7 +7,7 @@
 @cindex Simulation support
 
 Simulator support comes in the form of machine generated the decoder/executer
-as well as the structure that records CPU state information (ie. registers).
+as well as the structure that records CPU state information (i.e., registers).
 
 There are 3 architecture-wide generated files:
 

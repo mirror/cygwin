@@ -177,7 +177,7 @@ compiled and then the new version of the target program is run.
 
 The second way is to do the translation from target instruction set to
 host instruction set while the target program is running.  This is often
-refered to as JIT (Just In Time) simulation (FIXME: proper phrasing here?).
+referred to as JIT (Just In Time) simulation (FIXME: proper phrasing here?).
 One way to implement this is to simulate instructions the way existing
 CGEN simulators do, but keep track of how frequently a basic block is
 executed.  If a block gets executed often enough, then compile a translation
@@ -414,7 +414,7 @@ this is using RTL to describe instruction semantics rather than, say, C.
 The assembler can also make use of the instruction semantics.  It doesn't
 make use of the semantics, per se, but what it does use is the input and
 output operand information that is machine generated from the semantics.
-Groking operand usage from C is possible I guess, but a lot harder.
+Grokking operand usage from C is possible I guess, but a lot harder.
 So by writing the semantics in RTL multiple applications can make use if it.
 One can also generate from the RTL code in languages other than C.
 
@@ -599,7 +599,7 @@ well as supporting routines.
 @section Simulator support
 
 Simulator support comes in the form of machine generated the decoder/executer
-as well as the structure that records CPU state information (ie. registers).
+as well as the structure that records CPU state information (i.e., registers).
 
 @node Testing support
 @section Testing support

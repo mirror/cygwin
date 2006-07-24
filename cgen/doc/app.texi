@@ -92,7 +92,7 @@ the code must write to @code{(current-output-port)}.
 
 Some files require heavy duty processing of the cpu description.
 For example the simulator computes the instruction formats from the
-instruction field lists of each instruction.  This computation is defered
+instruction field lists of each instruction.  This computation is deferred
 to each cgen-<file> procedure that needs it and must be explicitly requested
 by them.  The results are cached so this is only done once of course.
 
@@ -156,7 +156,7 @@ access functions.
   - return the attributes specified with `define-arch'
 
   (current-arch-default-alignment)
-  - return a symbol indicated the default aligment
+  - return a symbol indicated the default alignment
     - one of aligned, unaligned, forced
 
   (current-arch-insn-lsb0?)
@@ -273,14 +273,14 @@ and thunks as arguments and writes each argument in turn to stdout.
 String-lists are lists of strings (nested arbitrarily deep).  It's cheaper
 to @code{cons} long strings together than to use @code{string-append}.
 Thunks return string-lists to write out, but isn't computed until all
-preceeding arguments to `string-write' have been written out.  This allows
-defering building up of large amounts of text until it needs to be.
+preceding arguments to `string-write' have been written out.  This allows
+deferring building up of large amounts of text until it needs to be.
 
 The main procedures for building strings and writing them out are:
 
 @itemize @bullet
 
-@item (string-write string-list-or-thunk1 string-list-or-thunk2 ...)
+@item (string-write string-list-or-thunk1 string-list-or-thunk2 @dots{})
 
 Loops over arguments writing them out in turn.
 
@@ -289,7 +289,7 @@ Loops over arguments writing them out in turn.
 Apply proc to each element in string-list-or-thunk-list and write out
 the result.
 
-@item (string-list arg1 arg2 ...)
+@item (string-list arg1 arg2 @dots{})
 
 Return list of arguments.  This is identical to @code{list} except it
 is intended to take string-lists as arguments.
@@ -300,7 +300,7 @@ Return list of @code{proc} applied to each element of @code{arg-list}.
 This is identical to @code{map} except it is intended to take strings
 as arguments.
 
-@item (string-append string1 string2 ...)
+@item (string-append string1 string2 @dots{})
 
 For small arguments it's just as well to use @code{string-append}.
 This is a standard Scheme procedure.  The output is also easier to read
@@ -333,8 +333,8 @@ Use @code{class-make} to define a class.
 @smallexample
 name: symbol, <name-of-class>
 parent-name-list: list of symbols, names of each parent class
-element-list: list of either symbols or (symbol . initial-value)
-method-list: list of (symbol . lambda)
+element-list: list of either symbols or (symbol .@: initial-value)
+method-list: list of (symbol .@: lambda)
 @end smallexample
 
 The result is the class's definition.  It is usually assigned to a global
@@ -362,7 +362,7 @@ This is a macro so don't quote anything.
 
 Write accessors are defined with @code{define-setters}, which
 creates one procedure for each element, each defined as
-@code{(prefix-set-element-name! object new-value)}.
+@code{(prefix-set-element-name!@: object new-value)}.
 
 This is a macro so don't quote anything.
 
@@ -370,7 +370,7 @@ This is a macro so don't quote anything.
 
 This can only be used in method definitions (blech, blah blah blah).
 
-@item (elm-set! object elm-name new-value)
+@item (elm-set!@: object elm-name new-value)
 
 This can only be used in method definitions (blech, blah blah blah).
 
@@ -386,18 +386,18 @@ The convention is to put this in a cover fn:
 Same as @code{send} except only usable in methods and is used to invoke
 the method in the parent class.
 
-@item (make object . args)
+@item (make object .@: args)
 
 One standard way to create a new object is with @code{make}.
 It is a wrapper, defined as
 
 @smallexample
-(define (make object . args)
-  (apply send (cons (new object) (cons 'make! args)))
+(define (make object .@: args)
+  (apply send (cons (new object) (cons 'make!@: args)))
 )
 @end smallexample
 
-@item (vmake class . args)
+@item (vmake class .@: args)
 
 The other standard way to create objects is with @code{vmake}.
 
@@ -405,16 +405,16 @@ The other standard way to create objects is with @code{vmake}.
 
 ??? Not completely implemented yet.
 
-@item (method-make! class method-name lambda)
+@item (method-make!@: class method-name lambda)
 
 The normal way of creating methods is to use @code{method-make!}, not define
 them with the class.  It's just easier to define them separately.
 
-@item (method-make-virtual! class method-name lambda)
+@item (method-make-virtual!@: class method-name lambda)
 
 Create virtual methods created with @code{method-make-virtual!}.
 
-@item (method-make-forward! class elm-name methods) -> unspecified
+@item (method-make-forward!@: class elm-name methods) -> unspecified
 
 Forwarding a method invocation on one object to another is extremely
 useful so some utilities have been created to simplify creating forwarding
@@ -425,6 +425,6 @@ that forwards the method onto the object contained in element ELM-NAME.
 
 @item (method-make-virtual-forward!)
 
-Same as method-make-forward! except that it creates virtual methods.
+Same as method-make-forward!@: except that it creates virtual methods.
 
 @end itemize

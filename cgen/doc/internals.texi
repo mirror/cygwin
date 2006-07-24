@@ -83,7 +83,7 @@ This manual documents the internals of CGEN, version @value{VERSION}.
 * Source file overview::
 * Option processing::
 * Parsing::
-* Debuging::			Debugging applications
+* Debugging::			Debugging applications
 * Version numbering::
 * Glossary::                    Glossary
 * Index::                       Index
@@ -108,7 +108,7 @@ understand.
 @item Procedures and variables local to a file are named @code{-foo}.
 @item Only routines that emit application code begin with @code{gen-}.
 @item Symbols beginning with @code{c-} are either variables containing C code
-      or procedures that generate C code, similarily for C++ and @code{c++-}.
+      or procedures that generate C code, similarly for C++ and @code{c++-}.
 @item Variables containing C code begin with @code{c-}.
 @item Only routines that emit an entire file begin with @code{cgen-}.
 @item All @file{.cpu} file elements shall have @code{-foo-parse} and
@@ -244,7 +244,7 @@ Hardware description routines.
 Instruction fields.
 
 @item insn.scm
-Instruction defintions.
+Instruction definitions.
 
 @item mach.scm
 Architecture description routines.

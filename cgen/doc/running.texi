@@ -6,4 +6,4 @@
 @chapter Running CGEN
 
 This chapter needs to explain how to run CGEN, how it fits together, and
-what to expect when you do run it (ie. output, resultant files, etc).
+what to expect when you do run it (i.e., output, resultant files, etc).

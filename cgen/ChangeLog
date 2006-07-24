@@ -1,3 +1,9 @@
+2006-07-24  Ralk Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* doc/app.texi, doc/internals.texi, doc/intro.texi,
+	doc/notes.texi, doc/porting.texi, doc/running.texi,
+	doc/sim.texi: Fix some typos.
+
 2006-07-14  Dave Brolley  <brolley@redhat.com>
 
 	* sid.scm (-op-gen-delayed-set-maybe-trace): If delay used, note the

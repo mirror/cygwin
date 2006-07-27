@@ -22,7 +22,7 @@ details. */
 #include <ctype.h>
 #include <errno.h>
 
-static const char version[] = "$Revision: 1.42 $";
+static const char version[] = "$Revision: 1.43 $";
 
 static char *prog_name;
 static char *file_arg;
@@ -239,11 +239,17 @@ get_long_name (const char *filename, DWORD& len)
     GetLongPathName = get_long_path_name_w32impl;
 
   len = GetLongPathName (filename, buf, MAX_PATH);
-  if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
+  if (len == 0)
     {
-      fprintf (stderr, "%s: cannot create long name of %s\n", prog_name,
-	       filename);
-      exit (2);
+      if (GetLastError () == ERROR_INVALID_PARAMETER)
+	{
+	  fprintf (stderr, "%s: cannot create long name of %s\n", prog_name,
+		   filename);
+	  exit (2);
+	}
+      buf[0] = '\0';
+      strncat (buf, filename, MAX_PATH - 1);
+      len = strlen (buf);
     }
   sbuf = (char *) malloc (len + 1);
   if (!sbuf)

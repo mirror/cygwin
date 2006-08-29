@@ -1,6 +1,6 @@
 // glue.cxx - miscellaneous glue components.  -*- C++ -*-
 
-// Copyright (C) 1999-2001 Red Hat.
+// Copyright (C) 1999-2001, 2006 Red Hat.
 // Portions Copyright (C) 2004 Sirius Satellite Radio Inc.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
@@ -377,6 +377,7 @@ class bus_prober: public virtual component,
   probing_bus upstream;
   bus* downstream;
 
+  host_int_4 base_address;
   output_pin address_pin;
   output_pin data_high_pin;
   output_pin data_low_pin;
@@ -391,7 +392,8 @@ public:
 
   bus_prober ():
     upstream (this),
-    downstream (0)
+    downstream (0),
+    base_address (0)
     {
       sample_interval = 1;
 
@@ -409,6 +411,7 @@ public:
       add_pin ("type", & this->accesstype_pin);
       add_attribute ("type", & this->accesstype_pin, "pin");
       
+      add_attribute ("base-address", & this->base_address, "setting");
       add_attribute ("sample-interval", & this->sample_interval, "setting");
       add_attribute ("trace?", & this->upstream.verbose_p, "setting");
       add_attribute ("label", & this->label, "setting");
@@ -471,7 +474,7 @@ probing_bus::writeAny(host_int_4 addr, DataType data, host_int_4 code) throw ()
 
 	  this->counter = 0;
 	  // drive informational pins
-	  this->prober->address_pin.drive (addr);
+	  this->prober->address_pin.drive (this->prober->base_address + addr);
 	  typename DataType::host_int_type d_host = data; // natural endianness
 	  host_int_8 d_wide(d_host); // widen
 	  this->prober->data_high_pin.drive ((d_wide >> 32) & 0xFFFFFFFF);
@@ -507,7 +510,7 @@ probing_bus::readAny(host_int_4 addr, DataType& data, host_int_4 code) throw ()
 
 	  this->counter = 0;
 	  // drive informational pins
-	  this->prober->address_pin.drive (addr);
+	  this->prober->address_pin.drive (this->prober->base_address + addr);
 	  typename DataType::host_int_type d_host = data; // natural endianness
 	  host_int_8 d_wide(d_host); // widen
 	  this->prober->data_high_pin.drive ((d_wide >> 32) & 0xFFFFFFFF);

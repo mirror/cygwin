@@ -18,6 +18,7 @@
     <defpin name="type" direction="out" legalvalues="enum values" behaviors="bus traffic sampling" />
 
     <!-- attributes -->
+    <defattribute name="base-address" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="bus traffic tracing" />
     <defattribute name="trace?" category="setting" legalvalues="boolean" defaultvalue="0" behaviors="bus traffic tracing" />
     <defattribute name="sample-interval" category="setting" legalvalues="numeric" defaultvalue="1" behaviors="bus traffic sampling" />
     <defattribute name="interval-counter" category="register" legalvalues="numeric" behaviors="bus traffic sampling" />
@@ -54,7 +55,7 @@
 	  pins.  In sequence, the following output pins are driven:</p>
 	<ul>
 	  <li>
-	    <name>address</name> - address parameter</li>
+	    <name>address</name> - address parameter added to the value of the <attribute>base-address</attribute> attribute</li>
 	  <li>
 	    <name>data-high</name> - top 32 bits of bus data being read/written</li>
 	  <li>

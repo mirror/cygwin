@@ -1,3 +1,12 @@
+2006-08-29  Dave Brolley  <brolley@redhat.com>
+
+	* glue.cxx (base_address): New member of bus_prober.
+	(bus_prober): Initialize base_address.
+	(writeAny): Add this->prober->base_address to the address driven.
+	(readAny): Likewise.
+	* hw-glue-probe-bus.xml: Document new base-address attribute.
+	* *.txt: Regenerated.
+
 2006-03-27  Frank Ch. Eigler  <fche@elastic.org>
 
 	* glue.cxx (bus_prober): Fix extra class qualifications.

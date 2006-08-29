@@ -469,12 +469,13 @@ probing_bus::writeAny(host_int_4 addr, DataType data, host_int_4 code) throw ()
       this->counter ++;
       if (this->counter >= this->prober->sample_interval)
 	{
+	  addr += this->prober->base_address;
 	  if (this->verbose_p)
 	    this->traceAccess (addr, data, code, s);
 
 	  this->counter = 0;
 	  // drive informational pins
-	  this->prober->address_pin.drive (this->prober->base_address + addr);
+	  this->prober->address_pin.drive (addr);
 	  typename DataType::host_int_type d_host = data; // natural endianness
 	  host_int_8 d_wide(d_host); // widen
 	  this->prober->data_high_pin.drive ((d_wide >> 32) & 0xFFFFFFFF);
@@ -505,12 +506,13 @@ probing_bus::readAny(host_int_4 addr, DataType& data, host_int_4 code) throw ()
       this->counter ++;
       if (this->counter >= this->prober->sample_interval)
 	{
+	  addr += this->prober->base_address;
 	  if (this->verbose_p)
 	    this->traceAccess (addr, data, code, s);
 
 	  this->counter = 0;
 	  // drive informational pins
-	  this->prober->address_pin.drive (this->prober->base_address + addr);
+	  this->prober->address_pin.drive (addr);
 	  typename DataType::host_int_type d_host = data; // natural endianness
 	  host_int_8 d_wide(d_host); // widen
 	  this->prober->data_high_pin.drive ((d_wide >> 32) & 0xFFFFFFFF);

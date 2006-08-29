@@ -106,6 +106,25 @@ Environment:
    A statistics-gathering component could attach to the sampling output pins
    to maintain a picture of a program's memory access patterns.
 
+   The base-address attribute should only be used if the downstream component
+   has a fixed address within the system. The base-address attribute is not
+   suitable for situations in which more than one address range is mapped
+   onto the upstream bus.
+
+   Consider the example below in which a single hw-glue-probe-bus is used to
+   trace two address ranges.
+
+         new hw-glue-probe-bus bus-prober
+         new SOME_KIND_OF_CPU cpu
+         new SOME_KIND_OF_TRANSPARENT_MAPPER probe-mapper
+         new SOME_KIND_OF_MAPPER mapper
+         connect-bus cpu insn-memory probe-mapper access-port
+         connect-bus probe-mapper [0-1023] bus-prober upstream
+         connect-bus probe-mapper [1024-2047] mapper access-port
+         connect-bus probe-mapper [2048-3071] bus-prober upstream
+         connect-bus bus-prober downstream mapper access-port
+         set bus-prober trace? 1
+
      ----------------------------------------------------------------------
 
 Component Reference:
@@ -153,7 +172,8 @@ Component Reference:
    |      name      |category| legal |default|     behaviors     ||
    |                |        |values | value |                   ||
    |----------------+--------+-------+-------+-------------------||
-   |base-address    |setting |numeric|0      |bus traffic tracing||
+   |base-address    |setting |numeric|0      |bus traffic        ||
+   |                |        |       |       |sampling           ||
    |----------------+--------+-------+-------+-------------------||
    |trace?          |setting |boolean|0      |bus traffic tracing||
    |----------------+--------+-------+-------+-------------------||

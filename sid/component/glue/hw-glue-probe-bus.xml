@@ -18,7 +18,7 @@
     <defpin name="type" direction="out" legalvalues="enum values" behaviors="bus traffic sampling" />
 
     <!-- attributes -->
-    <defattribute name="base-address" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="bus traffic tracing" />
+    <defattribute name="base-address" category="setting" legalvalues="numeric" defaultvalue="0" behaviors="bus traffic sampling" />
     <defattribute name="trace?" category="setting" legalvalues="boolean" defaultvalue="0" behaviors="bus traffic tracing" />
     <defattribute name="sample-interval" category="setting" legalvalues="numeric" defaultvalue="1" behaviors="bus traffic sampling" />
     <defattribute name="interval-counter" category="register" legalvalues="numeric" behaviors="bus traffic sampling" />
@@ -55,7 +55,8 @@
 	  pins.  In sequence, the following output pins are driven:</p>
 	<ul>
 	  <li>
-	    <name>address</name> - address parameter added to the value of the <attribute>base-address</attribute> attribute</li>
+	    <name>address</name> - address parameter added to the value of the
+            <attribute>base-address</attribute> attribute</li>
 	  <li>
 	    <name>data-high</name> - top 32 bits of bus data being read/written</li>
 	  <li>
@@ -146,6 +147,27 @@
     	<p>
 	  A statistics-gathering component could attach to the sampling output
 	  pins to maintain a picture of a program's memory access patterns.</p>
+
+        <p>
+          The <attribute>base-address</attribute> attribute should only be used if
+          the downstream component has a fixed address within the system. The
+          <attribute>base-address</attribute> attribute is not suitable for situations in
+          which more than one address range is mapped onto the <bus>upstream</bus> bus.</p>
+        <p>
+          Consider the example below in which a single hw-glue-probe-bus is used to trace
+          two address ranges.</p>
+
+	<code>	new hw-glue-probe-bus bus-prober
+	new SOME_KIND_OF_CPU cpu
+        new SOME_KIND_OF_TRANSPARENT_MAPPER probe-mapper
+        new SOME_KIND_OF_MAPPER mapper
+        connect-bus cpu insn-memory probe-mapper access-port
+        connect-bus probe-mapper [0-1023] bus-prober upstream
+        connect-bus probe-mapper [1024-2047] mapper access-port
+        connect-bus probe-mapper [2048-3071] bus-prober upstream
+        connect-bus bus-prober downstream mapper access-port
+        set bus-prober trace? 1</code>
+	
       </p>
     </p>
   </env>

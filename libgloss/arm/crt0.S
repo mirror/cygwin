@@ -22,16 +22,16 @@
 	.syntax unified
 	.thumb
 .macro FUNC_START name
-	.global	\name
+	.global \name
 	.thumb_func
 \name:
-.endm	
+.endm
 #else
 	.code 32
 .macro FUNC_START name
-	.global	\name
+	.global \name
 \name:
-.endm	
+.endm
 #endif
 	.align 	0
 
@@ -92,8 +92,57 @@
 				/*  and small frames */
 #  else
 	/*  Set up the stack pointer to a fixed value */
-	ldr	r3, .LC0
+	/*  Changes by toralf:
+	    - Allow linker script to provide stack via __stack symbol - see
+	      defintion of .Lstack
+	    - Provide "hooks" that may be used by the application to add
+	      custom init code - see .Lhwinit and .Lswinit	
+	    - Go through all execution modes and set up stack for each of them.
+	      Loosely based on init.s from ARM/Motorola example code.
+              Note: Mode switch via CPSR is not allowed once in non-privileged
+		    mode, so we take care not to enter "User" to set up its sp,
+		    and also skip most operations if already in that mode. */
+
+	ldr	r3, .Lstack
+	cmp	r3, #0
+	ldreq	r3, .LC0
+	/* Note: This 'mov' is essential when starting in User, and ensures we
+		 always get *some* sp value for the initial mode, even if we 
+		 have somehow missed it below (in which case it gets the same
+		 value as FIQ - not ideal, but better than nothing.) */
+	mov	sp, r3
+	mrs	r2, CPSR
+	tst	r2, #0x0F	/* Test mode bits - in User of all are 0 */
+	beq	.LC23		/* "eq" means r2 AND #0x0F is 0 */
+	msr     CPSR_c, #0xD1	/* FIRQ mode, interrupts disabled */
 	mov 	sp, r3
+	sub	sl, sp, #0x1000	/* This mode also has its own sl (see below) */
+	
+	mov	r3, sl	
+	msr     CPSR_c, #0xD7	/* Abort mode, interrupts disabled */
+	mov	sp, r3
+	sub	r3, r3, #0x1000
+
+	msr     CPSR_c, #0xDB	/* Undefined mode, interrupts disabled */
+	mov	sp, r3
+	sub	r3, r3, #0x1000
+
+	msr     CPSR_c, #0xD2	/* IRQ mode, interrupts disabled */
+	mov	sp, r3
+	sub	r3, r3, #0x2000
+		
+	msr     CPSR_c, #0xD3	/* Supervisory mode, interrupts disabled */
+	mov	sp, r3
+	sub	r3, r3, #0x8000	/* Min size 32k */
+	bic	r3, r3, #0x00FF	/* Align with current 64k block */
+	bic	r3, r3, #0xFF00
+
+	str	r3, [r3, #-4]	/* Move value into user mode sp without */ 
+	ldmdb	r3, {sp}^       /* changing modes, via '^' form of ldm */ 
+	
+	orr	r2, r2, #0xC0	/* Back to original mode, presumably SVC, */
+	msr	CPSR_c, r2	/* with FIQ/IRQ disable bits forced to 1 */
+.LC23:
 	/* Setup a default stack-limit in-case the code has been
 	   compiled with "-mapcs-stack-check".  Hard-wiring this value
 	   is not ideal, since there is currently no support for
@@ -133,6 +182,22 @@ __change_mode:
 	   and without semihosting.  */   
 #if ((!defined (ARM_RDP_MONITOR) && !defined (ARM_RDI_MONITOR)) \
      || defined (_ARM_V7M))
+/* Changes by toralf: Taken from libgloss/m68k/crt0.S
+ * initialize target specific stuff. Only execute these
+ * functions it they exist.
+ */
+	ldr	r3, .Lhwinit
+	cmp	r3, #0
+	beq	.LC24
+	mov	lr, pc
+	mov	pc, r3
+.LC24:	
+	ldr	r3, .Lswinit
+	cmp	r3, #0
+	beq	.LC25
+	mov	lr, pc
+	mov	pc, r3
+.LC25:	
 	mov	r0, #0		/*  no arguments  */
 	mov	r1, #0		/*  no argv either */
 #else
@@ -290,17 +355,46 @@ change_back:
 	.word	HeapBase
 # else
 #  ifndef ARM_RDP_MONITOR
+	/* Changes by toralf: Provide alternative "stack" variable whose value
+	   may be defined externally; .Lstack will be used instead of .LC0 if
+	   it points to a non-0 value. Also set up references to "hooks" that
+           may be used by the application to provide additional init code. */
+	
 #   ifdef __pe__
 	.word	0x800000
 #   else
-/*	.word	0x80000	*/		/* Top of RAM on the PIE board.  */
+	.word	0x80000			/* Top of RAM on the PIE board.  */
 #   endif
 #  endif
 # endif
 #endif 	
-#ifdef _ARM_V7M
+#if ((!defined (ARM_RDP_MONITOR) && !defined (ARM_RDI_MONITOR)) \
+     || defined (_ARM_V7M))
 .Lstack:	
 	.word	__stack
+.Lhwinit:	
+	.word	FUNCTION (hardware_init_hook)
+.Lswinit:
+	.word	FUNCTION (software_init_hook)
+
+	/* Set up defaults for the above variables in the form of weak symbols
+	   - so that application will link correctly, and get value 0 in
+	   runtime (meaning "ignore setting") for the variables, when the user
+	   does not provide the symbols. (The linker uses a weak symbol if,
+	   and only if, a normal version of the same symbol isn't provided
+	   e.g. by a linker script or another object file.) */	
+
+	.set FUNCTION (hardware_init_hook), 0
+	.set FUNCTION (software_init_hook), 0
+	
+	.weak FUNCTION (hardware_init_hook) 
+	.weak FUNCTION (software_init_hook)
+
+	/* For ARMV7M we want to error if no stack location is defined.  */
+#if !defined(_ARM_V7M)
+	.set __stack, 0
+	.weak __stack
+#endif
 #endif
 #if defined(__ELF__) && !defined(__USING_SJLJ_EXCEPTIONS__)
 	/* Protect against unhandled exceptions.  */

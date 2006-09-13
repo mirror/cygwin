@@ -52,7 +52,7 @@ void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
 
-static const char version[] = "$Revision: 1.91 $";
+static const char version[] = "$Revision: 1.92 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1839,7 +1839,7 @@ main (int argc, char **argv)
      user's original environment.  */
   char *posixly = getenv ("POSIXLY_CORRECT");
   if (posixly == NULL)
-  (void) putenv("POSIXLY_CORRECT=1");
+    (void) putenv("POSIXLY_CORRECT=1");
   while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (i)
       {

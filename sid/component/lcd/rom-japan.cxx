@@ -25,7 +25,7 @@ init_rom_japan( unsigned char rom[][8] ) {
   fm[4] = 0x2;
   fm[5] = 0x4;
 
-  fm = &(rom[0x7e][0]);	// left arrow
+  fm = &(rom[0x7f][0]);	// left arrow
   fm[1] = 0x4;
   fm[2] = 0x8;
   fm[3] = 0x1f;

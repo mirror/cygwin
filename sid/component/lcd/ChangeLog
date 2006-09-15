@@ -1,3 +1,8 @@
+2006-09-15  Frank Ch. Eigler  <fche@elastic.org>
+
+	From Hans Erickson <herickso@stratasys.com>:
+	* rom-japan.cxx (init_rom_japan): Correct left-arrow code.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

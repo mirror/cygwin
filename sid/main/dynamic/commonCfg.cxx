@@ -86,7 +86,7 @@ void MemCfg::set_write_latency (sid::host_int_4 lat)
 void MemCfg::set_size (sid::host_int_4 sz)
 {
   my_size = sz;
-  set (this, "size", sidutil::make_attribute(sz));
+  set (this, "size", "0x" + sidutil::make_numeric_attribute(sz, std::ios::hex));
 }
 
 sid::host_int_4 MemCfg::size()
@@ -506,26 +506,26 @@ void MapperCfg::map (const Mapping &m)
   
   string map_accessor = "[";
   if (m._wordsz.specified)
-    map_accessor += sidutil::make_attribute(m._wordsz.val) + "*";
+    map_accessor += "0x" + sidutil::make_numeric_attribute(m._wordsz.val, std::ios::hex) + "*";
 
   if (m._base.specified)
-    map_accessor += sidutil::make_attribute(m._base.val) + "=";
+    map_accessor += "0x" + sidutil::make_numeric_attribute(m._base.val, std::ios::hex) + "=";
 
   // always include a low and a high. default to 0 if not specified.
   // FIXME: perhaps issuing a warning here would be better?
-  map_accessor += 
-    sidutil::make_attribute(m._low.specified ? 
-			    m._low.val : 0) 
-    + "-"
-    + sidutil::make_attribute(m._high.specified ? 
-			      m._high.val : 0);
+  map_accessor += "0x" + 
+    sidutil::make_numeric_attribute(m._low.specified ? 
+				    m._low.val : 0, std::ios::hex) 
+    + "-0x"
+    + sidutil::make_numeric_attribute(m._high.specified ? 
+				      m._high.val : 0, std::ios::hex);
 
   // Both stride and width must be specified for either to make sense.
   if (m._stride.specified && m._width.specified)
-    map_accessor += "," 
-      + sidutil::make_attribute(m._stride.val) 
-      + ","
-      + sidutil::make_attribute(m._width.val);
+    map_accessor += ",0x" 
+      + sidutil::make_numeric_attribute(m._stride.val, std::ios::hex) 
+      + ",0x"
+      + sidutil::make_numeric_attribute(m._width.val, std::ios::hex);
   
   map_accessor += "]";
 

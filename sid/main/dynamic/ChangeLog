@@ -1,3 +1,9 @@
+2006-09-19  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.cxx (MemCfg::set_size): Use make_numeric_attribute and pass
+	std::ios::hex.
+	(MapperCfg::map): Likewise.
+
 2006-07-14  Dave Brolley  <brolley@redhat.com>
 
 	* commonCfg.cxx (BoardCfg::write_config): Connect stdio_obj's eof pin to

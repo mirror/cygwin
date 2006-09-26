@@ -135,7 +135,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 #if defined(LIBC_SCCS) && !defined(lint)
 /*static char *sccsid = "from: @(#)vfprintf.c	5.50 (Berkeley) 12/16/92";*/
-static char *rcsid = "$Id: vfprintf.c,v 1.11 2005/02/08 01:33:16 jjohnstn Exp $";
+static char *rcsid = "$Id: vfprintf.c,v 1.12 2006/09/26 21:22:19 jjohnstn Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 /*
@@ -321,7 +321,7 @@ _DEFUN (VFPRINTF, (fp, fmt0, ap),
 	_CONST char *fmt0 _AND
 	va_list ap)
 {
-  CHECK_INIT (_REENT);
+  CHECK_INIT (_REENT, fp);
   return _VFPRINTF_R (_REENT, fp, fmt0, ap);
 }
 
@@ -875,7 +875,9 @@ reswitch:	switch (ch) {
 					if (prec || flags & ALT)
 						size += prec + 1;
 				} else	/* "0.X" */
-					size = prec + 2;
+                                        size = (prec || flags & ALT)
+                                                  ? prec + 2
+                                                  : 1;
 			} else if (expt >= ndig) {	/* fixed g fmt */
 				size = expt;
 				if (flags & ALT)

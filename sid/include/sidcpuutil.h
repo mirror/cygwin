@@ -662,7 +662,7 @@ namespace sidutil
 		    // Set the state so that the next insn will be sampled,
 		    // followed by samples at the specified interval.
 		    gprof_counter = step_insn_count - 1;
-		    gprof_prev_cycle = this->total_insn_count - 1;
+		    gprof_prev_cycle = this->total_insn_count;
 		  }
 	      }
 	    return;

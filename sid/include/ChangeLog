@@ -1,3 +1,8 @@
+2006-09-27  Dave Brolley  <brolley@redhat.com>
+
+	* sidcpuutil.h (basic_cpu::configure): Set gprof_prev_cycle to
+	total_insn_count when gprof 'cycles' not specified.
+
 2006-06-26  Dave Brolley  <brolley@redhat.com>
 
 	* sidcpuutil.h (gprof_pc_pin,gprof_pc_hi_pin): New members of

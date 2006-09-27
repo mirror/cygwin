@@ -1,3 +1,7 @@
+2006-09-27  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.cxx (profile_opt_gprof_value): Handle "gprof=<file>,cycles".
+
 2006-09-19  Dave Brolley  <brolley@redhat.com>
 
 	* commonCfg.cxx (MemCfg::set_size): Use make_numeric_attribute and pass

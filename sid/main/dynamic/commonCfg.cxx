@@ -776,18 +776,25 @@ SessionCfg::profile_opt_gprof_value (const string& opt, const vector<string>& op
     profile_config_error (opt); // doesn't return
 
   vector<string> sub_parts = sidutil::tokenize (opt_parts[1], ",");
+  if (sub_parts.size () > 2)
+    profile_config_error (opt); // doesn't return
+
   string value = sub_parts[0];
-  if (size == 3)
+  if (sub_parts.size () == 2)
     {
-      if (sub_parts.size () != 2 || sub_parts[1] != "cycles")
+      if (sub_parts[1] != "cycles")
 	profile_config_error (opt); // doesn't return
 
-      unsigned n;
-      sid::component::status s = sidutil::parse_attribute (opt_parts[2], n);
-      if (s != sid::component::ok)
-	profile_config_error (opt); // doesn't return
-
-      value += "," + opt_parts[2];
+      if (size == 3)
+	{
+	  unsigned n;
+	  sid::component::status s = sidutil::parse_attribute (opt_parts[2], n);
+	  if (s != sid::component::ok)
+	    profile_config_error (opt); // doesn't return
+	  value += "," + opt_parts[2];
+	}
+      else
+	value += ",1";
     }
 
   need_gprof = true;

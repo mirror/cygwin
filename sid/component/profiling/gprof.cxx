@@ -277,7 +277,7 @@ namespace profiling_components
 
 	host_int_8 value = (((host_int_8)this->pc_hi_pin.sense ()) << 32) | (this->pc_pin.sense () & 0xffffffff);
 
-	//	std::cout << "sampled at 0x" << std::hex << value << std::dec << " for " << stats[current_stats].output_file << endl;
+	// std::cout << "sampled " << ticks << " ticks at 0x" << std::hex << value << std::dec << " for " << stats[current_stats].output_file << endl;
 	// Reject out-of-bounds samples
 	statistics &st = this->stats[current_stats];
 	if (value < st.limit_min || value > st.limit_max) return;

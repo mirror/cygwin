@@ -1,4 +1,4 @@
-2006-09-28  Keith Seitz  <keiths@redhat.com>
+2006-09-19  Keith Seitz  <keiths@redhat.com>
 
 	* Makefile.in Chagne all instances of configure.in to refer to
 	configure.ac.

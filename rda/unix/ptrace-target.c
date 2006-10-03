@@ -178,7 +178,14 @@ handle_waitstatus (struct child_process *process, union wait w)
 	                    &process->ss_info[i].ss_addr,
 			    process->ss_info[i].ss_val,
 			    process->ss_info[i].ss_size);
+
+	    /* Perform additional actions associated with this breakpoint.  */
+	    if (process->ss_info[i].restore_action)
+	      process->ss_info[i].restore_action (process->serv,
+	                                          &process->ss_info[i]);
+
 	    process->ss_info[i].in_use = 0;
+
 	    if (process->debug_backend)
 	      {
 		long addr;

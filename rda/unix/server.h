@@ -37,6 +37,10 @@ struct ss_save {
 	struct gdbserv_reg ss_addr;
 	char ss_val[8];
 	int ss_size;
+	/* Additional actions that need to be taken after restoring certain
+	   singlestep breakpoints.  This will be NULL if no action other
+	   than the default is required.  */
+	void (*restore_action) (struct gdbserv *serv, struct ss_save *save);
 };
 #endif
 

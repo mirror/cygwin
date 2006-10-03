@@ -497,6 +497,7 @@ enum
   A1_REGNUM = 5,
   A2_REGNUM = 6,
   A3_REGNUM = 7,
+  LIR_REGNUM = 12,
   LAR_REGNUM = 13,
   MDR_REGNUM = 10,
   SP_REGNUM = 8,
@@ -3354,7 +3355,9 @@ decr_pc_after_break (struct gdbserv *serv, pid_t pid)
 
 static void
 set_singlestep_breakpoint (struct gdbserv *serv, ptrace_arg3_type addr,
-			   char *breakpoint_bytes, int breakpoint_length)
+			   char *breakpoint_bytes, int breakpoint_length,
+			   void (*restore_action) (struct gdbserv *serv,
+			                           struct ss_save *save))
 {
   int i = 0;
   struct child_process *process = gdbserv_target_data (serv);
@@ -3393,6 +3396,8 @@ set_singlestep_breakpoint (struct gdbserv *serv, ptrace_arg3_type addr,
                   &process->ss_info[i].ss_addr,
 		  breakpoint_bytes,
 		  process->ss_info[i].ss_size);
+
+  process->ss_info[i].restore_action = restore_action;
   if (process->debug_backend)
     fprintf (stderr, "Singlestep breakpoint %d set at location %lx\n", i, addr);
 }
@@ -3551,15 +3556,15 @@ mips_singlestep (struct gdbserv *serv, pid_t pid, int sig)
       if (is_cond && targ != (mips_pc + 8))
 	{
 	  set_singlestep_breakpoint (serv, mips_pc + 8, &bp_inst,
-	                              sizeof (bp_inst));
+	                              sizeof (bp_inst), NULL);
 	}
       set_singlestep_breakpoint (serv, targ, &bp_inst,
-				  sizeof (bp_inst));
+				  sizeof (bp_inst), NULL);
     }
   else
     {
       set_singlestep_breakpoint (serv, mips_pc + 4, &bp_inst,
-				  sizeof (bp_inst));
+				  sizeof (bp_inst), NULL);
     }
 
   ptrace (PTRACE_CONT, pid, 1L, sig); 
@@ -3635,6 +3640,12 @@ am33_get_register (struct gdbserv *serv, pid_t pid, int regno)
   return debug_get_reg (serv, pid, regno);
 }
 
+static int
+am33_set_register (struct gdbserv *serv, pid_t pid, int regno, unsigned long regval)
+{
+  return write_reg_as_ulong (serv, pid, regno, regval);
+}
+
 
 /* Get the contents of An register.  */
 
@@ -3655,6 +3666,23 @@ am33_get_areg (struct gdbserv *serv, pid_t pid, int n)
   return 0;
 }
 
+/* Restore LIR after singlestepping an Lcc instruction.  */
+static void
+am33_restore_lir (struct gdbserv *serv, struct ss_save *save)
+{
+  struct child_process *process = gdbserv_target_data (serv);
+  int pid = process->pid;
+  unsigned long lir = am33_get_register (serv, pid, LIR_REGNUM);
+  unsigned long addr;
+  int rot;
+
+  gdbserv_host_bytes_from_reg (serv, &addr, sizeof (addr), &save->ss_addr,
+                               sign_extend);
+  rot = addr & 0x3;
+  lir = (lir & ~(0xff << (rot * 8))) 
+        | (am33_read_byte (serv, addr) << (rot * 8));
+  am33_set_register (serv, pid, LIR_REGNUM, lir);
+}
 
 /* Table of instruction sizes, indexed by first byte of instruction,
    used to determine the address of the next instruction for single stepping.
@@ -3680,7 +3708,7 @@ static char am33_opcode_size[256] =
 /* c */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 2,
 /* d */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 /* e */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-/* f */ 0, 2, 2, 2, 2, 2, 2, 1, 0, 3, 0, 4, 0, 6, 7, 1
+/* f */ 0, 2, 2, 2, 2, 2, 2, 0, 0, 3, 0, 4, 0, 6, 7, 1
 };
 
 /* Set breakpoint(s) to simulate a single step from the current PC.  */
@@ -3733,7 +3761,8 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
   displ = am33_opcode_size[opcode];
   if (displ != 0)
     {
-      set_singlestep_breakpoint (serv, pc + displ, &bp_inst, sizeof (bp_inst));
+      set_singlestep_breakpoint (serv, pc + displ, &bp_inst, sizeof (bp_inst),
+                                 NULL);
     }
   else
 
@@ -3755,10 +3784,29 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
 	 *  bxx (d8,PC)
 	 */
 	displ = (signed char) am33_read_byte (serv, pc + 1);
-	set_singlestep_breakpoint (serv, pc + 2, &bp_inst, sizeof (bp_inst));
+	set_singlestep_breakpoint (serv, pc + 2, &bp_inst, sizeof (bp_inst), NULL);
 	if (displ < 0 || displ > 2)
-	  set_singlestep_breakpoint (serv, pc + displ, &bp_inst, sizeof (bp_inst));
+	  set_singlestep_breakpoint (serv, pc + displ, &bp_inst,
+	                             sizeof (bp_inst), NULL);
 	break;
+
+      case 0xf7:
+	/* Various LIW instructions.  */
+	opcode = am33_read_byte (serv, pc + 1);
+	if (opcode != 0xe0)
+	  {
+	    /* Not a MOV_Lcc.  Set breakpoint four bytes after current
+	       instruction.  */
+	    set_singlestep_breakpoint (serv, pc + 4, &bp_inst,
+	                               sizeof (bp_inst), NULL);
+	    break;
+	  }
+	/* If it is a MOV_Lcc, we'll fall through to the Lcc case below.
+	   Advance PC so that the code below will work for this instruction
+	   too.  */
+	pc += 3;
+	
+	/* Fall through...  */
 
       case 0xd0:
       case 0xd1:
@@ -3771,23 +3819,71 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
       case 0xd8:
       case 0xd9:
       case 0xda:
-	/*
-	 *  lxx (d8,PC)
-	 */
-	if (pc != am33_get_register (serv, pid, LAR_REGNUM))
-	  set_singlestep_breakpoint (serv,
-				     am33_get_register (serv, pid, LAR_REGNUM),
-				     &bp_inst, sizeof (bp_inst));
-	set_singlestep_breakpoint (serv, pc + 1, &bp_inst, sizeof (bp_inst));
+	/* Lcc: This is (conceptually) a conditional branch to the address
+	   contained in LAR - 4.  A SETLB instruction should have been
+	   executed to set up LAR and LIR.  LIR contains four bytes of
+	   prefetched instructions beginning at LAR - 4.  (These will
+	   be rotated depending on the low two bits of the address.)
+	   In order to singlestep this instruction, we place
+	   breakpoints at the instruction following Lcc in addition to
+	   the branch target specified by LAR - 4.  However, we can't
+	   expect that this latter breakpoint will actually do
+	   anything useful since the processor uses the prefetched
+	   instruction data contained in LIR.  Therefore, we also
+	   place a breakpoint at correct byte of LIR.  The function
+	   am33_restore_lir() will restore the correct LIR contents
+	   after stopping at the breakpoint.
+	   
+	   Once the processor has stopped at the first instruction in
+	   the prefetched data, the subsequent instructions are executed
+	   from memory.  Thus, the effect of these instructions should be
+	   identical to that of executing out of the LIR with the proviso
+	   that the program doesn't change the LIR after executing the
+	   SETLB instruction.  (I guess this would be an interesting way
+	   to implement self modifying code...)  */
+
+
+	{
+	  unsigned long lar = am33_get_register (serv, pid, LAR_REGNUM);
+	  int rot = lar & 0x3; 
+	  if (pc != lar - 4)
+	    {
+	      unsigned long lir = am33_get_register (serv, pid, LIR_REGNUM);
+	      lir = (lir & ~(0xff << (rot * 8))) | (bp_inst << (rot * 8));
+	      am33_set_register (serv, pid, LIR_REGNUM, lir);
+	      set_singlestep_breakpoint (serv, lar - 4, &bp_inst,
+	                               sizeof (bp_inst), am33_restore_lir);
+	    }
+	  set_singlestep_breakpoint (serv, pc + 1, &bp_inst, sizeof (bp_inst),
+	                             NULL);
+	}
 	break;
 
       case 0xdb:
-	/*
-	 * setlb requires special attention. It loads the next four instruction
-	 * bytes into the LIR register, so we can't insert a breakpoint in any
-	 * of those locations.
-	 */
-	set_singlestep_breakpoint (serv, pc + 5, &bp_inst, sizeof (bp_inst));
+	/* setlb:  Simulate execution of setlb instruction.  Advance
+	   pc to next instruction and set a breakpoint there too to
+	   make it appear that we executed this instruction.
+	   
+	   If we set a breakpoint on the following instruction and then
+	   allow SETLB to execute, we'll end up with a breakpoint in the
+	   LIR register.
+	   
+	   An earlier version of this code attempted to set the
+	   breakpoint after the four bytes which are loaded into LIR. 
+	   This is incorrect because that location might not be the
+	   start of a new instruction.  */
+
+	am33_set_register (serv, pid, PC_REGNUM, pc + 1);
+	am33_set_register (serv, pid, LAR_REGNUM, pc + 5);
+	{
+	  unsigned long lir = (unsigned long) am33_read_disp32 (serv, pc + 1);
+	  int rot = (pc + 1) & 0x3; 
+	  if (rot != 0)
+	    lir = (lir << (rot * 8)) | (lir >> ((4 - rot) * 8));
+	  am33_set_register (serv, pid, LIR_REGNUM, lir);
+	}
+	set_singlestep_breakpoint (serv, pc + 1, &bp_inst, sizeof (bp_inst),
+	                           NULL);
 	break;
 
       case 0xcc:
@@ -3796,7 +3892,8 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
 	 * jmp (d16,PC) or call (d16,PC)
 	 */
 	displ = am33_read_disp16(serv, pc + 1);
-	set_singlestep_breakpoint (serv, pc + displ, &bp_inst, sizeof (bp_inst));
+	set_singlestep_breakpoint (serv, pc + displ, &bp_inst,
+	                           sizeof (bp_inst), NULL);
 	break;
 
       case 0xdc:
@@ -3805,7 +3902,8 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
 	 * jmp (d32,PC) or call (d32,PC)
 	 */
 	displ = am33_read_disp32(serv, pc + 1);
-	set_singlestep_breakpoint (serv, pc + displ, &bp_inst, sizeof (bp_inst));
+	set_singlestep_breakpoint (serv, pc + displ, &bp_inst,
+	                           sizeof (bp_inst), NULL);
 	break;
 
       case 0xde:
@@ -3813,7 +3911,7 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
 	 *  retf
 	 */
 	set_singlestep_breakpoint (serv, am33_get_register (serv, pid, MDR_REGNUM),
-				   &bp_inst, sizeof (bp_inst));
+				   &bp_inst, sizeof (bp_inst), NULL);
 	break;
 
       case 0xdf:
@@ -3825,7 +3923,7 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
 	  serv,
 	  am33_read_disp32 (serv,
 			    am33_get_register (serv, pid, SP_REGNUM) + displ),
-			    &bp_inst, sizeof (bp_inst));
+	  &bp_inst, sizeof (bp_inst), NULL);
 	break;
 
       case 0xf0:
@@ -3838,7 +3936,7 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
 	    /* jmp (An) / calls (An) */
 	    set_singlestep_breakpoint (serv,
 				       am33_get_areg (serv, pid, opcode & 3),
-				       &bp_inst, sizeof (bp_inst));
+				       &bp_inst, sizeof (bp_inst), NULL);
 
 	  }
 	else if (opcode == 0xfc)
@@ -3847,7 +3945,7 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
 	    set_singlestep_breakpoint (
 	      serv,
 	      am33_read_disp32 (serv, am33_get_register (serv, pid, SP_REGNUM)),
-				&bp_inst, sizeof (bp_inst));
+				&bp_inst, sizeof (bp_inst), NULL);
       
 	  }
 	else if (opcode == 0xfd)
@@ -3857,11 +3955,12 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
 	      serv,
 	      am33_read_disp32 (serv,
 				am33_get_register (serv, pid, SP_REGNUM) + 4),
-	      &bp_inst, sizeof (bp_inst));
+	      &bp_inst, sizeof (bp_inst), NULL);
 
 	  }
 	else 
-	  set_singlestep_breakpoint (serv, pc + 2, &bp_inst, sizeof (bp_inst));
+	  set_singlestep_breakpoint (serv, pc + 2, &bp_inst, sizeof (bp_inst),
+	                             NULL);
 
 	break;
 
@@ -3873,14 +3972,16 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
 	if (opcode >= 0xe8 && opcode <= 0xeb)
 	  {
 	    displ = (signed char) am33_read_byte (serv, pc + 2);
-	    set_singlestep_breakpoint (serv, pc + 3, &bp_inst, sizeof (bp_inst));
+	    set_singlestep_breakpoint (serv, pc + 3, &bp_inst, sizeof (bp_inst),
+	                               NULL);
 	    if (displ < 0 || displ > 3)
 	      set_singlestep_breakpoint (serv, pc + displ,
-					 &bp_inst, sizeof (bp_inst));
+					 &bp_inst, sizeof (bp_inst), NULL);
       
 	  }
 	else
-	  set_singlestep_breakpoint (serv, pc + 3, &bp_inst, sizeof (bp_inst));
+	  set_singlestep_breakpoint (serv, pc + 3, &bp_inst, sizeof (bp_inst),
+	                             NULL);
 	break;
 
       case 0xfa:
@@ -3890,10 +3991,11 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
 	    /* calls (d16,PC) */
 	    displ = am33_read_disp16 (serv, pc + 2);
 	    set_singlestep_breakpoint (serv, pc + displ,
-				       &bp_inst, sizeof (bp_inst));
+				       &bp_inst, sizeof (bp_inst), NULL);
 	  }
 	else
-	  set_singlestep_breakpoint (serv, pc + 4, &bp_inst, sizeof (bp_inst));
+	  set_singlestep_breakpoint (serv, pc + 4, &bp_inst, sizeof (bp_inst),
+	                             NULL);
 	break;
 
       case 0xfc:
@@ -3902,10 +4004,12 @@ am33_singlestep (struct gdbserv *serv, pid_t pid, int sig)
 	  {
 	    /* calls (d32,PC) */
 	    displ = am33_read_disp32 (serv, pc + 2);
-	    set_singlestep_breakpoint (serv, pc + displ, &bp_inst, sizeof (bp_inst));
+	    set_singlestep_breakpoint (serv, pc + displ,
+	                               &bp_inst, sizeof (bp_inst), NULL);
 	  }
 	else
-	  set_singlestep_breakpoint (serv, pc + 6, &bp_inst, sizeof (bp_inst));
+	  set_singlestep_breakpoint (serv, pc + 6,
+	                             &bp_inst, sizeof (bp_inst), NULL);
 	break;
 
     }

@@ -1,3 +1,16 @@
+2006-10-03  Kevin Buettner  <kevinb@redhat.com>
+
+	* server.h (struct ss_save): Add new field ``restore_action''.
+	* ptrace-target.c (handle_waitstatus): Invoke ``restore_action''.
+	* linux-target.c (LIR_REGNUM) [AM33_2_0_LINUX_TARGET]: Define.
+	(set_singlestep_breakpoint): Add ``restore_action'' parameter.
+	Fix all callers.
+	(am33_set_register, am33_restore_lir): New functions.
+	(am33_opcode_size): Change size of LIW instruction(s) to 0 so
+	that these will be handled explicitly in am33_singlestep.
+	(am33_singlestep): Handle LIW instructions.  Revise manner in
+	which Lcc and SETLB instructions are handled.
+
 2006-03-16  Kevin Buettner  <kevinb@redhat.com>
 
 	* server.c (main): Change polling interval for gdbloop_poll()

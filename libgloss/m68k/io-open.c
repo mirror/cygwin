@@ -1,5 +1,5 @@
 /*
- * bdm-close.c -- 
+ * io-open.c -- 
  *
  * Copyright (c) 2006 CodeSourcery Inc
  *
@@ -14,25 +14,48 @@
  * they apply.
  */
 
-#include "bdm-semihost.h"
-#include "bdm-gdb.h"
-#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdarg.h>
+#include <string.h>
 #include <errno.h>
+#define IO open
+#include "io.h"
 
 /*
- * close -- close a file descriptor.
+ * open -- Open a file.
  * input parameters:
- *   0 : file descriptor
+ *   0 : fname ptr
+ *   1 : fname length
+ *   2 : flags
+ *   3 : mode
  * output parameters:
  *   0 : result
  *   1 : errno
  */
 
-int close (int fd)
+int open (const char *fname, int flags, ...)
 {
+#if HOSTED
   gdb_parambuf_t parameters;
-  parameters[0] = (uint32_t) fd;
-  __bdm_semihost (BDM_CLOSE, parameters);
-  errno = convert_from_gdb_errno (parameters[1]);
+  parameters[0] = (uint32_t) fname;
+  parameters[1] = strlen (fname) + 1;
+  parameters[2] = __hosted_to_gdb_open_flags (flags);
+  if (flags & O_CREAT)
+    {
+      va_list ap;
+      va_start (ap, flags);
+      parameters[3] = __hosted_to_gdb_mode_t (va_arg (ap, mode_t));
+      va_end (ap);
+    }
+  else
+    parameters[3] = 0;
+  __hosted (HOSTED_OPEN, parameters);
+  errno = __hosted_from_gdb_errno (parameters[1]);
   return parameters[0];
+#else
+  errno = ENOSYS;
+  return -1;
+#endif
 }

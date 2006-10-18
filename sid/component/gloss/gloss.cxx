@@ -9,6 +9,8 @@
 #include "gloss.h"
 #include "libgloss.h"
 #include "libcygmon.h"
+#include "sh_compact.h"
+#include "sh_media.h"
 // ??? For now.  grep for newlib below.
 #include "newlib.h"
 #ifdef HAVE_TIMES
@@ -768,6 +770,105 @@ gloss32::target_to_host_syscall (int32 target_syscall)
   else if (syscall_numbering_scheme == "libgloss")
     {
       return target_syscall;
+    }
+  else if (syscall_numbering_scheme == "sh-compact")
+    {
+      switch(target_syscall)
+        {
+        case sh_compact::SYS_exit:
+          return libgloss::SYS_exit;
+          break;
+        case sh_compact::SYS_open:
+          return libgloss::SYS_open;
+          break;
+        case sh_compact::SYS_close:
+          return libgloss::SYS_close;
+          break;
+        case sh_compact::SYS_read:
+          return libgloss::SYS_read;
+          break;
+        case sh_compact::SYS_write:
+          return libgloss::SYS_write;
+          break;
+        case sh_compact::SYS_lseek:
+          return libgloss::SYS_lseek;
+          break;
+        case sh_compact::SYS_unlink:
+          return libgloss::SYS_unlink;
+          break;
+        case sh_compact::SYS_getpid:
+          return libgloss::SYS_getpid;
+          break;
+        case sh_compact::SYS_fstat:
+          return libgloss::SYS_fstat;
+          break;
+        case sh_compact::SYS_chdir:
+          return libgloss::SYS_chdir;
+          break;
+        case sh_compact::SYS_stat:
+          return libgloss::SYS_stat;
+          break;
+        case sh_compact::SYS_chmod:
+          return libgloss::SYS_chmod;
+          break;
+        case sh_compact::SYS_utime:
+          return libgloss::SYS_utime;
+          break;
+        case sh_compact::SYS_time:
+          return libgloss::SYS_time;
+          break;
+        case sh_compact::SYS_argc:
+          return libgloss::SYS_argc;
+          break;
+        case sh_compact::SYS_argnlen:
+          return libgloss::SYS_argnlen;
+          break;
+        case sh_compact::SYS_argn:
+          return libgloss::SYS_argn;
+          break;
+        default:
+          return libgloss::SYS_unsupported;
+          break;
+        };
+    }
+  else if (syscall_numbering_scheme == "sh-media")
+    {
+      switch(target_syscall)
+        {
+        case sh_compact::SYS_exit:
+          return libgloss::SYS_exit;
+          break;
+        case sh_compact::SYS_open:
+          return libgloss::SYS_open;
+          break;
+        case sh_compact::SYS_close:
+          return libgloss::SYS_close;
+          break;
+        case sh_compact::SYS_read:
+          return libgloss::SYS_read;
+          break;
+        case sh_compact::SYS_write:
+          return libgloss::SYS_write;
+          break;
+        case sh_compact::SYS_lseek:
+          return libgloss::SYS_lseek;
+          break;
+        case sh_compact::SYS_time:
+          return libgloss::SYS_time;
+          break;
+        case sh_compact::SYS_argc:
+          return libgloss::SYS_argc;
+          break;
+        case sh_compact::SYS_argnlen:
+          return libgloss::SYS_argnlen;
+          break;
+        case sh_compact::SYS_argn:
+          return libgloss::SYS_argn;
+          break;
+        default:
+          return libgloss::SYS_unsupported;
+          break;
+        };
     }
   else
     {

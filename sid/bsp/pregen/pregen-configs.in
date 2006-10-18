@@ -78,6 +78,12 @@ mvic a.out.conf mt-gloss.conf
 crs --cpu=mt --no-run --gdb=5000
 mvic sid.conf mt-gdb.conf
 
+crs --cpu=sh5 --no-run a.out
+mvic a.out.conf sh5-gloss.conf
+
+crs --cpu=sh5 --no-run --gdb=5000
+mvic sid.conf sh5-gdb.conf
+
 crs --cpu=xstormy16 --no-run a.out
 mvic a.out.conf xstormy16-gloss.conf
 

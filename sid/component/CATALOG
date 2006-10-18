@@ -42,6 +42,23 @@ hw-cache-*		Other memory caches (ref. component docs)
 hw-cpu-arm7t            ARM7 / ARM7T CPU model
 hw-cpu-x86		X86 CPU model
 hw-cpu-m32r/d           M32R/D CPU model
+hw-cpu-sh2		SH2   CPU model
+hw-cpu-sh2e		SH2e  CPU model
+hw-cpu-sh2a-nofpu	SH2a  CPU model no fpu
+hw-cpu-sh2a-fpu-single	SH2a  CPU model single precision fpu
+hw-cpu-sh2a-fpu		SH2a  CPU model with fpu
+hw-cpu-sh3		SH3   CPU model
+hw-cpu-sh3e		SH3e  CPU model
+hw-cpu-sh4		SH4   CPU model
+hw-cpu-sh4-nofpu	SH4   CPU model no fpu
+hw-cpu-sh4-single	SH4   CPU model single precision fpu
+hw-cpu-sh4a		SH4a  CPU model
+hw-cpu-sh4a-nofpu	SH4a  CPU model no fpu
+hw-cpu-sh4a-single	SH4a  CPU model single precision fpu
+hw-cpu-sh4al		SH4al CPU model
+hw-cpu-sh5-compact	SH5   CPU model compact ISA
+hw-cpu-sh5-32media	SH5   CPU model 32 bit compact and media ISAs
+hw-cpu-sh5-64media	SH5   CPU model 64 bit compact and media ISAs
 hw-cpu-xstormy16        Sanyo Xstormy16 CPU model
 hw-disk-harddrive	Newer IDE hard drive model (controller + drives)
 hw-disk-ide             IDE hard drive model (controller + drives)

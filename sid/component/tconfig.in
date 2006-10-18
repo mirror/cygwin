@@ -8,4 +8,6 @@
 #define SIDTARGET_M68K @sidtarget_m68k@
 #define SIDTARGET_MT @sidtarget_mt@
 #define SIDTARGET_PPC @sidtarget_ppc@
+#define SIDTARGET_SH @sidtarget_sh@
+#define SIDTARGET_SH64 @sidtarget_sh64@
 #define SIDTARGET_XSTORMY16 @sidtarget_xstormy16@

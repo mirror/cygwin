@@ -18,6 +18,7 @@ require 5.004;
 	         # INSERT NEW ENTRIES HERE
 		 "m32r" => "hw-cpu-m32r/d",
 		 "mt" => "hw-cpu-mt",
+		 "sh5" => "hw-cpu-sh5",
 		 "xstormy16" => "hw-cpu-xstormy16",
 		 );
 
@@ -25,6 +26,7 @@ require 5.004;
 		      "x86" => "-EL",
 		      "m32r" => "-EB",
 		      "mt" => "-EB",
+		      "sh5" => "-EL",
 		      "xstormy16" => "-EL",
 		      );
 
@@ -35,6 +37,7 @@ require 5.004;
 	           # INSERT NEW ENTRIES HERE
 		   "m32r" => "sw-gloss-m32r/libgloss",
 		   "mt" => "sw-gloss-generic/libgloss",
+		   "sh5" => "sw-gloss-generic/libgloss",
 		   "xstormy16" => "sw-gloss-generic/libgloss",
 		   );
 
@@ -45,6 +48,7 @@ require 5.004;
 	           # INSERT NEW ENTRIES HERE
 		   "m32r" => "0x00000000,0x00800000",
 		   "mt" => "0x00000000,0x00800000",
+		   "sh5" => "0x00000000,0x00800000", # check this
 		   "xstormy16" => "0x00000000,0x00800000",
 		  );
 
@@ -908,6 +912,11 @@ if ($opt_cpu eq "arm")
   }
 
 if ($opt_cpu eq "mt")
+  {
+    $enable_z_packet = "true";
+  }
+
+if ($opt_cpu eq "sh5")
   {
     $enable_z_packet = "true";
   }

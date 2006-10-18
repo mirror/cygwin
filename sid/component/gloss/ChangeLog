@@ -1,3 +1,15 @@
+2006-10-18  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+
+	2006-05-11  Dave Brolley  <brolley@redhat.com>
+
+	* gloss.cxx (sh_compact.h): #include it.
+	(sh_media.h): #include it.
+	(target_to_host_syscall): Handle "sh-compact" and "sh-media".
+	* sh_compact.h: New header.
+	* sh_media.h: New header.
+
 2006-07-14  Dave Brolley  <brolley@redhat.com>
 
 	* gloss.h (rx_eof_pin): New member of gloss32.

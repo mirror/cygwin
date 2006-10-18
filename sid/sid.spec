@@ -114,6 +114,9 @@ make install
 /usr/bin/m68k-elf-sid
 /usr/bin/m32r-elf-sid
 /usr/bin/mt-elf-sid
+/usr/bin/sh-elf-sid
+/usr/bin/sh5-elf-sid
+/usr/bin/sh64-elf-sid
 /usr/bin/xstormy16-elf-sid
 /usr/bin/sid
 /usr/bin/siddoc

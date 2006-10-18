@@ -1018,7 +1018,10 @@ GprofCfg::GprofCfg (const string name,
   conn_pin (cpu, "cg-callee", this, "cg-callee");
   conn_pin (cpu, "gprof-pc-hi", this, "pc-hi");
   conn_pin (cpu, "gprof-pc", this, "pc");
-  set (this, "bucket-size", "4"); // bytes-per-bucket
+  if (cpu->comp_type().substr(0, 9) == "hw-cpu-sh")
+    set (this, "bucket-size", "2"); // bytes-per-bucket
+  else
+    set (this, "bucket-size", "4"); // bytes-per-bucket
   set (this, "output-file", filename);
 }
 
@@ -1036,7 +1039,10 @@ GprofCfg::GprofCfg (const string name,
 
   sess->shutdown_seq->add_output (7, this, "store");
   relate (this, "target-component", cpu);
-  set (this, "bucket-size", "4"); // bytes-per-bucket
+  if (cpu->comp_type().substr(0, 9) == "hw-cpu-sh")
+    set (this, "bucket-size", "2"); // bytes-per-bucket
+  else
+    set (this, "bucket-size", "4"); // bytes-per-bucket
 }
 
 

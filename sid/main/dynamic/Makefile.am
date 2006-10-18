@@ -10,6 +10,15 @@ bin_PROGRAMS = sid
 TARGETCFGS = ""
 TARGETDEFINES =
 
+if SIDTARGET_SH
+TARGETCFGS += shCfg.cxx
+TARGETDEFINES += -DSIDTARGET_SH
+endif
+if SIDTARGET_SH64
+TARGETCFGS += shCfg.cxx
+TARGETDEFINES += -DSIDTARGET_SH64
+endif
+
 # If sid is being compiled without shared library support, arrange to
 # statically link in a bunch of component libraries using libtool's
 # '-dlpreopen' flag.

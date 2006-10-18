@@ -1,6 +1,6 @@
 // mainDynamic.cxx - high-tech mainline.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -13,6 +13,9 @@
 #include <sidmiscutil.h>
 #include <getopt.h>
 
+#if defined (SIDTARGET_SH) || defined (SIDTARGET_SH64)
+#include "shCfg.h"
+#endif /* SIDTARGET_SH */
 
 #include <string>
 
@@ -41,6 +44,33 @@ mk_basic (const string name, SessionCfg *sess)
 
 static boardspec boards [] = {
   {"basic", "basic cpu + memory board", & mk_basic},
+#if defined (SIDTARGET_SH) || defined (SIDTARGET_SH64)
+  { "sh", "sh default board", & mk_sh },
+  { "sh2", "sh2 board", & mk_sh2 },
+  { "sh2e", "sh2e board", & mk_sh2e },
+  { "sh2a", "sh2a default board", & mk_sh2a },
+  { "sh2a-nofpu", "sh2a board with no fpu", & mk_sh2a_nofpu },
+  { "sh2a-single-only", "sh2a board with single precision fpu", & mk_sh2a_fpu_single },
+  { "sh2a-single", "sh2a board with fpu: default precision is single", & mk_sh2a_fpu },
+  { "sh2a-fpu", "sh2a board with fpu", & mk_sh2a_fpu }, // same as sh2a-single
+  { "sh3", "sh3 board", & mk_sh3 },
+  { "sh3e", "sh3e board", & mk_sh3e },
+  { "sh4", "sh4 board with fpu", & mk_sh4 },
+  { "sh4-nofpu", "sh4 board with no fpu", & mk_sh4_nofpu },
+  { "sh4-single-only", "sh4 board with single precision fpu", & mk_sh4_single },
+  { "sh4-single", "sh4 board with fpu: default precision is single", & mk_sh4 },
+  { "sh4a", "sh4a board with fpu", & mk_sh4a },
+  { "sh4a-nofpu", "sh4a board with no fpu", & mk_sh4a_nofpu },
+  { "sh4a-single-only", "sh4a board with single precision fpu", & mk_sh4a_single },
+  { "sh4a-single", "sh4a board with fpu: default precision is single", & mk_sh4a },
+  { "sh4al", "sh4al board", & mk_sh4al },
+#if defined (SIDTARGET_SH64)
+  { "sh5", "sh5 default board", & mk_sh5_64media },
+  { "sh5-compact", "sh5 compact board", & mk_sh5_compact },
+  { "sh5-32media", "sh5 32 bit media board", & mk_sh5_32media },
+  { "sh5-64media", "sh5 64 bit media board", & mk_sh5_64media },
+#endif
+#endif
   {0, 0, 0}
 };
     

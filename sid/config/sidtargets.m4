@@ -43,6 +43,8 @@ sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
 sidtarget_mt=$sidtarget_default
 sidtarget_ppc=$sidtarget_default
+sidtarget_sh=$sidtarget_default
+sidtarget_sh64=$sidtarget_default
 sidtarget_xstormy16=$sidtarget_default
 
 dnl Iterate over all listed targets
@@ -58,6 +60,8 @@ do
       mt*)    sidtarget_mt=1 ;;
       powerpc*) sidtarget_ppc=1 ;;
       ppc*)   sidtarget_ppc=1 ;;
+      sh64*) sidtarget_sh64=1 ;;
+      sh*) sidtarget_sh=1 ;;
       xstormy16*) sidtarget_xstormy16=1 ;;
       *)      AC_MSG_WARN("Unknown target $targ") ;;
    esac
@@ -72,6 +76,8 @@ case 1 in
   ${sidtarget_m68k}) ;;
   ${sidtarget_mt}) ;;
   ${sidtarget_ppc}) ;;
+  ${sidtarget_sh}) ;;
+  ${sidtarget_sh64}) ;;
   ${sidtarget_xstormy16}) ;;
   *) AC_MSG_WARN([No selected sid targets: use --enable-targets or --target])
 	;;
@@ -115,6 +121,16 @@ AC_MSG_CHECKING(PPC family support)
 AC_SUBST(sidtarget_ppc)
 AM_CONDITIONAL(SIDTARGET_PPC,[test "x$sidtarget_ppc" = x1])
 AC_MSG_RESULT($sidtarget_ppc)
+
+AC_MSG_CHECKING(SH family support)
+AC_SUBST(sidtarget_sh)
+AM_CONDITIONAL(SIDTARGET_SH,[test "x$sidtarget_sh" = x1])
+AC_MSG_RESULT($sidtarget_sh)
+
+AC_MSG_CHECKING(SH64 family support)
+AC_SUBST(sidtarget_sh64)
+AM_CONDITIONAL(SIDTARGET_SH64,[test "x$sidtarget_sh64" = x1])
+AC_MSG_RESULT($sidtarget_sh64)
 
 AC_MSG_CHECKING(Sanyo Xstormy16 family support)
 AC_SUBST(sidtarget_xstormy16)

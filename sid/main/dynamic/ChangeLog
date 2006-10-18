@@ -1,3 +1,24 @@
+2006-10-18  Dave Brolley  <brolley@redhat.com>
+
+	* Contribue the following changes:
+
+	2006-07-19  Dave Brolley  <brolley@redhat.com>
+
+	* shCfg.h (insn_buffer): All references removed.
+	(main_memory): New member of ShBoardCfg.
+	* shCfg.cxx (insn_buffer): All references removed.
+	(ShBoardCfg): Don't initialize icache or ocache. Assume icache and
+	ocache are always created. Don't connect memory heirarchy here.
+	(write_config): Do it here instead.
+
+	2006-05-11  Dave Brolley  <brolley@redhat.com>
+
+	* Makefile.am: Add sh support.
+	* mainDynamic.cxx: Likewise.
+	* shCfg.cxx: New source file.
+	* shCfg.h: New source file.
+	* commonCfg.cxx (GprofCfg): Set bucket-size for hw-cpu-sh*.
+
 2006-09-27  Dave Brolley  <brolley@redhat.com>
 
 	* commonCfg.cxx (profile_opt_gprof_value): Handle "gprof=<file>,cycles".

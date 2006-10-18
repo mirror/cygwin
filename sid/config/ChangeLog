@@ -1,3 +1,12 @@
+2006-10-18  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+
+	2006-05-11  Dave Brolley  <brolley@redhat.com>
+
+	* sidtargets.m4: Add sh support.
+	* info.tcl.in: Likewise.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

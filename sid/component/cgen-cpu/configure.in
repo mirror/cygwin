@@ -57,6 +57,10 @@ if test $sidtarget_mt -eq 1; then
 	cpu_subdirs="$cpu_subdirs mt"
         AC_CONFIG_SUBDIRS(mt)
 fi
+if test $sidtarget_sh -eq 1 -o $sidtarget_sh64 -eq 1; then
+	cpu_subdirs="$cpu_subdirs sh"
+        AC_CONFIG_SUBDIRS(sh)
+fi
 if test $sidtarget_xstormy16 -eq 1; then
 	cpu_subdirs="$cpu_subdirs xstormy16"
         AC_CONFIG_SUBDIRS(xstormy16)

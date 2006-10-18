@@ -182,12 +182,16 @@ SIDTARGET_M32R_FALSE = @SIDTARGET_M32R_FALSE@
 SIDTARGET_M32R_TRUE = @SIDTARGET_M32R_TRUE@
 SIDTARGET_M68K_FALSE = @SIDTARGET_M68K_FALSE@
 SIDTARGET_M68K_TRUE = @SIDTARGET_M68K_TRUE@
-SIDTARGET_MT_FALSE = @SIDTARGET_MT_FALSE@
-SIDTARGET_MT_TRUE = @SIDTARGET_MT_TRUE@
 SIDTARGET_MIPS_FALSE = @SIDTARGET_MIPS_FALSE@
 SIDTARGET_MIPS_TRUE = @SIDTARGET_MIPS_TRUE@
+SIDTARGET_MT_FALSE = @SIDTARGET_MT_FALSE@
+SIDTARGET_MT_TRUE = @SIDTARGET_MT_TRUE@
 SIDTARGET_PPC_FALSE = @SIDTARGET_PPC_FALSE@
 SIDTARGET_PPC_TRUE = @SIDTARGET_PPC_TRUE@
+SIDTARGET_SH64_FALSE = @SIDTARGET_SH64_FALSE@
+SIDTARGET_SH64_TRUE = @SIDTARGET_SH64_TRUE@
+SIDTARGET_SH_FALSE = @SIDTARGET_SH_FALSE@
+SIDTARGET_SH_TRUE = @SIDTARGET_SH_TRUE@
 SIDTARGET_X86_FALSE = @SIDTARGET_X86_FALSE@
 SIDTARGET_X86_TRUE = @SIDTARGET_X86_TRUE@
 SIDTARGET_XSTORMY16_FALSE = @SIDTARGET_XSTORMY16_FALSE@
@@ -246,9 +250,11 @@ sharedstatedir = @sharedstatedir@
 sidtarget_arm = @sidtarget_arm@
 sidtarget_m32r = @sidtarget_m32r@
 sidtarget_m68k = @sidtarget_m68k@
-sidtarget_mt = @sidtarget_mt@
 sidtarget_mips = @sidtarget_mips@
+sidtarget_mt = @sidtarget_mt@
 sidtarget_ppc = @sidtarget_ppc@
+sidtarget_sh = @sidtarget_sh@
+sidtarget_sh64 = @sidtarget_sh64@
 sidtarget_x86 = @sidtarget_x86@
 sidtarget_xstormy16 = @sidtarget_xstormy16@
 subdirs = @subdirs@
@@ -373,8 +379,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/compCGEN.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cgen-fpu.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/compCGEN.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tracedis.Plo@am__quote@
 
@@ -808,8 +814,6 @@ dis-init.lo: ../../../opcodes/dis-init.c
 
 cgen-bitset.lo: ../../../opcodes/cgen-bitset.c
 	/bin/sh ./libtool --mode=compile $(CC) $(OPCODES_COMPILE_FLAGS) $(CFLAGS) -c $<
-
-
 check-local: all
 	-(cd ../testsuite ; $(MAKE) check RUNTESTFLAGS="$(RUNTESTFLAGS) $(DEJAGNUTESTS)" )
 	for subdir in @cpu_subdirs@; do \

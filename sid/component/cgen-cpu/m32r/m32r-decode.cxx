@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+Copyright (C) 2000-2005 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -20,7 +20,7 @@ using namespace m32rbf; // FIXME: namespace organization still wip
 
 // The instruction descriptor array. 
 
-m32rbf_idesc m32rbf_idesc::idesc_table[M32RBF_INSN_UNLOCK + 1] =
+m32rbf_idesc m32rbf_idesc::idesc_table[M32RBF_INSN_BTST + 1] =
 {
   { m32rbf_sem_x_invalid, "X_INVALID", M32RBF_INSN_X_INVALID, { 0|(1<<CGEN_INSN_VIRTUAL), (1<<MACH_BASE), PIPE_NONE } },
   { m32rbf_sem_add, "ADD", M32RBF_INSN_ADD, { 0, (1<<MACH_BASE), PIPE_OS } },
@@ -100,15 +100,15 @@ m32rbf_idesc m32rbf_idesc::idesc_table[M32RBF_INSN_UNLOCK + 1] =
   { m32rbf_sem_rach, "RACH", M32RBF_INSN_RACH, { 0, (1<<MACH_M32R), PIPE_S } },
   { m32rbf_sem_rte, "RTE", M32RBF_INSN_RTE, { 0|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), PIPE_O } },
   { m32rbf_sem_seth, "SETH", M32RBF_INSN_SETH, { 0, (1<<MACH_BASE), PIPE_NONE } },
-  { m32rbf_sem_sll, "SLL", M32RBF_INSN_SLL, { 0, (1<<MACH_BASE), PIPE_O } },
+  { m32rbf_sem_sll, "SLL", M32RBF_INSN_SLL, { 0, (1<<MACH_BASE), PIPE_O_OS } },
   { m32rbf_sem_sll3, "SLL3", M32RBF_INSN_SLL3, { 0, (1<<MACH_BASE), PIPE_NONE } },
-  { m32rbf_sem_slli, "SLLI", M32RBF_INSN_SLLI, { 0, (1<<MACH_BASE), PIPE_O } },
-  { m32rbf_sem_sra, "SRA", M32RBF_INSN_SRA, { 0, (1<<MACH_BASE), PIPE_O } },
+  { m32rbf_sem_slli, "SLLI", M32RBF_INSN_SLLI, { 0, (1<<MACH_BASE), PIPE_O_OS } },
+  { m32rbf_sem_sra, "SRA", M32RBF_INSN_SRA, { 0, (1<<MACH_BASE), PIPE_O_OS } },
   { m32rbf_sem_sra3, "SRA3", M32RBF_INSN_SRA3, { 0, (1<<MACH_BASE), PIPE_NONE } },
-  { m32rbf_sem_srai, "SRAI", M32RBF_INSN_SRAI, { 0, (1<<MACH_BASE), PIPE_O } },
-  { m32rbf_sem_srl, "SRL", M32RBF_INSN_SRL, { 0, (1<<MACH_BASE), PIPE_O } },
+  { m32rbf_sem_srai, "SRAI", M32RBF_INSN_SRAI, { 0, (1<<MACH_BASE), PIPE_O_OS } },
+  { m32rbf_sem_srl, "SRL", M32RBF_INSN_SRL, { 0, (1<<MACH_BASE), PIPE_O_OS } },
   { m32rbf_sem_srl3, "SRL3", M32RBF_INSN_SRL3, { 0, (1<<MACH_BASE), PIPE_NONE } },
-  { m32rbf_sem_srli, "SRLI", M32RBF_INSN_SRLI, { 0, (1<<MACH_BASE), PIPE_O } },
+  { m32rbf_sem_srli, "SRLI", M32RBF_INSN_SRLI, { 0, (1<<MACH_BASE), PIPE_O_OS } },
   { m32rbf_sem_st, "ST", M32RBF_INSN_ST, { 0, (1<<MACH_BASE), PIPE_O } },
   { m32rbf_sem_st_d, "ST_D", M32RBF_INSN_ST_D, { 0, (1<<MACH_BASE), PIPE_NONE } },
   { m32rbf_sem_stb, "STB", M32RBF_INSN_STB, { 0, (1<<MACH_BASE), PIPE_O } },
@@ -122,6 +122,11 @@ m32rbf_idesc m32rbf_idesc::idesc_table[M32RBF_INSN_UNLOCK + 1] =
   { m32rbf_sem_subx, "SUBX", M32RBF_INSN_SUBX, { 0, (1<<MACH_BASE), PIPE_OS } },
   { m32rbf_sem_trap, "TRAP", M32RBF_INSN_TRAP, { 0|(1<<CGEN_INSN_FILL_SLOT)|(1<<CGEN_INSN_UNCOND_CTI), (1<<MACH_BASE), PIPE_O } },
   { m32rbf_sem_unlock, "UNLOCK", M32RBF_INSN_UNLOCK, { 0, (1<<MACH_BASE), PIPE_O } },
+  { m32rbf_sem_clrpsw, "CLRPSW", M32RBF_INSN_CLRPSW, { 0|(1<<CGEN_INSN_SPECIAL_M32R), (1<<MACH_BASE), PIPE_O } },
+  { m32rbf_sem_setpsw, "SETPSW", M32RBF_INSN_SETPSW, { 0|(1<<CGEN_INSN_SPECIAL_M32R), (1<<MACH_BASE), PIPE_O } },
+  { m32rbf_sem_bset, "BSET", M32RBF_INSN_BSET, { 0|(1<<CGEN_INSN_SPECIAL_M32R), (1<<MACH_BASE), PIPE_NONE } },
+  { m32rbf_sem_bclr, "BCLR", M32RBF_INSN_BCLR, { 0|(1<<CGEN_INSN_SPECIAL_M32R), (1<<MACH_BASE), PIPE_NONE } },
+  { m32rbf_sem_btst, "BTST", M32RBF_INSN_BTST, { 0|(1<<CGEN_INSN_SPECIAL_M32R), (1<<MACH_BASE), PIPE_O } },
 
 };
 
@@ -251,6 +256,14 @@ static void
 m32rbf_extract_sfmt_trap (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn);
 static void
 m32rbf_extract_sfmt_unlock (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn);
+static void
+m32rbf_extract_sfmt_clrpsw (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn);
+static void
+m32rbf_extract_sfmt_setpsw (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn);
+static void
+m32rbf_extract_sfmt_bset (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn);
+static void
+m32rbf_extract_sfmt_btst (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn);
 
 // Fetch & decode instruction
 void
@@ -266,59 +279,244 @@ m32rbf_scache::decode (m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base
       unsigned int val = (((insn >> 24) & (15 << 4)) | ((insn >> 20) & (15 << 0)));
       switch (val)
       {
-      case 0 : itype = M32RBF_INSN_SUBV; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_addv (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 1 : itype = M32RBF_INSN_SUBX; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_addx (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 2 : itype = M32RBF_INSN_SUB; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 3 : itype = M32RBF_INSN_NEG; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mv (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 4 : itype = M32RBF_INSN_CMP; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_cmp (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 5 : itype = M32RBF_INSN_CMPU; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_cmp (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 8 : itype = M32RBF_INSN_ADDV; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_addv (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 9 : itype = M32RBF_INSN_ADDX; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_addx (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 10 : itype = M32RBF_INSN_ADD; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 11 : itype = M32RBF_INSN_NOT; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mv (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 12 : itype = M32RBF_INSN_AND; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 13 : itype = M32RBF_INSN_XOR; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 14 : itype = M32RBF_INSN_OR; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 16 : itype = M32RBF_INSN_SRL; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 18 : itype = M32RBF_INSN_SRA; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 20 : itype = M32RBF_INSN_SLL; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 22 : itype = M32RBF_INSN_MUL; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 24 : itype = M32RBF_INSN_MV; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mv (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 25 : itype = M32RBF_INSN_MVFC; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mvfc (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 26 : itype = M32RBF_INSN_MVTC; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mvtc (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 0 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x0)
+          { itype = M32RBF_INSN_SUBV; m32rbf_extract_sfmt_addv (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 1 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x10)
+          { itype = M32RBF_INSN_SUBX; m32rbf_extract_sfmt_addx (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 2 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x20)
+          { itype = M32RBF_INSN_SUB; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 3 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x30)
+          { itype = M32RBF_INSN_NEG; m32rbf_extract_sfmt_mv (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 4 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x40)
+          { itype = M32RBF_INSN_CMP; m32rbf_extract_sfmt_cmp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 5 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x50)
+          { itype = M32RBF_INSN_CMPU; m32rbf_extract_sfmt_cmp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 8 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x80)
+          { itype = M32RBF_INSN_ADDV; m32rbf_extract_sfmt_addv (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 9 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x90)
+          { itype = M32RBF_INSN_ADDX; m32rbf_extract_sfmt_addx (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 10 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0xa0)
+          { itype = M32RBF_INSN_ADD; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 11 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0xb0)
+          { itype = M32RBF_INSN_NOT; m32rbf_extract_sfmt_mv (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 12 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0xc0)
+          { itype = M32RBF_INSN_AND; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 13 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0xd0)
+          { itype = M32RBF_INSN_XOR; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 14 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0xe0)
+          { itype = M32RBF_INSN_OR; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 15 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf8f0) == 0xf0)
+          { itype = M32RBF_INSN_BTST; m32rbf_extract_sfmt_btst (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 16 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x1000)
+          { itype = M32RBF_INSN_SRL; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 18 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x1020)
+          { itype = M32RBF_INSN_SRA; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 20 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x1040)
+          { itype = M32RBF_INSN_SLL; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 22 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x1060)
+          { itype = M32RBF_INSN_MUL; m32rbf_extract_sfmt_add (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 24 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x1080)
+          { itype = M32RBF_INSN_MV; m32rbf_extract_sfmt_mv (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 25 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x1090)
+          { itype = M32RBF_INSN_MVFC; m32rbf_extract_sfmt_mvfc (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 26 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x10a0)
+          { itype = M32RBF_INSN_MVTC; m32rbf_extract_sfmt_mvtc (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 28 :
         {
           unsigned int val = (((insn >> 24) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = M32RBF_INSN_JL; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_jl (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = M32RBF_INSN_JMP; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_jmp (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xfff0) == 0x1ec0)
+              { itype = M32RBF_INSN_JL; m32rbf_extract_sfmt_jl (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xfff0) == 0x1fc0)
+              { itype = M32RBF_INSN_JMP; m32rbf_extract_sfmt_jmp (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
-      case 29 : itype = M32RBF_INSN_RTE; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_rte (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 31 : itype = M32RBF_INSN_TRAP; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_trap (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 32 : itype = M32RBF_INSN_STB; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_stb (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 34 : itype = M32RBF_INSN_STH; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_sth (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 36 : itype = M32RBF_INSN_ST; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_st (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 37 : itype = M32RBF_INSN_UNLOCK; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_unlock (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 38 : itype = M32RBF_INSN_ST_PLUS; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_st_plus (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 39 : itype = M32RBF_INSN_ST_MINUS; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_st_plus (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 40 : itype = M32RBF_INSN_LDB; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_ldb (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 41 : itype = M32RBF_INSN_LDUB; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_ldb (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 42 : itype = M32RBF_INSN_LDH; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_ldh (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 43 : itype = M32RBF_INSN_LDUH; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_ldh (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 44 : itype = M32RBF_INSN_LD; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_ld (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 45 : itype = M32RBF_INSN_LOCK; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_lock (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 46 : itype = M32RBF_INSN_LD_PLUS; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_ld_plus (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 48 : itype = M32RBF_INSN_MULHI; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mulhi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 49 : itype = M32RBF_INSN_MULLO; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mulhi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 50 : itype = M32RBF_INSN_MULWHI; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mulhi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 51 : itype = M32RBF_INSN_MULWLO; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mulhi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 52 : itype = M32RBF_INSN_MACHI; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_machi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 53 : itype = M32RBF_INSN_MACLO; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_machi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 54 : itype = M32RBF_INSN_MACWHI; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_machi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 55 : itype = M32RBF_INSN_MACWLO; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_machi (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 29 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xffff) == 0x10d6)
+          { itype = M32RBF_INSN_RTE; m32rbf_extract_sfmt_rte (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 31 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xfff0) == 0x10f0)
+          { itype = M32RBF_INSN_TRAP; m32rbf_extract_sfmt_trap (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 32 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x2000)
+          { itype = M32RBF_INSN_STB; m32rbf_extract_sfmt_stb (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 34 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x2020)
+          { itype = M32RBF_INSN_STH; m32rbf_extract_sfmt_sth (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 36 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x2040)
+          { itype = M32RBF_INSN_ST; m32rbf_extract_sfmt_st (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 37 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x2050)
+          { itype = M32RBF_INSN_UNLOCK; m32rbf_extract_sfmt_unlock (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 38 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x2060)
+          { itype = M32RBF_INSN_ST_PLUS; m32rbf_extract_sfmt_st_plus (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 39 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x2070)
+          { itype = M32RBF_INSN_ST_MINUS; m32rbf_extract_sfmt_st_plus (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 40 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x2080)
+          { itype = M32RBF_INSN_LDB; m32rbf_extract_sfmt_ldb (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 41 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x2090)
+          { itype = M32RBF_INSN_LDUB; m32rbf_extract_sfmt_ldb (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 42 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x20a0)
+          { itype = M32RBF_INSN_LDH; m32rbf_extract_sfmt_ldh (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 43 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x20b0)
+          { itype = M32RBF_INSN_LDUH; m32rbf_extract_sfmt_ldh (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 44 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x20c0)
+          { itype = M32RBF_INSN_LD; m32rbf_extract_sfmt_ld (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 45 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x20d0)
+          { itype = M32RBF_INSN_LOCK; m32rbf_extract_sfmt_lock (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 46 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x20e0)
+          { itype = M32RBF_INSN_LD_PLUS; m32rbf_extract_sfmt_ld_plus (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 48 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x3000)
+          { itype = M32RBF_INSN_MULHI; m32rbf_extract_sfmt_mulhi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 49 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x3010)
+          { itype = M32RBF_INSN_MULLO; m32rbf_extract_sfmt_mulhi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 50 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x3020)
+          { itype = M32RBF_INSN_MULWHI; m32rbf_extract_sfmt_mulhi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 51 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x3030)
+          { itype = M32RBF_INSN_MULWLO; m32rbf_extract_sfmt_mulhi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 52 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x3040)
+          { itype = M32RBF_INSN_MACHI; m32rbf_extract_sfmt_machi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 53 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x3050)
+          { itype = M32RBF_INSN_MACLO; m32rbf_extract_sfmt_machi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 54 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x3060)
+          { itype = M32RBF_INSN_MACWHI; m32rbf_extract_sfmt_machi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 55 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0f0) == 0x3070)
+          { itype = M32RBF_INSN_MACWLO; m32rbf_extract_sfmt_machi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 64 : /* fall through */
       case 65 : /* fall through */
       case 66 : /* fall through */
@@ -334,34 +532,78 @@ m32rbf_scache::decode (m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base
       case 76 : /* fall through */
       case 77 : /* fall through */
       case 78 : /* fall through */
-      case 79 : itype = M32RBF_INSN_ADDI; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 79 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf000) == 0x4000)
+          { itype = M32RBF_INSN_ADDI; m32rbf_extract_sfmt_addi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 80 : /* fall through */
-      case 81 : itype = M32RBF_INSN_SRLI; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_slli (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 81 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0e0) == 0x5000)
+          { itype = M32RBF_INSN_SRLI; m32rbf_extract_sfmt_slli (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 82 : /* fall through */
-      case 83 : itype = M32RBF_INSN_SRAI; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_slli (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 83 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0e0) == 0x5020)
+          { itype = M32RBF_INSN_SRAI; m32rbf_extract_sfmt_slli (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 84 : /* fall through */
-      case 85 : itype = M32RBF_INSN_SLLI; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_slli (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 85 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf0e0) == 0x5040)
+          { itype = M32RBF_INSN_SLLI; m32rbf_extract_sfmt_slli (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 87 :
         {
           unsigned int val = (((insn >> 16) & (1 << 0)));
           switch (val)
           {
-          case 0 : itype = M32RBF_INSN_MVTACHI; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mvtachi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = M32RBF_INSN_MVTACLO; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mvtachi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xf0ff) == 0x5070)
+              { itype = M32RBF_INSN_MVTACHI; m32rbf_extract_sfmt_mvtachi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xf0ff) == 0x5071)
+              { itype = M32RBF_INSN_MVTACLO; m32rbf_extract_sfmt_mvtachi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
-      case 88 : itype = M32RBF_INSN_RACH; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_rac (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 89 : itype = M32RBF_INSN_RAC; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_rac (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 88 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xffff) == 0x5080)
+          { itype = M32RBF_INSN_RACH; m32rbf_extract_sfmt_rac (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 89 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xffff) == 0x5090)
+          { itype = M32RBF_INSN_RAC; m32rbf_extract_sfmt_rac (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 95 :
         {
           unsigned int val = (((insn >> 16) & (3 << 0)));
           switch (val)
           {
-          case 0 : itype = M32RBF_INSN_MVFACHI; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mvfachi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = M32RBF_INSN_MVFACLO; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mvfachi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 2 : itype = M32RBF_INSN_MVFACMI; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_mvfachi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xf0ff) == 0x50f0)
+              { itype = M32RBF_INSN_MVFACHI; m32rbf_extract_sfmt_mvfachi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xf0ff) == 0x50f1)
+              { itype = M32RBF_INSN_MVFACLO; m32rbf_extract_sfmt_mvfachi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xf0ff) == 0x50f2)
+              { itype = M32RBF_INSN_MVFACMI; m32rbf_extract_sfmt_mvfachi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 96 : /* fall through */
@@ -379,18 +621,52 @@ m32rbf_scache::decode (m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base
       case 108 : /* fall through */
       case 109 : /* fall through */
       case 110 : /* fall through */
-      case 111 : itype = M32RBF_INSN_LDI8; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_ldi8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 111 :
+        entire_insn = entire_insn >> 16;
+        if ((entire_insn & 0xf000) == 0x6000)
+          { itype = M32RBF_INSN_LDI8; m32rbf_extract_sfmt_ldi8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 112 :
         {
           unsigned int val = (((insn >> 24) & (15 << 0)));
           switch (val)
           {
-          case 0 : itype = M32RBF_INSN_NOP; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 12 : itype = M32RBF_INSN_BC8; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_bc8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 13 : itype = M32RBF_INSN_BNC8; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_bc8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 14 : itype = M32RBF_INSN_BL8; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_bl8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 15 : itype = M32RBF_INSN_BRA8; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_bra8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xffff) == 0x7000)
+              { itype = M32RBF_INSN_NOP; m32rbf_extract_sfmt_nop (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xff00) == 0x7100)
+              { itype = M32RBF_INSN_SETPSW; m32rbf_extract_sfmt_setpsw (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xff00) == 0x7200)
+              { itype = M32RBF_INSN_CLRPSW; m32rbf_extract_sfmt_clrpsw (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 12 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xff00) == 0x7c00)
+              { itype = M32RBF_INSN_BC8; m32rbf_extract_sfmt_bc8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 13 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xff00) == 0x7d00)
+              { itype = M32RBF_INSN_BNC8; m32rbf_extract_sfmt_bc8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 14 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xff00) == 0x7e00)
+              { itype = M32RBF_INSN_BL8; m32rbf_extract_sfmt_bl8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 15 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xff00) == 0x7f00)
+              { itype = M32RBF_INSN_BRA8; m32rbf_extract_sfmt_bra8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
       case 113 : /* fall through */
@@ -409,48 +685,178 @@ m32rbf_scache::decode (m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base
       case 126 : /* fall through */
       case 127 :
         {
-          unsigned int val = (((insn >> 24) & (3 << 0)));
+          unsigned int val = (((insn >> 24) & (15 << 0)));
           switch (val)
           {
-          case 0 : itype = M32RBF_INSN_BC8; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_bc8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = M32RBF_INSN_BNC8; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_bc8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 2 : itype = M32RBF_INSN_BL8; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_bl8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 3 : itype = M32RBF_INSN_BRA8; entire_insn = base_insn >> 16; m32rbf_extract_sfmt_bra8 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 1 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xff00) == 0x7100)
+              { itype = M32RBF_INSN_SETPSW; m32rbf_extract_sfmt_setpsw (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xff00) == 0x7200)
+              { itype = M32RBF_INSN_CLRPSW; m32rbf_extract_sfmt_clrpsw (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 12 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xff00) == 0x7c00)
+              { itype = M32RBF_INSN_BC8; m32rbf_extract_sfmt_bc8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 13 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xff00) == 0x7d00)
+              { itype = M32RBF_INSN_BNC8; m32rbf_extract_sfmt_bc8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 14 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xff00) == 0x7e00)
+              { itype = M32RBF_INSN_BL8; m32rbf_extract_sfmt_bl8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 15 :
+            entire_insn = entire_insn >> 16;
+            if ((entire_insn & 0xff00) == 0x7f00)
+              { itype = M32RBF_INSN_BRA8; m32rbf_extract_sfmt_bra8 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
-      case 132 : itype = M32RBF_INSN_CMPI; m32rbf_extract_sfmt_cmpi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 133 : itype = M32RBF_INSN_CMPUI; m32rbf_extract_sfmt_cmpi (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 136 : itype = M32RBF_INSN_ADDV3; m32rbf_extract_sfmt_addv3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 138 : itype = M32RBF_INSN_ADD3; m32rbf_extract_sfmt_add3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 140 : itype = M32RBF_INSN_AND3; m32rbf_extract_sfmt_and3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 141 : itype = M32RBF_INSN_XOR3; m32rbf_extract_sfmt_and3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 142 : itype = M32RBF_INSN_OR3; m32rbf_extract_sfmt_or3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 144 : itype = M32RBF_INSN_DIV; m32rbf_extract_sfmt_div (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 145 : itype = M32RBF_INSN_DIVU; m32rbf_extract_sfmt_div (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 146 : itype = M32RBF_INSN_REM; m32rbf_extract_sfmt_div (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 147 : itype = M32RBF_INSN_REMU; m32rbf_extract_sfmt_div (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 152 : itype = M32RBF_INSN_SRL3; m32rbf_extract_sfmt_sll3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 154 : itype = M32RBF_INSN_SRA3; m32rbf_extract_sfmt_sll3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 156 : itype = M32RBF_INSN_SLL3; m32rbf_extract_sfmt_sll3 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 159 : itype = M32RBF_INSN_LDI16; m32rbf_extract_sfmt_ldi16 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 160 : itype = M32RBF_INSN_STB_D; m32rbf_extract_sfmt_stb_d (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 162 : itype = M32RBF_INSN_STH_D; m32rbf_extract_sfmt_sth_d (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 164 : itype = M32RBF_INSN_ST_D; m32rbf_extract_sfmt_st_d (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 168 : itype = M32RBF_INSN_LDB_D; m32rbf_extract_sfmt_ldb_d (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 169 : itype = M32RBF_INSN_LDUB_D; m32rbf_extract_sfmt_ldb_d (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 170 : itype = M32RBF_INSN_LDH_D; m32rbf_extract_sfmt_ldh_d (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 171 : itype = M32RBF_INSN_LDUH_D; m32rbf_extract_sfmt_ldh_d (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 172 : itype = M32RBF_INSN_LD_D; m32rbf_extract_sfmt_ld_d (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 176 : itype = M32RBF_INSN_BEQ; m32rbf_extract_sfmt_beq (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 177 : itype = M32RBF_INSN_BNE; m32rbf_extract_sfmt_beq (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 184 : itype = M32RBF_INSN_BEQZ; m32rbf_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 185 : itype = M32RBF_INSN_BNEZ; m32rbf_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 186 : itype = M32RBF_INSN_BLTZ; m32rbf_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 187 : itype = M32RBF_INSN_BGEZ; m32rbf_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 188 : itype = M32RBF_INSN_BLEZ; m32rbf_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 189 : itype = M32RBF_INSN_BGTZ; m32rbf_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done;
-      case 220 : itype = M32RBF_INSN_SETH; m32rbf_extract_sfmt_seth (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 132 :
+        if ((entire_insn & 0xfff00000) == 0x80400000)
+          { itype = M32RBF_INSN_CMPI; m32rbf_extract_sfmt_cmpi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 133 :
+        if ((entire_insn & 0xfff00000) == 0x80500000)
+          { itype = M32RBF_INSN_CMPUI; m32rbf_extract_sfmt_cmpi (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 136 :
+        if ((entire_insn & 0xf0f00000) == 0x80800000)
+          { itype = M32RBF_INSN_ADDV3; m32rbf_extract_sfmt_addv3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 138 :
+        if ((entire_insn & 0xf0f00000) == 0x80a00000)
+          { itype = M32RBF_INSN_ADD3; m32rbf_extract_sfmt_add3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 140 :
+        if ((entire_insn & 0xf0f00000) == 0x80c00000)
+          { itype = M32RBF_INSN_AND3; m32rbf_extract_sfmt_and3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 141 :
+        if ((entire_insn & 0xf0f00000) == 0x80d00000)
+          { itype = M32RBF_INSN_XOR3; m32rbf_extract_sfmt_and3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 142 :
+        if ((entire_insn & 0xf0f00000) == 0x80e00000)
+          { itype = M32RBF_INSN_OR3; m32rbf_extract_sfmt_or3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 144 :
+        if ((entire_insn & 0xf0f0ffff) == 0x90000000)
+          { itype = M32RBF_INSN_DIV; m32rbf_extract_sfmt_div (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 145 :
+        if ((entire_insn & 0xf0f0ffff) == 0x90100000)
+          { itype = M32RBF_INSN_DIVU; m32rbf_extract_sfmt_div (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 146 :
+        if ((entire_insn & 0xf0f0ffff) == 0x90200000)
+          { itype = M32RBF_INSN_REM; m32rbf_extract_sfmt_div (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 147 :
+        if ((entire_insn & 0xf0f0ffff) == 0x90300000)
+          { itype = M32RBF_INSN_REMU; m32rbf_extract_sfmt_div (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 152 :
+        if ((entire_insn & 0xf0f00000) == 0x90800000)
+          { itype = M32RBF_INSN_SRL3; m32rbf_extract_sfmt_sll3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 154 :
+        if ((entire_insn & 0xf0f00000) == 0x90a00000)
+          { itype = M32RBF_INSN_SRA3; m32rbf_extract_sfmt_sll3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 156 :
+        if ((entire_insn & 0xf0f00000) == 0x90c00000)
+          { itype = M32RBF_INSN_SLL3; m32rbf_extract_sfmt_sll3 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 159 :
+        if ((entire_insn & 0xf0ff0000) == 0x90f00000)
+          { itype = M32RBF_INSN_LDI16; m32rbf_extract_sfmt_ldi16 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 160 :
+        if ((entire_insn & 0xf0f00000) == 0xa0000000)
+          { itype = M32RBF_INSN_STB_D; m32rbf_extract_sfmt_stb_d (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 162 :
+        if ((entire_insn & 0xf0f00000) == 0xa0200000)
+          { itype = M32RBF_INSN_STH_D; m32rbf_extract_sfmt_sth_d (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 164 :
+        if ((entire_insn & 0xf0f00000) == 0xa0400000)
+          { itype = M32RBF_INSN_ST_D; m32rbf_extract_sfmt_st_d (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 166 :
+        if ((entire_insn & 0xf8f00000) == 0xa0600000)
+          { itype = M32RBF_INSN_BSET; m32rbf_extract_sfmt_bset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 167 :
+        if ((entire_insn & 0xf8f00000) == 0xa0700000)
+          { itype = M32RBF_INSN_BCLR; m32rbf_extract_sfmt_bset (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 168 :
+        if ((entire_insn & 0xf0f00000) == 0xa0800000)
+          { itype = M32RBF_INSN_LDB_D; m32rbf_extract_sfmt_ldb_d (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 169 :
+        if ((entire_insn & 0xf0f00000) == 0xa0900000)
+          { itype = M32RBF_INSN_LDUB_D; m32rbf_extract_sfmt_ldb_d (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 170 :
+        if ((entire_insn & 0xf0f00000) == 0xa0a00000)
+          { itype = M32RBF_INSN_LDH_D; m32rbf_extract_sfmt_ldh_d (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 171 :
+        if ((entire_insn & 0xf0f00000) == 0xa0b00000)
+          { itype = M32RBF_INSN_LDUH_D; m32rbf_extract_sfmt_ldh_d (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 172 :
+        if ((entire_insn & 0xf0f00000) == 0xa0c00000)
+          { itype = M32RBF_INSN_LD_D; m32rbf_extract_sfmt_ld_d (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 176 :
+        if ((entire_insn & 0xf0f00000) == 0xb0000000)
+          { itype = M32RBF_INSN_BEQ; m32rbf_extract_sfmt_beq (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 177 :
+        if ((entire_insn & 0xf0f00000) == 0xb0100000)
+          { itype = M32RBF_INSN_BNE; m32rbf_extract_sfmt_beq (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 184 :
+        if ((entire_insn & 0xfff00000) == 0xb0800000)
+          { itype = M32RBF_INSN_BEQZ; m32rbf_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 185 :
+        if ((entire_insn & 0xfff00000) == 0xb0900000)
+          { itype = M32RBF_INSN_BNEZ; m32rbf_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 186 :
+        if ((entire_insn & 0xfff00000) == 0xb0a00000)
+          { itype = M32RBF_INSN_BLTZ; m32rbf_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 187 :
+        if ((entire_insn & 0xfff00000) == 0xb0b00000)
+          { itype = M32RBF_INSN_BGEZ; m32rbf_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 188 :
+        if ((entire_insn & 0xfff00000) == 0xb0c00000)
+          { itype = M32RBF_INSN_BLEZ; m32rbf_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 189 :
+        if ((entire_insn & 0xfff00000) == 0xb0d00000)
+          { itype = M32RBF_INSN_BGTZ; m32rbf_extract_sfmt_beqz (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 220 :
+        if ((entire_insn & 0xf0ff0000) == 0xd0c00000)
+          { itype = M32RBF_INSN_SETH; m32rbf_extract_sfmt_seth (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 224 : /* fall through */
       case 225 : /* fall through */
       case 226 : /* fall through */
@@ -466,7 +872,10 @@ m32rbf_scache::decode (m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base
       case 236 : /* fall through */
       case 237 : /* fall through */
       case 238 : /* fall through */
-      case 239 : itype = M32RBF_INSN_LD24; m32rbf_extract_sfmt_ld24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
+      case 239 :
+        if ((entire_insn & 0xf0000000) == 0xe0000000)
+          { itype = M32RBF_INSN_LD24; m32rbf_extract_sfmt_ld24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+        itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       case 240 : /* fall through */
       case 241 : /* fall through */
       case 242 : /* fall through */
@@ -487,14 +896,26 @@ m32rbf_scache::decode (m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base
           unsigned int val = (((insn >> 24) & (3 << 0)));
           switch (val)
           {
-          case 0 : itype = M32RBF_INSN_BC24; m32rbf_extract_sfmt_bc24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 1 : itype = M32RBF_INSN_BNC24; m32rbf_extract_sfmt_bc24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 2 : itype = M32RBF_INSN_BL24; m32rbf_extract_sfmt_bl24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          case 3 : itype = M32RBF_INSN_BRA24; m32rbf_extract_sfmt_bra24 (this, current_cpu, pc, base_insn, entire_insn); goto done;
-          default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+          case 0 :
+            if ((entire_insn & 0xff000000) == 0xfc000000)
+              { itype = M32RBF_INSN_BC24; m32rbf_extract_sfmt_bc24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 1 :
+            if ((entire_insn & 0xff000000) == 0xfd000000)
+              { itype = M32RBF_INSN_BNC24; m32rbf_extract_sfmt_bc24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 2 :
+            if ((entire_insn & 0xff000000) == 0xfe000000)
+              { itype = M32RBF_INSN_BL24; m32rbf_extract_sfmt_bl24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          case 3 :
+            if ((entire_insn & 0xff000000) == 0xff000000)
+              { itype = M32RBF_INSN_BRA24; m32rbf_extract_sfmt_bra24 (this, current_cpu, pc, base_insn, entire_insn); goto done; }
+            itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
+          default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
           }
         }
-      default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn);  goto done;
+      default : itype = M32RBF_INSN_X_INVALID; m32rbf_extract_sfmt_empty (this, current_cpu, pc, base_insn, entire_insn); goto done;
       }
     }
 
@@ -1016,7 +1437,7 @@ m32rbf_extract_sfmt_div (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc
 void
 m32rbf_extract_sfmt_jl (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn){
     m32rbf_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_and3.f
+#define FLD(f) abuf->fields.sfmt_bset.f
     UINT f_r2;
 
     f_r2 = EXTRACT_MSB0_UINT (insn, 16, 12, 4);
@@ -1038,7 +1459,7 @@ m32rbf_extract_sfmt_jl (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc,
 void
 m32rbf_extract_sfmt_jmp (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn){
     m32rbf_insn_word insn = entire_insn;
-#define FLD(f) abuf->fields.sfmt_and3.f
+#define FLD(f) abuf->fields.sfmt_bset.f
     UINT f_r2;
 
     f_r2 = EXTRACT_MSB0_UINT (insn, 16, 12, 4);
@@ -1916,6 +2337,104 @@ m32rbf_extract_sfmt_unlock (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR
         << "0x" << hex << pc << dec << " (sfmt_unlock)\t"
         << " f_r1:0x" << hex << f_r1 << dec
         << " f_r2:0x" << hex << f_r2 << dec
+        << endl;
+    }
+
+#undef FLD
+}
+
+void
+m32rbf_extract_sfmt_clrpsw (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn){
+    m32rbf_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_clrpsw.f
+    UINT f_uimm8;
+
+    f_uimm8 = EXTRACT_MSB0_UINT (insn, 16, 8, 8);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_uimm8) = f_uimm8;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_clrpsw)\t"
+        << " f_uimm8:0x" << hex << f_uimm8 << dec
+        << endl;
+    }
+
+#undef FLD
+}
+
+void
+m32rbf_extract_sfmt_setpsw (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn){
+    m32rbf_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_clrpsw.f
+    UINT f_uimm8;
+
+    f_uimm8 = EXTRACT_MSB0_UINT (insn, 16, 8, 8);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_uimm8) = f_uimm8;
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_setpsw)\t"
+        << " f_uimm8:0x" << hex << f_uimm8 << dec
+        << endl;
+    }
+
+#undef FLD
+}
+
+void
+m32rbf_extract_sfmt_bset (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn){
+    m32rbf_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_bset.f
+    UINT f_uimm3;
+    UINT f_r2;
+    INT f_simm16;
+
+    f_uimm3 = EXTRACT_MSB0_UINT (insn, 32, 5, 3);
+    f_r2 = EXTRACT_MSB0_UINT (insn, 32, 12, 4);
+    f_simm16 = EXTRACT_MSB0_INT (insn, 32, 16, 16);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_simm16) = f_simm16;
+  FLD (f_r2) = f_r2;
+  FLD (f_uimm3) = f_uimm3;
+  FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_bset)\t"
+        << " f_simm16:0x" << hex << f_simm16 << dec
+        << " f_r2:0x" << hex << f_r2 << dec
+        << " f_uimm3:0x" << hex << f_uimm3 << dec
+        << endl;
+    }
+
+#undef FLD
+}
+
+void
+m32rbf_extract_sfmt_btst (m32rbf_scache* abuf, m32rbf_cpu* current_cpu, PCADDR pc, m32rbf_insn_word base_insn, m32rbf_insn_word entire_insn){
+    m32rbf_insn_word insn = entire_insn;
+#define FLD(f) abuf->fields.sfmt_bset.f
+    UINT f_uimm3;
+    UINT f_r2;
+
+    f_uimm3 = EXTRACT_MSB0_UINT (insn, 16, 5, 3);
+    f_r2 = EXTRACT_MSB0_UINT (insn, 16, 12, 4);
+
+  /* Record the fields for the semantic handler.  */
+  FLD (f_r2) = f_r2;
+  FLD (f_uimm3) = f_uimm3;
+  FLD (i_sr) = & current_cpu->hardware.h_gr[f_r2];
+  if (UNLIKELY(current_cpu->trace_extract_p))
+    {
+      current_cpu->trace_stream 
+        << "0x" << hex << pc << dec << " (sfmt_btst)\t"
+        << " f_r2:0x" << hex << f_r2 << dec
+        << " f_uimm3:0x" << hex << f_uimm3 << dec
         << endl;
     }
 

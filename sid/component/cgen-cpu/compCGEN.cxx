@@ -29,6 +29,22 @@ extern "C" {
 #if SIDTARGET_MT
 #include "mt.h"
 #endif
+#if SIDTARGET_SH || SIDTARGET_SH64
+#include "sh2.h"
+#include "sh2e.h"
+#include "sh2a_fpu.h"
+#include "sh2a_nofpu.h"
+#include "sh3.h"
+#include "sh3e.h"
+#include "sh4.h"
+#include "sh4_nofpu.h"
+#include "sh4a.h"
+#include "sh4a_nofpu.h"
+#include "sh4al.h"
+#endif
+#if SIDTARGET_SH64
+#include "sh5.h"
+#endif
 #if SIDTARGET_XSTORMY16
 #include "xstormy16.h"
 #endif
@@ -307,6 +323,27 @@ compCGENListTypes ()
 #if SIDTARGET_MT
   types.push_back ("hw-cpu-mt");
 #endif
+#if SIDTARGET_SH || SIDTARGET_SH64
+  types.push_back ("hw-cpu-sh2");
+  types.push_back ("hw-cpu-sh2e");
+  types.push_back ("hw-cpu-sh2a-nofpu");
+  types.push_back ("hw-cpu-sh2a-fpu-single");
+  types.push_back ("hw-cpu-sh2a-fpu");
+  types.push_back ("hw-cpu-sh3");
+  types.push_back ("hw-cpu-sh3e");
+  types.push_back ("hw-cpu-sh4");
+  types.push_back ("hw-cpu-sh4-nofpu");
+  types.push_back ("hw-cpu-sh4-single");
+  types.push_back ("hw-cpu-sh4a");
+  types.push_back ("hw-cpu-sh4a-nofpu");
+  types.push_back ("hw-cpu-sh4a-single");
+  types.push_back ("hw-cpu-sh4al");
+#endif
+#if SIDTARGET_SH64
+  types.push_back ("hw-cpu-sh5-compact");
+  types.push_back ("hw-cpu-sh5-32media");
+  types.push_back ("hw-cpu-sh5-64media");
+#endif
 #if SIDTARGET_XSTORMY16
   types.push_back ("hw-cpu-xstormy16");
 #endif
@@ -329,6 +366,44 @@ compCGENCreate (const string& typeName)
 #if SIDTARGET_MT
   if (typeName == "hw-cpu-mt")
     return new mt::mt_cpu ();
+#endif
+#if SIDTARGET_SH || SIDTARGET_SH64
+  if (typeName == "hw-cpu-sh2")
+    return new sh::sh2_cpu ();
+  if (typeName == "hw-cpu-sh2e")
+    return new sh::sh2e_cpu ();
+  if (typeName == "hw-cpu-sh2a-fpu")
+    return new sh::sh2a_fpu_cpu ();
+  if (typeName == "hw-cpu-sh2a-fpu-single")
+    return new sh::sh2a_fpu_single_cpu ();
+  if (typeName == "hw-cpu-sh2a-nofpu")
+    return new sh::sh2a_nofpu_cpu ();
+  if (typeName == "hw-cpu-sh3")
+    return new sh::sh3_cpu ();
+  if (typeName == "hw-cpu-sh3e")
+    return new sh::sh3e_cpu ();
+  if (typeName == "hw-cpu-sh4")
+    return new sh::sh4_cpu ();
+  if (typeName == "hw-cpu-sh4-nofpu")
+    return new sh::sh4_nofpu_cpu ();
+  if (typeName == "hw-cpu-sh4-single")
+    return new sh::sh4_single_cpu ();
+  if (typeName == "hw-cpu-sh4a")
+    return new sh::sh4a_cpu ();
+  if (typeName == "hw-cpu-sh4a-nofpu")
+    return new sh::sh4a_nofpu_cpu ();
+  if (typeName == "hw-cpu-sh4a-single")
+    return new sh::sh4a_single_cpu ();
+  if (typeName == "hw-cpu-sh4al")
+    return new sh::sh4al_cpu ();
+#endif
+#if SIDTARGET_SH64
+  if (typeName == "hw-cpu-sh5-compact")
+    return new sh::sh5_compact_cpu ();
+  if (typeName == "hw-cpu-sh5-32media")
+    return new sh::sh5_32media_cpu ();
+  if (typeName == "hw-cpu-sh5-64media")
+    return new sh::sh5_64media_cpu ();
 #endif
 #if SIDTARGET_XSTORMY16
   if (typeName == "hw-cpu-xstormy16")

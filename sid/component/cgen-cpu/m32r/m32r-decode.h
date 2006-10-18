@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+Copyright (C) 2000-2005 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -46,6 +46,8 @@ typedef enum m32rbf_insn_type {
  , M32RBF_INSN_ST_D, M32RBF_INSN_STB, M32RBF_INSN_STB_D, M32RBF_INSN_STH
  , M32RBF_INSN_STH_D, M32RBF_INSN_ST_PLUS, M32RBF_INSN_ST_MINUS, M32RBF_INSN_SUB
  , M32RBF_INSN_SUBV, M32RBF_INSN_SUBX, M32RBF_INSN_TRAP, M32RBF_INSN_UNLOCK
+ , M32RBF_INSN_CLRPSW, M32RBF_INSN_SETPSW, M32RBF_INSN_BSET, M32RBF_INSN_BCLR
+ , M32RBF_INSN_BTST
 } M32RBF_INSN_TYPE;
 
 
@@ -79,6 +81,9 @@ union m32rbf_sem_fields {
     int empty;
   } fmt_empty;
   struct { /*  */
+    UINT f_uimm8;
+  } sfmt_clrpsw;
+  struct { /*  */
     UINT f_uimm4;
   } sfmt_trap;
   struct { /*  */
@@ -107,6 +112,12 @@ union m32rbf_sem_fields {
     INT f_simm8;
     UINT f_r1;
   } sfmt_addi;
+  struct { /*  */
+    SI* i_sr;
+    INT f_simm16;
+    UINT f_r2;
+    UINT f_uimm3;
+  } sfmt_bset;
   struct { /*  */
     SI* i_src1;
     SI* i_src2;
@@ -279,5 +290,10 @@ extern m32rbf_sem_fn m32rbf_sem_subv;
 extern m32rbf_sem_fn m32rbf_sem_subx;
 extern m32rbf_sem_fn m32rbf_sem_trap;
 extern m32rbf_sem_fn m32rbf_sem_unlock;
+extern m32rbf_sem_fn m32rbf_sem_clrpsw;
+extern m32rbf_sem_fn m32rbf_sem_setpsw;
+extern m32rbf_sem_fn m32rbf_sem_bset;
+extern m32rbf_sem_fn m32rbf_sem_bclr;
+extern m32rbf_sem_fn m32rbf_sem_btst;
 
 #endif /* M32RBF_DECODE_H */

@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+Copyright (C) 2000-2005 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -11,6 +11,8 @@ This file is part of the Red Hat simulators.
 
 #ifndef DESC_M32R_H
 #define DESC_M32R_H
+
+#include "opcode/cgen-bitset.h"
 
 namespace m32r {
 
@@ -44,11 +46,11 @@ typedef enum gr_names {
 /* Enum declaration for .  */
 typedef enum cr_names {
   H_CR_PSW = 0, H_CR_CBR = 1, H_CR_SPI = 2, H_CR_SPU = 3
- , H_CR_BPC = 6, H_CR_BBPSW = 8, H_CR_BBPC = 14, H_CR_CR0 = 0
- , H_CR_CR1 = 1, H_CR_CR2 = 2, H_CR_CR3 = 3, H_CR_CR4 = 4
- , H_CR_CR5 = 5, H_CR_CR6 = 6, H_CR_CR7 = 7, H_CR_CR8 = 8
- , H_CR_CR9 = 9, H_CR_CR10 = 10, H_CR_CR11 = 11, H_CR_CR12 = 12
- , H_CR_CR13 = 13, H_CR_CR14 = 14, H_CR_CR15 = 15
+ , H_CR_BPC = 6, H_CR_BBPSW = 8, H_CR_BBPC = 14, H_CR_EVB = 5
+ , H_CR_CR0 = 0, H_CR_CR1 = 1, H_CR_CR2 = 2, H_CR_CR3 = 3
+ , H_CR_CR4 = 4, H_CR_CR5 = 5, H_CR_CR6 = 6, H_CR_CR7 = 7
+ , H_CR_CR8 = 8, H_CR_CR9 = 9, H_CR_CR10 = 10, H_CR_CR11 = 11
+ , H_CR_CR12 = 12, H_CR_CR13 = 13, H_CR_CR14 = 14, H_CR_CR15 = 15
 } CR_NAMES;
 
 // Insn attribute indices.
@@ -58,8 +60,8 @@ typedef enum cgen_insn_attr {
   CGEN_INSN_ALIAS, CGEN_INSN_VIRTUAL, CGEN_INSN_UNCOND_CTI, CGEN_INSN_COND_CTI
  , CGEN_INSN_SKIP_CTI, CGEN_INSN_DELAY_SLOT, CGEN_INSN_RELAXABLE, CGEN_INSN_RELAXED
  , CGEN_INSN_NO_DIS, CGEN_INSN_PBB, CGEN_INSN_FILL_SLOT, CGEN_INSN_SPECIAL
- , CGEN_INSN_END_BOOLS, CGEN_INSN_START_NBOOLS = 31, CGEN_INSN_MACH, CGEN_INSN_PIPE
- , CGEN_INSN_END_NBOOLS
+ , CGEN_INSN_SPECIAL_M32R, CGEN_INSN_SPECIAL_FLOAT, CGEN_INSN_END_BOOLS, CGEN_INSN_START_NBOOLS = 31
+ , CGEN_INSN_MACH, CGEN_INSN_PIPE, CGEN_INSN_END_NBOOLS
 } CGEN_INSN_ATTR;
 
 /* Number of non-boolean elements in cgen_insn_attr.  */
@@ -69,7 +71,8 @@ typedef enum cgen_insn_attr {
 
 /* Enum declaration for machine type selection.  */
 typedef enum mach_attr {
-  MACH_BASE, MACH_M32R, MACH_M32RX, MACH_MAX
+  MACH_BASE, MACH_M32R, MACH_M32RX, MACH_M32R2
+ , MACH_MAX
 } MACH_ATTR;
 
 /* Enum declaration for instruction set selection.  */
@@ -80,6 +83,7 @@ typedef enum isa_attr {
 /* Enum declaration for parallel execution pipeline selection.  */
 typedef enum pipe_attr {
   PIPE_NONE, PIPE_O, PIPE_S, PIPE_OS
+ , PIPE_O_OS
 } PIPE_ATTR;
 
 // Insn attributes.
@@ -102,6 +106,8 @@ struct m32r_insn_attr {
   inline int get_pbb_attr () { return (bools & (1<<CGEN_INSN_PBB)) != 0; }
   inline int get_fill_slot_attr () { return (bools & (1<<CGEN_INSN_FILL_SLOT)) != 0; }
   inline int get_special_attr () { return (bools & (1<<CGEN_INSN_SPECIAL)) != 0; }
+  inline int get_special_m32r_attr () { return (bools & (1<<CGEN_INSN_SPECIAL_M32R)) != 0; }
+  inline int get_special_float_attr () { return (bools & (1<<CGEN_INSN_SPECIAL_FLOAT)) != 0; }
 };
 
 #define MACH_M32R_INSN_CHUNK_BITSIZE 0

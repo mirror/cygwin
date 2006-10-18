@@ -79,17 +79,6 @@ using namespace cgen;
   {
   // types of stacks
 
-  write_stack< write<BI> >  	BI_memory_writes	[pipe_sz];
-  write_stack< write<QI> >  	QI_memory_writes	[pipe_sz];
-  write_stack< write<HI> >  	HI_memory_writes	[pipe_sz];
-  write_stack< write<SI> >  	SI_memory_writes	[pipe_sz];
-  write_stack< write<DI> >  	DI_memory_writes	[pipe_sz];
-  write_stack< write<UQI> > 	UQI_memory_writes	[pipe_sz];
-  write_stack< write<UHI> > 	UHI_memory_writes	[pipe_sz];
-  write_stack< write<USI> > 	USI_memory_writes	[pipe_sz];
-  write_stack< write<UDI> > 	UDI_memory_writes	[pipe_sz];
-  write_stack< write<SF> >  	SF_memory_writes	[pipe_sz];
-  write_stack< write<DF> >  	DF_memory_writes	[pipe_sz];
   write_stack< write<SI> >  	h_spr_writes	[pipe_sz];
   write_stack< write<USI> > 	h_pc_writes	[pipe_sz];
 

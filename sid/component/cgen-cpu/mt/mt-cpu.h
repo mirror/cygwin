@@ -69,33 +69,11 @@ public:
   {
     stream_stacks ( stacks.h_spr_writes, ost);
     stream_stacks ( stacks.h_pc_writes, ost);
-    stream_stacks ( stacks.BI_memory_writes, ost);
-    stream_stacks ( stacks.QI_memory_writes, ost);
-    stream_stacks ( stacks.HI_memory_writes, ost);
-    stream_stacks ( stacks.SI_memory_writes, ost);
-    stream_stacks ( stacks.DI_memory_writes, ost);
-    stream_stacks ( stacks.UQI_memory_writes, ost);
-    stream_stacks ( stacks.UHI_memory_writes, ost);
-    stream_stacks ( stacks.USI_memory_writes, ost);
-    stream_stacks ( stacks.UDI_memory_writes, ost);
-    stream_stacks ( stacks.SF_memory_writes, ost);
-    stream_stacks ( stacks.DF_memory_writes, ost);
   }
   void destream_cgen_write_stacks (std::istream &ist, mt::write_stacks &stacks) 
   {
     destream_stacks ( stacks.h_spr_writes, ist);
     destream_stacks ( stacks.h_pc_writes, ist);
-    destream_stacks ( stacks.BI_memory_writes, ist);
-    destream_stacks ( stacks.QI_memory_writes, ist);
-    destream_stacks ( stacks.HI_memory_writes, ist);
-    destream_stacks ( stacks.SI_memory_writes, ist);
-    destream_stacks ( stacks.DI_memory_writes, ist);
-    destream_stacks ( stacks.UQI_memory_writes, ist);
-    destream_stacks ( stacks.UHI_memory_writes, ist);
-    destream_stacks ( stacks.USI_memory_writes, ist);
-    destream_stacks ( stacks.UDI_memory_writes, ist);
-    destream_stacks ( stacks.SF_memory_writes, ist);
-    destream_stacks ( stacks.DF_memory_writes, ist);
   }
   // C++ register access function templates
 #define current_cpu this

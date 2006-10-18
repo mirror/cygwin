@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd" [
+<!ENTITY stdinterface SYSTEM "../common-xml/interface.xml">
+<!ENTITY stdbehavior SYSTEM "../common-xml/behavior.xml">
+<!ENTITY debugregisters SYSTEM "../common-xml/debugger-register-access.xml">
+<!ENTITY stdconventions SYSTEM "../common-xml/conventions.xml">
+<!ENTITY stdenvironment SYSTEM "../common-xml/environment.xml">
+]>
+
+<defcomplib lib="libcgencpu.la" dlsym="cgen_component_library">
+  <defcomponent name="hw-cpu-sh" type="concrete">
+
+  &stdinterface;
+
+    <!-- attributes -->
+    <defattribute name="trace-semantics?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="initialization" />
+    <defattribute name="trace-disassemble?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="initialization" />
+    <defattribute name="trace-counter?" category="setting" legalvalues="boolean" defaultvalue="false" behaviors="initialization" />
+  </defcomponent>
+  <synop>
+    <p>This component models the Renesas sh processors.</p>
+  </synop>
+  <func>
+    <modelling>
+        <p>This component models a sh processor.</p>  
+    </modelling>
+    &stdbehavior;
+    <behavior name="register access">
+
+      <p>All 16 general purpose registers are accessible as attribute
+      <attribute>r0</attribute> through <attribute>r15</attribute>.
+      The <attribute>pc</attribute> attribute is also available.  The
+      current endianness is available as attribute
+      <attribute>endian</attribute>.</p>
+
+    &debugregisters;
+    </behavior>
+
+  &stdconventions;
+  </func>
+  <env>
+  &stdenvironment;
+  </env>
+</defcomplib>
+

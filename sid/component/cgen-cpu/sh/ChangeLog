@@ -1,0 +1,243 @@
+2006-10-18  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+
+	2006-06-26  Dave Brolley  <brolley@redhat.com>
+
+	* sh5.h (get_pc_hi): New method of sh5_cpu.
+	* sh.h (set_pc): New method of sh_cpu.
+
+	2006-06-20  Dave Brolley  <brolley@redhat.com>
+
+	* sh_vliw.cxx (step_insns): After catching fp::error,
+	use insn_size and h_ism_get to compute the new pc.
+	* sh5.cxx (prefetch): Use GETIMEMHI.
+	* common_model.cxx: Add missing template instantiations.
+	* sh2a-fpu-decode.cxx: Regenerated.
+	* sh2a-nofpu-decode.cxx: Regenerated.
+	* sh4-decode.cxx: Regenerated.
+	* sh4-nofpu-decode.cxx: Regenerated.
+	* sh5-compact-decode.cxx: Regenerated.
+	* sh5-compact-decode.h: Regenerated.
+	* sh5-compact-model.cxx: Regenerated.
+	* sh5-compact-model.h: Regenerated.
+	* sh5-compact-sem.cxx: Regenerated.
+
+	2006-06-14  Dave Brolley  <brolley@redhat.com>
+
+	* sh_compact.h:	(step_insns): Moved from sh_cpu.
+	(step_one_insn): Likewise.
+	(model_insn_before, model_step_latency, model_before) 
+	(model_after, model_insn_after): Moved to sh5.cxx.
+	(cfg_address,branch_prediction,branch_optimization):
+	Moved lower in the class heirarchy.
+	(thisp): New member.
+	* sh_compact.cxx: Don't #include "config.h".
+	(step_insns): Moved from sh_cpu.
+	(step_one_insn): Likewise.
+	* sh5.h (SH5_CPU_BASE): New macro.
+	(SH5_CPU_NON_VLIW_BASE): New macro.
+	(execute_insn): New method takes scache argument.
+	(prefetch): New method.
+	(trace_counter): New method.
+	(model_insn_before, model_step_latency, model_before) 
+	(model_after, model_insn_after): New methods.
+	(sh64_save_cfg_address,sh64_get_cfg_address)
+	(save_branch_predication,get_branch_predication)
+	(save_branch_optimization,get_branch_optimization)
+	(prefetch,compact_insn_pending,fetch_insn): New methods.
+	(model_insn_before, model_step_latency, model_before) 
+	(model_after, model_insn_after): Moved to sh5.cxx.
+	(cfg_address,branch_prediction,branch_optimization):
+	New members.
+	* sh5.cxx: Don't #include "config.h".
+	(decode_insn): Check compact_insn_pending.
+	(fetch_insn): Check compact_p.
+	(execute_insn): New method takes scache argument.
+	(prefetch): New method.
+	(trace_counter): New method.
+	(model_insn_before, model_step_latency, model_before) 
+	(model_after, model_insn_after): Moved from sh5.h.
+	* sh2a_model.cxx: Don't #include "config.h".
+	#include "sh4*.h". Add additional explicit template
+	instantiations.
+	(sh2a_model): Initialize vbr_busy. 
+	(model_u_memory_access_after): Use exec_cycles.
+	(model_u_macw_after): Use exec_cycles. Use add_multiply_busy.
+	(model_u_macl_after): New method.
+	(model_u_branch_after): New method.
+	(branch_stall): New method.
+	(model_u_dmul_after): Use add_multiply_busy.
+	(model_u_mulr_after, model_u_mull_after): New methods.
+	(model_u_multiply_after): Don't check for mull.
+	(model_u_mulr_gr_after): Use UNIT_U_MULR.
+	(model_u_tas_after): 3 additional cycles.
+	(model_u_set_sr_after): Removed.
+	(model_u_ldcl_after): 1 Additional cycle.
+	(model_u_load_mac_after): Use exec_cycles.
+	(step_latency): Update gbr_busy, vbr_busy, current_branch_stall.
+	(parallel_possible): Always true.
+	(sh2a_fpu_model): Now a template.
+	(model_u_use_fpul_before): Check for sts vs stsl.
+	(model_u_lds_fpscr_before): New method.
+	(model_u_fpu_memory_access_after): Use exec_cycles.
+	(model_u_ldsl_fpscr_after): New method.
+	(model_u_load_fr_after): Use unit_cycles.
+	(model_u_fpu_load_gr_after): Use exec_cycles.
+	* sh2a_model.h	(model_u_macl_after): New method.
+	(model_u_branch_after): New method.
+	(branch_stall): New method.
+	(model_u_mulr_after, model_u_mull_after): New methods.
+	(model_u_lds_fpscr_before): New method.
+	(model_u_ldsl_fpscr_after): New method.
+	(model_u_set_sr_after): Removed.
+	(insn_is_macl,insn_is_mull): Removed.
+	(sh2a_fpu_model): Now a template.
+	(insn_is_stsl_fpul): New methods.
+	* sh2a_fpu.h (SH2A_FPU_BASE): Update template specification.
+	* sh2a.cxx (sh2a_cpu_base): Now inherits from sh_vliw_cpu.
+	(reset,reset_vliw): Removed.
+	(is_cti_insn,is_32_bit_insn): Removed.
+	(model_step_latency,save_pre_fetch_latency,model_insn_before)
+	(model_before,trace_counter,disassemble,execute_insn)
+	(model_after,model_insn_after,next_pc): Removed.
+	(parallel_possible): Now takes insn_info<SCACHE>*.
+	(fetch_insn): New method.
+	* sh2a.h: insn_info now a file scope class.
+	(sh2a_cpu_base): Now inherits from sh_vliw_cpu.
+	(reset,reset_vliw): Removed.
+	(is_cti_insn,is_32_bit_insn): Removed.
+	(model_step_latency,save_pre_fetch_latency,model_insn_before)
+	(model_before,trace_counter,disassemble,execute_insn)
+	(model_after,model_insn_after,next_pc): Removed.
+	(branch_taken,model_branch_taken,model_branch_taken_p)
+	(model_reduce_latency,cpu,next_insn_in_delay_slot_p): Removed.
+	(vliw_insns): Removed.
+	(parallel_possible): Now takes insn_info<SCACHE>*.
+	(fetch_insn): New method.
+	* sh3.h: Update sh_compact_cpu template specification.
+	* sh3e.h: Update sh_compact_cpu template specification.
+	* sh4.cxx: Don't #include "config.h".
+	(execute_insn): Now takes scache argument.
+	(parallel_allowed): New table.
+	(parallel_allowed): New method.
+	* sh4.h (execute_insn): Now takes scache argument.
+	(parallel_allowed): New table.
+	(parallel_allowed): New method.
+	* sh4_nofpu.cxx: Don't #include "config.h".
+	(execute_insn): Now takes scache argument.
+	* sh4_nofpu.h (execute_insn): Now takes scache argument.
+	* sh4a.cxx: Don't #include "config.h".
+	(execute_insn): Now takes scache argument.
+	(parallel_allowed): New table.
+	(parallel_allowed): New method.
+	* sh4a.h (execute_insn): Now takes scache argument.
+	* sh4a_nofpu.cxx: Don't #include "config.h".
+	(execute_insn): Now takes scache argument.
+	* sh4a_nofpu.h (execute_insn): Now takes scache argument.
+	* sh4al.cxx: Don't #include "config.h".
+	(execute_insn): Now takes scache argument.
+	* sh4a.h (execute_insn): Now takes scache argument.
+	* sh2.cxx: Don't #include "config.h".
+	* sh2a_fpu.cxx: Don't #include "config.h".
+	* sh2a_nofpu.cxx: Don't #include "config.h".
+	* sh2e.cxx: Don't #include "config.h".
+	* sh3.cxx: Don't #include "config.h".
+	* sh3.cxx: Don't #include "config.h".
+	* sh3e.cxx: Don't #include "config.h".
+	* sh.h (sh_cpu_cgen): Initialize fpu.
+	(fpu): New member of sh_cpu_cgen.
+	(step_insns): Moved lower in the class heirarchy.
+	(step_one_insn): Likewise.
+	(write_stacks_writeback, update_tick): Likewise.
+	(model_insn_before,model_step_latency,model_before)
+	(model_after,model_insn_after,check_vliw,reset_vliw)
+	(decode_insn,execute_insn,disassemble): Likewise.
+	(model_status): New enumeration.
+	(parallel_possible_p): New member of sh_cpu.
+	(current_insn_sampled,sample_gprof_pin): Removed.
+	(fpu): MOved to sh_cpu_cgen.
+	* sh.cxx: Don't #include "config.h". Removed unused code.
+	(sh_cpu): current_insn_sampled, fpu removed.
+	(reset): Initialize total_latency to 2 if profiling.
+	(step_insns): Moved lower in the class heirarchy.
+	(step_one_insn): Likewise.
+	* common_model.cxx: Don't #include "config.h". Remove vliw_adjust.
+	(sh_common_model): Initialize fpu_busy. Use num_gpr.
+	(set_fpu_busy): New method.
+	(model_before): Don't call check_vliw. Initialize exec_cycles.
+	(model_u_exec_after, model_u_sx_after, model_u_logic_b_after) 
+	(model_u_ldcl_after, model_u_ldcl_vbr_after) 
+	(model_u_sts_pr_after, model_u_tas_after, model_u_lds_pr_after):
+	New methods.
+	(model_u_jmp_after, model_u_jsr_after): New methods.
+	(model_u_load_pr_after): Use exec_cycles, unit_cycles.
+	(model_u_load_gr_after): Use exec_cycles.
+	(model_u_macw_after): Call model_mac_after.
+	(model_u_dmul_after, model_u_mull_after): Likewise.
+	(model_u_macl_after): New method.
+	(sh_common_model::step_latency): Don't call BASE::step_latency.
+	Use num_gr. Update fpu_busy.
+	(model_mac_after): New method.
+	(sh_common_model_with_fp): Initialize fpscr_busy. fpu_busy removed.
+	Use num_fpr.
+	(set_fpscr_busy): New method.
+	(sh_common_model_with_fp::fpu_busy): Removed.
+	(model_u_maybe_fpu_before): New method.
+	(model_u_flds_fpul_before): Call model_u_maybe_fpu_before.
+	(model_u_lds_fpscr_after, model_u_ldsl_fpscr_after): New methods.
+	(model_u_fpu_after): Set exec_cycles. Call set_fpscr_busy.
+	(model_u_maybe_fpu_after): New method.
+	(model_u_fcnv_after): New method.
+	(model_u_load_fr_after): Use exec_cycles.
+	(model_u_set_fr_after): Likewise.
+	(model_u_set_fpul_after): Likewise.
+	(model_u_load_fpul_after): Likewise.
+	(model_u_set_fr_0_before): Removed.
+	(model_u_set_fr_0_after): Don't call model_u_fpu_after.
+	(model_u_flds_fpul_after): Call model_u_maybe_fpu_after.
+	(step_latency): Use num_fpu.
+	(model_u_shift_after): Use exec_cycles.
+	(sh5_media*): Now based on sh_common_model_with_vliw.
+	* common_model.h: (set_fpu_busy): New method.
+	(model_u_sts_pr_after, model_u_tas_after, model_u_lds_pr_after):
+	New methods.
+	(model_u_jmp_after, model_u_jsr_after): New methods.
+	(model_u_macl_after): New method.
+	(model_mac_after): New method.
+	(set_fpscr_busy): New method.
+	(model_u_maybe_fpu_before): New method.
+	(model_u_lds_fpscr_after, model_u_ldsl_fpscr_after): New methods.
+	(model_u_maybe_fpu_after): New method.
+	(model_u_fcnv_after): New method.
+	(reduce_saved_latency): New method.
+	(branch_stall): New method.
+	(num_gpr): New method.
+	(sh_commmon_model::step_latency): Default parameter value now 0.
+	(fpu_busy): Moved to sh_common_Model from sh_common_model_with_fp.
+	(gpr_busy): Now 64 elements.
+	(exec_cycles): New member of sh_common_model.
+	(model_u_set_fr_0_before): Removed.
+	(sh_commmon_model_with_fp::step_latency): Default parameter value now 0.
+	(fpscr_busy): New member.
+	(fpr_busy): now 64 elements.
+	(sh_commmon_model_with_vliw::step_latency): Default parameter value now 0.
+	* Makefile.am (libsh_la_SOURCES): Add sh3_model.cxx, sh4_model.cxx,
+	sh4a_model.cxx, sh5_model.cxx, sh_vliw.cxx.
+	* Makefile.in: Regenerated.
+	* sh3_model.cxx: New file.
+	* sh3_model.h: New file.
+	* sh4_model.cxx: New file.
+	* sh4_model.h: New file.
+	* sh4a_model.cxx: New file.
+	* sh4a_model.h: New file.
+	* sh4al_model.h: New file.
+	* sh5_model.cxx: New file.
+	* sh5_model.h: New file.
+	* sh_vliw.cxx: New file.
+	* sh_vliw.h: New file.
+	* sh*-{cpu,defs,decode,model,sem,write}.{cxx,h}: Regenerated.
+
+	2006-05-11  Dave Brolley  <brolley@redhat.com>
+
+	* New cgen cpu.

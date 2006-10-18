@@ -1,3 +1,105 @@
+2006-10-18  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+
+	2006-07-11  Dave Brolley  <brolley@redhat.com>
+
+	* cpu/sh64-compact.cpu (movual, movual2): New insns.
+	(movcol): New insn.
+	* cpu/sh.cpu (sh4a-nofpu-models): New pmacro.
+	* sid.scm (-op-gen-delayed-set-maybe-trace): If delay used, note the
+	hardware or memory mode which was used.
+	* sid-cpu.scm (hw-need-write-stack?): New function.
+	(-gen-hw-stream-and-destream-fns): Compute stack-regs. Use it to
+	identify hardware which uses write stacks.
+	(useful-mode-names): Renamed to write-stack-memory-mode-names.
+	Initialized to an empty list.
+	(-gen-writestacks, -gen-reset-fn, -gen-unified-write-fn): Use
+	hw-need-write-stack?.
+	* hardware.scm (used-in-delay-rtl?): New member of <hardware-base>.
+	(define-getters <hardware-base>): Define used-in-delay-rtl?.
+	(used-in-delay-rtl?): New method of <hardware-base>.
+	(hw-used-in-delay-rtl?): New function.
+
+	2006-06-20  Dave Brolley  <brolley@redhat.com>
+
+	* sid.scm (gen-attr-type): Removed.
+	* cpu/sh.cpu (SH2a-nofpu-MACH): Add sh5.
+	(SH2a-MACH): Add sh5.
+	(sh2a-nofpu-models): Add units for sh5.
+	(sh2a-fpu-models): Likewise.
+
+	2006-06-15  Dave Brolley  <brolley@redhat.com>
+
+	* cpu/sh-sim.cpu: New file.
+	* cpu/sh-sid.cpu: New file.
+	* cpu/sh64-media.cpu (dshci): Add xtiming argument and splice it in.
+	(All fields): Remap for (insn-lsb0? #f)
+	(All insns): Add timing specs.
+	* cpu/sh64-compact.cpu (dshcf,dshcop): Replace 'ignored' argument with
+	'xattrs' and .splice it in.
+	(32-BIT-INSN,SH4-GROUP,SH4A-GROUP): New insn attributes.
+	(h-frc,h-drc): Add PROFILE attribute.
+	(h-fpccr): Removed.
+	(h-vbr): New hardware.
+	(All fields): Remap for (insn-lsb0? #f)
+	(f-imm20-hi,f-imm20-lo,f-imm20): New fields.
+	(fr0,fmovm,fmovn,imm20,imm12x4,imm12x8,vbr): New operands.
+	(fpscr): Use h-fpscr.
+	(fsdm,fsdn): Use h-fsd.
+	(dshci): Add xtiming argument and splice it in.
+	(dr,xd): pmacros removed.
+	(All insns): Add timing specs, *-MACH attribibutes,
+	SH4{A}-GROUP attributes.
+	(divu,mulr,ldc-vbr,ldc-sr,ldcl-vbr,movl12,movl13,stcl-vbr): New insns.
+	* cpu/sh.cpu): Include sh-sid.cpu or sh-sim.cpu depending on whether
+	we're being processed for sim or sid.
+	(define-arch): Change insn-lsb0? for #f. Add machs sh2e, sh2a-fpu,
+	sh2a-nofpu, sh4-nofpu, sh4a-nofpu, sh4a, sh4al.
+	(define-isa compact): Add (isa-parallel-insns 2).
+	(define-isa media): Add (isa-parallel-insns 2). Add
+	(default-insn-word-bitsize 32). Change base-insn-bitsize to 32.
+	(define-mach): Add sh2e, sh2a-fpu, sh2a-nofpu, sh4-nofpu, sh4a-nofpu,
+	sh4a, sh4al
+	(SH2-MACH, SH2e-MACH, SH2a-nofpu-MACH, SH2a-MACH, SH3-MACH) 
+	(SH3e-MACH, SH4-nofpu-MACH, SH4-MACH, SH4a-nofpu-MACH, SH4a-MACH) 
+	(SH4al-MACH, SH5-MACH): New pmacros.
+	(common-units, common-fp-units, sh2a-nofpu-units, sh2a-fpu-units) 
+	(sh4-nofpu-units, sh4-common-fp-units, sh5-media-units) 
+	(sh5-media-fp-units, common-model, common-model-with-fp) 
+	(sh3-model, sh3e-model): New pmacros.
+	(define-model sh2): New model.
+	(define-model sh2e): New model.
+	(define-model sh3): New model.
+	(define-model sh3e): New model.
+	(define-model sh2a-nofpu): New model.
+	(define-model sh2a-fpu): New model.
+	(define-model sh4-nofpu): New model.
+	(define-model sh4): New model.
+	(define-model sh4a-nofpu): New model.
+	(define-model sh4a): New model.
+	(define-model sh4al): New model.
+	(define-model sh5-media): New model.
+	(define-model sh5): Add all units.
+	(all-models, sh2e-models, sh2a-nofpu-models, sh2a-fpu-models) 
+	(sh3-models, sh3e-models, sh4-nofpu-models, sh4-models) 
+	(sh5-media-models, shad-models, fsqrt-models): New pmacros.
+	(h-pc): Add PROFILE attribute.
+	(h-fr): Likewise.
+	(h-tr): Likewise.
+	(h-gr,h-grc): Likewise.
+	(h-cr): Set h-sr in setter.
+	(h-frbit): Get/Set h-fpscr.
+	(h-szbit,h-prbit): Likewise.
+	(h-fp): Add PROFILE attribute. Now indexed by even indices 0-62.
+	Add getter and setter.
+	(h-fc): Add PROFILE attribute. Now indexed by quad indices 0-60.
+	Adjust getter and setter.
+	(h-fmtx): Add PROFILE attribute. Now indexed by 0, 16, 32 and 48.
+	Adjust getter and setter.
+	(h-dr): Add PROFILE attribute. Now indexed by even indices 0-62.
+	(h-fsd,h-fmov): New hardware.
+
 2006-07-24  Ralk Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	* doc/app.texi, doc/internals.texi, doc/intro.texi,

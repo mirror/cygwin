@@ -1,3 +1,7 @@
+2006-10-23  Dave Brolley  <brolley@redhat.com>
+
+	* compCGEN.cxx (cgen_print_address): Print "0x" prefix.
+
 2006-10-18  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:

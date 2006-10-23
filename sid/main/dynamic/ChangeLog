@@ -1,3 +1,9 @@
+2006-10-23  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.cxx (CacheCfg (const string, sid::host_int_4)):
+	Initialize type as "hw-cache-buffer-" + size. Don't call
+	compute_comptype.
+
 2006-10-18  Dave Brolley  <brolley@redhat.com>
 
 	* Contribue the following changes:

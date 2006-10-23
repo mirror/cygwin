@@ -113,14 +113,12 @@ CacheCfg::CacheCfg (const string name, sid::host_int_4 size) :
   AtomicCfg (name, 
 	     "libcache.la", 
 	     "cache_component_library",
-	     ""),
+	     "hw-cache-buffer-" + sidutil::make_attribute (size)),
   my_assoc (""),
   my_size (size),
   my_line_size (0),
   my_replace ("")
-{
-  compute_comptype ();
-}
+{}
 
 // direct caches
 CacheCfg::CacheCfg (const string name, 

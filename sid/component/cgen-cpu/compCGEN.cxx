@@ -249,7 +249,7 @@ cgen_bi_endian_cpu::cgen_print_address(bfd_vma addr, struct disassemble_info *in
 {
   cgen_bi_endian_cpu *thisp = static_cast<cgen_bi_endian_cpu *>(info->application_data);
 
-  thisp->trace_stream << hex << addr << dec;
+  thisp->trace_stream << "0x" << hex << addr << dec;
 
   if (cgen_symbol_at_address (addr, info))
     if (! thisp->symbol_at_address.empty ())

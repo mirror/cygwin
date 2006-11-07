@@ -1,3 +1,8 @@
+2006-11-07  Dave Brolley  <brolley@redhat.com>
+
+	* sid-model.scm (gen-model-unit-fn-decl): Use symbol->string where
+	necessary.
+
 2006-10-18  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:

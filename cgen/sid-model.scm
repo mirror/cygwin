@@ -85,7 +85,7 @@ static const MACH_IMP_PROPERTIES @cpu@_imp_properties =
 		    (gen-c-args (map (lambda (arg)
 				       (string-append
 					(mode:c-type (mode:lookup (cadr arg)))
-					" /*" (car arg) "*/"))
+					" /*" (symbol->string (car arg)) "*/"))
 				     (find (lambda (arg)
 					     ; Indices of scalars not passed.
 					     (not (null? (cdr arg))))

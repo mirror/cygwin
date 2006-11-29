@@ -1,3 +1,7 @@
+2006-11-29  Dave Brolley  <brolley@redhat.com>
+
+	* mt-elf-sid: New script.
+
 2006-10-18  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:

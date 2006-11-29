@@ -11,12 +11,13 @@ TARGETCFGS = ""
 TARGETDEFINES =
 
 if SIDTARGET_SH
-TARGETCFGS += shCfg.cxx
 TARGETDEFINES += -DSIDTARGET_SH
 endif
 if SIDTARGET_SH64
-TARGETCFGS += shCfg.cxx
 TARGETDEFINES += -DSIDTARGET_SH64
+endif
+if SIDTARGET_SH_OR_SH64
+TARGETCFGS += shCfg.cxx
 endif
 
 # If sid is being compiled without shared library support, arrange to

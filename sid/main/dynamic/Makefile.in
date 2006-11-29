@@ -39,10 +39,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = sid$(EXEEXT)
-@SIDTARGET_SH_TRUE@am__append_1 = shCfg.cxx
-@SIDTARGET_SH_TRUE@am__append_2 = -DSIDTARGET_SH
-@SIDTARGET_SH64_TRUE@am__append_3 = shCfg.cxx
-@SIDTARGET_SH64_TRUE@am__append_4 = -DSIDTARGET_SH64
+@SIDTARGET_SH_TRUE@am__append_1 = -DSIDTARGET_SH
+@SIDTARGET_SH64_TRUE@am__append_2 = -DSIDTARGET_SH64
+@SIDTARGET_SH_OR_SH64_TRUE@am__append_3 = shCfg.cxx
 DIST_COMMON = $(am__configure_deps) \
 	$(srcdir)/../../config/config.guess \
 	$(srcdir)/../../config/config.sub \
@@ -60,7 +59,9 @@ DIST_COMMON = $(am__configure_deps) \
 	acconfig.h
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/../../config/libtool.m4 \
+	$(top_srcdir)/../../config/sidtargets.m4 \
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -73,11 +74,10 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am__sid_SOURCES_DIST = mainDynamic.cxx baseCfg.cxx commonCfg.cxx "" \
 	shCfg.cxx
-@SIDTARGET_SH_TRUE@am__objects_1 = shCfg.$(OBJEXT)
-@SIDTARGET_SH64_TRUE@am__objects_2 = shCfg.$(OBJEXT)
-am__objects_3 = $(am__objects_1) $(am__objects_2)
+@SIDTARGET_SH_OR_SH64_TRUE@am__objects_1 = shCfg.$(OBJEXT)
+am__objects_2 = $(am__objects_1)
 am_sid_OBJECTS = mainDynamic.$(OBJEXT) baseCfg.$(OBJEXT) \
-	commonCfg.$(OBJEXT) $(am__objects_3)
+	commonCfg.$(OBJEXT) $(am__objects_2)
 sid_OBJECTS = $(am_sid_OBJECTS)
 am__DEPENDENCIES_1 =
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
@@ -175,6 +175,8 @@ SIDTARGET_PPC_TRUE = @SIDTARGET_PPC_TRUE@
 SIDTARGET_SH64_FALSE = @SIDTARGET_SH64_FALSE@
 SIDTARGET_SH64_TRUE = @SIDTARGET_SH64_TRUE@
 SIDTARGET_SH_FALSE = @SIDTARGET_SH_FALSE@
+SIDTARGET_SH_OR_SH64_FALSE = @SIDTARGET_SH_OR_SH64_FALSE@
+SIDTARGET_SH_OR_SH64_TRUE = @SIDTARGET_SH_OR_SH64_TRUE@
 SIDTARGET_SH_TRUE = @SIDTARGET_SH_TRUE@
 SIDTARGET_X86_FALSE = @SIDTARGET_X86_FALSE@
 SIDTARGET_X86_TRUE = @SIDTARGET_X86_TRUE@
@@ -233,6 +235,7 @@ sidtarget_mt = @sidtarget_mt@
 sidtarget_ppc = @sidtarget_ppc@
 sidtarget_sh = @sidtarget_sh@
 sidtarget_sh64 = @sidtarget_sh64@
+sidtarget_sh_or_sh64 = @sidtarget_sh_or_sh64@
 sidtarget_x86 = @sidtarget_x86@
 sidtarget_xstormy16 = @sidtarget_xstormy16@
 sysconfdir = @sysconfdir@
@@ -241,8 +244,8 @@ AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include -I$(srcdir)/../../../include
 LIBIBERTY = -L../../../libiberty/pic -L../../../libiberty -liberty
-TARGETCFGS = "" $(am__append_1) $(am__append_3)
-TARGETDEFINES = $(am__append_2) $(am__append_4)
+TARGETCFGS = "" $(am__append_3)
+TARGETDEFINES = $(am__append_1) $(am__append_2)
 
 # If sid is being compiled without shared library support, arrange to
 # statically link in a bunch of component libraries using libtool's

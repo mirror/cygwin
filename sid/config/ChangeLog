@@ -1,3 +1,9 @@
+2006-11-29  Dave Brolley  <brolley@redhat.com>
+
+	* sidtargets.m4 (sidtarget_sh_or_sh64): New variable.
+	(SIDTARGET_SH_OR_SH64): New automake conditional using
+	sidtarget_sh_or_sh64.
+
 2006-10-18  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:

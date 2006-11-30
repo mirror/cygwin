@@ -1,3 +1,8 @@
+2006-11-30  Christopher Faylor  <cgf@timesys.com>
+
+	* win/tclWinPipe.c (TclpCreateProcess): Call cygwin-specific routine to
+	set up windows environment.
+
 2006-07-13  Steve Ellcey  <sje@cup.hp.com>
 
 	* configure.in: Fix for autoconf 2.5.

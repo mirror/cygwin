@@ -4,6 +4,7 @@
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
+#if defined (SIDTARGET_SH) || defined (SIDTARGET_SH64)
 
 #include "shCfg.h"
 
@@ -222,3 +223,5 @@ mk_sh5_64media (const string name, SessionCfg *sess)
   return board;
 }
 #endif // defined (SIDTARGET_SH64)
+
+#endif // defined (SIDTARGET_SH) || defined (SIDTARGET_SH64)

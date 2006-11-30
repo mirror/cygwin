@@ -7,7 +7,7 @@ INCLUDES = -I. -I../../include -I$(srcdir)/../../include -I$(srcdir)/../../../in
 LIBIBERTY = -L../../../libiberty/pic -L../../../libiberty -liberty
 
 bin_PROGRAMS = sid
-TARGETCFGS = ""
+TARGETCFGS = shCfg.cxx
 TARGETDEFINES =
 
 if SIDTARGET_SH
@@ -15,9 +15,6 @@ TARGETDEFINES += -DSIDTARGET_SH
 endif
 if SIDTARGET_SH64
 TARGETDEFINES += -DSIDTARGET_SH64
-endif
-if SIDTARGET_SH_OR_SH64
-TARGETCFGS += shCfg.cxx
 endif
 
 # If sid is being compiled without shared library support, arrange to

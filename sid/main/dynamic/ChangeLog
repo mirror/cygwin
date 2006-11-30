@@ -1,3 +1,13 @@
+2006-11-30  Dave Brolley  <brolley@redhat.com>
+
+	* Makefile.am (TARGETCFGS): Revert previous changes. Add shCfg.cxx
+	unconditionally.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Regenerated.
+	* configure: Regenerated.
+	* shCfg.cxx: Protect the entire file with preprocessor conditional
+	compilation for sh or sh64.
+
 2006-11-29  Dave Brolley  <brolley@redhat.com>
 
 	* Makefile.am (TARGETCFGS): Set based on SIDTARGET_SH_OR_SH64.

@@ -1,3 +1,7 @@
+2006-11-30  Dave Brolley  <brolley@redhat.com>
+
+	* sidtargets.m4: Revert previous change.
+
 2006-11-29  Dave Brolley  <brolley@redhat.com>
 
 	* sidtargets.m4 (sidtarget_sh_or_sh64): New variable.

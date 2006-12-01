@@ -1,3 +1,9 @@
+2006-11-30  Christopher Faylor  <cgf@timesys.com>
+
+	* tk/win/tcl.m4 (LIB_AC_PROG_CC): Upgrade to avoid use of obsolete
+	ac_cv_cygwin variable.
+	* tk/win/configure: Regenerate.
+
 2006-07-13  Steve Ellcey  <sje@cup.hp.com>
 
 	* configure.in: Fix for autoconf 2.5.

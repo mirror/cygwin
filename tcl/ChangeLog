@@ -3,7 +3,7 @@
 	* cygwin/configure.in (LIB_AC_PROG_CC): Upgrade macro to accommodate
 	newer version of autoconf.
 	* cygwin/configure: Regenerate.
-	* win/tcl.m4: Upgrade to avoid use of absolete ac_cv_cygwin variable.
+	* win/tcl.m4: Upgrade to avoid use of obsolete ac_cv_cygwin variable.
 	* win/configure: Regenerate.
 
 2006-11-30  Christopher Faylor  <cgf@timesys.com>

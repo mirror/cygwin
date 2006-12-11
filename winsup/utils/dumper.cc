@@ -11,6 +11,7 @@
    details. */
 
 #include <bfd.h>
+#include <ansidecl.h>
 #include <elf/common.h>
 #include <elf/external.h>
 #include <sys/procfs.h>
@@ -36,7 +37,7 @@ __attribute__ ((packed))
 #endif
   note_header;
 
-static const char version[] = "$Revision: 1.12 $";
+static const char version[] = "$Revision: 1.13 $";
 
 BOOL verbose = FALSE;
 

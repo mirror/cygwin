@@ -15,6 +15,9 @@
 #include <sidwatchutil.h>
 
 #ifdef HAVE__USR_INCLUDE_CURSES_H
+// The following macro definition prevents curses.h from providing a typedef
+// for bool on Solaris.
+#define _BOOL 1
 #include "/usr/include/curses.h"
 #else
 #ifdef HAVE_CURSES_H

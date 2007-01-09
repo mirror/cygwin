@@ -1,5 +1,5 @@
 /* Model support.
-   Copyright (C) 1996, 1997, 1998 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 2007 Free Software Foundation, Inc.
    Contributed by Cygnus Support.
 
 This file is part of GDB, the GNU debugger.
@@ -51,7 +51,7 @@ model_option_handler (SIM_DESC sd, sim_cpu *cpu, int opt,
 	const MODEL *model = sim_model_lookup (arg);
 	if (! model)
 	  {
-	    sim_io_eprintf (sd, "unknown model `%s'", arg);
+	    sim_io_eprintf (sd, "unknown model `%s'\n", arg);
 	    return SIM_RC_FAIL;
 	  }
 	sim_model_set (sd, cpu, model);
@@ -197,6 +197,13 @@ sim_model_init (SIM_DESC sd)
       /* Use the default model for the selected machine.
 	 The default model is the first one in the list.  */
       const MACH *mach = sim_mach_lookup_bfd_name (STATE_ARCHITECTURE (sd)->printable_name);
+
+      if (mach == NULL)
+	{
+	  sim_io_eprintf (sd, "unsupported machine `%s'\n",
+			  STATE_ARCHITECTURE (sd)->printable_name);
+	  return SIM_RC_FAIL;
+	}
       sim_model_set (sd, NULL, MACH_MODELS (mach));
     }
   else

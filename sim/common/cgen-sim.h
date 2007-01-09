@@ -1,5 +1,5 @@
 /* Main header file for Cpu tools GENerated simulators.
-   Copyright (C) 1998 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2007 Free Software Foundation, Inc.
    Contributed by Cygnus Support.
 
 This file is part of GDB, the GNU debugger.
@@ -25,6 +25,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "cgen-defs.h"
 #include "cgen-scache.h"
+#include "cgen-fpu.h"
+#include "cgen-par.h"
 #include "cgen-cpu.h"
 #include "cgen-trace.h"
 

@@ -1,5 +1,5 @@
 /* Architecture, machine, and model support.
-   Copyright (C) 1997, 1998, 1999 Free Software Foundation, Inc.
+   Copyright (C) 1997, 1998, 1999, 2007 Free Software Foundation, Inc.
    Contributed by Cygnus Support.
 
 This file is part of GDB, the GNU debugger.
@@ -79,6 +79,9 @@ typedef struct {
   /* This is the argument to bfd_scan_arch.  */
   const char *bfd_name;
 #define MACH_BFD_NAME(m) ((m)->bfd_name)
+  enum mach_attr num;
+#define MACH_NUM(m) ((m)->num)
+
   int word_bitsize;
 #define MACH_WORD_BITSIZE(m) ((m)->word_bitsize)
   int addr_bitsize;

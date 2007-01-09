@@ -1,5 +1,5 @@
 /* Address ranges.
-   Copyright (C) 1998 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2007 Free Software Foundation, Inc.
    Contributed by Cygnus Solutions.
 
 This file is part of the GNU Simulators.
@@ -27,6 +27,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#endif
+
+#ifdef HAVE_STRING_H
+#include <string.h>
 #endif
 
 #define DEFINE_INLINE_P (! defined (SIM_ARANGE_C_INCLUDED))

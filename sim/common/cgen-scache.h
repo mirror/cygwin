@@ -1,5 +1,5 @@
 /* Simulator header for cgen scache support.
-   Copyright (C) 1998 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2007 Free Software Foundation, Inc.
    Contributed by Cygnus Solutions.
 
 This file is part of GDB, the GNU debugger.
@@ -69,10 +69,10 @@ typedef struct cpu_scache {
   SCACHE *next_free;
 #define CPU_SCACHE_NEXT_FREE(cpu) ((cpu) -> cgen_cpu.scache.next_free)
 
-  /* Address of cti-chain insn, only used by functional semantics,
-     not switch form.  */
-  SCACHE **pbb_br_npc_ptr;
-#define CPU_PBB_BR_NPC_PTR(cpu) ((cpu) -> cgen_cpu.scache.pbb_br_npc_ptr)
+  /* Kind of branch being taken.
+     Only used by functional semantics, not switch form.  */
+  SEM_BRANCH_TYPE pbb_br_type;
+#define CPU_PBB_BR_TYPE(cpu) ((cpu) -> cgen_cpu.scache.pbb_br_type)
   /* Target's branch address.  */
   IADDR pbb_br_npc;
 #define CPU_PBB_BR_NPC(cpu) ((cpu) -> cgen_cpu.scache.pbb_br_npc)

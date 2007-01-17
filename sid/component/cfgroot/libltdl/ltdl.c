@@ -1,5 +1,5 @@
 /* ltdl.c -- system independent dlopen wrapper
-   Copyright (C) 1998, 1999, 2000, 2004  Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2004, 2007  Free Software Foundation, Inc.
    Originally by Thomas Tanner <tanner@ffii.org>
    This file is part of GNU Libtool.
 
@@ -2330,6 +2330,15 @@ lt_dlexit ()
 		      ++errors;
 		    }
 		}
+	      /* Make sure that the handle pointed to by 'cur' still exists.
+		 lt_dlclose recursively closes dependent libraries which removes
+		 them from the linked list.  One of these might be the one
+		 pointed to by 'cur'.  */
+	      for (tmp = handles; tmp; tmp = tmp->next)
+		if (tmp == cur)
+		  break;
+	      if (! tmp)
+		cur = handles;
 	    }
 	  /* done if only resident modules are left */
 	  if (!saw_nonresident)

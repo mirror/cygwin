@@ -730,7 +730,7 @@ namespace sidutil
   template <typename DataType>
   class value_control_register: public control_register<DataType>
   {
-  private:
+  protected:
     typedef typename DataType::value_type ValueType;
 
   public:

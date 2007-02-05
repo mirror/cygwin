@@ -25,6 +25,7 @@ using std::cout;
 using std::endl;
 
 #include "cache.h"
+#include "mep-cache.h"
 
 static string buffer_sizes[] =
   { "4", "8" };
@@ -47,6 +48,7 @@ static cache_replacement_lru lru_replacement;
 static cache_replacement_fifo fifo_replacement;
 static cache_replacement_random random_replacement;
 static cache_line_factory internal_line_factory;
+static mep_assoc_replacement_algorithm mep_assoc_replacement;
 
 cache_component::cache_component (unsigned assocy,
 				  unsigned cache_sz, 
@@ -1087,7 +1089,80 @@ CacheListTypes ()
 		types.push_back ("hw-blocking-cache-" + type);
 	      }
 	}
+
+  for (unsigned i = 0; i < (sizeof (assocs) / sizeof (string)); i++)
+    for (unsigned j = 0; j < (sizeof (cache_sizes) / sizeof (string)); j++)
+      for (unsigned k = 0; k < (sizeof (line_sizes) / sizeof (string)); k++)
+	{
+	  type = "hw-mep-cache-";
+	  type += assocs[i] + "/";
+	  type += cache_sizes[j] + "kb/";
+	  type += line_sizes[k];
+	  types.push_back (type);
+	}
+
   return types;
+}
+
+static component *
+create_mep_cache (vector<string>& parts)
+{
+  // decode cache types: hw-mep-cache-<assoc>/<s>kb/<ls>
+  //
+  string assoc_string = parts[3];
+
+  bool match;
+  int i;
+  for (match = false, i = 0; i < sizeof (assocs) / sizeof (string); i++)
+    if (assoc_string == assocs[i])
+      match = true;
+
+  if (!match)
+    return 0;
+  
+  // Parse "<x>kb", where <x> is a positive integer. 
+  int cache_sz;
+  string cache_size_string = parts[4].substr (0, parts[4].length() - 2);
+  for (match = false, i = 0; i < sizeof (cache_sizes) / sizeof (string); i++)
+    if (cache_size_string == cache_sizes[i])
+      {
+	cache_sz = atoi (cache_size_string.c_str ()) * 1024;
+	match = true;
+      }
+
+  if (!match)
+    return 0;
+  
+  int line_sz;
+  string line_size_string = parts[5];
+  for (match = false, i = 0; i < sizeof (line_sizes) / sizeof (string); i++)
+    if (line_size_string == line_sizes[i])
+      {
+	line_sz = atoi (line_size_string.c_str ());
+	match = true;
+      }
+
+  if (!match)
+    return 0;
+
+  int assoc;
+  if (assoc_string == "direct")
+    assoc = 1;
+  else
+    {
+      int pos;
+      if ((pos = assoc_string.find ("way", 0)) == string::npos)
+	return 0;
+
+      assoc_string.erase (pos, assoc_string.length () - pos);
+      if ((assoc = atoi (assoc_string.c_str ())) == 0)
+	return 0;
+    }
+
+  if (assoc == 1)
+    return new mep_cache (assoc, cache_sz, line_sz, null_replacement);
+  
+  return new mep_cache (assoc, cache_sz, line_sz, mep_assoc_replacement);
 }
 
 static component*
@@ -1119,6 +1194,9 @@ CacheCreate (const string& typeName)
     }
   
   vector<string> parts = sidutil::tokenize (typeName, "-/");
+
+  if (parts.size () >= 6 && parts[0] == "hw" && parts[1] == "mep" && parts[1] != "cache")
+    return create_mep_cache (parts);
 
   unsigned extra_ix;
   if (parts.size () >= 5 && parts[0] == "hw" && parts[1] == "cache")

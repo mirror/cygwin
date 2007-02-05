@@ -1,0 +1,12 @@
+# mep testcase for uci $rn,$rm,$code16 -*- Asm -*-
+# configline(): set uci-option? true 
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global uci
+uci:
+	# This is a user-defined instruction.
+	# No testing to do, other than to check for correct decoding.
+	uci $1, $2, 0x1023
+	pass

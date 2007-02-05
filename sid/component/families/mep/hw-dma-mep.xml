@@ -1,0 +1,151 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libmepfamily.la" dlsym="mepfamily_component_library">
+
+  <defcomponent name="hw-dma-mep" type="concrete">
+
+    <defbus name="control-regs" behaviors="transferring"/> 
+    
+    <defpin name="burst-control" direction="out" behaviors="transferring"/>
+    <defpin name="burst-event" direction="in" behaviors="transferring"/>
+    
+    <defaccessor name="main-memory" behaviors="transferring"/>
+    <defaccessor name="local-memory" behaviors="transferring"/>
+
+    <!-- relationships -->
+    <defrelationship name="dynamic-configurator"	behaviors="configuration" />
+
+    <!-- pins -->
+    <defpin name="configure!"	direction="in"  legalvalues="any"	behaviors="configuration" />
+
+  </defcomponent>
+  <synop>
+    <p>
+      This component models a MeP external DMA controller, capable of
+      moving blocks of memory between <accessor>main memory</accessor>
+      and <accessor>local-memory</accessor>.
+    </p>
+  </synop>
+
+  <func>
+    <modelling>
+      <p>
+	The DMA controller is configured through 2 banks of
+	memory-mapped control registers, presented as the
+	<bus>control-regs-high</bus> and <bus>control-regs-low</bus>
+	buses. They are conventionally mapped to <tt>0x1FFF</tt> and
+	<tt>0x1000</tt> respectively, but this must be set up by an
+	external mapper, such as the MeP control bus mapper. The
+	following registers (and interpretations) are mapped: </p>
+
+      <table>
+
+	<tr><th>bus</th><th>address</th><th>bits</th><th>R/W</th><th>name</th></tr>
+
+	<tr><td><bus>control-bus-low</bus></td><td>0x0</td><td>0</td>      <td>R/W</td> <td>active</td></tr>
+	<tr><td><bus>control-bus-low</bus></td><td>0x2</td><td>0</td>      <td>R/W</td> <td>main-to-local</td></tr>
+	<tr><td><bus>control-bus-low</bus></td><td>0x3</td><td>31..0</td>  <td>R/W</td> <td>main-dma-addr</td></tr>
+	<tr><td><bus>control-bus-low</bus></td><td>0x4</td><td>31..16</td> <td>R/W</td> <td>local-dma-addr</td></tr>
+	<tr><td><bus>control-bus-low</bus></td><td>0x4</td><td>15..0</td>  <td>R/W</td> <td>dma-byte-count</td></tr>
+	<tr><td><bus>control-bus-low</bus></td><td>0x9</td><td>2</td>      <td>R  </td> <td>xz-status</td></tr>
+	<tr><td><bus>control-bus-low</bus></td><td>0x9</td><td>1</td>      <td>R  </td> <td>bus-error</td></tr>
+	<tr><td><bus>control-bus-high</bus></td><td>0x0</td><td>27..16</td> <td>R/W</td> <td>burst-size</td></tr>
+	<tr><td><bus>control-bus-high</bus></td><td>0x0</td><td>15..8</td>  <td>R/W</td> <td>begin-wait</td></tr>
+	<tr><td><bus>control-bus-high</bus></td><td>0x0</td><td>7..0</td>   <td>R/W</td> <td>transfer-wait</td></tr>
+
+      </table>
+
+      <p>
+	Most of the control registers are read/write, and describe the
+	parameters of a pending DMA request. The <tt>active</tt>
+	register, when written to, will activate a DMA transfer based on
+	the contents of the other registers, assuming there is not
+	already a transfer in progress. At the moment, any user of the
+	DMA controller must poll the status registers for the result;
+	interrupt delivery is not modeled.
+      </p>
+    </modelling>
+
+    <behavior name="transferring">
+
+      <p>the DMA controller begins a transfer by locking in values for
+	source, destination, and length. Once a transfer is initiated,
+	no other bus activity will stop it or alter its behavior (short
+	of a read/write failure or scheduler disconnection) until it
+	completes.  It schedules its first burst for
+	<tt>begin-wait</tt> cycles after its <tt>active</tt>
+	register is triggered. Once running, it repeatedly schedules
+	itself for bursts until it has transferred
+	<tt>dma-byte-count</tt> bytes. Each burst transfer moves
+	<tt>burst-size</tt> bytes, then schedules another burst for
+	<tt>transfer-wait</tt> cycles in the future if more bytes
+	remain.
+      </p>
+
+      <p>
+	The transfer moves bytes from
+	<accessor>local-memory</accessor> to
+	<accessor>main-memory</accessor>, unless the
+	<tt>main-to-local</tt> register is set, in which case the
+	direction of transfer is reversed.  The bytes are transferred
+	between <tt>main-dma-addr</tt> and
+	<tt>local-dma-addr</tt>.  If anything goes wrong during the
+	transfer, the <tt>bus-error</tt> register is set.
+      </p>
+    </behavior>
+
+    <behavior name="configuration">
+      
+      <p>When the <pin>configure!</pin> pin is driven, a new configuration is obtained from
+         the dynamic-configurator component via its <attribute>current-config</attribute>
+         attribute.  The resulting string is then interpreted as a new configuration for this
+         component.</p>
+
+    </behavior>
+
+  </func>
+
+  <env>
+
+    <p>
+      <title>related components</title>
+
+      <ul>
+	<li>
+	  <p>
+	    a <complib>sid-sched</complib> scheduler component is
+	    expected to be hooked into the DMA controller's
+	    <pin>burst-control</pin> and <pin>burst-event</pin>
+	    pins. it will not function at all without the
+	    scheduler.</p>
+	</li>
+
+	<li>
+	  <p>
+	    an <complib>hw-mapper-basic</complib> is probably required to
+	    set up the control bus and place <bus>control-regs-high</bus>
+	    and <bus>control-regs-low</bus> at their appropriate positions.
+	    <em>Note:</em> that the conventional addresses <tt>0x1FFF</tt>
+	    and <tt>0x1000</tt> are <em>word</em> addresses on the control
+	    bus; the control bus has a 4-byte word addressing scheme, so the
+	    mappings should be made at <tt>[0x1FFF-0x1FFF,4]</tt> and
+	    <tt>[0x1000-0x1009,4]</tt> respectively.</p>
+	</li>
+
+
+	<li>
+	  <p>
+	    an <complib>hw-mapper-basic</complib> or similar presumably
+	    has its bus(es) connected to the DMA controller's
+	    <accessor>local-memory</accessor> and
+	    <accessor>main-memory</accessor> accessors, though this is
+	    up to you; the transfer it will fail with a
+	    <tt>bus-error</tt> if one or other accessor is null.</p>
+	</li>
+      </ul>
+
+    </p>
+
+  </env>
+</defcomplib>

@@ -1,0 +1,19 @@
+# mep testcase for bsr $disp24a2 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+
+	.global bsr24
+bsr24:
+	bsr foo
+	pass
+
+bar:
+	nop
+	nop
+
+.org 0x80000
+foo:
+	ret

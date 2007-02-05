@@ -36,3 +36,6 @@ proc pin_safe_p {pin_name} {
    return 1
 }
 
+if {$sidtarget(mep)} then {
+    monkey_test hw-cpu-mep cgen_component_library libcgencpu.la 3m
+} else { untested "hw-cpu-mep not available" }

@@ -1,0 +1,23 @@
+# mep testcase for and $rn,$rm -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global and
+and:
+	# Test that and (x, 0) = 0.
+	mov $0, 0xff
+	mov $1, 0
+	and $0, $1
+	assert $0, 0
+
+	# Test that and (all-5s, all-As) = 0.
+	mov $0, 0x55
+	mov $1, 0xaa
+	and $0, $1
+	assert $0, 0
+
+okay:	
+	pass
+wrong:
+	fail

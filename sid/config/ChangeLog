@@ -1,3 +1,15 @@
+2007-02-05  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+	2001-10-02  Graham Stott  <grahams@redhat.com>
+
+	* config.sub: Add mep support.
+
+	2001-03-22  Ben Elliston  <bje@redhat.com>
+
+	* sidtargets.m4: Add support for SIDTARGET_MEP.
+	* info.tcl.in: Add sidtarget(mep).
+
 2006-11-30  Dave Brolley  <brolley@redhat.com>
 
 	* sidtargets.m4: Revert previous change.

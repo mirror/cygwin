@@ -1,0 +1,25 @@
+# mep testcase for bsetm ($rm),$imm3 -*- Asm -*-
+# configline(): set cpu bit-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global bsetm
+bsetm:
+	mov $0, 0
+	sb $0, ($0)
+	bsetm ($0),0
+	bsetm ($0),1
+	bsetm ($0),3
+	bsetm ($0),5
+	bsetm ($0),7
+
+	# Verify byte is 0xab.
+	lb $1, ($0)
+	assert $1, -85
+	
+okay:	
+	pass
+wrong:
+	fail
+	

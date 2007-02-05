@@ -1,0 +1,11 @@
+# mep testcase for cmovh $rm,$crn -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global cmovh2
+cmovh2:
+	# This instruction is exercised by the cmovh1 test case.
+	cmovh $3, $cr1
+	pass

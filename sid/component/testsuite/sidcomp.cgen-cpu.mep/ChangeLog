@@ -1,0 +1,404 @@
+2005-07-29  Dave Brolley  <brolley@redhat.com>
+
+	* INTC.conf: Add cache tag test memory.
+	* mep-allinsn.exp: Pass $all_machs to run-sid-tests-raw.
+	* mep-arch.exp: Pass option to set endian for little endian tests.
+
+2004-02-23  Dave Brolley  <brolley@redhat.com>
+
+	* opt.s (opt): Bit 26 of OPT register no longer set.
+	* ldcb.cgs: Now expects a warning.
+	* stcb.cgs: Now expects a warning.
+	* exit.s: Add memory to exit-watchdog so that it doesn't return
+	sid::status::unmapped when accessed.
+
+2003-02-20  Dave Brolley  <brolley@redhat.com>
+
+	* halt-nmi.cs: Provide a handler for the nmi.
+
+2002-11-26  Ben Elliston  <bje@redhat.com>
+
+	* exit.s: New test.
+
+2002-11-25  Ben Elliston  <bje@redhat.com>
+
+	* opt.s: Load correct expected OPT register value.
+
+2002-11-22  Ben Elliston  <bje@redhat.com>
+
+	* testutils.inc (exit): Rename macro from this ..
+	(sys_exit): .. to this.  Use new system call opcode.
+	(sys_write): Likewise.
+	(pass, fail): Use sys_exit and sys_write.
+	* jmp.cgs: Clean up test case.
+
+2002-10-15  Dave Brolley  <brolley@redhat.com>
+
+	* INTC.conf (dmac): Update dmac register bus names.
+
+2002-06-28  Dave Brolley  <brolley@redhat.com>
+
+	* cache.cgs: Remove 'cache' insns from execution path.
+	* cache.s: New testcase to test RI exception for 'cache' insn.
+
+2002-05-10  Ben Elliston  <bje@redhat.com>
+
+	* lmcpi.cgs: Update to reflect recent CPU changes.
+	* smcpi.cgs: Likewise.
+
+2002-05-09  Ben Elliston  <bje@redhat.com>
+
+	* testutils.inc (__sbss_start): Define label.
+	(__sbss_end): Likewise.
+
+2002-05-07  Ben Elliston  <bje@redhat.com>
+
+	* *.cgs: Use a configline() directive to enable instruction
+	options as required.
+
+2002-05-06  Ben Elliston  <bje@redhat.com>
+
+	* opt.s: Update test case for new $OPT register.
+	* zdiv.s: Add configline() directive to enable the DIV instruction
+	for this test.
+
+2002-05-06  Ben Elliston  <bje@redhat.com>
+
+	* mb0.s, mb1.s: New test case.
+	* me0.s, me1.s: Ditto.
+
+2002-02-19  Graydon Hoare  <graydon@redhat.com>
+
+	* mep-intc.exp: New test driver for intc tests.
+	* interrupt.inc: New include for intc tests.
+	* intc.ld: New linker script for intc tests.
+	* INTC.conf: Sid pregen for 4-channel intc tests.
+	* intc_iec_disable.intc: New test case.
+	* intc_hie_disable.intc: New test case.
+	* intc_isr_readonly.intc: New test case.
+	* intc_level.intc: New test case.
+	* intc_edge.intc: New test case.
+	* intc_chan.intc: New test case.
+	* intc_prio.intc: New test case.
+	* intc_prio.intc: New test case.
+	
+2001-12-10  Ben Elliston  <bje@redhat.com>
+
+	* opt.s: Make test pass after 2001-12-07 mep.cxx change.
+
+2001-12-10  Ben Elliston  <bje@redhat.com>
+
+	* cmov1.cgs: Test preservation of bits 63..32.
+
+2001-12-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* opt.s: Make test pass with new default (though implausible)
+	mep cpu OPT value.
+
+2001-12-04  Ben Elliston  <bje@redhat.com>
+
+	* repeat.cgs: Test branching within a repeat block.
+
+2001-11-19  Ben Elliston  <bje@redhat.com>
+
+	* zdiv.s: Test for the correct value of EXC.EXC in handler.
+	
+2001-11-13  Ben Elliston  <bje@redhat.com>
+
+	* id.s: Handle default processor revision of 0.
+
+2001-09-28  Frank Ch. Eigler  <fche@redhat.com>
+
+	* reset-1s.conf, nmi-1s.conf, interrupt-1s: Remove "processor-id"
+	attribute set.
+
+2001-09-26  Ben Elliston  <bje@redhat.com>
+
+	* ri.s: New test case.
+
+2001-09-25  Ben Elliston  <bje@redhat.com>
+
+	* fsft.cgs: Improve test case.
+
+2001-09-24  Ben Elliston  <bje@redhat.com>
+
+	* dret.cgs: Fix test case.
+
+2001-09-21  Ben Elliston  <bje@redhat.com>
+
+	* id.s: Do more extensive testing.
+	* cfg.s: New test case.
+	* rcfg.s: Ditto.
+
+2001-09-20  Ben Elliston  <bje@redhat.com>
+
+	* opt.s: New test case.
+
+2001-08-02  Dave Brolley  <brolley@redhat.com>
+
+	* interrupt-1s.conf: Rename loader to cpu-loader.
+	* nmi-1s.conf: Rename loader to cpu-loader.
+	* reset-1s.conf: Rename loader to cpu-loader.
+
+2001-08-02  John Healy  <jhealy@redhat.com>
+
+	* mep-arch.exp: Cleaned up comments.
+
+2001-08-02  John Healy  <jhealy@redhat.com>
+
+	* mep-arch.exp: Run tests using run-sid-tests-raw and force load of
+	basid-sid.
+	* mep-allinsn.exp: Ditto.
+	* break.s: Add configfile() option.
+	* id.s: Add configfile() option.
+	* swi.s: Add configfile() option.
+	* zdiv.s: Add configfile() option.
+	* halt-nmi.s: Add configfile() option and remove sim() option.
+	* halt.cs: Ditto. 
+	* hw-interrupt.cs: Ditto. 
+	* nmi.cs: Ditto. 
+	* reset.cs: Ditto. 
+
+2001-07-31  Ben Elliston  <bje@redhat.com>
+
+	* mep-arch.exp: Run *.s tests using run-sid-tests also.
+
+2001-07-30  Ben Elliston  <bje@redhat.com>
+
+	* mep-allinsn.exp: Use run-sid-tests, not run-sid-bsp-tests.
+
+2001-07-18  Ben Elliston  <bje@redhat.com>
+
+	* bcpaf.cgs, bcpat.cgs, bcpeq.cgs: Tweak branch target addresses.
+	* bcpne.cgs, beq.cgs, beqi.cgs, bgei.cgs, blti.cgs: Ditto.
+	* bne.cgs, bnei.cgs: Ditto.
+
+2001-07-10  Ben Elliston  <bje@redhat.com>
+
+	* reset.cs: New test case.
+	* reset-1s.conf: New test configuration.
+
+2001-07-09  Ben Elliston  <bje@redhat.com>
+
+	* break.s, swi.s, zdiv.s, hw-interrupt.cs: Update to reflect
+	mistaken understanding of vector address computations for
+	exceptions.  Place instructions at the vector address, not a
+	pointer to the vector handler.
+	* halt-nmi.cs: New test case.
+	* nmi.cs: Likewise.
+	* nmi-1s.conf: New test configuration.
+	* mep-allinsn.exp: Only run .cgs tests.
+	* mep-arch.exp: Run .s tests -- these are architectural cases.
+
+	* interrupt-1s.conf: Rename from interrupt-2s.conf.
+	* halt.cs (sim): Update directive.
+	* hw-interrupt.cs (sim): Likewise.
+
+2001-07-05  Ben Elliston  <bje@redhat.com>
+
+	* mep-arch.exp: New test script.
+	* interrupt-2s.conf: New.
+	* halt.cs: New test case.
+	* hw-interrupt.cs: Likewise.
+	* halt.cgs: Remove.
+
+2001-07-05  Ben Elliston  <bje@redhat.com>
+
+	* break.s: New test case.
+	* swi.s: Likewise.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* break.cgs: Remove; tested by more detailed test cases.
+	* reti.cgs: Ditto.
+	* swi.cgs: Ditto.
+
+2001-06-30  Ben Elliston  <bje@redhat.com>
+
+	* zdiv.s: New test case.
+
+2001-06-29  Ben Elliston  <bje@redhat.com>
+
+	* div.cgs, divu.cgs: Remove division by zero tests. These
+	conditions will be tested by specific architectural test cases.
+
+2001-06-06  Ben Elliston  <bje@redhat.com>
+
+	* cp.cgs: Remove.
+
+2001-05-30  Ben Elliston  <bje@redhat.com>
+
+	* mep-allinsn.exp: Glob tests matching *.s as well as *.cgs.
+	* id.s: New test case.
+
+2001-05-30  Ben Elliston  <bje@redhat.com>
+
+	* testutils.inc (failmsg): Define in .data section.
+	(passmsg): Likewise.
+	(exit): Define macro. Use gloss exit syscall.
+	(pass): Rewrite to use gloss syscall to write passmsg.
+	(fail): Likewise for failmsg.
+
+	* bcpaf.cgs, bcpat.cgs: Bring branch target labels closer.
+	* bcpeq.cgs, bcpne.cgs, beq.cgs, beqi.cgs, bgei.cgs: Likewise.
+	* blti.cgs, bne.cgs, bnei.cgs, bsr24.cgs, bsrv.cgs: Likewise.
+	* jmp.cgs: Correct address of branch target.
+	* jsr.cgs: Use a label for branch target addresses.
+	* jsrv.cgs: Likewise.
+	* mul.cgs (wrong): Move label to avoid displacement overflows.
+	* mulr.cgs (wrong): Likewise.
+	* mulru.cgs (wrong): Likewise.
+	* mulu.cgs (wrong): Likewise.
+	* repeat.cgs: Complete test case.
+	* erepeat.cgs: Likewise.
+	* ret.cgs: Correct address of branch target.
+	* sbcpm0.cgs: Load mb0 and me0 registers with reasonable values.
+	* shcpm0.cgs, swcpm0.cgs, smcpm0.cgs: Likewise.
+	* sbcpm1.cgs: Likewise for mb1/me1.
+	* shcpm1.cgs, swcpm1.cgs, smcpm1.cgs: Likewise.
+
+2001-05-29  Ben Elliston  <bje@redhat.com>
+
+	* lhcpa.cgs, lmcpa.cgs, lwcpa.cgs: Complete test cases.
+	* sbcpa.cgs, shcpa.cgs, smcpa.cgs, swcpa.cgs: Ditto.
+	* lbcpm0.cgs, lbcpm1.cgs, lhcpm0.cgs, lhcpm1.cgs: Ditto.
+	* lmcpm0.cgs, lmcpm1.cgs, lwcpm0.cgs, lwcpm1.cgs: Ditto.
+	* sbcpm0.cgs, sbcpm1.cgs, shcpm0.cgs, shcpm1.cgs: Ditto.
+	* smcpm0.cgs, smcpm1.cgs, swcpm0.cgs, swcpm1.cgs: Ditto.
+	
+2001-05-28  Ben Elliston  <bje@redhat.com>
+
+	* mep-allinsn.exp (gas_debug_flags): Remove --gdwarf2 for now.
+
+	* abs.cgs, add3x.cgs, and3.cgs, ave.cgs: Complete test cases.
+	* clip.cgs, cmov1.cgs, cmov2.cgs, cmovc1.cgs, cmovh1.cgs: Ditto.
+	* cmovh2.cgs, lb16.cgs, lbcpa.cgs, lbu16.cgs, ldcb.cgs: Ditto.
+	* ldz.cgs, lh.cgs, lh16.cgs, lhu16.cgs, lmcp16.cgs: Ditto.
+	* lw16.cgs, lwcp16.cgs, madd.cgs, maddr.cgs, maddru.cgs: Ditto.
+	* maddu.cgs, movh.cgs, movi16.cgs, movu16.cgs, movu24.cgs: Ditto.
+	* or3.cgs, sadd.cgs, saddu.cgs, sbcpa.cgs, slt3x.cgs: Ditto.
+	* sltu3x.cgs, ssub.cgs, ssubu.cgs, stcb.cgs, sw16.cgs: Ditto.
+	* sw24.cgs, swcp16.cgs: Ditto.
+
+2001-05-25  Ben Elliston  <bje@redhat.com>
+
+	* clip.cgs, clipu.cgs, jmp.cgs: Correct errors in test cases.
+	* jsr.cgs, jsrv.cgs, ret.cgs, sltu3i.cgs, swi.cgs: Likewise.
+
+	* testutils.inc (pass): Don't use SWI, use the reserved opcode.
+	(fail): Likewise.
+
+2001-05-22  Ben Elliston  <bje@redhat.com>
+
+	* bcpaf.cgs, bcpat.cgs, bcpeq.cgs, bcpne.cgs: Complete test cases.
+	* beq.cgs, beqi.cgs, bgei.cgs, blti.cgs, bne.cgs: Ditto.
+	* bnei.cgs, bsr24.cgs, bsrv.cgs, clip.cgs, clipu.cgs: Ditto.
+	* cmovc2.cgs, divu.cgs, jmp24.cgs, ldcb.cgs, lmcp16.cgs: Ditto.
+	* lwcp16.cgs, movu24.cgs, sb16.cgs, sh16.cgs, smcp16.cgs: Ditto.
+	* stcb.cgs, swcp16.cgs, xor3.cgs: Ditto.
+
+2001-05-21  Ben Elliston  <bje@redhat.com>
+
+	* abc.cgs, ave.cgs, cmov2.cgs, cmovc1.cgs: Complete test cases.
+	* cp.cgs, dsp.cgs, ldz.cgs, lw24.cgs, max.cgs, maxu.cgs: Ditto.
+	* min.cgs, minu.cgs, movu24.cgs, sw24.cgs, uci.cgs: Ditto.
+
+2001-05-18  Ben Elliston  <bje@redhat.com>
+
+	* testutils.inc (assert): New macro.
+	* add.cgs, add3.cgs, add3i.cgs, advck3.cgs: Complete test cases.
+	* and.cgs, bclrm.cgs, beqz.cgs, bnez.cgs, bnotm.cgs: Ditto.
+	* bsetm.cgs, bsr12.cgs, div.cgs, divu.cgs, extb.cgs: Ditto.
+	* exth.cgs, extub.cgs, extuh.cgs, fsft.cgs, jsr.cgs: Ditto.
+	* lb-tp.cgs, lb.cgs, lbu-tp.cgs, lbu.cgs, ldc.cgs: Ditto.
+	* lh-tp.cgs, lh.cgs, lhu-tp.cgs, lhu.cgs, lcmpi.cgs: Ditto.
+	* lwcpi.cgs, mov.cgs, movi8.cgs, mul.cgs, mulr.cgs: Ditto.
+	* mulru.cgs, mulu.cgs, neg.cgs, nor.cgs, or.cgs, sb-tp.cgs: Ditto.
+	* sb.cgs, sbvck3.cgs, sh-tp.cgs, sh.cgs, sl1ad3.cgs: Ditto.
+	* sl2ad3.cgs, sll.cgs, sll3.cgs, slli.cgs, slt3.cgs: Ditto.
+	* slt3i.cgs, sltu3.cgs, sltu3i.cgs, smcp.cgs, smcpi.cgs: Ditto.
+	* sra.cgs, srai.cgs, srl.cgs, srli.cgs, ssarb.cgs, stc.cgs: Ditto.
+	* sub.cgs, sw.cgs, swcp.cgs, swcpi.cgs, tas.cgs, xor.cgs: Ditto.
+
+2001-05-18  Ben Elliston  <bje@redhat.com>
+	
+	* add3i.cgs, bnotm.cgs, btstm.cgs, div.cgs: Enhance tests.
+	* divu.cgs, lmcp.cgs, lmcpi.cgs, lw-sp.cgs, lw-tp.cgs: Ditto.
+	* lwcp.cgs, lwcpi.cgs, sw-sp.cgs, sw-tp.cgs: Ditto.
+
+	* bsr12.cgs, bsrv.cgs, div.cgs, divu.cgs, extb.cgs: Enhance tests.
+	* exth.cgs, jsrv.cgs, lb-tp.cgs, lb.cgs, lbu-tp.cgs: Ditto.
+	* lbu.cgs, lh-tp.cgs, lh.cgs, lhu-tp.cgs, lhu.cgs: Ditto.
+	* mulr.cgs, mulru.cgs, mulu.cgs, sb-tp.cgs, sh-tp.cgs: Ditto.
+	* sll3.cgs, slli.cgs, smcp.cgs, smcpi.cgs, srli.cgs: Ditto.
+	* ssarb.cgs, swcp.cgs, swcpi.cgs: Ditto.
+
+2001-05-17  Ben Elliston  <bje@redhat.com>
+
+	* add.cgs, advck3.cgs, beqz.cgs, bnez.cgs: Enhance tests.
+	* lb.cgs, lh.cgs, lw.cgs, mul.cgs, sbvck3.cgs: Ditto.
+	* sh.cgs, slt3.cgs, slt3i.cgs, sltu3.cgs, sltu3i.cgs: Ditto.
+	* sub.cgs, sw.cgs: Ditto.
+
+2001-05-16  Ben Elliston  <bje@redhat.com>
+
+	* abs.cgs, add.cgs, add3.cgs, add3i.cgs, add3x.cgs: Enhance tests.
+	* advck3.cgs, and3.cgs, ave.cgs, beq.cgs, beqi.cgs: Ditto.
+	* beqz.cgs, bgei.cgs, blti.cgs, bne.cgs, bnei.cgs: Ditto.
+	* bnez.cgs, bnotm.cgs, bra.cgs, bsr12.cgs, bsr24.cgs: Ditto.
+	* btstm.cgs, clip.cgs, clipu.cgs, cmov1.cgs, cmov2.cgs: Ditto.
+	* cmovc1.cgs, cmovc2.cgs, cmovh1.cgs, cmovh2.cgs, div.cgs: Ditto.
+	* divu.cgs, dsp.cgs, erepeat.cgs, extb.cgs, exth.cgs: Ditto.
+	* extub.cgs, extuh.cgs, fsft.cgs, jmp.cgs, lb-tp.cgs: Ditto.
+	* lb.cgs, lb16.cgs, lbcpa.cgs, lbcpm0.cgs, lbcpm1.cgs: Ditto.
+	* lbu-tp.cgs, lbu.cgs, lbu16.cgs, ldcb.cgs, ldz.cgs: Ditto.
+	* lh-tp.cgs, lh.cgs, lh16.cgs, lhcpm0.cgs, lhcpm1.cgs: Ditto.
+	* lhu-tp.cgs, lhu.cgs, lhu16.cgs, lmcp.cgs, lmcp16.cgs: Ditto.
+	* lmcpa.cgs, lmcpi.cgs, lmcpm0.cgs, lmcpm1.cgs, lw-sp.cgs: Ditto.
+	* lw-tp.cgs, lw.cgs, lw16.cgs, lw24.cgs, lwcp.cgs: Ditto.
+	* lwcp16.cgs, lwcpa.cgs, lwcpi.cgs, lwcpm0.cgs, lwcpm1.cgs: Ditto.
+	* madd.cgs, maddr.cgs, maddru.cgs, maddu.cgs, max.cgs: Ditto.
+	* maxu.cgs, min.cgs, minu.cgs, mov.cgs, movh.cgs: Ditto.
+	* movi16.cgs, movi8.cgs, movu16.cgs, movu24.cgs, mul.cgs: Ditto.
+	* mulr.cgs, mulu.cgs, or3.cgs, repeat.cgs, sadd.cgs: Ditto.
+	* saddu.cgs, sb-tp.cgs, sb16.cgs, sbcpa.cgs, sbcpm0.cgs: Ditto.
+	* sbcpm1.cgs, sbvck3.cgs, sh-tp.cgs, sh.cgs, sh16.cgs: Ditto.
+	* shcpa.cgs, shcpm0.cgs, shcpm1.cgs, sl1ad3.cgs: Ditto.
+	* sl2ad3.cgs, sll.cgs, sll3.cgs, slli.cgs, slt3.cgs: Ditto.
+	* slt3i.cgs, slt3x.cgs, sltu3.cgs, sltu3i.cgs, sltu3x.cgs: Ditto.
+	* smcp.cgs, smcp16.cgs, smcpa.cgs, smcpi.cgs, smcpm0.cgs: Ditto.
+	* smcpm1.cgs, sra.cgs, srl.cgs, srli.cgs, ssarb.cgs: Ditto.
+	* ssub.cgs, ssubu.cgs, stcb.cgs, sub.cgs, sw-sp.cgs: Ditto.
+	* sw-tp.cgs, sw.cgs, sw16.cgs, sw24.cgs, swcp.cgs: Ditto.
+	* swcp16.cgs, swcpa.cgs, swcpi.cgs, swcpm0.cgs: Ditto.
+	* swcpm1.cgs, uci.cgs, xor3.cgs: Ditto.
+	
+	* bsrv.cgs, jsrv.cgs: Generate.
+	* mulur.cgs: Rename from this ..
+	* mulru.cgs: .. to this. Due to a typo in the cpu description.
+
+2001-05-15  Ben Elliston  <bje@redhat.com>
+
+	* and.cgs, bclrm.cgs, break.cgs, cache.cgs: Enhance test cases.
+	* dbreak.cgs, di.cgs, dret.cgs, ei.cgs, halt.cgs, ldc.cgs: Ditto.
+	* neg.cgs, nor.cgs, or.cgs, ret.cgs, reti.cgs, stc.cgs: Ditto.
+	* swi.cgs, synccp.cgs, syncm.cgs, tas.cgs, xor.cgs: Ditto.
+
+2001-05-14  Ben Elliston  <bje@redhat.com>
+
+	* sycnm.cgs: Rename from this ..
+	* sycnm.cgs: .. to this.
+
+2001-05-11  Ben Elliston  <bje@redhat.com>
+
+	* testutils.inc (pass): Define.
+	(fail): Likewise.
+
+	* allinsn.exp: Rename from this ..
+	* mep-allinsn.exp: .. to this.
+
+2001-04-03  Ben Elliston  <bje@redhat.com>
+
+	* *.cgs: Generate.
+	* allinsn.exp: Likewise.
+	* testutils.inc: New file.

@@ -2,7 +2,7 @@
 // pins and outputs (== lists of others' input pins), and mixtures of
 // these.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -83,7 +83,7 @@ namespace sidutil
     pin_list_t neighbours;
 
     public:
-      ~list_output() throw() {}
+      ~list_output() {}
 
       // Propagate value to list of outputs.
       void
@@ -169,7 +169,7 @@ namespace sidutil
 	this->value = 0;
       }
       
-    virtual ~output_pin () throw()
+    virtual ~output_pin ()
       {
 	if (this->num_outputs == 0)
 	  {
@@ -375,7 +375,7 @@ namespace sidutil
 	}
       
     public:
-      ~fixed_pin_map_component() throw() {}
+      ~fixed_pin_map_component() {}
 
       // Return the names of all known pins (input & output)
       std::vector<std::string>

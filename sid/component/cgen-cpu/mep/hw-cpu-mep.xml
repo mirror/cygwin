@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd" [
+<!ENTITY stdinterface SYSTEM "../common-xml/interface.xml">
+<!ENTITY stdbehavior SYSTEM "../common-xml/behavior.xml">
+<!ENTITY debugregisters SYSTEM "../common-xml/debugger-register-access.xml">
+<!ENTITY stdconventions SYSTEM "../common-xml/conventions.xml">
+<!ENTITY stdenvironment SYSTEM "../common-xml/environment.xml">
+]>
+
+<defcomplib lib="libcgencpu.la" dlsym="cgen_component_library">
+  <defcomponent name="hw-cpu-mep" type="concrete">
+
+  &stdinterface;
+
+    <!-- accessors -->
+    <defaccessor name="control-space" accesses="any" behaviors="word-addressed I/O space" />
+
+    <!-- attributes -->
+    <defattribute name="$N" category="watchable register" legalvalues="number" behaviors="register access" />
+    <defattribute name="control-space-low" category="setting" legalvalues="number" behaviors="initialization" />
+    <defattribute name="control-space-high" category="setting" legalvalues="number" behaviors="initialization" />
+    <defattribute name="raise-ri-exception?" category="setting" legalvalues="boolean" behaviors="exception processing" />
+    <defattribute name="step-insn-count-1-required?" category="setting" legalvalues="boolean" behaviors="running" />
+
+    <!-- relationships -->
+    <defrelationship name="insn-buffer"	behaviors="configuration" />
+    <defrelationship name="dynamic-configurator"	behaviors="configuration" />
+
+    <!-- pins -->
+    <defpin name="configure!"	direction="in"  legalvalues="any"	behaviors="configuration" />
+
+  </defcomponent>
+  <synop>
+    <p>This component models the Toshiba Media Processor (MeP).</p>
+  </synop>
+  <func>
+    <modelling>
+      <p>This component models a simplified MeP processor.</p>  
+      <p>It does not model floating point instructions.</p>
+      <p>It does not model supervisory functions such as
+	exceptions/traps.  It implements only a subset of user-level
+	MeP instructions.</p>
+
+      <p>GDB can see both the main system memory and the MeP control
+      bus. It sees the control bus by accessing a special range of
+      system memory, which is diverted into the control bus. The
+      <attribute>control-space-low</attribute> attribute specifies the
+      low end of this range, and the
+      <attribute>control-space-high</attribute> attribute specifies
+      the high end of this range. These addresses default to
+      <tt>0x007c0000</tt> and <tt>0x007fffff</tt>, respectively.
+	</p>
+
+    </modelling>
+    &stdbehavior;
+    <behavior name="register access">
+      
+      <p>All 32 general purpose registers are accessible as attribute
+      <attribute>r0</attribute> through <attribute>r31</attribute>.
+      The <attribute>pc</attribute> attribute is also available.  The
+      current endianness is available as attribute
+      <attribute>endian</attribute>.</p>
+
+    &debugregisters;
+    </behavior>
+
+    <behavior name="configuration">
+      
+      <p>When the <pin>configure!</pin> pin is driven, a new configuration is obtained from
+         the dynamic-configurator component via its <attribute>current-config</attribute>
+         attribute.  The resulting string is then interpreted as a new configuration for this
+         component.  The insn-buffer relationship may be used to reconfigure the instruction
+         fetch buffer at this time.</p>
+
+    </behavior>
+
+  &stdconventions;
+  </func>
+  <env>
+  &stdenvironment;
+  </env>
+</defcomplib>
+

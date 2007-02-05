@@ -1,0 +1,405 @@
+# Testsuite for the Toshiba Media Engine interrupt controller unit.
+# Copyright (C) 2001 Red Hat
+
+if {! $sidtarget(mep)} then { untested "hw-interrupt-mep not available"; return }
+
+# The number of available interrupt lines.
+set num_lines 32
+
+# A convenience variable.
+set all_ones 0xFFFFFFFF
+
+set test "sid configuration"
+sid_config_component_test "mep-intc.conf" \
+	"load libcache.la cache_component_library
+load libmemory.la mem_component_library
+load libmepfamily.la mepfamily_component_library" \
+	"hw-interrupt-mep-32"
+pass $test
+
+set test "sid start"
+if {[sid_start "mep-intc.conf"]} { pass $test } else { fail $test; return }
+
+set test "attribute list"
+sid_assert_includes_all "sid::component::attribute_names $victim" \
+	{reset interrupt}
+
+set test "get interrupt output pin"
+sid_assert_success "sid::component::find_pin $victim interrupt"
+
+set test "get reset pin"
+sid_assert_success "sid::component::find_pin $victim reset"
+
+# Check for all N interrupt input lines.
+
+for {set i 0} {$i < $num_lines} {incr i} {
+    set test "get interrupt-source-$i pin"
+    sid_assert ![string match [set irq_source($i) [sid_cmd "sid::component::find_pin $victim interrupt-source-$i"]] ""]
+}
+
+# Check for the presence of the register set. Record the name given to
+# it by sid_cmd, as we'll use it throughout this testsuite.
+
+set test "get register bus" 
+sid_assert ![string match [set bus [sid_cmd "sid::component::find_bus $victim registers"]] ""]
+
+# A pin we use again, and again, and again.
+
+set probe_pin [sid_cmd "sid::pin::new"]
+
+# Overwrite IVR with all ones.  Ensure that no read-only bits are
+# modified.
+
+set test "overwrite IVR"
+set result [sid_cmd "sid::bus::read_h4_b4 $bus 0"]
+if [sid_bus_ok_p $result] {
+    set ivr0 [lindex $result 1]
+    set result [sid_cmd "sid::bus::write_h4_b4 $bus 0 $all_ones"]
+    if [sid_bus_ok_p $result] {
+	set result [sid_cmd "sid::bus::read_h4_b4 $bus 0"]
+	if [sid_bus_ok_p $result] {
+	    set ivr1 [lindex $result 1]
+	    sid_assert [expr $ivr0 | (0xf << 8) == $ivr1]
+	} else {
+	    fail $test
+	}
+    } else {
+	fail $test
+    }
+}
+
+# Reset the IVR to 0.
+
+set test "reset IVR"
+set result [sid_cmd "sid::bus::write_h4_b4 $bus 0 0"]
+if [sid_bus_ok_p $result] {
+    set result [sid_cmd "sid::bus::read_h4_b4 $bus 0"]
+    sid_assert [sid_bus_ok_p $result]
+} else { fail $test }
+
+# Test setting different trigger modes (edge vs. level) amongst
+# interrupt sources.
+
+foreach pattern "0x12345678 0 0x55555555 0xAAAAAAAA $all_ones" {
+    set test "set IET to $pattern"
+    sid_assert_success "sid::bus::write_h4_b4 $bus 0xc $pattern"
+    set test "check IET for $pattern"
+    set result [sid_cmd "sid::bus::read_h4_b4 $bus 0xc"]
+    if [sid_bus_ok_p $result] {
+	sid_assert [expr [lindex $result 1] == $pattern]
+    } else { fail $test }
+}
+
+# Test setting different interrupt levels to ILR0..ILR3.
+
+foreach reg {{ILR0 0x10} {ILR1 0x14} {ILR2 0x18} {ILR3 0x1c}} {
+    set regname [lindex $reg 0]
+    set regaddr [lindex $reg 1]
+    foreach pattern "0 0x12345678 0x55555555 0xAAAAAAAA $all_ones" {
+	set test "set $regname to $pattern"
+	sid_assert_success "sid::bus::write_h4_b4 $bus $regaddr $pattern"
+	set test "check $regname for $pattern"
+	set result [sid_cmd "sid::bus::read_h4_b4 $bus $regaddr"]
+	if [sid_bus_ok_p $result] {
+	    sid_assert [expr [lindex $result 1] == $pattern]
+	} else { fail $test }
+    }
+}
+
+# Test enabling different sets of interrupt lines.
+
+foreach pattern "0x0 0x12345678 0x55555555 0xAAAAAAAA $all_ones" {
+    set test "disable all interrupt lines"
+    sid_assert_success "sid::bus::write_h4_b4 $bus 8 0"
+
+    set test "validate all interrupt lines are disabled"
+    set result [sid_cmd "sid::bus::read_h4_b4 $bus 8"]
+
+    if [sid_bus_ok_p $result] {
+	sid_assert [expr [lindex $result 1] == 0]
+    } else { fail "$test (bus error)" }
+
+    set test "initialise set of enabled interrupt lines ($pattern)"
+    sid_assert_success "sid::bus::write_h4_b4 $bus 8 $pattern"
+
+    set test "validate set of enabled interrupt lines ($pattern)"
+    set result [sid_cmd "sid::bus::read_h4_b4 $bus 8"]
+    if [sid_bus_ok_p $result] {
+	sid_assert [expr [lindex $result 1] == $pattern]
+    } else { fail "$test (bus error)" }
+}
+
+# Set all interrupt levels to 1.
+# ie. ILRx = 0x11111111
+
+foreach reg {{ilr0 0x10} {ilr1 0x14} {ilr2 0x18} {ilr3 0x1c}} {
+    set regname [lindex $reg 0]
+    set regaddr [lindex $reg 1]
+    set test "set all channels to interrupt level 1 for $regname"
+    sid_assert_success "sid::bus::write_h4_b4 $bus $regaddr 0x11111111"
+    set test "validate contents of $regname"
+    set result [sid_cmd "sid::bus::read_h4_b4 $bus $regaddr"]
+    if {[sid_bus_ok_p $result] && [expr [lindex $result 1] == 0x11111111]} {
+	pass $test
+    } else {
+	fail $test
+    }
+}
+
+# Permit interrupts on one channel at a time.
+# Generate an interrupt on each interrupt line on each iteration.
+# For edge triggered mode, clear the interrupt by writing to the ISR.
+# For level triggered mode, clear it by clearing the interrupt source.
+
+# This is a double nested loop -- n^2 tests are performed to make sure
+# that other interrupt lines going high does not invoke an interrupt
+# (ie. to ensure that the masking works correctly for all cases).
+
+sid_cmd "set hook_driven_h4($probe_pin) { 
+    global driven_h4_value interrupted
+    set interrupted \$driven_h4_value
+}"
+
+sid_cmd "sid::component::connect_pin $victim interrupt $probe_pin"
+
+proc exhaustive_driven_test {triggermode} {
+    global all_ones
+    global bus
+    global victim
+    global probe_pin
+    global num_lines
+    global irq_source
+
+    set test "set IET "
+
+    if {$triggermode == "edge"} {
+	append test "for edge-triggered interrupts"
+	set value $all_ones
+    } else {
+	append test "for level-triggered interrupts"
+	set value 0
+    }	
+    sid_assert_success "sid::bus::write_h4_b4 $bus 0xc $value"
+
+    set test "validate IET register"
+    set result [sid_cmd "sid::bus::read_h4_b4 $bus 0xc"]
+    sid_assert [expr [sid_bus_ok_p $result] && [expr [lindex $result 1] == $value]]
+    unset value
+
+    set failures 0
+    for {set i 0} {$i < $num_lines} {incr i} {
+
+	set test "disable all interrupt lines"
+	sid_assert_success "sid::bus::write_h4_b4 $bus 8 0"
+	set test "validate all interrupt lines are disabled"
+	set result [sid_cmd "sid::bus::read_h4_b4 $bus 8"]
+	if {![sid_bus_ok_p $result] || [expr [lindex $result 1] != 0]} {
+	    incr failures
+	    fail $test
+	    break
+	}
+	
+	set test "enable interrupt line $i"
+	sid_assert_success "sid::bus::write_h4_b4 $bus 8 [expr 1 << $i]"
+	
+	set test "validate only interrupt line $i is enabled"
+	set result [sid_cmd "sid::bus::read_h4_b4 $bus 8"]
+	if [sid_bus_ok_p $result] {
+	    set val [expr 1 << $i]
+	    if {$val < 0} {
+		set val [expr - $val]
+	    }
+	    if {[lindex $result 1] != $val} {
+		incr failures
+		fail $test
+		continue
+	    }
+	} else {
+	    incr failures
+	    fail "$test -- [lindex $result 0]"
+	    continue
+	}
+
+	for {set j 0} {$j < $num_lines} {incr j} {
+	    
+	    sid_cmd "set interrupted -1"
+	    set test "clear ISR register"
+	    set result [sid_cmd "sid::bus::write_h4_b4 $bus 4 0"]
+	    if ![sid_bus_ok_p $result] { fail $test; break }
+
+	    # Raise an interrupt on interrupt line j.
+	    sid_cmd "sid::pin::driven_h4 $irq_source($j) 1"
+	    
+	    set deferred_result [sid_cmd "set interrupted"]
+
+	    set result [sid_cmd "sid::bus::read_h4_b4 $bus 0"]
+	    if {![sid_bus_ok_p $result]} {
+		incr failures
+		fail $test
+		continue
+	    } else {
+		set ivr [lindex $result 1]
+	    }
+	    
+	    set test "ensure bit $j is set in the ISR"
+	    set result [sid_cmd "sid::bus::read_h4_b4 $bus 4"]
+	    if {![sid_bus_ok_p $result]} {
+		incr failures
+		fail "$test ($result) not ok"
+		continue
+	    }
+	    set val [expr 1 << $j]
+	    if {$val < 0} {
+		set val [expr - $val]
+	    }
+	    if {[expr [lindex $result 1] != $val]} {
+		incr failures
+		fail "$test ($result) result != $val"
+		continue
+	    }
+
+	    if { $triggermode == "level" } {
+		# drop the interrupt
+		sid_cmd "sid::pin::driven_h4 $irq_source($j) 0"
+	    } else {
+		# signal that the interrupt is handled
+		set test "clear bit $j in the ISR"
+		set result [sid_cmd "sid::bus::write_h4_b4 $bus 4 0"]
+		if {![sid_bus_ok_p $result]} {
+		    incr failures
+		    fail $test
+		    continue
+		}
+	    }
+	    
+	    set test "verify bit $j is cleared in the ISR"
+	    set result [sid_cmd "sid::bus::read_h4_b4 $bus 4"]
+	    if {![sid_bus_ok_p $result] || [expr [lindex $result 1] != 0]} {
+		incr failures
+		fail $test
+		continue
+	    }
+
+	    if {$i == $j} { set test permitting } else { set test masking }
+	    append test " interrupt from interrupt $j when enabling interrupt $i only"
+	    set result $deferred_result
+	    
+	    if {$i == $j} {
+		if {$result != $i} { 
+		    incr failures
+		    fail "$test - $result"
+		    continue
+		}
+		
+		set test "ensure IVR.ILV contains interrupt level (1)"
+		if [expr [expr [expr $ivr & 0xf000] >> 12] != 1] {
+		    incr failures
+		    fail "$test - $ivr"
+		    continue
+		}
+		
+		set test "ensure IVR.ICN contains interrupt channel"
+		set result [sid_cmd "sid::bus::read_h4_b4 $bus 0"]
+		if [expr [expr [expr $ivr & 0xf8] >> 3] != $i] {
+		    incr failures
+		    fail $test
+		    continue
+		}
+	    }
+	    if {$i != $j && $result != "-1"} {
+		incr failures
+		fail "$test - $result"
+		continue
+	    }
+	}
+    }
+    if [expr !$failures] { pass "masking edge-triggered interrupts" }
+}
+
+exhaustive_driven_test edge
+exhaustive_driven_test level
+
+# Make all interrupt sources edge-triggered again.
+
+set test "set all interrupt sources to edge-triggered"
+sid_assert_success "sid::bus::write_h4_b4 $bus 0xc $all_ones"
+set test "validate IET register"
+set result [sid_cmd "sid::bus::read_h4_b4 $bus 0xc"]
+sid_assert [expr [sid_bus_ok_p $result] && [expr [lindex $result 1] == $all_ones]]
+
+# Set channel 0 to interrupt level 7.
+# Mask interrupts at or below interrupt level 7.
+# Make sure the interrupt is ignored until we set the IML to 0.
+
+set test "set channel 0 to interrupt level 7"
+sid_assert_success "sid::bus::write_h4_b4 $bus 0x10 7"
+set test "validate channel 0 is set to interrupt level 7"
+set result [sid_cmd "sid::bus::read_h4_b4 $bus 0x10"]
+sid_assert [expr [sid_bus_ok_p $result] && [expr [lindex $result 1] == 7]]
+
+set test "set IVR.IML to 7"
+set result [sid_cmd "sid::bus::read_h4_b4 $bus 0"]
+if [sid_bus_ok_p $result] {
+    set new_ivr [expr [lindex $result 1] | [expr 7 << 8]]
+    sid_assert_success "sid::bus::write_h4_b4 $bus 0 $new_ivr"
+} else {
+    fail $test
+}
+
+set result [sid_cmd "sid::bus::read_h4_b4 $bus 0"]
+sid_cmd "set interrupted -1"
+sid_cmd "sid::pin::driven_h4 $irq_source(0) 1"
+set test "mask level 7 interrupt"
+sid_assert [expr [sid_cmd "set interrupted"] == -1]
+set result [sid_cmd "sid::bus::read_h4_b4 $bus 0"]
+
+
+set test "interrupt level priority selection"
+sid_cmd "set interrupted -1"
+set failures 0
+
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x0  0"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x4  0"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x8  $all_ones"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0xc  $all_ones"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x10 0x137f137f"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x14 0"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x18 0"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x1c 0"]] { incr failures }
+
+sid_cmd "sid::pin::driven_h4 $irq_source(5) 1"
+sid_cmd "sid::pin::driven_h4 $irq_source(7) 1"
+
+# check registers.
+set selected [sid_cmd "set interrupted"]
+sid_assert [expr $selected == 5]
+
+set test "interrupt channel priority selection (equal levels)"
+sid_cmd "set interrupted -1"
+set failures 0
+
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x0  0"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x4  0"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x8  $all_ones"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0xc  $all_ones"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x10 0x33333333"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x14 0"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x18 0"]] { incr failures }
+if ![sid_bus_ok_p [sid_cmd "sid::bus::write_h4_b4 $bus 0x1c 0"]] { incr failures }
+
+sid_cmd "sid::pin::driven_h4 $irq_source(5) 1"
+sid_cmd "sid::pin::driven_h4 $irq_source(7) 1"
+
+# check registers.
+set selected [sid_cmd "set interrupted"]
+sid_assert [expr ($failures == 0) && ($selected == 7)]
+
+
+sid_cmd "sid::component::disconnect_pin $victim interrupt $probe_pin"
+
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "mep-intc.conf" }

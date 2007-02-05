@@ -1,0 +1,34 @@
+# mep testcase for swcpa $crn,($rm+),$imm8a4 -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global swcpa
+swcpa:
+	# Load 0xffffffff into $cr1.
+	mov $0, -1
+	cmov $cr1, $0
+
+	# Store it.
+	mov $0, 0x40
+	swcpa $cr1, ($0+), 4
+
+	# Ensure $0 has been incremented by 4.
+	assert $0, 0x44
+
+	# Load it back.
+	mov $0, 0x40
+	lwcpa $cr2, ($0+), 4
+
+	# Ensure $0 has been incremented by 4.
+	assert $0, 0x44
+	cmov $1, $cr2
+
+	# Assert $1 = 0xffffffff.
+	assert $1, -1
+	
+okay:	
+	pass
+wrong:	
+	fail	

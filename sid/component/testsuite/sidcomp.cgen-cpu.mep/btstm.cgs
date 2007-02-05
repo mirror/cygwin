@@ -1,0 +1,35 @@
+# mep testcase for btstm $0,($rm),$imm3 -*- Asm -*-
+# configline(): set cpu bit-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global btstm
+btstm:
+	# Load 0x55 into 0x40.
+	mov $2, 0x40
+	mov $1, 0x55
+	sb $1, ($2)
+
+	# Start testing each bit.
+	# 0x55 => 01010101
+	btstm $0, ($2), 0
+	beqz $0, wrong
+	btstm $0, ($2), 1
+	bnez $0, wrong
+	btstm $0, ($2), 2
+	beqz $0, wrong
+	btstm $0, ($2), 3
+	bnez $0, wrong
+	btstm $0, ($2), 4
+	beqz $0, wrong
+	btstm $0, ($2), 5
+	bnez $0, wrong
+	btstm $0, ($2), 6
+	beqz $0, wrong
+	btstm $0, ($2), 7
+	bnez $0, wrong
+okay:	
+	pass
+wrong:
+	fail

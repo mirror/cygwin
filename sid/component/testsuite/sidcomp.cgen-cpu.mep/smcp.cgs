@@ -1,0 +1,11 @@
+# mep testcase for smcp $crn,($rm) -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global smcp
+smcp:
+	mov $0, 0x47
+	smcp $cr0,($0)
+	pass

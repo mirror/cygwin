@@ -1,0 +1,42 @@
+# mep testcase for madd $rn,$rm -*- Asm -*-
+# configline(): set cpu mul-option? true
+# mach: all
+
+	.include "testutils.inc"
+        .macro assert_hilo hi lo
+        ldc $8, $hi
+        assert $8, \hi
+        ldc $8, $lo
+        assert $8, \lo
+        .endm
+
+	start
+	.global madd
+madd:
+	# Init.
+	mov $0, 0
+	stc $0, $lo
+	stc $0, $hi
+
+	# 0 * 0 = 0.
+	mov $1, 0
+	mov $2, 0
+	madd $1, $2
+	assert_hilo 0, 0
+
+	# 2 * 3 = 6, total=6.
+	mov $1, 2
+	mov $2, 3
+	madd $1, $2
+	assert_hilo 0, 6
+
+	# 2 * -3 = -6, total=0.
+	mov $1, 2
+	mov $2, -3
+	madd $1, $2
+	assert_hilo 0, 0
+
+okay:	
+	pass
+wrong:
+	fail

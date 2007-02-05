@@ -1,0 +1,11 @@
+# mep testcase for swcp $crn,($rm) -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global swcp
+swcp:
+	mov $0, 0x43
+	swcp $cr0,($0)
+	pass

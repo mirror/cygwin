@@ -387,6 +387,38 @@ public:
   virtual void write_load (Writer &w);
   virtual void write_config (Writer &w);
 
+  // Mep-specific options
+  virtual void set_config_index (unsigned i = 0) {}
+  virtual void set_warn_write_to_code (bool b = true) {}
+  virtual void set_warn_write_to_rom (bool b = true) {}
+  virtual void set_allow_write_to_rom (bool b = true) {}
+  virtual void set_model_busses (bool b = true) {}
+  virtual void set_dsp_user_out (bool b = true) {}
+  virtual void set_corrupt_caches (bool b = true) {}
+  virtual void set_opt_insn (string s = "") {}
+  virtual void set_opt_no_insn (string s = "") {}
+  virtual void set_opt_local_mem (string s = "") {}
+  virtual void set_opt_global_mem (string s = "") {}
+  virtual void set_opt_shadow_mem (string s = "") {}
+  virtual void set_opt_dmac_channel_bitw (string s = "") {}
+  virtual void set_opt_biu_width (string s = "") {}
+  virtual void set_opt_dmac_rectangle (bool b = false) {}
+  virtual void set_opt_imem_size (string s = "") {}
+  virtual void set_opt_dmem_size (string s = "") {}
+  virtual void set_opt_dmem_bank_num (string s = "") {}
+  virtual void set_opt_dmem_fixed_start_address (bool b = false) {}
+  virtual void set_opt_icache_size (string s = "") {}
+  virtual void set_opt_icache_line_size (string s = "") {}
+  virtual void set_opt_icache_way (string s = "") {}
+  virtual void set_opt_icache_cwf (string s = "") {}
+  virtual void set_opt_dcache_size (string s = "") {}
+  virtual void set_opt_dcache_line_size (string s = "") {}
+  virtual void set_opt_dcache_way (string s = "") {}
+  virtual void set_opt_dcache_cwf (string s = "") {}
+  virtual void set_opt_intc_channel_bitw (string s = "") {}
+  virtual void set_opt_intc_level (string s = "") {}
+  virtual void set_opt_timer_channel_bitw (string s = "") {}
+
   virtual ~BoardCfg ();
 
   GlueSeqCfg *cache_flush_net;

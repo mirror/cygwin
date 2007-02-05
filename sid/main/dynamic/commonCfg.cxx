@@ -831,6 +831,8 @@ SessionCfg::profile_config (const string &spec)
   string final_insn_count = "false";
   string gprof = "";
   string insn_count = "10000";
+  // mep-specific options
+  string model_busses = "false";
 
   // Now examine the spec and reset those which are specified.
   vector<string>opts = sidutil::tokenize (parts[1], " ");
@@ -877,6 +879,9 @@ SessionCfg::profile_config (const string &spec)
 	gprof = profile_opt_gprof_value (opt, opt_parts);
       else if (match_profile_opt (opt_name, "--insn-count=", 3))
 	insn_count = profile_opt_int_value (opt, opt_parts);
+      // mep-specific options
+      else if (match_profile_opt (opt_name, "--model-busses", 3))
+	model_busses = profile_opt_value (opt, opt_parts, 1);
     }
 
   // Now contruct a string representing the complete configuration
@@ -892,7 +897,9 @@ SessionCfg::profile_config (const string &spec)
 		      "verbose="           + verbose           + ":" +
 		      "final-insn-count="  + final_insn_count  + ":" +
 		      "gprof="             + gprof             + ":" +
-		      "insn-count="        + insn_count);
+		      "insn-count="        + insn_count        + ":" +
+		      // mep-specific options
+		      "model-busses="      + model_busses);
 }
 
 void SessionCfg::write_config (Writer &w)
@@ -1016,7 +1023,9 @@ GprofCfg::GprofCfg (const string name,
   conn_pin (cpu, "cg-callee", this, "cg-callee");
   conn_pin (cpu, "gprof-pc-hi", this, "pc-hi");
   conn_pin (cpu, "gprof-pc", this, "pc");
-  if (cpu->comp_type().substr(0, 9) == "hw-cpu-sh")
+  if (cpu->comp_type().substr(0, 10) == "hw-cpu-mep")
+    set (this, "bucket-size", "2"); // bytes-per-bucket
+  else if (cpu->comp_type().substr(0, 9) == "hw-cpu-sh")
     set (this, "bucket-size", "2"); // bytes-per-bucket
   else
     set (this, "bucket-size", "4"); // bytes-per-bucket
@@ -1037,7 +1046,9 @@ GprofCfg::GprofCfg (const string name,
 
   sess->shutdown_seq->add_output (7, this, "store");
   relate (this, "target-component", cpu);
-  if (cpu->comp_type().substr(0, 9) == "hw-cpu-sh")
+  if (cpu->comp_type().substr(0, 10) == "hw-cpu-mep")
+    set (this, "bucket-size", "2"); // bytes-per-bucket
+  else if (cpu->comp_type().substr(0, 9) == "hw-cpu-sh")
     set (this, "bucket-size", "2"); // bytes-per-bucket
   else
     set (this, "bucket-size", "4"); // bytes-per-bucket

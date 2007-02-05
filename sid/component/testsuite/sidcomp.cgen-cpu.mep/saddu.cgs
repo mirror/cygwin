@@ -1,0 +1,30 @@
+# mep testcase for saddu $rn,$rm -*- Asm -*-
+# configline(): set cpu sat-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global saddu
+saddu:
+	# Null addition.
+	mov $1, 0
+	mov $2, 0
+	saddu $2, $1
+	assert $2, 0
+
+	# Simple addition.
+	mov $1, 3
+	mov $2, 7
+	saddu $2, $1
+	assert $2, 10
+
+	# Generate a carry (ie. X + Y > U_MAX).
+	mov $1, -1
+	mov $2, -1
+	saddu $2, $1
+	assert $2, -1
+
+okay:
+	pass
+wrong:
+	fail

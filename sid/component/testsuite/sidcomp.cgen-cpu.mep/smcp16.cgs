@@ -1,0 +1,11 @@
+# mep testcase for smcp $crn,$disp16($rm) -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global smcp16
+smcp16:
+	mov $1, 0x40
+	swcp $cr3,102($1)
+	pass

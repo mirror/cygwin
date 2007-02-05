@@ -1,0 +1,18 @@
+# mep testcase for jsrv $rm -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global jsrv
+jsrv:
+	# load $0 with address of <foo>.
+	mov $0, %lo(foo)
+	add $0, 1
+	# this instruction should mask off bit 0
+	jsrv $0
+	fail
+	fail
+	nop
+foo:
+	pass

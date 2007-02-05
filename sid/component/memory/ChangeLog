@@ -1,3 +1,74 @@
+2007-02-05  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+	2006-10-23  Dave Brolley  <brolley@redhat.com>
+
+	* Makefile.am (libmemory_la_SOURCES): Add mep-cache-tag.cxx.
+	* Makefile.in: Regenerated.
+
+	2004-04-29  Dave Brolley  <brolley@redhat.com>
+
+	* mep-cache-tag.cxx (log2): New static template function.
+
+	2004-04-29  Dave Brolley  <brolley@redhat.com>
+
+	* components.cxx (mep-cache_tag): #include it.
+	(compMemoryListTypes): List hw-mep-cache-tag-memory.
+	(compMemoryCreate): Create hw_mep_cache_tag_memory.
+	* Makefile.am (libmemory_la_SOURCES): Add mep-cache-tag.cxx.
+	* Makefile.in: Regenerated.
+
+	2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Frank Ch. Eigler  <fche@redhat.com>
+	* generic.cxx (generic_memory ctor): Add evil backdoor hack to
+	read memory buffer base/size via attributes.
+
+2007-01-17  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+	2004-04-29  Dave Brolley  <brolley@redhat.com>
+
+	* generic.h (generic_memory): warn_rom_write,allow_rom_write now
+	 protected.
+
+	2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* generic.h (SID_GB_WRITE): allow_rom_write implies warn_rom_write.
+
+	2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* generic.h (generic_memory): New member allow_rom_write.
+	(SID_GB_WRITE): Use it.
+	* generic.cxx (generic_memory): Initialize it.
+
+	2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* generic.h (generic_read_write_bus::write_any): Move to
+	generic_read_only_bus.
+	(generic_read_only_bus::SID_GB_WRITE): Allow write to read-only-port
+	with a warning if ignore_rom_write is set.
+
+	2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* generic.h (generic_memory): New member: base_address.
+	(SID_GB_WRITE): Add target->base_address to the address printed.
+	* generic.cxx (generic_memory): Initialize base_address. Add
+	base-address attribute.
+
+	2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* generic.cxx (generic_memory): New member ignore_rom_write.
+	* generic.h (generic_read_only_bus::SID_GB_WRITE): Use it.
+
+2007-01-16  Dave Brolley  <brolley@redhat.com>
+
+	* generic.cxx (~generic_memory): Remove throw() specifier.
+	* generic.h (~generic_memory): Likewise.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

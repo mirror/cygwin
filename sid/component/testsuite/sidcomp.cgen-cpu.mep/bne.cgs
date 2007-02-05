@@ -1,0 +1,21 @@
+# mep testcase for bne $rn,$rm,$disp17a2 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global bne
+bne:
+	mov $1, 5
+	mov $2, 5
+	bne $1, $2, wrong
+	mov $1, 7
+	mov $2, 3
+	bne $1, $2, okay
+	fail
+
+.org 0x4000
+wrong:
+	fail
+
+okay:
+	pass

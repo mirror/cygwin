@@ -1,0 +1,10 @@
+# mep testcase for dret -*- Asm -*-
+# configline(): set cpu debug-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global dret
+dret:
+	# This instruction currently has no visible semantics.
+	pass

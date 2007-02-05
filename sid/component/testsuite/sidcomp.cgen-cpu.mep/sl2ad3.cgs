@@ -1,0 +1,16 @@
+# mep testcase for sl2ad3 $0,$rn,$rm -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global sl2ad3
+sl2ad3:
+	mov $1, 1
+	mov $2, 7
+	# (1 << 2) + 7 is 11.
+	sl2ad3 $0, $1, $2
+	assert $0, 11
+okay:
+	pass
+wrong:
+	fail

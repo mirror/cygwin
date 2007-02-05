@@ -1,0 +1,11 @@
+# mep testcase for synccp -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global synccp
+synccp:
+	# This instruction currently has no visible semantics.
+	synccp
+	pass

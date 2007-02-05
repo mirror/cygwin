@@ -1,0 +1,31 @@
+# mep testcase for sltu3 $rn,$rm,$imm16 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global sltu3x
+sltu3x:
+	mov $1, 0x1000
+	mov $2, 0x3000
+	# 0x1000 < 0x3000 is true ($0 <= 1).
+	sltu3 $0, $1, 0x3000
+	assert $0, 1
+
+	# 0x3000 < 0x1000 is false ($0 <= 0).
+	sltu3 $0, $2, 0x1000
+	assert $0, 0
+
+	mov $1, -1
+	mov $2, 0x3000
+	# -1 < 0x3000 is false ($0 <= 0).
+	sltu3 $0, $1, 0x3000
+	assert $0, 0
+
+	# 0x3000 < 0 is false ($0 <= 0).
+	sltu3 $0, $2, 0 
+	assert $0, 0
+
+okay:
+	pass
+wrong:
+	fail

@@ -1,0 +1,12 @@
+# mep testcase for bcpne $cccc,$disp17a2 -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global bcpne
+bcpne:
+	bcpne 12, okay
+	pass
+okay:
+	pass

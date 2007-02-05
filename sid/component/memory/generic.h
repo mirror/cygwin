@@ -1,6 +1,6 @@
 // generic.h - Header for the generic_memory class.  -*- C++ -*-
 
-// Copyright (C) 1999-2001 Red Hat.
+// Copyright (C) 1999-2001, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -69,7 +69,7 @@ class generic_memory: public virtual component,
 {
 public:
   generic_memory() throw (bad_alloc);
-  ~generic_memory() throw ();
+  ~generic_memory();
 
 protected:
   // memory buffers
@@ -94,12 +94,16 @@ protected:
   host_int_4 max_buffer_length;
   bool attempt_resize (host_int_4 new_length) throw();
 
+  host_int_4 base_address;
+  bool warn_rom_write;
+  bool allow_rom_write;
+  
+  host_int_2 read_latency;
+  host_int_2 write_latency;
+
 private:
   string get_size_attr ();
   component::status set_size_attr (const string& s);
-
-  host_int_2 read_latency;
-  host_int_2 write_latency;
 
   string image_file_name;
   callback_pin<generic_memory> imageload_pin;
@@ -125,7 +129,13 @@ public:
   // some macros to make manufacturing of the cartesian-product calls simpler
 #define SID_GB_WRITE(type2) \
       bus::status write(host_int_4 address, type2 data) throw () \
-	  { return bus::unpermitted; } 
+	  { if (! target->warn_rom_write && ! target->allow_rom_write) \
+	       return bus::unpermitted;			\
+	    cerr << "Warning: invalid write to ROM address 0x" << std::hex << target->base_address + address << endl; \
+	    if (target->allow_rom_write)		\
+	        return this->write_any(address,data);	\
+	    else					\
+		return bus::ok; }
  
 #define SID_GB_READ(type2) \
       bus::status read(host_int_4 address, type2& data) throw () \
@@ -160,6 +170,10 @@ protected:
   template <typename DataType>
   inline bus::status
   read_any(host_int_4 address, DataType& data);
+
+  template <typename DataType>
+  inline bus::status
+  write_any(host_int_4 address, DataType data);
 };
 
 
@@ -190,11 +204,6 @@ public:
     SID_GB_WRITE(big_int_8);
       
 #undef SID_GB_WRITE
-
-protected:
-  template <typename DataType>
-  inline bus::status
-  write_any(host_int_4 address, DataType data);
 };
 
 
@@ -203,7 +212,7 @@ protected:
 
 template <typename DataType>
 inline bus::status
-generic_read_write_bus::write_any(host_int_4 address, DataType data)
+generic_read_only_bus::write_any(host_int_4 address, DataType data)
 {
   const unsigned width = sizeof(typename DataType::value_type); 
 

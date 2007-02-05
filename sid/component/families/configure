@@ -463,7 +463,8 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL sidtarget_arm SIDTARGET_ARM_TRUE SIDTARGET_ARM_FALSE sidtarget_x86 SIDTARGET_X86_TRUE SIDTARGET_X86_FALSE sidtarget_mips SIDTARGET_MIPS_TRUE SIDTARGET_MIPS_FALSE sidtarget_m32r SIDTARGET_M32R_TRUE SIDTARGET_M32R_FALSE sidtarget_m68k SIDTARGET_M68K_TRUE SIDTARGET_M68K_FALSE sidtarget_mt SIDTARGET_MT_TRUE SIDTARGET_MT_FALSE sidtarget_ppc SIDTARGET_PPC_TRUE SIDTARGET_PPC_FALSE sidtarget_sh SIDTARGET_SH_TRUE SIDTARGET_SH_FALSE sidtarget_sh64 SIDTARGET_SH64_TRUE SIDTARGET_SH64_FALSE sidtarget_xstormy16 SIDTARGET_XSTORMY16_TRUE SIDTARGET_XSTORMY16_FALSE family_subdirs LIBOBJS LTLIBOBJS'
+ac_subdirs_all="$ac_subdirs_all mep"
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL AS ac_ct_AS OBJDUMP ac_ct_OBJDUMP CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL sidtarget_arm SIDTARGET_ARM_TRUE SIDTARGET_ARM_FALSE sidtarget_x86 SIDTARGET_X86_TRUE SIDTARGET_X86_FALSE sidtarget_mips SIDTARGET_MIPS_TRUE SIDTARGET_MIPS_FALSE sidtarget_m32r SIDTARGET_M32R_TRUE SIDTARGET_M32R_FALSE sidtarget_m68k SIDTARGET_M68K_TRUE SIDTARGET_M68K_FALSE sidtarget_mep SIDTARGET_MEP_TRUE SIDTARGET_MEP_FALSE sidtarget_mt SIDTARGET_MT_TRUE SIDTARGET_MT_FALSE sidtarget_ppc SIDTARGET_PPC_TRUE SIDTARGET_PPC_FALSE sidtarget_sh SIDTARGET_SH_TRUE SIDTARGET_SH_FALSE sidtarget_sh64 SIDTARGET_SH64_TRUE SIDTARGET_SH64_FALSE sidtarget_xstormy16 SIDTARGET_XSTORMY16_TRUE SIDTARGET_XSTORMY16_FALSE subdirs family_subdirs LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -3671,7 +3672,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 3674 "configure"' > conftest.$ac_ext
+  echo '#line 3675 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5492,7 +5493,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5495:" \
+echo "$as_me:5496:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6590,11 +6591,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6593: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6594: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6597: \$? = $ac_status" >&5
+   echo "$as_me:6598: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -6852,11 +6853,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6855: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6856: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6859: \$? = $ac_status" >&5
+   echo "$as_me:6860: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -6914,11 +6915,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6917: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6918: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:6921: \$? = $ac_status" >&5
+   echo "$as_me:6922: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9154,7 +9155,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9157 "configure"
+#line 9158 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9252,7 +9253,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9255 "configure"
+#line 9256 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11500,11 +11501,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11503: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11504: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:11507: \$? = $ac_status" >&5
+   echo "$as_me:11508: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -11562,11 +11563,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11565: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11566: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:11569: \$? = $ac_status" >&5
+   echo "$as_me:11570: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12931,7 +12932,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12934 "configure"
+#line 12935 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13029,7 +13030,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13032 "configure"
+#line 13033 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13914,11 +13915,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13917: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13918: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13921: \$? = $ac_status" >&5
+   echo "$as_me:13922: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13976,11 +13977,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13979: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13980: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13983: \$? = $ac_status" >&5
+   echo "$as_me:13984: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16098,11 +16099,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16101: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16102: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16105: \$? = $ac_status" >&5
+   echo "$as_me:16106: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16360,11 +16361,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16363: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16364: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16367: \$? = $ac_status" >&5
+   echo "$as_me:16368: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16422,11 +16423,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16425: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16426: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16429: \$? = $ac_status" >&5
+   echo "$as_me:16430: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18662,7 +18663,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18665 "configure"
+#line 18666 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18760,7 +18761,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18763 "configure"
+#line 18764 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -20547,6 +20548,7 @@ sidtarget_x86=$sidtarget_default
 sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
+sidtarget_mep=$sidtarget_default
 sidtarget_mt=$sidtarget_default
 sidtarget_ppc=$sidtarget_default
 sidtarget_sh=$sidtarget_default
@@ -20562,11 +20564,12 @@ do
       mips*)  sidtarget_mips=1 ;;
       m32r*)  sidtarget_m32r=1 ;;
       m68k*)  sidtarget_m68k=1 ;;
+      mep*)   sidtarget_mep=1 ;;
       mt*)    sidtarget_mt=1 ;;
       powerpc*) sidtarget_ppc=1 ;;
       ppc*)   sidtarget_ppc=1 ;;
       sh64*) sidtarget_sh64=1 ;;
-      sh*) sidtarget_sh=1 ;;
+      sh*)   sidtarget_sh=1 ;;
       xstormy16*) sidtarget_xstormy16=1 ;;
       *)      { echo "$as_me:$LINENO: WARNING: \"Unknown target $targ\"" >&5
 echo "$as_me: WARNING: \"Unknown target $targ\"" >&2;} ;;
@@ -20579,6 +20582,7 @@ case 1 in
   ${sidtarget_mips}) ;;
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
+  ${sidtarget_mep}) ;;
   ${sidtarget_mt}) ;;
   ${sidtarget_ppc}) ;;
   ${sidtarget_sh}) ;;
@@ -20670,6 +20674,22 @@ fi
 echo "$as_me:$LINENO: result: $sidtarget_m68k" >&5
 echo "${ECHO_T}$sidtarget_m68k" >&6
 
+echo "$as_me:$LINENO: checking Toshiba MeP family support" >&5
+echo $ECHO_N "checking Toshiba MeP family support... $ECHO_C" >&6
+
+
+
+if test "x$sidtarget_mep" = x1; then
+  SIDTARGET_MEP_TRUE=
+  SIDTARGET_MEP_FALSE='#'
+else
+  SIDTARGET_MEP_TRUE='#'
+  SIDTARGET_MEP_FALSE=
+fi
+
+echo "$as_me:$LINENO: result: $sidtarget_mep" >&5
+echo "${ECHO_T}$sidtarget_mep" >&6
+
 echo "$as_me:$LINENO: checking MT family support" >&5
 echo $ECHO_N "checking MT family support... $ECHO_C" >&6
 
@@ -20757,6 +20777,13 @@ echo "${ECHO_T}$sidtarget_xstormy16" >&6
 # to the list.
 family_subdirs=
 
+if test $sidtarget_mep -eq 1; then
+	family_subdirs="$family_subdirs mep"
+
+
+subdirs="$subdirs mep"
+
+fi
 
 
           ac_config_files="$ac_config_files Makefile"
@@ -20949,6 +20976,13 @@ if test -z "${SIDTARGET_M68K_TRUE}" && test -z "${SIDTARGET_M68K_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"SIDTARGET_M68K\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"SIDTARGET_M68K\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SIDTARGET_MEP_TRUE}" && test -z "${SIDTARGET_MEP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SIDTARGET_MEP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SIDTARGET_MEP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -21601,6 +21635,9 @@ s,@SIDTARGET_M32R_FALSE@,$SIDTARGET_M32R_FALSE,;t t
 s,@sidtarget_m68k@,$sidtarget_m68k,;t t
 s,@SIDTARGET_M68K_TRUE@,$SIDTARGET_M68K_TRUE,;t t
 s,@SIDTARGET_M68K_FALSE@,$SIDTARGET_M68K_FALSE,;t t
+s,@sidtarget_mep@,$sidtarget_mep,;t t
+s,@SIDTARGET_MEP_TRUE@,$SIDTARGET_MEP_TRUE,;t t
+s,@SIDTARGET_MEP_FALSE@,$SIDTARGET_MEP_FALSE,;t t
 s,@sidtarget_mt@,$sidtarget_mt,;t t
 s,@SIDTARGET_MT_TRUE@,$SIDTARGET_MT_TRUE,;t t
 s,@SIDTARGET_MT_FALSE@,$SIDTARGET_MT_FALSE,;t t
@@ -21616,6 +21653,7 @@ s,@SIDTARGET_SH64_FALSE@,$SIDTARGET_SH64_FALSE,;t t
 s,@sidtarget_xstormy16@,$sidtarget_xstormy16,;t t
 s,@SIDTARGET_XSTORMY16_TRUE@,$SIDTARGET_XSTORMY16_TRUE,;t t
 s,@SIDTARGET_XSTORMY16_FALSE@,$SIDTARGET_XSTORMY16_FALSE,;t t
+s,@subdirs@,$subdirs,;t t
 s,@family_subdirs@,$family_subdirs,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
@@ -22087,5 +22125,182 @@ if test "$no_create" != yes; then
   # Use ||, not &&, to avoid exiting from the if with $? = 1, which
   # would make configure fail if this is the last instruction.
   $ac_cs_success || { (exit 1); exit 1; }
+fi
+
+#
+# CONFIG_SUBDIRS section.
+#
+if test "$no_recursion" != yes; then
+
+  # Remove --cache-file and --srcdir arguments so they do not pile up.
+  ac_sub_configure_args=
+  ac_prev=
+  for ac_arg in $ac_configure_args; do
+    if test -n "$ac_prev"; then
+      ac_prev=
+      continue
+    fi
+    case $ac_arg in
+    -cache-file | --cache-file | --cache-fil | --cache-fi \
+    | --cache-f | --cache- | --cache | --cach | --cac | --ca | --c)
+      ac_prev=cache_file ;;
+    -cache-file=* | --cache-file=* | --cache-fil=* | --cache-fi=* \
+    | --cache-f=* | --cache-=* | --cache=* | --cach=* | --cac=* | --ca=* \
+    | --c=*)
+      ;;
+    --config-cache | -C)
+      ;;
+    -srcdir | --srcdir | --srcdi | --srcd | --src | --sr)
+      ac_prev=srcdir ;;
+    -srcdir=* | --srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=*)
+      ;;
+    -prefix | --prefix | --prefi | --pref | --pre | --pr | --p)
+      ac_prev=prefix ;;
+    -prefix=* | --prefix=* | --prefi=* | --pref=* | --pre=* | --pr=* | --p=*)
+      ;;
+    *) ac_sub_configure_args="$ac_sub_configure_args $ac_arg" ;;
+    esac
+  done
+
+  # Always prepend --prefix to ensure using the same prefix
+  # in subdir configurations.
+  ac_sub_configure_args="--prefix=$prefix $ac_sub_configure_args"
+
+  ac_popdir=`pwd`
+  for ac_dir in : $subdirs; do test "x$ac_dir" = x: && continue
+
+    # Do not complain, so a configure script can configure whichever
+    # parts of a large source tree are present.
+    test -d $srcdir/$ac_dir || continue
+
+    { echo "$as_me:$LINENO: configuring in $ac_dir" >&5
+echo "$as_me: configuring in $ac_dir" >&6;}
+    { if $as_mkdir_p; then
+    mkdir -p "$ac_dir"
+  else
+    as_dir="$ac_dir"
+    as_dirs=
+    while test ! -d "$as_dir"; do
+      as_dirs="$as_dir $as_dirs"
+      as_dir=`(dirname "$as_dir") 2>/dev/null ||
+$as_expr X"$as_dir" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X"$as_dir" : 'X\(//\)[^/]' \| \
+	 X"$as_dir" : 'X\(//\)$' \| \
+	 X"$as_dir" : 'X\(/\)' \| \
+	 .     : '\(.\)' 2>/dev/null ||
+echo X"$as_dir" |
+    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
+  	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
+  	  /^X\(\/\/\)$/{ s//\1/; q; }
+  	  /^X\(\/\).*/{ s//\1/; q; }
+  	  s/.*/./; q'`
+    done
+    test ! -n "$as_dirs" || mkdir $as_dirs
+  fi || { { echo "$as_me:$LINENO: error: cannot create directory \"$ac_dir\"" >&5
+echo "$as_me: error: cannot create directory \"$ac_dir\"" >&2;}
+   { (exit 1); exit 1; }; }; }
+
+    ac_builddir=.
+
+if test "$ac_dir" != .; then
+  ac_dir_suffix=/`echo "$ac_dir" | sed 's,^\.[\\/],,'`
+  # A "../" for each directory in $ac_dir_suffix.
+  ac_top_builddir=`echo "$ac_dir_suffix" | sed 's,/[^\\/]*,../,g'`
+else
+  ac_dir_suffix= ac_top_builddir=
+fi
+
+case $srcdir in
+  .)  # No --srcdir option.  We are building in place.
+    ac_srcdir=.
+    if test -z "$ac_top_builddir"; then
+       ac_top_srcdir=.
+    else
+       ac_top_srcdir=`echo $ac_top_builddir | sed 's,/$,,'`
+    fi ;;
+  [\\/]* | ?:[\\/]* )  # Absolute path.
+    ac_srcdir=$srcdir$ac_dir_suffix;
+    ac_top_srcdir=$srcdir ;;
+  *) # Relative path.
+    ac_srcdir=$ac_top_builddir$srcdir$ac_dir_suffix
+    ac_top_srcdir=$ac_top_builddir$srcdir ;;
+esac
+
+# Do not use `cd foo && pwd` to compute absolute paths, because
+# the directories may not exist.
+case `pwd` in
+.) ac_abs_builddir="$ac_dir";;
+*)
+  case "$ac_dir" in
+  .) ac_abs_builddir=`pwd`;;
+  [\\/]* | ?:[\\/]* ) ac_abs_builddir="$ac_dir";;
+  *) ac_abs_builddir=`pwd`/"$ac_dir";;
+  esac;;
+esac
+case $ac_abs_builddir in
+.) ac_abs_top_builddir=${ac_top_builddir}.;;
+*)
+  case ${ac_top_builddir}. in
+  .) ac_abs_top_builddir=$ac_abs_builddir;;
+  [\\/]* | ?:[\\/]* ) ac_abs_top_builddir=${ac_top_builddir}.;;
+  *) ac_abs_top_builddir=$ac_abs_builddir/${ac_top_builddir}.;;
+  esac;;
+esac
+case $ac_abs_builddir in
+.) ac_abs_srcdir=$ac_srcdir;;
+*)
+  case $ac_srcdir in
+  .) ac_abs_srcdir=$ac_abs_builddir;;
+  [\\/]* | ?:[\\/]* ) ac_abs_srcdir=$ac_srcdir;;
+  *) ac_abs_srcdir=$ac_abs_builddir/$ac_srcdir;;
+  esac;;
+esac
+case $ac_abs_builddir in
+.) ac_abs_top_srcdir=$ac_top_srcdir;;
+*)
+  case $ac_top_srcdir in
+  .) ac_abs_top_srcdir=$ac_abs_builddir;;
+  [\\/]* | ?:[\\/]* ) ac_abs_top_srcdir=$ac_top_srcdir;;
+  *) ac_abs_top_srcdir=$ac_abs_builddir/$ac_top_srcdir;;
+  esac;;
+esac
+
+
+    cd $ac_dir
+
+    # Check for guested configure; otherwise get Cygnus style configure.
+    if test -f $ac_srcdir/configure.gnu; then
+      ac_sub_configure="$SHELL '$ac_srcdir/configure.gnu'"
+    elif test -f $ac_srcdir/configure; then
+      ac_sub_configure="$SHELL '$ac_srcdir/configure'"
+    elif test -f $ac_srcdir/configure.in; then
+      ac_sub_configure=$ac_configure
+    else
+      { echo "$as_me:$LINENO: WARNING: no configuration information is in $ac_dir" >&5
+echo "$as_me: WARNING: no configuration information is in $ac_dir" >&2;}
+      ac_sub_configure=
+    fi
+
+    # The recursion is here.
+    if test -n "$ac_sub_configure"; then
+      # Make the cache file name correct relative to the subdirectory.
+      case $cache_file in
+      [\\/]* | ?:[\\/]* ) ac_sub_cache_file=$cache_file ;;
+      *) # Relative path.
+	ac_sub_cache_file=$ac_top_builddir$cache_file ;;
+      esac
+
+      { echo "$as_me:$LINENO: running $ac_sub_configure $ac_sub_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir" >&5
+echo "$as_me: running $ac_sub_configure $ac_sub_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir" >&6;}
+      # The eval makes quoting arguments work.
+      eval $ac_sub_configure $ac_sub_configure_args \
+	   --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir ||
+	{ { echo "$as_me:$LINENO: error: $ac_sub_configure failed for $ac_dir" >&5
+echo "$as_me: error: $ac_sub_configure failed for $ac_dir" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
+
+    cd $ac_popdir
+  done
 fi
 

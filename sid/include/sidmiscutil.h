@@ -1,6 +1,6 @@
 // sidmiscutil.h - Useful utility classes.  -*- C++ -*-
 
-// Copyright (C) 1999-2003 Red Hat.
+// Copyright (C) 1999-2003, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -411,7 +411,7 @@ namespace sidutil
 	buffer = new char[buffer_size];
 #endif
       }
-    ~logger () throw()
+    ~logger ()
       {
 	// Output any saved messages.
 	output_saved_messages ();

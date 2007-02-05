@@ -1,0 +1,36 @@
+# mep testcase for shcpa $crn,($rm+),$imm8a2 -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global shcpa
+shcpa:
+	# Load 0x1234 into $cr1.
+	mov $0, 0x1234
+	cmov $cr1, $0
+
+	# Store it.
+	mov $0, 0x40
+	shcpa $cr1,($0+),4
+
+	# Ensure $0 has been incremented by 4.
+	assert $0, 0x44
+
+	# Load it back.
+	mov $0, 0x40
+	lhcpa $cr2,($0+),4
+
+	# Ensure $0 has been incremented by 4.
+	assert $0, 0x44
+	cmov $1, $cr2
+
+	# Assert $1 = 0x1234.
+	mov $7, 0x1234
+	sub $7, $1
+	bnez $7, wrong
+
+okay:
+	pass
+wrong:
+	fail

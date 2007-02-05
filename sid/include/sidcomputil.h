@@ -1,6 +1,6 @@
 // sidcomputil.h - Useful mix-in classes for components.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -177,7 +177,7 @@ namespace sidutil
   class fixed_relation_map_component: public virtual sid::component
   {
   public:
-    ~fixed_relation_map_component() throw() {}
+    ~fixed_relation_map_component() {}
 
     typedef std::vector<sid::component*> component_relation_t;
 

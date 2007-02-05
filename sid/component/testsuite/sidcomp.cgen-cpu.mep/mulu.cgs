@@ -1,0 +1,57 @@
+# mep testcase for mulu $rn,$rm -*- Asm -*-
+# configline(): set cpu mul-option? true
+# mach: all
+
+	.include "testutils.inc"
+        .macro assert_hilo hi lo
+        ldc $8, $hi
+        assert $8, \hi
+        ldc $8, $lo
+        assert $8, \lo
+        .endm
+
+	start
+	.global mulu
+mulu:
+	# 5 * 0 = 0.
+	mov $0, 5
+	mov $1, 0
+	mulu $0, $1
+	assert_hilo 0, 0
+
+	# 3 * 1 = 3.
+	mov $0, 3
+	mov $1, 1
+	mulu $0, $1
+	assert_hilo 0, 3
+
+	# 2 * 3 = 6. 
+	mov $0, 2
+	mov $1, 3
+	mulu $0, $1
+	assert_hilo 0, 6
+
+	bra cont
+wrong:
+	fail
+cont:
+	# 2 * -3 = big.
+	mov $0, 2
+	mov $1, -3
+	mulu $0, $1
+	assert_hilo 1, -6
+
+	# -2 * 3 = big.
+	mov $0, -2
+	mov $1, 3
+	mulu $0, $1
+	assert_hilo 2, -6
+
+	# -2 * -3 = big!
+	mov $0, -2
+	mov $1, -3
+	mulu $0, $1
+	assert_hilo -5, 6
+
+okay:
+	pass

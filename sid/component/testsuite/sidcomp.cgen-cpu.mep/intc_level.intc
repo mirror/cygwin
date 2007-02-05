@@ -1,0 +1,104 @@
+# mach: all
+# configfile(): INTC.conf
+	
+	.include "testutils.inc"
+	.include "interrupt.inc"
+	start
+
+	.global		main
+main:
+	mov	$0,0x0
+	stc	$0,$psw		# psw,cfg Initialize
+	stc	$0,$cfg
+	mov     $10,0x0         # interrupt counter
+	mov     $11,0x3         # number of interrupts desired
+	mov	$13,0x0		# check code
+
+	cancel_hw_interrupt
+	set_level_triggered 0
+	set_interrupt_mask_level 0
+	set_interrupt_priority 0 1
+	set_umc
+	
+	# case 1: enable everything then trigger interrupt
+	# should interrupt $11 times and then continue.
+	ei
+	enable_hie
+	enable_interrupt_channel 0
+	save_label_to_reg interrupt_addr_1, $12
+	raise_hw_interrupt	
+interrupt_addr_1:	
+	assert $10, $11
+	mov $10, 0x0
+	disable_interrupt_channel 0
+	disable_hie
+	di
+
+
+		
+	# case 2: raise the interrupt and then enable things
+	# should interrupt $11 times and then continue
+	save_label_to_reg interrupt_addr_2, $12
+	raise_hw_interrupt
+	enable_interrupt_channel 0
+	enable_hie
+	ei
+interrupt_addr_2:	
+	assert $10, $11
+	mov $10, 0x0
+	disable_interrupt_channel 0
+	disable_hie
+	di
+	
+okay:
+	pass
+wrong:
+	fail
+
+
+EntryINT00:
+EntryINT01:
+EntryINT02:
+EntryINT03:
+EntryINT04:
+EntryINT05:	
+EntryINT06:	
+EntryINT07:	
+EntryINT08:	
+EntryINT09:					
+EntryINT10:
+EntryINT11:
+EntryINT12:
+EntryINT13:
+EntryINT14:
+EntryINT15:	
+EntryINT16:	
+EntryINT17:	
+EntryINT18:	
+EntryINT19:					
+EntryINT20:
+EntryINT21:
+EntryINT22:
+EntryINT23:
+EntryINT24:
+EntryINT25:	
+EntryINT26:	
+EntryINT27:	
+EntryINT28:	
+EntryINT29:					
+EntryINT30:
+EntryINT31:
+	check_interrupt_entry_from $12
+	add $10, 1
+	mov $3, $11
+	sub $3, $10
+	bnez $3, return_from_interrupt
+	cancel_hw_interrupt
+return_from_interrupt:	
+	reti
+
+
+	
+# and finally, setting up the interrupt vectors:	
+
+	standard_interrupt_vectors

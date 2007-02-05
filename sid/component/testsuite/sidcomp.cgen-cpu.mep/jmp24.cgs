@@ -1,0 +1,13 @@
+# mep testcase for jmp $targ24a2 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global jmp24
+jmp24:
+	jmp okay
+	fail
+
+.org 0x10000
+okay:
+	pass

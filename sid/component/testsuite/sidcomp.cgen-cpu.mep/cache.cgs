@@ -1,0 +1,15 @@
+# mep testcase for cache $cimm4,($rm) -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global cache
+cache:
+.if 0	# Can't execute these insns with no cache configured
+	# These instructions currently have no visible semantics.
+	cache 0, ($0)
+	cache 1, ($0)
+	cache 2, ($0)
+	cache 3, ($0)
+.endif
+	pass

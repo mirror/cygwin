@@ -1,6 +1,6 @@
 // sidcpuutil.h - Elements common to CPU models.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -1004,7 +1004,7 @@ public:
 	add_uni_relation("main", &this->main);
       }
 
-    virtual ~basic_cpu() throw() {}
+    virtual ~basic_cpu() {}
   };
 
 
@@ -1139,7 +1139,7 @@ public:
       {
 	add_attribute_ro_value ("endian", endian_big, "register");
       }
-    ~basic_big_endian_cpu () throw() {}
+    ~basic_big_endian_cpu () {}
 
     sid::host_int_1 read_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address)
       {
@@ -1235,7 +1235,7 @@ public:
       {
 	add_attribute_ro_value ("endian", endian_little, "register");
       }
-    ~basic_little_endian_cpu () throw() {}
+    ~basic_little_endian_cpu () {}
 
     sid::host_int_1 read_insn_memory_1 (sid::host_int_4 pc, sid::host_int_4 address)
       {
@@ -1334,7 +1334,7 @@ public:
 	this->_current_endianness = endian_big;
 	add_attribute ("endian", & this->_current_endianness, "register");
       }
-    ~basic_bi_endian_cpu () throw() {}
+    ~basic_bi_endian_cpu () {}
 
     void set_endian(sid::host_int_4 v)
       {

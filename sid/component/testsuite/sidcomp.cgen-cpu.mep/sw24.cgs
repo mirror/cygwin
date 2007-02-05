@@ -1,0 +1,25 @@
+# mep testcase for sw $rn,($abs24) -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global sw24
+sw24:
+	mov $1, 0x0c04
+	sll $1, 8
+	add $1, 1
+	sll $1, 8
+	add $1, 5
+	# Store 0x0c040105.
+	sw $1, (0x10000)
+
+	# Load it back.
+	lw $2, (0x10000)
+	# Verify $1 = $2.
+	sub $1, $2
+	bnez $1, wrong
+
+okay:
+	pass
+wrong:
+	fail

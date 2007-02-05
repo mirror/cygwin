@@ -1,0 +1,50 @@
+# mep testcase for swcpm0 $crn,($rm+),$imm8a4 -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global swcpm0
+swcpm0:
+	# Prime mb0, me0.
+	movu $0, 0x3333
+	stc $0, $mb0
+	movu $0, 0x5555
+	stc $0, $me0
+
+	# Load 0x12340802 into $cr1.
+	mov $0, 0x1234
+	sll $0, 8
+	add $0, 8
+	sll $0, 8
+	add $0, 2
+	cmov $cr1, $0
+
+	# Store it.
+	mov $0, 0x40
+	swcpm0 $cr1, ($0+), 4
+
+	# Ensure $0 has been incremented by 4.
+	assert $0, 0x44
+
+	# Load it back.
+	mov $0, 0x40
+	lwcpm0 $cr2, ($0+), 4
+
+	# Ensure $0 has been incremented by 4.
+	assert $0, 0x44
+	cmov $1, $cr2
+
+	# Verify.
+	mov $7, 0x1234
+	sll $7, 8
+	add $7, 8
+	sll $7, 8
+	add $7, 2
+	sub $7, $1
+	bnez $7, wrong
+
+okay:
+	pass
+wrong:
+	fail

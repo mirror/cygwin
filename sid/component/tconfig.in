@@ -6,6 +6,7 @@
 #define SIDTARGET_MIPS @sidtarget_mips@
 #define SIDTARGET_M32R @sidtarget_m32r@
 #define SIDTARGET_M68K @sidtarget_m68k@
+#define SIDTARGET_MEP @sidtarget_mep@
 #define SIDTARGET_MT @sidtarget_mt@
 #define SIDTARGET_PPC @sidtarget_ppc@
 #define SIDTARGET_SH @sidtarget_sh@

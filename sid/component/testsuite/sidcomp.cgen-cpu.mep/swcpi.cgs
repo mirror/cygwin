@@ -1,0 +1,15 @@
+# mep testcase for swcpi $crn,($rm+) -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global swcpi
+swcpi:
+	mov $0, 0x43
+	swcpi $cr0,($0+)
+	assert $0, 0x47
+okay:	
+	pass
+wrong:
+	fail

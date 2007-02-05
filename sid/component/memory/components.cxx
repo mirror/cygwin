@@ -15,6 +15,7 @@
 #include "am29.h"
 #include "at29.h"
 #include "ramrom.h"
+#include "mep-cache-tag.h"
 
 using std::vector;
 using std::string;
@@ -51,6 +52,8 @@ compMemoryListTypes()
     {
       types.push_back(string("hw-memory-flash-am29") + ft->name);
     }
+
+  types.push_back ("hw-mep-cache-tag-memory");
 
   return types;
 }
@@ -90,6 +93,9 @@ compMemoryCreate(const string& typeName)
 	  if (that_type == typeName)
 	    return new am29_flash_memory(ft->memory_size, ft->sector_size, ft->device_id);
 	}
+
+      if (typeName == "hw-mep-cache-tag-memory")
+	return new mep_cache_tag_memory ();
     }
   catch (...) { }
 

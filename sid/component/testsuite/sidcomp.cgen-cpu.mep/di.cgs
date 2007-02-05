@@ -1,0 +1,10 @@
+# mep testcase for di -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global di
+di:
+	# This instruction currently has no visible semantics.
+	di
+	pass

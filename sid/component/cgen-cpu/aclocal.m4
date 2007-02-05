@@ -7107,6 +7107,7 @@ sidtarget_x86=$sidtarget_default
 sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
+sidtarget_mep=$sidtarget_default
 sidtarget_mt=$sidtarget_default
 sidtarget_ppc=$sidtarget_default
 sidtarget_sh=$sidtarget_default
@@ -7123,11 +7124,12 @@ do
       mips*)  sidtarget_mips=1 ;;
       m32r*)  sidtarget_m32r=1 ;;
       m68k*)  sidtarget_m68k=1 ;;
+      mep*)   sidtarget_mep=1 ;;
       mt*)    sidtarget_mt=1 ;;
       powerpc*) sidtarget_ppc=1 ;;
       ppc*)   sidtarget_ppc=1 ;;
       sh64*) sidtarget_sh64=1 ;;
-      sh*) sidtarget_sh=1 ;;
+      sh*)   sidtarget_sh=1 ;;
       xstormy16*) sidtarget_xstormy16=1 ;;
       *)      AC_MSG_WARN("Unknown target $targ") ;;
    esac
@@ -7140,6 +7142,7 @@ case 1 in
   ${sidtarget_mips}) ;;
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
+  ${sidtarget_mep}) ;;
   ${sidtarget_mt}) ;;
   ${sidtarget_ppc}) ;;
   ${sidtarget_sh}) ;;
@@ -7177,6 +7180,11 @@ AC_MSG_CHECKING(M68K family support)
 AC_SUBST(sidtarget_m68k)
 AM_CONDITIONAL(SIDTARGET_M68K,[test "x$sidtarget_m68k" = x1])
 AC_MSG_RESULT($sidtarget_m68k)
+
+AC_MSG_CHECKING(Toshiba MeP family support)
+AC_SUBST(sidtarget_mep)
+AM_CONDITIONAL(SIDTARGET_MEP,[test "x$sidtarget_mep" = x1])
+AC_MSG_RESULT($sidtarget_mep)
 
 AC_MSG_CHECKING(MT family support)
 AC_SUBST(sidtarget_mt)

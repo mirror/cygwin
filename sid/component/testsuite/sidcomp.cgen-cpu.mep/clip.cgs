@@ -1,0 +1,37 @@
+# mep testcase for clip $rn,$cimm5 -*- Asm -*-
+# configline(): set cpu clip-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global clip
+clip:
+	# clip (10, 0) => 0.
+	mov $3, 10
+	clip $3, 0
+	assert $3, 0
+
+	# clip (0x3000, 8) => 127.
+	mov $3, 0x3000
+	clip $3, 8
+	assert $3, 127
+
+	# clip (-0x3000, 5) => -16.
+	mov $3, -0x3000
+	clip $3, 5
+	assert $3, -16
+	
+	# clip (68, 9) => 68.
+	mov $3, 68
+	clip $3, 9
+	assert $3, 68
+
+	# clip (-68, 9) => -68.
+	mov $3, -68
+	clip $3, 9
+	assert $3, -68
+
+okay:
+	pass
+wrong:
+	fail

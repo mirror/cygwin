@@ -1,0 +1,27 @@
+# mep testcase for tas $rn,($rm) -*- Asm -*-
+# configline(): set cpu bit-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global tas
+tas:
+	mov $0, 0x40
+	mov $1, 0x23
+
+	# Store 0x23 @ 0x40.
+	sb $1, ($0)
+
+	mov $1, 0
+	tas $1, ($0)
+
+	# Instruction should move 0x23 => R1.
+	# Then it should atomically set the byte @ 0x40 to 1.
+	assert $1 0x23
+	mov $0, 0x40
+	lb $1, ($0)
+	assert $1, 1
+okay:	
+	pass
+wrong:
+	fail

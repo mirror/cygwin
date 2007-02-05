@@ -1,0 +1,1015 @@
+# Testsuite for the Toshiba Media Engine DMA controller unit.
+# Copyright (C) 2001, 2002 Red Hat
+
+proc readword {bus addr} {
+    global test
+    set saved_test $test
+    set test "$saved_test: read a word @ $addr"
+    set result [sid_cmd "sid::bus::read_h4_b4 $bus $addr"]
+    if ![sid_bus_ok_p $result] {
+	fail "$test (bus error: $result)"
+	set test $saved_test
+	return 0
+    } else {
+	set test $saved_test
+	return [lindex $result 1]
+    }
+}
+
+proc writeword {bus addr word} {
+    global test
+    set saved_test $test
+    set test "$saved_test: write a word $word @ $addr"
+    set result [sid_cmd "sid::bus::write_h4_b4 $bus $addr $word"]
+    if ![sid_bus_ok_p $result] {
+	fail "$test (bus error: $result)"
+	set test $saved_test
+	return 0
+    } else {
+	set test $saved_test
+	return [lindex $result 1]
+    }
+}
+
+proc write_words {bus addr word count} {
+    global test
+    for {set i 0} {$i < $count} {set i [expr $i + 4]} {
+	writeword $bus [expr $addr + $i] $word
+    }
+    pass $test
+}
+
+proc check_words {bus addr word count} {
+    global test
+    set error 0
+    for {set i 0} {$i < $count} {set i [expr $i + 4]} {
+	set res [readword $bus [expr $addr + $i]]
+	if {$res != $word} {
+	    fail "$test: read from [expr $addr + $i]: $res != $word"
+	    set error 1
+	}
+    }
+    if {$error != 0} {
+	pass $test
+    }
+}
+
+proc do_single_dma_transfer {channel} {
+    global test
+    global ctrl_bus
+    global event_pin
+
+    set saved_test $test
+    # Run the DMAC until it is no longer active
+    set test "$saved_test: running the DMAC on one channel"
+    for {set act 1} {$act != 0} {} {
+	sid_cmd "sid::pin::driven_h4 $event_pin 1"
+	set act [readword $ctrl_bus [expr (0x1000 + ($channel << 4) + 0x0) * 4]]
+    }
+    set test $saved_test
+    pass $test
+}
+
+proc do_multiple_dma_transfer {} {
+    global test
+    global ctrl_bus
+    global event_pin
+
+    set saved_test $test
+    # Run the DMAC until it is no longer active
+    set test "$saved_test: running the DMAC on multiple channels"
+    for {set act 1} {$act != 0} {} {
+	sid_cmd "sid::pin::driven_h4 $event_pin 1"
+	for {set channel 0} {$channel < 6} {set channel [expr $channel + 1]} {
+	    set act [readword $ctrl_bus [expr (0x1000 + ($channel << 4) + 0x0) * 4]]
+	    if {$act != 0} {
+		break
+	    }
+	}
+    }
+    set test $saved_test
+    pass $test
+}
+
+proc write_main_reg {addr word} {
+    global test
+    global ctrl_bus
+    set saved_test $test
+    set test "$saved_test: write a word $word @ main control register $addr"
+    set result [sid_cmd "sid::bus::write_h4_b4 $ctrl_bus [expr $addr * 4] $word"]
+    if ![sid_bus_ok_p $result] {
+	fail "$test (bus error: $result)"
+	set test $saved_test
+	return 0
+    } else {
+	set test $saved_test
+	return [lindex $result 1]
+    }
+}
+
+proc check_main_reg {addr expected} {
+    global test
+    global ctrl_bus
+
+    set res [readword $ctrl_bus [expr $addr * 4]]
+    if {$res != $expected} {
+	fail "$test: read from main register $addr: $res != $expected"
+	return
+    }
+    pass $test
+}
+
+proc write_channel_reg {channel addr word} {
+    global test
+    global ctrl_bus
+    set saved_test $test
+    set test "$saved_test: write a word $word @ channel $channel address $addr"
+    set result [sid_cmd "sid::bus::write_h4_b4 $ctrl_bus [expr (0x1000 + $addr + ($channel << 4)) * 4] $word"]
+    if ![sid_bus_ok_p $result] {
+	fail "$test (bus error: $result)"
+	set test $saved_test
+	return 0
+    } else {
+	set test $saved_test
+	return [lindex $result 1]
+    }
+}
+
+proc check_channel_reg {channel addr expected} {
+    global test
+    global ctrl_bus
+
+    set res [readword $ctrl_bus [expr (0x1000 + $addr + ($channel << 4)) * 4]]
+    if {$res != $expected} {
+	fail "$test: read from channel $channel register $addr: $res != $expected"
+	return
+    }
+    pass $test
+}
+
+# Setup test data for a contiguous region
+proc setup_contiguous_region {bus addr data} {
+    global test
+
+    set save_test $test
+    # Remember that local memory is based at 0x200000 within
+    # the DMAC, but not when accessing memory directly.
+    set test "$save_test: write test data to $addr"
+    write_words $bus [expr $addr & 0x1fffff] $data 0x200
+    set test "$save_test: check $addr contains test data"
+    check_words $bus [expr $addr & 0x1fffff] $data 0x200
+
+    set test $save_test
+}
+
+# Setup test data for a contiguous source region
+proc setup_fixed_address_region {ccr bus addr data} {
+    global test
+    global data_width
+
+    set save_test $test
+
+    # Only one burst length of data should be read.
+    set units [expr 4 << (($ccr >> 8) & 0x3)]
+    set burst [expr $units * (4 << $data_width)]
+
+    # Remember that local memory is based at 0x200000 within
+    # the DMAC, but not when accessing memory directly.
+    set test "$save_test: write test data to $addr"
+    write_words $bus [expr ($addr + 0x10) & 0x1fffff] $data $burst
+    set test "$save_test: check $addr contains test data"
+    check_words $bus [expr ($addr + 0x10) & 0x1fffff] $data $burst
+
+    set test $save_test
+}
+
+# Setup test data for a contiguous region
+proc setup_rectangular_region {bus addr data} {
+    global test
+
+    set save_test $test
+
+    for {set line 0x0} {$line < 0x1c0} {set line [expr $line + 0x40]} {
+	# Remember that local memory is based at 0x200000 within
+	# the DMAC, but not when accessing memory directly.
+	set test "$save_test: write test data to $addr"
+	write_words $bus [expr ($addr + 0x10 + $line) & 0x1fffff] $data 0x20
+	write_words $bus [expr ($addr + 0x10 + $line + 0x20) & 0x1fffff] 0x0 0x20
+	set test "$save_test: check $addr contains test data"
+	check_words $bus [expr ($addr + 0x10 + $line) & 0x1fffff] $data 0x20
+	check_words $bus [expr ($addr + 0x10 + $line + 0x20) & 0x1fffff] 0x0 0x20
+    }
+
+    set test $save_test
+}
+
+proc check_source_reg_result {channel start_addr tt} {
+    global test
+    set save_test $test
+
+    set test "$save_test: check src register"
+    if {$tt == 0 || $tt == 1 || $tt == 5} {
+	check_channel_reg $channel 0x3 [expr $start_addr + 0xf0]
+    } else {
+	if {$tt == 4} {
+	    check_channel_reg $channel 0x3 [expr $start_addr + 0x10]
+	} else {
+	    check_channel_reg $channel 0x3 [expr $start_addr + 0x10 + (7 * 0x40)]
+	}
+    }
+
+    set test $save_test
+}
+
+proc check_dest_reg_result {channel start_addr tt} {
+    global test
+
+    set save_test $test
+
+    if {$tt == 0 || $tt == 2 || $tt == 4} {
+	set test "$save_test: check dst register"
+	check_channel_reg $channel 0x4 [expr $start_addr + 0xf0]
+    } else {
+	if {$tt == 1 || $tt == 3} {
+	    set test "$save_test: check dst register"
+	    check_channel_reg $channel 0x4 [expr $start_addr + 0x10 + (7 * 0x40)]
+	} else {
+	    # The dest register should still be pointing at the start
+	    # of the region (aligned to the bus width).
+	    set test "$save_test: check dst register"
+	    check_channel_reg $channel 0x4 [expr $start_addr + 0x10]
+	}
+    }
+
+    set test $save_test
+}
+
+# Check the test data has been received by a contiguous region
+proc check_contiguous_region {bus dest data} {
+    global test
+
+    set save_test $test
+
+    # Remember that local memory is based at 0x200000 within
+    # the DMAC, but not when accessing memory directly.
+    set test "$save_test: check dest memory region received data"
+    check_words $bus  [expr ($dest + 0x10) & 0x1fffff] $data 0xe0
+    set test "$save_test: check nearby dest memory unchanged"
+    check_words $bus  [expr $dest & 0x1fffff] 0x0 0x10
+    set test "$save_test: check nearby dest memory unchanged"
+    check_words $bus  [expr ($dest + 0xf0) & 0x1fffff] 0x0 0x10
+
+    set test $save_test
+}
+
+# Check that test data has been received by a fixed address region
+proc check_fixed_address_region {ccr bus dest data} {
+    global data_width
+    global test
+
+    set save_test $test
+
+    # Only one burst length of data should have been written.
+    # Remember that local memory is based at 0x200000 within
+    # the DMAC, but not when accessing memory directly.
+    set test "$save_test: check dest memory region received data"
+    set units [expr 4 << (($ccr >> 8) & 0x3)]
+    set burst [expr $units * (4 << $data_width)]
+
+    check_words $bus  [expr ($dest + 0x10) & 0x1fffff] $data $burst
+    set test "$save_test: check nearby dest memory unchanged"
+    check_words $bus  [expr $dest & 0x1fffff] 0x0 0x10
+    set test "$save_test: check nearby dest memory unchanged"
+    check_words $bus  [expr ($dest + 0x10 + $burst) & 0x1fffff] 0x0 0x10
+
+    set test $save_test
+}
+
+# Check the test data has been received by a contiguous region
+proc check_rectangular_region {bus dest data} {
+    global test
+
+    set save_test $test
+
+    for {set line 0} {$line < 0x1c0} {set line [expr $line + 0x40]} {
+	# Remember that local memory is based at 0x200000 within
+	# the DMAC, but not when accessing memory directly.
+	set test "$save_test: check dest memory region received data"
+	check_words $bus  [expr ($dest + 0x10 + $line) & 0x1fffff] $data 0x20
+	set test "$save_test: check nearby dest memory unchanged"
+	check_words $bus  [expr ($dest + 0x10 + $line + 0x20) & 0x1fffff] 0x0 0x20
+    }
+    set test "$save_test: check nearby dest memory unchanged"
+    check_words $bus  [expr $dest & 0x1fffff] 0x0 0x10
+
+    set test $save_test
+}
+
+#setup test data for the given transfer type
+proc setup_test_data {tt addr ccr} {
+    global source_mem_bus
+
+    if {$tt == 0 || $tt == 1 || $tt == 5} {
+	setup_contiguous_region $source_mem_bus $addr 0xdeadf00d
+    } else {
+	if {$tt == 4} {
+	    setup_fixed_address_region $ccr $source_mem_bus $addr 0xdeadf00d
+	} else {
+	    setup_rectangular_region $source_mem_bus $addr 0xdeadf00d
+	}
+    }
+}
+
+proc check_test_data {tt ccr addr} {
+    global dest_mem_bus
+
+    if {$tt == 0 || $tt == 2 || $tt == 4} {
+	check_contiguous_region $dest_mem_bus $addr 0xdeadf00d
+    } else {
+	if {$tt == 1 || $tt == 3} {
+	    check_rectangular_region $dest_mem_bus $addr 0xdeadf00d
+	} else {
+	    check_fixed_address_region $ccr $dest_mem_bus $addr 0xdeadf00d
+	}
+    }
+}
+
+# Setup for a single channel DMA transfer
+proc setup_one_transfer {channel ccr tcm source dest} {
+    global test
+    global dest_mem_bus
+    global ctrl_bus
+
+    set save_test $test
+
+    # Setup test data
+    set tt [expr $tcm & 0x7]
+    setup_test_data $tt $source $ccr
+
+    # A contiguous region of zeroes will do fine as the target
+    # of any transfer type.
+    setup_contiguous_region $dest_mem_bus $dest 0x0
+
+    # Configure the channel
+    set test "$save_test: set channel config"
+    write_channel_reg $channel 0x1 $ccr
+    write_channel_reg $channel 0x2 $tcm
+    # addresses and length will be aligned to to the bus width
+    set test "$save_test: set source address"
+    writeword $ctrl_bus [expr (0x1000 + ($channel << 4) + 0x3) * 4] [expr $source + 0x13]
+    set test "$save_test: set dest address register"
+    writeword $ctrl_bus [expr (0x1000 + ($channel << 4) + 0x4) * 4] [expr $dest + 0x12]
+    set test "$save_test: set count register"
+    writeword $ctrl_bus [expr (0x1000 + ($channel << 4) + 0x5) * 4] 0xe1
+    write_channel_reg $channel 0x6 0x20
+    write_channel_reg $channel 0x7 0x00400040
+    set test "$save_test: set status register"
+    writeword $ctrl_bus [expr (0x1000 + ($channel << 4) + 0xa) * 4] 0x0
+    set test "$save_test: initiating DMA transfer"
+    writeword $ctrl_bus [expr (0x1000 + ($channel << 4) + 0x0) * 4] 0x1
+
+    set test "$save_test: check channel config"
+    check_channel_reg $channel 0x0 0x1
+    check_channel_reg $channel 0x1 $ccr
+    check_channel_reg $channel 0x2 $tcm
+    check_channel_reg $channel 0x3 [expr $source + 0x10]
+    check_channel_reg $channel 0x4 [expr $dest + 0x10]
+    check_channel_reg $channel 0x5 0xe0
+    check_channel_reg $channel 0x6 0x20
+    check_channel_reg $channel 0x7 0x00400040
+    check_channel_reg $channel 0xa 0x0
+
+    set test $save_test
+}
+
+proc check_one_transfer {channel ccr tcm source dest} {
+    global test
+
+    set save_test $test
+
+    # Check the DMAC state
+    set test "$save_test: check car register"
+    check_channel_reg $channel 0x0 0x0
+    set test "$save_test: check ccr register"
+    check_channel_reg $channel 0x1 $ccr
+    set test "$save_test: check tcm register"
+    check_channel_reg $channel 0x2 $tcm
+    set test "$save_test: check trc register"
+    check_channel_reg $channel 0x5 0x0
+    set test "$save_test: check lwr register"
+    check_channel_reg $channel 0x6 0x20
+    set test "$save_test: check lsr register"
+    check_channel_reg $channel 0x7 0x00400040
+    set test "$save_test: check dsr register"
+    check_channel_reg $channel 0xa 0x00000001
+
+    set test $save_test
+
+    set tt [expr $tcm & 0x7]
+    # Check the result in the source register
+    check_source_reg_result $channel $source $tt
+    # Check the result in the dest register
+    check_dest_reg_result $channel $dest $tt
+
+    # Check that the data was transferred
+    check_test_data $tt $ccr $dest
+
+    set test $save_test
+}
+
+# Perform one transfer from a source region to a destination region
+# with the given configuration on the given channel
+proc do_one_transfer {channel ccr tcm source dest} {
+    global test
+    global dest_mem_bus
+
+    set save_test $test
+
+    # Set up the test
+    setup_one_transfer $channel $ccr $tcm $source $dest
+
+    # Do the transfer
+    # Addresses and lengths will get aligned down to the width of the data bus
+    # writes to main bus will be divided at burst-length boundary
+    set test "$save_test: transfer 0xe0 bytes from source + 0x10 to dest + 0x10"
+    do_single_dma_transfer $channel
+
+    # Check the result
+    check_one_transfer $channel $ccr $tcm $source $dest
+
+    set test $save_test
+}
+
+# Perform transfers for all four combinations of local and main buses
+# with the given configuration on the given channel
+proc single_channel_transfer_test {channel ccr tcm} {
+    global local_mem_bus
+    global main_mem_bus
+    global test
+    global dcr
+    global source_mem_bus
+    global dest_mem_bus
+
+    set save_test $test
+
+    # base the data for each channel at $channel * 0x10000
+    set base [expr $channel * 0x10000]
+
+    # Local to main region transfer
+    #
+    set test "$save_test,local to main"
+    set source_mem_bus $local_mem_bus
+    set dest_mem_bus $main_mem_bus
+
+    do_one_transfer $channel $ccr $tcm [expr $base + 0x200100] [expr $base + 0x100]
+
+    set test "$save_test: check dmac main control registers"
+    check_main_reg 0x1100 $dcr
+
+    # main to local region transfer
+    #
+    set test "$save_test,main to local"
+    set source_mem_bus $main_mem_bus
+    set dest_mem_bus $local_mem_bus
+
+    do_one_transfer $channel $ccr $tcm [expr $base + 0x300] [expr $base + 0x200300]
+
+    set test "$save_test: check dmac main control registers"
+    check_main_reg 0x1100 $dcr
+
+    # main to main region transfer
+    #
+    set test "$save_test,main to main"
+    set source_mem_bus $main_mem_bus
+    set dest_mem_bus $main_mem_bus
+
+    do_one_transfer $channel $ccr $tcm [expr $base + 0x500] [expr $base + 0x700]
+
+    set test "$save_test: check dmac main control registers"
+    check_main_reg 0x1100 $dcr
+
+    # local to local region transfer
+    #
+    set test "$save_test,local to local"
+    set source_mem_bus $local_mem_bus
+    set dest_mem_bus $local_mem_bus
+
+    do_one_transfer $channel $ccr $tcm [expr $base + 0x200900] [expr $base + 0x200b00]
+
+    set test "$save_test: check dmac main control registers"
+    check_main_reg 0x1100 $dcr
+
+    set test $save_test
+}
+
+# Setup test data for one element of the chain
+proc setup_one_chain_test {tt ccr source dest} {
+    global test
+    global dta
+    global dts
+    global local_mem_bus
+    global dest_mem_bus
+
+    set save_test $test
+
+    set test "$save_test,setup tcm"
+    set tcm [expr (($dts << 24) | $tt) & 0xff000007]
+    writeword $local_mem_bus $dta $tcm
+    set dta [expr $dta + 4]
+    set dts [expr $dts + 1]
+
+    # Separate the data for each transfer type by basing
+    # it at address tt * 0x1000.
+    set source [expr $source + ($tt * 0x1000)]
+    set dest [expr $dest + ($tt * 0x1000)]
+
+    # src, dst and trc will be aligned down to the bus width
+    set test "$save_test,setup src"
+    writeword $local_mem_bus $dta [expr $source + 0x13]
+    set dta [expr $dta + 4]
+    
+    set test "$save_test,setup dst"
+    writeword $local_mem_bus $dta [expr $dest + 0x12]
+    set dta [expr $dta + 4]
+    
+    set test "$save_test,setup trc"
+    writeword $local_mem_bus $dta 0xe1
+    set dta [expr $dta + 4]
+
+    # Setup line width and line step for rectangular transfers
+    if {$tt >= 1 && $tt <= 3} {
+	set test "$save_test,setup lwr"
+	writeword $local_mem_bus $dta 0x20
+	set dta [expr $dta + 4]
+
+	set test "$save_test,setup lsr"
+	if {$tt == 1} {
+	    writeword $local_mem_bus $dta 0x00400000
+	} else {
+	    if {$tt == 2} {
+		writeword $local_mem_bus $dta 0x00000040
+	    } else {
+		writeword $local_mem_bus $dta 0x00400040
+	    }
+	}
+	set dta [expr $dta + 4]
+    }
+
+    set test $save_test
+
+    # Setup test data
+    setup_test_data $tt $source $ccr
+    # A contiguous region of zeroes will do fine as the target
+    # of any transfer type.
+    setup_contiguous_region $dest_mem_bus $dest 0x0
+}
+
+# Setup test data for one element of the chain
+proc check_one_chain_test {channel tt ccr} {
+    global test
+    global dta
+    global dts
+    global local_mem_bus
+    global data_width
+
+    set save_test $test
+
+    # Re-read the transfer table and check the results
+    set test "$save_test,check tcm in chain table"
+    set expected [expr (($dts << 24) | $tt) & 0xff000007]
+    set actual [readword $local_mem_bus $dta]
+    if {$expected != $actual} {
+	fail "$test: $actual != $expected"
+	return
+    }
+    set dta [expr $dta + 4]
+    set dts [expr $dts + 1]
+
+    # advance past the source address
+    set dta [expr $dta + 4]
+
+    # Obtain the desitnation address
+    set test "$save_test,check dst"
+    set dst [readword $local_mem_bus $dta]
+    set dta [expr $dta + 4]
+    
+    # advance past transfer count
+    set dta [expr $dta + 4]
+
+    # Advance past line width and line step for rectangular transfers
+    if {$tt >= 1 && $tt <= 3} {
+	set dta [expr $dta + 8]
+    }
+
+    set test $save_test
+    # Check that the data was transferred. Adjust the address stored
+    # in the table for alignment and offset.
+    set dst [expr ($dst - 0x10) & ~((4 << $data_width) - 1)]
+    check_test_data $tt $ccr $dst
+}
+
+# Setup data for a chained transfer of type $tt. Setup one
+# test for each transfer direction combination
+proc setup_chain_test_data {channel tt ccr} {
+    global test
+    global local_mem_bus
+    global main_mem_bus
+    global source_mem_bus
+    global dest_mem_bus
+
+    set save_test $test
+
+    # Base the data for each channel at $channel * 0x10000
+    set base [expr $channel * 0x10000]
+
+    # Local to main region transfer
+    #
+    set test "$save_test,local to main"
+    set source_mem_bus $local_mem_bus
+    set dest_mem_bus $main_mem_bus
+    setup_one_chain_test $tt $ccr [expr $base + 0x200000] [expr $base + 0x000]
+
+    # Main to local region transfer
+    #
+    set test "$save_test,main to local"
+    set source_mem_bus $main_mem_bus
+    set dest_mem_bus $local_mem_bus
+    setup_one_chain_test $tt $ccr [expr $base + 0x200] [expr $base + 0x200200]
+
+    # Main to main region transfer
+    #
+    set test "$save_test,main to main"
+    set source_mem_bus $main_mem_bus
+    set dest_mem_bus $main_mem_bus
+    setup_one_chain_test $tt $ccr [expr $base + 0x400] [expr $base + 0x600]
+
+    # Local to local region transfer
+    #
+    set test "$save_test,local to local"
+    set source_mem_bus $local_mem_bus
+    set dest_mem_bus $local_mem_bus
+    setup_one_chain_test $tt $ccr [expr $base + 0x200800] [expr $base + 0x200a00]
+
+    set test $save_test
+}
+
+# Check that the given chained transfer type was performed
+# correctly
+proc check_chain_test_data {channel tt ccr} {
+    global test
+    global local_mem_bus
+    global main_mem_bus
+    global source_mem_bus
+    global dest_mem_bus
+    global dta_start
+
+    set save_test $test
+
+    # Local to main region transfer
+    #
+    set test "$save_test,local to main"
+    set dest_mem_bus $main_mem_bus
+    check_one_chain_test $channel $tt $ccr
+
+    # Main to local region transfer
+    #
+    set test "$save_test,main to local"
+    set dest_mem_bus $local_mem_bus
+    check_one_chain_test $channel $tt $ccr
+
+    # Main to main region transfer
+    #
+    set test "$save_test,main to main"
+    set dest_mem_bus $main_mem_bus
+    check_one_chain_test $channel $tt $ccr
+
+    # Local to local region transfer
+    #
+    set test "$save_test,local to local"
+    set dest_mem_bus $local_mem_bus
+    check_one_chain_test $channel $tt $ccr
+
+    set test $save_test
+}
+
+# Setup the control registers for a chained transfer request
+proc setup_chain_control {channel ccr} {
+    global test
+    global dta_start
+    global dta
+    global dts
+    global ctrl_bus
+
+    set save_test $test
+
+    set test "$save_test: set ccr register"
+    write_channel_reg $channel 0x1 $ccr
+    set test "$save_test: set dta register"
+    write_channel_reg $channel 0x8 $dta_start
+    set test "$save_test: set dts register"
+    write_channel_reg $channel 0x9 $dts
+    set test "$save_test: set status register"
+    writeword $ctrl_bus [expr (0x1000 + ($channel << 4) + 0xa) * 4] 0x0
+    set test "$save_test: initiating DMA transfer"
+    writeword $ctrl_bus [expr (0x1000 + ($channel << 4) + 0x0) * 4] 0x1
+
+    set test $save_test
+}
+
+# Perform a chained transfer covering all the transfer types
+# and directions.
+proc single_channel_chain_test {channel ccr} {
+    global test
+    global dta_start
+    global dta
+    global dts
+    global dcr
+    global ctrl_bus
+
+    set save_test $test
+
+    # Setup the chain tables in local memory at address
+    # 0xa000 + ($channel * 0x10000)
+    set dta_start [expr 0xa000 + ($channel * 0x10000)]
+    set dta $dta_start
+    set dts 0
+
+    # Setup data for each transfer type
+    for {set tt 0} {$tt < 6} {set tt [expr $tt + 1]} {
+	set test "$save_test: Setup chain for tt==$tt"
+	setup_chain_test_data $channel $tt $ccr
+    }
+
+    # Set control registers
+    setup_chain_control $channel $ccr
+
+    set test "$save_test: Run chained transfer"
+    do_single_dma_transfer $channel
+
+    # Check the results of the transfer
+    set dta $dta_start
+    set dts 0
+    for {set tt 0} {$tt < 6} {set tt [expr $tt + 1]} {
+	set test "$save_test: Check chain results for tt==$tt"
+	check_chain_test_data $channel $tt $ccr
+    }
+
+    set test $save_test
+    # Check the result in the source and dest registers. We can only
+    # check the result of the last transfer in the chain.
+    check_source_reg_result $channel [expr ($channel * 0x10000) + 0x205800] 5
+    check_dest_reg_result $channel [expr ($channel * 0x10000) + 0x205a00] 5
+
+    # Check the main control registers
+    set test "$save_test: check dmac main control registers"
+    check_main_reg 0x1100 $dcr
+
+    set test $save_test
+}
+
+# Perform a simultaneous test of all transfer types and directions
+# on all channels
+proc stress_test {} {
+    global test
+    global source_mem_bus
+    global dest_mem_bus
+    global local_mem_bus
+    global main_mem_bus
+    global data_width
+    global dta_start
+    global dta
+    global dts
+    global dcr
+
+    set save_test $test
+
+    # Set up a test for each channel, varying the parameters
+    set test "$save_test,setup stress test,channel 0,local to main"
+    set source_mem_bus $local_mem_bus
+    set dest_mem_bus $main_mem_bus
+    setup_one_transfer 0 0x00000001 0x00000005 0x200100 0x000100
+    set test "$save_test,setup stress test,channel 1,main to local"
+    set source_mem_bus $main_mem_bus
+    set dest_mem_bus $local_mem_bus
+    setup_one_transfer 1 0x00000101 0x00000004 0x010300 0x210300
+    set test "$save_test,setup stress test,channel 2,main to main"
+    set source_mem_bus $main_mem_bus
+    set dest_mem_bus $main_mem_bus
+    # Burst length can't be 2 (16 units) if the bus width is 1 (64 bits)
+    if {$data_width == 1} {
+	setup_one_transfer 2 0x00000001 0x00000003 0x020500 0x020700
+    } else {
+	setup_one_transfer 2 0x00000201 0x00000003 0x020500 0x020700
+    }
+    set test "$save_test,setup stress test,channel 3,local to local"
+    set source_mem_bus $local_mem_bus
+    set dest_mem_bus $local_mem_bus
+    setup_one_transfer 3 0x00000101 0x00000002 0x230900 0x230b00
+    set test "$save_test,setup stress test,channel 4,local to main"
+    set source_mem_bus $local_mem_bus
+    set dest_mem_bus $main_mem_bus
+    setup_one_transfer 4 0x00000001 0x00000001 0x240c00 0x040e00
+
+    set save_test1 "$save_test,setup stress test,channel 5,chained"
+    # Setup a chained transfer on the last channel
+    # Setup the chain tables in local memory at address
+    # 0xa000 + ($channel * 0x10000)
+    set dta_start [expr 0xa000 + (5 * 0x10000)]
+    set dta $dta_start
+    set dts 0
+
+    # Setup data for each transfer type
+    set ccr 0x00000011
+    for {set tt 0} {$tt < 6} {set tt [expr $tt + 1]} {
+	set test "$save_test1: Setup chain for tt==$tt"
+	setup_chain_test_data 5 $tt $ccr
+    }
+
+    set test $save_test1
+    # Set control registers
+    setup_chain_control 5 $ccr
+
+    # Run the simultaneous transfers
+    do_multiple_dma_transfer
+
+    # Check the results
+    set test "$save_test,check stress test,channel 0,local to main"
+    set source_mem_bus $local_mem_bus
+    set dest_mem_bus $main_mem_bus
+    check_one_transfer 0 0x00000001 0x00000005 0x200100 0x00100
+    set test "$save_test,check stress test,channel 1,main to local"
+    set source_mem_bus $main_mem_bus
+    set dest_mem_bus $local_mem_bus
+    check_one_transfer 1 0x00000101 0x00000004 0x10300 0x210300
+    set test "$save_test,check stress test,channel 2,main to main"
+    set source_mem_bus $main_mem_bus
+    set dest_mem_bus $main_mem_bus
+    # Burst length can't be 2 (16 units) if the bus width is 1 (64 bits)
+    if {$data_width == 1} {
+	check_one_transfer 2 0x00000001 0x00000003 0x20500 0x20700
+    } else {
+	check_one_transfer 2 0x00000201 0x00000003 0x20500 0x20700
+    }
+    set test "$save_test,check stress test,channel 3,local to local"
+    set source_mem_bus $local_mem_bus
+    set dest_mem_bus $local_mem_bus
+    check_one_transfer 3 0x00000101 0x00000002 0x230900 0x230b00
+    set test "$save_test,check stress test,channel 4,local to main"
+    set source_mem_bus $local_mem_bus
+    set dest_mem_bus $main_mem_bus
+    check_one_transfer 4 0x00000001 0x00000001 0x240c00 0x040e00
+
+    # Check the results of the chained transfer
+    set test "$save_test,check stress test,channel 5,chained"
+    set dta $dta_start
+    set dts 0
+    for {set tt 0} {$tt < 6} {set tt [expr $tt + 1]} {
+	set test "$save_test: Check chain results for tt==$tt"
+	check_chain_test_data 5 $tt $ccr
+    }
+
+    set test $save_test
+    # Check the result in the source and dest registers. We can only
+    # check the result of the last transfer in the chain.
+    check_source_reg_result 5 [expr (5 * 0x10000) + 0x205800] 5
+    check_dest_reg_result 5 [expr (5 * 0x10000) + 0x205a00] 5
+
+    # Check the main control registers
+    set test "$save_test: check dmac main control registers"
+    check_main_reg 0x1100 $dcr
+}
+
+# Perform all tests on a DMAC of the given data width
+# 
+proc dmac_test {} {
+    global victim
+    global local_mem_bus
+    global main_mem_bus
+    global test
+    global ctrl_bus
+    global event_pin
+    global data_width
+    global dcr
+
+    set save_test "DMAC data_width==[expr 32 * ($data_width + 1)]"
+    set test "$save_test: sid configuration"
+    # Configure the dmac for
+    #   6 channels
+    #   $data_width bit data width
+    #   rectangular support
+    set dcr [expr 0x00000604 | ($data_width << 6) | ($data_width << 4)]
+    sid_config_component_etc_test "mep-dmac.conf" \
+	    "load libcache.la cache_component_library
+load libmemory.la mem_component_library
+load libmepfamily.la mepfamily_component_library" \
+	    "hw-dma-mep" \
+	    "load libmemory.la mem_component_library
+load libmapper.la mapper_component_library
+new hw-memory-ram/rom-basic main-mem
+new hw-memory-ram/rom-basic local-mem
+new hw-mapper-basic control-bus-mapper
+relate tester mapper control-bus-mapper
+relate tester main main-mem
+relate tester local local-mem
+set main-mem size 0x100000
+set local-mem size 0x100000
+connect-bus control-bus-mapper \[4*0x1000-0x100a\] real-victim channel-control-regs-0
+connect-bus control-bus-mapper \[4*0x1010-0x101a\] real-victim channel-control-regs-1
+connect-bus control-bus-mapper \[4*0x1020-0x102a\] real-victim channel-control-regs-2
+connect-bus control-bus-mapper \[4*0x1030-0x103a\] real-victim channel-control-regs-3
+connect-bus control-bus-mapper \[4*0x1040-0x104a\] real-victim channel-control-regs-4
+connect-bus control-bus-mapper \[4*0x1050-0x105a\] real-victim channel-control-regs-5
+connect-bus control-bus-mapper \[4*0x1100-0x1100\] real-victim main-control-regs
+connect-bus real-victim main-memory main-mem read-write-port
+connect-bus real-victim local-memory local-mem read-write-port
+set real-victim dcr $dcr"
+    pass $test
+
+    set test "$save_test: sid start"
+    if {[sid_start "mep-dmac.conf"]} { pass $test } else { fail $test; return }
+
+    set test "$save_test: acquire schedule event pin"
+    set event_pin [sid_cmd "sid::component::find_pin $victim burst-event"]
+    if {$event_pin != ""} { pass $test } else { fail $test }
+
+    set test "$save_test: acquire control register bus handle"
+    set ctrl_bus [sid_cmd "sid::component::find_bus [sid_cmd {set relationships(mapper)}] access-port"]
+    if {$ctrl_bus != ""} { pass $test } else { fail $test }
+
+    set test "$save_test: acquire main memory bus handle"
+    set main_mem_bus [sid_cmd "sid::component::find_bus [sid_cmd {set relationships(main)}] read-write-port"]
+    if {$main_mem_bus != ""} { pass $test } else { fail $test }
+
+    set test "$save_test: acquire local memory bus handle"
+    set local_mem_bus [sid_cmd "sid::component::find_bus [sid_cmd {set relationships(local)}] read-write-port"]
+    if {$local_mem_bus != ""} { pass $test } else { fail $test }
+
+    # Try various priorities, burst lengths, transfer types and channels
+    set priority 0
+    set bl 0
+    set channel 1
+    set tt 2
+    for {set i 0} {$i < 6} {set i [expr $i + 1]} {
+	# Configure channel priority
+	set dcr [expr ($dcr & ~0x1) | ($priority & 0x1)]
+	set test "$save_test: set dmac main control registers"
+	write_main_reg 0x1100 $dcr
+	set test "$save_test: check dmac main control registers"
+	check_main_reg 0x1100 $dcr
+	set save_test1 "$save_test,dcr==$dcr"
+
+	# $bl == 0 --> 4 * data_width byte bursts
+	# $bl == 1 --> 8 * data_width byte bursts
+	# $bl == 2 --> 16 * data_width  byte bursts (not supported with 64 bit data_width)
+	if { $bl == 2 && $data_width == 1 } {
+	    set bl 0
+	}
+	set ccr [expr ($bl << 8) + 0x00000001]
+	set tcm $tt
+	set test "$save_test1,channel==$channel,ccr==$ccr,tcm==$tcm"
+	single_channel_transfer_test $channel $ccr $tcm
+
+	# Run a single channel test of a chained transfer
+	set ccr [expr $ccr | 0x10]
+	set test "$save_test1,channel==$channel,ccr==$ccr"
+	single_channel_chain_test $channel $ccr
+
+	# Update the test parameters
+	set priority [expr ($priority + 1) % 2]
+	set bl [expr ($bl + 1) % 3]
+	set channel [expr ($channel + 1) % 6]
+	set tt [expr ($tt + 1) % 6]
+    }
+
+    for {set priority 0} {$priority < 2} {set priority [expr $priority + 1]} {
+	# Configure channel priority
+	set dcr [expr ($dcr & ~0x1) | ($priority & 0x1)]
+	set test "$save_test: set dmac main control registers"
+	write_main_reg 0x1100 $dcr
+	set test "$save_test: check dmac main control registers"
+	check_main_reg 0x1100 $dcr
+	set save_test1 "$save_test,dcr==$dcr"
+
+	# Run a simultaneous transfer on all channels in various modes
+	set test $save_test1
+	stress_test
+    }
+
+    set test "$save_test: sid stop"
+    if {[sid_stop]} { pass $test } else { fail $test ; return }
+}
+
+### tests follow...
+
+if {! $sidtarget(mep)} then { untested "hw-dma-mep not available"; return }
+
+# Run the tests with data width of 32 and 64 bits
+# 0 --> 32 bits
+# 1 --> 64 bits
+for {set data_width 0} {$data_width < 2} {set data_width [expr $data_width + 1]} {
+    dmac_test
+}
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "mep-dmac.conf" }

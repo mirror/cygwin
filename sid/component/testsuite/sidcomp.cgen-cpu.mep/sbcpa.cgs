@@ -1,0 +1,34 @@
+# mep testcase for sbcpa $crn,($rm+),$imm8 -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global sbcpa
+sbcpa:
+	# Load 0x123 into $cr1.
+	mov $0, 0x123
+	cmov $cr1, $0
+
+	# Store it.
+	mov $0, 0x40
+	sbcpa $cr1,($0+),4
+	
+	# Ensure $0 has been incremented by 4.
+	assert $0, 0x44
+
+	# Load it back.
+	mov $0, 0x40
+	lbcpa $cr2,($0+),4
+	
+	# Ensure $0 has been incremented by 4.
+	assert $0, 0x44
+	cmov $1, $cr2
+	
+	# Assert $1 = 0x23.
+	assert $1, 0x23
+
+okay:
+	pass
+wrong:
+	fail

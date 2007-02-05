@@ -1,3 +1,28 @@
+2007-02-05  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+	2005-07-29  Dave Brolley  <brolley@redhat.com>
+
+	* families/configure.in (family_subdirs): Add 'mep'.
+	* families/configure: Regenerated.
+
+	2001-08-20  Ben Elliston  <bje@redhat.com>
+
+	* CATALOG: Document the mepfamily_component_library. Add
+	hw-debug-mep and hw-dma-mep.
+
+	2001-06-28  Ben Elliston  <bje@redhat.com>
+
+	* CATALOG: Add hw-interrupt-mep.
+
+	2001-05-31  Ben Elliston  <bje@redhat.com>
+
+	* CATALOG: Add hw-cpu-mep.
+
+	2001-04-03  Ben Elliston  <bje@redhat.com>
+
+	* tconfig.in: Belatedly add support for mep.
+
 2006-05-15  Frank Ch. Eigler  <fche@elastic.org>
 
 	From Wesley Li-Wei Chou <wesley@andestech.com>:

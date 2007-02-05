@@ -17,6 +17,7 @@ require 5.004;
 		 "x86" => "hw-cpu-x86",
 	         # INSERT NEW ENTRIES HERE
 		 "m32r" => "hw-cpu-m32r/d",
+		 "mep" => "hw-cpu-mep",
 		 "mt" => "hw-cpu-mt",
 		 "sh5" => "hw-cpu-sh5",
 		 "xstormy16" => "hw-cpu-xstormy16",
@@ -36,6 +37,7 @@ require 5.004;
 		   "x86" => "sw-gloss-generic/libgloss",
 	           # INSERT NEW ENTRIES HERE
 		   "m32r" => "sw-gloss-m32r/libgloss",
+		   "mep" => "sw-gloss-generic/libgloss",
 		   "mt" => "sw-gloss-generic/libgloss",
 		   "sh5" => "sw-gloss-generic/libgloss",
 		   "xstormy16" => "sw-gloss-generic/libgloss",
@@ -47,6 +49,7 @@ require 5.004;
 		   "x86" => "0x00000,0x500000",
 	           # INSERT NEW ENTRIES HERE
 		   "m32r" => "0x00000000,0x00800000",
+		   "mep" => "0x00000000,0x00200000:0x00300000,0x10000",
 		   "mt" => "0x00000000,0x00800000",
 		   "sh5" => "0x00000000,0x00800000", # check this
 		   "xstormy16" => "0x00000000,0x00800000",
@@ -95,7 +98,7 @@ if ($ENV{'SID'}) {
   $sid .= "/sid";
 }
 
-$version=q$Id: configrun-sid.in,v 1.39 2006/10/18 18:30:52 brolley Exp $;
+$version=q$Id: configrun-sid.in,v 1.40 2007/02/05 20:28:38 brolley Exp $;
 
 # by default the loader data mapper connects to the cpu-mapper access-port
 $load_mapper_data = "cpu-mapper access-port";
@@ -450,6 +453,7 @@ connect-pin main starting -> init-sequence input
 connect-pin main stopping -> deinit-sequence input
 connect-pin init-sequence output-0 -> hw-reset-net input
 connect-pin hw-reset-net output-0 -> cpu reset!
+set target-sched 0-name \"CPU stepping\"
 connect-pin target-sched 0-event -> cpu step!
 connect-pin target-sched 0-control <- cpu step-cycles
 connect-pin target-sched time-query <- cpu time-query
@@ -510,8 +514,13 @@ connect-pin cpu gprof-pc-hi -> gprof pc-hi
 connect-pin cpu cg-caller -> gprof cg-caller
 connect-pin cpu cg-callee -> gprof cg-callee
 relate gprof target-component cpu
-set gprof bucket-size 4 # bytes per bucket
 ";
+    if ($opt_cpu eq "mep") {
+      $second_section .= "set gprof bucket-size 2\n";
+    }
+    else {
+      $second_section .= "set gprof bucket-size 4\n";
+    }
   }
 
 if ($opt_trace_core || $opt_trace_core_visual)
@@ -713,6 +722,249 @@ set uart2 sio-framing? 0
     configure_uart1_uart2();
 
   }
+elsif ($opt_cpu eq "mep" && ($opt_board ne "gloss-stdio"))
+  {
+    # Fallback defaults for incomplete configurations
+    $mepcfg_index = -1; # flag to detect match
+    $mepcfg_core_id = 0;
+    $mepcfg_core_rev = 1;
+    $mepcfg_imem_size = 0;
+    $mepcfg_dmem_size = 0;
+    $mepcfg_icache_size = 0;
+    $mepcfg_icache_way = 1;
+    $mepcfg_icache_line_size = 32;
+    $mepcfg_dcache_size = 0;
+    $mepcfg_dcache_way = 1;
+    $mepcfg_dcache_line_size = 32;
+    $mepcfg_dsu = 0;
+    $mepcfg_intc_channel_bitw = 32;
+    $mepcfg_intc = 0;
+    $mepcfg_dmac = 0;
+    $mepcfg_cop_vliw_bitw = 0;
+    $mepcfg_opt_abs = 0;
+    $mepcfg_opt_ave = 0;
+    $mepcfg_opt_bit = 0;
+    $mepcfg_opt_clip = 0;
+    $mepcfg_opt_cp = 0;
+    $mepcfg_opt_div = 0;
+    $mepcfg_opt_ldz = 0;
+    $mepcfg_opt_min = 0;
+    $mepcfg_opt_mul = 0;
+    $mepcfg_opt_sat = 0;
+    $mepcfg_dsp = 0;
+    $mepcfg_uci = 0;
+    @mep_boards = ();
+
+    $mepcfg_index = 1;
+    $mepcfg_imem_size = 16;
+    $mepcfg_dmem_size = 32;
+    $mepcfg_icache_size = 16;
+    $mepcfg_icache_way = 1;
+    $mepcfg_icache_line_size = 32;
+    $mepcfg_dcache_size = 16;
+    $mepcfg_dcache_way = 1;
+    $mepcfg_dcache_line_size = 32;
+    $mepcfg_intc_channel_bitw = 16;
+    $mepcfg_opt_cp = 1;
+    $mepcfg_cop_vliw_bitw = 64;
+    $mepcfg_opt_abs = 1;
+    $mepcfg_opt_ave = 1;
+    $mepcfg_opt_bit = 1;
+    $mepcfg_opt_clp = 1;
+    $mepcfg_opt_div = 1;
+    $mepcfg_opt_ldz = 1;
+    $mepcfg_opt_min = 1;
+    $mepcfg_opt_mul = 1;
+    $mepcfg_opt_sat = 1;
+    $mepcfg_endian = "big";
+    $mepcfg_intc = 1;
+    $mepcfg_dsu = 1;
+    $mepcfg_dmac = 1;
+    $mepcfg_dsp = 1;
+    $mepcfg_uci = 1;
+
+    # Eww, ugly hack to change "hw-cpu-mep" in $first_section to
+    # "hw-cpu-mep-extNNN" for NNN=$mepcfg_index
+    $first_section =~ s|new hw-cpu-mep|new hw-cpu-mep-ext$mepcfg_index|;
+
+    # cpu attributes
+    if ($mepcfg_endian eq "big") { $opt_EB = 1; }
+    elsif ($mepcfg_endian eq "little") { $opt_EL = 1; }
+
+    $csr17 = (($mepcfg_core_id << 16) | (1 << 8) | $mepcfg_core_rev);
+    $second_section .= "set cpu csr17 $csr17\n";
+
+    $second_section .= "set cpu abs-option? " . ($mepcfg_opt_abs) . "\n";
+    $second_section .= "set cpu ave-option? " . ($mepcfg_opt_ave) . "\n";
+    $second_section .= "set cpu bit-option? " . ($mepcfg_opt_bit) . "\n";
+    $second_section .= "set cpu clip-option? " . ($mepcfg_opt_clip) . "\n";
+    $second_section .= "set cpu cp-option? " .  ($mepcfg_opt_cp) . "\n";
+    $second_section .= "set cpu div-option? " . ($mepcfg_opt_div) . "\n";
+    $second_section .= "set cpu ldz-option? " . ($mepcfg_opt_ldz) . "\n";
+    $second_section .= "set cpu minmax-option? " . ($mepcfg_opt_min) . "\n";
+    $second_section .= "set cpu mul-option? " . ($mepcfg_opt_mul) . "\n";
+    $second_section .= "set cpu sat-option? " . ($mepcfg_opt_sat) . "\n";
+
+    $second_section .= "set cpu debug-option? " . ($mepcfg_dsu) . "\n";
+    $second_section .= "set cpu dsp-option? " . ($mepcfg_dsp) . "\n";
+    $second_section .= "set cpu uci-option? " . ($mepcfg_uci) . "\n";
+
+    $second_section .= "set cpu vliw32-option? " . ($mepcfg_cop_vliw_bits == 32 ? 1 : 0) . "\n";
+    $second_section .= "set cpu vliw64-option? " . ($mepcfg_cop_vliw_bits == 64 ? 1 : 0) . "\n";
+
+    # dmem/imem calculations; see mep RCFG definition and memory layout chapter
+    $mep_imem_base = ($mepcfg_imem_size == 0 ? 0 : 0x00200000);
+    $mep_imem_size = 1024 * $mepcfg_imem_size;
+    $mep_dmem_base = (($mepcfg_dmem_size == 0) ? 0 :
+		      ($mepcfg_imem_size == 0) ? 0x00200000 :
+		      ($mepcfg_dmem_size > 16) ? 0x00208000 :
+		      ($mepcfg_imem_size >= 12) ? 0x00204000 :
+		      ($mepcfg_dmem_size <= 8) ? 0x00202000 :
+		      ($mepcfg_dmem_size <= 16) ? 0x00204000 :
+		      0xdeadbeef); # can't happen
+
+    $mep_dmem_bank0_base = $mep_dmem_base;
+    $mep_dmem_bank1_base = $mep_dmem_base + 1024 * ($mepcfg_dmem_size == 6 ? 4 :
+						    $mepcfg_dmem_size == 12 ? 8 :
+						    $mepcfg_dmem_size == 24 ? 16 :
+						    $mepcfg_dmem_size / 2);
+    $mep_dmem_bank0_size = 1024 * $mepcfg_dmem_size / 2;
+    $mep_dmem_bank1_size = 1024 * $mepcfg_dmem_size / 2;
+
+    # These are complex bitfields:
+    # LCFG: local memory configuration
+    $csr27 = (0x01000100 | # fixed bits
+	      ($mepcfg_imem_size << 16) | # IRSZ
+	      ($mepcfg_dmem_size << 0) | # DRSZ
+	      (($mep_dmem_base >> 12) & 0xf)); # DRBA
+    $second_section .= "set cpu csr27 $csr27\n";
+
+    # CCFG: cache memory configuration
+    $csr28 = (0x00000000 | # no fixed bits
+	      ($mepcfg_icache_size << 16) | # ICSZ
+	      ($mepcfg_dcache_size << 0)); # DCSZ
+    $second_section .= "set cpu csr28 $csr28\n";
+
+    # control bus layout
+    $zeroth_section .= "load libmepfamily.la mepfamily_component_library\n";
+    $first_section .= "# control space
+new hw-mapper-basic cpu-control-space
+set cpu-control-space latency 1
+new hw-mapper-basic cpu-local-space
+" .
+  ($mepcfg_dsu ? "new hw-debug-mep cpu-dsu\n" : "") .
+  ($mepcfg_dmac ? "new hw-dma-mep cpu-dmac\n" : "") .
+  ($mepcfg_intc ? "new hw-interrupt-mep-${mepcfg_intc_channel_bitw} cpu-intc\n" : "");
+
+    $second_section .= "# configuration / connection of control space peripherals
+connect-bus cpu control-space cpu-control-space access-port
+" .
+  ($mepcfg_dsu ? "connect-bus cpu-control-space dsu[4*0x800-0x802] cpu-dsu status-regs
+connect-bus cpu-control-space dsu[4*0x900-0x902] cpu-dsu insn-regs
+connect-bus cpu-control-space dsu[4*0xA00-0xA05] cpu-dsu data-regs\n" : "") .
+  ($mepcfg_dmac ? "connect-bus cpu-control-space dmac[4*0x1000-0x1009] cpu-dmac control-regs-low
+connect-bus cpu-control-space dmac[4*0x1FFF-0x1FFF] cpu-dmac control-regs-high\n" : "") .
+  ($mepcfg_intc ? "connect-bus cpu-control-space intc[4*0x0-0x7] cpu-intc registers\n" : "");
+
+    $third_section .=
+      ($mepcfg_dmac ? "# mep dmac connection
+connect-bus cpu-dmac local-memory cpu-local-space access-port
+connect-bus cpu-dmac main-memory cpu-mapper access-port
+set target-sched 2-name \"DMA controller burst events\"
+connect-pin target-sched 2-event -> cpu-dmac burst-event
+connect-pin target-sched 2-control <- cpu-dmac burst-control
+" : "") .
+  ($mepcfg_intc ? "# mep intc connection
+connect-pin cpu-intc interrupt -> cpu interrupt
+" : "");
+
+    # mep instruction fetch buffer: 8 bytes
+    $first_section .= "# instruction fetch buffer
+new hw-cache-buffer-8 cpu-insn-buffer
+set cpu-insn-buffer write-through? true
+connect-pin cache-flush-net output-0 -> cpu-insn-buffer flush-all
+connect-pin init-sequence output-1 -> cpu-insn-buffer invalidate-all
+";
+
+    # "default" memory layout
+    push @opt_memory_region, "0x00000000,0x200,latency=5";    # vec
+    push @opt_memory_region, "0x00010000,0x60000,latency=5";  # romdata.m
+    push @opt_memory_region, "0x00080000,0x80000,latency=5";  # code.m
+    push @opt_memory_region, "0x00100000,0x80000,latency=5";  # data.m
+    # push @opt_memory_region, "0x00300000,0x10000";  # icache data testing area
+    # push @opt_memory_region, "0x00310000,0x10000";  # icache tag testing area
+    # push @opt_memory_region, "0x00320000,0x10000";  # dcache data testing area
+    # push @opt_memory_region, "0x00330000,0x10000";  # dcache tag testing area
+    push @opt_memory_region, "0x01000000,0x8000,latency=5";   # romdata.s
+    push @opt_memory_region, "0x01008000,0x8000,latency=5";   # data.s
+    push @opt_memory_region, "0x02000000,0x100000,latency=5"; # data.l
+    push @opt_memory_region, "0x02200000,0x100000,latency=5"; # romdata.l
+    push @opt_memory_region, "0x02300000,0x100000,latency=5"; # code.l
+    push @opt_memory_region, "0x03000000,0x100000,latency=5"; # stack
+    push @opt_memory_region, "0x04000000,0x100000,latency=5"; # heap
+
+    $third_section .= "connect-bus cpu-mapper local:[0x00200000,0x00210000] cpu-local-space access-port\n";
+
+    push @opt_memory_region, ($mep_imem_base - 0x00200000) . "," . $mep_imem_size . ",bus=cpu-local-space,latency=2" if $mep_imem_size;
+    push @opt_memory_region, ($mep_dmem_bank0_base - 0x00200000) . "," . $mep_dmem_bank0_size . ",bus=cpu-local-space,latency=2" if $mep_dmem_bank0_size;
+    push @opt_memory_region, ($mep_dmem_bank1_base - 0x00200000) . "," . $mep_dmem_bank1_size . ",bus=cpu-local-space,latency=2" if $mep_dmem_bank1_size;
+
+    if ($mepcfg_icache_size)
+      {
+	$cachetype =
+	  ($mepcfg_icache_way == 1 ? "direct" : ($mepcfg_icache_way . "way")) . "/" .
+	    $mepcfg_icache_size . "kb" . "/" .
+	      $mepcfg_icache_line_size .
+		($mepcfg_icache_way == 1 ? "" : "/random");
+
+	configure_mep_cached_bus("insn", $cachetype, $mepcfg_dsu);
+	$third_section .= "# icache tag test area
+new hw-glue-probe-bus cpu-insn-cache-tagtest
+new hw-memory-ram/rom-basic cpu-insn-cache-tag
+set cpu-insn-cache-tag size 0x10000
+connect-bus cpu-mapper [0x00310000-0x0031FFFF] cpu-insn-cache-tagtest upstream
+connect-bus cpu-insn-cache-tagtest downstream cpu-insn-cache-tag read-write-port
+connect-pin cpu-insn-cache-tagtest address -> cpu-insn-cache invalidate-all
+";
+      }
+    else
+      {
+	$second_section .= "
+disconnect-bus cpu insn-memory cpu-mapper access-port
+connect-bus cpu insn-memory cpu-insn-buffer upstream
+connect-bus cpu-insn-buffer downstream cpu-mapper access-port
+connect-pin init-sequence output-0 -> cpu-insn-buffer invalidate-all\n";
+      }
+    if ($mepcfg_dcache_size)
+      {
+	$cachetype =
+	  ($mepcfg_dcache_way == 1 ? "direct" : ($mepcfg_dcache_way . "way")) . "/" .
+	    $mepcfg_dcache_size . "kb" . "/" .
+	      $mepcfg_dcache_line_size .
+		($mepcfg_dcache_way == 1 ? "" : "/random");
+	configure_mep_cached_bus("data", $cachetype, $mepcfg_dsu);
+	$bus_upstream = "cpu-data-cachefilter access-port";
+	$third_section .= "# dcache tag test area
+new hw-glue-probe-bus cpu-data-cache-tagtest
+new hw-memory-ram/rom-basic cpu-data-cache-tag
+set cpu-data-cache-tag size 0x10000
+connect-bus cpu-mapper [0x00330000-0x0033FFFF] cpu-data-cache-tagtest upstream
+connect-bus cpu-data-cache-tagtest downstream cpu-data-cache-tag read-write-port
+connect-pin cpu-data-cache-tagtest address -> cpu-data-cache invalidate-all
+";
+      }
+    else
+      {
+	$bus_upstream = "cpu-mapper access-port";
+      }
+
+    if ($opt_board =~ /gloss/)
+      {
+	# prevent configure_gloss from adding in the overlapping defaults
+	$gloss_memspecs{$opt_cpu}="";
+	configure_gloss ($opt_board);
+      }
+  }
 elsif ($opt_board =~ /gloss/)
   {
     configure_gloss($opt_board);
@@ -903,8 +1155,53 @@ connect-bus gloss target-memory data-mapper access-port
 
   }
 
+sub configure_mep_cached_bus
+  {
+    my $addrspace = $_[0];
+    my $cachetype = $_[1];
+    my $dsu_p = $_[2];
 
+    $first_section .= "# $addrspace caching
+new hw-mapper-transparent cpu-${addrspace}-cachefilter
+new hw-cache-$cachetype cpu-${addrspace}-cache
+set cpu-${addrspace}-cache hit-latency 1
+set cpu-${addrspace}-cache miss-latency 1
+connect-pin cpu ${addrspace}-cache-enable -> cpu-${addrspace}-cachefilter bank
+connect-pin cache-flush-net output-0 -> cpu-${addrspace}-cache flush-all
+connect-pin cache-flush-net output-1 -> cpu-${addrspace}-cache invalidate-all
+";
+    $second_section .= "# $addrspace cache filtering
+disconnect-bus cpu ${addrspace}-memory $bus_upstream
+";
 
+    if ($addrspace eq "insn") {
+      $second_section .= "connect-bus cpu insn-memory cpu-insn-buffer upstream\n";
+      $cpubus = "cpu-insn-buffer downstream";
+    } else {
+      $cpubus = "cpu data-memory";
+    }
+
+    if ($dsu_p) {
+      $second_section .= "connect-bus $cpubus cpu-dsu ${addrspace}-upstream
+connect-bus cpu-dsu ${addrspace}-downstream cpu-${addrspace}-cachefilter access-port
+";
+    } else {
+      $second_section .= "connect-bus $cpubus cpu-${addrspace}-cachefilter access-port\n";
+    }
+
+    $second_section .=
+"connect-bus cpu-${addrspace}-cachefilter ${addrspace}:[0x00000000-0x007FFFFF]{0,1}:uncacheable cpu-mapper access-port
+connect-bus cpu-${addrspace}-cachefilter ${addrspace}:[0x00800000-0x7FFFFFFF]{1}:cached cpu-${addrspace}-cache upstream
+connect-bus cpu-${addrspace}-cachefilter ${addrspace}:[0x00800000-0x7FFFFFFF]{0}:uncached cpu-mapper access-port
+connect-bus cpu-${addrspace}-cachefilter ${addrspace}:[0x80000000-0xBFFFFFFF]{0,1}:uncacheable cpu-mapper access-port
+connect-bus cpu-${addrspace}-cachefilter ${addrspace}:[0xC0000000-0xFFFFFFFF]{1}:cached cpu-${addrspace}-cache upstream
+connect-bus cpu-${addrspace}-cachefilter ${addrspace}:[0xC0000000-0xFFFFFFFF]{0}:uncached cpu-mapper access-port
+connect-bus cpu-${addrspace}-cache downstream cpu-mapper access-port
+# $addrspace cache setup
+set cpu-${addrspace}-cache report-heading \"${addrspace} profile report\"
+connect-pin init-sequence output-1 -> cpu-${addrspace}-cache invalidate-all\n" .
+  ($opt_trace_counter ? "connect-pin deinit-sequence output-6 -> cpu-${addrspace}-cache report!\n" : "");
+  }
 
 if ($opt_cpu eq "arm")
   {
@@ -926,6 +1223,10 @@ if ($opt_cpu eq "xstormy16")
     $enable_z_packet = "true";
   }
 
+if ($opt_cpu eq "mep")
+  {
+    $enable_z_packet = "true";
+  }
 
 # --engine
 if ($opt_engine eq "pbb")

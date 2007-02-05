@@ -1,0 +1,24 @@
+# mep testcase for sb $rn3,$disp7($tp) -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global sb_tp
+sb_tp:
+	mov $tp, 0x10
+	mov $0, 0x23
+
+	# Store 0x23 @ 0x50.
+	sb $0,0x40($tp)
+
+	# Read it back.
+	lb $1,0x40($tp)
+
+	# Verify it's the same.
+	sub $0,$1
+	bnez $0, wrong
+
+okay:
+	pass
+wrong:
+	fail

@@ -1,0 +1,15 @@
+# mep testcase for lwcpi $crn,($rm+) -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global lwcpi
+lwcpi:
+	mov $1, 0x43
+	lwcpi $cr2,($1+)
+	assert $1, 0x47
+okay:	
+	pass
+wrong:
+	fail

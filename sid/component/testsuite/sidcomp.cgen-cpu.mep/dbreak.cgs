@@ -1,0 +1,11 @@
+# mep testcase for dbreak -*- Asm -*-
+# configline(): set cpu debug-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global dbreak
+dbreak:
+	# This instruction currently has no visible semantics.
+	dbreak
+	pass

@@ -1,3 +1,138 @@
+2007-02-05  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+	2005-07-29  Dave Brolley  <brolley@redhat.com>
+
+	* sidcomp.families.mep/mep-dmac.exp: load
+	mem_component_library and cache_component_library.
+	* sidcomp.families.mep/mep-dsu.exp: Likewise.
+	* sidcomp.families.mep/mep-interrupt.exp: Likewise.
+	* sidcomp.families.mep/mep-timer.exp: Likewise.
+
+	2004-07-20  Dave Brolley  <brolley@redhat.com>
+
+	* sidcomp.families.mep/mep-interrupt.exp
+	(exhaustive_driven_test):  Make sure mask for checking ISR is
+	non-negative.
+
+	2002-03-15  Frank Ch. Eigler  <fche@redhat.com>
+
+	* sidcomp.cgen-cpu.mep/INTC.conf: Update for new word-multiplier
+	syntax.
+	* sidcomp.families.mep/mep-dmac.exp: Ditto.
+
+	2003-02-11  Dave Brolley  <brolley@redhat.com>
+
+	* sidcomp.families.mep/mep-timer.exp (stress_test): Set both CMP and CNT
+	to zero to test immediate timeout.
+	(timer_test): Ditto.
+
+	2003-01-16  Dave Brolley  <brolley@redhat.com>
+
+	* sidcomp.families.mep/mep-timer.exp (check_one_timer_test): Adjust
+	expected iteration count.
+
+	2002-11-28  Dave Brolley  <brolley@redhat.com>
+
+	* sidcomp.families.mep/mep-dmac.exp: Cut down execution time by using
+	a mix of priorities rather than running all tests with all priorities.
+
+	2002-11-21  Dave Brolley  <brolley@redhat.com>
+
+	* sidcomp.families.mep/mep-timer.exp: New testcase.
+
+	2002-10-25  Dave Brolley  <brolley@redhat.com>
+
+	* sidcomp.families.mep/mep-dmac.exp: Cut down execution time by using
+	a mix of configurations rather than an exhaustive approach.
+
+	2002-10-25  Dave Brolley  <brolley@redhat.com>
+
+	* sidcomp.families.mep/mep-dmac.exp: Completely rewritten to test new
+	DMAC specification.
+
+	2002-10-15  Dave Brolley  <brolley@redhat.com>
+
+	* sidcomp.families.mep/mep-dmac.exp: Update dmac control register bus
+	names.
+	(do_local_to_main_dma): Update control dmac register mapping.
+	(do_main_to_local_dma): Ditto.
+
+	2002-02-28  Graydon Hoare  <graydon@redhat.com>
+
+	* sidcomp.families.mep/mep-interrupt.exp: Correct little-endian
+	control bus accesses. Cancel level-triggered interrupts by clearing
+	interrupt channel rather than writing to ISR.	
+
+	2001-12-05  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.families.mep/mep-interrupt.exp: Overhaul.
+
+	2001-12-04  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.families.mep/mep-dsu.exp: Make more robust.
+
+	2001-09-17  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.families.mep/mep-dsu.exp: Unset $bus for good measure.
+
+	2001-09-05  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.families.mep/mep-dsu.exp: Test unmasking of interrupts
+	and NMIs when any are pending.
+
+	2001-08-22  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.families.mep/mep-dsu.exp: Revise for new features.
+
+	2001-08-22  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.families.mep/mepdocs.exp: Test hw-debug-mep docs.
+	* sidcomp.families.mep/mep-dsu.exp: New test script.
+
+	2001-07-24  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.families.mep/mep-dmac.exp: Use new type names.
+	* sidcomp.families.mep/mep-interrupt.exp: Likewise.
+	* sidcomp.families.mep/mepdocs.exp: Likewise.
+
+	2001-07-23  graydon hoare  <graydon@redhat.com>
+
+	* sidcomp.families.mep/mep-dmac.exp: Add tests for the DMA
+	controller.
+
+	2001-07-19  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.families.mep/mep-interrupt.exp: Locate component from
+	the correct component library.
+
+	2001-07-18  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.families.mep/mepdocs.exp: New file.
+
+	2001-07-18  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.interrupt/interruptdocs.exp: Remove hw-interrupt-mep.
+	* sidcomp.interrupt/mep-interrupt.exp: Move from here ..
+	* sidcomp.families.mep/mep-interrupt.exp: .. to here.
+
+	2001-07-02  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.interrupt/interruptdocs.exp: Test hw-interrupt-mep docs.
+
+	2001-06-29  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.interrupt/mep-interrupt.exp: Add level-triggered cases.
+
+	2001-06-29  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.interrupt/mep-interrupt.exp: New test script.
+
+	2001-05-31  Ben Elliston  <bje@redhat.com>
+
+	* sidcomp.cgen-cpu/cpudocs.exp: Test hw-cpu-mep documentation.
+	* sidcomp.cgen-cpu/cpumonkey.exp: Monkey test hw-cpu-mep.
+
 2005-12-19  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* sidcomp.cgen-cpu.mt: Renamed from sidcomp.cgen-cpu.ms1.
@@ -1422,7 +1557,7 @@
 
 1999-09-15  Frank Ch. Eigler  <fche@cygnus.com>
 
-	* testsuite/sidcomp.gloss/angel.exp: Add "None" pseudo-signal.  
+	* sidcomp.gloss/angel.exp: Add "None" pseudo-signal.  
 	Use it in "exception (exit)" test.
 
 1999-09-15  Ben Elliston  <bje@cygnus.com>

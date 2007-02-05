@@ -1,0 +1,33 @@
+# mep testcase for abs $rn,$rm -*- Asm -*-
+# configline(): set cpu abs-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global abs
+abs:
+	# Condition 1: Rm < Rn.
+	mov $1, 3
+	mov $2, 8
+	abs $2, $1
+	# | 8 - 3 | = 5.
+	assert $2, 5
+
+	# Condition 2: Rn < Rm.
+	mov $5, 8
+	mov $6, 3
+	abs $6, $5
+	# | 3 - 8 | = 5.
+	assert $6, 5
+
+	# Condition 3: Rn = Rm.
+	mov $5, 12
+	mov $6, 12
+	abs $6, $5
+	# | 12 - 12 | = 0.
+	assert $6, 0
+
+okay:
+	pass
+wrong:
+	fail

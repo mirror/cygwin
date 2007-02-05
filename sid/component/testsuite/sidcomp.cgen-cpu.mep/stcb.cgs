@@ -1,0 +1,16 @@
+# mep testcase for stcb $rn,$abs16 -*- Asm -*-
+# mach: all
+# output: "Warning: write to control bus address 0x5000 is out of range
+pass"
+	.include "testutils.inc"
+	start
+	.global stcb
+stcb:
+	mov $1, 0x1307
+	sll $1, 8
+	add $1, 2
+	sll $1, 8
+	add $1, 9
+	# Move 0x13070209 to word 0x5000 in control bus space.
+	stcb $1, 0x5000
+	pass

@@ -69,7 +69,7 @@ pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libmemory_la_LIBADD =
 am_libmemory_la_OBJECTS = components.lo generic.lo ramrom.lo flash.lo \
-	at29.lo am29.lo
+	mep-cache-tag.lo at29.lo am29.lo
 libmemory_la_OBJECTS = $(am_libmemory_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/../config/depcomp
@@ -162,6 +162,8 @@ SIDTARGET_M32R_FALSE = @SIDTARGET_M32R_FALSE@
 SIDTARGET_M32R_TRUE = @SIDTARGET_M32R_TRUE@
 SIDTARGET_M68K_FALSE = @SIDTARGET_M68K_FALSE@
 SIDTARGET_M68K_TRUE = @SIDTARGET_M68K_TRUE@
+SIDTARGET_MEP_FALSE = @SIDTARGET_MEP_FALSE@
+SIDTARGET_MEP_TRUE = @SIDTARGET_MEP_TRUE@
 SIDTARGET_MIPS_FALSE = @SIDTARGET_MIPS_FALSE@
 SIDTARGET_MIPS_TRUE = @SIDTARGET_MIPS_TRUE@
 SIDTARGET_MT_FALSE = @SIDTARGET_MT_FALSE@
@@ -229,6 +231,7 @@ sharedstatedir = @sharedstatedir@
 sidtarget_arm = @sidtarget_arm@
 sidtarget_m32r = @sidtarget_m32r@
 sidtarget_m68k = @sidtarget_m68k@
+sidtarget_mep = @sidtarget_mep@
 sidtarget_mips = @sidtarget_mips@
 sidtarget_mt = @sidtarget_mt@
 sidtarget_ppc = @sidtarget_ppc@
@@ -245,6 +248,7 @@ pkglib_LTLIBRARIES = libmemory.la
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include
 noinst_HEADERS = generic.h ramrom.h flash.h at29.h
 libmemory_la_SOURCES = components.cxx generic.cxx ramrom.cxx flash.cxx \
+		       mep-cache-tag.cxx \
                        at29.cxx am29.cxx
 
 libmemory_la_LDFLAGS = -module -no-undefined
@@ -326,6 +330,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/components.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/flash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mep-cache-tag.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ramrom.Plo@am__quote@
 
 .cxx.o:

@@ -1,0 +1,26 @@
+# mep testcase for add $rn,$imm6 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global add
+add:
+	# 5 + 1 = 6.
+	mov $0, 5
+	add $0, 1
+	assert $0, 6 
+	
+	# 5 + -1 = 4.
+	mov $0, 5
+	add $0, -1
+	assert $0, 4
+
+	# 3 + 0 = 3.
+	mov $0, 3
+	add $0, 0
+	assert $0, 3
+
+okay:
+	pass
+wrong:
+	fail

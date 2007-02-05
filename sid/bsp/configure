@@ -272,7 +272,7 @@ PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
 ac_unique_file="Makefile.in"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT INSTALL sidtarget_arm SIDTARGET_ARM_TRUE SIDTARGET_ARM_FALSE sidtarget_x86 SIDTARGET_X86_TRUE SIDTARGET_X86_FALSE sidtarget_mips SIDTARGET_MIPS_TRUE SIDTARGET_MIPS_FALSE sidtarget_m32r SIDTARGET_M32R_TRUE SIDTARGET_M32R_FALSE sidtarget_m68k SIDTARGET_M68K_TRUE SIDTARGET_M68K_FALSE sidtarget_mt SIDTARGET_MT_TRUE SIDTARGET_MT_FALSE sidtarget_ppc SIDTARGET_PPC_TRUE SIDTARGET_PPC_FALSE sidtarget_sh SIDTARGET_SH_TRUE SIDTARGET_SH_FALSE sidtarget_sh64 SIDTARGET_SH64_TRUE SIDTARGET_SH64_FALSE sidtarget_xstormy16 SIDTARGET_XSTORMY16_TRUE SIDTARGET_XSTORMY16_FALSE LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT INSTALL sidtarget_arm SIDTARGET_ARM_TRUE SIDTARGET_ARM_FALSE sidtarget_x86 SIDTARGET_X86_TRUE SIDTARGET_X86_FALSE sidtarget_mips SIDTARGET_MIPS_TRUE SIDTARGET_MIPS_FALSE sidtarget_m32r SIDTARGET_M32R_TRUE SIDTARGET_M32R_FALSE sidtarget_m68k SIDTARGET_M68K_TRUE SIDTARGET_M68K_FALSE sidtarget_mep SIDTARGET_MEP_TRUE SIDTARGET_MEP_FALSE sidtarget_mt SIDTARGET_MT_TRUE SIDTARGET_MT_FALSE sidtarget_ppc SIDTARGET_PPC_TRUE SIDTARGET_PPC_FALSE sidtarget_sh SIDTARGET_SH_TRUE SIDTARGET_SH_FALSE sidtarget_sh64 SIDTARGET_SH64_TRUE SIDTARGET_SH64_FALSE sidtarget_xstormy16 SIDTARGET_XSTORMY16_TRUE SIDTARGET_XSTORMY16_FALSE LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1807,6 +1807,7 @@ sidtarget_x86=$sidtarget_default
 sidtarget_mips=$sidtarget_default
 sidtarget_m32r=$sidtarget_default
 sidtarget_m68k=$sidtarget_default
+sidtarget_mep=$sidtarget_default
 sidtarget_mt=$sidtarget_default
 sidtarget_ppc=$sidtarget_default
 sidtarget_sh=$sidtarget_default
@@ -1822,11 +1823,12 @@ do
       mips*)  sidtarget_mips=1 ;;
       m32r*)  sidtarget_m32r=1 ;;
       m68k*)  sidtarget_m68k=1 ;;
+      mep*)   sidtarget_mep=1 ;;
       mt*)    sidtarget_mt=1 ;;
       powerpc*) sidtarget_ppc=1 ;;
       ppc*)   sidtarget_ppc=1 ;;
       sh64*) sidtarget_sh64=1 ;;
-      sh*) sidtarget_sh=1 ;;
+      sh*)   sidtarget_sh=1 ;;
       xstormy16*) sidtarget_xstormy16=1 ;;
       *)      { echo "$as_me:$LINENO: WARNING: \"Unknown target $targ\"" >&5
 echo "$as_me: WARNING: \"Unknown target $targ\"" >&2;} ;;
@@ -1839,6 +1841,7 @@ case 1 in
   ${sidtarget_mips}) ;;
   ${sidtarget_m32r}) ;;
   ${sidtarget_m68k}) ;;
+  ${sidtarget_mep}) ;;
   ${sidtarget_mt}) ;;
   ${sidtarget_ppc}) ;;
   ${sidtarget_sh}) ;;
@@ -1929,6 +1932,22 @@ fi
 
 echo "$as_me:$LINENO: result: $sidtarget_m68k" >&5
 echo "${ECHO_T}$sidtarget_m68k" >&6
+
+echo "$as_me:$LINENO: checking Toshiba MeP family support" >&5
+echo $ECHO_N "checking Toshiba MeP family support... $ECHO_C" >&6
+
+
+
+if test "x$sidtarget_mep" = x1; then
+  SIDTARGET_MEP_TRUE=
+  SIDTARGET_MEP_FALSE='#'
+else
+  SIDTARGET_MEP_TRUE='#'
+  SIDTARGET_MEP_FALSE=
+fi
+
+echo "$as_me:$LINENO: result: $sidtarget_mep" >&5
+echo "${ECHO_T}$sidtarget_mep" >&6
 
 echo "$as_me:$LINENO: checking MT family support" >&5
 echo $ECHO_N "checking MT family support... $ECHO_C" >&6
@@ -2178,6 +2197,13 @@ if test -z "${SIDTARGET_M68K_TRUE}" && test -z "${SIDTARGET_M68K_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"SIDTARGET_M68K\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"SIDTARGET_M68K\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SIDTARGET_MEP_TRUE}" && test -z "${SIDTARGET_MEP_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SIDTARGET_MEP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SIDTARGET_MEP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -2785,6 +2811,9 @@ s,@SIDTARGET_M32R_FALSE@,$SIDTARGET_M32R_FALSE,;t t
 s,@sidtarget_m68k@,$sidtarget_m68k,;t t
 s,@SIDTARGET_M68K_TRUE@,$SIDTARGET_M68K_TRUE,;t t
 s,@SIDTARGET_M68K_FALSE@,$SIDTARGET_M68K_FALSE,;t t
+s,@sidtarget_mep@,$sidtarget_mep,;t t
+s,@SIDTARGET_MEP_TRUE@,$SIDTARGET_MEP_TRUE,;t t
+s,@SIDTARGET_MEP_FALSE@,$SIDTARGET_MEP_FALSE,;t t
 s,@sidtarget_mt@,$sidtarget_mt,;t t
 s,@SIDTARGET_MT_TRUE@,$SIDTARGET_MT_TRUE,;t t
 s,@SIDTARGET_MT_FALSE@,$SIDTARGET_MT_FALSE,;t t

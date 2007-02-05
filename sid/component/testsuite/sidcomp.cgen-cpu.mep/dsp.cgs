@@ -1,0 +1,12 @@
+# mep testcase for dsp $rn,$rm,$code16 -*- Asm -*-
+# configline(): set dsp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global dsp
+dsp:
+	# This is a user-defined instruction.
+	# No testing to do, other than to check for correct decoding.
+	dsp $1, $2, 0x1023
+	pass

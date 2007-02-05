@@ -1,0 +1,11 @@
+# mep testcase for lmcp $crn,($rm) -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global lmcp
+lmcp:
+	mov $1, 0x47
+	lmcp $cr2,($1)
+	pass

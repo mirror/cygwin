@@ -1,0 +1,156 @@
+          hw-dma-mep (libmepfamily.la :: mepfamily_component_library)
+
+Synopsis:
+
+   This component models a MeP external DMA controller, capable of moving
+   blocks of memory between main memory and local-memory.
+
+     ----------------------------------------------------------------------
+
+Functionality:
+
+  Modelling:
+
+   The DMA controller is configured through 2 banks of memory-mapped control
+   registers, presented as the control-regs-high and control-regs-low buses.
+   They are conventionally mapped to 0x1FFF and 0x1000 respectively, but this
+   must be set up by an external mapper, such as the MeP control bus mapper.
+   The following registers (and interpretations) are mapped:
+
+   +------------------------------------------------------------+
+   | bus              | address | bits   | R/W | name           |
+   |------------------+---------+--------+-----+----------------|
+   | control-bus-low  | 0x0     | 0      | R/W | active         |
+   |------------------+---------+--------+-----+----------------|
+   | control-bus-low  | 0x2     | 0      | R/W | main-to-local  |
+   |------------------+---------+--------+-----+----------------|
+   | control-bus-low  | 0x3     | 31..0  | R/W | main-dma-addr  |
+   |------------------+---------+--------+-----+----------------|
+   | control-bus-low  | 0x4     | 31..16 | R/W | local-dma-addr |
+   |------------------+---------+--------+-----+----------------|
+   | control-bus-low  | 0x4     | 15..0  | R/W | dma-byte-count |
+   |------------------+---------+--------+-----+----------------|
+   | control-bus-low  | 0x9     | 2      | R   | xz-status      |
+   |------------------+---------+--------+-----+----------------|
+   | control-bus-low  | 0x9     | 1      | R   | bus-error      |
+   |------------------+---------+--------+-----+----------------|
+   | control-bus-high | 0x0     | 27..16 | R/W | burst-size     |
+   |------------------+---------+--------+-----+----------------|
+   | control-bus-high | 0x0     | 15..8  | R/W | begin-wait     |
+   |------------------+---------+--------+-----+----------------|
+   | control-bus-high | 0x0     | 7..0   | R/W | transfer-wait  |
+   +------------------------------------------------------------+
+
+   Most of the control registers are read/write, and describe the parameters
+   of a pending DMA request. The active register, when written to, will
+   activate a DMA transfer based on the contents of the other registers,
+   assuming there is not already a transfer in progress. At the moment, any
+   user of the DMA controller must poll the status registers for the result;
+   interrupt delivery is not modeled.
+
+   +-------------------------------------------------+
+   |                    Behaviors                    |
+   |-------------------------------------------------|
+   |  transferring | the DMA controller begins a     |
+   |               | transfer by locking in values   |
+   |               | for source, destination, and    |
+   |               | length. Once a transfer is      |
+   |               | initiated, no other bus         |
+   |               | activity will stop it or alter  |
+   |               | its behavior (short of a        |
+   |               | read/write failure or scheduler |
+   |               | disconnection) until it         |
+   |               | completes. It schedules its     |
+   |               | first burst for begin-wait      |
+   |               | cycles after its active         |
+   |               | register is triggered. Once     |
+   |               | running, it repeatedly          |
+   |               | schedules itself for bursts     |
+   |               | until it has transferred        |
+   |               | dma-byte-count bytes. Each      |
+   |               | burst transfer moves burst-size |
+   |               | bytes, then schedules another   |
+   |               | burst for transfer-wait cycles  |
+   |               | in the future if more bytes     |
+   |               | remain.                         |
+   |               |                                 |
+   |               | The transfer moves bytes from   |
+   |               | local-memory to main-memory,    |
+   |               | unless the main-to-local        |
+   |               | register is set, in which case  |
+   |               | the direction of transfer is    |
+   |               | reversed. The bytes are         |
+   |               | transferred between             |
+   |               | main-dma-addr and               |
+   |               | local-dma-addr. If anything     |
+   |               | goes wrong during the transfer, |
+   |               | the bus-error register is set.  |
+   |---------------+---------------------------------|
+   | configuration | When the configure! pin is      |
+   |               | driven, a new configuration is  |
+   |               | obtained from the               |
+   |               | dynamic-configurator component  |
+   |               | via its current-config          |
+   |               | attribute. The resulting string |
+   |               | is then interpreted as a new    |
+   |               | configuration for this          |
+   |               | component.                      |
+   +-------------------------------------------------+
+
+     ----------------------------------------------------------------------
+
+Environment:
+
+   related components
+
+     * a sid-sched scheduler component is expected to be hooked into the DMA
+       controller's burst-control and burst-event pins. it will not function
+       at all without the scheduler.
+
+     * an hw-mapper-basic is probably required to set up the control bus and
+       place control-regs-high and control-regs-low at their appropriate
+       positions. Note: that the conventional addresses 0x1FFF and 0x1000 are
+       word addresses on the control bus; the control bus has a 4-byte word
+       addressing scheme, so the mappings should be made at [0x1FFF-0x1FFF,4]
+       and [0x1000-0x1009,4] respectively.
+
+     * an hw-mapper-basic or similar presumably has its bus(es) connected to
+       the DMA controller's local-memory and main-memory accessors, though
+       this is up to you; the transfer it will fail with a bus-error if one
+       or other accessor is null.
+
+     ----------------------------------------------------------------------
+
+Component Reference:
+
+  Component: hw-dma-mep
+
+   +---------------------------------------------------------+
+   |                          pins                           |
+   |---------------------------------------------------------|
+   |     name      | direction | legalvalues |   behaviors   |
+   |---------------+-----------+-------------+---------------|
+   |burst-control  |out        |-            |transferring   |
+   |---------------+-----------+-------------+---------------|
+   |burst-event    |in         |-            |transferring   |
+   |---------------+-----------+-------------+---------------|
+   |configure!     |in         |any          |configuration  |
+   +---------------------------------------------------------+
+
+   +----------------------------------------------------+
+   |                       buses                        |
+   |----------------------------------------------------|
+   |     name     | addresses | accesses |  behaviors   |
+   |--------------+-----------+----------+--------------|
+   |control-regs  |-          |-         |transferring  |
+   +----------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                    accessors                    |
+   |-------------------------------------------------|
+   |      name       |  accesses   |    behaviors    |
+   |-----------------+-------------+-----------------|
+   | main-memory     | -           | transferring    |
+   |-----------------+-------------+-----------------|
+   | local-memory    | -           | transferring    |
+   +-------------------------------------------------+

@@ -1,0 +1,35 @@
+2005-07-29  Dave Brolley  <brolley@redhat.com>
+
+	* cfgs/cop-data-bus-width.cfg: Change ISA_DEFINE to CGEN_DEFINE.
+	* cfgs/test.cfg: Likewise.
+
+2003-10-17  DJ Delorie  <dj@redhat.com>
+
+	* Makefile.in: Regenerated.
+
+2003-10-16  DJ Delorie  <dj@redhat.com>
+
+	* customize.sh: Rename mepcfgtool to MeP-Integrator.  Force
+	CFG_ROOT to be absolute.
+	* cfgs/test.cfg: Remove BANK_NUM from IMEM.
+
+2002-05-08  Dave Brolley  <brolley@redhat.com>
+
+	* Makefile.am (TESTS): Add cop-test.sh.
+	* cop-test.sh: New test.
+	* cfgs/cop.cfg: New test configuration.
+	* option_unit/cop*.cpu: New coprocessor ISA definitions.
+
+2002-04-24  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (TESTS): Define.
+	* Makefile.in: Regenerate.
+	* customise.sh: New library script.
+	* customise-test.sh: New test.
+
+2002-04-18  Ben Elliston  <bje@redhat.com>
+
+	* cfgs: New directory; populated with existing configurations.
+	* gmap: Ditto.
+	* option_unit: Ditto.
+

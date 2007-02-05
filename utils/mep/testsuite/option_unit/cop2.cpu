@@ -1,0 +1,17 @@
+; Trivial ISA for coprocessor 2
+(dnf f-cop2-opcode "cop2 opcode" ((ISA ext_cop2_32)) 0 32)
+
+(define-normal-insn-enum cop2major "major opcodes" ((ISA ext_cop2_32)) COP2_
+  f-cop2-opcode
+  (ANINSN 0x12345678)
+)
+
+(define-pmacro (dncp232i xname xcomment xattrs xsyntax xformat xsemantics xtiming)  (dni-isa xname xcomment xattrs xsyntax xformat xsemantics ext_cop2_32)
+)
+
+(dncp232i cop2aninsn "An insn" ()
+	"aninsn"
+	(+ COP2_ANINSN)
+	(nop)
+	()
+)

@@ -1,0 +1,13 @@
+;; -*- scheme -*-
+;;
+;; This is a sample UCI to be included in the 
+;; CGEN cpu description
+
+(dni uci.square 
+     "uci square operation" 
+     (OPTIONAL_UCI_INSN VOLATILE (ISA ext_core1))
+     "uci.square $rn $rm"
+     (+ MAJ_15 rn rm (f-sub4 2) (f-16u16 #xf001))
+     (sequence ()
+	       (set rn (c-call SI "square" rm)))
+     ())

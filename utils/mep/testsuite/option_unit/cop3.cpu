@@ -1,0 +1,17 @@
+; Trivial ISA for coprocessor 3
+(dnf f-cop3-opcode "cop3 opcode" ((ISA ext_cop3_32)) 0 32)
+
+(define-normal-insn-enum cop3major "major opcodes" ((ISA ext_cop3_32)) COP3_
+  f-cop3-opcode
+  (ANINSN 0x12345678)
+)
+
+(define-pmacro (dncp332i xname xcomment xattrs xsyntax xformat xsemantics xtiming)  (dni-isa xname xcomment xattrs xsyntax xformat xsemantics ext_cop3_32)
+)
+
+(dncp332i cop3aninsn "An insn" ()
+	"aninsn"
+	(+ COP3_ANINSN)
+	(nop)
+	()
+)

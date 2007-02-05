@@ -1,0 +1,8 @@
+//start	   :size       :name		:cache	:shd_org_start	:scope	:type		:read_write(opt);
+0x0000_0000:0x0020_0000:ROM		:	:		:global	:memory		:ro;
+0x0030_0000:0x0010_0000:reserved	:	:		:	:reserved	:;
+0x0070_0000:0x0001_0000:LocalMem	:	:		:local	:reserved	:;
+0x0080_0000:0x0080_0000:SDRAM		:Cache	:		:global	:memory		:;
+0x8080_0000:0x0080_0000:SDRAM Shadow	:	:0x80_0000	:	:shadow		:;
+0xa000_0000:0x0010_0000:MM_TEST Shadow	:	:0x20_8000(mm_test):global:shadow	:;
+0xa100_0000:0x0010_0000:MM_MIN Shadow	:	:0x20_2000(mm_min):global:shadow	:;

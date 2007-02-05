@@ -1,5 +1,9 @@
 2007-02-05  Dave Brolley  <brolley@redhat.com>
 
+	* *mep*: New cpu description for Toshiba Media Processor (MeP).
+
+2007-02-05  Dave Brolley  <brolley@redhat.com>
+
 	* opc-asmdis.scm (-gen-init-asm-fn): Include CGEN_ASM_INIT_HOOK
 	in the generated code for @arch@_cgen_init_asm if it is defined.
 

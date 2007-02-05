@@ -1,0 +1,8 @@
+; Toshiba MeP Media Engine architecture description.  -*- Scheme -*-
+; Copyright (C) 2003 Red Hat, Inc.
+; This file is part of CGEN.
+; See file COPYING.CGEN for details.
+
+;; begin-user-isa-includes
+(include "mep-fmax.cpu")
+;; end-user-isa-includes

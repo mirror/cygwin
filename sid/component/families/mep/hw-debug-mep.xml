@@ -1,0 +1,171 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libmepfamily.la" dlsym="mepfamily_component_library">
+
+  <defcomponent name="hw-debug-mep" type="concrete">
+
+    <defbus name="status-regs" addresses="0..2" accesses="32-bit words" behaviors="configuration"/> 
+    <defbus name="insn-regs" addresses="0..2" accesses="32-bit words" behaviors="configuration"/> 
+    <defbus name="data-regs" addresses="0..6" accesses="32-bit words" behaviors="configuration"/> 
+    <defbus name="insn-upstream" addresses="any" accesses="any" behaviors="pass through"/> 
+    <defbus name="data-upstream" addresses="any" accesses="any" behaviors="pass through"/> 
+
+    <defattribute name="insn-break-enabled?" category="read-only register" legalvalues="boolean" behaviors="configuration" />
+    <defattribute name="data-break-enabled?" category="read-only register" legalvalues="boolean" behaviors="configuration" />
+    <defattribute name="interrupts-enabled?" category="read-only register" legalvalues="boolean" behaviors="configuration" />
+    <defattribute name="nmi-enabled?" category="read-only register" legalvalues="boolean" behaviors="configuration" />
+    <defattribute name="halted?" category="read-only register" legalvalues="boolean" behaviors="configuration" />
+    <defattribute name="insn-break-channel-#" category="read-only register" legalvalues="integer" behaviors="configuration" />
+    <defattribute name="data-break-channel-#" category="read-only register" legalvalues="integer" behaviors="configuration" />
+    <defattribute name="insn-break-status" category="read-only register" legalvalues="boolean" behaviors="configuration" />
+    <defattribute name="data-break-status" category="read-only register" legalvalues="boolean" behaviors="configuration" />
+
+    <defpin name="exception!" direction="out" behaviors="debug exceptions"/>
+    <defpin name="interrupt-in" direction="in" behaviors="interrupts"/>
+    <defpin name="interrupt-out" direction="out" behaviors="interrupts"/>
+    <defpin name="nmi-in" direction="in" behaviors="interrupts"/>
+    <defpin name="nmi-out" direction="out" behaviors="interrupts"/>
+    
+    <defaccessor name="insn-downstream" accesses="any" behaviors="pass through"/>
+    <defaccessor name="data-downstream" accesses="any" behaviors="pass through"/>
+
+  </defcomponent>
+  <synop>
+    <p>
+      This component models the MeP debug support unit (DSU).  The
+      programmable DSU supports a number of debugging facilities,
+      including:
+
+      <ul>
+      <li>single step</li>
+      <li>instruction address break</li>
+      <li>data address/value break</li>
+      <li>debug breakpoint</li>
+      <li>debug interrupt</li>
+      </ul>
+      </p>
+  </synop>
+
+  <func>
+    <modelling>
+    <p>
+    The DSU is configured through three banks of memory-mapped control
+    registers, presented as the <bus>status-regs</bus>,
+    <bus>insn-regs</bus> and <bus>data-regs</bus> buses.  They are
+    conventionally mapped to the base addresses <tt>0x800</tt>,
+    <tt>0x900</tt> and <tt>0xA00</tt> respectively.  The following
+    registers are mapped:</p>
+
+      <table>
+      	<tr><th>bus</th><th>address</th><th>bits</th><th>R/W</th><th>name</th></tr>
+	<tr><td><bus>status-regs</bus></td><td>0</td><td>14</td><td></td><td>R  </td><td>halt status</td></tr>
+	<tr><td><bus>status-regs</bus></td><td>0</td><td>4</td><td></td><td>R/W</td><td>enable interrupts</td></tr>
+	<tr><td><bus>status-regs</bus></td><td>0</td><td>3</td><td></td><td>R/W</td><td>enable nmi</td></tr>
+	<tr><td><bus>status-regs</bus></td><td>1</td><td>27:24</td><td></td><td>R  </td><td>instruction break channel number</td></tr>
+	<tr><td><bus>status-regs</bus></td><td>1</td><td>0</td><td></td><td>R/W</td><td>instruction break status</td></tr>
+	<tr><td><bus>status-regs</bus></td><td>2</td><td>27:24</td><td></td><td>R  </td><td>data break channel number</td></tr>
+	<tr><td><bus>status-regs</bus></td><td>2</td><td>0</td><td></td><td>R/W</td><td>data break status</td></tr>
+
+	<tr><td><bus>insn-regs</bus></td><td>0</td><td>31:1</td><td></td><td>R/W</td><td>instruction break address</td></tr>
+	<tr><td><bus>insn-regs</bus></td><td>1</td><td>0</td><td></td><td>R/W</td><td>instruction break enable</td></tr>
+	<tr><td><bus>insn-regs</bus></td><td>2</td><td>31:1</td><td></td><td>R/W</td><td>instruction break mask</td></tr>
+
+	<tr><td><bus>data-regs</bus></td><td>0</td><td>31:2</td><td></td><td>R/W</td><td>data break address</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>0</td><td></td><td>R/W</td><td>data break enable</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>13</td><td></td><td>R/W</td><td>no store break</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>12</td><td></td><td>R/W</td><td>no load break</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>4</td><td></td><td>R/W</td><td>byte lane mask 0</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>5</td><td></td><td>R/W</td><td>byte lane mask 1</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>6</td><td></td><td>R/W</td><td>byte lane mask 2</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>7</td><td></td><td>R/W</td><td>byte lane mask 3</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>8</td><td></td><td>R/W</td><td>byte lane mask 4</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>9</td><td></td><td>R/W</td><td>byte lane mask 5</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>10</td><td></td><td>R/W</td><td>byte lane mask 6</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>11</td><td></td><td>R/W</td><td>byte lane mask 7</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>14</td><td></td><td>R/W</td><td>byte address ignored 0</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>15</td><td></td><td>R/W</td><td>byte address ignored 1</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>16</td><td></td><td>R/W</td><td>byte address ignored 2</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>17</td><td></td><td>R/W</td><td>byte address ignored 3</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>18</td><td></td><td>R/W</td><td>byte address ignored 4</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>19</td><td></td><td>R/W</td><td>byte address ignored 5</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>20</td><td></td><td>R/W</td><td>byte address ignored 6</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>1</td><td>21</td><td></td><td>R/W</td><td>byte address ignored 7</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>2</td><td>31:2</td><td></td><td>R/W</td><td>data break mask</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>3</td><td>31:0</td><td></td><td>R/W</td><td>reserved</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>4</td><td>31:0</td><td></td><td>R/W</td><td>data value break</td></tr>
+	<tr><td><bus>data-regs</bus></td><td>5</td><td>31:0</td><td></td><td>R/W</td><td>data value break upper</td></tr>
+	</table>
+
+    </modelling>
+    <behavior name="pass through">
+    <p>
+    Bus accesses that are of no interest to the DSU are passed through.</p>
+    </behavior>
+
+    <behavior name="configuration">
+    The DSU is configured through its memory-mapped configuration
+    registers.  These registers are outlined above.  Please refer to
+    the Media Engine User's Guide for a detailed explanation of each
+    register.
+    </behavior>
+
+    <behavior name="debug exceptions">
+    <p>
+    The DSU produces a debug exception when one or more critera (such
+    as a matched instruction address) are met.  The debug exception
+    code is driven on the <pin>exception!</pin> pin with a value
+    comprised of the bitwise OR of the following bitfields:</p>
+
+    <table>
+      <tr><th>condition</th><th>value</th></tr>
+      <tr><td>single step</td><td>0x1</td></tr>
+      <tr><td>instruction address break</td><td>0x2</td></tr>
+      <tr><td>data address/value break</td><td>0x4</td></tr>
+      <tr><td>debug breakpoint</td><td>0x8</td></tr>
+      <tr><td>debug interrupt</td><td>0x10</td></tr>
+    </table>
+
+    <p>The <complib>hw-cpu-mep</complib> component is designed to respond
+    correctly in the event of these debug exceptions.</p>
+    </behavior>
+
+    <behavior name="interrupts">
+    <p>
+    Interrupts (regular and NMI) are passed through the DSU to the CPU
+    from external sources.  By clearing the <tt>EINT</tt> and
+    <tt>ENMI</tt> bits in the debug control register (DCR), interrupts
+    may be masked.</p>
+    </behavior>
+
+  </func>
+
+  <env>
+
+    <p>
+      <title>related components</title>
+      <ul>
+	<li>
+	  <p>
+	    This component typically inspects bus traffic between a
+	    <complib>hw-cpu-mep</complib> component and the rest of
+	    the memory hierarchy.</p>
+	</li>
+
+	<li>
+	<p>
+	A <complib>hw-mapper-basic</complib> is responsible for
+	mapping the control bus space into the relevant control
+	registers of the DSU.</p>
+	</li>
+      </ul>
+
+    </p>
+
+  </env>
+
+  <refs>
+     <em>Toshiba Media Engine User's Manual</em>, Section 3.11.8.
+  </refs>
+
+</defcomplib>

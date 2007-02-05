@@ -1,0 +1,25 @@
+# mep testcase for bgei $rn,$imm4,$disp17a2 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global bgei
+bgei:
+	mov $1, 2
+	bgei $1, 5, wrong
+	mov $1, 3
+	bgei $1, 3, okay1
+	fail
+
+.org 0x4000
+wrong:
+	fail
+
+okay1:
+	mov $1, 8
+	bgei $1, 1, okay2
+	fail
+
+.org 0x6000
+okay2:	
+	pass

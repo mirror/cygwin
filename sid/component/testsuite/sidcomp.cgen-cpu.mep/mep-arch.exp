@@ -1,0 +1,19 @@
+# MeP architectural feature tests.
+
+if {! $sidtarget(mep)} then { untested "hw-cpu-mep not available"; return }
+
+# Load a baseboard description for SID simulators.
+load_base_board_description "basic-sid"
+
+# The .cs suffix is for ".conf'd .s".
+load_lib "cpudefs.exp"
+
+# all machines
+set all_machs "mep"
+
+set gas_debug_flags ""
+
+run-sid-tests-raw mep-elf mep $srcdir/sidcomp.cgen-cpu.mep "*.cs" -EL -EL "-e \"set cpu endian little\"" "" xl
+run-sid-tests-raw mep-elf mep $srcdir/sidcomp.cgen-cpu.mep "*.cs" -EB -EB "" "" xb
+run-sid-tests-raw mep-elf mep $srcdir/sidcomp.cgen-cpu.mep "*.s" $gas_debug_flags "" "" mep-gloss.conf x
+

@@ -1,0 +1,18 @@
+# Toshiba Media Processor (MeP) testsuite.
+
+if {! $sidtarget(mep)} { untested "hw-cpu-mep not available"; return }
+
+# Load a baseboard description for SID simulators.
+load_base_board_description "basic-sid"
+
+# load support procs (none yet)
+load_lib "cpudefs.exp"
+
+# all machines
+set all_machs "mep"
+
+# The .cgs suffix is for "cgen .s".
+set gas_debug_flags ""
+
+# run-sid-tests mep-elf mep $srcdir/sidcomp.cgen-cpu.mep "*.cgs" $gas_debug_flags "" "" x
+run-sid-tests-raw mep-elf mep $srcdir/sidcomp.cgen-cpu.mep "*.cgs" $gas_debug_flags "" "" mep-gloss.conf x

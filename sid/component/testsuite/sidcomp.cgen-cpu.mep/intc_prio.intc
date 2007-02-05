@@ -1,0 +1,93 @@
+# mach: all
+# configfile(): INTC.conf
+	
+	.include "testutils.inc"
+	.include "interrupt.inc"
+	start
+
+	.global		main
+main:
+	mov	$0,0x0
+	stc	$0,$psw		# psw,cfg Initialize
+	stc	$0,$cfg
+
+	cancel_hw_interrupt
+	set_umc
+	enable_hie
+	ei
+	set_edge_triggered 0
+	enable_interrupt_channel 0
+
+	.macro test_prio prio
+	mov $13, 0xFF # reset interrupt level number
+	set_interrupt_mask_level \prio
+
+	# step 1: generate an interrupt at (<=) mask
+	set_interrupt_priority 0, \prio
+	raise_hw_interrupt
+	# no interrupt should occur here
+	assert $13, 0xFF	
+	signal_interrupt_handled 0
+	cancel_hw_interrupt
+	
+	# step 2: generate an interrupt above mask
+	set_interrupt_priority 0, (\prio + 1)
+	raise_hw_interrupt
+	# interrupt should occur here, $13 <- (prio + 1)
+	assert $13, (\prio + 1)
+	cancel_hw_interrupt
+	.endm
+	
+	test_prio 1
+	test_prio 2
+	test_prio 3
+	test_prio 4
+	test_prio 5
+	test_prio 6
+	test_prio 7
+	
+okay:
+	pass
+wrong:
+	fail
+
+
+EntryINT00:
+EntryINT01:
+EntryINT02:
+EntryINT03:
+EntryINT04:
+EntryINT05:	
+EntryINT06:	
+EntryINT07:	
+EntryINT08:	
+EntryINT09:					
+EntryINT10:
+EntryINT11:
+EntryINT12:
+EntryINT13:
+EntryINT14:
+EntryINT15:	
+EntryINT16:	
+EntryINT17:	
+EntryINT18:	
+EntryINT19:					
+EntryINT20:
+EntryINT21:
+EntryINT22:
+EntryINT23:
+EntryINT24:
+EntryINT25:	
+EntryINT26:	
+EntryINT27:	
+EntryINT28:	
+EntryINT29:					
+EntryINT30:
+EntryINT31:
+	load_ILV $13
+	signal_interrupt_handled 0
+	reti
+	
+# and finally, setting up the interrupt vectors:	
+
+	standard_interrupt_vectors

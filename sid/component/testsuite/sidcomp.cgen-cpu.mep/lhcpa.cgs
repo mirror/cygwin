@@ -1,0 +1,12 @@
+# mep testcase for lhcpa $crn,($rm+),$imm8a2 -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global lhcpa
+lhcpa:
+	# This instruction is exercised by the shcpa test case.
+	mov $0, 0
+	lhcpa $cr0,($0+),0
+	pass

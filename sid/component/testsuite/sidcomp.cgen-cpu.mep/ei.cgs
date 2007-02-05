@@ -1,0 +1,10 @@
+# mep testcase for ei -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global ei
+ei:
+	# This instruction currently has no visible semantics.
+	ei
+	pass

@@ -1,0 +1,30 @@
+# mep testcase for swcp $crn,$disp16($rm) -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global swcp16
+swcp16:
+	# Load $cr with 0x4010.
+	mov $1, 0x4010
+	cmov $cr3, $1
+
+	# Store it at 0x40+102.
+	mov $0, 0x40
+	swcp $cr3,102($0)
+
+	# Load it back from memory.
+	lwcp $cr4,100($0)
+	# Load it back into general regs.
+	cmov $2, $cr4
+
+	# Validate it.
+	sub $2, $1
+	bnez $2, wrong
+
+okay:
+	pass
+wrong:
+	fail
+	

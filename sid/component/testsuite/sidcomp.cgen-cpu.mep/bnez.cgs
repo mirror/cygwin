@@ -1,0 +1,18 @@
+# mep testcase for bnez $rn,$disp8a2 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global bnez
+bnez:
+	mov $0, 0
+	bnez $0, failure
+
+taken:	
+	mov $0, 1
+	bnez $0, okay
+	
+failure:	
+	fail
+okay:
+	pass

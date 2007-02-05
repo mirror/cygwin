@@ -13,6 +13,10 @@
 #include <sidmiscutil.h>
 #include <getopt.h>
 
+#ifdef SIDTARGET_MEP
+#include "mepCfg.h"
+#endif /* SIDTARGET_MEP */
+
 #if defined (SIDTARGET_SH) || defined (SIDTARGET_SH64)
 #include "shCfg.h"
 #endif /* SIDTARGET_SH */
@@ -41,9 +45,78 @@ mk_basic (const string name, SessionCfg *sess)
   return new BoardCfg (name, "none", sess, false, true, true);
 }
 
+#ifdef SIDTARGET_MEP
+/* begin-mepcfgtool-factories */
+static BoardCfg *
+mk_simple (const string name, SessionCfg *sess)
+{
+  MepBoardCfg *b = new MepBoardCfg (name, "simple", sess);
+
+  b->set_core_type (MEP_CORE_C2);
+  b->set_cpu ("mep-ext1");
+  b->add_irq_board ();
+  b->set_core_id (1);
+  b->set_intc_channel_bitw (8);
+  b->set_intc_level (15);
+  b->set_opt_biu (64);
+  b->set_endian ("big");
+  b->set_opt_abs (false);
+  b->set_opt_ave (false);
+  b->set_opt_bit (false);
+  b->set_opt_clp (false);
+  b->set_opt_div (false);
+  b->set_opt_ldz (false);
+  b->set_opt_min (false);
+  b->set_opt_mul (false);
+  b->set_opt_sat (false);
+  b->set_opt_dsu (false);
+  b->set_opt_uci (false);
+  return b;
+}
+
+static BoardCfg *
+mk_fmax (const string name, SessionCfg *sess)
+{
+  MepBoardCfg *b = new MepBoardCfg (name, "fmax", sess);
+
+  b->set_core_type (MEP_CORE_C2);
+  b->set_cpu ("mep-ext2");
+  b->add_irq_board ();
+  b->set_core_id (2);
+  b->set_intc_channel_bitw (8);
+  b->set_intc_level (15);
+  b->add_cop ("fmax_cop", 0);
+  b->set_cop_data_bus_width (32);
+  b->set_cop_ccr ( 0, 0x00000101);
+  b->set_cop_ccr ( 1, 0x00000000);
+  b->set_cop_ccr (15, 0x00000000);
+  b->set_opt_biu (64);
+  b->set_endian ("big");
+  b->set_opt_abs (true);
+  b->set_opt_ave (true);
+  b->set_opt_bit (true);
+  b->set_opt_clp (true);
+  b->set_opt_div (true);
+  b->set_opt_ldz (true);
+  b->set_opt_min (true);
+  b->set_opt_mul (true);
+  b->set_opt_sat (true);
+  b->set_opt_dsu (false);
+  b->set_opt_uci (false);
+  return b;
+}
+/* end-mepcfgtool-factories */
+
+#endif /* SIDTARGET_MEP */
 
 static boardspec boards [] = {
   {"basic", "basic cpu + memory board", & mk_basic},
+#ifdef SIDTARGET_MEP
+/* begin-mepcfgtool-boards */
+  { "simple", "MeP custom board 'simple'", & mk_simple },
+  { "fmax", "MeP custom board 'fmax'", & mk_fmax },
+/* end-mepcfgtool-boards */
+#endif /* SIDTARGET_MEP */
 #if defined (SIDTARGET_SH) || defined (SIDTARGET_SH64)
   { "sh", "sh default board", & mk_sh },
   { "sh2", "sh2 board", & mk_sh2 },
@@ -163,6 +236,40 @@ usage ()
   cout << "--warmup              Start the simulation in 'warm-up' mode" << endl;
   cout << "--warmup-func=FUNCTIONS" << endl;
   cout << "                      Specify functions to be simulated in 'warm-up' mode" << endl;
+  cout << "--warn-write-to-code  Generate a warning when memory containing executable code is written to" << endl;
+  cout << "--no-warn-write-to-code  Do not generate a warning when memory containing executable code is written to" << endl;
+  cout << "--warn-write-to-rom   Generate a warning when read only memory is written to" << endl;
+  cout << "--allow-write-to-rom  Allow read only memory to be written to" << endl;
+  // MeP-specific options
+  cout << "--model-busses        Turn on bus arbitration modelling" << endl;
+  cout << "--dsp-user-out        Display user written DSP trace output for --trace-disassemble" << endl;
+  cout << "--no-dsp-user-out     Display normal insn disassembly of DSP insns for --trace-disassemble" << endl;
+  cout << "--local-mem=START,SIZE,NAME[,api]" << endl;
+  cout << "--global-mem=START,SIZE[,cached][,rom]" << endl;
+  cout << "--shadow-mem=START,SIZE,BASE[,cached][,MODULE_NAME]" << endl;
+  cout << "--biu-width=N" << endl;
+  cout << "--dmac-channel-bitw=N" << endl;
+  cout << "--dmac-rectangle" << endl;
+  cout << "--dmac-no-rectangle" << endl;
+  cout << "--insn=abs|ave|bit|clp|div|ldz|min|mul|sat" << endl;
+  cout << "--no-insn=abs|ave|bit|clp|div|ldz|min|mul|sat" << endl;
+  cout << "--imem-size=N" << endl;
+  cout << "--dmem-size=N" << endl;
+  cout << "--dmem-bank-num=N" << endl;
+  cout << "--dmem-fixed-start-address" << endl;
+  cout << "--dmem-no-fixed-start-address" << endl;
+  cout << "--icache-size=N" << endl;
+  cout << "--icache-line-size=N" << endl;
+  cout << "--icache-way=N" << endl;
+  cout << "--icache-cwf=on|off" << endl;
+  cout << "--dcache-size=N" << endl;
+  cout << "--dcache-line-size=N" << endl;
+  cout << "--dcache-way=N" << endl;
+  cout << "--dcache-cwf=on|off" << endl;
+  cout << "--corrupt-caches" << endl;
+  cout << "--intc-channel-bitw=N" << endl;
+  cout << "--intc-level=N" << endl;
+  cout << "--timer-channel-bitw=N" << endl;
   cout << endl
        << " note: most board-specific options can be used in board-neutral position " << endl
        << " where they are interpreted as session-specific or default settings. " << endl;
@@ -515,6 +622,14 @@ struct Defs {
 	    profile_func (""),
 	    warmup_func (""),
 	    start_config (""),
+	    warn_write_to_code (true),
+	    warn_write_to_rom (false),
+	    allow_write_to_rom (false),
+	    // MeP-specific
+	    model_busses (false),
+	    dsp_user_out (false),
+	    corrupt_caches (false),
+	    // End MeP-specific
 	    step_insn_count ("10000")
   {}
   string cpu;
@@ -533,6 +648,13 @@ struct Defs {
   string warmup_func;
   string start_config;
   string step_insn_count;
+  bool warn_write_to_code;
+  bool warn_write_to_rom;
+  bool allow_write_to_rom;
+  // MeP-specific
+  bool model_busses;
+  bool dsp_user_out;
+  bool corrupt_caches;
 };
   
 struct BoardConfig
@@ -587,7 +709,22 @@ main(int argc, char* argv[])
 		    opt_trace_disassemble, opt_trace_counter, opt_trace_core,
 		    opt_final_insn_count, opt_eb, opt_el, opt_gprof,
 		    opt_ulog_level, opt_ulog_mode, opt_ulog_file,
-		    opt_warmup, opt_warmup_func };
+		    opt_warmup, opt_warmup_func,
+		    opt_warn_write_to_code, no_opt_warn_write_to_code,
+  		    opt_warn_write_to_rom, opt_allow_write_to_rom,
+		    // Mep-specific options
+		    opt_model_busses,
+		    opt_dsp_user_out, opt_no_dsp_user_out,
+		    opt_local_mem, opt_global_mem, opt_shadow_mem,
+		    opt_biu_width, opt_insn, opt_no_insn,
+		    opt_imem_size, opt_dmem_size, opt_dmem_bank_num,
+		    opt_dmem_fixed_start_address, opt_dmem_no_fixed_start_address,
+		    opt_icache_size, opt_icache_line_size, opt_icache_way, opt_icache_cwf,
+		    opt_dcache_size, opt_dcache_line_size, opt_dcache_way, opt_dcache_cwf,
+		    opt_dmac_channel_bitw, opt_dmac_rectangle, opt_dmac_no_rectangle,
+		    opt_corrupt_caches,
+		    opt_intc_channel_bitw, opt_intc_level,
+		    opt_timer_channel_bitw };
 		    
   int curr_opt;
 
@@ -639,6 +776,40 @@ main(int argc, char* argv[])
     {"ulog-file",         required_argument, &curr_opt, opt_ulog_file },
     {"warmup",            no_argument, &curr_opt, opt_warmup },
     {"warmup-func",       required_argument, &curr_opt, opt_warmup_func },
+    {"warn-write-to-code",no_argument, & curr_opt, opt_warn_write_to_code },
+    {"no-warn-write-to-code",no_argument, & curr_opt, no_opt_warn_write_to_code },
+    {"warn-write-to-rom",no_argument, & curr_opt, opt_warn_write_to_rom },
+    {"allow-write-to-rom",no_argument, & curr_opt, opt_allow_write_to_rom },
+    // Mep-specific options
+    {"model-busses",no_argument, & curr_opt, opt_model_busses },
+    {"dsp-user-out",no_argument, & curr_opt, opt_dsp_user_out },
+    {"no-dsp-user-out",no_argument, & curr_opt, opt_no_dsp_user_out },
+    {"local-mem",required_argument, & curr_opt, opt_local_mem },
+    {"global-mem",required_argument, & curr_opt, opt_global_mem },
+    {"shadow-mem",required_argument, & curr_opt, opt_shadow_mem },
+    {"dmac-channel-bitw",required_argument, & curr_opt, opt_dmac_channel_bitw },
+    {"biu-width",required_argument, & curr_opt, opt_biu_width },
+    {"dmac-rectangle",no_argument, & curr_opt, opt_dmac_rectangle },
+    {"dmac-no-rectangle",no_argument, & curr_opt, opt_dmac_no_rectangle },
+    {"insn",required_argument, & curr_opt, opt_insn },
+    {"no-insn",required_argument, & curr_opt, opt_no_insn },
+    {"imem-size",required_argument, & curr_opt, opt_imem_size },
+    {"dmem-size",required_argument, & curr_opt, opt_dmem_size },
+    {"dmem-bank-num",required_argument, & curr_opt, opt_dmem_bank_num },
+    {"dmem-fixed-start-address",no_argument, & curr_opt, opt_dmem_fixed_start_address },
+    {"dmem-no-fixed-start-address",no_argument, & curr_opt, opt_dmem_no_fixed_start_address },
+    {"icache-size",required_argument, & curr_opt, opt_icache_size },
+    {"icache-line-size",required_argument, & curr_opt, opt_icache_line_size },
+    {"icache-way",required_argument, & curr_opt, opt_icache_way },
+    {"icache-cwf",required_argument, & curr_opt, opt_icache_cwf },
+    {"dcache-size",required_argument, & curr_opt, opt_dcache_size },
+    {"dcache-line-size",required_argument, & curr_opt, opt_dcache_line_size },
+    {"dcache-way",required_argument, & curr_opt, opt_dcache_way },
+    {"dcache-cwf",required_argument, & curr_opt, opt_dcache_cwf },
+    {"corrupt-caches",no_argument, & curr_opt, opt_corrupt_caches },
+    {"intc-channel-bitw",required_argument, & curr_opt, opt_intc_channel_bitw },
+    {"intc-level",required_argument, & curr_opt, opt_intc_level },
+    {"timer-channel-bitw",required_argument, & curr_opt, opt_timer_channel_bitw },
     { 0, 0, NULL, 0 }
  };
 
@@ -730,6 +901,22 @@ main(int argc, char* argv[])
 			curr_board->add_profile_func (defaults.profile_func);
 			if (defaults.step_insn_count != "10000")
 			  curr_board->set_step_insn_count(defaults.step_insn_count);
+			if (defaults.warn_write_to_code)
+			  curr_board->set_warn_write_to_code(true);
+			else
+			  curr_board->set_warn_write_to_code(false);
+			if (defaults.warn_write_to_rom)
+			  curr_board->set_warn_write_to_rom(true);
+			if (defaults.allow_write_to_rom)
+			  curr_board->set_allow_write_to_rom(true);
+			// Mep-specific options
+			curr_board->set_config_index (i - boards);
+			if (defaults.model_busses)
+			  curr_board->set_model_busses(true);
+			if (defaults.dsp_user_out)
+			  curr_board->set_dsp_user_out(true);
+			if (defaults.corrupt_caches)
+			  curr_board->set_corrupt_caches(true);
 			break;
 		      }
 		  }
@@ -1034,6 +1221,217 @@ main(int argc, char* argv[])
 	      need_sess (sess, verbose_p);
 	      sess->profile_config (optstring ());
 	      break;
+
+	    case opt_warn_write_to_code:
+	      if (curr_board)
+		curr_board->set_warn_write_to_code (true);
+	      else
+		defaults.warn_write_to_code = true;
+	      break;
+
+	    case no_opt_warn_write_to_code:
+	      if (curr_board)
+		curr_board->set_warn_write_to_code (false);
+	      else
+		defaults.warn_write_to_code = false;
+	      break;
+
+	    case opt_warn_write_to_rom:
+	      if (curr_board)
+		curr_board->set_warn_write_to_rom (true);
+	      else
+		defaults.warn_write_to_rom = true;
+	      break;
+
+	    case opt_allow_write_to_rom:
+	      if (curr_board)
+		curr_board->set_allow_write_to_rom (true);
+	      else
+		defaults.allow_write_to_rom = true;
+	      break;
+
+	      // Mep-specific options.
+	    case opt_model_busses:
+	      if (curr_board)
+		{
+		  curr_board->set_model_busses (true);
+		  board_start_config += " --model-busses";
+		}
+	      else
+		{
+		  defaults.model_busses = true;
+		  defaults.start_config += " --model-busses";
+		}
+	      break;
+
+	    case opt_dsp_user_out:
+	      if (curr_board)
+		curr_board->set_dsp_user_out (true);
+	      else
+		defaults.dsp_user_out = true;
+	      break;
+
+	    case opt_no_dsp_user_out:
+	      if (curr_board)
+		curr_board->set_dsp_user_out (false);
+	      else
+		defaults.dsp_user_out = false;
+	      break;
+
+	    case opt_local_mem:
+	      if (curr_board)
+		curr_board->set_opt_local_mem (optstring ());
+	      break;
+	      
+	    case opt_global_mem:
+	      if (curr_board)
+		curr_board->set_opt_global_mem (optstring ());
+	      break;
+	      
+	    case opt_shadow_mem:
+	      if (curr_board)
+		curr_board->set_opt_shadow_mem (optstring ());
+	      break;
+	      
+	    case opt_dmac_channel_bitw:
+	      if (curr_board)
+		curr_board->set_opt_dmac_channel_bitw (optstring ());
+	      break;
+
+	    case opt_biu_width:
+	      if (curr_board)
+		curr_board->set_opt_biu_width (optstring ());
+	      break;
+	      
+	    case opt_dmac_rectangle:
+	      if (curr_board)
+		curr_board->set_opt_dmac_rectangle (true);
+	      break;
+	      
+	    case opt_dmac_no_rectangle:
+	      if (curr_board)
+		curr_board->set_opt_dmac_rectangle (false);
+	      break;
+	      
+	    case opt_insn:
+	      if (curr_board)
+		curr_board->set_opt_insn (optstring ());
+	      break;
+	      
+	    case opt_no_insn:
+	      if (curr_board)
+		curr_board->set_opt_no_insn (optstring ());
+	      break;
+	      
+	    case opt_imem_size:
+	      if (curr_board)
+		curr_board->set_opt_imem_size (optstring ());
+	      break;
+	      
+	    case opt_dmem_size:
+	      if (curr_board)
+		curr_board->set_opt_dmem_size (optstring ());
+	      break;
+	      
+	    case opt_dmem_bank_num:
+	      if (curr_board)
+		curr_board->set_opt_dmem_bank_num (optstring ());
+	      break;
+	      
+	    case opt_dmem_fixed_start_address:
+	      if (curr_board)
+		curr_board->set_opt_dmem_fixed_start_address (true);
+	      break;
+	      
+	    case opt_dmem_no_fixed_start_address:
+	      if (curr_board)
+		curr_board->set_opt_dmem_fixed_start_address (false);
+	      break;
+	      
+	    case opt_icache_size:
+	      if (curr_board)
+		curr_board->set_opt_icache_size (optstring ());
+	      break;
+	      
+	    case opt_icache_line_size:
+	      if (curr_board)
+		curr_board->set_opt_icache_line_size (optstring ());
+	      break;
+	      
+	    case opt_icache_way:
+	      if (curr_board)
+		curr_board->set_opt_icache_way (optstring ());
+	      break;
+	      
+	    case opt_icache_cwf:
+	      {
+		string cwf = optstring();
+		if (cwf == "on" || cwf == "off")
+		  {
+		    if (curr_board)
+		      curr_board->set_opt_icache_cwf (cwf);
+		  }
+		else
+		  {
+		    cerr << "error: --icache-cwf must be either on or off" << endl;
+		    exit (8);
+		  }
+	      }
+	      break;
+
+	    case opt_dcache_size:
+	      if (curr_board)
+		curr_board->set_opt_dcache_size (optstring ());
+	      break;
+	      
+	    case opt_dcache_line_size:
+	      if (curr_board)
+		curr_board->set_opt_dcache_line_size (optstring ());
+	      break;
+	      
+	    case opt_dcache_way:
+	      if (curr_board)
+		curr_board->set_opt_dcache_way (optstring ());
+	      break;
+	      
+	    case opt_dcache_cwf:
+	      {
+		string cwf = optstring();
+		if (cwf == "on" || cwf == "off")
+		  {
+		    if (curr_board)
+		      curr_board->set_opt_dcache_cwf (cwf);
+		  }
+		else
+		  {
+		    cerr << "error: --dcache-cwf must be either on or off" << endl;
+		    exit (8);
+		  }
+	      }
+	      break;
+
+	    case opt_corrupt_caches:
+	      if (curr_board)
+		curr_board->set_corrupt_caches (true);
+	      else
+		defaults.corrupt_caches = true;
+	      break;
+
+	    case opt_intc_channel_bitw:
+	      if (curr_board)
+		curr_board->set_opt_intc_channel_bitw (optstring ());
+	      break;
+	      
+	    case opt_intc_level:
+	      if (curr_board)
+		curr_board->set_opt_intc_level (optstring ());
+	      break;
+
+	    case opt_timer_channel_bitw:
+	      if (curr_board)
+		curr_board->set_opt_timer_channel_bitw (optstring ());
+	      break;
+	      // End Mep-specific options.
 	    }
 	  break;
 

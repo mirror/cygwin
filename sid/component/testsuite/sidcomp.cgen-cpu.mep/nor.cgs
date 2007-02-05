@@ -1,0 +1,27 @@
+# mep testcase for nor $rn,$rm -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global nor
+nor:
+	# Test that nor (x, 0) = ~x.
+	mov $0, 0x55
+	mov $1, 0
+	nor $1, $0
+	# Compute ~x.
+	mov $4, -1
+	xor $4, $0
+	sub $4, $1
+	bnez $4, wrong
+
+	# Test that nor (x, all-1s) = 0.
+	mov $0, 0x6c
+	mov $1, -1
+	nor $0, $1
+	assert $0, 0
+
+okay:
+	pass
+wrong:
+	fail

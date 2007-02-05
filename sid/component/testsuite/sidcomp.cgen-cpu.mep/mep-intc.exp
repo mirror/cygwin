@@ -1,0 +1,16 @@
+# MeP external component tests for INTC
+
+if {! $sidtarget(mep)} then { untested "hw-cpu-mep not available"; return }
+
+# Load a baseboard description for SID simulators.
+load_base_board_description "basic-sid"
+load_lib "cpudefs.exp"
+
+# all machines
+set all_machs "mep"
+set gas_debug_flags ""
+set ld_intc_flags "-T $srcdir/sidcomp.cgen-cpu.mep/intc.ld"
+
+run-sid-tests-raw mep-elf mep $srcdir/sidcomp.cgen-cpu.mep "*.intc" \
+    $gas_debug_flags $ld_intc_flags \
+    "" mep-intc-gloss.conf x

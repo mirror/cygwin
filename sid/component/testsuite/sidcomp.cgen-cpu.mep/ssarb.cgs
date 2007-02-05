@@ -1,0 +1,34 @@
+# mep testcase for ssarb $disp2($rm) -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global ssarb
+ssarb:
+	mov $5, -1
+	# $5 & 0x3 will be 3.
+
+	# This should load SAR with 3+0 => 24.
+	ssarb 0($5)
+	ldc $0, $sar
+	assert $0, 24
+
+	# Likewise, 3+1 => 4 => 0*8 => 0.
+	ssarb 1($5)
+	ldc $0, $sar
+	assert $0, 0
+
+	# Likewise, 3+2 => 5 => 1*8 => 8.
+	ssarb 2($5)
+	ldc $0, $sar
+	assert $0, 8
+
+	# Likewise, 3+3 => 6 => 2*8 => 16.
+	ssarb 3($5)
+	ldc $0, $sar
+	assert $0, 16
+	
+okay:
+	pass
+wrong:
+	fail

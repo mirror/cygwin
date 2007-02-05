@@ -1,0 +1,29 @@
+# mep testcase for extuh $rn -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+	.global extuh
+extuh:
+	# This should put 0x5500 in $0.
+	mov $0, 0x55
+	sll $0, 8
+	mov $1, $0
+	extuh $0
+	sub $1, $0
+	bnez $1, wrong
+
+	# This should put 0xffaa in $0.
+	mov $0, -86
+	extuh $0
+	mov $1, -86
+	sll $1, 16
+	srl $1, 16
+	sub $1, $0
+	bnez $1, wrong 
+
+okay:
+	pass
+wrong:
+	fail

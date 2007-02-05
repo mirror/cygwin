@@ -1,0 +1,38 @@
+# mep testcase for sadd $rn,$rm -*- Asm -*-
+# configline(): set cpu sat-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global sadd
+sadd:
+	# Null addition.
+	mov $1, 0
+	mov $2, 0
+	sadd $1, $2
+	assert $1, 0
+
+	# Simple addition.
+	mov $1, 10
+	mov $2, 3
+	sadd $1, $2
+	assert $1, 13
+
+	# Overflow condition.
+	# Generate the maximum positive value in 32 bits.
+	mov $1, -1
+	srl $1, 1
+	# Adding 3 will overflow.
+	mov $2, 3
+	sadd $1, $2
+
+	# Verify $1 = -1 >> 1.
+	mov $3, -1
+	srl $3, 1
+	sub $3, $1
+	bnez $3, wrong
+
+okay:
+	pass
+wrong:
+	fail

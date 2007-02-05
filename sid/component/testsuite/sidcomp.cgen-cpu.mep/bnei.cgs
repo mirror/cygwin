@@ -1,0 +1,19 @@
+# mep testcase for bnei $rn,$imm4,$disp17a2 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global bnei
+bnei:
+	mov $1, 5
+	bnei $1, 5, wrong
+	mov $1, 7
+	bnei $1, 3, okay
+	fail
+
+.org 0x4000
+wrong:
+	fail
+
+okay:
+	pass

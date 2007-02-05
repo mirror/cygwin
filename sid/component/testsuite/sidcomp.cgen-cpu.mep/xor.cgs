@@ -1,0 +1,29 @@
+# mep testcase for xor $rn,$rm -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global xor
+xor:
+	# Test that xor (x, 0) = x.
+	mov $0, -86
+	mov $1, 0
+	xor $0, $1
+	assert $0, -86
+
+	# Test that xor (all-5s, all-As) = all-1s.
+	mov $0, 0x55
+	mov $1, -86
+	xor $0, $1
+	assert $0, -1
+
+	# Test that xor (all-5s, all-1s) = all-As.
+	mov $0, 0x55
+	mov $1, -1
+	xor $0, $1
+	assert $0, -86
+
+okay:
+	pass
+wrong:
+	fail

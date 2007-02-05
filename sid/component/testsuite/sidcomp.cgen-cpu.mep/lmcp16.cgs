@@ -1,0 +1,12 @@
+# mep testcase for lmcp $crn,$disp16($rm) -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global lmcp16
+lmcp16:
+	# This instruction is exercised by the smcp16 test case.
+	mov $1, 0x40
+	lmcp $cr3,102($1)
+	pass

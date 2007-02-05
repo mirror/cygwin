@@ -1,0 +1,15 @@
+# mep testcase for add3 $rn,$rm,$imm16 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global add3x
+add3x:
+	mov $2, 2
+	add3 $1, $2, 3
+	# The sum should be 5.
+	assert $1, 5
+okay:
+	pass
+wrong:
+	fail

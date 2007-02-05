@@ -1,6 +1,6 @@
 // sidblockingutil.h - Elements used for blockable components.  -*- C++ -*-
 
-// Copyright (C) 2004, 2005 Red Hat.
+// Copyright (C) 2004, 2005, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -37,7 +37,7 @@ namespace sidutil
 			      & blocking_component::set_blockable,
 			      "setting");
       }
-    ~blocking_component () throw()
+    ~blocking_component ()
       {
       }
 

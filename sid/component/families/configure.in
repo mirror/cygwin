@@ -20,6 +20,10 @@ CY_SIDTARGET_CHECK
 # to the list.
 family_subdirs=
 
+if test $sidtarget_mep -eq 1; then
+	family_subdirs="$family_subdirs mep"
+	AC_CONFIG_SUBDIRS(mep)
+fi
 
 AC_SUBST(family_subdirs)
 AC_OUTPUT([Makefile])

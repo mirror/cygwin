@@ -2,7 +2,7 @@
 // mappings between application objects and their string
 // representations.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2003, 2005 Red Hat.
+// Copyright (C) 1999, 2000, 2003, 2005, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -399,7 +399,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
   public:
     virtual std::string make_attribute() const = 0;
     virtual sid::component::status parse_attribute(const std::string& str) = 0;
-    virtual ~attribute_coder_base() throw() {}
+    virtual ~attribute_coder_base() {}
   };
 
 
@@ -431,7 +431,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
     parse_attribute (const std::string& str)
       { return (receiver->*setter) (str); }
 
-    ~attribute_coder_virtual() throw() { }
+    ~attribute_coder_virtual() { }
   };
 
 
@@ -455,7 +455,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
     parse_attribute (const std::string& str)
       { return receiver->set_attribute_value (name, str); }
 
-    ~attribute_coder_alias() throw() { }
+    ~attribute_coder_alias() { }
   };
 
 
@@ -498,7 +498,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	return (receiver->*setter) (parameter, str);
       }
 
-   ~attribute_coder_virtual_parameterized() throw() { }
+   ~attribute_coder_virtual_parameterized() { }
 
   };
 
@@ -523,7 +523,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	return sidutil::parse_attribute (str, *ptr);
       }
 
-    ~attribute_coder() throw() { }
+    ~attribute_coder() { }
   };
 
 
@@ -543,7 +543,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	return sid::component::bad_value;
       }
     
-    ~attribute_coder_ro() throw() { }
+    ~attribute_coder_ro() { }
   };
 
 
@@ -568,7 +568,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	return sid::component::bad_value; 
       }
     
-    ~attribute_coder_ro_value() throw() { }
+    ~attribute_coder_ro_value() { }
  
   };
 
@@ -632,7 +632,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	else return sid::component::bad_value;
       }
     
-    ~attribute_coder_bus_rw() throw() { }
+    ~attribute_coder_bus_rw() { }
   };
 
 
@@ -675,7 +675,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	return s;
       }
 
-   ~attribute_coder_bus_wo() throw() { }
+   ~attribute_coder_bus_wo() { }
 
   private:
     std::string last_written_attribute;
@@ -719,7 +719,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
     // the compiler working set blew up.
     
   protected:
-    ~fixed_attribute_map_component () throw() { /* XXX: delete coder objects */ }
+    ~fixed_attribute_map_component () { /* XXX: delete coder objects */ }
 
     // Add or remove an attribute <-> category association.  The named
     // attribute must already exist.
@@ -1031,7 +1031,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 			       & configurable_component::dynamic_config,
 			       & configurable_component::nothing);
       }
-    ~configurable_component() throw() {}
+    ~configurable_component() {}
 
     // Dynamic reconfiguration support
   private:
@@ -1070,7 +1070,7 @@ make_attribute (const sid::any_int<IntType,IsBig>& value)
 	add_pin ("ulog-out", & ulog_out_pin);
 	ulog_logger =  new logger (& ulog_out_pin, buffer_output, ulog_level, ulog_mode);
       }
-    ~fixed_attribute_map_with_logging_component () throw()
+    ~fixed_attribute_map_with_logging_component ()
       {
 	// Output any saved messages.
 	ulog_logger->output_saved_messages ();

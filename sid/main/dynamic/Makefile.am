@@ -10,9 +10,17 @@ bin_PROGRAMS = sid
 TARGETCFGS = shCfg.cxx
 TARGETDEFINES =
 
+if SIDTARGET_MEP
+FAM9LIB = ../../component/families/mep/libmepfamily.la
+FAM9LIB2 = -dlpreopen ../../component/families/mep/libmepfamily.la
+TARGETCFGS += mepCfg.cxx
+TARGETDEFINES += -DSIDTARGET_MEP
+endif
+
 if SIDTARGET_SH
 TARGETDEFINES += -DSIDTARGET_SH
 endif
+
 if SIDTARGET_SH64
 TARGETDEFINES += -DSIDTARGET_SH64
 endif

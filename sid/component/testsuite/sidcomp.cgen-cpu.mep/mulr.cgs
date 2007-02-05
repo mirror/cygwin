@@ -1,0 +1,67 @@
+# mep testcase for mulr $rn,$rm -*- Asm -*-
+# configline(): set cpu mul-option? true
+# mach: all
+
+	.include "testutils.inc"
+        .macro assert_hilo hi lo
+        ldc $8, $hi
+        assert $8, \hi
+        ldc $8, $lo
+        assert $8, \lo
+        .endm
+
+	.macro assert_lo_eq reg
+	ldc $8, $lo
+	sub $8, \reg
+	bnez $8, wrong
+	.endm
+
+	start
+	.global mulr
+mulr:
+	# 5 * 0 = 0.
+	mov $0, 5
+	mov $1, 0
+	mulr $0, $1
+	assert_hilo 0, 0
+	assert_lo_eq $0
+
+	# 3 * 1 = 3.
+	mov $0, 3
+	mov $1, 1
+	mulr $0, $1
+	assert_hilo 0, 3
+	assert_lo_eq $0
+
+	# 2 * 3 = 6. 
+	mov $0, 2
+	mov $1, 3
+	mulr $0, $1
+	assert_hilo 0, 6
+	assert_lo_eq $0
+
+	bra cont
+wrong:
+	fail
+cont:
+	# 2 * -3 = -6.
+	mov $0, 2
+	mov $1, -3
+	mulr $0, $1
+	assert_hilo -1, -6
+	assert_lo_eq $0
+
+	# -2 * 3 = -6.
+	mov $0, -2
+	mov $1, 3
+	mulr $0, $1
+	assert_lo_eq $0
+
+	# -2 * -3 = 6.
+	mov $1, -2
+	mov $2, -3
+	mulr $1, $2
+	assert_lo_eq $1
+
+okay:
+	pass

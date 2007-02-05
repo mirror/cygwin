@@ -1,0 +1,19 @@
+# mep testcase for jmp $rm -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global jmp
+jmp:
+	# load $0 with address of <foo>
+	mov $0, %lo(foo)
+	# now jump to it
+	jmp $0
+	fail
+	fail
+	fail
+
+foo:	
+	pass
+	fail
+	fail

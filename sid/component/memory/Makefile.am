@@ -7,6 +7,7 @@ pkglib_LTLIBRARIES = libmemory.la
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include
 noinst_HEADERS = generic.h ramrom.h flash.h at29.h
 libmemory_la_SOURCES = components.cxx generic.cxx ramrom.cxx flash.cxx \
+		       mep-cache-tag.cxx \
                        at29.cxx am29.cxx
 libmemory_la_LDFLAGS = -module -no-undefined
 

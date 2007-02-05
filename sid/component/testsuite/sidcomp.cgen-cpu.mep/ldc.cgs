@@ -1,0 +1,32 @@
+# mep testcase for ldc $rn,$csrn -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+	.global ldc
+ldc:
+	mov $0, 0x23
+	# Stores to $pc should be a nop.
+	stc $0, $pc
+	# Load it back -- it should be .+2
+	ldc $1, $pc
+
+	mov $0, 0x34
+	# Store 0x34 to $lp.
+	stc $0, $lp
+	# Verify.
+	ldc $1, $lp
+	assert $1, 0x34
+
+	mov $0, 0x45
+	# Store 0x45 to $rpe.
+	stc $0, $rpe
+	# Verify.
+	ldc $1, $rpe
+	assert $1, 0x45
+
+okay:
+	pass
+wrong:
+	fail

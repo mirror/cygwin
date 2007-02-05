@@ -1,0 +1,253 @@
+         hw-debug-mep (libmepfamily.la :: mepfamily_component_library)
+
+Synopsis:
+
+   This component models the MeP debug support unit (DSU). The programmable
+   DSU supports a number of debugging facilities, including:
+     * single step
+     * instruction address break
+     * data address/value break
+     * debug breakpoint
+     * debug interrupt
+
+     ----------------------------------------------------------------------
+
+Functionality:
+
+  Modelling:
+
+   The DSU is configured through three banks of memory-mapped control
+   registers, presented as the status-regs, insn-regs and data-regs buses.
+   They are conventionally mapped to the base addresses 0x800, 0x900 and
+   0xA00 respectively. The following registers are mapped:
+
+   +------------------------------------------------------------------------+
+   | bus         | address | bits  | R/W | name |                           |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | status-regs | 0       | 14    |     | R    | halt status               |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | status-regs | 0       | 4     |     | R/W  | enable interrupts         |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | status-regs | 0       | 3     |     | R/W  | enable nmi                |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | status-regs | 1       | 27:24 |     | R    | instruction break channel |
+   |             |         |       |     |      | number                    |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | status-regs | 1       | 0     |     | R/W  | instruction break status  |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | status-regs | 2       | 27:24 |     | R    | data break channel number |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | status-regs | 2       | 0     |     | R/W  | data break status         |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | insn-regs   | 0       | 31:1  |     | R/W  | instruction break address |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | insn-regs   | 1       | 0     |     | R/W  | instruction break enable  |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | insn-regs   | 2       | 31:1  |     | R/W  | instruction break mask    |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 0       | 31:2  |     | R/W  | data break address        |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 0     |     | R/W  | data break enable         |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 13    |     | R/W  | no store break            |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 12    |     | R/W  | no load break             |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 4     |     | R/W  | byte lane mask 0          |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 5     |     | R/W  | byte lane mask 1          |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 6     |     | R/W  | byte lane mask 2          |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 7     |     | R/W  | byte lane mask 3          |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 8     |     | R/W  | byte lane mask 4          |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 9     |     | R/W  | byte lane mask 5          |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 10    |     | R/W  | byte lane mask 6          |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 11    |     | R/W  | byte lane mask 7          |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 14    |     | R/W  | byte address ignored 0    |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 15    |     | R/W  | byte address ignored 1    |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 16    |     | R/W  | byte address ignored 2    |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 17    |     | R/W  | byte address ignored 3    |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 18    |     | R/W  | byte address ignored 4    |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 19    |     | R/W  | byte address ignored 5    |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 20    |     | R/W  | byte address ignored 6    |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 1       | 21    |     | R/W  | byte address ignored 7    |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 2       | 31:2  |     | R/W  | data break mask           |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 3       | 31:0  |     | R/W  | reserved                  |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 4       | 31:0  |     | R/W  | data value break          |
+   |-------------+---------+-------+-----+------+---------------------------|
+   | data-regs   | 5       | 31:0  |     | R/W  | data value break upper    |
+   +------------------------------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                    Behaviors                    |
+   |-------------------------------------------------|
+   |  pass through | Bus accesses that are of no     |
+   |               | interest to the DSU are passed  |
+   |               | through.                        |
+   |---------------+---------------------------------|
+   | configuration | The DSU is configured through   |
+   |               | its memory-mapped configuration |
+   |               | registers. These registers are  |
+   |               | outlined above. Please refer to |
+   |               | the Media Engine User's Guide   |
+   |               | for a detailed explanation of   |
+   |               | each register.                  |
+   |---------------+---------------------------------|
+   |         debug | The DSU produces a debug        |
+   |    exceptions | exception when one or more      |
+   |               | critera (such as a matched      |
+   |               | instruction address) are met.   |
+   |               | The debug exception code is     |
+   |               | driven on the exception! pin    |
+   |               | with a value comprised of the   |
+   |               | bitwise OR of the following     |
+   |               | bitfields:                      |
+   |               |                                 |
+   |               | +-----------------------------+ |
+   |               | | condition           | value | |
+   |               | |---------------------+-------| |
+   |               | | single step         | 0x1   | |
+   |               | |---------------------+-------| |
+   |               | | instruction address | 0x2   | |
+   |               | | break               |       | |
+   |               | |---------------------+-------| |
+   |               | | data address/value  | 0x4   | |
+   |               | | break               |       | |
+   |               | |---------------------+-------| |
+   |               | | debug breakpoint    | 0x8   | |
+   |               | |---------------------+-------| |
+   |               | | debug interrupt     | 0x10  | |
+   |               | +-----------------------------+ |
+   |               |                                 |
+   |               | The hw-cpu-mep component is     |
+   |               | designed to respond correctly   |
+   |               | in the event of these debug     |
+   |               | exceptions.                     |
+   |---------------+---------------------------------|
+   |    interrupts | Interrupts (regular and NMI)    |
+   |               | are passed through the DSU to   |
+   |               | the CPU from external sources.  |
+   |               | By clearing the EINT and ENMI   |
+   |               | bits in the debug control       |
+   |               | register (DCR), interrupts may  |
+   |               | be masked.                      |
+   +-------------------------------------------------+
+
+     ----------------------------------------------------------------------
+
+Environment:
+
+   related components
+     * This component typically inspects bus traffic between a hw-cpu-mep
+       component and the rest of the memory hierarchy.
+
+     * A hw-mapper-basic is responsible for mapping the control bus space
+       into the relevant control registers of the DSU.
+
+     ----------------------------------------------------------------------
+
+Component Reference:
+
+  Component: hw-debug-mep
+
+   +-------------------------------------------------+
+   |                      pins                       |
+   |-------------------------------------------------|
+   |    name     |direction|legalvalues|  behaviors  |
+   |-------------+---------+-----------+-------------|
+   |exception!   |out      |-          |debug        |
+   |             |         |           |exceptions   |
+   |-------------+---------+-----------+-------------|
+   |interrupt-in |in       |-          |interrupts   |
+   |-------------+---------+-----------+-------------|
+   |interrupt-out|out      |-          |interrupts   |
+   |-------------+---------+-----------+-------------|
+   |nmi-in       |in       |-          |interrupts   |
+   |-------------+---------+-----------+-------------|
+   |nmi-out      |out      |-          |interrupts   |
+   +-------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                      buses                      |
+   |-------------------------------------------------|
+   |    name     |addresses| accesses  |  behaviors  |
+   |-------------+---------+-----------+-------------|
+   |status-regs  |0..2     |32-bit     |configuration|
+   |             |         |words      |             |
+   |-------------+---------+-----------+-------------|
+   |insn-regs    |0..2     |32-bit     |configuration|
+   |             |         |words      |             |
+   |-------------+---------+-----------+-------------|
+   |data-regs    |0..6     |32-bit     |configuration|
+   |             |         |words      |             |
+   |-------------+---------+-----------+-------------|
+   |insn-upstream|any      |any        |pass through |
+   |-------------+---------+-----------+-------------|
+   |data-upstream|any      |any        |pass through |
+   +-------------------------------------------------+
+
+   +-------------------------------------------------------------+
+   |                         attributes                          |
+   |-------------------------------------------------------------|
+   |        name        |category | legal |default|  behaviors  ||
+   |                    |         |values | value |             ||
+   |--------------------+---------+-------+-------+-------------||
+   |insn-break-enabled? |read-only|boolean|-      |configuration||
+   |                    |register |       |       |             ||
+   |--------------------+---------+-------+-------+-------------||
+   |data-break-enabled? |read-only|boolean|-      |configuration||
+   |                    |register |       |       |             ||
+   |--------------------+---------+-------+-------+-------------||
+   |interrupts-enabled? |read-only|boolean|-      |configuration||
+   |                    |register |       |       |             ||
+   |--------------------+---------+-------+-------+-------------||
+   |nmi-enabled?        |read-only|boolean|-      |configuration||
+   |                    |register |       |       |             ||
+   |--------------------+---------+-------+-------+-------------||
+   |halted?             |read-only|boolean|-      |configuration||
+   |                    |register |       |       |             ||
+   |--------------------+---------+-------+-------+-------------||
+   |insn-break-channel-#|read-only|integer|-      |configuration||
+   |                    |register |       |       |             ||
+   |--------------------+---------+-------+-------+-------------||
+   |data-break-channel-#|read-only|integer|-      |configuration||
+   |                    |register |       |       |             ||
+   |--------------------+---------+-------+-------+-------------||
+   |insn-break-status   |read-only|boolean|-      |configuration||
+   |                    |register |       |       |             ||
+   |--------------------+---------+-------+-------+-------------||
+   |data-break-status   |read-only|boolean|-      |configuration||
+   |                    |register |       |       |             ||
+   +-------------------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                    accessors                    |
+   |-------------------------------------------------|
+   |       name        |  accesses  |   behaviors    |
+   |-------------------+------------+----------------|
+   | insn-downstream   | any        | pass through   |
+   |-------------------+------------+----------------|
+   | data-downstream   | any        | pass through   |
+   +-------------------------------------------------+
+
+     ----------------------------------------------------------------------
+
+References:
+
+   Toshiba Media Engine User's Manual, Section 3.11.8.

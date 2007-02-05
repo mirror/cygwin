@@ -19,6 +19,7 @@ lcd             liblcd-char-display.la  lcd_char_display_component_library Red H
 loader          libloader.la            loader_component_library           Red Hat
 mapper          libmapper.la            mapper_component_library           Red Hat
 memory          libmemory.la            mem_component_library              Red Hat
+mepfamily	libmepfamily.la		mepfamily_component_library	   Red Hat
 mmu             libmmu.la               mmu_component_library              Red Hat
 parport         libparport.la           parport_component_library          Red Hat
 profiling       libprof.la              prof_component_library             Red Hat
@@ -42,6 +43,7 @@ hw-cache-*		Other memory caches (ref. component docs)
 hw-cpu-arm7t            ARM7 / ARM7T CPU model
 hw-cpu-x86		X86 CPU model
 hw-cpu-m32r/d           M32R/D CPU model
+hw-cpu-mep		Toshiba Media Processor (MeP) CPU model
 hw-cpu-sh2		SH2   CPU model
 hw-cpu-sh2e		SH2e  CPU model
 hw-cpu-sh2a-nofpu	SH2a  CPU model no fpu
@@ -60,8 +62,10 @@ hw-cpu-sh5-compact	SH5   CPU model compact ISA
 hw-cpu-sh5-32media	SH5   CPU model 32 bit compact and media ISAs
 hw-cpu-sh5-64media	SH5   CPU model 64 bit compact and media ISAs
 hw-cpu-xstormy16        Sanyo Xstormy16 CPU model
+hw-debug-mep		Toshiba MeP debug support unit (DSU)
 hw-disk-harddrive	Newer IDE hard drive model (controller + drives)
 hw-disk-ide             IDE hard drive model (controller + drives)
+hw-dma-mep		Toshiba MeP DMA controller
 hw-glue-bus-mux         Bus multiplexer
 hw-glue-pin-pacer	Pin signal FIFO queue.
 hw-glue-probe-bus       Bus traffic tracer
@@ -69,6 +73,7 @@ hw-glue-sequence        Sequential pin event dispatcher
 hw-input-keyboard	PC keyboard model
 hw-interrupt-arm/ref    ARM7 reference peripheral: interrupt controller
 hw-interrupt-cogent/cma222      Interrupt controller: Cogent CMA222 ARM CPU board
+hw-interrupt-mep	Toshiba MeP interrupt controller unit
 hw-lcd-hd44780u         HD44780U LCD controller
 hw-lcd-char-display     curses based LCD display
 hw-mapper-basic         Generic address space decoder/mapper

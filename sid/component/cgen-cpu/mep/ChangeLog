@@ -1,0 +1,1682 @@
+2007-01-03  Dave Brolley  <brolley@redhat.com>
+
+	* Makefile.am (libmep_la_LIBADD): Remove cgen-bitset.lo.
+	(cgen-bitset.lo): Target removed.
+	* Makefile.in: Regenerated.
+
+2006-10-23  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (step_insns): Restore save_pc in all cases.
+	* common_model.h (class mep_common_model): Do not define MAX_UNITS or
+	UNIT_U_EXEC.
+
+2006-09-27  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (step_insns): Don't decrement this->gprof_counter when
+	stalled. Temporarily restore the pc of the insn before calling
+	stop_after_insns_p so that any generated gprof trace uses that pc.
+	* Makefile.am (libmep_la_LIBADD): Add cgen-bitset.lo.
+	(cgen-bitset.lo): New target.
+	* Makefile.in: Regenerated.
+
+2006-08-29  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (done_insn): Clear bit_insn_p.
+	(done_cti_insn): Clear bit_insn_p.
+	(check_option_bit): Set bit_insn_p.
+	(bit_insn_p): New member of mep_cpu.
+	(bit_insn_bad_address_pin): New member of mep_cpu.
+	(bit_insn_bad_address_pin_handler): New method of mep_cpu.
+	* mep.cxx (mep_cpu): Initialize bit_insn_bad_address_pin. Add
+	bit-insn-bad-address pin.
+	(reset): Initizlize bit_insn_p.
+	(bit_insn_bad_address_pin_handler): New method of mep_cpu.
+
+2005-08-24  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (cgen_set_csr_value): Ensure that the LTOM, ETOM and NTOM
+	fields of the the LP, EPC and NPC registers respectively are read-only
+	when VLIW is disabled.
+
+2005-08-22  Dave Brolley  <brolley@redhat.com>
+
+	* Merge these changes:
+
+	2005-07-13  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (dynamic_config): New virtual override in mep_cpu.
+	(configure): Don't handle "insn-count=" here.
+	* fmax-cpu.h (fmax_fr_get_handler): Set the CAUSE field based on
+	'detected'.
+	* mep.h (dynamic_config): New virtual override in mep_cpu.
+	* mep*-model.cxx: Regenerated.
+	* mep*-sem.cxx: Regenerated.
+
+	2005-07-05  Dave Brolley  <brolley@redhat.com>
+
+	* fmax-cpu.h (fmax_fr_get_handler): Don't clear redundant 'inexact',
+	'overflow' or 'underflow' in the CAUSE field.
+
+	2005-06-21  Dave Brolley  <brolley@redhat.com>
+
+	* fmax-fpu.cxx (check_result): Set 'inexact' when 'underflow' is set.
+	* fmax-cpu.h (fmax_record_exception): Leave all FLAGS set.
+
+	2005-06-14  Dave Brolley  <brolley@redhat.com>
+
+	* fmax-cpu.h (fmax_record_exception): Leave overflow set in the
+	FLAG mask when overflow is not enabled and becomes inexact.
+	* fmax-fpu.cxx (check_result): Correct typo in comment.
+	* fmax-fp.cxx (integer): Set result to qnan if the input is
+	infinity.
+	(do_normal_underflow): New virtual override in fmax_fp.
+	(operator-): Don't apply 'neg' to nan.
+	* fmax-fp.h (do_normal_underflow): New virtual override in fmax_fp.
+
+	2005-06-06  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (mep_cpu): Initialize insn_buffer and
+	step_insn_count_1_required. Add step-insn-count-1-required
+	attribute. Add insn-buffer relation.
+	(do_syscall): Restore the passthrough pin to its previous
+	state after making the syscall.
+	(configure): Handle insn-count and model-busses.
+	* mep.h (step_insn_count_required): New member of mep_cpu.
+	(insn_buffer): Likewise.
+	(print_insn_summary): Check print_final_insn_count_p.
+	(disassemble): Restore the passthrough pin to its previous
+	state.
+	* hw-cpu-mep.xml: Add description of new interfaces.
+	* hw-cpu-mep.txt: Regenerated.
+
+	2005-05-29  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (branch): Call cgen_be_endian_cpu::branch.
+	(done_cti_insn): Call cgen_be_endian_cpu::done_cti_insn.
+	(configure): New virtual override in mep_cpu.
+	(get_gprof_sample_pin): New method of mep_cpu.
+	* mep.cxx (configure): New virtual override in mep_cpu.
+	* mep-core1-model.cxx,mep-core1-model-sem: Regenerated.
+	* mep-core2-model.cxx,mep-core2-model-sem: Regenerated.
+	* mep-model.cxx,mep-sem: Regenerated.
+
+	2005-05-20  Dave Brolley  <brolley@redhat.com>
+
+	* fmax-fpu.h (check_zero_sum): New method of fmax_fpu.
+	* fmax-fpu.cxx (check_zero_sum): New method of fmax_fpu.
+	(addsf): Call check_zero_sum.
+	(subsf): Likewise.
+
+	2005-05-18  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (do_ldz): Accept 'rm' by value.
+	* mep.h: (invalid_insn): Now virtual.
+	(do_ldz): Accept 'rm' by value.
+	* fmax.h (invalid_insn): New virtual override for fmax.
+	* fmax-fp.cxx (round_int_32): Preserve the sign for a
+	fraction shifted beyond its size.
+	* mep-cop2-16-decode.cxx: Regenerated.
+	* mep-cop2-32-decode.cxx: Regenerated.
+	* mep-cop2-48-decode.cxx: Regenerated.
+	* mep-cop2-64-decode.cxx: Regenerated.
+	* mep-core1-decode.cxx: Regenerated.
+	* mep-core2-decode.cxx: Regenerated.
+	* mep-core2-decode.h: Regenerated.
+	* mep-core2-model.cxx: Regenerated.
+	* mep-core2-model.h: Regenerated.
+	* mep-core2-sem.cxx: Regenerated.
+	* mep-decode.cxx: Regenerated.
+
+	2005-05-13  Dave Brolley  <brolley@redhat.com>
+
+	* fmax-fp.h (fmax_fp): New constructor taking 'enum cless_t'.
+	(operator+): New method of fmax_fp.
+	(operator-): New method of fmax_fp.
+	* fmax-fp.cxx (fmax_constant_qnan): New constant.
+	(integer): Return fmax_constant_qnan for nan input and for
+	input beyond the rang of an integer.
+	(round_int_32): Don't shift beyond the size of 'unrounded'.
+	(operator+): New method of fmax_fp.
+	(operator-): New method of fmax_fp.
+
+	2005-05-12  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (cgen_set_ccr_value): New virtual method of mep_cpu_cgen.
+	* avc-cpu.h: Remove avc_ccr_set_handler.
+	* avc.h: Renanme avc_ccr_set_handler to cgen_set_ccr_value.
+	* avc2-cpu.h: Remove avc2_ccr_set_handler.
+	* avc2.h: Renanme avc2_ccr_set_handler to cgen_set_ccr_value.
+	* fmax-cpu.h: Remove fmax_ccr_set_handler.
+	* fmax.h: Renanme fmax_ccr_set_handler to cgen_set_ccr_value.
+
+	2005-04-27  Dave Brolley  <brolley@redhat.com>
+
+	* fmax.h (fmax_ccr_set_handler): Actual implementation is now here.
+	* fmax-fpu.cxx (check_operand): Generated an exception for all
+	qnan operands.
+	* fmax-cpu.h (fmax_cc_set_handler): Now virtual with an empty
+	default implementation.
+	* mep_ext2.h: Regenerated.
+	* avc.h: New header.
+	* avc2.h: New header.
+	* avc-cpu.h: New header.
+	* avc2-cpu.h: New header.
+	* mep-cop2-32-decode.cxx: Regenerated.
+	* mep-cop2-32-decode.h: Regenerated.
+	* mep-cop2-32-model.cxx: Regenerated.
+	* mep-cop2-32-model.h: Regenerated.
+	* mep-cop2-32-sem.cxx: Regenerated.
+	* mep-core2-decode.cxx: Regenerated.
+	* mep-core2-sem.cxx: Regenerated.
+	* mep-cpu.h: Regenerated.
+
+	2005-04-22  Richard Sandiford  <rsandifo@redhat.com>
+
+	* Makefile.am, Makefile.in, common_model.cxx, mep.h,
+	mep_ext1.h: Apply automatic MeP-Integrator changes.
+	* mep-cop1-16-decode.cxx, mep-cop1-16-decode.h, mep-cop1-16-defs.h,
+	mep-cop1-16-model.cxx, mep-cop1-16-model.h, mep-cop1-16-sem.cxx,
+	mep-cop1-32-decode.cxx, mep-cop1-32-decode.h, mep-cop1-32-defs.h,
+	mep-cop1-32-model.cxx, mep-cop1-32-model.h, mep-cop1-32-sem.cxx,
+	mep-cop1-48-decode.cxx, mep-cop1-48-decode.h, mep-cop1-48-defs.h,
+	mep-cop1-48-model.cxx, mep-cop1-48-model.h, mep-cop1-48-sem.cxx,
+	mep-cop1-64-decode.cxx, mep-cop1-64-decode.h, mep-cop1-64-defs.h,
+	mep-cop1-64-model.cxx, mep-cop1-64-model.h,
+	mep-cop1-64-sem.cxx: Delete.
+	* mep-core1-decode.cxx, mep-core1-decode.h, mep-core1-model.cxx,
+	mep-core1-model.h, mep-core1-sem.cxx, mep-cpu.h, mep-decode.cxx,
+	mep-desc.h: Regenerate.
+	* mep-cop2-16-decode.cxx, mep-cop2-16-decode.h, mep-cop2-16-defs.h,
+	mep-cop2-16-model.cxx, mep-cop2-16-model.h, mep-cop2-16-sem.cxx,
+	mep-cop2-32-decode.cxx, mep-cop2-32-decode.h, mep-cop2-32-defs.h,
+	mep-cop2-32-model.cxx, mep-cop2-32-model.h, mep-cop2-32-sem.cxx,
+	mep-cop2-48-decode.cxx, mep-cop2-48-decode.h, mep-cop2-48-defs.h,
+	mep-cop2-48-model.cxx, mep-cop2-48-model.h, mep-cop2-48-sem.cxx,
+	mep-cop2-64-decode.cxx, mep-cop2-64-decode.h, mep-cop2-64-defs.h,
+	mep-cop2-64-model.cxx, mep-cop2-64-model.h, mep-cop2-64-sem.cxx,
+	mep-core2-decode.cxx, mep-core2-decode.h, mep-core2-defs.h,
+	mep-core2-model.cxx, mep-core2-model.h, mep-core2-sem.cxx: New files,
+	automatically generated by cgen.
+	* mep_ext2.h: New file, automatically generated by MeP-Integrator.
+
+	2005-04-20  Dave Brolley  <brolley@redhat.com>
+
+	* fmax.h (fmax_froundws): Access the fmax hardware
+	directly to avoid problems with CGEN.
+	* fmax-fpu.cxx (check_operand): Access the fmax hardware
+	directly to avoid problems with CGEN.
+	(check_result): Likewise.
+	(round): Likewise.
+
+	2005-04-12  Dave Brolley  <brolley@redhat.com>
+
+	* Makefile.am (mep-core1, mep-cop1-16, mep-cop1-32, mep-cop1-48) 
+	(mep-cop1-64): Remove unnecessary \ from before $(cgendir).
+	* Makefile.in: Regenerated
+	* mep.cxx (fp.h): #include it.
+	(step_insns): Catch fp:error after step_one_insn.
+	* mep.h (fpu_exception): New virtual method of mep_cpu.
+	* fmax.h: Rework all operations to check for exceptions.
+	(fpu_exception): New method.
+	* fmax-fpu.cxx (fmax_fp): Rework all operations to check for
+	exceptions. Code for fmax_fp moved to fmax-fp.cxx.
+	(mep.h): #include it.
+	(check_operand): New method of fmax_fp_ops.
+	(check_result): Likewise.
+	(round): Likewise.
+	(check_result): Now takes reference to fp.
+	(round): Likewise.
+	* fmax-fpu.h: Code for fmax_fp moved to fmax-fp.h.
+	(check_result): Now takes reference to fp.
+	(round): Likewise.
+	* fmax-cpu.h (fmax_handle_fpu_exception): Removed.
+	(FMAX_*_MASK): New constants.
+	(FMAX_CERR): New constant.
+	(fmax_reserved_operation_exception): New method.
+	(fmax_record_exception): New method.
+	* fmax-fp.cxx: New file.
+	* fmax-fp.h: New file.
+
+	2005-03-31  Dave Brolley  <brolley@redhat.com>
+
+	* Makefile.am (mep-core1): Call CGEN using "with-multiple-isa".
+	(mep-cop*): Likewise.
+	(mep-decsemdefs): Likewise.
+	* Makefile.in: Regenerated.
+	* mep-cpu.h: Regenerated.
+
+	2005-03-21  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (mep_cpu): Create 64 ccr<n> attributes (not 32).
+
+	2005-03-18  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h: Add begin/end-copro-cpu-includes markers for MeP-Integrator.
+	Add begin/end-fpu-includes markers for MeP-Integrator.
+	(cgen_set_cr_value): Removed.
+	* mep.cxx (mep_cpu): Add ccr<n> attributes for the coprocessor
+	control registers.
+	(cgen_set_cr_value): Removed.
+	(reset): Don't initialize coprocessor control registers here.
+	* fmax-cpu.h: New source file.
+	* fmax-fpu.cxx: New source file.
+	* fmax-fpu.h: New source file.
+	* fmax.h: New source file.
+
+	2005-02-24  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (CORE_C4): New static member of mep_cpu.
+	* mep.cxx (reset): Set the LEND bit in CFG for MeP-c4.
+
+	2005-01-25  Dave Brolley  <brolley@redhat.com>
+
+	* mep-*: Regenerated with new copyright year.
+	* mep-core1-sem.cxx: Regenerated with fix for 'tas' insn.
+	* mep-sem.cxx: Regenerated with fix for 'tas' insn.
+
+	2005-01-09  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (cgen_set_csr_value): Remove redundant setting of writemask.
+
+	2004-11-10  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (step_one_insn): Adjust total_latency to account for a stall
+	when blockable.
+
+	2004-11-08  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (step_pin_handler): Do not set blocked_latency here.
+	* mep.h (parent_step_pin_handler): Do it here.
+	(pending_fetch_latency): Renamed to pending_latency.
+	(step_one_insn): Block the cpu for stalls, if blockable.
+
+	2004-11-02  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (memory_read_latency): Renamed to blocked_latency.
+	(record_memory_read_latency): Renamed to record_blocked_latency.
+	(mep_cpu): Add "cache-operation-status" pin.
+	(do_cache): Block and retry if operation status is 'busy'.
+	* mep.h (memory_read_latency): Renamed to blocked_latency.
+	(record_memory_read_latency): Renamed to record_blocked_latency.
+	(cache_operation_status_pin): New output pin.
+	(record_blocked_latency): Handle latency of zero.
+
+	2004-10-28  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (step_pin_handler): Remove log message.
+
+	2004-10-22  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (record_insn_memory_read_latency): New virtual method.
+	(record_data_memory_read_latency): New virtual method.
+	(record_memory_read_latency): New virtual method.
+	(stepped): New virtual override.
+	* mep.cxx (mep_cpu): Initialize memory_read_latency.
+	(step_pin_handler): Initialize memory_read_latency. Don't call stepped
+	here.
+	(handle_bus_error): call record_memory_read_latency.
+
+	2004-10-12  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx: Rename gbif-passthrough pin to
+	downstream-passthrough. Rname gbif_passthrough_pin to
+	downstream_passthrough_pin.
+	* mep.h: Ditto.
+
+	2004-09-30  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (step_pin_handler): SID_SIG_CHILD_BLOCKED is now
+	ctl_child_blocked.
+	(handle_bus_error): Don't call child_wait_for_resume.
+	(mep_cpu_child_thread_root): Ditto.
+
+	2004-09-16  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (sidblockingutil.h): #include it.
+	(mep_cpu_child_thread_root): New function.
+	(mep_cpu): Inherit from blocking_component.
+	(mep_cpu::disassemble): Set gbif_passthrough_pin while disassembling.
+	(mep_cpu::gbif_passthrough_pin): New output pin.
+	(mep_cpu::step_pin_handler): New method.
+	(mep_cpu::handle_bus_error): Ditto.
+	(mep_cpu::handle_{insn,data},_memory_{read,write}_error): New virtual
+	overrides.
+	* mep.cxx (mep_cpu): Inherit from blocking_component. Add
+	gbif-passthrough pin.
+	(do_syscall): Set gbif_passthrough_pin while syscall is executing.
+	(mep_cpu::step_pin_handler): New method.
+	(mep_cpu::handle_bus_error): Ditto.
+	(mep_cpu_child_thread_root): New function.
+
+2005-07-29  Dave Brolley  <brolley@redhat.com>
+
+	* mep-*.*: Regenerated.
+	* common_model.h (__MAX_UNITS_DEFINED): #undef it after using it.
+
+2005-04-05  Richard Sandiford  <rsandifo@redhat.com>
+
+	* common-model.cxx: Reduce divergence from MeP-Integrator output.
+	* mep_ext1.h: Likewise.
+	* Makefile.am: Likewise.
+	* Makefile.in: Regenerate.
+
+2004-08-20  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (set_endian): New virtual override in mep_cpu.
+	* mep.h (set_endian): New virtual override in mep_cpu.
+
+2004-08-16  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (mep_cpu): Remove unused warn_write_to_code_pin. Add
+	current_insn_sampled and sample_gprof_pin.
+	* mep.cxx (mep_cpu): Initialize current_insn_sampled. Add
+	"sample-gprof" pin.
+	(step_insns): Drive sample_gprof_pin here. Set current_insn_sampled for
+	the next iteration, if we're stalled.
+
+2004-07-20 Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (check_option_icache): New method of mep_cpu.
+	* mep.cxx (do_cache): Check icache/dcache option here. Check for
+	CORE_H1 as appropriate.
+	* mep-core1-sem.cxx: Regenerated.
+	* mep-sem.cxx: Regenerated.
+
+2004-06-24  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (mep_cpu): Add pins cache-prefetch,
+	data-cache-invalidate-all, and insn-cache-invalidate-all.
+	(cgen_set_csr_value): Add h1 register fields. Check for core_type ()
+	greater than CORE_C3 for C3 fields.
+	(opt_reg_value): Check for core_type () greater than CORE_C3 for C3
+	fields.
+	(init_caches): Ditto.
+	(do_cache): Handle invalidate line and invalidate all.
+	(do_cache_prefetch): New method.
+	(do_ldcb): Pass word_addr by value.
+	(do_stcb): Ditto. Also rn.
+	* mep.h (do_ldcb): Pass word_addr by value.
+	(do_stcb): Ditto. Also rn.
+	(do_cache_prefetch): New method.
+	(CORE_H1): New static constant.
+	(cache_prefetch_pin, data_cache_invalidate_all_pin, 
+	insn_cache_invalidate_all_pin): New pins.
+	(mep_cpu::disassemble): Pass machine_name () and machine () to
+	cgen_bi_endian_cpu::disassemble.
+	* Makefile.am (CGEN_MACH): New variable.
+	(mep-core1): Pass CGEN_MACH to CGEN.sh.
+	(mep-cop1-16, mep-cop1-32, mep-cop1-48, mep-cop1-64, mep-cpudesc) 
+	(mep-decsemdefs): Ditto.
+	* Makefile.in: Regenerated.
+
+2004-06-24  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (mep_cpu): Initialize corrupt_caches. Add attribute
+	"corrupt-caches".
+	(init_caches): Only do this if corrupt_caches is set.
+	* mep.h (mep_cpu): New member: corrupt_caches.
+
+2004-05-07  Richard Sandiford  <rsandifo@redhat.com>
+
+	* mep.cxx (mep_cpu::mep_cpu): Treat $8 as the frame pointer, not $12.
+
+2004-04-28  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (init_caches): New method of mep_cpu.
+	* mep.cxx (init_caches): New method of mep_cpu.
+	(reset): Call init_caches.
+
+2004-04-08  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (do_smcp): Output semantic trace before execution.
+
+2004-04-01  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (dsp_dmem_if_width): New member of mep_cpu.
+	(CORE_*): New constants for mep_cpu.
+	* mep.cxx (mep_cpu): Initialize dsp_dmem_if_width. Add the
+	"dsp-dmem-if-width" attribute.
+	(cgen_set_csr_value): Handle register 22 as VID on the C3 core.
+	(opt_reg_value): Include the CBS and DBS fields for C3.
+
+2004-03-30  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (ucipin_arg4,dsppin_arg4,dsppin_arg7): New output pins.
+	* mep.cxx (mep_cpu): Call add_pin for "uci-arg4", "dsp-arg4" and
+	"dsp-arg7".
+	(do_DSP): Drive 0 on dsppin_arg4. Drive the entire dsp opcode on
+	dsppin_arg7.
+	(do_UCI): Drive the entire uci opcode on ucipin_arg4.
+
+2004-03-22  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (cgen_set_csr_value): Trace the actual value written if it's
+	not the same as what was given.
+	(cgen_set_cr_value): Ditto.
+	* mep-cop1-16-sem.cxx: Regenerated.
+	* mep-cop1-48-sem.cxx: Regenerated.
+	* mep-cop1-64-sem.cxx: Regenerated.
+	* mep-core1-sem.cxx: Regenerated.
+	* mep.cxx: Regenerated.
+
+2004-02-24  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (opt_reg_value): OPT.DBG is now always zero.
+
+2004-02-23  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (insn_option_types): Remove WWTC and DUO.
+	(warn_write_to_code): New member of mep_cpu_cgen.
+	(dsp_user_out): Ditto.
+	(hwe_option): Ditto.
+	(config_index): Ditto.
+	(step_one_insn): Use dsp_user_out.
+	* mep.cxx (mep_cpu): Initialize config_index, warn_write_to_code,
+	dsp_user_out and hwe_option. "warn-write-to-code-option?" now mapped to
+	warn_write_to_code. "dsp-user-out-option?" dsp_user_out. Add new
+	attributes, "hwe_option? and "config-index"".
+	(opt_reg_value): Set bit 26 based on hwe_option.
+	(write_to_code_pin_handler): Use warn_write_to_code.
+	(check_write_to_text): Ditto.
+	(dbg_get_reg): Use register number 100 as the config index register.
+
+2004-02-19  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (do_ldcb): Issue warning if read status is not
+	sid::bus::ok.
+	(do_stcb): Ditto for write status.
+
+2004-02-18  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (do_smcp): Output trace results.
+
+2004-02-16  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (insn_options_types): Add DUO.
+	(step_one_insn): Check insn_options[DUO].
+	* mep.cxx (mep_cpu): Add "dsp-user-out-option?" attribute.
+
+2004-01-30  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (nmi_exception): Correct NMI vector address.
+
+2003-12-03  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (zap_required): New member of mep_cpu.
+	(zap_scaches): No longer takes 'addr' argument.
+	* mep.cxx (mep_cpu): Initialize zap_required.
+	(write_to_code_pin_handler): Set zap_required rather than calling
+	zap_scaches here.
+	(step_insns): Call zap_scaches here if required.
+
+2003-11-19  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (check_option_cp64): New method of mep_cpu.
+	* mep-core1-decode.cxx,mep-core1-sem.cxx: Regenerated.
+	* mep-decode.cxx,mep-sem.cxx: Regenerated.
+	* mep-desc.h: Regenerated.
+
+2003-10-26  Dave Brolley  <brolley@redhat.com>
+
+	* mep-core-decode.cxx,mep-cop1-{16,48,64}-decode.cxx:
+	Regenerated.
+
+2003-10-22  Richard Sandiford  <rsandifo@redhat.com>
+
+	* Makefile.am (mep-core*): Add .cpu file to CGEN.sh invocation.
+	(mep-cop*, mep-cpudesc, mep-decsemsdfs): Likewise.
+	* Makefile.in: Regenerated.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (step_insns): When handling a DSP exception,
+	save the pc and set the status to SEM_STATUS_BRANCH_TAKEN.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* mep.h (step_one_insn): Don't disassemble dsp instructions.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (done_insn): Restore trace_result_p.
+	* mep.cxx (mep_cpu): Initialize saved_trace_result_p.
+	(do_DSP): Save trace_result_p in trace_result_p_cache and
+	set it to false.
+	(saved_trace_result_p): New member of mep_cpu.
+	(trace_result_p_cache): Ditto.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (mep_cpu): Initialize write_to_code_pin, stepping. Add
+	"write-to-code-address" pin. Remove "warn-write-to-code" pin.
+	(write_to_code_pin_handler): New method of mep_cpu.
+	(step_insns): Don't drive warn_write_to_code_pin. Set/reset
+	'stepping' instead.
+	* mep.h (write_to_code_pin_handler): New method of mep_cpu.
+	(write_to_code_pin): New member of mep_cpu.
+	(stepping): Ditto.
+	(zap_scaches): New member of mep_cpu and mep_cpu_vliw.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (warn_write_to_code_pin): New member of mep_cpu.
+	* mep.cxx (mep_cpu): Add pin "warn-write-to-code"
+	(textSegmentAddress): Removed declaration.
+	(check_write_to_text): Don't call textSegmentAddress.
+	(step_insns): Drive warn_write_to_code_pin before and after
+	stepping.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+	For Jim Blandy  <jimb@redhat.com>
+	Fix more locations that assume only 16 coprocessor control
+	registers.
+	* mep.cxx (mep_cpu, dbg_set_reg, reset): MeP V1.5 has 64
+	coprocessor control registers, not 16, for 144 registers in total,
+	not 96.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+	For Jim Blandy  <jimb@redhat.com>
+	* mep.cxx (dbg_get_reg): There are 64 coprocessor control registers.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* mep.h (mep_cpu): New pin dsp-cycles.
+	* mep.cxx (mep_cpu): Likewise.
+	(do_DSP): Call update_total_latency.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* mep-sem.cxx: Regenerated.
+	* mep-core1-sem.cxx: Regenerated.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (step_insns): Save pc when stalled.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* mep_basic.h (mep_basic): New method: core_model_step_latency.
+	* mep_ext1.h (mep_basic): New method: core_model_step_latency.
+	* mep.h (pending_fetch_latency): New member of mep_cpu_vliw.
+	(step_one_insn): Count insn fetch latency as part of the
+	the execution cycles of the insn which is delayed.
+	* common_model.h (class mep_common_model): New virtual override for
+	model_insn_before. step_latency now public.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (imem_address): New method of mep_cpu.
+	(check_write_to_text): Use imem_address.
+	* mep.h (imem_address): New method of mep_cpu.
+	(rcfg): New register number.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* mep.cxx (check_write_to_text): Tweak warning message.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* mep_basic.h,mep_ext1.h (model_before): Update cpu latency and return
+	number of stall cycles.
+	(my_core_model): Provide new SCACHE argument.
+	* mep.h (step_one_insn): Move tracing to here. Delay until we know
+	we're not stalled. Call this->model_before for core insn.
+	* mep.cxx (config.h): #include it.
+	(step_insns): Handle SEM_STATUS_STALLED. Move tracing to step_one_insn.
+	* common_model.h (current_stall): New member of mep_common_model.
+	(save_total_latency): Ditto.
+	(gpr_busy): Ditto.
+	(num_gpr): Ditto.
+	(mep_common_model): Initialize gpr_busy.
+	(model_before): Return current_stall.
+	(model_u_use_gpr_before): New method.
+	(model_u_branch_after): Ditto.
+	(model_u_load_gpr_after): Ditto.
+	(model_u_mul_gpr_after): Ditto.
+	(step_latency): Ditto.
+	(set_gpr_busy): Ditto.
+	* common_model.cxx (config.h): #include it.
+	(all templates): New argument SCACHE added.
+	(model_u_use_gpr_before): New method.
+	(model_u_branch_after): Ditto.
+	(model_u_load_gpr_after): Ditto.
+	(model_u_mul_gpr_after): Ditto.
+	(step_latency): Ditto.
+	* Makefile.am (INCLUDES): Add -I..
+	* Makefile.in Regenerated.
+	* mep{,-core,-cop}*-{decode,sem,model}.{cxx,h}: Regenerated.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* mep.cxx (check_write_to_text): New method.
+	* mep.h (check_write_to_text): Likewise.
+	* mep-core1-sem.cxx: Regenerated after check_write_to_text change.
+	* mep-sem.cxx: Likewise.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (dummy_scache,dummy_idesc): Moved here from mep_basic.h.
+	* mep_basic.h (dummy_scache,dummy_idesc): Moved to mep.h.
+	(mep_basic.cpu): Remove *model*before and cop*model* methods.
+	* mep_ext1.h: Now generated by CGEN.
+	* common_model.cxx: Remove references to mep_ext[2-12]. Add
+	MeP-Integrator for generating these as necessary. Add marks for
+	generated instantiations.
+	* Makefile.am (CPU_SOURCES): Remove mep-{core,cop}[2-12]*.
+	(CPU_TARGETS, CPU_LIST): New macros.
+	(CGEN_TARGETS): Use CPU_TARGETS.
+	mep-{core,cop}[2-12]*: Removed.
+	* Makefile.in: Regenerated.
+	* mep_ext[2-12].h: Removed.
+	* mep-{core,cop}[2-12]*: Removed.
+	* mep-{core,cop}1*: Regenerated.
+	* mep-*.{cxx,h}: Regenerated.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (disassemble): Maintain CGEN_ISA_MASK to pass to
+	cgen_bi_endian_cpu::disassemble.
+	* Makefile.am (libmep_la_SOURCES): Add mep-{core,cop}[7-12]*.{cxx,h}.
+	(CGEN_TARGETS): Add mep-{core,cop}[7-12]*.
+	(mep-cpudesc): Add ext_{core,cop}[7-12]*.
+	(mep-{core,cop}[7-12]): New targets.
+	* Makefile.in: Regenerated.
+	(mep-{core,cop}*-decode.cxx): Regenerated.
+	(mep-cpu.h): Regenerated.
+	(mep-desc.h): Regenerated.
+	(mep-{core,cop}[7-12]*.{cxx.h}): New files.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Frank Ch. Eigler  <fche@redhat.com>
+	* mep.cxx (mep_cpu ctor): Add new uci/dsp pins.
+	(do_DSP, do_UCI): New functions.
+	(reset): Clear new dsp_exception_pending_p flag.
+	(step_insns): Handle new flag.
+	* mep.h: Corresponding changes.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Anthony Green  <green@redhat.com>
+	* mep.cxx (cgen_set_csr_value): Fix SAR write mask.
+
+2003-06-27  Dave Brolley  <brolley@redhat.com>
+
+	* common_model.h (divide_busy): New member of mep_common_model.
+	(multiply_busy): Ditto.
+	(ldcb_busy): Ditto.
+	(ctrl_reg_busy): Ditto.
+	(model_u_ldcb_before, model_u_divide_before, model_u_multiply_before) 
+	(model_u_use_ctrl_reg_before, model_u_multiply_after) 
+	(model_u_stcb_after, model_u_divide_after) 
+	(model_u_ldcb_gpr_after): New methods of mep_common_model..
+	(set_ctrl_reg_busy, set_divide_busy, set_multiply_busy)
+	(set_ldcb_busy, set_current_stall, u_exec_cycles): New methods of
+	mep_common_model..
+	(CTRL_HI, CTRL_LO, num_ctrl_reg): New constants.
+	* common_model.cxx (model_u_ldcb_before): New method.
+	(model_u_divide_before, model_u_multiply_before) 
+	(model_u_use_ctrl_reg_before, model_u_multiply_after) 
+	(model_u_stcb_after, model_u_divide_after) 
+	(model_u_ldcb_gpr_after): New methods.
+	(all methods): Use set_current_stall. Use u_exec_cycles to get
+	the insns execution cycles.
+	(step_latency): Return immediately if there's no latency. Track
+	latency for control regs, multiply divide and stcb.
+
+2003-06-25  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (ri_exception): Zero PSW.IEC and PSW.UMP before ORing in the
+	new value.
+	(hw_int_exception, swi_exception, break_exception) 
+	(zdiv_exception, cop_exception, dsp_exception): Ditto.
+
+2003-04-22  Dave Brolley  <brolley@redhat.com>
+
+        * mep.h (step_one_insn): Call model_insn_{before,after} only for the
+        core model using information from the core and coprocessor models.
+        Don't call model_before at all.
+
+2003-04-16  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (step_one_insn): Call *_model_insn_{before,after} and
+	model_{before,after} for each VLIW insn executed.
+	* Makefile.am (libmep_la_SOURCES): Add *model.cxx.
+	(mep-{core,cop}-*): Generate model.cxx and model.h.
+	* Makefile.in: Regenerated.
+	* mep_basic.h (mep_basic_cpu): Add a mep_common_model and
+	*model_*{before,after} methods.
+	* mep_ext*.h: Ditto.
+	* mep-*: Regenerated.
+	* common_model.cxx: New file.
+	* common_model.h: New file.
+	* mep-*-model.{cxx,h}: New files.
+
+2003-01-28  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (mep_cpu): Initialize sleeping_p.
+	(interrupt_pin_handler): Test sleeping_p. Fall through to normal
+	handling when waking up.
+	(nmi_pin_handler): Ditto.
+	(do_sleep): New method of mep_cpu.
+	(step_insns): Test sleeping_p.
+	* mep.h (sleeping_p): New member of mep_cpu.
+	(do_sleep): New method of mep_cpu.
+	(mep-core*-sem.cxx, mep-sem.cxx): Regenerated.
+
+2002-11-29  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep_cpu::print_insn_summary): New overriding method.
+	* hw-cpu-mep.txt: Regenerate for common-xml changes.
+
+2002-11-28  Dave Brolley  <brolley@redhat.com>
+
+	* mep-ALL-sem.cxx, mep-ALL-decode.*: Regenerate.
+
+2002-11-22  Ben Elliston  <bje@redhat.com>
+
+	* mep-ALL-sem.cxx, mep-ALL-decode.*: Regenerate.
+
+2002-11-22  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (mep_cpu): Initialize data_bus_width and num_timer_channels.
+	Add data-bus-width and num-timer-channels attributes.
+	(opt_reg_value): Compute values of TCN, BIS and LBS fields.
+	* mep.h (data_bus_width): New member of mep_cpu.
+	(num_timer_channels): Ditto.
+
+2002-11-22  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.cxx (vector_base_address): Remove default value in formal args.
+
+2002-11-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* hw-cpu-mep.txt: Regenerated.
+
+2002-09-19  Alexandre Oliva  <aoliva@redhat.com>
+
+	* Makefile.am (cgen-all): Break it up into multiple...
+	(CGEN_TARGETS): ... listed here.
+
+2002-09-11  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (interrupt_pin_handler): Use h_csr_set_internal.
+	(interrupt_pin_handler): Ditto.
+	(nmi_pin_handler): Ditto.
+	(ri_exception): Ditto.
+	(nmi_exception): Ditto.
+	(hw_int_exception): Ditto.
+	(swi_exception): Ditto.
+	(break_exception): Ditto.
+	(zdiv_exception): Ditto.
+	(cop_exception): Ditto.
+	(dsp_exception): Ditto.
+	(step_insns): Ditto.
+	* mep.h (h_csr_set_internal): New method of mep_cpu.
+	* mep-core[1-6]-decode.cxx,-sem.cxx: Regenerated.
+	* mep-decode.cxx,-sem.cxx: Regenerated.
+
+2002-09-08  Anthony Green  <green@redhat.com>
+
+	* mep.cxx (cgen_set_csr_value): Handle r/w type for SAR, RPB, PSW,
+	EXC and DBG.
+
+2002-07-19  Jim Wilson  <wilson@redhat.com>
+
+	* mep.cxx (mep_cpu::step_insns): Do not set repeat_delayed_branch to
+	true if second to last insn is a taken branch.
+
+2002-07-16  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (mep_cpu): Add cache_flush_and_invalidate_pin and
+	cache_index_flush_and_invalidate_pin.
+	* mep.cxx (mep_cpu): Add cache-flush-and-invalidate and
+	cache-index-flush-and-invalidate pins.
+	(do_cache): Drive the cache_flush_and_invalidate_pin and
+	cache_index_flush_and_invalidate_pin.
+
+2002-06-28  Dave Brolley  <brolley@redhat.com>
+
+	* mep.h (check_option_dcache): New method.
+
+2002-06-24  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (CGENDEPS): Remove dependency on stamp-cgen.
+
+2002-06-08  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep_cpu::do_cache): New method.
+	(mep_cpu::cache_flush_pin): New pin.
+	(mep_cpu::cache_index_flush_pin): Likewise.
+	(mep_cpu::cache_invalidate_pin): Likewise.
+	(mep_cpu::cache_index_invalidate_pin): Likewise.
+	* mep.cxx (mep_cpu constructor): Add pins for "cache-flush",
+	"cache-index-flush", "cache-invalidate", "cache-index-invalidate".
+	(mep_cpu::do_cache): Implement.
+
+2002-06-07  Ben Elliston  <bje@redhat.com>
+
+	* mep.cxx (mep_cpu::invalid_insn): Handle RI exceptions correctly.
+
+2002-05-23  Graydon Hoare  <graydon@redhat.com>
+	    Jim Wilson  <wilson@redhat.com>
+
+	* mep.h (mep_cpu::repeat_delayed_branch): New member.
+	* mep.cxx (step_insns): Overhaul.
+
+2002-05-21  Graydon Hoare  <graydon@redhat.com>
+
+	* mep.cxx (step_insns): Add CPU ID counter to listing when
+	--trace-counter is enabled.
+
+2002-05-07  Dave Brolley  <brolley@redhat.com>
+
+	* mep.cxx (mep_cpu): Add cop-data-bus-width attribute.
+	(cgen_set_cr_value): New set handler for h-cr.
+	(do_smcp): New function.
+	(do_lmcp): Ditto.
+	(do_smcpa): Ditto.
+	(do_lmcpa): Ditto.
+	(do_smcpi): Ditto.
+	(do_lmcpi): Ditto.
+	(do_smcp16): Ditto.
+	(do_lmcp16): Ditto.
+	* mep.h (cgen_set_cr_value): New set handler for h-cr.
+	(do_smcp): New function.
+	(do_lmcp): Ditto.
+	(do_smcpa): Ditto.
+	(do_lmcpa): Ditto.
+	(do_smcpi): Ditto.
+	(do_lmcpi): Ditto.
+	(do_smcp16): Ditto.
+	(do_lmcp16): Ditto.
+	(cop_data_bus_width): New data member.
+
+2002-05-06  Ben Elliston  <bje@redhat.com>
+
+	* mep.cxx (mep_cpu::reset): Go beneath h_csr_set() function to
+	ensure that even read-only bits are initialised correctly.
+
+2002-04-30  Graydon Hoare  <graydon@redhat.com>
+
+	* mep.cxx (mep_cpu): Initialize all options to false.
+
+2002-04-01  DJ Delorie  <dj@redhat.com>
+
+	* mep-ALL-sem.cxx, mep-ALL-decode.*: Regenerate.
+
+2002-03-21  Graydon Hoare  <graydon@redhat.com>
+
+	* mep.h (mep): Add hooks for mepcfgtool to include DSP/UCI code.
+
+2002-03-20  Graydon Hoare  <graydon@redhat.com>
+
+	* mep-ALL-decode.*: Regenerate with ldc_hi/lo/lp constant field fix.
+
+2002-03-19  Graydon Hoare  <graydon@redhat.com>
+
+	* mep-ALL-sem.cxx, mep-ALL-decode.*: Regenerate with aldc
+	typo correction.
+
+2002-03-17  Graydon Hoare  <graydon@redhat.com>
+
+	* mep-ALL-sem.cxx, mep-ALL-decode.*: Regenerate with special
+	ldc/stc variants.
+
+2002-03-14  Ben Elliston  <bje@redhat.com>
+
+	* hw-cpu-mep.txt: Regenerate with recent common-xml changes.
+
+2002-03-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.h, mep.cxx: Add insn-cache-enable/data-cache-enable pins.
+	(update_cache_pins): New functions.  Add some callers.
+	(cgen_get_csr_value, cgen_set_csr_value): New functions.
+	* mep-ALL-sem.cxx, mep-ALL-decode.*, mep-cpu.h: Regenerated with
+	graydon's attribute changes and h-csr access changes.
+
+2002-02-27  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep_cpu::ri_exception_p): New member.
+	* mep.cxx (mep_cpu::mep_cpu): Initialise raise_ri_exception_p.
+	Bind a new "raise-ri-exception?" attribute to this variable.
+	(mep_cpu::invalid_insn): If raise_ri_exception_p is set via
+	configuration, then invoke the RI exception handler, otherwise
+	signal cpu_trap_invalid_insn as usual.
+	* hw-mep-cpu.xml: Document "raise-ri-exception?" attribute.
+
+2002-02-26  Ben Elliston  <bje@redhat.com>
+
+	* mep.cxx (mep_cpu::ri_exception): Set EPC.ETOM to PSW.OM. Clear
+	PSW.OM to go into core mode when handling exceptions.
+	(mep_cpu::hw_int_exception): Likewise.
+	(mep_cpu::swi_exception): Likewise.
+	(mep_cpu::break_exception): Likewise.
+	(mep_cpu::zdiv_exception): Likewise.
+	(mep_cpu::cop_exception): Likwise.
+	(mep_cpu::dsp_exception): Likewise.
+	(mep_cpu::nmi_exception): Set NPC.NTOM to PSW.OM. Clear PSW.OM to
+	go into core mode when handling exceptions.
+
+	* mep-sem.cxx: Regenerate with today's mep-core.cpu reti fix.
+
+2002-02-19  Graydon Hoare  <graydon@redhat.com>
+
+	* mep.cxx (mep_cpu): Drive -1 (no interrupts) on interrupt pin,
+	at startup.
+	(interrupt_pin_handler): Test HIE and IEC separately.
+	(step_insns): Sense interrupt line on each iteration.
+
+2002-02-06  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep_basic.h: Reordered declarations for more compiler compatibility.
+
+2002-02-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am: Generate and build all mep-cop* and mep-core* sources.
+	* Makefile.in: Regenerated.
+	* mep-core*, mep-cop*: New generated files.
+	* mep-decode.*, mep-sem.cxx, mep-defs.h, mep-desc.h: Regenerated.
+	* mep_ext[1-6].h: New files.
+	* mep.h, mep.cxx: Reorganized for multiple-core configuration.
+
+2002-01-03  Don Howard  <dhoward@redhat.com>
+
+	* mep.cxx (mep_cpu): Increase the number of registers to include
+	copro and copro control registers.
+
+2002-01-02  Don Howard  <dhoward@redhat.com>
+
+	* mep.cxx (dbg_set_reg): Fixed register number range check.
+
+2001-12-27  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.cxx (flush_icache): New PC-taking variant function.
+	(step_insns): Remove duplicate trace_counter call.
+	* mep.h (flush_icache): Matching declaration.
+
+2001-12-14  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.h (mep_cpu): Add new engine_bundling member; remove
+	branch_taken_p; rename engine -> engine_core.
+	(mep_insn_bundling): New enum.
+	(branch, done_insn, done_cti_insn): Rewrite.
+	* mep.cxx (mep_cpu ctor): Update for field changes.
+	(reset): Clear cr[] and ccr[].
+	(flush_icache): Flush bundling cache.
+	(decode_bundling): New function.
+	(step_insns): Rewrite inner loop.
+	* mep-decode.cxx, -sem.cxx: Regenerated.
+
+2001-12-11  Ben Elliston  <bje@redhat.com>
+
+	* mep-decode.cxx: Regenerate.
+
+2001-12-10  Ben Elliston  <bje@redhat.com>
+
+	* mep-decode.cxx, mep-sem.cxx: Regenerate.
+
+2001-12-08  Ben Elliston  <bje@redhat.com>
+
+	* mep.cxx (hw_int_exception): Clean up trace output.
+	(ri_exception): Likewise.
+	(nmi_exception): Likewise.
+	(swi_exception): Likewise.
+	(break_exception): Likewise.
+	(zdiv_exception): Likewise.
+
+2001-12-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.cxx (mep_cpu ctor): Leave VL32 unset and clear CCFG.
+
+2001-12-05  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.cxx (dsp_exception): New function.
+	* mep.h (*_exception): Take simple PCADDR arg type.
+
+2001-12-04  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep_cpu::interrupt_channel): New member.
+	(mep_cpu::hip_p): New method.
+	* mep.cxx (mep_cpu ctor): Initialise interrupt_pending_p,
+	interrupt_channel members.
+	(interrupt_pin_handler): Guard against bad pin values.  For
+	inactive and active pin activity, set PSW.HIP accordingly.
+	(vector_base_address): Re-write.
+
+2001-12-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.h (insn_option_type): VL32, VL64: Add.
+	* mep.cxx (mep_cpu ctor, opt_reg_value): Handle VL32/VL64 options.
+
+2001-11-19  Ben Elliston  <bje@redhat.com>
+
+	* mep.cxx (zdiv_exception): Set EXC.EXC.
+
+2001-11-16  John Healy  <jhealy@redhat.com>
+
+	* mep-cop1-48-sem.cxx, mep-cop1-48-decode.cxx: Regenerated.
+
+2001-11-16  John Healy  <jhealy@redhat.com>
+
+	* mep-cop1-32-decode.cxx, mep-cop1-32-decode.h, mep-cop1-32-sem.cxx,
+	mep-cop1-48-decode.cxx, mep-cop1-48-decode.h, mep-cop1-48-sem.cxx:
+	Regenerated.
+
+2001-11-14  John Healy  <jhealy@redhat.com>
+
+	* mep-desc.h: Regenerated.
+
+2001-11-14  John Healy  <jhealy@redhat.com>
+
+	* mep-cop{2,3,4,5,6,7}-32*: New files.
+	* Makefile.am: Added targets for generation of files for coprocessors
+	2 through 7.  Commented out all but those related to 32-bit ISAs since
+	no other ISAs are used at this time in the coprocessor definitions.
+	* Makefile.in: Regenerated.
+	* mep.cxx (step_insns): Cleaned up tracing a bit.  Fixed error in
+	instruction execution logic.
+	(mep_cpu::mep_cpu): Added initializations for scache engines for 
+	ISAs involving 32-bit insns in coprocessors 2 through 7.  Left
+	commented out since support is not complete.
+	(mep_cpu::flush_icache): Flush 32-bit engines for coprocessors 2
+	through 7.  Also left commented out for now.
+	* mep.h (mep_cpu): Added scache engines for ISAs involving 32-bit
+	insns in coprocessors 2 through 7.  Also left commented out for now.
+	* mep-cop1-64-decode.cxx, mep-cop1-64-decode.h, mep-cop1-64-sem.cxx:
+        Regenerated
+
+2001-11-13  Ben Elliston  <bje@redhat.com>
+ 
+ 	* mep.cxx (ri_exception, hw_int_exception, break_exception,
+ 	zdiv_exception, cop_exception): Fix thinko when moving PSW.UMC to
+ 	PSW.UMP. Tidy trace output.
+ 
+2001-11-08  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep-*: Regenerated.
+
+2001-11-07  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.cxx (vector_base_address): Correct evm/eva bit extraction typos.
+
+2001-11-06  John Healy  <jhealy@redhat.com>
+
+	* mep.cxx (step_insns): Added vliw support.
+	(mep_cpu::mep_cpu): Initialize corpocessor scache engines.
+	(mep_cpu::flush_icache): Flush coprocessor engines.
+	* mep.h (mep_cpu): Added scache engines for coprocessor isas.
+
+2001-11-01  John Healy  <jhealy@redhat.com>
+
+        * Makefile.am: Added new targets to generate cop1-specific files .
+        * Makefile.in: Regenerated.
+        * mep-cop1-16-decode.cxx: New file.
+        * mep-cop1-16-decode.h: Ditto.
+        * mep-cop1-16-defs.h: Ditto.
+        * mep-cop1-16-sem.cxx: Ditto.
+        * mep-cop1-32-decode.cxx: Ditto.
+        * mep-cop1-32-decode.h: Ditto.
+        * mep-cop1-32-defs.h: Ditto.
+        * mep-cop1-32-sem.cxx: Ditto.
+        * mep-cop1-48-decode.cxx: Ditto.
+        * mep-cop1-48-decode.h: Ditto.
+        * mep-cop1-48-defs.h: Ditto.
+        * mep-cop1-48-sem.cxx: Ditto.
+        * mep-cop1-64-decode.cxx: Ditto.
+        * mep-cop1-64-decode.h: Ditto.
+        * mep-cop1-64-defs.h: Ditto.
+        * mep-cop1-64-sem.cxx: Ditto.
+        * mep.h: Regenerated.
+
+2001-10-30  John Healy  <jhealy@redhat.com>
+
+        * mep-decode.cxx, mep-desc.h: Regenerated.
+
+2001-10-29  Frank Ch. Eigler  <fche@redhat.com>
+
+	With Don Howard <dhoward@redhat.com>:
+	* mep.cxx (dbg_get/set_reg): Use h_*_get/set routines
+	instead of direct h_*[] access.  Handle coprocessor registers.
+
+2001-10-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.cxx (ri_exception): Use correct exception vector.
+
+2001-10-25  John Healy  <jhealy@redhat.com>
+	
+	* mep.cxx (mep_cpu::ri_exception): Added vliw handling.
+	(mep_cpu::nmi_exception): Added vliw handling.
+	(mep_cpu::hw_int_exception): Added vliw handling.
+	(mep_cpu::swi_exception): Added vliw handling.
+	(mep_cpu::break_exception): Added vliw handling. 
+	(mep_cpu::zdiv_exception): Added vliw handling.
+	(mep_cpu::cop_exception): New routine.
+	* mep.h (mep_cpu): Added cop_exception member function.
+	* mep-cpu.h, mep-decode.cxx, mep-desc.h, mep-sem.cxx: Regenerated.
+	* mep-desc.h: Regenerated.
+
+2001-10-24  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.cxx (*_exception): Trace iff trace_result_p, not *_semantics_p.
+
+2001-10-23  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.h (swi_pending_p): Simplified & moved from here ...
+	* mep.cxx: ... to here.
+
+2001-10-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep-sem.cxx: Regenerated with trace_result_p change.
+	* mep.cxx (step_insns): Revamp tracing logic.
+
+2001-10-03  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.cxx (reg): Eliminate weird static.  Fix users.
+	(mep_cpu ctor): Standardize csr/gpr initialization.
+	Export csrNN attributes.  Kill processor-id etc. attributes.
+	Make syscall-NN alias attributes.
+	(get_cache_size etc.): Remove attribute handler functions.
+	(reset): Standardize csr reset.
+	(invalid_insn): Defer to ri_exception() if trap_unhandled.
+	(do-syscall): Simplify.
+	(dbg_get_reg, dbg_set_reg): Support little-endian.
+	(step_insns): Ditto for disassembly.
+	* mep.h: Corresponding changes.
+
+2001-09-27  John Healy  <jhealy@redhat.com>
+
+	* mep-desc.h: Regenerated.
+
+2001-09-26  Ben Elliston  <bje@redhat.com>
+
+	* mep-decode.cxx: Regenerate.
+	* mep-decode.h: Likewise.
+	* mep-sem.cxx: Likewise.
+
+	* mep.cxx (mep_cpu::ri_exception): Set EXC correctly and improve
+	the trace output for reserved instruction exception.
+
+2001-09-25  Ben Elliston  <bje@redhat.com>
+
+	* mep-sem.cxx: Regenerate.
+
+2001-09-24  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep_cpu::branch_taken_p): New member.
+	(mep_cpu::branch): Set branch_taken_p.
+	* mep.cxx (mep_cpu ctor): Initialise branch_taken_p.
+	(mep_cpu::step_insns): Simplify repeat block logic.
+
+2001-09-21  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep_cpu::get_processor_rev): New method.
+	(mep_cpu::set_processor_rev): Likewise.
+	* mep.cxx (mep_cpu ctor): Initialise ID and RCFG. Add a new
+	"processor-rev" attribute.
+	(mep_cpu::reset): Reset certain CSRs.
+	(mep_cpu::get_processor_id): Implement.
+	(mep_cpu::set_processor_id): Likewise.
+
+	* mep-cpu.h: Regenerate.
+
+2001-09-20  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep_cpu::swi_pending_p): Mask EXC register appropriately
+	before applying it to the PSW. Move this function out of the class
+	declaration and reformat for readability.
+
+2001-09-20  Ben Elliston  <bje@redhat.com>
+
+	* mep-cpu.h: Regenerate.
+	* mep.h (mep_cpu_cgen::opt_reg_value): New pure virtual function.
+	(mep_cpu::opt_reg_value): Declare.
+
+	* mep.cxx (mep_cpu::opt_reg_value): Implement.
+
+2001-09-19  Ben Elliston  <bje@redhat.com>
+
+	* mep-cpu.h: Regenerate.
+
+2001-09-04  graydon hoare  <graydon@redhat.com>
+
+	* mep.h (debugger_bus_with_control_bus_vision): New class.
+	(mep_cpu::debugger_bus): New member.
+	* mep.cxx (mep_cpu ctor): Initialize it.
+
+2001-08-17  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep_cpu::hw_debugger_p): New member.
+	* mep.cxx (mep_cpu ctor): Initialise it.
+	(mep_cpu ctor): Add a "hardware-debugger?" attribute.
+
+2001-08-16  graydon hoare  <graydon@redhat.com>
+
+	* Makefile.am: gcc -> $(CC) fix.
+	* Makefile.in: Regenerate.
+
+2001-08-15  graydon hoare  <graydon@redhat.com>
+
+	* Makefile.am: Add support for building and
+	linking invididual objects from opcodes.
+	* Makefile.in: Regenerate.
+
+2001-08-15  Ben Elliston  <bje@redhat.com>
+
+	* mep-decode.cxx: Regenerate.
+	* mep-sem.cxx: Likewise.
+
+2001-08-10  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep_cpu::{get,set}_cache_size): Declare.
+	(mep_cpu::{get,set}_data_cache_size): Likewise.
+	(mep_cpu::{get,set}_insn_cache_size): Likewise.
+	* mep.cxx (mep_cpu ctor): Clear CCFG. Add two new virtual
+	attributes: "insn-cache-size" and "data-cache-size".
+	(mep_cpu::{get,set}_cache_size): Define.
+	(mep_cpu::{get,set}_data_cache_size): Likewise.
+	(mep_cpu::{get,set}_insn_cache_size): Likewise.
+
+	* mep-cpu.h: Regenerate.
+
+2001-08-03  matthew green  <mrg@redhat.com>
+
+	* mep.h (dtor): Add throw() specifier.
+
+2001-07-25  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.cxx (dbg_{get,set}_reg): Handle regno16 == h_pc.
+	(mep_cpu ctor): Fix expedited register list.
+
+2001-07-25  Ben Elliston  <bje@redhat.com>
+
+	* mep.cxx (dbg_get_reg): Access target registers directly.
+	(dbg_set_reg): Likewise.
+
+2001-07-24  matthew green  <mrg@redhat.com>
+
+	* mep.cxx (do_ldcb, do_stcb): Rework to avoid GCC 2.95.3 errors.
+
+2001-07-18  Ben Elliston  <bje@redhat.com>
+
+	* mep.cxx (reg): Give file scope.
+	(mep_cpu constructor): Make "nmi" a watchable pin.
+	(nmi_p): New method.  Use it in other methods, where applicable.
+	(step_insns): Handle pending NMIs.
+	* mep.h (nmi_p): New.
+	(nmi_suspended_p): Likewise.
+
+2001-07-13  John Healy  <jhealy@redhat.com>
+
+	* mep-decode.cxx: Regenerated.
+	* mep-desc.h: Regenerated.
+
+2001-07-13  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (check-local): Rename target from "checkme".
+
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.cxx (step_insns): Fetch insn in 16-bit pieces.
+	* mep-decode.cxx: Regen with funny-endian fixes.
+	* mep-desc.h: Regen with ...INSN_CHUNK_BITSIZE... macro.
+
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* hw-pu-mep.xml: Add <?xml ... ?> prefix.
+
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.cxx (dbg_set_reg): Correct regno>=16 case.
+
+2001-07-09  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (ri_exception): New method.
+	(nmi_exception): Likewise.
+	(npc): New enumerator.
+	(halted_p): New method.
+	(nmi_pin): New member.
+	(nmi_pin_handler): New method.
+	(nmi_suspended_p): New member.
+	(swi_pending_p): Consider the state of PSW.NMI.
+	* mep.cxx (mep_cpu constructor): Initialise nmi_pin.
+	(reset): Clear nmi_suspended_p.
+	(halted_p): New method.
+	(interrupt_pin_handler): Test PSW.NMI.
+	(nmi_pin_handler): Implement.
+	(ri_exception): Likewise.
+	(nmi_exception): Likewise.
+	(hw_int_exception): Return vector, not @vector.
+	(swi_exception): Likewise.
+	(break_exception): Likewise.
+	(zdvi_exception): Likewise.
+	(step_insns): Check for NMI interrupts.
+	* mep-decode.cxx: Regenerate.
+	* mep-desc.h: Likewise.
+	* mep-sem.cxx: Likewise.
+	
+2001-07-04  graydon hoare  <graydon@redhat.com>
+
+	* configure.in: Add maintainer-mode doc building configury.
+	* configure: Regenerate.
+	* Makefile.am: Add maintainer-mode doc building.
+	* Makefile.in: Regenerate.
+
+2001-07-05  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (hw_int_exception): New method.
+	(swi_pending_p): Rename from "swi_pending".
+	(interrupt_pin): New member.
+	(interrupt_pending_p): Likewise.
+	(interrupt_pin_handler): New method.
+	* mep.cxx (mep_cpu constructor): Initialise interrupt_pin.
+	(reset): Clear interrupt_pending_p.
+	(interrupt_pin_handler): Implement.
+	(hw_int_exception): Likewise.
+	(step_insns): Handle any pending interrupts. Use swi_pending_p(),
+	not the former swi_pending().
+	* Makefile.am (DEJAGNUTESTS): Add mep-arch.exp.
+	* Makefile.in: Regenerate.
+
+2001-07-05  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (swi_exception): New method.
+	(reset_pin): Remove member.
+	(reset_handler): Likewise.
+	(swi_pending): New method.
+	* mep.cxx (mep_cpu constructor): Don't initialise reset_pin.
+	(reset_handler): Remove.
+	(swi_exception): New method.
+	(step_insns): Test for pending SWIs.
+
+2001-07-04  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (cgen-mep): Don't generate write.cxx after all.
+	* Makefile.in: Regenerate.
+	* mep-write.cxx: Remove.
+	* mep-decode.cxx: Regenerate.
+	* mep-decode.h: Likewise.
+	* mep-defs.h: Likewise.
+	* mep-sem.cxx: Likewise.
+	
+	* Makefile.am (pkgdata_DATA): Add hw-cpu-mep.txt.
+	(cgen-mep): Generate write.cxx.
+
+	* Makefile.in: Regenerate.
+	* mep-write.cxx: New file.
+
+	* hw-cpu-mep.txt: Generate.
+
+2001-07-03  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (zdiv_exception): New method.
+	(break_exception): Likewise.
+	(reset_pin): New callback_pin.
+	(reset_handler): New method.
+	(vector_base_address): Likewise.
+	(psw, epc, exc, cfg): New enumerators.
+	* mep.cxx (mep_cpu ctor): Initialise reset_pin. Add "reset" pin.
+	(reset_handler): Implement.
+	(vector_base_address): Likewise.
+	(break_exception): Likewise.
+	(zdiv_exception): Likewise.
+	* mep-decode.cxx: Regenerate.
+	* mep-desc.h: Likewise.
+	* mep-sem.cxx: Likewise.
+
+2001-07-02  Ben Elliston  <bje@redhat.com>
+
+	* mep.cxx (reset): Clear general purpose registers correctly.
+
+2001-06-29  graydon hoare  <graydon@redhat.com>
+
+	* hw-cpu-mep.xml: Add.
+
+2001-06-28  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* mep.cxx (mep_cpu::memory_trap): Remove warning code that is under
+	control of now removed flag debug_exec_p.
+	* hw-cpu-mep.txt: Remove all debug-exec? references.
+
+2001-06-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): Refer to $srcdir.
+	* Makefile.in: Regenerated.
+
+2001-06-21  matthew green  <mrg@redhat.com>
+
+	* Makefile.am: Formatting consistency.
+	* Makefile.in: Regenerate.
+
+2001-06-20  matthew green  <mrg@redhat.com>
+
+	* Makefile.am (BFDINCLUDES): Set unconditionally.
+	* mep.cxx: Remove CGEN_BFD_DISASSEMBLER conditional.  Do not
+	#include "config.h".
+	* configure.in (AM_CONFIG_HEADER, CY_SID_BFD_DISASM_CHECK): Delete.
+	* config.in: Delete.
+	* aclocal.m4: Regenerated.
+	* configure: Likewise.
+	* Makefile.in: Likewise.
+
+2001-06-14  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.cxx (dbg_get_reg, dbg_set_reg): Correct register number
+	conversion when accessing CSRs (e.g., PC).
+
+2001-06-14  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep.cxx (invalid_insn, memory_trap): Implement more completely.
+
+2001-06-07  matthew green  <mrg@redhat.com>
+
+	* mep.cxx (step_insns): disassemble() method takes new name parameter.
+
+2001-06-05  Ben Elliston  <bje@redhat.com>
+
+	* hw-cpu-mep.txt (accessors): Document "control-space" accessor.
+
+2001-06-01  Ben Elliston  <bje@redhat.com>
+
+	* mep-decode.cxx: Regenerate.
+
+2001-05-31  Ben Elliston  <bje@redhat.com>
+
+	* mep.cxx (mep_cpu::reset): Clear general purpose registers.
+	(mep_cpu constructor): Add register attributes for g.p. registers.
+	* hw-cpu-mep.txt: New file.
+
+2001-05-30  matthew green  <mrg@redhat.com>
+
+	* Makefile.am (BFDINCLUDES): New variable conditional on
+	CGEN_BFD_DISASSEMBLER, added on the end of $(INCLUDES).
+	* configure.in: Call AM_CONFIG_HEADER(config.h:config.in).  Use
+	CY_SID_BFD_DISASM_CHECK.
+	* mep.cxx: Include "config.h". Add trace counter & trace disassembly
+	support, the latter conditional on CGEN_BFD_DISASSEMBLER.  Convert
+	trace_result_p to trace_semantics_p in C instruction implementations.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Likewise.
+	* mep-sem.cxx: Likewise.
+	* config.in: Likewise.
+	* configure: Likewise.
+
+2001-05-30  Ben Elliston  <bje@redhat.com>
+
+	* mep-cpu.h, mep-decode.cxx, mep-decode.h: Regenerate.
+	* mep-sem.cxx: Likewise.
+
+	* mep.h (mep_cpu::big_endian_p): New method.
+	(mep_cpu::get_processor_id): Likewise.
+	(mep_cpu::set_processor_id): Likewise.
+	* mep.cxx (mep_cpu constructor): Make "processor-id" a virtual
+	attribute. Use get/set_processor_id methods. Initialise $id.
+	(mep_cpu::reset): Zero all control/special registers.
+	(mep_cpu::get_processor_id): Implement.
+	(mep_cpu::set_processor_id): Likewise.
+	(mep_cpu::step_insns): Add logic for repeat blocks.
+
+2001-05-29  Ben Elliston  <bje@redhat.com>
+
+	* mep.cxx (mep_cpu::mep_cpu): Register a number of "syscall-argN",
+	"syscall-result", "syscall-error" and "syscall-trap" attributes.
+	(mep_cpu::do_syscall): Rewrite to use sw-gloss-generic/libgloss.
+	* mep.h (mep_cpu::do_syscall): Include pc in params.
+	(mep_cpu::syscall_arg0): New member.
+	(mep_cpu::syscall_arg1): Likewise.
+	(mep_cpu::syscall_arg2): Likewise.
+	(mep_cpu::syscall_arg3): Likewise.
+	(mep_cpu::syscall_error): Likewise.
+	(mep_cpu::syscall_result): Likewise.
+	(mep_cpu::syscall_trap_num): Likewise.
+	
+2001-05-25  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep_cpu::do_swi): Rename from this ..
+	(mep_cpu::do_syscall): .. to this.
+	* mep.cxx: Likewise.
+	* mep-decode.cxx, mep-decode.h, mep-sem.cxx: Regenerate.
+	
+	* mep.h	(mep_cpu::check_option): New method.
+	(mep_cpu::check_option_abs): Likewise.
+	(mep_cpu::check_option_ave): Likewise.
+	(mep_cpu::check_option_bit): Likewise.
+	(mep_cpu::check_option_clip): Likewise.
+	(mep_cpu::check_option_cp: Likewise.
+	(mep_cpu::check_option_debug): Likewise.
+	(mep_cpu::check_option_div): Likewise.
+	(mep_cpu::check_option_dsp): Likewise.
+	(mep_cpu::check_option_ldz): Likewise.
+	(mep_cpu::check_option_minmax): Likewise.
+	(mep_cpu::check_option_mul): Likewise.
+	(mep_cpu::check_option_sat): Likewise.
+	(mep_cpu::check_option_uci): Likewise.
+
+	* mep-decode.cxx, mep-sem.cxx: Regenerate.
+
+2001-05-24  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep_cpu::insn_option_types): Enumerate.
+	(mep_cpu::insn_options): New member.
+	* mep.cxx (mep_cpu constructor): Add attributes for the optional
+	instruction classes. Enable these options by default.
+
+2001-05-24  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep_cpu::delayed_branch): Remove.
+	(mep_cpu::delay_slot_p): Remove.
+	(mep_cpu::do_ldcb): New method.
+	(mep_cpu::do_stcb): Likewise.
+	(mep_cpu::control_bus): New member.
+	(mep_cpu): Move private members beneath public ones.
+	* mep.cxx (mep_cpu constructor): Add "control-space" accessor and
+	create register attributes needed by gdb.
+	(mep_cpu::do_ldcb): Implement.
+	(mep_cpu::do_stcb): Likewise.
+	(mep_cpu::step_insn): Remove delayed branch logic.
+
+	* mep-decode.cxx, mep-sem.cxx: Regenerate.
+
+2001-05-23  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep::mep_cpu::skip): Remove; MeP has no exposed delays.
+	(mep::mep_cpu::do_swi): Move method body to mep.cxx.
+	* mep.cxx (mep::mep_cpu constructor): Clean up.
+	(mep::mep_cpu::do_swi): Implement method.
+	(mep::mep_cpu::dbg_get_reg): Likewise.
+	(mep::mep_cpu::dbg_set_reg): Likewise.
+
+2001-05-22  Ben Elliston  <bje@redhat.com>
+
+	* mep-decode.cxx, mep-sem.cxx: Regenerate.
+
+2001-05-21  Ben Elliston  <bje@redhat.com>
+
+	* mep.cxx (mep::mep_cpu::do_ldz): Implement fully.
+
+	* mep-decode.cxx, mep-sem.cxx: Regenerate.
+
+2001-05-18  Ben Elliston  <bje@redhat.com>
+
+	* mep-decode.cxx, mep-sem.cxx: Regenerate.
+
+2001-05-17  Ben Elliston  <bje@redhat.com>
+
+	* mep-decode.h, mep-decode.cxx, mep-sem.cxx: Regenerate.
+
+2001-05-16  Ben Elliston  <bje@redhat.com>
+
+	* mep.cxx (mep::mep_cpu::mep_cpu): Add a "processor-id" attribute
+	which is tied to the $id control/special register.
+
+	* mep-cpu.h: Regenerate.
+
+2001-05-15  Ben Elliston  <bje@redhat.com>
+
+	* mep-cpu.h, mep-sem.cxx: Regenerate.
+
+2001-05-14  Ben Elliston  <bje@redhat.com>
+
+	* mep-decode.cxx, mep-decode.h, mep-sem.cxx: Regenerate.
+
+	* Makefile.am (DEJAGNUTESTS): Define.
+	(checkme): New target.
+	* Makefile.in: Regenerate.
+
+2001-05-11  Ben Elliston  <bje@redhat.com>
+
+	* mep.h (mep::mep_cpu::do_swi): New method.
+	* mep.cxx (mep::mep_cpu::step_insns): Fetch 16-bit words for now.
+
+	* mep-decode.cxx, mep-decode.h, mep-sem.cxx: Regenate.
+
+2001-05-10  Ben Elliston  <bje@redhat.com>
+
+	* mep-decode.cxx, mep-decode.h, mep-sem.cxx: Regenerate.
+
+2001-04-03  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (libmep_la_SOURCES): Add mep.cxx.
+	* Makefile.in: Regenerate.
+	* mep-sem.cxx: Likewise.
+	* mep.h (mep::mep_cpu::do_ldz): Don't inline; move to ..
+	* mep.cxx: New file.
+
+	* mep-cpu.h, mep-decode.cxx: Regenerate.
+	* mep.h (mep::mep_cpu::do_ldz): New method.
+
+	* mep.h: New file.
+
+2001-04-02  Ben Elliston  <bje@redhat.com>
+
+	* mep-decode.cxx, mep-decode.h, mep-sem.cxx: Regenerate.
+
+2001-03-28  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am: Reinstate targets.
+	* Makefile.in: Regenerate.
+	* mep-cpu.h, mep-decode.cxx, mep-decode.h: New files.
+	* mep-defs.h, mep-desc.h, mep-sem.cxx: Likewise.
+	
+	* Makefile.am: Disable most targets for now.
+	* Makefile.in: Regenerate.
+
+2001-03-22  Ben Elliston  <bje@redhat.com>
+
+	* configure.in (RH_CGEN_MAINT): Invoke.
+	* configure: Regenerate.
+	* Makefile.in: Likewise.
+	* aclocal.m4: Likewise.
+
+2001-03-20  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am: New file.
+	* configure.in: Likewise.
+	* Makefile.in: Generate.
+	* configure: Likewise.
+	* aclocal.m4: Likewise.

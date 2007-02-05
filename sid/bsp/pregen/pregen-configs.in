@@ -72,6 +72,21 @@ mvic a.out.conf i386-gloss.conf
 crs --cpu=x86 --no-run --gdb=5000
 mvic sid.conf i386-gdb.conf
 
+crs --cpu=mep --no-run a.out
+mvic a.out.conf mep-gloss.conf
+
+crs --cpu=mep --no-run --gdb=5000 -EB
+mvic sid.conf mep-gdb.conf
+
+crs --cpu=mep --no-run --gdb=5000 -EB --tksm
+mvic sid.conf mep-gdb-tksm.conf
+
+crs --cpu=mep --no-run --gdb=5000 -EL
+mvic sid.conf mep-little-gdb.conf
+
+crs --cpu=mep --no-run --gdb=5000 -EL --tksm
+mvic sid.conf mep-little-gdb-tksm.conf
+
 crs --cpu=mt --no-run a.out
 mvic a.out.conf mt-gloss.conf
 

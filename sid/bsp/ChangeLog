@@ -1,3 +1,33 @@
+2007-02-05  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+	2004-02-03  Dave Brolley  <brolley@redhat.com>
+
+	* Makefile.am (FAM9SCRIPTS): Removed.
+	* Makefile.in: Regenerated.
+	* mep-elf-sid: Removed.
+
+	2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	Add pretty names for various scheduler connections.
+	* mep-elf-sid: Run sid directly, rather than configrun-sid.in.
+	For Ben Elliston  <bje@redhat.com>
+	* mep-elf-sid: Pass updated --board and --gloss options to sid.
+
+	2001-05-21  Ben Elliston  <bje@redhat.com>
+
+	* mep-elf-sid: Remove --board none.
+
+	2001-04-04  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (FAM9SCRIPTS): Add mep-elf-sid.
+	(ALLFAMSCRIPTS): Add $(FAM9SCRIPTS).
+	* Makefile.in: Regenerate.
+
+	2001-04-03  Ben Elliston  <bje@redhat.com>
+
+	* mep-elf-sid: New file.
+
 2006-11-29  Dave Brolley  <brolley@redhat.com>
 
 	* mt-elf-sid: New script.

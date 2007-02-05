@@ -26,6 +26,13 @@ extern "C" {
 #if SIDTARGET_M32R
 #include "m32rbf.h"
 #endif
+#if SIDTARGET_MEP
+#include "mep_basic.h"
+// begin-mep-includes
+#include "mep_ext1.h"
+#include "mep_ext2.h"
+// end-mep-includes
+#endif
 #if SIDTARGET_MT
 #include "mt.h"
 #endif
@@ -320,6 +327,13 @@ compCGENListTypes ()
 #if SIDTARGET_ARM
   types.push_back ("hw-cpu-arm7t");
 #endif
+#if SIDTARGET_MEP
+  types.push_back ("hw-cpu-mep");
+  // begin-mep-types
+  types.push_back ("hw-cpu-mep-ext1");
+  types.push_back ("hw-cpu-mep-ext2");
+  // end-mep-types
+#endif
 #if SIDTARGET_MT
   types.push_back ("hw-cpu-mt");
 #endif
@@ -362,6 +376,16 @@ compCGENCreate (const string& typeName)
 #if SIDTARGET_ARM
   if (typeName == "hw-cpu-arm7t")
     return new arm7f::arm7f_cpu ();
+#endif
+#if SIDTARGET_MEP
+  if (typeName == "hw-cpu-mep")
+    return new mep_basic::mep_basic_cpu ();
+  // begin-mep-constructors
+  if (typeName == "hw-cpu-mep-ext1")
+    return new mep_ext1::mep_ext1_cpu ();
+  if (typeName == "hw-cpu-mep-ext2")
+    return new mep_ext2::mep_ext2_cpu ();
+  // end-mep-constructors
 #endif
 #if SIDTARGET_MT
   if (typeName == "hw-cpu-mt")

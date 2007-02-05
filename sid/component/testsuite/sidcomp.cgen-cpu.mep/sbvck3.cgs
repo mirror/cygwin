@@ -1,0 +1,26 @@
+# mep testcase for sbvck3 $0,$rn,$rm -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global sbvck3
+sbvck3:
+	# 2 - 1 should not underflow!
+	mov $1, 2
+	mov $2, 1
+	sbvck3 $0,$1,$2
+	assert $0, 0
+
+	# small ($1) - big ($2) will underflow.
+	mov $1, -100
+	mov $2, -1
+	mov $7, 1
+	sll $7, 31
+	xor $2, $7
+	sbvck3 $0,$1,$2
+	assert $0, 1
+
+okay:	
+	pass
+wrong:
+	fail

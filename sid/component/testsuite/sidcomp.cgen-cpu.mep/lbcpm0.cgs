@@ -1,0 +1,12 @@
+# mep testcase for lbcpm0 $crn,($rm+),$imm8 -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global lbcpm0
+lbcpm0:
+	# This instruction is exercised by the sbcpm0 test case.
+	mov $0, 0
+	lbcpm0 $cr0,($0+),0
+	pass

@@ -1,3 +1,935 @@
+2007-02-05  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+	2006-09-14  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h (get_local_shadow_bit_insn_probe): New method of MepBoardCfg.
+	(shadow_covers_local_region): New method of MepBoardCfg.
+	(local_shadow_bit_insn_probe): New member of MepBoardCfg.
+	* mepCfg.cxx (map_boards): Call map_imem_dmem for each board here...
+	(setup_memory_map): ... not here. Connect a probe to any mappings
+	of local shadows onto another module's dmem in order to monitor
+	access by bit insns.
+	(MepCacheCfg): bit_insn_probes array is now a scalar, bit_insn_probe.
+	(MepCacheCfg::configure): Connect bit_insn_probe's downstream accessor
+	to the cache, if it exists.
+	(cache): Insert bit_insn_probe into the mapping of any cached regions,
+	if it exists. Remove instance which takes a second argument.
+	(need_bit_insn_probe): Renamed from need_bit_insn_probes. Now creates
+	only one probe.
+	(MepBoardCfg): Initialize local_shadow_bit_insn_probe.
+	(configure_dcache): Do not insert a probe to monitor access to cache tag
+	and data areas.
+	(shadow_covers_local_region): Multiply imem_size by 1024 when testing the
+	imem range. Now takes a 5th argument which is a reference to a bool
+	indicating whether the memory range covered is dmem.
+	(write_load): If opt_bit_p is set, create local_shadow_bit_insn_probe.
+	(MepMemRegionCfg): Use make_numeric_attribute and pass std::ios::hex.
+	(mep_imem_dmem): Likewise.
+
+	2006-08-29  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h (MepBoardCfg::write_load): New method.
+	(dmem_probes): New member of MepBoardCfg.
+	(opt_bit_p): New member of MepBoardCfg.
+	* mepCfg.cxx (MepCacheCfg): Initizlize bit_insn_probes.
+	(MepCacheCfg::configure): Connect the bit insn probes to main memory,
+	if they exist.
+	(MepCacheCfg::pass): New variant for passing a region with probing.
+	(need_bit_insn_probes): New method of MepCacheCfg.
+	(bit_insn_probes): New member of MepCacheCfg.
+	(opt_bit_p): New member of MepBoardCfg.
+	(configure_dcache): If opt_bit_p is set, pass the cache line area and cache
+	tag area with probing.
+	(map_imem_dmem): If opt_bit_p is set, set up a bus probe for the dmem regions.
+	(MepBoardCfg::write_load): New method.
+	(set_opt_bit): Set opt_bit_p.
+
+	2005-06-30  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (num_boards): New method of MepMemCfg.
+	(irq_specs): New static member of MepBoardCfg.
+	(MepBoardCfg::write_config): Call configure_irqs. Don't clear
+	mep_peripherals. Use a static flag to process peripherals only once.
+	(add_irq): Just add the spec to irq_specs.
+	(configure_irqs): New method of MepBoardCfg.
+	(configure_irq): New method of MepBoardCfg.
+	* mepCfg.h (MepIrq): New struct type in MepBoardCfg.
+	(configure_irqs): New method of MepBoardCfg.
+	(configure_irq): New method of MepBoardCfg.
+
+	2005-06-06  Dave Brolley  <brolley@redhat.com>
+
+	* mainDynamic.cxx (main): Add " --model-busses" to board_start_config instead of
+	" --model_busses" (typo).
+	* mepCfg.cxx (MepCacheCfg::set_dynamic_config): Check whether my_cache
+	is wrapped before connecting it to the dynamic_configurator.
+	(MepBoardCfg): Relate cpu to insn_buffer.
+	(configure_icache): Don't set our loader member here. Use automatic
+	temp, the_loader.
+	(configure_dcache): Likewise.
+	(MepBoardCfg::write_config): Connect the downstream-passthrough pin
+	to the correct passthrough pin on the gbmif. Set the cpu's
+	step-insn-count-1-required attribute. Check whether insn-buffer is
+	wrapped before connecting it to the dynamic configurator. Likewise
+	for the dmac, hardware engines and peripherals.
+
+	2005-05-29  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (set_dynamic_config): New method of mepCacheCfg.
+	(mepBoardCfg::write_config): Make connections and set attributes to
+	allow dynamic reconfiguration of mep components.
+
+	2005-04-22  Richard Sandiford  <rsandifo@redhat.com>
+
+	* mepCfg.cxx (MepMemCfg::MepMemCfg, MepBoardCfg::MepBoardCfg)
+	(MepBoardCfg::add_memory, MepBoardCfg::configure_icache)
+	* mainDynamic.cxx, mepCfg.cxx: Apply automatic MeP-Integrator changes.
+
+	2005-02-24  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h (MEP_CORE_C4): New macro.
+	* mepCfg.cxx (map_imem_dmem): Don't check core type when checking
+	dmem_fixed_start_address.
+	(write_config): Likewise.
+
+	2005-01-14  Dave Brolley  <brolley@redhat.com>
+
+	* mainDynamic.cxx (usage): Document --model-busses.
+
+	2004-12-07  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.h (set_opt_gbif): Removed.
+	(set_opt_lbif): Removed.
+	(set_opt_gbmif): Removed.
+	* mainDynamic.cxx (usage): Removed description of --gbif, --lbif and
+	--gbmif.
+	(Defs): Removed gbmif.
+	(option_num): Remove opt_gbif, opt_lbif and opt_gbmif.
+	(long_options): Remove gbif, lbif and gbmif.
+	(main): Remove default for gbmif. Remove handling of opt_gbif,
+	opt_lbif, opt_gbmif.
+	* mepCfg.cxx (MepBusArbitratorCfg): Now takes second argument for type.
+	(gbmif_type): New member of MepMemCfg.
+	(set_opt_gbmif): Removed from MepMemCfg and MepBoardCfg.
+	(add_toshapi_gbmif): Renamed to add_toshapi_global_bus_model. Now sets
+	gbmif_type.
+	(MepBoardCfg): gbif_name and lbif_name renamed to gbif_type and
+	lbif_type respectively.
+	(add_toshapi_gbif): Renamed to add_toshapi_global_bus_if_model.
+	(add_toshapi_lbif): Renamed to add toshapi_local_bus_model.
+	(set_core_id): Update curr_core_id.
+	(set_opt_gbif): Removed from MepBoardCfg.
+	(set_opt_lbif): Removed from MepBoardCfg.
+	* MepCfg.h (add_toshapi_gbmif): Renamed to add_toshapi_global_bus_model.
+	(MepBoardCfg): gbif_name and lbif_name renamed to gbif_type and
+	lbif_type respectively.
+	(add_toshapi_gbif): Renamed to add_toshapi_global_bus_if_model.
+	(add_toshapi_lbif): Renamed to add toshapi_local_bus_model.
+	(set_opt_gbmif): Removed from MepMemCfg and MepBoardCfg.
+	(set_opt_gbif): Removed from MepBoardCfg.
+	(set_opt_lbif): Removed from MepBoardCfg.
+	(gbif_map): Removed from MepBoardCfg.
+	(lbif_map): Removed from MepBoardCfg.
+
+	2004-11-08  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepCacheCfg): Initialize data_width.
+	(MepCacheCfg::configure): Set data-width attributeof the cache.
+	(set_data_width): New method of MepCacheCfg.
+	(data_width): New member of MepCacheCfg.
+	(configure_icache): Call icache->set_data_width.
+	(configure_dcache): Call dcache->set_data_width.
+	(MepBoardCfg::write_config): Set the data-width attribute of the
+	insn_buffer.
+	* commonCfg.cxx (GprofCfg): Check the initial substring of comp_type ()
+	not the entire string.
+
+	2004-11-02  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepCacheCfg::configure): Connect the cache's
+	"operation-status" pin to the cpu's "cache-operation-status" pin.
+
+	2004-10-28  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (mep_boards): Only connect gbmif's global-bus-lock to the
+	board's gbif global-bus-slave-lock if the board has a gbif.
+	(MepBoardCfg::set_model_busses): Set insn_count_1.
+	(MepBoardCfg::set_opt_gbmif): Don't call set_model_busses.
+
+	2004-10-22  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.h (set_opt_gbif): New method of BoardCfg.
+	(set_opt_lbif): New method of BoardCfg.
+	(set_opt_gbmif): New method of BoardCfg.
+	* mepCfg.h (MepBusArbitratorCfg): New class.
+	(set_opt_gbmif): New method of MepMemCfg and MepBoardCfg.
+	(add_toshapi_gbmif): New method of MepMemCfg.
+	(add_toshapi_gbif): New method of MepBoardCfg.
+	(add_toshapi_lbif): New method of MepBoardCfg.
+	(set_opt_gbif): New method of MepBoardCfg.
+	(set_opt_lbif): New method of MepBoardCfg.
+	(gbif_name,lbif_name): New members of MepBoardCfg.
+	(gbif_map,lbif_map): Ditto.
+	* mepCfg.cxx (MepBusArbitratorCfg): New class.
+	(map_global_memory): Set latency of memory to 1 cycle if modelling
+	busses.
+	(setup_memory_map): Adjust base address of local memory if mapping
+	via the lbif.
+	(set_opt_gbmif): New method of MepMemCfg and MepBoardCfg.
+	(add_toshapi_gbmif): New method of MepMemCfg.
+	(set_model_busses): Create MepBusArbitratorCfg. Connect the gbmif to the
+	global bus here.
+	(MepCacheCfg): Map the "total-latency?" attribute the the cache.
+	(MepBoardCfg): Initialize gbif_name and lbif_name.
+	(add_toshapi_gbif): New method of MepBoardCfg.
+	(add_toshapi_lbif): New method of MepBoardCfg.
+	(MepBoardCfg::write_config): Set the "total-latency?" attribute of
+	the caches here.
+	(set_opt_gbif): New method of MepBoardCfg.
+	(set_opt_lbif): New method of MepBoardCfg.
+	* mainDynamic.cxx (usage): Describe --gbif, --lbif and --gbmif.
+	(Defs): New member gbmif.
+	(option_num): Add opt_gbif, opt_lbif and opt_gbmif.
+	(long_options): Add gbif, lbif and gbmif.
+	(main): Propogate default for gbmif to boards. Handle opt_gbif,
+	opt_lbif, opt_gbmif.
+	
+	2004-10-12  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepMemCfg): Initialize gbmif.
+	(map_global_memory): Set the "ports" attribute of the gbmif.
+	(map_boards): Connect the gbmif's "global-bus-lock" pin to the
+	"global-bus-slave-lock" pin of each gbif.
+	(setup_memory_map): Map local shadows to the global-bus-slave-interface
+	of the gbif, if specified. Don't use a base address when mapping local
+	shadows onto the lbif. Connect the gbmif's "global-bus" to the global
+	mapper.
+	(set_model_busses): Move the implementation out of the class
+	declaration.
+	(MepCacheCfg): Map the downstream-lock pin from the cache component.
+	(set_loader): Connect the dmac's "check-address" pin to the "probe" pin.
+	(set_model_busses): Schedule the gbif and the lbif.
+	(MepBoardCfg::write_config): Connect the gbif to the gbmif. Connect
+	the downstream-lock pins for all blockable and arbitrating components.
+	Set up the dmac as a blockable component.
+	(configure_dmac): Connect the dmac to the gbif and lbif if specified.
+
+	2004-09-16  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h (MepBoardCfg::set_model_busses): New virtual method.
+	(gbif,lbif): New members of MepBoardCfg.
+	* mepCfg.cxx (MepMemCfg): Initialize model_busses.
+	(MepMemCfg::setup_memory_map): Map global memory through the GBIF if
+	necessary. Connect the GBIF and LBIF to downstream objects if
+	necessary.
+	(MepMemCfg::set_model_busses): New method.
+	(MepMemCfg::model_busses_p): New method.
+	(MepMemCfg::model_busses): New member.
+	(map_peripheral): Map peripheral memory through the GBIF if necessary.
+	(map_mm_int): Ditto for mm_int memory..
+	(MepCacheComponentCfg): Inherit from BlockingCacheCfg.
+	(MepCacheCfg): Map attributes "name", "blockable?", "ulog-*",
+	"buffer-output" from my_cache.
+	(MepBoardCfg): Initialize gbif and lbif. Construct insn_buffer using
+	BlockingCacheCfg.
+	(MepBoardCfg::set_model_busses): New virtual method.
+	(MepBoardCfg)::map_local_mem): Map local memory through the GBIF if
+	necessary.
+	(MepBoardCfg::write_config): Set up the cpu, gbif, lbif, insn_buffer,
+	icache and dcache as blockable is specified.
+	* mainDynamic.cxx (model_busses): New member of Defs.
+	(opt_model_busses): New member of option_num.
+	(long_options): Add model-busses.
+	(main): Set default for --model-busses. Handle opt_model_busses.
+
+	2005-07-29  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (set_cop_ccr): New method of MepBoardCfg.
+	* mepCfg.h (set_cop_ccr): Likewise.
+
+	2004-08-20  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (configure_dmac): Connect the dmac's "error" pin to main's
+	"stop!" pin and yield-net's "input" pin.
+
+	2004-08-16  Dave Brolley  <brolley@redhat.com>
+
+	* commonCfg.cxx (GprofCfg): Connect the cpu's "sample-gprof" pin to
+	the gprof's "sample" pin for instruction_count mode of sampling.
+	* mepCfg.cxx (write_config): Don't set the gprof's "bucket-size" here.
+
+	2004-08-11  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepCacheTagMemCfg): Don't initialize read_latency
+	and write_latency for MemCfg.
+	(MepCacheCfg): Ditto for "data-test-mem".
+
+	2004-07-22  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepBoardCfg::write_config): Correct DRBN value for the
+	case of no DMEM.
+
+	2004-07-20  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepCacheCfg::configure): connect "cache-invalidate" to
+	"clear-tag".
+
+	2004-06-24  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h (MEP_CORE_MEP, MEP_CORE_H1): New macros.
+	(MEP_CORE_UNKNOWN): Removed.
+	(set_dmem_fixed_start_address): New method.
+	(set_opt_dmem_fixed_start_address): New method.
+	* mepCfg.cxx (MepCacheCfg): Set latency of data_test_mem to be 10
+	cycles.
+	(MepCacheCfg::configure): Connect the cpu's insn-cache-invalidate-all
+	pin, data-cache-invalidate-all pin and cache-prefetch pin.
+	(MepDSUCfg): Now takes a core_type argument. Use it to set the range
+	of the DSU registers on the control bus.
+	(MepBoardCfg): Initialize core_type to MEP_CORE_MEP. Initialize
+	dmem_fixed_start_address.
+	(set_dmem_fixed_start_address): New method.
+	(set_opt_dmem_fixed_start_address): New method.
+	(map_imem_dmem): Only compute imem/dmem bases if they are configured.
+	(MepBoardCfg::write_config): Set the dsu's core-type attribute.
+	Handle dmem_fixed_start_address.
+	(need_dsu): Pass core_type to MepDSUCfg.
+	* mainDynamic.cxx (usage): Document --dmem-[no-]fixed-start-address.
+	(option_num): Add dmem_[no_]fixed_start_address.
+	(long_options): Add dmem-[no-]fixed-start-address.
+	(main): Handle dmem_[no_]fixed_start_address.
+	* commonCfg.h (BoardCfg): New virtual method
+	set_opt_dmem_fixed_start_address.
+
+	2004-06-24  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepCacheCfg): Don't connect "invalidate-all" pin to the
+	init-sequence.
+	(MepBoardCfg): Initialize corrupt_caches.
+	(MepBoardCfg::write_config): set the cpu's "corrupt-caches" attribute.
+	* mainDynamic.cxx (usage): Document --corrupt-caches.
+	(Defs): New member: corrupt_caches.
+	(opt_corrupt_caches): New member of option_num.
+	(long_options): Add "corrupt-caches".
+	(main): Handle opt_corrupt_caches.
+	* mepCfg.h (set_corrupt_caches): New virtual method of MepBoardCfg.
+	(corrupt_caches): New member of MepBoardCfg.
+	* commonCfg.h (set_corrupt_caches): New virtual method of BoardCfg.
+
+	2004-04-29  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepCacheCfg::configure): Move the setting of tag_test_mem
+	attributes to here from the constructor.
+	* mep-cache.{cxx,h}: New files.
+
+	2004-04-29  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h (MepBoardCfg::set_endian): New specialization.
+	(endianness): New member of MepBoardCfg.
+	* mepCfg.cxx (MepCacheComponentCfg): New class.
+	(MepCacheTagMemCfg): New class.
+	(MepCacheCfg): Use new classes above. Allocate and map cache data/tag
+	test memory. No more tag_test_probe. Caches read tags from mapped
+	memory.
+	(MepCacheCfg::get_size): Removed.
+	(MepCacheCfg::set_endianness): New method.
+	(MepBoardCfg): Initialize core_type to MEP_CORE_UNKNOWN.
+	(MepBoardCfg::set_endian): New specialization.
+	(MepBoardCfg::configure{i,d}cache): Get loader from the session if the
+	board doesn't have its own. Call {i,d}cache->set_endianness based on
+	the loader.
+
+	2004-04-08  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h (hw_engines): New member of MepBoardCfg.
+	* mepCfg.cxx (MepBoardCfg): Initialize hw_engines.
+	(add_hw_engine): Don't set the cpu's hwe-option? attribute here. Just
+	count the hardware engine.
+	(add_toshapi_hw_engine): Ditto.
+	(add_toshapi_dsp, add_toshapi_uci): Don't count as a hardware engine.
+	(write_config): Set the cpu's hwe-option? attribute here based on
+	hw_engines.
+
+	2004-04-01  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h (MEP_CORE_*): New macros.
+	(add_dsp): New argument: dmem_if_width.
+	(add_toshapi_dsp): Ditto.
+	(set_core_type): New method of MepBoardCfg.
+	(set_icache_cwf): New method of MepBoardCfg.
+	(set_dcache_cwf): New method of MepBoardCfg.
+	(set_opt_icache_cwf): New method of MepBoardCfg.
+	(set_opt_dcache_cwf): New method of MepBoardCfg.
+	* mepCfg.cxx (MepCacheCfg): New parameter: cwf. New members: my_cwf,
+	my_way.
+	(set_way): Set this->my_way.
+	(set_cwf): New method of MepCacheCfg.
+	(get_size): Ditto.
+	(get_way): Ditto.
+	(get_line_size): Ditto.
+	(get_cwf): Ditto.
+	(MepBoardCfg): Initialize core_type.
+	(add_dsp): New argument: dmem_if_width. Set the cpu's
+	"dsp-dmem-if-width" attribute.
+	(add_toshapi_dsp): Ditto.
+	(set_core_type): New method of MepBoardCfg.
+	(need_icache): Call MepCacheCfg with new argument list.
+	(need_dcache): Call MepCacheCfg with new argument list.
+	(set_icache_cwf): New method of MepBoardCfg.
+	(set_dcache_cwf): New method of MepBoardCfg.
+	(MepBoardCfg::write_config): Use core_type to set the ID.ID field. Set
+	new fields for c3 fore in CCFG.
+	(set_opt_icache_cwf): New method of MepBoardCfg.
+	(set_opt_dcache_cwf): New method of MepBoardCfg.
+	* mainDynamic.cxx (usage): Document --icache-line-size, --icache-way,
+	--icache-cwf options. Also same options for dcache.
+	(option_num): New enumerators opt_icache_line_size, opt_icache_way,
+	opt_icache_cwf. Same for dcache.
+	(long_options): Add icache-line-size, icache-way and icache-cwf.
+	Same for dcache.
+	(main): Handleopt_icache_line_size, opt_icache_way, opt_icache_cwf.
+	Same for dcache.
+	* commonCfg.h (set_opt_icache_cwf): New method of BoardCfg.
+	(set_opt_dcache_cwf): New method of BoardCfg.
+
+	2004-03-30  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepCacheCfg): New parameter: way. Call set_way.
+	(add_toshapi_dsp): Call conn_pin for "dsp-arg4" and "dsp-arg7".
+	(add_toshapi_uci): Call conn_pin for "uci-arg4".
+	(need_icache): Pass default setting of 1 for 'way'.
+	(need_dcache): Pass default setting of 1 for 'way'.
+	(set_opt_{icache,dcache}_{linesize,way}): New methods of MepBoardCfg.
+	(set_{icache,dcache}_{linesize,way}): New methods of MepBoardCfg.
+	* commonCfg.h (set_opt_{icache,dcache}_{linesize,way}): New methods of
+	BoardCfg.
+	* mepCfg.h: Ditto for MepBoardCfg.
+
+	2004-03-22  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (shared_dsp_log): Removed.
+	(add_toshapi_dsp): Connext the dsp's "dsp-log-out" pin to the cpu's
+	"trace" pin.
+	* mepCfg.h (shared_dsp_log): Removed.
+
+	2004-03-09  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (add_toshapi_dsp): Set cpu's "hwe-option?" to false.
+	(add_toshapi_uci): Ditto.
+
+	2004-02-23  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h (add_dmac): No longer takes irq_dmac argument.
+	(set_config_index): New virtual method of BoardCfg.
+	(set_opt_dmac_irq): Removed.
+	(config_index): New member of MepBoardCfg.
+	(dmac_irq): Removed.
+	* mepCfg.cxx (MepBoardCfg): Initialize config_index. Remove
+	initialization of dmac_irq.
+	(add_hw_engine): set the cpu's "hwe_option?" attribute.
+	(add_toshapi_hw_engine): Ditto.
+	(MepBoardCfg::write_config): Set the cpuj's "config-index" attribute.
+	ID.ID is now 0x2.
+	(add_dmac): No longer takes irq_dmac argument.
+	(configure_dmac): Remove check of dmac_irq.
+	(add_exit_location): Add memory to the exit-watchdog so that it doesn't
+	return sid::status::unmapped when accessed.
+	(set_opt_dmac_irq): Removed.
+	(irq_dmac): Removed.
+	(add_irq): Remove handling of irq_dmac.
+	* mainDynamic.cxx (usage): Remove description of --dmac-irq and
+	--dmac-no-irq.
+	(option_num): Remove opt_dmac_irq and opt_dmac_no_irq.
+	(main): Call curr_board->set_config_index. Remove handling of
+	opt_dmac_irq and opt_dmac_no_irq.
+	* commonCfg.h (set_config_index): New virtual method of BoardCfg.
+	(opt_dmac_irq): Removed.
+
+	2004-02-17  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (add_timer): Check that timer has been allocated.
+
+	2004-02-16  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h (set_dsp_user_out): New virtual method of BoardCfg.
+	(dsp_user_out): New member of MepBoardCfg.
+	* mepCfg.cxx (dsp_user_out): New member of MepBoardCfg.
+	(MepBoardCfg::write_config): Set "dsp-user-out-option?" in the
+	cpu and "user-out" in each dsp.
+	* mainDynamic.cxx (usage): Document --[no-]dsp-user-out.
+	(dsp_user_out): New member of Defs. Initialize it.
+	(option_num): Add opt_dsp_user_out and opt_no_dsp_user_out.
+	(load_options): Add "dsp-user-out" and "no-dsp-user-out".
+	(main): Use default setting of dsp_user_out if specified.
+	Handle opt_dsp_user_out and opt_no_dsp_user_out.
+	* commonCfg.h (set_dsp_user_out): New virtual method of BoardCfg.
+
+	2004-02-09  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepMemCfg): Initialize insn_count_1.
+	(insn_count_1_required): New method of MepBoardCfg.
+	(insn_count_1): New member of MepBoardCfg.
+	(add_peripheral): Set insn_count_1.
+	(add_toshapi_peripheral): Ditto.
+	(add_hw_engine, add_toshapi_hw_engine): Ditto.
+	(MepBoardCfg): initialize insn_count_1 and step_insn_count.
+	(MepBoardCfg::write_config): Call set_step_insn_count if required.
+	(trace_counter): New virtual method of MepBoardCfg.
+	(set_step_insn_count): Ditto.
+	(insn_count_1_required): Ditto.
+	* mepCfg.h (trace_counter): New virtual method of MepBoardCfg.
+	(set_step_insn_count): Ditto.
+	(step_insn_count, insn_count_1): New members of MepBoardCfg.
+	(step_insn_count_1_required): New method of MepBoardCfg.
+
+	2004-02-03  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (set_channels): New method of MepTimerCfg.
+	(MepBoardCfg): Remove timer_channel_bitw.
+	(add_timer): Pass channel_bitw to allocate_timer and call
+	timer->set_channels.
+	(allocate_timer): Now takes channel_bitw_argument.
+	(configure_timer): Use timer->get_channels.
+	(configure_dmac): Ditto.
+	* mepCfg.h (allocate_timer): Now takes channel_bitw_argument.
+	(MepBoardCfg): Remove timer_channel_bitw.
+
+	2004-01-30  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (add_toshapi_dsp): Call set_opt_dsp.
+
+	2004-01-26  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h (allocate_timer, configure_timer): New methods of MepBoardCfg.
+	(set_opt_timer_channel_bitw): New method of MepBoardCfg.
+	(timer_channel_bitw): New member of MepBoardCfg.
+	* mepCfg.cxx (MepBoardCfg): Initialize timer_channel_bitw.
+	(set_dmem_bank_num): Allow dmem_bank_num to be set to zero.
+	(map_imem_dmem): Correct fmem_base_address for case of no dmem.
+	Initialize dmem_base[0].
+	(MepBoardCfg::write_config): Call configure_timer. Move setup of timer
+	interrupt pins to configure_timer. Handle case where dmem_bank_num is
+	zero.
+	(add_timer): Move allocation, scheduling and connection of timer to
+	allocate_timer and configure_timer.
+	(allocate_timer, configure_timer): New methods of MepBoardCfg.
+	(configure_dmac): Use timer_channel_bitw.
+	(set_opt_timer_channel_bitw): New method of MepBoardCfg.
+	* mainDynamic.cxx (usage): Document --timer-channel-bitw.
+	(option_num): Add opt_timer_channel_bitw.
+	(long_options): Add timer-channel-bitw.
+	(main): Handle opt_timer_channel_bitw.
+	* commonCfg.h (set_opt_timer_channel_bitw): New prototype.
+
+	2003-01-28  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (add_timer): Connect the timer's nmi pin to the cpu's
+	nmi pin.
+
+	2003-01-23  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepTimerCfg): Remove 'ctrlmap' and 'cpu'. Add
+	'channel-bitw'.
+	Initialize 'channels' with 'channel_bitw'.
+	(add_timer): Call MepTimerCfg with channel_bitw.
+	(add_dmac): Connect output pins to the intc interrupt-source-N and
+	above, where N is the number of timer channels.
+
+	2003-01-13  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepMemCfg::map_mm_int): Now takes mm_int as an
+	argument.
+	(MepBoardCfg::map_mm_int): New method.
+	* MepCfg.h (MepBoardCfg::map_mm_int): New method.
+
+	2002-12-10  D. Marlin  <dmarlin@redhat.com>
+
+	* baseCfg.h : Added a typedef for gprof_type.
+	* commonCfg.h : Added type and interval parameters to GprofCfg class interface
+	and set_gprof method prototype.
+	* commonCfg.cxx (GprofCfg::GprofCfg): Added type and interval to GprofCfg class.
+	Modified constructor to support data collection based on simulated cycles.
+	(BoardCfg::set_gprof): Added type and interval parameters.
+	* mainDynamic.cxx (usage): Added 'cycles=N' suboption to --gprof.
+	(try_add_gprof): New method.
+	(main): Added call to try_add_gprof.
+
+	2002-12-09  D. Marlin  <dmarlin@redhat.com>
+
+	* mepCfg.h:  Changed imem to have two banks instead of one.
+	Added dmem_bank_num configurable member.
+	Changed dmem to use an array of four (dmem[4]) instead of two static 
+	banks (dmem0 and dmem1).
+	Removed prototypes for methods to set_[icache|dcache]_[way|line_size]
+	* mepCfg.cxx : Removed methods to set_[icache|dcache]_[way|line_size]
+	(set_imem_size): Changed to initialize two banks.
+	(set_dmem_bank_num): Added new method to set the number of dmem banks.
+	(set_dmem_size):  Changed to initialize two to four banks, depending
+	on the number of banks configured (dmem_bank_num).
+	(MepBoardCfg::write_config):  Changed to emit the bank specifiers for two imem 
+	banks and two to four dmem banks.  
+	Modified the way the dmem bank specifiers are determined to use a table based 
+	on the data in the architecture manual.
+	Updated rcfg register configuration for new format.
+
+	2002-11-29  Ben Elliston  <bje@redhat.com>
+
+	* commonCfg.h (BoardCfg::final_insn_count): Declare.
+	* commonCfg.cxx (BoardCfg::final_insn_count): Implement.
+	* mainDynamic.cxx (usage): Document --final-insn-count.	
+	(Defs::final_insn_count): New option flag.
+	(Defs::Defs): Initialise it.
+	(enum option_num): Add opt_final_insn_count.
+	(long_options): Add --final-insn-count.
+	(main): Process opt_final_insn_count.
+
+	2002-11-26  Ben Elliston  <bje@redhat.com>
+
+	* mepCfg.h (MepBoardCfg::add_exit_location): Declare member.
+	* mepCfg.cxx (MepBoardCfg::add_exit_location): Implement.
+
+	2002-11-22  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (add_timer): Set the cpu's num-timer-channels attribute.
+	(set_opt_biu): New method of  MepBoardCfg.
+	* mepCfg.h (set_opt_biu): New method of  MepBoardCfg.
+
+	2002-11-21  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepTimerCfg): New class.
+	(MepBoardCfg): Initialize timer.
+	(add_timer): New method of MepBoardCfg.
+	* mepCfg.h (add_timer): New method of MepBoardCfg.
+	(timer): New member of MepBoardCfg.
+
+	2002-11-19  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (add_dsp): Change first parameter name to "name" and use it
+	in the name of the memory for the cbus interface.
+	(add_cop): New method of MepBoardCfg.
+	* mepCfg.h (add_cop): New method of MepBoardCfg.
+
+	2002-11-19  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (add_dsp): New method of MepBoardCfg.
+	* mepCfg.h (add_dsp): New method of MepBoardCfg.
+
+	2002-11-15  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepMM_INT_Cfg): New class.
+	(add_mm_int): New method of MepMemCfg.
+	(map_mm_int): Ditto.
+	(channels): New member of MepINTCCfg.
+	(get_channels): New methos of MepINTCCfg.
+	(MepBoardCfg): Call allocate_mm_int to initialize shared_mm_int.
+	(need_mm_int): New method of MepBoardCfg.
+	(need_icache): Pass mm_int region.
+	(need_dcache): Ditto.
+	(allocate_mm_int): New method of MepBoardCfg.
+	(write_config): Connect MM_INT pins to the INTC.
+	* mepCfg.h (MepMM_INT_Cfg): New class.
+	(shared_mm_int): New member of MepMemCfg.
+	(need_mm_int): New method of MepBoardCfg.
+	(allocate_mm_int): New method of MepBoardCfg.
+
+	2002-11-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* baseCfg.h: Add `using namespace std' clause.
+
+	2002-11-08  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx: Move MepCacheCfg to before MepMemCfg so that it can be
+	used by MepMemCfg. Add markers for peripherals and peripheral-mappings.
+	(add_peripheral): New method of MepMemCfg.
+	(map_peripheral): New method of MepMemCfg.
+
+	2002-10-09  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h (add_dmac): New method.
+	(need_dmac): Removed.
+	(set_opt_dmac): Removed.
+	(dmac): Now of type AtomicCfg *.
+	* mepCfg.cxx: Remove class MepDMACCfg.
+	(add_dmac): New method of MepBoardCfg replaces need_dmac and MepDMACCfg.
+	(set_opt_dmac): Removed.
+
+	2002-10-02  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepDMACCCfg): Use new control register mapping.
+
+	2002-09-26  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h: Rename 'global' to 'global_mapper'.  Rename 'localmap'
+	to local_mapper.
+	(imem_dmem_base): New constant.
+	(imem_dmem_size): New constant.
+	(add_local_mem): Now returns MemCfg *.
+	(add_hw_engine): New parameters: lbus_if, lbus_addr, lbus_size.
+	(get_lmem_address): New function.
+	(local_mem_map): New mapping.
+	* mepCfg.cxx: Rename 'global' to 'global_mapper'.  Rename 'localmap'
+	to local_mapper. Fix Diagram of memory heirarchy.
+	(MepBoardCfg): Initialize local_mem_map.  Use localmem_base and
+	imem_dmem_size.
+	(add_local_mem): Now returns MemCfg *.  Always specify memory size.
+	Pass new memory region through the caches.
+	(get_lmem_address): New function.
+	(add_hw_engine): New parameters: lbus_if, lbus_addr, lbus_size.
+	Connect the hw_engine to the specified local memory regions.
+	(need_icache): Use localmem_base and imem_dmem_size.
+	(need_dcache): Ditto.
+
+	2002-07-23  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepBoardCfg): Call new variant of GlossCfg.
+	(write_config): Connect the gloss target-memory to the dcache mapper
+	if available, otherwise to the main-mapper.
+	* commonCfg.h (GlossCfg): New constructor.
+	* commonCfg.cxx (GlossCfg): New constructor.
+
+	2002-07-19  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepCacheCfg): Allocate cache of correct size. Allocate
+	cache test areas of correct size.
+
+	2002-07-16  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepCacheCfg): Connect cache-flush-and-invalidate and
+	cache-index-flush-and-invalidate pins to the appropriate cache pins.
+
+	2002-06-13  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.h (set_intc_level): New method.
+	* mepCfg.cxx (set_intc_level): Configure interrupt levels.
+	(MepINTCCfg::set_level): Set "cfg-interrupt-level".
+
+	2002-06-11  Graydon Hoare  <graydon@redhat.com>
+
+	* commonCfg.cxx (set_way): Add missing 'break' statement.
+
+	2002-06-08  Ben Elliston  <bje@redhat.com>
+
+	* mepCfg.cxx (mepCacheCfg::mepCacheCfg): Connect cache-flush,
+	cache-invalidate, cache-index-flush, cache-index-invalidate pins
+	to the data cache.
+
+	2002-06-04  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfx.cxx (MepCacheCfg): Connect probe in-line with tag test
+	mapper.
+
+	2002-06-04  Graydon Hoare  <graydon@redhat.com>
+
+	* commonCfg.h (BoardCfg::add_memory): New method.
+	* commonCfg.cxx (BoardCfg::add_memory): Call main_mapper->map.
+	* mainDynamic.cxx (try_add_memory): Use BoardCfg::add_memory.
+	* mepCfg.h (MepBoardCfg::add_memory): New method.
+	* mepCfg.cxx (MepBoardCfg::add_memory): Also call 
+	{i,d}cache->pass.
+	(MepGlobalMapperCfg): Rename from MepMapperCfg.
+
+	2002-05-29  Ben Elliston  <bje@redhat.com>
+
+	* commonCfg.h (CpuCfg::set_disasm_mem): New method.
+	* commonCfg.cxx (CpuCfg::set_disasm_mem): Implement it.
+	* mepCfg.cxx (MepBoardCfg::MepBoardCfg): Set disassembler-memory
+	accessor to point to main mapper's access-port.
+
+	2002-05-28  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.cxx (add_hw_engine): Connect to main, local memories.
+
+	2002-05-27  Ben Elliston  <bje@redhat.com>
+
+	* mepCfg.cxx (need_dcache): Specify a refill latency of 10.
+	(set_dmem_size): Do not specify latencies (assume defaults of 0).
+	(set_imem_size): Likewise.
+
+	2002-05-21  Ben Elliston  <bje@redhat.com>
+
+	* mepCfg.cxx (need_dcache): Enable write-allocate? attribute.
+	(mepCacheCfg ctor): Add mapping for write-allocate? attribute.
+
+	2002-05-21  Ben Elliston  <bje@redhat.com>
+
+	* commonCfg.h (CacheCfg::set_refill_latency): New method.
+	* commonCfg.cxx (CacheCfg::set_refill_latency): Implement it.
+	* mepCfg.cxx (MepCacheCfg ctor): Invoke set_refill_latency() if a
+	non-zero latency value is specified.
+	(mepBoardCfg::need_icache): Specify a refill latency of 10.
+
+	2002-05-16  Ben Elliston  <bje@redhat.com>
+
+	* mepCfg.cxx (MepBoardCfg::need_icache): Set hit latency to 0.
+	(MepBoardCfg::need_dcache): Likewise.
+
+	2002-05-15  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.cxx (MepCacheCfg): Add tag-test regions.
+	(MepBoardCfg): Remove un-necessary second layer from local memory;
+	use .base() instead.
+	* mepCfg.h (MepBoardCfg): Likewise.
+
+	2002-05-13  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.h (MepBoardCfg): Add second layer to local memory
+	hierarchy to permit DMA Controllers using 0-based addresses.
+	* mepCfg.cxx (MepMemCfg): Likewise.
+	(MepBoardCfg) Likewise.
+	(MepBoardCfg) Add burst-event, burst-control pins during HW-Engine
+	connection.
+
+	2002-05-08  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (set_cop_data_bus_width): New function.
+	* mepCfg.h (set_cop_data_bus_width): New function.
+
+	2002-04-30  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.cxx (set_opt_cp): Set cp-option? rather than uci-option?
+	* mepCfg.cxx (MepBoardCfg::write_config): Shift DRBA left 12 bits 
+	in rcfg (csr27).
+
+	2002-04-29  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.cxx (MepMapperCfg): New class.
+	(MepMemCfg): Use Mapping objects, MepMapperCfg.
+	(MepCacheCfg): Use Mapping objects.
+	(MepBoardCfg): Use Mapping objects.
+	(MepBoardCfg::write_config): Correct dmem_size underflow for 1kb regions.
+	(MepBoardCfg::need_icache): Add "always pass" regions for local memory.
+	(MepBoardCfg::need_dcache): Add "always pass" regions for local memory.
+	* mepCfg.h (MepBoardCfg): Make MepMemCfg a friend of MepBoardCfg.
+
+	2002-04-19  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.cxx (add_hw_engine): Remove support for cbus_size.
+	* mepCfg.h (MepBoardCfg::add_hw_engine): remove support for
+	cbus_size.
+
+	2002-04-15  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.h (MepBoardCfg): Add board type parameter to ctor
+	signature.
+	(MepBoardCfg): Remove obsolete main_passthru mapper.
+	* mepCfg.cxx (MepMemCfg): Add global shadow configuration block.
+	(MepMemCfg::setup_memory_map): Add local shadow configuration block.
+
+	2002-04-15  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.h (add_local_mem): Add optional name parameter.
+	(add_hw_engine): Add optional local_mem_list parameter.
+	* mepCfg.cxx (sidmiscutil.h): #include it.
+	(add_local_mem): Use the given name, if provided.
+	(add_hw_engine): Relate this engine to the given local memory list.
+
+	2002-04-09  Dave Brolley  <brolley@redhat.com>
+
+	* mepCfg.cxx (MepMemCfg): Remove member 'shadow'.  Update comment
+	describing the memory system.  Remove mappings involving 'shadow'.  Map
+	global memory directly from 'main_mapper' to 'global'.  Map all shadows
+	back onto 'main_mapper'.
+
+	2002-03-30  Graydon Hoare  <graydon@redhat.com>
+
+	* mainDynamic.cxx: Predicate portions on -D SIDTARGET_MEP.
+	* Makefile.am: Add -D SIDTARGET_MEP to CXXFLAGS when configured
+	with SIDTARGET_MEP.
+	* Makefile.in: Regenerate.
+
+	2002-03-24  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.cxx (need_icache): Transpose markers with need_dcache.
+	(need_dcache): Likewise.
+	(set_core_id): New function.
+	(add_hw_engine): Correct bus range calculation.
+	* mepCfg.h (MepBoardCfg::set_core_id): New prototype.
+
+	2002-03-23  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.cxx (add_hw_engine): New function.
+	* mepCfg.h (MepBoardCfg::add_hw_engine): New prototype.
+
+	2002-03-23  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.cxx (need_icache): Add hooks for cache/pass settings.
+	(need_dcache): Likewise.
+	(add_local_mem): New function.
+	* mepCfg.h (MepBoardCfg::add_local_mem): New prototype.
+
+	2002-03-22  Graydon Hoare  <graydon@redhat.com>
+
+	* commonCfg.cxx (MapperCfg): Permit switching between transparent
+	and basic after construction.
+	* commonCfg.h (MapperCfg): Likewise.
+	* mepCfg.cxx (MepMemCfg): Rearrange to handle shadows and gmap
+	local definitions.
+	(main_passthru): Remove, make main_mapper transparent.
+	(write_config): Use absolute addresses for local map.
+	(set/get_module_type): New methods.
+
+	2002-03-21  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.cxx (MepMemCfg): Add hooks for mepcfgtool to define
+	global memory map.
+
+	2002-03-18  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.cxx (MepBoardCfg): Extensive reworking to permit
+	post-construction customization from factory methods in
+	mainDynamic.cxx
+	* mainDynamic.cxx (try_load_file): Add.
+	(try_add_memory): Modify to work in non-board cases.
+	* commonCfg.cxx (loaderCfg): Make configurable after construction.
+	(CpuCfg): Add static name map like MapperCfg.
+	(CacheCfg): Compute comptype dynamically.
+	(MemCfg): Permit size adjustment after construction.
+	(BoardCfg): Remove per-board loader logic, moved to mainDynamic.cxx.
+	* commonCfg.h: Reflect above changes.
+	* baseCfg.cxx: Change config graph path separator from "-" to "/".
+
+	2002-03-12  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.cxx (MepBoardCfg): Add cpu-option-customizations.
+
+	2002-03-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* commonCfg.cxx (add_mapping): Add raw string-spec argument.
+	Correct other variants for new wordsz syntax.
+	* mepCfg.cxx (MepCacheCfg): Take cpu parameter.  Connect to the
+	FOO-cache-enable pins.  Add cached/uncached mapping banks.
+	(MepBoardCfg): Reorganize cache mappings accordingly.
+	* commonCfg.h: Corresponding changes.
+
+	2002-02-27  Ben Elliston  <bje@redhat.com>
+
+	* mepCfg.cxx (MepMemCfg::MepMemCfg): Set shared-mem memory
+	regions' read/write latencies to {10, 1} respectively.
+	(MepBoardCfg::MepBoardCfg): Set local memory latencies to {1, 1}
+	and cache hit/miss latencies to {1, 3} respectively.
+
+	* mainDynamic.cxx (usage): Condense and tidy output.
+
+	2002-02-14  Graydon Hoare  <graydon@redhat.com>
+
+	* commonCfg.cxx: Various small corrections to gdb and gloss
+	coexistence.
+	* commonCfg.h: Likewise.
+	* mainDynamic.cxx: Likewise.
+	* Makefile.am: Move mepCfg.cxx into a separate block.
+	* Makefile.in: Regenerate.
+
+	2002-02-08  Graydon Hoare  <graydon@redhat.com>
+
+	* mepCfg.cxx: New file.
+	* mepCfg.h: New file.	
+
+	2001-07-19  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (NEARBY_LIBS): Add libmepfamily.la.
+	(NEARBY_DEP_LIBS): Likewise.
+
 2006-11-30  Dave Brolley  <brolley@redhat.com>
 
 	* Makefile.am (TARGETCFGS): Revert previous changes. Add shCfg.cxx

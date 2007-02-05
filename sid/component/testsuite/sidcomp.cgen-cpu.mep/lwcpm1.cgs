@@ -1,0 +1,12 @@
+# mep testcase for lwcpm1 $crn,($rm+),$imm8a4 -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global lwcpm1
+lwcpm1:
+	# This instruction is exercised by the swcpm1 test case.
+	mov $0, 0
+	lwcpm1 $cr0,($0+),0
+	pass

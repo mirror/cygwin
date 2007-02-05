@@ -1,0 +1,26 @@
+# mep testcase for advck3 $0,$rn,$rm -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global advck3
+advck3:
+	# 1 + 2 should not overflow!
+	mov $1, 1
+	mov $2, 2
+	advck3 $0,$1,$2
+	assert $0, 0
+
+	# big ($1) + big ($2) will overflow.
+	mov $1, -1
+	mov $7, 1
+	sll $7, 31
+	xor $1, $7
+	mov $2, $1
+	advck3 $0,$1,$2
+	assert $0, 1
+
+okay:	
+	pass
+wrong:
+	fail

@@ -1,0 +1,177 @@
+<?xml version="1.0" ?>
+<!DOCTYPE defcomplib SYSTEM "http://sources.redhat.com/sid/component.dtd">
+
+<defcomplib lib="libmepfamily.la" dlsym="mepfamily_component_library">
+  <defcomponent name="hw-interrupt-mep" type="concrete">
+    <variants>
+      <defcomponent name="hw-interrupt-mep-1"  type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-2"  type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-3"  type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-4"  type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-5"  type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-6"  type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-7"  type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-8"  type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-9"  type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-10" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-11" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-12" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-13" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-14" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-15" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-16" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-17" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-18" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-19" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-20" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-21" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-22" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-23" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-24" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-25" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-26" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-27" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-28" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-29" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-30" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-31" type="concrete"/>
+      <defcomponent name="hw-interrupt-mep-32" type="concrete"/>
+    </variants>
+
+    <!-- pins -->
+    <defpin name="reset" direction="in" legalvalues="any" behaviors="reset" />
+    <defpin name="interrupt-source-[0,31]" direction="in" legalvalues="any" behaviors="interrupt processing" />
+    <defpin name="interrupt" direction="out" legalvalues="-1 (inactive) or [0,31] (active)" behaviors="interrupt processing" />
+
+    <!-- buses -->
+    <defbus name="registers" addresses="0x0--0x1C" accesses="read/write" behaviors="register access" />
+
+    <!-- attributes -->
+    <defattribute name="reset" category="pin" legalvalues="any" behaviors="reset" />
+    <defattribute name="interrupt" category="pin" legalvalues="-1, [0..31]" behaviors="interrupt processing" />
+    <defattribute name="interrupt-level" category="read-only register" legalvalues="[1,3,7,15]" behaviors="interrupt processing" />
+    <defattribute name="interrupt-mask-level" category="register" legalvalues="[1,3,7,15]" behaviors="interrupt processing" />
+    <defattribute name="interrupt-channel-number" category="read-only register" legalvalues="[0..31]" behaviors="interrupt processing" />
+    <defattribute name="interrupt-status-register" category="read-only register" legalvalues="any" behaviors="interrupt processing" />
+    <defattribute name="interrupt-enable-register" category="read-only register" legalvalues="any" behaviors="interrupt processing" />
+    <defattribute name="interrupt-edge-trigger-register" category="read-only register" legalvalues="any" behaviors="interrupt processing" />
+    <defattribute name="interrupt-level-register-0" category="read-only register" legalvalues="any" behaviors="interrupt processing" />
+    <defattribute name="interrupt-level-register-1" category="read-only register" legalvalues="any" behaviors="interrupt processing" />
+    <defattribute name="interrupt-level-register-2" category="read-only register" legalvalues="any" behaviors="interrupt processing" />
+    <defattribute name="interrupt-level-register-3" category="read-only register" legalvalues="any" behaviors="interrupt processing" />
+    <defattribute name="interrupt-name-[0,31]" category="setting" legalvalues="any"/>
+
+  </defcomponent>
+  <synop>
+    <p>
+      This component simulates the Toshiba Media Engine (MeP) interrupt controller unit.</p>
+  </synop>
+  <func>
+    <modelling>
+      <p>
+	<p>
+	  The interrupt controller model features a configurable
+	  number of (up to 32) general purpose interrupts.</p>
+	<p>
+	  The component models both edge and level triggered
+	  interrupts.  When an interrupt source is configured as level
+	  triggered, an interrupt source pin repeatedly driving the
+	  same value will only constitute a single interrupt event.</p>
+	</p>
+    </modelling>
+
+    <behavior name="reset">
+      <p>
+	When the <pin>reset</pin> input pin is driven, this component
+	is reset to the hardware's normal power-up state.</p>
+    </behavior>
+    <behavior name="register access">
+      <p>
+	<p>
+	  When the <bus>registers</bus> bus is accessed, the
+	  appropriate 32-bit control register is read or written.
+
+	  <table>
+	    <tr>
+	      <th>byte address</th>
+	      <th>register</th>
+	    </tr>
+	    <tr>
+	      <td>0x0</td>
+	      <td>IVR</td>
+	    </tr>
+	    <tr>
+	      <td>0x4</td>
+	      <td>ISR</td>
+	    </tr>
+	    <tr>
+	      <td>0x8</td>
+	      <td>IER</td>
+	    </tr>
+	    <tr>
+	      <td>0xC</td>
+	      <td>IET</td>
+	    </tr>
+	    <tr>
+	      <td>0x10</td>
+	      <td>ILR0</td>
+	    </tr>
+	    <tr>
+	      <td>0x14</td>
+	      <td>ILR1</td>
+	    </tr>
+	    <tr>
+	      <td>0x18</td>
+	      <td>ILR2</td>
+	    </tr>
+	    <tr>
+	      <td>0x1C</td>
+	      <td>ILR3</td>
+	    </tr>
+	  </table>
+	</p>
+      </p>
+    </behavior>
+    <behavior name="interrupt processing">
+      <p>
+	When any interrupt source is signalled, or interrupt-enabled
+	masks are modified, pending interrupts are processed.  Subject
+	to the then-current interrupt-enabling registers, the
+	<pin>interrupt</pin> output pin may be driven with a value
+	representing the interrupt channel that was chosen.</p>
+      
+      <p>
+	The polarity for the input source pins are positive, meaning
+	that non-zero values are interpreted as <em>asserted</em>.</p>
+
+      <p>
+	Similarly named attributes may be used to generate/monitor pin
+	traffic.</p>
+    </behavior>
+    <convention name="functional" supported="true">
+      <p>
+	This is a functional component.</p>
+    </convention>
+  </func>
+  <env>
+    <title>
+      Related components</title>
+    <p>
+      The interrupt controller typically sits between a CPU component,
+      which usually has only one interrupt pin, and an array of other
+      peripheral components.  Each of the peripheral components is
+      capable of generating its own interrupt.  The following
+      configuration file fragment demonstrates how to connect two
+      simple timers into the interrupt subsystem of a more complete
+      simulation:
+      
+      <code>
+	new hw-cpu-mep cpu
+	new hw-timer-arm/ref-nosched timer1
+	new hw-timer-arm/ref-nosched timer2
+	new hw-interrupt-mep intc
+        connect-pin timer1 interrupt -&gt; intc interrupt-source-0
+	connect-pin timer2 interrupt -&gt; intc interrupt-source-1
+	connect-pin intc interrupt -&gt; cpu irq</code></p>
+  </env>
+</defcomplib>

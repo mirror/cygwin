@@ -1,0 +1,19 @@
+# mep testcase for bsr $disp12a2 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global bsr12
+bsr12:
+	# Branching to a symbol so close guarantees that the assembler
+	# will select bsr12 rather than bsr24.
+	bsr next
+	nop
+	pass
+	fail
+	fail
+next:	
+	ret
+toofar:	
+	fail
+	fail

@@ -1,6 +1,6 @@
 // sidbusutil.h -*- C++ -*- Different types and sizes of buses.
 
-// Copyright (C) 1999, 2000, 2001, 2002, 2004, 2005 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2002, 2004, 2005, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -30,7 +30,7 @@ namespace sidutil
   {
   protected:
     word_bus() {}
-    ~word_bus() throw() {}
+    ~word_bus() {}
 
     virtual sid::bus::status word_write(sid::host_int_4 addr,
 					DataType mask,
@@ -229,7 +229,7 @@ namespace sidutil
       {
 	assert (target != 0);
       }
-    ~passthrough_bus() throw() {}
+    ~passthrough_bus() {}
     
     // Some macros to make manufacturing of the cartesian-product
     // calls simpler.
@@ -281,7 +281,7 @@ namespace sidutil
 	this->target = t1;
         this->t[1] = t2;
       }
-    ~mux_passthrough_bus() throw() {}
+    ~mux_passthrough_bus() {}
     void switch_bus()
     {
       // Switch to the next bus if the current one is valid (0 or 1)
@@ -370,7 +370,7 @@ namespace sidutil
       { 
 	assert (target != 0);
       }
-    ~passthrough_word_bus() throw() {}
+    ~passthrough_word_bus() {}
 
     virtual sid::bus::status word_write(sid::host_int_4 addr,
 					DataType mask,
@@ -448,7 +448,7 @@ namespace sidutil
 	assert (insn_bus != 0);
 	assert (data_bus != 0);
       }
-    ~harvard_bus() throw() {}
+    ~harvard_bus() {}
 
     sid::bus *map_addr_to_bus (sid::host_int_4 *addr)
       {
@@ -517,7 +517,7 @@ namespace sidutil
   {
   protected:
     byte_bus() {}
-    ~byte_bus() throw() {}
+    ~byte_bus() {}
     
     virtual sid::bus::status 
     write_data(sid::host_int_4 addr, sid::host_int_1 data) throw () = 0;
@@ -600,7 +600,7 @@ namespace sidutil
 			 sid::host_int_4, sid::host_int_1 )
 		      ) : receiver(h), reader(r), writer(w) {}
 
-    ~callback_byte_bus() throw() {}
+    ~callback_byte_bus() {}
 
   protected:
     Receiver* receiver;
@@ -638,7 +638,7 @@ namespace sidutil
 			       sid::host_int_4 address);
     void add_readwrite_register(control_register<DataType>* reg,
 				sid::host_int_4 address);
-    ~control_register_bank () throw () { }
+    ~control_register_bank () { }
     
   protected:
     typedef std::vector<control_register<DataType>*> reg_vector;
@@ -1043,7 +1043,7 @@ namespace sidutil
   {
   public:
 
-    ~fixed_accessor_map_component() throw() {}
+    ~fixed_accessor_map_component() {}
 
     // Returns vector of accessor names to components.
     std::vector<std::string>
@@ -1133,7 +1133,7 @@ namespace sidutil
   class fixed_bus_map_component: public virtual sid::component
   {
   public:
-    ~fixed_bus_map_component() throw() {}
+    ~fixed_bus_map_component() {}
 
     std::vector<std::string>
     bus_names() throw ()
@@ -1214,7 +1214,7 @@ namespace sidutil
 	add_pin ("active", & active_pin);
 	active_pin.set_active_high ();
       }
-    ~bus_arbitrator () throw () { }
+    ~bus_arbitrator () { }
 
   protected:
     // A bus for requests from the input interfaces.

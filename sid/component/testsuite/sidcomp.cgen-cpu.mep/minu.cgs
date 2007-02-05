@@ -1,0 +1,30 @@
+# mep testcase for minu $rn,$rm -*- Asm -*-
+# configline(): set cpu minmax-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global minu
+minu:
+	# minu (3, 10) = 3.
+	mov $1, 3
+	mov $2, 10
+	minu $1, $2
+	assert $1, 3
+
+	# minu (-1, 10) = 10.
+	mov $1, 10 
+	mov $2, -1
+	minu $1, $2
+	assert $1, 10
+
+	# minu (-1, -3) = -3.
+	mov $1, -1
+	mov $2, -3
+	minu $1, $2
+	assert $1, -3
+	
+okay:
+	pass
+wrong:
+	fail

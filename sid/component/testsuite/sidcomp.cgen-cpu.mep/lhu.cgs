@@ -1,0 +1,39 @@
+# mep testcase for lhu $rn,($rm) -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global lhu
+lhu:
+	mov $0, 0x40
+
+	# Store a half-word (0x2308) at 0x40.
+	mov $1, 0x23
+	sll $1, 8
+	add $1, 8
+	sh $1, ($0)
+
+	# Read it back.
+	lhu $2, ($0)
+
+	# Verify.
+	sub $2, $1
+	bnez $2, wrong
+
+	# Store a signed half-word at 0x40.
+	mov $1, -1
+	sll $1, 8
+	add $1, 3
+	sh $1, ($0)
+
+	# Read it back.
+	lhu $2, ($0)
+
+	# Verify.
+	sub $2, $1
+	beqz $2, wrong
+
+okay:	
+	pass
+wrong:
+	fail

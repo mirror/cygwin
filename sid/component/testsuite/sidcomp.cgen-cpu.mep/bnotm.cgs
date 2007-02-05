@@ -1,0 +1,30 @@
+# mep testcase for bnotm ($rm),$imm3 -*- Asm -*-
+# configline(): set cpu bit-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global bnotm
+bnotm:
+	# Store 0x55 in 0x40.
+	mov $0, 0x40
+	mov $1, 0x55
+	sb $1, ($0)
+
+	# Now flip every bit.
+	bnotm ($0),0
+	bnotm ($0),1
+	bnotm ($0),2
+	bnotm ($0),3
+	bnotm ($0),4
+	bnotm ($0),5
+	bnotm ($0),6
+	bnotm ($0),7
+
+	# Check to make sure we have 0xAA.
+	lb $1, ($0)
+	assert $1, -86
+okay:
+	pass
+wrong:
+	fail

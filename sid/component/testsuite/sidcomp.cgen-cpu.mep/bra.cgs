@@ -1,0 +1,23 @@
+# mep testcase for bra $disp12a2 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+
+	start
+	.global bra
+bra:
+	bra foo
+	fail
+	fail
+	fail
+bar:
+	pass
+	fail
+	fail
+
+foo:	
+	bra bar
+	fail
+	fail
+	fail
+	

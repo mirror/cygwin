@@ -1,0 +1,11 @@
+# mep testcase for cmovc $rm,$ccrn -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global cmovc2
+cmovc2:
+	# This instruction is exercised by the cmovc1 test case.
+	cmovc $ccr4,$1
+	pass

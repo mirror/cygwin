@@ -1,0 +1,11 @@
+# mep testcase for lw $rn,$disp16($rm) -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global lw16
+lw16:
+	# This instruction is exercised by the sw16 test case.
+	mov $0, 0
+	lw $0,0($0)
+	pass

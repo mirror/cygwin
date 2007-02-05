@@ -1,0 +1,34 @@
+# mep testcase for smcpa $crn,($rm+),$imm8a8 -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global smcpa
+smcpa:
+	# Load all-ones into $cr1.
+	mov $0, -1
+	cmov $cr1, $0
+
+	# Store it.
+	mov $0, 0x40
+	smcpa $cr1, ($0+), 8
+
+	# Ensure $0 has been incremented by 8.
+	assert $0, 0x48
+
+	# Load it back.
+	mov $0, 0x40
+	lmcpa $cr2, ($0+), 8
+
+	# Ensure $0 has been incremented by 8.
+	assert $0, 0x48
+	cmov $1, $cr2
+
+	# Assert $1 = all-ones.
+	assert $1, -1
+
+okay:
+	pass
+wrong:
+	fail

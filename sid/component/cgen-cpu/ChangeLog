@@ -1,3 +1,47 @@
+2007-02-05  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+	2005-04-22  Richard Sandiford  <rsandifo@redhat.com>
+
+	* compCGEN.cxx: Apply automatic MeP-Integrator changes.
+
+	2005-04-17  Nick Clifton  <nickc@redhat.com>
+
+	* common_model.h (class mep_common_model): Add default
+          defintions of MAX_UNITS and UNIT_U_EXEC in case they are not
+          defined.
+
+	2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	* compCGEN.cxx: Remove references to mep_ext[2-6] and
+	 mep_ext_{core,cop}[2-6].
+
+	2002-02-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* compCGEN.cxx (mep): Add new hw-cpu-mep-extN types.
+
+	2001-04-03  John Healy  <jhealy@redhat.com>
+
+	* compCGEN.cxx (compCGENCreate): Added conditional statements so
+	that the mep code is only included in the compilation when the
+	target is mep.
+
+	2001-04-03  Ben Elliston  <bje@redhat.com>
+
+	* compCGEN.cxx (compCGENListTypes): Add hw-cpu-mep.
+	(compCGENCreate): Handle it.
+
+	* configure.in (cpu_subdirs): Reinstate mep.
+	* configure: Regenerate.
+
+	2001-03-28  Ben Elliston  <bje@redhat.com>
+
+	* configure.in (cpu_subdirs): Back out today's change.
+	* configure: Regenerate.
+
+	* configure.in (cpu_subdirs): Add mep.
+	* configure: Regenerate.
+
 2006-10-23  Dave Brolley  <brolley@redhat.com>
 
 	* compCGEN.cxx (cgen_print_address): Print "0x" prefix.

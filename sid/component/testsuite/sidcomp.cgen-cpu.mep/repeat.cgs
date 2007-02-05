@@ -1,0 +1,30 @@
+# mep testcase for repeat $rn,$disp17a2 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global repeat
+repeat:
+	mov $0, 0
+	# repeat the addition five times
+	mov $8, 4
+	repeat $8, foo
+	nop
+	nop
+	bsr subr
+foo:
+	nop
+	add $0, 3
+	# ^^^ included in the block ^^^
+
+	mov $7, 15
+	sub $0, $7
+	bnez $0, wrong
+
+okay:
+	pass
+wrong:
+	fail
+
+subr:
+	ret

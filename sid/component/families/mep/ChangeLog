@@ -1,0 +1,1082 @@
+2006-11-07  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.h (toshapi_component): Do not qualify relationship_names.
+	* mep-intc.h: Declare class interrupt_pin.
+
+2005-08-14  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.cxx (perform_write_burst): Assign the result of adjust_address to
+	effective_address. Use effective address for writing to the downstream
+	bus. Use address otherwise.
+
+2005-08-22  Dave Brolley  <brolley@redhat.com>
+
+	* Merge the following changes:
+
+	2005-08-12  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.cxx (perform_write_burst): Assign the result of adjust_address to
+	effective_address. Use effective address for writing to the downstream
+	bus. Use address otherwise.
+
+	2005-07-13  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.cxx (relationship_names): Don't list dynamic-configurator.
+	(relate): Don't handle dynamic-configurator. Don't relate memory to
+	dynamic_configurator.
+	(unrelate): Don't handle dynamic-configurator.
+	(related_components): Don't handle dynamic_configurator.
+	* mep-dmac.h (mep_dmac): Inherit from no_relation_component.
+
+	2005-07-05  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.cxx (toshapi_component): Set buffer_output to true.
+
+	2005-06-30  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.h (irq_lbound): Removed from Intc.
+	(irq_names): New member of Intc.
+	* toshapi.cxx (relate): Add "irq-name-<n>" attributes when "intc"
+	is related. One for each interrupt channel.
+	(interrupt): Look for an irq pin for the given channel in irq_names.
+	(lookupChannel): Look for the given channel name in ira_names and
+	return that channel, if found.
+
+	2005-06-06  Dave Brolley  <brolley@redhat.com>
+
+	* gbif.cxx (GlobalBusInterface): Add passthrough pin and set it
+	active when high.
+	(check_passthrough): New virtual override in GlobalBusInterface.
+	* lbif.cxx: Like gbif.cxx.
+	* gbmif.cxx: Like gbif.cxx with a passthough pin for each input
+	interface.
+	* gbif.h (check_passthrough): New virtual override in GlobalBusInterface.
+	(passthrough_pin): New member of GlobalBusInterface.
+	* lbif.h: Like gbif.h
+	* gbmif.h: Likewise.
+	* dmac.cxx (configure): New virtual override in mep_dmac.
+	* mep-dmac.h (configure): Likewise.
+	* toshapi.cxx (configure): New virtual override in toshapi_component.
+	* toshapi.h (configure): Likewise.
+	(toshapi_component): fixed_attribute_map_with_logging_component and
+	configurable_component inherited virtually.
+	* hw-dma-mep.xml: Add description of new interfaces.
+	* hw-dma-mep.txt: Regenerated.
+
+	2005-05-29  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.cxx (relationship_names): Push back dynamic-configurator.
+	(toshapi_component::relate): Handle dynamic-configurator. Relate synamic_configurator to
+	any memory which has been added.
+	(unrelate): Handle dynamic-configurator.
+	(related_components): handle dynamic-configurator.
+	(Memory::relate): Call toshapi_component::relate.
+	* mep-dmac.h (mep_dmac): No longer inherits from no_relation_component.
+
+	2005-04-22  Richard Sandiford  <rsandifo@redhat.com>
+
+	* Makefile.in, components.cxx, mm_int.h: Apply automatic
+	MeP-Integrator changes.
+
+	2005-04-21  Dave Brolley  <brolley@redhat.com>
+
+	* components.cxx (compMepFamilyListTypes): Remove unused string.
+
+	2005-02-24  Dave Brolley  <brolley@redhat.com>
+
+	* dsu.h (MEP_CORE_C4): New macro.
+	(set_ibc0_te): Check for MEP_CORE_C4.
+	(set_dbc0_te): Check for MEP_CORE_C4.
+
+	2005-01-14  Dave Brolley  <brolley@redhat.com>
+
+	* lbif.cxx (set_route_busy): Check for and account for gaps in a
+	burst transfer. Update 'busy' with total_latency at the end of a
+	burst and adjust for the initial access penalty.
+
+	2004-12-22  Dave Brolley  <brolley@redhat.com>
+
+	* mep-lbif.h (busy_status): New virtual override.
+	(check_route_busy): New virtual override.
+	(update_busy_routes): Ditto.
+	(busy): New member for LocalBus.
+	* lbif.cxx (LocalBus): Initialize 'busy'.
+	(access_granted): Remove log message.
+	(set_route_busy): Set the bus busy for the duration of the burst.
+	(check_route_busy): New virtual override.
+	(update_busy_routes): Ditto.
+	* gbmif.cxx (prioritize): Keep requests from the same upstream
+	interface together. Maintain the FIFO ordering of the blocks
+	of requests.
+	(access_granted): Give equal priority to requests from the same
+	upstream interface at the head of the queue.
+	* gbif.cxx (prioritize): Make sure requests for each downstream
+	interface are kept together on the queue.
+
+	2004-12-07  Dave Brolley  <brolley@redhat.com>
+
+	* components.cxx,gbif.cxx,lbif.cxx,gbmif.cxx,mep-gbif.h,mep-lbif.h,
+	mep-gbmif.h: Rename Gbif to GlobalBusInterface, Lbif to LocalBus and
+	Gbmif to GlobalBus.
+	* Gbif.h,Lbif.h,Gbmif.h: Removed.
+	* GlobalBusInterface.h,LocalBus.h,GlobalBus.h: New files.
+
+	2004-11-10  Dave Brolley  <brolley@redhat.com>
+
+	* gbif.cxx (Gbif): Initialize lock_owner.
+	(access_granted): Grant access unconditionally to the lock owner.
+	Adjust log message level.
+	(set_route_busy): Set/reset lock_owner.
+	(check_route_busy): Adjust log message levels.
+	* gbmif.cxx (Gbmif): Initialize lock_owner.
+	(access_granted): Grant access unconditionally to the lock owner.
+	Adjust log message level.
+	(set_route_busy): Set/reset lock_owner.
+	(check_route_busy): Adjust log message levels.
+	* lbif.cxx (Lbif): Initialize lock_owner.
+	(access_granted): Grant access unconditionally to the lock owner.
+	Adjust log message level.
+	(set_route_busy): Set/reset lock_owner.
+	(check_route_busy): Adjust log message levels.
+	* mep-gbif.h (lock_owner): New member of Gbif.
+	* mep-gbmif.h (lock_owner): New member of Gbmif.
+	* mep-lbif.h (lock_owner): New member of Lbif.
+
+	2004-11-08  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.cxx (perform_read_burst): Access the data 4 or 8 bytes at a time
+	depending on data_width ().
+	(perform_write_burst): Ditto.
+	(add_4_bytes): Renamed to add_bytes and overloaded on the data type.
+	(read_downstream): New method of mep_dmac.
+	(write_downstream): Ditto.
+	(read_from_local_mem): Now a template method based on the data type.
+	(flush_8_bytes): New method of mep_dmac.
+	* mep-dmac.h (add_4_bytes): Renamed to add_bytes and overloaded on the
+	data type.
+	(read_downstream): New method of mep_dmac.
+	(write_downstream): Ditto.
+	(read_from_local_mem): Now a template method based on the data type.
+	(flush_8_bytes): New method of mep_dmac.
+
+	2004-10-28  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.cxx (init_transfer): Now takes reference to latency argument.
+	Pass it to init_chain.
+	(init_chain): Now takes reference to latency argument. Compute latency
+	as total of all latencies while loading the chain. Lock downstream
+	interface while loading the chain.
+	(mep_dmac_channel::begin_transfer): Obtain latency from init_transfer
+	and pass it to mep_dmac::begin_transfer.
+	(begin_transfer): Now takes latency argument. Pass it to record_latency.
+	(perform_action): Remove log message.
+	(do_one_burst): Use max of read and write latencies as actual latency.
+	(arbitration_latency): New method of mep_dmac.
+	(insert_arbitration_latency_: Removed.
+	(check_end_burst): Call record_latency.
+	(read_from_local_mem): New takes reference to a latency argument.
+	Compute latency as the total of the all the reads.
+	(record_latency): New method of mep_dmac.
+	* mep-dmac.h (init_transfer): Now takes reference to latency argument.
+	(init_chain): Now takes reference to latency argument.
+	(begin_transfer): Now takes latency argument.
+	(arbitration_latency): New method of mep_dmac.
+	(insert_arbitration_latency_: Removed.
+	(read_from_local_mem): New takes reference to a latency argument.
+	(record_latency): New method of mep_dmac.
+	(lock_downstream_for_chain): Ditto.
+	(unlock_downstream_for_chain): Ditto.
+
+	2004-10-22  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.h (mep-gbif.h): #include it.
+	(mep-lbif.h): #include it.
+	(mep-gbmif.h): #include it.
+	* lbif.cxx: Rename mep_lbif to Lbif and move to toshapi namespace.
+	(access_latency): New method.
+	(set_route_busy): Reschedule for 1 cycle from now.
+	(update_busy_routes): Now called every cycle while busy.
+	* gbmif.cxx: Rename mep_gbmif to Gbmif and move to toshapi namespace.
+	(access_latency): New method.
+	(set_route_busy): Reschedule for 1 cycle from now.
+	(update_busy_routes): Now called every cycle while busy.
+	* gbif.cxx: Rename mep_gbif to Gbif and move to toshapi namespace.
+	(prioritize_request): Check whether Global bus slave interface request
+	is already queued before holding it.
+	(reschedule): Removed.
+	(prioritize): Reverse the sense of the comparison.
+	(access_latency): New method.
+	(set_route_busy): Reschedule for 1 cycle from now.
+	(update_busy_routes): Now called every cycle while busy.
+	* dmac.h (perform_read_burst): Now returns latency.
+	(perform_write_burst): Now returns latency and channel number.
+	(lock_downstream): New method.
+	(unlock_downstream): New method.
+	(request_pending): Check read_completed.
+	(read_completed): New member of mep_dmac.
+	* dmac.cxx (mep_dmac_channel): Initialize read_completed.
+	(init_transfer): Ditto.
+	(update_after_read_burst): Set read_completed.
+	(perform_action): Don't reschedule here.
+	(do_one_burst): If blockable: Account for latency of parallel write and
+	read. Add wait cycles. Block this thread while waiting. Prioritize
+	the next cycle and finalize the previous one here.
+	(perform_read_burst): Now returns latency. Don't prioritize the
+	next cycle here.
+	(insert_arbitration_cycles): New method.
+	(perform_write_burst): Now returns latency and channel number. Don't
+	call check_end_burst here.
+	(lock_downstream): New method.
+	(unlock_downstream): New method.
+	(handle_bus_error): Reschedule here.
+	* components.cxx: mep_gbif, mep_lbif and mep_gbmif renamed to Gbif,
+	Lbif and Gbmif respectively.
+	(gbif.h): Don't #include it.
+	(lbif.h): Don't #include it.
+	(gbmif.h): Don't #include it.
+	* mep-gbif.h: Renamed from gbif.h.
+	* mep-gbmif.h: Renamed from gbmif.h.
+	* mep-lbif.h: Renamed from lbif.h.
+	* toshapi/Gbif.h: New header.
+	* toshapi/Gbmif.h: New header.
+	* toshapi/Lbif.h: New header.
+
+	2004-10-12  Dave Brolley  <brolley@redhat.com>
+
+	* mep-dmac.h (sidblockingutil.h): #include it.
+	(mep_dmac): Inherit from blocking_component.
+	(do_one_burst): Now public.
+	(gbif_lock_pin): New output pin.
+	(lbif_lock_pin): New output pin.
+	(check_address): New output pin.
+	(bus_error): Renamed to signal_bus_error.
+	(handle_bus_error): New method of mep_dmac.
+	* gbif.cxx (mep_gbif): Rewrite to move common functionality up to the
+	bus_arbitrator base class. Implement virtual overrides for arbitration.
+	* gbif.h: Ditto.
+	* lbif.cxx: Ditto.
+	* lbif.h: Ditto.
+	* dmac.cxx (mep_dmac_child_thread_root): Declare it.
+	(mep_dmac): Initialize blocking_component. Set perform_action as the
+	callback for the "event-burst pin". Add "gbif-lock", "lbif-lock" and
+	"check-address" pins.
+	(perform_action): New method.
+	(perform_read_burst): Call handle_bus_error for read errors.
+	(perform_write_burst): Ditto for write errors. Call signal_bus_error
+	if error not handled. Drive the check_address_pin to check for problems
+	with the address.
+	(read_from_local_mem): Call handle_bus_error for read errors.
+	(bus_error): Renamed to signal_bus_error.
+	(handle_bus_error): New method of mep_dmac.
+	(mep_dmac_child_thread_root): New function.
+	* components.cxx (gbmif.h): #include it.
+	(compMepFamilyListTypes): Add hw-gbmif-mep.
+	(compMepFamilyCreate): Parse and construct the above.
+	(compMepFamilyDelete): Destroy the above.
+	* Makefile.am (libmepfamily_la_SOURCES): Add gbmif.cxx.
+	* Makefile.in: Regenerated.
+	* gbmif.cxx: New file.
+	* gbmif.h: New file.
+
+	2004-09-16  Dave Brolley  <brolley@redhat.com>
+
+	* components.cxx (gbif.h): #include it.
+	(lbif.h): #include it.
+	(compMepFamilyListTypes): Add hw-gbif-mep and hw-lbif-mep.
+	(compMepFamilyCreate): Parse and construct the above.
+	(compMepFamilyDelete): Destroy the above.
+	* Makefile.am (libmepfamily_la_SOURCES): Add gbif.cxx and lbif.cxx.
+	* Makefile.in: Regenerated.
+	* gbif.cxx: New source file.
+	* gbif.h: Ditto.
+	* lbif.cxx: Ditto.
+	* lbif.h: Ditto.
+
+2005-07-29  Dave Brolley  <brolley@redhat.com>
+
+	* mep-intc.h (post_access_hook): Move out of the class definition.
+
+2004-08-20  Dave Brolley  <brolley@redhat.com>
+
+	* mep-dmac.h (error_pin): New member of mep_dmac.
+	* dmac.cxx (mep_dmac): Add "error" pin.
+	(perform_write_burst): If bus::unpermitted is returned, generate a
+	warning and drive the "error" pin.
+
+2004-08-11  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.h: Renamed to mep-dmac.h.
+	* intc.h: Renamed to mep-intc.h.
+	* dmac.cxx: Update #include of the above files.
+	* intc.cxx: Update #include of the above files.
+	* components.cxx: Update #include of the above files.
+
+2004-07-20  Dave Brolley  <brolley@redhat.com>
+
+	* dsu.h (set_ibc0_te): Mask the value but don't shift it.
+	(set_dbc0_te): Mask the value but don't shift it.
+
+2004-06-21  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.cxx (relate): Only save m in memory_map if addMem was
+	successful.
+	* dsu.h (MEP_CORE_MEP, MEP_CORE_C2, MEP_CORE_C3, MEP_CORE_H1): New
+	macros.
+	(core_type): New member of mep_dsu. Add h1 registers and fields.
+	* dsu.cxx (mep_dsu): Initialize core_type. Add h1 register fields. Add
+	the core-type attribute.
+
+2004-04-29  Dave Brolley  <brolley@redhat.com>
+
+	* mep-cache.cxx (write_tag): Make sure downstream bus is connected.
+	(read_tag, write_data, read_data): Ditto.
+	(mep_cache_line): Now takes cache index as an argument. Update all
+	callers.
+	(set_tag): Don't clear non-address bits of the tag.
+	(set_R): Correct setting of the R bit.
+	(write_any_filtered): Make sure cache is associative before allowing the
+	R bit to be updated.
+	* mep-cache.h (mep_cache_line): Now takes cache index as an argument. 
+	Update all callers.
+	(mep_cache_line_factory::make_line): Now takes cache index as an
+	argument. Update all callers.
+
+2004-04-29  Dave Brolley  <brolley@redhat.com>
+
+	* components.cxx (mep-cache.h): #include it.
+	(line_sizes,cache_sizes,assocs): New static string arrays.
+	(null_replacement,mep_assoc_replacement): New cache line replacement
+	algorithms.
+	(compMepFamilyListTypes): Add hw-mep-cache-* types.
+	(compMepFamilyCreate): Handle hw-mep-cache-* types.
+	* Makefile.am (INCLUDES): Add $(srcdir)/../../cache and
+	$(srcdir)/../../memory.
+	(libmepfamily_la_SOURCES): Add mep-cache.cxx
+	* Makefile.in: Regenerated.
+	* mep-cache.{cxx,h}: New files.
+
+2004-03-30  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.h (EXoperand): New member: arg7.
+	(ucidsp_arg4,ucidsp_arg7): New input pins.
+	* toshapi.cxx (DSP): Call add_pin for "ucidsp-arg4" and "ucidsp-arg7".
+	(do_ucidsp_protocol): Sense the value on ucidsp_arg4 and ucidsp_arg7.
+	Set the_op.arg7. Only drive the ucidsp_exception pin for a DSP.
+
+2004-03-24  Dave Brolley  <brolley@redhat.com>
+
+	* components.cxx: Add {begin,end}-toshapi-headers for MeP-Integrator.
+	* toshapi.h: Remove {begin,end}-toshapi-headers.
+	* toshapi.cxx: Remove {begin,end}-toshapi-sources.
+	* Makefile.am (TOSHAPI_SOURCES): New variable.
+	(libmepfamily_la_SOURCES): Add $(TOSHAPI_SOURCES).
+	* Makefile.in: Regenerated.
+
+2004-02-23  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.h (u8, u16, u64): New types.
+
+2004-02-16  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.h (uer_out_p): New member of DSP.
+	(DSP_P): Return if user_out_p is set.
+	* toshapi.cxx (DSP): Initialize user_out_p. Add "user-out?" attribute.
+
+2003-12-09  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.cxx (Dmac): Initialize channel_control_bus.
+
+2003-10-29  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.h (s32): New typedef.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* toshapi.h (MemoryMap): New class.
+	(Memory): New methods base_address, size.
+	(toshapi_component): New member memmap.	 
+	* toshapi.cxx (toshapi_component): Likewise.
+	(toshapi_component::relate): Add m to memmap.
+	(Memory::base_address, Memory::size, MemoryMap::getMem): New methods
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* toshapi.h (EXoperand): New member arg5.
+	(DSP): New pin ucidsp_cycles, dsp_out_pin.  New logger dsp_logger.
+	New methods DSP_P, DSP_P_DIS, DSP_P_FLUSH.
+	* toshapi.cxx (DSP): New pins ucidsp_cycles, dsp_out_pin.
+	New logger dsp_logger.
+	(HWengine): Add pins ucidsp_cycles and dsp_out_pin.  Allocate dsp_logger
+	(do_ucidsp_protocol): New arg5.  Call dsp_logger->output_saved_messages
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.cxx (perform_read_burst): Call bus_error with new interface.
+	(perform_write_burst): Ditto.
+	(read_from_local_mem): Ditto.
+	(set_dcr): Clear bus_error_pin if DCR.MBE is cleared.
+	(bus_error): No longer takes a channel as an argument.
+	Clear CAR.ACT on all channels.
+	* dmac.h (bus_error): No longer takes a channel as an argument.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.h (find_ctrl_regs): New method of Dmac.
+	* toshapi.cxx (Dmac): Don't connect conreol regs here.
+	(find_ctrl_regs): Do it here.
+	(Dmac::hweReq): Call find_ctrl_regs.
+	(PicardDmac::hweReq): Ditto.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* Makefile.am (INCLUDES): Add ../..
+	* toshapi.cxx (config.h): #include it.
+	* Makefile.in: Regenerated.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.h (toshapi_component): Inherit from
+	fixed_attribute_map_with_logging_component. Don't inherit from
+	fixed_pin_map_component.
+	toshapi/UserLog.h: New header.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.cxx (DSP): Initialize dmem[0-3].
+	* toshapi.h (class DSP): New members: dmem[0-3].
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* toshapi.cxx (toshapi_component::relate): setupIntcChannel
+	only if IRQ is not in .cfg file.
+	(toshapi_component::pin_factory): New method.
+	(Intc::interrupt): Add IRQ lookup.
+	(Intc::lookupChannel): Likewise.
+	* toshapi.h (toshapi_component::pin_factory): New method.
+	(Intc::plt): New.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* mm_int.h (mep_mm_int::max_modules): Now 1.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Stan Cox  <scox@redhat.com>
+	* intc.h (mep_intc::have_irq): New member.
+	* intc.cxx (mep_intc::have_irq): Likewise.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.h (DSP::doit): Provide a default, empty implementation.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Frank Ch. Eigler  <fche@redhat.com>
+	* toshapi.cxx (toshapi_component dtor): Remove throw().
+	* toshapi.h (toshapi_component dtor): Ditto.
+	Remove unused HWengine, PIuci dtors entirely.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.h (toshapi_component::downstream_memory): Now protected.
+	(Memory::read*): Now virtual.
+	(Dmac::ccr_addr): Now 1.
+	(Dmac::trc_addr): New constant.
+	(Dmac::hweReq): Now virtual.
+	(PicardDmac::trc): New array.
+	(PicardDmac): Initialize trc.
+	(class PeripheralModule): Remove sizeWord and destructor.
+	(PeriperhalModule::readCntlBus): New virtual override.
+	(PeriperhalModule::writeCntlBus): New virtual override.
+	(HWengine::handle_signal_map): New method.
+	(HWengine::signal_map): New member.
+	(toshapi_component::readCntlBus): Now public.
+	(toshapi_component::writeCntlBus): Now public.
+	(Memory): Now takes optional name. Now inherits toshapi_component.
+	* toshapi.cxx (sidmiscutils.h): #include it.
+	(sidutil::tokenize): Add "using" statement.
+	(HWengine): Add "signal-map" attribute.
+	(handle_signal_map): New function.
+	(PeripheralModule::relate): Call setMemory for "__mapped_memory".
+	Use base class method otherwise.
+	(PicardDmac::hweReq): New method.
+	(getChStat): Compare TRC to determine whether burst has been performed.
+	(Memory): Now takes optional name. Initialialize
+	toshapi_component.
+	(Memory::relate): New virtual override.
+	* toshapi/BLog.h: New file.
+	* toshapi/Dmac.h: New file.
+	* toshapi/PicardDmac.h: New file.
+	* toshapi/Resource.h: New file.
+	* toshapi/SimBasicType.h: New file.
+	* toshapi/SimController.h: New file.
+	* toshapi/PeripheralModule.h: New file.
+
+2003-10-10  Dave Brolley  <brolley@redhat.com>
+
+	* toshapi.h (toshapi_component::relationship_names): Make it virtual.
+	(toshapi_component::relate): Make it virtual.
+	(toshapi_component::unrelate): Make it virtual.
+	(toshapi_component::related_components): Make it virtual.
+	(end_pin): New method of toshapi_component.
+	(dmac): Ditto.
+	(controller): Ditto.
+	(setDmacCh): New method of toshapi_component.
+	(Memory): New constructor variant.
+	(setMemory): New method of Memory.
+	(class Dmac, class PicardDmac, class PeripheralModule): New classes.
+	* toshapi.cxx (toshapi_component): Add "end-sim" pin. Initialize 'dmac'
+	and 'controller'.
+	(toshapi_component): delete 'dmac' and 'controller'.
+	(toshapi_component::relate): Handle relationships to "dmac".
+	(toshapi_component::unrelate): Ditto.
+	(toshapi_component::related_components): Ditto.
+	(Memory): New constructor variant.
+	(setMemory): New method of Memory.
+	(PeripheralModule::relate): New method.
+	(Dmac): New method.
+	(hweReq): New method.
+	(getChStat): New method.
+	* dmac.h (hw_req_pin): New member of mep_dmac.
+	(read_burst_channel): New parameter 'consider_all'.
+	(read_burst_pending): Pass 'true' to read_burst_channel.
+	(mep_dmac_channel): New input_pin parameter.
+	(ready): New method of mep_dmac_channel.
+	(hw_req_pin): New member of mep_dmac_channel.
+	* dmac.cxx (mep_dmac_channel): Initialize hw_req_pin.
+	(update_after_read_burst): Clearn the hw_req_pin.
+	(update_after_write_burst): Ditto.
+	(mep_dmac): Add a hw_req_pin for each channel.
+	(dcr_attribute_set): Pass hw_req_pin to each channel's constructor.
+	(read_burst_channel): New parameter 'consider_all'. Use it to decide
+	whether to consider channels with CCR.HTRQ set.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Frank Ch. Eigler  <fche@redhat.com>
+	* toshapi.cxx (toshapi_component): Add verbose flag, and associated
+	conditional tracing messages.
+	(Intc::lookupChannel): Correct logic.
+	(*): Add "namespace toshapi" wrapper.  Remove SimAPI_test samples.
+	(Memory): Fill in dangerous getStorage function.  Remove stubs.
+	* toshapi.h (uint): Added new type.  Corrected Intc member functions
+	to use it.
+	(toshapi/*): Remove SimAPI_test samples.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Brendan Conoboy  <blc@redhat.com>
+	* intc.h, timer.cxx, toshapi.cxx, toshapi.h: More throw() fixes.
+	
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Frank Ch. Eigler  <fche@redhat.com>
+	* toshap.h: Rename "uint" -> "u32" in SimAPI_test extracts.
+	* toshapi.cxx: Ditto.
+	(toshapi_component ctor): Rename pin "step-inst" -> "step-insn".
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Frank Ch. Eigler  <fche@redhat.com>
+	* components.cxx (compMepFamilyDelete): Treat toshapi parts
+	in different temporary variable namespace.
+
+2003-10-07  Dave Brolley  <brolley@redhat.com>
+
+	For Frank Ch. Eigler  <fche@redhat.com>
+	Sketch of toshapi support.
+	* Makefile.am (SOURCES): Add toshapi.cxx.
+	(INCLUDES): Add toshapi/ subdir.
+	* Makefile.in: Regenerated.
+
+	* toshapi.cxx: New file: toshapi wrappers + SimAPI_test samples.
+	* toshapi.h: New file: decls for above.
+	* toshapi/*.h: New empty files, plus a README.
+
+	* intc.cxx: Add new "interrupt-name-NN" attribute group.
+	* intc.h, hw-interrupt-mep.xml: Corresponding changes.
+	* hw-interrupt-mep.txt: Regenerated.
+
+	* components.cxx: Add mepcfgtool markers and samples for
+	toshapi components.
+
+2003-02-11  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.cxx (init_transfer): Don't check for request_pending.
+	(check_end_burst): Check for request_pending here.
+	* timer.cxx (set_ten_ten): Indicate an immediate timeout if CNT and
+	CMP are both zero.
+
+2003-01-29  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.cxx (mep_dmac_channel): Initialize dsr_nc.
+	* timer.cxx (set_tis_tis): Signal NMI when tcr_tmd is set.
+	(mep_timer): Initialize and add nmi_pin.
+	(signal_nmi): New method of mep_timer.
+	* timer.h (signal_nmi): New method of mep_timer.
+	(nmi_pin): New member of mep_timer.
+
+2003-01-23  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.h (mep_dmact): New member, bus_error_pin.
+	* dmac.cxx (mep_dmac): Add bus-error pin connected to bus_error_pin.
+	* intc.cxx (update_state): Don't clear interrupt_channel_num or
+	interrupt_level when no interrupts are pending.
+
+2003-01-23  Dave Brolley  <brolley@redhat.com>
+
+	* intc.cxx (update_state): Don't clear interrupt_channel_num or
+	interrupt_level when no interrupts are pending.
+
+2003-01-21  Dave Brolley  <brolley@redhat.com>
+
+	* timer.cxx (set_tis_tis): Drive the interrupt pin whenever setting
+	tis_tis to 1 while tcr_tie is set.
+
+2003-01-16  Dave Brolley  <brolley@redhat.com>
+
+	* timer.cxx (set_ten_ten): Perform one tick immediately upon activation.
+
+2003-01-09  Dave Brolley  <brolley@redhat.com>
+
+	* timer.cxx (set_tis_tis): Clear any pending interrupt if setting this
+	bit to 0 in interval mode.
+
+2003-01-08  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.h (channel_ctrl_bus): Use max_channels for array size.
+	(mep_dmac_channel): New third parameter provides a
+	reference to a pin to drive for interrupt upon completion. New member
+	'interrupt_pin'.
+	* dmac.cxx (mep_dmac_channel): New third parameter provides a
+	reference to a pin to drive for interrupt upon completion.
+	(set_dsr_nc): Drive the interrupt_pin with zero if clearing this bit.
+	(dcr_attribute_set): Pass interrupt pin to channel constructor.
+
+2002-11-28  Dave Brolley  <brolley@redhat.com>
+
+	* dsu.h (sleep_status): New member of mep_dsu.
+	* dsu.cxx (mep_dsu): Initialize sleep_status. Update init value of
+	dcr_reserved. Add new attribute, "sleeping?".
+
+2002-11-21  Dave Brolley  <brolley@redhat.com>
+
+	* Makefile.am (libmepfamily_la_SOURCES): Add timer.h timer.cxx.
+	(DEJAGNUTESTS): Add mep-timer.exp.
+	* Makefile.in: Regenerated.
+	* timer.cxx: New file.
+	* timer.h: New file.
+	* components.cxx (compMepFamilyListTypes): Support hw-timer-mep.
+	(compMepFamilyCreate): Ditto.
+	(timer.h): #include it.
+
+2002-11-15  Dave Brolley  <brolley@redhat.com>
+
+	* components.cxx (compMepFamilyListTypes): Support hw-mm_int-mep.
+	(compMepFamilyCreate): Ditto.
+	(mm_int.h): #include it.
+	* Makefile.am (libmepfamily_la_SOURCES): Add mm_int.h and mm_int.cxx.
+	* Makefile.in: Regenerated.
+	* mm_int.h: New file.
+	* mm_int.cxx: New file.
+
+2002-11-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* dmac.h, intc.cxx, intc.h: Namespace fixes, dtor throw () fixes.
+
+2002-11-08  Dave Brolley  <brolley@redhat.com>
+
+	* components.cxx: Add markers for peripheral-definitions,
+	peripheral-contructor-names, peripheral-contructors and
+	peripheral-destructors.
+
+2002-10-25  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.cxx: Maintain control registers as individual fields. Map them
+	to the control bus as whole registers using callbacks.
+	(init_transfer): Maintain intermediate source and destination addresses.
+	(check_validity): Check lsr_sls and lsr_dls individually depending on
+	the transfer type.
+	(init_source_line): Use source_rectangular and source_address_fixed.
+	(init_dest_line): Ditto.
+	(update_after_{read,write}_burst): Adjust intermediate source and dest
+	addresses. Update the actual registers if the transfer is not from/to a
+	fixed address.
+	(get_ccr): New method of mep_dmac_channel.
+	(get_tcm): Ditto.
+	(get_lsr): Ditto.
+	(perform_read_burst): Use intermediate source address from the channel.
+	(perform_write_burst): Use intermediate dest address from the channel.
+	(set_dcr): New method of mep_dmac.
+	* dmac.h: Maintain control registers as individual fields. Map them
+	to the control bus as whole registers using callbacks.
+	(current_src_sa): New member of mep_dmac_channel.
+	(current_dst_da): Ditto.
+	(source_rectangular): New method of mep_dmac_channel.
+	(dest_rectangular): New method of mep_dmac_channel.
+
+2002-10-16  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.h (set_dcr_mbe): New defined in dmac.cxx.
+	(set_dsr_nc): Ditto.
+	(set_dcr_mbe_internal): New method of mep_dmac.
+	(set_dsr_nc_internal): New method of mep_dmac_channel.
+	(check_validity): Ditto.
+	(transfer_complete): Ditto.
+	(burst_size): Ditto.
+	(init_transfer): Now public.
+	(init_chain): Now private.
+	* dmac.cxx (mep_dmac_channel): Use set_dsr_nc_internal.
+	(set_car_act): Setting to 1 when already set now has no effect. Check
+	return code from begin_transfer and leave value as 0 if it fails.
+	(init_transfer): Check whether the transfer is valid.
+	(set_dsr_nc): New defined here.
+	(set_dcr_mbe): Ditto.
+	(check_validity): New method of mep_dmac_channel.
+	(transfer_complete): Ditto.
+	(begin_transfer): Return true if transfer successfully initialized.
+	(perform_read_burst): Use burst_size method.
+	(check_end_burst): Use init_transfer and transfer_complete.
+	(bus_error): Use set_dcr_mbe_internal.
+
+2002-10-11  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.h (read_from_local_mem): New method of mep_dmac.
+	(init_chain): New method of mep_dmac_channel.
+	(init_transfer): Now private.
+	(mep_dmac_channel): Rename ccr_dc to ccr_dcm. Add methods for reading
+	entire registers.
+	(is_rectangular): New method of mep_dmac_channel.
+	* dmac.cxx (mep_dmac_channel): Rename ccr_dc to ccr_dcm.
+	(init_transfer): Call is_rectangular. Initialize for chaining mode.
+	(init_chain): New method of mep_dmac_channel.
+	(do_one_burst): Check for errors after read and write bursts.
+	(check_end_burst): Check for chain descriptors at the end of each
+	transfer request.
+	(read_from_local_mem): New method of mep_dmac.
+
+2002-10-11  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.h (mep_dmac): data_width, {get,set}_*, debug_burst now public.
+	(init_transfer): New method of mep_dmac_channel.
+	(init_source_line): Ditto.
+	(init_dest_line): Ditto.
+	(limit_read_burst): Ditto.
+	(limit_write_burst): Ditto.
+	(limit_burst): Ditto.
+	(update_after_read_burst): Ditto.
+	(update_after_write_burst): Ditto.
+	(adjust_address): New method of mep_dmac.
+	(mep_dmac_channel): Enforce bus-width alignment in set-*.
+	(source_address_fixed): New methods of mep_dmac_channel.
+	(dest_address_fixed): Ditto.
+	(get_source_line_remain): Ditto.
+	(get_dest_line_remain): Ditto.
+	({source,dest}_line_{start,remain}): New members of mep_dmac_channel.
+	(_address): Removed from mep_dmac_buffer.
+	(_target_bus): Ditto.
+	(initialize): Now has fewer parameters.
+	* dmac.cxx (mep_dmac_channel): Initialize
+	{source,dest}_line_{start,remain}.
+	(init_transfer): New method of mep_dmac_channel.
+	(init_source_line): Ditto.
+	(init_dest_line): Ditto.
+	(limit_read_burst): Ditto.
+	(limit_write_burst): Ditto.
+	(limit_burst): Ditto.
+	(update_after_read_burst): Ditto.
+	(update_after_write_burst): Ditto.
+	(begin_transfer): Don't activate the DMA unless the transfer request is
+	valid.
+	(read_write_conflict): Get more write information from the channel.
+	(perform_read_burst): Don't do bus-width alignment here.  Call
+	limit_read_burst. Call adjust_address. Call update_after_read_burst.
+	(adjust_address): New method of mep_dmac.
+	(perform_write_burst): Call limit_write_burst. Call adjust_address.
+	Call update_after_write_burst.
+
+2002-10-09  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.h (data_size): New method of mep_dmac_buffer.
+	(dcr_default): Change default value.
+	(data_width): New method of mep_dmac.
+	* dmac.cxx (perform_read_burst): Multiply the burst length by the
+	data bus width.
+	(perform_write_burst): Limit the burst length to the amount of data in
+	the buffer.
+
+2002-10-09  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.h (mep_dmac_channel): No longer local to class mep_dmac.
+	(request_pending): New method of mep_dmac_channel.
+	(mep_dmac_buffer): New class.
+	(dcr_default): Change default value.
+	(dcr_lbdw): Renamed from dcr_lbd.
+	(set_dcr_{cnn,mbdw,lbdw,rto}): Now empty.
+	(channels): Renamed from channel.
+	(debug_burst): New member of mep_dmac.
+	(high_channel): Ditto.
+	({read,write}_buffer_ix): Ditto.
+	(buffers): Ditto.
+	(read_burst_channel): New method of mep_dmac.
+	({read,write}_burst_pending): Ditto.
+	(read_write_conflict): Ditto.
+	(perform_read_burst): Ditto.
+	(prioritize_channels): Ditto.
+	(next_channel): Ditto.
+	(perform_write_burst): Ditto.
+	(check_end_burst): Ditto.
+	(bus_error): Ditto.
+	* dmac.cxx (mep_dmac_channel): No longer takes channel number as an
+	argument. Correct control register offsets. This class is no longer
+	local to class mep_dmac. Initialize new members high_channel,
+	read_buffer_ix and write_buffer_ix. Rename dcr_lbd to dcr_lbdw. Rename
+	channel to channels. Allocate internal buffers.
+	(do_one_burst): Rewritten to handle multiple channels.
+	(read_burst_channel): New method of mep_dmac.
+	(write_burst_pending): Ditto.
+	(read_write_conflict): Ditto.
+	(perform_read_burst): Ditto.
+	(prioritize_channels): Ditto.
+	(next_channel): Ditto.
+	(perform_write_burst): Ditto.
+	(check_end_burst): Ditto.
+	(bus_error): Ditto.
+	(add_4_bytes): New method of mep_dmac_buffer.
+	(flush_4_bytes): Ditto.
+
+2002-10-02  Dave Brolley  <brolley@redhat.com>
+
+	* dmac.h (mep_dmac::mep_dmac_channel): New class.
+	(mep_dmac): Add 6 channel capability. Implement new control register
+	mapping.
+	* dmac.cxx (mep_dmac_channel::mep_dmac_channel): New function.
+	(mep_dmac_channel::set_car_act): New function.
+	(mep_dmac_channel::begin_transfer): New function.
+	(mep_dmac::mep_dmac): Implement new control register mapping. Add
+	6 channel capability. Remove local_mem_list relation.
+	(mep_dmac::dcr_attribute_set): New function.
+	(mep_dmac::do_one_burst): Implement new control register mapping for
+	channel 0.
+	(mep_dmac::bus_for_address): New function.
+
+2002-06-19  Graydon Hoare  <graydon@redhat.com>
+
+	* dmac.h (mep_dmac): Add local_mem_list relation.
+	(mep_dmac): Change to fixed_relation_map_component.
+	* dmac.cxx (mep_dmac): Register local_mem_list relation as
+	"local-mem-list".
+
+2002-06-13  Graydon Hoare  <graydon@redhat.com>
+
+	* dsu.h (insn_break_write_ign): Add member.
+	(data_break_write_ign): Add member.
+	* dsu.cxx (mep_dsu): Ignore writes to read-only
+	bits within IBS, DBS value regsters.
+
+2002-06-13  Graydon Hoare  <graydon@redhat.com>
+
+	* intc.cxx (update_state): Cap interrupt levels.
+	(mep_intc): Add attribute "cfg-interrupt-level".
+	* intc.h: Add member cfg_interrupt_level.
+
+2002-05-13  Graydon Hoare  <graydon@redhat.com>
+
+	* dmac.h (mep_dmac): Add interrupt pin.
+	* dmac.cxx (mep_dmac): Expose interrupt pin.
+	(do_one_burst): Set remaining = 0 on burst error.
+	(do_one_burst): Drive interrupt on completion.
+
+2002-03-24  Graydon Hoare  <graydon@redhat.com>
+
+	* components.cxx (compMepFamilyDelete): Add hooks for destroying
+	hw engines.
+
+2002-03-23  Graydon Hoare  <graydon@redhat.com>
+
+	* components.cxx: Add hooks for including hw engines.
+
+2002-02-19  Graydon Hoare  <graydon@redhat.com>
+
+	* intc.h (updating_control_register_bus): Change bus to update
+	state after every access.
+	(isr_control_register::set): Permit 0-writes to edge-triggered
+	channels only.
+	* intc.cxx (update_state): Correct signalling and register-updating
+	logic.
+	
+2002-02-06  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): Define.
+
+2002-01-04  Graydon Hoare  <graydon@redhat.com>
+
+	* intc.h: Change all little endian registers to big endian.
+	* intc.cxx: Likewise.
+
+2001-12-05  Ben Elliston  <bje@redhat.com>
+
+	* intc.h: Completely re-write.
+	* intc.cxx: Ditto.
+	* intcontroller.h: Remove cruft.
+	* hw-interrupt-mep.xml: Update.
+
+2001-12-01  Frank Ch. Eigler  <fche@redhat.com>
+
+	* intcontroller.h, components.h: C++ standard respectification.
+
+2001-10-26  Frank Ch. Eigler  <fche@redhat.com>
+
+	* components.cxx (compMepFamilyDelete): Avoid RTTI calls
+	on possibly-deleted objects.
+
+2001-09-10  Ben Elliston  <bje@redhat.com>
+
+	* dsu.h (insn_break_status_p): New member.
+	(data_break_status_p): Likewise.
+	(get_ibs0): New method.
+	(get_dbs0): Likewise.
+	(set_ibs0): Likewise.
+	(set_dbs0): Likewise.
+	(insn_break_p): Likewise.
+	(data_break_p): New function template.
+	(insn_break_status): Make a callback_control_register.
+	(data_break_status): Likewise.
+	(byte_address_ignored_4): Make a fixed_control_register.
+	(byte_address_ignored_5): Make a fixed_control_register.
+	(byte_address_ignored_6): Make a fixed_control_register.
+	(byte_address_ignored_7): Make a fixed_control_register.
+	* dsu.cxx (mep_dsu ctor): Initialise insn_break_status,
+	data_break_status, byte_address_ignored_{4,5,6,7} appropriately.
+	Initialise insn_break_status_p and data_break_status_p. Bind
+	"insn-break-status" to insn_break_status_p and "data-break-status"
+	to data_break_status_p.
+
+2001-09-05  Ben Elliston  <bje@redhat.com>
+
+	* dsu.h (get_enmi): New inline method.
+	(set_enmi): New method.
+	(nmi_enabled): New member.
+	(nmi_pending_p): Likewise.
+	(nmi_pending_value): Likewise.
+	(enable_interrupt): Make a callback_control_register instead.
+	(enable_nmi): Likewise.
+	* dsu.cxx (mep_dsu constructor): Construct enable_enmi and
+	enable_interrupt accordingly. Initialise new members.
+	(mep_dsu::set_enmi): Define.
+	(mep_dsu::nmi): Likewise.
+	(mep_dsu::set_eint): Likewise.
+	(mep_dsu::interrupt): Likewise.
+
+	* hw-debug-mep.xml: Document attributes.
+	* hw-debug-mep.txt: Regenerate.
+
+2001-08-29  Ben Elliston  <bje@redhat.com>
+
+	* hw-debug-mep.xml: Complete.
+	* hw-debug-mep.txt: Generate.
+
+2001-08-22  Ben Elliston  <bje@redhat.com>
+
+	* dsu.h (interrupt_pin): New callback pin.
+	(nmi_pin): Likewise.
+	(interrupt_out_pin): New output pin.
+	(nmi_out_pin): Likewise.
+	(interrupt): New pin callback method.
+	(nmi): Likewise.
+	(fixed_control_registers): Consolidate reserved registers.
+	* dsu.cxx (mep_dsu ctor): Update for simplified reserved regs.
+	(mep_dsu ctor): Add "interrupt-{in,out} and "nmi-{in,out}" pins.
+	(mep_dsu::nmi): Define.
+	(mep_dsu::interrupt): Likewise.
+
+2001-08-22  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (libmepfamily_la_SOURCES): Add dsu.h, dsu.cxx.
+	(pktdata_DATA): Add hw-debug-mep.txt.
+	(DEJAGNUTESTS): Add mep-dsu.exp.
+	* dsu.h: New file.
+	* dsu.cxx: Likewise.
+	* components.cxx (compFamilyListTypes): Add "hw-debug-mep".
+	(compFamilyCreate): Likewise, recognise it.
+	(compFamilyDelete): Likewise, delete it.
+	* hw-debug-mep.xml: New skeleton file.
+	* hw-debug-mep.txt: Touch.
+
+2001-08-06  Ben Elliston  <bje@redhat.com>
+
+	* dmac.h: Add user-friendly comments.
+	* dmac.cxx: Likewise.
+	* Makefile.am (DEJAGNUTESTS): Add mep-dmac.exp.
+
+2001-07-24  Ben Elliston  <bje@redhat.com>
+
+	* Makefile.am (pkgdata_DATA): Refer to new documentation files.
+	* hw-mepfamily-dmac.txt, hw-mepfamily-dmac.xml: Rename ..
+	* hw-dma-mep.txt, hw-dma-mep.xml: .. to these.
+	* hw-mepfamily-intc.txt, hw-mepfamily-intc.xml: Rename ..
+	* hw-interrupt-mep.txt, hw-interrupt-mep.xml: .. to these.
+	* components.cxx (compMepFamilyListTypes): Change component
+	nomenclature from "hw-mepfamily-TYPE" to "hw-TYPE-mep".
+	(compMepFamilyCreate): Recognise such.
+
+2001-07-23  graydon hoare  <graydon@redhat.com>
+
+	* dmac.cxx (mep_dmac): Add 0-initializers for pointer,
+	integer values. Split control bus in 2 parts, delegate
+	address selection to external mapper.
+	* hw-mepfamily-dmac.xml: Update to reflect changes.
+	* hw-mepfamily-dmac.txt: Likewise.
+
+2001-07-23  Ben Elliston  <bje@redhat.com>
+
+	* intc.cxx, intc.h: Don't make conditional on SIDTARGET_MEP.
+	* dmac.cxx, dmac.h: Likewise.
+	* components.cxx (compMepFamilyListTypes): Make unconditional.
+	(compMepFamilyCreate, compMepFamilyDelete): Likewise.
+	* configure.in: New file.
+	* configure: Ditto.
+	* aclocal.m4: Ditto.
+
+2001-07-19  Frank Ch. Eigler  <fche@redhat.com>
+
+	* components.cxx (compMepFamilyListTypes): Make conditional 
+	on SIDTARGET_MEP.
+	(compMepFamilyCreate, compMepFamilyDelete): Ditto.
+	* dmac.cxx: Tweak comment header.  #include tconfig.h.
+	Add SIDTARGET_MEP checking.
+	* intc.cxx, intc.h, dmac.h: Ditto.
+
+2001-07-19  Ben Elliston  <bje@redhat.com>
+
+	* components.cxx (compMepFamilyListTypes): Add intc components.
+	(compMepFamilyCreate): Detect them.
+	(compMepFamilyDelete): Delete them.
+	* intc.h: New file.
+	* intc.cxx: Likewise.
+	* intcontroller.h: Likewise.
+	* Makefile.am (libmepfamily_la_SOURCES): Add int.h, int.cxx.
+	(DOCS): Remove.
+	(pkgdata_DATA): Re-define. Add hw-mepfamily-intc.txt.
+	(DEJAGNUTESTS): Add mep-interrupt.exp.
+	(check-local): Testsuite directory is two levels up.
+
+2001-07-18  graydon hoare  <graydon@redhat.com>
+
+	* dmac.cxx (mep_dmac): Modified masks to
+	reflect address alignment requirement.
+
+2001-07-17  graydon hoare  <graydon@redhat.com>
+
+	* dmac.{h,cxx}, components.{h,cxx}: Add.
+	* hw-mepfamily-dmac.{xml,txt}: Add.
+
+2001-07-18  Ben Elliston  <bje@redhat.com>
+
+	* hw-mepfamily-intc.xml: New file.
+	* hw-mepfamily-intc.txt: Likewise.
+
+

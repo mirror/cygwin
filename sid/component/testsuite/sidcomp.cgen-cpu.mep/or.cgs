@@ -1,0 +1,23 @@
+# mep testcase for or $rn,$rm -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global or
+or:
+	# Test that or (x, 0) = x.
+	mov $0, -1
+	mov $1, 0
+	or $0, $1
+	assert $0, -1
+
+	# Test that or (all-5s, all-As) = all-1s.
+	mov $0, 0x55
+	mov $1, -86
+	or $0, $1
+	assert $0, -1
+
+okay:
+	pass
+wrong:
+	fail

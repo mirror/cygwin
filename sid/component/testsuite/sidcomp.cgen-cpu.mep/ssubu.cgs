@@ -1,0 +1,30 @@
+# mep testcase for ssubu $rn,$rm -*- Asm -*-
+# configline(): set cpu sat-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global ssubu
+ssubu:
+	# Null subtraction.
+	mov $1, 0
+	mov $2, 0
+	ssubu $2, $1
+	assert $2, 0
+	
+	# Simple subtraction.
+	mov $1, 3
+	mov $2, 7
+	ssubu $2, $1
+	assert $2, 4
+
+	# Generate a borrow (ie. X < Y).
+	mov $1, 9
+	mov $2, 3
+	ssubu $2, $1
+	assert $2, 0
+
+okay:		
+	pass
+wrong:
+	fail

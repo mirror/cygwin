@@ -1,0 +1,11 @@
+# mep testcase for lhu $rn,$disp16($rm) -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global lhu16
+lhu16:
+	# This instruction is exercised by the sh16 test case.
+	mov $0, 0
+	lhu $0,0($0)
+	pass

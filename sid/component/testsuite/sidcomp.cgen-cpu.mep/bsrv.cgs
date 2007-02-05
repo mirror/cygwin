@@ -1,0 +1,18 @@
+# mep testcase for bsrv $pcrel24a2 -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global bsrv
+bsrv:
+	bsrv okay
+	fail
+	fail
+
+.org 0x80000
+okay:
+	pass
+toofar:	
+	fail
+	fail

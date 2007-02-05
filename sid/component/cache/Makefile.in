@@ -67,7 +67,7 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(pkgdatadir)"
 pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libcache_la_LIBADD =
-am__objects_1 =
+am__objects_1 = mep-cache.lo
 am_libcache_la_OBJECTS = cache.lo $(am__objects_1) cacheutil.lo
 libcache_la_OBJECTS = $(am_libcache_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -168,6 +168,8 @@ SIDTARGET_M32R_FALSE = @SIDTARGET_M32R_FALSE@
 SIDTARGET_M32R_TRUE = @SIDTARGET_M32R_TRUE@
 SIDTARGET_M68K_FALSE = @SIDTARGET_M68K_FALSE@
 SIDTARGET_M68K_TRUE = @SIDTARGET_M68K_TRUE@
+SIDTARGET_MEP_FALSE = @SIDTARGET_MEP_FALSE@
+SIDTARGET_MEP_TRUE = @SIDTARGET_MEP_TRUE@
 SIDTARGET_MIPS_FALSE = @SIDTARGET_MIPS_FALSE@
 SIDTARGET_MIPS_TRUE = @SIDTARGET_MIPS_TRUE@
 SIDTARGET_MT_FALSE = @SIDTARGET_MT_FALSE@
@@ -235,6 +237,7 @@ sharedstatedir = @sharedstatedir@
 sidtarget_arm = @sidtarget_arm@
 sidtarget_m32r = @sidtarget_m32r@
 sidtarget_m68k = @sidtarget_m68k@
+sidtarget_mep = @sidtarget_mep@
 sidtarget_mips = @sidtarget_mips@
 sidtarget_mt = @sidtarget_mt@
 sidtarget_ppc = @sidtarget_ppc@
@@ -251,7 +254,7 @@ pkglib_LTLIBRARIES = libcache.la
 AM_CXXFLAGS = $(TOP_CXXFLAGS)
 AM_MAKEFLAGS = "TOP_CXXFLAGS=$(TOP_CXXFLAGS)"
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include
-EXTRA_SOURCES = 
+EXTRA_SOURCES = mep-cache.cxx mep-cache.h
 libcache_la_SOURCES = cache.cxx cache.h \
 	$(EXTRA_SOURCES) \
 	cacheutil.cxx cacheutil.h log2.h
@@ -335,6 +338,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cache.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cacheutil.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mep-cache.Plo@am__quote@
 
 .cxx.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

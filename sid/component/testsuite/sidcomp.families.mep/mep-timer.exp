@@ -1,0 +1,312 @@
+# Testsuite for the Toshiba Media Engine Timer unit.
+# Copyright (C) 2002, 2003 Red Hat
+
+proc readword {bus addr} {
+    global test
+    set saved_test $test
+    set test "$saved_test: read a word @ $addr"
+    set result [sid_cmd "sid::bus::read_h4_b4 $bus $addr"]
+    if ![sid_bus_ok_p $result] {
+	fail "$test (bus error: $result)"
+	set test $saved_test
+	return 0
+    } else {
+	set test $saved_test
+	return [lindex $result 1]
+    }
+}
+
+proc write_channel_reg {channel addr word} {
+    global test
+    global ctrl_bus
+    set saved_test $test
+    set test "$saved_test: write a word $word @ channel $channel address $addr"
+    set result [sid_cmd "sid::bus::write_h4_b4 $ctrl_bus [expr (0x0400 + $addr + ($channel << 4)) * 4] $word"]
+    if ![sid_bus_ok_p $result] {
+	fail "$test (bus error: $result)"
+	set test $saved_test
+	return 0
+    } else {
+	set test $saved_test
+	return [lindex $result 1]
+    }
+}
+
+proc check_channel_reg {channel addr expected} {
+    global test
+    global ctrl_bus
+
+    set res [readword $ctrl_bus [expr (0x0400 + $addr + ($channel << 4)) * 4]]
+    if {$res != $expected} {
+	fail "$test: read from channel $channel register $addr: $res != $expected"
+	return
+    }
+    pass $test
+}
+
+# Setup for a single channel timer test
+proc setup_one_timer_test {channel tcr tcd cnt cmp} {
+    global test
+
+    set save_test $test
+
+    # Configure the channel
+    set test "$save_test: clear channel enable"
+    write_channel_reg $channel 0x2 0x0
+
+    set test "$save_test: set channel counter"
+    write_channel_reg $channel 0x0 $cnt
+    set test "$save_test: set channel compare"
+    write_channel_reg $channel 0x1 $cmp
+    set test "$save_test: set channel control"
+    write_channel_reg $channel 0x3 $tcr
+    set test "$save_test: clear channel status"
+    write_channel_reg $channel 0x4 0x0
+    set test "$save_test: set channel clock divide"
+    write_channel_reg $channel 0x5 $tcd
+
+    set test "$save_test: set channel enable"
+    write_channel_reg $channel 0x2 0x1
+
+    set test $save_test
+}
+
+proc do_one_timer_test {channel cnt cmp} {
+    global test
+    global ctrl_bus
+    global event_pin
+    global iter
+
+    set saved_test $test
+
+    # Run the TIMER until it is no longer active
+    set test "$saved_test: running the TIMER on channel $channel"
+    set iter($channel) 0
+    for {set done [readword $ctrl_bus [expr (0x0400 + ($channel << 4) + 0x4) * 4]]} {$done == 0} {set done [readword $ctrl_bus [expr (0x0400 + ($channel << 4) + 0x4) * 4]]} {
+	    sid_cmd "sid::pin::driven_h4 $event_pin 1"
+	    set iter($channel) [expr $iter($channel) + 1]
+    }
+
+    set test $saved_test
+    pass $test
+}
+
+proc check_one_timer_test {channel tcr tcd cnt cmp} {
+    global test
+    global iter
+
+    set save_test $test
+
+    # tcr_tmd is fixed at 0 for channels other than 0
+    if {$channel != 0} {
+	set tcr [expr $tcr & ~0x10]
+    }
+
+    # Check the TIMER state
+    set test "$save_test: check cnt register"
+    if {$tcr & 0x20} {
+	check_channel_reg $channel 0x0 0x1
+    } else {
+	if {$cmp == 0} {
+	    check_channel_reg $channel 0x0 $cnt
+	} else {
+	    check_channel_reg $channel 0x0 $cmp
+	}
+    }
+    set test "$save_test: check cmp register"
+    check_channel_reg $channel 0x1 $cmp
+
+    set test "$save_test: check ten register"
+    if {($tcr & 0x30) == 0x20} {
+	check_channel_reg $channel 0x2 0x1
+    } else {
+	check_channel_reg $channel 0x2 0x0
+    }
+
+    set test "$save_test: check tcr register"
+    check_channel_reg $channel 0x3 $tcr
+    set test "$save_test: check tis register"
+    check_channel_reg $channel 0x4 0x1
+    set test "$save_test: check tcd register"
+    check_channel_reg $channel 0x5 $tcd
+
+    set test "$save_test: Check iteration count"
+    if {$cmp == 0} {
+	set expected 0
+    } else {
+	set expected [expr (($cmp - $cnt) << $tcd) - 1]
+    }
+    if {$iter($channel) != $expected} {
+	fail "$test ($iter($channel) != $expected)"
+    } else {
+	pass $test
+    }
+
+    set test $save_test
+}
+
+# Perform a timer test the given configuration on the given channel
+proc single_channel_timer_test {channel tcr tcd cnt cmp} {
+    global test
+
+    set save_test $test
+
+    # Set up the test
+    setup_one_timer_test $channel $tcr $tcd $cnt $cmp
+
+    # Do the test
+    do_one_timer_test $channel $cnt $cmp
+
+    # Check the result
+    check_one_timer_test $channel $tcr $tcd $cnt $cmp
+
+    set test $save_test
+}
+
+proc do_multiple_timer_test {} {
+    global test
+    global ctrl_bus
+    global event_pin
+    global iter
+
+    set saved_test $test
+
+    # Run the TIMER until it is no longer active
+    set test "$saved_test: running the TIMER on all channels"
+    for {set channel 0} {$channel < 4} {set channel [expr $channel + 1]} {
+	set iter($channel) 0
+    }
+    for {set active 1} {$active == 1} {} {
+	set active 0
+	for {set channel 0} {$channel < 4} {set channel [expr $channel + 1]} {
+	    set done($channel) [readword $ctrl_bus [expr (0x0400 + ($channel << 4) + 0x4) * 4]]
+	    if {! $done($channel)} {
+		set iter($channel) [expr $iter($channel) + 1]
+		set active 1
+	    }
+	}
+	if {$active} {
+	    sid_cmd "sid::pin::driven_h4 $event_pin 1"
+	}
+    }
+
+    set test $saved_test
+    pass $test
+}
+
+# Perform a simultaneous test of all transfer types and directions
+# on all channels
+proc stress_test {} {
+    global test
+
+    set save_test $test
+
+    # Set up a test for each channel, varying the parameters
+    set test "$save_test,setup stress test,channel 0,tcr==0x10,tcd=0x0,cnt==0x100,cmp==0x200"
+    setup_one_timer_test 0 0x10 0x0 0x100 0x110
+    set test "$save_test,setup stress test,channel 1,tcr==0x00,tcd=0x2,cnt==0x110,cmp==0x220"
+    setup_one_timer_test 1 0x00 0x2 0x110 0x120
+    set test "$save_test,setup stress test,channel 2,tcr==0x01,tcd=0x4,cnt==0x120,cmp==0x240"
+    setup_one_timer_test 2 0x01 0x4 0x120 0x130
+    set test "$save_test,setup stress test,channel 3,tcr==0x11,tcd=0x7,cnt==0x0,cmp==0x0"
+    setup_one_timer_test 3 0x11 0x7 0x0 0x0
+
+    # Run the simultaneous timers
+    do_multiple_timer_test
+
+    # Check the results
+    set test "$save_test,check stress test,channel 0,tcr==0x10,tcd=0x0,cnt==0x100,cmp==0x200"
+    check_one_timer_test 0 0x10 0x0 0x100 0x110
+    set test "$save_test,check stress test,channel 1,tcr==0x00,tcd=0x2,cnt==0x110,cmp==0x220"
+    check_one_timer_test 1 0x00 0x2 0x110 0x120
+    set test "$save_test,check stress test,channel 2,tcr==0x01,tcd=0x4,cnt==0x120,cmp==0x240"
+    check_one_timer_test 2 0x01 0x4 0x120 0x130
+    set test "$save_test,check stress test,channel 3,tcr==0x11,tcd=0x7,cnt==0x0,cmp==0x0"
+    check_one_timer_test 3 0x11 0x7 0x0 0x0
+}
+
+### tests follow...
+
+if {! $sidtarget(mep)} then { untested "hw-timer-mep not available"; return }
+
+# Perform all tests on a TIMER of the given data width
+# 
+proc timer_test {} {
+    global victim
+    global test
+    global ctrl_bus
+    global event_pin
+
+    set save_test "Mep TIMER"
+    set test "$save_test: sid configuration"
+    # Configure the timer for
+    #   4 channels
+    sid_config_component_etc_test "mep-timer.conf" \
+	    "load libcache.la cache_component_library
+load libmemory.la mem_component_library
+load libmepfamily.la mepfamily_component_library" \
+	    "hw-timer-mep" \
+	    "load libmapper.la mapper_component_library
+new hw-mapper-basic control-bus-mapper
+relate tester mapper control-bus-mapper
+connect-bus control-bus-mapper \[4*0x0400-0x0405\] real-victim control-regs-0
+connect-bus control-bus-mapper \[4*0x0410-0x0415\] real-victim control-regs-1
+connect-bus control-bus-mapper \[4*0x0420-0x0425\] real-victim control-regs-2
+connect-bus control-bus-mapper \[4*0x0430-0x0435\] real-victim control-regs-3
+set real-victim num-channels 4"
+    pass $test
+
+    set test "$save_test: sid start"
+    if {[sid_start "mep-timer.conf"]} { pass $test } else { fail $test; return }
+
+    set test "$save_test: acquire schedule event pin"
+    set event_pin [sid_cmd "sid::component::find_pin $victim burst-event"]
+    if {$event_pin != ""} { pass $test } else { fail $test }
+
+    set test "$save_test: acquire control register bus handle"
+    set ctrl_bus [sid_cmd "sid::component::find_bus [sid_cmd {set relationships(mapper)}] access-port"]
+    if {$ctrl_bus != ""} { pass $test } else { fail $test }
+
+    # Try various tcr and tcd settings
+    set tai 0
+    set tmd 1
+    set tie 0
+    set tcd 0
+    set channel 0
+    set cnt 0x10
+    set cmp 0x20
+    for {set i 0} {$i < 8} {set i [expr $i + 1]} {
+	set tcr [expr ($tai << 5) | ($tmd << 4) | $tie]
+
+	# Run a single channel test.
+	set test "$save_test,channel==$channel,tcr==$tcr,tcd==$tcd,cnt==$cnt,cmp==$cmp"
+	single_channel_timer_test $channel $tcr $tcd $cnt $cmp
+
+	# Special test: cnt==0,cmp==0. Should cause an immediate timeout
+	set test "$save_test,channel==$channel,tcr==$tcr,tcd==$tcd,cnt==0,cmp==0"
+	single_channel_timer_test $channel $tcr $tcd 0 0
+
+	# Update the test parameters
+	set tai [expr ($tai + 1) & 1]
+	set tmd [expr ($tmd + 1) & 1]
+	set tie [expr ($tie + 1) & 1]
+	set tcd [expr ($tcd + 1) & 7]
+	set channel [expr ($channel + 1) % 4]
+	set cnt [expr $cnt + 1]
+	set cmp [expr $cmp + 2]
+    }
+
+    # Run a simultaneous timing on all channels in various modes
+    set test $save_test
+    stress_test
+
+    set test "$save_test: sid stop"
+    if {[sid_stop]} { pass $test } else { fail $test ; return }
+}
+
+# Execution starts here
+timer_test
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "mep-timer.conf" }

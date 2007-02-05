@@ -1,0 +1,21 @@
+# mep testcase for beq $rn,$rm,$disp17a2 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global beq
+beq:
+	mov $1, 5
+	mov $2, 3
+	beq $1, $2, wrong
+	mov $1, -1
+	mov $2, -1
+	beq $1, $2, okay
+	fail
+
+.org 0x4000
+wrong:
+	fail
+
+okay:
+	pass

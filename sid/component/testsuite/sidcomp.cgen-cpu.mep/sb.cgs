@@ -1,0 +1,31 @@
+# mep testcase for sb $rn,($rm) -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+
+	.global sb
+sb:
+	# Test this instruction by storing a magic byte in a magic
+	# memory location.  Attempt to read it back after writing.
+
+	# address in r0
+	mov $0, 0x40
+	# data in r1
+	mov $1, 0x13
+
+	# store it
+	sb $1, ($0)
+
+	# address in r3
+	mov $3, 0x40
+	# reload it
+	lb $4, ($3)
+
+	sub $4, $1
+	bnez $4, wrong
+
+okay:
+	pass
+wrong:
+	fail

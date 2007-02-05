@@ -1,0 +1,14 @@
+# mep testcase for add3 $rn,sp,$imm7a4 -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global add3i
+add3i:
+	mov $sp, 13
+	add3 $3, $sp, 12
+	assert $3, 25
+okay:
+	pass
+wrong:
+	fail

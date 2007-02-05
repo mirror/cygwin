@@ -1,0 +1,44 @@
+# mep testcase for sra $rn,$rm -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global sra
+sra:
+	# Test this instruction by shifting various values.
+	# Try negative values as well.
+
+	# 127 >> 4 is 7.
+	mov $0, 127
+	mov $1, 4
+	sra $0, $1
+	assert $0, 7
+
+	# 7 >> 4 is 0.
+	sra $0, $1
+	assert $0, 0
+
+	# 1 >> 1 is 0.
+	mov $0, 1
+	mov $1, 1
+	sra $0, $1
+	assert $0, 0
+
+	# -1 >> 3 is still -1.
+	mov $0, -1
+	mov $7, $0
+	mov $1, 3
+	sra $0, $1
+	assert $0, -1
+
+	# 4 >> 1 is 2, even if shift amt is 65,
+	# as shift amt is only Rm4..0.
+	mov $0, 4
+	mov $1, 65
+	sra $0, $1
+	assert $0, 2
+
+okay:	
+	pass
+wrong:
+	fail

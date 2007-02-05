@@ -1,0 +1,29 @@
+# mep testcase for cmovc $ccrn,$rm -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global cmovc1
+cmovc1:
+	# Load a magic value into $1.
+	mov $1, 0x3012
+	sll $1, 8
+	add $1, 23
+	sll $1, 8
+	add $1, 9
+
+	# Move this to $ccr3.
+	cmovc $ccr3, $1
+
+	# Load it back to $2.
+	cmovc $2, $ccr3
+
+	# Verify.
+	sub $1, $2
+	bnez $1, wrong
+
+okay:	
+	pass
+wrong:
+	fail

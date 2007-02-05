@@ -1,0 +1,31 @@
+# mep testcase for exth $rn -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global exth
+exth:
+	mov $0, -1
+	# Clear low 16 bits.
+	sra $0, 16
+	sll $0, 8
+	add $0, 5
+	sll $0, 8
+	add $0, 9
+	# exth(0xffff0509) => 0x0509.
+	exth $0
+	mov $4, 5
+	sll $4, 8
+	add $4, 9
+	sub $4, $0
+	bnez $4, wrong
+
+	mov $0, -1
+	# exth(0xffffffff) is unchanged.
+	exth $0
+	assert $0, -1
+	
+okay:
+	pass
+wrong:
+	fail

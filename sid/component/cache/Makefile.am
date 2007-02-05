@@ -8,7 +8,7 @@ AM_CXXFLAGS=$(TOP_CXXFLAGS)
 AM_MAKEFLAGS= "TOP_CXXFLAGS=$(TOP_CXXFLAGS)"
 
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include
-EXTRA_SOURCES=
+EXTRA_SOURCES=mep-cache.cxx mep-cache.h
 libcache_la_SOURCES = cache.cxx cache.h \
 	$(EXTRA_SOURCES) \
 	cacheutil.cxx cacheutil.h log2.h

@@ -1,0 +1,52 @@
+# mep testcase for cmov $crn,$rm -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global cmov1
+cmov1:
+	# Load $1 with 0x3210309.
+	mov $1, 0x3210
+	sll $1, 8
+	add $1, 0x03
+	sll $1, 8
+	add $1, 0x09
+
+	# Move it to $cr1.
+	cmov $cr1, $1
+
+	# Load it back.
+	cmov $2, $cr1
+
+	# Verify $1 = $2.
+	sub $1, $2
+	bnez $1, wrong
+
+	# Bug reported by Toshiba.
+	# Ensure CR[63:32] are preserved by cmov type 1 insn.
+	
+	movh $11,%hi(0x12345678)
+	movh $12,%hi(0x9abcdef0)
+	# clear cr1
+	mov $0, 0
+	cmov $cr1, $0
+	# load high word.
+	cmovh $cr1,$12
+	# load low word.
+	cmov $cr1,$11
+
+	# get them back.
+	cmov $1, $cr1
+	cmovh $2, $cr1
+
+	# verify $1/$2 against $11/$12.
+	sub $1, $11
+	bnez $1, wrong
+	sub $2, $12
+	bnez $2, wrong
+
+okay:	
+	pass
+wrong:
+	fail

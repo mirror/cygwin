@@ -1,0 +1,382 @@
+              hw-cpu-mep (libcgencpu.la :: cgen_component_library)
+
+Synopsis:
+
+   This component models the Toshiba Media Processor (MeP).
+
+     ----------------------------------------------------------------------
+
+Functionality:
+
+  Modelling:
+
+   This component models a simplified MeP processor.
+
+   It does not model floating point instructions.
+
+   It does not model supervisory functions such as exceptions/traps. It
+   implements only a subset of user-level MeP instructions.
+
+   GDB can see both the main system memory and the MeP control bus. It sees
+   the control bus by accessing a special range of system memory, which is
+   diverted into the control bus. The control-space-low attribute specifies
+   the low end of this range, and the control-space-high attribute specifies
+   the high end of this range. These addresses default to 0x007c0000 and
+   0x007fffff, respectively.
+
+   +---------------------------------------------------------+
+   |                        Behaviors                        |
+   |---------------------------------------------------------|
+   |  initialization|The CPU performs a power-on-reset style |
+   |                |of operation when the reset! pin is     |
+   |                |driven.                                 |
+   |                |                                        |
+   |                |Other mode settings may be controlled by|
+   |                |pins and/or attributes:                 |
+   |                |endian-set!/endian to set endianness,   |
+   |                |start-pc-set! to set the PC. These are  |
+   |                |useful if the standard powerup state of |
+   |                |the CPU needs to be changed for running |
+   |                |a program that expects an initialized   |
+   |                |environment.                            |
+   |----------------+----------------------------------------|
+   |       execution|The component executes zero or more     |
+   |                |instructions when the step! pin is      |
+   |                |driven. You can specify the maximum     |
+   |                |number of instructions to be executed   |
+   |                |via the step-insn-count attribute. If   |
+   |                |the yield pin is driven in a reentrant  |
+   |                |fashion while the instruction loop is   |
+   |                |active, the loop will be exited at the  |
+   |                |next opportunity. At the end of the     |
+   |                |loop, the step-cycles output pin is     |
+   |                |driven with the number of instructions  |
+   |                |actually executed, though this value is |
+   |                |clamped to be at least 1. The insn-count|
+   |                |attribute accumulates the total number  |
+   |                |of instructions executed since reset.   |
+   |                |                                        |
+   |                |Each instruction is first fetched from  |
+   |                |memory via the insn-memory accessor, and|
+   |                |its decoding traced if the              |
+   |                |trace-extract? attribute is set to a    |
+   |                |true value. To prevent unwanted cache   |
+   |                |side effects, the disassembler-memory   |
+   |                |accessor can be used and connected      |
+   |                |directly to main memory, bypassing any  |
+   |                |memory caches. The decoded form may be  |
+   |                |cached indefinitely afterwards, although|
+   |                |this cache is flushed when the          |
+   |                |flush-icache pin is driven.             |
+   |                |                                        |
+   |                |The engine-type attribute specifies     |
+   |                |whether the "scache" ("semantic cache") |
+   |                |or "pbb" ("pseudo basic block")         |
+   |                |dispatching mechanism is used during    |
+   |                |execution. The "scache" mode executes   |
+   |                |each instruction in isolation and checks|
+   |                |all triggerpoints after each. If the    |
+   |                |enable-step-trap? attribute is set,     |
+   |                |after each instruction, a               |
+   |                |single-stepping trap is signalled as    |
+   |                |described in the exceptions/traps       |
+   |                |behavior below.                         |
+   |                |                                        |
+   |                |The "pbb" mode executes a series of     |
+   |                |sequential instructions in one          |
+   |                |uninterruptible sequence, and is thus   |
+   |                |faster. However, it cannot handle       |
+   |                |triggerpoints or single-stepping, nor   |
+   |                |can it respond to icache flushing as    |
+   |                |quickly. The "pbb" mode is temporarily  |
+   |                |and transparently downgraded to the     |
+   |                |"scache" mode when needed.              |
+   |                |                                        |
+   |                |During the execution of an instruction, |
+   |                |this component may make accesses using  |
+   |                |the data-memory accessor, may update its|
+   |                |simulated registers, and may trigger an |
+   |                |exception/trap.                         |
+   |----------------+----------------------------------------|
+   |         tracing|The component can be configured to      |
+   |                |perform certain kinds of tracing as     |
+   |                |target programs execute. These are      |
+   |                |controlled by the family of trace-*     |
+   |                |boolean attributes. By default, trace   |
+   |                |output is directed to the standard      |
+   |                |output stream. The trace-filename       |
+   |                |attribute allows the user to specify the|
+   |                |name of a file where trace output will  |
+   |                |be collected. A special filename of "-" |
+   |                |is used to represent standard output.   |
+   |                |Trace output files are not appended, but|
+   |                |overwritten each time they are opened.  |
+   |                |The print-insn-summary! pin can be      |
+   |                |driven to print a summary of instruction|
+   |                |and cycle counts, usually at the end of |
+   |                |the simulation. The trace pin can be    |
+   |                |driven with any value which will be     |
+   |                |output as a character into the trace    |
+   |                |stream.                                 |
+   |----------------+----------------------------------------|
+   |exceptions/traps|When encountering exception/trap        |
+   |                |conditions such as memory access errors |
+   |                |or software interrupts, this component  |
+   |                |signals the event using the trap pin.   |
+   |                |(For some traps, the trap-code pin is   |
+   |                |driven with extra information just      |
+   |                |beforehand.) An external component may  |
+   |                |interpret the values in the table below,|
+   |                |and declare a disposition for the       |
+   |                |condition. In the absence of input, the |
+   |                |condition will be treated as the        |
+   |                |hardware would, that is by dispatching  |
+   |                |to exception vectors, switching         |
+   |                |processor modes, etc.                   |
+   |                |                                        |
+   |                |The trap codes sent on the trap output  |
+   |                |pin are:                                |
+   |                |                                        |
+   |                |+--------------------------------------+|
+   |                || trap | cause           | trap-code   ||
+   |                ||------+-----------------+-------------||
+   |                || 1    | software trap   | instruction ||
+   |                ||      |                 | bitmap      ||
+   |                ||------+-----------------+-------------||
+   |                || 2    | breakpoint      | bkpt number ||
+   |                ||------+-----------------+-------------||
+   |                || 3    | system call     | syscall     ||
+   |                ||      |                 | number      ||
+   |                ||------+-----------------+-------------||
+   |                || 4    | invalid         | n/a         ||
+   |                ||      | instruction     |             ||
+   |                ||------+-----------------+-------------||
+   |                || 5    | memory fault    | faulting    ||
+   |                ||      |                 | address     ||
+   |                ||------+-----------------+-------------||
+   |                || 6    | arithmetic      | faulting    ||
+   |                ||      | overflow        | address     ||
+   |                ||------+-----------------+-------------||
+   |                || 7    | stepped         | n/a         ||
+   |                |+--------------------------------------+|
+   |                |                                        |
+   |                |The disposition codes returned on the   |
+   |                |trap input pin are:                     |
+   |                |                                        |
+   |                |+--------------------------------------+|
+   |                || trap     | effect                    ||
+   |                ||----------+---------------------------||
+   |                || 0 or n/a | dispatch as hardware      ||
+   |                ||          | would                     ||
+   |                ||----------+---------------------------||
+   |                || 1        | handled; continue         ||
+   |                ||----------+---------------------------||
+   |                || 2        | reissue                   ||
+   |                ||----------+---------------------------||
+   |                || 3        | handled; skip instruction ||
+   |                ||          | and continue              ||
+   |                |+--------------------------------------+|
+   |----------------+----------------------------------------|
+   | register access|All 32 general purpose registers are    |
+   |                |accessible as attribute r0 through r31. |
+   |                |The pc attribute is also available. The |
+   |                |current endianness is available as      |
+   |                |attribute endian.                       |
+   |                |                                        |
+   |                |This component exports a number of      |
+   |                |attributes for use by the sw-debug-gdb  |
+   |                |component. These are the gdb-*          |
+   |                |attributes, in the "debugger" category. |
+   |                |The gdb-register-N group access all     |
+   |                |registers in gdb's indexing scheme, in  |
+   |                |raw target byte order. The              |
+   |                |gdb-register-pc is a special watchable  |
+   |                |value with no associated attribute. The |
+   |                |gdb-num-registers attribute provides the|
+   |                |limit for N. The gdb-exp-registers      |
+   |                |attribute provides a semicolon-separated|
+   |                |list of "expedited" register numbers.   |
+   |                |                                        |
+   |                |The debugger-bus bus provides access to |
+   |                |the target program's address space, and |
+   |                |is used by gdb to access target memory. |
+   |                |                                        |
+   |                |The gdb-breakpoint-big and              |
+   |                |gdb-breakpoint-little attributes, if    |
+   |                |present, are used as memory images of   |
+   |                |software breakpoint instructions for the|
+   |                |appropriate run-time endianness mode.   |
+   |----------------+----------------------------------------|
+   |   configuration|When the configure! pin is driven, a new|
+   |                |configuration is obtained from the      |
+   |                |dynamic-configurator component via its  |
+   |                |current-config attribute. The resulting |
+   |                |string is then interpreted as a new     |
+   |                |configuration for this component. The   |
+   |                |insn-buffer relationship may be used to |
+   |                |reconfigure the instruction fetch buffer|
+   |                |at this time.                           |
+   +---------------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                 SID Conventions                 |
+   |-------------------------------------------------|
+   |        functional | supported | -               |
+   |-------------------+-----------+-----------------|
+   |      save/restore | supported | -               |
+   |-------------------+-----------+-----------------|
+   |     triggerpoints | supported | Triggerpoints   |
+   |                   |           | are supported   |
+   |                   |           | for CPU         |
+   |                   |           | registers.      |
+   |-------------------+-----------+-----------------|
+   | inhibit-recursion | supported | It prevents     |
+   |                   |           | harmful         |
+   |                   |           | recursion from  |
+   |                   |           | the step! input |
+   |                   |           | pin.            |
+   +-------------------------------------------------+
+
+     ----------------------------------------------------------------------
+
+Environment:
+
+   Related components:
+
+   CPUs connect to many components: memory to store data and instructions, a
+   scheduler to provide step! signals, software trap emulators, debugger
+   interfaces. The step-cycles output pin may be used as a N-event-control
+   input for a target scheduler to track an estimate of consumed target time.
+
+   Host system:
+
+   Some error conditions are signalled by messages to standard error. These
+   include some illegal CPU states caused by the simulated program.
+
+     ----------------------------------------------------------------------
+
+Component Reference:
+
+  Component: hw-cpu-mep
+
+   +-------------------------------------------------------------------------+
+   |                                  pins                                   |
+   |-------------------------------------------------------------------------|
+   |        name         | direction |    legalvalues     |    behaviors     |
+   |---------------------+-----------+--------------------+------------------|
+   |endian-set!          |in         |1 (big) / 2 (little)|initialization    |
+   |---------------------+-----------+--------------------+------------------|
+   |start-pc-set!        |in         |any value           |initialization    |
+   |---------------------+-----------+--------------------+------------------|
+   |reset!               |in         |0 or 1              |initialization    |
+   |---------------------+-----------+--------------------+------------------|
+   |trap                 |inout      |enum values         |exceptions/traps  |
+   |---------------------+-----------+--------------------+------------------|
+   |trap-code            |out        |various values      |exceptions/traps  |
+   |---------------------+-----------+--------------------+------------------|
+   |step-cycles          |out        |1..step-insn-count  |execution         |
+   |---------------------+-----------+--------------------+------------------|
+   |step!                |in         |any value           |execution         |
+   |---------------------+-----------+--------------------+------------------|
+   |yield                |in         |any                 |execution         |
+   |---------------------+-----------+--------------------+------------------|
+   |flush-icache         |in         |any                 |execution         |
+   |---------------------+-----------+--------------------+------------------|
+   |print-insn-summary!  |in         |any                 |tracing           |
+   |---------------------+-----------+--------------------+------------------|
+   |trace                |in         |any                 |tracing           |
+   |---------------------+-----------+--------------------+------------------|
+   |configure!           |in         |any                 |configuration     |
+   +-------------------------------------------------------------------------+
+
+   +-------------------------------------------------+
+   |                      buses                      |
+   |-------------------------------------------------|
+   |     name     | addresses | accesses | behaviors |
+   |--------------+-----------+----------+-----------|
+   | debugger-bus | any       | any      | debugger  |
+   |              |           |          | access    |
+   +-------------------------------------------------+
+
++-----------------------------------------------------------------------------------------------+
+|                                          attributes                                           |
+|-----------------------------------------------------------------------------------------------|
+|           name            |category |     legal values     |default|        behaviors        ||
+|                           |         |                      | value |                         ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|endian                     |register |'1'/'big'/'2'/'little'|big    |initialization, register ||
+|                           |         |                      |       |access                   ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|trace-extract?             |setting  |boolean               |false  |tracing                  ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|trace-filename             |setting  |string                |-      |tracing                  ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|trace-result?              |setting  |boolean               |false  |tracing                  ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|trace-counter?             |setting  |boolean               |false  |tracing                  ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|final-insn-count?          |setting  |boolean               |false  |tracing                  ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|engine-type                |setting  |scache or pbb         |pbb    |execution                ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|insn-count                 |watchable|number                |-      |execution                ||
+|                           |register |                      |       |                         ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|step-insn-count            |setting  |number                |1      |execution                ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|enable-step-trap?          |setting  |boolean               |false  |execution                ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|rN                         |watchable|number                |-      |register access          ||
+|                           |register |                      |       |                         ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|pc                         |watchable|number                |-      |register access          ||
+|                           |register |                      |       |                         ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|gdb-register-N             |debugger |byte array            |-      |register access          ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|gdb-num-registers          |debugger |number                |-      |register access          ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|gdb-exp-registers          |debugger |number list           |-      |register access          ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|gdb-breakpoint-big         |debugger |byte array            |-      |register access          ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|gdb-breakpoint-little      |debugger |byte array            |-      |register access          ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|state-snapshot             |-        |opaque string         |-      |state save/restore       ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|step-cycles                |watchable|number                |-      |execution                ||
+|                           |pin      |                      |       |                         ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|trap                       |watchable|number                |-      |execution/traps          ||
+|                           |pin      |                      |       |                         ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|trap-code                  |watchable|number                |-      |execution/traps          ||
+|                           |pin      |                      |       |                         ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|$N                         |watchable|number                |-      |register access          ||
+|                           |register |                      |       |                         ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|control-space-low          |setting  |number                |-      |initialization           ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|control-space-high         |setting  |number                |-      |initialization           ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|raise-ri-exception?        |setting  |boolean               |-      |exception processing     ||
+|---------------------------+---------+----------------------+-------+-------------------------||
+|step-insn-count-1-required?|setting  |boolean               |-      |running                  ||
++-----------------------------------------------------------------------------------------------+
+
+   +--------------------------------------------------+
+   |                    accessors                     |
+   |--------------------------------------------------|
+   |       name        |   accesses    |  behaviors   |
+   |-------------------+---------------+--------------|
+   |data-memory        |any            |execution     |
+   |-------------------+---------------+--------------|
+   |insn-memory        |typically      |execution     |
+   |                   |4-byte accesses|              |
+   |-------------------+---------------+--------------|
+   |disassembler-memory|any            |execution     |
+   |-------------------+---------------+--------------|
+   |control-space      |any            |word-addressed|
+   |                   |               |I/O space     |
+   +--------------------------------------------------+

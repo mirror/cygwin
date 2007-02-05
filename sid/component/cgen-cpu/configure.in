@@ -53,6 +53,10 @@ if test $sidtarget_m32r -eq 1; then
 	cpu_subdirs="$cpu_subdirs m32r"
         AC_CONFIG_SUBDIRS(m32r)
 fi
+if test $sidtarget_mep -eq 1; then
+	cpu_subdirs="$cpu_subdirs mep"
+        AC_CONFIG_SUBDIRS(mep)
+fi
 if test $sidtarget_mt -eq 1; then
 	cpu_subdirs="$cpu_subdirs mt"
         AC_CONFIG_SUBDIRS(mt)

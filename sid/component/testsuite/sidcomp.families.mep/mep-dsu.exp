@@ -1,0 +1,268 @@
+if {! $sidtarget(mep)} then { untested "hw-debug-mep not available"; return }
+
+catch {unset bus}
+
+# Instrument $bus as a test bus.
+# Lifted from sidcomp.cache/utils.exp.
+
+proc instrument_bus {{prefix ""} bus} {
+    sid_cmd "if {[info exists hook_written]} { unset hook_written }"
+    sid_cmd "if {[info exists hook_read]} { unset hook_read }"
+    foreach endian {l b} {
+        foreach width {1 2 4 8} {
+            sid_cmd "set hook_read(h4,${endian}${width},$bus) { set ${prefix}-thru 1 ; return {{ok 0} 0} }"
+            sid_cmd "set hook_written(h4,${endian}${width},$bus) { set ${prefix}-thru 1 ; return {ok 0} }"
+        }
+    }
+}
+
+set test "sid configuration"
+sid_config_component_test "mep-dsu.conf" \
+	"load libcache.la cache_component_library
+load libmemory.la mem_component_library
+load libmepfamily.la mepfamily_component_library" \
+	"hw-debug-mep"
+pass $test
+
+set test "sid start"
+if {[sid_start "mep-dsu.conf"]} { pass $test } else { fail $test; return }
+
+set test "accessor names"
+sid_assert_includes_all "sid::component::accessor_names $victim" \
+	{insn-downstream data-downstream}
+
+set test "attribute names"
+sid_assert_includes_all "sid::component::attribute_names $victim" \
+	{halted? interrupts-enabled? nmi-enabled? insn-break-channel-\# data-break-channel-\# \
+	insn-break-status data-break-status insn-break-enabled? data-break-enabled?}
+
+set test "bus names"
+sid_assert_includes_all "sid::component::bus_names $victim" \
+	{status-regs insn-regs data-regs insn-upstream data-upstream}
+
+set test "pin names"
+sid_assert_includes_all "sid::component::pin_names $victim" \
+	{exception! interrupt-in interrupt-out nmi-in nmi-out}
+
+foreach bank {status-regs insn-regs data-regs} {
+    set test "acquire cbus($bank)"
+    set cbus($bank) [sid_cmd "sid::component::find_bus $victim $bank"]
+    if {$cbus($bank) != ""} { pass $test } else { fail $test }
+}
+
+set test "initial value of DCR register"
+set value [format %x [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(status-regs) 0"] 1]]
+if {$value == "18"} { pass $test } else { fail "$test (got $value, expected 18)" }
+
+set test "initial value of IBS register"
+set value [format %x [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(status-regs) 4"] 1]]
+if {$value == "1000000"} { pass $test } else { fail "$test (got $value, expected 1000000)" }
+
+set test "initial value of DBS register"
+set value [format %x [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(status-regs) 8"] 1]]
+if {$value == "1000000"} { pass $test } else { fail "$test (got $value, expected 1000000)" }
+
+set test "initial value of IBA0 register"
+set value [format %x [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(insn-regs) 0"] 1]]
+if {$value == "0"} { pass $test } else { fail "$test (got $value, expected 0)" }
+
+set test "initial value of IBC0 register"
+set value [format %x [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(insn-regs) 4"] 1]]
+if {$value == "0"} { pass $test } else { fail "$test (got $value, expected 0)"} 
+
+set test "initial value of IBM0 register"
+set value [format %x [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(insn-regs) 8"] 1]]
+if {$value == "0"} { pass $test } else { fail "$test (got $value, expected 0)" }
+
+set test "initial value of DBA0 register"
+set value [format %x [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(data-regs) 0"] 1]]
+if {$value == "0"} { pass $test } else { fail "$test (got $value, expected 0)" }
+
+set test "initial value of DBC0 register"
+set value [format %x [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(data-regs) 4"] 1]]
+if {$value == "0"} { pass $test } else { fail "$test (got $value, expected 0)" }
+
+set test "initial value of DBM0 register"
+set value [format %x [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(data-regs) 8"] 1]]
+if {$value == "0"} { pass $test } else { fail "$test (got $value, expected 0)" }
+
+set test "initial value of reserved register"
+set value [format %x [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(data-regs) 12"] 1]]
+if {$value == "0"} { pass $test } else { fail "$test (got $value, expected 0)" }
+
+set test "initial value of DB0 register"
+set value [format %x [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(data-regs) 16"] 1]]
+if {$value == "0"} { pass $test } else { fail "$test (got $value, expected 0)" }
+
+set test "initial value of DBU0 register"
+set value [format %x [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(data-regs) 20"] 1]]
+if {$value == "0"} { pass $test } else { fail "$test (got $value, expected 0)" }
+
+set test "initial value of halted? attribute"
+set value [sid_cmd "sid::component::attribute_value $victim halted?"]
+if {$value == "0"} { pass $test } else { fail $test }
+
+set test "initial value of DCR.EINT"
+set value [sid_cmd "sid::component::attribute_value $victim interrupts-enabled?"]
+if {$value == "16"} { pass $test } else { fail $test }
+
+set test "initial value of DCR.ENMI"
+set value [sid_cmd "sid::component::attribute_value $victim nmi-enabled?"]
+if {$value == "8"} { pass $test } else { fail $test }
+
+set test "initial value of IBS.BCN"
+set value [format %x [sid_cmd "sid::component::attribute_value $victim insn-break-channel-#"]]
+if {$value == "1000000"} { pass $test } else { fail "$test ($value, not 1000000)" }
+
+set test "initial value of IBS.BS0"
+set value [sid_cmd "sid::component::attribute_value $victim insn-break-status"]
+if {$value == "0"} { pass $test } else { fail "$test ($value, not 0)" }
+
+set test "initial value of DBS.BCN"
+set value [format %x [sid_cmd "sid::component::attribute_value $victim data-break-channel-#"]]
+if {$value == "1000000"} { pass $test } else { fail "$test ($value, not 1000000)" }
+
+set test "initial value of DBS.BS0"
+set value [sid_cmd "sid::component::attribute_value $victim data-break-status"]
+if {$value == "0"} { pass $test } else { fail "$test ($value, not 0)" }
+
+set test "acquire upstream bus handles"
+set bus(insn,upstream) [sid_cmd "sid::component::find_bus $victim insn-upstream"]
+set bus(data,upstream) [sid_cmd "sid::component::find_bus $victim data-upstream"]
+if {$bus(insn,upstream) == "" || $bus(data,upstream) == ""} {
+    fail $test
+} else { pass $test }
+
+set test "generate test buses for downstream"
+set bus(insn,downstream) [sid_cmd "sid::bus::new"]
+set bus(data,downstream) [sid_cmd "sid::bus::new"]
+if {$bus(data,downstream) == "" || $bus(insn,downstream) == ""} {
+    fail $test
+} else { pass $test }
+
+set test "connect DSU to test buses"
+set result [sid_cmd "sid::component::connect_accessor $victim data-downstream $bus(data,downstream)"]
+if {$result != "ok"} { fail $test }
+set result [sid_cmd "sid::component::connect_accessor $victim insn-downstream $bus(insn,downstream)"]
+if {$result == "ok"} { pass $test } else { fail $test }
+
+instrument_bus "insn" $bus(insn,downstream)
+instrument_bus "data" $bus(data,downstream)
+
+foreach space {insn data} {
+    foreach width {1 2 4 8} {
+	set test "read $width ${space} byte(s) from 0x100"
+	sid_cmd "set ${space}-thru 0"
+	set result [sid_cmd "sid::bus::read_h4_b${width} $bus($space,upstream) 0x100"]
+	if [sid_cmd "set ${space}-thru"] { pass $test } else { fail [sid_cmd "set data-thru"] }
+	sid_cmd "set ${space}-thru 0"
+
+	set test "write $width ${space} byte(s) to 0x100"
+	set result [sid_cmd "sid::bus::write_h4_b${width} $bus($space,upstream) 0x100 0"]
+	if [sid_cmd "set ${space}-thru"] { pass $test } else { fail [sid_cmd "set data-thru"] }
+	sid_cmd "set ${space}-thru 0"
+    }
+}
+
+set test "instruction break status bit is clear"
+set result [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(status-regs) 4"] 1]
+if {[expr $result & 1]} { fail $test } else { pass $test }
+
+set test "Set ICB0.BE"
+set result [sid_cmd "sid::bus::read_h4_b4 $cbus(insn-regs) 4"]
+set value [expr [lindex $result 1] | 1]
+set result [sid_cmd "sid::bus::write_h4_b4 $cbus(insn-regs) 4 $value"]
+if [sid_bus_ok_p $result] { pass $test } else { fail $test }
+
+set test "Set IBM0.IBM"
+set result [sid_cmd "sid::bus::write_h4_b4 $cbus(insn-regs) 8 0"]
+if [sid_bus_ok_p $result] { pass $test } else { fail $test }
+
+set test "Set IBA0.IBA"
+set result [sid_cmd "sid::bus::write_h4_b4 $cbus(insn-regs) 0 0x1000"]
+if [sid_bus_ok_p $result] { pass $test } else { fail $test }
+
+# Interrupt/NMI tests.
+
+set probe_pin [sid_cmd "sid::pin::new"]
+sid_cmd "set probe_pin_value -1"
+sid_cmd "set hook_driven_h4($probe_pin) { 
+    global driven_h4_value probe_pin_value
+    set probe_pin_value \$driven_h4_value
+}"
+sid_cmd "sid::component::connect_pin $victim exception! $probe_pin"
+
+set test "no instruction break at 0x990"
+sid_cmd "sid::bus::read_h4_b4 $bus(insn,upstream) 0x990"
+sid_assert {[expr [sid_cmd "set probe_pin_value"] == -1]}
+
+set test "instruction break at 0x1000"
+sid_cmd "sid::bus::read_h4_b4 $bus(insn,upstream) 0x1000"
+sid_assert {[expr [sid_cmd "set probe_pin_value"] == 2]}
+sid_cmd "sid::component::disconnect_pin $victim exception! $probe_pin"
+
+set test "pass through interrupts by default"
+sid_cmd "sid::component::connect_pin $victim interrupt-out $probe_pin"
+sid_cmd "set probe_pin_value 0"
+set in_pin [sid_cmd "sid::component::find_pin $victim interrupt-in"]
+sid_cmd "sid::pin::driven_h4 $in_pin 55"
+sid_assert {[expr [sid_cmd "set probe_pin_value"] == 55]}
+sid_cmd "sid::component::disconnect_pin $victim interrupt-out $probe_pin"
+unset in_pin
+
+set test "pass through NMIs by default"
+sid_cmd "sid::component::connect_pin $victim nmi-out $probe_pin"
+sid_cmd "set probe_pin_value 0"
+set in_pin [sid_cmd "sid::component::find_pin $victim nmi-in"]
+sid_cmd "sid::pin::driven_h4 $in_pin 66"
+sid_assert {[expr [sid_cmd "set probe_pin_value"] == 66]}
+sid_cmd "sid::component::disconnect_pin $victim nmi-out $probe_pin"
+unset in_pin
+
+set test "write all zeroes to DCR (clearing EINT, ENMI)"
+sid_cmd "sid::bus::write_h4_b4 $cbus(status-regs) 0 0"
+set result [lindex [sid_cmd "sid::bus::read_h4_b4 $cbus(status-regs) 0"] 1]
+sid_assert [expr $result == 0]
+
+set test "mask interrupts"
+sid_cmd "sid::component::connect_pin $victim interrupt-out $probe_pin"
+sid_cmd "set probe_pin_value 13"
+set in_pin [sid_cmd "sid::component::find_pin $victim interrupt-in"]
+sid_cmd "sid::pin::driven_h4 $in_pin 55"
+sid_assert {[expr [sid_cmd "set probe_pin_value"] == 13]}
+sid_cmd "sid::component::disconnect_pin $victim interrupt-out $probe_pin"
+unset in_pin
+
+set test "mask NMIs"
+sid_cmd "sid::component::connect_pin $victim nmi-out $probe_pin"
+sid_cmd "set probe_pin_value 13"
+set in_pin [sid_cmd "sid::component::find_pin $victim nmi-in"]
+sid_cmd "sid::pin::driven_h4 $in_pin 66"
+sid_assert {[expr [sid_cmd "set probe_pin_value"] == 13]}
+sid_cmd "sid::component::disconnect_pin $victim nmi-out $probe_pin"
+unset in_pin
+
+set test "unmask interrupts"
+sid_cmd "sid::component::connect_pin $victim interrupt-out $probe_pin"
+sid_cmd "set probe_pin_value 13"
+sid_cmd "sid::bus::write_h4_b4 $cbus(status-regs) 0 0x10"
+sid_assert {[expr [sid_cmd "set probe_pin_value"] == 55]}
+sid_cmd "sid::component::disconnect_pin $victim interrupt-out $probe_pin"
+
+set test "unmask NMIs"
+sid_cmd "sid::component::connect_pin $victim nmi-out $probe_pin"
+sid_cmd "set probe_pin_value 13"
+sid_cmd "sid::bus::write_h4_b4 $cbus(status-regs) 0 8"
+sid_assert {[expr [sid_cmd "set probe_pin_value"] == 66]}
+sid_cmd "sid::component::disconnect_pin $victim interrupt-out $probe_pin"
+
+# clean-up.
+unset bus
+
+set test "sid stop"
+if {[sid_stop]} { pass $test } else { fail $test ; return }
+
+# zap temp file if tests were successful
+global exit_status
+if {$exit_status == "0"} { file delete "mep-dsu.conf" }
+

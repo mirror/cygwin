@@ -1,0 +1,11 @@
+The empty files in this directory exist so that unmodified
+toshapi .cc/.cxx files can #include them without causing
+errors.  The declarations that one might find in these
+files are already loaded into the compilation unit
+../toshapi.cxx from ../toshapi.h.
+
+The files AddSubHWE.h, LmemHWE.h, MulDSP.h, MulUci.h
+correspond to the SimAPI_test suite, and are here
+temporarily.
+
+- FChE

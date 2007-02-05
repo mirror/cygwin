@@ -1,7 +1,7 @@
 // sidcomp.h - Define the external interface of a SID component, that
 // is, the SID component API expressed in -*- C++ -*-.
 
-// Copyright (C) 1999, 2000, 2001, 2004 Red Hat.
+// Copyright (C) 1999, 2000, 2001, 2004, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -23,7 +23,7 @@ namespace sid
   // interopration attempts with obsolete component objects.
 
   const unsigned API_MAJOR_VERSION = 3;
-  const unsigned API_MINOR_VERSION = 2;
+  const unsigned API_MINOR_VERSION = 3;
 
   // PART 1: Buses
   //
@@ -129,7 +129,7 @@ namespace sid
 
   protected:
     bus() {}
-    virtual ~bus() throw() {}  
+    virtual ~bus() {}  
   };
 
   
@@ -150,7 +150,7 @@ namespace sid
 
   protected:
     pin() {}
-    virtual ~pin() throw() {}
+    virtual ~pin() {}
   };
   
 
@@ -175,7 +175,7 @@ namespace sid
     // PART 3.1: instantiation
   protected:
     component() {}
-    virtual ~component() throw() {}  
+    virtual ~component() {}  
 
   public:
     // PART 3.2: attributes (SUPERVISORY)

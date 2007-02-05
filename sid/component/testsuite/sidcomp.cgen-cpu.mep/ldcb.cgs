@@ -1,0 +1,12 @@
+# mep testcase for ldcb $rn,$abs16 -*- Asm -*-
+# mach: all
+# output: "Warning: read from control bus address 0x5000 is out of range
+pass"
+
+	.include "testutils.inc"
+	start
+	.global ldcb
+ldcb:
+	# Load from word 0x5000 in control bus space.
+	ldcb $1, 0x5000
+	pass

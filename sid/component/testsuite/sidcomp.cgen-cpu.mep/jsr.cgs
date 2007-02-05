@@ -1,0 +1,33 @@
+# mep testcase for jsr $rm -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global jsr
+jsr:
+	# load $0 with address of <foo>.
+	mov $0, %lo(foo)
+	add $0, 1
+	# now jump to subroutine .. the insn should mask off bit 0.
+here:
+	jsr $0
+	pass
+	fail
+	fail
+
+foo:
+	# assert that lp holds pc (here+2).
+	ldc $0, $lp
+	mov $4, %lo(here)
+	add $4, 2 
+	sub $4, $0
+	bnez $4, wrong
+
+	# now return.
+	ret
+
+	fail
+	fail
+
+wrong:
+	fail

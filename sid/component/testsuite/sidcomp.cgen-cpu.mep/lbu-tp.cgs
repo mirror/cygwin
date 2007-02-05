@@ -1,0 +1,36 @@
+# mep testcase for lbu $rn3,$disp7($tp) -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global lbu_tp
+lbu_tp:
+	mov $tp, 0x10
+	mov $0, 0x23
+
+	# Store 0x23 @ 0x50.
+	sb $0,0x40($tp)
+
+	# Read it back.
+	lb $1,0x40($tp)
+
+	# Verify it's the same.
+	sub $0, $1
+	bnez $0, wrong
+
+	mov $0, -1
+	# Store 0xff at 0x50.
+	sb $0,0x40($tp)
+	
+	# Read it back.
+	lbu $1,0x40($tp)	
+
+	# Verify it's the same.
+	srl $0,24
+	sub $0,$1
+	bnez $0, wrong
+
+okay:
+	pass
+wrong:
+	fail

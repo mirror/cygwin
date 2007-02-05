@@ -1,0 +1,24 @@
+# mep testcase for bclrm ($rm),$imm3 -*- Asm -*-
+# configline(): set cpu bit-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global bclrm
+bclrm:
+	mov $0, 0
+	mov $1, -85
+	sb $1, ($0)
+	bclrm ($0),0
+	bclrm ($0),1
+	bclrm ($0),3
+	bclrm ($0),5
+	bclrm ($0),7
+
+	# Verify.
+	lbu $3, ($0)
+	assert $3, 0
+okay:
+	pass
+wrong:
+	fail

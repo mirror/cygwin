@@ -39,8 +39,10 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = sid$(EXEEXT)
-@SIDTARGET_SH_TRUE@am__append_1 = -DSIDTARGET_SH
-@SIDTARGET_SH64_TRUE@am__append_2 = -DSIDTARGET_SH64
+@SIDTARGET_MEP_TRUE@am__append_1 = mepCfg.cxx
+@SIDTARGET_MEP_TRUE@am__append_2 = -DSIDTARGET_MEP
+@SIDTARGET_SH_TRUE@am__append_3 = -DSIDTARGET_SH
+@SIDTARGET_SH64_TRUE@am__append_4 = -DSIDTARGET_SH64
 DIST_COMMON = $(am__configure_deps) \
 	$(srcdir)/../../config/config.guess \
 	$(srcdir)/../../config/config.sub \
@@ -58,9 +60,7 @@ DIST_COMMON = $(am__configure_deps) \
 	acconfig.h
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/../../config/libtool.m4 \
-	$(top_srcdir)/../../config/sidtargets.m4 \
-	$(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -71,9 +71,12 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_1 = shCfg.$(OBJEXT)
+am__sid_SOURCES_DIST = mainDynamic.cxx baseCfg.cxx commonCfg.cxx \
+	shCfg.cxx mepCfg.cxx
+@SIDTARGET_MEP_TRUE@am__objects_1 = mepCfg.$(OBJEXT)
+am__objects_2 = shCfg.$(OBJEXT) $(am__objects_1)
 am_sid_OBJECTS = mainDynamic.$(OBJEXT) baseCfg.$(OBJEXT) \
-	commonCfg.$(OBJEXT) $(am__objects_1)
+	commonCfg.$(OBJEXT) $(am__objects_2)
 sid_OBJECTS = $(am_sid_OBJECTS)
 am__DEPENDENCIES_1 =
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
@@ -88,7 +91,7 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(sid_SOURCES)
-DIST_SOURCES = $(sid_SOURCES)
+DIST_SOURCES = $(am__sid_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -162,6 +165,8 @@ SIDTARGET_M32R_FALSE = @SIDTARGET_M32R_FALSE@
 SIDTARGET_M32R_TRUE = @SIDTARGET_M32R_TRUE@
 SIDTARGET_M68K_FALSE = @SIDTARGET_M68K_FALSE@
 SIDTARGET_M68K_TRUE = @SIDTARGET_M68K_TRUE@
+SIDTARGET_MEP_FALSE = @SIDTARGET_MEP_FALSE@
+SIDTARGET_MEP_TRUE = @SIDTARGET_MEP_TRUE@
 SIDTARGET_MIPS_FALSE = @SIDTARGET_MIPS_FALSE@
 SIDTARGET_MIPS_TRUE = @SIDTARGET_MIPS_TRUE@
 SIDTARGET_MT_FALSE = @SIDTARGET_MT_FALSE@
@@ -224,6 +229,7 @@ sharedstatedir = @sharedstatedir@
 sidtarget_arm = @sidtarget_arm@
 sidtarget_m32r = @sidtarget_m32r@
 sidtarget_m68k = @sidtarget_m68k@
+sidtarget_mep = @sidtarget_mep@
 sidtarget_mips = @sidtarget_mips@
 sidtarget_mt = @sidtarget_mt@
 sidtarget_ppc = @sidtarget_ppc@
@@ -237,8 +243,10 @@ AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
 INCLUDES = -I. -I../../include -I$(srcdir)/../../include -I$(srcdir)/../../../include
 LIBIBERTY = -L../../../libiberty/pic -L../../../libiberty -liberty
-TARGETCFGS = shCfg.cxx
-TARGETDEFINES = $(am__append_1) $(am__append_2)
+TARGETCFGS = shCfg.cxx $(am__append_1)
+TARGETDEFINES = $(am__append_2) $(am__append_3) $(am__append_4)
+@SIDTARGET_MEP_TRUE@FAM9LIB = ../../component/families/mep/libmepfamily.la
+@SIDTARGET_MEP_TRUE@FAM9LIB2 = -dlpreopen ../../component/families/mep/libmepfamily.la
 
 # If sid is being compiled without shared library support, arrange to
 # statically link in a bunch of component libraries using libtool's
@@ -405,6 +413,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/baseCfg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/commonCfg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mainDynamic.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mepCfg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shCfg.Po@am__quote@
 
 .cxx.o:

@@ -1,0 +1,5 @@
+load_lib "docs.exp"
+
+doc_test families/mep hw-debug-mep
+doc_test families/mep hw-dma-mep
+doc_test families/mep hw-interrupt-mep

@@ -1,3 +1,38 @@
+2007-02-05  Dave Brolley  <brolley@redhat.com>
+
+	* Contribute the following changes:
+	2001-12-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* mep*.conf: Regenerated with mepcfgtool tweaks.
+
+	2001-10-29  Frank Ch. Eigler  <fche@redhat.com>
+
+	* pregen-configs.in (mep): Add --tksm for some configurations.
+
+	2001-10-04  Frank Ch. Eigler  <fche@redhat.com>
+
+	* pregen-configs.in (mep): Make "-EB" explicit where needed.
+
+	2001-07-30  Ben Elliston  <bje@redhat.com>
+
+	* pregen-configs.in: Emit mep-gloss.conf.
+	* mep-gdb-tksm.conf: Regenerate.
+	* mep-gdb.conf: Likewise.
+	* mep-little-gdb-tksm.conf: Likewise.
+	* mep-little-gdb.conf: Likewise.
+	* mep-gloss.conf: New file.
+
+	2001-07-11  Ben Elliston  <bje@redhat.com>
+
+	* pregen-configs.in (mep): Generate little endian versions.
+	* mep-little-gdb.conf: New file.
+	* mep-little-gdb-tksm.conf: Likewise.
+
+	2001-07-02  Ben Elliston  <bje@redhat.com>
+
+	* pregen-configs.in (mep): Create basic files.
+	* mep-gdb.conf, mep-gdb-tksm.conf: New files.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

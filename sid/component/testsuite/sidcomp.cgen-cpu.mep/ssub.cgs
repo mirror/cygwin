@@ -1,0 +1,24 @@
+# mep testcase for ssub $rn,$rm -*- Asm -*-
+# configline(): set cpu sat-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global ssub
+ssub:
+	# Null subtraction.
+	mov $1, 0
+	mov $2, 0
+	ssub $1, $2
+	assert $1, 0
+
+	# Simple subtraction.
+	mov $1, 10
+	mov $2, 3
+	ssub $1, $2
+	assert $1, 7
+
+okay:
+	pass
+wrong:
+	fail

@@ -1,0 +1,12 @@
+# mep testcase for lwcp $crn,$disp16($rm) -*- Asm -*-
+# configline(): set cpu cp-option? true
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global lwcp16
+lwcp16:
+	# This instruction is exercised by the swcp16 test case.
+	mov $1, 0x40
+	lwcp $cr3,102($1)
+	pass

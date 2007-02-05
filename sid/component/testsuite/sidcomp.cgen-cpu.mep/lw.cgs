@@ -1,0 +1,9 @@
+# mep testcase for lw $rn,($rm) -*- Asm -*-
+# mach: all
+
+	.include "testutils.inc"
+	start
+	.global lw
+lw:
+	# This instruction is exercised by the sw test case.
+	pass

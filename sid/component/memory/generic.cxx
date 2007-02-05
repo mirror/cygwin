@@ -1,6 +1,6 @@
 // generic.cxx - a class of generic memories.  -*- C++ -*-
 
-// Copyright (C) 1999-2001,2003 Red Hat.
+// Copyright (C) 1999-2001, 2003, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -55,7 +55,10 @@ generic_memory::generic_memory() throw (bad_alloc):
   imagemmap_pin (this, & generic_memory::imagemmap_handler),
   imagemsync_pin (this, & generic_memory::imagemsync_handler),
   read_latency (0),
-  write_latency (0)
+  write_latency (0),
+  base_address (0),
+  warn_rom_write (false),
+  allow_rom_write (false)
 {
   this->max_buffer_length = 32UL * 1024UL * 1024UL;
   this->buffer = 0;
@@ -82,6 +85,14 @@ generic_memory::generic_memory() throw (bad_alloc):
 
   add_attribute ("read-latency", & this->read_latency, "setting");
   add_attribute ("write-latency", & this->write_latency, "setting");
+  add_attribute ("base-address", & this->base_address, "setting");
+
+  add_attribute ("warn-rom-write-option?", & this->warn_rom_write, "setting");
+  add_attribute ("allow-rom-write-option?", & this->allow_rom_write, "setting");
+
+  // Undocumented, dangerous, do not use ...
+  add_attribute_ro ("buffer-base-UNSAFE", (host_int_4*) & this->buffer);
+  add_attribute_ro ("buffer-length-UNSAFE", & this->buffer_length);
 
   add_attribute_virtual ("state-snapshot", this,
 			 & generic_memory::save_state,
@@ -89,7 +100,7 @@ generic_memory::generic_memory() throw (bad_alloc):
 }
 
 
-generic_memory::~generic_memory () throw()
+generic_memory::~generic_memory ()
 {
   assert (this->buffer);
   if (this->mmapping_p)

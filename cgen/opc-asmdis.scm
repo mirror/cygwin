@@ -70,6 +70,9 @@ void
   @arch@_cgen_init_ibld_table (cd);
   cd->parse_handlers = & @arch@_cgen_parse_handlers[0];
   cd->parse_operand = @arch@_cgen_parse_operand;
+#ifdef CGEN_ASM_INIT_HOOK
+CGEN_ASM_INIT_HOOK
+#endif
 "
    -asm-init-code
 "}\n\n"

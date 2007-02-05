@@ -1,5 +1,5 @@
 ; Attributes.
-; Copyright (C) 2000, 2003 Red Hat, Inc.
+; Copyright (C) 2000, 2003, 2005 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -15,6 +15,7 @@
 ; Boolean attributes are specified as (NAME #t) or (NAME #f),
 ; but for convenience ATTR and !ATTR are also supported.
 ; integer/enum attrs are specified as (ATTR value).
+; string attrs are specified as (ATTR value).
 ; Bitset attrs are specified as (ATTR val1,val2,val3).
 ; In all cases the value needn't be constant, and can be an expression,
 ; though expressions are currently only supported for META-attributes
@@ -90,6 +91,15 @@
 	      nil)
 )
 
+; VALUES is ignored for string-attribute.
+
+(define <string-attribute>
+  (class-make '<string-attribute>
+	      '(<attribute>)
+	      '(default values)
+	      nil)
+)
+
 ; For bitset attributes VALUES is a list of
 ; (symbol bit-number-or-#f attr-list comment-or-#f),
 ; one for each bit.
@@ -143,11 +153,12 @@
 (define (bitset-attr? x) (class-instance? <bitset-attribute> x))
 
 ; Return a symbol indicating the kind of attribute ATTR is.
-; The result is one of boolean,integer,enum,bitset.
+; The result is one of boolean,integer,enum,bitset or string.
 
 (define (attr-kind attr)
   (case (object-class-name attr)
     ((<boolean-attribute>) 'boolean)
+    ((<string-attribute>)  'string)
     ((<integer-attribute>) 'integer)
     ((<enum-attribute>)    'enum)
     ((<bitset-attribute>)  'bitset)
@@ -184,17 +195,25 @@
 
 (define (enum-attr-make name value) (cons name value))
 
+(define (parse-simple-attribute right-type? message)
+  (lambda (self errtxt val)
+    (if (and (not (null? val))
+	     (right-type? (car val))
+	     (null? (cdr val)))
+	(cons (obj:name self) (car val))
+	(parse-error errtxt message (cons (obj:name self) val))))
+)
+
 ; A boolean attribute's value is either #t or #f.
 
 (method-make!
  <boolean-attribute> 'parse-value
- (lambda (self errtxt val)
-   (if (and (not (null? val))
-	    (boolean? (car val)))
-       (cons (obj:name self) (car val))
-       (parse-error errtxt "boolean attribute not one of #f/#t"
-		    (cons (obj:name self) val))))
+ (parse-simple-attribute boolean? "boolean attribute not one of #f/#t")
 )
+
+(method-make!
+ <string-attribute> 'parse-value
+ (parse-simple-attribute string? "invalid argument to string attribute"))
 
 ; A bitset attribute's value is a comma separated list of elements.
 ; We don't validate the values.  In the case of the MACH attribute,
@@ -208,14 +227,8 @@
 
 (method-make!
  <bitset-attribute> 'parse-value
- (lambda (self errtxt val)
-   (if (and (not (null? val))
-	    (or (symbol? (car val))
-		(string? (car val)))
-	    (null? (cdr val)))
-       (cons (obj:name self) (car val))
-       (parse-error errtxt "improper bitset attribute"
-		    (cons (obj:name self) val))))
+ (parse-simple-attribute (lambda (x) (or (symbol? x) (string? x)))
+			 "improper bitset attribute")
 )
 
 ; An integer attribute's value is a number
@@ -223,26 +236,16 @@
 
 (method-make!
  <integer-attribute> 'parse-value
- (lambda (self errtxt val)
-   (if (and (not (null? val))
-	    (or (number? (car val)) (symbol? (car val)))
-	    (null? (cdr val)))
-       (cons (obj:name self) (car val))
-       (parse-error errtxt "improper integer attribute"
-		    (cons (obj:name self) val))))
+ (parse-simple-attribute (lambda (x) (or (number? x) (symbol? x)))
+			 "improper integer attribute")
 )
 
 ; An enum attribute's value is a symbol representing that value.
 
 (method-make!
  <enum-attribute> 'parse-value
- (lambda (self errtxt val)
-   (if (and (not (null? val))
-	    (or (symbol? (car val)) (string? (car val)))
-	    (null? (cdr val)))
-       (cons (obj:name self) (car val))
-       (parse-error errtxt "improper enum attribute"
-		    (cons (obj:name self) val))))
+ (parse-simple-attribute (lambda (x) (or (symbol? x) (string? x)))
+			 "improper enum attribute")
 )
 
 ; Parse a boolean attribute's value definition.
@@ -253,6 +256,14 @@
    (if (equal? values '(#f #t))
        values
        (parse-error errtxt "boolean value list must be (#f #t)" values)))
+)
+
+; Ignore values for strings.  We can't do any error checking since
+; the default value is (#f #t).
+
+(method-make!
+ <string-attribute> 'parse-value-def
+ (lambda (self errtxt values) #f)
 )
 
 ; Parse a bitset attribute's value definition.
@@ -297,7 +308,7 @@
 ; description in the .cpu file.
 ; All arguments are in raw (non-evaluated) form.
 ; TYPE-CLASS is the class of the object to create.
-; i.e. one of <{boolean,bitset,integer,enum}-attribute>.
+; i.e. one of <{boolean,bitset,integer,enum,string}-attribute>.
 ; If DEFAULT is #f, use the first value.
 ; ??? Allowable values for integer attributes is wip.
 
@@ -318,6 +329,12 @@
 		(not (rtx? default)))
 	   (parse-error errtxt "invalid default" default))
        (elm-xset! result 'default default))
+      ((<string-attribute>)
+       (let ((default (or default "")))
+	 (if (and (not (string? default))
+		  (not (rtx? default)))
+	     (parse-error errtxt "invalid default" default))
+	 (elm-xset! result 'default default)))
       ((<integer-attribute>)
        (let ((default (if default default (if (null? values) 0 (car values)))))
 	 (if (and (not (integer? default))
@@ -359,6 +376,7 @@
 	    (case elm-name
 	      ((type) (set! type-class (case (cadr arg)
 					((boolean) <boolean-attribute>)
+					((string) <string-attribute>)
 					((bitset) <bitset-attribute>)
 					((integer) <integer-attribute>)
 					((enum) <enum-attribute>)
@@ -1038,6 +1056,20 @@
      ", 0 } }")
  )
 )
+
+;; Doesn't handle escape sequences.
+(method-make!
+ <string-attribute> 'gen-value-for-defn-raw
+ (lambda (self value)
+   (string-append "\"" value "\""))
+)
+
+(method-make!
+ <string-attribute> 'gen-value-for-defn
+ (lambda (self value)
+   (send self 'gen-value-for-defn-raw value))
+)
+
 
 ; Called before loading a .cpu file to initialize.
 

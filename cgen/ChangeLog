@@ -1,3 +1,24 @@
+2007-02-05  Dave Brolley  <brolley@redhat.com>
+
+	* opc-asmdis.scm (-gen-init-asm-fn): Include CGEN_ASM_INIT_HOOK
+	in the generated code for @arch@_cgen_init_asm if it is defined.
+
+	* Contribute the following changes:
+	2005-04-05  Richard Sandiford  <rsandifo@redhat.com>
+
+	* attr.scm (<string-attribute>): New attribute class.
+	(attr-kind): Handle <string-attribute>.
+	(parse-simple-attribute): New function.
+	(<boolean-attribute> 'parse-value): Use parse-simple-attribute.
+	(<bitset-attribute> 'parse-value): Likewise.
+	(<boolean-attribute> 'parse-value): Likewise.
+	(<enum-attribute> 'parse-value): Likewise.
+	(<string-attribute> 'parse-value): New function.
+	(-attr-parse): Handle <string-attribute>.
+	(-attr-read): Likewise.
+	(<string-attribute> 'gen-value-for-defn-raw): New function.
+	(<string-attribute> 'gen-value-for-defn): New function.
+
 2006-11-07  Dave Brolley  <brolley@redhat.com>
 
 	* sid-model.scm (gen-model-unit-fn-decl): Use symbol->string where

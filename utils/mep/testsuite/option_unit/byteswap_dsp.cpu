@@ -1,0 +1,13 @@
+;; -*- scheme -*-
+;;
+;; This is a sample DSP to be included in the 
+;; CGEN cpu description
+
+(dni dsp.byteswap
+     "dsp byteswap operation" 
+     (OPTIONAL_DSP_INSN VOLATILE (ISA ext_core1))
+     "dsp.byteswap $rn $rm"
+     (+ MAJ_15 rn rm (f-sub4 0) (f-16u16 #xf001))
+     (sequence ()
+	       (set rn (c-call SI "byteswap" rm)))
+     ())

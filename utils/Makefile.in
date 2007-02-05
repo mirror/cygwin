@@ -59,8 +59,8 @@ mostlyclean: @mostlyclean_subdirs@
 clean: @clean_subdirs@
 
 # These should always clean all sudirectories...
-distclean: distclean-spu distclean-wince 
-maintainer-clean: maintainer-clean-spu maintainer-clean-wince 
+distclean: distclean-mep distclean-spu distclean-wince 
+maintainer-clean: maintainer-clean-mep maintainer-clean-spu maintainer-clean-wince 
 clean mostlyclean:
 	-rm -f *~ core *.o a.out 
 maintainer-clean distclean:
@@ -101,6 +101,10 @@ FLAGS_TO_PASS = \
 
 # Glue for all.
 
+all-mep: configure-mep
+	cd mep && $(MAKE) $(FLAGS_TO_PASS) all
+.PHONY: all-mep
+
 all-spu: configure-spu
 	cd spu && $(MAKE) $(FLAGS_TO_PASS) all
 .PHONY: all-spu
@@ -110,6 +114,10 @@ all-wince: configure-wince
 .PHONY: all-wince
 
 # Glue for install.
+
+install-mep: configure-mep
+	cd mep && $(MAKE)  install
+.PHONY: install-mep
 
 install-spu: configure-spu
 	cd spu && $(MAKE)  install
@@ -121,6 +129,10 @@ install-wince: configure-wince
 
 # Glue for mostlyclean.
 
+mostlyclean-mep: configure-mep
+	cd mep && $(MAKE)  mostlyclean
+.PHONY: mostlyclean-mep
+
 mostlyclean-spu: configure-spu
 	cd spu && $(MAKE)  mostlyclean
 .PHONY: mostlyclean-spu
@@ -130,6 +142,10 @@ mostlyclean-wince: configure-wince
 .PHONY: mostlyclean-wince
 
 # Glue for clean.
+
+clean-mep: configure-mep
+	cd mep && $(MAKE)  clean
+.PHONY: clean-mep
 
 clean-spu: configure-spu
 	cd spu && $(MAKE)  clean
@@ -141,6 +157,10 @@ clean-wince: configure-wince
 
 # Glue for distclean.
 
+distclean-mep: configure-mep
+	-cd mep && $(MAKE)  distclean
+.PHONY: distclean-mep
+
 distclean-spu: configure-spu
 	-cd spu && $(MAKE)  distclean
 .PHONY: distclean-spu
@@ -151,6 +171,10 @@ distclean-wince: configure-wince
 
 # Glue for maintainer-clean.
 
+maintainer-clean-mep: configure-mep
+	-cd mep && $(MAKE)  maintainer-clean
+.PHONY: maintainer-clean-mep
+
 maintainer-clean-spu: configure-spu
 	-cd spu && $(MAKE)  maintainer-clean
 .PHONY: maintainer-clean-spu
@@ -160,6 +184,12 @@ maintainer-clean-wince: configure-wince
 .PHONY: maintainer-clean-wince
 
 # Glue for configure.
+
+configure-mep: mep/Makefile
+mep/Makefile: config.status
+	test -d mep || mkdir mep ; \
+	cd mep && $(this_srcdir)/mep/configure $(subconfigure_args)/mep
+.PHONY: configure-mep
 
 configure-spu: spu/Makefile
 spu/Makefile: config.status

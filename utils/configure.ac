@@ -10,6 +10,11 @@ if test -d ${srcdir}/spu ; then
 fi
 
 case "${target}" in
+  mep*-*)
+    if test -d ${srcdir}/mep ; then
+       configdirs="$configdirs mep"
+    fi   
+    ;;
   *mips*-*-pe* | *sh*-*-pe* | *arm*-*-wince | *arm*-wince-pe* )
     if test -d ${srcdir}/wince ; then
       configdirs="$configdirs wince"

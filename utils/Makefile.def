@@ -36,6 +36,7 @@ targets = { target = "distclean";
 targets = { target = "maintainer-clean"; 
             makeline_flag = "-"; };
 
+subdirs = { subdir = "mep"; };
 subdirs = { subdir = "spu"; };
 subdirs = { subdir = "wince"; };
 

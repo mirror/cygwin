@@ -1,0 +1,14 @@
+; Trivial ISA for coprocessor 1
+(dnf f-cop1-opcode "cop1 opcode" ((ISA ext_cop1_32)) 0 32)
+
+(define-normal-insn-enum cop1major "major opcodes" ((ISA ext_cop1_32)) COP1_
+  f-cop1-opcode
+  (ANINSN 0x12345678)
+)
+
+(dncp132i cop1aninsn "An insn" ()
+	"aninsn"
+	(+ COP1_ANINSN)
+	(nop)
+	()
+)

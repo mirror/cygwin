@@ -1,0 +1,19 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_PREREQ(2.3)dnl
+AC_INIT(mepcfgtool.c)
+AM_INIT_AUTOMAKE(mepcfgtool,1.0)
+
+CC=${CC-cc}
+AC_PROG_CC
+AC_EXEEXT
+
+AC_PROG_INSTALL
+
+AC_CONFIG_AUX_DIR(../..)
+AC_ARG_PROGRAM
+AC_CANONICAL_SYSTEM
+
+PROGS='MeP-Integrator$(EXEEXT)'
+AC_SUBST(PROGS)
+
+AC_OUTPUT([Makefile testsuite/Makefile])

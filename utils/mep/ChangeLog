@@ -1,6 +1,7 @@
 2007-02-07  Dave Brolley  <brolley@redhat.com>
 
-	* rebuild.mk: Remove scaffolding for gcc and gdb.
+	* rebuild.mk (all-binutils,all-gas,all-ld): Depend on
+	mep-reconfig-opcodes.
 
 2007-01-03  Dave Brolley  <brolley@redhat.com>
 

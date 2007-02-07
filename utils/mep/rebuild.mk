@@ -67,7 +67,7 @@ mep-reconfig-sid: configure-sid
 	fi
 mep-reconfig-gcc: configure-gcc
 	@dir=gcc; \
-	if test -f $${dir}/Makefile; then \
+	if test -f $${dir}/Makefile-not-yet; then \
 	  r=`pwd`; export r; \
 	  s=`cd $(srcdir); pwd`; export s; \
 	  $(SET_LIB_PATH) \
@@ -83,18 +83,19 @@ mep-rebuild: \
   all-opcodes all-bfd all-gprof
 mep-rebuild-gcc: all-binutils all-gas all-ld mep-reconfig-gcc
 	@dir=gcc; \
-	if [ -f ./$${dir}/Makefile ] ; then \
+	if [ -f ./$${dir}/Makefile-not-yet ] ; then \
 	  r=`pwd`; export r; \
 	  s=`cd $(srcdir); pwd`; export s; \
 	  $(SET_LIB_PATH) \
 	  (cd $${dir}; $(MAKE) $(FLAGS_TO_PASS) start.encap); \
 	  (cd $${dir}; $(MAKE) $(FLAGS_TO_PASS) gcc-cross); \
 	else \
-	  true; \
+	  rm -f $(exec_prefix)/bin/mep-elf-gcc; \
+	  ln -s `namei $(exec_prefix) | awk '/^ l / { print $$4 }' | sed s,sources,comp/mep-061010-branch,`/bin/mep-elf-gcc $(exec_prefix)/bin/mep-elf-gcc; \
 	fi
 mep-rebuild-target-libgloss: mep-rebuild-gcc mep-reconfig-target-libgloss
 	@dir=libgloss; \
-	if [ -f $(TARGET_SUBDIR)/$${dir}/Makefile ] ; then \
+	if [ -f $(TARGET_SUBDIR)/$${dir}/Makefile-not-yet ] ; then \
 	  r=`pwd`; export r; \
 	  s=`cd $(srcdir); pwd`; export s; \
 	  $(SET_LIB_PATH) \
@@ -108,10 +109,10 @@ mep-rebuild-target-libgloss: mep-rebuild-gcc mep-reconfig-target-libgloss
 mep-reinstall: \
   mep-reinstall-sid mep-reinstall-gcc mep-reinstall-gdb \
   install-gas install-ld install-binutils install-gprof \
-  install-target-libgloss mep-reinstall-utils
+  $(install-target-libgloss) mep-reinstall-utils
 mep-reinstall-gcc: installdirs mep-rebuild-gcc
 	@dir=gcc; \
-	if [ -f ./$${dir}/Makefile ] ; then \
+	if [ -f ./$${dir}/Makefile-not-yet ] ; then \
 	  r=`pwd`; export r; \
 	  s=`cd $(srcdir); pwd`; export s; \
 	  $(SET_LIB_PATH) \
@@ -121,7 +122,7 @@ mep-reinstall-gcc: installdirs mep-rebuild-gcc
 	fi
 mep-reinstall-gdb: installdirs all-gdb
 	@dir=gdb; \
-	if [ -f ./$${dir}/Makefile ] ; then \
+	if [ -f ./$${dir}/Makefile-not-yet ] ; then \
 	  r=`pwd`; export r; \
 	  s=`cd $(srcdir); pwd`; export s; \
 	  $(SET_LIB_PATH) \
@@ -157,12 +158,17 @@ configure-opcodes: mep-config-stmp
 configure-sid: mep-config-stmp
 configure-gcc: mep-config-stmp
 configure-utils: mep-config-stmp
+configure-gdb: mep-config-stmp
+	@true
 
 all-binutils: mep-reconfig-opcodes
 all-gas: mep-reconfig-opcodes
 all-ld: mep-reconfig-opcodes
 all-opcodes: mep-reconfig-opcodes
-all-gdb: configure-gdb all-sid
+all-gdb: all-sid
+	  rm -f $(exec_prefix)/bin/mep-elf-gdb
+	  ln -s `namei $(exec_prefix) | awk '/^ l / { print $$4 }' | sed s,sources,comp/mep-061010-branch,`/bin/mep-elf-gdb $(exec_prefix)/bin/mep-elf-gdb
+
 all-sid: mep-reconfig-sid mep-reconfig-opcodes
 
 install-opcodes: all-opcodes
@@ -172,3 +178,4 @@ install-bfd: all-bfd
 install-binutils: all-binutils
 install-gprof: all-gprof
 install-target-libgloss: mep-rebuild-target-libgloss
+

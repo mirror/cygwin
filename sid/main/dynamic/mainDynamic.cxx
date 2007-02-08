@@ -240,7 +240,7 @@ usage ()
   cout << "--no-warn-write-to-code  Do not generate a warning when memory containing executable code is written to" << endl;
   cout << "--warn-write-to-rom   Generate a warning when read only memory is written to" << endl;
   cout << "--allow-write-to-rom  Allow read only memory to be written to" << endl;
-  // MeP-specific options
+  // MeP specific options
   cout << "--model-busses        Turn on bus arbitration modelling" << endl;
   cout << "--dsp-user-out        Display user written DSP trace output for --trace-disassemble" << endl;
   cout << "--no-dsp-user-out     Display normal insn disassembly of DSP insns for --trace-disassemble" << endl;
@@ -270,6 +270,7 @@ usage ()
   cout << "--intc-channel-bitw=N" << endl;
   cout << "--intc-level=N" << endl;
   cout << "--timer-channel-bitw=N" << endl;
+  // End MeP specific options
   cout << endl
        << " note: most board-specific options can be used in board-neutral position " << endl
        << " where they are interpreted as session-specific or default settings. " << endl;
@@ -625,11 +626,11 @@ struct Defs {
 	    warn_write_to_code (true),
 	    warn_write_to_rom (false),
 	    allow_write_to_rom (false),
-	    // MeP-specific
+	    // MeP specific options
 	    model_busses (false),
 	    dsp_user_out (false),
 	    corrupt_caches (false),
-	    // End MeP-specific
+	    // End MeP specific options
 	    step_insn_count ("10000")
   {}
   string cpu;
@@ -651,10 +652,11 @@ struct Defs {
   bool warn_write_to_code;
   bool warn_write_to_rom;
   bool allow_write_to_rom;
-  // MeP-specific
+  // MeP specific options
   bool model_busses;
   bool dsp_user_out;
   bool corrupt_caches;
+  // End MeP specific options
 };
   
 struct BoardConfig
@@ -712,7 +714,7 @@ main(int argc, char* argv[])
 		    opt_warmup, opt_warmup_func,
 		    opt_warn_write_to_code, no_opt_warn_write_to_code,
   		    opt_warn_write_to_rom, opt_allow_write_to_rom,
-		    // Mep-specific options
+		    // MeP specific options
 		    opt_model_busses,
 		    opt_dsp_user_out, opt_no_dsp_user_out,
 		    opt_local_mem, opt_global_mem, opt_shadow_mem,
@@ -724,7 +726,9 @@ main(int argc, char* argv[])
 		    opt_dmac_channel_bitw, opt_dmac_rectangle, opt_dmac_no_rectangle,
 		    opt_corrupt_caches,
 		    opt_intc_channel_bitw, opt_intc_level,
-		    opt_timer_channel_bitw };
+		    opt_timer_channel_bitw
+		    // End MeP specific options
+  };
 		    
   int curr_opt;
 
@@ -780,7 +784,7 @@ main(int argc, char* argv[])
     {"no-warn-write-to-code",no_argument, & curr_opt, no_opt_warn_write_to_code },
     {"warn-write-to-rom",no_argument, & curr_opt, opt_warn_write_to_rom },
     {"allow-write-to-rom",no_argument, & curr_opt, opt_allow_write_to_rom },
-    // Mep-specific options
+    // MeP specific options
     {"model-busses",no_argument, & curr_opt, opt_model_busses },
     {"dsp-user-out",no_argument, & curr_opt, opt_dsp_user_out },
     {"no-dsp-user-out",no_argument, & curr_opt, opt_no_dsp_user_out },
@@ -810,6 +814,7 @@ main(int argc, char* argv[])
     {"intc-channel-bitw",required_argument, & curr_opt, opt_intc_channel_bitw },
     {"intc-level",required_argument, & curr_opt, opt_intc_level },
     {"timer-channel-bitw",required_argument, & curr_opt, opt_timer_channel_bitw },
+    // End MeP specific options
     { 0, 0, NULL, 0 }
  };
 
@@ -909,7 +914,7 @@ main(int argc, char* argv[])
 			  curr_board->set_warn_write_to_rom(true);
 			if (defaults.allow_write_to_rom)
 			  curr_board->set_allow_write_to_rom(true);
-			// Mep-specific options
+			// MeP specific options
 			curr_board->set_config_index (i - boards);
 			if (defaults.model_busses)
 			  curr_board->set_model_busses(true);
@@ -917,6 +922,7 @@ main(int argc, char* argv[])
 			  curr_board->set_dsp_user_out(true);
 			if (defaults.corrupt_caches)
 			  curr_board->set_corrupt_caches(true);
+			// End MeP specific options
 			break;
 		      }
 		  }
@@ -1250,7 +1256,7 @@ main(int argc, char* argv[])
 		defaults.allow_write_to_rom = true;
 	      break;
 
-	      // Mep-specific options.
+	    // MeP specific options.
 	    case opt_model_busses:
 	      if (curr_board)
 		{
@@ -1431,7 +1437,7 @@ main(int argc, char* argv[])
 	      if (curr_board)
 		curr_board->set_opt_timer_channel_bitw (optstring ());
 	      break;
-	      // End Mep-specific options.
+	    // End MeP specific options.
 	    }
 	  break;
 

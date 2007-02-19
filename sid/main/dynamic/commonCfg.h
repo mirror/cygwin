@@ -243,6 +243,7 @@ struct SessionCfg :
   bool use_stdio;
   bool need_gprof;
   bool need_core_probe;
+  bool maybe_model_busses;
   void add_ulog_file (const string filename);
 
   map<const string, AtomicCfg *> ulog_map;

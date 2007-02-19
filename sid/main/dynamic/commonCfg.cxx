@@ -582,6 +582,7 @@ SessionCfg::SessionCfg (const string name)
     use_stdio (true),
     need_gprof (false),
     need_core_probe (false),
+    maybe_model_busses (false),
     board_count (0),
     gdb_count (0)
 {
@@ -883,6 +884,9 @@ SessionCfg::profile_config (const string &spec)
       else if (match_profile_opt (opt_name, "--model-busses", 3))
 	model_busses = profile_opt_value (opt, opt_parts, 1);
     }
+
+  if (model_busses != "false")
+    maybe_model_busses = true;
 
   // Now contruct a string representing the complete configuration
   add_profile_config (name,

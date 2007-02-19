@@ -514,6 +514,11 @@ public:
       {
 	Relation (dynamic_configurator, "client", global_mapper).write_to (w);
       }
+    // The GBMIF uses ulog, so it may be reconfigured.
+    if (gbmif)
+      {
+	Relation (dynamic_configurator, "client", gbmif).write_to (w);
+      }
   }
 
   void set_model_busses (bool b = true);
@@ -1370,15 +1375,6 @@ void MepBoardCfg::need_mm_int (sid::big_int_4 mapped_addr, unsigned reg_num,
       shared_main_mem->add_child (shared_mm_int);
       shared_main_mem->add_mm_int (shared_mm_int);
     }
-}
-
-
-void MepBoardCfg::map_mm_int ()
-{
-  // Create a mapping from the main mapper to the global mapper, where
-  // the mm_int is already mapped.
-  assert (shared_mm_int);
-  shared_main_mem->map_mm_int (this, shared_mm_int);
 }
 
 void MepBoardCfg::add_memory (const Mapping &m)
@@ -2379,6 +2375,10 @@ MepMemCfg::write_config(Writer &w)
 
 void MepBoardCfg::write_load (Writer &w)
 {
+  assert (sess);
+  if (sess->maybe_model_busses)
+    set_model_busses (true);
+
   if (opt_bit_p)
     {
       if (dmem_bank_num && dmem_size)
@@ -2417,6 +2417,11 @@ void MepBoardCfg::write_config (Writer &w)
   assert (cpu);
   set (cpu, "config-index", sidutil::make_attribute (config_index));
   set (cpu, "corrupt-caches?", sidutil::make_attribute (corrupt_caches));
+
+  // Create a mapping from the main mapper to the global mapper, where
+  // the mm_int is already mapped.
+  if (shared_mm_int)
+    shared_main_mem->map_mm_int (this, shared_mm_int);
 
   // Setup the bus model, if requested
   if (gbif)
@@ -2765,6 +2770,18 @@ void MepBoardCfg::write_config (Writer &w)
       if (dmac && ! dmac->possibly_wrapped ())
 	{
 	  Relation (dynamic_configurator, "client", dmac).write_to (w);
+	}
+
+      // The GBIF uses ulog.
+      if (gbif && ! gbif->possibly_wrapped ())
+	{
+	  Relation (dynamic_configurator, "client", gbif).write_to (w);
+	}
+
+      // The LBIF uses ulog.
+      if (lbif && ! lbif->possibly_wrapped ())
+	{
+	  Relation (dynamic_configurator, "client", lbif).write_to (w);
 	}
 
       // Toshapi hardware engines...

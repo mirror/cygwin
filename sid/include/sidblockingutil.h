@@ -49,9 +49,8 @@ namespace sidutil
       {
 	log (10, "%s: child_init\n", name.c_str ());
 	assert (child_created);
-	// Lock both mutexes
-	pthread_mutex_lock (& child_resume_mutex);
-	pthread_mutex_lock (& child_stopped_mutex);
+	// Lock the syncronization mutex
+	pthread_mutex_lock (& child_sync_mutex);
       }
 
   protected:
@@ -59,15 +58,12 @@ namespace sidutil
       {
 	log (10, "%s: parent_init\n", name.c_str ());
 
-	// Create mutexes for synchronizing the parent and child threads
-	pthread_mutex_init (& child_resume_mutex, NULL);
-	pthread_cond_init (& child_resume_condition, NULL);
-	pthread_mutex_init (& child_stopped_mutex, NULL);
-	pthread_cond_init (& child_stopped_condition, NULL);
+	// Create a mutex for synchronizing the parent and child threads
+	pthread_mutex_init (& child_sync_mutex, NULL);
+	pthread_cond_init (& child_sync_condition, NULL);
 
-	// Lock both mutexes
-	pthread_mutex_lock (& child_resume_mutex);
-	pthread_mutex_lock (& child_stopped_mutex);
+	// Lock the mutex
+	pthread_mutex_lock (& child_sync_mutex);
 	control_status = ctl_parent;
       }
 
@@ -121,19 +117,16 @@ namespace sidutil
 	// Signal the child to resume
 	assert (control_status != ctl_child_start);
 	control_status = ctl_child_start;
-	pthread_cond_signal (& child_resume_condition);
-
-	// Unlock the mutex so that the child can gain control
-	pthread_mutex_unlock (& child_resume_mutex);
+	log (11, "%s: parent signalling the child thread\n", name.c_str ());
+	pthread_cond_signal (& child_sync_condition);
 
 	// Wait for the return signal from the child
-	pthread_cond_wait (& child_stopped_condition, & child_stopped_mutex);
+	do {
+	  log (11, "%s: parent waiting for child thread\n", name.c_str ());
+	  pthread_cond_wait (& child_sync_condition, & child_sync_mutex);
+	} while (control_status == ctl_child_start); 
+	log (11, "%s: parent regains control\n", name.c_str ());
 
-	// Reacquire the mutex so that the child can gain control
-	pthread_mutex_lock (& child_resume_mutex);
-
-	// Check the value of control_status
-	assert (control_status != ctl_child_start);
 	return control_status;
       }
 
@@ -168,18 +161,14 @@ namespace sidutil
 
 	// Signal the parent that we're stopped
 	log (11, "%s: child signalling the parent thread\n", name.c_str ());
-	pthread_cond_signal (& child_stopped_condition);
-
-	// Unlock the mutex so that the parent can gain control
-	pthread_mutex_unlock (& child_stopped_mutex);
+	pthread_cond_signal (& child_sync_condition);
 
 	// Wait for a signal to resume
-	log (11, "%s: child waiting for parent thread\n", name.c_str ());
-	pthread_cond_wait (& child_resume_condition, & child_resume_mutex);
-
-	// Reacquire the stopped mutex
-	pthread_mutex_lock (& child_stopped_mutex);
-	assert (control_status == ctl_child_start);
+	do {
+	  log (11, "%s: child waiting for parent thread\n", name.c_str ());
+	  pthread_cond_wait (& child_sync_condition, & child_sync_mutex);
+	} while (control_status != ctl_child_start);
+	log (11, "%s: child regains control\n", name.c_str ());
       }
 
     void set_blockable ()
@@ -198,11 +187,9 @@ namespace sidutil
     bool child_created;
     pthread_t child_thread;
     void *(*child_thread_function)(void *);
-    pthread_mutex_t child_resume_mutex;
-    pthread_cond_t child_resume_condition;
-    pthread_mutex_t child_stopped_mutex;
-    pthread_cond_t child_stopped_condition;
-    enum
+    pthread_mutex_t child_sync_mutex;
+    pthread_cond_t child_sync_condition;
+    volatile enum
       {
 	ctl_parent, ctl_child_start, ctl_child_blocked, ctl_child_complete
       } control_status;

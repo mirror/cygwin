@@ -1,3 +1,12 @@
+2007-02-19  Dave Brolley  <brolley@redhat.com>
+
+	* sidblockingutil.h (sidutil::blocking_component): Remove
+	child_resume_mutex, child_stopped_mutex, chiuld_resume_condition and
+	child_stopped_condition. Use a single mutex/condition pair:
+	child_sync_mutex and child_sync_condition. Handle spontaneous returns
+	from pthread_cond_wait.
+	(control_status): Now volatile.
+
 2007-01-17  Dave Brolley  <brolley@redhat.com>
 
 	* sidbusutil.h (value_control_register::ValueType): Now

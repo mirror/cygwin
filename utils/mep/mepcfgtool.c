@@ -5339,11 +5339,6 @@ if (item) fprintf (fd, "  b->set_" #name1 "_" #name2 " (%lu);\n", item->ival);\
 			 ucis[i].cmodel->instance_name);
 	      }
 
-	  /* Incorporate the mm_int into the module, if specified.  */
-	  scan_mm_int ();
-	  if (mm_int.specified)
-	    fprintf (fd, "  b->map_mm_int ();\n");
-
 	  /* Incorporate the coprocessor into the module, if specified.  */
 	  item = find_sub (modules, "cop", 0);
 	  if (item) 

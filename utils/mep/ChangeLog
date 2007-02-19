@@ -1,3 +1,8 @@
+2007-02-19  Dave Brolley  <brolley@redhat.com>
+
+	* mepcfgtool.c (do_sidmain_config): Don't call scan_mm_int or
+	generate a call to b->map_mm_int.
+
 2007-02-07  Dave Brolley  <brolley@redhat.com>
 
 	* rebuild.mk (all-binutils,all-gas,all-ld): Depend on

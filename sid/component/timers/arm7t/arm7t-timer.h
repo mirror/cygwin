@@ -142,6 +142,7 @@ class armTimerNoSched: public armTimer
 {
 public:
   armTimerNoSched();
+  ~armTimerNoSched() throw () {}
 
 private:
   callback_pin<armTimerNoSched> clockpin;

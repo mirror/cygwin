@@ -160,6 +160,7 @@ class armTimerSched: public armTimer
 {
 public:
   armTimerSched();
+  ~armTimerSched() throw () {}
 
 private:
   friend class scheduler_event_subscription<armTimerSched>;

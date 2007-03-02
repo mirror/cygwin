@@ -2,6 +2,7 @@
 
 	* arm7t-timer.h (~armTimerNoSched): New virtual destructor with empty
 	throw specifier.
+	(~armTimerSched): Likewise.
 
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 

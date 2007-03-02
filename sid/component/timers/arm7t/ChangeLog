@@ -1,3 +1,8 @@
+2007-03-02  Dave Brolley  <brolley@redhat.com>
+
+	* arm7t-timer.h (~armTimerNoSched): New virtual destructor with empty
+	throw specifier.
+
 2005-06-03  Jim Blandy  <jimb@redhat.com>
 
 	* Makefile.in, aclocal.m4: Regenerated with Automake 1.9.5.

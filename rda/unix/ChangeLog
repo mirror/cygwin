@@ -1,3 +1,9 @@
+2007-04-09  Kevin Buettner  <kevinb@redhat.com>
+
+	* linux-target.c (NUM_REGS)[FRV_LINUX_TARGET]: Update.
+	(frv_read_only_register): New function.
+	(reginfo)[FRV_LINUX_TARGET]: Mark as read-only.
+
 2006-10-03  Kevin Buettner  <kevinb@redhat.com>
 
 	* server.h (struct ss_save): Add new field ``restore_action''.

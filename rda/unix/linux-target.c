@@ -1252,7 +1252,7 @@ is_extended_reg (int regnum)
 
 enum
 {
-  NUM_REGS = 149,
+  NUM_REGS = 166,
   PC_REGNUM = 128,
   sign_extend = 0
 };
@@ -1263,6 +1263,8 @@ enum
 
 static int frv_fdpic_loadmap_addresses (struct gdbserv *, int, int, void *,
                                         const void *);
+static int frv_read_only_register (struct gdbserv *, int, int, void *,
+                                   const void *);
 
 static struct peekuser_pokeuser_reginfo reginfo[] =
 {
@@ -1398,7 +1400,8 @@ static struct peekuser_pokeuser_reginfo reginfo[] =
   { PT_FR(63) * 4,  4, fpreg_offset_and_size (fr[63]), 4, 0 },
 
   { PT_PC * 4,      4, greg_offset_and_size (pc),      4, 0 },
-  { PT_PSR * 4,     4, greg_offset_and_size (psr),     4, 0 },
+  /* The PSR is read-only.  */
+  { PT_PSR * 4,     4, greg_offset_and_size (psr),     4, frv_read_only_register },
   { PT_CCR * 4,     4, greg_offset_and_size (ccr),     4, 0 },
   { PT_CCCR * 4,    4, greg_offset_and_size (cccr),    4, 0 },
 
@@ -1492,6 +1495,19 @@ frv_fdpic_loadmap_addresses (struct gdbserv *serv, int pid, int regno,
     }
   return 0;
 }
+
+int
+frv_read_only_register (struct gdbserv *serv, int pid, int regno,
+                        void *read_buf, const void *write_buf)
+{
+  if (read_buf != NULL)
+    {
+      return ptrace_read_user (serv, pid, reginfo[regno].ptrace_offset,
+                               reginfo[regno].ptrace_size, read_buf);
+    }
+  return 0;
+}
+
 
 /* Breakpoint methods for the frv.  These use the stock breakpoint
    code.

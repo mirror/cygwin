@@ -170,6 +170,7 @@ target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
 AUTOMAKE_OPTIONS = foreign
+ACLOCAL_AMFLAGS = -I ..
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 APPL_DIRS = @targ_subdirs@
 SUBDIRS = lib samples qe $(APPL_DIRS)

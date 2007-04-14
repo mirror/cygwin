@@ -1,3 +1,8 @@
+2007-04-14  Steve Ellcey  <sje@cup.hp.com>
+
+	* Makefile.am: Add ACLOCAL_AMFLAGS.
+	* Makefile.in: Regenerate.
+
 2006-05-31  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* samples/Makefile.am: Replace INTLLIBS and INTLDEPS with LIBINTL

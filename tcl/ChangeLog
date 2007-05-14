@@ -1,3 +1,8 @@
+2007-05-14  Maciej W. Rozycki  <macro@mips.com>
+
+	* win/tclWinPipe.c (TclpCreateProcess): Only use CW_SYNC_WINENV if
+	supported by the compilation environment.
+
 2006-12-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* win/tclWin32Dll.c (TclWinInit): Set native cwd to Cygwin's cwd.

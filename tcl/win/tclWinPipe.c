@@ -1228,7 +1228,9 @@ TclpCreateProcess(
 
     BuildCommandLine(execPath, argc, argv, &cmdLine);
 
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) && \
+    (CYGWIN_VERSION_API_MAJOR > 0 || CYGWIN_VERSION_API_MINOR >= 154)
+    /* Only available in Cygwin 1.5.20+. */
     cygwin_internal (CW_SYNC_WINENV);
 #endif
 

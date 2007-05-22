@@ -1,3 +1,8 @@
+2007-05-22  Nick Clifton  <nickc@redhat.com>
+
+	* doc/cgen.texi: Use @copying around the copyright notice.
+	* doc/internals.texi: Likewise.
+
 2007-02-05  Dave Brolley  <brolley@redhat.com>
 
 	* *mep*: New cpu description for Toshiba Media Processor (MeP).

@@ -11,20 +11,12 @@ END-INFO-DIR-ENTRY
 @end format
 @end ifinfo
 
-@ifinfo
-Copyright @copyright{} 2000 Red Hat, Inc.
+@copying
+Copyright @copyright{} 2000, 2007 Red Hat, Inc.
 
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice
 are preserved on all copies.
-
-@ignore
-Permission is granted to process this file through TeX and print the
-results, provided the printed document carries a copying permission
-notice identical to this one except for the removal of this paragraph
-(this paragraph not being relevant to the printed manual).
-
-@end ignore
 
 Permission is granted to copy and distribute modified versions of this
 manual under the conditions for verbatim copying, provided also that
@@ -33,7 +25,7 @@ permission notice identical to this one.
 
 Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions.
-@end ifinfo
+@end copying
 
 @synindex ky cp
 @c

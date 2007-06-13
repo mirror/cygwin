@@ -15,7 +15,7 @@
  *  OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
  *  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  *
- *  $Id: features.h,v 1.11 2007/02/14 10:07:02 corinna Exp $
+ *  $Id: features.h,v 1.12 2007/06/13 17:44:24 jjohnstn Exp $
  */
 
 #ifndef _SYS_FEATURES_H
@@ -164,6 +164,11 @@ extern "C" {
 /* #define _XOPEN_STREAMS			    -1 */
 /* #define _XOPEN_UNIX				    -1 */
 
+#endif
+
+#ifdef __SPU__
+/* Not much for now! */
+#define _POSIX_TIMERS				     1
 #endif
 
 #ifdef __cplusplus

@@ -2,7 +2,7 @@
 /* 
  * libgen.h
  *
- * $Id: libgen.h,v 1.1 2006/12/31 18:03:33 keithmarshall Exp $
+ * $Id: libgen.h,v 1.2 2007/06/23 07:34:15 dannysmith Exp $
  *
  * This file has no copyright assigned and is placed in the Public Domain.
  * This file is a part of the mingw-runtime package.
@@ -20,8 +20,8 @@
 extern "C" {
 #endif
 
-extern __cdecl char *basename (char *);
-extern __cdecl char *dirname  (char *);
+extern __cdecl __MINGW_NOTHROW char *basename (char *);
+extern __cdecl __MINGW_NOTHROW char *dirname  (char *);
 
 #ifdef __cplusplus
 }

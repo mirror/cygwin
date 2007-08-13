@@ -6,8 +6,8 @@
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
-#ifndef COMMON_MODEL_H
-#define COMMON_MODEL_H
+#ifndef MEP_COMMON_MODEL_H
+#define MEP_COMMON_MODEL_H
 
 #include <sidtypes.h>
 #include "cgen-types.h"
@@ -135,4 +135,4 @@ private:
   sid::host_int_8 save_total_latency;
 };
 
-#endif /*  COMMON_MODEL_H */
+#endif /*  MEP_COMMON_MODEL_H */

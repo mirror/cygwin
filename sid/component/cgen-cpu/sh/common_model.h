@@ -6,8 +6,8 @@
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
-#ifndef COMMON_MODEL_H
-#define COMMON_MODEL_H
+#ifndef SH_COMMON_MODEL_H
+#define SH_COMMON_MODEL_H
 
 #include <sidtypes.h>
 #include "cgen-types.h"
@@ -161,4 +161,4 @@ protected:
   sid::host_int_4 shift_busy;
 };
 
-#endif /*  COMMON_MODEL_H */
+#endif /*  SH_COMMON_MODEL_H */

@@ -95,7 +95,9 @@ namespace sh
 
       // Floating point support
       cgen_fpu fpu;
+#ifndef CGEN_CPU_FPU
 #define CGEN_CPU_FPU(cpu) (&(cpu)->fpu)
+#endif
 
     protected:
       virtual BI sh64_endian () const = 0;

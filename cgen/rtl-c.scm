@@ -1446,7 +1446,9 @@
   (let ((mode (mode:lookup mode)))
     (cx:make mode
 	     (cond ((or (mode:eq? 'DI mode)
-			(mode:eq? 'UDI mode))
+			(mode:eq? 'UDI mode)
+			(< #xffffffff c)
+			(> #x-80000000 c))
 		    (string-append "MAKEDI ("
 				   (gen-integer (high-part c)) ", "
 				   (gen-integer (low-part c))

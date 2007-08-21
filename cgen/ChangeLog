@@ -1,3 +1,8 @@
+2007-08-21  Dave Brolley  <brolley@redhat.com>
+
+	* rtl-c.scm (const): Generate call to MAKEDI for integers larger
+	than 32 bits.
+
 2007-07-05  Nick Clifton  <nickc@redhat.com>
 
 	* utils.scm (copyright-fsf): Update copyright notice to refer to

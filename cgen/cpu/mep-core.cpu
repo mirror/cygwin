@@ -623,19 +623,19 @@
 
 (dnop rma       "register Rm holding pointer"          (all-mep-core-isas (CDATA POINTER)) h-gpr   f-rm)
 
-(dnop rnc       "register Rn holding char"             (all-mep-core-isas (CDATA CHAR))    h-gpr   f-rn)
-(dnop rnuc      "register Rn holding unsigned char"    (all-mep-core-isas (CDATA UCHAR))   h-gpr   f-rn)
-(dnop rns       "register Rn holding short"            (all-mep-core-isas (CDATA SHORT))   h-gpr   f-rn)
-(dnop rnus      "register Rn holding unsigned short"   (all-mep-core-isas (CDATA USHORT))  h-gpr   f-rn)
+(dnop rnc       "register Rn holding char"             (all-mep-core-isas (CDATA LONG))    h-gpr   f-rn)
+(dnop rnuc      "register Rn holding unsigned char"    (all-mep-core-isas (CDATA LONG))    h-gpr   f-rn)
+(dnop rns       "register Rn holding short"            (all-mep-core-isas (CDATA LONG))    h-gpr   f-rn)
+(dnop rnus      "register Rn holding unsigned short"   (all-mep-core-isas (CDATA LONG))    h-gpr   f-rn)
 (dnop rnl       "register Rn holding long"             (all-mep-core-isas (CDATA LONG))    h-gpr   f-rn)
 (dnop rnul      "register Rn holding unsigned  long"   (all-mep-core-isas (CDATA ULONG))   h-gpr   f-rn)
 
-(dnop rn3c       "register 0-7 holding unsigned char"    (all-mep-core-isas (CDATA CHAR))    h-gpr   f-rn3)
-(dnop rn3uc      "register 0-7 holding byte"             (all-mep-core-isas (CDATA UCHAR))   h-gpr   f-rn3)
-(dnop rn3s       "register 0-7 holding unsigned short"   (all-mep-core-isas (CDATA SHORT))   h-gpr   f-rn3)
-(dnop rn3us      "register 0-7 holding short"            (all-mep-core-isas (CDATA USHORT))  h-gpr   f-rn3)
-(dnop rn3l       "register 0-7 holding unsigned long"    (all-mep-core-isas (CDATA LONG))    h-gpr   f-rn3)
-(dnop rn3ul      "register 0-7 holding long"             (all-mep-core-isas (CDATA ULONG))   h-gpr   f-rn3)
+(dnop rn3c       "register 0-7 holding unsigned char"    (all-mep-core-isas (CDATA LONG))  h-gpr   f-rn3)
+(dnop rn3uc      "register 0-7 holding byte"             (all-mep-core-isas (CDATA LONG))  h-gpr   f-rn3)
+(dnop rn3s       "register 0-7 holding unsigned short"   (all-mep-core-isas (CDATA LONG))  h-gpr   f-rn3)
+(dnop rn3us      "register 0-7 holding short"            (all-mep-core-isas (CDATA LONG))  h-gpr   f-rn3)
+(dnop rn3l       "register 0-7 holding unsigned long"    (all-mep-core-isas (CDATA LONG))  h-gpr   f-rn3)
+(dnop rn3ul      "register 0-7 holding long"             (all-mep-core-isas (CDATA ULONG)) h-gpr   f-rn3)
 
 
 (dnop lp        "link pointer"            (all-mep-core-isas) h-csr   1)

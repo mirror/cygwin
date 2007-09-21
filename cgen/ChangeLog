@@ -1,3 +1,8 @@
+2007-09-21  Dave Brolley  <brolley@redhat.com>
+
+	* cpu/mep-core.cpu (rnc, rnuc, rns, rnus, rn3c, rn3uc, rn3s) 
+	(rn3us): CDATA attribute now LONG.
+	
 2007-08-21  Dave Brolley  <brolley@redhat.com>
 
 	* rtl-c.scm (const): Generate call to MAKEDI for integers larger

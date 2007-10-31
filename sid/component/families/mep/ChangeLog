@@ -1,3 +1,8 @@
+2007-10-31  Dave Brolley  <brolley@redhat.com>
+
+        * components.cxx (mepfamily_component_library): Correct DLLEXPORT
+	specification.
+
 2006-11-07  Dave Brolley  <brolley@redhat.com>
 
 	* toshapi.h (toshapi_component): Do not qualify relationship_names.

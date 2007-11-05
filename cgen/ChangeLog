@@ -1,3 +1,9 @@
+2007-11-05  Dave Brolley  <brolley@redhat.com>
+
+        * intrinsics.scm,cgen-intrinsics.scm: New application which
+	generates code to support intrinsic functions for insns in the
+	mep architecture in gcc.
+
 2007-09-21  Dave Brolley  <brolley@redhat.com>
 
 	* cpu/mep-core.cpu (rnc, rnuc, rns, rnus, rn3c, rn3uc, rn3s) 

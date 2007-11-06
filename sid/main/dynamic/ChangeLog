@@ -1,6 +1,6 @@
 2007-11-06  Dave Brolley  <brolley@redhat.com>
 
-	* mepCfg.cxx (MepBoardCfg): Set the gloss c omponent's
+	* mepCfg.cxx (MepBoardCfg): Set the gloss component's
 	syscall-numbering-scheme attribute to "mep".
 
 2007-02-19  Dave Brolley  <brolley@redhat.com>

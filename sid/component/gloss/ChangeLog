@@ -1,3 +1,8 @@
+2007-11-06  Dave Brolley  <brolley@redhat.com>
+
+	* gloss.cxx (target_to_host_syscall): Map syscall 0 to SYS_reconfig for
+	MeP.
+
 2006-10-18  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:

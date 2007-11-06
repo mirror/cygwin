@@ -771,6 +771,13 @@ gloss32::target_to_host_syscall (int32 target_syscall)
     {
       return target_syscall;
     }
+  else if (syscall_numbering_scheme == "mep")
+    {
+      // syscall 0 is an alternate for SYS_reconfig on MeP
+      if (target_syscall == 0)
+	return libgloss::SYS_reconfig;
+      return target_syscall;
+    }
   else if (syscall_numbering_scheme == "sh-compact")
     {
       switch(target_syscall)

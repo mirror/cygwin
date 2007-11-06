@@ -1270,6 +1270,7 @@ MepBoardCfg::MepBoardCfg (const string name,
   assert (cpu);
   assert (sess);
   gloss = new GlossCfg ("gloss", cpu, sess);  
+  set (gloss, "syscall-numbering-scheme", "mep");
   assert (gloss);
 
   // control bus for peripheral items

@@ -1,3 +1,8 @@
+2007-11-07  Dave Brolley  <brolley@redhat.com>
+
+	* libgloss.h (libgloss::SYS_reconfig): Value to changed to match the new
+	value in libgloss/syscall.h.
+
 2007-11-06  Dave Brolley  <brolley@redhat.com>
 
 	* gloss.cxx (target_to_host_syscall): Map syscall 0 to SYS_reconfig for

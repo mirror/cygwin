@@ -19,7 +19,6 @@ public:
 
   enum libgloss_syscall
   {
-    SYS_reconfig = 0,
     SYS_exit = 1,
     SYS_open = 2, 
     SYS_close = 3, 
@@ -39,6 +38,7 @@ public:
     SYS_time = 18,
     SYS_gettimeofday = 19,
     SYS_times = 20,
+    SYS_reconfig = 25,
     SYS_argc = 172,
     SYS_argnlen = 173,
     SYS_argn = 174,

@@ -1,3 +1,7 @@
+2007-11-13  Dave Brolley  <brolley@redhat.com>
+
+	* cgen-intrinsics.scm (load-files): Remove reference to fixup.scm.
+
 2007-11-05  Dave Brolley  <brolley@redhat.com>
 
         * intrinsics.scm,cgen-intrinsics.scm: New application which

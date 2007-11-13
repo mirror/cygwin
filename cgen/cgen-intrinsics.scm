@@ -14,7 +14,6 @@
 
 (define (load-files srcdir)
   ; Fix up Scheme to be what we use (guile is always in flux).
-  (primitive-load-path (string-append srcdir "/fixup.scm"))
   (primitive-load-path (string-append srcdir "/guile.scm"))
 
   (load (string-append srcdir "/read.scm"))

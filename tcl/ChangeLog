@@ -1,3 +1,9 @@
+2008-03-03  Keith Seitz  <keiths@redhat.com>
+
+	From Dave Murphy  <davem@devkitpro.org>:
+	* win/tclWin32Dll.c (TclpCheckStackSpace): Backport
+	EXCEPTION_REGISTRATION code from Tcl mainline.
+
 2007-05-14  Maciej W. Rozycki  <macro@mips.com>
 
 	* win/tclWinPipe.c (TclpCreateProcess): Only use CW_SYNC_WINENV if

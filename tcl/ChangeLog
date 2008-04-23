@@ -1,3 +1,9 @@
+2008-04-23  Keith Seitz  <keiths@redhat.com>
+
+	Based on patch from Masaki Muranaka  <monaka@monami-software.com>:
+	* compat/strstr.c: Include tcl.h and define NULL if it is
+	not already defined.
+
 2008-03-03  Keith Seitz  <keiths@redhat.com>
 
 	From Dave Murphy  <davem@devkitpro.org>:

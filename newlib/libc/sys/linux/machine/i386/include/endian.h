@@ -31,7 +31,7 @@
  * SUCH DAMAGE.
  *
  *      from: @(#)endian.h      7.8 (Berkeley) 4/3/91
- *      $Id: endian.h,v 1.1 2002/10/18 22:52:40 jjohnstn Exp $
+ *      $Id: endian.h,v 1.2 2008/05/22 21:30:27 jjohnstn Exp $
  */
 
 #ifndef _MACHINE_ENDIAN_H_
@@ -47,11 +47,22 @@
  * Definitions for byte order, according to byte significance from low
  * address to high.
  */
-#define LITTLE_ENDIAN   1234    /* LSB first: i386, vax */
-#define BIG_ENDIAN      4321    /* MSB first: 68000, ibm, net */
-#define PDP_ENDIAN      3412    /* LSB first in word, MSW first in long */
 
+#ifndef LITTLE_ENDIAN
+#define LITTLE_ENDIAN   1234    /* LSB first: i386, vax */
+#endif
+
+#ifndef BIG_ENDIAN
+#define BIG_ENDIAN      4321    /* MSB first: 68000, ibm, net */
+#endif
+
+#ifndef PDP_ENDIAN
+#define PDP_ENDIAN      3412    /* LSB first in word, MSW first in long */
+#endif
+
+#ifndef BYTE_ORDER
 #define BYTE_ORDER      LITTLE_ENDIAN
+#endif
 
 #ifndef KERNEL
 #include <sys/cdefs.h>

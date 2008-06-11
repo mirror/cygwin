@@ -1,3 +1,11 @@
+2008-06-11  Michael Snyder  <msnyder@specifix.com>
+
+	* demo-tfind.c (tfind_singlestep_program): New function.
+	* demo-target.c (demo_singlestep_program): Call the above.
+	* demo-target.h: Export tfind_singlestep_program interface.
+
+	* demo-target.c (target_regs): Increase regs buffer size.
+
 2005-06-03  Michael Snyder  <msnyder@redhat.com>
 
 	* demo-tfind.c (tfind_set_gen): Return "OK" on tfind end.

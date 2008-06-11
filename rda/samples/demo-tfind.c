@@ -380,3 +380,26 @@ tfind_get_mem (unsigned long addr)
   else
     return 0;
 }
+
+extern int
+tfind_singlestep_program (struct gdbserv *serv)
+{
+  if (cur_frame == -1)
+    {
+      return 2; /*sched_break (serv, 2);*/
+    }
+  else if (cur_frame >= last_cached_frame - 1)
+    {
+      /* Stepped past the end of the tfind buffer.  */
+      demo_get_regs_hook = NULL;
+      demo_get_mem_hook  = NULL;
+      cur_frame = -1;
+      return 0; /*sched_break (serv, 0);*/
+    }
+  else
+    {
+      /* Increment cur_frame and schedule an immediate break.  */
+      cur_frame++;
+      return 0; /*sched_break (serv, 0);*/
+    }
+}

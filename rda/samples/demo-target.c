@@ -277,9 +277,11 @@ demo_process_rcmd (struct gdbserv* serv, const char* cmd, int sizeof_cmd)
  * (including a primitive register cache) 
  */
 
+#define TARGET_REGBUF_SIZE 312
+
 static struct target_regs {	/* register cache */
   unsigned int len;
-  char buf[180];
+  char buf[TARGET_REGBUF_SIZE];
 } target_regs;
 
 static void 
@@ -292,7 +294,7 @@ demo_process_get_regs (struct gdbserv* serv)
       demo_get_regs_hook (serv);
       return;
     }
-  for (i=0; i<180; i++) /* 180 bytes < gdb's PBUFSIZ/2 */
+  for (i=0; i<TARGET_REGBUF_SIZE; i++)
     gdbserv_output_byte (serv, target_regs.buf[i]);
 }
 

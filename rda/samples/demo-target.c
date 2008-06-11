@@ -336,7 +336,7 @@ demo_restart_program (struct gdbserv* serv)
 void
 demo_singlestep_program (struct gdbserv* serv)
 {
-  sched_break (serv, 2);
+  sched_break (serv, tfind_singlestep_program (serv));
 }
 
 void

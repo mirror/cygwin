@@ -48,4 +48,5 @@ extern void (*demo_get_regs_hook) (struct gdbserv *);
 extern int  (*demo_get_mem_hook)  (unsigned long);
 
 extern void demo_tfind_open (char *);
+extern int tfind_singlestep_program (struct gdbserv *);
 #endif

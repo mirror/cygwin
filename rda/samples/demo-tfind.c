@@ -388,6 +388,7 @@ tfind_singlestep_program (struct gdbserv *serv)
 {
   if (cur_frame == -1)
     {
+      fprintf (stderr, "TFIND: fake singlestep (not at trace frame).\n");
       return 2; /*sched_break (serv, 2);*/
     }
   else if (demo_reverse_flag == 0)
@@ -395,6 +396,7 @@ tfind_singlestep_program (struct gdbserv *serv)
       if (cur_frame >= last_cached_frame - 1)
 	{
 	  /* Stepped past the end of the tfind buffer.  */
+	  fprintf (stderr, "TFIND: stepped past end of trace buffer.\n");
 	  demo_get_regs_hook = NULL;
 	  demo_get_mem_hook  = NULL;
 	  cur_frame = -1;
@@ -403,6 +405,7 @@ tfind_singlestep_program (struct gdbserv *serv)
       else
 	{
 	  /* Increment cur_frame and schedule an immediate break.  */
+	  fprintf (stderr, "TFIND: stepi.\n");
 	  cur_frame++;
 	  return 0; /*sched_break (serv, 0);*/
 	}
@@ -412,6 +415,7 @@ tfind_singlestep_program (struct gdbserv *serv)
       if (cur_frame == 0)
 	{
 	  /* Stepped past the beginning of the tfind buffer.  */
+	  fprintf (stderr, "TFIND: backstepped past start of trace buffer.\n");
 	  demo_get_regs_hook = NULL;
 	  demo_get_mem_hook  = NULL;
 	  cur_frame = -1;
@@ -420,8 +424,209 @@ tfind_singlestep_program (struct gdbserv *serv)
       else
 	{
 	  /* Decrement cur_frame and schedule an immediate break.  */
+	  fprintf (stderr, "TFIND: reverse-stepi.\n");
 	  cur_frame--;
 	  return 0; /*sched_break (serv, 0);*/
 	}
     }
+}
+
+typedef struct tfind_breakpoint_type {
+  unsigned long addr;
+  unsigned long len;
+  struct tfind_breakpoint_type *next;
+} tfind_breakpoint;
+
+static tfind_breakpoint *tfind_bplist[5];
+
+int 
+tfind_continue_thread (struct gdbserv *serv, 
+		       struct gdbserv_thread *thread,
+		       const struct gdbserv_reg *sigval)
+{
+  int index_frame;
+  tfind_breakpoint *index_bp;
+
+  if (cur_frame == -1)
+    {
+      fprintf (stderr, 
+	       "TFIND: continue - send break from gdb or wait 10 seconds.\n");
+      /* Enqueue a break response after 10 seconds.  */
+      return 10;
+    }
+  else if (demo_reverse_flag == 0)
+    {
+      /* Search forward for a breakpoint/checkpoint match.  */
+      for (index_frame = cur_frame + 1;
+	   index_frame < last_cached_frame;
+	   index_frame++)
+	{
+	  for (index_bp = tfind_bplist[GDBSERV_TARGET_BP_SOFTWARE];
+	       index_bp != NULL;
+	       index_bp = index_bp->next)
+	    {
+	      if (index_bp->addr == frame[index_frame].pc)
+		{
+		  /* Hit breakpoint at index_frame.  */
+		  fprintf (stderr, "TFIND: continue / break\n");
+		  cur_frame = index_frame;
+		  /* Stop immediately.  */
+		  return 0;
+		}
+	    }
+	}
+      /* No match.  Run to end (set cur_frame to last valid one).  */
+      fprintf (stderr, "TFIND: continue / end\n");
+      cur_frame = last_cached_frame - 1;
+      return 0;
+    }
+  else
+    {
+      /* Search backward for a breakpoint/checkpoint match.  */
+      for (index_frame = cur_frame - 1;
+	   index_frame >= 0;
+	   index_frame--)
+	{
+	  for (index_bp = tfind_bplist[GDBSERV_TARGET_BP_SOFTWARE];
+	       index_bp != NULL;
+	       index_bp = index_bp->next)
+	    {
+	      if (index_bp->addr == frame[index_frame].pc)
+		{
+		  /* Hit breakpoint at index_frame.  */
+		  fprintf (stderr, "TFIND: reverse-continue / break\n");
+		  cur_frame = index_frame;
+		  /* Stop immediately.  */
+		  return 0;
+		}
+	    }
+	}
+      /* No match.  Stop at beginning (set cur_frame to 0).  */
+      fprintf (stderr, "TFIND: reverse-continue / start\n");
+      cur_frame = 0;
+      return 0;
+    }
+}
+
+/*
+ * tfind_insert_breakpoint
+ *
+ * returns: 0 for fail, 1 for success
+ */
+
+static int
+tfind_insert_breakpoint (struct gdbserv *serv,
+			 enum gdbserv_target_bp bptype,
+			 struct gdbserv_reg *addr,
+			 struct gdbserv_reg *len)
+{
+  tfind_breakpoint *this_bp;
+
+  switch (bptype) {
+  case GDBSERV_TARGET_BP_ACCESS:
+  case GDBSERV_TARGET_BP_HARDWARE:
+  case GDBSERV_TARGET_BP_READ:
+  default:
+    /* Can't do those.  */
+    return 0;
+    break;
+  case GDBSERV_TARGET_BP_SOFTWARE:
+  case GDBSERV_TARGET_BP_WRITE:
+    this_bp = malloc (sizeof (tfind_breakpoint));
+    gdbserv_reg_to_ulong (serv, addr, &this_bp->addr);
+    gdbserv_reg_to_ulong (serv, len,  &this_bp->len);
+    this_bp->next = tfind_bplist[bptype];
+    tfind_bplist[bptype] = this_bp;
+    return 1;
+  }    
+}
+			 
+/*
+ * tfind_unlink_breakpoint
+ *
+ * returns: 0 for fail, 1 for success
+ */
+
+static int
+tfind_unlink_breakpoint (struct gdbserv *serv,
+			 enum gdbserv_target_bp bptype,
+			 struct gdbserv_reg *addr,
+			 struct gdbserv_reg *len)
+{
+  tfind_breakpoint *this_bp, *tmp;
+  unsigned long laddr;
+  unsigned long llen;
+  switch (bptype) {
+  case GDBSERV_TARGET_BP_ACCESS:
+  case GDBSERV_TARGET_BP_HARDWARE:
+  case GDBSERV_TARGET_BP_READ:
+  default:
+    /* Can't do those.  */
+    return 0;
+    break;
+  case GDBSERV_TARGET_BP_SOFTWARE:
+  case GDBSERV_TARGET_BP_WRITE:
+    /* Special case - list is empty.  */
+    if (tfind_bplist[bptype] == NULL)
+      return 0;
+
+    gdbserv_reg_to_ulong (serv, addr, &laddr);
+    gdbserv_reg_to_ulong (serv, len,  &llen);
+
+    /* Start from list head.  */
+    this_bp = tfind_bplist[bptype];
+    /* Special case -- remove head of list.  */
+    if (this_bp->addr == laddr &&
+	this_bp->len  == llen)
+      {
+	tfind_bplist[bptype] = this_bp->next;
+	return 1;
+      }
+
+    /* Scan list.  */
+    for (; this_bp && this_bp->next; this_bp = this_bp->next)
+      if (this_bp->next->addr == laddr &&
+	  this_bp->next->len  == llen)
+	{
+	  /* Remove from middle of list.  */
+	  tmp = this_bp->next->next;
+	  free (this_bp->next);
+	  this_bp->next = tmp;
+	  return 1;
+	}
+
+    /* Not found.  */
+    return 0;
+  }    
+}
+			 
+
+extern enum gdbserv_target_rc 
+tfind_remove_swbp (struct gdbserv *serv,
+		   enum gdbserv_target_bp bptype,
+		   struct gdbserv_reg *addr,
+		   struct gdbserv_reg *len)
+{
+  fprintf (stderr, "TFIND: Remove sw breakpoint type %d\n", bptype);
+  if (tfind_unlink_breakpoint (serv, bptype, addr, len) == 0)
+    {
+      fprintf (stderr, "       FAILED!\n");
+      return GDBSERV_TARGET_RC_ERROR;
+    }
+  return GDBSERV_TARGET_RC_OK;
+}
+
+extern enum gdbserv_target_rc 
+tfind_set_swbp (struct gdbserv *serv,
+		enum gdbserv_target_bp bptype,
+		struct gdbserv_reg *addr,
+		struct gdbserv_reg *len)
+{
+  fprintf (stderr, "TFIND: Set sw breakpoint type %d\n", bptype);
+  if (tfind_insert_breakpoint (serv, bptype, addr, len) == 0)
+    {
+      fprintf (stderr, "       FAILED!\n");
+      return GDBSERV_TARGET_RC_ERROR;
+    }
+  return GDBSERV_TARGET_RC_OK;
 }

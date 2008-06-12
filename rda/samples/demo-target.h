@@ -49,4 +49,17 @@ extern int  (*demo_get_mem_hook)  (unsigned long);
 
 extern void demo_tfind_open (char *);
 extern int tfind_singlestep_program (struct gdbserv *);
+extern int tfind_continue_thread (struct gdbserv *, 
+				  struct gdbserv_thread *,
+				  const struct gdbserv_reg *);
+
+extern enum gdbserv_target_rc tfind_remove_swbp (struct gdbserv *,
+						 enum gdbserv_target_bp,
+						 struct gdbserv_reg *,
+						 struct gdbserv_reg *);
+extern enum gdbserv_target_rc tfind_set_swbp (struct gdbserv *,
+					      enum gdbserv_target_bp,
+					      struct gdbserv_reg *,
+					      struct gdbserv_reg *);
+
 #endif

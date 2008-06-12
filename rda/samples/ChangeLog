@@ -1,3 +1,23 @@
+2008-06-12  Michael Snyder  <msnyder@specifix.com>
+
+	* demo-target.c: Implement hooks for software breakpoints.
+	(demo_remove_swbp): New function.
+	(demo_set_swbp): New function.
+	(demo_target): Set up method vectors for set/remove breakpoints.
+	* demo-target.h: Export interface for software breakpoints.
+	* demo-tfind.c: Implement software breakpoints.
+	(tfind_insert_breakpoint): New function.
+	(tfind_unlink_breakpoint): New function.
+	(tfind_set_swbp): New function.
+	(tfind_remove_swbp): New function.
+
+	* demo-target.c: Implement hooks for continue_thread.
+	(demo_continue_thread): call tfind_continue_thread.
+	* demo-target.h: Export interface for tfind_continue_thread.
+	* demo-tfind.c: Implement continue_thread with software breakpoints.
+	(tfind_continue_thread): New function.  Find a new frame
+	based on software breakpoints.
+
 2008-06-11  Michael Snyder  <msnyder@specifix.com>
 
 	* demo-tfind.c (tfind_singlestep_program): 

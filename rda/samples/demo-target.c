@@ -44,6 +44,9 @@
 #include "demo-target.h"
 #include "gdbsched.h"
 
+struct gdbserv;
+struct gdbserv_reg;
+
 /* This is a sample gdbserv target that demonstrates use of the RDA library
    routines.  It acts to gdb like a strange generic remote target. */
 
@@ -82,8 +85,17 @@ static void demo_sigkill_program (struct gdbserv* serv);
 static void demo_continue_thread (struct gdbserv *serv,
 				  struct gdbserv_thread *thread,
 				  const struct gdbserv_reg *sigval);
- /* remove_breakpoint */
- /* set_breakpoint */
+
+static enum gdbserv_target_rc demo_remove_swbp (struct gdbserv * serv,
+						enum gdbserv_target_bp type,
+						struct gdbserv_reg *addr,
+						struct gdbserv_reg *len);
+
+static enum gdbserv_target_rc demo_set_swbp (struct gdbserv * serv,
+					     enum gdbserv_target_bp type,
+					     struct gdbserv_reg *addr,
+					     struct gdbserv_reg *len);
+
  /* process_target */
 static void demo_detach (struct gdbserv* serv, struct gdbserv_target* target);
 
@@ -192,8 +204,8 @@ demo_target (struct gdbserv *serv, void *context)
   target->cyclestep_program = demo_cyclestep_program;
   target->sigkill_program = demo_sigkill_program;
   target->continue_thread = demo_continue_thread;
-  target->remove_breakpoint = NULL;
-  target->set_breakpoint = NULL;
+  target->remove_breakpoint = demo_remove_swbp;
+  target->set_breakpoint = demo_set_swbp;
   target->process_target_packet = NULL;
   target->detach = demo_detach;
 
@@ -332,11 +344,11 @@ demo_restart_program (struct gdbserv* serv)
   sched_break (serv, 1);
 }
 
-
 void
 demo_singlestep_program (struct gdbserv* serv)
 {
-  sched_break (serv, tfind_singlestep_program (serv));
+  sched_break (serv, 
+	       tfind_singlestep_program (serv));
 }
 
 void
@@ -356,9 +368,8 @@ demo_continue_thread (struct gdbserv *serv,
 		      struct gdbserv_thread *thread,
 		      const struct gdbserv_reg *sigval)
 {
-  fprintf (stderr, "Resumed fictional target program - send break from gdb or wait a while.\n");
-  /* Enqueue a break response */
-  sched_break (serv, 10);
+  sched_break (serv, 
+	       tfind_continue_thread (serv, thread, sigval));
 }
 
 
@@ -465,3 +476,30 @@ void
 demo_flush_i_cache (struct gdbserv* serv)
 {
 }
+
+/*
+ * demo_remove_swbp -- remove software breakpoint
+ */
+
+static enum gdbserv_target_rc
+demo_remove_swbp (struct gdbserv *serv,
+		  enum gdbserv_target_bp bptype,
+		  struct gdbserv_reg *addr,
+		  struct gdbserv_reg *len)
+{
+  return tfind_remove_swbp (serv, bptype, addr, len);
+}
+
+/*
+ * demo_set_swbp -- remove software breakpoint
+ */
+
+static enum gdbserv_target_rc
+demo_set_swbp (struct gdbserv *serv,
+	       enum gdbserv_target_bp bptype,
+	       struct gdbserv_reg *addr,
+	       struct gdbserv_reg *len)
+{
+  return tfind_set_swbp (serv, bptype, addr, len);
+}
+

@@ -47,6 +47,8 @@ int  (*demo_get_mem_hook)  (unsigned long);
 
 static FILE *tfind_file;
 
+extern int demo_reverse_flag;
+
 extern void
 demo_tfind_open (char *filename)
 {
@@ -388,18 +390,38 @@ tfind_singlestep_program (struct gdbserv *serv)
     {
       return 2; /*sched_break (serv, 2);*/
     }
-  else if (cur_frame >= last_cached_frame - 1)
+  else if (demo_reverse_flag == 0)
     {
-      /* Stepped past the end of the tfind buffer.  */
-      demo_get_regs_hook = NULL;
-      demo_get_mem_hook  = NULL;
-      cur_frame = -1;
-      return 0; /*sched_break (serv, 0);*/
+      if (cur_frame >= last_cached_frame - 1)
+	{
+	  /* Stepped past the end of the tfind buffer.  */
+	  demo_get_regs_hook = NULL;
+	  demo_get_mem_hook  = NULL;
+	  cur_frame = -1;
+	  return 0; /*sched_break (serv, 0);*/
+	}
+      else
+	{
+	  /* Increment cur_frame and schedule an immediate break.  */
+	  cur_frame++;
+	  return 0; /*sched_break (serv, 0);*/
+	}
     }
   else
     {
-      /* Increment cur_frame and schedule an immediate break.  */
-      cur_frame++;
-      return 0; /*sched_break (serv, 0);*/
+      if (cur_frame == 0)
+	{
+	  /* Stepped past the beginning of the tfind buffer.  */
+	  demo_get_regs_hook = NULL;
+	  demo_get_mem_hook  = NULL;
+	  cur_frame = -1;
+	  return 0; /*sched_break (serv, 0);*/
+	}
+      else
+	{
+	  /* Decrement cur_frame and schedule an immediate break.  */
+	  cur_frame--;
+	  return 0; /*sched_break (serv, 0);*/
+	}
     }
 }

@@ -1,5 +1,8 @@
 2008-06-11  Michael Snyder  <msnyder@specifix.com>
 
+	* demo-tfind.c (tfind_singlestep_program): 
+	Add ability to step backward.
+
 	* demo-tfind.c (tfind_singlestep_program): New function.
 	* demo-target.c (demo_singlestep_program): Call the above.
 	* demo-target.h: Export tfind_singlestep_program interface.

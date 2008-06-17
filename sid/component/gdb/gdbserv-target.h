@@ -1,7 +1,7 @@
 /*
  * gdbserv-target.h -- part of GDB remote server.
  *
- * Copyright (C) 2000, 2002 Red Hat.
+ * Copyright (C) 2000, 2002, 2006 Red Hat.
  * This file is part of SID and is licensed under the GPL.
  * See the file COPYING.SID for conditions for redistribution.
  */
@@ -125,6 +125,7 @@ struct gdbserv_target {
   void (*cyclestep_program) (struct gdbserv *);
   void (*sigkill_program) (struct gdbserv *);
   int (*continue_program) (struct gdbserv *);
+  int (*set_exec_direction) (struct gdbserv *, const char *direction);
 #endif
 
   /* Breakpoint methods */

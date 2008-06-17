@@ -1,3 +1,14 @@
+2008-06-17  Dave Brolley  <brolley@redhat.com>
+
+	* compSched.cxx (deliver_regular): Drive rnext->when.
+	(deliver_irregular): Drive irnext->when.
+	(advancy_any): Check yield_step_loop_p.
+	(cancel_all): New method of generic_scheduler.
+	(time_set_pin): New member of scheduler_component.
+	(scheduler_component::set_time): Call set_now with 'then - 1'.
+	Call sched.cancel_all. Drive time_set_pin.
+	(scheduler_component_ctor_1): Add time-set pin.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

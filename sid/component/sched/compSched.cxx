@@ -1,6 +1,6 @@
 // compSched.cxx - the scheduler component.  -*- C++ -*-
 
-// Copyright (C) 1999-2003, 2005 Red Hat.
+// Copyright (C) 1999-2003, 2005, 2006 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 #include "config.h"
@@ -639,7 +639,7 @@ operator >> (istream& i, exact_host_time_keeper& it)
 	  this->refill_regular_events_table();
 	// deliver event
 	assert (victim);
-	victim->drive (0);
+	victim->drive (rnext->when);
       }
 
 
@@ -656,7 +656,7 @@ operator >> (istream& i, exact_host_time_keeper& it)
 	this->irregular_events.pop_back();
 	// deliver event
 	assert (victim);
-	victim->drive (0);
+	victim->drive (irnext->when);
       }
 
 
@@ -721,7 +721,8 @@ operator >> (istream& i, exact_host_time_keeper& it)
 	    evpair = this->next_event ();
 	  } while ((evpair.first != 0) // still an event
 		   && (evpair.first->when <= now) // still due
-		   && (due_count < due_limit)); // not too many iterations
+		   && (due_count < due_limit)  // not too many iterations
+		   && ! this->yield_step_loop_p);
 
 	// cout << "sid-sched: delivered " << due_count << " due/overdue events." << endl;
 
@@ -870,6 +871,15 @@ operator >> (istream& i, exact_host_time_keeper& it)
 	// hmm -- pin does not appear in the schedules anywhere -- multiple cancel()s?
       }
 
+
+    // Cancel all pending events.
+    void
+    cancel_all ()
+      {
+	this->irregular_events.clear ();
+	this->regular_table_iter = this->regular_events_table.end();
+	this->yield_step_loop_p = true;
+      }
 
     // Add a pin<->string mapping
     void
@@ -1357,6 +1367,7 @@ class scheduler_component: public scheduler_component_base
   output_pin time_low_pin;
   output_pin time_high_pin;
   output_pin active_pin;
+  output_pin time_set_pin;
 
 public:
 
@@ -1379,13 +1390,14 @@ private:
       tick_t then;
       component::status s = parse_attribute(t, then); 
       if (UNLIKELY(s != component::ok)) return s;
-      this->sched.set_now (then);
+      this->sched.set_now (then - 1);
       tick_t now;
       this->sched.get_now (now);
-      if (then != now)
+      if (then - 1 != now)
 	return component::bad_value;
-      else
-	return component::ok;
+      this->sched.cancel_all ();
+      time_set_pin.drive (then);
+      return component::ok;
     }
 
 protected:
@@ -1486,6 +1498,7 @@ scheduler_component<Scheduler>::scheduler_component_ctor_1()
   add_pin ("time-low", & this->time_low_pin);
   add_pin ("yield", & this->yield_pin);
   add_pin ("active", & this->active_pin);
+  add_pin ("time-set", & this->time_set_pin);
   add_attribute ("yield", & this->yield_pin, "pin");
   add_attribute ("enable-threshold", & this->enable_threshold, "setting");
   add_attribute ("enabled?", & this->enable_p, "setting");

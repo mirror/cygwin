@@ -2,7 +2,7 @@
 
 THIS FILE IS MACHINE GENERATED WITH CGEN.
 
-Copyright (C) 2000-2005 Red Hat, Inc.
+Copyright (C) 2000-2007 Red Hat, Inc.
 
 This file is part of the Red Hat simulators.
 
@@ -39,10 +39,11 @@ public:
 #define current_cpu this
 
   inline USI h_pc_get () const { return this->hardware.h_pc; }
-  inline void h_pc_set (USI newval) { this->hardware.h_pc = newval; }
+  inline void h_pc_set (USI newval) { current_cpu->h_pc_set_handler (newval);
+ }
 
   inline SI h_gr_get (UINT regno) const { return ((65535) & (current_cpu->hardware.h_gr[regno])); }
-  inline void h_gr_set (UINT regno, SI newval) { current_cpu->hardware.h_gr[regno] = ((65535) & (newval));
+  inline void h_gr_set (UINT regno, SI newval) { current_cpu->h_gr_set_handler (regno, newval);
  }
 
   inline SI h_Rb_get (UINT regno) const { return current_cpu->h_gr_get (((regno) + (8))); }

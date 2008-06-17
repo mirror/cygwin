@@ -1,7 +1,7 @@
 // xstormy16.cxx - Implementations of hand-written functions for the Xstormy16
 // simulator. -*- C++ -*-
 
-// Copyright (C) 2000 Red Hat.
+// Copyright (C) 2000, 2006 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -362,4 +362,146 @@ xstormy16_cpu::parity (int reg)
   tmp ^= tmp >> 2;
   tmp ^= tmp >> 1;
   return tmp & 1;
+}
+
+// Called before execution of an insn.  Perform any tasks associated with
+// logging changes in the state of this cpu during execution of an insn.
+void
+xstormy16_cpu_cgen::init_change_logging ()
+{
+  // Call up to the base class.
+  cgen_bi_endian_cpu::init_change_logging ();
+
+  // We will be tracking changes to the pc and to the gr registers.
+  gr_changed = 0;
+  pc_changed = PC_UNCHANGED;
+}
+
+// Called after execution of an insn.  Log the changes which occurred during
+// execution of the insn.
+void
+xstormy16_cpu_cgen::finish_change_logging ()
+{
+  // Call up to the base class.
+  cgen_bi_endian_cpu::finish_change_logging ();
+
+  // The largest possible record would contain:
+  //   1 byte representing the type of pc change
+  //   A 16 bit mask indicating which gr registers changed
+  //   Possibly the old pc value
+  //   Old gr register values (if any)
+  char buffer[1 + 2 + sizeof (old_h_pc) + sizeof (old_h_gr)];
+
+  // Record the nature of any pc or gr changes.
+  *(sid::host_int_1 *)(buffer + 0) = pc_changed;
+  *(sid::host_int_2 *)(buffer + 1) = gr_changed;
+
+  // If the pc change was too large to represent in the byte written above, then
+  // record the old pc value.
+  unsigned bufix = 3;
+  if (pc_changed == PC_RESET)
+    {
+      *(USI *)(buffer + bufix) = old_h_pc;
+      bufix += sizeof (old_h_pc);
+    }
+
+  // Record the old values of any gr registers that changed.
+  sid::host_int_2 mask = 1;
+  for (int i = 0; i < 16; ++i)
+    {
+      if ((gr_changed & mask) != 0)
+	{
+	  *(SI *)(buffer + bufix) = old_h_gr[i];
+	  bufix += sizeof (old_h_gr[i]);
+	  //		 std::cout << ' ' << std::hex << old_h_gr[i] << std::dec;
+	}
+      mask <<= 1;
+    }
+
+  // Save the change log record we have just created.
+  log_change (buffer, bufix);
+}
+
+// Keep track of any changes to the pc.
+void
+xstormy16_cpu_cgen::log_pc_change (USI new_pc)
+{
+  // If this is the first change, then save the original pc value.
+  if (LIKELY (pc_changed == PC_UNCHANGED))
+    old_h_pc = this->hardware.h_pc;
+
+  // Most of the time, pc changes are small enough to represented by one byte.
+  // Save these changes in 'pc_changed'.
+  //
+  // The value of PC_UNCHANGED is zero and so this condition will be represented
+  // with no special handling.
+  //
+  // The special value PC_RESET is an odd number and cannot occur under normal
+  // circumstances.  It indicates a larger pc change.
+  SI diff = new_pc - old_h_pc;
+  if (LIKELY (-128 <= diff && diff <= 127))
+    pc_changed = diff;
+  else
+    pc_changed = PC_RESET;
+}
+
+// Keep track of any changes to gr registers.  It is only necessary to
+// save the original value of a register the first time it is changed.
+void
+xstormy16_cpu_cgen::log_gr_change (UINT regno, SI newval)
+{
+  if (! (gr_changed & (1 << regno)))
+    {
+      gr_changed |= 1 << regno;
+      old_h_gr[regno] = this->hardware.h_gr[regno];
+    }
+}
+
+// Given a change log record, restore the state that it represents.
+void
+xstormy16_cpu_cgen::restore_change (const char *data, sid::host_int_4 length)
+{
+  // The first byte indicates the nature of any change to the pc.
+  assert (length >= 1);
+  sid::signed_host_int_1 pc_changed = *(sid::host_int_1 *)data;
+  ++data;
+  --length;
+
+  // The second two bytes are a bit mask indicating changes to gr registers.
+  assert (length >= 2);
+  sid::host_int_2 gr_changed = *(sid::host_int_2 *)data;
+  data += 2;
+  length -= 2;
+
+  // Restore the pc.
+  if (UNLIKELY (pc_changed == PC_RESET))
+    {
+      // For large changes to the pc, the previous pc value is recorded in the
+      // change log record.
+      this->hardware.h_pc = *(USI *)data;
+      data += sizeof (USI);
+      length -= sizeof (USI);
+    }
+  else
+    {
+      // Smaller changes to the pc are represented by a one byte delta.
+      this->hardware.h_pc -= pc_changed;
+    }
+
+  // Restore any gr registers which changed.
+  sid::host_int_2 mask = 1;
+  for (int i = 0; i < 16; ++i)
+    {
+      if ((gr_changed & mask) != 0)
+	{
+	  assert (length >= sizeof (SI));
+	  this->hardware.h_gr[i] = *(SI *)data;
+	  data += sizeof (SI);
+	  length -= sizeof (SI);
+	}
+      mask <<= 1;
+    }
+
+  // The entire record must be consumed.
+  assert (length == 0);
 }

@@ -1,6 +1,6 @@
 // xstormy16.h - Hand-written code for the Sanyo Xstormy16 CPU. -*- C++ -*-
 
-// Copyright (C) 1999, 2000 Red Hat.
+// Copyright (C) 1999, 2000, 2006 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -11,22 +11,62 @@
 
 namespace xstormy16
 {
-  class xstormy16_cpu_cgen
+  class xstormy16_cpu_cgen: public cgen_bi_endian_cpu
     {
       // Include cgen generated elements.
 #include "xstormy16-cpu.h"
 
     public:
+      xstormy16_cpu_cgen () {}
+      ~xstormy16_cpu_cgen () throw() { };
+
+    protected:
+      // Log any changes to the pc, if we're reversible.
+      void h_pc_set_handler (USI newval)
+        {
+	  if (UNLIKELY (this->reversible_p))
+	    log_pc_change (newval);
+	  this->hardware.h_pc = newval;
+        }
+
+      // Log any changes to the gr registers, if we're reversible.
+      void h_gr_set_handler (UINT regno, SI newval)
+        {
+	  if (UNLIKELY (this->reversible_p))
+	    log_gr_change (regno, newval);
+	  this->hardware.h_gr[regno] = (0xffff & newval);
+        }
+
+      // Stateful (reversible) component implementation methods.
+      virtual void init_change_logging ();
+      virtual void finish_change_logging ();
+
+      void log_pc_change (USI new_pc);
+      void log_gr_change (UINT regno, SI newval);
+
+      virtual void restore_change (const char *data, sid::host_int_4 length);
+
+    protected:
       inline void cgen_rtx_error(const char* msg) const
 	{
 	  cerr << "xstormy16-cpu rtx error: " << msg << endl;
 	}
+
     protected:
       USI syscall_trap_num;
 
+      // The values of these constants are significant and must not be changed.
+      static const sid::signed_host_int_1 PC_UNCHANGED = 0x00;
+      static const sid::signed_host_int_1 PC_RESET = 0x01;
+
+      // State for change logging.
+      sid::host_int_2 gr_changed;
+      sid::signed_host_int_1 pc_changed;
+      SI old_h_gr[16];
+      USI old_h_pc;
     };
 
-  class xstormy16_cpu: public xstormy16_cpu_cgen, public cgen_bi_endian_cpu
+  class xstormy16_cpu: public xstormy16_cpu_cgen
     {
     private:
       scache_engine<xstormy16_scache> engine;

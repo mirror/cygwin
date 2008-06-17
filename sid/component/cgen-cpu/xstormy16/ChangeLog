@@ -1,3 +1,19 @@
+2008-06-17  Dave Brolley  <brolley@redhat.com>
+
+	* xstormy16.h (xstormy16_cpu_cgen): Now inherits from
+	cgen_bi_endian_cpu.
+	(h_pc_set_handler): New method of xstormy16_cpu_cgen.
+	(h_gr_set_handler,init_change_logging,finish_change_logging)
+	(log_pc_change,log_gr_change,restore_change) Likewise.
+	(PC_UNCHANGED,PC_RESET,gr_changed,pc_changed,old_gr,old_h_pc):
+	New members of xstormy16_cpu_cgen.
+	(xstormy16_cpu): Now inherits only from xstormy16_cpu_cgen.
+	* xstormy16.cxx (init_change_logging): New method of
+	xstormy16_cpu_cgen.
+	(finish_change_logging,log_pc_change,log_gr_change,restore_change):
+	Likewise.
+	* xstormy16-cpu.h: Regenerated.
+
 2006-06-26  Dave Brolley  <brolley@redhat.com>
 
 	* xstormy16.h (get_pc): New member of xstormy16_cpu.

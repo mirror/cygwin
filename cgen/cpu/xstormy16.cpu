@@ -1,5 +1,5 @@
 ; xstormy16 CPU core description. -*- Scheme -*-
-; Copyright (C) 2001, 2002, 2003 Red Hat, Inc.
+; Copyright (C) 2001, 2002, 2003, 2006 Red Hat, Inc.
 ; This file is part of CGEN.
 ; See file COPYING.CGEN for details.
 
@@ -68,7 +68,13 @@
 
 ; Hardware elements.
 
-(dsh h-pc "program counter" (PC) (pc))
+(define-hardware
+  (name h-pc)
+  (comment "program counter")
+  (attrs PC)
+  (type pc)
+  (set (newval) (c-call "h_pc_set_handler" newval))
+)
 
 (define-keyword
   (name gr-names)
@@ -92,7 +98,7 @@
   (type register WI (16))
   (indices extern-keyword gr-names)
   (get (index) (and #xFFFF (raw-reg h-gr index)))
-  (set (index newval) (set (raw-reg h-gr index) (and #xFFFF newval)))
+  (set (index newval) (c-call "h_gr_set_handler" index newval))
 )
 
 (define-hardware

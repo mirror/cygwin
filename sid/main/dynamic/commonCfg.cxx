@@ -344,6 +344,7 @@ CpuCfg::CpuCfg (const string name,
     sess->sim_sched->add_subscription 
     (this, "step!", "step-cycles", 
      "time-query", "time-high", "time-low");
+  relate (this, "sim-sched", sess->sim_sched);
 }
 
 
@@ -579,6 +580,7 @@ SessionCfg::SessionCfg (const string name)
     tcl_bridge (NULL),
     loader (NULL),
     verbose (false),
+    reversible_p (false),
     use_stdio (true),
     need_gprof (false),
     need_core_probe (false),
@@ -658,6 +660,18 @@ void SessionCfg::write_load (Writer &w)
       host_sched->set_time (n, 150);
       use_stdio = false;
     }
+
+  // Setup all memory regions to be reversible, if specified.
+  if (reversible_p)
+    for (vector<MemCfg *>::iterator it = memory.begin ();
+	 it != memory.end ();
+	 ++it)
+      {
+	set (*it, "reversible?", "true");
+	relate (*it, "sim-sched", sim_sched);
+	conn_pin (sim_sched, "time-set", *it, "restore-to-time!");
+      }
+
   AggregateCfg::write_load (w);
 }
 
@@ -1386,6 +1400,13 @@ void BoardCfg::write_config (Writer &w)
 	  PinConnection (cpu, "trap-code", gdb, "trap-code").write_to(w);
 	}
     }  
+
+  // Set up the cpu to be reversible, if requested.
+  if (sess->reversible_p)
+    {
+      Setting (cpu, "reversible?", "true").write_to (w);
+      PinConnection (sess->sim_sched, "time-set", cpu, "restore-to-time!").write_to(w);
+    }
 }
 
 void BoardCfg::set_gprof (const string filename, gprof_type type, int interval)

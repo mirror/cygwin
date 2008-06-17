@@ -233,6 +233,7 @@ struct SessionCfg :
   void use_tksm();
   void use_tcl_bridge();
   void use_no_stdio ();
+  void set_reversible () { reversible_p = true; }
   virtual void set_loader (LoaderCfg *l);
   LoaderCfg *get_loader () const { return loader; }
   AtomicCfg *audio;
@@ -241,6 +242,7 @@ struct SessionCfg :
   AtomicCfg *tcl_bridge;
   bool verbose;
   bool use_stdio;
+  bool reversible_p;
   bool need_gprof;
   bool need_core_probe;
   bool maybe_model_busses;
@@ -249,6 +251,8 @@ struct SessionCfg :
   map<const string, AtomicCfg *> ulog_map;
   void add_gdb () { ++gdb_count; }
   void add_board (ComponentCfg *b) { ++board_count; add_child (b); }
+  void add_memory (MemCfg *mem) { memory.push_back (mem); }
+  vector<MemCfg *> memory;
   virtual void write_config (Writer &w);
   // Support for dynamic configuration profiles
   vector<AtomicCfg *> wrapped_components;

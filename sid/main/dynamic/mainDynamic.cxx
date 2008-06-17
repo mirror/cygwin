@@ -176,6 +176,7 @@ usage ()
   cout << "--profile-config=NAME,OPTIONS" << endl;
   cout << "                      Specify options for a named profiling configuration" << endl;
   cout << "--rc                  Pass stop code as simulator exit rc" << endl;
+  cout << "--reversible          Configure for reversible simulation" << endl;
   cout << "--save-temps=FILE     Write config to FILE, '-' for stdout." << endl;
   cout << "--wrap=COMPONENT      Turn on SID API tracing for COMPONENT" << endl;
   cout << "--verbose             Turn on run-time verbosity settings" << endl;
@@ -550,6 +551,8 @@ void try_add_memory (const string memspec,
       if (! (mmap_p || read_only_p))
 	sess->shutdown_seq->add_output (6, mem, "image-store");
     }
+
+  sess->add_memory (mem);
 }
 
 
@@ -703,7 +706,7 @@ main(int argc, char* argv[])
   enum option_num { opt_help, opt_version, opt_save_temps, opt_wrap, 
 		    opt_verbose, opt_tksched, opt_enable_warnings,
 		    opt_persistent, opt_profile_config,
-		    opt_rc, opt_no_run, opt_sidrtc, opt_sidcodec, 
+		    opt_rc, opt_reversible, opt_no_run, opt_sidrtc, opt_sidcodec, 
 		    opt_tksm, opt_board, opt_cpu, opt_gdb, opt_gloss, opt_engine, 
 		    opt_insn_count, opt_load, opt_icache, opt_dcache, 
 		    opt_memory_region, opt_profile_func,
@@ -749,6 +752,7 @@ main(int argc, char* argv[])
     {"persistent",      no_argument, & curr_opt, opt_persistent },
     {"profile-config",  required_argument, &curr_opt, opt_profile_config },
     {"rc",              no_argument, & curr_opt, opt_rc },
+    {"reversible",      no_argument, & curr_opt, opt_reversible },
     {"tksm",            no_argument, & curr_opt, opt_tksm },
 
 
@@ -1101,6 +1105,24 @@ main(int argc, char* argv[])
 
 	    case opt_rc:
 	      rc_p = true;
+	      break;
+
+	    case opt_reversible:
+	      if (sess)
+		{
+		  sess->set_reversible ();
+		  // --insn-count must be 1 for this to work correctly
+		  if (curr_board)
+		    {
+		      curr_board->set_step_insn_count("1");
+		      board_start_config += " --insn-count=1";
+		    }
+		  else
+		    {
+		      defaults.step_insn_count = "1";
+		      defaults.start_config += " --insn-count=1";
+		    }
+		}
 	      break;
 
 	    case opt_sidrtc:

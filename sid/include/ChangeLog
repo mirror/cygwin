@@ -1,3 +1,23 @@
+2008-06-17  Dave Brolley  <brolley@redhat.com>
+
+	* sidmiscutil.h (change_log): New utility class.
+	* sidcpuutil.h (basic_cpu): Now inherits from reversible_component.
+	(step_pin_handler): Parameter now named 'tick'. Save the current
+	tick. Handle exec_direction == "backward". Initialize change logging,
+	if reversible. Finish change logging, if reversible.
+	(step_backward): New method of basic_cpu.
+	(reset_pin_handler): Terminte the current change log, if any.
+	Set exec_direction to "forward".
+	(change_log,change_log_begin,change_log_end,change_log_boundaries)
+	(change_string,exec_direction,sim_sched,current_tick,last_tick): New
+	members of basic_cpu.
+	(init_change_logging,finish_change_logging,log_change)
+	(restore_state_to_time): New virtual methods of basic_cpu.
+	(basic_cpu): Initialize change_log, change_log_begin,
+	change_log_end, change_log_boundaries, last_tick, exec_direction,
+	and sim_sched. Add the exec-direction and sim-sched attributes.
+	* sidattrutil.h (reversible_component): New mix-in class.
+
 2007-02-19  Dave Brolley  <brolley@redhat.com>
 
 	* sidblockingutil.h (sidutil::blocking_component): Remove

@@ -1,6 +1,6 @@
 // sidmiscutil.h - Useful utility classes.  -*- C++ -*-
 
-// Copyright (C) 1999-2003, 2007 Red Hat.
+// Copyright (C) 1999-2003, 2006, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -531,6 +531,84 @@ namespace sidutil
     }
   };
 
+  // This class is intended for the implementation of change logging and
+  // change reversing. It is optimized for a potentially large number of
+  // elements and for growth, shrinkage and access as a LIFO stack. It is
+  // also optimized for growing again after shrinking.
+  class change_log
+  {
+  public:
+    change_log (sid::host_int_4 g = 0x100000) :
+      growth_rate (g),
+      buffer (0),
+      buf_index (0),
+      buf_size (0),
+      current_length (0)
+    {}
+   ~change_log ()
+    {
+      if (buffer)
+	delete buffer;
+    }
+
+    // Begin a new record and add the given data.
+    void push (const void *data, sid::host_int_4 length)
+    {
+      current_length = 0;
+      add (data, length);
+    }
+
+    // Add the given data to the current record.
+    void add (const void *data, sid::host_int_4 length)
+    {
+      if (buf_index + length > buf_size)
+	{
+	  buf_size += growth_rate * length;
+	  unsigned char* new_buf = new unsigned char[buf_size];
+	  if (buffer)
+	    {
+	      memcpy (new_buf, buffer, buf_index);
+	      delete buffer;
+	    }
+	  buffer = new_buf;
+	}
+
+      memcpy (buffer + buf_index, data, length);
+      buf_index += length;
+      current_length += length;
+    }
+
+    // Complete the current record by writing its length.
+    void finish ()
+    {
+      unsigned char l = current_length;
+      add (& l, 1);
+    }
+
+    // Remove the last record.
+    void pop ()
+    {
+      unsigned len = buffer[--buf_index];
+      buf_index -= len;
+    }
+
+    // Return a pointer to the last record.
+    const void *top (sid::host_int_4 &length) const
+    {
+      length = buffer[buf_index - 1];
+      return buffer + buf_index - length - 1;
+    }
+
+    // Is the change log emtpy?
+    bool empty () const { return buf_index <= 0; }
+
+  private:
+    sid::host_int_4 growth_rate;
+    unsigned char* buffer;
+    sid::host_int_4 buf_index;
+    sid::host_int_4 buf_size;
+    unsigned char current_length;
+  };
 }
 
 #endif // SIDMISCUTIL_H

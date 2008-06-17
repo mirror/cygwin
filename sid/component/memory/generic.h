@@ -1,6 +1,6 @@
 // generic.h - Header for the generic_memory class.  -*- C++ -*-
 
-// Copyright (C) 1999-2001, 2007 Red Hat.
+// Copyright (C) 1999-2001, 2006, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -50,8 +50,9 @@ using sid::big_int_8;
 using sidutil::fixed_pin_map_component;
 using sidutil::no_accessor_component;
 using sidutil::fixed_attribute_map_component;
-using sidutil::no_relation_component;
+using sidutil::fixed_relation_map_component;
 using sidutil::fixed_bus_map_component;
+using sidutil::reversible_component;
 using sidutil::std_error_string;
 using sidutil::callback_pin;
 using sidutil::output_pin;
@@ -61,11 +62,12 @@ using sidutil::output_pin;
 
 
 class generic_memory: public virtual component,
-		      protected fixed_pin_map_component,
+		      protected virtual fixed_pin_map_component,
 		      protected no_accessor_component,
-		      protected fixed_attribute_map_component,
-		      protected no_relation_component,
-		      protected fixed_bus_map_component
+		      protected virtual fixed_attribute_map_component,
+		      protected fixed_relation_map_component,
+		      protected fixed_bus_map_component,
+		      protected reversible_component
 {
 public:
   generic_memory() throw (bad_alloc);
@@ -100,6 +102,13 @@ protected:
   
   host_int_2 read_latency;
   host_int_2 write_latency;
+
+protected:
+  // Change logging for the purpose of reverse simulation.
+  component *sched;
+  sidutil::change_log change_log;
+  void record_update (host_int_4 address, const void *bytes, unsigned width);
+  virtual void restore_state_to_time (sid::host_int_4 tick);
 
 private:
   string get_size_attr ();
@@ -220,6 +229,8 @@ generic_read_only_bus::write_any(host_int_4 address, DataType data)
   if (LIKELY((address >= 0) && ((address+width) <= target->buffer_length)))
     {
       typename DataType::value_type mem_image = data.target_memory_value();
+      if (UNLIKELY (target->reversible_p))
+	target->record_update (address, & mem_image, width);
       memcpy (& target->buffer[address], & mem_image, width);
       bus::status st (bus::ok);
       st.latency = target->write_latency;

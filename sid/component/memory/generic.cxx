@@ -1,6 +1,6 @@
 // generic.cxx - a class of generic memories.  -*- C++ -*-
 
-// Copyright (C) 1999-2001, 2003, 2007 Red Hat.
+// Copyright (C) 1999-2001, 2003, 2006, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -54,6 +54,8 @@ generic_memory::generic_memory() throw (bad_alloc):
   imagestore_pin (this, & generic_memory::imagestore_handler),
   imagemmap_pin (this, & generic_memory::imagemmap_handler),
   imagemsync_pin (this, & generic_memory::imagemsync_handler),
+  sched (0),
+  change_log (0x60000),
   read_latency (0),
   write_latency (0),
   base_address (0),
@@ -97,6 +99,8 @@ generic_memory::generic_memory() throw (bad_alloc):
   add_attribute_virtual ("state-snapshot", this,
 			 & generic_memory::save_state,
 			 & generic_memory::restore_state);
+
+  add_uni_relation ("sim-sched", & sched);
 }
 
 
@@ -274,9 +278,75 @@ generic_memory::imagemmap_handler (host_int_4)
 }
 
 
+// Record a change in this memory region, so that it may be restored later.
+void
+generic_memory::record_update (host_int_4 address, const void *bytes, unsigned width)
+{
+  // This function is only used during reverse debugging at the moment.
+  assert (reversible_p);
+
+  // Make sure we can get the current time
+  if (! sched)
+    return;
+  string tick_attr = sched->attribute_value ("time");
+  host_int_4 tick;
+  component::status s = parse_attribute (tick_attr, tick);
+  if (s != component::ok)
+    return;
+
+  // Make sure that the time is not 0.
+  if (tick == 0)
+    return;
+
+  // Assemble the change log entry
+  char change[4 + 8]; // max buffer size
+  *(sid::host_int_4 *)change = address;
+  memcpy (change + 4, this->buffer + address, width);
+
+  // The change log record contains the current tick, the address and the
+  // original data.
+  change_log.push (& tick, sizeof (tick));
+  change_log.add (change, 4 + width);
+  change_log.finish ();
+}
 
 
+// Restore this mrmory region to the state it was at the given time (tick).
+void
+generic_memory::restore_state_to_time (sid::host_int_4 tick)
+{
+  // Call up to the base class.
+  reversible_component::restore_state_to_time (tick);
 
+  // Undo all updates back to the given time.
+  while (! change_log.empty ())
+    {
+      sid::host_int_4 length;
+      const unsigned char *record = (const unsigned char *)change_log.top (length);
+
+      // The time (tick) of the change is the first item in the record.
+      // If this record occurred previous to our target time, then we are done.
+      sid::host_int_4 new_tick = *(sid::host_int_4*)record;
+      if (new_tick < tick)
+	break;
+
+      record += sizeof (new_tick);
+      length -= sizeof (new_tick);
+
+      // The next item in the record is the address which was changed.
+      sid::host_int_4 address = *(sid::host_int_4*)record;
+      record += sizeof (address);
+      length -= sizeof (address);
+
+      // The remainder of the record contains the original data.
+      // Restore the change.
+      memcpy (this->buffer + address, record, length);
+
+      // Done with this record.
+      change_log.pop ();
+    }
+}
+	
 // ----------------------------------------------------------------------------
 
 

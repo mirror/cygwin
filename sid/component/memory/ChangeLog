@@ -1,3 +1,21 @@
+2008-06-17  Dave Brolley  <brolley@redhat.com>
+
+	* generic.h: Remove 'using sidutil::no_relation_component'. Add
+	'using sidutil::fixed_relation_map_component'.
+	(generic_memory): New inherits from reversible_component and
+	fixed_relation_map_component. Now inherits virtually from
+	fixed_pin_map_component and fixed_attribute_map_component.
+	(sched): New member of generic_memory.
+	(change_log): Likewise.
+	(record_update): New method of generic_memory.
+	(restore_state_to_time): Likewise.
+	(generic_read_write_bus::write_any): call record_update if this
+	memory is reversible.
+	* generic.cxx (generic_memory): Initialize sched and
+	change_log. Add sim-sched relation.
+	(record_update): New method of generic_memory.
+	(restore_state_to_time): Likewise.
+
 2007-02-05  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:

@@ -1,3 +1,21 @@
+2008-06-17  Dave Brolley  <brolley@redhat.com>
+
+	* mainDynamic.cxx (usage): Document --reversible.
+	(try_add_memory): Call sess->add_memory.
+	(option_num): add opt_reversible.
+	(long_options): Add "reversible".
+	(main): Handle opt_reversible.
+	* commonCfg.h (set_reversible): New method of SessionCfg.
+	(add_memory): Likewise.
+	(reversible_p): New member of SessionCfg.
+	(memory): Likewise.
+	* commonCfg.cxx (CpuCfg): Establish sim-sched relation.
+	(SessionCfg): Initialize reversible_p.
+	(SessionCfg::write_load): Set up all memory regions as reversible,
+	if requested.
+	(BoardCfg::write_config): Set up the cpu to be reversible, if
+	requested.
+
 2007-11-06  Dave Brolley  <brolley@redhat.com>
 
 	* mepCfg.cxx (MepBoardCfg): Set the gloss component's

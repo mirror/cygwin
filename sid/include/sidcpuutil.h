@@ -16,6 +16,7 @@
 #include <sidschedutil.h>
 
 using std::string;
+using std::pair;
 
 namespace sidutil
 {
@@ -106,7 +107,8 @@ namespace sidutil
 		   protected virtual fixed_attribute_map_component,
 		   protected virtual fixed_relation_map_component,
 		   protected virtual fixed_bus_map_component,
-		   protected virtual configurable_component
+		   protected virtual configurable_component,
+		   protected virtual reversible_component
   {
     // custom memory allocators for poisioning freshly-allocated memory
   public:
@@ -308,12 +310,25 @@ namespace sidutil
     bool enable_step_trap_p;
     cpu_trace_stream trace_stream;
 
-    virtual void step_pin_handler (sid::host_int_4)
+    virtual void step_pin_handler (sid::host_int_4 tick)
       {
 	recursion_record limit (& this->step_limit);
 	if (UNLIKELY(! limit.ok())) return;
 
 	this->yield_p = false;
+	this->current_tick = tick;
+
+	// Executing backward?
+	if (UNLIKELY (exec_direction == "backward"))
+	  {
+	    step_backward ();
+	    this->stepped (1);
+	    return;
+	  }
+
+	this->current_step_insn_count = 0;
+	if (UNLIKELY (reversible_p))
+	  this->init_change_logging ();
 
 	// Check for triggerpoints due right now; may set yield_p!
 	this->triggerpoint_manager.check_and_dispatch ();
@@ -339,7 +354,74 @@ namespace sidutil
 	  insn_cycles >= max_num_cycles ? max_num_cycles :
 	  insn_cycles;
 
+	if (UNLIKELY (reversible_p))
+	  this->finish_change_logging ();
 	this->stepped (num_cycles);
+      }
+
+    virtual void step_backward ()
+      {
+	// Make sure the infrastructure for reverse execution is in place.
+	if (UNLIKELY (! sim_sched || ! reversible_p))
+	  {
+	    std::cerr << "unable to execute in reverse" << endl;
+	    this->signal_trap (cpu_trap_breakpoint, 0);
+	    return;
+	  }
+
+	// Check whether we're at the start of the program.
+	if (UNLIKELY (change_log_end <= change_log_begin))
+	  {
+	    // We're at the start of the program. See if there are previous
+	    // instances to step backward into.
+	    if (change_log_boundaries.empty ())
+	      {
+		std::cerr << "No previous program instances to return to" << endl;
+		this->signal_trap (cpu_trap_breakpoint, 0);
+		return;
+	      }
+	    std::cerr << "Stepping back into the previous program instance" << endl;
+
+	    // Switch to the previous program instance.
+	    change_log_begin = change_log_boundaries.back ();
+	    change_log_boundaries.pop_back ();
+	    assert (change_log_begin < change_log_end);
+	  }
+
+	// Unwind the change log until a triggerpoint is reached.
+	//
+	bool single_stepping = this->enable_step_trap_p;
+	while (change_log_end > change_log_begin)
+	  {
+	    // Restore the state to the previous tick.
+	    --this->current_tick;
+	    restore_state_to_time (this->current_tick);
+
+	    // We've restored all the changes which take us back to the start of the
+	    // previous insn.  Now notify the scheduler to reset the rest of
+	    // the system to this time.
+	    if (LIKELY (sim_sched))
+	      sim_sched->set_attribute_value ("time", make_numeric_attribute (this->current_tick));
+
+	    // Check for single stepping.
+	    if (single_stepping) 
+	      {
+		this->signal_trap (sidutil::cpu_trap_stepped);
+		break;
+	      }
+
+	    // Check for triggerpoints due right now; may set yield_p!
+	    this->triggerpoint_manager.check_and_dispatch ();
+	    if (this->yield_p)
+	      break;
+	  }
+
+	// Let GDB know if we run out of state to reverse.
+	if (UNLIKELY (change_log_end <= change_log_begin))
+	  {
+	    std::cerr << "Program start reached while executing in reverse" << endl;
+	    this->signal_trap (cpu_trap_breakpoint, 0);
+	  }
       }
     void yield ()
       {
@@ -504,7 +586,18 @@ namespace sidutil
   private:
     callback_pin<basic_cpu> reset_pin;
     virtual void reset () = 0;
-    void reset_pin_handler(sid::host_int_4 v) { this->reset (); this->stepped(1); }
+    void reset_pin_handler(sid::host_int_4 v)
+    {
+      // If there's a change log, then start a new one.
+      if (change_log_end != 0)
+	{
+	  change_log_boundaries.push_back (change_log_begin);
+	  change_log_begin = change_log_end;
+	}
+      exec_direction = "forward";
+      this->reset ();
+      this->stepped(1);
+    }
 
     // Flush internal abstract icache (if any)
   private:
@@ -719,6 +812,82 @@ namespace sidutil
 	  }
       }
 
+    // Reversible implementation
+  protected:
+    sidutil::change_log change_log;
+    unsigned change_log_begin;
+    unsigned change_log_end;
+    vector<unsigned> change_log_boundaries;
+    std::string change_string;
+    string exec_direction;
+    component *sim_sched;
+    sid::host_int_4 current_tick;
+    sid::host_int_4 last_tick;
+
+    virtual void init_change_logging () {}
+    virtual void finish_change_logging () {}
+
+    // Log any changes since the last change was logged.  Target specific
+    // changes are logged in change_log.finish ().
+    virtual void log_change (const void* change, sid::host_int_4 length)
+      {
+	assert (reversible_p);
+	change_log.push (& current_tick, sizeof (current_tick));
+	change_log.add (change, length);
+	change_log.finish ();
+	++change_log_end;
+      }
+
+    // Restore the state represented by the given change log record.
+    virtual void restore_change (const char* record, sid::host_int_4 length)
+      {
+      }
+
+    // Restore our state to what it was at the given time.
+    virtual void restore_state_to_time (sid::host_int_4 tick)
+      {
+	// Call up to the base class.
+	reversible_component::restore_state_to_time (tick);
+
+	// Nothing to restore?
+	if (UNLIKELY (change_log_end == 0))
+	  return;
+
+	// Rewind the change log to the given time.
+	unsigned found = change_log_end;
+	while (change_log_end >= 1)
+	  {
+	    // Obtain the most recent change log record.
+	    sid::host_int_4 length;
+	    const char *record = (const char *)change_log.top (length);
+
+	    // The first item in the record is the time (tick) of the change.
+	    // If it's before our target time, then we're done.
+	    sid::host_int_4 new_tick = *(sid::host_int_4*)record;
+	    if (new_tick < tick)
+	      break;
+
+	    record += sizeof (new_tick);
+	    length -= sizeof (new_tick);
+
+	    // Restore the state represented by the record.
+	    restore_change (record, length);
+
+	    // We're done with this record.
+	    change_log.pop ();
+	    --change_log_end;
+
+	    // Adjust program instance boundaries, if necessary.
+	    if (change_log_end < change_log_begin)
+	      {
+		assert (! change_log_boundaries.empty ());
+		change_log_begin = change_log_boundaries.back ();
+		change_log_boundaries.pop_back ();
+		assert (change_log_end >= change_log_begin);
+	      }
+	  }
+      }
+	
     virtual component::status dynamic_config(const string& spec)
       {
 	// Call up to the base class
@@ -930,7 +1099,14 @@ public:
       gprof_unconfigured_p (false),
       gprof_prev_cycle (0),
       core_probe (0),
-      main (0)
+      main (0),
+      change_log (),
+      change_log_begin (0),
+      change_log_end (0),
+      change_log_boundaries (),
+      last_tick (~(sid::host_int_4)0),
+      exec_direction ("forward"),
+      sim_sched (0)
       {
 	// buses
 	this->data_bus = 0;
@@ -997,6 +1173,8 @@ public:
 	add_attribute_notify ("final-insn-count?", & this->final_insn_count_p, this,
 			      & basic_cpu::update_final_insn_count_p,
 			      "setting");
+	add_attribute ("exec-direction", &exec_direction, "setting");
+	add_uni_relation("sim-sched", &this->sim_sched);
 
 	// For dynamic configuration
 	add_uni_relation("gprof", &this->gprof);

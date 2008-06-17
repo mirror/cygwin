@@ -2,7 +2,7 @@
 // mappings between application objects and their string
 // representations.  -*- C++ -*-
 
-// Copyright (C) 1999, 2000, 2003, 2005, 2007 Red Hat.
+// Copyright (C) 1999, 2000, 2003, 2005, 2006, 2007 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -1127,6 +1127,30 @@ protected:
       }
   };
 
+
+  // A mix-in for components which need to save and restore state
+  // at given time indices.
+  class reversible_component :
+    public virtual fixed_pin_map_component,
+    public virtual fixed_attribute_map_component
+  {
+  public:
+    reversible_component () :
+      reversible_p (false),
+      restore_to_time_pin (this, & reversible_component::restore_state_to_time)
+      {
+	add_pin ("restore-to-time!", & this->restore_to_time_pin);
+	add_attribute ("reversible?", & reversible_p, "setting");
+      }
+
+    ~reversible_component () {}
+
+  protected:
+    bool reversible_p;
+
+    virtual void restore_state_to_time (sid::host_int_4) {}
+    callback_pin<reversible_component> restore_to_time_pin;
+  };
 }
 
 #endif // SIDATTRUTIL_H

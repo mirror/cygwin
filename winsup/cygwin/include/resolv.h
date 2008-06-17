@@ -50,7 +50,7 @@
 
 /*
  *	@(#)resolv.h	8.1 (Berkeley) 6/2/93
- *	$Id: resolv.h,v 1.1 2006/12/11 19:59:05 corinna Exp $
+ *	$Id: resolv.h,v 1.2 2008/06/17 10:05:28 corinna Exp $
  */
 
 #ifndef _RESOLV_H_
@@ -391,10 +391,6 @@ const char *	loc_ntoa __P((const u_char *binary, char *ascii));
 int		dn_skipname __P((const u_char *, const u_char *));
 void		putlong __P((u_int32_t, u_char *));
 void		putshort __P((u_int16_t, u_char *));
-#ifndef __ultrix__
-u_int16_t	_getshort __P((const u_char *src));
-u_int32_t	_getlong __P((const u_char *src));
-#endif
 const char *	p_class __P((int));
 const char *	p_time __P((u_int32_t));
 const char *	p_type __P((int));

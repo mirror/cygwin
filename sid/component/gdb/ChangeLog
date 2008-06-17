@@ -1,3 +1,15 @@
+2008-06-17  Dave Brolley  <brolley@redhat.com>
+
+	* gdbserv-target.h (set_exec_direction): New member of
+	gdbserv_target.
+	* gdbserv-state.c (gdbserv_data_packet): Initialize exec_direction.
+	Check for a 'b' prefix for the S, s, C, and c packets.  Call
+	gdbserv->target->set_exec_direction.
+	* gdb.h (set_exec_direction): New function prototype.
+	* gdb.cxx (set_exec_direction_hook): New function.
+	(gdbsid_target_attach): Set gdbtarget->set_exec_direction.
+	(set_exec_direction): New function.
+
 2005-12-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	Second part of ms1 to mt renaming.

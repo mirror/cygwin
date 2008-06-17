@@ -1,6 +1,6 @@
 // gdb.cxx - GDB stub implementation.  -*- C++ -*-
 
-// Copyright (C) 1999-2002, 2004, 2005 Red Hat.
+// Copyright (C) 1999-2002, 2004, 2005, 2006 Red Hat.
 // This file is part of SID and is licensed under the GPL.
 // See the file COPYING.SID for conditions for redistribution.
 
@@ -232,6 +232,13 @@ process_detach_hook (struct gdbserv *gdbserv)
   return g->process_detach ();
 }
 
+extern "C" int
+set_exec_direction_hook (struct gdbserv *gdbserv, const char *direction)
+{
+  gdb* g = static_cast<gdb*> (gdbserv_target_data (gdbserv));
+  return g->set_exec_direction (direction);
+}
+
 
 
 
@@ -278,6 +285,7 @@ gdb::gdbsid_target_attach (struct gdbserv *gdbserv)
       gdbtarget->rangestep_program = rangestep_program_hook;
       gdbtarget->sigkill_program = sigkill_program_hook;
       gdbtarget->continue_program = continue_program_hook;
+      gdbtarget->set_exec_direction = set_exec_direction_hook;
       gdbtarget->remove_breakpoint = remove_breakpoint_hook;
       gdbtarget->set_breakpoint = set_breakpoint_hook;
       gdbtarget->detach = process_detach_hook;
@@ -1326,6 +1334,23 @@ gdb::add_sw_breakpoint (host_int_8 address, host_int_4 length)
   // success!
   this->sw_breakpoints [address] = imem;
   return true;
+}
+
+
+int
+gdb::set_exec_direction (const char *direction)
+{
+  if (trace_gdbsid)
+    cerr << "set_exec_direction " << endl;
+
+  assert (cpu != 0);
+  component::status s = cpu->set_attribute_value ("exec-direction", direction);
+  if (s != component::ok)
+    {
+      cerr << "Cannot set exec-direction attribute in cpu: status " << (int)s << endl;
+    }
+
+  return 0;
 }
 
 

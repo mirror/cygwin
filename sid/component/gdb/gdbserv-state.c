@@ -1,7 +1,7 @@
 /*
  * gdbserv-state.c -- part of GDB remote server
  *
- * Copyright (C) 2000, 2002 Red Hat.
+ * Copyright (C) 2000, 2002, 2006 Red Hat.
  * This file is part of SID and is licensed under the GPL.
  * See the file COPYING.SID for conditions for redistribution.
  */
@@ -123,11 +123,28 @@ gdbserv_fromclient_data (struct gdbserv *gdbserv,
 void
 gdbserv_data_packet (struct gdbserv *gdbserv)
 {
+  const char *exec_direction = "forward";
   char packet_type = gdbserv_input_char (gdbserv);
   if (gdbserv_state_trace)
     fprintf (gdbserv_state_trace, "<gdbserv_data_packet:%c>\n", packet_type);
   
   /* NB: default is for this to send an empty packet */
+
+  /* Check for a 'b' (backward) prefix for S, s, C and c.  This indicates that
+     the direction of execution is to be backward.  */
+  if (packet_type == 'b')
+    {
+      char next = gdbserv_input_peek (gdbserv);
+      switch (next)
+	{
+	case 'S': case 's': case 'C': case 'c':
+	  exec_direction = "backward";
+	  packet_type = gdbserv_input_char (gdbserv);
+	  break;
+	default:
+	  break;
+	}
+    }
 
   switch (packet_type)
     {
@@ -461,7 +478,10 @@ gdbserv_data_packet (struct gdbserv *gdbserv)
 	    gdbserv->target->sigkill_program (gdbserv);
 	    return;
 	  }
-	
+
+	/* Set the direction.  */
+	gdbserv->target->set_exec_direction (gdbserv, exec_direction);
+
 	/* Set machine state to force a single step.  */
 	if (packet_type == 's' || packet_type == 'S')
 	  {

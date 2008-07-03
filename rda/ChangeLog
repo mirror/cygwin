@@ -1,3 +1,11 @@
+2008-07-03  Kevin Buettner  <kevinb@redhat.com>
+
+	* HOWTO, HOWTO.old: Preserve old HOWTO document as HOWTO.old.  It
+	may still contain some useful information about the library
+	internals.  Revise HOWTO, providing significantly more detail
+	about how to create a new RDA application than was found in the
+	original document.
+
 2007-05-24  Steve Ellcey  <sje@cup.hp.com>
 
 	* Makefile.in: Regnerate.

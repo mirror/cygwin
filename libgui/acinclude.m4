@@ -1,1 +1,1 @@
-"sinclude(../config/acinclude.m4)"
+"sinclude(tcl.m4)"

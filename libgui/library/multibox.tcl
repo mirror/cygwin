@@ -1,25 +1,25 @@
 # multibox.tcl - Multi-column listbox.
-# Copyright (C) 1997 Cygnus Solutions.
+# Copyright (C) 1997,2008 Red Hat, Inc.
 # Written by Tom Tromey <tromey@cygnus.com>.
 
 # FIXME:
 # * Should support sashes so user can repartition widget sizes.
 # * Should support itemcget, itemconfigure.
 
-itcl_class Multibox {
+itcl::class Multibox {
   # The selection mode.
-  public selectmode browse {
+  public variable selectmode browse {
     _apply_all configure [list -selectmode $selectmode]
   }
 
   # The height.
-  public height 10 {
+  public variable height 10 {
     _apply_all configure [list -height $height]
   }
 
   # This is a list of all the listbox widgets we've created.  Private
   # variable.
-  protected _listboxen {}
+  protected variable _listboxen {}
 
   # Tricky: take the class bindings for the Listbox widget and turn
   # them into Multibox bindings that directly run our bindings.  That
@@ -32,7 +32,7 @@ itcl_class Multibox {
     bind Multibox $seq $sub
   }
 
-  constructor {config} {
+  constructor {} {
     # The standard widget-making trick.
     set class [$this info class]
     set hull [namespace tail $this]
@@ -43,7 +43,8 @@ itcl_class Multibox {
     ::rename $this $old_name
 
     scrollbar [namespace tail $this].vs -orient vertical
-    bind [namespace tail $this].vs <Destroy> [list $this delete]
+    bind [namespace tail $this].vs <Destroy> \
+	[itcl::code itcl::delete object $this]
 
     grid rowconfigure  [namespace tail $this] 0 -weight 0
     grid rowconfigure  [namespace tail $this] 1 -weight 1
@@ -94,8 +95,6 @@ itcl_class Multibox {
     grid [namespace tail $this].vs -row 1 -column $num -sticky nsw
     grid columnconfigure  [namespace tail $this] $num -weight 0
   }
-
-  method configure {config} {}
 
   # FIXME: should handle automatically.
   method cget {option} {

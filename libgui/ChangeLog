@@ -1,3 +1,31 @@
+2008-07-22  Keith Seitz  <keiths@redhat.com>
+
+	* tcl.m4: New file.
+	* acinclude.m4: Include tcl.m4 instead of ../config/acinclude.m4
+	* aclocal.m4: Regenerated.
+	* configure.ac: Do not check for ITCL_SH.
+	Use SC_PATH_TCLCONFIG, SC_PATH_TKCONFIG, SC_LOAD_TCLCONFIG, and
+	SC_LOAD_TKCONFIG to find Tcl and Tk.
+	Add some logic for when using in-tree Tcl/Tk.
+	Change substitutes for TCL_BUILD_LIB_SPEC, TK_BUILD_LIB_SPEC, and
+	TCLHDIR to accommodate using system-supplied Tcl and Tk.
+	* configure: Regenerated.
+	* Makefile.in: Regenerated.
+	* library/Makefile.am: Replace ITCL_SH with TCLSH.
+	Remove TCL_SHARED rules.
+	(tclIndex): Update build rules.
+	* library/Makefile.in: Regenerate.
+	* library/balloon.tcl: Update for Itcl 3.2/3.3.
+	* library/cframe.tcl: Likewise.
+	* library/lframe.tcl: Likewise.
+	* library/multibox.tcl: Likewise.
+	* library/sendpr.tcl: Likewise.
+	* library/ventry.tcl: Likewise.
+	* library/wframe.tcl: Likewise.
+	* src/Makefile.am (INCLUDES): Update.
+	* src/Makefile.in: Regenerate.
+	* src/paths.c (init_script): Accommodate builddir != srcdir.
+	
 2005-03-23  Martin Hunt  <hunt@redhat.com>
 
 	* configure.ac: Remove -fwritable-strings from CFLAGS.

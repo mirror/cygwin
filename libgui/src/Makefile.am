@@ -41,10 +41,8 @@ LIBGUI_CFLAGS=@LIBGUI_CFLAGS@
 
 ## Some of the files in this directory want to see Tk internals.
 ## Nasty.
-INCLUDES = $(LIBGUI_CFLAGS) $(TCLHDIR) \
-$(TKHDIR) \
-$(TK_XINCLUDES) $(TCL_DEFS) $(TK_DEFS) \
-$(TKHDIR)/../unix $(TKHDIR)/../win \
+INCLUDES = $(LIBGUI_CFLAGS) $(TCL_INCLUDES) \
+$(TK_INCLUDES) $(TK_XINCLUDES) $(TCL_DEFS) $(TK_DEFS) \
 -DTBL_VERSION=\"$(TBL_VERSION)\"\
 -DTBL_COMMAND=\"$(TBL_COMMAND)\"\
 -DTBL_RUNTIME=\"tkTable.tcl\" -DTBL_RUNTIME_DIR=\"$(guidir)\"\

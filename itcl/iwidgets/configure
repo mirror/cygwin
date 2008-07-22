@@ -17,8 +17,6 @@ ac_help="$ac_help
   --with-tk               directory containing tk configuration (tkConfig.sh)"
 ac_help="$ac_help
   --with-itcl=DIR         use Itcl 3.0 binaries from DIR"
-ac_help="$ac_help
-  --with-itk=DIR          use Itk 3.0 binaries from DIR"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -529,12 +527,7 @@ else
 fi
 
 
-# RCS: $Id: configure.in,v 1.2.4.2 2001/05/25 00:11:35 mdejong Exp $
-
-#--------------------------------------------------------------------
-# We should really cache the ITCL_VERSION when we configure itcl,
-# and pick up the version from the cache here.
-#--------------------------------------------------------------------
+# RCS: $Id: configure,v 1.18 2001/11/29 20:51:34 smithc Exp $
 
 ITCL_VERSION=3.2
 
@@ -545,94 +538,11 @@ MINOR_VERSION=0
 PATCHLEVEL=.1
 
 VERSION=${MAJOR_VERSION}.${MINOR_VERSION}${PATCHLEVEL}
+IWIDGETS_SRC_DIR=`pwd`
 
 
 
 
-ac_aux_dir=
-for ac_dir in ../config $srcdir/../config; do
-  if test -f $ac_dir/install-sh; then
-    ac_aux_dir=$ac_dir
-    ac_install_sh="$ac_aux_dir/install-sh -c"
-    break
-  elif test -f $ac_dir/install.sh; then
-    ac_aux_dir=$ac_dir
-    ac_install_sh="$ac_aux_dir/install.sh -c"
-    break
-  fi
-done
-if test -z "$ac_aux_dir"; then
-  { echo "configure: error: can not find install-sh or install.sh in ../config $srcdir/../config" 1>&2; exit 1; }
-fi
-ac_config_guess=$ac_aux_dir/config.guess
-ac_config_sub=$ac_aux_dir/config.sub
-ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
-
-
-
-# Find a good install program.  We prefer a C program (faster),
-# so one script is as good as another.  But avoid the broken or
-# incompatible versions:
-# SysV /etc/install, /usr/sbin/install
-# SunOS /usr/etc/install
-# IRIX /sbin/install
-# AIX /bin/install
-# AIX 4 /usr/bin/installbsd, which doesn't work without a -g flag
-# AFS /usr/afsws/bin/install, which mishandles nonexistent args
-# SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
-# ./install, which can be erroneously created by make from ./install.sh.
-echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:586: checking for a BSD compatible install" >&5
-if test -z "$INSTALL"; then
-if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-    IFS="${IFS= 	}"; ac_save_IFS="$IFS"; IFS=":"
-  for ac_dir in $PATH; do
-    # Account for people who put trailing slashes in PATH elements.
-    case "$ac_dir/" in
-    /|./|.//|/etc/*|/usr/sbin/*|/usr/etc/*|/sbin/*|/usr/afsws/bin/*|/usr/ucb/*) ;;
-    *)
-      # OSF1 and SCO ODT 3.0 have their own names for install.
-      # Don't use installbsd from OSF since it installs stuff as root
-      # by default.
-      for ac_prog in ginstall scoinst install; do
-        if test -f $ac_dir/$ac_prog; then
-	  if test $ac_prog = install &&
-            grep dspmsg $ac_dir/$ac_prog >/dev/null 2>&1; then
-	    # AIX install.  It has an incompatible calling convention.
-	    :
-	  else
-	    ac_cv_path_install="$ac_dir/$ac_prog -c"
-	    break 2
-	  fi
-	fi
-      done
-      ;;
-    esac
-  done
-  IFS="$ac_save_IFS"
-
-fi
-  if test "${ac_cv_path_install+set}" = set; then
-    INSTALL="$ac_cv_path_install"
-  else
-    # As a last resort, use the slow shell script.  We don't cache a
-    # path for INSTALL within a source directory, because that will
-    # break other packages using the cache if that directory is
-    # removed, or if the path is relative.
-    INSTALL="$ac_install_sh"
-  fi
-fi
-echo "$ac_t""$INSTALL" 1>&6
-
-# Use test -z because SunOS4 sh mishandles braces in ${var-val}.
-# It thinks the first close brace ends the variable substitution.
-test -z "$INSTALL_PROGRAM" && INSTALL_PROGRAM='${INSTALL}'
-
-test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL_PROGRAM}'
-
-test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 
 
 case "`uname -s`" in
@@ -671,7 +581,7 @@ if test "${with_tcl+set}" = set; then
 fi
 
 	echo $ac_n "checking for Tcl configuration""... $ac_c" 1>&6
-echo "configure:675: checking for Tcl configuration" >&5
+echo "configure:585: checking for Tcl configuration" >&5
 	if eval "test \"`echo '$''{'ac_cv_c_tclconfig'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -741,7 +651,7 @@ fi
 
 
     echo $ac_n "checking for existence of $TCL_BIN_DIR/tclConfig.sh""... $ac_c" 1>&6
-echo "configure:745: checking for existence of $TCL_BIN_DIR/tclConfig.sh" >&5
+echo "configure:655: checking for existence of $TCL_BIN_DIR/tclConfig.sh" >&5
 
     if test -f "$TCL_BIN_DIR/tclConfig.sh" ; then
         echo "$ac_t""loading" 1>&6
@@ -797,7 +707,7 @@ if test "${with_tk+set}" = set; then
 fi
 
 	echo $ac_n "checking for Tk configuration""... $ac_c" 1>&6
-echo "configure:801: checking for Tk configuration" >&5
+echo "configure:711: checking for Tk configuration" >&5
 	if eval "test \"`echo '$''{'ac_cv_c_tkconfig'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -865,7 +775,7 @@ fi
 
 
     echo $ac_n "checking for existence of $TK_BIN_DIR/tkConfig.sh""... $ac_c" 1>&6
-echo "configure:869: checking for existence of $TK_BIN_DIR/tkConfig.sh" >&5
+echo "configure:779: checking for existence of $TK_BIN_DIR/tkConfig.sh" >&5
 
     if test -f "$TK_BIN_DIR/tkConfig.sh" ; then
         echo "$ac_t""loading" 1>&6
@@ -881,8 +791,9 @@ echo "configure:869: checking for existence of $TK_BIN_DIR/tkConfig.sh" >&5
 
 
 #--------------------------------------------------------------------
-#   See if there was a command-line option for where Itcl is;  if
-#   not, search for Itcl.
+# See if --with-itcl was specified to give the [incr Tcl] and [incr Tk]
+# source code location.  If not, then we'll assume that the Iwidgets
+# package is being installed directly beneath the toplevel Itcl directory.
 #--------------------------------------------------------------------
 
 # Check whether --with-itcl or --without-itcl was given.
@@ -890,61 +801,67 @@ if test "${with_itcl+set}" = set; then
   withval="$with_itcl"
   itcl_search=$withval
 else
-  itcl_search=`cd ${srcdir}/../itcl; pwd`
+  itcl_search=`cd ${IWIDGETS_SRC_DIR}/..; pwd`
 fi
 
 
 ITCL_LIB_DIR=""
-for dir in $exec_prefix/lib $TCL_LIB_DIR $itcl_search ; do
-    if test -r $dir/library/itcl.tcl; then
-        ITCL_LIB_DIR=$dir
-        ITCL_SRC_DIR=$dir
-        break
+if test -r $itcl_search/itcl/library/itcl.tcl; then
+    if test -r $itcl_search/itk/library/itk.tcl; then
+        if test -r $itcl_search/config/mkinstalldirs; then
+            ITCL_LIB_DIR=$itcl_search/itcl/library
+            ITCL_SRC_DIR=$itcl_search/itcl
+            ITK_LIB_DIR=$itcl_search/itk/library
+            ITK_SRC_DIR=$itcl_search/itk
+        fi
     fi
-done
+fi
 
 if test -z "$ITCL_LIB_DIR"; then
-    { echo "configure: error: Can't find Itcl libraries.  Use --with-itcl to specify the directory containing itcl.tcl on your system." 1>&2; exit 1; }
+    { echo "configure: error: Can't find Itcl source.  Use --with-itcl to specify the the toplevel incr Tcl directory on your system.  (This directory should contain itcl/library/itcl.tcl, itk/library/itk.tcl, and config/mkinstalldirs.)" 1>&2; exit 1; }
 fi
 
-#--------------------------------------------------------------------
-#   See if there was a command-line option for where Itk is;  if
-#   not, search for Itk.
-#--------------------------------------------------------------------
-
-# Check whether --with-itk or --without-itk was given.
-if test "${with_itk+set}" = set; then
-  withval="$with_itk"
-  itk_search=$withval
-else
-  itk_search=`cd ${srcdir}/../itk; pwd`
-fi
-
-
-ITK_LIB_DIR=""
-for dir in $exec_prefix/lib $TCL_LIB_DIR $itk_search ; do
-    if test -r $dir/library/itk.tcl; then
-        ITK_LIB_DIR=$dir
-        ITK_SRC_DIR=$dir
-        break
-    fi
-done
-
-if test -z "$ITK_LIB_DIR"; then
-    { echo "configure: error: Can't find Itk libraries.  Use --with-itk to specify the directory containing itk.tcl on your system." 1>&2; exit 1; }
-fi
 
 #--------------------------------------------------------------------
 #   Needed for running the test suite
 #--------------------------------------------------------------------
 
-# CYGNUS LOCAL
-# END CYGNUS LOCAL
+
+    echo $ac_n "checking for tclsh""... $ac_c" 1>&6
+echo "configure:832: checking for tclsh" >&5
+
+    if eval "test \"`echo '$''{'ac_cv_path_tclsh'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  
+	search_path=`echo ${exec_prefix}/bin:${prefix}/bin:${TCL_BIN_DIR}:${TCL_BIN_DIR}/../bin:${PATH} | sed -e 's/:/ /g'`
+	for dir in $search_path ; do
+	    for j in `ls -r $dir/tclsh[8-9]*${EXEEXT} 2> /dev/null` \
+		    `ls -r $dir/tclsh*${EXEEXT} 2> /dev/null` ; do
+		if test x"$ac_cv_path_tclsh" = x ; then
+		    if test -f "$j" ; then
+			ac_cv_path_tclsh=$j
+			break
+		    fi
+		fi
+	    done
+	done
+    
+fi
+
+
+    if test -f "$ac_cv_path_tclsh" ; then
+	TCLSH_PROG=$ac_cv_path_tclsh
+	echo "$ac_t""$TCLSH_PROG" 1>&6
+    else
+	{ echo "configure: error: No tclsh found in PATH:  $search_path" 1>&2; exit 1; }
+    fi
+    
+
 
 #--------------------------------------------------------------------
 #   Fill in template files with the proper info.
 #--------------------------------------------------------------------
-#AC_SUBST(BUILD_DIR)
 
 
 
@@ -952,12 +869,6 @@ fi
 
 
 
-
-
-#AC_SUBST(ITCL_VERSION)
-#AC_SUBST(IWIDGETS_VERSION)
-#AC_SUBST(IWIDGETS_LIBRARY)
-#AC_SUBST(IWIDGETS_SRC_DIR)
 
 trap '' 1 2 15
 cat > confcache <<\EOF
@@ -1025,34 +936,15 @@ trap 'rm -f $CONFIG_STATUS conftest*; exit 1' 1 2 15
 # Transform confdefs.h into DEFS.
 # Protect against shell expansion while executing Makefile rules.
 # Protect against Makefile macro expansion.
-#
-# If the first sed substitution is executed (which looks for macros that
-# take arguments), then we branch to the quote section.  Otherwise,
-# look for a macro that doesn't take arguments.
-cat >confdef2opt.sed <<\_ACEOF
-t clear
-: clear
-s,^[ 	]*#[ 	]*define[ 	][ 	]*\([^ 	(][^ 	(]*([^)]*)\)[ 	]*\(.*\),-D\1=\2,g
-t quote
-s,^[ 	]*#[ 	]*define[ 	][ 	]*\([^ 	][^ 	]*\)[ 	]*\(.*\),-D\1=\2,g
-t quote
-d
-: quote
-s,[ 	`~#$^&*(){}\\|;'"<>?],\\&,g
-s,\[,\\&,g
-s,\],\\&,g
-s,\$,$$,g
-p
-_ACEOF
-# We use echo to avoid assuming a particular line-breaking character.
-# The extra dot is to prevent the shell from consuming trailing
-# line-breaks from the sub-command output.  A line-break within
-# single-quotes doesn't work because, if this script is created in a
-# platform that uses two characters for line-breaks (e.g., DOS), tr
-# would break.
-ac_LF_and_DOT=`echo; echo .`
-DEFS=`sed -n -f confdef2opt.sed confdefs.h | tr "$ac_LF_and_DOT" ' .'`
-rm -f confdef2opt.sed
+cat > conftest.defs <<\EOF
+s%#define \([A-Za-z_][A-Za-z0-9_]*\) *\(.*\)%-D\1=\2%g
+s%[ 	`~#$^&*(){}\\|;'"<>?]%\\&%g
+s%\[%\\&%g
+s%\]%\\&%g
+s%\$%$$%g
+EOF
+DEFS=`sed -f conftest.defs confdefs.h | tr '\012' ' '`
+rm -f conftest.defs
 
 
 # Without the "./", some shells look in PATH for config.status.
@@ -1089,7 +981,6 @@ do
 done
 
 ac_given_srcdir=$srcdir
-ac_given_INSTALL="$INSTALL"
 
 trap 'rm -fr `echo "Makefile \
 	iwidgets.tcl \
@@ -1128,9 +1019,6 @@ s%@mandir@%$mandir%g
 s%@ITCL_VERSION@%$ITCL_VERSION%g
 s%@PACKAGE@%$PACKAGE%g
 s%@VERSION@%$VERSION%g
-s%@INSTALL_PROGRAM@%$INSTALL_PROGRAM%g
-s%@INSTALL_SCRIPT@%$INSTALL_SCRIPT%g
-s%@INSTALL_DATA@%$INSTALL_DATA%g
 s%@CYGPATH@%$CYGPATH%g
 s%@RELPATH@%$RELPATH%g
 s%@TCL_DBGX@%$TCL_DBGX%g
@@ -1151,12 +1039,12 @@ s%@TK_BIN_DIR@%$TK_BIN_DIR%g
 s%@TK_SRC_DIR@%$TK_SRC_DIR%g
 s%@TK_LIB_FILE@%$TK_LIB_FILE%g
 s%@TK_XINCLUDES@%$TK_XINCLUDES%g
-s%@TCL_LIB_DIR@%$TCL_LIB_DIR%g
-s%@TK_LIB_DIR@%$TK_LIB_DIR%g
+s%@TCLSH_PROG@%$TCLSH_PROG%g
 s%@ITCL_LIB_DIR@%$ITCL_LIB_DIR%g
 s%@ITCL_SRC_DIR@%$ITCL_SRC_DIR%g
 s%@ITK_LIB_DIR@%$ITK_LIB_DIR%g
 s%@ITK_SRC_DIR@%$ITK_SRC_DIR%g
+s%@IWIDGETS_SRC_DIR@%$IWIDGETS_SRC_DIR%g
 
 CEOF
 EOF
@@ -1235,10 +1123,6 @@ for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then
     top_srcdir="$ac_dots$ac_given_srcdir" ;;
   esac
 
-  case "$ac_given_INSTALL" in
-  [/$]*) INSTALL="$ac_given_INSTALL" ;;
-  *) INSTALL="$ac_dots$ac_given_INSTALL" ;;
-  esac
 
   echo creating "$ac_file"
   rm -f "$ac_file"
@@ -1254,7 +1138,6 @@ for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then
 s%@configure_input@%$configure_input%g
 s%@srcdir@%$srcdir%g
 s%@top_srcdir@%$top_srcdir%g
-s%@INSTALL@%$INSTALL%g
 " $ac_file_inputs | (eval "$ac_sed_cmds") > $ac_file
 fi; done
 rm -f conftest.s*

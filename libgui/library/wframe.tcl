@@ -1,11 +1,11 @@
 # wframe.tcl - Frame with a widget on its border.
-# Copyright (C) 1997 Cygnus Solutions.
+# Copyright (C) 1997,2008 Red Hat, Inc.
 # Written by Tom Tromey <tromey@cygnus.com>.
 
-itcl_class Widgetframe {
+itcl::class Widgetframe {
   # Where to put the widget.  For now, we don't support many anchors.
   # Augment as you like.
-  public anchor nw {
+  public variable anchor nw {
     if {$anchor != "nw" && $anchor != "n"} then {
       error "anchors nw and n are the only ones supported"
     }
@@ -14,9 +14,9 @@ itcl_class Widgetframe {
 
   # The name of the widget to put on the frame.  This is set by some
   # subclass calling the _add method.  Private variable.
-  protected _widget {}
+  protected variable _widget {}
 
-  constructor {config} {
+  constructor {} {
     # The standard widget-making trick.
     set class [$this info class]
     set hull [namespace tail $this]
@@ -39,7 +39,8 @@ itcl_class Widgetframe {
     grid rowconfigure [namespace tail $this].iframe 1 -weight 1
     grid columnconfigure [namespace tail $this].iframe 0 -weight 1
 
-    bind [namespace tail $this].iframe <Destroy> [list $this delete]
+    bind [namespace tail $this].iframe <Destroy> \
+	[itcl::code itcl::delete object $this]
   }
 
   destructor {

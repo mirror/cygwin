@@ -1,18 +1,18 @@
 # lframe.tcl - Labelled frame widget.
-# Copyright (C) 1997 Cygnus Solutions.
+# Copyright (C) 1997,2008 Red Hat, Inc.
 # Written by Tom Tromey <tromey@cygnus.com>.
 
-itcl_class Labelledframe {
+itcl::class Labelledframe {
   inherit Widgetframe
 
   # The label text.
-  public text {} {
+  public variable text {} {
     if {[winfo exists [namespace tail $this].label]} then {
       [namespace tail $this].label configure -text $text
     }
   }
 
-  constructor {config} {
+  constructor {} {
     label [namespace tail $this].label -text $text -padx 2
     _add [namespace tail $this].label
   }

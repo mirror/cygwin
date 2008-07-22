@@ -1,5 +1,5 @@
 # balloon.tcl - Balloon help.
-# Copyright (C) 1997, 1998, 2000 Cygnus Solutions.
+# Copyright (C) 1997, 1998, 2000, 2008 Red Hat, Inc.
 # Written by Tom Tromey <tromey@cygnus.com>.
 
 # KNOWN BUGS:
@@ -7,36 +7,36 @@
 #   presently they are hard-coded.
 # * Likewise, balloon positioning on Windows is a hack.
 
-itcl_class Balloon {
+itcl::class Balloon {
   # Name of associated global variable which should be set whenever
   # the help is shown.
-  public variable {}
+  public variable varname {}
 
   # Name of associated toplevel.  Private variable.
-  protected _top {}
+  protected variable _top {}
 
   # This is non-empty if there is an after script pending.  Private
   # method.
-  protected _after_id {}
+  protected variable _after_id {}
 
   # This is an array mapping window name to help text.
-  protected _help_text
+  protected variable _help_text
 
   # This is an array mapping window name to notification proc.
-  protected _notifiers
+  protected variable _notifiers
 
   # This is set to the name of the parent widget whenever the mouse is
   # in a widget with balloon help.
-  protected _active {}
+  protected variable _active {}
 
   # This is true when we're already calling a notification proc.
   # Private variable.
-  protected _in_notifier 0
+  protected variable _in_notifier 0
 
   # This holds the parent of the most recently entered widget.  It is
   # used to determine when the user is moving through a toolbar.
   # Private variable.
-  protected _recent_parent {}
+  protected variable _recent_parent {}
 
   constructor {top} {
     global tcl_platform
@@ -92,7 +92,7 @@ itcl_class Balloon {
     # Clean up when the label is destroyed.  This has the hidden
     # assumption that the balloon widget is a child of the toplevel to
     # which it is connected.
-    bind [namespace tail $this].label <Destroy> [list $this delete]
+    bind [namespace tail $this].label <Destroy> [itcl::code itcl::delete object $this]
   }
 
   destructor {
@@ -100,8 +100,6 @@ itcl_class Balloon {
     catch {after cancel [list $this _unshowballoon]}
     catch {destroy $this}
   }
-
-  method configure {config} {}
 
   # Register a notifier for a window.
   method notify {command window {tag {}}} {
@@ -256,16 +254,16 @@ itcl_class Balloon {
     if {$index == ""} then {
       set value ""
     } elseif {[info exists _notifiers($index)] && ! $_in_notifier} then {
-      if {$variable != ""} {
-	upvar $variable var
+      if {$varname != ""} {
+	upvar $varname var
 	set var $_help_text($index)
       }
       set _in_notifier 1
       uplevel \#0 $_notifiers($index)
       set _in_notifier 0
       # Get value afterwards to give notifier a chance to change it.
-      if {$variable != ""} {
-	upvar $variable var
+      if {$varname != ""} {
+	upvar $varname var
 	set _help_text($index) $var
       } 
       set value $_help_text($index)
@@ -273,8 +271,8 @@ itcl_class Balloon {
       set value $_help_text($index)
     }
 
-    if {$variable != ""} then {
-      upvar $variable var
+    if {$varname != ""} then {
+      upvar $varname var
       set var $value
     }
   }
@@ -401,7 +399,7 @@ itcl_class Balloon {
     # Decode window name.
     regsub -all -- ! $name . name
 
-    if {$variable == ""} then {
+    if {$varname == ""} then {
       # There's no point to doing anything.
       return
     }
@@ -493,12 +491,12 @@ proc BALLOON_command_variable {window args} {
   if {[llength $args] == 0} then {
     # Fetch.
     set b [BALLOON_find_balloon $window]
-    return [$b cget -variable]
+    return [$b cget -varname]
   } else {
     # FIXME: no arg checking here.
     # Set.
     set b [BALLOON_find_balloon $window]
-    $b configure -variable [lindex $args 0]
+    $b configure -varname [lindex $args 0]
   }
 }
 

@@ -17,38 +17,18 @@ PACKAGES = combobox.tcl
 guidir = $(datadir)/redhat/gui
 gui_DATA = tclIndex pkgIndex.tcl $(TCL) $(PACKAGES)
 
-if TCL_SHARED
-SET_LIB_PATH = 	$(RPATH_ENVVAR)=$$here/../../tcl/unix:$$here/../../itcl/itcl/unix:$$$(RPATH_ENVVAR); export $(RPATH_ENVVAR);
-else
-SET_LIB_PATH = 
-endif
-
-WISH = wish
 
 if CROSS_COMPILING
-ITCL_SH = itclsh3.0
+TCLSH = tclsh8.4
 else
-ITCL_SH = @ITCL_SH@
+TCLSH = @TCLSH@
 endif
 
 if MAINTAINER_MODE
 tclIndex: $(TCL)
-	TCL_LIBRARY=$(srcdir)/../../tcl/library; export TCL_LIBRARY; \
-	here=`pwd`; \
-	$(SET_LIB_PATH) \
-	cd $(srcdir) && \
-	  echo "auto_mkindex $(LIBGUI_LIBRARY_DIR) $(TCL)" | $(ITCL_SH)
-
-pkgIndex.tcl: @MAINT@ $(PACKAGES)
-	here=`pwd`;	 \
-	$(SET_LIB_PATH) \
-	cd $(srcdir) && \
-	echo "pkg_mkIndex . $(PACKAGES); exit" | $(ITCL_SH)
+	 echo "package require Itcl; auto_mkindex $(LIBGUI_LIBRARY_DIR) $(TCL)" | $(TCLSH)
 else
 tclIndex:
-
-pkgIndex.tcl:
-
 endif
 
 ETAGS_ARGS = --lang=none --regex='/[ \t]*\(proc\|method\|itcl_class\)[ \t]+\([^ \t]+\)/\1/' $(TCL) --lang=auto

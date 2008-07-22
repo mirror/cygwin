@@ -1,5 +1,5 @@
 # sendpr.tcl - GUI to send-pr.
-# Copyright (C) 1997 Cygnus Solutions.
+# Copyright (C) 1997,2008 Red Hat, Inc.
 # Written by Tom Tromey <tromey@cygnus.com>.
 
 # FIXME:
@@ -13,7 +13,7 @@
 # FIXME: shouldn't have global variable.
 defarray SENDPR_state
 
-itcl_class Sendpr {
+itcl::class Sendpr {
   inherit Ide_window
 
   # This array holds information about this site.  It is a private
@@ -198,7 +198,8 @@ itcl_class Sendpr {
     grid rowconfigure  [namespace tail $this] 3 -weight 1
     grid columnconfigure  [namespace tail $this] 0 -weight 1
 
-    bind [namespace tail $this].buttons <Destroy> [list $this delete]
+    bind [namespace tail $this].buttons <Destroy> \
+	[itcl::code itcl::delete object $this]
 
     wm deiconify  [namespace tail $this]
   }

@@ -14,8 +14,6 @@ AM_CONDITIONAL(CROSS_COMPILING, test x$cross_compiling = xyes)
 AM_CONDITIONAL(INSTALL_LIBGUI, test x$enable_install_libgui = xyes)
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 AC_CHECK_TOOL(AR, ar, :)
-AC_CHECK_PROG(ITCL_SH, itcl_sh, itcl_sh,
-	[\$\$here/\$(top_builddir)/../itcl/itcl/unix/itcl_sh\$(EXEEXT)])
 
 AC_FUNC_ALLOCA
 AC_HAVE_HEADERS(stddef.h stdlib.h getopt.h unistd.h fcntl.h sys/file.h sys/wait.h string.h strings.h)
@@ -81,44 +79,39 @@ else
 fi
 AC_SUBST(LIBGUI_LIBRARY_DIR)
 
-# Find the init.tcl file.
-
-AC_MSG_CHECKING(for init.tcl)
-AC_CACHE_VAL(ac_cv_c_tcl_libdir,[
-dnl currently, only check the source tree
-if test -f $srcdir/../tcl/library/init.tcl ; then
-  ac_cv_c_tcl_libdir=`cd $srcdir/../tcl/library; pwd`
-elif test -f $srcdir/../tcl8.1/library/init.tcl; then
-  ac_cv_c_tcl_libdir=`cd $srcdir/../tcl8.1/library; pwd`
-fi
-])
-AC_MSG_RESULT(${ac_cv_c_tcl_libdir})
-
-if test x"$ac_cv_prog_CC" = xcl; then
-  tmp2="`cygpath --windows $ac_cv_c_tcl_libdir`"
-  TCL_LIBRARY="`echo $tmp2 | sed -e s#\\\\\\\\#/#g`"
-else
-  TCL_LIBRARY=$ac_cv_c_tcl_libdir
-fi
-AC_SUBST(TCL_LIBRARY)
-
 # Check for Tcl and Tk.
-CYG_AC_PATH_TCLCONFIG
-CYG_AC_LOAD_TCLCONFIG
-CYG_AC_PATH_TKCONFIG
-CYG_AC_LOAD_TKCONFIG
-CYG_AC_PATH_TCLH
-# FIXME: consider only doing this if --with-x given.
-CYG_AC_PATH_TKH
+SC_PATH_TCLCONFIG
+SC_LOAD_TCLCONFIG
+SC_PATH_TKCONFIG
+SC_LOAD_TKCONFIG
+
+here=`pwd`
+cd ${srcdir}/..
+topdir=`pwd`
+cd ${here}
+
+if test "${TCL_SRC_DIR}" = "${topdir}/tcl"; then
+  # Using in-tree Tcl/Tk
+  TCL_INCLUDES="-I${TCL_SRC_DIR}/generic"
+  TCL_LIBRARY=${TCL_BUILD_LIB_SPEC}
+  TK_INCLUDES="-I${TK_SRC_DIR}/generic"
+  TK_LIBRARY=${TK_BUILD_LIB_SPEC}
+else
+  # Using installed Tcl/Tk
+  TCL_INCLUDES=${TCL_INCLUDE_SPEC}
+  TCL_LIBRARY=${TCL_LIB_SPEC}
+  TK_INCLUDES=${TK_INCLUDE_SPEC}
+  TK_LIBRARY=${TK_LIB_SPEC}
+fi
 
 AC_SUBST(TCL_DEFS)
+AC_SUBST(TCL_INCLUDES)
 AC_SUBST(TK_DEFS)
-AC_SUBST(TCLHDIR)
-AC_SUBST(TKHDIR)
+AC_SUBST(TK_INCLUDES)
 AC_SUBST(TK_XINCLUDES)
 AC_SUBST(TCL_LIBS)
-AC_SUBST(TK_BUILD_LIB_SPEC)
-AC_SUBST(TCL_BUILD_LIB_SPEC)
+AC_SUBST(TK_LIBRARY)
+AC_SUBST(TCL_LIBRARY)
 AC_SUBST(TK_LIBS)
 
 AM_CONDITIONAL(TCL_SHARED, test x$TCL_SHARED_BUILD = x1)

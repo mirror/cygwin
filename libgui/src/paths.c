@@ -1,5 +1,5 @@
 /* paths.c - Find IDE and application Tcl libraries.
-   Copyright (C) 1997 Cygnus Solutions.
+   Copyright (C) 1997, 2008 Red Hat, Inc.
    Written by Tom Tromey <tromey@cygnus.com>.  */
 
 #include <tk.h>
@@ -50,7 +50,6 @@
 static char init_script[] = "\
 proc initialize_paths {} {\n\
   global ide_application_name auto_path env Paths\n\
-  global tcl_library\n\
   rename initialize_paths {}\n\
   # First find the GUI library.\n\
   set guidirs {}\n\
@@ -93,7 +92,11 @@ proc initialize_paths {} {\n\
   set Paths(exec_prefix) [file dirname [pwd]]\n\
   cd $here\n\
   # Try to handle running from the build tree:\n\
-  lappend guidirs [file join [file dirname [file dirname $tcl_library]] libgui library]\n\
+  # We check for the two most common installations:\n\
+  # exec_dir/../ (if built in the source tree)\n\
+  # exec_dir/../../src (if using builddir & CVS)\n\
+  lappend guidirs [file join [file dirname $Paths(exec_prefix)] libgui library]\n\
+  lappend guidirs [file join [file dirname $Paths(exec_prefix)] src libgui library]\n\
   foreach sd $guidirs {\n\
     if {[file exists [file join $sd tclIndex]]} {\n\
       lappend auto_path $sd\n\
@@ -110,7 +113,7 @@ proc initialize_paths {} {\n\
     lappend idedirs [file join $d redhat ide]\n\
   }\n\
   # Try to handle running from the build tree:\n\
-  lappend idedirs [file join [file dirname [file dirname $tcl_library]] libide library]\n\
+  lappend idedirs [file join [file dirname [file dirname $::tcl_library]] libide library]\n\
   foreach sd $idedirs {\n\
     if {[file exists [file join $sd tclIndex]]} {\n\
       lappend auto_path $sd\n\

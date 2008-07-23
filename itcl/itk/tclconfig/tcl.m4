@@ -48,6 +48,13 @@ AC_DEFUN(TEA_PATH_TCLCONFIG, [
 	AC_MSG_CHECKING([for Tcl configuration])
 	AC_CACHE_VAL(ac_cv_c_tclconfig,[
 
+            # For platform-specific directories
+            case $TEA_PLATFORM in
+              windows) platform="win" ;;
+              unix) platform="unix" ;;
+              *) AC_MSG_ERROR([unknown TEA_PLATFORM: \"$TEA_PLATFORM\"])
+            esac
+
 	    # First check to see if --with-tcl was specified.
 	    if test x"${with_tclconfig}" != x ; then
 		case ${with_tclconfig} in
@@ -79,8 +86,8 @@ AC_DEFUN(TEA_PATH_TCLCONFIG, [
                         `ls -dr ../../../tcl[[8-9]].[[0-9]].[[0-9]]* 2>/dev/null` \
                         `ls -dr ../../../tcl[[8-9]].[[0-9]] 2>/dev/null` \
 			`ls -dr ../../../tcl[[8-9]].[[0-9]]* 2>/dev/null` ; do
-		    if test -f "$i/unix/tclConfig.sh" ; then
-			ac_cv_c_tclconfig=`(cd $i/unix; pwd)`
+		    if test -f "$i/$platform/tclConfig.sh" ; then
+			ac_cv_c_tclconfig=`(cd $i/$platform; pwd)`
 			break
 		    fi
 		done
@@ -108,10 +115,11 @@ AC_DEFUN(TEA_PATH_TCLCONFIG, [
 			`ls -dr ${srcdir}/../tcl[[8-9]].[[0-9]].[[0-9]]* 2>/dev/null` \
 			`ls -dr ${srcdir}/../tcl[[8-9]].[[0-9]] 2>/dev/null` \
 			`ls -dr ${srcdir}/../tcl[[8-9]].[[0-9]]* 2>/dev/null` ; do
-		    if test -f "$i/unix/tclConfig.sh" ; then
-		    ac_cv_c_tclconfig=`(cd $i/unix; pwd)`
-		    break
-		fi
+                   
+		    if test -f "$i/$platform/tclConfig.sh" ; then
+		      ac_cv_c_tclconfig=`(cd $i/$platform; pwd)`
+		      break
+		    fi
 		done
 	    fi
 	])
@@ -160,6 +168,13 @@ AC_DEFUN(TEA_PATH_TKCONFIG, [
 	AC_MSG_CHECKING([for Tk configuration])
 	AC_CACHE_VAL(ac_cv_c_tkconfig,[
 
+            # For platform-specific directories
+            case $TEA_PLATFORM in
+              windows) platform="win" ;;
+              unix) platform="unix" ;;
+              *) AC_MSG_ERROR([unknown TEA_PLATFORM: \"$TEA_PLATFORM\"])
+            esac
+
 	    # First check to see if --with-tkconfig was specified.
 	    if test x"${with_tkconfig}" != x ; then
 		case ${with_tkconfig} in
@@ -191,8 +206,8 @@ AC_DEFUN(TEA_PATH_TKCONFIG, [
 			`ls -dr ../../../tk[[8-9]].[[0-9]].[[0-9]]* 2>/dev/null` \
 			`ls -dr ../../../tk[[8-9]].[[0-9]] 2>/dev/null` \
 			`ls -dr ../../../tk[[8-9]].[[0-9]]* 2>/dev/null` ; do
-		    if test -f "$i/unix/tkConfig.sh" ; then
-			ac_cv_c_tkconfig=`(cd $i/unix; pwd)`
+		    if test -f "$i/$platform/tkConfig.sh" ; then
+			ac_cv_c_tkconfig=`(cd $i/$platform; pwd)`
 			break
 		    fi
 		done
@@ -218,8 +233,8 @@ AC_DEFUN(TEA_PATH_TKCONFIG, [
 			`ls -dr ${srcdir}/../tk[[8-9]].[[0-9]].[[0-9]]* 2>/dev/null` \
 			`ls -dr ${srcdir}/../tk[[8-9]].[[0-9]] 2>/dev/null` \
 			`ls -dr ${srcdir}/../tk[[8-9]].[[0-9]]* 2>/dev/null` ; do
-		    if test -f "$i/unix/tkConfig.sh" ; then
-			ac_cv_c_tkconfig=`(cd $i/unix; pwd)`
+		    if test -f "$i/$platform/tkConfig.sh" ; then
+			ac_cv_c_tkconfig=`(cd $i/$platform; pwd)`
 			break
 		    fi
 		done
@@ -3068,7 +3083,12 @@ AC_DEFUN(TEA_MAKE_LIB, [
 	    eval eval "PKG_LIB_FILE=${PACKAGE_NAME}${UNSHARED_LIB_SUFFIX}"
 	fi
 	# Some packages build there own stubs libraries
-	eval eval "PKG_STUB_LIB_FILE=${PACKAGE_NAME}stub${UNSHARED_LIB_SUFFIX}"
+        if test "$GCC" = "yes"; then
+	  eval eval "PKG_STUB_LIB_FILE=lib${PACKAGE_NAME}stub${UNSHARED_LIB_SUFFIX}"
+        else
+	   eval eval "PKG_STUB_LIB_FILE=${PACKAGE_NAME}stub${UNSHARED_LIB_SUFFIX}"
+	fi
+
 	# These aren't needed on Windows (either MSVC or gcc)
 	RANLIB=:
 	RANLIB_STUB=:

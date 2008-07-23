@@ -56,12 +56,12 @@ ItkStubs *itkStubsPtr;
 CONST char *
 Itk_InitStubs (interp, version, exact)
     Tcl_Interp *interp;
-    char *version;
+    CONST char *version;
     int exact;
 {
     CONST char *actualVersion;
     
-    actualVersion = Tcl_PkgRequireEx(interp, "Itk", version, exact,
+    actualVersion = Tcl_PkgRequireEx(interp, "Itk", (CONST84 char *)version, exact,
         (ClientData *) &itkStubsPtr);
 
     if (actualVersion == NULL) {

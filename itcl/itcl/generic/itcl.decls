@@ -33,18 +33,19 @@ declare 1 generic {
     int Itcl_SafeInit(Tcl_Interp *interp)
 }
 declare 2 generic {
-    int Itcl_RegisterC(Tcl_Interp *interp, char *name, \
+    int Itcl_RegisterC(Tcl_Interp *interp, CONST char *name, \
         Tcl_CmdProc *proc, ClientData clientData, \
         Tcl_CmdDeleteProc *deleteProc)
 }
 declare 3 generic {
-    int Itcl_RegisterObjC (Tcl_Interp *interp, char *name, \
+    int Itcl_RegisterObjC (Tcl_Interp *interp, CONST char *name, \
         Tcl_ObjCmdProc *proc, ClientData clientData, \
         Tcl_CmdDeleteProc *deleteProc)
 }
 declare 4 generic {
-    int Itcl_FindC(Tcl_Interp *interp, char *name, Tcl_CmdProc **argProcPtr, \
-        Tcl_ObjCmdProc **objProcPtr, ClientData *cDataPtr)
+    int Itcl_FindC(Tcl_Interp *interp, CONST char *name, \
+	Tcl_CmdProc **argProcPtr, Tcl_ObjCmdProc **objProcPtr, \
+	ClientData *cDataPtr)
 }
 declare 5 generic {
     void Itcl_InitStack(Itcl_Stack *stack)

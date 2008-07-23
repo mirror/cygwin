@@ -1,3 +1,30 @@
+2008-07-23  Keith Seitz  <keiths@redhat.com>
+
+	Import of Itcl 3.3.
+	* itcl/configure.in, itk/configure.in, iwidgets/configure.in:
+	Replace with configure.ac.
+	* itcl/configure, itk/configure, iwidgets/configure: Regenerate.
+	* configure.ac, Makefile.am, Makefile.in: New files.
+	* README: "New" file.
+	* aclocal.m4: Regenerate.
+	* itcl/Makefile.in (RANLIB): Replace with RANLIB_LIB so
+	that the toplevel build does not override this variable.
+	* itk/Makefile.in (RANLIB): Likewise.
+	* itcl/tclconfig/tcl.m4 (TEA_PATH_TCLCONFIG): Look for itclConfig.sh
+	in the platform-specific location (unix or win).
+	(TEA_PATH_TKCONFIG): Likewise.
+	(TEA_MAKE_LIB): Even on windows, GCC libraries must start with "lib".
+	* itk/tclconfig.m4: Copy of itcl/tcl.m4.
+	* iwidgets/tcl.m4: Remove.
+	* iwidgets/tclconfig: New directory.
+	* iwidgets/tclconfig/tcl.m4, iwidgets/tclconfig/install-sh: Copies
+	of itcl/tclconfig files.
+	* iwidgets/Makefile.in (MKINSTALLDIRS): Use mkdir -p.
+	* iwidgets/configure.ac (PACKAGE): Rename to PACKAGE_NAME.
+	Call TEA_INIT, add AC_CONFIG_AUX_DIR and AC_PROG_INSTALL.
+	Use TEA_* instead of SC_* macros.
+	Search a few more directories for the itcl and itk libraries.
+
 2006-06-16  Steve Ellcey  <sje@cup.hp.com>
 
 	* configure.in: Fix for autoconf 2.5.

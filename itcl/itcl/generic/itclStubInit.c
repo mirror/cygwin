@@ -139,12 +139,14 @@ ItclIntStubs itclIntStubs = {
     Itcl_EnsembleCmd, /* 107 */
     Itcl_EnsPartCmd, /* 108 */
     Itcl_EnsembleErrorCmd, /* 109 */
-    Itcl_OldInit, /* 110 */
-    Itcl_InstallOldBiMethods, /* 111 */
+    NULL, /* 110 */
+    NULL, /* 111 */
     _Tcl_GetCallFrame, /* 112 */
     _Tcl_ActivateCallFrame, /* 113 */
     _TclNewVar, /* 114 */
     Itcl_Assert, /* 115 */
+    Itcl_IsObjectCmd, /* 116 */
+    Itcl_IsClassCmd, /* 117 */
 };
 
 static ItclStubHooks itclStubHooks = {

@@ -5,27 +5,24 @@ dnl installation to configure the system for the local environment.
 AC_INIT(generic/buttonbox.itk)
 # RCS: $Id$
 
-#--------------------------------------------------------------------
-# We should really cache the ITCL_VERSION when we configure itcl,
-# and pick up the version from the cache here.
-#--------------------------------------------------------------------
-
 ITCL_VERSION=3.2
 AC_SUBST(ITCL_VERSION)
 
-PACKAGE=iwidgets
+PACKAGE_NAME=iwidgets
 MAJOR_VERSION=4
 MINOR_VERSION=0
 PATCHLEVEL=.1
 
 VERSION=${MAJOR_VERSION}.${MINOR_VERSION}${PATCHLEVEL}
+IWIDGETS_SRC_DIR=`pwd`
 
-AC_SUBST(PACKAGE)
+AC_SUBST(PACKAGE_NAME)
 AC_SUBST(VERSION)
 
-AC_CONFIG_AUX_DIR(../config)
 AC_PREREQ(2.0)
 
+TEA_INIT([3.2])
+AC_CONFIG_AUX_DIR(tclconfig)
 AC_PROG_INSTALL
 
 case "`uname -s`" in
@@ -47,84 +44,60 @@ AC_SUBST(RELPATH)
 #   not, search for Tcl.
 #--------------------------------------------------------------------
 
-SC_PATH_TCLCONFIG
-SC_LOAD_TCLCONFIG
+TEA_PATH_TCLCONFIG
+TEA_LOAD_TCLCONFIG
 
 #--------------------------------------------------------------------
 #   See if there was a command-line option for where Tk is;  if
 #   not, search for Tk.
 #--------------------------------------------------------------------
 
-SC_PATH_TKCONFIG
-SC_LOAD_TKCONFIG
+TEA_PATH_TKCONFIG
+TEA_LOAD_TKCONFIG
 
 #--------------------------------------------------------------------
-#   See if there was a command-line option for where Itcl is;  if
-#   not, search for Itcl.
+# See if --with-itcl was specified to give the [incr Tcl] and [incr Tk]
+# source code location.  If not, then we'll assume that the Iwidgets
+# package is being installed directly beneath the toplevel Itcl directory.
 #--------------------------------------------------------------------
 
 AC_ARG_WITH(itcl, [  --with-itcl=DIR         use Itcl 3.0 binaries from DIR],
-        itcl_search=$withval, itcl_search=`cd ${srcdir}/../itcl; pwd`)
+        itcl_search=$withval, itcl_search=`cd ${IWIDGETS_SRC_DIR}/..; pwd`)
 
 ITCL_LIB_DIR=""
-for dir in $exec_prefix/lib $TCL_LIB_DIR $itcl_search ; do
-    if test -r $dir/library/itcl.tcl; then
-        ITCL_LIB_DIR=$dir
-        ITCL_SRC_DIR=$dir
-        break
-    fi
+for dir in $exec_prefix/lib $TCL_LIB_DIR $TCL_SRC_DIR/../itcl $itcl_search ; do
+  if test -r $dir/itcl/library/itcl.tcl; then
+      if test -r $dir/itk/library/itk.tcl; then
+            ITCL_LIB_DIR=$dir/itcl/library
+            ITCL_SRC_DIR=$dir/itcl
+            ITK_LIB_DIR=$dir/itk/library
+            ITK_SRC_DIR=$dir/itk
+      fi
+  fi
 done
 
 if test -z "$ITCL_LIB_DIR"; then
-    AC_MSG_ERROR(Can't find Itcl libraries.  Use --with-itcl to specify the directory containing itcl.tcl on your system.)
+    AC_MSG_ERROR(Can't find Itcl source.  Use --with-itcl to specify the the toplevel [incr Tcl] directory on your system.  (This directory should contain itcl/library/itcl.tcl, itk/library/itk.tcl, and config/mkinstalldirs.))
 fi
 
-#--------------------------------------------------------------------
-#   See if there was a command-line option for where Itk is;  if
-#   not, search for Itk.
-#--------------------------------------------------------------------
-
-AC_ARG_WITH(itk, [  --with-itk=DIR          use Itk 3.0 binaries from DIR],
-        itk_search=$withval, itk_search=`cd ${srcdir}/../itk; pwd`)
-
-ITK_LIB_DIR=""
-for dir in $exec_prefix/lib $TCL_LIB_DIR $itk_search ; do
-    if test -r $dir/library/itk.tcl; then
-        ITK_LIB_DIR=$dir
-        ITK_SRC_DIR=$dir
-        break
-    fi
-done
-
-if test -z "$ITK_LIB_DIR"; then
-    AC_MSG_ERROR(Can't find Itk libraries.  Use --with-itk to specify the directory containing itk.tcl on your system.)
-fi
+TEA_SETUP_COMPILER
 
 #--------------------------------------------------------------------
 #   Needed for running the test suite
 #--------------------------------------------------------------------
 
-# CYGNUS LOCAL
-dnl SC_PROG_TCLSH
-# END CYGNUS LOCAL
+TEA_PROG_TCLSH
 
 #--------------------------------------------------------------------
 #   Fill in template files with the proper info.
 #--------------------------------------------------------------------
-#AC_SUBST(BUILD_DIR)
-AC_SUBST(TCL_LIB_DIR)
 AC_SUBST(TCL_SRC_DIR)
-AC_SUBST(TK_LIB_DIR)
 AC_SUBST(TK_SRC_DIR)
 AC_SUBST(ITCL_LIB_DIR)
 AC_SUBST(ITCL_SRC_DIR)
 AC_SUBST(ITK_LIB_DIR)
 AC_SUBST(ITK_SRC_DIR)
-
-#AC_SUBST(ITCL_VERSION)
-#AC_SUBST(IWIDGETS_VERSION)
-#AC_SUBST(IWIDGETS_LIBRARY)
-#AC_SUBST(IWIDGETS_SRC_DIR)
+AC_SUBST(IWIDGETS_SRC_DIR)
 
 AC_OUTPUT(Makefile \
 	iwidgets.tcl \

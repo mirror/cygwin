@@ -1,3 +1,11 @@
+2008-08-02  Keith Seitz  <keiths@redhat.com>
+
+	* itk/configure.ac: Add missing bits to actually fill in
+	itkConfig.sh.
+	* itk/itkConfig.sh.in: Rewrite substitution values so that
+	this file looks more like itcl/itclConfig.sh.in.
+	* itk/configure: Regenerated.
+
 2008-07-23  Keith Seitz  <keiths@redhat.com>
 
 	Import of Itcl 3.3.

@@ -219,7 +219,9 @@ fi
 # library.
 #--------------------------------------------------------------------
 
-AC_SUBST(itkstub_LIB_FILE)
+itk_STUB_LIB_FILE=${PKG_STUB_LIB_FILE}
+itk_LIB_FILE=${PKG_LIB_FILE}
+AC_SUBST(itk_STUB_LIB_FILE)
 AC_SUBST(itk_LIB_FILE)
 
 #--------------------------------------------------------------------
@@ -232,6 +234,39 @@ AC_SUBST(itk_LIB_FILE)
 
 TEA_PROG_TCLSH
 TEA_PROG_WISH
+
+#--------------------------------------------------------------------
+# These are for itkConfig.sh
+#--------------------------------------------------------------------
+
+# pkglibdir must be a fully qualified path and (not ${exec_prefix/lib)
+eval pkglibdir="${libdir}/${PACKAGE_NAME}${PACKAGE_VERSION}"
+if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
+    eval itk_LIB_FLAG="-litk${PACKAGE_VERSION}${DBGX}"
+    eval itk_STUB_LIB_FLAG="-litclstub${PACKAGE_VERSION}${DBGX}"
+else
+    eval itk_LIB_FLAG="-litcl`echo ${PACKAGE_VERSION} | tr -d .`${DBGX}"
+    eval itk_STUB_LIB_FLAG="-litcl`echo ${PACKAGE_VERSION} | tr -d .`${DBGX}"
+fi
+itk_BUILD_LIB_SPEC="-L`pwd` ${itk_LIB_FLAG}"
+itk_LIB_SPEC="-L${pkglibdir} ${itk_LIB_FLAG}"
+
+itk_BUILD_STUB_LIB_SPEC="-L`pwd` ${itk_STUB_LIB_FLAG}"
+itk_STUB_LIB_SPEC="-L${pkglibdir} ${itk_STUB_LIB_FLAG}"
+itk_BUILD_STUB_LIB_PATH="`pwd`/${itk_STUB_LIB_FILE}"
+itk_STUB_LIB_PATH="${pkglibdir}/${itk_STUB_LIB_FILE}"
+
+AC_SUBST(itk_BUILD_LIB_SPEC)
+AC_SUBST(itk_LIB_SPEC)
+AC_SUBST(itk_BUILD_STUB_LIB_SPEC)
+AC_SUBST(itk_STUB_LIB_SPEC)
+AC_SUBST(itk_BUILD_STUB_LIB_PATH)
+AC_SUBST(itk_STUB_LIB_PATH)
+
+# itk_SRC_DIR must be a fully qualified path
+eval itk_SRC_DIR="$srcdir"
+itk_SRC_DIR=`cd "${itk_SRC_DIR}"; pwd`
+AC_SUBST(itk_SRC_DIR)
 
 #--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.

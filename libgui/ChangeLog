@@ -1,3 +1,18 @@
+2008-08-02  Keith Seitz  <keiths@redhat.com>
+
+	* tcl.m4: Remove. I changed my mind.
+	* acinclude.m4: Include ../config/tcl.m4.
+	(CY_AC_TCL_PRIVATE_HEADERS): New macro.
+	(CY_AC_TK_PRIVATE_HEADERS): New macro.
+	* configure.ac: When using in-tree tcl/tk, include
+	Tcl's/Tk's platform directory.
+	When using installed Tcl/Tk, use CY_AC_{TCL,TK}_PRIVATE_HEADERS
+	to find the private header files.
+	* aclocal.m4: Regenerated.
+	* configure: Regenerated.
+	* library/Makefile.in: Regenerated.
+	* src/Makefile.in: Regenerated.
+
 2008-07-22  Keith Seitz  <keiths@redhat.com>
 
 	* tcl.m4: New file.

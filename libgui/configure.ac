@@ -92,15 +92,22 @@ cd ${here}
 
 if test "${TCL_SRC_DIR}" = "${topdir}/tcl"; then
   # Using in-tree Tcl/Tk
-  TCL_INCLUDES="-I${TCL_SRC_DIR}/generic"
+  case "${host}" in
+    *-*-cygwin*) platDir="win" ;;
+    *) platDir="unix" ;;
+  esac
+
+  TCL_INCLUDES="-I${TCL_SRC_DIR}/generic -I${TCL_SRC_DIR}/${platDir}"
   TCL_LIBRARY=${TCL_BUILD_LIB_SPEC}
-  TK_INCLUDES="-I${TK_SRC_DIR}/generic"
+  TK_INCLUDES="-I${TK_SRC_DIR}/generic -I${TK_SRC_DIR}/${platDir}"
   TK_LIBRARY=${TK_BUILD_LIB_SPEC}
 else
   # Using installed Tcl/Tk
-  TCL_INCLUDES=${TCL_INCLUDE_SPEC}
+  CY_AC_TCL_PRIVATE_HEADERS
+  CY_AC_TK_PRIVATE_HEADERS
+  TCL_INCLUDES="${TCL_INCLUDE_SPEC} ${TCL_PRIVATE_INCLUDE}"
   TCL_LIBRARY=${TCL_LIB_SPEC}
-  TK_INCLUDES=${TK_INCLUDE_SPEC}
+  TK_INCLUDES="${TK_INCLUDE_SPEC} ${TK_PRIVATE_INCLUDE}"
   TK_LIBRARY=${TK_LIB_SPEC}
 fi
 

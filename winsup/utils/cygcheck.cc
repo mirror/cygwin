@@ -58,7 +58,7 @@ void package_list (int, char **);
 void dump_dodgy_apps (int verbose);
 
 
-static const char version[] = "$Revision: 1.101 $";
+static const char version[] = "$Revision: 1.102 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -2024,8 +2024,15 @@ load_cygwin (int& argc, char **&argv)
     {
       char **av = (char **) cygwin_internal (CW_ARGV);
       if (av && ((DWORD) av != (DWORD) -1))
-	for (argc = 0, argv = av; *av; av++)
-	  argc++;
+	{
+	  /* Copy cygwin's idea of the argument list into this Window application. */
+	  for (argc = 0; av[argc]; argc++)
+	    continue;
+	  argv = (char **) calloc (argc + 1, sizeof (char *));
+	  for (char **argvp = argv; *av; av++)
+	    *argvp++ = strdup (*av);
+	}
+
 
       char **envp = (char **) cygwin_internal (CW_ENVP);
       if (envp && ((DWORD) envp != (DWORD) -1))

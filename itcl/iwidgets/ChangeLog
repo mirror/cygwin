@@ -1,3 +1,9 @@
+2008-08-07  Doug Evans  <dje@google.com>
+
+	* tclconfig/tcl.m4 (TEA_CONFIG_CFLAGS): Remove extranous single quote.
+	Fix quoting of arg to awk.
+	(TEA_BLOCKING_STYLE): Ditto.
+
 =-=-=-=-=-=-=-=-=-=-= BEGIN IWIDGETS 4.0.1 CHANGES =-=-=-=-=-=-=-=-=-=-=-
 2002-09-09  Chad Smith  <csmith@adc.com>
     * Makefile.in: SF ticket 227921

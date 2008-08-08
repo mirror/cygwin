@@ -6947,7 +6947,7 @@ echo "${ECHO_T}unknown (can't find uname command)" >&6; }
 	    # results, and the version is kept in special file).
 
 	    if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
-		system=MP-RAS-`awk '{print }' /etc/.relid'`
+		system=MP-RAS-`awk '{print $3}' /etc/.relid`
 	    fi
 	    if test "`uname -s`" = "AIX" ; then
 		system=AIX-`uname -v`.`uname -r`
@@ -8684,7 +8684,7 @@ _ACEOF
 		arch=`isainfo`
 		if test "$arch" = "sparcv9 sparc" ; then
 			if test "$GCC" = "yes" ; then
-			    if test "`gcc -dumpversion` | awk -F. '{print }'" -lt "3" ; then
+			    if test "`gcc -dumpversion` | awk -F. '{print $1}'" -lt "3" ; then
 				{ echo "$as_me:$LINENO: WARNING: 64bit mode not supported with GCC < 3.2 on $system" >&5
 echo "$as_me: WARNING: 64bit mode not supported with GCC < 3.2 on $system" >&2;}
 			    else

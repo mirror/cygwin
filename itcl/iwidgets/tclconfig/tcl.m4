@@ -9,7 +9,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: tcl.m4,v 1.1 2008/07/23 22:44:52 kseitz Exp $
+# RCS: @(#) $Id: tcl.m4,v 1.2 2008/08/08 02:54:39 devans Exp $
 
 AC_PREREQ(2.50)
 
@@ -809,7 +809,7 @@ AC_DEFUN(TEA_CONFIG_CFLAGS, [
 	    # results, and the version is kept in special file).
 	
 	    if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
-		system=MP-RAS-`awk '{print $3}' /etc/.relid'`
+		system=MP-RAS-`awk '{print $[3]}' /etc/.relid`
 	    fi
 	    if test "`uname -s`" = "AIX" ; then
 		system=AIX-`uname -v`.`uname -r`
@@ -1621,7 +1621,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 		arch=`isainfo`
 		if test "$arch" = "sparcv9 sparc" ; then
 			if test "$GCC" = "yes" ; then
-			    if test "`gcc -dumpversion` | awk -F. '{print $1}'" -lt "3" ; then
+			    if test "`gcc -dumpversion` | awk -F. '{print $[1]}'" -lt "3" ; then
 				AC_MSG_WARN([64bit mode not supported with GCC < 3.2 on $system])
 			    else
 				do64bit_ok=yes
@@ -2223,7 +2223,7 @@ AC_DEFUN(TEA_BLOCKING_STYLE, [
 	    # results, and the version is kept in special file).
 	
 	    if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
-		system=MP-RAS-`awk '{print $3}' /etc/.relid'`
+		system=MP-RAS-`awk '{print $[3]}' /etc/.relid`
 	    fi
 	    if test "`uname -s`" = "AIX" ; then
 		system=AIX-`uname -v`.`uname -r`

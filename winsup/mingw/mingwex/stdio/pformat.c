@@ -5,7 +5,7 @@
 
 /* pformat.c
  *
- * $Id: pformat.c,v 1.1 2008/07/28 23:24:20 keithmarshall Exp $
+ * $Id: pformat.c,v 1.2 2008/08/27 20:23:42 keithmarshall Exp $
  *
  * Provides a core implementation of the formatting capabilities
  * common to the entire `printf()' family of functions; it conforms
@@ -356,8 +356,10 @@ void __pformat_puts( const char *s, __pformat_t *stream )
    * to the `__pformat()' output stream.
    *
    * This is implemented as a trivial call to `__pformat_putchars()',
-   * passing the length of the input string as the character count.
+   * passing the length of the input string as the character count,
+   * (after first verifying that the input pointer is not NULL).
    */
+  if( s == NULL ) s = "(null)";
   __pformat_putchars( s, strlen( s ), stream );
 }
 
@@ -434,8 +436,10 @@ void __pformat_wcputs( const wchar_t *s, __pformat_t *stream )
    * the input string, to the `__pformat()' output stream.
    *
    * This is implemented as a trivial call to `__pformat_wputchars()',
-   * passing the length of the input string as the character count.
+   * passing the length of the input string as the character count,
+   * (after first verifying that the input pointer is not NULL).
    */
+  if( s == NULL ) s = L"(null)";
   __pformat_wputchars( s, wcslen( s ), stream );
 }
 
@@ -2508,4 +2512,4 @@ int __pformat( int flags, void *dest, int max, const char *fmt, va_list argv )
   return stream.count;
 }
 
-/* $RCSfile: pformat.c,v $Revision: 1.1 $: end of file */
+/* $RCSfile: pformat.c,v $Revision: 1.2 $: end of file */

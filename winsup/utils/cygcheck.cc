@@ -58,7 +58,7 @@ void package_list (int, char **);
 void dump_dodgy_apps (int verbose);
 
 
-static const char version[] = "$Revision: 1.103 $";
+static const char version[] = "$Revision: 1.104 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -2003,7 +2003,7 @@ void
 nuke (char *ev)
 {
   int n = 1 + strchr (ev, '=') - ev;
-  char *s = (char *) alloca (n + 1);
+  char *s = (char *) malloc (n + 1);
   memcpy (s, ev, n);
   s[n] = '\0';
   putenv (s);
@@ -2051,7 +2051,7 @@ load_cygwin (int& argc, char **&argv)
 	    }
 	  for (char **ev = envp; *ev; ev++)
 	    if (strncmp (*ev, "PATH=", 5) != 0)
-	     putenv (*ev);
+	      putenv (strdup (*ev));
 	  if (path)
 	    putenv (path);
 	}

@@ -176,7 +176,7 @@ extern void
 #define GDBTK_SYMBOL_SOURCE_NAME(symbol) \
       (SYMBOL_DEMANGLED_NAME (symbol) != NULL \
        ? SYMBOL_DEMANGLED_NAME (symbol)       \
-       : DEPRECATED_SYMBOL_NAME (symbol))
+       : SYMBOL_PRINT_NAME (symbol))
 
 
 /* gdbtk_add_hooks - add all the hooks to gdb.  This will get called

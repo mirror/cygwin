@@ -122,7 +122,7 @@ gdb_block_vars (ClientData clientData, Tcl_Interp *interp,
 		case LOC_REGISTER:        /* register              */
 		case LOC_COMPUTED:	  /* computed location     */
 		  Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
-					    Tcl_NewStringObj (DEPRECATED_SYMBOL_NAME (sym),
+					    Tcl_NewStringObj (SYMBOL_PRINT_NAME (sym),
 							      -1));
 		  break;
 
@@ -337,7 +337,7 @@ gdb_get_vars_command (ClientData clientData, Tcl_Interp *interp,
 	    case LOC_REGPARM_ADDR:	/* indirect register arg */
 	      if (arguments)
 		Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
-					  Tcl_NewStringObj (DEPRECATED_SYMBOL_NAME (sym), -1));
+					  Tcl_NewStringObj (SYMBOL_PRINT_NAME (sym), -1));
 	      break;
 	    case LOC_LOCAL:	/* stack local           */
 	    case LOC_STATIC:	/* static                */
@@ -345,7 +345,7 @@ gdb_get_vars_command (ClientData clientData, Tcl_Interp *interp,
 	    case LOC_COMPUTED:	/* computed location     */
 	      if (!arguments)
 		Tcl_ListObjAppendElement (interp, result_ptr->obj_ptr,
-					  Tcl_NewStringObj (DEPRECATED_SYMBOL_NAME (sym), -1));
+					  Tcl_NewStringObj (SYMBOL_PRINT_NAME (sym), -1));
 	      break;
 	    }
 	}

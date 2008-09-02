@@ -1,3 +1,11 @@
+2008-09-02  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-cmds.c (gdb_listfuncs): Use SYMBOL_PRINT_NAME
+	instead of DEPRECATED_SYMBOL_NAME.
+	* generic/gdbtk-stack.c (gdb_block_vars): Likewise.
+	(gdb_get_vars_command): Likewise.
+	* generic/gdbtk.h (GDBTK_SYMBOL_SOURCE_NAME): Likewise.
+
 2008-08-02  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-cmds.c: Don't include itcl.h.

@@ -1495,7 +1495,7 @@ gdb_listfuncs (clientData, interp, objc, objv)
 		}
 	      else
 		{
-		  funcVals[0] = Tcl_NewStringObj (DEPRECATED_SYMBOL_NAME (sym), -1);
+		  funcVals[0] = Tcl_NewStringObj (SYMBOL_PRINT_NAME (sym), -1);
 		  funcVals[1] = not_mangled;
 		}
 	      Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,

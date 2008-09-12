@@ -22,7 +22,7 @@
 #include <windows.h>
 #include <getopt.h>
 
-static const char version[] = "$Revision: 1.10 $";
+static const char version[] = "$Revision: 1.11 $";
 static char *prog_name;
 
 static struct option longopts[] =
@@ -161,10 +161,12 @@ static HANDLE
 lookup_thread_id (DWORD threadId, int *tix)
 {
   int i;
+  *tix = 0;
   for (i=0; i<num_active_threads; i++)
     if (active_thread_ids[i] == threadId)
       {
-	if (tix) *tix = i;
+	if (tix)
+	  *tix = i;
 	return active_threads[i];
       }
   return 0;

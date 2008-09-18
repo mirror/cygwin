@@ -1,3 +1,12 @@
+2008-09-18  Keith Seitz  <keiths@redhat.com>
+
+	From Pedro Alves  <pedro@codesourcery.com>:
+	* generic/gdbtk-cmds.c (gdb_cmd, gdb_immediate_command): Adjust to
+	new bpstat_do_actions inferface.
+	* generic/gdbtk-hooks.c: Include gdbthread.h.
+	(gdbtk_annotate_signal): Get the stop_signal from the current
+	thread.
+
 2008-09-02  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-cmds.c (gdb_listfuncs): Use SYMBOL_PRINT_NAME

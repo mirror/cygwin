@@ -701,7 +701,7 @@ gdb_cmd (ClientData clientData, Tcl_Interp *interp,
       result_ptr->flags |= GDBTK_TO_RESULT;
     }
 
-  bpstat_do_actions (&stop_bpstat);
+  bpstat_do_actions ();
 
   return TCL_OK;
 }
@@ -752,7 +752,7 @@ gdb_immediate_command (ClientData clientData, Tcl_Interp *interp,
 
   execute_command (Tcl_GetStringFromObj (objv[1], NULL), from_tty);
 
-  bpstat_do_actions (&stop_bpstat);
+  bpstat_do_actions ();
 
   result_ptr->flags |= GDBTK_TO_RESULT;
 

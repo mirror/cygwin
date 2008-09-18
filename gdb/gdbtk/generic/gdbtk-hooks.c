@@ -33,6 +33,7 @@
 #include "annotate.h"
 #include "cli/cli-decode.h"
 #include "observer.h"
+#include "gdbthread.h"
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -794,9 +795,10 @@ gdbtk_error_begin ()
 
 /* notify GDBtk when a signal occurs */
 static void
-gdbtk_annotate_signal ()
+gdbtk_annotate_signal (void)
 {
   char *buf;
+  struct thread_info *tp = inferior_thread ();
 
   /* Inform gui that the target has stopped. This is
      a necessary stop button evil. We don't want signal notification
@@ -804,8 +806,9 @@ gdbtk_annotate_signal ()
      timeout. */
   Tcl_Eval (gdbtk_interp, "gdbtk_stop_idle_callback");
 
-  xasprintf (&buf, "gdbtk_signal %s {%s}", target_signal_to_name (stop_signal),
-	     target_signal_to_string (stop_signal));
+  xasprintf (&buf, "gdbtk_signal %s {%s}",
+	     target_signal_to_name (tp->stop_signal),
+	     target_signal_to_string (tp->stop_signal));
   if (Tcl_Eval (gdbtk_interp, buf) != TCL_OK)
     report_error ();
   free(buf);

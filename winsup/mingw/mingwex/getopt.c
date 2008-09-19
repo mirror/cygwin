@@ -1,7 +1,7 @@
 /* 
  * getopt.c
  *
- * $Id: getopt.c,v 1.5 2008/08/31 22:27:58 keithmarshall Exp $
+ * $Id: getopt.c,v 1.6 2008/09/19 22:41:01 keithmarshall Exp $
  *
  * Implementation of the `getopt', `getopt_long' and `getopt_long_only'
  * APIs, for inclusion in the MinGW runtime library.
@@ -21,9 +21,9 @@
  * DISCLAIMED. This includes but is not limited to warranties of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * $Revision: 1.5 $
+ * $Revision: 1.6 $
  * $Author: keithmarshall $
- * $Date: 2008/08/31 22:27:58 $
+ * $Date: 2008/09/19 22:41:01 $
  *
  */
 
@@ -283,12 +283,12 @@ struct option *opt, int index, int *retindex, const CHAR *optstring )
 
   /* when the caller has provided a return buffer ...
    */
-  if( retindex != NULL )
+  if( opt[index].flag != NULL )
   {
     /* ... then we place the proper return value there,
      * and return a status code of zero ...
      */
-    *retindex = opt[index].val;
+    *(opt[index].flag) = opt[index].val;
     return 0;
   }
   /* ... otherwise, the return value becomes the status code.
@@ -646,4 +646,4 @@ __weak_alias( getopt_long, _getopt_long )
 __weak_alias( getopt_long_only, _getopt_long_only )
 #endif
 
-/* $RCSfile: getopt.c,v $Revision: 1.5 $: end of file */
+/* $RCSfile: getopt.c,v $Revision: 1.6 $: end of file */

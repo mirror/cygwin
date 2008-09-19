@@ -1,3 +1,9 @@
+2008-09-19  Denis Pilat  <denis.pilat@st.com>
+
+	* generic/gdbtk-bp.c (gdb_get_breakpoint_info): Manage the case of NULL
+	location to handle pending breakpoint in a better way.
+	(gdb_find_bp_at_addr): Likewise.
+
 2008-09-18  Keith Seitz  <keiths@redhat.com>
 
 	From Pedro Alves  <pedro@codesourcery.com>:

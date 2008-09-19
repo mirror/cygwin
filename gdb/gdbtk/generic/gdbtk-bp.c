@@ -221,7 +221,7 @@ gdb_find_bp_at_addr (ClientData clientData, Tcl_Interp *interp,
   Tcl_SetListObj (result_ptr->obj_ptr, 0, NULL);
   for (i = 0; i < breakpoint_list_size; i++)
     {
-      if (breakpoint_list[i] != NULL
+      if (breakpoint_list[i] != NULL && breakpoint_list[i]->loc != NULL
 	  && breakpoint_list[i]->loc->address == addr)
 	Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
 				  Tcl_NewIntObj (i));
@@ -290,6 +290,7 @@ gdb_get_breakpoint_info (ClientData clientData, Tcl_Interp *interp, int objc,
   int bpnum;
   struct breakpoint *b;
   char *funcname, *filename;
+  int isPending = 0;
 
   Tcl_Obj *new_obj;
 
@@ -312,26 +313,41 @@ gdb_get_breakpoint_info (ClientData clientData, Tcl_Interp *interp, int objc,
       return TCL_ERROR;
     }
 
-  sal = find_pc_line (b->loc->address, 0);
-
-  filename = symtab_to_filename (sal.symtab);
-  if (filename == NULL)
-    filename = "";
-
+  isPending = (b->loc == NULL);
   Tcl_SetListObj (result_ptr->obj_ptr, 0, NULL);
-  Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
-			    Tcl_NewStringObj (filename, -1));
+  /* Pending breakpoints will display "<PENDING>" as the file name and the 
+     user expression into the Function field of the breakpoint view.
+    "0" and "0" in the line number and address field.  */
+  if (isPending)
+    {
+      Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
+                                Tcl_NewStringObj ("<PENDING>", -1));
+      Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
+                                Tcl_NewStringObj (b->addr_string, -1));
+      Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
+                                Tcl_NewIntObj (0));
+      Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
+                                Tcl_NewIntObj (0));
+    }
+  else
+    {
+      sal = find_pc_line (b->loc->address, 0);
 
-  funcname = pc_function_name (b->loc->address);
-  new_obj = Tcl_NewStringObj (funcname, -1);
-  Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr, new_obj);
+      filename = symtab_to_filename (sal.symtab);
+      if (filename == NULL)
+        filename = "";
+      Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
+                                Tcl_NewStringObj (filename, -1));
+      funcname = pc_function_name (b->loc->address);
+      Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
+                                Tcl_NewStringObj (funcname, -1));
+      Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
+                                Tcl_NewIntObj (b->line_number));
+      Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
+                                Tcl_NewStringObj (core_addr_to_string
+                               (b->loc->address), -1));
+  }
 
-  Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
-			    Tcl_NewIntObj (b->line_number));
-  Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
-			    Tcl_NewStringObj (core_addr_to_string
-					      (b->loc->address),
-					      -1));
   Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,
 			    Tcl_NewStringObj (bptypes[b->type], -1));
   Tcl_ListObjAppendElement (NULL, result_ptr->obj_ptr,

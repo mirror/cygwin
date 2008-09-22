@@ -1,3 +1,8 @@
+2008-09-22  Keith Seitz  <keiths@redhat.com>
+
+	* generic/gdbtk-cmds.c (gdb_clear_file): The global "attach_flag"
+	is now per-inferior.
+
 2008-09-19  Denis Pilat  <denis.pilat@st.com>
 
 	* generic/gdbtk-bp.c (gdb_get_breakpoint_info): Manage the case of NULL

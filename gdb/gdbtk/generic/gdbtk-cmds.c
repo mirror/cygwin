@@ -456,7 +456,8 @@ gdb_clear_file (ClientData clientData, Tcl_Interp *interp,
 
   if (! ptid_equal (inferior_ptid, null_ptid) && target_has_execution)
     {
-      if (attach_flag)
+      struct inferior *inf = current_inferior ();
+      if (inf->attach_flag)
 	target_detach (NULL, 0);
       else
 	target_kill ();

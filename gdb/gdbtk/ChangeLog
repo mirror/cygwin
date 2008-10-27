@@ -1,7 +1,7 @@
 2008-10-27  Keith Seitz  <keiths@redhat.com>
 
-	* generic/gdbtk-stack.c (get_gdb_vars_command): Remove superfluous
-	ampersand from assignment.
+	* generic/gdbtk-stack.c (get_gdb_vars_command): clientData is an
+	int, not a pointer to int.
 
 2008-09-22  Keith Seitz  <keiths@redhat.com>
 

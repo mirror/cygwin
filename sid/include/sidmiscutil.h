@@ -332,13 +332,13 @@ namespace sidutil
   {
     std::vector<std::string> search_directories;
 
-    char* slp = getenv ("SID_LIBRARY_PATH"); // run-time configuration
+    const char* slp = getenv ("SID_LIBRARY_PATH"); // run-time configuration
     if (slp)
       {
 	search_directories = tokenize (slp, ":");
       }
     
-    char* sep = getenv ("SID_EXEC_PREFIX"); // install-time configuration
+    const char* sep = getenv ("SID_EXEC_PREFIX"); // install-time configuration
 #ifdef __CYGWIN__
     char conv_fn[PATH_MAX*2];
     if (sep)

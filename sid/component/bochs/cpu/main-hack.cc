@@ -48,7 +48,7 @@ void   bx_close_harddrive(void);
 
 void bx_init_debug(void);
 void bx_emulate_hga_dumps_timer(void);
-static char *divider = "========================================================================";
+static const char *divider = "========================================================================";
 
 
 /* typedefs */
@@ -145,7 +145,7 @@ iofunctions::init_log(char *fn)
 	// use newfd/newfn so that we can log the message to the OLD log
 	// file descriptor.
 	FILE *newfd = stderr;
-	char *newfn = "/dev/stderr";
+	const char *newfn = "/dev/stderr";
 	if( strcmp( fn, "-" ) != 0 ) {
 		newfd = fopen(fn, "w");
 		if(newfd != NULL) {
@@ -195,7 +195,7 @@ iofunctions::init_log(int fd)
 //    fmt and ap retained for direct printinf from iofunctions only!
 
 void
-iofunctions::out(int f, int l, char *prefix, char *fmt, va_list ap)
+iofunctions::out(int f, int l, const char *prefix, const char *fmt, va_list ap)
 {
 	assert (magic==MAGIC_LOGNUM);
 	assert (this != NULL);
@@ -290,7 +290,7 @@ logfunctions::setio(iofunc_t *i)
 }
 
 void
-logfunctions::setprefix(char *p)
+logfunctions::setprefix(const char *p)
 {
 	this->prefix=strdup(p);
 }
@@ -302,7 +302,7 @@ logfunctions::settype(int t)
 }
 
 void
-logfunctions::info(char *fmt, ...)
+logfunctions::info(const char *fmt, ...)
 {
 	va_list ap;
 	FILE *fs;
@@ -320,7 +320,7 @@ logfunctions::info(char *fmt, ...)
 }
 
 void
-logfunctions::error(char *fmt, ...)
+logfunctions::error(const char *fmt, ...)
 {
 	va_list ap;
 	FILE *fs;
@@ -337,7 +337,7 @@ logfunctions::error(char *fmt, ...)
 }
 
 void
-logfunctions::panic(char *fmt, ...)
+logfunctions::panic(const char *fmt, ...)
 {
 	va_list ap;
 	FILE *fs;
@@ -354,7 +354,7 @@ logfunctions::panic(char *fmt, ...)
 }
 
 void
-logfunctions::ldebug(char *fmt, ...)
+logfunctions::ldebug(const char *fmt, ...)
 {
 	va_list ap;
 	FILE *fs;
@@ -371,7 +371,7 @@ logfunctions::ldebug(char *fmt, ...)
 }
 
 void
-logfunctions::fatal (char *prefix, char *fmt, va_list ap)
+logfunctions::fatal (const char *prefix, const char *fmt, va_list ap)
 {
   static int fatal_reentry = 0;
   if (fatal_reentry) return;

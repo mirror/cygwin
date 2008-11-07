@@ -283,7 +283,7 @@ extern Bit8u DTPageDirty[];
 #define MAX_LOGLEV   4
 
 typedef class logfunctions {
-	char *prefix;
+	const char *prefix;
 	int type;
 // values of onoff: 0=ignore, 1=report, 2=fatal
 #define ACT_IGNORE 0
@@ -296,12 +296,12 @@ public:
 	logfunctions(class iofunctions *);
 	~logfunctions(void);
 
-	void info(char *fmt, ...);
-	void error(char *fmt, ...);
-	void panic(char *fmt, ...);
-	void ldebug(char *fmt, ...);
-	void fatal (char *prefix, char *fmt, va_list ap);
-	void setprefix(char *);
+	void info(const char *fmt, ...);
+	void error(const char *fmt, ...);
+	void panic(const char *fmt, ...);
+	void ldebug(const char *fmt, ...);
+	void fatal (const char *prefix, const char *fmt, va_list ap);
+	void setprefix(const char *);
 	void settype(int);
 	void setio(class iofunctions *);
 	void setonoff(int loglev, int value) { onoff[loglev] = value; }
@@ -313,8 +313,8 @@ class iofunctions {
 	class logfunctions *log;
 	void init(void);
 	void flush(void);
-	char *getlevel(int i) {
-		static char *loglevel[] = {
+	const char *getlevel(int i) {
+		static const char *loglevel[] = {
 			"DEBUG",
 			"INFO",
 			"ERROR",
@@ -323,8 +323,8 @@ class iofunctions {
 		return loglevel[i];
 	}
 
-	char *getclass(int i) {
-		char *logclass[] = {
+	const char *getclass(int i) {
+		static const char *logclass[] = {
 		  "IO  ",
 		  "FD  ",
 		  "GEN ",
@@ -421,7 +421,7 @@ public:
 	iofunctions(char *);
 	~iofunctions(void);
 
-	void out(int facility, int level, char *pre, char *fmt, va_list ap);
+	void out(int facility, int level, const char *pre, const char *fmt, va_list ap);
 
 	void init_log(char *fn);
 	void init_log(int fd);
@@ -434,7 +434,7 @@ protected:
 	int n_logfn;
 #define MAX_LOGFNS 64
 	logfunc_t *logfn_list[MAX_LOGFNS];
-	char *logfn;
+	const char *logfn;
 };
 
 typedef class iofunctions iofunc_t;

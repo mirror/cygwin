@@ -189,7 +189,7 @@ namespace sidutil
       typedef int exp_t;
       typedef sid::host_int_8 fraction_t;
       
-      typedef enum round_mode_t
+      enum round_mode_t
 	{
 	  round_default,
 	  round_near,
@@ -198,14 +198,14 @@ namespace sidutil
 	  round_down
 	};
       
-      typedef enum denorm_t
+      enum denorm_t
 	{
 	  denorm_default,
 	  denorm_underflow_inexact,
 	  denorm_zero
 	};
       
-      typedef enum class_t
+      enum class_t
 	{
 	  class_zero,
 	  class_snan,

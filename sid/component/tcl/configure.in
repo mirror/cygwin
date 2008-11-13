@@ -64,7 +64,8 @@ dnl AC_MSG_RESULT($with_blt_lib)
 
 
 
-CPPFLAGS="$CPPFLAGS $with_tcl_include $with_tk_include $with_blt_include"
+EXTRA_INCLUDES="$with_tcl_include $with_tk_include $with_blt_include"
+AC_SUBST(EXTRA_INCLUDES)
 
 case "$host" in
 

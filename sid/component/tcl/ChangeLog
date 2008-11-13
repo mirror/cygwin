@@ -1,3 +1,10 @@
+2008-11-13  Frank Ch. Eigler  <fche@elastic.org>
+
+	From Alon Bar-Lev <alon.barlev@gmail.com>:
+	* configure.am (EXTRA_INCLUDES): New macro.
+	* Makefile.am: Use it to supplement CPPFLAGS.
+	* aclocal.m4, configure.in, Makefile.in: Regenerated.
+
 2005-08-19  Dave Brolley  <brolley@redhat.com>
 
 	* Contribute the following changes:

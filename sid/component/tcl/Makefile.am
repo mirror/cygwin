@@ -5,7 +5,7 @@ ACLOCAL_AMFLAGS = -I $(srcdir)/../../config
 
 pkglib_LTLIBRARIES = libtclapi.la
 
-INCLUDES = -I. -I../../include -I$(srcdir)/../../include
+INCLUDES = -I. -I../../include -I$(srcdir)/../../include $(EXTRA_INCLUDES)
 
 pkgdata_DATA = sid-control-tksm.tk hw-visual-probe-bus.blt bridge-tcl.tcl bridge-tk.tk bridge-blt.blt bridge-tcl.txt sid-api-trace.tcl hw-visual-probe-pin.tk
 noinst_DATA = tester.tcl

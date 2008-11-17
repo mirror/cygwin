@@ -36,7 +36,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)param.h	8.3 (Berkeley) 4/4/95
- * $Id: param.h,v 1.3 2004/05/07 20:29:24 jjohnstn Exp $
+ * $Id: param.h,v 1.4 2008/11/17 22:05:12 jjohnstn Exp $
  */
 
 #ifndef _SYS_PARAM_H_
@@ -93,7 +93,6 @@
 #include <sys/resource.h>
 #include <sys/ucred.h>
 #include <sys/uio.h>
-#include <sys/rtprio.h>
 
 #ifndef FALSE
 #define	FALSE	0

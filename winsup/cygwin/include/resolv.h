@@ -50,7 +50,7 @@
 
 /*
  *	@(#)resolv.h	8.1 (Berkeley) 6/2/93
- *	$Id: resolv.h,v 1.2 2008/06/17 10:05:28 corinna Exp $
+ *	$Id: resolv.h,v 1.3 2008/12/09 16:09:46 corinna Exp $
  */
 
 #ifndef _RESOLV_H_
@@ -66,6 +66,7 @@
 #include <sys/socket.h>
 #include <stdio.h>
 #include <arpa/nameser.h>
+#include <netinet/in.h>
 
 /*
  * Revision information.  This is the release date in YYYYMMDD format.

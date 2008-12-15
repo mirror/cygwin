@@ -1,3 +1,18 @@
+2008-12-15  Kevin Buettner  <kevinb@redhat.com>
+
+	* generic/gdbtk-cmds.c (valprint.h): Include.
+	(gdb_eval): Fetch print options via get_formatted_print_options.
+	Update call to val_print.
+	(gdb_update_mem): Likewise, but for print_scalar_formatted.
+	* generic/gdbtk-register.c (valprint.h): Include.
+	(get_register): Use get_formatted_print_options.  Update calls
+	to val_print.
+	* generic/gdbtk-wrapper.c (valprint.h): Include.
+	(wrap_val_print): Use get_formatted_print_options.  Delete
+	variables deref_ref and pretty; assign to equivalent fields
+	in the value_print_options struct instead.  Update call to
+	val_print.
+
 2008-10-27  Keith Seitz  <keiths@redhat.com>
 
 	* generic/gdbtk-stack.c (get_gdb_vars_command): clientData is an

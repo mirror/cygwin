@@ -25,6 +25,7 @@
 #include "block.h"
 #include "exceptions.h"
 #include "language.h"
+#include "valprint.h"
 #include "gdbtk-wrapper.h"
 
 /*
@@ -204,21 +205,21 @@ wrap_val_print (char *a)
   CORE_ADDR address;
   struct ui_file *stream;
   int format;
-  int deref_ref;
   int recurse;
-  enum val_prettyprint pretty;
+  struct value_print_options opts;
 
   type = (struct type *) (*args)->args[0].ptr;
   valaddr = (gdb_byte *) (*args)->args[1].ptr;
   address = *(CORE_ADDR *) (*args)->args[2].ptr;
   stream = (struct ui_file *) (*args)->args[3].ptr;
   format = (*args)->args[4].integer;
-  deref_ref = (*args)->args[5].integer;
+  get_formatted_print_options (&opts, format);
+  opts.deref_ref = (*args)->args[5].integer;
   recurse = (*args)->args[6].integer;
-  pretty = (enum val_prettyprint) (*args)->args[7].integer;
+  opts.pretty = (enum val_prettyprint) (*args)->args[7].integer;
 
-  val_print (type, valaddr, 0, address, stream, format, deref_ref,
-	     recurse, pretty, current_language);
+  val_print (type, valaddr, 0, address, stream, recurse, &opts,
+             current_language);
   return 1;
 }
 

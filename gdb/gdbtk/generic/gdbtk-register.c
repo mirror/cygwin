@@ -26,6 +26,7 @@
 #include "target.h"
 #include "gdb_string.h"
 #include "language.h"
+#include "valprint.h"
 
 #include <tcl.h>
 #include "gdbtk.h"
@@ -329,16 +330,22 @@ get_register (int regnum, map_arg arg)
     }
   else
     {
+      struct value_print_options opts;
+
+      get_formatted_print_options (&opts, format);
+      opts.deref_ref = 1;
+      opts.pretty = Val_pretty_default;
+
       if ((TYPE_CODE (reg_vtype) == TYPE_CODE_UNION)
 	  && (strcmp (FIELD_NAME (TYPE_FIELD (reg_vtype, 0)), 
 		      gdbarch_register_name (current_gdbarch, regnum)) == 0))
 	{
 	  val_print (FIELD_TYPE (TYPE_FIELD (reg_vtype, 0)), buffer, 0, 0,
-		     stb, format, 1, 0, Val_pretty_default, current_language);
+		     stb, 0, &opts, current_language);
 	}
       else
 	val_print (reg_vtype, buffer, 0, 0,
-		   stb, format, 1, 0, Val_pretty_default, current_language);
+		   stb, 0, &opts, current_language);
     }
   
   res = ui_file_xstrdup (stb, &dummy);

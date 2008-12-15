@@ -43,6 +43,7 @@
 #include "exceptions.h"
 #include "language.h"
 #include "target.h"
+#include "valprint.h"
 
 /* tcl header files includes varargs.h unless HAS_STDARG is defined,
    but gdb uses stdarg.h, so make sure HAS_STDARG is defined.  */
@@ -614,6 +615,7 @@ gdb_eval (ClientData clientData, Tcl_Interp *interp,
   struct ui_file *stb;
   long dummy;
   char *result;
+  struct value_print_options opts;
 
   if (objc != 2 && objc != 3)
     {
@@ -624,6 +626,8 @@ gdb_eval (ClientData clientData, Tcl_Interp *interp,
   if (objc == 3)
     format = *(Tcl_GetStringFromObj (objv[2], NULL));
 
+  get_formatted_print_options (&opts, format);
+
   expr = parse_expression (Tcl_GetStringFromObj (objv[1], NULL));
   old_chain = make_cleanup (free_current_contents, &expr);
   val = evaluate_expression (expr);
@@ -633,7 +637,7 @@ gdb_eval (ClientData clientData, Tcl_Interp *interp,
   make_cleanup_ui_file_delete (stb);
   val_print (value_type (val), value_contents (val),
 	     value_embedded_offset (val), VALUE_ADDRESS (val),
-	     stb, format, 0, 0, 0, current_language);
+	     stb, 0, &opts, current_language);
   result = ui_file_xstrdup (stb, &dummy);
   Tcl_SetObjResult (interp, Tcl_NewStringObj (result, -1));
   xfree (result);
@@ -2529,9 +2533,13 @@ gdb_update_mem (ClientData clientData, Tcl_Interp *interp,
 	}
       else
 	{
+	  struct value_print_options opts;
+
+	  get_formatted_print_options (&opts, format);
+
 	  /* print memory to our uiout file and set the table's variable */
 	  ui_file_rewind (stb);
-	  print_scalar_formatted (mptr, val_type, format, asize, stb);
+	  print_scalar_formatted (mptr, val_type, &opts, asize, stb);
 	  tmp = ui_file_xstrdup (stb, &dummy);
 
 	  /* See comments above on max_*_len */

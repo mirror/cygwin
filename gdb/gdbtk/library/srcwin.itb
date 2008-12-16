@@ -1026,6 +1026,8 @@ itcl::body SrcWin::_choose_window {file} {
 #  Choose the right source window and then cause it to be updated
 # ------------------------------------------------------------------
 itcl::body SrcWin::choose_and_update {} {
+  global gdb_exe_name
+
   if {$pc_window == ""} then {
     set pc_window [lindex $window_list 0]
   }
@@ -1039,10 +1041,12 @@ itcl::body SrcWin::choose_and_update {} {
     set file [lindex $loc 2]
     set pc_window [_choose_window $file]
     debug "chose window $pc_window"
-    $pc_window _update $loc
-    if {$pc_window != $prev} then {
-      $pc_window reveal
-      $prev _set_tag_to_stack
+    if {$gdb_exe_name != ""} {
+      $pc_window _update $loc
+      if {$pc_window != $prev} then {
+        $pc_window reveal
+        $prev _set_tag_to_stack
+      }
     }
   }
 }

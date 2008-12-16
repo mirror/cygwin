@@ -2951,7 +2951,7 @@ itcl::body SrcTextWin::_clear_cache {} {
 
   # delete all cached frames
   foreach p [array names Stwc *:pane] {
-    set p [lindex [split $p :] 0]
+    set p [string trimright $p ":pane"]
     if {$p != "gdbtk_scratch_widget"} {
       catch {
 	#debug "clearing cache: \"$p\""

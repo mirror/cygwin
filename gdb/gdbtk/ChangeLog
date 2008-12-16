@@ -1,3 +1,11 @@
+2008-12-16  Denis Pilat  <denis.pilat@st.com> 
+	on behalf of Nunzio Raciti  <nunzio.raciti@st.com>
+
+	* library/srctextwin.itb (_clear_cache): Take care of $p variable that
+	could contains ":" for source pane on windows hosts.
+	* library/srcwin.itb (choose_and_update): Avoid updating the "source"
+	window if target executable name is empty.
+
 2008-12-15  Kevin Buettner  <kevinb@redhat.com>
 
 	* generic/gdbtk-cmds.c (valprint.h): Include.

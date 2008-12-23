@@ -1144,9 +1144,9 @@
 	     (if setter
 		 "fn_"
 		 "")
-	     (string-downcase (if sem-mode
+	     (string-downcase (symbol->string (if sem-mode
 				  (mode-real-name sem-mode)
-				  (mode-real-name mode))))))
+				  (mode-real-name mode)))))))
      "_write (current_cpu"
      ; ??? May need to include h/w id some day.
      (if setter

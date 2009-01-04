@@ -2,7 +2,7 @@
 /* 
  * getopt.h
  *
- * $Id: getopt.h,v 1.3 2008/08/31 22:27:58 keithmarshall Exp $
+ * $Id: getopt.h,v 1.4 2009/01/04 17:35:36 keithmarshall Exp $
  *
  * Defines constants and function prototypes required to implement
  * the `getopt', `getopt_long' and `getopt_long_only' APIs.
@@ -22,9 +22,9 @@
  * DISCLAIMED. This includes but is not limited to warranties of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * $Revision: 1.3 $
+ * $Revision: 1.4 $
  * $Author: keithmarshall $
- * $Date: 2008/08/31 22:27:58 $
+ * $Date: 2009/01/04 17:35:36 $
  *
  */
 #define __GETOPT_H__
@@ -45,6 +45,17 @@ extern char *optarg;		/* pointer to argument of current option  */
 
 extern int getopt( int, char * const [], const char * );
 
+#ifdef _BSD_SOURCE
+/*
+ * BSD adds the non-standard `optreset' feature, for reinitialisation
+ * of `getopt' parsing.  We support this feature, for applications which
+ * proclaim their BSD heritage, before including this header; however,
+ * to maintain portability, developers are advised to avoid it.
+ */
+# define optreset  __mingw_optreset
+
+extern int optreset;
+#endif
 #ifdef __cplusplus
 }
 #endif
@@ -97,4 +108,4 @@ extern int getopt_long_only( int, char * const [], const char *, const struct op
 #endif
 
 #endif /* !defined(__UNISTD_H_SOURCED__) && !defined(__GETOPT_LONG_H__) */
-/* $RCSfile: getopt.h,v $Revision: 1.3 $: end of file */
+/* $RCSfile: getopt.h,v $Revision: 1.4 $: end of file */

@@ -1,7 +1,7 @@
 /* 
  * getopt.c
  *
- * $Id: getopt.c,v 1.7 2008/10/03 22:56:18 keithmarshall Exp $
+ * $Id: getopt.c,v 1.8 2009/01/04 17:35:36 keithmarshall Exp $
  *
  * Implementation of the `getopt', `getopt_long' and `getopt_long_only'
  * APIs, for inclusion in the MinGW runtime library.
@@ -21,9 +21,9 @@
  * DISCLAIMED. This includes but is not limited to warranties of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * $Revision: 1.7 $
+ * $Revision: 1.8 $
  * $Author: keithmarshall $
- * $Date: 2008/10/03 22:56:18 $
+ * $Date: 2009/01/04 17:35:36 $
  *
  */
 
@@ -86,6 +86,14 @@ enum
 };
 
 int optopt = getopt_unknown;	/* return value for option being evaluated   */
+
+/* Some BSD applications expect to be able to reinitialise `getopt' parsing
+ * by setting a global variable called `optreset'.  We provide an obfuscated
+ * API, which allows applications to emulate this brain damage; however, any
+ * use of this is non-portable, and is strongly discouraged.
+ */
+#define optreset  __mingw_optreset
+int optreset = 0;
 
 static __inline__
 int getopt_missing_arg( const CHAR *optstring )
@@ -313,7 +321,7 @@ int getopt_parse( int mode, getopt_std_args, ... )
   static const CHAR *nextchar = NULL;
   static int optmark = 0;
 
-  if( optind < optbase )
+  if( (optreset |= (optind < 1)) || (optind < optbase) )
   {
     /* POSIX does not prescribe any definitive mechanism for restarting
      * a `getopt' scan, but some applications may require such capability.
@@ -325,7 +333,25 @@ int getopt_parse( int mode, getopt_std_args, ... )
      * adjusting all of the internal placeholders to one less than the
      * adjusted `optind' value, (but never to less than zero).
      */
-    optmark = optbase = argind = (optind > 0) ? optind - 1 : 0;
+    if( optreset )
+    {
+      /* User has explicitly requested reinitialisation...
+       * We need to reset `optind' to it's normal initial value of 1,
+       * to avoid a potential infinitely recursive loop; by doing this
+       * up front, we also ensure that the remaining placeholders will
+       * be correctly reinitialised to no less than zero.
+       */
+      optind = 1;
+
+      /* We also need to clear the `optreset' request...
+       */
+      optreset = 0;
+    }
+
+    /* Now, we may safely reinitialise the internal placeholders, to
+     * one less than `optind', without fear of making them negative.
+     */
+    optmark = optbase = argind = optind - 1;
     nextchar = NULL;
   }
 
@@ -664,4 +690,4 @@ __weak_alias( getopt_long, _getopt_long )
 __weak_alias( getopt_long_only, _getopt_long_only )
 #endif
 
-/* $RCSfile: getopt.c,v $Revision: 1.7 $: end of file */
+/* $RCSfile: getopt.c,v $Revision: 1.8 $: end of file */

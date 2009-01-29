@@ -58,7 +58,7 @@ void package_list (int, char **);
 void dump_dodgy_apps (int verbose);
 
 
-static const char version[] = "$Revision: 1.109 $";
+static const char version[] = "$Revision: 1.110 $";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -1208,6 +1208,8 @@ dump_sysinfo ()
   bool is_nt = false;
   bool more_info = true;
   char osname[128];
+  DWORD obcaseinsensitive = 1;
+  HKEY key;
 
   printf ("\nCygwin Configuration Diagnostics\n");
   time (&now);
@@ -1522,6 +1524,17 @@ dump_sysinfo ()
     }
   else
     printf ("Use '-r' to scan registry\n\n");
+
+  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE,
+                  "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\kernel",
+                  0, KEY_READ, &key) == ERROR_SUCCESS)
+    {
+      DWORD size;
+      RegQueryValueEx (key, "obcaseinsensitive", NULL, NULL,
+                       (LPBYTE) &obcaseinsensitive, &size);
+      RegCloseKey (key);
+    }
+  printf ("obcaseinsensitive set to %d\n\n", obcaseinsensitive);
 
   if (givehelp)
     {

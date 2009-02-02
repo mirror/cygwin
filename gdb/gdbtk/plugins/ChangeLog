@@ -1,3 +1,8 @@
+2009-02-02  Doug Evans  <dje@google.com>
+
+	* aclocal.m4: Regenerate.
+	* configure: Regenerate.
+
 2007-07-26  Maciej W. Rozycki  <macro@mips.com>
 
 	* Make-rules (html): Add goal.
